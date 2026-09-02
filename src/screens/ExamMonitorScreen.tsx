@@ -158,7 +158,7 @@ export default function ExamMonitorScreen() {
                     <td className="p-2">{new Date(r.thoiGianNop).toLocaleTimeString('vi-VN')}</td>
                     <td className="p-2 text-right font-semibold">{r.score ? r.score.total.toFixed(2) : '—'}</td>
                     <td className="p-2">{r.score ? classify(r.score.total) : ''}</td>
-                    <td className={`p-2 text-right ${r.leaveCount >= 2 ? 'text-rose-600 font-semibold' : ''}`}>
+                    <td className={`p-2 text-right ${r.leaveCount >= 1 ? 'text-rose-600 font-semibold' : ''}`}>
                       {r.leaveCount > 0 ? `${r.leaveCount} lần / ${r.totalHiddenSec}s` : '—'}
                     </td>
                     <td className="p-2">
@@ -178,7 +178,7 @@ export default function ExamMonitorScreen() {
           <p className="text-xs text-slate-400">
             Cột "Rời app" đếm số lần &amp; tổng thời gian học sinh chuyển tab/tắt màn hình lúc làm bài — không phát
             hiện được chụp ảnh màn hình (không trình duyệt nào cho phép web làm việc này), chỉ để thầy tham khảo
-            thêm. "Nghi gian lận" là bài bị hệ thống tự khoá + tự nộp do rời màn hình từ 2 lần trở lên.
+            thêm. "Gian lận" là bài bị hệ thống tự khoá + tự nộp ngay lần đầu rời màn hình (quy định từ 2/9/2026).
           </p>
 
           <div className="flex gap-2">

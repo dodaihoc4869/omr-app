@@ -63,11 +63,32 @@ export interface McqQuestion extends QuestionMedia {
  * `nghi_dap_an_sai` chỉ gắn nhãn cảnh báo cho học sinh và lọc cho thầy quyết. */
 export type TrangThaiLoiGiai = 'khop' | 'lech_co_hd' | 'nghi_dap_an_sai' | 'thieu_dap_an'
 
+/** LỜI GIẢI CÓ CẤU TRÚC (THIẾT KẾ LẠI Ô LỜI GIẢI, 2026-09-02): một câu chốt
+ * kiến thức quyết định (≤ 20 từ) + lý do cho TỪNG phương án/ý (≤ 25 từ, lý do
+ * cụ thể, nêu bẫy nếu có) hoặc các bước tính + kết quả (Phần III). Khoá
+ * `tungPa`/`tungY` theo chữ GỐC trong đề (A–D / a–d) — màn xem lại tự ánh xạ
+ * sang thứ tự đã xáo của từng em. Dấu ✓/✗ khi hiển thị lấy theo `correct`
+ * (đáp án đang chấm), không theo `dung` — để không mâu thuẫn với điểm. */
+export interface LyDoY {
+  dung: boolean
+  viSao: string
+}
+export interface LoiGiaiCauTruc {
+  chot: string
+  tungPa?: Partial<Record<'A' | 'B' | 'C' | 'D', LyDoY>>
+  tungY?: Partial<Record<'a' | 'b' | 'c' | 'd', LyDoY>>
+  buoc?: string[]
+  ketQua?: string
+}
+
 export interface LoiGiaiMeta {
   loiGiaiTrangThai?: TrangThaiLoiGiai
   /** Đáp án pipeline tự giải ra (khác `correct` khi nghi đề sai). */
   dapAnTuGiai?: string
   ghiChuLoiGiai?: string
+  /** Lời giải có cấu trúc — ưu tiên hiển thị; `explanation` (chuỗi) chỉ còn
+   * cho dữ liệu cũ. */
+  loiGiai?: LoiGiaiCauTruc
 }
 
 export interface TeacherMcqQuestion extends McqQuestion, LoiGiaiMeta {

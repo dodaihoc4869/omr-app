@@ -189,9 +189,9 @@ export default function NganHangDeScreen() {
   const tongNghi = useMemo(() => sources.reduce((n, s) => n + cauNghiCua(s).length, 0), [sources])
 
   return (
-    <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k5)', fontFamily: 'var(--serif)' }}>
+    <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k5)', fontFamily: 'var(--sans)' }}>
       <div className="flex items-center justify-between">
-        <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)' }}>
+        <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
           Ngân hàng câu hỏi
         </h1>
         <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target">
@@ -202,7 +202,7 @@ export default function NganHangDeScreen() {
       <TheNoiDung>
         <div className="flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
           <div>
-            <div className="font-bold" style={{ fontSize: 'var(--cx-4)', fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }}>
+            <div className="font-bold" style={{ fontSize: 'var(--cx-4)', fontFamily: 'var(--serif)', fontVariantNumeric: 'tabular-nums' }}>
               {sources.length} đề · {tongCau} câu
             </div>
             <div style={NHAN_NHO}>
@@ -279,7 +279,7 @@ export default function NganHangDeScreen() {
                       })
                     }
                     className="tap-target flex items-center justify-between font-bold"
-                    style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--do)' }}
+                    style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)', color: 'var(--do)' }}
                   >
                     <span>Câu nghi đáp án đề sai / thiếu đáp án ({nghi.length})</span>
                     {mo ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
@@ -303,7 +303,7 @@ export default function NganHangDeScreen() {
       )}
 
       <TheNoiDung>
-        <button onClick={() => setMoCauHinh((v) => !v)} className="tap-target w-full flex items-center justify-between font-bold" style={{ fontSize: 'var(--cx-3)' }}>
+        <button onClick={() => setMoCauHinh((v) => !v)} className="tap-target w-full flex items-center justify-between font-bold" style={{ fontSize: 'var(--cx-3)', fontFamily: 'var(--serif)' }}>
           <span>Cấu hình (1 lần)</span>
           {moCauHinh ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
         </button>
@@ -363,7 +363,7 @@ function CauNghiCard({ c, onChot }: { c: CauNghi; onChot: (dapAn: string) => voi
   return (
     <div className="flex flex-col" style={{ gap: 'var(--k2)', padding: 'var(--k3)', borderRadius: 'var(--bo-1)', background: 'var(--the-2)' }}>
       <div className="flex items-center justify-between" style={{ gap: 'var(--k2)' }}>
-        <b style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
+        <b style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)' }}>
           {nhanPhan} câu {c.idx + 1}
         </b>
         <Nhan tone={q.loiGiaiTrangThai === 'thieu_dap_an' ? 'cam' : 'do'}>{q.loiGiaiTrangThai === 'thieu_dap_an' ? 'đề thiếu đáp án' : 'nghi đáp án đề sai'}</Nhan>

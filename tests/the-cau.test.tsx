@@ -115,3 +115,54 @@ describe('MaCaInput — 6 ô số', () => {
     expect(oSo.slice(0, 6)).toEqual(['8', '0', '2', '5', '5', '3'])
   })
 })
+
+describe('TheCau — ô lời giải có cấu trúc', () => {
+  it('Phần I: chốt in đậm không nghiêng; 4 dòng lý do theo thứ tự ĐÃ XÁO, ✓ đúng theo correct, chữ hiện là chữ đang thấy', () => {
+    const { container } = render(
+      <TheCau
+        cheDo="xem_lai"
+        phan="I"
+        stt={1}
+        text="Đề"
+        choices={['CaO', 'CO2', 'NaOH', 'HCl']}
+        choicePerm={[1, 0, 3, 2]}
+        selected="A"
+        correct="B"
+        loiGiai={{ chot: 'Oxide acid tác dụng với base.', tungPa: { A: { dung: false, viSao: 'CaO là oxide base' }, B: { dung: true, viSao: 'CO2 là oxide acid' }, C: { dung: false, viSao: 'NaOH là base' }, D: { dung: false, viSao: 'HCl là acid' } } }}
+      />,
+    )
+    const chot = container.querySelector('.loi-giai-chot')!
+    expect(chot.textContent).toContain('Oxide acid tác dụng với base.')
+    const dong = Array.from(container.querySelectorAll('.lg-y'))
+    expect(dong).toHaveLength(4)
+    // vị trí hiển thị 1 là gốc B (CO2) -> mã "A." + ✓
+    expect(dong[0].querySelector('.lg-ma')!.textContent).toBe('A.')
+    expect(dong[0].getAttribute('data-dung')).toBe('1')
+    expect(dong[0].querySelector('.lg-chu')!.textContent).toContain('CO2 là oxide acid')
+    expect(dong[1].querySelector('.lg-ma')!.textContent).toBe('B.')
+    expect(dong[1].getAttribute('data-dung')).toBe('0')
+    expect(container.querySelectorAll('.lg-dau.dung')).toHaveLength(1)
+  })
+  it('Phần II: 4 ý a) b) c) d) mỗi ý một dòng, ✓/✗ theo correct', () => {
+    const { container } = render(
+      <TheCau cheDo="xem_lai" phan="II" stt={2} text="Đề" ideas={['1', '2', '3', '4']} correct={['S', 'D', 'S', 'D']} selected={[null, null, null, null]}
+        loiGiai={{ chot: 'Chốt.', tungY: { a: { dung: false, viSao: 'ra' }, b: { dung: true, viSao: 'rb' }, c: { dung: false, viSao: 'rc' }, d: { dung: true, viSao: 'rd' } } }} />,
+    )
+    const dong = Array.from(container.querySelectorAll('.lg-y'))
+    expect(dong.map((d) => d.querySelector('.lg-ma')!.textContent)).toEqual(['a)', 'b)', 'c)', 'd)'])
+    expect(dong.map((d) => d.getAttribute('data-dung'))).toEqual(['0', '1', '0', '1'])
+  })
+  it('Phần III: bước đánh số + kết quả; thiếu ket_qua thì lấy correct', () => {
+    const { container } = render(
+      <TheCau cheDo="xem_lai" phan="III" stt={3} text="Đề" correct="6,8" selected="6,8" loiGiai={{ chot: 'Bảo toàn khối lượng.', buoc: ['n = 0,1', 'm = 6,8'] }} />,
+    )
+    expect(container.querySelectorAll('.lg-buoc li')).toHaveLength(2)
+    expect(container.querySelector('.lg-ket-qua')!.textContent).toContain('6,8')
+  })
+  it('dữ liệu cũ (chỉ explanation) vẫn hiện trong ô lời giải; thiếu cả hai -> báo rõ', () => {
+    const cu = render(<TheCau cheDo="xem_lai" phan="III" stt={1} text="Đề" correct="1" selected={null} explanation="Lời giải cũ" />)
+    expect(cu.container.querySelector('.loi-giai')!.textContent).toContain('Lời giải cũ')
+    const trong = render(<TheCau cheDo="xem_lai" phan="III" stt={1} text="Đề" correct="1" selected={null} />)
+    expect(trong.container.querySelector('.loi-giai')!.textContent).toContain('chưa nhập lời giải')
+  })
+})

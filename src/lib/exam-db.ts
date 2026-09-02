@@ -27,7 +27,7 @@ export interface IntegrityLog {
   leaveCount: number // số lần rời app (tab ẩn / mất focus)
   totalHiddenMs: number // tổng thời gian app bị ẩn (cộng dồn)
   events: IntegrityEvent[]
-  blocked: boolean // true = đã rời màn hình từ lần thứ 2 trở lên, bài bị khoá + tự nộp, đánh dấu nghi gian lận
+  blocked: boolean // true = đã rời màn hình (1 lần là đủ), bài bị khoá + tự nộp, ghi nhận gian lận
 }
 
 export function emptyIntegrityLog(): IntegrityLog {

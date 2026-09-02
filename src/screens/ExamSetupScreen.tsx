@@ -5,9 +5,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { CheckSquare, Square, Library, Copy, Check } from 'lucide-react'
 import { bankSizeWarning, mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
-import { TheNoiDung, Hang, OThongBao, NutChinh, Nhan } from '../components/DesignSystem'
+import { TheNoiDung, Hang, OThongBao, NutChinh } from '../components/DesignSystem'
+import NutDongBo from '../components/NutDongBo'
 import { publishSession, type CongBoDiem } from '../lib/exam-api'
-import { loadExamSources, loadScriptUrl, saveSessionTeacherBank } from '../lib/exam-db'
+import { loadExamSources, loadScriptUrl, loadTeacherSecret, saveSessionTeacherBank } from '../lib/exam-db'
+import { dongBoNganHang } from '../lib/exam-sync'
 import { useAppStore } from '../store/appStore'
 
 function randomSessionCode(): string {
@@ -72,12 +74,26 @@ export default function ExamSetupScreen() {
   const [daCopy, setDaCopy] = useState(false)
 
   useEffect(() => {
+    let huy = false
     loadScriptUrl().then(setScriptUrl)
     loadExamSources().then((list) => {
+      if (huy) return
       setSavedSources(list)
       // Chỉ có 1 đề thì chọn sẵn luôn — bớt một chạm.
       if (list.length === 1) setSelectedMaDe(new Set([list[0].maDe]))
     })
+    // Đồng bộ IM LẶNG khi mở màn (đề pipeline vừa đẩy lên tự về) — lỗi/mất
+    // mạng thì bỏ qua, thầy vẫn còn nút "Đồng bộ" để bấm tay.
+    Promise.all([loadScriptUrl(), loadTeacherSecret()])
+      .then(([url, mat]) => (url.trim() && mat.trim() ? dongBoNganHang(url.trim(), mat.trim()) : null))
+      .then((kq) => {
+        if (!kq || huy) return
+        if (kq.moi.length + kq.capNhat.length > 0) loadExamSources().then((list) => !huy && setSavedSources(list))
+      })
+      .catch(() => {})
+    return () => {
+      huy = true
+    }
   }, [])
 
   // Lớp gợi ý từ danh sách lớp đã nối (Google Sheet) — bấm 1 chạm thay vì gõ.
@@ -141,8 +157,8 @@ export default function ExamSetupScreen() {
   // ------------------------------------------------------------ CA ĐÃ MỞ
   if (opened) {
     return (
-      <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--serif)' }}>
-        <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)' }}>
+      <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
+        <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
           Ca kiểm tra đã mở
         </h1>
         <div className="text-center" style={{ background: 'var(--g1)', color: 'var(--giay)', borderRadius: 'var(--bo-3)', padding: 'var(--k6)', boxShadow: 'var(--bong-2)' }}>
@@ -177,9 +193,9 @@ export default function ExamSetupScreen() {
 
   // ------------------------------------------------------------ SOẠN CA
   return (
-    <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--serif)' }}>
+    <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
       <div className="flex items-center justify-between">
-        <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)' }}>
+        <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
           Mở ca kiểm tra
         </h1>
         <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target">
@@ -190,12 +206,21 @@ export default function ExamSetupScreen() {
       {/* 1. ĐỀ */}
       <TheNoiDung>
         <div className="flex items-center justify-between" style={{ gap: 'var(--k3)', marginBottom: 'var(--k3)' }}>
-          <div style={TIEU_DE_MUC}>Đề cho ca này</div>
-          {selectedSources.length > 0 && (
-            <Nhan tone="xanh">
-              {selectedSources.length} đề · {tongCauDaChon} câu
-            </Nhan>
-          )}
+          <div className="min-w-0">
+            <div style={TIEU_DE_MUC}>Đề cho ca này</div>
+            {selectedSources.length > 0 && (
+              <div style={NHAN_NHO}>
+                Đã chọn {selectedSources.length} đề · {tongCauDaChon} câu
+              </div>
+            )}
+          </div>
+          {/* Một chạm kéo đề mới từ kho về — không cần vào Ngân hàng câu hỏi. */}
+          <NutDongBo
+            onXong={(kq) => {
+              if (kq.moi.length + kq.capNhat.length > 0) loadExamSources().then(setSavedSources)
+              if (kq.canXem.length > 0) showToast(`${kq.canXem.length} câu nghi đáp án — xem ở Ngân hàng câu hỏi`, 'error')
+            }}
+          />
         </div>
 
         {savedSources.length === 0 ? (

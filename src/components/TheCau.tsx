@@ -8,10 +8,10 @@
 // hàng. Ảnh cắt từ đề gốc (HinhAnh) nhúng đúng vị trí: sau đề, sau từng
 // phương án/ý (đi theo chữ cái GỐC khi xáo), cuối câu. Chỉ dùng biến tokens.css.
 import { Check, X as XIcon } from 'lucide-react'
-import type { HinhAnh, TrangThaiLoiGiai } from '../data/examContent'
+import type { HinhAnh, LoiGiaiCauTruc, TrangThaiLoiGiai } from '../data/examContent'
 import { ChemText } from '../lib/chem-format'
 import { BangSoLieu, CauHinh, HinhTaiViTri } from './QuestionMedia'
-import { TheNoiDung, DauThe, Hang, OThongBao, Nhan } from './DesignSystem'
+import { TheNoiDung, DauThe, Hang, Nhan } from './DesignSystem'
 
 export type CheDo = 'thi' | 'xem_lai'
 type Chu = 'A' | 'B' | 'C' | 'D'
@@ -31,8 +31,10 @@ interface BaseProps {
   table?: string[][]
   imageDataUrl?: string
   hinhAnh?: HinhAnh[]
-  /** Chỉ chế độ xem lại. */
+  /** Chỉ chế độ xem lại — lời giải dạng chuỗi (dữ liệu cũ). */
   explanation?: string
+  /** Chỉ chế độ xem lại — lời giải có cấu trúc (ưu tiên). */
+  loiGiai?: LoiGiaiCauTruc
   /** Chỉ chế độ xem lại — nhãn cảnh báo khi pipeline nghi đáp án đề sai /
    * đề thiếu đáp án (NAPDETUDONG.md "Hiển thị trong app"). */
   nhanLoiGiai?: TrangThaiLoiGiai
@@ -89,20 +91,87 @@ function DauSai() {
   )
 }
 
-function GiaiThich({ text, nhan }: { text?: string; nhan?: TrangThaiLoiGiai }) {
+/** Một dòng lý do: dấu ✓/✗ (theo đáp án ĐANG CHẤM) · mã A./a) · lý do. */
+function DongLyDo({ dung, ma, chu }: { dung: boolean; ma: string; chu?: string }) {
+  return (
+    <div className="lg-y" data-dung={dung ? '1' : '0'}>
+      <span className={`lg-dau ${dung ? 'dung' : 'sai'}`} aria-label={dung ? 'đúng' : 'sai'}>
+        {dung ? '✓' : '✗'}
+      </span>
+      <span className="lg-ma">{ma}</span>
+      <span className="lg-chu">{chu?.trim() ? <ChemText text={chu} /> : <span style={{ color: 'var(--mo)' }}>(chưa có lý do)</span>}</span>
+    </div>
+  )
+}
+
+/** Ô LỜI GIẢI (THIẾT KẾ LẠI Ô LỜI GIẢI): nhãn nhỏ → câu chốt in đậm, không
+ * nghiêng → mỗi phương án/ý MỘT DÒNG có ✓/✗ (Phần I theo thứ tự ĐÃ XÁO của
+ * em, mã hiện là chữ đang thấy; lý do tra theo chữ GỐC) · Phần III: các bước
+ * đánh số tròn + kết quả nổi màu xanh. Dữ liệu cũ (chỉ có chuỗi) vẫn hiện. */
+function LoiGiai({ props, nhan }: { props: TheCauProps; nhan?: TrangThaiLoiGiai }) {
+  const lg = props.loiGiai
+  const text = props.explanation
+  const coGi = !!lg?.chot || !!text?.trim()
   return (
     <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
       {nhan === 'nghi_dap_an_sai' && (
-        <Nhan tone="do" className="self-start whitespace-normal" data-nhan="nghi_dap_an_sai">
+        <Nhan tone="do" wrap className="self-start" data-nhan="nghi_dap_an_sai">
           Câu này đáp án có thể chưa chuẩn — thầy sẽ chữa trên lớp
         </Nhan>
       )}
       {nhan === 'thieu_dap_an' && (
-        <Nhan tone="cam" className="self-start whitespace-normal" data-nhan="thieu_dap_an">
+        <Nhan tone="cam" wrap className="self-start" data-nhan="thieu_dap_an">
           Đáp án theo lời giải của thầy
         </Nhan>
       )}
-      <OThongBao>{text?.trim() ? <ChemText text={text} /> : 'Thầy chưa nhập lời giải cho câu này.'}</OThongBao>
+      <div className="loi-giai">
+        <div className="loi-giai-nhan">LỜI GIẢI</div>
+        {!coGi && <div className="lg-chu">Thầy chưa nhập lời giải cho câu này.</div>}
+        {lg?.chot && (
+          <div className="loi-giai-chot">
+            <ChemText text={lg.chot} />
+          </div>
+        )}
+        {!lg?.chot && text?.trim() && (
+          <div className="lg-chu">
+            <ChemText text={text} />
+          </div>
+        )}
+        {lg && props.phan === 'I' && lg.tungPa && (
+          <div>
+            {props.choicePerm.map((origIdx, displayPos) => {
+              const orig = 'ABCD'[origIdx] as Chu
+              const y = lg.tungPa?.[orig]
+              return <DongLyDo key={orig} dung={props.correct === orig} ma={`${'ABCD'[displayPos]}.`} chu={y?.viSao} />
+            })}
+          </div>
+        )}
+        {lg && props.phan === 'II' && lg.tungY && (
+          <div>
+            {(['a', 'b', 'c', 'd'] as const).map((k, i) => (
+              <DongLyDo key={k} dung={props.correct?.[i] === 'D'} ma={`${k})`} chu={lg.tungY?.[k]?.viSao} />
+            ))}
+          </div>
+        )}
+        {lg && props.phan === 'III' && (
+          <>
+            {lg.buoc && lg.buoc.length > 0 && (
+              <ol className="lg-buoc">
+                {lg.buoc.map((b, i) => (
+                  <li key={i}>
+                    <ChemText text={b} />
+                  </li>
+                ))}
+              </ol>
+            )}
+            {(lg.ketQua || props.correct) && (
+              <div className="lg-ket-qua">
+                <ChemText text={lg.ketQua || props.correct || ''} />
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   )
 }
@@ -274,7 +343,7 @@ export default function TheCau(props: TheCauProps) {
         <HinhTaiViTri hinhAnh={hinhAnh} viTri="sau_de" onZoom={onZoom} nhan={nhan} />
         {body}
         <HinhTaiViTri hinhAnh={hinhAnh} viTri="cuoi_cau" onZoom={onZoom} nhan={nhan} />
-        {xemLai && <GiaiThich text={props.explanation} nhan={props.nhanLoiGiai} />}
+        {xemLai && <LoiGiai props={props} nhan={props.nhanLoiGiai} />}
       </div>
     </TheNoiDung>
   )

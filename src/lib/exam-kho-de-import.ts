@@ -8,16 +8,55 @@
 // IndexedDB máy thầy qua saveExamSource() sẵn có. File JSON có đáp án này
 // KHÔNG BAO GIỜ được commit lên git (repo omr-app đang PUBLIC — xem
 // kho-de/.gitignore) hay tải lên bất kỳ server nào.
-import type { HinhAnh, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion, TrangThaiLoiGiai, ViTriHinh } from '../data/examContent'
+import type { HinhAnh, LoiGiaiCauTruc, LyDoY, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion, TrangThaiLoiGiai, ViTriHinh } from '../data/examContent'
 
 /** Lời giải do pipeline "giải mù" rồi đối chiếu đáp án đề (NAPDETUDONG.md
  * B2–B3). `dap_an_de` là đáp án in trong đề — luôn dùng để CHẤM. */
+export interface KhoDeLyDo {
+  dung: boolean
+  vi_sao: string
+}
 export interface KhoDeLoiGiai {
-  noi_dung: string
+  /** Bản cũ: một chuỗi liền. Bản mới: `chot` + `tung_pa`/`tung_y`/`buoc`. */
+  noi_dung?: string
+  chot?: string
+  tung_pa?: Partial<Record<'A' | 'B' | 'C' | 'D', KhoDeLyDo>>
+  tung_y?: Partial<Record<'a' | 'b' | 'c' | 'd', KhoDeLyDo>>
+  buoc?: string[]
+  ket_qua?: string
   dap_an_de?: string
   dap_an_tu_giai?: string
   trang_thai?: TrangThaiLoiGiai
   ghi_chu?: string | null
+}
+
+const GIOI_HAN_TU_CHOT = 20
+const GIOI_HAN_TU_VI_SAO = 25
+const demTu = (t: string) => t.trim().split(/\s+/).filter(Boolean).length
+
+/** Kiểm tra QUY TẮC VIẾT lời giải có cấu trúc — trả về cảnh báo (không chặn):
+ * chốt ≤ 20 từ, mỗi lý do ≤ 25 từ và không rỗng, đủ 4 phương án/ý. */
+export function kiemTraLoiGiaiCauTruc(lg: KhoDeLoiGiai, phan: 'I' | 'II' | 'III', nhan: string): string[] {
+  const w: string[] = []
+  if (lg.chot && demTu(lg.chot) > GIOI_HAN_TU_CHOT) w.push(`${nhan}: câu chốt ${demTu(lg.chot)} từ (> ${GIOI_HAN_TU_CHOT})`)
+  const kiemLyDo = (obj: Partial<Record<string, KhoDeLyDo>> | undefined, khoa: string[], ten: string) => {
+    if (!obj) {
+      w.push(`${nhan}: thiếu ${ten}`)
+      return
+    }
+    for (const k of khoa) {
+      const y = obj[k]
+      if (!y || !y.vi_sao || !y.vi_sao.trim()) w.push(`${nhan}: ${ten}.${k} thiếu lý do`)
+      else if (demTu(y.vi_sao) > GIOI_HAN_TU_VI_SAO) w.push(`${nhan}: ${ten}.${k} dài ${demTu(y.vi_sao)} từ (> ${GIOI_HAN_TU_VI_SAO})`)
+    }
+  }
+  if (phan === 'I') kiemLyDo(lg.tung_pa, ['A', 'B', 'C', 'D'], 'tung_pa')
+  if (phan === 'II') kiemLyDo(lg.tung_y, ['a', 'b', 'c', 'd'], 'tung_y')
+  if (phan === 'III') {
+    if (!lg.buoc || lg.buoc.length === 0) w.push(`${nhan}: thiếu "buoc" (các bước tính)`)
+    if (!lg.ket_qua || !lg.ket_qua.trim()) w.push(`${nhan}: thiếu "ket_qua"`)
+  }
+  return w
 }
 
 /** Ảnh cắt sẵn từ đề gốc (200 DPI, mép 8px, nền trắng) — pipeline "Nạp đề
@@ -59,19 +98,58 @@ export interface KhoDeParseResult {
 const VI_TRI_HOP_LE = new Set<string>(['sau_de', 'sau_pa_A', 'sau_pa_B', 'sau_pa_C', 'sau_pa_D', 'sau_y_a', 'sau_y_b', 'sau_y_c', 'sau_y_d', 'cuoi_cau'])
 const TRANG_THAI_HOP_LE = new Set<string>(['khop', 'lech_co_hd', 'nghi_dap_an_sai', 'thieu_dap_an'])
 
+function parseLyDoMap(raw: unknown, khoa: string[]): Record<string, KhoDeLyDo> | undefined {
+  if (typeof raw !== 'object' || raw === null) return undefined
+  const o = raw as Record<string, unknown>
+  const out: Record<string, KhoDeLyDo> = {}
+  for (const k of khoa) {
+    const y = o[k]
+    if (typeof y === 'object' && y !== null) {
+      const yy = y as Record<string, unknown>
+      out[k] = { dung: yy.dung === true, vi_sao: typeof yy.vi_sao === 'string' ? yy.vi_sao : '' }
+    } else if (typeof y === 'string') {
+      // dạng rút gọn: "A": "lý do" (không có cờ đúng/sai)
+      out[k] = { dung: false, vi_sao: y }
+    }
+  }
+  return Object.keys(out).length ? out : undefined
+}
+
 function parseLoiGiai(raw: unknown): KhoDeLoiGiai | null {
   if (typeof raw !== 'object' || raw === null) return null
   const o = raw as Record<string, unknown>
-  if (typeof o.noi_dung !== 'string' || !o.noi_dung.trim()) return null
+  const noiDung = typeof o.noi_dung === 'string' && o.noi_dung.trim() ? o.noi_dung : undefined
+  const chot = typeof o.chot === 'string' && o.chot.trim() ? o.chot.trim() : undefined
+  if (!noiDung && !chot) return null
   const tt = typeof o.trang_thai === 'string' && TRANG_THAI_HOP_LE.has(o.trang_thai) ? (o.trang_thai as TrangThaiLoiGiai) : undefined
   const dapAn = (v: unknown) => (typeof v === 'string' ? v : typeof v === 'object' && v !== null ? JSON.stringify(v) : undefined)
   return {
-    noi_dung: o.noi_dung,
+    noi_dung: noiDung,
+    chot,
+    tung_pa: parseLyDoMap(o.tung_pa, ['A', 'B', 'C', 'D']) as KhoDeLoiGiai['tung_pa'],
+    tung_y: parseLyDoMap(o.tung_y, ['a', 'b', 'c', 'd']) as KhoDeLoiGiai['tung_y'],
+    buoc: Array.isArray(o.buoc) ? o.buoc.filter((x): x is string => typeof x === 'string' && x.trim() !== '') : undefined,
+    ket_qua: typeof o.ket_qua === 'string' && o.ket_qua.trim() ? o.ket_qua.trim() : undefined,
     dap_an_de: dapAn(o.dap_an_de),
     dap_an_tu_giai: dapAn(o.dap_an_tu_giai),
     trang_thai: tt,
     ghi_chu: typeof o.ghi_chu === 'string' ? o.ghi_chu : null,
   }
+}
+
+/** Chuyển lời giải kho đề → LoiGiaiCauTruc của app (chỉ khi có `chot`). */
+function toLoiGiaiCauTruc(lg: KhoDeLoiGiai | undefined): LoiGiaiCauTruc | undefined {
+  if (!lg?.chot) return undefined
+  const map = <K extends string>(m: Partial<Record<K, KhoDeLyDo>> | undefined): Partial<Record<K, LyDoY>> | undefined => {
+    if (!m) return undefined
+    const out: Partial<Record<K, LyDoY>> = {}
+    for (const k of Object.keys(m) as K[]) {
+      const y = m[k]
+      if (y) out[k] = { dung: y.dung, viSao: y.vi_sao }
+    }
+    return out
+  }
+  return { chot: lg.chot, tungPa: map(lg.tung_pa), tungY: map(lg.tung_y), buoc: lg.buoc, ketQua: lg.ket_qua }
 }
 
 function parseHinh(raw: unknown, nhan: string, errors: string[]): KhoDeHinh[] | null {
@@ -199,6 +277,7 @@ export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherE
     }
     if (c.can_xem) canXemList.push(nhan)
     const lg = c.loi_giai ?? undefined
+    if (lg?.chot) for (const w of kiemTraLoiGiaiCauTruc(lg, c.phan, nhan)) warnings.push(w)
     const chung = {
       text: c.de,
       table: c.bang ?? undefined,
@@ -206,6 +285,7 @@ export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherE
       tieuDe: c.tieu_de,
       canXem: c.can_xem,
       explanation: lg?.noi_dung,
+      loiGiai: toLoiGiaiCauTruc(lg),
       loiGiaiTrangThai: lg?.trang_thai,
       dapAnTuGiai: lg?.dap_an_tu_giai,
       ghiChuLoiGiai: lg?.ghi_chu ?? undefined,

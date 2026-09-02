@@ -4,7 +4,7 @@
 // khi con rời màn hình làm bài (tín hiệu nghi gian lận) — poll lại server
 // mỗi ~15 giây, KHÔNG phải push thật (Apps Script không hỗ trợ push).
 import { useEffect, useRef, useState } from 'react'
-import { HeartHandshake, TriangleAlert, RefreshCw, ShieldAlert, Send, MessageSquareText } from 'lucide-react'
+import { HeartHandshake, RefreshCw, ShieldAlert, Send, MessageSquareText } from 'lucide-react'
 import {
   registerParent,
   fetchParentFeedback,
@@ -222,7 +222,6 @@ export default function ParentScreen() {
   const st = status?.status
   const daLamCauHoi = st?.daLamCauHoi ?? 0
   const tongCauHoi = st?.tongCauHoi ?? 0
-  const soLanRoiApp = st?.soLanRoiApp ?? 0
 
   return (
     <div className="min-h-screen pb-24 px-4 pt-4 space-y-4 bg-slate-50 dark:bg-slate-950">
@@ -276,17 +275,8 @@ export default function ParentScreen() {
         <div className="rounded-xl bg-rose-600 text-white p-4 flex items-start gap-3 shadow-lg">
           <ShieldAlert size={26} className="shrink-0" />
           <div className="text-sm leading-relaxed">
-            <b>Con có hành vi nghi gian lận trong lúc thi.</b> Con đã rời màn hình làm bài từ 2 lần trở lên trong ca
-            kiểm tra {st.maCa}, bài đã bị hệ thống tự động khoá và nộp. Thầy sẽ xem xét kỹ hơn khi chấm bài.
-          </div>
-        </div>
-      )}
-      {!st?.blocked && soLanRoiApp > 0 && st?.dangLam && (
-        <div className="rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 p-3 flex items-start gap-2.5">
-          <TriangleAlert size={20} className="text-amber-600 shrink-0 mt-0.5" />
-          <div className="text-sm text-amber-800 dark:text-amber-300">
-            Con đã rời màn hình làm bài <b>{soLanRoiApp} lần</b> trong ca kiểm tra đang diễn ra — nếu rời thêm 1 lần
-            nữa bài sẽ tự động bị khoá và đánh dấu nghi gian lận.
+            <b>Con đã gian lận trong lúc thi.</b> Con rời màn hình làm bài trong ca kiểm tra {st.maCa} — theo quy định,
+            bài được nộp ngay, khoá và ghi nhận gian lận. Thầy sẽ trao đổi thêm với gia đình.
           </div>
         </div>
       )}

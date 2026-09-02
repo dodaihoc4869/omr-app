@@ -112,3 +112,103 @@ body {
   padding-top: env(safe-area-inset-top);
   height: calc(56px + env(safe-area-inset-top)) !important;
 }
+
+/* Ô LỜI GIẢI (THIẾT KẾ LẠI Ô LỜI GIẢI — 2026-09-02): KHÔNG nghiêng cả khối;
+ * câu chốt in đậm trên cùng; mỗi phương án/ý một dòng có kẻ mảnh; Phần III
+ * bước đánh số tròn + kết quả xanh. Chỉ dùng biến tokens.css. */
+.loi-giai {
+  background: var(--cam-nen);
+  border-left: 3px solid var(--cam);
+  border-radius: var(--bo-1);
+  padding: var(--k4) var(--k5);
+  margin-top: var(--k4);
+}
+.loi-giai-nhan {
+  font: 700 var(--cx-1) / 1 var(--sans);
+  letter-spacing: 0.1em;
+  color: var(--cam);
+  margin-bottom: var(--k3);
+}
+.loi-giai-chot {
+  font: 700 var(--cx-3) / 1.6 var(--serif);
+  font-style: normal; /* BỎ nghiêng — nghiêng khó đọc */
+  color: var(--muc);
+  margin-bottom: var(--k4);
+}
+.lg-y {
+  display: flex;
+  gap: var(--k3);
+  align-items: flex-start;
+  padding: var(--k2) 0;
+  border-top: 1px solid var(--vien);
+}
+.lg-y:first-of-type {
+  border-top: none;
+}
+.lg-dau {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font: 700 13px var(--sans);
+  margin-top: 2px;
+}
+.lg-dau.dung {
+  background: var(--xanh-nen);
+  color: var(--xanh);
+}
+.lg-dau.sai {
+  background: var(--do-nen);
+  color: var(--do);
+}
+.lg-ma {
+  flex: none;
+  width: 26px;
+  font: 700 var(--cx-2) var(--serif);
+  color: var(--nhat);
+  margin-top: 2px;
+}
+.lg-chu {
+  flex: 1;
+  min-width: 0; /* BẮT BUỘC — thiếu thì chữ bị ép */
+  font: var(--cx-2) / 1.65 var(--serif);
+  color: var(--muc);
+  overflow-wrap: break-word;
+}
+.lg-buoc {
+  counter-reset: b;
+  margin: var(--k3) 0 0;
+  padding: 0;
+}
+.lg-buoc li {
+  counter-increment: b;
+  list-style: none;
+  padding: var(--k2) 0 var(--k2) var(--k6);
+  position: relative;
+  font: var(--cx-2) / 1.65 var(--serif);
+  color: var(--muc);
+  overflow-wrap: break-word;
+}
+.lg-buoc li::before {
+  content: counter(b);
+  position: absolute;
+  left: 0;
+  top: var(--k2);
+  width: 20px;
+  height: 20px;
+  background: var(--cam);
+  color: var(--muc-nguoc);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font: 700 11px var(--sans);
+}
+.lg-ket-qua {
+  margin-top: var(--k3);
+  padding-top: var(--k3);
+  border-top: 1px solid var(--vien);
+  font: 700 var(--cx-4) var(--serif);
+  color: var(--xanh);
+}

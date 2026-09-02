@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
-import { fetchSession, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, type KeyBank, type CongBoDiem } from '../lib/exam-api'
+import { fetchSession, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendTeacherMessage, type KeyBank, type CongBoDiem } from '../lib/exam-api'
 import TheCau from '../components/TheCau'
 import MaCaInput from '../components/MaCaInput'
 import DaiNhacCaiApp from '../components/DaiNhacCaiApp'
@@ -22,6 +22,29 @@ import {
   type ExamAttempt,
 } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
+
+/** Đang toàn màn hình: đã thêm vào màn hình chính (standalone) HOẶC Fullscreen API đang bật. */
+function dangToanManHinh(): boolean {
+  if (typeof document === 'undefined') return true
+  const nav = navigator as Navigator & { standalone?: boolean }
+  if (nav.standalone || window.matchMedia('(display-mode: standalone)').matches || window.matchMedia('(display-mode: fullscreen)').matches) return true
+  const d = document as Document & { webkitFullscreenElement?: Element | null }
+  return !!(document.fullscreenElement || d.webkitFullscreenElement)
+}
+function coTheBatToanManHinh(): boolean {
+  if (typeof document === 'undefined') return false
+  const el = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => Promise<void> | void }
+  return typeof el.requestFullscreen === 'function' || typeof el.webkitRequestFullscreen === 'function'
+}
+async function batToanManHinh(): Promise<void> {
+  const el = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => Promise<void> | void }
+  try {
+    if (typeof el.requestFullscreen === 'function') await el.requestFullscreen({ navigationUI: 'hide' } as FullscreenOptions)
+    else if (typeof el.webkitRequestFullscreen === 'function') await el.webkitRequestFullscreen()
+  } catch {
+    // trình duyệt từ chối (vd iOS Safari) — ô nhắc phía trên đã hướng dẫn thêm vào màn hình chính
+  }
+}
 
 function formatClock(totalSeconds: number): string {
   const s = Math.max(0, Math.floor(totalSeconds))
@@ -108,8 +131,22 @@ export default function ExamTakeScreen() {
   const retryTimer = useRef<ReturnType<typeof setInterval> | null>(null)
   const hiddenSinceRef = useRef<number | null>(null)
   const leaveCountRef = useRef(0)
-  const [leaveWarning, setLeaveWarning] = useState<{ count: number; sec: number } | null>(null)
-  const leaveWarningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // TOÀN MÀN HÌNH: bắt buộc trước khi vào thi (đã thêm vào màn hình chính =
+  // standalone, hoặc bật Fullscreen API). Thoát toàn màn hình giữa chừng =
+  // rời màn hình = khoá bài.
+  const [toanManHinh, setToanManHinh] = useState(() => dangToanManHinh())
+  useEffect(() => {
+    const cap = () => setToanManHinh(dangToanManHinh())
+    document.addEventListener('fullscreenchange', cap)
+    document.addEventListener('webkitfullscreenchange', cap)
+    const mq = window.matchMedia('(display-mode: standalone)')
+    mq.addEventListener('change', cap)
+    return () => {
+      document.removeEventListener('fullscreenchange', cap)
+      document.removeEventListener('webkitfullscreenchange', cap)
+      mq.removeEventListener('change', cap)
+    }
+  }, [])
   // Luôn phản ánh giá trị attempt MỚI NHẤT (kể cả đáp án em vừa chọn) — để sự
   // kiện rời màn hình không vô tình ghi đè lại đáp án bằng bản cũ.
   const attemptRef = useRef<ExamAttempt | null>(null)
@@ -329,11 +366,12 @@ export default function ExamTakeScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
 
-  // Ghi lại việc rời app (chuyển tab / tắt màn hình / mất focus) trong lúc làm bài — KHÔNG
-  // thể phát hiện chụp ảnh màn hình bằng JavaScript (không trình duyệt nào cho phép), đây là
-  // tín hiệu gần nhất có thể đo được để thầy tham khảo. Rời màn hình LẦN 2 trở lên: khoá bài,
-  // tự nộp ngay lập tức, đánh dấu nghi gian lận — chặn ngay lúc rời (không đợi quay lại), vì
-  // học sinh có thể không quay lại nữa (đóng tab).
+  // RỜI MÀN HÌNH = GIAN LẬN (quy định của thầy, 2026-09-02): chuyển tab / tắt
+  // màn hình / mất focus / thoát toàn màn hình DÙ CHỈ MỘT LẦN → khoá bài, tự
+  // nộp ngay, ghi nhận gian lận, báo phụ huynh ngay (tin nhắn + trạng thái).
+  // Chặn ngay lúc rời, không đợi quay lại (em có thể không quay lại nữa).
+  // KHÔNG thể phát hiện CHỤP ẢNH MÀN HÌNH bằng JavaScript — không trình duyệt
+  // nào (Chrome, Safari, kể cả PWA) cấp quyền đó; đây là giới hạn của nền web.
   useEffect(() => {
     if (phase !== 'exam') return
     const logEvent = (type: 'hidden' | 'visible' | 'blur' | 'focus') => {
@@ -348,17 +386,11 @@ export default function ExamTakeScreen() {
           hiddenSinceRef.current = Date.now()
           leaveCount += 1
           leaveCountRef.current = leaveCount
-          if (leaveCount >= 2) blockNow = true
+          blockNow = true
         }
       } else if (hiddenSinceRef.current !== null) {
-        const awaySec = Math.max(1, Math.round((Date.now() - hiddenSinceRef.current) / 1000))
         totalHiddenMs += Date.now() - hiddenSinceRef.current
         hiddenSinceRef.current = null
-        // Cảnh báo nghiêm khắc ngay khi em quay lại màn hình — thấy ngay lúc
-        // đó mới có tác dụng răn đe, báo sau khi nộp bài thì vô nghĩa.
-        if (leaveWarningTimerRef.current) clearTimeout(leaveWarningTimerRef.current)
-        setLeaveWarning({ count: leaveCountRef.current, sec: awaySec })
-        leaveWarningTimerRef.current = setTimeout(() => setLeaveWarning(null), 10000)
       }
       const next: ExamAttempt = {
         ...cur,
@@ -367,25 +399,50 @@ export default function ExamTakeScreen() {
       attemptRef.current = next
       setAttempt(next)
       saveAttempt(next)
-      // Gửi ngay khi có tín hiệu rời màn hình (không đợi tick định kỳ) — đây
-      // là lúc phụ huynh cần biết sớm nhất để cảnh báo có tác dụng.
-      if (type === 'hidden' || type === 'blur' || blockNow) pushStatusNow(next, !blockNow)
-      if (blockNow) doSubmit(next)
+      if (blockNow) {
+        pushStatusNow(next, false)
+        baoPhuHuynhGianLan(next)
+        doSubmit(next)
+      }
     }
     const onVis = () => logEvent(document.hidden ? 'hidden' : 'visible')
     const onBlur = () => logEvent('blur')
     const onFocus = () => logEvent('focus')
+    // Thoát toàn màn hình (Back trên Android, vuốt xuống…) khi KHÔNG ở chế độ
+    // standalone → tính là rời màn hình.
+    const onFs = () => {
+      if (!dangToanManHinh()) logEvent('hidden')
+    }
     document.addEventListener('visibilitychange', onVis)
     window.addEventListener('blur', onBlur)
     window.addEventListener('focus', onFocus)
+    document.addEventListener('fullscreenchange', onFs)
+    document.addEventListener('webkitfullscreenchange', onFs)
     return () => {
       document.removeEventListener('visibilitychange', onVis)
       window.removeEventListener('blur', onBlur)
       window.removeEventListener('focus', onFocus)
-      if (leaveWarningTimerRef.current) clearTimeout(leaveWarningTimerRef.current)
+      document.removeEventListener('fullscreenchange', onFs)
+      document.removeEventListener('webkitfullscreenchange', onFs)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
+
+  // Báo phụ huynh NGAY khi bài bị khoá: ghi 1 tin vào hộp thư của em (phụ
+  // huynh/học sinh thấy khi mở app — app phụ huynh tự hỏi lại định kỳ); trạng
+  // thái Blocked cũng đã đẩy lên qua pushStatusNow (màn phụ huynh hiện ô đỏ).
+  const baoPhuHuynhGianLan = (a: ExamAttempt) => {
+    const url = scriptUrlRef.current.trim()
+    if (!url) return
+    const luc = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+    sendTeacherMessage(
+      url,
+      a.sbd,
+      `[TỰ ĐỘNG] Lúc ${luc}, trong ca kiểm tra ${a.maCa}, học sinh SBD ${a.sbd} đã rời màn hình làm bài. Theo quy định, bài được nộp ngay, khoá và ghi nhận GIAN LẬN. Thầy sẽ trao đổi thêm với gia đình.`,
+    ).catch(() => {
+      // mất mạng — trạng thái Blocked vẫn được gửi lại khi nộp bài (pendingSubmit)
+    })
+  }
 
   const doSubmit = async (a: ExamAttempt) => {
     const updated: ExamAttempt = { ...a, submitted: true, submittedAt: new Date().toISOString(), pendingSubmit: true }
@@ -570,7 +627,22 @@ export default function ExamTakeScreen() {
                   }}
                 />
               </div>
-              <NutChinh onClick={handleJoin}>Vào thi</NutChinh>
+              {!toanManHinh && (
+                <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+                  <OThongBao tone="cam">
+                    Chỉ vào thi được khi app ở <b>toàn màn hình</b>.
+                    {coTheBatToanManHinh() ? ' Bấm nút dưới để bật.' : ' Thêm app vào màn hình chính (hướng dẫn ở trên) rồi mở lại từ đó.'}
+                  </OThongBao>
+                  {coTheBatToanManHinh() && (
+                    <NutChinh variant="phu" onClick={batToanManHinh}>
+                      Bật toàn màn hình
+                    </NutChinh>
+                  )}
+                </div>
+              )}
+              <NutChinh onClick={handleJoin} disabled={!toanManHinh}>
+                Vào thi
+              </NutChinh>
             </div>
           </TheNoiDung>
         </div>
@@ -715,8 +787,8 @@ export default function ExamTakeScreen() {
                   BÀI THI ĐÃ BỊ KHOÁ
                 </div>
                 <div style={{ fontSize: 'var(--cx-2)', lineHeight: 1.7 }}>
-                  Em đã rời màn hình làm bài từ <b>2 lần trở lên</b>. Theo quy định, bài thi tự động nộp và được đánh dấu{' '}
-                  <b>nghi vấn gian lận</b> để thầy xem xét, có thể kèm báo phụ huynh.
+                  Em đã <b>rời màn hình làm bài</b>. Theo quy định, bài thi được <b>nộp ngay và khoá</b>, ghi nhận <b>gian lận</b>.
+                  Hệ thống đã gửi thông báo cho phụ huynh.
                 </div>
                 {attempt?.pendingSubmit && <Nhan tone="cam">Đang gửi lên hệ thống… đừng tắt trình duyệt</Nhan>}
               </div>
@@ -973,20 +1045,6 @@ export default function ExamTakeScreen() {
         </div>
       </div>
 
-      {leaveWarning && (
-        <div className="sticky z-30 px-3" style={{ top: 60, paddingTop: 'var(--k1)' }}>
-          <div className="flex items-start" style={{ background: 'var(--do)', color: 'var(--muc-nguoc)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)', gap: 'var(--k2)', boxShadow: 'var(--bong-2)' }}>
-            <TriangleAlert size={20} className="shrink-0 mt-0.5" />
-            <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', lineHeight: 1.5 }}>
-              <b>Em vừa rời khỏi màn hình làm bài</b> (lần {leaveWarning.count}, {leaveWarning.sec} giây). Thầy đã ghi lại — hành vi này sẽ đưa vào báo cáo gửi
-              phụ huynh khi thầy xem xét bài thi. <b>Nếu em rời màn hình thêm một lần nữa, bài thi sẽ tự động NỘP NGAY và bị đánh dấu nghi vấn gian lận.</b>
-            </div>
-            <button onClick={() => setLeaveWarning(null)} className="shrink-0 text-lg leading-none px-1" style={{ color: 'var(--muc-nguoc)', opacity: 0.85 }}>
-              ×
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* DANH SÁCH CÂU — cuộn dọc liên tục, đầu phần dính */}
       <div className="px-3 sm:px-4 flex flex-col" style={{ gap: 'var(--k5)', paddingTop: 'var(--k2)', paddingBottom: 'calc(var(--k8) + env(safe-area-inset-bottom))' }}>

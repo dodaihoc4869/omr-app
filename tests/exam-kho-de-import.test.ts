@@ -120,3 +120,37 @@ describe('buildTeacherSourceFromKhoDe', () => {
     expect(q.ghiChuLoiGiai).toBe('lệch')
   })
 })
+
+describe('loi_giai có cấu trúc (THIẾT KẾ LẠI Ô LỜI GIẢI)', () => {
+  it('Phần I: chot + tung_pa -> loiGiai.tungPa theo chữ GỐC; vi_sao > 25 từ -> cảnh báo, không chặn', () => {
+    const dai = Array.from({ length: 26 }, (_, i) => `t${i}`).join(' ')
+    const json = {
+      ma_de: '100', cau: [{ phan: 'I' as const, so: 1, de: 'x', pa: { A: 'a', B: 'b', C: 'c', D: 'd' }, dap_an: 'C',
+        loi_giai: { chot: 'Nước làm lạnh đi ngược chiều hơi.', tung_pa: { A: { dung: false, vi_sao: 'vào (1) ra (2)' }, B: { dung: false, vi_sao: dai }, C: { dung: true, vi_sao: 'đúng chiều' }, D: { dung: false, vi_sao: 'sai' } } } }],
+    }
+    const { source, errors, warnings } = buildTeacherSourceFromKhoDe(parseKhoDeJsonText(JSON.stringify(json)).json!)
+    expect(errors).toEqual([])
+    expect(warnings.join(' ')).toMatch(/tung_pa\.B dài 26 từ/)
+    const q = source.phanI[0]
+    expect(q.loiGiai?.chot).toBe('Nước làm lạnh đi ngược chiều hơi.')
+    expect(q.loiGiai?.tungPa?.C).toEqual({ dung: true, viSao: 'đúng chiều' })
+    expect(q.explanation).toBeUndefined()
+  })
+  it('Phần II thiếu ý d -> cảnh báo; Phần III buoc + ket_qua giữ nguyên', () => {
+    const json = {
+      ma_de: '100', cau: [
+        { phan: 'II' as const, so: 2, de: 'x', y: { a: '1', b: '2', c: '3', d: '4' }, dap_an: 'SDSD', loi_giai: { chot: 'chốt', tung_y: { a: { dung: false, vi_sao: 'a' }, b: { dung: true, vi_sao: 'b' }, c: { dung: false, vi_sao: 'c' } } } },
+        { phan: 'III' as const, so: 3, de: 'x', dap_an: '6,8', loi_giai: { chot: 'Bảo toàn khối lượng.', buoc: ['n = 0,1 mol', 'm = 6,8 tấn'], ket_qua: '6,8 tấn' } },
+      ],
+    }
+    const { source, warnings } = buildTeacherSourceFromKhoDe(parseKhoDeJsonText(JSON.stringify(json)).json!)
+    expect(warnings.join(' ')).toMatch(/tung_y\.d thiếu lý do/)
+    expect(source.phanIII[0].loiGiai).toEqual({ chot: 'Bảo toàn khối lượng.', tungPa: undefined, tungY: undefined, buoc: ['n = 0,1 mol', 'm = 6,8 tấn'], ketQua: '6,8 tấn' })
+  })
+  it('bản cũ chỉ có noi_dung vẫn parse -> explanation, không có loiGiai', () => {
+    const json = { ma_de: '100', cau: [{ phan: 'III' as const, so: 1, de: 'x', dap_an: '1', loi_giai: { noi_dung: 'cũ' } }] }
+    const { source } = buildTeacherSourceFromKhoDe(parseKhoDeJsonText(JSON.stringify(json)).json!)
+    expect(source.phanIII[0].explanation).toBe('cũ')
+    expect(source.phanIII[0].loiGiai).toBeUndefined()
+  })
+})

@@ -163,15 +163,17 @@ const NHAN_TONE: Record<'xanh' | 'cam' | 'do' | 'tim' | 'xam', { bg: string; fg:
   xam: { bg: 'var(--the-2)', fg: 'var(--nhat)' },
 }
 
-export function Nhan({ tone, children, className = '', ...rest }: { tone: keyof typeof NHAN_TONE; children: ReactNode; className?: string; 'data-nhan'?: string }) {
+export function Nhan({ tone, children, className = '', wrap = false, ...rest }: { tone: keyof typeof NHAN_TONE; children: ReactNode; className?: string; /** true = nhãn dài, cho xuống dòng (mặc định 1 dòng). */ wrap?: boolean; 'data-nhan'?: string }) {
   const t = NHAN_TONE[tone]
   return (
     <span
       {...rest}
-      className={`inline-flex items-center font-bold whitespace-nowrap ${className}`}
+      className={`inline-flex items-center font-bold ${className}`}
       style={{
-        borderRadius: 'var(--bo-tron)',
-        padding: '2px 10px',
+        whiteSpace: wrap ? 'normal' : 'nowrap',
+        lineHeight: wrap ? 1.4 : undefined,
+        borderRadius: wrap ? 'var(--bo-1)' : 'var(--bo-tron)',
+        padding: wrap ? '6px 10px' : '2px 10px',
         background: t.bg,
         color: t.fg,
         fontFamily: 'var(--sans)',
@@ -215,7 +217,9 @@ export function OThongBao({ tone = 'cam', children, className = '' }: { tone?: '
 
 // ---------------------------------------------------------------------------
 // <NutChinh> — nút hành động cao 56px, rộng hết bề ngang. chinh=nền --muc
-// đặc; phu=viền, nền trong suốt; nguyhiem=chữ/viền đỏ.
+// đặc; phu=viền, nền trong suốt; nguyhiem=chữ/viền đỏ. Nhãn nút dùng --sans
+// (quy ước tokens.css: serif cho tiêu đề & nội dung học thuật, sans cho nhãn
+// nút/số liệu/mô tả) — thầy yêu cầu đồng bộ font 2026-09-02.
 // ---------------------------------------------------------------------------
 const NUT_CHINH_STYLE: Record<'chinh' | 'phu' | 'nguyhiem', React.CSSProperties> = {
   chinh: { background: 'var(--muc)', color: 'var(--muc-nguoc)', border: '1px solid var(--muc)' },
@@ -247,8 +251,8 @@ export function NutChinh({
       style={{
         height: 56,
         borderRadius: 'var(--bo-1)',
-        fontFamily: 'var(--serif)',
-        fontSize: 'var(--cx-3)',
+        fontFamily: 'var(--sans)',
+        fontSize: 'var(--cx-2)',
         transitionProperty: 'background-color, opacity',
         transitionDuration: 'var(--nhanh)',
         ...NUT_CHINH_STYLE[variant],
