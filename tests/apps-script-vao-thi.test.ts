@@ -1,0 +1,89 @@
+// Bảng quyết định VÀO THI của máy chủ (QUANLYCATHI.md mục 1 + 3) — nạp thẳng
+// file Apps Script (docs/apps-script-kiem-tra.gs) vào Node và gọi hàm thuần
+// quyetDinhVaoThi_ để logic test được đúng bản sẽ dán lên Google.
+import { describe, expect, it } from 'vitest'
+import gsCode from '../docs/apps-script-kiem-tra.gs?raw'
+
+type QD = { ok: true; cach: 'moi' | 'khoi_phuc' | 'duyet_lai' } | { ok: false; lyDo: string; nopLuc?: string; lanThu?: number; batDau?: string; hetHanVao?: string }
+interface Gs {
+  quyetDinhVaoThi_: (
+    ca: { trangThai: string; batDau: string; hetHanVao: string; thoiGianPhut: number },
+    luot: { trangThai: string; idThietBi: string; lanThu: number; nopLuc: string } | null,
+    idThietBi: string,
+    nowMs: number,
+  ) => QD
+  msCua_: (iso: string) => number
+  LUOT_HEADERS: string[]
+  CA_HEADERS: string[]
+}
+
+// File chỉ khai báo const + function ở cấp cao nhất (không gọi Google API lúc
+// nạp) nên đưa vào Function là chạy được; các hàm hoist nên lấy ra được.
+const gs: Gs = new Function(`${gsCode}\nreturn { quyetDinhVaoThi_, msCua_, LUOT_HEADERS, CA_HEADERS }`)()
+
+const T0 = Date.parse('2026-09-03T07:00:00Z') // 14:00 VN
+const caMo = { trangThai: 'mo', batDau: '2026-09-03T07:00:00Z', hetHanVao: '2026-09-03T07:30:00Z', thoiGianPhut: 45 }
+
+describe('Apps Script quyetDinhVaoThi_ — một SBD một lượt', () => {
+  it('chưa có lượt, trong giờ → lượt mới', () => {
+    expect(gs.quyetDinhVaoThi_(caMo, null, 'may-A', T0 + 60_000)).toEqual({ ok: true, cach: 'moi' })
+  })
+
+  it('kiểm chứng 2: dang_lam CÙNG máy → khôi phục (kể cả đã quá hạn vào phòng)', () => {
+    const luot = { trangThai: 'dang_lam', idThietBi: 'may-A', lanThu: 1, nopLuc: '' }
+    expect(gs.quyetDinhVaoThi_(caMo, luot, 'may-A', T0 + 60_000)).toEqual({ ok: true, cach: 'khoi_phuc' })
+    expect(gs.quyetDinhVaoThi_(caMo, luot, 'may-A', T0 + 40 * 60_000)).toEqual({ ok: true, cach: 'khoi_phuc' })
+  })
+
+  it('kiểm chứng 3: dang_lam KHÁC máy → chặn, kể cả khi lượt cũ đã hết giờ', () => {
+    const luot = { trangThai: 'dang_lam', idThietBi: 'may-A', lanThu: 1, nopLuc: '' }
+    expect(gs.quyetDinhVaoThi_(caMo, luot, 'may-B', T0 + 60_000)).toMatchObject({ ok: false, lyDo: 'dang_lam_may_khac' })
+    expect(gs.quyetDinhVaoThi_(caMo, luot, 'may-B', T0 + 3 * 3600_000)).toMatchObject({ ok: false, lyDo: 'dang_lam_may_khac' })
+  })
+
+  it('kiểm chứng 1: đã nộp → chặn kèm giờ nộp; bị khoá cũng chặn', () => {
+    const daNop = { trangThai: 'da_nop', idThietBi: 'may-A', lanThu: 1, nopLuc: '2026-09-03T07:32:00Z' }
+    expect(gs.quyetDinhVaoThi_(caMo, daNop, 'may-A', T0 + 60_000)).toEqual({ ok: false, lyDo: 'da_nop', nopLuc: '2026-09-03T07:32:00Z', lanThu: 1 })
+    const khoa = { ...daNop, trangThai: 'khoa' }
+    expect(gs.quyetDinhVaoThi_(caMo, khoa, 'may-B', T0 + 60_000)).toMatchObject({ ok: false, lyDo: 'da_nop' })
+  })
+
+  it('kiểm chứng 4: thầy duyệt thi lại → vào được, cách = duyet_lai', () => {
+    const duyet = { trangThai: 'duoc_duyet_lai', idThietBi: '', lanThu: 2, nopLuc: '' }
+    expect(gs.quyetDinhVaoThi_(caMo, duyet, 'may-B', T0 + 60_000)).toEqual({ ok: true, cach: 'duyet_lai' })
+  })
+
+  it('kiểm chứng 7: quá hạn vào phòng → mã ca vô hiệu (lượt mới và cả lượt được duyệt lại)', () => {
+    expect(gs.quyetDinhVaoThi_(caMo, null, 'may-A', T0 + 31 * 60_000)).toEqual({ ok: false, lyDo: 'het_han_vao', hetHanVao: caMo.hetHanVao })
+    const duyet = { trangThai: 'duoc_duyet_lai', idThietBi: '', lanThu: 2, nopLuc: '' }
+    expect(gs.quyetDinhVaoThi_(caMo, duyet, 'may-A', T0 + 31 * 60_000)).toMatchObject({ ok: false, lyDo: 'het_han_vao' })
+  })
+
+  it('trước giờ bắt đầu → "chưa mở" kèm mốc bắt đầu', () => {
+    expect(gs.quyetDinhVaoThi_(caMo, null, 'may-A', T0 - 60_000)).toEqual({ ok: false, lyDo: 'chua_mo', batDau: caMo.batDau })
+  })
+
+  it('không đặt hạn vào phòng (rỗng) → vào lúc nào cũng được', () => {
+    const tuDo = { ...caMo, hetHanVao: '' }
+    expect(gs.quyetDinhVaoThi_(tuDo, null, 'may-A', T0 + 5 * 3600_000)).toEqual({ ok: true, cach: 'moi' })
+  })
+
+  it('ca đã xoá / đã đóng → chặn trước mọi thứ', () => {
+    expect(gs.quyetDinhVaoThi_({ ...caMo, trangThai: 'da_xoa' }, null, 'may-A', T0)).toEqual({ ok: false, lyDo: 'da_xoa' })
+    const luot = { trangThai: 'dang_lam', idThietBi: 'may-A', lanThu: 1, nopLuc: '' }
+    expect(gs.quyetDinhVaoThi_({ ...caMo, trangThai: 'dong' }, luot, 'may-A', T0)).toEqual({ ok: false, lyDo: 'da_dong' })
+  })
+
+  it('tiêu đề sheet LuotThi đúng thứ tự cột mà code ghi theo chỉ số', () => {
+    // vaoThi ghi cột 4..8 (IdThietBi, VaoLuc, HetGioLuc, NopLuc, TrangThai); submit ghi 7..12; sendFeedback ghi 14..17; GhiChu 20, CapNhatLuc 21.
+    expect(gs.LUOT_HEADERS.slice(3, 8)).toEqual(['IdThietBi', 'VaoLuc', 'HetGioLuc', 'NopLuc', 'TrangThai'])
+    expect(gs.LUOT_HEADERS.slice(6, 12)).toEqual(['NopLuc', 'TrangThai', 'DapAnJson', 'SoLanRoiMan', 'TongGiayRoiMan', 'IntegrityJson'])
+    expect(gs.LUOT_HEADERS.slice(13, 17)).toEqual(['DiemI', 'DiemII', 'DiemIII', 'Tong'])
+    expect(gs.LUOT_HEADERS[17]).toBe('DuyetBoi')
+    expect(gs.LUOT_HEADERS[19]).toBe('GhiChu')
+    expect(gs.LUOT_HEADERS[20]).toBe('CapNhatLuc')
+    expect(gs.LUOT_HEADERS).toHaveLength(21)
+    expect(gs.CA_HEADERS.slice(0, 7)).toEqual(['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson'])
+    expect(gs.CA_HEADERS.slice(7, 10)).toEqual(['BatDau', 'HetHanVao', 'TrangThai'])
+  })
+})

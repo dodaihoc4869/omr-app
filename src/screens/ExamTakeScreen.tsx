@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
-import { fetchSession, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendTeacherMessage, type KeyBank, type CongBoDiem } from '../lib/exam-api'
+import { vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendTeacherMessage, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { gioMayChu, gioNgan } from '../lib/gio-may-chu'
+import { layIdThietBi } from '../lib/thiet-bi'
 import TheCau from '../components/TheCau'
 import MaCaInput from '../components/MaCaInput'
 import DaiNhacCaiApp from '../components/DaiNhacCaiApp'
@@ -14,6 +16,7 @@ import {
   cacheSession,
   emptyAnswerRecord,
   emptyIntegrityLog,
+  hetGioCua,
   loadAttempt,
   loadCachedSession,
   loadScriptUrlHoacMacDinh,
@@ -287,6 +290,24 @@ export default function ExamTakeScreen() {
     })
   }
 
+  // Mở lại màn "Đã nộp" từ bản đã lưu trên máy (đã nộp trước đó): nạp lại đề
+  // đã cache để đếm số câu / hiện điểm; effect hỏi lại kết quả (fetchKetQua)
+  // chạy ở màn đó. Bài chưa gửi được (mất mạng lúc nộp) thì gửi tiếp.
+  const moLaiDaNop = async (existing: ExamAttempt) => {
+    const cachedCu = await loadCachedSession(existing.maCa)
+    if (cachedCu) {
+      setBank(cachedCu.bank)
+      setLop(cachedCu.lop)
+    }
+    setAttempt(existing)
+    setPhase('submitted')
+    if (existing.pendingSubmit) trySend(existing)
+  }
+
+  // VÀO THI (QUANLYCATHI.md mục 1 + 3): máy chủ quyết định — một SBD một lượt
+  // mỗi ca, phân biệt máy bằng id thiết bị, 3 mốc thời gian, giờ máy chủ.
+  // Không có mạng: CHỈ cho tiếp tục lượt đang làm dở trên chính máy này (đề
+  // đã cache) — không tạo được lượt mới ngoài tầm máy chủ.
   const handleJoin = async () => {
     const ma = maCa.trim()
     const sb = sbd.trim()
@@ -294,47 +315,82 @@ export default function ExamTakeScreen() {
     setPhase('loading')
     try {
       const existing = await loadAttempt(ma, sb)
-      if (existing?.submitted) {
-        // Mở lại sau khi đã nộp: nạp lại đề đã cache để đếm số câu / hiện điểm
-        // chi tiết; effect hỏi lại kết quả (fetchKetQua) chạy ở màn "Đã nộp".
-        const cachedCu = await loadCachedSession(ma)
-        if (cachedCu) {
-          setBank(cachedCu.bank)
-          setLop(cachedCu.lop)
+      const cached = await loadCachedSession(ma)
+      const url = scriptUrl.trim()
+      const idTb = layIdThietBi()
+
+      let kq: KetQuaVaoThi | null = null
+      if (url) {
+        try {
+          kq = await vaoThi(url, ma, sb, idTb, !cached)
+        } catch {
+          kq = null
         }
-        setAttempt(existing)
-        setPhase('submitted')
-        return
       }
 
-      let cached = await loadCachedSession(ma)
-      if (!cached) {
-        if (!scriptUrl.trim())
-          throw new Error('Chưa có link kết nối — mở đúng link thầy gửi, hoặc hỏi thầy mã ca + link Apps Script')
-        const session = await fetchSession(scriptUrl.trim(), ma)
-        if (!session.found || !session.bank) throw new Error('Không tìm thấy ca kiểm tra — kiểm tra lại mã ca')
-        cached = { maCa: ma, lop: session.lop || '', thoiGianPhut: session.thoiGianPhut || 45, bank: session.bank }
-        await cacheSession(cached)
-      }
-      setBank(cached.bank)
-      setLop(cached.lop)
-
-      const a: ExamAttempt =
-        existing ?? {
-          key: `${ma}:${sb}`,
-          maCa: ma,
-          sbd: sb,
-          maDe: 'ngân hàng',
-          startedAt: new Date().toISOString(),
-          durationMinutes: cached.thoiGianPhut,
-          answers: emptyAnswerRecord(),
-          integrity: emptyIntegrityLog(),
-          submitted: false,
-          submittedAt: null,
-          pendingSubmit: false,
+      if (!kq) {
+        if (existing?.submitted) return moLaiDaNop(existing)
+        if (existing && cached && !existing.submitted) {
+          // Rớt mạng, mở lại cùng máy: tiếp tục lượt dở — mốc hết giờ đã lưu từ máy chủ.
+          setBank(cached.bank)
+          setLop(cached.lop)
+          setAttempt(existing)
+          setPhase('exam')
+          return
         }
-      if (!existing) await saveAttempt(a)
+        throw new Error(url ? 'Không kết nối được máy chủ — cần mạng để vào thi. Kiểm tra mạng rồi bấm Vào thi lại.' : 'Chưa có link kết nối — mở đúng link thầy gửi.')
+      }
+
+      if (!kq.ok) {
+        // Đã nộp đúng lượt này trên chính máy này → mở màn "Đã nộp" (xem điểm,
+        // lời giải) thay vì báo lỗi; các trường hợp chặn khác hiện lý do rõ.
+        if (kq.lyDo === 'da_nop' && existing?.submitted && (existing.lanThu ?? 1) === (kq.lanThu ?? 1)) return moLaiDaNop(existing)
+        throw new Error(thongDiepChan(kq, gioNgan))
+      }
+
+      // Máy chủ nói "khôi phục" nhưng máy này đã nộp (mất mạng lúc nộp, máy chủ
+      // chưa nhận) → về màn Đã nộp và gửi tiếp, không cho làm lại.
+      if (kq.cach === 'khoi_phuc' && existing?.submitted) return moLaiDaNop(existing)
+
+      const bank = cached?.bank ?? kq.bank
+      if (!bank) throw new Error('Máy chủ chưa gửi đề — bấm Vào thi lại.')
+      if (!cached || kq.bank) await cacheSession({ maCa: ma, lop: kq.lop, thoiGianPhut: kq.thoiGianPhut, bank })
+      setBank(bank)
+      setLop(kq.lop)
+      setCongBo(kq.congBo)
+
+      // Lượt trước nộp lúc mất mạng chưa gửi được mà máy chủ đã cho lượt mới
+      // (thầy duyệt thi lại) → gửi nốt bài cũ trước, không để mất.
+      if (existing?.submitted && existing.pendingSubmit && kq.cach !== 'khoi_phuc') {
+        try {
+          await submitAnswers(url, existing.maCa, existing.sbd, existing.maDe, existing.answers, existing.integrity, existing.lanThu ?? 1, existing.idThietBi ?? idTb)
+        } catch {
+          // vẫn mở lượt mới — máy chủ đã ghi trạng thái lượt cũ theo cách của nó
+        }
+      }
+
+      const giuLuotDo = kq.cach === 'khoi_phuc' && existing && !existing.submitted && (existing.lanThu ?? 1) === kq.lanThu
+      const a: ExamAttempt = giuLuotDo
+        ? { ...existing, startedAt: kq.vaoLuc, hetGioLuc: kq.hetGioLuc, durationMinutes: kq.thoiGianPhut, idThietBi: idTb }
+        : {
+            key: `${ma}:${sb}`,
+            maCa: ma,
+            sbd: sb,
+            maDe: 'ngân hàng',
+            startedAt: kq.vaoLuc,
+            durationMinutes: kq.thoiGianPhut,
+            hetGioLuc: kq.hetGioLuc,
+            lanThu: kq.lanThu,
+            idThietBi: idTb,
+            answers: emptyAnswerRecord(),
+            integrity: emptyIntegrityLog(),
+            submitted: false,
+            submittedAt: null,
+            pendingSubmit: false,
+          }
+      await saveAttempt(a)
       setAttempt(a)
+      if (kq.cach === 'duyet_lai') showToast(`Thầy đã duyệt cho thi lại — lần ${kq.lanThu}`, 'success')
       setPhase('exam')
     } catch (e) {
       setErrorMsg(e instanceof Error ? e.message : 'Lỗi không rõ nguyên nhân')
@@ -342,11 +398,13 @@ export default function ExamTakeScreen() {
     }
   }
 
-  // Đồng hồ đếm ngược: luôn tính lại từ startedAt (không cộng dồn setInterval) để không lệch giờ.
+  // Đồng hồ đếm ngược: mốc hết giờ do MÁY CHỦ đặt (hetGioLuc), thời gian hiện
+  // tại lấy từ gioMayChu() (đã hiệu chỉnh theo máy chủ, chống chỉnh giờ máy) —
+  // không cộng dồn setInterval để không lệch giờ.
   useEffect(() => {
     if (phase !== 'exam' || !attempt) return
-    const deadline = new Date(attempt.startedAt).getTime() + attempt.durationMinutes * 60000
-    const tick = () => setRemaining((deadline - Date.now()) / 1000)
+    const deadline = new Date(hetGioCua(attempt)).getTime()
+    const tick = () => setRemaining((deadline - gioMayChu()) / 1000)
     tick()
     const id = setInterval(tick, 1000)
     return () => clearInterval(id)
@@ -473,6 +531,7 @@ export default function ExamTakeScreen() {
           g.score.total,
           classify(g.score.total),
           { phanI: g.wrongPhanI, phanII: g.wrongPhanII, phanIII: g.wrongPhanIII },
+          { I: g.score.phanIScore, II: g.score.phanIIScore, III: g.score.phanIIIScore },
         ).catch(() => {
           // Gửi nhận xét cho phụ huynh không phải luồng chính — lỗi thì bỏ qua.
         })
@@ -520,7 +579,7 @@ export default function ExamTakeScreen() {
   const trySend = async (a: ExamAttempt) => {
     try {
       if (!scriptUrl.trim()) throw new Error('no-script-url')
-      const { keyBank, congBo: cb } = await submitAnswers(scriptUrl.trim(), a.maCa, a.sbd, a.maDe, a.answers, a.integrity)
+      const { keyBank, congBo: cb } = await submitAnswers(scriptUrl.trim(), a.maCa, a.sbd, a.maDe, a.answers, a.integrity, a.lanThu ?? 1, a.idThietBi ?? layIdThietBi())
       const done = { ...a, pendingSubmit: false }
       setAttempt(done)
       await saveAttempt(done)
@@ -807,8 +866,11 @@ export default function ExamTakeScreen() {
         <div className="w-full flex flex-col" style={{ maxWidth: 400, gap: 'var(--k4)' }}>
           <TheNoiDung>
             <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
-              <div className="font-bold" style={{ fontSize: 'var(--cx-4)' }}>
-                Đã nộp bài
+              <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
+                <div className="font-bold" style={{ fontSize: 'var(--cx-4)' }}>
+                  Đã nộp bài
+                </div>
+                {(attempt?.lanThu ?? 1) > 1 && <Nhan tone="tim">lần {attempt?.lanThu}</Nhan>}
               </div>
               <div className="flex flex-col" style={{ gap: 'var(--k1)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--nhat)' }}>
                 <div>

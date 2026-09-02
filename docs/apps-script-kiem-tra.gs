@@ -54,7 +54,21 @@ const SHEET_TINNHAN = 'TinNhan'
 const SHEET_HOCSINH = 'HocSinh'
 const SHEET_TINTHAY = 'TinNhanThay'
 const SHEET_DE = 'NganHangDe'
+const SHEET_LUOT = 'LuotThi'
 const DRIVE_FOLDER = 'OMR-APP-DATA'
+
+// Cột sheet CaKiemTra (1-based = vị trí trong mảng + 1). 7 cột đầu có từ bản
+// đầu; từ cột 8 thêm khi làm QUANLYCATHI (3 mốc thời gian, trạng thái, phạm vi).
+// getSheet_ chỉ ghi tiêu đề khi TẠO MỚI sheet — sheet cũ được bổ sung tiêu đề
+// cột thiếu bằng boSungTieuDe_.
+const CA_HEADERS = ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson', 'BatDau', 'HetHanVao', 'TrangThai', 'TenCa', 'PhamVi', 'DanhSachMoi', 'NguoiTao', 'XoaLuc']
+// Mỗi LƯỢT THI một dòng: (MaCa, SBD, LanThu) là khoá. Thi lại = dòng mới, không
+// đè dòng cũ. TrangThai: dang_lam · da_nop · khoa (bị khoá vì rời màn) ·
+// duoc_duyet_lai (thầy đã duyệt, em chưa vào) · Điểm do app ghi sau khi chấm.
+const LUOT_HEADERS = ['MaCa', 'SBD', 'LanThu', 'IdThietBi', 'VaoLuc', 'HetGioLuc', 'NopLuc', 'TrangThai', 'DapAnJson', 'SoLanRoiMan', 'TongGiayRoiMan', 'IntegrityJson', 'HoTen', 'DiemI', 'DiemII', 'DiemIII', 'Tong', 'DuyetBoi', 'DuyetLuc', 'GhiChu', 'CapNhatLuc']
+// Thời gian ân hạn sau HẾT GIỜ làm bài (đồng hồ máy em lệch, mạng chậm lúc tự
+// nộp) — quá mốc này vẫn nhận bài nhưng ghi chú "nộp muộn".
+const AN_HAN_NOP_GIAY = 120
 
 // ---------------------------------------------------------------------------
 // JSON LỚN (đề có ảnh cắt base64 ~ vài trăm KB) KHÔNG nhét vừa 1 ô Sheet
@@ -142,88 +156,261 @@ function findRowByKey_(sh, keyCol, keyVal) {
   return -1
 }
 
+/** Sheet tạo từ bản cũ thiếu cột mới → ghi bổ sung tiêu đề các cột còn thiếu
+ * (dữ liệu cũ giữ nguyên, ô cột mới để trống = mặc định). */
+function boSungTieuDe_(sh, headers) {
+  const hienCo = sh.getLastColumn()
+  const cu = hienCo > 0 ? sh.getRange(1, 1, 1, hienCo).getValues()[0] : []
+  for (let i = 0; i < headers.length; i++) {
+    if (String(cu[i] || '') !== headers[i]) sh.getRange(1, i + 1).setValue(headers[i])
+  }
+}
+
+function sheetCa_() {
+  const sh = getSheet_(SHEET_CA, CA_HEADERS)
+  boSungTieuDe_(sh, CA_HEADERS)
+  return sh
+}
+
+function sheetLuot_() {
+  const sh = getSheet_(SHEET_LUOT, LUOT_HEADERS)
+  boSungTieuDe_(sh, LUOT_HEADERS)
+  return sh
+}
+
+/** Đọc 1 dòng CaKiemTra thành object có tên — không đụng chỉ số cột rải rác. */
+function docCa_(sh, row) {
+  const v = sh.getRange(row, 1, 1, CA_HEADERS.length).getValues()[0]
+  return {
+    row: row,
+    maCa: String(v[0]),
+    lop: v[1],
+    thoiGianPhut: Number(v[2]) || 45,
+    moLuc: v[3],
+    bankRef: v[4],
+    congBo: congBoCua_(v[5]),
+    keyBankRef: v[6],
+    batDau: v[7] ? String(v[7]) : '',
+    hetHanVao: v[8] ? String(v[8]) : '',
+    trangThai: v[9] ? String(v[9]) : 'mo',
+    tenCa: v[10] ? String(v[10]) : '',
+    phamVi: v[11] ? String(v[11]) : 'tu_do',
+    danhSachMoi: v[12] ? String(v[12]) : '',
+    nguoiTao: v[13] ? String(v[13]) : '',
+  }
+}
+
+function docLuot_(v) {
+  return {
+    maCa: String(v[0]),
+    sbd: String(v[1]),
+    lanThu: Number(v[2]) || 1,
+    idThietBi: String(v[3] || ''),
+    vaoLuc: v[4] ? String(v[4]) : '',
+    hetGioLuc: v[5] ? String(v[5]) : '',
+    nopLuc: v[6] ? String(v[6]) : '',
+    trangThai: String(v[7] || ''),
+    dapAnJson: v[8],
+    soLanRoiMan: Number(v[9]) || 0,
+    tongGiayRoiMan: Number(v[10]) || 0,
+    integrityJson: v[11],
+    hoTen: v[12] ? String(v[12]) : '',
+    tong: v[16] === '' || v[16] === null || v[16] === undefined ? null : Number(v[16]),
+    duyetBoi: v[17] ? String(v[17]) : '',
+    duyetLuc: v[18] ? String(v[18]) : '',
+    ghiChu: v[19] ? String(v[19]) : '',
+  }
+}
+
+/** Lượt MỚI NHẤT của mỗi SBD trong 1 ca (LanThu lớn nhất) + chỉ số dòng sheet. */
+function luotMoiNhatTheoSbd_(sh, maCa) {
+  const data = sh.getDataRange().getValues()
+  const map = {}
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][0]) !== String(maCa)) continue
+    const l = docLuot_(data[i])
+    l.row = i + 1
+    if (!map[l.sbd] || map[l.sbd].lanThu < l.lanThu) map[l.sbd] = l
+  }
+  return map
+}
+
+function msCua_(iso) {
+  const t = new Date(iso).getTime()
+  return isFinite(t) ? t : NaN
+}
+
+/** QUYẾT ĐỊNH CHO VÀO THI (thuần logic, không IO — có test ở tests/apps-script-vao-thi.test.ts).
+ * ca: {trangThai, batDau, hetHanVao, thoiGianPhut} · luot: lượt mới nhất của
+ * SBD hoặc null · idThietBi: id máy đang xin vào · nowMs: giờ MÁY CHỦ.
+ * Trả về {ok:false, lyDo, ...} hoặc {ok:true, cach:'moi'|'khoi_phuc'|'duyet_lai'}.
+ * Bảng xử lý theo QUANLYCATHI.md mục 1 + mục 3:
+ *   chưa có lượt            → tạo lượt 1 (nếu ca đang mở & chưa quá hạn vào)
+ *   dang_lam cùng máy       → cho vào tiếp (khôi phục), KHÔNG xét hạn vào phòng
+ *   dang_lam khác máy       → chặn (kể cả khi lượt cũ đã hết giờ — tránh mượn máy thi lại từ đầu)
+ *   da_nop / khoa           → chặn, cần thầy duyệt
+ *   duoc_duyet_lai          → cho vào, lượt này thành dang_lam (xét hạn vào phòng như lượt mới) */
+function quyetDinhVaoThi_(ca, luot, idThietBi, nowMs) {
+  if (ca.trangThai === 'da_xoa') return { ok: false, lyDo: 'da_xoa' }
+  if (ca.trangThai === 'dong') return { ok: false, lyDo: 'da_dong' }
+  if (luot && luot.trangThai === 'dang_lam') {
+    if (luot.idThietBi && idThietBi && luot.idThietBi === idThietBi) return { ok: true, cach: 'khoi_phuc' }
+    return { ok: false, lyDo: 'dang_lam_may_khac' }
+  }
+  if (luot && (luot.trangThai === 'da_nop' || luot.trangThai === 'khoa')) return { ok: false, lyDo: 'da_nop', nopLuc: luot.nopLuc, lanThu: luot.lanThu }
+  // lượt mới (chưa có, hoặc thầy đã duyệt thi lại) → xét cửa sổ vào phòng
+  const batDau = ca.batDau ? msCua_(ca.batDau) : NaN
+  if (isFinite(batDau) && nowMs < batDau) return { ok: false, lyDo: 'chua_mo', batDau: ca.batDau }
+  const hetHan = ca.hetHanVao ? msCua_(ca.hetHanVao) : NaN
+  if (isFinite(hetHan) && nowMs > hetHan) return { ok: false, lyDo: 'het_han_vao', hetHanVao: ca.hetHanVao }
+  return { ok: true, cach: luot && luot.trangThai === 'duoc_duyet_lai' ? 'duyet_lai' : 'moi' }
+}
+
+function tenHocSinh_(sbd) {
+  try {
+    const sh = getSheet_(SHEET_HOCSINH, ['SBD', 'HoTen', 'NamSinh', 'Lop', 'DangKyLuc'])
+    const row = findRowByKey_(sh, 0, sbd)
+    return row > 0 ? String(sh.getRange(row, 2).getValue() || '') : ''
+  } catch (err) {
+    return ''
+  }
+}
+
 function doGet(e) {
   const action = e.parameter.action
   if (action === 'session') {
+    // Bản cũ (trước QUANLYCATHI): chỉ tải đề. App mới vào thi bằng POST
+    // vaoThi (có kiểm tra 1 SBD 1 lượt + 3 mốc thời gian); giữ action này để
+    // link cũ / bản app cũ còn chạy. Vẫn KHÔNG trả KeyBankJson.
     const maCa = e.parameter.maCa || ''
-    const sh = getSheet_(SHEET_CA, ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson'])
+    const sh = sheetCa_()
     const row = findRowByKey_(sh, 0, maCa)
     if (row < 0) return jsonResponse_({ found: false })
-    // CHỈ trả về bank KHÔNG đáp án (BankJson) ở đây — đây là lúc học sinh
-    // vào thi, đáp án đúng (KeyBankJson) tuyệt đối không được lộ lúc này.
-    const vals = sh.getRange(row, 1, 1, 5).getValues()[0]
+    const ca = docCa_(sh, row)
+    if (ca.trangThai === 'da_xoa') return jsonResponse_({ found: false })
     return jsonResponse_({
       found: true,
-      maCa: vals[0],
-      lop: vals[1],
-      thoiGianPhut: vals[2],
-      moLuc: vals[3],
-      bank: docJsonLon_(vals[4]),
+      maCa: ca.maCa,
+      lop: ca.lop,
+      thoiGianPhut: ca.thoiGianPhut,
+      moLuc: ca.moLuc,
+      batDau: ca.batDau,
+      hetHanVao: ca.hetHanVao,
+      serverNow: Date.now(),
+      bank: docJsonLon_(ca.bankRef),
     })
   }
   if (action === 'ketQua') {
     // Em hỏi lại sau khi nộp: đã được xem đáp án chưa? CHỈ trả keyBank cho em
-    // ĐÃ NỘP, và với chế độ 'calop' chỉ khi (a) mọi SBD đã vào thi ca này
-    // (sheet TrangThai) đều đã có bài nộp, hoặc (b) mọi em đó đều đã hết giờ
-    // (BatDauLuc + thoiGianPhut + 2 phút) — em nộp sớm không thể lấy đáp án
-    // trong lúc bạn còn đang làm.
+    // ĐÃ NỘP, và với chế độ 'calop' chỉ khi mọi SBD đã vào thi ca này đều đã
+    // nộp, hoặc đều đã hết giờ (HetGioLuc + ân hạn) — em nộp sớm không thể lấy
+    // đáp án trong lúc bạn còn đang làm. Nguồn: sheet LuotThi (lượt mới nhất
+    // mỗi SBD); ca mở từ bản cũ không có LuotThi → dùng BaiLam + TrangThai.
     const maCa = e.parameter.maCa || ''
     const sbd = (e.parameter.sbd || '').trim()
-    const caSh = getSheet_(SHEET_CA, ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson'])
+    const caSh = sheetCa_()
     const caRow = findRowByKey_(caSh, 0, maCa)
     if (caRow < 0) return jsonResponse_({ ok: false, error: 'Không có ca ' + maCa })
-    const caVals = caSh.getRange(caRow, 1, 1, 7).getValues()[0]
-    const congBo = congBoCua_(caVals[5])
-    const thoiGianPhut = Number(caVals[2]) || 45
-
-    const blSh = getSheet_(SHEET_BAILAM, ['MaCa', 'SBD', 'MaDe', 'ThoiGianNop', 'DapAnJson', 'SoLanRoiApp', 'TongGiayRoiApp', 'IntegrityJson'])
-    const bl = blSh.getDataRange().getValues()
-    const daNop = {}
-    for (let i = 1; i < bl.length; i++) if (String(bl[i][0]) === String(maCa)) daNop[String(bl[i][1])] = true
-    const emDaNop = !!daNop[sbd]
-    const soDaNop = Object.keys(daNop).length
-
-    if (congBo === 'khong' || !caVals[6]) return jsonResponse_({ ok: true, congBo: congBo, sanSang: false, daNop: soDaNop, daVao: soDaNop, keyBank: null })
-    if (congBo === 'ngay') return jsonResponse_({ ok: true, congBo: congBo, sanSang: emDaNop, daNop: soDaNop, daVao: soDaNop, keyBank: emDaNop ? docJsonLon_(caVals[6]) : null })
-
-    // calop
-    const stSh = getSheet_(SHEET_TRANGTHAI, ['SBD', 'MaCa', 'Lop', 'DangLam', 'BatDauLuc', 'DaLamCauHoi', 'TongCauHoi', 'SoLanRoiApp', 'Blocked', 'CapNhatLuc'])
-    const st = stSh.getDataRange().getValues()
+    const ca = docCa_(caSh, caRow)
+    const congBo = ca.congBo
     const now = Date.now()
-    const han = (thoiGianPhut + 2) * 60000
+
+    const luot = luotMoiNhatTheoSbd_(sheetLuot_(), maCa)
+    const dsSbd = Object.keys(luot)
+    let daNop = {}
+    let soDaNop = 0
     let daVao = 0
     let conDangLam = 0
-    for (let i = 1; i < st.length; i++) {
-      if (String(st[i][1]) !== String(maCa)) continue
-      daVao++
-      const sbdKia = String(st[i][0])
-      const batDau = new Date(st[i][4]).getTime()
-      const hetGio = isFinite(batDau) && now > batDau + han
-      if (!daNop[sbdKia] && !hetGio) conDangLam++
+    if (dsSbd.length > 0) {
+      for (let k = 0; k < dsSbd.length; k++) {
+        const l = luot[dsSbd[k]]
+        if (l.trangThai === 'duoc_duyet_lai') continue // thầy duyệt nhưng em chưa vào
+        daVao++
+        if (l.trangThai === 'da_nop' || l.trangThai === 'khoa') {
+          daNop[l.sbd] = true
+          soDaNop++
+        } else {
+          const hetGio = msCua_(l.hetGioLuc)
+          if (!(isFinite(hetGio) && now > hetGio + AN_HAN_NOP_GIAY * 1000)) conDangLam++
+        }
+      }
+    } else {
+      const blSh = getSheet_(SHEET_BAILAM, ['MaCa', 'SBD', 'MaDe', 'ThoiGianNop', 'DapAnJson', 'SoLanRoiApp', 'TongGiayRoiApp', 'IntegrityJson'])
+      const bl = blSh.getDataRange().getValues()
+      for (let i = 1; i < bl.length; i++) if (String(bl[i][0]) === String(maCa)) daNop[String(bl[i][1])] = true
+      soDaNop = Object.keys(daNop).length
+      const stSh = getSheet_(SHEET_TRANGTHAI, ['SBD', 'MaCa', 'Lop', 'DangLam', 'BatDauLuc', 'DaLamCauHoi', 'TongCauHoi', 'SoLanRoiApp', 'Blocked', 'CapNhatLuc'])
+      const st = stSh.getDataRange().getValues()
+      const han = (ca.thoiGianPhut + 2) * 60000
+      for (let i = 1; i < st.length; i++) {
+        if (String(st[i][1]) !== String(maCa)) continue
+        daVao++
+        const batDau = new Date(st[i][4]).getTime()
+        const hetGio = isFinite(batDau) && now > batDau + han
+        if (!daNop[String(st[i][0])] && !hetGio) conDangLam++
+      }
+      if (soDaNop > daVao) daVao = soDaNop
     }
-    // Em nào nộp mà không có dòng TrangThai (mất mạng lúc đẩy trạng thái) vẫn tính là đã vào.
-    if (soDaNop > daVao) daVao = soDaNop
+    const emDaNop = !!daNop[sbd]
+
+    if (congBo === 'khong' || !ca.keyBankRef) return jsonResponse_({ ok: true, congBo: congBo, sanSang: false, daNop: soDaNop, daVao: daVao, keyBank: null })
+    if (congBo === 'ngay') return jsonResponse_({ ok: true, congBo: congBo, sanSang: emDaNop, daNop: soDaNop, daVao: daVao, keyBank: emDaNop ? docJsonLon_(ca.keyBankRef) : null })
     const sanSang = emDaNop && soDaNop > 0 && conDangLam === 0
-    return jsonResponse_({ ok: true, congBo: congBo, sanSang: sanSang, daNop: soDaNop, daVao: daVao, keyBank: sanSang ? docJsonLon_(caVals[6]) : null })
+    return jsonResponse_({ ok: true, congBo: congBo, sanSang: sanSang, daNop: soDaNop, daVao: daVao, keyBank: sanSang ? docJsonLon_(ca.keyBankRef) : null })
   }
 
   if (action === 'listSubmissions') {
+    // Lượt MỚI NHẤT của mỗi SBD trong ca (mọi trạng thái — màn Theo dõi tự lọc
+    // đã nộp để chấm). Ca mở từ bản cũ không có LuotThi → đọc BaiLam như trước.
     const maCa = e.parameter.maCa || ''
-    const sh = getSheet_(SHEET_BAILAM, ['MaCa', 'SBD', 'MaDe', 'ThoiGianNop', 'DapAnJson', 'SoLanRoiApp', 'TongGiayRoiApp', 'IntegrityJson'])
-    const data = sh.getDataRange().getValues()
+    const luot = luotMoiNhatTheoSbd_(sheetLuot_(), maCa)
     const rows = []
-    for (let i = 1; i < data.length; i++) {
-      if (String(data[i][0]) === String(maCa)) {
-        rows.push({
-          sbd: data[i][1],
-          maDe: data[i][2],
-          thoiGianNop: data[i][3],
-          dapAn: JSON.parse(data[i][4]),
-          integrity: data[i][7] ? JSON.parse(data[i][7]) : null,
-        })
+    const dsSbd = Object.keys(luot)
+    for (let k = 0; k < dsSbd.length; k++) {
+      const l = luot[dsSbd[k]]
+      let integrity = null
+      try { integrity = l.integrityJson ? JSON.parse(l.integrityJson) : null } catch (err) {}
+      let dapAn = null
+      try { dapAn = l.dapAnJson ? JSON.parse(l.dapAnJson) : null } catch (err) {}
+      rows.push({
+        sbd: l.sbd,
+        hoTen: l.hoTen,
+        maDe: 'ngân hàng',
+        lanThu: l.lanThu,
+        trangThai: l.trangThai,
+        vaoLuc: l.vaoLuc,
+        hetGioLuc: l.hetGioLuc,
+        thoiGianNop: l.nopLuc,
+        dapAn: dapAn,
+        integrity: integrity,
+        ghiChu: l.ghiChu,
+        duyetBoi: l.duyetBoi,
+      })
+    }
+    if (rows.length === 0) {
+      const sh = getSheet_(SHEET_BAILAM, ['MaCa', 'SBD', 'MaDe', 'ThoiGianNop', 'DapAnJson', 'SoLanRoiApp', 'TongGiayRoiApp', 'IntegrityJson'])
+      const data = sh.getDataRange().getValues()
+      for (let i = 1; i < data.length; i++) {
+        if (String(data[i][0]) === String(maCa)) {
+          const integ = data[i][7] ? JSON.parse(data[i][7]) : null
+          rows.push({
+            sbd: data[i][1],
+            hoTen: '',
+            maDe: data[i][2],
+            lanThu: 1,
+            trangThai: integ && integ.blocked ? 'khoa' : 'da_nop',
+            vaoLuc: '',
+            hetGioLuc: '',
+            thoiGianNop: data[i][3],
+            dapAn: JSON.parse(data[i][4]),
+            integrity: integ,
+            ghiChu: '',
+            duyetBoi: '',
+          })
+        }
       }
     }
-    return jsonResponse_({ rows: rows })
+    return jsonResponse_({ rows: rows, serverNow: Date.now() })
   }
   if (action === 'parentFeedback') {
     const sdt = (e.parameter.sdt || '').trim()
@@ -498,81 +685,219 @@ function doPost(e) {
     // Không đụng BankJson (đề học sinh đang làm) và chế độ công bố.
     const loi = kiemTraMaBiMat_(body)
     if (loi) return jsonResponse_({ ok: false, error: loi })
-    const sh = getSheet_(SHEET_CA, ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson'])
+    const sh = sheetCa_()
     const row = findRowByKey_(sh, 0, body.maCa)
     if (row < 0) return jsonResponse_({ ok: false, error: 'Không có ca ' + body.maCa })
-    const cu = sh.getRange(row, 1, 1, 7).getValues()[0]
-    sh.getRange(row, 7).setValue(luuJsonLon_('ca_' + body.maCa + '_key', body.keyBank, cu[6]))
-    return jsonResponse_({ ok: true, maCa: String(body.maCa), congBo: congBoCua_(cu[5]) })
+    const ca = docCa_(sh, row)
+    sh.getRange(row, 7).setValue(luuJsonLon_('ca_' + body.maCa + '_key', body.keyBank, ca.keyBankRef))
+    return jsonResponse_({ ok: true, maCa: String(body.maCa), congBo: ca.congBo })
   }
 
   if (action === 'publish') {
-    const sh = getSheet_(SHEET_CA, ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson'])
+    const sh = sheetCa_()
     const row = findRowByKey_(sh, 0, body.maCa)
     // keyBank (có đáp án) CHỈ được gửi lên nếu thầy chủ động bật "xem điểm
     // ngay sau khi nộp" ở màn Soạn đề — lưu riêng cột này, KHÔNG bao giờ trả
-    // về ở action "session" (chỉ trả trong response của "submit", xem dưới).
-    const cu = row > 0 ? sh.getRange(row, 1, 1, 7).getValues()[0] : [null, null, null, null, '', '', '']
+    // về ở action "session"/"vaoThi" (chỉ trả trong response của "submit").
+    const cu = row > 0 ? docCa_(sh, row) : { bankRef: '', keyBankRef: '' }
+    // 3 MỐC THỜI GIAN (QUANLYCATHI mục 3): BatDau (rỗng = mở ngay, lấy giờ máy
+    // chủ) · HetHanVao (rỗng = không giới hạn) · ThoiGianPhut tính từ lúc TỪNG
+    // EM vào (vaoThi), không phải giờ chung.
+    const batDauMs0 = body.batDau ? msCua_(body.batDau) : NaN
+    const batDauMs = isFinite(batDauMs0) ? batDauMs0 : Date.now()
+    const batDau = new Date(batDauMs).toISOString()
+    // hanVaoPhut (số phút sau BatDau, tính theo giờ máy chủ) ưu tiên hơn hetHanVao tuyệt đối.
+    const hanPhut = Number(body.hanVaoPhut) || 0
+    const hetHanMs = hanPhut > 0 ? batDauMs + hanPhut * 60000 : body.hetHanVao ? msCua_(body.hetHanVao) : NaN
     const rowData = [
       body.maCa,
       body.lop,
       body.thoiGianPhut,
       new Date().toISOString(),
-      luuJsonLon_('ca_' + body.maCa + '_bank', body.bank, cu[4]),
+      luuJsonLon_('ca_' + body.maCa + '_bank', body.bank, cu.bankRef),
       // 'true' = xem điểm ngay khi nộp · 'calop' = khi cả lớp nộp xong · 'false' = không
       body.immediateFeedback === 'calop' ? 'calop' : body.immediateFeedback ? 'true' : 'false',
-      body.keyBank ? luuJsonLon_('ca_' + body.maCa + '_key', body.keyBank, cu[6]) : '',
+      body.keyBank ? luuJsonLon_('ca_' + body.maCa + '_key', body.keyBank, cu.keyBankRef) : '',
+      batDau,
+      isFinite(hetHanMs) ? new Date(hetHanMs).toISOString() : '',
+      'mo',
+      body.tenCa || '',
+      body.phamVi || 'tu_do',
+      body.danhSachMoi ? JSON.stringify(body.danhSachMoi) : '',
+      body.nguoiTao || '',
+      '',
     ]
     if (row > 0) {
-      sh.getRange(row, 1, 1, 7).setValues([rowData])
+      sh.getRange(row, 1, 1, rowData.length).setValues([rowData])
     } else {
       sh.appendRow(rowData)
     }
-    return jsonResponse_({ ok: true })
+    return jsonResponse_({ ok: true, batDau: batDau, hetHanVao: rowData[8], serverNow: Date.now() })
+  }
+
+  if (action === 'vaoThi') {
+    // MỘT SỐ BÁO DANH — MỘT LƯỢT THI MỖI CA (QUANLYCATHI mục 1) + 3 mốc thời
+    // gian (mục 3). Máy chủ là nguồn giờ duy nhất: trả serverNow, vaoLuc,
+    // hetGioLuc để máy em CHỈ hiển thị — đổi giờ điện thoại không kéo dài được
+    // bài. Khoá script để 2 máy cùng xin vào 1 SBD không tạo 2 lượt.
+    const maCa = String(body.maCa || '').trim()
+    const sbd = String(body.sbd || '').trim()
+    const idThietBi = String(body.idThietBi || '').trim()
+    if (!maCa || !sbd) return jsonResponse_({ ok: false, lyDo: 'thieu', error: 'Thiếu mã ca hoặc số báo danh' })
+    const caSh = sheetCa_()
+    const caRow = findRowByKey_(caSh, 0, maCa)
+    if (caRow < 0) return jsonResponse_({ ok: false, lyDo: 'khong_co_ca', error: 'Không tìm thấy ca kiểm tra — kiểm tra lại mã ca' })
+    const ca = docCa_(caSh, caRow)
+    const lock = LockService.getScriptLock()
+    lock.waitLock(15000)
+    try {
+      const sh = sheetLuot_()
+      const luot = luotMoiNhatTheoSbd_(sh, maCa)[sbd] || null
+      const now = Date.now()
+      const qd = quyetDinhVaoThi_(ca, luot, idThietBi, now)
+      if (!qd.ok) {
+        qd.serverNow = now
+        qd.thoiGianPhut = ca.thoiGianPhut
+        return jsonResponse_(qd)
+      }
+      let lanThu = 1
+      let vaoLuc = new Date(now).toISOString()
+      let hetGioLuc = new Date(now + ca.thoiGianPhut * 60000).toISOString()
+      if (qd.cach === 'khoi_phuc') {
+        lanThu = luot.lanThu
+        vaoLuc = luot.vaoLuc
+        hetGioLuc = luot.hetGioLuc || new Date(msCua_(luot.vaoLuc) + ca.thoiGianPhut * 60000).toISOString()
+      } else if (qd.cach === 'duyet_lai') {
+        lanThu = luot.lanThu
+        sh.getRange(luot.row, 4, 1, 5).setValues([[idThietBi, vaoLuc, hetGioLuc, '', 'dang_lam']])
+        sh.getRange(luot.row, LUOT_HEADERS.length).setValue(new Date().toISOString())
+      } else {
+        lanThu = luot ? luot.lanThu + 1 : 1
+        const rowData = []
+        for (let i = 0; i < LUOT_HEADERS.length; i++) rowData.push('')
+        rowData[0] = maCa
+        rowData[1] = sbd
+        rowData[2] = lanThu
+        rowData[3] = idThietBi
+        rowData[4] = vaoLuc
+        rowData[5] = hetGioLuc
+        rowData[7] = 'dang_lam'
+        rowData[9] = 0
+        rowData[10] = 0
+        rowData[12] = tenHocSinh_(sbd)
+        rowData[LUOT_HEADERS.length - 1] = new Date().toISOString()
+        sh.appendRow(rowData)
+      }
+      const out = {
+        ok: true,
+        cach: qd.cach,
+        maCa: maCa,
+        lop: ca.lop,
+        thoiGianPhut: ca.thoiGianPhut,
+        congBo: ca.congBo,
+        lanThu: lanThu,
+        vaoLuc: vaoLuc,
+        hetGioLuc: hetGioLuc,
+        serverNow: Date.now(),
+      }
+      // Đề (KHÔNG đáp án) chỉ gửi khi máy em chưa có bản cache — tiết kiệm băng thông.
+      if (body.canBank) out.bank = docJsonLon_(ca.bankRef)
+      return jsonResponse_(out)
+    } finally {
+      lock.releaseLock()
+    }
+  }
+
+  if (action === 'duyetThiLai') {
+    // Thầy cho 1 em thi lại (QUANLYCATHI mục 1): thêm dòng lượt MỚI trạng thái
+    // duoc_duyet_lai — lượt cũ giữ nguyên, khi em vào (vaoThi) dòng này thành
+    // dang_lam. Cần MA_BI_MAT (chỉ máy thầy có).
+    const loi = kiemTraMaBiMat_(body)
+    if (loi) return jsonResponse_({ ok: false, error: loi })
+    const maCa = String(body.maCa || '').trim()
+    const sbd = String(body.sbd || '').trim()
+    const sh = sheetLuot_()
+    const luot = luotMoiNhatTheoSbd_(sh, maCa)[sbd] || null
+    if (luot && luot.trangThai === 'duoc_duyet_lai') return jsonResponse_({ ok: true, lanThu: luot.lanThu, daDuyetTruoc: true })
+    if (luot && luot.trangThai === 'dang_lam') return jsonResponse_({ ok: false, error: 'Em này đang làm bài (lượt ' + luot.lanThu + ') — chưa nộp thì không cần duyệt' })
+    const lanThu = luot ? luot.lanThu + 1 : 1
+    const rowData = []
+    for (let i = 0; i < LUOT_HEADERS.length; i++) rowData.push('')
+    rowData[0] = maCa
+    rowData[1] = sbd
+    rowData[2] = lanThu
+    rowData[7] = 'duoc_duyet_lai'
+    rowData[9] = 0
+    rowData[10] = 0
+    rowData[12] = luot && luot.hoTen ? luot.hoTen : tenHocSinh_(sbd)
+    rowData[17] = body.nguoiDuyet || 'thầy'
+    rowData[18] = new Date().toISOString()
+    rowData[LUOT_HEADERS.length - 1] = new Date().toISOString()
+    sh.appendRow(rowData)
+    return jsonResponse_({ ok: true, lanThu: lanThu })
   }
 
   if (action === 'submit') {
-    const sh = getSheet_(SHEET_BAILAM, ['MaCa', 'SBD', 'MaDe', 'ThoiGianNop', 'DapAnJson', 'SoLanRoiApp', 'TongGiayRoiApp', 'IntegrityJson'])
+    // Ghi bài nộp vào dòng lượt (MaCa, SBD, LanThu) trong LuotThi: trạng thái
+    // da_nop (hoặc khoa nếu bài bị khoá vì rời màn). Nộp lại (mất mạng nộp
+    // lại) ghi đè cùng dòng. Ca mở từ bản cũ (không có lượt) → vẫn ghi BaiLam
+    // như trước để màn Theo dõi đọc được.
+    const integrity = body.integrity || { leaveCount: 0, totalHiddenMs: 0, events: [] }
+    const nopLuc = new Date().toISOString()
+    const trangThai = integrity.blocked ? 'khoa' : 'da_nop'
+    const sh = sheetLuot_()
     const data = sh.getDataRange().getValues()
-    let foundRow = -1
+    let luotRow = -1
+    let luotCu = null
+    const lanThuMuon = Number(body.lanThu) || 0
     for (let i = 1; i < data.length; i++) {
-      if (String(data[i][0]) === String(body.maCa) && String(data[i][1]) === String(body.sbd)) {
-        foundRow = i + 1
-        break
+      if (String(data[i][0]) !== String(body.maCa) || String(data[i][1]) !== String(body.sbd)) continue
+      const l = docLuot_(data[i])
+      // Đúng lượt em đang làm; không gửi lanThu (bản app cũ) → lượt mới nhất.
+      if (lanThuMuon ? l.lanThu === lanThuMuon : !luotCu || luotCu.lanThu < l.lanThu) {
+        luotRow = i + 1
+        luotCu = l
       }
     }
-    const integrity = body.integrity || { leaveCount: 0, totalHiddenMs: 0, events: [] }
-    const rowData = [
-      body.maCa,
-      body.sbd,
-      body.maDe,
-      new Date().toISOString(),
-      JSON.stringify(body.dapAn),
-      integrity.leaveCount,
-      Math.round(integrity.totalHiddenMs / 1000),
-      JSON.stringify(integrity),
-    ]
-    if (foundRow > 0) {
-      // Học sinh nộp lại (vd mất mạng nộp lại) — ghi đè bài cũ bằng bài mới nhất, không tạo dòng trùng.
-      sh.getRange(foundRow, 1, 1, 8).setValues([rowData])
+    if (luotRow > 0) {
+      let ghiChu = luotCu.ghiChu
+      const hetGio = msCua_(luotCu.hetGioLuc)
+      if (isFinite(hetGio) && Date.now() > hetGio + AN_HAN_NOP_GIAY * 1000) {
+        const muon = Math.round((Date.now() - hetGio) / 1000)
+        ghiChu = 'nộp muộn ' + muon + ' giây'
+      }
+      // Cột 7..12: NopLuc, TrangThai, DapAnJson, SoLanRoiMan, TongGiayRoiMan, IntegrityJson
+      sh.getRange(luotRow, 7, 1, 6).setValues([[nopLuc, trangThai, JSON.stringify(body.dapAn), integrity.leaveCount || 0, Math.round((integrity.totalHiddenMs || 0) / 1000), JSON.stringify(integrity)]])
+      sh.getRange(luotRow, 20, 1, 2).setValues([[ghiChu, nopLuc]])
     } else {
-      sh.appendRow(rowData)
+      const bl = getSheet_(SHEET_BAILAM, ['MaCa', 'SBD', 'MaDe', 'ThoiGianNop', 'DapAnJson', 'SoLanRoiApp', 'TongGiayRoiApp', 'IntegrityJson'])
+      const blData = bl.getDataRange().getValues()
+      let foundRow = -1
+      for (let i = 1; i < blData.length; i++) {
+        if (String(blData[i][0]) === String(body.maCa) && String(blData[i][1]) === String(body.sbd)) {
+          foundRow = i + 1
+          break
+        }
+      }
+      const rowData = [body.maCa, body.sbd, body.maDe, nopLuc, JSON.stringify(body.dapAn), integrity.leaveCount, Math.round(integrity.totalHiddenMs / 1000), JSON.stringify(integrity)]
+      if (foundRow > 0) bl.getRange(foundRow, 1, 1, 8).setValues([rowData])
+      else bl.appendRow(rowData)
     }
 
     // Nếu ca này bật "xem điểm ngay sau khi nộp", trả kèm đáp án (keyBank)
     // NGAY TRONG RESPONSE của lần nộp này — chỉ em vừa nộp nhận được, không
     // có endpoint nào khác cho phép lấy đáp án trước khi nộp bài. Chế độ
     // 'calop' (khi cả lớp nộp xong) KHÔNG trả ở đây — em hỏi lại qua ketQua.
-    const caSh = getSheet_(SHEET_CA, ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson'])
+    const caSh = sheetCa_()
     const caRow = findRowByKey_(caSh, 0, body.maCa)
     let keyBank = null
     let congBo = 'khong'
     if (caRow > 0) {
-      const caVals = caSh.getRange(caRow, 1, 1, 7).getValues()[0]
-      congBo = congBoCua_(caVals[5])
-      if (congBo === 'ngay' && caVals[6]) keyBank = docJsonLon_(caVals[6])
+      const ca = docCa_(caSh, caRow)
+      congBo = ca.congBo
+      if (congBo === 'ngay' && ca.keyBankRef) keyBank = docJsonLon_(ca.keyBankRef)
     }
-    return jsonResponse_({ ok: true, keyBank: keyBank, congBo: congBo })
+    return jsonResponse_({ ok: true, keyBank: keyBank, congBo: congBo, serverNow: Date.now() })
   }
 
   if (action === 'registerParent') {
@@ -614,6 +939,16 @@ function doPost(e) {
     } else {
       sh.appendRow(rowData)
     }
+    // Ghi điểm vào dòng lượt mới nhất của em trong LuotThi (cột 14..17) để
+    // Lịch sử ca thi hiện điểm mà không cần chấm lại. diemPhan có thể thiếu
+    // (bản app cũ) → chỉ ghi Tong.
+    try {
+      const luot = luotMoiNhatTheoSbd_(sheetLuot_(), body.maCa)[String(body.sbd)]
+      if (luot) {
+        const p = body.diemPhan || {}
+        sheetLuot_().getRange(luot.row, 14, 1, 4).setValues([[p.I === undefined ? '' : p.I, p.II === undefined ? '' : p.II, p.III === undefined ? '' : p.III, body.diem]])
+      }
+    } catch (err) {}
     return jsonResponse_({ ok: true })
   }
 
@@ -653,7 +988,9 @@ function doPost(e) {
     } else {
       sh.appendRow(rowData)
     }
-    return jsonResponse_({ ok: true })
+    // serverNow: máy em hiệu chỉnh lại đồng hồ theo giờ máy chủ mỗi lần đẩy
+    // trạng thái (10 giây/lần) — đổi giờ điện thoại giữa chừng cũng vô ích.
+    return jsonResponse_({ ok: true, serverNow: Date.now() })
   }
 
   if (action === 'sendMessage') {

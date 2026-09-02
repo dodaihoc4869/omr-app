@@ -4,6 +4,7 @@
 // nếu dùng application/json.
 import type { PublicExamBank, TeacherExamSource } from '../data/examContent'
 import type { AnswerRecord, IntegrityLog } from './exam-db'
+import { dongBoGioMayChu } from './gio-may-chu'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
 export interface KeyBank {
@@ -27,7 +28,83 @@ async function postJson(scriptUrl: string, body: unknown): Promise<any> {
     body: JSON.stringify(body),
   })
   if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
-  return res.json()
+  const r = await res.json()
+  // Mọi phản hồi có serverNow → hiệu chỉnh đồng hồ theo máy chủ ngay tại đây,
+  // màn hình không phải nhớ gọi.
+  if (r && typeof r.serverNow === 'number') dongBoGioMayChu(r.serverNow)
+  return r
+}
+
+// ============================================================================
+// VÀO THI — một SBD một lượt mỗi ca + 3 mốc thời gian (QUANLYCATHI.md mục 1, 3)
+// ============================================================================
+
+/** Lý do máy chủ KHÔNG cho vào (xem quyetDinhVaoThi_ trong Apps Script). */
+export type LyDoChan = 'khong_co_ca' | 'da_xoa' | 'da_dong' | 'dang_lam_may_khac' | 'da_nop' | 'chua_mo' | 'het_han_vao' | 'thieu'
+
+export type KetQuaVaoThi =
+  | {
+      ok: true
+      /** moi = lượt mới · khoi_phuc = mở lại cùng máy (rớt mạng) · duyet_lai = thầy đã duyệt cho thi lại */
+      cach: 'moi' | 'khoi_phuc' | 'duyet_lai'
+      lop: string
+      thoiGianPhut: number
+      congBo: CongBoDiem
+      lanThu: number
+      vaoLuc: string
+      hetGioLuc: string
+      bank?: PublicExamBank
+    }
+  | { ok: false; lyDo: LyDoChan; nopLuc?: string; lanThu?: number; batDau?: string; hetHanVao?: string; error?: string }
+
+/** Xin vào thi: máy chủ kiểm tra (mã ca, SBD, id thiết bị) rồi tạo/khôi phục
+ * lượt và trả mốc giờ (vaoLuc, hetGioLuc theo giờ máy chủ). canBank=true khi
+ * máy em chưa có đề trong cache → nhận luôn đề (không đáp án) trong cùng 1 lượt gọi. */
+export async function vaoThi(scriptUrl: string, maCa: string, sbd: string, idThietBi: string, canBank: boolean): Promise<KetQuaVaoThi> {
+  const r = await postJson(scriptUrl, { action: 'vaoThi', maCa, sbd, idThietBi, canBank })
+  if (r.ok) {
+    return {
+      ok: true,
+      cach: r.cach,
+      lop: String(r.lop ?? ''),
+      thoiGianPhut: Number(r.thoiGianPhut) || 45,
+      congBo: r.congBo ?? 'khong',
+      lanThu: Number(r.lanThu) || 1,
+      vaoLuc: String(r.vaoLuc),
+      hetGioLuc: String(r.hetGioLuc),
+      bank: r.bank ?? undefined,
+    }
+  }
+  return { ok: false, lyDo: r.lyDo ?? 'thieu', nopLuc: r.nopLuc, lanThu: r.lanThu, batDau: r.batDau, hetHanVao: r.hetHanVao, error: r.error }
+}
+
+/** Thông điệp cho học sinh khi bị chặn — nêu rõ lý do + việc cần làm, không vòng vo. */
+export function thongDiepChan(kq: Extract<KetQuaVaoThi, { ok: false }>, gio: (iso: string) => string): string {
+  switch (kq.lyDo) {
+    case 'khong_co_ca':
+      return 'Không tìm thấy ca kiểm tra — kiểm tra lại mã ca.'
+    case 'da_xoa':
+      return 'Ca kiểm tra này đã bị thầy xoá.'
+    case 'da_dong':
+      return 'Ca kiểm tra này đã đóng.'
+    case 'dang_lam_may_khac':
+      return 'Số báo danh này đang làm bài ở máy khác. Nếu đúng là em, mở lại trên máy đã bắt đầu; nếu không, báo thầy ngay.'
+    case 'da_nop':
+      return `Em đã nộp bài ca này${kq.nopLuc ? ` lúc ${gio(kq.nopLuc)}` : ''}${kq.lanThu && kq.lanThu > 1 ? ` (lần ${kq.lanThu})` : ''}. Muốn thi lại, xin thầy duyệt.`
+    case 'chua_mo':
+      return `Ca thi chưa mở${kq.batDau ? ` — bắt đầu lúc ${gio(kq.batDau)}` : ''}. Đợi đến giờ rồi bấm Vào thi lại.`
+    case 'het_han_vao':
+      return `Đã quá giờ vào phòng thi${kq.hetHanVao ? ` (hết hạn ${gio(kq.hetHanVao)})` : ''} — mã ca không còn hiệu lực.`
+    default:
+      return kq.error || 'Không vào được ca thi.'
+  }
+}
+
+/** Thầy cho 1 em thi lại (cần mã bí mật) — máy chủ tạo lượt mới trạng thái duoc_duyet_lai. */
+export async function duyetThiLai(scriptUrl: string, secret: string, maCa: string, sbd: string, nguoiDuyet = 'thầy'): Promise<number> {
+  const r = await postJson(scriptUrl, { action: 'duyetThiLai', secret, maCa, sbd, nguoiDuyet })
+  if (!r.ok) throw new Error(r.error || 'Không duyệt được')
+  return Number(r.lanThu) || 1
 }
 
 /** Cách công bố điểm cho học sinh của 1 ca:
@@ -40,6 +117,16 @@ async function postJson(scriptUrl: string, body: unknown): Promise<any> {
  * Hai chế độ sau đều gửi keyBank lên máy chủ — thầy tự cân nhắc. */
 export type CongBoDiem = 'khong' | 'ngay' | 'ca_lop_xong'
 
+/** 3 mốc thời gian của ca (QUANLYCATHI.md mục 3). batDau/hetHanVao là ISO
+ * tuyệt đối; rỗng = "mở ngay" (máy chủ lấy giờ của nó) / "không giới hạn giờ
+ * vào". Thời lượng (phút) tính từ lúc TỪNG EM vào, không phải giờ chung. */
+export interface MocThoiGianCa {
+  batDau?: string
+  hetHanVao?: string
+  /** Số phút sau BẮT ĐẦU (tính theo giờ máy chủ) còn cho vào phòng — ưu tiên hơn hetHanVao. 0/undefined = dùng hetHanVao (rỗng = không giới hạn). */
+  hanVaoPhut?: number
+}
+
 export async function publishSession(
   scriptUrl: string,
   maCa: string,
@@ -48,7 +135,8 @@ export async function publishSession(
   bank: PublicExamBank,
   congBoDiem: CongBoDiem = 'khong',
   keyBank?: KeyBank,
-): Promise<void> {
+  moc: MocThoiGianCa = {},
+): Promise<{ batDau: string; hetHanVao: string }> {
   const result = await postJson(scriptUrl, {
     action: 'publish',
     maCa,
@@ -58,8 +146,12 @@ export async function publishSession(
     // Cột ImmediateFeedback trên sheet: 'true' | 'false' | 'calop' (bản cũ chỉ có true/false).
     immediateFeedback: congBoDiem === 'ngay' ? true : congBoDiem === 'ca_lop_xong' ? 'calop' : false,
     keyBank: congBoDiem === 'khong' ? undefined : keyBank,
+    batDau: moc.batDau || '',
+    hetHanVao: moc.hetHanVao || '',
+    hanVaoPhut: moc.hanVaoPhut || 0,
   })
   if (!result.ok) throw new Error(result.error || 'Mở ca kiểm tra thất bại')
+  return { batDau: String(result.batDau || ''), hetHanVao: String(result.hetHanVao || '') }
 }
 
 /** Cập nhật bản CÓ đáp án + lời giải của một ca ĐÃ MỞ (thầy chốt đáp án, hoặc
@@ -103,26 +195,42 @@ export async function submitAnswers(
   maDe: string,
   dapAn: AnswerRecord,
   integrity: IntegrityLog,
+  lanThu = 1,
+  idThietBi = '',
 ): Promise<{ keyBank: KeyBank | null; congBo: CongBoDiem }> {
-  const result = await postJson(scriptUrl, { action: 'submit', maCa, sbd, maDe, dapAn, integrity })
+  const result = await postJson(scriptUrl, { action: 'submit', maCa, sbd, maDe, dapAn, integrity, lanThu, idThietBi })
   if (!result.ok) throw new Error(result.error || 'Nộp bài thất bại')
   return { keyBank: result.keyBank ?? null, congBo: result.congBo ?? (result.keyBank ? 'ngay' : 'khong') }
 }
 
+/** Trạng thái 1 lượt thi trên máy chủ (sheet LuotThi). */
+export type TrangThaiLuot = 'dang_lam' | 'da_nop' | 'khoa' | 'duoc_duyet_lai'
+
 export interface SubmissionRow {
   sbd: string
+  hoTen?: string
   maDe: string
+  /** Lượt thứ mấy của em trong ca (thi lại = 2, 3…). Bản cũ không có → 1. */
+  lanThu?: number
+  trangThai?: TrangThaiLuot
+  vaoLuc?: string
+  hetGioLuc?: string
   thoiGianNop: string
-  dapAn: AnswerRecord
-  integrity?: IntegrityLog
+  dapAn: AnswerRecord | null
+  integrity?: IntegrityLog | null
+  ghiChu?: string
+  duyetBoi?: string
 }
 
+/** Lượt MỚI NHẤT của mỗi SBD trong ca — mọi trạng thái (đang làm, đã nộp, bị
+ * khoá, đã duyệt thi lại). Màn Theo dõi tự lọc đã nộp để chấm. */
 export async function listSubmissions(scriptUrl: string, maCa: string): Promise<SubmissionRow[]> {
   const url = `${scriptUrl}?action=listSubmissions&maCa=${encodeURIComponent(maCa)}`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
   const data = await res.json()
-  return data.rows || []
+  if (typeof data.serverNow === 'number') dongBoGioMayChu(data.serverNow)
+  return (data.rows || []).map((r: SubmissionRow) => ({ ...r, lanThu: Number(r.lanThu) || 1, trangThai: r.trangThai || 'da_nop' }))
 }
 
 // ============================================================================
@@ -175,8 +283,9 @@ export async function sendParentFeedback(
   diem: number,
   xepLoai: string,
   cauSai: { phanI: number[]; phanII: number[]; phanIII: number[] },
+  diemPhan?: { I: number; II: number; III: number },
 ): Promise<void> {
-  const result = await postJson(scriptUrl, { action: 'sendFeedback', sbd, maCa, maDe, thoiGianNop, diem, xepLoai, cauSai })
+  const result = await postJson(scriptUrl, { action: 'sendFeedback', sbd, maCa, maDe, thoiGianNop, diem, xepLoai, cauSai, diemPhan })
   if (!result.ok) throw new Error(result.error || 'Gửi nhận xét thất bại')
 }
 

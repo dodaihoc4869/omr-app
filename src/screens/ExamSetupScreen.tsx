@@ -50,6 +50,57 @@ const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'va
 const TIEU_DE_MUC: React.CSSProperties = { fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)', fontWeight: 700, color: 'var(--muc)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 
+/** Cửa sổ VÀO PHÒNG (QUANLYCATHI mục 3): số phút sau giờ bắt đầu còn cho vào;
+ * 0 = không giới hạn (luyện tập ngoài giờ). Thời lượng làm bài tách riêng —
+ * em vào muộn 5 phút vẫn đủ giờ làm. Mặc định 30 phút (giả định: tại lớp, cả
+ * lớp vào trong nửa giờ đầu). */
+const HAN_VAO_CHON: { phut: number; ten: string }[] = [
+  { phut: 15, ten: '15 phút' },
+  { phut: 30, ten: '30 phút' },
+  { phut: 60, ten: '60 phút' },
+  { phut: 0, ten: 'Không giới hạn' },
+]
+
+/** Giá trị mặc định cho ô hẹn giờ (datetime-local): tròn 5 phút tới, theo giờ máy thầy. */
+function henGioMacDinh(): string {
+  const d = new Date(Date.now() + 5 * 60000)
+  d.setSeconds(0, 0)
+  d.setMinutes(Math.ceil(d.getMinutes() / 5) * 5)
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`
+}
+
+function gioHienThi(iso: string): string {
+  const d = new Date(iso)
+  if (!Number.isFinite(d.getTime())) return ''
+  return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+}
+
+/** Chip chọn 1 trong nhiều (bắt đầu ngay/hẹn giờ, hạn vào phòng) — cùng kiểu với chip lớp. */
+function ChipChon({ chon, onClick, children }: { chon: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={chon}
+      onClick={onClick}
+      className="tap-target font-bold"
+      style={{
+        ...SO,
+        fontSize: 'var(--cx-2)',
+        padding: '0 var(--k4)',
+        borderRadius: 'var(--bo-tron)',
+        background: chon ? 'var(--muc)' : 'var(--the-2)',
+        color: chon ? 'var(--muc-nguoc)' : 'var(--muc)',
+        transitionProperty: 'background-color, color',
+        transitionDuration: 'var(--nhanh)',
+      }}
+    >
+      {children}
+    </button>
+  )
+}
+
 const CACH_CONG_BO: { id: CongBoDiem; ten: string; mota: string }[] = [
   { id: 'khong', ten: 'Không công bố trên máy em', mota: 'Thầy chấm ở màn Theo dõi rồi gửi nhận xét cho phụ huynh.' },
   { id: 'ngay', ten: 'Ngay sau khi em nộp bài', mota: 'Hiện điểm + câu sai + lời giải trên máy em. Em nộp sớm có thể kể đáp án cho em đang làm.' },
@@ -70,9 +121,13 @@ export default function ExamSetupScreen() {
 
   const [lop, setLop] = useState('')
   const [thoiGianPhut, setThoiGianPhut] = useState(45)
+  // 3 mốc thời gian: bắt đầu (ngay / hẹn giờ) · hạn vào phòng (phút sau bắt đầu) · thời lượng.
+  const [batDauCach, setBatDauCach] = useState<'ngay' | 'hen'>('ngay')
+  const [batDauLocal, setBatDauLocal] = useState(henGioMacDinh)
+  const [hanVaoPhut, setHanVaoPhut] = useState(30)
   const [congBoDiem, setCongBoDiem] = useState<CongBoDiem>('khong')
   const [opening, setOpening] = useState(false)
-  const [opened, setOpened] = useState<{ maCa: string; joinLink: string } | null>(null)
+  const [opened, setOpened] = useState<{ maCa: string; joinLink: string; batDau: string; hetHanVao: string } | null>(null)
   const [daCopy, setDaCopy] = useState(false)
 
   useEffect(() => {
@@ -130,16 +185,23 @@ export default function ExamSetupScreen() {
     if (selectedSources.length === 0) return showToast('Chưa chọn đề nào cho ca này', 'error')
     if (!lop.trim()) return showToast('Chưa nhập lớp', 'error')
     if (!Number.isFinite(thoiGianPhut) || thoiGianPhut <= 0) return showToast('Thời gian làm bài phải lớn hơn 0', 'error')
+    let batDauIso = ''
+    if (batDauCach === 'hen') {
+      const t = new Date(batDauLocal).getTime()
+      if (!Number.isFinite(t)) return showToast('Giờ bắt đầu không hợp lệ', 'error')
+      if (t < Date.now() - 60000) return showToast('Giờ bắt đầu đã qua — chọn "Ngay bây giờ" hoặc giờ sau', 'error')
+      batDauIso = new Date(t).toISOString()
+    }
 
     setOpening(true)
     try {
       const maCa = randomSessionCode()
       const publicBank = mergeAndStrip(selectedSources)
       const keyBank = congBoDiem === 'khong' ? undefined : mergeKeepAnswers(selectedSources)
-      await publishSession(scriptUrl.trim(), maCa, lop.trim(), thoiGianPhut, publicBank, congBoDiem, keyBank)
+      const moc = await publishSession(scriptUrl.trim(), maCa, lop.trim(), thoiGianPhut, publicBank, congBoDiem, keyBank, { batDau: batDauIso, hanVaoPhut })
       // Lưu bản CÓ đáp án trên máy thầy để màn Theo dõi chấm lại được sau này.
       await saveSessionTeacherBank(maCa, selectedSources)
-      setOpened({ maCa, joinLink: await taoLinkMoi(maCa, scriptUrl.trim()) })
+      setOpened({ maCa, joinLink: await taoLinkMoi(maCa, scriptUrl.trim()), batDau: moc.batDau, hetHanVao: moc.hetHanVao })
       setDaCopy(false)
       showToast('Đã mở ca kiểm tra', 'success')
     } catch (e) {
@@ -171,6 +233,9 @@ export default function ExamSetupScreen() {
           </div>
           <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', opacity: 0.9 }}>
             Lớp {lop.trim()} · {thoiGianPhut} phút · {tongCauDaChon} câu · {CACH_CONG_BO.find((c) => c.id === congBoDiem)?.ten}
+          </div>
+          <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', opacity: 0.9, marginTop: 'var(--k1)' }}>
+            Bắt đầu <b style={SO}>{gioHienThi(opened.batDau) || 'ngay'}</b> · vào phòng đến <b style={SO}>{opened.hetHanVao ? gioHienThi(opened.hetHanVao) : 'không giới hạn'}</b>
           </div>
         </div>
         <TheNoiDung>
@@ -346,7 +411,42 @@ export default function ExamSetupScreen() {
               value={thoiGianPhut}
               onChange={(e) => setThoiGianPhut(Number(e.target.value))}
             />
-            <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--nhat)' }}>phút làm bài</span>
+            <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--nhat)' }}>phút làm bài — tính từ lúc từng em vào</span>
+          </div>
+
+          {/* BẮT ĐẦU: ngay / hẹn giờ */}
+          <div>
+            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Bắt đầu</div>
+            <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Giờ bắt đầu">
+              {(
+                [
+                  ['ngay', 'Ngay bây giờ'],
+                  ['hen', 'Hẹn giờ'],
+                ] as const
+              ).map(([id, ten]) => (
+                <ChipChon key={id} chon={batDauCach === id} onClick={() => setBatDauCach(id)}>
+                  {ten}
+                </ChipChon>
+              ))}
+              {batDauCach === 'hen' && (
+                <input type="datetime-local" style={{ ...O_NHAP, width: 'auto', ...SO }} value={batDauLocal} onChange={(e) => setBatDauLocal(e.target.value)} aria-label="Giờ bắt đầu" />
+              )}
+            </div>
+          </div>
+
+          {/* HẠN VÀO PHÒNG */}
+          <div>
+            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Cho vào phòng trong</div>
+            <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Hạn vào phòng">
+              {HAN_VAO_CHON.map((h) => (
+                <ChipChon key={h.phut} chon={hanVaoPhut === h.phut} onClick={() => setHanVaoPhut(h.phut)}>
+                  {h.ten}
+                </ChipChon>
+              ))}
+            </div>
+            <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
+              {hanVaoPhut > 0 ? `Sau ${hanVaoPhut} phút kể từ giờ bắt đầu, mã ca vô hiệu — kể cả em đã có link. Em đã vào vẫn đủ ${thoiGianPhut || 0} phút làm bài.` : 'Ai có mã ca vào lúc nào cũng được — dùng cho luyện tập ngoài giờ.'}
+            </div>
           </div>
         </div>
       </TheNoiDung>

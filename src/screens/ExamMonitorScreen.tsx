@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { TriangleAlert } from 'lucide-react'
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
-import { listSubmissions, type SubmissionRow } from '../lib/exam-api'
-import { loadScriptUrl, loadSessionTeacherBank } from '../lib/exam-db'
+import { duyetThiLai, listSubmissions, type SubmissionRow, type TrangThaiLuot } from '../lib/exam-api'
+import { loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { gradeSubmissionFull } from '../lib/exam-grade'
 import { buildStudentEntry, downloadDuLieuJson } from '../lib/json-export'
 import { downloadBangDiem, type StudentRow } from '../lib/xlsx-export'
@@ -20,6 +20,16 @@ interface GradedRow {
   leaveCount: number
   totalHiddenSec: number
   blocked: boolean
+  lanThu: number
+  trangThai: TrangThaiLuot
+  ghiChu: string
+}
+
+const TEN_TRANG_THAI: Record<TrangThaiLuot, string> = {
+  dang_lam: 'Đang làm',
+  da_nop: 'Đã nộp',
+  khoa: 'Bị khoá',
+  duoc_duyet_lai: 'Chờ thi lại',
 }
 
 export default function ExamMonitorScreen() {
@@ -31,6 +41,9 @@ export default function ExamMonitorScreen() {
   const [loading, setLoading] = useState(false)
   const [rows, setRows] = useState<GradedRow[]>([])
   const [noBankWarning, setNoBankWarning] = useState(false)
+  const [dangDuyet, setDangDuyet] = useState<string | null>(null)
+  // SBD đang chờ thầy xác nhận "Cho thi lại" (xác nhận ngay trong hàng, không dùng hộp thoại trình duyệt).
+  const [xacNhanSbd, setXacNhanSbd] = useState<string | null>(null)
 
   useEffect(() => {
     loadScriptUrl().then(setScriptUrl)
@@ -40,7 +53,7 @@ export default function ExamMonitorScreen() {
     const student = classList.find((c) => c.sbd === s.sbd)
     return {
       sbd: s.sbd,
-      hoTen: student?.hoTen ?? '',
+      hoTen: student?.hoTen ?? s.hoTen ?? '',
       lop: student?.lop ?? '',
       sdt: student?.sdt ?? '',
       thoiGianNop: s.thoiGianNop,
@@ -50,6 +63,27 @@ export default function ExamMonitorScreen() {
       leaveCount: s.integrity?.leaveCount ?? 0,
       totalHiddenSec: Math.round((s.integrity?.totalHiddenMs ?? 0) / 1000),
       blocked: s.integrity?.blocked ?? false,
+      lanThu: s.lanThu ?? 1,
+      trangThai: s.trangThai ?? 'da_nop',
+      ghiChu: s.ghiChu ?? '',
+    }
+  }
+
+  // Cho 1 em thi lại (QUANLYCATHI mục 1): máy chủ tạo lượt mới, lượt cũ giữ
+  // nguyên; bảng này hiện lượt mới nhất kèm nhãn "lần N".
+  const handleChoThiLai = async (sbd: string) => {
+    const mat = (await loadTeacherSecret()).trim()
+    if (!mat) return showToast('Chưa nhập mã bí mật — vào Ngân hàng câu hỏi → Cấu hình', 'error')
+    setXacNhanSbd(null)
+    setDangDuyet(sbd)
+    try {
+      const lan = await duyetThiLai(scriptUrl.trim(), mat, maCa.trim(), sbd)
+      showToast(`Đã duyệt — em vào lại link là làm lần ${lan}`, 'success')
+      setRows((cur) => cur.map((r) => (r.sbd === sbd ? { ...r, trangThai: 'duoc_duyet_lai', lanThu: lan } : r)))
+    } catch (e) {
+      showToast(`Không duyệt được: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
+    } finally {
+      setDangDuyet(null)
     }
   }
 
@@ -68,7 +102,9 @@ export default function ExamMonitorScreen() {
         return
       }
       setNoBankWarning(false)
+      // Chỉ chấm lượt ĐÃ NỘP / BỊ KHOÁ có đáp án; đang làm / chờ thi lại hiện trạng thái thôi.
       const graded = submissions.map((s) => {
+        if (!s.dapAn || (s.trangThai !== 'da_nop' && s.trangThai !== 'khoa')) return buildRow(s, null)
         try {
           return buildRow(s, gradeSubmissionFull(teacherBank, maCa.trim(), s.sbd, s.dapAn))
         } catch {
@@ -76,7 +112,7 @@ export default function ExamMonitorScreen() {
         }
       })
       setRows(graded)
-      showToast(`Tải và chấm được ${graded.length} bài nộp`, 'success')
+      showToast(`Tải ${graded.length} em · chấm được ${graded.filter((r) => r.score).length} bài`, 'success')
     } catch (e) {
       showToast(`Lỗi tải danh sách: ${e instanceof Error ? e.message : 'không rõ nguyên nhân'}`, 'error')
     } finally {
@@ -132,7 +168,7 @@ export default function ExamMonitorScreen() {
       {rows.length > 0 && (
         <>
           <div className="text-sm text-slate-500">
-            {rows.length} bài nộp · {gradedRows.length} đã chấm được
+            {rows.length} em đã vào · {rows.filter((r) => r.trangThai === 'da_nop' || r.trangThai === 'khoa').length} đã nộp · {gradedRows.length} chấm được
           </div>
           <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
             <table className="w-full text-xs">
@@ -144,7 +180,8 @@ export default function ExamMonitorScreen() {
                   <th className="p-2 text-right">Điểm</th>
                   <th className="p-2 text-left">Xếp loại</th>
                   <th className="p-2 text-right">Rời app</th>
-                  <th className="p-2 text-left">Nghi vấn</th>
+                  <th className="p-2 text-left">Trạng thái</th>
+                  <th className="p-2 text-left">Thi lại</th>
                 </tr>
               </thead>
               <tbody>
@@ -153,22 +190,46 @@ export default function ExamMonitorScreen() {
                     key={r.sbd}
                     className={`border-t border-slate-100 dark:border-slate-800 ${r.blocked ? 'bg-rose-50 dark:bg-rose-950/40' : ''}`}
                   >
-                    <td className="p-2">{r.sbd}</td>
+                    <td className="p-2">
+                      {r.sbd}
+                      {r.lanThu > 1 && <span className="ml-1 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200 text-[10px] font-bold px-1.5 py-0.5">lần {r.lanThu}</span>}
+                    </td>
                     <td className="p-2">{r.hoTen || '(không khớp danh sách lớp)'}</td>
-                    <td className="p-2">{new Date(r.thoiGianNop).toLocaleTimeString('vi-VN')}</td>
+                    <td className="p-2">{r.thoiGianNop ? new Date(r.thoiGianNop).toLocaleTimeString('vi-VN') : '—'}</td>
                     <td className="p-2 text-right font-semibold">{r.score ? r.score.total.toFixed(2) : '—'}</td>
                     <td className="p-2">{r.score ? classify(r.score.total) : ''}</td>
                     <td className={`p-2 text-right ${r.leaveCount >= 1 ? 'text-rose-600 font-semibold' : ''}`}>
                       {r.leaveCount > 0 ? `${r.leaveCount} lần / ${r.totalHiddenSec}s` : '—'}
                     </td>
                     <td className="p-2">
-                      {r.blocked ? (
+                      {r.blocked || r.trangThai === 'khoa' ? (
                         <span className="inline-flex items-center gap-1 rounded-full bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5">
-                          <TriangleAlert size={11} /> Nghi gian lận
+                          <TriangleAlert size={11} /> Bị khoá
                         </span>
                       ) : (
-                        '—'
+                        <span className={r.trangThai === 'dang_lam' ? 'text-indigo-600 font-semibold' : r.trangThai === 'duoc_duyet_lai' ? 'text-amber-600 font-semibold' : ''}>
+                          {TEN_TRANG_THAI[r.trangThai]}
+                        </span>
                       )}
+                      {r.ghiChu && <div className="text-[10px] text-amber-600">{r.ghiChu}</div>}
+                    </td>
+                    <td className="p-2">
+                      {(r.trangThai === 'da_nop' || r.trangThai === 'khoa') &&
+                        (xacNhanSbd === r.sbd ? (
+                          <span className="inline-flex items-center gap-1">
+                            <button onClick={() => handleChoThiLai(r.sbd)} disabled={dangDuyet === r.sbd} className="tap-target rounded-md bg-indigo-600 text-white font-semibold px-2">
+                              {dangDuyet === r.sbd ? '…' : 'Đồng ý'}
+                            </button>
+                            <button onClick={() => setXacNhanSbd(null)} className="tap-target rounded-md bg-slate-200 dark:bg-slate-800 px-2">
+                              Huỷ
+                            </button>
+                          </span>
+                        ) : (
+                          <button onClick={() => setXacNhanSbd(r.sbd)} className="tap-target rounded-md border border-indigo-300 text-indigo-700 dark:text-indigo-200 font-semibold px-2">
+                            Cho thi lại
+                          </button>
+                        ))}
+                      {r.trangThai === 'duoc_duyet_lai' && <span className="text-slate-400">đã duyệt</span>}
                     </td>
                   </tr>
                 ))}

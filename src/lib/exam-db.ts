@@ -35,17 +35,28 @@ export function emptyIntegrityLog(): IntegrityLog {
 }
 
 export interface ExamAttempt {
-  key: string // `${maCa}:${sbd}`
+  key: string // `${maCa}:${sbd}` — máy em chỉ giữ LƯỢT MỚI NHẤT; lịch sử các lượt nằm trên máy chủ (LuotThi)
   maCa: string
   sbd: string
   maDe: string // giữ để hiển thị, không còn dùng để tra đáp án cố định theo vị trí
-  startedAt: string // ISO — dùng để tính đồng hồ đếm ngược, không dùng setInterval cộng dồn
+  startedAt: string // ISO GIỜ MÁY CHỦ lúc em vào (vaoLuc) — không dùng setInterval cộng dồn
   durationMinutes: number
+  /** ISO giờ máy chủ hết giờ làm bài (vaoLuc + thời lượng). Bản cũ không có → tính từ startedAt. */
+  hetGioLuc?: string
+  /** Lượt thứ mấy trong ca (thi lại = 2, 3…). Bản cũ không có → 1. */
+  lanThu?: number
+  idThietBi?: string
   answers: AnswerRecord
   integrity: IntegrityLog
   submitted: boolean
   submittedAt: string | null
   pendingSubmit: boolean // true = đã bấm Nộp nhưng chưa gửi được lên server (mất mạng)
+}
+
+/** Mốc hết giờ của lượt (ISO): ưu tiên mốc máy chủ, bản cũ tính từ startedAt. */
+export function hetGioCua(a: Pick<ExamAttempt, 'startedAt' | 'durationMinutes' | 'hetGioLuc'>): string {
+  if (a.hetGioLuc) return a.hetGioLuc
+  return new Date(new Date(a.startedAt).getTime() + a.durationMinutes * 60000).toISOString()
 }
 
 const DB_NAME = 'omr-exam'
