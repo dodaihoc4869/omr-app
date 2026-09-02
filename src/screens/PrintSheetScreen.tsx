@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { downloadAnswerSheetPdfBlob } from '../lib/print-sheet'
 import { useAppStore } from '../store/appStore'
 
@@ -6,7 +6,16 @@ export default function PrintSheetScreen() {
   const [hoTen, setHoTen] = useState('')
   const [lop, setLop] = useState('')
   const [busy, setBusy] = useState(false)
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const showToast = useAppStore((s) => s.showToast)
+  const pdfUrlRef = useRef<string | null>(null)
+
+  // Giải phóng blob URL khi rời màn hình, tránh rò rỉ bộ nhớ.
+  useEffect(() => {
+    return () => {
+      if (pdfUrlRef.current) URL.revokeObjectURL(pdfUrlRef.current)
+    }
+  }, [])
 
   const handleCreatePdf = () => {
     // Vẽ PDF (~500+ hình tròn/chữ) chạy đồng bộ và có thể mất vài giây trên
@@ -17,14 +26,27 @@ export default function PrintSheetScreen() {
     setBusy(true)
     setTimeout(() => {
       try {
-        downloadAnswerSheetPdfBlob({ hoTen, lop })
-        showToast('Đã tải PhieuTraLoi.pdf — mở app Files/Tải xuống trên máy để xem', 'success')
+        const url = downloadAnswerSheetPdfBlob({ hoTen, lop }, 'PhieuTraLoi.pdf', pdfUrlRef.current ?? undefined)
+        pdfUrlRef.current = url
+        setPdfUrl(url)
+        showToast('Đã tải PhieuTraLoi.pdf — bấm "Xem PDF vừa tạo" bên dưới để xem ngay', 'success')
       } catch (e) {
         showToast(`Lỗi tạo PDF: ${e instanceof Error ? e.message : 'không rõ nguyên nhân'}`, 'error')
       } finally {
         setBusy(false)
       }
     }, 30)
+  }
+
+  const handleViewPdf = () => {
+    // Bấm trực tiếp vào nút này là một user-gesture đồng bộ mới, nên
+    // window.open ở đây mở tin cậy, không bị Chrome/Safari di động chặn như
+    // khi gọi tự động ngay sau khi tạo xong.
+    if (!pdfUrl) return
+    const win = window.open(pdfUrl, '_blank', 'noopener')
+    if (!win) {
+      showToast('Trình duyệt đang chặn cửa sổ xem PDF — mở app Files/Tải xuống để xem file đã tải', 'warn')
+    }
   }
 
   return (
@@ -53,6 +75,15 @@ export default function PrintSheetScreen() {
       >
         {busy ? 'Đang tạo…' : 'Tạo PDF phiếu trả lời'}
       </button>
+
+      {pdfUrl && (
+        <button
+          onClick={handleViewPdf}
+          className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 font-semibold"
+        >
+          Xem PDF vừa tạo
+        </button>
+      )}
 
       <div className="text-sm text-slate-500 space-y-1">
         <p>In khổ A4, chọn scale 100% (tắt "Fit to page" / "Vừa trang") trong hộp thoại in.</p>

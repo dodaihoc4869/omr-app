@@ -122,16 +122,26 @@ export function buildAnswerSheetPdf(studentInfo?: { hoTen?: string; lop?: string
 
 /**
  * Tải PDF trực tiếp qua thẻ <a download> (blob) — CỐ Ý không dùng
- * window.open(): nếu hàm này chạy sau một setTimeout/rAF (để nhường UI thread
- * vẽ trạng thái "Đang tạo…" trước khi build PDF nặng — xem PrintSheetScreen),
- * lệnh gọi không còn nằm trong đúng user-gesture đồng bộ nữa, và Chrome/Safari
- * di động có thể âm thầm chặn window.open() như popup — trông y hệt "bấm
- * không phản hồi". Tải bằng thẻ <a download> không bị giới hạn này.
+ * window.open() ở BƯỚC NÀY: nếu hàm này chạy sau một setTimeout/rAF (để
+ * nhường UI thread vẽ trạng thái "Đang tạo…" trước khi build PDF nặng — xem
+ * PrintSheetScreen), lệnh gọi không còn nằm trong đúng user-gesture đồng bộ
+ * nữa, và Chrome/Safari di động có thể âm thầm chặn window.open() như popup —
+ * trông y hệt "bấm không phản hồi". Tải bằng thẻ <a download> không bị giới
+ * hạn này.
+ *
+ * Trả về blob URL của PDF vừa tạo — màn hình giữ lại để hiện nút "Xem PDF vừa
+ * tạo": lúc đó người dùng bấm trực tiếp vào nút đó (user-gesture mới, đồng
+ * bộ), nên window.open lúc ấy mở tin cậy, không bị chặn như khi gọi tự động.
+ * Gọi objectUrlToRevoke trước đó (nếu có) để giải phóng blob URL của lần tạo
+ * trước, tránh rò rỉ bộ nhớ khi người dùng tạo phiếu nhiều lần liên tiếp.
  */
 export function downloadAnswerSheetPdfBlob(
   studentInfo?: { hoTen?: string; lop?: string },
   fileName = 'PhieuTraLoi.pdf',
-): void {
+  objectUrlToRevoke?: string,
+): string {
+  if (objectUrlToRevoke) URL.revokeObjectURL(objectUrlToRevoke)
+
   const doc = buildAnswerSheetPdf(studentInfo)
   const blob = doc.output('blob')
   const url = URL.createObjectURL(blob)
@@ -141,5 +151,5 @@ export function downloadAnswerSheetPdfBlob(
   document.body.appendChild(a)
   a.click()
   a.remove()
-  setTimeout(() => URL.revokeObjectURL(url), 60_000)
+  return url
 }
