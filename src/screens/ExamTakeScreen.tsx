@@ -3,6 +3,7 @@ import type { PublicExamBank } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
 import { fetchSession, submitAnswers } from '../lib/exam-api'
 import { ChemText } from '../lib/chem-format'
+import QuestionMedia from '../components/QuestionMedia'
 import {
   cacheSession,
   emptyAnswerRecord,
@@ -302,6 +303,7 @@ export default function ExamTakeScreen() {
                 <span className="text-indigo-600 dark:text-indigo-400 font-bold">Câu {displayIdx + 1}. </span>
                 <ChemText text={item.question.text} />
               </div>
+              <QuestionMedia table={item.question.table} imageDataUrl={item.question.imageDataUrl} />
               <div className="grid grid-cols-1 gap-2">
                 {item.choicePerm.map((origChoiceIdx, displayPos) => {
                   const letter = 'ABCD'[displayPos] as 'A' | 'B' | 'C' | 'D'
@@ -348,6 +350,7 @@ export default function ExamTakeScreen() {
               <span className="text-indigo-600 dark:text-indigo-400 font-bold">Câu {displayIdx + 1}. </span>
               <ChemText text={item.question.text} />
             </div>
+            <QuestionMedia table={item.question.table} imageDataUrl={item.question.imageDataUrl} />
             <div className="space-y-2">
               {item.question.ideas.map((idea, ideaIdx) => {
                 const val = attempt.answers.phanII[item.qid]?.[ideaIdx]
@@ -402,6 +405,7 @@ export default function ExamTakeScreen() {
               <span className="text-indigo-600 dark:text-indigo-400 font-bold">Câu {displayIdx + 1}. </span>
               <ChemText text={item.question.text} />
             </div>
+            <QuestionMedia table={item.question.table} imageDataUrl={item.question.imageDataUrl} />
             <input
               className="tap-target w-full rounded-lg border-2 border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 font-medium"
               placeholder="Đáp án"

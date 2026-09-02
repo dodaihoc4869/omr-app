@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent, type ClipboardEvent, type DragEvent } from 'react'
+import { ImagePlus } from 'lucide-react'
 import { bankSizeWarning, mergeAndStrip, validateTeacherSource, type TeacherExamSource } from '../data/examContent'
 import { publishSession } from '../lib/exam-api'
+import QuestionMedia from '../components/QuestionMedia'
 import {
   deleteExamSource,
   loadExamSources,
@@ -47,6 +49,9 @@ export default function ExamSetupScreen() {
   const [parseErrors, setParseErrors] = useState<string[]>([])
   const [parseWarnings, setParseWarnings] = useState<string[]>([])
   const [parsedPreview, setParsedPreview] = useState<TeacherExamSource | null>(null)
+  const [imageMap, setImageMap] = useState<Record<string, string>>({})
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [lop, setLop] = useState('')
   const [thoiGianPhut, setThoiGianPhut] = useState(45)
@@ -63,8 +68,66 @@ export default function ExamSetupScreen() {
     showToast('Đã lưu link Apps Script trên máy này', 'success')
   }
 
+  // Tự động đính kèm ảnh vào đúng vị trí con trỏ trong ô soạn đề — dùng chung
+  // cho 3 cách: dán ảnh (Ctrl+V/paste, tự động nhất, không cần bấm gì thêm),
+  // kéo-thả ảnh vào ô, và chọn file qua nút bấm.
+  const attachImageAt = async (file: File, pos: number) => {
+    if (!file.type.startsWith('image/')) return showToast('Chỉ nhận file ảnh (đồ thị/hình vẽ chụp hoặc scan)', 'error')
+    const dataUrl: string = await new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+    const token = `img_${Math.random().toString(36).slice(2, 9)}`
+    setImageMap((prev) => ({ ...prev, [token]: dataUrl }))
+    const marker = `[ANH:${token}]`
+    setDraftText((cur) => cur.slice(0, pos) + marker + cur.slice(pos))
+    const ta = textareaRef.current
+    requestAnimationFrame(() => {
+      if (!ta) return
+      ta.focus()
+      ta.selectionStart = ta.selectionEnd = pos + marker.length
+    })
+    showToast('Đã tự động đính kèm ảnh vào đúng vị trí — hiển thị y nguyên cho học sinh', 'success')
+  }
+
+  const handleAttachImage = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    const ta = textareaRef.current
+    await attachImageAt(file, ta?.selectionStart ?? draftText.length)
+  }
+
+  // Dán ảnh trực tiếp (vd copy hình từ Word/PowerPoint hoặc chụp màn hình rồi
+  // Ctrl+V) — app tự phát hiện, tự đính kèm, không cần thao tác thêm nào.
+  const handlePasteImage = async (e: ClipboardEvent<HTMLTextAreaElement>) => {
+    const items = e.clipboardData?.items
+    if (!items) return
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile()
+        if (!file) continue
+        e.preventDefault()
+        const ta = e.currentTarget
+        await attachImageAt(file, ta.selectionStart ?? draftText.length)
+        return
+      }
+    }
+  }
+
+  // Kéo-thả file ảnh vào ô soạn đề cũng tự đính kèm.
+  const handleDropImage = async (e: DragEvent<HTMLTextAreaElement>) => {
+    const file = Array.from(e.dataTransfer?.files ?? []).find((f) => f.type.startsWith('image/'))
+    if (!file) return
+    e.preventDefault()
+    const ta = e.currentTarget
+    await attachImageAt(file, ta.selectionStart ?? draftText.length)
+  }
+
   const handleParse = () => {
-    const result = parseExamText(draftText)
+    const result = parseExamText(draftText, imageMap)
     setParseErrors(result.errors)
     setParseWarnings(result.warnings)
     setParsedPreview(result.source)
@@ -96,6 +159,7 @@ export default function ExamSetupScreen() {
     setParsedPreview(null)
     setParseErrors([])
     setParseWarnings([])
+    setImageMap({})
   }
 
   const handleDeleteContent = async (maDe: string) => {
@@ -214,16 +278,36 @@ export default function ExamSetupScreen() {
           khỏi sai: "SO4^{'{2-}'}" → <ChemText text={'SO4^{2-}'} />. Mũi tên phản ứng gõ "-&gt;" hoặc "&lt;=&gt;" sẽ
           tự thành → hoặc ⇌.
         </p>
+        <p className="text-xs text-slate-500">
+          Bảng số liệu (tái tạo đúng 100%, không suy đoán): đặt giữa <code>[BANG]</code> và <code>[/BANG]</code>, mỗi
+          dòng 1 hàng, cột cách nhau bằng "|" — hàng đầu là tiêu đề cột. Đồ thị/hình vẽ: đặt con trỏ vào đúng chỗ cần
+          chèn rồi <b>dán ảnh (Ctrl+V)</b> hoặc kéo-thả file ảnh vào ô soạn đề — app tự động đính kèm ngay, không cần
+          bấm thêm gì. Hiển thị lại y nguyên ảnh gốc cho học sinh, không có tính năng vẽ lại đồ thị bằng AI vì không
+          đảm bảo đúng số liệu.
+        </p>
         <textarea
+          ref={textareaRef}
           className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 text-xs font-mono"
           rows={10}
           placeholder={SAMPLE_TEXT}
           value={draftText}
           onChange={(e) => setDraftText(e.target.value)}
+          onPaste={handlePasteImage}
+          onDrop={handleDropImage}
+          onDragOver={(e) => e.preventDefault()}
         />
-        <button onClick={handleParse} className="tap-target w-full rounded-lg bg-slate-200 dark:bg-slate-800 text-sm font-semibold">
-          Phân tích đề
-        </button>
+        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAttachImage} />
+        <div className="flex gap-2">
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="tap-target flex-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-sm font-semibold flex items-center justify-center gap-1.5"
+          >
+            <ImagePlus size={16} /> Chọn file ảnh
+          </button>
+          <button onClick={handleParse} className="tap-target flex-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-sm font-semibold">
+            Phân tích đề
+          </button>
+        </div>
         {parseErrors.length > 0 && (
           <div className="rounded-lg bg-rose-50 dark:bg-rose-950 border border-rose-300 dark:border-rose-800 p-3 text-xs text-rose-700 dark:text-rose-300 space-y-1">
             {parseErrors.map((e, i) => (
@@ -248,6 +332,7 @@ export default function ExamSetupScreen() {
               <div className="rounded-md bg-white/70 dark:bg-slate-900/50 px-2 py-1.5">
                 Câu 1 Phần I (xem thử hiển thị): <ChemText text={parsedPreview.phanI[0].text} /> — đáp án đúng:{' '}
                 <b>{parsedPreview.phanI[0].correct}</b>
+                <QuestionMedia table={parsedPreview.phanI[0].table} imageDataUrl={parsedPreview.phanI[0].imageDataUrl} />
               </div>
             )}
             <button onClick={handleSaveContent} className="tap-target w-full rounded-lg bg-emerald-600 text-white font-semibold">

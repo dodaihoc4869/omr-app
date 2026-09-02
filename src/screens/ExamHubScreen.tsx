@@ -1,3 +1,4 @@
+import { ClipboardList, GraduationCap, Users2 } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 
 export default function ExamHubScreen() {
@@ -13,26 +14,41 @@ export default function ExamHubScreen() {
 
       <button
         onClick={() => setScreen('examsetup')}
-        className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold p-4 text-left"
+        className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold p-4 text-left flex items-center gap-3"
       >
-        <div className="text-base">👩‍🏫 Giáo viên — Soạn đề &amp; mở ca kiểm tra</div>
-        <div className="text-xs font-normal opacity-90 mt-1">Dán đề, chọn lớp, đặt thời gian, tạo mã ca cho học sinh</div>
+        <span className="shrink-0 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center">
+          <GraduationCap size={22} />
+        </span>
+        <span>
+          <div className="text-base">Giáo viên — Soạn đề &amp; mở ca kiểm tra</div>
+          <div className="text-xs font-normal opacity-90 mt-1">Dán đề, chọn lớp, đặt thời gian, tạo mã ca cho học sinh</div>
+        </span>
       </button>
 
       <button
         onClick={() => setScreen('exammonitor')}
-        className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 font-semibold p-4 text-left"
+        className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 font-semibold p-4 text-left flex items-center gap-3"
       >
-        <div className="text-base">📋 Giáo viên — Theo dõi &amp; chấm bài đã nộp</div>
-        <div className="text-xs font-normal opacity-90 mt-1">Nhập mã ca để xem ai đã nộp, chấm điểm tự động</div>
+        <span className="shrink-0 w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center">
+          <ClipboardList size={22} />
+        </span>
+        <span>
+          <div className="text-base">Giáo viên — Theo dõi &amp; chấm bài đã nộp</div>
+          <div className="text-xs font-normal opacity-90 mt-1">Nhập mã ca để xem ai đã nộp, chấm điểm tự động</div>
+        </span>
       </button>
 
       <button
         onClick={() => setScreen('examtake')}
-        className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold p-4 text-left"
+        className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold p-4 text-left flex items-center gap-3"
       >
-        <div className="text-base">🧑‍🎓 Học sinh — Vào thi</div>
-        <div className="text-xs font-normal opacity-90 mt-1">Nhập mã ca thầy cho + số báo danh</div>
+        <span className="shrink-0 w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+          <Users2 size={22} />
+        </span>
+        <span>
+          <div className="text-base">Học sinh — Vào thi</div>
+          <div className="text-xs font-normal opacity-90 mt-1">Nhập mã ca thầy cho + số báo danh</div>
+        </span>
       </button>
 
       <div className="text-xs text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-800">

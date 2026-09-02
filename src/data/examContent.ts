@@ -9,7 +9,18 @@
 //   - "Public*" (KHÔNG có đáp án) — dạng duy nhất được gửi lên Apps Script /
 //     tải xuống máy học sinh.
 
-export interface McqQuestion {
+/**
+ * Bảng số liệu / đồ thị đính kèm câu hỏi — được TÁI TẠO CHÍNH XÁC (không suy
+ * đoán): bảng là dữ liệu thô do thầy gõ (dòng [BANG]...[/BANG] trong đề),
+ * đồ thị/hình vẽ là ẢNH THẦY UPLOAD hiển thị nguyên vẹn — không có tính năng
+ * nào "vẽ lại" đồ thị bằng AI vì không thể đảm bảo đúng 100% số liệu gốc.
+ */
+export interface QuestionMedia {
+  table?: string[][] // hàng đầu là tiêu đề cột
+  imageDataUrl?: string // ảnh chụp đồ thị/hình vẽ, base64, hiển thị y nguyên
+}
+
+export interface McqQuestion extends QuestionMedia {
   id: string
   text: string
   choices: [string, string, string, string] // ứng A,B,C,D theo thứ tự GỐC (chưa xáo)
@@ -18,7 +29,7 @@ export interface TeacherMcqQuestion extends McqQuestion {
   correct: 'A' | 'B' | 'C' | 'D'
 }
 
-export interface TrueFalseQuestion {
+export interface TrueFalseQuestion extends QuestionMedia {
   id: string
   text: string
   ideas: [string, string, string, string] // ý a,b,c,d theo thứ tự GỐC, KHÔNG xáo
@@ -27,7 +38,7 @@ export interface TeacherTrueFalseQuestion extends TrueFalseQuestion {
   correct: ['D' | 'S', 'D' | 'S', 'D' | 'S', 'D' | 'S']
 }
 
-export interface ShortAnswerQuestion {
+export interface ShortAnswerQuestion extends QuestionMedia {
   id: string
   text: string
 }
@@ -83,9 +94,9 @@ export function validateTeacherSource(c: TeacherExamSource): string[] {
 /** Gộp nhiều đề đã tải + xoá đáp án — đây mới là thứ được publish lên server. */
 export function mergeAndStrip(sources: TeacherExamSource[]): PublicExamBank {
   return {
-    phanI: sources.flatMap((s) => s.phanI.map(({ id, text, choices }) => ({ id, text, choices }))),
-    phanII: sources.flatMap((s) => s.phanII.map(({ id, text, ideas }) => ({ id, text, ideas }))),
-    phanIII: sources.flatMap((s) => s.phanIII.map(({ id, text }) => ({ id, text }))),
+    phanI: sources.flatMap((s) => s.phanI.map(({ id, text, choices, table, imageDataUrl }) => ({ id, text, choices, table, imageDataUrl }))),
+    phanII: sources.flatMap((s) => s.phanII.map(({ id, text, ideas, table, imageDataUrl }) => ({ id, text, ideas, table, imageDataUrl }))),
+    phanIII: sources.flatMap((s) => s.phanIII.map(({ id, text, table, imageDataUrl }) => ({ id, text, table, imageDataUrl }))),
   }
 }
 

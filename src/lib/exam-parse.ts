@@ -1,7 +1,8 @@
 // Phân tích văn bản thuần (thầy soạn trong Word rồi dán vào, hoặc gõ trực
 // tiếp) thành TeacherExamSource (có đáp án đúng). KHÔNG đọc được công thức
-// MathType — nếu đề có công thức phức tạp, thầy gõ lại bằng chữ thường (vd
-// "H2SO4", "CO2") hoặc mô tả bằng lời; đây là giới hạn đã biết của bản v1.
+// MathType — công thức Hoá gõ lại bằng chữ thường (vd "H2SO4", "Fe^2+"), app
+// tự hiển thị chỉ số dưới/số mũ khi render (xem chem-format.tsx), KHÔNG BAO
+// GIỜ tự đoán sai — chỗ nào không chắc thì giữ nguyên chữ, không suy diễn.
 // Số câu mỗi phần KHÔNG bắt buộc đúng 18/4/6 — thầy tải càng nhiều câu, ngân
 // hàng càng đa dạng để random cho học sinh càng ít trùng nhau.
 //
@@ -23,12 +24,65 @@
 //   PHẦN III
 //   1) Đề bài câu 1 (điền số, không có lựa chọn)...
 //   => 12,5              <- dòng đáp án, bắt đầu bằng =>
+//
+// Bảng số liệu (tái tạo CHÍNH XÁC, không suy đoán): đặt giữa [BANG] và
+// [/BANG], mỗi dòng 1 hàng, các cột cách nhau bằng "|":
+//   [BANG]
+//   Thời gian (phút) | Nồng độ (M)
+//   0 | 1,0
+//   5 | 0,5
+//   [/BANG]
+// Đồ thị/hình vẽ: KHÔNG thể gõ lại bằng chữ mà đảm bảo đúng 100% số liệu gốc
+// — phải đính kèm ẢNH THẬT (chụp/scan) qua nút "Đính kèm ảnh" ở màn Soạn đề,
+// app chèn tự động 1 dòng [ANH:mã-ảnh] vào đúng vị trí, hiển thị lại y
+// nguyên ảnh đó cho học sinh — không có tính năng "vẽ lại" đồ thị bằng AI.
 import {
   type TeacherExamSource,
   type TeacherMcqQuestion,
   type TeacherShortAnswerQuestion,
   type TeacherTrueFalseQuestion,
 } from '../data/examContent'
+
+const IMG_RE = /\[ANH:([A-Za-z0-9_-]+)\]/
+
+/** Tách [BANG]...[/BANG] và [ANH:token] ra khỏi các dòng văn bản của 1 câu hỏi. */
+function extractMedia(
+  block: string[],
+  imageMap: Record<string, string>,
+): { lines: string[]; table?: string[][]; imageDataUrl?: string } {
+  const lines: string[] = []
+  let table: string[][] | undefined
+  let imageDataUrl: string | undefined
+  let inTable = false
+  const tableRows: string[][] = []
+
+  for (const raw of block) {
+    const line = raw
+    if (/^\s*\[BANG\]\s*$/i.test(line)) {
+      inTable = true
+      continue
+    }
+    if (/^\s*\[\/BANG\]\s*$/i.test(line)) {
+      inTable = false
+      if (tableRows.length > 0) table = tableRows.slice()
+      continue
+    }
+    if (inTable) {
+      tableRows.push(line.split('|').map((c) => c.trim()))
+      continue
+    }
+    const imgMatch = line.match(IMG_RE)
+    if (imgMatch) {
+      const token = imgMatch[1]
+      if (imageMap[token]) imageDataUrl = imageMap[token]
+      const rest = line.replace(IMG_RE, '').trim()
+      if (rest) lines.push(rest)
+      continue
+    }
+    lines.push(line)
+  }
+  return { lines, table, imageDataUrl }
+}
 
 function findSectionBounds(lines: string[]): { maDe: string; p1Start: number; p2Start: number; p3Start: number } {
   const reMaDe = /^mã\s*đề\s*:?\s*(.+)$/i
@@ -68,12 +122,13 @@ function splitQuestionBlocks(lines: string[]): string[][] {
   return blocks
 }
 
-function parseMcqBlock(block: string[], id: string): TeacherMcqQuestion {
+function parseMcqBlock(block: string[], id: string, imageMap: Record<string, string>): TeacherMcqQuestion {
+  const { lines, table, imageDataUrl } = extractMedia(block, imageMap)
   const reChoice = /^\s*(\*?)([A-Da-d])[).]\s*(.*)$/
   const textLines: string[] = []
   const choices: Record<string, string> = {}
   let correct: 'A' | 'B' | 'C' | 'D' | '' = ''
-  for (const line of block) {
+  for (const line of lines) {
     const m = line.match(reChoice)
     if (m) {
       const letter = m[2].toUpperCase() as 'A' | 'B' | 'C' | 'D'
@@ -88,16 +143,19 @@ function parseMcqBlock(block: string[], id: string): TeacherMcqQuestion {
     text: textLines.join(' ').trim(),
     choices: [choices.A ?? '', choices.B ?? '', choices.C ?? '', choices.D ?? ''],
     correct: correct || 'A',
+    table,
+    imageDataUrl,
   }
 }
 
-function parseTrueFalseBlock(block: string[], id: string): TeacherTrueFalseQuestion {
+function parseTrueFalseBlock(block: string[], id: string, imageMap: Record<string, string>): TeacherTrueFalseQuestion {
+  const { lines, table, imageDataUrl } = extractMedia(block, imageMap)
   const reIdea = /^\s*([a-dA-D])[).]\s*(.*?)\s*\(\s*([ĐĐ]|D|[Ss]|S)\s*\)\s*$/i
   const reIdeaNoMark = /^\s*([a-dA-D])[).]\s*(.*)$/
   const textLines: string[] = []
   const ideas: Record<string, string> = {}
   const marks: Record<string, 'D' | 'S'> = {}
-  for (const line of block) {
+  for (const line of lines) {
     const m = line.match(reIdea)
     if (m) {
       const letter = m[1].toLowerCase()
@@ -118,19 +176,22 @@ function parseTrueFalseBlock(block: string[], id: string): TeacherTrueFalseQuest
     text: textLines.join(' ').trim(),
     ideas: [ideas.a ?? '', ideas.b ?? '', ideas.c ?? '', ideas.d ?? ''],
     correct: [marks.a ?? 'S', marks.b ?? 'S', marks.c ?? 'S', marks.d ?? 'S'],
+    table,
+    imageDataUrl,
   }
 }
 
-function parseShortAnswerBlock(block: string[], id: string): TeacherShortAnswerQuestion {
+function parseShortAnswerBlock(block: string[], id: string, imageMap: Record<string, string>): TeacherShortAnswerQuestion {
+  const { lines, table, imageDataUrl } = extractMedia(block, imageMap)
   const reAnswer = /^\s*=>\s*(.+)$/
   const textLines: string[] = []
   let correct = ''
-  for (const line of block) {
+  for (const line of lines) {
     const m = line.match(reAnswer)
     if (m) correct = m[1].trim()
     else textLines.push(line.trim())
   }
-  return { id, text: textLines.join(' ').trim(), correct }
+  return { id, text: textLines.join(' ').trim(), correct, table, imageDataUrl }
 }
 
 export interface ParseExamResult {
@@ -139,7 +200,7 @@ export interface ParseExamResult {
   warnings: string[]
 }
 
-export function parseExamText(raw: string): ParseExamResult {
+export function parseExamText(raw: string, imageMap: Record<string, string> = {}): ParseExamResult {
   const lines = raw.split(/\r?\n/)
   const { maDe, p1Start, p2Start, p3Start } = findSectionBounds(lines)
   const errors: string[] = []
@@ -165,9 +226,9 @@ export function parseExamText(raw: string): ParseExamResult {
 
   const source: TeacherExamSource = {
     maDe,
-    phanI: p1Blocks.map((b, i) => parseMcqBlock(b, `${maDe}-p1-${i}`)),
-    phanII: p2Blocks.map((b, i) => parseTrueFalseBlock(b, `${maDe}-p2-${i}`)),
-    phanIII: p3Blocks.map((b, i) => parseShortAnswerBlock(b, `${maDe}-p3-${i}`)),
+    phanI: p1Blocks.map((b, i) => parseMcqBlock(b, `${maDe}-p1-${i}`, imageMap)),
+    phanII: p2Blocks.map((b, i) => parseTrueFalseBlock(b, `${maDe}-p2-${i}`, imageMap)),
+    phanIII: p3Blocks.map((b, i) => parseShortAnswerBlock(b, `${maDe}-p3-${i}`, imageMap)),
   }
 
   const warnings: string[] = []

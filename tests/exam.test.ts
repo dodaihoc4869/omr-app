@@ -80,6 +80,108 @@ describe('exam-parse', () => {
     const result = parseExamText('MÃ ĐỀ: x\nPHẦN I\n1) a\nA. x\n*B. y\nC. z\nD. w\n')
     expect(result.errors.length).toBeGreaterThan(0)
   })
+
+  it('đọc đúng bảng số liệu [BANG]...[/BANG] — tái tạo y nguyên từng ô, không suy đoán', () => {
+    const text = [
+      'MÃ ĐỀ: co-bang',
+      'PHẦN I',
+      '1) Cho bảng số liệu sau:',
+      '[BANG]',
+      'Thời gian (phút) | Nồng độ (M)',
+      '0 | 1,0',
+      '5 | 0,5',
+      '[/BANG]',
+      'Nồng độ ở phút thứ 5 là bao nhiêu?',
+      'A. 1,0',
+      '*B. 0,5',
+      'C. 0,25',
+      'D. 2,0',
+      '2) câu 2',
+      'A. x',
+      '*B. y',
+      'C. z',
+      'D. w',
+      'PHẦN II',
+      '1) c',
+      'a) a (Đ)',
+      'b) b (S)',
+      'c) c (Đ)',
+      'd) d (S)',
+      'PHẦN III',
+      '1) c',
+      '=> 1',
+    ].join('\n')
+    const result = parseExamText(text)
+    expect(result.errors).toEqual([])
+    const q = result.source!.phanI[0]
+    expect(q.table).toEqual([
+      ['Thời gian (phút)', 'Nồng độ (M)'],
+      ['0', '1,0'],
+      ['5', '0,5'],
+    ])
+    // Dòng bảng KHÔNG bị lẫn vào text câu hỏi
+    expect(q.text).not.toMatch(/\|/)
+    expect(q.text).toContain('Cho bảng số liệu sau')
+    expect(q.text).toContain('Nồng độ ở phút thứ 5 là bao nhiêu')
+  })
+
+  it('gắn đúng ảnh theo mã [ANH:token] và xoá marker khỏi text câu hỏi', () => {
+    const text = [
+      'MÃ ĐỀ: co-anh',
+      'PHẦN I',
+      '1) Quan sát đồ thị sau [ANH:img_test1] và cho biết X là gì?',
+      'A. a',
+      '*B. b',
+      'C. c',
+      'D. d',
+      '2) câu 2',
+      'A. x',
+      '*B. y',
+      'C. z',
+      'D. w',
+      'PHẦN II',
+      '1) c',
+      'a) a (Đ)',
+      'b) b (S)',
+      'c) c (Đ)',
+      'd) d (S)',
+      'PHẦN III',
+      '1) c',
+      '=> 1',
+    ].join('\n')
+    const imageMap = { img_test1: 'data:image/png;base64,AAA' }
+    const result = parseExamText(text, imageMap)
+    expect(result.errors).toEqual([])
+    const q = result.source!.phanI[0]
+    expect(q.imageDataUrl).toBe('data:image/png;base64,AAA')
+    expect(q.text).not.toContain('[ANH:')
+    expect(q.text).toContain('Quan sát đồ thị sau')
+  })
+
+  it('mergeAndStrip giữ nguyên bảng/ảnh khi gộp sang bản public (không phải bí mật cần xoá)', () => {
+    const text = [
+      'MÃ ĐỀ: giu-bang',
+      'PHẦN I',
+      '1) câu 1 [ANH:img_x]',
+      'A. a',
+      '*B. b',
+      'C. c',
+      'D. d',
+      'PHẦN II',
+      '1) c',
+      'a) a (Đ)',
+      'b) b (S)',
+      'c) c (Đ)',
+      'd) d (S)',
+      'PHẦN III',
+      '1) c',
+      '=> 1',
+    ].join('\n')
+    const source = parseExamText(text, { img_x: 'data:image/png;base64,BBB' }).source!
+    const bank = mergeAndStrip([source])
+    expect(bank.phanI[0].imageDataUrl).toBe('data:image/png;base64,BBB')
+    expect((bank.phanI[0] as unknown as { correct?: string }).correct).toBeUndefined()
+  })
 })
 
 describe('mergeAndStrip', () => {
