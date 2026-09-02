@@ -157,24 +157,24 @@ export default function LichSuCaScreen() {
             {dsLoc.map((c) => {
               const tt = trangThaiCa(c, now)
               return (
-                <Hang key={c.maCa} onClick={() => moChiTietCa(c.maCa)} data-trang-thai={tt.ten}>
-                  <span className="flex-1 min-w-0">
-                    <div className="font-bold truncate" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
-                      {c.tenCa || `Ca ${c.maCa}`}
-                    </div>
-                    <div style={NHAN_NHO}>
-                      <span style={SO}>{c.maCa}</span>
-                      {c.lop ? ` · Lớp ${c.lop}` : ''} · <span style={SO}>{ngayGio(c.batDau || c.moLuc)}</span> · {c.thoiGianPhut} phút
-                    </div>
-                  </span>
-                  <span className="shrink-0 flex flex-col items-end" style={{ gap: 4 }}>
-                    <span className="font-bold" style={{ ...SO, fontSize: 'var(--cx-2)' }}>
+                <Hang key={c.maCa} onClick={() => moChiTietCa(c.maCa)} data-trang-thai={tt.ten} className="flex-col" style={{ alignItems: 'stretch' }}>
+                  <span className="flex items-start justify-between" style={{ gap: 'var(--k3)' }}>
+                    <span className="flex-1 min-w-0">
+                      <div className="font-bold truncate" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
+                        {c.tenCa || `Ca ${c.maCa}`}
+                      </div>
+                      <div style={NHAN_NHO}>
+                        <span style={SO}>{c.maCa}</span>
+                        {c.lop ? ` · Lớp ${c.lop}` : ''} · <span style={SO}>{ngayGio(c.batDau || c.moLuc)}</span> · {c.thoiGianPhut} phút
+                      </div>
+                    </span>
+                    <span className="shrink-0 font-bold" style={{ ...SO, fontSize: 'var(--cx-2)' }}>
                       {c.daNop}/{c.daVao} nộp
                     </span>
-                    <span className="flex items-center" style={{ gap: 4 }}>
-                      {c.canhBao > 0 && <Nhan tone="cam">{c.canhBao} cảnh báo</Nhan>}
-                      <Nhan tone={tt.tone}>{tt.ten}</Nhan>
-                    </span>
+                  </span>
+                  <span className="flex items-center flex-wrap" style={{ gap: 4, marginTop: 6 }}>
+                    <Nhan tone={tt.tone}>{tt.ten}</Nhan>
+                    {c.canhBao > 0 && <Nhan tone="cam">{c.canhBao} cảnh báo</Nhan>}
                   </span>
                 </Hang>
               )

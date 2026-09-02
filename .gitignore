@@ -10,3 +10,7 @@ kho-de/moi/*
 kho-de/xong/*
 kho-de/loi/*
 !kho-de/*/.gitkeep
+
+# gói đồng bộ tạm từ Cowork
+_sync.tgz
+_to_delete/
