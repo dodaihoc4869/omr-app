@@ -23,6 +23,43 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl
 export interface FileImportResult {
   text: string
   warnings: string[]
+  /** Số ký tự trung bình/trang — chỉ có ở PDF, dùng để phân biệt PDF có lớp
+   * chữ thật (đọc được) với PDF ảnh scan (không có chữ, phải đọc bằng ảnh). */
+  avgCharsPerPage?: number
+}
+
+export type DocxKind = 'docx_omml' | 'docx_mathtype' | 'docx_chu'
+export type PdfKind = 'pdf_chu' | 'pdf_scan'
+export type FileKind = DocxKind | PdfKind
+
+/** Ngưỡng phân biệt PDF có lớp chữ thật với PDF ảnh scan (không có chữ nào
+ * trích được, chỉ là ảnh chụp/scan trang giấy). */
+const PDF_SCAN_THRESHOLD_CHARS_PER_PAGE = 100
+
+/** Xác định PDF là "có lớp chữ" hay "ảnh scan" dựa trên số ký tự trích được
+ * trung bình mỗi trang — KHÔNG dựa vào tên file hay phần mở rộng. */
+export function classifyPdf(avgCharsPerPage: number): PdfKind {
+  return avgCharsPerPage > PDF_SCAN_THRESHOLD_CHARS_PER_PAGE ? 'pdf_chu' : 'pdf_scan'
+}
+
+/** Xác định file .docx thuộc loại nào để chọn đúng đường xử lý công thức:
+ * - có thẻ <m:oMath> (công thức gõ bằng công cụ Equation gốc của Word, LƯU
+ *   DẠNG CHỮ) -> trích được thẳng, sạch nhất.
+ * - không có oMath nhưng có ảnh .wmf/.emf trong word/media (công thức
+ *   MathType/Equation Editor cũ, LƯU DẠNG ẢNH) -> phải đọc lại bằng ảnh.
+ * - không có cả hai -> file chữ thuần, không có công thức chèn kiểu đối tượng. */
+export async function classifyDocx(buf: ArrayBuffer): Promise<DocxKind> {
+  try {
+    const zip = await JSZip.loadAsync(buf)
+    const docXmlFile = zip.file('word/document.xml')
+    const xml = docXmlFile ? await docXmlFile.async('text') : ''
+    if (/<m:oMath[ >]/.test(xml)) return 'docx_omml'
+    const hasMedia = Object.keys(zip.files).some((name) => /\.(wmf|emf)$/i.test(name))
+    if (hasMedia) return 'docx_mathtype'
+    return 'docx_chu'
+  } catch {
+    return 'docx_chu'
+  }
 }
 
 interface PdfTextItemLike {
@@ -68,8 +105,11 @@ export async function extractTextFromPdf(file: File): Promise<FileImportResult> 
     const items = content.items.filter((it) => 'str' in it) as unknown as PdfTextItemLike[]
     pages.push(pageItemsToText(items))
   }
+  const totalChars = pages.reduce((sum, p) => sum + p.length, 0)
+  const avgCharsPerPage = doc.numPages > 0 ? totalChars / doc.numPages : 0
   return {
     text: pages.join('\n\n'),
+    avgCharsPerPage,
     warnings: [
       'Đã trích chữ từ PDF và tự tái tạo xuống dòng theo đúng bố cục trang gốc — nếu PDF là ảnh scan (không phải PDF chữ thật) thì sẽ KHÔNG trích được chữ nào, phải gõ tay hoặc dán ảnh.',
       'Công thức hoá dạng ảnh vẽ riêng trong PDF (không phải chữ) sẽ KHÔNG trích ra được — thầy tự gõ lại theo cú pháp của app (vd H2SO4, Na+, SO4^{2-}).',
