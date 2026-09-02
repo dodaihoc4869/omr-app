@@ -49,6 +49,19 @@ export default function PrintSheetScreen() {
     }
   }
 
+  const handleDownloadPdf = () => {
+    // Tải lại file PDF đã tạo (không vẽ lại) — để thầy có file riêng gửi
+    // qua Zalo/email cho quán photocopy in hộ.
+    if (!pdfUrl) return
+    const a = document.createElement('a')
+    a.href = pdfUrl
+    a.download = 'PhieuTraLoi.pdf'
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    showToast('Đã tải PhieuTraLoi.pdf — gửi file này cho quán photo là in được', 'success')
+  }
+
   return (
     <div className="min-h-screen pb-24 px-4 pt-4 space-y-4 bg-slate-50 dark:bg-slate-950">
       <h1 className="text-xl font-bold">Tạo & in phiếu</h1>
@@ -77,12 +90,20 @@ export default function PrintSheetScreen() {
       </button>
 
       {pdfUrl && (
-        <button
-          onClick={handleViewPdf}
-          className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 font-semibold"
-        >
-          Xem PDF vừa tạo
-        </button>
+        <div className="space-y-2">
+          <button
+            onClick={handleViewPdf}
+            className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 font-semibold"
+          >
+            Xem PDF vừa tạo
+          </button>
+          <button
+            onClick={handleDownloadPdf}
+            className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold"
+          >
+            Tải PDF (gửi cho quán photo)
+          </button>
+        </div>
       )}
 
       <div className="text-sm text-slate-500 space-y-1">
