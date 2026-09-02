@@ -1,4 +1,4 @@
-import { ClipboardList, GraduationCap, Users2, Users, UploadCloud } from 'lucide-react'
+import { ClipboardList, GraduationCap, Users2, Users, Library } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 
 export default function ExamHubScreen() {
@@ -13,15 +13,15 @@ export default function ExamHubScreen() {
       </p>
 
       <button
-        onClick={() => setScreen('examimport')}
+        onClick={() => setScreen('nganhangde')}
         className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold p-4 text-left flex items-center gap-3"
       >
         <span className="shrink-0 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center">
-          <UploadCloud size={22} />
+          <Library size={22} />
         </span>
         <span>
-          <div className="text-base">Giáo viên — Tải đề vào ngân hàng câu hỏi</div>
-          <div className="text-xs font-normal opacity-90 mt-1">Thả file .pdf/.docx, app tự đọc câu + đáp án, thầy chỉ duyệt lại</div>
+          <div className="text-base">Giáo viên — Ngân hàng câu hỏi</div>
+          <div className="text-xs font-normal opacity-90 mt-1">Đề tự về từ kho (thầy chỉ thả file vào kho-de/moi trên máy) · duyệt câu nghi đáp án</div>
         </span>
       </button>
 

@@ -1,15 +1,24 @@
-// Nhập đề "đã đọc sẵn" — Claude đọc PDF/docx bằng thị giác (ngoài luồng app,
-// trong hội thoại hoặc qua tác vụ định kỳ "Nạp đề mới"), xuất JSON đầy đủ
-// đáp án theo khuôn cố định bên dưới, thầy dán/chọn file JSON này vào màn
-// Tải đề để lưu thẳng vào ngân hàng câu hỏi — KHÔNG đi qua lại bước tách
-// câu bằng lớp chữ pdftotext/geometry, vì Claude đã đọc và cấu trúc hoá sẵn.
+// Đề "đã đọc sẵn" — pipeline "Nạp đề mới" (Cowork) đọc PDF bằng thị giác,
+// giải mù, đối chiếu đáp án, xuất JSON theo khuôn dưới rồi đẩy lên kho đề
+// Apps Script; app trên máy thầy tải về (exam-sync.ts) và build thành
+// TeacherExamSource bằng file này. App KHÔNG đọc PDF/DOCX nữa.
 //
 // AN TOÀN DỮ LIỆU: hàm ở đây CHỈ build dữ liệu trong bộ nhớ, KHÔNG tự lưu,
-// KHÔNG tự gửi đi đâu — nơi gọi (ExamImportScreen) mới quyết định lưu vào
+// KHÔNG tự gửi đi đâu — nơi gọi (exam-sync.ts, màn Ngân hàng) mới lưu vào
 // IndexedDB máy thầy qua saveExamSource() sẵn có. File JSON có đáp án này
 // KHÔNG BAO GIỜ được commit lên git (repo omr-app đang PUBLIC — xem
 // kho-de/.gitignore) hay tải lên bất kỳ server nào.
-import type { HinhAnh, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion, ViTriHinh } from '../data/examContent'
+import type { HinhAnh, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion, TrangThaiLoiGiai, ViTriHinh } from '../data/examContent'
+
+/** Lời giải do pipeline "giải mù" rồi đối chiếu đáp án đề (NAPDETUDONG.md
+ * B2–B3). `dap_an_de` là đáp án in trong đề — luôn dùng để CHẤM. */
+export interface KhoDeLoiGiai {
+  noi_dung: string
+  dap_an_de?: string
+  dap_an_tu_giai?: string
+  trang_thai?: TrangThaiLoiGiai
+  ghi_chu?: string | null
+}
 
 /** Ảnh cắt sẵn từ đề gốc (200 DPI, mép 8px, nền trắng) — pipeline "Nạp đề
  * mới" vừa lưu file PNG vào kho-de/xong/<mã đề>/anh/<tep> vừa nhúng base64
@@ -31,6 +40,7 @@ export interface KhoDeCau {
   hinh?: KhoDeHinh[] | null
   tieu_de?: string
   can_xem?: boolean
+  loi_giai?: KhoDeLoiGiai | null
 }
 
 export interface KhoDeJson {
@@ -47,6 +57,22 @@ export interface KhoDeParseResult {
 }
 
 const VI_TRI_HOP_LE = new Set<string>(['sau_de', 'sau_pa_A', 'sau_pa_B', 'sau_pa_C', 'sau_pa_D', 'sau_y_a', 'sau_y_b', 'sau_y_c', 'sau_y_d', 'cuoi_cau'])
+const TRANG_THAI_HOP_LE = new Set<string>(['khop', 'lech_co_hd', 'nghi_dap_an_sai', 'thieu_dap_an'])
+
+function parseLoiGiai(raw: unknown): KhoDeLoiGiai | null {
+  if (typeof raw !== 'object' || raw === null) return null
+  const o = raw as Record<string, unknown>
+  if (typeof o.noi_dung !== 'string' || !o.noi_dung.trim()) return null
+  const tt = typeof o.trang_thai === 'string' && TRANG_THAI_HOP_LE.has(o.trang_thai) ? (o.trang_thai as TrangThaiLoiGiai) : undefined
+  const dapAn = (v: unknown) => (typeof v === 'string' ? v : typeof v === 'object' && v !== null ? JSON.stringify(v) : undefined)
+  return {
+    noi_dung: o.noi_dung,
+    dap_an_de: dapAn(o.dap_an_de),
+    dap_an_tu_giai: dapAn(o.dap_an_tu_giai),
+    trang_thai: tt,
+    ghi_chu: typeof o.ghi_chu === 'string' ? o.ghi_chu : null,
+  }
+}
 
 function parseHinh(raw: unknown, nhan: string, errors: string[]): KhoDeHinh[] | null {
   if (raw === undefined || raw === null) return null
@@ -131,6 +157,7 @@ export function parseKhoDeJsonText(raw: string): KhoDeParseResult {
       hinh: parseHinh(c.hinh, nhan, errors),
       tieu_de: typeof c.tieu_de === 'string' ? c.tieu_de : undefined,
       can_xem: c.can_xem === true,
+      loi_giai: parseLoiGiai(c.loi_giai),
     })
   })
   if (errors.length > 0) return { ok: false, errors }
@@ -171,7 +198,18 @@ export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherE
       if (hinhAnh.length === 0) hinhAnh = undefined
     }
     if (c.can_xem) canXemList.push(nhan)
-    const chung = { text: c.de, table: c.bang ?? undefined, hinhAnh, tieuDe: c.tieu_de, canXem: c.can_xem }
+    const lg = c.loi_giai ?? undefined
+    const chung = {
+      text: c.de,
+      table: c.bang ?? undefined,
+      hinhAnh,
+      tieuDe: c.tieu_de,
+      canXem: c.can_xem,
+      explanation: lg?.noi_dung,
+      loiGiaiTrangThai: lg?.trang_thai,
+      dapAnTuGiai: lg?.dap_an_tu_giai,
+      ghiChuLoiGiai: lg?.ghi_chu ?? undefined,
+    }
 
     if (c.phan === 'I') {
       const pa = c.pa ?? {}
@@ -215,5 +253,5 @@ export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherE
     }
   }
 
-  return { source: { maDe: json.ma_de, phanI, phanII, phanIII }, errors, warnings, canXemList }
+  return { source: { maDe: json.ma_de, phanI, phanII, phanIII, nguon: json.nguon, ngayNap: json.ngay_nap }, errors, warnings, canXemList }
 }

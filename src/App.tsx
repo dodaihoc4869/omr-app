@@ -7,7 +7,7 @@ import { loadClassList } from './lib/classlist-db'
 import ClassListScreen from './screens/ClassListScreen'
 import ExamHubScreen from './screens/ExamHubScreen'
 import ExamSetupScreen from './screens/ExamSetupScreen'
-import ExamImportScreen from './screens/ExamImportScreen'
+import NganHangDeScreen from './screens/NganHangDeScreen'
 import ExamTakeScreen from './screens/ExamTakeScreen'
 import ExamMonitorScreen from './screens/ExamMonitorScreen'
 import ParentScreen from './screens/ParentScreen'
@@ -16,7 +16,7 @@ import RegistrationManagerScreen from './screens/RegistrationManagerScreen'
 
 // Icon tin nhắn nổi chỉ dành cho THẦY — ẩn ở các màn phụ huynh/học sinh tự
 // dùng trên máy riêng của họ (họ không cần thấy hộp thư của thầy).
-const HIDE_FAB_ON: string[] = ['parent', 'studentprofile', 'examtake', 'examimport']
+const HIDE_FAB_ON: string[] = ['parent', 'studentprofile', 'examtake', 'nganhangde']
 // Thanh menu dưới (Lớp/Kiểm tra/Phụ huynh...) chỉ dành cho THẦY điều hướng
 // giữa các màn quản lý — ẩn hẳn khi học sinh vào bằng link mời làm bài, để
 // không còn lối bấm ra khỏi màn thi (tránh xao nhãng, tránh lộ menu quản lý
@@ -46,7 +46,7 @@ function App() {
       {screen === 'classlist' && <ClassListScreen />}
       {screen === 'examhub' && <ExamHubScreen />}
       {screen === 'examsetup' && <ExamSetupScreen />}
-      {screen === 'examimport' && <ExamImportScreen />}
+      {screen === 'nganhangde' && <NganHangDeScreen />}
       {screen === 'examtake' && <ExamTakeScreen />}
       {screen === 'exammonitor' && <ExamMonitorScreen />}
       {screen === 'parent' && <ParentScreen />}

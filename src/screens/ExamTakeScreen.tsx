@@ -579,6 +579,7 @@ export default function ExamTakeScreen() {
                 selected={(attempt.answers.phanI[item.qid] as 'A' | 'B' | 'C' | 'D' | undefined) ?? null}
                 correct={q.correct}
                 explanation={q.explanation}
+                nhanLoiGiai={q.loiGiaiTrangThai}
                 onZoom={setZoomSrc}
               />
             )
@@ -605,6 +606,7 @@ export default function ExamTakeScreen() {
                 selected={attempt.answers.phanII[item.qid] ?? [null, null, null, null]}
                 correct={q.correct}
                 explanation={q.explanation}
+                nhanLoiGiai={q.loiGiaiTrangThai}
                 onZoom={setZoomSrc}
               />
             )
@@ -629,6 +631,7 @@ export default function ExamTakeScreen() {
                 selected={attempt.answers.phanIII[item.qid] ?? null}
                 correct={q.correct}
                 explanation={q.explanation}
+                nhanLoiGiai={q.loiGiaiTrangThai}
                 onZoom={setZoomSrc}
               />
             )

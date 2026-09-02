@@ -8,10 +8,10 @@
 // hàng. Ảnh cắt từ đề gốc (HinhAnh) nhúng đúng vị trí: sau đề, sau từng
 // phương án/ý (đi theo chữ cái GỐC khi xáo), cuối câu. Chỉ dùng biến tokens.css.
 import { Check, X as XIcon } from 'lucide-react'
-import type { HinhAnh } from '../data/examContent'
+import type { HinhAnh, TrangThaiLoiGiai } from '../data/examContent'
 import { ChemText } from '../lib/chem-format'
 import { BangSoLieu, CauHinh, HinhTaiViTri } from './QuestionMedia'
-import { TheNoiDung, DauThe, Hang, OThongBao } from './DesignSystem'
+import { TheNoiDung, DauThe, Hang, OThongBao, Nhan } from './DesignSystem'
 
 export type CheDo = 'thi' | 'xem_lai'
 type Chu = 'A' | 'B' | 'C' | 'D'
@@ -33,6 +33,9 @@ interface BaseProps {
   hinhAnh?: HinhAnh[]
   /** Chỉ chế độ xem lại. */
   explanation?: string
+  /** Chỉ chế độ xem lại — nhãn cảnh báo khi pipeline nghi đáp án đề sai /
+   * đề thiếu đáp án (NAPDETUDONG.md "Hiển thị trong app"). */
+  nhanLoiGiai?: TrangThaiLoiGiai
   onZoom?: (src: string) => void
 }
 
@@ -86,8 +89,22 @@ function DauSai() {
   )
 }
 
-function GiaiThich({ text }: { text?: string }) {
-  return <OThongBao>{text?.trim() ? <ChemText text={text} /> : 'Thầy chưa nhập lời giải cho câu này.'}</OThongBao>
+function GiaiThich({ text, nhan }: { text?: string; nhan?: TrangThaiLoiGiai }) {
+  return (
+    <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+      {nhan === 'nghi_dap_an_sai' && (
+        <Nhan tone="do" className="self-start whitespace-normal" data-nhan="nghi_dap_an_sai">
+          Câu này đáp án có thể chưa chuẩn — thầy sẽ chữa trên lớp
+        </Nhan>
+      )}
+      {nhan === 'thieu_dap_an' && (
+        <Nhan tone="cam" className="self-start whitespace-normal" data-nhan="thieu_dap_an">
+          Đáp án theo lời giải của thầy
+        </Nhan>
+      )}
+      <OThongBao>{text?.trim() ? <ChemText text={text} /> : 'Thầy chưa nhập lời giải cho câu này.'}</OThongBao>
+    </div>
+  )
 }
 
 export default function TheCau(props: TheCauProps) {
@@ -257,7 +274,7 @@ export default function TheCau(props: TheCauProps) {
         <HinhTaiViTri hinhAnh={hinhAnh} viTri="sau_de" onZoom={onZoom} nhan={nhan} />
         {body}
         <HinhTaiViTri hinhAnh={hinhAnh} viTri="cuoi_cau" onZoom={onZoom} nhan={nhan} />
-        {xemLai && <GiaiThich text={props.explanation} />}
+        {xemLai && <GiaiThich text={props.explanation} nhan={props.nhanLoiGiai} />}
       </div>
     </TheNoiDung>
   )

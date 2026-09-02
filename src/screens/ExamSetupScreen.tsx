@@ -1,41 +1,13 @@
-import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ClipboardEvent, type DragEvent } from 'react'
-import { ImagePlus, Trash2, Search, CheckSquare, Square, FolderUp, ChevronDown, ChevronUp } from 'lucide-react'
-import { bankSizeWarning, mergeAndStrip, mergeKeepAnswers, validateTeacherSource, type TeacherExamSource } from '../data/examContent'
+import { useEffect, useMemo, useState } from 'react'
+import { Trash2, Search, CheckSquare, Square, Library } from 'lucide-react'
+import { bankSizeWarning, mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
 import { publishSession } from '../lib/exam-api'
-import QuestionMedia from '../components/QuestionMedia'
-import {
-  deleteExamSource,
-  loadExamSources,
-  loadScriptUrl,
-  saveExamSource,
-  saveScriptUrl,
-  saveSessionTeacherBank,
-} from '../lib/exam-db'
-import { parseExamText } from '../lib/exam-parse'
-import { ChemText } from '../lib/chem-format'
+import { deleteExamSource, loadExamSources, loadScriptUrl, saveScriptUrl, saveSessionTeacherBank } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 
 function randomSessionCode(): string {
   return String(Math.floor(100000 + Math.random() * 900000))
 }
-
-const SAMPLE_TEXT = `MÃ ĐỀ: de-01
-PHẦN I
-1) Chất nào sau đây là oxit axit?
-A. CaO
-*B. CO2
-C. NaOH
-D. HCl
-2) Hoà tan hết 5,6 gam Fe bằng dung dịch H2SO4 loãng, dư thu được ion Fe^2+ và khí H2. ...(muốn ngân hàng đa dạng thì tải càng nhiều câu càng tốt, không bắt buộc đúng 18 câu)...
-PHẦN II
-1) Cho các phát biểu sau về nguyên tố X:
-a) Phát biểu a (Đ)
-b) Phát biểu b (S)
-c) Phát biểu c (Đ)
-d) Phát biểu d (S)
-PHẦN III
-1) Tính khối lượng chất X thu được...
-=> 12,5`
 
 export default function ExamSetupScreen() {
   const showToast = useAppStore((s) => s.showToast)
@@ -45,16 +17,7 @@ export default function ExamSetupScreen() {
   const [savedSources, setSavedSources] = useState<TeacherExamSource[]>([])
   const [selectedMaDe, setSelectedMaDe] = useState<Set<string>>(new Set())
 
-  const [draftText, setDraftText] = useState('')
-  const [parseErrors, setParseErrors] = useState<string[]>([])
-  const [parseWarnings, setParseWarnings] = useState<string[]>([])
-  const [parsedPreview, setParsedPreview] = useState<TeacherExamSource | null>(null)
-  const [imageMap, setImageMap] = useState<Record<string, string>>({})
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
   const [timKiemMaDe, setTimKiemMaDe] = useState('')
-  const [moNhapThuCong, setMoNhapThuCong] = useState(false)
 
   const [lop, setLop] = useState('')
   const [thoiGianPhut, setThoiGianPhut] = useState(45)
@@ -70,112 +33,6 @@ export default function ExamSetupScreen() {
   const handleSaveScriptUrl = async () => {
     await saveScriptUrl(scriptUrl.trim())
     showToast('Đã lưu link Apps Script trên máy này', 'success')
-  }
-
-  // Tự động đính kèm ảnh vào đúng vị trí con trỏ trong ô soạn đề — dùng chung
-  // cho 3 cách: dán ảnh (Ctrl+V/paste, tự động nhất, không cần bấm gì thêm),
-  // kéo-thả ảnh vào ô, và chọn file qua nút bấm.
-  const attachImageAt = async (file: File, pos: number) => {
-    if (!file.type.startsWith('image/')) return showToast('Chỉ nhận file ảnh (đồ thị/hình vẽ chụp hoặc scan)', 'error')
-    const dataUrl: string = await new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => resolve(reader.result as string)
-      reader.onerror = reject
-      reader.readAsDataURL(file)
-    })
-    const token = `img_${Math.random().toString(36).slice(2, 9)}`
-    setImageMap((prev) => ({ ...prev, [token]: dataUrl }))
-    const marker = `[ANH:${token}]`
-    setDraftText((cur) => cur.slice(0, pos) + marker + cur.slice(pos))
-    const ta = textareaRef.current
-    requestAnimationFrame(() => {
-      if (!ta) return
-      ta.focus()
-      ta.selectionStart = ta.selectionEnd = pos + marker.length
-    })
-    showToast('Đã tự động đính kèm ảnh vào đúng vị trí — hiển thị y nguyên cho học sinh', 'success')
-  }
-
-  const handleAttachImage = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    e.target.value = ''
-    if (!file) return
-    const ta = textareaRef.current
-    await attachImageAt(file, ta?.selectionStart ?? draftText.length)
-  }
-
-  // Dán ảnh trực tiếp (vd copy hình từ Word/PowerPoint hoặc chụp màn hình rồi
-  // Ctrl+V) — app tự phát hiện, tự đính kèm, không cần thao tác thêm nào.
-  const handlePasteImage = async (e: ClipboardEvent<HTMLTextAreaElement>) => {
-    const items = e.clipboardData?.items
-    if (!items) return
-    for (const item of items) {
-      if (item.type.startsWith('image/')) {
-        const file = item.getAsFile()
-        if (!file) continue
-        e.preventDefault()
-        const ta = e.currentTarget
-        await attachImageAt(file, ta.selectionStart ?? draftText.length)
-        return
-      }
-    }
-  }
-
-  // Kéo-thả file ảnh vào ô soạn đề cũng tự đính kèm.
-  const handleDropImage = async (e: DragEvent<HTMLTextAreaElement>) => {
-    const file = Array.from(e.dataTransfer?.files ?? []).find((f) => f.type.startsWith('image/'))
-    if (!file) return
-    e.preventDefault()
-    const ta = e.currentTarget
-    await attachImageAt(file, ta.selectionStart ?? draftText.length)
-  }
-
-  const handleParse = () => {
-    const result = parseExamText(draftText, imageMap)
-    setParseErrors(result.errors)
-    setParseWarnings(result.warnings)
-    setParsedPreview(result.source)
-    if (result.source) {
-      const errs = validateTeacherSource(result.source)
-      setParseErrors(errs)
-      if (errs.length === 0) {
-        showToast(
-          `Đọc được "${result.source.maDe}" — ${result.source.phanI.length} câu Phần I, ${result.source.phanII.length} câu Phần II, ${result.source.phanIII.length} câu Phần III`,
-          'success',
-        )
-      }
-    }
-  }
-
-  // Xoá sạch bản nháp đang soạn (kể cả ảnh đã đính kèm) — dùng khi lỡ tải
-  // nhầm file hoặc dán nhầm đề, làm lại từ đầu cho nhanh thay vì tự bôi đen
-  // xoá tay cả khối văn bản dài.
-  const handleClearDraft = () => {
-    setDraftText('')
-    setParsedPreview(null)
-    setParseErrors([])
-    setParseWarnings([])
-    setImageMap({})
-    showToast('Đã xoá bản nháp đề đang soạn', 'success')
-  }
-
-  const handleSaveContent = async () => {
-    if (!parsedPreview) return
-    const errors = validateTeacherSource(parsedPreview)
-    if (errors.length > 0) {
-      setParseErrors(errors)
-      return
-    }
-    await saveExamSource(parsedPreview)
-    const list = await loadExamSources()
-    setSavedSources(list)
-    setSelectedMaDe((prev) => new Set(prev).add(parsedPreview.maDe))
-    showToast(`Đã lưu đề "${parsedPreview.maDe}" vào ngân hàng câu hỏi`, 'success')
-    setDraftText('')
-    setParsedPreview(null)
-    setParseErrors([])
-    setParseWarnings([])
-    setImageMap({})
   }
 
   const handleDeleteContent = async (maDe: string) => {
@@ -300,21 +157,21 @@ export default function ExamSetupScreen() {
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-sm">2. Chọn đề từ ngân hàng câu hỏi cho ca này</h2>
           <button
-            onClick={() => setScreen('examimport')}
+            onClick={() => setScreen('nganhangde')}
             className="tap-target flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 font-medium"
           >
-            <FolderUp size={14} /> Tải thêm đề
+            <Library size={14} /> Ngân hàng câu hỏi
           </button>
         </div>
 
         {savedSources.length === 0 ? (
           <div className="rounded-lg border border-dashed border-slate-300 dark:border-slate-600 p-4 text-center space-y-2">
-            <p className="text-xs text-slate-500">Ngân hàng câu hỏi chưa có đề nào.</p>
+            <p className="text-xs text-slate-500">Ngân hàng câu hỏi chưa có đề nào — thả file vào kho-de/moi/ trên máy rồi đồng bộ.</p>
             <button
-              onClick={() => setScreen('examimport')}
+              onClick={() => setScreen('nganhangde')}
               className="tap-target inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold px-4"
             >
-              <FolderUp size={16} /> Thả file đề (.pdf/.docx) vào ngân hàng
+              <Library size={16} /> Mở Ngân hàng câu hỏi
             </button>
           </div>
         ) : (
@@ -402,111 +259,7 @@ export default function ExamSetupScreen() {
       </section>
 
       <section className="space-y-2">
-        <button
-          onClick={() => setMoNhapThuCong((v) => !v)}
-          className="tap-target w-full flex items-center justify-between text-sm font-semibold text-slate-500"
-        >
-          <span>Nâng cao: tự gõ đề mới bằng tay (không có file)</span>
-          {moNhapThuCong ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        </button>
-
-        {moNhapThuCong && (
-          <div className="space-y-2">
-            <p className="text-xs text-slate-500">
-              Có sẵn file .pdf/.docx? Bấm "Tải thêm đề" ở mục 2 phía trên — thầy chỉ cần thả file, app tự đọc
-              câu/đáp án. Mục này chỉ dành cho khi thầy tự gõ đề mới từ đầu, chưa có file.
-            </p>
-            <p className="text-xs text-slate-500">
-              Mỗi lần dán 1 đề. Đúng định dạng: dòng đầu "MÃ ĐỀ: ...", "PHẦN I" (mỗi câu A. B. C. D., đặt <b>*</b> trước
-              lựa chọn ĐÚNG), "PHẦN II" (mỗi ý ghi thêm (Đ) hoặc (S)), "PHẦN III" (dòng cuối "=&gt; đáp án"). Số câu mỗi
-              phần KHÔNG cần đúng 18/4/6 — càng nhiều đề, mỗi học sinh càng ít trùng câu với nhau.
-            </p>
-            <p className="text-xs text-slate-500">
-              Công thức Hoá: gõ số bình thường ngay sau chữ, app tự hiển thị chỉ số dưới (vd "H2SO4" →{' '}
-              <ChemText text="H2SO4" />, "Fe2O3" → <ChemText text="Fe2O3" />). Điện tích đơn giản gõ liền dấu +/- (vd
-              "Na+" → <ChemText text="Na+" />). Điện tích phức tạp (có cả số + dấu, vd ion SO4 2-) gõ rõ bằng dấu ^ để
-              khỏi sai: "SO4^{'{2-}'}" → <ChemText text={'SO4^{2-}'} />. Mũi tên phản ứng gõ "-&gt;" hoặc "&lt;=&gt;" sẽ
-              tự thành → hoặc ⇌.
-            </p>
-            <p className="text-xs text-slate-500">
-              Bảng số liệu (tái tạo đúng 100%, không suy đoán): đặt giữa <code>[BANG]</code> và <code>[/BANG]</code>, mỗi
-              dòng 1 hàng, cột cách nhau bằng "|" — hàng đầu là tiêu đề cột. Đồ thị/hình vẽ: đặt con trỏ vào đúng chỗ cần
-              chèn rồi <b>dán ảnh (Ctrl+V)</b> hoặc kéo-thả file ảnh vào ô soạn đề — app tự động đính kèm ngay, không cần
-              bấm thêm gì. Hiển thị lại y nguyên ảnh gốc cho học sinh, không có tính năng vẽ lại đồ thị bằng AI vì không
-              đảm bảo đúng số liệu.
-            </p>
-            <textarea
-              ref={textareaRef}
-              className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 text-xs font-mono"
-              rows={10}
-              placeholder={SAMPLE_TEXT}
-              value={draftText}
-              onChange={(e) => setDraftText(e.target.value)}
-              onPaste={handlePasteImage}
-              onDrop={handleDropImage}
-              onDragOver={(e) => e.preventDefault()}
-            />
-            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAttachImage} />
-            <div className="flex gap-2">
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="tap-target flex-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-sm font-semibold flex items-center justify-center gap-1.5"
-              >
-                <ImagePlus size={16} /> Chọn file ảnh
-              </button>
-              <button onClick={handleParse} className="tap-target flex-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-sm font-semibold">
-                Phân tích đề
-              </button>
-              <button
-                onClick={() => {
-                  if (draftText.trim() && !confirm('Xoá hết bản nháp đề đang soạn? Không thể hoàn tác.')) return
-                  handleClearDraft()
-                }}
-                disabled={!draftText.trim()}
-                className="tap-target rounded-lg bg-rose-50 dark:bg-rose-950 border border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-400 text-sm font-semibold flex items-center justify-center gap-1.5 px-3 disabled:opacity-40"
-                title="Xoá bản nháp đề đang soạn (vd tải nhầm file)"
-              >
-                <Trash2 size={16} /> Xoá đề
-              </button>
-            </div>
-            {parseErrors.length > 0 && (
-              <div className="rounded-lg bg-rose-50 dark:bg-rose-950 border border-rose-300 dark:border-rose-800 p-3 text-xs text-rose-700 dark:text-rose-300 space-y-1">
-                {parseErrors.map((e, i) => (
-                  <div key={i}>• {e}</div>
-                ))}
-              </div>
-            )}
-            {parseWarnings.length > 0 && (
-              <div className="rounded-lg bg-amber-50 dark:bg-amber-950 border border-amber-300 dark:border-amber-800 p-3 text-xs text-amber-700 dark:text-amber-300 space-y-1">
-                {parseWarnings.map((w, i) => (
-                  <div key={i}>• {w}</div>
-                ))}
-              </div>
-            )}
-            {parsedPreview && parseErrors.length === 0 && (
-              <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-800 p-3 text-xs text-emerald-700 dark:text-emerald-300 space-y-2">
-                <div>
-                  "{parsedPreview.maDe}": {parsedPreview.phanI.length} câu Phần I, {parsedPreview.phanII.length} câu Phần
-                  II, {parsedPreview.phanIII.length} câu Phần III.
-                </div>
-                {parsedPreview.phanI[0] && (
-                  <div className="rounded-md bg-white/70 dark:bg-slate-900/50 px-2 py-1.5">
-                    Câu 1 Phần I (xem thử hiển thị): <ChemText text={parsedPreview.phanI[0].text} /> — đáp án đúng:{' '}
-                    <b>{parsedPreview.phanI[0].correct}</b>
-                    <QuestionMedia table={parsedPreview.phanI[0].table} imageDataUrl={parsedPreview.phanI[0].imageDataUrl} />
-                  </div>
-                )}
-                <button onClick={handleSaveContent} className="tap-target w-full rounded-lg bg-emerald-600 text-white font-semibold">
-                  Lưu vào ngân hàng câu hỏi
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="font-semibold text-sm">4. Lớp &amp; thời gian</h2>
+        <h2 className="font-semibold text-sm">3. Lớp &amp; thời gian</h2>
         <input
           className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3"
           placeholder="Lớp (vd 12A1)"

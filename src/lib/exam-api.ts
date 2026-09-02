@@ -388,3 +388,42 @@ export async function listAllFeedback(scriptUrl: string): Promise<FeedbackSummar
   const data = await res.json()
   return data.items || []
 }
+
+// ---------------------------------------------------------------------------
+// KHO ĐỀ trên Apps Script (NAPDETUDONG.md, hướng A): pipeline "Nạp đề mới"
+// đẩy đề đầy đủ (đáp án + lời giải + ảnh) lên đây bằng MÃ BÍ MẬT; app trên
+// máy thầy tự tải về ngân hàng. Mã bí mật thầy nhập 1 lần, lưu IndexedDB máy
+// thầy (không nhúng trong code). Tất cả đi qua POST để mã không lọt vào URL.
+// ---------------------------------------------------------------------------
+export interface KhoDeItem {
+  maDe: string
+  nguon: string
+  ngayNap: string
+  soCau: number
+  soNghi: number
+  capNhatLuc: string
+}
+
+export async function danhSachDe(scriptUrl: string, secret: string): Promise<KhoDeItem[]> {
+  const r = await postJson(scriptUrl, { action: 'danhSachDe', secret })
+  if (!r.ok) throw new Error(r.error || 'Không lấy được danh sách đề')
+  return (r.items as KhoDeItem[]).map((x) => ({ ...x, maDe: String(x.maDe), ngayNap: String(x.ngayNap ?? ''), nguon: String(x.nguon ?? '') }))
+}
+
+/** Trả về JSON đề nguyên dạng pipeline đã đẩy (khuôn KhoDeJson, xem exam-kho-de-import.ts). */
+export async function layDe(scriptUrl: string, secret: string, maDe: string): Promise<unknown> {
+  const r = await postJson(scriptUrl, { action: 'layDe', secret, maDe })
+  if (!r.ok) throw new Error(r.error || `Không lấy được đề ${maDe}`)
+  return r.de
+}
+
+export async function luuDe(scriptUrl: string, secret: string, de: unknown): Promise<{ maDe: string; soCau: number; soNghi: number }> {
+  const r = await postJson(scriptUrl, { action: 'luuDe', secret, de })
+  if (!r.ok) throw new Error(r.error || 'Đẩy đề thất bại')
+  return { maDe: String(r.maDe), soCau: Number(r.soCau), soNghi: Number(r.soNghi) }
+}
+
+export async function xoaDe(scriptUrl: string, secret: string, maDe: string): Promise<void> {
+  const r = await postJson(scriptUrl, { action: 'xoaDe', secret, maDe })
+  if (!r.ok) throw new Error(r.error || 'Xoá đề thất bại')
+}

@@ -100,4 +100,23 @@ describe('buildTeacherSourceFromKhoDe', () => {
     expect(khoi.ok).toBe(false)
     expect(khoi.errors.join(' ')).toMatch(/\$\$/)
   })
+
+  it('loi_giai -> explanation + trạng thái + đáp án tự giải; nguon/ngay_nap giữ trên source', () => {
+    const json = {
+      ma_de: '100', nguon: 'de.pdf', ngay_nap: '2026-09-02T10:00:00+07:00',
+      cau: [{ phan: 'I' as const, so: 16, de: 'x', pa: { A: 'a', B: 'b', C: 'c', D: 'd' }, dap_an: 'D',
+        loi_giai: { noi_dung: 'Glu về cực (+).', dap_an_de: 'D', dap_an_tu_giai: 'C', trang_thai: 'nghi_dap_an_sai' as const, ghi_chu: 'lệch' } }],
+    }
+    const parsed = parseKhoDeJsonText(JSON.stringify(json))
+    expect(parsed.ok).toBe(true)
+    const { source } = buildTeacherSourceFromKhoDe(parsed.json!)
+    expect(source.nguon).toBe('de.pdf')
+    expect(source.ngayNap).toBe('2026-09-02T10:00:00+07:00')
+    const q = source.phanI[0]
+    expect(q.correct).toBe('D') // chấm vẫn theo đáp án đề
+    expect(q.explanation).toBe('Glu về cực (+).')
+    expect(q.loiGiaiTrangThai).toBe('nghi_dap_an_sai')
+    expect(q.dapAnTuGiai).toBe('C')
+    expect(q.ghiChuLoiGiai).toBe('lệch')
+  })
 })

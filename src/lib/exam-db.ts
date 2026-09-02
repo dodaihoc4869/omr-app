@@ -114,6 +114,30 @@ export async function loadScriptUrl(): Promise<string> {
   return (await db.get(STORE_SETTINGS, 'scriptUrl')) || ''
 }
 
+/** Mã bí mật kho đề (khớp MA_BI_MAT trong Apps Script) — chỉ trên máy thầy. */
+export async function saveTeacherSecret(secret: string): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, secret, 'teacherSecret')
+}
+
+export async function loadTeacherSecret(): Promise<string> {
+  const db = await getDb()
+  return (await db.get(STORE_SETTINGS, 'teacherSecret')) || ''
+}
+
+/** Toàn bộ ngân hàng CÓ đáp án của các ca đã mở (để chấm lại khi thầy sửa
+ * đáp án một câu trong ngân hàng — xem NganHangDeScreen). */
+export async function loadAllSessionTeacherBanks(): Promise<{ maCa: string; sources: TeacherExamSource[] }[]> {
+  const db = await getDb()
+  const keys = (await db.getAllKeys(STORE_SESSION_BANK_TEACHER)) as string[]
+  const out: { maCa: string; sources: TeacherExamSource[] }[] = []
+  for (const k of keys) {
+    const sources = (await db.get(STORE_SESSION_BANK_TEACHER, k)) as TeacherExamSource[] | undefined
+    if (sources) out.push({ maCa: String(k), sources })
+  }
+  return out
+}
+
 export async function saveExamSource(source: TeacherExamSource): Promise<void> {
   const db = await getDb()
   await db.put(STORE_SOURCES, source)

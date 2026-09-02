@@ -39,9 +39,9 @@ export interface QuestionMedia {
   canXem?: boolean
 }
 
-/** `text`/`choices` là chữ trích từ PDF — CHỈ dùng để định vị + tìm kiếm/gắn
- * nhãn (xem exam-image-crop.ts), KHÔNG dùng để hiển thị cho học sinh nếu đã
- * có ảnh cắt sẵn. `thanCauImg`/`choiceImgs` là ẢNH CẮT THẲNG từ trang PDF gốc
+/** `text`/`choices` là chữ đề (mhchem). `thanCauImg`/`choiceImgs` (cũ) là ảnh
+ * cắt cả câu từ PDF — có ảnh thì ưu tiên hiện ảnh; dữ liệu mới từ pipeline
+ * dùng chữ + HinhAnh nhúng đúng vị trí. `thanCauImg`/`choiceImgs` là ẢNH CẮT THẲNG từ trang PDF gốc
  * (200 DPI, đã nhị phân hoá nền trong suốt) — có ảnh thì LUÔN ưu tiên hiện
  * ảnh, vì lớp chữ PDF hay vỡ công thức mà vỡ ÂM THẦM (đọc vẫn hợp lý nhưng
  * sai đề). Đề gõ tay không có ảnh -> vẫn hiện bằng chữ như trước, không đổi. */
@@ -58,7 +58,19 @@ export interface McqQuestion extends QuestionMedia {
  * "xem điểm ngay", không mở thêm đường lộ đề mới. Cả hai đều TUỲ CHỌN — nhiều
  * đề tải từ file gốc (đề thi thật) không có sẵn lời giải, thầy gõ thêm sau
  * nếu muốn học sinh xem lại. */
-export interface TeacherMcqQuestion extends McqQuestion {
+/** Kết quả đối chiếu lời giải tự giải (pipeline Nạp đề) với đáp án in trong
+ * đề — NAPDETUDONG.md B3. Chấm điểm LUÔN theo `correct` (đáp án đề);
+ * `nghi_dap_an_sai` chỉ gắn nhãn cảnh báo cho học sinh và lọc cho thầy quyết. */
+export type TrangThaiLoiGiai = 'khop' | 'lech_co_hd' | 'nghi_dap_an_sai' | 'thieu_dap_an'
+
+export interface LoiGiaiMeta {
+  loiGiaiTrangThai?: TrangThaiLoiGiai
+  /** Đáp án pipeline tự giải ra (khác `correct` khi nghi đề sai). */
+  dapAnTuGiai?: string
+  ghiChuLoiGiai?: string
+}
+
+export interface TeacherMcqQuestion extends McqQuestion, LoiGiaiMeta {
   correct: 'A' | 'B' | 'C' | 'D'
   explanation?: string
   tieuDe?: string
@@ -71,7 +83,7 @@ export interface TrueFalseQuestion extends QuestionMedia {
   thanCauImg?: string
   ideaImgs?: [string?, string?, string?, string?]
 }
-export interface TeacherTrueFalseQuestion extends TrueFalseQuestion {
+export interface TeacherTrueFalseQuestion extends TrueFalseQuestion, LoiGiaiMeta {
   correct: ['D' | 'S', 'D' | 'S', 'D' | 'S', 'D' | 'S']
   explanation?: string
   tieuDe?: string
@@ -82,7 +94,7 @@ export interface ShortAnswerQuestion extends QuestionMedia {
   text: string
   thanCauImg?: string
 }
-export interface TeacherShortAnswerQuestion extends ShortAnswerQuestion {
+export interface TeacherShortAnswerQuestion extends ShortAnswerQuestion, LoiGiaiMeta {
   correct: string
   explanation?: string
   tieuDe?: string
@@ -100,6 +112,10 @@ export interface TeacherExamSource {
   phanI: TeacherMcqQuestion[]
   phanII: TeacherTrueFalseQuestion[]
   phanIII: TeacherShortAnswerQuestion[]
+  /** Tên file gốc + thời điểm pipeline nạp — để đồng bộ từ Apps Script biết
+   * đề nào mới/đã đổi (so `ngayNap`), không tải lại tất cả mỗi lần. */
+  nguon?: string
+  ngayNap?: string
 }
 
 export const PHAN_I_NEED = 18

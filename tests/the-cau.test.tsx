@@ -93,6 +93,17 @@ describe('TheCau — chế độ XEM LẠI', () => {
   })
 })
 
+describe('TheCau — nhãn lời giải (NAPDETUDONG)', () => {
+  it('xem lại + nghi_dap_an_sai -> nhãn đỏ; thi -> không nhãn dù truyền', () => {
+    const xem = render(
+      <TheCau cheDo="xem_lai" phan="III" stt={1} text="Đề" correct="6,8" selected={null} explanation="Lời giải" nhanLoiGiai="nghi_dap_an_sai" />,
+    )
+    expect(xem.container.querySelector('[data-nhan="nghi_dap_an_sai"]')?.textContent).toContain('thầy sẽ chữa trên lớp')
+    const thi = render(<TheCau cheDo="thi" phan="III" stt={1} text="Đề" selected={null} nhanLoiGiai="nghi_dap_an_sai" />)
+    expect(thi.container.querySelector('[data-nhan]')).toBeNull()
+  })
+})
+
 describe('MaCaInput — 6 ô số', () => {
   it('chỉ nhận số, tối đa 6 ký tự, hiện từng số vào từng ô', () => {
     const onChange = vi.fn()

@@ -18,6 +18,13 @@
 //    thay được).
 // 6. Copy đường link "URL ứng dụng web" (kết thúc bằng /exec) → dán vào ô
 //    "Link Apps Script" trong màn Cài đặt ca kiểm tra của app.
+// 7. (Nạp đề tự động) Đặt MÃ BÍ MẬT: trong trình soạn Apps Script → biểu
+//    tượng bánh răng "Cài đặt dự án" (Project Settings) → "Thuộc tính tập
+//    lệnh" (Script properties) → Thêm: tên MA_BI_MAT, giá trị là một chuỗi
+//    dài tuỳ thầy (vd 20 ký tự ngẫu nhiên). Nhập cùng mã này vào màn "Ngân
+//    hàng câu hỏi" của app trên máy thầy và vào file kho-de/cau-hinh.json
+//    trên máy để pipeline "Nạp đề mới" đẩy đề lên. Ai không có mã này thì
+//    KHÔNG đọc được đề/đáp án trong kho — đề không bao giờ nằm trên GitHub.
 //
 // Mỗi lần sửa code này, phải bấm "Triển khai" → "Quản lý triển khai" →
 // chỉnh sửa (bút chì) → chọn phiên bản mới → Triển khai lại, thì thay đổi
@@ -40,6 +47,52 @@ const SHEET_TRANGTHAI = 'TrangThai'
 const SHEET_TINNHAN = 'TinNhan'
 const SHEET_HOCSINH = 'HocSinh'
 const SHEET_TINTHAY = 'TinNhanThay'
+const SHEET_DE = 'NganHangDe'
+const DRIVE_FOLDER = 'OMR-APP-DATA'
+
+// ---------------------------------------------------------------------------
+// JSON LỚN (đề có ảnh cắt base64 ~ vài trăm KB) KHÔNG nhét vừa 1 ô Sheet
+// (giới hạn 50.000 ký tự) — lưu thành file trong thư mục Drive OMR-APP-DATA,
+// ô Sheet chỉ giữ "drive:<fileId>". Đọc lại tự nhận cả 2 dạng (JSON thẳng
+// trong ô — dữ liệu cũ, hoặc drive:...) nên các ca đã mở trước đây vẫn chạy.
+// ---------------------------------------------------------------------------
+function driveFolder_() {
+  const it = DriveApp.getFoldersByName(DRIVE_FOLDER)
+  return it.hasNext() ? it.next() : DriveApp.createFolder(DRIVE_FOLDER)
+}
+
+function luuJsonLon_(ten, obj, refCu) {
+  const noiDung = JSON.stringify(obj)
+  if (refCu && String(refCu).indexOf('drive:') === 0) {
+    try {
+      const f = DriveApp.getFileById(String(refCu).slice(6))
+      f.setContent(noiDung)
+      return refCu
+    } catch (err) {
+      // file cũ đã bị xoá tay -> tạo mới
+    }
+  }
+  const f = driveFolder_().createFile(ten + '.json', noiDung, MimeType.PLAIN_TEXT)
+  return 'drive:' + f.getId()
+}
+
+function docJsonLon_(cell) {
+  const v = String(cell || '')
+  if (!v) return null
+  if (v.indexOf('drive:') === 0) return JSON.parse(DriveApp.getFileById(v.slice(6)).getBlob().getDataAsString('UTF-8'))
+  return JSON.parse(v)
+}
+
+function maBiMat_() {
+  return (PropertiesService.getScriptProperties().getProperty('MA_BI_MAT') || '').trim()
+}
+
+function kiemTraMaBiMat_(body) {
+  const mat = maBiMat_()
+  if (!mat) return 'Chưa đặt MA_BI_MAT trong Script properties của Apps Script (xem hướng dẫn đầu file)'
+  if (String(body.secret || '').trim() !== mat) return 'Sai mã bí mật'
+  return ''
+}
 
 function getSheet_(name, headers) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
@@ -79,7 +132,7 @@ function doGet(e) {
       lop: vals[1],
       thoiGianPhut: vals[2],
       moLuc: vals[3],
-      bank: JSON.parse(vals[4]),
+      bank: docJsonLon_(vals[4]),
     })
   }
   if (action === 'listSubmissions') {
@@ -307,20 +360,78 @@ function doPost(e) {
   const body = JSON.parse(e.postData.contents)
   const action = body.action
 
+  // ------------------------------------------------------------------ KHO ĐỀ
+  // Pipeline "Nạp đề mới" (Cowork) đẩy đề ĐẦY ĐỦ đáp án + lời giải + ảnh lên
+  // đây; app trên máy thầy tự tải về ngân hàng câu hỏi. Cả 3 action đều cần
+  // MA_BI_MAT — học sinh/phụ huynh không bao giờ có mã này, và đề KHÔNG nằm
+  // trên GitHub (repo public). Dùng POST để mã bí mật không lọt vào URL/log.
+  if (action === 'luuDe' || action === 'danhSachDe' || action === 'layDe' || action === 'xoaDe') {
+    const loi = kiemTraMaBiMat_(body)
+    if (loi) return jsonResponse_({ ok: false, error: loi })
+    const sh = getSheet_(SHEET_DE, ['MaDe', 'Nguon', 'NgayNap', 'SoCau', 'SoNghi', 'DeJson', 'CapNhatLuc'])
+    if (action === 'danhSachDe') {
+      const data = sh.getDataRange().getValues()
+      const items = []
+      for (let i = 1; i < data.length; i++) {
+        items.push({ maDe: String(data[i][0]), nguon: data[i][1], ngayNap: data[i][2], soCau: data[i][3], soNghi: data[i][4], capNhatLuc: data[i][6] })
+      }
+      return jsonResponse_({ ok: true, items: items })
+    }
+    if (action === 'layDe') {
+      const row = findRowByKey_(sh, 0, body.maDe)
+      if (row < 0) return jsonResponse_({ ok: false, error: 'Không có đề ' + body.maDe })
+      const v = sh.getRange(row, 1, 1, 7).getValues()[0]
+      return jsonResponse_({ ok: true, de: docJsonLon_(v[5]) })
+    }
+    if (action === 'xoaDe') {
+      const row = findRowByKey_(sh, 0, body.maDe)
+      if (row < 0) return jsonResponse_({ ok: true })
+      const ref = String(sh.getRange(row, 6, 1, 1).getValues()[0][0])
+      if (ref.indexOf('drive:') === 0) {
+        try { DriveApp.getFileById(ref.slice(6)).setTrashed(true) } catch (err) {}
+      }
+      sh.deleteRow(row)
+      return jsonResponse_({ ok: true })
+    }
+    // luuDe
+    const de = body.de
+    if (!de || !de.ma_de || !de.cau || !de.cau.length) return jsonResponse_({ ok: false, error: 'Thiếu de.ma_de hoặc de.cau' })
+    const row = findRowByKey_(sh, 0, de.ma_de)
+    const cu = row > 0 ? sh.getRange(row, 1, 1, 7).getValues()[0] : [null, null, null, null, null, '', null]
+    let soNghi = 0
+    for (let i = 0; i < de.cau.length; i++) {
+      const lg = de.cau[i].loi_giai
+      if (lg && (lg.trang_thai === 'nghi_dap_an_sai' || lg.trang_thai === 'thieu_dap_an')) soNghi++
+    }
+    const rowData = [
+      String(de.ma_de),
+      de.nguon || '',
+      de.ngay_nap || new Date().toISOString(),
+      de.cau.length,
+      soNghi,
+      luuJsonLon_('de_' + de.ma_de, de, cu[5]),
+      new Date().toISOString(),
+    ]
+    if (row > 0) sh.getRange(row, 1, 1, 7).setValues([rowData])
+    else sh.appendRow(rowData)
+    return jsonResponse_({ ok: true, maDe: String(de.ma_de), soCau: de.cau.length, soNghi: soNghi })
+  }
+
   if (action === 'publish') {
     const sh = getSheet_(SHEET_CA, ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson'])
     const row = findRowByKey_(sh, 0, body.maCa)
     // keyBank (có đáp án) CHỈ được gửi lên nếu thầy chủ động bật "xem điểm
     // ngay sau khi nộp" ở màn Soạn đề — lưu riêng cột này, KHÔNG bao giờ trả
     // về ở action "session" (chỉ trả trong response của "submit", xem dưới).
+    const cu = row > 0 ? sh.getRange(row, 1, 1, 7).getValues()[0] : [null, null, null, null, '', '', '']
     const rowData = [
       body.maCa,
       body.lop,
       body.thoiGianPhut,
       new Date().toISOString(),
-      JSON.stringify(body.bank),
+      luuJsonLon_('ca_' + body.maCa + '_bank', body.bank, cu[4]),
       body.immediateFeedback ? 'true' : 'false',
-      body.keyBank ? JSON.stringify(body.keyBank) : '',
+      body.keyBank ? luuJsonLon_('ca_' + body.maCa + '_key', body.keyBank, cu[6]) : '',
     ]
     if (row > 0) {
       sh.getRange(row, 1, 1, 7).setValues([rowData])
@@ -366,7 +477,7 @@ function doPost(e) {
     let keyBank = null
     if (caRow > 0) {
       const caVals = caSh.getRange(caRow, 1, 1, 7).getValues()[0]
-      if (String(caVals[5]) === 'true' && caVals[6]) keyBank = JSON.parse(caVals[6])
+      if (String(caVals[5]) === 'true' && caVals[6]) keyBank = docJsonLon_(caVals[6])
     }
     return jsonResponse_({ ok: true, keyBank: keyBank })
   }

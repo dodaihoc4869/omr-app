@@ -11,7 +11,7 @@ export type ScreenId =
   | 'classlist'
   | 'examhub'
   | 'examsetup'
-  | 'examimport'
+  | 'nganhangde'
   | 'examtake'
   | 'exammonitor'
   | 'parent'

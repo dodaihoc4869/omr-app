@@ -163,10 +163,11 @@ const NHAN_TONE: Record<'xanh' | 'cam' | 'do' | 'tim' | 'xam', { bg: string; fg:
   xam: { bg: 'var(--the-2)', fg: 'var(--nhat)' },
 }
 
-export function Nhan({ tone, children, className = '' }: { tone: keyof typeof NHAN_TONE; children: ReactNode; className?: string }) {
+export function Nhan({ tone, children, className = '', ...rest }: { tone: keyof typeof NHAN_TONE; children: ReactNode; className?: string; 'data-nhan'?: string }) {
   const t = NHAN_TONE[tone]
   return (
     <span
+      {...rest}
       className={`inline-flex items-center font-bold whitespace-nowrap ${className}`}
       style={{
         borderRadius: 'var(--bo-tron)',
