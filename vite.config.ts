@@ -12,6 +12,11 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      // Tự đăng ký service worker trong main.tsx (registerSW từ
+      // 'virtual:pwa-register', immediate:true) để có bản mới TỰ TẢI LẠI
+      // ngay, không cần thầy/học sinh xoá cache tay mới thấy sửa lỗi —
+      // injectRegister:false để không đăng ký trùng 2 lần.
+      injectRegister: false,
       includeAssets: ['favicon.svg'],
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data}'],

@@ -19,11 +19,20 @@ body {
   min-width: 44px;
 }
 
-/* Công thức Hoá (KaTeX, \ce{...}/$...$) phải NẰM CÙNG DÒNG và ĐÚNG BẰNG cỡ
- * chữ thường xung quanh — mặc định KaTeX tự đặt .katex{font-size:1.21em},
- * to hơn hẳn chữ thường 21% nên trông như bị tách dòng/lệch cỡ. Ghi đè về
- * 1em (bằng chữ cha) để công thức chảy tự nhiên trong câu, !important vì
- * katex.min.css nạp SAU index.css nên cần thắng ở cùng độ đặc hiệu. */
+/* Công thức Hoá (KaTeX, \ce{...}/$...$ — src/lib/chem-format.tsx, LUÔN gọi
+ * displayMode:false, không có công thức nào tự tách khối) phải NẰM CÙNG
+ * DÒNG và ĐÚNG BẰNG cỡ chữ thường xung quanh. Ba phần ghi đè mặc định của
+ * KaTeX: (1) .katex tự đặt font-size:1.21em, to hơn chữ thường 21%; (2)
+ * line-height/vertical-align mặc định làm dòng chứa công thức bị lệch/giãn
+ * so với dòng chữ thường bên cạnh; (3) khối chỉ số trên/dưới (.msupsub, vd
+ * Ca^2+) tự đẩy cao cả dòng chứa nó dù bản thân chữ không cao hơn.
+ * !important vì katex.min.css nạp SAU index.css nên cần thắng ở cùng độ
+ * đặc hiệu. */
 .katex {
   font-size: 1em !important;
+  line-height: normal !important;
+  vertical-align: baseline !important;
+}
+.katex .msupsub {
+  line-height: 0 !important;
 }

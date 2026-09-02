@@ -141,7 +141,11 @@ export function splitCeSegments(raw: string): Segment[] {
   return out
 }
 
-const KATEX_OPTS = { throwOnError: true, strict: false } as const
+// displayMode:false TƯỜNG MINH — công thức luôn nằm trong dòng chữ (không
+// tự tách khối riêng), dù đây vốn đã là mặc định của KaTeX. Ghi rõ ra để
+// không ai vô tình bật displayMode:true sau này (sẽ làm công thức tự xuống
+// dòng, chiếm hẳn 1 dòng riêng, đúng lỗi đã gặp).
+const KATEX_OPTS = { throwOnError: true, strict: false, displayMode: false } as const
 
 /** 1 công thức "\ce{...}" hoặc "$...$" render bằng KaTeX. Lỗi cú pháp -> hiện
  * nguyên văn chuỗi gốc kèm gạch chân đỏ cảnh báo, KHÔNG BAO GIỜ để trắng hay

@@ -17,6 +17,11 @@ import RegistrationManagerScreen from './screens/RegistrationManagerScreen'
 // Icon tin nhắn nổi chỉ dành cho THẦY — ẩn ở các màn phụ huynh/học sinh tự
 // dùng trên máy riêng của họ (họ không cần thấy hộp thư của thầy).
 const HIDE_FAB_ON: string[] = ['parent', 'studentprofile', 'examtake', 'examimport']
+// Thanh menu dưới (Lớp/Kiểm tra/Phụ huynh...) chỉ dành cho THẦY điều hướng
+// giữa các màn quản lý — ẩn hẳn khi học sinh vào bằng link mời làm bài, để
+// không còn lối bấm ra khỏi màn thi (tránh xao nhãng, tránh lộ menu quản lý
+// không liên quan tới học sinh).
+const HIDE_BOTTOMNAV_ON: string[] = ['examtake']
 
 function App() {
   const screen = useAppStore((s) => s.screen)
@@ -48,7 +53,7 @@ function App() {
       {screen === 'studentprofile' && <StudentProfileScreen />}
       {screen === 'registrationmanager' && <RegistrationManagerScreen />}
       {!HIDE_FAB_ON.includes(screen) && <MessagesFab />}
-      <BottomNav />
+      {!HIDE_BOTTOMNAV_ON.includes(screen) && <BottomNav />}
     </div>
   )
 }
