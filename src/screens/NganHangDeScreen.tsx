@@ -7,13 +7,16 @@
 // đề thiếu đáp án) — quyết định giữ hay sửa đáp án. Sửa xong app hỏi có chấm
 // lại các ca đã dùng câu đó không (cập nhật ngân hàng CÓ đáp án của từng ca;
 // màn Theo dõi mở lại là chấm theo đáp án mới).
-import { useEffect, useMemo, useState } from 'react'
-import { RefreshCw, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { RefreshCw, Trash2, ChevronDown, ChevronUp, Upload } from 'lucide-react'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { TheNoiDung, DauThe, Hang, Nhan, OThongBao, NutChinh } from '../components/DesignSystem'
 import { ChemText } from '../lib/chem-format'
 import { deleteExamSource, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, saveExamSource, saveScriptUrl, saveSessionTeacherBank, saveTeacherSecret } from '../lib/exam-db'
 import { dongBoNganHang, type KetQuaDongBo } from '../lib/exam-sync'
+import { luuDe } from '../lib/exam-api'
+import { buildTeacherSourceFromKhoDe, parseKhoDeJsonText } from '../lib/exam-kho-de-import'
+import { validateTeacherSource } from '../data/examContent'
 import { useAppStore } from '../store/appStore'
 
 type CauNghi = {
@@ -62,6 +65,37 @@ export default function NganHangDeScreen() {
   const [moCauHinh, setMoCauHinh] = useState(false)
   const [moDe, setMoDe] = useState<Set<string>>(new Set())
   const [hoiChamLai, setHoiChamLai] = useState<{ maDe: string; soCa: number; capNhat: () => Promise<void> } | null>(null)
+  const [dangDay, setDangDay] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  /** Dự phòng khi máy chạy pipeline không gọi được Apps Script (chặn mạng):
+   * thầy chọn file kho-de/xong/<mã>.json — app đẩy lên kho (luuDe) và lưu
+   * luôn vào ngân hàng máy này. Cùng khuôn JSON, cùng kiểm tra. */
+  const dayFileJson = async (file: File) => {
+    if (!scriptUrl.trim() || !secret.trim()) {
+      showToast('Cần link Apps Script + mã bí mật trước (mục Cấu hình)', 'error')
+      setMoCauHinh(true)
+      return
+    }
+    setDangDay(true)
+    try {
+      const raw = await file.text()
+      const parsed = parseKhoDeJsonText(raw)
+      if (!parsed.ok || !parsed.json) throw new Error(parsed.errors[0])
+      const { source, errors, canXemList } = buildTeacherSourceFromKhoDe(parsed.json)
+      if (errors.length > 0) throw new Error(errors[0])
+      const v = validateTeacherSource(source)
+      if (v.length > 0) throw new Error(v[0])
+      const r = await luuDe(scriptUrl.trim(), secret.trim(), JSON.parse(raw))
+      await saveExamSource(source)
+      await taiLocal()
+      showToast(`Đã đẩy đề ${r.maDe} lên kho (${r.soCau} câu${r.soNghi ? `, ${r.soNghi} câu nghi` : ''}) và lưu vào máy này${canXemList.length ? ` — cần xem: ${canXemList.join(', ')}` : ''}`, r.soNghi ? 'warn' : 'success')
+    } catch (e) {
+      showToast(`Đẩy đề lỗi: ${e instanceof Error ? e.message : 'không rõ'}`, 'error')
+    } finally {
+      setDangDay(false)
+    }
+  }
 
   const taiLocal = async () => setSources(await loadExamSources())
 
@@ -177,12 +211,28 @@ export default function NganHangDeScreen() {
           </div>
           {tongNghi > 0 && <Nhan tone="do">{tongNghi} câu cần thầy quyết</Nhan>}
         </div>
-        <div style={{ marginTop: 'var(--k4)' }}>
+        <div className="flex flex-col" style={{ marginTop: 'var(--k4)', gap: 'var(--k2)' }}>
           <NutChinh onClick={() => dongBo(scriptUrl, secret)} disabled={dangDongBo}>
             <span className="inline-flex items-center gap-2">
               <RefreshCw size={18} className={dangDongBo ? 'animate-spin' : ''} /> {dangDongBo ? 'Đang đồng bộ…' : 'Đồng bộ ngay'}
             </span>
           </NutChinh>
+          <NutChinh variant="phu" onClick={() => fileRef.current?.click()} disabled={dangDay}>
+            <span className="inline-flex items-center gap-2">
+              <Upload size={18} /> {dangDay ? 'Đang đẩy…' : 'Đẩy file JSON từ kho-de/xong lên kho'}
+            </span>
+          </NutChinh>
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".json,application/json"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0]
+              e.target.value = ''
+              if (f) dayFileJson(f)
+            }}
+          />
         </div>
         {ketQua && (ketQua.loi.length > 0 || ketQua.canXem.length > 0) && (
           <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
