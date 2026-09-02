@@ -85,7 +85,7 @@ function drawPhanIIILabels(doc: jsPDF) {
   const blockCenter = ((t.cols - 1) * t.pitch_mm.x) / 2
   for (let q = 0; q < t.questions; q++) {
     const x = t.blockOrigin_mm.x + q * t.blockSpacing_mm.x + blockCenter
-    doc.text(`Câu ${q + 1}`, x, t.blockOrigin_mm.y - 2.5, { align: 'center' })
+    doc.text(`Câu ${q + 1}`, x, t.blockOrigin_mm.y - 1.8, { align: 'center' })
   }
 }
 
@@ -111,21 +111,21 @@ export function buildAnswerSheetPdf(studentInfo?: { hoTen?: string; lop?: string
 
   doc.setFont(FONT, 'bold')
   doc.setFontSize(8)
-  doc.text(template.phanI.label, template.phanI.blockOrigin_mm.x, template.phanI.blockOrigin_mm.y - 4)
+  doc.text(template.phanI.label, template.phanI.blockOrigin_mm.x, template.phanI.blockOrigin_mm.y - 5)
   doc.setFont(FONT, 'normal')
   drawQuestionNumbers(doc)
   drawBubbleGroup(doc, genPhanIBubbles())
 
   doc.setFont(FONT, 'bold')
   doc.setFontSize(8)
-  doc.text(template.phanII.label, template.phanII.origin_mm.x, template.phanII.origin_mm.y - 4)
+  doc.text(template.phanII.label, template.phanII.origin_mm.x, template.phanII.origin_mm.y - 5)
   doc.setFont(FONT, 'normal')
   drawPhanIILabels(doc)
   drawBubbleGroup(doc, genPhanIIBubbles())
 
   doc.setFont(FONT, 'bold')
   doc.setFontSize(8)
-  doc.text(template.phanIII.label, template.phanIII.blockOrigin_mm.x, template.phanIII.blockOrigin_mm.y - 4)
+  doc.text(template.phanIII.label, template.phanIII.blockOrigin_mm.x, template.phanIII.blockOrigin_mm.y - 5)
   doc.setFont(FONT, 'normal')
   drawPhanIIILabels(doc)
   drawBubbleGroup(doc, genPhanIIIBubbles())

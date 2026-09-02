@@ -17,14 +17,14 @@
     "digits": 6,
     "choices": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
     "origin_mm": { "x": 14, "y": 31 },
-    "pitch_mm": { "x": 5.2, "y": 4.0 }
+    "pitch_mm": { "x": 5.2, "y": 3.6 }
   },
   "madeThi": {
     "label": "Mã đề thi",
     "digits": 3,
     "choices": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
     "origin_mm": { "x": 95, "y": 31 },
-    "pitch_mm": { "x": 5.2, "y": 4.0 }
+    "pitch_mm": { "x": 5.2, "y": 3.6 }
   },
   "phanI": {
     "label": "Phần I — Trắc nghiệm nhiều lựa chọn",
@@ -32,17 +32,17 @@
     "choices": ["A", "B", "C", "D"],
     "blockCols": 3,
     "questionsPerBlock": 6,
-    "blockOrigin_mm": { "x": 14, "y": 75 },
+    "blockOrigin_mm": { "x": 14, "y": 73.8 },
     "blockSpacing_mm": { "x": 30 },
-    "pitch_mm": { "x": 6.5, "y": 6.1 }
+    "pitch_mm": { "x": 6.5, "y": 5.5 }
   },
   "phanII": {
     "label": "Phần II — Đúng / Sai",
     "questions": 4,
     "ideas": 4,
     "choices": ["D", "S"],
-    "origin_mm": { "x": 14, "y": 113.9 },
-    "questionPitch_mm": 7.5,
+    "origin_mm": { "x": 14, "y": 111.7 },
+    "questionPitch_mm": 6.5,
     "ideaSpacing_mm": 17,
     "choiceSpacing_mm": 6
   },
@@ -52,8 +52,8 @@
     "cols": 4,
     "rows": 12,
     "rowSymbols": ["-", ",", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
-    "blockOrigin_mm": { "x": 14, "y": 144.8 },
+    "blockOrigin_mm": { "x": 14, "y": 141.6 },
     "blockSpacing_mm": { "x": 16.6 },
-    "pitch_mm": { "x": 4.2, "y": 3.75 }
+    "pitch_mm": { "x": 4.2, "y": 3.9 }
   }
 }
