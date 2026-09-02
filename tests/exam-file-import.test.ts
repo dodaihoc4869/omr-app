@@ -57,4 +57,17 @@ describe('htmlToLines (Word HTML -> text có xuống dòng + số thứ tự)', 
     const text = htmlToLines(html)
     expect(text.split('\n')).toEqual(['A) chọn A', 'B) chọn B', 'C) chọn C', 'D) chọn D'])
   })
+
+  it('bảng 2x2 (2 lựa chọn/hàng, rất hay dùng để căn cột A/B/C/D) tách đúng mỗi ô 1 dòng, không dính lựa chọn sau vào lựa chọn trước', () => {
+    // Mammoth xuất bảng Word thành <table><tr><td>...</td><td>...</td></tr></table>.
+    // Trước khi sửa, 'td' không nằm trong BLOCK_TAGS nên 2 ô cùng hàng dính
+    // chung 1 dòng ("A. x" liền "B. y" không xuống dòng) -> app chỉ nhận ra
+    // lựa chọn đứng đầu dòng (A, C), còn lựa chọn dính sau (B, D) bị báo
+    // "thiếu nội dung" dù chữ vẫn còn nguyên trong file gốc.
+    const html =
+      '<table><tr><td><p>A. chọn A</p></td><td><p>B. chọn B</p></td></tr>' +
+      '<tr><td><p>C. chọn C</p></td><td><p>D. chọn D</p></td></tr></table>'
+    const text = htmlToLines(html)
+    expect(text.split('\n')).toEqual(['A. chọn A', 'B. chọn B', 'C. chọn C', 'D. chọn D'])
+  })
 })

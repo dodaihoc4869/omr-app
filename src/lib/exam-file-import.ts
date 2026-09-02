@@ -98,7 +98,13 @@ export function htmlToLines(html: string): string {
     current = ''
   }
 
-  const BLOCK_TAGS = new Set(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'tr', 'div'])
+  // 'td'/'th' PHẢI có trong danh sách này: đề Hoá rất hay trình bày 4 lựa
+  // chọn A/B/C/D theo bảng 2x2 (2 lựa chọn/hàng) để căn cột cho đẹp. Nếu
+  // không tách dòng ở biên mỗi ô, 2 lựa chọn cùng hàng (vd "A." và "B.")
+  // dính vào chung 1 dòng — app chỉ nhận diện được lựa chọn đứng đầu dòng
+  // (A) còn lựa chọn dính sau (B) bị báo "thiếu nội dung" hàng loạt, dù chữ
+  // vẫn còn nguyên trong file gốc.
+  const BLOCK_TAGS = new Set(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'tr', 'td', 'th', 'div'])
 
   const walk = (node: ChildNode) => {
     if (node.nodeType === Node.TEXT_NODE) {
