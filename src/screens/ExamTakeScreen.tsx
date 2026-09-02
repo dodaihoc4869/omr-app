@@ -4,7 +4,7 @@ import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assi
 import { fetchSession, submitAnswers, pushExamStatus, sendParentFeedback, type KeyBank } from '../lib/exam-api'
 import { ChemText } from '../lib/chem-format'
 import QuestionMedia from '../components/QuestionMedia'
-import { SolutionMcq, SolutionTrueFalse, SolutionShortAnswer } from '../components/SolutionCard'
+import { SolutionMcq, SolutionTrueFalse, SolutionShortAnswer, MAU_HEADER } from '../components/SolutionCard'
 import { TriangleAlert, X, ArrowLeft } from 'lucide-react'
 import { classify } from '../engine/score'
 import { gradeFromKeyBank, type GradedSubmission } from '../lib/exam-grade'
@@ -26,6 +26,41 @@ function formatClock(totalSeconds: number): string {
   const m = Math.floor(s / 60)
   const sec = s % 60
   return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
+}
+
+// Thẻ câu hỏi khi ĐANG LÀM BÀI — cùng ngôn ngữ hình ảnh với SolutionCard
+// (header màu gradient xoay vòng, số thứ tự trong huy hiệu tròn) nhưng LUÔN
+// MỞ (không gập) vì học sinh cần thấy và trả lời từng câu, khác màn xem lại
+// lời giải là để đọc lại nên mặc định gập cho gọn. Chấm tròn ở góc phải báo
+// đã trả lời hay chưa, không tô đúng/sai vì chưa nộp bài.
+function QCard({
+  mauIdx,
+  soThuTu,
+  daTraLoi,
+  children,
+}: {
+  mauIdx: number
+  soThuTu: number
+  daTraLoi: boolean
+  children: React.ReactNode
+}) {
+  return (
+    <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+      <div
+        className={`flex items-center justify-between gap-2 px-3.5 py-2.5 bg-gradient-to-r ${MAU_HEADER[mauIdx % MAU_HEADER.length]} text-white`}
+      >
+        <div className="flex items-center gap-2.5 min-w-0">
+          <span className="shrink-0 w-7 h-7 rounded-full bg-white/25 flex items-center justify-center text-sm font-bold">{soThuTu}</span>
+          <span className="font-semibold text-sm">Câu {soThuTu}</span>
+        </div>
+        <span
+          className={`shrink-0 w-3 h-3 rounded-full border-2 border-white/80 ${daTraLoi ? 'bg-white' : 'bg-transparent'}`}
+          title={daTraLoi ? 'Đã trả lời' : 'Chưa trả lời'}
+        />
+      </div>
+      <div className="p-3.5 space-y-2.5">{children}</div>
+    </div>
+  )
 }
 
 export default function ExamTakeScreen() {
@@ -641,12 +676,8 @@ export default function ExamTakeScreen() {
         {assignment.phanI.map((item, displayIdx) => {
           const selectedLetter = attempt.answers.phanI[item.qid]
           return (
-            <div
-              key={item.qid}
-              className="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-3 space-y-2.5"
-            >
+            <QCard key={item.qid} mauIdx={displayIdx} soThuTu={displayIdx + 1} daTraLoi={!!selectedLetter}>
               <div className="text-sm font-medium leading-relaxed">
-                <span className="text-indigo-600 dark:text-indigo-400 font-bold">Câu {displayIdx + 1}. </span>
                 <ChemText text={item.question.text} />
               </div>
               <QuestionMedia table={item.question.table} imageDataUrl={item.question.imageDataUrl} />
@@ -680,75 +711,76 @@ export default function ExamTakeScreen() {
                   )
                 })}
               </div>
-            </div>
+            </QCard>
           )
         })}
       </section>
 
       <section className="space-y-3">
         <h2 className="font-bold text-indigo-700 dark:text-indigo-400">Phần II — Đúng / Sai</h2>
-        {assignment.phanII.map((item, displayIdx) => (
-          <div
-            key={item.qid}
-            className="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-3 space-y-2.5"
-          >
-            <div className="text-sm font-medium leading-relaxed">
-              <span className="text-indigo-600 dark:text-indigo-400 font-bold">Câu {displayIdx + 1}. </span>
-              <ChemText text={item.question.text} />
-            </div>
-            <QuestionMedia table={item.question.table} imageDataUrl={item.question.imageDataUrl} />
-            <div className="space-y-2">
-              {item.question.ideas.map((idea, ideaIdx) => {
-                const val = attempt.answers.phanII[item.qid]?.[ideaIdx]
-                return (
-                  <div
-                    key={ideaIdx}
-                    className="flex items-center justify-between gap-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 px-2.5 py-1.5"
-                  >
-                    <span className="text-sm flex-1">
-                      <b className="text-slate-500">{'abcd'[ideaIdx]})</b> <ChemText text={idea} />
-                    </span>
-                    <span className="flex gap-1.5 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => setPhanII(item.qid, ideaIdx, 'D')}
-                        className={`tap-target w-11 rounded-md text-xs font-bold border-2 transition-colors ${
-                          val === 'D'
-                            ? 'bg-emerald-600 border-emerald-600 text-white'
-                            : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-500'
-                        }`}
-                      >
-                        Đúng
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPhanII(item.qid, ideaIdx, 'S')}
-                        className={`tap-target w-11 rounded-md text-xs font-bold border-2 transition-colors ${
-                          val === 'S'
-                            ? 'bg-rose-600 border-rose-600 text-white'
-                            : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-500'
-                        }`}
-                      >
-                        Sai
-                      </button>
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        ))}
+        {assignment.phanII.map((item, displayIdx) => {
+          const vals = attempt.answers.phanII[item.qid]
+          const daTraLoi = !!vals && vals.some((v) => v !== null && v !== undefined)
+          return (
+            <QCard key={item.qid} mauIdx={assignment.phanI.length + displayIdx} soThuTu={displayIdx + 1} daTraLoi={daTraLoi}>
+              <div className="text-sm font-medium leading-relaxed">
+                <ChemText text={item.question.text} />
+              </div>
+              <QuestionMedia table={item.question.table} imageDataUrl={item.question.imageDataUrl} />
+              <div className="space-y-2">
+                {item.question.ideas.map((idea, ideaIdx) => {
+                  const val = attempt.answers.phanII[item.qid]?.[ideaIdx]
+                  return (
+                    <div
+                      key={ideaIdx}
+                      className="flex items-center justify-between gap-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 px-2.5 py-1.5"
+                    >
+                      <span className="text-sm flex-1">
+                        <b className="text-slate-500">{'abcd'[ideaIdx]})</b> <ChemText text={idea} />
+                      </span>
+                      <span className="flex gap-1.5 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setPhanII(item.qid, ideaIdx, 'D')}
+                          className={`tap-target w-11 rounded-md text-xs font-bold border-2 transition-colors ${
+                            val === 'D'
+                              ? 'bg-emerald-600 border-emerald-600 text-white'
+                              : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-500'
+                          }`}
+                        >
+                          Đúng
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPhanII(item.qid, ideaIdx, 'S')}
+                          className={`tap-target w-11 rounded-md text-xs font-bold border-2 transition-colors ${
+                            val === 'S'
+                              ? 'bg-rose-600 border-rose-600 text-white'
+                              : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-500'
+                          }`}
+                        >
+                          Sai
+                        </button>
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            </QCard>
+          )
+        })}
       </section>
 
       <section className="space-y-3">
         <h2 className="font-bold text-indigo-700 dark:text-indigo-400">Phần III — Trả lời ngắn</h2>
         {assignment.phanIII.map((item, displayIdx) => (
-          <div
+          <QCard
             key={item.qid}
-            className="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-3 space-y-2.5"
+            mauIdx={assignment.phanI.length + assignment.phanII.length + displayIdx}
+            soThuTu={displayIdx + 1}
+            daTraLoi={!!attempt.answers.phanIII[item.qid]?.trim()}
           >
             <div className="text-sm font-medium leading-relaxed">
-              <span className="text-indigo-600 dark:text-indigo-400 font-bold">Câu {displayIdx + 1}. </span>
               <ChemText text={item.question.text} />
             </div>
             <QuestionMedia table={item.question.table} imageDataUrl={item.question.imageDataUrl} />
@@ -758,7 +790,7 @@ export default function ExamTakeScreen() {
               value={attempt.answers.phanIII[item.qid] ?? ''}
               onChange={(e) => setPhanIII(item.qid, e.target.value)}
             />
-          </div>
+          </QCard>
         ))}
       </section>
 

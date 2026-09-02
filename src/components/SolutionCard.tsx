@@ -9,7 +9,7 @@ import QuestionMedia from './QuestionMedia'
 
 // Cùng 1 bảng màu lặp lại theo chỉ số câu — KHÔNG gắn với chủ đề thật (app
 // không có dữ liệu phân loại chủ đề), chỉ để phân biệt các thẻ cho dễ nhìn.
-const MAU_HEADER = [
+export const MAU_HEADER = [
   'from-indigo-500 to-indigo-600',
   'from-amber-500 to-amber-600',
   'from-emerald-500 to-emerald-600',
