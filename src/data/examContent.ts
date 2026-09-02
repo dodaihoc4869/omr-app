@@ -137,6 +137,10 @@ export interface TeacherExamSource {
    * đề nào mới/đã đổi (so `ngayNap`), không tải lại tất cả mỗi lần. */
   nguon?: string
   ngayNap?: string
+  /** NHÓM ĐỀ = tên thư mục con thầy tạo trong kho-de/moi/ (vd "12A1",
+   * "Chuyen-de/Ester") — pipeline ghi vào JSON, app dùng để lọc khi chọn đề
+   * mở ca. Không có thư mục con thì rỗng. */
+  nhom?: string
 }
 
 export const PHAN_I_NEED = 18

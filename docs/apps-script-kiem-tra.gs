@@ -440,12 +440,14 @@ function doPost(e) {
   if (action === 'luuDe' || action === 'danhSachDe' || action === 'layDe' || action === 'xoaDe') {
     const loi = kiemTraMaBiMat_(body)
     if (loi) return jsonResponse_({ ok: false, error: loi })
-    const sh = getSheet_(SHEET_DE, ['MaDe', 'Nguon', 'NgayNap', 'SoCau', 'SoNghi', 'DeJson', 'CapNhatLuc'])
+    const sh = getSheet_(SHEET_DE, ['MaDe', 'Nguon', 'NgayNap', 'SoCau', 'SoNghi', 'DeJson', 'CapNhatLuc', 'Nhom'])
+    // Sheet tạo trước khi có cột Nhom (thư mục con trong kho-de/moi/) — bổ sung tiêu đề cột 8.
+    if (String(sh.getRange(1, 8).getValue()) !== 'Nhom') sh.getRange(1, 8).setValue('Nhom')
     if (action === 'danhSachDe') {
       const data = sh.getDataRange().getValues()
       const items = []
       for (let i = 1; i < data.length; i++) {
-        items.push({ maDe: String(data[i][0]), nguon: data[i][1], ngayNap: data[i][2], soCau: data[i][3], soNghi: data[i][4], capNhatLuc: data[i][6] })
+        items.push({ maDe: String(data[i][0]), nguon: data[i][1], ngayNap: data[i][2], soCau: data[i][3], soNghi: data[i][4], capNhatLuc: data[i][6], nhom: data[i][7] ? String(data[i][7]) : '' })
       }
       return jsonResponse_({ ok: true, items: items })
     }
@@ -469,7 +471,7 @@ function doPost(e) {
     const de = body.de
     if (!de || !de.ma_de || !de.cau || !de.cau.length) return jsonResponse_({ ok: false, error: 'Thiếu de.ma_de hoặc de.cau' })
     const row = findRowByKey_(sh, 0, de.ma_de)
-    const cu = row > 0 ? sh.getRange(row, 1, 1, 7).getValues()[0] : [null, null, null, null, null, '', null]
+    const cu = row > 0 ? sh.getRange(row, 1, 1, 8).getValues()[0] : [null, null, null, null, null, '', null, '']
     let soNghi = 0
     for (let i = 0; i < de.cau.length; i++) {
       const lg = de.cau[i].loi_giai
@@ -483,8 +485,9 @@ function doPost(e) {
       soNghi,
       luuJsonLon_('de_' + de.ma_de, de, cu[5]),
       new Date().toISOString(),
+      de.nhom || '',
     ]
-    if (row > 0) sh.getRange(row, 1, 1, 7).setValues([rowData])
+    if (row > 0) sh.getRange(row, 1, 1, 8).setValues([rowData])
     else sh.appendRow(rowData)
     return jsonResponse_({ ok: true, maDe: String(de.ma_de), soCau: de.cau.length, soNghi: soNghi })
   }

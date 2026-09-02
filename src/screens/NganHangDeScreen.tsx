@@ -260,6 +260,7 @@ export default function NganHangDeScreen() {
                   {s.nguon ? ` · ${s.nguon}` : ''}
                 </div>
                 <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
+                  {s.nhom && <Nhan tone="tim">{s.nhom}</Nhan>}
                   {nghi.length > 0 ? <Nhan tone="do">{nghi.length} nghi</Nhan> : <Nhan tone="xanh">đáp án đủ</Nhan>}
                   <button onClick={() => xoaDe(s.maDe)} className="tap-target" style={{ color: 'var(--mo)' }} title="Xoá khỏi máy này" aria-label="Xoá đề">
                     <Trash2 size={16} />

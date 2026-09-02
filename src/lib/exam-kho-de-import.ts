@@ -86,6 +86,8 @@ export interface KhoDeJson {
   ma_de: string
   nguon?: string
   ngay_nap?: string
+  /** Thư mục con trong kho-de/moi/ chứa file gốc (nhóm đề) — tuỳ chọn. */
+  nhom?: string
   cau: KhoDeCau[]
 }
 
@@ -246,6 +248,7 @@ export function parseKhoDeJsonText(raw: string): KhoDeParseResult {
       ma_de: String(d.ma_de),
       nguon: typeof d.nguon === 'string' ? d.nguon : undefined,
       ngay_nap: typeof d.ngay_nap === 'string' ? d.ngay_nap : undefined,
+      nhom: typeof d.nhom === 'string' && d.nhom.trim() ? d.nhom.trim().replace(/^\/+|\/+$/g, '') : undefined,
       cau,
     },
   }
@@ -333,5 +336,5 @@ export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherE
     }
   }
 
-  return { source: { maDe: json.ma_de, phanI, phanII, phanIII, nguon: json.nguon, ngayNap: json.ngay_nap }, errors, warnings, canXemList }
+  return { source: { maDe: json.ma_de, phanI, phanII, phanIII, nguon: json.nguon, ngayNap: json.ngay_nap, nhom: json.nhom }, errors, warnings, canXemList }
 }

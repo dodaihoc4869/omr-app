@@ -65,6 +65,8 @@ export default function ExamSetupScreen() {
   const [savedSources, setSavedSources] = useState<TeacherExamSource[]>([])
   const [selectedMaDe, setSelectedMaDe] = useState<Set<string>>(new Set())
   const [timKiemMaDe, setTimKiemMaDe] = useState('')
+  // Lọc theo NHÓM ĐỀ (= thư mục con thầy tạo trong kho-de/moi/); '' = tất cả.
+  const [nhomLoc, setNhomLoc] = useState('')
 
   const [lop, setLop] = useState('')
   const [thoiGianPhut, setThoiGianPhut] = useState(45)
@@ -111,11 +113,12 @@ export default function ExamSetupScreen() {
   const selectedSources = savedSources.filter((c) => selectedMaDe.has(c.maDe))
   const sizeWarning = selectedSources.length > 0 ? bankSizeWarning(selectedSources) : null
 
+  const dsNhom = useMemo(() => Array.from(new Set(savedSources.map((c) => (c.nhom || '').trim()).filter(Boolean))).sort(), [savedSources])
+
   const dsDeLoc = useMemo(() => {
     const q = timKiemMaDe.trim().toLowerCase()
-    if (!q) return savedSources
-    return savedSources.filter((c) => c.maDe.toLowerCase().includes(q))
-  }, [savedSources, timKiemMaDe])
+    return savedSources.filter((c) => (!nhomLoc || (c.nhom || '') === nhomLoc) && (!q || c.maDe.toLowerCase().includes(q)))
+  }, [savedSources, timKiemMaDe, nhomLoc])
 
   const tongCauDaChon = selectedSources.reduce((s, c) => s + c.phanI.length + c.phanII.length + c.phanIII.length, 0)
 
@@ -234,6 +237,35 @@ export default function ExamSetupScreen() {
           </div>
         ) : (
           <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+            {dsNhom.length > 0 && (
+              <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="group" aria-label="Lọc theo nhóm đề">
+                {['', ...dsNhom].map((n) => {
+                  const chon = nhomLoc === n
+                  return (
+                    <button
+                      key={n || '__tat_ca'}
+                      type="button"
+                      onClick={() => setNhomLoc(n)}
+                      className="tap-target font-bold"
+                      style={{
+                        fontFamily: 'var(--sans)',
+                        fontSize: 'var(--cx-1)',
+                        minHeight: 36,
+                        padding: '0 var(--k3)',
+                        borderRadius: 'var(--bo-tron)',
+                        background: chon ? 'var(--tim-nen)' : 'var(--the-2)',
+                        color: chon ? 'var(--tim)' : 'var(--nhat)',
+                        border: `1.5px solid ${chon ? 'var(--tim)' : 'transparent'}`,
+                        transitionProperty: 'background-color, color, border-color',
+                        transitionDuration: 'var(--nhanh)',
+                      }}
+                    >
+                      {n || 'Tất cả'}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
             {savedSources.length >= 6 && (
               <input style={O_NHAP} placeholder="Tìm theo mã đề…" value={timKiemMaDe} onChange={(e) => setTimKiemMaDe(e.target.value)} inputMode="search" />
             )}
@@ -251,6 +283,7 @@ export default function ExamSetupScreen() {
                     </div>
                     <div style={NHAN_NHO}>
                       I {c.phanI.length} · II {c.phanII.length} · III {c.phanIII.length}
+                      {c.nhom && !nhomLoc ? ` · ${c.nhom}` : ''}
                     </div>
                   </span>
                   <span className="shrink-0 font-bold" style={{ ...SO, fontSize: 'var(--cx-2)' }}>

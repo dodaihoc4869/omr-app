@@ -154,3 +154,12 @@ describe('loi_giai có cấu trúc (THIẾT KẾ LẠI Ô LỜI GIẢI)', () => 
     expect(source.phanIII[0].loiGiai).toBeUndefined()
   })
 })
+
+describe('nhom (thư mục con trong kho-de/moi/)', () => {
+  it('nhom -> source.nhom, bỏ dấu / thừa; không có thì undefined', () => {
+    const co = buildTeacherSourceFromKhoDe(parseKhoDeJsonText(JSON.stringify({ ma_de: '1', nhom: '/12A1/', cau: [{ phan: 'III', so: 1, de: 'x', dap_an: '1' }] })).json!)
+    expect(co.source.nhom).toBe('12A1')
+    const khong = buildTeacherSourceFromKhoDe(parseKhoDeJsonText(OK_JSON).json!)
+    expect(khong.source.nhom).toBeUndefined()
+  })
+})

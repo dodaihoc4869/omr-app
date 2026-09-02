@@ -436,6 +436,8 @@ export interface KhoDeItem {
   soCau: number
   soNghi: number
   capNhatLuc: string
+  /** Nhóm đề (thư mục con trong kho-de/moi/) — rỗng nếu không có. */
+  nhom?: string
 }
 
 export async function danhSachDe(scriptUrl: string, secret: string): Promise<KhoDeItem[]> {
