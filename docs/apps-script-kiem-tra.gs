@@ -492,6 +492,20 @@ function doPost(e) {
     return jsonResponse_({ ok: true, maDe: String(de.ma_de), soCau: de.cau.length, soNghi: soNghi })
   }
 
+  if (action === 'capNhatKeyBank') {
+    // Thầy chốt lại đáp án / lời giải mới về máy → cập nhật bản CÓ đáp án của
+    // các ca ĐÃ MỞ (KeyBankJson) để học sinh xem lại thấy bản mới. Cần MA_BI_MAT.
+    // Không đụng BankJson (đề học sinh đang làm) và chế độ công bố.
+    const loi = kiemTraMaBiMat_(body)
+    if (loi) return jsonResponse_({ ok: false, error: loi })
+    const sh = getSheet_(SHEET_CA, ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson'])
+    const row = findRowByKey_(sh, 0, body.maCa)
+    if (row < 0) return jsonResponse_({ ok: false, error: 'Không có ca ' + body.maCa })
+    const cu = sh.getRange(row, 1, 1, 7).getValues()[0]
+    sh.getRange(row, 7).setValue(luuJsonLon_('ca_' + body.maCa + '_key', body.keyBank, cu[6]))
+    return jsonResponse_({ ok: true, maCa: String(body.maCa), congBo: congBoCua_(cu[5]) })
+  }
+
   if (action === 'publish') {
     const sh = getSheet_(SHEET_CA, ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson'])
     const row = findRowByKey_(sh, 0, body.maCa)

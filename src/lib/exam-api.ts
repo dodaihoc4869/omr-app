@@ -62,6 +62,14 @@ export async function publishSession(
   if (!result.ok) throw new Error(result.error || 'Mở ca kiểm tra thất bại')
 }
 
+/** Cập nhật bản CÓ đáp án + lời giải của một ca ĐÃ MỞ (thầy chốt đáp án, hoặc
+ * lời giải mới về máy) — học sinh xem lại thấy bản mới. Cần mã bí mật. */
+export async function capNhatKeyBank(scriptUrl: string, secret: string, maCa: string, keyBank: KeyBank): Promise<CongBoDiem> {
+  const r = await postJson(scriptUrl, { action: 'capNhatKeyBank', secret, maCa, keyBank })
+  if (!r.ok) throw new Error(r.error || 'Không cập nhật được ca ' + maCa)
+  return r.congBo
+}
+
 /** Kết quả hỏi lại sau khi nộp (chế độ ca_lop_xong, hoặc mở lại app sau khi
  * đã nộp): sanSang=true kèm keyBank khi đã được phép xem. */
 export interface KetQuaCongBo {

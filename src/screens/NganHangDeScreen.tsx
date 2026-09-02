@@ -13,10 +13,10 @@ import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion,
 import { TheNoiDung, DauThe, Hang, Nhan, OThongBao, NutChinh } from '../components/DesignSystem'
 import { ChemText } from '../lib/chem-format'
 import { deleteExamSource, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, saveExamSource, saveScriptUrl, saveSessionTeacherBank, saveTeacherSecret } from '../lib/exam-db'
-import { dongBoNganHang, type KetQuaDongBo } from '../lib/exam-sync'
-import { luuDe } from '../lib/exam-api'
+import { capNhatCaDaMo, dongBoNganHang, type KetQuaDongBo } from '../lib/exam-sync'
+import { capNhatKeyBank, luuDe } from '../lib/exam-api'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJsonText } from '../lib/exam-kho-de-import'
-import { validateTeacherSource } from '../data/examContent'
+import { mergeKeepAnswers, validateTeacherSource } from '../data/examContent'
 import { useAppStore } from '../store/appStore'
 
 type CauNghi = {
@@ -88,6 +88,9 @@ export default function NganHangDeScreen() {
       if (v.length > 0) throw new Error(v[0])
       const r = await luuDe(scriptUrl.trim(), secret.trim(), JSON.parse(raw))
       await saveExamSource(source)
+      // Ca đã mở dùng đề này → đổi sang bản mới (lời giải/đáp án) cho học sinh xem lại.
+      const soCa = await capNhatCaDaMo(scriptUrl.trim(), secret.trim(), source).catch(() => 0)
+      if (soCa > 0) showToast(`Đã cập nhật lời giải/đáp án cho ${soCa} ca đã mở`, 'success')
       await taiLocal()
       showToast(`Đã đẩy đề ${r.maDe} lên kho (${r.soCau} câu${r.soNghi ? `, ${r.soNghi} câu nghi` : ''}) và lưu vào máy này${canXemList.length ? ` — cần xem: ${canXemList.join(', ')}` : ''}`, r.soNghi ? 'warn' : 'success')
     } catch (e) {
@@ -179,6 +182,12 @@ export default function NganHangDeScreen() {
             return cp
           })
           await saveSessionTeacherBank(b.maCa, capNhat)
+          // Đẩy bản CÓ đáp án mới lên máy chủ để học sinh xem lại đúng đáp án thầy chốt.
+          if (scriptUrl.trim() && secret.trim()) {
+            await capNhatKeyBank(scriptUrl.trim(), secret.trim(), b.maCa, mergeKeepAnswers(capNhat)).catch(() => {
+              showToast(`Ca ${b.maCa}: chưa đẩy được đáp án mới lên máy chủ (mất mạng?)`, 'error')
+            })
+          }
         }
         showToast(`Đã cập nhật đáp án cho ${caLienQuan.length} ca — mở "Theo dõi & chấm bài" từng ca để xem điểm mới`, 'success')
       },

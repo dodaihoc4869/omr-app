@@ -166,3 +166,10 @@ describe('TheCau — ô lời giải có cấu trúc', () => {
     expect(trong.container.querySelector('.loi-giai')!.textContent).toContain('chưa nhập lời giải')
   })
 })
+
+describe('ExamTakeScreen truyền loiGiai khi xem lại (lỗi 2026-09-02: quên prop -> "chưa nhập lời giải")', () => {
+  it('mã nguồn màn xem lại có loiGiai={q.loiGiai} cho cả 3 phần', async () => {
+    const src = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default as string
+    expect((src.match(/loiGiai=\{q\.loiGiai\}/g) || []).length).toBe(3)
+  })
+})
