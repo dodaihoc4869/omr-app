@@ -160,3 +160,15 @@ export async function loadMyParentPhone(): Promise<string> {
   const db = await getDb()
   return (await db.get(STORE_SETTINGS, 'myParentPhone')) || ''
 }
+
+// Lưu SBD học sinh đã đăng ký hồ sơ trên CHÍNH máy này — mở lại app tự điền
+// sẵn SBD lúc vào thi/nhắn tin, không phải gõ lại mỗi lần.
+export async function saveMyStudentSbd(sbd: string): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, sbd, 'myStudentSbd')
+}
+
+export async function loadMyStudentSbd(): Promise<string> {
+  const db = await getDb()
+  return (await db.get(STORE_SETTINGS, 'myStudentSbd')) || ''
+}

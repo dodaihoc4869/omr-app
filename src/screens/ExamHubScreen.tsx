@@ -1,4 +1,4 @@
-import { ClipboardList, GraduationCap, MessageCircle, Users2 } from 'lucide-react'
+import { ClipboardList, GraduationCap, Users2, Users } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 
 export default function ExamHubScreen() {
@@ -39,15 +39,15 @@ export default function ExamHubScreen() {
       </button>
 
       <button
-        onClick={() => setScreen('parentmessages')}
+        onClick={() => setScreen('registrationmanager')}
         className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 font-semibold p-4 text-left flex items-center gap-3"
       >
         <span className="shrink-0 w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center">
-          <MessageCircle size={22} />
+          <Users size={22} />
         </span>
         <span>
-          <div className="text-base">Giáo viên — Tin nhắn từ phụ huynh</div>
-          <div className="text-xs font-normal opacity-90 mt-1">Xem tin nhắn phụ huynh gửi trực tiếp qua app</div>
+          <div className="text-base">Giáo viên — Quản lý đăng ký</div>
+          <div className="text-xs font-normal opacity-90 mt-1">Xem/xoá phụ huynh &amp; học sinh đã đăng ký, gửi tin cho 1 em</div>
         </span>
       </button>
 
@@ -61,6 +61,19 @@ export default function ExamHubScreen() {
         <span>
           <div className="text-base">Học sinh — Vào thi</div>
           <div className="text-xs font-normal opacity-90 mt-1">Nhập mã ca thầy cho + số báo danh</div>
+        </span>
+      </button>
+
+      <button
+        onClick={() => setScreen('studentprofile')}
+        className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold p-4 text-left flex items-center gap-3"
+      >
+        <span className="shrink-0 w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+          <GraduationCap size={22} />
+        </span>
+        <span>
+          <div className="text-base">Học sinh — Hồ sơ &amp; nhắn tin thầy</div>
+          <div className="text-xs font-normal opacity-90 mt-1">Đăng ký 1 lần, tự điền SBD lúc vào thi, nhắn tin cho thầy</div>
         </span>
       </button>
 

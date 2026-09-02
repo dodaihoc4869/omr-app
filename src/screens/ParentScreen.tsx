@@ -4,14 +4,17 @@
 // khi con rời màn hình làm bài (tín hiệu nghi gian lận) — poll lại server
 // mỗi ~15 giây, KHÔNG phải push thật (Apps Script không hỗ trợ push).
 import { useEffect, useRef, useState } from 'react'
-import { HeartHandshake, TriangleAlert, RefreshCw, ShieldAlert, Send } from 'lucide-react'
+import { HeartHandshake, TriangleAlert, RefreshCw, ShieldAlert, Send, MessageSquareText } from 'lucide-react'
 import {
   registerParent,
   fetchParentFeedback,
   fetchParentStatus,
+  fetchParentInbox,
+  markTeacherMessagesRead,
   sendParentMessage,
   type ParentFeedbackResult,
   type ParentStatus,
+  type TeacherMessage,
 } from '../lib/exam-api'
 import { loadMyParentPhone, loadScriptUrl, saveMyParentPhone } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
@@ -38,11 +41,12 @@ export default function ParentScreen() {
   const [sdt, setSdt] = useState('')
   const [phase, setPhase] = useState<'loading' | 'register' | 'view'>('loading')
 
-  // Đăng ký chỉ còn 3 ô: SĐT, ngày sinh của con (dùng làm mã đối chiếu thay
-  // SBD — GIẢ ĐỊNH: thầy đặt "Số báo danh" học sinh dùng khi vào thi CHÍNH LÀ
-  // ngày sinh dạng yyyy-mm-dd, để khớp được dữ liệu bài làm/nhận xét theo SBD
-  // đã có sẵn trong hệ thống), và họ tên con. Họ tên phụ huynh không hỏi nữa —
-  // tự sinh theo cấu trúc "<năm sinh con>PH<Họ tên con>".
+  // Đăng ký: SĐT, SBD của con (KHOÁ ĐỐI CHIẾU THẬT — mọi tra cứu bài làm/nhận
+  // xét/trạng thái đều theo đúng SBD này, không còn suy đoán qua ngày sinh),
+  // ngày sinh của con (chỉ để tự sinh mã phụ huynh cho dễ nhớ, không dùng để
+  // đối chiếu), và họ tên con. Họ tên phụ huynh không hỏi nữa — tự sinh theo
+  // cấu trúc "<năm sinh con>PH<Họ tên con>".
+  const [sbd, setSbd] = useState('')
   const [ngaySinh, setNgaySinh] = useState('')
   const [hoTenHocSinh, setHoTenHocSinh] = useState('')
   const [saving, setSaving] = useState(false)
@@ -50,6 +54,7 @@ export default function ParentScreen() {
 
   const [data, setData] = useState<ParentFeedbackResult | null>(null)
   const [status, setStatus] = useState<ParentStatus | null>(null)
+  const [inbox, setInbox] = useState<TeacherMessage[]>([])
   const [refreshing, setRefreshing] = useState(false)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -72,9 +77,16 @@ export default function ParentScreen() {
     if (!urlToUse.trim() || !sdtToUse.trim()) return
     setRefreshing(true)
     try {
-      const [fb, st] = await Promise.all([fetchParentFeedback(urlToUse.trim(), sdtToUse.trim()), fetchParentStatus(urlToUse.trim(), sdtToUse.trim())])
+      const [fb, st, ib] = await Promise.all([
+        fetchParentFeedback(urlToUse.trim(), sdtToUse.trim()),
+        fetchParentStatus(urlToUse.trim(), sdtToUse.trim()),
+        fetchParentInbox(urlToUse.trim(), sdtToUse.trim()),
+      ])
       setData(fb)
       setStatus(st)
+      setInbox(ib.items || [])
+      const unread = (ib.items || []).filter((m) => !m.daXem).map((m) => m.id)
+      if (unread.length > 0) markTeacherMessagesRead(urlToUse.trim(), unread).catch(() => {})
       if (!fb.found) {
         showToast('Chưa đăng ký với SĐT này — đăng ký lại bên dưới', 'warn')
         setPhase('register')
@@ -100,12 +112,12 @@ export default function ParentScreen() {
 
   const handleRegister = async () => {
     if (!scriptUrl.trim()) return showToast('Chưa có link kết nối — hỏi thầy link Apps Script', 'error')
-    if (!sdt.trim() || !ngaySinh.trim() || !hoTenHocSinh.trim())
-      return showToast('Nhập đủ SĐT, ngày sinh và họ tên con', 'error')
+    if (!sdt.trim() || !sbd.trim() || !ngaySinh.trim() || !hoTenHocSinh.trim())
+      return showToast('Nhập đủ SĐT, số báo danh, ngày sinh và họ tên con', 'error')
     setSaving(true)
     try {
       const tenChuan = titleCase(hoTenHocSinh.trim())
-      await registerParent(scriptUrl.trim(), sdt.trim(), hoTenPhuHuynhAuto, ngaySinh.trim(), '', tenChuan)
+      await registerParent(scriptUrl.trim(), sdt.trim(), hoTenPhuHuynhAuto, sbd.trim(), '', tenChuan)
       await saveMyParentPhone(sdt.trim())
       showToast('Đăng ký thành công', 'success')
       setPhase('view')
@@ -152,7 +164,8 @@ export default function ParentScreen() {
         </div>
         <p className="text-sm text-slate-500">
           Đăng ký 1 lần để xem nhận xét bài kiểm tra và theo dõi con làm bài. Thông tin chỉ dùng để đối chiếu đúng học
-          sinh, không dùng cho mục đích khác.
+          sinh, không dùng cho mục đích khác. Sau khi đăng ký, chỉ thầy mới xoá được để đăng ký lại — phụ huynh không tự
+          xoá trong app.
         </p>
         <input
           className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3"
@@ -160,6 +173,15 @@ export default function ParentScreen() {
           value={sdt}
           onChange={(e) => setSdt(e.target.value)}
         />
+        <div>
+          <label className="text-xs text-slate-500 pl-1">Số báo danh của con (thầy cho khi vào thi)</label>
+          <input
+            className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3"
+            placeholder="Số báo danh"
+            value={sbd}
+            onChange={(e) => setSbd(e.target.value)}
+          />
+        </div>
         <div>
           <label className="text-xs text-slate-500 pl-1">Ngày sinh của con</label>
           <input
@@ -235,6 +257,20 @@ export default function ParentScreen() {
           {sendingMsg ? 'Đang gửi…' : 'Gửi tin nhắn'}
         </button>
       </div>
+
+      {inbox.length > 0 && (
+        <div className="rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-900 p-4 space-y-2.5">
+          <div className="font-semibold text-sm flex items-center gap-2 text-indigo-700 dark:text-indigo-400">
+            <MessageSquareText size={16} /> Tin nhắn từ thầy
+          </div>
+          {inbox.map((m) => (
+            <div key={m.id} className="text-sm bg-white dark:bg-slate-900 rounded-lg p-2.5 border border-indigo-100 dark:border-indigo-900">
+              <div className="whitespace-pre-wrap">{m.noiDung}</div>
+              <div className="text-[11px] text-slate-400 mt-1">{new Date(m.thoiGian).toLocaleString('vi-VN')}</div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {st?.blocked && (
         <div className="rounded-xl bg-rose-600 text-white p-4 flex items-start gap-3 shadow-lg">

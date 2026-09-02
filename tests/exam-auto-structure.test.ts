@@ -83,4 +83,49 @@ describe('autoStructureRawExam', () => {
     const { text } = autoStructureRawExam(raw, 'x.pdf')
     expect(text).toMatch(/^5\) nội dung/m)
   })
+
+  it('file bị dính liền HẾT thành 1 dòng (mất xuống dòng thật) -> vẫn đoán được ranh giới 3 phần theo thứ tự, và báo rõ độ tin cậy thấp', () => {
+    const raw =
+      'MÃ ĐỀ: 132 PHẦN I Câu 1: Cho phản ứng A. chọn A B. chọn B C. chọn C D. chọn D PHẦN II 1. Ý a) ý a (Đ) PHẦN III 1. Điền số => 5'
+    const { text, notes } = autoStructureRawExam(raw, 'de.pdf')
+    // Đã chèn được xuống dòng thật trước mỗi tiêu đề, để dòng bắt đầu đúng "PHẦN I/II/III".
+    expect(text).toMatch(/^PHẦN I\b/m)
+    expect(text).toMatch(/^PHẦN II\b/m)
+    expect(text).toMatch(/^PHẦN III\b/m)
+    expect(notes.join(' ')).toMatch(/CẢNH BÁO ĐỘ TIN CẬY THẤP/)
+  })
+
+  it('có ít nhất 1 tiêu đề đã đúng đầu dòng -> KHÔNG kích hoạt suy đoán (tránh đoán sai khi đã có tín hiệu tốt)', () => {
+    const raw = 'MÃ ĐỀ: 1\nPHẦN I\nCâu 1: a A. x B. y C. z D. t PHẦN II 1. y PHẦN III 1. z'
+    const { notes } = autoStructureRawExam(raw, 'de.pdf')
+    expect(notes.join(' ')).not.toMatch(/CẢNH BÁO ĐỘ TIN CẬY THẤP/)
+  })
+
+  it('cụm "chọn đáp án đúng" giữa câu hỏi KHÔNG bị nhầm là bảng đáp án (chỉ nhận dòng gần như chỉ có chữ "Đáp án")', () => {
+    const raw = [
+      'MÃ ĐỀ: 1',
+      'PHẦN I',
+      'Câu 1: Hãy chọn đáp án đúng nhất trong 4 phương án sau',
+      'A. x',
+      'B. y',
+      'C. z',
+      'D. t',
+      'PHẦN II',
+      '1. y',
+      'a) ý a (Đ)',
+      'PHẦN III',
+      '1. z',
+      '=> 5',
+    ].join('\n')
+    const { text } = autoStructureRawExam(raw, 'de.pdf')
+    expect(text).toContain('Hãy chọn đáp án đúng nhất')
+    // Câu hỏi Phần III (sau câu chứa "đáp án đúng") vẫn còn nguyên trong output.
+    expect(text).toMatch(/=> 5/)
+  })
+
+  it('tìm thấy tiêu đề Phần nhưng không nhận diện được câu nào bên trong -> báo rõ để thầy tự xuống dòng thủ công', () => {
+    const raw = 'MÃ ĐỀ: 1\nPHẦN I\nnội dung không có số thứ tự câu nào cả, không tách được câu\nPHẦN II\n1. y\nPHẦN III\n1. z'
+    const { notes } = autoStructureRawExam(raw, 'de.pdf')
+    expect(notes.join(' ')).toMatch(/Phần I: tìm thấy tiêu đề nhưng KHÔNG nhận diện được câu nào/)
+  })
 })

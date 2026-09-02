@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent, type ClipboardEvent, type DragEvent } from 'react'
-import { ImagePlus, FileUp } from 'lucide-react'
+import { ImagePlus, FileUp, Trash2 } from 'lucide-react'
 import { extractTextFromFile } from '../lib/exam-file-import'
 import { autoStructureRawExam } from '../lib/exam-auto-structure'
 import { bankSizeWarning, mergeAndStrip, mergeKeepAnswers, validateTeacherSource, type TeacherExamSource } from '../data/examContent'
@@ -170,6 +170,18 @@ export default function ExamSetupScreen() {
         )
       }
     }
+  }
+
+  // Xoá sạch bản nháp đang soạn (kể cả ảnh đã đính kèm) — dùng khi lỡ tải
+  // nhầm file hoặc dán nhầm đề, làm lại từ đầu cho nhanh thay vì tự bôi đen
+  // xoá tay cả khối văn bản dài.
+  const handleClearDraft = () => {
+    setDraftText('')
+    setParsedPreview(null)
+    setParseErrors([])
+    setParseWarnings([])
+    setImageMap({})
+    showToast('Đã xoá bản nháp đề đang soạn', 'success')
   }
 
   const handleSaveContent = async () => {
@@ -354,6 +366,17 @@ export default function ExamSetupScreen() {
           </button>
           <button onClick={handleParse} className="tap-target flex-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-sm font-semibold">
             Phân tích đề
+          </button>
+          <button
+            onClick={() => {
+              if (draftText.trim() && !confirm('Xoá hết bản nháp đề đang soạn? Không thể hoàn tác.')) return
+              handleClearDraft()
+            }}
+            disabled={!draftText.trim()}
+            className="tap-target rounded-lg bg-rose-50 dark:bg-rose-950 border border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-400 text-sm font-semibold flex items-center justify-center gap-1.5 px-3 disabled:opacity-40"
+            title="Xoá bản nháp đề đang soạn (vd tải nhầm file)"
+          >
+            <Trash2 size={16} /> Xoá đề
           </button>
         </div>
         {parseErrors.length > 0 && (

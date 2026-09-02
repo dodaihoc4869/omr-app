@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import BottomNav from './components/BottomNav'
 import Toast from './components/Toast'
+import MessagesFab from './components/MessagesFab'
 import { useAppStore } from './store/appStore'
 import { loadClassList } from './lib/classlist-db'
 import ClassListScreen from './screens/ClassListScreen'
@@ -9,7 +10,12 @@ import ExamSetupScreen from './screens/ExamSetupScreen'
 import ExamTakeScreen from './screens/ExamTakeScreen'
 import ExamMonitorScreen from './screens/ExamMonitorScreen'
 import ParentScreen from './screens/ParentScreen'
-import ParentMessagesScreen from './screens/ParentMessagesScreen'
+import StudentProfileScreen from './screens/StudentProfileScreen'
+import RegistrationManagerScreen from './screens/RegistrationManagerScreen'
+
+// Icon tin nhắn nổi chỉ dành cho THẦY — ẩn ở các màn phụ huynh/học sinh tự
+// dùng trên máy riêng của họ (họ không cần thấy hộp thư của thầy).
+const HIDE_FAB_ON: string[] = ['parent', 'studentprofile', 'examtake']
 
 function App() {
   const screen = useAppStore((s) => s.screen)
@@ -37,7 +43,9 @@ function App() {
       {screen === 'examtake' && <ExamTakeScreen />}
       {screen === 'exammonitor' && <ExamMonitorScreen />}
       {screen === 'parent' && <ParentScreen />}
-      {screen === 'parentmessages' && <ParentMessagesScreen />}
+      {screen === 'studentprofile' && <StudentProfileScreen />}
+      {screen === 'registrationmanager' && <RegistrationManagerScreen />}
+      {!HIDE_FAB_ON.includes(screen) && <MessagesFab />}
       <BottomNav />
     </div>
   )

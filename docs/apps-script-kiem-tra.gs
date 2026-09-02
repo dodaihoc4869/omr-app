@@ -38,6 +38,8 @@ const SHEET_PHUHUYNH = 'PhuHuynh'
 const SHEET_NHANXET = 'NhanXet'
 const SHEET_TRANGTHAI = 'TrangThai'
 const SHEET_TINNHAN = 'TinNhan'
+const SHEET_HOCSINH = 'HocSinh'
+const SHEET_TINTHAY = 'TinNhanThay'
 
 function getSheet_(name, headers) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
@@ -180,9 +182,10 @@ function doGet(e) {
   }
 
   if (action === 'listMessages') {
-    // Thầy xem tin nhắn phụ huynh gửi — không cần đăng nhập (giống listSubmissions),
-    // chỉ ai có đúng link Apps Script này (thầy tự giữ link) mới gọi được.
-    const sh = getSheet_(SHEET_TINNHAN, ['Id', 'SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'NoiDung', 'ThoiGian', 'DaDoc'])
+    // Thầy xem tin nhắn phụ huynh/học sinh gửi — không cần đăng nhập (giống
+    // listSubmissions), chỉ ai có đúng link Apps Script này (thầy tự giữ
+    // link) mới gọi được.
+    const sh = getSheet_(SHEET_TINNHAN, ['Id', 'SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'NoiDung', 'ThoiGian', 'DaDoc', 'NguoiGui'])
     const data = sh.getDataRange().getValues()
     const items = []
     for (let i = 1; i < data.length; i++) {
@@ -196,11 +199,104 @@ function doGet(e) {
         noiDung: data[i][6],
         thoiGian: data[i][7],
         daDoc: String(data[i][8]) === 'true',
+        nguoiGui: data[i][9] || 'phuhuynh', // dòng cũ trước khi có cột này -> mặc định phụ huynh
       })
     }
     items.sort(function (a, b) {
       return new Date(b.thoiGian) - new Date(a.thoiGian)
     })
+    return jsonResponse_({ items: items })
+  }
+
+  if (action === 'listParents') {
+    // Danh sách phụ huynh đã đăng ký — cho màn quản lý của thầy (xoá khi đăng
+    // ký nhầm). Phụ huynh/học sinh KHÔNG tự xoá được đăng ký của mình trong
+    // app — chỉ thầy xoá được ở đây.
+    const sh = getSheet_(SHEET_PHUHUYNH, ['SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'DangKyLuc'])
+    const data = sh.getDataRange().getValues()
+    const items = []
+    for (let i = 1; i < data.length; i++) {
+      items.push({
+        sdt: data[i][0],
+        hoTenPhuHuynh: data[i][1],
+        sbd: data[i][2],
+        lop: data[i][3],
+        hoTenHocSinh: data[i][4],
+        dangKyLuc: data[i][5],
+      })
+    }
+    return jsonResponse_({ items: items })
+  }
+
+  if (action === 'listStudents') {
+    // Danh sách học sinh đã đăng ký hồ sơ — cho màn quản lý của thầy.
+    const sh = getSheet_(SHEET_HOCSINH, ['SBD', 'HoTen', 'NamSinh', 'Lop', 'DangKyLuc'])
+    const data = sh.getDataRange().getValues()
+    const items = []
+    for (let i = 1; i < data.length; i++) {
+      items.push({
+        sbd: data[i][0],
+        hoTen: data[i][1],
+        namSinh: data[i][2],
+        lop: data[i][3],
+        dangKyLuc: data[i][4],
+      })
+    }
+    return jsonResponse_({ items: items })
+  }
+
+  if (action === 'studentProfile') {
+    const sbd = (e.parameter.sbd || '').trim()
+    const sh = getSheet_(SHEET_HOCSINH, ['SBD', 'HoTen', 'NamSinh', 'Lop', 'DangKyLuc'])
+    const row = findRowByKey_(sh, 0, sbd)
+    if (row < 0) return jsonResponse_({ found: false })
+    const v = sh.getRange(row, 1, 1, 5).getValues()[0]
+    return jsonResponse_({ found: true, sbd: String(v[0]), hoTen: v[1], namSinh: v[2], lop: v[3] })
+  }
+
+  if (action === 'parentInbox' || action === 'studentInbox') {
+    // Tin nhắn THẦY GỬI CHO 1 em — phụ huynh/học sinh tự poll lại (giống
+    // parentStatus), không phải đẩy tức thì thật sự.
+    let sbd = ''
+    if (action === 'parentInbox') {
+      const sdt = (e.parameter.sdt || '').trim()
+      const phSh = getSheet_(SHEET_PHUHUYNH, ['SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'DangKyLuc'])
+      const phRow = findRowByKey_(phSh, 0, sdt)
+      if (phRow < 0) return jsonResponse_({ found: false })
+      sbd = String(phSh.getRange(phRow, 3, 1, 1).getValues()[0][0])
+    } else {
+      sbd = (e.parameter.sbd || '').trim()
+    }
+    const sh = getSheet_(SHEET_TINTHAY, ['Id', 'SBD', 'NoiDung', 'ThoiGian', 'DaXem'])
+    const data = sh.getDataRange().getValues()
+    const items = []
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][1]) === sbd) {
+        items.push({ id: data[i][0], sbd: data[i][1], noiDung: data[i][2], thoiGian: data[i][3], daXem: String(data[i][4]) === 'true' })
+      }
+    }
+    items.sort(function (a, b) {
+      return new Date(b.thoiGian) - new Date(a.thoiGian)
+    })
+    return jsonResponse_({ found: true, items: items })
+  }
+
+  if (action === 'listAllFeedback') {
+    // Toàn bộ nhận xét/điểm đã chấm — dùng cho thầy tra cứu nhanh theo tên
+    // học sinh (vd để gửi lại điểm cho phụ huynh) mà không cần nhớ SBD.
+    const nxSh = getSheet_(SHEET_NHANXET, ['SBD', 'MaCa', 'MaDe', 'ThoiGianNop', 'Diem', 'XepLoai', 'CauSai', 'GuiLuc'])
+    const data = nxSh.getDataRange().getValues()
+    const items = []
+    for (let i = 1; i < data.length; i++) {
+      items.push({
+        sbd: String(data[i][0]),
+        maCa: data[i][1],
+        maDe: data[i][2],
+        thoiGianNop: data[i][3],
+        diem: data[i][4],
+        xepLoai: data[i][5],
+      })
+    }
     return jsonResponse_({ items: items })
   }
 
@@ -357,12 +453,13 @@ function doPost(e) {
   }
 
   if (action === 'sendMessage') {
-    // Phụ huynh nhắn tin trực tiếp cho thầy — lưu nguyên văn, không chỉnh sửa gì.
-    const sh = getSheet_(SHEET_TINNHAN, ['Id', 'SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'NoiDung', 'ThoiGian', 'DaDoc'])
+    // Phụ huynh HOẶC học sinh nhắn tin trực tiếp cho thầy — lưu nguyên văn,
+    // không chỉnh sửa gì. body.nguoiGui = 'phuhuynh' | 'hocsinh'.
+    const sh = getSheet_(SHEET_TINNHAN, ['Id', 'SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'NoiDung', 'ThoiGian', 'DaDoc', 'NguoiGui'])
     const id = Utilities.getUuid()
     sh.appendRow([
       id,
-      body.sdt,
+      body.sdt || '',
       body.hoTenPhuHuynh || '',
       body.sbd || '',
       body.lop || '',
@@ -370,17 +467,69 @@ function doPost(e) {
       body.noiDung,
       new Date().toISOString(),
       'false',
+      body.nguoiGui || 'phuhuynh',
     ])
     return jsonResponse_({ ok: true, id: id })
   }
 
   if (action === 'markMessagesRead') {
-    const sh = getSheet_(SHEET_TINNHAN, ['Id', 'SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'NoiDung', 'ThoiGian', 'DaDoc'])
+    const sh = getSheet_(SHEET_TINNHAN, ['Id', 'SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'NoiDung', 'ThoiGian', 'DaDoc', 'NguoiGui'])
     const data = sh.getDataRange().getValues()
     const ids = body.ids || []
     for (let i = 1; i < data.length; i++) {
       if (ids.indexOf(data[i][0]) >= 0) {
         sh.getRange(i + 1, 9).setValue('true')
+      }
+    }
+    return jsonResponse_({ ok: true })
+  }
+
+  if (action === 'registerStudent') {
+    // Học sinh đăng ký hồ sơ 1 lần (SBD + họ tên + năm sinh) — để tự điền
+    // sẵn SBD lúc vào thi và nhắn tin cho thầy có tên hiển thị rõ ràng.
+    const sh = getSheet_(SHEET_HOCSINH, ['SBD', 'HoTen', 'NamSinh', 'Lop', 'DangKyLuc'])
+    const row = findRowByKey_(sh, 0, body.sbd)
+    const rowData = [body.sbd, body.hoTen, body.namSinh, body.lop || '', new Date().toISOString()]
+    if (row > 0) {
+      sh.getRange(row, 1, 1, 5).setValues([rowData])
+    } else {
+      sh.appendRow(rowData)
+    }
+    return jsonResponse_({ ok: true })
+  }
+
+  if (action === 'deleteParent') {
+    // CHỈ thầy dùng (từ màn quản lý) — phụ huynh không có nút này trong app,
+    // đăng ký xong không tự "đăng xuất/đăng ký lại" được, đúng theo yêu cầu.
+    const sh = getSheet_(SHEET_PHUHUYNH, ['SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'DangKyLuc'])
+    const row = findRowByKey_(sh, 0, body.sdt)
+    if (row > 0) sh.deleteRow(row)
+    return jsonResponse_({ ok: true })
+  }
+
+  if (action === 'deleteStudent') {
+    const sh = getSheet_(SHEET_HOCSINH, ['SBD', 'HoTen', 'NamSinh', 'Lop', 'DangKyLuc'])
+    const row = findRowByKey_(sh, 0, body.sbd)
+    if (row > 0) sh.deleteRow(row)
+    return jsonResponse_({ ok: true })
+  }
+
+  if (action === 'sendTeacherMessage') {
+    // Thầy gửi tin nhắn cho 1 em (theo SBD) — phụ huynh/học sinh của em đó
+    // sẽ thấy khi app tự poll lại (parentInbox/studentInbox).
+    const sh = getSheet_(SHEET_TINTHAY, ['Id', 'SBD', 'NoiDung', 'ThoiGian', 'DaXem'])
+    const id = Utilities.getUuid()
+    sh.appendRow([id, body.sbd, body.noiDung, new Date().toISOString(), 'false'])
+    return jsonResponse_({ ok: true, id: id })
+  }
+
+  if (action === 'markTeacherMessagesRead') {
+    const sh = getSheet_(SHEET_TINTHAY, ['Id', 'SBD', 'NoiDung', 'ThoiGian', 'DaXem'])
+    const data = sh.getDataRange().getValues()
+    const ids = body.ids || []
+    for (let i = 1; i < data.length; i++) {
+      if (ids.indexOf(data[i][0]) >= 0) {
+        sh.getRange(i + 1, 5).setValue('true')
       }
     }
     return jsonResponse_({ ok: true })
