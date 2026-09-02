@@ -7,6 +7,7 @@ const TABS: { id: ScreenId; label: string; icon: string }[] = [
   { id: 'results', label: 'Kết quả', icon: '📊' },
   { id: 'print', label: 'In phiếu', icon: '🖨️' },
   { id: 'classlist', label: 'Lớp', icon: '👥' },
+  { id: 'examhub', label: 'Kiểm tra', icon: '⏱️' },
 ]
 
 export default function BottomNav() {

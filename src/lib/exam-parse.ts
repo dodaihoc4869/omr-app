@@ -1,0 +1,182 @@
+// Phân tích văn bản thuần (thầy soạn trong Word rồi dán vào, hoặc gõ trực
+// tiếp) thành TeacherExamSource (có đáp án đúng). KHÔNG đọc được công thức
+// MathType — nếu đề có công thức phức tạp, thầy gõ lại bằng chữ thường (vd
+// "H2SO4", "CO2") hoặc mô tả bằng lời; đây là giới hạn đã biết của bản v1.
+// Số câu mỗi phần KHÔNG bắt buộc đúng 18/4/6 — thầy tải càng nhiều câu, ngân
+// hàng càng đa dạng để random cho học sinh càng ít trùng nhau.
+//
+// Định dạng mong đợi:
+//   MÃ ĐỀ: 132
+//   PHẦN I
+//   1) Đề bài câu 1...
+//   A. Lựa chọn A
+//   *B. Lựa chọn B      <- dấu * trước lựa chọn ĐÚNG
+//   C. Lựa chọn C
+//   D. Lựa chọn D
+//   2) ...
+//   PHẦN II
+//   1) Đề bài câu 1 (có 4 ý a,b,c,d)...
+//   a) Ý a (Đ)          <- (Đ) hoặc (S) sau mỗi ý
+//   b) Ý b (S)
+//   c) Ý c (Đ)
+//   d) Ý d (S)
+//   PHẦN III
+//   1) Đề bài câu 1 (điền số, không có lựa chọn)...
+//   => 12,5              <- dòng đáp án, bắt đầu bằng =>
+import {
+  type TeacherExamSource,
+  type TeacherMcqQuestion,
+  type TeacherShortAnswerQuestion,
+  type TeacherTrueFalseQuestion,
+} from '../data/examContent'
+
+function findSectionBounds(lines: string[]): { maDe: string; p1Start: number; p2Start: number; p3Start: number } {
+  const reMaDe = /^mã\s*đề\s*:?\s*(.+)$/i
+  const reP1 = /^ph[aầ]n\s*i\b/i
+  const reP2 = /^ph[aầ]n\s*ii\b/i
+  const reP3 = /^ph[aầ]n\s*iii\b/i
+
+  let maDe = ''
+  let p1Start = -1
+  let p2Start = -1
+  let p3Start = -1
+  lines.forEach((line, i) => {
+    const t = line.trim()
+    const mMaDe = t.match(reMaDe)
+    if (mMaDe && !maDe) maDe = mMaDe[1].trim()
+    if (reP1.test(t) && p1Start < 0) p1Start = i
+    else if (reP2.test(t) && p2Start < 0) p2Start = i
+    else if (reP3.test(t) && p3Start < 0) p3Start = i
+  })
+  return { maDe, p1Start, p2Start, p3Start }
+}
+
+function splitQuestionBlocks(lines: string[]): string[][] {
+  const reNum = /^\s*\(?(\d+)[).]\s*/
+  const blocks: string[][] = []
+  let current: string[] | null = null
+  for (const raw of lines) {
+    const line = raw.trimEnd()
+    if (reNum.test(line)) {
+      if (current) blocks.push(current)
+      current = [line.replace(reNum, '')]
+    } else if (current && line.trim().length > 0) {
+      current.push(line)
+    }
+  }
+  if (current) blocks.push(current)
+  return blocks
+}
+
+function parseMcqBlock(block: string[], id: string): TeacherMcqQuestion {
+  const reChoice = /^\s*(\*?)([A-Da-d])[).]\s*(.*)$/
+  const textLines: string[] = []
+  const choices: Record<string, string> = {}
+  let correct: 'A' | 'B' | 'C' | 'D' | '' = ''
+  for (const line of block) {
+    const m = line.match(reChoice)
+    if (m) {
+      const letter = m[2].toUpperCase() as 'A' | 'B' | 'C' | 'D'
+      choices[letter] = m[3].trim()
+      if (m[1] === '*') correct = letter
+    } else {
+      textLines.push(line.trim())
+    }
+  }
+  return {
+    id,
+    text: textLines.join(' ').trim(),
+    choices: [choices.A ?? '', choices.B ?? '', choices.C ?? '', choices.D ?? ''],
+    correct: correct || 'A',
+  }
+}
+
+function parseTrueFalseBlock(block: string[], id: string): TeacherTrueFalseQuestion {
+  const reIdea = /^\s*([a-dA-D])[).]\s*(.*?)\s*\(\s*([ĐĐ]|D|[Ss]|S)\s*\)\s*$/i
+  const reIdeaNoMark = /^\s*([a-dA-D])[).]\s*(.*)$/
+  const textLines: string[] = []
+  const ideas: Record<string, string> = {}
+  const marks: Record<string, 'D' | 'S'> = {}
+  for (const line of block) {
+    const m = line.match(reIdea)
+    if (m) {
+      const letter = m[1].toLowerCase()
+      ideas[letter] = m[2].trim()
+      const markRaw = m[3].toUpperCase()
+      marks[letter] = markRaw === 'D' || markRaw === 'Đ' ? 'D' : 'S'
+      continue
+    }
+    const m2 = line.match(reIdeaNoMark)
+    if (m2) {
+      ideas[m2[1].toLowerCase()] = m2[2].trim()
+    } else {
+      textLines.push(line.trim())
+    }
+  }
+  return {
+    id,
+    text: textLines.join(' ').trim(),
+    ideas: [ideas.a ?? '', ideas.b ?? '', ideas.c ?? '', ideas.d ?? ''],
+    correct: [marks.a ?? 'S', marks.b ?? 'S', marks.c ?? 'S', marks.d ?? 'S'],
+  }
+}
+
+function parseShortAnswerBlock(block: string[], id: string): TeacherShortAnswerQuestion {
+  const reAnswer = /^\s*=>\s*(.+)$/
+  const textLines: string[] = []
+  let correct = ''
+  for (const line of block) {
+    const m = line.match(reAnswer)
+    if (m) correct = m[1].trim()
+    else textLines.push(line.trim())
+  }
+  return { id, text: textLines.join(' ').trim(), correct }
+}
+
+export interface ParseExamResult {
+  source: TeacherExamSource | null
+  errors: string[]
+  warnings: string[]
+}
+
+export function parseExamText(raw: string): ParseExamResult {
+  const lines = raw.split(/\r?\n/)
+  const { maDe, p1Start, p2Start, p3Start } = findSectionBounds(lines)
+  const errors: string[] = []
+
+  if (!maDe) errors.push('Không tìm thấy dòng "Mã đề: ..." ở đầu văn bản')
+  if (p1Start < 0) errors.push('Không tìm thấy tiêu đề "Phần I"')
+  if (p2Start < 0) errors.push('Không tìm thấy tiêu đề "Phần II"')
+  if (p3Start < 0) errors.push('Không tìm thấy tiêu đề "Phần III"')
+  if (errors.length > 0) return { source: null, errors, warnings: [] }
+
+  const p1Lines = lines.slice(p1Start + 1, p2Start)
+  const p2Lines = lines.slice(p2Start + 1, p3Start)
+  const p3Lines = lines.slice(p3Start + 1)
+
+  const p1Blocks = splitQuestionBlocks(p1Lines)
+  const p2Blocks = splitQuestionBlocks(p2Lines)
+  const p3Blocks = splitQuestionBlocks(p3Lines)
+
+  if (p1Blocks.length === 0) errors.push('Phần I: không đọc được câu nào')
+  if (p2Blocks.length === 0) errors.push('Phần II: không đọc được câu nào')
+  if (p3Blocks.length === 0) errors.push('Phần III: không đọc được câu nào')
+  if (errors.length > 0) return { source: null, errors, warnings: [] }
+
+  const source: TeacherExamSource = {
+    maDe,
+    phanI: p1Blocks.map((b, i) => parseMcqBlock(b, `${maDe}-p1-${i}`)),
+    phanII: p2Blocks.map((b, i) => parseTrueFalseBlock(b, `${maDe}-p2-${i}`)),
+    phanIII: p3Blocks.map((b, i) => parseShortAnswerBlock(b, `${maDe}-p3-${i}`)),
+  }
+
+  const warnings: string[] = []
+  source.phanI.forEach((q, i) => {
+    if (!q.choices.every((c) => c)) warnings.push(`Phần I câu ${i + 1}: thiếu 1 hoặc nhiều lựa chọn A/B/C/D`)
+  })
+  source.phanIII.forEach((q, i) => {
+    if (!q.correct) warnings.push(`Phần III câu ${i + 1}: chưa có dòng đáp án "=> ..."`)
+  })
+
+  return { source, errors: [], warnings }
+}
