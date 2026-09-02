@@ -9,6 +9,7 @@ import ExamSetupScreen from './screens/ExamSetupScreen'
 import ExamTakeScreen from './screens/ExamTakeScreen'
 import ExamMonitorScreen from './screens/ExamMonitorScreen'
 import ParentScreen from './screens/ParentScreen'
+import ParentMessagesScreen from './screens/ParentMessagesScreen'
 
 function App() {
   const screen = useAppStore((s) => s.screen)
@@ -36,6 +37,7 @@ function App() {
       {screen === 'examtake' && <ExamTakeScreen />}
       {screen === 'exammonitor' && <ExamMonitorScreen />}
       {screen === 'parent' && <ParentScreen />}
+      {screen === 'parentmessages' && <ParentMessagesScreen />}
       <BottomNav />
     </div>
   )

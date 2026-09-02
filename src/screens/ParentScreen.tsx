@@ -4,11 +4,12 @@
 // khi con rời màn hình làm bài (tín hiệu nghi gian lận) — poll lại server
 // mỗi ~15 giây, KHÔNG phải push thật (Apps Script không hỗ trợ push).
 import { useEffect, useRef, useState } from 'react'
-import { HeartHandshake, TriangleAlert, RefreshCw, ShieldAlert } from 'lucide-react'
+import { HeartHandshake, TriangleAlert, RefreshCw, ShieldAlert, Send } from 'lucide-react'
 import {
   registerParent,
   fetchParentFeedback,
   fetchParentStatus,
+  sendParentMessage,
   type ParentFeedbackResult,
   type ParentStatus,
 } from '../lib/exam-api'
@@ -22,22 +23,38 @@ function classifyBadgeColor(xepLoai: string): string {
   return 'text-rose-600 dark:text-rose-400'
 }
 
+/** In hoa chữ cái đầu mỗi từ, phần còn lại về chữ thường (kiểu "Title Case") — áp
+ * dụng cho họ tên con gõ tay, để không phụ thuộc thói quen gõ hoa/thường của phụ huynh. */
+function titleCase(s: string): string {
+  return s
+    .split(' ')
+    .map((w) => (w.length === 0 ? w : w[0].toLocaleUpperCase('vi') + w.slice(1).toLocaleLowerCase('vi')))
+    .join(' ')
+}
+
 export default function ParentScreen() {
   const showToast = useAppStore((s) => s.showToast)
   const [scriptUrl, setScriptUrl] = useState('')
   const [sdt, setSdt] = useState('')
   const [phase, setPhase] = useState<'loading' | 'register' | 'view'>('loading')
 
-  const [hoTenPhuHuynh, setHoTenPhuHuynh] = useState('')
-  const [sbd, setSbd] = useState('')
-  const [lop, setLop] = useState('')
+  // Đăng ký chỉ còn 3 ô: SĐT, ngày sinh của con (dùng làm mã đối chiếu thay
+  // SBD — GIẢ ĐỊNH: thầy đặt "Số báo danh" học sinh dùng khi vào thi CHÍNH LÀ
+  // ngày sinh dạng yyyy-mm-dd, để khớp được dữ liệu bài làm/nhận xét theo SBD
+  // đã có sẵn trong hệ thống), và họ tên con. Họ tên phụ huynh không hỏi nữa —
+  // tự sinh theo cấu trúc "<năm sinh con>PH<Họ tên con>".
+  const [ngaySinh, setNgaySinh] = useState('')
   const [hoTenHocSinh, setHoTenHocSinh] = useState('')
   const [saving, setSaving] = useState(false)
+  const hoTenPhuHuynhAuto = ngaySinh && hoTenHocSinh.trim() ? `${ngaySinh.slice(0, 4)}PH${titleCase(hoTenHocSinh.trim())}` : ''
 
   const [data, setData] = useState<ParentFeedbackResult | null>(null)
   const [status, setStatus] = useState<ParentStatus | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const [msgText, setMsgText] = useState('')
+  const [sendingMsg, setSendingMsg] = useState(false)
 
   useEffect(() => {
     loadScriptUrl().then(setScriptUrl)
@@ -83,11 +100,12 @@ export default function ParentScreen() {
 
   const handleRegister = async () => {
     if (!scriptUrl.trim()) return showToast('Chưa có link kết nối — hỏi thầy link Apps Script', 'error')
-    if (!sdt.trim() || !hoTenPhuHuynh.trim() || !sbd.trim() || !hoTenHocSinh.trim())
-      return showToast('Nhập đủ SĐT, họ tên phụ huynh, số báo danh và họ tên học sinh', 'error')
+    if (!sdt.trim() || !ngaySinh.trim() || !hoTenHocSinh.trim())
+      return showToast('Nhập đủ SĐT, ngày sinh và họ tên con', 'error')
     setSaving(true)
     try {
-      await registerParent(scriptUrl.trim(), sdt.trim(), hoTenPhuHuynh.trim(), sbd.trim(), lop.trim(), hoTenHocSinh.trim())
+      const tenChuan = titleCase(hoTenHocSinh.trim())
+      await registerParent(scriptUrl.trim(), sdt.trim(), hoTenPhuHuynhAuto, ngaySinh.trim(), '', tenChuan)
       await saveMyParentPhone(sdt.trim())
       showToast('Đăng ký thành công', 'success')
       setPhase('view')
@@ -95,6 +113,29 @@ export default function ParentScreen() {
       showToast(e instanceof Error ? e.message : 'Đăng ký thất bại', 'error')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleSendMessage = async () => {
+    if (!scriptUrl.trim()) return showToast('Chưa có link kết nối', 'error')
+    if (!msgText.trim()) return showToast('Nhập nội dung tin nhắn', 'error')
+    setSendingMsg(true)
+    try {
+      await sendParentMessage(
+        scriptUrl.trim(),
+        sdt.trim(),
+        data?.hoTenPhuHuynh || '',
+        data?.sbd || '',
+        data?.lop || '',
+        data?.hoTenHocSinh || '',
+        msgText.trim(),
+      )
+      setMsgText('')
+      showToast('Đã gửi tin nhắn cho thầy', 'success')
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Gửi tin nhắn thất bại', 'error')
+    } finally {
+      setSendingMsg(false)
     }
   }
 
@@ -119,30 +160,27 @@ export default function ParentScreen() {
           value={sdt}
           onChange={(e) => setSdt(e.target.value)}
         />
+        <div>
+          <label className="text-xs text-slate-500 pl-1">Ngày sinh của con</label>
+          <input
+            type="date"
+            className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3"
+            value={ngaySinh}
+            onChange={(e) => setNgaySinh(e.target.value)}
+          />
+        </div>
         <input
           className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3"
-          placeholder="Họ tên phụ huynh"
-          value={hoTenPhuHuynh}
-          onChange={(e) => setHoTenPhuHuynh(e.target.value)}
-        />
-        <input
-          className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3"
-          placeholder="Số báo danh của con"
-          value={sbd}
-          onChange={(e) => setSbd(e.target.value)}
-        />
-        <input
-          className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3"
-          placeholder="Lớp của con"
-          value={lop}
-          onChange={(e) => setLop(e.target.value)}
-        />
-        <input
-          className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3"
-          placeholder="Họ tên học sinh"
+          placeholder="Họ tên con"
           value={hoTenHocSinh}
           onChange={(e) => setHoTenHocSinh(e.target.value)}
+          onBlur={(e) => setHoTenHocSinh(titleCase(e.target.value.trim()))}
         />
+        {hoTenPhuHuynhAuto && (
+          <div className="text-xs text-slate-500 pl-1">
+            Mã phụ huynh tự sinh: <span className="font-medium text-slate-700 dark:text-slate-300">{hoTenPhuHuynhAuto}</span>
+          </div>
+        )}
         <button
           onClick={handleRegister}
           disabled={saving}
@@ -176,6 +214,25 @@ export default function ParentScreen() {
           className="tap-target w-9 h-9 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-500"
         >
           <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+        </button>
+      </div>
+
+      <div className="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-4 space-y-2.5">
+        <div className="font-semibold text-sm flex items-center gap-2">
+          <Send size={16} className="text-indigo-600" /> Nhắn tin cho thầy
+        </div>
+        <textarea
+          className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 text-sm min-h-[80px]"
+          placeholder="Nhập nội dung muốn trao đổi với thầy…"
+          value={msgText}
+          onChange={(e) => setMsgText(e.target.value)}
+        />
+        <button
+          onClick={handleSendMessage}
+          disabled={sendingMsg}
+          className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold disabled:opacity-60"
+        >
+          {sendingMsg ? 'Đang gửi…' : 'Gửi tin nhắn'}
         </button>
       </div>
 

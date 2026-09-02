@@ -122,7 +122,13 @@ function splitQuestionBlocks(lines: string[]): string[][] {
   return blocks
 }
 
-function parseMcqBlock(block: string[], id: string, imageMap: Record<string, string>): TeacherMcqQuestion {
+function parseMcqBlock(
+  block: string[],
+  id: string,
+  imageMap: Record<string, string>,
+  warnings: string[],
+  displayIndex: number,
+): TeacherMcqQuestion {
   const { lines, table, imageDataUrl } = extractMedia(block, imageMap)
   const reChoice = /^\s*(\*?)([A-Da-d])[).]\s*(.*)$/
   const textLines: string[] = []
@@ -138,6 +144,13 @@ function parseMcqBlock(block: string[], id: string, imageMap: Record<string, str
       textLines.push(line.trim())
     }
   }
+  // KHÔNG được âm thầm chọn bừa 1 đáp án khi thầy chưa đánh dấu * — phải báo
+  // rõ để thầy tự kiểm tra, tuyệt đối không suy đoán đáp án đúng.
+  if (!correct) {
+    warnings.push(
+      `Phần I câu ${displayIndex}: CHƯA đánh dấu đáp án đúng (thiếu dấu * trước lựa chọn) — app tạm để A, thầy PHẢI kiểm tra và sửa lại.`,
+    )
+  }
   return {
     id,
     text: textLines.join(' ').trim(),
@@ -148,9 +161,19 @@ function parseMcqBlock(block: string[], id: string, imageMap: Record<string, str
   }
 }
 
-function parseTrueFalseBlock(block: string[], id: string, imageMap: Record<string, string>): TeacherTrueFalseQuestion {
+function parseTrueFalseBlock(
+  block: string[],
+  id: string,
+  imageMap: Record<string, string>,
+  warnings: string[],
+  displayIndex: number,
+): TeacherTrueFalseQuestion {
   const { lines, table, imageDataUrl } = extractMedia(block, imageMap)
+  // Nhận cả 2 cách ghi: "(Đ)"/"(S)" có ngoặc, HOẶC "Đúng"/"Sai"/"đ"/"s" viết
+  // liền cuối dòng không ngoặc — cùng là TRÍCH XUẤT chữ thầy đã ghi sẵn, không
+  // phải suy đoán, nên được phép chuẩn hoá tự động.
   const reIdea = /^\s*([a-dA-D])[).]\s*(.*?)\s*\(\s*([ĐĐ]|D|[Ss]|S)\s*\)\s*$/i
+  const reIdeaWord = /^\s*([a-dA-D])[).]\s*(.*?)\s*[-–—]?\s*(Đúng|đúng|DÚNG|ĐÚNG|Sai|sai|SAI)\s*\.?\s*$/
   const reIdeaNoMark = /^\s*([a-dA-D])[).]\s*(.*)$/
   const textLines: string[] = []
   const ideas: Record<string, string> = {}
@@ -164,12 +187,27 @@ function parseTrueFalseBlock(block: string[], id: string, imageMap: Record<strin
       marks[letter] = markRaw === 'D' || markRaw === 'Đ' ? 'D' : 'S'
       continue
     }
+    const mw = line.match(reIdeaWord)
+    if (mw) {
+      const letter = mw[1].toLowerCase()
+      ideas[letter] = mw[2].trim()
+      marks[letter] = /đúng/i.test(mw[3]) ? 'D' : 'S'
+      continue
+    }
     const m2 = line.match(reIdeaNoMark)
     if (m2) {
       ideas[m2[1].toLowerCase()] = m2[2].trim()
     } else {
       textLines.push(line.trim())
     }
+  }
+  // Ý nào không xác định được Đ/S (không có mark) — hiện đang mặc định 'S',
+  // phải báo rõ để thầy tự kiểm tra, không âm thầm coi là Sai.
+  const missing = (['a', 'b', 'c', 'd'] as const).filter((k) => ideas[k] && !marks[k])
+  if (missing.length > 0) {
+    warnings.push(
+      `Phần II câu ${displayIndex}: ý ${missing.join(', ')} CHƯA xác định được Đúng/Sai — app tạm để Sai, thầy PHẢI kiểm tra và sửa lại.`,
+    )
   }
   return {
     id,
@@ -224,14 +262,14 @@ export function parseExamText(raw: string, imageMap: Record<string, string> = {}
   if (p3Blocks.length === 0) errors.push('Phần III: không đọc được câu nào')
   if (errors.length > 0) return { source: null, errors, warnings: [] }
 
+  const warnings: string[] = []
   const source: TeacherExamSource = {
     maDe,
-    phanI: p1Blocks.map((b, i) => parseMcqBlock(b, `${maDe}-p1-${i}`, imageMap)),
-    phanII: p2Blocks.map((b, i) => parseTrueFalseBlock(b, `${maDe}-p2-${i}`, imageMap)),
+    phanI: p1Blocks.map((b, i) => parseMcqBlock(b, `${maDe}-p1-${i}`, imageMap, warnings, i + 1)),
+    phanII: p2Blocks.map((b, i) => parseTrueFalseBlock(b, `${maDe}-p2-${i}`, imageMap, warnings, i + 1)),
     phanIII: p3Blocks.map((b, i) => parseShortAnswerBlock(b, `${maDe}-p3-${i}`, imageMap)),
   }
 
-  const warnings: string[] = []
   source.phanI.forEach((q, i) => {
     if (!q.choices.every((c) => c)) warnings.push(`Phần I câu ${i + 1}: thiếu 1 hoặc nhiều lựa chọn A/B/C/D`)
   })

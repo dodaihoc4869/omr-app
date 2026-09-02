@@ -14,7 +14,9 @@ export default function BottomNav() {
   const setScreen = useAppStore((s) => s.setScreen)
 
   // Các màn con của Kiểm tra vẫn tính là đang ở tab "Kiểm tra".
-  const activeTab: ScreenId = ['examhub', 'examsetup', 'examtake', 'exammonitor'].includes(screen) ? 'examhub' : screen
+  const activeTab: ScreenId = ['examhub', 'examsetup', 'examtake', 'exammonitor', 'parentmessages'].includes(screen)
+    ? 'examhub'
+    : screen
 
   return (
     <nav className="fixed bottom-0 inset-x-0 z-40 flex justify-center pb-[calc(env(safe-area-inset-bottom)+12px)] pt-2 pointer-events-none">

@@ -7,7 +7,7 @@ import type { AnswerKey, StudentAnswers } from '../engine/score'
 import { isReviewFlag, scoreStudent, type ScoreResult } from '../engine/score'
 import type { ClassListRow } from '../lib/sheet-gviz'
 
-export type ScreenId = 'classlist' | 'examhub' | 'examsetup' | 'examtake' | 'exammonitor' | 'parent'
+export type ScreenId = 'classlist' | 'examhub' | 'examsetup' | 'examtake' | 'exammonitor' | 'parent' | 'parentmessages'
 
 export interface ScannedSheet {
   id: string

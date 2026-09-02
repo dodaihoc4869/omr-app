@@ -186,3 +186,46 @@ export async function fetchParentStatus(scriptUrl: string, sdt: string): Promise
   if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
   return res.json()
 }
+
+// ============================================================================
+// TIN NHẮN PHỤ HUYNH ↔ THẦY — phụ huynh nhắn trực tiếp, thầy xem trong app
+// ============================================================================
+
+export async function sendParentMessage(
+  scriptUrl: string,
+  sdt: string,
+  hoTenPhuHuynh: string,
+  sbd: string,
+  lop: string,
+  hoTenHocSinh: string,
+  noiDung: string,
+): Promise<void> {
+  const result = await postJson(scriptUrl, { action: 'sendMessage', sdt, hoTenPhuHuynh, sbd, lop, hoTenHocSinh, noiDung })
+  if (!result.ok) throw new Error(result.error || 'Gửi tin nhắn thất bại')
+}
+
+export interface ParentMessage {
+  id: string
+  sdt: string
+  hoTenPhuHuynh: string
+  sbd: string
+  lop: string
+  hoTenHocSinh: string
+  noiDung: string
+  thoiGian: string
+  daDoc: boolean
+}
+
+export async function listParentMessages(scriptUrl: string): Promise<ParentMessage[]> {
+  const url = `${scriptUrl}?action=listMessages`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
+  const data = await res.json()
+  return data.items || []
+}
+
+export async function markMessagesRead(scriptUrl: string, ids: string[]): Promise<void> {
+  if (ids.length === 0) return
+  const result = await postJson(scriptUrl, { action: 'markMessagesRead', ids })
+  if (!result.ok) throw new Error(result.error || 'Đánh dấu đã đọc thất bại')
+}

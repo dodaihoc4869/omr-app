@@ -37,6 +37,7 @@ const SHEET_BAILAM = 'BaiLam'
 const SHEET_PHUHUYNH = 'PhuHuynh'
 const SHEET_NHANXET = 'NhanXet'
 const SHEET_TRANGTHAI = 'TrangThai'
+const SHEET_TINNHAN = 'TinNhan'
 
 function getSheet_(name, headers) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
@@ -176,6 +177,31 @@ function doGet(e) {
         capNhatLuc: v[9],
       },
     })
+  }
+
+  if (action === 'listMessages') {
+    // Thầy xem tin nhắn phụ huynh gửi — không cần đăng nhập (giống listSubmissions),
+    // chỉ ai có đúng link Apps Script này (thầy tự giữ link) mới gọi được.
+    const sh = getSheet_(SHEET_TINNHAN, ['Id', 'SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'NoiDung', 'ThoiGian', 'DaDoc'])
+    const data = sh.getDataRange().getValues()
+    const items = []
+    for (let i = 1; i < data.length; i++) {
+      items.push({
+        id: data[i][0],
+        sdt: data[i][1],
+        hoTenPhuHuynh: data[i][2],
+        sbd: data[i][3],
+        lop: data[i][4],
+        hoTenHocSinh: data[i][5],
+        noiDung: data[i][6],
+        thoiGian: data[i][7],
+        daDoc: String(data[i][8]) === 'true',
+      })
+    }
+    items.sort(function (a, b) {
+      return new Date(b.thoiGian) - new Date(a.thoiGian)
+    })
+    return jsonResponse_({ items: items })
   }
 
   return jsonResponse_({ error: 'Thiếu hoặc sai tham số action' })
@@ -326,6 +352,36 @@ function doPost(e) {
       sh.getRange(row, 1, 1, 10).setValues([rowData])
     } else {
       sh.appendRow(rowData)
+    }
+    return jsonResponse_({ ok: true })
+  }
+
+  if (action === 'sendMessage') {
+    // Phụ huynh nhắn tin trực tiếp cho thầy — lưu nguyên văn, không chỉnh sửa gì.
+    const sh = getSheet_(SHEET_TINNHAN, ['Id', 'SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'NoiDung', 'ThoiGian', 'DaDoc'])
+    const id = Utilities.getUuid()
+    sh.appendRow([
+      id,
+      body.sdt,
+      body.hoTenPhuHuynh || '',
+      body.sbd || '',
+      body.lop || '',
+      body.hoTenHocSinh || '',
+      body.noiDung,
+      new Date().toISOString(),
+      'false',
+    ])
+    return jsonResponse_({ ok: true, id: id })
+  }
+
+  if (action === 'markMessagesRead') {
+    const sh = getSheet_(SHEET_TINNHAN, ['Id', 'SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'NoiDung', 'ThoiGian', 'DaDoc'])
+    const data = sh.getDataRange().getValues()
+    const ids = body.ids || []
+    for (let i = 1; i < data.length; i++) {
+      if (ids.indexOf(data[i][0]) >= 0) {
+        sh.getRange(i + 1, 9).setValue('true')
+      }
     }
     return jsonResponse_({ ok: true })
   }

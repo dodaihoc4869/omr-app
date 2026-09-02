@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent, type ClipboardEvent, type DragEvent } from 'react'
-import { ImagePlus } from 'lucide-react'
+import { ImagePlus, FileUp } from 'lucide-react'
+import { extractTextFromFile } from '../lib/exam-file-import'
+import { autoStructureRawExam } from '../lib/exam-auto-structure'
 import { bankSizeWarning, mergeAndStrip, mergeKeepAnswers, validateTeacherSource, type TeacherExamSource } from '../data/examContent'
 import { publishSession } from '../lib/exam-api'
 import QuestionMedia from '../components/QuestionMedia'
@@ -52,6 +54,8 @@ export default function ExamSetupScreen() {
   const [imageMap, setImageMap] = useState<Record<string, string>>({})
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const docFileInputRef = useRef<HTMLInputElement>(null)
+  const [importing, setImporting] = useState(false)
 
   const [lop, setLop] = useState('')
   const [thoiGianPhut, setThoiGianPhut] = useState(45)
@@ -125,6 +129,30 @@ export default function ExamSetupScreen() {
     e.preventDefault()
     const ta = e.currentTarget
     await attachImageAt(file, ta.selectionStart ?? draftText.length)
+  }
+
+  // Tải file PDF/Word THÔ (không cần đúng khuôn "MÃ ĐỀ:"/"PHẦN I/II/III"/*
+  // của app) — trích chữ, rồi TỰ ĐỘNG chuẩn hoá đúng khuôn: đổi cách đánh số,
+  // thêm "MÃ ĐỀ:" nếu thiếu, và CHỈ tự đánh dấu đáp án đúng Phần I khi tìm
+  // thấy bảng "ĐÁP ÁN" có sẵn trong file (trích xuất dữ liệu thầy đã ghi,
+  // KHÔNG suy đoán). Câu nào không chắc sẽ được exam-parse.ts cảnh báo rõ khi
+  // bấm "Phân tích đề" — không bao giờ âm thầm chọn bừa 1 đáp án.
+  const handleImportFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setImporting(true)
+    try {
+      const { text, warnings } = await extractTextFromFile(file)
+      const { text: structuredText, notes } = autoStructureRawExam(text, file.name)
+      setDraftText((cur) => (cur.trim() ? `${cur}\n\n${structuredText}` : structuredText))
+      showToast(`Đã trích và tự chuẩn hoá đề từ "${file.name}" vào ô soạn đề — rà lại các cảnh báo bên dưới trước khi Phân tích đề`, 'success')
+      setParseWarnings([...warnings, ...notes])
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Không đọc được file', 'error')
+    } finally {
+      setImporting(false)
+    }
   }
 
   const handleParse = () => {
@@ -299,6 +327,24 @@ export default function ExamSetupScreen() {
           onDragOver={(e) => e.preventDefault()}
         />
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAttachImage} />
+        <input
+          ref={docFileInputRef}
+          type="file"
+          accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          className="hidden"
+          onChange={handleImportFile}
+        />
+        <button
+          onClick={() => docFileInputRef.current?.click()}
+          disabled={importing}
+          className="tap-target w-full rounded-lg bg-indigo-50 dark:bg-indigo-950 border-2 border-indigo-600 text-indigo-700 dark:text-indigo-400 text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-60"
+        >
+          <FileUp size={16} /> {importing ? 'Đang đọc file…' : 'Tải đề từ file PDF/Word (.pdf, .docx)'}
+        </button>
+        <p className="text-xs text-slate-500">
+          Trích chữ thẳng vào ô soạn đề bên dưới, đỡ phải tự mở file để copy tay. App chỉ trích được CHỮ — công thức
+          MathType, bảng, hình vẽ vẫn cần thầy tự gõ lại/chèn như bình thường sau khi trích xong.
+        </p>
         <div className="flex gap-2">
           <button
             onClick={() => fileInputRef.current?.click()}
