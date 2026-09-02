@@ -148,3 +148,15 @@ export async function listPendingAttempts(): Promise<ExamAttempt[]> {
   const all: ExamAttempt[] = await db.getAll(STORE_ATTEMPTS)
   return all.filter((a) => a.pendingSubmit)
 }
+
+// Lưu SĐT phụ huynh đã đăng ký trên CHÍNH máy này — mở lại app không cần
+// đăng ký/nhập lại số để xem nhận xét, giống lưu link Apps Script.
+export async function saveMyParentPhone(sdt: string): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, sdt, 'myParentPhone')
+}
+
+export async function loadMyParentPhone(): Promise<string> {
+  const db = await getDb()
+  return (await db.get(STORE_SETTINGS, 'myParentPhone')) || ''
+}

@@ -34,6 +34,9 @@
 const SPREADSHEET_ID = 'DÁN_ID_GOOGLE_SHEET_CỦA_THẦY_VÀO_ĐÂY'
 const SHEET_CA = 'CaKiemTra'
 const SHEET_BAILAM = 'BaiLam'
+const SHEET_PHUHUYNH = 'PhuHuynh'
+const SHEET_NHANXET = 'NhanXet'
+const SHEET_TRANGTHAI = 'TrangThai'
 
 function getSheet_(name, headers) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
@@ -61,9 +64,11 @@ function doGet(e) {
   const action = e.parameter.action
   if (action === 'session') {
     const maCa = e.parameter.maCa || ''
-    const sh = getSheet_(SHEET_CA, ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson'])
+    const sh = getSheet_(SHEET_CA, ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson'])
     const row = findRowByKey_(sh, 0, maCa)
     if (row < 0) return jsonResponse_({ found: false })
+    // CHỈ trả về bank KHÔNG đáp án (BankJson) ở đây — đây là lúc học sinh
+    // vào thi, đáp án đúng (KeyBankJson) tuyệt đối không được lộ lúc này.
     const vals = sh.getRange(row, 1, 1, 5).getValues()[0]
     return jsonResponse_({
       found: true,
@@ -92,6 +97,87 @@ function doGet(e) {
     }
     return jsonResponse_({ rows: rows })
   }
+  if (action === 'parentFeedback') {
+    const sdt = (e.parameter.sdt || '').trim()
+    const phSh = getSheet_(SHEET_PHUHUYNH, ['SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'DangKyLuc'])
+    const phRow = findRowByKey_(phSh, 0, sdt)
+    if (phRow < 0) return jsonResponse_({ found: false })
+    const phVals = phSh.getRange(phRow, 1, 1, 6).getValues()[0]
+    const sbd = String(phVals[2])
+
+    const nxSh = getSheet_(SHEET_NHANXET, ['SBD', 'MaCa', 'MaDe', 'ThoiGianNop', 'Diem', 'XepLoai', 'CauSai', 'GuiLuc'])
+    const data = nxSh.getDataRange().getValues()
+    const items = []
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][0]) === sbd) {
+        items.push({
+          maCa: data[i][1],
+          maDe: data[i][2],
+          thoiGianNop: data[i][3],
+          diem: data[i][4],
+          xepLoai: data[i][5],
+          cauSai: data[i][6],
+        })
+      }
+    }
+    items.sort(function (a, b) {
+      return new Date(b.thoiGianNop) - new Date(a.thoiGianNop)
+    })
+    return jsonResponse_({
+      found: true,
+      hoTenPhuHuynh: phVals[1],
+      sbd: sbd,
+      lop: phVals[3],
+      hoTenHocSinh: phVals[4],
+      items: items,
+    })
+  }
+  if (action === 'parentStatus') {
+    // Trạng thái làm bài GẦN-THỜI-GIAN-THỰC cho phụ huynh xem — phụ huynh
+    // tự poll lại endpoint này (app tự gọi lại mỗi ~15 giây khi đang mở màn
+    // theo dõi), không phải server đẩy tin thật sự.
+    const sdt = (e.parameter.sdt || '').trim()
+    const phSh = getSheet_(SHEET_PHUHUYNH, ['SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'DangKyLuc'])
+    const phRow = findRowByKey_(phSh, 0, sdt)
+    if (phRow < 0) return jsonResponse_({ found: false })
+    const phVals = phSh.getRange(phRow, 1, 1, 6).getValues()[0]
+    const sbd = String(phVals[2])
+
+    const stSh = getSheet_(SHEET_TRANGTHAI, [
+      'SBD',
+      'MaCa',
+      'Lop',
+      'DangLam',
+      'BatDauLuc',
+      'DaLamCauHoi',
+      'TongCauHoi',
+      'SoLanRoiApp',
+      'Blocked',
+      'CapNhatLuc',
+    ])
+    const stRow = findRowByKey_(stSh, 0, sbd)
+    if (stRow < 0) {
+      return jsonResponse_({ found: true, hoTenHocSinh: phVals[4], sbd: sbd, status: null })
+    }
+    const v = stSh.getRange(stRow, 1, 1, 10).getValues()[0]
+    return jsonResponse_({
+      found: true,
+      hoTenHocSinh: phVals[4],
+      sbd: sbd,
+      status: {
+        maCa: v[1],
+        lop: v[2],
+        dangLam: String(v[3]) === 'true',
+        batDauLuc: v[4],
+        daLamCauHoi: v[5],
+        tongCauHoi: v[6],
+        soLanRoiApp: v[7],
+        blocked: String(v[8]) === 'true',
+        capNhatLuc: v[9],
+      },
+    })
+  }
+
   return jsonResponse_({ error: 'Thiếu hoặc sai tham số action' })
 }
 
@@ -100,11 +186,22 @@ function doPost(e) {
   const action = body.action
 
   if (action === 'publish') {
-    const sh = getSheet_(SHEET_CA, ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson'])
+    const sh = getSheet_(SHEET_CA, ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson'])
     const row = findRowByKey_(sh, 0, body.maCa)
-    const rowData = [body.maCa, body.lop, body.thoiGianPhut, new Date().toISOString(), JSON.stringify(body.bank)]
+    // keyBank (có đáp án) CHỈ được gửi lên nếu thầy chủ động bật "xem điểm
+    // ngay sau khi nộp" ở màn Soạn đề — lưu riêng cột này, KHÔNG bao giờ trả
+    // về ở action "session" (chỉ trả trong response của "submit", xem dưới).
+    const rowData = [
+      body.maCa,
+      body.lop,
+      body.thoiGianPhut,
+      new Date().toISOString(),
+      JSON.stringify(body.bank),
+      body.immediateFeedback ? 'true' : 'false',
+      body.keyBank ? JSON.stringify(body.keyBank) : '',
+    ]
     if (row > 0) {
-      sh.getRange(row, 1, 1, 5).setValues([rowData])
+      sh.getRange(row, 1, 1, 7).setValues([rowData])
     } else {
       sh.appendRow(rowData)
     }
@@ -135,6 +232,98 @@ function doPost(e) {
     if (foundRow > 0) {
       // Học sinh nộp lại (vd mất mạng nộp lại) — ghi đè bài cũ bằng bài mới nhất, không tạo dòng trùng.
       sh.getRange(foundRow, 1, 1, 8).setValues([rowData])
+    } else {
+      sh.appendRow(rowData)
+    }
+
+    // Nếu ca này bật "xem điểm ngay sau khi nộp", trả kèm đáp án (keyBank)
+    // NGAY TRONG RESPONSE của lần nộp này — chỉ em vừa nộp nhận được, không
+    // có endpoint nào khác cho phép lấy đáp án trước khi nộp bài.
+    const caSh = getSheet_(SHEET_CA, ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson'])
+    const caRow = findRowByKey_(caSh, 0, body.maCa)
+    let keyBank = null
+    if (caRow > 0) {
+      const caVals = caSh.getRange(caRow, 1, 1, 7).getValues()[0]
+      if (String(caVals[5]) === 'true' && caVals[6]) keyBank = JSON.parse(caVals[6])
+    }
+    return jsonResponse_({ ok: true, keyBank: keyBank })
+  }
+
+  if (action === 'registerParent') {
+    const sh = getSheet_(SHEET_PHUHUYNH, ['SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'DangKyLuc'])
+    const row = findRowByKey_(sh, 0, body.sdt)
+    const rowData = [body.sdt, body.hoTenPhuHuynh, body.sbd, body.lop, body.hoTenHocSinh, new Date().toISOString()]
+    if (row > 0) {
+      sh.getRange(row, 1, 1, 6).setValues([rowData])
+    } else {
+      sh.appendRow(rowData)
+    }
+    return jsonResponse_({ ok: true })
+  }
+
+  if (action === 'sendFeedback') {
+    const sh = getSheet_(SHEET_NHANXET, ['SBD', 'MaCa', 'MaDe', 'ThoiGianNop', 'Diem', 'XepLoai', 'CauSai', 'GuiLuc'])
+    const data = sh.getDataRange().getValues()
+    let foundRow = -1
+    for (let i = 1; i < data.length; i++) {
+      // Khoá trùng theo SBD+MaCa — 1 ca kiểm tra chỉ có 1 nhận xét cho 1 em,
+      // gửi lại (vd thầy chấm lại) thì ghi đè, không tạo dòng trùng.
+      if (String(data[i][0]) === String(body.sbd) && String(data[i][1]) === String(body.maCa)) {
+        foundRow = i + 1
+        break
+      }
+    }
+    const rowData = [
+      body.sbd,
+      body.maCa,
+      body.maDe,
+      body.thoiGianNop || new Date().toISOString(),
+      body.diem,
+      body.xepLoai,
+      JSON.stringify(body.cauSai || {}),
+      new Date().toISOString(),
+    ]
+    if (foundRow > 0) {
+      sh.getRange(foundRow, 1, 1, 8).setValues([rowData])
+    } else {
+      sh.appendRow(rowData)
+    }
+    return jsonResponse_({ ok: true })
+  }
+
+  if (action === 'examStatus') {
+    // Trạng thái LÀM BÀI THỜI GIAN THỰC của 1 em — mỗi em 1 dòng duy nhất
+    // (khoá theo SBD), lần cập nhật sau ghi đè lần trước. Học sinh tự động
+    // gửi lên định kỳ trong lúc làm bài + gửi ngay mỗi lần rời màn hình, để
+    // phụ huynh xem gần-như-thời-gian-thực (poll lại, không phải đẩy tức thì
+    // thật sự vì Apps Script không hỗ trợ push).
+    const sh = getSheet_(SHEET_TRANGTHAI, [
+      'SBD',
+      'MaCa',
+      'Lop',
+      'DangLam',
+      'BatDauLuc',
+      'DaLamCauHoi',
+      'TongCauHoi',
+      'SoLanRoiApp',
+      'Blocked',
+      'CapNhatLuc',
+    ])
+    const row = findRowByKey_(sh, 0, body.sbd)
+    const rowData = [
+      body.sbd,
+      body.maCa,
+      body.lop || '',
+      body.dangLam ? 'true' : 'false',
+      body.batDauLuc || new Date().toISOString(),
+      body.daLamCauHoi || 0,
+      body.tongCauHoi || 0,
+      body.soLanRoiApp || 0,
+      body.blocked ? 'true' : 'false',
+      new Date().toISOString(),
+    ]
+    if (row > 0) {
+      sh.getRange(row, 1, 1, 10).setValues([rowData])
     } else {
       sh.appendRow(rowData)
     }

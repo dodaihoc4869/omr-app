@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent, type ClipboardEvent, type DragEvent } from 'react'
 import { ImagePlus } from 'lucide-react'
-import { bankSizeWarning, mergeAndStrip, validateTeacherSource, type TeacherExamSource } from '../data/examContent'
+import { bankSizeWarning, mergeAndStrip, mergeKeepAnswers, validateTeacherSource, type TeacherExamSource } from '../data/examContent'
 import { publishSession } from '../lib/exam-api'
 import QuestionMedia from '../components/QuestionMedia'
 import {
@@ -55,6 +55,7 @@ export default function ExamSetupScreen() {
 
   const [lop, setLop] = useState('')
   const [thoiGianPhut, setThoiGianPhut] = useState(45)
+  const [immediateFeedback, setImmediateFeedback] = useState(false)
   const [opening, setOpening] = useState(false)
   const [opened, setOpened] = useState<{ maCa: string; joinLink: string } | null>(null)
 
@@ -194,7 +195,8 @@ export default function ExamSetupScreen() {
     try {
       const maCa = randomSessionCode()
       const publicBank = mergeAndStrip(selectedSources)
-      await publishSession(scriptUrl.trim(), maCa, lop.trim(), thoiGianPhut, publicBank)
+      const keyBank = immediateFeedback ? mergeKeepAnswers(selectedSources) : undefined
+      await publishSession(scriptUrl.trim(), maCa, lop.trim(), thoiGianPhut, publicBank, immediateFeedback, keyBank)
       // Lưu bản CÓ đáp án trên máy thầy để màn Theo dõi chấm lại được sau này.
       await saveSessionTeacherBank(maCa, selectedSources)
       const joinLink = `${location.origin}${location.pathname}?examCode=${maCa}&api=${encodeURIComponent(scriptUrl.trim())}`
@@ -383,6 +385,21 @@ export default function ExamSetupScreen() {
           />
           <span className="text-sm text-slate-500">phút làm bài</span>
         </div>
+        <label className="tap-target flex items-start gap-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2.5">
+          <input
+            type="checkbox"
+            className="mt-0.5"
+            checked={immediateFeedback}
+            onChange={(e) => setImmediateFeedback(e.target.checked)}
+          />
+          <span className="text-sm">
+            <b>Cho học sinh xem điểm ngay sau khi nộp bài</b>
+            <div className="text-xs text-slate-500 mt-0.5">
+              Hiện popup điểm chi tiết + câu sai ngay trên máy em. Đánh đổi: đáp án của ca này sẽ có trong máy chủ để
+              trả về — chỉ bật khi KHÔNG lo lộ đề giữa các em (vd mỗi em thi giờ riêng, hoặc đề không dùng lại).
+            </div>
+          </span>
+        </label>
       </section>
 
       <button

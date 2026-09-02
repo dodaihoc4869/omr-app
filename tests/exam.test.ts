@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { validateTeacherSource, mergeAndStrip } from '../src/data/examContent'
 import { parseExamText } from '../src/lib/exam-parse'
 import { assignStudentQuestions } from '../src/lib/exam-assign'
-import { gradeSubmissionFull } from '../src/lib/exam-grade'
+import { gradeSubmissionFull, gradeFromKeyBank } from '../src/lib/exam-grade'
 import { hashSeed, seededPermutation } from '../src/lib/exam-shuffle'
 import { emptyAnswerRecord } from '../src/lib/exam-db'
 
@@ -290,5 +290,60 @@ describe('exam-grade — chấm bài từ ngân hàng câu hỏi khớp với en
     expect(graded1.score.total).toBe(graded2.score.total)
     expect(graded1.score.phanIScore).toBe(0)
     expect(graded1.score.phanIIIScore).toBe(1.5) // 6 câu x 0.25 đúng hết
+  })
+
+  it('gradeFromKeyBank (dùng trực tiếp keyBank server trả về lúc nộp bài) liệt kê đúng câu sai theo thứ tự hiển thị', () => {
+    const s1 = parseExamText(makeSampleText('keybank-test', 8, 4, 4)).source!
+    const maCa = 'ca-keybank'
+    const sbd = 'hs099'
+    const keyBank = { phanI: s1.phanI, phanII: s1.phanII, phanIII: s1.phanIII }
+    const assignment = assignStudentQuestions(keyBank, maCa, sbd)
+
+    const answers = emptyAnswerRecord()
+    // Câu 1 (displayIdx 0) trả lời sai, còn lại đúng hết.
+    assignment.phanI.forEach((item, i) => {
+      const correct = s1.phanI.find((q) => q.id === item.qid)!.correct
+      if (i === 0) {
+        const wrong = (['A', 'B', 'C', 'D'] as const).find((l) => l !== correct)!
+        answers.phanI[item.qid] = wrong
+      } else {
+        answers.phanI[item.qid] = correct
+      }
+    })
+    assignment.phanII.forEach((item) => {
+      const correct = s1.phanII.find((q) => q.id === item.qid)!.correct
+      answers.phanII[item.qid] = [...correct]
+    })
+    assignment.phanIII.forEach((item) => {
+      const correct = s1.phanIII.find((q) => q.id === item.qid)!.correct
+      answers.phanIII[item.qid] = correct
+    })
+
+    const graded = gradeFromKeyBank(keyBank, maCa, sbd, answers)
+    expect(graded.wrongPhanI).toEqual([1])
+    expect(graded.wrongPhanII).toEqual([])
+    expect(graded.wrongPhanIII).toEqual([])
+    // gradeFromKeyBank và gradeSubmissionFull phải cho CÙNG kết quả khi cùng nguồn dữ liệu
+    // (gradeSubmissionFull chỉ là gradeFromKeyBank + gộp TeacherExamSource[] trước).
+    const graded2 = gradeSubmissionFull([s1], maCa, sbd, answers)
+    expect(graded2.wrongPhanI).toEqual(graded.wrongPhanI)
+    expect(graded2.score.total).toBe(graded.score.total)
+  })
+
+  it('gradeFromKeyBank: đáp án Phần III lệch dấu phẩy/chấm hoặc có khoảng trắng vẫn được coi là đúng', () => {
+    const s1 = parseExamText(makeSampleText('keybank-norm', 2, 2, 4)).source!
+    const maCa = 'ca-keybank-norm'
+    const sbd = 'hs100'
+    const keyBank = { phanI: s1.phanI, phanII: s1.phanII, phanIII: s1.phanIII }
+    const assignment = assignStudentQuestions(keyBank, maCa, sbd)
+
+    const answers = emptyAnswerRecord()
+    assignment.phanIII.forEach((item) => {
+      const correct = s1.phanIII.find((q) => q.id === item.qid)!.correct // dạng "N,00"
+      answers.phanIII[item.qid] = ` ${correct.replace(',', '.')} ` // đổi dấu phẩy -> chấm + thêm khoảng trắng thừa
+    })
+
+    const graded = gradeFromKeyBank(keyBank, maCa, sbd, answers)
+    expect(graded.wrongPhanIII).toEqual([])
   })
 })

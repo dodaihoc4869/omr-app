@@ -1,11 +1,12 @@
-import { Users, Timer, type LucideIcon } from 'lucide-react'
+import { Users, Timer, HeartHandshake, type LucideIcon } from 'lucide-react'
 import { useAppStore, type ScreenId } from '../store/appStore'
 
-// Chỉ còn 2 nhóm chức năng (Lớp + Kiểm tra) — thiết kế dạng thanh nổi, bo
+// 3 nhóm chức năng (Lớp + Kiểm tra + Phụ huynh) — thiết kế dạng thanh nổi, bo
 // tròn, căn giữa cho cân đối thay vì kéo dài sát 2 mép màn hình như trước.
 const TABS: { id: ScreenId; label: string; icon: LucideIcon }[] = [
   { id: 'classlist', label: 'Lớp', icon: Users },
   { id: 'examhub', label: 'Kiểm tra', icon: Timer },
+  { id: 'parent', label: 'Phụ huynh', icon: HeartHandshake },
 ]
 
 export default function BottomNav() {

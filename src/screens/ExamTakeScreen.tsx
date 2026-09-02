@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
-import { fetchSession, submitAnswers } from '../lib/exam-api'
+import { fetchSession, submitAnswers, pushExamStatus, sendParentFeedback } from '../lib/exam-api'
 import { ChemText } from '../lib/chem-format'
 import QuestionMedia from '../components/QuestionMedia'
-import { TriangleAlert } from 'lucide-react'
+import { TriangleAlert, X } from 'lucide-react'
+import { classify } from '../engine/score'
+import { gradeFromKeyBank, type GradedSubmission } from '../lib/exam-grade'
 import {
   cacheSession,
   emptyAnswerRecord,
@@ -36,6 +38,7 @@ export default function ExamTakeScreen() {
   const [scriptUrl, setScriptUrl] = useState('')
 
   const [bank, setBank] = useState<PublicExamBank | null>(null)
+  const [lop, setLop] = useState('')
   const [attempt, setAttempt] = useState<ExamAttempt | null>(null)
   // null = chưa tính lần nào (mới vào thi) — PHẢI phân biệt với 0 (đã hết giờ
   // thật sự), nếu không effect tự-nộp-bài bên dưới sẽ chạy với giá trị khởi
@@ -53,6 +56,19 @@ export default function ExamTakeScreen() {
   useEffect(() => {
     attemptRef.current = attempt
   }, [attempt])
+  const [gradedPopup, setGradedPopup] = useState<GradedSubmission | null>(null)
+
+  // Refs để hàm chạy trong effect/listener luôn đọc được giá trị MỚI NHẤT
+  // (tránh closure cũ), dùng cho việc đẩy trạng thái làm bài lên cho phụ huynh.
+  const scriptUrlRef = useRef('')
+  useEffect(() => {
+    scriptUrlRef.current = scriptUrl
+  }, [scriptUrl])
+  const lopRef = useRef('')
+  useEffect(() => {
+    lopRef.current = lop
+  }, [lop])
+  const totalCountRef = useRef(0)
 
   // Đọc link mời (?examCode=...&api=...) — học sinh mở link chỉ cần gõ SBD.
   useEffect(() => {
@@ -72,6 +88,32 @@ export default function ExamTakeScreen() {
     if (!bank || !maCa || !sbd) return null
     return assignStudentQuestions(bank, maCa.trim(), sbd.trim())
   }, [bank, maCa, sbd])
+  useEffect(() => {
+    totalCountRef.current = assignment ? assignment.phanI.length + assignment.phanII.length + assignment.phanIII.length : 0
+  }, [assignment])
+
+  // Đẩy trạng thái làm bài (đang làm/đã làm bao nhiêu câu/số lần rời màn
+  // hình/có bị khoá không) lên server để phụ huynh xem gần-thời-gian-thực —
+  // không chặn luồng làm bài chính, lỗi mạng thì bỏ qua (xem pushExamStatus).
+  const pushStatusNow = (a: ExamAttempt, dangLam: boolean) => {
+    const url = scriptUrlRef.current.trim()
+    if (!url) return
+    const daLam =
+      Object.keys(a.answers.phanI).length +
+      Object.keys(a.answers.phanII).length +
+      Object.values(a.answers.phanIII).filter((v) => v.trim() !== '').length
+    pushExamStatus(url, {
+      sbd: a.sbd,
+      maCa: a.maCa,
+      lop: lopRef.current,
+      dangLam,
+      batDauLuc: a.startedAt,
+      daLamCauHoi: daLam,
+      tongCauHoi: totalCountRef.current,
+      soLanRoiApp: a.integrity.leaveCount,
+      blocked: a.integrity.blocked,
+    })
+  }
 
   const handleJoin = async () => {
     const ma = maCa.trim()
@@ -96,6 +138,7 @@ export default function ExamTakeScreen() {
         await cacheSession(cached)
       }
       setBank(cached.bank)
+      setLop(cached.lop)
 
       const a: ExamAttempt =
         existing ?? {
@@ -129,6 +172,18 @@ export default function ExamTakeScreen() {
     const id = setInterval(tick, 1000)
     return () => clearInterval(id)
   }, [phase, attempt])
+
+  // Đẩy trạng thái làm bài lên cho phụ huynh: ngay khi vào thi + định kỳ mỗi
+  // 20 giây trong lúc làm (không cần đợi em thao tác gì).
+  useEffect(() => {
+    if (phase !== 'exam') return
+    if (attemptRef.current) pushStatusNow(attemptRef.current, true)
+    const id = setInterval(() => {
+      if (attemptRef.current) pushStatusNow(attemptRef.current, true)
+    }, 20000)
+    return () => clearInterval(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase])
 
   // Ghi lại việc rời app (chuyển tab / tắt màn hình / mất focus) trong lúc làm bài — KHÔNG
   // thể phát hiện chụp ảnh màn hình bằng JavaScript (không trình duyệt nào cho phép), đây là
@@ -168,6 +223,9 @@ export default function ExamTakeScreen() {
       attemptRef.current = next
       setAttempt(next)
       saveAttempt(next)
+      // Gửi ngay khi có tín hiệu rời màn hình (không đợi tick định kỳ) — đây
+      // là lúc phụ huynh cần biết sớm nhất để cảnh báo có tác dụng.
+      if (type === 'hidden' || type === 'blur' || blockNow) pushStatusNow(next, !blockNow)
       if (blockNow) doSubmit(next)
     }
     const onVis = () => logEvent(document.hidden ? 'hidden' : 'visible')
@@ -190,18 +248,47 @@ export default function ExamTakeScreen() {
     setAttempt(updated)
     await saveAttempt(updated)
     setPhase('submitted')
+    pushStatusNow(updated, false)
     trySend(updated)
   }
 
   const trySend = async (a: ExamAttempt) => {
     try {
       if (!scriptUrl.trim()) throw new Error('no-script-url')
-      await submitAnswers(scriptUrl.trim(), a.maCa, a.sbd, a.maDe, a.answers, a.integrity)
+      const { keyBank } = await submitAnswers(scriptUrl.trim(), a.maCa, a.sbd, a.maDe, a.answers, a.integrity)
       const done = { ...a, pendingSubmit: false }
       setAttempt(done)
       await saveAttempt(done)
       showToast('Đã nộp bài thành công', 'success')
       if (retryTimer.current) clearInterval(retryTimer.current)
+      // Thầy bật "xem điểm ngay" cho ca này — chấm ngay tại máy em bằng đúng
+      // engine chấm chuẩn, không phải ước lượng. Không hiện nếu bài bị khoá
+      // do nghi gian lận (màn khoá đã đủ nghiêm rồi).
+      if (keyBank) {
+        try {
+          const graded = gradeFromKeyBank(keyBank, done.maCa, done.sbd, done.answers)
+          // Chỉ hiện popup điểm ngay TRÊN MÁY EM nếu bài không bị khoá (màn khoá
+          // đã đủ nghiêm rồi) — nhưng vẫn gửi nhận xét cho phụ huynh trong cả 2
+          // trường hợp, để phụ huynh biết cả khi bài bị đánh dấu nghi gian lận.
+          if (!done.integrity.blocked) setGradedPopup(graded)
+          if (scriptUrlRef.current.trim()) {
+            sendParentFeedback(
+              scriptUrlRef.current.trim(),
+              done.sbd,
+              done.maCa,
+              done.maDe,
+              done.submittedAt || new Date().toISOString(),
+              graded.score.total,
+              classify(graded.score.total),
+              { phanI: graded.wrongPhanI, phanII: graded.wrongPhanII, phanIII: graded.wrongPhanIII },
+            ).catch(() => {
+              // Gửi nhận xét cho phụ huynh không phải luồng chính — lỗi thì bỏ qua.
+            })
+          }
+        } catch {
+          // Không chấm được (vd ngân hàng đề đổi khác) — bỏ qua, không hiện popup sai lệch.
+        }
+      }
     } catch {
       // Mất mạng — giữ pendingSubmit=true, đã lưu local, sẽ tự thử lại.
       if (!retryTimer.current) {
@@ -315,6 +402,79 @@ export default function ExamTakeScreen() {
           </div>
         )}
         {!attempt?.pendingSubmit && <div className="text-sm text-slate-500">Bài đã gửi lên hệ thống thành công.</div>}
+
+        {gradedPopup && (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm px-4 py-6">
+            <div className="w-full max-w-sm max-h-[85vh] overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 shadow-2xl">
+              <div className="sticky top-0 bg-white dark:bg-slate-900 px-5 pt-5 pb-3 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between">
+                <div>
+                  <div className="text-xs text-slate-400">Kết quả bài thi</div>
+                  <div className="text-4xl font-extrabold text-indigo-600 dark:text-indigo-400 tabular-nums">
+                    {gradedPopup.score.total.toFixed(2)}
+                    <span className="text-base font-medium text-slate-400">/10</span>
+                  </div>
+                  <div className="text-sm font-semibold mt-0.5">{classify(gradedPopup.score.total)}</div>
+                </div>
+                <button
+                  onClick={() => setGradedPopup(null)}
+                  className="shrink-0 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              <div className="px-5 py-4 space-y-3 text-left">
+                <div className="grid grid-cols-3 gap-2">
+                  {(
+                    [
+                      ['Phần I', gradedPopup.score.phanIScore, assignment?.phanI.length ?? 0, gradedPopup.wrongPhanI.length],
+                      ['Phần II', gradedPopup.score.phanIIScore, assignment?.phanII.length ?? 0, gradedPopup.wrongPhanII.length],
+                      ['Phần III', gradedPopup.score.phanIIIScore, assignment?.phanIII.length ?? 0, gradedPopup.wrongPhanIII.length],
+                    ] as const
+                  ).map(([label, pts, n, wrong]) => (
+                    <div key={label} className="rounded-xl bg-slate-50 dark:bg-slate-800 p-2.5 text-center">
+                      <div className="text-[11px] text-slate-400">{label}</div>
+                      <div className="text-lg font-bold">{pts.toFixed(2)}đ</div>
+                      <div className="text-[11px] text-slate-500">
+                        {n - wrong}/{n} đúng
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {(gradedPopup.wrongPhanI.length > 0 || gradedPopup.wrongPhanII.length > 0 || gradedPopup.wrongPhanIII.length > 0) && (
+                  <div className="rounded-xl bg-rose-50 dark:bg-rose-950/40 p-3 text-sm">
+                    <div className="font-semibold text-rose-700 dark:text-rose-300 mb-1">Cần xem lại</div>
+                    <div className="text-rose-700 dark:text-rose-300 text-xs leading-relaxed">
+                      {gradedPopup.wrongPhanI.length > 0 && <div>Phần I — câu {gradedPopup.wrongPhanI.join(', ')}</div>}
+                      {gradedPopup.wrongPhanII.length > 0 && <div>Phần II — câu {gradedPopup.wrongPhanII.join(', ')}</div>}
+                      {gradedPopup.wrongPhanIII.length > 0 && <div>Phần III — câu {gradedPopup.wrongPhanIII.join(', ')}</div>}
+                    </div>
+                  </div>
+                )}
+                {gradedPopup.wrongPhanI.length === 0 && gradedPopup.wrongPhanII.length === 0 && gradedPopup.wrongPhanIII.length === 0 && (
+                  <div className="rounded-xl bg-emerald-50 dark:bg-emerald-950/40 p-3 text-sm text-emerald-700 dark:text-emerald-300 font-medium text-center">
+                    Đúng hết tất cả các câu! 🎉
+                  </div>
+                )}
+                {!gradedPopup.score.crossSumOk && (
+                  <div className="text-[11px] text-amber-600 dark:text-amber-400">
+                    * Có sai lệch khi cộng điểm — thầy sẽ kiểm tra lại thủ công.
+                  </div>
+                )}
+              </div>
+
+              <div className="px-5 pb-5">
+                <button
+                  onClick={() => setGradedPopup(null)}
+                  className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold"
+                >
+                  Đóng
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     )
   }

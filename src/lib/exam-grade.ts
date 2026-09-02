@@ -20,15 +20,23 @@ export interface GradedSubmission {
   score: ScoreResult
   key: AnswerKey
   studentAnswers: StudentAnswers
+  // Đúng/sai từng câu theo đúng thứ tự hiển thị cho em (displayIdx) — dùng
+  // để hiện popup điểm ngay, KHÔNG suy diễn lý do sai, chỉ nêu đúng dữ kiện.
+  wrongPhanI: number[]
+  wrongPhanII: number[]
+  wrongPhanIII: number[]
 }
 
-export function gradeSubmissionFull(
-  teacherSources: TeacherExamSource[],
-  maCa: string,
-  sbd: string,
-  submitted: AnswerRecord,
-): GradedSubmission {
-  const bank = mergeTeacherSources(teacherSources)
+type KeyBankLike = {
+  phanI: TeacherMcqQuestion[]
+  phanII: TeacherTrueFalseQuestion[]
+  phanIII: TeacherShortAnswerQuestion[]
+}
+
+/** Lõi chấm điểm — nhận thẳng bank đã gộp CÓ đáp án (dùng cho cả 2 nơi: máy
+ * thầy chấm lại từ TeacherExamSource[], và máy học sinh chấm ngay từ keyBank
+ * server trả về sau khi nộp). */
+export function gradeFromKeyBank(bank: KeyBankLike, maCa: string, sbd: string, submitted: AnswerRecord): GradedSubmission {
   // assignStudentQuestions chỉ cần {id, text, choices/ideas} — TeacherExamSource là
   // superset đúng shape đó nên dùng thẳng được, không cần tách riêng phiên bản Public.
   const assignment = assignStudentQuestions(bank, maCa, sbd)
@@ -55,5 +63,24 @@ export function gradeSubmissionFull(
 
   const studentAnswers: StudentAnswers = { sbd, madeThi: maCa, phanI, phanII, phanIII }
   const score = scoreStudent(studentAnswers, key)
-  return { score, key, studentAnswers }
+
+  const wrongPhanI = phanI.map((it, i) => (it.value !== key.phanI[i] ? i + 1 : -1)).filter((n) => n > 0)
+  const wrongPhanII = phanII
+    .map((row, i) => (row.some((it, j) => it.value !== key.phanII[i][j]) ? i + 1 : -1))
+    .filter((n) => n > 0)
+  const norm = (s: string) => s.trim().replace(',', '.')
+  const wrongPhanIII = phanIII
+    .map((it, i) => (norm(it.value ?? '') !== norm(key.phanIII[i]) ? i + 1 : -1))
+    .filter((n) => n > 0)
+
+  return { score, key, studentAnswers, wrongPhanI, wrongPhanII, wrongPhanIII }
+}
+
+export function gradeSubmissionFull(
+  teacherSources: TeacherExamSource[],
+  maCa: string,
+  sbd: string,
+  submitted: AnswerRecord,
+): GradedSubmission {
+  return gradeFromKeyBank(mergeTeacherSources(teacherSources), maCa, sbd, submitted)
 }

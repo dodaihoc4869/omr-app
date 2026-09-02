@@ -100,6 +100,23 @@ export function mergeAndStrip(sources: TeacherExamSource[]): PublicExamBank {
   }
 }
 
+/**
+ * Gộp nhiều đề nhưng GIỮ NGUYÊN đáp án — chỉ dùng khi thầy chủ động bật "xem
+ * điểm ngay sau khi nộp" (kèm cảnh báo đánh đổi rủi ro lộ đề). KHÁC với
+ * mergeAndStrip: không publish trực tiếp lên phần bank công khai của ca.
+ */
+export function mergeKeepAnswers(sources: TeacherExamSource[]): {
+  phanI: TeacherMcqQuestion[]
+  phanII: TeacherTrueFalseQuestion[]
+  phanIII: TeacherShortAnswerQuestion[]
+} {
+  return {
+    phanI: sources.flatMap((s) => s.phanI),
+    phanII: sources.flatMap((s) => s.phanII),
+    phanIII: sources.flatMap((s) => s.phanIII),
+  }
+}
+
 export function bankSizeWarning(sources: TeacherExamSource[]): string | null {
   const totalI = sources.reduce((n, s) => n + s.phanI.length, 0)
   const totalII = sources.reduce((n, s) => n + s.phanII.length, 0)
