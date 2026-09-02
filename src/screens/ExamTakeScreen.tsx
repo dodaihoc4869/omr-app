@@ -4,6 +4,7 @@ import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assi
 import { fetchSession, submitAnswers } from '../lib/exam-api'
 import { ChemText } from '../lib/chem-format'
 import QuestionMedia from '../components/QuestionMedia'
+import { TriangleAlert } from 'lucide-react'
 import {
   cacheSession,
   emptyAnswerRecord,
@@ -43,6 +44,9 @@ export default function ExamTakeScreen() {
   const [remaining, setRemaining] = useState<number | null>(null)
   const retryTimer = useRef<ReturnType<typeof setInterval> | null>(null)
   const hiddenSinceRef = useRef<number | null>(null)
+  const leaveCountRef = useRef(0)
+  const [leaveWarning, setLeaveWarning] = useState<{ count: number; sec: number } | null>(null)
+  const leaveWarningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Đọc link mời (?examCode=...&api=...) — học sinh mở link chỉ cần gõ SBD.
   useEffect(() => {
@@ -135,10 +139,17 @@ export default function ExamTakeScreen() {
           if (hiddenSinceRef.current === null) {
             hiddenSinceRef.current = Date.now()
             leaveCount += 1
+            leaveCountRef.current = leaveCount
           }
         } else if (hiddenSinceRef.current !== null) {
+          const awaySec = Math.max(1, Math.round((Date.now() - hiddenSinceRef.current) / 1000))
           totalHiddenMs += Date.now() - hiddenSinceRef.current
           hiddenSinceRef.current = null
+          // Cảnh báo nghiêm khắc ngay khi em quay lại màn hình — thấy ngay lúc
+          // đó mới có tác dụng răn đe, báo sau khi nộp bài thì vô nghĩa.
+          if (leaveWarningTimerRef.current) clearTimeout(leaveWarningTimerRef.current)
+          setLeaveWarning({ count: leaveCountRef.current, sec: awaySec })
+          leaveWarningTimerRef.current = setTimeout(() => setLeaveWarning(null), 8000)
         }
         const next = { ...cur, integrity: { leaveCount, totalHiddenMs, events } }
         saveAttempt(next)
@@ -155,6 +166,7 @@ export default function ExamTakeScreen() {
       document.removeEventListener('visibilitychange', onVis)
       window.removeEventListener('blur', onBlur)
       window.removeEventListener('focus', onFocus)
+      if (leaveWarningTimerRef.current) clearTimeout(leaveWarningTimerRef.current)
     }
   }, [phase])
 
@@ -289,6 +301,22 @@ export default function ExamTakeScreen() {
           {formatClock(remaining ?? 0)}
         </div>
       </div>
+
+      {leaveWarning && (
+        <div className="sticky top-[46px] z-30 -mx-4 px-4">
+          <div className="bg-rose-600 text-white rounded-lg px-3 py-2.5 shadow-lg flex items-start gap-2 animate-[pulse_1.2s_ease-in-out_2]">
+            <TriangleAlert size={20} className="shrink-0 mt-0.5" />
+            <div className="text-sm leading-snug">
+              <b>Thầy đã ghi lại: em vừa rời khỏi màn hình làm bài</b> (lần {leaveWarning.count}, {leaveWarning.sec}{' '}
+              giây). Đây sẽ là căn cứ khi thầy xem xét bài thi — tập trung làm bài, không chuyển màn hình/mở app
+              khác.
+            </div>
+            <button onClick={() => setLeaveWarning(null)} className="shrink-0 text-white/80 hover:text-white text-lg leading-none px-1">
+              ×
+            </button>
+          </div>
+        </div>
+      )}
 
       <section className="space-y-3">
         <h2 className="font-bold text-indigo-700 dark:text-indigo-400">Phần I — Trắc nghiệm nhiều lựa chọn</h2>
