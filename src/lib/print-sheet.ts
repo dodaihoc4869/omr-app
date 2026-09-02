@@ -120,7 +120,41 @@ export function buildAnswerSheetPdf(studentInfo?: { hoTen?: string; lop?: string
   return doc
 }
 
-export function downloadAnswerSheetPdf(studentInfo?: { hoTen?: string; lop?: string }, fileName = 'PhieuTraLoi.pdf') {
+/**
+ * Mở PDF ra tab mới để xem/in/lưu trực tiếp thay vì chỉ âm thầm tải xuống —
+ * trên một số trình duyệt di động (đặc biệt PWA cài lên màn hình chính trên
+ * iPhone), download bằng thẻ <a download> chạy "im lặng" không có bất kỳ
+ * phản hồi nào, khiến người dùng tưởng nút bấm không hoạt động. Mở tab mới
+ * cho thấy ngay kết quả, và người dùng có sẵn nút Chia sẻ/In/Tải của chính
+ * trình duyệt.
+ *
+ * Trả về 'opened' nếu mở được tab xem PDF, 'downloaded' nếu trình duyệt chặn
+ * popup và phải rơi về tải file trực tiếp, để màn hình gọi hàm này báo đúng
+ * thông báo cho người dùng.
+ */
+export function openOrDownloadAnswerSheetPdf(
+  studentInfo?: { hoTen?: string; lop?: string },
+  fileName = 'PhieuTraLoi.pdf',
+): 'opened' | 'downloaded' {
   const doc = buildAnswerSheetPdf(studentInfo)
-  doc.save(fileName)
+  const blob = doc.output('blob')
+  const url = URL.createObjectURL(blob)
+
+  const win = window.open(url, '_blank')
+  let result: 'opened' | 'downloaded' = 'opened'
+  if (!win) {
+    // Trình duyệt chặn popup (thường do không coi đây là hành động người dùng
+    // trực tiếp) — rơi về tải file trực tiếp qua thẻ <a download>.
+    const a = document.createElement('a')
+    a.href = url
+    a.download = fileName
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    result = 'downloaded'
+  }
+
+  // Giữ blob URL đủ lâu để tab mới/trình xem PDF tải xong rồi mới thu hồi.
+  setTimeout(() => URL.revokeObjectURL(url), 60_000)
+  return result
 }

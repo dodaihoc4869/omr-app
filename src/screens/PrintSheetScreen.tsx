@@ -1,9 +1,27 @@
 import { useState } from 'react'
-import { downloadAnswerSheetPdf } from '../lib/print-sheet'
+import { openOrDownloadAnswerSheetPdf } from '../lib/print-sheet'
+import { useAppStore } from '../store/appStore'
 
 export default function PrintSheetScreen() {
   const [hoTen, setHoTen] = useState('')
   const [lop, setLop] = useState('')
+  const [busy, setBusy] = useState(false)
+  const showToast = useAppStore((s) => s.showToast)
+
+  const handleCreatePdf = () => {
+    setBusy(true)
+    try {
+      const result = openOrDownloadAnswerSheetPdf({ hoTen, lop })
+      showToast(
+        result === 'opened' ? 'Đã mở PDF ở tab mới — bấm Chia sẻ/In để lưu' : 'Đã tải PhieuTraLoi.pdf về máy',
+        'success',
+      )
+    } catch (e) {
+      showToast(`Lỗi tạo PDF: ${e instanceof Error ? e.message : 'không rõ nguyên nhân'}`, 'error')
+    } finally {
+      setBusy(false)
+    }
+  }
 
   return (
     <div className="min-h-screen pb-24 px-4 pt-4 space-y-4 bg-slate-50 dark:bg-slate-950">
@@ -25,10 +43,11 @@ export default function PrintSheetScreen() {
       </div>
 
       <button
-        onClick={() => downloadAnswerSheetPdf({ hoTen, lop })}
-        className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold"
+        onClick={handleCreatePdf}
+        disabled={busy}
+        className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold disabled:opacity-60"
       >
-        Tạo PDF phiếu trả lời
+        {busy ? 'Đang tạo…' : 'Tạo PDF phiếu trả lời'}
       </button>
 
       <div className="text-sm text-slate-500 space-y-1">
