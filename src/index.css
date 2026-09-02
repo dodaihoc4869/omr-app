@@ -18,3 +18,12 @@ body {
   min-height: 44px;
   min-width: 44px;
 }
+
+/* Công thức Hoá (KaTeX, \ce{...}/$...$) phải NẰM CÙNG DÒNG và ĐÚNG BẰNG cỡ
+ * chữ thường xung quanh — mặc định KaTeX tự đặt .katex{font-size:1.21em},
+ * to hơn hẳn chữ thường 21% nên trông như bị tách dòng/lệch cỡ. Ghi đè về
+ * 1em (bằng chữ cha) để công thức chảy tự nhiên trong câu, !important vì
+ * katex.min.css nạp SAU index.css nên cần thắng ở cùng độ đặc hiệu. */
+.katex {
+  font-size: 1em !important;
+}

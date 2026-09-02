@@ -886,16 +886,16 @@ export default function ExamTakeScreen() {
                       const val = attempt.answers.phanII[item.qid]?.[ideaIdx]
                       const img = item.question.ideaImgs?.[ideaIdx]
                       return (
-                        <div key={ideaIdx} className="rounded-lg border p-2.5 space-y-2" style={{ borderColor: 'var(--ke)', background: 'var(--the)' }}>
-                          <div className="text-sm flex items-start gap-1.5" style={{ color: 'var(--muc)' }}>
+                        <div key={ideaIdx} className="rounded-lg border p-2.5 flex items-center gap-2.5" style={{ borderColor: 'var(--ke)', background: 'var(--the)' }}>
+                          <div className="text-sm flex-1 flex items-start gap-1.5" style={{ color: 'var(--muc)' }}>
                             <b style={{ color: 'var(--nhat)' }}>{'abcd'[ideaIdx]})</b>
                             {img ? <img src={img} alt={`Ý ${'abcd'[ideaIdx]}`} className="max-h-14 w-auto" /> : <ChemText text={idea} />}
                           </div>
-                          <div className="flex gap-1.5">
+                          <div className="flex flex-col gap-1.5 shrink-0 w-20">
                             <button
                               type="button"
                               onClick={() => setPhanII(item.qid, ideaIdx, 'D')}
-                              className="tap-target flex-1 rounded-md text-sm font-bold border-2 py-2"
+                              className="tap-target rounded-md text-sm font-bold border-2 py-1.5"
                               style={{
                                 borderColor: val === 'D' ? 'var(--chon)' : 'var(--ke)',
                                 background: val === 'D' ? 'var(--chon)' : 'var(--the)',
@@ -907,10 +907,10 @@ export default function ExamTakeScreen() {
                             <button
                               type="button"
                               onClick={() => setPhanII(item.qid, ideaIdx, 'S')}
-                              className="tap-target flex-1 rounded-md text-sm font-bold border-2 py-2"
+                              className="tap-target rounded-md text-sm font-bold border-2 py-1.5"
                               style={{
-                                borderColor: val === 'S' ? 'var(--muc)' : 'var(--ke)',
-                                background: val === 'S' ? 'var(--muc)' : 'var(--the)',
+                                borderColor: val === 'S' ? 'var(--gap)' : 'var(--ke)',
+                                background: val === 'S' ? 'var(--gap)' : 'var(--the)',
                                 color: val === 'S' ? '#fff' : 'var(--muc)',
                               }}
                             >
