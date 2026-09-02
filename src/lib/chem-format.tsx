@@ -15,7 +15,16 @@
 //      nghĩa khác nhau tuỳ từng ion cụ thể → KHÔNG đoán bừa, giữ nguyên chữ
 //      thường để tránh hiển thị sai điện tích. Muốn hiển thị đúng, thầy gõ rõ
 //      bằng dấu ^: "SO4^{2-}" hoặc "Fe^3+".
+// 4) Cú pháp chuẩn mhchem/LaTeX (dùng cho công thức đọc lại bằng ảnh, chính
+//    xác tuyệt đối, không suy đoán): "\ce{...}" cho công thức/phương trình
+//    Hoá (vd \ce{Ca^2+}, \ce{H2SO4 + 2NaOH -> Na2SO4 + 2H2O}), "$...$" cho ký
+//    hiệu toán/lý không phải phản ứng Hoá (vd $\Delta_f H^\circ_{298}$,
+//    $E^\circ_{Ni^{2+}/Ni}$). Render bằng KaTeX (nhẹ, nhanh trên điện thoại
+//    hơn MathJax). Công thức lỗi cú pháp -> hiện nguyên văn kèm dấu cảnh báo,
+//    KHÔNG BAO GIỜ để trắng hay làm sập trang (bọc try/catch).
 import type { JSX } from 'react'
+import katex from 'katex'
+import 'katex/contrib/mhchem'
 
 type ChemPart = { t: 'text'; v: string } | { t: 'sub'; v: string } | { t: 'sup'; v: string }
 
@@ -109,15 +118,77 @@ export function parseChemText(raw: string): ChemPart[] {
   return parts
 }
 
-/** Component hiển thị: <ChemText text={item.question.text} /> */
+type Segment = { t: 'ce' | 'math'; latex: string } | { t: 'plain'; text: string }
+
+// Tách "\ce{...}" và "$...$" ra khỏi phần chữ thường xung quanh — phần chữ
+// thường vẫn qua parseChemText (giữ nguyên cách hiển thị cũ, dữ liệu thầy đã
+// gõ trước đây không cần sửa lại tay).
+const CE_OR_MATH_RE = /\\ce\{([^}]*)\}|\$([^$]*)\$/g
+
+export function splitCeSegments(raw: string): Segment[] {
+  const text = raw ?? ''
+  const out: Segment[] = []
+  let last = 0
+  let m: RegExpExecArray | null
+  CE_OR_MATH_RE.lastIndex = 0
+  while ((m = CE_OR_MATH_RE.exec(text))) {
+    if (m.index > last) out.push({ t: 'plain', text: text.slice(last, m.index) })
+    if (m[1] !== undefined) out.push({ t: 'ce', latex: m[1] })
+    else out.push({ t: 'math', latex: m[2] ?? '' })
+    last = m.index + m[0].length
+  }
+  if (last < text.length) out.push({ t: 'plain', text: text.slice(last) })
+  return out
+}
+
+const KATEX_OPTS = { throwOnError: true, strict: false } as const
+
+/** 1 công thức "\ce{...}" hoặc "$...$" render bằng KaTeX. Lỗi cú pháp -> hiện
+ * nguyên văn chuỗi gốc kèm gạch chân đỏ cảnh báo, KHÔNG BAO GIỜ để trắng hay
+ * làm sập trang. */
+function ChemFormula({ t, latex }: { t: 'ce' | 'math'; latex: string }): JSX.Element {
+  try {
+    const html = katex.renderToString(t === 'ce' ? `\\ce{${latex}}` : latex, KATEX_OPTS)
+    // Sơ đồ phản ứng nhiều bước (vd FeS2 ->[..] SO2 ->[..] SO3 ->..) render ra
+    // rất RỘNG và KaTeX không tự xuống dòng — bọc trong span cuộn ngang riêng
+    // để tràn nằm gọn trong khung công thức, không đẩy tràn cả trang (đúng
+    // yêu cầu "công thức không tràn ngang" ở khổ 360px).
+    // eslint-disable-next-line react/no-danger
+    return (
+      <span className="inline-block max-w-full overflow-x-auto align-middle" style={{ verticalAlign: '-0.2em' }}>
+        <span dangerouslySetInnerHTML={{ __html: html }} />
+      </span>
+    )
+  } catch {
+    const goc = t === 'ce' ? `\\ce{${latex}}` : `$${latex}$`
+    return (
+      <span className="underline decoration-wavy decoration-rose-500 text-rose-600" title="Công thức lỗi cú pháp — hiện nguyên văn, thầy tự kiểm tra lại">
+        {goc}
+      </span>
+    )
+  }
+}
+
+/** Component hiển thị: <ChemText text={item.question.text} /> — nhận cả cú
+ * pháp cũ (H2SO4, Na+, SO4^{2-} — tự suy chỉ số dưới/số mũ) LẪN cú pháp mới
+ * chuẩn mhchem (\ce{...}, $...$) trong CÙNG một chuỗi, không cần chuyển đổi
+ * dữ liệu cũ. */
 export function ChemText({ text }: { text: string }): JSX.Element {
-  const parts = parseChemText(text ?? '')
+  const segments = splitCeSegments(text ?? '')
   return (
     <>
-      {parts.map((p, i) => {
-        if (p.t === 'sub') return <sub key={i}>{p.v}</sub>
-        if (p.t === 'sup') return <sup key={i}>{p.v}</sup>
-        return <span key={i}>{p.v}</span>
+      {segments.map((seg, si) => {
+        if (seg.t !== 'plain') return <ChemFormula key={si} t={seg.t} latex={seg.latex} />
+        const parts = parseChemText(seg.text)
+        return (
+          <span key={si}>
+            {parts.map((p, i) => {
+              if (p.t === 'sub') return <sub key={i}>{p.v}</sub>
+              if (p.t === 'sup') return <sup key={i}>{p.v}</sup>
+              return <span key={i}>{p.v}</span>
+            })}
+          </span>
+        )
       })}
     </>
   )

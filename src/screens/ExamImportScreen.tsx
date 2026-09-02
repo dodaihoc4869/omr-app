@@ -9,9 +9,10 @@
 // do; đỏ: CHƯA có đáp án — bắt buộc điền, khoá nút lưu) -> [3] Lưu vào ngân
 // hàng câu hỏi theo từng mã đề, báo số câu trùng với ngân hàng đã có.
 import { useRef, useState, type DragEvent } from 'react'
-import { UploadCloud, Check, AlertTriangle, X as XIcon, Trash2 } from 'lucide-react'
-import { extractTextFromFile, classifyDocx, classifyPdf, type FileKind } from '../lib/exam-file-import'
+import { UploadCloud, Check, AlertTriangle, X as XIcon, Trash2, ImageIcon, Table as TableIcon } from 'lucide-react'
+import { extractTextFromFile, classifyDocx, classifyPdf, renderPdfPageDataUrls, type FileKind } from '../lib/exam-file-import'
 import { buildExamDraft } from '../lib/exam-import-pipeline'
+import { congThucVo } from '../lib/exam-question-split'
 import { validateTeacherSource, type TeacherExamSource, type TeacherMcqQuestion, type TeacherTrueFalseQuestion, type TeacherShortAnswerQuestion } from '../data/examContent'
 import { loadExamSources, saveExamSource } from '../lib/exam-db'
 import { ChemText } from '../lib/chem-format'
@@ -36,6 +37,9 @@ interface FileJob {
   soCauI: number
   soCauII: number
   soCauIII: number
+  /** Ảnh PNG từng trang PDF (150 DPI tương đương, scale 1.5) — để thầy/Claude
+   * đối chiếu trực quan khi sửa câu vàng, KHÔNG dùng để tự động đọc lại. */
+  pageImages?: string[]
 }
 
 type Trangthai = 'xanh' | 'vang' | 'do'
@@ -56,15 +60,27 @@ interface ReviewCau {
   pa: ReviewOption[]
   dapAnDung: string
   canDocAnh: boolean
+  /** Thầy (hoặc Claude đọc ảnh trang PDF) xác nhận câu này đã đọc lại bằng mắt
+   * và đúng — set true thì tắt hẳn cờ "cần liếc" dù văn bản còn trông giống
+   * dấu hiệu vỡ (vd bảng số liệu đã gõ đúng thành hàng/cột thật). KHÔNG tự
+   * động set — chỉ set khi có xác nhận thật, đúng nguyên tắc "đừng tự chuyển
+   * xanh". */
+  daXacNhanBangAnh?: boolean
+  table?: string[][]
+  imageDataUrl?: string
 }
 
+/** Trạng thái tính LẠI trên chữ HIỆN TẠI (không phải cờ tĩnh lúc đọc file) —
+ * để khi thầy/Claude sửa chữ trong ô, thẻ tự gỡ vàng ngay, không cần một cờ
+ * "đã sửa" riêng dễ lệch với nội dung thật. */
 function trangThaiCua(c: ReviewCau): { tt: Trangthai; lyDo: string[] } {
   const lyDo: string[] = []
   if (!c.dapAnDung.trim()) {
     lyDo.push('Chưa có đáp án')
     return { tt: 'do', lyDo }
   }
-  if (c.canDocAnh) lyDo.push('Nghi công thức Hoá bị vỡ khi trích PDF — thầy liếc lại chữ/số')
+  const ngheVo = !c.daXacNhanBangAnh && (congThucVo(c.de) || c.pa.some((p) => congThucVo(p.text)))
+  if (ngheVo) lyDo.push('Nghi công thức/bảng Hoá bị vỡ khi trích PDF — thầy liếc lại chữ/số hoặc đối chiếu ảnh trang gốc')
   if ((c.ten === 'I' || c.ten === 'II') && c.pa.length < 4) lyDo.push(`Chỉ đọc được ${c.pa.length}/4 ${c.ten === 'I' ? 'phương án' : 'ý'}`)
   if (c.pa.some((p) => !p.text.trim())) lyDo.push('Có phương án/ý rỗng')
   if (!c.de.trim()) lyDo.push('Đề bài rỗng')
@@ -95,6 +111,8 @@ export default function ExamImportScreen() {
   const [filter, setFilter] = useState<Trangthai | 'tatca'>('tatca')
   const [saving, setSaving] = useState(false)
   const [dragOver, setDragOver] = useState(false)
+  const [viewerSrc, setViewerSrc] = useState<string | null>(null)
+  const [openGallery, setOpenGallery] = useState<Set<string>>(new Set())
   const inputRef = useRef<HTMLInputElement>(null)
 
   const processFiles = async (files: File[]) => {
@@ -110,6 +128,18 @@ export default function ExamImportScreen() {
         if (kind === 'pdf_scan') {
           setJobs((prev) => prev.map((j) => (j.id === jobId ? { ...j, status: 'loi', kind, error: 'PDF ảnh scan — chưa có lớp chữ, chưa đọc bằng ảnh được (việc sắp tới)' } : j)))
           continue
+        }
+
+        // Render sẵn ảnh trang PDF để đối chiếu trực quan khi sửa câu vàng —
+        // lớp chữ pdftotext chỉ dùng để tách câu/đối chiếu số lượng, KHÔNG
+        // phải nguồn nội dung hiển thị cuối cùng cho công thức/bảng phức tạp.
+        let pageImages: string[] | undefined
+        if (!isDocx) {
+          try {
+            pageImages = await renderPdfPageDataUrls(file, 8, 1.5)
+          } catch {
+            pageImages = undefined
+          }
         }
 
         const draft = buildExamDraft(text)
@@ -132,7 +162,7 @@ export default function ExamImportScreen() {
         const soCauI = draft.phan.find((p) => p.ten === 'I')?.cau.length ?? 0
         const soCauII = draft.phan.find((p) => p.ten === 'II')?.cau.length ?? 0
         const soCauIII = draft.phan.find((p) => p.ten === 'III')?.cau.length ?? 0
-        setJobs((prev) => prev.map((j) => (j.id === jobId ? { ...j, status: 'xong', kind, maDe, soCauI, soCauII, soCauIII } : j)))
+        setJobs((prev) => prev.map((j) => (j.id === jobId ? { ...j, status: 'xong', kind, maDe, soCauI, soCauII, soCauIII, pageImages } : j)))
         // Mặc định mở sẵn thẻ vàng/đỏ, gập thẻ xanh.
         setExpanded((prev) => {
           const next = new Set(prev)
@@ -264,7 +294,7 @@ export default function ExamImportScreen() {
   }
 
   return (
-    <div className="min-h-screen pb-28 px-4 pt-4 space-y-4 bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen pb-40 px-4 pt-4 space-y-4 bg-slate-50 dark:bg-slate-950">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">Tải đề vào ngân hàng câu hỏi</h1>
         <button onClick={() => setScreen('examsetup')} className="text-xs text-slate-500">
@@ -293,23 +323,66 @@ export default function ExamImportScreen() {
 
       {jobs.length > 0 && (
         <div className="space-y-1.5">
-          {jobs.map((j) => (
-            <div key={j.id} className="flex items-center justify-between rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-3 py-2 text-xs">
-              <div className="min-w-0 flex-1">
-                <div className="font-medium truncate">{j.name}</div>
-                {j.status === 'dang_doc' && <div className="text-slate-400">⟳ đang đọc…</div>}
-                {j.status === 'xong' && (
-                  <div className="text-slate-500">
-                    {j.kind && KIND_LABEL[j.kind]} · mã {j.maDe} · câu I{j.soCauI} II{j.soCauII} III{j.soCauIII}
+          {jobs.map((j) => {
+            const dangMoGallery = openGallery.has(j.id)
+            return (
+              <div key={j.id} className="rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-3 py-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium truncate">{j.name}</div>
+                    {j.status === 'dang_doc' && <div className="text-slate-400">⟳ đang đọc…</div>}
+                    {j.status === 'xong' && (
+                      <div className="text-slate-500">
+                        {j.kind && KIND_LABEL[j.kind]} · mã {j.maDe} · câu I{j.soCauI} II{j.soCauII} III{j.soCauIII}
+                      </div>
+                    )}
+                    {j.status === 'loi' && <div className="text-rose-600">✕ {j.error}</div>}
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {j.pageImages && j.pageImages.length > 0 && (
+                      <button
+                        onClick={() =>
+                          setOpenGallery((prev) => {
+                            const next = new Set(prev)
+                            if (next.has(j.id)) next.delete(j.id)
+                            else next.add(j.id)
+                            return next
+                          })
+                        }
+                        className="tap-target ml-2 flex items-center gap-1 text-indigo-600 dark:text-indigo-400"
+                        title="Xem ảnh trang gốc để đối chiếu"
+                      >
+                        <ImageIcon size={15} />
+                        {dangMoGallery ? 'Ẩn ảnh' : `${j.pageImages.length} trang`}
+                      </button>
+                    )}
+                    <button onClick={() => handleRemoveFile(j.id)} className="tap-target ml-1 text-slate-400 hover:text-rose-600">
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                </div>
+                {dangMoGallery && j.pageImages && (
+                  <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+                    {j.pageImages.map((src, i) => (
+                      <button key={i} onClick={() => setViewerSrc(src)} className="tap-target shrink-0">
+                        <img src={src} alt={`Trang ${i + 1}`} className="h-32 w-auto rounded border border-slate-300 dark:border-slate-600" />
+                        <div className="text-center text-[10px] text-slate-400">Trang {i + 1}</div>
+                      </button>
+                    ))}
                   </div>
                 )}
-                {j.status === 'loi' && <div className="text-rose-600">✕ {j.error}</div>}
               </div>
-              <button onClick={() => handleRemoveFile(j.id)} className="tap-target ml-2 text-slate-400 hover:text-rose-600">
-                <Trash2 size={15} />
-              </button>
-            </div>
-          ))}
+            )
+          })}
+        </div>
+      )}
+
+      {viewerSrc && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-2 overflow-auto"
+          onClick={() => setViewerSrc(null)}
+        >
+          <img src={viewerSrc} alt="Trang gốc phóng to" className="max-w-full max-h-full rounded shadow-2xl" />
         </div>
       )}
 
@@ -346,21 +419,25 @@ export default function ExamImportScreen() {
         </div>
       )}
 
-      {/* MÀN HÌNH 3 — LƯU */}
+      {/* MÀN HÌNH 3 — LƯU. Đặt NỔI TRÊN thanh điều hướng dưới (z cao hơn +
+          cách đáy màn hình một khoảng), không phải bottom-0 full-width, để
+          không đè/không bị đè bởi pill "Lớp/Kiểm tra/Phụ huynh". */}
       {cauList.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700">
-          {countDo > 0 && (
-            <div className="text-xs text-rose-600 mb-2 text-center">
-              Còn {countDo} câu chưa có đáp án — bấm vào ô "Chưa có đáp án" trong thẻ đỏ để điền trước khi lưu.
-            </div>
-          )}
-          <button
-            onClick={handleSave}
-            disabled={countDo > 0 || saving}
-            className="tap-target w-full rounded-xl bg-emerald-600 text-white font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {saving ? 'Đang lưu…' : `Lưu ${cauList.length} câu vào ngân hàng câu hỏi`}
-          </button>
+        <div className="fixed left-0 right-0 bottom-[calc(env(safe-area-inset-bottom)+72px)] z-50 px-3">
+          <div className="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-lg p-3">
+            {countDo > 0 && (
+              <div className="text-xs text-rose-600 mb-2 text-center">
+                Còn {countDo} câu chưa có đáp án — bấm vào ô "Chưa có đáp án" trong thẻ đỏ để điền trước khi lưu.
+              </div>
+            )}
+            <button
+              onClick={handleSave}
+              disabled={countDo > 0 || saving}
+              className="tap-target w-full rounded-xl bg-emerald-600 text-white font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {saving ? 'Đang lưu…' : `Lưu ${cauList.length} câu vào ngân hàng câu hỏi`}
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -436,7 +513,8 @@ function CauCard({
       {expanded && (
         <>
           <EditableText value={c.de} onChange={(v) => onUpdate({ de: v })} placeholder="Đề bài" />
-          <QuestionMedia table={undefined} imageDataUrl={undefined} />
+          <QuestionMedia table={c.table} imageDataUrl={c.imageDataUrl} />
+          <TableImageEditor c={c} onUpdate={onUpdate} />
 
           {c.ten === 'I' &&
             (['A', 'B', 'C', 'D'] as const).map((k) => {
@@ -500,6 +578,84 @@ function CauCard({
             </div>
           )}
         </>
+      )}
+    </div>
+  )
+}
+
+/** Thầy/Claude sửa tay bảng số liệu (cú pháp mỗi dòng 1 hàng, cột cách nhau
+ * bằng "|") và ảnh sơ đồ/hình vẽ (dán Ctrl+V hoặc chọn file) — KHÔNG có thuật
+ * toán tự dò bảng từ chữ vỡ, vì lớp chữ PDF đã xé lẻ bảng thành vô nghĩa;
+ * cách chắc ăn là đọc bằng ảnh trang gốc rồi gõ lại đúng cấu trúc. */
+function TableImageEditor({ c, onUpdate }: { c: ReviewCau; onUpdate: (patch: Partial<ReviewCau>) => void }) {
+  const [dangSuaBang, setDangSuaBang] = useState(false)
+  const tableToText = (t?: string[][]) => (t ?? []).map((row) => row.join(' | ')).join('\n')
+  const textToTable = (s: string): string[][] =>
+    s
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0)
+      .map((line) => line.split('|').map((cell) => cell.trim()))
+
+  const onPasteImage = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    const item = Array.from(e.clipboardData.items).find((it) => it.type.startsWith('image/'))
+    if (!item) return
+    const file = item.getAsFile()
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => onUpdate({ imageDataUrl: reader.result as string })
+    reader.readAsDataURL(file)
+  }
+  const onPickImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => onUpdate({ imageDataUrl: reader.result as string })
+    reader.readAsDataURL(file)
+  }
+
+  return (
+    <div className="space-y-1.5" onPaste={onPasteImage} tabIndex={-1}>
+      <div className="flex flex-wrap items-center gap-2 text-[11px]">
+        <button
+          onClick={() => setDangSuaBang((v) => !v)}
+          className="tap-target flex items-center gap-1 rounded-full border border-slate-300 dark:border-slate-600 px-2 text-slate-600 dark:text-slate-300"
+        >
+          <TableIcon size={12} /> {c.table ? 'Sửa bảng' : 'Thêm bảng'}
+        </button>
+        {c.table && (
+          <button onClick={() => onUpdate({ table: undefined })} className="tap-target text-rose-500">
+            Bỏ bảng
+          </button>
+        )}
+        <label className="tap-target flex items-center gap-1 rounded-full border border-slate-300 dark:border-slate-600 px-2 text-slate-600 dark:text-slate-300 cursor-pointer">
+          <ImageIcon size={12} /> {c.imageDataUrl ? 'Đổi ảnh' : 'Thêm ảnh (dán hoặc chọn)'}
+          <input type="file" accept="image/*" className="hidden" onChange={onPickImage} />
+        </label>
+        {c.imageDataUrl && (
+          <button onClick={() => onUpdate({ imageDataUrl: undefined })} className="tap-target text-rose-500">
+            Bỏ ảnh
+          </button>
+        )}
+        {(c.table || c.imageDataUrl) && !c.daXacNhanBangAnh && (
+          <button
+            onClick={() => onUpdate({ daXacNhanBangAnh: true })}
+            className="tap-target flex items-center gap-1 rounded-full border border-emerald-400 text-emerald-700 dark:text-emerald-400 px-2"
+            title="Đã đối chiếu với ảnh trang gốc, đúng — chuyển thẻ này sang chắc chắn"
+          >
+            <Check size={12} /> Đã đối chiếu đúng
+          </button>
+        )}
+      </div>
+      {dangSuaBang && (
+        <textarea
+          className="w-full rounded-md border border-indigo-400 bg-white dark:bg-slate-950 px-2 py-1 text-xs font-mono"
+          rows={3}
+          defaultValue={tableToText(c.table)}
+          placeholder={'Cột cách nhau bằng | , mỗi dòng 1 hàng — hàng đầu là tiêu đề\nvd: Chất | CH4(g) | O2(g)\n\\Delta_f H^\\circ_{298} (kJ/mol) | -74,9 | 0'}
+          onBlur={(e) => onUpdate({ table: textToTable(e.target.value) })}
+        />
       )}
     </div>
   )

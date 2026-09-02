@@ -28,27 +28,61 @@ export interface ParsedPhan {
 }
 
 // Dấu hiệu công thức Hoá bị vỡ khi lớp chữ PDF tách rời chỉ số/điện tích ra
-// khỏi nguyên tố (lỗi rất hay gặp, vd ion Ca2+ bị trích thành "2\nCa +").
+// khỏi nguyên tố (lỗi rất hay gặp, vd ion Ca2+ bị trích thành "2\nCa +"), HOẶC
+// dấu hiệu có BẢNG SỐ LIỆU/SƠ ĐỒ bị xé lẻ thành chữ vô nghĩa — cả hai đều
+// KHÔNG tự sửa được bằng regex, chỉ đánh dấu để đọc lại bằng ảnh trang gốc.
 const DAU_HIEU_VO: RegExp[] = [
   /\d\s+[A-ZĐ][a-zàảãáạâầấậẫẩăằắặẵẳêềếệễểôồốộỗổơờớợỡởưừứựữử]?\s*[+\-−]/, // "2 Ca +"
   /[A-ZĐ][a-zàảãáạâầấậẫẩăằắặẵẳêềếệễểôồốộỗổơờớợỡởưừứựữử]?\s*\d\s*[+\-−]\s/, // "Ca 2 +"
   /[ΔΕ]\s*[HfE]/, // "Δ f H" (nhiệt tạo thành chuẩn, thế điện cực)
   /°/,
   /\s{4,}\S/, // nhiều khoảng trắng liên tiếp chen giữa chữ — dấu hiệu bảng/công thức bị xé lẻ
+  /\d\s\d\s\d/, // "2 2 2 4 2O" — chỉ số/hệ số của sơ đồ phản ứng nhiều bước bị xé rời từng ký tự
+  /(?:[-–−]?\d+,\d+\s+){2,}/, // "0,340 –0,763 –0,440" — dãy số thập phân liên tiếp, dấu hiệu BẢNG bị đọc thành 1 dòng chữ
 ]
 
-function congThucVo(text: string): boolean {
-  return DAU_HIEU_VO.some((re) => re.test(text))
+// Cú pháp mhchem hợp lệ (\ce{...}) hoặc toán/lý ($...$) mà thầy/Claude đã gõ
+// lại đúng chuẩn TỰ NHIÊN chứa đúng hình dạng "chữ + số + khoảng trắng + dấu
+// +/-" (vd "\ce{6nCO2 + 5nH2O ...}") — giống hệt dấu hiệu vỡ ở trên. Phải bỏ
+// các đoạn \ce{}/$...$ ra trước khi dò, chỉ dò phần CHỮ THƯỜNG còn lại, nếu
+// không công thức càng đúng chuẩn càng dễ bị báo vỡ nhầm.
+const CE_OR_MATH_STRIP_RE = /\\ce\{[^}]*\}|\$[^$]*\$/g
+
+/** Xuất ra ngoài để màn Duyệt câu dùng lại — sau khi thầy (hoặc Claude) sửa
+ * chữ, chạy lại đúng phép kiểm tra này trên chữ MỚI để tự gỡ cờ vàng, không
+ * cần một cơ chế đánh dấu "đã sửa" riêng dễ lệch với nội dung thật. */
+export function congThucVo(text: string): boolean {
+  const chuThuong = text.replace(CE_OR_MATH_STRIP_RE, ' ')
+  return DAU_HIEU_VO.some((re) => re.test(chuThuong))
 }
 
 function normSpace(s: string): string {
   return s.replace(/\s+/g, ' ').trim()
 }
 
+// Đầu trang/chân trang PDF (số trang, mã đề lặp lại, khung "Họ tên/Số báo
+// danh") — KHÔNG thuộc nội dung câu hỏi. Không lọc thì câu bị cắt ngang trang
+// (vd câu cuối trang 3) sẽ bị dòng chân trang chen vào GIỮA đề bài, làm hỏng
+// cả phần đề lẫn việc tách phương án phía sau nó.
+const HEADER_FOOTER_LINE_RE = [
+  /^\s*Trang\s+\d+\s*\/\s*\d+.*$/im,
+  /^\s*M[aã]\s*đ[ềe]\s*(?:thi)?\s*:?\s*\d+\s*$/im,
+  /^\s*Họ,?\s*t[êe]n\s*th[íi]\s*sinh.*$/im,
+  /^\s*S[ốo]\s*b[áa]o\s*danh.*$/im,
+]
+
+function stripHeaderFooterLines(text: string): string {
+  return text
+    .split('\n')
+    .filter((line) => !HEADER_FOOTER_LINE_RE.some((re) => re.test(line)))
+    .join('\n')
+}
+
 const PHAN_RE = /^[ \t]*PH[ẦA]N\s+(I{1,3})\b/gim
 
 /** Cắt vùng đề thành các khối PHẦN I/II/III theo đúng thứ tự xuất hiện. */
-export function splitPhan(vungA: string): ParsedPhan[] {
+export function splitPhan(vungAGoc: string): ParsedPhan[] {
+  const vungA = stripHeaderFooterLines(vungAGoc)
   const markers: { index: number; ten: 'I' | 'II' | 'III' }[] = []
   let m: RegExpExecArray | null
   PHAN_RE.lastIndex = 0

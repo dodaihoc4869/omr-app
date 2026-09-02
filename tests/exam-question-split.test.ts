@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { splitPhan } from '../src/lib/exam-question-split'
+import { splitPhan, congThucVo } from '../src/lib/exam-question-split'
 
 describe('splitPhan/splitCau/splitPa (tách câu + phương án, nhiều kiểu trình bày trong 1 file)', () => {
   it('4 phương án viết chung 1 dòng vẫn tách đúng 4 ý', () => {
@@ -76,9 +76,38 @@ describe('splitPhan/splitCau/splitPa (tách câu + phương án, nhiều kiểu 
     expect(c1.canDocAnh).toBe(true)
   })
 
+  it('lọc bỏ dòng chân trang PDF ("Trang X/Y", "Mã đề thi N") chen giữa câu bị cắt ngang trang', () => {
+    const vungA =
+      'PHẦN I.\nCâu 1. Đề bài phần đầu ở cuối trang 3\nTrang 3/4 – Mã đề thi 100\nphần tiếp theo ở đầu trang 4\nA. a B. b C. c D. d'
+    const c1 = splitPhan(vungA)[0].cau[0]
+    expect(c1.de).not.toContain('Trang 3/4')
+    expect(c1.de).toContain('Đề bài phần đầu')
+    expect(c1.de).toContain('phần tiếp theo')
+  })
+
+  it('lọc bỏ dòng "Họ, tên thí sinh" / "Số báo danh" nếu lẫn vào giữa câu', () => {
+    const vungA = 'PHẦN I.\nCâu 1. Đề bài\nHọ, tên thí sinh: ..........\nSố báo danh: ..........\nA. a B. b C. c D. d'
+    const c1 = splitPhan(vungA)[0].cau[0]
+    expect(c1.de).toBe('Đề bài')
+  })
+
   it('câu bình thường không có dấu hiệu vỡ công thức -> canDocAnh false', () => {
     const vungA = 'PHẦN I.\nCâu 1. Chất nào sau đây là acid?\nA. HCl B. NaOH C. NaCl D. KOH'
     const c1 = splitPhan(vungA)[0].cau[0]
     expect(c1.canDocAnh).toBe(false)
+  })
+})
+
+describe('congThucVo — không báo vỡ nhầm cú pháp mhchem ĐÚNG chuẩn đã gõ lại', () => {
+  it('phương trình nhiều bước trong \\ce{...} (có "chữ+số +" tự nhiên) không bị coi là vỡ', () => {
+    expect(congThucVo('\\ce{6nCO2 + 5nH2O ->[as][chlorophyll] (C6H10O5)_n + 6nO2}')).toBe(false)
+  })
+
+  it('ký hiệu $...$ với số thập phân liền nhau không bị coi là vỡ', () => {
+    expect(congThucVo('Biết $E^\\circ_{Pin(Ni-Ag)}$ = 1,06 V; $E^\\circ_{Ni^{2+}/Ni}$ = −0,26 V')).toBe(false)
+  })
+
+  it('chữ thường NGOÀI \\ce{}/$...$ vẫn bị dò đúng nếu thật sự vỡ', () => {
+    expect(congThucVo('bình thường 2 Ca + rồi \\ce{H2SO4}')).toBe(true)
   })
 })

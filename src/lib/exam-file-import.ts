@@ -249,6 +249,30 @@ export async function extractTextFromDocx(file: File): Promise<FileImportResult>
   }
 }
 
+/** Render các trang ĐẦU của PDF thành ảnh PNG (data URL) — để thầy (hoặc
+ * Claude) đối chiếu trực tiếp với chữ đã trích khi sửa những câu bị đánh dấu
+ * "cần liếc" (công thức/bảng bị vỡ khi trích lớp chữ). Giới hạn số trang vì
+ * đề thi thường chỉ 4-6 trang phần đề, phần đáp án/lời giải phía sau không
+ * cần xem ảnh (đã đọc bằng chữ ở exam-answer-key.ts). */
+export async function renderPdfPageDataUrls(file: File, maxPages = 6, scale = 1.5): Promise<string[]> {
+  const buf = await file.arrayBuffer()
+  const doc = await pdfjsLib.getDocument({ data: buf }).promise
+  const urls: string[] = []
+  const n = Math.min(doc.numPages, maxPages)
+  for (let i = 1; i <= n; i++) {
+    const page = await doc.getPage(i)
+    const viewport = page.getViewport({ scale })
+    const canvas = document.createElement('canvas')
+    canvas.width = viewport.width
+    canvas.height = viewport.height
+    const ctx = canvas.getContext('2d')
+    if (!ctx) continue
+    await page.render({ canvasContext: ctx, viewport, canvas }).promise
+    urls.push(canvas.toDataURL('image/png'))
+  }
+  return urls
+}
+
 export async function extractTextFromFile(file: File): Promise<FileImportResult> {
   const name = file.name.toLowerCase()
   if (name.endsWith('.pdf') || file.type === 'application/pdf') return extractTextFromPdf(file)

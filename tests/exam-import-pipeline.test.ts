@@ -62,6 +62,13 @@ describe('buildExamDraft — kiểm chứng đầu-cuối trên đề tham khả
     expect(phanIII.cau.map((c) => c.dapAnDung)).toEqual(['0,8', '3', '6,8', '2', '19,8', '31,0'])
   })
 
+  it('Phần I câu 18: đề bài KHÔNG được dính chân trang "Trang X/Y" (câu bị cắt ngang trang PDF)', () => {
+    const phanI = draft.phan.find((p) => p.ten === 'I')!
+    const c18 = phanI.cau.find((c) => c.so === 18)!
+    expect(c18.de).not.toContain('Trang')
+    expect(c18.de).not.toContain('/4')
+  })
+
   it('không còn câu nào thiếu đáp án', () => {
     expect(draft.thieuDapAn).toEqual([])
   })
