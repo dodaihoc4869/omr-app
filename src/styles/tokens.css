@@ -1,0 +1,84 @@
+/* HỆ THIẾT KẾ TOÀN APP — nguồn sự thật DUY NHẤT cho màu/cỡ chữ/khoảng cách.
+ * Bước 1 trong HETHIETKETOANAPP.md — mọi mã màu/cỡ chữ viết cứng trong các
+ * màn hình sẽ được thay bằng biến ở đây khi áp dụng (bước 3, CHƯA làm ở đây).
+ * KHÔNG theo theme sáng/tối hệ thống — một bộ giá trị cố định cho toàn app,
+ * giống nguyên tắc đã áp cho màn Quét OMR/Làm bài trước đó. */
+:root {
+  /* nền và bề mặt */
+  --nen: #f7f8fa;
+  --the: #ffffff;
+  --the-2: #f3f4f6; /* nền chìm: hàng phương án, ô nhập */
+
+  /* chữ */
+  --muc: #1a2332;
+  --nhat: #6b7280;
+  --mo: #9ca3af;
+
+  /* đường kẻ */
+  --vien: #e5e7eb;
+  --vien-dam: #d1d5db;
+
+  /* trạng thái */
+  --xanh: #10b981;
+  --xanh-nen: #ecfdf5;
+  --do: #ef4444;
+  --do-nen: #fef2f2;
+  --cam: #f59e0b;
+  --cam-nen: #fffbeb;
+  --tim: #6366f1;
+  --tim-nen: #eef2ff;
+
+  /* gradient đầu thẻ — xoay vòng theo số câu (chỉ số modulo 4) */
+  --g1: linear-gradient(135deg, #6366f1, #8b5cf6);
+  --g2: linear-gradient(135deg, #f59e0b, #fbbf24);
+  --g3: linear-gradient(135deg, #3b82f6, #60a5fa);
+  --g4: linear-gradient(135deg, #10b981, #34d399);
+
+  /* chữ: mọi nội dung học thuật (đề bài, phương án, nhận xét, tiêu đề) dùng
+   * --serif; số liệu/đồng hồ/nhãn nút/bảng biểu dùng --sans kèm
+   * font-variant-numeric: tabular-nums */
+  --serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, Georgia, serif;
+  --sans: -apple-system, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+
+  --cx-1: 13px;
+  --cx-2: 15px;
+  --cx-3: 17px;
+  --cx-4: 20px;
+  --cx-5: 24px;
+  --cx-6: 30px;
+
+  /* khoảng cách — bội số 4 */
+  --k1: 4px;
+  --k2: 8px;
+  --k3: 12px;
+  --k4: 16px;
+  --k5: 20px;
+  --k6: 24px;
+  --k7: 32px;
+  --k8: 48px;
+
+  /* bo góc */
+  --bo-1: 10px;
+  --bo-2: 14px;
+  --bo-3: 16px;
+  --bo-tron: 999px;
+
+  /* đổ bóng — CHỈ hai mức, không thêm mức khác */
+  --bong-1: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --bong-2: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+  --nhanh: 120ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Tôn trọng prefers-reduced-motion trên TOÀN APP — tắt hết chuyển động,
+ * không chỉ riêng màn làm bài. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
