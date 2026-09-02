@@ -1,0 +1,59 @@
+{
+  "version": "2025.1",
+  "page": { "width_mm": 210, "height_mm": 297, "dpi": 200, "width_px": 1654, "height_px": 2339 },
+  "anchors": [
+    { "id": "TL", "x_mm": 10, "y_mm": 10, "size_mm": 15 },
+    { "id": "TR", "x_mm": 185, "y_mm": 10, "size_mm": 15 },
+    { "id": "BL", "x_mm": 10, "y_mm": 277, "size_mm": 15 },
+    { "id": "BR", "x_mm": 185, "y_mm": 277, "size_mm": 15 }
+  ],
+  "timingMarks": {
+    "enabled": false,
+    "note": "ĐỂ SAU — chỉ bật khi thực tế đo được cờ giãn giấy vượt 2% số ô; toạ độ sẽ bổ sung khi kích hoạt"
+  },
+  "bubble_diameter_mm": 4,
+  "sbd": {
+    "label": "Số báo danh",
+    "digits": 6,
+    "choices": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+    "origin_mm": { "x": 18, "y": 28 },
+    "pitch_mm": { "x": 9, "y": 6 }
+  },
+  "madeThi": {
+    "label": "Mã đề thi",
+    "digits": 3,
+    "choices": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+    "origin_mm": { "x": 152, "y": 28 },
+    "pitch_mm": { "x": 9, "y": 6 }
+  },
+  "phanI": {
+    "label": "Phần I — Trắc nghiệm nhiều lựa chọn",
+    "questions": 18,
+    "choices": ["A", "B", "C", "D"],
+    "blockCols": 3,
+    "questionsPerBlock": 6,
+    "blockOrigin_mm": { "x": 18, "y": 95 },
+    "blockSpacing_mm": { "x": 63 },
+    "pitch_mm": { "x": 9, "y": 9 }
+  },
+  "phanII": {
+    "label": "Phần II — Đúng / Sai",
+    "questions": 4,
+    "ideas": 4,
+    "choices": ["D", "S"],
+    "origin_mm": { "x": 18, "y": 160 },
+    "questionPitch_mm": 12,
+    "ideaSpacing_mm": 20,
+    "choiceSpacing_mm": 8
+  },
+  "phanIII": {
+    "label": "Phần III — Trả lời ngắn (điền số)",
+    "questions": 6,
+    "cols": 4,
+    "rows": 12,
+    "rowSymbols": ["-", ",", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+    "blockOrigin_mm": { "x": 18, "y": 205 },
+    "blockSpacing_mm": { "x": 29 },
+    "pitch_mm": { "x": 9, "y": 5.5 }
+  }
+}
