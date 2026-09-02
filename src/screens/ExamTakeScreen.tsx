@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
-import { vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendTeacherMessage, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendTeacherMessage, ghiDiem, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { taoBaiGhiDiem } from '../lib/chi-tiet-cau'
 import { gioMayChu, gioNgan } from '../lib/gio-may-chu'
 import { layIdThietBi } from '../lib/thiet-bi'
 import TheCau from '../components/TheCau'
@@ -424,6 +425,64 @@ export default function ExamTakeScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
 
+  // GIÂY LÀM TỪNG CÂU (QUANLYCATHI mục 5): mỗi giây cộng 1 cho câu đang chiếm
+  // nhiều màn hình nhất (IntersectionObserver trên thẻ câu). Không đếm khi màn
+  // bị ẩn. Lưu vào attempt mỗi 10 giây + lúc nộp — mở lại vẫn cộng tiếp.
+  const giayCauRef = useRef<Record<string, number>>({})
+  useEffect(() => {
+    if (phase !== 'exam' || !assignment || flat.length === 0) return
+    giayCauRef.current = { ...(attemptRef.current?.giayCau ?? {}) }
+    const qidCua = (stt: number): string | null => {
+      const f = flat[stt - 1]
+      if (!f) return null
+      const items = f.phan === 'I' ? assignment.phanI : f.phan === 'II' ? assignment.phanII : assignment.phanIII
+      return items[f.i]?.qid ?? null
+    }
+    const tiLe = new Map<number, number>()
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          const stt = Number((e.target as HTMLElement).id.replace('cau-', ''))
+          tiLe.set(stt, e.isIntersecting ? e.intersectionRatio : 0)
+        }
+      },
+      { threshold: [0, 0.25, 0.5, 0.75, 1] },
+    )
+    for (let stt = 1; stt <= flat.length; stt++) {
+      const el = document.getElementById(`cau-${stt}`)
+      if (el) io.observe(el)
+    }
+    const tick = setInterval(() => {
+      if (document.hidden) return
+      let best = 0
+      let bestStt = 0
+      tiLe.forEach((r, stt) => {
+        if (r > best) {
+          best = r
+          bestStt = stt
+        }
+      })
+      if (!bestStt) return
+      const qid = qidCua(bestStt)
+      if (!qid) return
+      giayCauRef.current[qid] = (giayCauRef.current[qid] ?? 0) + 1
+    }, 1000)
+    const luu = setInterval(() => {
+      setAttempt((cur) => {
+        if (!cur || cur.submitted) return cur
+        const next = { ...cur, giayCau: { ...giayCauRef.current } }
+        saveAttempt(next)
+        return next
+      })
+    }, 10000)
+    return () => {
+      io.disconnect()
+      clearInterval(tick)
+      clearInterval(luu)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, assignment])
+
   // RỜI MÀN HÌNH = GIAN LẬN (quy định của thầy, 2026-09-02): chuyển tab / tắt
   // màn hình / mất focus / thoát toàn màn hình DÙ CHỈ MỘT LẦN → khoá bài, tự
   // nộp ngay, ghi nhận gian lận, báo phụ huynh ngay (tin nhắn + trạng thái).
@@ -503,7 +562,7 @@ export default function ExamTakeScreen() {
   }
 
   const doSubmit = async (a: ExamAttempt) => {
-    const updated: ExamAttempt = { ...a, submitted: true, submittedAt: new Date().toISOString(), pendingSubmit: true }
+    const updated: ExamAttempt = { ...a, giayCau: { ...(a.giayCau ?? {}), ...giayCauRef.current }, submitted: true, submittedAt: new Date().toISOString(), pendingSubmit: true }
     setAttempt(updated)
     await saveAttempt(updated)
     setPhase('submitted')
@@ -522,6 +581,13 @@ export default function ExamTakeScreen() {
       setGraded(g)
       if (!done.integrity.blocked) setGradedPopup(true)
       if (scriptUrlRef.current.trim()) {
+        // Ghi điểm + chi tiết từng câu (chuyên đề, mức độ, giây làm) lên máy chủ
+        // — quyền bằng id thiết bị của chính lượt này, không cần mã bí mật.
+        ghiDiem(scriptUrlRef.current.trim(), '', done.maCa, [
+          taoBaiGhiDiem(kb, done.maCa, done.sbd, done.lanThu ?? 1, done.answers, g, done.giayCau, done.idThietBi ?? layIdThietBi()),
+        ]).catch(() => {
+          // máy thầy chấm lại sẽ ghi đè — không chặn luồng
+        })
         sendParentFeedback(
           scriptUrlRef.current.trim(),
           done.sbd,
@@ -579,7 +645,7 @@ export default function ExamTakeScreen() {
   const trySend = async (a: ExamAttempt) => {
     try {
       if (!scriptUrl.trim()) throw new Error('no-script-url')
-      const { keyBank, congBo: cb } = await submitAnswers(scriptUrl.trim(), a.maCa, a.sbd, a.maDe, a.answers, a.integrity, a.lanThu ?? 1, a.idThietBi ?? layIdThietBi())
+      const { keyBank, congBo: cb } = await submitAnswers(scriptUrl.trim(), a.maCa, a.sbd, a.maDe, a.answers, a.integrity, a.lanThu ?? 1, a.idThietBi ?? layIdThietBi(), a.giayCau)
       const done = { ...a, pendingSubmit: false }
       setAttempt(done)
       await saveAttempt(done)
@@ -618,7 +684,7 @@ export default function ExamTakeScreen() {
   const updateAndSave = (mutate: (a: ExamAttempt) => ExamAttempt) => {
     setAttempt((cur) => {
       if (!cur) return cur
-      const next = mutate(cur)
+      const next = { ...mutate(cur), giayCau: { ...giayCauRef.current } }
       saveAttempt(next)
       return next
     })

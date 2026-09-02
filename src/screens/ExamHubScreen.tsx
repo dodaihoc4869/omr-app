@@ -74,7 +74,7 @@ export default function ExamHubScreen() {
         onClick={() => setScreen('examsetup')}
       />
       <TheBam icon={<Library size={22} />} title="Ngân hàng câu hỏi" sub="Đề tự về từ kho · duyệt câu nghi đáp án" onClick={() => setScreen('nganhangde')} />
-      <TheBam icon={<ClipboardList size={22} />} title="Theo dõi & chấm bài" sub="Nhập mã ca để xem ai đã nộp, chấm tự động" onClick={() => setScreen('exammonitor')} />
+      <TheBam icon={<ClipboardList size={22} />} title="Lịch sử ca thi & chấm bài" sub="Mọi ca đã mở, ai đã nộp, điểm, cho thi lại, xuất bảng điểm" onClick={() => setScreen('lichsuca')} />
       <TheBam icon={<Users size={22} />} title="Quản lý đăng ký" sub="Phụ huynh & học sinh đã đăng ký, gửi tin cho 1 em" onClick={() => setScreen('registrationmanager')} />
       <TheBam icon={<Users2 size={22} />} title="Học sinh — Vào thi" sub="Nhập mã ca thầy cho + số báo danh" onClick={() => setScreen('examtake')} />
       <TheBam icon={<GraduationCap size={22} />} title="Học sinh — Hồ sơ & nhắn tin thầy" sub="Đăng ký 1 lần, tự điền SBD lúc vào thi" onClick={() => setScreen('studentprofile')} />

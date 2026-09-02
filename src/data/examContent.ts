@@ -89,6 +89,10 @@ export interface LoiGiaiMeta {
   /** Lời giải có cấu trúc — ưu tiên hiển thị; `explanation` (chuỗi) chỉ còn
    * cho dữ liệu cũ. */
   loiGiai?: LoiGiaiCauTruc
+  /** Chuyên đề + mức độ (QUANLYCATHI mục 5) — ghi vào ChiTietCau để phân tích
+   * hồ sơ từng em về sau. Thiếu thì để trống, không đoán. */
+  chuyenDe?: string
+  mucDo?: 'biet' | 'hieu' | 'van_dung'
 }
 
 export interface TeacherMcqQuestion extends McqQuestion, LoiGiaiMeta {

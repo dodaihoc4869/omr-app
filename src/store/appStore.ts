@@ -14,6 +14,7 @@ export type ScreenId =
   | 'nganhangde'
   | 'examtake'
   | 'exammonitor'
+  | 'lichsuca'
   | 'parent'
   | 'studentprofile'
   | 'registrationmanager'
@@ -35,6 +36,9 @@ export interface ScannedSheet {
 interface AppState {
   screen: ScreenId
   setScreen: (s: ScreenId) => void
+  /** Mã ca đang mở ở màn Chi tiết ca / Theo dõi (đi từ Lịch sử ca thi hoặc ngay sau khi mở ca). */
+  maCaTheoDoi: string
+  moChiTietCa: (maCa: string) => void
 
   sheets: ScannedSheet[]
   addSheet: (sheet: ScannedSheet) => void
@@ -65,6 +69,8 @@ function recomputeScore(answers: StudentAnswers, key: AnswerKey | undefined): Sc
 export const useAppStore = create<AppState>((set) => ({
   screen: 'examhub',
   setScreen: (s) => set({ screen: s }),
+  maCaTheoDoi: '',
+  moChiTietCa: (maCa) => set({ maCaTheoDoi: maCa, screen: 'exammonitor' }),
 
   sheets: [],
   addSheet: (sheet) => set((st) => ({ sheets: [...st.sheets, sheet] })),

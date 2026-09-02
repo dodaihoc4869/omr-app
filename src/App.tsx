@@ -10,6 +10,7 @@ import ExamSetupScreen from './screens/ExamSetupScreen'
 import NganHangDeScreen from './screens/NganHangDeScreen'
 import ExamTakeScreen from './screens/ExamTakeScreen'
 import ExamMonitorScreen from './screens/ExamMonitorScreen'
+import LichSuCaScreen from './screens/LichSuCaScreen'
 import ParentScreen from './screens/ParentScreen'
 import StudentProfileScreen from './screens/StudentProfileScreen'
 import RegistrationManagerScreen from './screens/RegistrationManagerScreen'
@@ -49,6 +50,7 @@ function App() {
       {screen === 'nganhangde' && <NganHangDeScreen />}
       {screen === 'examtake' && <ExamTakeScreen />}
       {screen === 'exammonitor' && <ExamMonitorScreen />}
+      {screen === 'lichsuca' && <LichSuCaScreen />}
       {screen === 'parent' && <ParentScreen />}
       {screen === 'studentprofile' && <StudentProfileScreen />}
       {screen === 'registrationmanager' && <RegistrationManagerScreen />}

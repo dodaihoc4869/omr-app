@@ -80,6 +80,24 @@ export interface KhoDeCau {
   tieu_de?: string
   can_xem?: boolean
   loi_giai?: KhoDeLoiGiai | null
+  /** Chuyên đề (theo chương trình 2018, vd "Este – lipid") — QUANLYCATHI mục 5. Thiếu → không ghi, không đoán. */
+  chuyen_de?: string
+  /** Mức độ: biet | hieu | van_dung (ma trận đề 2025). */
+  muc_do?: MucDo
+}
+
+export type MucDo = 'biet' | 'hieu' | 'van_dung'
+const MUC_DO_HOP_LE = new Set<string>(['biet', 'hieu', 'van_dung'])
+/** Nhận cả cách viết có dấu của pipeline cũ ("Nhận biết", "Thông hiểu", "Vận dụng"). */
+export function chuanHoaMucDo(v: unknown): MucDo | undefined {
+  if (typeof v !== 'string') return undefined
+  const t = v.trim().toLowerCase()
+  if (MUC_DO_HOP_LE.has(t)) return t as MucDo
+  const khongDau = t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd')
+  if (/^(nhan )?biet$/.test(khongDau) || khongDau === 'nb') return 'biet'
+  if (/^(thong )?hieu$/.test(khongDau) || khongDau === 'th') return 'hieu'
+  if (/^van dung( cao)?$/.test(khongDau) || khongDau === 'vd' || khongDau === 'vdc') return 'van_dung'
+  return undefined
 }
 
 export interface KhoDeJson {
@@ -238,6 +256,8 @@ export function parseKhoDeJsonText(raw: string): KhoDeParseResult {
       tieu_de: typeof c.tieu_de === 'string' ? c.tieu_de : undefined,
       can_xem: c.can_xem === true,
       loi_giai: parseLoiGiai(c.loi_giai),
+      chuyen_de: typeof c.chuyen_de === 'string' && c.chuyen_de.trim() ? c.chuyen_de.trim() : undefined,
+      muc_do: chuanHoaMucDo(c.muc_do),
     })
   })
   if (errors.length > 0) return { ok: false, errors }
@@ -292,6 +312,8 @@ export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherE
       loiGiaiTrangThai: lg?.trang_thai,
       dapAnTuGiai: lg?.dap_an_tu_giai,
       ghiChuLoiGiai: lg?.ghi_chu ?? undefined,
+      chuyenDe: c.chuyen_de,
+      mucDo: c.muc_do,
     }
 
     if (c.phan === 'I') {

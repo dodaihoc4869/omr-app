@@ -163,3 +163,39 @@ describe('nhom (thư mục con trong kho-de/moi/)', () => {
     expect(khong.source.nhom).toBeUndefined()
   })
 })
+
+describe('chuyen_de + muc_do (QUANLYCATHI mục 5)', () => {
+  it('đọc chuyên đề, chuẩn hoá mức độ (có dấu / viết tắt / đúng khoá) vào TeacherExamSource', () => {
+    const r = parseKhoDeJsonText(
+      JSON.stringify({
+        ma_de: '200',
+        cau: [
+          { phan: 'I', so: 1, de: 'x', pa: { A: 'a', B: 'b', C: 'c', D: 'd' }, dap_an: 'A', chuyen_de: 'Este – lipid', muc_do: 'Thông hiểu' },
+          { phan: 'I', so: 2, de: 'x', pa: { A: 'a', B: 'b', C: 'c', D: 'd' }, dap_an: 'B', chuyen_de: 'Pin điện', muc_do: 'van_dung' },
+          { phan: 'III', so: 1, de: 'x', dap_an: '1', chuyen_de: '  ', muc_do: 'VDC' },
+          { phan: 'III', so: 2, de: 'x', dap_an: '2' },
+        ],
+      }),
+    )
+    expect(r.ok).toBe(true)
+    const { source } = buildTeacherSourceFromKhoDe(r.json!)
+    expect(source.phanI[0].chuyenDe).toBe('Este – lipid')
+    expect(source.phanI[0].mucDo).toBe('hieu')
+    expect(source.phanI[1].mucDo).toBe('van_dung')
+    // chuyên đề rỗng → không ghi; "VDC" → van_dung (ma trận 2025 chỉ 3 mức)
+    expect(source.phanIII[0].chuyenDe).toBeUndefined()
+    expect(source.phanIII[0].mucDo).toBe('van_dung')
+    // thiếu hoàn toàn → để trống, không đoán
+    expect(source.phanIII[1].chuyenDe).toBeUndefined()
+    expect(source.phanIII[1].mucDo).toBeUndefined()
+  })
+
+  it('chuanHoaMucDo: giá trị lạ → undefined', async () => {
+    const { chuanHoaMucDo } = await import('../src/lib/exam-kho-de-import')
+    expect(chuanHoaMucDo('nhận biết')).toBe('biet')
+    expect(chuanHoaMucDo('NB')).toBe('biet')
+    expect(chuanHoaMucDo('Vận dụng cao')).toBe('van_dung')
+    expect(chuanHoaMucDo('khó')).toBeUndefined()
+    expect(chuanHoaMucDo(3)).toBeUndefined()
+  })
+})

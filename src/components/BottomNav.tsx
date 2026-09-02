@@ -19,6 +19,7 @@ export default function BottomNav() {
     'examsetup',
     'examtake',
     'exammonitor',
+    'lichsuca',
     'studentprofile',
     'registrationmanager',
   ].includes(screen)

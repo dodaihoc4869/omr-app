@@ -40,7 +40,31 @@ async function postJson(scriptUrl: string, body: unknown): Promise<any> {
 // ============================================================================
 
 /** Lý do máy chủ KHÔNG cho vào (xem quyetDinhVaoThi_ trong Apps Script). */
-export type LyDoChan = 'khong_co_ca' | 'da_xoa' | 'da_dong' | 'dang_lam_may_khac' | 'da_nop' | 'chua_mo' | 'het_han_vao' | 'thieu'
+export type LyDoChan =
+  | 'khong_co_ca'
+  | 'da_xoa'
+  | 'da_dong'
+  | 'dang_lam_may_khac'
+  | 'da_nop'
+  | 'chua_mo'
+  | 'het_han_vao'
+  | 'chua_co_ho_so'
+  | 'khong_thuoc_khoi'
+  | 'khong_trong_danh_sach'
+  | 'thieu'
+
+/** Phạm vi gửi ca (QUANLYCATHI mục 4): tu_do = ai có mã đều vào · khoi = theo
+ * năm sinh (hồ sơ HocSinh) · chon = danh sách SBD thầy tích. Máy chủ kiểm tra. */
+export type PhamViCa = 'tu_do' | 'khoi' | 'chon'
+
+/** Khối lớp suy từ năm sinh theo năm học hiện tại (vào lớp 1 lúc 6 tuổi; năm
+ * học mới tính từ tháng 9). 2010 → lớp 11 trong năm học 2026–2027. */
+export function khoiTuNamSinh(namSinh: string | number, now: Date = new Date()): number | null {
+  const ns = Number(namSinh)
+  if (!Number.isFinite(ns) || ns < 1990 || ns > now.getFullYear()) return null
+  const namHoc = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1
+  return namHoc - ns - 5
+}
 
 export type KetQuaVaoThi =
   | {
@@ -55,7 +79,7 @@ export type KetQuaVaoThi =
       hetGioLuc: string
       bank?: PublicExamBank
     }
-  | { ok: false; lyDo: LyDoChan; nopLuc?: string; lanThu?: number; batDau?: string; hetHanVao?: string; error?: string }
+  | { ok: false; lyDo: LyDoChan; nopLuc?: string; lanThu?: number; batDau?: string; hetHanVao?: string; namSinh?: string; error?: string }
 
 /** Xin vào thi: máy chủ kiểm tra (mã ca, SBD, id thiết bị) rồi tạo/khôi phục
  * lượt và trả mốc giờ (vaoLuc, hetGioLuc theo giờ máy chủ). canBank=true khi
@@ -75,7 +99,7 @@ export async function vaoThi(scriptUrl: string, maCa: string, sbd: string, idThi
       bank: r.bank ?? undefined,
     }
   }
-  return { ok: false, lyDo: r.lyDo ?? 'thieu', nopLuc: r.nopLuc, lanThu: r.lanThu, batDau: r.batDau, hetHanVao: r.hetHanVao, error: r.error }
+  return { ok: false, lyDo: r.lyDo ?? 'thieu', nopLuc: r.nopLuc, lanThu: r.lanThu, batDau: r.batDau, hetHanVao: r.hetHanVao, namSinh: r.namSinh, error: r.error }
 }
 
 /** Thông điệp cho học sinh khi bị chặn — nêu rõ lý do + việc cần làm, không vòng vo. */
@@ -95,6 +119,12 @@ export function thongDiepChan(kq: Extract<KetQuaVaoThi, { ok: false }>, gio: (is
       return `Ca thi chưa mở${kq.batDau ? ` — bắt đầu lúc ${gio(kq.batDau)}` : ''}. Đợi đến giờ rồi bấm Vào thi lại.`
     case 'het_han_vao':
       return `Đã quá giờ vào phòng thi${kq.hetHanVao ? ` (hết hạn ${gio(kq.hetHanVao)})` : ''} — mã ca không còn hiệu lực.`
+    case 'chua_co_ho_so':
+      return `Ca này chỉ dành cho khối ${khoiTuNamSinh(kq.namSinh ?? '') ?? '?'} (sinh ${kq.namSinh}) — em chưa đăng ký hồ sơ (năm sinh). Vào mục Hồ sơ đăng ký rồi bấm Vào thi lại.`
+    case 'khong_thuoc_khoi':
+      return `Ca này dành cho khối ${khoiTuNamSinh(kq.namSinh ?? '') ?? '?'} (sinh ${kq.namSinh}). Số báo danh của em không thuộc khối này.`
+    case 'khong_trong_danh_sach':
+      return 'Ca này thầy chỉ mở cho một số em — số báo danh của em không có trong danh sách.'
     default:
       return kq.error || 'Không vào được ca thi.'
   }
@@ -125,6 +155,10 @@ export interface MocThoiGianCa {
   hetHanVao?: string
   /** Số phút sau BẮT ĐẦU (tính theo giờ máy chủ) còn cho vào phòng — ưu tiên hơn hetHanVao. 0/undefined = dùng hetHanVao (rỗng = không giới hạn). */
   hanVaoPhut?: number
+  tenCa?: string
+  /** Phạm vi gửi ca (mục 4). khoi → danhSachMoi = năm sinh (chuỗi) · chon → danhSachMoi = mảng SBD. */
+  phamVi?: PhamViCa
+  danhSachMoi?: string | string[]
 }
 
 export async function publishSession(
@@ -149,6 +183,9 @@ export async function publishSession(
     batDau: moc.batDau || '',
     hetHanVao: moc.hetHanVao || '',
     hanVaoPhut: moc.hanVaoPhut || 0,
+    tenCa: moc.tenCa || '',
+    phamVi: moc.phamVi || 'tu_do',
+    danhSachMoi: moc.phamVi === 'chon' ? (Array.isArray(moc.danhSachMoi) ? moc.danhSachMoi : []) : moc.phamVi === 'khoi' ? String(moc.danhSachMoi ?? '') : '',
   })
   if (!result.ok) throw new Error(result.error || 'Mở ca kiểm tra thất bại')
   return { batDau: String(result.batDau || ''), hetHanVao: String(result.hetHanVao || '') }
@@ -197,8 +234,9 @@ export async function submitAnswers(
   integrity: IntegrityLog,
   lanThu = 1,
   idThietBi = '',
+  giayCau?: Record<string, number>,
 ): Promise<{ keyBank: KeyBank | null; congBo: CongBoDiem }> {
-  const result = await postJson(scriptUrl, { action: 'submit', maCa, sbd, maDe, dapAn, integrity, lanThu, idThietBi })
+  const result = await postJson(scriptUrl, { action: 'submit', maCa, sbd, maDe, dapAn, integrity, lanThu, idThietBi, giayCau })
   if (!result.ok) throw new Error(result.error || 'Nộp bài thất bại')
   return { keyBank: result.keyBank ?? null, congBo: result.congBo ?? (result.keyBank ? 'ngay' : 'khong') }
 }
@@ -220,6 +258,10 @@ export interface SubmissionRow {
   integrity?: IntegrityLog | null
   ghiChu?: string
   duyetBoi?: string
+  /** Giây làm từng câu (qid → giây) em gửi lúc nộp — mục 5. */
+  giayCau?: Record<string, number> | null
+  /** Điểm đã ghi trên máy chủ (ghiDiem / sendFeedback) — null nếu chưa. */
+  tong?: number | null
 }
 
 /** Lượt MỚI NHẤT của mỗi SBD trong ca — mọi trạng thái (đang làm, đã nộp, bị
@@ -579,4 +621,100 @@ export async function luuDe(scriptUrl: string, secret: string, de: unknown): Pro
 export async function xoaDe(scriptUrl: string, secret: string, maDe: string): Promise<void> {
   const r = await postJson(scriptUrl, { action: 'xoaDe', secret, maDe })
   if (!r.ok) throw new Error(r.error || 'Xoá đề thất bại')
+}
+
+// ============================================================================
+// LỊCH SỬ CA THI + CHI TIẾT + XOÁ MỀM + GHI ĐIỂM/CHI TIẾT CÂU (QUANLYCATHI 2, 5)
+// Tất cả cần MA_BI_MAT (máy thầy); ghiDiem chấp nhận thêm idThietBi của chính lượt (máy em).
+// ============================================================================
+
+export interface CaTomTat {
+  maCa: string
+  tenCa: string
+  lop: string
+  thoiGianPhut: number
+  moLuc: string
+  batDau: string
+  hetHanVao: string
+  trangThai: 'mo' | 'dong' | 'da_xoa'
+  phamVi: PhamViCa
+  congBo: CongBoDiem
+  daVao: number
+  daNop: number
+  canhBao: number
+}
+
+export async function danhSachCa(scriptUrl: string, secret: string): Promise<CaTomTat[]> {
+  const r = await postJson(scriptUrl, { action: 'danhSachCa', secret })
+  if (!r.ok) throw new Error(r.error || 'Không lấy được danh sách ca')
+  return (r.items as CaTomTat[]).map((c) => ({ ...c, maCa: String(c.maCa), lop: String(c.lop ?? ''), tenCa: String(c.tenCa ?? '') }))
+}
+
+export interface LuotThiRow {
+  sbd: string
+  hoTen: string
+  lanThu: number
+  trangThai: TrangThaiLuot
+  vaoLuc: string
+  hetGioLuc: string
+  nopLuc: string
+  soLanRoiMan: number
+  tongGiayRoiMan: number
+  diemI: number | null
+  diemII: number | null
+  diemIII: number | null
+  tong: number | null
+  duyetBoi: string
+  duyetLuc: string
+  ghiChu: string
+  dapAn: AnswerRecord | null
+  integrity: IntegrityLog | null
+  giayCau: Record<string, number> | null
+}
+
+export interface ChiTietCa {
+  ca: Omit<CaTomTat, 'daVao' | 'daNop' | 'canhBao'> & { danhSachMoi: string | string[]; nguoiTao: string }
+  luot: LuotThiRow[]
+}
+
+export async function chiTietCa(scriptUrl: string, secret: string, maCa: string): Promise<ChiTietCa> {
+  const r = await postJson(scriptUrl, { action: 'chiTietCa', secret, maCa })
+  if (!r.ok) throw new Error(r.error || 'Không lấy được chi tiết ca')
+  return { ca: { ...r.ca, maCa: String(r.ca.maCa), lop: String(r.ca.lop ?? '') }, luot: (r.luot as LuotThiRow[]).map((l) => ({ ...l, sbd: String(l.sbd), lanThu: Number(l.lanThu) || 1 })) }
+}
+
+/** Xoá MỀM một ca — phải gõ lại đúng mã ca (xacNhan). Bài làm/điểm giữ nguyên trên Sheet. */
+export async function xoaCa(scriptUrl: string, secret: string, maCa: string, xacNhan: string): Promise<void> {
+  const r = await postJson(scriptUrl, { action: 'xoaCa', secret, maCa, xacNhan })
+  if (!r.ok) throw new Error(r.error || 'Không xoá được ca')
+}
+
+/** Một dòng ChiTietCau (mục 5). soCau = số thứ tự em nhìn thấy (1..n trong phần). */
+export interface ChiTietCauRow {
+  phan: 'I' | 'II' | 'III'
+  soCau: number
+  qid: string
+  chuyenDe: string
+  mucDo: string
+  dapAnChon: string
+  dapAnDung: string
+  dungSai: boolean | null
+  giay: number | null
+}
+
+export interface BaiGhiDiem {
+  sbd: string
+  lanThu: number
+  idThietBi?: string
+  diem: { I: number; II: number; III: number; tong: number }
+  cau: ChiTietCauRow[]
+}
+
+/** Ghi điểm + chi tiết từng câu cho nhiều lượt trong 1 lần gọi (máy thầy: secret;
+ * máy em: secret rỗng + idThietBi của lượt). Trả về SBD đã ghi / bị từ chối. */
+export async function ghiDiem(scriptUrl: string, secret: string, maCa: string, bai: BaiGhiDiem[]): Promise<{ daGhi: string[]; tuChoi: string[] }> {
+  if (bai.length === 0) return { daGhi: [], tuChoi: [] }
+  const r = await postJson(scriptUrl, { action: 'ghiDiem', secret, maCa, bai })
+  if (!r.ok) throw new Error(r.error || 'Không ghi được điểm')
+  return { daGhi: r.daGhi ?? [], tuChoi: r.tuChoi ?? [] }
 }

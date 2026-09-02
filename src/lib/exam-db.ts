@@ -46,6 +46,8 @@ export interface ExamAttempt {
   /** Lượt thứ mấy trong ca (thi lại = 2, 3…). Bản cũ không có → 1. */
   lanThu?: number
   idThietBi?: string
+  /** Giây em dừng ở từng câu (qid → giây, cộng dồn theo thẻ câu đang chiếm màn) — QUANLYCATHI mục 5. */
+  giayCau?: Record<string, number>
   answers: AnswerRecord
   integrity: IntegrityLog
   submitted: boolean

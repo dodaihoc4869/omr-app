@@ -7,7 +7,7 @@ import { CheckSquare, Square, Library, Copy, Check } from 'lucide-react'
 import { bankSizeWarning, mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
 import { TheNoiDung, Hang, OThongBao, NutChinh } from '../components/DesignSystem'
 import NutDongBo from '../components/NutDongBo'
-import { publishSession, type CongBoDiem } from '../lib/exam-api'
+import { khoiTuNamSinh, listRegisteredStudents, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
 import { loadExamSources, loadScriptUrl, loadTeacherSecret, saveSessionTeacherBank } from '../lib/exam-db'
 import { dongBoNganHang } from '../lib/exam-sync'
 import { useAppStore } from '../store/appStore'
@@ -101,6 +101,20 @@ function ChipChon({ chon, onClick, children }: { chon: boolean; onClick: () => v
   )
 }
 
+/** Phạm vi gửi ca (QUANLYCATHI mục 4) — máy chủ kiểm tra lúc vào thi, không chỉ ẩn giao diện. */
+const PHAM_VI_CHON: { id: PhamViCa; ten: string; mota: string }[] = [
+  { id: 'tu_do', ten: 'Tự do', mota: 'Ai có mã ca đều vào được — luyện tập, ôn ngoài giờ.' },
+  { id: 'khoi', ten: 'Theo khối', mota: 'Chọn năm sinh; em không đúng khối (theo hồ sơ đã đăng ký) bị chặn.' },
+  { id: 'chon', ten: 'Chọn từng em', mota: 'Tích từng em trong danh sách — thi lại, phụ đạo, kiểm tra riêng nhóm yếu.' },
+]
+
+/** Năm sinh gợi ý: 5 năm quanh khối 10–12 hiện tại. */
+function dsNamSinhGoiY(): string[] {
+  const nam = new Date().getFullYear()
+  const dau = nam - 5 - 12 // khối 12 năm nay
+  return Array.from({ length: 5 }, (_, i) => String(dau - 1 + i))
+}
+
 const CACH_CONG_BO: { id: CongBoDiem; ten: string; mota: string }[] = [
   { id: 'khong', ten: 'Không công bố trên máy em', mota: 'Thầy chấm ở màn Theo dõi rồi gửi nhận xét cho phụ huynh.' },
   { id: 'ngay', ten: 'Ngay sau khi em nộp bài', mota: 'Hiện điểm + câu sai + lời giải trên máy em. Em nộp sớm có thể kể đáp án cho em đang làm.' },
@@ -110,6 +124,7 @@ const CACH_CONG_BO: { id: CongBoDiem; ten: string; mota: string }[] = [
 export default function ExamSetupScreen() {
   const showToast = useAppStore((s) => s.showToast)
   const setScreen = useAppStore((s) => s.setScreen)
+  const moChiTietCa = useAppStore((s) => s.moChiTietCa)
   const classList = useAppStore((s) => s.classList)
 
   const [scriptUrl, setScriptUrl] = useState('')
@@ -126,6 +141,14 @@ export default function ExamSetupScreen() {
   const [batDauLocal, setBatDauLocal] = useState(henGioMacDinh)
   const [hanVaoPhut, setHanVaoPhut] = useState(30)
   const [congBoDiem, setCongBoDiem] = useState<CongBoDiem>('khong')
+  // Tên ca (tuỳ chọn) + phạm vi gửi ca.
+  const [tenCa, setTenCa] = useState('')
+  const [phamVi, setPhamVi] = useState<PhamViCa>('tu_do')
+  const [namSinhKhoi, setNamSinhKhoi] = useState('')
+  const [chonSbd, setChonSbd] = useState<Set<string>>(new Set())
+  const [timTen, setTimTen] = useState('')
+  // Danh sách em để tích: danh sách lớp (Google Sheet) — không có thì lấy hồ sơ đã đăng ký trên máy chủ.
+  const [dsDangKy, setDsDangKy] = useState<{ sbd: string; hoTen: string; lop: string }[] | null>(null)
   const [opening, setOpening] = useState(false)
   const [opened, setOpened] = useState<{ maCa: string; joinLink: string; batDau: string; hetHanVao: string } | null>(null)
   const [daCopy, setDaCopy] = useState(false)
@@ -156,6 +179,27 @@ export default function ExamSetupScreen() {
   // Lớp gợi ý từ danh sách lớp đã nối (Google Sheet) — bấm 1 chạm thay vì gõ.
   const dsLop = useMemo(() => Array.from(new Set(classList.map((r) => r.lop.trim()).filter(Boolean))).sort(), [classList])
 
+  // Nguồn em để "Chọn từng em": danh sách lớp; rỗng thì hồ sơ đã đăng ký (tải khi cần).
+  useEffect(() => {
+    if (phamVi !== 'chon' || classList.length > 0 || dsDangKy !== null || !scriptUrl.trim()) return
+    listRegisteredStudents(scriptUrl.trim())
+      .then((ds) => setDsDangKy(ds.map((d) => ({ sbd: String(d.sbd), hoTen: d.hoTen, lop: d.lop }))))
+      .catch(() => setDsDangKy([]))
+  }, [phamVi, classList.length, dsDangKy, scriptUrl])
+  const dsEmChon = useMemo(() => {
+    const nguon = classList.length > 0 ? classList.map((r) => ({ sbd: r.sbd, hoTen: r.hoTen, lop: r.lop })) : (dsDangKy ?? [])
+    const q = timTen.trim().toLowerCase()
+    const loc = nguon.filter((r) => r.sbd && (!lop.trim() || !r.lop || r.lop.trim() === lop.trim()) && (!q || r.hoTen.toLowerCase().includes(q) || r.sbd.toLowerCase().includes(q)))
+    return loc.sort((a, b) => a.hoTen.localeCompare(b.hoTen, 'vi'))
+  }, [classList, dsDangKy, timTen, lop])
+  const toggleSbd = (sbd: string) =>
+    setChonSbd((prev) => {
+      const next = new Set(prev)
+      if (next.has(sbd)) next.delete(sbd)
+      else next.add(sbd)
+      return next
+    })
+
   const toggleSelect = (maDe: string) => {
     setSelectedMaDe((prev) => {
       const next = new Set(prev)
@@ -185,6 +229,8 @@ export default function ExamSetupScreen() {
     if (selectedSources.length === 0) return showToast('Chưa chọn đề nào cho ca này', 'error')
     if (!lop.trim()) return showToast('Chưa nhập lớp', 'error')
     if (!Number.isFinite(thoiGianPhut) || thoiGianPhut <= 0) return showToast('Thời gian làm bài phải lớn hơn 0', 'error')
+    if (phamVi === 'khoi' && !/^\d{4}$/.test(namSinhKhoi.trim())) return showToast('Chọn năm sinh cho phạm vi theo khối', 'error')
+    if (phamVi === 'chon' && chonSbd.size === 0) return showToast('Chưa tích em nào cho phạm vi chọn từng em', 'error')
     let batDauIso = ''
     if (batDauCach === 'hen') {
       const t = new Date(batDauLocal).getTime()
@@ -198,7 +244,13 @@ export default function ExamSetupScreen() {
       const maCa = randomSessionCode()
       const publicBank = mergeAndStrip(selectedSources)
       const keyBank = congBoDiem === 'khong' ? undefined : mergeKeepAnswers(selectedSources)
-      const moc = await publishSession(scriptUrl.trim(), maCa, lop.trim(), thoiGianPhut, publicBank, congBoDiem, keyBank, { batDau: batDauIso, hanVaoPhut })
+      const moc = await publishSession(scriptUrl.trim(), maCa, lop.trim(), thoiGianPhut, publicBank, congBoDiem, keyBank, {
+        batDau: batDauIso,
+        hanVaoPhut,
+        tenCa: tenCa.trim(),
+        phamVi,
+        danhSachMoi: phamVi === 'khoi' ? namSinhKhoi.trim() : phamVi === 'chon' ? Array.from(chonSbd) : '',
+      })
       // Lưu bản CÓ đáp án trên máy thầy để màn Theo dõi chấm lại được sau này.
       await saveSessionTeacherBank(maCa, selectedSources)
       setOpened({ maCa, joinLink: await taoLinkMoi(maCa, scriptUrl.trim()), batDau: moc.batDau, hetHanVao: moc.hetHanVao })
@@ -236,6 +288,7 @@ export default function ExamSetupScreen() {
           </div>
           <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', opacity: 0.9, marginTop: 'var(--k1)' }}>
             Bắt đầu <b style={SO}>{gioHienThi(opened.batDau) || 'ngay'}</b> · vào phòng đến <b style={SO}>{opened.hetHanVao ? gioHienThi(opened.hetHanVao) : 'không giới hạn'}</b>
+            {phamVi === 'khoi' ? ` · khối ${khoiTuNamSinh(namSinhKhoi) ?? '?'} (sinh ${namSinhKhoi})` : phamVi === 'chon' ? ` · ${chonSbd.size} em được mời` : ' · tự do'}
           </div>
         </div>
         <TheNoiDung>
@@ -249,7 +302,7 @@ export default function ExamSetupScreen() {
             </span>
           </NutChinh>
         </TheNoiDung>
-        <NutChinh variant="phu" onClick={() => setScreen('exammonitor')}>
+        <NutChinh variant="phu" onClick={() => moChiTietCa(opened.maCa)}>
           Theo dõi bài nộp của ca này →
         </NutChinh>
         <button onClick={() => setOpened(null)} className="tap-target" style={NHAN_NHO}>
@@ -376,6 +429,7 @@ export default function ExamSetupScreen() {
       <TheNoiDung>
         <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Lớp & thời gian</div>
         <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
+          <input style={O_NHAP} placeholder="Tên ca (tuỳ chọn, vd Kiểm tra 15 phút — Este)" value={tenCa} onChange={(e) => setTenCa(e.target.value)} aria-label="Tên ca" />
           {dsLop.length > 0 && (
             <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }}>
               {dsLop.map((l) => {
@@ -451,7 +505,84 @@ export default function ExamSetupScreen() {
         </div>
       </TheNoiDung>
 
-      {/* 3. CÔNG BỐ ĐIỂM */}
+      {/* 3. PHẠM VI GỬI CA */}
+      <TheNoiDung>
+        <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Ai được vào ca này</div>
+        <div className="flex flex-col" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Phạm vi gửi ca">
+          {PHAM_VI_CHON.map((p) => {
+            const chon = phamVi === p.id
+            return (
+              <Hang key={p.id} selected={chon} onClick={() => setPhamVi(p.id)} data-trang-thai={chon ? 'chon' : undefined}>
+                <span className="shrink-0 flex items-center justify-center" aria-hidden style={{ width: 20, height: 20, borderRadius: 'var(--bo-tron)', border: `2px solid ${chon ? 'var(--xanh)' : 'var(--vien-dam)'}` }}>
+                  {chon && <span style={{ width: 10, height: 10, borderRadius: 'var(--bo-tron)', background: 'var(--xanh)' }} />}
+                </span>
+                <span className="flex-1 min-w-0">
+                  <div className="font-bold" style={{ fontSize: 'var(--cx-2)' }}>
+                    {p.ten}
+                  </div>
+                  <div style={NHAN_NHO}>{p.mota}</div>
+                </span>
+              </Hang>
+            )
+          })}
+        </div>
+        {phamVi === 'khoi' && (
+          <div style={{ marginTop: 'var(--k3)' }}>
+            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Năm sinh của khối</div>
+            <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Năm sinh">
+              {dsNamSinhGoiY().map((ns) => (
+                <ChipChon key={ns} chon={namSinhKhoi === ns} onClick={() => setNamSinhKhoi(ns)}>
+                  {ns} → khối {khoiTuNamSinh(ns) ?? '?'}
+                </ChipChon>
+              ))}
+              <input style={{ ...O_NHAP, width: 120, ...SO }} placeholder="Năm khác" value={dsNamSinhGoiY().includes(namSinhKhoi) ? '' : namSinhKhoi} onChange={(e) => setNamSinhKhoi(e.target.value.replace(/\D/g, '').slice(0, 4))} inputMode="numeric" aria-label="Năm sinh khác" />
+            </div>
+            <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>Em chưa đăng ký hồ sơ (năm sinh) sẽ bị chặn kèm hướng dẫn đăng ký rồi vào lại.</div>
+          </div>
+        )}
+        {phamVi === 'chon' && (
+          <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
+            <div className="flex items-center justify-between" style={NHAN_NHO}>
+              <span>
+                Đã tích <b style={{ ...SO, color: 'var(--muc)' }}>{chonSbd.size}</b> em{classList.length === 0 ? ' (nguồn: hồ sơ đã đăng ký)' : ''}
+              </span>
+              {chonSbd.size > 0 && (
+                <button type="button" onClick={() => setChonSbd(new Set())} className="tap-target">
+                  Bỏ chọn
+                </button>
+              )}
+            </div>
+            <input style={O_NHAP} placeholder="Tìm theo tên hoặc SBD…" value={timTen} onChange={(e) => setTimTen(e.target.value)} inputMode="search" aria-label="Tìm học sinh" />
+            {dsEmChon.length === 0 ? (
+              <OThongBao tone="cam">{classList.length === 0 && dsDangKy === null ? 'Đang tải danh sách…' : 'Không có em nào — nối danh sách lớp (tab Lớp) hoặc để em đăng ký hồ sơ.'}</OThongBao>
+            ) : (
+              <div className="flex flex-col overflow-y-auto" style={{ gap: 'var(--k2)', maxHeight: 320 }}>
+                {dsEmChon.map((r) => {
+                  const chon = chonSbd.has(r.sbd)
+                  return (
+                    <Hang key={r.sbd} selected={chon} onClick={() => toggleSbd(r.sbd)} data-trang-thai={chon ? 'chon' : undefined}>
+                      <span className="shrink-0" style={{ color: chon ? 'var(--xanh)' : 'var(--mo)' }}>
+                        {chon ? <CheckSquare size={20} /> : <Square size={20} />}
+                      </span>
+                      <span className="flex-1 min-w-0">
+                        <div className="font-bold truncate" style={{ fontSize: 'var(--cx-2)' }}>
+                          {r.hoTen || '(chưa có tên)'}
+                        </div>
+                        <div style={NHAN_NHO}>
+                          SBD <span style={SO}>{r.sbd}</span>
+                          {r.lop ? ` · ${r.lop}` : ''}
+                        </div>
+                      </span>
+                    </Hang>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )}
+      </TheNoiDung>
+
+      {/* 4. CÔNG BỐ ĐIỂM */}
       <TheNoiDung>
         <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Công bố điểm cho học sinh</div>
         <div className="flex flex-col" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Cách công bố điểm">

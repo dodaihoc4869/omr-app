@@ -7,19 +7,21 @@ import gsCode from '../docs/apps-script-kiem-tra.gs?raw'
 type QD = { ok: true; cach: 'moi' | 'khoi_phuc' | 'duyet_lai' } | { ok: false; lyDo: string; nopLuc?: string; lanThu?: number; batDau?: string; hetHanVao?: string }
 interface Gs {
   quyetDinhVaoThi_: (
-    ca: { trangThai: string; batDau: string; hetHanVao: string; thoiGianPhut: number },
+    ca: { trangThai: string; batDau: string; hetHanVao: string; thoiGianPhut: number; phamVi?: string; danhSachMoi?: string },
     luot: { trangThai: string; idThietBi: string; lanThu: number; nopLuc: string } | null,
     idThietBi: string,
     nowMs: number,
+    hocSinh?: { sbd: string; namSinh: string },
   ) => QD
   msCua_: (iso: string) => number
   LUOT_HEADERS: string[]
   CA_HEADERS: string[]
+  CHITIET_HEADERS: string[]
 }
 
 // File chỉ khai báo const + function ở cấp cao nhất (không gọi Google API lúc
 // nạp) nên đưa vào Function là chạy được; các hàm hoist nên lấy ra được.
-const gs: Gs = new Function(`${gsCode}\nreturn { quyetDinhVaoThi_, msCua_, LUOT_HEADERS, CA_HEADERS }`)()
+const gs: Gs = new Function(`${gsCode}\nreturn { quyetDinhVaoThi_, msCua_, LUOT_HEADERS, CA_HEADERS, CHITIET_HEADERS }`)()
 
 const T0 = Date.parse('2026-09-03T07:00:00Z') // 14:00 VN
 const caMo = { trangThai: 'mo', batDau: '2026-09-03T07:00:00Z', hetHanVao: '2026-09-03T07:30:00Z', thoiGianPhut: 45 }
@@ -82,8 +84,42 @@ describe('Apps Script quyetDinhVaoThi_ — một SBD một lượt', () => {
     expect(gs.LUOT_HEADERS[17]).toBe('DuyetBoi')
     expect(gs.LUOT_HEADERS[19]).toBe('GhiChu')
     expect(gs.LUOT_HEADERS[20]).toBe('CapNhatLuc')
-    expect(gs.LUOT_HEADERS).toHaveLength(21)
+    expect(gs.LUOT_HEADERS[21]).toBe('GiayCauJson')
+    expect(gs.LUOT_HEADERS).toHaveLength(22)
     expect(gs.CA_HEADERS.slice(0, 7)).toEqual(['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson'])
     expect(gs.CA_HEADERS.slice(7, 10)).toEqual(['BatDau', 'HetHanVao', 'TrangThai'])
+    expect(gs.CA_HEADERS.slice(10, 15)).toEqual(['TenCa', 'PhamVi', 'DanhSachMoi', 'NguoiTao', 'XoaLuc'])
+  })
+
+  it('kiểm chứng 12: bảng ChiTietCau có đủ cột chuyên đề, mức độ, giây làm câu', () => {
+    expect(gs.CHITIET_HEADERS).toEqual(['MaCa', 'SBD', 'LanThu', 'Phan', 'SoCau', 'Qid', 'ChuyenDe', 'MucDo', 'DapAnChon', 'DapAnDung', 'DungSai', 'GiayLamCau', 'GhiLuc'])
+  })
+})
+
+describe('Apps Script quyetDinhVaoThi_ — phạm vi gửi ca (mục 4)', () => {
+  const caKhoi = { ...caMo, phamVi: 'khoi', danhSachMoi: '2010' }
+  const caChon = { ...caMo, phamVi: 'chon', danhSachMoi: JSON.stringify(['HS01', 'HS02']) }
+
+  it('kiểm chứng 8: theo khối — đúng năm sinh vào được, khác khối bị chặn kèm năm sinh của ca', () => {
+    expect(gs.quyetDinhVaoThi_(caKhoi, null, 'may-A', T0 + 60_000, { sbd: 'HS01', namSinh: '2010' })).toEqual({ ok: true, cach: 'moi' })
+    expect(gs.quyetDinhVaoThi_(caKhoi, null, 'may-A', T0 + 60_000, { sbd: 'HS01', namSinh: '2009' })).toEqual({ ok: false, lyDo: 'khong_thuoc_khoi', namSinh: '2010' })
+  })
+
+  it('theo khối — chưa đăng ký hồ sơ (không có năm sinh) → chặn với lý do riêng', () => {
+    expect(gs.quyetDinhVaoThi_(caKhoi, null, 'may-A', T0 + 60_000, { sbd: 'HS01', namSinh: '' })).toEqual({ ok: false, lyDo: 'chua_co_ho_so', namSinh: '2010' })
+  })
+
+  it('chọn từng em — có trong danh sách vào được, không có bị chặn', () => {
+    expect(gs.quyetDinhVaoThi_(caChon, null, 'may-A', T0 + 60_000, { sbd: 'HS02', namSinh: '' })).toEqual({ ok: true, cach: 'moi' })
+    expect(gs.quyetDinhVaoThi_(caChon, null, 'may-A', T0 + 60_000, { sbd: 'HS09', namSinh: '' })).toEqual({ ok: false, lyDo: 'khong_trong_danh_sach' })
+  })
+
+  it('phạm vi KHÔNG chặn em đang làm dở mở lại cùng máy (khôi phục) — đã được vào rồi', () => {
+    const luot = { trangThai: 'dang_lam', idThietBi: 'may-A', lanThu: 1, nopLuc: '' }
+    expect(gs.quyetDinhVaoThi_(caChon, luot, 'may-A', T0 + 60_000, { sbd: 'HS09', namSinh: '' })).toEqual({ ok: true, cach: 'khoi_phuc' })
+  })
+
+  it('tự do — ai cũng vào được, kể cả chưa có hồ sơ', () => {
+    expect(gs.quyetDinhVaoThi_({ ...caMo, phamVi: 'tu_do' }, null, 'may-A', T0 + 60_000, { sbd: 'X', namSinh: '' })).toEqual({ ok: true, cach: 'moi' })
   })
 })
