@@ -25,8 +25,16 @@ export interface McqQuestion extends QuestionMedia {
   text: string
   choices: [string, string, string, string] // ứng A,B,C,D theo thứ tự GỐC (chưa xáo)
 }
+/** Lời giải & tiêu đề ngắn (chủ đề) — CHỈ đi kèm dữ liệu CÓ đáp án (Teacher*),
+ * không bao giờ vào PublicExamBank (mergeAndStrip không chọn 2 trường này) —
+ * học sinh chỉ thấy sau khi nộp bài, qua đúng cơ chế keyBank đã có sẵn cho
+ * "xem điểm ngay", không mở thêm đường lộ đề mới. Cả hai đều TUỲ CHỌN — nhiều
+ * đề tải từ file gốc (đề thi thật) không có sẵn lời giải, thầy gõ thêm sau
+ * nếu muốn học sinh xem lại. */
 export interface TeacherMcqQuestion extends McqQuestion {
   correct: 'A' | 'B' | 'C' | 'D'
+  explanation?: string
+  tieuDe?: string
 }
 
 export interface TrueFalseQuestion extends QuestionMedia {
@@ -36,6 +44,8 @@ export interface TrueFalseQuestion extends QuestionMedia {
 }
 export interface TeacherTrueFalseQuestion extends TrueFalseQuestion {
   correct: ['D' | 'S', 'D' | 'S', 'D' | 'S', 'D' | 'S']
+  explanation?: string
+  tieuDe?: string
 }
 
 export interface ShortAnswerQuestion extends QuestionMedia {
@@ -44,6 +54,8 @@ export interface ShortAnswerQuestion extends QuestionMedia {
 }
 export interface TeacherShortAnswerQuestion extends ShortAnswerQuestion {
   correct: string
+  explanation?: string
+  tieuDe?: string
 }
 
 export interface PublicExamBank {

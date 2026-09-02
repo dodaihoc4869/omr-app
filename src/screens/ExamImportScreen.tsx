@@ -68,6 +68,11 @@ interface ReviewCau {
   daXacNhanBangAnh?: boolean
   table?: string[][]
   imageDataUrl?: string
+  /** Tuỳ chọn — chỉ hiện cho học sinh SAU khi nộp bài (qua keyBank), không
+   * lộ đề trước giờ thi. Nhiều đề tải từ file gốc không có sẵn, để trống
+   * cũng lưu được bình thường. */
+  explanation?: string
+  tieuDe?: string
 }
 
 /** Trạng thái tính LẠI trên chữ HIỆN TẠI (không phải cờ tĩnh lúc đọc file) —
@@ -248,6 +253,10 @@ export default function ExamImportScreen() {
             text: c.de,
             choices: ['A', 'B', 'C', 'D'].map((k) => c.pa.find((p) => p.key === k)?.text ?? '') as [string, string, string, string],
             correct: (c.dapAnDung as 'A' | 'B' | 'C' | 'D') || 'A',
+            table: c.table,
+            imageDataUrl: c.imageDataUrl,
+            explanation: c.explanation,
+            tieuDe: c.tieuDe,
           }))
         const phanII: TeacherTrueFalseQuestion[] = cau
           .filter((c) => c.ten === 'II')
@@ -257,11 +266,23 @@ export default function ExamImportScreen() {
             text: c.de,
             ideas: ['A', 'B', 'C', 'D'].map((k) => c.pa.find((p) => p.key === k)?.text ?? '') as [string, string, string, string],
             correct: [0, 1, 2, 3].map((idx) => (c.dapAnDung[idx] === 'Đ' ? 'D' : 'S')) as ['D' | 'S', 'D' | 'S', 'D' | 'S', 'D' | 'S'],
+            table: c.table,
+            imageDataUrl: c.imageDataUrl,
+            explanation: c.explanation,
+            tieuDe: c.tieuDe,
           }))
         const phanIII: TeacherShortAnswerQuestion[] = cau
           .filter((c) => c.ten === 'III')
           .sort((a, b) => a.so - b.so)
-          .map((c, i) => ({ id: `${maDe}-p3-${i}`, text: c.de, correct: c.dapAnDung }))
+          .map((c, i) => ({
+            id: `${maDe}-p3-${i}`,
+            text: c.de,
+            correct: c.dapAnDung,
+            table: c.table,
+            imageDataUrl: c.imageDataUrl,
+            explanation: c.explanation,
+            tieuDe: c.tieuDe,
+          }))
 
         for (const q of [...phanI, ...phanII, ...phanIII]) {
           tongCau += 1
@@ -609,6 +630,21 @@ function CauCard({
               />
             </div>
           )}
+
+          {/* Tuỳ chọn — chỉ học sinh xem SAU khi nộp bài (màn Xem lại lời
+              giải), không lộ đề trước giờ thi. Nhiều đề thi thật không có
+              sẵn, để trống vẫn lưu bình thường. */}
+          <div className="pt-1 border-t border-dashed border-slate-200 dark:border-slate-700 space-y-1">
+            <div className="text-[11px] text-slate-400">Tuỳ chọn — học sinh chỉ xem SAU khi nộp bài:</div>
+            <div>
+              <span className="text-[11px] text-slate-400 mr-1">Tiêu đề ngắn (chủ đề):</span>
+              <EditableText value={c.tieuDe ?? ''} onChange={(v) => onUpdate({ tieuDe: v })} placeholder="vd Ăn mòn kim loại (để trống nếu không cần)" />
+            </div>
+            <div>
+              <span className="text-[11px] text-slate-400 mr-1">Lời giải:</span>
+              <EditableText value={c.explanation ?? ''} onChange={(v) => onUpdate({ explanation: v })} placeholder="Giải thích ngắn gọn (để trống nếu chưa có)" />
+            </div>
+          </div>
         </>
       )}
     </div>

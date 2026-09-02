@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
-import { fetchSession, submitAnswers, pushExamStatus, sendParentFeedback } from '../lib/exam-api'
+import { fetchSession, submitAnswers, pushExamStatus, sendParentFeedback, type KeyBank } from '../lib/exam-api'
 import { ChemText } from '../lib/chem-format'
 import QuestionMedia from '../components/QuestionMedia'
-import { TriangleAlert, X } from 'lucide-react'
+import { SolutionMcq, SolutionTrueFalse, SolutionShortAnswer } from '../components/SolutionCard'
+import { TriangleAlert, X, ArrowLeft } from 'lucide-react'
 import { classify } from '../engine/score'
 import { gradeFromKeyBank, type GradedSubmission } from '../lib/exam-grade'
 import {
@@ -57,6 +58,11 @@ export default function ExamTakeScreen() {
     attemptRef.current = attempt
   }, [attempt])
   const [gradedPopup, setGradedPopup] = useState<GradedSubmission | null>(null)
+  // Lưu lại keyBank (CÓ đáp án + lời giải) nhận được lúc nộp bài — để màn
+  // "Xem lại lời giải" mở lại được bất cứ lúc nào trong phiên này mà không
+  // cần gọi mạng lại. Chỉ tồn tại khi thầy bật "xem điểm ngay" cho ca này.
+  const [keyBank, setKeyBank] = useState<KeyBank | null>(null)
+  const [xemLoiGiai, setXemLoiGiai] = useState(false)
 
   // Refs để hàm chạy trong effect/listener luôn đọc được giá trị MỚI NHẤT
   // (tránh closure cũ), dùng cho việc đẩy trạng thái làm bài lên cho phụ huynh.
@@ -88,6 +94,14 @@ export default function ExamTakeScreen() {
     if (!bank || !maCa || !sbd) return null
     return assignStudentQuestions(bank, maCa.trim(), sbd.trim())
   }, [bank, maCa, sbd])
+
+  // Bộ câu ĐẦY ĐỦ (kèm đáp án đúng + lời giải) dùng riêng cho màn "Xem lại
+  // lời giải" — assignStudentQuestions tái tạo LẠI ĐÚNG cùng bộ câu vì cùng
+  // seed (maCa+sbd), chỉ khác nguồn có đáp án (keyBank) thay vì bank công khai.
+  const solutionAssignment: StudentAssignment | null = useMemo(() => {
+    if (!keyBank || !attempt) return null
+    return assignStudentQuestions(keyBank, attempt.maCa, attempt.sbd)
+  }, [keyBank, attempt])
   useEffect(() => {
     totalCountRef.current = assignment ? assignment.phanI.length + assignment.phanII.length + assignment.phanIII.length : 0
   }, [assignment])
@@ -265,6 +279,7 @@ export default function ExamTakeScreen() {
       // engine chấm chuẩn, không phải ước lượng. Không hiện nếu bài bị khoá
       // do nghi gian lận (màn khoá đã đủ nghiêm rồi).
       if (keyBank) {
+        setKeyBank(keyBank)
         try {
           const graded = gradeFromKeyBank(keyBank, done.maCa, done.sbd, done.answers)
           // Chỉ hiện popup điểm ngay TRÊN MÁY EM nếu bài không bị khoá (màn khoá
@@ -376,6 +391,99 @@ export default function ExamTakeScreen() {
     )
   }
 
+  if (phase === 'submitted' && xemLoiGiai && solutionAssignment && attempt) {
+    let stt = 0
+    return (
+      <div className="min-h-screen pb-10 px-4 pt-4 space-y-3 bg-slate-50 dark:bg-slate-950">
+        <div className="sticky top-0 z-30 -mx-4 px-4 py-2.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 flex items-center gap-2">
+          <button onClick={() => setXemLoiGiai(false)} className="tap-target shrink-0 flex items-center gap-1 text-sm font-semibold text-indigo-600 dark:text-indigo-400">
+            <ArrowLeft size={16} /> Quay lại
+          </button>
+          <div className="font-bold text-sm">Xem lại lời giải</div>
+        </div>
+
+        <section className="space-y-2.5">
+          <h2 className="font-bold text-indigo-700 dark:text-indigo-400 text-sm">
+            Phần I — Trắc nghiệm ({solutionAssignment.phanI.length} câu)
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {solutionAssignment.phanI.map((item) => {
+              stt += 1
+              const q = item.question as import('../data/examContent').TeacherMcqQuestion
+              return (
+                <SolutionMcq
+                  key={item.qid}
+                  mauIdx={stt - 1}
+                  soThuTu={stt}
+                  tieuDe={q.tieuDe}
+                  text={q.text}
+                  table={q.table}
+                  imageDataUrl={q.imageDataUrl}
+                  choices={q.choices}
+                  choicePerm={item.choicePerm}
+                  correct={q.correct}
+                  selected={(attempt.answers.phanI[item.qid] as 'A' | 'B' | 'C' | 'D' | undefined) ?? null}
+                  explanation={q.explanation}
+                />
+              )
+            })}
+          </div>
+        </section>
+
+        <section className="space-y-2.5">
+          <h2 className="font-bold text-indigo-700 dark:text-indigo-400 text-sm">
+            Phần II — Đúng / Sai ({solutionAssignment.phanII.length} câu)
+          </h2>
+          {solutionAssignment.phanII.map((item) => {
+            stt += 1
+            const q = item.question as import('../data/examContent').TeacherTrueFalseQuestion
+            return (
+              <SolutionTrueFalse
+                key={item.qid}
+                mauIdx={stt - 1}
+                soThuTu={stt}
+                tieuDe={q.tieuDe}
+                text={q.text}
+                table={q.table}
+                imageDataUrl={q.imageDataUrl}
+                ideas={q.ideas}
+                correct={q.correct}
+                selected={attempt.answers.phanII[item.qid] ?? [null, null, null, null]}
+                explanation={q.explanation}
+              />
+            )
+          })}
+        </section>
+
+        <section className="space-y-2.5">
+          <h2 className="font-bold text-indigo-700 dark:text-indigo-400 text-sm">
+            Phần III — Trả lời ngắn ({solutionAssignment.phanIII.length} câu)
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {solutionAssignment.phanIII.map((item) => {
+              stt += 1
+              const q = item.question as import('../data/examContent').TeacherShortAnswerQuestion
+              return (
+                <SolutionShortAnswer
+                  key={item.qid}
+                  mauIdx={stt - 1}
+                  soThuTu={stt}
+                  tieuDe={q.tieuDe}
+                  text={q.text}
+                  table={q.table}
+                  imageDataUrl={q.imageDataUrl}
+                  correct={q.correct}
+                  selected={attempt.answers.phanIII[item.qid] ?? null}
+                  explanation={q.explanation}
+                />
+              )
+            })}
+          </div>
+        </section>
+      </div>
+    )
+  }
+
   if (phase === 'submitted') {
     if (attempt?.integrity.blocked) {
       return (
@@ -402,6 +510,15 @@ export default function ExamTakeScreen() {
           </div>
         )}
         {!attempt?.pendingSubmit && <div className="text-sm text-slate-500">Bài đã gửi lên hệ thống thành công.</div>}
+
+        {keyBank && solutionAssignment && (
+          <button
+            onClick={() => setXemLoiGiai(true)}
+            className="tap-target rounded-xl bg-indigo-600 text-white font-semibold px-5"
+          >
+            Xem lại lời giải
+          </button>
+        )}
 
         {gradedPopup && (
           <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm px-4 py-6">
@@ -464,10 +581,21 @@ export default function ExamTakeScreen() {
                 )}
               </div>
 
-              <div className="px-5 pb-5">
+              <div className="px-5 pb-5 space-y-2">
+                {solutionAssignment && (
+                  <button
+                    onClick={() => {
+                      setGradedPopup(null)
+                      setXemLoiGiai(true)
+                    }}
+                    className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold"
+                  >
+                    Xem lại lời giải
+                  </button>
+                )}
                 <button
                   onClick={() => setGradedPopup(null)}
-                  className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold"
+                  className={`tap-target w-full rounded-xl font-semibold ${solutionAssignment ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' : 'bg-indigo-600 text-white'}`}
                 >
                   Đóng
                 </button>
