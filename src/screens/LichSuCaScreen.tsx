@@ -45,7 +45,6 @@ function ngayGio(iso: string): string {
 }
 
 export default function LichSuCaScreen() {
-  const showToast = useAppStore((s) => s.showToast)
   const setScreen = useAppStore((s) => s.setScreen)
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
 
