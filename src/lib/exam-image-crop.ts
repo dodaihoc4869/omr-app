@@ -58,7 +58,18 @@ export function groupWordsIntoLines(words: WordBox[]): Line[] {
       }
     }
   }
-  for (const l of lines) l.words.sort((a, b) => a.x0 - b.x0)
+  for (const l of lines) {
+    l.words.sort((a, b) => a.x0 - b.x0)
+    // Chừa biên phải mỗi từ KHÔNG được lấn sang từ kế tiếp cùng dòng — công
+    // thức quy đổi bề rộng chữ từ pdf.js chỉ là XẤP XỈ, có thể hơi rộng hơn
+    // thật. Không kẹp lại thì khi nhiều phương án nằm CHUNG 1 dòng (vd "A.
+    // (a) và (c).   B. (a) và (d).   C. ...   D. ..."), vùng cắt của A sẽ
+    // "tràn" chụp luôn cả B/C/D phía sau — cắt ảnh phương án dính nhau đúng
+    // điều cấm kỵ nhất của yêu cầu này.
+    for (let j = 0; j < l.words.length - 1; j++) {
+      if (l.words[j].x1 > l.words[j + 1].x0) l.words[j].x1 = l.words[j + 1].x0
+    }
+  }
   return lines
 }
 
