@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { TriangleAlert } from 'lucide-react'
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
 import { listSubmissions, type SubmissionRow } from '../lib/exam-api'
 import { loadScriptUrl, loadSessionTeacherBank } from '../lib/exam-db'
@@ -18,6 +19,7 @@ interface GradedRow {
   studentAnswers: StudentAnswers | null
   leaveCount: number
   totalHiddenSec: number
+  blocked: boolean
 }
 
 export default function ExamMonitorScreen() {
@@ -47,6 +49,7 @@ export default function ExamMonitorScreen() {
       studentAnswers: graded?.studentAnswers ?? null,
       leaveCount: s.integrity?.leaveCount ?? 0,
       totalHiddenSec: Math.round((s.integrity?.totalHiddenMs ?? 0) / 1000),
+      blocked: s.integrity?.blocked ?? false,
     }
   }
 
@@ -141,18 +144,31 @@ export default function ExamMonitorScreen() {
                   <th className="p-2 text-right">Điểm</th>
                   <th className="p-2 text-left">Xếp loại</th>
                   <th className="p-2 text-right">Rời app</th>
+                  <th className="p-2 text-left">Nghi vấn</th>
                 </tr>
               </thead>
               <tbody>
                 {rows.map((r) => (
-                  <tr key={r.sbd} className="border-t border-slate-100 dark:border-slate-800">
+                  <tr
+                    key={r.sbd}
+                    className={`border-t border-slate-100 dark:border-slate-800 ${r.blocked ? 'bg-rose-50 dark:bg-rose-950/40' : ''}`}
+                  >
                     <td className="p-2">{r.sbd}</td>
                     <td className="p-2">{r.hoTen || '(không khớp danh sách lớp)'}</td>
                     <td className="p-2">{new Date(r.thoiGianNop).toLocaleTimeString('vi-VN')}</td>
                     <td className="p-2 text-right font-semibold">{r.score ? r.score.total.toFixed(2) : '—'}</td>
                     <td className="p-2">{r.score ? classify(r.score.total) : ''}</td>
-                    <td className={`p-2 text-right ${r.leaveCount > 2 ? 'text-rose-600 font-semibold' : ''}`}>
+                    <td className={`p-2 text-right ${r.leaveCount >= 2 ? 'text-rose-600 font-semibold' : ''}`}>
                       {r.leaveCount > 0 ? `${r.leaveCount} lần / ${r.totalHiddenSec}s` : '—'}
+                    </td>
+                    <td className="p-2">
+                      {r.blocked ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5">
+                          <TriangleAlert size={11} /> Nghi gian lận
+                        </span>
+                      ) : (
+                        '—'
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -161,7 +177,8 @@ export default function ExamMonitorScreen() {
           </div>
           <p className="text-xs text-slate-400">
             Cột "Rời app" đếm số lần &amp; tổng thời gian học sinh chuyển tab/tắt màn hình lúc làm bài — không phát
-            hiện được chụp ảnh màn hình (không trình duyệt nào cho phép web làm việc này), chỉ để thầy tham khảo thêm.
+            hiện được chụp ảnh màn hình (không trình duyệt nào cho phép web làm việc này), chỉ để thầy tham khảo
+            thêm. "Nghi gian lận" là bài bị hệ thống tự khoá + tự nộp do rời màn hình từ 2 lần trở lên.
           </p>
 
           <div className="flex gap-2">

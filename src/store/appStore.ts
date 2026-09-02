@@ -7,17 +7,7 @@ import type { AnswerKey, StudentAnswers } from '../engine/score'
 import { isReviewFlag, scoreStudent, type ScoreResult } from '../engine/score'
 import type { ClassListRow } from '../lib/sheet-gviz'
 
-export type ScreenId =
-  | 'scan'
-  | 'review'
-  | 'answerkey'
-  | 'results'
-  | 'print'
-  | 'classlist'
-  | 'examhub'
-  | 'examsetup'
-  | 'examtake'
-  | 'exammonitor'
+export type ScreenId = 'classlist' | 'examhub' | 'examsetup' | 'examtake' | 'exammonitor'
 
 export interface ScannedSheet {
   id: string
@@ -64,7 +54,7 @@ function recomputeScore(answers: StudentAnswers, key: AnswerKey | undefined): Sc
 }
 
 export const useAppStore = create<AppState>((set) => ({
-  screen: 'scan',
+  screen: 'examhub',
   setScreen: (s) => set({ screen: s }),
 
   sheets: [],

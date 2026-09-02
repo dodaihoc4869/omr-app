@@ -47,6 +47,12 @@ export default function ExamTakeScreen() {
   const leaveCountRef = useRef(0)
   const [leaveWarning, setLeaveWarning] = useState<{ count: number; sec: number } | null>(null)
   const leaveWarningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Luôn phản ánh giá trị attempt MỚI NHẤT (kể cả đáp án em vừa chọn) — để sự
+  // kiện rời màn hình không vô tình ghi đè lại đáp án bằng bản cũ.
+  const attemptRef = useRef<ExamAttempt | null>(null)
+  useEffect(() => {
+    attemptRef.current = attempt
+  }, [attempt])
 
   // Đọc link mời (?examCode=...&api=...) — học sinh mở link chỉ cần gõ SBD.
   useEffect(() => {
@@ -126,35 +132,43 @@ export default function ExamTakeScreen() {
 
   // Ghi lại việc rời app (chuyển tab / tắt màn hình / mất focus) trong lúc làm bài — KHÔNG
   // thể phát hiện chụp ảnh màn hình bằng JavaScript (không trình duyệt nào cho phép), đây là
-  // tín hiệu gần nhất có thể đo được để thầy tham khảo.
+  // tín hiệu gần nhất có thể đo được để thầy tham khảo. Rời màn hình LẦN 2 trở lên: khoá bài,
+  // tự nộp ngay lập tức, đánh dấu nghi gian lận — chặn ngay lúc rời (không đợi quay lại), vì
+  // học sinh có thể không quay lại nữa (đóng tab).
   useEffect(() => {
     if (phase !== 'exam') return
     const logEvent = (type: 'hidden' | 'visible' | 'blur' | 'focus') => {
-      setAttempt((cur) => {
-        if (!cur) return cur
-        const events = [...cur.integrity.events, { type, at: new Date().toISOString() }].slice(-200)
-        let leaveCount = cur.integrity.leaveCount
-        let totalHiddenMs = cur.integrity.totalHiddenMs
-        if (type === 'hidden' || type === 'blur') {
-          if (hiddenSinceRef.current === null) {
-            hiddenSinceRef.current = Date.now()
-            leaveCount += 1
-            leaveCountRef.current = leaveCount
-          }
-        } else if (hiddenSinceRef.current !== null) {
-          const awaySec = Math.max(1, Math.round((Date.now() - hiddenSinceRef.current) / 1000))
-          totalHiddenMs += Date.now() - hiddenSinceRef.current
-          hiddenSinceRef.current = null
-          // Cảnh báo nghiêm khắc ngay khi em quay lại màn hình — thấy ngay lúc
-          // đó mới có tác dụng răn đe, báo sau khi nộp bài thì vô nghĩa.
-          if (leaveWarningTimerRef.current) clearTimeout(leaveWarningTimerRef.current)
-          setLeaveWarning({ count: leaveCountRef.current, sec: awaySec })
-          leaveWarningTimerRef.current = setTimeout(() => setLeaveWarning(null), 8000)
+      const cur = attemptRef.current
+      if (!cur || cur.submitted) return
+      const events = [...cur.integrity.events, { type, at: new Date().toISOString() }].slice(-200)
+      let leaveCount = cur.integrity.leaveCount
+      let totalHiddenMs = cur.integrity.totalHiddenMs
+      let blockNow = false
+      if (type === 'hidden' || type === 'blur') {
+        if (hiddenSinceRef.current === null) {
+          hiddenSinceRef.current = Date.now()
+          leaveCount += 1
+          leaveCountRef.current = leaveCount
+          if (leaveCount >= 2) blockNow = true
         }
-        const next = { ...cur, integrity: { leaveCount, totalHiddenMs, events } }
-        saveAttempt(next)
-        return next
-      })
+      } else if (hiddenSinceRef.current !== null) {
+        const awaySec = Math.max(1, Math.round((Date.now() - hiddenSinceRef.current) / 1000))
+        totalHiddenMs += Date.now() - hiddenSinceRef.current
+        hiddenSinceRef.current = null
+        // Cảnh báo nghiêm khắc ngay khi em quay lại màn hình — thấy ngay lúc
+        // đó mới có tác dụng răn đe, báo sau khi nộp bài thì vô nghĩa.
+        if (leaveWarningTimerRef.current) clearTimeout(leaveWarningTimerRef.current)
+        setLeaveWarning({ count: leaveCountRef.current, sec: awaySec })
+        leaveWarningTimerRef.current = setTimeout(() => setLeaveWarning(null), 10000)
+      }
+      const next: ExamAttempt = {
+        ...cur,
+        integrity: { leaveCount, totalHiddenMs, events, blocked: cur.integrity.blocked || blockNow },
+      }
+      attemptRef.current = next
+      setAttempt(next)
+      saveAttempt(next)
+      if (blockNow) doSubmit(next)
     }
     const onVis = () => logEvent(document.hidden ? 'hidden' : 'visible')
     const onBlur = () => logEvent('blur')
@@ -168,6 +182,7 @@ export default function ExamTakeScreen() {
       window.removeEventListener('focus', onFocus)
       if (leaveWarningTimerRef.current) clearTimeout(leaveWarningTimerRef.current)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
 
   const doSubmit = async (a: ExamAttempt) => {
@@ -275,6 +290,21 @@ export default function ExamTakeScreen() {
   }
 
   if (phase === 'submitted') {
+    if (attempt?.integrity.blocked) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center gap-3 px-6 text-center bg-rose-50 dark:bg-rose-950">
+          <TriangleAlert size={40} className="text-rose-600" />
+          <div className="text-lg font-bold text-rose-700 dark:text-rose-300">BÀI THI ĐÃ BỊ KHOÁ</div>
+          <div className="text-sm text-rose-700 dark:text-rose-300 leading-relaxed">
+            Em đã rời màn hình làm bài từ <b>2 lần trở lên</b>. Theo quy định, bài thi tự động nộp và được đánh dấu{' '}
+            <b>nghi vấn gian lận</b> để thầy xem xét, có thể kèm báo phụ huynh.
+          </div>
+          {attempt?.pendingSubmit && (
+            <div className="text-xs text-amber-700 dark:text-amber-400">Đang gửi lên hệ thống… đừng tắt trình duyệt.</div>
+          )}
+        </div>
+      )
+    }
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-3 px-4 text-center">
         <div className="text-3xl">✅</div>
@@ -307,9 +337,9 @@ export default function ExamTakeScreen() {
           <div className="bg-rose-600 text-white rounded-lg px-3 py-2.5 shadow-lg flex items-start gap-2 animate-[pulse_1.2s_ease-in-out_2]">
             <TriangleAlert size={20} className="shrink-0 mt-0.5" />
             <div className="text-sm leading-snug">
-              <b>Thầy đã ghi lại: em vừa rời khỏi màn hình làm bài</b> (lần {leaveWarning.count}, {leaveWarning.sec}{' '}
-              giây). Đây sẽ là căn cứ khi thầy xem xét bài thi — tập trung làm bài, không chuyển màn hình/mở app
-              khác.
+              <b>Em vừa rời khỏi màn hình làm bài</b> (lần {leaveWarning.count}, {leaveWarning.sec} giây). Thầy đã ghi
+              lại — hành vi này sẽ đưa vào báo cáo gửi phụ huynh khi thầy xem xét bài thi.{' '}
+              <b>Nếu em rời màn hình thêm một lần nữa, bài thi sẽ tự động NỘP NGAY và bị đánh dấu nghi vấn gian lận.</b>
             </div>
             <button onClick={() => setLeaveWarning(null)} className="shrink-0 text-white/80 hover:text-white text-lg leading-none px-1">
               ×
