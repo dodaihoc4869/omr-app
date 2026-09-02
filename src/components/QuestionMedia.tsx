@@ -3,16 +3,22 @@
 // Chữ trong từng ô (tiêu đề cột lẫn số liệu) được đưa qua ChemText để chỉ số
 // dưới/số mũ (vd nồng độ "10^-3", cột "C_M") hiển thị đúng như trong câu hỏi
 // — không chỉ phần đề bài mới đẹp, bảng đi kèm cũng phải đẹp tương tự.
+import { useState } from 'react'
 import type { QuestionMedia as QuestionMediaData } from '../data/examContent'
 import { ChemText } from '../lib/chem-format'
 
+// Bảng số liệu và ảnh hình vẽ/sơ đồ PHẢI luôn hiện ngay dưới đề bài liên
+// quan — không giấu sau nút bấm nào, học sinh không hiểu đề nếu phải bấm
+// thêm mới thấy. Ảnh bấm được để phóng to toàn màn hình (đối chiếu số liệu
+// dễ hơn trên điện thoại màn nhỏ); bảng chữ tối thiểu 13px, không co nhỏ hơn.
 export default function QuestionMedia({ table, imageDataUrl }: QuestionMediaData) {
+  const [phongTo, setPhongTo] = useState(false)
   if (!table && !imageDataUrl) return null
   return (
     <div className="space-y-2 mt-1">
       {table && table.length > 0 && (
         <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
-          <table className="w-full text-xs border-collapse">
+          <table className="w-full text-[13px] border-collapse">
             <thead className="bg-slate-100 dark:bg-slate-800">
               <tr>
                 {table[0].map((cell, i) => (
@@ -45,11 +51,23 @@ export default function QuestionMedia({ table, imageDataUrl }: QuestionMediaData
         </div>
       )}
       {imageDataUrl && (
-        <img
-          src={imageDataUrl}
-          alt="Đồ thị / hình vẽ đính kèm"
-          className="max-w-full rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm"
-        />
+        <>
+          <button type="button" onClick={() => setPhongTo(true)} className="tap-target block w-full" title="Bấm để phóng to toàn màn hình">
+            <img
+              src={imageDataUrl}
+              alt="Đồ thị / hình vẽ đính kèm"
+              className="w-full rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm"
+            />
+          </button>
+          {phongTo && (
+            <div
+              className="fixed inset-0 z-[70] bg-black/85 flex items-center justify-center p-2 overflow-auto"
+              onClick={() => setPhongTo(false)}
+            >
+              <img src={imageDataUrl} alt="Đồ thị / hình vẽ phóng to" className="max-w-full max-h-full rounded shadow-2xl" />
+            </div>
+          )}
+        </>
       )}
     </div>
   )

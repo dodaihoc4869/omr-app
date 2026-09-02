@@ -267,7 +267,7 @@ export async function renderPdfPageDataUrls(file: File, maxPages = 6, scale = 1.
     canvas.height = viewport.height
     const ctx = canvas.getContext('2d')
     if (!ctx) continue
-    await page.render({ canvasContext: ctx, viewport, canvas }).promise
+    await page.render({ canvasContext: ctx, viewport }).promise
     urls.push(canvas.toDataURL('image/png'))
   }
   return urls

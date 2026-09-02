@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type ChangeEvent, type ClipboardEvent, type DragEvent } from 'react'
-import { ImagePlus, Trash2 } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ClipboardEvent, type DragEvent } from 'react'
+import { ImagePlus, Trash2, Search, CheckSquare, Square, FolderUp, ChevronDown, ChevronUp } from 'lucide-react'
 import { bankSizeWarning, mergeAndStrip, mergeKeepAnswers, validateTeacherSource, type TeacherExamSource } from '../data/examContent'
 import { publishSession } from '../lib/exam-api'
 import QuestionMedia from '../components/QuestionMedia'
@@ -52,6 +52,9 @@ export default function ExamSetupScreen() {
   const [imageMap, setImageMap] = useState<Record<string, string>>({})
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const [timKiemMaDe, setTimKiemMaDe] = useState('')
+  const [moNhapThuCong, setMoNhapThuCong] = useState(false)
 
   const [lop, setLop] = useState('')
   const [thoiGianPhut, setThoiGianPhut] = useState(45)
@@ -197,6 +200,21 @@ export default function ExamSetupScreen() {
   const selectedSources = savedSources.filter((c) => selectedMaDe.has(c.maDe))
   const sizeWarning = selectedSources.length > 0 ? bankSizeWarning(selectedSources) : null
 
+  const dsDeLoc = useMemo(() => {
+    const q = timKiemMaDe.trim().toLowerCase()
+    if (!q) return savedSources
+    return savedSources.filter((c) => c.maDe.toLowerCase().includes(q))
+  }, [savedSources, timKiemMaDe])
+
+  const tongCauDaChon = selectedSources.reduce((s, c) => s + c.phanI.length + c.phanII.length + c.phanIII.length, 0)
+
+  const chonTatCa = () => setSelectedMaDe(new Set(dsDeLoc.map((c) => c.maDe)))
+  const boChonTatCa = () => setSelectedMaDe((prev) => {
+    const next = new Set(prev)
+    for (const c of dsDeLoc) next.delete(c.maDe)
+    return next
+  })
+
   const handleOpenSession = async () => {
     if (!scriptUrl.trim()) return showToast('Chưa nhập link Apps Script', 'error')
     if (!lop.trim()) return showToast('Chưa nhập lớp', 'error')
@@ -279,118 +297,210 @@ export default function ExamSetupScreen() {
       </section>
 
       <section className="space-y-2">
-        <h2 className="font-semibold text-sm">2. Nhập thủ công (chỉ dùng khi tự soạn đề mới, chưa có file)</h2>
-        <p className="text-xs text-slate-500">
-          Có sẵn file .pdf/.docx? Dùng màn "Tải đề vào ngân hàng câu hỏi" ở trang chính — thầy chỉ cần thả file, app tự
-          đọc câu/đáp án. Mục này chỉ dành cho khi thầy tự gõ đề mới từ đầu.
-        </p>
-        <p className="text-xs text-slate-500">
-          Mỗi lần dán 1 đề. Đúng định dạng: dòng đầu "MÃ ĐỀ: ...", "PHẦN I" (mỗi câu A. B. C. D., đặt <b>*</b> trước lựa
-          chọn ĐÚNG), "PHẦN II" (mỗi ý ghi thêm (Đ) hoặc (S)), "PHẦN III" (dòng cuối "=&gt; đáp án"). Số câu mỗi phần
-          KHÔNG cần đúng 18/4/6 — càng nhiều đề, mỗi học sinh càng ít trùng câu với nhau.
-        </p>
-        <p className="text-xs text-slate-500">
-          Công thức Hoá: gõ số bình thường ngay sau chữ, app tự hiển thị chỉ số dưới (vd "H2SO4" →{' '}
-          <ChemText text="H2SO4" />, "Fe2O3" → <ChemText text="Fe2O3" />). Điện tích đơn giản gõ liền dấu +/- (vd
-          "Na+" → <ChemText text="Na+" />). Điện tích phức tạp (có cả số + dấu, vd ion SO4 2-) gõ rõ bằng dấu ^ để
-          khỏi sai: "SO4^{'{2-}'}" → <ChemText text={'SO4^{2-}'} />. Mũi tên phản ứng gõ "-&gt;" hoặc "&lt;=&gt;" sẽ
-          tự thành → hoặc ⇌.
-        </p>
-        <p className="text-xs text-slate-500">
-          Bảng số liệu (tái tạo đúng 100%, không suy đoán): đặt giữa <code>[BANG]</code> và <code>[/BANG]</code>, mỗi
-          dòng 1 hàng, cột cách nhau bằng "|" — hàng đầu là tiêu đề cột. Đồ thị/hình vẽ: đặt con trỏ vào đúng chỗ cần
-          chèn rồi <b>dán ảnh (Ctrl+V)</b> hoặc kéo-thả file ảnh vào ô soạn đề — app tự động đính kèm ngay, không cần
-          bấm thêm gì. Hiển thị lại y nguyên ảnh gốc cho học sinh, không có tính năng vẽ lại đồ thị bằng AI vì không
-          đảm bảo đúng số liệu.
-        </p>
-        <textarea
-          ref={textareaRef}
-          className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 text-xs font-mono"
-          rows={10}
-          placeholder={SAMPLE_TEXT}
-          value={draftText}
-          onChange={(e) => setDraftText(e.target.value)}
-          onPaste={handlePasteImage}
-          onDrop={handleDropImage}
-          onDragOver={(e) => e.preventDefault()}
-        />
-        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAttachImage} />
-        <div className="flex gap-2">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-sm">2. Chọn đề từ ngân hàng câu hỏi cho ca này</h2>
           <button
-            onClick={() => fileInputRef.current?.click()}
-            className="tap-target flex-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-sm font-semibold flex items-center justify-center gap-1.5"
+            onClick={() => setScreen('examimport')}
+            className="tap-target flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 font-medium"
           >
-            <ImagePlus size={16} /> Chọn file ảnh
-          </button>
-          <button onClick={handleParse} className="tap-target flex-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-sm font-semibold">
-            Phân tích đề
-          </button>
-          <button
-            onClick={() => {
-              if (draftText.trim() && !confirm('Xoá hết bản nháp đề đang soạn? Không thể hoàn tác.')) return
-              handleClearDraft()
-            }}
-            disabled={!draftText.trim()}
-            className="tap-target rounded-lg bg-rose-50 dark:bg-rose-950 border border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-400 text-sm font-semibold flex items-center justify-center gap-1.5 px-3 disabled:opacity-40"
-            title="Xoá bản nháp đề đang soạn (vd tải nhầm file)"
-          >
-            <Trash2 size={16} /> Xoá đề
+            <FolderUp size={14} /> Tải thêm đề
           </button>
         </div>
-        {parseErrors.length > 0 && (
-          <div className="rounded-lg bg-rose-50 dark:bg-rose-950 border border-rose-300 dark:border-rose-800 p-3 text-xs text-rose-700 dark:text-rose-300 space-y-1">
-            {parseErrors.map((e, i) => (
-              <div key={i}>• {e}</div>
-            ))}
-          </div>
-        )}
-        {parseWarnings.length > 0 && (
-          <div className="rounded-lg bg-amber-50 dark:bg-amber-950 border border-amber-300 dark:border-amber-800 p-3 text-xs text-amber-700 dark:text-amber-300 space-y-1">
-            {parseWarnings.map((w, i) => (
-              <div key={i}>• {w}</div>
-            ))}
-          </div>
-        )}
-        {parsedPreview && parseErrors.length === 0 && (
-          <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-800 p-3 text-xs text-emerald-700 dark:text-emerald-300 space-y-2">
-            <div>
-              "{parsedPreview.maDe}": {parsedPreview.phanI.length} câu Phần I, {parsedPreview.phanII.length} câu Phần
-              II, {parsedPreview.phanIII.length} câu Phần III.
-            </div>
-            {parsedPreview.phanI[0] && (
-              <div className="rounded-md bg-white/70 dark:bg-slate-900/50 px-2 py-1.5">
-                Câu 1 Phần I (xem thử hiển thị): <ChemText text={parsedPreview.phanI[0].text} /> — đáp án đúng:{' '}
-                <b>{parsedPreview.phanI[0].correct}</b>
-                <QuestionMedia table={parsedPreview.phanI[0].table} imageDataUrl={parsedPreview.phanI[0].imageDataUrl} />
-              </div>
-            )}
-            <button onClick={handleSaveContent} className="tap-target w-full rounded-lg bg-emerald-600 text-white font-semibold">
-              Lưu vào ngân hàng câu hỏi
+
+        {savedSources.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-slate-300 dark:border-slate-600 p-4 text-center space-y-2">
+            <p className="text-xs text-slate-500">Ngân hàng câu hỏi chưa có đề nào.</p>
+            <button
+              onClick={() => setScreen('examimport')}
+              className="tap-target inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold px-4"
+            >
+              <FolderUp size={16} /> Thả file đề (.pdf/.docx) vào ngân hàng
             </button>
           </div>
+        ) : (
+          <>
+            <div className="relative">
+              <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 pl-8 pr-3 text-sm"
+                placeholder="Tìm theo mã đề…"
+                value={timKiemMaDe}
+                onChange={(e) => setTimKiemMaDe(e.target.value)}
+              />
+            </div>
+
+            <div className="flex items-center gap-3 text-xs">
+              <button onClick={chonTatCa} className="tap-target flex items-center gap-1 text-indigo-600 dark:text-indigo-400 font-medium">
+                <CheckSquare size={14} /> Chọn tất cả
+              </button>
+              <button onClick={boChonTatCa} className="tap-target flex items-center gap-1 text-slate-500">
+                <Square size={14} /> Bỏ chọn hết
+              </button>
+              {dsDeLoc.length !== savedSources.length && (
+                <span className="text-slate-400">({dsDeLoc.length}/{savedSources.length} đề khớp tìm kiếm)</span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {dsDeLoc.map((c) => {
+                const dangChon = selectedMaDe.has(c.maDe)
+                const tongCau = c.phanI.length + c.phanII.length + c.phanIII.length
+                return (
+                  <button
+                    key={c.maDe}
+                    onClick={() => toggleSelect(c.maDe)}
+                    className={`tap-target text-left rounded-xl border-2 p-3 transition-colors ${
+                      dangChon
+                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950'
+                        : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="font-semibold text-sm truncate flex items-center gap-1.5">
+                          {dangChon ? (
+                            <CheckSquare size={15} className="shrink-0 text-indigo-600" />
+                          ) : (
+                            <Square size={15} className="shrink-0 text-slate-300" />
+                          )}
+                          Mã {c.maDe}
+                        </div>
+                        <div className="text-xs text-slate-500 mt-0.5">
+                          Phần I {c.phanI.length} · Phần II {c.phanII.length} · Phần III {c.phanIII.length} · tổng {tongCau} câu
+                        </div>
+                      </div>
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (confirm(`Xoá đề "${c.maDe}" khỏi ngân hàng câu hỏi? Không thể hoàn tác.`)) handleDeleteContent(c.maDe)
+                        }}
+                        className="tap-target shrink-0 text-slate-300 hover:text-rose-600"
+                        title="Xoá đề này khỏi ngân hàng"
+                      >
+                        <Trash2 size={14} />
+                      </span>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+
+            {selectedSources.length > 0 && (
+              <div className="rounded-lg bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 px-3 py-2 text-xs text-indigo-700 dark:text-indigo-300">
+                Đã chọn {selectedSources.length} đề · {tongCauDaChon} câu gộp vào ngân hàng câu hỏi của ca này.
+              </div>
+            )}
+            {sizeWarning && (
+              <div className="rounded-lg bg-amber-50 dark:bg-amber-950 border border-amber-300 dark:border-amber-800 p-3 text-xs text-amber-700 dark:text-amber-300">
+                {sizeWarning}
+              </div>
+            )}
+          </>
         )}
       </section>
 
       <section className="space-y-2">
-        <h2 className="font-semibold text-sm">3. Chọn (các) đề gộp thành ngân hàng cho ca này</h2>
-        {savedSources.length === 0 && <p className="text-xs text-slate-500">Chưa có đề nào đã lưu.</p>}
-        {savedSources.map((c) => (
-          <label
-            key={c.maDe}
-            className="tap-target flex items-center justify-between rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3"
-          >
-            <span className="flex items-center gap-2">
-              <input type="checkbox" checked={selectedMaDe.has(c.maDe)} onChange={() => toggleSelect(c.maDe)} />
-              {c.maDe} ({c.phanI.length}+{c.phanII.length}+{c.phanIII.length} câu)
-            </span>
-            <button onClick={() => handleDeleteContent(c.maDe)} className="text-xs text-rose-600">
-              Xoá
-            </button>
-          </label>
-        ))}
-        {sizeWarning && (
-          <div className="rounded-lg bg-amber-50 dark:bg-amber-950 border border-amber-300 dark:border-amber-800 p-3 text-xs text-amber-700 dark:text-amber-300">
-            {sizeWarning}
+        <button
+          onClick={() => setMoNhapThuCong((v) => !v)}
+          className="tap-target w-full flex items-center justify-between text-sm font-semibold text-slate-500"
+        >
+          <span>Nâng cao: tự gõ đề mới bằng tay (không có file)</span>
+          {moNhapThuCong ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+
+        {moNhapThuCong && (
+          <div className="space-y-2">
+            <p className="text-xs text-slate-500">
+              Có sẵn file .pdf/.docx? Bấm "Tải thêm đề" ở mục 2 phía trên — thầy chỉ cần thả file, app tự đọc
+              câu/đáp án. Mục này chỉ dành cho khi thầy tự gõ đề mới từ đầu, chưa có file.
+            </p>
+            <p className="text-xs text-slate-500">
+              Mỗi lần dán 1 đề. Đúng định dạng: dòng đầu "MÃ ĐỀ: ...", "PHẦN I" (mỗi câu A. B. C. D., đặt <b>*</b> trước
+              lựa chọn ĐÚNG), "PHẦN II" (mỗi ý ghi thêm (Đ) hoặc (S)), "PHẦN III" (dòng cuối "=&gt; đáp án"). Số câu mỗi
+              phần KHÔNG cần đúng 18/4/6 — càng nhiều đề, mỗi học sinh càng ít trùng câu với nhau.
+            </p>
+            <p className="text-xs text-slate-500">
+              Công thức Hoá: gõ số bình thường ngay sau chữ, app tự hiển thị chỉ số dưới (vd "H2SO4" →{' '}
+              <ChemText text="H2SO4" />, "Fe2O3" → <ChemText text="Fe2O3" />). Điện tích đơn giản gõ liền dấu +/- (vd
+              "Na+" → <ChemText text="Na+" />). Điện tích phức tạp (có cả số + dấu, vd ion SO4 2-) gõ rõ bằng dấu ^ để
+              khỏi sai: "SO4^{'{2-}'}" → <ChemText text={'SO4^{2-}'} />. Mũi tên phản ứng gõ "-&gt;" hoặc "&lt;=&gt;" sẽ
+              tự thành → hoặc ⇌.
+            </p>
+            <p className="text-xs text-slate-500">
+              Bảng số liệu (tái tạo đúng 100%, không suy đoán): đặt giữa <code>[BANG]</code> và <code>[/BANG]</code>, mỗi
+              dòng 1 hàng, cột cách nhau bằng "|" — hàng đầu là tiêu đề cột. Đồ thị/hình vẽ: đặt con trỏ vào đúng chỗ cần
+              chèn rồi <b>dán ảnh (Ctrl+V)</b> hoặc kéo-thả file ảnh vào ô soạn đề — app tự động đính kèm ngay, không cần
+              bấm thêm gì. Hiển thị lại y nguyên ảnh gốc cho học sinh, không có tính năng vẽ lại đồ thị bằng AI vì không
+              đảm bảo đúng số liệu.
+            </p>
+            <textarea
+              ref={textareaRef}
+              className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 text-xs font-mono"
+              rows={10}
+              placeholder={SAMPLE_TEXT}
+              value={draftText}
+              onChange={(e) => setDraftText(e.target.value)}
+              onPaste={handlePasteImage}
+              onDrop={handleDropImage}
+              onDragOver={(e) => e.preventDefault()}
+            />
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAttachImage} />
+            <div className="flex gap-2">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="tap-target flex-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-sm font-semibold flex items-center justify-center gap-1.5"
+              >
+                <ImagePlus size={16} /> Chọn file ảnh
+              </button>
+              <button onClick={handleParse} className="tap-target flex-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-sm font-semibold">
+                Phân tích đề
+              </button>
+              <button
+                onClick={() => {
+                  if (draftText.trim() && !confirm('Xoá hết bản nháp đề đang soạn? Không thể hoàn tác.')) return
+                  handleClearDraft()
+                }}
+                disabled={!draftText.trim()}
+                className="tap-target rounded-lg bg-rose-50 dark:bg-rose-950 border border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-400 text-sm font-semibold flex items-center justify-center gap-1.5 px-3 disabled:opacity-40"
+                title="Xoá bản nháp đề đang soạn (vd tải nhầm file)"
+              >
+                <Trash2 size={16} /> Xoá đề
+              </button>
+            </div>
+            {parseErrors.length > 0 && (
+              <div className="rounded-lg bg-rose-50 dark:bg-rose-950 border border-rose-300 dark:border-rose-800 p-3 text-xs text-rose-700 dark:text-rose-300 space-y-1">
+                {parseErrors.map((e, i) => (
+                  <div key={i}>• {e}</div>
+                ))}
+              </div>
+            )}
+            {parseWarnings.length > 0 && (
+              <div className="rounded-lg bg-amber-50 dark:bg-amber-950 border border-amber-300 dark:border-amber-800 p-3 text-xs text-amber-700 dark:text-amber-300 space-y-1">
+                {parseWarnings.map((w, i) => (
+                  <div key={i}>• {w}</div>
+                ))}
+              </div>
+            )}
+            {parsedPreview && parseErrors.length === 0 && (
+              <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-800 p-3 text-xs text-emerald-700 dark:text-emerald-300 space-y-2">
+                <div>
+                  "{parsedPreview.maDe}": {parsedPreview.phanI.length} câu Phần I, {parsedPreview.phanII.length} câu Phần
+                  II, {parsedPreview.phanIII.length} câu Phần III.
+                </div>
+                {parsedPreview.phanI[0] && (
+                  <div className="rounded-md bg-white/70 dark:bg-slate-900/50 px-2 py-1.5">
+                    Câu 1 Phần I (xem thử hiển thị): <ChemText text={parsedPreview.phanI[0].text} /> — đáp án đúng:{' '}
+                    <b>{parsedPreview.phanI[0].correct}</b>
+                    <QuestionMedia table={parsedPreview.phanI[0].table} imageDataUrl={parsedPreview.phanI[0].imageDataUrl} />
+                  </div>
+                )}
+                <button onClick={handleSaveContent} className="tap-target w-full rounded-lg bg-emerald-600 text-white font-semibold">
+                  Lưu vào ngân hàng câu hỏi
+                </button>
+              </div>
+            )}
           </div>
         )}
       </section>

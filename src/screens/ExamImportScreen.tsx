@@ -111,7 +111,7 @@ export default function ExamImportScreen() {
   const [filter, setFilter] = useState<Trangthai | 'tatca'>('tatca')
   const [saving, setSaving] = useState(false)
   const [dragOver, setDragOver] = useState(false)
-  const [viewerSrc, setViewerSrc] = useState<string | null>(null)
+  const [viewerImages, setViewerImages] = useState<string[] | null>(null)
   const [openGallery, setOpenGallery] = useState<Set<string>>(new Set())
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -364,7 +364,7 @@ export default function ExamImportScreen() {
                 {dangMoGallery && j.pageImages && (
                   <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
                     {j.pageImages.map((src, i) => (
-                      <button key={i} onClick={() => setViewerSrc(src)} className="tap-target shrink-0">
+                      <button key={i} onClick={() => setViewerImages(j.pageImages ? [src] : null)} className="tap-target shrink-0">
                         <img src={src} alt={`Trang ${i + 1}`} className="h-32 w-auto rounded border border-slate-300 dark:border-slate-600" />
                         <div className="text-center text-[10px] text-slate-400">Trang {i + 1}</div>
                       </button>
@@ -377,12 +377,18 @@ export default function ExamImportScreen() {
         </div>
       )}
 
-      {viewerSrc && (
-        <div
-          className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-2 overflow-auto"
-          onClick={() => setViewerSrc(null)}
-        >
-          <img src={viewerSrc} alt="Trang gốc phóng to" className="max-w-full max-h-full rounded shadow-2xl" />
+      {viewerImages && viewerImages.length > 0 && (
+        <div className="fixed inset-0 z-[60] bg-black/85 flex flex-col overflow-auto" onClick={() => setViewerImages(null)}>
+          {viewerImages.length > 1 && (
+            <div className="sticky top-0 z-10 bg-black/60 text-white text-xs text-center py-1.5">
+              Cuộn để xem hết {viewerImages.length} trang gốc — chạm bất kỳ đâu để đóng
+            </div>
+          )}
+          <div className="flex-1 flex flex-col items-center gap-2 p-2">
+            {viewerImages.map((src, i) => (
+              <img key={i} src={src} alt={`Trang gốc ${i + 1}`} className="max-w-full rounded shadow-2xl" />
+            ))}
+          </div>
         </div>
       )}
 
@@ -414,6 +420,8 @@ export default function ExamImportScreen() {
               onToggle={() => toggleExpand(c.uid)}
               onUpdate={(patch) => updateCau(c.uid, patch)}
               onUpdateOption={(key, text) => updateOption(c.uid, key, text)}
+              sourceImages={jobs.find((j) => j.id === c.fileId)?.pageImages}
+              onXemGoc={(imgs) => setViewerImages(imgs)}
             />
           ))}
         </div>
@@ -480,6 +488,8 @@ function CauCard({
   onToggle,
   onUpdate,
   onUpdateOption,
+  sourceImages,
+  onXemGoc,
 }: {
   c: ReviewCau
   tt: Trangthai
@@ -488,17 +498,39 @@ function CauCard({
   onToggle: () => void
   onUpdate: (patch: Partial<ReviewCau>) => void
   onUpdateOption: (key: 'A' | 'B' | 'C' | 'D', text: string) => void
+  sourceImages?: string[]
+  onXemGoc: (imgs: string[]) => void
 }) {
   return (
     <div className={`rounded-xl bg-white dark:bg-slate-900 border-2 p-3 space-y-2 ${BORDER[tt]}`}>
-      <div className="flex items-center justify-between cursor-pointer" onClick={onToggle}>
-        <div className="text-xs font-semibold text-slate-500">
-          Mã {c.maDe} · Phần {c.ten} · Câu {c.so}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0 cursor-pointer" onClick={onToggle}>
+          <div className="text-xs font-semibold text-slate-500 truncate">
+            Mã {c.maDe} · Phần {c.ten} · Câu {c.so}
+          </div>
         </div>
-        <div className="flex items-center gap-1 text-xs">
-          {tt === 'xanh' && <Check size={14} className="text-emerald-600" />}
-          {tt === 'vang' && <AlertTriangle size={14} className="text-amber-500" />}
-          {tt === 'do' && <XIcon size={14} className="text-rose-600" />}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* "Xem bản gốc" — đường lui đối chiếu, hiện với MỌI câu kể cả thẻ
+              xanh, vì chữ render ra có thể trông hợp lý nhưng sai đề (vd
+              "280% FeS" đáng ra "80% FeS2") mà không đối chiếu thì không phát
+              hiện được. Bản hiện tại mở nguyên các trang PDF của file nguồn
+              (chưa crop khít từng câu — cần lưu toạ độ mới crop được). */}
+          {sourceImages && sourceImages.length > 0 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onXemGoc(sourceImages)
+              }}
+              className="tap-target text-[12px] text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 underline decoration-dotted"
+            >
+              xem bản gốc
+            </button>
+          )}
+          <div className="flex items-center gap-1 text-xs cursor-pointer" onClick={onToggle}>
+            {tt === 'xanh' && <Check size={14} className="text-emerald-600" />}
+            {tt === 'vang' && <AlertTriangle size={14} className="text-amber-500" />}
+            {tt === 'do' && <XIcon size={14} className="text-rose-600" />}
+          </div>
         </div>
       </div>
 
