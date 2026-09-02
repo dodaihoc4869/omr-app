@@ -107,7 +107,7 @@ export default function PrintSheetScreen() {
       )}
 
       <div className="text-sm text-slate-500 space-y-1">
-        <p>In khổ A4, chọn scale 100% (tắt "Fit to page" / "Vừa trang") trong hộp thoại in.</p>
+        <p>In khổ A5, chọn scale 100% (tắt "Fit to page" / "Vừa trang") trong hộp thoại in.</p>
         <p>Toạ độ trên phiếu in khớp chính xác với toạ độ máy đọc — không tự chỉnh sửa layout PDF.</p>
       </div>
     </div>
