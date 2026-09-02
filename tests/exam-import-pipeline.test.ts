@@ -48,6 +48,14 @@ describe('buildExamDraft — kiểm chứng đầu-cuối trên đề tham khả
     expect(phanII.cau.map((c) => c.dapAnDung)).toEqual(['ĐĐSĐ', 'SĐSĐ', 'ĐSSĐ', 'SĐSS'])
   })
 
+  it('Phần II: mỗi câu tách đủ 4 ý a/b/c/d (không chỉ có đáp án, còn có cả nội dung ý)', () => {
+    const phanII = draft.phan.find((p) => p.ten === 'II')!
+    for (const c of phanII.cau) {
+      expect(c.pa).toHaveLength(4)
+      for (const idea of c.pa) expect(idea.text.length).toBeGreaterThan(0)
+    }
+  })
+
   it('Phần III ra đúng 6 câu, đáp án giữ nguyên dấu phẩy thập phân', () => {
     const phanIII = draft.phan.find((p) => p.ten === 'III')!
     expect(phanIII.cau).toHaveLength(6)

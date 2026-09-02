@@ -61,7 +61,7 @@ export function splitPhan(vungA: string): ParsedPhan[] {
   for (let i = 0; i < markers.length; i++) {
     const start = markers[i].index
     const end = i + 1 < markers.length ? markers[i + 1].index : vungA.length
-    out.push({ ten: markers[i].ten, cau: splitCau(vungA.slice(start, end)) })
+    out.push({ ten: markers[i].ten, cau: splitCau(vungA.slice(start, end), markers[i].ten) })
   }
   return out
 }
@@ -71,7 +71,7 @@ export function splitPhan(vungA: string): ParsedPhan[] {
 // mốc "Câu <số>" tường minh, an toàn hơn cho kho đề đa dạng của thầy.
 const CAU_RE = /^[ \t]*C[âa]u\s+(\d{1,3})\s*[.:]?\s/gim
 
-function splitCau(khoi: string): ParsedQuestion[] {
+function splitCau(khoi: string, ten: 'I' | 'II' | 'III'): ParsedQuestion[] {
   const markers: { index: number; so: number; markerEnd: number }[] = []
   let m: RegExpExecArray | null
   CAU_RE.lastIndex = 0
@@ -83,29 +83,41 @@ function splitCau(khoi: string): ParsedQuestion[] {
     const from = markers[i].markerEnd
     const to = i + 1 < markers.length ? markers[i + 1].index : khoi.length
     const raw = khoi.slice(from, to)
-    const { de, pa } = splitPa(raw)
+    const { de, pa } = splitPa(raw, ten)
     out.push({ so: markers[i].so, de, pa, canDocAnh: congThucVo(raw) })
   }
   return out
 }
 
-// Mốc phương án: chữ A/B/C/D KHÔNG đứng liền sau chữ/số khác (tránh bắt nhầm
-// giữa từ, vd không bắt "A" trong "NaHCO3"), theo sau là dấu chấm/ngoặc rồi
-// khoảng trắng. Chỉ nhận theo ĐÚNG THỨ TỰ A rồi B rồi C rồi D — mốc nào không
-// khớp thứ tự đang chờ thì bỏ qua (chặn bắt nhầm chữ hoa đơn lẻ ngẫu nhiên
-// trong đề, ví dụ ký hiệu nguyên tố hay biến số vật lý).
-const OPTION_MARK_RE = /(?<![A-Za-zÀ-ỹ0-9])([ABCD])\s*[.)]\s+/g
+// Mốc phương án. Phần I dùng chữ HOA "A." "B." "C." "D." (phương án chọn 1
+// trong 4). Phần II dùng chữ THƯỜNG "a)" "b)" "c)" "d)" (4 ý Đúng/Sai) — cùng
+// một cơ chế tách, chỉ khác bảng chữ cái. Phần III không có mốc nào (trả lời
+// ngắn), coi cả câu là đề bài.
+// Chữ cái KHÔNG được đứng liền sau chữ/số khác (tránh bắt nhầm giữa từ, vd
+// không bắt "A" trong "NaHCO3"), theo sau là dấu chấm/ngoặc rồi khoảng
+// trắng. Chỉ nhận ĐÚNG THỨ TỰ mốc 1 rồi 2 rồi 3 rồi 4 — mốc không khớp thứ tự
+// đang chờ thì bỏ qua (chặn bắt nhầm ký hiệu nguyên tố/biến số vật lý).
+function optionMarkerRe(ten: 'I' | 'II' | 'III'): RegExp | null {
+  if (ten === 'I') return /(?<![A-Za-zÀ-ỹ0-9])([ABCD])\s*[.)]\s+/g
+  if (ten === 'II') return /(?<![A-Za-zÀ-ỹ0-9])([abcd])\s*[.)]\s+/g
+  return null
+}
 
-function splitPa(raw: string): { de: string; pa: ParsedOption[] } {
+const KEYS: Array<'A' | 'B' | 'C' | 'D'> = ['A', 'B', 'C', 'D']
+
+function splitPa(raw: string, ten: 'I' | 'II' | 'III'): { de: string; pa: ParsedOption[] } {
+  const re = optionMarkerRe(ten)
+  if (!re) return { de: normSpace(raw), pa: [] }
+
   const found: { index: number; markerEnd: number; key: 'A' | 'B' | 'C' | 'D' }[] = []
   let m: RegExpExecArray | null
-  OPTION_MARK_RE.lastIndex = 0
-  let expect = 'A'
-  while ((m = OPTION_MARK_RE.exec(raw))) {
-    if (m[1] === expect) {
-      found.push({ index: m.index, markerEnd: m.index + m[0].length, key: expect as 'A' | 'B' | 'C' | 'D' })
-      expect = String.fromCharCode(expect.charCodeAt(0) + 1)
-      if (expect > 'D') break
+  re.lastIndex = 0
+  let expectIdx = 0
+  while ((m = re.exec(raw))) {
+    if (m[1].toUpperCase() === KEYS[expectIdx]) {
+      found.push({ index: m.index, markerEnd: m.index + m[0].length, key: KEYS[expectIdx] })
+      expectIdx += 1
+      if (expectIdx >= KEYS.length) break
     }
   }
   if (found.length < 2) {

@@ -1,4 +1,4 @@
-import { ClipboardList, GraduationCap, Users2, Users } from 'lucide-react'
+import { ClipboardList, GraduationCap, Users2, Users, UploadCloud } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 
 export default function ExamHubScreen() {
@@ -13,15 +13,28 @@ export default function ExamHubScreen() {
       </p>
 
       <button
-        onClick={() => setScreen('examsetup')}
+        onClick={() => setScreen('examimport')}
         className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold p-4 text-left flex items-center gap-3"
       >
         <span className="shrink-0 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center">
+          <UploadCloud size={22} />
+        </span>
+        <span>
+          <div className="text-base">Giáo viên — Tải đề vào ngân hàng câu hỏi</div>
+          <div className="text-xs font-normal opacity-90 mt-1">Thả file .pdf/.docx, app tự đọc câu + đáp án, thầy chỉ duyệt lại</div>
+        </span>
+      </button>
+
+      <button
+        onClick={() => setScreen('examsetup')}
+        className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 font-semibold p-4 text-left flex items-center gap-3"
+      >
+        <span className="shrink-0 w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center">
           <GraduationCap size={22} />
         </span>
         <span>
-          <div className="text-base">Giáo viên — Soạn đề &amp; mở ca kiểm tra</div>
-          <div className="text-xs font-normal opacity-90 mt-1">Dán đề, chọn lớp, đặt thời gian, tạo mã ca cho học sinh</div>
+          <div className="text-base">Giáo viên — Chọn đề &amp; mở ca kiểm tra</div>
+          <div className="text-xs font-normal opacity-90 mt-1">Chọn lớp, đặt thời gian, tạo mã ca cho học sinh (đề đã có sẵn trong ngân hàng)</div>
         </span>
       </button>
 

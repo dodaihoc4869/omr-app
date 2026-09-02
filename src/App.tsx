@@ -7,6 +7,7 @@ import { loadClassList } from './lib/classlist-db'
 import ClassListScreen from './screens/ClassListScreen'
 import ExamHubScreen from './screens/ExamHubScreen'
 import ExamSetupScreen from './screens/ExamSetupScreen'
+import ExamImportScreen from './screens/ExamImportScreen'
 import ExamTakeScreen from './screens/ExamTakeScreen'
 import ExamMonitorScreen from './screens/ExamMonitorScreen'
 import ParentScreen from './screens/ParentScreen'
@@ -40,6 +41,7 @@ function App() {
       {screen === 'classlist' && <ClassListScreen />}
       {screen === 'examhub' && <ExamHubScreen />}
       {screen === 'examsetup' && <ExamSetupScreen />}
+      {screen === 'examimport' && <ExamImportScreen />}
       {screen === 'examtake' && <ExamTakeScreen />}
       {screen === 'exammonitor' && <ExamMonitorScreen />}
       {screen === 'parent' && <ParentScreen />}

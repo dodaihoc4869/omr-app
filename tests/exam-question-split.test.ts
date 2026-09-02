@@ -48,6 +48,17 @@ describe('splitPhan/splitCau/splitPa (tách câu + phương án, nhiều kiểu 
     expect(phan[2].cau[0].de).toContain('Đề 3')
   })
 
+  it('Phần II: tách đúng 4 ý a)/b)/c)/d) (chữ thường) thành pa, kể cả khi trải nhiều dòng', () => {
+    const vungA =
+      'PHẦN II. Mô tả\nCâu 1. Thực hiện thí nghiệm...\n' +
+      'a) Phức chất được tạo thành.\nb) Dấu hiệu nhận biết là kết tủa tan ra.\nc) Chứa bốn phối tử NH3.\nd) Nguyên tử trung tâm là Ni2+.'
+    const c1 = splitPhan(vungA)[0].cau[0]
+    expect(c1.de).toBe('Thực hiện thí nghiệm...')
+    expect(c1.pa.map((p) => p.key)).toEqual(['A', 'B', 'C', 'D'])
+    expect(c1.pa[0].text).toBe('Phức chất được tạo thành')
+    expect(c1.pa[3].text).toBe('Nguyên tử trung tâm là Ni2+')
+  })
+
   it('Phần III không có phương án A/B/C/D -> pa rỗng, không báo lỗi', () => {
     const vungA = 'PHẦN III: Mô tả\nCâu 1. Tính giá trị x?'
     const c1 = splitPhan(vungA)[0].cau[0]
