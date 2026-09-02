@@ -25,6 +25,12 @@
 //    hàng câu hỏi" của app trên máy thầy và vào file kho-de/cau-hinh.json
 //    trên máy để pipeline "Nạp đề mới" đẩy đề lên. Ai không có mã này thì
 //    KHÔNG đọc được đề/đáp án trong kho — đề không bao giờ nằm trên GitHub.
+// 8. (Nạp đề tự động) CẤP QUYỀN DRIVE 1 LẦN: kho đề lưu file JSON trong thư
+//    mục Drive OMR-APP-DATA (đề có ảnh vượt 50.000 ký tự/ô Sheet), nên script
+//    cần thêm quyền Drive — cập nhật triển khai KHÔNG tự hỏi quyền này. Trong
+//    trình soạn: chọn hàm capQuyenVaKiemTra ở thanh trên → Chạy → "Xem lại
+//    quyền" → Cho phép. Nhật ký thực thi phải in "ghi/đọc JSON: OK". Chưa làm
+//    bước này thì nút "Đẩy file JSON" trong app báo "Failed to fetch" (503).
 //
 // Mỗi lần sửa code này, phải bấm "Triển khai" → "Quản lý triển khai" →
 // chỉnh sửa (bút chì) → chọn phiên bản mới → Triển khai lại, thì thay đổi
@@ -92,6 +98,18 @@ function kiemTraMaBiMat_(body) {
   if (!mat) return 'Chưa đặt MA_BI_MAT trong Script properties của Apps Script (xem hướng dẫn đầu file)'
   if (String(body.secret || '').trim() !== mat) return 'Sai mã bí mật'
   return ''
+}
+
+// CHẠY 1 LẦN trong trình soạn (bước 8 đầu file): chọn hàm capQuyenVaKiemTra
+// → Chạy → Google hỏi cấp quyền Sheet + Drive (bấm Cho phép). Hàm tự ghi/đọc
+// thử 1 file JSON trong thư mục Drive rồi xoá — xem kết quả ở Nhật ký thực thi.
+function capQuyenVaKiemTra() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const folder = driveFolder_()
+  const ref = luuJsonLon_('_kiem_tra', { ok: true, luc: new Date().toISOString() }, '')
+  const doc = docJsonLon_(ref)
+  DriveApp.getFileById(ref.slice(6)).setTrashed(true)
+  Logger.log('Sheet: ' + ss.getName() + ' | Thư mục Drive: ' + folder.getName() + ' | ghi/đọc JSON: ' + (doc && doc.ok ? 'OK' : 'LỖI') + ' | MA_BI_MAT: ' + (maBiMat_() ? 'đã đặt' : 'CHƯA ĐẶT'))
 }
 
 function getSheet_(name, headers) {
