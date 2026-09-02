@@ -121,40 +121,25 @@ export function buildAnswerSheetPdf(studentInfo?: { hoTen?: string; lop?: string
 }
 
 /**
- * Mở PDF ra tab mới để xem/in/lưu trực tiếp thay vì chỉ âm thầm tải xuống —
- * trên một số trình duyệt di động (đặc biệt PWA cài lên màn hình chính trên
- * iPhone), download bằng thẻ <a download> chạy "im lặng" không có bất kỳ
- * phản hồi nào, khiến người dùng tưởng nút bấm không hoạt động. Mở tab mới
- * cho thấy ngay kết quả, và người dùng có sẵn nút Chia sẻ/In/Tải của chính
- * trình duyệt.
- *
- * Trả về 'opened' nếu mở được tab xem PDF, 'downloaded' nếu trình duyệt chặn
- * popup và phải rơi về tải file trực tiếp, để màn hình gọi hàm này báo đúng
- * thông báo cho người dùng.
+ * Tải PDF trực tiếp qua thẻ <a download> (blob) — CỐ Ý không dùng
+ * window.open(): nếu hàm này chạy sau một setTimeout/rAF (để nhường UI thread
+ * vẽ trạng thái "Đang tạo…" trước khi build PDF nặng — xem PrintSheetScreen),
+ * lệnh gọi không còn nằm trong đúng user-gesture đồng bộ nữa, và Chrome/Safari
+ * di động có thể âm thầm chặn window.open() như popup — trông y hệt "bấm
+ * không phản hồi". Tải bằng thẻ <a download> không bị giới hạn này.
  */
-export function openOrDownloadAnswerSheetPdf(
+export function downloadAnswerSheetPdfBlob(
   studentInfo?: { hoTen?: string; lop?: string },
   fileName = 'PhieuTraLoi.pdf',
-): 'opened' | 'downloaded' {
+): void {
   const doc = buildAnswerSheetPdf(studentInfo)
   const blob = doc.output('blob')
   const url = URL.createObjectURL(blob)
-
-  const win = window.open(url, '_blank')
-  let result: 'opened' | 'downloaded' = 'opened'
-  if (!win) {
-    // Trình duyệt chặn popup (thường do không coi đây là hành động người dùng
-    // trực tiếp) — rơi về tải file trực tiếp qua thẻ <a download>.
-    const a = document.createElement('a')
-    a.href = url
-    a.download = fileName
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-    result = 'downloaded'
-  }
-
-  // Giữ blob URL đủ lâu để tab mới/trình xem PDF tải xong rồi mới thu hồi.
+  const a = document.createElement('a')
+  a.href = url
+  a.download = fileName
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
   setTimeout(() => URL.revokeObjectURL(url), 60_000)
-  return result
 }

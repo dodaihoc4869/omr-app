@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { openOrDownloadAnswerSheetPdf } from '../lib/print-sheet'
+import { downloadAnswerSheetPdfBlob } from '../lib/print-sheet'
 import { useAppStore } from '../store/appStore'
 
 export default function PrintSheetScreen() {
@@ -9,18 +9,22 @@ export default function PrintSheetScreen() {
   const showToast = useAppStore((s) => s.showToast)
 
   const handleCreatePdf = () => {
+    // Vẽ PDF (~500+ hình tròn/chữ) chạy đồng bộ và có thể mất vài giây trên
+    // điện thoại tầm trung — nếu build ngay trong handler, trình duyệt chưa
+    // kịp sơn lại nút "Đang tạo…" trước khi màn hình đứng hình, trông y hệt
+    // "bấm không phản hồi". setTimeout(0) nhường một nhịp cho React vẽ trạng
+    // thái bận trước, rồi mới bắt đầu phần nặng.
     setBusy(true)
-    try {
-      const result = openOrDownloadAnswerSheetPdf({ hoTen, lop })
-      showToast(
-        result === 'opened' ? 'Đã mở PDF ở tab mới — bấm Chia sẻ/In để lưu' : 'Đã tải PhieuTraLoi.pdf về máy',
-        'success',
-      )
-    } catch (e) {
-      showToast(`Lỗi tạo PDF: ${e instanceof Error ? e.message : 'không rõ nguyên nhân'}`, 'error')
-    } finally {
-      setBusy(false)
-    }
+    setTimeout(() => {
+      try {
+        downloadAnswerSheetPdfBlob({ hoTen, lop })
+        showToast('Đã tải PhieuTraLoi.pdf — mở app Files/Tải xuống trên máy để xem', 'success')
+      } catch (e) {
+        showToast(`Lỗi tạo PDF: ${e instanceof Error ? e.message : 'không rõ nguyên nhân'}`, 'error')
+      } finally {
+        setBusy(false)
+      }
+    }, 30)
   }
 
   return (
