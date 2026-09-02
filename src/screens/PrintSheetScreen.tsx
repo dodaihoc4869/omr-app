@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { NutChinh } from '../components/DesignSystem'
 import { downloadAnswerSheetPdfBlob } from '../lib/print-sheet'
 import { useAppStore } from '../store/appStore'
 
@@ -91,18 +92,10 @@ export default function PrintSheetScreen() {
 
       {pdfUrl && (
         <div className="space-y-2">
-          <button
-            onClick={handleViewPdf}
-            className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 font-semibold"
-          >
-            Xem PDF vừa tạo
-          </button>
-          <button
-            onClick={handleDownloadPdf}
-            className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold"
-          >
+          <NutChinh onClick={handleViewPdf}>Xem PDF vừa tạo</NutChinh>
+          <NutChinh variant="phu" onClick={handleDownloadPdf}>
             Tải PDF (gửi cho quán photo)
-          </button>
+          </NutChinh>
         </div>
       )}
 

@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
-import { fetchSession, submitAnswers, pushExamStatus, sendParentFeedback, type KeyBank } from '../lib/exam-api'
+import { fetchSession, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, type KeyBank, type CongBoDiem } from '../lib/exam-api'
 import TheCau from '../components/TheCau'
 import MaCaInput from '../components/MaCaInput'
+import DaiNhacCaiApp from '../components/DaiNhacCaiApp'
+import LogoDDH from '../components/LogoDDH'
 import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
 import { TriangleAlert, X, ArrowLeft, LayoutGrid } from 'lucide-react'
 import { classify } from '../engine/score'
@@ -14,7 +16,7 @@ import {
   emptyIntegrityLog,
   loadAttempt,
   loadCachedSession,
-  loadScriptUrl,
+  loadScriptUrlHoacMacDinh,
   saveAttempt,
   saveScriptUrl,
   type ExamAttempt,
@@ -114,7 +116,14 @@ export default function ExamTakeScreen() {
   useEffect(() => {
     attemptRef.current = attempt
   }, [attempt])
-  const [gradedPopup, setGradedPopup] = useState<GradedSubmission | null>(null)
+  // Kết quả đã chấm trên máy em (khi thầy cho công bố) — giữ lại để bấm "Xem
+  // điểm" mở lại popup bất cứ lúc nào; popup chỉ là cờ hiện/ẩn.
+  const [graded, setGraded] = useState<GradedSubmission | null>(null)
+  const [gradedPopup, setGradedPopup] = useState(false)
+  // Chế độ công bố của ca (server trả về sau khi nộp / khi hỏi lại) + số em
+  // đã nộp / đã vào thi để hiện "đang chờ cả lớp x/y".
+  const [congBo, setCongBo] = useState<CongBoDiem | null>(null)
+  const [choCaLop, setChoCaLop] = useState<{ daNop: number; daVao: number } | null>(null)
   // Lưu lại keyBank (CÓ đáp án + lời giải) nhận được lúc nộp bài — để màn
   // "Xem lại lời giải" mở lại được bất cứ lúc nào trong phiên này mà không
   // cần gọi mạng lại. Chỉ tồn tại khi thầy bật "xem điểm ngay" cho ca này.
@@ -187,7 +196,7 @@ export default function ExamTakeScreen() {
       setScriptUrl(apiFromUrl)
       saveScriptUrl(apiFromUrl)
     } else {
-      loadScriptUrl().then(setScriptUrl)
+      loadScriptUrlHoacMacDinh().then(setScriptUrl)
     }
   }, [])
 
@@ -249,6 +258,13 @@ export default function ExamTakeScreen() {
     try {
       const existing = await loadAttempt(ma, sb)
       if (existing?.submitted) {
+        // Mở lại sau khi đã nộp: nạp lại đề đã cache để đếm số câu / hiện điểm
+        // chi tiết; effect hỏi lại kết quả (fetchKetQua) chạy ở màn "Đã nộp".
+        const cachedCu = await loadCachedSession(ma)
+        if (cachedCu) {
+          setBank(cachedCu.bank)
+          setLop(cachedCu.lop)
+        }
         setAttempt(existing)
         setPhase('submitted')
         return
@@ -380,44 +396,84 @@ export default function ExamTakeScreen() {
     trySend(updated)
   }
 
+  // Nhận keyBank (CÓ đáp án) → chấm tại máy em, hiện popup điểm (trừ bài bị
+  // khoá — màn khoá đã đủ nghiêm), gửi nhận xét cho phụ huynh. Dùng chung cho
+  // cả 2 đường: trả về ngay lúc nộp, hoặc hỏi lại sau (cả lớp xong / mở lại app).
+  const apDungKeyBank = (kb: KeyBank, done: ExamAttempt) => {
+    setKeyBank(kb)
+    setChoCaLop(null)
+    try {
+      const g = gradeFromKeyBank(kb, done.maCa, done.sbd, done.answers)
+      setGraded(g)
+      if (!done.integrity.blocked) setGradedPopup(true)
+      if (scriptUrlRef.current.trim()) {
+        sendParentFeedback(
+          scriptUrlRef.current.trim(),
+          done.sbd,
+          done.maCa,
+          done.maDe,
+          done.submittedAt || new Date().toISOString(),
+          g.score.total,
+          classify(g.score.total),
+          { phanI: g.wrongPhanI, phanII: g.wrongPhanII, phanIII: g.wrongPhanIII },
+        ).catch(() => {
+          // Gửi nhận xét cho phụ huynh không phải luồng chính — lỗi thì bỏ qua.
+        })
+      }
+    } catch {
+      // Không chấm được (vd ngân hàng đề đổi khác) — bỏ qua, không hiện popup sai lệch.
+    }
+  }
+
+  // Đã nộp mà chưa có đáp án → hỏi lại máy chủ: ngay khi vào màn "Đã nộp" và
+  // mỗi 20 giây khi màn hình đang mở (chế độ "khi cả lớp nộp xong", hoặc em
+  // mở lại link sau khi đã nộp). Server tự quyết đã được phép xem hay chưa.
+  useEffect(() => {
+    if (phase !== 'submitted' || keyBank || !attempt || attempt.pendingSubmit) return
+    if (congBo === 'khong') return
+    const url = scriptUrlRef.current.trim()
+    if (!url) return
+    let dung = false
+    const hoi = async () => {
+      if (dung || document.hidden) return
+      try {
+        const r = await fetchKetQua(url, attempt.maCa, attempt.sbd)
+        if (dung) return
+        setCongBo(r.congBo)
+        if (r.sanSang && r.keyBank) apDungKeyBank(r.keyBank, attempt)
+        else if (r.congBo === 'ca_lop_xong') setChoCaLop({ daNop: r.daNop, daVao: r.daVao })
+      } catch {
+        // mất mạng — lần sau hỏi lại
+      }
+    }
+    hoi()
+    const id = setInterval(hoi, 20000)
+    const onVis = () => {
+      if (!document.hidden) hoi()
+    }
+    document.addEventListener('visibilitychange', onVis)
+    return () => {
+      dung = true
+      clearInterval(id)
+      document.removeEventListener('visibilitychange', onVis)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, keyBank, attempt?.pendingSubmit, congBo])
+
   const trySend = async (a: ExamAttempt) => {
     try {
       if (!scriptUrl.trim()) throw new Error('no-script-url')
-      const { keyBank } = await submitAnswers(scriptUrl.trim(), a.maCa, a.sbd, a.maDe, a.answers, a.integrity)
+      const { keyBank, congBo: cb } = await submitAnswers(scriptUrl.trim(), a.maCa, a.sbd, a.maDe, a.answers, a.integrity)
       const done = { ...a, pendingSubmit: false }
       setAttempt(done)
       await saveAttempt(done)
       showToast('Đã nộp bài thành công', 'success')
       if (retryTimer.current) clearInterval(retryTimer.current)
+      setCongBo(cb)
       // Thầy bật "xem điểm ngay" cho ca này — chấm ngay tại máy em bằng đúng
-      // engine chấm chuẩn, không phải ước lượng. Không hiện nếu bài bị khoá
-      // do nghi gian lận (màn khoá đã đủ nghiêm rồi).
-      if (keyBank) {
-        setKeyBank(keyBank)
-        try {
-          const graded = gradeFromKeyBank(keyBank, done.maCa, done.sbd, done.answers)
-          // Chỉ hiện popup điểm ngay TRÊN MÁY EM nếu bài không bị khoá (màn khoá
-          // đã đủ nghiêm rồi) — nhưng vẫn gửi nhận xét cho phụ huynh trong cả 2
-          // trường hợp, để phụ huynh biết cả khi bài bị đánh dấu nghi gian lận.
-          if (!done.integrity.blocked) setGradedPopup(graded)
-          if (scriptUrlRef.current.trim()) {
-            sendParentFeedback(
-              scriptUrlRef.current.trim(),
-              done.sbd,
-              done.maCa,
-              done.maDe,
-              done.submittedAt || new Date().toISOString(),
-              graded.score.total,
-              classify(graded.score.total),
-              { phanI: graded.wrongPhanI, phanII: graded.wrongPhanII, phanIII: graded.wrongPhanIII },
-            ).catch(() => {
-              // Gửi nhận xét cho phụ huynh không phải luồng chính — lỗi thì bỏ qua.
-            })
-          }
-        } catch {
-          // Không chấm được (vd ngân hàng đề đổi khác) — bỏ qua, không hiện popup sai lệch.
-        }
-      }
+      // engine chấm chuẩn, không phải ước lượng. Chế độ "khi cả lớp nộp xong"
+      // thì chưa có keyBank lúc này — effect hỏi lại bên dưới sẽ lo.
+      if (keyBank) apDungKeyBank(keyBank, done)
     } catch {
       // Mất mạng — giữ pendingSubmit=true, đã lưu local, sẽ tự thử lại.
       if (!retryTimer.current) {
@@ -475,8 +531,12 @@ export default function ExamTakeScreen() {
     return (
       <Trang className="flex items-center justify-center px-4 py-8">
         <div className="w-full" style={{ maxWidth: 400 }}>
+          <DaiNhacCaiApp />
           <TheNoiDung>
             <div className="text-center" style={{ marginBottom: 'var(--k6)' }}>
+              <div className="flex justify-center" style={{ color: 'var(--muc)', marginBottom: 'var(--k3)' }}>
+                <LogoDDH size={44} />
+              </div>
               <div className="font-bold" style={{ fontSize: 'var(--cx-5)', letterSpacing: '.28em', color: 'var(--muc)' }}>
                 ĐỖ ĐẠI HỌC
               </div>
@@ -546,7 +606,7 @@ export default function ExamTakeScreen() {
       <Trang>
         <div
           className="sticky top-0 z-30 flex items-center"
-          style={{ height: 56, background: 'rgba(255,255,255,.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--vien)', padding: '0 var(--k4)', gap: 'var(--k3)' }}
+          style={{ height: 56, background: 'var(--the-mo)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--vien)', padding: '0 var(--k4)', gap: 'var(--k3)' }}
         >
           <button onClick={() => setXemLoiGiai(false)} className="tap-target shrink-0 flex items-center gap-1 font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
             <ArrowLeft size={18} /> Quay lại
@@ -698,12 +758,29 @@ export default function ExamTakeScreen() {
               </div>
               {attempt?.pendingSubmit ? (
                 <OThongBao tone="cam">Đang gửi lên hệ thống… đừng tắt trình duyệt. Bài đã lưu an toàn trên máy và sẽ tự gửi lại khi có mạng.</OThongBao>
+              ) : graded ? (
+                <OThongBao tone="xanh">
+                  Điểm của em: <b style={SANS_SO}>{graded.score.total.toFixed(2)}/10</b> — {classify(graded.score.total)}.
+                </OThongBao>
+              ) : choCaLop ? (
+                <OThongBao tone="cam">
+                  Điểm sẽ tự hiện khi cả lớp nộp xong — đã nộp{' '}
+                  <b style={SANS_SO}>
+                    {choCaLop.daNop}/{choCaLop.daVao}
+                  </b>{' '}
+                  em. Giữ màn hình này, hoặc mở lại link sau.
+                </OThongBao>
               ) : (
                 <OThongBao tone="xanh">Thầy sẽ công bố kết quả sau.</OThongBao>
               )}
             </div>
           </TheNoiDung>
 
+          {graded && !attempt?.integrity.blocked && (
+            <NutChinh onClick={() => setGradedPopup(true)}>
+              Xem điểm chi tiết
+            </NutChinh>
+          )}
           {keyBank && solutionAssignment && (
             <NutChinh variant="phu" onClick={() => setXemLoiGiai(true)}>
               Xem lại lời giải
@@ -711,21 +788,21 @@ export default function ExamTakeScreen() {
           )}
         </div>
 
-        {gradedPopup && (
-          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center px-4 py-6" style={{ background: 'rgba(26,35,50,.55)' }}>
+        {gradedPopup && graded && (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center px-4 py-6" style={{ background: 'var(--phu)' }}>
             <div className="w-full overflow-y-auto" style={{ maxWidth: 400, maxHeight: '85vh', background: 'var(--the)', borderRadius: 'var(--bo-3)', boxShadow: 'var(--bong-2)' }}>
               <div className="sticky top-0 flex items-start justify-between" style={{ background: 'var(--the)', padding: 'var(--k5) var(--k5) var(--k3)', borderBottom: '1px solid var(--vien)' }}>
                 <div>
                   <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>Kết quả bài thi</div>
                   <div className="font-bold" style={{ fontSize: 'var(--cx-6)', ...SANS_SO }}>
-                    {gradedPopup.score.total.toFixed(2)}
+                    {graded.score.total.toFixed(2)}
                     <span style={{ fontSize: 'var(--cx-2)', color: 'var(--nhat)', fontWeight: 500 }}>/10</span>
                   </div>
                   <div className="font-bold" style={{ fontSize: 'var(--cx-2)' }}>
-                    {classify(gradedPopup.score.total)}
+                    {classify(graded.score.total)}
                   </div>
                 </div>
-                <button onClick={() => setGradedPopup(null)} className="shrink-0 flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: 'var(--the-2)', color: 'var(--nhat)' }}>
+                <button onClick={() => setGradedPopup(false)} className="shrink-0 flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: 'var(--the-2)', color: 'var(--nhat)' }}>
                   <X size={16} />
                 </button>
               </div>
@@ -733,9 +810,9 @@ export default function ExamTakeScreen() {
                 <div className="grid grid-cols-3" style={{ gap: 'var(--k2)' }}>
                   {(
                     [
-                      ['Phần I', gradedPopup.score.phanIScore, assignment?.phanI.length ?? 0, gradedPopup.wrongPhanI.length],
-                      ['Phần II', gradedPopup.score.phanIIScore, assignment?.phanII.length ?? 0, gradedPopup.wrongPhanII.length],
-                      ['Phần III', gradedPopup.score.phanIIIScore, assignment?.phanIII.length ?? 0, gradedPopup.wrongPhanIII.length],
+                      ['Phần I', graded.score.phanIScore, assignment?.phanI.length ?? 0, graded.wrongPhanI.length],
+                      ['Phần II', graded.score.phanIIScore, assignment?.phanII.length ?? 0, graded.wrongPhanII.length],
+                      ['Phần III', graded.score.phanIIIScore, assignment?.phanIII.length ?? 0, graded.wrongPhanIII.length],
                     ] as const
                   ).map(([label, pts, n, wrong]) => (
                     <div key={label} className="text-center" style={{ background: 'var(--the-2)', borderRadius: 'var(--bo-1)', padding: 'var(--k2)' }}>
@@ -749,30 +826,30 @@ export default function ExamTakeScreen() {
                     </div>
                   ))}
                 </div>
-                {gradedPopup.wrongPhanI.length + gradedPopup.wrongPhanII.length + gradedPopup.wrongPhanIII.length > 0 ? (
+                {graded.wrongPhanI.length + graded.wrongPhanII.length + graded.wrongPhanIII.length > 0 ? (
                   <OThongBao tone="do">
                     <b>Cần xem lại:</b>
-                    {gradedPopup.wrongPhanI.length > 0 && <div>Phần I — câu {gradedPopup.wrongPhanI.join(', ')}</div>}
-                    {gradedPopup.wrongPhanII.length > 0 && <div>Phần II — câu {gradedPopup.wrongPhanII.join(', ')}</div>}
-                    {gradedPopup.wrongPhanIII.length > 0 && <div>Phần III — câu {gradedPopup.wrongPhanIII.join(', ')}</div>}
+                    {graded.wrongPhanI.length > 0 && <div>Phần I — câu {graded.wrongPhanI.join(', ')}</div>}
+                    {graded.wrongPhanII.length > 0 && <div>Phần II — câu {graded.wrongPhanII.join(', ')}</div>}
+                    {graded.wrongPhanIII.length > 0 && <div>Phần III — câu {graded.wrongPhanIII.join(', ')}</div>}
                   </OThongBao>
                 ) : (
                   <OThongBao tone="xanh">Đúng hết tất cả các câu!</OThongBao>
                 )}
-                {!gradedPopup.score.crossSumOk && (
+                {!graded.score.crossSumOk && (
                   <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--cam)' }}>* Có sai lệch khi cộng điểm — thầy sẽ kiểm tra lại thủ công.</div>
                 )}
                 {solutionAssignment && (
                   <NutChinh
                     onClick={() => {
-                      setGradedPopup(null)
+                      setGradedPopup(false)
                       setXemLoiGiai(true)
                     }}
                   >
                     Xem lại lời giải
                   </NutChinh>
                 )}
-                <NutChinh variant="phu" onClick={() => setGradedPopup(null)}>
+                <NutChinh variant="phu" onClick={() => setGradedPopup(false)}>
                   Đóng
                 </NutChinh>
               </div>
@@ -873,11 +950,11 @@ export default function ExamTakeScreen() {
   }
 
   return (
-    <Trang>
+    <Trang className="man-lam-bai">
       {/* THANH TRÊN — 56px, dính, mờ; tiến độ 3px sát mép trên; chấm lưu 6px góc phải */}
       <div
         className="sticky top-0 z-30"
-        style={{ height: 56, background: 'rgba(255,255,255,.85)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid var(--vien)' }}
+        style={{ height: 56, background: 'var(--the-mo)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid var(--vien)' }}
       >
         <div className="absolute left-0 top-0 w-full" style={{ height: 3, background: 'var(--vien)' }}>
           <div style={{ height: 3, width: `${total ? (daLamCount / total) * 100 : 0}%`, background: 'var(--xanh)', transitionProperty: 'width', transitionDuration: 'var(--nhanh)' }} />
@@ -898,13 +975,13 @@ export default function ExamTakeScreen() {
 
       {leaveWarning && (
         <div className="sticky z-30 px-3" style={{ top: 60, paddingTop: 'var(--k1)' }}>
-          <div className="flex items-start" style={{ background: 'var(--do)', color: '#fff', borderRadius: 'var(--bo-1)', padding: 'var(--k3)', gap: 'var(--k2)', boxShadow: 'var(--bong-2)' }}>
+          <div className="flex items-start" style={{ background: 'var(--do)', color: 'var(--muc-nguoc)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)', gap: 'var(--k2)', boxShadow: 'var(--bong-2)' }}>
             <TriangleAlert size={20} className="shrink-0 mt-0.5" />
             <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', lineHeight: 1.5 }}>
               <b>Em vừa rời khỏi màn hình làm bài</b> (lần {leaveWarning.count}, {leaveWarning.sec} giây). Thầy đã ghi lại — hành vi này sẽ đưa vào báo cáo gửi
               phụ huynh khi thầy xem xét bài thi. <b>Nếu em rời màn hình thêm một lần nữa, bài thi sẽ tự động NỘP NGAY và bị đánh dấu nghi vấn gian lận.</b>
             </div>
-            <button onClick={() => setLeaveWarning(null)} className="shrink-0 text-lg leading-none px-1" style={{ color: 'rgba(255,255,255,.85)' }}>
+            <button onClick={() => setLeaveWarning(null)} className="shrink-0 text-lg leading-none px-1" style={{ color: 'var(--muc-nguoc)', opacity: 0.85 }}>
               ×
             </button>
           </div>
@@ -923,7 +1000,7 @@ export default function ExamTakeScreen() {
 
       {/* LƯỚI SỐ CÂU — tấm trượt từ dưới lên */}
       {showGrid && (
-        <div className="fixed inset-0 z-40 flex items-end" style={{ background: 'rgba(26,35,50,.5)' }} onClick={() => setShowGrid(false)}>
+        <div className="fixed inset-0 z-40 flex items-end" style={{ background: 'var(--phu)' }} onClick={() => setShowGrid(false)}>
           <div
             className="w-full flex flex-col"
             style={{ background: 'var(--the)', borderTopLeftRadius: 'var(--bo-3)', borderTopRightRadius: 'var(--bo-3)', padding: 'var(--k4)', gap: 'var(--k3)', maxHeight: '75vh', paddingBottom: 'calc(var(--k4) + env(safe-area-inset-bottom))', boxShadow: 'var(--bong-2)' }}
@@ -951,7 +1028,7 @@ export default function ExamTakeScreen() {
                       cuonToiCau(i + 1)
                     }}
                     className="tap-target aspect-square flex items-center justify-center font-bold"
-                    style={{ ...SANS_SO, fontSize: 'var(--cx-2)', borderRadius: 'var(--bo-1)', background: done ? 'var(--muc)' : 'var(--the-2)', color: done ? '#fff' : 'var(--muc)' }}
+                    style={{ ...SANS_SO, fontSize: 'var(--cx-2)', borderRadius: 'var(--bo-1)', background: done ? 'var(--muc)' : 'var(--the-2)', color: done ? 'var(--muc-nguoc)' : 'var(--muc)' }}
                   >
                     {i + 1}
                   </button>
@@ -1048,7 +1125,7 @@ function Trang({ children, className = '' }: { children: React.ReactNode; classN
 
 function HopThoai({ children }: { children: React.ReactNode }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(26,35,50,.6)' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'var(--phu)' }}>
       <div className="w-full flex flex-col" style={{ maxWidth: 400, background: 'var(--the)', borderRadius: 'var(--bo-3)', padding: 'var(--k5)', gap: 'var(--k3)', boxShadow: 'var(--bong-2)' }}>
         {children}
       </div>
@@ -1058,7 +1135,7 @@ function HopThoai({ children }: { children: React.ReactNode }) {
 
 function ZoomOverlay({ src, onClose }: { src: string; onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-2 overflow-auto" style={{ background: 'rgba(26,35,50,.9)' }} onClick={onClose}>
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-2 overflow-auto" style={{ background: 'var(--phu-dam)' }} onClick={onClose}>
       <img src={src} alt="Phóng to" className="max-w-full max-h-full" style={{ borderRadius: 'var(--bo-1)' }} />
     </div>
   )

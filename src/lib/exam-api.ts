@@ -30,21 +30,55 @@ async function postJson(scriptUrl: string, body: unknown): Promise<any> {
   return res.json()
 }
 
+/** Cách công bố điểm cho học sinh của 1 ca:
+ * - khong: không công bố trên máy em — thầy chấm ở màn Theo dõi rồi gửi nhận xét.
+ * - ngay: server trả keyBank (CÓ đáp án) ĐÚNG 1 LẦN trong response lần nộp của
+ *   chính em đó (submitAnswers) — không có cách lấy đáp án trước khi nộp.
+ * - ca_lop_xong: em nộp xong chỉ thấy "đang chờ cả lớp"; app tự hỏi lại
+ *   (fetchKetQua) và server chỉ trả keyBank khi MỌI em đã vào thi đều đã nộp,
+ *   hoặc mọi em đều đã hết giờ — tránh em nộp sớm đọc đáp án cho em đang làm.
+ * Hai chế độ sau đều gửi keyBank lên máy chủ — thầy tự cân nhắc. */
+export type CongBoDiem = 'khong' | 'ngay' | 'ca_lop_xong'
+
 export async function publishSession(
   scriptUrl: string,
   maCa: string,
   lop: string,
   thoiGianPhut: number,
   bank: PublicExamBank,
-  // Bật thì gửi kèm keyBank (CÓ đáp án) lên server — server chỉ trả lại đúng
-  // 1 lần trong response của chính lần nộp bài của từng em (xem submitAnswers),
-  // không có cách nào lấy đáp án trước khi nộp. Thầy tự cân nhắc bật/tắt vì
-  // đây là đánh đổi với rủi ro lộ đề giữa các em thi cùng ca.
-  immediateFeedback?: boolean,
+  congBoDiem: CongBoDiem = 'khong',
   keyBank?: KeyBank,
 ): Promise<void> {
-  const result = await postJson(scriptUrl, { action: 'publish', maCa, lop, thoiGianPhut, bank, immediateFeedback, keyBank })
+  const result = await postJson(scriptUrl, {
+    action: 'publish',
+    maCa,
+    lop,
+    thoiGianPhut,
+    bank,
+    // Cột ImmediateFeedback trên sheet: 'true' | 'false' | 'calop' (bản cũ chỉ có true/false).
+    immediateFeedback: congBoDiem === 'ngay' ? true : congBoDiem === 'ca_lop_xong' ? 'calop' : false,
+    keyBank: congBoDiem === 'khong' ? undefined : keyBank,
+  })
   if (!result.ok) throw new Error(result.error || 'Mở ca kiểm tra thất bại')
+}
+
+/** Kết quả hỏi lại sau khi nộp (chế độ ca_lop_xong, hoặc mở lại app sau khi
+ * đã nộp): sanSang=true kèm keyBank khi đã được phép xem. */
+export interface KetQuaCongBo {
+  congBo: CongBoDiem
+  sanSang: boolean
+  daNop: number
+  daVao: number
+  keyBank: KeyBank | null
+}
+
+export async function fetchKetQua(scriptUrl: string, maCa: string, sbd: string): Promise<KetQuaCongBo> {
+  const url = `${scriptUrl}?action=ketQua&maCa=${encodeURIComponent(maCa)}&sbd=${encodeURIComponent(sbd)}`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
+  const r = await res.json()
+  if (!r.ok) throw new Error(r.error || 'Không hỏi được kết quả')
+  return { congBo: r.congBo, sanSang: !!r.sanSang, daNop: r.daNop ?? 0, daVao: r.daVao ?? 0, keyBank: r.keyBank ?? null }
 }
 
 export async function fetchSession(scriptUrl: string, maCa: string): Promise<SessionConfig> {
@@ -61,10 +95,10 @@ export async function submitAnswers(
   maDe: string,
   dapAn: AnswerRecord,
   integrity: IntegrityLog,
-): Promise<{ keyBank: KeyBank | null }> {
+): Promise<{ keyBank: KeyBank | null; congBo: CongBoDiem }> {
   const result = await postJson(scriptUrl, { action: 'submit', maCa, sbd, maDe, dapAn, integrity })
   if (!result.ok) throw new Error(result.error || 'Nộp bài thất bại')
-  return { keyBank: result.keyBank ?? null }
+  return { keyBank: result.keyBank ?? null, congBo: result.congBo ?? (result.keyBank ? 'ngay' : 'khong') }
 }
 
 export interface SubmissionRow {

@@ -1,49 +1,87 @@
+// MỞ CA KIỂM TRA — tối giản theo yêu cầu thầy (2026-09-02): đề đã tự về từ
+// kho, link Apps Script đã cấu hình 1 lần ở màn Ngân hàng câu hỏi, nên màn
+// này CHỈ còn 3 việc: chọn đề · lớp & thời gian · cách công bố điểm → Mở ca.
+// Không còn mục dán link, không xoá đề ở đây (xoá ở Ngân hàng câu hỏi).
 import { useEffect, useMemo, useState } from 'react'
-import { Trash2, Search, CheckSquare, Square, Library } from 'lucide-react'
+import { CheckSquare, Square, Library, Copy, Check } from 'lucide-react'
 import { bankSizeWarning, mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
-import { publishSession } from '../lib/exam-api'
-import { deleteExamSource, loadExamSources, loadScriptUrl, saveScriptUrl, saveSessionTeacherBank } from '../lib/exam-db'
+import { TheNoiDung, Hang, OThongBao, NutChinh, Nhan } from '../components/DesignSystem'
+import { publishSession, type CongBoDiem } from '../lib/exam-api'
+import { loadExamSources, loadScriptUrl, saveSessionTeacherBank } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 
 function randomSessionCode(): string {
   return String(Math.floor(100000 + Math.random() * 900000))
 }
 
+/** Link mời NGẮN: <origin>/omr-app/t/<mã ca> (public/404.html chuyển hướng về
+ * ?examCode=…; máy em lấy link Apps Script từ public/cau-hinh.json). Chỉ dùng
+ * link ngắn khi link trong cau-hinh.json ĐÚNG BẰNG link thầy đang dùng — lệch
+ * thì quay về link dài có &api=… để em không nộp nhầm chỗ. */
+async function taoLinkMoi(maCa: string, scriptUrl: string): Promise<string> {
+  const base = import.meta.env.BASE_URL
+  const linkDai = `${location.origin}${base}?examCode=${maCa}&api=${encodeURIComponent(scriptUrl)}`
+  try {
+    const res = await fetch(`${base}cau-hinh.json`, { cache: 'no-cache' })
+    if (!res.ok) return linkDai
+    const cfg = (await res.json()) as { scriptUrl?: string }
+    if ((cfg.scriptUrl || '').trim() !== scriptUrl) return linkDai
+    return `${location.origin}${base}t/${maCa}`
+  } catch {
+    return linkDai
+  }
+}
+
+const O_NHAP: React.CSSProperties = {
+  height: 52,
+  borderRadius: 'var(--bo-1)',
+  padding: '0 var(--k4)',
+  background: 'var(--the-2)',
+  border: '1.5px solid transparent',
+  fontFamily: 'var(--sans)',
+  fontSize: 'var(--cx-2)',
+  color: 'var(--muc)',
+  outline: 'none',
+  width: '100%',
+}
+const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
+const TIEU_DE_MUC: React.CSSProperties = { fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)', fontWeight: 700, color: 'var(--muc)' }
+const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
+
+const CACH_CONG_BO: { id: CongBoDiem; ten: string; mota: string }[] = [
+  { id: 'khong', ten: 'Không công bố trên máy em', mota: 'Thầy chấm ở màn Theo dõi rồi gửi nhận xét cho phụ huynh.' },
+  { id: 'ngay', ten: 'Ngay sau khi em nộp bài', mota: 'Hiện điểm + câu sai + lời giải trên máy em. Em nộp sớm có thể kể đáp án cho em đang làm.' },
+  { id: 'ca_lop_xong', ten: 'Khi cả lớp nộp xong', mota: 'Em nộp xong chỉ thấy "đang chờ cả lớp"; điểm tự hiện khi mọi em đã vào thi đều nộp (hoặc đều hết giờ).' },
+]
+
 export default function ExamSetupScreen() {
   const showToast = useAppStore((s) => s.showToast)
   const setScreen = useAppStore((s) => s.setScreen)
+  const classList = useAppStore((s) => s.classList)
 
   const [scriptUrl, setScriptUrl] = useState('')
   const [savedSources, setSavedSources] = useState<TeacherExamSource[]>([])
   const [selectedMaDe, setSelectedMaDe] = useState<Set<string>>(new Set())
-
   const [timKiemMaDe, setTimKiemMaDe] = useState('')
 
   const [lop, setLop] = useState('')
   const [thoiGianPhut, setThoiGianPhut] = useState(45)
-  const [immediateFeedback, setImmediateFeedback] = useState(false)
+  const [congBoDiem, setCongBoDiem] = useState<CongBoDiem>('khong')
   const [opening, setOpening] = useState(false)
   const [opened, setOpened] = useState<{ maCa: string; joinLink: string } | null>(null)
+  const [daCopy, setDaCopy] = useState(false)
 
   useEffect(() => {
     loadScriptUrl().then(setScriptUrl)
-    loadExamSources().then(setSavedSources)
+    loadExamSources().then((list) => {
+      setSavedSources(list)
+      // Chỉ có 1 đề thì chọn sẵn luôn — bớt một chạm.
+      if (list.length === 1) setSelectedMaDe(new Set([list[0].maDe]))
+    })
   }, [])
 
-  const handleSaveScriptUrl = async () => {
-    await saveScriptUrl(scriptUrl.trim())
-    showToast('Đã lưu link Apps Script trên máy này', 'success')
-  }
-
-  const handleDeleteContent = async (maDe: string) => {
-    await deleteExamSource(maDe)
-    setSavedSources((prev) => prev.filter((c) => c.maDe !== maDe))
-    setSelectedMaDe((prev) => {
-      const next = new Set(prev)
-      next.delete(maDe)
-      return next
-    })
-  }
+  // Lớp gợi ý từ danh sách lớp đã nối (Google Sheet) — bấm 1 chạm thay vì gõ.
+  const dsLop = useMemo(() => Array.from(new Set(classList.map((r) => r.lop.trim()).filter(Boolean))).sort(), [classList])
 
   const toggleSelect = (maDe: string) => {
     setSelectedMaDe((prev) => {
@@ -66,28 +104,24 @@ export default function ExamSetupScreen() {
   const tongCauDaChon = selectedSources.reduce((s, c) => s + c.phanI.length + c.phanII.length + c.phanIII.length, 0)
 
   const chonTatCa = () => setSelectedMaDe(new Set(dsDeLoc.map((c) => c.maDe)))
-  const boChonTatCa = () => setSelectedMaDe((prev) => {
-    const next = new Set(prev)
-    for (const c of dsDeLoc) next.delete(c.maDe)
-    return next
-  })
+  const boChonTatCa = () => setSelectedMaDe(new Set())
 
   const handleOpenSession = async () => {
-    if (!scriptUrl.trim()) return showToast('Chưa nhập link Apps Script', 'error')
+    if (!scriptUrl.trim()) return showToast('Chưa cấu hình link Apps Script — vào Ngân hàng câu hỏi → Cấu hình', 'error')
+    if (selectedSources.length === 0) return showToast('Chưa chọn đề nào cho ca này', 'error')
     if (!lop.trim()) return showToast('Chưa nhập lớp', 'error')
-    if (selectedSources.length === 0) return showToast('Chưa chọn đề nào cho ngân hàng câu hỏi của ca này', 'error')
-    if (thoiGianPhut <= 0) return showToast('Thời gian làm bài phải lớn hơn 0', 'error')
+    if (!Number.isFinite(thoiGianPhut) || thoiGianPhut <= 0) return showToast('Thời gian làm bài phải lớn hơn 0', 'error')
 
     setOpening(true)
     try {
       const maCa = randomSessionCode()
       const publicBank = mergeAndStrip(selectedSources)
-      const keyBank = immediateFeedback ? mergeKeepAnswers(selectedSources) : undefined
-      await publishSession(scriptUrl.trim(), maCa, lop.trim(), thoiGianPhut, publicBank, immediateFeedback, keyBank)
+      const keyBank = congBoDiem === 'khong' ? undefined : mergeKeepAnswers(selectedSources)
+      await publishSession(scriptUrl.trim(), maCa, lop.trim(), thoiGianPhut, publicBank, congBoDiem, keyBank)
       // Lưu bản CÓ đáp án trên máy thầy để màn Theo dõi chấm lại được sau này.
       await saveSessionTeacherBank(maCa, selectedSources)
-      const joinLink = `${location.origin}${location.pathname}?examCode=${maCa}&api=${encodeURIComponent(scriptUrl.trim())}`
-      setOpened({ maCa, joinLink })
+      setOpened({ maCa, joinLink: await taoLinkMoi(maCa, scriptUrl.trim()) })
+      setDaCopy(false)
       showToast('Đã mở ca kiểm tra', 'success')
     } catch (e) {
       showToast(`Lỗi mở ca: ${e instanceof Error ? e.message : 'không rõ nguyên nhân'}`, 'error')
@@ -96,209 +130,199 @@ export default function ExamSetupScreen() {
     }
   }
 
+  const copyLink = () => {
+    if (!opened) return
+    navigator.clipboard.writeText(opened.joinLink).then(() => {
+      setDaCopy(true)
+      showToast('Đã copy link mời vào thi', 'success')
+    })
+  }
+
+  // ------------------------------------------------------------ CA ĐÃ MỞ
   if (opened) {
     return (
-      <div className="min-h-screen pb-24 px-4 pt-4 space-y-4 bg-slate-50 dark:bg-slate-950">
-        <h1 className="text-xl font-bold">Ca kiểm tra đã mở</h1>
-        <div className="rounded-xl bg-indigo-600 text-white p-6 text-center">
-          <div className="text-sm opacity-90">Mã ca</div>
-          <div className="text-4xl font-bold tracking-widest">{opened.maCa}</div>
+      <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--serif)' }}>
+        <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)' }}>
+          Ca kiểm tra đã mở
+        </h1>
+        <div className="text-center" style={{ background: 'var(--g1)', color: 'var(--giay)', borderRadius: 'var(--bo-3)', padding: 'var(--k6)', boxShadow: 'var(--bong-2)' }}>
+          <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', opacity: 0.9 }}>Mã ca</div>
+          <div className="font-bold" style={{ ...SO, fontSize: 44, letterSpacing: '.18em' }}>
+            {opened.maCa}
+          </div>
+          <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', opacity: 0.9 }}>
+            Lớp {lop.trim()} · {thoiGianPhut} phút · {tongCauDaChon} câu · {CACH_CONG_BO.find((c) => c.id === congBoDiem)?.ten}
+          </div>
         </div>
-        <p className="text-sm text-slate-500">
-          Gửi link sau cho học sinh (qua Zalo nhóm lớp) — học sinh mở link, chỉ cần nhập số báo danh là vào thi ngay:
-        </p>
-        <div className="rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 p-3 text-xs break-all">
-          {opened.joinLink}
-        </div>
-        <button
-          onClick={() => navigator.clipboard.writeText(opened.joinLink).then(() => showToast('Đã copy link', 'success'))}
-          className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold"
-        >
-          Copy link mời vào thi
-        </button>
-        <button
-          onClick={() => setScreen('exammonitor')}
-          className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 font-semibold"
-        >
+        <TheNoiDung>
+          <div style={NHAN_NHO}>Gửi link này vào nhóm Zalo lớp — em mở link, gõ số báo danh là vào thi:</div>
+          <div className="break-all" style={{ ...SO, fontSize: 'var(--cx-1)', background: 'var(--the-2)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)', marginTop: 'var(--k2)', marginBottom: 'var(--k3)' }}>
+            {opened.joinLink}
+          </div>
+          <NutChinh onClick={copyLink}>
+            <span className="inline-flex items-center gap-2">
+              {daCopy ? <Check size={18} /> : <Copy size={18} />} {daCopy ? 'Đã copy' : 'Copy link mời vào thi'}
+            </span>
+          </NutChinh>
+        </TheNoiDung>
+        <NutChinh variant="phu" onClick={() => setScreen('exammonitor')}>
           Theo dõi bài nộp của ca này →
-        </button>
-        <button onClick={() => setOpened(null)} className="tap-target w-full text-sm text-slate-500">
+        </NutChinh>
+        <button onClick={() => setOpened(null)} className="tap-target" style={NHAN_NHO}>
           ← Mở ca khác
         </button>
       </div>
     )
   }
 
+  // ------------------------------------------------------------ SOẠN CA
   return (
-    <div className="min-h-screen pb-24 px-4 pt-4 space-y-5 bg-slate-50 dark:bg-slate-950">
-      <h1 className="text-xl font-bold">Soạn đề &amp; mở ca kiểm tra</h1>
-
-      <section className="space-y-2">
-        <h2 className="font-semibold text-sm">1. Link Apps Script nhận bài</h2>
-        <p className="text-xs text-slate-500">
-          Làm 1 lần: dán code file <code>docs/apps-script-kiem-tra.gs</code> vào script.google.com, triển khai làm Ứng
-          dụng web, dán link /exec vào đây.
-        </p>
-        <input
-          className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 text-sm"
-          placeholder="https://script.google.com/macros/s/.../exec"
-          value={scriptUrl}
-          onChange={(e) => setScriptUrl(e.target.value)}
-        />
-        <button
-          onClick={handleSaveScriptUrl}
-          className="tap-target w-full rounded-lg bg-slate-200 dark:bg-slate-800 text-sm font-semibold"
-        >
-          Lưu link
+    <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--serif)' }}>
+      <div className="flex items-center justify-between">
+        <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)' }}>
+          Mở ca kiểm tra
+        </h1>
+        <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target">
+          ← Kiểm tra
         </button>
-      </section>
+      </div>
 
-      <section className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-sm">2. Chọn đề từ ngân hàng câu hỏi cho ca này</h2>
-          <button
-            onClick={() => setScreen('nganhangde')}
-            className="tap-target flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 font-medium"
-          >
-            <Library size={14} /> Ngân hàng câu hỏi
-          </button>
+      {/* 1. ĐỀ */}
+      <TheNoiDung>
+        <div className="flex items-center justify-between" style={{ gap: 'var(--k3)', marginBottom: 'var(--k3)' }}>
+          <div style={TIEU_DE_MUC}>Đề cho ca này</div>
+          {selectedSources.length > 0 && (
+            <Nhan tone="xanh">
+              {selectedSources.length} đề · {tongCauDaChon} câu
+            </Nhan>
+          )}
         </div>
 
         {savedSources.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-slate-300 dark:border-slate-600 p-4 text-center space-y-2">
-            <p className="text-xs text-slate-500">Ngân hàng câu hỏi chưa có đề nào — thả file vào kho-de/moi/ trên máy rồi đồng bộ.</p>
-            <button
-              onClick={() => setScreen('nganhangde')}
-              className="tap-target inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold px-4"
-            >
-              <Library size={16} /> Mở Ngân hàng câu hỏi
-            </button>
+          <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
+            <OThongBao tone="cam">Ngân hàng chưa có đề nào — thả file vào kho-de/moi/ trên máy, đề tự về.</OThongBao>
+            <NutChinh variant="phu" onClick={() => setScreen('nganhangde')}>
+              <span className="inline-flex items-center gap-2">
+                <Library size={18} /> Mở Ngân hàng câu hỏi
+              </span>
+            </NutChinh>
           </div>
         ) : (
-          <>
-            <div className="relative">
-              <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 pl-8 pr-3 text-sm"
-                placeholder="Tìm theo mã đề…"
-                value={timKiemMaDe}
-                onChange={(e) => setTimKiemMaDe(e.target.value)}
-              />
-            </div>
+          <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+            {savedSources.length >= 6 && (
+              <input style={O_NHAP} placeholder="Tìm theo mã đề…" value={timKiemMaDe} onChange={(e) => setTimKiemMaDe(e.target.value)} inputMode="search" />
+            )}
+            {dsDeLoc.map((c) => {
+              const dangChon = selectedMaDe.has(c.maDe)
+              const tongCau = c.phanI.length + c.phanII.length + c.phanIII.length
+              return (
+                <Hang key={c.maDe} selected={dangChon} onClick={() => toggleSelect(c.maDe)} data-trang-thai={dangChon ? 'chon' : undefined}>
+                  <span className="shrink-0" style={{ color: dangChon ? 'var(--xanh)' : 'var(--mo)' }}>
+                    {dangChon ? <CheckSquare size={20} /> : <Square size={20} />}
+                  </span>
+                  <span className="flex-1 min-w-0">
+                    <div className="font-bold" style={{ fontSize: 'var(--cx-2)' }}>
+                      Mã {c.maDe}
+                    </div>
+                    <div style={NHAN_NHO}>
+                      I {c.phanI.length} · II {c.phanII.length} · III {c.phanIII.length}
+                    </div>
+                  </span>
+                  <span className="shrink-0 font-bold" style={{ ...SO, fontSize: 'var(--cx-2)' }}>
+                    {tongCau} câu
+                  </span>
+                </Hang>
+              )
+            })}
+            {savedSources.length > 1 && (
+              <div className="flex items-center" style={{ gap: 'var(--k4)', ...NHAN_NHO }}>
+                <button onClick={chonTatCa} className="tap-target" style={{ color: 'var(--muc)', fontWeight: 700 }}>
+                  Chọn tất cả
+                </button>
+                <button onClick={boChonTatCa} className="tap-target">
+                  Bỏ chọn
+                </button>
+              </div>
+            )}
+            {sizeWarning && <OThongBao tone="cam">{sizeWarning}</OThongBao>}
+          </div>
+        )}
+      </TheNoiDung>
 
-            <div className="flex items-center gap-3 text-xs">
-              <button onClick={chonTatCa} className="tap-target flex items-center gap-1 text-indigo-600 dark:text-indigo-400 font-medium">
-                <CheckSquare size={14} /> Chọn tất cả
-              </button>
-              <button onClick={boChonTatCa} className="tap-target flex items-center gap-1 text-slate-500">
-                <Square size={14} /> Bỏ chọn hết
-              </button>
-              {dsDeLoc.length !== savedSources.length && (
-                <span className="text-slate-400">({dsDeLoc.length}/{savedSources.length} đề khớp tìm kiếm)</span>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {dsDeLoc.map((c) => {
-                const dangChon = selectedMaDe.has(c.maDe)
-                const tongCau = c.phanI.length + c.phanII.length + c.phanIII.length
+      {/* 2. LỚP & THỜI GIAN */}
+      <TheNoiDung>
+        <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Lớp & thời gian</div>
+        <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
+          {dsLop.length > 0 && (
+            <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }}>
+              {dsLop.map((l) => {
+                const chon = lop.trim() === l
                 return (
                   <button
-                    key={c.maDe}
-                    onClick={() => toggleSelect(c.maDe)}
-                    className={`tap-target text-left rounded-xl border-2 p-3 transition-colors ${
-                      dangChon
-                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950'
-                        : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900'
-                    }`}
+                    key={l}
+                    type="button"
+                    onClick={() => setLop(l)}
+                    className="tap-target font-bold"
+                    style={{
+                      ...SO,
+                      fontSize: 'var(--cx-2)',
+                      padding: '0 var(--k4)',
+                      borderRadius: 'var(--bo-tron)',
+                      background: chon ? 'var(--muc)' : 'var(--the-2)',
+                      color: chon ? 'var(--muc-nguoc)' : 'var(--muc)',
+                    }}
                   >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <div className="font-semibold text-sm truncate flex items-center gap-1.5">
-                          {dangChon ? (
-                            <CheckSquare size={15} className="shrink-0 text-indigo-600" />
-                          ) : (
-                            <Square size={15} className="shrink-0 text-slate-300" />
-                          )}
-                          Mã {c.maDe}
-                        </div>
-                        <div className="text-xs text-slate-500 mt-0.5">
-                          Phần I {c.phanI.length} · Phần II {c.phanII.length} · Phần III {c.phanIII.length} · tổng {tongCau} câu
-                        </div>
-                      </div>
-                      <span
-                        role="button"
-                        tabIndex={0}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          if (confirm(`Xoá đề "${c.maDe}" khỏi ngân hàng câu hỏi? Không thể hoàn tác.`)) handleDeleteContent(c.maDe)
-                        }}
-                        className="tap-target shrink-0 text-slate-300 hover:text-rose-600"
-                        title="Xoá đề này khỏi ngân hàng"
-                      >
-                        <Trash2 size={14} />
-                      </span>
-                    </div>
+                    {l}
                   </button>
                 )
               })}
             </div>
-
-            {selectedSources.length > 0 && (
-              <div className="rounded-lg bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 px-3 py-2 text-xs text-indigo-700 dark:text-indigo-300">
-                Đã chọn {selectedSources.length} đề · {tongCauDaChon} câu gộp vào ngân hàng câu hỏi của ca này.
-              </div>
-            )}
-            {sizeWarning && (
-              <div className="rounded-lg bg-amber-50 dark:bg-amber-950 border border-amber-300 dark:border-amber-800 p-3 text-xs text-amber-700 dark:text-amber-300">
-                {sizeWarning}
-              </div>
-            )}
-          </>
-        )}
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="font-semibold text-sm">3. Lớp &amp; thời gian</h2>
-        <input
-          className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3"
-          placeholder="Lớp (vd 12A1)"
-          value={lop}
-          onChange={(e) => setLop(e.target.value)}
-        />
-        <div className="flex items-center gap-2">
-          <input
-            type="number"
-            className="tap-target w-24 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3"
-            value={thoiGianPhut}
-            onChange={(e) => setThoiGianPhut(Number(e.target.value))}
-          />
-          <span className="text-sm text-slate-500">phút làm bài</span>
+          )}
+          <input style={O_NHAP} placeholder="Lớp (vd 12A1)" value={lop} onChange={(e) => setLop(e.target.value)} />
+          <div className="flex items-center" style={{ gap: 'var(--k3)' }}>
+            <input
+              type="number"
+              inputMode="numeric"
+              min={1}
+              style={{ ...O_NHAP, width: 110, ...SO }}
+              value={thoiGianPhut}
+              onChange={(e) => setThoiGianPhut(Number(e.target.value))}
+            />
+            <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--nhat)' }}>phút làm bài</span>
+          </div>
         </div>
-        <label className="tap-target flex items-start gap-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2.5">
-          <input
-            type="checkbox"
-            className="mt-0.5"
-            checked={immediateFeedback}
-            onChange={(e) => setImmediateFeedback(e.target.checked)}
-          />
-          <span className="text-sm">
-            <b>Cho học sinh xem điểm ngay sau khi nộp bài</b>
-            <div className="text-xs text-slate-500 mt-0.5">
-              Hiện popup điểm chi tiết + câu sai ngay trên máy em. Đánh đổi: đáp án của ca này sẽ có trong máy chủ để
-              trả về — chỉ bật khi KHÔNG lo lộ đề giữa các em (vd mỗi em thi giờ riêng, hoặc đề không dùng lại).
-            </div>
-          </span>
-        </label>
-      </section>
+      </TheNoiDung>
 
-      <button
-        onClick={handleOpenSession}
-        disabled={opening}
-        className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold disabled:opacity-60"
-      >
+      {/* 3. CÔNG BỐ ĐIỂM */}
+      <TheNoiDung>
+        <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Công bố điểm cho học sinh</div>
+        <div className="flex flex-col" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Cách công bố điểm">
+          {CACH_CONG_BO.map((c) => {
+            const chon = congBoDiem === c.id
+            return (
+              <Hang key={c.id} selected={chon} onClick={() => setCongBoDiem(c.id)} data-trang-thai={chon ? 'chon' : undefined}>
+                <span
+                  className="shrink-0 flex items-center justify-center"
+                  aria-hidden
+                  style={{ width: 20, height: 20, borderRadius: 'var(--bo-tron)', border: `2px solid ${chon ? 'var(--xanh)' : 'var(--vien-dam)'}` }}
+                >
+                  {chon && <span style={{ width: 10, height: 10, borderRadius: 'var(--bo-tron)', background: 'var(--xanh)' }} />}
+                </span>
+                <span className="flex-1 min-w-0">
+                  <div className="font-bold" style={{ fontSize: 'var(--cx-2)' }}>
+                    {c.ten}
+                  </div>
+                  <div style={NHAN_NHO}>{c.mota}</div>
+                </span>
+              </Hang>
+            )
+          })}
+        </div>
+      </TheNoiDung>
+
+      <NutChinh onClick={handleOpenSession} disabled={opening}>
         {opening ? 'Đang mở ca…' : 'Mở ca kiểm tra'}
-      </button>
+      </NutChinh>
     </div>
   )
 }

@@ -126,6 +126,14 @@ function jsonResponse_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON)
 }
 
+// Cột ImmediateFeedback của ca -> tên chế độ công bố điểm dùng trong app.
+function congBoCua_(cell) {
+  const v = String(cell || '')
+  if (v === 'true') return 'ngay'
+  if (v === 'calop') return 'ca_lop_xong'
+  return 'khong'
+}
+
 function findRowByKey_(sh, keyCol, keyVal) {
   const data = sh.getDataRange().getValues()
   for (let i = 1; i < data.length; i++) {
@@ -153,6 +161,52 @@ function doGet(e) {
       bank: docJsonLon_(vals[4]),
     })
   }
+  if (action === 'ketQua') {
+    // Em hỏi lại sau khi nộp: đã được xem đáp án chưa? CHỈ trả keyBank cho em
+    // ĐÃ NỘP, và với chế độ 'calop' chỉ khi (a) mọi SBD đã vào thi ca này
+    // (sheet TrangThai) đều đã có bài nộp, hoặc (b) mọi em đó đều đã hết giờ
+    // (BatDauLuc + thoiGianPhut + 2 phút) — em nộp sớm không thể lấy đáp án
+    // trong lúc bạn còn đang làm.
+    const maCa = e.parameter.maCa || ''
+    const sbd = (e.parameter.sbd || '').trim()
+    const caSh = getSheet_(SHEET_CA, ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson'])
+    const caRow = findRowByKey_(caSh, 0, maCa)
+    if (caRow < 0) return jsonResponse_({ ok: false, error: 'Không có ca ' + maCa })
+    const caVals = caSh.getRange(caRow, 1, 1, 7).getValues()[0]
+    const congBo = congBoCua_(caVals[5])
+    const thoiGianPhut = Number(caVals[2]) || 45
+
+    const blSh = getSheet_(SHEET_BAILAM, ['MaCa', 'SBD', 'MaDe', 'ThoiGianNop', 'DapAnJson', 'SoLanRoiApp', 'TongGiayRoiApp', 'IntegrityJson'])
+    const bl = blSh.getDataRange().getValues()
+    const daNop = {}
+    for (let i = 1; i < bl.length; i++) if (String(bl[i][0]) === String(maCa)) daNop[String(bl[i][1])] = true
+    const emDaNop = !!daNop[sbd]
+    const soDaNop = Object.keys(daNop).length
+
+    if (congBo === 'khong' || !caVals[6]) return jsonResponse_({ ok: true, congBo: congBo, sanSang: false, daNop: soDaNop, daVao: soDaNop, keyBank: null })
+    if (congBo === 'ngay') return jsonResponse_({ ok: true, congBo: congBo, sanSang: emDaNop, daNop: soDaNop, daVao: soDaNop, keyBank: emDaNop ? docJsonLon_(caVals[6]) : null })
+
+    // calop
+    const stSh = getSheet_(SHEET_TRANGTHAI, ['SBD', 'MaCa', 'Lop', 'DangLam', 'BatDauLuc', 'DaLamCauHoi', 'TongCauHoi', 'SoLanRoiApp', 'Blocked', 'CapNhatLuc'])
+    const st = stSh.getDataRange().getValues()
+    const now = Date.now()
+    const han = (thoiGianPhut + 2) * 60000
+    let daVao = 0
+    let conDangLam = 0
+    for (let i = 1; i < st.length; i++) {
+      if (String(st[i][1]) !== String(maCa)) continue
+      daVao++
+      const sbdKia = String(st[i][0])
+      const batDau = new Date(st[i][4]).getTime()
+      const hetGio = isFinite(batDau) && now > batDau + han
+      if (!daNop[sbdKia] && !hetGio) conDangLam++
+    }
+    // Em nào nộp mà không có dòng TrangThai (mất mạng lúc đẩy trạng thái) vẫn tính là đã vào.
+    if (soDaNop > daVao) daVao = soDaNop
+    const sanSang = emDaNop && soDaNop > 0 && conDangLam === 0
+    return jsonResponse_({ ok: true, congBo: congBo, sanSang: sanSang, daNop: soDaNop, daVao: daVao, keyBank: sanSang ? docJsonLon_(caVals[6]) : null })
+  }
+
   if (action === 'listSubmissions') {
     const maCa = e.parameter.maCa || ''
     const sh = getSheet_(SHEET_BAILAM, ['MaCa', 'SBD', 'MaDe', 'ThoiGianNop', 'DapAnJson', 'SoLanRoiApp', 'TongGiayRoiApp', 'IntegrityJson'])
@@ -448,7 +502,8 @@ function doPost(e) {
       body.thoiGianPhut,
       new Date().toISOString(),
       luuJsonLon_('ca_' + body.maCa + '_bank', body.bank, cu[4]),
-      body.immediateFeedback ? 'true' : 'false',
+      // 'true' = xem điểm ngay khi nộp · 'calop' = khi cả lớp nộp xong · 'false' = không
+      body.immediateFeedback === 'calop' ? 'calop' : body.immediateFeedback ? 'true' : 'false',
       body.keyBank ? luuJsonLon_('ca_' + body.maCa + '_key', body.keyBank, cu[6]) : '',
     ]
     if (row > 0) {
@@ -489,15 +544,18 @@ function doPost(e) {
 
     // Nếu ca này bật "xem điểm ngay sau khi nộp", trả kèm đáp án (keyBank)
     // NGAY TRONG RESPONSE của lần nộp này — chỉ em vừa nộp nhận được, không
-    // có endpoint nào khác cho phép lấy đáp án trước khi nộp bài.
+    // có endpoint nào khác cho phép lấy đáp án trước khi nộp bài. Chế độ
+    // 'calop' (khi cả lớp nộp xong) KHÔNG trả ở đây — em hỏi lại qua ketQua.
     const caSh = getSheet_(SHEET_CA, ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson'])
     const caRow = findRowByKey_(caSh, 0, body.maCa)
     let keyBank = null
+    let congBo = 'khong'
     if (caRow > 0) {
       const caVals = caSh.getRange(caRow, 1, 1, 7).getValues()[0]
-      if (String(caVals[5]) === 'true' && caVals[6]) keyBank = docJsonLon_(caVals[6])
+      congBo = congBoCua_(caVals[5])
+      if (congBo === 'ngay' && caVals[6]) keyBank = docJsonLon_(caVals[6])
     }
-    return jsonResponse_({ ok: true, keyBank: keyBank })
+    return jsonResponse_({ ok: true, keyBank: keyBank, congBo: congBo })
   }
 
   if (action === 'registerParent') {

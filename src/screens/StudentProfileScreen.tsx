@@ -201,12 +201,12 @@ export default function StudentProfileScreen() {
       </div>
 
       {inbox.length > 0 && (
-        <div className="rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-900 p-4 space-y-2.5">
-          <div className="font-semibold text-sm flex items-center gap-2 text-indigo-700 dark:text-indigo-400">
+        <div className="rounded-xl p-4 space-y-2.5" style={{ background: 'var(--the)', boxShadow: 'var(--bong-1)' }}>
+          <div className="font-semibold text-sm flex items-center gap-2" style={{ color: 'var(--muc)' }}>
             <MessageSquareText size={16} /> Tin nhắn từ thầy
           </div>
           {inbox.map((m) => (
-            <div key={m.id} className="text-sm bg-white dark:bg-slate-900 rounded-lg p-2.5 border border-indigo-100 dark:border-indigo-900">
+            <div key={m.id} className="text-sm rounded-lg p-2.5" style={{ background: 'var(--the-2)' }}>
               <div className="whitespace-pre-wrap">{m.noiDung}</div>
               <div className="text-[11px] text-slate-400 mt-1">{new Date(m.thoiGian).toLocaleString('vi-VN')}</div>
             </div>

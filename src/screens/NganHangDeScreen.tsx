@@ -328,7 +328,7 @@ export default function NganHangDeScreen() {
       </TheNoiDung>
 
       {hoiChamLai && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(26,35,50,.6)' }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'var(--phu)' }}>
           <div className="w-full flex flex-col" style={{ maxWidth: 400, background: 'var(--the)', borderRadius: 'var(--bo-3)', padding: 'var(--k5)', gap: 'var(--k3)', boxShadow: 'var(--bong-2)' }}>
             <div style={{ fontSize: 'var(--cx-3)', lineHeight: 1.6 }}>
               Đã chốt đáp án mới cho đề {hoiChamLai.maDe}. Có <b>{hoiChamLai.soCa} ca đã mở</b> dùng câu này — chấm lại các bài đã nộp theo đáp án mới không?

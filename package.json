@@ -9,6 +9,7 @@
     "build:pages": "tsc -b && GITHUB_PAGES=true vite build",
     "test": "vitest",
     "lint": "oxlint",
+    "check:mau": "node scripts/check-mau.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

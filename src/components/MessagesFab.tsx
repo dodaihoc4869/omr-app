@@ -22,19 +22,31 @@ function loadPos(): { x: number; y: number } {
   } catch {
     // localStorage có thể bị chặn (chế độ ẩn danh) — dùng vị trí mặc định.
   }
-  return { x: typeof window !== 'undefined' ? window.innerWidth - SIZE - 16 : 300, y: typeof window !== 'undefined' ? window.innerHeight - SIZE - 100 : 400 }
+  return { x: typeof window !== 'undefined' ? window.innerWidth - SIZE - 16 : 300, y: typeof window !== 'undefined' ? window.innerHeight - SIZE - vungDuoi() : 400 }
+}
+
+// Vùng phía dưới KHÔNG được đè lên: thanh Lớp/Kiểm tra/Phụ huynh (72px) +
+// vùng an toàn của máy (env(safe-area-inset-bottom)) — MANCUAVAOVANENTOI.md mục 5.
+function vungDuoi(): number {
+  if (typeof window === 'undefined') return 72
+  const probe = document.createElement('div')
+  probe.style.cssText = 'position:fixed;bottom:0;height:env(safe-area-inset-bottom);visibility:hidden;pointer-events:none'
+  document.body.appendChild(probe)
+  const safe = probe.getBoundingClientRect().height || 0
+  probe.remove()
+  return 72 + safe
 }
 
 function clampPos(p: { x: number; y: number }): { x: number; y: number } {
   const maxX = window.innerWidth - SIZE - 4
-  const maxY = window.innerHeight - SIZE - 4
+  const maxY = window.innerHeight - SIZE - vungDuoi()
   return { x: Math.min(Math.max(p.x, 4), Math.max(4, maxX)), y: Math.min(Math.max(p.y, 4), Math.max(4, maxY)) }
 }
 
 export default function MessagesFab() {
   const showToast = useAppStore((s) => s.showToast)
   const [scriptUrl, setScriptUrl] = useState('')
-  const [pos, setPos] = useState(loadPos)
+  const [pos, setPos] = useState(() => (typeof window !== 'undefined' ? clampPos(loadPos()) : loadPos()))
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState<ParentMessage[] | null>(null)
   const [loading, setLoading] = useState(false)

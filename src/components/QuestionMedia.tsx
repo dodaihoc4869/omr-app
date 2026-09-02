@@ -27,8 +27,8 @@ export function ZoomableImage({ src, alt, className = '' }: { src: string; alt: 
 /** Lớp phủ xem ảnh toàn màn hình — nền tối 90%, chạm ra ngoài để đóng. */
 export function ManHinhAnh({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-2 overflow-auto" style={{ background: 'rgba(26,35,50,.9)' }} onClick={onClose}>
-      <img src={src} alt={alt} className="max-w-full max-h-full" style={{ borderRadius: 'var(--bo-1)', background: '#fff' }} />
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-2 overflow-auto" style={{ background: 'var(--phu-dam)' }} onClick={onClose}>
+      <img src={src} alt={alt} className="max-w-full max-h-full" style={{ borderRadius: 'var(--bo-1)', background: 'var(--giay)' }} />
     </div>
   )
 }

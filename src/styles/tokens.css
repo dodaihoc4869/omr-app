@@ -1,18 +1,25 @@
 /* HỆ THIẾT KẾ TOÀN APP — nguồn sự thật DUY NHẤT cho màu/cỡ chữ/khoảng cách.
- * Bước 1 trong HETHIETKETOANAPP.md — mọi mã màu/cỡ chữ viết cứng trong các
- * màn hình sẽ được thay bằng biến ở đây khi áp dụng (bước 3, CHƯA làm ở đây).
- * KHÔNG theo theme sáng/tối hệ thống — một bộ giá trị cố định cho toàn app,
- * giống nguyên tắc đã áp cho màn Quét OMR/Làm bài trước đó. */
+ * Bước 1 trong HETHIETKETOANAPP.md; nền tối theo MANCUAVAOVANENTOI.md mục 1:
+ * cùng TÊN biến, giá trị đổi theo prefers-color-scheme của hệ thống. Ngoài
+ * file này KHÔNG được có mã màu "#" nào khác (kiểm bằng scripts trong
+ * package.json: "check:mau"). */
 :root {
   /* nền và bề mặt */
   --nen: #f7f8fa;
   --the: #ffffff;
   --the-2: #f3f4f6; /* nền chìm: hàng phương án, ô nhập */
+  --the-mo: rgba(255, 255, 255, 0.85); /* thanh trên mờ (backdrop-filter) của màn làm bài */
+  --giay: #ffffff; /* "tờ giấy": nền ảnh cắt từ đề + phiếu in — CỐ ĐỊNH trắng ở cả 2 nền */
 
   /* chữ */
   --muc: #1a2332;
   --nhat: #6b7280;
   --mo: #9ca3af;
+  --muc-nguoc: #ffffff; /* chữ đặt TRÊN nền --muc/--do/--tim đặc (nút chính, cảnh báo) */
+
+  /* lớp phủ sau hộp thoại / ảnh phóng to */
+  --phu: rgba(26, 35, 50, 0.55);
+  --phu-dam: rgba(26, 35, 50, 0.9);
 
   /* đường kẻ */
   --vien: #e5e7eb;
@@ -69,6 +76,41 @@
   --bong-2: 0 4px 16px rgba(0, 0, 0, 0.1);
 
   --nhanh: 120ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* NỀN TỐI — MANCUAVAOVANENTOI.md mục 1. Giữ nguyên tên biến, chỉ đổi giá trị;
+ * gradient --g1..--g4 giữ nguyên (đủ tương phản ở cả hai nền). Các biến cỡ
+ * chữ/khoảng cách/bo góc không đổi theo nền. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --nen: #0f1419;
+    --the: #1a2029;
+    --the-2: #242b36;
+    --the-mo: rgba(26, 32, 41, 0.85);
+
+    --muc: #e8eaed;
+    --nhat: #9aa4b2;
+    --mo: #6b7482;
+    --muc-nguoc: #0f1419;
+
+    --phu: rgba(0, 0, 0, 0.6);
+    --phu-dam: rgba(0, 0, 0, 0.9);
+
+    --vien: #2a323d;
+    --vien-dam: #3a434f;
+
+    --xanh: #34d399;
+    --xanh-nen: #0d2f24;
+    --do: #f87171;
+    --do-nen: #2f1516;
+    --cam: #fbbf24;
+    --cam-nen: #2d2411;
+    --tim: #818cf8;
+    --tim-nen: #1e1f3d;
+
+    --bong-1: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --bong-2: 0 4px 16px rgba(0, 0, 0, 0.5);
+  }
 }
 
 /* Tôn trọng prefers-reduced-motion trên TOÀN APP — tắt hết chuyển động,

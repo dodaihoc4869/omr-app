@@ -114,6 +114,25 @@ export async function loadScriptUrl(): Promise<string> {
   return (await db.get(STORE_SETTINGS, 'scriptUrl')) || ''
 }
 
+/** Link Apps Script cho MÁY HỌC SINH mở link ngắn /t/<mã ca> (không kèm
+ * &api=...): thứ tự ưu tiên IndexedDB (đã lưu từ lần trước) → file
+ * public/cau-hinh.json cùng thư mục app (do thầy push kèm code). Lấy được từ
+ * file thì lưu lại để lần sau offline vẫn có. */
+export async function loadScriptUrlHoacMacDinh(): Promise<string> {
+  const daLuu = await loadScriptUrl()
+  if (daLuu) return daLuu
+  try {
+    const res = await fetch(`${import.meta.env.BASE_URL}cau-hinh.json`, { cache: 'no-cache' })
+    if (!res.ok) return ''
+    const cfg = (await res.json()) as { scriptUrl?: string }
+    const url = (cfg.scriptUrl || '').trim()
+    if (url) await saveScriptUrl(url)
+    return url
+  } catch {
+    return ''
+  }
+}
+
 /** Mã bí mật kho đề (khớp MA_BI_MAT trong Apps Script) — chỉ trên máy thầy. */
 export async function saveTeacherSecret(secret: string): Promise<void> {
   const db = await getDb()

@@ -1,0 +1,4 @@
+{
+  "ghi_chu": "Link Apps Script nhận bài — app học sinh tự đọc file này khi mở link ngắn /t/<mã ca> mà máy chưa lưu link. KHÔNG phải bí mật (mọi link mời vào thi trước đây đều chứa nó); đáp án/đề trong kho được bảo vệ bằng MA_BI_MAT, không bằng link. Đổi link /exec thì sửa ở đây rồi push.",
+  "scriptUrl": "https://script.google.com/macros/s/AKfycbyrnfvuVqJuI_vO6sar8J9DGqACIVLw3kNXmosa9981ukgEGZy3jrMvUT8PmyZPcvvi/exec"
+}

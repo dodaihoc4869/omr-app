@@ -1,99 +1,83 @@
+import type { ReactNode } from 'react'
 import { ClipboardList, GraduationCap, Users2, Users, Library } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
+
+// MANCUAVAOVANENTOI.md mục 2: thẻ KHÔNG viền màu, phân cấp bằng bóng --bong-1;
+// CHỈ MỘT thẻ nổi bật — hành động chính (mở ca) — bằng nền gradient --g1;
+// tiêu đề thẻ màu --muc. Màn này sẽ được thay bằng "màn cửa vào ba vai trò"
+// (mục 3) — giữ tối giản, không thêm gì ngoài hệ thiết kế.
+function TheBam({
+  icon,
+  title,
+  sub,
+  onClick,
+  noiBat = false,
+}: {
+  icon: ReactNode
+  title: string
+  sub: string
+  onClick: () => void
+  noiBat?: boolean
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="tap-target w-full text-left flex items-center gap-3"
+      style={{
+        background: noiBat ? 'var(--g1)' : 'var(--the)',
+        color: noiBat ? 'var(--giay)' : 'var(--muc)',
+        borderRadius: 'var(--bo-3)',
+        boxShadow: 'var(--bong-1)',
+        padding: 'var(--k4) var(--k5)',
+        minHeight: 72,
+      }}
+    >
+      <span
+        className="shrink-0 flex items-center justify-center"
+        style={{
+          width: 40,
+          height: 40,
+          borderRadius: 'var(--bo-1)',
+          background: noiBat ? 'rgba(255,255,255,.2)' : 'var(--the-2)',
+          color: noiBat ? 'var(--giay)' : 'var(--nhat)',
+        }}
+      >
+        {icon}
+      </span>
+      <span className="min-w-0">
+        <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)' }}>
+          {title}
+        </div>
+        <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: noiBat ? 'var(--giay)' : 'var(--nhat)', opacity: noiBat ? 0.9 : 1, marginTop: 2 }}>
+          {sub}
+        </div>
+      </span>
+    </button>
+  )
+}
 
 export default function ExamHubScreen() {
   const setScreen = useAppStore((s) => s.setScreen)
 
   return (
-    <div className="min-h-screen pb-24 px-4 pt-4 space-y-4 bg-slate-50 dark:bg-slate-950">
-      <h1 className="text-xl font-bold">Kiểm tra tại lớp</h1>
-      <p className="text-sm text-slate-500">
-        Mỗi học sinh nhận một đề với thứ tự câu/đáp án riêng (chống nhìn bài), có đồng hồ đếm giờ, nộp bài tự lưu lên
-        Google Sheet của lớp để chấm.
-      </p>
+    <div className="min-h-screen pb-24 px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)' }}>
+      <h1 className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-5)' }}>
+        Kiểm tra tại lớp
+      </h1>
 
-      <button
-        onClick={() => setScreen('nganhangde')}
-        className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold p-4 text-left flex items-center gap-3"
-      >
-        <span className="shrink-0 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center">
-          <Library size={22} />
-        </span>
-        <span>
-          <div className="text-base">Giáo viên — Ngân hàng câu hỏi</div>
-          <div className="text-xs font-normal opacity-90 mt-1">Đề tự về từ kho (thầy chỉ thả file vào kho-de/moi trên máy) · duyệt câu nghi đáp án</div>
-        </span>
-      </button>
-
-      <button
+      <TheBam
+        noiBat
+        icon={<GraduationCap size={22} />}
+        title="Chọn đề & mở ca kiểm tra"
+        sub="Chọn đề trong ngân hàng, đặt lớp và thời gian, phát mã ca"
         onClick={() => setScreen('examsetup')}
-        className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 font-semibold p-4 text-left flex items-center gap-3"
-      >
-        <span className="shrink-0 w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center">
-          <GraduationCap size={22} />
-        </span>
-        <span>
-          <div className="text-base">Giáo viên — Chọn đề &amp; mở ca kiểm tra</div>
-          <div className="text-xs font-normal opacity-90 mt-1">Chọn lớp, đặt thời gian, tạo mã ca cho học sinh (đề đã có sẵn trong ngân hàng)</div>
-        </span>
-      </button>
-
-      <button
-        onClick={() => setScreen('exammonitor')}
-        className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 font-semibold p-4 text-left flex items-center gap-3"
-      >
-        <span className="shrink-0 w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center">
-          <ClipboardList size={22} />
-        </span>
-        <span>
-          <div className="text-base">Giáo viên — Theo dõi &amp; chấm bài đã nộp</div>
-          <div className="text-xs font-normal opacity-90 mt-1">Nhập mã ca để xem ai đã nộp, chấm điểm tự động</div>
-        </span>
-      </button>
-
-      <button
-        onClick={() => setScreen('registrationmanager')}
-        className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 font-semibold p-4 text-left flex items-center gap-3"
-      >
-        <span className="shrink-0 w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center">
-          <Users size={22} />
-        </span>
-        <span>
-          <div className="text-base">Giáo viên — Quản lý đăng ký</div>
-          <div className="text-xs font-normal opacity-90 mt-1">Xem/xoá phụ huynh &amp; học sinh đã đăng ký, gửi tin cho 1 em</div>
-        </span>
-      </button>
-
-      <button
-        onClick={() => setScreen('examtake')}
-        className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold p-4 text-left flex items-center gap-3"
-      >
-        <span className="shrink-0 w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
-          <Users2 size={22} />
-        </span>
-        <span>
-          <div className="text-base">Học sinh — Vào thi</div>
-          <div className="text-xs font-normal opacity-90 mt-1">Nhập mã ca thầy cho + số báo danh</div>
-        </span>
-      </button>
-
-      <button
-        onClick={() => setScreen('studentprofile')}
-        className="tap-target w-full rounded-xl bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold p-4 text-left flex items-center gap-3"
-      >
-        <span className="shrink-0 w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
-          <GraduationCap size={22} />
-        </span>
-        <span>
-          <div className="text-base">Học sinh — Hồ sơ &amp; nhắn tin thầy</div>
-          <div className="text-xs font-normal opacity-90 mt-1">Đăng ký 1 lần, tự điền SBD lúc vào thi, nhắn tin cho thầy</div>
-        </span>
-      </button>
-
-      <div className="text-xs text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-800">
-        Cần cấu hình 1 lần: dán code Apps Script (file docs/apps-script-kiem-tra.gs) vào script.google.com để có nơi
-        nhận bài — làm ở màn "Soạn đề &amp; mở ca kiểm tra".
-      </div>
+      />
+      <TheBam icon={<Library size={22} />} title="Ngân hàng câu hỏi" sub="Đề tự về từ kho · duyệt câu nghi đáp án" onClick={() => setScreen('nganhangde')} />
+      <TheBam icon={<ClipboardList size={22} />} title="Theo dõi & chấm bài" sub="Nhập mã ca để xem ai đã nộp, chấm tự động" onClick={() => setScreen('exammonitor')} />
+      <TheBam icon={<Users size={22} />} title="Quản lý đăng ký" sub="Phụ huynh & học sinh đã đăng ký, gửi tin cho 1 em" onClick={() => setScreen('registrationmanager')} />
+      <TheBam icon={<Users2 size={22} />} title="Học sinh — Vào thi" sub="Nhập mã ca thầy cho + số báo danh" onClick={() => setScreen('examtake')} />
+      <TheBam icon={<GraduationCap size={22} />} title="Học sinh — Hồ sơ & nhắn tin thầy" sub="Đăng ký 1 lần, tự điền SBD lúc vào thi" onClick={() => setScreen('studentprofile')} />
     </div>
   )
 }

@@ -218,7 +218,7 @@ export function OThongBao({ tone = 'cam', children, className = '' }: { tone?: '
 // đặc; phu=viền, nền trong suốt; nguyhiem=chữ/viền đỏ.
 // ---------------------------------------------------------------------------
 const NUT_CHINH_STYLE: Record<'chinh' | 'phu' | 'nguyhiem', React.CSSProperties> = {
-  chinh: { background: 'var(--muc)', color: '#fff', border: '1px solid var(--muc)' },
+  chinh: { background: 'var(--muc)', color: 'var(--muc-nguoc)', border: '1px solid var(--muc)' },
   phu: { background: 'transparent', color: 'var(--muc)', border: '1px solid var(--vien-dam)' },
   nguyhiem: { background: 'transparent', color: 'var(--do)', border: '1px solid var(--do)' },
 }

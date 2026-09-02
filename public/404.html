@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ĐỖ ĐẠI HỌC</title>
+    <style>
+      body { margin: 0; background: #f7f8fa; color: #1a2332; font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; display: flex; min-height: 100vh; align-items: center; justify-content: center; }
+      @media (prefers-color-scheme: dark) { body { background: #0f1419; color: #e8eaed; } }
+      p { text-align: center; padding: 24px; line-height: 1.6; }
+      a { color: inherit; }
+    </style>
+    <script>
+      // LINK NGẮN CHO HỌC SINH: https://<host>/omr-app/t/<mã ca>
+      // GitHub Pages không có server route nên đường dẫn này rơi vào 404.html;
+      // trang này chỉ chuyển hướng về trang chính kèm ?examCode=<mã ca>.
+      // Link Apps Script app tự lấy từ cau-hinh.json cùng thư mục (exam-db.ts).
+      ;(function () {
+        var m = location.pathname.match(/^(.*?\/)t\/(\d{4,8})\/?$/)
+        if (m) {
+          location.replace(m[1] + '?examCode=' + m[2])
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <p>
+      Không tìm thấy trang.<br />
+      <a href="../">Về trang chính</a>
+    </p>
+  </body>
+</html>
