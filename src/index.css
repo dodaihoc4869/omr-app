@@ -19,20 +19,72 @@ body {
   min-width: 44px;
 }
 
-/* Công thức Hoá (KaTeX, \ce{...}/$...$ — src/lib/chem-format.tsx, LUÔN gọi
- * displayMode:false, không có công thức nào tự tách khối) phải NẰM CÙNG
- * DÒNG và ĐÚNG BẰNG cỡ chữ thường xung quanh. Ba phần ghi đè mặc định của
- * KaTeX: (1) .katex tự đặt font-size:1.21em, to hơn chữ thường 21%; (2)
- * line-height/vertical-align mặc định làm dòng chứa công thức bị lệch/giãn
- * so với dòng chữ thường bên cạnh; (3) khối chỉ số trên/dưới (.msupsub, vd
- * Ca^2+) tự đẩy cao cả dòng chứa nó dù bản thân chữ không cao hơn.
- * !important vì katex.min.css nạp SAU index.css nên cần thắng ở cùng độ
- * đặc hiệu. */
+/* CÔNG THỨC HOÁ (KaTeX, luôn displayMode:false — src/lib/chem-format.tsx).
+ * Chữ đề/phương án/ý giãn dòng 1.9 để đủ chỗ cho chỉ số trên VÀ dưới; KaTeX
+ * chỉ ghi đè ĐÚNG MỘT thứ: bỏ hệ số font-size 1.21 mặc định. KHÔNG đặt
+ * line-height, vertical-align, overflow lên .katex — chúng phá đường chân
+ * chữ và cắt mất chỉ số dưới (lỗi đã gặp: Cl^- hiện thành "C.", H2O thành
+ * "H₂"). !important vì katex.min.css nạp SAU index.css. */
+.cau-de,
+.pa-noi-dung,
+.y-noi-dung {
+  font-family: var(--serif);
+  font-size: var(--cx-3);
+  line-height: 1.9;
+  color: var(--muc);
+}
+/* Đề bài: xuống dòng theo đúng "\n" trong dữ liệu (vd các ý (a)(b)(c)(d)
+ * liệt kê mỗi ý một dòng) — khoảng trắng khác vẫn gộp bình thường. */
+.cau-de {
+  white-space: pre-line;
+}
 .katex {
   font-size: 1em !important;
-  line-height: normal !important;
-  vertical-align: baseline !important;
 }
-.katex .msupsub {
-  line-height: 0 !important;
+
+/* HÀNG Ý ĐÚNG/SAI (Phần II) — chữ một khối liền, nút bên phải; màn hẹp thì
+ * nút xuống dưới, không ép chữ thành cột hẹp. */
+.y-hang {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--k3);
+  min-height: 56px;
+  padding: var(--k3) var(--k4);
+  border-radius: var(--bo-1);
+  background: var(--the-2);
+}
+.y-noi-dung {
+  flex: 1;
+  min-width: 0; /* BẮT BUỘC — thiếu dòng này chữ bị ép */
+  overflow-wrap: break-word;
+}
+.y-nut {
+  flex: none;
+  display: flex;
+  gap: var(--k2);
+  align-items: center;
+}
+@media (max-width: 430px) {
+  .y-hang {
+    flex-direction: column;
+  }
+  .y-nut {
+    align-self: flex-end;
+  }
+}
+
+/* ẢNH CẮT TỪ ĐỀ GỐC (sơ đồ phản ứng, công thức cấu tạo, mô hình thí nghiệm,
+ * bảng phức tạp) — nhúng ngay dưới đoạn chữ liên quan, bấm mở toàn màn hình. */
+.cau-hinh {
+  margin: var(--k2) 0;
+  padding: var(--k3);
+  background: var(--the-2);
+  border-radius: var(--bo-1);
+  text-align: center;
+}
+.cau-hinh img {
+  max-width: 100%;
+  height: auto;
+  cursor: zoom-in;
+  display: inline-block;
 }

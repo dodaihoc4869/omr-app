@@ -153,16 +153,12 @@ const KATEX_OPTS = { throwOnError: true, strict: false, displayMode: false } as 
 function ChemFormula({ t, latex }: { t: 'ce' | 'math'; latex: string }): JSX.Element {
   try {
     const html = katex.renderToString(t === 'ce' ? `\\ce{${latex}}` : latex, KATEX_OPTS)
-    // Sơ đồ phản ứng nhiều bước (vd FeS2 ->[..] SO2 ->[..] SO3 ->..) render ra
-    // rất RỘNG và KaTeX không tự xuống dòng — bọc trong span cuộn ngang riêng
-    // để tràn nằm gọn trong khung công thức, không đẩy tràn cả trang (đúng
-    // yêu cầu "công thức không tràn ngang" ở khổ 360px).
+    // KHÔNG bọc thêm inline-block/overflow/vertical-align — từng làm lệch
+    // đường chân chữ và CẮT mất chỉ số dưới (overflow-x:auto kéo theo
+    // overflow-y:auto). Sơ đồ phản ứng nhiều mũi tên quá rộng KHÔNG render
+    // bằng KaTeX nữa mà nhúng ảnh cắt từ đề gốc (xem HinhAnh, examContent.ts).
     // eslint-disable-next-line react/no-danger
-    return (
-      <span className="inline-block max-w-full overflow-x-auto align-middle" style={{ verticalAlign: '-0.2em' }}>
-        <span dangerouslySetInnerHTML={{ __html: html }} />
-      </span>
-    )
+    return <span dangerouslySetInnerHTML={{ __html: html }} />
   } catch {
     const goc = t === 'ce' ? `\\ce{${latex}}` : `$${latex}$`
     return (

@@ -27,6 +27,7 @@
   --cam-nen: #fffbeb;
   --tim: #6366f1;
   --tim-nen: #eef2ff;
+  --gap: #dc2626; /* CHỈ một việc: đồng hồ làm bài còn dưới 5 phút (GIAO-DIEN-LAM-BAI.md) */
 
   /* gradient đầu thẻ — xoay vòng theo số câu (chỉ số modulo 4) */
   --g1: linear-gradient(135deg, #6366f1, #8b5cf6);

@@ -73,19 +73,31 @@ describe('buildTeacherSourceFromKhoDe', () => {
     expect(source.phanII[0].correct).toEqual(['D', 'S', 'D', 'S'])
   })
 
-  it('câu có "hinh" nhưng không truyền resolveHinh -> cảnh báo, không chặn lưu', async () => {
-    const json = { ma_de: '100', cau: [{ phan: 'III' as const, so: 1, de: 'x', dap_an: '5', hinh: { trang: 1, x0: 0, y0: 0, x1: 0.5, y1: 0.5 } }] }
-    const { source, errors, warnings } = await buildTeacherSourceFromKhoDe(json)
+  it('câu có "hinh" thiếu du_lieu -> cảnh báo, không chặn lưu, không có ảnh', () => {
+    const json = { ma_de: '100', cau: [{ phan: 'III' as const, so: 1, de: 'x', dap_an: '5', hinh: [{ tep: 'III_1.png', vi_tri: 'sau_de' as const }] }] }
+    const { source, errors, warnings } = buildTeacherSourceFromKhoDe(json)
     expect(errors).toHaveLength(0)
     expect(warnings.length).toBeGreaterThan(0)
     expect(source.phanIII).toHaveLength(1)
-    expect(source.phanIII[0].imageDataUrl).toBeUndefined()
+    expect(source.phanIII[0].hinhAnh).toBeUndefined()
   })
 
-  it('câu có "hinh" và resolveHinh thành công -> gán imageDataUrl', async () => {
-    const json = { ma_de: '100', cau: [{ phan: 'III' as const, so: 1, de: 'x', dap_an: '5', hinh: { trang: 1, x0: 0, y0: 0, x1: 0.5, y1: 0.5 } }] }
-    const { source, warnings } = await buildTeacherSourceFromKhoDe(json, async () => 'data:image/png;base64,AAA')
+  it('câu có "hinh" kèm du_lieu base64 -> gán hinhAnh đúng vị trí', () => {
+    const json = {
+      ma_de: '100',
+      cau: [{ phan: 'I' as const, so: 16, de: 'x', pa: { A: 'a', B: 'b', C: 'c', D: 'd' }, dap_an: 'D', hinh: [{ tep: 'I_16.png', vi_tri: 'sau_de' as const, du_lieu: 'data:image/png;base64,AAA' }] }],
+    }
+    const { source, warnings } = buildTeacherSourceFromKhoDe(json)
     expect(warnings).toHaveLength(0)
-    expect(source.phanIII[0].imageDataUrl).toBe('data:image/png;base64,AAA')
+    expect(source.phanI[0].hinhAnh).toEqual([{ src: 'data:image/png;base64,AAA', viTri: 'sau_de', alt: 'Hình Phần I câu 16 (I_16.png)' }])
+  })
+
+  it('parse: "hinh" sai vi_tri -> lỗi; "de" chứa $$ -> lỗi', () => {
+    const sai = parseKhoDeJsonText(JSON.stringify({ ma_de: '1', cau: [{ phan: 'III', so: 1, de: 'x', dap_an: '5', hinh: [{ tep: 'a.png', vi_tri: 'giua' }] }] }))
+    expect(sai.ok).toBe(false)
+    expect(sai.errors.join(' ')).toMatch(/vi_tri/)
+    const khoi = parseKhoDeJsonText(JSON.stringify({ ma_de: '1', cau: [{ phan: 'III', so: 1, de: 'x $$a$$', dap_an: '5' }] }))
+    expect(khoi.ok).toBe(false)
+    expect(khoi.errors.join(' ')).toMatch(/\$\$/)
   })
 })

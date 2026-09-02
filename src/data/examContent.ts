@@ -15,9 +15,24 @@
  * đồ thị/hình vẽ là ẢNH THẦY UPLOAD hiển thị nguyên vẹn — không có tính năng
  * nào "vẽ lại" đồ thị bằng AI vì không thể đảm bảo đúng 100% số liệu gốc.
  */
+/** Vị trí nhúng ảnh trong thẻ câu: sau đề bài · sau phương án A-D (theo chữ
+ * cái GỐC, đi theo phương án khi xáo) · sau ý a-d (Phần II) · cuối câu. */
+export type ViTriHinh = 'sau_de' | 'sau_pa_A' | 'sau_pa_B' | 'sau_pa_C' | 'sau_pa_D' | 'sau_y_a' | 'sau_y_b' | 'sau_y_c' | 'sau_y_d' | 'cuoi_cau'
+
+/** Ảnh cắt từ file đề gốc (200 DPI, nền trắng, mép 8px) cho 4 loại nội dung
+ * KHÔNG render bằng KaTeX: sơ đồ phản ứng nhiều mũi tên, công thức cấu tạo,
+ * bảng phức tạp (>5 cột/ô gộp), đồ thị/mô hình thí nghiệm. `src` là data
+ * URL base64 — nằm trong IndexedDB máy thầy/máy em, không đi qua git. */
+export interface HinhAnh {
+  src: string
+  viTri: ViTriHinh
+  alt?: string
+}
+
 export interface QuestionMedia {
   table?: string[][] // hàng đầu là tiêu đề cột
-  imageDataUrl?: string // ảnh chụp đồ thị/hình vẽ, base64, hiển thị y nguyên
+  imageDataUrl?: string // (cũ) 1 ảnh đồ thị/hình vẽ, hiện sau đề bài — dữ liệu mới dùng hinhAnh
+  hinhAnh?: HinhAnh[]
   /** Đọc bằng thị giác nhưng KHÔNG chắc chắn 100% (chữ mờ, công thức lạ...)
    * — set true qua luồng "Nhập đề đã xử lý sẵn (JSON)". Vẫn lưu vào ngân
    * hàng bình thường (không chặn), chỉ để đánh dấu thầy nên xem lại. */
@@ -122,12 +137,12 @@ export function validateTeacherSource(c: TeacherExamSource): string[] {
 export function mergeAndStrip(sources: TeacherExamSource[]): PublicExamBank {
   return {
     phanI: sources.flatMap((s) =>
-      s.phanI.map(({ id, text, choices, table, imageDataUrl, thanCauImg, choiceImgs, canXem }) => ({ id, text, choices, table, imageDataUrl, thanCauImg, choiceImgs, canXem })),
+      s.phanI.map(({ id, text, choices, table, imageDataUrl, hinhAnh, thanCauImg, choiceImgs, canXem }) => ({ id, text, choices, table, imageDataUrl, hinhAnh, thanCauImg, choiceImgs, canXem })),
     ),
     phanII: sources.flatMap((s) =>
-      s.phanII.map(({ id, text, ideas, table, imageDataUrl, thanCauImg, ideaImgs, canXem }) => ({ id, text, ideas, table, imageDataUrl, thanCauImg, ideaImgs, canXem })),
+      s.phanII.map(({ id, text, ideas, table, imageDataUrl, hinhAnh, thanCauImg, ideaImgs, canXem }) => ({ id, text, ideas, table, imageDataUrl, hinhAnh, thanCauImg, ideaImgs, canXem })),
     ),
-    phanIII: sources.flatMap((s) => s.phanIII.map(({ id, text, table, imageDataUrl, thanCauImg, canXem }) => ({ id, text, table, imageDataUrl, thanCauImg, canXem }))),
+    phanIII: sources.flatMap((s) => s.phanIII.map(({ id, text, table, imageDataUrl, hinhAnh, thanCauImg, canXem }) => ({ id, text, table, imageDataUrl, hinhAnh, thanCauImg, canXem }))),
   }
 }
 

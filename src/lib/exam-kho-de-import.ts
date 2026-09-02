@@ -9,25 +9,26 @@
 // IndexedDB máy thầy qua saveExamSource() sẵn có. File JSON có đáp án này
 // KHÔNG BAO GIỜ được commit lên git (repo omr-app đang PUBLIC — xem
 // kho-de/.gitignore) hay tải lên bất kỳ server nào.
-import type { TeacherExamSource, TeacherMcqQuestion, TeacherTrueFalseQuestion, TeacherShortAnswerQuestion } from '../data/examContent'
+import type { HinhAnh, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion, ViTriHinh } from '../data/examContent'
 
+/** Ảnh cắt sẵn từ đề gốc (200 DPI, mép 8px, nền trắng) — pipeline "Nạp đề
+ * mới" vừa lưu file PNG vào kho-de/xong/<mã đề>/anh/<tep> vừa nhúng base64
+ * vào `du_lieu` để file JSON tự chứa, nhập 1 lần là đủ. */
 export interface KhoDeHinh {
-  trang: number // số trang PDF (từ 1)
-  x0: number // toạ độ tỉ lệ 0..1 theo chiều rộng trang, gốc trên-trái
-  y0: number
-  x1: number
-  y1: number
+  tep: string // vd "I_16.png" — <phần>_<số câu>[_<thứ tự>].png
+  vi_tri: ViTriHinh
+  du_lieu?: string // data URL base64 — thiếu thì câu vẫn lưu, chỉ thiếu ảnh (cảnh báo)
 }
 
 export interface KhoDeCau {
   phan: 'I' | 'II' | 'III'
   so: number
-  de: string // mhchem/LaTeX cho công thức Hoá
+  de: string // công thức bọc $\ce{...}$ (hoặc \ce{...} trần) — KHÔNG dùng $$...$$
   pa?: Partial<Record<'A' | 'B' | 'C' | 'D', string>> // Phần I
   y?: Partial<Record<'a' | 'b' | 'c' | 'd', string>> // Phần II
   dap_an: string | Partial<Record<'a' | 'b' | 'c' | 'd', 'D' | 'S'>> // I: "A".."D" — II: "DSDS" hoặc {a,b,c,d} — III: chuỗi giá trị
-  bang?: string[][] | null
-  hinh?: KhoDeHinh | null
+  bang?: string[][] | null // bảng ĐƠN GIẢN (≤5 cột, không ô gộp) — phức tạp hơn thì cắt ảnh
+  hinh?: KhoDeHinh[] | null
   tieu_de?: string
   can_xem?: boolean
 }
@@ -43,6 +44,34 @@ export interface KhoDeParseResult {
   ok: boolean
   json?: KhoDeJson
   errors: string[]
+}
+
+const VI_TRI_HOP_LE = new Set<string>(['sau_de', 'sau_pa_A', 'sau_pa_B', 'sau_pa_C', 'sau_pa_D', 'sau_y_a', 'sau_y_b', 'sau_y_c', 'sau_y_d', 'cuoi_cau'])
+
+function parseHinh(raw: unknown, nhan: string, errors: string[]): KhoDeHinh[] | null {
+  if (raw === undefined || raw === null) return null
+  if (!Array.isArray(raw)) {
+    errors.push(`${nhan}: "hinh" phải là mảng [{tep, vi_tri, du_lieu}] hoặc null`)
+    return null
+  }
+  const out: KhoDeHinh[] = []
+  raw.forEach((h, i) => {
+    if (typeof h !== 'object' || h === null) {
+      errors.push(`${nhan}: hình thứ ${i + 1} không phải object`)
+      return
+    }
+    const o = h as Record<string, unknown>
+    if (typeof o.tep !== 'string' || !o.tep.trim()) {
+      errors.push(`${nhan}: hình thứ ${i + 1} thiếu "tep"`)
+      return
+    }
+    if (typeof o.vi_tri !== 'string' || !VI_TRI_HOP_LE.has(o.vi_tri)) {
+      errors.push(`${nhan}: hình "${o.tep}" có "vi_tri" không hợp lệ (${String(o.vi_tri)})`)
+      return
+    }
+    out.push({ tep: o.tep, vi_tri: o.vi_tri as ViTriHinh, du_lieu: typeof o.du_lieu === 'string' && o.du_lieu.startsWith('data:image/') ? o.du_lieu : undefined })
+  })
+  return out
 }
 
 /** Bước 1 — parse JSON thô + kiểm tra đủ trường bắt buộc từng câu (không
@@ -78,12 +107,17 @@ export function parseKhoDeJsonText(raw: string): KhoDeParseResult {
       errors.push(`Phần ${c.phan}, phần tử thứ ${i + 1}: thiếu "so" (số thứ tự câu)`)
       return
     }
+    const nhan = `Phần ${c.phan} câu ${c.so}`
     if (typeof c.de !== 'string' || !c.de.trim()) {
-      errors.push(`Phần ${c.phan} câu ${c.so}: thiếu "de"`)
+      errors.push(`${nhan}: thiếu "de"`)
       return
     }
     if (c.dap_an === undefined || c.dap_an === null || c.dap_an === '') {
-      errors.push(`Phần ${c.phan} câu ${c.so}: thiếu "dap_an"`)
+      errors.push(`${nhan}: thiếu "dap_an"`)
+      return
+    }
+    if (typeof c.de === 'string' && c.de.includes('$$')) {
+      errors.push(`${nhan}: "de" chứa $$...$$ (chế độ khối) — công thức trong câu phải bọc $...$`)
       return
     }
     cau.push({
@@ -94,7 +128,7 @@ export function parseKhoDeJsonText(raw: string): KhoDeParseResult {
       y: (c.y as KhoDeCau['y']) ?? undefined,
       dap_an: c.dap_an as KhoDeCau['dap_an'],
       bang: (c.bang as string[][] | null | undefined) ?? null,
-      hinh: (c.hinh as KhoDeHinh | null | undefined) ?? null,
+      hinh: parseHinh(c.hinh, nhan, errors),
       tieu_de: typeof c.tieu_de === 'string' ? c.tieu_de : undefined,
       can_xem: c.can_xem === true,
     })
@@ -112,15 +146,11 @@ export function parseKhoDeJsonText(raw: string): KhoDeParseResult {
   }
 }
 
-/** Bước 2 — build TeacherExamSource từ KhoDeJson đã parse. `resolveHinh` do
- * nơi gọi cung cấp (cắt ảnh thật từ file PDF gốc bằng cropRegionFromPdf) để
- * hàm này KHÔNG đụng PDF/DOM — build thuần, test được không cần trình
- * duyệt. `errors` (thiếu đáp án/phương án) CHẶN lưu; `warnings` (vd cắt ảnh
- * hình lỗi) KHÔNG chặn, câu vẫn vào ngân hàng nhưng thiếu ảnh minh hoạ. */
-export async function buildTeacherSourceFromKhoDe(
-  json: KhoDeJson,
-  resolveHinh?: (hinh: KhoDeHinh) => Promise<string>,
-): Promise<{ source: TeacherExamSource; errors: string[]; warnings: string[]; canXemList: string[] }> {
+/** Bước 2 — build TeacherExamSource từ KhoDeJson đã parse. Thuần, không đụng
+ * DOM — test được không cần trình duyệt. `errors` (thiếu đáp án/phương án)
+ * CHẶN lưu; `warnings` (vd hình thiếu dữ liệu base64) KHÔNG chặn, câu vẫn vào
+ * ngân hàng nhưng thiếu ảnh minh hoạ đó. */
+export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherExamSource; errors: string[]; warnings: string[]; canXemList: string[] } {
   const errors: string[] = []
   const warnings: string[] = []
   const canXemList: string[] = []
@@ -131,19 +161,17 @@ export async function buildTeacherSourceFromKhoDe(
 
   for (const c of json.cau) {
     const nhan = `Phần ${c.phan} câu ${c.so}`
-    let imageDataUrl: string | undefined
-    if (c.hinh) {
-      if (resolveHinh) {
-        try {
-          imageDataUrl = await resolveHinh(c.hinh)
-        } catch (err) {
-          warnings.push(`${nhan}: cắt ảnh hình thất bại — ${err instanceof Error ? err.message : 'lỗi không rõ'} (câu vẫn lưu, thiếu ảnh minh hoạ)`)
-        }
-      } else {
-        warnings.push(`${nhan}: có "hinh" cần cắt nhưng chưa chọn file gốc kèm theo (câu vẫn lưu, thiếu ảnh minh hoạ)`)
+    let hinhAnh: HinhAnh[] | undefined
+    if (c.hinh && c.hinh.length > 0) {
+      hinhAnh = []
+      for (const h of c.hinh) {
+        if (h.du_lieu) hinhAnh.push({ src: h.du_lieu, viTri: h.vi_tri, alt: `Hình ${nhan} (${h.tep})` })
+        else warnings.push(`${nhan}: hình "${h.tep}" thiếu dữ liệu ảnh (du_lieu) — câu vẫn lưu, thiếu ảnh này`)
       }
+      if (hinhAnh.length === 0) hinhAnh = undefined
     }
     if (c.can_xem) canXemList.push(nhan)
+    const chung = { text: c.de, table: c.bang ?? undefined, hinhAnh, tieuDe: c.tieu_de, canXem: c.can_xem }
 
     if (c.phan === 'I') {
       const pa = c.pa ?? {}
@@ -157,7 +185,7 @@ export async function buildTeacherSourceFromKhoDe(
         errors.push(`${nhan}: "dap_an" phải là 1 trong A/B/C/D`)
         continue
       }
-      phanI.push({ id: `${json.ma_de}-I-${c.so}`, text: c.de, choices, correct, table: c.bang ?? undefined, imageDataUrl, tieuDe: c.tieu_de, canXem: c.can_xem })
+      phanI.push({ id: `${json.ma_de}-I-${c.so}`, ...chung, choices, correct })
     } else if (c.phan === 'II') {
       const y = c.y ?? {}
       const ideas: [string, string, string, string] = [y.a ?? '', y.b ?? '', y.c ?? '', y.d ?? '']
@@ -176,14 +204,14 @@ export async function buildTeacherSourceFromKhoDe(
         errors.push(`${nhan}: "dap_an" phải là chuỗi 4 ký tự D/S (vd "DSDS") hoặc object {a,b,c,d}`)
         continue
       }
-      phanII.push({ id: `${json.ma_de}-II-${c.so}`, text: c.de, ideas, correct, table: c.bang ?? undefined, imageDataUrl, tieuDe: c.tieu_de, canXem: c.can_xem })
+      phanII.push({ id: `${json.ma_de}-II-${c.so}`, ...chung, ideas, correct })
     } else {
       const correct = typeof c.dap_an === 'string' ? c.dap_an.trim() : ''
       if (!correct) {
         errors.push(`${nhan}: thiếu "dap_an"`)
         continue
       }
-      phanIII.push({ id: `${json.ma_de}-III-${c.so}`, text: c.de, correct, table: c.bang ?? undefined, imageDataUrl, tieuDe: c.tieu_de, canXem: c.can_xem })
+      phanIII.push({ id: `${json.ma_de}-III-${c.so}`, ...chung, correct })
     }
   }
 

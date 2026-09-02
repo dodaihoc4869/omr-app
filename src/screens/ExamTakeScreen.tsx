@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { PublicExamBank } from '../data/examContent'
+import type { PublicExamBank, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
 import { fetchSession, submitAnswers, pushExamStatus, sendParentFeedback, type KeyBank } from '../lib/exam-api'
-import { ChemText } from '../lib/chem-format'
-import QuestionMedia from '../components/QuestionMedia'
-import { SolutionMcq, SolutionTrueFalse, SolutionShortAnswer } from '../components/SolutionCard'
-import { TriangleAlert, X, ArrowLeft, Grid3x3 } from 'lucide-react'
+import TheCau from '../components/TheCau'
+import MaCaInput from '../components/MaCaInput'
+import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
+import { TriangleAlert, X, ArrowLeft, LayoutGrid } from 'lucide-react'
 import { classify } from '../engine/score'
 import { gradeFromKeyBank, type GradedSubmission } from '../lib/exam-grade'
 import {
@@ -29,26 +29,24 @@ function formatClock(totalSeconds: number): string {
 }
 
 // ============================================================================
-// MÀN LÀM BÀI ("phòng thi") — bản sắc RIÊNG, cố định, KHÔNG đổi theo theme
-// sáng/tối hệ thống (giống màn Quét OMR) để học sinh/phụ huynh nhận ra cùng
-// một trung tâm với phiếu kết quả giấy đã gửi. Bảy màu, mỗi màu một nhiệm
-// vụ — đỏ (--gap) CHỈ dùng đúng một việc: còn dưới 5 phút.
+// MÀN LÀM BÀI — theo GIAO-DIEN-LAM-BAI.md: cuộn dọc liên tục (không phân
+// trang, không vuốt ngang), thẻ câu dùng chung với màn Xem lại (TheCau, cờ
+// cheDo), ẩn hết menu (BottomNav/FAB đã gỡ khỏi DOM ở App.tsx khi
+// screen==='examtake'), chặn Back vật lý, nút Nộp bài ở cuối trang. Mọi
+// màu/cỡ chữ lấy từ tokens.css — không hard-code.
 // ============================================================================
-const PHONG_THI_VARS = {
-  '--muc': '#12212b',
-  '--giay': '#fdfcf8',
-  '--the': '#ffffff',
-  '--ke': '#e3ded1',
-  '--nhat': '#8a8578',
-  '--chon': '#1f6f5c',
-  '--gap': '#b8332e',
-} as React.CSSProperties
-const SERIF = "'Iowan Old Style', Palatino, 'Palatino Linotype', Georgia, serif"
-
 type PhanKey = 'I' | 'II' | 'III'
 interface FlatRef {
   phan: PhanKey
   i: number
+}
+
+const SANS_SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
+
+const PHAN_INFO: Record<PhanKey, { ten: string; diem: string }> = {
+  I: { ten: 'Trắc nghiệm', diem: 'Mỗi câu đúng 0,25 điểm' },
+  II: { ten: 'Đúng / Sai', diem: 'Đúng 1 ý 0,1đ · 2 ý 0,25đ · 3 ý 0,5đ · cả 4 ý 1đ' },
+  III: { ten: 'Trả lời ngắn', diem: 'Mỗi câu đúng 0,25 điểm' },
 }
 
 function daTraLoiEntry(attempt: ExamAttempt, assignment: StudentAssignment, ref: FlatRef): boolean {
@@ -58,6 +56,33 @@ function daTraLoiEntry(attempt: ExamAttempt, assignment: StudentAssignment, ref:
     return !!v && v.some((x) => x !== null && x !== undefined)
   }
   return !!attempt.answers.phanIII[assignment.phanIII[ref.i].qid]?.trim()
+}
+
+function cuonToiCau(stt: number) {
+  document.getElementById(`cau-${stt}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+/** Đầu phần dính — cuộn qua phần nào thì đầu phần đó dính lên dưới thanh trên. */
+function DauPhan({ phan, soCau }: { phan: PhanKey; soCau: number }) {
+  const info = PHAN_INFO[phan]
+  return (
+    <div className="sticky z-20 flex items-center" style={{ top: 56, background: 'var(--nen)', padding: 'var(--k3) 0', gap: 'var(--k3)' }}>
+      <div
+        className="shrink-0 flex items-center justify-center font-bold"
+        style={{ width: 36, height: 36, borderRadius: 'var(--bo-1)', background: 'var(--tim-nen)', color: 'var(--tim)', fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}
+      >
+        {phan}
+      </div>
+      <div className="min-w-0">
+        <div className="font-bold truncate" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)', color: 'var(--muc)' }}>
+          PHẦN {phan} — {info.ten} ({soCau} câu)
+        </div>
+        <div className="truncate" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
+          {info.diem}
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default function ExamTakeScreen() {
@@ -96,24 +121,15 @@ export default function ExamTakeScreen() {
   const [keyBank, setKeyBank] = useState<KeyBank | null>(null)
   const [xemLoiGiai, setXemLoiGiai] = useState(false)
 
-  // ---- Màn làm bài kiểu "phòng thi": mỗi câu 1 màn hình ----
-  const [qIndex, setQIndex] = useState(0)
+  // ---- Trạng thái riêng của màn làm bài ----
   const [showGrid, setShowGrid] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
+  const [showBackDialog, setShowBackDialog] = useState(false)
   const [zoomSrc, setZoomSrc] = useState<string | null>(null)
   const [saveFlash, setSaveFlash] = useState(false)
   const saveFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [online, setOnline] = useState(() => (typeof navigator !== 'undefined' ? navigator.onLine : true))
   const gapVibratedRef = useRef(false)
-  const reducedMotion = useMemo(
-    () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
-    [],
-  )
-  const swipeStartRef = useRef<{ x: number; y: number } | null>(null)
-
-  useEffect(() => {
-    if (phase === 'exam') setQIndex(0)
-  }, [phase])
 
   useEffect(() => {
     const onOn = () => setOnline(true)
@@ -134,6 +150,20 @@ export default function ExamTakeScreen() {
       navigator.vibrate?.(200)
     }
   }, [remaining])
+
+  // Chặn Back vật lý (Android) / nút quay lại trình duyệt trong lúc làm bài:
+  // đẩy 1 mục lịch sử giả, mỗi lần bấm Back thì đẩy lại + hỏi có nộp luôn
+  // không — không thoát được khỏi màn thi (GIAO-DIEN-LAM-BAI.md).
+  useEffect(() => {
+    if (phase !== 'exam') return
+    history.pushState(null, '', location.href)
+    const onPop = () => {
+      history.pushState(null, '', location.href)
+      setShowBackDialog(true)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [phase])
 
   // Refs để hàm chạy trong effect/listener luôn đọc được giá trị MỚI NHẤT
   // (tránh closure cũ), dùng cho việc đẩy trạng thái làm bài lên cho phụ huynh.
@@ -166,8 +196,8 @@ export default function ExamTakeScreen() {
     return assignStudentQuestions(bank, maCa.trim(), sbd.trim())
   }, [bank, maCa, sbd])
 
-  // Gộp cả 3 phần thành 1 danh sách phẳng — "mỗi câu một màn hình", đánh số
-  // liên tục 1..tổng (đúng số hiện trong "7/18" và lưới câu hỏi).
+  // Gộp cả 3 phần thành 1 danh sách phẳng, đánh số liên tục 1..tổng (đúng số
+  // hiện trong "12/28", lưới số câu và id cuộn tới "cau-N").
   const flat: FlatRef[] = useMemo(() => {
     if (!assignment) return []
     const out: FlatRef[] = []
@@ -269,14 +299,16 @@ export default function ExamTakeScreen() {
     return () => clearInterval(id)
   }, [phase, attempt])
 
-  // Đẩy trạng thái làm bài lên cho phụ huynh: ngay khi vào thi + định kỳ mỗi
-  // 20 giây trong lúc làm (không cần đợi em thao tác gì).
+  // Gửi trạng thái làm bài lên máy chủ theo lô mỗi 10 giây (GIAO-DIEN-LAM-BAI.md
+  // "Lưu bài"): ngay khi vào thi + định kỳ, không cần đợi em thao tác gì.
+  // Đáp án chi tiết chỉ gửi lúc nộp (submitAnswers) — Apps Script hiện chỉ
+  // nhận trạng thái tiến độ giữa chừng, không nhận đáp án từng câu.
   useEffect(() => {
     if (phase !== 'exam') return
     if (attemptRef.current) pushStatusNow(attemptRef.current, true)
     const id = setInterval(() => {
       if (attemptRef.current) pushStatusNow(attemptRef.current, true)
-    }, 20000)
+    }, 10000)
     return () => clearInterval(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
@@ -438,197 +470,264 @@ export default function ExamTakeScreen() {
   const setPhanIII = (qid: string, text: string) =>
     updateAndSave((a) => ({ ...a, answers: { ...a.answers, phanIII: { ...a.answers.phanIII, [qid]: text } } }))
 
+  // ---------------------------------------------------------------- VÀO PHÒNG
   if (phase === 'join') {
     return (
-      <div className="min-h-screen pb-24 px-4 pt-4 space-y-4 bg-slate-50 dark:bg-slate-950">
-        <h1 className="text-xl font-bold">Vào thi</h1>
-        <input
-          className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3"
-          placeholder="Mã ca (6 số thầy cho)"
-          value={maCa}
-          onChange={(e) => setMaCa(e.target.value)}
-        />
-        <input
-          className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3"
-          placeholder="Số báo danh"
-          value={sbd}
-          onChange={(e) => setSbd(e.target.value)}
-        />
-        <button onClick={handleJoin} className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold">
-          Vào thi
-        </button>
-      </div>
+      <Trang className="flex items-center justify-center px-4 py-8">
+        <div className="w-full" style={{ maxWidth: 400 }}>
+          <TheNoiDung>
+            <div className="text-center" style={{ marginBottom: 'var(--k6)' }}>
+              <div className="font-bold" style={{ fontSize: 'var(--cx-5)', letterSpacing: '.28em', color: 'var(--muc)' }}>
+                ĐỖ ĐẠI HỌC
+              </div>
+              <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--mo)', letterSpacing: '.1em' }}>KIÊN TRÌ</div>
+            </div>
+            <div className="flex flex-col" style={{ gap: 'var(--k4)' }}>
+              <div>
+                <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginBottom: 'var(--k2)' }}>Mã ca (6 số thầy cho)</div>
+                <MaCaInput value={maCa} onChange={setMaCa} autoFocus={!maCa} />
+              </div>
+              <div>
+                <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginBottom: 'var(--k2)' }}>Số báo danh</div>
+                <input
+                  className="tap-target w-full"
+                  style={{
+                    height: 52,
+                    borderRadius: 'var(--bo-1)',
+                    padding: '0 var(--k4)',
+                    background: 'var(--the-2)',
+                    border: '1.5px solid transparent',
+                    fontFamily: 'var(--serif)',
+                    fontSize: 'var(--cx-3)',
+                    color: 'var(--muc)',
+                    outline: 'none',
+                  }}
+                  placeholder="Số báo danh"
+                  value={sbd}
+                  onChange={(e) => setSbd(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleJoin()
+                  }}
+                />
+              </div>
+              <NutChinh onClick={handleJoin}>Vào thi</NutChinh>
+            </div>
+          </TheNoiDung>
+        </div>
+      </Trang>
     )
   }
 
   if (phase === 'loading') {
-    return <div className="min-h-screen flex items-center justify-center text-slate-500">Đang tải đề…</div>
+    return (
+      <Trang className="flex items-center justify-center">
+        <div style={{ color: 'var(--nhat)', fontSize: 'var(--cx-3)' }}>Đang tải đề…</div>
+      </Trang>
+    )
   }
 
   if (phase === 'error') {
     return (
-      <div className="min-h-screen pb-24 px-4 pt-4 space-y-4 bg-slate-50 dark:bg-slate-950">
-        <div className="rounded-lg bg-rose-50 dark:bg-rose-950 border border-rose-300 p-4 text-rose-700 dark:text-rose-300 text-sm">
-          {errorMsg}
+      <Trang className="flex items-center justify-center px-4">
+        <div className="w-full flex flex-col" style={{ maxWidth: 400, gap: 'var(--k4)' }}>
+          <OThongBao tone="do">{errorMsg}</OThongBao>
+          <NutChinh variant="phu" onClick={() => setPhase('join')}>
+            Thử lại
+          </NutChinh>
         </div>
-        <button onClick={() => setPhase('join')} className="tap-target w-full rounded-xl bg-slate-200 dark:bg-slate-800 font-semibold">
-          Thử lại
-        </button>
-      </div>
+      </Trang>
     )
   }
 
+  // ------------------------------------------------------- XEM LẠI LỜI GIẢI
   if (phase === 'submitted' && xemLoiGiai && solutionAssignment && attempt) {
     let stt = 0
     return (
-      <div className="min-h-screen pb-10 px-4 pt-4 space-y-3 bg-slate-50 dark:bg-slate-950">
-        <div className="sticky top-0 z-30 -mx-4 px-4 py-2.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 flex items-center gap-2">
-          <button onClick={() => setXemLoiGiai(false)} className="tap-target shrink-0 flex items-center gap-1 text-sm font-semibold text-indigo-600 dark:text-indigo-400">
-            <ArrowLeft size={16} /> Quay lại
+      <Trang>
+        <div
+          className="sticky top-0 z-30 flex items-center"
+          style={{ height: 56, background: 'rgba(255,255,255,.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--vien)', padding: '0 var(--k4)', gap: 'var(--k3)' }}
+        >
+          <button onClick={() => setXemLoiGiai(false)} className="tap-target shrink-0 flex items-center gap-1 font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
+            <ArrowLeft size={18} /> Quay lại
           </button>
-          <div className="font-bold text-sm">Xem lại lời giải</div>
-        </div>
-
-        <section className="space-y-2.5">
-          <h2 className="font-bold text-indigo-700 dark:text-indigo-400 text-sm">
-            Phần I — Trắc nghiệm ({solutionAssignment.phanI.length} câu)
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            {solutionAssignment.phanI.map((item) => {
-              stt += 1
-              const q = item.question as import('../data/examContent').TeacherMcqQuestion
-              return (
-                <SolutionMcq
-                  key={item.qid}
-                  mauIdx={stt - 1}
-                  soThuTu={stt}
-                  tieuDe={q.tieuDe}
-                  text={q.text}
-                  table={q.table}
-                  imageDataUrl={q.imageDataUrl}
-                  choices={q.choices}
-                  choicePerm={item.choicePerm}
-                  correct={q.correct}
-                  selected={(attempt.answers.phanI[item.qid] as 'A' | 'B' | 'C' | 'D' | undefined) ?? null}
-                  explanation={q.explanation}
-                />
-              )
-            })}
+          <div className="font-bold" style={{ fontSize: 'var(--cx-3)' }}>
+            Xem lại lời giải
           </div>
-        </section>
-
-        <section className="space-y-2.5">
-          <h2 className="font-bold text-indigo-700 dark:text-indigo-400 text-sm">
-            Phần II — Đúng / Sai ({solutionAssignment.phanII.length} câu)
-          </h2>
-          {solutionAssignment.phanII.map((item) => {
+        </div>
+        <div className="px-3 sm:px-4 pb-12 flex flex-col" style={{ gap: 'var(--k5)', paddingTop: 'var(--k2)' }}>
+          <DauPhan phan="I" soCau={solutionAssignment.phanI.length} />
+          {solutionAssignment.phanI.map((item) => {
             stt += 1
-            const q = item.question as import('../data/examContent').TeacherTrueFalseQuestion
+            const q = item.question as TeacherMcqQuestion
             return (
-              <SolutionTrueFalse
+              <TheCau
                 key={item.qid}
-                mauIdx={stt - 1}
-                soThuTu={stt}
+                cheDo="xem_lai"
+                phan="I"
+                stt={stt}
+                id={`cau-${stt}`}
                 tieuDe={q.tieuDe}
                 text={q.text}
+                thanCauImg={q.thanCauImg}
                 table={q.table}
                 imageDataUrl={q.imageDataUrl}
-                ideas={q.ideas}
+                hinhAnh={q.hinhAnh}
+                choices={q.choices}
+                choiceImgs={q.choiceImgs}
+                choicePerm={item.choicePerm}
+                selected={(attempt.answers.phanI[item.qid] as 'A' | 'B' | 'C' | 'D' | undefined) ?? null}
                 correct={q.correct}
-                selected={attempt.answers.phanII[item.qid] ?? [null, null, null, null]}
                 explanation={q.explanation}
+                onZoom={setZoomSrc}
               />
             )
           })}
-        </section>
-
-        <section className="space-y-2.5">
-          <h2 className="font-bold text-indigo-700 dark:text-indigo-400 text-sm">
-            Phần III — Trả lời ngắn ({solutionAssignment.phanIII.length} câu)
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            {solutionAssignment.phanIII.map((item) => {
-              stt += 1
-              const q = item.question as import('../data/examContent').TeacherShortAnswerQuestion
-              return (
-                <SolutionShortAnswer
-                  key={item.qid}
-                  mauIdx={stt - 1}
-                  soThuTu={stt}
-                  tieuDe={q.tieuDe}
-                  text={q.text}
-                  table={q.table}
-                  imageDataUrl={q.imageDataUrl}
-                  correct={q.correct}
-                  selected={attempt.answers.phanIII[item.qid] ?? null}
-                  explanation={q.explanation}
-                />
-              )
-            })}
-          </div>
-        </section>
-      </div>
+          <DauPhan phan="II" soCau={solutionAssignment.phanII.length} />
+          {solutionAssignment.phanII.map((item) => {
+            stt += 1
+            const q = item.question as TeacherTrueFalseQuestion
+            return (
+              <TheCau
+                key={item.qid}
+                cheDo="xem_lai"
+                phan="II"
+                stt={stt}
+                id={`cau-${stt}`}
+                tieuDe={q.tieuDe}
+                text={q.text}
+                thanCauImg={q.thanCauImg}
+                table={q.table}
+                imageDataUrl={q.imageDataUrl}
+                hinhAnh={q.hinhAnh}
+                ideas={q.ideas}
+                ideaImgs={q.ideaImgs}
+                selected={attempt.answers.phanII[item.qid] ?? [null, null, null, null]}
+                correct={q.correct}
+                explanation={q.explanation}
+                onZoom={setZoomSrc}
+              />
+            )
+          })}
+          <DauPhan phan="III" soCau={solutionAssignment.phanIII.length} />
+          {solutionAssignment.phanIII.map((item) => {
+            stt += 1
+            const q = item.question as TeacherShortAnswerQuestion
+            return (
+              <TheCau
+                key={item.qid}
+                cheDo="xem_lai"
+                phan="III"
+                stt={stt}
+                id={`cau-${stt}`}
+                tieuDe={q.tieuDe}
+                text={q.text}
+                thanCauImg={q.thanCauImg}
+                table={q.table}
+                imageDataUrl={q.imageDataUrl}
+                hinhAnh={q.hinhAnh}
+                selected={attempt.answers.phanIII[item.qid] ?? null}
+                correct={q.correct}
+                explanation={q.explanation}
+                onZoom={setZoomSrc}
+              />
+            )
+          })}
+        </div>
+        {zoomSrc && <ZoomOverlay src={zoomSrc} onClose={() => setZoomSrc(null)} />}
+      </Trang>
     )
   }
 
+  // ------------------------------------------------------------- ĐÃ NỘP BÀI
   if (phase === 'submitted') {
     if (attempt?.integrity.blocked) {
       return (
-        <div className="min-h-screen flex flex-col items-center justify-center gap-3 px-6 text-center bg-rose-50 dark:bg-rose-950">
-          <TriangleAlert size={40} className="text-rose-600" />
-          <div className="text-lg font-bold text-rose-700 dark:text-rose-300">BÀI THI ĐÃ BỊ KHOÁ</div>
-          <div className="text-sm text-rose-700 dark:text-rose-300 leading-relaxed">
-            Em đã rời màn hình làm bài từ <b>2 lần trở lên</b>. Theo quy định, bài thi tự động nộp và được đánh dấu{' '}
-            <b>nghi vấn gian lận</b> để thầy xem xét, có thể kèm báo phụ huynh.
+        <Trang className="flex items-center justify-center px-4">
+          <div className="w-full" style={{ maxWidth: 400 }}>
+            <TheNoiDung>
+              <div className="flex flex-col items-center text-center" style={{ gap: 'var(--k3)' }}>
+                <TriangleAlert size={40} style={{ color: 'var(--do)' }} />
+                <div className="font-bold" style={{ fontSize: 'var(--cx-4)', color: 'var(--do)' }}>
+                  BÀI THI ĐÃ BỊ KHOÁ
+                </div>
+                <div style={{ fontSize: 'var(--cx-2)', lineHeight: 1.7 }}>
+                  Em đã rời màn hình làm bài từ <b>2 lần trở lên</b>. Theo quy định, bài thi tự động nộp và được đánh dấu{' '}
+                  <b>nghi vấn gian lận</b> để thầy xem xét, có thể kèm báo phụ huynh.
+                </div>
+                {attempt?.pendingSubmit && <Nhan tone="cam">Đang gửi lên hệ thống… đừng tắt trình duyệt</Nhan>}
+              </div>
+            </TheNoiDung>
           </div>
-          {attempt?.pendingSubmit && (
-            <div className="text-xs text-amber-700 dark:text-amber-400">Đang gửi lên hệ thống… đừng tắt trình duyệt.</div>
-          )}
-        </div>
+        </Trang>
       )
     }
+    const soDaLam = attempt && assignment ? flat.filter((f) => daTraLoiEntry(attempt, assignment, f)).length : null
+    const gioNop = attempt?.submittedAt ? new Date(attempt.submittedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-3 px-4 text-center">
-        <div className="text-3xl">✅</div>
-        <div className="text-lg font-bold">Đã nộp bài</div>
-        {attempt?.pendingSubmit && (
-          <div className="text-sm text-amber-600 dark:text-amber-400">
-            Đang gửi lên hệ thống… đừng tắt trình duyệt, bài đã lưu an toàn trên máy và sẽ tự gửi lại khi có mạng.
-          </div>
-        )}
-        {!attempt?.pendingSubmit && <div className="text-sm text-slate-500">Bài đã gửi lên hệ thống thành công.</div>}
+      <Trang className="flex items-center justify-center px-4 py-8">
+        <div className="w-full flex flex-col" style={{ maxWidth: 400, gap: 'var(--k4)' }}>
+          <TheNoiDung>
+            <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
+              <div className="font-bold" style={{ fontSize: 'var(--cx-4)' }}>
+                Đã nộp bài
+              </div>
+              <div className="flex flex-col" style={{ gap: 'var(--k1)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--nhat)' }}>
+                <div>
+                  Số báo danh: <b style={{ color: 'var(--muc)' }}>{attempt?.sbd}</b>
+                </div>
+                <div>
+                  Mã ca: <b style={{ color: 'var(--muc)' }}>{attempt?.maCa}</b>
+                </div>
+                {gioNop && (
+                  <div>
+                    Giờ nộp: <b style={{ color: 'var(--muc)', ...SANS_SO }}>{gioNop}</b>
+                  </div>
+                )}
+                {soDaLam !== null && (
+                  <div>
+                    Số câu đã làm:{' '}
+                    <b style={{ color: 'var(--muc)', ...SANS_SO }}>
+                      {soDaLam}/{flat.length}
+                    </b>
+                  </div>
+                )}
+              </div>
+              {attempt?.pendingSubmit ? (
+                <OThongBao tone="cam">Đang gửi lên hệ thống… đừng tắt trình duyệt. Bài đã lưu an toàn trên máy và sẽ tự gửi lại khi có mạng.</OThongBao>
+              ) : (
+                <OThongBao tone="xanh">Thầy sẽ công bố kết quả sau.</OThongBao>
+              )}
+            </div>
+          </TheNoiDung>
 
-        {keyBank && solutionAssignment && (
-          <button
-            onClick={() => setXemLoiGiai(true)}
-            className="tap-target rounded-xl bg-indigo-600 text-white font-semibold px-5"
-          >
-            Xem lại lời giải
-          </button>
-        )}
+          {keyBank && solutionAssignment && (
+            <NutChinh variant="phu" onClick={() => setXemLoiGiai(true)}>
+              Xem lại lời giải
+            </NutChinh>
+          )}
+        </div>
 
         {gradedPopup && (
-          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm px-4 py-6">
-            <div className="w-full max-w-sm max-h-[85vh] overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 shadow-2xl">
-              <div className="sticky top-0 bg-white dark:bg-slate-900 px-5 pt-5 pb-3 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between">
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center px-4 py-6" style={{ background: 'rgba(26,35,50,.55)' }}>
+            <div className="w-full overflow-y-auto" style={{ maxWidth: 400, maxHeight: '85vh', background: 'var(--the)', borderRadius: 'var(--bo-3)', boxShadow: 'var(--bong-2)' }}>
+              <div className="sticky top-0 flex items-start justify-between" style={{ background: 'var(--the)', padding: 'var(--k5) var(--k5) var(--k3)', borderBottom: '1px solid var(--vien)' }}>
                 <div>
-                  <div className="text-xs text-slate-400">Kết quả bài thi</div>
-                  <div className="text-4xl font-extrabold text-indigo-600 dark:text-indigo-400 tabular-nums">
+                  <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>Kết quả bài thi</div>
+                  <div className="font-bold" style={{ fontSize: 'var(--cx-6)', ...SANS_SO }}>
                     {gradedPopup.score.total.toFixed(2)}
-                    <span className="text-base font-medium text-slate-400">/10</span>
+                    <span style={{ fontSize: 'var(--cx-2)', color: 'var(--nhat)', fontWeight: 500 }}>/10</span>
                   </div>
-                  <div className="text-sm font-semibold mt-0.5">{classify(gradedPopup.score.total)}</div>
+                  <div className="font-bold" style={{ fontSize: 'var(--cx-2)' }}>
+                    {classify(gradedPopup.score.total)}
+                  </div>
                 </div>
-                <button
-                  onClick={() => setGradedPopup(null)}
-                  className="shrink-0 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500"
-                >
+                <button onClick={() => setGradedPopup(null)} className="shrink-0 flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: 'var(--the-2)', color: 'var(--nhat)' }}>
                   <X size={16} />
                 </button>
               </div>
-
-              <div className="px-5 py-4 space-y-3 text-left">
-                <div className="grid grid-cols-3 gap-2">
+              <div className="flex flex-col" style={{ padding: 'var(--k4) var(--k5)', gap: 'var(--k3)' }}>
+                <div className="grid grid-cols-3" style={{ gap: 'var(--k2)' }}>
                   {(
                     [
                       ['Phần I', gradedPopup.score.phanIScore, assignment?.phanI.length ?? 0, gradedPopup.wrongPhanI.length],
@@ -636,486 +735,328 @@ export default function ExamTakeScreen() {
                       ['Phần III', gradedPopup.score.phanIIIScore, assignment?.phanIII.length ?? 0, gradedPopup.wrongPhanIII.length],
                     ] as const
                   ).map(([label, pts, n, wrong]) => (
-                    <div key={label} className="rounded-xl bg-slate-50 dark:bg-slate-800 p-2.5 text-center">
-                      <div className="text-[11px] text-slate-400">{label}</div>
-                      <div className="text-lg font-bold">{pts.toFixed(2)}đ</div>
-                      <div className="text-[11px] text-slate-500">
+                    <div key={label} className="text-center" style={{ background: 'var(--the-2)', borderRadius: 'var(--bo-1)', padding: 'var(--k2)' }}>
+                      <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>{label}</div>
+                      <div className="font-bold" style={{ fontSize: 'var(--cx-4)', ...SANS_SO }}>
+                        {pts.toFixed(2)}đ
+                      </div>
+                      <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
                         {n - wrong}/{n} đúng
                       </div>
                     </div>
                   ))}
                 </div>
-
-                {(gradedPopup.wrongPhanI.length > 0 || gradedPopup.wrongPhanII.length > 0 || gradedPopup.wrongPhanIII.length > 0) && (
-                  <div className="rounded-xl bg-rose-50 dark:bg-rose-950/40 p-3 text-sm">
-                    <div className="font-semibold text-rose-700 dark:text-rose-300 mb-1">Cần xem lại</div>
-                    <div className="text-rose-700 dark:text-rose-300 text-xs leading-relaxed">
-                      {gradedPopup.wrongPhanI.length > 0 && <div>Phần I — câu {gradedPopup.wrongPhanI.join(', ')}</div>}
-                      {gradedPopup.wrongPhanII.length > 0 && <div>Phần II — câu {gradedPopup.wrongPhanII.join(', ')}</div>}
-                      {gradedPopup.wrongPhanIII.length > 0 && <div>Phần III — câu {gradedPopup.wrongPhanIII.join(', ')}</div>}
-                    </div>
-                  </div>
-                )}
-                {gradedPopup.wrongPhanI.length === 0 && gradedPopup.wrongPhanII.length === 0 && gradedPopup.wrongPhanIII.length === 0 && (
-                  <div className="rounded-xl bg-emerald-50 dark:bg-emerald-950/40 p-3 text-sm text-emerald-700 dark:text-emerald-300 font-medium text-center">
-                    Đúng hết tất cả các câu! 🎉
-                  </div>
+                {gradedPopup.wrongPhanI.length + gradedPopup.wrongPhanII.length + gradedPopup.wrongPhanIII.length > 0 ? (
+                  <OThongBao tone="do">
+                    <b>Cần xem lại:</b>
+                    {gradedPopup.wrongPhanI.length > 0 && <div>Phần I — câu {gradedPopup.wrongPhanI.join(', ')}</div>}
+                    {gradedPopup.wrongPhanII.length > 0 && <div>Phần II — câu {gradedPopup.wrongPhanII.join(', ')}</div>}
+                    {gradedPopup.wrongPhanIII.length > 0 && <div>Phần III — câu {gradedPopup.wrongPhanIII.join(', ')}</div>}
+                  </OThongBao>
+                ) : (
+                  <OThongBao tone="xanh">Đúng hết tất cả các câu!</OThongBao>
                 )}
                 {!gradedPopup.score.crossSumOk && (
-                  <div className="text-[11px] text-amber-600 dark:text-amber-400">
-                    * Có sai lệch khi cộng điểm — thầy sẽ kiểm tra lại thủ công.
-                  </div>
+                  <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--cam)' }}>* Có sai lệch khi cộng điểm — thầy sẽ kiểm tra lại thủ công.</div>
                 )}
-              </div>
-
-              <div className="px-5 pb-5 space-y-2">
                 {solutionAssignment && (
-                  <button
+                  <NutChinh
                     onClick={() => {
                       setGradedPopup(null)
                       setXemLoiGiai(true)
                     }}
-                    className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold"
                   >
                     Xem lại lời giải
-                  </button>
+                  </NutChinh>
                 )}
-                <button
-                  onClick={() => setGradedPopup(null)}
-                  className={`tap-target w-full rounded-xl font-semibold ${solutionAssignment ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' : 'bg-indigo-600 text-white'}`}
-                >
+                <NutChinh variant="phu" onClick={() => setGradedPopup(null)}>
                   Đóng
-                </button>
+                </NutChinh>
               </div>
             </div>
           </div>
         )}
-      </div>
+      </Trang>
     )
   }
 
+  // ---------------------------------------------------------------- LÀM BÀI
   if (!assignment || !attempt || flat.length === 0) return null
 
   const total = flat.length
-  const cur = flat[Math.min(qIndex, total - 1)]
   const daLamCount = flat.filter((f) => daTraLoiEntry(attempt, assignment, f)).length
   const chuaLam = flat.map((f, i) => (daTraLoiEntry(attempt, assignment, f) ? null : i + 1)).filter((x): x is number => x !== null)
-
-  const onTouchStart = (e: React.TouchEvent) => {
-    const t = e.touches[0]
-    swipeStartRef.current = { x: t.clientX, y: t.clientY }
-  }
-  const onTouchEnd = (e: React.TouchEvent) => {
-    const start = swipeStartRef.current
-    swipeStartRef.current = null
-    if (!start) return
-    const t = e.changedTouches[0]
-    const dx = t.clientX - start.x
-    const dy = t.clientY - start.y
-    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-      if (dx < 0) setQIndex((i) => Math.min(total - 1, i + 1))
-      else setQIndex((i) => Math.max(0, i - 1))
-    }
-  }
-
   const gapNow = remaining !== null && remaining <= 300
-  const dotColor = !online ? 'var(--nhat)' : saveFlash ? '#c98a1f' : 'var(--chon)'
-  const dotLabel = !online ? 'mất mạng, đã lưu máy' : saveFlash ? 'đang lưu…' : 'đã lưu'
+  const dotColor = !online ? 'var(--mo)' : saveFlash ? 'var(--cam)' : 'var(--xanh)'
+  const dotLabel = !online ? 'mất mạng — đã lưu trên máy' : saveFlash ? 'đang lưu…' : 'đã lưu'
 
-  const phanLabel = cur.phan === 'I' ? 'Phần I — Trắc nghiệm' : cur.phan === 'II' ? 'Phần II — Đúng / Sai' : 'Phần III — Trả lời ngắn'
+  let stt = 0
+  const renderPhan = (phan: PhanKey) => {
+    const items = phan === 'I' ? assignment.phanI : phan === 'II' ? assignment.phanII : assignment.phanIII
+    if (items.length === 0) return null
+    return (
+      <>
+        <DauPhan phan={phan} soCau={items.length} />
+        {phan === 'I' &&
+          assignment.phanI.map((item) => {
+            stt += 1
+            return (
+              <TheCau
+                key={item.qid}
+                cheDo="thi"
+                phan="I"
+                stt={stt}
+                id={`cau-${stt}`}
+                text={item.question.text}
+                thanCauImg={item.question.thanCauImg}
+                table={item.question.table}
+                imageDataUrl={item.question.imageDataUrl}
+                hinhAnh={item.question.hinhAnh}
+                choices={item.question.choices}
+                choiceImgs={item.question.choiceImgs}
+                choicePerm={item.choicePerm}
+                selected={(attempt.answers.phanI[item.qid] as 'A' | 'B' | 'C' | 'D' | undefined) ?? null}
+                onSelect={(orig) => setPhanI(item.qid, orig)}
+                onZoom={setZoomSrc}
+              />
+            )
+          })}
+        {phan === 'II' &&
+          assignment.phanII.map((item) => {
+            stt += 1
+            return (
+              <TheCau
+                key={item.qid}
+                cheDo="thi"
+                phan="II"
+                stt={stt}
+                id={`cau-${stt}`}
+                text={item.question.text}
+                thanCauImg={item.question.thanCauImg}
+                table={item.question.table}
+                imageDataUrl={item.question.imageDataUrl}
+                hinhAnh={item.question.hinhAnh}
+                ideas={item.question.ideas}
+                ideaImgs={item.question.ideaImgs}
+                selected={attempt.answers.phanII[item.qid] ?? [null, null, null, null]}
+                onSelect={(idx, v) => setPhanII(item.qid, idx, v)}
+                onZoom={setZoomSrc}
+              />
+            )
+          })}
+        {phan === 'III' &&
+          assignment.phanIII.map((item) => {
+            stt += 1
+            return (
+              <TheCau
+                key={item.qid}
+                cheDo="thi"
+                phan="III"
+                stt={stt}
+                id={`cau-${stt}`}
+                text={item.question.text}
+                thanCauImg={item.question.thanCauImg}
+                table={item.question.table}
+                imageDataUrl={item.question.imageDataUrl}
+                hinhAnh={item.question.hinhAnh}
+                selected={attempt.answers.phanIII[item.qid] ?? null}
+                onChange={(t) => setPhanIII(item.qid, t)}
+                onZoom={setZoomSrc}
+              />
+            )
+          })}
+      </>
+    )
+  }
 
   return (
-    <div style={PHONG_THI_VARS} className="min-h-screen flex flex-col bg-[var(--giay)]">
-      {/* THANH TRÊN — dính, thanh tiến độ theo từng ô câu + vị trí + đồng hồ + chấm lưu */}
+    <Trang>
+      {/* THANH TRÊN — 56px, dính, mờ; tiến độ 3px sát mép trên; chấm lưu 6px góc phải */}
       <div
-        className="sticky top-0 z-30 border-b px-3 pb-2 space-y-1.5"
-        style={{ borderColor: 'var(--ke)', background: 'var(--giay)', paddingTop: 'max(0.5rem, env(safe-area-inset-top))' }}
+        className="sticky top-0 z-30"
+        style={{ height: 56, background: 'rgba(255,255,255,.85)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid var(--vien)' }}
       >
-        <div className="flex gap-[2px] h-1.5">
-          {flat.map((f, i) => (
-            <div
-              key={i}
-              className="flex-1 rounded-full"
-              style={{
-                background: daTraLoiEntry(attempt, assignment, f) ? 'var(--muc)' : 'var(--ke)',
-                outline: i === qIndex ? '1.5px solid var(--chon)' : 'none',
-                outlineOffset: 1,
-              }}
-            />
-          ))}
+        <div className="absolute left-0 top-0 w-full" style={{ height: 3, background: 'var(--vien)' }}>
+          <div style={{ height: 3, width: `${total ? (daLamCount / total) * 100 : 0}%`, background: 'var(--xanh)', transitionProperty: 'width', transitionDuration: 'var(--nhanh)' }} />
         </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className="shrink-0 w-2 h-2 rounded-full transition-colors" style={{ background: dotColor }} title={dotLabel} />
-            <span className="text-[11px] truncate" style={{ color: 'var(--nhat)' }}>
-              {dotLabel}
-            </span>
+        <span className="absolute rounded-full" style={{ top: 8, right: 8, width: 6, height: 6, background: dotColor }} title={dotLabel} aria-label={dotLabel} />
+        <div className="h-full flex items-center justify-between" style={{ padding: '0 var(--k4)' }}>
+          <div className="font-bold" style={{ ...SANS_SO, fontSize: 'var(--cx-2)' }}>
+            {daLamCount}/{total}
           </div>
-          <div className="text-sm font-semibold tabular-nums" style={{ fontFamily: SERIF, color: 'var(--muc)' }}>
-            {qIndex + 1}/{total}
-          </div>
-          <div
-            className="text-lg font-bold tabular-nums transition-colors"
-            style={{ fontFamily: SERIF, color: gapNow ? 'var(--gap)' : 'var(--nhat)' }}
-          >
+          <div className="font-bold" style={{ ...SANS_SO, fontSize: 'var(--cx-4)', color: gapNow ? 'var(--gap)' : 'var(--muc)', transitionProperty: 'color', transitionDuration: 'var(--nhanh)' }}>
             {formatClock(remaining ?? 0)}
           </div>
+          <button onClick={() => setShowGrid(true)} className="tap-target flex items-center justify-center" style={{ color: 'var(--muc)' }} title="Danh sách câu" aria-label="Danh sách câu">
+            <LayoutGrid size={22} />
+          </button>
         </div>
       </div>
 
       {leaveWarning && (
-        <div className="sticky top-[70px] z-30 px-3 pt-1.5">
-          <div className="bg-rose-600 text-white rounded-lg px-3 py-2.5 shadow-lg flex items-start gap-2 animate-[pulse_1.2s_ease-in-out_2]">
+        <div className="sticky z-30 px-3" style={{ top: 60, paddingTop: 'var(--k1)' }}>
+          <div className="flex items-start" style={{ background: 'var(--do)', color: '#fff', borderRadius: 'var(--bo-1)', padding: 'var(--k3)', gap: 'var(--k2)', boxShadow: 'var(--bong-2)' }}>
             <TriangleAlert size={20} className="shrink-0 mt-0.5" />
-            <div className="text-sm leading-snug">
-              <b>Em vừa rời khỏi màn hình làm bài</b> (lần {leaveWarning.count}, {leaveWarning.sec} giây). Thầy đã ghi
-              lại — hành vi này sẽ đưa vào báo cáo gửi phụ huynh khi thầy xem xét bài thi.{' '}
-              <b>Nếu em rời màn hình thêm một lần nữa, bài thi sẽ tự động NỘP NGAY và bị đánh dấu nghi vấn gian lận.</b>
+            <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', lineHeight: 1.5 }}>
+              <b>Em vừa rời khỏi màn hình làm bài</b> (lần {leaveWarning.count}, {leaveWarning.sec} giây). Thầy đã ghi lại — hành vi này sẽ đưa vào báo cáo gửi
+              phụ huynh khi thầy xem xét bài thi. <b>Nếu em rời màn hình thêm một lần nữa, bài thi sẽ tự động NỘP NGAY và bị đánh dấu nghi vấn gian lận.</b>
             </div>
-            <button onClick={() => setLeaveWarning(null)} className="shrink-0 text-white/80 hover:text-white text-lg leading-none px-1">
+            <button onClick={() => setLeaveWarning(null)} className="shrink-0 text-lg leading-none px-1" style={{ color: 'rgba(255,255,255,.85)' }}>
               ×
             </button>
           </div>
         </div>
       )}
 
-      {/* NỘI DUNG — 1 câu 1 màn hình, vuốt ngang để chuyển câu */}
-      <div
-        className="flex-1 overflow-y-auto px-4 py-4"
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-      >
-        <div key={qIndex} className={reducedMotion ? '' : 'animate-[phongthifade_150ms_ease-out]'}>
-          <div className="text-[11px] font-semibold tracking-wide mb-2" style={{ color: 'var(--nhat)' }}>
-            {phanLabel.toUpperCase()}
-          </div>
-
-          {cur.phan === 'I' &&
-            (() => {
-              const item = assignment.phanI[cur.i]
-              const stemImg = item.question.thanCauImg
-              return (
-                <>
-                  {stemImg ? (
-                    <button type="button" onClick={() => setZoomSrc(stemImg)} className="block w-full mb-1">
-                      <img src={stemImg} alt="Đề bài" className="w-full rounded-lg border" style={{ borderColor: 'var(--ke)' }} />
-                    </button>
-                  ) : (
-                    <div className="text-base leading-relaxed mb-2" style={{ color: 'var(--muc)' }}>
-                      <ChemText text={item.question.text} />
-                    </div>
-                  )}
-                  <QuestionMedia table={item.question.table} imageDataUrl={item.question.imageDataUrl} />
-                  {stemImg && (
-                    <button
-                      onClick={() => setZoomSrc(stemImg)}
-                      className="text-[12px] underline decoration-dotted mb-3 mt-1 block"
-                      style={{ color: 'var(--nhat)' }}
-                    >
-                      xem bản gốc
-                    </button>
-                  )}
-                  <div className="space-y-2 mt-3">
-                    {item.choicePerm.map((origIdx, displayPos) => {
-                      const letter = 'ABCD'[displayPos] as 'A' | 'B' | 'C' | 'D'
-                      const origLetter = 'ABCD'[origIdx] as 'A' | 'B' | 'C' | 'D'
-                      const active = attempt.answers.phanI[item.qid] === origLetter
-                      const img = item.question.choiceImgs?.[origIdx]
-                      return (
-                        <button
-                          key={displayPos}
-                          type="button"
-                          onClick={() => setPhanI(item.qid, origLetter)}
-                          className="tap-target w-full flex items-stretch rounded-lg border-2 overflow-hidden text-left transition-colors"
-                          style={{
-                            borderColor: active ? 'var(--chon)' : 'var(--ke)',
-                            background: active ? 'rgba(31,111,92,0.07)' : 'var(--the)',
-                            minHeight: 56,
-                          }}
-                        >
-                          <span
-                            className="shrink-0 w-12 flex items-center justify-center font-bold text-base"
-                            style={{ fontFamily: SERIF, color: active ? '#fff' : 'var(--muc)', background: active ? 'var(--chon)' : 'transparent' }}
-                          >
-                            {letter}
-                          </span>
-                          <span className="flex-1 flex items-center px-3 py-2" style={{ color: 'var(--muc)' }}>
-                            {img ? (
-                              <img src={img} alt={`Phương án ${letter}`} className="max-h-14 w-auto" />
-                            ) : (
-                              <span className="text-sm">
-                                <ChemText text={item.question.choices[origIdx]} />
-                              </span>
-                            )}
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </>
-              )
-            })()}
-
-          {cur.phan === 'II' &&
-            (() => {
-              const item = assignment.phanII[cur.i]
-              const stemImg = item.question.thanCauImg
-              return (
-                <>
-                  {stemImg ? (
-                    <button type="button" onClick={() => setZoomSrc(stemImg)} className="block w-full mb-1">
-                      <img src={stemImg} alt="Đề bài" className="w-full rounded-lg border" style={{ borderColor: 'var(--ke)' }} />
-                    </button>
-                  ) : (
-                    <div className="text-base leading-relaxed mb-2" style={{ color: 'var(--muc)' }}>
-                      <ChemText text={item.question.text} />
-                    </div>
-                  )}
-                  <QuestionMedia table={item.question.table} imageDataUrl={item.question.imageDataUrl} />
-                  {stemImg && (
-                    <button
-                      onClick={() => setZoomSrc(stemImg)}
-                      className="text-[12px] underline decoration-dotted mb-3 mt-1 block"
-                      style={{ color: 'var(--nhat)' }}
-                    >
-                      xem bản gốc
-                    </button>
-                  )}
-                  <div className="space-y-2.5 mt-3">
-                    {item.question.ideas.map((idea, ideaIdx) => {
-                      const val = attempt.answers.phanII[item.qid]?.[ideaIdx]
-                      const img = item.question.ideaImgs?.[ideaIdx]
-                      return (
-                        <div key={ideaIdx} className="rounded-lg border p-2.5 flex items-center gap-2.5" style={{ borderColor: 'var(--ke)', background: 'var(--the)' }}>
-                          <div className="text-sm flex-1 flex items-start gap-1.5" style={{ color: 'var(--muc)' }}>
-                            <b style={{ color: 'var(--nhat)' }}>{'abcd'[ideaIdx]})</b>
-                            {img ? <img src={img} alt={`Ý ${'abcd'[ideaIdx]}`} className="max-h-14 w-auto" /> : <ChemText text={idea} />}
-                          </div>
-                          <div className="flex flex-col gap-1.5 shrink-0 w-20">
-                            <button
-                              type="button"
-                              onClick={() => setPhanII(item.qid, ideaIdx, 'D')}
-                              className="tap-target rounded-md text-sm font-bold border-2 py-1.5"
-                              style={{
-                                borderColor: val === 'D' ? 'var(--chon)' : 'var(--ke)',
-                                background: val === 'D' ? 'var(--chon)' : 'var(--the)',
-                                color: val === 'D' ? '#fff' : 'var(--muc)',
-                              }}
-                            >
-                              Đúng
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setPhanII(item.qid, ideaIdx, 'S')}
-                              className="tap-target rounded-md text-sm font-bold border-2 py-1.5"
-                              style={{
-                                borderColor: val === 'S' ? 'var(--gap)' : 'var(--ke)',
-                                background: val === 'S' ? 'var(--gap)' : 'var(--the)',
-                                color: val === 'S' ? '#fff' : 'var(--muc)',
-                              }}
-                            >
-                              Sai
-                            </button>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </>
-              )
-            })()}
-
-          {cur.phan === 'III' &&
-            (() => {
-              const item = assignment.phanIII[cur.i]
-              const stemImg = item.question.thanCauImg
-              return (
-                <>
-                  {stemImg ? (
-                    <button type="button" onClick={() => setZoomSrc(stemImg)} className="block w-full mb-1">
-                      <img src={stemImg} alt="Đề bài" className="w-full rounded-lg border" style={{ borderColor: 'var(--ke)' }} />
-                    </button>
-                  ) : (
-                    <div className="text-base leading-relaxed mb-2" style={{ color: 'var(--muc)' }}>
-                      <ChemText text={item.question.text} />
-                    </div>
-                  )}
-                  <QuestionMedia table={item.question.table} imageDataUrl={item.question.imageDataUrl} />
-                  {stemImg && (
-                    <button
-                      onClick={() => setZoomSrc(stemImg)}
-                      className="text-[12px] underline decoration-dotted mb-3 mt-1 block"
-                      style={{ color: 'var(--nhat)' }}
-                    >
-                      xem bản gốc
-                    </button>
-                  )}
-                  <input
-                    className="tap-target w-full rounded-lg border-2 px-3 font-medium mt-3"
-                    style={{ borderColor: 'var(--ke)', background: 'var(--the)', color: 'var(--muc)', minHeight: 56 }}
-                    placeholder="Đáp án"
-                    value={attempt.answers.phanIII[item.qid] ?? ''}
-                    onChange={(e) => setPhanIII(item.qid, e.target.value)}
-                  />
-                </>
-              )
-            })()}
+      {/* DANH SÁCH CÂU — cuộn dọc liên tục, đầu phần dính */}
+      <div className="px-3 sm:px-4 flex flex-col" style={{ gap: 'var(--k5)', paddingTop: 'var(--k2)', paddingBottom: 'calc(var(--k8) + env(safe-area-inset-bottom))' }}>
+        {renderPhan('I')}
+        {renderPhan('II')}
+        {renderPhan('III')}
+        <div style={{ paddingTop: 'var(--k3)' }}>
+          <NutChinh onClick={() => setShowConfirm(true)}>Nộp bài</NutChinh>
         </div>
       </div>
 
-      {/* THANH DƯỚI — dính, Trước / lưới câu / Sau (đổi thành Nộp bài ở câu cuối) */}
-      <div
-        className="sticky bottom-0 z-30 border-t px-3 py-2 flex items-center justify-between gap-2"
-        style={{ borderColor: 'var(--ke)', background: 'var(--giay)', paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
-      >
-        <button
-          onClick={() => setQIndex((i) => Math.max(0, i - 1))}
-          disabled={qIndex === 0}
-          className="tap-target px-4 py-2.5 rounded-lg font-semibold disabled:opacity-30"
-          style={{ color: 'var(--muc)' }}
-        >
-          ‹ Trước
-        </button>
-        <button
-          onClick={() => setShowGrid(true)}
-          className="tap-target w-12 h-12 rounded-full flex items-center justify-center border-2"
-          style={{ borderColor: 'var(--ke)' }}
-          title="Xem danh sách câu"
-        >
-          <Grid3x3 size={18} style={{ color: 'var(--muc)' }} />
-        </button>
-        {qIndex === total - 1 ? (
-          <button
-            onClick={() => setShowConfirm(true)}
-            className="tap-target px-5 py-2.5 rounded-lg font-semibold text-white"
-            style={{ background: 'var(--chon)' }}
-          >
-            Nộp bài
-          </button>
-        ) : (
-          <button
-            onClick={() => setQIndex((i) => Math.min(total - 1, i + 1))}
-            className="tap-target px-4 py-2.5 rounded-lg font-semibold"
-            style={{ color: 'var(--muc)' }}
-          >
-            Sau ›
-          </button>
-        )}
-      </div>
-
-      {/* LƯỚI SỐ CÂU */}
+      {/* LƯỚI SỐ CÂU — tấm trượt từ dưới lên */}
       {showGrid && (
-        <div className="fixed inset-0 z-40 flex items-end" style={{ background: 'rgba(18,33,43,0.5)' }} onClick={() => setShowGrid(false)}>
+        <div className="fixed inset-0 z-40 flex items-end" style={{ background: 'rgba(26,35,50,.5)' }} onClick={() => setShowGrid(false)}>
           <div
-            className="w-full rounded-t-2xl p-4 space-y-3"
-            style={{ background: 'var(--giay)', maxHeight: '75vh' }}
+            className="w-full flex flex-col"
+            style={{ background: 'var(--the)', borderTopLeftRadius: 'var(--bo-3)', borderTopRightRadius: 'var(--bo-3)', padding: 'var(--k4)', gap: 'var(--k3)', maxHeight: '75vh', paddingBottom: 'calc(var(--k4) + env(safe-area-inset-bottom))', boxShadow: 'var(--bong-2)' }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
-              <div className="font-bold" style={{ fontFamily: SERIF, color: 'var(--muc)' }}>
-                Danh sách câu — đã làm {daLamCount}/{total}
+              <div className="font-bold" style={{ fontSize: 'var(--cx-3)' }}>
+                Đã làm{' '}
+                <span style={SANS_SO}>
+                  {daLamCount}/{total}
+                </span>
               </div>
-              <button onClick={() => setShowGrid(false)} style={{ color: 'var(--nhat)' }}>
+              <button onClick={() => setShowGrid(false)} className="tap-target flex items-center justify-center" style={{ color: 'var(--nhat)' }} aria-label="Đóng">
                 <X size={20} />
               </button>
             </div>
-            <div className="grid grid-cols-6 gap-2 max-h-[45vh] overflow-y-auto pb-1">
+            <div className="grid grid-cols-6 overflow-y-auto" style={{ gap: 'var(--k2)', maxHeight: '45vh' }}>
               {flat.map((f, i) => {
                 const done = daTraLoiEntry(attempt, assignment, f)
-                const dangXem = i === qIndex
                 return (
                   <button
                     key={i}
                     onClick={() => {
-                      setQIndex(i)
                       setShowGrid(false)
+                      cuonToiCau(i + 1)
                     }}
-                    className="tap-target aspect-square rounded-lg flex items-center justify-center font-semibold text-sm tabular-nums"
-                    style={{
-                      fontFamily: SERIF,
-                      background: done ? 'var(--muc)' : 'var(--the)',
-                      color: done ? 'var(--giay)' : 'var(--muc)',
-                      border: dangXem ? '2px solid var(--chon)' : '1px solid var(--ke)',
-                    }}
+                    className="tap-target aspect-square flex items-center justify-center font-bold"
+                    style={{ ...SANS_SO, fontSize: 'var(--cx-2)', borderRadius: 'var(--bo-1)', background: done ? 'var(--muc)' : 'var(--the-2)', color: done ? '#fff' : 'var(--muc)' }}
                   >
                     {i + 1}
                   </button>
                 )
               })}
             </div>
-            <button
+            <NutChinh
               onClick={() => {
                 setShowGrid(false)
                 setShowConfirm(true)
               }}
-              className="tap-target w-full rounded-xl font-semibold text-white py-3"
-              style={{ background: 'var(--chon)' }}
             >
               Nộp bài
-            </button>
+            </NutChinh>
           </div>
         </div>
       )}
 
       {/* XÁC NHẬN NỘP BÀI */}
       {showConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(18,33,43,0.6)' }}>
-          <div className="w-full max-w-sm rounded-2xl p-5 space-y-3" style={{ background: 'var(--the)' }}>
-            <div className="text-sm leading-relaxed" style={{ color: 'var(--muc)' }}>
-              Em đã làm{' '}
-              <b>
-                {daLamCount}/{total}
-              </b>{' '}
-              câu.
-              {chuaLam.length > 0 && (
-                <div className="mt-1.5 font-medium" style={{ color: 'var(--gap)' }}>
-                  Còn {chuaLam.length} câu chưa làm: câu {chuaLam.join(', ')}.
-                </div>
-              )}
-            </div>
-            <div className="text-xs" style={{ color: 'var(--nhat)' }}>
-              Sau khi nộp không sửa được nữa.
-            </div>
-            <div className="flex gap-2 pt-1">
-              <button
-                onClick={() => {
-                  setShowConfirm(false)
-                  if (chuaLam.length > 0) setQIndex(chuaLam[0] - 1)
-                }}
-                className="tap-target flex-1 rounded-xl font-semibold py-2.5"
-                style={{ border: '1px solid var(--ke)', color: 'var(--muc)' }}
-              >
-                Xem lại
-              </button>
-              <button
-                onClick={() => {
-                  setShowConfirm(false)
-                  doSubmit(attempt)
-                }}
-                className="tap-target flex-1 rounded-xl font-semibold py-2.5 text-white"
-                style={{ background: 'var(--chon)' }}
-              >
-                NỘP BÀI
-              </button>
-            </div>
+        <HopThoai>
+          <div style={{ fontSize: 'var(--cx-3)', lineHeight: 1.6 }}>
+            Em đã làm{' '}
+            <b style={SANS_SO}>
+              {daLamCount}/{total}
+            </b>{' '}
+            câu.
           </div>
-        </div>
+          {chuaLam.length > 0 && (
+            <OThongBao tone="do">
+              Còn {chuaLam.length} câu chưa làm: câu {chuaLam.join(', ')}.
+            </OThongBao>
+          )}
+          <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>Sau khi nộp không sửa được nữa.</div>
+          <div className="flex" style={{ gap: 'var(--k2)' }}>
+            <NutChinh
+              variant="phu"
+              onClick={() => {
+                setShowConfirm(false)
+                if (chuaLam.length > 0) cuonToiCau(chuaLam[0])
+              }}
+            >
+              Xem lại
+            </NutChinh>
+            <NutChinh
+              onClick={() => {
+                setShowConfirm(false)
+                doSubmit(attempt)
+              }}
+            >
+              Nộp bài
+            </NutChinh>
+          </div>
+        </HopThoai>
       )}
 
-      {/* PHÓNG TO ẢNH ĐỀ/PHƯƠNG ÁN */}
-      {zoomSrc && (
-        <div
-          className="fixed inset-0 z-[70] flex items-center justify-center p-2 overflow-auto"
-          style={{ background: 'rgba(18,33,43,0.9)' }}
-          onClick={() => setZoomSrc(null)}
-        >
-          <img src={zoomSrc} alt="Phóng to" className="max-w-full max-h-full rounded shadow-2xl" />
-        </div>
+      {/* BẤM BACK TRONG LÚC THI */}
+      {showBackDialog && (
+        <HopThoai>
+          <div style={{ fontSize: 'var(--cx-3)', lineHeight: 1.6 }}>Đang làm bài, không thoát được. Nộp bài luôn?</div>
+          <div className="flex" style={{ gap: 'var(--k2)' }}>
+            <NutChinh variant="phu" onClick={() => setShowBackDialog(false)}>
+              Tiếp tục làm
+            </NutChinh>
+            <NutChinh
+              onClick={() => {
+                setShowBackDialog(false)
+                doSubmit(attempt)
+              }}
+            >
+              Nộp bài
+            </NutChinh>
+          </div>
+        </HopThoai>
       )}
 
-      {!reducedMotion && (
-        <style>{`@keyframes phongthifade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }`}</style>
-      )}
+      {zoomSrc && <ZoomOverlay src={zoomSrc} onClose={() => setZoomSrc(null)} />}
+    </Trang>
+  )
+}
+
+// Khung trang chung cho mọi trạng thái của màn này — nền --nen, chữ --muc,
+// KHÔNG theo theme tối của App (một bộ màu cố định cho học sinh). Định nghĩa
+// NGOÀI component chính để không bị tạo lại mỗi lần render (nếu khai báo bên
+// trong, React sẽ unmount/mount lại cả trang mỗi lần chọn đáp án — mất vị trí
+// cuộn và focus ô nhập).
+function Trang({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={`min-h-screen ${className}`} style={{ background: 'var(--nen)', color: 'var(--muc)', fontFamily: 'var(--serif)' }}>
+      {children}
+    </div>
+  )
+}
+
+function HopThoai({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(26,35,50,.6)' }}>
+      <div className="w-full flex flex-col" style={{ maxWidth: 400, background: 'var(--the)', borderRadius: 'var(--bo-3)', padding: 'var(--k5)', gap: 'var(--k3)', boxShadow: 'var(--bong-2)' }}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function ZoomOverlay({ src, onClose }: { src: string; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-2 overflow-auto" style={{ background: 'rgba(26,35,50,.9)' }} onClick={onClose}>
+      <img src={src} alt="Phóng to" className="max-w-full max-h-full" style={{ borderRadius: 'var(--bo-1)' }} />
     </div>
   )
 }

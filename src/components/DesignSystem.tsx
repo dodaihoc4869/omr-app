@@ -14,6 +14,7 @@ export function TheNoiDung({
   className = '',
   style,
   noPadding = false,
+  id,
 }: {
   children: ReactNode
   className?: string
@@ -21,9 +22,12 @@ export function TheNoiDung({
   /** true khi thẻ chứa sẵn <DauThe> full-bleed ở trên — đệm trong chỉ áp
    * cho phần nội dung bên dưới đầu thẻ, không đệm quanh đầu thẻ. */
   noPadding?: boolean
+  /** id DOM để cuộn tới (scrollIntoView) — vd "cau-12". */
+  id?: string
 }) {
   return (
     <div
+      id={id}
       className={className}
       style={{
         background: 'var(--the)',
@@ -107,15 +111,24 @@ export function DauThe({
 export function Hang({
   children,
   selected = false,
+  tone = 'xanh',
   onClick,
   className = '',
+  style,
+  ...rest
 }: {
   children: ReactNode
   selected?: boolean
+  /** Màu trạng thái "được chọn": xanh (mặc định — đang chọn/đúng), đỏ (CHỈ
+   * chế độ xem lại: phương án em chọn sai). */
+  tone?: 'xanh' | 'do'
   onClick?: () => void
   className?: string
+  style?: React.CSSProperties
+  'data-trang-thai'?: string
 }) {
   const Comp = onClick ? 'button' : 'div'
+  const mau = tone === 'do' ? { nen: 'var(--do-nen)', vien: 'var(--do)' } : { nen: 'var(--xanh-nen)', vien: 'var(--xanh)' }
   return (
     <Comp
       type={onClick ? 'button' : undefined}
@@ -125,11 +138,13 @@ export function Hang({
         minHeight: 56,
         borderRadius: 'var(--bo-1)',
         padding: 'var(--k3) var(--k4)',
-        background: selected ? 'var(--xanh-nen)' : 'var(--the-2)',
-        border: selected ? '1.5px solid var(--xanh)' : '1.5px solid transparent',
+        background: selected ? mau.nen : 'var(--the-2)',
+        border: selected ? `1.5px solid ${mau.vien}` : '1.5px solid transparent',
         transitionProperty: 'background-color, border-color',
         transitionDuration: 'var(--nhanh)',
+        ...style,
       }}
+      {...rest}
     >
       {children}
     </Comp>
