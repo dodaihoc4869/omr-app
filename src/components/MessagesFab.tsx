@@ -115,6 +115,31 @@ export default function MessagesFab() {
     }
   }
 
+  // Popup là 1 thẻ nổi NEO NGAY CẠNH icon (không phải bottom-sheet phủ hết
+  // chiều ngang màn hình) — mặc định bung lên PHÍA TRÊN icon vì icon
+  // thường để ở góc dưới màn hình; tự lật xuống dưới nếu icon đang ở gần
+  // đỉnh màn hình (không đủ chỗ bung lên trên), và luôn tự kẹp trong màn
+  // hình theo chiều ngang để không tràn ra ngoài.
+  const GAP = 10
+  const popupWidth = Math.min(340, window.innerWidth - 24)
+  const spaceAbove = pos.y
+  const spaceBelow = window.innerHeight - (pos.y + SIZE)
+  const openAbove = spaceAbove >= 260 || spaceAbove >= spaceBelow
+  const left = Math.min(Math.max(pos.x + SIZE / 2 - popupWidth / 2, 8), window.innerWidth - popupWidth - 8)
+  const popupStyle: React.CSSProperties = openAbove
+    ? {
+        left,
+        bottom: window.innerHeight - pos.y + GAP,
+        width: popupWidth,
+        maxHeight: Math.max(200, spaceAbove - GAP - 8),
+      }
+    : {
+        left,
+        top: pos.y + SIZE + GAP,
+        width: popupWidth,
+        maxHeight: Math.max(200, spaceBelow - GAP - 8),
+      }
+
   return (
     <>
       <button
@@ -135,9 +160,10 @@ export default function MessagesFab() {
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 px-0 sm:px-4" onClick={() => setOpen(false)}>
+        <div className="fixed inset-0 z-50" onClick={() => setOpen(false)}>
           <div
-            className="w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl bg-white dark:bg-slate-900 shadow-2xl max-h-[85vh] flex flex-col"
+            style={popupStyle}
+            className="fixed rounded-2xl bg-white dark:bg-slate-900 shadow-2xl ring-1 ring-black/5 dark:ring-white/10 flex flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">

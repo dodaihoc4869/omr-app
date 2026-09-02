@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { pageItemsToText, htmlToLines } from '../src/lib/exam-file-import'
+import JSZip from 'jszip'
+import { pageItemsToText, htmlToLines, countEmbeddedEquations } from '../src/lib/exam-file-import'
 
 describe('pageItemsToText (PDF -> text có xuống dòng)', () => {
   it('tách dòng đúng theo hasEOL do pdf.js báo, không dính liền các dòng khác nhau', () => {
@@ -69,5 +70,36 @@ describe('htmlToLines (Word HTML -> text có xuống dòng + số thứ tự)', 
       '<tr><td><p>C. chọn C</p></td><td><p>D. chọn D</p></td></tr></table>'
     const text = htmlToLines(html)
     expect(text.split('\n')).toEqual(['A. chọn A', 'B. chọn B', 'C. chọn C', 'D. chọn D'])
+  })
+})
+
+describe('countEmbeddedEquations (đếm công thức MathType/Equation Editor trong .docx)', () => {
+  async function buildFakeDocx(documentXmlBody: string): Promise<ArrayBuffer> {
+    const zip = new JSZip()
+    zip.file(
+      'word/document.xml',
+      `<?xml version="1.0"?><w:document xmlns:w="w" xmlns:m="m" xmlns:o="o"><w:body>${documentXmlBody}</w:body></w:document>`,
+    )
+    return zip.generateAsync({ type: 'arraybuffer' })
+  }
+
+  it('đếm đúng số <m:oMath> (công thức MathType/Equation kiểu mới)', async () => {
+    const buf = await buildFakeDocx('<m:oMath>x</m:oMath><w:p>text</w:p><m:oMath>y</m:oMath>')
+    expect(await countEmbeddedEquations(buf)).toBe(2)
+  })
+
+  it('đếm đúng số <o:OLEObject> (công thức Equation Editor 3.0 kiểu cũ)', async () => {
+    const buf = await buildFakeDocx('<o:OLEObject Type="Embed">x</o:OLEObject>')
+    expect(await countEmbeddedEquations(buf)).toBe(1)
+  })
+
+  it('trả về 0 khi file không có công thức nào', async () => {
+    const buf = await buildFakeDocx('<w:p>không có công thức</w:p>')
+    expect(await countEmbeddedEquations(buf)).toBe(0)
+  })
+
+  it('file hỏng/không phải zip hợp lệ -> trả về 0, không ném lỗi', async () => {
+    const buf = new TextEncoder().encode('không phải file zip').buffer
+    expect(await countEmbeddedEquations(buf)).toBe(0)
   })
 })

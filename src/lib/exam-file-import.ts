@@ -16,6 +16,7 @@
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url'
 import mammoth from 'mammoth'
+import JSZip from 'jszip'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl
 
@@ -160,6 +161,28 @@ export function htmlToLines(html: string): string {
   return lines.join('\n')
 }
 
+/** Đếm số công thức chèn kiểu đối tượng (MathType/Equation Editor — cả bản
+ * mới dùng OMML `<m:oMath>` lẫn bản cũ nhúng OLE `<o:OLEObject>`) có trong
+ * word/document.xml của file .docx — KHÔNG đếm chữ, đếm đúng số đối tượng
+ * công thức thật sự tồn tại trong file, để chỉ cảnh báo khi file THỰC SỰ có
+ * công thức bị mất (mammoth không hỗ trợ chuyển các đối tượng này thành
+ * chữ, và thường không hề báo warning khi bỏ qua chúng — nên không thể dựa
+ * vào result.messages của mammoth để biết). Đọc lỗi (file hỏng, không phải
+ * zip hợp lệ...) thì coi như không đếm được, KHÔNG chặn luồng chính. */
+export async function countEmbeddedEquations(buf: ArrayBuffer): Promise<number> {
+  try {
+    const zip = await JSZip.loadAsync(buf)
+    const docXmlFile = zip.file('word/document.xml')
+    if (!docXmlFile) return 0
+    const xml = await docXmlFile.async('text')
+    const oMathCount = (xml.match(/<m:oMath[ >]/g) || []).length
+    const oleCount = (xml.match(/<o:OLEObject[ >]/g) || []).length
+    return oMathCount + oleCount
+  } catch {
+    return 0
+  }
+}
+
 export async function extractTextFromDocx(file: File): Promise<FileImportResult> {
   const buf = await file.arrayBuffer()
   // convertToHtml (thay vì extractRawText cũ) để giữ được ranh giới đoạn/dòng
@@ -169,6 +192,7 @@ export async function extractTextFromDocx(file: File): Promise<FileImportResult>
   const result = await mammoth.convertToHtml({ arrayBuffer: buf })
   const text = htmlToLines(result.value)
   const usedAutoNumberedList = /<ol[\s>]/i.test(result.value)
+  const equationCount = await countEmbeddedEquations(buf)
   return {
     text,
     warnings: [
@@ -176,7 +200,9 @@ export async function extractTextFromDocx(file: File): Promise<FileImportResult>
       ...(usedAutoNumberedList
         ? ['File có dùng danh sách đánh số/đánh chữ tự động của Word — app đã tự đánh lại đúng thứ tự, thầy rà nhanh xem số câu/số lựa chọn có khớp bản gốc không.']
         : []),
-      'Công thức chèn bằng MathType/Equation Editor sẽ KHÔNG trích ra được (Word lưu dạng ảnh/công thức riêng) — thầy tự gõ lại theo cú pháp của app (vd H2SO4, Na+, SO4^{2-}).',
+      equationCount > 0
+        ? `Phát hiện ${equationCount} công thức chèn kiểu MathType/Equation Editor trong file — các công thức này KHÔNG trích ra được (Word lưu dạng ảnh/đối tượng riêng, không phải chữ), vị trí tương ứng trong bài trích ra sẽ bị TRỐNG hoặc thiếu. Thầy tìm đúng những chỗ trống đó, gõ lại bằng cú pháp app (vd "H2SO4", "Na+", "SO4^{2-}") — gõ xong sẽ hiển thị đẹp y như công thức thật cho học sinh.`
+        : 'Không phát hiện công thức chèn kiểu MathType/Equation Editor trong file.',
       'Bảng và hình trong file Word KHÔNG tự trích ra được — thầy tự chèn bằng [BANG]...[/BANG] hoặc dán ảnh (Ctrl+V) như cách làm thường ngày.',
       ...(result.messages.length > 0 ? [`Word báo ${result.messages.length} cảnh báo khi đọc file (định dạng lạ) — kiểm tra kỹ nội dung trích ra.`] : []),
     ],
