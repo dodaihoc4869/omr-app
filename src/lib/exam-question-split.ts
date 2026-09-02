@@ -78,7 +78,10 @@ function stripHeaderFooterLines(text: string): string {
     .join('\n')
 }
 
-const PHAN_RE = /^[ \t]*PH[ẦA]N\s+(I{1,3})\b/gim
+// Export để exam-image-crop.ts dùng LẠI nguyên các mốc này khi định vị vùng
+// ẢNH cần cắt — tách bằng chữ và tách bằng ảnh phải khớp tuyệt đối cùng một
+// quy tắc, tránh 2 bộ regex lệch nhau theo thời gian.
+export const PHAN_RE = /^[ \t]*PH[ẦA]N\s+(I{1,3})\b/gim
 
 /** Cắt vùng đề thành các khối PHẦN I/II/III theo đúng thứ tự xuất hiện. */
 export function splitPhan(vungAGoc: string): ParsedPhan[] {
@@ -103,7 +106,7 @@ export function splitPhan(vungAGoc: string): ParsedPhan[] {
 // Nhận "Câu 1." "Câu 1:" "Câu 1 " ở đầu dòng — KHÔNG bắt "1." đầu dòng ở đây
 // vì dễ trùng với số liệu/bảng trong đề (vd "1 kg", "1 số điện") — chỉ dùng
 // mốc "Câu <số>" tường minh, an toàn hơn cho kho đề đa dạng của thầy.
-const CAU_RE = /^[ \t]*C[âa]u\s+(\d{1,3})\s*[.:]?\s/gim
+export const CAU_RE = /^[ \t]*C[âa]u\s+(\d{1,3})\s*[.:]?\s/gim
 
 function splitCau(khoi: string, ten: 'I' | 'II' | 'III'): ParsedQuestion[] {
   const markers: { index: number; so: number; markerEnd: number }[] = []
@@ -131,13 +134,13 @@ function splitCau(khoi: string, ten: 'I' | 'II' | 'III'): ParsedQuestion[] {
 // không bắt "A" trong "NaHCO3"), theo sau là dấu chấm/ngoặc rồi khoảng
 // trắng. Chỉ nhận ĐÚNG THỨ TỰ mốc 1 rồi 2 rồi 3 rồi 4 — mốc không khớp thứ tự
 // đang chờ thì bỏ qua (chặn bắt nhầm ký hiệu nguyên tố/biến số vật lý).
-function optionMarkerRe(ten: 'I' | 'II' | 'III'): RegExp | null {
+export function optionMarkerRe(ten: 'I' | 'II' | 'III'): RegExp | null {
   if (ten === 'I') return /(?<![A-Za-zÀ-ỹ0-9])([ABCD])\s*[.)]\s+/g
   if (ten === 'II') return /(?<![A-Za-zÀ-ỹ0-9])([abcd])\s*[.)]\s+/g
   return null
 }
 
-const KEYS: Array<'A' | 'B' | 'C' | 'D'> = ['A', 'B', 'C', 'D']
+export const KEYS: Array<'A' | 'B' | 'C' | 'D'> = ['A', 'B', 'C', 'D']
 
 function splitPa(raw: string, ten: 'I' | 'II' | 'III'): { de: string; pa: ParsedOption[] } {
   const re = optionMarkerRe(ten)

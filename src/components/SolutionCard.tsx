@@ -5,7 +5,7 @@
 import { useState } from 'react'
 import { Check, X as XIcon, ChevronDown, ChevronUp } from 'lucide-react'
 import { ChemText } from '../lib/chem-format'
-import QuestionMedia from './QuestionMedia'
+import QuestionMedia, { StemOrText, ChoiceOrText } from './QuestionMedia'
 
 // Cùng 1 bảng màu lặp lại theo chỉ số câu — KHÔNG gắn với chủ đề thật (app
 // không có dữ liệu phân loại chủ đề), chỉ để phân biệt các thẻ cho dễ nhìn.
@@ -77,9 +77,11 @@ export function SolutionMcq({
   soThuTu,
   tieuDe,
   text,
+  thanCauImg,
   table,
   imageDataUrl,
   choices,
+  choiceImgs,
   choicePerm,
   correct,
   selected,
@@ -89,9 +91,11 @@ export function SolutionMcq({
   soThuTu: number
   tieuDe?: string
   text: string
+  thanCauImg?: string
   table?: string[][]
   imageDataUrl?: string
   choices: [string, string, string, string]
+  choiceImgs?: [string?, string?, string?, string?]
   choicePerm: number[]
   correct: 'A' | 'B' | 'C' | 'D'
   selected: 'A' | 'B' | 'C' | 'D' | null
@@ -100,9 +104,7 @@ export function SolutionMcq({
   const dungHet = selected === null ? null : selected === correct
   return (
     <CardShell mauIdx={mauIdx} tieuDe={tieuDe?.trim() || `Câu ${soThuTu}`} soThuTu={soThuTu} dungHet={dungHet}>
-      <div className="text-sm leading-relaxed">
-        <ChemText text={text} />
-      </div>
+      <StemOrText img={thanCauImg} text={text} />
       <QuestionMedia table={table} imageDataUrl={imageDataUrl} />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {choicePerm.map((origIdx, displayPos) => {
@@ -122,9 +124,7 @@ export function SolutionMcq({
               }`}
             >
               <span className="shrink-0 font-bold">{displayLetter}.</span>
-              <span className="flex-1">
-                <ChemText text={choices[origIdx]} />
-              </span>
+              <ChoiceOrText img={choiceImgs?.[origIdx]} text={choices[origIdx]} />
             </div>
           )
         })}

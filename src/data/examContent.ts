@@ -20,10 +20,18 @@ export interface QuestionMedia {
   imageDataUrl?: string // ảnh chụp đồ thị/hình vẽ, base64, hiển thị y nguyên
 }
 
+/** `text`/`choices` là chữ trích từ PDF — CHỈ dùng để định vị + tìm kiếm/gắn
+ * nhãn (xem exam-image-crop.ts), KHÔNG dùng để hiển thị cho học sinh nếu đã
+ * có ảnh cắt sẵn. `thanCauImg`/`choiceImgs` là ẢNH CẮT THẲNG từ trang PDF gốc
+ * (200 DPI, đã nhị phân hoá nền trong suốt) — có ảnh thì LUÔN ưu tiên hiện
+ * ảnh, vì lớp chữ PDF hay vỡ công thức mà vỡ ÂM THẦM (đọc vẫn hợp lý nhưng
+ * sai đề). Đề gõ tay không có ảnh -> vẫn hiện bằng chữ như trước, không đổi. */
 export interface McqQuestion extends QuestionMedia {
   id: string
   text: string
   choices: [string, string, string, string] // ứng A,B,C,D theo thứ tự GỐC (chưa xáo)
+  thanCauImg?: string
+  choiceImgs?: [string?, string?, string?, string?] // ứng A,B,C,D theo thứ tự GỐC — xáo cùng lúc với choices qua choicePerm, không cần đổi thuật toán xáo
 }
 /** Lời giải & tiêu đề ngắn (chủ đề) — CHỈ đi kèm dữ liệu CÓ đáp án (Teacher*),
  * không bao giờ vào PublicExamBank (mergeAndStrip không chọn 2 trường này) —
@@ -41,6 +49,8 @@ export interface TrueFalseQuestion extends QuestionMedia {
   id: string
   text: string
   ideas: [string, string, string, string] // ý a,b,c,d theo thứ tự GỐC, KHÔNG xáo
+  thanCauImg?: string
+  ideaImgs?: [string?, string?, string?, string?]
 }
 export interface TeacherTrueFalseQuestion extends TrueFalseQuestion {
   correct: ['D' | 'S', 'D' | 'S', 'D' | 'S', 'D' | 'S']
@@ -51,6 +61,7 @@ export interface TeacherTrueFalseQuestion extends TrueFalseQuestion {
 export interface ShortAnswerQuestion extends QuestionMedia {
   id: string
   text: string
+  thanCauImg?: string
 }
 export interface TeacherShortAnswerQuestion extends ShortAnswerQuestion {
   correct: string
@@ -106,9 +117,13 @@ export function validateTeacherSource(c: TeacherExamSource): string[] {
 /** Gộp nhiều đề đã tải + xoá đáp án — đây mới là thứ được publish lên server. */
 export function mergeAndStrip(sources: TeacherExamSource[]): PublicExamBank {
   return {
-    phanI: sources.flatMap((s) => s.phanI.map(({ id, text, choices, table, imageDataUrl }) => ({ id, text, choices, table, imageDataUrl }))),
-    phanII: sources.flatMap((s) => s.phanII.map(({ id, text, ideas, table, imageDataUrl }) => ({ id, text, ideas, table, imageDataUrl }))),
-    phanIII: sources.flatMap((s) => s.phanIII.map(({ id, text, table, imageDataUrl }) => ({ id, text, table, imageDataUrl }))),
+    phanI: sources.flatMap((s) =>
+      s.phanI.map(({ id, text, choices, table, imageDataUrl, thanCauImg, choiceImgs }) => ({ id, text, choices, table, imageDataUrl, thanCauImg, choiceImgs })),
+    ),
+    phanII: sources.flatMap((s) =>
+      s.phanII.map(({ id, text, ideas, table, imageDataUrl, thanCauImg, ideaImgs }) => ({ id, text, ideas, table, imageDataUrl, thanCauImg, ideaImgs })),
+    ),
+    phanIII: sources.flatMap((s) => s.phanIII.map(({ id, text, table, imageDataUrl, thanCauImg }) => ({ id, text, table, imageDataUrl, thanCauImg }))),
   }
 }
 

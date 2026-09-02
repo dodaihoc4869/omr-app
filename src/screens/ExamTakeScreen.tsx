@@ -4,8 +4,8 @@ import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assi
 import { fetchSession, submitAnswers, pushExamStatus, sendParentFeedback, type KeyBank } from '../lib/exam-api'
 import { ChemText } from '../lib/chem-format'
 import QuestionMedia from '../components/QuestionMedia'
-import { SolutionMcq, SolutionTrueFalse, SolutionShortAnswer, MAU_HEADER } from '../components/SolutionCard'
-import { TriangleAlert, X, ArrowLeft } from 'lucide-react'
+import { SolutionMcq, SolutionTrueFalse, SolutionShortAnswer } from '../components/SolutionCard'
+import { TriangleAlert, X, ArrowLeft, Grid3x3 } from 'lucide-react'
 import { classify } from '../engine/score'
 import { gradeFromKeyBank, type GradedSubmission } from '../lib/exam-grade'
 import {
@@ -28,39 +28,36 @@ function formatClock(totalSeconds: number): string {
   return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
 }
 
-// Thẻ câu hỏi khi ĐANG LÀM BÀI — cùng ngôn ngữ hình ảnh với SolutionCard
-// (header màu gradient xoay vòng, số thứ tự trong huy hiệu tròn) nhưng LUÔN
-// MỞ (không gập) vì học sinh cần thấy và trả lời từng câu, khác màn xem lại
-// lời giải là để đọc lại nên mặc định gập cho gọn. Chấm tròn ở góc phải báo
-// đã trả lời hay chưa, không tô đúng/sai vì chưa nộp bài.
-function QCard({
-  mauIdx,
-  soThuTu,
-  daTraLoi,
-  children,
-}: {
-  mauIdx: number
-  soThuTu: number
-  daTraLoi: boolean
-  children: React.ReactNode
-}) {
-  return (
-    <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-      <div
-        className={`flex items-center justify-between gap-2 px-3.5 py-2.5 bg-gradient-to-r ${MAU_HEADER[mauIdx % MAU_HEADER.length]} text-white`}
-      >
-        <div className="flex items-center gap-2.5 min-w-0">
-          <span className="shrink-0 w-7 h-7 rounded-full bg-white/25 flex items-center justify-center text-sm font-bold">{soThuTu}</span>
-          <span className="font-semibold text-sm">Câu {soThuTu}</span>
-        </div>
-        <span
-          className={`shrink-0 w-3 h-3 rounded-full border-2 border-white/80 ${daTraLoi ? 'bg-white' : 'bg-transparent'}`}
-          title={daTraLoi ? 'Đã trả lời' : 'Chưa trả lời'}
-        />
-      </div>
-      <div className="p-3.5 space-y-2.5">{children}</div>
-    </div>
-  )
+// ============================================================================
+// MÀN LÀM BÀI ("phòng thi") — bản sắc RIÊNG, cố định, KHÔNG đổi theo theme
+// sáng/tối hệ thống (giống màn Quét OMR) để học sinh/phụ huynh nhận ra cùng
+// một trung tâm với phiếu kết quả giấy đã gửi. Bảy màu, mỗi màu một nhiệm
+// vụ — đỏ (--gap) CHỈ dùng đúng một việc: còn dưới 5 phút.
+// ============================================================================
+const PHONG_THI_VARS = {
+  '--muc': '#12212b',
+  '--giay': '#fdfcf8',
+  '--the': '#ffffff',
+  '--ke': '#e3ded1',
+  '--nhat': '#8a8578',
+  '--chon': '#1f6f5c',
+  '--gap': '#b8332e',
+} as React.CSSProperties
+const SERIF = "'Iowan Old Style', Palatino, 'Palatino Linotype', Georgia, serif"
+
+type PhanKey = 'I' | 'II' | 'III'
+interface FlatRef {
+  phan: PhanKey
+  i: number
+}
+
+function daTraLoiEntry(attempt: ExamAttempt, assignment: StudentAssignment, ref: FlatRef): boolean {
+  if (ref.phan === 'I') return !!attempt.answers.phanI[assignment.phanI[ref.i].qid]
+  if (ref.phan === 'II') {
+    const v = attempt.answers.phanII[assignment.phanII[ref.i].qid]
+    return !!v && v.some((x) => x !== null && x !== undefined)
+  }
+  return !!attempt.answers.phanIII[assignment.phanIII[ref.i].qid]?.trim()
 }
 
 export default function ExamTakeScreen() {
@@ -99,6 +96,45 @@ export default function ExamTakeScreen() {
   const [keyBank, setKeyBank] = useState<KeyBank | null>(null)
   const [xemLoiGiai, setXemLoiGiai] = useState(false)
 
+  // ---- Màn làm bài kiểu "phòng thi": mỗi câu 1 màn hình ----
+  const [qIndex, setQIndex] = useState(0)
+  const [showGrid, setShowGrid] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [zoomSrc, setZoomSrc] = useState<string | null>(null)
+  const [saveFlash, setSaveFlash] = useState(false)
+  const saveFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [online, setOnline] = useState(() => (typeof navigator !== 'undefined' ? navigator.onLine : true))
+  const gapVibratedRef = useRef(false)
+  const reducedMotion = useMemo(
+    () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
+    [],
+  )
+  const swipeStartRef = useRef<{ x: number; y: number } | null>(null)
+
+  useEffect(() => {
+    if (phase === 'exam') setQIndex(0)
+  }, [phase])
+
+  useEffect(() => {
+    const onOn = () => setOnline(true)
+    const onOff = () => setOnline(false)
+    window.addEventListener('online', onOn)
+    window.addEventListener('offline', onOff)
+    return () => {
+      window.removeEventListener('online', onOn)
+      window.removeEventListener('offline', onOff)
+    }
+  }, [])
+
+  // Rung MỘT LẦN DUY NHẤT khi vừa xuống dưới 5 phút — không lặp lại, không
+  // nhấp nháy, đúng nguyên tắc "báo trạng thái, không gây hoảng".
+  useEffect(() => {
+    if (remaining !== null && remaining <= 300 && !gapVibratedRef.current) {
+      gapVibratedRef.current = true
+      navigator.vibrate?.(200)
+    }
+  }, [remaining])
+
   // Refs để hàm chạy trong effect/listener luôn đọc được giá trị MỚI NHẤT
   // (tránh closure cũ), dùng cho việc đẩy trạng thái làm bài lên cho phụ huynh.
   const scriptUrlRef = useRef('')
@@ -129,6 +165,17 @@ export default function ExamTakeScreen() {
     if (!bank || !maCa || !sbd) return null
     return assignStudentQuestions(bank, maCa.trim(), sbd.trim())
   }, [bank, maCa, sbd])
+
+  // Gộp cả 3 phần thành 1 danh sách phẳng — "mỗi câu một màn hình", đánh số
+  // liên tục 1..tổng (đúng số hiện trong "7/18" và lưới câu hỏi).
+  const flat: FlatRef[] = useMemo(() => {
+    if (!assignment) return []
+    const out: FlatRef[] = []
+    assignment.phanI.forEach((_, i) => out.push({ phan: 'I', i }))
+    assignment.phanII.forEach((_, i) => out.push({ phan: 'II', i }))
+    assignment.phanIII.forEach((_, i) => out.push({ phan: 'III', i }))
+    return out
+  }, [assignment])
 
   // Bộ câu ĐẦY ĐỦ (kèm đáp án đúng + lời giải) dùng riêng cho màn "Xem lại
   // lời giải" — assignStudentQuestions tái tạo LẠI ĐÚNG cùng bộ câu vì cùng
@@ -371,6 +418,11 @@ export default function ExamTakeScreen() {
       saveAttempt(next)
       return next
     })
+    // Chấm lưu ở thanh trên: lưu vào IndexedDB máy em NGAY khi chọn (không
+    // đợi bấm nộp) — mất mạng/hết pin giữa giờ vẫn còn nguyên đáp án.
+    setSaveFlash(true)
+    if (saveFlashTimerRef.current) clearTimeout(saveFlashTimerRef.current)
+    saveFlashTimerRef.current = setTimeout(() => setSaveFlash(false), 700)
   }
 
   const setPhanI = (qid: string, letter: 'A' | 'B' | 'C' | 'D') =>
@@ -642,21 +694,77 @@ export default function ExamTakeScreen() {
     )
   }
 
-  if (!assignment || !attempt) return null
+  if (!assignment || !attempt || flat.length === 0) return null
+
+  const total = flat.length
+  const cur = flat[Math.min(qIndex, total - 1)]
+  const daLamCount = flat.filter((f) => daTraLoiEntry(attempt, assignment, f)).length
+  const chuaLam = flat.map((f, i) => (daTraLoiEntry(attempt, assignment, f) ? null : i + 1)).filter((x): x is number => x !== null)
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0]
+    swipeStartRef.current = { x: t.clientX, y: t.clientY }
+  }
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const start = swipeStartRef.current
+    swipeStartRef.current = null
+    if (!start) return
+    const t = e.changedTouches[0]
+    const dx = t.clientX - start.x
+    const dy = t.clientY - start.y
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0) setQIndex((i) => Math.min(total - 1, i + 1))
+      else setQIndex((i) => Math.max(0, i - 1))
+    }
+  }
+
+  const gapNow = remaining !== null && remaining <= 300
+  const dotColor = !online ? 'var(--nhat)' : saveFlash ? '#c98a1f' : 'var(--chon)'
+  const dotLabel = !online ? 'mất mạng, đã lưu máy' : saveFlash ? 'đang lưu…' : 'đã lưu'
+
+  const phanLabel = cur.phan === 'I' ? 'Phần I — Trắc nghiệm' : cur.phan === 'II' ? 'Phần II — Đúng / Sai' : 'Phần III — Trả lời ngắn'
 
   return (
-    <div className="min-h-screen pb-24 px-4 pt-4 space-y-6 bg-slate-50 dark:bg-slate-950">
-      <div className="sticky top-0 z-30 -mx-4 px-4 py-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-        <div className="text-sm">
-          SBD <b>{attempt.sbd}</b>
+    <div style={PHONG_THI_VARS} className="min-h-screen flex flex-col bg-[var(--giay)]">
+      {/* THANH TRÊN — dính, thanh tiến độ theo từng ô câu + vị trí + đồng hồ + chấm lưu */}
+      <div
+        className="sticky top-0 z-30 border-b px-3 pb-2 space-y-1.5"
+        style={{ borderColor: 'var(--ke)', background: 'var(--giay)', paddingTop: 'max(0.5rem, env(safe-area-inset-top))' }}
+      >
+        <div className="flex gap-[2px] h-1.5">
+          {flat.map((f, i) => (
+            <div
+              key={i}
+              className="flex-1 rounded-full"
+              style={{
+                background: daTraLoiEntry(attempt, assignment, f) ? 'var(--muc)' : 'var(--ke)',
+                outline: i === qIndex ? '1.5px solid var(--chon)' : 'none',
+                outlineOffset: 1,
+              }}
+            />
+          ))}
         </div>
-        <div className={`text-lg font-bold tabular-nums ${remaining !== null && remaining < 300 ? 'text-rose-600' : ''}`}>
-          {formatClock(remaining ?? 0)}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="shrink-0 w-2 h-2 rounded-full transition-colors" style={{ background: dotColor }} title={dotLabel} />
+            <span className="text-[11px] truncate" style={{ color: 'var(--nhat)' }}>
+              {dotLabel}
+            </span>
+          </div>
+          <div className="text-sm font-semibold tabular-nums" style={{ fontFamily: SERIF, color: 'var(--muc)' }}>
+            {qIndex + 1}/{total}
+          </div>
+          <div
+            className="text-lg font-bold tabular-nums transition-colors"
+            style={{ fontFamily: SERIF, color: gapNow ? 'var(--gap)' : 'var(--nhat)' }}
+          >
+            {formatClock(remaining ?? 0)}
+          </div>
         </div>
       </div>
 
       {leaveWarning && (
-        <div className="sticky top-[46px] z-30 -mx-4 px-4">
+        <div className="sticky top-[70px] z-30 px-3 pt-1.5">
           <div className="bg-rose-600 text-white rounded-lg px-3 py-2.5 shadow-lg flex items-start gap-2 animate-[pulse_1.2s_ease-in-out_2]">
             <TriangleAlert size={20} className="shrink-0 mt-0.5" />
             <div className="text-sm leading-snug">
@@ -671,132 +779,343 @@ export default function ExamTakeScreen() {
         </div>
       )}
 
-      <section className="space-y-3">
-        <h2 className="font-bold text-indigo-700 dark:text-indigo-400">Phần I — Trắc nghiệm nhiều lựa chọn</h2>
-        {assignment.phanI.map((item, displayIdx) => {
-          const selectedLetter = attempt.answers.phanI[item.qid]
-          return (
-            <QCard key={item.qid} mauIdx={displayIdx} soThuTu={displayIdx + 1} daTraLoi={!!selectedLetter}>
-              <div className="text-sm font-medium leading-relaxed">
-                <ChemText text={item.question.text} />
-              </div>
-              <QuestionMedia table={item.question.table} imageDataUrl={item.question.imageDataUrl} />
-              <div className="grid grid-cols-1 gap-2">
-                {item.choicePerm.map((origChoiceIdx, displayPos) => {
-                  const letter = 'ABCD'[displayPos] as 'A' | 'B' | 'C' | 'D'
-                  const origLetter = 'ABCD'[origChoiceIdx] as 'A' | 'B' | 'C' | 'D'
-                  const active = selectedLetter === origLetter
-                  return (
-                    <button
-                      key={displayPos}
-                      type="button"
-                      onClick={() => setPhanI(item.qid, origLetter)}
-                      className={`tap-target flex items-center gap-2.5 text-left rounded-lg border-2 px-3 py-2 text-sm transition-colors ${
-                        active
-                          ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950 text-indigo-900 dark:text-indigo-200'
-                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900'
-                      }`}
-                    >
-                      <span
-                        className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                          active ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                        }`}
-                      >
-                        {letter}
-                      </span>
-                      <span className="flex-1">
-                        <ChemText text={item.question.choices[origChoiceIdx]} />
-                      </span>
+      {/* NỘI DUNG — 1 câu 1 màn hình, vuốt ngang để chuyển câu */}
+      <div
+        className="flex-1 overflow-y-auto px-4 py-4"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
+        <div key={qIndex} className={reducedMotion ? '' : 'animate-[phongthifade_150ms_ease-out]'}>
+          <div className="text-[11px] font-semibold tracking-wide mb-2" style={{ color: 'var(--nhat)' }}>
+            {phanLabel.toUpperCase()}
+          </div>
+
+          {cur.phan === 'I' &&
+            (() => {
+              const item = assignment.phanI[cur.i]
+              const stemImg = item.question.thanCauImg
+              return (
+                <>
+                  {stemImg ? (
+                    <button type="button" onClick={() => setZoomSrc(stemImg)} className="block w-full mb-1">
+                      <img src={stemImg} alt="Đề bài" className="w-full rounded-lg border" style={{ borderColor: 'var(--ke)' }} />
                     </button>
-                  )
-                })}
-              </div>
-            </QCard>
-          )
-        })}
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="font-bold text-indigo-700 dark:text-indigo-400">Phần II — Đúng / Sai</h2>
-        {assignment.phanII.map((item, displayIdx) => {
-          const vals = attempt.answers.phanII[item.qid]
-          const daTraLoi = !!vals && vals.some((v) => v !== null && v !== undefined)
-          return (
-            <QCard key={item.qid} mauIdx={assignment.phanI.length + displayIdx} soThuTu={displayIdx + 1} daTraLoi={daTraLoi}>
-              <div className="text-sm font-medium leading-relaxed">
-                <ChemText text={item.question.text} />
-              </div>
-              <QuestionMedia table={item.question.table} imageDataUrl={item.question.imageDataUrl} />
-              <div className="space-y-2">
-                {item.question.ideas.map((idea, ideaIdx) => {
-                  const val = attempt.answers.phanII[item.qid]?.[ideaIdx]
-                  return (
-                    <div
-                      key={ideaIdx}
-                      className="flex items-center justify-between gap-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 px-2.5 py-1.5"
-                    >
-                      <span className="text-sm flex-1">
-                        <b className="text-slate-500">{'abcd'[ideaIdx]})</b> <ChemText text={idea} />
-                      </span>
-                      <span className="flex gap-1.5 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => setPhanII(item.qid, ideaIdx, 'D')}
-                          className={`tap-target w-11 rounded-md text-xs font-bold border-2 transition-colors ${
-                            val === 'D'
-                              ? 'bg-emerald-600 border-emerald-600 text-white'
-                              : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-500'
-                          }`}
-                        >
-                          Đúng
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setPhanII(item.qid, ideaIdx, 'S')}
-                          className={`tap-target w-11 rounded-md text-xs font-bold border-2 transition-colors ${
-                            val === 'S'
-                              ? 'bg-rose-600 border-rose-600 text-white'
-                              : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-500'
-                          }`}
-                        >
-                          Sai
-                        </button>
-                      </span>
+                  ) : (
+                    <div className="text-base leading-relaxed mb-2" style={{ color: 'var(--muc)' }}>
+                      <ChemText text={item.question.text} />
                     </div>
-                  )
-                })}
-              </div>
-            </QCard>
-          )
-        })}
-      </section>
+                  )}
+                  <QuestionMedia table={item.question.table} imageDataUrl={item.question.imageDataUrl} />
+                  {stemImg && (
+                    <button
+                      onClick={() => setZoomSrc(stemImg)}
+                      className="text-[12px] underline decoration-dotted mb-3 mt-1 block"
+                      style={{ color: 'var(--nhat)' }}
+                    >
+                      xem bản gốc
+                    </button>
+                  )}
+                  <div className="space-y-2 mt-3">
+                    {item.choicePerm.map((origIdx, displayPos) => {
+                      const letter = 'ABCD'[displayPos] as 'A' | 'B' | 'C' | 'D'
+                      const origLetter = 'ABCD'[origIdx] as 'A' | 'B' | 'C' | 'D'
+                      const active = attempt.answers.phanI[item.qid] === origLetter
+                      const img = item.question.choiceImgs?.[origIdx]
+                      return (
+                        <button
+                          key={displayPos}
+                          type="button"
+                          onClick={() => setPhanI(item.qid, origLetter)}
+                          className="tap-target w-full flex items-stretch rounded-lg border-2 overflow-hidden text-left transition-colors"
+                          style={{
+                            borderColor: active ? 'var(--chon)' : 'var(--ke)',
+                            background: active ? 'rgba(31,111,92,0.07)' : 'var(--the)',
+                            minHeight: 56,
+                          }}
+                        >
+                          <span
+                            className="shrink-0 w-12 flex items-center justify-center font-bold text-base"
+                            style={{ fontFamily: SERIF, color: active ? '#fff' : 'var(--muc)', background: active ? 'var(--chon)' : 'transparent' }}
+                          >
+                            {letter}
+                          </span>
+                          <span className="flex-1 flex items-center px-3 py-2" style={{ color: 'var(--muc)' }}>
+                            {img ? (
+                              <img src={img} alt={`Phương án ${letter}`} className="max-h-14 w-auto" />
+                            ) : (
+                              <span className="text-sm">
+                                <ChemText text={item.question.choices[origIdx]} />
+                              </span>
+                            )}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </>
+              )
+            })()}
 
-      <section className="space-y-3">
-        <h2 className="font-bold text-indigo-700 dark:text-indigo-400">Phần III — Trả lời ngắn</h2>
-        {assignment.phanIII.map((item, displayIdx) => (
-          <QCard
-            key={item.qid}
-            mauIdx={assignment.phanI.length + assignment.phanII.length + displayIdx}
-            soThuTu={displayIdx + 1}
-            daTraLoi={!!attempt.answers.phanIII[item.qid]?.trim()}
+          {cur.phan === 'II' &&
+            (() => {
+              const item = assignment.phanII[cur.i]
+              const stemImg = item.question.thanCauImg
+              return (
+                <>
+                  {stemImg ? (
+                    <button type="button" onClick={() => setZoomSrc(stemImg)} className="block w-full mb-1">
+                      <img src={stemImg} alt="Đề bài" className="w-full rounded-lg border" style={{ borderColor: 'var(--ke)' }} />
+                    </button>
+                  ) : (
+                    <div className="text-base leading-relaxed mb-2" style={{ color: 'var(--muc)' }}>
+                      <ChemText text={item.question.text} />
+                    </div>
+                  )}
+                  <QuestionMedia table={item.question.table} imageDataUrl={item.question.imageDataUrl} />
+                  {stemImg && (
+                    <button
+                      onClick={() => setZoomSrc(stemImg)}
+                      className="text-[12px] underline decoration-dotted mb-3 mt-1 block"
+                      style={{ color: 'var(--nhat)' }}
+                    >
+                      xem bản gốc
+                    </button>
+                  )}
+                  <div className="space-y-2.5 mt-3">
+                    {item.question.ideas.map((idea, ideaIdx) => {
+                      const val = attempt.answers.phanII[item.qid]?.[ideaIdx]
+                      const img = item.question.ideaImgs?.[ideaIdx]
+                      return (
+                        <div key={ideaIdx} className="rounded-lg border p-2.5 space-y-2" style={{ borderColor: 'var(--ke)', background: 'var(--the)' }}>
+                          <div className="text-sm flex items-start gap-1.5" style={{ color: 'var(--muc)' }}>
+                            <b style={{ color: 'var(--nhat)' }}>{'abcd'[ideaIdx]})</b>
+                            {img ? <img src={img} alt={`Ý ${'abcd'[ideaIdx]}`} className="max-h-14 w-auto" /> : <ChemText text={idea} />}
+                          </div>
+                          <div className="flex gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => setPhanII(item.qid, ideaIdx, 'D')}
+                              className="tap-target flex-1 rounded-md text-sm font-bold border-2 py-2"
+                              style={{
+                                borderColor: val === 'D' ? 'var(--chon)' : 'var(--ke)',
+                                background: val === 'D' ? 'var(--chon)' : 'var(--the)',
+                                color: val === 'D' ? '#fff' : 'var(--muc)',
+                              }}
+                            >
+                              Đúng
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setPhanII(item.qid, ideaIdx, 'S')}
+                              className="tap-target flex-1 rounded-md text-sm font-bold border-2 py-2"
+                              style={{
+                                borderColor: val === 'S' ? 'var(--muc)' : 'var(--ke)',
+                                background: val === 'S' ? 'var(--muc)' : 'var(--the)',
+                                color: val === 'S' ? '#fff' : 'var(--muc)',
+                              }}
+                            >
+                              Sai
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </>
+              )
+            })()}
+
+          {cur.phan === 'III' &&
+            (() => {
+              const item = assignment.phanIII[cur.i]
+              const stemImg = item.question.thanCauImg
+              return (
+                <>
+                  {stemImg ? (
+                    <button type="button" onClick={() => setZoomSrc(stemImg)} className="block w-full mb-1">
+                      <img src={stemImg} alt="Đề bài" className="w-full rounded-lg border" style={{ borderColor: 'var(--ke)' }} />
+                    </button>
+                  ) : (
+                    <div className="text-base leading-relaxed mb-2" style={{ color: 'var(--muc)' }}>
+                      <ChemText text={item.question.text} />
+                    </div>
+                  )}
+                  <QuestionMedia table={item.question.table} imageDataUrl={item.question.imageDataUrl} />
+                  {stemImg && (
+                    <button
+                      onClick={() => setZoomSrc(stemImg)}
+                      className="text-[12px] underline decoration-dotted mb-3 mt-1 block"
+                      style={{ color: 'var(--nhat)' }}
+                    >
+                      xem bản gốc
+                    </button>
+                  )}
+                  <input
+                    className="tap-target w-full rounded-lg border-2 px-3 font-medium mt-3"
+                    style={{ borderColor: 'var(--ke)', background: 'var(--the)', color: 'var(--muc)', minHeight: 56 }}
+                    placeholder="Đáp án"
+                    value={attempt.answers.phanIII[item.qid] ?? ''}
+                    onChange={(e) => setPhanIII(item.qid, e.target.value)}
+                  />
+                </>
+              )
+            })()}
+        </div>
+      </div>
+
+      {/* THANH DƯỚI — dính, Trước / lưới câu / Sau (đổi thành Nộp bài ở câu cuối) */}
+      <div
+        className="sticky bottom-0 z-30 border-t px-3 py-2 flex items-center justify-between gap-2"
+        style={{ borderColor: 'var(--ke)', background: 'var(--giay)', paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
+      >
+        <button
+          onClick={() => setQIndex((i) => Math.max(0, i - 1))}
+          disabled={qIndex === 0}
+          className="tap-target px-4 py-2.5 rounded-lg font-semibold disabled:opacity-30"
+          style={{ color: 'var(--muc)' }}
+        >
+          ‹ Trước
+        </button>
+        <button
+          onClick={() => setShowGrid(true)}
+          className="tap-target w-12 h-12 rounded-full flex items-center justify-center border-2"
+          style={{ borderColor: 'var(--ke)' }}
+          title="Xem danh sách câu"
+        >
+          <Grid3x3 size={18} style={{ color: 'var(--muc)' }} />
+        </button>
+        {qIndex === total - 1 ? (
+          <button
+            onClick={() => setShowConfirm(true)}
+            className="tap-target px-5 py-2.5 rounded-lg font-semibold text-white"
+            style={{ background: 'var(--chon)' }}
           >
-            <div className="text-sm font-medium leading-relaxed">
-              <ChemText text={item.question.text} />
-            </div>
-            <QuestionMedia table={item.question.table} imageDataUrl={item.question.imageDataUrl} />
-            <input
-              className="tap-target w-full rounded-lg border-2 border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 font-medium"
-              placeholder="Đáp án"
-              value={attempt.answers.phanIII[item.qid] ?? ''}
-              onChange={(e) => setPhanIII(item.qid, e.target.value)}
-            />
-          </QCard>
-        ))}
-      </section>
+            Nộp bài
+          </button>
+        ) : (
+          <button
+            onClick={() => setQIndex((i) => Math.min(total - 1, i + 1))}
+            className="tap-target px-4 py-2.5 rounded-lg font-semibold"
+            style={{ color: 'var(--muc)' }}
+          >
+            Sau ›
+          </button>
+        )}
+      </div>
 
-      <button onClick={() => doSubmit(attempt)} className="tap-target w-full rounded-xl bg-emerald-600 text-white font-semibold">
-        Nộp bài
-      </button>
+      {/* LƯỚI SỐ CÂU */}
+      {showGrid && (
+        <div className="fixed inset-0 z-40 flex items-end" style={{ background: 'rgba(18,33,43,0.5)' }} onClick={() => setShowGrid(false)}>
+          <div
+            className="w-full rounded-t-2xl p-4 space-y-3"
+            style={{ background: 'var(--giay)', maxHeight: '75vh' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <div className="font-bold" style={{ fontFamily: SERIF, color: 'var(--muc)' }}>
+                Danh sách câu — đã làm {daLamCount}/{total}
+              </div>
+              <button onClick={() => setShowGrid(false)} style={{ color: 'var(--nhat)' }}>
+                <X size={20} />
+              </button>
+            </div>
+            <div className="grid grid-cols-6 gap-2 max-h-[45vh] overflow-y-auto pb-1">
+              {flat.map((f, i) => {
+                const done = daTraLoiEntry(attempt, assignment, f)
+                const dangXem = i === qIndex
+                return (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      setQIndex(i)
+                      setShowGrid(false)
+                    }}
+                    className="tap-target aspect-square rounded-lg flex items-center justify-center font-semibold text-sm tabular-nums"
+                    style={{
+                      fontFamily: SERIF,
+                      background: done ? 'var(--muc)' : 'var(--the)',
+                      color: done ? 'var(--giay)' : 'var(--muc)',
+                      border: dangXem ? '2px solid var(--chon)' : '1px solid var(--ke)',
+                    }}
+                  >
+                    {i + 1}
+                  </button>
+                )
+              })}
+            </div>
+            <button
+              onClick={() => {
+                setShowGrid(false)
+                setShowConfirm(true)
+              }}
+              className="tap-target w-full rounded-xl font-semibold text-white py-3"
+              style={{ background: 'var(--chon)' }}
+            >
+              Nộp bài
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* XÁC NHẬN NỘP BÀI */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(18,33,43,0.6)' }}>
+          <div className="w-full max-w-sm rounded-2xl p-5 space-y-3" style={{ background: 'var(--the)' }}>
+            <div className="text-sm leading-relaxed" style={{ color: 'var(--muc)' }}>
+              Em đã làm{' '}
+              <b>
+                {daLamCount}/{total}
+              </b>{' '}
+              câu.
+              {chuaLam.length > 0 && (
+                <div className="mt-1.5 font-medium" style={{ color: 'var(--gap)' }}>
+                  Còn {chuaLam.length} câu chưa làm: câu {chuaLam.join(', ')}.
+                </div>
+              )}
+            </div>
+            <div className="text-xs" style={{ color: 'var(--nhat)' }}>
+              Sau khi nộp không sửa được nữa.
+            </div>
+            <div className="flex gap-2 pt-1">
+              <button
+                onClick={() => {
+                  setShowConfirm(false)
+                  if (chuaLam.length > 0) setQIndex(chuaLam[0] - 1)
+                }}
+                className="tap-target flex-1 rounded-xl font-semibold py-2.5"
+                style={{ border: '1px solid var(--ke)', color: 'var(--muc)' }}
+              >
+                Xem lại
+              </button>
+              <button
+                onClick={() => {
+                  setShowConfirm(false)
+                  doSubmit(attempt)
+                }}
+                className="tap-target flex-1 rounded-xl font-semibold py-2.5 text-white"
+                style={{ background: 'var(--chon)' }}
+              >
+                NỘP BÀI
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PHÓNG TO ẢNH ĐỀ/PHƯƠNG ÁN */}
+      {zoomSrc && (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center p-2 overflow-auto"
+          style={{ background: 'rgba(18,33,43,0.9)' }}
+          onClick={() => setZoomSrc(null)}
+        >
+          <img src={zoomSrc} alt="Phóng to" className="max-w-full max-h-full rounded shadow-2xl" />
+        </div>
+      )}
+
+      {!reducedMotion && (
+        <style>{`@keyframes phongthifade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+      )}
     </div>
   )
 }

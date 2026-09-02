@@ -9,14 +9,15 @@
 // do; đỏ: CHƯA có đáp án — bắt buộc điền, khoá nút lưu) -> [3] Lưu vào ngân
 // hàng câu hỏi theo từng mã đề, báo số câu trùng với ngân hàng đã có.
 import { useRef, useState, type DragEvent } from 'react'
-import { UploadCloud, Check, AlertTriangle, X as XIcon, Trash2, ImageIcon, Table as TableIcon } from 'lucide-react'
+import { UploadCloud, Check, AlertTriangle, X as XIcon, Trash2, ImageIcon, Table as TableIcon, Pencil } from 'lucide-react'
 import { extractTextFromFile, classifyDocx, classifyPdf, renderPdfPageDataUrls, type FileKind } from '../lib/exam-file-import'
+import { extractPdfQuestionImages } from '../lib/exam-image-crop'
 import { buildExamDraft } from '../lib/exam-import-pipeline'
 import { congThucVo } from '../lib/exam-question-split'
 import { validateTeacherSource, type TeacherExamSource, type TeacherMcqQuestion, type TeacherTrueFalseQuestion, type TeacherShortAnswerQuestion } from '../data/examContent'
 import { loadExamSources, saveExamSource } from '../lib/exam-db'
 import { ChemText } from '../lib/chem-format'
-import QuestionMedia from '../components/QuestionMedia'
+import QuestionMedia, { ZoomableImage } from '../components/QuestionMedia'
 import { useAppStore } from '../store/appStore'
 
 const KIND_LABEL: Record<FileKind, string> = {
@@ -68,6 +69,12 @@ interface ReviewCau {
   daXacNhanBangAnh?: boolean
   table?: string[][]
   imageDataUrl?: string
+  /** Ảnh cắt thẳng từ trang PDF gốc (200 DPI) — có ảnh thì HIỂN THỊ ẢNH,
+   * không dùng chữ `de`/`pa` để hiện cho học sinh nữa (chữ chỉ còn dùng định
+   * vị + tìm kiếm/gắn nhãn, xem exam-image-crop.ts). Không có ảnh (đề gõ
+   * tay, hoặc cắt ảnh thất bại) -> vẫn hiện bằng chữ như trước. */
+  thanCauImg?: string
+  choiceImgs?: [string?, string?, string?, string?]
   /** Tuỳ chọn — chỉ hiện cho học sinh SAU khi nộp bài (qua keyBank), không
    * lộ đề trước giờ thi. Nhiều đề tải từ file gốc không có sẵn, để trống
    * cũng lưu được bình thường. */
@@ -83,6 +90,16 @@ function trangThaiCua(c: ReviewCau): { tt: Trangthai; lyDo: string[] } {
   if (!c.dapAnDung.trim()) {
     lyDo.push('Chưa có đáp án')
     return { tt: 'do', lyDo }
+  }
+  // Câu ĐÃ có ảnh cắt từ file gốc -> hiện bằng ảnh, không còn phụ thuộc lớp
+  // chữ vỡ hay không (đúng nguyên tắc "lớp chữ chỉ để định vị"). Chỉ còn cần
+  // kiểm tra đủ ảnh phương án (Phần I/II) — thiếu ảnh 1 vài phương án thì
+  // vẫn vàng để thầy tự bổ khuyết.
+  if (c.thanCauImg) {
+    const canPa = c.ten === 'III' ? 0 : c.pa.length
+    const duAnhPa = c.ten === 'III' || (c.choiceImgs && c.choiceImgs.filter(Boolean).length === canPa && canPa === 4)
+    if (!duAnhPa) lyDo.push('Cắt được ảnh đề bài nhưng thiếu ảnh 1 vài phương án — thầy kiểm tra tay')
+    return { tt: lyDo.length > 0 ? 'vang' : 'xanh', lyDo }
   }
   const ngheVo = !c.daXacNhanBangAnh && (congThucVo(c.de) || c.pa.some((p) => congThucVo(p.text)))
   if (ngheVo) lyDo.push('Nghi công thức/bảng Hoá bị vỡ khi trích PDF — thầy liếc lại chữ/số hoặc đối chiếu ảnh trang gốc')
@@ -147,21 +164,44 @@ export default function ExamImportScreen() {
           }
         }
 
+        // ĐỔI CÁCH ĐỌC PDF: cắt ẢNH thẳng từ trang gốc cho từng câu/phương án
+        // thay vì hiển thị lại bằng chữ trích ra (chữ chỉ còn dùng định vị +
+        // lưu ẩn). Best-effort — câu nào không xác định đủ mốc thì bỏ qua,
+        // giữ nguyên chế độ chữ + cờ vàng như trước cho câu đó, KHÔNG chặn
+        // luồng đọc file (rất tốn công tính toán nên chỉ chạy cho PDF có lớp
+        // chữ, không chạy cho Word).
+        let imgResult: Awaited<ReturnType<typeof extractPdfQuestionImages>> | null = null
+        if (!isDocx && kind === 'pdf_chu') {
+          try {
+            imgResult = await extractPdfQuestionImages(file)
+          } catch {
+            imgResult = null
+          }
+        }
+
         const draft = buildExamDraft(text)
         const maDe = draft.maDe || file.name.replace(/\.(pdf|docx)$/i, '')
         const newCau: ReviewCau[] = draft.phan.flatMap((p) =>
-          p.cau.map((c) => ({
-            uid: `${jobId}-${p.ten}-${c.so}`,
-            fileId: jobId,
-            fileName: file.name,
-            maDe,
-            ten: p.ten,
-            so: c.so,
-            de: c.de,
-            pa: c.pa,
-            dapAnDung: c.dapAnDung ?? '',
-            canDocAnh: c.canDocAnh,
-          })),
+          p.cau.map((c) => {
+            const img = imgResult?.images.get(`${p.ten}-${c.so}`)
+            const choiceImgs = img?.paImgs
+              ? (['A', 'B', 'C', 'D'] as const).map((k) => img.paImgs?.[k]) as [string?, string?, string?, string?]
+              : undefined
+            return {
+              uid: `${jobId}-${p.ten}-${c.so}`,
+              fileId: jobId,
+              fileName: file.name,
+              maDe,
+              ten: p.ten,
+              so: c.so,
+              de: c.de,
+              pa: c.pa,
+              dapAnDung: c.dapAnDung ?? '',
+              canDocAnh: c.canDocAnh,
+              thanCauImg: img?.thanCauImg,
+              choiceImgs,
+            }
+          }),
         )
         setCauList((prev) => [...prev, ...newCau])
         const soCauI = draft.phan.find((p) => p.ten === 'I')?.cau.length ?? 0
@@ -257,6 +297,8 @@ export default function ExamImportScreen() {
             imageDataUrl: c.imageDataUrl,
             explanation: c.explanation,
             tieuDe: c.tieuDe,
+            thanCauImg: c.thanCauImg,
+            choiceImgs: c.choiceImgs,
           }))
         const phanII: TeacherTrueFalseQuestion[] = cau
           .filter((c) => c.ten === 'II')
@@ -270,6 +312,8 @@ export default function ExamImportScreen() {
             imageDataUrl: c.imageDataUrl,
             explanation: c.explanation,
             tieuDe: c.tieuDe,
+            thanCauImg: c.thanCauImg,
+            ideaImgs: c.choiceImgs,
           }))
         const phanIII: TeacherShortAnswerQuestion[] = cau
           .filter((c) => c.ten === 'III')
@@ -282,6 +326,7 @@ export default function ExamImportScreen() {
             imageDataUrl: c.imageDataUrl,
             explanation: c.explanation,
             tieuDe: c.tieuDe,
+            thanCauImg: c.thanCauImg,
           }))
 
         for (const q of [...phanI, ...phanII, ...phanIII]) {
@@ -490,13 +535,17 @@ function EditableText({ value, onChange, placeholder }: { value: string; onChang
       />
     )
   }
+  // LỖI GIAO DIỆN ĐÃ SỬA: trước đây dùng `title="Bấm để sửa"` (tooltip trình
+  // duyệt) đè lên đúng chỗ con trỏ đang rê, che mất chữ giữa câu khi đọc.
+  // Đổi sang icon bút chì nhỏ ở MÉP PHẢI, mờ sẵn, chỉ rõ hẳn khi rê chuột
+  // (group-hover) — không còn che chữ.
   return (
     <div
       onClick={() => setEditing(true)}
-      className={`rounded-md px-2 py-1 text-sm cursor-text hover:bg-slate-100 dark:hover:bg-slate-800 ${!value.trim() ? 'text-rose-500 italic' : ''}`}
-      title="Bấm để sửa"
+      className={`group relative rounded-md pl-2 pr-6 py-1 text-sm cursor-text hover:bg-slate-100 dark:hover:bg-slate-800 ${!value.trim() ? 'text-rose-500 italic' : ''}`}
     >
       {value.trim() ? <ChemText text={value} /> : placeholder || '(trống — bấm để gõ)'}
+      <Pencil size={11} className="absolute right-1.5 top-1.5 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
     </div>
   )
 }
@@ -565,14 +614,25 @@ function CauCard({
 
       {expanded && (
         <>
-          <EditableText value={c.de} onChange={(v) => onUpdate({ de: v })} placeholder="Đề bài" />
+          {c.thanCauImg ? (
+            <div className="space-y-1">
+              <ZoomableImage src={c.thanCauImg} alt="Đề bài (ảnh cắt từ file gốc)" />
+              <details className="text-[11px] text-slate-400">
+                <summary className="cursor-pointer select-none">Chữ ẩn (định vị/tìm kiếm) — bấm để sửa</summary>
+                <EditableText value={c.de} onChange={(v) => onUpdate({ de: v })} placeholder="Đề bài" />
+              </details>
+            </div>
+          ) : (
+            <EditableText value={c.de} onChange={(v) => onUpdate({ de: v })} placeholder="Đề bài" />
+          )}
           <QuestionMedia table={c.table} imageDataUrl={c.imageDataUrl} />
           <TableImageEditor c={c} onUpdate={onUpdate} />
 
           {c.ten === 'I' &&
-            (['A', 'B', 'C', 'D'] as const).map((k) => {
+            (['A', 'B', 'C', 'D'] as const).map((k, idx) => {
               const opt = c.pa.find((p) => p.key === k)
               const dung = c.dapAnDung === k
+              const img = c.choiceImgs?.[idx]
               return (
                 <div key={k} className="flex items-center gap-2">
                   <button
@@ -585,7 +645,17 @@ function CauCard({
                     {k}
                   </button>
                   <div className="flex-1">
-                    <EditableText value={opt?.text ?? ''} onChange={(v) => onUpdateOption(k, v)} placeholder={`Phương án ${k}`} />
+                    {img ? (
+                      <div className="space-y-1">
+                        <img src={img} alt={`Phương án ${k}`} className="max-h-16 w-auto rounded border border-slate-200 dark:border-slate-700" />
+                        <details className="text-[11px] text-slate-400">
+                          <summary className="cursor-pointer select-none">Chữ ẩn — sửa</summary>
+                          <EditableText value={opt?.text ?? ''} onChange={(v) => onUpdateOption(k, v)} placeholder={`Phương án ${k}`} />
+                        </details>
+                      </div>
+                    ) : (
+                      <EditableText value={opt?.text ?? ''} onChange={(v) => onUpdateOption(k, v)} placeholder={`Phương án ${k}`} />
+                    )}
                   </div>
                 </div>
               )
@@ -595,6 +665,7 @@ function CauCard({
             (['A', 'B', 'C', 'D'] as const).map((k, idx) => {
               const opt = c.pa.find((p) => p.key === k)
               const chuCai = 'abcd'[idx]
+              const img = c.choiceImgs?.[idx]
               const dSValue = c.dapAnDung[idx] === 'Đ' ? 'Đ' : c.dapAnDung[idx] === 'S' ? 'S' : ''
               const setDS = (v: 'Đ' | 'S') => {
                 const chars = (c.dapAnDung || 'SSSS').padEnd(4, 'S').split('')
@@ -612,8 +683,21 @@ function CauCard({
                     </button>
                   </div>
                   <div className="flex-1">
-                    <span className="text-xs text-slate-400 mr-1">{chuCai})</span>
-                    <EditableText value={opt?.text ?? ''} onChange={(v) => onUpdateOption(k, v)} placeholder={`Ý ${chuCai}`} />
+                    {img ? (
+                      <div className="space-y-1">
+                        <span className="text-xs text-slate-400 mr-1">{chuCai})</span>
+                        <img src={img} alt={`Ý ${chuCai}`} className="max-h-16 w-auto rounded border border-slate-200 dark:border-slate-700" />
+                        <details className="text-[11px] text-slate-400">
+                          <summary className="cursor-pointer select-none">Chữ ẩn — sửa</summary>
+                          <EditableText value={opt?.text ?? ''} onChange={(v) => onUpdateOption(k, v)} placeholder={`Ý ${chuCai}`} />
+                        </details>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="text-xs text-slate-400 mr-1">{chuCai})</span>
+                        <EditableText value={opt?.text ?? ''} onChange={(v) => onUpdateOption(k, v)} placeholder={`Ý ${chuCai}`} />
+                      </>
+                    )}
                   </div>
                 </div>
               )
