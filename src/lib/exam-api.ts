@@ -77,6 +77,11 @@ export type KetQuaVaoThi =
       lanThu: number
       vaoLuc: string
       hetGioLuc: string
+      /** Ngưỡng chống gian lận của ca (QUANLYCATHI mục 6): số lần rời màn → khoá; một lần rời quá N giây → khoá. */
+      nguongLan: number
+      nguongGiay: number
+      /** true = thầy vừa mở khoá lượt này (máy em còn giữ cờ khoá) → bỏ khoá, làm tiếp. */
+      daMoKhoa: boolean
       bank?: PublicExamBank
     }
   | { ok: false; lyDo: LyDoChan; nopLuc?: string; lanThu?: number; batDau?: string; hetHanVao?: string; namSinh?: string; error?: string }
@@ -96,6 +101,9 @@ export async function vaoThi(scriptUrl: string, maCa: string, sbd: string, idThi
       lanThu: Number(r.lanThu) || 1,
       vaoLuc: String(r.vaoLuc),
       hetGioLuc: String(r.hetGioLuc),
+      nguongLan: Number(r.nguongLan) || 3,
+      nguongGiay: Number(r.nguongGiay) || 30,
+      daMoKhoa: r.daMoKhoa === true,
       bank: r.bank ?? undefined,
     }
   }
@@ -130,6 +138,12 @@ export function thongDiepChan(kq: Extract<KetQuaVaoThi, { ok: false }>, gio: (is
   }
 }
 
+/** Thầy MỞ KHOÁ lượt bị khoá vì rời màn (mục 6): trạng thái về dang_lam, em mở lại link trên cùng máy là làm tiếp. */
+export async function moKhoa(scriptUrl: string, secret: string, maCa: string, sbd: string, nguoiMo = 'thầy'): Promise<void> {
+  const r = await postJson(scriptUrl, { action: 'moKhoa', secret, maCa, sbd, nguoiMo })
+  if (!r.ok) throw new Error(r.error || 'Không mở khoá được')
+}
+
 /** Thầy cho 1 em thi lại (cần mã bí mật) — máy chủ tạo lượt mới trạng thái duoc_duyet_lai. */
 export async function duyetThiLai(scriptUrl: string, secret: string, maCa: string, sbd: string, nguoiDuyet = 'thầy'): Promise<number> {
   const r = await postJson(scriptUrl, { action: 'duyetThiLai', secret, maCa, sbd, nguoiDuyet })
@@ -159,6 +173,9 @@ export interface MocThoiGianCa {
   /** Phạm vi gửi ca (mục 4). khoi → danhSachMoi = năm sinh (chuỗi) · chon → danhSachMoi = mảng SBD. */
   phamVi?: PhamViCa
   danhSachMoi?: string | string[]
+  /** Chống gian lận theo mức (mục 6): rời màn lần thứ N → khoá; rời quá N giây → khoá. Trống = mặc định máy chủ (3 / 30). */
+  nguongLan?: number
+  nguongGiay?: number
 }
 
 export async function publishSession(
@@ -186,6 +203,8 @@ export async function publishSession(
     tenCa: moc.tenCa || '',
     phamVi: moc.phamVi || 'tu_do',
     danhSachMoi: moc.phamVi === 'chon' ? (Array.isArray(moc.danhSachMoi) ? moc.danhSachMoi : []) : moc.phamVi === 'khoi' ? String(moc.danhSachMoi ?? '') : '',
+    nguongLan: moc.nguongLan || 0,
+    nguongGiay: moc.nguongGiay || 0,
   })
   if (!result.ok) throw new Error(result.error || 'Mở ca kiểm tra thất bại')
   return { batDau: String(result.batDau || ''), hetHanVao: String(result.hetHanVao || '') }
@@ -673,7 +692,7 @@ export interface LuotThiRow {
 }
 
 export interface ChiTietCa {
-  ca: Omit<CaTomTat, 'daVao' | 'daNop' | 'canhBao'> & { danhSachMoi: string | string[]; nguoiTao: string }
+  ca: Omit<CaTomTat, 'daVao' | 'daNop' | 'canhBao'> & { danhSachMoi: string | string[]; nguoiTao: string; nguongLan?: number; nguongGiay?: number }
   luot: LuotThiRow[]
 }
 

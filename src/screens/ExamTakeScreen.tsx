@@ -5,6 +5,7 @@ import { vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedbac
 import { taoBaiGhiDiem } from '../lib/chi-tiet-cau'
 import { gioMayChu, gioNgan } from '../lib/gio-may-chu'
 import { layIdThietBi } from '../lib/thiet-bi'
+import { chuanHoaNguong, khoaViRoiLau, loiCanhBao, mucKhiRoiMan, soLanTinhTu, type NguongGianLan } from '../lib/chong-gian-lan'
 import TheCau from '../components/TheCau'
 import MaCaInput from '../components/MaCaInput'
 import DaiNhacCaiApp from '../components/DaiNhacCaiApp'
@@ -176,6 +177,10 @@ export default function ExamTakeScreen() {
   const [showConfirm, setShowConfirm] = useState(false)
   const [showBackDialog, setShowBackDialog] = useState(false)
   const [zoomSrc, setZoomSrc] = useState<string | null>(null)
+  // Dải cảnh báo rời màn (mục 6): nhẹ (lần 1) / đậm (lần 2+), tự ẩn sau 15 giây.
+  const [canhBaoRoi, setCanhBaoRoi] = useState<{ muc: 'nhe' | 'dam'; loi: string } | null>(null)
+  const canhBaoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const roiLauTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [saveFlash, setSaveFlash] = useState(false)
   const saveFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [online, setOnline] = useState(() => (typeof navigator !== 'undefined' ? navigator.onLine : true))
@@ -349,6 +354,29 @@ export default function ExamTakeScreen() {
         throw new Error(thongDiepChan(kq, gioNgan))
       }
 
+      // Thầy vừa MỞ KHOÁ (mục 6): máy này đang giữ bài bị khoá → bỏ khoá, đếm
+      // ngưỡng lại từ mốc hiện tại, giữ nguyên đáp án + lịch sử rời màn, làm tiếp.
+      if (kq.cach === 'khoi_phuc' && existing?.submitted && existing.integrity.blocked && kq.daMoKhoa) {
+        const bankMo = cached?.bank ?? kq.bank
+        if (!bankMo) throw new Error('Máy chủ chưa gửi đề — bấm Vào thi lại.')
+        setBank(bankMo)
+        setLop(kq.lop)
+        setCongBo(kq.congBo)
+        const moKhoaRoi: ExamAttempt = {
+          ...existing,
+          submitted: false,
+          submittedAt: null,
+          pendingSubmit: false,
+          hetGioLuc: kq.hetGioLuc,
+          nguong: { lan: kq.nguongLan, giay: kq.nguongGiay },
+          integrity: { ...existing.integrity, blocked: false, lyDoKhoa: undefined, mocMoKhoa: existing.integrity.leaveCount, soLanMoKhoa: (existing.integrity.soLanMoKhoa ?? 0) + 1 },
+        }
+        await saveAttempt(moKhoaRoi)
+        setAttempt(moKhoaRoi)
+        showToast('Thầy đã mở khoá — em làm tiếp, đừng rời màn hình nữa', 'success')
+        setPhase('exam')
+        return
+      }
       // Máy chủ nói "khôi phục" nhưng máy này đã nộp (mất mạng lúc nộp, máy chủ
       // chưa nhận) → về màn Đã nộp và gửi tiếp, không cho làm lại.
       if (kq.cach === 'khoi_phuc' && existing?.submitted) return moLaiDaNop(existing)
@@ -371,8 +399,9 @@ export default function ExamTakeScreen() {
       }
 
       const giuLuotDo = kq.cach === 'khoi_phuc' && existing && !existing.submitted && (existing.lanThu ?? 1) === kq.lanThu
+      const nguong = { lan: kq.nguongLan, giay: kq.nguongGiay }
       const a: ExamAttempt = giuLuotDo
-        ? { ...existing, startedAt: kq.vaoLuc, hetGioLuc: kq.hetGioLuc, durationMinutes: kq.thoiGianPhut, idThietBi: idTb }
+        ? { ...existing, startedAt: kq.vaoLuc, hetGioLuc: kq.hetGioLuc, durationMinutes: kq.thoiGianPhut, idThietBi: idTb, nguong }
         : {
             key: `${ma}:${sb}`,
             maCa: ma,
@@ -383,6 +412,7 @@ export default function ExamTakeScreen() {
             hetGioLuc: kq.hetGioLuc,
             lanThu: kq.lanThu,
             idThietBi: idTb,
+            nguong,
             answers: emptyAnswerRecord(),
             integrity: emptyIntegrityLog(),
             submitted: false,
@@ -483,53 +513,83 @@ export default function ExamTakeScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, assignment])
 
-  // RỜI MÀN HÌNH = GIAN LẬN (quy định của thầy, 2026-09-02): chuyển tab / tắt
-  // màn hình / mất focus / thoát toàn màn hình DÙ CHỈ MỘT LẦN → khoá bài, tự
-  // nộp ngay, ghi nhận gian lận, báo phụ huynh ngay (tin nhắn + trạng thái).
-  // Chặn ngay lúc rời, không đợi quay lại (em có thể không quay lại nữa).
-  // KHÔNG thể phát hiện CHỤP ẢNH MÀN HÌNH bằng JavaScript — không trình duyệt
-  // nào (Chrome, Safari, kể cả PWA) cấp quyền đó; đây là giới hạn của nền web.
+  // CHỐNG GIAN LẬN THEO MỨC (QUANLYCATHI mục 6, thay quy định "1 lần là khoá"
+  // ngày 2/9): rời màn (chuyển app, tắt màn hình, mất tiêu điểm — bắt được cả
+  // cửa sổ nổi vừa hiện, thoát toàn màn hình) → lần 1 cảnh báo nhẹ, lần 2 cảnh
+  // báo đậm + rung, lần thứ N (ngưỡng ca, mặc định 3) → KHOÁ + tự nộp phần đã
+  // làm; một lần rời quá M giây (mặc định 30) → khoá ngay. Cuộc gọi đến, pin
+  // yếu cũng gây blur nên không khoá oan ngay lần đầu. Thầy mở khoá được ở màn
+  // Chi tiết ca. KHÔNG thể phát hiện CHỤP ẢNH MÀN HÌNH bằng JavaScript.
   useEffect(() => {
     if (phase !== 'exam') return
-    const logEvent = (type: 'hidden' | 'visible' | 'blur' | 'focus') => {
-      const cur = attemptRef.current
-      if (!cur || cur.submitted) return
-      const events = [...cur.integrity.events, { type, at: new Date().toISOString() }].slice(-200)
-      let leaveCount = cur.integrity.leaveCount
-      let totalHiddenMs = cur.integrity.totalHiddenMs
-      let blockNow = false
-      if (type === 'hidden' || type === 'blur') {
-        if (hiddenSinceRef.current === null) {
-          hiddenSinceRef.current = Date.now()
-          leaveCount += 1
-          leaveCountRef.current = leaveCount
-          blockNow = true
-        }
-      } else if (hiddenSinceRef.current !== null) {
-        totalHiddenMs += Date.now() - hiddenSinceRef.current
-        hiddenSinceRef.current = null
-      }
+    const nguong: NguongGianLan = chuanHoaNguong(attemptRef.current?.nguong)
+    const khoa = (cur: ExamAttempt, lyDo: 'qua_so_lan' | 'roi_qua_lau', themMs: number) => {
       const next: ExamAttempt = {
         ...cur,
-        integrity: { leaveCount, totalHiddenMs, events, blocked: cur.integrity.blocked || blockNow },
+        integrity: { ...cur.integrity, totalHiddenMs: cur.integrity.totalHiddenMs + themMs, blocked: true, lyDoKhoa: lyDo },
       }
       attemptRef.current = next
       setAttempt(next)
       saveAttempt(next)
-      if (blockNow) {
-        pushStatusNow(next, false)
-        baoPhuHuynhGianLan(next)
-        doSubmit(next)
+      pushStatusNow(next, false)
+      baoPhuHuynhGianLan(next)
+      doSubmit(next)
+    }
+    const logEvent = (type: 'hidden' | 'visible' | 'blur' | 'focus') => {
+      const cur = attemptRef.current
+      if (!cur || cur.submitted) return
+      const events = [...cur.integrity.events, { type, at: new Date().toISOString() }].slice(-200)
+      if (type === 'hidden' || type === 'blur') {
+        if (hiddenSinceRef.current !== null) return // đã đang ẩn (blur rồi hidden) — tính 1 lần
+        hiddenSinceRef.current = Date.now()
+        const leaveCount = cur.integrity.leaveCount + 1
+        leaveCountRef.current = leaveCount
+        const next: ExamAttempt = { ...cur, integrity: { ...cur.integrity, leaveCount, events } }
+        attemptRef.current = next
+        setAttempt(next)
+        saveAttempt(next)
+        pushStatusNow(next, true)
+        const muc = mucKhiRoiMan(leaveCount, cur.integrity.mocMoKhoa ?? 0, nguong)
+        if (muc === 'khoa') {
+          hiddenSinceRef.current = null
+          khoa(next, 'qua_so_lan', 0)
+          return
+        }
+        // Rời quá lâu → khoá ngay cả khi em chưa quay lại (đồng hồ chờ; trình
+        // duyệt có thể tạm dừng khi ẩn → lúc quay lại vẫn kiểm tra lại thời gian).
+        if (roiLauTimerRef.current) clearTimeout(roiLauTimerRef.current)
+        roiLauTimerRef.current = setTimeout(() => {
+          const c = attemptRef.current
+          if (!c || c.submitted || hiddenSinceRef.current === null) return
+          const ms = Date.now() - hiddenSinceRef.current
+          hiddenSinceRef.current = null
+          khoa(c, 'roi_qua_lau', ms)
+        }, nguong.giay * 1000 + 500)
+        setCanhBaoRoi({ muc, loi: loiCanhBao(muc, soLanTinhTu(leaveCount, cur.integrity.mocMoKhoa ?? 0), nguong) })
+        if (muc === 'dam') navigator.vibrate?.([200, 100, 200])
+        if (canhBaoTimerRef.current) clearTimeout(canhBaoTimerRef.current)
+        canhBaoTimerRef.current = setTimeout(() => setCanhBaoRoi(null), 15000)
+      } else if (hiddenSinceRef.current !== null) {
+        const ms = Date.now() - hiddenSinceRef.current
+        hiddenSinceRef.current = null
+        if (roiLauTimerRef.current) clearTimeout(roiLauTimerRef.current)
+        if (khoaViRoiLau(ms / 1000, nguong)) {
+          khoa({ ...cur, integrity: { ...cur.integrity, events } }, 'roi_qua_lau', ms)
+          return
+        }
+        const next: ExamAttempt = { ...cur, integrity: { ...cur.integrity, totalHiddenMs: cur.integrity.totalHiddenMs + ms, events } }
+        attemptRef.current = next
+        setAttempt(next)
+        saveAttempt(next)
+        pushStatusNow(next, true)
       }
     }
     const onVis = () => logEvent(document.hidden ? 'hidden' : 'visible')
     const onBlur = () => logEvent('blur')
     const onFocus = () => logEvent('focus')
     // Thoát toàn màn hình (Back trên Android, vuốt xuống…) khi KHÔNG ở chế độ
-    // standalone → tính là rời màn hình.
-    const onFs = () => {
-      if (!dangToanManHinh()) logEvent('hidden')
-    }
+    // standalone → tính là rời màn hình (quay lại toàn màn hình = quay lại).
+    const onFs = () => logEvent(dangToanManHinh() ? 'focus' : 'hidden')
     document.addEventListener('visibilitychange', onVis)
     window.addEventListener('blur', onBlur)
     window.addEventListener('focus', onFocus)
@@ -541,6 +601,8 @@ export default function ExamTakeScreen() {
       window.removeEventListener('focus', onFocus)
       document.removeEventListener('fullscreenchange', onFs)
       document.removeEventListener('webkitfullscreenchange', onFs)
+      if (roiLauTimerRef.current) clearTimeout(roiLauTimerRef.current)
+      if (canhBaoTimerRef.current) clearTimeout(canhBaoTimerRef.current)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
@@ -552,10 +614,14 @@ export default function ExamTakeScreen() {
     const url = scriptUrlRef.current.trim()
     if (!url) return
     const luc = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+    const lyDo =
+      a.integrity.lyDoKhoa === 'roi_qua_lau'
+        ? `rời khỏi màn hình làm bài quá ${chuanHoaNguong(a.nguong).giay} giây`
+        : `rời khỏi màn hình làm bài ${soLanTinhTu(a.integrity.leaveCount, a.integrity.mocMoKhoa ?? 0)} lần (đã được cảnh báo trước đó)`
     sendTeacherMessage(
       url,
       a.sbd,
-      `[TỰ ĐỘNG] Lúc ${luc}, trong ca kiểm tra ${a.maCa}, học sinh SBD ${a.sbd} đã rời màn hình làm bài. Theo quy định, bài được nộp ngay, khoá và ghi nhận GIAN LẬN. Thầy sẽ trao đổi thêm với gia đình.`,
+      `[TỰ ĐỘNG] Lúc ${luc}, trong ca kiểm tra ${a.maCa}, học sinh SBD ${a.sbd} đã ${lyDo}. Bài đã được nộp phần đã làm và khoá. Thầy sẽ trao đổi thêm với gia đình.`,
     ).catch(() => {
       // mất mạng — trạng thái Blocked vẫn được gửi lại khi nộp bài (pendingSubmit)
     })
@@ -912,11 +978,19 @@ export default function ExamTakeScreen() {
               <div className="flex flex-col items-center text-center" style={{ gap: 'var(--k3)' }}>
                 <TriangleAlert size={40} style={{ color: 'var(--do)' }} />
                 <div className="font-bold" style={{ fontSize: 'var(--cx-4)', color: 'var(--do)' }}>
-                  BÀI THI ĐÃ BỊ KHOÁ
+                  BÀI THI ĐÃ KHOÁ
                 </div>
                 <div style={{ fontSize: 'var(--cx-2)', lineHeight: 1.7 }}>
-                  Em đã <b>rời màn hình làm bài</b>. Theo quy định, bài thi được <b>nộp ngay và khoá</b>, ghi nhận <b>gian lận</b>.
-                  Hệ thống đã gửi thông báo cho phụ huynh.
+                  {attempt.integrity.lyDoKhoa === 'roi_qua_lau' ? (
+                    <>
+                      Em đã <b>rời khỏi màn hình làm bài quá {chuanHoaNguong(attempt.nguong).giay} giây</b>.
+                    </>
+                  ) : (
+                    <>
+                      Em đã <b>rời khỏi màn hình làm bài {soLanTinhTu(attempt.integrity.leaveCount, attempt.integrity.mocMoKhoa ?? 0)} lần</b> dù đã được cảnh báo.
+                    </>
+                  )}{' '}
+                  Phần đã làm được <b>nộp và khoá</b>. Hệ thống đã báo cho thầy và phụ huynh. <b>Em báo thầy</b> — thầy mở khoá thì mở lại link này trên đúng máy này để làm tiếp.
                 </div>
                 {attempt?.pendingSubmit && <Nhan tone="cam">Đang gửi lên hệ thống… đừng tắt trình duyệt</Nhan>}
               </div>
@@ -1176,6 +1250,15 @@ export default function ExamTakeScreen() {
         </div>
       </div>
 
+
+      {/* DẢI CẢNH BÁO RỜI MÀN (mục 6) — dính dưới thanh trên, tự ẩn sau 15 giây */}
+      {canhBaoRoi && (
+        <div className="sticky z-30 px-3 sm:px-4" style={{ top: 56, paddingTop: 'var(--k2)', background: 'var(--nen)' }} role="alert" data-canh-bao={canhBaoRoi.muc}>
+          <OThongBao tone={canhBaoRoi.muc === 'dam' ? 'do' : 'cam'}>
+            <b>{canhBaoRoi.loi}</b>
+          </OThongBao>
+        </div>
+      )}
 
       {/* DANH SÁCH CÂU — cuộn dọc liên tục, đầu phần dính */}
       <div className="px-3 sm:px-4 flex flex-col" style={{ gap: 'var(--k5)', paddingTop: 'var(--k2)', paddingBottom: 'calc(var(--k8) + env(safe-area-inset-bottom))' }}>

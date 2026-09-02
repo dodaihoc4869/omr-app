@@ -123,3 +123,11 @@ describe('Apps Script quyetDinhVaoThi_ — phạm vi gửi ca (mục 4)', () => 
     expect(gs.quyetDinhVaoThi_({ ...caMo, phamVi: 'tu_do' }, null, 'may-A', T0 + 60_000, { sbd: 'X', namSinh: '' })).toEqual({ ok: true, cach: 'moi' })
   })
 })
+
+describe('Apps Script quyetDinhVaoThi_ — dữ liệu năm sinh bị bọc dấu nháy (ca mở bằng v10)', () => {
+  it('vẫn so khớp đúng năm sinh', () => {
+    const ca = { ...caMo, phamVi: 'khoi', danhSachMoi: '"2010"' }
+    expect(gs.quyetDinhVaoThi_(ca, null, 'may-A', T0 + 60_000, { sbd: 'HS01', namSinh: '2010' })).toEqual({ ok: true, cach: 'moi' })
+    expect(gs.quyetDinhVaoThi_(ca, null, 'may-A', T0 + 60_000, { sbd: 'HS01', namSinh: '2009' })).toEqual({ ok: false, lyDo: 'khong_thuoc_khoi', namSinh: '2010' })
+  })
+})

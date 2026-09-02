@@ -61,7 +61,12 @@ const DRIVE_FOLDER = 'OMR-APP-DATA'
 // đầu; từ cột 8 thêm khi làm QUANLYCATHI (3 mốc thời gian, trạng thái, phạm vi).
 // getSheet_ chỉ ghi tiêu đề khi TẠO MỚI sheet — sheet cũ được bổ sung tiêu đề
 // cột thiếu bằng boSungTieuDe_.
-const CA_HEADERS = ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson', 'BatDau', 'HetHanVao', 'TrangThai', 'TenCa', 'PhamVi', 'DanhSachMoi', 'NguoiTao', 'XoaLuc']
+const CA_HEADERS = ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson', 'BatDau', 'HetHanVao', 'TrangThai', 'TenCa', 'PhamVi', 'DanhSachMoi', 'NguoiTao', 'XoaLuc', 'NguongLan', 'NguongGiay']
+// CHỐNG GIAN LẬN THEO MỨC (QUANLYCATHI mục 6): rời màn lần 1, 2 chỉ cảnh báo;
+// lần thứ NguongLan khoá bài; một lần rời quá NguongGiay giây khoá ngay. Thầy
+// chỉnh khi mở ca; ô trống = mặc định dưới đây.
+const NGUONG_LAN_MAC_DINH = 3
+const NGUONG_GIAY_MAC_DINH = 30
 // Mỗi LƯỢT THI một dòng: (MaCa, SBD, LanThu) là khoá. Thi lại = dòng mới, không
 // đè dòng cũ. TrangThai: dang_lam · da_nop · khoa (bị khoá vì rời màn) ·
 // duoc_duyet_lai (thầy đã duyệt, em chưa vào) · Điểm do app ghi sau khi chấm.
@@ -202,6 +207,8 @@ function docCa_(sh, row) {
     phamVi: v[11] ? String(v[11]) : 'tu_do',
     danhSachMoi: v[12] ? String(v[12]) : '',
     nguoiTao: v[13] ? String(v[13]) : '',
+    nguongLan: Number(v[15]) > 0 ? Number(v[15]) : NGUONG_LAN_MAC_DINH,
+    nguongGiay: Number(v[16]) > 0 ? Number(v[16]) : NGUONG_GIAY_MAC_DINH,
   }
 }
 
@@ -274,7 +281,7 @@ function quyetDinhVaoThi_(ca, luot, idThietBi, nowMs, hocSinh) {
   // chon: DanhSachMoi = JSON mảng SBD.
   const pv = ca.phamVi || 'tu_do'
   if (pv === 'khoi') {
-    const namSinh = String(ca.danhSachMoi || '').trim()
+    const namSinh = String(ca.danhSachMoi || '').trim().replace(/^"+|"+$/g, '').trim()
     const cuaEm = hocSinh && hocSinh.namSinh !== undefined && hocSinh.namSinh !== null ? String(hocSinh.namSinh).trim() : ''
     if (!cuaEm) return { ok: false, lyDo: 'chua_co_ho_so', namSinh: namSinh }
     if (cuaEm !== namSinh) return { ok: false, lyDo: 'khong_thuoc_khoi', namSinh: namSinh }
@@ -776,9 +783,12 @@ function doPost(e) {
       'mo',
       body.tenCa || '',
       body.phamVi || 'tu_do',
-      body.danhSachMoi ? JSON.stringify(body.danhSachMoi) : '',
+      // khoi: chuỗi năm sinh giữ nguyên · chon: mảng SBD → JSON. (v10 từng bọc chuỗi trong dấu nháy — đọc lại đã chịu được.)
+      typeof body.danhSachMoi === 'string' ? body.danhSachMoi.trim() : body.danhSachMoi ? JSON.stringify(body.danhSachMoi) : '',
       body.nguoiTao || '',
       '',
+      Number(body.nguongLan) > 0 ? Number(body.nguongLan) : NGUONG_LAN_MAC_DINH,
+      Number(body.nguongGiay) > 0 ? Number(body.nguongGiay) : NGUONG_GIAY_MAC_DINH,
     ]
     if (row > 0) {
       sh.getRange(row, 1, 1, rowData.length).setValues([rowData])
@@ -852,6 +862,10 @@ function doPost(e) {
         lanThu: lanThu,
         vaoLuc: vaoLuc,
         hetGioLuc: hetGioLuc,
+        nguongLan: ca.nguongLan,
+        nguongGiay: ca.nguongGiay,
+        // Thầy vừa mở khoá lượt này (dòng LuotThi đang dang_lam nhưng máy em còn giữ cờ khoá) → máy em bỏ khoá, làm tiếp.
+        daMoKhoa: qd.cach === 'khoi_phuc' && luot && luot.ghiChu.indexOf('mở khoá') >= 0,
         serverNow: Date.now(),
       }
       // Đề (KHÔNG đáp án) chỉ gửi khi máy em chưa có bản cache — tiết kiệm băng thông.
@@ -889,6 +903,31 @@ function doPost(e) {
     rowData[20] = new Date().toISOString()
     sh.appendRow(rowData)
     return jsonResponse_({ ok: true, lanThu: lanThu })
+  }
+
+  if (action === 'moKhoa') {
+    // Thầy MỞ KHOÁ một lượt bị khoá vì rời màn (QUANLYCATHI mục 6): trạng thái
+    // về dang_lam, giữ nguyên đáp án đã tự nộp + số lần rời màn, ghi ai mở lúc
+    // nào. Em mở lại link trên CÙNG máy là làm tiếp (đồng hồ vẫn theo HetGioLuc).
+    const loi = kiemTraMaBiMat_(body)
+    if (loi) return jsonResponse_({ ok: false, error: loi })
+    const maCa = String(body.maCa || '').trim()
+    const sbd = String(body.sbd || '').trim()
+    const sh = sheetLuot_()
+    const luot = luotMoiNhatTheoSbd_(sh, maCa)[sbd] || null
+    if (!luot) return jsonResponse_({ ok: false, error: 'Em này chưa vào thi' })
+    if (luot.trangThai !== 'khoa') return jsonResponse_({ ok: false, error: 'Lượt hiện tại không bị khoá (' + luot.trangThai + ')' })
+    const luc = new Date().toISOString()
+    const ghiChu = (luot.ghiChu ? luot.ghiChu + ' · ' : '') + 'thầy mở khoá ' + luc.slice(11, 16) + 'Z (' + (body.nguoiMo || 'thầy') + ')'
+    sh.getRange(luot.row, 8).setValue('dang_lam')
+    sh.getRange(luot.row, 20, 1, 2).setValues([[ghiChu, luc]])
+    // Trạng thái theo dõi của phụ huynh: bỏ cờ khoá ngay.
+    try {
+      const st = getSheet_(SHEET_TRANGTHAI, ['SBD', 'MaCa', 'Lop', 'DangLam', 'BatDauLuc', 'DaLamCauHoi', 'TongCauHoi', 'SoLanRoiApp', 'Blocked', 'CapNhatLuc'])
+      const r = findRowByKey_(st, 0, sbd)
+      if (r > 0 && String(st.getRange(r, 2).getValue()) === maCa) st.getRange(r, 9).setValue('false')
+    } catch (err) {}
+    return jsonResponse_({ ok: true, lanThu: luot.lanThu })
   }
 
   // ------------------------------------------------------ LỊCH SỬ CA THI (mục 2)

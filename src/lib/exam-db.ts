@@ -24,10 +24,16 @@ export interface IntegrityEvent {
   at: string // ISO timestamp
 }
 export interface IntegrityLog {
-  leaveCount: number // số lần rời app (tab ẩn / mất focus)
+  leaveCount: number // số lần rời app (tab ẩn / mất focus) — cộng dồn cả lượt, kể cả sau khi thầy mở khoá
   totalHiddenMs: number // tổng thời gian app bị ẩn (cộng dồn)
   events: IntegrityEvent[]
-  blocked: boolean // true = đã rời màn hình (1 lần là đủ), bài bị khoá + tự nộp, ghi nhận gian lận
+  blocked: boolean // true = bài đang bị khoá (rời màn tới ngưỡng, hoặc một lần rời quá lâu) + đã tự nộp
+  /** Vì sao khoá lần gần nhất (QUANLYCATHI mục 6). */
+  lyDoKhoa?: 'qua_so_lan' | 'roi_qua_lau'
+  /** leaveCount tại lần thầy mở khoá gần nhất — đếm ngưỡng lại từ mốc này. */
+  mocMoKhoa?: number
+  /** Số lần thầy đã mở khoá lượt này. */
+  soLanMoKhoa?: number
 }
 
 export function emptyIntegrityLog(): IntegrityLog {
@@ -48,6 +54,8 @@ export interface ExamAttempt {
   idThietBi?: string
   /** Giây em dừng ở từng câu (qid → giây, cộng dồn theo thẻ câu đang chiếm màn) — QUANLYCATHI mục 5. */
   giayCau?: Record<string, number>
+  /** Ngưỡng chống gian lận của ca (máy chủ trả lúc vào thi) — mục 6. */
+  nguong?: { lan: number; giay: number }
   answers: AnswerRecord
   integrity: IntegrityLog
   submitted: boolean

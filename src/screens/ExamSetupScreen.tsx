@@ -143,6 +143,9 @@ export default function ExamSetupScreen() {
   const [congBoDiem, setCongBoDiem] = useState<CongBoDiem>('khong')
   // Tên ca (tuỳ chọn) + phạm vi gửi ca.
   const [tenCa, setTenCa] = useState('')
+  // Chống gian lận theo mức (mục 6): rời màn lần thứ N → khoá; một lần rời quá M giây → khoá.
+  const [nguongLan, setNguongLan] = useState(3)
+  const [nguongGiay, setNguongGiay] = useState(30)
   const [phamVi, setPhamVi] = useState<PhamViCa>('tu_do')
   const [namSinhKhoi, setNamSinhKhoi] = useState('')
   const [chonSbd, setChonSbd] = useState<Set<string>>(new Set())
@@ -250,6 +253,8 @@ export default function ExamSetupScreen() {
         tenCa: tenCa.trim(),
         phamVi,
         danhSachMoi: phamVi === 'khoi' ? namSinhKhoi.trim() : phamVi === 'chon' ? Array.from(chonSbd) : '',
+        nguongLan,
+        nguongGiay,
       })
       // Lưu bản CÓ đáp án trên máy thầy để màn Theo dõi chấm lại được sau này.
       await saveSessionTeacherBank(maCa, selectedSources)
@@ -582,7 +587,37 @@ export default function ExamSetupScreen() {
         )}
       </TheNoiDung>
 
-      {/* 4. CÔNG BỐ ĐIỂM */}
+      {/* 4. CHỐNG GIAN LẬN */}
+      <TheNoiDung>
+        <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k1)' }}>Rời màn hình khi làm bài</div>
+        <div style={{ ...NHAN_NHO, marginBottom: 'var(--k3)' }}>
+          Lần 1 cảnh báo, lần 2 cảnh báo đậm + rung. Đến ngưỡng thì khoá bài, nộp phần đã làm, báo thầy và phụ huynh. Thầy mở khoá được ở Chi tiết ca.
+        </div>
+        <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
+          <div>
+            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Khoá khi rời màn lần thứ</div>
+            <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Số lần rời màn thì khoá">
+              {[2, 3, 5].map((n) => (
+                <ChipChon key={n} chon={nguongLan === n} onClick={() => setNguongLan(n)}>
+                  {n} lần
+                </ChipChon>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Khoá ngay nếu một lần rời quá</div>
+            <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Số giây rời màn thì khoá ngay">
+              {[15, 30, 60].map((g) => (
+                <ChipChon key={g} chon={nguongGiay === g} onClick={() => setNguongGiay(g)}>
+                  {g} giây
+                </ChipChon>
+              ))}
+            </div>
+          </div>
+        </div>
+      </TheNoiDung>
+
+      {/* 5. CÔNG BỐ ĐIỂM */}
       <TheNoiDung>
         <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Công bố điểm cho học sinh</div>
         <div className="flex flex-col" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Cách công bố điểm">

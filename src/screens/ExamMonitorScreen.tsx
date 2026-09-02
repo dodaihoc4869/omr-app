@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Copy, Check, RefreshCw, Trash2 } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
-import { chiTietCa, duyetThiLai, ghiDiem, xoaCa, type ChiTietCa, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
+import { chiTietCa, duyetThiLai, ghiDiem, moKhoa, xoaCa, type ChiTietCa, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
 import { taoBaiGhiDiem } from '../lib/chi-tiet-cau'
 import { loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
@@ -209,6 +209,23 @@ export default function ExamMonitorScreen() {
     }
   }
 
+  // Mở khoá (mục 6): lượt về dang_lam, em mở lại link trên cùng máy là làm tiếp.
+  const [xacNhanMoKhoa, setXacNhanMoKhoa] = useState<string | null>(null)
+  const handleMoKhoa = async (sbd: string) => {
+    if (!chiTiet) return
+    setXacNhanMoKhoa(null)
+    setDangDuyet(sbd)
+    try {
+      await moKhoa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, sbd)
+      showToast('Đã mở khoá — em mở lại link trên đúng máy đang làm để tiếp tục', 'success')
+      await tai(chiTiet.ca.maCa, true)
+    } catch (e) {
+      showToast(`Không mở khoá được: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
+    } finally {
+      setDangDuyet(null)
+    }
+  }
+
   const handleXoa = async () => {
     if (!chiTiet) return
     setDangXoa(true)
@@ -295,6 +312,9 @@ export default function ExamMonitorScreen() {
                   {chiTiet.ca.thoiGianPhut} phút · bắt đầu <span style={SO}>{ngayGio(chiTiet.ca.batDau || chiTiet.ca.moLuc)}</span> · vào phòng đến <span style={SO}>{chiTiet.ca.hetHanVao ? gio(chiTiet.ca.hetHanVao) : 'không giới hạn'}</span>
                 </div>
                 <div style={NHAN_NHO}>
+                  Khoá khi rời màn {chiTiet.ca.nguongLan ?? 3} lần / quá {chiTiet.ca.nguongGiay ?? 30} giây
+                </div>
+                <div style={NHAN_NHO}>
                   {TEN_CONG_BO[chiTiet.ca.congBo]} · {TEN_PHAM_VI[chiTiet.ca.phamVi]}
                   {chiTiet.ca.phamVi === 'khoi' ? ` (sinh ${chiTiet.ca.danhSachMoi} → khối ${khoiTuNamSinh(String(chiTiet.ca.danhSachMoi)) ?? '?'})` : ''}
                   {chiTiet.ca.phamVi === 'chon' && Array.isArray(chiTiet.ca.danhSachMoi) ? ` (${chiTiet.ca.danhSachMoi.length} em)` : ''}
@@ -372,6 +392,21 @@ export default function ExamMonitorScreen() {
                         <span className="flex items-center flex-wrap" style={{ gap: 4, marginTop: 4 }}>
                           <Nhan tone={nh.tone}>{nh.ten}</Nhan>
                           {daNop && l.soLanRoiMan > 0 && <Nhan tone="cam">rời màn {l.soLanRoiMan} lần / {l.tongGiayRoiMan}s</Nhan>}
+                          {l.trangThai === 'khoa' &&
+                            (xacNhanMoKhoa === e.sbd ? (
+                              <span className="inline-flex items-center" style={{ gap: 4 }}>
+                                <button type="button" onClick={() => handleMoKhoa(e.sbd)} disabled={dangDuyet === e.sbd} className="tap-target font-bold" style={{ ...NHAN_NHO, minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--muc)', color: 'var(--muc-nguoc)' }}>
+                                  {dangDuyet === e.sbd ? '…' : 'Đồng ý mở khoá'}
+                                </button>
+                                <button type="button" onClick={() => setXacNhanMoKhoa(null)} className="tap-target" style={{ ...NHAN_NHO, minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)' }}>
+                                  Huỷ
+                                </button>
+                              </span>
+                            ) : (
+                              <button type="button" onClick={() => setXacNhanMoKhoa(e.sbd)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--do)', minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--do)' }}>
+                                Mở khoá
+                              </button>
+                            ))}
                           {daNop &&
                             (xacNhanSbd === e.sbd ? (
                               <span className="inline-flex items-center" style={{ gap: 4 }}>
