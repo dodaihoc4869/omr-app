@@ -507,3 +507,46 @@ export async function extractPdfQuestionImages(file: File, dpi = 200): Promise<P
   }
   return { images, warnings }
 }
+
+export interface NormRect {
+  x0: number
+  y0: number
+  x1: number
+  y1: number
+} // toạ độ tỉ lệ 0..1 theo chiều rộng/cao trang, gốc trên-trái
+
+/** Cắt 1 vùng hình vẽ/đồ thị THEO TOẠ ĐỘ TỈ LỆ do Claude chỉ ra khi đọc đề
+ * bằng thị giác (không tách được bằng lớp chữ như câu/phương án — dùng cho
+ * "hinh" trong luồng Nhập đề đã xử lý sẵn). KHÔNG nhị phân hoá/cắt sát viền
+ * như `cleanupCrop` (dành cho chữ) — hình vẽ/đồ thị cần GIỮ NGUYÊN màu/nét
+ * mảnh, chỉ cắt đúng khung + chừa mép nhỏ, để không mất chi tiết. */
+export async function cropRegionFromPdf(file: File, page: number, rect: NormRect, dpi = 200): Promise<string> {
+  const buf = await file.arrayBuffer()
+  const doc = await pdfjsLib.getDocument({ data: buf }).promise
+  if (page < 1 || page > doc.numPages) throw new Error(`Trang ${page} không tồn tại (file có ${doc.numPages} trang)`)
+  const scale = dpi / 72
+  const pdfPage = await doc.getPage(page)
+  const viewport = pdfPage.getViewport({ scale })
+  const canvas = document.createElement('canvas')
+  canvas.width = viewport.width
+  canvas.height = viewport.height
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('Không tạo được canvas')
+  await pdfPage.render({ canvasContext: ctx, viewport }).promise
+
+  const marginPx = 6
+  const x0 = Math.max(0, Math.floor(rect.x0 * viewport.width) - marginPx)
+  const y0 = Math.max(0, Math.floor(rect.y0 * viewport.height) - marginPx)
+  const x1 = Math.min(viewport.width, Math.ceil(rect.x1 * viewport.width) + marginPx)
+  const y1 = Math.min(viewport.height, Math.ceil(rect.y1 * viewport.height) + marginPx)
+  const w = Math.max(1, x1 - x0)
+  const h = Math.max(1, y1 - y0)
+
+  const out = document.createElement('canvas')
+  out.width = w
+  out.height = h
+  const octx = out.getContext('2d')
+  if (!octx) throw new Error('Không tạo được canvas kết quả')
+  octx.drawImage(canvas, x0, y0, w, h, 0, 0, w, h)
+  return out.toDataURL('image/png')
+}

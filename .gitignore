@@ -3,3 +3,10 @@ dist
 dist-ssr
 *.local
 .DS_Store
+
+# Kho đề nạp tự động (thầy thả PDF/docx vào kho-de/moi) — file .json kết quả
+# CÓ ĐÁP ÁN ĐẦY ĐỦ, không bao giờ được lên git vì repo này đang PUBLIC.
+kho-de/moi/*
+kho-de/xong/*
+kho-de/loi/*
+!kho-de/*/.gitkeep

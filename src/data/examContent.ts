@@ -18,6 +18,10 @@
 export interface QuestionMedia {
   table?: string[][] // hàng đầu là tiêu đề cột
   imageDataUrl?: string // ảnh chụp đồ thị/hình vẽ, base64, hiển thị y nguyên
+  /** Đọc bằng thị giác nhưng KHÔNG chắc chắn 100% (chữ mờ, công thức lạ...)
+   * — set true qua luồng "Nhập đề đã xử lý sẵn (JSON)". Vẫn lưu vào ngân
+   * hàng bình thường (không chặn), chỉ để đánh dấu thầy nên xem lại. */
+  canXem?: boolean
 }
 
 /** `text`/`choices` là chữ trích từ PDF — CHỈ dùng để định vị + tìm kiếm/gắn
@@ -118,12 +122,12 @@ export function validateTeacherSource(c: TeacherExamSource): string[] {
 export function mergeAndStrip(sources: TeacherExamSource[]): PublicExamBank {
   return {
     phanI: sources.flatMap((s) =>
-      s.phanI.map(({ id, text, choices, table, imageDataUrl, thanCauImg, choiceImgs }) => ({ id, text, choices, table, imageDataUrl, thanCauImg, choiceImgs })),
+      s.phanI.map(({ id, text, choices, table, imageDataUrl, thanCauImg, choiceImgs, canXem }) => ({ id, text, choices, table, imageDataUrl, thanCauImg, choiceImgs, canXem })),
     ),
     phanII: sources.flatMap((s) =>
-      s.phanII.map(({ id, text, ideas, table, imageDataUrl, thanCauImg, ideaImgs }) => ({ id, text, ideas, table, imageDataUrl, thanCauImg, ideaImgs })),
+      s.phanII.map(({ id, text, ideas, table, imageDataUrl, thanCauImg, ideaImgs, canXem }) => ({ id, text, ideas, table, imageDataUrl, thanCauImg, ideaImgs, canXem })),
     ),
-    phanIII: sources.flatMap((s) => s.phanIII.map(({ id, text, table, imageDataUrl, thanCauImg }) => ({ id, text, table, imageDataUrl, thanCauImg }))),
+    phanIII: sources.flatMap((s) => s.phanIII.map(({ id, text, table, imageDataUrl, thanCauImg, canXem }) => ({ id, text, table, imageDataUrl, thanCauImg, canXem }))),
   }
 }
 

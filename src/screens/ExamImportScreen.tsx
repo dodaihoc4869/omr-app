@@ -9,11 +9,12 @@
 // do; đỏ: CHƯA có đáp án — bắt buộc điền, khoá nút lưu) -> [3] Lưu vào ngân
 // hàng câu hỏi theo từng mã đề, báo số câu trùng với ngân hàng đã có.
 import { useRef, useState, type DragEvent } from 'react'
-import { UploadCloud, Check, AlertTriangle, X as XIcon, Trash2, ImageIcon, Table as TableIcon, Pencil } from 'lucide-react'
+import { UploadCloud, Check, AlertTriangle, X as XIcon, Trash2, ImageIcon, Table as TableIcon, Pencil, FileJson } from 'lucide-react'
 import { extractTextFromFile, classifyDocx, classifyPdf, renderPdfPageDataUrls, type FileKind } from '../lib/exam-file-import'
-import { extractPdfQuestionImages } from '../lib/exam-image-crop'
+import { extractPdfQuestionImages, cropRegionFromPdf } from '../lib/exam-image-crop'
 import { buildExamDraft } from '../lib/exam-import-pipeline'
 import { congThucVo } from '../lib/exam-question-split'
+import { parseKhoDeJsonText, buildTeacherSourceFromKhoDe, type KhoDeHinh } from '../lib/exam-kho-de-import'
 import { validateTeacherSource, type TeacherExamSource, type TeacherMcqQuestion, type TeacherTrueFalseQuestion, type TeacherShortAnswerQuestion } from '../data/examContent'
 import { loadExamSources, saveExamSource } from '../lib/exam-db'
 import { ChemText } from '../lib/chem-format'
@@ -136,6 +137,16 @@ export default function ExamImportScreen() {
   const [viewerImages, setViewerImages] = useState<string[] | null>(null)
   const [openGallery, setOpenGallery] = useState<Set<string>>(new Set())
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // Nhập đề đã xử lý sẵn (JSON có đáp án, do Claude đọc bằng thị giác ngoài
+  // app hoặc qua tác vụ "Nạp đề mới") — đường tắt, bỏ qua hẳn màn Duyệt câu
+  // vì Claude đã cấu trúc hoá + kiểm tra sẵn, lưu THẲNG vào ngân hàng.
+  const [khoDeText, setKhoDeText] = useState('')
+  const [khoDeFile, setKhoDeFile] = useState<File | null>(null)
+  const [khoDeBusy, setKhoDeBusy] = useState(false)
+  const [khoDeMoRong, setKhoDeMoRong] = useState(false)
+  const khoDeJsonInputRef = useRef<HTMLInputElement>(null)
+  const khoDePdfInputRef = useRef<HTMLInputElement>(null)
 
   const processFiles = async (files: File[]) => {
     for (const file of files) {
@@ -263,6 +274,45 @@ export default function ExamImportScreen() {
     setCauList((prev) => prev.filter((c) => c.fileId !== jobId))
   }
 
+  const handleKhoDeImport = async () => {
+    if (!khoDeText.trim()) {
+      showToast('Chưa dán/chọn file JSON', 'error')
+      return
+    }
+    setKhoDeBusy(true)
+    try {
+      const parsed = parseKhoDeJsonText(khoDeText)
+      if (!parsed.ok || !parsed.json) {
+        showToast(parsed.errors[0] + (parsed.errors.length > 1 ? ` (và ${parsed.errors.length - 1} lỗi khác)` : ''), 'error')
+        return
+      }
+      const file = khoDeFile
+      const resolveHinh = file ? async (hinh: KhoDeHinh) => cropRegionFromPdf(file, hinh.trang, hinh) : undefined
+      const { source, errors, warnings, canXemList } = await buildTeacherSourceFromKhoDe(parsed.json, resolveHinh)
+      if (errors.length > 0) {
+        showToast(`${errors[0]}${errors.length > 1 ? ` (và ${errors.length - 1} lỗi khác)` : ''} — CHƯA lưu, sửa JSON rồi thử lại.`, 'error')
+        return
+      }
+      const validateErrs = validateTeacherSource(source)
+      if (validateErrs.length > 0) {
+        showToast(validateErrs[0], 'error')
+        return
+      }
+      await saveExamSource(source)
+      const tongCau = source.phanI.length + source.phanII.length + source.phanIII.length
+      const ghiChu: string[] = []
+      if (warnings.length > 0) ghiChu.push(`${warnings.length} cảnh báo (vd: ${warnings[0]})`)
+      if (canXemList.length > 0) ghiChu.push(`${canXemList.length} câu cần thầy xem lại: ${canXemList.slice(0, 5).join(', ')}${canXemList.length > 5 ? '…' : ''}`)
+      showToast(`Đã lưu mã ${source.maDe}: ${tongCau} câu (I${source.phanI.length} II${source.phanII.length} III${source.phanIII.length}).${ghiChu.length ? ' ' + ghiChu.join(' — ') : ''}`, ghiChu.length > 0 ? 'warn' : 'success')
+      setKhoDeText('')
+      setKhoDeFile(null)
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Lỗi không rõ khi nhập JSON', 'error')
+    } finally {
+      setKhoDeBusy(false)
+    }
+  }
+
   const handleSave = async () => {
     if (countDo > 0) return
     if (cauList.length === 0) return
@@ -385,6 +435,84 @@ export default function ExamImportScreen() {
         <div className="font-semibold text-sm">Thả file đề vào đây, hoặc bấm để chọn</div>
         <div className="text-xs text-slate-500">Nhận .pdf và .docx, nhiều file cùng lúc — file thế nào app đọc thế đó, không cần gõ theo khuôn nào.</div>
         <input ref={inputRef} type="file" multiple accept=".pdf,.docx" className="hidden" onChange={handlePick} />
+      </div>
+
+      {/* Đường tắt — đề đã đọc sẵn bằng thị giác (Claude đọc trong hội thoại,
+          hoặc tác vụ định kỳ "Nạp đề mới"), có đủ đáp án -> lưu thẳng, bỏ qua
+          hẳn màn Duyệt câu. File JSON này CÓ ĐÁP ÁN — không đưa lên git/nơi
+          công khai, chỉ dán/chọn trực tiếp vào đây. */}
+      <div className="rounded-xl border border-indigo-200 dark:border-indigo-900 bg-indigo-50/60 dark:bg-indigo-950/30">
+        <button
+          type="button"
+          onClick={() => setKhoDeMoRong((v) => !v)}
+          className="tap-target w-full flex items-center gap-2 px-3 py-2.5 text-left"
+        >
+          <FileJson size={16} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
+          <span className="text-sm font-semibold text-indigo-700 dark:text-indigo-300 flex-1">Nhập đề đã xử lý sẵn (JSON có đáp án)</span>
+          <span className="text-[11px] text-indigo-400">{khoDeMoRong ? 'Thu gọn' : 'Mở'}</span>
+        </button>
+        {khoDeMoRong && (
+          <div className="px-3 pb-3 space-y-2">
+            <div className="text-[11px] text-slate-500 dark:text-slate-400">
+              Dán JSON Claude đã đọc (đủ đáp án, đúng khuôn <code>{'{ma_de, cau:[...]}'}</code>), hoặc chọn file .json. Có câu nào kèm "hinh" (toạ độ ảnh cần cắt) thì chọn thêm đúng file PDF gốc bên dưới.
+            </div>
+            <textarea
+              className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-950 px-2 py-1.5 text-xs font-mono"
+              rows={5}
+              value={khoDeText}
+              onChange={(e) => setKhoDeText(e.target.value)}
+              placeholder='{"ma_de":"100","cau":[{"phan":"I","so":1,"de":"...","pa":{"A":"...","B":"...","C":"...","D":"..."},"dap_an":"D"}]}'
+            />
+            <div className="flex flex-wrap items-center gap-2 text-[11px]">
+              <button
+                onClick={() => khoDeJsonInputRef.current?.click()}
+                className="tap-target rounded-full border border-slate-300 dark:border-slate-600 px-2.5 text-slate-600 dark:text-slate-300"
+              >
+                Chọn file .json
+              </button>
+              <input
+                ref={khoDeJsonInputRef}
+                type="file"
+                accept=".json,application/json"
+                className="hidden"
+                onChange={async (e) => {
+                  const f = e.target.files?.[0]
+                  e.target.value = ''
+                  if (f) setKhoDeText(await f.text())
+                }}
+              />
+              <button
+                onClick={() => khoDePdfInputRef.current?.click()}
+                className="tap-target rounded-full border border-slate-300 dark:border-slate-600 px-2.5 text-slate-600 dark:text-slate-300"
+              >
+                {khoDeFile ? `File gốc: ${khoDeFile.name}` : 'Chọn file PDF gốc (nếu có "hinh")'}
+              </button>
+              <input
+                ref={khoDePdfInputRef}
+                type="file"
+                accept=".pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0]
+                  e.target.value = ''
+                  if (f) setKhoDeFile(f)
+                }}
+              />
+              {khoDeFile && (
+                <button onClick={() => setKhoDeFile(null)} className="tap-target text-rose-500">
+                  Bỏ file gốc
+                </button>
+              )}
+            </div>
+            <button
+              onClick={handleKhoDeImport}
+              disabled={khoDeBusy || !khoDeText.trim()}
+              className="tap-target w-full rounded-lg bg-indigo-600 text-white text-sm font-semibold py-2 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {khoDeBusy ? 'Đang nạp…' : 'Nạp vào ngân hàng câu hỏi'}
+            </button>
+          </div>
+        )}
       </div>
 
       {jobs.length > 0 && (
