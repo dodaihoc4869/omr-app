@@ -17,7 +17,7 @@ export default defineConfig({
       // ngay, không cần thầy/học sinh xoá cache tay mới thấy sửa lỗi —
       // injectRegister:false để không đăng ký trùng 2 lần.
       injectRegister: false,
-      includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png', '404.html', 'cau-hinh.json'],
+      includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png', 'icon-hs-192.png', 'icon-hs-512.png', 'icon-ph-192.png', 'icon-ph-512.png', 'manifest-hs.json', 'manifest-ph.json', '404.html', 'cau-hinh.json'],
       manifestFilename: 'manifest.json',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data}'],

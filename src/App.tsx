@@ -5,6 +5,8 @@ import MessagesFab from './components/MessagesFab'
 import { useAppStore } from './store/appStore'
 import { loadClassList } from './lib/classlist-db'
 import { docDuongVao, manDauCua, xoaDauVetToken } from './lib/vai-tro'
+import { datManifestTheoVai } from './lib/pwa-install'
+import DaiCaiApp from './components/DaiCaiApp'
 import { saveTokenHocSinh, saveTokenPhuHuynh } from './lib/exam-db'
 import ClassListScreen from './screens/ClassListScreen'
 import ExamHubScreen from './screens/ExamHubScreen'
@@ -62,6 +64,9 @@ function App() {
       .finally(() => {
         if (vai) {
           setVai(vai)
+          // Manifest theo vai: học sinh và phụ huynh cài ra HAI app khác nhau
+          // (khác tên, khác biểu tượng) để không cài nhầm app của nhau.
+          datManifestTheoVai(vai)
           if (!maCa) setScreen(manDauCua(vai))
         }
         xoaDauVetToken()
@@ -78,6 +83,8 @@ function App() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       <Toast />
+      {/* Dải cài app: chỉ vai học sinh/phụ huynh, và không chen vào màn đang làm bài. */}
+      {laKhach && manHienThi !== 'examtake' && <DaiCaiApp vai={vai as 'hs' | 'ph'} />}
       {manHienThi === 'classlist' && <ClassListScreen />}
       {manHienThi === 'examhub' && <ExamHubScreen />}
       {manHienThi === 'examsetup' && <ExamSetupScreen />}

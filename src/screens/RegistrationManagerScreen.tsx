@@ -6,7 +6,7 @@
 // huynh/học sinh khác (dữ liệu vị thành niên — sai người nhận là lỗi nghiêm
 // trọng).
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, Users, Trash2, Send, RefreshCw, Check, Link2, KeyRound } from 'lucide-react'
+import { ArrowLeft, Users, Trash2, Send, RefreshCw, Check, Link2, KeyRound, Smartphone } from 'lucide-react'
 import {
   listRegisteredParents,
   listRegisteredStudents,
@@ -24,6 +24,7 @@ import {
   type FeedbackSummary,
 } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
+import { tinGuiLinkCaiApp } from '../lib/ca-link'
 import { useAppStore } from '../store/appStore'
 
 export default function RegistrationManagerScreen() {
@@ -98,6 +99,17 @@ export default function RegistrationManagerScreen() {
       showToast(`Đã copy link riêng của ${ten} — dán vào Zalo gửi đúng người đó`, 'success')
     } catch {
       showToast(link, 'success')
+    }
+  }
+
+  /** Copy nguyên tin nhắn (link + hướng dẫn cài ra màn hình) để dán Zalo. */
+  const copyTinCaiApp = async (duong: string, ten: string, vai: 'hs' | 'ph') => {
+    const tin = tinGuiLinkCaiApp(duong, ten, vai)
+    try {
+      await navigator.clipboard.writeText(tin)
+      showToast(`Đã copy tin gửi ${ten} (link + cách cài app)`, 'success')
+    } catch {
+      showToast(tin, 'success')
     }
   }
 
@@ -237,6 +249,9 @@ export default function RegistrationManagerScreen() {
                       <button onClick={() => copyLink(`ph/${p.token}`, p.hoTenPhuHuynh || p.sdt)} className="tap-target w-9 h-9 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center" title="Copy link riêng">
                         <Link2 size={16} />
                       </button>
+                      <button onClick={() => copyTinCaiApp(`ph/${p.token}`, p.hoTenHocSinh || p.sdt, 'ph')} className="tap-target w-9 h-9 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 flex items-center justify-center" title="Copy tin gửi link + cách cài app">
+                        <Smartphone size={16} />
+                      </button>
                       <button onClick={() => handleDuyet('ph', p.sdt, p.hoTenPhuHuynh || p.sdt, true)} className="tap-target w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center" title="Cấp lại link (link cũ hết hiệu lực)">
                         <KeyRound size={16} />
                       </button>
@@ -282,6 +297,9 @@ export default function RegistrationManagerScreen() {
                     <>
                       <button onClick={() => copyLink(`hs/${s.token}`, s.hoTen || s.sbd)} className="tap-target w-9 h-9 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center" title="Copy link riêng">
                         <Link2 size={16} />
+                      </button>
+                      <button onClick={() => copyTinCaiApp(`hs/${s.token}`, s.hoTen || s.sbd, 'hs')} className="tap-target w-9 h-9 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 flex items-center justify-center" title="Copy tin gửi link + cách cài app">
+                        <Smartphone size={16} />
                       </button>
                       <button onClick={() => handleDuyet('hs', s.sbd, s.hoTen || s.sbd, true)} className="tap-target w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center" title="Cấp lại link (link cũ hết hiệu lực)">
                         <KeyRound size={16} />

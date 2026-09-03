@@ -54,17 +54,50 @@ export function theoDoiSuKienCai(f: () => void): () => void {
 }
 
 const KHOA_BO_QUA = 'ddh.boQuaCaiApp'
-export function daBoQuaNhacCai(): boolean {
+/** "Để sau" chỉ im 7 ngày rồi hỏi lại — chứ không im vĩnh viễn: em/phụ huynh
+ * bấm để sau lúc đang vội thì tuần sau vẫn cần lời nhắc. */
+export const NGAY_IM_LANG = 7
+
+export function daBoQuaNhacCai(now = Date.now()): boolean {
   try {
-    return localStorage.getItem(KHOA_BO_QUA) === '1'
+    const v = localStorage.getItem(KHOA_BO_QUA)
+    if (!v) return false
+    if (v === '1') return true // bản cũ: đã bỏ qua vĩnh viễn
+    const moc = Number(v)
+    if (!Number.isFinite(moc)) return false
+    return now - moc < NGAY_IM_LANG * 86400000
   } catch {
     return false
   }
 }
-export function ghiNhoBoQuaNhacCai(): void {
+
+export function ghiNhoBoQuaNhacCai(now = Date.now()): void {
   try {
-    localStorage.setItem(KHOA_BO_QUA, '1')
+    localStorage.setItem(KHOA_BO_QUA, String(now))
   } catch {
     // trình duyệt chặn storage — lần sau hỏi lại, không sao
   }
+}
+
+/** iPhone/iPad: Safari KHÔNG có beforeinstallprompt, chỉ cài được bằng tay. */
+export function laIOS(): boolean {
+  if (typeof navigator === 'undefined') return false
+  const ua = navigator.userAgent || ''
+  // iPadOS 13+ báo là Macintosh nhưng có cảm ứng.
+  return /iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && typeof document !== 'undefined' && 'ontouchend' in document)
+}
+
+/** Đổi thẻ <link rel="manifest"> theo VAI để hai bên cài ra hai app khác nhau
+ * (khác tên, khác biểu tượng) — Chrome đọc manifest tại thời điểm bấm cài. */
+export function datManifestTheoVai(vai: 'gv' | 'hs' | 'ph' | null): void {
+  if (typeof document === 'undefined') return
+  const ten = vai === 'hs' ? 'manifest-hs.json' : vai === 'ph' ? 'manifest-ph.json' : 'manifest.json'
+  const href = `${import.meta.env.BASE_URL}${ten}`
+  let link = document.querySelector('link[rel="manifest"]') as HTMLLinkElement | null
+  if (!link) {
+    link = document.createElement('link')
+    link.rel = 'manifest'
+    document.head.appendChild(link)
+  }
+  if (link.getAttribute('href') !== href) link.setAttribute('href', href)
 }

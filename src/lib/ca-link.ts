@@ -23,3 +23,13 @@ export async function taoLinkMoi(maCa: string, scriptUrl: string): Promise<strin
     return linkDai
   }
 }
+
+/** Tin nhắn thầy gửi kèm link riêng (BA-APP đợt 1 + nút cài app). Viết theo
+ * đúng quy tắc: vào thẳng việc, xưng Thầy, không lời chào/chúc. */
+export function tinGuiLinkCaiApp(duong: string, hoTen: string, vai: 'hs' | 'ph'): string {
+  const link = `${location.origin}${import.meta.env.BASE_URL}${duong}`
+  if (vai === 'ph') {
+    return `Đây là link riêng xem kết quả của em ${hoTen}: ${link}\nBấm link, rồi bấm Cài đặt để có biểu tượng trên màn hình. Lần sau mở thẳng, không cần link. Link này chỉ dùng cho một người, đừng chuyển tiếp.`
+  }
+  return `Link riêng của em ${hoTen}: ${link}\nBấm link, rồi bấm Cài đặt để có biểu tượng trên màn hình. Lần sau mở thẳng, không cần link. Không đưa link này cho bạn khác.`
+}
