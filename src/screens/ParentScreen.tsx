@@ -10,6 +10,7 @@ import {
   fetchParentFeedback,
   fetchParentStatus,
   fetchParentInbox,
+  phDongYGiaoBai,
   markTeacherMessagesRead,
   sendParentMessage,
   type ParentFeedbackResult,
@@ -62,6 +63,9 @@ export default function ParentScreen() {
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const [msgText, setMsgText] = useState('')
+  // BA-APP đợt 4: phụ huynh đồng ý cho thầy giao bài tập theo chuyên đề con yếu.
+  const [dangGuiYc, setDangGuiYc] = useState(false)
+  const [daGuiYc, setDaGuiYc] = useState(false)
   const [sendingMsg, setSendingMsg] = useState(false)
 
   useEffect(() => {
@@ -72,6 +76,20 @@ export default function ParentScreen() {
       setPhase(saved || tk ? 'view' : 'register')
     })
   }, [])
+
+  const dongYGiaoBai = async () => {
+    if (!token) return showToast('Cần mở app bằng link riêng thầy gửi', 'error')
+    setDangGuiYc(true)
+    try {
+      const kq = await phDongYGiaoBai(scriptUrl.trim(), token)
+      setDaGuiYc(true)
+      showToast(kq.daCo ? 'Yêu cầu trước đó vẫn đang chờ thầy giao bài' : 'Đã gửi. Thầy giao bài xong sẽ hiện trong app của con', 'success')
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Không gửi được yêu cầu', 'error')
+    } finally {
+      setDangGuiYc(false)
+    }
+  }
 
   const refresh = async (sdtToUse: string, urlToUse: string) => {
     if (!urlToUse.trim() || (!sdtToUse.trim() && !token)) return
@@ -297,6 +315,27 @@ export default function ParentScreen() {
             />
           </div>
           <div className="text-[11px] text-slate-400">Tự cập nhật mỗi ~15 giây.</div>
+        </div>
+      )}
+
+      {token && data?.items && data.items.length > 0 && (
+        <div className="rounded-xl p-4 space-y-2" style={{ background: 'var(--the)', boxShadow: 'var(--bong-1)' }}>
+          <div className="font-semibold text-sm" style={{ color: 'var(--muc)' }}>
+            Bài tập theo chuyên đề con đang yếu
+          </div>
+          <div className="text-sm" style={{ color: 'var(--nhat)' }}>
+            Anh/chị đồng ý thì Thầy giao bài tập riêng phần con hay sai, con làm trong app này.
+          </div>
+          <button
+            onClick={dongYGiaoBai}
+            disabled={dangGuiYc || daGuiYc}
+            className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold disabled:opacity-60"
+          >
+            {daGuiYc ? 'Đã gửi cho Thầy' : dangGuiYc ? 'Đang gửi…' : 'Đồng ý giao bài'}
+          </button>
+          <div className="text-[12px]" style={{ color: 'var(--nhat)' }}>
+            Thầy chọn câu rồi giao; bài hiện trong mục Bài tập về nhà của con.
+          </div>
         </div>
       )}
 

@@ -5,14 +5,15 @@
 // Cùng hồ sơ này sẽ dùng lại cho lối vào từ mục Phụ huynh — không dựng hai màn.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, BookPlus, RefreshCw, Search, TrendingDown, TrendingUp, Minus } from 'lucide-react'
+import { ArrowLeft, BookPlus, ClipboardCopy, RefreshCw, Search, TrendingDown, TrendingUp, Minus } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung, DauThe } from '../components/DesignSystem'
 import { danhSachEm, hoSoEm, khoiTuNamSinh, type ChuyenDeEm, type EmTomTat, type HoSoEm, type XuHuong } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { classify } from '../engine/score'
 import { useAppStore } from '../store/appStore'
 import GiaoBaiTap from '../components/GiaoBaiTap'
-import { baiTapCuaEm, type BaiTapCuaEm, type TrangThaiBaiTap } from '../lib/exam-api'
+import { baiTapCuaEm, danhSachYeuCau, type BaiTapCuaEm, type TrangThaiBaiTap, type YeuCauGiaoBai } from '../lib/exam-api'
+import { soanPhieuZalo, NHAC_TRUOC_KHI_GUI } from '../lib/phieu-zalo'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -97,7 +98,10 @@ export default function HocSinhScreen() {
   const [hoSo, setHoSo] = useState<HoSoEm | null>(null)
   const [dangTaiHoSo, setDangTaiHoSo] = useState(false)
   const [moGiaoBai, setMoGiaoBai] = useState(false)
+  const showToast = useAppStore((s) => s.showToast)
   const [baiTap, setBaiTap] = useState<BaiTapCuaEm[] | null>(null)
+  // Hàng chờ phụ huynh xin giao bài (BA-APP đợt 4) — máy thầy là nơi rút câu.
+  const [yeuCau, setYeuCau] = useState<YeuCauGiaoBai[]>([])
 
   const tai = async () => {
     setDangTai(true)
@@ -108,6 +112,9 @@ export default function HocSinhScreen() {
       if (!mat.trim()) throw new Error('Chưa nhập mã bí mật — vào Ngân hàng câu hỏi → Cấu hình')
       setCauHinh({ url: url.trim(), mat: mat.trim() })
       setDs(await danhSachEm(url.trim(), mat.trim()))
+      danhSachYeuCau(url.trim(), mat.trim())
+        .then(setYeuCau)
+        .catch(() => setYeuCau([]))
     } catch (e) {
       setLoi(e instanceof Error ? e.message : 'Lỗi không rõ')
       if (ds === null) setDs([])
@@ -141,6 +148,33 @@ export default function HocSinhScreen() {
   const taiLaiBaiTap = () => {
     if (!cauHinh || !sbdDangXem) return
     baiTapCuaEm(cauHinh.url, { secret: cauHinh.mat, sbd: sbdDangXem }).then(setBaiTap).catch(() => {})
+  }
+
+  /** Soạn phiếu kết quả ca gần nhất theo đúng quy tắc viết của thầy rồi copy
+   * để dán Zalo. Máy KHÔNG đoán nguyên nhân — nhắc thầy tự thêm trước khi gửi. */
+  const copyPhieu = async (hs: HoSoEm) => {
+    const ca = hs.caGanNhat
+    if (!ca || ca.tong === null) return showToast('Em chưa có ca nào đã chấm điểm', 'warn')
+    // Số của RIÊNG ca gần nhất, không phải số cộng dồn — phiếu gửi phụ huynh
+    // mà ghi sai số là mất tin ngay.
+    const yeuNhat = hs.chuyenDeCaGanNhat.find((c) => c.soSai > 0) ?? null
+    const bai = baiTap?.find((b) => b.trangThai !== 'da_nop' && b.hanNop)
+    const phieu = soanPhieuZalo({
+      hoTen: hs.em.hoTen || `SBD ${hs.em.sbd}`,
+      ngay: ca.nopLuc,
+      diem: ca.tong,
+      xepLoai: classify(ca.tong),
+      diemPhan: ca.diemI !== null && ca.diemII !== null && ca.diemIII !== null ? { I: ca.diemI, II: ca.diemII, III: ca.diemIII } : null,
+      soCauSai: hs.soCauSaiCaGanNhat,
+      chuyenDeSai: yeuNhat ? { ten: yeuNhat.ten, soSai: yeuNhat.soSai } : null,
+      baiTapDaGiao: bai ? { soCau: 0, hanNop: bai.hanNop } : null,
+    })
+    try {
+      await navigator.clipboard.writeText(phieu)
+      showToast(`Đã copy phiếu. ${NHAC_TRUOC_KHI_GUI}`, 'success')
+    } catch {
+      showToast(phieu, 'success')
+    }
   }
 
   const dsLoc = useMemo(() => {
@@ -186,11 +220,24 @@ export default function HocSinhScreen() {
               </div>
             </TheNoiDung>
 
-            <NutChinh onClick={() => setMoGiaoBai(true)}>
-              <span className="inline-flex items-center" style={{ gap: 6 }}>
-                <BookPlus size={18} /> Giao bài tập
-              </span>
-            </NutChinh>
+            {yeuCau.some((y) => y.sbd === hoSo.em.sbd) && (
+              <OThongBao tone="cam">
+                Phụ huynh em này đã bấm đồng ý giao bài. Bấm <b>Giao bài tập</b> để giao; giao xong yêu cầu tự đóng.
+              </OThongBao>
+            )}
+
+            <div className="flex" style={{ gap: 'var(--k2)' }}>
+              <NutChinh onClick={() => setMoGiaoBai(true)}>
+                <span className="inline-flex items-center" style={{ gap: 6 }}>
+                  <BookPlus size={18} /> Giao bài tập
+                </span>
+              </NutChinh>
+              <NutChinh variant="phu" onClick={() => copyPhieu(hoSo)}>
+                <span className="inline-flex items-center" style={{ gap: 6 }}>
+                  <ClipboardCopy size={18} /> Copy phiếu Zalo
+                </span>
+              </NutChinh>
+            </div>
 
             <TheNoiDung>
               <h2 className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', marginBottom: 'var(--k3)' }}>
@@ -340,6 +387,20 @@ export default function HocSinhScreen() {
           Danh sách lớp →
         </button>
       </div>
+
+      {yeuCau.length > 0 && (
+        <OThongBao tone="cam">
+          <span className="flex items-center justify-between flex-wrap" style={{ gap: 'var(--k2)' }}>
+            <span>
+              <b style={SO}>{yeuCau.length}</b> phụ huynh xin giao bài tập: {yeuCau.slice(0, 3).map((y) => y.hoTen || y.sbd).join(', ')}
+              {yeuCau.length > 3 ? '…' : ''}
+            </span>
+            <button onClick={() => moHoSoEm(yeuCau[0].sbd)} className="tap-target font-bold" style={{ ...SO, fontSize: 'var(--cx-1)', textDecoration: 'underline' }}>
+              Mở hồ sơ em đầu tiên
+            </button>
+          </span>
+        </OThongBao>
+      )}
 
       <TheNoiDung>
         <div className="flex items-center" style={{ gap: 'var(--k3)', marginBottom: 'var(--k3)' }}>

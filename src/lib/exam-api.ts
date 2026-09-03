@@ -733,8 +733,14 @@ export interface CaCuaEm {
 
 export interface HoSoEm {
   em: { sbd: string; hoTen: string; namSinh: string; lop: string }
+  /** Chuyên đề CỘNG DỒN mọi ca — dùng cho bảng mạnh/yếu. */
   chuyenDe: ChuyenDeEm[]
   ca: CaCuaEm[]
+  /** Ca gần nhất ĐÃ CHẤM (null nếu chưa có) — phiếu gửi phụ huynh dùng số của
+   * riêng ca này, không dùng số cộng dồn. */
+  caGanNhat: CaCuaEm | null
+  chuyenDeCaGanNhat: { ten: string; soCau: number; soSai: number }[]
+  soCauSaiCaGanNhat: number
 }
 
 /** Ai gọi: thầy (secret + sbd) · em (tokenHS) · phụ huynh (tokenPH). */
@@ -748,7 +754,14 @@ export interface QuyenHoSo {
 export async function hoSoEm(scriptUrl: string, quyen: QuyenHoSo): Promise<HoSoEm> {
   const r = await postJson(scriptUrl, { action: 'hoSoEm', ...quyen })
   if (!r.ok) throw new Error(r.error || 'Không lấy được hồ sơ')
-  return { em: { ...r.em, sbd: String(r.em.sbd) }, chuyenDe: r.chuyenDe || [], ca: (r.ca || []).map((c: CaCuaEm) => ({ ...c, maCa: String(c.maCa) })) }
+  return {
+    em: { ...r.em, sbd: String(r.em.sbd) },
+    chuyenDe: r.chuyenDe || [],
+    ca: (r.ca || []).map((c: CaCuaEm) => ({ ...c, maCa: String(c.maCa) })),
+    caGanNhat: r.caGanNhat ? { ...r.caGanNhat, maCa: String(r.caGanNhat.maCa) } : null,
+    chuyenDeCaGanNhat: r.chuyenDeCaGanNhat || [],
+    soCauSaiCaGanNhat: Number(r.soCauSaiCaGanNhat) || 0,
+  }
 }
 
 export interface EmTomTat {
@@ -799,6 +812,42 @@ export async function qidDaLam(scriptUrl: string, secret: string, sbd: string): 
   const r = await postJson(scriptUrl, { action: 'qidDaLam', secret, sbd })
   if (!r.ok) throw new Error(r.error || 'Không lấy được danh sách câu đã làm')
   return (r.qids as string[]).map(String)
+}
+
+// ============================================================================
+// YÊU CẦU GIAO BÀI (BA-APP.md đợt 4) — phụ huynh bấm "Đồng ý giao bài" trên
+// phiếu kết quả; MÁY THẦY là nơi rút câu nên yêu cầu nằm chờ ở máy chủ cho tới
+// khi máy thầy mở app (kho đề nằm trong Drive, Apps Script đọc rất chậm).
+// ============================================================================
+
+export interface YeuCauGiaoBai {
+  id: string
+  sbd: string
+  hoTen: string
+  chuyenDe: string[]
+  soCau: number
+  taoLuc: string
+  taoBoi: string
+  trangThai: 'cho' | 'xong' | 'huy'
+  maCa: string
+}
+
+/** Phụ huynh đồng ý giao bài. Bấm nhiều lần chỉ tạo MỘT yêu cầu đang chờ. */
+export async function phDongYGiaoBai(scriptUrl: string, tokenPH: string, chuyenDe: string[] = [], soCau = 0): Promise<{ daCo: boolean }> {
+  const r = await postJson(scriptUrl, { action: 'phDongYGiaoBai', tokenPH, chuyenDe, soCau })
+  if (!r.ok) throw new Error(r.error || 'Không gửi được yêu cầu')
+  return { daCo: r.daCo === true }
+}
+
+export async function danhSachYeuCau(scriptUrl: string, secret: string, tatCa = false): Promise<YeuCauGiaoBai[]> {
+  const r = await postJson(scriptUrl, { action: 'danhSachYeuCau', secret, tatCa })
+  if (!r.ok) throw new Error(r.error || 'Không lấy được hàng chờ giao bài')
+  return (r.items as YeuCauGiaoBai[]).map((x) => ({ ...x, sbd: String(x.sbd) }))
+}
+
+export async function danhDauYeuCau(scriptUrl: string, secret: string, id: string, trangThai: 'xong' | 'huy', maCa = ''): Promise<void> {
+  const r = await postJson(scriptUrl, { action: 'danhDauYeuCau', secret, id, trangThai, maCa })
+  if (!r.ok) throw new Error(r.error || 'Không cập nhật được yêu cầu')
 }
 
 /** Link đầy đủ để thầy gửi Zalo cho em/phụ huynh. */

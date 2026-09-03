@@ -113,6 +113,15 @@ const SO_CAU_TOI_THIEU = 2
 // Chênh lệch tỉ lệ sai coi là "có chuyển biến" (dưới mức này coi như đi ngang).
 const NGUONG_XU_HUONG = 0.05
 
+// YÊU CẦU GIAO BÀI (BA-APP.md đợt 4). Phụ huynh bấm "Đồng ý giao bài" trên
+// phiếu kết quả → tạo một dòng chờ ở đây. MÁY THẦY là nơi rút câu (kho đề nằm
+// trong Drive dạng file lớn, Apps Script đọc rất chậm), nên máy thầy mở app là
+// tự xử lý hàng chờ này rồi đánh dấu xong. TrangThai: cho | xong | huy.
+const SHEET_YEUCAU = 'YeuCauGiaoBai'
+const YEUCAU_HEADERS = ['Id', 'SBD', 'ChuyenDe', 'SoCau', 'TaoLuc', 'TaoBoi', 'TrangThai', 'XuLyLuc', 'MaCa']
+// Số câu mặc định khi phụ huynh bấm đồng ý mà không chọn gì.
+const SO_CAU_YEU_CAU_MAC_DINH = 10
+
 // Lệnh GET chỉ dành cho thầy — phải kèm secret. Trước v12 các lệnh này mở cho
 // bất kỳ ai có link /exec (đọc được cả danh bạ phụ huynh) — đó là lỗ hổng v12 vá.
 const GET_CHI_THAY = ['listParents', 'listStudents', 'listAllFeedback', 'listMessages']
@@ -1698,7 +1707,94 @@ function doPost(e) {
       })
     }
     ca.sort(function (a, b) { return msCua_(b.nopLuc) - msCua_(a.nopLuc) })
-    return jsonResponse_({ ok: true, em: em, chuyenDe: chuyenDe, ca: ca, serverNow: Date.now() })
+
+    // Số liệu của RIÊNG ca gần nhất đã chấm — phiếu gửi phụ huynh phải dùng số
+    // của ca đó, không được dùng số cộng dồn (BA-APP: cấm bịa/nhầm số).
+    let caGanNhat = null
+    for (let i = 0; i < ca.length; i++) {
+      if (ca[i].tong !== null) { caGanNhat = ca[i]; break }
+    }
+    const cdCaGanNhat = []
+    let soCauSaiCaGanNhat = 0
+    if (caGanNhat) {
+      for (let i = 0; i < dongEm.length; i++) {
+        if (String(dongEm[i][1]) !== caGanNhat.maCa) continue
+        const soSai = Number(dongEm[i][4]) || 0
+        soCauSaiCaGanNhat += soSai
+        cdCaGanNhat.push({ ten: String(dongEm[i][2]), soCau: Number(dongEm[i][3]) || 0, soSai: soSai })
+      }
+      cdCaGanNhat.sort(function (a, b) { return b.soSai - a.soSai })
+    }
+    return jsonResponse_({
+      ok: true,
+      em: em,
+      chuyenDe: chuyenDe,
+      ca: ca,
+      caGanNhat: caGanNhat,
+      chuyenDeCaGanNhat: cdCaGanNhat,
+      soCauSaiCaGanNhat: soCauSaiCaGanNhat,
+      serverNow: Date.now(),
+    })
+  }
+
+  if (action === 'phDongYGiaoBai') {
+    // Phụ huynh bấm ĐỒNG Ý GIAO BÀI trên phiếu kết quả (BA-APP.md mục 4B).
+    // Chỉ ghi YÊU CẦU — việc rút câu do máy thầy làm (kho đề ở Drive).
+    const ph = phTuToken_(body.tokenPH)
+    if (!ph) return jsonResponse_({ ok: false, error: 'Link không hợp lệ hoặc đã bị thu hồi' })
+    const sh = getSheet_(SHEET_YEUCAU, YEUCAU_HEADERS)
+    boSungTieuDe_(sh, YEUCAU_HEADERS)
+    const data = sh.getDataRange().getValues()
+    // Một em chỉ có MỘT yêu cầu đang chờ — bấm nhiều lần không tạo nhiều bài.
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][1]) === ph.sbd && String(data[i][6]) === 'cho') {
+        return jsonResponse_({ ok: true, daCo: true, id: String(data[i][0]), serverNow: Date.now() })
+      }
+    }
+    const id = Utilities.getUuid()
+    const soCau = Number(body.soCau) > 0 ? Number(body.soCau) : SO_CAU_YEU_CAU_MAC_DINH
+    const chuyenDe = Array.isArray(body.chuyenDe) ? body.chuyenDe.join('|') : String(body.chuyenDe || '')
+    sh.appendRow([id, ph.sbd, chuyenDe, soCau, new Date().toISOString(), 'phu_huynh', 'cho', '', ''])
+    return jsonResponse_({ ok: true, daCo: false, id: id, serverNow: Date.now() })
+  }
+
+  if (action === 'danhSachYeuCau') {
+    // Hàng chờ cho máy thầy. Mặc định chỉ trả yêu cầu đang chờ.
+    const loi = kiemTraMaBiMat_(body)
+    if (loi) return jsonResponse_({ ok: false, error: loi })
+    const sh = getSheet_(SHEET_YEUCAU, YEUCAU_HEADERS)
+    boSungTieuDe_(sh, YEUCAU_HEADERS)
+    const data = sh.getDataRange().getValues()
+    const tatCa = body.tatCa === true
+    const items = []
+    for (let i = 1; i < data.length; i++) {
+      const tt = String(data[i][6] || '')
+      if (!tatCa && tt !== 'cho') continue
+      items.push({
+        id: String(data[i][0]),
+        sbd: String(data[i][1]),
+        hoTen: tenHocSinh_(String(data[i][1])),
+        chuyenDe: String(data[i][2] || '').split('|').filter(function (x) { return x }),
+        soCau: Number(data[i][3]) || SO_CAU_YEU_CAU_MAC_DINH,
+        taoLuc: String(data[i][4] || ''),
+        taoBoi: String(data[i][5] || ''),
+        trangThai: tt,
+        maCa: String(data[i][8] || ''),
+      })
+    }
+    items.sort(function (a, b) { return msCua_(a.taoLuc) - msCua_(b.taoLuc) })
+    return jsonResponse_({ ok: true, items: items, serverNow: Date.now() })
+  }
+
+  if (action === 'danhDauYeuCau') {
+    // Máy thầy đã giao xong (hoặc thầy bỏ qua) → đóng yêu cầu.
+    const loi = kiemTraMaBiMat_(body)
+    if (loi) return jsonResponse_({ ok: false, error: loi })
+    const sh = getSheet_(SHEET_YEUCAU, YEUCAU_HEADERS)
+    const row = findRowByKey_(sh, 0, body.id)
+    if (row < 0) return jsonResponse_({ ok: false, error: 'Không tìm thấy yêu cầu' })
+    sh.getRange(row, 7, 1, 3).setValues([[String(body.trangThai || 'xong'), new Date().toISOString(), String(body.maCa || '')]])
+    return jsonResponse_({ ok: true, serverNow: Date.now() })
   }
 
   if (action === 'qidDaLam') {

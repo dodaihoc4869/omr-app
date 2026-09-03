@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { CheckSquare, Square, X } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh } from './DesignSystem'
 import { demCauTheoChuyenDe, rutBaiTap, SO_CAU_BAI_TAP_MAC_DINH, SO_CAU_BAI_TAP_TOI_DA, SO_CAU_BAI_TAP_TOI_THIEU, type MucDoLoc } from '../lib/bai-tap'
-import { publishSession, qidDaLam, type ChuyenDeEm } from '../lib/exam-api'
+import { publishSession, qidDaLam, danhSachYeuCau, danhDauYeuCau, type ChuyenDeEm } from '../lib/exam-api'
 import { loadExamSources, loadScriptUrl, loadTeacherSecret, saveSessionTeacherBank } from '../lib/exam-db'
 import { randomSessionCode } from '../lib/ca-link'
 import type { TeacherExamSource } from '../data/examContent'
@@ -116,6 +116,15 @@ export default function GiaoBaiTap({
         hanNop,
       })
       await saveSessionTeacherBank(maCa, nguon)
+      // Phụ huynh em này có yêu cầu đang chờ → đóng lại, khỏi giao hai lần.
+      try {
+        const ds = await danhSachYeuCau(url.trim(), mat.trim())
+        for (const y of ds.filter((x) => x.sbd === sbd)) {
+          await danhDauYeuCau(url.trim(), mat.trim(), y.id, 'xong', maCa)
+        }
+      } catch {
+        // không đóng được yêu cầu thì bài vẫn đã giao — thầy đóng tay sau
+      }
       const thieu = kq.soCau < soCau ? ` — kho chỉ có ${kq.soCau} câu khớp` : ''
       const lap = kq.soCauLapLai > 0 ? `, ${kq.soCauLapLai} câu em đã từng làm` : ''
       showToast(`Đã giao ${kq.soCau} câu cho ${hoTen || sbd}${thieu}${lap}${canhBaoQid}`, kq.soCau < soCau ? 'warn' : 'success')
