@@ -1628,13 +1628,18 @@ function doPost(e) {
     }
     const tenCa = {}
     const caRows = getSheet_(SHEET_CA, CA_HEADERS).getDataRange().getValues()
-    for (let i = 1; i < caRows.length; i++) tenCa[String(caRows[i][0])] = { tenCa: String(caRows[i][10] || ''), lop: String(caRows[i][1] || '') }
+    for (let i = 1; i < caRows.length; i++) {
+      // Ca thầy đã xoá thì không hiện lại trong hồ sơ em nữa.
+      if (String(caRows[i][9]) === 'da_xoa') continue
+      tenCa[String(caRows[i][0])] = { tenCa: String(caRows[i][10] || ''), lop: String(caRows[i][1] || '') }
+    }
     const ca = []
     for (let i = 1; i < luotData.length; i++) {
       if (String(luotData[i][1]) !== sbd) continue
       const tt = String(luotData[i][7])
       if (tt !== 'da_nop' && tt !== 'khoa') continue
       const mc = String(luotData[i][0])
+      if (!tenCa[mc]) continue // ca đã xoá (hoặc không còn trong CaKiemTra)
       const tong = luotData[i][16] === '' || luotData[i][16] === null ? null : Number(luotData[i][16])
       let hang = null
       let siSo = null
