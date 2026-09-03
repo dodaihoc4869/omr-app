@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { GraduationCap, Send, MessageSquareText } from 'lucide-react'
 import { registerStudent, fetchStudentProfile, sendStudentMessage, fetchStudentInbox, markTeacherMessagesRead, baiTapCuaEm, hoSoEm, type TeacherMessage, type BaiTapCuaEm, type HoSoEm } from '../lib/exam-api'
 import { KhoiBaiTap, KhoiChuyenDe, KhoiLichSuCa } from '../components/HoSoEmView'
+import { NutCaiApp } from '../components/DaiCaiApp'
 import { loadMyStudentSbd, loadScriptUrl, loadTokenHocSinh, saveMyStudentSbd } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 
@@ -280,6 +281,7 @@ export default function StudentProfileScreen() {
           ))}
         </div>
       )}
+      <NutCaiApp vai="hs" />
     </div>
   )
 }

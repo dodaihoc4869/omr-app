@@ -22,6 +22,7 @@ import {
   type BaiTapCuaEm,
 } from '../lib/exam-api'
 import { KhoiBaiTap, KhoiChuyenDe, KhoiLichSuCa } from '../components/HoSoEmView'
+import { NutCaiApp } from '../components/DaiCaiApp'
 import { loadMyParentPhone, loadScriptUrl, loadTokenPhuHuynh, saveMyParentPhone } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 
@@ -411,6 +412,7 @@ export default function ParentScreen() {
         })}
       </div>
       )}
+      <NutCaiApp vai="ph" />
     </div>
   )
 }

@@ -1,14 +1,33 @@
-// DẢI "CÀI ĐỖ ĐẠI HỌC RA MÀN HÌNH" — đặt ở ĐẦU TRANG, trên nội dung, không
-// phải cửa sổ bật lên che màn. Hiện cho vai học sinh và phụ huynh khi app đang
-// chạy trong tab trình duyệt thường; đã cài rồi thì không bao giờ hiện.
+// CÀI APP RA MÀN HÌNH CHÍNH — hai lối vào, chung một bộ logic.
 //
-// Chrome/Android: có beforeinstallprompt → bấm "Cài đặt" là cài ngay.
-// Safari iOS: KHÔNG có sự kiện đó → bấm "Cài đặt" mở tấm trượt hướng dẫn tay,
-// kèm hình nút Chia sẻ để phụ huynh lớn tuổi tìm được.
-// "Để sau" im 7 ngày rồi nhắc lại (pwa-install.ts).
+//   <DaiCaiApp>  dải nhắc ở ĐẦU TRANG. Bấm "Để sau" thì im 7 ngày.
+//   <NutCaiApp>  hàng nhỏ ở CUỐI TRANG, LUÔN CÓ khi app đang chạy trong tab
+//                trình duyệt. Bấm "Để sau" chỉ tắt dải nhắc, KHÔNG được cắt
+//                mất đường cài — thầy đã dính đúng cảnh này: bấm Để sau một
+//                lần rồi mở lại link thì không còn chỗ nào bấm cài nữa.
+//
+// Ba tình huống, cùng một cách xử:
+//   1. Cài được 1 chạm (Chrome Android)  → gọi hộp thoại cài của trình duyệt.
+//   2. iOS Safari                        → tấm trượt hướng dẫn Chia sẻ → Thêm vào MH chính.
+//   3. Không cài được (Cốc Cốc, Zalo, …) → tấm trượt bảo mở bằng Chrome,
+//      kèm Sao chép link và (Android) Thử mở trong Chrome bằng intent.
 import { useEffect, useState } from 'react'
-import { X } from 'lucide-react'
-import { caiMotCham, CHO_SU_KIEN_CAI_MS, coTheCaiMotCham, daBoQuaNhacCai, dangTrongTrinhDuyet, ghiNhoBoQuaNhacCai, laCocCoc, laIOS, moBangChrome, tenAppCuaVai, tenAppSeCai, theoDoiSuKienCai, trongTrinhDuyetTrongApp, NGAY_IM_LANG } from '../lib/pwa-install'
+import { X, Smartphone } from 'lucide-react'
+import {
+  caiMotCham,
+  CHO_SU_KIEN_CAI_MS,
+  coTheCaiMotCham,
+  daBoQuaNhacCai,
+  dangTrongTrinhDuyet,
+  ghiNhoBoQuaNhacCai,
+  laCocCoc,
+  laIOS,
+  moBangChrome,
+  tenAppCuaVai,
+  tenAppSeCai,
+  theoDoiSuKienCai,
+  trongTrinhDuyetTrongApp,
+} from '../lib/pwa-install'
 import { useAppStore } from '../store/appStore'
 
 const SANS: React.CSSProperties = { fontFamily: 'var(--sans)' }
@@ -49,31 +68,43 @@ function NutChiaSeIOS() {
   )
 }
 
-// Chỉ dùng cho vai học sinh / phụ huynh — thầy không cần cài app riêng.
-export default function DaiCaiApp({ vai }: { vai: 'hs' | 'ph' }) {
-  // Hook phải gọi TRƯỚC mọi lệnh return sớm bên dưới.
+const NUT_DAC: React.CSSProperties = {
+  fontSize: 'var(--cx-1)',
+  color: 'var(--muc-nguoc)',
+  background: 'var(--muc)',
+  borderRadius: 'var(--bo-1)',
+  padding: '0 var(--k4)',
+  minHeight: 40,
+}
+const NUT_VIEN: React.CSSProperties = {
+  fontSize: 'var(--cx-1)',
+  color: 'var(--muc)',
+  border: '1px solid var(--vien)',
+  borderRadius: 'var(--bo-1)',
+  padding: '0 var(--k4)',
+  minHeight: 40,
+}
+
+/** Toàn bộ logic cài app, dùng chung cho dải nhắc và nút cuối trang. */
+function useCaiApp(vai: 'hs' | 'ph') {
   const showToast = useAppStore((s) => s.showToast)
-  const [hien, setHien] = useState(() => dangTrongTrinhDuyet() && !daBoQuaNhacCai())
-  const [moHuongDan, setMoHuongDan] = useState(false)
-  // Nút "Cài đặt" luôn hiện: có beforeinstallprompt thì cài 1 chạm, không có
-  // (Safari) thì mở hướng dẫn tay. Vẫn nghe sự kiện để cập nhật khả năng cài.
+  const [trongTab, setTrongTab] = useState(dangTrongTrinhDuyet)
+  const [moTam, setMoTam] = useState(false)
   const [coNutCai, setCoNutCai] = useState(coTheCaiMotCham())
+  const [hetGioCho, setHetGioCho] = useState(false)
+  // TÊN APP TRÌNH DUYỆT THẬT SỰ SẼ CÀI, đọc từ đúng file manifest đang được
+  // thẻ <link rel="manifest"> trỏ tới. null = chưa đọc xong.
+  const [tenSeCai, setTenSeCai] = useState<string | null>(null)
+
   useEffect(() => theoDoiSuKienCai(() => setCoNutCai(coTheCaiMotCham())), [])
 
   // KHÔNG ĐOÁN THEO TÊN TRÌNH DUYỆT, DÒ KHẢ NĂNG THẬT. Cốc Cốc là Chromium
-  // nhưng không có luồng cài PWA: menu không có "Thêm vào Màn hình chính" và
-  // không bắn beforeinstallprompt. Đoán theo tên thì còn sót bao nhiêu trình
-  // duyệt khác. Chờ hết CHO_SU_KIEN_CAI_MS mà không có sự kiện, và không phải
-  // iOS (iOS vốn không có sự kiện này, cài tay được), thì kết luận không cài được.
-  const [hetGioCho, setHetGioCho] = useState(false)
+  // nhưng không có luồng cài PWA; đoán theo tên thì còn sót bao nhiêu cái khác.
   useEffect(() => {
     const t = setTimeout(() => setHetGioCho(true), CHO_SU_KIEN_CAI_MS)
     return () => clearTimeout(t)
   }, [])
 
-  // TÊN APP TRÌNH DUYỆT THẬT SỰ SẼ CÀI, đọc từ đúng file manifest đang được
-  // thẻ <link rel="manifest"> trỏ tới. null = chưa đọc xong.
-  const [tenSeCai, setTenSeCai] = useState<string | null>(null)
   useEffect(() => {
     let con = true
     tenAppSeCai().then((t) => con && setTenSeCai(t))
@@ -81,20 +112,18 @@ export default function DaiCaiApp({ vai }: { vai: 'hs' | 'ph' }) {
       con = false
     }
   }, [])
+
   useEffect(() => {
     const mq = window.matchMedia('(display-mode: browser)')
-    const onChange = () => setHien(dangTrongTrinhDuyet() && !daBoQuaNhacCai())
-    mq.addEventListener('change', onChange)
-    return () => mq.removeEventListener('change', onChange)
+    const doi = () => setTrongTab(dangTrongTrinhDuyet())
+    mq.addEventListener('change', doi)
+    return () => mq.removeEventListener('change', doi)
   }, [])
 
-  if (!hien) return null
-
-  const deSau = () => {
-    ghiNhoBoQuaNhacCai()
-    setHien(false)
-  }
-
+  const tenApp = tenAppCuaVai(vai)
+  // Máy còn giữ bản HTML cũ thì thẻ manifest vẫn trỏ app chung — bấm Cài đặt
+  // lúc này ra app "ĐỖ ĐẠI HỌC" chung. Thà chặn lại còn hơn cài nhầm.
+  const lechManifest = tenSeCai !== null && tenSeCai !== '' && tenSeCai !== tenApp
   const trongApp = trongTrinhDuyetTrongApp()
   // iOS: không bao giờ có beforeinstallprompt, nhưng Safari cài tay được.
   const khongCaiDuoc = trongApp || (!coNutCai && hetGioCho && !laIOS())
@@ -110,74 +139,114 @@ export default function DaiCaiApp({ vai }: { vai: 'hs' | 'ph' }) {
   }
 
   const cai = async () => {
-    if (!coTheCaiMotCham()) return setMoHuongDan(true)
+    if (!coTheCaiMotCham()) return setMoTam(true)
     const ok = await caiMotCham()
-    if (ok) setHien(false)
+    if (ok) setTrongTab(false)
     else setCoNutCai(coTheCaiMotCham())
   }
 
-  const tenApp = tenAppCuaVai(vai)
-  // Máy còn giữ bản HTML cũ thì thẻ manifest vẫn trỏ app chung — bấm Cài đặt
-  // lúc này ra app "ĐỖ ĐẠI HỌC" chung, không phải app của vai. Thà chặn lại và
-  // bảo mở lại một lần, còn hơn để thầy/phụ huynh cài nhầm rồi tưởng đã xong.
-  const lechManifest = tenSeCai !== null && tenSeCai !== '' && tenSeCai !== tenApp
+  return { trongTab, tenApp, tenSeCai, lechManifest, trongApp, khongCaiDuoc, linkChrome, chepLink, cai, moTam, setMoTam }
+}
 
-  // TRONG ZALO/FACEBOOK thì không cài được, và cũng không nên vờ như cài được:
-  // các trình duyệt đó bỏ qua manifest, "Thêm vào màn hình chính" chỉ ra một lối
-  // tắt mang tên và biểu tượng chung. Phải mở bằng Chrome/Safari trước.
-  if (khongCaiDuoc) {
-    return (
+type BoCaiApp = ReturnType<typeof useCaiApp>
+
+/** Tấm trượt hướng dẫn — nội dung đổi theo tình huống thật của máy. */
+function TamHuongDan({ bo }: { bo: BoCaiApp }) {
+  if (!bo.moTam) return null
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'var(--phu)' }} onClick={() => bo.setMoTam(false)}>
       <div
-        role="note"
-        style={{ background: 'var(--the)', borderBottom: '1px solid var(--vien)', padding: 'var(--k3) var(--k4)', ...SANS }}
+        className="w-full"
+        style={{ maxWidth: 480, background: 'var(--the)', borderTopLeftRadius: 'var(--bo-3)', borderTopRightRadius: 'var(--bo-3)', padding: 'var(--k5)', ...SANS }}
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center" style={{ gap: 'var(--k3)' }}>
-          <img src={bieuTuong(vai)} alt="" width={44} height={44} style={{ borderRadius: 'var(--bo-1)', flex: 'none' }} />
-          <div className="flex-1 min-w-0">
-            <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
-              Mở bằng Chrome để cài app
-            </div>
-            <div style={{ fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
-              {trongApp ? (
-                <>
-                  Đang mở trong Zalo nên không cài được. Bấm <b>⋮</b> góc trên bên phải, chọn <b>Mở bằng trình duyệt</b>.
-                </>
-              ) : laCocCoc() ? (
-                <>Cốc Cốc không cài được app ra màn hình chính. Sao chép link rồi mở bằng Chrome.</>
-              ) : (
-                <>Trình duyệt này không cài được app ra màn hình chính. Sao chép link rồi mở bằng Chrome.</>
-              )}
-            </div>
+        <div className="flex items-start justify-between" style={{ gap: 'var(--k3)', marginBottom: 'var(--k4)' }}>
+          <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', color: 'var(--muc)' }}>
+            {bo.khongCaiDuoc ? 'Mở bằng Chrome để cài app' : 'Cài ra màn hình chính'}
           </div>
-          <button type="button" onClick={deSau} className="tap-target shrink-0" style={{ fontSize: 'var(--cx-1)', color: 'var(--nhat)', padding: '0 var(--k2)' }}>
-            Để sau
+          <button onClick={() => bo.setMoTam(false)} className="tap-target shrink-0" style={{ color: 'var(--nhat)' }} aria-label="Đóng">
+            <X size={20} />
           </button>
         </div>
 
-        <div className="flex items-center" style={{ gap: 'var(--k3)', marginTop: 'var(--k3)' }}>
-          <ViTriNutBaCham />
-          <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)' }}>
-            <button
-              type="button"
-              onClick={chepLink}
-              className="tap-target font-bold"
-              style={{ fontSize: 'var(--cx-1)', color: 'var(--muc-nguoc)', background: 'var(--muc)', borderRadius: 'var(--bo-1)', padding: '0 var(--k4)', minHeight: 40 }}
-            >
-              Sao chép link
-            </button>
-            {linkChrome && (
-              <a
-                href={linkChrome}
-                className="tap-target font-bold inline-flex items-center"
-                style={{ fontSize: 'var(--cx-1)', color: 'var(--muc)', border: '1px solid var(--vien)', borderRadius: 'var(--bo-1)', padding: '0 var(--k4)', minHeight: 40 }}
-              >
-                Thử mở trong Chrome
-              </a>
-            )}
+        {bo.khongCaiDuoc ? (
+          <div className="flex items-start" style={{ gap: 'var(--k4)' }}>
+            <ViTriNutBaCham />
+            <div className="flex-1 min-w-0">
+              <div style={{ fontSize: 'var(--cx-2)', color: 'var(--muc)', lineHeight: 1.7 }}>
+                {bo.trongApp ? (
+                  <>
+                    Đang mở trong Zalo nên không cài được. Bấm <b>⋮</b> góc trên bên phải, chọn <b>Mở bằng trình duyệt</b>.
+                  </>
+                ) : laCocCoc() ? (
+                  <>Cốc Cốc không cài được app ra màn hình chính. Sao chép link rồi mở bằng Chrome.</>
+                ) : (
+                  <>Trình duyệt này không cài được app ra màn hình chính. Sao chép link rồi mở bằng Chrome.</>
+                )}
+              </div>
+              <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)', marginTop: 'var(--k4)' }}>
+                <button type="button" onClick={bo.chepLink} className="tap-target font-bold" style={NUT_DAC}>
+                  Sao chép link
+                </button>
+                {bo.linkChrome && (
+                  <a href={bo.linkChrome} className="tap-target font-bold inline-flex items-center" style={NUT_VIEN}>
+                    Thử mở trong Chrome
+                  </a>
+                )}
+              </div>
+            </div>
           </div>
+        ) : laIOS() ? (
+          <ol className="flex flex-col" style={{ gap: 'var(--k4)', fontSize: 'var(--cx-2)', color: 'var(--muc)', paddingLeft: 0, listStyle: 'none' }}>
+            <li className="flex items-center" style={{ gap: 'var(--k3)' }}>
+              <span className="shrink-0 flex items-center justify-center" style={{ width: 40, height: 40, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--tim)' }}>
+                <NutChiaSeIOS />
+              </span>
+              <span>
+                Bấm nút <b>Chia sẻ</b> ở thanh dưới Safari (hình mũi tên đi lên).
+              </span>
+            </li>
+            <li className="flex items-center" style={{ gap: 'var(--k3)' }}>
+              <span className="shrink-0 flex items-center justify-center font-bold" style={{ width: 40, height: 40, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)' }}>
+                2
+              </span>
+              <span>
+                Kéo xuống, chọn <b>Thêm vào MH chính</b>.
+              </span>
+            </li>
+            <li className="flex items-center" style={{ gap: 'var(--k3)' }}>
+              <span className="shrink-0 flex items-center justify-center font-bold" style={{ width: 40, height: 40, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)' }}>
+                3
+              </span>
+              <span>
+                Bấm <b>Thêm</b> ở góc trên bên phải.
+              </span>
+            </li>
+          </ol>
+        ) : (
+          <div style={{ fontSize: 'var(--cx-2)', color: 'var(--muc)', lineHeight: 1.7 }}>
+            Mở menu <b>⋮</b> của trình duyệt, chọn <b>Thêm vào Màn hình chính</b> (hoặc <b>Cài ứng dụng</b>).
+          </div>
+        )}
+
+        <div style={{ fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginTop: 'var(--k5)' }}>
+          Cài xong, mở app từ biểu tượng là vào thẳng, không cần link.
         </div>
       </div>
-    )
+    </div>
+  )
+}
+
+/** DẢI NHẮC ở đầu trang. "Để sau" im 7 ngày rồi nhắc lại (pwa-install.ts). */
+export default function DaiCaiApp({ vai }: { vai: 'hs' | 'ph' }) {
+  const bo = useCaiApp(vai)
+  const [daBoQua, setDaBoQua] = useState(daBoQuaNhacCai)
+
+  if (!bo.trongTab || daBoQua) return null
+
+  const deSau = () => {
+    ghiNhoBoQuaNhacCai()
+    setDaBoQua(true)
   }
 
   return (
@@ -185,25 +254,21 @@ export default function DaiCaiApp({ vai }: { vai: 'hs' | 'ph' }) {
       <div
         role="note"
         className="flex items-center"
-        style={{
-          gap: 'var(--k3)',
-          background: 'var(--the)',
-          borderBottom: '1px solid var(--vien)',
-          padding: 'var(--k3) var(--k4)',
-          ...SANS,
-        }}
+        style={{ gap: 'var(--k3)', background: 'var(--the)', borderBottom: '1px solid var(--vien)', padding: 'var(--k3) var(--k4)', ...SANS }}
       >
         <img src={bieuTuong(vai)} alt="" width={44} height={44} style={{ borderRadius: 'var(--bo-1)', flex: 'none' }} />
         <div className="flex-1 min-w-0">
           <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
-            {lechManifest ? 'Máy còn giữ bản cũ' : `Cài ${tenSeCai || tenApp} ra màn hình`}
+            {bo.lechManifest ? 'Máy còn giữ bản cũ' : bo.khongCaiDuoc ? 'Mở bằng Chrome để cài app' : `Cài ${bo.tenSeCai || bo.tenApp} ra màn hình`}
           </div>
           <div style={{ fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
-            {lechManifest
-              ? `Bấm Cài đặt lúc này sẽ ra app "${tenSeCai}". Tải lại một lần rồi cài.`
-              : vai === 'ph'
-                ? 'Mở nhanh, không cần tìm lại link'
-                : 'Mở nhanh, làm bài toàn màn hình'}
+            {bo.lechManifest
+              ? `Bấm Cài đặt lúc này sẽ ra app "${bo.tenSeCai}". Tải lại một lần rồi cài.`
+              : bo.khongCaiDuoc
+                ? 'Trình duyệt đang dùng không cài được app.'
+                : vai === 'ph'
+                  ? 'Mở nhanh, không cần tìm lại link'
+                  : 'Mở nhanh, làm bài toàn màn hình'}
           </div>
         </div>
         <div className="flex items-center shrink-0" style={{ gap: 'var(--k2)' }}>
@@ -212,70 +277,42 @@ export default function DaiCaiApp({ vai }: { vai: 'hs' | 'ph' }) {
           </button>
           <button
             type="button"
-            onClick={lechManifest ? () => location.reload() : cai}
+            onClick={bo.lechManifest ? () => location.reload() : bo.khongCaiDuoc ? () => bo.setMoTam(true) : bo.cai}
             className="tap-target font-bold"
-            style={{ fontSize: 'var(--cx-1)', color: 'var(--muc-nguoc)', background: 'var(--muc)', borderRadius: 'var(--bo-1)', padding: '0 var(--k4)', minHeight: 40 }}
+            style={NUT_DAC}
           >
-            {lechManifest ? 'Tải lại' : 'Cài đặt'}
+            {bo.lechManifest ? 'Tải lại' : bo.khongCaiDuoc ? 'Cách cài' : 'Cài đặt'}
           </button>
         </div>
       </div>
+      <TamHuongDan bo={bo} />
+    </>
+  )
+}
 
-      {moHuongDan && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'var(--phu)' }} onClick={() => setMoHuongDan(false)}>
-          <div
-            className="w-full"
-            style={{ maxWidth: 480, background: 'var(--the)', borderTopLeftRadius: 'var(--bo-3)', borderTopRightRadius: 'var(--bo-3)', padding: 'var(--k5)', ...SANS }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-start justify-between" style={{ gap: 'var(--k3)', marginBottom: 'var(--k4)' }}>
-              <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', color: 'var(--muc)' }}>
-                Cài ra màn hình chính
-              </div>
-              <button onClick={() => setMoHuongDan(false)} className="tap-target shrink-0" style={{ color: 'var(--nhat)' }} aria-label="Đóng">
-                <X size={20} />
-              </button>
-            </div>
+/**
+ * NÚT CÀI Ở CUỐI TRANG — luôn có khi app đang chạy trong tab trình duyệt.
+ *
+ * "Để sau" chỉ tắt dải nhắc ở đầu trang; đường cài KHÔNG được biến mất, nếu
+ * không thì bấm nhầm một lần là phải chờ 7 ngày hoặc xoá dữ liệu trang mới
+ * cài được.
+ */
+export function NutCaiApp({ vai }: { vai: 'hs' | 'ph' }) {
+  const bo = useCaiApp(vai)
+  if (!bo.trongTab) return null
 
-            {laIOS() ? (
-              <ol className="flex flex-col" style={{ gap: 'var(--k4)', fontSize: 'var(--cx-2)', color: 'var(--muc)', paddingLeft: 0, listStyle: 'none' }}>
-                <li className="flex items-center" style={{ gap: 'var(--k3)' }}>
-                  <span className="shrink-0 flex items-center justify-center" style={{ width: 40, height: 40, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--tim)' }}>
-                    <NutChiaSeIOS />
-                  </span>
-                  <span>
-                    Bấm nút <b>Chia sẻ</b> ở thanh dưới Safari (hình mũi tên đi lên).
-                  </span>
-                </li>
-                <li className="flex items-center" style={{ gap: 'var(--k3)' }}>
-                  <span className="shrink-0 flex items-center justify-center font-bold" style={{ width: 40, height: 40, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)' }}>
-                    2
-                  </span>
-                  <span>
-                    Kéo xuống, chọn <b>Thêm vào MH chính</b>.
-                  </span>
-                </li>
-                <li className="flex items-center" style={{ gap: 'var(--k3)' }}>
-                  <span className="shrink-0 flex items-center justify-center font-bold" style={{ width: 40, height: 40, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)' }}>
-                    3
-                  </span>
-                  <span>
-                    Bấm <b>Thêm</b> ở góc trên bên phải.
-                  </span>
-                </li>
-              </ol>
-            ) : (
-              <div style={{ fontSize: 'var(--cx-2)', color: 'var(--muc)', lineHeight: 1.7 }}>
-                Mở menu <b>⋮</b> của trình duyệt, chọn <b>Thêm vào Màn hình chính</b> (hoặc <b>Cài ứng dụng</b>).
-              </div>
-            )}
-
-            <div style={{ fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginTop: 'var(--k5)' }}>
-              Cài xong, mở app từ biểu tượng là vào thẳng, không cần link. Bấm "Để sau" thì {NGAY_IM_LANG} ngày nữa mới nhắc lại.
-            </div>
-          </div>
-        </div>
-      )}
+  return (
+    <>
+      <button
+        type="button"
+        onClick={bo.lechManifest ? () => location.reload() : bo.khongCaiDuoc ? () => bo.setMoTam(true) : bo.cai}
+        className="tap-target w-full flex items-center justify-center"
+        style={{ ...SANS, gap: 'var(--k2)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', minHeight: 44 }}
+      >
+        <Smartphone size={16} />
+        {bo.lechManifest ? 'Tải lại để cài đúng app' : bo.khongCaiDuoc ? 'Cách cài app ra màn hình chính' : `Cài ${bo.tenSeCai || bo.tenApp} ra màn hình chính`}
+      </button>
+      <TamHuongDan bo={bo} />
     </>
   )
 }

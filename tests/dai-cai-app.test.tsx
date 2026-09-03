@@ -6,8 +6,8 @@
 // lệch thì đổi thành nút "Tải lại" chứ không cho cài nhầm.
 import { act, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import DaiCaiApp from '../src/components/DaiCaiApp'
-import { CHO_SU_KIEN_CAI_MS, laCocCoc, moBangChrome, tenAppCuaVai, tenAppSeCai, trongTrinhDuyetTrongApp } from '../src/lib/pwa-install'
+import DaiCaiApp, { NutCaiApp } from '../src/components/DaiCaiApp'
+import { CHO_SU_KIEN_CAI_MS, ghiNhoBoQuaNhacCai, laCocCoc, moBangChrome, tenAppCuaVai, tenAppSeCai, trongTrinhDuyetTrongApp } from '../src/lib/pwa-install'
 
 function datManifest(noiDung: object | null) {
   document.head.querySelectorAll('link[rel="manifest"]').forEach((l) => l.remove())
@@ -142,13 +142,17 @@ describe('DaiCaiApp trong Zalo', () => {
     datManifest({ short_name: 'ĐĐH Học sinh' })
     render(<DaiCaiApp vai="hs" />)
     expect(screen.getByText('Mở bằng Chrome để cài app')).toBeTruthy()
-    expect(screen.getByText(/Đang mở trong Zalo/)).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Cài đặt' })).toBeNull()
+    // Chi tiết nằm trong tấm trượt — bấm "Cách cài" để mở.
+    await act(async () => {
+      screen.getByRole('button', { name: 'Cách cài' }).click()
+    })
+    expect(screen.getByText(/Đang mở trong Zalo/)).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Sao chép link' })).toBeTruthy()
     expect(screen.getByRole('link', { name: 'Thử mở trong Chrome' })).toBeTruthy()
   })
 
-  it('iPhone trong Facebook: có sao chép link, KHÔNG có nút Chrome', () => {
+  it('iPhone trong Facebook: có sao chép link, KHÔNG có nút Chrome', async () => {
     vi.stubGlobal('navigator', {
       ...navigator,
       userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 [FBAN/FBIOS;FBAV/450.0]',
@@ -156,6 +160,9 @@ describe('DaiCaiApp trong Zalo', () => {
     })
     datManifest({ short_name: 'ĐĐH Phụ huynh' })
     render(<DaiCaiApp vai="ph" />)
+    await act(async () => {
+      screen.getByRole('button', { name: 'Cách cài' }).click()
+    })
     expect(screen.getByRole('button', { name: 'Sao chép link' })).toBeTruthy()
     expect(screen.queryByRole('link', { name: 'Thử mở trong Chrome' })).toBeNull()
   })
@@ -186,8 +193,11 @@ describe('Trình duyệt không hỗ trợ cài (Cốc Cốc)', () => {
       vi.advanceTimersByTime(CHO_SU_KIEN_CAI_MS + 10)
     })
     expect(screen.getByText('Mở bằng Chrome để cài app')).toBeTruthy()
-    expect(screen.getByText(/Cốc Cốc không cài được/)).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Cài đặt' })).toBeNull()
+    await act(async () => {
+      screen.getByRole('button', { name: 'Cách cài' }).click()
+    })
+    expect(screen.getByText(/Cốc Cốc không cài được/)).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Sao chép link' })).toBeTruthy()
     vi.useRealTimers()
   })
@@ -207,5 +217,53 @@ describe('Trình duyệt không hỗ trợ cài (Cốc Cốc)', () => {
     expect(screen.getByRole('button', { name: 'Cài đặt' })).toBeTruthy()
     expect(screen.queryByText('Mở bằng Chrome để cài app')).toBeNull()
     vi.useRealTimers()
+  })
+})
+
+// BẤM "ĐỂ SAU" KHÔNG ĐƯỢC CẮT MẤT ĐƯỜNG CÀI.
+// Thầy bấm Để sau một lần rồi mở lại link: dải nhắc im 7 ngày, và vì không còn
+// chỗ nào khác để bấm cài nên coi như mất hẳn tính năng. Nay có nút cài cố định
+// ở cuối màn học sinh / phụ huynh, không phụ thuộc "Để sau".
+describe('NutCaiApp — nút cài cố định ở cuối trang', () => {
+  it('đã bấm Để sau: dải nhắc biến mất nhưng nút cài VẪN CÒN', async () => {
+    ghiNhoBoQuaNhacCai()
+    datManifest({ short_name: 'ĐĐH Học sinh' })
+
+    const { container: cuaDai } = render(<DaiCaiApp vai="hs" />)
+    expect(cuaDai.textContent).toBe('')
+
+    render(<NutCaiApp vai="hs" />)
+    await waitFor(() => expect(screen.getByRole('button', { name: /Cài ĐĐH Học sinh ra màn hình chính/ })).toBeTruthy())
+  })
+
+  it('trình duyệt không cài được: nút đổi chữ thành "Cách cài app…"', async () => {
+    vi.useFakeTimers()
+    vi.stubGlobal('navigator', {
+      ...navigator,
+      userAgent: 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/120 Mobile Safari/537.36 coc_coc_browser/120.0.0',
+      clipboard: { writeText: vi.fn() },
+    })
+    datManifest({ short_name: 'ĐĐH Phụ huynh' })
+    render(<NutCaiApp vai="ph" />)
+    await act(async () => {
+      vi.advanceTimersByTime(CHO_SU_KIEN_CAI_MS + 10)
+    })
+    const nut = screen.getByRole('button', { name: /Cách cài app ra màn hình chính/ })
+    await act(async () => {
+      nut.click()
+    })
+    expect(screen.getByText(/Cốc Cốc không cài được/)).toBeTruthy()
+    vi.useRealTimers()
+  })
+
+  it('app ĐÃ CÀI (chạy standalone) thì không hiện nút nào', () => {
+    vi.stubGlobal('matchMedia', (q: string) => ({
+      matches: !q.includes('browser'),
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }))
+    datManifest({ short_name: 'ĐĐH Học sinh' })
+    const { container } = render(<NutCaiApp vai="hs" />)
+    expect(container.textContent).toBe('')
   })
 })
