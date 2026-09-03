@@ -106,7 +106,11 @@ export default function ParentScreen() {
       const unread = (ib.items || []).filter((m) => !m.daXem).map((m) => m.id)
       if (unread.length > 0) markTeacherMessagesRead(urlToUse.trim(), unread).catch(() => {})
       if (!fb.found) {
-        showToast(token ? 'Link riêng không còn hiệu lực — xin thầy gửi lại link mới' : 'Chưa đăng ký với SĐT này, hoặc thầy đã cấp link riêng — mở link thầy gửi', 'warn')
+        // Chỉ báo khi có lý do thật: link riêng hỏng, hoặc SĐT đã lưu trên máy
+        // này mà tra không ra. Mở màn để đăng ký lần đầu thì im lặng — dội
+        // cảnh báo vàng lên đầu trang chỉ làm người dùng hoang mang.
+        if (token) showToast('Link riêng không còn hiệu lực — xin thầy gửi lại link mới', 'warn')
+        else if (sdtToUse.trim()) showToast('Chưa có hồ sơ với số điện thoại này — đăng ký bên dưới', 'warn')
         setPhase('register')
       }
       if (fb.found && fb.sdt) setSdt(String(fb.sdt))

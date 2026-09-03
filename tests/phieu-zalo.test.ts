@@ -2,7 +2,7 @@
 // không lời chào, không lời chúc, không khen suông, không thổi phồng, không
 // emoji, không gạch ngang dài; số liệu lấy nguyên từ bài đã chấm.
 import { describe, expect, it } from 'vitest'
-import { demChu, soanPhieuZalo, type DuLieuPhieu } from '../src/lib/phieu-zalo'
+import { demChu, soanPhieuZalo, soanTinRoiMan, type DuLieuPhieu } from '../src/lib/phieu-zalo'
 
 const mau: DuLieuPhieu = {
   hoTen: 'Lê Minh Đức',
@@ -95,5 +95,39 @@ describe('soanPhieuZalo — nội dung', () => {
     const s = soanPhieuZalo({ ...mau, baiTapDaGiao: null })
     expect(s).not.toContain('hạn nộp')
     expect(s).toContain('sẽ giao')
+  })
+})
+
+describe('soanTinRoiMan — báo phụ huynh việc rời màn', () => {
+  const d = { hoTen: 'Lê Minh Đức', maCa: '984033', tenCa: 'Ca 12A1', ngay: '2026-09-03T07:00:00Z', soLan: 3, tongGiay: 47, daKhoa: true }
+
+  it('nêu đúng số lần và số giây máy đo được', () => {
+    const s = soanTinRoiMan(d)
+    expect(s).toContain('3 lần')
+    expect(s).toContain('47 giây')
+  })
+
+  it('KHÔNG kết luận gian lận — máy chỉ đo được tín hiệu, cuộc gọi cũng cho tín hiệu đó', () => {
+    for (const bienThe of [d, { ...d, daKhoa: false }]) {
+      const s = soanTinRoiMan(bienThe).toLowerCase()
+      expect(s).not.toContain('gian lận')
+      expect(s).not.toContain('quay cóp')
+      expect(s).not.toContain('vi phạm')
+      expect(s).not.toContain('cháu nhà')
+    }
+  })
+
+  it('nói rõ bài bị khoá hay vẫn tính, và nêu bước tiếp theo của Thầy', () => {
+    expect(soanTinRoiMan(d)).toContain('khoá bài')
+    expect(soanTinRoiMan({ ...d, daKhoa: false })).toContain('vẫn tính bình thường')
+    expect(soanTinRoiMan(d)).toContain('hỏi em')
+    expect(soanTinRoiMan(d)).toContain('Không làm phiền')
+  })
+
+  it('không lời chào, không lời chúc, độ dài vừa tin nhắn', () => {
+    const s = soanTinRoiMan(d)
+    for (const tu of TU_CAM) expect(s.toLowerCase()).not.toContain(tu.toLowerCase())
+    expect(demChu(s)).toBeGreaterThanOrEqual(40)
+    expect(demChu(s)).toBeLessThanOrEqual(120)
   })
 })

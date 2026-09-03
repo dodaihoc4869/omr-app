@@ -69,7 +69,9 @@ const CA_HEADERS = ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'Immedia
 // lần thứ NguongLan khoá bài; một lần rời quá NguongGiay giây khoá ngay. Thầy
 // chỉnh khi mở ca; ô trống = mặc định dưới đây.
 const NGUONG_LAN_MAC_DINH = 3
-const NGUONG_GIAY_MAC_DINH = 30
+// Mặc định 10 giây (BA-APP đợt 5). Thầy chọn 2/5/10/30 khi mở ca; ô trống
+// (ca mở từ bản cũ) dùng số này.
+const NGUONG_GIAY_MAC_DINH = 10
 // Mỗi LƯỢT THI một dòng: (MaCa, SBD, LanThu) là khoá. Thi lại = dòng mới, không
 // đè dòng cũ. TrangThai: dang_lam · da_nop · khoa (bị khoá vì rời màn) ·
 // duoc_duyet_lai (thầy đã duyệt, em chưa vào) · Điểm do app ghi sau khi chấm.

@@ -124,7 +124,9 @@ export default function ExamSetupScreen() {
   const [tenCa, setTenCa] = useState('')
   // Chống gian lận theo mức (mục 6): rời màn lần thứ N → khoá; một lần rời quá M giây → khoá.
   const [nguongLan, setNguongLan] = useState(3)
-  const [nguongGiay, setNguongGiay] = useState(30)
+  // Mặc định 10 giây (BA-APP mục 3): 2 giây gắt tới mức một cuộc gọi đến cũng
+  // khoá bài, nên để 10 và cho thầy hạ xuống 2 khi cần siết ca quan trọng.
+  const [nguongGiay, setNguongGiay] = useState(10)
   const [phamVi, setPhamVi] = useState<PhamViCa>('tu_do')
   const [namSinhKhoi, setNamSinhKhoi] = useState('')
   const [chonSbd, setChonSbd] = useState<Set<string>>(new Set())
@@ -589,12 +591,17 @@ export default function ExamSetupScreen() {
           <div>
             <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Khoá ngay nếu một lần rời quá</div>
             <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Số giây rời màn thì khoá ngay">
-              {[15, 30, 60].map((g) => (
+              {[2, 5, 10, 30].map((g) => (
                 <ChipChon key={g} chon={nguongGiay === g} onClick={() => setNguongGiay(g)}>
                   {g} giây
                 </ChipChon>
               ))}
             </div>
+            {nguongGiay <= 5 && (
+              <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)', color: 'var(--cam)' }}>
+                {nguongGiay} giây rất gắt: một cuộc gọi đến hay thông báo Zalo cũng đủ khoá bài. Ca này thầy nên ngồi cạnh màn Chi tiết ca để mở khoá ngay.
+              </div>
+            )}
           </div>
         </div>
       </TheNoiDung>

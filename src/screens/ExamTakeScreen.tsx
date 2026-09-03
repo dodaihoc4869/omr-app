@@ -843,6 +843,12 @@ export default function ExamTakeScreen() {
                   )}
                 </div>
               )}
+              {/* Nhắc trước khi vào (BA-APP đợt 5): rời màn hình là bị khoá bài,
+                  mà cuộc gọi/thông báo cũng tính là rời — bật Không làm phiền
+                  là cách duy nhất em tự phòng được. */}
+              <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }}>
+                Bật <b>Không làm phiền</b> trước khi bắt đầu. Cuộc gọi hay thông báo kéo em ra khỏi màn làm bài đều bị tính là rời màn.
+              </div>
               <NutChinh onClick={handleJoin} disabled={!toanManHinh}>
                 Vào thi
               </NutChinh>

@@ -106,7 +106,7 @@ export async function vaoThi(scriptUrl: string, maCa: string, sbd: string, idThi
       vaoLuc: String(r.vaoLuc),
       hetGioLuc: String(r.hetGioLuc),
       nguongLan: Number(r.nguongLan) || 3,
-      nguongGiay: Number(r.nguongGiay) || 30,
+      nguongGiay: Number(r.nguongGiay) || 10,
       loai: r.loai === 'baitap' ? 'baitap' : 'thi',
       hanNop: String(r.hanNop ?? ''),
       tenCa: String(r.tenCa ?? ''),

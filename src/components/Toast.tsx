@@ -20,7 +20,9 @@ export default function Toast() {
   if (!toast) return null
 
   return (
-    <div className="fixed inset-x-0 top-4 z-50 flex justify-center px-4 pointer-events-none">
+    // Đặt Ở ĐÁY màn, trên thanh menu: hiện ở đầu trang thì đè mất tiêu đề và
+    // dòng hướng dẫn ngay dưới nó (thầy đã gặp: dải vàng che mất chữ).
+    <div className="fixed inset-x-0 z-50 flex justify-center px-4 pointer-events-none" style={{ bottom: 'calc(env(safe-area-inset-bottom) + 88px)' }}>
       <div
         className={`pointer-events-auto rounded-2xl px-5 py-3 shadow-lg text-base font-semibold transition-all duration-200 ${KIND_STYLE[toast.kind]}`}
       >

@@ -9,11 +9,12 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Copy, Check, RefreshCw, Trash2 } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
-import { chiTietCa, duyetThiLai, ghiDiem, moKhoa, xoaCa, type ChiTietCa, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
+import { chiTietCa, duyetThiLai, ghiDiem, moKhoa, sendTeacherMessage, xoaCa, type ChiTietCa, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
 import { taoBaiGhiDiem } from '../lib/chi-tiet-cau'
 import { loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
+import { soanTinRoiMan } from '../lib/phieu-zalo'
 import { buildStudentEntry, downloadDuLieuJson } from '../lib/json-export'
 import { downloadBangDiem, type StudentRow } from '../lib/xlsx-export'
 import { mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
@@ -87,6 +88,10 @@ export default function ExamMonitorScreen() {
   const [dangDuyet, setDangDuyet] = useState<string | null>(null)
   const [hoiXoa, setHoiXoa] = useState(false)
   const [maXoa, setMaXoa] = useState('')
+  // BÁO PHỤ HUYNH việc rời màn (BA-APP mục 4D): tin soạn sẵn, THẦY sửa rồi mới
+  // gửi — máy không tự gửi vì một cuộc gọi đến cũng cho đúng tín hiệu này.
+  const [tinBao, setTinBao] = useState<{ sbd: string; noiDung: string } | null>(null)
+  const [dangGuiBao, setDangGuiBao] = useState(false)
   const [dangXoa, setDangXoa] = useState(false)
   // Đã ghi điểm lên Sheet cho lượt nào (khoá `${sbd}:${lanThu}:${nopLuc}`) — không ghi lặp mỗi lần tải lại.
   const daGhiRef = useRef<Set<string>>(new Set())
@@ -241,6 +246,35 @@ export default function ExamMonitorScreen() {
     }
   }
 
+  const moBaoPhuHuynh = (sbd: string, hoTen: string, l: LuotThiRow) => {
+    setTinBao({
+      sbd,
+      noiDung: soanTinRoiMan({
+        hoTen: hoTen || `SBD ${sbd}`,
+        maCa: chiTiet?.ca.maCa ?? '',
+        tenCa: chiTiet?.ca.tenCa || '',
+        ngay: l.nopLuc || l.vaoLuc || new Date().toISOString(),
+        soLan: l.soLanRoiMan || 0,
+        tongGiay: l.tongGiayRoiMan || 0,
+        daKhoa: l.trangThai === 'khoa',
+      }),
+    })
+  }
+
+  const guiBaoPhuHuynh = async () => {
+    if (!tinBao || !tinBao.noiDung.trim()) return
+    setDangGuiBao(true)
+    try {
+      await sendTeacherMessage(scriptUrl.trim(), secret.trim(), tinBao.sbd, tinBao.noiDung.trim())
+      showToast('Đã gửi vào hộp thư của em — phụ huynh thấy khi mở app', 'success')
+      setTinBao(null)
+    } catch (e) {
+      showToast(`Không gửi được: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
+    } finally {
+      setDangGuiBao(false)
+    }
+  }
+
   const copyLink = () => {
     if (!chiTiet) return
     const link = `${location.origin}${import.meta.env.BASE_URL}t/${chiTiet.ca.maCa}`
@@ -392,6 +426,11 @@ export default function ExamMonitorScreen() {
                         <span className="flex items-center flex-wrap" style={{ gap: 4, marginTop: 4 }}>
                           <Nhan tone={nh.tone}>{nh.ten}</Nhan>
                           {daNop && l.soLanRoiMan > 0 && <Nhan tone="cam">rời màn {l.soLanRoiMan} lần / {l.tongGiayRoiMan}s</Nhan>}
+                          {(l.trangThai === 'khoa' || l.soLanRoiMan > 0) && (
+                            <button type="button" onClick={() => moBaoPhuHuynh(e.sbd, l.hoTen, l)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--cam)', minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--cam)' }}>
+                              Báo phụ huynh
+                            </button>
+                          )}
                           {l.trangThai === 'khoa' &&
                             (xacNhanMoKhoa === e.sbd ? (
                               <span className="inline-flex items-center" style={{ gap: 4 }}>
@@ -444,6 +483,34 @@ export default function ExamMonitorScreen() {
               <NutChinh variant="phu" onClick={handleExportJson}>
                 Xuất dulieu.json
               </NutChinh>
+            </div>
+          )}
+
+          {/* BÁO PHỤ HUYNH — thầy đọc lại, sửa, rồi mới gửi */}
+          {tinBao && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'var(--phu)' }}>
+              <div className="w-full flex flex-col" style={{ maxWidth: 460, background: 'var(--the)', borderRadius: 'var(--bo-3)', padding: 'var(--k5)', gap: 'var(--k3)', boxShadow: 'var(--bong-2)' }}>
+                <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)' }}>
+                  Báo phụ huynh · SBD <span style={SO}>{tinBao.sbd}</span>
+                </div>
+                <OThongBao tone="cam">
+                  Máy chỉ đo được em rời khỏi màn làm bài mấy lần, mấy giây. Một cuộc gọi đến cũng cho đúng tín hiệu đó, nên tin này nêu dữ kiện, không kết luận gian lận. Thầy sửa lại trước khi gửi.
+                </OThongBao>
+                <textarea
+                  value={tinBao.noiDung}
+                  onChange={(ev) => setTinBao({ ...tinBao, noiDung: ev.target.value })}
+                  style={{ width: '100%', minHeight: 140, borderRadius: 'var(--bo-1)', padding: 'var(--k3)', background: 'var(--the-2)', border: '1.5px solid transparent', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)', outline: 'none', lineHeight: 1.6 }}
+                  aria-label="Nội dung tin báo phụ huynh"
+                />
+                <div className="flex" style={{ gap: 'var(--k2)' }}>
+                  <NutChinh variant="phu" onClick={() => setTinBao(null)}>
+                    Huỷ
+                  </NutChinh>
+                  <NutChinh onClick={guiBaoPhuHuynh} disabled={dangGuiBao || !tinBao.noiDung.trim()}>
+                    {dangGuiBao ? 'Đang gửi…' : 'Gửi'}
+                  </NutChinh>
+                </div>
+              </div>
             </div>
           )}
 

@@ -16,7 +16,11 @@ export interface NguongGianLan {
   giay: number
 }
 
-export const NGUONG_MAC_DINH: NguongGianLan = { lan: 3, giay: 30 }
+export const NGUONG_MAC_DINH: NguongGianLan = { lan: 3, giay: 10 }
+
+/** Ngưỡng giây NHỎ NHẤT chấp nhận. Thầy chọn được 2 giây (BA-APP đợt 5) nên
+ * không được loại giá trị dưới 5 — loại là ca đặt 2 giây sẽ âm thầm chạy 10. */
+export const GIAY_TOI_THIEU = 1
 
 export type MucCanhBao = 'nhe' | 'dam' | 'khoa'
 
@@ -25,7 +29,7 @@ export function chuanHoaNguong(n?: Partial<NguongGianLan> | null): NguongGianLan
   const giay = Number(n?.giay)
   return {
     lan: Number.isFinite(lan) && lan >= 1 ? Math.floor(lan) : NGUONG_MAC_DINH.lan,
-    giay: Number.isFinite(giay) && giay >= 5 ? Math.floor(giay) : NGUONG_MAC_DINH.giay,
+    giay: Number.isFinite(giay) && giay >= GIAY_TOI_THIEU ? Math.floor(giay) : NGUONG_MAC_DINH.giay,
   }
 }
 
