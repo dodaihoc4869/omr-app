@@ -1,12 +1,14 @@
-// EM THI LÀ TỰ CÓ TÊN TRONG DANH SÁCH.
+// DANH SÁCH HỌC SINH LÀ CỔNG VÀO THI.
 //
 // Bỏ màn đăng ký (app học sinh tách sang repo riêng) thì không còn ai điền hồ
-// sơ nữa. Em vào thi chỉ gõ SỐ BÁO DANH, nên họ tên phải đến từ bản sao danh
-// sách lớp mà app thầy đẩy lên máy chủ. Test này khoá cả hai đầu: phía app đọc
-// đúng cột, phía máy chủ tự thêm em và chỉ cho thầy xoá.
+// sơ nữa. Thay vào đó thầy nạp file danh sách 3 cột — số báo danh, họ tên, năm
+// sinh — và em phải nhập đúng CẢ BA mới vào thi được. Test này khoá cả hai đầu:
+// phía app đọc file đúng và không im lặng bỏ dòng hỏng, phía máy chủ chặn đúng
+// chỗ và chỉ thầy mới đụng được danh sách.
 import { describe, expect, it } from 'vitest'
 import gsCode from '../docs/apps-script-kiem-tra.gs?raw'
 import { autoMatchColumns, rowsToClassList } from '../src/lib/sheet-gviz'
+import { docNamSinh, hangToDanhSach } from '../src/lib/danh-sach-hs'
 
 describe('Đọc danh sách lớp từ Google Sheet', () => {
   const HEADER = ['SBD', 'Họ và tên', 'Ngày sinh', 'Lớp', 'SĐT phụ huynh']
@@ -38,14 +40,112 @@ describe('Đọc danh sách lớp từ Google Sheet', () => {
   })
 })
 
-describe('Máy chủ — em vào thi tự vào danh sách', () => {
-  it('vaoThi tự thêm em khi chưa có hồ sơ, TRƯỚC khi xét phạm vi ca', () => {
-    // Thứ tự quan trọng: thêm sau khi xét phạm vi thì ca lọc theo khối chặn
-    // em ngay lần đầu, dù danh sách lớp có năm sinh của em.
-    const iThem = gsCode.indexOf('if (!hoSo) hoSo = themEmVaoDanhSach_(sbd, ca)')
+describe('Đọc FILE danh sách học sinh của thầy', () => {
+  const TIEU_DE = ['SBD', 'Họ và tên', 'Năm sinh']
+
+  it('đọc đủ ba cột từ file có hàng tiêu đề', () => {
+    const kq = hangToDanhSach([
+      TIEU_DE,
+      ['110234', 'Lê Minh Đức', 2009],
+      ['110235', 'Trần Bảo An', '12/05/2010'],
+    ])
+    expect(kq.items).toEqual([
+      { sbd: '110234', hoTen: 'Lê Minh Đức', namSinh: '2009' },
+      { sbd: '110235', hoTen: 'Trần Bảo An', namSinh: '2010' },
+    ])
+    expect(kq.boQua).toEqual([])
+  })
+
+  it('file KHÔNG có hàng tiêu đề vẫn đọc được — đoán theo hình dạng ô', () => {
+    const kq = hangToDanhSach([
+      ['110234', 'Lê Minh Đức', '2009'],
+      ['110235', 'Trần Bảo An', '2010'],
+    ])
+    expect(kq.items.map((e) => e.sbd)).toEqual(['110234', '110235'])
+    expect(kq.items[0].hoTen).toBe('Lê Minh Đức')
+  })
+
+  it('DÒNG THIẾU KHÔNG ĐƯỢC IM LẶNG — em không lên danh sách là em đứng ngoài phòng thi', () => {
+    const kq = hangToDanhSach([
+      TIEU_DE,
+      ['110234', 'Lê Minh Đức', '2009'],
+      ['110235', '', '2010'],
+      ['', 'Phạm Gia Huy', '2009'],
+      ['110237', 'Vũ Khánh Linh', ''],
+    ])
+    expect(kq.items).toHaveLength(1)
+    expect(kq.boQua.map((b) => b.dong)).toEqual([3, 4, 5])
+    expect(kq.boQua[0].vaoSao).toContain('họ tên')
+    expect(kq.boQua[1].vaoSao).toContain('số báo danh')
+    expect(kq.boQua[2].vaoSao).toContain('năm sinh')
+  })
+
+  it('số báo danh trùng: giữ dòng đầu và nêu ra', () => {
+    const kq = hangToDanhSach([TIEU_DE, ['110234', 'Lê Minh Đức', '2009'], ['110234', 'Lê Minh Đúc', '2009']])
+    expect(kq.items).toHaveLength(1)
+    expect(kq.items[0].hoTen).toBe('Lê Minh Đức')
+    expect(kq.trung).toEqual(['110234'])
+  })
+
+  it('thiếu hẳn một cột thì BÁO LỖI, không nạp nửa vời', () => {
+    expect(() => hangToDanhSach([['SBD', 'Họ và tên'], ['110234', 'Lê Minh Đức']])).toThrow(/3 cột/)
+  })
+
+  it('năm sinh đọc được từ số, chuỗi, ngày đầy đủ và ô Date của Excel', () => {
+    expect(docNamSinh(2009)).toBe('2009')
+    expect(docNamSinh('12/05/2010')).toBe('2010')
+    expect(docNamSinh(new Date(2008, 4, 12))).toBe('2008')
+    expect(docNamSinh('')).toBe('')
+    expect(docNamSinh('lớp 11')).toBe('')
+  })
+
+  it('gộp khoảng trắng thừa trong tên và bỏ khoảng trắng trong số báo danh', () => {
+    const kq = hangToDanhSach([TIEU_DE, [' 110 234 ', '  Lê   Minh  Đức ', '2009']])
+    expect(kq.items[0]).toEqual({ sbd: '110234', hoTen: 'Lê Minh Đức', namSinh: '2009' })
+  })
+})
+
+describe('Máy chủ — cổng vào thi theo danh sách', () => {
+  it('chặn khi không khớp đủ ba, và KHÔNG nói rõ sai ô nào', () => {
+    const i = gsCode.indexOf('function quyetDinhVaoThi_')
+    const than = gsCode.slice(i, gsCode.indexOf('\nfunction ', i + 10))
+    expect(than).toContain("hocSinh.trongDanhSach === false) return { ok: false, lyDo: 'sai_ho_so' }")
+    // Cổng phải đứng TRƯỚC phạm vi ca — chặn sớm nhất có thể.
+    expect(than.indexOf('trongDanhSach')).toBeLessThan(than.indexOf("pv === 'khoi'"))
+  })
+
+  it('chưa nạp danh sách bao giờ thì KHÔNG chặn ai — không để trung tâm đứng hình', () => {
+    const i = gsCode.indexOf("if (action === 'vaoThi')")
+    const than = gsCode.slice(i, i + 3000)
+    expect(than).toContain('const coDs = coDanhSachHocSinh_()')
+    expect(than).toContain('trongDanhSach: coDs ? !!trongDs : null')
+  })
+
+  it('so khớp tên bỏ dấu và bỏ khoảng trắng thừa, năm sinh so đúng 4 chữ số', () => {
+    const i = gsCode.indexOf("if (action === 'vaoThi')")
+    const than = gsCode.slice(i, i + 3000)
+    expect(than).toContain('chuanTen_(body.hoTen)')
+    expect(than).toContain('chuanNamSinh_(body.namSinh)')
+    // Dòng thầy bỏ trống thì không lấy đó làm cớ chặn em.
+    expect(than).toContain('!chuanTen_(dong.hoTen)')
+    expect(than).toContain('!dong.namSinh')
+  })
+})
+
+describe('Máy chủ — em qua cổng thì có hồ sơ', () => {
+  it('tạo hồ sơ TRƯỚC khi xét phạm vi ca', () => {
+    // Thứ tự quan trọng: tạo sau khi xét phạm vi thì ca lọc theo khối chặn em
+    // ngay lần đầu, dù danh sách có năm sinh của em.
+    const iThem = gsCode.indexOf('if (!hoSo && (!coDs || trongDs)) hoSo = themEmVaoDanhSach_(sbd, ca, trongDs)')
     const iXet = gsCode.indexOf('const qd = quyetDinhVaoThi_(ca, luot, idThietBi, now')
     expect(iThem).toBeGreaterThan(0)
     expect(iXet).toBeGreaterThan(iThem)
+  })
+
+  it('CHỈ tạo hồ sơ cho em đã qua cổng danh sách', () => {
+    // `!hoSo && (!coDs || trongDs)`: có danh sách mà không khớp thì không tạo
+    // dòng nào — danh sách học sinh không phình ra vì người lạ gõ bừa.
+    expect(gsCode).toContain('if (!hoSo && (!coDs || trongDs)) hoSo = themEmVaoDanhSach_(sbd, ca, trongDs)')
   })
 
   it('em tự vào được đánh dấu tu_vao_thi và KHÔNG được cấp token', () => {
@@ -56,11 +156,12 @@ describe('Máy chủ — em vào thi tự vào danh sách', () => {
     expect(ham).not.toContain('sinhToken_')
   })
 
-  it('họ tên tra từ bản sao danh sách lớp, không để em tự gõ', () => {
+  it('họ tên ghi vào hồ sơ lấy từ DANH SÁCH, không lấy chữ em gõ', () => {
     const than = gsCode.slice(gsCode.indexOf('function themEmVaoDanhSach_'))
     const ham = than.slice(0, than.indexOf('\nfunction '))
-    expect(ham).toContain('timTrongDanhSachLop_(sbd)')
-    // Không đọc tên từ body của lệnh vaoThi — em gõ gì cũng không thành tên.
+    // Tham số `tu` là dòng tra được trong danh sách; body của lệnh vaoThi
+    // (chữ em gõ) không bao giờ chạm tới đây.
+    expect(ham).toContain('tu ? tu.hoTen :')
     expect(ham).not.toContain('body.')
   })
 })

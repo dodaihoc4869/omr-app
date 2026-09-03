@@ -115,6 +115,22 @@ function DauPhan({ phan, soCau }: { phan: PhanKey; soCau: number }) {
   )
 }
 
+const KHOA_HO_TEN = 'ddh.em.hoTen'
+const KHOA_NAM_SINH = 'ddh.em.namSinh'
+
+/** Ô nhập họ tên / năm sinh ở màn vào thi — cùng kích cỡ với ô số báo danh. */
+const O_DANH_TINH: React.CSSProperties = {
+  height: 52,
+  borderRadius: 'var(--bo-1)',
+  padding: '0 var(--k4)',
+  background: 'var(--the-2)',
+  border: '1.5px solid transparent',
+  fontFamily: 'var(--serif)',
+  fontSize: 'var(--cx-3)',
+  color: 'var(--muc)',
+  outline: 'none',
+}
+
 export default function ExamTakeScreen() {
   const showToast = useAppStore((s) => s.showToast)
 
@@ -123,6 +139,15 @@ export default function ExamTakeScreen() {
 
   const [maCa, setMaCa] = useState('')
   const [sbd, setSbd] = useState('')
+  // DANH TÍNH — máy chủ đối chiếu đủ ba (số báo danh, họ tên, năm sinh) với
+  // danh sách thầy đã nạp. Nhớ trên máy để lần sau em chỉ gõ mã ca; đây là
+  // tiện dùng, KHÔNG phải quyền: máy chủ vẫn kiểm lại mỗi lần vào thi.
+  const [hoTen, setHoTen] = useState(() => {
+    try { return localStorage.getItem(KHOA_HO_TEN) ?? '' } catch { return '' }
+  })
+  const [namSinh, setNamSinh] = useState(() => {
+    try { return localStorage.getItem(KHOA_NAM_SINH) ?? '' } catch { return '' }
+  })
   const [scriptUrl, setScriptUrl] = useState('')
 
   const [bank, setBank] = useState<PublicExamBank | null>(null)
@@ -324,7 +349,18 @@ export default function ExamTakeScreen() {
   const handleJoin = async () => {
     const ma = maCa.trim()
     const sb = sbd.trim()
+    const ten = hoTen.trim()
+    const nam = namSinh.trim()
     if (!ma || !sb) return showToast('Nhập đủ mã ca và số báo danh', 'error')
+    if (!ten) return showToast('Nhập họ tên đúng như Thầy ghi trong sổ', 'error')
+    if (!/^(19|20)\d{2}$/.test(nam)) return showToast('Nhập năm sinh 4 chữ số, ví dụ 2009', 'error')
+    // Nhớ cho lần sau — em không phải gõ lại mỗi ca.
+    try {
+      localStorage.setItem(KHOA_HO_TEN, ten)
+      localStorage.setItem(KHOA_NAM_SINH, nam)
+    } catch {
+      // trình duyệt chặn storage — chỉ mất tiện dùng, vẫn thi được
+    }
     setPhase('loading')
     try {
       const existing = await loadAttempt(ma, sb)
@@ -335,7 +371,7 @@ export default function ExamTakeScreen() {
       let kq: KetQuaVaoThi | null = null
       if (url) {
         try {
-          kq = await vaoThi(url, ma, sb, idTb, !cached)
+          kq = await vaoThi(url, ma, sb, idTb, !cached, { hoTen: ten, namSinh: nam })
         } catch {
           kq = null
         }
@@ -831,6 +867,38 @@ export default function ExamTakeScreen() {
                   placeholder="Số báo danh"
                   value={sbd}
                   onChange={(e) => setSbd(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleJoin()
+                  }}
+                />
+              </div>
+              {/* HỌ TÊN + NĂM SINH: máy chủ đối chiếu với danh sách của thầy.
+                  Gõ nhầm một chữ số báo danh sẽ bị chặn ngay ở đây thay vì tạo
+                  ra một em lạ trong bảng điểm. Máy nhớ sẵn từ lần trước. */}
+              <div>
+                <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginBottom: 'var(--k2)' }}>Họ và tên</div>
+                <input
+                  className="tap-target w-full"
+                  style={O_DANH_TINH}
+                  placeholder="Họ và tên"
+                  autoComplete="name"
+                  value={hoTen}
+                  onChange={(e) => setHoTen(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleJoin()
+                  }}
+                />
+              </div>
+              <div>
+                <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginBottom: 'var(--k2)' }}>Năm sinh</div>
+                <input
+                  className="tap-target w-full"
+                  style={{ ...O_DANH_TINH, fontVariantNumeric: 'tabular-nums' }}
+                  placeholder="2009"
+                  inputMode="numeric"
+                  maxLength={4}
+                  value={namSinh}
+                  onChange={(e) => setNamSinh(e.target.value.replace(/\D/g, '').slice(0, 4))}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleJoin()
                   }}

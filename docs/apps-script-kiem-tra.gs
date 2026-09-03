@@ -124,12 +124,14 @@ const YEUCAU_HEADERS = ['Id', 'SBD', 'ChuyenDe', 'SoCau', 'TaoLuc', 'TaoBoi', 'T
 // Số câu mặc định khi phụ huynh bấm đồng ý mà không chọn gì.
 const SO_CAU_YEU_CAU_MAC_DINH = 10
 
-// DANH SÁCH LỚP — bản sao Google Sheet danh sách lớp của thầy, do app thầy đẩy
-// lên (lệnh napDanhSachLop, đòi mã bí mật). Máy chủ CHỈ ĐỌC nó để tra HỌ TÊN,
-// NĂM SINH và LỚP khi một em vào thi lần đầu — em chỉ gõ số báo danh, không gõ
-// tên, nên tên phải đến từ đây. Sheet gốc vẫn là nguồn sự thật: đẩy lại là ghi
-// đè toàn bộ. Không có cột năm sinh trong sheet của thầy thì để rỗng, ca lọc
-// theo khối sẽ chặn em đó cho tới khi thầy điền.
+// DANH SÁCH HỌC SINH CHÍNH THỨC — thầy nạp từ file danh sách của mình (lệnh
+// napDanhSachLop, đòi mã bí mật). Sheet này làm HAI việc:
+//   1. CỔNG VÀO THI: em phải nhập ĐÚNG CẢ BA — số báo danh, họ tên, năm sinh —
+//      khớp một dòng trong đây mới vào thi được, dù mã ca đúng. Gõ nhầm một
+//      chữ số là bị chặn ngay thay vì tạo ra một em lạ trong bảng điểm.
+//   2. NGUỒN HỌ TÊN cho bảng điểm và hồ sơ.
+// Nạp lại là GHI ĐÈ TOÀN BỘ — file của thầy là nguồn sự thật duy nhất. Sheet
+// rỗng thì mọi em đều bị chặn, nên lệnh nạp từ chối danh sách rỗng.
 const SHEET_DSLOP = 'DanhSachLop'
 const DSLOP_HEADERS = ['SBD', 'HoTen', 'NamSinh', 'Lop', 'CapNhatLuc']
 
@@ -344,6 +346,13 @@ function quyetDinhVaoThi_(ca, luot, idThietBi, nowMs, hocSinh) {
     const hetHan = ca.hetHanVao ? msCua_(ca.hetHanVao) : NaN
     if (isFinite(hetHan) && nowMs > hetHan) return { ok: false, lyDo: 'het_han_vao', hetHanVao: ca.hetHanVao }
   }
+  // CỔNG DANH SÁCH HỌC SINH — chặn trước mọi phạm vi ca. Phải khớp đủ ba: số
+  // báo danh, họ tên, năm sinh. hocSinh.trongDanhSach do vaoThi tra sẵn
+  // (null = chưa nạp danh sách bao giờ → mở cổng, để trung tâm không đứng hình
+  // lúc thầy chưa kịp nạp file).
+  // KHÔNG nói rõ trường nào sai: nói ra là cho phép dò tên từ số báo danh.
+  if (hocSinh && hocSinh.trongDanhSach === false) return { ok: false, lyDo: 'sai_ho_so' }
+
   // PHẠM VI GỬI CA (QUANLYCATHI mục 4) — máy chủ kiểm tra, không chỉ ẩn giao diện.
   // khoi: DanhSachMoi = năm sinh; em phải có hồ sơ (sheet HocSinh) đúng năm sinh.
   // chon: DanhSachMoi = JSON mảng SBD.
@@ -366,6 +375,29 @@ function quyetDinhVaoThi_(ca, luot, idThietBi, nowMs, hocSinh) {
 // TOKEN + DUYỆT HỒ SƠ (BA-APP.md đợt 1)
 // ---------------------------------------------------------------------------
 
+/** Chuẩn hoá họ tên để so khớp: bỏ dấu, thường hoá, gộp khoảng trắng.
+ *
+ * Vì sao bỏ dấu: em gõ tên mình trên điện thoại, sai một dấu là trượt — mà mục
+ * đích của bước này là chặn gõ nhầm số báo danh và chặn em lạ, không phải làm
+ * mật khẩu. Người khác vẫn phải biết đủ CẢ BA: số báo danh, tên, năm sinh. */
+function chuanTen_(v) {
+  return String(v == null ? '' : v)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/** Năm sinh về đúng 4 chữ số — ô Sheet có thể là số, là ngày, hay là chuỗi. */
+function chuanNamSinh_(v) {
+  if (v instanceof Date) return String(v.getFullYear())
+  const m = String(v == null ? '' : v).match(/(19|20)\d{2}/)
+  return m ? m[0] : ''
+}
+
 /** Tra một em trong bản sao danh sách lớp. Trả null nếu chưa đẩy hoặc không có. */
 function timTrongDanhSachLop_(sbd) {
   try {
@@ -376,7 +408,7 @@ function timTrongDanhSachLop_(sbd) {
     const khoa = String(sbd).trim()
     for (let i = 1; i < data.length; i++) {
       if (String(data[i][0]).trim() === khoa) {
-        return { sbd: khoa, hoTen: String(data[i][1] || ''), namSinh: String(data[i][2] || ''), lop: String(data[i][3] || '') }
+        return { sbd: khoa, hoTen: String(data[i][1] || ''), namSinh: chuanNamSinh_(data[i][2]), lop: String(data[i][3] || '') }
       }
     }
     return null
@@ -385,20 +417,30 @@ function timTrongDanhSachLop_(sbd) {
   }
 }
 
-/** EM THI LÀ TỰ CÓ TÊN TRONG DANH SÁCH.
+/** Sheet DanhSachLop đã có dòng nào chưa. Chưa nạp bao giờ ⇒ KHÔNG chặn ai:
+ * bật tính năng này lên mà chặn sạch cả trung tâm thì hỏng buổi dạy. */
+function coDanhSachHocSinh_() {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sh = ss.getSheetByName(SHEET_DSLOP)
+    return !!sh && sh.getLastRow() > 1
+  } catch (err) {
+    return false
+  }
+}
+
+/** EM CÓ TRONG DANH SÁCH THÌ CÓ HỒ SƠ.
  *
- * Từ v22 không còn màn đăng ký (app học sinh tách sang repo riêng): em nào vào
- * thi mà chưa có dòng trong sheet HocSinh thì thêm ngay tại đây. Họ tên, năm
- * sinh, lớp tra từ bản sao danh sách lớp; không tra được thì để rỗng và lấy tạm
- * lớp của ca — thầy sửa hoặc xoá sau ở màn Học sinh (chỉ thầy xoá được, lệnh
- * deleteStudent đòi mã bí mật).
+ * Không còn màn đăng ký (app học sinh tách sang repo riêng). Em vào thi mà chưa
+ * có dòng trong sheet HocSinh thì thêm tại đây, họ tên/năm sinh/lớp lấy từ danh
+ * sách thầy đã nạp. CHỈ gọi khi số báo danh đã qua cổng danh sách — hàm này
+ * không tự quyết ai được thi.
  *
  * Trả về đúng khuôn hoSoHocSinh_ để chỗ gọi dùng thẳng. */
-function themEmVaoDanhSach_(sbd, ca) {
+function themEmVaoDanhSach_(sbd, ca, tu) {
   try {
     const sh = sheetHS_()
     if (findRowByKey_(sh, 0, sbd) >= 0) return hoSoHocSinh_(sbd)
-    const tu = timTrongDanhSachLop_(sbd)
     const row = []
     for (let i = 0; i < HS_HEADERS.length; i++) row.push('')
     row[0] = String(sbd)
@@ -1244,11 +1286,30 @@ function doPost(e) {
       const sh = sheetLuot_()
       const luot = luotMoiNhatTheoSbd_(sh, maCa)[sbd] || null
       const now = Date.now()
-      // Em chưa có trong danh sách thì thêm ngay, TRƯỚC khi xét phạm vi — để
-      // ca lọc theo khối đọc được năm sinh vừa tra từ danh sách lớp.
+      // CỔNG DANH SÁCH trước mọi thứ khác: phải khớp ĐỦ BA — số báo danh, họ
+      // tên, năm sinh — với một dòng trong danh sách thầy đã nạp. Chưa nạp danh
+      // sách bao giờ thì không chặn ai (để trung tâm không đứng hình).
+      const coDs = coDanhSachHocSinh_()
+      const dong = coDs ? timTrongDanhSachLop_(sbd) : null
+      let trongDs = dong
+      if (coDs && dong) {
+        const tenGoi = chuanTen_(body.hoTen)
+        const namGoi = chuanNamSinh_(body.namSinh)
+        // Dòng trong danh sách thiếu tên hoặc năm sinh thì không lấy đó làm cớ
+        // chặn em — chỉ so những gì thầy đã điền.
+        const tenKhop = !chuanTen_(dong.hoTen) || tenGoi === chuanTen_(dong.hoTen)
+        const namKhop = !dong.namSinh || namGoi === dong.namSinh
+        if (!tenKhop || !namKhop) trongDs = null
+      }
+      // Em qua cổng mà chưa có hồ sơ thì tạo luôn, TRƯỚC khi xét phạm vi — để
+      // ca lọc theo khối đọc được năm sinh vừa lấy từ danh sách.
       let hoSo = hoSoHocSinh_(sbd)
-      if (!hoSo) hoSo = themEmVaoDanhSach_(sbd, ca)
-      const qd = quyetDinhVaoThi_(ca, luot, idThietBi, now, { sbd: sbd, namSinh: hoSo ? hoSo.namSinh : '' })
+      if (!hoSo && (!coDs || trongDs)) hoSo = themEmVaoDanhSach_(sbd, ca, trongDs)
+      const qd = quyetDinhVaoThi_(ca, luot, idThietBi, now, {
+        sbd: sbd,
+        namSinh: hoSo ? hoSo.namSinh : '',
+        trongDanhSach: coDs ? !!trongDs : null,
+      })
       if (!qd.ok) {
         qd.serverNow = now
         qd.thoiGianPhut = ca.thoiGianPhut

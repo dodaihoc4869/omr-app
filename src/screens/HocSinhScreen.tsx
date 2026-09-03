@@ -13,6 +13,7 @@ import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { classify } from '../engine/score'
 import { useAppStore } from '../store/appStore'
 import GiaoBaiTap from '../components/GiaoBaiTap'
+import NutDongBoDanhSach from '../components/NutDongBoDanhSach'
 import { baiTapCuaEm, danhSachYeuCau, type BaiTapCuaEm, type YeuCauGiaoBai } from '../lib/exam-api'
 import { soanPhieuZalo, NHAC_TRUOC_KHI_GUI } from '../lib/phieu-zalo'
 
@@ -36,7 +37,6 @@ const O_NHAP: React.CSSProperties = {
 export { toneXepLoai, laYeu, NGUONG_YEU, SO_CAU_DU_TIN, NHAN_BAI_TAP } from '../components/HoSoEmView'
 
 export default function HocSinhScreen() {
-  const setScreen = useAppStore((s) => s.setScreen)
   const sbdDangXem = useAppStore((s) => s.sbdDangXem)
   const moHoSoEm = useAppStore((s) => s.moHoSoEm)
 
@@ -248,19 +248,23 @@ export default function HocSinhScreen() {
   // ------------------------------------------------------------- DANH SÁCH EM
   return (
     <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
         <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
           Học sinh
         </h1>
-        <button onClick={() => setScreen('classlist')} style={NHAN_NHO} className="tap-target">
-          Danh sách lớp →
-        </button>
+        {/* CÙNG MỘT NÚT VỚI KHO ĐỀ: bấm là chọn file danh sách rồi đẩy lên máy
+            chủ. Danh sách này là CỔNG VÀO THI — nạp xong, số báo danh ngoài
+            danh sách không thi được nữa. */}
+        <NutDongBoDanhSach onXong={() => void tai()} />
       </div>
 
       {/* Nói thẳng chạm vào đâu để giao bài — nút Giao bài tập nằm trong hồ sơ
           từng em (phải biết em yếu chuyên đề nào mới rút được câu), nên nhìn
           danh sách không đoán ra. */}
-      <div style={NHAN_NHO}>Chạm một em để xem hồ sơ, giao bài tập về nhà và copy phiếu Zalo.</div>
+      <div style={NHAN_NHO}>
+        Chạm một em để xem hồ sơ, giao bài tập về nhà và copy phiếu Zalo. Em chỉ vào thi được khi nhập đúng cả ba: số báo danh, họ tên,
+        năm sinh — khớp file danh sách đã đồng bộ.
+      </div>
 
       {yeuCau.length > 0 && (
         <OThongBao tone="cam">

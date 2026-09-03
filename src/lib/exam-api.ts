@@ -51,6 +51,7 @@ export type LyDoChan =
   | 'chua_co_ho_so'
   | 'khong_thuoc_khoi'
   | 'khong_trong_danh_sach'
+  | 'sai_ho_so'
   | 'thieu'
 
 /** Phạm vi gửi ca (QUANLYCATHI mục 4): tu_do = ai có mã đều vào · khoi = theo
@@ -93,8 +94,15 @@ export type KetQuaVaoThi =
 /** Xin vào thi: máy chủ kiểm tra (mã ca, SBD, id thiết bị) rồi tạo/khôi phục
  * lượt và trả mốc giờ (vaoLuc, hetGioLuc theo giờ máy chủ). canBank=true khi
  * máy em chưa có đề trong cache → nhận luôn đề (không đáp án) trong cùng 1 lượt gọi. */
-export async function vaoThi(scriptUrl: string, maCa: string, sbd: string, idThietBi: string, canBank: boolean): Promise<KetQuaVaoThi> {
-  const r = await postJson(scriptUrl, { action: 'vaoThi', maCa, sbd, idThietBi, canBank })
+export async function vaoThi(
+  scriptUrl: string,
+  maCa: string,
+  sbd: string,
+  idThietBi: string,
+  canBank: boolean,
+  danhTinh: { hoTen: string; namSinh: string } = { hoTen: '', namSinh: '' },
+): Promise<KetQuaVaoThi> {
+  const r = await postJson(scriptUrl, { action: 'vaoThi', maCa, sbd, idThietBi, canBank, hoTen: danhTinh.hoTen, namSinh: danhTinh.namSinh })
   if (r.ok) {
     return {
       ok: true,
@@ -140,6 +148,9 @@ export function thongDiepChan(kq: Extract<KetQuaVaoThi, { ok: false }>, gio: (is
       return `Ca này dành cho khối ${khoiTuNamSinh(kq.namSinh ?? '') ?? '?'} (sinh ${kq.namSinh}). Số báo danh của em không thuộc khối này.`
     case 'khong_trong_danh_sach':
       return 'Ca này thầy chỉ mở cho một số em — số báo danh của em không có trong danh sách.'
+    // KHÔNG nói rõ sai ở ô nào: nói ra là cho phép dò tên từ số báo danh.
+    case 'sai_ho_so':
+      return 'Số báo danh, họ tên hoặc năm sinh không khớp danh sách lớp. Kiểm tra lại đúng như Thầy ghi trong sổ; vẫn không vào được thì báo Thầy.'
     default:
       return kq.error || 'Không vào được ca thi.'
   }
