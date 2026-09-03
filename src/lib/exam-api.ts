@@ -708,6 +708,28 @@ export async function xoaCa(scriptUrl: string, secret: string, maCa: string, xac
   if (!r.ok) throw new Error(r.error || 'Không xoá được ca')
 }
 
+/** Kết quả xoá hàng loạt: ca nào xoá được, ca nào không kèm lý do. */
+export interface KetQuaXoaNhieu {
+  ok: string[]
+  loi: { maCa: string; loi: string }[]
+}
+
+/** Xoá MỀM nhiều ca một lượt. Gọi tuần tự (Apps Script ghi Sheet, chạy song song
+ * dễ chèn nhau); mỗi ca tự lấy mã của nó làm xacNhan vì thầy đã tích chọn ca đó
+ * trên màn hình. Một ca lỗi KHÔNG chặn các ca còn lại. */
+export async function xoaNhieuCa(scriptUrl: string, secret: string, dsMaCa: string[]): Promise<KetQuaXoaNhieu> {
+  const kq: KetQuaXoaNhieu = { ok: [], loi: [] }
+  for (const maCa of dsMaCa) {
+    try {
+      await xoaCa(scriptUrl, secret, maCa, maCa)
+      kq.ok.push(maCa)
+    } catch (e) {
+      kq.loi.push({ maCa, loi: e instanceof Error ? e.message : 'lỗi không rõ' })
+    }
+  }
+  return kq
+}
+
 /** Một dòng ChiTietCau (mục 5). soCau = số thứ tự em nhìn thấy (1..n trong phần). */
 export interface ChiTietCauRow {
   phan: 'I' | 'II' | 'III'
