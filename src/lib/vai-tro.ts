@@ -18,29 +18,85 @@ export interface DuongVao {
 
 const DAI_TOKEN = 32
 
+export function tokenHopLe(token: string): boolean {
+  return /^[A-Za-z0-9]{32}$/.test(token) && token.length === DAI_TOKEN
+}
+
+/**
+ * Đọc vai từ đường link.
+ *
+ * VAI KHÔNG ĐÒI TOKEN TRONG LINK. App đã cài ra màn hình chính mở bằng
+ * `start_url` của manifest — `?vai=hs&nguon=pwa`, KHÔNG có token, vì token là
+ * của riêng từng em, không nhét vào file manifest chung được. Token đã nằm sẵn
+ * trong máy (IndexedDB) từ lần đầu em bấm link riêng thầy gửi.
+ *
+ * Trước đây hàm này đòi token hợp lệ mới nhận vai, nên mở app đã cài sẽ rơi về
+ * `vai: null` và app hiện MÀN QUẢN LÝ CỦA THẦY — sai màn hoàn toàn.
+ *
+ * Vai chỉ quyết định HIỂN THỊ. Chặn thật vẫn ở Apps Script: mọi lệnh đọc dữ
+ * liệu một em đều tra token ra SBD ở máy chủ, nên gõ tay `?vai=hs` không đọc
+ * được gì nếu máy không có token.
+ */
 export function docDuongVao(search: string): DuongVao {
   const q = new URLSearchParams(search)
   const vaiRaw = (q.get('vai') || '').trim()
   const token = (q.get('token') || '').trim()
   const maCa = (q.get('examCode') || '').trim()
-  const hopLe = /^[A-Za-z0-9]{32}$/.test(token) && token.length === DAI_TOKEN
   if (vaiRaw === 'gv') return { vai: 'gv', token: '', maCa }
-  if ((vaiRaw === 'hs' || vaiRaw === 'ph') && hopLe) return { vai: vaiRaw, token, maCa }
+  if (vaiRaw === 'hs' || vaiRaw === 'ph') {
+    return { vai: vaiRaw, token: tokenHopLe(token) ? token : '', maCa }
+  }
   return { vai: null, token: '', maCa }
 }
 
-/** Xoá token khỏi thanh địa chỉ sau khi app đã lưu vào máy — link dán nhầm vào
- * nhóm chat thì cũng không còn nằm trong lịch sử trình duyệt của em. */
+/** Xoá TOKEN khỏi thanh địa chỉ sau khi app đã lưu vào máy — link dán nhầm vào
+ * nhóm chat thì cũng không còn nằm trong lịch sử trình duyệt của em.
+ *
+ * GIỮ LẠI `vai`: nó không phải bí mật, và xoá nó đi thì em kéo tải lại trang
+ * trong app đã cài là rơi về màn quản lý của thầy. */
 export function xoaDauVetToken(): void {
   try {
     const q = new URLSearchParams(location.search)
-    if (!q.get('token') && !q.get('vai')) return
+    if (!q.get('token')) return
     q.delete('token')
-    q.delete('vai')
     const con = q.toString()
     history.replaceState(null, '', location.pathname + (con ? `?${con}` : ''))
   } catch {
     // trình duyệt cũ không có history.replaceState — bỏ qua, không ảnh hưởng chức năng
+  }
+}
+
+const KHOA_VAI = 'ddh.vai'
+
+/** Nhớ vai trên MÁY EM / MÁY PHỤ HUYNH, để mở app bằng đường trống (bookmark,
+ * trình duyệt khôi phục tab) vẫn vào đúng app chứ không rơi về màn của thầy.
+ * KHÔNG nhớ vai `gv` — máy thầy nhận ra bằng mã bí mật, không cần đánh dấu. */
+export function nhoVai(vai: VaiTro): void {
+  if (vai !== 'hs' && vai !== 'ph') return
+  try {
+    localStorage.setItem(KHOA_VAI, vai)
+  } catch {
+    // trình duyệt chặn storage — vẫn chạy được bằng vai trên đường link
+  }
+}
+
+/** Vai đã nhớ. Máy thầy (có mã bí mật) thì bỏ qua hoàn toàn: thầy có thể đã
+ * mở thử link phụ huynh, không được vì thế mà biến máy thầy thành máy phụ huynh. */
+export function vaiDaNho(coMaBiMat: boolean): VaiTro | null {
+  if (coMaBiMat) return null
+  try {
+    const v = localStorage.getItem(KHOA_VAI)
+    return v === 'hs' || v === 'ph' ? v : null
+  } catch {
+    return null
+  }
+}
+
+export function quenVai(): void {
+  try {
+    localStorage.removeItem(KHOA_VAI)
+  } catch {
+    // không xoá được thì thôi
   }
 }
 

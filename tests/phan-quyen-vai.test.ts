@@ -94,9 +94,14 @@ describe('App — đường link quyết định vai', () => {
     expect(docDuongVao(`?vai=ph&token=${t}`).vai).toBe('ph')
   })
 
-  it('token sai độ dài hoặc có ký tự lạ → KHÔNG nhận vai', () => {
-    expect(docDuongVao('?vai=hs&token=abc').vai).toBeNull()
-    expect(docDuongVao(`?vai=hs&token=${'a'.repeat(31)}!`).vai).toBeNull()
+  // VAI chỉ là chuyện hiển thị, TOKEN mới là chuyện quyền. Token sai độ dài
+  // hoặc có ký tự lạ thì BỎ HẲN, không lưu vào máy; vai vẫn nhận vì app đã cài
+  // mở lên bằng start_url không hề có token (xem tests/mo-app-da-cai.test.ts).
+  // Không có token trong máy thì mọi lệnh đọc dữ liệu đều bị máy chủ chặn.
+  it('token sai độ dài hoặc có ký tự lạ → KHÔNG nhận token', () => {
+    expect(docDuongVao('?vai=hs&token=abc').token).toBe('')
+    expect(docDuongVao(`?vai=hs&token=${'a'.repeat(31)}!`).token).toBe('')
+    expect(docDuongVao(`?vai=ph&token=${'a'.repeat(33)}`).token).toBe('')
   })
 
   it('vai gv không cần token; không có tham số thì không có vai', () => {

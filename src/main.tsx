@@ -5,7 +5,8 @@ import './styles/tokens.css'
 import './index.css'
 import 'katex/dist/katex.min.css'
 import App from './App.tsx'
-import { batSuKienCaiApp } from './lib/pwa-install'
+import { batSuKienCaiApp, datManifestTheoVai } from './lib/pwa-install'
+import { docDuongVao } from './lib/vai-tro'
 import { batTuHoiBanMoi, daySangBanMoi } from './lib/cap-nhat-app'
 
 // BẢN MỚI PHẢI VỀ NGAY LẦN MỞ ĐẦU. Ba lớp cùng lo việc này:
@@ -33,6 +34,12 @@ registerSW({
 // Bắt beforeinstallprompt TRƯỚC khi React mount (sự kiện chỉ bắn 1 lần) —
 // để màn vào thi có nút "Cài đặt" 1 chạm (DaiNhacCaiApp).
 batSuKienCaiApp()
+
+// ĐẶT MANIFEST THEO VAI NGAY, trước khi React mount. Chrome đọc thẻ
+// <link rel="manifest"> rất sớm để quyết định bắn beforeinstallprompt và cài
+// app nào; đổi thẻ sau khi React chạy là ăn may. Đặt sớm thì em bấm Cài đặt
+// được đúng "ĐĐH Học sinh" / "ĐĐH Phụ huynh".
+datManifestTheoVai(docDuongVao(location.search).vai)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

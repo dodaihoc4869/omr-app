@@ -4,10 +4,10 @@ import Toast from './components/Toast'
 import MessagesFab from './components/MessagesFab'
 import { useAppStore } from './store/appStore'
 import { loadClassList } from './lib/classlist-db'
-import { docDuongVao, manDauCua, xoaDauVetToken } from './lib/vai-tro'
+import { docDuongVao, manDauCua, nhoVai, vaiDaNho, xoaDauVetToken, type VaiTro } from './lib/vai-tro'
 import { datManifestTheoVai } from './lib/pwa-install'
 import DaiCaiApp from './components/DaiCaiApp'
-import { saveTokenHocSinh, saveTokenPhuHuynh } from './lib/exam-db'
+import { loadTeacherSecret, saveTokenHocSinh, saveTokenPhuHuynh } from './lib/exam-db'
 import ClassListScreen from './screens/ClassListScreen'
 import ExamHubScreen from './screens/ExamHubScreen'
 import ExamSetupScreen from './screens/ExamSetupScreen'
@@ -54,14 +54,21 @@ function App() {
   // mới tới link riêng /hs/<token>, /ph/<token>, /gv. Token lưu vào máy rồi
   // xoá khỏi thanh địa chỉ ngay.
   useEffect(() => {
-    const { vai, token, maCa } = docDuongVao(location.search)
-    const luuToken = async () => {
-      if (vai === 'hs' && token) await saveTokenHocSinh(token)
-      if (vai === 'ph' && token) await saveTokenPhuHuynh(token)
+    const { vai: vaiLink, token, maCa } = docDuongVao(location.search)
+    const dungVai = async (): Promise<VaiTro | null> => {
+      if (vaiLink === 'hs' && token) await saveTokenHocSinh(token)
+      if (vaiLink === 'ph' && token) await saveTokenPhuHuynh(token)
+      if (vaiLink) {
+        nhoVai(vaiLink)
+        return vaiLink
+      }
+      // Đường trống (bookmark, trình duyệt khôi phục tab, app đã cài mở lại sau
+      // khi thanh địa chỉ đã bị dọn): lấy vai đã nhớ, trừ máy thầy.
+      return vaiDaNho(!!(await loadTeacherSecret()))
     }
-    luuToken()
-      .catch(() => {})
-      .finally(() => {
+    dungVai()
+      .catch(() => null)
+      .then((vai) => {
         if (vai) {
           setVai(vai)
           // Manifest theo vai: học sinh và phụ huynh cài ra HAI app khác nhau
