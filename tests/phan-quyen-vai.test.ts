@@ -114,3 +114,36 @@ describe('App — đường link quyết định vai', () => {
     expect(manDauCua('gv')).toBe('examhub')
   })
 })
+
+describe('Số điện thoại làm khoá tra cứu phụ huynh', () => {
+  // Google Sheets tự đổi "0912345678" thành SỐ 912345678 (mất số 0 đầu). Mọi
+  // số điện thoại Việt Nam đều bắt đầu bằng 0, nên không chuẩn hoá là tra
+  // trượt toàn bộ phụ huynh.
+  const gs2 = new Function(
+    'Utilities',
+    `${gsCode}\nreturn { chuanSdt_, timDongPH_ }`,
+  )({ getUuid: () => 'x' }) as {
+    chuanSdt_: (v: unknown) => string
+    timDongPH_: (sh: { getDataRange: () => { getValues: () => unknown[][] } }, sdt: string) => number
+  }
+
+  const sheetPH = (rows: unknown[][]) => ({ getDataRange: () => ({ getValues: () => rows }) })
+
+  it('chuẩn hoá: bỏ số 0 đầu, bỏ ký tự lạ, chịu được ô lưu dạng số', () => {
+    expect(gs2.chuanSdt_('0912345678')).toBe('912345678')
+    expect(gs2.chuanSdt_(912345678)).toBe('912345678')
+    expect(gs2.chuanSdt_(' 091 234 5678 ')).toBe('912345678')
+    expect(gs2.chuanSdt_('')).toBe('')
+  })
+
+  it('tra ra đúng dòng dù sheet lưu số điện thoại dạng SỐ', () => {
+    const rows = [
+      ['SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'DangKyLuc', 'Token', 'TrangThai', 'DuyetLuc'],
+      [912345678, 'Chị Lan', '110234', '11A1', 'Lê Minh Đức', '', '', 'cho_duyet', ''],
+    ]
+    expect(gs2.timDongPH_(sheetPH(rows), '0912345678')).toBe(2)
+    expect(gs2.timDongPH_(sheetPH(rows), '912345678')).toBe(2)
+    expect(gs2.timDongPH_(sheetPH(rows), '0912345679')).toBe(-1)
+    expect(gs2.timDongPH_(sheetPH(rows), '')).toBe(-1)
+  })
+})

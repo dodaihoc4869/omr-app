@@ -361,6 +361,25 @@ function sheetHS_() {
   return sh
 }
 
+/** SỐ ĐIỆN THOẠI làm khoá tra cứu: Google Sheets tự đổi "0912..." thành SỐ
+ * 912... (mất số 0 đầu), nên mọi so sánh phải chuẩn hoá — nếu không thì phụ
+ * huynh nào cũng tra không ra (số điện thoại Việt Nam đều bắt đầu bằng 0). */
+function chuanSdt_(v) {
+  const chuoi = String(v === null || v === undefined ? '' : v).trim().replace(/[^0-9]/g, '')
+  return chuoi.replace(/^0+/, '')
+}
+
+/** Tìm dòng phụ huynh theo SĐT, chịu được cả ô lưu dạng số lẫn dạng chuỗi. */
+function timDongPH_(sh, sdt) {
+  const can = chuanSdt_(sdt)
+  if (!can) return -1
+  const data = sh.getDataRange().getValues()
+  for (let i = 1; i < data.length; i++) {
+    if (chuanSdt_(data[i][0]) === can) return i + 1
+  }
+  return -1
+}
+
 function sheetPH_() {
   const sh = getSheet_(SHEET_PHUHUYNH, PH_HEADERS)
   boSungTieuDe_(sh, PH_HEADERS)
@@ -436,7 +455,7 @@ function phTuYeuCau_(token, sdtCu) {
   const sdt = String(sdtCu || '').trim()
   if (!sdt) return null
   const sh = sheetPH_()
-  const row = findRowByKey_(sh, 0, sdt)
+  const row = timDongPH_(sh, sdt)
   if (row < 0) return null
   if (!conDungDuocDuongCu_(sh, row, PH_COT_TOKEN)) return null
   const v = sh.getRange(row, 1, 1, PH_HEADERS.length).getValues()[0]
@@ -1536,14 +1555,16 @@ function doPost(e) {
     // Đăng ký = XIN, chưa phải được vào (BA-APP.md mục 4E). Thầy duyệt mới
     // cấp token. Ghi đè hồ sơ cũ KHÔNG được xoá token/trạng thái đã duyệt.
     const sh = sheetPH_()
-    const row = findRowByKey_(sh, 0, body.sdt)
-    const rowData = [body.sdt, body.hoTenPhuHuynh, body.sbd, body.lop, body.hoTenHocSinh, new Date().toISOString()]
+    const row = timDongPH_(sh, body.sdt)
+    const rowData = [String(body.sdt || ''), body.hoTenPhuHuynh, body.sbd, body.lop, body.hoTenHocSinh, new Date().toISOString()]
     if (row > 0) {
+      sh.getRange(row, 1).setNumberFormat('@')
       sh.getRange(row, 1, 1, 6).setValues([rowData])
       const ttCu = String(sh.getRange(row, PH_COT_TRANGTHAI + 1).getValue() || '')
       if (!ttCu) sh.getRange(row, PH_COT_TRANGTHAI + 1).setValue('cho_duyet')
     } else {
       sh.appendRow(rowData.concat(['', 'cho_duyet', '']))
+      sh.getRange(sh.getLastRow(), 1).setNumberFormat('@').setValue(String(body.sdt || ''))
     }
     return jsonResponse_({ ok: true, choDuyet: true })
   }
@@ -1593,7 +1614,7 @@ function doPost(e) {
     if (loi) return jsonResponse_({ ok: false, error: loi })
     const laHS = String(body.loai || '') === 'hs'
     const sh = laHS ? sheetHS_() : sheetPH_()
-    const row = findRowByKey_(sh, 0, body.khoa)
+    const row = laHS ? findRowByKey_(sh, 0, body.khoa) : timDongPH_(sh, body.khoa)
     if (row < 0) return jsonResponse_({ ok: false, error: 'Không tìm thấy hồ sơ' })
     const cotToken = (laHS ? HS_COT_TOKEN : PH_COT_TOKEN) + 1
     const cotTrangThai = (laHS ? HS_COT_TRANGTHAI : PH_COT_TRANGTHAI) + 1
@@ -1927,7 +1948,7 @@ function doPost(e) {
     if (loi) return jsonResponse_({ ok: false, error: loi })
     const laHS = String(body.loai || '') === 'hs'
     const sh = laHS ? sheetHS_() : sheetPH_()
-    const row = findRowByKey_(sh, 0, body.khoa)
+    const row = laHS ? findRowByKey_(sh, 0, body.khoa) : timDongPH_(sh, body.khoa)
     if (row < 0) return jsonResponse_({ ok: false, error: 'Không tìm thấy hồ sơ' })
     sh.getRange(row, (laHS ? HS_COT_TOKEN : PH_COT_TOKEN) + 1).setValue('')
     sh.getRange(row, (laHS ? HS_COT_TRANGTHAI : PH_COT_TRANGTHAI) + 1).setValue('cho_duyet')
@@ -2069,7 +2090,7 @@ function doPost(e) {
     const loiDP = kiemTraMaBiMat_(body)
     if (loiDP) return jsonResponse_({ ok: false, error: loiDP })
     const sh = sheetPH_()
-    const row = findRowByKey_(sh, 0, body.sdt)
+    const row = timDongPH_(sh, body.sdt)
     if (row > 0) sh.deleteRow(row)
     return jsonResponse_({ ok: true })
   }
