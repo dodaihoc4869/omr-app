@@ -347,3 +347,39 @@ describe('exam-grade — chấm bài từ ngân hàng câu hỏi khớp với en
     expect(graded.wrongPhanIII).toEqual([])
   })
 })
+
+// ĐÁP ÁN KHÔNG BAO GIỜ XUỐNG MÁY EM LÚC ĐANG THI.
+// Đây là điểm dễ hỏng nhất mà không ai thấy: chỉ cần một lần thêm trường vào
+// bản công khai là em mở công cụ nhà phát triển đọc được đáp án, mà app vẫn
+// chạy đúng nên không test nào khác báo. Khoá cứng ở đây.
+describe('Bản đề gửi máy em KHÔNG chứa đáp án', () => {
+  const nguon = parseExamText(makeSampleText('bi-mat', 4, 2, 2)).source!
+
+  it('bản gốc của thầy CÓ đáp án — nếu không thì test dưới vô nghĩa', () => {
+    expect(nguon.phanI[0]).toHaveProperty('correct')
+    expect(nguon.phanII[0]).toHaveProperty('correct')
+    expect(nguon.phanIII[0]).toHaveProperty('correct')
+  })
+
+  it('bản công khai không còn trường đáp án nào', () => {
+    const cong = mergeAndStrip([nguon])
+    for (const q of [...cong.phanI, ...cong.phanII, ...cong.phanIII]) {
+      expect(q).not.toHaveProperty('correct')
+      expect(q).not.toHaveProperty('solution')
+      expect(q).not.toHaveProperty('loiGiai')
+      expect(q).not.toHaveProperty('dapAn')
+    }
+  })
+
+  it('không có chuỗi đáp án nào lọt qua dạng JSON', () => {
+    const chuoi = JSON.stringify(mergeAndStrip([nguon]))
+    expect(chuoi).not.toContain('"correct"')
+    expect(chuoi).not.toContain('"solution"')
+  })
+
+  it('đề đã xáo gửi cho từng em cũng không mang đáp án', () => {
+    const cong = mergeAndStrip([nguon])
+    const de = assignStudentQuestions(cong, '123456', '001')
+    expect(JSON.stringify(de)).not.toContain('"correct"')
+  })
+})
