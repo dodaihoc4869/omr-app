@@ -124,6 +124,15 @@ const YEUCAU_HEADERS = ['Id', 'SBD', 'ChuyenDe', 'SoCau', 'TaoLuc', 'TaoBoi', 'T
 // Số câu mặc định khi phụ huynh bấm đồng ý mà không chọn gì.
 const SO_CAU_YEU_CAU_MAC_DINH = 10
 
+// DANH SÁCH LỚP — bản sao Google Sheet danh sách lớp của thầy, do app thầy đẩy
+// lên (lệnh napDanhSachLop, đòi mã bí mật). Máy chủ CHỈ ĐỌC nó để tra HỌ TÊN,
+// NĂM SINH và LỚP khi một em vào thi lần đầu — em chỉ gõ số báo danh, không gõ
+// tên, nên tên phải đến từ đây. Sheet gốc vẫn là nguồn sự thật: đẩy lại là ghi
+// đè toàn bộ. Không có cột năm sinh trong sheet của thầy thì để rỗng, ca lọc
+// theo khối sẽ chặn em đó cho tới khi thầy điền.
+const SHEET_DSLOP = 'DanhSachLop'
+const DSLOP_HEADERS = ['SBD', 'HoTen', 'NamSinh', 'Lop', 'CapNhatLuc']
+
 // Lệnh GET chỉ dành cho thầy — phải kèm secret. Trước v12 các lệnh này mở cho
 // bất kỳ ai có link /exec (đọc được cả danh bạ phụ huynh) — đó là lỗ hổng v12 vá.
 const GET_CHI_THAY = ['listParents', 'listStudents', 'listAllFeedback', 'listMessages']
@@ -356,6 +365,54 @@ function quyetDinhVaoThi_(ca, luot, idThietBi, nowMs, hocSinh) {
 // ---------------------------------------------------------------------------
 // TOKEN + DUYỆT HỒ SƠ (BA-APP.md đợt 1)
 // ---------------------------------------------------------------------------
+
+/** Tra một em trong bản sao danh sách lớp. Trả null nếu chưa đẩy hoặc không có. */
+function timTrongDanhSachLop_(sbd) {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sh = ss.getSheetByName(SHEET_DSLOP)
+    if (!sh) return null
+    const data = sh.getDataRange().getValues()
+    const khoa = String(sbd).trim()
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][0]).trim() === khoa) {
+        return { sbd: khoa, hoTen: String(data[i][1] || ''), namSinh: String(data[i][2] || ''), lop: String(data[i][3] || '') }
+      }
+    }
+    return null
+  } catch (err) {
+    return null
+  }
+}
+
+/** EM THI LÀ TỰ CÓ TÊN TRONG DANH SÁCH.
+ *
+ * Từ v22 không còn màn đăng ký (app học sinh tách sang repo riêng): em nào vào
+ * thi mà chưa có dòng trong sheet HocSinh thì thêm ngay tại đây. Họ tên, năm
+ * sinh, lớp tra từ bản sao danh sách lớp; không tra được thì để rỗng và lấy tạm
+ * lớp của ca — thầy sửa hoặc xoá sau ở màn Học sinh (chỉ thầy xoá được, lệnh
+ * deleteStudent đòi mã bí mật).
+ *
+ * Trả về đúng khuôn hoSoHocSinh_ để chỗ gọi dùng thẳng. */
+function themEmVaoDanhSach_(sbd, ca) {
+  try {
+    const sh = sheetHS_()
+    if (findRowByKey_(sh, 0, sbd) >= 0) return hoSoHocSinh_(sbd)
+    const tu = timTrongDanhSachLop_(sbd)
+    const row = []
+    for (let i = 0; i < HS_HEADERS.length; i++) row.push('')
+    row[0] = String(sbd)
+    row[1] = tu ? tu.hoTen : ''
+    row[2] = tu ? tu.namSinh : ''
+    row[3] = tu && tu.lop ? tu.lop : (ca && ca.lop ? String(ca.lop) : '')
+    row[4] = new Date().toISOString()
+    row[HS_COT_TRANGTHAI] = 'tu_vao_thi'
+    sh.appendRow(row)
+    return { sbd: String(sbd), hoTen: row[1], namSinh: row[2], lop: row[3] }
+  } catch (err) {
+    return null
+  }
+}
 
 function sheetHS_() {
   const sh = getSheet_(SHEET_HOCSINH, HS_HEADERS)
@@ -1187,7 +1244,10 @@ function doPost(e) {
       const sh = sheetLuot_()
       const luot = luotMoiNhatTheoSbd_(sh, maCa)[sbd] || null
       const now = Date.now()
-      const hoSo = hoSoHocSinh_(sbd)
+      // Em chưa có trong danh sách thì thêm ngay, TRƯỚC khi xét phạm vi — để
+      // ca lọc theo khối đọc được năm sinh vừa tra từ danh sách lớp.
+      let hoSo = hoSoHocSinh_(sbd)
+      if (!hoSo) hoSo = themEmVaoDanhSach_(sbd, ca)
       const qd = quyetDinhVaoThi_(ca, luot, idThietBi, now, { sbd: sbd, namSinh: hoSo ? hoSo.namSinh : '' })
       if (!qd.ok) {
         qd.serverNow = now
@@ -1961,6 +2021,32 @@ function doPost(e) {
       })
     }
     return jsonResponse_({ ok: true, items: items, serverNow: Date.now() })
+  }
+
+  if (action === 'napDanhSachLop') {
+    // App thầy đẩy bản sao danh sách lớp (Google Sheet của thầy) lên đây, để
+    // máy chủ tra được HỌ TÊN khi em vào thi lần đầu — em chỉ gõ số báo danh.
+    // GHI ĐÈ TOÀN BỘ: sheet gốc của thầy là nguồn sự thật duy nhất, bản này chỉ
+    // là bản sao. Không đụng gì tới sheet HocSinh (điểm, token, em tự vào thi).
+    const loi = kiemTraMaBiMat_(body)
+    if (loi) return jsonResponse_({ ok: false, error: loi })
+    const items = body.items || []
+    if (!items.length) return jsonResponse_({ ok: false, error: 'Danh sách rỗng — không ghi đè' })
+    const sh = getSheet_(SHEET_DSLOP, DSLOP_HEADERS)
+    const luc = new Date().toISOString()
+    const rows = []
+    const daCo = {}
+    for (let i = 0; i < items.length; i++) {
+      const sbd = String(items[i].sbd || '').trim()
+      if (!sbd || daCo[sbd]) continue // số báo danh trùng trong sheet của thầy: giữ dòng đầu
+      daCo[sbd] = true
+      rows.push([sbd, String(items[i].hoTen || '').trim(), String(items[i].namSinh || '').trim(), String(items[i].lop || '').trim(), luc])
+    }
+    if (!rows.length) return jsonResponse_({ ok: false, error: 'Không dòng nào có số báo danh' })
+    sh.clear()
+    sh.appendRow(DSLOP_HEADERS)
+    sh.getRange(2, 1, rows.length, DSLOP_HEADERS.length).setValues(rows)
+    return jsonResponse_({ ok: true, soDong: rows.length, capNhatLuc: luc })
   }
 
   if (action === 'huyDuyet') {

@@ -8,12 +8,15 @@ import {
   type ColumnMapping,
 } from '../lib/sheet-gviz'
 import { loadClassListMeta, saveClassList } from '../lib/classlist-db'
+import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
+import { napDanhSachLop } from '../lib/exam-api'
 
 const FIELD_LABEL: Record<keyof ColumnMapping, string> = {
   sbd: 'Số báo danh',
   hoTen: 'Họ tên',
   sdt: 'SĐT phụ huynh',
   lop: 'Lớp',
+  namSinh: 'Năm sinh',
 }
 
 export default function ClassListScreen() {
@@ -25,7 +28,7 @@ export default function ClassListScreen() {
   const [sheetUrl, setSheetUrl] = useState('')
   const [tsvText, setTsvText] = useState('')
   const [rows, setRows] = useState<string[][] | null>(null)
-  const [mapping, setMapping] = useState<ColumnMapping>({ sbd: null, hoTen: null, sdt: null, lop: null })
+  const [mapping, setMapping] = useState<ColumnMapping>({ sbd: null, hoTen: null, sdt: null, lop: null, namSinh: null })
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -71,6 +74,29 @@ export default function ClassListScreen() {
       mode,
     })
     showToast(`Đã lưu ${list.length} học sinh vào danh sách lớp`, 'success')
+
+    // ĐẨY LUÔN LÊN MÁY CHỦ. Em vào thi chỉ gõ số báo danh; không có bản sao này
+    // thì máy chủ không biết tên em, danh sách học sinh chỉ toàn số. Đẩy ngầm,
+    // hỏng thì báo một dòng chứ không chặn việc lưu ở máy.
+    try {
+      const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
+      if (!url.trim() || !mat.trim()) {
+        showToast('Đã lưu ở máy. Chưa có link Apps Script hoặc mã bí mật nên chưa đẩy lên máy chủ.', 'warn')
+        return
+      }
+      const kq = await napDanhSachLop(
+        url.trim(),
+        mat.trim(),
+        list.map((r) => ({ sbd: r.sbd, hoTen: r.hoTen, namSinh: r.namSinh, lop: r.lop })),
+      )
+      const thieuNam = list.filter((r) => !r.namSinh).length
+      showToast(
+        `Đã đẩy ${kq.soDong} em lên máy chủ — em vào thi là tự có tên${thieuNam ? `. ${thieuNam} em chưa có năm sinh, ca lọc theo khối sẽ chặn các em đó` : ''}`,
+        thieuNam ? 'warn' : 'success',
+      )
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Không đẩy được danh sách lên máy chủ', 'error')
+    }
   }
 
   const header = rows?.[0] ?? []

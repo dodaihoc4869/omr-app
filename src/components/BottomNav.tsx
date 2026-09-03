@@ -15,7 +15,7 @@ export default function BottomNav() {
   // Màn con thuộc tab nào: danh sách lớp (Google Sheet) nằm trong mục Học sinh;
   // các màn của ca kiểm tra nằm trong mục Kiểm tra.
   const CON_CUA_HOC_SINH: ScreenId[] = ['classlist']
-  const CON_CUA_KIEM_TRA: ScreenId[] = ['examhub', 'examsetup', 'examtake', 'exammonitor', 'lichsuca', 'registrationmanager']
+  const CON_CUA_KIEM_TRA: ScreenId[] = ['examhub', 'examsetup', 'examtake', 'exammonitor', 'lichsuca']
   const activeTab: ScreenId = CON_CUA_HOC_SINH.includes(screen) ? 'hocsinh' : CON_CUA_KIEM_TRA.includes(screen) ? 'examhub' : screen
 
   return (

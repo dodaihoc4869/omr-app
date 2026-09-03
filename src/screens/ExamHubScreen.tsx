@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { ClipboardList, GraduationCap, Users, Library, BookPlus, Smartphone } from 'lucide-react'
+import { ClipboardList, GraduationCap, Library, Smartphone } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { PHIEN_BAN_APP } from '../lib/cap-nhat-app'
 import { OThongBao, NutChinh } from '../components/DesignSystem'
@@ -129,11 +129,12 @@ export default function ExamHubScreen() {
       />
       <TheBam icon={<Library size={22} />} title="Ngân hàng câu hỏi" sub="Đề tự về từ kho · duyệt câu nghi đáp án" onClick={() => setScreen('nganhangde')} />
       <TheBam icon={<ClipboardList size={22} />} title="Lịch sử ca thi & chấm bài" sub="Mọi ca đã mở, ai đã nộp, điểm, cho thi lại, xuất bảng điểm" onClick={() => setScreen('lichsuca')} />
-      {/* Giao bài tập nằm trong hồ sơ từng em (phải chọn em mới biết em yếu chuyên
-          đề nào). Nhưng chôn sâu như thế thì không ai tìm ra — thầy đã tìm không
-          thấy. Thẻ này đưa thẳng tới danh sách em. */}
-      <TheBam icon={<BookPlus size={22} />} title="Giao bài tập về nhà" sub="Chọn em → Giao bài tập · chuyên đề em yếu được tick sẵn" onClick={() => setScreen('hocsinh')} />
-      <TheBam icon={<Users size={22} />} title="Quản lý đăng ký" sub="Phụ huynh & học sinh đã đăng ký, gửi tin cho 1 em" onClick={() => setScreen('registrationmanager')} />
+      {/* Giao bài tập vẫn nằm trong hồ sơ từng em — vào bằng tab HỌC SINH ở
+          thanh dưới, chạm một em. Bỏ thẻ lối tắt ở đây theo yêu cầu của thầy;
+          tính năng KHÔNG bị gỡ.
+          Quản lý đăng ký đã gỡ hẳn: màn đăng ký nằm trong app học sinh và app
+          phụ huynh, mà hai app đó đã tách khỏi repo này — hàng chờ duyệt sẽ
+          luôn rỗng. Em nay tự vào danh sách khi thi. */}
 
       <TheCaiApp />
 

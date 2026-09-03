@@ -15,7 +15,6 @@ export type ScreenId =
   | 'examtake'
   | 'exammonitor'
   | 'lichsuca'
-  | 'registrationmanager'
   | 'hocsinh'
 
 export interface ScannedSheet {

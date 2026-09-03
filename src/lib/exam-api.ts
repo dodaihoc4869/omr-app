@@ -391,12 +391,6 @@ export interface ParentStatus {
   } | null
 }
 
-/** Xoá đăng ký phụ huynh (theo SĐT) — dùng khi đăng ký nhầm, cho đăng ký lại từ đầu. */
-export async function deleteParentRegistration(scriptUrl: string, secret: string, sdt: string): Promise<void> {
-  const result = await postJson(scriptUrl, { action: 'deleteParent', secret, sdt })
-  if (!result.ok) throw new Error(result.error || 'Xoá đăng ký thất bại')
-}
-
 // ============================================================================
 // HỌC SINH — đăng ký hồ sơ 1 lần (SBD + họ tên + năm sinh), dùng để tự điền
 // sẵn SBD lúc vào thi và để nhắn tin cho thầy có tên hiển thị rõ ràng.
@@ -499,14 +493,6 @@ export interface RegisteredParent {
   trangThai?: string
 }
 
-export async function listRegisteredParents(scriptUrl: string, secret: string): Promise<RegisteredParent[]> {
-  const url = `${scriptUrl}?action=listParents&secret=${encodeURIComponent(secret)}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
-  const data = await res.json()
-  return data.items || []
-}
-
 export interface RegisteredStudent {
   sbd: string
   hoTen: string
@@ -534,15 +520,6 @@ export interface FeedbackSummary {
   thoiGianNop: string
   diem: number
   xepLoai: string
-}
-
-/** Toàn bộ điểm đã chấm — dùng để thầy tra nhanh theo tên rồi gửi lại cho phụ huynh. */
-export async function listAllFeedback(scriptUrl: string, secret: string): Promise<FeedbackSummary[]> {
-  const url = `${scriptUrl}?action=listAllFeedback&secret=${encodeURIComponent(secret)}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
-  const data = await res.json()
-  return data.items || []
 }
 
 // ============================================================================
@@ -579,33 +556,6 @@ export type LoaiHoSo = 'hs' | 'ph'
 export interface HoSoChoDuyet {
   hocSinh: RegisteredStudent[]
   phuHuynh: RegisteredParent[]
-}
-
-/** Danh sách hồ sơ (cả chờ duyệt lẫn đã duyệt) — chỉ thầy gọi được. */
-export async function danhSachChoDuyet(scriptUrl: string, secret: string): Promise<HoSoChoDuyet> {
-  const r = await postJson(scriptUrl, { action: 'danhSachChoDuyet', secret })
-  if (!r.ok) throw new Error(r.error || 'Không lấy được danh sách hồ sơ')
-  return { hocSinh: (r.hocSinh || []).map((x: RegisteredStudent) => ({ ...x, sbd: String(x.sbd) })), phuHuynh: (r.phuHuynh || []).map((x: RegisteredParent) => ({ ...x, sdt: String(x.sdt), sbd: String(x.sbd) })) }
-}
-
-/** Thầy duyệt hồ sơ → máy chủ cấp token, trả về đuôi link riêng ("hs/<token>"). */
-export async function duyetHoSo(scriptUrl: string, secret: string, loai: LoaiHoSo, khoa: string): Promise<{ token: string; duong: string }> {
-  const r = await postJson(scriptUrl, { action: 'duyetHoSo', secret, loai, khoa })
-  if (!r.ok) throw new Error(r.error || 'Không duyệt được hồ sơ')
-  return { token: String(r.token), duong: String(r.duong) }
-}
-
-/** Cấp lại token (mất máy, lộ link) — token cũ mất hiệu lực ngay lập tức. */
-export async function capLaiToken(scriptUrl: string, secret: string, loai: LoaiHoSo, khoa: string): Promise<{ token: string; duong: string }> {
-  const r = await postJson(scriptUrl, { action: 'capLaiToken', secret, loai, khoa })
-  if (!r.ok) throw new Error(r.error || 'Không cấp lại được link')
-  return { token: String(r.token), duong: String(r.duong) }
-}
-
-/** Thu hồi quyền vào mà giữ nguyên hồ sơ và điểm (em nghỉ học, đăng ký nhầm). */
-export async function huyDuyetHoSo(scriptUrl: string, secret: string, loai: LoaiHoSo, khoa: string): Promise<void> {
-  const r = await postJson(scriptUrl, { action: 'huyDuyet', secret, loai, khoa })
-  if (!r.ok) throw new Error(r.error || 'Không thu hồi được')
 }
 
 // ============================================================================
@@ -678,7 +628,6 @@ export interface EmTomTat {
   namSinh: string
   lop: string
   trangThai: string
-  coLinkRieng: boolean
   soCa: number
   diemGanNhat: number | null
   caGanNhat: string
@@ -744,6 +693,22 @@ export async function danhSachYeuCau(scriptUrl: string, secret: string, tatCa = 
   const r = await postJson(scriptUrl, { action: 'danhSachYeuCau', secret, tatCa })
   if (!r.ok) throw new Error(r.error || 'Không lấy được hàng chờ giao bài')
   return (r.items as YeuCauGiaoBai[]).map((x) => ({ ...x, sbd: String(x.sbd) }))
+}
+
+/** ĐẨY BẢN SAO DANH SÁCH LỚP LÊN MÁY CHỦ.
+ *
+ * Em vào thi chỉ gõ số báo danh, không gõ tên — nên máy chủ phải tra tên ở đâu
+ * đó. Sheet danh sách lớp của thầy là nguồn sự thật; đây là bản sao chỉ-đọc để
+ * máy chủ điền HỌ TÊN, NĂM SINH, LỚP cho em vào thi lần đầu. Ghi đè toàn bộ mỗi
+ * lần đẩy. KHÔNG đụng tới điểm hay hồ sơ đã có. */
+export async function napDanhSachLop(
+  scriptUrl: string,
+  secret: string,
+  items: { sbd: string; hoTen: string; namSinh: string; lop: string }[],
+): Promise<{ soDong: number }> {
+  const r = await postJson(scriptUrl, { action: 'napDanhSachLop', secret, items })
+  if (!r.ok) throw new Error(r.error || 'Không đẩy được danh sách lớp')
+  return { soDong: Number(r.soDong) || 0 }
 }
 
 export async function danhDauYeuCau(scriptUrl: string, secret: string, id: string, trangThai: 'xong' | 'huy', maCa = ''): Promise<void> {

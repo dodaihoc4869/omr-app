@@ -12,7 +12,6 @@ import NganHangDeScreen from './screens/NganHangDeScreen'
 import ExamTakeScreen from './screens/ExamTakeScreen'
 import ExamMonitorScreen from './screens/ExamMonitorScreen'
 import LichSuCaScreen from './screens/LichSuCaScreen'
-import RegistrationManagerScreen from './screens/RegistrationManagerScreen'
 import HocSinhScreen from './screens/HocSinhScreen'
 import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
 
@@ -63,7 +62,6 @@ function App() {
       {screen === 'examtake' && <ExamTakeScreen />}
       {screen === 'exammonitor' && <ExamMonitorScreen />}
       {screen === 'lichsuca' && <LichSuCaScreen />}
-      {screen === 'registrationmanager' && <RegistrationManagerScreen />}
       {screen === 'hocsinh' && <HocSinhScreen />}
       {!HIDE_FAB_ON.includes(screen) && <MessagesFab />}
       {!HIDE_BOTTOMNAV_ON.includes(screen) && <BottomNav />}

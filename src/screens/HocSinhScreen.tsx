@@ -5,10 +5,10 @@
 // Cùng hồ sơ này sẽ dùng lại cho lối vào từ mục Phụ huynh — không dựng hai màn.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, BookPlus, ClipboardCopy, RefreshCw, Search } from 'lucide-react'
+import { ArrowLeft, BookPlus, ClipboardCopy, RefreshCw, Search, Trash2 } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung, DauThe } from '../components/DesignSystem'
 import { KhoiBaiTap, KhoiChuyenDe, KhoiLichSuCa, NGUONG_YEU, toneXepLoai } from '../components/HoSoEmView'
-import { danhSachEm, hoSoEm, khoiTuNamSinh, type EmTomTat, type HoSoEm } from '../lib/exam-api'
+import { danhSachEm, deleteStudentRegistration, hoSoEm, khoiTuNamSinh, type EmTomTat, type HoSoEm } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { classify } from '../engine/score'
 import { useAppStore } from '../store/appStore'
@@ -129,6 +129,26 @@ export default function HocSinhScreen() {
     }
   }
 
+  /** XOÁ EM KHỎI DANH SÁCH — chỉ thầy (máy chủ đòi mã bí mật).
+   *
+   * Bắt gõ đúng số báo danh, giống cách xoá ca: em vào thi là tự có tên nên
+   * danh sách sẽ đông, chạm nhầm rất dễ. Xoá hồ sơ chứ KHÔNG xoá bài làm —
+   * điểm và lịch sử ca vẫn nằm trong LuotThi, em thi lại là tên hiện ra lại. */
+  const xoaEm = async (sbd: string, hoTen: string) => {
+    if (!cauHinh) return showToast('Chưa có link Apps Script hoặc mã bí mật', 'error')
+    const go = prompt(`Xoá "${hoTen || `SBD ${sbd}`}" khỏi danh sách học sinh?\n\nBài làm và điểm của em GIỮ NGUYÊN; em thi ca tiếp theo là tên tự hiện lại.\n\nGõ đúng số báo danh ${sbd} để xoá:`)
+    if (go === null) return
+    if (go.trim() !== sbd) return showToast('Số báo danh gõ vào không khớp — chưa xoá gì', 'warn')
+    try {
+      await deleteStudentRegistration(cauHinh.url, cauHinh.mat, sbd)
+      setDs((truoc) => (truoc ?? []).filter((e) => e.sbd !== sbd))
+      moHoSoEm('')
+      showToast(`Đã xoá ${hoTen || `SBD ${sbd}`} khỏi danh sách`, 'success')
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Không xoá được', 'error')
+    }
+  }
+
   const dsLoc = useMemo(() => {
     const q = timKiem.trim().toLowerCase()
     return (ds ?? []).filter((e) => {
@@ -189,6 +209,17 @@ export default function HocSinhScreen() {
                 </span>
               </NutChinh>
             </div>
+
+            {/* XOÁ EM KHỎI DANH SÁCH — CHỈ THẦY.
+                Em vào thi là tự có tên, nên danh sách sẽ dính cả số báo danh gõ
+                nhầm. Lệnh xoá đòi MÃ BÍ MẬT ở máy chủ, máy em và máy phụ huynh
+                không gọi được. Xoá hồ sơ thôi: bài đã làm và điểm giữ nguyên
+                trong LuotThi, em thi lại là tên lại hiện ra. */}
+            <NutChinh variant="nguyhiem" onClick={() => void xoaEm(hoSo.em.sbd, hoSo.em.hoTen)}>
+              <span className="inline-flex items-center" style={{ gap: 6 }}>
+                <Trash2 size={18} /> Xoá em khỏi danh sách
+              </span>
+            </NutChinh>
 
             <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />
 
@@ -294,12 +325,9 @@ export default function HocSinhScreen() {
           <div style={{ ...NHAN_NHO, padding: 'var(--k4) 0' }}>Đang tải danh sách học sinh…</div>
         ) : dsLoc.length === 0 ? (
           <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
-            <div style={{ ...NHAN_NHO, padding: 'var(--k2) 0' }}>{ds.length === 0 ? 'Chưa em nào đăng ký hồ sơ.' : 'Không có em nào khớp bộ lọc.'}</div>
-            {ds.length === 0 && (
-              <NutChinh variant="phu" onClick={() => setScreen('registrationmanager')}>
-                Mở Quản lý đăng ký
-              </NutChinh>
-            )}
+            <div style={{ ...NHAN_NHO, padding: 'var(--k2) 0' }}>
+              {ds.length === 0 ? 'Chưa em nào có tên trong danh sách. Em vào thi một ca là tự có tên ở đây.' : 'Không có em nào khớp bộ lọc.'}
+            </div>
           </div>
         ) : (
           <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
@@ -324,7 +352,10 @@ export default function HocSinhScreen() {
                   </span>
                   <span className="flex items-center flex-wrap" style={{ gap: 4, marginTop: 6 }}>
                     <Nhan tone={toneXepLoai(e.diemGanNhat)}>{e.diemGanNhat === null ? 'chưa có điểm' : classify(e.diemGanNhat)}</Nhan>
-                    {!e.coLinkRieng && <Nhan tone="xam">chưa có link riêng</Nhan>}
+                    {/* Em tự vào danh sách khi thi; tra được tên trong danh sách
+                        lớp thì có tên, không tra được thì chỉ có số báo danh —
+                        cờ hoá để thầy biết mà bổ sung vào Google Sheet. */}
+                    {!e.hoTen && <Nhan tone="cam">chưa có tên</Nhan>}
                   </span>
                 </Hang>
               )

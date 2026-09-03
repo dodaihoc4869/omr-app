@@ -6,6 +6,9 @@ export interface ClassListRow {
   hoTen: string
   sdt: string
   lop: string
+  /** Năm sinh — chỉ có nếu sheet của thầy có cột đó. Máy chủ cần nó để lọc ca
+   * theo KHỐI; rỗng thì ca lọc khối chặn em cho tới khi thầy điền. */
+  namSinh: string
   // Giữ toàn bộ cột gốc để không mất dữ liệu khi ánh xạ tay chưa khớp hết.
   raw: Record<string, string>
 }
@@ -15,6 +18,7 @@ export interface ColumnMapping {
   hoTen: string | null
   sdt: string | null
   lop: string | null
+  namSinh: string | null
 }
 
 const HEADER_ALIASES: Record<keyof ColumnMapping, string[]> = {
@@ -22,6 +26,7 @@ const HEADER_ALIASES: Record<keyof ColumnMapping, string[]> = {
   hoTen: ['họ tên', 'ho ten', 'họ và tên', 'ho va ten', 'tên', 'ten'],
   sdt: ['sđt', 'sdt', 'điện thoại', 'dien thoai', 'số điện thoại', 'so dien thoai'],
   lop: ['lớp', 'lop'],
+  namSinh: ['năm sinh', 'nam sinh', 'ngày sinh', 'ngay sinh', 'ns'],
 }
 
 function normalizeHeader(h: string): string {
@@ -88,7 +93,7 @@ export function parseTsv(text: string): string[][] {
 
 export function autoMatchColumns(header: string[]): ColumnMapping {
   const normalized = header.map(normalizeHeader)
-  const mapping: ColumnMapping = { sbd: null, hoTen: null, sdt: null, lop: null }
+  const mapping: ColumnMapping = { sbd: null, hoTen: null, sdt: null, lop: null, namSinh: null }
   ;(Object.keys(HEADER_ALIASES) as (keyof ColumnMapping)[]).forEach((key) => {
     const aliases = HEADER_ALIASES[key]
     const idx = normalized.findIndex((h) => aliases.some((a) => h === a || h.includes(a)))
@@ -104,6 +109,7 @@ export function rowsToClassList(rows: string[][], mapping: ColumnMapping): Class
   const iHoTen = idx(mapping.hoTen)
   const iSdt = idx(mapping.sdt)
   const iLop = idx(mapping.lop)
+  const iNamSinh = idx(mapping.namSinh)
 
   return body.map((r) => {
     const raw: Record<string, string> = {}
@@ -114,6 +120,9 @@ export function rowsToClassList(rows: string[][], mapping: ColumnMapping): Class
       // Số điện thoại giữ nguyên dạng chuỗi để không mất số 0 đầu.
       sdt: iSdt >= 0 ? (r[iSdt] ?? '').trim() : '',
       lop: iLop >= 0 ? (r[iLop] ?? '').trim() : '',
+      // Ô "ngày sinh" hay lưu cả ngày (12/05/2009) — chỉ giữ 4 chữ số năm, vì
+      // máy chủ so khối bằng đúng năm sinh.
+      namSinh: iNamSinh >= 0 ? ((r[iNamSinh] ?? '').match(/\b(19|20)\d{2}\b/)?.[0] ?? '') : '',
       raw,
     }
   })
