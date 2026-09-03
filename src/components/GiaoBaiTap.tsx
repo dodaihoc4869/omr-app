@@ -6,7 +6,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { CheckSquare, Square, X } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh } from './DesignSystem'
 import { demCauTheoChuyenDe, rutBaiTap, SO_CAU_BAI_TAP_MAC_DINH, SO_CAU_BAI_TAP_TOI_DA, SO_CAU_BAI_TAP_TOI_THIEU, type MucDoLoc } from '../lib/bai-tap'
-import { publishSession, qidDaLam, danhSachYeuCau, danhDauYeuCau, type ChuyenDeEm } from '../lib/exam-api'
+import { publishSession, qidDaLam, danhSachYeuCau, danhDauYeuCau, danhSachChoDuyet, linkRieng, type ChuyenDeEm } from '../lib/exam-api'
+import { tinBaoBaiTap } from '../lib/phieu-zalo'
 import { loadExamSources, loadScriptUrl, loadTeacherSecret, saveSessionTeacherBank } from '../lib/exam-db'
 import { randomSessionCode } from '../lib/ca-link'
 import type { TeacherExamSource } from '../data/examContent'
@@ -53,6 +54,9 @@ export default function GiaoBaiTap({
   onXong: () => void
 }) {
   const showToast = useAppStore((s) => s.showToast)
+  // Sau khi giao xong: giữ tấm này lại để thầy gửi link riêng cho em ngay.
+  const [daGiao, setDaGiao] = useState<{ soCau: number; hanNop: string } | null>(null)
+  const [tokenEm, setTokenEm] = useState<string | null>(null)
 
   const [nguon, setNguon] = useState<TeacherExamSource[] | null>(null)
   const [mucDo, setMucDo] = useState<MucDoLoc>('tron')
@@ -128,7 +132,17 @@ export default function GiaoBaiTap({
       const thieu = kq.soCau < soCau ? ` — kho chỉ có ${kq.soCau} câu khớp` : ''
       const lap = kq.soCauLapLai > 0 ? `, ${kq.soCauLapLai} câu em đã từng làm` : ''
       showToast(`Đã giao ${kq.soCau} câu cho ${hoTen || sbd}${thieu}${lap}${canhBaoQid}`, kq.soCau < soCau ? 'warn' : 'success')
-      onXong()
+      // KHÔNG đóng ngay. Giao xong mới là xong nửa việc: máy em CHỈ thấy bài khi
+      // mở LINK RIÊNG, không có link thì màn học sinh chỉ còn hồ sơ và ô nhắn
+      // tin — thầy đã gặp đúng cảnh này. Ở lại để thầy gửi link luôn.
+      setDaGiao({ soCau: kq.soCau, hanNop })
+      try {
+        const ds = await danhSachChoDuyet(url.trim(), mat.trim())
+        const em = ds.hocSinh.find((h) => String(h.sbd) === String(sbd))
+        setTokenEm(em?.token || '')
+      } catch {
+        setTokenEm('')
+      }
     } catch (e) {
       setLoi(e instanceof Error ? e.message : 'Không giao được bài')
     } finally {
@@ -157,6 +171,45 @@ export default function GiaoBaiTap({
         </div>
 
         {loi && <OThongBao tone="do">{loi}</OThongBao>}
+
+        {/* GIAO XONG MỚI LÀ NỬA VIỆC. Máy em chỉ thấy bài khi mở LINK RIÊNG;
+            không gửi link thì màn học sinh chỉ còn hồ sơ và ô nhắn tin. */}
+        {daGiao && (
+          <>
+            <OThongBao tone="xanh">
+              Đã giao <b style={SO}>{daGiao.soCau}</b> câu cho {hoTen || `SBD ${sbd}`}. Em <b>chỉ thấy bài khi mở link riêng</b> —
+              gửi link cho em thì bài mới hiện ra.
+            </OThongBao>
+            {tokenEm === null ? (
+              <div style={NHAN_NHO}>Đang lấy link riêng của em…</div>
+            ) : tokenEm ? (
+              <NutChinh
+                onClick={async () => {
+                  const tin = tinBaoBaiTap(hoTen, daGiao.soCau, daGiao.hanNop, linkRieng(`hs/${tokenEm}`))
+                  try {
+                    await navigator.clipboard.writeText(tin)
+                    showToast('Đã copy tin báo bài — dán vào Zalo gửi đúng em này', 'success')
+                  } catch {
+                    showToast(tin, 'success')
+                  }
+                }}
+              >
+                Copy tin báo bài cho em
+              </NutChinh>
+            ) : (
+              <OThongBao tone="cam">
+                Em này <b>chưa có link riêng</b>. Vào <b>Quản lý đăng ký</b> bấm <b>Duyệt</b> cho em, rồi copy link gửi Zalo —
+                chưa có link thì em không xem được bài tập.
+              </OThongBao>
+            )}
+            <NutChinh variant="phu" onClick={onXong}>
+              Xong
+            </NutChinh>
+          </>
+        )}
+
+        {!daGiao && (
+          <>
         {nguon === null && <div style={NHAN_NHO}>Đang đọc ngân hàng câu hỏi trên máy…</div>}
 
         <div>
@@ -284,6 +337,8 @@ export default function GiaoBaiTap({
             {dangGiao ? 'Đang giao…' : 'Giao bài'}
           </NutChinh>
         </div>
+          </>
+        )}
       </div>
     </div>
   )

@@ -107,3 +107,18 @@ export function soanTinRoiMan(d: DuLieuBaoRoiMan, xungHo = 'Anh/chị'): string 
   cau.push('Buổi tới anh/chị nhắc em bật Không làm phiền trước khi làm bài.')
   return cau.join(' ')
 }
+
+/** TIN BÁO BÀI TẬP MỚI GỬI EM, kèm LINK RIÊNG.
+ *
+ * Mắt xích hay bị quên: giao bài xong là xong ở phía thầy, nhưng máy em CHỈ
+ * thấy bài khi mở link riêng — không có link thì màn học sinh chỉ còn hồ sơ và
+ * ô nhắn tin. Nên tin này luôn kèm link, không bắt thầy đi tìm ở màn khác.
+ */
+export function tinBaoBaiTap(hoTen: string, soCau: number, hanNopISO: string, link: string): string {
+  const han = ngayVN(hanNopISO)
+  const cau: string[] = []
+  cau.push(`${hoTen ? hoTen + ', t' : 'T'}hầy vừa giao ${soCau} câu bài tập về nhà${han ? `, hạn nộp ${han}` : ''}.`)
+  cau.push(`Em mở link này để làm: ${link}`)
+  cau.push('Link riêng của em, không đưa cho bạn khác. Làm xong nộp là xem được lời giải ngay.')
+  return cau.join('\n')
+}

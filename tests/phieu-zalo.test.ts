@@ -2,7 +2,7 @@
 // không lời chào, không lời chúc, không khen suông, không thổi phồng, không
 // emoji, không gạch ngang dài; số liệu lấy nguyên từ bài đã chấm.
 import { describe, expect, it } from 'vitest'
-import { demChu, soanPhieuZalo, soanTinRoiMan, type DuLieuPhieu } from '../src/lib/phieu-zalo'
+import { demChu, soanPhieuZalo, soanTinRoiMan, tinBaoBaiTap, type DuLieuPhieu } from '../src/lib/phieu-zalo'
 
 const mau: DuLieuPhieu = {
   hoTen: 'Lê Minh Đức',
@@ -129,5 +129,36 @@ describe('soanTinRoiMan — báo phụ huynh việc rời màn', () => {
     for (const tu of TU_CAM) expect(s.toLowerCase()).not.toContain(tu.toLowerCase())
     expect(demChu(s)).toBeGreaterThanOrEqual(40)
     expect(demChu(s)).toBeLessThanOrEqual(120)
+  })
+})
+
+// TIN BÁO BÀI TẬP — mắt xích thầy đã hụt: giao bài xong, em mở app chỉ thấy hồ
+// sơ và ô nhắn tin, vì máy em CHỈ đọc được bài khi có link riêng.
+describe('tinBaoBaiTap', () => {
+  const LINK = 'https://dodaihoc4869.github.io/omr-app/hs/' + 'a'.repeat(32)
+
+  it('luôn kèm LINK RIÊNG — không có link thì em không thấy bài', () => {
+    expect(tinBaoBaiTap('Trần Minh Anh', 10, '2026-09-10T16:59:00Z', LINK)).toContain(LINK)
+  })
+
+  it('nêu đúng số câu và hạn nộp, không bịa', () => {
+    const t = tinBaoBaiTap('Trần Minh Anh', 10, '2026-09-10T16:59:00Z', LINK)
+    expect(t).toContain('10 câu')
+    expect(t).toContain('10/09')
+  })
+
+  it('không có hạn nộp thì không hứa hạn', () => {
+    const t = tinBaoBaiTap('Trần Minh Anh', 8, '', LINK)
+    expect(t).not.toContain('hạn nộp')
+    expect(t).toContain('8 câu')
+  })
+
+  it('nhắc không đưa link cho bạn khác', () => {
+    expect(tinBaoBaiTap('An', 5, '', LINK)).toContain('không đưa cho bạn khác')
+  })
+
+  it('không lời chào, không lời chúc', () => {
+    const t = tinBaoBaiTap('An', 5, '2026-09-10T16:59:00Z', LINK)
+    for (const tu of TU_CAM) expect(t.toLowerCase()).not.toContain(tu.toLowerCase())
   })
 })
