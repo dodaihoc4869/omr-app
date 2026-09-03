@@ -3,8 +3,9 @@
 // cho thầy. Sau khi đăng ký, học sinh KHÔNG có nút tự xoá/đăng ký lại — chỉ
 // thầy xoá được (ở màn Giáo viên — Quản lý đăng ký), đúng theo yêu cầu.
 import { useEffect, useState } from 'react'
-import { GraduationCap, Send, MessageSquareText, NotebookPen } from 'lucide-react'
-import { registerStudent, fetchStudentProfile, sendStudentMessage, fetchStudentInbox, markTeacherMessagesRead, baiTapCuaEm, type TeacherMessage, type BaiTapCuaEm } from '../lib/exam-api'
+import { GraduationCap, Send, MessageSquareText } from 'lucide-react'
+import { registerStudent, fetchStudentProfile, sendStudentMessage, fetchStudentInbox, markTeacherMessagesRead, baiTapCuaEm, hoSoEm, type TeacherMessage, type BaiTapCuaEm, type HoSoEm } from '../lib/exam-api'
+import { KhoiBaiTap, KhoiChuyenDe, KhoiLichSuCa } from '../components/HoSoEmView'
 import { loadMyStudentSbd, loadScriptUrl, loadTokenHocSinh, saveMyStudentSbd } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 
@@ -34,6 +35,9 @@ export default function StudentProfileScreen() {
   const [inbox, setInbox] = useState<TeacherMessage[]>([])
   // BÀI TẬP VỀ NHÀ (BA-APP đợt 3) — chỉ đọc được khi em đã có link riêng.
   const [baiTap, setBaiTap] = useState<BaiTapCuaEm[] | null>(null)
+  // LỊCH SỬ CA THI + CHUYÊN ĐỀ — cùng dữ liệu, cùng cách trình bày với màn hồ sơ
+  // của thầy (BA-APP.md mục 9: một màn hồ sơ cho ba lối vào).
+  const [hoSo, setHoSo] = useState<HoSoEm | null>(null)
   const [msgText, setMsgText] = useState('')
   const [sendingMsg, setSendingMsg] = useState(false)
 
@@ -78,6 +82,9 @@ export default function StudentProfileScreen() {
       baiTapCuaEm(scriptUrl.trim(), { tokenHS: token })
         .then(setBaiTap)
         .catch(() => setBaiTap([]))
+      hoSoEm(scriptUrl.trim(), { tokenHS: token })
+        .then(setHoSo)
+        .catch(() => setHoSo(null))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, sbd, scriptUrl, token])
@@ -214,38 +221,17 @@ export default function StudentProfileScreen() {
         {lop ? <> — lớp <b className="text-slate-700 dark:text-slate-300">{lop}</b></> : null}
       </div>
 
-      {baiTap !== null && (
-        <div className="rounded-xl p-4 space-y-2.5" style={{ background: 'var(--the)', boxShadow: 'var(--bong-1)' }}>
-          <div className="font-semibold text-sm flex items-center gap-2" style={{ color: 'var(--muc)' }}>
-            <NotebookPen size={16} /> Bài tập về nhà
-          </div>
-          {baiTap.length === 0 ? (
-            <div className="text-sm" style={{ color: 'var(--nhat)' }}>Thầy chưa giao bài tập nào.</div>
-          ) : (
-            baiTap.map((b) => (
-              <button
-                key={b.maCa}
-                onClick={() => moBaiTap(b.maCa)}
-                className="tap-target w-full text-left rounded-lg p-2.5"
-                style={{ background: 'var(--the-2)' }}
-                data-bai-tap={b.maCa}
-              >
-                <div className="font-semibold text-sm">{b.tenCa || `Bài ${b.maCa}`}</div>
-                <div className="text-[12px]" style={{ color: 'var(--nhat)' }}>
-                  {b.hanNop ? `Hạn ${new Date(b.hanNop).toLocaleDateString('vi-VN')}` : 'Không có hạn'} ·{' '}
-                  {b.trangThai === 'da_nop'
-                    ? `đã nộp${b.tong !== null ? ` — ${b.tong.toFixed(2).replace('.', ',')} điểm` : ''}`
-                    : b.trangThai === 'dang_lam'
-                      ? 'đang làm'
-                      : b.trangThai === 'qua_han'
-                        ? 'QUÁ HẠN — làm muộn vẫn nộp được'
-                        : 'chưa làm'}
-                </div>
-              </button>
-            ))
-          )}
+      {/* Khi em CHƯA có link riêng: chưa đọc được lịch sử/bài tập, nói thẳng
+          lý do thay vì để màn trống không hiểu vì sao. */}
+      {!token && (
+        <div className="rounded-xl p-4 text-sm" style={{ background: 'var(--the)', boxShadow: 'var(--bong-1)', color: 'var(--nhat)' }}>
+          Xem lịch sử ca thi và bài tập về nhà cần <b>link riêng Thầy gửi</b>. Đăng ký xong, Thầy duyệt rồi gửi link qua Zalo.
         </div>
       )}
+
+      {token && hoSo && <KhoiLichSuCa ca={hoSo.ca} choEm />}
+      {token && <KhoiBaiTap baiTap={baiTap} onMo={moBaiTap} />}
+      {token && hoSo && <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} choEm />}
 
       <div className="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-4 space-y-2.5">
         <div className="font-semibold text-sm flex items-center gap-2">
