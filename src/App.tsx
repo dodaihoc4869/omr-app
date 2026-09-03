@@ -16,6 +16,7 @@ import LichSuCaScreen from './screens/LichSuCaScreen'
 import ParentScreen from './screens/ParentScreen'
 import StudentProfileScreen from './screens/StudentProfileScreen'
 import RegistrationManagerScreen from './screens/RegistrationManagerScreen'
+import HocSinhScreen from './screens/HocSinhScreen'
 
 // Icon tin nhắn nổi chỉ dành cho THẦY — ẩn ở các màn phụ huynh/học sinh tự
 // dùng trên máy riêng của họ (họ không cần thấy hộp thư của thầy).
@@ -87,6 +88,7 @@ function App() {
       {manHienThi === 'parent' && <ParentScreen />}
       {manHienThi === 'studentprofile' && <StudentProfileScreen />}
       {manHienThi === 'registrationmanager' && <RegistrationManagerScreen />}
+      {manHienThi === 'hocsinh' && <HocSinhScreen />}
       {!laKhach && !HIDE_FAB_ON.includes(manHienThi) && <MessagesFab />}
       {!laKhach && !HIDE_BOTTOMNAV_ON.includes(manHienThi) && <BottomNav />}
     </div>

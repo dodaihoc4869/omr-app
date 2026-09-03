@@ -19,6 +19,7 @@ export type ScreenId =
   | 'parent'
   | 'studentprofile'
   | 'registrationmanager'
+  | 'hocsinh'
 
 export interface ScannedSheet {
   id: string
@@ -44,6 +45,9 @@ interface AppState {
   /** Mã ca đang mở ở màn Chi tiết ca / Theo dõi (đi từ Lịch sử ca thi hoặc ngay sau khi mở ca). */
   maCaTheoDoi: string
   moChiTietCa: (maCa: string) => void
+  /** SBD đang mở hồ sơ ở màn Học sinh (BA-APP.md đợt 2). Rỗng = đang ở danh sách. */
+  sbdDangXem: string
+  moHoSoEm: (sbd: string) => void
 
   sheets: ScannedSheet[]
   addSheet: (sheet: ScannedSheet) => void
@@ -78,6 +82,8 @@ export const useAppStore = create<AppState>((set) => ({
   setVai: (v) => set({ vai: v }),
   maCaTheoDoi: '',
   moChiTietCa: (maCa) => set({ maCaTheoDoi: maCa, screen: 'exammonitor' }),
+  sbdDangXem: '',
+  moHoSoEm: (sbd) => set({ sbdDangXem: sbd, screen: 'hocsinh' }),
 
   sheets: [],
   addSheet: (sheet) => set((st) => ({ sheets: [...st.sheets, sheet] })),

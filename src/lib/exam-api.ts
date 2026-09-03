@@ -683,6 +683,76 @@ export async function huyDuyetHoSo(scriptUrl: string, secret: string, loai: Loai
   if (!r.ok) throw new Error(r.error || 'Không thu hồi được')
 }
 
+// ============================================================================
+// HỒ SƠ HỌC SINH (BA-APP.md đợt 2) — chuyên đề mạnh/yếu + lịch sử ca thi.
+// Máy chủ tổng hợp sẵn (TienDoHS/TienDoCa) nên một lệnh là đủ.
+// ============================================================================
+
+export type XuHuong = 'tot' | 'xau' | 'deu' | 'chua_du'
+
+export interface ChuyenDeEm {
+  ten: string
+  soCau: number
+  soSai: number
+  tiLeSai: number
+  xuHuong: XuHuong
+}
+
+export interface CaCuaEm {
+  maCa: string
+  tenCa: string
+  lop: string
+  lanThu: number
+  nopLuc: string
+  trangThai: string
+  diemI: number | null
+  diemII: number | null
+  diemIII: number | null
+  tong: number | null
+  hang: number | null
+  siSo: number | null
+  soLanRoiMan: number
+}
+
+export interface HoSoEm {
+  em: { sbd: string; hoTen: string; namSinh: string; lop: string }
+  chuyenDe: ChuyenDeEm[]
+  ca: CaCuaEm[]
+}
+
+/** Ai gọi: thầy (secret + sbd) · em (tokenHS) · phụ huynh (tokenPH). */
+export interface QuyenHoSo {
+  secret?: string
+  sbd?: string
+  tokenHS?: string
+  tokenPH?: string
+}
+
+export async function hoSoEm(scriptUrl: string, quyen: QuyenHoSo): Promise<HoSoEm> {
+  const r = await postJson(scriptUrl, { action: 'hoSoEm', ...quyen })
+  if (!r.ok) throw new Error(r.error || 'Không lấy được hồ sơ')
+  return { em: { ...r.em, sbd: String(r.em.sbd) }, chuyenDe: r.chuyenDe || [], ca: (r.ca || []).map((c: CaCuaEm) => ({ ...c, maCa: String(c.maCa) })) }
+}
+
+export interface EmTomTat {
+  sbd: string
+  hoTen: string
+  namSinh: string
+  lop: string
+  trangThai: string
+  coLinkRieng: boolean
+  soCa: number
+  diemGanNhat: number | null
+  caGanNhat: string
+  nopGanNhat: string
+}
+
+export async function danhSachEm(scriptUrl: string, secret: string): Promise<EmTomTat[]> {
+  const r = await postJson(scriptUrl, { action: 'danhSachEm', secret })
+  if (!r.ok) throw new Error(r.error || 'Không lấy được danh sách học sinh')
+  return (r.items as EmTomTat[]).map((x) => ({ ...x, sbd: String(x.sbd) }))
+}
+
 /** Link đầy đủ để thầy gửi Zalo cho em/phụ huynh. */
 export function linkRieng(duong: string): string {
   return `${location.origin}${import.meta.env.BASE_URL}${duong}`

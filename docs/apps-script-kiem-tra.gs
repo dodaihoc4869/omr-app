@@ -91,6 +91,25 @@ const HS_COT_TOKEN = 7 // 0-based trong mảng giá trị
 const HS_COT_TRANGTHAI = 8
 const PH_COT_TOKEN = 6
 const PH_COT_TRANGTHAI = 7
+// TỔNG HỢP SẴN THEO CHUYÊN ĐỀ (BA-APP.md đợt 2). Hồ sơ một em phải mở bằng MỘT
+// lệnh đọc, không quét cả ChiTietCau (34.000 dòng/tháng ở quy mô 300 em).
+// TienDoCa = tổng hợp theo (em, ca, chuyên đề) — dùng vẽ xu hướng ↑↓.
+// TienDoHS = cộng dồn toàn thời gian, LUÔN bằng tổng TienDoCa của em đó (nên
+// chấm lại/ghi đè không bao giờ cộng trùng).
+// QidDaLam = tập câu em ĐÃ từng làm, để đợt 3 rút bài tập tránh câu cũ.
+const SHEET_TIENDO_CA = 'TienDoCa'
+const TIENDO_CA_HEADERS = ['SBD', 'MaCa', 'ChuyenDe', 'SoCau', 'SoSai', 'NopLuc', 'CapNhatLuc']
+const SHEET_TIENDO_HS = 'TienDoHS'
+const TIENDO_HS_HEADERS = ['SBD', 'ChuyenDe', 'SoCau', 'SoSai', 'CapNhatLuc']
+const SHEET_QID = 'QidDaLam'
+const QID_HEADERS = ['SBD', 'DanhSachQid', 'SoCau', 'CapNhatLuc']
+// Số ca gần nhất tính là "gần đây" khi so xu hướng; mỗi bên phải có tối thiểu
+// SO_CAU_TOI_THIEU câu của chuyên đề đó thì mới dám kết luận tăng/giảm.
+const SO_CA_GAN_DAY = 3
+const SO_CAU_TOI_THIEU = 2
+// Chênh lệch tỉ lệ sai coi là "có chuyển biến" (dưới mức này coi như đi ngang).
+const NGUONG_XU_HUONG = 0.05
+
 // Lệnh GET chỉ dành cho thầy — phải kèm secret. Trước v12 các lệnh này mở cho
 // bất kỳ ai có link /exec (đọc được cả danh bạ phụ huynh) — đó là lỗ hổng v12 vá.
 const GET_CHI_THAY = ['listParents', 'listStudents', 'listAllFeedback', 'listMessages']
@@ -399,6 +418,179 @@ function phTuYeuCau_(token, sdtCu) {
   if (!conDungDuocDuongCu_(sh, row, PH_COT_TOKEN)) return null
   const v = sh.getRange(row, 1, 1, PH_HEADERS.length).getValues()[0]
   return { row: row, sdt: String(v[0]), hoTenPhuHuynh: String(v[1] || ''), sbd: String(v[2]), lop: String(v[3] || ''), hoTenHocSinh: String(v[4] || ''), trangThai: String(v[PH_COT_TRANGTHAI] || '') }
+}
+
+// ---------------------------------------------------------------------------
+// TIẾN ĐỘ THEO CHUYÊN ĐỀ (BA-APP.md đợt 2)
+// ---------------------------------------------------------------------------
+
+function sheetTienDoCa_() {
+  const sh = getSheet_(SHEET_TIENDO_CA, TIENDO_CA_HEADERS)
+  boSungTieuDe_(sh, TIENDO_CA_HEADERS)
+  return sh
+}
+
+function sheetTienDoHS_() {
+  const sh = getSheet_(SHEET_TIENDO_HS, TIENDO_HS_HEADERS)
+  boSungTieuDe_(sh, TIENDO_HS_HEADERS)
+  return sh
+}
+
+function sheetQid_() {
+  const sh = getSheet_(SHEET_QID, QID_HEADERS)
+  boSungTieuDe_(sh, QID_HEADERS)
+  return sh
+}
+
+/** Gom mảng câu của MỘT lượt thành { chuyenDe: {soCau, soSai} }. Câu chưa phân
+ * loại chuyên đề gom vào "(chưa phân loại)" — không đoán, không bỏ im lặng. */
+function gomTheoChuyenDe_(cau) {
+  const out = {}
+  for (let i = 0; i < cau.length; i++) {
+    const q = cau[i]
+    const cd = String(q.chuyenDe || '').trim() || '(chưa phân loại)'
+    if (!out[cd]) out[cd] = { soCau: 0, soSai: 0 }
+    out[cd].soCau++
+    // dungSai === false nghĩa là SAI; null/undefined = chưa chấm được -> không tính sai.
+    if (q.dungSai === false) out[cd].soSai++
+  }
+  return out
+}
+
+/** Ghi tổng hợp cho các em vừa chấm trong 1 ca. tomTat = { sbd: { nopLuc,
+ * theoCd: {cd:{soCau,soSai}}, qids: [] } }. Ghi ĐÈ theo khoá, không cộng dồn,
+ * nên chấm lại lần 2 vẫn ra đúng số. Không xoá dòng nào (chuyên đề biến mất
+ * khỏi lần chấm mới thì về 0) — tránh lệch chỉ số khi xoá hàng loạt. */
+function ghiTienDo_(maCa, tomTat) {
+  const dsSbd = Object.keys(tomTat)
+  if (dsSbd.length === 0) return
+  const luc = new Date().toISOString()
+
+  // --- TienDoCa: khoá (SBD, MaCa, ChuyenDe)
+  const caSh = sheetTienDoCa_()
+  const caData = caSh.getDataRange().getValues()
+  const viTri = {}
+  for (let i = 1; i < caData.length; i++) {
+    viTri[String(caData[i][0]) + '' + String(caData[i][1]) + '' + String(caData[i][2])] = i
+  }
+  const themCa = []
+  for (let s = 0; s < dsSbd.length; s++) {
+    const sbd = dsSbd[s]
+    const t = tomTat[sbd]
+    // Chuyên đề đã có dòng cho cặp (sbd, maCa) nhưng lần chấm mới không còn -> về 0.
+    for (let i = 1; i < caData.length; i++) {
+      if (String(caData[i][0]) === sbd && String(caData[i][1]) === maCa && !t.theoCd[String(caData[i][2])]) {
+        caData[i][3] = 0
+        caData[i][4] = 0
+        caData[i][6] = luc
+      }
+    }
+    const dsCd = Object.keys(t.theoCd)
+    for (let c = 0; c < dsCd.length; c++) {
+      const cd = dsCd[c]
+      const v = t.theoCd[cd]
+      const k = sbd + '' + maCa + '' + cd
+      if (viTri[k] !== undefined) {
+        const i = viTri[k]
+        caData[i][3] = v.soCau
+        caData[i][4] = v.soSai
+        caData[i][5] = t.nopLuc || caData[i][5]
+        caData[i][6] = luc
+      } else {
+        themCa.push([sbd, maCa, cd, v.soCau, v.soSai, t.nopLuc || '', luc])
+      }
+    }
+  }
+  if (caData.length > 1) caSh.getRange(2, 1, caData.length - 1, TIENDO_CA_HEADERS.length).setValues(caData.slice(1))
+  if (themCa.length > 0) caSh.getRange(caSh.getLastRow() + 1, 1, themCa.length, TIENDO_CA_HEADERS.length).setValues(themCa)
+
+  // --- TienDoHS: cộng lại TỪ ĐẦU cho các em vừa chấm (nguồn = TienDoCa mới)
+  const tatCaCa = caData.slice(1).concat(themCa)
+  const cong = {}
+  for (let i = 0; i < tatCaCa.length; i++) {
+    const sbd = String(tatCaCa[i][0])
+    if (dsSbd.indexOf(sbd) < 0) continue
+    const cd = String(tatCaCa[i][2])
+    const k = sbd + '' + cd
+    if (!cong[k]) cong[k] = { sbd: sbd, cd: cd, soCau: 0, soSai: 0 }
+    cong[k].soCau += Number(tatCaCa[i][3]) || 0
+    cong[k].soSai += Number(tatCaCa[i][4]) || 0
+  }
+  const hsSh = sheetTienDoHS_()
+  const hsData = hsSh.getDataRange().getValues()
+  const viTriHs = {}
+  for (let i = 1; i < hsData.length; i++) viTriHs[String(hsData[i][0]) + '' + String(hsData[i][1])] = i
+  const themHs = []
+  const dsK = Object.keys(cong)
+  for (let i = 0; i < dsK.length; i++) {
+    const v = cong[dsK[i]]
+    if (viTriHs[dsK[i]] !== undefined) {
+      const r = viTriHs[dsK[i]]
+      hsData[r][2] = v.soCau
+      hsData[r][3] = v.soSai
+      hsData[r][4] = luc
+    } else {
+      themHs.push([v.sbd, v.cd, v.soCau, v.soSai, luc])
+    }
+  }
+  if (hsData.length > 1) hsSh.getRange(2, 1, hsData.length - 1, TIENDO_HS_HEADERS.length).setValues(hsData.slice(1))
+  if (themHs.length > 0) hsSh.getRange(hsSh.getLastRow() + 1, 1, themHs.length, TIENDO_HS_HEADERS.length).setValues(themHs)
+
+  // --- QidDaLam: hợp tập câu đã làm
+  const qSh = sheetQid_()
+  const qData = qSh.getDataRange().getValues()
+  const themQ = []
+  for (let s = 0; s < dsSbd.length; s++) {
+    const sbd = dsSbd[s]
+    const moi = tomTat[sbd].qids || []
+    if (moi.length === 0) continue
+    let r = -1
+    for (let i = 1; i < qData.length; i++) if (String(qData[i][0]) === sbd) { r = i; break }
+    const cu = r >= 0 ? String(qData[r][1] || '').split(',').filter(function (x) { return x }) : []
+    const tap = {}
+    for (let i = 0; i < cu.length; i++) tap[cu[i]] = 1
+    for (let i = 0; i < moi.length; i++) if (moi[i]) tap[String(moi[i])] = 1
+    const ds = Object.keys(tap)
+    if (r >= 0) {
+      qData[r][1] = ds.join(',')
+      qData[r][2] = ds.length
+      qData[r][3] = luc
+    } else {
+      themQ.push([sbd, ds.join(','), ds.length, luc])
+    }
+  }
+  if (qData.length > 1) qSh.getRange(2, 1, qData.length - 1, QID_HEADERS.length).setValues(qData.slice(1))
+  if (themQ.length > 0) qSh.getRange(qSh.getLastRow() + 1, 1, themQ.length, QID_HEADERS.length).setValues(themQ)
+}
+
+/** Xu hướng chuyên đề: so tỉ lệ sai của SO_CA_GAN_DAY ca gần nhất với các ca
+ * trước đó. Thiếu dữ liệu ở một bên -> 'chua_du', không đoán. */
+function xuHuongChuyenDe_(dongCua1Em) {
+  const theoCd = {}
+  for (let i = 0; i < dongCua1Em.length; i++) {
+    const d = dongCua1Em[i]
+    const cd = String(d[2])
+    if (!theoCd[cd]) theoCd[cd] = []
+    theoCd[cd].push({ nopLuc: String(d[5] || ''), soCau: Number(d[3]) || 0, soSai: Number(d[4]) || 0 })
+  }
+  const out = {}
+  const ds = Object.keys(theoCd)
+  for (let i = 0; i < ds.length; i++) {
+    const cd = ds[i]
+    const rows = theoCd[cd].slice().sort(function (a, b) { return msCua_(b.nopLuc) - msCua_(a.nopLuc) })
+    const gan = rows.slice(0, SO_CA_GAN_DAY)
+    const truoc = rows.slice(SO_CA_GAN_DAY)
+    const tong = function (arr, k) { let s = 0; for (let j = 0; j < arr.length; j++) s += arr[j][k]; return s }
+    const cauGan = tong(gan, 'soCau')
+    const cauTruoc = tong(truoc, 'soCau')
+    if (cauGan < SO_CAU_TOI_THIEU || cauTruoc < SO_CAU_TOI_THIEU) { out[cd] = 'chua_du'; continue }
+    const tlGan = tong(gan, 'soSai') / cauGan
+    const tlTruoc = tong(truoc, 'soSai') / cauTruoc
+    if (tlGan < tlTruoc - NGUONG_XU_HUONG) out[cd] = 'tot'
+    else if (tlGan > tlTruoc + NGUONG_XU_HUONG) out[cd] = 'xau'
+    else out[cd] = 'deu'
+  }
+  return out
 }
 
 /** Hồ sơ học sinh đã đăng ký (sheet HocSinh) — null nếu chưa có. */
@@ -1189,6 +1381,7 @@ function doPost(e) {
     const tuChoi = []
     const xoaDong = []
     const themDong = []
+    const tomTat = {}
     for (let b = 0; b < bai.length; b++) {
       const x = bai[b]
       const sbd = String(x.sbd || '').trim()
@@ -1216,11 +1409,18 @@ function doPost(e) {
         themDong.push([maCa, sbd, lanThu, q.phan || '', q.soCau || '', q.qid || '', q.chuyenDe || '', q.mucDo || '', q.dapAnChon === undefined || q.dapAnChon === null ? '' : String(q.dapAnChon), q.dapAnDung === undefined || q.dapAnDung === null ? '' : String(q.dapAnDung), q.dungSai === true ? 'dung' : q.dungSai === false ? 'sai' : '', q.giay === undefined || q.giay === null ? '' : Number(q.giay), luc])
       }
       daGhi.push(sbd)
+      // Tổng hợp sẵn theo chuyên đề (đợt 2) — tính từ chính mảng câu vừa chấm.
+      tomTat[sbd] = {
+        nopLuc: l.nopLuc || luc,
+        theoCd: gomTheoChuyenDe_(cau),
+        qids: cau.map(function (q) { return String(q.qid || '') }).filter(function (q) { return q }),
+      }
     }
     // Xoá dòng chi tiết cũ từ dưới lên (chỉ số không trôi), rồi ghi mới 1 lần.
     xoaDong.sort(function (a, b) { return b - a })
     for (let i = 0; i < xoaDong.length; i++) ctSh.deleteRow(xoaDong[i])
     if (themDong.length > 0) ctSh.getRange(ctSh.getLastRow() + 1, 1, themDong.length, CHITIET_HEADERS.length).setValues(themDong)
+    ghiTienDo_(maCa, tomTat)
     return jsonResponse_({ ok: true, daGhi: daGhi, tuChoi: tuChoi, soCau: themDong.length, serverNow: Date.now() })
   }
 
@@ -1360,6 +1560,134 @@ function doPost(e) {
     sh.getRange(row, cotTrangThai).setValue('da_duyet')
     sh.getRange(row, cotDuyet).setValue(new Date().toISOString())
     return jsonResponse_({ ok: true, token: token, duong: (laHS ? 'hs' : 'ph') + '/' + token })
+  }
+
+  if (action === 'hoSoEm') {
+    // HỒ SƠ MỘT EM (BA-APP.md đợt 2) — MỘT lệnh trả đủ: thông tin, bảng chuyên
+    // đề mạnh/yếu (đã tổng hợp sẵn), xu hướng ↑↓, lịch sử ca thi kèm hạng lớp.
+    // Quyền: mã bí mật (thầy, chọn SBD bất kỳ) · token học sinh (chỉ của mình)
+    // · token phụ huynh (chỉ con mình). KHÔNG tin SBD máy khách gửi khi có token.
+    let sbd = ''
+    if (!kiemTraMaBiMat_(body)) {
+      sbd = String(body.sbd || '').trim()
+    } else if (body.tokenHS) {
+      const hs = hsTuToken_(body.tokenHS)
+      if (!hs) return jsonResponse_({ ok: false, error: 'Link không hợp lệ hoặc đã bị thu hồi' })
+      sbd = hs.sbd
+    } else if (body.tokenPH) {
+      const ph = phTuToken_(body.tokenPH)
+      if (!ph) return jsonResponse_({ ok: false, error: 'Link không hợp lệ hoặc đã bị thu hồi' })
+      sbd = ph.sbd
+    } else {
+      return jsonResponse_({ ok: false, error: 'Không có quyền' })
+    }
+    if (!sbd) return jsonResponse_({ ok: false, error: 'Thiếu số báo danh' })
+
+    const em = hoSoHocSinh_(sbd) || { sbd: sbd, hoTen: tenHocSinh_(sbd), namSinh: '', lop: '' }
+
+    // Bảng chuyên đề (cộng dồn) + xu hướng (theo ca)
+    const hsData = sheetTienDoHS_().getDataRange().getValues()
+    const caData = sheetTienDoCa_().getDataRange().getValues()
+    const dongEm = []
+    for (let i = 1; i < caData.length; i++) if (String(caData[i][0]) === sbd) dongEm.push(caData[i])
+    const xh = xuHuongChuyenDe_(dongEm)
+    const chuyenDe = []
+    for (let i = 1; i < hsData.length; i++) {
+      if (String(hsData[i][0]) !== sbd) continue
+      const soCau = Number(hsData[i][2]) || 0
+      if (soCau === 0) continue
+      const soSai = Number(hsData[i][3]) || 0
+      chuyenDe.push({ ten: String(hsData[i][1]), soCau: soCau, soSai: soSai, tiLeSai: soSai / soCau, xuHuong: xh[String(hsData[i][1])] || 'chua_du' })
+    }
+    chuyenDe.sort(function (a, b) { return b.tiLeSai - a.tiLeSai })
+
+    // Lịch sử ca thi + hạng trong ca (tính từ chính LuotThi, không lưu sẵn)
+    const luotData = sheetLuot_().getDataRange().getValues()
+    const diemTheoCa = {}
+    for (let i = 1; i < luotData.length; i++) {
+      const tt = String(luotData[i][7])
+      if (tt !== 'da_nop' && tt !== 'khoa') continue
+      const mc = String(luotData[i][0])
+      const tong = luotData[i][16]
+      if (tong === '' || tong === null || tong === undefined) continue
+      if (!diemTheoCa[mc]) diemTheoCa[mc] = []
+      diemTheoCa[mc].push(Number(tong))
+    }
+    const tenCa = {}
+    const caSh = sheetCa_()
+    const caRows = caSh.getDataRange().getValues()
+    for (let i = 1; i < caRows.length; i++) tenCa[String(caRows[i][0])] = { tenCa: String(caRows[i][10] || ''), lop: String(caRows[i][1] || '') }
+    const ca = []
+    for (let i = 1; i < luotData.length; i++) {
+      if (String(luotData[i][1]) !== sbd) continue
+      const tt = String(luotData[i][7])
+      if (tt !== 'da_nop' && tt !== 'khoa') continue
+      const mc = String(luotData[i][0])
+      const tong = luotData[i][16] === '' || luotData[i][16] === null ? null : Number(luotData[i][16])
+      let hang = null
+      let siSo = null
+      if (tong !== null && diemTheoCa[mc]) {
+        const ds = diemTheoCa[mc].slice().sort(function (a, b) { return b - a })
+        siSo = ds.length
+        hang = ds.indexOf(tong) + 1
+      }
+      ca.push({
+        maCa: mc,
+        tenCa: (tenCa[mc] || {}).tenCa || '',
+        lop: (tenCa[mc] || {}).lop || '',
+        lanThu: Number(luotData[i][2]) || 1,
+        nopLuc: String(luotData[i][6] || ''),
+        trangThai: tt,
+        diemI: luotData[i][13] === '' ? null : Number(luotData[i][13]),
+        diemII: luotData[i][14] === '' ? null : Number(luotData[i][14]),
+        diemIII: luotData[i][15] === '' ? null : Number(luotData[i][15]),
+        tong: tong,
+        hang: hang,
+        siSo: siSo,
+        soLanRoiMan: Number(luotData[i][9]) || 0,
+      })
+    }
+    ca.sort(function (a, b) { return msCua_(b.nopLuc) - msCua_(a.nopLuc) })
+    return jsonResponse_({ ok: true, em: em, chuyenDe: chuyenDe, ca: ca, serverNow: Date.now() })
+  }
+
+  if (action === 'danhSachEm') {
+    // Danh sách em cho màn HỌC SINH của thầy: hồ sơ + điểm gần nhất + số ca.
+    const loi = kiemTraMaBiMat_(body)
+    if (loi) return jsonResponse_({ ok: false, error: loi })
+    const hsSh = sheetHS_()
+    const hsData = hsSh.getDataRange().getValues()
+    const luotData = sheetLuot_().getDataRange().getValues()
+    const moiNhat = {}
+    const soCa = {}
+    for (let i = 1; i < luotData.length; i++) {
+      const tt = String(luotData[i][7])
+      if (tt !== 'da_nop' && tt !== 'khoa') continue
+      const sbd = String(luotData[i][1])
+      soCa[sbd] = (soCa[sbd] || 0) + 1
+      const tong = luotData[i][16]
+      if (tong === '' || tong === null || tong === undefined) continue
+      const nop = String(luotData[i][6] || '')
+      if (!moiNhat[sbd] || msCua_(nop) > msCua_(moiNhat[sbd].nopLuc)) moiNhat[sbd] = { nopLuc: nop, tong: Number(tong), maCa: String(luotData[i][0]) }
+    }
+    const items = []
+    for (let i = 1; i < hsData.length; i++) {
+      const sbd = String(hsData[i][0])
+      if (!sbd) continue
+      items.push({
+        sbd: sbd,
+        hoTen: String(hsData[i][1] || ''),
+        namSinh: String(hsData[i][2] || ''),
+        lop: String(hsData[i][3] || ''),
+        trangThai: String(hsData[i][HS_COT_TRANGTHAI] || ''),
+        coLinkRieng: chuanToken_(hsData[i][HS_COT_TOKEN]).length === 32,
+        soCa: soCa[sbd] || 0,
+        diemGanNhat: moiNhat[sbd] ? moiNhat[sbd].tong : null,
+        caGanNhat: moiNhat[sbd] ? moiNhat[sbd].maCa : '',
+        nopGanNhat: moiNhat[sbd] ? moiNhat[sbd].nopLuc : '',
+      })
+    }
+    return jsonResponse_({ ok: true, items: items, serverNow: Date.now() })
   }
 
   if (action === 'huyDuyet') {
