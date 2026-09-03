@@ -225,6 +225,29 @@ export async function loadMyParentPhone(): Promise<string> {
   return (await db.get(STORE_SETTINGS, 'myParentPhone')) || ''
 }
 
+// TOKEN VAI TRÒ (BA-APP.md đợt 1) — link riêng thầy gửi cho từng em / phụ
+// huynh. Lưu lại để lần sau mở app không cần link nữa; thầy cấp lại token thì
+// token cũ hết hiệu lực, app tự báo "link không còn hiệu lực".
+export async function saveTokenHocSinh(token: string): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, token, 'tokenHocSinh')
+}
+
+export async function loadTokenHocSinh(): Promise<string> {
+  const db = await getDb()
+  return (await db.get(STORE_SETTINGS, 'tokenHocSinh')) || ''
+}
+
+export async function saveTokenPhuHuynh(token: string): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, token, 'tokenPhuHuynh')
+}
+
+export async function loadTokenPhuHuynh(): Promise<string> {
+  const db = await getDb()
+  return (await db.get(STORE_SETTINGS, 'tokenPhuHuynh')) || ''
+}
+
 // Lưu SBD học sinh đã đăng ký hồ sơ trên CHÍNH máy này — mở lại app tự điền
 // sẵn SBD lúc vào thi/nhắn tin, không phải gõ lại mỗi lần.
 export async function saveMyStudentSbd(sbd: string): Promise<void> {

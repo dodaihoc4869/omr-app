@@ -321,6 +321,7 @@ export interface ParentFeedbackItem {
 
 export interface ParentFeedbackResult {
   found: boolean
+  sdt?: string
   hoTenPhuHuynh?: string
   sbd?: string
   lop?: string
@@ -328,8 +329,8 @@ export interface ParentFeedbackResult {
   items?: ParentFeedbackItem[]
 }
 
-export async function fetchParentFeedback(scriptUrl: string, sdt: string): Promise<ParentFeedbackResult> {
-  const url = `${scriptUrl}?action=parentFeedback&sdt=${encodeURIComponent(sdt)}`
+export async function fetchParentFeedback(scriptUrl: string, sdt: string, token = ''): Promise<ParentFeedbackResult> {
+  const url = token ? `${scriptUrl}?action=parentFeedback&token=${encodeURIComponent(token)}` : `${scriptUrl}?action=parentFeedback&sdt=${encodeURIComponent(sdt)}`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
   return res.json()
@@ -392,16 +393,16 @@ export interface ParentStatus {
   } | null
 }
 
-export async function fetchParentStatus(scriptUrl: string, sdt: string): Promise<ParentStatus> {
-  const url = `${scriptUrl}?action=parentStatus&sdt=${encodeURIComponent(sdt)}`
+export async function fetchParentStatus(scriptUrl: string, sdt: string, token = ''): Promise<ParentStatus> {
+  const url = token ? `${scriptUrl}?action=parentStatus&token=${encodeURIComponent(token)}` : `${scriptUrl}?action=parentStatus&sdt=${encodeURIComponent(sdt)}`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
   return res.json()
 }
 
 /** Xoá đăng ký phụ huynh (theo SĐT) — dùng khi đăng ký nhầm, cho đăng ký lại từ đầu. */
-export async function deleteParentRegistration(scriptUrl: string, sdt: string): Promise<void> {
-  const result = await postJson(scriptUrl, { action: 'deleteParent', sdt })
+export async function deleteParentRegistration(scriptUrl: string, secret: string, sdt: string): Promise<void> {
+  const result = await postJson(scriptUrl, { action: 'deleteParent', secret, sdt })
   if (!result.ok) throw new Error(result.error || 'Xoá đăng ký thất bại')
 }
 
@@ -410,8 +411,8 @@ export async function deleteParentRegistration(scriptUrl: string, sdt: string): 
 // sẵn SBD lúc vào thi và để nhắn tin cho thầy có tên hiển thị rõ ràng.
 // ============================================================================
 
-export async function registerStudent(scriptUrl: string, sbd: string, hoTen: string, namSinh: string, lop: string): Promise<void> {
-  const result = await postJson(scriptUrl, { action: 'registerStudent', sbd, hoTen, namSinh, lop })
+export async function registerStudent(scriptUrl: string, sbd: string, hoTen: string, namSinh: string, lop: string, sdt = '', sdtPhuHuynh = ''): Promise<void> {
+  const result = await postJson(scriptUrl, { action: 'registerStudent', sbd, hoTen, namSinh, lop, sdt, sdtPhuHuynh })
   if (!result.ok) throw new Error(result.error || 'Đăng ký thất bại')
 }
 
@@ -423,16 +424,16 @@ export interface StudentProfile {
   lop?: string
 }
 
-export async function fetchStudentProfile(scriptUrl: string, sbd: string): Promise<StudentProfile> {
-  const url = `${scriptUrl}?action=studentProfile&sbd=${encodeURIComponent(sbd)}`
+export async function fetchStudentProfile(scriptUrl: string, sbd: string, token = ''): Promise<StudentProfile> {
+  const url = token ? `${scriptUrl}?action=studentProfile&token=${encodeURIComponent(token)}` : `${scriptUrl}?action=studentProfile&sbd=${encodeURIComponent(sbd)}`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
   return res.json()
 }
 
 /** Xoá đăng ký hồ sơ học sinh (theo SBD) — dùng khi đăng ký nhầm, cho đăng ký lại từ đầu. */
-export async function deleteStudentRegistration(scriptUrl: string, sbd: string): Promise<void> {
-  const result = await postJson(scriptUrl, { action: 'deleteStudent', sbd })
+export async function deleteStudentRegistration(scriptUrl: string, secret: string, sbd: string): Promise<void> {
+  const result = await postJson(scriptUrl, { action: 'deleteStudent', secret, sbd })
   if (!result.ok) throw new Error(result.error || 'Xoá đăng ký thất bại')
 }
 
@@ -491,8 +492,8 @@ export interface ParentMessage {
   nguoiGui: 'phuhuynh' | 'hocsinh'
 }
 
-export async function listParentMessages(scriptUrl: string): Promise<ParentMessage[]> {
-  const url = `${scriptUrl}?action=listMessages`
+export async function listParentMessages(scriptUrl: string, secret: string): Promise<ParentMessage[]> {
+  const url = `${scriptUrl}?action=listMessages&secret=${encodeURIComponent(secret)}`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
   const data = await res.json()
@@ -511,8 +512,8 @@ export async function markMessagesRead(scriptUrl: string, ids: string[]): Promis
 // tự poll lại thấy tin.
 // ============================================================================
 
-export async function sendTeacherMessage(scriptUrl: string, sbd: string, noiDung: string): Promise<void> {
-  const result = await postJson(scriptUrl, { action: 'sendTeacherMessage', sbd, noiDung })
+export async function sendTeacherMessage(scriptUrl: string, secret: string, sbd: string, noiDung: string): Promise<void> {
+  const result = await postJson(scriptUrl, { action: 'sendTeacherMessage', secret, sbd, noiDung })
   if (!result.ok) throw new Error(result.error || 'Gửi tin nhắn thất bại')
 }
 
@@ -524,15 +525,15 @@ export interface TeacherMessage {
   daXem: boolean
 }
 
-export async function fetchParentInbox(scriptUrl: string, sdt: string): Promise<{ found: boolean; items: TeacherMessage[] }> {
-  const url = `${scriptUrl}?action=parentInbox&sdt=${encodeURIComponent(sdt)}`
+export async function fetchParentInbox(scriptUrl: string, sdt: string, token = ''): Promise<{ found: boolean; items: TeacherMessage[] }> {
+  const url = token ? `${scriptUrl}?action=parentInbox&token=${encodeURIComponent(token)}` : `${scriptUrl}?action=parentInbox&sdt=${encodeURIComponent(sdt)}`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
   return res.json()
 }
 
-export async function fetchStudentInbox(scriptUrl: string, sbd: string): Promise<{ found: boolean; items: TeacherMessage[] }> {
-  const url = `${scriptUrl}?action=studentInbox&sbd=${encodeURIComponent(sbd)}`
+export async function fetchStudentInbox(scriptUrl: string, sbd: string, token = ''): Promise<{ found: boolean; items: TeacherMessage[] }> {
+  const url = token ? `${scriptUrl}?action=studentInbox&token=${encodeURIComponent(token)}` : `${scriptUrl}?action=studentInbox&sbd=${encodeURIComponent(sbd)}`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
   return res.json()
@@ -557,10 +558,12 @@ export interface RegisteredParent {
   lop: string
   hoTenHocSinh: string
   dangKyLuc: string
+  token?: string
+  trangThai?: string
 }
 
-export async function listRegisteredParents(scriptUrl: string): Promise<RegisteredParent[]> {
-  const url = `${scriptUrl}?action=listParents`
+export async function listRegisteredParents(scriptUrl: string, secret: string): Promise<RegisteredParent[]> {
+  const url = `${scriptUrl}?action=listParents&secret=${encodeURIComponent(secret)}`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
   const data = await res.json()
@@ -573,10 +576,14 @@ export interface RegisteredStudent {
   namSinh: string
   lop: string
   dangKyLuc: string
+  sdt?: string
+  sdtPhuHuynh?: string
+  token?: string
+  trangThai?: string
 }
 
-export async function listRegisteredStudents(scriptUrl: string): Promise<RegisteredStudent[]> {
-  const url = `${scriptUrl}?action=listStudents`
+export async function listRegisteredStudents(scriptUrl: string, secret: string): Promise<RegisteredStudent[]> {
+  const url = `${scriptUrl}?action=listStudents&secret=${encodeURIComponent(secret)}`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
   const data = await res.json()
@@ -593,12 +600,92 @@ export interface FeedbackSummary {
 }
 
 /** Toàn bộ điểm đã chấm — dùng để thầy tra nhanh theo tên rồi gửi lại cho phụ huynh. */
-export async function listAllFeedback(scriptUrl: string): Promise<FeedbackSummary[]> {
-  const url = `${scriptUrl}?action=listAllFeedback`
+export async function listAllFeedback(scriptUrl: string, secret: string): Promise<FeedbackSummary[]> {
+  const url = `${scriptUrl}?action=listAllFeedback&secret=${encodeURIComponent(secret)}`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
   const data = await res.json()
   return data.items || []
+}
+
+// ============================================================================
+// BA VAI TRÒ — TOKEN & DUYỆT HỒ SƠ (BA-APP.md đợt 1)
+// Máy em/phụ huynh vào bằng link riêng /hs/<token> · /ph/<token>. Máy chủ tra
+// token ra SBD; app KHÔNG bao giờ tự khai mình là SBD nào.
+// ============================================================================
+
+export interface HoSoHocSinhToken {
+  ok: boolean
+  found: boolean
+  sbd?: string
+  hoTen?: string
+  namSinh?: string
+  lop?: string
+  trangThai?: string
+  error?: string
+}
+
+export async function hoSoTheoTokenHS(scriptUrl: string, token: string): Promise<HoSoHocSinhToken> {
+  const res = await fetch(`${scriptUrl}?action=hsHoSo&token=${encodeURIComponent(token)}`)
+  if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
+  return res.json()
+}
+
+export interface HoSoPhuHuynhToken {
+  ok: boolean
+  found: boolean
+  sdt?: string
+  hoTenPhuHuynh?: string
+  sbd?: string
+  lop?: string
+  hoTenHocSinh?: string
+  trangThai?: string
+  error?: string
+}
+
+export async function hoSoTheoTokenPH(scriptUrl: string, token: string): Promise<HoSoPhuHuynhToken> {
+  const res = await fetch(`${scriptUrl}?action=phHoSo&token=${encodeURIComponent(token)}`)
+  if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
+  return res.json()
+}
+
+export type LoaiHoSo = 'hs' | 'ph'
+
+export interface HoSoChoDuyet {
+  hocSinh: RegisteredStudent[]
+  phuHuynh: RegisteredParent[]
+}
+
+/** Danh sách hồ sơ (cả chờ duyệt lẫn đã duyệt) — chỉ thầy gọi được. */
+export async function danhSachChoDuyet(scriptUrl: string, secret: string): Promise<HoSoChoDuyet> {
+  const r = await postJson(scriptUrl, { action: 'danhSachChoDuyet', secret })
+  if (!r.ok) throw new Error(r.error || 'Không lấy được danh sách hồ sơ')
+  return { hocSinh: (r.hocSinh || []).map((x: RegisteredStudent) => ({ ...x, sbd: String(x.sbd) })), phuHuynh: (r.phuHuynh || []).map((x: RegisteredParent) => ({ ...x, sdt: String(x.sdt), sbd: String(x.sbd) })) }
+}
+
+/** Thầy duyệt hồ sơ → máy chủ cấp token, trả về đuôi link riêng ("hs/<token>"). */
+export async function duyetHoSo(scriptUrl: string, secret: string, loai: LoaiHoSo, khoa: string): Promise<{ token: string; duong: string }> {
+  const r = await postJson(scriptUrl, { action: 'duyetHoSo', secret, loai, khoa })
+  if (!r.ok) throw new Error(r.error || 'Không duyệt được hồ sơ')
+  return { token: String(r.token), duong: String(r.duong) }
+}
+
+/** Cấp lại token (mất máy, lộ link) — token cũ mất hiệu lực ngay lập tức. */
+export async function capLaiToken(scriptUrl: string, secret: string, loai: LoaiHoSo, khoa: string): Promise<{ token: string; duong: string }> {
+  const r = await postJson(scriptUrl, { action: 'capLaiToken', secret, loai, khoa })
+  if (!r.ok) throw new Error(r.error || 'Không cấp lại được link')
+  return { token: String(r.token), duong: String(r.duong) }
+}
+
+/** Thu hồi quyền vào mà giữ nguyên hồ sơ và điểm (em nghỉ học, đăng ký nhầm). */
+export async function huyDuyetHoSo(scriptUrl: string, secret: string, loai: LoaiHoSo, khoa: string): Promise<void> {
+  const r = await postJson(scriptUrl, { action: 'huyDuyet', secret, loai, khoa })
+  if (!r.ok) throw new Error(r.error || 'Không thu hồi được')
+}
+
+/** Link đầy đủ để thầy gửi Zalo cho em/phụ huynh. */
+export function linkRieng(duong: string): string {
+  return `${location.origin}${import.meta.env.BASE_URL}${duong}`
 }
 
 // ---------------------------------------------------------------------------

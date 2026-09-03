@@ -5,7 +5,7 @@
 import { useEffect, useState } from 'react'
 import { GraduationCap, Send, MessageSquareText } from 'lucide-react'
 import { registerStudent, fetchStudentProfile, sendStudentMessage, fetchStudentInbox, markTeacherMessagesRead, type TeacherMessage } from '../lib/exam-api'
-import { loadMyStudentSbd, loadScriptUrl, saveMyStudentSbd } from '../lib/exam-db'
+import { loadMyStudentSbd, loadScriptUrl, loadTokenHocSinh, saveMyStudentSbd } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 
 function titleCase(s: string): string {
@@ -21,9 +21,14 @@ export default function StudentProfileScreen() {
   const [phase, setPhase] = useState<'loading' | 'register' | 'view'>('loading')
 
   const [sbd, setSbd] = useState('')
+  // Link riêng /hs/<token> (BA-APP.md đợt 1): có token thì máy chủ tự tra ra
+  // SBD — máy em không tự khai mình là ai nữa.
+  const [token, setToken] = useState('')
   const [namSinh, setNamSinh] = useState('')
   const [hoTen, setHoTen] = useState('')
   const [lop, setLop] = useState('')
+  const [sdtHS, setSdtHS] = useState('')
+  const [sdtPH, setSdtPH] = useState('')
   const [saving, setSaving] = useState(false)
 
   const [inbox, setInbox] = useState<TeacherMessage[]>([])
@@ -35,16 +40,17 @@ export default function StudentProfileScreen() {
 
   useEffect(() => {
     loadScriptUrl().then(setScriptUrl)
-    loadMyStudentSbd().then((saved) => {
+    Promise.all([loadMyStudentSbd(), loadTokenHocSinh()]).then(([saved, tk]) => {
       setSbd(saved)
-      setPhase(saved ? 'view' : 'register')
+      setToken(tk)
+      setPhase(saved || tk ? 'view' : 'register')
     })
   }, [])
 
   const loadInbox = async (sbdToUse: string, urlToUse: string) => {
-    if (!urlToUse.trim() || !sbdToUse.trim()) return
+    if (!urlToUse.trim() || (!sbdToUse.trim() && !token)) return
     try {
-      const ib = await fetchStudentInbox(urlToUse.trim(), sbdToUse.trim())
+      const ib = await fetchStudentInbox(urlToUse.trim(), sbdToUse.trim(), token)
       setInbox(ib.items || [])
       const unread = (ib.items || []).filter((m) => !m.daXem).map((m) => m.id)
       if (unread.length > 0) markTeacherMessagesRead(urlToUse.trim(), unread).catch(() => {})
@@ -54,19 +60,20 @@ export default function StudentProfileScreen() {
   }
 
   useEffect(() => {
-    if (phase !== 'view' || !sbd.trim() || !scriptUrl.trim()) return
-    fetchStudentProfile(scriptUrl.trim(), sbd.trim())
+    if (phase !== 'view' || (!sbd.trim() && !token) || !scriptUrl.trim()) return
+    fetchStudentProfile(scriptUrl.trim(), sbd.trim(), token)
       .then((p) => {
         if (p.found) {
           setNamSinh(p.namSinh || '')
           setHoTen(p.hoTen || '')
           setLop(p.lop || '')
+          if (p.sbd) setSbd(String(p.sbd))
         }
       })
       .catch(() => {})
     loadInbox(sbd, scriptUrl)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, sbd, scriptUrl])
+  }, [phase, sbd, scriptUrl, token])
 
   const handleRegister = async () => {
     if (!scriptUrl.trim()) return showToast('Chưa có link kết nối — hỏi thầy link Apps Script', 'error')
@@ -74,10 +81,10 @@ export default function StudentProfileScreen() {
     setSaving(true)
     try {
       const tenChuan = titleCase(hoTen.trim())
-      await registerStudent(scriptUrl.trim(), sbd.trim(), tenChuan, namSinh.trim(), lop.trim())
+      await registerStudent(scriptUrl.trim(), sbd.trim(), tenChuan, namSinh.trim(), lop.trim(), sdtHS.trim(), sdtPH.trim())
       await saveMyStudentSbd(sbd.trim())
       setHoTen(tenChuan)
-      showToast('Đăng ký hồ sơ thành công', 'success')
+      showToast('Đã gửi đăng ký — chờ thầy duyệt rồi gửi link riêng cho em', 'success')
       setPhase('view')
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Đăng ký thất bại', 'error')
@@ -113,8 +120,8 @@ export default function StudentProfileScreen() {
           <h1 className="text-xl font-bold">Đăng ký hồ sơ học sinh</h1>
         </div>
         <p className="text-sm text-slate-500">
-          Đăng ký 1 lần duy nhất để lần sau vào thi không cần gõ lại số báo danh, và nhắn tin trực tiếp cho thầy. Sau khi
-          đăng ký, chỉ thầy mới xoá được để đăng ký lại — không tự xoá trong app.
+          Đăng ký 1 lần duy nhất. Gửi xong, THẦY DUYỆT rồi mới gửi cho em link riêng để xem lịch sử làm bài. Trong lúc chờ
+          duyệt, em vẫn vào được ca thi thầy mở tự do. Sau khi đăng ký, chỉ thầy mới xoá được để đăng ký lại.
         </p>
         <div>
           <label className="text-xs text-slate-500 pl-1">Số báo danh (thầy cho khi vào thi)</label>
@@ -148,6 +155,20 @@ export default function StudentProfileScreen() {
           placeholder="Lớp (không bắt buộc)"
           value={lop}
           onChange={(e) => setLop(e.target.value)}
+        />
+        <input
+          className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3"
+          placeholder="Số điện thoại của em (không bắt buộc)"
+          inputMode="tel"
+          value={sdtHS}
+          onChange={(e) => setSdtHS(e.target.value.replace(/[^0-9]/g, ''))}
+        />
+        <input
+          className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3"
+          placeholder="Số điện thoại phụ huynh (không bắt buộc)"
+          inputMode="tel"
+          value={sdtPH}
+          onChange={(e) => setSdtPH(e.target.value.replace(/[^0-9]/g, ''))}
         />
         {hoTenHienThi && (
           <div className="text-xs text-slate-500 pl-1">

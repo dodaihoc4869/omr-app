@@ -155,10 +155,13 @@ export default function ExamSetupScreen() {
   const [opening, setOpening] = useState(false)
   const [opened, setOpened] = useState<{ maCa: string; joinLink: string; batDau: string; hetHanVao: string } | null>(null)
   const [daCopy, setDaCopy] = useState(false)
+  // Mã bí mật — mọi lệnh đọc dữ liệu học sinh của thầy đều phải kèm (BA-APP đợt 1).
+  const [maBiMat, setMaBiMat] = useState('')
 
   useEffect(() => {
     let huy = false
     loadScriptUrl().then(setScriptUrl)
+    loadTeacherSecret().then(setMaBiMat)
     loadExamSources().then((list) => {
       if (huy) return
       setSavedSources(list)
@@ -184,11 +187,11 @@ export default function ExamSetupScreen() {
 
   // Nguồn em để "Chọn từng em": danh sách lớp; rỗng thì hồ sơ đã đăng ký (tải khi cần).
   useEffect(() => {
-    if (phamVi !== 'chon' || classList.length > 0 || dsDangKy !== null || !scriptUrl.trim()) return
-    listRegisteredStudents(scriptUrl.trim())
+    if (phamVi !== 'chon' || classList.length > 0 || dsDangKy !== null || !scriptUrl.trim() || !maBiMat.trim()) return
+    listRegisteredStudents(scriptUrl.trim(), maBiMat.trim())
       .then((ds) => setDsDangKy(ds.map((d) => ({ sbd: String(d.sbd), hoTen: d.hoTen, lop: d.lop }))))
       .catch(() => setDsDangKy([]))
-  }, [phamVi, classList.length, dsDangKy, scriptUrl])
+  }, [phamVi, classList.length, dsDangKy, scriptUrl, maBiMat])
   const dsEmChon = useMemo(() => {
     const nguon = classList.length > 0 ? classList.map((r) => ({ sbd: r.sbd, hoTen: r.hoTen, lop: r.lop })) : (dsDangKy ?? [])
     const q = timTen.trim().toLowerCase()

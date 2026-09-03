@@ -80,6 +80,21 @@ const CHITIET_HEADERS = ['MaCa', 'SBD', 'LanThu', 'Phan', 'SoCau', 'Qid', 'Chuye
 // nộp) — quá mốc này vẫn nhận bài nhưng ghi chú "nộp muộn".
 const AN_HAN_NOP_GIAY = 120
 
+// BA VAI TRÒ (BA-APP.md đợt 1). Hồ sơ học sinh/phụ huynh có TOKEN 32 ký tự do
+// THẦY DUYỆT mới cấp; mọi lệnh đọc dữ liệu của một em đều tra token -> SBD ở
+// máy chủ, KHÔNG tin SBD/SĐT do máy khách gửi kèm.
+// TrangThai: '' = hồ sơ đăng ký trước v12 (đường cũ theo SBD/SĐT còn chạy để
+// không cắt ngang người đang dùng) · cho_duyet · da_duyet (có token).
+const HS_HEADERS = ['SBD', 'HoTen', 'NamSinh', 'Lop', 'DangKyLuc', 'Sdt', 'SdtPhuHuynh', 'Token', 'TrangThai', 'DuyetLuc']
+const PH_HEADERS = ['SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'DangKyLuc', 'Token', 'TrangThai', 'DuyetLuc']
+const HS_COT_TOKEN = 7 // 0-based trong mảng giá trị
+const HS_COT_TRANGTHAI = 8
+const PH_COT_TOKEN = 6
+const PH_COT_TRANGTHAI = 7
+// Lệnh GET chỉ dành cho thầy — phải kèm secret. Trước v12 các lệnh này mở cho
+// bất kỳ ai có link /exec (đọc được cả danh bạ phụ huynh) — đó là lỗ hổng v12 vá.
+const GET_CHI_THAY = ['listParents', 'listStudents', 'listAllFeedback', 'listMessages']
+
 // ---------------------------------------------------------------------------
 // JSON LỚN (đề có ảnh cắt base64 ~ vài trăm KB) KHÔNG nhét vừa 1 ô Sheet
 // (giới hạn 50.000 ký tự) — lưu thành file trong thư mục Drive OMR-APP-DATA,
@@ -294,10 +309,102 @@ function quyetDinhVaoThi_(ca, luot, idThietBi, nowMs, hocSinh) {
   return { ok: true, cach: luot && luot.trangThai === 'duoc_duyet_lai' ? 'duyet_lai' : 'moi' }
 }
 
+// ---------------------------------------------------------------------------
+// TOKEN + DUYỆT HỒ SƠ (BA-APP.md đợt 1)
+// ---------------------------------------------------------------------------
+
+function sheetHS_() {
+  const sh = getSheet_(SHEET_HOCSINH, HS_HEADERS)
+  boSungTieuDe_(sh, HS_HEADERS)
+  return sh
+}
+
+function sheetPH_() {
+  const sh = getSheet_(SHEET_PHUHUYNH, PH_HEADERS)
+  boSungTieuDe_(sh, PH_HEADERS)
+  return sh
+}
+
+/** Token 32 ký tự chữ+số, không đoán được, không mang thông tin cá nhân. */
+function sinhToken_() {
+  return (Utilities.getUuid() + Utilities.getUuid()).replace(/-/g, '').substring(0, 32)
+}
+
+function chuanToken_(t) {
+  return String(t || '').trim()
+}
+
+/** Tìm dòng theo token. Trả -1 nếu token rỗng/sai độ dài/không có. */
+function timTheoToken_(sh, cotToken, token) {
+  const t = chuanToken_(token)
+  if (t.length !== 32) return -1
+  const data = sh.getDataRange().getValues()
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][cotToken]) === t) return i + 1
+  }
+  return -1
+}
+
+/** Hồ sơ HỌC SINH từ token — null nếu token sai. Đây là cửa duy nhất để máy
+ * em nói "tôi là SBD nào"; SBD do máy khách gửi không bao giờ được tin. */
+function hsTuToken_(token) {
+  const sh = sheetHS_()
+  const row = timTheoToken_(sh, HS_COT_TOKEN, token)
+  if (row < 0) return null
+  const v = sh.getRange(row, 1, 1, HS_HEADERS.length).getValues()[0]
+  return { row: row, sbd: String(v[0]), hoTen: String(v[1] || ''), namSinh: String(v[2] || ''), lop: String(v[3] || ''), trangThai: String(v[HS_COT_TRANGTHAI] || '') }
+}
+
+/** Hồ sơ PHỤ HUYNH từ token — null nếu token sai. */
+function phTuToken_(token) {
+  const sh = sheetPH_()
+  const row = timTheoToken_(sh, PH_COT_TOKEN, token)
+  if (row < 0) return null
+  const v = sh.getRange(row, 1, 1, PH_HEADERS.length).getValues()[0]
+  return { row: row, sdt: String(v[0]), hoTenPhuHuynh: String(v[1] || ''), sbd: String(v[2]), lop: String(v[3] || ''), hoTenHocSinh: String(v[4] || ''), trangThai: String(v[PH_COT_TRANGTHAI] || '') }
+}
+
+/** Hồ sơ ĐÃ có token thì bắt buộc dùng link riêng — đường cũ (gõ SBD/SĐT) chỉ
+ * còn cho hồ sơ đăng ký trước v12, để không cắt ngang người đang dùng. */
+function conDungDuocDuongCu_(sh, row, cotToken) {
+  if (row < 0) return false
+  return chuanToken_(sh.getRange(row, cotToken + 1).getValue()).length !== 32
+}
+
+/** Học sinh: token (ưu tiên) hoặc SBD kiểu cũ. Trả { sbd } hoặc null. */
+function sbdTuYeuCau_(token, sbdCu) {
+  const t = chuanToken_(token)
+  if (t) {
+    const hs = hsTuToken_(t)
+    return hs ? { sbd: hs.sbd, hs: hs } : null
+  }
+  const sbd = String(sbdCu || '').trim()
+  if (!sbd) return null
+  const sh = sheetHS_()
+  const row = findRowByKey_(sh, 0, sbd)
+  // Chưa đăng ký hồ sơ bao giờ (row < 0) vẫn cho qua: em mới vào thi lần đầu.
+  if (row > 0 && !conDungDuocDuongCu_(sh, row, HS_COT_TOKEN)) return null
+  return { sbd: sbd, hs: null }
+}
+
+/** Phụ huynh: token (ưu tiên) hoặc SĐT kiểu cũ. Trả { row, sbd, ... } hoặc null. */
+function phTuYeuCau_(token, sdtCu) {
+  const t = chuanToken_(token)
+  if (t) return phTuToken_(t)
+  const sdt = String(sdtCu || '').trim()
+  if (!sdt) return null
+  const sh = sheetPH_()
+  const row = findRowByKey_(sh, 0, sdt)
+  if (row < 0) return null
+  if (!conDungDuocDuongCu_(sh, row, PH_COT_TOKEN)) return null
+  const v = sh.getRange(row, 1, 1, PH_HEADERS.length).getValues()[0]
+  return { row: row, sdt: String(v[0]), hoTenPhuHuynh: String(v[1] || ''), sbd: String(v[2]), lop: String(v[3] || ''), hoTenHocSinh: String(v[4] || ''), trangThai: String(v[PH_COT_TRANGTHAI] || '') }
+}
+
 /** Hồ sơ học sinh đã đăng ký (sheet HocSinh) — null nếu chưa có. */
 function hoSoHocSinh_(sbd) {
   try {
-    const sh = getSheet_(SHEET_HOCSINH, ['SBD', 'HoTen', 'NamSinh', 'Lop', 'DangKyLuc'])
+    const sh = sheetHS_()
     const row = findRowByKey_(sh, 0, sbd)
     if (row < 0) return null
     const v = sh.getRange(row, 1, 1, 5).getValues()[0]
@@ -324,7 +431,7 @@ function thongKeLuot_(luotMap) {
 
 function tenHocSinh_(sbd) {
   try {
-    const sh = getSheet_(SHEET_HOCSINH, ['SBD', 'HoTen', 'NamSinh', 'Lop', 'DangKyLuc'])
+    const sh = sheetHS_()
     const row = findRowByKey_(sh, 0, sbd)
     return row > 0 ? String(sh.getRange(row, 2).getValue() || '') : ''
   } catch (err) {
@@ -334,6 +441,23 @@ function tenHocSinh_(sbd) {
 
 function doGet(e) {
   const action = e.parameter.action
+  // CHẶN THEO VAI (BA-APP.md đợt 1): lệnh của thầy phải kèm mã bí mật. Không
+  // có mã thì không đọc được danh sách học sinh, danh bạ phụ huynh, hộp thư.
+  if (GET_CHI_THAY.indexOf(action) >= 0) {
+    const mat = maBiMat_()
+    if (!mat || String(e.parameter.secret || '').trim() !== mat) return jsonResponse_({ ok: false, error: 'Không có quyền' })
+  }
+  if (action === 'hsHoSo') {
+    // Máy học sinh mở link riêng /hs/<token> — máy chủ tự tra token ra SBD.
+    const hs = hsTuToken_(e.parameter.token)
+    if (!hs) return jsonResponse_({ ok: false, found: false, error: 'Link không hợp lệ hoặc đã bị thu hồi' })
+    return jsonResponse_({ ok: true, found: true, sbd: hs.sbd, hoTen: hs.hoTen, namSinh: hs.namSinh, lop: hs.lop, trangThai: hs.trangThai, serverNow: Date.now() })
+  }
+  if (action === 'phHoSo') {
+    const ph = phTuToken_(e.parameter.token)
+    if (!ph) return jsonResponse_({ ok: false, found: false, error: 'Link không hợp lệ hoặc đã bị thu hồi' })
+    return jsonResponse_({ ok: true, found: true, sdt: ph.sdt, hoTenPhuHuynh: ph.hoTenPhuHuynh, sbd: ph.sbd, lop: ph.lop, hoTenHocSinh: ph.hoTenHocSinh, trangThai: ph.trangThai, serverNow: Date.now() })
+  }
   if (action === 'session') {
     // Bản cũ (trước QUANLYCATHI): chỉ tải đề. App mới vào thi bằng POST
     // vaoThi (có kiểm tra 1 SBD 1 lượt + 3 mốc thời gian); giữ action này để
@@ -473,11 +597,10 @@ function doGet(e) {
     return jsonResponse_({ rows: rows, serverNow: Date.now() })
   }
   if (action === 'parentFeedback') {
-    const sdt = (e.parameter.sdt || '').trim()
-    const phSh = getSheet_(SHEET_PHUHUYNH, ['SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'DangKyLuc'])
-    const phRow = findRowByKey_(phSh, 0, sdt)
-    if (phRow < 0) return jsonResponse_({ found: false })
-    const phVals = phSh.getRange(phRow, 1, 1, 6).getValues()[0]
+    const ph = phTuYeuCau_(e.parameter.token, e.parameter.sdt)
+    if (!ph) return jsonResponse_({ found: false, canToken: true })
+    const phSh = sheetPH_()
+    const phVals = phSh.getRange(ph.row, 1, 1, 6).getValues()[0]
     const sbd = String(phVals[2])
 
     const nxSh = getSheet_(SHEET_NHANXET, ['SBD', 'MaCa', 'MaDe', 'ThoiGianNop', 'Diem', 'XepLoai', 'CauSai', 'GuiLuc'])
@@ -500,6 +623,7 @@ function doGet(e) {
     })
     return jsonResponse_({
       found: true,
+      sdt: String(phVals[0]),
       hoTenPhuHuynh: phVals[1],
       sbd: sbd,
       lop: phVals[3],
@@ -511,11 +635,10 @@ function doGet(e) {
     // Trạng thái làm bài GẦN-THỜI-GIAN-THỰC cho phụ huynh xem — phụ huynh
     // tự poll lại endpoint này (app tự gọi lại mỗi ~15 giây khi đang mở màn
     // theo dõi), không phải server đẩy tin thật sự.
-    const sdt = (e.parameter.sdt || '').trim()
-    const phSh = getSheet_(SHEET_PHUHUYNH, ['SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'DangKyLuc'])
-    const phRow = findRowByKey_(phSh, 0, sdt)
-    if (phRow < 0) return jsonResponse_({ found: false })
-    const phVals = phSh.getRange(phRow, 1, 1, 6).getValues()[0]
+    const ph = phTuYeuCau_(e.parameter.token, e.parameter.sdt)
+    if (!ph) return jsonResponse_({ found: false, canToken: true })
+    const phSh = sheetPH_()
+    const phVals = phSh.getRange(ph.row, 1, 1, 6).getValues()[0]
     const sbd = String(phVals[2])
 
     const stSh = getSheet_(SHEET_TRANGTHAI, [
@@ -584,7 +707,7 @@ function doGet(e) {
     // Danh sách phụ huynh đã đăng ký — cho màn quản lý của thầy (xoá khi đăng
     // ký nhầm). Phụ huynh/học sinh KHÔNG tự xoá được đăng ký của mình trong
     // app — chỉ thầy xoá được ở đây.
-    const sh = getSheet_(SHEET_PHUHUYNH, ['SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'DangKyLuc'])
+    const sh = sheetPH_()
     const data = sh.getDataRange().getValues()
     const items = []
     for (let i = 1; i < data.length; i++) {
@@ -595,6 +718,8 @@ function doGet(e) {
         lop: data[i][3],
         hoTenHocSinh: data[i][4],
         dangKyLuc: data[i][5],
+        token: String(data[i][PH_COT_TOKEN] || ''),
+        trangThai: String(data[i][PH_COT_TRANGTHAI] || ''),
       })
     }
     return jsonResponse_({ items: items })
@@ -602,7 +727,7 @@ function doGet(e) {
 
   if (action === 'listStudents') {
     // Danh sách học sinh đã đăng ký hồ sơ — cho màn quản lý của thầy.
-    const sh = getSheet_(SHEET_HOCSINH, ['SBD', 'HoTen', 'NamSinh', 'Lop', 'DangKyLuc'])
+    const sh = sheetHS_()
     const data = sh.getDataRange().getValues()
     const items = []
     for (let i = 1; i < data.length; i++) {
@@ -612,18 +737,23 @@ function doGet(e) {
         namSinh: data[i][2],
         lop: data[i][3],
         dangKyLuc: data[i][4],
+        sdt: String(data[i][5] || ''),
+        sdtPhuHuynh: String(data[i][6] || ''),
+        token: String(data[i][HS_COT_TOKEN] || ''),
+        trangThai: String(data[i][HS_COT_TRANGTHAI] || ''),
       })
     }
     return jsonResponse_({ items: items })
   }
 
   if (action === 'studentProfile') {
-    const sbd = (e.parameter.sbd || '').trim()
-    const sh = getSheet_(SHEET_HOCSINH, ['SBD', 'HoTen', 'NamSinh', 'Lop', 'DangKyLuc'])
-    const row = findRowByKey_(sh, 0, sbd)
+    const q = sbdTuYeuCau_(e.parameter.token, e.parameter.sbd)
+    if (!q) return jsonResponse_({ found: false, canToken: true })
+    const sh = sheetHS_()
+    const row = findRowByKey_(sh, 0, q.sbd)
     if (row < 0) return jsonResponse_({ found: false })
-    const v = sh.getRange(row, 1, 1, 5).getValues()[0]
-    return jsonResponse_({ found: true, sbd: String(v[0]), hoTen: v[1], namSinh: v[2], lop: v[3] })
+    const v = sh.getRange(row, 1, 1, HS_HEADERS.length).getValues()[0]
+    return jsonResponse_({ found: true, sbd: String(v[0]), hoTen: v[1], namSinh: v[2], lop: v[3], trangThai: String(v[HS_COT_TRANGTHAI] || '') })
   }
 
   if (action === 'parentInbox' || action === 'studentInbox') {
@@ -631,13 +761,13 @@ function doGet(e) {
     // parentStatus), không phải đẩy tức thì thật sự.
     let sbd = ''
     if (action === 'parentInbox') {
-      const sdt = (e.parameter.sdt || '').trim()
-      const phSh = getSheet_(SHEET_PHUHUYNH, ['SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'DangKyLuc'])
-      const phRow = findRowByKey_(phSh, 0, sdt)
-      if (phRow < 0) return jsonResponse_({ found: false })
-      sbd = String(phSh.getRange(phRow, 3, 1, 1).getValues()[0][0])
+      const ph = phTuYeuCau_(e.parameter.token, e.parameter.sdt)
+      if (!ph) return jsonResponse_({ found: false, canToken: true })
+      sbd = ph.sbd
     } else {
-      sbd = (e.parameter.sbd || '').trim()
+      const q = sbdTuYeuCau_(e.parameter.token, e.parameter.sbd)
+      if (!q) return jsonResponse_({ found: false, canToken: true })
+      sbd = q.sbd
     }
     const sh = getSheet_(SHEET_TINTHAY, ['Id', 'SBD', 'NoiDung', 'ThoiGian', 'DaXem'])
     const data = sh.getDataRange().getValues()
@@ -1159,14 +1289,89 @@ function doPost(e) {
   }
 
   if (action === 'registerParent') {
-    const sh = getSheet_(SHEET_PHUHUYNH, ['SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'DangKyLuc'])
+    // Đăng ký = XIN, chưa phải được vào (BA-APP.md mục 4E). Thầy duyệt mới
+    // cấp token. Ghi đè hồ sơ cũ KHÔNG được xoá token/trạng thái đã duyệt.
+    const sh = sheetPH_()
     const row = findRowByKey_(sh, 0, body.sdt)
     const rowData = [body.sdt, body.hoTenPhuHuynh, body.sbd, body.lop, body.hoTenHocSinh, new Date().toISOString()]
     if (row > 0) {
       sh.getRange(row, 1, 1, 6).setValues([rowData])
+      const ttCu = String(sh.getRange(row, PH_COT_TRANGTHAI + 1).getValue() || '')
+      if (!ttCu) sh.getRange(row, PH_COT_TRANGTHAI + 1).setValue('cho_duyet')
     } else {
-      sh.appendRow(rowData)
+      sh.appendRow(rowData.concat(['', 'cho_duyet', '']))
     }
+    return jsonResponse_({ ok: true, choDuyet: true })
+  }
+
+  if (action === 'danhSachChoDuyet') {
+    // Màn Quản lý đăng ký của thầy: ai đang chờ duyệt, ai đã có link riêng.
+    const loi = kiemTraMaBiMat_(body)
+    if (loi) return jsonResponse_({ ok: false, error: loi })
+    const hsSh = sheetHS_()
+    const hsData = hsSh.getDataRange().getValues()
+    const hs = []
+    for (let i = 1; i < hsData.length; i++) {
+      hs.push({
+        sbd: String(hsData[i][0]),
+        hoTen: String(hsData[i][1] || ''),
+        namSinh: String(hsData[i][2] || ''),
+        lop: String(hsData[i][3] || ''),
+        dangKyLuc: hsData[i][4],
+        sdt: String(hsData[i][5] || ''),
+        sdtPhuHuynh: String(hsData[i][6] || ''),
+        token: String(hsData[i][HS_COT_TOKEN] || ''),
+        trangThai: String(hsData[i][HS_COT_TRANGTHAI] || ''),
+      })
+    }
+    const phSh = sheetPH_()
+    const phData = phSh.getDataRange().getValues()
+    const ph = []
+    for (let i = 1; i < phData.length; i++) {
+      ph.push({
+        sdt: String(phData[i][0]),
+        hoTenPhuHuynh: String(phData[i][1] || ''),
+        sbd: String(phData[i][2]),
+        lop: String(phData[i][3] || ''),
+        hoTenHocSinh: String(phData[i][4] || ''),
+        dangKyLuc: phData[i][5],
+        token: String(phData[i][PH_COT_TOKEN] || ''),
+        trangThai: String(phData[i][PH_COT_TRANGTHAI] || ''),
+      })
+    }
+    return jsonResponse_({ ok: true, hocSinh: hs, phuHuynh: ph, serverNow: Date.now() })
+  }
+
+  if (action === 'duyetHoSo' || action === 'capLaiToken') {
+    // duyetHoSo: duyệt lần đầu, cấp token nếu chưa có.
+    // capLaiToken: em/phụ huynh mất máy hoặc lộ link — token cũ mất hiệu lực NGAY.
+    const loi = kiemTraMaBiMat_(body)
+    if (loi) return jsonResponse_({ ok: false, error: loi })
+    const laHS = String(body.loai || '') === 'hs'
+    const sh = laHS ? sheetHS_() : sheetPH_()
+    const row = findRowByKey_(sh, 0, body.khoa)
+    if (row < 0) return jsonResponse_({ ok: false, error: 'Không tìm thấy hồ sơ' })
+    const cotToken = (laHS ? HS_COT_TOKEN : PH_COT_TOKEN) + 1
+    const cotTrangThai = (laHS ? HS_COT_TRANGTHAI : PH_COT_TRANGTHAI) + 1
+    const cotDuyet = cotTrangThai + 1
+    let token = chuanToken_(sh.getRange(row, cotToken).getValue())
+    if (action === 'capLaiToken' || token.length !== 32) token = sinhToken_()
+    sh.getRange(row, cotToken).setValue(token)
+    sh.getRange(row, cotTrangThai).setValue('da_duyet')
+    sh.getRange(row, cotDuyet).setValue(new Date().toISOString())
+    return jsonResponse_({ ok: true, token: token, duong: (laHS ? 'hs' : 'ph') + '/' + token })
+  }
+
+  if (action === 'huyDuyet') {
+    // Thu hồi quyền vào mà KHÔNG xoá hồ sơ (em nghỉ học, phụ huynh đăng ký nhầm).
+    const loi = kiemTraMaBiMat_(body)
+    if (loi) return jsonResponse_({ ok: false, error: loi })
+    const laHS = String(body.loai || '') === 'hs'
+    const sh = laHS ? sheetHS_() : sheetPH_()
+    const row = findRowByKey_(sh, 0, body.khoa)
+    if (row < 0) return jsonResponse_({ ok: false, error: 'Không tìm thấy hồ sơ' })
+    sh.getRange(row, (laHS ? HS_COT_TOKEN : PH_COT_TOKEN) + 1).setValue('')
+    sh.getRange(row, (laHS ? HS_COT_TRANGTHAI : PH_COT_TRANGTHAI) + 1).setValue('cho_duyet')
     return jsonResponse_({ ok: true })
   }
 
@@ -1286,28 +1491,34 @@ function doPost(e) {
   if (action === 'registerStudent') {
     // Học sinh đăng ký hồ sơ 1 lần (SBD + họ tên + năm sinh) — để tự điền
     // sẵn SBD lúc vào thi và nhắn tin cho thầy có tên hiển thị rõ ràng.
-    const sh = getSheet_(SHEET_HOCSINH, ['SBD', 'HoTen', 'NamSinh', 'Lop', 'DangKyLuc'])
+    const sh = sheetHS_()
     const row = findRowByKey_(sh, 0, body.sbd)
-    const rowData = [body.sbd, body.hoTen, body.namSinh, body.lop || '', new Date().toISOString()]
+    const rowData = [body.sbd, body.hoTen, body.namSinh, body.lop || '', new Date().toISOString(), String(body.sdt || ''), String(body.sdtPhuHuynh || '')]
     if (row > 0) {
-      sh.getRange(row, 1, 1, 5).setValues([rowData])
+      sh.getRange(row, 1, 1, 7).setValues([rowData])
+      const ttCu = String(sh.getRange(row, HS_COT_TRANGTHAI + 1).getValue() || '')
+      if (!ttCu) sh.getRange(row, HS_COT_TRANGTHAI + 1).setValue('cho_duyet')
     } else {
-      sh.appendRow(rowData)
+      sh.appendRow(rowData.concat(['', 'cho_duyet', '']))
     }
-    return jsonResponse_({ ok: true })
+    return jsonResponse_({ ok: true, choDuyet: true })
   }
 
   if (action === 'deleteParent') {
     // CHỈ thầy dùng (từ màn quản lý) — phụ huynh không có nút này trong app,
     // đăng ký xong không tự "đăng xuất/đăng ký lại" được, đúng theo yêu cầu.
-    const sh = getSheet_(SHEET_PHUHUYNH, ['SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'DangKyLuc'])
+    const loiDP = kiemTraMaBiMat_(body)
+    if (loiDP) return jsonResponse_({ ok: false, error: loiDP })
+    const sh = sheetPH_()
     const row = findRowByKey_(sh, 0, body.sdt)
     if (row > 0) sh.deleteRow(row)
     return jsonResponse_({ ok: true })
   }
 
   if (action === 'deleteStudent') {
-    const sh = getSheet_(SHEET_HOCSINH, ['SBD', 'HoTen', 'NamSinh', 'Lop', 'DangKyLuc'])
+    const loiDS = kiemTraMaBiMat_(body)
+    if (loiDS) return jsonResponse_({ ok: false, error: loiDS })
+    const sh = sheetHS_()
     const row = findRowByKey_(sh, 0, body.sbd)
     if (row > 0) sh.deleteRow(row)
     return jsonResponse_({ ok: true })
@@ -1315,7 +1526,10 @@ function doPost(e) {
 
   if (action === 'sendTeacherMessage') {
     // Thầy gửi tin nhắn cho 1 em (theo SBD) — phụ huynh/học sinh của em đó
-    // sẽ thấy khi app tự poll lại (parentInbox/studentInbox).
+    // sẽ thấy khi app tự poll lại (parentInbox/studentInbox). Phải có mã bí
+    // mật: không ai được mạo danh thầy nhắn cho học sinh.
+    const loiTM = kiemTraMaBiMat_(body)
+    if (loiTM) return jsonResponse_({ ok: false, error: loiTM })
     const sh = getSheet_(SHEET_TINTHAY, ['Id', 'SBD', 'NoiDung', 'ThoiGian', 'DaXem'])
     const id = Utilities.getUuid()
     sh.appendRow([id, body.sbd, body.noiDung, new Date().toISOString(), 'false'])

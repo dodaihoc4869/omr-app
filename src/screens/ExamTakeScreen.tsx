@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
-import { vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendTeacherMessage, ghiDiem, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
 import { taoBaiGhiDiem } from '../lib/chi-tiet-cau'
 import { gioMayChu, gioNgan } from '../lib/gio-may-chu'
 import { layIdThietBi } from '../lib/thiet-bi'
@@ -532,7 +532,7 @@ export default function ExamTakeScreen() {
       setAttempt(next)
       saveAttempt(next)
       pushStatusNow(next, false)
-      baoPhuHuynhGianLan(next)
+      baoThayGianLan(next)
       doSubmit(next)
     }
     const logEvent = (type: 'hidden' | 'visible' | 'blur' | 'focus') => {
@@ -607,10 +607,11 @@ export default function ExamTakeScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
 
-  // Báo phụ huynh NGAY khi bài bị khoá: ghi 1 tin vào hộp thư của em (phụ
-  // huynh/học sinh thấy khi mở app — app phụ huynh tự hỏi lại định kỳ); trạng
-  // thái Blocked cũng đã đẩy lên qua pushStatusNow (màn phụ huynh hiện ô đỏ).
-  const baoPhuHuynhGianLan = (a: ExamAttempt) => {
+  // BÁO THẦY khi bài bị khoá — KHÔNG gửi thẳng phụ huynh (BA-APP.md mục 4D):
+  // sự kiện có thể là một cuộc gọi đến, tin nhắn "cháu nhà anh chị gian lận"
+  // gửi tự động thì không rút lại được. Tin này vào hộp thư của THẦY; thầy đọc,
+  // xác minh, rồi mới bấm "Báo phụ huynh". Trạng thái Blocked vẫn đẩy lên như cũ.
+  const baoThayGianLan = (a: ExamAttempt) => {
     const url = scriptUrlRef.current.trim()
     if (!url) return
     const luc = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
@@ -618,10 +619,12 @@ export default function ExamTakeScreen() {
       a.integrity.lyDoKhoa === 'roi_qua_lau'
         ? `rời khỏi màn hình làm bài quá ${chuanHoaNguong(a.nguong).giay} giây`
         : `rời khỏi màn hình làm bài ${soLanTinhTu(a.integrity.leaveCount, a.integrity.mocMoKhoa ?? 0)} lần (đã được cảnh báo trước đó)`
-    sendTeacherMessage(
+    sendStudentMessage(
       url,
       a.sbd,
-      `[TỰ ĐỘNG] Lúc ${luc}, trong ca kiểm tra ${a.maCa}, học sinh SBD ${a.sbd} đã ${lyDo}. Bài đã được nộp phần đã làm và khoá. Thầy sẽ trao đổi thêm với gia đình.`,
+      `[HỆ THỐNG] SBD ${a.sbd}`,
+      '',
+      `[TỰ ĐỘNG] Lúc ${luc}, trong ca kiểm tra ${a.maCa}, học sinh SBD ${a.sbd} đã ${lyDo}. Bài đã được nộp phần đã làm và khoá. Thầy mở khoá hoặc báo phụ huynh ở màn Chi tiết ca.`,
     ).catch(() => {
       // mất mạng — trạng thái Blocked vẫn được gửi lại khi nộp bài (pendingSubmit)
     })

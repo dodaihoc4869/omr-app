@@ -16,7 +16,7 @@ import {
   type ParentStatus,
   type TeacherMessage,
 } from '../lib/exam-api'
-import { loadMyParentPhone, loadScriptUrl, saveMyParentPhone } from '../lib/exam-db'
+import { loadMyParentPhone, loadScriptUrl, loadTokenPhuHuynh, saveMyParentPhone } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 
 function classifyBadgeColor(xepLoai: string): string {
@@ -39,6 +39,9 @@ export default function ParentScreen() {
   const showToast = useAppStore((s) => s.showToast)
   const [scriptUrl, setScriptUrl] = useState('')
   const [sdt, setSdt] = useState('')
+  // Link riêng /ph/<token> (BA-APP.md đợt 1): có token thì máy chủ tra token ra
+  // đúng con của phụ huynh này — không còn ai gõ SĐT người khác là xem được.
+  const [token, setToken] = useState('')
   const [phase, setPhase] = useState<'loading' | 'register' | 'view'>('loading')
 
   // Đăng ký: SĐT, SBD của con (KHOÁ ĐỐI CHIẾU THẬT — mọi tra cứu bài làm/nhận
@@ -63,24 +66,21 @@ export default function ParentScreen() {
 
   useEffect(() => {
     loadScriptUrl().then(setScriptUrl)
-    loadMyParentPhone().then((saved) => {
+    Promise.all([loadMyParentPhone(), loadTokenPhuHuynh()]).then(([saved, tk]) => {
       setSdt(saved)
-      if (saved) {
-        setPhase('view')
-      } else {
-        setPhase('register')
-      }
+      setToken(tk)
+      setPhase(saved || tk ? 'view' : 'register')
     })
   }, [])
 
   const refresh = async (sdtToUse: string, urlToUse: string) => {
-    if (!urlToUse.trim() || !sdtToUse.trim()) return
+    if (!urlToUse.trim() || (!sdtToUse.trim() && !token)) return
     setRefreshing(true)
     try {
       const [fb, st, ib] = await Promise.all([
-        fetchParentFeedback(urlToUse.trim(), sdtToUse.trim()),
-        fetchParentStatus(urlToUse.trim(), sdtToUse.trim()),
-        fetchParentInbox(urlToUse.trim(), sdtToUse.trim()),
+        fetchParentFeedback(urlToUse.trim(), sdtToUse.trim(), token),
+        fetchParentStatus(urlToUse.trim(), sdtToUse.trim(), token),
+        fetchParentInbox(urlToUse.trim(), sdtToUse.trim(), token),
       ])
       setData(fb)
       setStatus(st)
@@ -88,9 +88,10 @@ export default function ParentScreen() {
       const unread = (ib.items || []).filter((m) => !m.daXem).map((m) => m.id)
       if (unread.length > 0) markTeacherMessagesRead(urlToUse.trim(), unread).catch(() => {})
       if (!fb.found) {
-        showToast('Chưa đăng ký với SĐT này — đăng ký lại bên dưới', 'warn')
+        showToast(token ? 'Link riêng không còn hiệu lực — xin thầy gửi lại link mới' : 'Chưa đăng ký với SĐT này, hoặc thầy đã cấp link riêng — mở link thầy gửi', 'warn')
         setPhase('register')
       }
+      if (fb.found && fb.sdt) setSdt(String(fb.sdt))
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không tải được dữ liệu', 'error')
     } finally {

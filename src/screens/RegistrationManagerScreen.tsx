@@ -6,7 +6,7 @@
 // huynh/học sinh khác (dữ liệu vị thành niên — sai người nhận là lỗi nghiêm
 // trọng).
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, Users, Trash2, Send, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Users, Trash2, Send, RefreshCw, Check, Link2, KeyRound } from 'lucide-react'
 import {
   listRegisteredParents,
   listRegisteredStudents,
@@ -14,17 +14,23 @@ import {
   deleteParentRegistration,
   deleteStudentRegistration,
   sendTeacherMessage,
+  duyetHoSo,
+  capLaiToken,
+  huyDuyetHoSo,
+  linkRieng,
+  type LoaiHoSo,
   type RegisteredParent,
   type RegisteredStudent,
   type FeedbackSummary,
 } from '../lib/exam-api'
-import { loadScriptUrl } from '../lib/exam-db'
+import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 
 export default function RegistrationManagerScreen() {
   const showToast = useAppStore((s) => s.showToast)
   const setScreen = useAppStore((s) => s.setScreen)
   const [scriptUrl, setScriptUrl] = useState('')
+  const [secret, setSecret] = useState('')
   const [loading, setLoading] = useState(true)
   const [parents, setParents] = useState<RegisteredParent[]>([])
   const [students, setStudents] = useState<RegisteredStudent[]>([])
@@ -35,18 +41,19 @@ export default function RegistrationManagerScreen() {
   const [sending, setSending] = useState(false)
 
   useEffect(() => {
-    loadScriptUrl().then((url) => {
+    Promise.all([loadScriptUrl(), loadTeacherSecret()]).then(([url, mat]) => {
       setScriptUrl(url)
-      if (url.trim()) load(url)
+      setSecret(mat)
+      if (url.trim() && mat.trim()) load(url, mat)
       else setLoading(false)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const load = async (url: string) => {
+  const load = async (url: string, mat: string) => {
     setLoading(true)
     try {
-      const [ps, ss, fb] = await Promise.all([listRegisteredParents(url.trim()), listRegisteredStudents(url.trim()), listAllFeedback(url.trim())])
+      const [ps, ss, fb] = await Promise.all([listRegisteredParents(url.trim(), mat.trim()), listRegisteredStudents(url.trim(), mat.trim()), listAllFeedback(url.trim(), mat.trim())])
       setParents(ps)
       setStudents(ss)
       setFeedback(fb)
@@ -60,7 +67,7 @@ export default function RegistrationManagerScreen() {
   const handleDeleteParent = async (sdt: string, ten: string) => {
     if (!confirm(`Xoá đăng ký phụ huynh của "${ten}"? Phụ huynh sẽ đăng ký lại được ngay sau đó.`)) return
     try {
-      await deleteParentRegistration(scriptUrl.trim(), sdt)
+      await deleteParentRegistration(scriptUrl.trim(), secret.trim(), sdt)
       setParents((prev) => prev.filter((p) => p.sdt !== sdt))
       showToast('Đã xoá đăng ký', 'success')
     } catch (e) {
@@ -71,11 +78,55 @@ export default function RegistrationManagerScreen() {
   const handleDeleteStudent = async (sbd: string, ten: string) => {
     if (!confirm(`Xoá hồ sơ học sinh "${ten}"? Em sẽ đăng ký lại được ngay sau đó.`)) return
     try {
-      await deleteStudentRegistration(scriptUrl.trim(), sbd)
+      await deleteStudentRegistration(scriptUrl.trim(), secret.trim(), sbd)
       setStudents((prev) => prev.filter((s) => s.sbd !== sbd))
       showToast('Đã xoá hồ sơ', 'success')
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Xoá thất bại', 'error')
+    }
+  }
+
+  // DUYỆT HỒ SƠ (BA-APP.md đợt 1): duyệt xong máy chủ cấp token, app copy sẵn
+  // link riêng để thầy dán vào Zalo. Chưa duyệt thì em/phụ huynh không đọc
+  // được gì ngoài ca thi tự do.
+  const [dangDuyet, setDangDuyet] = useState('')
+
+  const copyLink = async (duong: string, ten: string) => {
+    const link = linkRieng(duong)
+    try {
+      await navigator.clipboard.writeText(link)
+      showToast(`Đã copy link riêng của ${ten} — dán vào Zalo gửi đúng người đó`, 'success')
+    } catch {
+      showToast(link, 'success')
+    }
+  }
+
+  const handleDuyet = async (loai: LoaiHoSo, khoa: string, ten: string, capLai = false) => {
+    if (capLai && !confirm(`Cấp lại link cho "${ten}"? Link cũ mất hiệu lực ngay.`)) return
+    setDangDuyet(khoa)
+    try {
+      const kq = capLai
+        ? await capLaiToken(scriptUrl.trim(), secret.trim(), loai, khoa)
+        : await duyetHoSo(scriptUrl.trim(), secret.trim(), loai, khoa)
+      if (loai === 'hs') setStudents((prev) => prev.map((x) => (x.sbd === khoa ? { ...x, token: kq.token, trangThai: 'da_duyet' } : x)))
+      else setParents((prev) => prev.map((x) => (x.sdt === khoa ? { ...x, token: kq.token, trangThai: 'da_duyet' } : x)))
+      await copyLink(kq.duong, ten)
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Không duyệt được', 'error')
+    } finally {
+      setDangDuyet('')
+    }
+  }
+
+  const handleHuyDuyet = async (loai: LoaiHoSo, khoa: string, ten: string) => {
+    if (!confirm(`Thu hồi quyền vào của "${ten}"? Hồ sơ và điểm vẫn giữ nguyên, chỉ link riêng hết hiệu lực.`)) return
+    try {
+      await huyDuyetHoSo(scriptUrl.trim(), secret.trim(), loai, khoa)
+      if (loai === 'hs') setStudents((prev) => prev.map((x) => (x.sbd === khoa ? { ...x, token: '', trangThai: 'cho_duyet' } : x)))
+      else setParents((prev) => prev.map((x) => (x.sdt === khoa ? { ...x, token: '', trangThai: 'cho_duyet' } : x)))
+      showToast('Đã thu hồi link riêng', 'success')
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Không thu hồi được', 'error')
     }
   }
 
@@ -94,7 +145,7 @@ export default function RegistrationManagerScreen() {
     if (!composeSbd.trim() || !composeText.trim()) return showToast('Nhập SBD và nội dung tin nhắn', 'error')
     setSending(true)
     try {
-      await sendTeacherMessage(scriptUrl.trim(), composeSbd.trim(), composeText.trim())
+      await sendTeacherMessage(scriptUrl.trim(), secret.trim(), composeSbd.trim(), composeText.trim())
       showToast('Đã gửi — phụ huynh/học sinh của SBD này sẽ thấy khi mở app', 'success')
       setComposeText('')
     } catch (e) {
@@ -116,7 +167,7 @@ export default function RegistrationManagerScreen() {
         </div>
         {scriptUrl.trim() && (
           <button
-            onClick={() => load(scriptUrl)}
+            onClick={() => load(scriptUrl, secret)}
             className="tap-target w-9 h-9 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-500"
           >
             <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
@@ -125,6 +176,9 @@ export default function RegistrationManagerScreen() {
       </div>
 
       {!scriptUrl.trim() && <div className="text-sm text-slate-500">Chưa có link Apps Script — vào màn Soạn đề để cấu hình trước.</div>}
+      {scriptUrl.trim() && !secret.trim() && (
+        <div className="text-sm text-rose-600">Chưa nhập mã bí mật — vào Ngân hàng câu hỏi → Cấu hình. Từ bản này, danh sách học sinh và phụ huynh chỉ đọc được khi có mã bí mật.</div>
+      )}
 
       {scriptUrl.trim() && (
         <>
@@ -172,15 +226,41 @@ export default function RegistrationManagerScreen() {
               <div key={p.sdt} className="rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 flex items-center justify-between gap-2">
                 <div className="text-sm min-w-0">
                   <div className="font-medium truncate">{p.hoTenHocSinh || '(chưa rõ tên con)'} — SBD {p.sbd}</div>
-                  <div className="text-xs text-slate-400 truncate">SĐT {p.sdt} · {p.hoTenPhuHuynh}</div>
+                  <div className="text-xs text-slate-400 truncate">
+                    SĐT {p.sdt} · {p.hoTenPhuHuynh}
+                    {p.token ? ' · đã duyệt' : p.trangThai === 'cho_duyet' ? ' · CHỜ DUYỆT' : ' · hồ sơ cũ (chưa có link riêng)'}
+                  </div>
                 </div>
-                <button
-                  onClick={() => handleDeleteParent(p.sdt, p.hoTenHocSinh || p.sdt)}
-                  className="tap-target shrink-0 w-9 h-9 rounded-full bg-rose-50 dark:bg-rose-950 text-rose-600 flex items-center justify-center"
-                  title="Xoá đăng ký, cho đăng ký lại"
-                >
-                  <Trash2 size={16} />
-                </button>
+                <div className="shrink-0 flex items-center gap-1.5">
+                  {p.token ? (
+                    <>
+                      <button onClick={() => copyLink(`ph/${p.token}`, p.hoTenPhuHuynh || p.sdt)} className="tap-target w-9 h-9 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center" title="Copy link riêng">
+                        <Link2 size={16} />
+                      </button>
+                      <button onClick={() => handleDuyet('ph', p.sdt, p.hoTenPhuHuynh || p.sdt, true)} className="tap-target w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center" title="Cấp lại link (link cũ hết hiệu lực)">
+                        <KeyRound size={16} />
+                      </button>
+                      <button onClick={() => handleHuyDuyet('ph', p.sdt, p.hoTenPhuHuynh || p.sdt)} className="tap-target w-9 h-9 rounded-full bg-amber-50 dark:bg-amber-950 text-amber-600 flex items-center justify-center" title="Thu hồi quyền vào">
+                        <ArrowLeft size={16} />
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => handleDuyet('ph', p.sdt, p.hoTenPhuHuynh || p.sdt)}
+                      disabled={dangDuyet === p.sdt || !secret.trim()}
+                      className="tap-target h-9 px-3 rounded-full bg-indigo-600 text-white text-sm font-semibold flex items-center gap-1 disabled:opacity-60"
+                    >
+                      <Check size={16} /> Duyệt
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleDeleteParent(p.sdt, p.hoTenHocSinh || p.sdt)}
+                    className="tap-target w-9 h-9 rounded-full bg-rose-50 dark:bg-rose-950 text-rose-600 flex items-center justify-center"
+                    title="Xoá đăng ký, cho đăng ký lại"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -192,15 +272,41 @@ export default function RegistrationManagerScreen() {
               <div key={s.sbd} className="rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 flex items-center justify-between gap-2">
                 <div className="text-sm min-w-0">
                   <div className="font-medium truncate">{s.namSinh} - {s.hoTen} — SBD {s.sbd}</div>
-                  <div className="text-xs text-slate-400 truncate">{s.lop ? `Lớp ${s.lop}` : 'Chưa rõ lớp'}</div>
+                  <div className="text-xs text-slate-400 truncate">
+                    {s.lop ? `Lớp ${s.lop}` : 'Chưa rõ lớp'}
+                    {s.token ? ' · đã duyệt' : s.trangThai === 'cho_duyet' ? ' · CHỜ DUYỆT' : ' · hồ sơ cũ (chưa có link riêng)'}
+                  </div>
                 </div>
-                <button
-                  onClick={() => handleDeleteStudent(s.sbd, s.hoTen)}
-                  className="tap-target shrink-0 w-9 h-9 rounded-full bg-rose-50 dark:bg-rose-950 text-rose-600 flex items-center justify-center"
-                  title="Xoá hồ sơ, cho đăng ký lại"
-                >
-                  <Trash2 size={16} />
-                </button>
+                <div className="shrink-0 flex items-center gap-1.5">
+                  {s.token ? (
+                    <>
+                      <button onClick={() => copyLink(`hs/${s.token}`, s.hoTen || s.sbd)} className="tap-target w-9 h-9 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center" title="Copy link riêng">
+                        <Link2 size={16} />
+                      </button>
+                      <button onClick={() => handleDuyet('hs', s.sbd, s.hoTen || s.sbd, true)} className="tap-target w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center" title="Cấp lại link (link cũ hết hiệu lực)">
+                        <KeyRound size={16} />
+                      </button>
+                      <button onClick={() => handleHuyDuyet('hs', s.sbd, s.hoTen || s.sbd)} className="tap-target w-9 h-9 rounded-full bg-amber-50 dark:bg-amber-950 text-amber-600 flex items-center justify-center" title="Thu hồi quyền vào">
+                        <ArrowLeft size={16} />
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => handleDuyet('hs', s.sbd, s.hoTen || s.sbd)}
+                      disabled={dangDuyet === s.sbd || !secret.trim()}
+                      className="tap-target h-9 px-3 rounded-full bg-indigo-600 text-white text-sm font-semibold flex items-center gap-1 disabled:opacity-60"
+                    >
+                      <Check size={16} /> Duyệt
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleDeleteStudent(s.sbd, s.hoTen)}
+                    className="tap-target w-9 h-9 rounded-full bg-rose-50 dark:bg-rose-950 text-rose-600 flex items-center justify-center"
+                    title="Xoá hồ sơ, cho đăng ký lại"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>

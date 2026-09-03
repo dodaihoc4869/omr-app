@@ -5,7 +5,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { MessageCircle, X, RefreshCw } from 'lucide-react'
 import { listParentMessages, markMessagesRead, type ParentMessage } from '../lib/exam-api'
-import { loadScriptUrl } from '../lib/exam-db'
+import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 
 const POS_KEY = 'omr_msgfab_pos_v1'
@@ -46,6 +46,12 @@ function clampPos(p: { x: number; y: number }): { x: number; y: number } {
 export default function MessagesFab() {
   const showToast = useAppStore((s) => s.showToast)
   const [scriptUrl, setScriptUrl] = useState('')
+  // Mã bí mật giữ trong ref: hộp thư tự hỏi lại theo interval, dùng ref để
+  // không phải dựng lại interval mỗi lần state đổi.
+  const secretRef = useRef('')
+  const setSecret = (v: string) => {
+    secretRef.current = v
+  }
   const [pos, setPos] = useState(() => (typeof window !== 'undefined' ? clampPos(loadPos()) : loadPos()))
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState<ParentMessage[] | null>(null)
@@ -57,11 +63,12 @@ export default function MessagesFab() {
 
   useEffect(() => {
     loadScriptUrl().then(setScriptUrl)
+    loadTeacherSecret().then(setSecret)
   }, [])
 
   const pollUnread = async (url: string) => {
     try {
-      const rows = await listParentMessages(url.trim())
+      const rows = await listParentMessages(url.trim(), secretRef.current.trim())
       setUnread(rows.filter((r) => !r.daDoc).length)
     } catch {
       // Poll nền — lỗi thì bỏ qua, lần sau tự thử lại.
@@ -85,7 +92,7 @@ export default function MessagesFab() {
   const load = async (url: string) => {
     setLoading(true)
     try {
-      const rows = await listParentMessages(url.trim())
+      const rows = await listParentMessages(url.trim(), secretRef.current.trim())
       setItems(rows)
       const unreadIds = rows.filter((r) => !r.daDoc).map((r) => r.id)
       setUnread(0)

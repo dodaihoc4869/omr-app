@@ -6,6 +6,7 @@ import { create } from 'zustand'
 import type { AnswerKey, StudentAnswers } from '../engine/score'
 import { isReviewFlag, scoreStudent, type ScoreResult } from '../engine/score'
 import type { ClassListRow } from '../lib/sheet-gviz'
+import type { VaiTro } from '../lib/vai-tro'
 
 export type ScreenId =
   | 'classlist'
@@ -36,6 +37,10 @@ export interface ScannedSheet {
 interface AppState {
   screen: ScreenId
   setScreen: (s: ScreenId) => void
+  /** Vai của MÁY NÀY (BA-APP.md đợt 1): 'gv' | 'hs' | 'ph'. Do đường link quyết
+   * định, không cho người dùng tự đổi trong app. null = chưa xác định (bản cũ). */
+  vai: VaiTro | null
+  setVai: (v: VaiTro | null) => void
   /** Mã ca đang mở ở màn Chi tiết ca / Theo dõi (đi từ Lịch sử ca thi hoặc ngay sau khi mở ca). */
   maCaTheoDoi: string
   moChiTietCa: (maCa: string) => void
@@ -69,6 +74,8 @@ function recomputeScore(answers: StudentAnswers, key: AnswerKey | undefined): Sc
 export const useAppStore = create<AppState>((set) => ({
   screen: 'examhub',
   setScreen: (s) => set({ screen: s }),
+  vai: null,
+  setVai: (v) => set({ vai: v }),
   maCaTheoDoi: '',
   moChiTietCa: (maCa) => set({ maCaTheoDoi: maCa, screen: 'exammonitor' }),
 
