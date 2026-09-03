@@ -40,6 +40,13 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png', 'icon-hs-192.png', 'icon-hs-512.png', 'icon-ph-192.png', 'icon-ph-512.png', 'manifest-hs.json', 'manifest-ph.json', '404.html', 'cau-hinh.json'],
       manifestFilename: 'manifest.json',
       workbox: {
+        // BẢN MỚI PHẢI CHIẾM QUYỀN NGAY. Mặc định, service worker mới chỉ nằm
+        // chờ ("waiting") tới khi người dùng đóng HẾT tab/app — mà app đã cài
+        // vào màn hình chính thì gần như không bao giờ bị đóng hẳn, nên bản mới
+        // nằm chờ vô hạn: thầy sửa lỗi, đẩy lên, mở app vẫn thấy bản cũ. Đã dính
+        // đúng lỗi này (bản 0eddc42 nằm chờ trong khi máy chủ đã có bản mới).
+        skipWaiting: true,
+        clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data}'],
         maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
         // 404.html chỉ là trang chuyển hướng link ngắn /t/<mã ca> — không để

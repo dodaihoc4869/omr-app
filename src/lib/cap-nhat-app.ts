@@ -34,6 +34,17 @@ export const GIAN_CACH_TOI_THIEU_MS = 60 * 1000
 
 export interface DangKySW {
   update: () => Promise<unknown>
+  /** Bản mới đã tải xong nhưng còn nằm chờ (chưa chiếm quyền). */
+  waiting?: { postMessage: (m: unknown) => void } | null
+}
+
+/** Đẩy bản đang nằm chờ vào chạy ngay.
+ *
+ * Bản sinh ra từ `3420563` trở về trước chỉ gọi `skipWaiting()` KHI NHẬN được
+ * tin nhắn này, nên máy nào còn giữ service worker cũ vẫn cần một cú đẩy. Từ
+ * bản sau, sw tự gọi `skipWaiting` lúc cài nên hàm này chỉ còn là dây bảo hiểm. */
+export function daySangBanMoi(dangKy: DangKySW): void {
+  dangKy.waiting?.postMessage({ type: 'SKIP_WAITING' })
 }
 
 /**
@@ -63,7 +74,9 @@ export function batTuHoiBanMoi(
     const t = now()
     if (t - hoiLanCuoi < GIAN_CACH_TOI_THIEU_MS) return
     hoiLanCuoi = t
-    void Promise.resolve(dangKy.update()).catch(() => {})
+    void Promise.resolve(dangKy.update())
+      .then(() => daySangBanMoi(dangKy))
+      .catch(() => {})
   }
 
   const khiQuayLai = () => {

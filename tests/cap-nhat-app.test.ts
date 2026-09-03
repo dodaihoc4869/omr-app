@@ -110,6 +110,25 @@ describe('batTuHoiBanMoi', () => {
     expect(update).toHaveBeenCalledTimes(1)
   })
 
+  it('bản mới đang NẰM CHỜ thì đẩy sang ngay — chờ vô hạn là lỗi đã dính', async () => {
+    const mt = moiTruongGia()
+    const postMessage = vi.fn()
+    const dangKy = { update: vi.fn().mockResolvedValue(undefined), waiting: { postMessage } }
+    batTuHoiBanMoi(dangKy, mt.moi)
+    mt.ban('focus')
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(postMessage).toHaveBeenCalledWith({ type: 'SKIP_WAITING' })
+  })
+
+  it('không có bản nằm chờ thì không đẩy gì', async () => {
+    const mt = moiTruongGia()
+    const dangKy = { update: vi.fn().mockResolvedValue(undefined), waiting: null }
+    batTuHoiBanMoi(dangKy, mt.moi)
+    expect(() => mt.ban('focus')).not.toThrow()
+    await Promise.resolve()
+  })
+
   it('gỡ xong thì không còn nghe sự kiện nào', () => {
     const mt = moiTruongGia()
     const go = batTuHoiBanMoi({ update: vi.fn().mockResolvedValue(undefined) }, mt.moi)
