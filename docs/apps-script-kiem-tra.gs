@@ -2085,11 +2085,14 @@ function doPost(e) {
     const moiNhat = {}
     const soCa = {}
     const tenTuLuot = {}
+    const soCaTheoCa = {}
     for (let i = 1; i < luotData.length; i++) {
       const tt = String(luotData[i][7])
       if (tt !== 'da_nop' && tt !== 'khoa') continue
       const sbd = String(luotData[i][1])
       soCa[sbd] = (soCa[sbd] || 0) + 1
+      if (!soCaTheoCa[sbd]) soCaTheoCa[sbd] = []
+      soCaTheoCa[sbd].push(String(luotData[i][0]))
       if (!tenTuLuot[sbd] && luotData[i][12]) tenTuLuot[sbd] = String(luotData[i][12])
       const tong = luotData[i][16]
       if (tong === '' || tong === null || tong === undefined) continue
@@ -2144,9 +2147,25 @@ function doPost(e) {
     // Em ĐÃ LÀM BÀI mà không còn ở hai chỗ trên (danh sách thay rồi, hồ sơ đã
     // xoá): KHÔNG được biến mất — điểm của em vẫn nằm trong LuotThi và thầy
     // vẫn phải xem được. Tên lấy từ chính dòng lượt thi.
-    const dsSbdLuot = Object.keys(soCa)
+    //
+    // NHƯNG chỉ tính lượt của ca CÒN TỒN TẠI: thầy xoá hẳn một ca là xoá cả bài
+    // làm của ca đó, để lại lượt mồ côi trong LuotThi. Không lọc thì màn Học
+    // sinh đầy số báo danh của các ca thử đã xoá từ đời nào.
+    const caSong = {}
+    const caSh = sheetCa_()
+    const soDongCa = caSh.getLastRow()
+    if (soDongCa > 1) {
+      const caVals = caSh.getRange(1, 1, soDongCa, 1).getValues()
+      for (let i = 1; i < caVals.length; i++) caSong[String(caVals[i][0])] = true
+    }
+    const dsSbdLuot = Object.keys(soCaTheoCa)
     for (let i = 0; i < dsSbdLuot.length; i++) {
       const sbd = dsSbdLuot[i]
+      let coCaSong = false
+      for (let j = 0; j < soCaTheoCa[sbd].length; j++) {
+        if (caSong[soCaTheoCa[sbd][j]]) { coCaSong = true; break }
+      }
+      if (!coCaSong) continue
       them_(sbd, tenTuLuot[sbd] || '', '', '', dsLop.length ? 'ngoai_danh_sach' : '')
     }
     return jsonResponse_({ ok: true, items: items, serverNow: Date.now() })

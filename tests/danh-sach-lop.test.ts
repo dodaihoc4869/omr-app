@@ -208,8 +208,15 @@ describe('Máy chủ — danh sách em trên màn Học sinh', () => {
   it('KHÔNG làm biến mất em đã có bài làm, dù danh sách mới không còn tên em', () => {
     // Điểm của em nằm trong LuotThi; danh sách thay không được xoá em khỏi mắt
     // thầy. Ba nguồn gộp lại: danh sách nạp · hồ sơ riêng · lượt thi.
-    expect(than).toContain('const dsSbdLuot = Object.keys(soCa)')
+    expect(than).toContain('const dsSbdLuot = Object.keys(soCaTheoCa)')
     expect(than).toContain('tenTuLuot[sbd]')
+  })
+
+  it('nhưng BỎ QUA lượt mồ côi của ca đã xoá hẳn', () => {
+    // Xoá hẳn một ca là xoá cả bài làm của ca đó. Không lọc thì màn Học sinh
+    // đầy số báo danh của các ca thử đã xoá từ đời nào.
+    expect(than).toContain('const caSong = {}')
+    expect(than).toContain('if (!coCaSong) continue')
   })
 
   it('em ngoài danh sách được gắn cờ để thầy biết em đó không thi được nữa', () => {
