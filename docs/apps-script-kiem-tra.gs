@@ -1610,8 +1610,12 @@ function doPost(e) {
     }
     chuyenDe.sort(function (a, b) { return b.tiLeSai - a.tiLeSai })
 
-    // Lịch sử ca thi + hạng trong ca (tính từ chính LuotThi, không lưu sẵn)
-    const luotData = sheetLuot_().getDataRange().getValues()
+    // Lịch sử ca thi + hạng trong ca (tính từ chính LuotThi, không lưu sẵn).
+    // Chỉ lấy 17 cột đầu: bỏ GhiChu/CapNhatLuc và nhất là GiayCauJson —
+    // getDataRange() kéo về cả JSON giây-từng-câu của MỌI lượt, rất nặng.
+    const luotSh = sheetLuot_()
+    const soDongLuot = luotSh.getLastRow()
+    const luotData = soDongLuot > 0 ? luotSh.getRange(1, 1, soDongLuot, 17).getValues() : []
     const diemTheoCa = {}
     for (let i = 1; i < luotData.length; i++) {
       const tt = String(luotData[i][7])
