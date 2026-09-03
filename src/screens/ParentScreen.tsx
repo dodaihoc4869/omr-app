@@ -63,10 +63,14 @@ export default function ParentScreen() {
   // đối chiếu), và họ tên con. Họ tên phụ huynh không hỏi nữa — tự sinh theo
   // cấu trúc "<năm sinh con>PH<Họ tên con>".
   const [sbd, setSbd] = useState('')
-  const [ngaySinh, setNgaySinh] = useState('')
+  // NĂM SINH, không phải ngày sinh đầy đủ. App chỉ dùng 4 chữ số năm để sinh mã
+  // phụ huynh; hỏi thêm ngày và tháng là thu thập quá mức cần cho tính năng —
+  // đây là dữ liệu của trẻ vị thành niên. Cũng khớp đúng ô "Năm sinh" mà em đã
+  // điền lúc đăng ký, để hai bên không lệch nhau.
+  const [namSinh, setNamSinh] = useState('')
   const [hoTenHocSinh, setHoTenHocSinh] = useState('')
   const [saving, setSaving] = useState(false)
-  const hoTenPhuHuynhAuto = ngaySinh && hoTenHocSinh.trim() ? `${ngaySinh.slice(0, 4)}PH${titleCase(hoTenHocSinh.trim())}` : ''
+  const hoTenPhuHuynhAuto = namSinh.trim() && hoTenHocSinh.trim() ? `${namSinh.trim()}PH${titleCase(hoTenHocSinh.trim())}` : ''
 
   const [data, setData] = useState<ParentFeedbackResult | null>(null)
   const [status, setStatus] = useState<ParentStatus | null>(null)
@@ -159,8 +163,9 @@ export default function ParentScreen() {
 
   const handleRegister = async () => {
     if (!scriptUrl.trim()) return showToast('Chưa có link kết nối — hỏi thầy link Apps Script', 'error')
-    if (!sdt.trim() || !sbd.trim() || !ngaySinh.trim() || !hoTenHocSinh.trim())
-      return showToast('Nhập đủ SĐT, số báo danh, ngày sinh và họ tên con', 'error')
+    if (!sdt.trim() || !sbd.trim() || !namSinh.trim() || !hoTenHocSinh.trim())
+      return showToast('Nhập đủ SĐT, số báo danh, năm sinh và họ tên con', 'error')
+    if (!/^\d{4}$/.test(namSinh.trim())) return showToast('Năm sinh gồm 4 chữ số, ví dụ 2010', 'error')
     setSaving(true)
     try {
       const tenChuan = titleCase(hoTenHocSinh.trim())
@@ -230,12 +235,14 @@ export default function ParentScreen() {
           />
         </div>
         <div>
-          <label className="text-xs text-slate-500 pl-1">Ngày sinh của con</label>
+          <label className="text-xs text-slate-500 pl-1">Năm sinh của con</label>
           <input
-            type="date"
+            inputMode="numeric"
+            maxLength={4}
             className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3"
-            value={ngaySinh}
-            onChange={(e) => setNgaySinh(e.target.value)}
+            placeholder="Vd 2010"
+            value={namSinh}
+            onChange={(e) => setNamSinh(e.target.value.replace(/[^0-9]/g, ''))}
           />
         </div>
         <input
