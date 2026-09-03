@@ -27,6 +27,7 @@ import {
   type ExamAttempt,
 } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
+import { datDangLamBai } from '../lib/cap-nhat-app'
 
 /** Đang toàn màn hình: đã thêm vào màn hình chính (standalone) HOẶC Fullscreen API đang bật. */
 function dangToanManHinh(): boolean {
@@ -205,6 +206,13 @@ export default function ExamTakeScreen() {
       navigator.vibrate?.(200)
     }
   }, [remaining])
+
+  // Đang thi thì hoãn việc tự tải bản app mới — tải lại giữa bài làm mất toàn
+  // màn hình và có thể bị tính là một lần rời màn (xem cap-nhat-app.ts).
+  useEffect(() => {
+    datDangLamBai(phase === 'exam')
+    return () => datDangLamBai(false)
+  }, [phase])
 
   // Chặn Back vật lý (Android) / nút quay lại trình duyệt trong lúc làm bài:
   // đẩy 1 mục lịch sử giả, mỗi lần bấm Back thì đẩy lại + hỏi có nộp luôn

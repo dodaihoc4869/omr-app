@@ -13,6 +13,21 @@
 /** Khoảng cách giữa hai lần tự hỏi máy chủ khi app cứ mở (ms). */
 export const NHIP_HOI_MS = 30 * 60 * 1000
 
+// ĐANG LÀM BÀI THÌ KHÔNG HỎI. Có bản mới là app tự tải lại trang — giữa lúc em
+// đang thi thì tải lại làm mất toàn màn hình, và máy chống gian lận có thể tính
+// đó là một lần rời màn. Bài không mất (IndexedDB), nhưng em hoảng là có thật.
+// Bản mới chờ tới lúc em nộp xong cũng không muộn.
+let dangLamBai = false
+
+/** ExamTakeScreen gọi khi vào/ra màn làm bài. */
+export function datDangLamBai(v: boolean): void {
+  dangLamBai = v
+}
+
+export function dangLamBaiKhong(): boolean {
+  return dangLamBai
+}
+
 /** Khoảng cách tối thiểu giữa hai lần hỏi — chặn hỏi dồn khi người dùng bật
  * tắt màn hình liên tục. */
 export const GIAN_CACH_TOI_THIEU_MS = 60 * 1000
@@ -44,6 +59,7 @@ export function batTuHoiBanMoi(
   let hoiLanCuoi = 0
 
   const hoi = () => {
+    if (dangLamBaiKhong()) return
     const t = now()
     if (t - hoiLanCuoi < GIAN_CACH_TOI_THIEU_MS) return
     hoiLanCuoi = t

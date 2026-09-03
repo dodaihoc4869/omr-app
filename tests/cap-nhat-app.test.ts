@@ -1,7 +1,9 @@
 // TỰ HỎI BẢN MỚI — vì sửa lỗi xong mà máy vẫn chạy bản cũ là lỗi làm thầy
 // mất thời gian nhất: tưởng chưa sửa, sửa lại lần nữa.
-import { describe, expect, it, vi } from 'vitest'
-import { batTuHoiBanMoi, GIAN_CACH_TOI_THIEU_MS, NHIP_HOI_MS } from '../src/lib/cap-nhat-app'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { batTuHoiBanMoi, datDangLamBai, GIAN_CACH_TOI_THIEU_MS, NHIP_HOI_MS } from '../src/lib/cap-nhat-app'
+
+afterEach(() => datDangLamBai(false))
 
 function moiTruongGia() {
   const nghe = new Map<string, Set<() => void>>()
@@ -91,6 +93,21 @@ describe('batTuHoiBanMoi', () => {
     batTuHoiBanMoi({ update }, mt.moi)
     expect(() => mt.ban('focus')).not.toThrow()
     await Promise.resolve()
+  })
+
+  it('EM ĐANG THI thì không hỏi — tải lại giữa bài là mất toàn màn hình', () => {
+    const mt = moiTruongGia()
+    const update = vi.fn().mockResolvedValue(undefined)
+    batTuHoiBanMoi({ update }, mt.moi)
+    datDangLamBai(true)
+    mt.ban('focus')
+    mt.troiQua(NHIP_HOI_MS)
+    mt.chayNhip()
+    expect(update).not.toHaveBeenCalled()
+
+    datDangLamBai(false)
+    mt.ban('focus')
+    expect(update).toHaveBeenCalledTimes(1)
   })
 
   it('gỡ xong thì không còn nghe sự kiện nào', () => {
