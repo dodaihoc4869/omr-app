@@ -226,6 +226,11 @@ export default function HocSinhScreen() {
         </button>
       </div>
 
+      {/* Nói thẳng chạm vào đâu để giao bài — nút Giao bài tập nằm trong hồ sơ
+          từng em (phải biết em yếu chuyên đề nào mới rút được câu), nên nhìn
+          danh sách không đoán ra. */}
+      <div style={NHAN_NHO}>Chạm một em để xem hồ sơ, giao bài tập về nhà và copy phiếu Zalo.</div>
+
       {yeuCau.length > 0 && (
         <OThongBao tone="cam">
           <span className="flex items-center justify-between flex-wrap" style={{ gap: 'var(--k2)' }}>

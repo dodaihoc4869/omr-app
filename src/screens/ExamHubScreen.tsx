@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { ClipboardList, GraduationCap, Users2, Users, Library } from 'lucide-react'
+import { ClipboardList, GraduationCap, Users2, Users, Library, BookPlus } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { PHIEN_BAN_APP } from '../lib/cap-nhat-app'
 
@@ -76,6 +76,10 @@ export default function ExamHubScreen() {
       />
       <TheBam icon={<Library size={22} />} title="Ngân hàng câu hỏi" sub="Đề tự về từ kho · duyệt câu nghi đáp án" onClick={() => setScreen('nganhangde')} />
       <TheBam icon={<ClipboardList size={22} />} title="Lịch sử ca thi & chấm bài" sub="Mọi ca đã mở, ai đã nộp, điểm, cho thi lại, xuất bảng điểm" onClick={() => setScreen('lichsuca')} />
+      {/* Giao bài tập nằm trong hồ sơ từng em (phải chọn em mới biết em yếu chuyên
+          đề nào). Nhưng chôn sâu như thế thì không ai tìm ra — thầy đã tìm không
+          thấy. Thẻ này đưa thẳng tới danh sách em. */}
+      <TheBam icon={<BookPlus size={22} />} title="Giao bài tập về nhà" sub="Chọn em → Giao bài tập · chuyên đề em yếu được tick sẵn" onClick={() => setScreen('hocsinh')} />
       <TheBam icon={<Users size={22} />} title="Quản lý đăng ký" sub="Phụ huynh & học sinh đã đăng ký, gửi tin cho 1 em" onClick={() => setScreen('registrationmanager')} />
       <TheBam icon={<Users2 size={22} />} title="Học sinh — Vào thi" sub="Nhập mã ca thầy cho + số báo danh" onClick={() => setScreen('examtake')} />
       <TheBam icon={<GraduationCap size={22} />} title="Học sinh — Hồ sơ & nhắn tin thầy" sub="Đăng ký 1 lần, tự điền SBD lúc vào thi" onClick={() => setScreen('studentprofile')} />
