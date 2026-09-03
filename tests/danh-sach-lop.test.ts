@@ -193,6 +193,36 @@ describe('Máy chủ — em qua cổng thì có hồ sơ', () => {
   })
 })
 
+describe('Máy chủ — danh sách em trên màn Học sinh', () => {
+  const than = (() => {
+    const i = gsCode.indexOf("if (action === 'danhSachEm')")
+    return gsCode.slice(i, gsCode.indexOf('serverNow: Date.now() })', i))
+  })()
+
+  it('lấy danh sách thầy nạp làm nguồn chính, không phải bảng hồ sơ', () => {
+    expect(than).toContain('const dsLop = docDanhSachLop_()')
+    // Danh sách thầy nạp phải duyệt TRƯỚC hồ sơ riêng, để tên trong file thắng.
+    expect(than.indexOf('for (let i = 0; i < dsLop.length; i++)')).toBeLessThan(than.indexOf('dsSbdHoSo'))
+  })
+
+  it('KHÔNG làm biến mất em đã có bài làm, dù danh sách mới không còn tên em', () => {
+    // Điểm của em nằm trong LuotThi; danh sách thay không được xoá em khỏi mắt
+    // thầy. Ba nguồn gộp lại: danh sách nạp · hồ sơ riêng · lượt thi.
+    expect(than).toContain('const dsSbdLuot = Object.keys(soCa)')
+    expect(than).toContain('tenTuLuot[sbd]')
+  })
+
+  it('em ngoài danh sách được gắn cờ để thầy biết em đó không thi được nữa', () => {
+    expect(than).toContain("'ngoai_danh_sach'")
+    // Chưa nạp danh sách lần nào thì không gắn cờ bừa cho ai.
+    expect(than).toContain("dsLop.length ? 'ngoai_danh_sach'")
+  })
+
+  it('mỗi số báo danh chỉ ra MỘT dòng, dù có ở cả ba nguồn', () => {
+    expect(than).toContain('if (!sbd || daRa[sbd]) return')
+  })
+})
+
 describe('Máy chủ — chỉ thầy đụng được danh sách', () => {
   it('napDanhSachLop đòi mã bí mật', () => {
     const i = gsCode.indexOf("if (action === 'napDanhSachLop')")

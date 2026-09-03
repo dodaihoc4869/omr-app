@@ -2084,11 +2084,13 @@ function doPost(e) {
     const luotData = sheetLuot_().getDataRange().getValues()
     const moiNhat = {}
     const soCa = {}
+    const tenTuLuot = {}
     for (let i = 1; i < luotData.length; i++) {
       const tt = String(luotData[i][7])
       if (tt !== 'da_nop' && tt !== 'khoa') continue
       const sbd = String(luotData[i][1])
       soCa[sbd] = (soCa[sbd] || 0) + 1
+      if (!tenTuLuot[sbd] && luotData[i][12]) tenTuLuot[sbd] = String(luotData[i][12])
       const tong = luotData[i][16]
       if (tong === '' || tong === null || tong === undefined) continue
       const nop = String(luotData[i][6] || '')
@@ -2138,6 +2140,14 @@ function doPost(e) {
       const sbd = dsSbdHoSo[i]
       const h = hoSo[sbd]
       them_(sbd, h.hoTen, h.namSinh, h.lop, dsLop.length ? 'ngoai_danh_sach' : h.trangThai)
+    }
+    // Em ĐÃ LÀM BÀI mà không còn ở hai chỗ trên (danh sách thay rồi, hồ sơ đã
+    // xoá): KHÔNG được biến mất — điểm của em vẫn nằm trong LuotThi và thầy
+    // vẫn phải xem được. Tên lấy từ chính dòng lượt thi.
+    const dsSbdLuot = Object.keys(soCa)
+    for (let i = 0; i < dsSbdLuot.length; i++) {
+      const sbd = dsSbdLuot[i]
+      them_(sbd, tenTuLuot[sbd] || '', '', '', dsLop.length ? 'ngoai_danh_sach' : '')
     }
     return jsonResponse_({ ok: true, items: items, serverNow: Date.now() })
   }
