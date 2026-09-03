@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -6,8 +7,27 @@ import { VitePWA } from 'vite-plugin-pwa'
 // Đổi giá trị này đúng bằng tên repo GitHub của thầy trước khi deploy.
 const REPO_BASE = '/omr-app/'
 
+// DẤU PHIÊN BẢN in ở màn chính: <mã commit> · <ngày giờ build>. Để khi thầy
+// sửa lỗi rồi mở app trên máy khác, nhìn dòng này biết ngay máy đã nhận bản
+// mới hay còn giữ bản cũ trong bộ nhớ — thay vì đoán.
+function dauPhienBan(): string {
+  let sha = process.env.GITHUB_SHA || ''
+  if (!sha) {
+    try {
+      sha = execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim()
+    } catch {
+      sha = ''
+    }
+  }
+  const ngay = new Date().toISOString().slice(0, 16).replace('T', ' ')
+  return `${sha ? sha.slice(0, 7) : 'dev'} · ${ngay}`
+}
+
 export default defineConfig({
   base: process.env.GITHUB_PAGES === 'true' ? REPO_BASE : '/',
+  define: {
+    __PHIEN_BAN__: JSON.stringify(dauPhienBan()),
+  },
   plugins: [
     react(),
     VitePWA({

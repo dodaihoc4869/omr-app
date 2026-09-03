@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { ClipboardList, GraduationCap, Users2, Users, Library } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
+import { PHIEN_BAN_APP } from '../lib/cap-nhat-app'
 
 // MANCUAVAOVANENTOI.md mục 2: thẻ KHÔNG viền màu, phân cấp bằng bóng --bong-1;
 // CHỈ MỘT thẻ nổi bật — hành động chính (mở ca) — bằng nền gradient --g1;
@@ -78,6 +79,12 @@ export default function ExamHubScreen() {
       <TheBam icon={<Users size={22} />} title="Quản lý đăng ký" sub="Phụ huynh & học sinh đã đăng ký, gửi tin cho 1 em" onClick={() => setScreen('registrationmanager')} />
       <TheBam icon={<Users2 size={22} />} title="Học sinh — Vào thi" sub="Nhập mã ca thầy cho + số báo danh" onClick={() => setScreen('examtake')} />
       <TheBam icon={<GraduationCap size={22} />} title="Học sinh — Hồ sơ & nhắn tin thầy" sub="Đăng ký 1 lần, tự điền SBD lúc vào thi" onClick={() => setScreen('studentprofile')} />
+
+      {/* Dấu phiên bản: sửa lỗi xong, mở app thấy mã commit mới nghĩa là máy đã
+          nhận bản mới; còn mã cũ nghĩa là máy còn giữ bản cũ. */}
+      <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', textAlign: 'center', marginTop: 'var(--k2)' }}>
+        Bản {PHIEN_BAN_APP}
+      </div>
     </div>
   )
 }
