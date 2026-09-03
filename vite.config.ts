@@ -37,8 +37,13 @@ export default defineConfig({
       // ngay, không cần thầy/học sinh xoá cache tay mới thấy sửa lỗi —
       // injectRegister:false để không đăng ký trùng 2 lần.
       injectRegister: false,
-      includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png', 'icon-hs-192.png', 'icon-hs-512.png', 'icon-ph-192.png', 'icon-ph-512.png', 'manifest-hs.json', 'manifest-ph.json', '404.html', 'cau-hinh.json'],
-      manifestFilename: 'manifest.json',
+      includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png', 'icon-hs-192.png', 'icon-hs-512.png', 'icon-ph-192.png', 'icon-ph-512.png', 'manifest.json', 'manifest-hs.json', 'manifest-ph.json', '404.html', 'cau-hinh.json'],
+      // KHÔNG để plugin sinh và CHÈN thẻ manifest. Thẻ nó chèn nằm cuối <head>
+      // và luôn trỏ manifest chung, nên Chrome cài ra app "ĐỖ ĐẠI HỌC" chung dù
+      // em đang ở app học sinh — mã JS đổi thẻ sau đó là đã muộn. Ba file
+      // manifest.json / manifest-hs.json / manifest-ph.json nay nằm thẳng trong
+      // public/, và index.html tự chọn đúng file ngay lúc phân tích HTML.
+      manifest: false,
       workbox: {
         // BẢN MỚI PHẢI CHIẾM QUYỀN NGAY. Mặc định, service worker mới chỉ nằm
         // chờ ("waiting") tới khi người dùng đóng HẾT tab/app — mà app đã cài
@@ -56,27 +61,6 @@ export default defineConfig({
         // 404.html chỉ chạy khi máy CHƯA cài service worker; máy đã cài thì nó
         // không bao giờ chạy, và link riêng rơi thẳng vào màn quản lý của thầy.
         // Đọc từ đường dẫn còn được cái nữa: link vào thi mở được cả khi mất mạng.
-      },
-      // Tên hiển thị "ĐỖ ĐẠI HỌC" (tên trung tâm); màu = --muc / --nen của
-      // tokens.css. display:standalone + orientation:portrait chỉ có tác dụng
-      // khi học sinh đã "Thêm vào màn hình chính" — app nhắc việc đó ở màn
-      // vào thi (DaiNhacCaiApp).
-      manifest: {
-        name: 'ĐỖ ĐẠI HỌC',
-        short_name: 'ĐỖ ĐẠI HỌC',
-        description: 'Kiểm tra tại lớp, chấm bài và kết quả — trung tâm luyện thi Hoá Đỗ Đại Học',
-        lang: 'vi',
-        theme_color: '#1a2332',
-        background_color: '#f7f8fa',
-        display: 'standalone',
-        orientation: 'portrait',
-        start_url: '.',
-        scope: '.',
-        icons: [
-          { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
-          { src: 'icon-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
-        ],
       },
     }),
   ],
