@@ -2094,22 +2094,50 @@ function doPost(e) {
       const nop = String(luotData[i][6] || '')
       if (!moiNhat[sbd] || msCua_(nop) > msCua_(moiNhat[sbd].nopLuc)) moiNhat[sbd] = { nopLuc: nop, tong: Number(tong), maCa: String(luotData[i][0]) }
     }
-    const items = []
+    // Hồ sơ riêng theo SBD, để ghép tên/lớp cho em nào đã có.
+    const hoSo = {}
     for (let i = 1; i < hsData.length; i++) {
-      const sbd = String(hsData[i][0])
+      const sbd = String(hsData[i][0]).trim()
       if (!sbd) continue
-      items.push({
-        sbd: sbd,
+      hoSo[sbd] = {
         hoTen: String(hsData[i][1] || ''),
         namSinh: String(hsData[i][2] || ''),
         lop: String(hsData[i][3] || ''),
         trangThai: String(hsData[i][HS_COT_TRANGTHAI] || ''),
-        coLinkRieng: chuanToken_(hsData[i][HS_COT_TOKEN]).length === 32,
+      }
+    }
+
+    const dsLop = docDanhSachLop_()
+    const items = []
+    const daRa = {}
+    function them_(sbd, hoTen, namSinh, lop, trangThai) {
+      if (!sbd || daRa[sbd]) return
+      daRa[sbd] = true
+      items.push({
+        sbd: sbd,
+        hoTen: hoTen,
+        namSinh: namSinh,
+        lop: lop,
+        trangThai: trangThai,
         soCa: soCa[sbd] || 0,
         diemGanNhat: moiNhat[sbd] ? moiNhat[sbd].tong : null,
         caGanNhat: moiNhat[sbd] ? moiNhat[sbd].maCa : '',
         nopGanNhat: moiNhat[sbd] ? moiNhat[sbd].nopLuc : '',
       })
+    }
+    // Danh sách thầy nạp đi trước; hồ sơ riêng chỉ bù chỗ thầy để trống.
+    for (let i = 0; i < dsLop.length; i++) {
+      const e = dsLop[i]
+      const h = hoSo[e.sbd]
+      them_(e.sbd, e.hoTen || (h ? h.hoTen : ''), e.namSinh || (h ? h.namSinh : ''), e.lop || (h ? h.lop : ''), h ? h.trangThai : '')
+    }
+    // Em có hồ sơ mà KHÔNG có trong danh sách mới: vẫn hiện, gắn cờ để thầy
+    // biết — em đó không vào thi được nữa.
+    const dsSbdHoSo = Object.keys(hoSo)
+    for (let i = 0; i < dsSbdHoSo.length; i++) {
+      const sbd = dsSbdHoSo[i]
+      const h = hoSo[sbd]
+      them_(sbd, h.hoTen, h.namSinh, h.lop, dsLop.length ? 'ngoai_danh_sach' : h.trangThai)
     }
     return jsonResponse_({ ok: true, items: items, serverNow: Date.now() })
   }
