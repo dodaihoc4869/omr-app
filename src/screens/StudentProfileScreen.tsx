@@ -7,7 +7,7 @@ import { GraduationCap, Send, MessageSquareText } from 'lucide-react'
 import { registerStudent, fetchStudentProfile, sendStudentMessage, fetchStudentInbox, markTeacherMessagesRead, baiTapCuaEm, hoSoEm, type TeacherMessage, type BaiTapCuaEm, type HoSoEm } from '../lib/exam-api'
 import { KhoiBaiTap, KhoiChuyenDe, KhoiLichSuCa } from '../components/HoSoEmView'
 import { NutCaiApp } from '../components/DaiCaiApp'
-import { loadMyStudentSbd, loadScriptUrl, loadTokenHocSinh, saveMyStudentSbd } from '../lib/exam-db'
+import { loadMyStudentSbd, loadScriptUrlHoacMacDinh, loadTokenHocSinh, saveMyStudentSbd } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 
 function titleCase(s: string): string {
@@ -48,7 +48,11 @@ export default function StudentProfileScreen() {
   const hoTenHienThi = namSinh && hoTen.trim() ? `${namSinh} - ${titleCase(hoTen.trim())}` : ''
 
   useEffect(() => {
-    loadScriptUrl().then(setScriptUrl)
+    // MÁY EM / MÁY PHỤ HUYNH chưa bao giờ lưu link Apps Script — link đó chỉ
+    // được lưu trên máy thầy hoặc khi vào thi bằng link có sẵn &api=. Phải đọc
+    // tiếp từ public/cau-hinh.json, nếu không màn đăng ký báo "Chưa có link kết
+    // nối — hỏi thầy link Apps Script" và em không đăng ký được.
+    loadScriptUrlHoacMacDinh().then(setScriptUrl)
     Promise.all([loadMyStudentSbd(), loadTokenHocSinh()]).then(([saved, tk]) => {
       setSbd(saved)
       setToken(tk)

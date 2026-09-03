@@ -23,7 +23,7 @@ import {
 } from '../lib/exam-api'
 import { KhoiBaiTap, KhoiChuyenDe, KhoiLichSuCa } from '../components/HoSoEmView'
 import { NutCaiApp } from '../components/DaiCaiApp'
-import { loadMyParentPhone, loadScriptUrl, loadTokenPhuHuynh, saveMyParentPhone } from '../lib/exam-db'
+import { loadMyParentPhone, loadScriptUrlHoacMacDinh, loadTokenPhuHuynh, saveMyParentPhone } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 
 function classifyBadgeColor(xepLoai: string): string {
@@ -81,7 +81,11 @@ export default function ParentScreen() {
   const [sendingMsg, setSendingMsg] = useState(false)
 
   useEffect(() => {
-    loadScriptUrl().then(setScriptUrl)
+    // MÁY EM / MÁY PHỤ HUYNH chưa bao giờ lưu link Apps Script — link đó chỉ
+    // được lưu trên máy thầy hoặc khi vào thi bằng link có sẵn &api=. Phải đọc
+    // tiếp từ public/cau-hinh.json, nếu không màn đăng ký báo "Chưa có link kết
+    // nối — hỏi thầy link Apps Script" và em không đăng ký được.
+    loadScriptUrlHoacMacDinh().then(setScriptUrl)
     Promise.all([loadMyParentPhone(), loadTokenPhuHuynh()]).then(([saved, tk]) => {
       setSdt(saved)
       setToken(tk)
