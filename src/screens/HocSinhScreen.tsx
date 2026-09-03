@@ -255,7 +255,12 @@ export default function HocSinhScreen() {
         {/* CÙNG MỘT NÚT VỚI KHO ĐỀ: bấm là chọn file danh sách rồi đẩy lên máy
             chủ. Danh sách này là CỔNG VÀO THI — nạp xong, số báo danh ngoài
             danh sách không thi được nữa. */}
-        <NutDongBoDanhSach onXong={() => void tai()} />
+        <NutDongBoDanhSach
+          onXong={(soEm, tomTat) => {
+            showToast(`Đã nạp ${soEm} em lên máy chủ${tomTat ? ` — ${tomTat}` : ''}. Từ giờ chỉ những em này vào thi được.`, 'success')
+            void tai()
+          }}
+        />
       </div>
 
       {/* Nói thẳng chạm vào đâu để giao bài — nút Giao bài tập nằm trong hồ sơ

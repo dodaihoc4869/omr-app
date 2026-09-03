@@ -13,14 +13,24 @@ export interface EmTrongDanhSach {
   sbd: string
   hoTen: string
   namSinh: string
+  /** Lớp — lấy từ TÊN SHEET trong file của thầy ("lớp 12" → "12"). */
+  lop: string
 }
 
 export interface KetQuaDocDanhSach {
   items: EmTrongDanhSach[]
-  /** Dòng bị bỏ vì thiếu dữ liệu — kèm số dòng trong file để thầy mở ra sửa. */
-  boQua: { dong: number; vaoSao: string }[]
+  /** Dòng bị bỏ vì thiếu dữ liệu — kèm tên sheet và số dòng để thầy mở ra sửa. */
+  boQua: { sheet: string; dong: number; vaoSao: string }[]
   /** Số báo danh xuất hiện nhiều lần: giữ dòng đầu, nêu ra để thầy biết. */
   trung: string[]
+  /** Số em đọc được từ mỗi sheet — thầy đối chiếu với sổ. */
+  theoSheet: { ten: string; soEm: number }[]
+}
+
+/** Tên sheet → tên lớp. Thầy hay đặt "lớp 12", "Lop 11"; hiển thị "Lớp lớp 12"
+ * thì đọc kỳ. Bỏ tiền tố, giữ nguyên khi sheet đặt kiểu "12A1". */
+export function lopTuTenSheet(ten: string): string {
+  return String(ten ?? '').replace(/^\s*l[ơo]?[pớ]?p?\s*/i, '').trim() || String(ten ?? '').trim()
 }
 
 function bo(v: unknown): string {
@@ -78,15 +88,23 @@ function doCotTheoHinhDang(hang: unknown[]): { sbd: number; hoTen: number; namSi
   return kq
 }
 
-/** Chuyển các hàng thô (từ xlsx hoặc csv) thành danh sách học sinh. */
-export function hangToDanhSach(hang: unknown[][]): KetQuaDocDanhSach {
+/** Chuyển các hàng thô của MỘT sheet thành danh sách học sinh.
+ *
+ * `lop` là tên lớp gán cho mọi em trong sheet này; `daCo` và `trung` được
+ * truyền vào để lọc trùng XUYÊN SUỐT cả file — một em chỉ được nằm ở một lớp. */
+export function hangToDanhSach(
+  hang: unknown[][],
+  lop = '',
+  daCo: Set<string> = new Set(),
+  gomTrung: string[] = [],
+  tenSheet = '',
+): KetQuaDocDanhSach {
   const items: EmTrongDanhSach[] = []
-  const boQua: { dong: number; vaoSao: string }[] = []
-  const trung: string[] = []
-  const daCo = new Set<string>()
+  const boQua: { sheet: string; dong: number; vaoSao: string }[] = []
+  const trung = gomTrung
 
   const khongRong = hang.filter((h) => h.some((o) => bo(o) !== ''))
-  if (khongRong.length === 0) return { items, boQua, trung }
+  if (khongRong.length === 0) return { items, boQua, trung, theoSheet: [{ ten: tenSheet, soEm: 0 }] }
 
   let cot = doCotTheoTieuDe(khongRong[0])
   let batDau = 1
@@ -110,7 +128,7 @@ export function hangToDanhSach(hang: unknown[][]): KetQuaDocDanhSach {
     if (!hoTen) thieu.push('họ tên')
     if (!namSinh) thieu.push('năm sinh')
     if (thieu.length) {
-      boQua.push({ dong, vaoSao: `thiếu ${thieu.join(', ')}` })
+      boQua.push({ sheet: tenSheet, dong, vaoSao: `thiếu ${thieu.join(', ')}` })
       continue
     }
     if (daCo.has(sbd)) {
@@ -118,17 +136,44 @@ export function hangToDanhSach(hang: unknown[][]): KetQuaDocDanhSach {
       continue
     }
     daCo.add(sbd)
-    items.push({ sbd, hoTen, namSinh })
+    items.push({ sbd, hoTen, namSinh, lop })
   }
-  return { items, boQua, trung }
+  return { items, boQua, trung, theoSheet: [{ ten: tenSheet, soEm: items.length }] }
 }
 
-/** Đọc một file thầy chọn (xlsx, xls, csv) thành danh sách học sinh. */
+/** Đọc một file thầy chọn (xlsx, xls, csv) thành danh sách học sinh.
+ *
+ * ĐỌC HẾT MỌI SHEET, không chỉ sheet đầu: file của thầy tách mỗi khối một sheet
+ * ("lớp 10", "lớp 11", "lớp 12"), chỉ đọc sheet đầu là mất hơn 200 em mà không
+ * ai biết. Tên sheet thành tên lớp. Sheet nào không có đủ 3 cột thì BỎ QUA sheet
+ * đó (thầy hay để thêm sheet ghi chú), nhưng cả file không ra em nào thì báo lỗi. */
 export async function docFileDanhSach(file: File): Promise<KetQuaDocDanhSach> {
   const buf = await file.arrayBuffer()
   const wb = XLSX.read(buf, { cellDates: true })
-  const ten = wb.SheetNames[0]
-  if (!ten) throw new Error('File không có sheet nào')
-  const hang = XLSX.utils.sheet_to_json<unknown[]>(wb.Sheets[ten], { header: 1, raw: true, defval: '' })
-  return hangToDanhSach(hang)
+  if (!wb.SheetNames.length) throw new Error('File không có sheet nào')
+
+  const items: EmTrongDanhSach[] = []
+  const boQua: KetQuaDocDanhSach['boQua'] = []
+  const theoSheet: KetQuaDocDanhSach['theoSheet'] = []
+  const trung: string[] = []
+  const daCo = new Set<string>()
+  const loiSheet: string[] = []
+
+  for (const ten of wb.SheetNames) {
+    const hang = XLSX.utils.sheet_to_json<unknown[]>(wb.Sheets[ten], { header: 1, raw: true, defval: '' })
+    try {
+      const kq = hangToDanhSach(hang, lopTuTenSheet(ten), daCo, trung, ten)
+      items.push(...kq.items)
+      boQua.push(...kq.boQua)
+      theoSheet.push(...kq.theoSheet)
+    } catch (e) {
+      loiSheet.push(`${ten}: ${e instanceof Error ? e.message : 'không đọc được'}`)
+      theoSheet.push({ ten, soEm: 0 })
+    }
+  }
+
+  if (items.length === 0) {
+    throw new Error(loiSheet.length ? loiSheet[0] : 'Không tìm thấy đủ 3 cột: số báo danh, họ tên, năm sinh.')
+  }
+  return { items, boQua, trung, theoSheet }
 }

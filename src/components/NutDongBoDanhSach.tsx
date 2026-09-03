@@ -17,7 +17,8 @@ export default function NutDongBoDanhSach({
   onXong,
   className = '',
 }: {
-  onXong?: (soEm: number) => void
+  /** Gọi sau khi đẩy xong: số em và dòng tóm tắt theo lớp để màn ngoài hiện ra. */
+  onXong?: (soEm: number, tomTat: string) => void
   className?: string
 }) {
   const [tt, setTt] = useState<TrangThai>({ kieu: 'nghi' })
@@ -42,8 +43,15 @@ export default function NutDongBoDanhSach({
       const doc = await docFileDanhSach(file)
       if (doc.items.length === 0) return bao({ kieu: 'loi', chu: 'File không có em nào đủ 3 cột' })
 
-      const kq = await napDanhSachLop(url.trim(), secret.trim(), doc.items.map((e) => ({ ...e, lop: '' })))
-      onXong?.(kq.soDong)
+      const kq = await napDanhSachLop(url.trim(), secret.trim(), doc.items)
+
+      // Số em TỪNG SHEET để thầy đối chiếu với sổ — file nhiều sheet mà đọc
+      // hụt một sheet thì nhìn tổng số không phát hiện ra.
+      const tomTat = doc.theoSheet
+        .filter((t) => t.soEm > 0)
+        .map((t) => `${t.ten}: ${t.soEm}`)
+        .join(' · ')
+      onXong?.(kq.soDong, tomTat)
 
       // Dòng hỏng KHÔNG được im lặng: em nào không lên danh sách là em đó đứng
       // ngoài phòng thi. Báo đúng số dòng để thầy mở file sửa.
