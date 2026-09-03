@@ -596,7 +596,9 @@ function xuHuongChuyenDe_(dongCua1Em) {
 /** Hồ sơ học sinh đã đăng ký (sheet HocSinh) — null nếu chưa có. */
 function hoSoHocSinh_(sbd) {
   try {
-    const sh = sheetHS_()
+    // Đường chỉ-đọc: không gọi sheetHS_() vì hàm đó còn ghi bổ sung tiêu đề
+    // (thêm một lượt đọc/ghi cho mỗi lệnh — đắt trên Apps Script).
+    const sh = getSheet_(SHEET_HOCSINH, HS_HEADERS)
     const row = findRowByKey_(sh, 0, sbd)
     if (row < 0) return null
     const v = sh.getRange(row, 1, 1, 5).getValues()[0]
@@ -1583,21 +1585,28 @@ function doPost(e) {
     }
     if (!sbd) return jsonResponse_({ ok: false, error: 'Thiếu số báo danh' })
 
-    const em = hoSoHocSinh_(sbd) || { sbd: sbd, hoTen: tenHocSinh_(sbd), namSinh: '', lop: '' }
+    const em = hoSoHocSinh_(sbd) || { sbd: sbd, hoTen: '', namSinh: '', lop: '' }
 
-    // Bảng chuyên đề (cộng dồn) + xu hướng (theo ca)
-    const hsData = sheetTienDoHS_().getDataRange().getValues()
-    const caData = sheetTienDoCa_().getDataRange().getValues()
+    // Bảng chuyên đề + xu hướng, cả hai tính từ MỘT lần đọc TienDoCa: mỗi lệnh
+    // Apps Script tốn sẵn ~1,5 giây overhead nên cắt được lần đọc sheet nào là
+    // cắt (TienDoHS vẫn giữ để các lệnh khác dùng, nhưng ở đây không cần đọc).
+    const caData = getSheet_(SHEET_TIENDO_CA, TIENDO_CA_HEADERS).getDataRange().getValues()
     const dongEm = []
     for (let i = 1; i < caData.length; i++) if (String(caData[i][0]) === sbd) dongEm.push(caData[i])
     const xh = xuHuongChuyenDe_(dongEm)
+    const cong = {}
+    for (let i = 0; i < dongEm.length; i++) {
+      const cd = String(dongEm[i][2])
+      if (!cong[cd]) cong[cd] = { soCau: 0, soSai: 0 }
+      cong[cd].soCau += Number(dongEm[i][3]) || 0
+      cong[cd].soSai += Number(dongEm[i][4]) || 0
+    }
     const chuyenDe = []
-    for (let i = 1; i < hsData.length; i++) {
-      if (String(hsData[i][0]) !== sbd) continue
-      const soCau = Number(hsData[i][2]) || 0
-      if (soCau === 0) continue
-      const soSai = Number(hsData[i][3]) || 0
-      chuyenDe.push({ ten: String(hsData[i][1]), soCau: soCau, soSai: soSai, tiLeSai: soSai / soCau, xuHuong: xh[String(hsData[i][1])] || 'chua_du' })
+    const dsCd = Object.keys(cong)
+    for (let i = 0; i < dsCd.length; i++) {
+      const v = cong[dsCd[i]]
+      if (v.soCau === 0) continue
+      chuyenDe.push({ ten: dsCd[i], soCau: v.soCau, soSai: v.soSai, tiLeSai: v.soSai / v.soCau, xuHuong: xh[dsCd[i]] || 'chua_du' })
     }
     chuyenDe.sort(function (a, b) { return b.tiLeSai - a.tiLeSai })
 
@@ -1614,8 +1623,7 @@ function doPost(e) {
       diemTheoCa[mc].push(Number(tong))
     }
     const tenCa = {}
-    const caSh = sheetCa_()
-    const caRows = caSh.getDataRange().getValues()
+    const caRows = getSheet_(SHEET_CA, CA_HEADERS).getDataRange().getValues()
     for (let i = 1; i < caRows.length; i++) tenCa[String(caRows[i][0])] = { tenCa: String(caRows[i][10] || ''), lop: String(caRows[i][1] || '') }
     const ca = []
     for (let i = 1; i < luotData.length; i++) {
