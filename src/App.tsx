@@ -4,10 +4,10 @@ import Toast from './components/Toast'
 import MessagesFab from './components/MessagesFab'
 import { useAppStore } from './store/appStore'
 import { loadClassList } from './lib/classlist-db'
-import { docDuongVao, manDauCua, nhoVai, vaiDaNho, xoaDauVetToken, type VaiTro } from './lib/vai-tro'
+import { docDuongVao, manDauCua, xoaDauVetToken, type VaiTro } from './lib/vai-tro'
 import { datManifestTheoVai } from './lib/pwa-install'
 import DaiCaiApp from './components/DaiCaiApp'
-import { loadTeacherSecret, saveTokenHocSinh, saveTokenPhuHuynh } from './lib/exam-db'
+import { saveTokenHocSinh, saveTokenPhuHuynh } from './lib/exam-db'
 import ClassListScreen from './screens/ClassListScreen'
 import ExamHubScreen from './screens/ExamHubScreen'
 import ExamSetupScreen from './screens/ExamSetupScreen'
@@ -19,15 +19,16 @@ import ParentScreen from './screens/ParentScreen'
 import StudentProfileScreen from './screens/StudentProfileScreen'
 import RegistrationManagerScreen from './screens/RegistrationManagerScreen'
 import HocSinhScreen from './screens/HocSinhScreen'
+import CuaVaoScreen from './screens/CuaVaoScreen'
 
 // Icon tin nhắn nổi chỉ dành cho THẦY — ẩn ở các màn phụ huynh/học sinh tự
 // dùng trên máy riêng của họ (họ không cần thấy hộp thư của thầy).
-const HIDE_FAB_ON: string[] = ['parent', 'studentprofile', 'examtake', 'nganhangde']
+const HIDE_FAB_ON: string[] = ['cuavao', 'parent', 'studentprofile', 'examtake', 'nganhangde']
 // Thanh menu dưới (Lớp/Kiểm tra/Phụ huynh...) chỉ dành cho THẦY điều hướng
 // giữa các màn quản lý — ẩn hẳn khi học sinh vào bằng link mời làm bài, để
 // không còn lối bấm ra khỏi màn thi (tránh xao nhãng, tránh lộ menu quản lý
 // không liên quan tới học sinh).
-const HIDE_BOTTOMNAV_ON: string[] = ['examtake']
+const HIDE_BOTTOMNAV_ON: string[] = ['cuavao', 'examtake']
 
 // Màn nào vai nào được mở. Máy học sinh / phụ huynh KHÔNG có lối nào bấm sang
 // màn quản lý của thầy — kể cả khi state bị đặt nhầm.
@@ -55,16 +56,12 @@ function App() {
   // xoá khỏi thanh địa chỉ ngay.
   useEffect(() => {
     const { vai: vaiLink, token, maCa } = docDuongVao(location.search, location.pathname)
+    // VAI CHỈ ĐẾN TỪ ĐƯỜNG LINK, không từ dữ liệu cũ trong máy. Đường trống thì
+    // để nguyên vai null — app hiện MÀN CỬA VÀO ba vai trò, không tự đoán.
     const dungVai = async (): Promise<VaiTro | null> => {
       if (vaiLink === 'hs' && token) await saveTokenHocSinh(token)
       if (vaiLink === 'ph' && token) await saveTokenPhuHuynh(token)
-      if (vaiLink) {
-        nhoVai(vaiLink)
-        return vaiLink
-      }
-      // Đường trống (bookmark, trình duyệt khôi phục tab, app đã cài mở lại sau
-      // khi thanh địa chỉ đã bị dọn): lấy vai đã nhớ, trừ máy thầy.
-      return vaiDaNho(!!(await loadTeacherSecret()))
+      return vaiLink
     }
     dungVai()
       .catch(() => null)
@@ -92,6 +89,7 @@ function App() {
       <Toast />
       {/* Dải cài app: chỉ vai học sinh/phụ huynh, và không chen vào màn đang làm bài. */}
       {laKhach && manHienThi !== 'examtake' && <DaiCaiApp vai={vai as 'hs' | 'ph'} />}
+      {manHienThi === 'cuavao' && <CuaVaoScreen />}
       {manHienThi === 'classlist' && <ClassListScreen />}
       {manHienThi === 'examhub' && <ExamHubScreen />}
       {manHienThi === 'examsetup' && <ExamSetupScreen />}

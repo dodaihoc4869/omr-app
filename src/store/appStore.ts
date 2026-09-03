@@ -9,6 +9,7 @@ import type { ClassListRow } from '../lib/sheet-gviz'
 import type { VaiTro } from '../lib/vai-tro'
 
 export type ScreenId =
+  | 'cuavao'
   | 'classlist'
   | 'examhub'
   | 'examsetup'
@@ -76,7 +77,9 @@ function recomputeScore(answers: StudentAnswers, key: AnswerKey | undefined): Sc
 }
 
 export const useAppStore = create<AppState>((set) => ({
-  screen: 'examhub',
+  // Mở đường gốc thì hiện màn cửa vào 3 vai trò, KHÔNG rơi thẳng vào app quản
+  // lý của thầy: em/phụ huynh mở nhầm đường gốc sẽ thấy nguyên menu quản lý.
+  screen: 'cuavao',
   setScreen: (s) => set({ screen: s }),
   vai: null,
   setVai: (v) => set({ vai: v }),

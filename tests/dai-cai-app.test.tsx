@@ -4,10 +4,10 @@
 // "ĐỖ ĐẠI HỌC" chung, vì máy còn giữ bản HTML cũ nên thẻ <link rel="manifest">
 // vẫn trỏ manifest chung. Dải nay đọc tên thẳng từ manifest đang được trỏ tới,
 // lệch thì đổi thành nút "Tải lại" chứ không cho cài nhầm.
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import DaiCaiApp from '../src/components/DaiCaiApp'
-import { moBangChrome, tenAppCuaVai, tenAppSeCai, trongTrinhDuyetTrongApp } from '../src/lib/pwa-install'
+import { CHO_SU_KIEN_CAI_MS, laCocCoc, moBangChrome, tenAppCuaVai, tenAppSeCai, trongTrinhDuyetTrongApp } from '../src/lib/pwa-install'
 
 function datManifest(noiDung: object | null) {
   document.head.querySelectorAll('link[rel="manifest"]').forEach((l) => l.remove())
@@ -141,7 +141,8 @@ describe('DaiCaiApp trong Zalo', () => {
     vi.stubGlobal('navigator', { ...navigator, userAgent: UA_ZALO, clipboard: { writeText: vi.fn() } })
     datManifest({ short_name: 'ĐĐH Học sinh' })
     render(<DaiCaiApp vai="hs" />)
-    expect(screen.getByText('Mở bằng trình duyệt để cài app')).toBeTruthy()
+    expect(screen.getByText('Mở bằng Chrome để cài app')).toBeTruthy()
+    expect(screen.getByText(/Đang mở trong Zalo/)).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Cài đặt' })).toBeNull()
     expect(screen.getByRole('button', { name: 'Sao chép link' })).toBeTruthy()
     expect(screen.getByRole('link', { name: 'Thử mở trong Chrome' })).toBeTruthy()
@@ -157,5 +158,54 @@ describe('DaiCaiApp trong Zalo', () => {
     render(<DaiCaiApp vai="ph" />)
     expect(screen.getByRole('button', { name: 'Sao chép link' })).toBeTruthy()
     expect(screen.queryByRole('link', { name: 'Thử mở trong Chrome' })).toBeNull()
+  })
+})
+
+// TRÌNH DUYỆT KHÔNG CÀI ĐƯỢC PWA (Cốc Cốc và mọi trình duyệt khác cùng cảnh).
+// Video thứ hai của thầy: menu trình duyệt KHÔNG có "Thêm vào Màn hình chính",
+// bấm Cài đặt chỉ ra tấm hướng dẫn chỉ vào một mục không tồn tại. Nên không
+// đoán theo tên trình duyệt nữa mà dò khả năng thật: chờ beforeinstallprompt,
+// im lặng thì kết luận không cài được.
+describe('Trình duyệt không hỗ trợ cài (Cốc Cốc)', () => {
+  const UA_COCCOC =
+    'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/120 Mobile Safari/537.36 coc_coc_browser/120.0.0'
+
+  it('laCocCoc nhận đúng, không nhận nhầm Chrome', () => {
+    expect(laCocCoc(UA_COCCOC)).toBe(true)
+    expect(laCocCoc('Mozilla/5.0 (Linux; Android 13) Chrome/120 Mobile Safari/537.36')).toBe(false)
+  })
+
+  it('chờ hết giờ mà không có beforeinstallprompt → bỏ nút Cài đặt, chỉ đường sang Chrome', async () => {
+    vi.useFakeTimers()
+    vi.stubGlobal('navigator', { ...navigator, userAgent: UA_COCCOC, clipboard: { writeText: vi.fn() } })
+    datManifest({ short_name: 'ĐĐH Học sinh' })
+    render(<DaiCaiApp vai="hs" />)
+    // Trước khi hết giờ chờ: vẫn mời cài, không kết luận vội.
+    expect(screen.queryByText('Mở bằng Chrome để cài app')).toBeNull()
+    await act(async () => {
+      vi.advanceTimersByTime(CHO_SU_KIEN_CAI_MS + 10)
+    })
+    expect(screen.getByText('Mở bằng Chrome để cài app')).toBeTruthy()
+    expect(screen.getByText(/Cốc Cốc không cài được/)).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Cài đặt' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Sao chép link' })).toBeTruthy()
+    vi.useRealTimers()
+  })
+
+  it('iPhone Safari KHÔNG bị kết luận là không cài được — cài tay vẫn được', async () => {
+    vi.useFakeTimers()
+    vi.stubGlobal('navigator', {
+      ...navigator,
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1',
+      clipboard: { writeText: vi.fn() },
+    })
+    datManifest({ short_name: 'ĐĐH Học sinh' })
+    render(<DaiCaiApp vai="hs" />)
+    await act(async () => {
+      vi.advanceTimersByTime(CHO_SU_KIEN_CAI_MS + 10)
+    })
+    expect(screen.getByRole('button', { name: 'Cài đặt' })).toBeTruthy()
+    expect(screen.queryByText('Mở bằng Chrome để cài app')).toBeNull()
+    vi.useRealTimers()
   })
 })

@@ -155,6 +155,18 @@ export function trongTrinhDuyetTrongApp(ua = typeof navigator === 'undefined' ? 
   return false
 }
 
+/** Cốc Cốc — trình duyệt Chromium phổ biến ở Việt Nam nhưng KHÔNG có luồng cài
+ * PWA: menu không có "Thêm vào Màn hình chính" và không bắn beforeinstallprompt.
+ * Thầy quay video đúng cảnh này. Nhận riêng để nói đúng tên trình duyệt. */
+export function laCocCoc(ua = typeof navigator === 'undefined' ? '' : navigator.userAgent || ''): boolean {
+  return /coc_coc_browser|CocCoc/i.test(ua)
+}
+
+/** Thời gian chờ beforeinstallprompt trước khi kết luận trình duyệt không cài
+ * được. Chrome bắn sự kiện này ngay sau khi tải xong; quá mốc này mà im thì
+ * gần như chắc chắn là trình duyệt không hỗ trợ. */
+export const CHO_SU_KIEN_CAI_MS = 2500
+
 /** Android: thử nhảy sang Chrome bằng intent. iOS không có cách tương đương. */
 export function moBangChrome(ua = typeof navigator === 'undefined' ? '' : navigator.userAgent || ''): string | null {
   if (!/Android/i.test(ua)) return null

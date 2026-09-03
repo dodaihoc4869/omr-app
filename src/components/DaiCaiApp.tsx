@@ -8,7 +8,7 @@
 // "Để sau" im 7 ngày rồi nhắc lại (pwa-install.ts).
 import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
-import { caiMotCham, coTheCaiMotCham, daBoQuaNhacCai, dangTrongTrinhDuyet, ghiNhoBoQuaNhacCai, laIOS, moBangChrome, tenAppCuaVai, tenAppSeCai, theoDoiSuKienCai, trongTrinhDuyetTrongApp, NGAY_IM_LANG } from '../lib/pwa-install'
+import { caiMotCham, CHO_SU_KIEN_CAI_MS, coTheCaiMotCham, daBoQuaNhacCai, dangTrongTrinhDuyet, ghiNhoBoQuaNhacCai, laCocCoc, laIOS, moBangChrome, tenAppCuaVai, tenAppSeCai, theoDoiSuKienCai, trongTrinhDuyetTrongApp, NGAY_IM_LANG } from '../lib/pwa-install'
 import { useAppStore } from '../store/appStore'
 
 const SANS: React.CSSProperties = { fontFamily: 'var(--sans)' }
@@ -57,8 +57,19 @@ export default function DaiCaiApp({ vai }: { vai: 'hs' | 'ph' }) {
   const [moHuongDan, setMoHuongDan] = useState(false)
   // Nút "Cài đặt" luôn hiện: có beforeinstallprompt thì cài 1 chạm, không có
   // (Safari) thì mở hướng dẫn tay. Vẫn nghe sự kiện để cập nhật khả năng cài.
-  const [, setCoNutCai] = useState(coTheCaiMotCham())
+  const [coNutCai, setCoNutCai] = useState(coTheCaiMotCham())
   useEffect(() => theoDoiSuKienCai(() => setCoNutCai(coTheCaiMotCham())), [])
+
+  // KHÔNG ĐOÁN THEO TÊN TRÌNH DUYỆT, DÒ KHẢ NĂNG THẬT. Cốc Cốc là Chromium
+  // nhưng không có luồng cài PWA: menu không có "Thêm vào Màn hình chính" và
+  // không bắn beforeinstallprompt. Đoán theo tên thì còn sót bao nhiêu trình
+  // duyệt khác. Chờ hết CHO_SU_KIEN_CAI_MS mà không có sự kiện, và không phải
+  // iOS (iOS vốn không có sự kiện này, cài tay được), thì kết luận không cài được.
+  const [hetGioCho, setHetGioCho] = useState(false)
+  useEffect(() => {
+    const t = setTimeout(() => setHetGioCho(true), CHO_SU_KIEN_CAI_MS)
+    return () => clearTimeout(t)
+  }, [])
 
   // TÊN APP TRÌNH DUYỆT THẬT SỰ SẼ CÀI, đọc từ đúng file manifest đang được
   // thẻ <link rel="manifest"> trỏ tới. null = chưa đọc xong.
@@ -85,7 +96,9 @@ export default function DaiCaiApp({ vai }: { vai: 'hs' | 'ph' }) {
   }
 
   const trongApp = trongTrinhDuyetTrongApp()
-  const linkChrome = trongApp ? moBangChrome() : null
+  // iOS: không bao giờ có beforeinstallprompt, nhưng Safari cài tay được.
+  const khongCaiDuoc = trongApp || (!coNutCai && hetGioCho && !laIOS())
+  const linkChrome = khongCaiDuoc ? moBangChrome() : null
 
   const chepLink = async () => {
     try {
@@ -112,7 +125,7 @@ export default function DaiCaiApp({ vai }: { vai: 'hs' | 'ph' }) {
   // TRONG ZALO/FACEBOOK thì không cài được, và cũng không nên vờ như cài được:
   // các trình duyệt đó bỏ qua manifest, "Thêm vào màn hình chính" chỉ ra một lối
   // tắt mang tên và biểu tượng chung. Phải mở bằng Chrome/Safari trước.
-  if (trongApp) {
+  if (khongCaiDuoc) {
     return (
       <div
         role="note"
@@ -122,10 +135,18 @@ export default function DaiCaiApp({ vai }: { vai: 'hs' | 'ph' }) {
           <img src={bieuTuong(vai)} alt="" width={44} height={44} style={{ borderRadius: 'var(--bo-1)', flex: 'none' }} />
           <div className="flex-1 min-w-0">
             <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
-              Mở bằng trình duyệt để cài app
+              Mở bằng Chrome để cài app
             </div>
             <div style={{ fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
-              Đang mở trong Zalo nên không cài được. Bấm <b>⋮</b> góc trên bên phải, chọn <b>Mở bằng trình duyệt</b>.
+              {trongApp ? (
+                <>
+                  Đang mở trong Zalo nên không cài được. Bấm <b>⋮</b> góc trên bên phải, chọn <b>Mở bằng trình duyệt</b>.
+                </>
+              ) : laCocCoc() ? (
+                <>Cốc Cốc không cài được app ra màn hình chính. Sao chép link rồi mở bằng Chrome.</>
+              ) : (
+                <>Trình duyệt này không cài được app ra màn hình chính. Sao chép link rồi mở bằng Chrome.</>
+              )}
             </div>
           </div>
           <button type="button" onClick={deSau} className="tap-target shrink-0" style={{ fontSize: 'var(--cx-1)', color: 'var(--nhat)', padding: '0 var(--k2)' }}>

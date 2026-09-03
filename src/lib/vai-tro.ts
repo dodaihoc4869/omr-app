@@ -22,21 +22,6 @@ export function tokenHopLe(token: string): boolean {
   return /^[A-Za-z0-9]{32}$/.test(token) && token.length === DAI_TOKEN
 }
 
-/**
- * Đọc vai từ đường link.
- *
- * VAI KHÔNG ĐÒI TOKEN TRONG LINK. App đã cài ra màn hình chính mở bằng
- * `start_url` của manifest — `?vai=hs&nguon=pwa`, KHÔNG có token, vì token là
- * của riêng từng em, không nhét vào file manifest chung được. Token đã nằm sẵn
- * trong máy (IndexedDB) từ lần đầu em bấm link riêng thầy gửi.
- *
- * Trước đây hàm này đòi token hợp lệ mới nhận vai, nên mở app đã cài sẽ rơi về
- * `vai: null` và app hiện MÀN QUẢN LÝ CỦA THẦY — sai màn hoàn toàn.
- *
- * Vai chỉ quyết định HIỂN THỊ. Chặn thật vẫn ở Apps Script: mọi lệnh đọc dữ
- * liệu một em đều tra token ra SBD ở máy chủ, nên gõ tay `?vai=hs` không đọc
- * được gì nếu máy không có token.
- */
 const RE_TOKEN_TREN_DUONG = /(?:^|\/)(hs|ph)\/([A-Za-z0-9]{32})\/?$/
 const RE_GV_TREN_DUONG = /(?:^|\/)gv\/?$/
 const RE_CA_TREN_DUONG = /(?:^|\/)t\/(\d{4,8})\/?$/
@@ -142,40 +127,6 @@ export function xoaDauVetToken(goc = '/'): void {
     history.replaceState(null, '', duong + (con ? `?${con}` : ''))
   } catch {
     // trình duyệt cũ không có history.replaceState — bỏ qua, không ảnh hưởng chức năng
-  }
-}
-
-const KHOA_VAI = 'ddh.vai'
-
-/** Nhớ vai trên MÁY EM / MÁY PHỤ HUYNH, để mở app bằng đường trống (bookmark,
- * trình duyệt khôi phục tab) vẫn vào đúng app chứ không rơi về màn của thầy.
- * KHÔNG nhớ vai `gv` — máy thầy nhận ra bằng mã bí mật, không cần đánh dấu. */
-export function nhoVai(vai: VaiTro): void {
-  if (vai !== 'hs' && vai !== 'ph') return
-  try {
-    localStorage.setItem(KHOA_VAI, vai)
-  } catch {
-    // trình duyệt chặn storage — vẫn chạy được bằng vai trên đường link
-  }
-}
-
-/** Vai đã nhớ. Máy thầy (có mã bí mật) thì bỏ qua hoàn toàn: thầy có thể đã
- * mở thử link phụ huynh, không được vì thế mà biến máy thầy thành máy phụ huynh. */
-export function vaiDaNho(coMaBiMat: boolean): VaiTro | null {
-  if (coMaBiMat) return null
-  try {
-    const v = localStorage.getItem(KHOA_VAI)
-    return v === 'hs' || v === 'ph' ? v : null
-  } catch {
-    return null
-  }
-}
-
-export function quenVai(): void {
-  try {
-    localStorage.removeItem(KHOA_VAI)
-  } catch {
-    // không xoá được thì thôi
   }
 }
 

@@ -5,7 +5,7 @@
 // docDuongVao lại đòi token hợp lệ mới nhận vai. Kết quả: em bấm biểu tượng app
 // trên màn hình chính thì vào thẳng MÀN QUẢN LÝ CỦA THẦY.
 import { beforeEach, describe, expect, it } from 'vitest'
-import { chuanHoaDuongDan, docDuongVao, docVaiTuDuongDan, manDauCua, nhoVai, quenVai, vaiDaNho, xoaDauVetToken } from '../src/lib/vai-tro'
+import { chuanHoaDuongDan, docDuongVao, docVaiTuDuongDan, manDauCua, xoaDauVetToken } from '../src/lib/vai-tro'
 import manifestHS from '../public/manifest-hs.json'
 import manifestPH from '../public/manifest-ph.json'
 
@@ -164,29 +164,13 @@ describe('Dọn thanh địa chỉ', () => {
   })
 })
 
-describe('Nhớ vai trên máy em / máy phụ huynh', () => {
-  it('nhớ rồi thì mở đường trống vẫn vào đúng app', () => {
-    nhoVai('hs')
-    expect(vaiDaNho(false)).toBe('hs')
-  })
-
-  it('MÁY THẦY (có mã bí mật) bỏ qua vai đã nhớ — thầy mở thử link phụ huynh không biến máy thầy thành máy phụ huynh', () => {
-    nhoVai('ph')
-    expect(vaiDaNho(true)).toBe(null)
-  })
-
-  it('không nhớ vai thầy', () => {
-    nhoVai('gv')
-    expect(vaiDaNho(false)).toBe(null)
-  })
-
-  it('quên vai thì về mặc định', () => {
-    nhoVai('hs')
-    quenVai()
-    expect(vaiDaNho(false)).toBe(null)
-  })
-
-  it('chưa nhớ gì thì trả null, không đoán bừa', () => {
-    expect(vaiDaNho(false)).toBe(null)
+// VAI CHỈ ĐẾN TỪ ĐƯỜNG LINK. Trước có cơ chế nhớ vai trong localStorage để mở
+// đường trống vẫn vào đúng app; đã bỏ theo đúng nguyên tắc "localStorage chỉ
+// dùng để điền sẵn, KHÔNG dùng để điều hướng". Đường trống nay hiện MÀN CỬA VÀO
+// ba vai trò (CuaVaoScreen) chứ không đoán bừa.
+describe('Đường trống thì không đoán vai', () => {
+  it('không có tham số, không có đường dẫn đặc biệt → vai null', () => {
+    expect(docDuongVao('', '/omr-app/').vai).toBe(null)
+    expect(docDuongVao('?nguon=pwa', '/omr-app/').vai).toBe(null)
   })
 })
