@@ -81,8 +81,9 @@ export default function ExamHubScreen() {
       <TheBam icon={<GraduationCap size={22} />} title="Học sinh — Hồ sơ & nhắn tin thầy" sub="Đăng ký 1 lần, tự điền SBD lúc vào thi" onClick={() => setScreen('studentprofile')} />
 
       {/* Dấu phiên bản: sửa lỗi xong, mở app thấy mã commit mới nghĩa là máy đã
-          nhận bản mới; còn mã cũ nghĩa là máy còn giữ bản cũ. */}
-      <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', textAlign: 'center', marginTop: 'var(--k2)' }}>
+          nhận bản mới; còn mã cũ nghĩa là máy còn giữ bản cũ. Căn TRÁI để không
+          bị icon tin nhắn (kéo thả được, hay nằm giữa dưới) đè lên. */}
+      <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginTop: 'var(--k2)' }}>
         Bản {PHIEN_BAN_APP}
       </div>
     </div>
