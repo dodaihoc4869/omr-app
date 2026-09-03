@@ -128,7 +128,7 @@ export default function ExamHubScreen() {
         onClick={() => setScreen('examsetup')}
       />
       <TheBam icon={<Library size={22} />} title="Ngân hàng câu hỏi" sub="Đề tự về từ kho · duyệt câu nghi đáp án" onClick={() => setScreen('nganhangde')} />
-      <TheBam icon={<ClipboardList size={22} />} title="Lịch sử ca thi & chấm bài" sub="Mọi ca đã mở, ai đã nộp, điểm, cho thi lại, xuất bảng điểm" onClick={() => setScreen('lichsuca')} />
+      <TheBam icon={<ClipboardList size={22} />} title="Ca thi" sub="Mọi ca đã mở, ai đã nộp, điểm, cho thi lại, xuất bảng điểm · tích chọn xoá nhiều ca" onClick={() => setScreen('lichsuca')} />
       {/* Giao bài tập vẫn nằm trong hồ sơ từng em — vào bằng tab HỌC SINH ở
           thanh dưới, chạm một em. Bỏ thẻ lối tắt ở đây theo yêu cầu của thầy;
           tính năng KHÔNG bị gỡ.

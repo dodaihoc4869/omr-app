@@ -1,4 +1,4 @@
-// Màn Lịch sử ca thi — chế độ tích chọn để xoá nhiều ca.
+// Màn Ca thi — chế độ tích chọn để xoá nhiều ca.
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { render, fireEvent, waitFor, act } from '@testing-library/react'
 import type { CaTomTat } from '../src/lib/exam-api'
@@ -51,7 +51,7 @@ beforeEach(() => {
   xoaNhieuCa.mockResolvedValue({ ok: [], loi: [] })
 })
 
-describe('Lịch sử ca thi — tích chọn xoá', () => {
+describe('Ca thi — tích chọn xoá', () => {
   it('chọn tất cả rồi xoá: gửi đúng danh sách mã ca đang hiện', async () => {
     const r = await moMan([ca('111111', '12', 0), ca('222222', '2', 0)])
     fireEvent.click(r.getByText('Chọn tất cả (2)'))
@@ -78,16 +78,22 @@ describe('Lịch sử ca thi — tích chọn xoá', () => {
     expect(xoaNhieuCa).toHaveBeenCalledWith('https://gia/exec', 'mat', ['222222'])
   })
 
-  it('ca đã có em vào làm: phải gõ XOA mới bấm được nút xoá', async () => {
+  // Thầy bỏ bước gõ "XOA": xoá ngay sau khi bấm, không gõ gì thêm. Hộp xác
+  // nhận vẫn còn — nó liệt kê đúng ca nào và bao nhiêu bài làm sẽ mất.
+  it('ca đã có em vào làm: xoá được ngay, KHÔNG bắt gõ chữ xác nhận', async () => {
     const r = await moMan([ca('111111', '12', 3)])
     fireEvent.click(r.getByText('Ca 111111'))
     await act(async () => {
       fireEvent.click(r.getByText('Xoá 1'))
     })
-    const nut = r.getByText('Xoá 1 ca') as HTMLButtonElement
-    expect(nut.disabled).toBe(true)
-    fireEvent.change(r.getByLabelText('Gõ XOA để xác nhận xoá'), { target: { value: 'XOA' } })
     expect((r.getByText('Xoá 1 ca') as HTMLButtonElement).disabled).toBe(false)
+    expect(r.queryByLabelText('Gõ XOA để xác nhận xoá')).toBeNull()
+    // Hộp xác nhận vẫn phải nói rõ mất bao nhiêu bài làm.
+    expect(r.getByText(/xoá rồi không khôi phục được/)).toBeTruthy()
+    await act(async () => {
+      fireEvent.click(r.getByText('Xoá 1 ca'))
+    })
+    expect(xoaNhieuCa).toHaveBeenCalledWith('https://gia/exec', 'mat', ['111111'])
   })
 
   it('bộ lọc lớp đang bật: "Chọn tất cả" không đụng ca của lớp khác', async () => {

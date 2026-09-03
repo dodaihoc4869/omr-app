@@ -5,16 +5,15 @@
 // Cùng hồ sơ này sẽ dùng lại cho lối vào từ mục Phụ huynh — không dựng hai màn.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, BookPlus, ClipboardCopy, RefreshCw, Search, Trash2 } from 'lucide-react'
+import { ArrowLeft, ClipboardCopy, RefreshCw, Search, Trash2 } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung, DauThe } from '../components/DesignSystem'
-import { KhoiBaiTap, KhoiChuyenDe, KhoiLichSuCa, NGUONG_YEU, toneXepLoai } from '../components/HoSoEmView'
+import { KhoiChuyenDe, KhoiLichSuCa, toneXepLoai } from '../components/HoSoEmView'
 import { danhSachEm, deleteStudentRegistration, hoSoEm, khoiTuNamSinh, type EmTomTat, type HoSoEm } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { classify } from '../engine/score'
 import { useAppStore } from '../store/appStore'
-import GiaoBaiTap from '../components/GiaoBaiTap'
 import NutDongBoDanhSach from '../components/NutDongBoDanhSach'
-import { baiTapCuaEm, danhSachYeuCau, type BaiTapCuaEm, type YeuCauGiaoBai } from '../lib/exam-api'
+import { baiTapCuaEm, type BaiTapCuaEm } from '../lib/exam-api'
 import { soanPhieuZalo, NHAC_TRUOC_KHI_GUI } from '../lib/phieu-zalo'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -49,11 +48,8 @@ export default function HocSinhScreen() {
 
   const [hoSo, setHoSo] = useState<HoSoEm | null>(null)
   const [dangTaiHoSo, setDangTaiHoSo] = useState(false)
-  const [moGiaoBai, setMoGiaoBai] = useState(false)
   const showToast = useAppStore((s) => s.showToast)
   const [baiTap, setBaiTap] = useState<BaiTapCuaEm[] | null>(null)
-  // Hàng chờ phụ huynh xin giao bài (BA-APP đợt 4) — máy thầy là nơi rút câu.
-  const [yeuCau, setYeuCau] = useState<YeuCauGiaoBai[]>([])
 
   const tai = async () => {
     setDangTai(true)
@@ -64,9 +60,6 @@ export default function HocSinhScreen() {
       if (!mat.trim()) throw new Error('Chưa nhập mã bí mật — vào Ngân hàng câu hỏi → Cấu hình')
       setCauHinh({ url: url.trim(), mat: mat.trim() })
       setDs(await danhSachEm(url.trim(), mat.trim()))
-      danhSachYeuCau(url.trim(), mat.trim())
-        .then(setYeuCau)
-        .catch(() => setYeuCau([]))
     } catch (e) {
       setLoi(e instanceof Error ? e.message : 'Lỗi không rõ')
       if (ds === null) setDs([])
@@ -96,11 +89,6 @@ export default function HocSinhScreen() {
       .then(setBaiTap)
       .catch(() => setBaiTap([]))
   }, [sbdDangXem, cauHinh])
-
-  const taiLaiBaiTap = () => {
-    if (!cauHinh || !sbdDangXem) return
-    baiTapCuaEm(cauHinh.url, { secret: cauHinh.mat, sbd: sbdDangXem }).then(setBaiTap).catch(() => {})
-  }
 
   /** Soạn phiếu kết quả ca gần nhất theo đúng quy tắc viết của thầy rồi copy
    * để dán Zalo. Máy KHÔNG đoán nguyên nhân — nhắc thầy tự thêm trước khi gửi. */
@@ -191,24 +179,15 @@ export default function HocSinhScreen() {
               </div>
             </TheNoiDung>
 
-            {yeuCau.some((y) => y.sbd === hoSo.em.sbd) && (
-              <OThongBao tone="cam">
-                Phụ huynh em này đã bấm đồng ý giao bài. Bấm <b>Giao bài tập</b> để giao; giao xong yêu cầu tự đóng.
-              </OThongBao>
-            )}
-
-            <div className="flex" style={{ gap: 'var(--k2)' }}>
-              <NutChinh onClick={() => setMoGiaoBai(true)}>
-                <span className="inline-flex items-center" style={{ gap: 6 }}>
-                  <BookPlus size={18} /> Giao bài tập
-                </span>
-              </NutChinh>
-              <NutChinh variant="phu" onClick={() => copyPhieu(hoSo)}>
-                <span className="inline-flex items-center" style={{ gap: 6 }}>
-                  <ClipboardCopy size={18} /> Copy phiếu Zalo
-                </span>
-              </NutChinh>
-            </div>
+            {/* Mục GIAO BÀI TẬP VỀ NHÀ đã gỡ theo yêu cầu của thầy. Code vẫn
+                còn nguyên trong repo (thư mục components, lib/bai-tap.ts, ca
+                Loai=baitap ở máy chủ) — cần lại thì gắn nút vào đây, không phải
+                dựng lại từ đầu. */}
+            <NutChinh variant="phu" onClick={() => copyPhieu(hoSo)}>
+              <span className="inline-flex items-center" style={{ gap: 6 }}>
+                <ClipboardCopy size={18} /> Copy phiếu Zalo
+              </span>
+            </NutChinh>
 
             {/* XOÁ EM KHỎI DANH SÁCH — CHỈ THẦY.
                 Em vào thi là tự có tên, nên danh sách sẽ dính cả số báo danh gõ
@@ -225,20 +204,6 @@ export default function HocSinhScreen() {
 
             <KhoiLichSuCa ca={hoSo.ca} />
 
-            <KhoiBaiTap baiTap={baiTap} />
-
-            {moGiaoBai && (
-              <GiaoBaiTap
-                sbd={hoSo.em.sbd}
-                hoTen={hoSo.em.hoTen}
-                chuyenDeEm={hoSo.chuyenDe}
-                nguongYeu={NGUONG_YEU}
-                onXong={() => {
-                  setMoGiaoBai(false)
-                  taiLaiBaiTap()
-                }}
-              />
-            )}
           </>
         )}
       </div>
@@ -267,23 +232,9 @@ export default function HocSinhScreen() {
           từng em (phải biết em yếu chuyên đề nào mới rút được câu), nên nhìn
           danh sách không đoán ra. */}
       <div style={NHAN_NHO}>
-        Chạm một em để xem hồ sơ, giao bài tập về nhà và copy phiếu Zalo. Em chỉ vào thi được khi nhập đúng cả ba: số báo danh, họ tên,
-        năm sinh — khớp file danh sách đã đồng bộ.
+        Chạm một em để xem hồ sơ: chuyên đề mạnh–yếu và toàn bộ ca thi đã làm. Em chỉ vào thi được khi nhập đúng cả ba: số báo
+        danh, họ tên, năm sinh — khớp file danh sách đã đồng bộ.
       </div>
-
-      {yeuCau.length > 0 && (
-        <OThongBao tone="cam">
-          <span className="flex items-center justify-between flex-wrap" style={{ gap: 'var(--k2)' }}>
-            <span>
-              <b style={SO}>{yeuCau.length}</b> phụ huynh xin giao bài tập: {yeuCau.slice(0, 3).map((y) => y.hoTen || y.sbd).join(', ')}
-              {yeuCau.length > 3 ? '…' : ''}
-            </span>
-            <button onClick={() => moHoSoEm(yeuCau[0].sbd)} className="tap-target font-bold" style={{ ...SO, fontSize: 'var(--cx-1)', textDecoration: 'underline' }}>
-              Mở hồ sơ em đầu tiên
-            </button>
-          </span>
-        </OThongBao>
-      )}
 
       <TheNoiDung>
         <div className="flex items-center" style={{ gap: 'var(--k3)', marginBottom: 'var(--k3)' }}>
@@ -361,10 +312,12 @@ export default function HocSinhScreen() {
                   </span>
                   <span className="flex items-center flex-wrap" style={{ gap: 4, marginTop: 6 }}>
                     <Nhan tone={toneXepLoai(e.diemGanNhat)}>{e.diemGanNhat === null ? 'chưa có điểm' : classify(e.diemGanNhat)}</Nhan>
-                    {/* Em tự vào danh sách khi thi; tra được tên trong danh sách
-                        lớp thì có tên, không tra được thì chỉ có số báo danh —
-                        cờ hoá để thầy biết mà bổ sung vào Google Sheet. */}
+                    {/* Danh sách lấy từ file thầy nạp. Em nào chỉ có số báo danh,
+                        hoặc có hồ sơ cũ mà không nằm trong file mới, đều cờ hoá —
+                        em ngoài danh sách KHÔNG vào thi được. */}
                     {!e.hoTen && <Nhan tone="cam">chưa có tên</Nhan>}
+                    {e.trangThai === 'ngoai_danh_sach' && <Nhan tone="do">ngoài danh sách</Nhan>}
+                    {e.soCa === 0 && <Nhan tone="xam">chưa thi ca nào</Nhan>}
                   </span>
                 </Hang>
               )

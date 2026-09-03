@@ -27,23 +27,26 @@ describe('Màn chính của thầy', () => {
     render(<ExamHubScreen />)
     expect(screen.getByText('Chọn đề & mở ca kiểm tra')).toBeTruthy()
     expect(screen.getByText('Ngân hàng câu hỏi')).toBeTruthy()
-    expect(screen.getByText('Lịch sử ca thi & chấm bài')).toBeTruthy()
+    expect(screen.getByText('Ca thi')).toBeTruthy()
   })
 })
 
-describe('Đường vào giao bài tập sau khi bỏ thẻ lối tắt', () => {
-  it('tab Học sinh ở thanh dưới vẫn còn — bỏ thẻ mà bỏ luôn tab là mất đường', () => {
+describe('Tab Học sinh', () => {
+  it('tab Học sinh ở thanh dưới vẫn còn — đường duy nhất vào hồ sơ từng em', () => {
     render(<BottomNav />)
     screen.getByText('Học sinh').click()
     expect(useAppStore.getState().screen).toBe('hocsinh')
   })
 
-  it('có dòng chỉ đường: chạm một em để giao bài tập', () => {
-    expect(maHocSinh).toContain('Chạm một em để xem hồ sơ, giao bài tập về nhà')
+  it('có dòng chỉ đường: chạm một em để xem chuyên đề mạnh yếu và ca đã thi', () => {
+    expect(maHocSinh).toContain('Chạm một em để xem hồ sơ')
+    expect(maHocSinh).toContain('chuyên đề mạnh–yếu')
   })
 
-  it('nút Giao bài tập vẫn nằm trong hồ sơ em — chỗ duy nhất biết em yếu gì', () => {
-    expect(maHocSinh).toContain('Giao bài tập')
-    expect(maHocSinh).toContain('GiaoBaiTap')
+  // Thầy cho gỡ mục giao bài tập. Code GIỮ NGUYÊN để gắn lại được, nhưng màn
+  // Học sinh không được còn đường nào dẫn tới nó.
+  it('KHÔNG còn nút Giao bài tập trong hồ sơ em', () => {
+    expect(maHocSinh).not.toContain('GiaoBaiTap')
+    expect(maHocSinh).not.toContain('KhoiBaiTap')
   })
 })

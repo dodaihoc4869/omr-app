@@ -1,4 +1,4 @@
-// LỊCH SỬ CA THI (QUANLYCATHI.md mục 2) — mọi ca nằm trên Google Sheet, máy
+// CA THI (QUANLYCATHI.md mục 2) — mọi ca nằm trên Google Sheet, máy
 // nào của thầy mở cũng thấy đủ và giống nhau. Mỗi hàng: tên ca, mã ca, lớp,
 // ngày, tỉ lệ đã nộp, nhãn trạng thái. Chạm → Chi tiết ca (ExamMonitorScreen).
 // Bật "Chọn" → mỗi hàng thành ô tích, xoá được nhiều ca ngay tại màn này.
@@ -25,11 +25,6 @@ const O_NHAP: React.CSSProperties = {
   outline: 'none',
   width: '100%',
 }
-const O_XAC_NHAN: React.CSSProperties = { ...O_NHAP, padding: '0 var(--k4)' }
-
-/** Chữ thầy phải gõ để xác nhận xoá lô có bài làm của học sinh. */
-export const CHU_XAC_NHAN = 'XOA'
-
 /** Trạng thái hiển thị của ca theo mốc thời gian máy chủ + số đã nộp. */
 export function trangThaiCa(ca: Pick<CaTomTat, 'trangThai' | 'batDau' | 'hetHanVao' | 'daVao' | 'daNop'>, nowMs: number): { ten: string; tone: 'xanh' | 'cam' | 'do' | 'tim' | 'xam' } {
   if (ca.trangThai === 'dong') return { ten: 'Đã đóng', tone: 'xam' }
@@ -63,7 +58,6 @@ export default function LichSuCaScreen() {
   const [chonMode, setChonMode] = useState(false)
   const [daChon, setDaChon] = useState<string[]>([])
   const [hoiXoa, setHoiXoa] = useState(false)
-  const [chuXacNhan, setChuXacNhan] = useState('')
   const [dangXoa, setDangXoa] = useState(false)
   // THÙNG RÁC: xoá ca là xoá MỀM, bài làm còn nguyên — xem lại và khôi phục được.
   const [xemDaXoa, setXemDaXoa] = useState(false)
@@ -100,15 +94,12 @@ export default function LichSuCaScreen() {
   const chonTrongLoc = useMemo(() => dsLoc.filter((c) => daChon.includes(c.maCa)), [dsLoc, daChon])
   const tichHet = dsLoc.length > 0 && chonTrongLoc.length === dsLoc.length
   const soBaiLam = useMemo(() => chonTrongLoc.reduce((s, c) => s + c.daVao, 0), [chonTrongLoc])
-  const canGoChu = soBaiLam > 0
-  const chuaDuXacNhan = canGoChu && chuXacNhan.trim().toUpperCase() !== CHU_XAC_NHAN
 
   const bat = (maCa: string) => setDaChon((cu) => (cu.includes(maCa) ? cu.filter((m) => m !== maCa) : [...cu, maCa]))
   const thoatChon = () => {
     setChonMode(false)
     setDaChon([])
     setHoiXoa(false)
-    setChuXacNhan('')
   }
 
   const handleKhoiPhuc = async (maCa: string) => {
@@ -150,7 +141,7 @@ export default function LichSuCaScreen() {
     <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
       <div className="flex items-center justify-between">
         <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
-          {xemDaXoa ? 'Ca đã xoá' : 'Lịch sử ca thi'}
+          {xemDaXoa ? 'Ca đã xoá' : 'Ca thi'}
         </h1>
         <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target">
           ← Kiểm tra
@@ -352,32 +343,16 @@ export default function LichSuCaScreen() {
                   </div>
                 ))}
               </div>
-              {canGoChu && (
-                <>
-                  <div style={NHAN_NHO}>
-                    Gõ <b>{CHU_XAC_NHAN}</b> để xác nhận:
-                  </div>
-                  <input
-                    style={{ ...O_XAC_NHAN, letterSpacing: '.15em' }}
-                    placeholder={CHU_XAC_NHAN}
-                    value={chuXacNhan}
-                    onChange={(e) => setChuXacNhan(e.target.value)}
-                    autoFocus
-                    aria-label={`Gõ ${CHU_XAC_NHAN} để xác nhận xoá`}
-                  />
-                </>
-              )}
               <div className="flex" style={{ gap: 'var(--k2)' }}>
                 <NutChinh
                   variant="phu"
                   onClick={() => {
                     setHoiXoa(false)
-                    setChuXacNhan('')
-                  }}
+                                  }}
                 >
                   Huỷ
                 </NutChinh>
-                <NutChinh variant="nguyhiem" onClick={handleXoa} disabled={dangXoa || chuaDuXacNhan}>
+                <NutChinh variant="nguyhiem" onClick={handleXoa} disabled={dangXoa}>
                   {dangXoa ? 'Đang xoá…' : `Xoá ${chonTrongLoc.length} ca`}
                 </NutChinh>
               </div>

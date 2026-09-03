@@ -417,6 +417,25 @@ function timTrongDanhSachLop_(sbd) {
   }
 }
 
+/** Đọc TOÀN BỘ bản sao danh sách học sinh (một lần đọc sheet). */
+function docDanhSachLop_() {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sh = ss.getSheetByName(SHEET_DSLOP)
+    if (!sh || sh.getLastRow() < 2) return []
+    const data = sh.getDataRange().getValues()
+    const out = []
+    for (let i = 1; i < data.length; i++) {
+      const sbd = String(data[i][0]).trim()
+      if (!sbd) continue
+      out.push({ sbd: sbd, hoTen: String(data[i][1] || ''), namSinh: chuanNamSinh_(data[i][2]), lop: String(data[i][3] || '') })
+    }
+    return out
+  } catch (err) {
+    return []
+  }
+}
+
 /** Sheet DanhSachLop đã có dòng nào chưa. Chưa nạp bao giờ ⇒ KHÔNG chặn ai:
  * bật tính năng này lên mà chặn sạch cả trung tâm thì hỏng buổi dạy. */
 function coDanhSachHocSinh_() {
@@ -1790,7 +1809,14 @@ function doPost(e) {
     }
     if (!sbd) return jsonResponse_({ ok: false, error: 'Thiếu số báo danh' })
 
-    const em = hoSoHocSinh_(sbd) || { sbd: sbd, hoTen: '', namSinh: '', lop: '' }
+    // Em chưa thi lần nào thì chưa có dòng trong HocSinh — lấy tên từ danh sách
+    // thầy đã nạp, để bấm vào em nào cũng ra hồ sơ có tên, không phải ô trống.
+    let em = hoSoHocSinh_(sbd)
+    if (!em || !em.hoTen) {
+      const tu = timTrongDanhSachLop_(sbd)
+      if (tu) em = { sbd: sbd, hoTen: tu.hoTen, namSinh: tu.namSinh, lop: tu.lop || (em ? em.lop : '') }
+    }
+    if (!em) em = { sbd: sbd, hoTen: '', namSinh: '', lop: '' }
 
     // Bảng chuyên đề + xu hướng, cả hai tính từ MỘT lần đọc TienDoCa: mỗi lệnh
     // Apps Script tốn sẵn ~1,5 giây overhead nên cắt được lần đọc sheet nào là
@@ -2049,6 +2075,10 @@ function doPost(e) {
     // Danh sách em cho màn HỌC SINH của thầy: hồ sơ + điểm gần nhất + số ca.
     const loi = kiemTraMaBiMat_(body)
     if (loi) return jsonResponse_({ ok: false, error: loi })
+    // DANH SÁCH CHÍNH THỨC LÀ SHEET DanhSachLop (file thầy nạp) — thầy đồng bộ
+    // xong là thấy đủ mọi em ngay, không phải chờ em vào thi mới có tên. Em nào
+    // đã có hồ sơ riêng trong HocSinh (thi rồi, hoặc dữ liệu cũ) thì gộp thêm,
+    // KHÔNG bỏ sót em cũ khi danh sách mới chưa có tên em đó.
     const hsSh = sheetHS_()
     const hsData = hsSh.getDataRange().getValues()
     const luotData = sheetLuot_().getDataRange().getValues()
