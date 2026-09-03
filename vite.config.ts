@@ -49,9 +49,13 @@ export default defineConfig({
         clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data}'],
         maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
-        // 404.html chỉ là trang chuyển hướng link ngắn /t/<mã ca> — không để
-        // service worker trả nó thay cho trang chính khi offline.
-        navigateFallbackDenylist: [/\/t\//],
+        // KHÔNG chặn /t/, /hs/, /ph/ nữa: service worker cứ trả index.html cho
+        // mọi đường điều hướng, và app tự đọc vai + mã ca từ ĐƯỜNG DẪN
+        // (vai-tro.ts · docVaiTuDuongDan). Trước đây trông cậy vào
+        // public/404.html để đổi /hs/<token> thành ?vai=hs&token=… — nhưng
+        // 404.html chỉ chạy khi máy CHƯA cài service worker; máy đã cài thì nó
+        // không bao giờ chạy, và link riêng rơi thẳng vào màn quản lý của thầy.
+        // Đọc từ đường dẫn còn được cái nữa: link vào thi mở được cả khi mất mạng.
       },
       // Tên hiển thị "ĐỖ ĐẠI HỌC" (tên trung tâm); màu = --muc / --nen của
       // tokens.css. display:standalone + orientation:portrait chỉ có tác dụng

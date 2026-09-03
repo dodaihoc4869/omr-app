@@ -54,7 +54,7 @@ function App() {
   // mới tới link riêng /hs/<token>, /ph/<token>, /gv. Token lưu vào máy rồi
   // xoá khỏi thanh địa chỉ ngay.
   useEffect(() => {
-    const { vai: vaiLink, token, maCa } = docDuongVao(location.search)
+    const { vai: vaiLink, token, maCa } = docDuongVao(location.search, location.pathname)
     const dungVai = async (): Promise<VaiTro | null> => {
       if (vaiLink === 'hs' && token) await saveTokenHocSinh(token)
       if (vaiLink === 'ph' && token) await saveTokenPhuHuynh(token)
@@ -76,7 +76,7 @@ function App() {
           datManifestTheoVai(vai)
           if (!maCa) setScreen(manDauCua(vai))
         }
-        xoaDauVetToken()
+        xoaDauVetToken(import.meta.env.BASE_URL)
       })
     if (maCa) setScreen('examtake')
     // eslint-disable-next-line react-hooks/exhaustive-deps

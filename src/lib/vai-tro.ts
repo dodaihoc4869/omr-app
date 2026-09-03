@@ -37,14 +37,60 @@ export function tokenHopLe(token: string): boolean {
  * liệu một em đều tra token ra SBD ở máy chủ, nên gõ tay `?vai=hs` không đọc
  * được gì nếu máy không có token.
  */
-export function docDuongVao(search: string): DuongVao {
+const RE_TOKEN_TREN_DUONG = /(?:^|\/)(hs|ph)\/([A-Za-z0-9]{32})\/?$/
+const RE_GV_TREN_DUONG = /(?:^|\/)gv\/?$/
+const RE_CA_TREN_DUONG = /(?:^|\/)t\/(\d{4,8})\/?$/
+
+/**
+ * Đọc vai và mã ca TRỰC TIẾP TỪ ĐƯỜNG DẪN (`/omr-app/hs/<token>`).
+ *
+ * Vì sao cần: `public/404.html` là thứ đổi `/hs/<token>` thành
+ * `?vai=hs&token=…`, và nó chỉ chạy khi GitHub Pages trả 404. Nhưng khi máy đã
+ * cài service worker, mọi lần điều hướng đều được service worker trả thẳng
+ * `index.html` — 404.html KHÔNG BAO GIỜ chạy. App thấy đường trống, không có
+ * vai, và mở màn quản lý của thầy. Thầy đã dính đúng lỗi này: bấm link riêng
+ * thì vào app giáo viên, và vì không phải vai em/phụ huynh nên dải "Cài đặt"
+ * cũng không hiện ra.
+ *
+ * Đọc thẳng từ đường dẫn thì đúng cả hai đường: 404.html chuyển hướng (máy
+ * chưa cài) hay service worker trả index.html (máy đã cài) — và chạy được cả
+ * khi mất mạng.
+ */
+export function docVaiTuDuongDan(duongDan: string): DuongVao {
+  const m = duongDan.match(RE_TOKEN_TREN_DUONG)
+  if (m) return { vai: m[1] as 'hs' | 'ph', token: m[2], maCa: '' }
+  if (RE_GV_TREN_DUONG.test(duongDan)) return { vai: 'gv', token: '', maCa: '' }
+  const c = duongDan.match(RE_CA_TREN_DUONG)
+  if (c) return { vai: null, token: '', maCa: c[1] }
+  return { vai: null, token: '', maCa: '' }
+}
+
+/**
+ * Đọc vai từ đường link: tham số truy vấn trước, rồi tới đường dẫn.
+ *
+ * VAI KHÔNG ĐÒI TOKEN TRONG LINK. App đã cài ra màn hình chính mở bằng
+ * `start_url` của manifest — `?vai=hs&nguon=pwa`, KHÔNG có token, vì token là
+ * của riêng từng em, không nhét vào file manifest chung được. Token đã nằm sẵn
+ * trong máy (IndexedDB) từ lần đầu em bấm link riêng thầy gửi.
+ *
+ * Vai chỉ quyết định HIỂN THỊ. Chặn thật vẫn ở Apps Script: mọi lệnh đọc dữ
+ * liệu một em đều tra token ra SBD ở máy chủ, nên gõ tay `?vai=hs` không đọc
+ * được gì nếu máy không có token.
+ */
+export function docDuongVao(search: string, duongDan = ''): DuongVao {
   const q = new URLSearchParams(search)
   const vaiRaw = (q.get('vai') || '').trim()
   const token = (q.get('token') || '').trim()
   const maCa = (q.get('examCode') || '').trim()
+
   if (vaiRaw === 'gv') return { vai: 'gv', token: '', maCa }
   if (vaiRaw === 'hs' || vaiRaw === 'ph') {
     return { vai: vaiRaw, token: tokenHopLe(token) ? token : '', maCa }
+  }
+
+  const tuDuong = duongDan ? docVaiTuDuongDan(duongDan) : null
+  if (tuDuong && (tuDuong.vai || tuDuong.maCa)) {
+    return { vai: tuDuong.vai, token: tuDuong.token, maCa: maCa || tuDuong.maCa }
   }
   return { vai: null, token: '', maCa }
 }
@@ -54,13 +100,20 @@ export function docDuongVao(search: string): DuongVao {
  *
  * GIỮ LẠI `vai`: nó không phải bí mật, và xoá nó đi thì em kéo tải lại trang
  * trong app đã cài là rơi về màn quản lý của thầy. */
-export function xoaDauVetToken(): void {
+export function xoaDauVetToken(goc = '/'): void {
   try {
     const q = new URLSearchParams(location.search)
-    if (!q.get('token')) return
+    // Token nằm ngay trên ĐƯỜNG DẪN (/omr-app/hs/<token>) khi service worker
+    // trả thẳng index.html — cũng phải dọn, nếu không token vẫn nằm trong lịch
+    // sử trình duyệt và trên thanh địa chỉ.
+    const tuDuong = docVaiTuDuongDan(location.pathname)
+    const tokenTrenDuong = !!(tuDuong.vai && tuDuong.token)
+    if (!q.get('token') && !tokenTrenDuong) return
     q.delete('token')
+    if (tokenTrenDuong && !q.get('vai')) q.set('vai', tuDuong.vai as string)
     const con = q.toString()
-    history.replaceState(null, '', location.pathname + (con ? `?${con}` : ''))
+    const duong = tokenTrenDuong ? goc : location.pathname
+    history.replaceState(null, '', duong + (con ? `?${con}` : ''))
   } catch {
     // trình duyệt cũ không có history.replaceState — bỏ qua, không ảnh hưởng chức năng
   }

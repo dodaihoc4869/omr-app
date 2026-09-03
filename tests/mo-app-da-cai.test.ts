@@ -5,7 +5,7 @@
 // docDuongVao lại đòi token hợp lệ mới nhận vai. Kết quả: em bấm biểu tượng app
 // trên màn hình chính thì vào thẳng MÀN QUẢN LÝ CỦA THẦY.
 import { beforeEach, describe, expect, it } from 'vitest'
-import { docDuongVao, manDauCua, nhoVai, quenVai, vaiDaNho, xoaDauVetToken } from '../src/lib/vai-tro'
+import { docDuongVao, docVaiTuDuongDan, manDauCua, nhoVai, quenVai, vaiDaNho, xoaDauVetToken } from '../src/lib/vai-tro'
 import manifestHS from '../public/manifest-hs.json'
 import manifestPH from '../public/manifest-ph.json'
 
@@ -53,6 +53,52 @@ describe('Vai đọc từ đường link', () => {
   })
 })
 
+// LỖI THẦY BÁO: bấm link riêng thì vào thẳng app quản lý của giáo viên, và vì
+// không phải vai em/phụ huynh nên dải "Cài đặt" cũng không hiện ra.
+// Gốc: public/404.html — thứ đổi /hs/<token> thành ?vai=hs&token=… — chỉ chạy
+// khi GitHub Pages trả 404. Máy đã cài service worker thì mọi lần điều hướng
+// được service worker trả thẳng index.html, 404.html KHÔNG BAO GIỜ chạy.
+describe('Đọc vai TỪ ĐƯỜNG DẪN (service worker nuốt 404.html)', () => {
+  it('/omr-app/hs/<token> → vai học sinh, lấy được token', () => {
+    expect(docVaiTuDuongDan(`/omr-app/hs/${TOKEN}`)).toEqual({ vai: 'hs', token: TOKEN, maCa: '' })
+  })
+
+  it('/omr-app/ph/<token> → vai phụ huynh, có hay không dấu / cuối đều được', () => {
+    expect(docVaiTuDuongDan(`/omr-app/ph/${TOKEN}`).vai).toBe('ph')
+    expect(docVaiTuDuongDan(`/omr-app/ph/${TOKEN}/`).token).toBe(TOKEN)
+  })
+
+  it('/omr-app/gv → vai thầy', () => {
+    expect(docVaiTuDuongDan('/omr-app/gv').vai).toBe('gv')
+    expect(docVaiTuDuongDan('/omr-app/gv/').vai).toBe('gv')
+  })
+
+  it('/omr-app/t/<mã ca> → mã ca, để link vào thi mở được cả khi mất mạng', () => {
+    expect(docVaiTuDuongDan('/omr-app/t/984033')).toEqual({ vai: null, token: '', maCa: '984033' })
+  })
+
+  it('đường thường thì không đoán ra vai', () => {
+    for (const d of ['/omr-app/', '/omr-app/index.html', '/', '/omr-app/hs/abc', `/omr-app/hs/${TOKEN}x`]) {
+      expect(docVaiTuDuongDan(d).vai).toBe(null)
+    }
+  })
+
+  it('docDuongVao lấy vai từ đường dẫn khi không có tham số — ĐÚNG LỖI ĐÃ BÁO', () => {
+    const d = docDuongVao('', `/omr-app/hs/${TOKEN}`)
+    expect(d.vai).toBe('hs')
+    expect(d.token).toBe(TOKEN)
+    expect(manDauCua(d.vai!)).not.toBe('examhub')
+  })
+
+  it('tham số truy vấn thắng đường dẫn (404.html đã chuyển hướng rồi)', () => {
+    expect(docDuongVao('?vai=ph', `/omr-app/hs/${TOKEN}`).vai).toBe('ph')
+  })
+
+  it('mã ca trên đường dẫn mở thẳng màn thi', () => {
+    expect(docDuongVao('', '/omr-app/t/760435').maCa).toBe('760435')
+  })
+})
+
 describe('Dọn thanh địa chỉ', () => {
   it('xoá TOKEN nhưng GIỮ vai — kéo tải lại trong app không rơi về màn thầy', () => {
     history.replaceState(null, '', `/omr-app/?vai=hs&token=${TOKEN}&nguon=pwa`)
@@ -65,8 +111,22 @@ describe('Dọn thanh địa chỉ', () => {
 
   it('không có token thì không đụng vào thanh địa chỉ', () => {
     history.replaceState(null, '', '/omr-app/?vai=ph&nguon=pwa')
-    xoaDauVetToken()
+    xoaDauVetToken('/omr-app/')
     expect(location.search).toBe('?vai=ph&nguon=pwa')
+  })
+
+  it('token nằm TRÊN ĐƯỜNG DẪN cũng phải dọn, và giữ lại vai', () => {
+    history.replaceState(null, '', `/omr-app/hs/${TOKEN}`)
+    xoaDauVetToken('/omr-app/')
+    expect(location.pathname).toBe('/omr-app/')
+    expect(location.href).not.toContain(TOKEN)
+    expect(docDuongVao(location.search, location.pathname).vai).toBe('hs')
+  })
+
+  it('link vào thi trên đường dẫn thì để nguyên — không có gì bí mật', () => {
+    history.replaceState(null, '', '/omr-app/t/984033')
+    xoaDauVetToken('/omr-app/')
+    expect(location.pathname).toBe('/omr-app/t/984033')
   })
 })
 

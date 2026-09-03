@@ -39,7 +39,7 @@ batSuKienCaiApp()
 // <link rel="manifest"> rất sớm để quyết định bắn beforeinstallprompt và cài
 // app nào; đổi thẻ sau khi React chạy là ăn may. Đặt sớm thì em bấm Cài đặt
 // được đúng "ĐĐH Học sinh" / "ĐĐH Phụ huynh".
-datManifestTheoVai(docDuongVao(location.search).vai)
+datManifestTheoVai(docDuongVao(location.search, location.pathname).vai)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
