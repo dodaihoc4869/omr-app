@@ -101,3 +101,34 @@ export function datManifestTheoVai(vai: 'gv' | 'hs' | 'ph' | null): void {
   }
   if (link.getAttribute('href') !== href) link.setAttribute('href', href)
 }
+
+/** Tên app sẽ hiện trên màn hình chính của từng vai — phải khớp `short_name`
+ * trong public/manifest-hs.json và public/manifest-ph.json. */
+export function tenAppCuaVai(vai: 'hs' | 'ph'): string {
+  return vai === 'ph' ? 'ĐĐH Phụ huynh' : 'ĐĐH Học sinh'
+}
+
+/**
+ * ĐỌC TÊN APP MÀ TRÌNH DUYỆT THẬT SỰ SẼ CÀI.
+ *
+ * Trình duyệt cài theo file manifest mà thẻ `<link rel="manifest">` trỏ tới,
+ * đọc từ lúc phân tích HTML. Nếu máy còn giữ bản HTML cũ trong bộ nhớ (service
+ * worker), thẻ đó vẫn trỏ manifest chung, và bấm Cài đặt sẽ ra app "ĐỖ ĐẠI HỌC"
+ * chung dù dải cài ghi "Cài ĐĐH Học sinh" — đúng lỗi thầy quay video.
+ *
+ * Nên dải cài KHÔNG tự ghi tên nữa mà đọc thẳng từ manifest: nói đúng cái sắp
+ * cài, và lệch thì biết ngay là máy còn bản cũ.
+ */
+export async function tenAppSeCai(): Promise<string> {
+  if (typeof document === 'undefined') return ''
+  const the = document.querySelector('link[rel="manifest"]') as HTMLLinkElement | null
+  if (!the) return ''
+  try {
+    const res = await fetch(the.href, { cache: 'no-cache' })
+    if (!res.ok) return ''
+    const m = (await res.json()) as { short_name?: string; name?: string }
+    return String(m.short_name || m.name || '')
+  } catch {
+    return ''
+  }
+}

@@ -8,14 +8,13 @@
 // "Để sau" im 7 ngày rồi nhắc lại (pwa-install.ts).
 import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
-import { caiMotCham, coTheCaiMotCham, daBoQuaNhacCai, dangTrongTrinhDuyet, ghiNhoBoQuaNhacCai, laIOS, theoDoiSuKienCai, NGAY_IM_LANG } from '../lib/pwa-install'
-import type { VaiTro } from '../lib/vai-tro'
+import { caiMotCham, coTheCaiMotCham, daBoQuaNhacCai, dangTrongTrinhDuyet, ghiNhoBoQuaNhacCai, laIOS, tenAppCuaVai, tenAppSeCai, theoDoiSuKienCai, NGAY_IM_LANG } from '../lib/pwa-install'
 
 const SANS: React.CSSProperties = { fontFamily: 'var(--sans)' }
 
 /** Icon vai — dùng chính file biểu tượng sẽ hiện trên màn hình chính, để em
  * thấy trước đúng cái sắp cài. */
-function bieuTuong(vai: VaiTro): string {
+function bieuTuong(vai: 'hs' | 'ph'): string {
   return `${import.meta.env.BASE_URL}${vai === 'ph' ? 'icon-ph-192.png' : 'icon-hs-192.png'}`
 }
 
@@ -30,13 +29,25 @@ function NutChiaSeIOS() {
   )
 }
 
-export default function DaiCaiApp({ vai }: { vai: VaiTro }) {
+// Chỉ dùng cho vai học sinh / phụ huynh — thầy không cần cài app riêng.
+export default function DaiCaiApp({ vai }: { vai: 'hs' | 'ph' }) {
   const [hien, setHien] = useState(() => dangTrongTrinhDuyet() && !daBoQuaNhacCai())
   const [moHuongDan, setMoHuongDan] = useState(false)
   // Nút "Cài đặt" luôn hiện: có beforeinstallprompt thì cài 1 chạm, không có
   // (Safari) thì mở hướng dẫn tay. Vẫn nghe sự kiện để cập nhật khả năng cài.
   const [, setCoNutCai] = useState(coTheCaiMotCham())
   useEffect(() => theoDoiSuKienCai(() => setCoNutCai(coTheCaiMotCham())), [])
+
+  // TÊN APP TRÌNH DUYỆT THẬT SỰ SẼ CÀI, đọc từ đúng file manifest đang được
+  // thẻ <link rel="manifest"> trỏ tới. null = chưa đọc xong.
+  const [tenSeCai, setTenSeCai] = useState<string | null>(null)
+  useEffect(() => {
+    let con = true
+    tenAppSeCai().then((t) => con && setTenSeCai(t))
+    return () => {
+      con = false
+    }
+  }, [])
   useEffect(() => {
     const mq = window.matchMedia('(display-mode: browser)')
     const onChange = () => setHien(dangTrongTrinhDuyet() && !daBoQuaNhacCai())
@@ -58,7 +69,11 @@ export default function DaiCaiApp({ vai }: { vai: VaiTro }) {
     else setCoNutCai(coTheCaiMotCham())
   }
 
-  const tenApp = vai === 'ph' ? 'ĐĐH Phụ huynh' : 'ĐĐH Học sinh'
+  const tenApp = tenAppCuaVai(vai)
+  // Máy còn giữ bản HTML cũ thì thẻ manifest vẫn trỏ app chung — bấm Cài đặt
+  // lúc này ra app "ĐỖ ĐẠI HỌC" chung, không phải app của vai. Thà chặn lại và
+  // bảo mở lại một lần, còn hơn để thầy/phụ huynh cài nhầm rồi tưởng đã xong.
+  const lechManifest = tenSeCai !== null && tenSeCai !== '' && tenSeCai !== tenApp
 
   return (
     <>
@@ -76,10 +91,14 @@ export default function DaiCaiApp({ vai }: { vai: VaiTro }) {
         <img src={bieuTuong(vai)} alt="" width={44} height={44} style={{ borderRadius: 'var(--bo-1)', flex: 'none' }} />
         <div className="flex-1 min-w-0">
           <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
-            Cài {tenApp} ra màn hình
+            {lechManifest ? 'Máy còn giữ bản cũ' : `Cài ${tenSeCai || tenApp} ra màn hình`}
           </div>
           <div style={{ fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
-            {vai === 'ph' ? 'Mở nhanh, không cần tìm lại link' : 'Mở nhanh, làm bài toàn màn hình'}
+            {lechManifest
+              ? `Bấm Cài đặt lúc này sẽ ra app "${tenSeCai}". Tải lại một lần rồi cài.`
+              : vai === 'ph'
+                ? 'Mở nhanh, không cần tìm lại link'
+                : 'Mở nhanh, làm bài toàn màn hình'}
           </div>
         </div>
         <div className="flex items-center shrink-0" style={{ gap: 'var(--k2)' }}>
@@ -88,11 +107,11 @@ export default function DaiCaiApp({ vai }: { vai: VaiTro }) {
           </button>
           <button
             type="button"
-            onClick={cai}
+            onClick={lechManifest ? () => location.reload() : cai}
             className="tap-target font-bold"
             style={{ fontSize: 'var(--cx-1)', color: 'var(--muc-nguoc)', background: 'var(--muc)', borderRadius: 'var(--bo-1)', padding: '0 var(--k4)', minHeight: 40 }}
           >
-            Cài đặt
+            {lechManifest ? 'Tải lại' : 'Cài đặt'}
           </button>
         </div>
       </div>
