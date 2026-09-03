@@ -5,7 +5,7 @@
 // docDuongVao lại đòi token hợp lệ mới nhận vai. Kết quả: em bấm biểu tượng app
 // trên màn hình chính thì vào thẳng MÀN QUẢN LÝ CỦA THẦY.
 import { beforeEach, describe, expect, it } from 'vitest'
-import { docDuongVao, docVaiTuDuongDan, manDauCua, nhoVai, quenVai, vaiDaNho, xoaDauVetToken } from '../src/lib/vai-tro'
+import { chuanHoaDuongDan, docDuongVao, docVaiTuDuongDan, manDauCua, nhoVai, quenVai, vaiDaNho, xoaDauVetToken } from '../src/lib/vai-tro'
 import manifestHS from '../public/manifest-hs.json'
 import manifestPH from '../public/manifest-ph.json'
 
@@ -96,6 +96,40 @@ describe('Đọc vai TỪ ĐƯỜNG DẪN (service worker nuốt 404.html)', () 
 
   it('mã ca trên đường dẫn mở thẳng màn thi', () => {
     expect(docDuongVao('', '/omr-app/t/760435').maCa).toBe('760435')
+  })
+})
+
+// Chuẩn hoá NGAY khi app khởi động, để mọi màn chỉ thấy một dạng URL. Màn vào
+// thi đọc ?examCode= để tự điền 6 ô mã ca — bỏ bước này là em phải gõ tay mã ca
+// dù đã bấm đúng link mời.
+describe('chuanHoaDuongDan — đổi đường dẫn thành tham số truy vấn', () => {
+  it('/t/<mã ca> → ?examCode=, để màn vào thi tự điền mã ca', () => {
+    history.replaceState(null, '', '/omr-app/t/984033')
+    chuanHoaDuongDan('/omr-app/')
+    expect(location.pathname).toBe('/omr-app/')
+    expect(new URLSearchParams(location.search).get('examCode')).toBe('984033')
+  })
+
+  it('/hs/<token> → ?vai=hs&token=', () => {
+    history.replaceState(null, '', `/omr-app/hs/${TOKEN}`)
+    chuanHoaDuongDan('/omr-app/')
+    const q = new URLSearchParams(location.search)
+    expect(q.get('vai')).toBe('hs')
+    expect(q.get('token')).toBe(TOKEN)
+  })
+
+  it('giữ nguyên tham số sẵn có, ví dụ ?api=', () => {
+    history.replaceState(null, '', '/omr-app/t/123456?api=https%3A%2F%2Fvi.du%2Fexec')
+    chuanHoaDuongDan('/omr-app/')
+    const q = new URLSearchParams(location.search)
+    expect(q.get('api')).toBe('https://vi.du/exec')
+    expect(q.get('examCode')).toBe('123456')
+  })
+
+  it('đường thường thì không đụng vào', () => {
+    history.replaceState(null, '', '/omr-app/?vai=ph&nguon=pwa')
+    chuanHoaDuongDan('/omr-app/')
+    expect(location.pathname + location.search).toBe('/omr-app/?vai=ph&nguon=pwa')
   })
 })
 

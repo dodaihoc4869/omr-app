@@ -66,6 +66,32 @@ export function docVaiTuDuongDan(duongDan: string): DuongVao {
 }
 
 /**
+ * ĐỔI ĐƯỜNG DẪN THÀNH THAM SỐ TRUY VẤN, chạy TRƯỚC khi app khởi động.
+ *
+ * Làm đúng việc mà `public/404.html` vẫn làm — `/hs/<token>` → `?vai=hs&token=…`,
+ * `/t/<mã ca>` → `?examCode=…` — nhưng làm ở trong app, nên chạy cả khi service
+ * worker đã nuốt mất 404.html (máy đã cài app), và chạy cả khi mất mạng.
+ *
+ * Chuẩn hoá ngay từ đầu thay vì để mỗi màn tự đọc đường dẫn: màn vào thi đọc
+ * `?examCode=` để tự điền 6 ô mã ca, đọc `?api=` để biết link Apps Script —
+ * giữ nguyên một dạng URL duy nhất thì không màn nào phải sửa.
+ */
+export function chuanHoaDuongDan(goc = '/'): void {
+  try {
+    const d = docVaiTuDuongDan(location.pathname)
+    if (!d.vai && !d.maCa) return
+    const q = new URLSearchParams(location.search)
+    if (d.vai && !q.get('vai')) q.set('vai', d.vai)
+    if (d.token && !q.get('token')) q.set('token', d.token)
+    if (d.maCa && !q.get('examCode')) q.set('examCode', d.maCa)
+    history.replaceState(null, '', goc + `?${q.toString()}`)
+  } catch {
+    // trình duyệt cũ không có history.replaceState — app vẫn đọc được vai từ
+    // đường dẫn qua docDuongVao(search, pathname)
+  }
+}
+
+/**
  * Đọc vai từ đường link: tham số truy vấn trước, rồi tới đường dẫn.
  *
  * VAI KHÔNG ĐÒI TOKEN TRONG LINK. App đã cài ra màn hình chính mở bằng

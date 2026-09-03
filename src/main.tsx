@@ -6,7 +6,7 @@ import './index.css'
 import 'katex/dist/katex.min.css'
 import App from './App.tsx'
 import { batSuKienCaiApp, datManifestTheoVai } from './lib/pwa-install'
-import { docDuongVao } from './lib/vai-tro'
+import { chuanHoaDuongDan, docDuongVao } from './lib/vai-tro'
 import { batTuHoiBanMoi, daySangBanMoi } from './lib/cap-nhat-app'
 
 // BẢN MỚI PHẢI VỀ NGAY LẦN MỞ ĐẦU. Ba lớp cùng lo việc này:
@@ -34,6 +34,12 @@ registerSW({
 // Bắt beforeinstallprompt TRƯỚC khi React mount (sự kiện chỉ bắn 1 lần) —
 // để màn vào thi có nút "Cài đặt" 1 chạm (DaiNhacCaiApp).
 batSuKienCaiApp()
+
+// ĐỔI /hs/<token>, /ph/<token>, /t/<mã ca> THÀNH THAM SỐ TRUY VẤN trước mọi
+// thứ khác — việc mà public/404.html vẫn làm, nhưng 404.html không chạy trên
+// máy đã cài app (service worker trả thẳng index.html). Sau bước này cả app
+// chỉ thấy một dạng URL duy nhất, không màn nào phải sửa.
+chuanHoaDuongDan(import.meta.env.BASE_URL)
 
 // ĐẶT MANIFEST THEO VAI NGAY, trước khi React mount. Chrome đọc thẻ
 // <link rel="manifest"> rất sớm để quyết định bắn beforeinstallprompt và cài
