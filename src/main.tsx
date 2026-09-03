@@ -7,6 +7,7 @@ import 'katex/dist/katex.min.css'
 import App from './App.tsx'
 import { batSuKienCaiApp, datManifestTheoVai } from './lib/pwa-install'
 import { chuanHoaDuongDan, docDuongVao } from './lib/vai-tro'
+import { donPhienCu } from './lib/don-phien-cu'
 import { batTuHoiBanMoi, daySangBanMoi } from './lib/cap-nhat-app'
 
 // BẢN MỚI PHẢI VỀ NGAY LẦN MỞ ĐẦU. Ba lớp cùng lo việc này:
@@ -34,6 +35,10 @@ registerSW({
 // Bắt beforeinstallprompt TRƯỚC khi React mount (sự kiện chỉ bắn 1 lần) —
 // để màn vào thi có nút "Cài đặt" 1 chạm (DaiNhacCaiApp).
 batSuKienCaiApp()
+
+// Dọn thiết lập cũ nếu cấu trúc dữ liệu đã đổi. Chạy trước mọi logic khác;
+// KHÔNG đụng id thiết bị và IndexedDB (xem don-phien-cu.ts).
+donPhienCu()
 
 // ĐỔI /hs/<token>, /ph/<token>, /t/<mã ca> THÀNH THAM SỐ TRUY VẤN trước mọi
 // thứ khác — việc mà public/404.html vẫn làm, nhưng 404.html không chạy trên

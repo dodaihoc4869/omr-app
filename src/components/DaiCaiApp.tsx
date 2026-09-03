@@ -8,7 +8,8 @@
 // "Để sau" im 7 ngày rồi nhắc lại (pwa-install.ts).
 import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
-import { caiMotCham, coTheCaiMotCham, daBoQuaNhacCai, dangTrongTrinhDuyet, ghiNhoBoQuaNhacCai, laIOS, tenAppCuaVai, tenAppSeCai, theoDoiSuKienCai, NGAY_IM_LANG } from '../lib/pwa-install'
+import { caiMotCham, coTheCaiMotCham, daBoQuaNhacCai, dangTrongTrinhDuyet, ghiNhoBoQuaNhacCai, laIOS, moBangChrome, tenAppCuaVai, tenAppSeCai, theoDoiSuKienCai, trongTrinhDuyetTrongApp, NGAY_IM_LANG } from '../lib/pwa-install'
+import { useAppStore } from '../store/appStore'
 
 const SANS: React.CSSProperties = { fontFamily: 'var(--sans)' }
 
@@ -16,6 +17,25 @@ const SANS: React.CSSProperties = { fontFamily: 'var(--sans)' }
  * thấy trước đúng cái sắp cài. */
 function bieuTuong(vai: 'hs' | 'ph'): string {
   return `${import.meta.env.BASE_URL}${vai === 'ph' ? 'icon-ph-192.png' : 'icon-hs-192.png'}`
+}
+
+/** Vẽ khung điện thoại, tô sáng đúng vị trí nút ⋮ góc trên bên phải.
+ * Phụ huynh lớn tuổi không tìm ra nút đó nếu chỉ tả bằng chữ. */
+function ViTriNutBaCham() {
+  return (
+    <svg viewBox="0 0 60 96" width="46" height="74" aria-hidden="true" style={{ flex: 'none' }}>
+      <rect x="1" y="1" width="58" height="94" rx="8" fill="none" stroke="currentColor" strokeOpacity="0.35" strokeWidth="2" />
+      <rect x="1" y="1" width="58" height="18" rx="8" fill="currentColor" fillOpacity="0.06" />
+      <rect x="8" y="7" width="26" height="5" rx="2.5" fill="currentColor" fillOpacity="0.25" />
+      <circle cx="50" cy="10" r="9" fill="var(--cam)" fillOpacity="0.22" />
+      <circle cx="50" cy="6.2" r="1.5" fill="currentColor" />
+      <circle cx="50" cy="10" r="1.5" fill="currentColor" />
+      <circle cx="50" cy="13.8" r="1.5" fill="currentColor" />
+      <rect x="8" y="28" width="44" height="4" rx="2" fill="currentColor" fillOpacity="0.15" />
+      <rect x="8" y="38" width="34" height="4" rx="2" fill="currentColor" fillOpacity="0.15" />
+      <rect x="8" y="48" width="40" height="4" rx="2" fill="currentColor" fillOpacity="0.15" />
+    </svg>
+  )
 }
 
 /** Nút Chia sẻ của Safari, vẽ bằng SVG (không tải ảnh ngoài). */
@@ -31,6 +51,8 @@ function NutChiaSeIOS() {
 
 // Chỉ dùng cho vai học sinh / phụ huynh — thầy không cần cài app riêng.
 export default function DaiCaiApp({ vai }: { vai: 'hs' | 'ph' }) {
+  // Hook phải gọi TRƯỚC mọi lệnh return sớm bên dưới.
+  const showToast = useAppStore((s) => s.showToast)
   const [hien, setHien] = useState(() => dangTrongTrinhDuyet() && !daBoQuaNhacCai())
   const [moHuongDan, setMoHuongDan] = useState(false)
   // Nút "Cài đặt" luôn hiện: có beforeinstallprompt thì cài 1 chạm, không có
@@ -62,6 +84,18 @@ export default function DaiCaiApp({ vai }: { vai: 'hs' | 'ph' }) {
     setHien(false)
   }
 
+  const trongApp = trongTrinhDuyetTrongApp()
+  const linkChrome = trongApp ? moBangChrome() : null
+
+  const chepLink = async () => {
+    try {
+      await navigator.clipboard.writeText(location.href)
+      showToast('Đã sao chép — dán vào Chrome để mở', 'success')
+    } catch {
+      showToast('Máy không cho sao chép. Bấm ⋮ rồi chọn Mở bằng trình duyệt.', 'warn')
+    }
+  }
+
   const cai = async () => {
     if (!coTheCaiMotCham()) return setMoHuongDan(true)
     const ok = await caiMotCham()
@@ -74,6 +108,56 @@ export default function DaiCaiApp({ vai }: { vai: 'hs' | 'ph' }) {
   // lúc này ra app "ĐỖ ĐẠI HỌC" chung, không phải app của vai. Thà chặn lại và
   // bảo mở lại một lần, còn hơn để thầy/phụ huynh cài nhầm rồi tưởng đã xong.
   const lechManifest = tenSeCai !== null && tenSeCai !== '' && tenSeCai !== tenApp
+
+  // TRONG ZALO/FACEBOOK thì không cài được, và cũng không nên vờ như cài được:
+  // các trình duyệt đó bỏ qua manifest, "Thêm vào màn hình chính" chỉ ra một lối
+  // tắt mang tên và biểu tượng chung. Phải mở bằng Chrome/Safari trước.
+  if (trongApp) {
+    return (
+      <div
+        role="note"
+        style={{ background: 'var(--the)', borderBottom: '1px solid var(--vien)', padding: 'var(--k3) var(--k4)', ...SANS }}
+      >
+        <div className="flex items-center" style={{ gap: 'var(--k3)' }}>
+          <img src={bieuTuong(vai)} alt="" width={44} height={44} style={{ borderRadius: 'var(--bo-1)', flex: 'none' }} />
+          <div className="flex-1 min-w-0">
+            <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
+              Mở bằng trình duyệt để cài app
+            </div>
+            <div style={{ fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
+              Đang mở trong Zalo nên không cài được. Bấm <b>⋮</b> góc trên bên phải, chọn <b>Mở bằng trình duyệt</b>.
+            </div>
+          </div>
+          <button type="button" onClick={deSau} className="tap-target shrink-0" style={{ fontSize: 'var(--cx-1)', color: 'var(--nhat)', padding: '0 var(--k2)' }}>
+            Để sau
+          </button>
+        </div>
+
+        <div className="flex items-center" style={{ gap: 'var(--k3)', marginTop: 'var(--k3)' }}>
+          <ViTriNutBaCham />
+          <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)' }}>
+            <button
+              type="button"
+              onClick={chepLink}
+              className="tap-target font-bold"
+              style={{ fontSize: 'var(--cx-1)', color: 'var(--muc-nguoc)', background: 'var(--muc)', borderRadius: 'var(--bo-1)', padding: '0 var(--k4)', minHeight: 40 }}
+            >
+              Sao chép link
+            </button>
+            {linkChrome && (
+              <a
+                href={linkChrome}
+                className="tap-target font-bold inline-flex items-center"
+                style={{ fontSize: 'var(--cx-1)', color: 'var(--muc)', border: '1px solid var(--vien)', borderRadius: 'var(--bo-1)', padding: '0 var(--k4)', minHeight: 40 }}
+              >
+                Thử mở trong Chrome
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>

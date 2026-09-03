@@ -132,3 +132,32 @@ export async function tenAppSeCai(): Promise<string> {
     return ''
   }
 }
+
+/**
+ * TRÌNH DUYỆT TRONG ỨNG DỤNG (Zalo, Facebook, Messenger, Instagram, Line).
+ *
+ * Link thầy gửi qua Zalo mở bằng trình duyệt nội bộ của Zalo, không phải
+ * Chrome/Safari. Các trình duyệt này KHÔNG bắn `beforeinstallprompt`, và lệnh
+ * "Thêm vào màn hình chính" của chúng thường bỏ qua hẳn file manifest — nó lấy
+ * tiêu đề trang và favicon, nên ra biểu tượng chữ "A" với tên "ĐỖ ĐẠI HỌC"
+ * chung thay vì "ĐĐH Học sinh". Đây là nguyên nhân thật của việc cài mãi không
+ * ra đúng app.
+ *
+ * Không lách được: phải mở link bằng Chrome hoặc Safari rồi mới cài.
+ */
+export function trongTrinhDuyetTrongApp(ua = typeof navigator === 'undefined' ? '' : navigator.userAgent || ''): boolean {
+  if (/Zalo/i.test(ua)) return true
+  if (/FBAN|FBAV|FB_IAB|FBIOS|Instagram/i.test(ua)) return true
+  if (/Line\//i.test(ua)) return true
+  // iOS: mọi trình duyệt thật (Safari, Chrome iOS, Edge iOS) đều có "Safari"
+  // trong chuỗi nhận dạng; thiếu nó là đang ở webview trong một app khác.
+  if (/(iPhone|iPod|iPad)/.test(ua) && !/Safari/.test(ua)) return true
+  return false
+}
+
+/** Android: thử nhảy sang Chrome bằng intent. iOS không có cách tương đương. */
+export function moBangChrome(ua = typeof navigator === 'undefined' ? '' : navigator.userAgent || ''): string | null {
+  if (!/Android/i.test(ua)) return null
+  const u = location.href.replace(/^https?:\/\//, '')
+  return `intent://${u}#Intent;scheme=https;package=com.android.chrome;end`
+}
