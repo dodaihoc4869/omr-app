@@ -1323,10 +1323,11 @@ function doPost(e) {
       if (!m[l.sbd] || m[l.sbd].lanThu < l.lanThu) m[l.sbd] = l
     }
     const items = []
+    const layCaDaXoa = body.daXoa === true
     for (let i = 1; i < data.length; i++) {
       const v = data[i]
       const trangThai = v[9] ? String(v[9]) : 'mo'
-      if (trangThai === 'da_xoa') continue
+      if (layCaDaXoa ? trangThai !== 'da_xoa' : trangThai === 'da_xoa') continue
       const maCa = String(v[0])
       const tk = thongKeLuot_(theoCa[maCa] || {})
       items.push({
@@ -1342,6 +1343,7 @@ function doPost(e) {
         phamVi: v[11] ? String(v[11]) : 'tu_do',
         loai: String(v[17] || '') === 'baitap' ? 'baitap' : 'thi',
         hanNop: v[18] ? String(v[18]) : '',
+        xoaLuc: v[14] ? String(v[14]) : '',
         daVao: tk.daVao,
         daNop: tk.daNop,
         canhBao: tk.canhBao,
@@ -1417,6 +1419,23 @@ function doPost(e) {
     caSh.getRange(caRow, 10).setValue('da_xoa')
     caSh.getRange(caRow, 15).setValue(new Date().toISOString())
     return jsonResponse_({ ok: true })
+  }
+
+  if (action === 'khoiPhucCa') {
+    // Xoá ca là xoá MỀM (TrangThai = da_xoa), bài làm giữ nguyên — nên xoá
+    // nhầm là khôi phục lại được. Có tính năng xoá nhiều ca một lượt thì càng
+    // cần đường lùi này.
+    const loi = kiemTraMaBiMat_(body)
+    if (loi) return jsonResponse_({ ok: false, error: loi })
+    const maCa = String(body.maCa || '').trim()
+    const caSh = sheetCa_()
+    const caRow = findRowByKey_(caSh, 0, maCa)
+    if (caRow < 0) return jsonResponse_({ ok: false, error: 'Không có ca ' + maCa })
+    const ca = docCa_(caSh, caRow)
+    if (ca.trangThai !== 'da_xoa') return jsonResponse_({ ok: false, error: 'Ca này chưa bị xoá' })
+    caSh.getRange(caRow, 10).setValue('mo')
+    caSh.getRange(caRow, 15).setValue('')
+    return jsonResponse_({ ok: true, maCa: maCa, serverNow: Date.now() })
   }
 
   if (action === 'ghiDiem') {

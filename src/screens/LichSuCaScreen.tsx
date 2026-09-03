@@ -4,9 +4,9 @@
 // Bật "Chọn" → mỗi hàng thành ô tích, xoá được nhiều ca ngay tại màn này.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
 import { useEffect, useMemo, useState } from 'react'
-import { CheckSquare, RefreshCw, Search, Square, Trash2 } from 'lucide-react'
+import { CheckSquare, RefreshCw, RotateCcw, Search, Square, Trash2 } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
-import { danhSachCa, xoaNhieuCa, type CaTomTat } from '../lib/exam-api'
+import { danhSachCa, khoiPhucCa, xoaNhieuCa, type CaTomTat } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { useAppStore } from '../store/appStore'
@@ -65,6 +65,9 @@ export default function LichSuCaScreen() {
   const [hoiXoa, setHoiXoa] = useState(false)
   const [chuXacNhan, setChuXacNhan] = useState('')
   const [dangXoa, setDangXoa] = useState(false)
+  // THÙNG RÁC: xoá ca là xoá MỀM, bài làm còn nguyên — xem lại và khôi phục được.
+  const [xemDaXoa, setXemDaXoa] = useState(false)
+  const [dangKhoiPhuc, setDangKhoiPhuc] = useState('')
 
   const tai = async () => {
     setDangTai(true)
@@ -73,7 +76,7 @@ export default function LichSuCaScreen() {
       const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
       if (!url.trim()) throw new Error('Chưa cấu hình link Apps Script — vào Ngân hàng câu hỏi → Cấu hình')
       if (!mat.trim()) throw new Error('Chưa nhập mã bí mật — vào Ngân hàng câu hỏi → Cấu hình')
-      setDsCa(await danhSachCa(url.trim(), mat.trim()))
+      setDsCa(await danhSachCa(url.trim(), mat.trim(), xemDaXoa))
     } catch (e) {
       setLoi(e instanceof Error ? e.message : 'Lỗi không rõ')
       if (dsCa === null) setDsCa([])
@@ -85,7 +88,7 @@ export default function LichSuCaScreen() {
   useEffect(() => {
     tai()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [xemDaXoa])
 
   const dsLop = useMemo(() => Array.from(new Set((dsCa ?? []).map((c) => c.lop.trim()).filter(Boolean))).sort(), [dsCa])
   const dsLoc = useMemo(() => {
@@ -106,6 +109,20 @@ export default function LichSuCaScreen() {
     setDaChon([])
     setHoiXoa(false)
     setChuXacNhan('')
+  }
+
+  const handleKhoiPhuc = async (maCa: string) => {
+    setDangKhoiPhuc(maCa)
+    try {
+      const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
+      await khoiPhucCa(url.trim(), mat.trim(), maCa)
+      showToast(`Đã khôi phục ca ${maCa}`, 'success')
+      await tai()
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Không khôi phục được', 'error')
+    } finally {
+      setDangKhoiPhuc('')
+    }
   }
 
   const handleXoa = async () => {
@@ -133,7 +150,7 @@ export default function LichSuCaScreen() {
     <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
       <div className="flex items-center justify-between">
         <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
-          Lịch sử ca thi
+          {xemDaXoa ? 'Ca đã xoá' : 'Lịch sử ca thi'}
         </h1>
         <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target">
           ← Kiểm tra
@@ -149,6 +166,7 @@ export default function LichSuCaScreen() {
           <button
             type="button"
             onClick={() => (chonMode ? thoatChon() : setChonMode(true))}
+            disabled={xemDaXoa}
             className="tap-target shrink-0 flex items-center justify-center"
             style={{ width: 48, height: 48, borderRadius: 'var(--bo-1)', background: chonMode ? 'var(--muc)' : 'var(--the-2)', color: chonMode ? 'var(--muc-nguoc)' : 'var(--muc)' }}
             aria-label={chonMode ? 'Thoát chế độ chọn' : 'Chọn ca để xoá'}
@@ -156,6 +174,20 @@ export default function LichSuCaScreen() {
             title={chonMode ? 'Xong' : 'Chọn ca để xoá'}
           >
             <CheckSquare size={18} />
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              thoatChon()
+              setXemDaXoa((v) => !v)
+            }}
+            className="tap-target shrink-0 flex items-center justify-center"
+            style={{ width: 48, height: 48, borderRadius: 'var(--bo-1)', background: xemDaXoa ? 'var(--muc)' : 'var(--the-2)', color: xemDaXoa ? 'var(--muc-nguoc)' : 'var(--muc)' }}
+            aria-label={xemDaXoa ? 'Về danh sách ca đang dùng' : 'Xem ca đã xoá'}
+            aria-pressed={xemDaXoa}
+            title={xemDaXoa ? 'Về danh sách ca đang dùng' : 'Ca đã xoá'}
+          >
+            <RotateCcw size={18} />
           </button>
           <button
             type="button"
@@ -196,7 +228,7 @@ export default function LichSuCaScreen() {
           </div>
         )}
 
-        {chonMode && (
+        {chonMode && !xemDaXoa && (
           <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k3)' }}>
             <button
               type="button"
@@ -236,8 +268,8 @@ export default function LichSuCaScreen() {
           <div style={{ ...NHAN_NHO, padding: 'var(--k4) 0' }}>Đang tải danh sách ca từ Google Sheet…</div>
         ) : dsLoc.length === 0 ? (
           <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
-            <div style={{ ...NHAN_NHO, padding: 'var(--k2) 0' }}>{dsCa.length === 0 ? 'Chưa có ca nào.' : 'Không có ca khớp bộ lọc.'}</div>
-            {dsCa.length === 0 && (
+            <div style={{ ...NHAN_NHO, padding: 'var(--k2) 0' }}>{dsCa.length === 0 ? (xemDaXoa ? 'Không có ca nào đã xoá.' : 'Chưa có ca nào.') : 'Không có ca khớp bộ lọc.'}</div>
+            {dsCa.length === 0 && !xemDaXoa && (
               <NutChinh variant="phu" onClick={() => setScreen('examsetup')}>
                 Mở ca kiểm tra đầu tiên
               </NutChinh>
@@ -251,14 +283,14 @@ export default function LichSuCaScreen() {
               return (
                 <Hang
                   key={c.maCa}
-                  onClick={() => (chonMode ? bat(c.maCa) : moChiTietCa(c.maCa))}
+                  onClick={xemDaXoa ? undefined : () => (chonMode ? bat(c.maCa) : moChiTietCa(c.maCa))}
                   selected={chonMode && tich}
                   data-trang-thai={tt.ten}
                   className="flex-col"
                   style={{ alignItems: 'stretch' }}
                 >
                   <span className="flex items-start justify-between" style={{ gap: 'var(--k3)' }}>
-                    {chonMode && (
+                    {chonMode && !xemDaXoa && (
                       <span className="shrink-0" style={{ color: tich ? 'var(--xanh)' : 'var(--mo)', marginTop: 2 }} aria-hidden="true">
                         {tich ? <CheckSquare size={20} /> : <Square size={20} />}
                       </span>
@@ -277,8 +309,19 @@ export default function LichSuCaScreen() {
                     </span>
                   </span>
                   <span className="flex items-center flex-wrap" style={{ gap: 4, marginTop: 6 }}>
-                    <Nhan tone={tt.tone}>{tt.ten}</Nhan>
+                    <Nhan tone={xemDaXoa ? 'xam' : tt.tone}>{xemDaXoa ? 'đã xoá' : tt.ten}</Nhan>
                     {c.canhBao > 0 && <Nhan tone="cam">{c.canhBao} cảnh báo</Nhan>}
+                    {xemDaXoa && (
+                      <button
+                        type="button"
+                        onClick={() => handleKhoiPhuc(c.maCa)}
+                        disabled={dangKhoiPhuc === c.maCa}
+                        className="tap-target font-bold inline-flex items-center"
+                        style={{ ...NHAN_NHO, gap: 4, color: 'var(--muc)', minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien-dam)' }}
+                      >
+                        <RotateCcw size={14} /> {dangKhoiPhuc === c.maCa ? 'Đang khôi phục…' : 'Khôi phục'}
+                      </button>
+                    )}
                   </span>
                 </Hang>
               )

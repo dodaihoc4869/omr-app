@@ -915,13 +915,16 @@ export interface CaTomTat {
   /** 'baitap' = bài tập về nhà (BA-APP đợt 3). Ca cũ không có cột này → 'thi'. */
   loai: LoaiCa
   hanNop: string
+  /** Thời điểm bị xoá mềm (chỉ có khi lấy danh sách ca đã xoá). */
+  xoaLuc?: string
   daVao: number
   daNop: number
   canhBao: number
 }
 
-export async function danhSachCa(scriptUrl: string, secret: string): Promise<CaTomTat[]> {
-  const r = await postJson(scriptUrl, { action: 'danhSachCa', secret })
+/** daXoa = true → lấy các ca ĐÃ XOÁ (thùng rác) thay vì ca đang dùng. */
+export async function danhSachCa(scriptUrl: string, secret: string, daXoa = false): Promise<CaTomTat[]> {
+  const r = await postJson(scriptUrl, { action: 'danhSachCa', secret, daXoa })
   if (!r.ok) throw new Error(r.error || 'Không lấy được danh sách ca')
   return (r.items as CaTomTat[]).map((c) => ({ ...c, maCa: String(c.maCa), lop: String(c.lop ?? ''), tenCa: String(c.tenCa ?? ''), loai: c.loai === 'baitap' ? 'baitap' : 'thi', hanNop: String(c.hanNop ?? '') }))
 }
@@ -963,6 +966,12 @@ export async function chiTietCa(scriptUrl: string, secret: string, maCa: string)
 export async function xoaCa(scriptUrl: string, secret: string, maCa: string, xacNhan: string): Promise<void> {
   const r = await postJson(scriptUrl, { action: 'xoaCa', secret, maCa, xacNhan })
   if (!r.ok) throw new Error(r.error || 'Không xoá được ca')
+}
+
+/** Khôi phục một ca đã xoá mềm — bài làm vẫn còn nguyên nên lấy lại được. */
+export async function khoiPhucCa(scriptUrl: string, secret: string, maCa: string): Promise<void> {
+  const r = await postJson(scriptUrl, { action: 'khoiPhucCa', secret, maCa })
+  if (!r.ok) throw new Error(r.error || 'Không khôi phục được ca')
 }
 
 /** Kết quả xoá hàng loạt: ca nào xoá được, ca nào không kèm lý do. */
