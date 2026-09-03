@@ -5,12 +5,14 @@
 // Cùng hồ sơ này sẽ dùng lại cho lối vào từ mục Phụ huynh — không dựng hai màn.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, RefreshCw, Search, TrendingDown, TrendingUp, Minus } from 'lucide-react'
+import { ArrowLeft, BookPlus, RefreshCw, Search, TrendingDown, TrendingUp, Minus } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung, DauThe } from '../components/DesignSystem'
 import { danhSachEm, hoSoEm, khoiTuNamSinh, type ChuyenDeEm, type EmTomTat, type HoSoEm, type XuHuong } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { classify } from '../engine/score'
 import { useAppStore } from '../store/appStore'
+import GiaoBaiTap from '../components/GiaoBaiTap'
+import { baiTapCuaEm, type BaiTapCuaEm, type TrangThaiBaiTap } from '../lib/exam-api'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -43,6 +45,14 @@ export const SO_CAU_DU_TIN = 4
 
 export function laYeu(cd: Pick<ChuyenDeEm, 'tiLeSai' | 'soCau'>): boolean {
   return cd.soCau >= SO_CAU_DU_TIN && cd.tiLeSai > NGUONG_YEU
+}
+
+/** Nhãn trạng thái bài tập — dùng chung cho màn thầy và màn học sinh. */
+export const NHAN_BAI_TAP: Record<TrangThaiBaiTap, { ten: string; tone: 'xanh' | 'cam' | 'do' | 'tim' | 'xam' }> = {
+  chua_lam: { ten: 'chưa làm', tone: 'xam' },
+  dang_lam: { ten: 'đang làm', tone: 'tim' },
+  da_nop: { ten: 'đã nộp', tone: 'xanh' },
+  qua_han: { ten: 'quá hạn', tone: 'do' },
 }
 
 function phanTram(x: number): string {
@@ -86,6 +96,8 @@ export default function HocSinhScreen() {
 
   const [hoSo, setHoSo] = useState<HoSoEm | null>(null)
   const [dangTaiHoSo, setDangTaiHoSo] = useState(false)
+  const [moGiaoBai, setMoGiaoBai] = useState(false)
+  const [baiTap, setBaiTap] = useState<BaiTapCuaEm[] | null>(null)
 
   const tai = async () => {
     setDangTai(true)
@@ -121,7 +133,15 @@ export default function HocSinhScreen() {
       .then(setHoSo)
       .catch((e) => setLoi(e instanceof Error ? e.message : 'Không mở được hồ sơ'))
       .finally(() => setDangTaiHoSo(false))
+    baiTapCuaEm(cauHinh.url, { secret: cauHinh.mat, sbd: sbdDangXem })
+      .then(setBaiTap)
+      .catch(() => setBaiTap([]))
   }, [sbdDangXem, cauHinh])
+
+  const taiLaiBaiTap = () => {
+    if (!cauHinh || !sbdDangXem) return
+    baiTapCuaEm(cauHinh.url, { secret: cauHinh.mat, sbd: sbdDangXem }).then(setBaiTap).catch(() => {})
+  }
 
   const dsLoc = useMemo(() => {
     const q = timKiem.trim().toLowerCase()
@@ -165,6 +185,12 @@ export default function HocSinhScreen() {
                 </div>
               </div>
             </TheNoiDung>
+
+            <NutChinh onClick={() => setMoGiaoBai(true)}>
+              <span className="inline-flex items-center" style={{ gap: 6 }}>
+                <BookPlus size={18} /> Giao bài tập
+              </span>
+            </NutChinh>
 
             <TheNoiDung>
               <h2 className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', marginBottom: 'var(--k3)' }}>
@@ -249,6 +275,54 @@ export default function HocSinhScreen() {
                 </div>
               )}
             </TheNoiDung>
+
+            <TheNoiDung>
+              <h2 className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', marginBottom: 'var(--k3)' }}>
+                Bài tập về nhà
+              </h2>
+              {baiTap === null ? (
+                <div style={NHAN_NHO}>Đang tải…</div>
+              ) : baiTap.length === 0 ? (
+                <div style={NHAN_NHO}>Chưa giao bài tập nào cho em.</div>
+              ) : (
+                <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+                  {baiTap.map((b) => (
+                    <Hang key={b.maCa} className="flex-col" style={{ alignItems: 'stretch' }} data-bai-tap={b.maCa}>
+                      <span className="flex items-start justify-between" style={{ gap: 'var(--k3)' }}>
+                        <span className="flex-1 min-w-0">
+                          <div className="font-bold truncate" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
+                            {b.tenCa || `Bài ${b.maCa}`}
+                          </div>
+                          <div style={NHAN_NHO}>
+                            giao <span style={SO}>{ngayGio(b.giaoLuc)}</span>
+                            {b.hanNop ? <> · hạn <span style={SO}>{ngayGio(b.hanNop)}</span></> : ''}
+                          </div>
+                        </span>
+                        <span className="shrink-0 font-bold" style={{ ...SO, fontSize: 'var(--cx-3)' }}>
+                          {b.tong === null ? '' : b.tong.toFixed(2).replace('.', ',')}
+                        </span>
+                      </span>
+                      <span className="flex items-center flex-wrap" style={{ gap: 4, marginTop: 6 }}>
+                        <Nhan tone={NHAN_BAI_TAP[b.trangThai].tone}>{NHAN_BAI_TAP[b.trangThai].ten}</Nhan>
+                      </span>
+                    </Hang>
+                  ))}
+                </div>
+              )}
+            </TheNoiDung>
+
+            {moGiaoBai && (
+              <GiaoBaiTap
+                sbd={hoSo.em.sbd}
+                hoTen={hoSo.em.hoTen}
+                chuyenDeEm={hoSo.chuyenDe}
+                nguongYeu={NGUONG_YEU}
+                onXong={() => {
+                  setMoGiaoBai(false)
+                  taiLaiBaiTap()
+                }}
+              />
+            )}
           </>
         )}
       </div>

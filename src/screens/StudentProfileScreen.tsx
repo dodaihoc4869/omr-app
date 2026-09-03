@@ -3,8 +3,8 @@
 // cho thầy. Sau khi đăng ký, học sinh KHÔNG có nút tự xoá/đăng ký lại — chỉ
 // thầy xoá được (ở màn Giáo viên — Quản lý đăng ký), đúng theo yêu cầu.
 import { useEffect, useState } from 'react'
-import { GraduationCap, Send, MessageSquareText } from 'lucide-react'
-import { registerStudent, fetchStudentProfile, sendStudentMessage, fetchStudentInbox, markTeacherMessagesRead, type TeacherMessage } from '../lib/exam-api'
+import { GraduationCap, Send, MessageSquareText, NotebookPen } from 'lucide-react'
+import { registerStudent, fetchStudentProfile, sendStudentMessage, fetchStudentInbox, markTeacherMessagesRead, baiTapCuaEm, type TeacherMessage, type BaiTapCuaEm } from '../lib/exam-api'
 import { loadMyStudentSbd, loadScriptUrl, loadTokenHocSinh, saveMyStudentSbd } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 
@@ -32,6 +32,8 @@ export default function StudentProfileScreen() {
   const [saving, setSaving] = useState(false)
 
   const [inbox, setInbox] = useState<TeacherMessage[]>([])
+  // BÀI TẬP VỀ NHÀ (BA-APP đợt 3) — chỉ đọc được khi em đã có link riêng.
+  const [baiTap, setBaiTap] = useState<BaiTapCuaEm[] | null>(null)
   const [msgText, setMsgText] = useState('')
   const [sendingMsg, setSendingMsg] = useState(false)
 
@@ -72,8 +74,18 @@ export default function StudentProfileScreen() {
       })
       .catch(() => {})
     loadInbox(sbd, scriptUrl)
+    if (token) {
+      baiTapCuaEm(scriptUrl.trim(), { tokenHS: token })
+        .then(setBaiTap)
+        .catch(() => setBaiTap([]))
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, sbd, scriptUrl, token])
+
+  /** Mở bài tập = vào đúng màn làm bài, đường như link mời ca thi. */
+  const moBaiTap = (maCa: string) => {
+    location.href = `${import.meta.env.BASE_URL}?examCode=${encodeURIComponent(maCa)}`
+  }
 
   const handleRegister = async () => {
     if (!scriptUrl.trim()) return showToast('Chưa có link kết nối — hỏi thầy link Apps Script', 'error')
@@ -201,6 +213,39 @@ export default function StudentProfileScreen() {
         SBD <b className="text-slate-700 dark:text-slate-300">{sbd}</b>
         {lop ? <> — lớp <b className="text-slate-700 dark:text-slate-300">{lop}</b></> : null}
       </div>
+
+      {baiTap !== null && (
+        <div className="rounded-xl p-4 space-y-2.5" style={{ background: 'var(--the)', boxShadow: 'var(--bong-1)' }}>
+          <div className="font-semibold text-sm flex items-center gap-2" style={{ color: 'var(--muc)' }}>
+            <NotebookPen size={16} /> Bài tập về nhà
+          </div>
+          {baiTap.length === 0 ? (
+            <div className="text-sm" style={{ color: 'var(--nhat)' }}>Thầy chưa giao bài tập nào.</div>
+          ) : (
+            baiTap.map((b) => (
+              <button
+                key={b.maCa}
+                onClick={() => moBaiTap(b.maCa)}
+                className="tap-target w-full text-left rounded-lg p-2.5"
+                style={{ background: 'var(--the-2)' }}
+                data-bai-tap={b.maCa}
+              >
+                <div className="font-semibold text-sm">{b.tenCa || `Bài ${b.maCa}`}</div>
+                <div className="text-[12px]" style={{ color: 'var(--nhat)' }}>
+                  {b.hanNop ? `Hạn ${new Date(b.hanNop).toLocaleDateString('vi-VN')}` : 'Không có hạn'} ·{' '}
+                  {b.trangThai === 'da_nop'
+                    ? `đã nộp${b.tong !== null ? ` — ${b.tong.toFixed(2).replace('.', ',')} điểm` : ''}`
+                    : b.trangThai === 'dang_lam'
+                      ? 'đang làm'
+                      : b.trangThai === 'qua_han'
+                        ? 'QUÁ HẠN — làm muộn vẫn nộp được'
+                        : 'chưa làm'}
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+      )}
 
       <div className="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-4 space-y-2.5">
         <div className="font-semibold text-sm flex items-center gap-2">

@@ -61,7 +61,10 @@ const DRIVE_FOLDER = 'OMR-APP-DATA'
 // đầu; từ cột 8 thêm khi làm QUANLYCATHI (3 mốc thời gian, trạng thái, phạm vi).
 // getSheet_ chỉ ghi tiêu đề khi TẠO MỚI sheet — sheet cũ được bổ sung tiêu đề
 // cột thiếu bằng boSungTieuDe_.
-const CA_HEADERS = ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson', 'BatDau', 'HetHanVao', 'TrangThai', 'TenCa', 'PhamVi', 'DanhSachMoi', 'NguoiTao', 'XoaLuc', 'NguongLan', 'NguongGiay']
+// Cột 18–19 thêm ở BA-APP đợt 3: Loai = 'thi' (mặc định, ô trống cũng là thi)
+// hoặc 'baitap' — BÀI TẬP VỀ NHÀ dùng CHUNG mọi thứ với ca thi, chỉ khác 5 điểm
+// (xem BA-APP.md mục 6). HanNop chỉ có nghĩa với bài tập.
+const CA_HEADERS = ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson', 'BatDau', 'HetHanVao', 'TrangThai', 'TenCa', 'PhamVi', 'DanhSachMoi', 'NguoiTao', 'XoaLuc', 'NguongLan', 'NguongGiay', 'Loai', 'HanNop']
 // CHỐNG GIAN LẬN THEO MỨC (QUANLYCATHI mục 6): rời màn lần 1, 2 chỉ cảnh báo;
 // lần thứ NguongLan khoá bài; một lần rời quá NguongGiay giây khoá ngay. Thầy
 // chỉnh khi mở ca; ô trống = mặc định dưới đây.
@@ -243,7 +246,14 @@ function docCa_(sh, row) {
     nguoiTao: v[13] ? String(v[13]) : '',
     nguongLan: Number(v[15]) > 0 ? Number(v[15]) : NGUONG_LAN_MAC_DINH,
     nguongGiay: Number(v[16]) > 0 ? Number(v[16]) : NGUONG_GIAY_MAC_DINH,
+    loai: String(v[17] || '') === 'baitap' ? 'baitap' : 'thi',
+    hanNop: v[18] ? String(v[18]) : '',
   }
+}
+
+/** true = ca này là BÀI TẬP VỀ NHÀ (không đồng hồ đếm ngược, nộp muộn vẫn nhận). */
+function laBaiTap_(ca) {
+  return ca && ca.loai === 'baitap'
 }
 
 function docLuot_(v) {
@@ -308,8 +318,12 @@ function quyetDinhVaoThi_(ca, luot, idThietBi, nowMs, hocSinh) {
   // lượt mới (chưa có, hoặc thầy đã duyệt thi lại) → xét cửa sổ vào phòng
   const batDau = ca.batDau ? msCua_(ca.batDau) : NaN
   if (isFinite(batDau) && nowMs < batDau) return { ok: false, lyDo: 'chua_mo', batDau: ca.batDau }
-  const hetHan = ca.hetHanVao ? msCua_(ca.hetHanVao) : NaN
-  if (isFinite(hetHan) && nowMs > hetHan) return { ok: false, lyDo: 'het_han_vao', hetHanVao: ca.hetHanVao }
+  // BÀI TẬP VỀ NHÀ: không có "hạn vào phòng" — em mở lúc nào cũng được, quá hạn
+  // nộp vẫn vào làm được và chỉ bị đánh dấu nộp muộn (BA-APP.md mục 6).
+  if (!laBaiTap_(ca)) {
+    const hetHan = ca.hetHanVao ? msCua_(ca.hetHanVao) : NaN
+    if (isFinite(hetHan) && nowMs > hetHan) return { ok: false, lyDo: 'het_han_vao', hetHanVao: ca.hetHanVao }
+  }
   // PHẠM VI GỬI CA (QUANLYCATHI mục 4) — máy chủ kiểm tra, không chỉ ẩn giao diện.
   // khoi: DanhSachMoi = năm sinh; em phải có hồ sơ (sheet HocSinh) đúng năm sinh.
   // chon: DanhSachMoi = JSON mảng SBD.
@@ -1113,13 +1127,15 @@ function doPost(e) {
       '',
       Number(body.nguongLan) > 0 ? Number(body.nguongLan) : NGUONG_LAN_MAC_DINH,
       Number(body.nguongGiay) > 0 ? Number(body.nguongGiay) : NGUONG_GIAY_MAC_DINH,
+      String(body.loai || '') === 'baitap' ? 'baitap' : 'thi',
+      body.hanNop ? new Date(msCua_(body.hanNop)).toISOString() : '',
     ]
     if (row > 0) {
       sh.getRange(row, 1, 1, rowData.length).setValues([rowData])
     } else {
       sh.appendRow(rowData)
     }
-    return jsonResponse_({ ok: true, batDau: batDau, hetHanVao: rowData[8], serverNow: Date.now() })
+    return jsonResponse_({ ok: true, batDau: batDau, hetHanVao: rowData[8], loai: rowData[17], hanNop: rowData[18], serverNow: Date.now() })
   }
 
   if (action === 'vaoThi') {
@@ -1150,11 +1166,13 @@ function doPost(e) {
       }
       let lanThu = 1
       let vaoLuc = new Date(now).toISOString()
-      let hetGioLuc = new Date(now + ca.thoiGianPhut * 60000).toISOString()
+      // Bài tập về nhà KHÔNG đếm ngược theo phút — mốc hết giờ là HẠN NỘP của
+      // bài (rỗng thì coi như không có hạn: để trống, máy em không hiện đồng hồ).
+      let hetGioLuc = laBaiTap_(ca) ? ca.hanNop || '' : new Date(now + ca.thoiGianPhut * 60000).toISOString()
       if (qd.cach === 'khoi_phuc') {
         lanThu = luot.lanThu
         vaoLuc = luot.vaoLuc
-        hetGioLuc = luot.hetGioLuc || new Date(msCua_(luot.vaoLuc) + ca.thoiGianPhut * 60000).toISOString()
+        hetGioLuc = laBaiTap_(ca) ? ca.hanNop || '' : luot.hetGioLuc || new Date(msCua_(luot.vaoLuc) + ca.thoiGianPhut * 60000).toISOString()
       } else if (qd.cach === 'duyet_lai') {
         lanThu = luot.lanThu
         sh.getRange(luot.row, 4, 1, 5).setValues([[idThietBi, vaoLuc, hetGioLuc, '', 'dang_lam']])
@@ -1182,6 +1200,9 @@ function doPost(e) {
         maCa: maCa,
         lop: ca.lop,
         thoiGianPhut: ca.thoiGianPhut,
+        loai: ca.loai,
+        hanNop: ca.hanNop,
+        tenCa: ca.tenCa,
         congBo: ca.congBo,
         lanThu: lanThu,
         vaoLuc: vaoLuc,
@@ -1289,6 +1310,8 @@ function doPost(e) {
         trangThai: trangThai,
         tenCa: v[10] ? String(v[10]) : '',
         phamVi: v[11] ? String(v[11]) : 'tu_do',
+        loai: String(v[17] || '') === 'baitap' ? 'baitap' : 'thi',
+        hanNop: v[18] ? String(v[18]) : '',
         daVao: tk.daVao,
         daNop: tk.daNop,
         canhBao: tk.canhBao,
@@ -1434,6 +1457,15 @@ function doPost(e) {
     const integrity = body.integrity || { leaveCount: 0, totalHiddenMs: 0, events: [] }
     const nopLuc = new Date().toISOString()
     const trangThai = integrity.blocked ? 'khoa' : 'da_nop'
+    // Ca này là bài tập về nhà? (đọc 1 lần, dùng cho ghi chú nộp muộn bên dưới)
+    let laBaiTapCa = false
+    try {
+      const caShS = sheetCa_()
+      const caRowS = findRowByKey_(caShS, 0, body.maCa)
+      if (caRowS > 0) laBaiTapCa = laBaiTap_(docCa_(caShS, caRowS))
+    } catch (err) {
+      laBaiTapCa = false
+    }
     const sh = sheetLuot_()
     const data = sh.getDataRange().getValues()
     let luotRow = -1
@@ -1453,7 +1485,8 @@ function doPost(e) {
       const hetGio = msCua_(luotCu.hetGioLuc)
       if (isFinite(hetGio) && Date.now() > hetGio + AN_HAN_NOP_GIAY * 1000) {
         const muon = Math.round((Date.now() - hetGio) / 1000)
-        ghiChu = 'nộp muộn ' + muon + ' giây'
+        // Bài tập về nhà: quá hạn VẪN NHẬN, chỉ đánh dấu; ghi theo ngày cho dễ đọc.
+        ghiChu = laBaiTapCa ? 'nộp quá hạn ' + Math.max(1, Math.round(muon / 86400)) + ' ngày' : 'nộp muộn ' + muon + ' giây'
       }
       // Cột 7..12: NopLuc, TrangThai, DapAnJson, SoLanRoiMan, TongGiayRoiMan, IntegrityJson
       sh.getRange(luotRow, 7, 1, 6).setValues([[nopLuc, trangThai, JSON.stringify(body.dapAn), integrity.leaveCount || 0, Math.round((integrity.totalHiddenMs || 0) / 1000), JSON.stringify(integrity)]])
@@ -1666,6 +1699,91 @@ function doPost(e) {
     }
     ca.sort(function (a, b) { return msCua_(b.nopLuc) - msCua_(a.nopLuc) })
     return jsonResponse_({ ok: true, em: em, chuyenDe: chuyenDe, ca: ca, serverNow: Date.now() })
+  }
+
+  if (action === 'qidDaLam') {
+    // Tập câu em ĐÃ từng làm — máy thầy dùng để rút bài tập tránh câu cũ.
+    const loi = kiemTraMaBiMat_(body)
+    if (loi) return jsonResponse_({ ok: false, error: loi })
+    const sbd = String(body.sbd || '').trim()
+    const qData = getSheet_(SHEET_QID, QID_HEADERS).getDataRange().getValues()
+    for (let i = 1; i < qData.length; i++) {
+      if (String(qData[i][0]) === sbd) {
+        const ds = String(qData[i][1] || '').split(',').filter(function (x) { return x })
+        return jsonResponse_({ ok: true, qids: ds, serverNow: Date.now() })
+      }
+    }
+    return jsonResponse_({ ok: true, qids: [], serverNow: Date.now() })
+  }
+
+  if (action === 'baiTapCuaEm') {
+    // Danh sách BÀI TẬP VỀ NHÀ của một em (BA-APP.md đợt 3). Quyền: token học
+    // sinh · token phụ huynh (xem bài của con) · mã bí mật + sbd (máy thầy).
+    let sbd = ''
+    if (!kiemTraMaBiMat_(body)) {
+      sbd = String(body.sbd || '').trim()
+    } else if (body.tokenHS) {
+      const hs = hsTuToken_(body.tokenHS)
+      if (!hs) return jsonResponse_({ ok: false, error: 'Link không hợp lệ hoặc đã bị thu hồi' })
+      sbd = hs.sbd
+    } else if (body.tokenPH) {
+      const ph = phTuToken_(body.tokenPH)
+      if (!ph) return jsonResponse_({ ok: false, error: 'Link không hợp lệ hoặc đã bị thu hồi' })
+      sbd = ph.sbd
+    } else {
+      return jsonResponse_({ ok: false, error: 'Không có quyền' })
+    }
+    if (!sbd) return jsonResponse_({ ok: false, error: 'Thiếu số báo danh' })
+
+    // Lượt của em: (maCa -> trạng thái, nộp lúc) — chỉ đọc cột cần.
+    const luotSh = sheetLuot_()
+    const nLuot = luotSh.getLastRow()
+    const luotData = nLuot > 0 ? luotSh.getRange(1, 1, nLuot, 17).getValues() : []
+    const luotCua = {}
+    for (let i = 1; i < luotData.length; i++) {
+      if (String(luotData[i][1]) !== sbd) continue
+      const mc = String(luotData[i][0])
+      const lan = Number(luotData[i][2]) || 1
+      if (!luotCua[mc] || lan >= luotCua[mc].lanThu) {
+        luotCua[mc] = {
+          lanThu: lan,
+          trangThai: String(luotData[i][7] || ''),
+          nopLuc: String(luotData[i][6] || ''),
+          tong: luotData[i][16] === '' || luotData[i][16] === null ? null : Number(luotData[i][16]),
+        }
+      }
+    }
+
+    const now = Date.now()
+    const caRows = sheetCa_().getDataRange().getValues()
+    const items = []
+    for (let i = 1; i < caRows.length; i++) {
+      if (String(caRows[i][17] || '') !== 'baitap') continue
+      if (String(caRows[i][9]) === 'da_xoa') continue
+      // Bài tập luôn giao đích danh (PhamVi = chon) — chỉ trả bài của đúng em này.
+      let ds = []
+      try { ds = JSON.parse(String(caRows[i][12] || '[]')) } catch (err) { ds = [] }
+      if (!ds.some(function (x) { return String(x).trim() === sbd })) continue
+      const mc = String(caRows[i][0])
+      const l = luotCua[mc]
+      const hanNop = caRows[i][18] ? String(caRows[i][18]) : ''
+      const hetHan = hanNop ? msCua_(hanNop) : NaN
+      let trangThai = 'chua_lam'
+      if (l && (l.trangThai === 'da_nop' || l.trangThai === 'khoa')) trangThai = 'da_nop'
+      else if (l && l.trangThai === 'dang_lam') trangThai = 'dang_lam'
+      else if (isFinite(hetHan) && now > hetHan) trangThai = 'qua_han'
+      items.push({
+        maCa: mc,
+        tenCa: String(caRows[i][10] || ''),
+        giaoLuc: String(caRows[i][3] || ''),
+        hanNop: hanNop,
+        trangThai: trangThai,
+        nopLuc: l ? l.nopLuc : '',
+        tong: l ? l.tong : null,
+      })
+    }
+    items.sort(function (a, b) { return msCua_(b.giaoLuc) - msCua_(a.giaoLuc) })
+    return jsonResponse_({ ok: true, sbd: sbd, items: items, serverNow: Date.now() })
   }
 
   if (action === 'danhSachEm') {

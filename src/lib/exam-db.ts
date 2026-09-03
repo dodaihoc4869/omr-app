@@ -56,6 +56,11 @@ export interface ExamAttempt {
   giayCau?: Record<string, number>
   /** Ngưỡng chống gian lận của ca (máy chủ trả lúc vào thi) — mục 6. */
   nguong?: { lan: number; giay: number }
+  /** BÀI TẬP VỀ NHÀ (BA-APP đợt 3): không đồng hồ đếm ngược, không tự nộp khi
+   * hết giờ, chỉ hiện hạn nộp. Bản cũ không có trường này → coi như ca thi. */
+  loai?: 'thi' | 'baitap'
+  hanNop?: string
+  tenCa?: string
   answers: AnswerRecord
   integrity: IntegrityLog
   submitted: boolean

@@ -400,8 +400,9 @@ export default function ExamTakeScreen() {
 
       const giuLuotDo = kq.cach === 'khoi_phuc' && existing && !existing.submitted && (existing.lanThu ?? 1) === kq.lanThu
       const nguong = { lan: kq.nguongLan, giay: kq.nguongGiay }
+      const thongTinCa = { loai: kq.loai, hanNop: kq.hanNop, tenCa: kq.tenCa }
       const a: ExamAttempt = giuLuotDo
-        ? { ...existing, startedAt: kq.vaoLuc, hetGioLuc: kq.hetGioLuc, durationMinutes: kq.thoiGianPhut, idThietBi: idTb, nguong }
+        ? { ...existing, startedAt: kq.vaoLuc, hetGioLuc: kq.hetGioLuc, durationMinutes: kq.thoiGianPhut, idThietBi: idTb, nguong, ...thongTinCa }
         : {
             key: `${ma}:${sb}`,
             maCa: ma,
@@ -413,6 +414,7 @@ export default function ExamTakeScreen() {
             lanThu: kq.lanThu,
             idThietBi: idTb,
             nguong,
+            ...thongTinCa,
             answers: emptyAnswerRecord(),
             integrity: emptyIntegrityLog(),
             submitted: false,
@@ -434,6 +436,12 @@ export default function ExamTakeScreen() {
   // không cộng dồn setInterval để không lệch giờ.
   useEffect(() => {
     if (phase !== 'exam' || !attempt) return
+    // BÀI TẬP VỀ NHÀ: không đồng hồ đếm ngược, không tự nộp — chỉ hiện hạn nộp
+    // (BA-APP.md mục 6). Quá hạn vẫn làm và nộp được, máy chủ đánh dấu quá hạn.
+    if (attempt.loai === 'baitap') {
+      setRemaining(null)
+      return
+    }
     const deadline = new Date(hetGioCua(attempt)).getTime()
     const tick = () => setRemaining((deadline - gioMayChu()) / 1000)
     tick()
@@ -740,6 +748,7 @@ export default function ExamTakeScreen() {
 
   useEffect(() => {
     if (phase !== 'exam' || !attempt) return
+    if (attempt.loai === 'baitap') return // bài tập không tự nộp theo giờ
     if (remaining !== null && remaining <= 0) doSubmit(attempt)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remaining, phase])
@@ -1147,6 +1156,13 @@ export default function ExamTakeScreen() {
   const daLamCount = flat.filter((f) => daTraLoiEntry(attempt, assignment, f)).length
   const chuaLam = flat.map((f, i) => (daTraLoiEntry(attempt, assignment, f) ? null : i + 1)).filter((x): x is number => x !== null)
   const gapNow = remaining !== null && remaining <= 300
+  // BÀI TẬP VỀ NHÀ: thay đồng hồ đếm ngược bằng hạn nộp (BA-APP.md mục 6).
+  const laBaiTap = attempt?.loai === 'baitap'
+  const hanNopNgan = (() => {
+    if (!attempt?.hanNop) return ''
+    const d = new Date(attempt.hanNop)
+    return Number.isFinite(d.getTime()) ? d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }) : ''
+  })()
   const dotColor = !online ? 'var(--mo)' : saveFlash ? 'var(--cam)' : 'var(--xanh)'
   const dotLabel = !online ? 'mất mạng — đã lưu trên máy' : saveFlash ? 'đang lưu…' : 'đã lưu'
 
@@ -1244,9 +1260,15 @@ export default function ExamTakeScreen() {
           <div className="font-bold" style={{ ...SANS_SO, fontSize: 'var(--cx-2)' }}>
             {daLamCount}/{total}
           </div>
-          <div className="font-bold" style={{ ...SANS_SO, fontSize: 'var(--cx-4)', color: gapNow ? 'var(--gap)' : 'var(--muc)', transitionProperty: 'color', transitionDuration: 'var(--nhanh)' }}>
-            {formatClock(remaining ?? 0)}
-          </div>
+          {laBaiTap ? (
+            <div className="font-bold" style={{ ...SANS_SO, fontSize: 'var(--cx-2)', color: 'var(--muc)' }} title="Bài tập về nhà — không tính giờ">
+              {hanNopNgan ? `Hạn ${hanNopNgan}` : 'Bài tập'}
+            </div>
+          ) : (
+            <div className="font-bold" style={{ ...SANS_SO, fontSize: 'var(--cx-4)', color: gapNow ? 'var(--gap)' : 'var(--muc)', transitionProperty: 'color', transitionDuration: 'var(--nhanh)' }}>
+              {formatClock(remaining ?? 0)}
+            </div>
+          )}
           <button onClick={() => setShowGrid(true)} className="tap-target flex items-center justify-center" style={{ color: 'var(--muc)' }} title="Danh sách câu" aria-label="Danh sách câu">
             <LayoutGrid size={22} />
           </button>

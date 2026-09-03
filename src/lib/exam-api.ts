@@ -80,6 +80,10 @@ export type KetQuaVaoThi =
       /** Ngưỡng chống gian lận của ca (QUANLYCATHI mục 6): số lần rời màn → khoá; một lần rời quá N giây → khoá. */
       nguongLan: number
       nguongGiay: number
+      /** Bài tập về nhà: không đồng hồ đếm ngược, chỉ hiện hạn nộp; nộp muộn vẫn nhận. */
+      loai: LoaiCa
+      hanNop: string
+      tenCa: string
       /** true = thầy vừa mở khoá lượt này (máy em còn giữ cờ khoá) → bỏ khoá, làm tiếp. */
       daMoKhoa: boolean
       bank?: PublicExamBank
@@ -103,6 +107,9 @@ export async function vaoThi(scriptUrl: string, maCa: string, sbd: string, idThi
       hetGioLuc: String(r.hetGioLuc),
       nguongLan: Number(r.nguongLan) || 3,
       nguongGiay: Number(r.nguongGiay) || 30,
+      loai: r.loai === 'baitap' ? 'baitap' : 'thi',
+      hanNop: String(r.hanNop ?? ''),
+      tenCa: String(r.tenCa ?? ''),
       daMoKhoa: r.daMoKhoa === true,
       bank: r.bank ?? undefined,
     }
@@ -176,7 +183,15 @@ export interface MocThoiGianCa {
   /** Chống gian lận theo mức (mục 6): rời màn lần thứ N → khoá; rời quá N giây → khoá. Trống = mặc định máy chủ (3 / 30). */
   nguongLan?: number
   nguongGiay?: number
+  /** BA-APP đợt 3: 'baitap' = bài tập về nhà (không đồng hồ, nộp muộn vẫn nhận,
+   * xem lời giải ngay). Trống/'thi' = ca kiểm tra như cũ. */
+  loai?: LoaiCa
+  /** Hạn nộp bài tập (ISO). Chỉ có nghĩa với loai='baitap'. */
+  hanNop?: string
 }
+
+/** Loại ca: kiểm tra hay bài tập về nhà. Dùng CHUNG mọi thứ, khác nhau bằng cờ này. */
+export type LoaiCa = 'thi' | 'baitap'
 
 export async function publishSession(
   scriptUrl: string,
@@ -203,6 +218,8 @@ export async function publishSession(
     tenCa: moc.tenCa || '',
     phamVi: moc.phamVi || 'tu_do',
     danhSachMoi: moc.phamVi === 'chon' ? (Array.isArray(moc.danhSachMoi) ? moc.danhSachMoi : []) : moc.phamVi === 'khoi' ? String(moc.danhSachMoi ?? '') : '',
+    loai: moc.loai || 'thi',
+    hanNop: moc.hanNop || '',
     nguongLan: moc.nguongLan || 0,
     nguongGiay: moc.nguongGiay || 0,
   })
@@ -753,6 +770,37 @@ export async function danhSachEm(scriptUrl: string, secret: string): Promise<EmT
   return (r.items as EmTomTat[]).map((x) => ({ ...x, sbd: String(x.sbd) }))
 }
 
+// ============================================================================
+// BÀI TẬP VỀ NHÀ (BA-APP.md đợt 3) — là một CA loại 'baitap', giao đích danh.
+// ============================================================================
+
+/** Trạng thái bài tập nhìn từ phía em. */
+export type TrangThaiBaiTap = 'chua_lam' | 'dang_lam' | 'da_nop' | 'qua_han'
+
+export interface BaiTapCuaEm {
+  maCa: string
+  tenCa: string
+  giaoLuc: string
+  hanNop: string
+  trangThai: TrangThaiBaiTap
+  nopLuc: string
+  tong: number | null
+}
+
+/** Bài tập của một em. Quyền: tokenHS (em) · tokenPH (phụ huynh) · secret+sbd (thầy). */
+export async function baiTapCuaEm(scriptUrl: string, quyen: QuyenHoSo): Promise<BaiTapCuaEm[]> {
+  const r = await postJson(scriptUrl, { action: 'baiTapCuaEm', ...quyen })
+  if (!r.ok) throw new Error(r.error || 'Không lấy được danh sách bài tập')
+  return (r.items as BaiTapCuaEm[]).map((x) => ({ ...x, maCa: String(x.maCa) }))
+}
+
+/** Tập câu em ĐÃ từng làm — để rút bài tập tránh câu cũ (chỉ thầy gọi được). */
+export async function qidDaLam(scriptUrl: string, secret: string, sbd: string): Promise<string[]> {
+  const r = await postJson(scriptUrl, { action: 'qidDaLam', secret, sbd })
+  if (!r.ok) throw new Error(r.error || 'Không lấy được danh sách câu đã làm')
+  return (r.qids as string[]).map(String)
+}
+
 /** Link đầy đủ để thầy gửi Zalo cho em/phụ huynh. */
 export function linkRieng(duong: string): string {
   return `${location.origin}${import.meta.env.BASE_URL}${duong}`
@@ -815,6 +863,9 @@ export interface CaTomTat {
   trangThai: 'mo' | 'dong' | 'da_xoa'
   phamVi: PhamViCa
   congBo: CongBoDiem
+  /** 'baitap' = bài tập về nhà (BA-APP đợt 3). Ca cũ không có cột này → 'thi'. */
+  loai: LoaiCa
+  hanNop: string
   daVao: number
   daNop: number
   canhBao: number
@@ -823,7 +874,7 @@ export interface CaTomTat {
 export async function danhSachCa(scriptUrl: string, secret: string): Promise<CaTomTat[]> {
   const r = await postJson(scriptUrl, { action: 'danhSachCa', secret })
   if (!r.ok) throw new Error(r.error || 'Không lấy được danh sách ca')
-  return (r.items as CaTomTat[]).map((c) => ({ ...c, maCa: String(c.maCa), lop: String(c.lop ?? ''), tenCa: String(c.tenCa ?? '') }))
+  return (r.items as CaTomTat[]).map((c) => ({ ...c, maCa: String(c.maCa), lop: String(c.lop ?? ''), tenCa: String(c.tenCa ?? ''), loai: c.loai === 'baitap' ? 'baitap' : 'thi', hanNop: String(c.hanNop ?? '') }))
 }
 
 export interface LuotThiRow {

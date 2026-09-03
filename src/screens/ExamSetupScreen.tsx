@@ -5,34 +5,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { CheckSquare, Square, Library, Copy, Check } from 'lucide-react'
 import { bankSizeWarning, mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
+import { randomSessionCode, taoLinkMoi } from '../lib/ca-link'
 import { TheNoiDung, Hang, OThongBao, NutChinh } from '../components/DesignSystem'
 import NutDongBo from '../components/NutDongBo'
 import { khoiTuNamSinh, listRegisteredStudents, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
 import { loadExamSources, loadScriptUrl, loadTeacherSecret, saveSessionTeacherBank } from '../lib/exam-db'
 import { dongBoNganHang } from '../lib/exam-sync'
 import { useAppStore } from '../store/appStore'
-
-function randomSessionCode(): string {
-  return String(Math.floor(100000 + Math.random() * 900000))
-}
-
-/** Link mời NGẮN: <origin>/omr-app/t/<mã ca> (public/404.html chuyển hướng về
- * ?examCode=…; máy em lấy link Apps Script từ public/cau-hinh.json). Chỉ dùng
- * link ngắn khi link trong cau-hinh.json ĐÚNG BẰNG link thầy đang dùng — lệch
- * thì quay về link dài có &api=… để em không nộp nhầm chỗ. */
-async function taoLinkMoi(maCa: string, scriptUrl: string): Promise<string> {
-  const base = import.meta.env.BASE_URL
-  const linkDai = `${location.origin}${base}?examCode=${maCa}&api=${encodeURIComponent(scriptUrl)}`
-  try {
-    const res = await fetch(`${base}cau-hinh.json`, { cache: 'no-cache' })
-    if (!res.ok) return linkDai
-    const cfg = (await res.json()) as { scriptUrl?: string }
-    if ((cfg.scriptUrl || '').trim() !== scriptUrl) return linkDai
-    return `${location.origin}${base}t/${maCa}`
-  } catch {
-    return linkDai
-  }
-}
 
 const O_NHAP: React.CSSProperties = {
   height: 52,
