@@ -38,6 +38,8 @@ export default function StudentProfileScreen() {
   // LỊCH SỬ CA THI + CHUYÊN ĐỀ — cùng dữ liệu, cùng cách trình bày với màn hồ sơ
   // của thầy (BA-APP.md mục 9: một màn hồ sơ cho ba lối vào).
   const [hoSo, setHoSo] = useState<HoSoEm | null>(null)
+  // Token hỏng / đã bị thầy cấp lại: phải nói thẳng, đừng để màn trống không.
+  const [tokenHong, setTokenHong] = useState(false)
   const [msgText, setMsgText] = useState('')
   const [sendingMsg, setSendingMsg] = useState(false)
 
@@ -83,8 +85,14 @@ export default function StudentProfileScreen() {
         .then(setBaiTap)
         .catch(() => setBaiTap([]))
       hoSoEm(scriptUrl.trim(), { tokenHS: token })
-        .then(setHoSo)
-        .catch(() => setHoSo(null))
+        .then((h) => {
+          setHoSo(h)
+          setTokenHong(false)
+        })
+        .catch(() => {
+          setHoSo(null)
+          setTokenHong(true)
+        })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, sbd, scriptUrl, token])
@@ -229,8 +237,15 @@ export default function StudentProfileScreen() {
         </div>
       )}
 
+      {token && tokenHong && (
+        <div className="rounded-xl p-4 text-sm" style={{ background: 'var(--cam-nen)', boxShadow: 'var(--bong-1)', color: 'var(--muc)' }}>
+          Link riêng của em không còn dùng được — có thể Thầy đã cấp lại link mới. Nhắn cho Thầy xin link mới, phần lịch sử
+          và bài tập sẽ hiện lại.
+        </div>
+      )}
+
       {token && hoSo && <KhoiLichSuCa ca={hoSo.ca} choEm />}
-      {token && <KhoiBaiTap baiTap={baiTap} onMo={moBaiTap} />}
+      {token && !tokenHong && <KhoiBaiTap baiTap={baiTap} onMo={moBaiTap} />}
       {token && hoSo && <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} choEm />}
 
       <div className="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-4 space-y-2.5">
