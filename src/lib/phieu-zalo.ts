@@ -108,17 +108,22 @@ export function soanTinRoiMan(d: DuLieuBaoRoiMan, xungHo = 'Anh/chị'): string 
   return cau.join(' ')
 }
 
-/** TIN BÁO BÀI TẬP MỚI GỬI EM, kèm LINK RIÊNG.
+/** TIN BÁO BÀI TẬP MỚI GỬI EM, kèm LINK VÀO LÀM BÀI.
  *
  * Mắt xích hay bị quên: giao bài xong là xong ở phía thầy, nhưng máy em CHỈ
- * thấy bài khi mở link riêng — không có link thì màn học sinh chỉ còn hồ sơ và
- * ô nhắn tin. Nên tin này luôn kèm link, không bắt thầy đi tìm ở màn khác.
+ * thấy bài khi mở đúng link ca đó. Nên tin này luôn kèm link, không bắt thầy đi
+ * tìm ở màn khác. Bài tập là một ca đặt riêng cho một em, nên em phải nhập số
+ * báo danh của mình mới vào được — nhắc luôn số trong tin cho khỏi hỏi lại.
  */
-export function tinBaoBaiTap(hoTen: string, soCau: number, hanNopISO: string, link: string): string {
+export function tinBaoBaiTap(hoTen: string, soCau: number, hanNopISO: string, link: string, sbd = ''): string {
   const han = ngayVN(hanNopISO)
   const cau: string[] = []
   cau.push(`${hoTen ? hoTen + ', t' : 'T'}hầy vừa giao ${soCau} câu bài tập về nhà${han ? `, hạn nộp ${han}` : ''}.`)
   cau.push(`Em mở link này để làm: ${link}`)
-  cau.push('Link riêng của em, không đưa cho bạn khác. Làm xong nộp là xem được lời giải ngay.')
+  cau.push(
+    sbd
+      ? `Vào rồi nhập số báo danh ${sbd}. Bài chỉ mở cho số báo danh này, bạn khác không vào được. Làm xong nộp là xem được lời giải ngay.`
+      : 'Vào rồi nhập số báo danh của em. Bài chỉ mở cho số báo danh đó, bạn khác không vào được. Làm xong nộp là xem được lời giải ngay.',
+  )
   return cau.join('\n')
 }

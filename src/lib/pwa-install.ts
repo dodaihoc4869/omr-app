@@ -31,6 +31,9 @@ export function dangTrongTrinhDuyet(): boolean {
   // iOS Safari: navigator.standalone; còn lại: display-mode
   const nav = navigator as Navigator & { standalone?: boolean }
   if (nav.standalone) return false
+  // jsdom (và vài webview cũ) không có matchMedia — coi như không phải tab
+  // trình duyệt, để không hiện thẻ cài app sai chỗ.
+  if (typeof window.matchMedia !== 'function') return false
   return window.matchMedia('(display-mode: browser)').matches
 }
 

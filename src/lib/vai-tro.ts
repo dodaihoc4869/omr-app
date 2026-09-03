@@ -1,65 +1,60 @@
-// VAI TRÒ (BA-APP.md đợt 1) — một mã nguồn, ba giao diện. Vai do ĐƯỜNG LINK
-// quyết định, không do người dùng tự chọn:
-//   /gv                  → thầy (còn phải có mã bí mật trong máy mới gọi được lệnh)
-//   /hs/<token>          → học sinh
-//   /ph/<token>          → phụ huynh
-//   /t/<mã ca>           → vào thi (giữ nguyên từ trước)
-// public/404.html đổi các đường trên thành ?vai=...&token=... rồi mới vào app.
+// ĐƯỜNG VÀO APP GIÁO VIÊN.
 //
-// Đây CHỈ là chuyện hiển thị. Chặn thật nằm ở Apps Script: lệnh của thầy đòi
-// mã bí mật, lệnh của em/phụ huynh tra token ra SBD ở máy chủ.
-export type VaiTro = 'gv' | 'hs' | 'ph'
+// Repo này CHỈ còn app của thầy. App học sinh và app phụ huynh đã tách sang hai
+// repo riêng (TACHAPPHSPH.md phần 1), nên ở đây không còn `/hs/<token>`,
+// `/ph/<token>`, `?vai=hs`, `?vai=ph`, cũng không còn màn nào của hai vai đó.
+//
+// Còn đúng hai đường:
+//   /gv          → app giáo viên (mọi lệnh vẫn đòi MÃ BÍ MẬT ở Apps Script)
+//   /t/<mã ca>   → màn LÀM BÀI, giữ lại để lớp vẫn thi và làm bài tập được
+//                  trong lúc app học sinh mới chưa xong. Khi hs-app chạy thật
+//                  thì gỡ nốt màn này khỏi đây.
+//
+// `public/404.html` đổi hai đường trên thành `?vai=gv` / `?examCode=…` khi máy
+// chưa cài service worker; `chuanHoaDuongDan()` làm đúng việc đó ở trong app,
+// nên máy đã cài app (service worker nuốt mất 404.html) vẫn chạy đúng.
+export type VaiTro = 'gv'
 
 export interface DuongVao {
   vai: VaiTro | null
-  token: string
   maCa: string
 }
 
-const DAI_TOKEN = 32
-
-export function tokenHopLe(token: string): boolean {
-  return /^[A-Za-z0-9]{32}$/.test(token) && token.length === DAI_TOKEN
-}
-
-const RE_TOKEN_TREN_DUONG = /(?:^|\/)(hs|ph)\/([A-Za-z0-9]{32})\/?$/
 const RE_GV_TREN_DUONG = /(?:^|\/)gv\/?$/
 const RE_CA_TREN_DUONG = /(?:^|\/)t\/(\d{4,8})\/?$/
+const RE_APP_CU = /(?:^|\/)(?:hs|ph)\/[0-9a-zA-Z]{8,}\/?$/
 
-/**
- * Đọc vai và mã ca TRỰC TIẾP TỪ ĐƯỜNG DẪN (`/omr-app/hs/<token>`).
+/** Link riêng CŨ của em hoặc phụ huynh (`/hs/<token>`, `/ph/<token>`), hoặc
+ * app cũ đã cài trên máy các em (`?vai=hs`, `?vai=ph`).
  *
- * Vì sao cần: `public/404.html` là thứ đổi `/hs/<token>` thành
- * `?vai=hs&token=…`, và nó chỉ chạy khi GitHub Pages trả 404. Nhưng khi máy đã
- * cài service worker, mọi lần điều hướng đều được service worker trả thẳng
- * `index.html` — 404.html KHÔNG BAO GIỜ chạy. App thấy đường trống, không có
- * vai, và mở màn quản lý của thầy. Thầy đã dính đúng lỗi này: bấm link riêng
- * thì vào app giáo viên, và vì không phải vai em/phụ huynh nên dải "Cài đặt"
- * cũng không hiện ra.
+ * Những link này đã phát ra Zalo rồi, không thu về được. Trả về đúng app quản
+ * lý của thầy là lỗi thầy đã báo — em và phụ huynh rơi thẳng vào màn quản lý.
+ * Nhận diện ở đây để App hiện một màn báo tin, không cho đi tiếp. */
+export function laLinkAppCu(search: string, duongDan = ''): boolean {
+  const v = (new URLSearchParams(search).get('vai') || '').trim()
+  if (v === 'hs' || v === 'ph') return true
+  return RE_APP_CU.test(duongDan)
+}
+
+/** Đọc vai và mã ca TRỰC TIẾP TỪ ĐƯỜNG DẪN.
  *
- * Đọc thẳng từ đường dẫn thì đúng cả hai đường: 404.html chuyển hướng (máy
- * chưa cài) hay service worker trả index.html (máy đã cài) — và chạy được cả
- * khi mất mạng.
- */
+ * Vì sao cần: `public/404.html` chỉ chạy khi GitHub Pages trả 404. Máy đã cài
+ * service worker thì mọi lần điều hướng được trả thẳng `index.html` — 404.html
+ * KHÔNG BAO GIỜ chạy. Đọc thẳng từ đường dẫn thì đúng cả hai đường, và chạy
+ * được cả khi mất mạng. */
 export function docVaiTuDuongDan(duongDan: string): DuongVao {
-  const m = duongDan.match(RE_TOKEN_TREN_DUONG)
-  if (m) return { vai: m[1] as 'hs' | 'ph', token: m[2], maCa: '' }
-  if (RE_GV_TREN_DUONG.test(duongDan)) return { vai: 'gv', token: '', maCa: '' }
+  if (RE_GV_TREN_DUONG.test(duongDan)) return { vai: 'gv', maCa: '' }
   const c = duongDan.match(RE_CA_TREN_DUONG)
-  if (c) return { vai: null, token: '', maCa: c[1] }
-  return { vai: null, token: '', maCa: '' }
+  if (c) return { vai: null, maCa: c[1] }
+  return { vai: null, maCa: '' }
 }
 
 /**
  * ĐỔI ĐƯỜNG DẪN THÀNH THAM SỐ TRUY VẤN, chạy TRƯỚC khi app khởi động.
  *
- * Làm đúng việc mà `public/404.html` vẫn làm — `/hs/<token>` → `?vai=hs&token=…`,
- * `/t/<mã ca>` → `?examCode=…` — nhưng làm ở trong app, nên chạy cả khi service
- * worker đã nuốt mất 404.html (máy đã cài app), và chạy cả khi mất mạng.
- *
- * Chuẩn hoá ngay từ đầu thay vì để mỗi màn tự đọc đường dẫn: màn vào thi đọc
- * `?examCode=` để tự điền 6 ô mã ca, đọc `?api=` để biết link Apps Script —
- * giữ nguyên một dạng URL duy nhất thì không màn nào phải sửa.
+ * Làm đúng việc `public/404.html` vẫn làm, nhưng ở trong app. Chuẩn hoá ngay từ
+ * đầu để mọi màn chỉ thấy MỘT dạng URL: màn làm bài đọc `?examCode=` để tự điền
+ * 6 ô mã ca và `?api=` để biết link Apps Script.
  */
 export function chuanHoaDuongDan(goc = '/'): void {
   try {
@@ -67,7 +62,6 @@ export function chuanHoaDuongDan(goc = '/'): void {
     if (!d.vai && !d.maCa) return
     const q = new URLSearchParams(location.search)
     if (d.vai && !q.get('vai')) q.set('vai', d.vai)
-    if (d.token && !q.get('token')) q.set('token', d.token)
     if (d.maCa && !q.get('examCode')) q.set('examCode', d.maCa)
     history.replaceState(null, '', goc + `?${q.toString()}`)
   } catch {
@@ -76,63 +70,15 @@ export function chuanHoaDuongDan(goc = '/'): void {
   }
 }
 
-/**
- * Đọc vai từ đường link: tham số truy vấn trước, rồi tới đường dẫn.
- *
- * VAI KHÔNG ĐÒI TOKEN TRONG LINK. App đã cài ra màn hình chính mở bằng
- * `start_url` của manifest — `?vai=hs&nguon=pwa`, KHÔNG có token, vì token là
- * của riêng từng em, không nhét vào file manifest chung được. Token đã nằm sẵn
- * trong máy (IndexedDB) từ lần đầu em bấm link riêng thầy gửi.
- *
- * Vai chỉ quyết định HIỂN THỊ. Chặn thật vẫn ở Apps Script: mọi lệnh đọc dữ
- * liệu một em đều tra token ra SBD ở máy chủ, nên gõ tay `?vai=hs` không đọc
- * được gì nếu máy không có token.
- */
+/** Đọc vai từ đường link: tham số truy vấn trước, rồi tới đường dẫn. */
 export function docDuongVao(search: string, duongDan = ''): DuongVao {
   const q = new URLSearchParams(search)
-  const vaiRaw = (q.get('vai') || '').trim()
-  const token = (q.get('token') || '').trim()
   const maCa = (q.get('examCode') || '').trim()
-
-  if (vaiRaw === 'gv') return { vai: 'gv', token: '', maCa }
-  if (vaiRaw === 'hs' || vaiRaw === 'ph') {
-    return { vai: vaiRaw, token: tokenHopLe(token) ? token : '', maCa }
-  }
+  if ((q.get('vai') || '').trim() === 'gv') return { vai: 'gv', maCa }
 
   const tuDuong = duongDan ? docVaiTuDuongDan(duongDan) : null
   if (tuDuong && (tuDuong.vai || tuDuong.maCa)) {
-    return { vai: tuDuong.vai, token: tuDuong.token, maCa: maCa || tuDuong.maCa }
+    return { vai: tuDuong.vai, maCa: maCa || tuDuong.maCa }
   }
-  return { vai: null, token: '', maCa }
-}
-
-/** Xoá TOKEN khỏi thanh địa chỉ sau khi app đã lưu vào máy — link dán nhầm vào
- * nhóm chat thì cũng không còn nằm trong lịch sử trình duyệt của em.
- *
- * GIỮ LẠI `vai`: nó không phải bí mật, và xoá nó đi thì em kéo tải lại trang
- * trong app đã cài là rơi về màn quản lý của thầy. */
-export function xoaDauVetToken(goc = '/'): void {
-  try {
-    const q = new URLSearchParams(location.search)
-    // Token nằm ngay trên ĐƯỜNG DẪN (/omr-app/hs/<token>) khi service worker
-    // trả thẳng index.html — cũng phải dọn, nếu không token vẫn nằm trong lịch
-    // sử trình duyệt và trên thanh địa chỉ.
-    const tuDuong = docVaiTuDuongDan(location.pathname)
-    const tokenTrenDuong = !!(tuDuong.vai && tuDuong.token)
-    if (!q.get('token') && !tokenTrenDuong) return
-    q.delete('token')
-    if (tokenTrenDuong && !q.get('vai')) q.set('vai', tuDuong.vai as string)
-    const con = q.toString()
-    const duong = tokenTrenDuong ? goc : location.pathname
-    history.replaceState(null, '', duong + (con ? `?${con}` : ''))
-  } catch {
-    // trình duyệt cũ không có history.replaceState — bỏ qua, không ảnh hưởng chức năng
-  }
-}
-
-/** Màn mặc định của từng vai. */
-export function manDauCua(vai: VaiTro): 'examhub' | 'studentprofile' | 'parent' {
-  if (vai === 'hs') return 'studentprofile'
-  if (vai === 'ph') return 'parent'
-  return 'examhub'
+  return { vai: null, maCa }
 }

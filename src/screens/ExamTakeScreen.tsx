@@ -8,7 +8,6 @@ import { layIdThietBi } from '../lib/thiet-bi'
 import { chuanHoaNguong, khoaViRoiLau, loiCanhBao, mucKhiRoiMan, soLanTinhTu, type NguongGianLan } from '../lib/chong-gian-lan'
 import TheCau from '../components/TheCau'
 import MaCaInput from '../components/MaCaInput'
-import DaiNhacCaiApp from '../components/DaiNhacCaiApp'
 import LogoDDH from '../components/LogoDDH'
 import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
 import { TriangleAlert, X, ArrowLeft, LayoutGrid } from 'lucide-react'
@@ -799,7 +798,6 @@ export default function ExamTakeScreen() {
     return (
       <Trang className="flex items-center justify-center px-4 py-8">
         <div className="w-full" style={{ maxWidth: 400 }}>
-          <DaiNhacCaiApp />
           <TheNoiDung>
             <div className="text-center" style={{ marginBottom: 'var(--k6)' }}>
               <div className="flex justify-center" style={{ color: 'var(--muc)', marginBottom: 'var(--k3)' }}>

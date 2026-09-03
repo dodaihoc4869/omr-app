@@ -1,12 +1,11 @@
-import { GraduationCap, Timer, HeartHandshake, type LucideIcon } from 'lucide-react'
+import { GraduationCap, Timer, type LucideIcon } from 'lucide-react'
 import { useAppStore, type ScreenId } from '../store/appStore'
 
-// 3 nhóm chức năng (Lớp + Kiểm tra + Phụ huynh) — thiết kế dạng thanh nổi, bo
-// tròn, căn giữa cho cân đối thay vì kéo dài sát 2 mép màn hình như trước.
+// HAI nhóm chức năng của thầy: Học sinh + Kiểm tra. Tab "Phụ huynh" đã gỡ —
+// đó là app riêng của phụ huynh, tách sang repo khác (TACHAPPHSPH.md).
 const TABS: { id: ScreenId; label: string; icon: LucideIcon }[] = [
   { id: 'hocsinh', label: 'Học sinh', icon: GraduationCap },
   { id: 'examhub', label: 'Kiểm tra', icon: Timer },
-  { id: 'parent', label: 'Phụ huynh', icon: HeartHandshake },
 ]
 
 export default function BottomNav() {
@@ -16,7 +15,7 @@ export default function BottomNav() {
   // Màn con thuộc tab nào: danh sách lớp (Google Sheet) nằm trong mục Học sinh;
   // các màn của ca kiểm tra nằm trong mục Kiểm tra.
   const CON_CUA_HOC_SINH: ScreenId[] = ['classlist']
-  const CON_CUA_KIEM_TRA: ScreenId[] = ['examhub', 'examsetup', 'examtake', 'exammonitor', 'lichsuca', 'studentprofile', 'registrationmanager']
+  const CON_CUA_KIEM_TRA: ScreenId[] = ['examhub', 'examsetup', 'examtake', 'exammonitor', 'lichsuca', 'registrationmanager']
   const activeTab: ScreenId = CON_CUA_HOC_SINH.includes(screen) ? 'hocsinh' : CON_CUA_KIEM_TRA.includes(screen) ? 'examhub' : screen
 
   return (

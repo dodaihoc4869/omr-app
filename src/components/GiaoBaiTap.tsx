@@ -6,10 +6,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { CheckSquare, Square, X } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh } from './DesignSystem'
 import { demCauTheoChuyenDe, rutBaiTap, SO_CAU_BAI_TAP_MAC_DINH, SO_CAU_BAI_TAP_TOI_DA, SO_CAU_BAI_TAP_TOI_THIEU, type MucDoLoc } from '../lib/bai-tap'
-import { publishSession, qidDaLam, danhSachYeuCau, danhDauYeuCau, danhSachChoDuyet, linkRieng, type ChuyenDeEm } from '../lib/exam-api'
+import { publishSession, qidDaLam, danhSachYeuCau, danhDauYeuCau, type ChuyenDeEm } from '../lib/exam-api'
 import { tinBaoBaiTap } from '../lib/phieu-zalo'
 import { loadExamSources, loadScriptUrl, loadTeacherSecret, saveSessionTeacherBank } from '../lib/exam-db'
-import { randomSessionCode } from '../lib/ca-link'
+import { randomSessionCode, taoLinkMoi } from '../lib/ca-link'
 import type { TeacherExamSource } from '../data/examContent'
 import { useAppStore } from '../store/appStore'
 
@@ -55,8 +55,8 @@ export default function GiaoBaiTap({
 }) {
   const showToast = useAppStore((s) => s.showToast)
   // Sau khi giao xong: giữ tấm này lại để thầy gửi link riêng cho em ngay.
-  const [daGiao, setDaGiao] = useState<{ soCau: number; hanNop: string } | null>(null)
-  const [tokenEm, setTokenEm] = useState<string | null>(null)
+  const [daGiao, setDaGiao] = useState<{ soCau: number; hanNop: string; maCa: string } | null>(null)
+  const [linkBai, setLinkBai] = useState('')
 
   const [nguon, setNguon] = useState<TeacherExamSource[] | null>(null)
   const [mucDo, setMucDo] = useState<MucDoLoc>('tron')
@@ -133,16 +133,9 @@ export default function GiaoBaiTap({
       const lap = kq.soCauLapLai > 0 ? `, ${kq.soCauLapLai} câu em đã từng làm` : ''
       showToast(`Đã giao ${kq.soCau} câu cho ${hoTen || sbd}${thieu}${lap}${canhBaoQid}`, kq.soCau < soCau ? 'warn' : 'success')
       // KHÔNG đóng ngay. Giao xong mới là xong nửa việc: máy em CHỈ thấy bài khi
-      // mở LINK RIÊNG, không có link thì màn học sinh chỉ còn hồ sơ và ô nhắn
-      // tin — thầy đã gặp đúng cảnh này. Ở lại để thầy gửi link luôn.
-      setDaGiao({ soCau: kq.soCau, hanNop })
-      try {
-        const ds = await danhSachChoDuyet(url.trim(), mat.trim())
-        const em = ds.hocSinh.find((h) => String(h.sbd) === String(sbd))
-        setTokenEm(em?.token || '')
-      } catch {
-        setTokenEm('')
-      }
+      // mở LINK VÀO LÀM BÀI. Ở lại để thầy copy tin gửi Zalo luôn.
+      setDaGiao({ soCau: kq.soCau, hanNop, maCa })
+      setLinkBai(await taoLinkMoi(maCa, url.trim()))
     } catch (e) {
       setLoi(e instanceof Error ? e.message : 'Không giao được bài')
     } finally {
@@ -172,20 +165,20 @@ export default function GiaoBaiTap({
 
         {loi && <OThongBao tone="do">{loi}</OThongBao>}
 
-        {/* GIAO XONG MỚI LÀ NỬA VIỆC. Máy em chỉ thấy bài khi mở LINK RIÊNG;
-            không gửi link thì màn học sinh chỉ còn hồ sơ và ô nhắn tin. */}
+        {/* GIAO XONG MỚI LÀ NỬA VIỆC. Bài tập là MỘT CA, em vào bằng đúng link
+            ca đó rồi nhập số báo danh; không gửi link thì em không biết có bài.
+            Ca đã đặt phamVi='chon' cho một mình em nên số báo danh khác không
+            vào được — link gửi nhầm cũng không lộ bài. */}
         {daGiao && (
           <>
             <OThongBao tone="xanh">
-              Đã giao <b style={SO}>{daGiao.soCau}</b> câu cho {hoTen || `SBD ${sbd}`}. Em <b>chỉ thấy bài khi mở link riêng</b> —
-              gửi link cho em thì bài mới hiện ra.
+              Đã giao <b style={SO}>{daGiao.soCau}</b> câu cho {hoTen || `SBD ${sbd}`}, mã ca <b style={SO}>{daGiao.maCa}</b>. Em{' '}
+              <b>chỉ thấy bài khi mở link này</b> — gửi link cho em thì bài mới hiện ra.
             </OThongBao>
-            {tokenEm === null ? (
-              <div style={NHAN_NHO}>Đang lấy link riêng của em…</div>
-            ) : tokenEm ? (
+            {linkBai ? (
               <NutChinh
                 onClick={async () => {
-                  const tin = tinBaoBaiTap(hoTen, daGiao.soCau, daGiao.hanNop, linkRieng(`hs/${tokenEm}`))
+                  const tin = tinBaoBaiTap(hoTen, daGiao.soCau, daGiao.hanNop, linkBai, sbd)
                   try {
                     await navigator.clipboard.writeText(tin)
                     showToast('Đã copy tin báo bài — dán vào Zalo gửi đúng em này', 'success')
@@ -197,10 +190,7 @@ export default function GiaoBaiTap({
                 Copy tin báo bài cho em
               </NutChinh>
             ) : (
-              <OThongBao tone="cam">
-                Em này <b>chưa có link riêng</b>. Vào <b>Quản lý đăng ký</b> bấm <b>Duyệt</b> cho em, rồi copy link gửi Zalo —
-                chưa có link thì em không xem được bài tập.
-              </OThongBao>
+              <div style={NHAN_NHO}>Đang tạo link vào làm bài…</div>
             )}
             <NutChinh variant="phu" onClick={onXong}>
               Xong

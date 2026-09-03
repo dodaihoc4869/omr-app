@@ -3,7 +3,7 @@
 // đúng bản sẽ dán lên Google; phần app test bộ đọc đường link.
 import { describe, expect, it } from 'vitest'
 import gsCode from '../docs/apps-script-kiem-tra.gs?raw'
-import { docDuongVao, manDauCua } from '../src/lib/vai-tro'
+import { docDuongVao } from '../src/lib/vai-tro'
 
 interface Gs {
   GET_CHI_THAY: string[]
@@ -83,40 +83,23 @@ describe('Máy chủ — tra token ra hồ sơ', () => {
   })
 })
 
-describe('App — đường link quyết định vai', () => {
-  it('/hs/<token> → vai học sinh, giữ token', () => {
-    const t = 'c'.repeat(32)
-    expect(docDuongVao(`?vai=hs&token=${t}`)).toEqual({ vai: 'hs', token: t, maCa: '' })
-  })
-
-  it('/ph/<token> → vai phụ huynh', () => {
-    const t = 'd'.repeat(32)
-    expect(docDuongVao(`?vai=ph&token=${t}`).vai).toBe('ph')
-  })
-
-  // VAI chỉ là chuyện hiển thị, TOKEN mới là chuyện quyền. Token sai độ dài
-  // hoặc có ký tự lạ thì BỎ HẲN, không lưu vào máy; vai vẫn nhận vì app đã cài
-  // mở lên bằng start_url không hề có token (xem tests/mo-app-da-cai.test.ts).
-  // Không có token trong máy thì mọi lệnh đọc dữ liệu đều bị máy chủ chặn.
-  it('token sai độ dài hoặc có ký tự lạ → KHÔNG nhận token', () => {
-    expect(docDuongVao('?vai=hs&token=abc').token).toBe('')
-    expect(docDuongVao(`?vai=hs&token=${'a'.repeat(31)}!`).token).toBe('')
-    expect(docDuongVao(`?vai=ph&token=${'a'.repeat(33)}`).token).toBe('')
-  })
-
-  it('vai gv không cần token; không có tham số thì không có vai', () => {
-    expect(docDuongVao('?vai=gv')).toEqual({ vai: 'gv', token: '', maCa: '' })
+// APP TRONG REPO NÀY CHỈ CÒN VAI THẦY. Token của em và của phụ huynh vẫn do
+// máy chủ cấp và vẫn được test ở trên, nhưng phía app thì hai vai đó đã tách
+// sang repo riêng (TACHAPPHSPH.md) — đường vào còn lại xem
+// tests/mo-app-da-cai.test.ts.
+describe('App — đường link chỉ còn vai thầy', () => {
+  it('?vai=gv → vai thầy; không có tham số thì không có vai', () => {
+    expect(docDuongVao('?vai=gv')).toEqual({ vai: 'gv', maCa: '' })
     expect(docDuongVao('').vai).toBeNull()
   })
 
-  it('link mời làm bài đi kèm vẫn được giữ để mở màn thi', () => {
-    expect(docDuongVao('?examCode=984033').maCa).toBe('984033')
+  it('vai hs và ph KHÔNG còn được app này nhận', () => {
+    expect(docDuongVao(`?vai=hs&token=${'c'.repeat(32)}`).vai).toBeNull()
+    expect(docDuongVao(`?vai=ph&token=${'d'.repeat(32)}`).vai).toBeNull()
   })
 
-  it('mỗi vai mở đúng màn đầu của mình', () => {
-    expect(manDauCua('hs')).toBe('studentprofile')
-    expect(manDauCua('ph')).toBe('parent')
-    expect(manDauCua('gv')).toBe('examhub')
+  it('link mời làm bài vẫn được giữ để mở màn thi', () => {
+    expect(docDuongVao('?examCode=984033').maCa).toBe('984033')
   })
 })
 

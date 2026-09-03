@@ -15,19 +15,19 @@
       // GitHub Pages không có server route nên đường dẫn này rơi vào 404.html;
       // trang này chỉ chuyển hướng về trang chính kèm ?examCode=<mã ca>.
       // Link Apps Script app tự lấy từ cau-hinh.json cùng thư mục (exam-db.ts).
-      // LINK RIÊNG THEO VAI (BA-APP.md đợt 1):
-      //   /hs/<token 32 ký tự>  → app học sinh
-      //   /ph/<token 32 ký tự>  → app phụ huynh
-      //   /gv                   → app giáo viên (vẫn phải có mã bí mật trong máy)
-      // Token KHÔNG nằm lại trên thanh địa chỉ sau khi app lưu vào máy.
+      // /gv → app giáo viên (vẫn phải có mã bí mật trong máy).
+      // Link riêng /hs/<token> và /ph/<token> đã gỡ: hai app đó tách sang repo
+      // riêng (TACHAPPHSPH.md). Link cũ đã phát ra Zalo rồi nên vẫn phải đón:
+      // đưa về ?vai=hs|ph để app hiện màn "Link này đã ngừng dùng", KHÔNG để
+      // em và phụ huynh rơi vào app quản lý của thầy.
       ;(function () {
         var p = location.pathname
         var m = p.match(/^(.*?\/)t\/(\d{4,8})\/?$/)
         if (m) return location.replace(m[1] + '?examCode=' + m[2])
-        var v = p.match(/^(.*?\/)(hs|ph)\/([A-Za-z0-9]{32})\/?$/)
-        if (v) return location.replace(v[1] + '?vai=' + v[2] + '&token=' + v[3])
         var g = p.match(/^(.*?\/)gv\/?$/)
         if (g) return location.replace(g[1] + '?vai=gv')
+        var c = p.match(/^(.*?\/)(hs|ph)\/[0-9a-zA-Z]{8,}\/?$/)
+        if (c) return location.replace(c[1] + '?vai=' + c[2])
       })()
     </script>
   </head>

@@ -132,12 +132,13 @@ describe('soanTinRoiMan — báo phụ huynh việc rời màn', () => {
   })
 })
 
-// TIN BÁO BÀI TẬP — mắt xích thầy đã hụt: giao bài xong, em mở app chỉ thấy hồ
-// sơ và ô nhắn tin, vì máy em CHỈ đọc được bài khi có link riêng.
+// TIN BÁO BÀI TẬP — mắt xích thầy đã hụt: giao bài xong nhưng không gửi link
+// thì em không biết có bài. Bài tập là MỘT CA, em vào bằng link ca đó rồi nhập
+// số báo danh; ca đã đặt riêng cho một em nên số khác không vào được.
 describe('tinBaoBaiTap', () => {
-  const LINK = 'https://dodaihoc4869.github.io/omr-app/hs/' + 'a'.repeat(32)
+  const LINK = 'https://dodaihoc4869.github.io/omr-app/t/261509'
 
-  it('luôn kèm LINK RIÊNG — không có link thì em không thấy bài', () => {
+  it('luôn kèm LINK VÀO LÀM BÀI — không có link thì em không thấy bài', () => {
     expect(tinBaoBaiTap('Trần Minh Anh', 10, '2026-09-10T16:59:00Z', LINK)).toContain(LINK)
   })
 
@@ -153,8 +154,11 @@ describe('tinBaoBaiTap', () => {
     expect(t).toContain('8 câu')
   })
 
-  it('nhắc không đưa link cho bạn khác', () => {
-    expect(tinBaoBaiTap('An', 5, '', LINK)).toContain('không đưa cho bạn khác')
+  it('nhắc nhập số báo danh và nói rõ bạn khác không vào được', () => {
+    expect(tinBaoBaiTap('An', 5, '', LINK, '123')).toContain('nhập số báo danh 123')
+    expect(tinBaoBaiTap('An', 5, '', LINK, '123')).toContain('bạn khác không vào được')
+    // Không có SBD thì vẫn phải nhắc nhập số báo danh, chỉ là không nêu số.
+    expect(tinBaoBaiTap('An', 5, '', LINK)).toContain('nhập số báo danh của em')
   })
 
   it('không lời chào, không lời chúc', () => {

@@ -17,14 +17,13 @@ import {
   duyetHoSo,
   capLaiToken,
   huyDuyetHoSo,
-  linkRieng,
   type LoaiHoSo,
   type RegisteredParent,
   type RegisteredStudent,
   type FeedbackSummary,
 } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
-import { tinGuiLinkCaiApp } from '../lib/ca-link'
+import { GOC_APP_HS, GOC_APP_PH, linkRiengVai, tinGuiLinkCaiApp } from '../lib/ca-link'
 import { useAppStore } from '../store/appStore'
 
 export default function RegistrationManagerScreen() {
@@ -92,8 +91,15 @@ export default function RegistrationManagerScreen() {
   // được gì ngoài ca thi tự do.
   const [dangDuyet, setDangDuyet] = useState('')
 
-  const copyLink = async (duong: string, ten: string) => {
-    const link = linkRieng(duong)
+  // App học sinh và app phụ huynh đã tách sang repo riêng (TACHAPPHSPH.md).
+  // Chừng nào hai app đó chưa chạy thật thì KHÔNG có link để gửi — ẩn hẳn hai
+  // nút copy thay vì đưa thầy một link chết. Bật lại bằng cách điền GOC_APP_HS
+  // / GOC_APP_PH trong src/lib/ca-link.ts (một chỗ duy nhất).
+  const COPY_DUOC: Record<'hs' | 'ph', boolean> = { hs: !!GOC_APP_HS, ph: !!GOC_APP_PH }
+
+  const copyLink = async (vai: 'hs' | 'ph', token: string, ten: string) => {
+    const link = linkRiengVai(vai, token)
+    if (!link) return
     try {
       await navigator.clipboard.writeText(link)
       showToast(`Đã copy link riêng của ${ten} — dán vào Zalo gửi đúng người đó`, 'success')
@@ -103,8 +109,10 @@ export default function RegistrationManagerScreen() {
   }
 
   /** Copy nguyên tin nhắn (link + hướng dẫn cài ra màn hình) để dán Zalo. */
-  const copyTinCaiApp = async (duong: string, ten: string, vai: 'hs' | 'ph') => {
-    const tin = tinGuiLinkCaiApp(duong, ten, vai)
+  const copyTinCaiApp = async (vai: 'hs' | 'ph', token: string, ten: string) => {
+    const link = linkRiengVai(vai, token)
+    if (!link) return
+    const tin = tinGuiLinkCaiApp(link, ten, vai)
     try {
       await navigator.clipboard.writeText(tin)
       showToast(`Đã copy tin gửi ${ten} (link + cách cài app)`, 'success')
@@ -122,7 +130,8 @@ export default function RegistrationManagerScreen() {
         : await duyetHoSo(scriptUrl.trim(), secret.trim(), loai, khoa)
       if (loai === 'hs') setStudents((prev) => prev.map((x) => (x.sbd === khoa ? { ...x, token: kq.token, trangThai: 'da_duyet' } : x)))
       else setParents((prev) => prev.map((x) => (x.sdt === khoa ? { ...x, token: kq.token, trangThai: 'da_duyet' } : x)))
-      await copyLink(kq.duong, ten)
+      if (COPY_DUOC[loai]) await copyLink(loai, kq.token, ten)
+      else showToast(`Đã duyệt ${ten}. App ${loai === 'hs' ? 'học sinh' : 'phụ huynh'} đang tách sang bản riêng — khi xong mới có link gửi.`, 'success')
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không duyệt được', 'error')
     } finally {
@@ -246,12 +255,16 @@ export default function RegistrationManagerScreen() {
                 <div className="shrink-0 flex items-center gap-1.5">
                   {p.token ? (
                     <>
-                      <button onClick={() => copyLink(`ph/${p.token}`, p.hoTenPhuHuynh || p.sdt)} className="tap-target w-9 h-9 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center" title="Copy link riêng">
-                        <Link2 size={16} />
-                      </button>
-                      <button onClick={() => copyTinCaiApp(`ph/${p.token}`, p.hoTenHocSinh || p.sdt, 'ph')} className="tap-target w-9 h-9 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 flex items-center justify-center" title="Copy tin gửi link + cách cài app">
-                        <Smartphone size={16} />
-                      </button>
+                      {COPY_DUOC.ph && (
+                        <>
+                          <button onClick={() => copyLink('ph', p.token ?? '', p.hoTenPhuHuynh || p.sdt)} className="tap-target w-9 h-9 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center" title="Copy link riêng">
+                            <Link2 size={16} />
+                          </button>
+                          <button onClick={() => copyTinCaiApp('ph', p.token ?? '', p.hoTenHocSinh || p.sdt)} className="tap-target w-9 h-9 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 flex items-center justify-center" title="Copy tin gửi link + cách cài app">
+                            <Smartphone size={16} />
+                          </button>
+                        </>
+                      )}
                       <button onClick={() => handleDuyet('ph', p.sdt, p.hoTenPhuHuynh || p.sdt, true)} className="tap-target w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center" title="Cấp lại link (link cũ hết hiệu lực)">
                         <KeyRound size={16} />
                       </button>
@@ -295,12 +308,16 @@ export default function RegistrationManagerScreen() {
                 <div className="shrink-0 flex items-center gap-1.5">
                   {s.token ? (
                     <>
-                      <button onClick={() => copyLink(`hs/${s.token}`, s.hoTen || s.sbd)} className="tap-target w-9 h-9 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center" title="Copy link riêng">
-                        <Link2 size={16} />
-                      </button>
-                      <button onClick={() => copyTinCaiApp(`hs/${s.token}`, s.hoTen || s.sbd, 'hs')} className="tap-target w-9 h-9 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 flex items-center justify-center" title="Copy tin gửi link + cách cài app">
-                        <Smartphone size={16} />
-                      </button>
+                      {COPY_DUOC.hs && (
+                        <>
+                          <button onClick={() => copyLink('hs', s.token ?? '', s.hoTen || s.sbd)} className="tap-target w-9 h-9 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center" title="Copy link riêng">
+                            <Link2 size={16} />
+                          </button>
+                          <button onClick={() => copyTinCaiApp('hs', s.token ?? '', s.hoTen || s.sbd)} className="tap-target w-9 h-9 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 flex items-center justify-center" title="Copy tin gửi link + cách cài app">
+                            <Smartphone size={16} />
+                          </button>
+                        </>
+                      )}
                       <button onClick={() => handleDuyet('hs', s.sbd, s.hoTen || s.sbd, true)} className="tap-target w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center" title="Cấp lại link (link cũ hết hiệu lực)">
                         <KeyRound size={16} />
                       </button>

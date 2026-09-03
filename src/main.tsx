@@ -5,10 +5,25 @@ import './styles/tokens.css'
 import './index.css'
 import 'katex/dist/katex.min.css'
 import App from './App.tsx'
-import { batSuKienCaiApp, datManifestTheoVai } from './lib/pwa-install'
-import { chuanHoaDuongDan, docDuongVao } from './lib/vai-tro'
+
+import { chuanHoaDuongDan } from './lib/vai-tro'
 import { donPhienCu } from './lib/don-phien-cu'
 import { batTuHoiBanMoi, daySangBanMoi } from './lib/cap-nhat-app'
+import { batSuKienCaiApp } from './lib/pwa-install'
+
+// Dọn thiết lập cũ nếu cấu trúc dữ liệu đã đổi. Chạy trước mọi logic khác;
+// KHÔNG đụng id thiết bị và IndexedDB (xem don-phien-cu.ts).
+donPhienCu()
+
+// Đổi /gv và /t/<mã ca> thành tham số truy vấn — việc mà public/404.html vẫn
+// làm, nhưng 404.html không chạy trên máy đã cài app (service worker trả thẳng
+// index.html). Sau bước này cả app chỉ thấy MỘT dạng URL.
+chuanHoaDuongDan(import.meta.env.BASE_URL)
+
+// beforeinstallprompt chỉ bắn MỘT LẦN và bắn trước khi React kịp mount — phải
+// nghe từ đây, không nghe được trong component. Có nó thì thẻ "Cài app lên màn
+// hình chính" ở màn Kiểm tra cài được 1 chạm.
+batSuKienCaiApp()
 
 // BẢN MỚI PHẢI VỀ NGAY LẦN MỞ ĐẦU. Ba lớp cùng lo việc này:
 //   1. sw.js tự gọi skipWaiting + clientsClaim lúc cài (vite.config.ts) — bản
@@ -32,26 +47,6 @@ registerSW({
     })
   },
 })
-// Bắt beforeinstallprompt TRƯỚC khi React mount (sự kiện chỉ bắn 1 lần) —
-// để màn vào thi có nút "Cài đặt" 1 chạm (DaiNhacCaiApp).
-batSuKienCaiApp()
-
-// Dọn thiết lập cũ nếu cấu trúc dữ liệu đã đổi. Chạy trước mọi logic khác;
-// KHÔNG đụng id thiết bị và IndexedDB (xem don-phien-cu.ts).
-donPhienCu()
-
-// ĐỔI /hs/<token>, /ph/<token>, /t/<mã ca> THÀNH THAM SỐ TRUY VẤN trước mọi
-// thứ khác — việc mà public/404.html vẫn làm, nhưng 404.html không chạy trên
-// máy đã cài app (service worker trả thẳng index.html). Sau bước này cả app
-// chỉ thấy một dạng URL duy nhất, không màn nào phải sửa.
-chuanHoaDuongDan(import.meta.env.BASE_URL)
-
-// ĐẶT MANIFEST THEO VAI NGAY, trước khi React mount. Chrome đọc thẻ
-// <link rel="manifest"> rất sớm để quyết định bắn beforeinstallprompt và cài
-// app nào; đổi thẻ sau khi React chạy là ăn may. Đặt sớm thì em bấm Cài đặt
-// được đúng "ĐĐH Học sinh" / "ĐĐH Phụ huynh".
-datManifestTheoVai(docDuongVao(location.search, location.pathname).vai)
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

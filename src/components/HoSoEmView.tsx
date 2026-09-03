@@ -66,7 +66,7 @@ function ThanhTiLe({ tiLe }: { tiLe: number }) {
   )
 }
 
-export function KhoiChuyenDe({ chuyenDe, choEm = false }: { chuyenDe: ChuyenDeEm[]; choEm?: boolean }) {
+export function KhoiChuyenDe({ chuyenDe }: { chuyenDe: ChuyenDeEm[] }) {
   const yeu = chuyenDe.filter(laYeu)
   return (
     <TheNoiDung>
@@ -75,7 +75,7 @@ export function KhoiChuyenDe({ chuyenDe, choEm = false }: { chuyenDe: ChuyenDeEm
       </h2>
       {chuyenDe.length === 0 ? (
         <div style={NHAN_NHO}>
-          {choEm ? 'Làm xong một bài là bảng này tự có.' : 'Chưa có dữ liệu chuyên đề. Chấm một ca (màn Chi tiết ca) là bảng này tự có.'}
+          Chưa có dữ liệu chuyên đề. Chấm một ca (màn Chi tiết ca) là bảng này tự có.
         </div>
       ) : (
         <>
@@ -115,14 +115,14 @@ export function KhoiChuyenDe({ chuyenDe, choEm = false }: { chuyenDe: ChuyenDeEm
   )
 }
 
-export function KhoiLichSuCa({ ca, choEm = false }: { ca: HoSoEm['ca']; choEm?: boolean }) {
+export function KhoiLichSuCa({ ca }: { ca: HoSoEm['ca'] }) {
   return (
     <TheNoiDung>
       <h2 className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', marginBottom: 'var(--k3)' }}>
         Lịch sử ca thi
       </h2>
       {ca.length === 0 ? (
-        <div style={NHAN_NHO}>{choEm ? 'Em chưa nộp bài ca nào.' : 'Em chưa nộp bài ca nào.'}</div>
+        <div style={NHAN_NHO}>Em chưa nộp bài ca nào.</div>
       ) : (
         <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
           {ca.map((c) => (
@@ -170,14 +170,7 @@ export function KhoiLichSuCa({ ca, choEm = false }: { ca: HoSoEm['ca']; choEm?: 
   )
 }
 
-export function KhoiBaiTap({
-  baiTap,
-  onMo,
-}: {
-  baiTap: BaiTapCuaEm[] | null
-  /** Có hàm này (app học sinh) thì chạm vào bài là vào làm luôn. */
-  onMo?: (maCa: string) => void
-}) {
+export function KhoiBaiTap({ baiTap }: { baiTap: BaiTapCuaEm[] | null }) {
   return (
     <TheNoiDung>
       <h2 className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', marginBottom: 'var(--k3)' }}>
@@ -195,7 +188,6 @@ export function KhoiBaiTap({
               className="flex-col"
               style={{ alignItems: 'stretch' }}
               data-bai-tap={b.maCa}
-              onClick={onMo && b.trangThai !== 'da_nop' ? () => onMo(b.maCa) : undefined}
             >
               <span className="flex items-start justify-between" style={{ gap: 'var(--k3)' }}>
                 <span className="flex-1 min-w-0">
@@ -220,7 +212,6 @@ export function KhoiBaiTap({
               </span>
               <span className="flex items-center flex-wrap" style={{ gap: 4, marginTop: 6 }}>
                 <Nhan tone={NHAN_BAI_TAP[b.trangThai].tone}>{NHAN_BAI_TAP[b.trangThai].ten}</Nhan>
-                {onMo && b.trangThai === 'qua_han' && <Nhan tone="cam">làm muộn vẫn nộp được</Nhan>}
               </span>
             </Hang>
           ))}

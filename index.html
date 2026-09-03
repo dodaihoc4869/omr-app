@@ -4,55 +4,12 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- ================== MANIFEST THEO VAI — PHẢI NẰM Ở ĐÂY ==================
-      Trình duyệt đọc thẻ <link rel="manifest"> NGAY LÚC PHÂN TÍCH HTML, trước
-      khi mã JS của app chạy (script type=module bị hoãn tới sau khi phân tích
-      xong). Trước đây app đổi thẻ này bằng JS trong main.tsx — quá muộn: Chrome
-      đã lấy manifest.json mặc định rồi, nên em bấm "Cài đặt" ở dải "Cài ĐĐH Học
-      sinh" lại cài ra app "ĐỖ ĐẠI HỌC" chung, biểu tượng chung, và mở lên vào
-      thẳng app quản lý của thầy vì start_url không mang vai.
-
-      Vì vậy quyết định vai NGAY TẠI ĐÂY, bằng script nội tuyến chạy trong lúc
-      phân tích HTML. Theo chuẩn HTML, thẻ manifest ĐẦU TIÊN là thẻ được dùng —
-      thẻ này nằm trên thẻ mà vite-plugin-pwa chèn (nếu có).
-
-      Đặt luôn cả apple-touch-icon và tên app cho iPhone: iOS KHÔNG đọc icons
-      trong manifest khi "Thêm vào màn hình chính", nó lấy apple-touch-icon và
-      apple-mobile-web-app-title.
-    ========================================================================= -->
-    <link rel="manifest" id="ddh-manifest" href="/manifest.json" />
-    <link rel="apple-touch-icon" id="ddh-apple-icon" href="/icon-192.png" />
-    <meta name="apple-mobile-web-app-title" id="ddh-apple-title" content="ĐỖ ĐẠI HỌC" />
-    <script>
-      ;(function () {
-        var p = location.pathname
-        var s = location.search
-        var la = function (v) {
-          return (
-            new RegExp('[?&]vai=' + v + '(&|$)').test(s) ||
-            new RegExp('(^|/)' + v + '/[A-Za-z0-9]{32}/?$').test(p)
-          )
-        }
-        var vai = la('hs') ? 'hs' : la('ph') ? 'ph' : ''
-        if (!vai) return
-
-        // Thư mục gốc của app: cắt phần đuôi /hs/<token>, /ph/<token>, /t/<mã ca>,
-        // /gv hoặc tên file, để đường dẫn manifest đúng cả ở /omr-app/ lẫn khi chạy máy.
-        var goc = p
-          .replace(/(hs|ph)\/[A-Za-z0-9]{32}\/?$/, '')
-          .replace(/t\/\d{4,8}\/?$/, '')
-          .replace(/gv\/?$/, '')
-        if (goc.charAt(goc.length - 1) !== '/') goc = goc.replace(/[^/]*$/, '')
-
-        var dat = function (id, thuoc, giaTri) {
-          var el = document.getElementById(id)
-          if (el) el.setAttribute(thuoc, giaTri)
-        }
-        dat('ddh-manifest', 'href', goc + 'manifest-' + vai + '.json')
-        dat('ddh-apple-icon', 'href', goc + 'icon-' + vai + '-192.png')
-        dat('ddh-apple-title', 'content', vai === 'ph' ? 'ĐĐH Phụ huynh' : 'ĐĐH Học sinh')
-      })()
-    </script>
+    <!-- App GIÁO VIÊN — một manifest duy nhất. Manifest riêng cho học sinh và
+      phụ huynh đã gỡ khỏi repo này: hai app đó tách sang repo riêng
+      (TACHAPPHSPH.md). -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <meta name="apple-mobile-web-app-title" content="ĐỖ ĐẠI HỌC" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <!-- Màu thanh trạng thái/địa chỉ = --muc của hệ thiết kế (tokens.css); manifest.json do vite-plugin-pwa sinh từ vite.config.ts -->
