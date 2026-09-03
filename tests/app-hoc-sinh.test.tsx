@@ -147,3 +147,20 @@ describe('Ngưỡng và màu dùng chung, không lệch giữa ba lối vào', (
     expect(toneXepLoai(2)).toBe('do')
   })
 })
+
+// APP PHỤ HUYNH dùng CHÍNH ba khối trên — BA-APP.md mục 9 cấm dựng hai màn hồ
+// sơ khác nhau cho cùng một em. Khác duy nhất: phụ huynh không bấm vào làm bài
+// hộ con.
+describe('App phụ huynh dùng chung màn hồ sơ', () => {
+  it('phụ huynh thấy đúng lịch sử và chuyên đề như thầy thấy', () => {
+    const { container: cuaThay } = render(<KhoiLichSuCa ca={CA} />)
+    const { container: cuaPhuHuynh } = render(<KhoiLichSuCa ca={CA} />)
+    expect(cuaPhuHuynh.textContent).toBe(cuaThay.textContent)
+  })
+
+  it('phụ huynh KHÔNG có lối bấm vào làm bài của con', () => {
+    const { container } = render(<KhoiBaiTap baiTap={BAI_TAP} />)
+    expect(container.querySelectorAll('button[data-bai-tap]').length).toBe(0)
+    expect(screen.queryByText('làm muộn vẫn nộp được')).toBeNull()
+  })
+})

@@ -13,10 +13,15 @@ import {
   phDongYGiaoBai,
   markTeacherMessagesRead,
   sendParentMessage,
+  hoSoEm,
+  baiTapCuaEm,
   type ParentFeedbackResult,
   type ParentStatus,
   type TeacherMessage,
+  type HoSoEm,
+  type BaiTapCuaEm,
 } from '../lib/exam-api'
+import { KhoiBaiTap, KhoiChuyenDe, KhoiLichSuCa } from '../components/HoSoEmView'
 import { loadMyParentPhone, loadScriptUrl, loadTokenPhuHuynh, saveMyParentPhone } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 
@@ -44,6 +49,12 @@ export default function ParentScreen() {
   // đúng con của phụ huynh này — không còn ai gõ SĐT người khác là xem được.
   const [token, setToken] = useState('')
   const [phase, setPhase] = useState<'loading' | 'register' | 'view'>('loading')
+  // HỒ SƠ CON — cùng dữ liệu, cùng cách trình bày với màn của thầy và app học
+  // sinh (BA-APP.md mục 9: một màn hồ sơ cho ba lối vào). Chỉ đọc được khi phụ
+  // huynh đã có link riêng; hồ sơ đăng ký kiểu cũ (chỉ SĐT) vẫn dùng danh sách
+  // nhận xét bên dưới.
+  const [hoSo, setHoSo] = useState<HoSoEm | null>(null)
+  const [baiTap, setBaiTap] = useState<BaiTapCuaEm[] | null>(null)
 
   // Đăng ký: SĐT, SBD của con (KHOÁ ĐỐI CHIẾU THẬT — mọi tra cứu bài làm/nhận
   // xét/trạng thái đều theo đúng SBD này, không còn suy đoán qua ngày sinh),
@@ -123,6 +134,14 @@ export default function ParentScreen() {
 
   // Poll lại trạng thái mỗi 15s khi đang ở màn xem (để thấy con đang làm bài
   // gần-thời-gian-thực + cảnh báo rời màn hình sớm nhất có thể).
+  // Hồ sơ con chỉ tải MỘT LẦN khi vào màn — không nằm trong vòng poll 15 giây,
+  // vì mỗi lệnh Apps Script tốn sẵn hơn 1 giây, poll thêm là chậm cả màn.
+  useEffect(() => {
+    if (phase !== 'view' || !token || !scriptUrl.trim()) return
+    hoSoEm(scriptUrl.trim(), { tokenPH: token }).then(setHoSo).catch(() => setHoSo(null))
+    baiTapCuaEm(scriptUrl.trim(), { tokenPH: token }).then(setBaiTap).catch(() => setBaiTap([]))
+  }, [phase, token, scriptUrl])
+
   useEffect(() => {
     if (phase !== 'view' || !sdt.trim() || !scriptUrl.trim()) return
     refresh(sdt, scriptUrl)
@@ -343,6 +362,14 @@ export default function ParentScreen() {
         </div>
       )}
 
+      {token && hoSo && <KhoiLichSuCa ca={hoSo.ca} />}
+      {token && <KhoiBaiTap baiTap={baiTap} />}
+      {token && hoSo && <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />}
+
+      {/* Danh sách nhận xét kiểu cũ — chỉ còn cần cho hồ sơ đăng ký bằng SĐT,
+          chưa được thầy duyệt cấp link riêng. Có link riêng thì ba khối trên đã
+          đầy đủ hơn hẳn (điểm 3 phần, hạng lớp, chuyên đề, bài tập). */}
+      {!token && (
       <div className="space-y-3">
         <h2 className="font-bold text-indigo-700 dark:text-indigo-400">Nhận xét các bài kiểm tra</h2>
         {(!data?.items || data.items.length === 0) && (
@@ -383,6 +410,7 @@ export default function ParentScreen() {
           )
         })}
       </div>
+      )}
     </div>
   )
 }
