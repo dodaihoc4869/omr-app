@@ -1,6 +1,8 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import type { CauLuyen } from '../src/lib/bai-tap-pdf'
-import { biaHtml, chuHtml, dapAnChu, dungPhieu, ngayVN, oGiaiHtml, taiLieuHtml, thanhHtml, theCauHtml, thoat, tongQuanHtml } from '../src/lib/html-phieu'
+import { biaHtml, chuHtml, JS_PHIEU, dapAnChu, dungPhieu, ngayVN, oGiaiHtml, taiLieuHtml, thanhHtml, theCauHtml, thoat, tongQuanHtml } from '../src/lib/html-phieu'
 
 const C = (o: Partial<CauLuyen>): CauLuyen =>
   ({ phan: 'I', id: 'x', chuyenDe: 'Ester – lipid', mucDo: 'biet', text: 'Đề', luaChon: null, dapAn: '', chot: '', lyDo: null, buoc: null, ketQua: '', ...o }) as CauLuyen
@@ -280,12 +282,25 @@ describe('thanhHtml', () => {
 })
 
 describe('hai lựa chọn in', () => {
-  it('thanh có ĐỦ hai nút: in đề trần và in kèm lời giải', () => {
+  it('thanh có ĐỦ hai nút in và nút tải tệp', () => {
     const h = thanhHtml(10)
     expect(h).toContain('id="in-de"')
     expect(h).toContain('In đề')
     expect(h).toContain('id="in-giai"')
     expect(h).toContain('In kèm lời giải')
+    // Tải tệp nằm TRONG phiếu chứ không ở khung ngoài, để tệp HTML rời và bản
+    // xem trong app có đúng một bộ nút giống nhau.
+    expect(h).toContain('id="tai-tep"')
+  })
+
+  it('in đề trần ĐÓNG hết thẻ đang mở, không chỉ trông vào CSS', () => {
+    // Thẻ đang mở mang lớp `mo`, mà luật màn hình của lớp đó ngang cơ với luật
+    // bản in — câu thầy đang đọc dở in ra vẫn tô xanh đáp án.
+    const h = taiLieuHtml('', 'x')
+    expect(h).toContain('if (!coGiai)')
+    expect(h).toContain('daMo.push')
+    // và luật bản in phải !important để chắc chắn thắng
+    expect(h).toContain('body.in-de-tran .q-opt.dung { background: #f8fafc !important;')
   })
 
   it('bản in đề trần giấu SẠCH lời giải và đáp án đã tô', () => {
@@ -424,5 +439,35 @@ describe('hình trong phiếu', () => {
 
   it('câu không có hình thì KHÔNG chèn thẻ img rỗng', () => {
     expect(theCauHtml(MCQ, 1)).not.toContain('<img')
+  })
+})
+
+// ============================================================ CHỐT CHẶN BẪY
+// `CSS_PHIEU` và `JS_PHIEU` là template literal. MỘT dấu backtick lạc vào —
+// kể cả trong comment CSS hay comment JS — là chuỗi đứt giữa chừng, và lỗi báo
+// ra ở tận đâu đâu ("card is not defined", "Expected a semicolon"). Đã dính
+// BỐN lần trong một ngày. Test này bắt ngay tại chỗ.
+describe('không có backtick lạc trong CSS_PHIEU / JS_PHIEU', () => {
+  const doc = readFileSync(resolve(process.cwd(), 'src/lib/html-phieu.ts'), 'utf8').split('\n')
+
+  for (const ten of ['CSS_PHIEU', 'JS_PHIEU']) {
+    it(`${ten} không chứa dấu backtick nào ở giữa`, () => {
+      const dau = doc.findIndex((l) => l.startsWith(`export const ${ten} = \``))
+      expect(dau).toBeGreaterThan(-1)
+      const cuoi = doc.findIndex((l, i) => i > dau && l === '`')
+      expect(cuoi).toBeGreaterThan(dau)
+      const lac = doc.slice(dau + 1, cuoi).map((l, i) => (l.includes('`') ? dau + 2 + i : 0)).filter(Boolean)
+      expect(lac).toEqual([])
+    })
+  }
+})
+
+// Kịch bản nhúng vào phiếu phải CHẠY ĐƯỢC. Đã dính: dấu \n trong chuỗi JS bị
+// template literal của TS đổi thành xuống dòng THẬT, làm đứt chuỗi JS và cả
+// kịch bản chết ngay ("SyntaxError: Invalid or unexpected token") — gập mở lời
+// giải hỏng theo mà không báo gì.
+describe('JS_PHIEU chạy được', () => {
+  it('cú pháp hợp lệ', () => {
+    expect(() => new Function(JS_PHIEU)).not.toThrow()
   })
 })

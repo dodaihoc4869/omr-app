@@ -535,9 +535,13 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
      Cùng một tệp ra được hai bản giấy: bản này giấu sạch đáp án và lời giải,
      bản mặc định ở trên in đủ. Khỏi phải dựng hai tệp rồi lo gửi nhầm. */
   body.in-de-tran .sol-wrap { display: none !important; }
-  body.in-de-tran .q-opt.dung { background: #f8fafc; border-color: var(--vien); color: var(--muc-2); font-weight: 400; }
-  body.in-de-tran .q-opt.dung .q-opt-letter { background: var(--vien-dam); }
-  body.in-de-tran .tf-badge.dung { background: #f1f5f9; color: var(--rat-nhat); border-color: var(--vien); }
+  /* !important vì luật màn hình cho thẻ đang mở có ĐỘ ƯU TIÊN BẰNG
+     luật này. Thẻ nào thầy đang mở đọc dở lúc bấm In đề thì câu đó in ra vẫn
+     tô xanh đáp án — thầy bắt được đúng lỗi đó ở câu 1. */
+  body.in-de-tran .q-opt.dung { background: #f8fafc !important; border-color: var(--vien) !important; color: var(--muc-2) !important; font-weight: 400 !important; }
+  body.in-de-tran .q-opt.dung .q-opt-letter { background: var(--vien-dam) !important; }
+  body.in-de-tran .tf-badge.dung { background: #f1f5f9 !important; color: var(--rat-nhat) !important; border-color: var(--vien) !important; }
+  body.in-de-tran .q-card { border-left-color: var(--vien-dam) !important; }
   body.in-de-tran .sa-answer { display: none !important; }
   body.in-de-tran .sa-blank { display: block !important; }
 }
@@ -746,6 +750,7 @@ export function thanhHtml(soCau: number): string {
   <button class="nut chinh" type="button" id="mo-het" aria-pressed="false"><span class="chu-mo">Mở tất cả</span><span class="chu-dong">Đóng tất cả</span></button>
   <button class="nut" type="button" id="in-de" title="In hoặc lưu PDF chỉ có đề bài, không lộ đáp án">In đề</button>
   <button class="nut" type="button" id="in-giai" title="In hoặc lưu PDF có đủ đáp án và lời giải">In kèm lời giải</button>
+  <button class="nut" type="button" id="tai-tep" title="Tải tệp HTML này về máy để gửi Zalo">Tải tệp</button>
 </div>`
 }
 
@@ -866,14 +871,38 @@ export const JS_PHIEU = `
     var giuTen = tenLoc ? tenLoc.textContent : '';
     if (giu) locTheo('', '');
     document.body.classList.toggle('in-de-tran', !coGiai);
+    // ĐÓNG HẾT thẻ đang mở. Chỉ dựa vào CSS là chưa đủ chắc: thẻ đang mở mang
+    // lớp mo, mà luật màn hình của lớp đó ngang cơ với luật bản in.
+    var daMo = [];
+    if (!coGiai) {
+      for (var i = 0; i < tatCa.length; i++) {
+        if (tatCa[i].classList.contains('mo')) { daMo.push(tatCa[i]); bat(tatCa[i], false); }
+      }
+    }
     window.print();
     // Trả màn hình về như cũ sau khi hộp in đóng. Chrome trả quyền ngay sau
     // print(), Safari chậm hơn — chờ một nhịp cho chắc.
     setTimeout(function () {
       document.body.classList.remove('in-de-tran');
+      for (var j = 0; j < daMo.length; j++) bat(daMo[j], true);
       if (giu) locTheo(giu, giuTen);
+      demLai();
     }, 800);
   }
+
+  // TẢI CHÍNH TRANG NÀY về máy. Tự đọc mã nguồn của mình nên tệp tải về giống
+  // hệt bản đang xem, kể cả ảnh nhúng — không cần app dựng lại lần nữa.
+  var nutTai = document.getElementById('tai-tep');
+  if (nutTai) nutTai.addEventListener('click', function () {
+    var ten = (document.title || 'phieu').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')
+      .replace(/đ/g, 'd').replace(/Đ/g, 'D').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50) || 'phieu';
+    var goc = '<!DOCTYPE html>' + document.documentElement.outerHTML;
+    var u = URL.createObjectURL(new Blob([goc], { type: 'text/html;charset=utf-8' }));
+    var a = document.createElement('a');
+    a.href = u; a.download = ten + '.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(u); }, 8000);
+  });
 
   var nutInDe = document.getElementById('in-de');
   var nutInGiai = document.getElementById('in-giai');

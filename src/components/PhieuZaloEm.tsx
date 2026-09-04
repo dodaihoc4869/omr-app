@@ -19,7 +19,7 @@ import { soanPhieuZalo, viecCanLamMacDinh, demChu, NHAC_TRUOC_KHI_GUI, NHAN_KHOI
 import { veAnhPhieu, tenTepPhieu, type DuLieuAnhPhieu } from '../lib/anh-phieu'
 import { taoLinkPhieu } from '../lib/phieu-link'
 import KhungXemPhieu from './KhungXemPhieu'
-import { dungPhieu } from '../lib/phieu-du-lieu'
+import { dungPhieu, giamGoiPhieu } from '../lib/phieu-du-lieu'
 import { luuPhieu, qidDaLam, sinhMaPhieu, xoaPhieu, type ChiTietCauRow } from '../lib/exam-api'
 import { loadExamSources, loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import type { TeacherExamSource } from '../data/examContent'
@@ -161,7 +161,9 @@ export default function PhieuZaloEm({
             khoDe,
             qidDaLam: qidCu,
           })
-          await luuPhieu(url.trim(), mat.trim(), { ma, maCa: ca.maCa, sbd: hoSo.em.sbd, hoTen: hoSo.em.hoTen, phieu })
+          // Gói nặng thì bỏ bớt phần phụ chứ đừng để cả báo cáo gửi hỏng.
+          const { phieu: goiGui } = giamGoiPhieu(phieu)
+          await luuPhieu(url.trim(), mat.trim(), { ma, maCa: ca.maCa, sbd: hoSo.em.sbd, hoTen: hoSo.em.hoTen, phieu: goiGui })
           if (con) setLink(taoLinkPhieu(`${location.origin}${import.meta.env.BASE_URL}`, ma))
         } catch {
           // Mất mạng hoặc chưa cấu hình: tin nhắn chữ vẫn gửi được, chỉ mất

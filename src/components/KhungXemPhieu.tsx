@@ -1,56 +1,28 @@
-// XEM PHIẾU NGAY TRONG APP, KHÔNG MỞ THẺ MỚI.
+// XEM PHIẾU / BÁO CÁO NGAY TRONG APP, KHÔNG NHẢY SANG TRANG MỚI.
 //
 // LỖI ĐÃ DÍNH 04-09: bấm "Xem phiếu", app dựng xong rồi mở blob URL ra thẻ
 // mới, và thầy nhận trang trắng của Chrome "Không thể truy cập vào tệp của
 // bạn". App đã CÀI VÀO MÀN HÌNH CHÍNH chạy ở chế độ standalone — cửa sổ riêng,
-// không có thẻ. Ở đó `window.open` một blob URL không mở nổi, và đường dự
-// phòng tải tệp về rồi nhờ Chrome mở lại càng hỏng: tệp tạm bị dọn là ra đúng
-// màn hình trên.
+// không có thẻ. Ở đó `window.open` một blob URL không mở nổi.
 //
-// Nay phiếu hiện thẳng trong một lớp phủ, nội dung nằm trong iframe `srcDoc`.
-// Chạy giống nhau ở mọi chỗ: trình duyệt máy tính, app đã cài, điện thoại, và
-// cả khi mất mạng. Đúng cách trang báo cáo phụ huynh vẫn dùng và vẫn chạy.
+// Nay nội dung hiện thẳng trong một lớp phủ, nằm trong iframe. Chạy giống nhau
+// ở mọi chỗ: trình duyệt máy tính, app đã cài, điện thoại, và cả khi mất mạng.
 //
-// iframe `srcDoc` cùng nguồn với trang cha nên kịch bản trong phiếu chạy bình
-// thường: gập mở lời giải, lọc theo phần, và HAI NÚT IN ("In đề" / "In kèm
-// lời giải") nằm ngay trên thanh của phiếu.
+// KHÔNG CÓ THANH CÔNG CỤ (thầy chốt 04-09 tối). Bản trước có một dải "Đóng" ở
+// đầu; mở phiếu bài tập từ trong báo cáo là ra HAI dải chồng nhau, cùng chữ
+// Đóng, chiếm mất hai dòng đầu màn hình. Nay đóng bằng đúng thứ người dùng đã
+// quen:
+//   · vuốt quay lại / nút back của trình duyệt — mở lớp phủ có ĐẨY MỘT MỤC vào
+//     lịch sử, nên back là đóng chứ không thoát app;
+//   · phím Esc trên máy tính;
+//   · nút X nhỏ nổi ở góc, để người chưa biết hai cách trên không bị kẹt.
 //
-// Cố ý KHÔNG đặt thêm nút In ở thanh ngoài này: hai nút in đã nằm trong phiếu,
-// thêm nút thứ ba ở ngoài là thầy phải đoán nút nào in ra bản nào. Nhờ vậy bản
-// xem trong app và tệp HTML tải về hành xử giống hệt nhau.
+// Các nút "In đề" / "In kèm lời giải" / "Tải tệp" nằm trên thanh của CHÍNH
+// phiếu (html-phieu.ts), nên bản xem trong app và tệp HTML tải về giống hệt
+// nhau, và không có nút nào phải đoán nghĩa.
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { X, Download } from 'lucide-react'
-
-/** Tải chuỗi HTML về máy thành tệp. Giữ lại làm đường thoát: thầy muốn gửi
- * nguyên tệp qua Zalo cho em thay vì gửi link. */
-export function taiTepHtml(html: string, ten: string): void {
-  const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = ten
-  document.body.appendChild(a)
-  a.click()
-  a.remove()
-  setTimeout(() => URL.revokeObjectURL(url), 8000)
-}
-
-const NUT: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 6,
-  minHeight: 38,
-  padding: '0 14px',
-  borderRadius: 999,
-  border: '1px solid var(--p-vien)',
-  background: 'var(--p-giay)',
-  color: 'var(--p-muc)',
-  fontFamily: 'var(--sans)',
-  fontSize: 'var(--cx-1)',
-  fontWeight: 700,
-  cursor: 'pointer',
-}
+import { X } from 'lucide-react'
 
 export interface KhungXemPhieuProps {
   /** Nội dung dựng sẵn tại máy. Dùng cho phiếu bài tập và đề ca. */
@@ -58,70 +30,87 @@ export interface KhungXemPhieuProps {
   /** Địa chỉ trang có sẵn, vd link báo cáo gửi phụ huynh. Dùng khi cần xem
    * ĐÚNG thứ người nhận sẽ thấy chứ không phải bản dựng lại. */
   src?: string
-  /** Tiêu đề trên thanh, vd "Báo cáo gửi phụ huynh". */
+  /** Nhãn cho trình đọc màn hình. Không hiện thành chữ trên màn. */
   ten?: string
-  /** Tên tệp khi thầy bấm Tải tệp, vd "phieu-Nguyen-Van-A.html". */
-  tenTep?: string
   dong: () => void
 }
 
-export default function KhungXemPhieu({ html, src, ten, tenTep = 'phieu.html', dong }: KhungXemPhieuProps) {
-  // Esc để đóng, và khoá cuộn trang nền — không thì cuộn trong phiếu tới cuối
-  // là trang phía sau cuộn theo, nhìn như phiếu bị trôi.
+export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuProps) {
   useEffect(() => {
+    // ĐẨY MỘT MỤC LỊCH SỬ để vuốt quay lại (và nút back) đóng lớp phủ thay vì
+    // thoát khỏi app.
+    let cuaMinh = true
+    try {
+      history.pushState({ khungXemPhieu: Date.now() }, '')
+    } catch {
+      cuaMinh = false
+    }
+    const quayLai = () => {
+      // back đã tiêu mục của mình rồi, đừng gọi back thêm lần nữa lúc dọn.
+      cuaMinh = false
+      dong()
+    }
     const phim = (e: KeyboardEvent) => {
       if (e.key === 'Escape') dong()
     }
+    window.addEventListener('popstate', quayLai)
     window.addEventListener('keydown', phim)
-    const cuCu = document.body.style.overflow
+
+    // Khoá cuộn trang nền — không thì cuộn trong phiếu tới cuối là trang phía
+    // sau cuộn theo, nhìn như phiếu bị trôi.
+    const cuonCu = document.body.style.overflow
     document.body.style.overflow = 'hidden'
+
     return () => {
+      window.removeEventListener('popstate', quayLai)
       window.removeEventListener('keydown', phim)
-      document.body.style.overflow = cuCu
+      document.body.style.overflow = cuonCu
+      // Đóng bằng Esc hoặc nút X thì mục lịch sử vẫn còn — gỡ ra, không thì
+      // lần sau bấm back thành một nhịp thừa không làm gì.
+      if (cuaMinh) {
+        try {
+          history.back()
+        } catch {
+          /* trình duyệt chặn thì thôi */
+        }
+      }
     }
   }, [dong])
 
   return createPortal(
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Phiếu bài tập"
-      style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', flexDirection: 'column', background: 'var(--p-nen)' }}
-    >
-      <div
-        className="flex items-center"
-        style={{
-          gap: 'var(--k2)',
-          padding: 'var(--k2) var(--k3)',
-          paddingTop: 'calc(var(--k2) + env(safe-area-inset-top))',
-          background: 'var(--p-giay)',
-          borderBottom: '1px solid var(--p-vien)',
-        }}
-      >
-        <button type="button" onClick={dong} className="tap-target" style={{ ...NUT, paddingLeft: 10, paddingRight: 14 }}>
-          <X size={16} />
-          Đóng
-        </button>
-        {ten && (
-          <div className="font-bold truncate" style={{ flex: 1, minWidth: 0, fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--p-nhat)' }}>
-            {ten}
-          </div>
-        )}
-        {!ten && <div style={{ flex: 1 }} />}
-        {/* Chỉ tải được thứ dựng tại máy. Trang lấy từ máy chủ thì tệp nằm ở
-            máy chủ, nút Tải tệp ở đây sẽ tải ra tệp rỗng — thà không có nút. */}
-        {html && (
-          <button type="button" onClick={() => taiTepHtml(html, tenTep)} className="tap-target" style={NUT} title="Tải tệp HTML về máy để gửi Zalo">
-            <Download size={16} />
-            Tải tệp
-          </button>
-        )}
-      </div>
+    <div role="dialog" aria-modal="true" aria-label={ten || 'Phiếu bài tập'} style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'var(--p-giay)' }}>
       <iframe
         title={ten || 'Phiếu bài tập'}
         {...(html ? { srcDoc: html } : { src })}
-        style={{ flex: 1, width: '100%', border: 0, background: 'var(--p-giay)' }}
+        style={{ display: 'block', width: '100%', height: '100%', border: 0, background: 'var(--p-giay)' }}
       />
+      {/* Nút thoát NHỎ, nổi góc trên phải. Không phải một dải chiếm hết bề
+          ngang: dải đó chồng lên nhau khi mở phiếu từ trong báo cáo. */}
+      <button
+        type="button"
+        onClick={dong}
+        aria-label="Đóng"
+        title="Đóng (Esc, hoặc vuốt quay lại)"
+        style={{
+          position: 'fixed',
+          top: 'calc(10px + env(safe-area-inset-top))',
+          right: 10,
+          zIndex: 61,
+          width: 34,
+          height: 34,
+          display: 'grid',
+          placeItems: 'center',
+          borderRadius: '50%',
+          border: 'none',
+          background: 'rgba(15,23,42,.55)',
+          color: 'var(--p-trang)',
+          cursor: 'pointer',
+          WebkitBackdropFilter: 'blur(6px)',
+          backdropFilter: 'blur(6px)',
+        }}
+      >
+        <X size={18} />
+      </button>
     </div>,
     document.body,
   )

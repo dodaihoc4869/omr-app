@@ -11,7 +11,7 @@
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import type { CaCuaEm, ChiTietCauRow, ChuyenDeEm, HoSoEm } from './exam-api'
 import { ducKetKienThuc, thongKeLamBai, tinHieuLamBai, type DucKetChuyenDe, type ThongKeLamBai, type TinHieuLamBai } from './phan-tich-lam-bai'
-import { chonCauLuyen, type CauLuyen } from './bai-tap-pdf'
+import { cauLuyenTuBoCau, chonCauLuyen, type CauLuyen } from './bai-tap-pdf'
 
 /** Phiên bản gói báo cáo. Trang đọc từ chối bản lạ thay vì vẽ thiếu mục. */
 export const BAN_PHIEU = 2
@@ -84,6 +84,57 @@ export interface PhieuDayDu {
    * một nút là tải được phiếu PDF ngay trên máy mình — không phải chờ thầy gửi
    * thêm file. Rút lúc thầy tạo báo cáo, ở máy thầy, nơi có cả kho đề. */
   baiTap?: CauLuyen[]
+  /** TRỌN BỘ ĐỀ EM ĐÃ LÀM, kèm lời giải — để phụ huynh mở đúng thứ con vừa
+   * thi, giống hệt màn "đã nộp bài" của em. Mỗi em một bộ câu riêng nên không
+   * gửi chung đề của ca được.
+   *
+   * Trường TUỲ CHỌN: gói báo cáo có hạn cỡ (Apps Script cất vào ô của Sheet),
+   * ca nhiều hình mà nhét cả đề vào là quá cỡ. Chỗ gửi tự bỏ trường này ra khi
+   * gói quá nặng (xem `giamGoiPhieu`), báo cáo vẫn gửi được, chỉ thiếu nút xem
+   * đề. */
+  deCuaEm?: CauLuyen[]
+}
+
+/** Gói báo cáo lớn nhất còn gửi lên máy chủ được (byte). Phải khớp với
+ * `CO_TOI_DA_PHIEU` trong exam-api.ts. */
+const CO_TOI_DA = 4 * 1024 * 1024
+
+/** BỎ BỚT PHẦN PHỤ KHI GÓI QUÁ NẶNG, thay vì để cả báo cáo gửi hỏng.
+ *
+ * Báo cáo nhúng ảnh cắt từ đề dưới dạng data URL, nên ca nhiều hình có thể
+ * phình vài MB. Thứ tự hy sinh đi từ ít quan trọng nhất:
+ *   1. `deCuaEm` — nút xem đề, phụ huynh vẫn còn cả báo cáo.
+ *   2. `baiTap` — bài luyện kèm sẵn.
+ * Bỏ hết mà vẫn quá cỡ thì trả về nguyên gói, để chỗ gửi báo lỗi rõ ràng chứ
+ * không âm thầm cắt mất phần chấm bài. */
+export function giamGoiPhieu(p: PhieuDayDu, toiDa: number = CO_TOI_DA): { phieu: PhieuDayDu; daBo: string[] } {
+  const co = (x: unknown) => new Blob([JSON.stringify(x)]).size
+  if (co(p) <= toiDa) return { phieu: p, daBo: [] }
+  const daBo: string[] = []
+  let ra: PhieuDayDu = p
+  if (ra.deCuaEm && ra.deCuaEm.length > 0) {
+    ra = { ...ra, deCuaEm: undefined }
+    daBo.push('đề của em')
+    if (co(ra) <= toiDa) return { phieu: ra, daBo }
+  }
+  if (ra.baiTap && ra.baiTap.length > 0) {
+    ra = { ...ra, baiTap: undefined }
+    daBo.push('bài tập kèm sẵn')
+  }
+  return { phieu: ra, daBo }
+}
+
+/** Dựng bộ câu em đã làm theo ĐÚNG thứ tự máy đã gán, kèm đáp án và lời giải.
+ * Rỗng khi thiếu bảng chấm hoặc thiếu ngân hàng. */
+export function deCuaEmTuRows(rows: ChiTietCauRow[], banks: TeacherExamSource[]): CauLuyen[] {
+  if (rows.length === 0 || banks.length === 0) return []
+  const tra = timCauTheoQid(banks)
+  const bo: { phan: 'I' | 'II' | 'III'; q: CauBatKy }[] = []
+  for (const r of rows) {
+    const q = tra.get(r.qid)
+    if (q) bo.push({ phan: r.phan, q })
+  }
+  return bo.length > 0 ? cauLuyenTuBoCau(bo as never) : []
 }
 
 type CauBatKy = TeacherMcqQuestion | TeacherTrueFalseQuestion | TeacherShortAnswerQuestion
@@ -238,6 +289,7 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
     ducKet: ducKetKienThuc(cauSai.map((c) => ({ chuyenDe: c.chuyenDe, chot: c.chot }))),
     cauSai,
     dai: n.rows.map((r) => ({ nhan: `Phần ${r.phan} câu ${r.soCau}`, giay: r.giay, dung: Boolean(r.dungSai) })),
+    deCuaEm: deCuaEmTuRows(n.rows, n.banks),
   }
 }
 
@@ -286,5 +338,6 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
     cauSai,
     dai: rows.map((r) => ({ nhan: `Phần ${r.phan} câu ${r.soCau}`, giay: r.giay, dung: Boolean(r.dungSai) })),
     baiTap,
+    deCuaEm: deCuaEmTuRows(rows, banks),
   }
 }

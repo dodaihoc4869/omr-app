@@ -805,6 +805,7 @@ export default function PhieuScreen({ duCoSan }: { duCoSan?: PhieuDayDu } = {}) 
           <section className="bc-viec">
             <div className="bc-tieu">Việc cần làm</div>
             <div className="bc-viec-chu">{du.vieCanLam}</div>
+            {du.deCuaEm && du.deCuaEm.length > 0 && <NutXemDeCuaCon du={du} />}
             {du.baiTap && du.baiTap.length > 0 && <NutTaiBaiTap du={du} />}
           </section>
         )}
@@ -825,6 +826,80 @@ export default function PhieuScreen({ duCoSan }: { duCoSan?: PhieuDayDu } = {}) 
  * 10 câu đã được thầy rút sẵn và gói vào báo cáo, nên phụ huynh bấm là dựng PDF
  * ngay trên máy mình — không phải chờ thầy gửi thêm file, và không cần gọi thêm
  * lệnh nào lên máy chủ. Bộ vẽ PDF nặng gần 300KB nên nạp động, chỉ khi bấm. */
+/** XEM ĐỀ CON VỪA THI, kèm lời giải — đúng thứ em thấy ở màn "đã nộp bài".
+ *
+ * Mỗi em một bộ câu riêng nên bộ này đi kèm ngay trong báo cáo, không lấy
+ * chung đề của ca được. Ca nhiều hình mà gói quá nặng thì lúc gửi đã bỏ trường
+ * này ra (giamGoiPhieu) và nút không hiện — thà thiếu nút còn hơn phụ huynh
+ * không nhận được báo cáo. */
+function NutXemDeCuaCon({ du }: { du: PhieuDayDu }) {
+  const [dang, setDang] = useState(false)
+  const [loi, setLoi] = useState('')
+  const [html, setHtml] = useState('')
+
+  const mo = async () => {
+    setDang(true)
+    setLoi('')
+    try {
+      const { dungPhieu: dungTrang } = await napDong(() => import('../lib/html-phieu'))
+      const cd = [...new Set((du.deCuaEm ?? []).map((c) => c.chuyenDe).filter(Boolean))]
+      setHtml(
+        dungTrang(
+          {
+            hoTen: du.hoTen,
+            sbd: du.sbd,
+            ngay: du.ngay ? new Date(du.ngay) : new Date(),
+            tenChuyenDe: cd.length === 1 ? cd[0] : du.tenCa || 'Hoá học',
+            ketQua: `Điểm ${du.diem.toFixed(2).replace('.', ',')}/10`,
+            hienDapAn: true,
+            nhanBia: 'Đề con vừa làm, kèm lời giải',
+            oBia: [
+              { nhan: 'Học sinh', gia: du.hoTen },
+              { nhan: 'SBD', gia: du.sbd },
+              ...(du.tenCa ? [{ nhan: 'Bài kiểm tra', gia: du.tenCa }] : []),
+            ],
+          },
+          du.deCuaEm ?? [],
+        ),
+      )
+    } catch {
+      setLoi('Máy chưa mở được đề. Phụ huynh thử lại khi có mạng ổn định.')
+    } finally {
+      setDang(false)
+    }
+  }
+
+  return (
+    <div style={{ marginTop: 14 }}>
+      <button
+        type="button"
+        onClick={() => void mo()}
+        disabled={dang}
+        style={{
+          width: '100%',
+          minHeight: 46,
+          border: '1.5px solid var(--p-tim)',
+          borderRadius: 12,
+          background: 'var(--p-giay)',
+          color: 'var(--p-tim)',
+          fontFamily: 'var(--sans)',
+          fontSize: 14.5,
+          fontWeight: 700,
+          cursor: dang ? 'default' : 'pointer',
+          opacity: dang ? 0.6 : 1,
+        }}
+      >
+        {dang ? 'Đang dựng đề…' : `Xem đề con vừa làm (${du.deCuaEm?.length ?? 0} câu) kèm lời giải`}
+      </button>
+      <div style={{ fontSize: 12, color: 'var(--p-nhat)', marginTop: 7, lineHeight: 1.6 }}>
+        Đúng bộ câu máy đã gán riêng cho con. Bấm vào từng câu để xem đáp án và lời giải.
+      </div>
+      {loi && <div style={{ fontSize: 12.5, color: 'var(--p-do)', marginTop: 6 }}>{loi}</div>}
+      {html && <KhungXemPhieu html={html} ten="Đề con vừa làm" dong={() => setHtml('')} />}
+    </div>
+  )
+}
+
 function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
   const [dang, setDang] = useState(false)
   const [loi, setLoi] = useState('')
@@ -880,7 +955,7 @@ function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
         Thầy đã chọn sẵn theo đúng chuyên đề em mất điểm ở bài này, xếp từ dễ lên khó. Em làm hết rồi mới bấm vào từng câu xem lời giải.
       </div>
       {loi && <div style={{ fontSize: 12.5, color: 'var(--p-do)', marginTop: 6 }}>{loi}</div>}
-      {html && <KhungXemPhieu html={html} tenTep={`bai-tap-${du.sbd || 'cua-em'}.html`} dong={() => setHtml('')} />}
+      {html && <KhungXemPhieu html={html} ten="Phiếu bài tập" dong={() => setHtml('')} />}
     </div>
   )
 }

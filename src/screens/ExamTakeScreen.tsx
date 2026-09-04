@@ -1277,7 +1277,7 @@ export default function ExamTakeScreen() {
           )}
         </div>
 
-        {htmlDe && <KhungXemPhieu html={htmlDe} tenTep={`de-${attempt?.sbd || 'cua-em'}.html`} dong={() => setHtmlDe('')} />}
+        {htmlDe && <KhungXemPhieu html={htmlDe} ten="Đề của em kèm lời giải" dong={() => setHtmlDe('')} />}
 
         {gradedPopup && graded && (
           <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center px-4 py-6" style={{ background: 'var(--phu)' }}>

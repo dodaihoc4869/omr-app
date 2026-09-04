@@ -47,12 +47,6 @@ async function copyAnToan(chu: string, han = 4000): Promise<boolean> {
   }
 }
 
-/** Tên tệp tải về: bỏ dấu, thay khoảng trắng bằng gạch. Tên có dấu tiếng Việt
- * hay bị Zalo và Windows đổi thành ký tự lạ. */
-function khongDau(s: string): string {
-  return (s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'phieu').slice(0, 40)
-}
-
 function nut(chinh: boolean): React.CSSProperties {
   return {
     gap: 6,
@@ -80,7 +74,6 @@ export interface NutPhieuHtmlProps {
 export default function NutPhieuHtml({ dungGoi, nhanXem, showToast, choPhepLink }: NutPhieuHtmlProps) {
   const [dang, setDang] = useState<'' | 'xem' | 'link'>('')
   const [htmlPhieu, setHtmlPhieu] = useState('')
-  const [tenTep, setTenTep] = useState('phieu.html')
   const [daCopy, setDaCopy] = useState('')
   const [coMaBiMat, setCoMaBiMat] = useState(false)
 
@@ -100,7 +93,6 @@ export default function NutPhieuHtml({ dungGoi, nhanXem, showToast, choPhepLink 
       const g = await dungGoi()
       if (!g) return
       const { dungPhieu } = await napDong(() => import('../lib/html-phieu'))
-      setTenTep(`phieu-${khongDau(g.tt.hoTen || 'hoc-sinh')}.html`)
       setHtmlPhieu(dungPhieu(g.tt, g.cau))
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không dựng được phiếu', 'error')
@@ -148,7 +140,7 @@ export default function NutPhieuHtml({ dungGoi, nhanXem, showToast, choPhepLink 
           </button>
         )}
       </div>
-      {htmlPhieu && <KhungXemPhieu html={htmlPhieu} tenTep={tenTep} dong={() => setHtmlPhieu('')} />}
+      {htmlPhieu && <KhungXemPhieu html={htmlPhieu} dong={() => setHtmlPhieu('')} />}
       {daCopy && (
         <div className="break-all" style={{ ...NHAN_NHO, fontVariantNumeric: 'tabular-nums' }}>
           {daCopy}

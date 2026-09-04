@@ -101,9 +101,12 @@ export const LOI_NHAN_LUYEN_TAP =
   'Thầy đã giao cho em tổng hợp bài tập để khắc phục điểm yếu của em. Hãy luyện tập nghiêm túc để bản thân tiến bộ trong lần thi tới.\nKhông ai có thể giúp em tiến bộ bằng chính em.'
 
 export function viecCanLamMacDinh(d: DuLieuPhieu): string {
+  // ĐÃ giao bài cụ thể thì nêu số câu và hạn nộp TRƯỚC — phụ huynh cần mốc thời
+  // gian — rồi mới tới lời nhắn. Bỏ mốc đi là mất thông tin duy nhất họ phải
+  // hành động theo.
   if (d.baiTapDaGiao) {
     const han = ngayVN(d.baiTapDaGiao.hanNop)
-    return `Thầy đã giao em ${d.baiTapDaGiao.soCau} câu bài tập trong app, hạn nộp ${han}. Thầy chấm bài đó rồi báo lại kết quả.`
+    return `Thầy đã giao em ${d.baiTapDaGiao.soCau} câu bài tập trong app, hạn nộp ${han}. Thầy chấm bài đó rồi báo lại kết quả.\n${LOI_NHAN_LUYEN_TAP}`
   }
   // Chữ thầy tự viết 04-09, dùng nguyên văn. Không chèn tên chuyên đề vào đây:
   // chuyên đề em mất điểm đã nằm ở khối CHỖ MẤT ĐIỂM ngay phía trên, nhắc lại

@@ -97,6 +97,52 @@ export function batTuHoiBanMoi(
   }
 }
 
+/** BẢN MỚI CHIẾM QUYỀN THÌ TẢI LẠI TRANG NGAY.
+ *
+ * LỖI ĐÃ DÍNH 04-09, dính nhiều lần liền: thầy sửa lỗi, đẩy bản mới lên, CI
+ * chạy xong, nhưng app đang mở trên máy thầy vẫn chạy MÃ CỦA BẢN CŨ trong bộ
+ * nhớ. Service worker mới đã chiếm quyền (skipWaiting + clientsClaim) nhưng
+ * việc đó chỉ đổi thứ được TẢI TỪ ĐÂY VỀ SAU — trang đang mở thì không.
+ * Thầy thử lại, thấy y nguyên lỗi cũ, và tưởng tôi chưa sửa.
+ *
+ * `controllerchange` bắn đúng lúc bản mới chiếm quyền. Nghe sự kiện đó rồi
+ * tải lại là trang nhận đúng mã mới.
+ *
+ * BA CHỐT AN TOÀN:
+ *   · Đang làm bài thì KHÔNG tải lại — tải lại giữa giờ thi làm em hoảng, và
+ *     máy chống gian lận có thể tính là một lần rời màn. Bài không mất
+ *     (IndexedDB), nhưng chờ tới lúc em nộp xong cũng không muộn.
+ *   · Chặn vòng lặp bằng mốc thời gian: tải lại rồi mà 20 giây sau lại bắn
+ *     nữa thì thôi, không nạp lại vô hạn.
+ *   · Lần đầu cài service worker (chưa từng có controller) KHÔNG tính là đổi
+ *     bản — lần đó `controllerchange` cũng bắn, tải lại là thừa. */
+const KHOA_TAI_LAI = 'taiLaiVìBanMoi'
+const CHO_GIUA_HAI_LAN_MS = 20_000
+
+export function batTuTaiLaiKhiDoiBan(
+  sw: { addEventListener: (t: string, f: () => void) => void; controller: unknown } | undefined = typeof navigator === 'undefined' ? undefined : navigator.serviceWorker,
+  taiLai: () => void = () => location.reload(),
+  now: () => number = () => Date.now(),
+  kho: Storage | null = typeof sessionStorage === 'undefined' ? null : sessionStorage,
+): void {
+  if (!sw) return
+  // Chưa có controller = lần đầu cài, không phải đổi bản.
+  const laLanDau = !sw.controller
+  sw.addEventListener('controllerchange', () => {
+    if (laLanDau) return
+    if (dangLamBaiKhong()) return
+    try {
+      const truoc = Number(kho?.getItem(KHOA_TAI_LAI) || 0)
+      const t = now()
+      if (truoc && t - truoc < CHO_GIUA_HAI_LAN_MS) return
+      kho?.setItem(KHOA_TAI_LAI, String(t))
+    } catch {
+      /* máy chặn lưu trữ thì vẫn tải lại, chỉ mất cái chặn vòng lặp */
+    }
+    taiLai()
+  })
+}
+
 /** Phiên bản đang chạy — vite ghi vào lúc build (xem vite.config.ts).
  * Hiện ở màn chính để thầy đối chiếu: sửa xong, mở app, thấy đúng mã commit
  * mới nghĩa là máy đã nhận bản mới; còn mã cũ nghĩa là chưa nhận. */
