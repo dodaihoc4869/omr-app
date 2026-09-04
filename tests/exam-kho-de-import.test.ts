@@ -122,15 +122,15 @@ describe('buildTeacherSourceFromKhoDe', () => {
 })
 
 describe('loi_giai có cấu trúc (THIẾT KẾ LẠI Ô LỜI GIẢI)', () => {
-  it('Phần I: chot + tung_pa -> loiGiai.tungPa theo chữ GỐC; vi_sao > 25 từ -> cảnh báo, không chặn', () => {
-    const dai = Array.from({ length: 26 }, (_, i) => `t${i}`).join(' ')
+  it('Phần I: chot + tung_pa -> loiGiai.tungPa theo chữ GỐC; vi_sao > 35 từ -> cảnh báo, không chặn', () => {
+    const dai = Array.from({ length: 36 }, (_, i) => `t${i}`).join(' ')
     const json = {
       ma_de: '100', cau: [{ phan: 'I' as const, so: 1, de: 'x', pa: { A: 'a', B: 'b', C: 'c', D: 'd' }, dap_an: 'C',
         loi_giai: { chot: 'Nước làm lạnh đi ngược chiều hơi.', tung_pa: { A: { dung: false, vi_sao: 'vào (1) ra (2)' }, B: { dung: false, vi_sao: dai }, C: { dung: true, vi_sao: 'đúng chiều' }, D: { dung: false, vi_sao: 'sai' } } } }],
     }
     const { source, errors, warnings } = buildTeacherSourceFromKhoDe(parseKhoDeJsonText(JSON.stringify(json)).json!)
     expect(errors).toEqual([])
-    expect(warnings.join(' ')).toMatch(/tung_pa\.B dài 26 từ/)
+    expect(warnings.join(' ')).toMatch(/tung_pa\.B dài 36 từ/)
     const q = source.phanI[0]
     expect(q.loiGiai?.chot).toBe('Nước làm lạnh đi ngược chiều hơi.')
     expect(q.loiGiai?.tungPa?.C).toEqual({ dung: true, viSao: 'đúng chiều' })

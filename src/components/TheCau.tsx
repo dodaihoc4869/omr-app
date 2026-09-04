@@ -129,6 +129,7 @@ function LoiGiai({ props, nhan }: { props: TheCauProps; nhan?: TrangThaiLoiGiai 
         {!coGi && <div className="lg-chu">Thầy chưa nhập lời giải cho câu này.</div>}
         {lg?.chot && (
           <div className="loi-giai-chot">
+            <div className="loi-giai-nhan-nho">Kiến thức cốt lõi</div>
             <ChemText text={lg.chot} />
           </div>
         )}

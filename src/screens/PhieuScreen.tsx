@@ -125,7 +125,8 @@ const CSS = `
 .bc-pa.chon{border-color:var(--p-do)}
 .bc-co{font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px;margin-left:6px;white-space:nowrap}
 .bc-giai{margin-top:11px;border-left:3px solid var(--p-tim);padding:2px 0 2px 12px}
-.bc-giai-chot{font-family:var(--serif);font-size:14px;font-weight:700;line-height:1.55}
+.bc-giai-chot{font-family:var(--serif);font-size:14px;font-weight:800;line-height:1.55}
+.bc-giai-nhan{display:block;font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--p-nhat);margin-bottom:2px}
 .bc-giai-y{font-size:13px;margin-top:7px;line-height:1.6;color:var(--p-muc)}
 .bc-buoc{font-size:13px;margin-top:5px;padding-left:16px;position:relative;line-height:1.6}
 .bc-buoc::before{content:'';position:absolute;left:3px;top:9px;width:5px;height:5px;border-radius:50%;background:var(--p-tim)}
@@ -606,6 +607,7 @@ function TheCauSai({ c, stt }: { c: CauSaiChiTiet; stt: number }) {
               <div className="bc-giai">
                 {c.chot && (
                   <div className="bc-giai-chot">
+                    <span className="bc-giai-nhan">Kiến thức cốt lõi</span>
                     <ChemText text={c.chot} />
                   </div>
                 )}

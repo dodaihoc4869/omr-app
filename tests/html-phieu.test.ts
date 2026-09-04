@@ -154,9 +154,11 @@ describe('oGiaiHtml — lời giải gộp một chỗ', () => {
     expect(h).toContain('sol-dap">Đáp án: <b>B</b>')
   })
 
-  it('gộp ĐỦ hướng làm, các bước và kết quả — không còn mục lời giải riêng ở cuối', () => {
+  it('gộp ĐỦ kiến thức cốt lõi, các bước và kết quả — không còn mục lời giải riêng ở cuối', () => {
     const h = oGiaiHtml(C({ dapAn: 'A', chot: 'x', buoc: ['b1'], ketQua: 'k' }))
-    expect(h).toContain('Hướng làm')
+    expect(h).toContain('Kiến thức cốt lõi')
+    // Cốt lõi in đậm và đứng TRƯỚC các bước (thầy chốt 04-09 khuya).
+    expect(h.indexOf('sol-cot-loi')).toBeLessThan(h.indexOf('Làm từng bước'))
     expect(h).toContain('Làm từng bước')
     expect(h).toContain('Kết quả')
   })
@@ -166,8 +168,14 @@ describe('oGiaiHtml — lời giải gộp một chỗ', () => {
       { khoa: 'A', dung: false, ly: 'sai vì x' },
       { khoa: 'B', dung: true, ly: 'đúng vì y' },
     ] }))
-    expect(h).toContain('<strong>A.</strong> sai vì x')
+    expect(h).toContain('<strong>A.</strong> ✗ sai vì x')
     expect(h).toContain('<strong>B.</strong> ✓ đúng vì y')
+    expect(h).toContain('Vì sao chọn / không chọn từng phương án')
+  })
+
+  it('kiến thức cốt lõi đứng TRÊN phần vì sao từng phương án', () => {
+    const h = oGiaiHtml(C({ dapAn: 'B', chot: 'COT-LOI', lyDo: [{ khoa: 'B', dung: true, ly: 'đúng vì y' }] }))
+    expect(h.indexOf('COT-LOI')).toBeLessThan(h.indexOf('Vì sao chọn'))
   })
 
   it('Phần II đổi DSSD thành Đ S S Đ và đánh ✓ đúng ý', () => {
@@ -180,7 +188,7 @@ describe('oGiaiHtml — lời giải gộp một chỗ', () => {
     const h = oGiaiHtml(c)
     expect(h).toContain('Đ S S Đ')
     expect(h).toContain('<strong>a.</strong> ✓ la')
-    expect(h).toContain('<strong>b.</strong> lb')
+    expect(h).toContain('<strong>b.</strong> ✗ lb')
     expect(h).toContain('Vì sao từng ý')
   })
 })

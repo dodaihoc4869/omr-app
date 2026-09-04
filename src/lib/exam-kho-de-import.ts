@@ -31,8 +31,8 @@ export interface KhoDeLoiGiai {
   ghi_chu?: string | null
 }
 
-const GIOI_HAN_TU_CHOT = 20
-const GIOI_HAN_TU_VI_SAO = 25
+const GIOI_HAN_TU_CHOT = 45
+const GIOI_HAN_TU_VI_SAO = 35
 const demTu = (t: string) => t.trim().split(/\s+/).filter(Boolean).length
 
 /** Kiểm tra QUY TẮC VIẾT lời giải có cấu trúc — trả về cảnh báo (không chặn):

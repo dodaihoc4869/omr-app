@@ -456,6 +456,10 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
 .sol-dap b { font-size: 16px; font-weight: 800; color: var(--kem-muc); letter-spacing: .04em; }
 .sol-text { font-size: 14.5px; line-height: 1.65; color: var(--kem-muc); overflow-wrap: break-word; }
 .sol-text strong { color: #5b2a06; }
+.sol-cot-loi { font-weight: 800; font-size: 15px; line-height: 1.6; color: #3b1d05; }
+.sol-pa { padding: 3px 0; }
+.sol-pa + .sol-pa { border-top: 1px dashed rgba(91,42,6,.18); }
+.sol-pa.chon { font-weight: 600; }
 .sol-step { font-size: 14.5px; line-height: 1.65; color: var(--kem-muc); padding-left: 18px; text-indent: -18px; }
 .sol-ket { font-size: 15px; font-weight: 800; color: var(--kem-muc); }
 /* Ảnh lời giải gốc chụp từ đề của tác giả. Nền trắng vì ảnh cắt ra là giấy
@@ -636,15 +640,18 @@ export function oGiaiHtml(c: CauLuyen): string {
 
   const dungKhoa = c.phan === 'II' ? CHU_Y.filter((_, i) => ysDung(c.dapAn)[i]) : [(c.dapAn || '').trim().toUpperCase()]
   let coGiai = false
-  if (c.lyDo && c.lyDo.length > 0) {
-    const dong = c.lyDo
-      .map((l) => `<strong>${thoat(l.khoa)}.</strong> ${dungKhoa.includes(l.khoa) ? '✓ ' : ''}${chuHtml(l.ly)}`)
-      .join('<br>')
-    khoi.push(`<div class="sol-label">${c.phan === 'II' ? 'Vì sao từng ý' : 'Vì sao từng phương án'}</div><div class="sol-text">${dong}</div>`)
+  // KIẾN THỨC CỐT LÕI in đậm TRÊN CÙNG (thầy chốt 04-09 khuya: "kiến thức cốt lõi
+  // bôi đậm trên cùng để giải câu đó"), rồi mới tới vì sao chọn / không chọn
+  // từng phương án.
+  if (c.chot) {
+    khoi.push(`<div class="sol-label">Kiến thức cốt lõi</div><div class="sol-text sol-cot-loi">${chuHtml(c.chot)}</div>`)
     coGiai = true
   }
-  if (c.chot) {
-    khoi.push(`<div class="sol-label">Hướng làm</div><div class="sol-text">${chuHtml(c.chot)}</div>`)
+  if (c.lyDo && c.lyDo.length > 0) {
+    const dong = c.lyDo
+      .map((l) => `<div class="sol-pa${dungKhoa.includes(l.khoa) ? ' chon' : ''}"><strong>${thoat(l.khoa)}.</strong> ${dungKhoa.includes(l.khoa) ? '✓ ' : '✗ '}${chuHtml(l.ly)}</div>`)
+      .join('')
+    khoi.push(`<div class="sol-label">${c.phan === 'II' ? 'Vì sao từng ý đúng / sai' : 'Vì sao chọn / không chọn từng phương án'}</div><div class="sol-text">${dong}</div>`)
     coGiai = true
   }
   const buoc = c.buoc ?? []

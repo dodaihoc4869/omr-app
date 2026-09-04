@@ -130,10 +130,21 @@ body {
   margin-bottom: var(--k3);
 }
 .loi-giai-chot {
-  font: 700 var(--cx-3) / 1.6 var(--serif);
+  font: 800 var(--cx-3) / 1.6 var(--serif);
   font-style: normal; /* BỎ nghiêng — nghiêng khó đọc */
   color: var(--muc);
   margin-bottom: var(--k4);
+  padding: var(--k2) var(--k3);
+  border-left: 3px solid var(--cam);
+  background: var(--the-2);
+  border-radius: 0 var(--bo-1) var(--bo-1) 0;
+}
+.loi-giai-nhan-nho {
+  font: 700 var(--cx-1) / 1 var(--sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cam);
+  margin-bottom: var(--k1);
 }
 .lg-y {
   display: flex;
