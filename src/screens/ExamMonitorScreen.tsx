@@ -6,11 +6,13 @@
 // xám chờ thi lại · tím đang làm · cam rời màn N lần · đỏ bị khoá · xanh đã nộp.
 // Xoá ca = xoá mềm, phải gõ đúng mã ca.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Copy, Check, RefreshCw, Trash2, ArrowLeft, ChevronRight } from 'lucide-react'
+import { Copy, Check, RefreshCw, Trash2, ArrowLeft, ChevronRight, Images } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
 import { chiTietCa, duyetThiLai, ghiDiem, moKhoa, sendTeacherMessage, xoaCa, type ChiTietCa, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
-import { taoBaiGhiDiem } from '../lib/chi-tiet-cau'
+import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
+import { goiPhieuCaZip, tenTepZipCa, chuyenDeTuChiTiet, type EmTrongCaDeXuatPhieu } from '../lib/phieu-hang-loat'
+import { viecCanLamMacDinh } from '../lib/phieu-zalo'
 import { loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
@@ -103,6 +105,9 @@ export default function ExamMonitorScreen() {
   const [tinBao, setTinBao] = useState<{ sbd: string; noiDung: string } | null>(null)
   const [dangGuiBao, setDangGuiBao] = useState(false)
   const [dangXoa, setDangXoa] = useState(false)
+  // Tải phiếu cả ca: dựng ảnh cho từng em rồi gói .zip, chạy hoàn toàn tại máy
+  // thầy nên không phụ thuộc mạng.
+  const [dangGoiPhieu, setDangGoiPhieu] = useState('')
   // Đã ghi điểm lên Sheet cho lượt nào (khoá `${sbd}:${lanThu}:${nopLuc}`) — không ghi lặp mỗi lần tải lại.
   const daGhiRef = useRef<Set<string>>(new Set())
 
@@ -318,6 +323,70 @@ export default function ExamMonitorScreen() {
     const rows: StudentRow[] = daCham.map((e, i) => ({ stt: i + 1, sbd: e.sbd, hoTen: e.hoTen, lop: e.lop || chiTiet?.ca.lop || '', madeThi: chiTiet?.ca.maCa ?? '', sdtPhuHuynh: e.sdt, score: e.graded!.score as ScoreResult }))
     downloadBangDiem(rows, `BangDiem_kiemtra_${chiTiet?.ca.maCa}.xlsx`)
   }
+  /** TẢI PHIẾU HÀNG LOẠT — mỗi em đã chấm một ảnh, gói chung một .zip.
+   *
+   * Hạng lớp tính TẠI ĐÂY từ chính bảng điểm của ca (xếp giảm dần, đồng điểm
+   * đồng hạng) chứ không gọi máy chủ — cùng một con số mà lấy hai nguồn thì sớm
+   * muộn cũng lệch. Dòng "việc cần làm" dùng bản mặc định theo chuyên đề em sai
+   * nhiều nhất; em nào cần lời riêng thì thầy mở hồ sơ em đó sửa rồi tải lại. */
+  const handleTaiPhieuHangLoat = async () => {
+    if (!chiTiet || daCham.length === 0) return
+    const bank = teacherBank
+    if (!bank || bank.length === 0) return showToast('Máy này chưa có bản đề CÓ đáp án của ca — không dựng được phiếu', 'error')
+    setDangGoiPhieu('0/' + daCham.length)
+    try {
+      const keyBank = mergeKeepAnswers(bank)
+      const xep = [...daCham].sort((a, b) => (b.diem ?? 0) - (a.diem ?? 0))
+      const hangCua = new Map<string, number>()
+      xep.forEach((e, i) => {
+        const truoc = i > 0 ? xep[i - 1] : null
+        hangCua.set(e.sbd, truoc && truoc.diem === e.diem ? hangCua.get(truoc.sbd)! : i + 1)
+      })
+
+      const ds: EmTrongCaDeXuatPhieu[] = daCham.map((e) => {
+        const rows = taoChiTietCau(keyBank, chiTiet.ca.maCa, e.sbd, e.moiNhat.dapAn!, e.moiNhat.giayCau)
+        const sc = e.graded!.score
+        const cd = chuyenDeTuChiTiet(rows).filter((c) => c.soSai > 0)
+        return {
+          sbd: e.sbd,
+          hoTen: e.hoTen,
+          lop: e.lop || chiTiet.ca.lop || '',
+          diem: sc.total,
+          xepLoai: classify(sc.total),
+          diemPhan: { I: sc.phanIScore, II: sc.phanIIScore, III: sc.phanIIIScore },
+          toiDaPhan: { I: keyBank.phanI.length * 0.25, II: keyBank.phanII.length, III: keyBank.phanIII.length * 0.25 },
+          chiTietCau: rows,
+          hang: hangCua.get(e.sbd) ?? null,
+          siSo: daCham.length,
+          nopLuc: e.moiNhat.nopLuc || new Date().toISOString(),
+          vieCanLam: viecCanLamMacDinh({
+            hoTen: e.hoTen,
+            ngay: e.moiNhat.nopLuc,
+            diem: sc.total,
+            xepLoai: classify(sc.total),
+            soCauSai: rows.filter((r) => r.dungSai === false).length,
+            chuyenDeSai: cd[0] ? { ten: cd[0].ten, soSai: cd[0].soSai } : null,
+            baiTapDaGiao: null,
+          }),
+        }
+      })
+
+      const zip = await goiPhieuCaZip(ds, chiTiet.ca.tenCa || `Ca ${chiTiet.ca.maCa}`, (da, tong) => setDangGoiPhieu(`${da}/${tong}`))
+      const ten = tenTepZipCa(chiTiet.ca.tenCa, chiTiet.ca.maCa)
+      const u = URL.createObjectURL(zip)
+      const a = document.createElement('a')
+      a.href = u
+      a.download = ten
+      a.click()
+      setTimeout(() => URL.revokeObjectURL(u), 6000)
+      showToast(`Đã tải ${ten} — ${ds.length} phiếu`, 'success')
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Không tạo được phiếu hàng loạt', 'error')
+    } finally {
+      setDangGoiPhieu('')
+    }
+  }
+
   const handleExportJson = () => {
     const entries = daCham.map((e) => buildStudentEntry(e.hoTen, e.lop || chiTiet?.ca.lop || '', e.sdt, e.graded!.studentAnswers as StudentAnswers, e.graded!.key as AnswerKey))
     downloadDuLieuJson(entries, `dulieu_kiemtra_${chiTiet?.ca.maCa}.json`)
@@ -561,11 +630,21 @@ export default function ExamMonitorScreen() {
 
           {/* XUẤT */}
           {daCham.length > 0 && (
-            <div className="flex" style={{ gap: 'var(--k2)' }}>
-              <NutChinh onClick={handleExportXlsx}>Xuất BangDiem.xlsx ({daCham.length})</NutChinh>
-              <NutChinh variant="phu" onClick={handleExportJson}>
-                Xuất dulieu.json
+            <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+              {/* Tải phiếu cả ca: một ảnh một em, gói .zip. Thầy giải nén ra là
+                  gửi thẳng Zalo từng phụ huynh được. */}
+              <NutChinh onClick={() => void handleTaiPhieuHangLoat()} disabled={!!dangGoiPhieu}>
+                <span className="inline-flex items-center" style={{ gap: 6 }}>
+                  <Images size={18} />
+                  {dangGoiPhieu ? `Đang dựng phiếu… ${dangGoiPhieu}` : `Tải phiếu cả ca (${daCham.length} ảnh .zip)`}
+                </span>
               </NutChinh>
+              <div className="flex" style={{ gap: 'var(--k2)' }}>
+                <NutChinh variant="phu" onClick={handleExportXlsx}>Xuất BangDiem.xlsx ({daCham.length})</NutChinh>
+                <NutChinh variant="phu" onClick={handleExportJson}>
+                  Xuất dulieu.json
+                </NutChinh>
+              </div>
             </div>
           )}
 

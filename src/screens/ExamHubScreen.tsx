@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { ClipboardList, GraduationCap, Library, Smartphone } from 'lucide-react'
+import { ClipboardList, GraduationCap, Library, Smartphone, Presentation } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { PHIEN_BAN_APP } from '../lib/cap-nhat-app'
 import { OThongBao, NutChinh } from '../components/DesignSystem'
@@ -129,6 +129,7 @@ export default function ExamHubScreen() {
       />
       <TheBam icon={<Library size={22} />} title="Ngân hàng câu hỏi" sub="Đề tự về từ kho · duyệt câu nghi đáp án" onClick={() => setScreen('nganhangde')} />
       <TheBam icon={<ClipboardList size={22} />} title="Ca thi" sub="Mọi ca đã mở, ai đã nộp, điểm, cho thi lại, xuất bảng điểm · tích chọn xoá nhiều ca" onClick={() => setScreen('lichsuca')} />
+      <TheBam icon={<Presentation size={22} />} title="Gọi lên bảng" sub="Tích em, máy chọn câu đúng chuyên đề em yếu nhất trong ca gần nhất" onClick={() => setScreen('goilenbang')} />
       {/* Giao bài tập vẫn nằm trong hồ sơ từng em — vào bằng tab HỌC SINH ở
           thanh dưới, chạm một em. Bỏ thẻ lối tắt ở đây theo yêu cầu của thầy;
           tính năng KHÔNG bị gỡ.

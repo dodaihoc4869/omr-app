@@ -14,6 +14,7 @@ import ExamMonitorScreen from './screens/ExamMonitorScreen'
 import LichSuCaScreen from './screens/LichSuCaScreen'
 import HocSinhScreen from './screens/HocSinhScreen'
 import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
+import GoiLenBangScreen from './screens/GoiLenBangScreen'
 import ChanLoi from './components/ChanLoi'
 
 // APP GIÁO VIÊN. Màn đăng ký, hồ sơ, lịch sử, bài tập và nhắn tin PHÍA HỌC SINH
@@ -33,6 +34,7 @@ const TEN_MAN: Record<string, string> = {
   exammonitor: 'Theo dõi ca',
   lichsuca: 'Ca thi',
   hocsinh: 'Học sinh',
+  goilenbang: 'Gọi lên bảng',
 }
 
 const HIDE_FAB_ON: string[] = ['examtake', 'nganhangde']
@@ -79,6 +81,7 @@ function App() {
         {screen === 'exammonitor' && <ExamMonitorScreen />}
         {screen === 'lichsuca' && <LichSuCaScreen />}
         {screen === 'hocsinh' && <HocSinhScreen />}
+        {screen === 'goilenbang' && <GoiLenBangScreen />}
       </ChanLoi>
       {!HIDE_FAB_ON.includes(screen) && <MessagesFab />}
       {!HIDE_BOTTOMNAV_ON.includes(screen) && <BottomNav />}
