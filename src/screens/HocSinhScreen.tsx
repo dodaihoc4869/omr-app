@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, RefreshCw, Search, Trash2 } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung, DauThe } from '../components/DesignSystem'
 import { KhoiChuyenDe, KhoiLichSuCa, toneXepLoai } from '../components/HoSoEmView'
+import NutBaiTapPdf from '../components/NutBaiTapPdf'
 import { danhSachEm, deleteStudentRegistration, hoSoEm, khoiTuNamSinh, type EmTomTat, type HoSoEm } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { classify } from '../engine/score'
@@ -165,6 +166,9 @@ export default function HocSinhScreen() {
             </NutChinh>
 
             <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />
+            <TheNoiDung>
+              <NutBaiTapPdf sbd={hoSo.em.sbd} hoTen={hoSo.em.hoTen} lop={hoSo.em.lop} chuyenDe={hoSo.chuyenDe} showToast={showToast} />
+            </TheNoiDung>
 
             <KhoiLichSuCa ca={hoSo.ca} />
 

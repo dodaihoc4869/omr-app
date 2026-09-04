@@ -18,6 +18,7 @@ import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { soanTinRoiMan } from '../lib/phieu-zalo'
 import { KhoiChuyenDe, KhoiLichSuCa } from '../components/HoSoEmView'
+import NutBaiTapPdf from '../components/NutBaiTapPdf'
 import PhieuZaloEm from '../components/PhieuZaloEm'
 import { hoSoEm, type HoSoEm } from '../lib/exam-api'
 import { buildStudentEntry, downloadDuLieuJson } from '../lib/json-export'
@@ -472,6 +473,9 @@ export default function ExamMonitorScreen() {
             />
 
             <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />
+            <TheNoiDung>
+              <NutBaiTapPdf sbd={hoSo.em.sbd} hoTen={hoSo.em.hoTen} lop={hoSo.em.lop} chuyenDe={hoSo.chuyenDe} showToast={showToast} />
+            </TheNoiDung>
             <KhoiLichSuCa ca={hoSo.ca} />
           </>
         )}
