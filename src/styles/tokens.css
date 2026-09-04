@@ -96,6 +96,9 @@
   --p-tim: #6366f1;
   --p-tim-2: #8b5cf6;
   --p-trang: #ffffff;
+  /* bóng của thẻ điểm trong phiếu HTML (screens/PhieuScreen.tsx) — đặt ở đây
+   * để mã màu vẫn nằm đúng một chỗ, kể cả màu trong rgba(). */
+  --p-bong: 0 18px 44px -18px rgba(26, 35, 50, 0.34), 0 2px 6px rgba(26, 35, 50, 0.06);
 }
 
 /* NỀN TỐI — MANCUAVAOVANENTOI.md mục 1. Giữ nguyên tên biến, chỉ đổi giá trị;

@@ -99,7 +99,9 @@ describe('Ảnh phiếu', () => {
 
   it('ảnh và tin nhắn dùng CHUNG một dòng việc cần làm', () => {
     expect(maPhieu).toContain('vieCanLam: viec.trim() || viecCanLamMacDinh(duPhieu)')
-    expect(maPhieu).toContain('soanPhieuZalo(duPhieu, viec.trim() || undefined)')
+    // Tham số thứ ba là link phiếu HTML (04-09) — dòng việc cần làm vẫn là
+    // tham số thứ hai và vẫn dùng chung với ảnh.
+    expect(maPhieu).toContain('soanPhieuZalo(duPhieu, viec.trim() || undefined, link)')
   })
 
   it('chạm vào ảnh là gửi/tải luôn, không bắt đi tìm nút khác', () => {

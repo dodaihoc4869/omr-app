@@ -26,6 +26,10 @@
         if (m) return location.replace(m[1] + '?examCode=' + m[2])
         var g = p.match(/^(.*?\/)gv\/?$/)
         if (g) return location.replace(g[1] + '?vai=gv')
+        // PHIẾU KẾT QUẢ: /p#<dữ liệu>. Phải bê nguyên location.hash sang, cả
+        // phiếu nằm trong đó; bỏ hash là phụ huynh mở ra trang trống.
+        var ph = p.match(/^(.*?\/)p\/?$/)
+        if (ph) return location.replace(ph[1] + '?vai=phieu' + location.hash)
         var c = p.match(/^(.*?\/)(hs|ph)\/[0-9a-zA-Z]{8,}\/?$/)
         if (c) return location.replace(c[1] + '?vai=' + c[2])
       })()

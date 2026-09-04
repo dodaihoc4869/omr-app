@@ -7,12 +7,17 @@
 //   3. chạm vào ảnh phiếu → chia sẻ thẳng sang Zalo, hoặc tải về.
 //
 // Dòng "việc cần làm" đi vào CẢ tin nhắn lẫn ảnh — sửa một lần, hai thứ khớp nhau.
+//
+// ĐỔI 04-09: thứ gửi qua Zalo là TIN NHẮN CHỮ KÈM LINK PHIẾU, không gửi ảnh
+// nữa. Ảnh vẫn dựng ở đây để thầy xem và tải khi cần (in ra, lưu hồ sơ), nhưng
+// không nằm trong luồng gửi.
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ClipboardCopy, Check, Download, Share2 } from 'lucide-react'
 import { TheNoiDung, OThongBao, NutChinh } from './DesignSystem'
 import { classify } from '../engine/score'
 import { soanPhieuZalo, viecCanLamMacDinh, demChu, NHAC_TRUOC_KHI_GUI, NHAN_KHOI, type DuLieuPhieu } from '../lib/phieu-zalo'
 import { veAnhPhieu, tenTepPhieu, type DuLieuAnhPhieu } from '../lib/anh-phieu'
+import { taoLinkPhieu } from '../lib/phieu-link'
 import type { HoSoEm } from '../lib/exam-api'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -70,7 +75,8 @@ export default function PhieuZaloEm({
     setViec(duPhieu ? viecCanLamMacDinh(duPhieu) : '')
   }, [duPhieu])
 
-  const tin = duPhieu ? soanPhieuZalo(duPhieu, viec.trim() || undefined) : ''
+  const [link, setLink] = useState('')
+  const tin = duPhieu ? soanPhieuZalo(duPhieu, viec.trim() || undefined, link) : ''
 
   const duAnh: DuLieuAnhPhieu | null = useMemo(() => {
     if (!ca || ca.tong === null || !duPhieu) return null
@@ -93,6 +99,43 @@ export default function PhieuZaloEm({
       vieCanLam: viec.trim() || viecCanLamMacDinh(duPhieu),
     }
   }, [ca, chuyenDeCa, duPhieu, hoSo, viec])
+
+  // LINK PHIẾU: dựng lại mỗi khi số liệu hoặc dòng "việc cần làm" đổi, vì cả
+  // phiếu nằm trong chính link (không có máy chủ nào giữ hộ). Nén là việc bất
+  // đồng bộ nên phải qua state; hỏng thì link rỗng và tin nhắn vẫn gửi được,
+  // chỉ mất khối XEM PHIẾU.
+  useEffect(() => {
+    let con = true
+    if (!duAnh) {
+      setLink('')
+      return
+    }
+    const goc = `${location.origin}${import.meta.env.BASE_URL}`
+    void taoLinkPhieu(goc, {
+      hoTen: duAnh.hoTen,
+      sbd: duAnh.sbd,
+      lop: duAnh.lop ?? '',
+      tenCa: duAnh.tenCa ?? '',
+      ngay: duAnh.ngay,
+      diem: duAnh.diem,
+      diemPhan: duAnh.diemPhan ?? null,
+      soCauSai: duAnh.soCauSai,
+      tongSoCau: duAnh.tongSoCau ?? null,
+      hang: duAnh.hang ?? null,
+      siSo: duAnh.siSo ?? null,
+      chuyenDe: duAnh.chuyenDe,
+      vieCanLam: duAnh.vieCanLam,
+    })
+      .then((l) => {
+        if (con) setLink(l)
+      })
+      .catch(() => {
+        if (con) setLink('')
+      })
+    return () => {
+      con = false
+    }
+  }, [duAnh])
 
   // Vẽ lại ảnh mỗi khi số liệu hoặc dòng "việc cần làm" đổi. Vẽ vào DOM luôn để
   // thầy thấy đúng thứ sẽ tải về, không phải tải rồi mới biết nó ra sao.
@@ -243,13 +286,14 @@ export default function PhieuZaloEm({
           </button>
         </div>
 
-        {/* ẢNH PHIẾU — chạm vào ảnh là lưu/chia sẻ luôn, không phải đi tìm nút */}
-        <div style={NHAN_NHO}>Ảnh phiếu — chạm vào ảnh để gửi hoặc tải về</div>
+        {/* ẢNH PHIẾU — KHÔNG còn nằm trong luồng gửi Zalo (link đã thay chỗ đó).
+            Giữ lại để thầy in ra hoặc lưu hồ sơ khi cần. */}
+        <div style={NHAN_NHO}>Ảnh phiếu — không gửi Zalo nữa, chạm để tải về khi thầy cần in hoặc lưu</div>
         <button
           type="button"
           onClick={() => void luuAnh()}
           disabled={dangTai}
-          aria-label="Chạm để gửi hoặc tải ảnh phiếu"
+          aria-label="Chạm để tải ảnh phiếu về máy"
           style={{ display: 'block', width: '100%', padding: 0, border: 'none', background: 'transparent', borderRadius: 'var(--bo-2)', boxShadow: 'var(--bong-2)', cursor: 'pointer', opacity: dangTai ? 0.6 : 1 }}
         >
           <div ref={khungAnh} />
@@ -257,7 +301,7 @@ export default function PhieuZaloEm({
         <NutChinh variant="phu" onClick={() => void luuAnh()} disabled={dangTai}>
           <span className="inline-flex items-center" style={{ gap: 6 }}>
             {typeof navigator !== 'undefined' && 'share' in navigator ? <Share2 size={18} /> : <Download size={18} />}
-            {dangTai ? 'Đang lưu ảnh…' : 'Gửi / tải ảnh phiếu'}
+            {dangTai ? 'Đang lưu ảnh…' : 'Tải ảnh phiếu về máy'}
           </span>
         </NutChinh>
       </div>

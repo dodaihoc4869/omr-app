@@ -4,16 +4,19 @@
 // repo riêng (TACHAPPHSPH.md phần 1), nên ở đây không còn `/hs/<token>`,
 // `/ph/<token>`, `?vai=hs`, `?vai=ph`, cũng không còn màn nào của hai vai đó.
 //
-// Còn đúng hai đường:
+// Còn đúng ba đường:
 //   /gv          → app giáo viên (mọi lệnh vẫn đòi MÃ BÍ MẬT ở Apps Script)
 //   /t/<mã ca>   → màn LÀM BÀI, giữ lại để lớp vẫn thi và làm bài tập được
 //                  trong lúc app học sinh mới chưa xong. Khi hs-app chạy thật
 //                  thì gỡ nốt màn này khỏi đây.
+//   /p#<dữ liệu> → PHIẾU KẾT QUẢ gửi phụ huynh. Dữ liệu nằm sau dấu `#` nên
+//                  không bao giờ rời máy phụ huynh (xem lib/phieu-link.ts).
+//                  Chỉ đọc, không có mã bí mật, không gọi máy chủ.
 //
 // `public/404.html` đổi hai đường trên thành `?vai=gv` / `?examCode=…` khi máy
 // chưa cài service worker; `chuanHoaDuongDan()` làm đúng việc đó ở trong app,
 // nên máy đã cài app (service worker nuốt mất 404.html) vẫn chạy đúng.
-export type VaiTro = 'gv'
+export type VaiTro = 'gv' | 'phieu'
 
 export interface DuongVao {
   vai: VaiTro | null
@@ -21,6 +24,7 @@ export interface DuongVao {
 }
 
 const RE_GV_TREN_DUONG = /(?:^|\/)gv\/?$/
+const RE_PHIEU_TREN_DUONG = /(?:^|\/)p\/?$/
 const RE_CA_TREN_DUONG = /(?:^|\/)t\/(\d{4,8})\/?$/
 const RE_APP_CU = /(?:^|\/)(?:hs|ph)\/[0-9a-zA-Z]{8,}\/?$/
 
@@ -44,6 +48,7 @@ export function laLinkAppCu(search: string, duongDan = ''): boolean {
  * được cả khi mất mạng. */
 export function docVaiTuDuongDan(duongDan: string): DuongVao {
   if (RE_GV_TREN_DUONG.test(duongDan)) return { vai: 'gv', maCa: '' }
+  if (RE_PHIEU_TREN_DUONG.test(duongDan)) return { vai: 'phieu', maCa: '' }
   const c = duongDan.match(RE_CA_TREN_DUONG)
   if (c) return { vai: null, maCa: c[1] }
   return { vai: null, maCa: '' }
@@ -63,7 +68,9 @@ export function chuanHoaDuongDan(goc = '/'): void {
     const q = new URLSearchParams(location.search)
     if (d.vai && !q.get('vai')) q.set('vai', d.vai)
     if (d.maCa && !q.get('examCode')) q.set('examCode', d.maCa)
-    history.replaceState(null, '', goc + `?${q.toString()}`)
+    // GIỮ NGUYÊN PHẦN SAU DẤU `#`. Cả dữ liệu phiếu nằm ở đó — viết lại URL mà
+    // bỏ hash là phụ huynh mở link ra thấy phiếu trống.
+    history.replaceState(null, '', goc + `?${q.toString()}` + location.hash)
   } catch {
     // trình duyệt cũ không có history.replaceState — app vẫn đọc được vai từ
     // đường dẫn qua docDuongVao(search, pathname)
@@ -74,7 +81,9 @@ export function chuanHoaDuongDan(goc = '/'): void {
 export function docDuongVao(search: string, duongDan = ''): DuongVao {
   const q = new URLSearchParams(search)
   const maCa = (q.get('examCode') || '').trim()
-  if ((q.get('vai') || '').trim() === 'gv') return { vai: 'gv', maCa }
+  const vaiQ = (q.get('vai') || '').trim()
+  if (vaiQ === 'gv') return { vai: 'gv', maCa }
+  if (vaiQ === 'phieu') return { vai: 'phieu', maCa: '' }
 
   const tuDuong = duongDan ? docVaiTuDuongDan(duongDan) : null
   if (tuDuong && (tuDuong.vai || tuDuong.maCa)) {

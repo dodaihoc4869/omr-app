@@ -42,8 +42,16 @@ export function demChu(s: string): number {
  * lẫn nhóm phụ huynh, mở Zalo thấy ngay ai gửi thì khỏi phải đoán. */
 export const NGUOI_GUI = 'Thầy Đỗ Đại Học'
 
-/** Soạn phiếu kết quả để thầy dán vào Zalo. */
-export function soanPhieuZalo(d: DuLieuPhieu, vieCanLam?: string): string {
+/** Nhãn khối chứa link xem phiếu đầy đủ. */
+export const NHAN_XEM_PHIEU = 'XEM PHIẾU:'
+
+/** Soạn phiếu kết quả để thầy dán vào Zalo.
+ *
+ * `link` là link phiếu HTML (lib/phieu-link.ts). Có link thì thêm một khối cuối
+ * để phụ huynh bấm xem bản đầy đủ có biểu đồ. Tin nhắn chữ vẫn phải **tự đủ ý**
+ * khi không bấm link: phụ huynh mở Zalo trên máy cũ, hoặc chỉ liếc qua thông
+ * báo, thì đã thấy đủ điểm và việc cần làm. */
+export function soanPhieuZalo(d: DuLieuPhieu, vieCanLam?: string, link?: string): string {
   const ngay = ngayVN(d.ngay)
   const khoi: string[] = []
 
@@ -71,13 +79,17 @@ export function soanPhieuZalo(d: DuLieuPhieu, vieCanLam?: string): string {
 
   khoi.push(`VIỆC CẦN LÀM: ${vieCanLam ?? viecCanLamMacDinh(d)}`)
 
+  // Link để cuối: Zalo hiện link dài thành một khối xanh, để giữa thì cắt đôi
+  // tin nhắn. Không thêm câu mời "anh/chị bấm vào đây" — nhãn đã nói rõ việc.
+  if (link && link.trim()) khoi.push(`${NHAN_XEM_PHIEU} ${link.trim()}`)
+
   // Dòng trống giữa các khối: đọc trên điện thoại mới tách bạch được từng phần.
   return khoi.join('\n\n')
 }
 
 /** Nhãn khối để màn hình tô đậm khi xem trước. Zalo nhận CHỮ THƯỜNG, đây chỉ
  * là chuyện hiển thị trong app. */
-export const NHAN_KHOI = ['ĐIỂM:', 'CHỖ MẤT ĐIỂM:', 'VIỆC CẦN LÀM:']
+export const NHAN_KHOI = ['ĐIỂM:', 'CHỖ MẤT ĐIỂM:', 'VIỆC CẦN LÀM:', NHAN_XEM_PHIEU]
 
 /** VIỆC CẦN LÀM — phần 3 và 4 của bộ quy tắc viết (việc em phải làm + mốc thầy
  * kiểm tra lại). Tách riêng vì ẢNH PHIẾU và TIN NHẮN phải nói cùng một việc:
