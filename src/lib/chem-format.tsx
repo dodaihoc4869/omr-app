@@ -151,10 +151,17 @@ const KATEX_OPTS = { throwOnError: true, strict: false, displayMode: false } as 
 /** 1 công thức "\ce{...}" hoặc "$...$" render bằng KaTeX. Lỗi cú pháp -> hiện
  * nguyên văn chuỗi gốc kèm gạch chân đỏ cảnh báo, KHÔNG BAO GIỜ để trắng hay
  * làm sập trang. */
-/** Công thức dài hơn ngần này thì gần như chắc chắn rộng hơn màn điện thoại.
- * Phương trình ester hoá isoamyl acetate (thầy chụp 04-09) dài 96 ký tự và bị
- * cắt cụt mất vế phải. */
-const DAI_PHAI_CUON = 42
+/** Công thức dài hơn ngần này thì tách thành khối riêng cuộn ngang được.
+ *
+ * Ngưỡng đặt theo phương trình NGẮN NHẤT đã thấy bị cắt trên máy thầy:
+ * `HCOOCH3 + NaOH -> HCOONa + CH3OH` (32 ký tự) tràn khỏi ô lời giải ở màn
+ * Gọi lên bảng. Bản đầu để 42 nên đúng câu đó vẫn lọt lưới. Để 26 thì mọi
+ * phương trình phản ứng đều thành khối riêng, còn công thức một chất
+ * (`CH3COOC2H5` — 10 ký tự) vẫn nằm trong dòng chữ như cũ.
+ *
+ * Thà xuống dòng thừa còn hơn cắt cụt: chữ tràn ra ngoài thì em MẤT HẲN vế
+ * phải mà không biết là mình đang thiếu. */
+const DAI_PHAI_CUON = 26
 
 function ChemFormula({ t, latex }: { t: 'ce' | 'math'; latex: string }): JSX.Element {
   try {
