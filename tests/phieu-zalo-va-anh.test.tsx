@@ -126,7 +126,8 @@ describe('Chi tiết ca — chạm tên em', () => {
   it('hồ sơ trong Chi tiết ca có đủ mạnh–yếu, lịch sử ca và khối gửi phụ huynh', () => {
     expect(maChiTietCa).toContain('<KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />')
     expect(maChiTietCa).toContain('<KhoiLichSuCa ca={hoSo.ca} />')
-    expect(maChiTietCa).toContain('<PhieuZaloEm hoSo={hoSo}')
+    expect(maChiTietCa).toContain('<PhieuZaloEm')
+    expect(maChiTietCa).toContain('hoSo={hoSo}')
   })
 
   it('phiếu soạn theo ĐÚNG ca đang mở, không phải ca mới nhất của em', () => {

@@ -18,6 +18,10 @@ import { classify } from '../engine/score'
 import { soanPhieuZalo, viecCanLamMacDinh, demChu, NHAC_TRUOC_KHI_GUI, NHAN_KHOI, type DuLieuPhieu } from '../lib/phieu-zalo'
 import { veAnhPhieu, tenTepPhieu, type DuLieuAnhPhieu } from '../lib/anh-phieu'
 import { taoLinkPhieu } from '../lib/phieu-link'
+import { dungPhieu } from '../lib/phieu-du-lieu'
+import { luuPhieu, sinhMaPhieu, xoaPhieu, type ChiTietCauRow } from '../lib/exam-api'
+import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
+import type { TeacherExamSource } from '../data/examContent'
 import type { HoSoEm } from '../lib/exam-api'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -37,11 +41,24 @@ export default function PhieuZaloEm({
   hoSo,
   maCa,
   showToast,
+  rows,
+  banks,
+  diemLop,
+  thoiLuongPhut,
+  vaoLuc,
 }: {
   hoSo: HoSoEm
   /** Mã ca cần làm phiếu. Bỏ trống = ca gần nhất đã chấm. */
   maCa?: string
   showToast: (chu: string, kieu?: 'success' | 'error' | 'warn') => void
+  /** Bảng chấm từng câu của em trong ca này. Thiếu thì báo cáo bỏ phần cách làm
+   * bài và phần câu sai — không dựng phần rỗng. */
+  rows?: ChiTietCauRow[] | null
+  banks?: TeacherExamSource[] | null
+  /** Điểm mọi em trong ca (không kèm tên) để vẽ phân bố lớp. */
+  diemLop?: number[] | null
+  thoiLuongPhut?: number | null
+  vaoLuc?: string | null
 }) {
   const ca = chonCa(hoSo, maCa)
   const khungAnh = useRef<HTMLDivElement | null>(null)
@@ -100,42 +117,69 @@ export default function PhieuZaloEm({
     }
   }, [ca, chuyenDeCa, duPhieu, hoSo, viec])
 
-  // LINK PHIẾU: dựng lại mỗi khi số liệu hoặc dòng "việc cần làm" đổi, vì cả
-  // phiếu nằm trong chính link (không có máy chủ nào giữ hộ). Nén là việc bất
-  // đồng bộ nên phải qua state; hỏng thì link rỗng và tin nhắn vẫn gửi được,
-  // chỉ mất khối XEM PHIẾU.
+  // LINK BÁO CÁO: đẩy báo cáo lên kho rồi lấy mã 16 ký tự. Mã giữ nguyên cho
+  // một cặp (em, ca) trong suốt phiên — thầy sửa dòng "việc cần làm" thì báo
+  // cáo được GHI ĐÈ lên đúng mã cũ, không đẻ ra một phiếu mồ côi mỗi lần gõ.
+  // Chờ 1,2 giây sau lần gõ cuối rồi mới đẩy, kẻo mỗi chữ một lần gọi máy chủ.
+  const maRef = useRef<{ khoa: string; ma: string } | null>(null)
   useEffect(() => {
-    let con = true
-    if (!duAnh) {
+    if (!duPhieu || !ca) {
       setLink('')
       return
     }
-    const goc = `${location.origin}${import.meta.env.BASE_URL}`
-    void taoLinkPhieu(goc, {
-      hoTen: duAnh.hoTen,
-      sbd: duAnh.sbd,
-      lop: duAnh.lop ?? '',
-      tenCa: duAnh.tenCa ?? '',
-      ngay: duAnh.ngay,
-      diem: duAnh.diem,
-      diemPhan: duAnh.diemPhan ?? null,
-      soCauSai: duAnh.soCauSai,
-      tongSoCau: duAnh.tongSoCau ?? null,
-      hang: duAnh.hang ?? null,
-      siSo: duAnh.siSo ?? null,
-      chuyenDe: duAnh.chuyenDe,
-      vieCanLam: duAnh.vieCanLam,
-    })
-      .then((l) => {
-        if (con) setLink(l)
-      })
-      .catch(() => {
-        if (con) setLink('')
-      })
+    let con = true
+    const hen = setTimeout(() => {
+      void (async () => {
+        try {
+          const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
+          if (!url.trim() || !mat.trim()) {
+            if (con) setLink('')
+            return
+          }
+          const khoa = `${hoSo.em.sbd}:${ca.maCa}`
+          if (maRef.current?.khoa !== khoa) maRef.current = { khoa, ma: sinhMaPhieu() }
+          const ma = maRef.current.ma
+          const phieu = dungPhieu({
+            hoSo,
+            ca,
+            chuyenDeCa,
+            vieCanLam: viec.trim() || viecCanLamMacDinh(duPhieu),
+            rows,
+            banks,
+            diemLop,
+            thoiLuongPhut,
+            vaoLuc,
+          })
+          await luuPhieu(url.trim(), mat.trim(), { ma, maCa: ca.maCa, sbd: hoSo.em.sbd, hoTen: hoSo.em.hoTen, phieu })
+          if (con) setLink(taoLinkPhieu(`${location.origin}${import.meta.env.BASE_URL}`, ma))
+        } catch {
+          // Mất mạng hoặc chưa cấu hình: tin nhắn chữ vẫn gửi được, chỉ mất
+          // khối XEM PHIẾU. KHÔNG dán một link chết vào tin của thầy.
+          if (con) setLink('')
+        }
+      })()
+    }, 1200)
     return () => {
       con = false
+      clearTimeout(hen)
     }
-  }, [duAnh])
+  }, [duPhieu, ca, hoSo, chuyenDeCa, viec, rows, banks, diemLop, thoiLuongPhut, vaoLuc])
+
+  /** Thu hồi: xoá mã trên kho là link đã gửi chết ngay. Đây là thứ cách cũ
+   * (nhét dữ liệu vào link) không làm được. */
+  const thuHoi = async () => {
+    const ma = maRef.current?.ma
+    if (!ma) return
+    try {
+      const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
+      await xoaPhieu(url.trim(), mat.trim(), ma)
+      maRef.current = null
+      setLink('')
+      showToast('Đã thu hồi. Link đã gửi cho phụ huynh không mở được nữa.', 'success')
+    } catch (e) {
+      showToast(`Chưa thu hồi được: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
+    }
+  }
 
   // Vẽ lại ảnh mỗi khi số liệu hoặc dòng "việc cần làm" đổi. Vẽ vào DOM luôn để
   // thầy thấy đúng thứ sẽ tải về, không phải tải rồi mới biết nó ra sao.
@@ -286,9 +330,24 @@ export default function PhieuZaloEm({
           </button>
         </div>
 
-        {/* ẢNH PHIẾU — KHÔNG còn nằm trong luồng gửi Zalo (link đã thay chỗ đó).
-            Giữ lại để thầy in ra hoặc lưu hồ sơ khi cần. */}
-        <div style={NHAN_NHO}>Ảnh phiếu — không gửi Zalo nữa, chạm để tải về khi thầy cần in hoặc lưu</div>
+        {link && (
+          <div className="flex items-center justify-between" style={{ gap: 'var(--k2)', marginTop: 'calc(var(--k2) * -1)' }}>
+            <span style={NHAN_NHO}>Link báo cáo đã sẵn sàng trong tin nhắn</span>
+            <button
+              type="button"
+              onClick={() => void thuHoi()}
+              className="tap-target inline-flex items-center font-bold"
+              style={{ gap: 6, minHeight: 36, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--do-nen)', color: 'var(--do)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', border: 'none' }}
+            >
+              Thu hồi link
+            </button>
+          </div>
+        )}
+
+        {/* ẢNH PHIẾU — PHƯƠNG ÁN DỰ PHÒNG, thầy chọn gửi kiểu nào tuỳ lúc: tin
+            nhắn kèm link, hay tin nhắn kèm ảnh. Ảnh mở được cả khi phụ huynh
+            mất mạng và không cần bấm vào đâu. */}
+        <div style={NHAN_NHO}>Ảnh phiếu — dự phòng khi thầy muốn gửi ảnh thay vì link. Chạm để tải về hoặc chia sẻ.</div>
         <button
           type="button"
           onClick={() => void luuAnh()}
@@ -301,7 +360,7 @@ export default function PhieuZaloEm({
         <NutChinh variant="phu" onClick={() => void luuAnh()} disabled={dangTai}>
           <span className="inline-flex items-center" style={{ gap: 6 }}>
             {typeof navigator !== 'undefined' && 'share' in navigator ? <Share2 size={18} /> : <Download size={18} />}
-            {dangTai ? 'Đang lưu ảnh…' : 'Tải ảnh phiếu về máy'}
+            {dangTai ? 'Đang lưu ảnh…' : 'Gửi / tải ảnh phiếu'}
           </span>
         </NutChinh>
       </div>

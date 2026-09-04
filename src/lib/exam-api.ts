@@ -788,6 +788,39 @@ export async function luuDe(scriptUrl: string, secret: string, de: unknown): Pro
   return { maDe: String(r.maDe), soCau: Number(r.soCau), soNghi: Number(r.soNghi) }
 }
 
+// ---------------------------------------------------------------------------
+// PHIẾU KẾT QUẢ GỬI PHỤ HUYNH — lưu theo mã ngẫu nhiên, đọc bằng đúng mã đó.
+// `layPhieu` là lệnh đọc DUY NHẤT không cần mã bí mật (phụ huynh chỉ có link),
+// nên nó chỉ trả về đúng một phiếu và không có lệnh liệt kê đi kèm.
+// ---------------------------------------------------------------------------
+
+/** Mã phiếu 16 ký tự, ~96 bit ngẫu nhiên. Sinh ở máy thầy bằng nguồn ngẫu
+ * nhiên mật mã: mã đoán được là ai cũng đọc được điểm của em. */
+export function sinhMaPhieu(): string {
+  const chu = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789'
+  const b = new Uint8Array(16)
+  crypto.getRandomValues(b)
+  let s = ''
+  for (const x of b) s += chu[x % chu.length]
+  return s
+}
+
+export async function luuPhieu(scriptUrl: string, secret: string, d: { ma: string; maCa: string; sbd: string; hoTen: string; phieu: unknown }): Promise<void> {
+  const r = await postJson(scriptUrl, { action: 'luuPhieu', secret, ...d })
+  if (!r.ok) throw new Error(r.error || 'Không lưu được phiếu')
+}
+
+export async function layPhieu(scriptUrl: string, ma: string): Promise<unknown> {
+  const r = await postJson(scriptUrl, { action: 'layPhieu', ma })
+  if (!r.ok) throw new Error(r.error || 'Không tìm thấy phiếu')
+  return r.phieu
+}
+
+export async function xoaPhieu(scriptUrl: string, secret: string, ma: string): Promise<void> {
+  const r = await postJson(scriptUrl, { action: 'xoaPhieu', secret, ma })
+  if (!r.ok) throw new Error(r.error || 'Không thu hồi được phiếu')
+}
+
 export async function xoaDe(scriptUrl: string, secret: string, maDe: string): Promise<void> {
   const r = await postJson(scriptUrl, { action: 'xoaDe', secret, maDe })
   if (!r.ok) throw new Error(r.error || 'Xoá đề thất bại')

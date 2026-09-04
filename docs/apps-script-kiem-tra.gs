@@ -54,6 +54,11 @@ const SHEET_TINNHAN = 'TinNhan'
 const SHEET_HOCSINH = 'HocSinh'
 const SHEET_TINTHAY = 'TinNhanThay'
 const SHEET_DE = 'NganHangDe'
+// PHIẾU KẾT QUẢ GỬI PHỤ HUYNH. Mỗi phiếu một dòng, khoá là MÃ NGẪU NHIÊN 16 ký
+// tự do máy thầy sinh (crypto.getRandomValues, ~96 bit) — không dò ra được và
+// KHÔNG có lệnh nào liệt kê danh sách mã. Chỉ `layPhieu` là đọc được, và phải
+// đưa đúng mã. Xoá dòng ở đây là link đã gửi chết ngay: đó là đường thu hồi.
+const SHEET_PHIEU = 'PhieuKetQua'
 const SHEET_LUOT = 'LuotThi'
 const DRIVE_FOLDER = 'OMR-APP-DATA'
 
@@ -1312,6 +1317,64 @@ function doPost(e) {
     if (row > 0) sh.getRange(row, 1, 1, 8).setValues([rowData])
     else sh.appendRow(rowData)
     return jsonResponse_({ ok: true, maDe: String(de.ma_de), soCau: de.cau.length, soNghi: soNghi })
+  }
+
+  // -------------------------------------------------------- PHIẾU GỬI PHỤ HUYNH
+  // `luuPhieu` cần MÃ BÍ MẬT (chỉ máy thầy ghi). `layPhieu` thì KHÔNG — phụ
+  // huynh không có mã bí mật, họ chỉ có đường link. Đây là lệnh đọc công khai
+  // duy nhất của hệ thống, nên nó bị bó chặt: phải đưa đúng mã 16 ký tự, trả
+  // về ĐÚNG MỘT phiếu, không có lệnh liệt kê, và mã không suy ra được từ mã ca
+  // hay số báo danh.
+  if (action === 'luuPhieu' || action === 'xoaPhieu') {
+    const loiP = kiemTraMaBiMat_(body)
+    if (loiP) return jsonResponse_({ ok: false, error: loiP })
+    const sh = getSheet_(SHEET_PHIEU, ['Ma', 'MaCa', 'SBD', 'HoTen', 'PhieuJson', 'TaoLuc', 'SoLanXem', 'XemLanCuoi'])
+    const ma = String(body.ma || '').trim()
+    if (!/^[A-Za-z0-9_-]{12,40}$/.test(ma)) return jsonResponse_({ ok: false, error: 'Mã phiếu không hợp lệ' })
+    const row = findRowByKey_(sh, 0, ma)
+    if (action === 'xoaPhieu') {
+      if (row > 0) {
+        const refCu = String(sh.getRange(row, 5).getValue())
+        if (refCu.indexOf('drive:') === 0) {
+          try { DriveApp.getFileById(refCu.slice(6)).setTrashed(true) } catch (err) {}
+        }
+        sh.deleteRow(row)
+      }
+      return jsonResponse_({ ok: true })
+    }
+    if (!body.phieu) return jsonResponse_({ ok: false, error: 'Thiếu nội dung phiếu' })
+    const cu = row > 0 ? String(sh.getRange(row, 5).getValue()) : ''
+    const hang = [
+      ma,
+      String(body.maCa || ''),
+      String(body.sbd || ''),
+      String(body.hoTen || ''),
+      luuJsonLon_('phieu_' + ma, body.phieu, cu),
+      row > 0 ? sh.getRange(row, 6).getValue() : new Date().toISOString(),
+      row > 0 ? sh.getRange(row, 7).getValue() : 0,
+      row > 0 ? sh.getRange(row, 8).getValue() : '',
+    ]
+    if (row > 0) sh.getRange(row, 1, 1, 8).setValues([hang])
+    else sh.appendRow(hang)
+    return jsonResponse_({ ok: true, ma: ma })
+  }
+
+  if (action === 'layPhieu') {
+    const sh = getSheet_(SHEET_PHIEU, ['Ma', 'MaCa', 'SBD', 'HoTen', 'PhieuJson', 'TaoLuc', 'SoLanXem', 'XemLanCuoi'])
+    const ma = String(body.ma || '').trim()
+    // Mã sai định dạng thì trả về ĐÚNG câu như mã không tồn tại — không để ai
+    // dò được định dạng mã qua thông điệp lỗi.
+    if (!/^[A-Za-z0-9_-]{12,40}$/.test(ma)) return jsonResponse_({ ok: false, error: 'Không tìm thấy phiếu' })
+    const row = findRowByKey_(sh, 0, ma)
+    if (row < 0) return jsonResponse_({ ok: false, error: 'Không tìm thấy phiếu' })
+    const phieu = docJsonLon_(sh.getRange(row, 5).getValue())
+    // Đếm lượt xem để thầy biết phụ huynh đã mở chưa. Ghi hỏng không được chặn
+    // việc trả phiếu — phụ huynh đang đứng chờ.
+    try {
+      sh.getRange(row, 7).setValue((Number(sh.getRange(row, 7).getValue()) || 0) + 1)
+      sh.getRange(row, 8).setValue(new Date().toISOString())
+    } catch (err) {}
+    return jsonResponse_({ ok: true, phieu: phieu })
   }
 
   if (action === 'capNhatKeyBank') {

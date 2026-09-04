@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Copy, Check, RefreshCw, Trash2, ArrowLeft, ChevronRight, Images } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
-import { chiTietCa, duyetThiLai, ghiDiem, moKhoa, sendTeacherMessage, xoaCa, type ChiTietCa, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
+import { chiTietCa, duyetThiLai, ghiDiem, moKhoa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { goiPhieuCaZip, tenTepZipCa, chuyenDeTuChiTiet, type EmTrongCaDeXuatPhieu } from '../lib/phieu-hang-loat'
 import { viecCanLamMacDinh } from '../lib/phieu-zalo'
@@ -417,6 +417,18 @@ export default function ExamMonitorScreen() {
   // nhau cho cùng một em), thêm khối gửi phụ huynh soạn theo ĐÚNG CA đang xem.
   if (sbdHoSo) {
     const emTrongCa = dsEm.find((e) => e.sbd === sbdHoSo)
+    // Bảng chấm từng câu của đúng em này trong đúng ca này — nguồn của phần
+    // "cách làm bài" và phần "từng câu sai" trong báo cáo gửi phụ huynh. Thiếu
+    // ngân hàng đáp án (ca mở ở máy khác, chưa xin được) thì để null: báo cáo
+    // bỏ hẳn hai phần đó chứ không dựng phần rỗng.
+    let rowsHoSo: ChiTietCauRow[] | null = null
+    if (chiTiet && teacherBank && emTrongCa?.moiNhat.dapAn) {
+      try {
+        rowsHoSo = taoChiTietCau(mergeKeepAnswers(teacherBank), chiTiet.ca.maCa, sbdHoSo, emTrongCa.moiNhat.dapAn, emTrongCa.moiNhat.giayCau)
+      } catch {
+        rowsHoSo = null
+      }
+    }
     return (
       <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
         <button onClick={() => setSbdHoSo('')} className="tap-target self-start inline-flex items-center" style={{ ...NHAN_NHO, gap: 4 }}>
@@ -448,7 +460,16 @@ export default function ExamMonitorScreen() {
 
             {/* Phiếu soạn theo ĐÚNG ca đang mở, không phải ca mới nhất của em —
                 thầy đang đứng ở ca này thì tin nhắn phải nói về ca này. */}
-            <PhieuZaloEm hoSo={hoSo} maCa={chiTiet?.ca.maCa} showToast={showToast} />
+            <PhieuZaloEm
+              hoSo={hoSo}
+              maCa={chiTiet?.ca.maCa}
+              showToast={showToast}
+              rows={rowsHoSo}
+              banks={teacherBank}
+              diemLop={dsEm.map((e) => e.diem).filter((d): d is number => typeof d === 'number')}
+              thoiLuongPhut={chiTiet?.ca.thoiGianPhut ?? null}
+              vaoLuc={emTrongCa?.moiNhat.vaoLuc ?? null}
+            />
 
             <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />
             <KhoiLichSuCa ca={hoSo.ca} />

@@ -1,256 +1,604 @@
-// PHIẾU KẾT QUẢ — trang phụ huynh mở từ link trong tin nhắn Zalo.
+// BÁO CÁO HỌC TẬP — trang phụ huynh mở từ link trong tin nhắn Zalo.
 //
-// Trang này KHÔNG phải một màn của app quản lý: không thanh menu, không hộp
-// thư, không gọi máy chủ, không đọc IndexedDB, không mã bí mật. Toàn bộ số liệu
-// lấy từ phần sau dấu `#` của chính đường link (lib/phieu-link.ts), nên phiếu
-// dựng xong trong máy phụ huynh và mở được cả khi mất mạng.
+// Không phải một màn của app quản lý: không thanh menu, không hộp thư, không mã
+// bí mật, không đọc IndexedDB của thầy. Chỉ đúng một việc — lấy báo cáo theo mã
+// trong link rồi vẽ ra.
 //
-// Màu lấy từ nhóm `--p-*` trong tokens.css — nhóm đó CỐ Ý không định nghĩa lại
-// ở khối nền tối: phiếu rời máy thầy, mở trên máy lạ, nên luôn phải là giấy
-// trắng mực đen. Máy phụ huynh để nền tối cũng không được đổi màu phiếu.
+// Màu lấy từ nhóm `--p-*` trong tokens.css, nhóm đó CỐ Ý không định nghĩa lại ở
+// khối nền tối: báo cáo rời máy thầy, mở trên máy lạ, nên luôn phải là giấy
+// trắng mực đen.
 //
-// Hoạt ảnh: chỉ động vào `transform` và `opacity` (GPU lo, không kích hoạt
-// layout) nên mượt cả trên máy yếu. Máy bật "giảm chuyển động" thì hiện thẳng
-// trạng thái cuối, không nhấp nháy.
-import { useEffect, useMemo, useRef, useState } from 'react'
+// Biểu đồ vẽ tay bằng SVG, không thêm thư viện: nhẹ, mở nhanh trên 4G, và không
+// phá nguyên tắc chốt công nghệ.
+//
+// Hoạt ảnh chỉ động vào `transform`, `opacity`, `stroke-dashoffset` và chiều cao
+// bằng grid — không thứ nào bắt trình duyệt tính lại bố cục, nên mượt trên máy
+// yếu. Máy bật "giảm chuyển động" thì hiện thẳng trạng thái cuối.
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { classify } from '../engine/score'
-import { giaiPhieu, type DuLieuPhieuLink } from '../lib/phieu-link'
+import { docMaTuHash } from '../lib/phieu-link'
+import { layPhieu } from '../lib/exam-api'
+import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
+import { BAN_PHIEU, type CauSaiChiTiet, type PhieuDayDu } from '../lib/phieu-du-lieu'
+import { TEN_MUC_DO, TEN_PHAN, type MucDo } from '../lib/phan-tich-lam-bai'
+import { ChemText } from '../lib/chem-format'
 
-const CSS = `
-.pk-goc{min-height:100vh;background:var(--p-nen);color:var(--p-muc);font-family:var(--sans);
-  -webkit-font-smoothing:antialiased;padding-bottom:48px}
-.pk-trong{max-width:520px;margin:0 auto}
-
-/* ----- ĐẦU PHIẾU: dải tím có hai vệt sáng trôi rất chậm ----- */
-.pk-dau{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--p-tim),var(--p-tim-2));
-  padding:38px 22px 96px;color:var(--p-trang)}
-.pk-dau::before,.pk-dau::after{content:'';position:absolute;width:280px;height:280px;border-radius:50%;
-  filter:blur(56px);opacity:.42;will-change:transform}
-.pk-dau::before{background:var(--p-trang);top:-140px;left:-90px;animation:pk-troi1 17s ease-in-out infinite}
-.pk-dau::after{background:var(--p-tim);bottom:-170px;right:-110px;animation:pk-troi2 21s ease-in-out infinite}
-@keyframes pk-troi1{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(56px,34px,0) scale(1.14)}}
-@keyframes pk-troi2{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-46px,-30px,0) scale(1.2)}}
-.pk-noi{position:relative}
-.pk-hieu{font-size:11px;font-weight:700;letter-spacing:.19em;text-transform:uppercase;opacity:.86}
-.pk-ten-phieu{font-family:var(--serif);font-size:30px;font-weight:700;line-height:1.15;margin-top:8px}
-.pk-ca{margin-top:8px;font-size:13px;opacity:.9}
-
-/* ----- THẺ ĐIỂM đè lên dải tím ----- */
-.pk-the-diem{margin:-72px 14px 0;background:var(--p-giay);border-radius:22px;padding:22px 20px;
-  box-shadow:var(--p-bong);position:relative}
-.pk-em{font-family:var(--serif);font-size:23px;font-weight:700;line-height:1.2}
-.pk-em-phu{margin-top:5px;font-size:12.5px;color:var(--p-nhat)}
-.pk-hang-diem{display:flex;align-items:center;gap:18px;margin-top:18px}
-.pk-vong{position:relative;width:118px;height:118px;flex:0 0 auto}
-.pk-vong svg{width:118px;height:118px;transform:rotate(-90deg)}
-.pk-vong-so{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.pk-so{font-family:var(--serif);font-size:33px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
-.pk-tren10{font-size:11px;color:var(--p-mo);margin-top:3px}
-.pk-canh{flex:1;min-width:0;display:flex;flex-direction:column;gap:9px}
-.pk-nhan{display:inline-flex;align-items:center;align-self:flex-start;height:28px;padding:0 12px;
-  border-radius:999px;font-size:12.5px;font-weight:700}
-.pk-doi{display:flex;justify-content:space-between;font-size:13px;gap:10px}
-.pk-doi span:first-child{color:var(--p-nhat)}
-.pk-doi span:last-child{font-weight:700;font-variant-numeric:tabular-nums}
-
-/* ----- KHỐI ----- */
-.pk-khoi{margin:16px 14px 0;background:var(--p-giay);border-radius:18px;padding:18px 18px 20px;
-  border:1px solid var(--p-vien)}
-.pk-tieu{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--p-nhat);
-  margin-bottom:14px}
-.pk-dong{margin-top:14px}
-.pk-dong:first-of-type{margin-top:0}
-.pk-dong-tren{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:13.5px}
-.pk-dong-ten{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pk-dong-so{font-weight:700;font-variant-numeric:tabular-nums;flex:0 0 auto}
-.pk-ray{height:8px;border-radius:999px;background:var(--p-chim);margin-top:7px;overflow:hidden}
-.pk-day{height:100%;border-radius:999px;width:0;transition:width 1s cubic-bezier(.22,.9,.28,1)}
-
-/* ----- VIỆC CẦN LÀM ----- */
-.pk-viec{margin:16px 14px 0;background:var(--p-giay);border-radius:18px;padding:18px 18px 18px 20px;
-  border:1px solid var(--p-vien);border-left:4px solid var(--p-tim)}
-.pk-viec-chu{font-family:var(--serif);font-size:15.5px;line-height:1.62;margin-top:10px}
-
-.pk-chan{margin:22px 14px 0;text-align:center;color:var(--p-mo);font-size:11.5px;line-height:1.7}
-.pk-chan b{color:var(--p-nhat)}
-
-/* ----- HIỆN DẦN, so le từng khối ----- */
-.pk-vao{opacity:0;transform:translate3d(0,16px,0);transition:opacity .62s ease,transform .62s cubic-bezier(.22,.9,.28,1)}
-.pk-vao.pk-ra{opacity:1;transform:none}
-
-@media (prefers-reduced-motion:reduce){
-  .pk-dau::before,.pk-dau::after{animation:none}
-  .pk-vao{transition:none;opacity:1;transform:none}
-  .pk-day{transition:none}
-}
-`
-
+// ---------------------------------------------------------------- kiểu chữ số
 function soVN(x: number, soLe = 2): string {
   return x.toFixed(soLe).replace('.', ',')
 }
-
 function ngayVN(iso: string): string {
   const d = new Date(iso)
   if (!Number.isFinite(d.getTime())) return ''
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`
 }
-
-/** Màu theo xếp loại — cùng thang với ảnh phiếu để hai thứ không đá nhau. */
-function mauXepLoai(diem: number): string {
+function ngayNgan(iso: string): string {
+  const d = new Date(iso)
+  if (!Number.isFinite(d.getTime())) return ''
+  return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`
+}
+function mauDiem(diem: number): string {
   if (diem >= 8) return 'var(--p-xanh)'
   if (diem >= 6.5) return 'var(--p-tim)'
   if (diem >= 5) return 'var(--p-cam)'
   return 'var(--p-do)'
 }
 
-/** Đếm số chạy lên. Dùng thời gian thật chứ không cộng dồn theo khung hình:
- * máy yếu bỏ khung thì vẫn dừng đúng lúc và đúng số. */
-function useDemLen(dich: number, chay: boolean, ms = 950): number {
-  const [v, setV] = useState(chay ? 0 : dich)
+const CSS = `
+.bc{min-height:100vh;background:var(--p-nen);color:var(--p-muc);font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;padding-bottom:56px;line-height:1.55}
+.bc *{box-sizing:border-box}
+.bc-trong{max-width:560px;margin:0 auto}
+
+.bc-dau{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--p-tim),var(--p-tim-2));
+  padding:34px 22px 88px;color:var(--p-trang)}
+.bc-dau::before,.bc-dau::after{content:'';position:absolute;width:300px;height:300px;border-radius:50%;
+  filter:blur(60px);opacity:.4;will-change:transform}
+.bc-dau::before{background:var(--p-trang);top:-150px;left:-100px;animation:bc-troi1 19s ease-in-out infinite}
+.bc-dau::after{background:var(--p-tim);bottom:-180px;right:-120px;animation:bc-troi2 23s ease-in-out infinite}
+@keyframes bc-troi1{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(60px,36px,0) scale(1.15)}}
+@keyframes bc-troi2{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-50px,-32px,0) scale(1.22)}}
+.bc-dau-noi{position:relative}
+.bc-hieu{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;opacity:.85}
+.bc-ten{font-family:var(--serif);font-size:29px;font-weight:700;line-height:1.15;margin-top:10px}
+.bc-phu{margin-top:8px;font-size:13px;opacity:.92}
+
+.bc-the{margin:16px 14px 0;background:var(--p-giay);border-radius:20px;padding:20px 18px;border:1px solid var(--p-vien)}
+.bc-the.noi{margin-top:-64px;border:none;box-shadow:var(--p-bong)}
+.bc-tieu{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--p-nhat)}
+.bc-tieu-lon{font-family:var(--serif);font-size:19px;font-weight:700;margin-top:2px}
+.bc-ghi{font-size:12.5px;color:var(--p-nhat);margin-top:6px}
+
+.bc-em{font-family:var(--serif);font-size:22px;font-weight:700}
+.bc-em-phu{margin-top:4px;font-size:12.5px;color:var(--p-nhat)}
+.bc-diem-hang{display:flex;align-items:center;gap:16px;margin-top:16px}
+.bc-vong{position:relative;width:116px;height:116px;flex:0 0 auto}
+.bc-vong svg{width:116px;height:116px;transform:rotate(-90deg)}
+.bc-vong-in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.bc-so{font-family:var(--serif);font-size:32px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.bc-tren{font-size:10.5px;color:var(--p-mo);margin-top:3px}
+.bc-canh{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.bc-nhan{display:inline-flex;align-items:center;align-self:flex-start;height:27px;padding:0 12px;border-radius:999px;
+  font-size:12.5px;font-weight:700;background:var(--p-chim)}
+.bc-doi{display:flex;justify-content:space-between;gap:10px;font-size:13px}
+.bc-doi>span:first-child{color:var(--p-nhat)}
+.bc-doi>span:last-child{font-weight:700;font-variant-numeric:tabular-nums}
+
+.bc-dong{margin-top:13px}
+.bc-dong:first-of-type{margin-top:12px}
+.bc-dtren{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:13.5px}
+.bc-dten{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bc-dso{font-weight:700;font-variant-numeric:tabular-nums;flex:0 0 auto;font-size:12.5px}
+.bc-ray{height:8px;border-radius:999px;background:var(--p-chim);margin-top:6px;overflow:hidden}
+.bc-day{height:100%;border-radius:999px;width:0;transition:width 1s cubic-bezier(.22,.9,.28,1)}
+
+.bc-o3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.bc-o{background:var(--p-chim);border-radius:12px;padding:11px 8px;text-align:center}
+.bc-o-so{font-family:var(--serif);font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+.bc-o-ten{font-size:10.5px;color:var(--p-nhat);margin-top:3px;line-height:1.35}
+
+.bc-mo{width:100%;text-align:left;background:none;border:none;padding:12px 0;cursor:pointer;color:inherit;
+  font:inherit;display:flex;align-items:center;gap:10px;border-top:1px solid var(--p-vien)}
+.bc-mo:first-of-type{border-top:none}
+.bc-mo-so{flex:0 0 auto;width:30px;height:30px;border-radius:9px;background:var(--p-chim);display:grid;place-items:center;
+  font-size:11.5px;font-weight:700}
+.bc-mo-giua{flex:1;min-width:0}
+.bc-mo-ten{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bc-mo-phu{font-size:11.5px;color:var(--p-nhat);margin-top:2px}
+.bc-mui{flex:0 0 auto;width:9px;height:9px;border-right:2px solid var(--p-mo);border-bottom:2px solid var(--p-mo);
+  transform:rotate(45deg);transition:transform .28s ease;margin-right:3px}
+.bc-mo[aria-expanded="true"] .bc-mui{transform:rotate(-135deg)}
+.bc-hop{display:grid;grid-template-rows:0fr;transition:grid-template-rows .34s cubic-bezier(.22,.9,.28,1)}
+.bc-hop.ra{grid-template-rows:1fr}
+.bc-hop>div{overflow:hidden;min-height:0}
+.bc-hop-in{padding:2px 0 16px}
+
+.bc-de{font-family:var(--serif);font-size:14.5px;line-height:1.65;background:var(--p-chim);border-radius:12px;padding:12px 13px}
+.bc-pa{display:flex;gap:9px;align-items:flex-start;padding:8px 11px;border-radius:10px;margin-top:6px;font-size:13.5px;
+  line-height:1.55;border:1px solid var(--p-vien)}
+.bc-pa-k{flex:0 0 auto;width:21px;height:21px;border-radius:6px;display:grid;place-items:center;font-size:11px;font-weight:700;
+  background:var(--p-chim)}
+.bc-pa.dung{border-color:var(--p-xanh)}
+.bc-pa.chon{border-color:var(--p-do)}
+.bc-co{font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px;margin-left:6px;white-space:nowrap}
+.bc-giai{margin-top:11px;border-left:3px solid var(--p-tim);padding:2px 0 2px 12px}
+.bc-giai-chot{font-family:var(--serif);font-size:14px;font-weight:700;line-height:1.55}
+.bc-giai-y{font-size:13px;margin-top:7px;line-height:1.6;color:var(--p-muc)}
+.bc-buoc{font-size:13px;margin-top:5px;padding-left:16px;position:relative;line-height:1.6}
+.bc-buoc::before{content:'';position:absolute;left:3px;top:9px;width:5px;height:5px;border-radius:50%;background:var(--p-tim)}
+
+.bc-tin{border-radius:14px;border:1px solid var(--p-vien);padding:13px 14px;margin-top:10px}
+.bc-tin:first-of-type{margin-top:12px}
+.bc-tin-nhan{font-family:var(--serif);font-size:15.5px;font-weight:700}
+.bc-tin-so{font-size:13px;color:var(--p-nhat);margin-top:5px;line-height:1.6}
+.bc-tin-khuyen{font-size:13.5px;margin-top:9px;line-height:1.62;background:var(--p-chim);border-radius:10px;padding:10px 11px}
+
+.bc-soan{margin-top:12px}
+.bc-soan-cd{font-size:12px;font-weight:700;color:var(--p-tim);letter-spacing:.02em}
+.bc-soan-y{display:flex;gap:9px;font-size:13.5px;line-height:1.62;margin-top:7px}
+.bc-soan-o{flex:0 0 auto;width:15px;height:15px;border:1.5px solid var(--p-mo);border-radius:4px;margin-top:3px}
+
+.bc-viec{margin:16px 14px 0;background:var(--p-giay);border-radius:18px;padding:18px 18px 18px 20px;
+  border:1px solid var(--p-vien);border-left:4px solid var(--p-tim)}
+.bc-viec-chu{font-family:var(--serif);font-size:15.5px;line-height:1.62;margin-top:9px}
+.bc-chan{margin:24px 16px 0;text-align:center;color:var(--p-mo);font-size:11.5px;line-height:1.75}
+.bc-chan b{color:var(--p-nhat)}
+
+.bc-vao{opacity:0;transform:translate3d(0,18px,0);transition:opacity .6s ease,transform .6s cubic-bezier(.22,.9,.28,1)}
+.bc-vao.ra{opacity:1;transform:none}
+
+@media (prefers-reduced-motion:reduce){
+  .bc-dau::before,.bc-dau::after{animation:none}
+  .bc-vao{transition:none;opacity:1;transform:none}
+  .bc-day,.bc-hop,.bc-mui{transition:none}
+}
+`
+
+// ------------------------------------------------------------------ tiện ích
+/** Hiện dần khi cuộn tới. Dùng IntersectionObserver để không phải nghe sự kiện
+ * scroll (nghe scroll là giật trên máy yếu). Máy không có API này thì hiện luôn. */
+function useHienKhiToi<T extends HTMLElement>(tat: boolean): [React.RefObject<T | null>, boolean] {
+  const o = useRef<T | null>(null)
+  const [ra, setRa] = useState(tat)
   useEffect(() => {
-    if (!chay) {
-      setV(dich)
-      return
-    }
-    let id = 0
-    const t0 = performance.now()
-    const buoc = (t: number) => {
-      const k = Math.min(1, (t - t0) / ms)
-      setV(dich * (1 - Math.pow(1 - k, 3)))
-      if (k < 1) id = requestAnimationFrame(buoc)
-    }
-    id = requestAnimationFrame(buoc)
-    return () => cancelAnimationFrame(id)
-  }, [dich, chay, ms])
-  return v
+    if (tat) return setRa(true)
+    const el = o.current
+    if (!el || typeof IntersectionObserver !== 'function') return setRa(true)
+    const io = new IntersectionObserver(
+      (e) => {
+        if (e.some((x) => x.isIntersecting)) {
+          setRa(true)
+          io.disconnect()
+        }
+      },
+      { rootMargin: '0px 0px -8% 0px' },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [tat])
+  return [o, ra]
 }
 
-const R = 52
-const CHU_VI = 2 * Math.PI * R
-
-export default function PhieuScreen() {
-  const [du, setDu] = useState<DuLieuPhieuLink | null | undefined>(undefined)
-  const [ra, setRa] = useState(false)
-  const daDoc = useRef(false)
-
-  const dongYen = useMemo(
-    () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches,
-    [],
+function Khoi({
+  tieu,
+  ten,
+  ghi,
+  noi,
+  tat,
+  children,
+}: {
+  tieu?: string
+  ten?: string
+  ghi?: string
+  noi?: boolean
+  tat: boolean
+  children: React.ReactNode
+}) {
+  const [o, ra] = useHienKhiToi<HTMLElement>(tat)
+  return (
+    <section ref={o} className={`bc-the${noi ? ' noi' : ''} bc-vao${ra ? ' ra' : ''}`}>
+      {tieu && <div className="bc-tieu">{tieu}</div>}
+      {ten && <div className="bc-tieu-lon">{ten}</div>}
+      {ghi && <div className="bc-ghi">{ghi}</div>}
+      {children}
+    </section>
   )
+}
 
-  useEffect(() => {
-    if (daDoc.current) return
-    daDoc.current = true
-    void giaiPhieu(location.hash).then((d) => {
-      setDu(d)
-      // Đợi một khung hình rồi mới bật hoạt ảnh, để trình duyệt kịp ghi nhận
-      // trạng thái đầu — bật ngay trong cùng khung thì không có gì để chuyển.
-      requestAnimationFrame(() => requestAnimationFrame(() => setRa(true)))
-    })
+function Thanh({ tiLe, mau, hoan, tat }: { tiLe: number; mau: string; hoan: number; tat: boolean }) {
+  const [o, ra] = useHienKhiToi<HTMLDivElement>(tat)
+  return (
+    <div className="bc-ray" ref={o}>
+      <div
+        className="bc-day"
+        style={{ width: ra ? `${Math.max(0, Math.min(100, tiLe * 100))}%` : 0, background: mau, transitionDelay: tat ? '0ms' : `${hoan}ms` }}
+      />
+    </div>
+  )
+}
+
+/** Ô số nhỏ. Giá trị null hiện gạch ngang, KHÔNG hiện số 0 giả. */
+function OSo({ so, ten }: { so: string | number | null; ten: string }) {
+  return (
+    <div className="bc-o">
+      <div className="bc-o-so">{so === null || so === '' ? '—' : so}</div>
+      <div className="bc-o-ten">{ten}</div>
+    </div>
+  )
+}
+
+// ------------------------------------------------------------------ biểu đồ
+/** ĐƯỜNG ĐIỂM QUA CÁC CA. Vẽ tay: đường + vùng tô nhạt + chấm, chấm cuối to hơn.
+ * Dưới 2 ca thì không vẽ — một điểm không thành xu hướng. */
+function DuongTienBo({ ds, tat }: { ds: { ngay: string; tong: number }[]; tat: boolean }) {
+  const [o, ra] = useHienKhiToi<HTMLDivElement>(tat)
+  const W = 300
+  const H = 108
+  const L = 26
+  const P = 10
+  if (ds.length < 2) return null
+  const n = ds.length
+  const x = (i: number) => L + ((W - L - P) * i) / (n - 1)
+  const y = (v: number) => P + (H - P * 2 - 12) * (1 - Math.max(0, Math.min(10, v)) / 10)
+  const duong = ds.map((d, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(d.tong).toFixed(1)}`).join(' ')
+  const vung = `${duong} L${x(n - 1).toFixed(1)},${H - 12} L${x(0).toFixed(1)},${H - 12} Z`
+  const cuoi = ds[n - 1]
+  return (
+    <div ref={o} style={{ marginTop: 12 }}>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', display: 'block' }} role="img" aria-label="Điểm qua các ca">
+        {[0, 5, 10].map((v) => (
+          <g key={v}>
+            <line x1={L} y1={y(v)} x2={W - P} y2={y(v)} stroke="var(--p-vien)" strokeWidth="1" />
+            <text x={L - 6} y={y(v) + 3.5} textAnchor="end" fontSize="9" fill="var(--p-mo)">
+              {v}
+            </text>
+          </g>
+        ))}
+        <path d={vung} fill="var(--p-tim)" opacity={ra ? 0.1 : 0} style={{ transition: tat ? 'none' : 'opacity .8s ease .3s' }} />
+        <path
+          d={duong}
+          fill="none"
+          stroke="var(--p-tim)"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          pathLength={1}
+          strokeDasharray={1}
+          strokeDashoffset={ra ? 0 : 1}
+          style={{ transition: tat ? 'none' : 'stroke-dashoffset 1.15s cubic-bezier(.22,.9,.28,1)' }}
+        />
+        {ds.map((d, i) => (
+          <circle
+            key={i}
+            cx={x(i)}
+            cy={y(d.tong)}
+            r={i === n - 1 ? 4.6 : 3}
+            fill={i === n - 1 ? mauDiem(cuoi.tong) : 'var(--p-giay)'}
+            stroke={i === n - 1 ? 'var(--p-giay)' : 'var(--p-tim)'}
+            strokeWidth="2"
+            opacity={ra ? 1 : 0}
+            style={{ transition: tat ? 'none' : `opacity .35s ease ${400 + i * 70}ms` }}
+          />
+        ))}
+        {ds.map((d, i) =>
+          i === 0 || i === n - 1 || n <= 5 ? (
+            <text key={`t${i}`} x={x(i)} y={H - 1} textAnchor="middle" fontSize="9" fill="var(--p-mo)">
+              {ngayNgan(d.ngay)}
+            </text>
+          ) : null,
+        )}
+      </svg>
+    </div>
+  )
+}
+
+/** PHÂN BỐ ĐIỂM CẢ CA, cột của em tô đậm. Chia 10 khoảng 1 điểm. */
+function PhanBoLop({ diemLop, cuaEm, tat }: { diemLop: number[]; cuaEm: number; tat: boolean }) {
+  const [o, ra] = useHienKhiToi<HTMLDivElement>(tat)
+  if (diemLop.length < 5) return null
+  const o10 = Array.from({ length: 10 }, () => 0)
+  for (const d of diemLop) o10[Math.max(0, Math.min(9, Math.floor(d)))]++
+  const cao = Math.max(...o10)
+  const oEm = Math.max(0, Math.min(9, Math.floor(cuaEm)))
+  const duoi = diemLop.filter((d) => d < cuaEm).length
+  const phanTram = Math.round((duoi / diemLop.length) * 100)
+  return (
+    <div ref={o} style={{ marginTop: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 96 }}>
+        {o10.map((c, i) => (
+          <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '100%' }}>
+            <div
+              style={{
+                height: ra ? `${cao ? Math.max(c ? 6 : 2, (c / cao) * 100) : 2}%` : '2%',
+                background: i === oEm ? mauDiem(cuaEm) : 'var(--p-chim)',
+                borderRadius: '6px 6px 3px 3px',
+                transition: tat ? 'none' : `height .8s cubic-bezier(.22,.9,.28,1) ${i * 45}ms`,
+              }}
+            />
+          </div>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 3, marginTop: 5 }}>
+        {o10.map((_, i) => (
+          <div key={i} style={{ flex: 1, textAlign: 'center', fontSize: 9, color: i === oEm ? mauDiem(cuaEm) : 'var(--p-mo)', fontWeight: i === oEm ? 700 : 400 }}>
+            {i}
+          </div>
+        ))}
+      </div>
+      <div className="bc-ghi" style={{ marginTop: 10 }}>
+        Trong {diemLop.length} bạn đã nộp, em đứng trên {duoi} bạn ({phanTram}%). Cột đậm là khoảng điểm của em.
+      </div>
+    </div>
+  )
+}
+
+/** DẢI THỜI GIAN TỪNG CÂU: mỗi câu một cột, cao theo số giây, đỏ là câu sai. */
+function DaiThoiGian({ cau, tat }: { cau: { giay: number | null; dung: boolean; nhan: string }[]; tat: boolean }) {
+  const [o, ra] = useHienKhiToi<HTMLDivElement>(tat)
+  const co = cau.filter((c) => c.giay !== null)
+  if (co.length < 3) return null
+  const cao = Math.max(...co.map((c) => c.giay as number))
+  return (
+    <div ref={o} style={{ marginTop: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 76 }}>
+        {cau.map((c, i) => (
+          <div
+            key={i}
+            title={`${c.nhan}${c.giay !== null ? ` · ${c.giay} giây` : ''}`}
+            style={{
+              flex: 1,
+              minWidth: 2,
+              height: ra ? `${c.giay === null ? 3 : Math.max(5, ((c.giay as number) / cao) * 100)}%` : '3%',
+              background: c.dung ? 'var(--p-xanh)' : 'var(--p-do)',
+              opacity: c.giay === null ? 0.25 : 1,
+              borderRadius: '3px 3px 1px 1px',
+              transition: tat ? 'none' : `height .55s cubic-bezier(.22,.9,.28,1) ${Math.min(600, i * 22)}ms`,
+            }}
+          />
+        ))}
+      </div>
+      <div className="bc-ghi" style={{ marginTop: 8 }}>
+        Mỗi cột là một câu theo đúng thứ tự em làm, cao là mất nhiều giây. Cột đỏ là câu sai, cột xanh là câu đúng.
+      </div>
+    </div>
+  )
+}
+
+// ------------------------------------------------------------- một câu sai
+function TheCauSai({ c, stt }: { c: CauSaiChiTiet; stt: number }) {
+  const [mo, setMo] = useState(false)
+  const nhanPhan = TEN_PHAN[c.phan] ?? c.phan
+  const khoaY = ['a', 'b', 'c', 'd']
+  return (
+    <div>
+      <button className="bc-mo" aria-expanded={mo} onClick={() => setMo((v) => !v)}>
+        <span className="bc-mo-so" style={{ color: 'var(--p-do)' }}>
+          {stt}
+        </span>
+        <span className="bc-mo-giua">
+          <span className="bc-mo-ten">
+            {nhanPhan}, câu {c.soCau}
+          </span>
+          <span className="bc-mo-phu">
+            {c.chuyenDe || 'chưa phân loại'}
+            {c.mucDo ? ` · ${TEN_MUC_DO[c.mucDo as MucDo] ?? c.mucDo}` : ''}
+            {c.giay !== null ? ` · ${c.giay} giây` : ''}
+          </span>
+        </span>
+        <span className="bc-mui" />
+      </button>
+      <div className={`bc-hop${mo ? ' ra' : ''}`}>
+        <div>
+          <div className="bc-hop-in">
+            <div className="bc-de">
+              <ChemText text={c.de} />
+              {c.coHinh && (
+                <div style={{ marginTop: 8, fontSize: 12, color: 'var(--p-nhat)', fontFamily: 'var(--sans)' }}>
+                  Câu này có hình trong đề. Báo cáo không kèm hình, em xem lại trong bài Thầy chữa trên lớp.
+                </div>
+              )}
+            </div>
+
+            {c.luaChon && c.phan === 'I' && (
+              <div style={{ marginTop: 8 }}>
+                {c.luaChon.map((pa, i) => {
+                  const k = ['A', 'B', 'C', 'D'][i]
+                  const laDung = k === c.dapAnDung
+                  const emChon = k === c.dapAnChon
+                  return (
+                    <div key={k} className={`bc-pa${laDung ? ' dung' : ''}${emChon && !laDung ? ' chon' : ''}`}>
+                      <span className="bc-pa-k" style={{ color: laDung ? 'var(--p-xanh)' : emChon ? 'var(--p-do)' : 'var(--p-nhat)' }}>
+                        {k}
+                      </span>
+                      <span style={{ flex: 1, minWidth: 0 }}>
+                        <ChemText text={pa} />
+                        {laDung && (
+                          <span className="bc-co" style={{ background: 'var(--p-xanh)', color: 'var(--p-trang)' }}>
+                            đáp án đúng
+                          </span>
+                        )}
+                        {emChon && !laDung && (
+                          <span className="bc-co" style={{ background: 'var(--p-do)', color: 'var(--p-trang)' }}>
+                            em chọn
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  )
+                })}
+                {!c.dapAnChon && (
+                  <div className="bc-ghi" style={{ marginTop: 7, color: 'var(--p-do)' }}>
+                    Em bỏ trống câu này.
+                  </div>
+                )}
+              </div>
+            )}
+
+            {c.luaChon && c.phan === 'II' && (
+              <div style={{ marginTop: 8 }}>
+                {c.luaChon.map((y, i) => {
+                  const dung = c.dapAnDung[i]
+                  const chon = c.dapAnChon[i]
+                  const khop = dung === chon
+                  return (
+                    <div key={i} className={`bc-pa${khop ? ' dung' : ' chon'}`}>
+                      <span className="bc-pa-k" style={{ color: khop ? 'var(--p-xanh)' : 'var(--p-do)' }}>
+                        {khoaY[i]}
+                      </span>
+                      <span style={{ flex: 1, minWidth: 0 }}>
+                        <ChemText text={y} />
+                        <span className="bc-co" style={{ background: 'var(--p-chim)', color: 'var(--p-nhat)' }}>
+                          đúng: {dung === 'D' ? 'Đúng' : 'Sai'} · em: {chon === 'D' ? 'Đúng' : chon === 'S' ? 'Sai' : 'bỏ trống'}
+                        </span>
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
+            {c.phan === 'III' && (
+              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                <div className="bc-pa dung" style={{ flex: 1 }}>
+                  <span style={{ fontSize: 12, color: 'var(--p-nhat)' }}>Đáp án đúng</span>
+                  <b style={{ marginLeft: 6 }}>{c.dapAnDung}</b>
+                </div>
+                <div className="bc-pa chon" style={{ flex: 1 }}>
+                  <span style={{ fontSize: 12, color: 'var(--p-nhat)' }}>Em điền</span>
+                  <b style={{ marginLeft: 6 }}>{c.dapAnChon || 'bỏ trống'}</b>
+                </div>
+              </div>
+            )}
+
+            {(c.chot || c.lyDo || c.buoc) && (
+              <div className="bc-giai">
+                {c.chot && (
+                  <div className="bc-giai-chot">
+                    <ChemText text={c.chot} />
+                  </div>
+                )}
+                {c.lyDo?.map((l) => (
+                  <div key={l.khoa} className="bc-giai-y">
+                    <b style={{ color: l.dung ? 'var(--p-xanh)' : 'var(--p-do)' }}>{l.khoa}.</b> <ChemText text={l.ly} />
+                  </div>
+                ))}
+                {c.buoc?.map((b, i) => (
+                  <div key={i} className="bc-buoc">
+                    <ChemText text={b} />
+                  </div>
+                ))}
+                {c.ketQua && (
+                  <div className="bc-giai-y" style={{ fontWeight: 700 }}>
+                    Kết quả: <ChemText text={c.ketQua} />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ------------------------------------------------------------------- màn hình
+export default function PhieuScreen() {
+  const [du, setDu] = useState<PhieuDayDu | null | undefined>(undefined)
+  const [loi, setLoi] = useState('')
+  const daChay = useRef(false)
+
+  const tat = useMemo(() => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches, [])
+
+  const nap = useCallback(async () => {
+    const ma = docMaTuHash(location.hash)
+    if (!ma) {
+      setLoi('Link không đúng hoặc bị cắt ngắn khi chuyển tiếp.')
+      setDu(null)
+      return
+    }
+    try {
+      const url = await loadScriptUrlHoacMacDinh()
+      if (!url) throw new Error('Chưa cấu hình được máy chủ')
+      const p = (await layPhieu(url, ma)) as PhieuDayDu
+      if (!p || Number(p.v) !== BAN_PHIEU) throw new Error('Báo cáo này thuộc phiên bản khác, Thầy cần gửi lại link mới.')
+      setDu(p)
+    } catch (e) {
+      setLoi(e instanceof Error ? e.message : 'Không mở được báo cáo')
+      setDu(null)
+    }
   }, [])
 
-  const diem = du?.diem ?? 0
-  const chay = ra && !dongYen
-  const soChay = useDemLen(diem, chay)
+  useEffect(() => {
+    if (daChay.current) return
+    daChay.current = true
+    void nap()
+  }, [nap])
 
   useEffect(() => {
-    if (!du) return
-    document.title = `Phiếu kết quả ${du.hoTen || du.sbd}`
+    if (du) document.title = `Báo cáo học tập ${du.hoTen || du.sbd}`
   }, [du])
+
+  const [oDau, raDau] = useHienKhiToi<HTMLDivElement>(tat)
 
   if (du === undefined) {
     return (
-      <div className="pk-goc" style={{ display: 'grid', placeItems: 'center' }}>
+      <div className="bc" style={{ display: 'grid', placeItems: 'center' }}>
         <style>{CSS}</style>
-        <div style={{ color: 'var(--p-nhat)', fontSize: 14 }}>Đang mở phiếu…</div>
+        <div style={{ color: 'var(--p-nhat)', fontSize: 14 }}>Đang mở báo cáo…</div>
       </div>
     )
   }
 
-  // Link hỏng thì NÓI THẲNG là hỏng. Dựng phiếu với phần dữ liệu đọc được là
-  // đưa cho phụ huynh một tờ phiếu sai số.
   if (du === null) {
     return (
-      <div className="pk-goc" style={{ display: 'grid', placeItems: 'center', padding: 24 }}>
+      <div className="bc" style={{ display: 'grid', placeItems: 'center', padding: 24 }}>
         <style>{CSS}</style>
-        <div style={{ maxWidth: 340, textAlign: 'center', lineHeight: 1.7 }}>
-          <div style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 700 }}>Link phiếu không đọc được</div>
-          <div style={{ marginTop: 10, color: 'var(--p-nhat)', fontSize: 14 }}>
-            Link có thể bị cắt ngắn khi chuyển tiếp. Anh/chị nhắn lại cho Thầy Đỗ Đại Học để nhận link mới.
+        <div style={{ maxWidth: 340, textAlign: 'center' }}>
+          <div style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 700 }}>Không mở được báo cáo</div>
+          <div style={{ marginTop: 10, color: 'var(--p-nhat)', fontSize: 14, lineHeight: 1.7 }}>
+            {loi} Anh/chị nhắn lại cho Thầy Đỗ Đại Học để nhận link mới.
           </div>
         </div>
       </div>
     )
   }
 
-  const xep = classify(diem)
-  const mau = mauXepLoai(diem)
-  const dung = du.tongSoCau ? du.tongSoCau - du.soCauSai : null
-  const keo = (i: number): React.CSSProperties => ({ transitionDelay: dongYen ? '0ms' : `${90 + i * 85}ms` })
-  const cls = `pk-vao${ra ? ' pk-ra' : ''}`
-  const sai = du.chuyenDe.filter((c) => c.soSai > 0).sort((a, b) => b.soSai / Math.max(1, b.soCau) - a.soSai / Math.max(1, a.soCau))
-
-  const phan: { ten: string; diem: number }[] = du.diemPhan
-    ? [
-        { ten: 'Phần I, trắc nghiệm', diem: du.diemPhan.I },
-        { ten: 'Phần II, đúng/sai', diem: du.diemPhan.II },
-        { ten: 'Phần III, trả lời ngắn', diem: du.diemPhan.III },
-      ]
-    : []
+  const tk = du.thongKe
+  const dung = du.tongSoCau !== null ? du.tongSoCau - du.soCauSai : null
+  const chuyenDeCa = [...du.chuyenDeCa].sort((a, b) => b.soSai / Math.max(1, b.soCau) - a.soSai / Math.max(1, a.soCau))
+  const saiTrongCa = chuyenDeCa.filter((c) => c.soSai > 0)
+  const yeuTong = [...du.chuyenDeTong].filter((c) => c.soCau >= 4).sort((a, b) => b.tiLeSai - a.tiLeSai)
 
   return (
-    <div className="pk-goc">
+    <div className="bc">
       <style>{CSS}</style>
-      <div className="pk-trong">
-        <header className="pk-dau">
-          <div className="pk-noi">
-            <div className="pk-hieu">Thầy Đỗ Đại Học</div>
-            <div className="pk-ten-phieu">Phiếu kết quả</div>
-            <div className="pk-ca">
+      <div className="bc-trong">
+        <header className="bc-dau">
+          <div className="bc-dau-noi">
+            <div className="bc-hieu">Thầy Đỗ Đại Học</div>
+            <div className="bc-ten">Báo cáo học tập</div>
+            <div className="bc-phu">
               {du.tenCa ? `${du.tenCa} · ` : ''}
               {ngayVN(du.ngay)}
             </div>
           </div>
         </header>
 
-        <section className={`pk-the-diem ${cls}`} style={keo(0)}>
-          <div className="pk-em">{du.hoTen || `SBD ${du.sbd}`}</div>
-          <div className="pk-em-phu">
+        {/* TỔNG QUAN */}
+        <section ref={oDau} className={`bc-the noi bc-vao${raDau ? ' ra' : ''}`}>
+          <div className="bc-em">{du.hoTen || `SBD ${du.sbd}`}</div>
+          <div className="bc-em-phu">
             {du.sbd ? `SBD ${du.sbd}` : ''}
             {du.lop ? ` · Lớp ${du.lop}` : ''}
           </div>
-
-          <div className="pk-hang-diem">
-            <div className="pk-vong">
-              <svg viewBox="0 0 118 118" aria-hidden="true">
-                <circle cx="59" cy="59" r={R} fill="none" stroke="var(--p-chim)" strokeWidth="9" />
-                <circle
-                  cx="59"
-                  cy="59"
-                  r={R}
-                  fill="none"
-                  stroke={mau}
-                  strokeWidth="9"
-                  strokeLinecap="round"
-                  strokeDasharray={CHU_VI}
-                  strokeDashoffset={ra || dongYen ? CHU_VI * (1 - Math.min(1, diem / 10)) : CHU_VI}
-                  style={{ transition: dongYen ? 'none' : 'stroke-dashoffset 1.05s cubic-bezier(.22,.9,.28,1) .12s' }}
-                />
-              </svg>
-              <div className="pk-vong-so">
-                <div className="pk-so" style={{ color: mau }}>
-                  {soVN(chay ? soChay : diem)}
-                </div>
-                <div className="pk-tren10">trên 10</div>
-              </div>
-            </div>
-
-            <div className="pk-canh">
-              <span className="pk-nhan" style={{ background: 'var(--p-chim)', color: mau }}>
-                {xep}
+          <div className="bc-diem-hang">
+            <VongDiem diem={du.diem} tat={tat} />
+            <div className="bc-canh">
+              <span className="bc-nhan" style={{ color: mauDiem(du.diem) }}>
+                {classify(du.diem)}
               </span>
               {dung !== null && (
-                <div className="pk-doi">
+                <div className="bc-doi">
                   <span>Số câu đúng</span>
                   <span>
                     {dung}/{du.tongSoCau}
@@ -258,80 +606,233 @@ export default function PhieuScreen() {
                 </div>
               )}
               {du.hang !== null && du.siSo !== null && (
-                <div className="pk-doi">
+                <div className="bc-doi">
                   <span>Hạng trong ca</span>
                   <span>
                     {du.hang}/{du.siSo}
                   </span>
                 </div>
               )}
+              {tk?.phutDaDung !== null && tk?.phutDaDung !== undefined && (
+                <div className="bc-doi">
+                  <span>Thời gian làm</span>
+                  <span>
+                    {tk.phutDaDung}
+                    {tk.phutChoPhep ? `/${tk.phutChoPhep}` : ''} phút
+                  </span>
+                </div>
+              )}
             </div>
           </div>
+          {du.diemPhan && (
+            <div style={{ marginTop: 16 }}>
+              {(['I', 'II', 'III'] as const).map((p, i) => (
+                <div className="bc-dong" key={p}>
+                  <div className="bc-dtren">
+                    <span className="bc-dten">{TEN_PHAN[p]}</span>
+                    <span className="bc-dso">{soVN(du.diemPhan![p])}/10</span>
+                  </div>
+                  <Thanh tiLe={du.diemPhan![p] / 10} mau={mauDiem(du.diemPhan![p])} hoan={220 + i * 110} tat={tat} />
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
-        {phan.length > 0 && (
-          <section className={`pk-khoi ${cls}`} style={keo(1)}>
-            <div className="pk-tieu">Điểm từng phần</div>
-            {phan.map((p, i) => (
-              <div className="pk-dong" key={p.ten}>
-                <div className="pk-dong-tren">
-                  <span className="pk-dong-ten">{p.ten}</span>
-                  <span className="pk-dong-so">{soVN(p.diem)}/10</span>
-                </div>
-                <div className="pk-ray">
-                  <div
-                    className="pk-day"
-                    style={{
-                      width: ra || dongYen ? `${Math.max(0, Math.min(100, p.diem * 10))}%` : 0,
-                      background: mauXepLoai(p.diem),
-                      transitionDelay: dongYen ? '0ms' : `${320 + i * 110}ms`,
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </section>
+        {/* VỊ TRÍ TRONG LỚP */}
+        {du.diemLop.length >= 5 && (
+          <Khoi tieu="Vị trí trong lớp" ten="Cả ca này đứng ở đâu" tat={tat}>
+            <PhanBoLop diemLop={du.diemLop} cuaEm={du.diem} tat={tat} />
+          </Khoi>
         )}
 
-        {sai.length > 0 && (
-          <section className={`pk-khoi ${cls}`} style={keo(2)}>
-            <div className="pk-tieu">Chuyên đề mất điểm</div>
-            {sai.map((c, i) => (
-              <div className="pk-dong" key={c.ten}>
-                <div className="pk-dong-tren">
-                  <span className="pk-dong-ten">{c.ten}</span>
-                  <span className="pk-dong-so" style={{ color: 'var(--p-do)' }}>
+        {/* TIẾN BỘ */}
+        {du.lichSu.length >= 2 && (
+          <Khoi tieu="Tiến bộ" ten="Điểm qua các bài đã làm" ghi={`${du.lichSu.length} bài, cũ nhất bên trái.`} tat={tat}>
+            <DuongTienBo ds={du.lichSu} tat={tat} />
+          </Khoi>
+        )}
+
+        {/* CHUYÊN ĐỀ TRONG BÀI NÀY */}
+        {saiTrongCa.length > 0 && (
+          <Khoi tieu="Bài này" ten="Chuyên đề mất điểm" tat={tat}>
+            {saiTrongCa.map((c, i) => (
+              <div className="bc-dong" key={c.ten}>
+                <div className="bc-dtren">
+                  <span className="bc-dten">{c.ten}</span>
+                  <span className="bc-dso" style={{ color: 'var(--p-do)' }}>
                     sai {c.soSai}/{c.soCau}
                   </span>
                 </div>
-                <div className="pk-ray">
-                  <div
-                    className="pk-day"
-                    style={{
-                      width: ra || dongYen ? `${Math.max(0, Math.min(100, (c.soSai / Math.max(1, c.soCau)) * 100))}%` : 0,
-                      background: 'var(--p-do)',
-                      transitionDelay: dongYen ? '0ms' : `${420 + i * 110}ms`,
-                    }}
-                  />
-                </div>
+                <Thanh tiLe={c.soSai / Math.max(1, c.soCau)} mau="var(--p-do)" hoan={140 + i * 90} tat={tat} />
               </div>
             ))}
-          </section>
+          </Khoi>
+        )}
+
+        {/* BẢN ĐỒ CHUYÊN ĐỀ TỔNG */}
+        {yeuTong.length > 0 && (
+          <Khoi
+            tieu="Cả quá trình"
+            ten="Bản đồ chuyên đề"
+            ghi="Cộng dồn mọi bài em đã làm. Mũi tên so với ba bài trước đó."
+            tat={tat}
+          >
+            {yeuTong.slice(0, 8).map((c, i) => (
+              <div className="bc-dong" key={c.ten}>
+                <div className="bc-dtren">
+                  <span className="bc-dten">
+                    {c.ten}
+                    {c.xuHuong === 'tot' && <span style={{ color: 'var(--p-xanh)' }}> ↑</span>}
+                    {c.xuHuong === 'xau' && <span style={{ color: 'var(--p-do)' }}> ↓</span>}
+                  </span>
+                  <span className="bc-dso" style={{ color: c.tiLeSai > 0.3 ? 'var(--p-do)' : 'var(--p-xanh)' }}>
+                    sai {c.soSai}/{c.soCau}
+                  </span>
+                </div>
+                <Thanh tiLe={c.tiLeSai} mau={c.tiLeSai > 0.3 ? 'var(--p-do)' : 'var(--p-xanh)'} hoan={140 + i * 70} tat={tat} />
+              </div>
+            ))}
+          </Khoi>
+        )}
+
+        {/* CÁCH LÀM BÀI */}
+        {tk && (
+          <Khoi tieu="Cách làm bài" ten="Em làm bài như thế nào" tat={tat}>
+            <div className="bc-o3">
+              <OSo so={tk.giayCauDungTB !== null ? `${tk.giayCauDungTB}s` : null} ten="giây trung bình một câu ĐÚNG" />
+              <OSo so={tk.giayCauSaiTB !== null ? `${tk.giayCauSaiTB}s` : null} ten="giây trung bình một câu SAI" />
+              <OSo so={tk.soBoTrong} ten="câu bỏ trống" />
+            </div>
+            <DaiThoiGian cau={du.dai ?? []} tat={tat} />
+            {tk.theoMucDo.length > 0 && (
+              <div style={{ marginTop: 14 }}>
+                <div className="bc-tieu">Sai theo mức độ</div>
+                {tk.theoMucDo.map((m, i) => (
+                  <div className="bc-dong" key={m.mucDo}>
+                    <div className="bc-dtren">
+                      <span className="bc-dten">{TEN_MUC_DO[m.mucDo]}</span>
+                      <span className="bc-dso">
+                        sai {m.sai}/{m.tong}
+                      </span>
+                    </div>
+                    <Thanh tiLe={m.sai / Math.max(1, m.tong)} mau={m.sai / Math.max(1, m.tong) > 0.3 ? 'var(--p-cam)' : 'var(--p-xanh)'} hoan={140 + i * 80} tat={tat} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </Khoi>
+        )}
+
+        {/* NHẬN ĐỊNH + TƯ VẤN */}
+        {du.tinHieu.length > 0 && (
+          <Khoi tieu="Nhận định" ten="Thầy thấy gì, anh/chị nhắc con gì" tat={tat}>
+            {du.tinHieu.map((t) => (
+              <div className="bc-tin" key={t.ma}>
+                <div className="bc-tin-nhan">{t.nhan}</div>
+                <div className="bc-tin-so">{t.soLieu}</div>
+                <div className="bc-tin-khuyen">{t.loiKhuyen}</div>
+              </div>
+            ))}
+          </Khoi>
+        )}
+
+        {/* TỪNG CÂU SAI */}
+        {du.cauSai.length > 0 && (
+          <Khoi tieu="Chi tiết" ten={`${du.cauSai.length} câu sai`} ghi="Chạm vào từng câu để xem đề, đáp án đúng và lời giải." tat={tat}>
+            <div style={{ marginTop: 6 }}>
+              {du.cauSai.map((c, i) => (
+                <TheCauSai key={`${c.phan}-${c.soCau}`} c={c} stt={i + 1} />
+              ))}
+            </div>
+          </Khoi>
+        )}
+
+        {/* ĐÚC KẾT */}
+        {du.ducKet.length > 0 && (
+          <Khoi tieu="Chép vào sổ" ten="Đúc kết kiến thức cần nhớ" ghi="Em chép đúng những dòng này vào sổ sửa lỗi, tick khi đã thuộc." tat={tat}>
+            {du.ducKet.map((g) => (
+              <div className="bc-soan" key={g.chuyenDe}>
+                <div className="bc-soan-cd">{g.chuyenDe}</div>
+                {g.y.map((y, i) => (
+                  <div className="bc-soan-y" key={i}>
+                    <span className="bc-soan-o" />
+                    <span>
+                      <ChemText text={y} />
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </Khoi>
         )}
 
         {du.vieCanLam.trim() && (
-          <section className={`pk-viec ${cls}`} style={keo(3)}>
-            <div className="pk-tieu">Việc cần làm</div>
-            <div className="pk-viec-chu">{du.vieCanLam}</div>
+          <section className="bc-viec">
+            <div className="bc-tieu">Việc cần làm</div>
+            <div className="bc-viec-chu">{du.vieCanLam}</div>
           </section>
         )}
 
-        <footer className={`pk-chan ${cls}`} style={keo(4)}>
+        <footer className="bc-chan">
           <div>
             <b>Thầy Đỗ Đại Học</b>
           </div>
-          <div>Phiếu riêng của em {du.hoTen || du.sbd}, anh/chị giữ trong máy, không chuyển tiếp.</div>
+          <div>Báo cáo riêng của em {du.hoTen || du.sbd}. Anh/chị giữ trong máy, không chuyển tiếp cho người khác.</div>
         </footer>
+      </div>
+    </div>
+  )
+}
+
+/** Vòng điểm có số chạy lên. Tách riêng để phần đếm số không dựng lại cả trang. */
+function VongDiem({ diem, tat }: { diem: number; tat: boolean }) {
+  const R = 51
+  const C = 2 * Math.PI * R
+  const [ra, setRa] = useState(tat)
+  const [so, setSo] = useState(tat ? diem : 0)
+
+  useEffect(() => {
+    if (tat) return
+    let id = 0
+    const t0 = performance.now()
+    const buoc = (t: number) => {
+      const k = Math.min(1, (t - t0) / 950)
+      setSo(diem * (1 - Math.pow(1 - k, 3)))
+      if (k < 1) id = requestAnimationFrame(buoc)
+    }
+    const r = requestAnimationFrame(() => {
+      setRa(true)
+      id = requestAnimationFrame(buoc)
+    })
+    return () => {
+      cancelAnimationFrame(r)
+      cancelAnimationFrame(id)
+    }
+  }, [diem, tat])
+
+  return (
+    <div className="bc-vong">
+      <svg viewBox="0 0 116 116" aria-hidden="true">
+        <circle cx="58" cy="58" r={R} fill="none" stroke="var(--p-chim)" strokeWidth="9" />
+        <circle
+          cx="58"
+          cy="58"
+          r={R}
+          fill="none"
+          stroke={mauDiem(diem)}
+          strokeWidth="9"
+          strokeLinecap="round"
+          strokeDasharray={C}
+          strokeDashoffset={ra ? C * (1 - Math.min(1, diem / 10)) : C}
+          style={{ transition: tat ? 'none' : 'stroke-dashoffset 1.05s cubic-bezier(.22,.9,.28,1) .1s' }}
+        />
+      </svg>
+      <div className="bc-vong-in">
+        <div className="bc-so" style={{ color: mauDiem(diem) }}>
+          {soVN(so)}
+        </div>
+        <div className="bc-tren">trên 10</div>
       </div>
     </div>
   )
