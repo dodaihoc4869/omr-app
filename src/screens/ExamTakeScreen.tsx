@@ -199,6 +199,7 @@ export default function ExamTakeScreen() {
   const [keyBank, setKeyBank] = useState<KeyBank | null>(null)
   // Màn báo cáo học tập của chính em, mở từ màn "Đã nộp bài".
   const [xemBaoCao, setXemBaoCao] = useState(false)
+  const [dangTaiDe, setDangTaiDe] = useState(false)
   const [xemLoiGiai, setXemLoiGiai] = useState(false)
 
   // ---- Trạng thái riêng của màn làm bài ----
@@ -310,6 +311,39 @@ export default function ExamTakeScreen() {
   // máy em đã có bài làm, giây từng câu và ngân hàng CÓ đáp án của ca. Mục nào
   // cần dữ liệu chỉ thầy có (hạng lớp, phân bố điểm, lịch sử ca) thì trang báo
   // cáo tự giấu, chứ không dựng mục rỗng.
+  /** Tải ĐÚNG bộ câu em vừa làm, kèm lời giải, theo mẫu phiếu đã chốt. */
+  const taiDeCuaEm = async () => {
+    if (!solutionAssignment || !attempt) return
+    setDangTaiDe(true)
+    try {
+      const bo = [
+        ...solutionAssignment.phanI.map((a) => ({ phan: 'I' as const, q: a.question as TeacherMcqQuestion })),
+        ...solutionAssignment.phanII.map((a) => ({ phan: 'II' as const, q: a.question as TeacherTrueFalseQuestion })),
+        ...solutionAssignment.phanIII.map((a) => ({ phan: 'III' as const, q: a.question as TeacherShortAnswerQuestion })),
+      ]
+      const [{ cauLuyenTuBoCau }, { dungPhieuHtml, phieuThanhPdf, taiTep }] = await Promise.all([import('../lib/bai-tap-pdf'), import('../lib/tai-phieu-pdf')])
+      const cau = cauLuyenTuBoCau(bo)
+      const cd = [...new Set(cau.map((c) => c.chuyenDe).filter(Boolean))]
+      const kq = await dungPhieuHtml(
+        {
+          hoTen: hoTen.trim() || `SBD ${attempt.sbd}`,
+          sbd: attempt.sbd,
+          ngay: new Date(),
+          tenChuyenDe: cd.length === 1 ? cd[0] : attempt.tenCa || 'Hoá học',
+          ketQua: graded ? `Điểm ${graded.score.total.toFixed(2)}/10` : '',
+          hienDapAn: true,
+        },
+        cau,
+      )
+      taiTep(await phieuThanhPdf(kq.html), `de-va-loi-giai-${attempt.sbd}-${attempt.maCa}.pdf`)
+      showToast('Đã tải đề và lời giải', 'success')
+    } catch {
+      showToast('Chưa dựng được đề PDF. Em thử lại khi máy rảnh hơn.', 'error')
+    } finally {
+      setDangTaiDe(false)
+    }
+  }
+
   const phieuCuaEm: PhieuDayDu | null = useMemo(() => {
     if (!keyBank || !attempt || !graded) return null
     try {
@@ -1215,6 +1249,13 @@ export default function ExamTakeScreen() {
           {phieuCuaEm && (
             <NutChinh variant="phu" onClick={() => setXemBaoCao(true)}>
               Xem báo cáo học tập
+            </NutChinh>
+          )}
+          {/* ĐỀ RIÊNG CỦA EM. Mỗi em một bộ câu khác nhau nên tải chung đề của
+              ca là sai — phải dựng từ ĐÚNG bộ máy đã gán cho em này. */}
+          {solutionAssignment && attempt && (
+            <NutChinh variant="phu" onClick={() => void taiDeCuaEm()} disabled={dangTaiDe}>
+              {dangTaiDe ? 'Đang dựng đề…' : 'Tải đề & lời giải (PDF)'}
             </NutChinh>
           )}
           {keyBank && solutionAssignment && (

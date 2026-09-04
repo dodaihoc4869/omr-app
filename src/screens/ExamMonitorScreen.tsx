@@ -19,6 +19,7 @@ import { gioMayChu } from '../lib/gio-may-chu'
 import { soanTinRoiMan } from '../lib/phieu-zalo'
 import { KhoiChuyenDe, KhoiLichSuCa } from '../components/HoSoEmView'
 import NutBaiTapPdf from '../components/NutBaiTapPdf'
+import NutTaiDeCa from '../components/NutTaiDeCa'
 import KhoiTienBo from '../components/KhoiTienBo'
 import PhieuZaloEm from '../components/PhieuZaloEm'
 import { hoSoEm, type HoSoEm } from '../lib/exam-api'
@@ -694,6 +695,21 @@ export default function ExamMonitorScreen() {
                 <NutXuat icon={<FileSpreadsheet size={20} />} ten="Bảng điểm" phu="xlsx" onClick={handleExportXlsx} />
                 <NutXuat icon={<FileJson size={20} />} ten="Dữ liệu" phu="json" onClick={handleExportJson} />
               </div>
+            </TheNoiDung>
+          )}
+
+          {/* ĐỀ + LỜI GIẢI CỦA CA. Cần ngân hàng CÓ đáp án; ca mở ở máy khác mà
+              chưa xin được thì không hiện nút chứ không hiện nút bấm vào lỗi. */}
+          {teacherBank && teacherBank.length > 0 && chiTiet && (
+            <TheNoiDung>
+              <div style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)', fontWeight: 700, marginBottom: 'var(--k3)' }}>Tải đề & lời giải</div>
+              <NutTaiDeCa
+                banks={teacherBank}
+                maCa={chiTiet.ca.maCa}
+                tenCa={chiTiet.ca.tenCa || `Ca ${chiTiet.ca.maCa}`}
+                ghiChu={chiTiet.ca.lop ? `Lớp ${chiTiet.ca.lop}` : ''}
+                showToast={showToast}
+              />
             </TheNoiDung>
           )}
 

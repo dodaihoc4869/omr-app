@@ -108,6 +108,21 @@ function doiSang(c: CauNguon): CauLuyen {
   }
 }
 
+/** Đổi cả một kho đề sang danh sách câu để in phiếu, GIỮ NGUYÊN thứ tự gốc.
+ *
+ * Khác `chonCauLuyen`: không lọc chuyên đề, không tránh câu đã làm, không xáo.
+ * Dùng khi thầy muốn in ĐÚNG đề của một ca hay của một em — in thiếu hay in
+ * khác thứ tự là tờ giấy không đối chiếu được với bài em đã làm. */
+export function cauLuyenTuNguon(nguon: TeacherExamSource[]): CauLuyen[] {
+  return goiCau(nguon).map(doiSang)
+}
+
+/** Đổi đúng bộ câu MỘT EM đã làm sang danh sách in phiếu, theo đúng thứ tự em
+ * nhìn thấy trên màn hình. */
+export function cauLuyenTuBoCau(bo: { phan: 'I' | 'II' | 'III'; q: TeacherMcqQuestion | TeacherTrueFalseQuestion | TeacherShortAnswerQuestion }[]): CauLuyen[] {
+  return bo.map(doiSang)
+}
+
 export interface YeuCauLuyen {
   /** Chuyên đề em đang yếu, kèm tỉ lệ sai để chọn bậc khởi điểm. */
   chuyenDe: { ten: string; tiLeSai: number }[]
