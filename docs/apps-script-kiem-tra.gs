@@ -2155,8 +2155,13 @@ function doPost(e) {
     const caSh = sheetCa_()
     const soDongCa = caSh.getLastRow()
     if (soDongCa > 1) {
-      const caVals = caSh.getRange(1, 1, soDongCa, 1).getValues()
-      for (let i = 1; i < caVals.length; i++) caSong[String(caVals[i][0])] = true
+      // Cột 0 = MaCa, cột 9 = TrangThai. Ca xoá MỀM (TrangThai='da_xoa') vẫn
+      // nằm trong sheet — không loại nó ra thì bộ lọc này vô nghĩa.
+      const caVals = caSh.getRange(1, 1, soDongCa, 10).getValues()
+      for (let i = 1; i < caVals.length; i++) {
+        if (String(caVals[i][9] || 'mo') === 'da_xoa') continue
+        caSong[String(caVals[i][0])] = true
+      }
     }
     const dsSbdLuot = Object.keys(soCaTheoCa)
     for (let i = 0; i < dsSbdLuot.length; i++) {

@@ -217,6 +217,8 @@ describe('Máy chủ — danh sách em trên màn Học sinh', () => {
     // đầy số báo danh của các ca thử đã xoá từ đời nào.
     expect(than).toContain('const caSong = {}')
     expect(than).toContain('if (!coCaSong) continue')
+    // Ca xoá MỀM vẫn nằm trong sheet — không loại nó ra thì bộ lọc vô nghĩa.
+    expect(than).toContain("caVals[i][9] || 'mo') === 'da_xoa'")
   })
 
   it('em ngoài danh sách được gắn cờ để thầy biết em đó không thi được nữa', () => {
