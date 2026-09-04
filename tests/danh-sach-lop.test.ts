@@ -232,6 +232,33 @@ describe('Máy chủ — danh sách em trên màn Học sinh', () => {
   })
 })
 
+describe('Hàm dọn tay donEmNgoaiDanhSach', () => {
+  const ham = (() => {
+    const i = gsCode.indexOf('function donEmNgoaiDanhSach')
+    return gsCode.slice(i, gsCode.indexOf('\n/**', i))
+  })()
+
+  it('DỪNG khi chưa nạp danh sách — chạy nhầm là xoá sạch cả trung tâm', () => {
+    expect(ham).toContain('if (!dsLop.length)')
+    expect(ham).toContain('DỪNG')
+  })
+
+  it('xoá từ DƯỚI LÊN — xoá từ trên xuống thì chỉ số dòng phía dưới tụt hết', () => {
+    expect(ham).toContain('for (let i = data.length - 1; i >= 1; i--)')
+  })
+
+  it('quét đủ mọi sheet có SBD, không bỏ sót chỗ nào', () => {
+    for (const s of ['SHEET_LUOT', 'SHEET_CHITIET', 'SHEET_TIENDO_CA', 'SHEET_TIENDO_HS', 'SHEET_QID', 'SHEET_HOCSINH', 'SHEET_NHANXET', 'SHEET_YEUCAU']) {
+      expect(ham).toContain(s)
+    }
+  })
+
+  it('KHÔNG gọi được từ ngoài — không nằm trong bảng lệnh nào', () => {
+    expect(gsCode).not.toContain("action === 'donEmNgoaiDanhSach'")
+    expect(gsCode).not.toContain("'donEmNgoaiDanhSach'")
+  })
+})
+
 describe('Máy chủ — chỉ thầy đụng được danh sách', () => {
   it('napDanhSachLop đòi mã bí mật', () => {
     const i = gsCode.indexOf("if (action === 'napDanhSachLop')")

@@ -417,6 +417,69 @@ function timTrongDanhSachLop_(sbd) {
   }
 }
 
+/** DỌN SẠCH MỌI DẤU VẾT CỦA SỐ BÁO DANH KHÔNG CÒN TRONG DANH SÁCH.
+ *
+ * Chạy TAY trong trình soạn Apps Script (chọn hàm này → Chạy), không phải lệnh
+ * web — nó xoá vĩnh viễn, không ai gọi được từ ngoài.
+ *
+ * Vì sao cần: danh sách học sinh nay do file của thầy quyết định. Số báo danh
+ * của các ca thử cũ vẫn nằm rải trong LuotThi, ChiTietCau, TienDoCa, TienDoHS,
+ * QidDaLam, HocSinh, NhanXet, YeuCauGiaoBai — màn Học sinh vẫn phải hiện chúng
+ * kèm cờ đỏ (không giấu dữ liệu), nên muốn hết hẳn thì phải xoá thật.
+ *
+ * CHẶN AN TOÀN: danh sách trống thì DỪNG. Không có chặn này, chạy nhầm lúc
+ * chưa nạp file là xoá sạch dữ liệu cả trung tâm.
+ *
+ * Kết quả in ra Nhật ký thực thi: xoá bao nhiêu dòng ở sheet nào, của SBD nào.
+ */
+function donEmNgoaiDanhSach() {
+  const dsLop = docDanhSachLop_()
+  if (!dsLop.length) {
+    Logger.log('DỪNG: sheet DanhSachLop trống — chưa nạp file danh sách thì không biết ai là "ngoài danh sách".')
+    return
+  }
+  const trongDs = {}
+  for (let i = 0; i < dsLop.length; i++) trongDs[String(dsLop[i].sbd).trim()] = true
+
+  // sheet → chỉ số cột chứa SBD
+  const BANG = [
+    [SHEET_LUOT, 1],
+    [SHEET_CHITIET, 1],
+    [SHEET_TIENDO_CA, 0],
+    [SHEET_TIENDO_HS, 0],
+    [SHEET_QID, 0],
+    [SHEET_HOCSINH, 0],
+    [SHEET_NHANXET, 0],
+    [SHEET_YEUCAU, 1],
+  ]
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const daXoa = {}
+  let tongDong = 0
+
+  for (let b = 0; b < BANG.length; b++) {
+    const ten = BANG[b][0]
+    const cot = BANG[b][1]
+    const sh = ss.getSheetByName(ten)
+    if (!sh || sh.getLastRow() < 2) continue
+    const data = sh.getDataRange().getValues()
+    // Xoá từ DƯỚI LÊN: xoá từ trên xuống thì chỉ số dòng phía dưới tụt hết.
+    let n = 0
+    for (let i = data.length - 1; i >= 1; i--) {
+      const sbd = String(data[i][cot] || '').trim()
+      if (!sbd || trongDs[sbd]) continue
+      sh.deleteRow(i + 1)
+      daXoa[sbd] = (daXoa[sbd] || 0) + 1
+      n++
+    }
+    if (n) Logger.log(ten + ': xoá ' + n + ' dòng')
+    tongDong += n
+  }
+
+  const dsSbd = Object.keys(daXoa)
+  Logger.log('XONG. Xoá ' + tongDong + ' dòng của ' + dsSbd.length + ' số báo danh: ' + dsSbd.join(', '))
+  Logger.log('Danh sách chính thức giữ nguyên ' + dsLop.length + ' em.')
+}
+
 /** Đọc TOÀN BỘ bản sao danh sách học sinh (một lần đọc sheet). */
 function docDanhSachLop_() {
   try {
