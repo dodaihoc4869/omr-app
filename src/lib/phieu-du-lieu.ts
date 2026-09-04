@@ -10,7 +10,8 @@
 // hiện ra với số 0 giả.
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import type { CaCuaEm, ChiTietCauRow, ChuyenDeEm, HoSoEm } from './exam-api'
-import { ducKetKienThuc, thongKeLamBai, tinHieuLamBai, type ThongKeLamBai, type TinHieuLamBai } from './phan-tich-lam-bai'
+import { ducKetKienThuc, thongKeLamBai, tinHieuLamBai, type DucKetChuyenDe, type ThongKeLamBai, type TinHieuLamBai } from './phan-tich-lam-bai'
+import { chonCauLuyen, type CauLuyen } from './bai-tap-pdf'
 
 /** Phiên bản gói báo cáo. Trang đọc từ chối bản lạ thay vì vẽ thiếu mục. */
 export const BAN_PHIEU = 2
@@ -74,11 +75,15 @@ export interface PhieuDayDu {
   vieCanLam: string
   thongKe: ThongKeLamBai | null
   tinHieu: TinHieuLamBai[]
-  ducKet: { chuyenDe: string; y: string[] }[]
+  ducKet: DucKetChuyenDe[]
   cauSai: CauSaiChiTiet[]
   /** Dải thời gian từng câu theo đúng thứ tự em làm — để vẽ biểu đồ nhịp làm
    * bài. Gọn hết mức: nhãn, số giây, đúng hay sai. */
   dai: { nhan: string; giay: number | null; dung: boolean }[]
+  /** 10 câu luyện đúng chuyên đề em yếu, kèm sẵn trong báo cáo để phụ huynh bấm
+   * một nút là tải được phiếu PDF ngay trên máy mình — không phải chờ thầy gửi
+   * thêm file. Rút lúc thầy tạo báo cáo, ở máy thầy, nơi có cả kho đề. */
+  baiTap?: CauLuyen[]
 }
 
 type CauBatKy = TeacherMcqQuestion | TeacherTrueFalseQuestion | TeacherShortAnswerQuestion
@@ -158,13 +163,30 @@ export interface NguonPhieu {
   diemLop?: number[] | null
   thoiLuongPhut?: number | null
   vaoLuc?: string | null
+  /** Cả kho đề trên máy thầy, để rút sẵn 10 câu luyện kèm vào báo cáo. */
+  khoDe?: TeacherExamSource[] | null
+  /** Câu em đã làm — tránh khi rút bài luyện. */
+  qidDaLam?: string[] | null
 }
+
+/** Số câu của phiếu luyện kèm trong báo cáo gửi phụ huynh. Cố định 10: đây là
+ * bài chữa lỗi ngay sau một bài kiểm tra, không phải bộ đề ôn cả chương. */
+export const SO_CAU_BAI_TAP_KEM = 10
 
 export function dungPhieu(n: NguonPhieu): PhieuDayDu {
   const rows = n.rows ?? []
   const banks = n.banks ?? []
   const cauSai = rows.length && banks.length ? dungCauSai(rows, banks) : []
   const tk = rows.length ? thongKeLamBai(rows, { vaoLuc: n.vaoLuc, nopLuc: n.ca.nopLuc, thoiLuongPhut: n.thoiLuongPhut }) : null
+
+  // Bài luyện kèm sẵn: rút theo chuyên đề em sai TRONG CA NÀY, tránh câu em đã
+  // làm. Kho đề chỉ có trên máy thầy nên phải rút ở đây, lúc tạo báo cáo.
+  const yeuCa = n.chuyenDeCa
+    .filter((c) => c.soSai > 0)
+    .map((c) => ({ ten: c.ten, tiLeSai: c.soSai / Math.max(1, c.soCau) }))
+    .sort((a, b) => b.tiLeSai - a.tiLeSai)
+  const kho = n.khoDe ?? []
+  const baiTap = kho.length > 0 ? chonCauLuyen(kho, { chuyenDe: yeuCa, qidDaLam: n.qidDaLam ?? [], soCau: SO_CAU_BAI_TAP_KEM }).cau : []
 
   return {
     v: BAN_PHIEU,
@@ -195,5 +217,6 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
     ducKet: ducKetKienThuc(cauSai.map((c) => ({ chuyenDe: c.chuyenDe, chot: c.chot }))),
     cauSai,
     dai: rows.map((r) => ({ nhan: `Phần ${r.phan} câu ${r.soCau}`, giay: r.giay, dung: Boolean(r.dungSai) })),
+    baiTap,
   }
 }

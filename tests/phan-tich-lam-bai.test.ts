@@ -172,7 +172,40 @@ describe('ducKetKienThuc', () => {
     ])
     expect(r).toHaveLength(2)
     expect(r[0].chuyenDe).toBe('Ester – lipid')
-    expect(r[0].y).toHaveLength(2)
+    expect(r[0].lyThuyet).toHaveLength(2)
+  })
+
+  // Thầy chốt: đúc kết phải là lý thuyết và kỹ năng, KHÔNG phải chép lại bài
+  // giải của một câu. "Acid 24/60 = 0,4 mol" chép vào sổ không dùng lại được ở
+  // câu nào khác.
+  it('LOẠI câu chốt là phép tính của riêng một câu', () => {
+    const r = ducKetKienThuc([
+      { chuyenDe: 'Ester – lipid', chot: 'Acid 24/60 = 0,4 mol, ester 26,4/88 = 0,3 mol, hiệu suất 0,3/0,4 = 75%.' },
+      { chuyenDe: 'Ester – lipid', chot: 'Alcohol 0,17 mol là chất thiếu; ester thu 0,12 mol.' },
+      { chuyenDe: 'Ester – lipid', chot: 'Ester không có H linh động nên ít tan trong nước.' },
+    ])
+    expect(r[0].lyThuyet.concat(r[0].kyNang)).toEqual(['Ester không có H linh động nên ít tan trong nước.'])
+  })
+
+  it('LOẠI câu quá dài — đúc kết là để chép vào sổ, không phải chép cả đoạn văn', () => {
+    const dai = 'Ester ' + 'rất '.repeat(30) + 'quan trọng.'
+    expect(ducKetKienThuc([{ chuyenDe: 'X', chot: dai }])).toEqual([])
+  })
+
+  it('tách hai ngăn: điều phải THUỘC và điều phải LÀM ĐƯỢC', () => {
+    const r = ducKetKienThuc([
+      { chuyenDe: 'Ester – lipid', chot: 'Ester không có H linh động nên ít tan trong nước.' },
+      { chuyenDe: 'Ester – lipid', chot: 'Đếm số nhóm COO để biết ester mấy chức.' },
+    ])
+    expect(r[0].lyThuyet).toHaveLength(1)
+    expect(r[0].kyNang).toHaveLength(1)
+    expect(r[0].kyNang[0]).toContain('Đếm')
+  })
+
+  it('mỗi ngăn tối đa 5 ý — sổ của em không phải quyển sách', () => {
+    const nhieu = Array.from({ length: 12 }, (_, i) => ({ chuyenDe: 'X', chot: `Tính chất số ${'a'.repeat(i + 1)} của ester.` }))
+    const r = ducKetKienThuc(nhieu)
+    expect(r[0].lyThuyet.length).toBeLessThanOrEqual(5)
   })
 
   it('câu không có chốt thì bỏ qua, KHÔNG tự nghĩ ra ý cho em chép vào sổ', () => {

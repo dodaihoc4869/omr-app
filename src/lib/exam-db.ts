@@ -170,6 +170,36 @@ export async function loadTeacherSecret(): Promise<string> {
   return (await db.get(STORE_SETTINGS, 'teacherSecret')) || ''
 }
 
+/** Câu đã từng in ra PHIẾU BÀI TẬP PDF của một em.
+ *
+ * Thầy chốt: "lần sau tạo khác các câu lần trước". Câu đã in ra giấy thì em đã
+ * cầm rồi, dù em chưa nộp lại nên máy chủ không biết. Vì vậy phải nhớ riêng ở
+ * máy thầy, cạnh danh sách `qidDaLam` của máy chủ.
+ *
+ * Giữ tối đa 400 mã gần nhất mỗi em: đủ cho vài chục phiếu, và không phình mãi. */
+const GIU_QID_PHIEU = 400
+
+export async function docQidRaPhieu(sbd: string): Promise<string[]> {
+  const db = await getDb()
+  const v = (await db.get(STORE_SETTINGS, `qidRaPhieu:${sbd}`)) as string[] | undefined
+  return Array.isArray(v) ? v.map(String) : []
+}
+
+export async function themQidRaPhieu(sbd: string, qids: string[]): Promise<void> {
+  if (qids.length === 0) return
+  const db = await getDb()
+  const cu = await docQidRaPhieu(sbd)
+  // Mã mới đứng đầu để khi cắt bớt thì cắt mã cũ nhất trước.
+  const moi = [...new Set([...qids.map(String), ...cu])].slice(0, GIU_QID_PHIEU)
+  await db.put(STORE_SETTINGS, moi, `qidRaPhieu:${sbd}`)
+}
+
+/** Thầy muốn phát lại từ đầu (vd sang học kỳ mới) thì xoá lịch sử này. */
+export async function xoaQidRaPhieu(sbd: string): Promise<void> {
+  const db = await getDb()
+  await db.delete(STORE_SETTINGS, `qidRaPhieu:${sbd}`)
+}
+
 /** Toàn bộ ngân hàng CÓ đáp án của các ca đã mở (để chấm lại khi thầy sửa
  * đáp án một câu trong ngân hàng — xem NganHangDeScreen). */
 export async function loadAllSessionTeacherBanks(): Promise<{ maCa: string; sources: TeacherExamSource[] }[]> {

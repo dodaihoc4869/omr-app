@@ -4,22 +4,28 @@
 // tự động; nút này ra một TỜ GIẤY thầy tải về, in ra hoặc gửi thẳng qua Zalo cho
 // em nào không dùng app.
 //
-// Chọn câu và bậc tiến bộ nằm ở lib/bai-tap-pdf.ts, vẽ PDF ở lib/ve-bai-tap-pdf.ts
-// — ở đây chỉ lo bấm nút, báo trạng thái và nói thật kết quả (thiếu câu, phải
-// lấy lại câu cũ) thay vì im lặng đưa ra một tờ giấy không đúng ý.
-import { useState } from 'react'
+// LẦN SAU KHÁC LẦN TRƯỚC: mã câu đã in ra phiếu được nhớ lại ngay trên máy thầy
+// (exam-db: qidRaPhieu). Máy chủ chỉ biết câu em đã NỘP, mà phiếu in ra thì em
+// đã cầm rồi dù chưa nộp — thiếu sổ này là lần sau phát lại đúng đề cũ.
+//
+// jsPDF và font nhúng nặng gần 300KB, nên cả bộ vẽ được NẠP ĐỘNG lúc thầy bấm
+// nút: người không dùng tới không phải tải.
+import { useEffect, useState } from 'react'
 import { FileDown, Loader2 } from 'lucide-react'
 import { NutChinh, OThongBao } from './DesignSystem'
-import { chonCauLuyen, tenTepBaiTap, type CauLuyen } from '../lib/bai-tap-pdf'
-import { veBaiTapPdf } from '../lib/ve-bai-tap-pdf'
-import { loadExamSources, loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
+import { chonCauLuyen, tenTepBaiTap } from '../lib/bai-tap-pdf'
+import { docQidRaPhieu, loadExamSources, loadScriptUrl, loadTeacherSecret, themQidRaPhieu, xoaQidRaPhieu } from '../lib/exam-db'
 import { qidDaLam } from '../lib/exam-api'
 import type { ChuyenDeEm } from '../lib/exam-api'
 import { laYeu } from './HoSoEmView'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 
-export const SO_CAU_PDF = 10
+export const SO_CAU_PDF_MAC_DINH = 10
+export const SO_CAU_PDF_TOI_DA = 60
+export const SO_CAU_PDF_TOI_THIEU = 5
+/** Mức chọn nhanh — thầy bấm một cái là xong, khỏi kéo thanh trượt. */
+export const MUC_SO_CAU = [10, 20, 30, 40, 50, 60]
 
 export default function NutBaiTapPdf({
   sbd,
@@ -35,12 +41,20 @@ export default function NutBaiTapPdf({
   showToast: (chu: string, kieu?: 'success' | 'error' | 'warn') => void
 }) {
   const [dang, setDang] = useState(false)
+  const [soCau, setSoCau] = useState(SO_CAU_PDF_MAC_DINH)
+  const [daRa, setDaRa] = useState(0)
   const [ketQua, setKetQua] = useState<{ soCau: number; lapLai: number; thieu: number; ten: string } | null>(null)
+
+  useEffect(() => {
+    let con = true
+    void docQidRaPhieu(sbd).then((ds) => con && setDaRa(ds.length))
+    return () => {
+      con = false
+    }
+  }, [sbd])
 
   // Chuyên đề để luyện: ưu tiên chuyên đề ĐỦ DỮ LIỆU và đang yếu (laYeu dùng
   // chung một ngưỡng với bảng mạnh–yếu, hai chỗ không được nói khác nhau).
-  // Không có chuyên đề nào đủ yếu thì lấy chuyên đề sai nhiều nhất, còn chưa có
-  // dữ liệu gì thì để rỗng và rút từ cả kho.
   const yeu = chuyenDe.filter((c) => laYeu(c))
   const dungDe = (yeu.length > 0 ? yeu : [...chuyenDe].filter((c) => c.soSai > 0).sort((a, b) => b.tiLeSai - a.tiLeSai).slice(0, 2)).map((c) => ({
     ten: c.ten,
@@ -54,17 +68,19 @@ export default function NutBaiTapPdf({
       const nguon = await loadExamSources()
       if (nguon.length === 0) throw new Error('Máy này chưa có đề nào. Vào Ngân hàng câu hỏi bấm Đồng bộ trước.')
 
-      // Câu em đã làm — để tránh phát lại. Mất mạng thì vẫn ra phiếu, chỉ là
-      // không tránh được câu cũ; nói rõ chứ không giấu.
-      let daLam: string[] = []
+      // Hai nguồn "câu em đã gặp": máy chủ biết câu em đã NỘP, máy thầy nhớ câu
+      // đã IN RA PHIẾU. Thiếu vế nào cũng phát lại câu cũ.
+      let daNop: string[] = []
       try {
         const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
-        if (url.trim() && mat.trim()) daLam = await qidDaLam(url.trim(), mat.trim(), sbd)
+        if (url.trim() && mat.trim()) daNop = await qidDaLam(url.trim(), mat.trim(), sbd)
       } catch {
-        daLam = []
+        daNop = []
       }
+      const daInRa = await docQidRaPhieu(sbd)
+      const tranh = [...new Set([...daNop, ...daInRa])]
 
-      const kq = chonCauLuyen(nguon, { chuyenDe: dungDe, qidDaLam: daLam, soCau: SO_CAU_PDF })
+      const kq = chonCauLuyen(nguon, { chuyenDe: dungDe, qidDaLam: tranh, soCau })
       if (kq.cau.length === 0) {
         throw new Error(
           dungDe.length > 0
@@ -73,17 +89,20 @@ export default function NutBaiTapPdf({
         )
       }
 
+      const { veBaiTapPdf } = await import('../lib/ve-bai-tap-pdf')
       const doc = veBaiTapPdf({
         hoTen,
         sbd,
         lop,
         ngay: new Date(),
         chuyenDe: (yeu.length > 0 ? yeu : chuyenDe).map((c) => ({ ten: c.ten, soCau: c.soCau, soSai: c.soSai })),
-        cau: kq.cau as CauLuyen[],
+        cau: kq.cau,
         lapLai: kq.lapLai,
       })
       const ten = tenTepBaiTap(hoTen, sbd)
       doc.save(ten)
+      await themQidRaPhieu(sbd, kq.cau.map((c) => c.id))
+      setDaRa((n) => n + kq.cau.length)
       setKetQua({ soCau: kq.cau.length, lapLai: kq.lapLai, thieu: kq.thieu, ten })
       showToast(`Đã tải ${ten}`, 'success')
     } catch (e) {
@@ -93,24 +112,86 @@ export default function NutBaiTapPdf({
     }
   }
 
+  const quenLichSu = async () => {
+    await xoaQidRaPhieu(sbd)
+    setDaRa(0)
+    showToast('Đã xoá lịch sử phiếu của em này. Lần sau được phép lấy lại câu cũ.', 'success')
+  }
+
   return (
-    <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+    <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
+      <div>
+        <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Số câu trong phiếu</div>
+        <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }}>
+          {MUC_SO_CAU.map((n) => (
+            <button
+              key={n}
+              type="button"
+              onClick={() => setSoCau(n)}
+              className="tap-target font-bold"
+              style={{
+                minHeight: 40,
+                padding: '0 var(--k4)',
+                borderRadius: 'var(--bo-tron)',
+                border: 'none',
+                background: soCau === n ? 'var(--phu-dam)' : 'var(--the-2)',
+                color: soCau === n ? 'var(--muc-nguoc)' : 'var(--muc)',
+                fontFamily: 'var(--sans)',
+                fontSize: 'var(--cx-2)',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {n}
+            </button>
+          ))}
+        </div>
+        <input
+          type="range"
+          min={SO_CAU_PDF_TOI_THIEU}
+          max={SO_CAU_PDF_TOI_DA}
+          step={1}
+          value={soCau}
+          onChange={(e) => setSoCau(Number(e.target.value))}
+          aria-label="Số câu trong phiếu"
+          style={{ width: '100%', marginTop: 'var(--k3)', accentColor: 'var(--phu-dam)' }}
+        />
+        <div style={NHAN_NHO}>
+          Đang chọn <b style={{ color: 'var(--muc)' }}>{soCau} câu</b> · tối đa {SO_CAU_PDF_TOI_DA}
+        </div>
+      </div>
+
       <NutChinh variant="phu" onClick={() => void tao()} disabled={dang}>
         <span className="inline-flex items-center" style={{ gap: 6 }}>
           {dang ? <Loader2 size={18} className="animate-spin" /> : <FileDown size={18} />}
-          {dang ? 'Đang dựng phiếu…' : `Tải phiếu bài tập PDF (${SO_CAU_PDF} câu)`}
+          {dang ? 'Đang dựng phiếu…' : `Tải phiếu bài tập PDF (${soCau} câu)`}
         </span>
       </NutChinh>
+
       <div style={NHAN_NHO}>
         {dungDe.length > 0
-          ? `Rút từ kho đề theo chuyên đề em đang yếu: ${dungDe.map((c) => c.ten).join(', ')}. Ưu tiên câu em chưa làm, xếp từ dễ lên khó.`
+          ? `Rút từ kho đề theo chuyên đề em đang yếu: ${dungDe.map((c) => c.ten).join(', ')}. Xếp từ dễ lên khó.`
           : 'Em chưa đủ dữ liệu để chọn chuyên đề yếu — phiếu sẽ rút từ cả kho đề.'}
       </div>
+
+      {daRa > 0 && (
+        <div className="flex items-center justify-between" style={{ gap: 'var(--k2)' }}>
+          <span style={NHAN_NHO}>Đã in {daRa} câu cho em này, phiếu sau tự tránh những câu đó.</span>
+          <button
+            type="button"
+            onClick={() => void quenLichSu()}
+            className="tap-target"
+            style={{ ...NHAN_NHO, textDecoration: 'underline', background: 'none', border: 'none', flex: '0 0 auto' }}
+          >
+            Cho phép lấy lại
+          </button>
+        </div>
+      )}
+
       {ketQua && (
         <OThongBao tone={ketQua.thieu > 0 || ketQua.lapLai > 0 ? 'cam' : 'xanh'}>
           {`Đã tải ${ketQua.ten}: ${ketQua.soCau} câu kèm lời giải.`}
-          {ketQua.lapLai > 0 && ` Trong đó ${ketQua.lapLai} câu em đã từng làm (kho hết câu mới).`}
-          {ketQua.thieu > 0 && ` Còn thiếu ${ketQua.thieu} câu so với ${SO_CAU_PDF} câu.`}
+          {ketQua.lapLai > 0 && ` Trong đó ${ketQua.lapLai} câu em đã gặp (kho hết câu mới).`}
+          {ketQua.thieu > 0 && ` Còn thiếu ${ketQua.thieu} câu so với ${soCau} câu đã chọn.`}
         </OThongBao>
       )}
     </div>

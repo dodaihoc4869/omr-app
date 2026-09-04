@@ -214,22 +214,63 @@ export function tinHieuLamBai(tk: ThongKeLamBai): TinHieuLamBai[] {
   return ra
 }
 
+export interface DucKetChuyenDe {
+  chuyenDe: string
+  /** Điều phải thuộc: tính chất, định nghĩa, quy tắc. */
+  lyThuyet: string[]
+  /** Điều phải làm được: cách nhận dạng, cách tính, bước xử lý. */
+  kyNang: string[]
+}
+
+/** Câu chốt là PHÉP TÍNH CỦA RIÊNG MỘT CÂU chứ không phải kiến thức chung.
+ *
+ * Thầy chốt: đúc kết phải là lý thuyết và kỹ năng, không phải chép lại bài giải.
+ * "Acid 24/60 = 0,4 mol, ester 26,4/88 = 0,3 mol, hiệu suất 75%" là lời giải của
+ * đúng một câu, chép vào sổ không dùng lại được ở câu nào khác. */
+function laPhepTinh(s: string): boolean {
+  if (/[=]/.test(s)) return true
+  if (/\d+[,.]\d+/.test(s)) return true // 0,4 mol · 26,4 gam
+  if (/\b\d+\s*(mol|gam|g|lít|l|ml|kg|tấn|%)\b/i.test(s)) return true
+  if (/\b(thu được|đề cho|bài cho|suy ra đáp án|chọn đáp án)\b/i.test(s)) return true
+  return false
+}
+
+/** Từ chỉ VIỆC PHẢI LÀM — dùng để tách kỹ năng khỏi lý thuyết. Đây là cách xếp
+ * chỗ cho dễ đọc, không phải phán xét nội dung: xếp nhầm ngăn thì ý vẫn đúng. */
+// So trên chuỗi ĐÃ hạ về chữ thường: `\b` và cờ `i` của JS không xử lý đúng
+// chữ hoa tiếng Việt (Đ/đ), dùng thẳng toLowerCase() cho chắc.
+const TU_KY_NANG = /(đếm|so sánh|tính |quy về|nhận ra|nhận dạng|dùng |áp dụng|bảo toàn|suy ra|kiểm tra|đặt |viết |lập |xét |gọi |chia |đổi )/
+
+const TOI_DA_TU = 24
+const TOI_DA_Y = 5
+
 /** ĐÚC KẾT KIẾN THỨC để em chép vào sổ.
  *
- * Lấy nguyên câu `chot` trong lời giải của KHO ĐỀ — mỗi câu chốt đúng một ý
- * kiến thức quyết định, dưới 20 từ, do chính pipeline nạp đề viết ra và thầy đã
- * duyệt. KHÔNG tự viết thêm câu nào: chữ trong sổ của em phải là chữ đúng.
- * Gom theo chuyên đề, bỏ ý trùng. */
-export function ducKetKienThuc(cauSai: { chuyenDe: string; chot: string }[]): { chuyenDe: string; y: string[] }[] {
-  const nhom = new Map<string, string[]>()
+ * Lấy nguyên câu `chot` trong lời giải của KHO ĐỀ — chữ do pipeline nạp đề viết
+ * và thầy đã duyệt. KHÔNG tự viết thêm câu nào: chữ trong sổ của em phải là chữ
+ * đúng. Việc ở đây là CHỌN LỌC: bỏ phép tính của từng câu, bỏ câu quá dài, bỏ
+ * ý trùng, rồi chia hai ngăn lý thuyết và kỹ năng, mỗi ngăn tối đa 5 ý. */
+export function ducKetKienThuc(cauSai: { chuyenDe: string; chot: string }[]): DucKetChuyenDe[] {
+  const nhom = new Map<string, { lyThuyet: string[]; kyNang: string[]; da: Set<string> }>()
   for (const c of cauSai) {
-    const chot = (c.chot || '').trim()
+    const chot = (c.chot || '').trim().replace(/\s+/g, ' ')
     if (!chot) continue
+    if (laPhepTinh(chot)) continue
+    if (chot.split(' ').length > TOI_DA_TU) continue
     const ten = (c.chuyenDe || '').trim() || 'Chưa phân loại chuyên đề'
-    const ds = nhom.get(ten) ?? []
-    const khoa = chot.toLowerCase().replace(/\s+/g, ' ')
-    if (!ds.some((x) => x.toLowerCase().replace(/\s+/g, ' ') === khoa)) ds.push(chot)
-    nhom.set(ten, ds)
+    const g = nhom.get(ten) ?? { lyThuyet: [], kyNang: [], da: new Set<string>() }
+    const khoa = chot.toLowerCase()
+    if (g.da.has(khoa)) {
+      nhom.set(ten, g)
+      continue
+    }
+    g.da.add(khoa)
+    const vao = TU_KY_NANG.test(khoa) ? g.kyNang : g.lyThuyet
+    if (vao.length < TOI_DA_Y) vao.push(chot)
+    nhom.set(ten, g)
   }
-  return [...nhom.entries()].map(([chuyenDe, y]) => ({ chuyenDe, y })).sort((a, b) => b.y.length - a.y.length)
+  return [...nhom.entries()]
+    .map(([chuyenDe, g]) => ({ chuyenDe, lyThuyet: g.lyThuyet, kyNang: g.kyNang }))
+    .filter((x) => x.lyThuyet.length + x.kyNang.length > 0)
+    .sort((a, b) => b.lyThuyet.length + b.kyNang.length - (a.lyThuyet.length + a.kyNang.length))
 }

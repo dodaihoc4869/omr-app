@@ -556,7 +556,7 @@ export default function PhieuScreen() {
         <div style={{ maxWidth: 340, textAlign: 'center' }}>
           <div style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 700 }}>Không mở được báo cáo</div>
           <div style={{ marginTop: 10, color: 'var(--p-nhat)', fontSize: 14, lineHeight: 1.7 }}>
-            {loi} Anh/chị nhắn lại cho Thầy Đỗ Đại Học để nhận link mới.
+            {loi} Phụ huynh nhắn lại cho Thầy Đỗ Đại Học để nhận link mới.
           </div>
         </div>
       </div>
@@ -754,14 +754,26 @@ export default function PhieuScreen() {
             {du.ducKet.map((g) => (
               <div className="bc-soan" key={g.chuyenDe}>
                 <div className="bc-soan-cd">{g.chuyenDe}</div>
-                {g.y.map((y, i) => (
-                  <div className="bc-soan-y" key={i}>
-                    <span className="bc-soan-o" />
-                    <span>
-                      <ChemText text={y} />
-                    </span>
-                  </div>
-                ))}
+                {([
+                  ['Lý thuyết phải thuộc', g.lyThuyet],
+                  ['Kỹ năng phải làm được', g.kyNang],
+                ] as const).map(([nhan, ds]) =>
+                  ds.length === 0 ? null : (
+                    <div key={nhan} style={{ marginTop: 10 }}>
+                      <div className="bc-tieu" style={{ marginBottom: 2 }}>
+                        {nhan}
+                      </div>
+                      {ds.map((y, i) => (
+                        <div className="bc-soan-y" key={i}>
+                          <span className="bc-soan-o" />
+                          <span>
+                            <ChemText text={y} />
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ),
+                )}
               </div>
             ))}
           </Khoi>
@@ -771,6 +783,7 @@ export default function PhieuScreen() {
           <section className="bc-viec">
             <div className="bc-tieu">Việc cần làm</div>
             <div className="bc-viec-chu">{du.vieCanLam}</div>
+            {du.baiTap && du.baiTap.length > 0 && <NutTaiBaiTap du={du} />}
           </section>
         )}
 
@@ -778,9 +791,68 @@ export default function PhieuScreen() {
           <div>
             <b>Thầy Đỗ Đại Học</b>
           </div>
-          <div>Báo cáo riêng của em {du.hoTen || du.sbd}. Anh/chị giữ trong máy, không chuyển tiếp cho người khác.</div>
+          <div>Báo cáo riêng của em {du.hoTen || du.sbd}. Phụ huynh giữ trong máy, không chuyển tiếp cho người khác.</div>
         </footer>
       </div>
+    </div>
+  )
+}
+
+/** NÚT TẢI PHIẾU BÀI TẬP ngay trong báo cáo.
+ *
+ * 10 câu đã được thầy rút sẵn và gói vào báo cáo, nên phụ huynh bấm là dựng PDF
+ * ngay trên máy mình — không phải chờ thầy gửi thêm file, và không cần gọi thêm
+ * lệnh nào lên máy chủ. Bộ vẽ PDF nặng gần 300KB nên nạp động, chỉ khi bấm. */
+function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
+  const [dang, setDang] = useState(false)
+  const [loi, setLoi] = useState('')
+  const tai = async () => {
+    setDang(true)
+    setLoi('')
+    try {
+      const [{ veBaiTapPdf }, { tenTepBaiTap }] = await Promise.all([import('../lib/ve-bai-tap-pdf'), import('../lib/bai-tap-pdf')])
+      const doc = veBaiTapPdf({
+        hoTen: du.hoTen,
+        sbd: du.sbd,
+        lop: du.lop,
+        ngay: new Date(),
+        chuyenDe: du.chuyenDeCa,
+        cau: du.baiTap ?? [],
+        lapLai: 0,
+      })
+      doc.save(tenTepBaiTap(du.hoTen, du.sbd))
+    } catch {
+      setLoi('Máy chưa tải được phiếu. Phụ huynh thử lại khi có mạng ổn định.')
+    } finally {
+      setDang(false)
+    }
+  }
+  return (
+    <div style={{ marginTop: 14 }}>
+      <button
+        type="button"
+        onClick={() => void tai()}
+        disabled={dang}
+        style={{
+          width: '100%',
+          minHeight: 46,
+          border: 'none',
+          borderRadius: 12,
+          background: 'var(--p-tim)',
+          color: 'var(--p-trang)',
+          fontFamily: 'var(--sans)',
+          fontSize: 14.5,
+          fontWeight: 700,
+          cursor: dang ? 'default' : 'pointer',
+          opacity: dang ? 0.6 : 1,
+        }}
+      >
+        {dang ? 'Đang dựng phiếu…' : `Tải phiếu bài tập ${du.baiTap?.length ?? 0} câu kèm lời giải`}
+      </button>
+      <div style={{ fontSize: 12, color: 'var(--p-nhat)', marginTop: 7, lineHeight: 1.6 }}>
+        Thầy đã chọn sẵn theo đúng chuyên đề em mất điểm ở bài này, xếp từ dễ lên khó. Lời giải nằm ở trang cuối, em làm hết rồi mới lật.
+      </div>
+      {loi && <div style={{ fontSize: 12.5, color: 'var(--p-do)', marginTop: 6 }}>{loi}</div>}
     </div>
   )
 }

@@ -12,15 +12,15 @@
 // nữa. Ảnh vẫn dựng ở đây để thầy xem và tải khi cần (in ra, lưu hồ sơ), nhưng
 // không nằm trong luồng gửi.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ClipboardCopy, Check, Download, Share2 } from 'lucide-react'
+import { ClipboardCopy, Check, Download, Eye, Share2 } from 'lucide-react'
 import { TheNoiDung, OThongBao, NutChinh } from './DesignSystem'
 import { classify } from '../engine/score'
 import { soanPhieuZalo, viecCanLamMacDinh, demChu, NHAC_TRUOC_KHI_GUI, NHAN_KHOI, type DuLieuPhieu } from '../lib/phieu-zalo'
 import { veAnhPhieu, tenTepPhieu, type DuLieuAnhPhieu } from '../lib/anh-phieu'
 import { taoLinkPhieu } from '../lib/phieu-link'
 import { dungPhieu } from '../lib/phieu-du-lieu'
-import { luuPhieu, sinhMaPhieu, xoaPhieu, type ChiTietCauRow } from '../lib/exam-api'
-import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
+import { luuPhieu, qidDaLam, sinhMaPhieu, xoaPhieu, type ChiTietCauRow } from '../lib/exam-api'
+import { loadExamSources, loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import type { TeacherExamSource } from '../data/examContent'
 import type { HoSoEm } from '../lib/exam-api'
 
@@ -139,6 +139,12 @@ export default function PhieuZaloEm({
           const khoa = `${hoSo.em.sbd}:${ca.maCa}`
           if (maRef.current?.khoa !== khoa) maRef.current = { khoa, ma: sinhMaPhieu() }
           const ma = maRef.current.ma
+          // Kho đề + câu em đã làm: để rút sẵn 10 câu luyện gói vào báo cáo, cho
+          // phụ huynh bấm một nút là tải được phiếu PDF trên máy mình.
+          const [khoDe, qidCu] = await Promise.all([
+            loadExamSources().catch(() => []),
+            qidDaLam(url.trim(), mat.trim(), hoSo.em.sbd).catch(() => [] as string[]),
+          ])
           const phieu = dungPhieu({
             hoSo,
             ca,
@@ -149,6 +155,8 @@ export default function PhieuZaloEm({
             diemLop,
             thoiLuongPhut,
             vaoLuc,
+            khoDe,
+            qidDaLam: qidCu,
           })
           await luuPhieu(url.trim(), mat.trim(), { ma, maCa: ca.maCa, sbd: hoSo.em.sbd, hoTen: hoSo.em.hoTen, phieu })
           if (con) setLink(taoLinkPhieu(`${location.origin}${import.meta.env.BASE_URL}`, ma))
@@ -330,9 +338,19 @@ export default function PhieuZaloEm({
           </button>
         </div>
 
+        {/* XEM BÁO CÁO: thầy mở đúng thứ phụ huynh sẽ thấy, trước khi gửi đi.
+            Gửi rồi mới phát hiện sai thì đã muộn. */}
         {link && (
-          <div className="flex items-center justify-between" style={{ gap: 'var(--k2)', marginTop: 'calc(var(--k2) * -1)' }}>
-            <span style={NHAN_NHO}>Link báo cáo đã sẵn sàng trong tin nhắn</span>
+          <div className="flex items-center flex-wrap justify-between" style={{ gap: 'var(--k2)', marginTop: 'calc(var(--k2) * -1)' }}>
+            <a
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="tap-target inline-flex items-center font-bold"
+              style={{ gap: 6, minHeight: 36, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--phu)', color: 'var(--phu-dam)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', textDecoration: 'none' }}
+            >
+              <Eye size={16} /> Xem báo cáo
+            </a>
             <button
               type="button"
               onClick={() => void thuHoi()}
