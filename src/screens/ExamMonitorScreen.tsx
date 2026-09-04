@@ -6,7 +6,7 @@
 // xám chờ thi lại · tím đang làm · cam rời màn N lần · đỏ bị khoá · xanh đã nộp.
 // Xoá ca = xoá mềm, phải gõ đúng mã ca.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Copy, Check, RefreshCw, Trash2 } from 'lucide-react'
+import { Copy, Check, RefreshCw, Trash2, ArrowLeft, ChevronRight } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
 import { chiTietCa, duyetThiLai, ghiDiem, moKhoa, sendTeacherMessage, xoaCa, type ChiTietCa, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
@@ -15,6 +15,9 @@ import { loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { soanTinRoiMan } from '../lib/phieu-zalo'
+import { KhoiChuyenDe, KhoiLichSuCa } from '../components/HoSoEmView'
+import PhieuZaloEm from '../components/PhieuZaloEm'
+import { hoSoEm, type HoSoEm } from '../lib/exam-api'
 import { buildStudentEntry, downloadDuLieuJson } from '../lib/json-export'
 import { downloadBangDiem, type StudentRow } from '../lib/xlsx-export'
 import { mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
@@ -72,6 +75,13 @@ export function nhanCuaLuot(l: Pick<LuotThiRow, 'trangThai' | 'soLanRoiMan'>): {
 
 export default function ExamMonitorScreen() {
   const showToast = useAppStore((s) => s.showToast)
+  // HỒ SƠ MỘT EM mở ngay trong màn này: thầy đang xem ca, chạm tên em là thấy
+  // luôn mạnh–yếu và soạn được phiếu gửi phụ huynh — không phải nhớ số báo danh
+  // rồi sang tab Học sinh tìm lại.
+  const [sbdHoSo, setSbdHoSo] = useState('')
+  const [hoSo, setHoSo] = useState<HoSoEm | null>(null)
+  const [dangTaiHoSo, setDangTaiHoSo] = useState(false)
+  const [loiHoSo, setLoiHoSo] = useState('')
   const setScreen = useAppStore((s) => s.setScreen)
   const classList = useAppStore((s) => s.classList)
   const maCaTheoDoi = useAppStore((s) => s.maCaTheoDoi)
@@ -95,6 +105,25 @@ export default function ExamMonitorScreen() {
   const [dangXoa, setDangXoa] = useState(false)
   // Đã ghi điểm lên Sheet cho lượt nào (khoá `${sbd}:${lanThu}:${nopLuc}`) — không ghi lặp mỗi lần tải lại.
   const daGhiRef = useRef<Set<string>>(new Set())
+
+  // Nạp hồ sơ khi thầy chạm tên một em. Chỉ nạp khi thật sự mở — hồ sơ tốn
+  // 2–4 giây một lượt gọi máy chủ, nạp sẵn cho cả lớp là phí.
+  useEffect(() => {
+    if (!sbdHoSo || !scriptUrl.trim() || !secret.trim()) {
+      setHoSo(null)
+      return
+    }
+    let huy = false
+    setDangTaiHoSo(true)
+    setLoiHoSo('')
+    hoSoEm(scriptUrl.trim(), { secret: secret.trim(), sbd: sbdHoSo })
+      .then((h) => !huy && setHoSo(h))
+      .catch((e) => !huy && setLoiHoSo(e instanceof Error ? e.message : 'Không mở được hồ sơ'))
+      .finally(() => !huy && setDangTaiHoSo(false))
+    return () => {
+      huy = true
+    }
+  }, [sbdHoSo, scriptUrl, secret])
 
   useEffect(() => {
     loadScriptUrl().then(setScriptUrl)
@@ -304,6 +333,52 @@ export default function ExamMonitorScreen() {
     : null
   const tt = chiTiet && tk ? trangThaiCa({ ...chiTiet.ca, ...tk }, now) : null
 
+  // ---------------------------------------------------------- HỒ SƠ MỘT EM
+  // Cùng các khối với tab Học sinh (BA-APP mục 9 cấm dựng hai màn hồ sơ khác
+  // nhau cho cùng một em), thêm khối gửi phụ huynh soạn theo ĐÚNG CA đang xem.
+  if (sbdHoSo) {
+    const emTrongCa = dsEm.find((e) => e.sbd === sbdHoSo)
+    return (
+      <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
+        <button onClick={() => setSbdHoSo('')} className="tap-target self-start inline-flex items-center" style={{ ...NHAN_NHO, gap: 4 }}>
+          <ArrowLeft size={16} /> {chiTiet ? chiTiet.ca.tenCa || `Ca ${chiTiet.ca.maCa}` : 'Chi tiết ca'}
+        </button>
+
+        {loiHoSo && <OThongBao tone="do">{loiHoSo}</OThongBao>}
+        {dangTaiHoSo && !hoSo && <div style={NHAN_NHO}>Đang mở hồ sơ…</div>}
+
+        {hoSo && (
+          <>
+            <TheNoiDung>
+              <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-5)' }}>
+                {hoSo.em.hoTen || `SBD ${hoSo.em.sbd}`}
+              </div>
+              <div style={{ ...NHAN_NHO, marginTop: 4 }}>
+                SBD <span style={SO}>{hoSo.em.sbd}</span>
+                {hoSo.em.lop ? ` · Lớp ${hoSo.em.lop}` : ''}
+                {hoSo.em.namSinh ? ` · sinh ${hoSo.em.namSinh}${khoiTuNamSinh(hoSo.em.namSinh) ? ` (khối ${khoiTuNamSinh(hoSo.em.namSinh)})` : ''}` : ''}
+              </div>
+              <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
+                <span className="font-bold" style={{ ...SO, fontSize: 'var(--cx-6)' }}>
+                  {emTrongCa?.diem === null || emTrongCa?.diem === undefined ? '—' : emTrongCa.diem.toFixed(2).replace('.', ',')}
+                </span>
+                <span style={NHAN_NHO}>điểm ca này</span>
+                <span style={{ ...NHAN_NHO, ...SO }}>· {hoSo.ca.length} ca đã làm</span>
+              </div>
+            </TheNoiDung>
+
+            {/* Phiếu soạn theo ĐÚNG ca đang mở, không phải ca mới nhất của em —
+                thầy đang đứng ở ca này thì tin nhắn phải nói về ca này. */}
+            <PhieuZaloEm hoSo={hoSo} maCa={chiTiet?.ca.maCa} showToast={showToast} />
+
+            <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />
+            <KhoiLichSuCa ca={hoSo.ca} />
+          </>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
       <div className="flex items-center justify-between">
@@ -408,9 +483,17 @@ export default function ExamMonitorScreen() {
                     <Hang key={e.sbd} data-trang-thai={nh.ten} style={{ alignItems: 'flex-start' }}>
                       <span className="flex-1 min-w-0">
                         <span className="flex items-center flex-wrap" style={{ gap: 6 }}>
-                          <span className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
+                          {/* CHẠM TÊN EM → hồ sơ đầy đủ ngay trong màn này:
+                              mạnh–yếu, lịch sử ca, tin nhắn và ảnh phiếu Zalo. */}
+                          <button
+                            type="button"
+                            onClick={() => setSbdHoSo(e.sbd)}
+                            className="tap-target font-bold inline-flex items-center text-left"
+                            style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)', color: 'var(--muc)', gap: 2, background: 'none', border: 'none', padding: 0, minHeight: 0, textDecoration: 'underline', textDecorationColor: 'var(--vien-dam)', textUnderlineOffset: 3 }}
+                          >
                             {e.hoTen || '(chưa có tên)'}
-                          </span>
+                            <ChevronRight size={14} style={{ color: 'var(--mo)' }} />
+                          </button>
                           {l.lanThu > 1 && <Nhan tone="tim">lần {l.lanThu}</Nhan>}
                         </span>
                         <span style={NHAN_NHO}>

@@ -42,7 +42,7 @@ export function demChu(s: string): number {
  * Soạn phiếu kết quả để thầy dán vào Zalo.
  * `xungHo` mặc định "Anh/chị"; biết tên phụ huynh thì truyền "Chị Lan".
  */
-export function soanPhieuZalo(d: DuLieuPhieu, xungHo = 'Anh/chị'): string {
+export function soanPhieuZalo(d: DuLieuPhieu, xungHo = 'Anh/chị', vieCanLam?: string): string {
   const ngay = ngayVN(d.ngay)
   const cau: string[] = []
 
@@ -60,18 +60,24 @@ export function soanPhieuZalo(d: DuLieuPhieu, xungHo = 'Anh/chị'): string {
     cau.push('Em làm đúng toàn bộ các câu.')
   }
 
-  if (d.baiTapDaGiao) {
-    const han = ngayVN(d.baiTapDaGiao.hanNop)
-    cau.push(`Thầy đã giao em ${d.baiTapDaGiao.soCau} câu bài tập trong app, hạn nộp ${han}.`)
-    cau.push('Thầy chấm bài đó rồi báo lại kết quả.')
-  } else if (d.chuyenDeSai && d.chuyenDeSai.soSai > 0) {
-    cau.push(`Thầy sẽ giao em bài tập riêng chuyên đề ${d.chuyenDeSai.ten} trong app.`)
-    cau.push('Em làm xong, Thầy chấm rồi báo lại.')
-  } else {
-    cau.push('Buổi tới Thầy cho em làm phần khó hơn để kiểm tra lại.')
-  }
+  cau.push(vieCanLam ?? viecCanLamMacDinh(d))
 
   return cau.join(' ')
+}
+
+/** VIỆC CẦN LÀM — phần 3 và 4 của bộ quy tắc viết (việc em phải làm + mốc thầy
+ * kiểm tra lại). Tách riêng vì ẢNH PHIẾU và TIN NHẮN phải nói cùng một việc:
+ * hai chỗ soạn riêng thì sớm muộn cũng lệch nhau. Thầy sửa được trước khi gửi,
+ * sửa một lần là cả hai đổi theo. */
+export function viecCanLamMacDinh(d: DuLieuPhieu): string {
+  if (d.baiTapDaGiao) {
+    const han = ngayVN(d.baiTapDaGiao.hanNop)
+    return `Thầy đã giao em ${d.baiTapDaGiao.soCau} câu bài tập trong app, hạn nộp ${han}. Thầy chấm bài đó rồi báo lại kết quả.`
+  }
+  if (d.chuyenDeSai && d.chuyenDeSai.soSai > 0) {
+    return `Thầy sẽ giao em bài tập riêng chuyên đề ${d.chuyenDeSai.ten} trong app. Em làm xong, Thầy chấm rồi báo lại.`
+  }
+  return 'Buổi tới Thầy cho em làm phần khó hơn để kiểm tra lại.'
 }
 
 /** Gợi ý chỗ thầy nên tự viết thêm trước khi gửi — máy không đoán thay. */

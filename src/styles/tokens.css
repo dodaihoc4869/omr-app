@@ -78,6 +78,26 @@
   --nhanh: 120ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* MÀU CỦA "TỜ GIẤY" GỬI ĐI — ảnh phiếu kết quả Zalo, phiếu in.
+ * KHÔNG redefine trong khối nền tối bên dưới: ảnh này rời khỏi máy thầy và mở
+ * trên máy phụ huynh, nên phải luôn là giấy trắng mực đen dù thầy đang để máy
+ * nền tối. Giữ ở đây để mã màu vẫn nằm đúng một chỗ (check:mau). */
+:root {
+  --p-giay: #ffffff;
+  --p-nen: #f7f8fa;
+  --p-chim: #f3f4f6;
+  --p-muc: #1a2332;
+  --p-nhat: #6b7280;
+  --p-mo: #9ca3af;
+  --p-vien: #e5e7eb;
+  --p-xanh: #10b981;
+  --p-do: #ef4444;
+  --p-cam: #f59e0b;
+  --p-tim: #6366f1;
+  --p-tim-2: #8b5cf6;
+  --p-trang: #ffffff;
+}
+
 /* NỀN TỐI — MANCUAVAOVANENTOI.md mục 1. Giữ nguyên tên biến, chỉ đổi giá trị;
  * gradient --g1..--g4 giữ nguyên (đủ tương phản ở cả hai nền). Các biến cỡ
  * chữ/khoảng cách/bo góc không đổi theo nền. */

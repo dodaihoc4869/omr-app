@@ -5,7 +5,7 @@
 // Cùng hồ sơ này sẽ dùng lại cho lối vào từ mục Phụ huynh — không dựng hai màn.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, ClipboardCopy, RefreshCw, Search, Trash2 } from 'lucide-react'
+import { ArrowLeft, RefreshCw, Search, Trash2 } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung, DauThe } from '../components/DesignSystem'
 import { KhoiChuyenDe, KhoiLichSuCa, toneXepLoai } from '../components/HoSoEmView'
 import { danhSachEm, deleteStudentRegistration, hoSoEm, khoiTuNamSinh, type EmTomTat, type HoSoEm } from '../lib/exam-api'
@@ -13,8 +13,7 @@ import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { classify } from '../engine/score'
 import { useAppStore } from '../store/appStore'
 import NutDongBoDanhSach from '../components/NutDongBoDanhSach'
-import { baiTapCuaEm, type BaiTapCuaEm } from '../lib/exam-api'
-import { soanPhieuZalo, NHAC_TRUOC_KHI_GUI } from '../lib/phieu-zalo'
+import PhieuZaloEm from '../components/PhieuZaloEm'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -49,7 +48,6 @@ export default function HocSinhScreen() {
   const [hoSo, setHoSo] = useState<HoSoEm | null>(null)
   const [dangTaiHoSo, setDangTaiHoSo] = useState(false)
   const showToast = useAppStore((s) => s.showToast)
-  const [baiTap, setBaiTap] = useState<BaiTapCuaEm[] | null>(null)
 
   const tai = async () => {
     setDangTai(true)
@@ -85,37 +83,7 @@ export default function HocSinhScreen() {
       .then(setHoSo)
       .catch((e) => setLoi(e instanceof Error ? e.message : 'Không mở được hồ sơ'))
       .finally(() => setDangTaiHoSo(false))
-    baiTapCuaEm(cauHinh.url, { secret: cauHinh.mat, sbd: sbdDangXem })
-      .then(setBaiTap)
-      .catch(() => setBaiTap([]))
   }, [sbdDangXem, cauHinh])
-
-  /** Soạn phiếu kết quả ca gần nhất theo đúng quy tắc viết của thầy rồi copy
-   * để dán Zalo. Máy KHÔNG đoán nguyên nhân — nhắc thầy tự thêm trước khi gửi. */
-  const copyPhieu = async (hs: HoSoEm) => {
-    const ca = hs.caGanNhat
-    if (!ca || ca.tong === null) return showToast('Em chưa có ca nào đã chấm điểm', 'warn')
-    // Số của RIÊNG ca gần nhất, không phải số cộng dồn — phiếu gửi phụ huynh
-    // mà ghi sai số là mất tin ngay.
-    const yeuNhat = hs.chuyenDeCaGanNhat.find((c) => c.soSai > 0) ?? null
-    const bai = baiTap?.find((b) => b.trangThai !== 'da_nop' && b.hanNop)
-    const phieu = soanPhieuZalo({
-      hoTen: hs.em.hoTen || `SBD ${hs.em.sbd}`,
-      ngay: ca.nopLuc,
-      diem: ca.tong,
-      xepLoai: classify(ca.tong),
-      diemPhan: ca.diemI !== null && ca.diemII !== null && ca.diemIII !== null ? { I: ca.diemI, II: ca.diemII, III: ca.diemIII } : null,
-      soCauSai: hs.soCauSaiCaGanNhat,
-      chuyenDeSai: yeuNhat ? { ten: yeuNhat.ten, soSai: yeuNhat.soSai } : null,
-      baiTapDaGiao: bai ? { soCau: 0, hanNop: bai.hanNop } : null,
-    })
-    try {
-      await navigator.clipboard.writeText(phieu)
-      showToast(`Đã copy phiếu. ${NHAC_TRUOC_KHI_GUI}`, 'success')
-    } catch {
-      showToast(phieu, 'success')
-    }
-  }
 
   /** XOÁ EM KHỎI DANH SÁCH — chỉ thầy (máy chủ đòi mã bí mật).
    *
@@ -183,11 +151,7 @@ export default function HocSinhScreen() {
                 còn nguyên trong repo (thư mục components, lib/bai-tap.ts, ca
                 Loai=baitap ở máy chủ) — cần lại thì gắn nút vào đây, không phải
                 dựng lại từ đầu. */}
-            <NutChinh variant="phu" onClick={() => copyPhieu(hoSo)}>
-              <span className="inline-flex items-center" style={{ gap: 6 }}>
-                <ClipboardCopy size={18} /> Copy phiếu Zalo
-              </span>
-            </NutChinh>
+            <PhieuZaloEm hoSo={hoSo} showToast={showToast} />
 
             {/* XOÁ EM KHỎI DANH SÁCH — CHỈ THẦY.
                 Em vào thi là tự có tên, nên danh sách sẽ dính cả số báo danh gõ
