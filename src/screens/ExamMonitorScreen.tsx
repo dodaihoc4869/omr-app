@@ -487,6 +487,24 @@ export default function ExamMonitorScreen() {
               diemLop={dsEm.map((e) => e.diem).filter((d): d is number => typeof d === 'number')}
               thoiLuongPhut={chiTiet?.ca.thoiGianPhut ?? null}
               vaoLuc={emTrongCa?.moiNhat.vaoLuc ?? null}
+              // BẰNG CHỨNG RỜI MÀN đi thẳng vào báo cáo: thầy bấm "Báo phụ
+              // huynh" xong, phụ huynh mở link là thấy nút Vi phạm nhấp nháy,
+              // bấm ra đúng mốc giờ máy đã ghi — thầy khỏi gõ tay lại con số.
+              viPham={
+                emTrongCa
+                  ? {
+                      soLan: emTrongCa.moiNhat.soLanRoiMan || 0,
+                      tongGiay: emTrongCa.moiNhat.tongGiayRoiMan || 0,
+                      daKhoa: emTrongCa.moiNhat.trangThai === 'khoa',
+                      lyDoKhoa: emTrongCa.moiNhat.integrity?.lyDoKhoa ?? null,
+                      nguong:
+                        chiTiet?.ca.nguongLan && chiTiet?.ca.nguongGiay
+                          ? { lan: Number(chiTiet.ca.nguongLan), giay: Number(chiTiet.ca.nguongGiay) }
+                          : null,
+                      events: emTrongCa.moiNhat.integrity?.events ?? null,
+                    }
+                  : null
+              }
             />
 
             <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />
@@ -708,6 +726,7 @@ export default function ExamMonitorScreen() {
                 maCa={chiTiet.ca.maCa}
                 tenCa={chiTiet.ca.tenCa || `Ca ${chiTiet.ca.maCa}`}
                 ghiChu={chiTiet.ca.lop ? `Lớp ${chiTiet.ca.lop}` : ''}
+                soCauCa={soCauCa ?? null}
                 showToast={showToast}
               />
             </TheNoiDung>

@@ -150,10 +150,40 @@ const CSS = `
 .bc-vao{opacity:0;transform:translate3d(0,18px,0);transition:opacity .6s ease,transform .6s cubic-bezier(.22,.9,.28,1)}
 .bc-vao.ra{opacity:1;transform:none}
 
+/* NÚT NHẤP NHÁY. Hai lớp: chữ mờ dần rồi rõ lại, kèm một vòng sáng loang ra từ
+   mép nút. Chỉ động vào opacity và transform nên không bắt trình duyệt tính
+   lại bố cục — mượt cả trên điện thoại cũ của phụ huynh. */
+.bc-nhay{position:relative;isolation:isolate;animation:bc-tho 1.5s ease-in-out infinite}
+.bc-nhay::after{content:'';position:absolute;inset:0;border-radius:inherit;background:currentColor;
+  z-index:-1;opacity:0;animation:bc-loang 1.5s ease-out infinite}
+@keyframes bc-tho{0%,100%{opacity:1}50%{opacity:.72}}
+@keyframes bc-loang{0%{opacity:.32;transform:scale(1)}70%,100%{opacity:0;transform:scale(1.08)}}
+
+/* VI PHẠM — khối bằng chứng rời màn. */
+.bc-vp{margin-top:14px}
+.bc-vp-nut{width:100%;min-height:46px;border-radius:12px;border:1.5px solid var(--p-do);background:var(--p-giay);
+  color:var(--p-do);font-family:var(--sans);font-size:14.5px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;padding:0 12px}
+.bc-vp-cham{width:9px;height:9px;border-radius:50%;background:currentColor;flex:0 0 auto}
+.bc-vp-in{margin-top:11px;border:1px solid var(--p-vien);border-radius:12px;padding:13px 14px}
+.bc-vp-so{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.bc-vp-hang{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:7px 0;
+  border-top:1px solid var(--p-vien);font-variant-numeric:tabular-nums}
+.bc-vp-hang:first-of-type{border-top:none}
+.bc-vp-noi{font-size:12.5px;color:var(--p-nhat);line-height:1.65;margin-top:10px}
+
+.bc-nut-doi{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.bc-nut{flex:1 1 150px;min-height:46px;border-radius:12px;font-family:var(--sans);font-size:14px;font-weight:700;
+  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 12px;border:none}
+.bc-nut.chinh{background:var(--p-tim);color:var(--p-trang)}
+.bc-nut.vien{background:var(--p-giay);color:var(--p-tim);border:1.5px solid var(--p-tim)}
+.bc-nut[disabled]{opacity:.55;cursor:default}
+
 @media (prefers-reduced-motion:reduce){
   .bc-dau::before,.bc-dau::after{animation:none}
   .bc-vao{transition:none;opacity:1;transform:none}
   .bc-day,.bc-hop,.bc-mui{transition:none}
+  .bc-nhay,.bc-nhay::after{animation:none}
 }
 `
 
@@ -362,6 +392,94 @@ function DaiThoiGian({ cau, tat }: { cau: { giay: number | null; dung: boolean; 
       </div>
       <div className="bc-ghi" style={{ marginTop: 8 }}>
         Mỗi cột là một câu theo đúng thứ tự em làm, cao là mất nhiều giây. Cột đỏ là câu sai, cột xanh là câu đúng.
+      </div>
+    </div>
+  )
+}
+
+// ------------------------------------------------------- bằng chứng rời màn
+/** Giờ:phút:giây của một mốc. Phụ huynh đối chiếu được với việc nhà lúc đó
+ * (gọi điện, sai đi lấy nước) nên phải có giây, không làm tròn. */
+function gioDayDu(iso: string): string {
+  const d = new Date(iso)
+  if (!Number.isFinite(d.getTime())) return ''
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`
+}
+
+function giayChu(g: number): string {
+  if (g < 60) return `${g} giây`
+  const p = Math.floor(g / 60)
+  const s = g % 60
+  return s === 0 ? `${p} phút` : `${p} phút ${s} giây`
+}
+
+const LY_DO_KHOA: Record<string, string> = {
+  qua_so_lan: 'rời khỏi bài quá số lần Thầy cho phép',
+  roi_qua_lau: 'một lần rời khỏi bài quá lâu',
+}
+
+/** NÚT VI PHẠM NHẤP NHÁY + BẰNG CHỨNG.
+ *
+ * Thầy chốt 04-09: bấm "Báo phụ huynh" thì trong báo cáo phải có nút này, bấm
+ * vào ra nội dung bằng chứng thoát màn hình.
+ *
+ * Nút nhấp nháy vì đây là thứ phụ huynh dễ lướt qua nhất mà lại cần thấy nhất.
+ * Nội dung bên trong CHỈ nêu số máy đo được và mốc giờ — không câu nào kết luận
+ * gian lận, vì một cuộc gọi đến cũng cho đúng tín hiệu đó. */
+function KhoiViPham({ vp }: { vp: NonNullable<PhieuDayDu['viPham']> }) {
+  const [mo, setMo] = useState(false)
+  const coMoc = vp.moc.length > 0
+  const daiNhat = vp.moc.reduce((n, m) => (m.giay !== null && m.giay > n ? m.giay : n), 0)
+  return (
+    <div className="bc-vp">
+      <button type="button" className={`bc-vp-nut${mo ? '' : ' bc-nhay'}`} aria-expanded={mo} onClick={() => setMo((v) => !v)}>
+        <span className="bc-vp-cham" />
+        Vi phạm{vp.daKhoa ? ' — bài bị khoá' : ''}
+        <span style={{ fontWeight: 400, opacity: 0.85 }}>{mo ? '· đóng lại' : '· chạm để xem bằng chứng'}</span>
+      </button>
+      <div className={`bc-hop${mo ? ' ra' : ''}`}>
+        <div>
+          <div className="bc-vp-in">
+            <div className="bc-vp-so">
+              <OSo so={vp.soLan} ten="lần rời khỏi màn làm bài" />
+              <OSo so={vp.tongGiay > 0 ? giayChu(vp.tongGiay) : null} ten="tổng thời gian ở ngoài" />
+              <OSo so={daiNhat > 0 ? giayChu(daiNhat) : null} ten="lần rời lâu nhất" />
+            </div>
+
+            {vp.nguong && (
+              <div className="bc-vp-noi">
+                Ngưỡng Thầy đặt cho bài này: rời <b>{vp.nguong.lan}</b> lần, hoặc một lần rời quá <b>{vp.nguong.giay}</b> giây, là máy tự khoá bài.
+              </div>
+            )}
+            {vp.daKhoa && (
+              <div className="bc-vp-noi" style={{ color: 'var(--p-do)' }}>
+                Bài đã bị máy khoá và nộp tự động{vp.lyDoKhoa && LY_DO_KHOA[vp.lyDoKhoa] ? `, do ${LY_DO_KHOA[vp.lyDoKhoa]}` : ''}.
+              </div>
+            )}
+
+            {coMoc && (
+              <div style={{ marginTop: 12 }}>
+                <div className="bc-tieu">Từng lần rời</div>
+                <div style={{ marginTop: 4 }}>
+                  {vp.moc.map((m, i) => (
+                    <div className="bc-vp-hang" key={`${m.luc}-${i}`}>
+                      <span style={{ color: 'var(--p-nhat)' }}>
+                        Lần {i + 1} · {gioDayDu(m.luc)}
+                      </span>
+                      <span style={{ fontWeight: 700 }}>{m.giay === null ? 'không thấy quay lại' : giayChu(m.giay)}</span>
+                    </div>
+                  ))}
+                </div>
+                {vp.mocBiCat ? <div className="bc-vp-noi">Còn {vp.mocBiCat} lần nữa không liệt kê hết ở đây.</div> : null}
+              </div>
+            )}
+
+            <div className="bc-vp-noi">
+              Máy chỉ đo được em rời khỏi màn làm bài mấy lần, mấy giây. Một cuộc gọi đến, một thông báo, hay pin yếu cũng cho đúng tín hiệu này, nên đây là dữ kiện chứ không phải kết luận. Phụ huynh hỏi em, rồi nhắn lại cho Thầy.
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -659,6 +777,9 @@ export default function PhieuScreen({ duCoSan }: { duCoSan?: PhieuDayDu } = {}) 
               ))}
             </div>
           )}
+          {/* VI PHẠM đứng ngay dưới điểm: phụ huynh mở báo cáo là thấy, không
+              phải cuộn hết trang mới gặp. */}
+          {du.viPham && <KhoiViPham vp={du.viPham} />}
         </section>
 
         {/* VỊ TRÍ TRONG LỚP */}
@@ -801,12 +922,22 @@ export default function PhieuScreen({ duCoSan }: { duCoSan?: PhieuDayDu } = {}) 
           </Khoi>
         )}
 
-        {du.vieCanLam.trim() && (
+        {/* PHẦN CUỐI — việc cần làm, đề con vừa thi, bài luyện.
+            LỖI ĐÃ DÍNH 04-09: cả khối này chỉ hiện khi `vieCanLam` có chữ. Báo
+            cáo em tự dựng trên máy mình sau khi nộp KHÔNG có dòng đó (máy em
+            không biết thầy muốn giao gì), nên em mất luôn nút xem đề vừa làm;
+            thầy mở từ Hồ sơ học sinh cũng thấy cụt. Nay mỗi mục tự quyết định
+            có hiện hay không. */}
+        {(du.vieCanLam.trim() || (du.deCuaEm && du.deCuaEm.length > 0) || (du.baiTap && du.baiTap.length > 0) || du.linkBaiTap) && (
           <section className="bc-viec">
-            <div className="bc-tieu">Việc cần làm</div>
-            <div className="bc-viec-chu">{du.vieCanLam}</div>
+            {du.vieCanLam.trim() && (
+              <>
+                <div className="bc-tieu">Việc cần làm</div>
+                <div className="bc-viec-chu">{du.vieCanLam}</div>
+              </>
+            )}
             {du.deCuaEm && du.deCuaEm.length > 0 && <NutXemDeCuaCon du={du} />}
-            {du.baiTap && du.baiTap.length > 0 && <NutTaiBaiTap du={du} />}
+            {((du.baiTap && du.baiTap.length > 0) || du.linkBaiTap) && <NutTaiBaiTap du={du} />}
           </section>
         )}
 
@@ -900,12 +1031,42 @@ function NutXemDeCuaCon({ du }: { du: PhieuDayDu }) {
   )
 }
 
+/** HAI VIỆC KHÁC NHAU, HAI NÚT (thầy chốt 04-09).
+ *
+ * Bản trước gộp làm một nút "Xem phiếu bài tập": phụ huynh bấm là phiếu mở ra
+ * trong máy MÌNH, xong không biết đưa cho con bằng cách nào — chụp màn hình,
+ * hoặc chuyển tiếp cả báo cáo có điểm và nhận xét của thầy sang cho con.
+ *
+ *   · XEM — phụ huynh tự xem trước xem thầy giao gì.
+ *   · COPY LINK GỬI CHO CON — link CHỈ có phiếu bài tập, không kèm điểm, không
+ *     kèm nhận xét. Nút này nhấp nháy vì đây mới là việc phụ huynh cần làm.
+ *
+ * Link do máy thầy cất sẵn lúc dựng báo cáo (`linkBaiTap`); trang này không có
+ * mã bí mật nên không tự ghi lên máy chủ được. Chưa có link thì chỉ hiện nút
+ * Xem — không dựng một nút copy ra rồi copy chuỗi rỗng. */
 function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
   const [dang, setDang] = useState(false)
   const [loi, setLoi] = useState('')
+  const [daCopy, setDaCopy] = useState(false)
+  /** Máy chặn copy tự động thì hiện link ra cho phụ huynh bôi đen copy tay. */
+  const [linkTay, setLinkTay] = useState('')
   // Phiếu hiện NGAY TRONG trang, không mở thẻ mới: phụ huynh mở link từ Zalo
   // thì đang ở trình duyệt trong ứng dụng Zalo, ở đó `window.open` bị chặn.
   const [html, setHtml] = useState('')
+
+  const copyLink = async () => {
+    const link = du.linkBaiTap
+    if (!link) return
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('không có clipboard')
+      await navigator.clipboard.writeText(link)
+      setDaCopy(true)
+      setTimeout(() => setDaCopy(false), 3000)
+    } catch {
+      setLinkTay(link)
+    }
+  }
+
   const tai = async () => {
     setDang(true)
     setLoi('')
@@ -929,31 +1090,32 @@ function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
       setDang(false)
     }
   }
+  const soCau = du.baiTap?.length ?? 0
   return (
     <div style={{ marginTop: 14 }}>
-      <button
-        type="button"
-        onClick={() => void tai()}
-        disabled={dang}
-        style={{
-          width: '100%',
-          minHeight: 46,
-          border: 'none',
-          borderRadius: 12,
-          background: 'var(--p-tim)',
-          color: 'var(--p-trang)',
-          fontFamily: 'var(--sans)',
-          fontSize: 14.5,
-          fontWeight: 700,
-          cursor: dang ? 'default' : 'pointer',
-          opacity: dang ? 0.6 : 1,
-        }}
-      >
-        {dang ? 'Đang dựng phiếu…' : `Xem phiếu bài tập ${du.baiTap?.length ?? 0} câu kèm lời giải`}
-      </button>
-      <div style={{ fontSize: 12, color: 'var(--p-nhat)', marginTop: 7, lineHeight: 1.6 }}>
-        Thầy đã chọn sẵn theo đúng chuyên đề em mất điểm ở bài này, xếp từ dễ lên khó. Em làm hết rồi mới bấm vào từng câu xem lời giải.
+      <div className="bc-tieu">Bài luyện{soCau > 0 ? ` ${soCau} câu` : ''} theo đúng chỗ em mất điểm</div>
+      <div className="bc-nut-doi">
+        {soCau > 0 && (
+          <button type="button" className="bc-nut vien" onClick={() => void tai()} disabled={dang}>
+            {dang ? 'Đang dựng…' : 'Xem trước'}
+          </button>
+        )}
+        {du.linkBaiTap && (
+          <button type="button" className={`bc-nut chinh${daCopy ? '' : ' bc-nhay'}`} onClick={() => void copyLink()}>
+            {daCopy ? 'Đã copy link' : 'Copy link gửi cho con'}
+          </button>
+        )}
       </div>
+      <div style={{ fontSize: 12, color: 'var(--p-nhat)', marginTop: 8, lineHeight: 1.6 }}>
+        Thầy đã chọn sẵn theo đúng chuyên đề em mất điểm ở bài này, xếp từ dễ lên khó. Em làm hết rồi mới bấm vào từng câu xem lời giải.
+        {du.linkBaiTap ? ' Link chỉ có bài tập, không kèm điểm và nhận xét, nên gửi thẳng cho con được.' : ''}
+      </div>
+      {linkTay && (
+        <div style={{ fontSize: 12.5, marginTop: 8, lineHeight: 1.6 }}>
+          <div style={{ color: 'var(--p-nhat)' }}>Máy không cho copy tự động. Phụ huynh bôi đen dòng dưới rồi copy:</div>
+          <div style={{ marginTop: 4, padding: '8px 10px', borderRadius: 10, background: 'var(--p-chim)', wordBreak: 'break-all', fontVariantNumeric: 'tabular-nums' }}>{linkTay}</div>
+        </div>
+      )}
       {loi && <div style={{ fontSize: 12.5, color: 'var(--p-do)', marginTop: 6 }}>{loi}</div>}
       {html && <KhungXemPhieu html={html} ten="Phiếu bài tập" dong={() => setHtml('')} />}
     </div>

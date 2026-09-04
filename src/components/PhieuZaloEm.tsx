@@ -19,10 +19,12 @@ import { soanPhieuZalo, viecCanLamMacDinh, demChu, NHAC_TRUOC_KHI_GUI, NHAN_KHOI
 import { veAnhPhieu, tenTepPhieu, type DuLieuAnhPhieu } from '../lib/anh-phieu'
 import { taoLinkPhieu } from '../lib/phieu-link'
 import KhungXemPhieu from './KhungXemPhieu'
-import { dungPhieu, giamGoiPhieu } from '../lib/phieu-du-lieu'
-import { luuPhieu, qidDaLam, sinhMaPhieu, xoaPhieu, type ChiTietCauRow } from '../lib/exam-api'
-import { loadExamSources, loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
-import type { TeacherExamSource } from '../data/examContent'
+import { BAN_PHIEU_BT, type GoiPhieuBaiTap } from './NutPhieuHtml'
+import { dungPhieu, giamGoiPhieu, type NguonViPham } from '../lib/phieu-du-lieu'
+import { chiTietCa, luuPhieu, qidDaLam, sinhMaPhieu, xoaPhieu, type ChiTietCauRow } from '../lib/exam-api'
+import { docSoCauCa, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
+import { taoChiTietCau } from '../lib/chi-tiet-cau'
+import { mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
 import type { HoSoEm } from '../lib/exam-api'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -47,6 +49,7 @@ export default function PhieuZaloEm({
   diemLop,
   thoiLuongPhut,
   vaoLuc,
+  viPham,
 }: {
   hoSo: HoSoEm
   /** Mã ca cần làm phiếu. Bỏ trống = ca gần nhất đã chấm. */
@@ -60,8 +63,98 @@ export default function PhieuZaloEm({
   diemLop?: number[] | null
   thoiLuongPhut?: number | null
   vaoLuc?: string | null
+  /** Nhật ký rời màn của lượt này. `undefined` = chỗ gọi không biết, khối này
+   * tự đi hỏi máy chủ; `null` = chỗ gọi đã biết và em không rời màn lần nào. */
+  viPham?: NguonViPham | null
 }) {
   const ca = chonCa(hoSo, maCa)
+
+  // ---------------------------------------------------------------------
+  // TỰ ĐI LẤY PHẦN CÒN THIẾU.
+  //
+  // LỖI ĐÃ DÍNH 04-09: màn Chi tiết ca truyền đủ bảng chấm từng câu + ngân
+  // hàng đáp án nên báo cáo ra đầy đủ; màn Hồ sơ học sinh gọi khối này với
+  // ĐÚNG MỘT prop (`hoSo`) nên báo cáo cụt mất cách làm bài, từng câu sai,
+  // đúc kết, và cả nút xem đề của con. Cùng một em, cùng một ca, hai bản báo
+  // cáo khác nhau — thầy gửi bản nào là hên xui.
+  //
+  // Nay: thiếu thì khối này tự hỏi máy chủ đúng ca đó rồi dựng lại y hệt. Chỗ
+  // gọi nào đã có sẵn dữ liệu vẫn truyền vào như cũ và KHÔNG tốn thêm lệnh
+  // nào — điều kiện dưới chỉ chạy khi thật sự thiếu.
+  const [them, setThem] = useState<{
+    rows: ChiTietCauRow[] | null
+    banks: TeacherExamSource[] | null
+    diemLop: number[] | null
+    thoiLuongPhut: number | null
+    vaoLuc: string | null
+    viPham: NguonViPham | null
+  } | null>(null)
+  const canThem = !rows || !banks || viPham === undefined
+  useEffect(() => {
+    if (!canThem || !ca) {
+      setThem(null)
+      return
+    }
+    let con = true
+    void (async () => {
+      try {
+        const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
+        if (!url.trim() || !mat.trim()) return
+        const banksCu = await loadSessionTeacherBank(ca.maCa)
+        const ct = await chiTietCa(url.trim(), mat.trim(), ca.maCa, !banksCu)
+        let bank = banksCu ?? null
+        if (!bank && ct.keyBank && (ct.keyBank.phanI.length || ct.keyBank.phanII.length || ct.keyBank.phanIII.length)) {
+          bank = [{ maDe: ca.maCa, phanI: ct.keyBank.phanI, phanII: ct.keyBank.phanII, phanIII: ct.keyBank.phanIII }]
+        }
+        // Lượt MỚI NHẤT của đúng em này — thầy đứng ở ca nào thì báo cáo nói về
+        // lượt cuối của ca đó, không gộp các lần thi lại.
+        const luot = ct.luot.filter((l) => String(l.sbd) === hoSo.em.sbd).sort((a, b) => b.lanThu - a.lanThu)[0]
+        const soCau = (await docSoCauCa(ca.maCa)) ?? (ct.keyBank as { soCau?: { I: number; II: number; III: number } } | null)?.soCau
+        let rowsMoi: ChiTietCauRow[] | null = null
+        if (bank && luot?.dapAn) {
+          try {
+            rowsMoi = taoChiTietCau(mergeKeepAnswers(bank, soCau), ca.maCa, hoSo.em.sbd, luot.dapAn, luot.giayCau)
+          } catch {
+            rowsMoi = null
+          }
+        }
+        if (!con) return
+        setThem({
+          rows: rowsMoi,
+          banks: bank,
+          diemLop: ct.luot.map((l) => l.tong).filter((d): d is number => typeof d === 'number'),
+          thoiLuongPhut: Number(ct.ca.thoiGianPhut) || null,
+          vaoLuc: luot?.vaoLuc || null,
+          viPham: luot
+            ? {
+                soLan: luot.soLanRoiMan || 0,
+                tongGiay: luot.tongGiayRoiMan || 0,
+                daKhoa: luot.trangThai === 'khoa',
+                lyDoKhoa: luot.integrity?.lyDoKhoa ?? null,
+                nguong: ct.ca.nguongLan && ct.ca.nguongGiay ? { lan: Number(ct.ca.nguongLan), giay: Number(ct.ca.nguongGiay) } : null,
+                events: luot.integrity?.events ?? null,
+              }
+            : null,
+        })
+      } catch {
+        // Mất mạng hoặc ca đã xoá: báo cáo vẫn dựng được từ hồ sơ, chỉ thiếu
+        // các mục cần bảng chấm. Không báo đỏ — thầy đang xem hồ sơ, không
+        // phải đang chờ tải gì.
+        if (con) setThem(null)
+      }
+    })()
+    return () => {
+      con = false
+    }
+  }, [canThem, ca, hoSo.em.sbd])
+
+  const rowsDung = rows ?? them?.rows ?? null
+  const banksDung = banks ?? them?.banks ?? null
+  const diemLopDung = diemLop ?? them?.diemLop ?? null
+  const thoiLuongDung = thoiLuongPhut ?? them?.thoiLuongPhut ?? null
+  const vaoLucDung = vaoLuc ?? them?.vaoLuc ?? null
+  const viPhamDung = viPham !== undefined ? viPham : (them?.viPham ?? null)
+
   const khungAnh = useRef<HTMLDivElement | null>(null)
   const [daCopy, setDaCopy] = useState(false)
   /** Link báo cáo đang mở xem trong app. Rỗng = chưa mở. */
@@ -125,6 +218,10 @@ export default function PhieuZaloEm({
   // cáo được GHI ĐÈ lên đúng mã cũ, không đẻ ra một phiếu mồ côi mỗi lần gõ.
   // Chờ 1,2 giây sau lần gõ cuối rồi mới đẩy, kẻo mỗi chữ một lần gọi máy chủ.
   const maRef = useRef<{ khoa: string; ma: string } | null>(null)
+  /** Mã + link của PHIẾU BÀI TẬP đã cất riêng. Cất một lần cho mỗi cặp (em,
+   * ca): bài luyện không phụ thuộc dòng "việc cần làm" thầy đang gõ, nên gõ
+   * mỗi chữ mà đẩy lại phiếu là phí đường truyền. */
+  const btRef = useRef<{ khoa: string; ma: string; link: string } | null>(null)
   useEffect(() => {
     if (!duPhieu || !ca) {
       setLink('')
@@ -153,14 +250,54 @@ export default function PhieuZaloEm({
             ca,
             chuyenDeCa,
             vieCanLam: viec.trim() || viecCanLamMacDinh(duPhieu),
-            rows,
-            banks,
-            diemLop,
-            thoiLuongPhut,
-            vaoLuc,
+            rows: rowsDung,
+            banks: banksDung,
+            diemLop: diemLopDung,
+            thoiLuongPhut: thoiLuongDung,
+            vaoLuc: vaoLucDung,
             khoDe,
             qidDaLam: qidCu,
+            viPham: viPhamDung,
           })
+
+          // PHIẾU BÀI TẬP CẤT RIÊNG, có link riêng — để phụ huynh copy gửi
+          // thẳng cho con. Link báo cáo có điểm và nhận xét của thầy, chuyển
+          // tiếp nguyên cho con là sai đối tượng.
+          if (phieu.baiTap && phieu.baiTap.length > 0) {
+            try {
+              if (btRef.current?.khoa !== khoa) {
+                const maBt = sinhMaPhieu()
+                const sai = phieu.chuyenDeCa.filter((c) => c.soSai > 0)
+                const goiBt: GoiPhieuBaiTap = {
+                  v: BAN_PHIEU_BT,
+                  loai: 'baitap',
+                  tt: {
+                    hoTen: phieu.hoTen || `SBD ${phieu.sbd}`,
+                    sbd: phieu.sbd,
+                    ngay: new Date(),
+                    tenChuyenDe: sai[0]?.ten || phieu.chuyenDeCa[0]?.ten || 'Hoá học',
+                    ketQua: '',
+                    hienDapAn: false,
+                    nhanBia: 'Bài luyện theo đúng chỗ em mất điểm',
+                    oBia: [
+                      { nhan: 'Học sinh', gia: phieu.hoTen || `SBD ${phieu.sbd}` },
+                      { nhan: 'SBD', gia: phieu.sbd },
+                      ...(phieu.tenCa ? [{ nhan: 'Sau bài', gia: phieu.tenCa }] : []),
+                      { nhan: 'Số câu', gia: `${phieu.baiTap.length} câu` },
+                    ],
+                  },
+                  cau: phieu.baiTap,
+                }
+                await luuPhieu(url.trim(), mat.trim(), { ma: maBt, maCa: ca.maCa, sbd: hoSo.em.sbd, hoTen: hoSo.em.hoTen, phieu: goiBt })
+                btRef.current = { khoa, ma: maBt, link: taoLinkPhieu(`${location.origin}${import.meta.env.BASE_URL}`, maBt) }
+              }
+              phieu.linkBaiTap = btRef.current?.link
+            } catch {
+              // Cất phiếu bài tập hỏng thì báo cáo vẫn phải gửi được, chỉ mất
+              // nút copy link. KHÔNG để một phần phụ kéo cả báo cáo xuống.
+            }
+          }
+
           // Gói nặng thì bỏ bớt phần phụ chứ đừng để cả báo cáo gửi hỏng.
           const { phieu: goiGui } = giamGoiPhieu(phieu)
           await luuPhieu(url.trim(), mat.trim(), { ma, maCa: ca.maCa, sbd: hoSo.em.sbd, hoTen: hoSo.em.hoTen, phieu: goiGui })
@@ -176,7 +313,7 @@ export default function PhieuZaloEm({
       con = false
       clearTimeout(hen)
     }
-  }, [duPhieu, ca, hoSo, chuyenDeCa, viec, rows, banks, diemLop, thoiLuongPhut, vaoLuc])
+  }, [duPhieu, ca, hoSo, chuyenDeCa, viec, rowsDung, banksDung, diemLopDung, thoiLuongDung, vaoLucDung, viPhamDung])
 
   /** Thu hồi: xoá mã trên kho là link đã gửi chết ngay. Đây là thứ cách cũ
    * (nhét dữ liệu vào link) không làm được. */

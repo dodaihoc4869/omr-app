@@ -7,6 +7,7 @@ import { CheckSquare, Square, Library, Copy, Check } from 'lucide-react'
 import { mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
 import KhoiRutDe from '../components/KhoiRutDe'
 import { locNguonTheoId, qidDaRaTuCacCa, type SoCauPhan } from '../lib/rut-de'
+import { goMaDeTachRa, tachNhieuTheoPhan, TEN_PHAN_TACH } from '../lib/tach-phan-de'
 import { randomSessionCode, taoLinkMoi } from '../lib/ca-link'
 import { TheNoiDung, Hang, OThongBao, NutChinh } from '../components/DesignSystem'
 import NutDongBo from '../components/NutDongBo'
@@ -159,8 +160,9 @@ export default function ExamSetupScreen() {
     loadExamSources().then((list) => {
       if (huy) return
       setSavedSources(list)
-      // Chỉ có 1 đề thì chọn sẵn luôn — bớt một chạm.
-      if (list.length === 1) setSelectedMaDe(new Set([list[0].maDe]))
+      // Chỉ có 1 đề thì chọn sẵn cả ba phần của đề đó — bớt một chạm, mà thầy
+      // vẫn bỏ tích được phần không cần.
+      if (list.length === 1) setSelectedMaDe(new Set(tachNhieuTheoPhan(list).map((s) => s.maDe)))
     })
     // Đồng bộ IM LẶNG khi mở màn (đề pipeline vừa đẩy lên tự về) — lỗi/mất
     // mạng thì bỏ qua, thầy vẫn còn nút "Đồng bộ" để bấm tay.
@@ -214,7 +216,16 @@ export default function ExamSetupScreen() {
     })
   }
 
-  const selectedSources = useMemo(() => savedSources.filter((c) => selectedMaDe.has(c.maDe)), [savedSources, selectedMaDe])
+  // MỖI MÃ ĐỀ TÁCH LÀM BA (thầy chốt 04-09): trắc nghiệm · đúng sai · trả lời
+  // ngắn. Một bài trong kho là 90–190 câu gộp cả ba phần; muốn mở ca chỉ gồm
+  // trắc nghiệm thì trước đây phải chọn cả mã rồi vào màn Rút đề đặt hai phần
+  // kia về 0. Nay tích đúng một dòng là xong.
+  //
+  // Tách CHỈ Ở ĐÂY, id từng câu giữ nguyên (xem `tach-phan-de.ts`), nên chấm
+  // bài, tránh câu trùng ca trước, lịch sử ca cũ đều không đụng gì.
+  const dsDeTach = useMemo(() => tachNhieuTheoPhan(savedSources), [savedSources])
+
+  const selectedSources = useMemo(() => dsDeTach.filter((c) => selectedMaDe.has(c.maDe)), [dsDeTach, selectedMaDe])
 
   /** Bộ đề THẬT SỰ gửi lên máy chủ: đã cắt xuống còn những câu thầy chốt. */
   const nguonRaDe = useMemo(() => (boRut ? locNguonTheoId(selectedSources, boRut.ids) : selectedSources), [selectedSources, boRut])
@@ -224,8 +235,8 @@ export default function ExamSetupScreen() {
 
   const dsDeLoc = useMemo(() => {
     const q = timKiemMaDe.trim().toLowerCase()
-    return savedSources.filter((c) => (!nhomLoc || (c.nhom || '') === nhomLoc) && (!q || c.maDe.toLowerCase().includes(q)))
-  }, [savedSources, timKiemMaDe, nhomLoc])
+    return dsDeTach.filter((c) => (!nhomLoc || (c.nhom || '') === nhomLoc) && (!q || c.maDe.toLowerCase().includes(q)))
+  }, [dsDeTach, timKiemMaDe, nhomLoc])
 
   const tongCauDaChon = nguonRaDe.reduce((s, c) => s + c.phanI.length + c.phanII.length + c.phanIII.length, 0)
 
@@ -401,9 +412,13 @@ export default function ExamSetupScreen() {
             {savedSources.length >= 6 && (
               <input style={O_NHAP} placeholder="Tìm theo mã đề…" value={timKiemMaDe} onChange={(e) => setTimKiemMaDe(e.target.value)} inputMode="search" />
             )}
-            {dsDeLoc.map((c) => {
+            {dsDeLoc.map((c, i) => {
               const dangChon = selectedMaDe.has(c.maDe)
               const tongCau = c.phanI.length + c.phanII.length + c.phanIII.length
+              const { goc, phan } = goMaDeTachRa(c.maDe)
+              // Dòng đầu của mỗi đề gốc mới in tên bài; ba dòng con của cùng
+              // một đề đứng liền nhau, không lặp lại tên bài ba lần.
+              const dauNhom = i === 0 || goMaDeTachRa(dsDeLoc[i - 1].maDe).goc !== goc
               return (
                 <Hang key={c.maDe} selected={dangChon} onClick={() => toggleSelect(c.maDe)} data-trang-thai={dangChon ? 'chon' : undefined}>
                   <span className="shrink-0" style={{ color: dangChon ? 'var(--xanh)' : 'var(--mo)' }}>
@@ -412,10 +427,10 @@ export default function ExamSetupScreen() {
                   <span className="flex-1 min-w-0">
                     <div className="font-bold" style={{ fontSize: 'var(--cx-2)' }}>
                       Mã {c.maDe}
+                      {phan ? <span style={{ fontWeight: 400, color: 'var(--nhat)' }}> · {TEN_PHAN_TACH[phan]}</span> : null}
                     </div>
                     <div style={NHAN_NHO}>
-                      I {c.phanI.length} · II {c.phanII.length} · III {c.phanIII.length}
-                      {c.nhom && !nhomLoc ? ` · ${c.nhom}` : ''}
+                      {dauNhom ? `${goc}${c.nhom && !nhomLoc ? ` · ${c.nhom}` : ''}` : `cùng bài ${goc}`}
                     </div>
                   </span>
                   <span className="shrink-0 font-bold" style={{ ...SO, fontSize: 'var(--cx-2)' }}>
@@ -424,7 +439,7 @@ export default function ExamSetupScreen() {
                 </Hang>
               )
             })}
-            {savedSources.length > 1 && (
+            {dsDeLoc.length > 1 && (
               <div className="flex items-center" style={{ gap: 'var(--k4)', ...NHAN_NHO }}>
                 <button onClick={chonTatCa} className="tap-target" style={{ color: 'var(--muc)', fontWeight: 700 }}>
                   Chọn tất cả

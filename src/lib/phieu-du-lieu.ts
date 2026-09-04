@@ -12,6 +12,7 @@ import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion,
 import type { CaCuaEm, ChiTietCauRow, ChuyenDeEm, HoSoEm } from './exam-api'
 import { ducKetKienThuc, thongKeLamBai, tinHieuLamBai, type DucKetChuyenDe, type ThongKeLamBai, type TinHieuLamBai } from './phan-tich-lam-bai'
 import { cauLuyenTuBoCau, chonCauLuyen, type CauLuyen } from './bai-tap-pdf'
+import { mocRoiMan } from './chong-gian-lan'
 
 /** Phiên bản gói báo cáo. Trang đọc từ chối bản lạ thay vì vẽ thiếu mục. */
 export const BAN_PHIEU = 2
@@ -50,6 +51,33 @@ export interface DiemMotCa {
   siSo: number | null
 }
 
+/** BẰNG CHỨNG RỜI MÀN LÀM BÀI, kèm trong báo cáo gửi phụ huynh.
+ *
+ * Thầy chốt 04-09: bấm "Báo phụ huynh" thì báo cáo phải có nút Vi phạm nhấp
+ * nháy, bấm vào ra ĐÚNG những gì máy đo được. Trước đây thầy phải gõ tay lại
+ * số lần, số giây vào tin nhắn, mà phụ huynh vẫn không có mốc giờ để đối chiếu.
+ *
+ * Máy CHỈ đo được em rời khỏi màn làm bài, không biết vì sao — cuộc gọi đến
+ * cũng cho đúng tín hiệu này. Nên gói này chở DỮ KIỆN, và trang báo cáo phải
+ * nói rõ điều đó thay vì kết luận gian lận. */
+export interface ViPhamRoiMan {
+  soLan: number
+  tongGiay: number
+  /** Bài đã bị máy khoá và tự nộp. */
+  daKhoa: boolean
+  lyDoKhoa?: 'qua_so_lan' | 'roi_qua_lau' | ''
+  /** Ngưỡng thầy đặt cho ca — để phụ huynh biết mốc nào là quá. */
+  nguong?: { lan: number; giay: number } | null
+  /** Từng lần rời, theo thứ tự. Cắt bớt nếu quá dài (xem MOC_TOI_DA). */
+  moc: { luc: string; giay: number | null }[]
+  /** Số mốc bị cắt khỏi `moc` vì quá dài — nói ra chứ không giấu. */
+  mocBiCat?: number
+}
+
+/** Số mốc rời màn tối đa nhét vào báo cáo. Đủ để phụ huynh thấy nhịp, mà không
+ * biến gói báo cáo thành nhật ký hàng trăm dòng. */
+export const MOC_TOI_DA = 40
+
 export interface PhieuDayDu {
   v: number
   hoTen: string
@@ -84,6 +112,14 @@ export interface PhieuDayDu {
    * một nút là tải được phiếu PDF ngay trên máy mình — không phải chờ thầy gửi
    * thêm file. Rút lúc thầy tạo báo cáo, ở máy thầy, nơi có cả kho đề. */
   baiTap?: CauLuyen[]
+  /** LINK PHIẾU BÀI TẬP đã cất sẵn trên kho, để phụ huynh copy gửi thẳng cho
+   * con — con mở link là làm bài, không phải mở báo cáo của phụ huynh.
+   *
+   * Link do MÁY THẦY tạo lúc dựng báo cáo (chỗ duy nhất có mã bí mật). Trang
+   * báo cáo chỉ việc copy, không ghi được gì lên máy chủ. */
+  linkBaiTap?: string
+  /** Bằng chứng rời màn — chỉ có khi ca ghi nhận em rời khỏi bài làm. */
+  viPham?: ViPhamRoiMan | null
   /** TRỌN BỘ ĐỀ EM ĐÃ LÀM, kèm lời giải — để phụ huynh mở đúng thứ con vừa
    * thi, giống hệt màn "đã nộp bài" của em. Mỗi em một bộ câu riêng nên không
    * gửi chung đề của ca được.
@@ -201,6 +237,37 @@ export function dungCauSai(rows: ChiTietCauRow[], banks: TeacherExamSource[]): C
   return ra
 }
 
+/** Nhật ký thô một lượt thi, đúng những trường cả máy thầy lẫn máy em đều có. */
+export interface NguonViPham {
+  soLan: number
+  tongGiay: number
+  daKhoa: boolean
+  lyDoKhoa?: 'qua_so_lan' | 'roi_qua_lau' | null
+  nguong?: { lan: number; giay: number } | null
+  events?: { type: string; at: string }[] | null
+}
+
+/** Dựng khối bằng chứng. Trả `null` khi em KHÔNG rời màn lần nào và bài không
+ * bị khoá — không có chuyện gì thì báo cáo không được mọc ra một nút Vi phạm
+ * rồi mở ra trống rỗng. */
+export function dungViPham(n: NguonViPham | null | undefined): ViPhamRoiMan | null {
+  if (!n) return null
+  const soLan = Math.max(0, Math.floor(Number(n.soLan) || 0))
+  const daKhoa = Boolean(n.daKhoa)
+  if (soLan === 0 && !daKhoa) return null
+  const tatCa = mocRoiMan(n.events)
+  const moc = tatCa.slice(0, MOC_TOI_DA)
+  return {
+    soLan,
+    tongGiay: Math.max(0, Math.round(Number(n.tongGiay) || 0)),
+    daKhoa,
+    lyDoKhoa: n.lyDoKhoa || '',
+    nguong: n.nguong ?? null,
+    moc,
+    mocBiCat: tatCa.length > moc.length ? tatCa.length - moc.length : undefined,
+  }
+}
+
 export interface NguonPhieu {
   hoSo: HoSoEm
   ca: CaCuaEm
@@ -218,6 +285,10 @@ export interface NguonPhieu {
   khoDe?: TeacherExamSource[] | null
   /** Câu em đã làm — tránh khi rút bài luyện. */
   qidDaLam?: string[] | null
+  /** Nhật ký rời màn của lượt này. Không có thì báo cáo không có nút Vi phạm. */
+  viPham?: NguonViPham | null
+  /** Link phiếu bài tập đã cất sẵn trên kho (máy thầy tạo). */
+  linkBaiTap?: string | null
 }
 
 /** Số câu của phiếu luyện kèm trong báo cáo gửi phụ huynh. Cố định 10: đây là
@@ -247,6 +318,8 @@ export interface NguonPhieuMayEm {
   diemPhan?: { I: number; II: number; III: number } | null
   rows: ChiTietCauRow[]
   banks: TeacherExamSource[]
+  /** Nhật ký rời màn của chính lượt em vừa nộp (máy em giữ đủ). */
+  viPham?: NguonViPham | null
 }
 
 export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
@@ -289,6 +362,7 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
     ducKet: ducKetKienThuc(cauSai.map((c) => ({ chuyenDe: c.chuyenDe, chot: c.chot }))),
     cauSai,
     dai: n.rows.map((r) => ({ nhan: `Phần ${r.phan} câu ${r.soCau}`, giay: r.giay, dung: Boolean(r.dungSai) })),
+    viPham: dungViPham(n.viPham),
     deCuaEm: deCuaEmTuRows(n.rows, n.banks),
   }
 }
@@ -337,7 +411,9 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
     ducKet: ducKetKienThuc(cauSai.map((c) => ({ chuyenDe: c.chuyenDe, chot: c.chot }))),
     cauSai,
     dai: rows.map((r) => ({ nhan: `Phần ${r.phan} câu ${r.soCau}`, giay: r.giay, dung: Boolean(r.dungSai) })),
+    viPham: dungViPham(n.viPham),
     baiTap,
+    linkBaiTap: n.linkBaiTap || undefined,
     deCuaEm: deCuaEmTuRows(rows, banks),
   }
 }

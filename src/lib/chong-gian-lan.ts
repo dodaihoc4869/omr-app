@@ -51,6 +51,45 @@ export function khoaViRoiLau(giayRoi: number, nguong: NguongGianLan): boolean {
   return giayRoi > nguong.giay
 }
 
+// ---------------------------------------------------------------------------
+// BẰNG CHỨNG RỜI MÀN — dựng từ nhật ký thô để báo cáo nói được TỪNG LẦN, chứ
+// không chỉ một con số tổng.
+//
+// Máy ghi bốn loại sự kiện: `hidden`/`visible` (tab bị ẩn) và `blur`/`focus`
+// (cửa sổ mất tiêu điểm). Chuyển tab bắn CẢ HAI cặp gần như cùng lúc, nên đếm
+// thẳng là ra gấp đôi. Luật ở đây: đang ở trong bài mà gặp `hidden` hoặc `blur`
+// thì tính MỘT lần rời và ghi mốc; đang ở ngoài thì mọi sự kiện rời tiếp theo
+// bị bỏ qua cho tới khi có `visible`/`focus` kéo về.
+//
+// Lần rời còn dở (em không quay lại, bài tự nộp) vẫn được ghi, `giay = null` —
+// thà nói "không rõ bao lâu" còn hơn bịa một con số.
+
+export interface MocRoiMan {
+  /** ISO lúc rời khỏi màn làm bài. */
+  luc: string
+  /** Số giây rời. `null` = chưa thấy quay lại trong nhật ký. */
+  giay: number | null
+}
+
+export function mocRoiMan(events: { type: string; at: string }[] | null | undefined): MocRoiMan[] {
+  const ra: MocRoiMan[] = []
+  let dangNgoai: number | null = null
+  for (const e of events ?? []) {
+    const t = new Date(e.at).getTime()
+    if (!Number.isFinite(t)) continue
+    const roi = e.type === 'hidden' || e.type === 'blur'
+    const ve = e.type === 'visible' || e.type === 'focus'
+    if (roi && dangNgoai === null) {
+      dangNgoai = t
+      ra.push({ luc: e.at, giay: null })
+    } else if (ve && dangNgoai !== null) {
+      ra[ra.length - 1].giay = Math.max(0, Math.round((t - dangNgoai) / 1000))
+      dangNgoai = null
+    }
+  }
+  return ra
+}
+
 /** Câu chữ trên dải cảnh báo — thẳng, không doạ quá mức (người dùng vị thành niên). */
 export function loiCanhBao(muc: Exclude<MucCanhBao, 'khoa'>, soLan: number, nguong: NguongGianLan): string {
   if (muc === 'nhe') return `Em vừa rời khỏi bài làm (lần ${soLan}). Thầy sẽ thấy điều này.`

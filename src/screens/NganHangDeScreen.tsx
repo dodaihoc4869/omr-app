@@ -8,7 +8,7 @@
 // lại các ca đã dùng câu đó không (cập nhật ngân hàng CÓ đáp án của từng ca;
 // màn Theo dõi mở lại là chấm theo đáp án mới).
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { RefreshCw, Trash2, ChevronDown, ChevronUp, Upload } from 'lucide-react'
+import { RefreshCw, Trash2, ChevronDown, ChevronUp, Upload, CheckCheck } from 'lucide-react'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { TheNoiDung, DauThe, Hang, Nhan, OThongBao, NutChinh } from '../components/DesignSystem'
 import { ChemText } from '../lib/chem-format'
@@ -17,6 +17,7 @@ import { caDungDe, capNhatCaDaMo, dongBoNganHang, type KetQuaDongBo } from '../l
 import { capNhatKeyBank, luuDe, xoaDe as xoaDeTrenKho } from '../lib/exam-api'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJsonText } from '../lib/exam-kho-de-import'
 import { mergeKeepAnswers, validateTeacherSource } from '../data/examContent'
+import { goMaDeTachRa, tachTheoPhan, TEN_PHAN_TACH } from '../lib/tach-phan-de'
 import TheCau from '../components/TheCau'
 import { useAppStore } from '../store/appStore'
 
@@ -48,6 +49,41 @@ function cauNghiCua(s: TeacherExamSource): CauNghi[] {
   return out
 }
 
+/** Đếm câu chờ quyết theo hai loại — hai loại này duyệt hàng loạt ra hai hệ
+ * quả khác nhau, nên hộp xác nhận phải tách bạch chứ không gộp một con số. */
+export function demChoQuyet(ds: TeacherExamSource[]): { thieu: number; nghi: number; tong: number } {
+  let thieu = 0
+  let nghi = 0
+  for (const s of ds) {
+    for (const c of cauNghiCua(s)) {
+      if (c.q.loiGiaiTrangThai === 'thieu_dap_an') thieu += 1
+      else nghi += 1
+    }
+  }
+  return { thieu, nghi, tong: thieu + nghi }
+}
+
+/** DUYỆT HÀNG LOẠT MỘT ĐỀ — chấp nhận ĐÚNG đáp án đang dùng để chấm, chỉ hạ cờ.
+ *
+ * KHÔNG đổi một đáp án nào. Đây là điều làm cho nút "duyệt hết" an toàn:
+ *   · câu `thieu_dap_an` — đề gốc không có đáp án, máy tự giải và đáp án đó đã
+ *     nằm sẵn trong `correct`; duyệt là công nhận nó.
+ *   · câu `nghi_dap_an_sai` / `lech_co_hd` — `correct` vẫn là đáp án CỦA TÁC
+ *     GIẢ ĐỀ (pipeline không bao giờ tự sửa); duyệt là giữ đáp án đề.
+ * Muốn ĐỔI đáp án thì vẫn phải mở từng câu — đổi đáp án là việc kéo theo chấm
+ * lại cả ca, không được làm hàng loạt bằng một cú bấm. */
+export function duyetDe(s: TeacherExamSource, ghiChu: string): { next: TeacherExamSource; n: number } {
+  const next: TeacherExamSource = JSON.parse(JSON.stringify(s))
+  let n = 0
+  for (const q of [...next.phanI, ...next.phanII, ...next.phanIII]) {
+    if (!TRANG_THAI_CHO_QUYET.includes(q.loiGiaiTrangThai ?? '')) continue
+    q.loiGiaiTrangThai = 'khop'
+    q.ghiChuLoiGiai = ghiChu
+    n += 1
+  }
+  return { next, n }
+}
+
 const O_NHAP: React.CSSProperties = {
   height: 52,
   borderRadius: 'var(--bo-1)',
@@ -77,6 +113,9 @@ export default function NganHangDeScreen() {
   const [dangDay, setDangDay] = useState(false)
   const [hoiXoa, setHoiXoa] = useState<{ s: TeacherExamSource; caLienQuan: string[] } | null>(null)
   const [dangXoa, setDangXoa] = useState(false)
+  /** Đang hỏi trước khi duyệt hàng loạt. `ds` = những đề sẽ duyệt. */
+  const [hoiDuyet, setHoiDuyet] = useState<{ ds: TeacherExamSource[]; nhan: string } | null>(null)
+  const [dangDuyet, setDangDuyet] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   /** Dự phòng khi máy chạy pipeline không gọi được Apps Script (chặn mạng):
@@ -242,6 +281,34 @@ export default function NganHangDeScreen() {
     })
   }
 
+  // ---------------------------------------------------------------------
+  // DUYỆT HÀNG LOẠT (thầy chốt 04-09).
+  //
+  // Đợt nạp 04-09 để lại 199 câu cờ đỏ, gần như toàn bộ là câu tác giả đề
+  // không tô vàng đáp án nên máy tự giải. Thầy đã chốt "câu tự giải không cần
+  // duyệt", nhưng cờ vẫn đỏ trên từng thẻ đề, và hạ tay từng câu là 199 lần
+  // bấm. Nút này hạ cờ cả loạt mà KHÔNG đụng vào một đáp án nào (xem `duyetDe`).
+  const duyetHangLoat = async (ds: TeacherExamSource[]) => {
+    setDangDuyet(true)
+    try {
+      const ghi = `Thầy duyệt hàng loạt ngày ${new Date().toLocaleDateString('vi-VN')}, giữ nguyên đáp án đang chấm`
+      let n = 0
+      for (const s of ds) {
+        const { next, n: k } = duyetDe(s, ghi)
+        if (k === 0) continue
+        await saveExamSource(next)
+        n += k
+      }
+      await taiLocal()
+      setHoiDuyet(null)
+      showToast(n > 0 ? `Đã duyệt ${n} câu — đáp án chấm bài giữ nguyên, không ca nào phải chấm lại` : 'Không còn câu nào chờ duyệt', 'success')
+    } catch (e) {
+      showToast(`Duyệt hàng loạt lỗi: ${e instanceof Error ? e.message : 'không rõ'}`, 'error')
+    } finally {
+      setDangDuyet(false)
+    }
+  }
+
   const tongCau = useMemo(() => sources.reduce((n, s) => n + s.phanI.length + s.phanII.length + s.phanIII.length, 0), [sources])
   const tongNghi = useMemo(() => sources.reduce((n, s) => n + cauNghiCua(s).length, 0), [sources])
 
@@ -274,6 +341,13 @@ export default function NganHangDeScreen() {
               <RefreshCw size={18} className={dangDongBo ? 'animate-spin' : ''} /> {dangDongBo ? 'Đang đồng bộ…' : 'Đồng bộ ngay'}
             </span>
           </NutChinh>
+          {tongNghi > 0 && (
+            <NutChinh variant="phu" onClick={() => setHoiDuyet({ ds: sources, nhan: `cả ${sources.length} đề` })} disabled={dangDuyet}>
+              <span className="inline-flex items-center gap-2">
+                <CheckCheck size={18} /> {dangDuyet ? 'Đang duyệt…' : `Duyệt hết ${tongNghi} câu cờ đỏ`}
+              </span>
+            </NutChinh>
+          )}
           <NutChinh variant="phu" onClick={() => fileRef.current?.click()} disabled={dangDay}>
             <span className="inline-flex items-center gap-2">
               <Upload size={18} /> {dangDay ? 'Đang đẩy…' : 'Đẩy file JSON từ kho-de/xong lên kho'}
@@ -325,6 +399,32 @@ export default function NganHangDeScreen() {
                 </div>
               </div>
 
+              {/* BA MÃ CON. Màn Mở ca liệt kê đúng ba mã này thành ba dòng
+                  tích riêng, nên thầy cần biết chúng tên gì ngay từ đây. Kho
+                  vẫn giữ MỘT bản đề: id từng câu không đổi, chấm bài và lịch
+                  sử ca cũ không đụng gì. */}
+              <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)' }}>
+                {tachTheoPhan(s).map((t) => {
+                  const { phan } = goMaDeTachRa(t.maDe)
+                  const n = t.phanI.length + t.phanII.length + t.phanIII.length
+                  return (
+                    <span
+                      key={t.maDe}
+                      style={{
+                        ...NHAN_NHO,
+                        fontVariantNumeric: 'tabular-nums',
+                        color: 'var(--muc)',
+                        background: 'var(--the-2)',
+                        borderRadius: 'var(--bo-tron)',
+                        padding: '3px 10px',
+                      }}
+                    >
+                      <b>{t.maDe}</b> · {phan ? TEN_PHAN_TACH[phan] : ''} {n} câu
+                    </span>
+                  )
+                })}
+              </div>
+
               {nghi.length > 0 && (
                 <>
                   <button
@@ -341,6 +441,17 @@ export default function NganHangDeScreen() {
                   >
                     <span>Câu nghi đáp án đề sai / thiếu đáp án ({nghi.length})</span>
                     {mo ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                  </button>
+                  {/* DUYỆT CẢ ĐỀ NÀY — thầy xem lướt xong một bài thì hạ cờ một
+                      bài, không phải hạ cả kho hay bấm từng câu. */}
+                  <button
+                    type="button"
+                    onClick={() => setHoiDuyet({ ds: [s], nhan: `đề ${s.maDe}` })}
+                    disabled={dangDuyet}
+                    className="tap-target self-start inline-flex items-center font-bold"
+                    style={{ ...NHAN_NHO, gap: 6, color: 'var(--muc)', minHeight: 36, padding: '0 12px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien-dam)' }}
+                  >
+                    <CheckCheck size={15} /> Duyệt hết {nghi.length} câu của đề này
                   </button>
                   {mo && (
                     <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
@@ -384,6 +495,54 @@ export default function NganHangDeScreen() {
           </div>
         )}
       </TheNoiDung>
+
+      {/* XÁC NHẬN DUYỆT HÀNG LOẠT. Nói rõ hai loại câu ra hai hệ quả khác nhau
+          — thầy bấm xong phải biết mình vừa công nhận cái gì. */}
+      {hoiDuyet && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'var(--phu)' }}>
+          <div className="w-full flex flex-col" style={{ maxWidth: 460, background: 'var(--the)', borderRadius: 'var(--bo-3)', padding: 'var(--k5)', gap: 'var(--k3)', boxShadow: 'var(--bong-2)' }}>
+            <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)' }}>
+              Duyệt hàng loạt {hoiDuyet.nhan}
+            </div>
+            {(() => {
+              const d = demChoQuyet(hoiDuyet.ds)
+              return (
+                <>
+                  <div style={{ ...NHAN_NHO, fontVariantNumeric: 'tabular-nums', lineHeight: 1.7 }}>
+                    <b style={{ color: 'var(--muc)' }}>{d.tong} câu</b> sẽ được hạ cờ:
+                    {d.thieu > 0 && (
+                      <div>
+                        · <b style={{ color: 'var(--muc)' }}>{d.thieu} câu</b> đề gốc không có đáp án, máy tự giải — duyệt là công nhận đáp án máy giải.
+                      </div>
+                    )}
+                    {d.nghi > 0 && (
+                      <div>
+                        · <b style={{ color: 'var(--muc)' }}>{d.nghi} câu</b> máy giải ra khác đề — duyệt là <b style={{ color: 'var(--muc)' }}>giữ đáp án của tác giả đề</b>.
+                      </div>
+                    )}
+                  </div>
+                  <OThongBao>
+                    Không đáp án nào bị đổi, nên không ca nào phải chấm lại. Câu nào thầy muốn ĐỔI đáp án thì mở riêng câu đó rồi chốt — đổi đáp án kéo theo chấm lại cả ca, không làm hàng loạt được.
+                  </OThongBao>
+                  {d.nghi > 0 && (
+                    <OThongBao tone="cam">
+                      Có {d.nghi} câu máy giải ra khác đề. Duyệt hết là bỏ qua cảnh báo đó. Muốn xem trước thì bấm Huỷ rồi mở mục "Câu nghi đáp án đề sai".
+                    </OThongBao>
+                  )}
+                </>
+              )
+            })()}
+            <div className="flex" style={{ gap: 'var(--k2)' }}>
+              <NutChinh variant="phu" onClick={() => setHoiDuyet(null)} disabled={dangDuyet}>
+                Huỷ
+              </NutChinh>
+              <NutChinh onClick={() => void duyetHangLoat(hoiDuyet.ds)} disabled={dangDuyet}>
+                {dangDuyet ? 'Đang duyệt…' : 'Duyệt hết'}
+              </NutChinh>
+            </div>
+          </div>
+        </div>
+      )}
 
       {hoiXoa && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'var(--phu)' }}>

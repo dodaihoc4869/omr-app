@@ -10,7 +10,7 @@
 // đáp án và lời giải nằm gập trong từng câu, bấm mới hiện. Một tệp dùng được
 // cả lúc phát cho em làm lẫn lúc thầy dò bài.
 import { useMemo } from 'react'
-import type { TeacherExamSource } from '../data/examContent'
+import type { SoCauMoiPhan, TeacherExamSource } from '../data/examContent'
 import { cauLuyenTuNguon } from '../lib/bai-tap-pdf'
 import NutPhieuHtml from './NutPhieuHtml'
 
@@ -24,10 +24,14 @@ export interface NutTaiDeCaProps {
   tenCa?: string
   /** Dòng nhỏ in ở bìa (vd "Lớp 12A1 · 28 câu"). */
   ghiChu?: string
+  /** Số câu MỖI EM thật sự làm trong ca. Ca mở bằng màn Rút đề thì bằng đúng
+   * số câu trong kho của ca; ca mở theo đường cũ thì máy cắt 18/4/6 câu ngẫu
+   * nhiên riêng từng em từ kho lớn hơn. */
+  soCauCa?: SoCauMoiPhan | null
   showToast: (chu: string, kieu?: 'success' | 'error' | 'warn') => void
 }
 
-export default function NutTaiDeCa({ banks, maCa, tenCa, ghiChu, showToast }: NutTaiDeCaProps) {
+export default function NutTaiDeCa({ banks, maCa, tenCa, ghiChu, soCauCa, showToast }: NutTaiDeCaProps) {
   // Ca ghép từ nhiều đề gốc thì cho thầy chọn tải từng đề — kho 147 câu in ra
   // là tập giấy dày, mà thường thầy chỉ cần đúng một bài.
   const chon = useMemo(() => {
@@ -37,6 +41,18 @@ export default function NutTaiDeCa({ banks, maCa, tenCa, ghiChu, showToast }: Nu
     for (const s of banks) ra.push({ khoa: s.maDe, ten: `Mã ${s.maDe}`, nguon: [s], soCau: s.phanI.length + s.phanII.length + s.phanIII.length })
     return ra
   }, [banks])
+
+  // SỐ CÂU MỖI EM LÀM, khác số câu trong kho của ca.
+  //
+  // LỖI ĐÃ DÍNH 04-09: thẻ ghi "Mã 12-C1-B1 · 85 câu" trong khi ca chỉ ra 28
+  // câu, thầy đọc là app đếm sai. Thật ra 85 là kho của ca, còn 28 là số câu
+  // máy cắt cho mỗi em. Hai con số đều đúng, chỉ là thẻ mới nói một con.
+  //
+  // Nay nói cả hai, và nói rõ tệp tải về là cái nào — thầy khỏi in nhầm 85 câu
+  // khi chỉ cần 28.
+  const tongKho = banks.reduce((n, s) => n + s.phanI.length + s.phanII.length + s.phanIII.length, 0)
+  const moiEm = soCauCa ? Math.max(0, soCauCa.I) + Math.max(0, soCauCa.II) + Math.max(0, soCauCa.III) : 0
+  const caCatBot = moiEm > 0 && moiEm < tongKho
 
   const goiCua = (o: (typeof chon)[number]) => async () => {
     const cau = cauLuyenTuNguon(o.nguon)
@@ -62,7 +78,7 @@ export default function NutTaiDeCa({ banks, maCa, tenCa, ghiChu, showToast }: Nu
           { nhan: 'Mã ca', gia: maCa },
           ...(ghiChu ? [{ nhan: 'Lớp', gia: ghiChu.replace(/^Lớp\s*/i, '') }] : []),
           ...(chon.length > 1 ? [{ nhan: 'Mã đề', gia: o.ten.replace(/^Mã\s*/i, '') }] : []),
-          { nhan: 'Số câu', gia: `${cau.length} câu` },
+          { nhan: 'Số câu', gia: caCatBot ? `${cau.length} câu trong kho của ca, mỗi em làm ${moiEm} câu` : `${cau.length} câu` },
         ],
       },
       cau,
@@ -75,10 +91,16 @@ export default function NutTaiDeCa({ banks, maCa, tenCa, ghiChu, showToast }: Nu
   return (
     <div className="flex flex-col" style={{ gap: 'var(--k4)' }}>
       <div style={NHAN_NHO}>Đề bài kèm lời giải chi tiết, đúng mẫu phiếu của Thầy Đỗ Đại Học.</div>
+      {caCatBot && (
+        <div style={NHAN_NHO}>
+          Ca này cắt <b style={{ color: 'var(--muc)' }}>{moiEm} câu</b> cho mỗi em (I {soCauCa?.I} · II {soCauCa?.II} · III {soCauCa?.III}) từ kho{' '}
+          <b style={{ color: 'var(--muc)' }}>{tongKho} câu</b> dưới đây, mỗi em một bộ khác nhau. Tệp tải về là cả kho. Muốn đúng bộ của một em thì mở hồ sơ em đó.
+        </div>
+      )}
       {chon.map((o) => (
         <div key={o.khoa} className="flex flex-col" style={{ gap: 'var(--k2)' }}>
           <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
-            {o.ten} · {o.soCau} câu
+            {o.ten} · {o.soCau} câu{caCatBot ? ' trong kho' : ''}
           </div>
           <NutPhieuHtml dungGoi={goiCua(o)} nhanXem="Xem đề" showToast={showToast} />
         </div>

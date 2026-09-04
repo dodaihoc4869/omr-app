@@ -372,6 +372,15 @@ export default function ExamTakeScreen() {
         diemPhan: { I: graded.score.phanIScore, II: graded.score.phanIIScore, III: graded.score.phanIIIScore },
         rows,
         banks,
+        // Em thấy đúng thứ thầy và phụ huynh sẽ thấy. Em đã nhận cảnh báo ngay
+        // lúc rời màn rồi, nên đây không phải tin dữ bất ngờ — chỉ là bản ghi.
+        viPham: {
+          soLan: attempt.integrity.leaveCount || 0,
+          tongGiay: Math.round((attempt.integrity.totalHiddenMs || 0) / 1000),
+          daKhoa: Boolean(attempt.integrity.blocked),
+          lyDoKhoa: attempt.integrity.lyDoKhoa ?? null,
+          events: attempt.integrity.events ?? null,
+        },
       })
     } catch {
       return null
