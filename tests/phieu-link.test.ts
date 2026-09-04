@@ -9,10 +9,10 @@ import trang404 from '../public/404.html?raw'
 const GOC = 'https://dodaihoc4869.github.io/omr-app/'
 
 describe('mã phiếu', () => {
-  it('16 ký tự, chỉ chữ và số, không lẫn ký tự dễ đọc nhầm', () => {
+  it('10 ký tự, chỉ chữ và số, không lẫn ký tự dễ đọc nhầm', () => {
     for (let i = 0; i < 50; i++) {
       const m = sinhMaPhieu()
-      expect(m).toHaveLength(16)
+      expect(m).toHaveLength(10)
       expect(/^[A-Za-z0-9]+$/.test(m)).toBe(true)
       // Bỏ 0/O/1/I/l để thầy đọc mã qua điện thoại không bị nhầm.
       expect(/[0O1Il]/.test(m)).toBe(false)
@@ -28,18 +28,20 @@ describe('mã phiếu', () => {
 
 describe('taoLinkPhieu / docMaTuHash', () => {
   it('link ngắn, mã nằm sau dấu #', () => {
-    const link = taoLinkPhieu(GOC, 'Abcdefgh23456789')
-    expect(link).toBe(GOC + 'p#Abcdefgh23456789')
-    expect(link.length).toBeLessThan(70)
+    const link = taoLinkPhieu(GOC, 'Abcd234567')
+    expect(link).toBe(GOC + 'p#Abcd234567')
+    // Cả link phải vừa một dòng tin nhắn Zalo. Bản cũ nhét dữ liệu vào link dài
+    // 458 ký tự, dán vào Zalo thành một khối xanh kín màn hình.
+    expect(link.length).toBeLessThanOrEqual(52)
   })
 
   it('gốc thiếu dấu / ở cuối vẫn ra link đúng', () => {
-    expect(taoLinkPhieu('https://dodaihoc4869.github.io/omr-app', 'Abcdefgh23456789')).toBe(GOC + 'p#Abcdefgh23456789')
+    expect(taoLinkPhieu('https://dodaihoc4869.github.io/omr-app', 'Abcd234567')).toBe(GOC + 'p#Abcd234567')
   })
 
   it('đọc lại được mã từ hash, có hay không dấu #', () => {
-    expect(docMaTuHash('#Abcdefgh23456789')).toBe('Abcdefgh23456789')
-    expect(docMaTuHash('Abcdefgh23456789')).toBe('Abcdefgh23456789')
+    expect(docMaTuHash('#Abcd234567')).toBe('Abcd234567')
+    expect(docMaTuHash('Abcd234567')).toBe('Abcd234567')
   })
 
   it('hash rác trả rỗng — không đem rác đi hỏi máy chủ', () => {
@@ -87,7 +89,7 @@ describe('tin nhắn Zalo mang link báo cáo', () => {
     chuyenDeSai: { ten: 'Ester – lipid', soSai: 6 },
     baiTapDaGiao: null,
   }
-  const link = taoLinkPhieu(GOC, 'Abcdefgh23456789')
+  const link = taoLinkPhieu(GOC, 'Abcd234567')
 
   it('có link thì thêm khối XEM PHIẾU ở CUỐI tin', () => {
     const tin = soanPhieuZalo(duTin, undefined, link)

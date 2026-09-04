@@ -794,11 +794,17 @@ export async function luuDe(scriptUrl: string, secret: string, de: unknown): Pro
 // nên nó chỉ trả về đúng một phiếu và không có lệnh liệt kê đi kèm.
 // ---------------------------------------------------------------------------
 
-/** Mã phiếu 16 ký tự, ~96 bit ngẫu nhiên. Sinh ở máy thầy bằng nguồn ngẫu
- * nhiên mật mã: mã đoán được là ai cũng đọc được điểm của em. */
+/** Mã phiếu 10 ký tự trên bảng chữ 56 ký tự — khoảng 58 bit ngẫu nhiên.
+ *
+ * Vì sao đúng 10: link phải NGẮN NHẤT CÓ THỂ để dán vào Zalo cho gọn, mà vẫn
+ * không dò ra được. 56^10 ≈ 3·10^17 tổ hợp; kho có 10.000 phiếu thì mỗi lần
+ * đoán bừa trúng với xác suất 3·10^-14, và Apps Script còn chặn gọi dồn. Ngắn
+ * hơn nữa thì bắt đầu đáng lo, dài hơn chỉ tổ dài link.
+ *
+ * Bỏ 0 O 1 I l khỏi bảng chữ để thầy đọc mã qua điện thoại không bị nhầm. */
 export function sinhMaPhieu(): string {
   const chu = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789'
-  const b = new Uint8Array(16)
+  const b = new Uint8Array(10)
   crypto.getRandomValues(b)
   let s = ''
   for (const x of b) s += chu[x % chu.length]

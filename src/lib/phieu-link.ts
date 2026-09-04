@@ -14,7 +14,7 @@
 // trang báo cáo đọc nó rồi hỏi Apps Script.
 
 /** Định dạng mã phiếu — dùng chung cho cả bên sinh mã và bên đọc link. */
-export const RE_MA_PHIEU = /^[A-Za-z0-9_-]{12,40}$/
+export const RE_MA_PHIEU = /^[A-Za-z0-9_-]{8,40}$/
 
 /** Link để dán vào tin nhắn Zalo. `goc` là gốc app, ví dụ
  * `https://dodaihoc4869.github.io/omr-app/`. */

@@ -1330,7 +1330,7 @@ function doPost(e) {
     if (loiP) return jsonResponse_({ ok: false, error: loiP })
     const sh = getSheet_(SHEET_PHIEU, ['Ma', 'MaCa', 'SBD', 'HoTen', 'PhieuJson', 'TaoLuc', 'SoLanXem', 'XemLanCuoi'])
     const ma = String(body.ma || '').trim()
-    if (!/^[A-Za-z0-9_-]{12,40}$/.test(ma)) return jsonResponse_({ ok: false, error: 'Mã phiếu không hợp lệ' })
+    if (!/^[A-Za-z0-9_-]{8,40}$/.test(ma)) return jsonResponse_({ ok: false, error: 'Mã phiếu không hợp lệ' })
     const row = findRowByKey_(sh, 0, ma)
     if (action === 'xoaPhieu') {
       if (row > 0) {
@@ -1364,7 +1364,7 @@ function doPost(e) {
     const ma = String(body.ma || '').trim()
     // Mã sai định dạng thì trả về ĐÚNG câu như mã không tồn tại — không để ai
     // dò được định dạng mã qua thông điệp lỗi.
-    if (!/^[A-Za-z0-9_-]{12,40}$/.test(ma)) return jsonResponse_({ ok: false, error: 'Không tìm thấy phiếu' })
+    if (!/^[A-Za-z0-9_-]{8,40}$/.test(ma)) return jsonResponse_({ ok: false, error: 'Không tìm thấy phiếu' })
     const row = findRowByKey_(sh, 0, ma)
     if (row < 0) return jsonResponse_({ ok: false, error: 'Không tìm thấy phiếu' })
     const phieu = docJsonLon_(sh.getRange(row, 5).getValue())
