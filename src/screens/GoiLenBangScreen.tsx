@@ -12,9 +12,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, ClipboardCopy, Check, RefreshCw, Search, Users, Wand2, Trash2, X, ThumbsUp, ThumbsDown } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
-import { chuoi, chiTietCa, danhSachCa, danhSachEm, ghiLenBang, hoSoEm, khoiTuNamSinh, type CaTomTat, type EmTomTat } from '../lib/exam-api'
+import { chuoi, chiTietCa, danhSachCa, danhSachEm, ghiLenBang, hoSoEm, khoiTuNamSinh, qidDaLam, type CaTomTat, type EmTomTat } from '../lib/exam-api'
 import { loadExamSources, loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
-import { bangPhanCongChu, phanCongCauHoi, type CauCoTheGoi, type EmDeGoi, type PhanCong } from '../lib/goi-len-bang'
+import { bangPhanCongChu, phanCongCauHoi, TEN_MUC, type CauCoTheGoi, type EmDeGoi, type PhanCong } from '../lib/goi-len-bang'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import TheCau from '../components/TheCau'
 import { useAppStore } from '../store/appStore'
@@ -93,6 +93,10 @@ export default function GoiLenBangScreen() {
   const [xemCauCua, setXemCauCua] = useState('')
   const [tichXoa, setTichXoa] = useState<Set<string>>(new Set())
   const [dangCham, setDangCham] = useState('')
+  // CÂU ĐÃ GỌI trong buổi này, theo SBD. Bấm "Phân công" lần nữa thì em nhận
+  // câu KHÁC — chữa lại đúng câu vừa chữa thì em không tiến thêm bước nào.
+  // Cộng thêm câu em đã làm trong bài thi/bài tập (máy chủ trả qua qidDaLam).
+  const [daGoi, setDaGoi] = useState<Record<string, string[]>>({})
 
   useEffect(() => {
     void (async () => {
@@ -174,7 +178,13 @@ export default function GoiLenBangScreen() {
         4,
         async (sbd) => {
           try {
-            return await hoSoEm(cauHinh.url, { secret: cauHinh.mat, sbd })
+            // Lấy CÙNG LÚC hồ sơ và tập câu em đã làm: hai lệnh nối tiếp nhau
+            // thì 30 em mất gấp đôi thời gian chờ.
+            const [h, qids] = await Promise.all([
+              hoSoEm(cauHinh.url, { secret: cauHinh.mat, sbd }),
+              qidDaLam(cauHinh.url, cauHinh.mat, sbd).catch(() => [] as string[]),
+            ])
+            return { h, qids }
           } catch {
             return null
           }
@@ -182,7 +192,7 @@ export default function GoiLenBangScreen() {
         (da) => setTienDo(`${da}/${sbds.length}`),
       )
       const emDeGoi: EmDeGoi[] = sbds.map((sbd, i) => {
-        const h = hoSo[i]
+        const h = hoSo[i]?.h
         const trongDs = (dsEm ?? []).find((e) => e.sbd === sbd)
         return {
           sbd,
@@ -191,7 +201,21 @@ export default function GoiLenBangScreen() {
           chuyenDeCaGanNhat: h?.chuyenDeCaGanNhat ?? [],
         }
       })
-      setKetQua(phanCongCauHoi(emDeGoi, cauHoi))
+
+      // Câu cần tránh = câu đã gọi trong buổi này + câu em đã làm trước đó.
+      const tranh: Record<string, string[]> = {}
+      sbds.forEach((sbd, i) => {
+        tranh[sbd] = [...new Set([...(daGoi[sbd] ?? []), ...(hoSo[i]?.qids ?? [])])]
+      })
+
+      const kq = phanCongCauHoi(emDeGoi, cauHoi, tranh)
+      setKetQua(kq)
+      // Ghi nhớ ngay: lần bấm sau phải ra câu khác.
+      setDaGoi((cu) => {
+        const m = { ...cu }
+        for (const p of kq) if (p.cau) m[p.sbd] = [...new Set([...(m[p.sbd] ?? []), p.cau.id])]
+        return m
+      })
     } catch (e) {
       setLoi(e instanceof Error ? e.message : 'Không phân công được')
     } finally {
@@ -427,7 +451,7 @@ export default function GoiLenBangScreen() {
           </div>
           <div className="flex items-center justify-between flex-wrap" style={{ ...NHAN_NHO, marginTop: 4, gap: 'var(--k2)' }}>
             <span>
-              <span style={SO}>{soDung}</span>/<span style={SO}>{ketQua.length}</span> em nhận đúng câu chuyên đề mình yếu · chạm tên em để xem câu và lời giải
+              <span style={SO}>{soDung}</span>/<span style={SO}>{ketQua.length}</span> em nhận đúng câu chuyên đề mình yếu · chạm tên em để xem câu và lời giải · bấm phân công lần nữa là ra câu khác, khó hơn một bậc
             </span>
             {ketQua.length > 0 && (
               <button
@@ -476,6 +500,11 @@ export default function GoiLenBangScreen() {
                           {p.cau.tomTat}
                         </span>
                       )}
+                      {p.viSao && (
+                        <span className="block" style={{ ...NHAN_NHO, marginTop: 2 }}>
+                          {p.viSao}
+                        </span>
+                      )}
                       {p.ghiChu && (
                         <span className="block" style={{ ...NHAN_NHO, color: 'var(--cam)', marginTop: 4 }}>
                           {p.ghiChu}
@@ -485,7 +514,8 @@ export default function GoiLenBangScreen() {
                         {p.lyDo === 'dung_chuyen_de_yeu' && <Nhan tone="xanh">đúng chuyên đề yếu</Nhan>}
                         {p.lyDo === 'de_khong_co_chuyen_de_nay' && <Nhan tone="cam">đề thiếu chuyên đề này</Nhan>}
                         {p.lyDo === 'chua_co_du_lieu' && <Nhan tone="xam">chưa có dữ liệu</Nhan>}
-                        {p.cau?.mucDo && <Nhan tone="tim">{p.cau.mucDo === 'van_dung' ? 'vận dụng' : p.cau.mucDo === 'hieu' ? 'thông hiểu' : 'nhận biết'}</Nhan>}
+                        {p.lyDo === 'het_cau_moi' && <Nhan tone="cam">hết câu mới</Nhan>}
+                        {p.cau?.mucDo && <Nhan tone="tim">{TEN_MUC[p.cau.mucDo]}</Nhan>}
                       </span>
                     </button>
                     <span className="shrink-0 text-right flex items-start" style={{ gap: 'var(--k2)' }}>

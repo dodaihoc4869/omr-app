@@ -1,6 +1,6 @@
 // GỌI LÊN BẢNG — khoá đúng những chỗ sai là thầy chỉ phát hiện lúc đứng lớp.
 import { describe, expect, it } from 'vitest'
-import { chuanChuyenDe, chuyenDeYeuNhat, phanCongCauHoi, bangPhanCongChu, type CauCoTheGoi, type EmDeGoi } from '../src/lib/goi-len-bang'
+import { chuanChuyenDe, chuyenDeYeuNhat, mucDoNenGoi, phanCongCauHoi, bangPhanCongChu, type CauCoTheGoi, type EmDeGoi } from '../src/lib/goi-len-bang'
 
 const cau = (id: string, phan: 'I' | 'II' | 'III', so: number, chuyenDe: string, mucDo?: 'biet' | 'hieu' | 'van_dung'): CauCoTheGoi => ({
   id,
@@ -77,9 +77,11 @@ describe('Phân công câu lên bảng', () => {
     expect(new Set(ids).size).toBe(3)
   })
 
-  it('ưu tiên câu KHÓ hơn lên bảng', () => {
+  // ĐỔI LUẬT 04-09: trước đây luôn lấy câu khó nhất. Ngược với việc giúp em
+  // tiến bộ — em sai 40% mà bị gọi lên chữa câu vận dụng thì đứng im.
+  it('lấy câu ĐÚNG TẦM của em, không phải câu khó nhất', () => {
     const kq = phanCongCauHoi([em('1', 'An', [{ ten: 'Ester – lipid', soCau: 10, soSai: 4 }])], KHO)
-    expect(kq[0].cau?.mucDo).toBe('van_dung')
+    expect(kq[0].cau?.mucDo).toBe('hieu')
   })
 
   // Đây là chỗ dễ hỏng nhất: em yếu chuyên đề hiếm câu mà bị xếp sau thì mất
@@ -132,7 +134,7 @@ describe('Bảng chữ để copy', () => {
     const t = bangPhanCongChu(kq, '12-C1-B1')
     expect(t).toContain('12-C1-B1')
     expect(t).toContain('Nguyễn An')
-    expect(t).toContain('Phần I câu 2')
+    expect(t).toContain('Phần I câu 3')
     expect(t).toContain('sai 4/10')
   })
 })
@@ -195,5 +197,75 @@ describe('Máy chủ ghi câu lên bảng', () => {
     const gs = (await import('../docs/apps-script-kiem-tra.gs?raw')).default
     expect(gs).toContain('body.xinKeyBank && ca.keyBankRef')
     expect(gs).toContain('keyBank: keyBank')
+  })
+})
+
+describe('Phân công cho em TIẾN BỘ', () => {
+  it('em hổng gốc (sai ≥60%) nhận câu NHẬN BIẾT, không phải vận dụng', () => {
+    expect(mucDoNenGoi(25 / 28)).toBe('biet')
+    const kq = phanCongCauHoi([em('1', 'An', [{ ten: 'Ester – lipid', soCau: 28, soSai: 25 }])], KHO)
+    expect(kq[0].cau?.mucDo).toBe('biet')
+    expect(kq[0].mucDoNham).toBe('biet')
+    expect(kq[0].viSao).toContain('89%')
+  })
+
+  it('sai vừa (30–60%) nhận thông hiểu; sai ít (<30%) mới nhận vận dụng', () => {
+    expect(mucDoNenGoi(0.5)).toBe('hieu')
+    expect(mucDoNenGoi(0.2)).toBe('van_dung')
+    expect(phanCongCauHoi([em('1', 'A', [{ ten: 'Ester – lipid', soCau: 10, soSai: 5 }])], KHO)[0].cau?.mucDo).toBe('hieu')
+    expect(phanCongCauHoi([em('1', 'A', [{ ten: 'Ester – lipid', soCau: 10, soSai: 2 }])], KHO)[0].cau?.mucDo).toBe('van_dung')
+  })
+
+  it('mỗi câu đã chữa nâng một bậc — gọi lại là câu khó hơn', () => {
+    expect(mucDoNenGoi(0.9, 0)).toBe('biet')
+    expect(mucDoNenGoi(0.9, 1)).toBe('hieu')
+    expect(mucDoNenGoi(0.9, 2)).toBe('van_dung')
+    expect(mucDoNenGoi(0.9, 9)).toBe('van_dung')
+  })
+
+  // Đây là điều thầy yêu cầu thẳng: phân công lại KHÔNG được lặp câu cũ.
+  it('phân công lại KHÔNG lặp lại câu đã gọi', () => {
+    const ds = [em('1', 'An', [{ ten: 'Ester – lipid', soCau: 28, soSai: 25 }])]
+    const l1 = phanCongCauHoi(ds, KHO)
+    const l2 = phanCongCauHoi(ds, KHO, { '1': [l1[0].cau!.id] })
+    const l3 = phanCongCauHoi(ds, KHO, { '1': [l1[0].cau!.id, l2[0].cau!.id] })
+    const ids = [l1[0].cau!.id, l2[0].cau!.id, l3[0].cau!.id]
+    expect(new Set(ids).size).toBe(3)
+    // và mỗi lần một bậc khó hơn
+    expect([l1[0].cau!.mucDo, l2[0].cau!.mucDo, l3[0].cau!.mucDo]).toEqual(['biet', 'hieu', 'van_dung'])
+  })
+
+  it('hết câu mới trong chuyên đề thì NÓI THẲNG, không lặng lẽ đưa lại câu cũ', () => {
+    const ds = [em('1', 'An', [{ ten: 'Ester – lipid', soCau: 28, soSai: 25 }])]
+    const kq = phanCongCauHoi(ds, KHO, { '1': ['a1', 'a2', 'a3'] })
+    expect(kq[0].lyDo).toBe('het_cau_moi')
+    expect(kq[0].ghiChu).toContain('đã chữa hết câu')
+  })
+
+  it('em đã chữa gần hết chuyên đề được chia trước em còn nhiều lựa chọn', () => {
+    const ds = [
+      em('1', 'Còn nhiều', [{ ten: 'Ester – lipid', soCau: 10, soSai: 6 }]),
+      em('2', 'Sắp hết', [{ ten: 'Ester – lipid', soCau: 10, soSai: 6 }]),
+    ]
+    const kq = phanCongCauHoi(ds, KHO, { '2': ['a1', 'a3'] })
+    expect(kq[1].cau?.id).toBe('a2')
+    expect(kq[0].cau?.id).not.toBe('a2')
+  })
+})
+
+describe('Màn nhớ câu đã gọi', () => {
+  it('lưu câu vừa phân công và tránh nó ở lần bấm sau', async () => {
+    const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
+    expect(ma).toContain('const [daGoi, setDaGoi]')
+    expect(ma).toContain('phanCongCauHoi(emDeGoi, cauHoi, tranh)')
+    // gộp cả câu em đã làm trong bài thi/bài tập
+    expect(ma).toContain('qidDaLam(cauHinh.url, cauHinh.mat, sbd)')
+    expect(ma).toContain('...(daGoi[sbd] ?? []), ...(hoSo[i]?.qids ?? [])')
+  })
+
+  it('lấy hồ sơ và câu đã làm CÙNG LÚC, không nối tiếp', async () => {
+    const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
+    expect(ma).toContain('await Promise.all([')
+    expect(ma).toContain('hoSoEm(cauHinh.url, { secret: cauHinh.mat, sbd })')
   })
 })
