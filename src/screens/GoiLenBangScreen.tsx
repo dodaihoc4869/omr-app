@@ -10,12 +10,13 @@
 // 2–4 giây — nên chỉ gọi cho những em ĐÃ TÍCH, chạy song song 4 em một đợt, và
 // hiện rõ đang chạy tới đâu. Thuật toán phân công nằm ở lib/goi-len-bang.ts.
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, ClipboardCopy, Check, RefreshCw, Search, Users, Wand2 } from 'lucide-react'
+import { ArrowLeft, ClipboardCopy, Check, RefreshCw, Search, Users, Wand2, Trash2, X, ThumbsUp, ThumbsDown } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
-import { chuoi, chiTietCa, danhSachCa, danhSachEm, hoSoEm, type CaTomTat, type EmTomTat } from '../lib/exam-api'
+import { chuoi, chiTietCa, danhSachCa, danhSachEm, ghiLenBang, hoSoEm, khoiTuNamSinh, type CaTomTat, type EmTomTat } from '../lib/exam-api'
 import { loadExamSources, loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { bangPhanCongChu, phanCongCauHoi, type CauCoTheGoi, type EmDeGoi, type PhanCong } from '../lib/goi-len-bang'
-import type { TeacherExamSource } from '../data/examContent'
+import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
+import TheCau from '../components/TheCau'
 import { useAppStore } from '../store/appStore'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -42,6 +43,7 @@ function cauTuDe(de: TeacherExamSource): CauCoTheGoi[] {
       id: q.id,
       phan,
       so: i + 1,
+      viTri: i,
       chuyenDe: q.chuyenDe,
       mucDo: q.mucDo,
       tomTat: (q.text || '').replace(/\$\\ce\{([^}]*)\}\$/g, '$1').replace(/\s+/g, ' ').trim().slice(0, 90),
@@ -75,6 +77,7 @@ export default function GoiLenBangScreen() {
 
   const [dsEm, setDsEm] = useState<EmTomTat[] | null>(null)
   const [tim, setTim] = useState('')
+  const [khoiLoc, setKhoiLoc] = useState<number | null>(null)
   const [tich, setTich] = useState<Set<string>>(new Set())
 
   const [caGanNhat, setCaGanNhat] = useState<CaTomTat | null>(null)
@@ -85,6 +88,11 @@ export default function GoiLenBangScreen() {
   const [ketQua, setKetQua] = useState<PhanCong[] | null>(null)
   const [daCopy, setDaCopy] = useState(false)
   const [loi, setLoi] = useState('')
+  // Sau khi phân công: chạm tên em để xem CÂU ĐẦY ĐỦ kèm lời giải; tích để bỏ
+  // bớt em (em vắng, em thầy đổi ý) rồi xoá một lượt.
+  const [xemCauCua, setXemCauCua] = useState('')
+  const [tichXoa, setTichXoa] = useState<Set<string>>(new Set())
+  const [dangCham, setDangCham] = useState('')
 
   useEffect(() => {
     void (async () => {
@@ -111,9 +119,11 @@ export default function GoiLenBangScreen() {
 
   const dsLoc = useMemo(() => {
     const q = tim.trim().toLowerCase()
-    if (!q) return dsEm ?? []
-    return (dsEm ?? []).filter((e) => e.sbd.includes(q) || e.hoTen.toLowerCase().includes(q) || e.lop.toLowerCase().includes(q))
-  }, [dsEm, tim])
+    return (dsEm ?? []).filter((e) => {
+      if (khoiLoc !== null && khoiTuNamSinh(e.namSinh) !== khoiLoc) return false
+      return !q || e.sbd.includes(q) || e.hoTen.toLowerCase().includes(q) || e.lop.toLowerCase().includes(q)
+    })
+  }, [dsEm, tim, khoiLoc])
 
   const doiTich = (sbd: string) =>
     setTich((cu) => {
@@ -205,6 +215,59 @@ export default function GoiLenBangScreen() {
 
   const soDung = ketQua?.filter((p) => p.lyDo === 'dung_chuyen_de_yeu').length ?? 0
 
+  /** Câu ĐẦY ĐỦ (phương án, hình, lời giải) từ đề đang chọn — dựng thẻ y hệt
+   * lúc em xem lại bài, không vẽ lại một kiểu hiển thị thứ hai. */
+  const cauDayDu = (c: CauCoTheGoi) => {
+    if (!de) return null
+    if (c.phan === 'I') return { phan: 'I' as const, q: de.phanI[c.viTri] as TeacherMcqQuestion | undefined }
+    if (c.phan === 'II') return { phan: 'II' as const, q: de.phanII[c.viTri] as TeacherTrueFalseQuestion | undefined }
+    return { phan: 'III' as const, q: de.phanIII[c.viTri] as TeacherShortAnswerQuestion | undefined }
+  }
+
+  const doiTichXoa = (sbd: string) =>
+    setTichXoa((cu) => {
+      const m = new Set(cu)
+      if (m.has(sbd)) m.delete(sbd)
+      else m.add(sbd)
+      return m
+    })
+
+  /** Bỏ em khỏi bảng phân công. KHÔNG phân công lại cho em còn lại: thầy đã đọc
+   * bảng rồi, câu tự nhảy sang em khác thì gọi nhầm ngay trên lớp. */
+  /** CHẤM CÂU TRÊN BẢNG: ghi đạt/không đạt vào log mạnh–yếu của em rồi bỏ em
+   * khỏi bảng — chữa xong là xong, không để lẫn với em chưa gọi.
+   *
+   * Ghi hỏng thì KHÔNG bỏ khỏi bảng: mất dòng mà không có gì trên máy chủ là
+   * thầy tưởng đã ghi rồi. */
+  const chamLenBang = async (p: PhanCong, dat: boolean) => {
+    if (!cauHinh) return showToast('Chưa cấu hình máy chủ', 'error')
+    const cd = p.chuyenDeYeu?.ten || p.cau?.chuyenDe || ''
+    if (!cd) return showToast('Câu này không có chuyên đề — chưa ghi được vào log mạnh–yếu', 'warn')
+    setDangCham(p.sbd)
+    try {
+      await ghiLenBang(cauHinh.url, cauHinh.mat, { sbd: p.sbd, chuyenDe: cd, dat, qid: p.cau?.id })
+      showToast(`${p.hoTen || p.sbd}: ${dat ? 'đạt' : 'không đạt'} — đã ghi vào ${cd}`, dat ? 'success' : 'warn')
+      setKetQua((cu) => (cu ?? []).filter((x) => x.sbd !== p.sbd))
+      setTich((cu) => new Set([...cu].filter((x) => x !== p.sbd)))
+      setTichXoa((cu) => new Set([...cu].filter((x) => x !== p.sbd)))
+      if (xemCauCua === p.sbd) setXemCauCua('')
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Không ghi được kết quả', 'error')
+    } finally {
+      setDangCham('')
+    }
+  }
+
+  const xoaKhoiBang = (sbds: Set<string>) => {
+    if (!ketQua || sbds.size === 0) return
+    const con = ketQua.filter((p) => !sbds.has(p.sbd))
+    setKetQua(con)
+    setTich((cu) => new Set([...cu].filter((x) => !sbds.has(x))))
+    setTichXoa(new Set())
+    if (xemCauCua && sbds.has(xemCauCua)) setXemCauCua('')
+    showToast(`Đã bỏ ${sbds.size} em khỏi bảng phân công`, 'success')
+  }
+
   return (
     <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
       <button onClick={() => setScreen('examhub')} className="tap-target self-start inline-flex items-center" style={{ ...NHAN_NHO, gap: 4 }}>
@@ -276,6 +339,26 @@ export default function GoiLenBangScreen() {
         </div>
         {caGanNhat && <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>Ca gần nhất: {caGanNhat.tenCa || `mã ${caGanNhat.maCa}`}</div>}
 
+        {/* Lọc khối trước rồi mới gõ tên: 251 em ba khối, không lọc thì gõ tên
+            nào cũng ra vài em trùng của khối khác. */}
+        <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
+          {([null, 10, 11, 12] as (number | null)[]).map((k) => {
+            const chon = khoiLoc === k
+            return (
+              <button
+                key={String(k)}
+                type="button"
+                onClick={() => setKhoiLoc(k)}
+                className="tap-target font-bold"
+                style={{ minHeight: 36, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: chon ? 'var(--muc)' : 'var(--the-2)', color: chon ? 'var(--muc-nguoc)' : 'var(--muc)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+              >
+                {k === null ? 'Tất cả' : `Khối ${k}`}
+              </button>
+            )
+          })}
+          <span style={{ ...NHAN_NHO, ...SO }}>{dsLoc.length} em</span>
+        </div>
+
         <div className="relative" style={{ marginTop: 'var(--k3)' }}>
           <Search size={18} style={{ position: 'absolute', left: 14, top: 15, color: 'var(--nhat)' }} />
           <input value={tim} onChange={(e) => setTim(e.target.value)} placeholder="Tìm theo tên hoặc số báo danh…" style={O_NHAP} aria-label="Tìm học sinh" />
@@ -319,66 +402,209 @@ export default function GoiLenBangScreen() {
 
       {ketQua && (
         <TheNoiDung>
-          <div className="flex items-center justify-between" style={{ gap: 'var(--k2)' }}>
+          <div className="flex items-center justify-between flex-wrap" style={{ gap: 'var(--k2)' }}>
             <div style={TIEU_DE_MUC}>Phân công</div>
-            <button
-              type="button"
-              onClick={() => void copyBang()}
-              className="tap-target inline-flex items-center font-bold"
-              style={{ gap: 6, minHeight: 40, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: daCopy ? 'var(--xanh-nen)' : 'var(--the-2)', color: daCopy ? 'var(--xanh)' : 'var(--muc)', border: 'none', fontSize: 'var(--cx-1)' }}
-            >
-              {daCopy ? <Check size={16} /> : <ClipboardCopy size={16} />} {daCopy ? 'Đã copy' : 'Copy bảng'}
-            </button>
+            <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
+              {tichXoa.size > 0 && (
+                <button
+                  type="button"
+                  onClick={() => xoaKhoiBang(tichXoa)}
+                  className="tap-target inline-flex items-center font-bold"
+                  style={{ gap: 6, minHeight: 40, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--do-nen)', color: 'var(--do)', border: 'none', fontSize: 'var(--cx-1)' }}
+                >
+                  <Trash2 size={16} /> Xoá {tichXoa.size} em đã tích
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => void copyBang()}
+                className="tap-target inline-flex items-center font-bold"
+                style={{ gap: 6, minHeight: 40, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: daCopy ? 'var(--xanh-nen)' : 'var(--the-2)', color: daCopy ? 'var(--xanh)' : 'var(--muc)', border: 'none', fontSize: 'var(--cx-1)' }}
+              >
+                {daCopy ? <Check size={16} /> : <ClipboardCopy size={16} />} {daCopy ? 'Đã copy' : 'Copy bảng'}
+              </button>
+            </div>
           </div>
-          <div style={{ ...NHAN_NHO, marginTop: 4 }}>
-            <span style={SO}>{soDung}</span>/<span style={SO}>{ketQua.length}</span> em nhận đúng câu chuyên đề mình yếu
+          <div className="flex items-center justify-between flex-wrap" style={{ ...NHAN_NHO, marginTop: 4, gap: 'var(--k2)' }}>
+            <span>
+              <span style={SO}>{soDung}</span>/<span style={SO}>{ketQua.length}</span> em nhận đúng câu chuyên đề mình yếu · chạm tên em để xem câu và lời giải
+            </span>
+            {ketQua.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setTichXoa(tichXoa.size === ketQua.length ? new Set() : new Set(ketQua.map((p) => p.sbd)))}
+                className="tap-target"
+                style={{ ...NHAN_NHO, minHeight: 32, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', border: 'none' }}
+              >
+                {tichXoa.size === ketQua.length ? 'Bỏ tích hết' : 'Tích hết'}
+              </button>
+            )}
           </div>
 
           <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
-            {ketQua.map((p) => (
-              <Hang key={p.sbd} style={{ alignItems: 'flex-start' }}>
-                <span className="flex-1 min-w-0">
-                  <span className="block font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
-                    {p.hoTen || `SBD ${p.sbd}`}
-                  </span>
-                  {p.chuyenDeYeu ? (
-                    <span style={NHAN_NHO}>
-                      Yếu nhất: {p.chuyenDeYeu.ten} — sai <span style={SO}>{p.chuyenDeYeu.soSai}/{p.chuyenDeYeu.soCau}</span> câu
-                    </span>
-                  ) : (
-                    <span style={NHAN_NHO}>Chưa có dữ liệu chuyên đề</span>
-                  )}
-                  {p.cau && (
-                    <span className="block" style={{ ...NHAN_NHO, color: 'var(--muc)', marginTop: 4 }}>
-                      {p.cau.tomTat}
-                    </span>
-                  )}
-                  {p.ghiChu && (
-                    <span className="block" style={{ ...NHAN_NHO, color: 'var(--cam)', marginTop: 4 }}>
-                      {p.ghiChu}
-                    </span>
-                  )}
-                  <span className="flex items-center flex-wrap" style={{ gap: 4, marginTop: 4 }}>
-                    {p.lyDo === 'dung_chuyen_de_yeu' && <Nhan tone="xanh">đúng chuyên đề yếu</Nhan>}
-                    {p.lyDo === 'de_khong_co_chuyen_de_nay' && <Nhan tone="cam">đề thiếu chuyên đề này</Nhan>}
-                    {p.lyDo === 'chua_co_du_lieu' && <Nhan tone="xam">chưa có dữ liệu</Nhan>}
-                    {p.cau?.mucDo && <Nhan tone="tim">{p.cau.mucDo === 'van_dung' ? 'vận dụng' : p.cau.mucDo === 'hieu' ? 'thông hiểu' : 'nhận biết'}</Nhan>}
-                  </span>
-                </span>
-                <span className="shrink-0 text-right">
-                  {p.cau ? (
-                    <>
-                      <span className="block font-bold" style={{ ...SO, fontSize: 'var(--cx-4)' }}>
-                        {p.cau.so}
+            {ketQua.map((p) => {
+              const mo = xemCauCua === p.sbd
+              const day = p.cau ? cauDayDu(p.cau) : null
+              return (
+                <div key={p.sbd} className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+                  <Hang style={{ alignItems: 'flex-start' }}>
+                    <input
+                      type="checkbox"
+                      checked={tichXoa.has(p.sbd)}
+                      onChange={() => doiTichXoa(p.sbd)}
+                      aria-label={`Tích để xoá ${p.hoTen || p.sbd}`}
+                      style={{ width: 20, height: 20, accentColor: 'var(--do)', marginTop: 2, marginRight: 'var(--k3)' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setXemCauCua(mo ? '' : p.sbd)}
+                      className="flex-1 min-w-0 text-left tap-target"
+                      style={{ background: 'none', border: 'none', padding: 0, minHeight: 0, color: 'var(--muc)' }}
+                    >
+                      <span className="block font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)', textDecoration: 'underline', textDecorationColor: 'var(--vien-dam)', textUnderlineOffset: 3 }}>
+                        {p.hoTen || `SBD ${p.sbd}`}
                       </span>
-                      <span style={NHAN_NHO}>Phần {p.cau.phan}</span>
-                    </>
-                  ) : (
-                    <span style={{ ...NHAN_NHO, color: 'var(--mo)' }}>—</span>
+                      {p.chuyenDeYeu ? (
+                        <span style={NHAN_NHO}>
+                          Yếu nhất: {p.chuyenDeYeu.ten} — sai <span style={SO}>{p.chuyenDeYeu.soSai}/{p.chuyenDeYeu.soCau}</span> câu
+                        </span>
+                      ) : (
+                        <span style={NHAN_NHO}>Chưa có dữ liệu chuyên đề</span>
+                      )}
+                      {p.cau && !mo && (
+                        <span className="block" style={{ ...NHAN_NHO, color: 'var(--muc)', marginTop: 4 }}>
+                          {p.cau.tomTat}
+                        </span>
+                      )}
+                      {p.ghiChu && (
+                        <span className="block" style={{ ...NHAN_NHO, color: 'var(--cam)', marginTop: 4 }}>
+                          {p.ghiChu}
+                        </span>
+                      )}
+                      <span className="flex items-center flex-wrap" style={{ gap: 4, marginTop: 4 }}>
+                        {p.lyDo === 'dung_chuyen_de_yeu' && <Nhan tone="xanh">đúng chuyên đề yếu</Nhan>}
+                        {p.lyDo === 'de_khong_co_chuyen_de_nay' && <Nhan tone="cam">đề thiếu chuyên đề này</Nhan>}
+                        {p.lyDo === 'chua_co_du_lieu' && <Nhan tone="xam">chưa có dữ liệu</Nhan>}
+                        {p.cau?.mucDo && <Nhan tone="tim">{p.cau.mucDo === 'van_dung' ? 'vận dụng' : p.cau.mucDo === 'hieu' ? 'thông hiểu' : 'nhận biết'}</Nhan>}
+                      </span>
+                    </button>
+                    <span className="shrink-0 text-right flex items-start" style={{ gap: 'var(--k2)' }}>
+                      <span>
+                        {p.cau ? (
+                          <>
+                            <span className="block font-bold" style={{ ...SO, fontSize: 'var(--cx-4)' }}>
+                              {p.cau.so}
+                            </span>
+                            <span style={NHAN_NHO}>Phần {p.cau.phan}</span>
+                          </>
+                        ) : (
+                          <span style={{ ...NHAN_NHO, color: 'var(--mo)' }}>—</span>
+                        )}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => xoaKhoiBang(new Set([p.sbd]))}
+                        aria-label={`Bỏ ${p.hoTen || p.sbd} khỏi bảng`}
+                        className="tap-target flex items-center justify-center"
+                        style={{ width: 32, height: 32, borderRadius: 'var(--bo-tron)', background: 'transparent', border: 'none', color: 'var(--mo)' }}
+                      >
+                        <X size={16} />
+                      </button>
+                    </span>
+                  </Hang>
+
+                  {/* CHẤM NGAY TẠI LỚP: chữa xong bấm một nút, kết quả vào log
+                      mạnh–yếu của em và hàng này biến khỏi bảng. */}
+                  <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)', paddingLeft: 'var(--k6)' }}>
+                    <button
+                      type="button"
+                      onClick={() => void chamLenBang(p, true)}
+                      disabled={dangCham === p.sbd}
+                      className="tap-target inline-flex items-center font-bold"
+                      style={{ gap: 6, minHeight: 36, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--xanh-nen)', color: 'var(--xanh)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+                    >
+                      <ThumbsUp size={15} /> Đạt
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void chamLenBang(p, false)}
+                      disabled={dangCham === p.sbd}
+                      className="tap-target inline-flex items-center font-bold"
+                      style={{ gap: 6, minHeight: 36, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--do-nen)', color: 'var(--do)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+                    >
+                      <ThumbsDown size={15} /> Không đạt
+                    </button>
+                    {dangCham === p.sbd && <span style={NHAN_NHO}>Đang ghi…</span>}
+                  </div>
+
+                  {/* CÂU ĐẦY ĐỦ + LỜI GIẢI — dựng bằng đúng thẻ câu của màn xem
+                      lại, nên công thức, hình và lời giải hiện y như em thấy. */}
+                  {mo && (
+                    <div style={{ paddingLeft: 'var(--k2)' }}>
+                      {!day?.q ? (
+                        <OThongBao tone="cam">Không tìm thấy câu này trong đề đang chọn — thầy đổi đề rồi phân công lại.</OThongBao>
+                      ) : day.phan === 'I' ? (
+                        <TheCau
+                          cheDo="xem_lai"
+                          phan="I"
+                          stt={p.cau!.so}
+                          tieuDe={day.q.tieuDe}
+                          text={day.q.text}
+                          thanCauImg={day.q.thanCauImg}
+                          table={day.q.table}
+                          imageDataUrl={day.q.imageDataUrl}
+                          hinhAnh={day.q.hinhAnh}
+                          choices={day.q.choices}
+                          choiceImgs={day.q.choiceImgs}
+                          choicePerm={[0, 1, 2, 3]}
+                          selected={null}
+                          correct={day.q.correct}
+                          explanation={day.q.explanation}
+                          loiGiai={day.q.loiGiai}
+                          nhanLoiGiai={day.q.loiGiaiTrangThai}
+                        />
+                      ) : day.phan === 'II' ? (
+                        <TheCau
+                          cheDo="xem_lai"
+                          phan="II"
+                          stt={p.cau!.so}
+                          tieuDe={day.q.tieuDe}
+                          text={day.q.text}
+                          thanCauImg={day.q.thanCauImg}
+                          table={day.q.table}
+                          imageDataUrl={day.q.imageDataUrl}
+                          hinhAnh={day.q.hinhAnh}
+                          ideas={day.q.ideas}
+                          ideaImgs={day.q.ideaImgs}
+                          selected={[null, null, null, null]}
+                          correct={day.q.correct}
+                          explanation={day.q.explanation}
+                          loiGiai={day.q.loiGiai}
+                          nhanLoiGiai={day.q.loiGiaiTrangThai}
+                        />
+                      ) : (
+                        <TheCau
+                          cheDo="xem_lai"
+                          phan="III"
+                          stt={p.cau!.so}
+                          tieuDe={day.q.tieuDe}
+                          text={day.q.text}
+                          thanCauImg={day.q.thanCauImg}
+                          table={day.q.table}
+                          imageDataUrl={day.q.imageDataUrl}
+                          hinhAnh={day.q.hinhAnh}
+                          selected={null}
+                          correct={day.q.correct}
+                          explanation={day.q.explanation}
+                          loiGiai={day.q.loiGiai}
+                          nhanLoiGiai={day.q.loiGiaiTrangThai}
+                        />
+                      )}
+                    </div>
                   )}
-                </span>
-              </Hang>
-            ))}
+                </div>
+              )
+            })}
           </div>
         </TheNoiDung>
       )}

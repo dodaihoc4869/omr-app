@@ -20,6 +20,9 @@ export interface CauCoTheGoi {
   mucDo?: 'biet' | 'hieu' | 'van_dung'
   /** Vài chữ đầu của đề bài, cho thầy nhận ra câu nào. */
   tomTat: string
+  /** Chỉ số câu trong mảng phần tương ứng của đề — để màn tra ra câu ĐẦY ĐỦ
+   * (phương án, hình, lời giải) mà không phải chép lại nội dung vào đây. */
+  viTri: number
 }
 
 export interface EmDeGoi {

@@ -9,6 +9,7 @@ const cau = (id: string, phan: 'I' | 'II' | 'III', so: number, chuyenDe: string,
   chuyenDe,
   mucDo,
   tomTat: `câu ${so}`,
+  viTri: so - 1,
 })
 
 const KHO: CauCoTheGoi[] = [
@@ -133,5 +134,66 @@ describe('Bảng chữ để copy', () => {
     expect(t).toContain('Nguyễn An')
     expect(t).toContain('Phần I câu 2')
     expect(t).toContain('sai 4/10')
+  })
+})
+
+describe('Màn Gọi lên bảng', () => {
+  it('có lọc khối, tìm theo tên, và chạm em ra câu kèm lời giải', async () => {
+    const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
+    expect(ma).toContain('Khối ${k}')
+    expect(ma).toContain('khoiTuNamSinh(e.namSinh) !== khoiLoc')
+    expect(ma).toContain('Tìm theo tên hoặc số báo danh')
+    // câu hiện bằng ĐÚNG thẻ của màn xem lại, không vẽ kiểu hiển thị thứ hai
+    expect(ma).toContain('cheDo="xem_lai"')
+    expect(ma).toContain('loiGiai={day.q.loiGiai}')
+  })
+
+  it('bảng phân công có tích xoá và xoá hàng loạt', async () => {
+    const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
+    expect(ma).toContain('Xoá {tichXoa.size} em đã tích')
+    expect(ma).toContain('xoaKhoiBang(tichXoa)')
+    expect(ma).toContain('xoaKhoiBang(new Set([p.sbd]))')
+    // Xoá KHÔNG được phân công lại: thầy đã đọc bảng, câu nhảy sang em khác là gọi nhầm.
+    expect(ma).toContain('ketQua.filter((p) => !sbds.has(p.sbd))')
+    expect(ma).not.toContain('phanCongCauHoi(con')
+  })
+})
+
+describe('Chấm câu trên bảng', () => {
+  it('có nút Đạt / Không đạt, ghi vào log mạnh–yếu rồi bỏ em khỏi bảng', async () => {
+    const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
+    expect(ma).toContain('chamLenBang(p, true)')
+    expect(ma).toContain('chamLenBang(p, false)')
+    expect(ma).toContain('ghiLenBang(cauHinh.url, cauHinh.mat')
+    // bỏ khỏi bảng CHỈ SAU khi máy chủ nhận — mất dòng mà chưa ghi là thầy tưởng xong rồi
+    const i = ma.indexOf('await ghiLenBang')
+    const j = ma.indexOf('filter((x) => x.sbd !== p.sbd)')
+    expect(i).toBeGreaterThan(0)
+    expect(j).toBeGreaterThan(i)
+  })
+
+  it('câu không có chuyên đề thì không ghi bừa vào log', async () => {
+    const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
+    expect(ma).toContain('chưa ghi được vào log mạnh–yếu')
+  })
+})
+
+describe('Máy chủ ghi câu lên bảng', () => {
+  it('KHÔNG tạo lượt thi giả và không thành "ca gần nhất"', async () => {
+    const gs = (await import('../docs/apps-script-kiem-tra.gs?raw')).default
+    expect(gs).toContain("if (action === 'ghiLenBang')")
+    expect(gs).toContain("'LENBANG-'")
+    // chỉ ghi tiến độ chuyên đề, không đụng LuotThi
+    const i = gs.indexOf("if (action === 'ghiLenBang')")
+    const khoi = gs.slice(i, i + 1400)
+    expect(khoi).toContain('ghiTienDo_(maCaLB, tomTat)')
+    expect(khoi).not.toContain('sheetLuot_')
+    expect(khoi).toContain('kiemTraMaBiMat_(body)')
+  })
+
+  it('chiTietCa chỉ trả ngân hàng có đáp án khi máy thầy xin', async () => {
+    const gs = (await import('../docs/apps-script-kiem-tra.gs?raw')).default
+    expect(gs).toContain('body.xinKeyBank && ca.keyBankRef')
+    expect(gs).toContain('keyBank: keyBank')
   })
 })

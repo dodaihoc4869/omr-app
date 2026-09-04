@@ -851,12 +851,29 @@ export interface LuotThiRow {
 export interface ChiTietCa {
   ca: Omit<CaTomTat, 'daVao' | 'daNop' | 'canhBao'> & { danhSachMoi: string | string[]; nguoiTao: string; nguongLan?: number; nguongGiay?: number }
   luot: LuotThiRow[]
+  /** Ngân hàng CÓ đáp án của ca — chỉ trả khi gọi với `xinKeyBank`, để máy thầy
+   * chưa có bản đề (ca mở ở máy khác) vẫn chấm lại và xuất phiếu được. */
+  keyBank?: KeyBank | null
 }
 
-export async function chiTietCa(scriptUrl: string, secret: string, maCa: string): Promise<ChiTietCa> {
-  const r = await postJson(scriptUrl, { action: 'chiTietCa', secret, maCa })
+export async function chiTietCa(scriptUrl: string, secret: string, maCa: string, xinKeyBank = false): Promise<ChiTietCa> {
+  const r = await postJson(scriptUrl, { action: 'chiTietCa', secret, maCa, xinKeyBank })
   if (!r.ok) throw new Error(r.error || 'Không lấy được chi tiết ca')
-  return { ca: { ...r.ca, maCa: String(r.ca.maCa), lop: String(r.ca.lop ?? '') }, luot: (r.luot as LuotThiRow[]).map((l) => ({ ...l, sbd: String(l.sbd), lanThu: Number(l.lanThu) || 1 })) }
+  return {
+    ca: { ...r.ca, maCa: String(r.ca.maCa), lop: String(r.ca.lop ?? '') },
+    luot: (r.luot as LuotThiRow[]).map((l) => ({ ...l, sbd: String(l.sbd), lanThu: Number(l.lanThu) || 1 })),
+    keyBank: (r.keyBank as KeyBank) ?? null,
+  }
+}
+
+/** GHI KẾT QUẢ CHỮA BÀI TRÊN BẢNG vào log mạnh–yếu của em.
+ *
+ * Một câu, một lần: đạt = làm đúng, không đạt = làm sai. Máy chủ cộng vào bảng
+ * chuyên đề tổng của em nhưng KHÔNG tạo lượt thi giả và KHÔNG đụng điểm số —
+ * nên nó không bao giờ bị nhầm thành "ca gần nhất". */
+export async function ghiLenBang(scriptUrl: string, secret: string, d: { sbd: string; chuyenDe: string; dat: boolean; qid?: string }): Promise<void> {
+  const r = await postJson(scriptUrl, { action: 'ghiLenBang', secret, sbd: d.sbd, chuyenDe: d.chuyenDe, dat: d.dat, qid: d.qid || '' })
+  if (!r.ok) throw new Error(r.error || 'Không ghi được kết quả lên bảng')
 }
 
 /** Xoá MỀM một ca — phải gõ lại đúng mã ca (xacNhan). Bài làm/điểm giữ nguyên trên Sheet. */

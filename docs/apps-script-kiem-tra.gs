@@ -1228,6 +1228,32 @@ function doPost(e) {
   const body = JSON.parse(e.postData.contents)
   const action = body.action
 
+  // -------------------------------------------------- CHẤM CÂU GỌI LÊN BẢNG
+  // Thầy gọi em lên bảng chữa một câu rồi bấm Đạt / Không đạt. Ghi lại như MỘT
+  // câu của chuyên đề đó, để lần sau máy phân công dựa trên cả những gì em làm
+  // trên bảng chứ không chỉ bài thi trên máy.
+  //
+  // Cố ý KHÔNG tạo lượt thi giả: mỗi lần ghi là một dòng TienDoCa riêng, mã
+  // 'LENBANG-<thời điểm>'. Nhờ vậy nó cộng vào bảng mạnh–yếu tổng của em nhưng
+  // KHÔNG bao giờ thành "ca gần nhất" (ca gần nhất đọc từ LuotThi), và không
+  // đụng vào điểm số của em.
+  if (action === 'ghiLenBang') {
+    const loiLB = kiemTraMaBiMat_(body)
+    if (loiLB) return jsonResponse_({ ok: false, error: loiLB })
+    const sbdLB = String(body.sbd || '').trim()
+    const cdLB = String(body.chuyenDe || '').trim()
+    if (!sbdLB || !cdLB) return jsonResponse_({ ok: false, error: 'Thiếu sbd hoặc chuyenDe' })
+    const datLB = body.dat === true
+    const lucLB = new Date().toISOString()
+    const maCaLB = 'LENBANG-' + lucLB.slice(0, 19).replace(/[-:T]/g, '')
+    const theoCd = {}
+    theoCd[cdLB] = { soCau: 1, soSai: datLB ? 0 : 1 }
+    const tomTat = {}
+    tomTat[sbdLB] = { nopLuc: lucLB, theoCd: theoCd, qids: body.qid ? [String(body.qid)] : [] }
+    ghiTienDo_(maCaLB, tomTat)
+    return jsonResponse_({ ok: true, maCa: maCaLB, dat: datLB })
+  }
+
   // ------------------------------------------------------------------ KHO ĐỀ
   // Pipeline "Nạp đề mới" (Cowork) đẩy đề ĐẦY ĐỦ đáp án + lời giải + ảnh lên
   // đây; app trên máy thầy tự tải về ngân hàng câu hỏi. Cả 3 action đều cần
@@ -1600,13 +1626,19 @@ function doPost(e) {
         giayCau: giayCau,
       })
     }
+    // NGÂN HÀNG CÓ ĐÁP ÁN của ca, trả kèm khi máy gọi xin (body.xinKeyBank).
+    // Trước đây luôn xoá, nên thầy mở ca bằng điện thoại rồi ngồi máy tính là
+    // không chấm lại, không xuất bảng điểm, không tải phiếu được — máy tính
+    // không có bản đề đó. Lệnh này đã đòi MA_BI_MAT; ai có mã thì `layDe` đã
+    // đọc được cả kho đề, nên trả thêm đáp án của MỘT ca không mở rộng quyền gì.
+    const keyBank = body.xinKeyBank && ca.keyBankRef ? docJsonLon_(ca.keyBankRef) : null
     delete ca.bankRef
     delete ca.keyBankRef
     delete ca.row
     let danhSachMoi = []
     try { danhSachMoi = ca.danhSachMoi && ca.phamVi === 'chon' ? JSON.parse(ca.danhSachMoi) : [] } catch (err) {}
     ca.danhSachMoi = ca.phamVi === 'chon' ? danhSachMoi : ca.danhSachMoi
-    return jsonResponse_({ ok: true, ca: ca, luot: luot, serverNow: Date.now() })
+    return jsonResponse_({ ok: true, ca: ca, luot: luot, keyBank: keyBank, serverNow: Date.now() })
   }
 
   if (action === 'xoaCa') {

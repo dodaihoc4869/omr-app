@@ -13,7 +13,7 @@ import { chiTietCa, duyetThiLai, ghiDiem, moKhoa, sendTeacherMessage, xoaCa, typ
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { goiPhieuCaZip, tenTepZipCa, chuyenDeTuChiTiet, type EmTrongCaDeXuatPhieu } from '../lib/phieu-hang-loat'
 import { viecCanLamMacDinh } from '../lib/phieu-zalo'
-import { loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
+import { loadScriptUrl, loadSessionTeacherBank, saveSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { soanTinRoiMan } from '../lib/phieu-zalo'
@@ -144,8 +144,18 @@ export default function ExamMonitorScreen() {
     if (!imLang) setDangTai(true)
     setLoi('')
     try {
-      const [ct, bank] = await Promise.all([chiTietCa(url, mat, ma.trim()), loadSessionTeacherBank(ma.trim())])
+      // Máy này chưa có bản đề CÓ đáp án của ca (ca mở ở máy/điện thoại khác)
+      // thì XIN LUÔN từ máy chủ và cất lại — nếu không, thầy ngồi máy tính sẽ
+      // không chấm lại, không xuất bảng điểm, không tải phiếu được. Lệnh đã đòi
+      // mã bí mật nên không mở rộng quyền cho ai.
+      const banksCu = await loadSessionTeacherBank(ma.trim())
+      const ct = await chiTietCa(url, mat, ma.trim(), !banksCu)
       setChiTiet(ct)
+      let bank = banksCu
+      if (!bank && ct.keyBank && (ct.keyBank.phanI.length || ct.keyBank.phanII.length || ct.keyBank.phanIII.length)) {
+        bank = [{ maDe: ct.ca.maCa, phanI: ct.keyBank.phanI, phanII: ct.keyBank.phanII, phanIII: ct.keyBank.phanIII }]
+        await saveSessionTeacherBank(ma.trim(), bank)
+      }
       setTeacherBank(bank ?? null)
     } catch (e) {
       setLoi(`Không tải được ca: ${e instanceof Error ? e.message : 'lỗi không rõ'}`)
@@ -533,7 +543,7 @@ export default function ExamMonitorScreen() {
           {loi && <OThongBao tone="do">{loi}</OThongBao>}
           {!teacherBank && dsEm.some((e) => e.moiNhat.dapAn) && (
             <OThongBao tone="cam">
-              Máy này không có ngân hàng CÓ đáp án của ca — chỉ máy đã mở ca mới chấm được (đáp án không rời máy thầy). Điểm hiện ra (nếu có) là điểm đã ghi trên Sheet.
+              Máy này chưa lấy được ngân hàng CÓ đáp án của ca. Ca mở khi chưa bật "xem điểm" thì đáp án không nằm trên máy chủ, chỉ máy đã mở ca mới chấm được — điểm hiện ra là điểm đã ghi trên Sheet.
             </OThongBao>
           )}
 
