@@ -13,8 +13,8 @@ import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion,
 import { TheNoiDung, DauThe, Hang, Nhan, OThongBao, NutChinh } from '../components/DesignSystem'
 import { ChemText } from '../lib/chem-format'
 import { deleteExamSource, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, saveExamSource, saveScriptUrl, saveSessionTeacherBank, saveTeacherSecret } from '../lib/exam-db'
-import { capNhatCaDaMo, dongBoNganHang, type KetQuaDongBo } from '../lib/exam-sync'
-import { capNhatKeyBank, luuDe } from '../lib/exam-api'
+import { caDungDe, capNhatCaDaMo, dongBoNganHang, type KetQuaDongBo } from '../lib/exam-sync'
+import { capNhatKeyBank, luuDe, xoaDe as xoaDeTrenKho } from '../lib/exam-api'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJsonText } from '../lib/exam-kho-de-import'
 import { mergeKeepAnswers, validateTeacherSource } from '../data/examContent'
 import { useAppStore } from '../store/appStore'
@@ -66,6 +66,8 @@ export default function NganHangDeScreen() {
   const [moDe, setMoDe] = useState<Set<string>>(new Set())
   const [hoiChamLai, setHoiChamLai] = useState<{ maDe: string; soCa: number; capNhat: () => Promise<void> } | null>(null)
   const [dangDay, setDangDay] = useState(false)
+  const [hoiXoa, setHoiXoa] = useState<{ s: TeacherExamSource; caLienQuan: string[] } | null>(null)
+  const [dangXoa, setDangXoa] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   /** Dự phòng khi máy chạy pipeline không gọi được Apps Script (chặn mạng):
@@ -141,10 +143,47 @@ export default function NganHangDeScreen() {
     dongBo(scriptUrl, secret)
   }
 
-  const xoaDe = async (maDe: string) => {
-    if (!confirm(`Xoá đề "${maDe}" khỏi ngân hàng trên máy này? (Kho đề trên Apps Script vẫn còn — lần đồng bộ sau sẽ tải lại nếu chưa xoá ở kho.)`)) return
-    await deleteExamSource(maDe)
-    await taiLocal()
+  /** Mở hộp hỏi xoá. Đếm trước số ca đã mở dùng đề này để nói thẳng cho thầy,
+   * thay vì để thầy đoán xoá đề có làm mất bài đã nộp không (không hề). */
+  const moHoiXoa = async (s: TeacherExamSource) => {
+    const banks = await loadAllSessionTeacherBanks().catch(() => [])
+    setHoiXoa({ s, caLienQuan: caDungDe(banks, s.maDe) })
+  }
+
+  /** Chỉ gỡ khỏi IndexedDB máy này. Kho còn nguyên nên lần Đồng bộ sau đề về lại. */
+  const xoaTrenMayNay = async (maDe: string) => {
+    setDangXoa(true)
+    try {
+      await deleteExamSource(maDe)
+      await taiLocal()
+      setHoiXoa(null)
+      showToast(`Đã gỡ đề ${maDe} khỏi máy này — kho vẫn giữ, bấm Đồng bộ là về lại`, 'success')
+    } finally {
+      setDangXoa(false)
+    }
+  }
+
+  /** Xoá HẲN: dòng trong sheet NganHangDe + file JSON trên Drive, rồi mới gỡ
+   * bản trên máy. Thứ tự này là cố ý — kho xoá hỏng thì giữ nguyên bản local
+   * để thầy thử lại, không để rơi vào cảnh máy mất đề mà kho vẫn còn. */
+  const xoaHanKhoiKho = async (maDe: string) => {
+    if (!scriptUrl.trim() || !secret.trim()) {
+      showToast('Cần link Apps Script + mã bí mật mới xoá được ở kho (mục Cấu hình)', 'error')
+      return
+    }
+    setDangXoa(true)
+    try {
+      await xoaDeTrenKho(scriptUrl.trim(), secret.trim(), maDe)
+      await deleteExamSource(maDe)
+      await taiLocal()
+      setKetQua(null)
+      setHoiXoa(null)
+      showToast(`Đã xoá hẳn đề ${maDe} khỏi kho và khỏi máy này`, 'success')
+    } catch (e) {
+      showToast(`Xoá ở kho lỗi: ${e instanceof Error ? e.message : 'không rõ'} — đề vẫn còn nguyên`, 'error')
+    } finally {
+      setDangXoa(false)
+    }
   }
 
   /** Thầy chốt đáp án mới cho 1 câu: sửa trong ngân hàng, gỡ cờ nghi, rồi
@@ -271,7 +310,7 @@ export default function NganHangDeScreen() {
                 <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
                   {s.nhom && <Nhan tone="tim">{s.nhom}</Nhan>}
                   {nghi.length > 0 ? <Nhan tone="do">{nghi.length} nghi</Nhan> : <Nhan tone="xanh">đáp án đủ</Nhan>}
-                  <button onClick={() => xoaDe(s.maDe)} className="tap-target" style={{ color: 'var(--mo)' }} title="Xoá khỏi máy này" aria-label="Xoá đề">
+                  <button onClick={() => moHoiXoa(s)} className="tap-target" style={{ color: 'var(--mo)' }} title="Xoá đề" aria-label={`Xoá đề ${s.maDe}`}>
                     <Trash2 size={16} />
                   </button>
                 </div>
@@ -336,6 +375,49 @@ export default function NganHangDeScreen() {
           </div>
         )}
       </TheNoiDung>
+
+      {hoiXoa && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'var(--phu)' }}>
+          <div className="w-full flex flex-col" style={{ maxWidth: 420, background: 'var(--the)', borderRadius: 'var(--bo-3)', padding: 'var(--k5)', gap: 'var(--k3)', boxShadow: 'var(--bong-2)' }}>
+            <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)' }}>
+              Xoá đề {hoiXoa.s.maDe}
+            </div>
+            <div style={{ ...NHAN_NHO, fontVariantNumeric: 'tabular-nums' }}>
+              {hoiXoa.s.phanI.length + hoiXoa.s.phanII.length + hoiXoa.s.phanIII.length} câu
+              {hoiXoa.s.nhom ? ` · ${hoiXoa.s.nhom}` : ''}
+              {hoiXoa.s.nguon ? ` · ${hoiXoa.s.nguon}` : ''}
+            </div>
+
+            {hoiXoa.caLienQuan.length > 0 && (
+              <OThongBao tone="cam">
+                <b>{hoiXoa.caLienQuan.length} ca đã mở</b> dùng đề này ({hoiXoa.caLienQuan.slice(0, 4).join(', ')}
+                {hoiXoa.caLienQuan.length > 4 ? '…' : ''}). Xoá đề <b>không</b> đụng tới các ca đó: mỗi ca giữ bản đề riêng, bài đã nộp và điểm vẫn nguyên.
+              </OThongBao>
+            )}
+
+            <div className="flex flex-col" style={{ gap: 'var(--k1)' }}>
+              <NutChinh variant="phu" onClick={() => xoaTrenMayNay(hoiXoa.s.maDe)} disabled={dangXoa}>
+                Chỉ xoá trên máy này
+              </NutChinh>
+              <div style={NHAN_NHO}>Kho trên Apps Script vẫn giữ. Bấm Đồng bộ là đề về lại máy.</div>
+            </div>
+
+            <div className="flex flex-col" style={{ gap: 'var(--k1)' }}>
+              <NutChinh variant="nguyhiem" onClick={() => xoaHanKhoiKho(hoiXoa.s.maDe)} disabled={dangXoa || !scriptUrl.trim() || !secret.trim()}>
+                {dangXoa ? 'Đang xoá…' : 'Xoá hẳn khỏi kho'}
+              </NutChinh>
+              <div style={NHAN_NHO}>
+                Xoá cả dòng trong sheet NganHangDe và file JSON trên Drive, rồi xoá luôn trên máy này. <b>Đồng bộ lại sẽ không còn đề này.</b> File gốc trong{' '}
+                <code>kho-de/xong/</code> trên ổ cứng vẫn còn, muốn dùng lại thì bấm "Đẩy file JSON" để đưa lên kho.
+              </div>
+            </div>
+
+            <NutChinh variant="phu" onClick={() => setHoiXoa(null)} disabled={dangXoa}>
+              Đóng, không xoá
+            </NutChinh>
+          </div>
+        </div>
+      )}
 
       {hoiChamLai && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'var(--phu)' }}>

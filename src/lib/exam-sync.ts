@@ -42,6 +42,13 @@ export async function capNhatCaDaMo(scriptUrl: string, secret: string, source: T
   return n
 }
 
+/** Các ca ĐÃ MỞ có dùng mã đề này (mỗi ca giữ một bản sao đề riêng trên máy
+ * thầy). Dùng để nói thẳng cho thầy trước khi xoá đề: xoá đề khỏi kho KHÔNG
+ * đụng tới các ca này — bài đã nộp, điểm và lời giải của chúng vẫn nguyên. */
+export function caDungDe(banks: { maCa: string; sources: { maDe: string }[] }[], maDe: string): string[] {
+  return banks.filter((b) => b.sources.some((s) => s.maDe === maDe)).map((b) => b.maCa)
+}
+
 /** Quyết định đề nào cần tải: chưa có local, hoặc ngayNap trên kho khác local. */
 export function chonDeCanTai(tren: KhoDeItem[], local: TeacherExamSource[]): { moi: KhoDeItem[]; capNhat: KhoDeItem[] } {
   const localMap = new Map(local.map((s) => [s.maDe, s]))
