@@ -64,14 +64,13 @@ const CSS = `
 .bc-phu{margin-top:8px;font-size:13px;opacity:.92}
 
 .bc-the{margin:16px 14px 0;background:var(--p-giay);border-radius:20px;padding:20px 18px;border:1px solid var(--p-vien)}
-.bc-the.noi{margin-top:-64px;border:none;box-shadow:var(--p-bong)}
+.bc-the.noi{position:relative;z-index:1;margin-top:-64px;border:none;box-shadow:var(--p-bong)}
 .bc-tieu{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--p-nhat)}
 .bc-tieu-lon{font-family:var(--serif);font-size:19px;font-weight:700;margin-top:2px}
 .bc-ghi{font-size:12.5px;color:var(--p-nhat);margin-top:6px}
 
-.bc-em{font-family:var(--serif);font-size:22px;font-weight:700}
-.bc-em-phu{margin-top:4px;font-size:12.5px;color:var(--p-nhat)}
 .bc-diem-hang{display:flex;align-items:center;gap:16px;margin-top:16px}
+.bc-diem-dau{margin-top:0}
 .bc-vong{position:relative;width:116px;height:116px;flex:0 0 auto}
 .bc-vong svg{width:116px;height:116px;transform:rotate(-90deg)}
 .bc-vong-in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -576,22 +575,18 @@ export default function PhieuScreen() {
         <header className="bc-dau">
           <div className="bc-dau-noi">
             <div className="bc-hieu">Thầy Đỗ Đại Học</div>
-            <div className="bc-ten">Báo cáo học tập</div>
+            <div className="bc-ten">Báo cáo học tập{du.hoTen ? ` của ${du.hoTen}` : ''}</div>
             <div className="bc-phu">
               {du.tenCa ? `${du.tenCa} · ` : ''}
               {ngayVN(du.ngay)}
+              {du.sbd ? ` · SBD ${du.sbd}` : ''}
             </div>
           </div>
         </header>
 
         {/* TỔNG QUAN */}
         <section ref={oDau} className={`bc-the noi bc-vao${raDau ? ' ra' : ''}`}>
-          <div className="bc-em">{du.hoTen || `SBD ${du.sbd}`}</div>
-          <div className="bc-em-phu">
-            {du.sbd ? `SBD ${du.sbd}` : ''}
-            {du.lop ? ` · Lớp ${du.lop}` : ''}
-          </div>
-          <div className="bc-diem-hang">
+          <div className="bc-diem-hang bc-diem-dau">
             <VongDiem diem={du.diem} tat={tat} />
             <div className="bc-canh">
               <span className="bc-nhan" style={{ color: mauDiem(du.diem) }}>
@@ -726,7 +721,7 @@ export default function PhieuScreen() {
 
         {/* NHẬN ĐỊNH + TƯ VẤN */}
         {du.tinHieu.length > 0 && (
-          <Khoi tieu="Nhận định" ten="Thầy thấy gì, anh/chị nhắc con gì" tat={tat}>
+          <Khoi tieu="Nhận định" ten="Thầy thấy gì, phụ huynh nhắc con gì" tat={tat}>
             {du.tinHieu.map((t) => (
               <div className="bc-tin" key={t.ma}>
                 <div className="bc-tin-nhan">{t.nhan}</div>

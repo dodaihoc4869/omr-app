@@ -125,10 +125,26 @@ export interface TeacherShortAnswerQuestion extends ShortAnswerQuestion, LoiGiai
   tieuDe?: string
 }
 
+/** Số câu MỖI EM phải làm ở từng phần trong một ca.
+ *
+ * Trước 04-09 con số này là hằng số 18/4/6 nằm trong code, và mỗi em được cắt
+ * NGẪU NHIÊN RIÊNG từng ấy câu. Với đề 28 câu (đúng 18+4+6) không ai thấy gì vì
+ * mọi em nhận trọn đề; với kho 90 câu phần I thì hai em làm hai bộ khác nhau,
+ * điểm không so được với nhau, mà hạng lớp trong báo cáo gửi phụ huynh lại dựa
+ * đúng vào đó. Nay màn Rút đề chốt bộ câu và ghi số câu vào ĐÂY, đi kèm gói đề
+ * lên máy chủ (Apps Script cất nguyên đối tượng bank nên không phải sửa gì bên
+ * đó). Ca mở trước ngày này không có trường này ⇒ vẫn chạy luật 18/4/6 cũ. */
+export interface SoCauMoiPhan {
+  I: number
+  II: number
+  III: number
+}
+
 export interface PublicExamBank {
   phanI: McqQuestion[]
   phanII: TrueFalseQuestion[]
   phanIII: ShortAnswerQuestion[]
+  soCau?: SoCauMoiPhan
 }
 
 /** Đề thầy soạn (1 lần tải lên = 1 TeacherExamSource), có đáp án — chỉ ở máy thầy. */
@@ -179,8 +195,9 @@ export function validateTeacherSource(c: TeacherExamSource): string[] {
 }
 
 /** Gộp nhiều đề đã tải + xoá đáp án — đây mới là thứ được publish lên server. */
-export function mergeAndStrip(sources: TeacherExamSource[]): PublicExamBank {
+export function mergeAndStrip(sources: TeacherExamSource[], soCau?: SoCauMoiPhan): PublicExamBank {
   return {
+    soCau,
     phanI: sources.flatMap((s) =>
       s.phanI.map(({ id, text, choices, table, imageDataUrl, hinhAnh, thanCauImg, choiceImgs, canXem }) => ({ id, text, choices, table, imageDataUrl, hinhAnh, thanCauImg, choiceImgs, canXem })),
     ),
@@ -196,12 +213,17 @@ export function mergeAndStrip(sources: TeacherExamSource[]): PublicExamBank {
  * điểm ngay sau khi nộp" (kèm cảnh báo đánh đổi rủi ro lộ đề). KHÁC với
  * mergeAndStrip: không publish trực tiếp lên phần bank công khai của ca.
  */
-export function mergeKeepAnswers(sources: TeacherExamSource[]): {
+export function mergeKeepAnswers(
+  sources: TeacherExamSource[],
+  soCau?: SoCauMoiPhan,
+): {
   phanI: TeacherMcqQuestion[]
   phanII: TeacherTrueFalseQuestion[]
   phanIII: TeacherShortAnswerQuestion[]
+  soCau?: SoCauMoiPhan
 } {
   return {
+    soCau,
     phanI: sources.flatMap((s) => s.phanI),
     phanII: sources.flatMap((s) => s.phanII),
     phanIII: sources.flatMap((s) => s.phanIII),

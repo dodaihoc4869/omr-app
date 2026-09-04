@@ -2,14 +2,15 @@
 // sinh (assignStudentQuestions với cùng mãCa+sbd luôn ra cùng 1 kết quả, xem
 // exam-assign.ts), rồi dùng đúng engine/score.ts đang chấm OMR — không viết
 // logic chấm điểm lần 2.
-import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
+import type { SoCauMoiPhan, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import type { AnswerKey, Choice, DS, GradedItem, StudentAnswers } from '../engine/score'
 import { scoreStudent, type ScoreResult } from '../engine/score'
 import { assignStudentQuestions } from './exam-assign'
 import type { AnswerRecord } from './exam-db'
 
-function mergeTeacherSources(sources: TeacherExamSource[]) {
+function mergeTeacherSources(sources: TeacherExamSource[], soCau?: SoCauMoiPhan) {
   return {
+    soCau,
     phanI: sources.flatMap((s) => s.phanI),
     phanII: sources.flatMap((s) => s.phanII),
     phanIII: sources.flatMap((s) => s.phanIII),
@@ -31,6 +32,8 @@ type KeyBankLike = {
   phanI: TeacherMcqQuestion[]
   phanII: TeacherTrueFalseQuestion[]
   phanIII: TeacherShortAnswerQuestion[]
+  /** Số câu mỗi phần của ca (màn Rút đề ghi). Thiếu ⇒ luật 18/4/6 cũ. */
+  soCau?: SoCauMoiPhan
 }
 
 /** Lõi chấm điểm — nhận thẳng bank đã gộp CÓ đáp án (dùng cho cả 2 nơi: máy
@@ -81,6 +84,7 @@ export function gradeSubmissionFull(
   maCa: string,
   sbd: string,
   submitted: AnswerRecord,
+  soCau?: SoCauMoiPhan,
 ): GradedSubmission {
-  return gradeFromKeyBank(mergeTeacherSources(teacherSources), maCa, sbd, submitted)
+  return gradeFromKeyBank(mergeTeacherSources(teacherSources, soCau), maCa, sbd, submitted)
 }

@@ -25,16 +25,24 @@ type CauNghi = {
   q: TeacherMcqQuestion | TeacherTrueFalseQuestion | TeacherShortAnswerQuestion
 }
 
+/** Câu chờ thầy quyết. Gồm CẢ `lech_co_hd`: pipeline giải ra đáp án khác đề
+ * nhưng đề vẫn có hướng dẫn, thường là đề hỏi chưa chặt (đếm cả đồng phân hình
+ * học, hai ý mâu thuẫn nhau). Trước đây ba trạng thái này bị lọc mất nên tài
+ * liệu ghi "3 câu chờ thầy quyết" mà màn hình chỉ hiện 1 — thầy không có cách
+ * nào chốt hai câu còn lại. */
+const TRANG_THAI_CHO_QUYET = ['nghi_dap_an_sai', 'thieu_dap_an', 'lech_co_hd']
+
 function cauNghiCua(s: TeacherExamSource): CauNghi[] {
   const out: CauNghi[] = []
+  const nghi = (q: { loiGiaiTrangThai?: string }) => TRANG_THAI_CHO_QUYET.includes(q.loiGiaiTrangThai ?? '')
   s.phanI.forEach((q, idx) => {
-    if (q.loiGiaiTrangThai === 'nghi_dap_an_sai' || q.loiGiaiTrangThai === 'thieu_dap_an') out.push({ phan: 'I', idx, q })
+    if (nghi(q)) out.push({ phan: 'I', idx, q })
   })
   s.phanII.forEach((q, idx) => {
-    if (q.loiGiaiTrangThai === 'nghi_dap_an_sai' || q.loiGiaiTrangThai === 'thieu_dap_an') out.push({ phan: 'II', idx, q })
+    if (nghi(q)) out.push({ phan: 'II', idx, q })
   })
   s.phanIII.forEach((q, idx) => {
-    if (q.loiGiaiTrangThai === 'nghi_dap_an_sai' || q.loiGiaiTrangThai === 'thieu_dap_an') out.push({ phan: 'III', idx, q })
+    if (nghi(q)) out.push({ phan: 'III', idx, q })
   })
   return out
 }

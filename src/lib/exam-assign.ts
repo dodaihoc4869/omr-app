@@ -33,12 +33,23 @@ function pick<T extends { id: string }>(arr: T[], need: number, seedTag: string)
   return perm.slice(0, k).map((i) => arr[i])
 }
 
-/** Bank ở đây có thể là PublicExamBank (học sinh) hoặc TeacherExamSource đã gộp (thầy chấm lại) — chỉ cần đúng shape id/text/choices/ideas. */
+function soDuong(v: unknown, macDinh: number): number {
+  const n = Number(v)
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : macDinh
+}
+
+/** Bank ở đây có thể là PublicExamBank (học sinh) hoặc TeacherExamSource đã gộp (thầy chấm lại) — chỉ cần đúng shape id/text/choices/ideas.
+ *
+ * Số câu lấy: `bank.soCau` do màn Rút đề ghi vào lúc mở ca. Ca cũ không có
+ * trường này nên rơi về hằng số 18/4/6 như trước — đổi thẳng sang "lấy hết" là
+ * mọi ca cũ có kho lớn hơn 28 câu đột nhiên đổi số câu, tức là chấm lại ra điểm
+ * khác điểm đã gửi phụ huynh. */
 export function assignStudentQuestions(bank: PublicExamBank, maCa: string, sbd: string): StudentAssignment {
   const base = `${maCa}:${sbd}`
-  const phanIQs = pick(bank.phanI, PHAN_I_NEED, `${base}:phanI`)
-  const phanIIQs = pick(bank.phanII, PHAN_II_NEED, `${base}:phanII`)
-  const phanIIIQs = pick(bank.phanIII, PHAN_III_NEED, `${base}:phanIII`)
+  const can = bank.soCau
+  const phanIQs = pick(bank.phanI, soDuong(can?.I, PHAN_I_NEED), `${base}:phanI`)
+  const phanIIQs = pick(bank.phanII, soDuong(can?.II, PHAN_II_NEED), `${base}:phanII`)
+  const phanIIIQs = pick(bank.phanIII, soDuong(can?.III, PHAN_III_NEED), `${base}:phanIII`)
 
   return {
     phanI: phanIQs.map((q) => ({

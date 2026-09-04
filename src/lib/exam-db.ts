@@ -4,7 +4,7 @@
 // luôn ở dạng chấm được ngay (chấm lại chỉ cần chạy lại đúng thuật toán chọn
 // câu từ (mãCa, sbd), không cần lưu thêm bộ câu đã gán cho từng em).
 import { openDB, type IDBPDatabase } from 'idb'
-import type { PublicExamBank, TeacherExamSource } from '../data/examContent'
+import type { PublicExamBank, SoCauMoiPhan, TeacherExamSource } from '../data/examContent'
 
 export interface AnswerRecord {
   phanI: Record<string, 'A' | 'B' | 'C' | 'D'> // qid -> lựa chọn (đã quy về chữ cái GỐC, chưa xáo)
@@ -128,6 +128,24 @@ export async function saveSessionTeacherBank(maCa: string, sources: TeacherExamS
 export async function loadSessionTeacherBank(maCa: string): Promise<TeacherExamSource[] | undefined> {
   const db = await getDb()
   return db.get(STORE_SESSION_BANK_TEACHER, maCa)
+}
+
+/** Số câu mỗi phần của một ca đã rút đề (bản song song của `bank.soCau` trên
+ * máy chủ). Máy thầy chấm lại bằng chính con số này, nếu không thì thầy rút 25
+ * câu phần I mà lúc chấm lại máy chỉ lấy 18 — sai điểm mà không báo gì. Ca mở
+ * trước màn Rút đề không có mục này ⇒ trả undefined ⇒ giữ luật 18/4/6 cũ. */
+export async function luuSoCauCa(maCa: string, soCau: SoCauMoiPhan): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, soCau, `soCauCa:${maCa}`)
+}
+
+export async function docSoCauCa(maCa: string): Promise<SoCauMoiPhan | undefined> {
+  const db = await getDb()
+  const v = (await db.get(STORE_SETTINGS, `soCauCa:${maCa}`)) as SoCauMoiPhan | undefined
+  if (!v) return undefined
+  const so = (x: unknown) => (Number.isFinite(Number(x)) && Number(x) > 0 ? Math.floor(Number(x)) : 0)
+  const ra = { I: so(v.I), II: so(v.II), III: so(v.III) }
+  return ra.I + ra.II + ra.III > 0 ? ra : undefined
 }
 
 export async function saveScriptUrl(url: string): Promise<void> {

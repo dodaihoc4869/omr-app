@@ -43,20 +43,25 @@ export function demChu(s: string): number {
 export const NGUOI_GUI = 'Thầy Đỗ Đại Học'
 
 /** Nhãn khối chứa link xem phiếu đầy đủ. */
-export const NHAN_XEM_PHIEU = 'XEM PHIẾU:'
+export const NHAN_XEM_PHIEU = 'PHỤ HUYNH XEM KĨ BÁO CÁO CỦA CON TẠI ĐÂY:'
 
 /** Soạn phiếu kết quả để thầy dán vào Zalo.
  *
- * `link` là link phiếu HTML (lib/phieu-link.ts). Có link thì thêm một khối cuối
- * để phụ huynh bấm xem bản đầy đủ có biểu đồ. Tin nhắn chữ vẫn phải **tự đủ ý**
- * khi không bấm link: phụ huynh mở Zalo trên máy cũ, hoặc chỉ liếc qua thông
- * báo, thì đã thấy đủ điểm và việc cần làm. */
+ * `link` là link báo cáo HTML (lib/phieu-link.ts). Có link thì khối link đứng
+ * NGAY SAU dòng mở đầu. Tin nhắn chữ vẫn phải **tự đủ ý** khi không bấm link:
+ * phụ huynh mở Zalo trên máy cũ, hoặc chỉ liếc qua thông báo, thì đã thấy đủ
+ * điểm và việc cần làm. */
 export function soanPhieuZalo(d: DuLieuPhieu, vieCanLam?: string, link?: string): string {
   const ngay = ngayVN(d.ngay)
   const khoi: string[] = []
 
   // Mở đầu: AI GỬI, bài nào, ngày nào. Một dòng, không lời chào.
   khoi.push(`${NGUOI_GUI} gửi kết quả bài kiểm tra ngày ${ngay} của em ${d.hoTen}.`)
+
+  // LINK BÁO CÁO ĐỨNG NGAY SAU DÒNG MỞ ĐẦU (thầy chốt 04-09): điểm và chuyên
+  // đề bên dưới chỉ là bản tóm tắt, thứ phụ huynh cần đọc kĩ nằm trong báo cáo.
+  // Để link xuống cuối là phần lớn phụ huynh đọc xong mấy dòng số rồi thôi.
+  if (link && link.trim()) khoi.push(`${NHAN_XEM_PHIEU} ${link.trim()}`)
 
   // ĐIỂM. Nhãn VIẾT HOA vì Zalo không hiện chữ đậm — gõ **đậm** vào tin nhắn
   // thì phụ huynh nhìn thấy đúng hai dấu sao. Viết hoa là cách nhấn mạnh DUY
@@ -79,17 +84,13 @@ export function soanPhieuZalo(d: DuLieuPhieu, vieCanLam?: string, link?: string)
 
   khoi.push(`VIỆC CẦN LÀM: ${vieCanLam ?? viecCanLamMacDinh(d)}`)
 
-  // Link để cuối: Zalo hiện link dài thành một khối xanh, để giữa thì cắt đôi
-  // tin nhắn. Không thêm câu mời "anh/chị bấm vào đây" — nhãn đã nói rõ việc.
-  if (link && link.trim()) khoi.push(`${NHAN_XEM_PHIEU} ${link.trim()}`)
-
   // Dòng trống giữa các khối: đọc trên điện thoại mới tách bạch được từng phần.
   return khoi.join('\n\n')
 }
 
 /** Nhãn khối để màn hình tô đậm khi xem trước. Zalo nhận CHỮ THƯỜNG, đây chỉ
  * là chuyện hiển thị trong app. */
-export const NHAN_KHOI = ['ĐIỂM:', 'CHỖ MẤT ĐIỂM:', 'VIỆC CẦN LÀM:', NHAN_XEM_PHIEU]
+export const NHAN_KHOI = [NHAN_XEM_PHIEU, 'ĐIỂM:', 'CHỖ MẤT ĐIỂM:', 'VIỆC CẦN LÀM:']
 
 /** VIỆC CẦN LÀM — phần 3 và 4 của bộ quy tắc viết (việc em phải làm + mốc thầy
  * kiểm tra lại). Tách riêng vì ẢNH PHIẾU và TIN NHẮN phải nói cùng một việc:
@@ -125,7 +126,7 @@ export interface DuLieuBaoRoiMan {
   daKhoa: boolean
 }
 
-export function soanTinRoiMan(d: DuLieuBaoRoiMan, xungHo = 'Anh/chị'): string {
+export function soanTinRoiMan(d: DuLieuBaoRoiMan, xungHo = 'Phụ huynh'): string {
   const ngay = ngayVN(d.ngay)
   const ten = d.tenCa ? `bài ${d.tenCa}` : `bài kiểm tra ${ngay}`
   const cau: string[] = []
@@ -135,8 +136,8 @@ export function soanTinRoiMan(d: DuLieuBaoRoiMan, xungHo = 'Anh/chị'): string 
       ? 'Máy đã khoá bài và nộp phần em làm được.'
       : 'Bài vẫn tính bình thường, Thầy ghi lại để theo dõi.',
   )
-  cau.push('Thầy hỏi em xem lúc đó có việc gì rồi báo lại anh/chị.')
-  cau.push('Buổi tới anh/chị nhắc em bật Không làm phiền trước khi làm bài.')
+  cau.push('Thầy hỏi em xem lúc đó có việc gì rồi báo lại phụ huynh.')
+  cau.push('Buổi tới phụ huynh nhắc em bật Không làm phiền trước khi làm bài.')
   return cau.join(' ')
 }
 

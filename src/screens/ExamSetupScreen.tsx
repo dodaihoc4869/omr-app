@@ -4,12 +4,14 @@
 // Không còn mục dán link, không xoá đề ở đây (xoá ở Ngân hàng câu hỏi).
 import { useEffect, useMemo, useState } from 'react'
 import { CheckSquare, Square, Library, Copy, Check } from 'lucide-react'
-import { bankSizeWarning, mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
+import { mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
+import KhoiRutDe from '../components/KhoiRutDe'
+import { locNguonTheoId, type SoCauPhan } from '../lib/rut-de'
 import { randomSessionCode, taoLinkMoi } from '../lib/ca-link'
 import { TheNoiDung, Hang, OThongBao, NutChinh } from '../components/DesignSystem'
 import NutDongBo from '../components/NutDongBo'
 import { chuoi, danhSachEm, khoiTuNamSinh, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
-import { loadExamSources, loadScriptUrl, loadTeacherSecret, saveSessionTeacherBank } from '../lib/exam-db'
+import { loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, luuSoCauCa, saveSessionTeacherBank } from '../lib/exam-db'
 import { dongBoNganHang } from '../lib/exam-sync'
 import { useAppStore } from '../store/appStore'
 
@@ -133,6 +135,11 @@ export default function ExamSetupScreen() {
   const [timTen, setTimTen] = useState('')
   // Danh sách em để tích: danh sách lớp trên máy (Google Sheet) — không có thì lấy danh sách lớp đã nạp lên máy chủ.
   const [dsDangKy, setDsDangKy] = useState<{ sbd: string; hoTen: string; lop: string }[] | null>(null)
+  // Bộ câu màn Rút đề chốt; null = thầy chọn lấy trọn kho (đường cũ).
+  const [boRut, setBoRut] = useState<{ ids: Set<string>; soCau: SoCauPhan } | null>(null)
+  // Câu đã ra ở các ca trước (đọc từ bản đề CÓ đáp án đã lưu của từng ca) — để
+  // rút đề tránh phát lại câu lớp vừa làm tuần trước.
+  const [qidCaTruoc, setQidCaTruoc] = useState<string[]>([])
   const [opening, setOpening] = useState(false)
   const [opened, setOpened] = useState<{ maCa: string; joinLink: string; batDau: string; hetHanVao: string } | null>(null)
   const [daCopy, setDaCopy] = useState(false)
@@ -143,6 +150,14 @@ export default function ExamSetupScreen() {
     let huy = false
     loadScriptUrl().then(setScriptUrl)
     loadTeacherSecret().then(setMaBiMat)
+    loadAllSessionTeacherBanks()
+      .then((ds) => {
+        if (huy) return
+        const ids = new Set<string>()
+        for (const b of ds) for (const s of b.sources) for (const q of [...s.phanI, ...s.phanII, ...s.phanIII]) ids.add(q.id)
+        setQidCaTruoc([...ids])
+      })
+      .catch(() => {})
     loadExamSources().then((list) => {
       if (huy) return
       setSavedSources(list)
@@ -201,8 +216,11 @@ export default function ExamSetupScreen() {
     })
   }
 
-  const selectedSources = savedSources.filter((c) => selectedMaDe.has(c.maDe))
-  const sizeWarning = selectedSources.length > 0 ? bankSizeWarning(selectedSources) : null
+  const selectedSources = useMemo(() => savedSources.filter((c) => selectedMaDe.has(c.maDe)), [savedSources, selectedMaDe])
+
+  /** Bộ đề THẬT SỰ gửi lên máy chủ: đã cắt xuống còn những câu thầy chốt. */
+  const nguonRaDe = useMemo(() => (boRut ? locNguonTheoId(selectedSources, boRut.ids) : selectedSources), [selectedSources, boRut])
+  const soCauRaDe = boRut ? boRut.soCau : undefined
 
   const dsNhom = useMemo(() => Array.from(new Set(savedSources.map((c) => (c.nhom || '').trim()).filter(Boolean))).sort(), [savedSources])
 
@@ -211,7 +229,7 @@ export default function ExamSetupScreen() {
     return savedSources.filter((c) => (!nhomLoc || (c.nhom || '') === nhomLoc) && (!q || c.maDe.toLowerCase().includes(q)))
   }, [savedSources, timKiemMaDe, nhomLoc])
 
-  const tongCauDaChon = selectedSources.reduce((s, c) => s + c.phanI.length + c.phanII.length + c.phanIII.length, 0)
+  const tongCauDaChon = nguonRaDe.reduce((s, c) => s + c.phanI.length + c.phanII.length + c.phanIII.length, 0)
 
   const chonTatCa = () => setSelectedMaDe(new Set(dsDeLoc.map((c) => c.maDe)))
   const boChonTatCa = () => setSelectedMaDe(new Set())
@@ -234,8 +252,9 @@ export default function ExamSetupScreen() {
     setOpening(true)
     try {
       const maCa = randomSessionCode()
-      const publicBank = mergeAndStrip(selectedSources)
-      const keyBank = congBoDiem === 'khong' ? undefined : mergeKeepAnswers(selectedSources)
+      if (nguonRaDe.length === 0) return showToast('Bộ câu ra đề đang rỗng — chỉnh lại phần Bộ câu ra đề', 'error')
+      const publicBank = mergeAndStrip(nguonRaDe, soCauRaDe)
+      const keyBank = congBoDiem === 'khong' ? undefined : mergeKeepAnswers(nguonRaDe, soCauRaDe)
       const moc = await publishSession(scriptUrl.trim(), maCa, lop.trim(), thoiGianPhut, publicBank, congBoDiem, keyBank, {
         batDau: batDauIso,
         hanVaoPhut,
@@ -246,7 +265,10 @@ export default function ExamSetupScreen() {
         nguongGiay,
       })
       // Lưu bản CÓ đáp án trên máy thầy để màn Theo dõi chấm lại được sau này.
-      await saveSessionTeacherBank(maCa, selectedSources)
+      // Lưu ĐÚNG bộ đã rút, không lưu cả kho: chấm lại phải tái tạo y hệt bộ
+      // câu em đã làm, mà máy chủ chỉ giữ bộ đã rút.
+      await saveSessionTeacherBank(maCa, nguonRaDe)
+      if (soCauRaDe) await luuSoCauCa(maCa, soCauRaDe)
       setOpened({ maCa, joinLink: await taoLinkMoi(maCa, scriptUrl.trim()), batDau: moc.batDau, hetHanVao: moc.hetHanVao })
       setDaCopy(false)
       showToast('Đã mở ca kiểm tra', 'success')
@@ -325,7 +347,7 @@ export default function ExamSetupScreen() {
             <div style={TIEU_DE_MUC}>Đề cho ca này</div>
             {selectedSources.length > 0 && (
               <div style={NHAN_NHO}>
-                Đã chọn {selectedSources.length} đề · {tongCauDaChon} câu
+                Đã chọn {selectedSources.length} đề · đề ra {tongCauDaChon} câu
               </div>
             )}
           </div>
@@ -414,9 +436,9 @@ export default function ExamSetupScreen() {
                 </button>
               </div>
             )}
-            {sizeWarning && <OThongBao tone="cam">{sizeWarning}</OThongBao>}
           </div>
         )}
+        {selectedSources.length > 0 && <KhoiRutDe nguon={selectedSources} qidCaTruoc={qidCaTruoc} onDoi={setBoRut} />}
       </TheNoiDung>
 
       {/* 2. LỚP & THỜI GIAN */}

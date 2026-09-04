@@ -91,10 +91,12 @@ describe('tin nhắn Zalo mang link báo cáo', () => {
   }
   const link = taoLinkPhieu(GOC, 'Abcd234567')
 
-  it('có link thì thêm khối XEM PHIẾU ở CUỐI tin', () => {
+  it('khối link đứng NGAY SAU dòng mở đầu, trước cả điểm', () => {
     const tin = soanPhieuZalo(duTin, undefined, link)
-    expect(tin).toContain(NHAN_XEM_PHIEU)
-    expect(tin.trimEnd().endsWith(link)).toBe(true)
+    const khoi = tin.split('\n\n')
+    expect(khoi[0]).toContain('Thầy Đỗ Đại Học gửi kết quả')
+    expect(khoi[1]).toBe(`${NHAN_XEM_PHIEU} ${link}`)
+    expect(tin.indexOf(NHAN_XEM_PHIEU)).toBeLessThan(tin.indexOf('ĐIỂM:'))
   })
 
   it('KHÔNG có link thì không hứa suông có phiếu để xem', () => {
@@ -105,7 +107,10 @@ describe('tin nhắn Zalo mang link báo cáo', () => {
 
   it('tin vẫn tự đủ ý khi phụ huynh không bấm link', () => {
     const tin = soanPhieuZalo(duTin, undefined, link)
-    const khongLink = tin.slice(0, tin.indexOf(NHAN_XEM_PHIEU))
+    const khongLink = tin
+      .split('\n\n')
+      .filter((k) => !k.startsWith(NHAN_XEM_PHIEU))
+      .join('\n\n')
     expect(khongLink).toContain('ĐIỂM: 6,60/10')
     expect(khongLink).toContain('CHỖ MẤT ĐIỂM:')
     expect(khongLink).toContain('VIỆC CẦN LÀM:')

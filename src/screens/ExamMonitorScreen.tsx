@@ -13,7 +13,7 @@ import { chiTietCa, duyetThiLai, ghiDiem, moKhoa, sendTeacherMessage, xoaCa, typ
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { goiPhieuCaZip, tenTepZipCa, chuyenDeTuChiTiet, type EmTrongCaDeXuatPhieu } from '../lib/phieu-hang-loat'
 import { viecCanLamMacDinh } from '../lib/phieu-zalo'
-import { loadScriptUrl, loadSessionTeacherBank, saveSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
+import { docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { soanTinRoiMan } from '../lib/phieu-zalo'
@@ -24,7 +24,7 @@ import PhieuZaloEm from '../components/PhieuZaloEm'
 import { hoSoEm, type HoSoEm } from '../lib/exam-api'
 import { buildStudentEntry, downloadDuLieuJson } from '../lib/json-export'
 import { downloadBangDiem, type StudentRow } from '../lib/xlsx-export'
-import { mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
+import { mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
 import { useAppStore } from '../store/appStore'
 import { trangThaiCa } from './LichSuCaScreen'
 
@@ -97,6 +97,10 @@ export default function ExamMonitorScreen() {
   const [loi, setLoi] = useState('')
   const [chiTiet, setChiTiet] = useState<ChiTietCa | null>(null)
   const [teacherBank, setTeacherBank] = useState<TeacherExamSource[] | null>(null)
+  // Số câu mỗi phần của ca này (màn Rút đề chốt lúc mở ca). Chấm lại PHẢI dùng
+  // đúng con số đó, nếu không thầy rút 25 câu phần I mà máy chỉ lấy 18 ⇒ điểm
+  // chấm lại khác điểm đã gửi phụ huynh mà không có dấu hiệu gì.
+  const [soCauCa, setSoCauCa] = useState<SoCauMoiPhan | undefined>(undefined)
   const [daCopy, setDaCopy] = useState(false)
   const [xacNhanSbd, setXacNhanSbd] = useState<string | null>(null)
   const [dangDuyet, setDangDuyet] = useState<string | null>(null)
@@ -159,6 +163,13 @@ export default function ExamMonitorScreen() {
         await saveSessionTeacherBank(ma.trim(), bank)
       }
       setTeacherBank(bank ?? null)
+      // Ưu tiên số câu lưu ở máy này; ca mở ở máy khác thì lấy theo gói đáp án
+      // máy chủ vừa trả (mergeKeepAnswers đã đính soCau vào đó) rồi cất lại.
+      const scLocal = await docSoCauCa(ma.trim())
+      const scServer = (ct.keyBank as { soCau?: SoCauMoiPhan } | undefined)?.soCau
+      const sc = scLocal ?? (scServer && scServer.I + scServer.II + scServer.III > 0 ? scServer : undefined)
+      setSoCauCa(sc)
+      if (!scLocal && sc) await luuSoCauCa(ma.trim(), sc)
     } catch (e) {
       setLoi(`Không tải được ca: ${e instanceof Error ? e.message : 'lỗi không rõ'}`)
     } finally {
@@ -188,7 +199,7 @@ export default function ExamMonitorScreen() {
       let graded: GradedSubmission | null = null
       if (teacherBank && moiNhat.dapAn && (moiNhat.trangThai === 'da_nop' || moiNhat.trangThai === 'khoa')) {
         try {
-          graded = gradeSubmissionFull(teacherBank, chiTiet.ca.maCa, sbd, moiNhat.dapAn)
+          graded = gradeSubmissionFull(teacherBank, chiTiet.ca.maCa, sbd, moiNhat.dapAn, soCauCa)
         } catch {
           graded = null
         }
@@ -208,12 +219,12 @@ export default function ExamMonitorScreen() {
     const thuTu = (l: LuotThiRow) => (l.trangThai === 'dang_lam' ? 1 : l.trangThai === 'duoc_duyet_lai' ? 2 : 0)
     out.sort((a, b) => thuTu(a.moiNhat) - thuTu(b.moiNhat) || (a.hoTen || a.sbd).localeCompare(b.hoTen || b.sbd, 'vi'))
     return out
-  }, [chiTiet, teacherBank, classList])
+  }, [chiTiet, teacherBank, soCauCa, classList])
 
   // Tự ghi điểm + chi tiết từng câu (mục 5) cho lượt vừa chấm được mà chưa ghi.
   useEffect(() => {
     if (!chiTiet || !teacherBank) return
-    const bank = mergeKeepAnswers(teacherBank)
+    const bank = mergeKeepAnswers(teacherBank, soCauCa)
     const can = dsEm.filter((e) => e.graded && !daGhiRef.current.has(`${e.sbd}:${e.moiNhat.lanThu}:${e.moiNhat.nopLuc}`))
     if (can.length === 0) return
     const bai = can.map((e) => taoBaiGhiDiem(bank, chiTiet.ca.maCa, e.sbd, e.moiNhat.lanThu, e.moiNhat.dapAn!, e.graded!, e.moiNhat.giayCau))
@@ -347,7 +358,7 @@ export default function ExamMonitorScreen() {
     if (!bank || bank.length === 0) return showToast('Máy này chưa có bản đề CÓ đáp án của ca — không dựng được phiếu', 'error')
     setDangGoiPhieu('0/' + daCham.length)
     try {
-      const keyBank = mergeKeepAnswers(bank)
+      const keyBank = mergeKeepAnswers(bank, soCauCa)
       const xep = [...daCham].sort((a, b) => (b.diem ?? 0) - (a.diem ?? 0))
       const hangCua = new Map<string, number>()
       xep.forEach((e, i) => {
@@ -426,7 +437,7 @@ export default function ExamMonitorScreen() {
     let rowsHoSo: ChiTietCauRow[] | null = null
     if (chiTiet && teacherBank && emTrongCa?.moiNhat.dapAn) {
       try {
-        rowsHoSo = taoChiTietCau(mergeKeepAnswers(teacherBank), chiTiet.ca.maCa, sbdHoSo, emTrongCa.moiNhat.dapAn, emTrongCa.moiNhat.giayCau)
+        rowsHoSo = taoChiTietCau(mergeKeepAnswers(teacherBank, soCauCa), chiTiet.ca.maCa, sbdHoSo, emTrongCa.moiNhat.dapAn, emTrongCa.moiNhat.giayCau)
       } catch {
         rowsHoSo = null
       }
