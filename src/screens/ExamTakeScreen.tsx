@@ -30,6 +30,7 @@ import {
 import { useAppStore } from '../store/appStore'
 import { datDangLamBai } from '../lib/cap-nhat-app'
 import { napDong } from '../lib/nap-manh'
+import KhungXemPhieu from '../components/KhungXemPhieu'
 
 /** Đang toàn màn hình: đã thêm vào màn hình chính (standalone) HOẶC Fullscreen API đang bật. */
 function dangToanManHinh(): boolean {
@@ -201,6 +202,9 @@ export default function ExamTakeScreen() {
   // Màn báo cáo học tập của chính em, mở từ màn "Đã nộp bài".
   const [xemBaoCao, setXemBaoCao] = useState(false)
   const [dangTaiDe, setDangTaiDe] = useState(false)
+  // Phiếu hiện NGAY TRONG APP, không mở thẻ mới — app đã cài chạy ở cửa sổ
+  // riêng, không có thẻ để mở.
+  const [htmlDe, setHtmlDe] = useState('')
   const [xemLoiGiai, setXemLoiGiai] = useState(false)
 
   // ---- Trạng thái riêng của màn làm bài ----
@@ -322,12 +326,12 @@ export default function ExamTakeScreen() {
         ...solutionAssignment.phanII.map((a) => ({ phan: 'II' as const, q: a.question as TeacherTrueFalseQuestion })),
         ...solutionAssignment.phanIII.map((a) => ({ phan: 'III' as const, q: a.question as TeacherShortAnswerQuestion })),
       ]
-      const [{ cauLuyenTuBoCau }, { dungPhieuHtml, moHtml }] = await napDong(() =>
-        Promise.all([import('../lib/bai-tap-pdf'), import('../lib/tai-phieu-pdf')]),
+      const [{ cauLuyenTuBoCau }, { dungPhieu }] = await napDong(() =>
+        Promise.all([import('../lib/bai-tap-pdf'), import('../lib/html-phieu')]),
       )
       const cau = cauLuyenTuBoCau(bo)
       const cd = [...new Set(cau.map((c) => c.chuyenDe).filter(Boolean))]
-      const html = dungPhieuHtml(
+      const html = dungPhieu(
         {
           hoTen: hoTen.trim() || `SBD ${attempt.sbd}`,
           sbd: attempt.sbd,
@@ -338,7 +342,7 @@ export default function ExamTakeScreen() {
         },
         cau,
       )
-      moHtml(html)
+      setHtmlDe(html)
     } catch {
       showToast('Chưa mở được đề. Em thử lại khi máy rảnh hơn.', 'error')
     } finally {
@@ -1267,6 +1271,8 @@ export default function ExamTakeScreen() {
           )}
         </div>
 
+        {htmlDe && <KhungXemPhieu html={htmlDe} tenTep={`de-${attempt?.sbd || 'cua-em'}.html`} dong={() => setHtmlDe('')} />}
+
         {gradedPopup && graded && (
           <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center px-4 py-6" style={{ background: 'var(--phu)' }}>
             <div className="w-full overflow-y-auto" style={{ maxWidth: 400, maxHeight: '85vh', background: 'var(--the)', borderRadius: 'var(--bo-3)', boxShadow: 'var(--bong-2)' }}>
@@ -1475,13 +1481,50 @@ export default function ExamTakeScreen() {
         </div>
       )}
 
-      {/* DANH SÁCH CÂU — cuộn dọc liên tục, đầu phần dính */}
-      <div className="px-3 sm:px-4 flex flex-col" style={{ gap: 'var(--k5)', paddingTop: 'var(--k2)', paddingBottom: 'calc(var(--k8) + env(safe-area-inset-bottom))' }}>
-        {renderPhan('I')}
-        {renderPhan('II')}
-        {renderPhan('III')}
-        <div style={{ paddingTop: 'var(--k3)' }}>
-          <NutChinh onClick={() => setShowConfirm(true)}>Nộp bài</NutChinh>
+      {/* HAI CỘT TRÊN MÀN RỘNG. Cột trái KHÔNG phải menu của thầy: em đang thi
+          mà bên cạnh có "Ngân hàng câu hỏi" thì một chạm là ra hết đáp án. Cột
+          trái là LƯỚI SỐ CÂU — thứ em thật sự cần: nhìn ra ngay còn câu nào
+          chưa làm, bấm là nhảy tới. Màn hẹp thì lưới này ẩn, vẫn mở bằng nút
+          ô vuông trên thanh trên như cũ. */}
+      <div className="thi-hai-cot">
+        <aside className="thi-luoi" aria-label="Danh sách câu">
+          <div className="thi-luoi-dinh">
+            <div className="font-bold" style={{ fontSize: 'var(--cx-2)', marginBottom: 'var(--k3)' }}>
+              Đã làm{' '}
+              <span style={SANS_SO}>
+                {daLamCount}/{total}
+              </span>
+            </div>
+            <div className="grid grid-cols-5" style={{ gap: 'var(--k2)' }}>
+              {flat.map((f, i) => {
+                const done = daTraLoiEntry(attempt, assignment, f)
+                return (
+                  <button
+                    key={i}
+                    onClick={() => cuonToiCau(i + 1)}
+                    className="tap-target aspect-square flex items-center justify-center font-bold"
+                    style={{ ...SANS_SO, fontSize: 'var(--cx-1)', borderRadius: 'var(--bo-1)', background: done ? 'var(--muc)' : 'var(--the-2)', color: done ? 'var(--muc-nguoc)' : 'var(--muc)' }}
+                    title={`Câu ${i + 1}${done ? ' — đã làm' : ' — chưa làm'}`}
+                  >
+                    {i + 1}
+                  </button>
+                )
+              })}
+            </div>
+            <div style={{ marginTop: 'var(--k4)' }}>
+              <NutChinh onClick={() => setShowConfirm(true)}>Nộp bài</NutChinh>
+            </div>
+          </div>
+        </aside>
+
+        {/* DANH SÁCH CÂU — cuộn dọc liên tục, đầu phần dính */}
+        <div className="px-3 sm:px-4 flex flex-col" style={{ gap: 'var(--k5)', paddingTop: 'var(--k2)', paddingBottom: 'calc(var(--k8) + env(safe-area-inset-bottom))' }}>
+          {renderPhan('I')}
+          {renderPhan('II')}
+          {renderPhan('III')}
+          <div style={{ paddingTop: 'var(--k3)' }}>
+            <NutChinh onClick={() => setShowConfirm(true)}>Nộp bài</NutChinh>
+          </div>
         </div>
       </div>
 

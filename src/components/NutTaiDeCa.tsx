@@ -3,7 +3,7 @@
 // Hai chỗ dùng:
 // Chi tiết ca: xem trọn kho của ca, hoặc từng đề gốc nếu ca ghép nhiều đề.
 //
-// Cả hai đi qua đúng một bộ dựng (`tai-phieu-pdf.ts`) nên phiếu bài tập, đề ca
+// Cả hai đi qua đúng một bộ dựng (`html-phieu.ts`) nên phiếu bài tập, đề ca
 // và đề riêng từng em không bao giờ ra ba kiểu khác nhau.
 //
 // KHÔNG cần chế độ "chỉ đề, giấu đáp án" nữa: phiếu mở ra là thấy đề trần,

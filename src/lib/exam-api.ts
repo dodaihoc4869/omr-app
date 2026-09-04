@@ -21,12 +21,41 @@ export interface SessionConfig {
   bank?: PublicExamBank
 }
 
-async function postJson(scriptUrl: string, body: unknown): Promise<any> {
-  const res = await fetch(scriptUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(body),
-  })
+/** Giới hạn chờ mặc định, tính bằng giây.
+ *
+ * LỖI ĐÃ DÍNH 04-09: nút "Copy link" đứng mãi ở "Đang tạo…". `fetch` KHÔNG tự
+ * bỏ cuộc — mạng chập hoặc Apps Script nghẹn là lời hứa treo vĩnh viễn, nút
+ * kẹt ở trạng thái đang chạy và thầy không biết nên chờ hay bấm lại. Mọi lệnh
+ * gọi máy chủ từ nay đều có hạn, hết hạn thì báo thẳng. */
+const HAN_GIAY = 25
+
+/** `fetch` có hạn chờ. Không dùng thẳng AbortSignal.timeout vì Safari cũ
+ * (iPhone đời trước) chưa có — tự dựng bằng AbortController cho chắc. */
+async function fetchCoHan(url: string, init: RequestInit, giay: number): Promise<Response> {
+  const bo = new AbortController()
+  const hen = setTimeout(() => bo.abort(), giay * 1000)
+  try {
+    return await fetch(url, { ...init, signal: bo.signal })
+  } catch (e) {
+    if (e instanceof DOMException && e.name === 'AbortError') {
+      throw new Error(`Máy chủ không trả lời sau ${giay} giây. Kiểm tra mạng rồi thử lại.`)
+    }
+    throw e
+  } finally {
+    clearTimeout(hen)
+  }
+}
+
+async function postJson(scriptUrl: string, body: unknown, giay: number = HAN_GIAY): Promise<any> {
+  const res = await fetchCoHan(
+    scriptUrl,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(body),
+    },
+    giay,
+  )
   if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
   const r = await res.json()
   // Mọi phản hồi có serverNow → hiệu chỉnh đồng hồ theo máy chủ ngay tại đây,
@@ -811,8 +840,23 @@ export function sinhMaPhieu(): string {
   return s
 }
 
+/** Gói phiếu lớn nhất còn gửi lên máy chủ được, tính bằng byte.
+ *
+ * Phiếu nhúng thẳng ảnh cắt từ đề dưới dạng data URL, nên một ca nhiều hình có
+ * thể phình lên vài MB. Apps Script cắt nhỏ rồi cất vào ô của Sheet, quá cỡ là
+ * nó nghẹn giữa chừng và trả lỗi khó hiểu — chặn ngay tại máy, báo đúng việc
+ * thầy phải làm, hơn là để thầy ngồi chờ rồi nhận lỗi lạ. */
+const CO_TOI_DA_PHIEU = 4 * 1024 * 1024
+
 export async function luuPhieu(scriptUrl: string, secret: string, d: { ma: string; maCa: string; sbd: string; hoTen: string; phieu: unknown }): Promise<void> {
-  const r = await postJson(scriptUrl, { action: 'luuPhieu', secret, ...d })
+  const co = new Blob([JSON.stringify(d.phieu)]).size
+  if (co > CO_TOI_DA_PHIEU) {
+    throw new Error(
+      `Phiếu này nặng ${(co / 1024 / 1024).toFixed(1)} MB vì nhiều hình, quá cỡ gửi bằng link. Thầy bấm Xem phiếu rồi dùng nút Tải tệp, gửi thẳng tệp qua Zalo.`,
+    )
+  }
+  // Gói nặng nên cho hạn rộng hơn mặc định: 4 MB qua 4G có khi mất cả phút.
+  const r = await postJson(scriptUrl, { action: 'luuPhieu', secret, ...d }, 90)
   if (!r.ok) throw new Error(r.error || 'Không lưu được phiếu')
 }
 

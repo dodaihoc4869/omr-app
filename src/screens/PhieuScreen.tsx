@@ -20,6 +20,7 @@ import { docMaTuHash } from '../lib/phieu-link'
 import { layPhieu } from '../lib/exam-api'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import { napDong } from '../lib/nap-manh'
+import KhungXemPhieu from '../components/KhungXemPhieu'
 import { BAN_PHIEU, type CauSaiChiTiet, type PhieuDayDu } from '../lib/phieu-du-lieu'
 import type { ThongTinPhieu } from '../lib/html-phieu'
 import type { CauLuyen } from '../lib/bai-tap-pdf'
@@ -533,8 +534,8 @@ export default function PhieuScreen({ duCoSan }: { duCoSan?: PhieuDayDu } = {}) 
       // chủ thứ hai là thêm một cửa đọc công khai nữa, không đáng.
       if (p && p.loai === 'baitap') {
         const g = p as unknown as { tt: ThongTinPhieu; cau: CauLuyen[] }
-        const { dungPhieuHtml } = await napDong(() => import('../lib/tai-phieu-pdf'))
-        setPhieuBt(dungPhieuHtml({ ...g.tt, ngay: new Date(g.tt.ngay) }, g.cau))
+        const { dungPhieu } = await napDong(() => import('../lib/html-phieu'))
+        setPhieuBt(dungPhieu({ ...g.tt, ngay: new Date(g.tt.ngay) }, g.cau))
         return
       }
       if (!p || Number(p.v) !== BAN_PHIEU) throw new Error('Báo cáo này thuộc phiên bản khác, Thầy cần gửi lại link mới.')
@@ -827,11 +828,14 @@ export default function PhieuScreen({ duCoSan }: { duCoSan?: PhieuDayDu } = {}) 
 function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
   const [dang, setDang] = useState(false)
   const [loi, setLoi] = useState('')
+  // Phiếu hiện NGAY TRONG trang, không mở thẻ mới: phụ huynh mở link từ Zalo
+  // thì đang ở trình duyệt trong ứng dụng Zalo, ở đó `window.open` bị chặn.
+  const [html, setHtml] = useState('')
   const tai = async () => {
     setDang(true)
     setLoi('')
     try {
-      const { dungPhieuHtml, moHtml } = await napDong(() => import('../lib/tai-phieu-pdf'))
+      const { dungPhieu } = await napDong(() => import('../lib/html-phieu'))
       const sai = du.chuyenDeCa.filter((c) => c.soSai > 0)
       const tt = {
         hoTen: du.hoTen,
@@ -843,7 +847,7 @@ function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
       }
       // MỘT lần dựng. Bản trước dựng hai lần (đề, lời giải) rồi nối chuỗi nên
       // phụ huynh tải về thấy bìa và trang tổng quan LẶP HAI LẦN.
-      moHtml(dungPhieuHtml(tt, du.baiTap ?? []))
+      setHtml(dungPhieu(tt, du.baiTap ?? []))
     } catch {
       setLoi('Máy chưa mở được phiếu. Phụ huynh thử lại khi có mạng ổn định.')
     } finally {
@@ -873,9 +877,10 @@ function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
         {dang ? 'Đang dựng phiếu…' : `Xem phiếu bài tập ${du.baiTap?.length ?? 0} câu kèm lời giải`}
       </button>
       <div style={{ fontSize: 12, color: 'var(--p-nhat)', marginTop: 7, lineHeight: 1.6 }}>
-        Thầy đã chọn sẵn theo đúng chuyên đề em mất điểm ở bài này, xếp từ dễ lên khó. Lời giải nằm ở trang cuối, em làm hết rồi mới lật.
+        Thầy đã chọn sẵn theo đúng chuyên đề em mất điểm ở bài này, xếp từ dễ lên khó. Em làm hết rồi mới bấm vào từng câu xem lời giải.
       </div>
       {loi && <div style={{ fontSize: 12.5, color: 'var(--p-do)', marginTop: 6 }}>{loi}</div>}
+      {html && <KhungXemPhieu html={html} tenTep={`bai-tap-${du.sbd || 'cua-em'}.html`} dong={() => setHtml('')} />}
     </div>
   )
 }

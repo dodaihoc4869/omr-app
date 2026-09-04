@@ -214,19 +214,28 @@ body {
 }
 
 /* ============================================================ HAI CỘT
- * MÀN HÌNH RỘNG (≥ 1024px): thanh điều hướng bên trái + vùng nội dung bên
- * phải, giống mọi app quản lý trên máy tính. MÀN HẸP giữ nguyên một cột với
- * thanh dưới đáy — ngón cái với tới được, và màn hẹp thì một cột là đúng.
+ * MÀN HÌNH RỘNG: thanh điều hướng bên trái + vùng nội dung bên phải, giống
+ * mọi app quản lý trên máy tính. MÀN HẸP giữ nguyên một cột với thanh dưới
+ * đáy — ngón cái với tới được, và màn hẹp thì một cột là đúng.
+ *
+ * NGƯỠNG 880px, KHÔNG PHẢI 1024px. Đã đặt 1024 và thầy báo "chưa thấy chia
+ * đôi": cửa sổ app của thầy rộng khoảng 1000 ĐIỂM ẢNH CSS — màn Retina 2000
+ * điểm thật chia đôi còn 1000 — nên hụt ngưỡng đúng một chút. Ngưỡng tính
+ * theo điểm ảnh CSS, không phải điểm ảnh thật của màn hình, và còn tụt thêm
+ * khi phóng to chữ trong trình duyệt.
+ *
+ * 880px là ngưỡng chịu được: trừ thanh trái 232px vẫn còn 648px cho nội dung,
+ * rộng hơn cả màn điện thoại nằm ngang. Dưới nữa thì hai cột chật hơn một cột.
  *
  * Vùng nội dung chặn bề rộng: dòng chữ kéo dài 1800px thì mắt lạc dòng. */
 .ben-trai {
   display: none;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 880px) {
   .khung-app {
     display: grid;
-    grid-template-columns: 264px minmax(0, 1fr);
+    grid-template-columns: 232px minmax(0, 1fr);
     min-height: 100vh;
   }
   .ben-trai {
@@ -251,5 +260,41 @@ body {
   /* Thanh điều hướng dưới đáy chỉ dành cho màn hẹp. */
   .khung-app > nav.fixed {
     display: none;
+  }
+}
+
+/* ------------------------------------------------ MÀN LÀM BÀI cũng hai cột
+ * Cột trái là LƯỚI SỐ CÂU, KHÔNG phải menu của thầy — em đang thi mà cạnh đó
+ * có "Ngân hàng câu hỏi" thì một chạm là ra hết đáp án.
+ *
+ * Lưới dính theo màn: cuộn tới câu 25 vẫn thấy còn câu nào chưa làm, không
+ * phải mở tấm trượt từ dưới lên như trên điện thoại. */
+.thi-luoi {
+  display: none;
+}
+
+@media (min-width: 880px) {
+  .thi-hai-cot {
+    display: grid;
+    grid-template-columns: 216px minmax(0, 1fr);
+    gap: var(--k4);
+    align-items: start;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 var(--k4);
+  }
+  .thi-luoi {
+    display: block;
+  }
+  .thi-luoi-dinh {
+    position: sticky;
+    /* 56px thanh trên + khoảng thở, để lưới không dính sát mép chữ. */
+    top: 68px;
+    max-height: calc(100vh - 84px);
+    overflow-y: auto;
+    padding: var(--k4);
+    border-radius: var(--bo-2);
+    background: var(--the);
+    border: 1px solid var(--vien);
   }
 }

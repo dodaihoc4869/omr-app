@@ -4,9 +4,11 @@
 // từng trang nên chữ KHÔNG NÉT, không bôi đen chọn được, tệp nặng, và mỗi lần
 // chụp lệch nửa pixel là ô lệch theo.
 //
-//   · XEM — dựng HTML tại chỗ rồi mở ra trong thẻ mới. Chạy được cả khi mất
-//     mạng, chữ nét đúng bằng màn hình. Muốn PDF thì bấm In rồi chọn "Lưu
-//     thành PDF": bản đó là vector, nét hơn hẳn bản chụp ảnh.
+//   · XEM — dựng HTML tại chỗ rồi hiện NGAY TRONG APP (xem KhungXemPhieu).
+//     Không mở thẻ mới: app đã cài chạy ở cửa sổ riêng, không có thẻ, mở blob
+//     URL ra đó là ra trang trắng "Không thể truy cập vào tệp của bạn". Chạy
+//     được cả khi mất mạng. Muốn PDF thì bấm In rồi chọn "Lưu thành PDF":
+//     bản đó là vector, nét hơn hẳn bản chụp ảnh.
 //   · COPY LINK — cất phiếu lên máy chủ rồi copy link ngắn, gửi Zalo cho em.
 //     Chỉ hiện trên máy CÓ mã bí mật (máy thầy). Máy học sinh và máy phụ huynh
 //     không được phép ghi lên máy chủ, nên ở đó chỉ có nút Xem.
@@ -14,6 +16,7 @@ import { useEffect, useState } from 'react'
 import { Check, Eye, Link2, Loader2 } from 'lucide-react'
 import type { CauLuyen } from '../lib/bai-tap-pdf'
 import type { ThongTinPhieu } from '../lib/html-phieu'
+import KhungXemPhieu from './KhungXemPhieu'
 import { luuPhieu, sinhMaPhieu } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { napDong } from '../lib/nap-manh'
@@ -30,6 +33,24 @@ export interface GoiPhieuBaiTap {
   loai: 'baitap'
   tt: ThongTinPhieu
   cau: CauLuyen[]
+}
+
+/** Copy vào bộ nhớ tạm, KHÔNG BAO GIỜ treo và không bao giờ ném lỗi.
+ * Trả về false khi máy không cho copy — chỗ gọi tự lo phần báo. */
+async function copyAnToan(chu: string, han = 4000): Promise<boolean> {
+  try {
+    if (!navigator.clipboard?.writeText) return false
+    const hen = new Promise<false>((r) => setTimeout(() => r(false), han))
+    return await Promise.race([navigator.clipboard.writeText(chu).then(() => true), hen])
+  } catch {
+    return false
+  }
+}
+
+/** Tên tệp tải về: bỏ dấu, thay khoảng trắng bằng gạch. Tên có dấu tiếng Việt
+ * hay bị Zalo và Windows đổi thành ký tự lạ. */
+function khongDau(s: string): string {
+  return (s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'phieu').slice(0, 40)
 }
 
 function nut(chinh: boolean): React.CSSProperties {
@@ -58,6 +79,8 @@ export interface NutPhieuHtmlProps {
 
 export default function NutPhieuHtml({ dungGoi, nhanXem, showToast, choPhepLink }: NutPhieuHtmlProps) {
   const [dang, setDang] = useState<'' | 'xem' | 'link'>('')
+  const [htmlPhieu, setHtmlPhieu] = useState('')
+  const [tenTep, setTenTep] = useState('phieu.html')
   const [daCopy, setDaCopy] = useState('')
   const [coMaBiMat, setCoMaBiMat] = useState(false)
 
@@ -76,8 +99,9 @@ export default function NutPhieuHtml({ dungGoi, nhanXem, showToast, choPhepLink 
     try {
       const g = await dungGoi()
       if (!g) return
-      const { dungPhieuHtml, moHtml } = await napDong(() => import('../lib/tai-phieu-pdf'))
-      moHtml(dungPhieuHtml(g.tt, g.cau))
+      const { dungPhieu } = await napDong(() => import('../lib/html-phieu'))
+      setTenTep(`phieu-${khongDau(g.tt.hoTen || 'hoc-sinh')}.html`)
+      setHtmlPhieu(dungPhieu(g.tt, g.cau))
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không dựng được phiếu', 'error')
     } finally {
@@ -96,9 +120,13 @@ export default function NutPhieuHtml({ dungGoi, nhanXem, showToast, choPhepLink 
       const goi: GoiPhieuBaiTap = { v: BAN_PHIEU_BT, loai: 'baitap', tt: { ...g.tt, ngay: g.tt.ngay }, cau: g.cau }
       await luuPhieu(url.trim(), mat.trim(), { ma, maCa: g.maCa || '', sbd: g.sbd || '', hoTen: g.tt.hoTen, phieu: goi })
       const link = taoLinkPhieu(location.origin + location.pathname.replace(/[^/]*$/, ''), ma)
-      await navigator.clipboard.writeText(link)
+      // HIỆN LINK TRƯỚC, COPY SAU. navigator.clipboard đòi trang đang được
+      // chú ý; app đã cài hoặc trình duyệt trong Zalo có lúc từ chối, có lúc
+      // treo luôn không trả lời. Copy hỏng thì link vẫn nằm dưới nút cho thầy
+      // bôi đen — mất một thao tác, còn hơn mất cả cái link vừa tạo.
       setDaCopy(link)
-      showToast('Đã copy link phiếu, dán vào Zalo là gửi được', 'success')
+      const xong = await copyAnToan(link)
+      showToast(xong ? 'Đã copy link phiếu, dán vào Zalo là gửi được' : 'Đã tạo link. Máy không cho copy tự động, thầy bôi đen dòng dưới rồi copy tay.', xong ? 'success' : 'warn')
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không tạo được link phiếu', 'error')
     } finally {
@@ -120,6 +148,7 @@ export default function NutPhieuHtml({ dungGoi, nhanXem, showToast, choPhepLink 
           </button>
         )}
       </div>
+      {htmlPhieu && <KhungXemPhieu html={htmlPhieu} tenTep={tenTep} dong={() => setHtmlPhieu('')} />}
       {daCopy && (
         <div className="break-all" style={{ ...NHAN_NHO, fontVariantNumeric: 'tabular-nums' }}>
           {daCopy}
