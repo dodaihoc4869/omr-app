@@ -727,6 +727,7 @@ export default function ExamMonitorScreen() {
                 tenCa={chiTiet.ca.tenCa || `Ca ${chiTiet.ca.maCa}`}
                 ghiChu={chiTiet.ca.lop ? `Lớp ${chiTiet.ca.lop}` : ''}
                 soCauCa={soCauCa ?? null}
+                dsEm={dsEm.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen }))}
                 showToast={showToast}
               />
             </TheNoiDung>

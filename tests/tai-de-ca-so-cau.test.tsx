@@ -27,16 +27,16 @@ describe('số câu trên thẻ tải đề', () => {
     const chu = container.textContent ?? ''
     expect(chu).toContain('85 câu')
     expect(chu).toContain('28 câu')
-    expect(chu).toContain('trong kho')
-    // Nói rõ tệp tải về là cái nào, để thầy khỏi in thừa.
-    expect(chu).toContain('Tệp tải về là cả kho')
+    expect(chu).toContain('Cả kho của ca')
+    // Nói rõ là mỗi em một bộ, không có "đề của ca" chung.
+    expect(chu).toContain('mỗi em một bộ khác nhau')
   })
 
   it('ca rút đề đúng bằng kho: chỉ một con số, không thêm câu chữ thừa', () => {
     const { container } = render(<NutTaiDeCa {...chung} banks={[kho('12-C1-B1', 18, 4, 6)]} soCauCa={{ I: 18, II: 4, III: 6 }} />)
     const chu = container.textContent ?? ''
     expect(chu).toContain('28 câu')
-    expect(chu).not.toContain('trong kho')
+    expect(chu).not.toContain('Cả kho của ca')
   })
 
   it('ca cũ không lưu số câu thì giữ nguyên cách hiện cũ, không đoán bừa', () => {

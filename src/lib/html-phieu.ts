@@ -458,6 +458,11 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
 .sol-text strong { color: #5b2a06; }
 .sol-step { font-size: 14.5px; line-height: 1.65; color: var(--kem-muc); padding-left: 18px; text-indent: -18px; }
 .sol-ket { font-size: 15px; font-weight: 800; color: var(--kem-muc); }
+/* Ảnh lời giải gốc chụp từ đề của tác giả. Nền trắng vì ảnh cắt ra là giấy
+   trắng mực đen; đặt trên nền kem của ô lời giải sẽ thấy một vệt lệch màu. */
+.sol-anh { margin-top: 6px; }
+.sol-anh img { display: block; width: 100%; height: auto; border-radius: 10px; background: #fff; }
+.sol-step + .sol-label, .sol-text + .sol-anh { margin-top: 10px; }
 
 /* ================= CHÂN TRANG ================= */
 .chan { margin-top: 26px; text-align: center; font-size: 12.5px; line-height: 1.7; color: var(--nhat); }
@@ -648,6 +653,20 @@ export function oGiaiHtml(c: CauLuyen): string {
   }
   if (c.ketQua) {
     khoi.push(`<div class="sol-label">Kết quả</div><div class="sol-text sol-ket">${chuHtml(c.ketQua)}</div>`)
+    coGiai = true
+  }
+
+  // ẢNH LỜI GIẢI GỐC — bản chụp nguyên trang giải của tác giả đề.
+  //
+  // Vị trí `sau_loi_giai` KHÔNG được vẽ cùng thân câu như `cuoi_cau`: ảnh này
+  // có sẵn đáp số, in ra cạnh đề là phát cho em cả bài giải. Nó chỉ hiện sau
+  // khi bấm "Xem lời giải".
+  //
+  // Có ảnh là ĐỦ để mở nút, kể cả khi chữ rút ra vỡ hết: 64 câu trong kho rơi
+  // đúng cảnh đó (xem kho-de/cong-cu/va-loi-giai.py).
+  const anhGiai = hinhTaiViTri(c, 'sau_loi_giai')
+  if (anhGiai) {
+    khoi.push(`<div class="sol-label">Lời giải của Thầy</div><div class="sol-anh">${anhGiai}</div>`)
     coGiai = true
   }
 

@@ -53,12 +53,11 @@ function chiPhan(s: TeacherExamSource, phan: PhanDe): TeacherExamSource {
 /** Ba mã con của một đề. Phần rỗng thì KHÔNG sinh mã — thầy không phải nhìn
  * "12-C1-B2-TLN · 0 câu" rồi chọn nhầm. */
 export function tachTheoPhan(s: TeacherExamSource): TeacherExamSource[] {
-  const ra: TeacherExamSource[] = []
-  for (const p of PHAN_DE_TACH) {
-    const n = p === 'I' ? s.phanI.length : p === 'II' ? s.phanII.length : s.phanIII.length
-    if (n > 0) ra.push(chiPhan(s, p))
-  }
-  return ra
+  const co = PHAN_DE_TACH.filter((p) => (p === 'I' ? s.phanI.length : p === 'II' ? s.phanII.length : s.phanIII.length) > 0)
+  // Đề vốn chỉ có MỘT phần (đề đã tách sẵn trong kho, hoặc đề chỉ có trắc
+  // nghiệm) thì trả nguyên, không gắn thêm hậu tố — kẻo ra "12-C1-B2-TN-TN".
+  if (co.length <= 1) return [s]
+  return co.map((p) => chiPhan(s, p))
 }
 
 /** Cả kho, đã tách. Giữ nguyên thứ tự đề gốc, trong mỗi đề là I → II → III. */

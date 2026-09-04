@@ -291,9 +291,15 @@ export interface NguonPhieu {
   linkBaiTap?: string | null
 }
 
-/** Số câu của phiếu luyện kèm trong báo cáo gửi phụ huynh. Cố định 10: đây là
- * bài chữa lỗi ngay sau một bài kiểm tra, không phải bộ đề ôn cả chương. */
-export const SO_CAU_BAI_TAP_KEM = 10
+/** Số câu luyện RÚT SẴN vào báo cáo.
+ *
+ * Thầy chốt 04-09 tối: phụ huynh tự chọn con mình làm 10 đến 40 câu. Nên rút
+ * sẵn đủ 40 rồi để trang báo cáo cắt xuống theo con số phụ huynh chọn — cắt ở
+ * máy phụ huynh thì đổi số câu không phải ghi thêm phiếu nào lên máy chủ.
+ *
+ * Rút theo thứ tự dễ lên khó, nên lấy 10 câu đầu vẫn đúng là 10 câu dễ nhất
+ * của đúng chuyên đề em yếu — không phải 10 câu ngẫu nhiên trong 40. */
+export const SO_CAU_BAI_TAP_KEM = 40
 
 /** Nguồn để dựng báo cáo NGAY TRÊN MÁY HỌC SINH, sau khi em nộp bài.
  *

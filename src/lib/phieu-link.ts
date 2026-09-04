@@ -16,16 +16,43 @@
 /** Định dạng mã phiếu — dùng chung cho cả bên sinh mã và bên đọc link. */
 export const RE_MA_PHIEU = /^[A-Za-z0-9_-]{8,40}$/
 
+/** SỐ CÂU GẮN VÀO LINK (thầy chốt 04-09 tối).
+ *
+ * Phụ huynh tự chọn con mình làm bao nhiêu câu, 10 đến 40. Phiếu trên máy chủ
+ * chỉ cất MỘT bản đầy đủ; số câu đi kèm trong link sau dấu `~`, trang phiếu đọc
+ * ra rồi lấy đúng bấy nhiêu câu đầu. Nhờ vậy đổi số câu KHÔNG phải ghi thêm
+ * phiếu nào lên máy chủ — mà trang phiếu thì không có mã bí mật để ghi.
+ *
+ * Dấu `~` không nằm trong bảng chữ sinh mã nên không lẫn với mã. */
+export const SO_CAU_MIN = 10
+export const SO_CAU_MAX = 40
+
+export function chanSoCau(n: unknown): number {
+  const v = Math.round(Number(n))
+  if (!Number.isFinite(v)) return SO_CAU_MIN
+  return Math.max(SO_CAU_MIN, Math.min(SO_CAU_MAX, v))
+}
+
 /** Link để dán vào tin nhắn Zalo. `goc` là gốc app, ví dụ
  * `https://dodaihoc4869.github.io/omr-app/`. */
-export function taoLinkPhieu(goc: string, ma: string): string {
+export function taoLinkPhieu(goc: string, ma: string, soCau?: number | null): string {
   const g = goc.endsWith('/') ? goc : goc + '/'
-  return `${g}p#${ma}`
+  return `${g}p#${ma}${soCau ? `~${chanSoCau(soCau)}` : ''}`
 }
 
 /** Đọc mã từ phần hash của địa chỉ. Trả '' khi không phải mã hợp lệ — trang báo
  * cáo báo "link hỏng" chứ không hỏi máy chủ bằng rác. */
 export function docMaTuHash(hash: string): string {
+  return docLinkPhieu(hash).ma
+}
+
+/** Đọc cả mã lẫn số câu. `soCau = null` nghĩa là link không ghi số — lấy trọn
+ * phiếu như trước. */
+export function docLinkPhieu(hash: string): { ma: string; soCau: number | null } {
   const s = (hash || '').trim().replace(/^#/, '')
-  return RE_MA_PHIEU.test(s) ? s : ''
+  const i = s.indexOf('~')
+  const ma = i >= 0 ? s.slice(0, i) : s
+  const duoi = i >= 0 ? s.slice(i + 1) : ''
+  if (!RE_MA_PHIEU.test(ma)) return { ma: '', soCau: null }
+  return { ma, soCau: /^\d{1,3}$/.test(duoi) ? chanSoCau(duoi) : null }
 }

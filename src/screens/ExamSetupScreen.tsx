@@ -6,8 +6,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { CheckSquare, Square, Library, Copy, Check } from 'lucide-react'
 import { mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
 import KhoiRutDe from '../components/KhoiRutDe'
+import HopChonDe from '../components/HopChonDe'
 import { locNguonTheoId, qidDaRaTuCacCa, type SoCauPhan } from '../lib/rut-de'
-import { goMaDeTachRa, tachNhieuTheoPhan, TEN_PHAN_TACH } from '../lib/tach-phan-de'
+import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import { randomSessionCode, taoLinkMoi } from '../lib/ca-link'
 import { TheNoiDung, Hang, OThongBao, NutChinh } from '../components/DesignSystem'
 import NutDongBo from '../components/NutDongBo'
@@ -112,7 +113,6 @@ export default function ExamSetupScreen() {
   const [scriptUrl, setScriptUrl] = useState('')
   const [savedSources, setSavedSources] = useState<TeacherExamSource[]>([])
   const [selectedMaDe, setSelectedMaDe] = useState<Set<string>>(new Set())
-  const [timKiemMaDe, setTimKiemMaDe] = useState('')
   // Lọc theo NHÓM ĐỀ (= thư mục con thầy tạo trong kho-de/moi/); '' = tất cả.
   const [nhomLoc, setNhomLoc] = useState('')
 
@@ -233,15 +233,9 @@ export default function ExamSetupScreen() {
 
   const dsNhom = useMemo(() => Array.from(new Set(savedSources.map((c) => (c.nhom || '').trim()).filter(Boolean))).sort(), [savedSources])
 
-  const dsDeLoc = useMemo(() => {
-    const q = timKiemMaDe.trim().toLowerCase()
-    return dsDeTach.filter((c) => (!nhomLoc || (c.nhom || '') === nhomLoc) && (!q || c.maDe.toLowerCase().includes(q)))
-  }, [dsDeTach, timKiemMaDe, nhomLoc])
 
   const tongCauDaChon = nguonRaDe.reduce((s, c) => s + c.phanI.length + c.phanII.length + c.phanIII.length, 0)
 
-  const chonTatCa = () => setSelectedMaDe(new Set(dsDeLoc.map((c) => c.maDe)))
-  const boChonTatCa = () => setSelectedMaDe(new Set())
 
   const handleOpenSession = async () => {
     if (!scriptUrl.trim()) return showToast('Chưa cấu hình link Apps Script — vào Ngân hàng câu hỏi → Cấu hình', 'error')
@@ -409,46 +403,16 @@ export default function ExamSetupScreen() {
                 })}
               </div>
             )}
-            {savedSources.length >= 6 && (
-              <input style={O_NHAP} placeholder="Tìm theo mã đề…" value={timKiemMaDe} onChange={(e) => setTimKiemMaDe(e.target.value)} inputMode="search" />
-            )}
-            {dsDeLoc.map((c, i) => {
-              const dangChon = selectedMaDe.has(c.maDe)
-              const tongCau = c.phanI.length + c.phanII.length + c.phanIII.length
-              const { goc, phan } = goMaDeTachRa(c.maDe)
-              // Dòng đầu của mỗi đề gốc mới in tên bài; ba dòng con của cùng
-              // một đề đứng liền nhau, không lặp lại tên bài ba lần.
-              const dauNhom = i === 0 || goMaDeTachRa(dsDeLoc[i - 1].maDe).goc !== goc
-              return (
-                <Hang key={c.maDe} selected={dangChon} onClick={() => toggleSelect(c.maDe)} data-trang-thai={dangChon ? 'chon' : undefined}>
-                  <span className="shrink-0" style={{ color: dangChon ? 'var(--xanh)' : 'var(--mo)' }}>
-                    {dangChon ? <CheckSquare size={20} /> : <Square size={20} />}
-                  </span>
-                  <span className="flex-1 min-w-0">
-                    <div className="font-bold" style={{ fontSize: 'var(--cx-2)' }}>
-                      Mã {c.maDe}
-                      {phan ? <span style={{ fontWeight: 400, color: 'var(--nhat)' }}> · {TEN_PHAN_TACH[phan]}</span> : null}
-                    </div>
-                    <div style={NHAN_NHO}>
-                      {dauNhom ? `${goc}${c.nhom && !nhomLoc ? ` · ${c.nhom}` : ''}` : `cùng bài ${goc}`}
-                    </div>
-                  </span>
-                  <span className="shrink-0 font-bold" style={{ ...SO, fontSize: 'var(--cx-2)' }}>
-                    {tongCau} câu
-                  </span>
-                </Hang>
-              )
-            })}
-            {dsDeLoc.length > 1 && (
-              <div className="flex items-center" style={{ gap: 'var(--k4)', ...NHAN_NHO }}>
-                <button onClick={chonTatCa} className="tap-target" style={{ color: 'var(--muc)', fontWeight: 700 }}>
-                  Chọn tất cả
-                </button>
-                <button onClick={boChonTatCa} className="tap-target">
-                  Bỏ chọn
-                </button>
-              </div>
-            )}
+            {/* HỘP CHỌN ĐỀ gọn, cuộn trong hộp (thầy chốt 04-09 tối). Dùng chung
+                với Gọi lên bảng — sửa một chỗ, hai màn đổi theo. */}
+            <HopChonDe
+              ds={dsDeTach}
+              daChon={selectedMaDe}
+              onChon={toggleSelect}
+              nhomLoc={nhomLoc}
+              chonNhieu
+              onChonTatCa={(ma) => setSelectedMaDe(new Set(ma))}
+            />
           </div>
         )}
         {selectedSources.length > 0 && <KhoiRutDe nguon={selectedSources} qidCaTruoc={qidCaTruoc} onDoi={setBoRut} />}

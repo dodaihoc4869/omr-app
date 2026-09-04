@@ -41,14 +41,25 @@ vi.mock('../src/store/appStore', () => ({
 const { default: ExamSetupScreen } = await import('../src/screens/ExamSetupScreen')
 
 describe('danh sách đề khi mở ca', () => {
+  it('danh sách nằm trong HỘP CUỘN cao cố định, không kéo dài cả trang', async () => {
+    const { container } = render(<ExamSetupScreen />)
+    await waitFor(() => expect(container.textContent).toContain('12-C1-B2-TN'))
+    const hop = container.querySelector('[role="listbox"]') as HTMLElement
+    expect(hop).toBeTruthy()
+    expect(hop.style.overflowY).toBe('auto')
+    expect(parseInt(hop.style.maxHeight, 10)).toBeGreaterThan(0)
+  })
+
   it('mỗi mã ra ba dòng, đặt tên rõ phần nào', async () => {
     const { container } = render(<ExamSetupScreen />)
     await waitFor(() => expect(container.textContent).toContain('12-C1-B2-TN'))
     const chu = container.textContent ?? ''
     for (const ma of ['12-C1-B2-TN', '12-C1-B2-DS', '12-C1-B2-TLN']) expect(chu).toContain(ma)
-    expect(chu).toContain('Trắc nghiệm')
-    expect(chu).toContain('Đúng sai')
-    expect(chu).toContain('Trả lời ngắn')
+    // Phần in thành viên ngắn TN / ĐS / TLN; tên đầy đủ nằm ở title để rê chuột.
+    const vien = [...container.querySelectorAll('[title]')].map((e) => e.getAttribute('title'))
+    expect(vien).toContain('Trắc nghiệm')
+    expect(vien).toContain('Đúng sai')
+    expect(vien).toContain('Trả lời ngắn')
   })
 
   it('phần rỗng KHÔNG sinh dòng — đề không có trả lời ngắn thì chỉ ra hai mã', async () => {
@@ -62,8 +73,8 @@ describe('danh sách đề khi mở ca', () => {
   it('số câu mỗi dòng đúng bằng số câu của phần đó', async () => {
     const { container } = render(<ExamSetupScreen />)
     await waitFor(() => expect(container.textContent).toContain('12-C1-B2-TN'))
-    const dong = [...container.querySelectorAll('[data-trang-thai], button, div')].map((e) => e.textContent ?? '')
-    const timDong = (ma: string) => dong.find((t) => t.includes(`Mã ${ma}`) && t.includes('câu')) ?? ''
+    const dong = [...container.querySelectorAll('[role="option"]')].map((e) => e.textContent ?? '')
+    const timDong = (ma: string) => dong.find((t) => t.includes(ma) && t.includes('câu')) ?? ''
     expect(timDong('12-C1-B2-TN')).toContain('51 câu')
     expect(timDong('12-C1-B2-DS')).toContain('19 câu')
     expect(timDong('12-C1-B2-TLN')).toContain('23 câu')

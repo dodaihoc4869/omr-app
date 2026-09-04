@@ -17,7 +17,7 @@
  */
 /** Vị trí nhúng ảnh trong thẻ câu: sau đề bài · sau phương án A-D (theo chữ
  * cái GỐC, đi theo phương án khi xáo) · sau ý a-d (Phần II) · cuối câu. */
-export type ViTriHinh = 'sau_de' | 'sau_pa_A' | 'sau_pa_B' | 'sau_pa_C' | 'sau_pa_D' | 'sau_y_a' | 'sau_y_b' | 'sau_y_c' | 'sau_y_d' | 'cuoi_cau'
+export type ViTriHinh = 'sau_de' | 'sau_pa_A' | 'sau_pa_B' | 'sau_pa_C' | 'sau_pa_D' | 'sau_y_a' | 'sau_y_b' | 'sau_y_c' | 'sau_y_d' | 'cuoi_cau' | 'sau_loi_giai'
 
 /** Ảnh cắt từ file đề gốc (200 DPI, nền trắng, mép 8px) cho 4 loại nội dung
  * KHÔNG render bằng KaTeX: sơ đồ phản ứng nhiều mũi tên, công thức cấu tạo,

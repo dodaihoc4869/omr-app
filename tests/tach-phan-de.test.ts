@@ -47,8 +47,18 @@ describe('tachTheoPhan', () => {
   })
 
   it('phần rỗng thì KHÔNG sinh mã — thầy không phải nhìn dòng "0 câu" rồi tích nhầm', () => {
-    expect(tachTheoPhan(de('X', 5, 0, 0)).map((s) => s.maDe)).toEqual(['X-TN'])
-    expect(tachTheoPhan(de('Y', 0, 0, 0))).toEqual([])
+    expect(tachTheoPhan(de('X', 5, 3, 0)).map((s) => s.maDe)).toEqual(['X-TN', 'X-DS'])
+  })
+
+  it('đề vốn chỉ có MỘT phần thì trả nguyên mã, không gắn hậu tố — tách hai lần không ra "-TN-TN"', () => {
+    expect(tachTheoPhan(de('X', 5, 0, 0)).map((s) => s.maDe)).toEqual(['X'])
+    const lan1 = tachNhieuTheoPhan([de('A', 4, 3, 2)])
+    const lan2 = tachNhieuTheoPhan(lan1)
+    expect(lan2.map((s) => s.maDe)).toEqual(lan1.map((s) => s.maDe))
+  })
+
+  it('đề rỗng hoàn toàn thì trả nguyên (một mục), không mất dấu đề', () => {
+    expect(tachTheoPhan(de('Y', 0, 0, 0)).map((s) => s.maDe)).toEqual(['Y'])
   })
 
   it('tổng số câu sau khi tách bằng đúng tổng trước khi tách', () => {

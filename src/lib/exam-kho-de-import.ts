@@ -116,7 +116,7 @@ export interface KhoDeParseResult {
   errors: string[]
 }
 
-const VI_TRI_HOP_LE = new Set<string>(['sau_de', 'sau_pa_A', 'sau_pa_B', 'sau_pa_C', 'sau_pa_D', 'sau_y_a', 'sau_y_b', 'sau_y_c', 'sau_y_d', 'cuoi_cau'])
+const VI_TRI_HOP_LE = new Set<string>(['sau_de', 'sau_pa_A', 'sau_pa_B', 'sau_pa_C', 'sau_pa_D', 'sau_y_a', 'sau_y_b', 'sau_y_c', 'sau_y_d', 'cuoi_cau', 'sau_loi_giai'])
 const TRANG_THAI_HOP_LE = new Set<string>(['khop', 'lech_co_hd', 'nghi_dap_an_sai', 'thieu_dap_an'])
 
 function parseLyDoMap(raw: unknown, khoa: string[]): Record<string, KhoDeLyDo> | undefined {

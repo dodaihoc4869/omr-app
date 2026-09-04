@@ -100,7 +100,7 @@ describe('màn Ngân hàng đề — nút duyệt hàng loạt', () => {
   it('có câu cờ đỏ thì hiện nút duyệt cả kho, kèm đúng số câu', async () => {
     KHO = [deMau('A'), deMau('B')]
     const { findByRole } = render(<NganHangDeScreen />)
-    expect(await findByRole('button', { name: /Duyệt hết 8 câu cờ đỏ/ })).toBeTruthy()
+    expect(await findByRole('button', { name: /Duyệt hết 8 câu/ })).toBeTruthy()
   })
 
   it('kho sạch thì KHÔNG hiện nút — không bày một nút bấm vào chẳng làm gì', async () => {
@@ -115,7 +115,7 @@ describe('màn Ngân hàng đề — nút duyệt hàng loạt', () => {
   it('bấm là hỏi trước, nêu rõ hai loại câu và cam kết không chấm lại', async () => {
     KHO = [deMau('A')]
     const { findByRole, getByText } = render(<NganHangDeScreen />)
-    fireEvent.click(await findByRole('button', { name: /Duyệt hết 4 câu cờ đỏ/ }))
+    fireEvent.click(await findByRole('button', { name: /Duyệt hết 4 câu(?! của đề này)/ }))
     expect(getByText(/Duyệt hàng loạt cả 1 đề/)).toBeTruthy()
     expect(document.body.textContent).toContain('máy tự giải')
     expect(document.body.textContent).toContain('giữ đáp án của tác giả đề')
@@ -129,7 +129,7 @@ describe('màn Ngân hàng đề — nút duyệt hàng loạt', () => {
     showToast.mockClear()
     KHO = [deMau('A')]
     const { findByRole, getByRole } = render(<NganHangDeScreen />)
-    fireEvent.click(await findByRole('button', { name: /Duyệt hết 4 câu cờ đỏ/ }))
+    fireEvent.click(await findByRole('button', { name: /Duyệt hết 4 câu(?! của đề này)/ }))
     fireEvent.click(getByRole('button', { name: 'Duyệt hết' }))
     await waitFor(() => expect(saveExamSource).toHaveBeenCalledTimes(1))
     const ghi = saveExamSource.mock.calls[0][0] as unknown as TeacherExamSource

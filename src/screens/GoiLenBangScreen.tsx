@@ -14,6 +14,8 @@ import { ArrowLeft, ClipboardCopy, Check, RefreshCw, Search, Users, Wand2, Trash
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { chuoi, chiTietCa, danhSachCa, danhSachEm, ghiLenBang, hoSoEm, khoiTuNamSinh, qidDaLam, type CaTomTat, type EmTomTat } from '../lib/exam-api'
 import { loadExamSources, loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
+import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
+import HopChonDe from '../components/HopChonDe'
 import { bangPhanCongChu, phanCongCauHoi, TEN_MUC, type CauCoTheGoi, type EmDeGoi, type PhanCong } from '../lib/goi-len-bang'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import TheCau from '../components/TheCau'
@@ -100,7 +102,11 @@ export default function GoiLenBangScreen() {
 
   useEffect(() => {
     void (async () => {
-      const [url, mat, ds] = await Promise.all([loadScriptUrl(), loadTeacherSecret(), loadExamSources()])
+      const [url, mat, kho] = await Promise.all([loadScriptUrl(), loadTeacherSecret(), loadExamSources()])
+      // TÁCH BA MÃ THEO PHẦN, đồng bộ với Ngân hàng đề và Mở ca (thầy chốt 04-09
+      // tối). Chữa bài trên bảng thường chỉ chữa trắc nghiệm, hoặc chỉ trả lời
+      // ngắn — chọn đúng phần là máy không rút nhầm câu đúng sai lên bảng.
+      const ds = tachNhieuTheoPhan(kho)
       setDeDaLuu(ds)
       if (ds.length > 0) setMaDe(ds[0].maDe)
       if (url.trim() && mat.trim()) {
@@ -309,31 +315,17 @@ export default function GoiLenBangScreen() {
         {deDaLuu.length === 0 ? (
           <OThongBao tone="cam">Chưa có đề nào trong máy — vào Ngân hàng câu hỏi bấm Đồng bộ trước.</OThongBao>
         ) : (
-          <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
-            {deDaLuu.map((d) => {
-              const chon = d.maDe === maDe
-              const soCau = d.phanI.length + d.phanII.length + d.phanIII.length
-              return (
-                <button
-                  key={d.maDe}
-                  type="button"
-                  onClick={() => {
-                    setMaDe(d.maDe)
-                    setKetQua(null)
-                  }}
-                  className="tap-target w-full text-left"
-                  style={{ padding: 'var(--k3) var(--k4)', borderRadius: 'var(--bo-1)', background: chon ? 'var(--xanh-nen)' : 'var(--the-2)', border: `1.5px solid ${chon ? 'var(--xanh)' : 'transparent'}`, color: 'var(--muc)' }}
-                >
-                  <div className="flex items-center justify-between" style={{ gap: 'var(--k2)' }}>
-                    <span className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
-                      Mã {d.maDe}
-                    </span>
-                    <span style={{ ...NHAN_NHO, ...SO }}>{soCau} câu</span>
-                  </div>
-                  {d.nhom && <div style={NHAN_NHO}>{d.nhom}</div>}
-                </button>
-              )
-            })}
+          <div style={{ marginTop: 'var(--k3)' }}>
+            {/* Hộp chọn đề gọn, cuộn trong hộp — cùng một hộp với màn Mở ca. */}
+            <HopChonDe
+              ds={deDaLuu}
+              daChon={new Set(maDe ? [maDe] : [])}
+              onChon={(ma) => {
+                setMaDe(ma)
+                setKetQua(null)
+              }}
+              cao={264}
+            />
           </div>
         )}
       </TheNoiDung>

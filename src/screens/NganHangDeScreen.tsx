@@ -10,14 +10,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { RefreshCw, Trash2, ChevronDown, ChevronUp, Upload, CheckCheck } from 'lucide-react'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
-import { TheNoiDung, DauThe, Hang, Nhan, OThongBao, NutChinh } from '../components/DesignSystem'
+import { TheNoiDung, Hang, Nhan, OThongBao, NutChinh } from '../components/DesignSystem'
 import { ChemText } from '../lib/chem-format'
 import { deleteExamSource, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, saveExamSource, saveScriptUrl, saveSessionTeacherBank, saveTeacherSecret } from '../lib/exam-db'
 import { caDungDe, capNhatCaDaMo, dongBoNganHang, type KetQuaDongBo } from '../lib/exam-sync'
 import { capNhatKeyBank, luuDe, xoaDe as xoaDeTrenKho } from '../lib/exam-api'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJsonText } from '../lib/exam-kho-de-import'
 import { mergeKeepAnswers, validateTeacherSource } from '../data/examContent'
-import { goMaDeTachRa, tachTheoPhan, TEN_PHAN_TACH } from '../lib/tach-phan-de'
+import { maDeTheoPhan, PHAN_DE_TACH, TEN_PHAN_TACH } from '../lib/tach-phan-de'
 import TheCau from '../components/TheCau'
 import { useAppStore } from '../store/appStore'
 
@@ -335,24 +335,36 @@ export default function NganHangDeScreen() {
           </div>
           {tongNghi > 0 && <Nhan tone="do">{tongNghi} câu cần thầy quyết</Nhan>}
         </div>
-        <div className="flex flex-col" style={{ marginTop: 'var(--k4)', gap: 'var(--k2)' }}>
-          <NutChinh onClick={() => dongBo(scriptUrl, secret)} disabled={dangDongBo}>
-            <span className="inline-flex items-center gap-2">
-              <RefreshCw size={18} className={dangDongBo ? 'animate-spin' : ''} /> {dangDongBo ? 'Đang đồng bộ…' : 'Đồng bộ ngay'}
-            </span>
-          </NutChinh>
+        {/* HAI VIỆC CHÍNH thành hai THẺ HÀNH ĐỘNG đặt cạnh nhau (thầy chốt 04-09
+            tối: "hiện đại, chuyên nghiệp"). Mỗi thẻ: biểu tượng trong ô tròn,
+            tên việc, một dòng nói việc đó làm gì — thầy không phải đọc hết một
+            câu dài trên nút mới biết bấm cái nào. Màn hẹp thì xếp dọc. */}
+        <div className="grid" style={{ marginTop: 'var(--k4)', gap: 'var(--k2)', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
+          <TheHanhDong
+            chinh
+            icon={<RefreshCw size={20} className={dangDongBo ? 'animate-spin' : ''} />}
+            ten={dangDongBo ? 'Đang đồng bộ…' : 'Đồng bộ ngay'}
+            phu="Kéo đề mới từ kho về máy này"
+            onClick={() => dongBo(scriptUrl, secret)}
+            disabled={dangDongBo}
+          />
+          <TheHanhDong
+            icon={<Upload size={20} />}
+            ten={dangDay ? 'Đang đẩy…' : 'Đẩy file JSON'}
+            phu="Từ kho-de/xong lên kho, khi máy pipeline bị chặn mạng"
+            onClick={() => fileRef.current?.click()}
+            disabled={dangDay}
+          />
           {tongNghi > 0 && (
-            <NutChinh variant="phu" onClick={() => setHoiDuyet({ ds: sources, nhan: `cả ${sources.length} đề` })} disabled={dangDuyet}>
-              <span className="inline-flex items-center gap-2">
-                <CheckCheck size={18} /> {dangDuyet ? 'Đang duyệt…' : `Duyệt hết ${tongNghi} câu cờ đỏ`}
-              </span>
-            </NutChinh>
+            <TheHanhDong
+              icon={<CheckCheck size={20} />}
+              ten={dangDuyet ? 'Đang duyệt…' : `Duyệt hết ${tongNghi} câu`}
+              phu="Hạ cờ đỏ cả kho, giữ nguyên đáp án đang chấm"
+              onClick={() => setHoiDuyet({ ds: sources, nhan: `cả ${sources.length} đề` })}
+              disabled={dangDuyet}
+              tone="cam"
+            />
           )}
-          <NutChinh variant="phu" onClick={() => fileRef.current?.click()} disabled={dangDay}>
-            <span className="inline-flex items-center gap-2">
-              <Upload size={18} /> {dangDay ? 'Đang đẩy…' : 'Đẩy file JSON từ kho-de/xong lên kho'}
-            </span>
-          </NutChinh>
           <input
             ref={fileRef}
             type="file"
@@ -382,48 +394,77 @@ export default function NganHangDeScreen() {
         const mo = moDe.has(s.maDe)
         return (
           <TheNoiDung key={s.maDe} noPadding>
-            <DauThe index={i} badge={s.maDe.length <= 3 ? s.maDe : i + 1} title={`Mã ${s.maDe}`} tone={nghi.length ? 'cam' : undefined} />
-            <div className="flex flex-col" style={{ padding: 'var(--k4) var(--k5)', gap: 'var(--k3)' }}>
-              <div className="flex items-center justify-between" style={{ gap: 'var(--k2)' }}>
-                <div style={{ ...NHAN_NHO, fontVariantNumeric: 'tabular-nums' }}>
-                  I{s.phanI.length} · II{s.phanII.length} · III{s.phanIII.length}
-                  {s.ngayNap ? ` · nạp ${new Date(s.ngayNap).toLocaleDateString('vi-VN')}` : ''}
-                  {s.nguon ? ` · ${s.nguon}` : ''}
-                </div>
-                <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
-                  {s.nhom && <Nhan tone="tim">{s.nhom}</Nhan>}
-                  {nghi.length > 0 ? <Nhan tone="do">{nghi.length} nghi</Nhan> : <Nhan tone="xanh">đáp án đủ</Nhan>}
-                  <button onClick={() => moHoiXoa(s)} className="tap-target" style={{ color: 'var(--mo)' }} title="Xoá đề" aria-label={`Xoá đề ${s.maDe}`}>
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
-
-              {/* BA MÃ CON. Màn Mở ca liệt kê đúng ba mã này thành ba dòng
-                  tích riêng, nên thầy cần biết chúng tên gì ngay từ đây. Kho
-                  vẫn giữ MỘT bản đề: id từng câu không đổi, chấm bài và lịch
-                  sử ca cũ không đụng gì. */}
-              <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)' }}>
-                {tachTheoPhan(s).map((t) => {
-                  const { phan } = goMaDeTachRa(t.maDe)
-                  const n = t.phanI.length + t.phanII.length + t.phanIII.length
-                  return (
-                    <span
-                      key={t.maDe}
-                      style={{
-                        ...NHAN_NHO,
-                        fontVariantNumeric: 'tabular-nums',
-                        color: 'var(--muc)',
-                        background: 'var(--the-2)',
-                        borderRadius: 'var(--bo-tron)',
-                        padding: '3px 10px',
-                      }}
+            {/* THẺ ĐỀ (thầy chốt 04-09 tối: "trực quan, đẹp, mịn"). Bỏ dải màu
+                đậm chiếm cả bề ngang; thay bằng một sọc màu mảnh bên trái nói
+                trạng thái (xanh: đáp án đủ · cam: còn câu chờ quyết), số thứ
+                tự trong ô tròn, mã đề làm tiêu đề, dòng nguồn nhỏ bên dưới. Ba
+                phần hiện thành ba Ô ĐẾM đều nhau, không phải ba viên thuốc dài
+                ngắn khác nhau xếp lệch hàng. */}
+            <div style={{ borderLeft: `4px solid ${nghi.length ? 'var(--cam)' : 'var(--xanh)'}`, borderTopLeftRadius: 'var(--bo-3)', borderBottomLeftRadius: 'var(--bo-3)' }}>
+              <div className="flex flex-col" style={{ padding: 'var(--k4) var(--k5)', gap: 'var(--k3)' }}>
+                <div className="flex items-start justify-between" style={{ gap: 'var(--k3)' }}>
+                  <div className="flex items-start min-w-0" style={{ gap: 'var(--k3)' }}>
+                    <div
+                      className="shrink-0 flex items-center justify-center font-bold"
+                      style={{ width: 36, height: 36, borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', color: 'var(--nhat)', fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)', fontVariantNumeric: 'tabular-nums' }}
                     >
-                      <b>{t.maDe}</b> · {phan ? TEN_PHAN_TACH[phan] : ''} {n} câu
-                    </span>
-                  )
-                })}
-              </div>
+                      {i + 1}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-bold truncate" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', lineHeight: 1.2 }}>
+                        {s.maDe}
+                      </div>
+                      <div className="truncate" style={{ ...NHAN_NHO, marginTop: 3 }}>
+                        {s.nguon || 'Không rõ nguồn'}
+                        {s.ngayNap ? ` · nạp ${new Date(s.ngayNap).toLocaleDateString('vi-VN')}` : ''}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center shrink-0" style={{ gap: 'var(--k2)' }}>
+                    {nghi.length > 0 ? <Nhan tone="cam">{nghi.length} chờ quyết</Nhan> : <Nhan tone="xanh">đáp án đủ</Nhan>}
+                    <button onClick={() => moHoiXoa(s)} className="tap-target" style={{ color: 'var(--mo)', width: 36, height: 36, borderRadius: 'var(--bo-tron)', display: 'grid', placeItems: 'center' }} title="Xoá đề" aria-label={`Xoá đề ${s.maDe}`}>
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* BA MÃ CON — Màn Mở ca liệt kê đúng ba mã này thành ba dòng
+                    tích riêng. Kho vẫn giữ MỘT bản đề: id từng câu không đổi,
+                    chấm bài và lịch sử ca cũ không đụng gì. */}
+                <div className="grid" style={{ gap: 'var(--k2)', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
+                  {PHAN_DE_TACH.map((phan) => {
+                    const n = phan === 'I' ? s.phanI.length : phan === 'II' ? s.phanII.length : s.phanIII.length
+                    const co = n > 0
+                    return (
+                      <div
+                        key={phan}
+                        style={{
+                          borderRadius: 'var(--bo-2)',
+                          background: co ? 'var(--the-2)' : 'transparent',
+                          border: co ? '1px solid transparent' : '1px dashed var(--vien)',
+                          padding: 'var(--k3)',
+                          opacity: co ? 1 : 0.55,
+                          minWidth: 0,
+                        }}
+                      >
+                        <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                          {n}
+                        </div>
+                        <div style={{ ...NHAN_NHO, marginTop: 4 }}>{TEN_PHAN_TACH[phan]}</div>
+                        {co && (
+                          <div className="truncate" style={{ ...NHAN_NHO, color: 'var(--muc)', fontWeight: 700, marginTop: 2, fontSize: 'var(--cx-1)' }}>
+                            {maDeTheoPhan(s.maDe, phan)}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+                {s.nhom && (
+                  <div>
+                    <Nhan tone="tim">{s.nhom}</Nhan>
+                  </div>
+                )}
 
               {nghi.length > 0 && (
                 <>
@@ -462,6 +503,7 @@ export default function NganHangDeScreen() {
                   )}
                 </>
               )}
+              </div>
             </div>
           </TheNoiDung>
         )
@@ -717,4 +759,63 @@ function TheCauNghi({ c }: { c: CauNghi }) {
   }
   const s = q as TeacherShortAnswerQuestion
   return <TheCau {...chung} phan="III" selected={null} correct={s.correct} />
+}
+
+
+/** THẺ HÀNH ĐỘNG ở đầu màn: biểu tượng trong ô tròn + tên việc + một dòng phụ.
+ * Thay cho nút dài một dòng chữ. `chinh` = nền mực đậm (việc hay bấm nhất). */
+function TheHanhDong({
+  icon,
+  ten,
+  phu,
+  onClick,
+  disabled,
+  chinh,
+  tone,
+}: {
+  icon: React.ReactNode
+  ten: string
+  phu: string
+  onClick: () => void
+  disabled?: boolean
+  chinh?: boolean
+  tone?: 'cam'
+}) {
+  const nen = chinh ? 'var(--muc)' : 'var(--the-2)'
+  const chu = chinh ? 'var(--muc-nguoc)' : 'var(--muc)'
+  const oIcon = chinh ? 'var(--phu)' : tone === 'cam' ? 'var(--cam-nen)' : 'var(--the)'
+  const mauIcon = chinh ? 'var(--muc-nguoc)' : tone === 'cam' ? 'var(--cam)' : 'var(--muc)'
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="tap-target text-left disabled:opacity-40 disabled:cursor-not-allowed"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 'var(--k3)',
+        minHeight: 72,
+        padding: 'var(--k3) var(--k4)',
+        borderRadius: 'var(--bo-2)',
+        background: nen,
+        color: chu,
+        border: chinh ? 'none' : '1px solid var(--vien)',
+        transitionProperty: 'transform, box-shadow, background-color',
+        transitionDuration: 'var(--nhanh)',
+      }}
+    >
+      <span className="shrink-0 flex items-center justify-center" style={{ width: 42, height: 42, borderRadius: 'var(--bo-tron)', background: oIcon, color: mauIcon }}>
+        {icon}
+      </span>
+      <span className="min-w-0 flex flex-col" style={{ gap: 2 }}>
+        <span className="font-bold truncate" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
+          {ten}
+        </span>
+        <span className="truncate" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: chinh ? 'var(--muc-nguoc)' : 'var(--nhat)', opacity: chinh ? 0.75 : 1 }}>
+          {phu}
+        </span>
+      </span>
+    </button>
+  )
 }

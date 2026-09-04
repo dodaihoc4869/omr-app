@@ -16,7 +16,7 @@
 // yếu. Máy bật "giảm chuyển động" thì hiện thẳng trạng thái cuối.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { classify } from '../engine/score'
-import { docMaTuHash } from '../lib/phieu-link'
+import { chanSoCau, docLinkPhieu, SO_CAU_MAX, SO_CAU_MIN } from '../lib/phieu-link'
 import { layPhieu } from '../lib/exam-api'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import { napDong } from '../lib/nap-manh'
@@ -176,8 +176,19 @@ const CSS = `
 .bc-nut{flex:1 1 150px;min-height:46px;border-radius:12px;font-family:var(--sans);font-size:14px;font-weight:700;
   cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 12px;border:none}
 .bc-nut.chinh{background:var(--p-tim);color:var(--p-trang)}
+/* NÚT VÀNG (thầy chốt 04-09 tối): chữ đen trên nền hổ phách, tương phản cao
+   hơn hẳn chữ trắng — nút này nhấp nháy nên phải đọc được ở mọi pha sáng. */
+.bc-nut.vang{background:var(--p-cam);color:var(--p-muc)}
 .bc-nut.vien{background:var(--p-giay);color:var(--p-tim);border:1.5px solid var(--p-tim)}
 .bc-nut[disabled]{opacity:.55;cursor:default}
+
+/* CHỌN SỐ CÂU cho con — thanh kéo 10..40. */
+.bc-so{margin-top:12px;background:var(--p-chim);border-radius:12px;padding:12px 13px}
+.bc-so-dau{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.bc-so-nhan{font-size:12.5px;color:var(--p-nhat)}
+.bc-so-gia{font-family:var(--serif);font-size:21px;font-weight:700;font-variant-numeric:tabular-nums}
+.bc-so input[type=range]{width:100%;margin-top:8px;accent-color:var(--p-cam);height:26px}
+.bc-so-moc{display:flex;justify-content:space-between;font-size:11px;color:var(--p-mo);font-variant-numeric:tabular-nums}
 
 @media (prefers-reduced-motion:reduce){
   .bc-dau::before,.bc-dau::after{animation:none}
@@ -637,7 +648,7 @@ export default function PhieuScreen({ duCoSan }: { duCoSan?: PhieuDayDu } = {}) 
   const tat = useMemo(() => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches, [])
 
   const nap = useCallback(async () => {
-    const ma = docMaTuHash(location.hash)
+    const { ma, soCau: soCauLink } = docLinkPhieu(location.hash)
     if (!ma) {
       setLoi('Link không đúng hoặc bị cắt ngắn khi chuyển tiếp.')
       setDu(null)
@@ -653,7 +664,13 @@ export default function PhieuScreen({ duCoSan }: { duCoSan?: PhieuDayDu } = {}) 
       if (p && p.loai === 'baitap') {
         const g = p as unknown as { tt: ThongTinPhieu; cau: CauLuyen[] }
         const { dungPhieu } = await napDong(() => import('../lib/html-phieu'))
-        setPhieuBt(dungPhieu({ ...g.tt, ngay: new Date(g.tt.ngay) }, g.cau))
+        // SỐ CÂU LẤY TỪ LINK. Máy chủ cất một bản đủ 40 câu; phụ huynh gửi cho
+        // con link kèm `~<số câu>` thì em chỉ nhận bấy nhiêu câu ĐẦU (đã xếp dễ
+        // lên khó). Link không ghi số thì lấy trọn như trước.
+        const cau = soCauLink ? g.cau.slice(0, chanSoCau(soCauLink)) : g.cau
+        const tt = { ...g.tt, ngay: new Date(g.tt.ngay) }
+        if (soCauLink && Array.isArray(tt.oBia)) tt.oBia = tt.oBia.map((o) => (o.nhan === 'Số câu' ? { ...o, gia: `${cau.length} câu` } : o))
+        setPhieuBt(dungPhieu(tt, cau))
         return
       }
       if (!p || Number(p.v) !== BAN_PHIEU) throw new Error('Báo cáo này thuộc phiên bản khác, Thầy cần gửi lại link mới.')
@@ -1054,16 +1071,27 @@ function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
   // thì đang ở trình duyệt trong ứng dụng Zalo, ở đó `window.open` bị chặn.
   const [html, setHtml] = useState('')
 
+  // SỐ CÂU DO PHỤ HUYNH CHỌN. Báo cáo chở sẵn tới 40 câu đã rút theo đúng
+  // chuyên đề em mất điểm, xếp dễ lên khó; kéo thanh là lấy bấy nhiêu câu ĐẦU,
+  // nên chọn 10 vẫn ra 10 câu dễ nhất chứ không phải 10 câu bốc ngẫu nhiên.
+  const coSan = du.baiTap?.length ?? 0
+  const tran = Math.min(SO_CAU_MAX, Math.max(SO_CAU_MIN, coSan || SO_CAU_MIN))
+  const [soCau, setSoCau] = useState(() => Math.min(SO_CAU_MIN, tran))
+  const lay = Math.min(soCau, coSan)
+
+  // Link đã cất sẵn là `.../p#<mã>`; gắn thêm `~<số câu>` là xong, không phải
+  // ghi lại phiếu nào lên máy chủ (trang này không có mã bí mật để ghi).
+  const linkGui = du.linkBaiTap ? `${du.linkBaiTap}~${chanSoCau(soCau)}` : ''
+
   const copyLink = async () => {
-    const link = du.linkBaiTap
-    if (!link) return
+    if (!linkGui) return
     try {
       if (!navigator.clipboard?.writeText) throw new Error('không có clipboard')
-      await navigator.clipboard.writeText(link)
+      await navigator.clipboard.writeText(linkGui)
       setDaCopy(true)
       setTimeout(() => setDaCopy(false), 3000)
     } catch {
-      setLinkTay(link)
+      setLinkTay(linkGui)
     }
   }
 
@@ -1083,26 +1111,50 @@ function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
       }
       // MỘT lần dựng. Bản trước dựng hai lần (đề, lời giải) rồi nối chuỗi nên
       // phụ huynh tải về thấy bìa và trang tổng quan LẶP HAI LẦN.
-      setHtml(dungPhieu(tt, du.baiTap ?? []))
+      setHtml(dungPhieu(tt, (du.baiTap ?? []).slice(0, lay)))
     } catch {
       setLoi('Máy chưa mở được phiếu. Phụ huynh thử lại khi có mạng ổn định.')
     } finally {
       setDang(false)
     }
   }
-  const soCau = du.baiTap?.length ?? 0
   return (
     <div style={{ marginTop: 14 }}>
-      <div className="bc-tieu">Bài luyện{soCau > 0 ? ` ${soCau} câu` : ''} theo đúng chỗ em mất điểm</div>
+      <div className="bc-tieu">Bài luyện theo đúng chỗ em mất điểm</div>
+
+      {/* PHỤ HUYNH TỰ CHỌN SỐ CÂU. Thầy chốt 04-09 tối: 10 tới 40 câu, tuỳ sức
+          con và tuỳ quỹ thời gian của gia đình. */}
+      {coSan > SO_CAU_MIN && (
+        <div className="bc-so">
+          <div className="bc-so-dau">
+            <span className="bc-so-nhan">Cho con làm bao nhiêu câu?</span>
+            <span className="bc-so-gia">{lay} câu</span>
+          </div>
+          <input
+            type="range"
+            min={SO_CAU_MIN}
+            max={tran}
+            step={1}
+            value={soCau}
+            onChange={(e) => setSoCau(chanSoCau(e.target.value))}
+            aria-label="Số câu cho con làm"
+          />
+          <div className="bc-so-moc">
+            <span>{SO_CAU_MIN}</span>
+            <span>{tran}</span>
+          </div>
+        </div>
+      )}
+
       <div className="bc-nut-doi">
-        {soCau > 0 && (
+        {coSan > 0 && (
           <button type="button" className="bc-nut vien" onClick={() => void tai()} disabled={dang}>
-            {dang ? 'Đang dựng…' : 'Xem trước'}
+            {dang ? 'Đang dựng…' : `Xem trước ${lay} câu`}
           </button>
         )}
         {du.linkBaiTap && (
-          <button type="button" className={`bc-nut chinh${daCopy ? '' : ' bc-nhay'}`} onClick={() => void copyLink()}>
-            {daCopy ? 'Đã copy link' : 'Copy link gửi cho con'}
+          <button type="button" className={`bc-nut vang${daCopy ? '' : ' bc-nhay'}`} onClick={() => void copyLink()}>
+            {daCopy ? `Đã copy link ${lay} câu` : 'Copy link gửi cho con'}
           </button>
         )}
       </div>

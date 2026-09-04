@@ -24,8 +24,9 @@ const NHOM: { ten: string; icon: typeof Timer; muc: Muc[] }[] = [
     ten: 'Học sinh',
     icon: GraduationCap,
     muc: [
+      // "Danh sách lớp" bỏ khỏi thanh (thầy chốt 04-09 tối): danh sách đã nạp
+      // lên máy chủ và app tự đọc, không còn việc gì để thầy vào màn đó làm.
       { id: 'hocsinh', ten: 'Hồ sơ học sinh', icon: Users },
-      { id: 'classlist', ten: 'Danh sách lớp', icon: ClipboardList },
     ],
   },
   {
