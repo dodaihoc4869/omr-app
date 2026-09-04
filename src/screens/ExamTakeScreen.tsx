@@ -321,10 +321,10 @@ export default function ExamTakeScreen() {
         ...solutionAssignment.phanII.map((a) => ({ phan: 'II' as const, q: a.question as TeacherTrueFalseQuestion })),
         ...solutionAssignment.phanIII.map((a) => ({ phan: 'III' as const, q: a.question as TeacherShortAnswerQuestion })),
       ]
-      const [{ cauLuyenTuBoCau }, { dungPhieuHtml, phieuThanhPdf, taiTep }] = await Promise.all([import('../lib/bai-tap-pdf'), import('../lib/tai-phieu-pdf')])
+      const [{ cauLuyenTuBoCau }, { dungPhieuHtml, moHtml }] = await Promise.all([import('../lib/bai-tap-pdf'), import('../lib/tai-phieu-pdf')])
       const cau = cauLuyenTuBoCau(bo)
       const cd = [...new Set(cau.map((c) => c.chuyenDe).filter(Boolean))]
-      const kq = await dungPhieuHtml(
+      const html = dungPhieuHtml(
         {
           hoTen: hoTen.trim() || `SBD ${attempt.sbd}`,
           sbd: attempt.sbd,
@@ -335,10 +335,9 @@ export default function ExamTakeScreen() {
         },
         cau,
       )
-      taiTep(await phieuThanhPdf(kq.html), `de-va-loi-giai-${attempt.sbd}-${attempt.maCa}.pdf`)
-      showToast('Đã tải đề và lời giải', 'success')
+      moHtml(html)
     } catch {
-      showToast('Chưa dựng được đề PDF. Em thử lại khi máy rảnh hơn.', 'error')
+      showToast('Chưa mở được đề. Em thử lại khi máy rảnh hơn.', 'error')
     } finally {
       setDangTaiDe(false)
     }
@@ -1255,7 +1254,7 @@ export default function ExamTakeScreen() {
               ca là sai — phải dựng từ ĐÚNG bộ máy đã gán cho em này. */}
           {solutionAssignment && attempt && (
             <NutChinh variant="phu" onClick={() => void taiDeCuaEm()} disabled={dangTaiDe}>
-              {dangTaiDe ? 'Đang dựng đề…' : 'Tải đề & lời giải (PDF)'}
+              {dangTaiDe ? 'Đang dựng đề…' : 'Xem đề & lời giải'}
             </NutChinh>
           )}
           {keyBank && solutionAssignment && (

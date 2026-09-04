@@ -10,9 +10,9 @@
 //
 // jsPDF và font nhúng nặng gần 300KB, nên cả bộ vẽ được NẠP ĐỘNG lúc thầy bấm
 // nút: người không dùng tới không phải tải.
-import { useEffect, useRef, useState } from 'react'
-import { FileDown, Loader2, Printer } from 'lucide-react'
-import { NutChinh, OThongBao } from './DesignSystem'
+import { useEffect, useState } from 'react'
+import { OThongBao } from './DesignSystem'
+import NutPhieuHtml from './NutPhieuHtml'
 import { chonCauLuyen, tenTepBaiTap } from '../lib/bai-tap-pdf'
 import { docQidRaPhieu, loadExamSources, loadScriptUrl, loadTeacherSecret, themQidRaPhieu, xoaQidRaPhieu } from '../lib/exam-db'
 import { qidDaLam } from '../lib/exam-api'
@@ -40,13 +40,9 @@ export default function NutBaiTapPdf({
   chuyenDe: ChuyenDeEm[]
   showToast: (chu: string, kieu?: 'success' | 'error' | 'warn') => void
 }) {
-  const [dang, setDang] = useState(false)
   const [soCau, setSoCau] = useState(SO_CAU_PDF_MAC_DINH)
   const [daRa, setDaRa] = useState(0)
   const [ketQua, setKetQua] = useState<{ soCau: number; lapLai: number; thieu: number; ten: string } | null>(null)
-  // Giữ lại bản HTML vừa dựng để thầy bấm "In bản chữ nét" mà không phải rút
-  // lại câu — rút lại là ra bộ câu khác, phiếu in không khớp phiếu đã tải.
-  const htmlRef = useRef<string>('')
 
   useEffect(() => {
     let con = true
@@ -64,8 +60,9 @@ export default function NutBaiTapPdf({
     tiLeSai: c.tiLeSai,
   }))
 
-  const tao = async () => {
-    setDang(true)
+  // Rút câu rồi trả GÓI phiếu cho hai nút Xem / Copy link. Không dựng HTML ở
+  // đây: hai nút cần cùng một bộ câu, dựng hai lần là ra hai bộ khác nhau.
+  const dungGoi = async () => {
     setKetQua(null)
     try {
       const nguon = await loadExamSources()
@@ -92,10 +89,6 @@ export default function NutBaiTapPdf({
         )
       }
 
-      // Phiếu dựng bằng HTML rồi CHÍNH TRÌNH DUYỆT vẽ, sau đó chụp thành PDF —
-      // đó là cách duy nhất ra đúng mẫu thầy chốt (nền chuyển sắc phủ kín A4,
-      // chữ nền chìm, emoji). Xem đầu file `tai-phieu-pdf.ts`.
-      const { dungPhieuHtml, phieuThanhPdf, taiTep } = await import('../lib/tai-phieu-pdf')
       const nhomYeu = (yeu.length > 0 ? yeu : chuyenDe).filter((c) => c.soSai > 0)
       const tt = {
         hoTen,
@@ -105,19 +98,13 @@ export default function NutBaiTapPdf({
         ketQua: nhomYeu.length > 0 ? `Sai ${nhomYeu.reduce((n, c) => n + c.soSai, 0)}/${nhomYeu.reduce((n, c) => n + c.soCau, 0)} câu` : '',
         hienDapAn: false,
       }
-      const de = await dungPhieuHtml(tt, kq.cau)
-      const giai = await dungPhieuHtml({ ...tt, hienDapAn: true }, kq.cau)
-      const ten = tenTepBaiTap(hoTen, sbd)
-      taiTep(await phieuThanhPdf(de.html + giai.html), ten)
-      htmlRef.current = de.html + giai.html
       await themQidRaPhieu(sbd, kq.cau.map((c) => c.id))
       setDaRa((n) => n + kq.cau.length)
-      setKetQua({ soCau: kq.cau.length, lapLai: kq.lapLai, thieu: kq.thieu, ten })
-      showToast(`Đã tải ${ten}`, 'success')
+      setKetQua({ soCau: kq.cau.length, lapLai: kq.lapLai, thieu: kq.thieu, ten: tenTepBaiTap(hoTen, sbd) })
+      return { tt, cau: kq.cau, sbd }
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không tạo được phiếu bài tập', 'error')
-    } finally {
-      setDang(false)
+      return null
     }
   }
 
@@ -169,12 +156,7 @@ export default function NutBaiTapPdf({
         </div>
       </div>
 
-      <NutChinh variant="phu" onClick={() => void tao()} disabled={dang}>
-        <span className="inline-flex items-center" style={{ gap: 6 }}>
-          {dang ? <Loader2 size={18} className="animate-spin" /> : <FileDown size={18} />}
-          {dang ? 'Đang dựng phiếu…' : `Tải phiếu bài tập PDF (${soCau} câu)`}
-        </span>
-      </NutChinh>
+      <NutPhieuHtml dungGoi={dungGoi} nhanXem={`Xem phiếu ${soCau} câu`} showToast={showToast} />
 
       <div style={NHAN_NHO}>
         {dungDe.length > 0
@@ -196,20 +178,9 @@ export default function NutBaiTapPdf({
         </div>
       )}
 
-      {ketQua && htmlRef.current && (
-        <button
-          type="button"
-          onClick={() => void import('../lib/tai-phieu-pdf').then((m) => m.inPhieu(htmlRef.current))}
-          className="tap-target inline-flex items-center justify-center font-bold"
-          style={{ gap: 6, minHeight: 44, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
-        >
-          <Printer size={16} /> In bản chữ nét (chọn "Lưu thành PDF")
-        </button>
-      )}
-
       {ketQua && (
         <OThongBao tone={ketQua.thieu > 0 || ketQua.lapLai > 0 ? 'cam' : 'xanh'}>
-          {`Đã tải ${ketQua.ten}: ${ketQua.soCau} câu kèm lời giải.`}
+          {`Phiếu ${ketQua.soCau} câu kèm lời giải.`}
           {ketQua.lapLai > 0 && ` Trong đó ${ketQua.lapLai} câu em đã gặp (kho hết câu mới).`}
           {ketQua.thieu > 0 && ` Còn thiếu ${ketQua.thieu} câu so với ${soCau} câu đã chọn.`}
         </OThongBao>

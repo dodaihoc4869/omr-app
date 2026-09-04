@@ -20,6 +20,8 @@ import { docMaTuHash } from '../lib/phieu-link'
 import { layPhieu } from '../lib/exam-api'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import { BAN_PHIEU, type CauSaiChiTiet, type PhieuDayDu } from '../lib/phieu-du-lieu'
+import type { ThongTinPhieu } from '../lib/html-phieu'
+import type { CauLuyen } from '../lib/bai-tap-pdf'
 import { TEN_MUC_DO, TEN_PHAN, type MucDo } from '../lib/phan-tich-lam-bai'
 import { ChemText } from '../lib/chem-format'
 
@@ -507,6 +509,8 @@ function TheCauSai({ c, stt }: { c: CauSaiChiTiet; stt: number }) {
  * chủ. */
 export default function PhieuScreen({ duCoSan }: { duCoSan?: PhieuDayDu } = {}) {
   const [du, setDu] = useState<PhieuDayDu | null | undefined>(duCoSan ?? undefined)
+  // Link phiếu bài tập: trang này chỉ việc hiện trọn tài liệu HTML đã dựng.
+  const [phieuBt, setPhieuBt] = useState('')
   const [loi, setLoi] = useState('')
   const daChay = useRef(false)
 
@@ -522,7 +526,16 @@ export default function PhieuScreen({ duCoSan }: { duCoSan?: PhieuDayDu } = {}) 
     try {
       const url = await loadScriptUrlHoacMacDinh()
       if (!url) throw new Error('Chưa cấu hình được máy chủ')
-      const p = (await layPhieu(url, ma)) as PhieuDayDu
+      const p = (await layPhieu(url, ma)) as PhieuDayDu & { loai?: string }
+      // Cùng một lệnh đọc công khai phục vụ hai loại gói: BÁO CÁO gửi phụ huynh
+      // và PHIẾU BÀI TẬP. Phân biệt bằng đúng một trường `loai` — thêm lệnh máy
+      // chủ thứ hai là thêm một cửa đọc công khai nữa, không đáng.
+      if (p && p.loai === 'baitap') {
+        const g = p as unknown as { tt: ThongTinPhieu; cau: CauLuyen[] }
+        const { dungPhieuHtml } = await import('../lib/tai-phieu-pdf')
+        setPhieuBt(dungPhieuHtml({ ...g.tt, ngay: new Date(g.tt.ngay) }, g.cau))
+        return
+      }
       if (!p || Number(p.v) !== BAN_PHIEU) throw new Error('Báo cáo này thuộc phiên bản khác, Thầy cần gửi lại link mới.')
       setDu(p)
     } catch (e) {
@@ -546,6 +559,10 @@ export default function PhieuScreen({ duCoSan }: { duCoSan?: PhieuDayDu } = {}) 
   }, [du])
 
   const [oDau, raDau] = useHienKhiToi<HTMLDivElement>(tat)
+
+  if (phieuBt) {
+    return <iframe title="Phiếu bài tập" srcDoc={phieuBt} style={{ display: 'block', width: '100%', height: '100vh', border: 0 }} />
+  }
 
   if (du === undefined) {
     return (
@@ -813,7 +830,7 @@ function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
     setDang(true)
     setLoi('')
     try {
-      const [{ dungPhieuHtml, phieuThanhPdf, taiTep }, { tenTepBaiTap }] = await Promise.all([import('../lib/tai-phieu-pdf'), import('../lib/bai-tap-pdf')])
+      const { dungPhieuHtml, moHtml } = await import('../lib/tai-phieu-pdf')
       const sai = du.chuyenDeCa.filter((c) => c.soSai > 0)
       const tt = {
         hoTen: du.hoTen,
@@ -823,12 +840,11 @@ function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
         ketQua: sai.length > 0 ? `Sai ${sai.reduce((n, c) => n + c.soSai, 0)}/${sai.reduce((n, c) => n + c.soCau, 0)} câu` : '',
         hienDapAn: false,
       }
-      const cau = du.baiTap ?? []
-      const de = await dungPhieuHtml(tt, cau)
-      const giai = await dungPhieuHtml({ ...tt, hienDapAn: true }, cau)
-      taiTep(await phieuThanhPdf(de.html + giai.html), tenTepBaiTap(du.hoTen, du.sbd))
+      // MỘT lần dựng. Bản trước dựng hai lần (đề, lời giải) rồi nối chuỗi nên
+      // phụ huynh tải về thấy bìa và trang tổng quan LẶP HAI LẦN.
+      moHtml(dungPhieuHtml(tt, du.baiTap ?? []))
     } catch {
-      setLoi('Máy chưa tải được phiếu. Phụ huynh thử lại khi có mạng ổn định.')
+      setLoi('Máy chưa mở được phiếu. Phụ huynh thử lại khi có mạng ổn định.')
     } finally {
       setDang(false)
     }
@@ -853,7 +869,7 @@ function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
           opacity: dang ? 0.6 : 1,
         }}
       >
-        {dang ? 'Đang dựng phiếu…' : `Tải phiếu bài tập ${du.baiTap?.length ?? 0} câu kèm lời giải`}
+        {dang ? 'Đang dựng phiếu…' : `Xem phiếu bài tập ${du.baiTap?.length ?? 0} câu kèm lời giải`}
       </button>
       <div style={{ fontSize: 12, color: 'var(--p-nhat)', marginTop: 7, lineHeight: 1.6 }}>
         Thầy đã chọn sẵn theo đúng chuyên đề em mất điểm ở bài này, xếp từ dễ lên khó. Lời giải nằm ở trang cuối, em làm hết rồi mới lật.
