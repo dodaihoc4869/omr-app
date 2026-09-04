@@ -96,7 +96,9 @@ describe('soanPhieuZalo — nội dung', () => {
   it('chưa giao bài thì không hứa hạn nộp không có thật', () => {
     const s = soanPhieuZalo({ ...mau, baiTapDaGiao: null })
     expect(s).not.toContain('hạn nộp')
-    expect(s).toContain('sẽ giao')
+    // Chưa có bài cụ thể thì dùng lời nhắn luyện tập thầy tự viết, không bịa
+    // ra một mốc thời gian nào.
+    expect(s).toContain('Không ai có thể giúp em tiến bộ bằng chính em.')
   })
 })
 

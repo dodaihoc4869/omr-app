@@ -120,19 +120,26 @@ function vuaBeRong(c: CanvasRenderingContext2D, chu: string, toiDa: number): str
 }
 
 /** Xuống dòng theo bề rộng. Trả về mảng dòng. */
+/** Ngắt dòng theo bề rộng, và TÔN TRỌNG dấu xuống dòng thầy gõ.
+ *
+ * Bản trước tách bằng `/\s+/` nên "\n" bị coi như dấu cách: hai đoạn thầy viết
+ * tách dòng bị dồn thành một khối liền, mất nhịp ngắt. */
 function xuongDong(c: CanvasRenderingContext2D, chu: string, toiDa: number): string[] {
-  const tu = chu.split(/\s+/).filter(Boolean)
   const dong: string[] = []
-  let hien = ''
-  for (const t of tu) {
-    const thu = hien ? `${hien} ${t}` : t
-    if (c.measureText(thu).width <= toiDa) hien = thu
-    else {
-      if (hien) dong.push(hien)
-      hien = t
+  for (const doan of (chu || '').split('\n')) {
+    const tu = doan.split(/[ \t]+/).filter(Boolean)
+    if (tu.length === 0) continue
+    let hien = ''
+    for (const t of tu) {
+      const thu = hien ? `${hien} ${t}` : t
+      if (c.measureText(thu).width <= toiDa) hien = thu
+      else {
+        if (hien) dong.push(hien)
+        hien = t
+      }
     }
+    if (hien) dong.push(hien)
   }
-  if (hien) dong.push(hien)
   return dong
 }
 

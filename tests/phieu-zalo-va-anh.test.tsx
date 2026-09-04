@@ -9,7 +9,7 @@
 //   2. mọi con số trên phiếu phải là số đã chấm, KHÔNG bịa,
 //   3. tên em trong danh sách ca phải là NÚT mở hồ sơ.
 import { describe, expect, it } from 'vitest'
-import { soanPhieuZalo, viecCanLamMacDinh, demChu, type DuLieuPhieu } from '../src/lib/phieu-zalo'
+import { soanPhieuZalo, viecCanLamMacDinh, demChu, LOI_NHAN_LUYEN_TAP, type DuLieuPhieu } from '../src/lib/phieu-zalo'
 import { tenTepPhieu } from '../src/lib/anh-phieu'
 import maChiTietCa from '../src/screens/ExamMonitorScreen.tsx?raw'
 import maPhieu from '../src/components/PhieuZaloEm.tsx?raw'
@@ -83,8 +83,19 @@ describe('Tin nhắn gửi phụ huynh', () => {
     expect(t).not.toContain(viecCanLamMacDinh(DU))
   })
 
-  it('mặc định vẫn nêu việc cụ thể chứ không nói chung chung', () => {
-    expect(viecCanLamMacDinh(DU)).toContain('Ester – lipid')
+  it('dùng NGUYÊN VĂN lời nhắn thầy viết, không chèn thêm tên chuyên đề', () => {
+    // Chuyên đề em mất điểm đã nằm ở khối CHỖ MẤT ĐIỂM ngay phía trên; nhắc
+    // lại trong VIỆC CẦN LÀM là thừa.
+    const v = viecCanLamMacDinh(DU)
+    expect(v).toBe(LOI_NHAN_LUYEN_TAP)
+    expect(v).toContain('Không ai có thể giúp em tiến bộ bằng chính em.')
+    expect(v).not.toContain('Ester – lipid')
+  })
+
+  it('bài tập ĐÃ giao thì vẫn báo số câu và hạn nộp — bỏ mốc là mất thông tin phụ huynh cần', () => {
+    const v = viecCanLamMacDinh({ ...DU, baiTapDaGiao: { soCau: 10, hanNop: '2026-09-10' } })
+    expect(v).toContain('10 câu')
+    expect(v).toContain('hạn nộp 10/09')
   })
 })
 

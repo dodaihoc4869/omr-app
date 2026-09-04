@@ -96,15 +96,19 @@ export const NHAN_KHOI = [NHAN_XEM_PHIEU, 'ĐIỂM:', 'CHỖ MẤT ĐIỂM:', 'V
  * kiểm tra lại). Tách riêng vì ẢNH PHIẾU và TIN NHẮN phải nói cùng một việc:
  * hai chỗ soạn riêng thì sớm muộn cũng lệch nhau. Thầy sửa được trước khi gửi,
  * sửa một lần là cả hai đổi theo. */
+/** Lời nhắn thầy tự viết, dùng nguyên văn — không sửa chữ, không rút gọn. */
+export const LOI_NHAN_LUYEN_TAP =
+  'Thầy đã giao cho em tổng hợp bài tập để khắc phục điểm yếu của em. Hãy luyện tập nghiêm túc để bản thân tiến bộ trong lần thi tới.\nKhông ai có thể giúp em tiến bộ bằng chính em.'
+
 export function viecCanLamMacDinh(d: DuLieuPhieu): string {
   if (d.baiTapDaGiao) {
     const han = ngayVN(d.baiTapDaGiao.hanNop)
     return `Thầy đã giao em ${d.baiTapDaGiao.soCau} câu bài tập trong app, hạn nộp ${han}. Thầy chấm bài đó rồi báo lại kết quả.`
   }
-  if (d.chuyenDeSai && d.chuyenDeSai.soSai > 0) {
-    return `Thầy sẽ giao em bài tập riêng chuyên đề ${d.chuyenDeSai.ten} trong app. Em làm xong, Thầy chấm rồi báo lại.`
-  }
-  return 'Buổi tới Thầy cho em làm phần khó hơn để kiểm tra lại.'
+  // Chữ thầy tự viết 04-09, dùng nguyên văn. Không chèn tên chuyên đề vào đây:
+  // chuyên đề em mất điểm đã nằm ở khối CHỖ MẤT ĐIỂM ngay phía trên, nhắc lại
+  // là thừa.
+  return LOI_NHAN_LUYEN_TAP
 }
 
 /** Gợi ý chỗ thầy nên tự viết thêm trước khi gửi — máy không đoán thay. */
