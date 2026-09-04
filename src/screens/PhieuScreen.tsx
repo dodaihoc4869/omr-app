@@ -813,17 +813,20 @@ function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
     setDang(true)
     setLoi('')
     try {
-      const [{ veBaiTapPdf }, { tenTepBaiTap }] = await Promise.all([import('../lib/ve-bai-tap-pdf'), import('../lib/bai-tap-pdf')])
-      const doc = veBaiTapPdf({
+      const [{ dungPhieuHtml, phieuThanhPdf, taiTep }, { tenTepBaiTap }] = await Promise.all([import('../lib/tai-phieu-pdf'), import('../lib/bai-tap-pdf')])
+      const sai = du.chuyenDeCa.filter((c) => c.soSai > 0)
+      const tt = {
         hoTen: du.hoTen,
         sbd: du.sbd,
-        lop: du.lop,
         ngay: new Date(),
-        chuyenDe: du.chuyenDeCa,
-        cau: du.baiTap ?? [],
-        lapLai: 0,
-      })
-      doc.save(tenTepBaiTap(du.hoTen, du.sbd))
+        tenChuyenDe: sai[0]?.ten || du.chuyenDeCa[0]?.ten || 'Hoá học',
+        ketQua: sai.length > 0 ? `Sai ${sai.reduce((n, c) => n + c.soSai, 0)}/${sai.reduce((n, c) => n + c.soCau, 0)} câu` : '',
+        hienDapAn: false,
+      }
+      const cau = du.baiTap ?? []
+      const de = await dungPhieuHtml(tt, cau)
+      const giai = await dungPhieuHtml({ ...tt, hienDapAn: true }, cau)
+      taiTep(await phieuThanhPdf(de.html + giai.html), tenTepBaiTap(du.hoTen, du.sbd))
     } catch {
       setLoi('Máy chưa tải được phiếu. Phụ huynh thử lại khi có mạng ổn định.')
     } finally {

@@ -10,8 +10,8 @@
 //
 // jsPDF và font nhúng nặng gần 300KB, nên cả bộ vẽ được NẠP ĐỘNG lúc thầy bấm
 // nút: người không dùng tới không phải tải.
-import { useEffect, useState } from 'react'
-import { FileDown, Loader2 } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { FileDown, Loader2, Printer } from 'lucide-react'
 import { NutChinh, OThongBao } from './DesignSystem'
 import { chonCauLuyen, tenTepBaiTap } from '../lib/bai-tap-pdf'
 import { docQidRaPhieu, loadExamSources, loadScriptUrl, loadTeacherSecret, themQidRaPhieu, xoaQidRaPhieu } from '../lib/exam-db'
@@ -30,13 +30,13 @@ export const MUC_SO_CAU = [10, 20, 30, 40, 50, 60]
 export default function NutBaiTapPdf({
   sbd,
   hoTen,
-  lop,
   chuyenDe,
   showToast,
 }: {
   sbd: string
   hoTen: string
-  lop: string
+  /** Giữ trong kiểu để nơi gọi không phải sửa; bìa phiếu không in lớp. */
+  lop?: string
   chuyenDe: ChuyenDeEm[]
   showToast: (chu: string, kieu?: 'success' | 'error' | 'warn') => void
 }) {
@@ -44,6 +44,9 @@ export default function NutBaiTapPdf({
   const [soCau, setSoCau] = useState(SO_CAU_PDF_MAC_DINH)
   const [daRa, setDaRa] = useState(0)
   const [ketQua, setKetQua] = useState<{ soCau: number; lapLai: number; thieu: number; ten: string } | null>(null)
+  // Giữ lại bản HTML vừa dựng để thầy bấm "In bản chữ nét" mà không phải rút
+  // lại câu — rút lại là ra bộ câu khác, phiếu in không khớp phiếu đã tải.
+  const htmlRef = useRef<string>('')
 
   useEffect(() => {
     let con = true
@@ -89,18 +92,24 @@ export default function NutBaiTapPdf({
         )
       }
 
-      const { veBaiTapPdf } = await import('../lib/ve-bai-tap-pdf')
-      const doc = veBaiTapPdf({
+      // Phiếu dựng bằng HTML rồi CHÍNH TRÌNH DUYỆT vẽ, sau đó chụp thành PDF —
+      // đó là cách duy nhất ra đúng mẫu thầy chốt (nền chuyển sắc phủ kín A4,
+      // chữ nền chìm, emoji). Xem đầu file `tai-phieu-pdf.ts`.
+      const { dungPhieuHtml, phieuThanhPdf, taiTep } = await import('../lib/tai-phieu-pdf')
+      const nhomYeu = (yeu.length > 0 ? yeu : chuyenDe).filter((c) => c.soSai > 0)
+      const tt = {
         hoTen,
         sbd,
-        lop,
         ngay: new Date(),
-        chuyenDe: (yeu.length > 0 ? yeu : chuyenDe).map((c) => ({ ten: c.ten, soCau: c.soCau, soSai: c.soSai })),
-        cau: kq.cau,
-        lapLai: kq.lapLai,
-      })
+        tenChuyenDe: dungDe[0]?.ten || nhomYeu[0]?.ten || 'Hoá học',
+        ketQua: nhomYeu.length > 0 ? `Sai ${nhomYeu.reduce((n, c) => n + c.soSai, 0)}/${nhomYeu.reduce((n, c) => n + c.soCau, 0)} câu` : '',
+        hienDapAn: false,
+      }
+      const de = await dungPhieuHtml(tt, kq.cau)
+      const giai = await dungPhieuHtml({ ...tt, hienDapAn: true }, kq.cau)
       const ten = tenTepBaiTap(hoTen, sbd)
-      doc.save(ten)
+      taiTep(await phieuThanhPdf(de.html + giai.html), ten)
+      htmlRef.current = de.html + giai.html
       await themQidRaPhieu(sbd, kq.cau.map((c) => c.id))
       setDaRa((n) => n + kq.cau.length)
       setKetQua({ soCau: kq.cau.length, lapLai: kq.lapLai, thieu: kq.thieu, ten })
@@ -185,6 +194,17 @@ export default function NutBaiTapPdf({
             Cho phép lấy lại
           </button>
         </div>
+      )}
+
+      {ketQua && htmlRef.current && (
+        <button
+          type="button"
+          onClick={() => void import('../lib/tai-phieu-pdf').then((m) => m.inPhieu(htmlRef.current))}
+          className="tap-target inline-flex items-center justify-center font-bold"
+          style={{ gap: 6, minHeight: 44, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+        >
+          <Printer size={16} /> In bản chữ nét (chọn "Lưu thành PDF")
+        </button>
       )}
 
       {ketQua && (

@@ -6,7 +6,7 @@
 // xám chờ thi lại · tím đang làm · cam rời màn N lần · đỏ bị khoá · xanh đã nộp.
 // Xoá ca = xoá mềm, phải gõ đúng mã ca.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Copy, Check, RefreshCw, Trash2, ArrowLeft, ChevronRight, Images } from 'lucide-react'
+import { Copy, Check, RefreshCw, Trash2, ArrowLeft, ChevronRight, Images, FileSpreadsheet, FileJson } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
 import { chiTietCa, duyetThiLai, ghiDiem, moKhoa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
@@ -679,24 +679,22 @@ export default function ExamMonitorScreen() {
             )}
           </TheNoiDung>
 
-          {/* XUẤT */}
+          {/* XUẤT — ba việc cùng hạng, nên cùng cỡ và xếp một hàng. Bản trước
+              một nút đen to đè hai nút viền, nhìn như ba việc khác hạng nhau
+              trong khi thầy dùng cả ba ngang nhau. Nhãn còn hai chữ, đuôi tệp
+              xuống dòng nhỏ bên dưới. */}
           {daCham.length > 0 && (
-            <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
-              {/* Tải phiếu cả ca: một ảnh một em, gói .zip. Thầy giải nén ra là
-                  gửi thẳng Zalo từng phụ huynh được. */}
-              <NutChinh onClick={() => void handleTaiPhieuHangLoat()} disabled={!!dangGoiPhieu}>
-                <span className="inline-flex items-center" style={{ gap: 6 }}>
-                  <Images size={18} />
-                  {dangGoiPhieu ? `Đang dựng phiếu… ${dangGoiPhieu}` : `Tải phiếu cả ca (${daCham.length} ảnh .zip)`}
-                </span>
-              </NutChinh>
-              <div className="flex" style={{ gap: 'var(--k2)' }}>
-                <NutChinh variant="phu" onClick={handleExportXlsx}>Xuất BangDiem.xlsx ({daCham.length})</NutChinh>
-                <NutChinh variant="phu" onClick={handleExportJson}>
-                  Xuất dulieu.json
-                </NutChinh>
+            <TheNoiDung>
+              <div className="flex items-baseline justify-between" style={{ gap: 'var(--k3)', marginBottom: 'var(--k3)' }}>
+                <div style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)', fontWeight: 700 }}>Xuất kết quả</div>
+                <div style={NHAN_NHO}>{daCham.length} em đã chấm</div>
               </div>
-            </div>
+              <div className="grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--k2)' }}>
+                <NutXuat icon={<Images size={20} />} ten={dangGoiPhieu ? 'Đang dựng…' : 'Phiếu'} phu={dangGoiPhieu || `${daCham.length} ảnh · zip`} onClick={() => void handleTaiPhieuHangLoat()} tat={!!dangGoiPhieu} />
+                <NutXuat icon={<FileSpreadsheet size={20} />} ten="Bảng điểm" phu="xlsx" onClick={handleExportXlsx} />
+                <NutXuat icon={<FileJson size={20} />} ten="Dữ liệu" phu="json" onClick={handleExportJson} />
+              </div>
+            </TheNoiDung>
           )}
 
           {/* BÁO PHỤ HUYNH — thầy đọc lại, sửa, rồi mới gửi */}
@@ -762,5 +760,38 @@ export default function ExamMonitorScreen() {
         </>
       )}
     </div>
+  )
+}
+
+/** Một ô xuất kết quả: biểu tượng trên, tên hai chữ ở giữa, đuôi tệp bên dưới.
+ * Ba ô cùng cỡ vì ba việc cùng hạng — thầy dùng cái nào cũng như nhau. */
+function NutXuat({ icon, ten, phu, onClick, tat }: { icon: React.ReactNode; ten: string; phu: string; onClick: () => void; tat?: boolean }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={tat}
+      className="tap-target flex flex-col items-center justify-center"
+      style={{
+        gap: 4,
+        minHeight: 84,
+        padding: 'var(--k3) var(--k2)',
+        borderRadius: 'var(--bo-2)',
+        background: 'var(--the-2)',
+        border: '1.5px solid transparent',
+        color: tat ? 'var(--mo)' : 'var(--muc)',
+        opacity: tat ? 0.7 : 1,
+        transitionProperty: 'background-color, border-color',
+        transitionDuration: 'var(--nhanh)',
+      }}
+    >
+      <span style={{ color: tat ? 'var(--mo)' : 'var(--phu-dam)' }}>{icon}</span>
+      <span className="font-bold text-center" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', lineHeight: 1.2 }}>
+        {ten}
+      </span>
+      <span className="text-center" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', fontVariantNumeric: 'tabular-nums', lineHeight: 1.2 }}>
+        {phu}
+      </span>
+    </button>
   )
 }
