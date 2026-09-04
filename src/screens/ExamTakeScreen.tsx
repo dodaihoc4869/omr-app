@@ -339,6 +339,12 @@ export default function ExamTakeScreen() {
           tenChuyenDe: cd.length === 1 ? cd[0] : attempt.tenCa || 'Hoá học',
           ketQua: graded ? `Điểm ${graded.score.total.toFixed(2)}/10` : '',
           hienDapAn: true,
+          nhanBia: 'Đề của em kèm lời giải',
+          oBia: [
+            { nhan: 'Học sinh', gia: hoTen.trim() || `SBD ${attempt.sbd}` },
+            { nhan: 'SBD', gia: attempt.sbd },
+            ...(attempt.tenCa ? [{ nhan: 'Bài kiểm tra', gia: attempt.tenCa }] : []),
+          ],
         },
         cau,
       )

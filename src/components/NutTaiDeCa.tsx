@@ -45,14 +45,25 @@ export default function NutTaiDeCa({ banks, maCa, tenCa, ghiChu, showToast }: Nu
       return null
     }
     const cd = [...new Set(cau.map((c) => c.chuyenDe).filter(Boolean))]
+    // BÌA GỌI ĐÚNG TÊN. Đây là đề của một CA, không phải phiếu của một em: ô
+    // đầu là TÊN BÀI KIỂM TRA, không phải tên học sinh; số 6 chữ số là MÃ CA,
+    // không phải SBD. Bìa không tự đoán được, chỗ gọi phải khai.
     return {
       tt: {
         hoTen: tenCa || `Ca ${maCa}`,
         sbd: maCa,
         ngay: new Date(),
         tenChuyenDe: cd.length === 1 ? cd[0] : o.ten,
-        ketQua: ghiChu || `${cau.length} câu`,
+        ketQua: '',
         hienDapAn: true,
+        nhanBia: 'Đề kiểm tra kèm lời giải',
+        oBia: [
+          { nhan: 'Bài kiểm tra', gia: tenCa || `Ca ${maCa}` },
+          { nhan: 'Mã ca', gia: maCa },
+          ...(ghiChu ? [{ nhan: 'Lớp', gia: ghiChu.replace(/^Lớp\s*/i, '') }] : []),
+          ...(chon.length > 1 ? [{ nhan: 'Mã đề', gia: o.ten.replace(/^Mã\s*/i, '') }] : []),
+          { nhan: 'Số câu', gia: `${cau.length} câu` },
+        ],
       },
       cau,
       maCa,

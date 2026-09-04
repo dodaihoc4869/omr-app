@@ -18,6 +18,7 @@ import { classify } from '../engine/score'
 import { soanPhieuZalo, viecCanLamMacDinh, demChu, NHAC_TRUOC_KHI_GUI, NHAN_KHOI, type DuLieuPhieu } from '../lib/phieu-zalo'
 import { veAnhPhieu, tenTepPhieu, type DuLieuAnhPhieu } from '../lib/anh-phieu'
 import { taoLinkPhieu } from '../lib/phieu-link'
+import KhungXemPhieu from './KhungXemPhieu'
 import { dungPhieu } from '../lib/phieu-du-lieu'
 import { luuPhieu, qidDaLam, sinhMaPhieu, xoaPhieu, type ChiTietCauRow } from '../lib/exam-api'
 import { loadExamSources, loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
@@ -63,6 +64,8 @@ export default function PhieuZaloEm({
   const ca = chonCa(hoSo, maCa)
   const khungAnh = useRef<HTMLDivElement | null>(null)
   const [daCopy, setDaCopy] = useState(false)
+  /** Link báo cáo đang mở xem trong app. Rỗng = chưa mở. */
+  const [xemLink, setXemLink] = useState('')
   const [dangTai, setDangTai] = useState(false)
 
   // Chuyên đề mất điểm CỦA RIÊNG CA NÀY. Phiếu gửi phụ huynh mà lấy số cộng dồn
@@ -342,15 +345,18 @@ export default function PhieuZaloEm({
             Gửi rồi mới phát hiện sai thì đã muộn. */}
         {link && (
           <div className="flex items-center flex-wrap justify-between" style={{ gap: 'var(--k2)', marginTop: 'calc(var(--k2) * -1)' }}>
-            <a
-              href={link}
-              target="_blank"
-              rel="noopener noreferrer"
+            {/* MỞ TRONG APP, không nhảy sang thẻ mới. App đã cài chạy ở cửa
+                sổ riêng: thẻ mới rơi ra trình duyệt ngoài, thầy mất chỗ đang
+                làm. Vẫn là ĐÚNG địa chỉ phụ huynh sẽ mở, không phải bản dựng
+                lại — mở ra sai thì gửi đi cũng sai. */}
+            <button
+              type="button"
+              onClick={() => setXemLink(link)}
               className="tap-target inline-flex items-center font-bold"
-              style={{ gap: 6, minHeight: 36, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--phu)', color: 'var(--phu-dam)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', textDecoration: 'none' }}
+              style={{ gap: 6, minHeight: 36, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--phu)', color: 'var(--phu-dam)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', border: 'none' }}
             >
               <Eye size={16} /> Xem báo cáo
-            </a>
+            </button>
             <button
               type="button"
               onClick={() => void thuHoi()}
@@ -382,6 +388,7 @@ export default function PhieuZaloEm({
           </span>
         </NutChinh>
       </div>
+      {xemLink && <KhungXemPhieu src={xemLink} ten="Báo cáo phụ huynh sẽ thấy" dong={() => setXemLink('')} />}
     </TheNoiDung>
   )
 }

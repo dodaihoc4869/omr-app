@@ -24,6 +24,13 @@
 // ÔN, em tự bấm ra dò sau khi làm xong.
 import type { CauLuyen } from './bai-tap-pdf'
 import { doanCongThuc } from './chu-hoa-hoc-pdf'
+import { goKyTuLa } from './chu-la-pdf'
+
+/** Một ô thông tin ngoài bìa: nhãn nhỏ ở trên, giá trị đậm ở dưới. */
+export interface OBia {
+  nhan: string
+  gia: string
+}
 
 export interface ThongTinPhieu {
   hoTen: string
@@ -36,6 +43,17 @@ export interface ThongTinPhieu {
   /** true = bản dò bài của thầy (đổi nhãn bìa). Không còn quyết định việc tô
    * đáp án nữa: đáp án nay do người đọc bấm mở. */
   hienDapAn: boolean
+  /** Nhãn nhỏ trên đầu bìa. Rỗng thì suy từ `hienDapAn`. */
+  nhanBia?: string
+  /** THAY hai ô "Học sinh" và "SBD" mặc định.
+   *
+   * LỖI ĐÃ DÍNH 04-09: bìa gõ cứng nhãn "HỌC SINH" và "SBD", nên đề của một
+   * CA in ra thành "Học sinh: Test 3" (đó là tên ca) và "SBD: 547341" (đó là
+   * mã ca). Bìa không được đoán mình đang in phiếu của ai — chỗ gọi biết rõ
+   * thì chỗ gọi phải nói ra.
+   *
+   * Ô Ngày và ô kết quả vẫn do bìa tự thêm, khỏi chỗ nào cũng phải lặp. */
+  oBia?: OBia[]
 }
 
 const CHU_PA = ['A', 'B', 'C', 'D']
@@ -50,9 +68,14 @@ export function thoat(s: string): string {
 }
 
 /** Chuỗi có công thức Hoá → HTML có <sub>/<sup>, mũi tên là ký tự thật.
- * Dùng lại đúng bộ tách của màn làm bài nên hai đường ra không bao giờ lệch. */
+ * Dùng lại đúng bộ tách của màn làm bài nên hai đường ra không bao giờ lệch.
+ *
+ * GỠ KÝ TỰ LẠ NGAY TẠI ĐÂY, không chỉ lúc nạp đề. Ca mở TRƯỚC khi có bộ gỡ vẫn
+ * đang giữ bản chưa lọc trong máy và trên máy chủ, nên phiếu của những ca đó
+ * in ra ô vuông rỗng (thầy bắt được ở câu Kc, đề 12-C1-B1). Lọc ở tầng hiển
+ * thị thì mọi ca cũ và mọi link đã gửi đi tự đúng, không phải nạp lại đề. */
 export function chuHtml(s: string): string {
-  return doanCongThuc(s)
+  return doanCongThuc(goKyTuLa(s))
     .map((d) => {
       const v = thoat(d.v)
       if (d.t === 'sub') return `<sub>${v}</sub>`
@@ -507,6 +530,16 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
   .sa-blank { display: none; }
   .sa-answer { display: inline-flex; }
   .ds-cau { gap: 4mm; }
+
+  /* IN ĐỀ TRẦN — phát cho em tự làm.
+     Cùng một tệp ra được hai bản giấy: bản này giấu sạch đáp án và lời giải,
+     bản mặc định ở trên in đủ. Khỏi phải dựng hai tệp rồi lo gửi nhầm. */
+  body.in-de-tran .sol-wrap { display: none !important; }
+  body.in-de-tran .q-opt.dung { background: #f8fafc; border-color: var(--vien); color: var(--muc-2); font-weight: 400; }
+  body.in-de-tran .q-opt.dung .q-opt-letter { background: var(--vien-dam); }
+  body.in-de-tran .tf-badge.dung { background: #f1f5f9; color: var(--rat-nhat); border-color: var(--vien); }
+  body.in-de-tran .sa-answer { display: none !important; }
+  body.in-de-tran .sa-blank { display: block !important; }
 }
 `
 
@@ -631,19 +664,28 @@ export function biaHtml(t: ThongTinPhieu, soCau: number): string {
   // no", và khối chữ cũng lệch hẳn so với mẫu.
   const ten = thoat(t.tenChuyenDe || 'Hoá học').toUpperCase()
   const tenHaiDong = ten.replace(/\s*([–—-])\s*/, '<br>$1 ').replace(/\s+&\s+/, '<br>& ')
+  // Chỗ gọi khai rõ thì dùng đúng lời khai; không khai thì mới rơi về "Học
+  // sinh / SBD" như cũ, để mọi link phiếu đã gửi đi vẫn hiện đúng như lúc gửi.
+  const oNhanDang = (t.oBia && t.oBia.length > 0 ? t.oBia : [
+    { nhan: 'Học sinh', gia: t.hoTen },
+    { nhan: 'SBD', gia: t.sbd },
+  ])
+    .filter((o) => o.gia)
+    .map((o) => `<div class="cover-info-item"><div class="cover-info-label">${thoat(o.nhan)}</div><div class="cover-info-value">${thoat(o.gia)}</div></div>`)
+    .join('')
+
   return `<header class="cover">
   <div class="cover-blob b1"></div><div class="cover-blob b2"></div>
   <div class="cover-molecule m1">RCOOR'</div>
   <div class="cover-molecule m2">CH<sub>3</sub>COOH</div>
   <div class="cover-molecule m3">C<sub>9</sub>H<sub>8</sub>O<sub>4</sub></div>
   <div class="cover-content">
-    <div class="cover-badge">${t.hienDapAn ? 'Lời giải chi tiết' : 'Phiếu Bài Tập Riêng'}</div>
+    <div class="cover-badge">${thoat(t.nhanBia || (t.hienDapAn ? 'Lời giải chi tiết' : 'Phiếu Bài Tập Riêng'))}</div>
     <h1 class="cover-title">${tenHaiDong}</h1>
     <div class="cover-subtitle">Bài tập Hóa học Hữu cơ</div>
     <div class="cover-chemical">RCOOR'</div>
     <div class="cover-info">
-      <div class="cover-info-item"><div class="cover-info-label">Học sinh</div><div class="cover-info-value">${thoat(t.hoTen || '—')}</div></div>
-      <div class="cover-info-item"><div class="cover-info-label">SBD</div><div class="cover-info-value">${thoat(t.sbd || '—')}</div></div>
+      ${oNhanDang}
       <div class="cover-info-item"><div class="cover-info-label">Ngày</div><div class="cover-info-value">${ngayVN(t.ngay)}</div></div>
       ${oKetQua}
     </div>
@@ -702,7 +744,8 @@ export function thanhHtml(soCau: number): string {
   <div class="thanh-chu">Đã xem lời giải <b id="dem-mo">0</b>/<span id="dem-tong">${soCau}</span> câu<span class="the-loc" id="the-loc" hidden> · <b id="ten-loc"></b></span></div>
   <button class="nut nho" type="button" id="bo-loc" hidden>Bỏ lọc</button>
   <button class="nut chinh" type="button" id="mo-het" aria-pressed="false"><span class="chu-mo">Mở tất cả</span><span class="chu-dong">Đóng tất cả</span></button>
-  <button class="nut" type="button" id="in-phieu">In / Lưu PDF</button>
+  <button class="nut" type="button" id="in-de" title="In hoặc lưu PDF chỉ có đề bài, không lộ đáp án">In đề</button>
+  <button class="nut" type="button" id="in-giai" title="In hoặc lưu PDF có đủ đáp án và lời giải">In kèm lời giải</button>
 </div>`
 }
 
@@ -715,7 +758,6 @@ export const JS_PHIEU = `
   var dem = document.getElementById('dem-mo');
   var demTong = document.getElementById('dem-tong');
   var nutHet = document.getElementById('mo-het');
-  var nutIn = document.getElementById('in-phieu');
   var nutBo = document.getElementById('bo-loc');
   var theLoc = document.getElementById('the-loc');
   var tenLoc = document.getElementById('ten-loc');
@@ -816,15 +858,27 @@ export const JS_PHIEU = `
       demLai();
     });
   }
-  if (nutIn) nutIn.addEventListener('click', function () {
-    // In thì in TRỌN phiếu, không in mỗi phần đang lọc: bản giấy phải đủ bài.
+  /** In. coGiai = false thì giấu sạch đáp án và lời giải trên giấy.
+   * In luôn in TRỌN phiếu, không in mỗi phần đang lọc: bản giấy phải đủ bài. */
+  function inPhieu(coGiai) {
     // Phải nhớ tên lọc TRƯỚC khi xoá, vì locTheo xoá luôn ô chữ đang giữ tên.
     var giu = locHienTai;
     var giuTen = tenLoc ? tenLoc.textContent : '';
     if (giu) locTheo('', '');
+    document.body.classList.toggle('in-de-tran', !coGiai);
     window.print();
-    if (giu) setTimeout(function () { locTheo(giu, giuTen); }, 800);
-  });
+    // Trả màn hình về như cũ sau khi hộp in đóng. Chrome trả quyền ngay sau
+    // print(), Safari chậm hơn — chờ một nhịp cho chắc.
+    setTimeout(function () {
+      document.body.classList.remove('in-de-tran');
+      if (giu) locTheo(giu, giuTen);
+    }, 800);
+  }
+
+  var nutInDe = document.getElementById('in-de');
+  var nutInGiai = document.getElementById('in-giai');
+  if (nutInDe) nutInDe.addEventListener('click', function () { inPhieu(false); });
+  if (nutInGiai) nutInGiai.addEventListener('click', function () { inPhieu(true); });
 
   demLai();
 })();
@@ -851,7 +905,8 @@ export function dungPhieu(t: ThongTinPhieu, cau: CauLuyen[]): string {
   ${tongQuanHtml(cau)}
   ${thanhHtml(coGiai)}
   <div class="ds-cau">${the}</div>
-  <div class="chan">Thầy Đỗ Đại Học · ${thoat(t.tenChuyenDe)} · ${ngayVN(t.ngay)}<span class="chi-man"><br>Bấm vào từng câu để xem lời giải. Muốn bản giấy thì bấm In rồi chọn "Lưu thành PDF".</span></div>
+  <div class="chan">Thầy Đỗ Đại Học · ${thoat(t.tenChuyenDe)} · ${ngayVN(t.ngay)}<span class="chi-man"><br>Bấm vào từng câu để xem lời giải. Muốn bản giấy thì bấm "In đề" (phát cho em tự làm) hoặc "In kèm lời giải", rồi chọn "Lưu thành PDF".</span></div>
 </div>`
-  return taiLieuHtml(than, `Phiếu ${t.tenChuyenDe} · ${t.hoTen}`)
+  const ai = t.oBia && t.oBia.length > 0 ? t.oBia[0].gia : t.hoTen
+  return taiLieuHtml(than, `${t.tenChuyenDe}${ai ? ` · ${ai}` : ''}`)
 }

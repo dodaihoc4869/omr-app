@@ -28,6 +28,14 @@ describe('chuHtml', () => {
   it('vẫn thoát ký tự nguy hiểm bên trong công thức', () => {
     expect(chuHtml('a < b')).not.toContain('< b')
   })
+
+  it('gỡ ký tự Symbol rơi ra từ PDF ngay lúc HIỂN THỊ, không đợi nạp lại đề', () => {
+    // Ca mở trước khi có bộ gỡ vẫn giữ bản chưa lọc; lọc ở tầng hiển thị thì
+    // mọi ca cũ tự đúng. \uF05B là dấu [ của font Symbol.
+    // Gỡ xong thì bộ định dạng Hoá nhận ra công thức và hạ chỉ số luôn.
+    expect(chuHtml('K = \uF05BCH3COOH\uF05D')).toBe('K = [CH<sub>3</sub>COOH]')
+    expect(chuHtml('\uF028x\uF029')).toBe('(x)')
+  })
 })
 
 describe('ngayVN', () => {
@@ -202,6 +210,40 @@ describe('bìa và tổng quan', () => {
     expect(biaHtml({ ...TT, hienDapAn: true }, 5)).toContain('Lời giải chi tiết')
   })
 
+  it('chỗ gọi khai ô bìa thì bìa gọi ĐÚNG TÊN, không gõ cứng "Học sinh" và "SBD"', () => {
+    // Đề của một CA: ô đầu là tên bài kiểm tra, số 6 chữ số là mã ca. Bản
+    // trước gõ cứng nhãn nên in ra "Học sinh: Test 3" và "SBD: 547341".
+    const h = biaHtml(
+      { ...TT, ketQua: '', nhanBia: 'Đề kiểm tra kèm lời giải', oBia: [
+        { nhan: 'Bài kiểm tra', gia: 'Test 3' },
+        { nhan: 'Mã ca', gia: '547341' },
+        { nhan: 'Lớp', gia: '31' },
+      ] },
+      28,
+    )
+    expect(h).toContain('>Bài kiểm tra</div><div class="cover-info-value">Test 3<')
+    expect(h).toContain('>Mã ca</div><div class="cover-info-value">547341<')
+    expect(h).toContain('Đề kiểm tra kèm lời giải')
+    expect(h).not.toContain('>Học sinh<')
+    expect(h).not.toContain('>SBD<')
+  })
+
+  it('ô bìa rỗng giá trị thì bỏ hẳn, không in ô trống', () => {
+    const h = biaHtml({ ...TT, oBia: [{ nhan: 'Lớp', gia: '' }, { nhan: 'Mã ca', gia: '99' }] }, 5)
+    expect(h).not.toContain('>Lớp<')
+    expect(h).toContain('>Mã ca<')
+  })
+
+  it('KHÔNG khai gì thì giữ nguyên bìa cũ — link phiếu đã gửi đi vẫn hiện như lúc gửi', () => {
+    const h = biaHtml(TT, 20)
+    expect(h).toContain('>Học sinh</div><div class="cover-info-value">Đỗ Đại Học<')
+    expect(h).toContain('>SBD</div><div class="cover-info-value">12121212<')
+  })
+
+  it('ô Ngày do bìa tự thêm, chỗ gọi không phải lặp lại', () => {
+    expect(biaHtml({ ...TT, oBia: [{ nhan: 'Mã ca', gia: '99' }] }, 5)).toContain('>Ngày</div><div class="cover-info-value">04/09/2026<')
+  })
+
   it('mức độ xen kẽ thì KHÔNG ghi khoảng "Câu 1–9" — nói sai số câu', () => {
     const cau = [C({ mucDo: 'biet' }), C({ mucDo: 'hieu' }), C({ mucDo: 'biet' })]
     const h = tongQuanHtml(cau)
@@ -232,9 +274,33 @@ describe('thanhHtml', () => {
     const h = thanhHtml(12)
     expect(h).toContain('id="dem-mo">0</b>/<span id="dem-tong">12</span>')
     expect(h).toContain('id="mo-het"')
-    expect(h).toContain('id="in-phieu"')
     expect(h).toContain('id="bo-loc"')
     expect(h).toContain('Mở tất cả')
+  })
+})
+
+describe('hai lựa chọn in', () => {
+  it('thanh có ĐỦ hai nút: in đề trần và in kèm lời giải', () => {
+    const h = thanhHtml(10)
+    expect(h).toContain('id="in-de"')
+    expect(h).toContain('In đề')
+    expect(h).toContain('id="in-giai"')
+    expect(h).toContain('In kèm lời giải')
+  })
+
+  it('bản in đề trần giấu SẠCH lời giải và đáp án đã tô', () => {
+    const h = taiLieuHtml('', 'x')
+    expect(h).toContain('body.in-de-tran .sol-wrap { display: none !important; }')
+    expect(h).toContain('body.in-de-tran .sa-answer { display: none !important; }')
+    expect(h).toContain('body.in-de-tran .sa-blank { display: block !important; }')
+    // Ô đáp án đúng phải trở lại màu thường, không thì em cầm tờ giấy vẫn
+    // thấy ô nào được tô xanh.
+    expect(h).toContain('body.in-de-tran .q-opt.dung')
+    expect(h).toContain('body.in-de-tran .tf-badge.dung')
+  })
+
+  it('in xong TRẢ màn hình về như cũ, không kẹt ở chế độ đề trần', () => {
+    expect(taiLieuHtml('', 'x')).toContain("document.body.classList.remove('in-de-tran')")
   })
 })
 

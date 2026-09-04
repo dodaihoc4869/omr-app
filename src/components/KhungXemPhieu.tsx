@@ -11,11 +11,16 @@
 // Chạy giống nhau ở mọi chỗ: trình duyệt máy tính, app đã cài, điện thoại, và
 // cả khi mất mạng. Đúng cách trang báo cáo phụ huynh vẫn dùng và vẫn chạy.
 //
-// iframe `srcDoc` cùng nguồn với trang cha nên kịch bản gập mở lời giải trong
-// phiếu chạy bình thường, và `contentWindow.print()` gọi được từ ngoài.
-import { useEffect, useRef } from 'react'
+// iframe `srcDoc` cùng nguồn với trang cha nên kịch bản trong phiếu chạy bình
+// thường: gập mở lời giải, lọc theo phần, và HAI NÚT IN ("In đề" / "In kèm
+// lời giải") nằm ngay trên thanh của phiếu.
+//
+// Cố ý KHÔNG đặt thêm nút In ở thanh ngoài này: hai nút in đã nằm trong phiếu,
+// thêm nút thứ ba ở ngoài là thầy phải đoán nút nào in ra bản nào. Nhờ vậy bản
+// xem trong app và tệp HTML tải về hành xử giống hệt nhau.
+import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { Printer, X, Download } from 'lucide-react'
+import { X, Download } from 'lucide-react'
 
 /** Tải chuỗi HTML về máy thành tệp. Giữ lại làm đường thoát: thầy muốn gửi
  * nguyên tệp qua Zalo cho em thay vì gửi link. */
@@ -48,15 +53,19 @@ const NUT: React.CSSProperties = {
 }
 
 export interface KhungXemPhieuProps {
-  html: string
+  /** Nội dung dựng sẵn tại máy. Dùng cho phiếu bài tập và đề ca. */
+  html?: string
+  /** Địa chỉ trang có sẵn, vd link báo cáo gửi phụ huynh. Dùng khi cần xem
+   * ĐÚNG thứ người nhận sẽ thấy chứ không phải bản dựng lại. */
+  src?: string
+  /** Tiêu đề trên thanh, vd "Báo cáo gửi phụ huynh". */
+  ten?: string
   /** Tên tệp khi thầy bấm Tải tệp, vd "phieu-Nguyen-Van-A.html". */
   tenTep?: string
   dong: () => void
 }
 
-export default function KhungXemPhieu({ html, tenTep = 'phieu.html', dong }: KhungXemPhieuProps) {
-  const khung = useRef<HTMLIFrameElement>(null)
-
+export default function KhungXemPhieu({ html, src, ten, tenTep = 'phieu.html', dong }: KhungXemPhieuProps) {
   // Esc để đóng, và khoá cuộn trang nền — không thì cuộn trong phiếu tới cuối
   // là trang phía sau cuộn theo, nhìn như phiếu bị trôi.
   useEffect(() => {
@@ -93,25 +102,26 @@ export default function KhungXemPhieu({ html, tenTep = 'phieu.html', dong }: Khu
           <X size={16} />
           Đóng
         </button>
-        <div style={{ flex: 1 }} />
-        <button type="button" onClick={() => taiTepHtml(html, tenTep)} className="tap-target" style={NUT} title="Tải tệp HTML về máy để gửi Zalo">
-          <Download size={16} />
-          Tải tệp
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            khung.current?.contentWindow?.focus()
-            khung.current?.contentWindow?.print()
-          }}
-          className="tap-target"
-          style={{ ...NUT, background: 'var(--p-tim)', borderColor: 'transparent', color: 'var(--p-giay)' }}
-        >
-          <Printer size={16} />
-          In / Lưu PDF
-        </button>
+        {ten && (
+          <div className="font-bold truncate" style={{ flex: 1, minWidth: 0, fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--p-nhat)' }}>
+            {ten}
+          </div>
+        )}
+        {!ten && <div style={{ flex: 1 }} />}
+        {/* Chỉ tải được thứ dựng tại máy. Trang lấy từ máy chủ thì tệp nằm ở
+            máy chủ, nút Tải tệp ở đây sẽ tải ra tệp rỗng — thà không có nút. */}
+        {html && (
+          <button type="button" onClick={() => taiTepHtml(html, tenTep)} className="tap-target" style={NUT} title="Tải tệp HTML về máy để gửi Zalo">
+            <Download size={16} />
+            Tải tệp
+          </button>
+        )}
       </div>
-      <iframe ref={khung} title="Phiếu bài tập" srcDoc={html} style={{ flex: 1, width: '100%', border: 0, background: 'var(--p-giay)' }} />
+      <iframe
+        title={ten || 'Phiếu bài tập'}
+        {...(html ? { srcDoc: html } : { src })}
+        style={{ flex: 1, width: '100%', border: 0, background: 'var(--p-giay)' }}
+      />
     </div>,
     document.body,
   )

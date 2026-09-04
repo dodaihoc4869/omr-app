@@ -235,12 +235,16 @@ body {
 @media (min-width: 880px) {
   .khung-app {
     display: grid;
-    grid-template-columns: 232px minmax(0, 1fr);
+    /* Bề rộng thầy tự kéo, nhớ trong localStorage (rong-cot.ts). Chưa kéo bao
+       giờ thì rơi về 232px. */
+    grid-template-columns: var(--rong-ben-trai, 232px) minmax(0, 1fr);
     min-height: 100vh;
   }
   .ben-trai {
     display: flex;
     flex-direction: column;
+    /* sticky vừa là mốc định vị cho tay kéo (position:absolute), vừa giữ thanh
+       trái đứng yên khi cuộn. */
     position: sticky;
     top: 0;
     align-self: start;
@@ -260,6 +264,42 @@ body {
   /* Thanh điều hướng dưới đáy chỉ dành cho màn hẹp. */
   .khung-app > nav.fixed {
     display: none;
+  }
+
+  /* TAY KÉO — dải 10px nằm đúng trên đường viền phải của thanh trái.
+     Rộng 10px cho dễ trúng (đường viền 1px thì phải rê chuột chính xác từng
+     pixel), nhưng chỉ TÔ MÀU 2px ở giữa khi rê tới, nên nhìn vẫn như một
+     đường viền mảnh.
+     
+     `fixed` chứ không `absolute` trong .ben-trai: thanh trái có
+     `overflow-y:auto` nên con nằm đè ra ngoài mép sẽ BỊ CẮT MẤT. */
+  .tay-keo {
+    position: fixed;
+    top: 0;
+    left: calc(var(--rong-ben-trai, 232px) - 5px);
+    width: 10px;
+    height: 100vh;
+    z-index: 25;
+    cursor: col-resize;
+    touch-action: none;
+    background: transparent;
+  }
+  .tay-keo::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 4px;
+    width: 2px;
+    height: 100%;
+    background: transparent;
+    transition: background-color var(--nhanh);
+  }
+  .tay-keo:hover::after,
+  .tay-keo:focus-visible::after {
+    background: var(--tim);
+  }
+  .tay-keo:focus-visible {
+    outline: none;
   }
 }
 
