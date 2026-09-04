@@ -25,6 +25,7 @@
 import type { JSX } from 'react'
 import katex from 'katex'
 import 'katex/contrib/mhchem'
+import { goKyTuLa } from './chu-la-pdf'
 
 type ChemPart = { t: 'text'; v: string } | { t: 'sub'; v: string } | { t: 'sup'; v: string }
 
@@ -150,13 +151,32 @@ const KATEX_OPTS = { throwOnError: true, strict: false, displayMode: false } as 
 /** 1 công thức "\ce{...}" hoặc "$...$" render bằng KaTeX. Lỗi cú pháp -> hiện
  * nguyên văn chuỗi gốc kèm gạch chân đỏ cảnh báo, KHÔNG BAO GIỜ để trắng hay
  * làm sập trang. */
+/** Công thức dài hơn ngần này thì gần như chắc chắn rộng hơn màn điện thoại.
+ * Phương trình ester hoá isoamyl acetate (thầy chụp 04-09) dài 96 ký tự và bị
+ * cắt cụt mất vế phải. */
+const DAI_PHAI_CUON = 42
+
 function ChemFormula({ t, latex }: { t: 'ce' | 'math'; latex: string }): JSX.Element {
   try {
     const html = katex.renderToString(t === 'ce' ? `\\ce{${latex}}` : latex, KATEX_OPTS)
-    // KHÔNG bọc thêm inline-block/overflow/vertical-align — từng làm lệch
-    // đường chân chữ và CẮT mất chỉ số dưới (overflow-x:auto kéo theo
-    // overflow-y:auto). Sơ đồ phản ứng nhiều mũi tên quá rộng KHÔNG render
-    // bằng KaTeX nữa mà nhúng ảnh cắt từ đề gốc (xem HinhAnh, examContent.ts).
+    // Công thức NGẮN: KHÔNG bọc thêm inline-block/overflow/vertical-align —
+    // từng làm lệch đường chân chữ và CẮT mất chỉ số dưới (overflow-x:auto kéo
+    // theo overflow-y:auto).
+    //
+    // Công thức DÀI: KaTeX không xuống dòng giữa phương trình được, nên để
+    // nguyên là chữ tràn khỏi màn hình và em MẤT HẲN vế phải mà không biết —
+    // đúng lỗi thầy chụp ngày 04-09. Tách thành khối riêng cuộn ngang được, có
+    // đệm trên dưới để chỉ số dưới không bị cắt.
+    if (latex.length > DAI_PHAI_CUON) {
+      return (
+        <span
+          className="ct-dai"
+          style={{ display: 'block', maxWidth: '100%', overflowX: 'auto', overflowY: 'hidden', padding: '6px 0', margin: '2px 0', WebkitOverflowScrolling: 'touch' }}
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      )
+    }
     // eslint-disable-next-line react/no-danger
     return <span dangerouslySetInnerHTML={{ __html: html }} />
   } catch {
@@ -174,7 +194,9 @@ function ChemFormula({ t, latex }: { t: 'ce' | 'math'; latex: string }): JSX.Ele
  * chuẩn mhchem (\ce{...}, $...$) trong CÙNG một chuỗi, không cần chuyển đổi
  * dữ liệu cũ. */
 export function ChemText({ text }: { text: string }): JSX.Element {
-  const segments = splitCeSegments(text ?? '')
+  // Lớp chắn cuối cho ký tự vùng dùng riêng: đề cũ đã nằm trong máy trước khi
+  // cửa nạp biết dọn thì vẫn hiện đúng chứ không ra ô vuông rỗng.
+  const segments = splitCeSegments(goKyTuLa(text ?? ''))
   return (
     <>
       {segments.map((seg, si) => {

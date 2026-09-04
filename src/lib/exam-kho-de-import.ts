@@ -9,6 +9,7 @@
 // KHÔNG BAO GIỜ được commit lên git (repo omr-app đang PUBLIC — xem
 // kho-de/.gitignore) hay tải lên bất kỳ server nào.
 import type { HinhAnh, LoiGiaiCauTruc, LyDoY, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion, TrangThaiLoiGiai, ViTriHinh } from '../data/examContent'
+import { donCau } from './chu-la-pdf'
 
 /** Lời giải do pipeline "giải mù" rồi đối chiếu đáp án đề (NAPDETUDONG.md
  * B2–B3). `dap_an_de` là đáp án in trong đề — luôn dùng để CHẤM. */
@@ -287,8 +288,17 @@ export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherE
   const phanII: TeacherTrueFalseQuestion[] = []
   const phanIII: TeacherShortAnswerQuestion[] = []
 
-  for (const c of json.cau) {
+  for (const cGoc of json.cau) {
+    // DỌN KÝ TỰ LẠ NGAY TẠI CỬA NẠP. Đề rút từ PDF hay dính ký tự vùng dùng
+    // riêng (font Symbol) — máy học sinh không có font đó nên hiện ô vuông
+    // rỗng. Gỡ được thì gỡ; còn sót thì cờ hoá cho thầy xem ảnh gốc, KHÔNG
+    // đoán thay bằng ký tự khác. Xem `src/lib/chu-la-pdf.ts`.
+    const { cau: c, conLa } = donCau(cGoc)
     const nhan = `Phần ${c.phan} câu ${c.so}`
+    if (conLa) {
+      warnings.push(`${nhan}: còn ký tự máy không đọc được (hiện ra ô vuông rỗng) — mở ảnh đề gốc kiểm lại`)
+      c.can_xem = true
+    }
     let hinhAnh: HinhAnh[] | undefined
     if (c.hinh && c.hinh.length > 0) {
       hinhAnh = []

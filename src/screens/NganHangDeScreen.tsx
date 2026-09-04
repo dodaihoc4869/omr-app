@@ -17,6 +17,7 @@ import { caDungDe, capNhatCaDaMo, dongBoNganHang, type KetQuaDongBo } from '../l
 import { capNhatKeyBank, luuDe, xoaDe as xoaDeTrenKho } from '../lib/exam-api'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJsonText } from '../lib/exam-kho-de-import'
 import { mergeKeepAnswers, validateTeacherSource } from '../data/examContent'
+import TheCau from '../components/TheCau'
 import { useAppStore } from '../store/appStore'
 
 type CauNghi = {
@@ -460,6 +461,7 @@ function CauNghiCard({ c, onChot }: { c: CauNghi; onChot: (dapAn: string) => voi
   const nhanPhan = c.phan === 'I' ? 'Phần I' : c.phan === 'II' ? 'Phần II' : 'Phần III'
   const dapAnDe = c.phan === 'II' ? (q as TeacherTrueFalseQuestion).correct.join('') : String((q as TeacherMcqQuestion | TeacherShortAnswerQuestion).correct)
   const [tuNhap, setTuNhap] = useState('')
+  const [moDe, setMoDe] = useState(false)
   return (
     <div className="flex flex-col" style={{ gap: 'var(--k2)', padding: 'var(--k3)', borderRadius: 'var(--bo-1)', background: 'var(--the-2)' }}>
       <div className="flex items-center justify-between" style={{ gap: 'var(--k2)' }}>
@@ -468,9 +470,20 @@ function CauNghiCard({ c, onChot }: { c: CauNghi; onChot: (dapAn: string) => voi
         </b>
         <Nhan tone={q.loiGiaiTrangThai === 'thieu_dap_an' ? 'cam' : 'do'}>{q.loiGiaiTrangThai === 'thieu_dap_an' ? 'đề thiếu đáp án' : 'nghi đáp án đề sai'}</Nhan>
       </div>
-      <div className="cau-de" style={{ fontSize: 'var(--cx-2)', lineHeight: 1.6 }}>
-        <ChemText text={q.text} />
-      </div>
+      {/* Thầy phải ĐỌC ĐƯỢC CẢ CÂU mới chốt được đáp án. Bản đầu chỉ hiện thân
+          câu, không có phương án lẫn hình, nên thầy nhìn "DSDD hay DSSD" mà
+          không có gì để đối chiếu. Nay bấm ra đúng thẻ câu như màn xem lại, kèm
+          phương án, hình và lời giải. */}
+      {moDe ? (
+        <TheCauNghi c={c} />
+      ) : (
+        <div className="cau-de" style={{ fontSize: 'var(--cx-2)', lineHeight: 1.6 }}>
+          <ChemText text={q.text} />
+        </div>
+      )}
+      <button type="button" onClick={() => setMoDe((v) => !v)} className="tap-target self-start font-bold" style={{ ...NHAN_NHO, color: 'var(--muc)', textDecoration: 'underline' }} aria-expanded={moDe}>
+        {moDe ? 'Thu gọn đề' : 'Xem đề đầy đủ (phương án, hình, lời giải)'}
+      </button>
       <div className="flex flex-wrap" style={{ gap: 'var(--k2)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}>
         <span>
           Đáp án đề (đang chấm): <b>{dapAnDe}</b>
@@ -514,4 +527,35 @@ function CauNghiCard({ c, onChot }: { c: CauNghi; onChot: (dapAn: string) => voi
       </div>
     </div>
   )
+}
+
+/** Thẻ câu đầy đủ để thầy đối chiếu trước khi chốt đáp án — dùng lại đúng
+ * `TheCau` chế độ "xem_lai" của màn học sinh, không dựng thẻ câu thứ hai.
+ * `choicePerm` giữ nguyên thứ tự gốc A-B-C-D: thầy đang đối chiếu với FILE ĐỀ,
+ * xáo thứ tự ở đây là thầy chốt nhầm chữ cái. */
+function TheCauNghi({ c }: { c: CauNghi }) {
+  const q = c.q
+  const chung = {
+    cheDo: 'xem_lai' as const,
+    stt: c.idx + 1,
+    tieuDe: q.chuyenDe,
+    text: q.text,
+    thanCauImg: q.thanCauImg,
+    table: q.table,
+    imageDataUrl: q.imageDataUrl,
+    hinhAnh: q.hinhAnh,
+    explanation: q.explanation,
+    loiGiai: q.loiGiai,
+    nhanLoiGiai: q.loiGiaiTrangThai,
+  }
+  if (c.phan === 'I') {
+    const m = q as TeacherMcqQuestion
+    return <TheCau {...chung} phan="I" choices={m.choices} choiceImgs={m.choiceImgs} choicePerm={[0, 1, 2, 3]} selected={null} correct={m.correct} />
+  }
+  if (c.phan === 'II') {
+    const t = q as TeacherTrueFalseQuestion
+    return <TheCau {...chung} phan="II" ideas={t.ideas} ideaImgs={t.ideaImgs} selected={[null, null, null, null]} correct={t.correct} />
+  }
+  const s = q as TeacherShortAnswerQuestion
+  return <TheCau {...chung} phan="III" selected={null} correct={s.correct} />
 }

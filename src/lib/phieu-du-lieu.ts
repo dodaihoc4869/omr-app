@@ -173,6 +173,74 @@ export interface NguonPhieu {
  * bài chữa lỗi ngay sau một bài kiểm tra, không phải bộ đề ôn cả chương. */
 export const SO_CAU_BAI_TAP_KEM = 10
 
+/** Nguồn để dựng báo cáo NGAY TRÊN MÁY HỌC SINH, sau khi em nộp bài.
+ *
+ * Máy em có đủ bài làm, giây từng câu và ngân hàng CÓ đáp án của ca (khi thầy
+ * bật công bố điểm), nên dựng được báo cáo mà KHÔNG gọi thêm lệnh máy chủ nào
+ * và không mở thêm đường đọc dữ liệu nào — đây là lý do không làm bằng cách cho
+ * máy em hỏi máy chủ "phiếu của em đâu".
+ *
+ * Những mục cần dữ liệu chỉ thầy có (hạng trong lớp, phân bố điểm cả lớp, lịch
+ * sử các ca, bản đồ chuyên đề cả quá trình) thì để trống và trang báo cáo GIẤU
+ * HẲN mục đó — không dựng mục rỗng, không bịa số. */
+export interface NguonPhieuMayEm {
+  hoTen: string
+  sbd: string
+  lop?: string
+  maCa: string
+  tenCa?: string
+  nopLuc: string
+  vaoLuc?: string | null
+  thoiLuongPhut?: number | null
+  diem: number
+  diemPhan?: { I: number; II: number; III: number } | null
+  rows: ChiTietCauRow[]
+  banks: TeacherExamSource[]
+}
+
+export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
+  const cauSai = dungCauSai(n.rows, n.banks)
+  const tk = thongKeLamBai(n.rows, { vaoLuc: n.vaoLuc, nopLuc: n.nopLuc, thoiLuongPhut: n.thoiLuongPhut })
+
+  const gom = new Map<string, { ten: string; soCau: number; soSai: number }>()
+  for (const r of n.rows) {
+    const ten = r.chuyenDe || ''
+    if (!ten) continue
+    const cu = gom.get(ten) ?? { ten, soCau: 0, soSai: 0 }
+    cu.soCau += 1
+    if (!r.dungSai) cu.soSai += 1
+    gom.set(ten, cu)
+  }
+  const chuyenDeCa = [...gom.values()]
+
+  return {
+    v: BAN_PHIEU,
+    hoTen: n.hoTen || '',
+    sbd: n.sbd || '',
+    lop: n.lop || '',
+    tenCa: n.tenCa || '',
+    maCa: n.maCa || '',
+    ngay: n.nopLuc || '',
+    diem: n.diem,
+    diemPhan: n.diemPhan ?? null,
+    soCauSai: tk.soSai,
+    tongSoCau: tk.tongCau,
+    // Máy em KHÔNG biết bảng điểm cả lớp — để trống, trang báo cáo tự giấu mục.
+    hang: null,
+    siSo: null,
+    chuyenDeCa,
+    chuyenDeTong: [],
+    lichSu: [],
+    diemLop: [],
+    vieCanLam: '',
+    thongKe: tk,
+    tinHieu: tinHieuLamBai(tk),
+    ducKet: ducKetKienThuc(cauSai.map((c) => ({ chuyenDe: c.chuyenDe, chot: c.chot }))),
+    cauSai,
+    dai: n.rows.map((r) => ({ nhan: `Phần ${r.phan} câu ${r.soCau}`, giay: r.giay, dung: Boolean(r.dungSai) })),
+  }
+}
+
 export function dungPhieu(n: NguonPhieu): PhieuDayDu {
   const rows = n.rows ?? []
   const banks = n.banks ?? []

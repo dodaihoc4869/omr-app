@@ -501,8 +501,12 @@ function TheCauSai({ c, stt }: { c: CauSaiChiTiet; stt: number }) {
 }
 
 // ------------------------------------------------------------------- màn hình
-export default function PhieuScreen() {
-  const [du, setDu] = useState<PhieuDayDu | null | undefined>(undefined)
+/** `duCoSan` = báo cáo đã dựng sẵn tại chỗ, không phải tải từ máy chủ. Dùng cho
+ * màn "Đã nộp bài" của học sinh: máy em đã có đủ bài làm và ngân hàng đáp án,
+ * không cần thầy tạo link trước, và cũng không mở thêm đường đọc nào trên máy
+ * chủ. */
+export default function PhieuScreen({ duCoSan }: { duCoSan?: PhieuDayDu } = {}) {
+  const [du, setDu] = useState<PhieuDayDu | null | undefined>(duCoSan ?? undefined)
   const [loi, setLoi] = useState('')
   const daChay = useRef(false)
 
@@ -528,10 +532,14 @@ export default function PhieuScreen() {
   }, [])
 
   useEffect(() => {
+    if (duCoSan) {
+      setDu(duCoSan)
+      return
+    }
     if (daChay.current) return
     daChay.current = true
     void nap()
-  }, [nap])
+  }, [nap, duCoSan])
 
   useEffect(() => {
     if (du) document.title = `Báo cáo học tập ${du.hoTen || du.sbd}`

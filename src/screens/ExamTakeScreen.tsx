@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { PublicExamBank, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
+import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
 import { vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
-import { taoBaiGhiDiem } from '../lib/chi-tiet-cau'
+import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
+import { dungPhieuMayEm, type PhieuDayDu } from '../lib/phieu-du-lieu'
+import PhieuScreen from './PhieuScreen'
 import { gioMayChu, gioNgan } from '../lib/gio-may-chu'
 import { layIdThietBi } from '../lib/thiet-bi'
 import { chuanHoaNguong, khoaViRoiLau, loiCanhBao, mucKhiRoiMan, soLanTinhTu, type NguongGianLan } from '../lib/chong-gian-lan'
@@ -195,6 +197,8 @@ export default function ExamTakeScreen() {
   // "Xem lại lời giải" mở lại được bất cứ lúc nào trong phiên này mà không
   // cần gọi mạng lại. Chỉ tồn tại khi thầy bật "xem điểm ngay" cho ca này.
   const [keyBank, setKeyBank] = useState<KeyBank | null>(null)
+  // Màn báo cáo học tập của chính em, mở từ màn "Đã nộp bài".
+  const [xemBaoCao, setXemBaoCao] = useState(false)
   const [xemLoiGiai, setXemLoiGiai] = useState(false)
 
   // ---- Trạng thái riêng của màn làm bài ----
@@ -301,6 +305,32 @@ export default function ExamTakeScreen() {
     if (!keyBank || !attempt) return null
     return assignStudentQuestions(keyBank, attempt.maCa, attempt.sbd)
   }, [keyBank, attempt])
+
+  // BÁO CÁO HỌC TẬP dựng NGAY TRÊN MÁY EM. Không gọi thêm lệnh máy chủ nào:
+  // máy em đã có bài làm, giây từng câu và ngân hàng CÓ đáp án của ca. Mục nào
+  // cần dữ liệu chỉ thầy có (hạng lớp, phân bố điểm, lịch sử ca) thì trang báo
+  // cáo tự giấu, chứ không dựng mục rỗng.
+  const phieuCuaEm: PhieuDayDu | null = useMemo(() => {
+    if (!keyBank || !attempt || !graded) return null
+    try {
+      const banks: TeacherExamSource[] = [{ maDe: attempt.maDe || attempt.maCa, phanI: keyBank.phanI, phanII: keyBank.phanII, phanIII: keyBank.phanIII }]
+      const rows = taoChiTietCau(keyBank, attempt.maCa, attempt.sbd, attempt.answers, attempt.giayCau)
+      return dungPhieuMayEm({
+        hoTen: hoTen.trim(),
+        sbd: attempt.sbd,
+        maCa: attempt.maCa,
+        nopLuc: attempt.submittedAt || new Date().toISOString(),
+        vaoLuc: attempt.startedAt,
+        thoiLuongPhut: attempt.durationMinutes,
+        diem: graded.score.total,
+        diemPhan: { I: graded.score.phanIScore, II: graded.score.phanIIScore, III: graded.score.phanIIIScore },
+        rows,
+        banks,
+      })
+    } catch {
+      return null
+    }
+  }, [keyBank, attempt, graded, hoTen])
   useEffect(() => {
     totalCountRef.current = assignment ? assignment.phanI.length + assignment.phanII.length + assignment.phanIII.length : 0
   }, [assignment])
@@ -955,6 +985,38 @@ export default function ExamTakeScreen() {
   }
 
   // ------------------------------------------------------- XEM LẠI LỜI GIẢI
+  if (phase === 'submitted' && xemBaoCao && phieuCuaEm) {
+    return (
+      <div style={{ minHeight: '100vh', position: 'relative' }}>
+        <button
+          type="button"
+          onClick={() => setXemBaoCao(false)}
+          className="tap-target font-bold"
+          style={{
+            position: 'fixed',
+            left: 12,
+            top: 12,
+            zIndex: 20,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            height: 40,
+            padding: '0 14px',
+            borderRadius: 999,
+            background: 'var(--muc)',
+            color: 'var(--muc-nguoc)',
+            fontFamily: 'var(--sans)',
+            fontSize: 'var(--cx-1)',
+            boxShadow: 'var(--bong-2)',
+          }}
+        >
+          <ArrowLeft size={16} /> Quay lại
+        </button>
+        <PhieuScreen duCoSan={phieuCuaEm} />
+      </div>
+    )
+  }
+
   if (phase === 'submitted' && xemLoiGiai && solutionAssignment && attempt) {
     let stt = 0
     return (
@@ -1148,6 +1210,11 @@ export default function ExamTakeScreen() {
           {graded && !attempt?.integrity.blocked && (
             <NutChinh onClick={() => setGradedPopup(true)}>
               Xem điểm chi tiết
+            </NutChinh>
+          )}
+          {phieuCuaEm && (
+            <NutChinh variant="phu" onClick={() => setXemBaoCao(true)}>
+              Xem báo cáo học tập
             </NutChinh>
           )}
           {keyBank && solutionAssignment && (
