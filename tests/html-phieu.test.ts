@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { CauLuyen } from '../src/lib/bai-tap-pdf'
-import { biaHtml, chuHtml, ngayVN, oGiaiHtml, taiLieuHtml, theCauHtml, thoat, tongQuanHtml } from '../src/lib/html-phieu'
+import { biaHtml, chuHtml, ngayVN, oGiaiHtml, taiLieuHtml, theCauHtml, theGiaiHtml, thoat, tongQuanHtml } from '../src/lib/html-phieu'
 
 const C = (o: Partial<CauLuyen>): CauLuyen =>
   ({ phan: 'I', id: 'x', chuyenDe: 'Ester – lipid', mucDo: 'biet', text: 'Đề', luaChon: null, dapAn: '', chot: '', lyDo: null, buoc: null, ketQua: '', ...o }) as CauLuyen
@@ -100,13 +100,11 @@ describe('theCauHtml — Phần III', () => {
     expect(h).not.toContain('100')
   })
 
-  it('bản lời giải in đáp án, các bước và kết quả', () => {
+  it('trang đề in đáp án nhưng KHÔNG in các bước — bước để dành cho trang lời giải', () => {
     const h = theCauHtml(sa, 1, true)
     expect(h).toContain('sa-answer')
     expect(h).toContain('100')
-    expect(h).toContain('1. Tính số mol')
-    expect(h).toContain('2. Suy ra thể tích')
-    expect(h).toContain('V = 100 ml')
+    expect(h).not.toContain('Làm từng bước')
   })
 })
 
@@ -114,10 +112,11 @@ describe('oGiaiHtml', () => {
   it('câu không có gì để giải thì KHÔNG in ô rỗng', () => {
     expect(oGiaiHtml(C({}))).toBe('')
   })
-  it('chỉ có chốt thì in mỗi hướng làm', () => {
-    const h = oGiaiHtml(C({ chot: 'x' }))
+  it('ô kem trang đề chỉ in câu chốt, một dòng', () => {
+    const h = oGiaiHtml(C({ chot: 'x', buoc: ['b'], ketQua: 'k' }))
     expect(h).toContain('Hướng làm')
     expect(h).not.toContain('Làm từng bước')
+    expect(h).not.toContain('Kết quả')
   })
 })
 
@@ -130,7 +129,7 @@ describe('bìa và tổng quan', () => {
     expect(h).toContain('12121212')
     expect(h).toContain('04/09/2026')
     expect(h).toContain('20 Câu')
-    expect(h).toContain('ESTER – LIPID')
+    expect(h).toContain('ESTER<br>– LIPID')
   })
 
   it('không có dòng kết quả thì KHÔNG in ô kết quả rỗng', () => {
@@ -139,6 +138,18 @@ describe('bìa và tổng quan', () => {
 
   it('bìa bản lời giải đổi nhãn', () => {
     expect(biaHtml({ ...t, hienDapAn: true }, 5)).toContain('Lời giải chi tiết')
+  })
+
+  it('mức độ xen kẽ thì KHÔNG ghi khoảng "Câu 1–9" — nói sai số câu', () => {
+    const cau = [C({ mucDo: 'biet' }), C({ mucDo: 'hieu' }), C({ mucDo: 'biet' })]
+    const h = tongQuanHtml(cau)
+    expect(h).toContain('Câu 1, 3 · 2 câu')
+    expect(h).not.toContain('Câu 1–3 · 2 câu')
+  })
+
+  it('mức độ đứng liền nhau thì ghi khoảng cho gọn', () => {
+    const cau = [C({ mucDo: 'biet' }), C({ mucDo: 'biet' }), C({ mucDo: 'hieu' })]
+    expect(tongQuanHtml(cau)).toContain('Câu 1–2 · 2 câu')
   })
 
   it('tổng quan đếm đúng số câu từng phần', () => {
@@ -161,5 +172,60 @@ describe('taiLieuHtml', () => {
     expect(h).toContain('charset="UTF-8"')
     expect(h).toContain('@page { size: A4')
     expect(h).toContain('print-color-adjust: exact')
+  })
+})
+
+describe('theGiaiHtml — trang Lời giải chi tiết', () => {
+  it('KHÔNG in lại phương án — trang giải phải gọn hơn trang đề', () => {
+    const h = theGiaiHtml(MCQ, 1)
+    expect(h).not.toContain('q-options')
+    expect(h).not.toContain('q-opt-letter')
+  })
+
+  it('nhãn chỉ còn mức độ và đáp án, bỏ nhãn loại và chuyên đề', () => {
+    const h = theGiaiHtml(MCQ, 1)
+    expect(h).toContain('Đáp án: C')
+    expect(h).not.toContain('type-mc')
+  })
+
+  it('in lý do TỪNG phương án, đánh dấu ✓ ở phương án đúng', () => {
+    const c = C({ dapAn: 'B', lyDo: [
+      { khoa: 'A', dung: false, ly: 'sai vì x' },
+      { khoa: 'B', dung: true, ly: 'đúng vì y' },
+    ] })
+    const h = theGiaiHtml(c, 2)
+    expect(h).toContain('<strong>A.</strong> sai vì x')
+    expect(h).toContain('<strong>B.</strong> ✓ đúng vì y')
+  })
+
+  it('Phần II đổi DSSD thành Đ S S Đ và đánh ✓ đúng ý', () => {
+    const c = C({ phan: 'II', dapAn: 'DSSD', lyDo: [
+      { khoa: 'a', dung: true, ly: 'la' },
+      { khoa: 'b', dung: false, ly: 'lb' },
+      { khoa: 'c', dung: false, ly: 'lc' },
+      { khoa: 'd', dung: true, ly: 'ld' },
+    ] })
+    const h = theGiaiHtml(c, 3)
+    expect(h).toContain('Đáp án: Đ S S Đ')
+    expect(h).toContain('<strong>a.</strong> ✓ la')
+    expect(h).toContain('<strong>b.</strong> lb')
+    expect(h).toContain('<strong>d.</strong> ✓ ld')
+    expect(h).toContain('Vì sao từng ý')
+  })
+
+  it('không có lý do từng phương án thì rơi về câu chốt', () => {
+    const h = theGiaiHtml(C({ dapAn: 'A', chot: 'chốt đây' }), 1)
+    expect(h).toContain('Hướng làm')
+    expect(h).toContain('chốt đây')
+  })
+
+  it('câu không có gì để giải thì KHÔNG in ô kem rỗng', () => {
+    expect(theGiaiHtml(C({ dapAn: 'A' }), 1)).not.toContain('sol-box')
+  })
+
+  it('in các bước và kết quả cho câu trả lời ngắn', () => {
+    const h = theGiaiHtml(C({ phan: 'III', dapAn: '100', buoc: ['Tính số mol', 'Suy ra thể tích'], ketQua: 'V = 100 ml' }), 4)
+    expect(h).toContain('1. Tính số mol')
+    expect(h).toContain('V = 100 ml')
   })
 })

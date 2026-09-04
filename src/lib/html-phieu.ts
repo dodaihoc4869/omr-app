@@ -170,7 +170,11 @@ sub { font-size: 0.72em; vertical-align: -0.25em; }
 sup { font-size: 0.72em; vertical-align: 0.42em; }
 `
 
-/** Một thẻ câu. `stt` là số thứ tự liên tục trên cả phiếu. */
+/** Một thẻ câu ở phần ĐỀ BÀI: nhãn loại + mức độ + chuyên đề, đủ phương án,
+ * phương án đúng tô xanh, ô kem "Hướng làm". Đúng như mẫu thầy chốt — phiếu
+ * này là bản ôn, không phải bài kiểm tra bịt đáp án.
+ *
+ * `stt` là số thứ tự liên tục trên cả phiếu. */
 export function theCauHtml(c: CauLuyen, stt: number, hienDapAn: boolean): string {
   const tags = [
     `<span class="q-tag ${LOP_LOAI[c.phan]}">${TEN_LOAI[c.phan]}</span>`,
@@ -210,18 +214,51 @@ export function theCauHtml(c: CauLuyen, stt: number, hienDapAn: boolean): string
 </div>`
 }
 
-/** Ô kem: hướng làm, các bước, kết quả. Mục nào rỗng thì không in ra. */
+/** Ô kem ở trang ĐỀ BÀI: chỉ câu chốt, một dòng. Phần dài (vì sao từng phương
+ * án, các bước) để dành cho trang Lời giải chi tiết — nhồi hết vào trang đề là
+ * mỗi trang chỉ còn hai câu. */
 export function oGiaiHtml(c: CauLuyen): string {
+  if (!c.chot) return ''
+  return `<div class="sol-box"><div class="sol-label">💡 Hướng làm</div><div class="sol-text">${chuHtml(c.chot)}</div></div>`
+}
+
+/** Đáp án in ra chữ cho nhãn "Đáp án: …". Phần II đổi DSDD thành Đ Đ S S. */
+export function dapAnChu(c: CauLuyen): string {
+  if (c.phan === 'II' && /^[DS]{2,4}$/.test(c.dapAn)) return c.dapAn.split('').map((k) => (k === 'D' ? 'Đ' : 'S')).join(' ')
+  return c.dapAn || '—'
+}
+
+/** THẺ Ở TRANG LỜI GIẢI CHI TIẾT — gọn hơn hẳn trang đề: không in lại phương
+ * án, chỉ nhãn mức độ + đáp án, rồi ô kem giải thích. Đúng mẫu thầy chốt. */
+export function theGiaiHtml(c: CauLuyen, stt: number): string {
+  const tags = [
+    c.mucDo ? `<span class="q-tag ${LOP_MUC[c.mucDo]}">${TEN_MUC[c.mucDo]}</span>` : '',
+    `<span class="q-tag topic">Đáp án: ${thoat(dapAnChu(c))}</span>`,
+  ].join(' ')
+
   const khoi: string[] = []
-  if (c.chot) khoi.push(`<div class="sol-label">💡 Hướng làm</div><div class="sol-text">${chuHtml(c.chot)}</div>`)
+  const dungKhoa = c.phan === 'II' ? CHU_Y.filter((_, i) => ysDung(c.dapAn)[i]) : [(c.dapAn || '').trim().toUpperCase()]
+  if (c.lyDo && c.lyDo.length > 0) {
+    const dong = c.lyDo
+      .map((l) => `<strong>${thoat(l.khoa)}.</strong> ${dungKhoa.includes(l.khoa) ? '✓ ' : ''}${chuHtml(l.ly)}`)
+      .join('<br>')
+    khoi.push(`<div class="sol-label">💡 ${c.phan === 'II' ? 'Vì sao từng ý' : 'Vì sao từng phương án'}</div><div class="sol-text">${dong}</div>`)
+  } else if (c.chot) {
+    khoi.push(`<div class="sol-label">💡 Hướng làm</div><div class="sol-text">${chuHtml(c.chot)}</div>`)
+  }
   const buoc = c.buoc ?? []
   if (buoc.length > 0) {
     const ds = buoc.map((b, i) => `<div class="sol-step">${i + 1}. ${chuHtml(b)}</div>`).join('')
-    khoi.push(`<div class="sol-label" style="margin-top:5px">Làm từng bước</div>${ds}`)
+    khoi.push(`<div class="sol-label"${khoi.length ? ' style="margin-top:5px"' : ''}>Làm từng bước</div>${ds}`)
   }
   if (c.ketQua) khoi.push(`<div class="sol-label" style="margin-top:5px">Kết quả</div><div class="sol-text" style="font-weight:700">${chuHtml(c.ketQua)}</div>`)
-  if (khoi.length === 0) return ''
-  return `<div class="sol-box">${khoi.join('')}</div>`
+  // Không có gì để giải thì vẫn in thẻ, nhưng KHÔNG in ô kem rỗng.
+  const oKem = khoi.length > 0 ? `<div class="sol-box">${khoi.join('')}</div>` : ''
+
+  return `<div class="q-card correct">
+  <div class="q-header"><div class="q-num">${stt}</div><div style="flex:1"><div class="q-tags">${tags}</div><div class="q-text" style="font-size:12px">${chuHtml(c.text)}</div></div></div>
+  ${oKem}
+</div>`
 }
 
 export function biaHtml(t: ThongTinPhieu, soCau: number): string {
@@ -230,7 +267,11 @@ export function biaHtml(t: ThongTinPhieu, soCau: number): string {
     <div class="cover-info-label" style="color:#fca5a5;">Kết quả</div>
     <div class="cover-info-value" style="color:#fca5a5;">${thoat(t.ketQua)}</div></div>`
     : ''
+  // Tên chuyên đề xuống DÒNG THỨ HAI ở dấu phân cách, đúng như mẫu
+  // ("ESTER" / "& LIPID"). Một dòng dài 52px là tràn khỏi bìa với tên như
+  // "Hydrocarbon không no", và khối chữ cũng lệch hẳn so với mẫu.
   const ten = thoat(t.tenChuyenDe || 'Hoá học').toUpperCase()
+  const tenHaiDong = ten.replace(/\s*([–—-])\s*/, '<br>$1 ').replace(/\s+&\s+/, '<br>& ')
   return `<div class="cover">
   <div class="cover-blob b1"></div><div class="cover-blob b2"></div>
   <div class="cover-molecule m1">RCOOR'</div>
@@ -238,7 +279,7 @@ export function biaHtml(t: ThongTinPhieu, soCau: number): string {
   <div class="cover-molecule m3">C<sub>9</sub>H<sub>8</sub>O<sub>4</sub></div>
   <div class="cover-content">
     <div class="cover-badge">${t.hienDapAn ? 'Lời giải chi tiết' : 'Phiếu Bài Tập Riêng'}</div>
-    <div class="cover-title">${ten}</div>
+    <div class="cover-title">${tenHaiDong}</div>
     <div class="cover-subtitle">Bài tập Hóa học Hữu cơ</div>
     <div class="cover-chemical">RCOOR'</div>
     <div class="cover-info">
@@ -264,8 +305,12 @@ export function tongQuanHtml(cau: CauLuyen[]): string {
       const ds = cau.map((c, i) => ({ c, i })).filter((x) => x.c.mucDo === k)
       if (ds.length === 0) return ''
       const so = ds.map((x) => x.i + 1)
+      // Chỉ ghi khoảng "Câu 1–5" khi các câu ĐỨNG LIỀN NHAU. Mức độ xen kẽ mà
+      // vẫn ghi khoảng là nói sai: "Câu 1–9" trong khi mức đó chỉ có 5 câu.
+      const lien = so[so.length - 1] - so[0] + 1 === so.length
+      const nhan = lien ? `Câu ${so[0]}–${so[so.length - 1]}` : `Câu ${so.join(', ')}`
       const cd = [...new Set(ds.map((x) => x.c.chuyenDe).filter(Boolean))].join(', ')
-      return `<div class="topic-item"><div class="topic-dot" style="background:${mau};"></div><span><strong>${ten}:</strong> Câu ${so[0]}–${so[so.length - 1]} · ${ds.length} câu${cd ? ` — ${thoat(cd)}` : ''}</span></div>`
+      return `<div class="topic-item"><div class="topic-dot" style="background:${mau};"></div><span><strong>${ten}:</strong> ${nhan} · ${ds.length} câu${cd ? ` — ${thoat(cd)}` : ''}</span></div>`
     })
     .join('')
   return `<div class="page summary-page">
@@ -280,9 +325,9 @@ export function tongQuanHtml(cau: CauLuyen[]): string {
 </div>`
 }
 
-export function dauTrangHtml(t: ThongTinPhieu, phu: string, so: number, tong: number): string {
+export function dauTrangHtml(_t: ThongTinPhieu, tieu: string, phu: string, so: number, tong: number): string {
   return `<div class="page-header"><div class="page-header-left"><div class="page-logo">H</div>
-    <div><div class="page-title">${thoat(t.tenChuyenDe)} · ${t.hienDapAn ? 'Lời giải' : 'Đề bài'}</div><div class="page-subtitle">${thoat(phu)}</div></div>
+    <div><div class="page-title">${thoat(tieu)}</div><div class="page-subtitle">${thoat(phu)}</div></div>
   </div><div class="page-number">${so}/${tong}</div></div>`
 }
 

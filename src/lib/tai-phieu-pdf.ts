@@ -21,7 +21,7 @@
 // in của trình duyệt, chọn "Lưu thành PDF", ra bản vector.
 import { jsPDF } from 'jspdf'
 import type { CauLuyen } from './bai-tap-pdf'
-import { biaHtml, chanTrangHtml, CSS_PHIEU, dauTrangHtml, taiLieuHtml, theCauHtml, tongQuanHtml, type ThongTinPhieu } from './html-phieu'
+import { biaHtml, chanTrangHtml, CSS_PHIEU, dauTrangHtml, taiLieuHtml, theCauHtml, theGiaiHtml, tongQuanHtml, type ThongTinPhieu } from './html-phieu'
 
 /** A4 ở 96 dpi — đúng đơn vị `mm` trong CSS quy ra pixel trình duyệt. */
 const RONG_PX = 794
@@ -47,13 +47,30 @@ function khungAn(): HTMLIFrameElement {
   return f
 }
 
+/** Bề rộng vùng chữ trong trang: 210mm trừ hai lề 14mm. */
+const RONG_TRONG = Math.round(RONG_PX - (14 / 210) * RONG_PX * 2)
+/** Chiều cao còn cho thẻ câu, tính bằng số THẬT của CSS thay vì ước lượng:
+ *   · lề trên 12mm = 45px, đầu trang 58px (logo 36 + đệm 8 + viền 2 + cách 12)
+ *     ⇒ chữ bắt đầu ở 103px.
+ *   · chân trang neo `bottom: 5mm` (19px), cao ~17px ⇒ mép trên ở 1087px.
+ *   · chừa 10px cho thẻ cuối không chạm chân trang.
+ * Đặt hụt 50px như bản đầu là mỗi trang mất đúng một câu. */
+const CAO_TRONG = Math.round(CAO_PX - 19 - 17 - 10 - (103 / 1123) * CAO_PX)
+
 /** Chia các thẻ câu vào từng trang theo chiều cao THẬT sau khi trình duyệt bố
- * cục. Trả về mảng HTML của phần thân mỗi trang. */
-export function chiaTrang(doc: Document, cauHtml: string[], caoConLai: number): string[] {
+ * cục.
+ *
+ * BẪY ĐÃ DÍNH 04-09: ô đo ban đầu để `class="page"`, mà `.page` có
+ * `height: 297mm` cố định nên `scrollHeight` LUÔN ≥ 1123px, tức luôn vượt
+ * ngưỡng ngay từ thẻ đầu tiên ⇒ mỗi trang đúng một câu. Ô đo phải là một khối
+ * TỰ CO, chỉ đặt đúng bề rộng vùng chữ. */
+export function chiaTrang(doc: Document, cauHtml: string[], caoConLai: number = CAO_TRONG): string[] {
   const do_ = doc.createElement('div')
-  do_.className = 'page'
   do_.style.position = 'absolute'
   do_.style.left = '-99999px'
+  do_.style.top = '0'
+  do_.style.width = `${RONG_TRONG}px`
+  do_.style.height = 'auto'
   doc.body.appendChild(do_)
 
   const trang: string[] = []
@@ -61,7 +78,7 @@ export function chiaTrang(doc: Document, cauHtml: string[], caoConLai: number): 
   for (const h of cauHtml) {
     const thu = [...dang, h]
     do_.innerHTML = thu.join('')
-    if (do_.scrollHeight > caoConLai && dang.length > 0) {
+    if (do_.offsetHeight > caoConLai && dang.length > 0) {
       trang.push(dang.join(''))
       dang = [h]
     } else {
@@ -73,10 +90,12 @@ export function chiaTrang(doc: Document, cauHtml: string[], caoConLai: number): 
   return trang
 }
 
-function phuTrang(cau: CauLuyen[], tu: number, den: number): string {
+function phuTrang(cau: CauLuyen[], tu: number, den: number, truocSo: boolean): string {
   const lat = cau.slice(tu, den)
   const muc = [...new Set(lat.map((c) => (c.mucDo ? (TEN_MUC[c.mucDo] ?? c.mucDo) : '')).filter(Boolean))]
-  return `${muc.join(' · ') || 'Bài tập'} · Câu ${tu + 1}–${den}`
+  const m = muc.join(' · ') || 'Bài tập'
+  const so = `Câu ${tu + 1}–${den}`
+  return truocSo ? `${m} · ${so}` : `${so} · ${m}`
 }
 
 export interface KetQuaDungPhieu {
@@ -101,21 +120,28 @@ export async function dungPhieuHtml(t: ThongTinPhieu, cau: CauLuyen[]): Promise<
   await new Promise((r) => setTimeout(r, 60))
 
   try {
-    const the = cau.map((c, i) => theCauHtml(c, i + 1, t.hienDapAn))
-    // Trang có đầu trang (~56px) và chân trang (~40px) trong vùng padding.
-    const caoTrong = CAO_PX - 45 - 57 - 56 - 40
-    const nhom = chiaTrang(d, the, caoTrong)
+    // MỘT tài liệu duy nhất: bìa · tổng quan · các trang ĐỀ BÀI · các trang
+    // LỜI GIẢI CHI TIẾT. Bản trước dựng hai tài liệu rời rồi nối, nên bìa và
+    // trang tổng quan hiện HAI LẦN — đúng chỗ thầy bảo bỏ.
+    const nhomDe = chiaTrang(d, cau.map((c, i) => theCauHtml(c, i + 1, true)))
+    const nhomGiai = chiaTrang(d, cau.map((c, i) => theGiaiHtml(c, i + 1)))
+    const tongTrang = nhomDe.length + nhomGiai.length
 
-    let dem = 0
-    const tongTrang = nhom.length
-    const trang = nhom.map((than, i) => {
-      const tu = dem
-      dem += (than.match(/class="q-card/g) || []).length
-      return `<div class="page">${dauTrangHtml(t, phuTrang(cau, tu, dem), i + 1, tongTrang)}${than}${chanTrangHtml(t, i + 1, tongTrang)}</div>`
-    })
+    let so = 0
+    const veTrang = (nhom: string[], tieu: string, truocSo: boolean) => {
+      let dem = 0
+      return nhom.map((than) => {
+        const tu = dem
+        dem += (than.match(/class="q-card/g) || []).length
+        so += 1
+        return `<div class="page">${dauTrangHtml(t, tieu, phuTrang(cau, tu, dem, truocSo), so, tongTrang)}${than}${chanTrangHtml(t, so, tongTrang)}</div>`
+      })
+    }
+    const trangDe = veTrang(nhomDe, `${t.tenChuyenDe} · Đề bài`, true)
+    const trangGiai = veTrang(nhomGiai, 'Lời Giải Chi Tiết', false)
 
-    const than = [biaHtml(t, cau.length), tongQuanHtml(cau), ...trang].join('\n')
-    return { html: taiLieuHtml(than, `${t.hienDapAn ? 'Lời giải' : 'Phiếu bài tập'} ${t.hoTen}`), soTrang: tongTrang + 2 }
+    const than = [biaHtml(t, cau.length), tongQuanHtml(cau), ...trangDe, ...trangGiai].join('\n')
+    return { html: taiLieuHtml(than, `Phiếu bài tập ${t.hoTen}`), soTrang: tongTrang + 2 }
   } finally {
     f.remove()
   }
@@ -142,14 +168,17 @@ export async function phieuThanhPdf(html: string): Promise<Blob> {
 
     const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' })
     for (let i = 0; i < trang.length; i++) {
-      const canvas = await html2canvas(trang[i], {
+      // Lấy đúng cỡ THẬT của trang chứ không gõ cứng 794x1123: 210mm quy ra
+      // 793,7px, lệch nửa pixel là bộ chụp căn giữa lệch theo.
+      const el = trang[i]
+      const canvas = await html2canvas(el, {
         scale: PHONG,
         useCORS: true,
         backgroundColor: '#ffffff',
-        width: RONG_PX,
-        height: CAO_PX,
-        windowWidth: RONG_PX,
-        windowHeight: CAO_PX,
+        width: el.offsetWidth,
+        height: el.offsetHeight,
+        windowWidth: el.offsetWidth,
+        windowHeight: el.offsetHeight,
         logging: false,
       })
       // JPEG chất lượng 0,92: nền chuyển sắc mượt mà tệp nhỏ hơn PNG vài lần.
