@@ -10,6 +10,7 @@ import { chuanHoaDuongDan } from './lib/vai-tro'
 import { donPhienCu } from './lib/don-phien-cu'
 import { batTuHoiBanMoi, daySangBanMoi } from './lib/cap-nhat-app'
 import { batSuKienCaiApp } from './lib/pwa-install'
+import { batLoiThieuManh } from './lib/nap-manh'
 
 // Dọn thiết lập cũ nếu cấu trúc dữ liệu đã đổi. Chạy trước mọi logic khác;
 // KHÔNG đụng id thiết bị và IndexedDB (xem don-phien-cu.ts).
@@ -24,6 +25,12 @@ chuanHoaDuongDan(import.meta.env.BASE_URL)
 // nghe từ đây, không nghe được trong component. Có nó thì thẻ "Cài app lên màn
 // hình chính" ở màn Kiểm tra cài được 1 chạm.
 batSuKienCaiApp()
+
+// MÁY ĐANG MỞ SẴN BẢN CŨ thì mọi mảnh mã tải sau (phiếu, bộ dựng đề) đi xin
+// đúng tên tệp của bản cũ — tên đó đã bị xoá khỏi máy chủ khi đẩy bản mới lên.
+// Bắt đúng lỗi ấy rồi tự tải lại một lần, thay vì để thầy nhìn dòng lỗi tiếng
+// Anh và tưởng hỏng app. Xem nap-manh.ts.
+batLoiThieuManh()
 
 // BẢN MỚI PHẢI VỀ NGAY LẦN MỞ ĐẦU. Ba lớp cùng lo việc này:
 //   1. sw.js tự gọi skipWaiting + clientsClaim lúc cài (vite.config.ts) — bản

@@ -16,6 +16,7 @@ import type { CauLuyen } from '../lib/bai-tap-pdf'
 import type { ThongTinPhieu } from '../lib/html-phieu'
 import { luuPhieu, sinhMaPhieu } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
+import { napDong } from '../lib/nap-manh'
 import { taoLinkPhieu } from '../lib/phieu-link'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -75,7 +76,7 @@ export default function NutPhieuHtml({ dungGoi, nhanXem, showToast, choPhepLink 
     try {
       const g = await dungGoi()
       if (!g) return
-      const { dungPhieuHtml, moHtml } = await import('../lib/tai-phieu-pdf')
+      const { dungPhieuHtml, moHtml } = await napDong(() => import('../lib/tai-phieu-pdf'))
       moHtml(dungPhieuHtml(g.tt, g.cau))
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không dựng được phiếu', 'error')

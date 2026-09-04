@@ -29,6 +29,7 @@ import {
 } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 import { datDangLamBai } from '../lib/cap-nhat-app'
+import { napDong } from '../lib/nap-manh'
 
 /** Đang toàn màn hình: đã thêm vào màn hình chính (standalone) HOẶC Fullscreen API đang bật. */
 function dangToanManHinh(): boolean {
@@ -321,7 +322,9 @@ export default function ExamTakeScreen() {
         ...solutionAssignment.phanII.map((a) => ({ phan: 'II' as const, q: a.question as TeacherTrueFalseQuestion })),
         ...solutionAssignment.phanIII.map((a) => ({ phan: 'III' as const, q: a.question as TeacherShortAnswerQuestion })),
       ]
-      const [{ cauLuyenTuBoCau }, { dungPhieuHtml, moHtml }] = await Promise.all([import('../lib/bai-tap-pdf'), import('../lib/tai-phieu-pdf')])
+      const [{ cauLuyenTuBoCau }, { dungPhieuHtml, moHtml }] = await napDong(() =>
+        Promise.all([import('../lib/bai-tap-pdf'), import('../lib/tai-phieu-pdf')]),
+      )
       const cau = cauLuyenTuBoCau(bo)
       const cd = [...new Set(cau.map((c) => c.chuyenDe).filter(Boolean))]
       const html = dungPhieuHtml(

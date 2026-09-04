@@ -19,6 +19,7 @@ import { classify } from '../engine/score'
 import { docMaTuHash } from '../lib/phieu-link'
 import { layPhieu } from '../lib/exam-api'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
+import { napDong } from '../lib/nap-manh'
 import { BAN_PHIEU, type CauSaiChiTiet, type PhieuDayDu } from '../lib/phieu-du-lieu'
 import type { ThongTinPhieu } from '../lib/html-phieu'
 import type { CauLuyen } from '../lib/bai-tap-pdf'
@@ -532,7 +533,7 @@ export default function PhieuScreen({ duCoSan }: { duCoSan?: PhieuDayDu } = {}) 
       // chủ thứ hai là thêm một cửa đọc công khai nữa, không đáng.
       if (p && p.loai === 'baitap') {
         const g = p as unknown as { tt: ThongTinPhieu; cau: CauLuyen[] }
-        const { dungPhieuHtml } = await import('../lib/tai-phieu-pdf')
+        const { dungPhieuHtml } = await napDong(() => import('../lib/tai-phieu-pdf'))
         setPhieuBt(dungPhieuHtml({ ...g.tt, ngay: new Date(g.tt.ngay) }, g.cau))
         return
       }
@@ -830,7 +831,7 @@ function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
     setDang(true)
     setLoi('')
     try {
-      const { dungPhieuHtml, moHtml } = await import('../lib/tai-phieu-pdf')
+      const { dungPhieuHtml, moHtml } = await napDong(() => import('../lib/tai-phieu-pdf'))
       const sai = du.chuyenDeCa.filter((c) => c.soSai > 0)
       const tt = {
         hoTen: du.hoTen,
