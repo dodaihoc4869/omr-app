@@ -8,7 +8,7 @@ import { bankSizeWarning, mergeAndStrip, mergeKeepAnswers, type TeacherExamSourc
 import { randomSessionCode, taoLinkMoi } from '../lib/ca-link'
 import { TheNoiDung, Hang, OThongBao, NutChinh } from '../components/DesignSystem'
 import NutDongBo from '../components/NutDongBo'
-import { khoiTuNamSinh, listRegisteredStudents, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
+import { chuoi, danhSachEm, khoiTuNamSinh, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
 import { loadExamSources, loadScriptUrl, loadTeacherSecret, saveSessionTeacherBank } from '../lib/exam-db'
 import { dongBoNganHang } from '../lib/exam-sync'
 import { useAppStore } from '../store/appStore'
@@ -164,20 +164,25 @@ export default function ExamSetupScreen() {
   }, [])
 
   // Lớp gợi ý từ danh sách lớp đã nối (Google Sheet) — bấm 1 chạm thay vì gõ.
-  const dsLop = useMemo(() => Array.from(new Set(classList.map((r) => r.lop.trim()).filter(Boolean))).sort(), [classList])
+  const dsLop = useMemo(() => Array.from(new Set(classList.map((r) => chuoi(r.lop).trim()).filter(Boolean))).sort(), [classList])
 
   // Nguồn em để "Chọn từng em": danh sách lớp; rỗng thì hồ sơ đã đăng ký (tải khi cần).
   useEffect(() => {
     if (phamVi !== 'chon' || classList.length > 0 || dsDangKy !== null || !scriptUrl.trim() || !maBiMat.trim()) return
-    listRegisteredStudents(scriptUrl.trim(), maBiMat.trim())
-      .then((ds) => setDsDangKy(ds.map((d) => ({ sbd: String(d.sbd), hoTen: d.hoTen, lop: d.lop }))))
+    // Nguồn phải là DANH SÁCH LỚP đã nạp (danhSachEm gộp danh sách + hồ sơ + lượt
+    // thi), không phải listStudents — listStudents chỉ đọc bảng hồ sơ nên chỉ ra
+    // vài em đã từng đăng ký, thầy tích không thấy 251 em trong danh sách.
+    danhSachEm(scriptUrl.trim(), maBiMat.trim())
+      .then((ds) => setDsDangKy(ds.map((d) => ({ sbd: chuoi(d.sbd), hoTen: chuoi(d.hoTen), lop: chuoi(d.lop) }))))
       .catch(() => setDsDangKy([]))
   }, [phamVi, classList.length, dsDangKy, scriptUrl, maBiMat])
   const dsEmChon = useMemo(() => {
-    const nguon = classList.length > 0 ? classList.map((r) => ({ sbd: r.sbd, hoTen: r.hoTen, lop: r.lop })) : (dsDangKy ?? [])
+    // chuoi() ở đây là lớp chắn thứ hai: dữ liệu có thể tới từ classList (Google
+    // Sheet) chứ không riêng API, mà ô sheet vẫn có thể là số.
+    const nguon = (classList.length > 0 ? classList : (dsDangKy ?? [])).map((r) => ({ sbd: chuoi(r.sbd), hoTen: chuoi(r.hoTen), lop: chuoi(r.lop) }))
     const q = timTen.trim().toLowerCase()
     const loc = nguon.filter((r) => r.sbd && (!lop.trim() || !r.lop || r.lop.trim() === lop.trim()) && (!q || r.hoTen.toLowerCase().includes(q) || r.sbd.toLowerCase().includes(q)))
-    return loc.sort((a, b) => a.hoTen.localeCompare(b.hoTen, 'vi'))
+    return loc.sort((a, b) => a.hoTen.localeCompare(b.hoTen, 'vi') || a.sbd.localeCompare(b.sbd, 'vi'))
   }, [classList, dsDangKy, timTen, lop])
   const toggleSbd = (sbd: string) =>
     setChonSbd((prev) => {

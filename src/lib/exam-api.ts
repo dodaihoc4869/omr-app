@@ -516,12 +516,28 @@ export interface RegisteredStudent {
   trangThai?: string
 }
 
+/** Ô trong Google Sheet có thể là SỐ (SBD 12000, lớp 12, năm sinh 2009). JSON giữ
+ * nguyên kiểu số, còn app thì gọi `.trim()`, `.toLowerCase()`, `.localeCompare()`
+ * trên các trường này. Một ô số là đủ ném TypeError giữa lúc render → React gỡ
+ * cây → MÀN TRẮNG. Ép chuỗi ngay tại cửa API, đúng một chỗ, cho mọi màn dùng chung. */
+export function chuoi(v: unknown): string {
+  return v === null || v === undefined ? '' : String(v)
+}
+
 export async function listRegisteredStudents(scriptUrl: string, secret: string): Promise<RegisteredStudent[]> {
   const url = `${scriptUrl}?action=listStudents&secret=${encodeURIComponent(secret)}`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
   const data = await res.json()
-  return data.items || []
+  return ((data.items || []) as RegisteredStudent[]).map((x) => ({
+    ...x,
+    sbd: chuoi(x.sbd),
+    hoTen: chuoi(x.hoTen),
+    namSinh: chuoi(x.namSinh),
+    lop: chuoi(x.lop),
+    dangKyLuc: chuoi(x.dangKyLuc),
+    trangThai: chuoi(x.trangThai),
+  }))
 }
 
 export interface FeedbackSummary {
@@ -624,7 +640,7 @@ export async function hoSoEm(scriptUrl: string, quyen: QuyenHoSo): Promise<HoSoE
   const r = await postJson(scriptUrl, { action: 'hoSoEm', ...quyen })
   if (!r.ok) throw new Error(r.error || 'Không lấy được hồ sơ')
   return {
-    em: { ...r.em, sbd: String(r.em.sbd) },
+    em: { ...r.em, sbd: chuoi(r.em.sbd), hoTen: chuoi(r.em.hoTen), namSinh: chuoi(r.em.namSinh), lop: chuoi(r.em.lop) },
     chuyenDe: r.chuyenDe || [],
     ca: (r.ca || []).map((c: CaCuaEm) => ({ ...c, maCa: String(c.maCa) })),
     caGanNhat: r.caGanNhat ? { ...r.caGanNhat, maCa: String(r.caGanNhat.maCa) } : null,
@@ -648,7 +664,16 @@ export interface EmTomTat {
 export async function danhSachEm(scriptUrl: string, secret: string): Promise<EmTomTat[]> {
   const r = await postJson(scriptUrl, { action: 'danhSachEm', secret })
   if (!r.ok) throw new Error(r.error || 'Không lấy được danh sách học sinh')
-  return (r.items as EmTomTat[]).map((x) => ({ ...x, sbd: String(x.sbd) }))
+  return (r.items as EmTomTat[]).map((x) => ({
+    ...x,
+    sbd: chuoi(x.sbd),
+    hoTen: chuoi(x.hoTen),
+    namSinh: chuoi(x.namSinh),
+    lop: chuoi(x.lop),
+    trangThai: chuoi(x.trangThai),
+    caGanNhat: chuoi(x.caGanNhat),
+    nopGanNhat: chuoi(x.nopGanNhat),
+  }))
 }
 
 // ============================================================================

@@ -14,6 +14,7 @@ import ExamMonitorScreen from './screens/ExamMonitorScreen'
 import LichSuCaScreen from './screens/LichSuCaScreen'
 import HocSinhScreen from './screens/HocSinhScreen'
 import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
+import ChanLoi from './components/ChanLoi'
 
 // APP GIÁO VIÊN. Màn đăng ký, hồ sơ, lịch sử, bài tập và nhắn tin PHÍA HỌC SINH
 // và PHÍA PHỤ HUYNH đã gỡ khỏi repo này — hai app đó tách sang repo riêng
@@ -22,6 +23,18 @@ import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
 // Còn giữ MÀN LÀM BÀI: link mời `/t/<mã ca>` vẫn phải chạy để lớp thi và làm
 // bài tập được trong lúc app học sinh mới chưa xong. Nó không có mục nào trên
 // menu — chỉ mở được bằng đúng link mời.
+/** Tên màn để câu báo lỗi nói đúng chỗ ("Màn Mở ca kiểm tra gặp lỗi"). */
+const TEN_MAN: Record<string, string> = {
+  classlist: 'Danh sách lớp',
+  examhub: 'Kiểm tra tại lớp',
+  examsetup: 'Mở ca kiểm tra',
+  nganhangde: 'Ngân hàng câu hỏi',
+  examtake: 'Làm bài',
+  exammonitor: 'Theo dõi ca',
+  lichsuca: 'Ca thi',
+  hocsinh: 'Học sinh',
+}
+
 const HIDE_FAB_ON: string[] = ['examtake', 'nganhangde']
 const HIDE_BOTTOMNAV_ON: string[] = ['examtake']
 
@@ -55,14 +68,18 @@ function App() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       <Toast />
-      {screen === 'classlist' && <ClassListScreen />}
-      {screen === 'examhub' && <ExamHubScreen />}
-      {screen === 'examsetup' && <ExamSetupScreen />}
-      {screen === 'nganhangde' && <NganHangDeScreen />}
-      {screen === 'examtake' && <ExamTakeScreen />}
-      {screen === 'exammonitor' && <ExamMonitorScreen />}
-      {screen === 'lichsuca' && <LichSuCaScreen />}
-      {screen === 'hocsinh' && <HocSinhScreen />}
+      {/* Một màn ném lỗi thì chỉ màn đó hiện báo lỗi, app KHÔNG trắng. key theo
+          `screen` để lỗi cũ không dính lại khi thầy sang màn khác. */}
+      <ChanLoi key={screen} o={TEN_MAN[screen]} veManChinh={() => setScreen('examhub')}>
+        {screen === 'classlist' && <ClassListScreen />}
+        {screen === 'examhub' && <ExamHubScreen />}
+        {screen === 'examsetup' && <ExamSetupScreen />}
+        {screen === 'nganhangde' && <NganHangDeScreen />}
+        {screen === 'examtake' && <ExamTakeScreen />}
+        {screen === 'exammonitor' && <ExamMonitorScreen />}
+        {screen === 'lichsuca' && <LichSuCaScreen />}
+        {screen === 'hocsinh' && <HocSinhScreen />}
+      </ChanLoi>
       {!HIDE_FAB_ON.includes(screen) && <MessagesFab />}
       {!HIDE_BOTTOMNAV_ON.includes(screen) && <BottomNav />}
     </div>
