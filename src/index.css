@@ -212,3 +212,44 @@ body {
   font: 700 var(--cx-4) var(--serif);
   color: var(--xanh);
 }
+
+/* ============================================================ HAI CỘT
+ * MÀN HÌNH RỘNG (≥ 1024px): thanh điều hướng bên trái + vùng nội dung bên
+ * phải, giống mọi app quản lý trên máy tính. MÀN HẸP giữ nguyên một cột với
+ * thanh dưới đáy — ngón cái với tới được, và màn hẹp thì một cột là đúng.
+ *
+ * Vùng nội dung chặn bề rộng: dòng chữ kéo dài 1800px thì mắt lạc dòng. */
+.ben-trai {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .khung-app {
+    display: grid;
+    grid-template-columns: 264px minmax(0, 1fr);
+    min-height: 100vh;
+  }
+  .ben-trai {
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    overflow-y: auto;
+    padding: var(--k5) var(--k3);
+    background: var(--the);
+    border-right: 1px solid var(--vien);
+  }
+  .khung-noi-dung {
+    min-width: 0;
+  }
+  .giua-noi-dung {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  /* Thanh điều hướng dưới đáy chỉ dành cho màn hẹp. */
+  .khung-app > nav.fixed {
+    display: none;
+  }
+}

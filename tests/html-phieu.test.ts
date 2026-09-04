@@ -229,3 +229,50 @@ describe('theGiaiHtml — trang Lời giải chi tiết', () => {
     expect(h).toContain('V = 100 ml')
   })
 })
+
+describe('hình trong phiếu', () => {
+  const A = 'data:image/png;base64,AAAA'
+
+  it('ảnh cắt cả thân câu THAY chữ đề — lớp chữ PDF hay vỡ công thức âm thầm', () => {
+    const h = theCauHtml(C({ anhThanCau: A, text: 'chữ có thể sai' }), 1, false)
+    expect(h).toContain('class="q-hinh than"')
+    expect(h).not.toContain('chữ có thể sai')
+  })
+
+  it('phương án bằng ảnh thì in ảnh, KHÔNG in chữ "(xem hình)"', () => {
+    const h = theCauHtml(C({ luaChon: ['(xem hình)', 'b', 'c', 'd'], anhLuaChon: [A, undefined, undefined, undefined], dapAn: 'A' }), 1, false)
+    expect(h).toContain('class="q-hinh pa"')
+    expect(h).not.toContain('(xem hình)')
+  })
+
+  it('ảnh nhúng đúng vị trí trong câu', () => {
+    const h = theCauHtml(C({ hinh: [{ src: A, viTri: 'sau_de' }, { src: A, viTri: 'cuoi_cau' }] }), 1, false)
+    expect((h.match(/class="q-hinh"/g) || []).length).toBe(2)
+  })
+
+  it('ảnh phương án A đứng trong đúng ô phương án A', () => {
+    const h = theCauHtml(C({ luaChon: ['a', 'b', 'c', 'd'], dapAn: 'A', hinh: [{ src: A, viTri: 'sau_pa_B' }] }), 1, false)
+    const oB = h.split('q-opt-letter">B<')[1].split('</div></div>')[0]
+    expect(oB).toContain('q-hinh')
+  })
+
+  it('bảng số liệu in thành bảng thật, hàng đầu là tiêu đề', () => {
+    const h = theCauHtml(C({ bang: [['Chất', 'M'], ['Ester', '88']] }), 1, false)
+    expect(h).toContain('<th>Chất</th>')
+    expect(h).toContain('<td>Ester</td>')
+  })
+
+  it('câu không có hình thì KHÔNG chèn thẻ img rỗng', () => {
+    expect(theCauHtml(MCQ, 1, false)).not.toContain('<img')
+  })
+
+  it('trang lời giải cũng in ảnh thân câu, không thì em không biết đang giải câu nào', () => {
+    expect(theGiaiHtml(C({ anhThanCau: A, dapAn: 'A' }), 1)).toContain('q-hinh than')
+  })
+
+  it('Phần II: mỗi ý một hàng flex để ô Đ/S cân giữa với chữ dài', () => {
+    const h = theCauHtml(C({ phan: 'II', luaChon: ['a', 'b', 'c', 'd'], dapAn: 'DSDS' }), 1, true)
+    expect((h.match(/class="tf-item"/g) || []).length).toBe(4)
+    expect(h).toContain('class="tf-o"')
+  })
+})

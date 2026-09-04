@@ -62,6 +62,29 @@ export function ngayVN(d: Date): string {
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`
 }
 
+/** Ảnh nhúng thẳng vào phiếu. `src` là data URL base64 lấy từ kho đề, không
+ * gọi ra mạng nên phiếu dựng được cả khi mất mạng. */
+export function anhHtml(src: string, lop = '', alt = ''): string {
+  if (!src) return ''
+  return `<img class="q-hinh${lop ? ` ${lop}` : ''}" src="${thoat(src)}" alt="${thoat(alt)}">`
+}
+
+/** Mọi ảnh ở một vị trí trong câu (sau đề, sau từng phương án, cuối câu). */
+export function hinhTaiViTri(c: CauLuyen, viTri: string): string {
+  return (c.hinh ?? [])
+    .filter((h) => h.viTri === viTri)
+    .map((h) => anhHtml(h.src, '', h.alt ?? ''))
+    .join('')
+}
+
+export function bangHtml(bang: string[][] | null | undefined): string {
+  if (!bang || bang.length === 0) return ''
+  const [dau, ...than] = bang
+  const th = dau.map((x) => `<th>${chuHtml(x)}</th>`).join('')
+  const tr = than.map((h) => `<tr>${h.map((x) => `<td>${chuHtml(x)}</td>`).join('')}</tr>`).join('')
+  return `<table class="q-bang"><thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table>`
+}
+
 /** Đáp án Phần II "DSDD" → mảng true/false. */
 function ysDung(dapAn: string): boolean[] {
   return CHU_Y.map((_, i) => (dapAn || '')[i] === 'D')
@@ -133,13 +156,28 @@ body { font-family: 'Segoe UI', 'Inter', system-ui, sans-serif; background: #f0f
 .q-opt.correct .q-opt-letter { background: #10b981; color: white; }
 .q-opt-text { flex: 1; }
 
-.tf-row { display: grid; grid-template-columns: 1fr auto auto; gap: 4px 10px; align-items: center; }
-.tf-statement { font-size: 11px; color: #475569; line-height: 1.35; padding: 3px 6px; }
+.tf-head { display: flex; justify-content: flex-end; gap: 8px; padding-right: 2px; margin-bottom: 2px; }
+.tf-head span { width: 26px; text-align: center; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; }
+/* Mỗi ý một hàng flex: chữ và hai ô Đ/S luôn cân giữa theo chiều dọc, kể cả
+   khi chữ dài xuống hai ba dòng. Bản trước dùng lưới 3 cột nên chữ dài là ô
+   Đ/S trôi lên trên, nhìn lệch hẳn. */
+.tf-item { display: flex; align-items: center; gap: 10px; padding: 2px 0; }
+.tf-statement { flex: 1; min-width: 0; font-size: 11px; color: #475569; line-height: 1.35; padding: 3px 0 3px 6px; }
+.tf-o { display: flex; gap: 8px; flex-shrink: 0; }
 .tf-badge { width: 26px; height: 22px; border-radius: 5px; display: flex; align-items: center; justify-content: center;
   font-size: 11px; font-weight: 800; background: #f1f5f9; color: #94a3b8; border: 1px solid #e2e8f0; }
 .tf-badge.true { background: #d1fae5; color: #065f46; border-color: #10b981; }
 .tf-badge.false { background: #fee2e2; color: #991b1b; border-color: #ef4444; }
-.tf-header-cell { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; text-align: center; padding-bottom: 4px; }
+
+/* ẢNH CẮT TỪ ĐỀ GỐC. Nền trắng vì ảnh cắt là nền trong suốt; giới hạn chiều
+   cao để một câu có hình không nuốt trọn cả trang giấy. */
+.q-hinh { display: block; max-width: 100%; max-height: 62mm; margin: 5px auto; border-radius: 6px;
+  border: 1px solid #e2e8f0; background: #ffffff; }
+.q-hinh.than { max-height: 78mm; }
+.q-hinh.pa { max-height: 16mm; margin: 0; border: none; background: transparent; }
+.q-bang { width: 100%; border-collapse: collapse; margin: 5px 0; font-size: 10.5px; }
+.q-bang th, .q-bang td { border: 1px solid #cbd5e1; padding: 3px 6px; text-align: center; color: #334155; }
+.q-bang th { background: #f1f5f9; font-weight: 700; }
 
 .sa-answer { background: linear-gradient(135deg, #0f3057, #008891); color: white; padding: 8px 18px; border-radius: 8px;
   font-size: 16px; font-weight: 800; display: inline-block; margin-top: 3px; }
@@ -184,32 +222,48 @@ export function theCauHtml(c: CauLuyen, stt: number, hienDapAn: boolean): string
 
   let than = ''
   if (c.phan === 'I' && c.luaChon) {
+    // Phương án bằng ẢNH thì ảnh THAY chữ, đúng như màn làm bài. Kho đề ghi
+    // chữ "(xem hình)" ở những phương án đó — in ra chữ ấy là em cầm tờ giấy
+    // không có gì để chọn.
+    const coAnhPa = (c.anhLuaChon ?? []).some(Boolean)
+    // Ảnh phương án đã bị chặn cao 16mm nên vẫn xếp hai cột được; chỉ chữ dài
+    // mới phải xuống một cột.
     const dai = c.luaChon.some((x) => (x || '').length > 46)
     const o = c.luaChon
       .map((pa, i) => {
         const dung = hienDapAn && CHU_PA[i] === (c.dapAn || '').trim().toUpperCase()
-        return `<div class="q-opt${dung ? ' correct' : ''}"><div class="q-opt-letter">${CHU_PA[i]}</div><div class="q-opt-text">${chuHtml(pa)}</div></div>`
+        const anh = c.anhLuaChon?.[i]
+        const noi = anh ? anhHtml(anh, 'pa', `Phương án ${CHU_PA[i]}`) : chuHtml(pa)
+        return `<div class="q-opt${dung ? ' correct' : ''}"><div class="q-opt-letter">${CHU_PA[i]}</div><div class="q-opt-text">${noi}${hinhTaiViTri(c, `sau_pa_${CHU_PA[i]}`)}</div></div>`
       })
       .join('')
-    than = `<div class="q-options${dai ? ' single-col' : ''}">${o}</div>`
+    than = `<div class="q-options${dai && !coAnhPa ? ' single-col' : ''}">${o}</div>`
   } else if (c.phan === 'II' && c.luaChon) {
     const dung = ysDung(c.dapAn)
     const hang = c.luaChon
       .map((y, i) => {
         const d = hienDapAn ? (dung[i] ? ' true' : '') : ''
         const s = hienDapAn ? (!dung[i] ? ' false' : '') : ''
-        return `<div class="tf-statement">${CHU_Y[i]}. ${chuHtml(y)}</div><div class="tf-badge${d}">Đ</div><div class="tf-badge${s}">S</div>`
+        const anh = c.anhLuaChon?.[i]
+        const noi = anh ? anhHtml(anh, 'pa', `Ý ${CHU_Y[i]}`) : chuHtml(y)
+        return `<div class="tf-item"><div class="tf-statement">${CHU_Y[i]}. ${noi}${hinhTaiViTri(c, `sau_y_${CHU_Y[i]}`)}</div><div class="tf-o"><div class="tf-badge${d}">Đ</div><div class="tf-badge${s}">S</div></div></div>`
       })
       .join('')
-    than = `<div class="tf-row"><div></div><div class="tf-header-cell">Đ</div><div class="tf-header-cell">S</div>${hang}</div>`
+    than = `<div class="tf-head"><span>Đ</span><span>S</span></div>${hang}`
   } else {
     than = hienDapAn ? `<div class="sa-answer">${chuHtml(c.dapAn || '—')}</div>` : `<div class="sa-blank">Đáp án: ……………………………</div>`
   }
 
+  // Ảnh cắt cả thân câu LÀ đề bài — có nó thì không in `text` nữa, đúng như
+  // màn làm bài của học sinh (lớp chữ trong PDF gốc hay vỡ công thức ÂM THẦM).
+  const deBai = c.anhThanCau ? anhHtml(c.anhThanCau, 'than', 'Đề bài') : `<div class="q-text">${chuHtml(c.text)}</div>`
   const giai = hienDapAn ? oGiaiHtml(c) : ''
   return `<div class="q-card${hienDapAn ? ' correct' : ''}">
-  <div class="q-header"><div class="q-num">${stt}</div><div style="flex:1"><div class="q-tags">${tags}</div><div class="q-text">${chuHtml(c.text)}</div></div></div>
+  <div class="q-header"><div class="q-num">${stt}</div><div style="flex:1"><div class="q-tags">${tags}</div>${deBai}</div></div>
+  ${bangHtml(c.bang)}
+  ${hinhTaiViTri(c, 'sau_de')}
   ${than}
+  ${hinhTaiViTri(c, 'cuoi_cau')}
   ${giai}
 </div>`
 }
@@ -255,8 +309,11 @@ export function theGiaiHtml(c: CauLuyen, stt: number): string {
   // Không có gì để giải thì vẫn in thẻ, nhưng KHÔNG in ô kem rỗng.
   const oKem = khoi.length > 0 ? `<div class="sol-box">${khoi.join('')}</div>` : ''
 
+  // Trang lời giải in lại thân câu ngắn gọn; câu mà đề nằm trong ẢNH thì phải
+  // in ảnh, không thì em không biết đang giải câu nào.
+  const deBai = c.anhThanCau ? anhHtml(c.anhThanCau, 'than', 'Đề bài') : `<div class="q-text" style="font-size:12px">${chuHtml(c.text)}</div>`
   return `<div class="q-card correct">
-  <div class="q-header"><div class="q-num">${stt}</div><div style="flex:1"><div class="q-tags">${tags}</div><div class="q-text" style="font-size:12px">${chuHtml(c.text)}</div></div></div>
+  <div class="q-header"><div class="q-num">${stt}</div><div style="flex:1"><div class="q-tags">${tags}</div>${deBai}</div></div>
   ${oKem}
 </div>`
 }

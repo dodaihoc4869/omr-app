@@ -21,6 +21,14 @@ import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion,
 export type MucDoCau = 'biet' | 'hieu' | 'van_dung'
 const BAC: MucDoCau[] = ['biet', 'hieu', 'van_dung']
 
+/** Ảnh đi kèm câu, đã gom mọi nguồn về MỘT dạng để bên in không phải biết dữ
+ * liệu cũ hay mới. `viTri` theo đúng thang của kho đề (`ViTriHinh`). */
+export interface HinhCau {
+  src: string
+  viTri: string
+  alt?: string
+}
+
 export interface CauLuyen {
   phan: 'I' | 'II' | 'III'
   id: string
@@ -33,6 +41,15 @@ export interface CauLuyen {
   lyDo: { khoa: string; dung: boolean; ly: string }[] | null
   buoc: string[] | null
   ketQua: string
+  /** Ảnh cắt cả thân câu — có ảnh này thì ảnh LÀ đề, không in `text` nữa
+   * (đúng như màn làm bài của học sinh). */
+  anhThanCau?: string
+  /** Ảnh riêng của từng phương án / từng ý, theo thứ tự A–D hoặc a–d. */
+  anhLuaChon?: (string | undefined)[]
+  /** Ảnh nhúng theo vị trí trong câu (sau đề, sau từng phương án, cuối câu). */
+  hinh?: HinhCau[]
+  /** Bảng số liệu thầy gõ trong đề. */
+  bang?: string[][] | null
 }
 
 export interface KetQuaChonCau {
@@ -93,6 +110,12 @@ function doiSang(c: CauNguon): CauLuyen {
   } else if (c.phan === 'II' && lg?.tungY) {
     lyDo = (['a', 'b', 'c', 'd'] as const).filter((k) => lg.tungY?.[k]).map((k) => ({ khoa: k, dung: Boolean(lg.tungY?.[k]?.dung), ly: String(lg.tungY?.[k]?.viSao ?? '') }))
   }
+  // Ảnh: gom `hinhAnh` (dữ liệu mới) và `imageDataUrl` (dữ liệu cũ, luôn nằm
+  // sau đề) về một danh sách. Ảnh thân câu và ảnh phương án giữ riêng vì chúng
+  // THAY THẾ chữ chứ không đứng cạnh chữ.
+  const hinh: HinhCau[] = [...(q.hinhAnh ?? []).map((h) => ({ src: h.src, viTri: String(h.viTri), alt: h.alt }))]
+  if (q.imageDataUrl) hinh.unshift({ src: q.imageDataUrl, viTri: 'sau_de' })
+
   return {
     phan: c.phan,
     id: q.id,
@@ -105,6 +128,10 @@ function doiSang(c: CauNguon): CauLuyen {
     lyDo,
     buoc: lg?.buoc ? [...lg.buoc] : null,
     ketQua: lg?.ketQua ?? '',
+    anhThanCau: q.thanCauImg,
+    anhLuaChon: c.phan === 'I' ? [...(mcq.choiceImgs ?? [])] : c.phan === 'II' ? [...(tf.ideaImgs ?? [])] : undefined,
+    hinh: hinh.length > 0 ? hinh : undefined,
+    bang: q.table ?? null,
   }
 }
 

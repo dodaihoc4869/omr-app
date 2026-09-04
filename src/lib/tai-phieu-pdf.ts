@@ -64,7 +64,24 @@ const CAO_TRONG = Math.round(CAO_PX - 19 - 17 - 10 - (103 / 1123) * CAO_PX)
  * `height: 297mm` cố định nên `scrollHeight` LUÔN ≥ 1123px, tức luôn vượt
  * ngưỡng ngay từ thẻ đầu tiên ⇒ mỗi trang đúng một câu. Ô đo phải là một khối
  * TỰ CO, chỉ đặt đúng bề rộng vùng chữ. */
-export function chiaTrang(doc: Document, cauHtml: string[], caoConLai: number = CAO_TRONG): string[] {
+/** Chờ mọi ảnh trong một nhánh DOM tải xong. Ảnh chưa tải thì trình duyệt đo
+ * chiều cao ra 0 ⇒ nhét thừa câu vào trang rồi tràn. Ảnh của phiếu là data URL
+ * nên chờ rất nhanh, nhưng KHÔNG được bỏ qua bước chờ. */
+async function choAnh(goc: ParentNode): Promise<void> {
+  const anh = [...goc.querySelectorAll('img')]
+  await Promise.all(
+    anh.map((im) =>
+      im.complete && im.naturalWidth > 0
+        ? Promise.resolve()
+        : new Promise<void>((xong) => {
+            im.addEventListener('load', () => xong(), { once: true })
+            im.addEventListener('error', () => xong(), { once: true })
+          }),
+    ),
+  )
+}
+
+export async function chiaTrang(doc: Document, cauHtml: string[], caoConLai: number = CAO_TRONG): Promise<string[]> {
   const do_ = doc.createElement('div')
   do_.style.position = 'absolute'
   do_.style.left = '-99999px'
@@ -78,6 +95,7 @@ export function chiaTrang(doc: Document, cauHtml: string[], caoConLai: number = 
   for (const h of cauHtml) {
     const thu = [...dang, h]
     do_.innerHTML = thu.join('')
+    await choAnh(do_)
     if (do_.offsetHeight > caoConLai && dang.length > 0) {
       trang.push(dang.join(''))
       dang = [h]
@@ -123,8 +141,8 @@ export async function dungPhieuHtml(t: ThongTinPhieu, cau: CauLuyen[]): Promise<
     // MỘT tài liệu duy nhất: bìa · tổng quan · các trang ĐỀ BÀI · các trang
     // LỜI GIẢI CHI TIẾT. Bản trước dựng hai tài liệu rời rồi nối, nên bìa và
     // trang tổng quan hiện HAI LẦN — đúng chỗ thầy bảo bỏ.
-    const nhomDe = chiaTrang(d, cau.map((c, i) => theCauHtml(c, i + 1, true)))
-    const nhomGiai = chiaTrang(d, cau.map((c, i) => theGiaiHtml(c, i + 1)))
+    const nhomDe = await chiaTrang(d, cau.map((c, i) => theCauHtml(c, i + 1, true)))
+    const nhomGiai = await chiaTrang(d, cau.map((c, i) => theGiaiHtml(c, i + 1)))
     const tongTrang = nhomDe.length + nhomGiai.length
 
     let so = 0
@@ -160,6 +178,8 @@ export async function phieuThanhPdf(html: string): Promise<Blob> {
   d.close()
   await new Promise((r) => setTimeout(r, 120))
   if (d.fonts?.ready) await d.fonts.ready.catch(() => {})
+  // Chụp trước khi ảnh tải xong là ra ô trắng — chờ hết ảnh rồi mới chụp.
+  await choAnh(d)
 
   try {
     const { default: html2canvas } = await import('html2canvas')

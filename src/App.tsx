@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import BottomNav from './components/BottomNav'
+import ThanhBenTrai from './components/ThanhBenTrai'
 import Toast from './components/Toast'
 import MessagesFab from './components/MessagesFab'
 import { useAppStore } from './store/appStore'
@@ -79,9 +80,16 @@ function App() {
   }
   if (linkCu) return <AppDaChuyenScreen />
 
+  // MÀN LÀM BÀI của học sinh không phải app quản lý: không thanh bên, không
+  // thanh đáy, để em tập trung vào bài.
+  const laManThi = screen === 'examtake'
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+    <div className={`min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100${laManThi ? '' : ' khung-app'}`}>
       <Toast />
+      {!laManThi && <ThanhBenTrai />}
+      <div className="khung-noi-dung">
+        <div className="giua-noi-dung">
       {/* Một màn ném lỗi thì chỉ màn đó hiện báo lỗi, app KHÔNG trắng. key theo
           `screen` để lỗi cũ không dính lại khi thầy sang màn khác. */}
       <ChanLoi key={screen} o={TEN_MAN[screen]} veManChinh={() => setScreen('examhub')}>
@@ -95,6 +103,8 @@ function App() {
         {screen === 'hocsinh' && <HocSinhScreen />}
         {screen === 'goilenbang' && <GoiLenBangScreen />}
       </ChanLoi>
+        </div>
+      </div>
       {!HIDE_FAB_ON.includes(screen) && <MessagesFab />}
       {!HIDE_BOTTOMNAV_ON.includes(screen) && <BottomNav />}
     </div>
