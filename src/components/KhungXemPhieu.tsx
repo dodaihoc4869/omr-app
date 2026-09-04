@@ -20,6 +20,11 @@
 // Các nút "In đề" / "In kèm lời giải" / "Tải tệp" nằm trên thanh của CHÍNH
 // phiếu (html-phieu.ts), nên bản xem trong app và tệp HTML tải về giống hệt
 // nhau, và không có nút nào phải đoán nghĩa.
+//
+// TRÊN MÀN RỘNG chỉ phủ NỬA PHẢI, chừa thanh điều hướng bên trái (xem
+// `.lop-xem-phieu` trong index.css). Phiếu co đúng theo bề rộng nửa phải, nên
+// thầy vẫn đổi được màn khác mà không phải đóng phiếu; kéo hẹp/rộng cột trái
+// là phiếu co theo ngay.
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
@@ -78,7 +83,7 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
   }, [dong])
 
   return createPortal(
-    <div role="dialog" aria-modal="true" aria-label={ten || 'Phiếu bài tập'} style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'var(--p-giay)' }}>
+    <div className="lop-xem-phieu" role="dialog" aria-modal="true" aria-label={ten || 'Phiếu bài tập'}>
       <iframe
         title={ten || 'Phiếu bài tập'}
         {...(html ? { srcDoc: html } : { src })}
@@ -86,29 +91,7 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
       />
       {/* Nút thoát NHỎ, nổi góc trên phải. Không phải một dải chiếm hết bề
           ngang: dải đó chồng lên nhau khi mở phiếu từ trong báo cáo. */}
-      <button
-        type="button"
-        onClick={dong}
-        aria-label="Đóng"
-        title="Đóng (Esc, hoặc vuốt quay lại)"
-        style={{
-          position: 'fixed',
-          top: 'calc(10px + env(safe-area-inset-top))',
-          right: 10,
-          zIndex: 61,
-          width: 34,
-          height: 34,
-          display: 'grid',
-          placeItems: 'center',
-          borderRadius: '50%',
-          border: 'none',
-          background: 'rgba(15,23,42,.55)',
-          color: 'var(--p-trang)',
-          cursor: 'pointer',
-          WebkitBackdropFilter: 'blur(6px)',
-          backdropFilter: 'blur(6px)',
-        }}
-      >
+      <button className="nut-dong-phieu" type="button" onClick={dong} aria-label="Đóng" title="Đóng (Esc, hoặc vuốt quay lại)">
         <X size={18} />
       </button>
     </div>,

@@ -338,3 +338,41 @@ body {
     border: 1px solid var(--vien);
   }
 }
+
+/* ============================================ LỚP XEM PHIẾU / BÁO CÁO
+ * Màn hẹp: phủ kín. MÀN RỘNG: chỉ phủ NỬA PHẢI, chừa thanh điều hướng bên
+ * trái — thầy vẫn thấy mình đang ở đâu và bấm sang màn khác được, không phải
+ * đóng phiếu trước. Phiếu bên trong tự co theo bề rộng còn lại.
+ *
+ * `body:has(.ben-trai)` để màn LÀM BÀI của học sinh (không dựng thanh trái)
+ * vẫn phủ kín — ở đó không có gì bên trái để chừa. Trình duyệt không hiểu
+ * `:has` thì phủ kín như cũ, không vỡ. */
+.lop-xem-phieu {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: var(--p-giay);
+}
+.nut-dong-phieu {
+  position: absolute;
+  top: calc(10px + env(safe-area-inset-top));
+  right: 10px;
+  z-index: 61;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: var(--phu-dam-mo);
+  color: var(--p-trang);
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+@media (min-width: 880px) {
+  body:has(.ben-trai) .lop-xem-phieu {
+    left: var(--rong-ben-trai, 232px);
+  }
+}

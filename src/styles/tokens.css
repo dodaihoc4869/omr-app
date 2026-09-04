@@ -20,6 +20,10 @@
   /* lớp phủ sau hộp thoại / ảnh phóng to */
   --phu: rgba(26, 35, 50, 0.55);
   --phu-dam: rgba(26, 35, 50, 0.9);
+  /* Nút thoát nổi trên phiếu — đủ tối để thấy trên nền trắng của phiếu, đủ
+     trong để không che chữ bên dưới. Giữ nguyên ở nền tối: phiếu luôn là
+     giấy trắng mực đen. */
+  --phu-dam-mo: rgba(15, 23, 42, 0.55);
 
   /* đường kẻ */
   --vien: #e5e7eb;
