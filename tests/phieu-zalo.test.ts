@@ -46,7 +46,7 @@ const TU_CAM = [
 describe('soanPhieuZalo — nội dung', () => {
   it('nêu đúng điểm, xếp loại, số câu sai và chuyên đề — không làm tròn sai', () => {
     const s = soanPhieuZalo(mau)
-    expect(s).toContain('6,60 điểm')
+    expect(s).toContain('ĐIỂM: 6,60/10, xếp loại Khá')
     expect(s).toContain('xếp loại Khá')
     expect(s).toContain('sai 4 câu')
     expect(s).toContain('3 câu thuộc pH và tính acid–base')

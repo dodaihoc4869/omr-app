@@ -44,26 +44,39 @@ export function demChu(s: string): number {
  */
 export function soanPhieuZalo(d: DuLieuPhieu, xungHo = 'Anh/chị', vieCanLam?: string): string {
   const ngay = ngayVN(d.ngay)
-  const cau: string[] = []
+  const khoi: string[] = []
 
-  cau.push(`${xungHo}, bài kiểm tra ${ngay} em ${d.hoTen} được ${soVN(d.diem)} điểm, xếp loại ${d.xepLoai}.`)
+  // Mở đầu: ai, bài nào, ngày nào. Một dòng, không lời chào.
+  khoi.push(`${xungHo}, kết quả bài kiểm tra ngày ${ngay} của em ${d.hoTen}.`)
 
+  // ĐIỂM. Nhãn VIẾT HOA vì Zalo không hiện chữ đậm — gõ **đậm** vào tin nhắn
+  // thì phụ huynh nhìn thấy đúng hai dấu sao. Viết hoa là cách nhấn mạnh DUY
+  // NHẤT còn nguyên khi tin nhắn sang tay người khác.
+  // Dấu phẩy chứ không phải gạch ngang dài — quy tắc viết của thầy cấm "—".
+  const diem: string[] = [`ĐIỂM: ${soVN(d.diem)}/10, xếp loại ${d.xepLoai}`]
   if (d.diemPhan) {
-    cau.push(`Phần I ${soVN(d.diemPhan.I)}, phần II ${soVN(d.diemPhan.II)}, phần III ${soVN(d.diemPhan.III)}.`)
+    diem.push(`Phần I ${soVN(d.diemPhan.I)} · Phần II ${soVN(d.diemPhan.II)} · Phần III ${soVN(d.diemPhan.III)}`)
   }
+  khoi.push(diem.join('\n'))
 
+  // CHỖ MẤT ĐIỂM — nêu đúng dữ kiện, không suy ra nguyên nhân.
   if (d.soCauSai > 0 && d.chuyenDeSai && d.chuyenDeSai.soSai > 0) {
-    cau.push(`Em sai ${d.soCauSai} câu, trong đó ${d.chuyenDeSai.soSai} câu thuộc ${d.chuyenDeSai.ten}.`)
+    khoi.push(`CHỖ MẤT ĐIỂM: sai ${d.soCauSai} câu, trong đó ${d.chuyenDeSai.soSai} câu thuộc ${d.chuyenDeSai.ten}.`)
   } else if (d.soCauSai > 0) {
-    cau.push(`Em sai ${d.soCauSai} câu, rải đều các chuyên đề.`)
+    khoi.push(`CHỖ MẤT ĐIỂM: sai ${d.soCauSai} câu, rải đều các chuyên đề.`)
   } else {
-    cau.push('Em làm đúng toàn bộ các câu.')
+    khoi.push('CHỖ MẤT ĐIỂM: không có, em làm đúng toàn bộ các câu.')
   }
 
-  cau.push(vieCanLam ?? viecCanLamMacDinh(d))
+  khoi.push(`VIỆC CẦN LÀM: ${vieCanLam ?? viecCanLamMacDinh(d)}`)
 
-  return cau.join(' ')
+  // Dòng trống giữa các khối: đọc trên điện thoại mới tách bạch được từng phần.
+  return khoi.join('\n\n')
 }
+
+/** Nhãn khối để màn hình tô đậm khi xem trước. Zalo nhận CHỮ THƯỜNG, đây chỉ
+ * là chuyện hiển thị trong app. */
+export const NHAN_KHOI = ['ĐIỂM:', 'CHỖ MẤT ĐIỂM:', 'VIỆC CẦN LÀM:']
 
 /** VIỆC CẦN LÀM — phần 3 và 4 của bộ quy tắc viết (việc em phải làm + mốc thầy
  * kiểm tra lại). Tách riêng vì ẢNH PHIẾU và TIN NHẮN phải nói cùng một việc:

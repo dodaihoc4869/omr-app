@@ -28,11 +28,34 @@ const DU: DuLieuPhieu = {
 describe('Tin nhắn gửi phụ huynh', () => {
   it('nêu đúng điểm, đúng số câu sai, đúng chuyên đề — không con số nào ngoài dữ liệu', () => {
     const t = soanPhieuZalo(DU)
-    expect(t).toContain('6,25 điểm')
-    expect(t).toContain('xếp loại Trung bình')
+    expect(t).toContain('ĐIỂM: 6,25/10, xếp loại Trung bình')
+    expect(t).toContain('Phần I 3,50 · Phần II 1,75 · Phần III 1,00')
     expect(t).toContain('sai 7 câu')
     expect(t).toContain('4 câu thuộc Ester – lipid')
     expect(t).toContain('03/09')
+  })
+
+  // Thầy yêu cầu: có xuống dòng, tách bạch từng khối, nhấn mạnh chỗ quan trọng.
+  it('chia bốn khối, cách nhau bằng dòng trống', () => {
+    const khoi = soanPhieuZalo(DU).split('\n\n')
+    expect(khoi).toHaveLength(4)
+    expect(khoi[0]).toMatch(/^Anh\/chị, kết quả bài kiểm tra ngày /)
+    expect(khoi[1]).toMatch(/^ĐIỂM: /)
+    expect(khoi[2]).toMatch(/^CHỖ MẤT ĐIỂM: /)
+    expect(khoi[3]).toMatch(/^VIỆC CẦN LÀM: /)
+  })
+
+  it('điểm từng phần nằm dòng riêng, không dính vào dòng tổng điểm', () => {
+    const dong = soanPhieuZalo(DU).split('\n')
+    expect(dong.some((d) => d.startsWith('Phần I '))).toBe(true)
+  })
+
+  // Zalo hiện chữ thuần: gõ **đậm** thì phụ huynh nhìn thấy đúng hai dấu sao.
+  it('KHÔNG chèn ký hiệu markdown vào tin nhắn', () => {
+    const t = soanPhieuZalo(DU)
+    expect(t).not.toContain('**')
+    expect(t).not.toContain('__')
+    expect(t).not.toMatch(/^#/m)
   })
 
   it('dùng dấu phẩy thập phân, không dùng dấu chấm', () => {

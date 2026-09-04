@@ -11,7 +11,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { ClipboardCopy, Check, Download, Share2 } from 'lucide-react'
 import { TheNoiDung, OThongBao, NutChinh } from './DesignSystem'
 import { classify } from '../engine/score'
-import { soanPhieuZalo, viecCanLamMacDinh, demChu, NHAC_TRUOC_KHI_GUI, type DuLieuPhieu } from '../lib/phieu-zalo'
+import { soanPhieuZalo, viecCanLamMacDinh, demChu, NHAC_TRUOC_KHI_GUI, NHAN_KHOI, type DuLieuPhieu } from '../lib/phieu-zalo'
 import { veAnhPhieu, tenTepPhieu, type DuLieuAnhPhieu } from '../lib/anh-phieu'
 import type { HoSoEm } from '../lib/exam-api'
 
@@ -198,19 +198,38 @@ export default function PhieuZaloEm({
           />
         </label>
 
-        {/* TIN NHẮN CHỮ */}
+        {/* TIN NHẮN CHỮ — xem trước ĐÚNG như phụ huynh sẽ thấy: xuống dòng
+            thật, các khối tách nhau. Nhãn khối tô đậm ở đây cho dễ đọc; bản
+            copy đi vẫn là chữ thuần, vì Zalo không hiện chữ đậm. */}
         <div
           style={{
-            padding: 'var(--k3)',
+            padding: 'var(--k4)',
             borderRadius: 'var(--bo-1)',
             background: 'var(--the-2)',
             fontFamily: 'var(--serif)',
             fontSize: 'var(--cx-2)',
-            lineHeight: 1.55,
-            whiteSpace: 'pre-wrap',
+            lineHeight: 1.6,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--k2)',
           }}
         >
-          {tin}
+          {tin.split('\n').map((dong, i) => {
+            const nhan = NHAN_KHOI.find((n) => dong.startsWith(n))
+            if (!dong.trim()) return <div key={i} style={{ height: 2 }} />
+            return (
+              <div key={i}>
+                {nhan ? (
+                  <>
+                    <b>{nhan}</b>
+                    {dong.slice(nhan.length)}
+                  </>
+                ) : (
+                  dong
+                )}
+              </div>
+            )
+          })}
         </div>
         <div className="flex items-center justify-between" style={{ gap: 'var(--k2)' }}>
           <span style={NHAN_NHO}>{demChu(tin)} chữ</span>
