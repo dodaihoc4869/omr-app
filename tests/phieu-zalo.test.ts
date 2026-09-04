@@ -60,10 +60,12 @@ describe('soanPhieuZalo — nội dung', () => {
     expect(s.toLowerCase()).toContain('thầy chấm')
   })
 
-  it('xưng THẦY, gọi phụ huynh theo tên khi biết', () => {
-    const s = soanPhieuZalo(mau, 'Chị Lan')
-    expect(s.startsWith('Chị Lan,')).toBe(true)
-    expect(s).toContain('Thầy')
+  // Thầy chốt 04-09: mở đầu bằng TÊN NGƯỜI GỬI, không phải xưng hô với phụ
+  // huynh. Phụ huynh mở Zalo thấy ngay ai gửi, khỏi phải đoán.
+  it('mở đầu bằng "Thầy Đỗ Đại Học gửi kết quả", xưng THẦY', () => {
+    const s = soanPhieuZalo(mau)
+    expect(s.startsWith('Thầy Đỗ Đại Học gửi kết quả bài kiểm tra ngày ')).toBe(true)
+    expect(s).not.toContain('Anh/chị')
     expect(s).not.toContain('tôi ')
     expect(s).not.toContain('mình ')
   })

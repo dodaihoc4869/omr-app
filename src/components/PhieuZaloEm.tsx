@@ -70,7 +70,7 @@ export default function PhieuZaloEm({
     setViec(duPhieu ? viecCanLamMacDinh(duPhieu) : '')
   }, [duPhieu])
 
-  const tin = duPhieu ? soanPhieuZalo(duPhieu, 'Anh/chị', viec.trim() || undefined) : ''
+  const tin = duPhieu ? soanPhieuZalo(duPhieu, viec.trim() || undefined) : ''
 
   const duAnh: DuLieuAnhPhieu | null = useMemo(() => {
     if (!ca || ca.tong === null || !duPhieu) return null

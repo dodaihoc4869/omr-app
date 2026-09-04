@@ -39,7 +39,7 @@ describe('Tin nhắn gửi phụ huynh', () => {
   it('chia bốn khối, cách nhau bằng dòng trống', () => {
     const khoi = soanPhieuZalo(DU).split('\n\n')
     expect(khoi).toHaveLength(4)
-    expect(khoi[0]).toMatch(/^Anh\/chị, kết quả bài kiểm tra ngày /)
+    expect(khoi[0]).toMatch(/^Thầy Đỗ Đại Học gửi kết quả bài kiểm tra ngày /)
     expect(khoi[1]).toMatch(/^ĐIỂM: /)
     expect(khoi[2]).toMatch(/^CHỖ MẤT ĐIỂM: /)
     expect(khoi[3]).toMatch(/^VIỆC CẦN LÀM: /)
@@ -78,7 +78,7 @@ describe('Tin nhắn gửi phụ huynh', () => {
   // Điểm mấu chốt: MỘT dòng "việc cần làm" cho cả tin nhắn lẫn ảnh.
   it('thầy sửa việc cần làm thì tin nhắn đổi theo', () => {
     const viec = 'Tuần này em làm 10 câu thuỷ phân ester trong tập 3. Thứ Bảy Thầy kiểm tra lại.'
-    const t = soanPhieuZalo(DU, 'Anh/chị', viec)
+    const t = soanPhieuZalo(DU, viec)
     expect(t).toContain(viec)
     expect(t).not.toContain(viecCanLamMacDinh(DU))
   })
@@ -99,7 +99,7 @@ describe('Ảnh phiếu', () => {
 
   it('ảnh và tin nhắn dùng CHUNG một dòng việc cần làm', () => {
     expect(maPhieu).toContain('vieCanLam: viec.trim() || viecCanLamMacDinh(duPhieu)')
-    expect(maPhieu).toContain("soanPhieuZalo(duPhieu, 'Anh/chị', viec.trim() || undefined)")
+    expect(maPhieu).toContain('soanPhieuZalo(duPhieu, viec.trim() || undefined)')
   })
 
   it('chạm vào ảnh là gửi/tải luôn, không bắt đi tìm nút khác', () => {

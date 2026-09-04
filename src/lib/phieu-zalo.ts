@@ -38,16 +38,17 @@ export function demChu(s: string): number {
   return s.trim().split(/\s+/).filter(Boolean).length
 }
 
-/**
- * Soạn phiếu kết quả để thầy dán vào Zalo.
- * `xungHo` mặc định "Anh/chị"; biết tên phụ huynh thì truyền "Chị Lan".
- */
-export function soanPhieuZalo(d: DuLieuPhieu, xungHo = 'Anh/chị', vieCanLam?: string): string {
+/** Tên người gửi mở đầu tin nhắn. Phụ huynh lưu số của thầy trong nhóm lớp
+ * lẫn nhóm phụ huynh, mở Zalo thấy ngay ai gửi thì khỏi phải đoán. */
+export const NGUOI_GUI = 'Thầy Đỗ Đại Học'
+
+/** Soạn phiếu kết quả để thầy dán vào Zalo. */
+export function soanPhieuZalo(d: DuLieuPhieu, vieCanLam?: string): string {
   const ngay = ngayVN(d.ngay)
   const khoi: string[] = []
 
-  // Mở đầu: ai, bài nào, ngày nào. Một dòng, không lời chào.
-  khoi.push(`${xungHo}, kết quả bài kiểm tra ngày ${ngay} của em ${d.hoTen}.`)
+  // Mở đầu: AI GỬI, bài nào, ngày nào. Một dòng, không lời chào.
+  khoi.push(`${NGUOI_GUI} gửi kết quả bài kiểm tra ngày ${ngay} của em ${d.hoTen}.`)
 
   // ĐIỂM. Nhãn VIẾT HOA vì Zalo không hiện chữ đậm — gõ **đậm** vào tin nhắn
   // thì phụ huynh nhìn thấy đúng hai dấu sao. Viết hoa là cách nhấn mạnh DUY
