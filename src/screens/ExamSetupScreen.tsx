@@ -83,7 +83,7 @@ function ChipChon({ chon, onClick, children }: { chon: boolean; onClick: () => v
 /** Phạm vi gửi ca (QUANLYCATHI mục 4) — máy chủ kiểm tra lúc vào thi, không chỉ ẩn giao diện. */
 const PHAM_VI_CHON: { id: PhamViCa; ten: string; mota: string }[] = [
   { id: 'tu_do', ten: 'Tự do', mota: 'Ai có mã ca đều vào được — luyện tập, ôn ngoài giờ.' },
-  { id: 'khoi', ten: 'Theo khối', mota: 'Chọn năm sinh; em không đúng khối (theo hồ sơ đã đăng ký) bị chặn.' },
+  { id: 'khoi', ten: 'Theo khối', mota: 'Chọn năm sinh; em không đúng khối (theo danh sách lớp đã nạp) bị chặn.' },
   { id: 'chon', ten: 'Chọn từng em', mota: 'Tích từng em trong danh sách — thi lại, phụ đạo, kiểm tra riêng nhóm yếu.' },
 ]
 
@@ -131,7 +131,7 @@ export default function ExamSetupScreen() {
   const [namSinhKhoi, setNamSinhKhoi] = useState('')
   const [chonSbd, setChonSbd] = useState<Set<string>>(new Set())
   const [timTen, setTimTen] = useState('')
-  // Danh sách em để tích: danh sách lớp (Google Sheet) — không có thì lấy hồ sơ đã đăng ký trên máy chủ.
+  // Danh sách em để tích: danh sách lớp trên máy (Google Sheet) — không có thì lấy danh sách lớp đã nạp lên máy chủ.
   const [dsDangKy, setDsDangKy] = useState<{ sbd: string; hoTen: string; lop: string }[] | null>(null)
   const [opening, setOpening] = useState(false)
   const [opened, setOpened] = useState<{ maCa: string; joinLink: string; batDau: string; hetHanVao: string } | null>(null)
@@ -166,7 +166,7 @@ export default function ExamSetupScreen() {
   // Lớp gợi ý từ danh sách lớp đã nối (Google Sheet) — bấm 1 chạm thay vì gõ.
   const dsLop = useMemo(() => Array.from(new Set(classList.map((r) => chuoi(r.lop).trim()).filter(Boolean))).sort(), [classList])
 
-  // Nguồn em để "Chọn từng em": danh sách lớp; rỗng thì hồ sơ đã đăng ký (tải khi cần).
+  // Nguồn em để "Chọn từng em": danh sách lớp trên máy; rỗng thì danh sách lớp trên máy chủ (tải khi cần).
   useEffect(() => {
     if (phamVi !== 'chon' || classList.length > 0 || dsDangKy !== null || !scriptUrl.trim() || !maBiMat.trim()) return
     // Nguồn phải là DANH SÁCH LỚP đã nạp (danhSachEm gộp danh sách + hồ sơ + lượt
@@ -538,7 +538,7 @@ export default function ExamSetupScreen() {
           <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
             <div className="flex items-center justify-between" style={NHAN_NHO}>
               <span>
-                Đã tích <b style={{ ...SO, color: 'var(--muc)' }}>{chonSbd.size}</b> em{classList.length === 0 ? ' (nguồn: hồ sơ đã đăng ký)' : ''}
+                Đã tích <b style={{ ...SO, color: 'var(--muc)' }}>{chonSbd.size}</b> em{classList.length === 0 ? ` (nguồn: danh sách lớp trên máy chủ · ${dsEmChon.length} em)` : ''}
               </span>
               {chonSbd.size > 0 && (
                 <button type="button" onClick={() => setChonSbd(new Set())} className="tap-target">
