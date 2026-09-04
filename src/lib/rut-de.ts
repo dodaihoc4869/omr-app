@@ -243,6 +243,45 @@ export function locNguonTheoId(sources: TeacherExamSource[], ids: Set<string>): 
     .filter((s) => s.phanI.length + s.phanII.length + s.phanIII.length > 0)
 }
 
+/** Ca đã mở, để tính câu nào THẬT SỰ đã ra. */
+export interface CaDaMo {
+  maCa: string
+  sources: TeacherExamSource[]
+  /** Số câu mỗi phần của ca (chỉ ca mở bằng màn Rút đề mới có). */
+  soCau?: SoCauPhan | null
+}
+
+/** Số câu mỗi phần của ca mở TRƯỚC màn Rút đề — hằng số cũ trong exam-assign. */
+const CU_18_4_6: SoCauPhan = { I: 18, II: 4, III: 6 }
+
+/** Câu đã ra ở các ca trước, để rút đề tránh phát lại.
+ *
+ * KHÔNG lấy bừa mọi câu trong bản đề đã lưu của mỗi ca. Ca mở TRƯỚC màn Rút đề
+ * lưu cả kho (đề `12-C1-B1` là 147 câu) trong khi mỗi em chỉ làm 18/4/6 câu
+ * random riêng — coi cả 147 câu là "đã ra" thì lần rút nào cũng báo lặp lại
+ * toàn bộ, tức là cái cờ mất hết ý nghĩa. Đã thấy đúng cảnh này trên máy thầy
+ * ngày 04-09.
+ *
+ * Luật: ca có `soCau` (mở bằng màn Rút đề) thì bản lưu CHÍNH LÀ bộ đã ra, tính
+ * hết. Ca cũ chỉ tính khi số câu từng phần không vượt 18/4/6 — khi đó mọi em
+ * nhận trọn đề nên chắc chắn câu nào cũng đã ra. Ca cũ có kho lớn hơn thì
+ * KHÔNG đoán em nào làm câu nào, bỏ qua cả ca. */
+export function qidDaRaTuCacCa(ds: CaDaMo[]): string[] {
+  const ra = new Set<string>()
+  for (const ca of ds) {
+    const so = { I: 0, II: 0, III: 0 }
+    for (const s of ca.sources) {
+      so.I += s.phanI.length
+      so.II += s.phanII.length
+      so.III += s.phanIII.length
+    }
+    const chacChan = ca.soCau ? true : PHAN_DE.every((p) => so[p] <= CU_18_4_6[p])
+    if (!chacChan) continue
+    for (const s of ca.sources) for (const q of [...s.phanI, ...s.phanII, ...s.phanIII]) ra.add(q.id)
+  }
+  return [...ra]
+}
+
 export function moiIdDaRut(kq: KetQuaRut): Set<string> {
   return new Set(PHAN_DE.flatMap((p) => kq.chon[p].map((c) => c.id)))
 }

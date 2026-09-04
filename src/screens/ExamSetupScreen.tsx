@@ -6,12 +6,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { CheckSquare, Square, Library, Copy, Check } from 'lucide-react'
 import { mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
 import KhoiRutDe from '../components/KhoiRutDe'
-import { locNguonTheoId, type SoCauPhan } from '../lib/rut-de'
+import { locNguonTheoId, qidDaRaTuCacCa, type SoCauPhan } from '../lib/rut-de'
 import { randomSessionCode, taoLinkMoi } from '../lib/ca-link'
 import { TheNoiDung, Hang, OThongBao, NutChinh } from '../components/DesignSystem'
 import NutDongBo from '../components/NutDongBo'
 import { chuoi, danhSachEm, khoiTuNamSinh, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
-import { loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, luuSoCauCa, saveSessionTeacherBank } from '../lib/exam-db'
+import { docSoCauCa, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, luuSoCauCa, saveSessionTeacherBank } from '../lib/exam-db'
 import { dongBoNganHang } from '../lib/exam-sync'
 import { useAppStore } from '../store/appStore'
 
@@ -151,11 +151,9 @@ export default function ExamSetupScreen() {
     loadScriptUrl().then(setScriptUrl)
     loadTeacherSecret().then(setMaBiMat)
     loadAllSessionTeacherBanks()
-      .then((ds) => {
-        if (huy) return
-        const ids = new Set<string>()
-        for (const b of ds) for (const s of b.sources) for (const q of [...s.phanI, ...s.phanII, ...s.phanIII]) ids.add(q.id)
-        setQidCaTruoc([...ids])
+      .then(async (ds) => {
+        const kem = await Promise.all(ds.map(async (b) => ({ ...b, soCau: await docSoCauCa(b.maCa) })))
+        if (!huy) setQidCaTruoc(qidDaRaTuCacCa(kem))
       })
       .catch(() => {})
     loadExamSources().then((list) => {

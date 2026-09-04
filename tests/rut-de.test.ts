@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../src/data/examContent'
 import { mergeAndStrip, mergeKeepAnswers } from '../src/data/examContent'
 import { assignStudentQuestions } from '../src/lib/exam-assign'
-import { boMotCau, demMucDo, doiMotCau, dsChuyenDe, dungUngVien, locNguonTheoId, locTheoYeuCau, moiIdDaRut, rutDe, soCauCua, tongCau, type MucDoRut, type YeuCauRut } from '../src/lib/rut-de'
+import { boMotCau, demMucDo, doiMotCau, dsChuyenDe, dungUngVien, locNguonTheoId, locTheoYeuCau, moiIdDaRut, qidDaRaTuCacCa, rutDe, soCauCua, tongCau, type MucDoRut, type YeuCauRut } from '../src/lib/rut-de'
 
 type Mo = { chuyenDe?: string; mucDo?: MucDoRut }
 
@@ -275,5 +275,83 @@ describe('bộ câu đã rút đi tới máy học sinh nguyên vẹn', () => {
     expect(a.phanI.length).toBe(18)
     expect(a.phanII.length).toBe(4)
     expect(a.phanIII.length).toBe(6)
+  })
+})
+
+describe('qidDaRaTuCacCa', () => {
+  const kho = khoLon()
+
+  it('ca mở bằng màn Rút đề: bản lưu chính là bộ đã ra, tính hết', () => {
+    const kq = rutDe(dungUngVien(kho), { soCau: { I: 25, II: 5, III: 8 }, chuyenDe: [], mucDo: [], seed: 5 })
+    const nguon = locNguonTheoId(kho, moiIdDaRut(kq))
+    const ra = qidDaRaTuCacCa([{ maCa: 'c1', sources: nguon, soCau: soCauCua(kq) }])
+    expect(ra.length).toBe(38)
+    expect(new Set(ra)).toEqual(moiIdDaRut(kq))
+  })
+
+  it('ca CŨ lưu cả kho 147 câu thì BỎ QUA — không coi cả kho là đã ra', () => {
+    expect(qidDaRaTuCacCa([{ maCa: 'cu', sources: kho }])).toEqual([])
+  })
+
+  it('ca cũ có kho vừa đúng 18/4/6 thì mọi em nhận trọn đề, tính hết', () => {
+    const vua: TeacherExamSource[] = [
+      {
+        maDe: 'D28',
+        phanI: Array.from({ length: 18 }, (_, i) => mcq(`d${i}`)),
+        phanII: Array.from({ length: 4 }, (_, i) => tf(`t${i}`)),
+        phanIII: Array.from({ length: 6 }, (_, i) => sa(`s${i}`)),
+      },
+    ]
+    expect(qidDaRaTuCacCa([{ maCa: 'cu', sources: vua }]).length).toBe(28)
+  })
+
+  it('gộp nhiều ca, không đếm trùng', () => {
+    const vua: TeacherExamSource[] = [{ maDe: 'D', phanI: [mcq('x1')], phanII: [], phanIII: [] }]
+    expect(qidDaRaTuCacCa([{ maCa: 'a', sources: vua }, { maCa: 'b', sources: vua }])).toEqual(['x1'])
+  })
+})
+
+describe('mỗi em một bộ câu riêng (thầy chốt 04-09)', () => {
+  const kho = khoLon()
+  // Thầy đặt mỗi em 18/4/6 câu; kho của ca rút gấp 3 = 54/12/18 câu.
+  const kq = rutDe(dungUngVien(kho), { soCau: { I: 54, II: 12, III: 18 }, chuyenDe: [], mucDo: [], seed: 21 })
+  const nguon = locNguonTheoId(kho, moiIdDaRut(kq))
+  const bank = mergeAndStrip(nguon, { I: 18, II: 4, III: 6 })
+
+  it('kho của ca lớn hơn số câu mỗi em', () => {
+    expect(bank.phanI.length).toBe(54)
+    expect(bank.soCau).toEqual({ I: 18, II: 4, III: 6 })
+  })
+
+  it('mỗi em vẫn làm đúng số câu thầy đặt', () => {
+    const a = assignStudentQuestions(bank, 'ca9', 'hs001')
+    expect(a.phanI.length).toBe(18)
+    expect(a.phanII.length).toBe(4)
+    expect(a.phanIII.length).toBe(6)
+  })
+
+  it('HAI EM NHẬN BỘ CÂU KHÁC NHAU', () => {
+    const a = assignStudentQuestions(bank, 'ca9', 'hs001')
+    const b = assignStudentQuestions(bank, 'ca9', 'hs002')
+    const ta = new Set(a.phanI.map((x) => x.qid))
+    const chung = b.phanI.filter((x) => ta.has(x.qid)).length
+    expect(chung).toBeLessThan(18)
+  })
+
+  it('cùng em thì luôn ra đúng bộ đó — chấm lại không lệch', () => {
+    const a = assignStudentQuestions(bank, 'ca9', 'hs001')
+    const b = assignStudentQuestions(bank, 'ca9', 'hs001')
+    expect(a.phanI.map((x) => x.qid)).toEqual(b.phanI.map((x) => x.qid))
+    expect(a.phanIII.map((x) => x.qid)).toEqual(b.phanIII.map((x) => x.qid))
+  })
+
+  it('thứ tự A–D cũng đảo riêng từng em', () => {
+    const a = assignStudentQuestions(bank, 'ca9', 'hs001')
+    const b = assignStudentQuestions(bank, 'ca9', 'hs002')
+    const chungQid = a.phanI.find((x) => b.phanI.some((y) => y.qid === x.qid))
+    if (chungQid) {
+      const kia = b.phanI.find((y) => y.qid === chungQid.qid)!
+      expect(chungQid.choicePerm).not.toEqual(kia.choicePerm)
+    }
   })
 })

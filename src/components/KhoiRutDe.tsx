@@ -136,6 +136,10 @@ export interface KhoiRutDeProps {
   onDoi: (kq: { ids: Set<string>; soCau: SoCauPhan } | null) => void
 }
 
+/** Kho ca rộng gấp mấy lần số câu mỗi em, để hai em ngồi cạnh nhau nhận đề
+ * khác nhau. Gấp 3 là mỗi em lấy 1/3 kho: đủ khác nhau mà gói đề chưa phình. */
+const HE_SO_KHO = 3
+
 export default function KhoiRutDe({ nguon, qidCaTruoc, onDoi }: KhoiRutDeProps) {
   const uv = useMemo(() => dungUngVien(nguon), [nguon])
   const co: SoCauPhan = useMemo(() => ({ I: uv.I.length, II: uv.II.length, III: uv.III.length }), [uv])
@@ -147,7 +151,12 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, onDoi }: KhoiRutDeProps) 
   // rút đề ở đó chỉ tổ làm thầy thêm một bước. Kho lớn hơn thì mặc định RÚT,
   // vì đẩy cả kho lên là bắt mỗi em tải vài megabyte.
   const [rut, setRut] = useState(() => tongKho > tongCau(SO_CAU_CHUAN))
+  // SỐ CÂU MỖI EM LÀM.
   const [soCau, setSoCau] = useState<SoCauPhan>(() => ({ I: Math.min(SO_CAU_CHUAN.I, co.I), II: Math.min(SO_CAU_CHUAN.II, co.II), III: Math.min(SO_CAU_CHUAN.III, co.III) }))
+  // SỐ CÂU RÚT VÀO KHO CỦA CA. Lớn hơn số câu mỗi em thì mỗi em bốc một bộ khác
+  // nhau từ kho đó (máy bốc theo mã ca + số báo danh nên tái tạo lại được khi
+  // chấm lại). Bằng nhau thì cả lớp làm cùng một đề.
+  const [rieng, setRieng] = useState(true)
   const [chonCd, setChonCd] = useState<string[]>([])
   const [chonMuc, setChonMuc] = useState<MucDoRut[]>([])
   const [seed, setSeed] = useState(() => Math.floor(Math.random() * 1e9))
@@ -165,7 +174,13 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, onDoi }: KhoiRutDeProps) 
     setRut(tongKho > tongCau(SO_CAU_CHUAN))
   }, [co.I, co.II, co.III, tongKho])
 
-  const yc: YeuCauRut = useMemo(() => ({ soCau, chuyenDe: chonCd, mucDo: chonMuc, tranhQid: qidCaTruoc, seed }), [soCau, chonCd, chonMuc, qidCaTruoc, seed])
+  // Kho của ca: gấp HE_SO_KHO lần số câu mỗi em, chặn trên bằng số câu thật có.
+  const soCauKho: SoCauPhan = useMemo(
+    () => (rieng ? { I: Math.min(co.I, soCau.I * HE_SO_KHO), II: Math.min(co.II, soCau.II * HE_SO_KHO), III: Math.min(co.III, soCau.III * HE_SO_KHO) } : soCau),
+    [rieng, soCau, co],
+  )
+
+  const yc: YeuCauRut = useMemo(() => ({ soCau: soCauKho, chuyenDe: chonCd, mucDo: chonMuc, tranhQid: qidCaTruoc, seed }), [soCauKho, chonCd, chonMuc, qidCaTruoc, seed])
 
   useEffect(() => {
     setKq(rutDe(uv, yc))
@@ -178,8 +193,11 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, onDoi }: KhoiRutDeProps) 
       onDoi(null)
       return
     }
-    onDoi({ ids: moiIdDaRut(kq), soCau: soCauCua(kq) })
-  }, [rut, kq, onDoi])
+    // soCau báo lên là SỐ CÂU MỖI EM LÀM, không phải cỡ kho. Kho lớn hơn thì
+    // máy bốc riêng cho từng em; bằng nhau thì cả lớp cùng một đề.
+    const kho = soCauCua(kq)
+    onDoi({ ids: moiIdDaRut(kq), soCau: { I: Math.min(soCau.I, kho.I), II: Math.min(soCau.II, kho.II), III: Math.min(soCau.III, kho.III) } })
+  }, [rut, kq, soCau, onDoi])
 
   const daRut = kq ? soCauCua(kq) : { I: 0, II: 0, III: 0 }
   const thieu = kq ? PHAN_DE.filter((p) => kq.thieu[p] > 0) : []
@@ -222,11 +240,11 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, onDoi }: KhoiRutDeProps) 
 
       {!rut ? (
         <OThongBao tone="cam">
-          Cả {tongKho} câu được đẩy lên máy chủ, và mỗi em vẫn chỉ được máy cắt ngẫu nhiên {SO_CAU_CHUAN.I}/{SO_CAU_CHUAN.II}/{SO_CAU_CHUAN.III} câu — mỗi em một bộ khác nhau nên
-          <b> điểm hai em không so được với nhau</b>, hạng lớp trong báo cáo gửi phụ huynh cũng không còn đúng. Chỉ nên dùng khi kho vừa đúng một đề.
+          Cả {tongKho} câu được đẩy lên máy chủ, mỗi em vẫn chỉ làm {SO_CAU_CHUAN.I}/{SO_CAU_CHUAN.II}/{SO_CAU_CHUAN.III} câu máy bốc ngẫu nhiên. Gói đề nặng, mà thầy không chọn được chuyên đề lẫn mức độ. Chỉ nên dùng khi kho vừa đúng một đề.
         </OThongBao>
       ) : (
         <>
+          <div style={NHAN_NHO}>Mỗi em làm</div>
           <div className="flex flex-wrap items-end" style={{ gap: 'var(--k4)' }}>
             <OSo nhan="Phần I" tri={soCau.I} doi={(n) => capNhat('I', n)} tran={co.I} />
             <OSo nhan="Phần II" tri={soCau.II} doi={(n) => capNhat('II', n)} tran={co.II} />
@@ -247,6 +265,18 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, onDoi }: KhoiRutDeProps) 
                 Phần {p} về {Math.min(SO_CAU_CHUAN[p], co[p])}
               </button>
             ))}
+          </div>
+
+          <div>
+            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Đề của từng em</div>
+            <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Đề của từng em">
+              <Chip chon={rieng} onClick={() => setRieng(true)}>
+                Mỗi em một bộ câu riêng
+              </Chip>
+              <Chip chon={!rieng} onClick={() => setRieng(false)}>
+                Cả lớp cùng một đề
+              </Chip>
+            </div>
           </div>
 
           {dsCd.length > 1 && (
@@ -283,7 +313,13 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, onDoi }: KhoiRutDeProps) 
 
           <div className="flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
             <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
-              Đề ra: <b style={SO}>{tongCau(daRut)}</b> câu (I {daRut.I} · II {daRut.II} · III {daRut.III})
+              Kho của ca: <b style={SO}>{tongCau(daRut)}</b> câu (I {daRut.I} · II {daRut.II} · III {daRut.III})
+              {rieng ? (
+                <>
+                  {' '}
+                  · mỗi em làm <b style={SO}>{tongCau(soCau)}</b> câu
+                </>
+              ) : null}
             </div>
             <button type="button" onClick={() => setMoChiTiet((v) => !v)} className="tap-target font-bold inline-flex items-center" style={{ ...NHAN_NHO, gap: 4, color: 'var(--muc)' }} aria-expanded={moChiTiet}>
               {moChiTiet ? 'Thu lại' : 'Xem từng câu'}
@@ -306,7 +342,11 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, onDoi }: KhoiRutDeProps) 
             </div>
           )}
 
-          <div style={NHAN_NHO}>Cả lớp làm cùng bộ câu này. Thứ tự câu và thứ tự A–D vẫn đảo riêng từng em nên hai em ngồi cạnh nhau không nhìn được bài của nhau.</div>
+          <div style={NHAN_NHO}>
+            {rieng
+              ? `Máy bốc ${tongCau(soCau)} câu riêng cho từng em từ kho ${tongCau(daRut)} câu này, rồi đảo thứ tự câu và thứ tự A–D. Hai em ngồi cạnh nhau gần như chắc chắn khác đề. Đổi lại, hai em làm hai bộ câu khác nhau nên điểm không so tuyệt đối với nhau được; hạng lớp trong báo cáo chỉ còn là so tương đối.`
+              : 'Cả lớp làm cùng bộ câu này, chỉ đảo thứ tự câu và thứ tự A–D riêng từng em. Điểm hai em so được trực tiếp với nhau.'}
+          </div>
         </>
       )}
     </div>
