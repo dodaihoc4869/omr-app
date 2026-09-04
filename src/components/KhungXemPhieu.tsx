@@ -25,7 +25,7 @@
 // `.lop-xem-phieu` trong index.css). Phiếu co đúng theo bề rộng nửa phải, nên
 // thầy vẫn đổi được màn khác mà không phải đóng phiếu; kéo hẹp/rộng cột trái
 // là phiếu co theo ngay.
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 
@@ -41,6 +41,31 @@ export interface KhungXemPhieuProps {
 }
 
 export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuProps) {
+  // ĐO THẲNG mép phải của thanh điều hướng, không trông vào CSS.
+  //
+  // Bản trước để CSS lo bằng `body:has(.ben-trai)`. Luật đó đúng và chạy được,
+  // nhưng thầy vẫn gặp một chỗ phủ kín màn — mà đo bằng JS thì không còn chỗ
+  // cho khác biệt: lấy đúng con số trình duyệt đang bố cục, mọi lối vào đều ra
+  // một kết quả. Thanh trái ẩn (màn hẹp, hoặc màn làm bài không dựng thanh) thì
+  // ra 0, tức phủ kín — đúng như mong muốn.
+  const [meTrai, setMeTrai] = useState(0)
+  useLayoutEffect(() => {
+    const thanh = document.querySelector('.ben-trai') as HTMLElement | null
+    const do_ = () => {
+      if (!thanh || getComputedStyle(thanh).display === 'none') return setMeTrai(0)
+      setMeTrai(Math.round(thanh.getBoundingClientRect().right))
+    }
+    do_()
+    window.addEventListener('resize', do_)
+    // Thầy kéo chỉnh bề rộng cột trong lúc đang mở phiếu thì phiếu co theo ngay.
+    const theoDoi = thanh && typeof ResizeObserver !== 'undefined' ? new ResizeObserver(do_) : null
+    if (thanh && theoDoi) theoDoi.observe(thanh)
+    return () => {
+      window.removeEventListener('resize', do_)
+      theoDoi?.disconnect()
+    }
+  }, [])
+
   useEffect(() => {
     // ĐẨY MỘT MỤC LỊCH SỬ để vuốt quay lại (và nút back) đóng lớp phủ thay vì
     // thoát khỏi app.
@@ -83,7 +108,7 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
   }, [dong])
 
   return createPortal(
-    <div className="lop-xem-phieu" role="dialog" aria-modal="true" aria-label={ten || 'Phiếu bài tập'}>
+    <div className="lop-xem-phieu" role="dialog" aria-modal="true" aria-label={ten || 'Phiếu bài tập'} style={{ left: meTrai }}>
       <iframe
         title={ten || 'Phiếu bài tập'}
         {...(html ? { srcDoc: html } : { src })}

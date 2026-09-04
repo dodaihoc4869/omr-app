@@ -371,6 +371,9 @@ body {
   backdrop-filter: blur(6px);
 }
 
+/* DÂY BẢO HIỂM. Vị trí thật do KhungXemPhieu ĐO BẰNG JS rồi đặt thẳng vào
+ * style của thẻ (style nội tuyến thắng luật này), nên luật dưới chỉ để trang
+ * không nhấp nháy phủ kín trong một khung hình đầu tiên trước khi đo xong. */
 @media (min-width: 880px) {
   body:has(.ben-trai) .lop-xem-phieu {
     left: var(--rong-ben-trai, 232px);

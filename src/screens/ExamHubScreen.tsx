@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { ClipboardList, GraduationCap, Library, Smartphone, Presentation } from 'lucide-react'
+import { ClipboardList, GraduationCap, Library, Smartphone, Presentation, RefreshCw } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
-import { PHIEN_BAN_APP } from '../lib/cap-nhat-app'
+import { daySangBanMoi, PHIEN_BAN_APP, type DangKySW } from '../lib/cap-nhat-app'
 import { OThongBao, NutChinh } from '../components/DesignSystem'
 import { caiMotCham, coTheCaiMotCham, dangTrongTrinhDuyet, theoDoiSuKienCai } from '../lib/pwa-install'
 
@@ -111,6 +111,58 @@ function TheCaiApp() {
   )
 }
 
+/** ÉP LẤY BẢN MỚI NGAY.
+ *
+ * ĐÃ MẤT NỬA NGÀY 04-09 vì chuyện này: tôi sửa lỗi, đẩy lên, CI xanh, nhưng
+ * app trên máy thầy vẫn chạy mã bản cũ trong bộ nhớ nên thầy thử lại thấy y
+ * lỗi cũ và tưởng tôi chưa làm. Nay app đã tự tải lại khi bản mới chiếm quyền,
+ * nhưng vẫn cần một nút bấm tay: máy còn giữ service worker ĐỜI CŨ (bản không
+ * có phần tự tải lại) thì chỉ nút này cứu được.
+ *
+ * Ba bước, không bỏ bước nào: hỏi máy chủ có bản mới không → đẩy bản đang nằm
+ * chờ vào chạy → tải lại trang. Thiếu bước cuối là vẫn chạy mã cũ. */
+function NutCapNhat() {
+  const [dang, setDang] = useState(false)
+
+  const capNhat = async () => {
+    setDang(true)
+    try {
+      const dk = await navigator.serviceWorker?.getRegistration()
+      if (dk) {
+        await dk.update().catch(() => {})
+        daySangBanMoi(dk as unknown as DangKySW)
+        // Chờ một nhịp cho bản mới kịp chiếm quyền rồi mới tải lại.
+        await new Promise((r) => setTimeout(r, 600))
+      }
+    } finally {
+      location.reload()
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => void capNhat()}
+      disabled={dang}
+      className="tap-target inline-flex items-center font-bold"
+      style={{
+        gap: 6,
+        minHeight: 32,
+        padding: '0 var(--k3)',
+        borderRadius: 'var(--bo-tron)',
+        border: '1px solid var(--vien)',
+        background: 'transparent',
+        color: 'var(--nhat)',
+        fontFamily: 'var(--sans)',
+        fontSize: 'var(--cx-1)',
+      }}
+    >
+      <RefreshCw size={13} className={dang ? 'animate-spin' : undefined} />
+      {dang ? 'Đang lấy…' : 'Lấy bản mới'}
+    </button>
+  )
+}
+
 export default function ExamHubScreen() {
   const setScreen = useAppStore((s) => s.setScreen)
 
@@ -141,9 +193,11 @@ export default function ExamHubScreen() {
 
       {/* Dấu phiên bản: sửa lỗi xong, mở app thấy mã commit mới nghĩa là máy đã
           nhận bản mới; còn mã cũ nghĩa là máy còn giữ bản cũ. Căn TRÁI để không
-          bị icon tin nhắn (kéo thả được, hay nằm giữa dưới) đè lên. */}
-      <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginTop: 'var(--k2)' }}>
-        Bản {PHIEN_BAN_APP}
+          bị icon tin nhắn (kéo thả được, hay nằm giữa dưới) đè lên.
+          Kèm nút ép cập nhật — xem NutCapNhat bên dưới. */}
+      <div className="flex items-center flex-wrap" style={{ gap: 'var(--k3)', marginTop: 'var(--k2)' }}>
+        <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>Bản {PHIEN_BAN_APP}</span>
+        <NutCapNhat />
       </div>
     </div>
   )

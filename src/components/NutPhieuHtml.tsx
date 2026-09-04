@@ -140,7 +140,7 @@ export default function NutPhieuHtml({ dungGoi, nhanXem, showToast, choPhepLink 
           </button>
         )}
       </div>
-      {htmlPhieu && <KhungXemPhieu html={htmlPhieu} dong={() => setHtmlPhieu('')} />}
+      {htmlPhieu && <KhungXemPhieu html={htmlPhieu} ten={nhanXem} dong={() => setHtmlPhieu('')} />}
       {daCopy && (
         <div className="break-all" style={{ ...NHAN_NHO, fontVariantNumeric: 'tabular-nums' }}>
           {daCopy}
