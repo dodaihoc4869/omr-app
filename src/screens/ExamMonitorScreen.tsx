@@ -19,6 +19,7 @@ import { gioMayChu } from '../lib/gio-may-chu'
 import { soanTinRoiMan } from '../lib/phieu-zalo'
 import { KhoiChuyenDe, KhoiLichSuCa } from '../components/HoSoEmView'
 import NutBaiTapPdf from '../components/NutBaiTapPdf'
+import KhoiTienBo from '../components/KhoiTienBo'
 import PhieuZaloEm from '../components/PhieuZaloEm'
 import { hoSoEm, type HoSoEm } from '../lib/exam-api'
 import { buildStudentEntry, downloadDuLieuJson } from '../lib/json-export'
@@ -458,6 +459,10 @@ export default function ExamMonitorScreen() {
                 <span style={{ ...NHAN_NHO, ...SO }}>· {hoSo.ca.length} ca đã làm</span>
               </div>
             </TheNoiDung>
+
+            {/* Biểu đồ tiến bộ đứng đầu hồ sơ: mở ra là biết em đang lên hay
+                đang xuống, trước khi đọc bất cứ số nào khác. */}
+            <KhoiTienBo ca={hoSo.ca} />
 
             {/* Phiếu soạn theo ĐÚNG ca đang mở, không phải ca mới nhất của em —
                 thầy đang đứng ở ca này thì tin nhắn phải nói về ca này. */}

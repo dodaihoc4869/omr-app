@@ -9,6 +9,7 @@ import { ArrowLeft, RefreshCw, Search, Trash2 } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung, DauThe } from '../components/DesignSystem'
 import { KhoiChuyenDe, KhoiLichSuCa, toneXepLoai } from '../components/HoSoEmView'
 import NutBaiTapPdf from '../components/NutBaiTapPdf'
+import KhoiTienBo from '../components/KhoiTienBo'
 import { danhSachEm, deleteStudentRegistration, hoSoEm, khoiTuNamSinh, type EmTomTat, type HoSoEm } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { classify } from '../engine/score'
@@ -147,6 +148,11 @@ export default function HocSinhScreen() {
                 </div>
               </div>
             </TheNoiDung>
+
+            {/* CÂU HỎI ĐẦU TIÊN khi mở hồ sơ một em luôn là "em này đang lên
+                hay đang xuống" — nên biểu đồ tiến bộ đứng ngay đây, trước mọi
+                thứ khác. */}
+            <KhoiTienBo ca={hoSo.ca} />
 
             {/* Mục GIAO BÀI TẬP VỀ NHÀ đã gỡ theo yêu cầu của thầy. Code vẫn
                 còn nguyên trong repo (thư mục components, lib/bai-tap.ts, ca
