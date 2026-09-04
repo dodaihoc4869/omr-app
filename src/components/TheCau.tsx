@@ -111,7 +111,7 @@ function DongLyDo({ dung, ma, chu }: { dung: boolean; ma: string; chu?: string }
 function LoiGiai({ props, nhan }: { props: TheCauProps; nhan?: TrangThaiLoiGiai }) {
   const lg = props.loiGiai
   const text = props.explanation
-  const coGi = !!lg?.chot || !!text?.trim()
+  const coGi = !!lg?.chot || !!text?.trim() || !!(lg?.buoc && lg.buoc.length > 0) || !!lg?.tungPa || !!lg?.tungY
   return (
     <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
       {nhan === 'nghi_dap_an_sai' && (

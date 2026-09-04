@@ -648,7 +648,7 @@ export default function PhieuScreen({ duCoSan }: { duCoSan?: PhieuDayDu } = {}) 
   const tat = useMemo(() => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches, [])
 
   const nap = useCallback(async () => {
-    const { ma, soCau: soCauLink } = docLinkPhieu(location.hash)
+    const { ma, soCau: soCauLink, cheDo } = docLinkPhieu(location.hash)
     if (!ma) {
       setLoi('Link không đúng hoặc bị cắt ngắn khi chuyển tiếp.')
       setDu(null)
@@ -670,7 +670,13 @@ export default function PhieuScreen({ duCoSan }: { duCoSan?: PhieuDayDu } = {}) 
         const cau = soCauLink ? g.cau.slice(0, chanSoCau(soCauLink)) : g.cau
         const tt = { ...g.tt, ngay: new Date(g.tt.ngay) }
         if (soCauLink && Array.isArray(tt.oBia)) tt.oBia = tt.oBia.map((o) => (o.nhan === 'Số câu' ? { ...o, gia: `${cau.length} câu` } : o))
-        setPhieuBt(dungPhieu(tt, cau))
+        // HAI LINK, MỘT PHIẾU: `~20d` là ĐỀ cho em tự làm (không một đáp án nào
+        // trong trang), `~20g` là LỜI GIẢI để em dò. Link cũ không ghi chữ
+        // cuối thì mở như trước: phiếu ôn gập sẵn lời giải.
+        const anGiai = cheDo === 'de'
+        if (anGiai) tt.nhanBia = 'Đề luyện theo đúng chỗ em mất điểm'
+        else if (soCauLink) tt.nhanBia = 'Lời giải bài luyện của em'
+        setPhieuBt(dungPhieu(tt, cau, { anGiai }))
         return
       }
       if (!p || Number(p.v) !== BAN_PHIEU) throw new Error('Báo cáo này thuộc phiên bản khác, Thầy cần gửi lại link mới.')
@@ -1079,19 +1085,24 @@ function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
   const [soCau, setSoCau] = useState(() => Math.min(SO_CAU_MIN, tran))
   const lay = Math.min(soCau, coSan)
 
-  // Link đã cất sẵn là `.../p#<mã>`; gắn thêm `~<số câu>` là xong, không phải
-  // ghi lại phiếu nào lên máy chủ (trang này không có mã bí mật để ghi).
-  const linkGui = du.linkBaiTap ? `${du.linkBaiTap}~${chanSoCau(soCau)}` : ''
+  // Link đã cất sẵn là `.../p#<mã>`; gắn thêm `~<số câu>` và chữ cuối là xong,
+  // không phải ghi lại phiếu nào lên máy chủ (trang này không có mã bí mật để
+  // ghi). HAI LINK (thầy chốt 04-09 khuya): `d` = chỉ có ĐỀ cho con tự làm,
+  // `g` = có LỜI GIẢI để con dò sau khi làm xong.
+  const linkDe = du.linkBaiTap ? `${du.linkBaiTap}~${chanSoCau(soCau)}d` : ''
+  const linkGiai = du.linkBaiTap ? `${du.linkBaiTap}~${chanSoCau(soCau)}g` : ''
+  const [daCopyGiai, setDaCopyGiai] = useState(false)
 
-  const copyLink = async () => {
-    if (!linkGui) return
+  const copyLink = async (link: string, giai: boolean) => {
+    if (!link) return
+    const bao = giai ? setDaCopyGiai : setDaCopy
     try {
       if (!navigator.clipboard?.writeText) throw new Error('không có clipboard')
-      await navigator.clipboard.writeText(linkGui)
-      setDaCopy(true)
-      setTimeout(() => setDaCopy(false), 3000)
+      await navigator.clipboard.writeText(link)
+      bao(true)
+      setTimeout(() => bao(false), 3000)
     } catch {
-      setLinkTay(linkGui)
+      setLinkTay(link)
     }
   }
 
@@ -1152,15 +1163,22 @@ function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
             {dang ? 'Đang dựng…' : `Xem trước ${lay} câu`}
           </button>
         )}
-        {du.linkBaiTap && (
-          <button type="button" className={`bc-nut vang${daCopy ? '' : ' bc-nhay'}`} onClick={() => void copyLink()}>
-            {daCopy ? `Đã copy link ${lay} câu` : 'Copy link gửi cho con'}
-          </button>
-        )}
       </div>
+      {du.linkBaiTap && (
+        <div className="bc-nut-doi" style={{ marginTop: 8 }}>
+          <button type="button" className={`bc-nut vang${daCopy ? '' : ' bc-nhay'}`} onClick={() => void copyLink(linkDe, false)}>
+            {daCopy ? `Đã copy link đề ${lay} câu` : 'Copy link gửi ĐỀ cho con'}
+          </button>
+          <button type="button" className="bc-nut vang" onClick={() => void copyLink(linkGiai, true)}>
+            {daCopyGiai ? `Đã copy link lời giải ${lay} câu` : 'Copy link gửi LỜI GIẢI cho con'}
+          </button>
+        </div>
+      )}
       <div style={{ fontSize: 12, color: 'var(--p-nhat)', marginTop: 8, lineHeight: 1.6 }}>
-        Thầy đã chọn sẵn theo đúng chuyên đề em mất điểm ở bài này, xếp từ dễ lên khó. Em làm hết rồi mới bấm vào từng câu xem lời giải.
-        {du.linkBaiTap ? ' Link chỉ có bài tập, không kèm điểm và nhận xét, nên gửi thẳng cho con được.' : ''}
+        Thầy đã chọn sẵn theo đúng chuyên đề em mất điểm ở bài này, xếp từ dễ lên khó.
+        {du.linkBaiTap
+          ? ' Gửi con link ĐỀ trước để em tự làm vào vở; em làm xong mới gửi link LỜI GIẢI để em dò. Hai link chỉ có bài tập, không kèm điểm và nhận xét.'
+          : ' Em làm hết rồi mới bấm vào từng câu xem lời giải.'}
       </div>
       {linkTay && (
         <div style={{ fontSize: 12.5, marginTop: 8, lineHeight: 1.6 }}>

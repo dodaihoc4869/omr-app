@@ -560,7 +560,7 @@ const MUI_TEN = '<svg class="q-mui" viewBox="0 0 24 24" fill="none" stroke="curr
  *
  * `stt` là số thứ tự liên tục trên cả phiếu.
  * `moSan` = true thì thẻ hiện sẵn lời giải (chỉ dùng khi cần bản đọc thẳng). */
-export function theCauHtml(c: CauLuyen, stt: number, moSan = false): string {
+export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = false): string {
   const tags = [
     `<span class="q-tag ${LOP_LOAI[c.phan]}">${TEN_LOAI[c.phan]}</span>`,
     c.mucDo ? `<span class="q-tag ${LOP_MUC[c.mucDo]}">${TEN_MUC[c.mucDo]}</span>` : '',
@@ -593,13 +593,15 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false): string {
       .join('')
     than = `<div class="tf-head"><span>Đ</span><span>S</span></div>${hang}`
   } else {
-    than = `<div class="sa-vung"><div class="sa-blank">Đáp án: ……………………………</div><div class="sa-answer"><span class="ky">${chuHtml(c.dapAn || '—')}</span></div></div>`
+    than = anGiai
+      ? `<div class="sa-vung"><div class="sa-blank">Đáp án: ……………………………</div></div>`
+      : `<div class="sa-vung"><div class="sa-blank">Đáp án: ……………………………</div><div class="sa-answer"><span class="ky">${chuHtml(c.dapAn || '—')}</span></div></div>`
   }
 
   // Ảnh cắt cả thân câu LÀ đề bài — có nó thì không in `text` nữa, đúng như màn
   // làm bài của học sinh (lớp chữ trong PDF gốc hay vỡ công thức ÂM THẦM).
   const deBai = c.anhThanCau ? anhHtml(c.anhThanCau, 'than', 'Đề bài') : `<div class="q-text">${chuHtml(c.text)}</div>`
-  const giai = oGiaiHtml(c)
+  const giai = anGiai ? '' : oGiaiHtml(c)
   const nut = giai
     ? `<button class="q-nut-giai" type="button" aria-expanded="${moSan ? 'true' : 'false'}" aria-controls="giai-${stt}">${MUI_TEN}<span class="chu-mo">Xem lời giải</span><span class="chu-dong">Ẩn lời giải</span></button>
   <div class="sol-wrap" id="giai-${stt}"><div class="sol-inner">${giai}</div></div>`
@@ -762,7 +764,15 @@ export function tongQuanHtml(cau: CauLuyen[]): string {
  *
  * `soCau` là số câu CÓ LỜI GIẢI, không phải tổng số câu — câu chưa có đáp án
  * thì không mở được, đếm nó vào mẫu số là mãi mãi không bao giờ đủ. */
-export function thanhHtml(soCau: number): string {
+export function thanhHtml(soCau: number, anGiai = false): string {
+  if (anGiai) {
+    return `<div class="thanh">
+  <div class="thanh-chu">Phiếu chỉ có đề<span class="the-loc" id="the-loc" hidden> · <b id="ten-loc"></b></span></div>
+  <button class="nut nho" type="button" id="bo-loc" hidden>Bỏ lọc</button>
+  <button class="nut chinh" type="button" id="in-de" title="In hoặc lưu PDF đề bài">In đề</button>
+  <button class="nut" type="button" id="tai-tep" title="Tải tệp HTML này về máy để gửi Zalo">Tải tệp</button>
+</div>`
+  }
   return `<div class="thanh">
   <div class="thanh-chu">Đã xem lời giải <b id="dem-mo">0</b>/<span id="dem-tong">${soCau}</span> câu<span class="the-loc" id="the-loc" hidden> · <b id="ten-loc"></b></span></div>
   <button class="nut nho" type="button" id="bo-loc" hidden>Bỏ lọc</button>
@@ -945,15 +955,32 @@ export function taiLieuHtml(than: string, tieuDe: string): string {
  *
  * Không còn mục "Lời Giải Chi Tiết" riêng: lời giải nằm trong từng thẻ câu,
  * bấm vào câu là mở. Hàm thuần chuỗi, không cần trình duyệt để đo trang. */
-export function dungPhieu(t: ThongTinPhieu, cau: CauLuyen[]): string {
-  const the = cau.map((c, i) => theCauHtml(c, i + 1)).join('\n')
-  const coGiai = cau.filter((c) => oGiaiHtml(c) !== '').length
+/** BẢN CHỈ CÓ ĐỀ: xoá sạch đáp án, lời giải và ảnh lời giải khỏi DỮ LIỆU trước
+ * khi dựng. Không giấu bằng CSS — em tò mò bấm "xem mã nguồn" là thấy hết.
+ * Đây là bản gửi cho con tự làm (link `~20d`). */
+export function boLoiGiai(c: CauLuyen): CauLuyen {
+  return { ...c, dapAn: '', chot: '', lyDo: null, buoc: null, ketQua: '', hinh: c.hinh?.filter((h) => h.viTri !== 'sau_loi_giai') }
+}
+
+export interface TuyChonPhieu {
+  /** true = phiếu CHỈ CÓ ĐỀ (không đáp án, không lời giải, không nút mở). */
+  anGiai?: boolean
+}
+
+export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChonPhieu = {}): string {
+  const anGiai = !!tuyChon.anGiai
+  const cau = anGiai ? cauVao.map(boLoiGiai) : cauVao
+  const the = cau.map((c, i) => theCauHtml(c, i + 1, false, anGiai)).join('\n')
+  const coGiai = anGiai ? 0 : cau.filter((c) => oGiaiHtml(c) !== '').length
+  const huongDan = anGiai
+    ? 'Em làm vào vở rồi đối chiếu với link lời giải bố mẹ gửi sau. Muốn bản giấy thì bấm "In đề" rồi chọn "Lưu thành PDF".'
+    : 'Bấm vào từng câu để xem lời giải. Muốn bản giấy thì bấm "In đề" (phát cho em tự làm) hoặc "In kèm lời giải", rồi chọn "Lưu thành PDF".'
   const than = `${biaHtml(t, cau.length)}
 <div class="khung">
   ${tongQuanHtml(cau)}
-  ${thanhHtml(coGiai)}
+  ${thanhHtml(coGiai, anGiai)}
   <div class="ds-cau">${the}</div>
-  <div class="chan">Thầy Đỗ Đại Học · ${thoat(t.tenChuyenDe)} · ${ngayVN(t.ngay)}<span class="chi-man"><br>Bấm vào từng câu để xem lời giải. Muốn bản giấy thì bấm "In đề" (phát cho em tự làm) hoặc "In kèm lời giải", rồi chọn "Lưu thành PDF".</span></div>
+  <div class="chan">Thầy Đỗ Đại Học · ${thoat(t.tenChuyenDe)} · ${ngayVN(t.ngay)}<span class="chi-man"><br>${huongDan}</span></div>
 </div>`
   const ai = t.oBia && t.oBia.length > 0 ? t.oBia[0].gia : t.hoTen
   return taiLieuHtml(than, `${t.tenChuyenDe}${ai ? ` · ${ai}` : ''}`)

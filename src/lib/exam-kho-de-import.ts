@@ -141,15 +141,21 @@ function parseLoiGiai(raw: unknown): KhoDeLoiGiai | null {
   const o = raw as Record<string, unknown>
   const noiDung = typeof o.noi_dung === 'string' && o.noi_dung.trim() ? o.noi_dung : undefined
   const chot = typeof o.chot === 'string' && o.chot.trim() ? o.chot.trim() : undefined
-  if (!noiDung && !chot) return null
+  const buoc = Array.isArray(o.buoc) ? o.buoc.filter((x): x is string => typeof x === 'string' && x.trim() !== '') : undefined
+  const tungPa = parseLyDoMap(o.tung_pa, ['A', 'B', 'C', 'D']) as KhoDeLoiGiai['tung_pa']
+  const tungY = parseLyDoMap(o.tung_y, ['a', 'b', 'c', 'd']) as KhoDeLoiGiai['tung_y']
+  // Lời giải phần III thường chỉ có `buoc` + `ket_qua`, chốt để trống; lời giải
+  // phần I/II có thể chỉ có lý do từng phương án. Trước đây thiếu `chot` là vứt
+  // cả lời giải — 333 câu trả lời ngắn trong kho vào app thành "chưa có lời giải".
+  if (!noiDung && !chot && !(buoc && buoc.length > 0) && !tungPa && !tungY) return null
   const tt = typeof o.trang_thai === 'string' && TRANG_THAI_HOP_LE.has(o.trang_thai) ? (o.trang_thai as TrangThaiLoiGiai) : undefined
   const dapAn = (v: unknown) => (typeof v === 'string' ? v : typeof v === 'object' && v !== null ? JSON.stringify(v) : undefined)
   return {
     noi_dung: noiDung,
     chot,
-    tung_pa: parseLyDoMap(o.tung_pa, ['A', 'B', 'C', 'D']) as KhoDeLoiGiai['tung_pa'],
-    tung_y: parseLyDoMap(o.tung_y, ['a', 'b', 'c', 'd']) as KhoDeLoiGiai['tung_y'],
-    buoc: Array.isArray(o.buoc) ? o.buoc.filter((x): x is string => typeof x === 'string' && x.trim() !== '') : undefined,
+    tung_pa: tungPa,
+    tung_y: tungY,
+    buoc,
     ket_qua: typeof o.ket_qua === 'string' && o.ket_qua.trim() ? o.ket_qua.trim() : undefined,
     dap_an_de: dapAn(o.dap_an_de),
     dap_an_tu_giai: dapAn(o.dap_an_tu_giai),
@@ -158,9 +164,16 @@ function parseLoiGiai(raw: unknown): KhoDeLoiGiai | null {
   }
 }
 
-/** Chuyển lời giải kho đề → LoiGiaiCauTruc của app (chỉ khi có `chot`). */
+/** Có gì để hiện trong ô lời giải không (chốt, bước, hay lý do từng ý). */
+export function coLoiGiaiCauTruc(lg: KhoDeLoiGiai | undefined): boolean {
+  return !!lg && (!!lg.chot || (!!lg.buoc && lg.buoc.length > 0) || !!lg.tung_pa || !!lg.tung_y)
+}
+
+/** Chuyển lời giải kho đề → LoiGiaiCauTruc của app. `chot` có thể rỗng khi lời
+ * giải là các bước (phần III) hoặc lý do từng phương án. */
 function toLoiGiaiCauTruc(lg: KhoDeLoiGiai | undefined): LoiGiaiCauTruc | undefined {
-  if (!lg?.chot) return undefined
+  if (!coLoiGiaiCauTruc(lg)) return undefined
+  if (!lg) return undefined
   const map = <K extends string>(m: Partial<Record<K, KhoDeLyDo>> | undefined): Partial<Record<K, LyDoY>> | undefined => {
     if (!m) return undefined
     const out: Partial<Record<K, LyDoY>> = {}
@@ -170,7 +183,7 @@ function toLoiGiaiCauTruc(lg: KhoDeLoiGiai | undefined): LoiGiaiCauTruc | undefi
     }
     return out
   }
-  return { chot: lg.chot, tungPa: map(lg.tung_pa), tungY: map(lg.tung_y), buoc: lg.buoc, ketQua: lg.ket_qua }
+  return { chot: lg.chot ?? '', tungPa: map(lg.tung_pa), tungY: map(lg.tung_y), buoc: lg.buoc, ketQua: lg.ket_qua }
 }
 
 function parseHinh(raw: unknown, nhan: string, errors: string[]): KhoDeHinh[] | null {
@@ -310,7 +323,7 @@ export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherE
     }
     if (c.can_xem) canXemList.push(nhan)
     const lg = c.loi_giai ?? undefined
-    if (lg?.chot) for (const w of kiemTraLoiGiaiCauTruc(lg, c.phan, nhan)) warnings.push(w)
+    if (coLoiGiaiCauTruc(lg)) for (const w of kiemTraLoiGiaiCauTruc(lg!, c.phan, nhan)) warnings.push(w)
     const chung = {
       text: c.de,
       table: c.bang ?? undefined,

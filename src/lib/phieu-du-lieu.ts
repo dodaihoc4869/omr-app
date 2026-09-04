@@ -369,7 +369,10 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
     cauSai,
     dai: n.rows.map((r) => ({ nhan: `Phần ${r.phan} câu ${r.soCau}`, giay: r.giay, dung: Boolean(r.dungSai) })),
     viPham: dungViPham(n.viPham),
-    deCuaEm: deCuaEmTuRows(n.rows, n.banks),
+    // KHÔNG kèm `deCuaEm`, KHÔNG kèm bài tập: thầy chốt 04-09 khuya "mục này của
+    // xem báo cáo sau thi cắt luôn". Trên máy em, sau khi nộp chỉ còn điểm, câu
+    // sai kèm lời giải và bằng chứng rời màn; đề đầy đủ và bài luyện chỉ đi
+    // theo báo cáo thầy gửi phụ huynh.
   }
 }
 

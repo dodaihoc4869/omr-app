@@ -129,10 +129,14 @@ describe('bài luyện — hai nút', () => {
       <PhieuScreen duCoSan={phieu({ baiTap: [cauLuyen('b1')], linkBaiTap: 'https://vi.du/omr-app/p#abc123' })} />,
     )
     expect(getByRole('button', { name: /Xem trước/ })).toBeTruthy()
-    const copy = getByRole('button', { name: /Copy link gửi cho con/ })
+    // HAI NÚT COPY (thầy chốt 04-09 khuya): một gửi ĐỀ, một gửi LỜI GIẢI.
+    const copy = getByRole('button', { name: /Copy link gửi ĐỀ cho con/ })
     expect(copy.className).toContain('bc-nhay')
     // Nút VÀNG (thầy chốt 04-09 tối), không phải tím.
     expect(copy.className).toContain('vang')
+    const copyGiai = getByRole('button', { name: /Copy link gửi LỜI GIẢI cho con/ })
+    expect(copyGiai.className).toContain('vang')
+    expect(copyGiai.className).not.toContain('bc-nhay')
   })
 
   it('chưa có link thì chỉ còn nút xem — không dựng nút copy rồi copy chuỗi rỗng', () => {
@@ -144,7 +148,8 @@ describe('bài luyện — hai nút', () => {
   it('gói bị cắt mất bài tập nhưng còn link thì vẫn gửi link cho con được', () => {
     const { queryByRole, getByRole } = render(<PhieuScreen duCoSan={phieu({ linkBaiTap: 'https://vi.du/omr-app/p#abc123' })} />)
     expect(queryByRole('button', { name: /Xem trước/ })).toBeNull()
-    expect(getByRole('button', { name: /Copy link gửi cho con/ })).toBeTruthy()
+    expect(getByRole('button', { name: /Copy link gửi ĐỀ cho con/ })).toBeTruthy()
+    expect(getByRole('button', { name: /Copy link gửi LỜI GIẢI cho con/ })).toBeTruthy()
   })
 
   it('bấm copy là link vào bộ nhớ tạm', () => {
@@ -153,8 +158,11 @@ describe('bài luyện — hai nút', () => {
     const { getByRole } = render(
       <PhieuScreen duCoSan={phieu({ baiTap: [cauLuyen('b1')], linkBaiTap: 'https://vi.du/omr-app/p#abc123' })} />,
     )
-    fireEvent.click(getByRole('button', { name: /Copy link gửi cho con/ }))
-    // Số câu mặc định 10 đi kèm link để trang phiếu cắt đúng bấy nhiêu câu.
-    expect(writeText).toHaveBeenCalledWith('https://vi.du/omr-app/p#abc123~10')
+    fireEvent.click(getByRole('button', { name: /Copy link gửi ĐỀ cho con/ }))
+    // Số câu mặc định 10 đi kèm link để trang phiếu cắt đúng bấy nhiêu câu;
+    // chữ `d` cuối = phiếu CHỈ CÓ ĐỀ, `g` = phiếu có lời giải.
+    expect(writeText).toHaveBeenCalledWith('https://vi.du/omr-app/p#abc123~10d')
+    fireEvent.click(getByRole('button', { name: /Copy link gửi LỜI GIẢI cho con/ }))
+    expect(writeText).toHaveBeenCalledWith('https://vi.du/omr-app/p#abc123~10g')
   })
 })

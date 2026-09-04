@@ -35,10 +35,16 @@ export function chanSoCau(n: unknown): number {
 
 /** Link để dán vào tin nhắn Zalo. `goc` là gốc app, ví dụ
  * `https://dodaihoc4869.github.io/omr-app/`. */
-export function taoLinkPhieu(goc: string, ma: string, soCau?: number | null): string {
+export function taoLinkPhieu(goc: string, ma: string, soCau?: number | null, cheDo?: CheDoPhieu): string {
   const g = goc.endsWith('/') ? goc : goc + '/'
-  return `${g}p#${ma}${soCau ? `~${chanSoCau(soCau)}` : ''}`
+  return `${g}p#${ma}${soCau ? `~${chanSoCau(soCau)}${cheDo === 'de' ? 'd' : cheDo === 'giai' ? 'g' : ''}` : ''}`
 }
+
+/** HAI LINK CHO CON (thầy chốt 04-09 khuya): một link CHỈ CÓ ĐỀ để em tự làm,
+ * một link CÓ LỜI GIẢI để em dò sau khi làm xong. Cùng một phiếu trên máy chủ,
+ * khác nhau ở chữ cuối link: `~20d` là đề, `~20g` là lời giải. Link cũ chỉ có
+ * `~20` (hoặc không có `~`) vẫn mở như trước: phiếu ôn gập sẵn lời giải. */
+export type CheDoPhieu = 'de' | 'giai'
 
 /** Đọc mã từ phần hash của địa chỉ. Trả '' khi không phải mã hợp lệ — trang báo
  * cáo báo "link hỏng" chứ không hỏi máy chủ bằng rác. */
@@ -48,11 +54,13 @@ export function docMaTuHash(hash: string): string {
 
 /** Đọc cả mã lẫn số câu. `soCau = null` nghĩa là link không ghi số — lấy trọn
  * phiếu như trước. */
-export function docLinkPhieu(hash: string): { ma: string; soCau: number | null } {
+export function docLinkPhieu(hash: string): { ma: string; soCau: number | null; cheDo: CheDoPhieu } {
   const s = (hash || '').trim().replace(/^#/, '')
   const i = s.indexOf('~')
   const ma = i >= 0 ? s.slice(0, i) : s
   const duoi = i >= 0 ? s.slice(i + 1) : ''
-  if (!RE_MA_PHIEU.test(ma)) return { ma: '', soCau: null }
-  return { ma, soCau: /^\d{1,3}$/.test(duoi) ? chanSoCau(duoi) : null }
+  if (!RE_MA_PHIEU.test(ma)) return { ma: '', soCau: null, cheDo: 'giai' }
+  const m = /^(\d{1,3})([dg]?)$/.exec(duoi)
+  if (!m) return { ma, soCau: null, cheDo: 'giai' }
+  return { ma, soCau: chanSoCau(m[1]), cheDo: m[2] === 'd' ? 'de' : 'giai' }
 }

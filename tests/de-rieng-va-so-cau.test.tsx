@@ -16,10 +16,16 @@ describe('link phiếu mang số câu', () => {
   it('gắn ~n vào link và đọc lại được', () => {
     const l = taoLinkPhieu('https://vi.du/omr-app/', 'abcdefgh12', 25)
     expect(l).toBe('https://vi.du/omr-app/p#abcdefgh12~25')
-    expect(docLinkPhieu('#abcdefgh12~25')).toEqual({ ma: 'abcdefgh12', soCau: 25 })
+    expect(docLinkPhieu('#abcdefgh12~25')).toEqual({ ma: 'abcdefgh12', soCau: 25, cheDo: 'giai' })
+  })
+  it('chữ cuối link phân biệt ĐỀ (d) và LỜI GIẢI (g); link cũ không chữ vẫn là bản có lời giải', () => {
+    expect(taoLinkPhieu('https://vi.du/omr-app/', 'abcdefgh12', 20, 'de')).toBe('https://vi.du/omr-app/p#abcdefgh12~20d')
+    expect(docLinkPhieu('#abcdefgh12~20d')).toEqual({ ma: 'abcdefgh12', soCau: 20, cheDo: 'de' })
+    expect(docLinkPhieu('#abcdefgh12~20g')).toEqual({ ma: 'abcdefgh12', soCau: 20, cheDo: 'giai' })
+    expect(docLinkPhieu('#abcdefgh12~20x').soCau).toBeNull()
   })
   it('link cũ không có số thì soCau = null, mã vẫn đọc được — link đã gửi không chết', () => {
-    expect(docLinkPhieu('#abcdefgh12')).toEqual({ ma: 'abcdefgh12', soCau: null })
+    expect(docLinkPhieu('#abcdefgh12')).toEqual({ ma: 'abcdefgh12', soCau: null, cheDo: 'giai' })
     expect(docMaTuHash('#abcdefgh12~30')).toBe('abcdefgh12')
   })
   it('kẹp số câu vào 10..40, rác thì về 10', () => {
@@ -29,7 +35,7 @@ describe('link phiếu mang số câu', () => {
     expect(docLinkPhieu('#abcdefgh12~999').soCau).toBe(SO_CAU_MAX)
   })
   it('mã rác thì trả rỗng, không hỏi máy chủ bằng rác', () => {
-    expect(docLinkPhieu('#a b~10')).toEqual({ ma: '', soCau: null })
+    expect(docLinkPhieu('#a b~10')).toEqual({ ma: '', soCau: null, cheDo: 'giai' })
   })
 })
 
