@@ -248,13 +248,32 @@ function capQuyenVaKiemTra() {
   Logger.log('Sheet: ' + ss.getName() + ' | Thư mục Drive: ' + folder.getName() + ' | ghi/đọc JSON: ' + (doc && doc.ok ? 'OK' : 'LỖI') + ' | MA_BI_MAT: ' + (maBiMat_() ? 'đã đặt' : 'CHƯA ĐẶT'))
 }
 
+// TỐI ƯU TỐC ĐỘ (05/09, trước ca thi thật) — CACHE TRONG MỘT REQUEST.
+//
+// `SpreadsheetApp.openById` và `getSheetByName` đều là lệnh gọi dịch vụ, mỗi
+// lệnh vài chục mili giây. Một request gọi `getSheet_` từ ba tới tám lần, nên
+// mở đi mở lại cùng một bảng là phí thuần tuý.
+//
+// Cache chỉ sống trong một lần chạy hàm doPost/doGet — Apps Script dựng lại
+// môi trường cho mỗi request, nên không có chuyện dữ liệu cũ dính sang request
+// sau. Đây là điều làm nó an toàn.
+let _ss = null
+const _shCache = {}
+
+function bang_() {
+  if (!_ss) _ss = SpreadsheetApp.openById(idBang_())
+  return _ss
+}
+
 function getSheet_(name, headers) {
-  const ss = SpreadsheetApp.openById(idBang_())
+  if (_shCache[name]) return _shCache[name]
+  const ss = bang_()
   let sh = ss.getSheetByName(name)
   if (!sh) {
     sh = ss.insertSheet(name)
     sh.appendRow(headers)
   }
+  _shCache[name] = sh
   return sh
 }
 
@@ -270,10 +289,22 @@ function congBoCua_(cell) {
   return 'khong'
 }
 
+/** Tìm dòng theo khoá — CHỈ ĐỌC ĐÚNG MỘT CỘT.
+ *
+ * Bản cũ gọi `getDataRange().getValues()`, tức kéo về TOÀN BỘ sheet chỉ để so
+ * một cột. Trên `CaKiemTra` mỗi dòng có BankJson và KeyBankJson; trên `LuotThi`
+ * mỗi dòng có DapAnJson, IntegrityJson và GiayCauJson. Tìm một mã ca mà kéo cả
+ * vài megabyte về là chỗ chậm nhất của máy chủ, và nó nằm trên đường đi của mọi
+ * lệnh vào thi.
+ *
+ * Đọc một cột cho ra ĐÚNG kết quả cũ, chỉ nhanh hơn nhiều lần. */
 function findRowByKey_(sh, keyCol, keyVal) {
-  const data = sh.getDataRange().getValues()
-  for (let i = 1; i < data.length; i++) {
-    if (String(data[i][keyCol]) === String(keyVal)) return i + 1 // 1-based row index
+  const n = sh.getLastRow()
+  if (n < 2) return -1
+  const cot = sh.getRange(1, keyCol + 1, n, 1).getValues()
+  const can = String(keyVal)
+  for (let i = 1; i < cot.length; i++) {
+    if (String(cot[i][0]) === can) return i + 1 // 1-based row index
   }
   return -1
 }
@@ -366,8 +397,39 @@ function docLuot_(v) {
 }
 
 /** Lượt MỚI NHẤT của mỗi SBD trong 1 ca (LanThu lớn nhất) + chỉ số dòng sheet. */
-function luotMoiNhatTheoSbd_(sh, maCa) {
-  const data = sh.getDataRange().getValues()
+/** Lượt mới nhất của từng SBD trong một ca.
+ *
+ * `nhe = true` BỎ QUA ba cột JSON nặng — DapAnJson (9), IntegrityJson (12),
+ * GiayCauJson (22). Mỗi lượt của một em có thể vài chục kilobyte ở ba cột đó;
+ * một ca 30 em qua vài tuần là vài megabyte kéo về MỖI LẦN có em bấm Vào thi.
+ *
+ * Đường vào thi chỉ cần trạng thái lượt, không cần bài làm — nên nó dùng bản
+ * nhẹ. Hai chỗ thật sự cần bài làm (listSubmissions, chiTietCa) vẫn đọc đủ.
+ *
+ * Đọc theo BA DẢI CỘT rồi ghép lại đúng chỉ số cũ, để `docLuot_` không phải
+ * biết gì về việc này — hai bên không được hiểu khác nhau về chỉ số cột. */
+function luotMoiNhatTheoSbd_(sh, maCa, nhe) {
+  const n = sh.getLastRow()
+  if (n < 2) return {}
+  let data
+  if (nhe) {
+    const A = sh.getRange(1, 1, n, 8).getValues() // MaCa..TrangThai
+    const B = sh.getRange(1, 10, n, 2).getValues() // SoLanRoiMan, TongGiayRoiMan
+    const C = sh.getRange(1, 13, n, 9).getValues() // HoTen..CapNhatLuc
+    data = []
+    for (let i = 0; i < n; i++) {
+      const d = A[i].slice()
+      d[8] = '' // DapAnJson — cố ý bỏ trống
+      d[9] = B[i][0]
+      d[10] = B[i][1]
+      d[11] = '' // IntegrityJson — cố ý bỏ trống
+      for (let k = 0; k < 9; k++) d[12 + k] = C[i][k]
+      d[21] = '' // GiayCauJson — cố ý bỏ trống
+      data.push(d)
+    }
+  } else {
+    data = sh.getDataRange().getValues()
+  }
   const map = {}
   for (let i = 1; i < data.length; i++) {
     if (String(data[i][0]) !== String(maCa)) continue
@@ -1561,11 +1623,21 @@ function doPost(e) {
     const caRow = findRowByKey_(caSh, 0, maCa)
     if (caRow < 0) return jsonResponse_({ ok: false, lyDo: 'khong_co_ca', error: 'Không tìm thấy ca kiểm tra — kiểm tra lại mã ca' })
     const ca = docCa_(caSh, caRow)
+    // ĐỌC ĐỀ TRƯỚC KHI VÀO KHOÁ (tối ưu 05/09, trước ca thi thật).
+    //
+    // Bản cũ đọc file đề từ Drive KHI ĐANG GIỮ KHOÁ. Cả lớp bấm Vào thi cùng
+    // lúc thì mỗi em phải chờ em trước đọc xong vài trăm kilobyte — ba mươi em
+    // xếp hàng nối tiếp, em cuối chờ hàng chục giây. Mà đề chẳng liên quan gì
+    // tới thứ khoá bảo vệ: khoá giữ cho dòng LuotThi khỏi tranh nhau, còn đề là
+    // dữ liệu CHỈ ĐỌC và giống hệt nhau cho mọi em.
+    //
+    // Đọc trước, ngoài khoá: khoá chỉ còn ôm đúng phần đọc-sửa-ghi LuotThi.
+    const bankGui = body.canBank ? docJsonLon_(ca.bankRef) : null
     const lock = LockService.getScriptLock()
     lock.waitLock(15000)
     try {
       const sh = sheetLuot_()
-      const luot = luotMoiNhatTheoSbd_(sh, maCa)[sbd] || null
+      const luot = luotMoiNhatTheoSbd_(sh, maCa, true)[sbd] || null
       const now = Date.now()
       // CỔNG DANH SÁCH trước mọi thứ khác: phải khớp ĐỦ BA — số báo danh, họ
       // tên, năm sinh — với một dòng trong danh sách thầy đã nạp. Chưa nạp danh
@@ -1647,8 +1719,9 @@ function doPost(e) {
         daMoKhoa: qd.cach === 'khoi_phuc' && luot && luot.ghiChu.indexOf('mở khoá') >= 0,
         serverNow: Date.now(),
       }
-      // Đề (KHÔNG đáp án) chỉ gửi khi máy em chưa có bản cache — tiết kiệm băng thông.
-      if (body.canBank) out.bank = docJsonLon_(ca.bankRef)
+      // Đề (KHÔNG đáp án) chỉ gửi khi máy em chưa có bản cache — tiết kiệm băng
+      // thông. Đã đọc TRƯỚC KHI VÀO KHOÁ, xem `bankGui` bên trên.
+      if (body.canBank) out.bank = bankGui
       return jsonResponse_(out)
     } finally {
       lock.releaseLock()
@@ -1664,7 +1737,7 @@ function doPost(e) {
     const maCa = String(body.maCa || '').trim()
     const sbd = String(body.sbd || '').trim()
     const sh = sheetLuot_()
-    const luot = luotMoiNhatTheoSbd_(sh, maCa)[sbd] || null
+    const luot = luotMoiNhatTheoSbd_(sh, maCa, true)[sbd] || null
     if (luot && luot.trangThai === 'duoc_duyet_lai') return jsonResponse_({ ok: true, lanThu: luot.lanThu, daDuyetTruoc: true })
     if (luot && luot.trangThai === 'dang_lam') return jsonResponse_({ ok: false, error: 'Em này đang làm bài (lượt ' + luot.lanThu + ') — chưa nộp thì không cần duyệt' })
     const lanThu = luot ? luot.lanThu + 1 : 1
@@ -1693,7 +1766,7 @@ function doPost(e) {
     const maCa = String(body.maCa || '').trim()
     const sbd = String(body.sbd || '').trim()
     const sh = sheetLuot_()
-    const luot = luotMoiNhatTheoSbd_(sh, maCa)[sbd] || null
+    const luot = luotMoiNhatTheoSbd_(sh, maCa, true)[sbd] || null
     if (!luot) return jsonResponse_({ ok: false, error: 'Em này chưa vào thi' })
     if (luot.trangThai !== 'khoa') return jsonResponse_({ ok: false, error: 'Lượt hiện tại không bị khoá (' + luot.trangThai + ')' })
     const luc = new Date().toISOString()
@@ -2010,7 +2083,7 @@ function doPost(e) {
     // CHẶN Ở MÁY CHỦ, không dựa vào giao diện đã ẩn nút.
     if (caDangKhoa_(docCa_(caShT, caRowT))) return jsonResponse_({ ok: false, lyDo: 'da_dong', error: 'Ca đã khoá — không lưu thêm được' })
     const shT = sheetLuot_()
-    const luotT = luotMoiNhatTheoSbd_(shT, maCa)[sbd] || null
+    const luotT = luotMoiNhatTheoSbd_(shT, maCa, true)[sbd] || null
     if (!luotT) return jsonResponse_({ ok: false, lyDo: 'chua_vao', error: 'Em này chưa vào thi' })
     if (luotT.trangThai !== 'dang_lam') return jsonResponse_({ ok: false, lyDo: 'khong_dang_lam', error: 'Lượt này không còn đang làm (' + luotT.trangThai + ')' })
     // Cột 9 DapAnJson · cột 21 CapNhatLuc · cột 22 GiayCauJson.
@@ -2624,7 +2697,7 @@ function doPost(e) {
     // Lịch sử ca thi hiện điểm mà không cần chấm lại. diemPhan có thể thiếu
     // (bản app cũ) → chỉ ghi Tong.
     try {
-      const luot = luotMoiNhatTheoSbd_(sheetLuot_(), body.maCa)[String(body.sbd)]
+      const luot = luotMoiNhatTheoSbd_(sheetLuot_(), body.maCa, true)[String(body.sbd)]
       if (luot) {
         const p = body.diemPhan || {}
         sheetLuot_().getRange(luot.row, 14, 1, 4).setValues([[p.I === undefined ? '' : p.I, p.II === undefined ? '' : p.II, p.III === undefined ? '' : p.III, body.diem]])

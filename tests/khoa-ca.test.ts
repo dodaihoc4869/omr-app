@@ -20,6 +20,12 @@ class SheetGia {
   getLastColumn() {
     return this.o[0].length
   }
+  /** Sheet thật có `getLastRow`; máy chủ nay dùng nó để đọc ĐÚNG một cột thay vì
+   * kéo cả bảng về (tối ưu 05/09). Sheet giả phải giống Sheet thật ở chỗ này,
+   * nếu không thì test đang kiểm một máy chủ không tồn tại. */
+  getLastRow() {
+    return this.o.length
+  }
   appendRow(r: unknown[]) {
     this.o.push(r.slice())
   }
