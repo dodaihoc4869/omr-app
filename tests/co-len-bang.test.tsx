@@ -71,12 +71,16 @@ async function moCa(cach: CachLay) {
   publishSession.mockClear()
   saveSessionTeacherBank.mockClear()
   const r = render(<ExamSetupScreen />)
-  await waitFor(() => expect(r.container.textContent).toContain('Bộ câu ra đề'))
+  // CHỜ RỘNG, KHÔNG PHẢI NỚI ĐIỀU KIỆN KIỂM. Màn Mở ca dựng xong mới gọi
+  // publishSession; chạy cả bộ 78 tệp song song thì bước dựng có lúc quá mốc
+  // 1 giây mặc định và phép kiểm đỏ ngẫu nhiên. Điều kiện kiểm giữ nguyên,
+  // chỉ cho nó đủ thời gian chạy.
+  await waitFor(() => expect(r.container.textContent).toContain('Bộ câu ra đề'), { timeout: 8000 })
   fireEvent.click(r.getByRole('checkbox', { name: TEN_CHIP[cach] }))
   fireEvent.change(r.getByPlaceholderText('Lớp (vd 12A1)'), { target: { value: '12A1' } })
   // Tiêu đề màn cũng là chữ "Mở ca kiểm tra" — lấy đúng cái NÚT.
   fireEvent.click(r.getAllByText('Mở ca kiểm tra').find((e) => e.tagName === 'BUTTON')!)
-  await waitFor(() => expect(publishSession).toHaveBeenCalled())
+  await waitFor(() => expect(publishSession).toHaveBeenCalled(), { timeout: 8000 })
   return { r, goi: publishSession.mock.calls.at(-1) as unknown as unknown[] }
 }
 

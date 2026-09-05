@@ -22,6 +22,7 @@ import { soanTinRoiMan } from '../lib/phieu-zalo'
 import { KhoiChuyenDe, KhoiLichSuCa } from '../components/HoSoEmView'
 import NutBaiTapPdf from '../components/NutBaiTapPdf'
 import NutTaiDeCa from '../components/NutTaiDeCa'
+import KhoiCauHoiEm from '../components/KhoiCauHoiEm'
 import KhoiTienBo from '../components/KhoiTienBo'
 import PhieuZaloEm from '../components/PhieuZaloEm'
 import { hoSoEm, type HoSoEm } from '../lib/exam-api'
@@ -940,6 +941,21 @@ export default function ExamMonitorScreen() {
                 showToast={showToast}
               />
             </TheNoiDung>
+          )}
+
+          {/* CÂU HỎI CỦA EM (HOIBAITHAY.md mục 4C). Không gọi máy chủ cho tới
+              khi thầy bấm — Chi tiết ca đã đủ nặng, thêm một lệnh nữa mỗi lần
+              mở màn là đi ngược việc giảm tải vừa làm. */}
+          {chiTiet && (
+            <KhoiCauHoiEm
+              scriptUrl={scriptUrl.trim()}
+              secret={secret.trim()}
+              maCa={chiTiet.ca.maCa}
+              tenCa={chiTiet.ca.tenCa || ''}
+              lop={chiTiet.ca.lop || ''}
+              banks={teacherBank}
+              showToast={showToast}
+            />
           )}
 
           {/* BÁO PHỤ HUYNH — thầy đọc lại, sửa, rồi mới gửi */}

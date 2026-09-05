@@ -4,6 +4,7 @@
 // nếu dùng application/json.
 import type { PublicExamBank, TeacherExamSource } from '../data/examContent'
 import type { AnswerRecord, IntegrityLog } from './exam-db'
+import type { CauHoiCuaEm, GoiCauHoi } from './hoi-bai'
 import { dongBoGioMayChu } from './gio-may-chu'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
@@ -1105,6 +1106,35 @@ export async function chiTietCa(scriptUrl: string, secret: string, maCa: string,
 export async function ghiLenBang(scriptUrl: string, secret: string, d: { sbd: string; chuyenDe: string; dat: boolean; qid?: string }): Promise<void> {
   const r = await postJson(scriptUrl, { action: 'ghiLenBang', secret, sbd: d.sbd, chuyenDe: d.chuyenDe, dat: d.dat, qid: d.qid || '' })
   if (!r.ok) throw new Error(r.error || 'Không ghi được kết quả lên bảng')
+}
+
+// ---------------------------------------------------------------------------
+// HỎI BÀI THẦY (HOIBAITHAY.md mục 2.3)
+
+/** EM GỬI CÂU HỎI. KHÔNG kèm mã bí mật — đây là lệnh ghi công khai, máy chủ
+ * khoá bằng bốn lớp chứ không bằng mã bí mật (máy em không bao giờ có mã đó).
+ *
+ * Gói gửi đi CHỈ có mã ca, số báo danh, mảng mã câu và ghi chú — không đề,
+ * không đáp án, không lời giải (điều cấm số 1). */
+export async function guiCauHoi(scriptUrl: string, goi: GoiCauHoi): Promise<{ soCau: number; guiLuc: string }> {
+  const r = await postJson(scriptUrl, { action: 'guiCauHoi', ...goi })
+  if (!r.ok) throw new Error(r.error || 'Không gửi được câu hỏi')
+  return { soCau: Number(r.soCau) || 0, guiLuc: String(r.guiLuc || '') }
+}
+
+/** THẦY LẤY toàn bộ câu hỏi của một ca. */
+export async function danhSachCauHoi(scriptUrl: string, secret: string, maCa: string): Promise<CauHoiCuaEm[]> {
+  const r = await postJson(scriptUrl, { action: 'danhSachCauHoi', secret, maCa })
+  if (!r.ok) throw new Error(r.error || 'Không lấy được câu hỏi')
+  return Array.isArray(r.items) ? (r.items as CauHoiCuaEm[]) : []
+}
+
+/** ĐÁNH DẤU ĐÃ CHỮA. Không truyền `sbd` = cả ca. Dòng đã chữa KHÔNG bị xoá —
+ * lần sau thầy còn tra lại được câu nào lớp hay vướng (mục 4E). */
+export async function danhDauDaChua(scriptUrl: string, secret: string, maCa: string, sbd = '', chua = true): Promise<number> {
+  const r = await postJson(scriptUrl, { action: 'danhDauDaChua', secret, maCa, sbd, chua })
+  if (!r.ok) throw new Error(r.error || 'Không đánh dấu được')
+  return Number(r.soDong) || 0
 }
 
 /** Xoá MỀM một ca — phải gõ lại đúng mã ca (xacNhan). Bài làm/điểm giữ nguyên trên Sheet. */

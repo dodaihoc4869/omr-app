@@ -468,6 +468,22 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
 .sol-anh img { display: block; width: 100%; height: auto; border-radius: 10px; background: #fff; }
 .sol-step + .sol-label, .sol-text + .sol-anh { margin-top: 10px; }
 
+/* ============ TÊN EM HỎI (trang tổng hợp câu hỏi) ============
+   HOIBAITHAY.md mục 4D. Nằm ở ĐÂY chứ không ở một bảng kiểu riêng: cả app chỉ
+   có MỘT bộ dựng phiếu, thêm bộ thứ hai là hai trang bắt đầu lệch nhau. */
+.cau-hoi-nhom { display: flex; flex-direction: column; }
+.em-hoi {
+  margin: -4px 0 0; padding: 9px 14px;
+  border: 1px solid var(--vien); border-top: none;
+  border-radius: 0 0 12px 12px;
+  background: #f8fafc;
+  font-size: 13.5px; line-height: 1.6; color: var(--muc-2);
+  overflow-wrap: break-word;
+}
+.em-hoi b { color: var(--muc); }
+.em-ghi-chu { padding: 2px 14px 0; font-size: 13px; line-height: 1.6; color: var(--nhat); overflow-wrap: break-word; }
+.em-ghi-chu:last-child { padding-bottom: 8px; }
+
 /* ================= CHÂN TRANG ================= */
 .chan { margin-top: 26px; text-align: center; font-size: 12.5px; line-height: 1.7; color: var(--nhat); }
 

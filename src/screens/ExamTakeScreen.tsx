@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
-import { vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { goiCauHoi } from '../lib/hoi-bai'
+import TamTruotHoiBai, { type CauChon } from '../components/TamTruotHoiBai'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { dungPhieuMayEm, type PhieuDayDu } from '../lib/phieu-du-lieu'
 import PhieuScreen from './PhieuScreen'
@@ -259,6 +261,12 @@ export default function ExamTakeScreen() {
   // riêng, không có thẻ để mở.
   const [htmlDe, setHtmlDe] = useState('')
   const [xemLoiGiai, setXemLoiGiai] = useState(false)
+  // HỎI BÀI THẦY (HOIBAITHAY.md). `daGuiHoi` giữ đúng những gì đã gửi lần
+  // trước, để mở lại tấm trượt là thấy tick sẵn và sửa được (mục 4B).
+  const [moHoiBai, setMoHoiBai] = useState(false)
+  const [dangGuiHoi, setDangGuiHoi] = useState(false)
+  const [loiHoiBai, setLoiHoiBai] = useState('')
+  const [daGuiHoi, setDaGuiHoi] = useState<{ qids: string[]; ghiChu: string } | null>(null)
 
   // ---- Trạng thái riêng của màn làm bài ----
   const [showGrid, setShowGrid] = useState(false)
@@ -348,6 +356,44 @@ export default function ExamTakeScreen() {
 
   // Gộp cả 3 phần thành 1 danh sách phẳng, đánh số liên tục 1..tổng (đúng số
   // hiện trong "12/28", lưới số câu và id cuộn tới "cau-N").
+  // DANH SÁCH CÂU CHO TẤM TRƯỢT HỎI BÀI — dựng TẠI MÁY EM từ bộ câu đã có
+  // trong bộ nhớ, KHÔNG gọi máy chủ (tiêu chí trải nghiệm số 2).
+  //
+  // `sai` CHỈ được điền khi ca đã công bố điểm và máy em đã chấm xong. Chưa
+  // công bố mà điền là lộ đáp án cho cả lớp — điều cấm số 3.
+  const cauHoiBai: CauChon[] = useMemo(() => {
+    if (!assignment) return []
+    const daCongBo = Boolean(graded)
+    const saiI = new Set(graded?.wrongPhanI ?? [])
+    const saiII = new Set(graded?.wrongPhanII ?? [])
+    const saiIII = new Set(graded?.wrongPhanIII ?? [])
+    const trich = (s: string) => String(s || '').replace(/\s+/g, ' ').trim().slice(0, 160)
+    return [
+      ...assignment.phanI.map((a, i) => ({ qid: a.qid, phan: 'I' as const, soCau: i + 1, trich: trich(a.question.text), sai: daCongBo ? saiI.has(i + 1) : undefined })),
+      ...assignment.phanII.map((a, i) => ({ qid: a.qid, phan: 'II' as const, soCau: i + 1, trich: trich(a.question.text), sai: daCongBo ? saiII.has(i + 1) : undefined })),
+      ...assignment.phanIII.map((a, i) => ({ qid: a.qid, phan: 'III' as const, soCau: i + 1, trich: trich(a.question.text), sai: daCongBo ? saiIII.has(i + 1) : undefined })),
+    ]
+  }, [assignment, graded])
+
+  const guiHoiBai = async (qids: string[], ghiChu: string) => {
+    const a = attemptRef.current
+    if (!a) return
+    setDangGuiHoi(true)
+    setLoiHoiBai('')
+    try {
+      const goi = goiCauHoi(a.maCa, a.sbd, qids, ghiChu)
+      await guiCauHoi(scriptUrl.trim(), goi)
+      setDaGuiHoi({ qids: goi.qids, ghiChu: goi.ghiChu })
+      setMoHoiBai(false)
+    } catch (e) {
+      // GIỮ NGUYÊN lựa chọn của em: tấm trượt không đóng, em bấm Gửi lại được
+      // ngay khi có mạng, không phải tick lại từ đầu.
+      setLoiHoiBai(e instanceof Error ? e.message : 'Chưa gửi được, em thử lại giúp Thầy')
+    } finally {
+      setDangGuiHoi(false)
+    }
+  }
+
   const flat: FlatRef[] = useMemo(() => {
     if (!assignment) return []
     const out: FlatRef[] = []
@@ -1769,7 +1815,27 @@ export default function ExamTakeScreen() {
               Xem lại lời giải
             </NutChinh>
           )}
+          {/* HỎI BÀI THẦY — hiện NGAY sau khi nộp, không chờ công bố điểm
+              (giả định mục 10): em vướng lúc vừa làm xong là lúc nhớ rõ nhất. */}
+          {cauHoiBai.length > 0 && (
+            <NutChinh variant="phu" onClick={() => setMoHoiBai(true)}>
+              {daGuiHoi ? `Sửa câu đã hỏi (${daGuiHoi.qids.length})` : 'Hỏi bài Thầy'}
+            </NutChinh>
+          )}
         </div>
+
+        {moHoiBai && (
+          <TamTruotHoiBai
+            cau={cauHoiBai}
+            daCongBo={Boolean(graded)}
+            daHoi={daGuiHoi?.qids ?? []}
+            ghiChuCu={daGuiHoi?.ghiChu ?? ''}
+            dang={dangGuiHoi}
+            loi={loiHoiBai}
+            dong={() => setMoHoiBai(false)}
+            gui={(q, g) => void guiHoiBai(q, g)}
+          />
+        )}
 
         {htmlDe && <KhungXemPhieu html={htmlDe} ten="Đề của em kèm lời giải" dong={() => setHtmlDe('')} />}
 

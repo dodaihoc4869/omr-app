@@ -188,6 +188,22 @@ const SO_CAU_YEU_CAU_MAC_DINH = 10
 const SHEET_DSLOP = 'DanhSachLop'
 const DSLOP_HEADERS = ['SBD', 'HoTen', 'NamSinh', 'Lop', 'CapNhatLuc']
 
+// HỎI BÀI THẦY (HOIBAITHAY.md mục 2.2). Em nộp bài xong, tick câu chưa hiểu
+// rồi gửi. MÁY CHỦ CHỈ GIỮ MÃ CÂU — không giữ đề, không giữ đáp án, không giữ
+// lời giải (mục 2.1): máy thầy đã có `ca_<mã>_bank.json` nên tự dựng nội dung.
+//
+// MỘT EM MỘT CA ĐÚNG MỘT DÒNG. Gửi lại thì ghi đè — em đổi ý bỏ bớt hay thêm
+// câu là chuyện thường; đẻ dòng mới thì thầy đọc hai bản mâu thuẫn của cùng
+// một em.
+const SHEET_CAUHOI = 'CauHoiEm'
+const CAUHOI_HEADERS = ['Ma', 'MaCa', 'SBD', 'HoTen', 'QidJson', 'GhiChu', 'GuiLuc', 'DaChua', 'ChuaLuc']
+/** Ghi chú của em: đủ một câu "em không hiểu bước quy đổi", không thành bài
+ * văn. Cắt cứng ở máy chủ, không tin máy khách cắt hộ. */
+const TOI_DA_GHI_CHU = 300
+/** Trần số câu một em hỏi được trong một lượt. Chặn gói khổng lồ, còn việc em
+ * tick nhiều thì chỉ NHẮC ở máy em chứ không chặn (mục 9). */
+const TOI_DA_CAU_HOI = 200
+
 // Lệnh GET chỉ dành cho thầy — phải kèm secret. Trước v12 các lệnh này mở cho
 // bất kỳ ai có link /exec (đọc được cả danh bạ phụ huynh) — đó là lỗ hổng v12 vá.
 const GET_CHI_THAY = ['listParents', 'listStudents', 'listAllFeedback', 'listMessages']
@@ -1559,6 +1575,140 @@ function doPost(e) {
       sh.getRange(row, 8).setValue(new Date().toISOString())
     } catch (err) {}
     return jsonResponse_({ ok: true, phieu: phieu })
+  }
+
+  // ------------------------------------------------------------- HỎI BÀI THẦY
+  //
+  // `guiCauHoi` là LỆNH GHI CÔNG KHAI ĐẦU TIÊN của cả hệ thống. Trước nay chỉ
+  // có một lệnh đọc công khai (`layPhieu`) và nó đã bị bó rất chặt. Lệnh ghi
+  // nguy hiểm hơn, nên BỐN KHOÁ (HOIBAITHAY.md mục 2.3):
+  //
+  //   1. Phải có lượt thi ĐÃ NỘP đúng cặp (maCa, sbd). Không có thì từ chối —
+  //      nhờ vậy không ai gửi khống cho một SBD bất kỳ, và không gửi được vào
+  //      ca chưa thi.
+  //   2. `qids` phải nằm trong bộ câu CHÍNH EM ĐÓ ĐÃ LÀM (đọc ChiTietCau).
+  //      Mã lạ bị loại IM LẶNG. Đọc ChiTietCau thay vì mở đề trong Drive: chặt
+  //      hơn (em chỉ hỏi được câu của mình) và nhanh hơn hẳn.
+  //   3. `ghiChu` cắt cứng ở TOI_DA_GHI_CHU.
+  //   4. Ghi đè theo (maCa, sbd) — spam bao nhiêu lần cũng chỉ một dòng.
+  //
+  // Sai bất kỳ khoá nào đều trả CÙNG MỘT CÂU, không nói sai ở đâu.
+  if (action === 'guiCauHoi') {
+    const LOI_CHUNG = { ok: false, error: 'Không gửi được câu hỏi' }
+    const maCa = String(body.maCa || '').trim()
+    const sbd = String(body.sbd || '').trim()
+    if (!maCa || !sbd) return jsonResponse_(LOI_CHUNG)
+
+    let xin = []
+    try {
+      xin = Array.isArray(body.qids) ? body.qids : []
+    } catch (err) {
+      xin = []
+    }
+    if (xin.length > TOI_DA_CAU_HOI) return jsonResponse_(LOI_CHUNG)
+
+    // KHOÁ 1 — phải có lượt ĐÃ NỘP đúng cặp này.
+    const luotSh = sheetLuot_()
+    const luots = luotMoiNhatTheoSbd_(luotSh, maCa, true)
+    const luot = luots[sbd]
+    if (!luot || (luot.trangThai !== 'da_nop' && luot.trangThai !== 'khoa')) return jsonResponse_(LOI_CHUNG)
+
+    // KHOÁ 2 — chỉ nhận qid em đó đã thật sự làm trong ca này.
+    const ctSh = getSheet_(SHEET_CHITIET, CHITIET_HEADERS)
+    const hopLe = {}
+    const nCt = ctSh.getLastRow()
+    if (nCt >= 2) {
+      // Ba cột thôi (MaCa, SBD, ... Qid) — đọc cả bảng ChiTietCau là rất nặng.
+      const cot = ctSh.getRange(1, 1, nCt, 6).getValues()
+      for (let i = 1; i < cot.length; i++) {
+        if (String(cot[i][0]) !== maCa || String(cot[i][1]) !== sbd) continue
+        const q = String(cot[i][5] || '').trim()
+        if (q) hopLe[q] = true
+      }
+    }
+    const qids = []
+    const daCo = {}
+    for (let i = 0; i < xin.length; i++) {
+      const q = String(xin[i] || '').trim()
+      if (!q || daCo[q] || !hopLe[q]) continue
+      daCo[q] = true
+      qids.push(q)
+    }
+    if (!qids.length) return jsonResponse_(LOI_CHUNG)
+
+    // KHOÁ 3 — cắt ghi chú.
+    const ghiChu = String(body.ghiChu || '').slice(0, TOI_DA_GHI_CHU)
+
+    // KHOÁ 4 — ghi đè theo (maCa, sbd).
+    const sh = getSheet_(SHEET_CAUHOI, CAUHOI_HEADERS)
+    boSungTieuDe_(sh, CAUHOI_HEADERS)
+    const ma = maCa + '|' + sbd
+    const nay = new Date().toISOString()
+    const row = findRowByKey_(sh, 0, ma)
+    const dong = [ma, maCa, sbd, luot.hoTen || '', JSON.stringify(qids), ghiChu, nay, '', '']
+    const lock = LockService.getScriptLock()
+    try {
+      lock.waitLock(10000)
+      const lai = findRowByKey_(sh, 0, ma)
+      if (lai > 0) sh.getRange(lai, 1, 1, dong.length).setValues([dong])
+      else sh.appendRow(dong)
+    } catch (err) {
+      return jsonResponse_(LOI_CHUNG)
+    } finally {
+      try { lock.releaseLock() } catch (e2) {}
+    }
+    return jsonResponse_({ ok: true, soCau: qids.length, guiLuc: nay, ghiDe: row > 0 })
+  }
+
+  if (action === 'danhSachCauHoi') {
+    const loi = kiemTraMaBiMat_(body)
+    if (loi) return jsonResponse_({ ok: false, error: loi })
+    const maCa = String(body.maCa || '').trim()
+    const sh = getSheet_(SHEET_CAUHOI, CAUHOI_HEADERS)
+    const n = sh.getLastRow()
+    const items = []
+    if (n >= 2) {
+      const data = sh.getRange(1, 1, n, CAUHOI_HEADERS.length).getValues()
+      for (let i = 1; i < data.length; i++) {
+        if (maCa && String(data[i][1]) !== maCa) continue
+        let qids = []
+        try { qids = JSON.parse(data[i][4] || '[]') } catch (err) { qids = [] }
+        items.push({
+          maCa: String(data[i][1]),
+          sbd: String(data[i][2]),
+          hoTen: String(data[i][3] || ''),
+          qids: qids,
+          ghiChu: String(data[i][5] || ''),
+          guiLuc: data[i][6] ? String(data[i][6]) : '',
+          daChua: String(data[i][7] || '') === 'x',
+          chuaLuc: data[i][8] ? String(data[i][8]) : '',
+        })
+      }
+    }
+    return jsonResponse_({ ok: true, items: items })
+  }
+
+  if (action === 'danhDauDaChua') {
+    const loi = kiemTraMaBiMat_(body)
+    if (loi) return jsonResponse_({ ok: false, error: loi })
+    const maCa = String(body.maCa || '').trim()
+    if (!maCa) return jsonResponse_({ ok: false, error: 'Thiếu mã ca' })
+    // Không có sbd = đánh dấu cả ca. Có sbd = đúng một em.
+    const sbd = String(body.sbd || '').trim()
+    const chua = body.chua !== false
+    const sh = getSheet_(SHEET_CAUHOI, CAUHOI_HEADERS)
+    const n = sh.getLastRow()
+    if (n < 2) return jsonResponse_({ ok: true, soDong: 0 })
+    const data = sh.getRange(1, 1, n, 3).getValues()
+    const nay = new Date().toISOString()
+    let soDong = 0
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][1]) !== maCa) continue
+      if (sbd && String(data[i][2]) !== sbd) continue
+      sh.getRange(i + 1, 8, 1, 2).setValues([[chua ? 'x' : '', chua ? nay : '']])
+      soDong++
+    }
+    return jsonResponse_({ ok: true, soDong: soDong })
   }
 
   if (action === 'capNhatKeyBank') {

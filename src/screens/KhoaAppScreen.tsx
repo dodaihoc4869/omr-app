@@ -11,12 +11,13 @@
 //
 // KHÔNG hiện gợi ý mật khẩu, KHÔNG hiện tên thầy: màn này người lạ cầm máy cũng
 // nhìn thấy.
-import { useEffect, useState } from 'react'
-import { Eye, EyeOff, KeyRound, Loader2 } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Eye, EyeOff, Fingerprint, KeyRound, Loader2, ScanFace } from 'lucide-react'
 import LogoDDH from '../components/LogoDDH'
 import { NutChinh, OThongBao, TheNoiDung } from '../components/DesignSystem'
 import { batKhoaApp, loadTeacherSecret, saveKhoaApp } from '../lib/exam-db'
 import { LOI_SAI_MAT_KHAU, TOI_THIEU_KY_TU, conChoGiay, datMatKhau, hopLeMatKhau, moKhoa, sauKhiDung, sauKhiSai, type BanGhiKhoa } from '../lib/khoa-app'
+import { laKhuonMat, moBangVanTay, type BanGhiVanTay } from '../lib/khoa-van-tay'
 
 const NHAN: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }
 const O_NHAP: React.CSSProperties = {
@@ -38,8 +39,10 @@ export interface KhoaAppScreenProps {
   pha: PhaKhoa
   /** Bản ghi đã cất — chỉ có ở pha 'mo'. */
   banGhi: BanGhiKhoa | null
+  /** Bản ghi vân tay của MÁY NÀY, nếu thầy đã bật. Không có = chỉ mật khẩu. */
+  banGhiVanTay?: BanGhiVanTay | null
   /** Gọi khi đã vào được: App nhận mã bí mật rồi dựng phần còn lại. */
-  onMoDuoc: (maBiMat: string) => void
+  onMoDuoc: (maBiMat: string, bangVanTay?: boolean) => void
 }
 
 function OMatKhau({ gia, dat, nhan, tuDong }: { gia: string; dat: (v: string) => void; nhan: string; tuDong?: boolean }) {
@@ -72,7 +75,7 @@ function OMatKhau({ gia, dat, nhan, tuDong }: { gia: string; dat: (v: string) =>
   )
 }
 
-export default function KhoaAppScreen({ pha, banGhi, onMoDuoc }: KhoaAppScreenProps) {
+export default function KhoaAppScreen({ pha, banGhi, banGhiVanTay = null, onMoDuoc }: KhoaAppScreenProps) {
   const [che, setChe] = useState<'dat' | 'mo' | 'quen'>(pha)
   const [mk, setMk] = useState('')
   const [mk2, setMk2] = useState('')
@@ -81,6 +84,11 @@ export default function KhoaAppScreen({ pha, banGhi, onMoDuoc }: KhoaAppScreenPr
   const [dang, setDang] = useState(false)
   const [choGiay, setChoGiay] = useState(() => (banGhi ? conChoGiay(banGhi) : 0))
   const [ghi, setGhi] = useState<BanGhiKhoa | null>(banGhi)
+  // Vân tay: 'dang_quet' khi hộp thoại của máy đang mở, 'go' khi thầy huỷ hoặc
+  // quét hỏng — lúc đó ô mật khẩu hiện ra ngay, không kẹt ở màn chờ.
+  const [vanTay, setVanTay] = useState<'khong' | 'dang_quet' | 'go'>(banGhiVanTay && pha === 'mo' ? 'dang_quet' : 'khong')
+  const daQuet = useRef(false)
+  const khuonMat = laKhuonMat()
 
   // Đồng hồ đếm ngược lúc bị chờ. Mốc chờ nằm trong IndexedDB nên tải lại trang
   // không xoá được — đồng hồ này chỉ là phần nhìn thấy của nó.
@@ -139,6 +147,41 @@ export default function KhoaAppScreen({ pha, banGhi, onMoDuoc }: KhoaAppScreenPr
     }
   }
 
+  // MỞ BẰNG VÂN TAY (mục 4B) — gọi NGAY khi mở màn, thầy không phải bấm gì.
+  //
+  // Thất bại KHÔNG tính là một lần nhập sai mật khẩu (điều 9 của định nghĩa
+  // hoàn thành): thầy huỷ hộp thoại hay tay ướt không phải là dò mật khẩu, mà
+  // đếm vào đó thì chạm hụt vài lần là bị khoá chờ 60 giây — vô lý.
+  const quetVanTay = async () => {
+    if (!banGhiVanTay || daQuet.current) return
+    daQuet.current = true
+    setVanTay('dang_quet')
+    setLoi('')
+    const ma = await moBangVanTay(banGhiVanTay)
+    if (ma === null) {
+      setVanTay('go')
+      return
+    }
+    if (ghi) {
+      const sau = sauKhiDung(ghi)
+      setGhi(sau)
+      await saveKhoaApp(sau)
+    }
+    onMoDuoc(ma, true)
+  }
+
+  useEffect(() => {
+    if (che !== 'mo' || !banGhiVanTay) return
+    void quetVanTay()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Bấm "Dùng mật khẩu" hoặc "Thử lại vân tay" thì cho quét lại từ đầu.
+  const thuLaiVanTay = () => {
+    daQuet.current = false
+    void quetVanTay()
+  }
+
   // QUÊN MẬT KHẨU: mã bí mật là khoá gốc. Thầy luôn lấy lại được nó từ Thuộc
   // tính tập lệnh của Apps Script, nên không có ngõ cụt — và cũng không cần một
   // cửa sau nào khác.
@@ -190,7 +233,27 @@ export default function KhoaAppScreen({ pha, banGhi, onMoDuoc }: KhoaAppScreenPr
               </>
             )}
 
-            {che === 'mo' && (
+            {/* VÂN TAY ĐANG QUÉT — hộp thoại của máy đang mở. Không dựng ô mật
+                khẩu chồng lên: hai ô cùng đòi chú ý là rối. Thầy huỷ thì nhánh
+                dưới hiện ô mật khẩu ngay. */}
+            {che === 'mo' && vanTay === 'dang_quet' && (
+              <div className="flex flex-col items-center text-center" style={{ gap: 'var(--k3)', padding: 'var(--k4) 0' }}>
+                <div style={{ color: 'var(--phu-dam)' }}>
+                  {khuonMat ? <ScanFace size={44} /> : <Fingerprint size={44} />}
+                </div>
+                <div style={NHAN}>{khuonMat ? 'Nhìn vào màn hình để mở' : 'Chạm cảm biến để mở'}</div>
+                <button
+                  type="button"
+                  onClick={() => setVanTay('go')}
+                  className="tap-target"
+                  style={{ ...NHAN, background: 'none', border: 'none', textDecoration: 'underline' }}
+                >
+                  Dùng mật khẩu
+                </button>
+              </div>
+            )}
+
+            {che === 'mo' && vanTay !== 'dang_quet' && (
               <>
                 <OMatKhau gia={mk} dat={setMk} nhan="Mật khẩu mở app" tuDong />
                 {choGiay > 0 ? (
@@ -207,6 +270,17 @@ export default function KhoaAppScreen({ pha, banGhi, onMoDuoc }: KhoaAppScreenPr
                       'Mở app'
                     )}
                   </NutChinh>
+                )}
+                {vanTay === 'go' && (
+                  <button
+                    type="button"
+                    onClick={thuLaiVanTay}
+                    className="tap-target inline-flex items-center justify-center"
+                    style={{ ...NHAN, gap: 6, background: 'none', border: 'none', textDecoration: 'underline' }}
+                  >
+                    {khuonMat ? <ScanFace size={15} /> : <Fingerprint size={15} />}
+                    {khuonMat ? ' Thử lại khuôn mặt' : ' Thử lại vân tay'}
+                  </button>
                 )}
                 <button
                   type="button"

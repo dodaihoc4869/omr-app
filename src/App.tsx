@@ -5,9 +5,10 @@ import Toast from './components/Toast'
 import MessagesFab from './components/MessagesFab'
 import { useAppStore } from './store/appStore'
 import { loadClassList } from './lib/classlist-db'
-import { datMaBiMatPhien, loadKhoaApp, loadTeacherSecret } from './lib/exam-db'
+import { datMaBiMatPhien, loadKhoaApp, loadKhoaVanTay, loadTeacherSecret } from './lib/exam-db'
 import { datDangMoKhoa } from './lib/cap-nhat-app'
 import { phaiHoiLai, type BanGhiKhoa } from './lib/khoa-app'
+import { datMoBangVanTay, type BanGhiVanTay } from './lib/khoa-van-tay'
 import { docDuongVao, laLinkAppCu, laManThayQuanLy } from './lib/vai-tro'
 import ClassListScreen from './screens/ClassListScreen'
 import ExamHubScreen from './screens/ExamHubScreen'
@@ -61,6 +62,9 @@ function App() {
   // đó: mục 5 đòi màn khoá hiện TRƯỚC khi bất kỳ dữ liệu học sinh nào được vẽ.
   const [khoa, setKhoa] = useState<'dang_doc' | 'can_dat' | 'can_mo' | 'da_mo'>(() => (canHoi ? 'dang_doc' : 'da_mo'))
   const [banGhiKhoa, setBanGhiKhoa] = useState<BanGhiKhoa | null>(null)
+  // Bản ghi vân tay của MÁY NÀY. Đọc cùng lúc với `khoaApp` để màn khoá gọi
+  // được vân tay ngay khi dựng, không phải chờ thêm một vòng đọc IndexedDB.
+  const [banGhiVanTay, setBanGhiVanTay] = useState<BanGhiVanTay | null>(null)
   const screen = useAppStore((s) => s.screen)
   const setClassList = useAppStore((s) => s.setClassList)
   const setScreen = useAppStore((s) => s.setScreen)
@@ -71,10 +75,13 @@ function App() {
     let con = true
     void (async () => {
       try {
-        const b = await loadKhoaApp()
+        const [b, vt] = await Promise.all([loadKhoaApp(), loadKhoaVanTay()])
         if (!con) return
         if (b) {
           setBanGhiKhoa(b)
+          // Vân tay chỉ có nghĩa khi ĐÃ có mật khẩu: nó là đường vào thứ hai
+          // tới cùng mã bí mật, không phải đường thay thế.
+          setBanGhiVanTay(vt)
           setKhoa('can_mo')
           return
         }
@@ -153,8 +160,10 @@ function App() {
         <KhoaAppScreen
           pha={khoa === 'can_dat' ? 'dat' : 'mo'}
           banGhi={banGhiKhoa}
-          onMoDuoc={(ma) => {
+          banGhiVanTay={banGhiVanTay}
+          onMoDuoc={(ma, bangVanTay) => {
             datMaBiMatPhien(ma)
+            datMoBangVanTay(Boolean(bangVanTay))
             // Bản mới của app phải chờ tới lần mở sau: tải lại giữa chừng là
             // mất mã bí mật trong bộ nhớ và thầy bị hỏi lại giữa buổi dạy.
             datDangMoKhoa(true)
