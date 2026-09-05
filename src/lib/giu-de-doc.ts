@@ -30,19 +30,23 @@
  * cửa sổ nổi rồi đọc được gì trong đó. */
 export const MS_AN_HAN_NHA_TAY = 3000
 
-/** Một ngón chạm mà KHÔNG di chuyển quá ngần này thì thôi được tính là bằng
- * chứng có mặt.
+/** NGƯỠNG CỨNG: màn hình bất động quá ngần này thì CHE, không ngoại lệ nào.
  *
- * Lớp này tồn tại vì đúng một lý do, ghi ra để sau này không ai gỡ nhầm: em có
- * thể kê một ngón bất động ở góc màn thi rồi dùng tay kia thao tác cửa sổ nổi.
- * Người đọc bài thật thì tay luôn nhúc nhích — cuộn, đổi chỗ tì, chọn đáp án.
+ * SỬA 05/09 sau khi thầy quay video: em chạm vào ô nhập Phần III một cái, con
+ * trỏ nhấp nháy ở đó, và bản trước coi "đang gõ ô nhập" là miễn trừ vô điều
+ * kiện — nên đề KHÔNG BAO GIỜ ẩn nữa. Một cú chạm là vô hiệu hoá cả cơ chế.
  *
- * 20 giây, đặt rộng hẳn để không phiền em đang tì tay đọc một câu Phần II dài. */
-export const MS_NGON_CHET = 20000
+ * Nay không còn miễn trừ nào vượt được ngưỡng này: caret đang nhấp nháy cũng
+ * che, ngón kê im ở góc màn cũng che. Ngưỡng này thay luôn lớp "ngón chết" 20
+ * giây của bản trước — 6 giây siết chặt hơn hẳn, nên lỗ hổng kê một ngón rồi
+ * thao tác tay kia bị bịt kín hơn chứ không hở ra.
+ *
+ * "Bất động" = không chạm, không cuộn, không gõ phím, không di ngón. */
+export const MS_BAT_DONG_CHE = 6000
 
 /** Dưới ngần này pixel là rung tay, không phải di chuyển thật. So với ĐIỂM NEO
  * (chỗ ghi nhận di chuyển lần cuối) chứ không so với khung trước — nếu so
- * khung trước thì rê ngón thật chậm sẽ lách được cả 20 giây. */
+ * khung trước thì rê ngón thật chậm sẽ lách được ngưỡng bất động. */
 export const PX_COI_LA_DI_CHUYEN = 8
 
 /** Chạm là hiện NGAY trong cùng nhịp xử lý sự kiện. Không timer, không chờ. */
@@ -57,8 +61,11 @@ export const MS_NHIP_SOI_GIU = 50
 export const BAT_MAC_DINH_CA_THI = true
 export const BAT_MAC_DINH_BAI_TAP = false
 
-/** Bốn mức ân hạn thầy chọn ở màn Mở ca. */
-export const AN_HAN_CHON_GIAY: readonly number[] = [2, 3, 5, 10]
+/** Ba mức ân hạn thầy chọn ở màn Mở ca.
+ *
+ * Trần là `MS_BAT_DONG_CHE` (6 giây): chọn cao hơn cũng vô nghĩa vì ngưỡng cứng
+ * che trước. Mức 10 giây của bản đầu đã bỏ vì lý do đó. */
+export const AN_HAN_CHON_GIAY: readonly number[] = [2, 3, 5]
 
 /** Chữ trên tấm phủ. Không có chữ "gian lận", "quay cóp", "vi phạm" — em nhả
  * tay để suy nghĩ là chuyện bình thường. */
@@ -66,7 +73,7 @@ export const CHU_TAM_PHU = 'Chạm để đọc tiếp'
 
 /** Dòng dặn trước khi vào bài. Em biết trước thì không hoảng. */
 export function chuDanTruoc(anHanGiay = MS_AN_HAN_NHA_TAY / 1000): string {
-  return `Giữ ngón tay trên màn hình để đọc đề. Nhấc tay quá ${anHanGiay} giây, đề sẽ tạm ẩn; chạm lại là hiện.`
+  return `Giữ ngón tay trên màn hình để đọc đề. Nhấc tay quá ${anHanGiay} giây, hoặc để màn hình im quá ${MS_BAT_DONG_CHE / 1000} giây, đề sẽ tạm ẩn; chạm lại là hiện.`
 }
 
 // ---------------------------------------------------------------------------
@@ -90,8 +97,11 @@ export interface TrangThaiGiu {
 export interface BoiCanhGiu {
   /** `navigator.maxTouchPoints > 0`. Máy không cảm ứng thì cơ chế KHÔNG bật. */
   coCamUng: boolean
-  /** `document.activeElement` là ô nhập Phần III. Gõ bàn phím thì tay không
-   * chạm màn; tắt đề lúc đó là chặn em làm bài. */
+  /** `document.activeElement` là ô nhập Phần III.
+   *
+   * KHÔNG còn là miễn trừ vô điều kiện (xem `MS_BAT_DONG_CHE`). Nó chỉ nới ân
+   * hạn từ 3 giây lên đúng ngưỡng cứng 6 giây, để em đang tính toán rồi gõ đáp
+   * án không bị nhấp nháy giữa chừng. */
   dangGoO: boolean
   anHanMs: number
 }
@@ -112,8 +122,8 @@ export function chamXuong(tt: TrangThaiGiu, id: number, x: number, y: number, na
   tt.mocHoatDong = nay
 }
 
-/** Chỉ dời neo khi ngón đã rời neo đủ xa. Rung tay dưới ngưỡng thì mốc ngón
- * chết KHÔNG được đếm lại — đó là toàn bộ điểm của lớp 3. */
+/** Chỉ dời neo khi ngón đã rời neo đủ xa. Rung tay dưới ngưỡng thì mốc bất
+ * động KHÔNG được đếm lại — đó là chỗ bịt lỗ kê một ngón rồi rung nhẹ. */
 export function chamDiChuyen(tt: TrangThaiGiu, id: number, x: number, y: number, nay: number): void {
   const n = tt.ngon.find((v) => v.id === id)
   if (!n) return chamXuong(tt, id, x, y, nay)
@@ -134,27 +144,27 @@ export function ghiHoatDong(tt: TrangThaiGiu, nay: number): void {
   tt.mocHoatDong = nay
 }
 
-/** Ngón còn được tính là bằng chứng có mặt hay không. */
-export function ngonConSong(n: NgonDangCham, nay: number): boolean {
-  return nay - n.mocDong < MS_NGON_CHET
-}
-
-/** BA LỚP ĐIỀU KIỆN.
+/** BỐN DÒNG, ĐỌC TỪ TRÊN XUỐNG.
  *
- * Lớp 1 — có ít nhất một ngón đang chạm và còn sống ⇒ hiện đề.
- * Lớp 2 — nhả hết tay thì còn ân hạn.
- * Lớp 3 — ngón bất động quá `MS_NGON_CHET` thôi được tính (lỗ hổng kê một ngón).
+ * 0. Máy không có cảm ứng ⇒ cơ chế KHÔNG bật. Màn thi vốn dựng cho điện thoại;
+ *    bật ở máy tính là khoá cứng bài của một em không làm gì sai.
+ * 1. NGƯỠNG CỨNG: bất động quá `MS_BAT_DONG_CHE` ⇒ che, KHÔNG ngoại lệ. Đây là
+ *    dòng thầy yêu cầu thêm 05/09, và nó đứng TRƯỚC mọi miễn trừ — kể cả con
+ *    trỏ đang nhấp nháy trong ô nhập, kể cả ngón kê im ở góc màn.
+ * 2. Caret trong ô nhập Phần III ⇒ hiện. Em đang tính toán rồi gõ đáp án thì
+ *    không được nhấp nháy giữa chừng; nhưng chỉ được nới tới ngưỡng cứng.
+ * 3. Tay còn trên màn ⇒ hiện.
+ * 4. Nhả hết tay ⇒ còn ân hạn (mặc định 3 giây).
  *
- * Ba ca KHÔNG BAO GIỜ tắt đề đứng trước cả ba lớp: máy không cảm ứng, đang gõ
- * ô nhập Phần III, và (qua `mocHoatDong`) đang cuộn quán tính. Sai một trong ba
- * ca này là em mất bài oan, nặng hơn hẳn bỏ sót một ca gian lận. */
+ * Cuộn quán tính đi qua `mocHoatDong` nên không lọt vào ca nào ở trên: nhả tay
+ * cho trang trôi thì mỗi sự kiện cuộn đẩy mốc lên, đề không tắt giữa lúc trôi. */
 export function coMat(tt: TrangThaiGiu, nay: number, bc: BoiCanhGiu): boolean {
   if (!bc.coCamUng) return true
+  const imLang = nay - mocGanNhat(tt)
+  if (imLang >= MS_BAT_DONG_CHE) return false
   if (bc.dangGoO) return true
-  if (tt.ngon.some((n) => ngonConSong(n, nay))) return true
-  // Ngón chết KHÔNG được cấp thêm ân hạn: `mocDong` của nó đã cũ hơn 20 giây
-  // nên `mocGanNhat` vẫn quá hạn, đề tắt đúng lúc ngón chết.
-  return nay - mocGanNhat(tt) < bc.anHanMs
+  if (tt.ngon.length > 0) return true
+  return imLang < bc.anHanMs
 }
 
 /** Mốc hoạt động gần nhất, tính cả ngón đang chạm. */
@@ -178,10 +188,11 @@ export function batMacDinh(loai?: 'thi' | 'baitap'): boolean {
   return loai === 'baitap' ? BAT_MAC_DINH_BAI_TAP : BAT_MAC_DINH_CA_THI
 }
 
+/** Ân hạn thật, đã chặn trần ở ngưỡng cứng — ca cũ ghi 10 giây vẫn chạy đúng. */
 export function anHanMsCua(giay?: number): number {
   const g = Number(giay)
   if (!Number.isFinite(g) || g <= 0) return MS_AN_HAN_NHA_TAY
-  return Math.round(g * 1000)
+  return Math.min(Math.round(g * 1000), MS_BAT_DONG_CHE)
 }
 
 // ---------------------------------------------------------------------------

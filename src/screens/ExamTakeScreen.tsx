@@ -1134,8 +1134,13 @@ export default function ExamTakeScreen() {
     }
     // Cuộn quán tính và gõ bàn phím đều là bằng chứng em còn làm bài: ân hạn
     // đếm lại từ đây, nếu không thì nhả tay cho trang trôi là đề tắt giữa lúc
-    // đang trôi.
-    const dong = () => ghiHoatDong(tt, performance.now())
+    // đang trôi. Bỏ che NGAY luôn — em gõ tiếp mà đề còn ẩn thêm một nhịp nữa
+    // thì bực, và ngón tay em không hề rời bàn phím để chạm màn.
+    const dong = () => {
+      const nay = performance.now()
+      ghiHoatDong(tt, nay)
+      dat(false, nay)
+    }
 
     document.addEventListener('touchstart', xuong, { passive: true })
     document.addEventListener('touchmove', di, { passive: true })

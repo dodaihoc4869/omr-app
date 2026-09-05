@@ -657,7 +657,7 @@ export default function ExamSetupScreen() {
           </button>
         </div>
         <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
-          Đề chỉ hiện khi ngón tay em còn trên màn. Nhả tay quá ân hạn thì đề tạm ẩn, chạm lại là hiện ngay. Muốn chạm vào cửa sổ nổi thì phải nhả tay khỏi bài, nên không đọc hai thứ cùng lúc được. KHÔNG khoá bài vì việc này.
+          Đề chỉ hiện khi ngón tay em còn trên màn. Nhả tay quá ân hạn, hoặc để màn hình im quá 6 giây, thì đề tạm ẩn; chạm lại là hiện ngay. Muốn chạm vào cửa sổ nổi thì phải nhả tay khỏi bài, nên không đọc hai thứ cùng lúc được. KHÔNG khoá bài vì việc này.
         </div>
         {giuDeDoc && (
           <div style={{ marginTop: 'var(--k3)' }}>
