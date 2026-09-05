@@ -19,6 +19,18 @@ const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric:
 /** Nhãn ngắn của phần, in trong viên nhỏ cạnh mã. */
 const NHAN_PHAN: Record<'I' | 'II' | 'III', string> = { I: 'TN', II: 'ĐS', III: 'TLN' }
 
+/** KHỐI của một đề (10 / 11 / 12), đọc từ đầu mã đề (`10-C1-B1`) hoặc đầu nhóm
+ * (`10 · C1 - Nguyên Tử`). Không nhận ra thì trả '' — đề vẫn hiện ở "Tất cả".
+ *
+ * Thầy chốt 04-09 khuya: "tạo cho tôi 3 bộ lọc đề là 10, 11, 12 ở cả mục gọi
+ * lên bảng và mục tạo ca". Kho giờ có ba khối, 24 dòng, lướt tìm đề lớp 12 mà
+ * phải qua hết lớp 10, 11 là mất thời gian trên lớp. */
+export function khoiCuaDe(c: Pick<TeacherExamSource, 'maDe' | 'nhom'>): string {
+  const m = /^(10|11|12)\b/.exec(c.maDe) || /^(10|11|12)\b/.exec(c.nhom || '')
+  return m ? m[1] : ''
+}
+export const KHOI_CO_THE = ['10', '11', '12'] as const
+
 export interface HopChonDeProps {
   /** Đề đã tách ba phần (xem tach-phan-de.ts). */
   ds: TeacherExamSource[]
@@ -36,11 +48,21 @@ export interface HopChonDeProps {
 
 export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308, chonNhieu, onChonTatCa }: HopChonDeProps) {
   const [tim, setTim] = useState('')
+  const [khoi, setKhoi] = useState('')
+
+  // Chỉ bày chip cho khối THỰC CÓ trong kho; kho toàn lớp 12 thì không bày ba chip
+  // mà hai chip bấm vào trống trơn.
+  const dsKhoi = useMemo(() => KHOI_CO_THE.filter((k) => ds.some((c) => khoiCuaDe(c) === k)), [ds])
 
   const loc = useMemo(() => {
     const q = tim.trim().toLowerCase()
-    return ds.filter((c) => (!nhomLoc || (c.nhom || '') === nhomLoc) && (!q || c.maDe.toLowerCase().includes(q) || (c.nhom || '').toLowerCase().includes(q) || (c.nguon || '').toLowerCase().includes(q)))
-  }, [ds, tim, nhomLoc])
+    return ds.filter(
+      (c) =>
+        (!khoi || khoiCuaDe(c) === khoi) &&
+        (!nhomLoc || (c.nhom || '') === nhomLoc) &&
+        (!q || c.maDe.toLowerCase().includes(q) || (c.nhom || '').toLowerCase().includes(q) || (c.nguon || '').toLowerCase().includes(q)),
+    )
+  }, [ds, tim, nhomLoc, khoi])
 
   // Gom theo bài gốc để in tiêu đề nhóm một lần.
   const nhom = useMemo(() => {
@@ -58,6 +80,36 @@ export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308,
 
   return (
     <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+      {dsKhoi.length > 0 && (
+        <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="group" aria-label="Lọc theo khối">
+          {['', ...dsKhoi].map((k) => {
+            const chon = khoi === k
+            return (
+              <button
+                key={k || '__tat_ca'}
+                type="button"
+                onClick={() => setKhoi(k)}
+                aria-pressed={chon}
+                className="tap-target font-bold"
+                style={{
+                  fontFamily: 'var(--sans)',
+                  fontSize: 'var(--cx-1)',
+                  minHeight: 36,
+                  padding: '0 var(--k3)',
+                  borderRadius: 'var(--bo-tron)',
+                  background: chon ? 'var(--xanh-nen)' : 'var(--the-2)',
+                  color: chon ? 'var(--xanh)' : 'var(--nhat)',
+                  border: `1.5px solid ${chon ? 'var(--xanh)' : 'transparent'}`,
+                  transitionProperty: 'background-color, color, border-color',
+                  transitionDuration: 'var(--nhanh)',
+                }}
+              >
+                {k ? `Lớp ${k}` : 'Tất cả'}
+              </button>
+            )
+          })}
+        </div>
+      )}
       <div className="flex items-center" style={{ gap: 'var(--k2)', height: 44, borderRadius: 'var(--bo-1)', padding: '0 var(--k3)', background: 'var(--the-2)', border: '1.5px solid transparent' }}>
         <Search size={16} style={{ color: 'var(--mo)', flex: '0 0 auto' }} />
         <input
