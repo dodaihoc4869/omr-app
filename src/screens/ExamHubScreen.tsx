@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { ClipboardList, GraduationCap, Library, Smartphone, Presentation, RefreshCw, Activity } from 'lucide-react'
+import { ClipboardList, GraduationCap, Library, Smartphone, Presentation, RefreshCw } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { daySangBanMoi, PHIEN_BAN_APP, type DangKySW } from '../lib/cap-nhat-app'
 import { OThongBao, NutChinh } from '../components/DesignSystem'
@@ -184,7 +184,6 @@ export default function ExamHubScreen() {
       <TheBam icon={<Presentation size={22} />} title="Gọi lên bảng" sub="Tích em, máy chọn câu đúng chuyên đề em yếu nhất trong ca gần nhất" onClick={() => setScreen('goilenbang')} />
       {/* ĐỢT 0 của BAOMATCATHI.md: trang đo, KHÔNG khoá ai. Thầy chụp thử trên
           máy thật để chấm điểm từng kênh; kênh nào đạt chuẩn mới được bật khoá. */}
-      <TheBam icon={<Activity size={22} />} title="Bàn cân tín hiệu" sub="Đo tám kênh phát hiện chụp màn hình trên máy thật · chưa khoá ai" onClick={() => setScreen('dotinhieu')} />
       {/* Giao bài tập vẫn nằm trong hồ sơ từng em — vào bằng tab HỌC SINH ở
           thanh dưới, chạm một em. Bỏ thẻ lối tắt ở đây theo yêu cầu của thầy;
           tính năng KHÔNG bị gỡ.

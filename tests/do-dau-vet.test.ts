@@ -203,14 +203,11 @@ describe('luật dữ liệu tầng đỏ', () => {
     expect(ma).not.toContain('exam-api')
   })
 
-  it('màn đo cũng không gọi máy chủ — Đợt 0 chỉ đo tại chỗ', async () => {
-    const ma = (await import('../src/screens/DoTinHieuScreen.tsx?raw')).default
-    expect(ma).not.toContain('exam-api')
-    expect(ma).not.toContain('fetch(')
-  })
-
   it('không chữ "gian lận", "quay cóp", "vi phạm" trong thứ máy sinh ra', async () => {
-    const files = ['../src/lib/do-dau-vet.ts?raw', '../src/lib/thu-tin-hieu.ts?raw', '../src/screens/DoTinHieuScreen.tsx?raw']
+    // Màn "Bàn cân tín hiệu" (/do) đã xoá theo lệnh thầy 05/09 — Đợt 0 đã đo
+    // xong, ngưỡng đã chốt vào man-thi-sach.ts, giữ lại chỉ là một lối vào thừa
+    // trong app của thầy. Bộ thu tám kênh thì GIỮ: màn thi vẫn dùng nó.
+    const files = ['../src/lib/do-dau-vet.ts?raw', '../src/lib/thu-tin-hieu.ts?raw']
     for (const f of files) {
       const ma = (await import(/* @vite-ignore */ f)).default as string
       expect(ma, f).not.toMatch(/gian lận|quay cóp/i)
