@@ -40,7 +40,7 @@ const O_NHAP: React.CSSProperties = {
 /** Đề đã lưu → danh sách câu có thể gọi lên bảng. Câu KHÔNG có chuyên đề vẫn
  * giữ lại: nó dùng được khi đề thiếu câu đúng chuyên đề, chỉ là không ưu tiên. */
 function cauTuDe(de: TeacherExamSource): CauCoTheGoi[] {
-  const lay = (phan: 'I' | 'II' | 'III', ds: { id: string; text: string; chuyenDe?: string; mucDo?: 'biet' | 'hieu' | 'van_dung' }[]) =>
+  const lay = (phan: 'I' | 'II' | 'III', ds: { id: string; text: string; chuyenDe?: string; mucDo?: 'biet' | 'hieu' | 'van_dung'; canChua?: { sao: 0 | 1 | 2; ly_do: string } }[]) =>
     ds.map((q, i) => ({
       id: q.id,
       phan,
@@ -48,6 +48,8 @@ function cauTuDe(de: TeacherExamSource): CauCoTheGoi[] {
       viTri: i,
       chuyenDe: q.chuyenDe,
       mucDo: q.mucDo,
+      sao: q.canChua?.sao ?? 0,
+      lyDoSao: q.canChua?.ly_do ?? '',
       tomTat: (q.text || '').replace(/\$\\ce\{([^}]*)\}\$/g, '$1').replace(/\s+/g, ' ').trim().slice(0, 90),
     }))
   return [...lay('I', de.phanI), ...lay('II', de.phanII), ...lay('III', de.phanIII)]
@@ -126,6 +128,10 @@ export default function GoiLenBangScreen() {
 
   const de = deDaLuu.find((d) => d.maDe === maDe) ?? null
   const cauHoi = useMemo(() => (de ? cauTuDe(de) : []), [de])
+  // ĐỀ CHƯA CÓ SAO NÀO: gần như chắc chắn là bản đề trong máy được nạp TRƯỚC khi
+  // app biết đọc trường `can_chua`. Nói thẳng ra, đừng để thầy ngồi đoán vì sao
+  // câu nào cũng không sao.
+  const chuaCoSao = cauHoi.length > 0 && cauHoi.every((c) => !c.sao)
 
   const dsLoc = useMemo(() => {
     const q = tim.trim().toLowerCase()
@@ -457,6 +463,14 @@ export default function GoiLenBangScreen() {
             )}
           </div>
 
+          {chuaCoSao && (
+            <div style={{ marginTop: 'var(--k3)' }}>
+              <OThongBao tone="cam">
+                Đề này chưa câu nào có sao cần chữa. Vào Ngân hàng đề bấm Đồng bộ để nạp lại kho — sao nằm sẵn trong file kho, bản đề đang lưu trong máy được nạp trước khi app biết đọc trường đó.
+              </OThongBao>
+            </div>
+          )}
+
           <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
             {ketQua.map((p) => {
               const mo = xemCauCua === p.sbd
@@ -497,6 +511,11 @@ export default function GoiLenBangScreen() {
                           {p.viSao}
                         </span>
                       )}
+                      {p.cau?.lyDoSao && !!p.cau.sao && (
+                        <span className="block" style={{ ...NHAN_NHO, color: 'var(--cam)', marginTop: 2 }}>
+                          {p.cau.lyDoSao}
+                        </span>
+                      )}
                       {p.ghiChu && (
                         <span className="block" style={{ ...NHAN_NHO, color: 'var(--cam)', marginTop: 4 }}>
                           {p.ghiChu}
@@ -518,6 +537,14 @@ export default function GoiLenBangScreen() {
                               {p.cau.so}
                             </span>
                             <span style={NHAN_NHO}>Phần {p.cau.phan}</span>
+                            {/* SAO CẦN CHỮA — thầy chấm sẵn trong kho. Không có
+                                sao ở đây thì thầy không biết câu máy vừa đưa ra
+                                có đáng đứng bảng chữa hay không. */}
+                            {!!p.cau.sao && (
+                              <span className="block" style={{ color: 'var(--cam)', fontSize: 'var(--cx-2)', letterSpacing: '.05em' }} title={p.cau.lyDoSao || undefined}>
+                                {'★'.repeat(p.cau.sao)}
+                              </span>
+                            )}
                           </>
                         ) : (
                           <span style={{ ...NHAN_NHO, color: 'var(--mo)' }}>—</span>

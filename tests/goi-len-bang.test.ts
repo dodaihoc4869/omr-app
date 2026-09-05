@@ -269,3 +269,39 @@ describe('Màn nhớ câu đã gọi', () => {
     expect(ma).toContain('hoSoEm(cauHinh.url, { secret: cauHinh.mat, sbd })')
   })
 })
+
+// SAO CẦN CHỮA ở màn Gọi lên bảng cũ (thầy báo 05/09: "không thấy gắn sao vào
+// câu đã phân công"). Sao phải đi tới tận dòng phân công, và ở cùng mức độ thì
+// câu nhiều sao được gọi trước.
+describe('sao cần chữa trong phân công', () => {
+  const c = (id: string, so: number, mucDo: 'biet' | 'hieu' | 'van_dung', sao: 0 | 1 | 2): CauCoTheGoi => ({
+    id,
+    phan: 'I',
+    so,
+    viTri: so - 1,
+    chuyenDe: 'Ester',
+    mucDo,
+    tomTat: 't',
+    sao,
+    lyDoSao: sao ? 'câu nền' : '',
+  })
+
+  it('cùng mức độ thì câu NHIỀU SAO được phân trước', () => {
+    const em = [{ sbd: '1', hoTen: 'A', chuyenDeCaGanNhat: [{ ten: 'Ester', soCau: 10, soSai: 2 }] }]
+    const kq = phanCongCauHoi(em, [c('q0', 1, 'van_dung', 0), c('q2', 2, 'van_dung', 2)])
+    expect(kq[0].cau?.id).toBe('q2')
+  })
+
+  it('MỨC ĐỘ vẫn thắng sao: em hổng gốc không bị lôi lên chữa câu vận dụng hai sao', () => {
+    // Sai 9/10 (90%) → nhắm nhận biết.
+    const em = [{ sbd: '1', hoTen: 'A', chuyenDeCaGanNhat: [{ ten: 'Ester', soCau: 10, soSai: 9 }] }]
+    const kq = phanCongCauHoi(em, [c('kho', 1, 'van_dung', 2), c('de', 2, 'biet', 0)])
+    expect(kq[0].cau?.id).toBe('de')
+  })
+
+  it('bảng chữ copy sang Zalo có ★ của câu', () => {
+    const em = [{ sbd: '1', hoTen: 'An', chuyenDeCaGanNhat: [{ ten: 'Ester', soCau: 10, soSai: 5 }] }]
+    const t = bangPhanCongChu(phanCongCauHoi(em, [c('q2', 7, 'hieu', 2)]), 'ĐỀ-1')
+    expect(t).toContain('câu 7 ★★')
+  })
+})

@@ -23,6 +23,10 @@ export interface CauCoTheGoi {
   /** Chỉ số câu trong mảng phần tương ứng của đề — để màn tra ra câu ĐẦY ĐỦ
    * (phương án, hình, lời giải) mà không phải chép lại nội dung vào đây. */
   viTri: number
+  /** SAO CẦN CHỮA (0/1/2) chấm sẵn trong kho. Câu chưa gắn tính 0 — không đoán. */
+  sao?: 0 | 1 | 2
+  /** Vì sao câu này đáng chữa — thầy đọc để quyết có gọi câu đó không. */
+  lyDoSao?: string
 }
 
 export interface EmDeGoi {
@@ -104,7 +108,10 @@ function xepTheoMuc(nham: MucDo) {
     // Câu không ghi mức độ xếp sau cùng: không biết khó dễ thì không dám đưa lên bảng trước.
     const da = ia < 0 ? 99 : Math.abs(ia - dich) * 2 + (ia > dich ? 1 : 0)
     const db = ib < 0 ? 99 : Math.abs(ib - dich) * 2 + (ib > dich ? 1 : 0)
-    return da - db || a.phan.length - b.phan.length || a.so - b.so
+    // ĐÚNG MỨC ĐỘ TRƯỚC, RỒI MỚI TỚI SAO. Sao nói câu nào đáng chữa với cả lớp;
+    // mức độ nói câu nào em này với tới được. Lôi em hổng gốc lên chữa câu hai
+    // sao vận dụng thì em đứng im, nên mức độ vẫn thắng.
+    return da - db || (b.sao ?? 0) - (a.sao ?? 0) || a.phan.length - b.phan.length || a.so - b.so
   }
 }
 
@@ -211,7 +218,7 @@ export const TEN_MUC: Record<MucDo, string> = { biet: 'nhận biết', hieu: 'th
 /** Bảng phân công dạng chữ để thầy copy sang Zalo lớp hoặc dán vào giáo án. */
 export function bangPhanCongChu(ds: PhanCong[], tenDe: string): string {
   const dong = ds.map((p, i) => {
-    const cau = p.cau ? `Phần ${p.cau.phan} câu ${p.cau.so}` : 'chưa có câu'
+    const cau = p.cau ? `Phần ${p.cau.phan} câu ${p.cau.so}${p.cau.sao ? ' ' + '★'.repeat(p.cau.sao) : ''}` : 'chưa có câu'
     const cd = p.chuyenDeYeu ? ` (${p.chuyenDeYeu.ten}, sai ${p.chuyenDeYeu.soSai}/${p.chuyenDeYeu.soCau})` : ' (chưa có dữ liệu)'
     return `${i + 1}. ${p.hoTen || `SBD ${p.sbd}`} — ${cau}${cd}`
   })
