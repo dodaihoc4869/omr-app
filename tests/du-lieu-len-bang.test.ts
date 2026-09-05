@@ -200,3 +200,56 @@ describe('cả chuỗi từ ca ra bảng phân công', () => {
     expect(kq.thongKe.find((t) => t.cau.id === 'q1')?.soEmLam).toBe(10)
   })
 })
+
+// THẦY BÁO 05/09 TỐI: tích đề chương 2 mà máy vẫn phân câu chương 1. Nguyên do:
+// câu của ca đã thi có bài làm nên điểm cao hơn, chen hết chỗ của câu thầy tích.
+describe('thầy tự chọn bài thì CHỈ chữa bài đó', () => {
+  const cauC1 = (n: number, sao: 0 | 1 | 2 = 0) => ({ ...tn(n, 'Ester – lipid', 'A', sao), id: `c1q${n}` })
+  const cauC2 = (n: number, sao: 0 | 1 | 2 = 0) => ({ ...tn(n, 'Carbohydrate', 'A', sao), id: `c2q${n}` })
+
+  const BANK_CA = { phanI: [cauC1(1, 2), cauC1(2, 1), cauC1(3)], phanII: [], phanIII: [] } as unknown as BanDeCa
+  const BANK_TICH = { phanI: [cauC2(1), cauC2(2, 2), cauC2(3, 1)], phanII: [], phanIII: [] } as unknown as BanDeCa
+
+  it('màn Gọi lên bảng bỏ hẳn câu của ca khi thầy tự chọn bài', async () => {
+    const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
+    expect(ma).toContain("if (cachLayCau === 'tu_chon') return cauTuBanDe(bankThem)")
+  })
+
+  it('danh sách chữa chỉ còn chuyên đề của bài đã tích', () => {
+    const cauCa = cauTuBanDe(BANK_CA)
+    const cauTich = cauTuBanDe(BANK_TICH)
+    expect(cauCa.every((c) => c.chuyenDe === 'Ester – lipid')).toBe(true)
+    expect(cauTich.every((c) => c.chuyenDe === 'Carbohydrate')).toBe(true)
+    // không trộn: hai danh sách rời nhau hoàn toàn
+    expect(cauTich.some((c) => cauCa.map((x) => x.id).includes(c.id))).toBe(false)
+  })
+
+  it('trong bài đã tích, câu 2 SAO được phân trước 1 sao rồi 0 sao', () => {
+    const dsCau = cauTuBanDe(BANK_TICH)
+    const em = emTuCa(
+      [luot('1', 'An', traLoi({}))],
+      { '1': { sbd: '1', hoTen: 'An', chuyenDe: [{ ten: 'Carbohydrate', soCau: 10, soSai: 8 }] } },
+      dsCau,
+    )
+    const kq = phanCong(dsCau, [], em, { ...MAC_DINH, soLuot: 1 })
+    expect(kq.phanCong[0].cau.sao).toBe(2)
+    // xếp hạng điểm giữ đúng thứ tự sao
+    const theoSao = kq.thongKe.slice().sort((a, b) => b.diem - a.diem).map((t) => t.cau.sao)
+    expect(theoSao).toEqual([2, 1, 0])
+  })
+
+  it('em yếu chuyên đề đó hơn được gọi trước ở cùng mức', () => {
+    const dsCau = cauTuBanDe(BANK_TICH)
+    const em = emTuCa(
+      [luot('1', 'Ít yếu', traLoi({})), luot('2', 'Rất yếu', traLoi({}))],
+      {
+        '1': { sbd: '1', hoTen: 'Ít yếu', chuyenDe: [{ ten: 'Carbohydrate', soCau: 10, soSai: 2 }] },
+        '2': { sbd: '2', hoTen: 'Rất yếu', chuyenDe: [{ ten: 'Carbohydrate', soCau: 10, soSai: 9 }] },
+      },
+      dsCau,
+    )
+    const kq = phanCong(dsCau, [], em, { ...MAC_DINH, soLuot: 1 })
+    // câu 2 sao đứng đầu phải rơi vào em yếu chuyên đề đó nhất
+    expect(kq.phanCong[0].hoTen).toBe('Rất yếu')
+  })
+})

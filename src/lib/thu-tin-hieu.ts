@@ -64,7 +64,8 @@ export function thuTinHieu(o: TuyChonThu): () => void {
     coTieuDiem: document.hasFocus(),
     rong: window.innerWidth,
     cao: window.innerHeight,
-    dangChamMan: performance.now() - dangChamMan < 200,
+    // 400 ms để bao trọn một nhát cuộn — xem MS_KHONG_CHAM_QUANH_PHIEU.
+    dangChamMan: performance.now() - dangChamMan < 400,
   })
   const bao = (kenh: PhieuKenh['kenh'], chiTiet: string, luc = performance.now()) => o.onPhieu({ kenh, luc, chiTiet }, boiCanh())
 

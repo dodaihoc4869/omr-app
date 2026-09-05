@@ -233,11 +233,19 @@ export default function GoiLenBangScreen() {
    * Số câu của phần thêm đánh tiếp sau câu của ca, không đánh lại từ 1: hai
    * dòng cùng ghi "Phần I câu 3" là thầy đọc nhầm câu ngay trên lớp. */
   const dsCau: CauChua[] = useMemo(() => {
+    // THẦY TỰ CHỌN BÀI ⇒ CHỈ chữa đúng những câu đó.
+    //
+    // Thầy báo 05/09 tối: tích đề chương 2 mà máy vẫn phân câu chương 1. Đúng
+    // vậy — câu của ca đã thi có bài làm nên điểm cao hơn, chen hết chỗ. Thầy
+    // chọn bài nào thì bảng chữa chỉ được có bài đó, không câu nào chuyên đề
+    // khác. Bài làm của ca vẫn dùng, nhưng chỉ để biết em nào yếu chỗ nào.
+    if (cachLayCau === 'tu_chon') return cauTuBanDe(bankThem)
+
     const cuaCa = du ? cauTuBanDe(du.bank) : []
     const dich = { I: du?.bank.phanI.length ?? 0, II: du?.bank.phanII.length ?? 0, III: du?.bank.phanIII.length ?? 0 }
     const daCo = new Set(cuaCa.map((c) => c.id))
     return [...cuaCa, ...cauTuBanDe(bankThem, dich).filter((c) => !daCo.has(c.id))]
-  }, [du, bankThem])
+  }, [du, bankThem, cachLayCau])
   const baiLam = useMemo(() => (du ? baiLamTuCa(du.bank, du.maCa, du.luot) : []), [du])
   const dsEmCa = useMemo(() => (du ? emTuCa(du.luot, du.hoSo, dsCau, daGoiCau, vang) : []), [du, dsCau, daGoiCau, vang])
   const dsEm = useMemo(() => {
@@ -519,7 +527,8 @@ export default function GoiLenBangScreen() {
           )
         ) : (
           <div style={{ ...NHAN_NHO, marginBottom: 'var(--k3)' }} data-tu-chon>
-            Tích bài muốn chữa. Câu thầy tích chưa em nào làm, nên máy chọn em lên bảng bằng <b>điểm yếu cộng dồn ở đúng chuyên đề của câu đó</b> — em sai nhiều chuyên đề ấy nhất được gọi trước.
+            Tích bài muốn chữa. Bảng chữa CHỈ lấy câu trong bài thầy tích, không chen câu chuyên đề khác. Trong đó máy lấy <b>câu 2 sao trước, rồi 1 sao, rồi 0 sao</b>, và chọn em lên bảng bằng{' '}
+            <b>điểm yếu cộng dồn ở đúng chuyên đề của câu đó</b> — em sai nhiều chuyên đề ấy nhất được gọi trước.
           </div>
         )}
 

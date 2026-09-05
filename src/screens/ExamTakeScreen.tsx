@@ -18,7 +18,9 @@ import {
   TI_LE_CO_MAN_CHOT,
   chuNhomPhieu,
   coKhoa,
+  duKhoaMotMinh,
   laCuaSoNoi,
+  MS_KHONG_CHAM_QUANH_PHIEU,
   MS_NHIP_SOI_TIEU_DIEM,
   nhomDuKhoa,
   xetCoMan,
@@ -834,17 +836,53 @@ export default function ExamTakeScreen() {
       void doSubmit(next)
     }
 
-    /** Một phiếu vừa tới: cất vào cửa sổ 300 ms rồi xét đủ HAI HỌ chưa.
-     * Hai kênh cùng đo một hiện tượng chỉ tính một phiếu — xem đầu
-     * `man-thi-sach.ts`, đây là chỗ chống khoá oan khi em cuộn nhanh. */
-    const xetPhieu = (p: PhieuKenh) => {
+    /** Một phiếu vừa tới. Hai đường dẫn tới khoá:
+     *
+     *   1. ĐỦ HAI HỌ trùng trong 300 ms — hai kênh cùng đo một hiện tượng chỉ
+     *      tính một phiếu, xem đầu `man-thi-sach.ts`.
+     *   2. MỘT phiếu họ luồng-chính mà KHÔNG AI CHẠM MÀN — số đo trên máy thầy
+     *      05/09 cho thấy chụp màn hình chỉ làm kênh 6 báo, nên nếu chỉ chờ đủ
+     *      hai họ thì không bao giờ khoá. Điều kiện "không chạm" là thứ tách
+     *      được chụp màn hình khỏi cuộn và gõ.
+     *
+     * Đường 2 đợi thêm 250 ms rồi mới chốt: ngón tay có thể chạm màn NGAY SAU
+     * nhát nghẽn (em vừa cuộn xong), và lúc phiếu tới thì chưa biết điều đó. */
+    const xetPhieu = (p: PhieuKenh, coChamMan: boolean) => {
       phieu.push(p)
       while (phieu.length && phieu[0].luc < p.luc - MS_TRUNG_KHOP * 2) phieu.shift()
       if (conAnHan()) return
+
       const nhom = nhomDuKhoa(phieu)
       const cuoi = nhom[nhom.length - 1]
-      if (cuoi && coKhoa(muc, 'dau_vet_chup')) khoaVi('dau_vet_chup', chuNhomPhieu(cuoi))
+      if (cuoi && coKhoa(muc, 'dau_vet_chup')) return khoaVi('dau_vet_chup', chuNhomPhieu(cuoi))
+
+      const hoLuongChinh = p.kenh === 'nhip_ve' || p.kenh === 'lech_dong_ho'
+      if (!hoLuongChinh || coChamMan) return
+      if (p.luc - mocKhoaMotMinh < MS_KHONG_CHAM_QUANH_PHIEU * 5) return // không chốt dồn dập
+      window.setTimeout(() => {
+        if (daKhoa) return
+        const chamSau = performance.now() - mocChamManCuoi < MS_KHONG_CHAM_QUANH_PHIEU
+        const du = duKhoaMotMinh({
+          hoLuongChinh: true,
+          coChamMan: chamSau,
+          dangLamBaiBinhThuong: document.hasFocus() && document.visibilityState === 'visible',
+        })
+        if (!du || !coKhoa(muc, 'dau_vet_chup')) return
+        mocKhoaMotMinh = performance.now()
+        khoaVi('dau_vet_chup', `${p.kenh === 'lech_dong_ho' ? 'kênh 6' : 'kênh 5'}, không chạm màn`)
+      }, 250)
     }
+
+    /** Mốc chạm màn gần nhất — dùng để biết ngón tay có chạm NGAY SAU nhát
+     * nghẽn hay không. */
+    let mocChamManCuoi = -1e9
+    let mocKhoaMotMinh = -1e9
+    const ghiChamMan = () => {
+      mocChamManCuoi = performance.now()
+    }
+    document.addEventListener('touchstart', ghiChamMan, { passive: true })
+    document.addEventListener('touchmove', ghiChamMan, { passive: true })
+    document.addEventListener('pointerdown', ghiChamMan, { passive: true })
 
     // NHỊP SOI TIÊU ĐIỂM — đây là chỗ bắt CỬA SỔ NỔI, kiểu gian lận thầy quay
     // video ngày 05/09: em mở cửa sổ nổi Gemini đè lên bài rồi đưa ảnh chụp vào
@@ -905,7 +943,7 @@ export default function ExamTakeScreen() {
         if (p.kenh === 'an_trang' || p.kenh === 'tieu_diem') {
           const veLai = (p.kenh === 'an_trang' && bc.hienTrang) || (p.kenh === 'tieu_diem' && bc.coTieuDiem)
           if (veLai) {
-            if (raTu !== null && p.luc - raTu < MS_VE_SOM) xetPhieu(p) // ra rồi về ngay = một dấu vết chụp
+            if (raTu !== null && p.luc - raTu < MS_VE_SOM) xetPhieu(p, bc.dangChamMan) // ra rồi về ngay = một dấu vết chụp
             raTu = null
             if (henNoi) window.clearTimeout(henNoi)
             boChe()
@@ -935,23 +973,26 @@ export default function ExamTakeScreen() {
         // bộ thu dùng ngưỡng QUAN SÁT rộng hơn để trang /do nhìn thấy nhát yếu.
         if (p.kenh === 'nhip_ve') {
           const gap = Number(/(\d+)/.exec(p.chiTiet)?.[1] ?? 0)
-          if (gap >= MS_RAF_NGHI_CHOT) xetPhieu(p)
+          if (gap >= MS_RAF_NGHI_CHOT) xetPhieu(p, bc.dangChamMan)
           return
         }
         if (p.kenh === 'lech_dong_ho') {
           const lech = Math.abs(Number(/(-?\d+)/.exec(p.chiTiet)?.[1] ?? 0))
-          if (lech >= MS_LECH_DONG_HO_CHOT) xetPhieu(p)
+          if (lech >= MS_LECH_DONG_HO_CHOT) xetPhieu(p, bc.dangChamMan)
           return
         }
         if (p.kenh === 'xung_chuyen_dong') {
           const xoan = Number(/([\d.]+)/.exec(p.chiTiet)?.[1] ?? 0)
-          if (xoan >= NGUONG_XUNG_CHOT.xoan) xetPhieu(p)
+          if (xoan >= NGUONG_XUNG_CHOT.xoan) xetPhieu(p, bc.dangChamMan)
         }
       },
     })
 
     return () => {
       go()
+      document.removeEventListener('touchstart', ghiChamMan)
+      document.removeEventListener('touchmove', ghiChamMan)
+      document.removeEventListener('pointerdown', ghiChamMan)
       window.clearInterval(nhipTieuDiem)
       if (henNoi) window.clearTimeout(henNoi)
       setLyDoChe(null)

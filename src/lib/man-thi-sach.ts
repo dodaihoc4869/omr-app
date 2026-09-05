@@ -72,19 +72,21 @@ export function chuNhomPhieu(nhom: PhieuKenh[]): string {
 
 /** Khoảng trống nhịp vẽ coi là trang ngừng được vẽ.
  *
- * 60 khung một giây ⇒ một khung 16,7 ms. Cuộn nhanh trên máy yếu rớt vài khung,
- * hiếm khi quá 8 khung liên tiếp (~130 ms). Lấy 250 ms = 15 khung: cao hơn hẳn
- * nhiễu cuộn, mà vẫn thấp hơn quãng nghẽn khi hệ thống dựng lớp phủ chụp màn
- * (thường vài trăm ms). */
-export const MS_RAF_NGHI_CHOT = 250
+ * 60 khung một giây ⇒ một khung 16,7 ms. Đo trên máy thầy 05/09: chụp màn hình
+ * KHÔNG làm rớt khung nào quá 150 ms — Android vẫn vẽ đều trong lúc ghi ảnh.
+ * Nên kênh này gần như im khi chụp; hạ xuống 200 ms để nó còn cơ hội góp phiếu,
+ * chứ không trông cậy vào nó. */
+export const MS_RAF_NGHI_CHOT = 200
 
 /** Lệch giữa đồng hồ âm thanh và luồng chính.
  *
- * `AudioContext` chạy trên luồng riêng nên vẫn đếm khi luồng chính bị treo;
- * lệch ≈ đúng quãng treo. Jitter bình thường vài ms. Lấy 200 ms — thấp hơn
- * ngưỡng nhịp vẽ một chút vì đồng hồ âm thanh sạch hơn, nhưng vẫn cao gấp
- * hàng chục lần jitter. */
-export const MS_LECH_DONG_HO_CHOT = 200
+ * ĐO TRÊN MÁY THẦY 05/09, chụp màn hình Android: **K6 lệch −210 ms**, và là
+ * kênh DUY NHẤT trong tám kênh phản ứng. Bảy kênh kia im re — kể cả kênh 8, vì
+ * máy thầy chụp không phải bằng cách bóp hai nút cứng.
+ *
+ * Lấy 150 ms: dưới số đo thật 210 để chắc chắn bắt được, mà vẫn cao gấp hàng
+ * chục lần jitter bình thường (vài ms). */
+export const MS_LECH_DONG_HO_CHOT = 150
 
 /** Xung bóp hai nút cứng.
  *
@@ -159,6 +161,45 @@ export function coKhoa(muc: MucNgat, lyDo: LyDoKhoaMoi, lanThu = 1): boolean {
   if (muc === 'binh_thuong') return false
   if (muc === 'ngat' && lyDo === 'cua_so_noi') return lanThu >= 2
   return true
+}
+
+// ============================================================================
+// KHOÁ MỘT MÌNH KHI KHÔNG CHẠM MÀN — chốt 05/09 tối từ số đo thật của thầy.
+// ============================================================================
+// Số đo: chụp màn hình trên Android chỉ làm K6 báo (lệch −210 ms), bảy kênh kia
+// im. Luật "≥ 2 họ" vì thế không bao giờ đạt, và chụp màn hình không bị khoá —
+// đúng như thầy thấy.
+//
+// Nhưng dòng nhật ký còn một chi tiết đáng giá hơn cả con số: **"không chạm"**.
+// Đó là chỗ tách được chụp màn hình khỏi nhiễu, mà không phải hạ ngưỡng:
+//
+//   · luồng chính nghẽn KHI TAY ĐANG CHẠM MÀN  = cuộn, gõ đáp án, kéo thả.
+//     Chuyện bình thường của một em làm bài. Chỉ góp phiếu.
+//   · luồng chính nghẽn KHI KHÔNG AI CHẠM MÀN  = máy tự dừng vẽ một nhịp.
+//     Em ngồi yên thì không có lý do gì để nghẽn 200 ms — trừ khi hệ điều hành
+//     đang làm việc gì đó nặng, mà việc nặng đúng lúc đang thi thì gần như chỉ
+//     có ghi ảnh màn hình. Đủ để khoá một mình.
+//
+// Đây KHÔNG phải hạ ngưỡng để "có cái mà bắt": ngưỡng giữ nguyên tính chất,
+// chỉ thêm một điều kiện PHỦ ĐỊNH rất mạnh mà nhiễu thường ngày không qua nổi.
+
+/** Cửa sổ tránh chạm quanh một phiếu: có ngón tay trên màn trong khoảng này thì
+ * phiếu chỉ góp phiếu, không được khoá một mình. Rộng hơn cửa sổ trùng khớp để
+ * bao trọn một nhát cuộn. */
+export const MS_KHONG_CHAM_QUANH_PHIEU = 400
+
+export interface XetKhoaMotMinh {
+  /** Phiếu thuộc họ `luong_chinh` (kênh 5 hoặc kênh 6). */
+  hoLuongChinh: boolean
+  /** Có ngón tay chạm màn trong ±400 ms quanh phiếu không. */
+  coChamMan: boolean
+  /** Trang còn hiện và còn tiêu điểm — nếu không thì đã có nhánh cửa sổ nổi /
+   * rời app lo, không phải việc của dấu vết chụp. */
+  dangLamBaiBinhThuong: boolean
+}
+
+export function duKhoaMotMinh(x: XetKhoaMotMinh): boolean {
+  return x.hoLuongChinh && !x.coChamMan && x.dangLamBaiBinhThuong
 }
 
 // ------------------------------------------------ CỬA SỔ NỔI: XÉT TẠI CHỖ

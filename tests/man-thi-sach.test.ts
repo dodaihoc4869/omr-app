@@ -20,7 +20,9 @@ import {
   chuNhomPhieu,
   chuanHoaMucNgat,
   coKhoa,
+  duKhoaMotMinh,
   laCuaSoNoi,
+  MS_KHONG_CHAM_QUANH_PHIEU,
   MS_NHIP_SOI_TIEU_DIEM,
   nhomDuKhoa,
   soHoKhacNhau,
@@ -150,13 +152,8 @@ describe('lời lẽ máy sinh ra', () => {
 })
 
 describe('ngưỡng chốt — nhạy nhất mà vẫn trên nhiễu', () => {
-  it('nhịp vẽ 250 ms ≈ 15 khung ở 60 fps, cao hơn hẳn nhiễu cuộn', () => {
-    expect(MS_RAF_NGHI_CHOT).toBe(250)
+  it('nhịp vẽ ≥ 10 khung ở 60 fps, cao hơn hẳn nhiễu cuộn', () => {
     expect(MS_RAF_NGHI_CHOT / (1000 / 60)).toBeGreaterThan(10)
-  })
-
-  it('lệch đồng hồ 200 ms, cao gấp hàng chục lần jitter thường thấy', () => {
-    expect(MS_LECH_DONG_HO_CHOT).toBe(200)
   })
 
   it('xung bóp nút giữ đúng khoảng 40–200 ms của đặc tả, z không được trội', () => {
@@ -248,5 +245,46 @@ describe('cửa sổ nổi — xét trạng thái tại mốc 900 ms, không tin
     expect(ma).toContain("khoaVi('cua_so_noi', 'nhịp soi tiêu điểm')")
     // vẫn phải giữ đủ 900 ms mới khoá — không bỏ nhịp chờ
     expect(ma).toContain('if (nay - mocMatTieuDiem < MS_XAC_NHAN_CUA_SO_NOI) return')
+  })
+})
+
+// SỐ ĐO THẬT của thầy 05/09 tối, chụp màn hình trên Android: CHỈ kênh 6 báo
+// (lệch −210 ms), bảy kênh kia im, và dòng nhật ký ghi "không chạm".
+//
+// Luật "≥ 2 họ" vì thế không bao giờ đạt. Thêm đường thứ hai: một phiếu họ
+// luồng-chính mà KHÔNG AI CHẠM MÀN cũng đủ khoá. Đây là điều kiện phủ định, chứ
+// không phải hạ ngưỡng.
+describe('khoá một mình khi không chạm màn', () => {
+  it('nghẽn luồng chính mà KHÔNG ai chạm màn → đủ khoá', () => {
+    expect(duKhoaMotMinh({ hoLuongChinh: true, coChamMan: false, dangLamBaiBinhThuong: true })).toBe(true)
+  })
+
+  it('nghẽn khi TAY ĐANG CHẠM MÀN (cuộn, gõ đáp án) → KHÔNG khoá', () => {
+    expect(duKhoaMotMinh({ hoLuongChinh: true, coChamMan: true, dangLamBaiBinhThuong: true })).toBe(false)
+  })
+
+  it('kênh khác họ (xung chuyển động, ẩn trang) không được khoá một mình', () => {
+    expect(duKhoaMotMinh({ hoLuongChinh: false, coChamMan: false, dangLamBaiBinhThuong: true })).toBe(false)
+  })
+
+  it('đang mất tiêu điểm thì để nhánh cửa sổ nổi lo, không tính là dấu vết chụp', () => {
+    expect(duKhoaMotMinh({ hoLuongChinh: true, coChamMan: false, dangLamBaiBinhThuong: false })).toBe(false)
+  })
+
+  it('ngưỡng kênh 6 hạ xuống DƯỚI số đo thật 210 ms để chắc chắn bắt được', () => {
+    expect(MS_LECH_DONG_HO_CHOT).toBeLessThan(210)
+    // nhưng vẫn cao gấp hàng chục lần jitter thường thấy (vài ms)
+    expect(MS_LECH_DONG_HO_CHOT).toBeGreaterThanOrEqual(100)
+  })
+
+  it('cửa sổ tránh chạm đủ rộng để bao trọn một nhát cuộn', () => {
+    expect(MS_KHONG_CHAM_QUANH_PHIEU).toBeGreaterThanOrEqual(400)
+  })
+
+  it('màn làm bài đợi thêm rồi mới chốt — ngón tay có thể chạm NGAY SAU nhát nghẽn', async () => {
+    const ma = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default
+    expect(ma).toContain('const chamSau = performance.now() - mocChamManCuoi < MS_KHONG_CHAM_QUANH_PHIEU')
+    expect(ma).toContain('duKhoaMotMinh({')
+    expect(ma).toContain('không chạm màn')
   })
 })
