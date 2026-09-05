@@ -23,6 +23,7 @@
 //     câu là ca không mở được),
 //   · thiếu câu thì BÁO SỐ THIẾU, không lặng lẽ trả ít hơn.
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
+import { soSao } from '../data/examContent'
 import { hashSeed, seededPermutation } from './exam-shuffle'
 import { chuanChuyenDe } from './goi-len-bang'
 
@@ -52,6 +53,10 @@ export interface CauUngVien {
   coHinh: boolean
   /** Câu pipeline tự đánh dấu cần thầy xem lại. */
   canXem: boolean
+  /** Sao cần chữa (0/1/2) — câu chưa gắn tính 0. */
+  sao: 0 | 1 | 2
+  /** Vì sao câu này đáng chữa — thầy đọc để quyết có đưa vào đề không. */
+  lyDoSao: string
 }
 
 export interface YeuCauRut {
@@ -105,6 +110,8 @@ export function dungUngVien(sources: TeacherExamSource[]): Record<PhanDe, CauUng
           text: q.text || '',
           coHinh: coHinhCua(q),
           canXem: Boolean(q.canXem),
+          sao: soSao(q),
+          lyDoSao: q.canChua?.ly_do || '',
         })
       })
     }

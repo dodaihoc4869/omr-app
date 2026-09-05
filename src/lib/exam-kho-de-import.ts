@@ -8,7 +8,7 @@
 // IndexedDB máy thầy qua saveExamSource() sẵn có. File JSON có đáp án này
 // KHÔNG BAO GIỜ được commit lên git (repo omr-app đang PUBLIC — xem
 // kho-de/.gitignore) hay tải lên bất kỳ server nào.
-import type { HinhAnh, LoiGiaiCauTruc, LyDoY, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion, TrangThaiLoiGiai, ViTriHinh } from '../data/examContent'
+import type { CanChua, HinhAnh, LoiGiaiCauTruc, LyDoY, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion, TrangThaiLoiGiai, ViTriHinh } from '../data/examContent'
 import { donCau } from './chu-la-pdf'
 
 /** Lời giải do pipeline "giải mù" rồi đối chiếu đáp án đề (NAPDETUDONG.md
@@ -85,6 +85,31 @@ export interface KhoDeCau {
   chuyen_de?: string
   /** Mức độ: biet | hieu | van_dung (ma trận đề 2025). */
   muc_do?: MucDo
+  /** Sao cần chữa (0/1/2) + lý do — xem `claude/GAN-SAO-CAN-CHUA.md`. Thiếu →
+   * để trống, tính như 0 sao, KHÔNG đoán. */
+  can_chua?: CanChua
+}
+
+const DK_HOP_LE = new Set<string>(['nen', 'buoc', 'bay', 'hay_gap'])
+const Y_HOP_LE = new Set<string>(['a', 'b', 'c', 'd'])
+
+/** Đọc `can_chua` từ kho. Sai kiểu ở đâu thì BỎ trường đó chứ không bịa giá
+ * trị: một câu bị mất sao chỉ làm nó tụt xuống cuối danh sách chữa, còn gắn
+ * bừa 2 sao là lôi em lên bảng chữa nhầm câu. `sao` sai kiểu → bỏ cả object. */
+export function parseCanChua(v: unknown): CanChua | undefined {
+  if (typeof v !== 'object' || v === null || Array.isArray(v)) return undefined
+  const o = v as Record<string, unknown>
+  if (o.sao !== 0 && o.sao !== 1 && o.sao !== 2) return undefined
+  const dk = Array.isArray(o.dk) ? (o.dk.filter((x) => typeof x === 'string' && DK_HOP_LE.has(x)) as CanChua['dk']) : []
+  const yCanChua = Array.isArray(o.y_can_chua) ? (o.y_can_chua.filter((x) => typeof x === 'string' && Y_HOP_LE.has(x)) as NonNullable<CanChua['y_can_chua']>) : undefined
+  return {
+    sao: o.sao,
+    dk,
+    ly_do: typeof o.ly_do === 'string' ? o.ly_do : '',
+    bay: typeof o.bay === 'string' && o.bay.trim() ? o.bay : null,
+    ...(yCanChua && yCanChua.length > 0 ? { y_can_chua: yCanChua } : {}),
+    ...(o.thong_hieu === true ? { thong_hieu: true as const } : {}),
+  }
 }
 
 export type MucDo = 'biet' | 'hieu' | 'van_dung'
@@ -272,6 +297,7 @@ export function parseKhoDeJsonText(raw: string): KhoDeParseResult {
       loi_giai: parseLoiGiai(c.loi_giai),
       chuyen_de: typeof c.chuyen_de === 'string' && c.chuyen_de.trim() ? c.chuyen_de.trim() : undefined,
       muc_do: chuanHoaMucDo(c.muc_do),
+      can_chua: parseCanChua(c.can_chua),
     })
   })
   if (errors.length > 0) return { ok: false, errors }
@@ -337,6 +363,7 @@ export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherE
       ghiChuLoiGiai: lg?.ghi_chu ?? undefined,
       chuyenDe: c.chuyen_de,
       mucDo: c.muc_do,
+      canChua: c.can_chua,
     }
 
     if (c.phan === 'I') {

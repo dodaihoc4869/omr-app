@@ -106,6 +106,11 @@ function HangCau({ c, stt, doi, bo, conDoi }: { c: CauUngVien; stt: number; doi:
             <span style={{ ...NHAN_NHO, ...SO }}>
               {c.maDe} · câu {c.soGoc}
             </span>
+            {c.sao > 0 && (
+              <span title={c.lyDoSao || undefined} style={{ ...NHAN_NHO, color: 'var(--cam)', letterSpacing: '.05em' }}>
+                {'★'.repeat(c.sao)}
+              </span>
+            )}
             {c.mucDo && <Nhan tone={c.mucDo === 'biet' ? 'xam' : c.mucDo === 'hieu' ? 'tim' : 'cam'}>{TEN_MUC[c.mucDo]}</Nhan>}
             {c.coHinh && (
               <span title="Câu có hình" style={{ color: 'var(--mo)' }}>

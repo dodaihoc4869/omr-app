@@ -23,13 +23,13 @@ describe('HopChonDe — chip khối', () => {
     for (const t of ['Tất cả', 'Lớp 10', 'Lớp 11', 'Lớp 12']) expect(getByRole('button', { name: t })).toBeTruthy()
   })
   it('bấm Lớp 12 thì chỉ còn đề lớp 12; Tất cả thì về đủ', () => {
-    const { getByRole, queryAllByRole } = render(<HopChonDe ds={DS} daChon={new Set()} onChon={vi.fn()} />)
+    const { getByRole, container } = render(<HopChonDe ds={DS} daChon={new Set()} onChon={vi.fn()} />)
+    const cay = () => (container.querySelector('[role="tree"]') as HTMLElement).textContent ?? ''
     fireEvent.click(getByRole('button', { name: 'Lớp 12' }))
-    const dong = queryAllByRole('option').map((e) => e.textContent ?? '')
-    expect(dong.some((t) => t.includes('12-C1-B1-TN'))).toBe(true)
-    expect(dong.some((t) => t.includes('10-C1-B1-TN'))).toBe(false)
+    expect(cay()).toContain('Khối 12')
+    expect(cay()).not.toContain('Khối 10')
     fireEvent.click(getByRole('button', { name: 'Tất cả' }))
-    expect(queryAllByRole('option')).toHaveLength(4)
+    for (const t of ['Khối 10', 'Khối 11', 'Khối 12', 'Chưa rõ khối']) expect(cay()).toContain(t)
   })
   it('kho chỉ có một khối thì vẫn bày chip khối đó, không bày khối trống', () => {
     const { queryByRole } = render(<HopChonDe ds={[de('12-C1-B1-TN')]} daChon={new Set()} onChon={vi.fn()} />)

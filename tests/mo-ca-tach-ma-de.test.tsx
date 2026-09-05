@@ -4,12 +4,13 @@
 // chỉ gồm trắc nghiệm thì trước đây phải chọn cả mã rồi vào màn Rút đề đặt hai
 // phần kia về 0. Nay tích đúng một dòng.
 import { describe, expect, it, vi } from 'vitest'
-import { render, waitFor } from '@testing-library/react'
+import { fireEvent, render, waitFor } from '@testing-library/react'
 import type { TeacherExamSource } from '../src/data/examContent'
 
 const de = (maDe: string, nI: number, nII: number, nIII: number): TeacherExamSource => ({
   maDe,
   nhom: '12 · CI - Ester lipid',
+  nguon: `Nguồn ${maDe}`,
   phanI: Array.from({ length: nI }, (_, i) => ({ id: `${maDe}-I-${i}`, text: 't', choices: ['a', 'b', 'c', 'd'], correct: 'A' })) as never,
   phanII: Array.from({ length: nII }, (_, i) => ({ id: `${maDe}-II-${i}`, text: 't', ideas: ['a', 'b', 'c', 'd'], correct: 'DDDD' })) as never,
   phanIII: Array.from({ length: nIII }, (_, i) => ({ id: `${maDe}-III-${i}`, text: 't', correct: '1' })) as never,
@@ -40,43 +41,62 @@ vi.mock('../src/store/appStore', () => ({
 
 const { default: ExamSetupScreen } = await import('../src/screens/ExamSetupScreen')
 
+/** Cây MẶC ĐỊNH GẬP HẾT — mở lần lượt khối, chương, bài để thấy tầng dạng. */
+async function moHetCay(container: HTMLElement) {
+  for (let i = 0; i < 4; i++) {
+    const nut = [...container.querySelectorAll('button[aria-expanded="false"]')] as HTMLElement[]
+    if (nut.length === 0) break
+    for (const b of nut) fireEvent.click(b)
+  }
+}
+
 describe('danh sách đề khi mở ca', () => {
-  it('danh sách nằm trong HỘP CUỘN cao cố định, không kéo dài cả trang', async () => {
+  it('cây nằm trong HỘP CUỘN cao cố định, không kéo dài cả trang', async () => {
     const { container } = render(<ExamSetupScreen />)
-    await waitFor(() => expect(container.textContent).toContain('12-C1-B2-TN'))
-    const hop = container.querySelector('[role="listbox"]') as HTMLElement
+    await waitFor(() => expect(container.textContent).toContain('Khối 12'))
+    const hop = container.querySelector('[role="tree"]') as HTMLElement
     expect(hop).toBeTruthy()
     expect(hop.style.overflowY).toBe('auto')
     expect(parseInt(hop.style.maxHeight, 10)).toBeGreaterThan(0)
   })
 
-  it('mỗi mã ra ba dòng, đặt tên rõ phần nào', async () => {
+  it('mặc định GẬP HẾT: chỉ thấy khối và chương, chưa thấy mã đề', async () => {
     const { container } = render(<ExamSetupScreen />)
-    await waitFor(() => expect(container.textContent).toContain('12-C1-B2-TN'))
-    const chu = container.textContent ?? ''
+    await waitFor(() => expect(container.textContent).toContain('Khối 12'))
+    const cay = (container.querySelector('[role="tree"]') as HTMLElement).textContent ?? ''
+    expect(cay).toContain('CI - Ester lipid')
+    expect(cay).not.toContain('12-C1-B2-TN')
+  })
+
+  it('mở hết cây thì mỗi mã ra ba dòng, đặt tên rõ phần nào', async () => {
+    const { container } = render(<ExamSetupScreen />)
+    await waitFor(() => expect(container.textContent).toContain('Khối 12'))
+    await moHetCay(container)
+    const chu = (container.querySelector('[role="tree"]') as HTMLElement).textContent ?? ''
     for (const ma of ['12-C1-B2-TN', '12-C1-B2-DS', '12-C1-B2-TLN']) expect(chu).toContain(ma)
-    // Phần in thành viên ngắn TN / ĐS / TLN; tên đầy đủ nằm ở title để rê chuột.
-    const vien = [...container.querySelectorAll('[title]')].map((e) => e.getAttribute('title'))
-    expect(vien).toContain('Trắc nghiệm')
-    expect(vien).toContain('Đúng sai')
-    expect(vien).toContain('Trả lời ngắn')
+    for (const ten of ['Trắc nghiệm', 'Đúng sai', 'Trả lời ngắn']) expect(chu).toContain(ten)
   })
 
   it('phần rỗng KHÔNG sinh dòng — đề không có trả lời ngắn thì chỉ ra hai mã', async () => {
     const { container } = render(<ExamSetupScreen />)
-    await waitFor(() => expect(container.textContent).toContain('11-C1-B1-TN'))
-    const chu = container.textContent ?? ''
+    await waitFor(() => expect(container.textContent).toContain('Khối 11'))
+    await moHetCay(container)
+    const chu = (container.querySelector('[role="tree"]') as HTMLElement).textContent ?? ''
+    expect(chu).toContain('11-C1-B1-TN')
     expect(chu).toContain('11-C1-B1-DS')
     expect(chu).not.toContain('11-C1-B1-TLN')
   })
 
-  it('số câu mỗi dòng đúng bằng số câu của phần đó', async () => {
+  it('số câu mỗi dòng đúng bằng số câu của phần đó, và tầng bài cộng đủ', async () => {
     const { container } = render(<ExamSetupScreen />)
-    await waitFor(() => expect(container.textContent).toContain('12-C1-B2-TN'))
-    const dong = [...container.querySelectorAll('[role="option"]')].map((e) => e.textContent ?? '')
+    await waitFor(() => expect(container.textContent).toContain('Khối 12'))
+    await moHetCay(container)
+    const dong = [...(container.querySelector('[role="tree"]') as HTMLElement).children].map((e) => e.textContent ?? '')
     const timDong = (ma: string) => dong.find((t) => t.includes(ma) && t.includes('câu')) ?? ''
     expect(timDong('12-C1-B2-TN')).toContain('51 câu')
     expect(timDong('12-C1-B2-DS')).toContain('19 câu')
     expect(timDong('12-C1-B2-TLN')).toContain('23 câu')
+    // Tầng bài phải cộng đúng ba dạng: 51 + 19 + 23 = 93.
+    expect(dong.some((t) => t.includes('Nguồn 12-C1-B2') && t.includes('93 câu'))).toBe(true)
   })
 })

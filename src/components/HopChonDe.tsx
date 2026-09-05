@@ -1,47 +1,132 @@
-// HỘP CHỌN ĐỀ — dùng chung cho Mở ca và Gọi lên bảng.
+// HỘP CHỌN ĐỀ — CÂY BỐN TẦNG, dùng chung cho Mở ca và Gọi lên bảng.
 //
-// Thầy chốt 04-09 tối: "làm cái ô này gọn lại để tôi lướt tìm trong cái ô đó".
-// Kho 8 đề tách ba phần là 24 dòng; mỗi dòng cao 80px như trước thì riêng
-// danh sách đã dài hai màn hình, phần Lớp & thời gian bị đẩy tít xuống dưới.
+// Trước: danh sách phẳng 45 dòng, tích cả chương phải bấm 15 lần. Nay: khối →
+// chương → bài → dạng, ô tích ba trạng thái, tích ô chương là chọn hết.
 //
-// Nay: ô tìm dính ở trên, danh sách cuộn TRONG HỘP cao cố định (~5,5 dòng —
-// nửa dòng cuối lộ ra để thầy biết còn nữa), mỗi dòng gọn một hàng: ô tích ·
-// mã đề · phần · số câu. Bài gốc in một lần làm tiêu đề nhóm, ba dòng con
-// thụt vào dưới nó — không lặp "cùng bài 10-C1-B1" ba lần.
+// BA THỨ KHÔNG ĐỂ THẦY ĐOÁN:
+//   · Thanh tổng LUÔN hiện ở đáy hộp — bao nhiêu câu, chia ba phần thế nào.
+//   · Ô tích nửa (gạch ngang) nghĩa là chọn một phần, khác hẳn ô trống.
+//   · Gõ vào ô tìm thì cây tự mở đến chỗ có kết quả, không bắt bấm từng tầng.
+//
+// Mọi luật gom nhóm và trạng thái ô tích nằm trong `src/lib/cay-chon-de.ts`,
+// có test. Ở đây chỉ vẽ.
 import { useMemo, useState } from 'react'
-import { CheckSquare, Square, Search } from 'lucide-react'
+import { CheckSquare, Square, MinusSquare, Search, ChevronRight, Circle, CircleDot } from 'lucide-react'
 import type { TeacherExamSource } from '../data/examContent'
-import { goMaDeTachRa, TEN_PHAN_TACH } from '../lib/tach-phan-de'
+import { bamTich, dungCay, khoiCuaDe, locCay, moiMaTrongCay, tongCau, tongDaChon, trangThaiTich, type Nut } from '../lib/cay-chon-de'
+
+export { khoiCuaDe }
+export const KHOI_CO_THE = ['10', '11', '12'] as const
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 
-/** Nhãn ngắn của phần, in trong viên nhỏ cạnh mã. */
-const NHAN_PHAN: Record<'I' | 'II' | 'III', string> = { I: 'TN', II: 'ĐS', III: 'TLN' }
+/** Thụt lề theo tầng. Bốn tầng mà thụt đều nhau thì nhìn ra một khối chữ. */
+const THUT: Record<Nut['tang'], number> = { khoi: 0, chuong: 14, bai: 28, dang: 42 }
+const CO_CHU: Record<Nut['tang'], string> = { khoi: 'var(--cx-2)', chuong: 'var(--cx-2)', bai: 'var(--cx-1)', dang: 'var(--cx-1)' }
 
-/** KHỐI của một đề (10 / 11 / 12), đọc từ đầu mã đề (`10-C1-B1`) hoặc đầu nhóm
- * (`10 · C1 - Nguyên Tử`). Không nhận ra thì trả '' — đề vẫn hiện ở "Tất cả".
- *
- * Thầy chốt 04-09 khuya: "tạo cho tôi 3 bộ lọc đề là 10, 11, 12 ở cả mục gọi
- * lên bảng và mục tạo ca". Kho giờ có ba khối, 24 dòng, lướt tìm đề lớp 12 mà
- * phải qua hết lớp 10, 11 là mất thời gian trên lớp. */
-export function khoiCuaDe(c: Pick<TeacherExamSource, 'maDe' | 'nhom'>): string {
-  const m = /^(10|11|12)\b/.exec(c.maDe) || /^(10|11|12)\b/.exec(c.nhom || '')
-  return m ? m[1] : ''
+function OTich({ tt }: { tt: 'trong' | 'day' | 'nua' }) {
+  const mau = tt === 'trong' ? 'var(--mo)' : 'var(--xanh)'
+  return <span style={{ color: mau, display: 'flex', flex: '0 0 auto' }}>{tt === 'day' ? <CheckSquare size={18} /> : tt === 'nua' ? <MinusSquare size={18} /> : <Square size={18} />}</span>
 }
-export const KHOI_CO_THE = ['10', '11', '12'] as const
+
+function Hang({
+  n,
+  moRong,
+  daChon,
+  chonNhieu,
+  onGap,
+  onTich,
+}: {
+  n: Nut
+  moRong: Set<string>
+  daChon: Set<string>
+  chonNhieu: boolean
+  onGap: (khoa: string) => void
+  onTich: (n: Nut) => void
+}) {
+  const la = !!n.maDe
+  const mo = moRong.has(n.khoa)
+  const tt = trangThaiTich(n, daChon)
+  // Chọn MỘT đề (Gọi lên bảng): chỉ lá mới bấm chọn được, tầng trên chỉ gập/mở.
+  // Cho tích ô cha ở chế độ chọn một thì bấm một cái là chọn 15 đề — vô nghĩa.
+  const tichDuoc = chonNhieu || la
+  const nhanSo = tongCau(n.soCau)
+
+  return (
+    <>
+      <div
+        className="flex items-center"
+        style={{
+          gap: 'var(--k2)',
+          minHeight: 40,
+          paddingLeft: 8 + THUT[n.tang],
+          paddingRight: 'var(--k3)',
+          background: la && tt === 'day' ? 'var(--xanh-nen)' : 'transparent',
+          borderLeft: `3px solid ${la && tt === 'day' ? 'var(--xanh)' : 'transparent'}`,
+          transitionProperty: 'background-color',
+          transitionDuration: 'var(--nhanh)',
+        }}
+      >
+        {n.con.length > 0 ? (
+          <button type="button" onClick={() => onGap(n.khoa)} aria-expanded={mo} aria-label={mo ? `Gập ${n.nhan}` : `Mở ${n.nhan}`} className="tap-target" style={{ color: 'var(--nhat)', padding: 4, display: 'flex', flex: '0 0 auto' }}>
+            <ChevronRight size={16} style={{ transform: mo ? 'rotate(90deg)' : 'none', transitionProperty: 'transform', transitionDuration: 'var(--nhanh)' }} />
+          </button>
+        ) : (
+          <span style={{ width: 24, flex: '0 0 auto' }} />
+        )}
+
+        <button
+          type="button"
+          role={tichDuoc ? (chonNhieu ? 'checkbox' : 'radio') : undefined}
+          aria-checked={tichDuoc ? tt !== 'trong' : undefined}
+          disabled={!tichDuoc}
+          onClick={() => tichDuoc && onTich(n)}
+          className="tap-target flex-1 min-w-0 text-left flex items-center"
+          style={{ gap: 'var(--k2)', minHeight: 40, color: 'var(--muc)', cursor: tichDuoc ? 'pointer' : 'default' }}
+        >
+          {tichDuoc ? (
+            chonNhieu ? (
+              <OTich tt={tt} />
+            ) : (
+              <span style={{ color: tt === 'day' ? 'var(--xanh)' : 'var(--mo)', display: 'flex', flex: '0 0 auto' }}>{tt === 'day' ? <CircleDot size={18} /> : <Circle size={18} />}</span>
+            )
+          ) : (
+            <span style={{ width: 18, flex: '0 0 auto' }} />
+          )}
+          <span className={n.tang === 'dang' ? 'truncate' : 'truncate font-bold'} style={{ fontFamily: n.tang === 'khoi' || n.tang === 'chuong' ? 'var(--serif)' : 'var(--sans)', fontSize: CO_CHU[n.tang] }} title={la ? n.nhan : undefined}>
+            {n.nhan}
+          </span>
+          {/* Mã đề vẫn phải hiện ở lá: thầy đối chiếu với file trên máy và với
+              lịch sử ca cũ bằng mã, không bằng tên bài. */}
+          {la && (
+            <span className="truncate" style={{ ...NHAN_NHO, ...SO, flex: '0 1 auto' }}>
+              {n.maDe}
+            </span>
+          )}
+        </button>
+
+        <span className="shrink-0 font-bold" style={{ ...SO, fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
+          {nhanSo} câu
+        </span>
+      </div>
+
+      {mo && n.con.map((c) => <Hang key={c.khoa} n={c} moRong={moRong} daChon={daChon} chonNhieu={chonNhieu} onGap={onGap} onTich={onTich} />)}
+    </>
+  )
+}
 
 export interface HopChonDeProps {
   /** Đề đã tách ba phần (xem tach-phan-de.ts). */
   ds: TeacherExamSource[]
-  /** Mã đang chọn. Chọn MỘT (Gọi lên bảng) hay NHIỀU (Mở ca) do chỗ gọi quyết. */
+  /** Mã đang chọn. Chọn MỘT (Gọi lên bảng) hay NHIỀU (Mở ca) do `chonNhieu`. */
   daChon: Set<string>
   onChon: (maDe: string) => void
   /** Lọc theo nhóm (chip "Tất cả / 12 · CI - Ester lipid") — rỗng = mọi nhóm. */
   nhomLoc?: string
-  /** Chiều cao hộp cuộn. Mặc định vừa 5,5 dòng. */
+  /** Chiều cao hộp cuộn. */
   cao?: number
-  /** Hiện nút Chọn tất cả / Bỏ chọn (chỉ khi cho chọn nhiều). */
+  /** Cho tích ô cha và hiện nút Chọn tất cả. */
   chonNhieu?: boolean
   onChonTatCa?: (ma: string[]) => void
 }
@@ -49,34 +134,48 @@ export interface HopChonDeProps {
 export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308, chonNhieu, onChonTatCa }: HopChonDeProps) {
   const [tim, setTim] = useState('')
   const [khoi, setKhoi] = useState('')
+  /** Nhánh thầy TỰ bấm mở/gập, gắn với chữ đang gõ. Đổi chữ tìm là quay về mặc định. */
+  const [moTay, setMoTay] = useState<{ tim: string; set: Set<string> } | null>(null)
 
-  // Chỉ bày chip cho khối THỰC CÓ trong kho; kho toàn lớp 12 thì không bày ba chip
-  // mà hai chip bấm vào trống trơn.
   const dsKhoi = useMemo(() => KHOI_CO_THE.filter((k) => ds.some((c) => khoiCuaDe(c) === k)), [ds])
 
-  const loc = useMemo(() => {
-    const q = tim.trim().toLowerCase()
-    return ds.filter(
-      (c) =>
-        (!khoi || khoiCuaDe(c) === khoi) &&
-        (!nhomLoc || (c.nhom || '') === nhomLoc) &&
-        (!q || c.maDe.toLowerCase().includes(q) || (c.nhom || '').toLowerCase().includes(q) || (c.nguon || '').toLowerCase().includes(q)),
-    )
-  }, [ds, tim, nhomLoc, khoi])
+  const dsLoc = useMemo(() => ds.filter((c) => (!khoi || khoiCuaDe(c) === khoi) && (!nhomLoc || (c.nhom || '') === nhomLoc)), [ds, khoi, nhomLoc])
+  const cayGoc = useMemo(() => dungCay(dsLoc), [dsLoc])
+  const { cay, moKhoa } = useMemo(() => locCay(cayGoc, tim), [cayGoc, tim])
 
-  // Gom theo bài gốc để in tiêu đề nhóm một lần.
-  const nhom = useMemo(() => {
-    const ra: { goc: string; nhom: string; dong: TeacherExamSource[] }[] = []
-    for (const c of loc) {
-      const { goc } = goMaDeTachRa(c.maDe)
-      const cuoi = ra[ra.length - 1]
-      if (cuoi && cuoi.goc === goc) cuoi.dong.push(c)
-      else ra.push({ goc, nhom: c.nhom || '', dong: [c] })
+  // TRẠNG THÁI GẬP/MỞ tính NGAY TRONG LÚC VẼ, không qua useEffect. Để effect
+  // đặt mặc định thì lần vẽ đầu cây gập sạch rồi mới bung ra — nhìn thấy giật,
+  // và test cũng bắt được đúng cái nháy đó.
+  //
+  //   · không gõ tìm  → mở tầng khối, gập từ chương xuống (đúng đặc tả 4.3)
+  //   · đang gõ tìm   → mở đúng nhánh có kết quả
+  //   · thầy tự bấm   → theo tay thầy, cho đến khi đổi chữ trong ô tìm
+  const macDinh = useMemo(() => new Set(tim.trim() ? moKhoa : cayGoc.map((n) => n.khoa)), [tim, moKhoa, cayGoc])
+  const moRong = moTay && moTay.tim === tim ? moTay.set : macDinh
+
+  const gap = (khoa: string) => {
+    const ra = new Set(moRong)
+    if (ra.has(khoa)) ra.delete(khoa)
+    else ra.add(khoa)
+    setMoTay({ tim, set: ra })
+  }
+
+  const tich = (n: Nut) => {
+    if (!chonNhieu) {
+      // Chọn một: bấm lá nào thì màn gọi thay hẳn lựa chọn cũ.
+      if (n.maDe) onChon(n.maDe)
+      return
     }
-    return ra
-  }, [loc])
+    if (!onChonTatCa) {
+      // Màn chỉ truyền onChon (bật/tắt từng mã) — lá thì bật/tắt, nút cha bó tay.
+      if (n.maDe) onChon(n.maDe)
+      return
+    }
+    onChonTatCa([...bamTich(n, daChon)])
+  }
 
-  const tongChon = loc.filter((c) => daChon.has(c.maDe)).length
+  const tong = useMemo(() => tongDaChon(cayGoc, daChon), [cayGoc, daChon])
+  const tongTrongLoc = useMemo(() => moiMaTrongCay(cay).length, [cay])
 
   return (
     <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
@@ -110,100 +209,47 @@ export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308,
           })}
         </div>
       )}
+
       <div className="flex items-center" style={{ gap: 'var(--k2)', height: 44, borderRadius: 'var(--bo-1)', padding: '0 var(--k3)', background: 'var(--the-2)', border: '1.5px solid transparent' }}>
         <Search size={16} style={{ color: 'var(--mo)', flex: '0 0 auto' }} />
         <input
           value={tim}
           onChange={(e) => setTim(e.target.value)}
-          placeholder="Tìm mã đề, bài, nhóm…"
+          placeholder="Tìm chương, bài, mã đề…"
           aria-label="Tìm đề"
           style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}
         />
-        <span style={{ ...NHAN_NHO, ...SO, flex: '0 0 auto' }}>
-          {tongChon > 0 ? `${tongChon}/${loc.length}` : `${loc.length} đề`}
+        <span style={{ ...NHAN_NHO, ...SO, flex: '0 0 auto' }}>{tongTrongLoc} đề</span>
+      </div>
+
+      <div role="tree" aria-label="Cây chọn đề" style={{ maxHeight: cao, overflowY: 'auto', borderRadius: 'var(--bo-2)', border: '1px solid var(--vien)', background: 'var(--the)', overscrollBehavior: 'contain' }}>
+        {cay.length === 0 ? (
+          <div style={{ ...NHAN_NHO, padding: 'var(--k4)' }}>Không có đề nào khớp "{tim.trim()}".</div>
+        ) : (
+          cay.map((n) => <Hang key={n.khoa} n={n} moRong={moRong} daChon={daChon} chonNhieu={!!chonNhieu} onGap={gap} onTich={tich} />)
+        )}
+      </div>
+
+      {/* THANH TỔNG — luôn hiện, kể cả khi chưa chọn gì. Thầy phải biết ca này
+          ra bao nhiêu câu mà không phải cuộn đi đâu. */}
+      <div className="flex items-center justify-between" style={{ gap: 'var(--k3)', padding: '8px var(--k3)', borderRadius: 'var(--bo-1)', background: 'var(--the-2)' }}>
+        <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--muc)' }}>
+          Đã chọn: <b style={SO}>{tongCau(tong)}</b> câu
+          <span style={{ color: 'var(--nhat)' }}>
+            {' · '}I: <b style={SO}>{tong.I}</b> II: <b style={SO}>{tong.II}</b> III: <b style={SO}>{tong.III}</b>
+          </span>
         </span>
+        {chonNhieu && onChonTatCa && (
+          <span className="flex items-center shrink-0" style={{ gap: 'var(--k3)' }}>
+            <button type="button" onClick={() => onChonTatCa(moiMaTrongCay(cay))} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--muc)' }}>
+              Chọn hết{tim.trim() || khoi ? ' đang lọc' : ''}
+            </button>
+            <button type="button" onClick={() => onChonTatCa([])} className="tap-target" style={NHAN_NHO} disabled={daChon.size === 0}>
+              Bỏ chọn hết
+            </button>
+          </span>
+        )}
       </div>
-
-      <div
-        role="listbox"
-        aria-multiselectable={chonNhieu ? true : undefined}
-        aria-label="Danh sách đề"
-        style={{ maxHeight: cao, overflowY: 'auto', borderRadius: 'var(--bo-2)', border: '1px solid var(--vien)', background: 'var(--the)', overscrollBehavior: 'contain' }}
-      >
-        {loc.length === 0 && <div style={{ ...NHAN_NHO, padding: 'var(--k4)' }}>Không có đề nào khớp "{tim.trim()}".</div>}
-        {nhom.map((g) => (
-          <div key={g.goc}>
-            <div className="flex items-baseline justify-between" style={{ padding: '8px var(--k3) 4px', position: 'sticky', top: 0, background: 'var(--the)', zIndex: 1, borderBottom: '1px solid var(--vien)' }}>
-              <span className="font-bold truncate" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
-                {g.goc}
-              </span>
-              {g.nhom && (
-                <span className="truncate" style={{ ...NHAN_NHO, marginLeft: 'var(--k2)' }}>
-                  {g.nhom}
-                </span>
-              )}
-            </div>
-            {g.dong.map((c) => {
-              const chon = daChon.has(c.maDe)
-              const { phan } = goMaDeTachRa(c.maDe)
-              const n = c.phanI.length + c.phanII.length + c.phanIII.length
-              return (
-                <button
-                  key={c.maDe}
-                  type="button"
-                  role="option"
-                  aria-selected={chon}
-                  onClick={() => onChon(c.maDe)}
-                  className="tap-target w-full text-left flex items-center"
-                  data-trang-thai={chon ? 'chon' : undefined}
-                  style={{
-                    gap: 'var(--k2)',
-                    minHeight: 44,
-                    padding: '6px var(--k3) 6px var(--k4)',
-                    background: chon ? 'var(--xanh-nen)' : 'transparent',
-                    borderLeft: `3px solid ${chon ? 'var(--xanh)' : 'transparent'}`,
-                    color: 'var(--muc)',
-                    transitionProperty: 'background-color',
-                    transitionDuration: 'var(--nhanh)',
-                  }}
-                >
-                  <span className="shrink-0" style={{ color: chon ? 'var(--xanh)' : 'var(--mo)', display: 'flex' }}>
-                    {chon ? <CheckSquare size={18} /> : <Square size={18} />}
-                  </span>
-                  <span className="flex-1 min-w-0 flex items-center" style={{ gap: 'var(--k2)' }}>
-                    <span className="font-bold truncate" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
-                      {c.maDe}
-                    </span>
-                    {phan && (
-                      <span
-                        className="shrink-0"
-                        title={TEN_PHAN_TACH[phan]}
-                        style={{ ...NHAN_NHO, ...SO, fontWeight: 700, padding: '1px 7px', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', color: 'var(--nhat)' }}
-                      >
-                        {NHAN_PHAN[phan]}
-                      </span>
-                    )}
-                  </span>
-                  <span className="shrink-0 font-bold" style={{ ...SO, fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
-                    {n} câu
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-        ))}
-      </div>
-
-      {chonNhieu && loc.length > 1 && onChonTatCa && (
-        <div className="flex items-center" style={{ gap: 'var(--k4)', ...NHAN_NHO }}>
-          <button type="button" onClick={() => onChonTatCa(loc.map((c) => c.maDe))} className="tap-target" style={{ color: 'var(--muc)', fontWeight: 700 }}>
-            Chọn tất cả{tim.trim() ? ' đang lọc' : ''}
-          </button>
-          <button type="button" onClick={() => onChonTatCa([])} className="tap-target">
-            Bỏ chọn
-          </button>
-        </div>
-      )}
     </div>
   )
 }

@@ -81,6 +81,34 @@ export interface LoiGiaiCauTruc {
   ketQua?: string
 }
 
+/** SAO CẦN CHỮA — chấm từ kho đề (`can_chua` trong JSON), xem
+ * `claude/GAN-SAO-CAN-CHUA.md`. Hai sao = câu nền hoặc câu có bẫy, chữa là cả
+ * lớp lên; một sao = nên chữa; không sao = trùng câu khác, đọc đáp án là đủ.
+ *
+ * Giữ nguyên tên khoá tiếng Việt như trong kho: đây là DỮ LIỆU chép nguyên từ
+ * file JSON của thầy, không phải biến trong mã. Đổi tên ở đây là mở đường cho
+ * lệch schema giữa kho và app.
+ *
+ * Câu KHÔNG có trường này tính như 0 sao — không đoán. */
+export interface CanChua {
+  sao: 0 | 1 | 2
+  /** Vì sao đáng chữa: nen = kiến thức nền · buoc = nhiều bước · bay = có bẫy · hay_gap = dạng hay ra. */
+  dk: ('nen' | 'buoc' | 'bay' | 'hay_gap')[]
+  ly_do: string
+  /** Bẫy cụ thể em hay mắc — null khi câu không có bẫy. */
+  bay: string | null
+  /** Chỉ Phần II: những ý đáng chữa trong câu. */
+  y_can_chua?: ('a' | 'b' | 'c' | 'd')[]
+  /** 1 sao thuần thông hiểu, không kèm điều kiện nào khác. */
+  thong_hieu?: boolean
+}
+
+/** Số sao của một câu, câu chưa gắn thì 0. Dùng chung mọi nơi cần so sao —
+ * cấm viết `c.canChua?.sao ?? 0` rải rác. */
+export function soSao(c: { canChua?: CanChua }): 0 | 1 | 2 {
+  return c.canChua?.sao ?? 0
+}
+
 export interface LoiGiaiMeta {
   loiGiaiTrangThai?: TrangThaiLoiGiai
   /** Đáp án pipeline tự giải ra (khác `correct` khi nghi đề sai). */
@@ -93,6 +121,9 @@ export interface LoiGiaiMeta {
    * hồ sơ từng em về sau. Thiếu thì để trống, không đoán. */
   chuyenDe?: string
   mucDo?: 'biet' | 'hieu' | 'van_dung'
+  /** Sao cần chữa — CHỈ sống trên máy thầy. `mergeAndStrip` không chọn trường
+   * này nên nó không bao giờ vào gói đề gửi máy chủ cho học sinh. */
+  canChua?: CanChua
 }
 
 export interface TeacherMcqQuestion extends McqQuestion, LoiGiaiMeta {

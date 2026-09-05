@@ -6,9 +6,11 @@ dist-ssr
 
 # Kho đề nạp tự động (thầy thả PDF/docx vào kho-de/moi) — file .json kết quả
 # CÓ ĐÁP ÁN ĐẦY ĐỦ, không bao giờ được lên git vì repo này đang PUBLIC.
-kho-de/moi/*
-kho-de/xong/*
-kho-de/loi/*
+# Chặn CẢ THƯ MỤC kho-de, không liệt kê từng thư mục con: mỗi lần thêm một
+# thư mục mới (vd bản nhẹ để chạy phép kiểm) mà quên sửa danh sách này là một
+# lần đề và đáp án suýt lên repo công khai.
+kho-de/**
+!kho-de/*/
 !kho-de/*/.gitkeep
 
 # gói đồng bộ tạm từ Cowork
