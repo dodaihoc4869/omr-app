@@ -141,7 +141,7 @@ export default function ExamSetupScreen() {
   // Danh sách em để tích: danh sách lớp trên máy (Google Sheet) — không có thì lấy danh sách lớp đã nạp lên máy chủ.
   const [dsDangKy, setDsDangKy] = useState<{ sbd: string; hoTen: string; lop: string }[] | null>(null)
   // Bộ câu màn Rút đề chốt; null = thầy chọn lấy trọn kho (đường cũ).
-  const [boRut, setBoRut] = useState<{ ids: Set<string>; soCau: SoCauPhan } | null>(null)
+  const [boRut, setBoRut] = useState<{ ids: Set<string>; soCau: SoCauPhan; lenBang: boolean } | null>(null)
   // Câu đã ra ở các ca trước (đọc từ bản đề CÓ đáp án đã lưu của từng ca) — để
   // rút đề tránh phát lại câu lớp vừa làm tuần trước.
   const [qidCaTruoc, setQidCaTruoc] = useState<string[]>([])
@@ -236,6 +236,13 @@ export default function ExamSetupScreen() {
   const selectedSources = useMemo(() => dsDeTach.filter((c) => selectedMaDe.has(c.maDe)), [dsDeTach, selectedMaDe])
 
   /** Bộ đề THẬT SỰ gửi lên máy chủ: đã cắt xuống còn những câu thầy chốt. */
+  // Chọn "Phân công lên bảng" ở khối Bộ câu ra đề thì BẬT LUÔN nút gạt bên
+  // dưới — thầy rút bộ câu để chữa bài mà ca không ra màn Gọi lên bảng thì rút
+  // để làm gì. Vẫn tắt tay được sau đó, nên đây là gợi ý chứ không phải khoá.
+  useEffect(() => {
+    if (boRut?.lenBang) setLenBang(true)
+  }, [boRut?.lenBang])
+
   const nguonRaDe = useMemo(() => (boRut ? locNguonTheoId(selectedSources, boRut.ids) : selectedSources), [selectedSources, boRut])
   const soCauRaDe = boRut ? boRut.soCau : undefined
 
@@ -427,7 +434,7 @@ export default function ExamSetupScreen() {
             />
           </div>
         )}
-        {selectedSources.length > 0 && <KhoiRutDe nguon={selectedSources} qidCaTruoc={qidCaTruoc} onDoi={setBoRut} />}
+        {selectedSources.length > 0 && <KhoiRutDe nguon={selectedSources} qidCaTruoc={qidCaTruoc} phutLamBai={thoiGianPhut} onDoi={setBoRut} />}
       </TheNoiDung>
 
       {/* 2. LỚP & THỜI GIAN */}
@@ -661,7 +668,7 @@ export default function ExamSetupScreen() {
           ten="Lấy dữ liệu phân công lên bảng"
           mota={
             lenBang
-              ? 'Ca hiện ở màn Gọi lên bảng: máy đọc em nào sai câu nào để chia câu chữa.'
+              ? 'Ca hiện ở màn Gọi lên bảng: máy đọc em nào sai câu nào để chia câu chữa. Phiếu phụ huynh và cộng dồn mạnh/yếu vẫn chạy như mọi ca.'
               : 'Ca không hiện ở màn Gọi lên bảng. Vẫn gửi phiếu phụ huynh và vẫn cộng dồn mạnh/yếu như thường.'
           }
         />

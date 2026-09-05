@@ -300,3 +300,135 @@ export function soCauCua(kq: KetQuaRut): SoCauPhan {
 export function tongCau(s: SoCauPhan): number {
   return s.I + s.II + s.III
 }
+
+// ===========================================================================
+// RÚT ĐỀ CHO BUỔI CHỮA BÀI — "Phân công lên bảng" (thầy chốt 05/09 chiều).
+//
+// Khác hẳn rút đề thường ở MỤC ĐÍCH: ca này mở ra không phải để lấy điểm mà để
+// biết cả lớp hổng chỗ nào, rồi chia câu cho từng em lên bảng. Ba hệ quả bắt
+// buộc, sai một cái là buổi chữa hỏng:
+//
+//  1. CẢ LỚP CÙNG MỘT ĐỀ. `doChum` (bao nhiêu em cùng sai một kiểu) và
+//     `tiLeDung` chỉ tính được khi nhiều em cùng làm MỘT câu. Mỗi em một bộ
+//     riêng là mất sạch hai chỉ số đó, mà đó chính là thứ quyết định câu nào
+//     giảng cả lớp thay vì gọi lên bảng.
+//
+//  2. ƯU TIÊN CÂU CÓ SAO. Sao cần chữa do pipeline chấm sẵn trong kho: câu 2
+//     sao là câu nền, sai là hổng gốc. Chữa câu 2 sao đáng hơn câu 0 sao.
+//
+//  3. PHỦ NHIỀU CHUYÊN ĐỀ. Dồn 9 câu vào một chuyên đề thì đo được đúng một
+//     chỗ. Nên chuyên đề đang ít câu nhất được lấy trước, TRONG chuyên đề đó
+//     mới tới sao cao nhất.
+//
+// SỐ CÂU tính theo NGÂN SÁCH GIÂY của ca, không phải con số cố định: thầy đặt
+// ca 15 phút thì ra 9 câu, đặt 45 phút thì ra gần ba chục. Giây mỗi câu lấy
+// theo cỡ thật một câu THPT.
+// ===========================================================================
+
+/** Giây trung bình một câu mỗi phần — đo trên đề thật, dùng để chia ngân sách. */
+export const GIAY_MOI_CAU: Record<PhanDe, number> = { I: 60, II: 150, III: 180 }
+
+/** Trần ngân sách mỗi phần, để không dồn cả ca vào một phần. Cộng lại = 1. */
+export const TRAN_NGAN_SACH: Record<PhanDe, number> = { I: 0.45, II: 0.35, III: 0.2 }
+
+export interface YeuCauLenBang {
+  /** Thời lượng làm bài của ca, phút. Ngân sách = phút × 60 giây. */
+  phut: number
+  tranhQid?: string[]
+  seed: number
+}
+
+/** SỐ CÂU mỗi phần cho buổi chữa bài: chia ngân sách giây theo trần từng phần,
+ * chặn trên bằng số câu THẬT có trong kho, rồi dồn phần giây thừa sang Phần I.
+ *
+ * Dồn sang Phần I chứ không sang II/III: Phần I rẻ nhất (60s) nên tận dụng
+ * được nhiều nhất phần thừa, và kho phần I bao giờ cũng dày nhất. */
+export function soCauLenBang(uv: Record<PhanDe, CauUngVien[]>, phut: number): SoCauPhan {
+  const nganSach = Math.max(0, Math.floor(Number(phut) || 0)) * 60
+  const ra: SoCauPhan = { I: 0, II: 0, III: 0 }
+  let thua = 0
+  for (const p of PHAN_DE) {
+    const phan = nganSach * TRAN_NGAN_SACH[p]
+    const theoGiay = Math.floor(phan / GIAY_MOI_CAU[p])
+    const n = Math.min(theoGiay, uv[p].length)
+    ra[p] = n
+    thua += phan - n * GIAY_MOI_CAU[p]
+  }
+  const themI = Math.min(Math.floor(thua / GIAY_MOI_CAU.I), uv.I.length - ra.I)
+  if (themI > 0) ra.I += themI
+  return ra
+}
+
+/** Tổng giây ước tính của bộ câu — hiện lên màn để thầy so với thời lượng ca. */
+export function giayUocTinh(s: SoCauPhan): number {
+  return PHAN_DE.reduce((t, p) => t + s[p] * GIAY_MOI_CAU[p], 0)
+}
+
+/** Số TÍN HIỆU chẩn đoán: một câu Phần II có bốn ý nên đáng bốn tín hiệu, các
+ * phần khác một. Nhiều tín hiệu = đọc ra hồ sơ em rõ hơn trong cùng số phút. */
+export function soTinHieu(s: SoCauPhan): number {
+  return s.I + s.II * 4 + s.III
+}
+
+/** Lấy n câu của MỘT phần cho buổi chữa bài.
+ *
+ * Khoá xếp, nhỏ hơn là lấy trước:
+ *   1. chuyên đề đang ít câu nhất trong bộ đang chọn — phủ rộng trước;
+ *   2. sao cao nhất (đảo dấu) — trong chuyên đề đó lấy câu đáng chữa nhất;
+ *   3. câu `canXem` (pipeline nghi đáp án sai) xuống cuối — đưa câu nghi ngờ
+ *      lên bảng chữa là thầy sai trước cả lớp;
+ *   4. câu chưa ra ở ca trước;
+ *   5. thứ tự ngẫu nhiên có seed — nút "Trộn lại" đổi seed là ra bộ khác. */
+function chonChuaBai(ds: CauUngVien[], can: number, tranh: Set<string>, seed: number): CauUngVien[] {
+  if (can <= 0 || ds.length === 0) return []
+  const perm = seededPermutation(ds.length, seed)
+  const hang = new Map<string, number>()
+  perm.forEach((goc, i) => hang.set(ds[goc].id, i))
+
+  const chon: CauUngVien[] = []
+  const conLai = [...ds]
+  const demCd = new Map<string, number>()
+
+  const diemCua = (c: CauUngVien): number[] => [demCd.get(chuanChuyenDe(c.chuyenDe)) ?? 0, -c.sao, c.canXem ? 1 : 0, tranh.has(c.id) ? 1 : 0, hang.get(c.id) ?? 0]
+  const nhoHon = (a: number[], b: number[]): boolean => {
+    for (let k = 0; k < a.length; k++) if (a[k] !== b[k]) return a[k] < b[k]
+    return false
+  }
+
+  while (chon.length < can && conLai.length > 0) {
+    let iTot = 0
+    let diemTot = diemCua(conLai[0])
+    for (let i = 1; i < conLai.length; i++) {
+      const d = diemCua(conLai[i])
+      if (nhoHon(d, diemTot)) {
+        diemTot = d
+        iTot = i
+      }
+    }
+    const lay = conLai.splice(iTot, 1)[0]
+    chon.push(lay)
+    const k = chuanChuyenDe(lay.chuyenDe)
+    demCd.set(k, (demCd.get(k) ?? 0) + 1)
+  }
+  return chon
+}
+
+/** RÚT BỘ CÂU CHO BUỔI CHỮA BÀI. Máy tự chọn hết — thầy chỉ tích kho và đặt
+ * thời lượng ca. Không lọc chuyên đề/mức độ: buổi chẩn đoán mà chặn sẵn chuyên
+ * đề thì chỉ đo lại đúng chỗ thầy đã đoán, không phát hiện được chỗ chưa biết. */
+export function rutDeLenBang(uv: Record<PhanDe, CauUngVien[]>, yc: YeuCauLenBang): KetQuaRut {
+  const tranh = new Set(yc.tranhQid ?? [])
+  const can = soCauLenBang(uv, yc.phut)
+  const chon = { I: [], II: [], III: [] } as Record<PhanDe, CauUngVien[]>
+  const thieu = { I: 0, II: 0, III: 0 }
+  const conLai = { I: 0, II: 0, III: 0 }
+  let lapLai = 0
+  for (const p of PHAN_DE) {
+    const c = chonChuaBai(uv[p], can[p], tranh, hashSeed(`${yc.seed}:lenbang:${p}`))
+    chon[p] = c
+    thieu[p] = Math.max(0, can[p] - c.length)
+    conLai[p] = uv[p].length - c.length
+    lapLai += c.filter((x) => tranh.has(x.id)).length
+  }
+  return { chon, thieu, lapLai, conLai }
+}

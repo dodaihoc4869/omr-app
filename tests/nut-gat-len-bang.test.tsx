@@ -20,6 +20,7 @@ const KHO: TeacherExamSource[] = [
 ]
 
 const publishSession = vi.fn(async () => ({ batDau: '', hetHanVao: '' }))
+const saveSessionTeacherBank = vi.fn(async () => {})
 
 vi.mock('../src/lib/exam-api', async (goc) => ({
   ...(await goc<Record<string, unknown>>()),
@@ -33,7 +34,7 @@ vi.mock('../src/lib/exam-db', () => ({
   loadAllSessionTeacherBanks: async () => [],
   docSoCauCa: async () => undefined,
   luuSoCauCa: async () => {},
-  saveSessionTeacherBank: async () => {},
+  saveSessionTeacherBank,
 }))
 vi.mock('../src/lib/exam-sync', () => ({ dongBoNganHang: async () => ({ moi: [], capNhat: [], canXem: [] }) }))
 vi.mock('../src/lib/ca-link', () => ({ randomSessionCode: () => '123456', taoLinkMoi: async () => 'https://link' }))
@@ -133,5 +134,36 @@ describe('cờ lên bảng ở màn Gọi lên bảng và trên máy chủ', () 
     const ma = (await import('../src/lib/exam-api.ts?raw')).default
     expect(ma).toContain('lenBang: c.lenBang !== false')
     expect(ma).toContain('lenBang: moc.lenBang !== false')
+  })
+})
+
+// THẦY CHỐT 05/09 CHIỀU, nói hai lần cho chắc: "Tắt bật đều lấy dữ liệu gửi
+// phiếu cho phụ huynh và cộng dồn mạnh yếu; tắt thì chỉ không lấy dữ liệu phân
+// công lên bảng, bật thì lấy." Nút gạt THÊM việc, không THAY việc.
+describe('bật hay tắt, phiếu phụ huynh và cộng dồn mạnh/yếu đều chạy', () => {
+  it('bản đề CÓ đáp án vẫn lưu trên máy thầy ở CẢ hai trạng thái — không lưu là không chấm lại, không xuất phiếu được', async () => {
+    for (const tat of [false, true]) {
+      publishSession.mockClear()
+      saveSessionTeacherBank.mockClear()
+      await moCa(render(<ExamSetupScreen />), tat)
+      expect(saveSessionTeacherBank).toHaveBeenCalledTimes(1)
+    }
+  })
+
+  it('gói đề công khai gửi lên máy chủ giống hệt nhau — điểm và chi tiết câu ghi y như cũ', async () => {
+    publishSession.mockClear()
+    const bat = await moCa(render(<ExamSetupScreen />), false)
+    publishSession.mockClear()
+    const tat = await moCa(render(<ExamSetupScreen />), true)
+    expect(JSON.stringify(tat[4])).toBe(JSON.stringify(bat[4]))
+  })
+
+  it('màn nói rõ hai việc kia không tắt được, ở CẢ hai trạng thái nút gạt', async () => {
+    const r = render(<ExamSetupScreen />)
+    await waitFor(() => expect(r.container.textContent).toContain(NHAN))
+    expect(r.container.textContent).toContain('không tắt được')
+    expect(r.container.textContent).toContain('Phiếu phụ huynh và cộng dồn mạnh/yếu vẫn chạy như mọi ca')
+    fireEvent.click(r.getByRole('switch', { name: NHAN }))
+    expect(r.container.textContent).toContain('Vẫn gửi phiếu phụ huynh và vẫn cộng dồn mạnh/yếu')
   })
 })

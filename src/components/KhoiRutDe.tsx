@@ -11,7 +11,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Dices, RefreshCw, X, ImageIcon, ChevronDown } from 'lucide-react'
 import type { TeacherExamSource } from '../data/examContent'
 import { Nhan, OThongBao } from './DesignSystem'
-import { boMotCau, demMucDo, doiMotCau, dsChuyenDe, dungUngVien, moiIdDaRut, MOI_MUC, PHAN_DE, rutDe, soCauCua, TEN_MUC, tongCau, type CauUngVien, type KetQuaRut, type MucDoRut, type PhanDe, type SoCauPhan, type YeuCauRut } from '../lib/rut-de'
+import { boMotCau, demMucDo, doiMotCau, dsChuyenDe, dungUngVien, giayUocTinh, moiIdDaRut, MOI_MUC, PHAN_DE, rutDe, rutDeLenBang, soCauCua, soCauLenBang, soTinHieu, TEN_MUC, tongCau, type CauUngVien, type KetQuaRut, type MucDoRut, type PhanDe, type SoCauPhan, type YeuCauRut } from '../lib/rut-de'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -137,15 +137,22 @@ export interface KhoiRutDeProps {
   nguon: TeacherExamSource[]
   /** Câu đã ra ở các ca trước — đẩy xuống cuối khi rút. */
   qidCaTruoc: string[]
-  /** Gọi mỗi khi bộ câu đổi. `null` = thầy chọn lấy trọn kho, không rút. */
-  onDoi: (kq: { ids: Set<string>; soCau: SoCauPhan } | null) => void
+  /** Thời lượng làm bài của ca (phút) — chế độ "Phân công lên bảng" chia ngân
+   * sách giây theo con số này để tự quyết số câu. */
+  phutLamBai: number
+  /** Gọi mỗi khi bộ câu đổi. `null` = thầy chọn lấy trọn kho, không rút.
+   * `lenBang` = bộ câu này rút cho buổi chữa bài, màn Mở ca tự bật nút gạt. */
+  onDoi: (kq: { ids: Set<string>; soCau: SoCauPhan; lenBang: boolean } | null) => void
 }
+
+/** Ba cách lấy câu. `lenbang` là chế độ máy tự chọn cho buổi chữa bài. */
+type CheDoLay = 'rut' | 'tron' | 'lenbang'
 
 /** Kho ca rộng gấp mấy lần số câu mỗi em, để hai em ngồi cạnh nhau nhận đề
  * khác nhau. Gấp 3 là mỗi em lấy 1/3 kho: đủ khác nhau mà gói đề chưa phình. */
 const HE_SO_KHO = 3
 
-export default function KhoiRutDe({ nguon, qidCaTruoc, onDoi }: KhoiRutDeProps) {
+export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi }: KhoiRutDeProps) {
   const uv = useMemo(() => dungUngVien(nguon), [nguon])
   const co: SoCauPhan = useMemo(() => ({ I: uv.I.length, II: uv.II.length, III: uv.III.length }), [uv])
   const tongKho = tongCau(co)
@@ -155,7 +162,9 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, onDoi }: KhoiRutDeProps) 
   // Kho vừa đúng cỡ một đề (≤ 28 câu, cấu trúc THPT) thì mặc định lấy trọn —
   // rút đề ở đó chỉ tổ làm thầy thêm một bước. Kho lớn hơn thì mặc định RÚT,
   // vì đẩy cả kho lên là bắt mỗi em tải vài megabyte.
-  const [rut, setRut] = useState(() => tongKho > tongCau(SO_CAU_CHUAN))
+  const [cheDo, setCheDo] = useState<CheDoLay>(() => (tongKho > tongCau(SO_CAU_CHUAN) ? 'rut' : 'tron'))
+  const rut = cheDo === 'rut'
+  const lenBang = cheDo === 'lenbang'
   // SỐ CÂU MỖI EM LÀM.
   const [soCau, setSoCau] = useState<SoCauPhan>(() => ({ I: Math.min(SO_CAU_CHUAN.I, co.I), II: Math.min(SO_CAU_CHUAN.II, co.II), III: Math.min(SO_CAU_CHUAN.III, co.III) }))
   // SỐ CÂU RÚT VÀO KHO CỦA CA. Lớn hơn số câu mỗi em thì mỗi em bốc một bộ khác
@@ -176,7 +185,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, onDoi }: KhoiRutDeProps) 
     setChonCd([])
     setChonMuc([])
     setDaBo([])
-    setRut(tongKho > tongCau(SO_CAU_CHUAN))
+    setCheDo(tongKho > tongCau(SO_CAU_CHUAN) ? 'rut' : 'tron')
   }, [co.I, co.II, co.III, tongKho])
 
   // Kho của ca: gấp HE_SO_KHO lần số câu mỗi em, chặn trên bằng số câu thật có.
@@ -187,22 +196,33 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, onDoi }: KhoiRutDeProps) 
 
   const yc: YeuCauRut = useMemo(() => ({ soCau: soCauKho, chuyenDe: chonCd, mucDo: chonMuc, tranhQid: qidCaTruoc, seed }), [soCauKho, chonCd, chonMuc, qidCaTruoc, seed])
 
+  // BỘ CÂU CHO BUỔI CHỮA BÀI: máy tự chọn hết, thầy không gõ số nào. Số câu
+  // theo ngân sách giây của chính ca này.
+  const soCauChuaBai = useMemo(() => soCauLenBang(uv, phutLamBai), [uv, phutLamBai])
+
   useEffect(() => {
-    setKq(rutDe(uv, yc))
+    setKq(lenBang ? rutDeLenBang(uv, { phut: phutLamBai, tranhQid: qidCaTruoc, seed }) : rutDe(uv, yc))
     setDaBo([])
-  }, [uv, yc])
+  }, [uv, yc, lenBang, phutLamBai, qidCaTruoc, seed])
 
   // Báo bộ câu lên màn Mở ca. Không rút thì báo null = giữ nguyên đường cũ.
   useEffect(() => {
-    if (!rut || !kq) {
+    if (cheDo === 'tron' || !kq) {
       onDoi(null)
+      return
+    }
+    // CHỮA BÀI: cả lớp cùng một đề, bắt buộc. Mỗi em một bộ riêng là mất sạch
+    // hai chỉ số quyết định câu nào giảng cả lớp (xem đầu lib/rut-de.ts).
+    if (lenBang) {
+      const kho = soCauCua(kq)
+      onDoi({ ids: moiIdDaRut(kq), soCau: kho, lenBang: true })
       return
     }
     // soCau báo lên là SỐ CÂU MỖI EM LÀM, không phải cỡ kho. Kho lớn hơn thì
     // máy bốc riêng cho từng em; bằng nhau thì cả lớp cùng một đề.
     const kho = soCauCua(kq)
-    onDoi({ ids: moiIdDaRut(kq), soCau: { I: Math.min(soCau.I, kho.I), II: Math.min(soCau.II, kho.II), III: Math.min(soCau.III, kho.III) } })
-  }, [rut, kq, soCau, onDoi])
+    onDoi({ ids: moiIdDaRut(kq), soCau: { I: Math.min(soCau.I, kho.I), II: Math.min(soCau.II, kho.II), III: Math.min(soCau.III, kho.III) }, lenBang: false })
+  }, [cheDo, lenBang, kq, soCau, onDoi])
 
   const daRut = kq ? soCauCua(kq) : { I: 0, II: 0, III: 0 }
   const thieu = kq ? PHAN_DE.filter((p) => kq.thieu[p] > 0) : []
@@ -235,15 +255,41 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, onDoi }: KhoiRutDeProps) 
       </div>
 
       <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Cách lấy câu">
-        <Chip chon={rut} onClick={() => setRut(true)}>
+        <Chip chon={rut} onClick={() => setCheDo('rut')}>
           Rút bộ câu
         </Chip>
-        <Chip chon={!rut} onClick={() => setRut(false)}>
+        <Chip chon={cheDo === 'tron'} onClick={() => setCheDo('tron')}>
           Lấy trọn kho ({tongKho} câu)
+        </Chip>
+        <Chip chon={lenBang} onClick={() => setCheDo('lenbang')} mau="tim">
+          Phân công lên bảng
         </Chip>
       </div>
 
-      {!rut ? (
+      {lenBang ? (
+        <div className="flex flex-col" style={{ gap: 'var(--k2)' }} data-khoi="len-bang">
+          <div style={NHAN_NHO}>
+            Máy tự chọn câu trong kho thầy đã tích: phủ đều chuyên đề trước, trong mỗi chuyên đề lấy câu nhiều sao nhất, đẩy câu nghi đáp án và câu đã ra ca trước xuống cuối.
+          </div>
+          <div style={{ ...NHAN_NHO, color: 'var(--muc)' }}>
+            <b style={SO}>{tongCau(soCauChuaBai)}</b> câu (I {soCauChuaBai.I} · II {soCauChuaBai.II} · III {soCauChuaBai.III}) · ước <b style={SO}>{Math.round(giayUocTinh(soCauChuaBai) / 60)}</b> phút trong{' '}
+            <b style={SO}>{phutLamBai}</b> phút của ca · <b style={SO}>{soTinHieu(soCauChuaBai)}</b> tín hiệu chẩn đoán
+          </div>
+          <OThongBao tone="xanh">
+            Cả lớp làm CÙNG một đề — bắt buộc với buổi chữa bài. Có cùng đề thì máy mới đếm được bao nhiêu em cùng sai một kiểu, và đó là thứ quyết định câu nào giảng cả lớp thay vì gọi một em lên bảng.
+          </OThongBao>
+          <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }}>
+            <button
+              type="button"
+              onClick={() => setSeed(Math.floor(Math.random() * 1e9))}
+              className="tap-target font-bold inline-flex items-center"
+              style={{ ...SO, gap: 6, height: 48, padding: '0 var(--k4)', borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)', fontSize: 'var(--cx-1)' }}
+            >
+              <Dices size={16} /> Trộn lại
+            </button>
+          </div>
+        </div>
+      ) : cheDo === 'tron' ? (
         <OThongBao tone="cam">
           Cả {tongKho} câu được đẩy lên máy chủ, mỗi em vẫn chỉ làm {SO_CAU_CHUAN.I}/{SO_CAU_CHUAN.II}/{SO_CAU_CHUAN.III} câu máy bốc ngẫu nhiên. Gói đề nặng, mà thầy không chọn được chuyên đề lẫn mức độ. Chỉ nên dùng khi kho vừa đúng một đề.
         </OThongBao>
