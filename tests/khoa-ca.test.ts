@@ -144,7 +144,10 @@ beforeEach(() => {
 
 describe('cột và hàm chung', () => {
   it('CaKiemTra có đủ ba cột dấu vết khoá ca', () => {
-    expect(gs.CA_HEADERS.slice(-3)).toEqual(['KhoaLuc', 'KhoaBoi', 'MoKhoaLuc'])
+    // Cột LenBang thêm sau ba cột này (05/09) — dò theo vị trí tuyệt đối chứ
+    // không dò đuôi bảng, để lần thêm cột sau không làm phép kiểm này gãy oan.
+    expect(gs.CA_HEADERS.slice(19, 22)).toEqual(['KhoaLuc', 'KhoaBoi', 'MoKhoaLuc'])
+    expect(gs.CA_HEADERS[22]).toBe('LenBang')
   })
   it('caDangKhoa_ coi cả ca đã xoá là khoá', () => {
     expect(gs.caDangKhoa_({ trangThai: 'mo' })).toBe(false)

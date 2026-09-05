@@ -91,7 +91,16 @@ const DRIVE_FOLDER = 'OMR-APP-DATA'
 // CATHIVAGOILENBANG mục 1. Trạng thái ca vẫn dùng cột TrangThai sẵn có
 // ('mo' · 'dong' · 'da_xoa'); ba cột này chỉ ghi DẤU VẾT ai khoá lúc nào, để
 // sau còn đối chứng khi em kêu "con đang làm thì mất bài".
-const CA_HEADERS = ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson', 'BatDau', 'HetHanVao', 'TrangThai', 'TenCa', 'PhamVi', 'DanhSachMoi', 'NguoiTao', 'XoaLuc', 'NguongLan', 'NguongGiay', 'Loai', 'HanNop', 'KhoaLuc', 'KhoaBoi', 'MoKhoaLuc']
+// Cột LenBang (thứ 23) = nút gạt thầy bật lúc mở ca: ca này có dùng để phân
+// công gọi lên bảng hay không. Ô TRỐNG (mọi ca mở trước 05/09) = CÓ — ca cũ
+// không được biến mất khỏi màn Gọi lên bảng chỉ vì thêm một cột.
+const CA_HEADERS = ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson', 'BatDau', 'HetHanVao', 'TrangThai', 'TenCa', 'PhamVi', 'DanhSachMoi', 'NguoiTao', 'XoaLuc', 'NguongLan', 'NguongGiay', 'Loai', 'HanNop', 'KhoaLuc', 'KhoaBoi', 'MoKhoaLuc', 'LenBang']
+
+/** Đọc cột LenBang: chỉ chuỗi 'khong' mới là TẮT. Ô trống, 'co', giá trị lạ
+ * đều là BẬT — một chỗ trả lời, để danhSachCa và docCa_ không hiểu khác nhau. */
+function lenBangCua_(v) {
+  return String(v || '') !== 'khong'
+}
 // CHỐNG GIAN LẬN THEO MỨC (QUANLYCATHI mục 6): rời màn lần 1, 2 chỉ cảnh báo;
 // lần thứ NguongLan khoá bài; một lần rời quá NguongGiay giây khoá ngay. Thầy
 // chỉnh khi mở ca; ô trống = mặc định dưới đây.
@@ -300,6 +309,7 @@ function docCa_(sh, row) {
     khoaLuc: v[19] ? String(v[19]) : '',
     khoaBoi: v[20] ? String(v[20]) : '',
     moKhoaLuc: v[21] ? String(v[21]) : '',
+    lenBang: lenBangCua_(v[22]),
   }
 }
 
@@ -1461,12 +1471,19 @@ function doPost(e) {
       String(body.loai || '') === 'baitap' ? 'baitap' : 'thi',
       body.hanNop ? new Date(msCua_(body.hanNop)).toISOString() : '',
     ]
+    let dong = row
     if (row > 0) {
       sh.getRange(row, 1, 1, rowData.length).setValues([rowData])
     } else {
       sh.appendRow(rowData)
+      dong = sh.getLastRow()
     }
-    return jsonResponse_({ ok: true, batDau: batDau, hetHanVao: rowData[8], loai: rowData[17], hanNop: rowData[18], serverNow: Date.now() })
+    // NÚT GẠT "dùng ca này để gọi lên bảng" — ghi riêng ô cột 23 chứ không nối
+    // vào rowData: rowData dừng ở cột 19, nối thêm là ghi đè luôn KhoaLuc /
+    // KhoaBoi / MoKhoaLuc (cột 20-22) của ca mở lại cùng mã.
+    const lenBang = body.lenBang === false ? 'khong' : 'co'
+    sh.getRange(dong, 23).setValue(lenBang)
+    return jsonResponse_({ ok: true, batDau: batDau, hetHanVao: rowData[8], loai: rowData[17], hanNop: rowData[18], lenBang: lenBang === 'co', serverNow: Date.now() })
   }
 
   if (action === 'vaoThi') {
@@ -1666,6 +1683,7 @@ function doPost(e) {
         phamVi: v[11] ? String(v[11]) : 'tu_do',
         loai: String(v[17] || '') === 'baitap' ? 'baitap' : 'thi',
         hanNop: v[18] ? String(v[18]) : '',
+        lenBang: lenBangCua_(v[22]),
         xoaLuc: v[14] ? String(v[14]) : '',
         daVao: tk.daVao,
         daNop: tk.daNop,

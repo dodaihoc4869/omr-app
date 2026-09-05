@@ -228,6 +228,15 @@ export interface MocThoiGianCa {
   loai?: LoaiCa
   /** Hạn nộp bài tập (ISO). Chỉ có nghĩa với loai='baitap'. */
   hanNop?: string
+  /** NÚT GẠT "dùng ca này để gọi lên bảng" (thầy chốt 05/09 chiều).
+   *
+   * Bật  — ca hiện ở màn Gọi lên bảng để rút câu chữa và phân công em.
+   * Tắt  — ca chỉ để gửi phiếu phụ huynh và cộng dồn mạnh/yếu, không hiện ở
+   *        màn đó nữa. Cờ KHÔNG đụng gì tới dữ liệu ghi xuống: điểm, chi tiết
+   *        câu, chuyên đề vẫn ghi y hệt ở cả hai trạng thái.
+   *
+   * Trống = BẬT. Mọi ca mở trước 05/09 không có cột này nên phải hiện tiếp. */
+  lenBang?: boolean
 }
 
 /** Loại ca: kiểm tra hay bài tập về nhà. Dùng CHUNG mọi thứ, khác nhau bằng cờ này. */
@@ -262,6 +271,7 @@ export async function publishSession(
     hanNop: moc.hanNop || '',
     nguongLan: moc.nguongLan || 0,
     nguongGiay: moc.nguongGiay || 0,
+    lenBang: moc.lenBang !== false,
   })
   if (!result.ok) throw new Error(result.error || 'Mở ca kiểm tra thất bại')
   return { batDau: String(result.batDau || ''), hetHanVao: String(result.hetHanVao || '') }
@@ -934,6 +944,8 @@ export interface CaTomTat {
   /** 'baitap' = bài tập về nhà (BA-APP đợt 3). Ca cũ không có cột này → 'thi'. */
   loai: LoaiCa
   hanNop: string
+  /** Nút gạt "dùng ca này để gọi lên bảng". Ca cũ không có cột này → true. */
+  lenBang: boolean
   /** Thời điểm bị xoá mềm (chỉ có khi lấy danh sách ca đã xoá). */
   xoaLuc?: string
   /** Dấu vết KHOÁ CA thủ công — ai khoá lúc nào, mở lại lúc nào. */
@@ -949,7 +961,17 @@ export interface CaTomTat {
 export async function danhSachCa(scriptUrl: string, secret: string, daXoa = false): Promise<CaTomTat[]> {
   const r = await postJson(scriptUrl, { action: 'danhSachCa', secret, daXoa })
   if (!r.ok) throw new Error(r.error || 'Không lấy được danh sách ca')
-  return (r.items as CaTomTat[]).map((c) => ({ ...c, maCa: String(c.maCa), lop: String(c.lop ?? ''), tenCa: String(c.tenCa ?? ''), loai: c.loai === 'baitap' ? 'baitap' : 'thi', hanNop: String(c.hanNop ?? '') }))
+  return (r.items as CaTomTat[]).map((c) => ({
+    ...c,
+    maCa: String(c.maCa),
+    lop: String(c.lop ?? ''),
+    tenCa: String(c.tenCa ?? ''),
+    loai: c.loai === 'baitap' ? 'baitap' : 'thi',
+    hanNop: String(c.hanNop ?? ''),
+    // Máy chủ chưa cập nhật (.gs bản cũ) thì KHÔNG có trường này — coi như bật,
+    // để danh sách ca ở màn Gọi lên bảng không rỗng sau khi cập nhật app.
+    lenBang: c.lenBang !== false,
+  }))
 }
 
 export interface LuotThiRow {

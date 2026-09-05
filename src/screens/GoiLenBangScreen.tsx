@@ -81,6 +81,7 @@ export default function GoiLenBangScreen() {
 
   const [dsCa, setDsCa] = useState<CaTomTat[] | null>(null)
   const [timCa, setTimCa] = useState('')
+  const [hienCaTat, setHienCaTat] = useState(false)
   const [dangTaiCa, setDangTaiCa] = useState('')
   const [tienDo, setTienDo] = useState('')
   const [du, setDu] = useState<DuLieuCa | null>(null)
@@ -127,10 +128,16 @@ export default function GoiLenBangScreen() {
     })()
   }, [])
 
+  /** Ca thầy TẮT nút gạt lúc mở: chỉ gửi phiếu phụ huynh, không ra màn này.
+   * Vẫn với tới được bằng chip "Hiện cả ca đã tắt" — thầy đổi ý sau buổi thi
+   * thì không phải mở lại ca. */
+  const soCaTat = useMemo(() => (dsCa ?? []).filter((c) => !c.lenBang).length, [dsCa])
   const dsCaLoc = useMemo(() => {
     const q = timCa.trim().toLowerCase()
-    return (dsCa ?? []).filter((c) => !q || c.maCa.includes(q) || (c.tenCa || '').toLowerCase().includes(q) || (c.lop || '').toLowerCase().includes(q))
-  }, [dsCa, timCa])
+    return (dsCa ?? [])
+      .filter((c) => hienCaTat || c.lenBang)
+      .filter((c) => !q || c.maCa.includes(q) || (c.tenCa || '').toLowerCase().includes(q) || (c.lop || '').toLowerCase().includes(q))
+  }, [dsCa, timCa, hienCaTat])
 
   /** MỞ MỘT CA: kéo về bản đề CÓ đáp án + đáp án từng em + hồ sơ tích luỹ.
    *
@@ -379,6 +386,18 @@ export default function GoiLenBangScreen() {
         </div>
         <div style={{ ...NHAN_NHO, marginTop: 4 }}>Câu để chữa và bài làm của em đều lấy từ ca này — cùng dữ liệu với phiếu gửi phụ huynh.</div>
 
+        {soCaTat > 0 && (
+          <button
+            type="button"
+            onClick={() => setHienCaTat((v) => !v)}
+            aria-pressed={hienCaTat}
+            className="tap-target self-start font-bold"
+            style={{ marginTop: 'var(--k2)', minHeight: 36, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: hienCaTat ? 'var(--muc)' : 'var(--the-2)', color: hienCaTat ? 'var(--muc-nguoc)' : 'var(--nhat)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+          >
+            {hienCaTat ? 'Ẩn lại' : `Hiện cả ${soCaTat} ca đã tắt nút gạt`}
+          </button>
+        )}
+
         <div className="relative" style={{ marginTop: 'var(--k3)' }}>
           <Search size={18} style={{ position: 'absolute', left: 14, top: 15, color: 'var(--nhat)' }} />
           <input value={timCa} onChange={(e) => setTimCa(e.target.value)} placeholder="Tìm ca theo tên, mã hoặc lớp…" style={O_NHAP} aria-label="Tìm ca" />
@@ -409,6 +428,7 @@ export default function GoiLenBangScreen() {
                     <span style={NHAN_NHO}>
                       mã <span style={SO}>{c.maCa}</span>
                       {c.lop ? ` · lớp ${c.lop}` : ''} · <span style={SO}>{c.daNop}</span>/<span style={SO}>{c.daVao}</span> đã nộp
+                      {!c.lenBang ? ' · đã tắt nút gạt' : ''}
                     </span>
                   </span>
                   {dangTaiCa === c.maCa ? <RefreshCw size={16} className="animate-spin shrink-0" /> : chon ? <Check size={16} className="shrink-0" style={{ color: 'var(--xanh)' }} /> : null}

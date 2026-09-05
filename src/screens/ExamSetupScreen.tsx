@@ -10,7 +10,7 @@ import HopChonDe from '../components/HopChonDe'
 import { locNguonTheoId, qidDaRaTuCacCa, type SoCauPhan } from '../lib/rut-de'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import { randomSessionCode, taoLinkMoi } from '../lib/ca-link'
-import { TheNoiDung, Hang, OThongBao, NutChinh } from '../components/DesignSystem'
+import { TheNoiDung, Hang, OThongBao, NutChinh, NutGat } from '../components/DesignSystem'
 import NutDongBo from '../components/NutDongBo'
 import { chuoi, danhSachEm, khoiTuNamSinh, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
 import { docSoCauCa, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, luuSoCauCa, saveSessionTeacherBank } from '../lib/exam-db'
@@ -123,6 +123,10 @@ export default function ExamSetupScreen() {
   const [batDauLocal, setBatDauLocal] = useState(henGioMacDinh)
   const [hanVaoPhut, setHanVaoPhut] = useState(30)
   const [congBoDiem, setCongBoDiem] = useState<CongBoDiem>('khong')
+  // NÚT GẠT "lấy dữ liệu phân công lên bảng" (thầy chốt 05/09 chiều). Mặc định
+  // BẬT: bật nhầm chỉ thừa một dòng trong danh sách ca, còn tắt nhầm thì thầy
+  // mở màn Gọi lên bảng giữa buổi và không thấy ca vừa thi đâu.
+  const [lenBang, setLenBang] = useState(true)
   // Tên ca (tuỳ chọn) + phạm vi gửi ca.
   const [tenCa, setTenCa] = useState('')
   // Chống gian lận theo mức (mục 6): rời màn lần thứ N → khoá; một lần rời quá M giây → khoá.
@@ -272,6 +276,7 @@ export default function ExamSetupScreen() {
         danhSachMoi: phamVi === 'khoi' ? namSinhKhoi.trim() : phamVi === 'chon' ? Array.from(chonSbd) : '',
         nguongLan,
         nguongGiay,
+        lenBang,
       })
       // Lưu bản CÓ đáp án trên máy thầy để màn Theo dõi chấm lại được sau này.
       // Lưu ĐÚNG bộ đã rút, không lưu cả kho: chấm lại phải tái tạo y hệt bộ
@@ -642,6 +647,24 @@ export default function ExamSetupScreen() {
             )
           })}
         </div>
+      </TheNoiDung>
+
+      {/* 6. CA NÀY DÙNG LÀM GÌ */}
+      <TheNoiDung>
+        <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k2)' }}>Ca này dùng làm gì</div>
+        <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>
+          Hai việc dưới đây chạy ở MỌI ca, không tắt được: gửi phiếu cho phụ huynh và cộng dồn mạnh/yếu của em. Nút gạt chỉ quyết định ca có ra màn Gọi lên bảng hay không.
+        </div>
+        <NutGat
+          bat={lenBang}
+          onDoi={setLenBang}
+          ten="Lấy dữ liệu phân công lên bảng"
+          mota={
+            lenBang
+              ? 'Ca hiện ở màn Gọi lên bảng: máy đọc em nào sai câu nào để chia câu chữa.'
+              : 'Ca không hiện ở màn Gọi lên bảng. Vẫn gửi phiếu phụ huynh và vẫn cộng dồn mạnh/yếu như thường.'
+          }
+        />
       </TheNoiDung>
 
       <NutChinh onClick={handleOpenSession} disabled={opening}>
