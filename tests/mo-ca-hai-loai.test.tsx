@@ -71,7 +71,9 @@ describe('MỤC 1 — màn mở thi tách làm hai', () => {
     fireEvent.click(getByLabelText('Mở ca chẩn đoán'))
     await waitFor(() => expect(container.textContent).toContain('ĐỀ MỚI'))
     expect(container.textContent).toContain('ĐỀ CŨ')
-    expect(container.textContent).toContain('KHÔNG vào sổ điểm')
+    // Thầy chốt 05/09 chiều: ca chẩn đoán GHI DỮ LIỆU ĐẦY ĐỦ như ca kiểm tra
+    // để còn gửi báo cáo hằng ngày cho phụ huynh — không còn "không vào sổ".
+    expect(container.textContent).toContain('ghi đầy đủ như ca kiểm tra')
     expect(container.textContent).toContain('15 phút')
   })
 
@@ -82,107 +84,127 @@ describe('MỤC 1 — màn mở thi tách làm hai', () => {
     fireEvent.click(getByText('← Chọn loại ca'))
     expect(getByLabelText('Mở ca kiểm tra')).toBeTruthy()
   })
+
+  it('tiêu đề nói đúng loại ca đang soạn', async () => {
+    const { container, getByLabelText } = render(<ExamSetupScreen />)
+    fireEvent.click(getByLabelText('Mở ca chẩn đoán'))
+    await waitFor(() => expect(container.textContent).toContain('ĐỀ MỚI'))
+    expect(container.querySelector('h1')?.textContent).toBe('Mở ca chẩn đoán')
+  })
 })
 
 // ------------------------------------------------------------------ MỤC 3
+// THẦY CHỐT KHÁC ĐẶC TẢ (05/09 chiều): cả HAI khối đều tích được tới từng bài
+// và từng dạng, y như màn Mở ca kiểm tra — không còn "đề mới chỉ một đề".
 
 const HO_SO: HoSoEm[] = [
   { sbd: '001', ten: 'Em A', chuyenDe: { Ester: { tiLeSai: 0.7, buoiChuaDo: 2, daiDang: true, chuaTungDo: false } }, daRa: [] },
   { sbd: '002', ten: 'Em B', chuyenDe: { Ester: { tiLeSai: 0.4, buoiChuaDo: 1, daiDang: false, chuaTungDo: false } }, daRa: [] },
 ]
 
-function dung(moCa = vi.fn(async () => {})) {
-  const r = render(<KhoiCaChanDoan nguon={KHO} dsEm={[{ sbd: '001', hoTen: 'Em A' }, { sbd: '002', hoTen: 'Em B' }]} layHoSo={async () => HO_SO} moCa={moCa} showToast={vi.fn()} />)
-  return { ...r, moCa }
+/** Mở màn Mở ca, chọn CHẨN ĐOÁN, chờ hai cây hiện ra. */
+async function moChanDoan() {
+  const r = render(<ExamSetupScreen />)
+  fireEvent.click(r.getByLabelText('Mở ca chẩn đoán'))
+  await waitFor(() => expect(r.container.textContent).toContain('ĐỀ MỚI'))
+  return r
 }
 
-const dongTong = (c: HTMLElement) => (c.querySelector('[data-dong-tong]') as HTMLElement).textContent ?? ''
+const dongTong = (c: HTMLElement) => (c.querySelector('[data-dong-tong]') as HTMLElement)?.textContent ?? ''
+const cayCua = (c: HTMLElement, khoi: 'moi' | 'cu') => c.querySelector(`[data-khoi="${khoi}"]`) as HTMLElement
 
-describe('MỤC 3 — hai khối tích chọn, bật tắt độc lập', () => {
-  it('mở ra chưa tích nội dung nào thì chưa mở được ca — không đoán hộ thầy', () => {
-    const { container } = dung()
-    expect(dongTong(container)).toContain('Chưa tích khối nào')
+/** Mở hết cây của một khối rồi tích dòng khớp chữ. */
+function tichTrongCay(cay: HTMLElement, chu: RegExp) {
+  for (let i = 0; i < 4; i++) {
+    const nut = [...cay.querySelectorAll('button[aria-expanded="false"]')] as HTMLElement[]
+    if (!nut.length) break
+    for (const b of nut) fireEvent.click(b)
+  }
+  const dong = [...cay.querySelectorAll('button')].filter((b) => chu.test(b.textContent ?? ''))
+  if (!dong.length) throw new Error(`không thấy dòng khớp ${chu}`)
+  fireEvent.click(dong[0])
+  return dong[0]
+}
+
+describe('MỤC 3 — hai khối, mỗi khối là cây bốn tầng', () => {
+  it('mỗi khối có CÂY riêng, tích được tới tầng dạng TN · ĐS · TLN', async () => {
+    const { container } = await moChanDoan()
+    expect(cayCua(container, 'moi')).toBeTruthy()
+    expect(cayCua(container, 'cu')).toBeTruthy()
+    const cay = cayCua(container, 'moi')
+    for (let i = 0; i < 4; i++) {
+      const nut = [...cay.querySelectorAll('button[aria-expanded="false"]')] as HTMLElement[]
+      if (!nut.length) break
+      for (const b of nut) fireEvent.click(b)
+    }
+    // Tầng dạng: mã đã tách theo phần.
+    expect(cay.textContent).toMatch(/12-C1-B2-(TN|DS)/)
   })
 
-  it('tích một đề mới + một chương cũ → chế độ ca_hai: 8 câu · 11 phút · 14 tín hiệu', () => {
-    const { container, getAllByRole } = dung()
-    fireEvent.click(getAllByRole('radio')[0])
-    fireEvent.click(getAllByRole('checkbox')[0])
+  it('ĐỀ MỚI tích được NHIỀU mã, không còn giới hạn một đề', async () => {
+    const { container } = await moChanDoan()
+    const cay = cayCua(container, 'moi')
+    tichTrongCay(cay, /12-C1-B2-TN/)
+    tichTrongCay(cay, /12-C1-B2-DS/)
+    expect(container.textContent).toContain('2 mã')
+  })
+
+  it('tích ĐỀ MỚI và ĐỀ CŨ ở hai cây độc lập → chế độ ca_hai', async () => {
+    const { container } = await moChanDoan()
+    tichTrongCay(cayCua(container, 'moi'), /12-C1-B2-TN/)
+    tichTrongCay(cayCua(container, 'cu'), /12-C2-B4-TN/)
     expect(dongTong(container)).toContain('8')
-    expect(dongTong(container)).toContain('11')
     expect(dongTong(container)).toContain('14')
     expect(container.textContent).toContain('Chữa bài mới và ôn cũ')
   })
 
-  it('khối ĐỀ MỚI chỉ tích được MỘT đề — tích đề thứ hai thì bỏ đề trước', () => {
-    const { container, getAllByRole } = dung()
-    const radio = getAllByRole('radio')
-    expect(radio).toHaveLength(KHO.length)
-    fireEvent.click(radio[0])
-    expect(radio[0].getAttribute('aria-checked')).toBe('true')
-    fireEvent.click(radio[1])
-    expect(radio[0].getAttribute('aria-checked')).toBe('false')
-    expect(radio[1].getAttribute('aria-checked')).toBe('true')
-    expect(getAllByRole('radio').filter((r) => r.getAttribute('aria-checked') === 'true')).toHaveLength(1)
-  })
-
-  it('khối ĐỀ CŨ tích được NHIỀU chương', () => {
-    const { getAllByRole } = dung()
-    const ox = getAllByRole('checkbox')
-    expect(ox.length).toBeGreaterThanOrEqual(3)
-    fireEvent.click(ox[0])
-    fireEvent.click(ox[1])
-    expect(getAllByRole('checkbox').filter((r) => r.getAttribute('aria-checked') === 'true')).toHaveLength(2)
-  })
-
-  it('chỉ đề mới → chi_moi, vẫn 8 câu · 11 phút · 14 tín hiệu', () => {
-    const { container, getAllByRole, getByLabelText } = dung()
-    fireEvent.click(getAllByRole('radio')[0]) // có đề mới
-    fireEvent.click(getByLabelText('Bật khối đề cũ')) // tắt đề cũ
-    expect(dongTong(container)).toContain('8')
-    expect(dongTong(container)).toContain('14')
-    expect(container.textContent).toContain('lõi chung dày hơn')
-  })
-
-  it('chỉ đề cũ → chi_cu, 7 câu · 10 phút · 13 tín hiệu, đo sâu hai chuyên đề', () => {
-    const { container, getAllByRole, getByLabelText } = dung()
-    fireEvent.click(getAllByRole('checkbox')[0]) // có chương cũ
-    fireEvent.click(getByLabelText('Bật khối đề mới')) // tắt đề mới
+  it('chỉ tích ĐỀ CŨ → chi_cu: 7 câu · 13 tín hiệu, đo sâu hai chuyên đề', async () => {
+    const { container } = await moChanDoan()
+    tichTrongCay(cayCua(container, 'cu'), /12-C2-B4-TN/)
     expect(dongTong(container)).toContain('7')
     expect(dongTong(container)).toContain('13')
     expect(container.textContent).toContain('đo sâu hai chuyên đề')
   })
 
-  it('bỏ tích cả hai → nút Mở ca TẮT, dòng tổng nói chưa tích gì', () => {
-    const { container, getByLabelText, getByText } = dung()
-    fireEvent.click(getByLabelText('Bật khối đề mới'))
-    fireEvent.click(getByLabelText('Bật khối đề cũ'))
+  it('chỉ tích ĐỀ MỚI → chi_moi: 8 câu · 14 tín hiệu, lõi chung dày hơn', async () => {
+    const { container } = await moChanDoan()
+    tichTrongCay(cayCua(container, 'moi'), /12-C1-B2-TN/)
+    expect(dongTong(container)).toContain('8')
+    expect(container.textContent).toContain('lõi chung dày hơn')
+  })
+
+  it('chưa tích gì thì dòng tổng nói thẳng, không đoán hộ thầy', async () => {
+    const { container } = await moChanDoan()
     expect(dongTong(container)).toContain('Chưa tích khối nào')
-    expect((getByText('Mở ca') as HTMLButtonElement).disabled).toBe(true)
   })
 
-  it('Xem trước một em ra bảng câu KÈM LÝ DO chọn từng câu', async () => {
-    const { container, getAllByRole, getByText } = dung()
-    fireEvent.click(getAllByRole('radio')[0])
-    fireEvent.click(getAllByRole('checkbox')[0])
-    fireEvent.click(getByText('Xem trước một em'))
-    await waitFor(() => expect(container.textContent).toContain('Xem trước'))
-    expect(container.textContent).toContain('lõi chung')
-    expect(container.textContent).toContain('tín hiệu')
+  it('tắt một khối thì cây của khối đó biến mất, chế độ tự đổi', async () => {
+    const { container, getByLabelText } = await moChanDoan()
+    tichTrongCay(cayCua(container, 'moi'), /12-C1-B2-TN/)
+    tichTrongCay(cayCua(container, 'cu'), /12-C2-B4-TN/)
+    fireEvent.click(getByLabelText('Bật khối đề cũ'))
+    expect(cayCua(container, 'cu')).toBeNull()
+    expect(container.textContent).toContain('lõi chung dày hơn')
+  })
+})
+
+describe('BẢO MẬT VÀ DỮ LIỆU — hai loại ca giống hệt nhau (thầy chốt 05/09)', () => {
+  it('ca chẩn đoán vẫn có ĐỦ ô lớp, thời gian, công bố điểm, chống gian lận, phạm vi', async () => {
+    const { container } = await moChanDoan()
+    const t = container.textContent ?? ''
+    expect(t).toContain('Lớp & thời gian')
+    expect(t).toContain('Rời màn hình khi làm bài')
+    expect(t).toContain('Ai được vào ca này')
+    expect(t).toContain('Không công bố trên máy em')
   })
 
-  it('bấm Mở ca thì giao bộ đã rút: lõi chung dùng chung, bộ riêng theo em', async () => {
-    const moCa = vi.fn(async (_k: CaKiemChung) => {})
-    const { getAllByRole, getByText } = dung(moCa)
-    fireEvent.click(getAllByRole('radio')[0])
-    fireEvent.click(getAllByRole('checkbox')[0])
-    fireEvent.click(getByText('Mở ca'))
-    await waitFor(() => expect(moCa).toHaveBeenCalled())
-    const ket = moCa.mock.calls[0][0]
-    expect(ket.loiChung).toHaveLength(3)
-    expect(Object.keys(ket.theoEm)).toEqual(['001', '002'])
-    // Lõi chung KHÔNG được nằm trong bộ riêng của bất kỳ em nào.
-    const chung = new Set(ket.loiChung.map((c) => c.id))
-    for (const r of Object.values(ket.theoEm)) expect(r.some((c) => chung.has(c.id))).toBe(false)
+  it('nói thẳng dữ liệu vẫn ghi đầy đủ để gửi phụ huynh', async () => {
+    const { container } = await moChanDoan()
+    expect(container.textContent).toContain('ghi đầy đủ như ca kiểm tra')
+  })
+
+  it('màn Rút đề của ca kiểm tra KHÔNG chen vào ca chẩn đoán', async () => {
+    const { container } = await moChanDoan()
+    expect(container.textContent).not.toContain('Bộ câu ra đề')
   })
 })

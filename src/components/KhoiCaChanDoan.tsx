@@ -1,24 +1,26 @@
-// CA CHẨN ĐOÁN — hai khối tích chọn, bật tắt ĐỘC LẬP.
-// Đặc tả MOCAVAGOILENBANG.md mục 3.
+// CA CHẨN ĐOÁN — hai khối chọn đề, bật tắt ĐỘC LẬP, mỗi khối là CÂY BỐN TẦNG.
 //
-// Có hôm chữa cả bài mới lẫn bài cũ, có hôm chỉ một trong hai. Bỏ tích một
-// khối thì TỰ CHUYỂN CHẾ ĐỘ và số câu tự chia lại để vẫn dùng hết 15 phút —
-// không để em ngồi không.
+// Đặc tả MOCAVAGOILENBANG.md mục 3, có BA CHỖ THẦY CHỐT KHÁC (05/09 chiều):
 //
-//   cả hai      ca_hai   8 câu · 660s · 14 tín hiệu
-//   chỉ đề mới  chi_moi  8 câu · 660s · 14 tín hiệu   (lõi chung dày hơn)
-//   chỉ đề cũ   chi_cu   7 câu · 600s · 13 tín hiệu   (đo sâu HAI chuyên đề)
-//
-// Khối ĐỀ MỚI chỉ tích được MỘT đề: lõi chung phải nằm trong đúng bài các em
-// vừa làm ở nhà. Khối ĐỀ CŨ tích được nhiều chương: càng rộng, thuật toán càng
-// dễ tìm câu đúng chuyên đề đến hạn đo.
+//   1. Đặc tả: "khối ĐỀ MỚI chỉ tích được một đề". Thầy chốt: CẢ HAI KHỐI đều
+//      tích được tới từng bài và từng dạng (trắc nghiệm · đúng sai · trả lời
+//      ngắn), y như màn Mở ca kiểm tra. Một buổi hiếm khi bó trong một mã, và
+//      "chỉ trắc nghiệm của bài này" là việc thầy làm thật.
+//      Lõi chung vẫn lấy câu 2 sao trong ĐÚNG phần ĐỀ MỚI đã tích, nên mục đích
+//      ban đầu (lõi nằm trong bài các em vừa làm ở nhà) vẫn giữ.
+//   2. Đặc tả: ca chẩn đoán không vào sổ điểm, tắt chống gian lận. Thầy chốt:
+//      GHI DỮ LIỆU ĐẦY ĐỦ như ca kiểm tra để còn gửi báo cáo hằng ngày cho phụ
+//      huynh, và BẢO MẬT HAI BÊN GIỐNG NHAU.
+//   3. Vì vậy khối này chỉ còn lo đúng một việc: CHỌN ĐỀ và RÚT CÂU theo hồ sơ.
+//      Lớp, thời gian, công bố điểm, chống gian lận, phạm vi mời đều dùng chung
+//      các ô của màn Mở ca — một nguồn sự thật, không dựng hai bản.
 //
 // Mọi luật chọn câu nằm trong `src/lib/ca-chan-doan.ts`, có test. Ở đây chỉ vẽ.
-import { useMemo, useState } from 'react'
-import { CheckSquare, Square, Circle, CircleDot, Eye } from 'lucide-react'
-import { NutChinh, TheNoiDung, OThongBao } from './DesignSystem'
+import { useEffect, useMemo, useState } from 'react'
+import { CheckSquare, Square, Eye } from 'lucide-react'
+import { TheNoiDung, OThongBao } from './DesignSystem'
+import HopChonDe from './HopChonDe'
 import type { TeacherExamSource } from '../data/examContent'
-import { chuongCuaDe } from '../lib/cay-chon-de'
 import { dungUngVien, type CauUngVien } from '../lib/rut-de'
 import { CHE_DO, cheDoTu, rutCaKiemChung, tomTatCheDo, type CaKiemChung, type CheDo, type HoSoEm } from '../lib/ca-chan-doan'
 
@@ -30,15 +32,21 @@ export interface EmChanDoan {
   hoTen: string
 }
 
+/** Bộ đề thầy đã tích, gửi ngược lên màn Mở ca để nút Mở ca dùng. */
+export interface BoChanDoan {
+  moi: TeacherExamSource[]
+  cu: TeacherExamSource[]
+  cheDo: CheDo | null
+}
+
 export interface KhoiCaChanDoanProps {
-  /** Toàn bộ kho đề đã lưu trên máy thầy. */
-  nguon: TeacherExamSource[]
-  /** Em sẽ vào ca — lấy hồ sơ của đúng những em này. */
+  /** Kho đề ĐÃ TÁCH THEO PHẦN — mỗi bài thành ba mã TN · DS · TLN. */
+  dsDeTach: TeacherExamSource[]
+  nhomLoc?: string
   dsEm: EmChanDoan[]
-  /** Hồ sơ chuyên đề của từng em. Trả về rỗng khi em chưa có dữ liệu — KHÔNG đoán. */
+  /** Hồ sơ chuyên đề từng em. Em chưa có dữ liệu thì trả rỗng — KHÔNG đoán. */
   layHoSo: (dsEm: EmChanDoan[]) => Promise<HoSoEm[]>
-  /** Mở ca thật: nhận bộ câu đã rút. */
-  moCa: (ket: CaKiemChung, nguonDaChon: TeacherExamSource[]) => Promise<void>
+  onDoi: (bo: BoChanDoan) => void
   showToast: (chu: string, kieu?: 'success' | 'error' | 'warn') => void
 }
 
@@ -48,74 +56,96 @@ export function phang(ds: TeacherExamSource[]): CauUngVien[] {
   return [...uv.I, ...uv.II, ...uv.III]
 }
 
-function OTich({ chon, tron = false }: { chon: boolean; tron?: boolean }) {
-  const I = tron ? (chon ? CircleDot : Circle) : chon ? CheckSquare : Square
+function OTich({ chon }: { chon: boolean }) {
+  const I = chon ? CheckSquare : Square
   return <I size={18} style={{ color: chon ? 'var(--xanh)' : 'var(--mo)', flex: '0 0 auto' }} />
 }
 
-function soCauCua(s: TeacherExamSource): { tong: number; I: number; II: number; III: number } {
-  return { tong: s.phanI.length + s.phanII.length + s.phanIII.length, I: s.phanI.length, II: s.phanII.length, III: s.phanIII.length }
+function demCau(ds: TeacherExamSource[]): number {
+  return ds.reduce((n, s) => n + s.phanI.length + s.phanII.length + s.phanIII.length, 0)
 }
 
-export default function KhoiCaChanDoan({ nguon, dsEm, layHoSo, moCa, showToast }: KhoiCaChanDoanProps) {
+/** KHÔNG định nghĩa trong thân component: mỗi lần vẽ lại sẽ là một kiểu
+ * component MỚI, React tháo cả cây con và HopChonDe mất sạch chữ đang gõ lẫn
+ * nhánh đang mở. Đã dính đúng lỗi này ở màn khác. */
+function Khoi({ id, bat, setBat, ten, phu, tich, setTich, de, dsDeTach, nhomLoc }: { id: string; bat: boolean; setBat: (v: boolean) => void; ten: string; phu: string; tich: Set<string>; setTich: (s: Set<string>) => void; de: TeacherExamSource[]; dsDeTach: TeacherExamSource[]; nhomLoc: string }) {
+  return (
+    <TheNoiDung>
+      <button
+        type="button"
+        onClick={() => setBat(!bat)}
+        className="tap-target w-full text-left inline-flex items-center"
+        style={{ gap: 'var(--k3)', minHeight: 44, background: 'none', border: 'none', padding: 0 }}
+        aria-pressed={bat}
+        aria-label={`Bật khối ${ten.toLowerCase()}`}
+      >
+        <OTich chon={bat} />
+        <span className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
+          {ten}
+        </span>
+        <span className="flex-1 min-w-0 truncate" style={NHAN_NHO}>
+          {phu}
+        </span>
+        {de.length > 0 && (
+          <span style={{ ...NHAN_NHO, ...SO }}>
+            {de.length} mã · {demCau(de)} câu
+          </span>
+        )}
+      </button>
+      {bat && (
+        <div style={{ marginTop: 'var(--k3) ' }} data-khoi={id}>
+          <HopChonDe
+            ds={dsDeTach}
+            daChon={tich}
+            onChon={(ma) => {
+              const s = new Set(tich)
+              if (s.has(ma)) s.delete(ma)
+              else s.add(ma)
+              setTich(s)
+            }}
+            nhomLoc={nhomLoc}
+            chonNhieu
+            onChonTatCa={(ma) => setTich(new Set(ma))}
+            cao={260}
+          />
+        </div>
+      )}
+    </TheNoiDung>
+  )
+}
+
+export default function KhoiCaChanDoan({ dsDeTach, nhomLoc = '', dsEm, layHoSo, onDoi, showToast }: KhoiCaChanDoanProps) {
   const [batMoi, setBatMoi] = useState(true)
-  const [maDeMoi, setMaDeMoi] = useState('')
+  const [tichMoi, setTichMoi] = useState<Set<string>>(new Set())
   const [batCu, setBatCu] = useState(true)
-  const [chuongCu, setChuongCu] = useState<Set<string>>(new Set())
-  const [dangMo, setDangMo] = useState('')
+  const [tichCu, setTichCu] = useState<Set<string>>(new Set())
+  const [dangRut, setDangRut] = useState(false)
   const [xemTruoc, setXemTruoc] = useState<CaKiemChung | null>(null)
 
-  const chuong = useMemo(() => {
-    const m = new Map<string, { ten: string; de: TeacherExamSource[]; soCau: number }>()
-    for (const s of nguon) {
-      const ten = chuongCuaDe(s) || '(chưa đặt chương)'
-      const cu = m.get(ten) ?? { ten, de: [], soCau: 0 }
-      cu.de.push(s)
-      cu.soCau += soCauCua(s).tong
-      m.set(ten, cu)
-    }
-    return [...m.values()].sort((a, b) => a.ten.localeCompare(b.ten, 'vi'))
-  }, [nguon])
-
-  const deMoi = useMemo(() => nguon.find((s) => s.maDe === maDeMoi) ?? null, [nguon, maDeMoi])
-  const coMoi = batMoi && !!deMoi
-  const deCu = useMemo(() => nguon.filter((s) => chuongCu.has(chuongCuaDe(s) || '(chưa đặt chương)')), [nguon, chuongCu])
+  const deMoi = useMemo(() => dsDeTach.filter((s) => tichMoi.has(s.maDe)), [dsDeTach, tichMoi])
+  const deCu = useMemo(() => dsDeTach.filter((s) => tichCu.has(s.maDe)), [dsDeTach, tichCu])
+  const coMoi = batMoi && deMoi.length > 0
   const coCu = batCu && deCu.length > 0
-
   const cheDo: CheDo | null = cheDoTu(coMoi, coCu)
   const tom = cheDo ? tomTatCheDo(CHE_DO[cheDo]) : null
 
-  const rut = async (): Promise<CaKiemChung | null> => {
-    if (!cheDo) return null
-    const hoSo = await layHoSo(dsEm)
-    return rutCaKiemChung(coMoi && deMoi ? phang([deMoi]) : [], coCu ? phang(deCu) : [], hoSo, CHE_DO[cheDo])
-  }
+  // Báo ngược lên màn Mở ca mỗi khi bộ tích đổi — nút Mở ca của màn dùng bộ này.
+  useEffect(() => {
+    onDoi({ moi: coMoi ? deMoi : [], cu: coCu ? deCu : [], cheDo })
+    // onDoi là hàm của màn cha, không đưa vào deps để khỏi chạy vòng.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deMoi, deCu, coMoi, coCu, cheDo])
 
   const bamXemTruoc = async () => {
-    setDangMo('Đang rút thử…')
+    if (!cheDo) return
+    setDangRut(true)
     try {
-      const r = await rut()
-      if (!r) return
-      setXemTruoc(r)
+      const hoSo = await layHoSo(dsEm)
+      setXemTruoc(rutCaKiemChung(coMoi ? phang(deMoi) : [], coCu ? phang(deCu) : [], hoSo, CHE_DO[cheDo]))
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không rút thử được', 'error')
     } finally {
-      setDangMo('')
-    }
-  }
-
-  const bamMoCa = async () => {
-    if (!cheDo) return
-    setDangMo('Đang lấy hồ sơ từng em…')
-    try {
-      const r = await rut()
-      if (!r) return
-      setDangMo('Đang mở ca…')
-      await moCa(r, [...(coMoi && deMoi ? [deMoi] : []), ...(coCu ? deCu : [])])
-    } catch (e) {
-      showToast(e instanceof Error ? e.message : 'Không mở được ca', 'error')
-    } finally {
-      setDangMo('')
+      setDangRut(false)
     }
   }
 
@@ -124,92 +154,12 @@ export default function KhoiCaChanDoan({ nguon, dsEm, layHoSo, moCa, showToast }
   return (
     <div className="flex flex-col" style={{ gap: 'var(--k4)' }}>
       <OThongBao tone="cam">
-        Ca chẩn đoán <b>KHÔNG vào sổ điểm</b>, 15 phút, không chống gian lận, không Phần III. Em biết là không lấy điểm thì không có động cơ chép, và dữ liệu mới thật — đây là điều kiện để phần
-        phân công lên bảng đúng.
+        Ca chẩn đoán lấy <b>dữ liệu để phân công lên bảng</b>: mỗi em một bộ câu chọn theo hồ sơ em ấy, 15 phút, không Phần III. Điểm và chi tiết từng câu vẫn ghi đầy đủ như ca kiểm tra để còn gửi
+        báo cáo cho phụ huynh; chống gian lận và phạm vi mời cũng đặt ở phần bên dưới, giống hệt ca kiểm tra.
       </OThongBao>
 
-      {/* KHỐI ĐỀ MỚI — chỉ MỘT đề */}
-      <TheNoiDung>
-        <button type="button" onClick={() => setBatMoi((v) => !v)} className="tap-target w-full text-left inline-flex items-center" style={{ gap: 'var(--k3)', minHeight: 44, background: 'none', border: 'none', padding: 0 }} aria-pressed={batMoi} aria-label="Bật khối đề mới">
-          <OTich chon={batMoi} />
-          <span className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
-            ĐỀ MỚI
-          </span>
-          <span style={NHAN_NHO}>bài vừa giao về nhà · tích 1 đề</span>
-        </button>
-        {batMoi && (
-          <div className="flex flex-col" style={{ gap: 4, marginTop: 'var(--k3)', maxHeight: 220, overflowY: 'auto' }} data-hop-de-moi>
-            {nguon.length === 0 && <div style={NHAN_NHO}>Chưa có đề nào trong kho.</div>}
-            {nguon.map((s) => {
-              const n = soCauCua(s)
-              const chon = s.maDe === maDeMoi
-              return (
-                <button
-                  key={s.maDe}
-                  type="button"
-                  role="radio"
-                  aria-checked={chon}
-                  // Tích đề thứ hai thì BỎ đề trước — lõi chung phải nằm trong
-                  // đúng bài các em vừa làm ở nhà.
-                  onClick={() => setMaDeMoi(chon ? '' : s.maDe)}
-                  className="tap-target w-full text-left inline-flex items-center"
-                  style={{ gap: 'var(--k3)', minHeight: 44, padding: '6px var(--k3)', borderRadius: 'var(--bo-1)', background: chon ? 'var(--xanh-nen)' : 'var(--the-2)', border: `1.5px solid ${chon ? 'var(--xanh)' : 'transparent'}` }}
-                >
-                  <OTich chon={chon} tron />
-                  <span className="flex-1 min-w-0 truncate" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
-                    {s.maDe}
-                  </span>
-                  <span style={{ ...NHAN_NHO, ...SO }}>
-                    {n.tong} câu · I:{n.I} II:{n.II} III:{n.III}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-        )}
-      </TheNoiDung>
-
-      {/* KHỐI ĐỀ CŨ — nhiều chương */}
-      <TheNoiDung>
-        <button type="button" onClick={() => setBatCu((v) => !v)} className="tap-target w-full text-left inline-flex items-center" style={{ gap: 'var(--k3)', minHeight: 44, background: 'none', border: 'none', padding: 0 }} aria-pressed={batCu} aria-label="Bật khối đề cũ">
-          <OTich chon={batCu} />
-          <span className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
-            ĐỀ CŨ
-          </span>
-          <span style={NHAN_NHO}>kho ôn lại · tích nhiều chương</span>
-        </button>
-        {batCu && (
-          <div className="flex flex-col" style={{ gap: 4, marginTop: 'var(--k3)', maxHeight: 220, overflowY: 'auto' }} data-hop-de-cu>
-            {chuong.map((c) => {
-              const chon = chuongCu.has(c.ten)
-              return (
-                <button
-                  key={c.ten}
-                  type="button"
-                  role="checkbox"
-                  aria-checked={chon}
-                  onClick={() =>
-                    setChuongCu((truoc) => {
-                      const s = new Set(truoc)
-                      if (s.has(c.ten)) s.delete(c.ten)
-                      else s.add(c.ten)
-                      return s
-                    })
-                  }
-                  className="tap-target w-full text-left inline-flex items-center"
-                  style={{ gap: 'var(--k3)', minHeight: 44, padding: '6px var(--k3)', borderRadius: 'var(--bo-1)', background: chon ? 'var(--xanh-nen)' : 'var(--the-2)', border: `1.5px solid ${chon ? 'var(--xanh)' : 'transparent'}` }}
-                >
-                  <OTich chon={chon} />
-                  <span className="flex-1 min-w-0 truncate" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
-                    {c.ten}
-                  </span>
-                  <span style={{ ...NHAN_NHO, ...SO }}>{c.soCau} câu</span>
-                </button>
-              )
-            })}
-          </div>
-        )}
-      </TheNoiDung>
+      <Khoi id="moi" bat={batMoi} setBat={setBatMoi} ten="ĐỀ MỚI" phu="bài vừa giao về nhà — lõi chung lấy từ đây" tich={tichMoi} setTich={setTichMoi} de={deMoi} dsDeTach={dsDeTach} nhomLoc={nhomLoc} />
+      <Khoi id="cu" bat={batCu} setBat={setBatCu} ten="ĐỀ CŨ" phu="kho ôn lại — càng rộng càng dễ tìm đúng chuyên đề đến hạn đo" tich={tichCu} setTich={setTichCu} de={deCu} dsDeTach={dsDeTach} nhomLoc={nhomLoc} />
 
       {/* DÒNG TỔNG — đọc thẳng từ hằng chế độ, không đếm tay */}
       <TheNoiDung>
@@ -231,14 +181,15 @@ export default function KhoiCaChanDoan({ nguon, dsEm, layHoSo, moCa, showToast }
                 ? 'Buổi ôn, không có đề mới — đo sâu hai chuyên đề.'
                 : 'Tích ĐỀ MỚI hoặc ĐỀ CŨ (hoặc cả hai) rồi mới mở được ca.'}
         </div>
-        <div className="grid grid-cols-2" style={{ gap: 'var(--k3)', marginTop: 'var(--k4)' }}>
-          <button type="button" onClick={bamXemTruoc} disabled={!cheDo || !!dangMo} className="tap-target font-bold inline-flex items-center justify-center" style={{ minHeight: 48, gap: 6, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', border: '1.5px solid var(--vien)', color: cheDo ? 'var(--muc)' : 'var(--mo)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
-            <Eye size={16} /> Xem trước một em
-          </button>
-          <NutChinh onClick={bamMoCa} disabled={!cheDo || !!dangMo}>
-            {dangMo || 'Mở ca'}
-          </NutChinh>
-        </div>
+        <button
+          type="button"
+          onClick={bamXemTruoc}
+          disabled={!cheDo || dangRut}
+          className="tap-target font-bold inline-flex items-center justify-center w-full"
+          style={{ minHeight: 48, gap: 6, marginTop: 'var(--k4)', borderRadius: 'var(--bo-1)', background: 'var(--the-2)', border: '1.5px solid var(--vien)', color: cheDo ? 'var(--muc)' : 'var(--mo)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}
+        >
+          <Eye size={16} /> {dangRut ? 'Đang rút thử…' : 'Xem trước một em'}
+        </button>
       </TheNoiDung>
 
       {/* XEM TRƯỚC — bảng câu của một em, kèm LÝ DO chọn từng câu */}
