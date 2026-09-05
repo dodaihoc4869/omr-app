@@ -63,6 +63,7 @@ interface Gs {
   LUOT_HEADERS: string[]
   caDangKhoa_: (ca: { trangThai: string } | null) => boolean
   quyetDinhVaoThi_: (ca: Record<string, unknown>, luot: unknown, id: string, now: number) => { ok: boolean; lyDo?: string }
+  idBang_: () => string
   __sheets: Record<string, SheetGia>
 }
 
@@ -91,7 +92,7 @@ function dungGs(): Gs {
     'Utilities',
     'Logger',
     'DriveApp',
-    `${gsCode}\nreturn { doPost, CA_HEADERS, LUOT_HEADERS, caDangKhoa_, quyetDinhVaoThi_ }`,
+    `${gsCode}\nreturn { doPost, CA_HEADERS, LUOT_HEADERS, caDangKhoa_, quyetDinhVaoThi_, idBang_ }`,
   )
   const g = fn(SpreadsheetApp, ContentService, PropertiesService, LockService, Utilities, Logger, DriveApp) as Gs
   g.__sheets = sheets
@@ -293,5 +294,28 @@ describe('PHÉP KIỂM 9 — luuTam chịu được mất mạng', () => {
     globalThis.fetch = (async () => ({ ok: true, json: async () => ({ ok: false, lyDo: 'da_dong' }) })) as unknown as typeof fetch
     await expect(luuTam('https://x', '123456', '001', { phanI: {}, phanII: {}, phanIII: {} })).resolves.toBe(false)
     globalThis.fetch = goc
+  })
+})
+
+// ---------------------------------------------------------------- CẤU HÌNH
+// SỰ CỐ 05/09/2026: dán cả file .gs trong repo đè lên bản đang chạy đã XOÁ
+// SPREADSHEET_ID thật của thầy (repo công khai nên hằng trong file buộc phải là
+// chỗ trống mẫu). Máy chủ chết 4 phút. Nay ID đọc từ Script properties trước,
+// hằng chỉ là đường lui — và test này chặn ai đó gỡ mất cơ chế ấy.
+describe('ID bảng tính không được nằm cứng trong file', () => {
+  it('hằng trong repo VẪN phải là chỗ trống mẫu — không được commit ID thật', () => {
+    const m = gsCode.match(/const\s+SPREADSHEET_ID\s*=\s*'([^']*)'/)
+    expect(m).toBeTruthy()
+    expect(m![1]).toContain('DÁN_ID')
+  })
+
+  it('mọi lời gọi openById đi qua idBang_(), không dùng thẳng hằng', () => {
+    expect(gsCode).not.toMatch(/SpreadsheetApp\.openById\(SPREADSHEET_ID\)/)
+    expect(gsCode).toMatch(/SpreadsheetApp\.openById\(idBang_\(\)\)/)
+  })
+
+  it('idBang_ lấy Script property trước, hằng chỉ là đường lui', () => {
+    // dungGs chỉ trả MA_BI_MAT nên property SPREADSHEET_ID rỗng → phải về hằng.
+    expect(dungGs().idBang_()).toContain('DÁN_ID')
   })
 })

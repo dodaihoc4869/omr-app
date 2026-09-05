@@ -6,7 +6,9 @@
 //
 // 1. Mở https://script.google.com → "Dự án mới" (New project).
 // 2. Xoá hết code mẫu, dán TOÀN BỘ nội dung file này vào.
-// 3. Đổi SPREADSHEET_ID bên dưới thành ID của 1 Google Sheet thầy đã tạo
+// 3. Vào Cài đặt dự án → Thuộc tính tập lệnh → thêm SPREADSHEET_ID = ID của
+//    Google Sheet thầy đã tạo (KHÔNG sửa hằng trong file — dán file mới đè lên
+//    là mất). Chưa đặt thuộc tính thì mới sửa hằng SPREADSHEET_ID bên dưới.
 //    (mở sheet đó, lấy đoạn ký tự trong URL giữa /d/ và /edit).
 // 4. Bấm biểu tượng đĩa mềm để lưu (Ctrl+S).
 // 5. Bấm "Triển khai" (Deploy) → "Triển khai mới" (New deployment) → chọn
@@ -45,6 +47,22 @@
 // ============================================================================
 
 const SPREADSHEET_ID = 'DÁN_ID_GOOGLE_SHEET_CỦA_THẦY_VÀO_ĐÂY'
+
+/** ID BẢNG TÍNH THẬT — đọc từ Script properties trước, hằng bên trên chỉ là
+ * đường lui.
+ *
+ * Vì sao: file này nằm trong repo CÔNG KHAI nên hằng bên trên buộc phải là chỗ
+ * trống mẫu. Dán cả file đè lên bản đang chạy là xoá mất ID thật của thầy và
+ * máy chủ chết ngay — đã xảy ra một lần, 05/09/2026. Đặt ID vào Script
+ * properties (Cài đặt dự án → Thuộc tính tập lệnh → thêm `SPREADSHEET_ID`) thì
+ * từ nay dán đè bao nhiêu lần cũng không mất. */
+function idBang_() {
+  try {
+    const p = (PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID') || '').trim()
+    if (p) return p
+  } catch (err) {}
+  return SPREADSHEET_ID
+}
 const SHEET_CA = 'CaKiemTra'
 const SHEET_BAILAM = 'BaiLam'
 const SHEET_PHUHUYNH = 'PhuHuynh'
@@ -196,7 +214,7 @@ function kiemTraMaBiMat_(body) {
 // → Chạy → Google hỏi cấp quyền Sheet + Drive (bấm Cho phép). Hàm tự ghi/đọc
 // thử 1 file JSON trong thư mục Drive rồi xoá — xem kết quả ở Nhật ký thực thi.
 function capQuyenVaKiemTra() {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const ss = SpreadsheetApp.openById(idBang_())
   const folder = driveFolder_()
   const ref = luuJsonLon_('_kiem_tra', { ok: true, luc: new Date().toISOString() }, '')
   const doc = docJsonLon_(ref)
@@ -205,7 +223,7 @@ function capQuyenVaKiemTra() {
 }
 
 function getSheet_(name, headers) {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const ss = SpreadsheetApp.openById(idBang_())
   let sh = ss.getSheetByName(name)
   if (!sh) {
     sh = ss.insertSheet(name)
@@ -419,7 +437,7 @@ function chuanNamSinh_(v) {
 /** Tra một em trong bản sao danh sách lớp. Trả null nếu chưa đẩy hoặc không có. */
 function timTrongDanhSachLop_(sbd) {
   try {
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const ss = SpreadsheetApp.openById(idBang_())
     const sh = ss.getSheetByName(SHEET_DSLOP)
     if (!sh) return null
     const data = sh.getDataRange().getValues()
@@ -470,7 +488,7 @@ function donEmNgoaiDanhSach() {
     [SHEET_NHANXET, 0],
     [SHEET_YEUCAU, 1],
   ]
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const ss = SpreadsheetApp.openById(idBang_())
   const daXoa = {}
   let tongDong = 0
 
@@ -501,7 +519,7 @@ function donEmNgoaiDanhSach() {
 /** Đọc TOÀN BỘ bản sao danh sách học sinh (một lần đọc sheet). */
 function docDanhSachLop_() {
   try {
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const ss = SpreadsheetApp.openById(idBang_())
     const sh = ss.getSheetByName(SHEET_DSLOP)
     if (!sh || sh.getLastRow() < 2) return []
     const data = sh.getDataRange().getValues()
@@ -521,7 +539,7 @@ function docDanhSachLop_() {
  * bật tính năng này lên mà chặn sạch cả trung tâm thì hỏng buổi dạy. */
 function coDanhSachHocSinh_() {
   try {
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const ss = SpreadsheetApp.openById(idBang_())
     const sh = ss.getSheetByName(SHEET_DSLOP)
     return !!sh && sh.getLastRow() > 1
   } catch (err) {
