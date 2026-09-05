@@ -8,9 +8,17 @@
 //
 // Phép kiểm số 3 là quan trọng nhất: bản ghi cất đi không được chứa mã bí mật
 // lẫn mật khẩu ở bất kỳ trường nào.
+//
+// TIMEOUT RỘNG cho mọi phép kiểm chạm tới mã hoá: 210.000 vòng PBKDF2 mất vài
+// trăm mili giây trên máy thầy, nhưng máy chạy CI chậm hơn hẳn và một `it` gọi
+// tới năm lần dẫn xuất khoá thì vượt mốc 5 giây mặc định. Đây KHÔNG phải nới
+// test — số vòng thật vẫn nguyên, chỉ cho nó đủ thời gian chạy.
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
+
+/** Đủ rộng cho máy chạy CI chậm nhất. */
+const HAN = 60_000
 import {
   CHO_BAN_DAU_GIAY,
   CHO_TOI_DA_GIAY,
@@ -39,7 +47,7 @@ describe('1 + 2. mã hoá và giải mã', () => {
   it('1. đặt rồi mở bằng đúng mật khẩu → ra ĐÚNG mã bí mật ban đầu', async () => {
     const b = await datMatKhau(MK, MA_BI_MAT)
     expect(await moKhoa(MK, b)).toBe(MA_BI_MAT)
-  })
+   }, HAN)
 
   it('2. mật khẩu sai → null, KHÔNG ném lỗi lộ thông tin', async () => {
     const b = await datMatKhau(MK, MA_BI_MAT)
@@ -48,13 +56,13 @@ describe('1 + 2. mã hoá và giải mã', () => {
     // nó đang đi đúng hướng.
     await expect(moKhoa(MK, { ...b, maHoa: b.maHoa.slice(0, -4) + 'AAAA' })).resolves.toBeNull()
     await expect(moKhoa(MK, { ...b, muoi: 'khong-phai-base64!!' })).resolves.toBeNull()
-  })
+   }, HAN)
 
   it('mã bí mật có dấu tiếng Việt và ký tự lạ vẫn ra nguyên vẹn', async () => {
     const ma = 'Mã-bí-mật · Đỗ Đại Học · 100%'
     const b = await datMatKhau(MK, ma)
     expect(await moKhoa(MK, b)).toBe(ma)
-  })
+   }, HAN)
 })
 
 describe('3. BẢN GHI KHÔNG CHỨA MÃ BÍ MẬT LẪN MẬT KHẨU — phép kiểm quan trọng nhất', () => {
@@ -65,13 +73,13 @@ describe('3. BẢN GHI KHÔNG CHỨA MÃ BÍ MẬT LẪN MẬT KHẨU — phép 
     expect(s).not.toContain(MK)
     // cũng không có dạng băm để "kiểm tra nhanh" — mục 9 cấm
     expect(Object.keys(b).sort()).toEqual(['hoiLai', 'iv', 'maHoa', 'mocMoLai', 'muoi', 'soLanSai', 'soVong'])
-  })
+   }, HAN)
 
   it('mã bí mật không lọt ra kể cả dưới dạng base64', async () => {
     const b = await datMatKhau(MK, MA_BI_MAT)
     const s = JSON.stringify(b)
     expect(s).not.toContain(Buffer.from(MA_BI_MAT, 'utf8').toString('base64'))
-  })
+   }, HAN)
 })
 
 describe('4. muối ngẫu nhiên', () => {
@@ -84,7 +92,7 @@ describe('4. muối ngẫu nhiên', () => {
     // nhưng cả hai vẫn mở ra đúng một thứ
     expect(await moKhoa(MK, a)).toBe(MA_BI_MAT)
     expect(await moKhoa(MK, b)).toBe(MA_BI_MAT)
-  })
+   }, HAN)
 
   it('muối 16 byte, IV 12 byte, đúng số vòng đã chốt', async () => {
     const b = await datMatKhau(MK, MA_BI_MAT)
@@ -92,7 +100,7 @@ describe('4. muối ngẫu nhiên', () => {
     expect(Buffer.from(b.iv, 'base64')).toHaveLength(DAI_IV)
     expect(b.soVong).toBe(SO_VONG_PBKDF2)
     expect(SO_VONG_PBKDF2).toBe(210000)
-  })
+   }, HAN)
 })
 
 describe('5. đổi mật khẩu', () => {
@@ -102,19 +110,19 @@ describe('5. đổi mật khẩu', () => {
     expect(b2).not.toBeNull()
     expect(await moKhoa('matkhaumoi', b2!)).toBe(MA_BI_MAT)
     expect(await moKhoa(MK, b2!)).toBeNull()
-  })
+   }, HAN)
 
   it('mật khẩu cũ sai → null, không đổi gì', async () => {
     const b = await datMatKhau(MK, MA_BI_MAT)
     expect(await doiMatKhau('sai', 'matkhaumoi', b)).toBeNull()
     expect(await moKhoa(MK, b)).toBe(MA_BI_MAT)
-  })
+   }, HAN)
 
   it('giữ nguyên nấc hỏi lại khi đổi mật khẩu', async () => {
     const b = await datMatKhau(MK, MA_BI_MAT, 'sau_15_phut')
     const b2 = await doiMatKhau(MK, 'matkhaumoi', b)
     expect(b2!.hoiLai).toBe('sau_15_phut')
-  })
+   }, HAN)
 })
 
 describe('6 + 7. chống dò', () => {
@@ -169,7 +177,7 @@ describe('8. mật khẩu tối thiểu 6 ký tự', () => {
     expect(hopLeMatKhau('12345')).toBe(false)
     expect(hopLeMatKhau('123456')).toBe(true)
     await expect(datMatKhau('12345', MA_BI_MAT)).rejects.toThrow()
-  })
+   }, HAN)
 
   it('KHÔNG ép chữ hoa, chữ số, ký tự đặc biệt', () => {
     // Ép phức tạp trên điện thoại chỉ dẫn tới việc thầy viết mật khẩu ra giấy
