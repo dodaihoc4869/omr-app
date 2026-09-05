@@ -3,7 +3,7 @@
 // này CHỈ còn 3 việc: chọn đề · lớp & thời gian · cách công bố điểm → Mở ca.
 // Không còn mục dán link, không xoá đề ở đây (xoá ở Ngân hàng câu hỏi).
 import { useEffect, useMemo, useState } from 'react'
-import { CheckSquare, Square, Library, Copy, Check } from 'lucide-react'
+import { CheckSquare, Square, Library, Copy, Check, ClipboardCheck, Stethoscope } from 'lucide-react'
 import { mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
 import KhoiRutDe from '../components/KhoiRutDe'
 import HopChonDe from '../components/HopChonDe'
@@ -12,7 +12,9 @@ import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import { randomSessionCode, taoLinkMoi } from '../lib/ca-link'
 import { TheNoiDung, Hang, OThongBao, NutChinh } from '../components/DesignSystem'
 import NutDongBo from '../components/NutDongBo'
-import { chuoi, danhSachEm, khoiTuNamSinh, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
+import { chuoi, danhSachEm, hoSoEm, khoiTuNamSinh, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
+import KhoiCaChanDoan, { type EmChanDoan } from '../components/KhoiCaChanDoan'
+import { type CaKiemChung, type HoSoEm as HoSoEmChanDoan, type ThongKeChuyenDe } from '../lib/ca-chan-doan'
 import { docSoCauCa, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, luuSoCauCa, saveSessionTeacherBank } from '../lib/exam-db'
 import { dongBoNganHang } from '../lib/exam-sync'
 import { useAppStore } from '../store/appStore'
@@ -146,6 +148,12 @@ export default function ExamSetupScreen() {
   const [daCopy, setDaCopy] = useState(false)
   // Mã bí mật — mọi lệnh đọc dữ liệu học sinh của thầy đều phải kèm (BA-APP đợt 1).
   const [maBiMat, setMaBiMat] = useState('')
+  // HAI LOẠI CA (MOCAVAGOILENBANG mục 1). Một nút "Mở ca" cho hai việc khác
+  // hẳn nhau là nguồn gốc mọi rối, nên chọn loại TRƯỚC rồi mới soạn.
+  //   kiểm tra  — lấy điểm, cả lớp một đề, có chống gian lận, vào sổ điểm
+  //   chẩn đoán — lấy dữ liệu phân công lên bảng, mỗi em một bộ, 15 phút,
+  //               KHÔNG chống gian lận, KHÔNG vào sổ điểm, KHÔNG Phần III
+  const [loaiCa, setLoaiCa] = useState<'kiem_tra' | 'chan_doan' | null>(null)
 
   useEffect(() => {
     let huy = false
@@ -282,6 +290,75 @@ export default function ExamSetupScreen() {
     }
   }
 
+  // ------------------------------------------------------- CA CHẨN ĐOÁN
+  // Em vào ca chẩn đoán = danh sách lớp đang có. Ca này không dùng phạm vi
+  // "theo khối"/"chọn từng em" của ca kiểm tra: buổi học nào thì cả lớp đó làm.
+  const emChanDoan: EmChanDoan[] = useMemo(() => (dsDangKy ?? []).filter((e) => !lop.trim() || e.lop === lop.trim()).map((e) => ({ sbd: e.sbd, hoTen: e.hoTen })), [dsDangKy, lop])
+
+  /** Hồ sơ chuyên đề của từng em, lấy song song có chặn 6 luồng — 27 lời gọi
+   * tuần tự là gần hai phút, thầy đứng lớp không đợi được.
+   *
+   * KHÔNG ĐOÁN phần máy chủ không trả về: `buoiChuaDo` và `daiDang` cần lịch sử
+   * theo buổi mà hồ sơ hiện chỉ có số cộng dồn, nên để 0 và false. Em gọi lỗi
+   * thì trả hồ sơ RỖNG (vẫn rút được câu, chỉ là không chọn được chuyên đề cũ)
+   * chứ không bịa số. */
+  const layHoSoChanDoan = async (ds: EmChanDoan[]): Promise<HoSoEmChanDoan[]> => {
+    const url = scriptUrl.trim()
+    const mat = maBiMat.trim()
+    const ra: HoSoEmChanDoan[] = []
+    const hang = [...ds]
+    const chay = async () => {
+      for (;;) {
+        const e = hang.shift()
+        if (!e) return
+        let cd: Record<string, ThongKeChuyenDe> = {}
+        if (url && mat) {
+          try {
+            const h = await hoSoEm(url, { secret: mat, sbd: e.sbd })
+            cd = Object.fromEntries(h.chuyenDe.map((c) => [c.ten, { tiLeSai: c.soCau > 0 ? c.soSai / c.soCau : 0, buoiChuaDo: 0, daiDang: false, chuaTungDo: c.soCau === 0 }]))
+          } catch {
+            cd = {}
+          }
+        }
+        ra.push({ sbd: e.sbd, ten: e.hoTen, chuyenDe: cd, daRa: qidCaTruoc })
+      }
+    }
+    await Promise.all(Array.from({ length: Math.min(6, ds.length) }, chay))
+    // Giữ đúng thứ tự danh sách để chạy lại ra kết quả y hệt.
+    const theoSbd = new Map(ra.map((h) => [h.sbd, h]))
+    return ds.map((e) => theoSbd.get(e.sbd)!).filter(Boolean)
+  }
+
+  const moCaChanDoan = async (ket: CaKiemChung, nguonDaChon: TeacherExamSource[]) => {
+    if (!scriptUrl.trim()) return showToast('Chưa cấu hình link Apps Script', 'error')
+    if (!lop.trim()) return showToast('Chưa nhập lớp', 'error')
+    if (emChanDoan.length === 0) return showToast('Chưa có em nào trong lớp này — nạp danh sách trước', 'error')
+    const maCa = randomSessionCode()
+    // Gói công khai chứa HỢP của lõi chung và mọi bộ riêng; `boTheoEm` nói em
+    // nào làm câu nào. Không có đáp án, đúng như mọi gói gửi máy chủ.
+    const dungId = new Set<string>([...ket.loiChung.map((c) => c.id), ...Object.values(ket.theoEm).flatMap((r) => r.map((c) => c.id))])
+    const nguonCa = locNguonTheoId(nguonDaChon, dungId)
+    const bank = mergeAndStrip(nguonCa)
+    const boTheoEm: Record<string, string[]> = {}
+    for (const e of emChanDoan) boTheoEm[e.sbd] = [...ket.loiChung.map((c) => c.id), ...(ket.theoEm[e.sbd] ?? []).map((c) => c.id)]
+    const goi = { ...bank, boTheoEm }
+    const moc = await publishSession(scriptUrl.trim(), maCa, lop.trim(), 15, goi, 'ngay', mergeKeepAnswers(nguonCa), {
+      batDau: '',
+      hanVaoPhut: 15,
+      tenCa: tenCa.trim() || `Chẩn đoán ${lop.trim()}`,
+      phamVi: 'chon',
+      danhSachMoi: emChanDoan.map((e) => e.sbd),
+      // Ca chẩn đoán KHÔNG chống gian lận: em biết ca không lấy điểm, mà vẫn
+      // khoá bài vì rời màn thì hỏng buổi học chứ không thu được gì.
+      nguongLan: 0,
+      nguongGiay: 0,
+    })
+    await saveSessionTeacherBank(maCa, nguonCa)
+    setOpened({ maCa, joinLink: await taoLinkMoi(maCa, scriptUrl.trim()), batDau: moc.batDau, hetHanVao: moc.hetHanVao })
+    setDaCopy(false)
+    showToast(`Đã mở ca chẩn đoán — ${ket.giayUocTinh}s, ${ket.soTinHieu} tín hiệu`, 'success')
+  }
+
   const copyLink = () => {
     if (!opened) return
     navigator.clipboard.writeText(opened.joinLink).then(() => {
@@ -327,6 +404,69 @@ export default function ExamSetupScreen() {
         <button onClick={() => setOpened(null)} className="tap-target" style={NHAN_NHO}>
           ← Mở ca khác
         </button>
+      </div>
+    )
+  }
+
+  // ------------------------------------------------- CHỌN LOẠI CA (mục 1)
+  // Trước khi soạn phải biết đang mở ca gì: hai loại khác nhau ở TÁM chỗ, từ
+  // thời lượng tới việc có vào sổ điểm hay không.
+  if (loaiCa === null) {
+    const The = ({ id, ten, phu, icon }: { id: 'kiem_tra' | 'chan_doan'; ten: string; phu: string[]; icon: React.ReactNode }) => (
+      <button
+        type="button"
+        onClick={() => setLoaiCa(id)}
+        aria-label={`Mở ca ${ten.toLowerCase()}`}
+        className="tap-target text-left flex flex-col"
+        style={{ gap: 'var(--k2)', minHeight: 132, padding: 'var(--k5)', borderRadius: 'var(--bo-3)', background: 'var(--the)', border: '2px solid var(--vien)', boxShadow: 'var(--bong-1)' }}
+      >
+        <span style={{ color: id === 'kiem_tra' ? 'var(--tim)' : 'var(--xanh)' }}>{icon}</span>
+        <span className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', color: 'var(--muc)' }}>
+          {ten}
+        </span>
+        {phu.map((d) => (
+          <span key={d} style={NHAN_NHO}>
+            {d}
+          </span>
+        ))}
+      </button>
+    )
+    return (
+      <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
+        <div className="flex items-center justify-between">
+          <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
+            Mở ca
+          </h1>
+          <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target">
+            ← Kiểm tra
+          </button>
+        </div>
+        <div style={NHAN_NHO}>Hai việc khác hẳn nhau, đừng dùng chung một nút. Chọn loại ca trước.</div>
+        <div className="grid grid-cols-2" style={{ gap: 'var(--k3)' }}>
+          <The id="kiem_tra" ten="KIỂM TRA" phu={['lấy điểm', 'cả lớp một đề', 'vào sổ điểm']} icon={<ClipboardCheck size={26} />} />
+          <The id="chan_doan" ten="CHẨN ĐOÁN" phu={['lấy dữ liệu', 'mỗi em một bộ', '15 phút · không vào sổ']} icon={<Stethoscope size={26} />} />
+        </div>
+      </div>
+    )
+  }
+
+  // ------------------------------------------------ CA CHẨN ĐOÁN (mục 3, 4)
+  if (loaiCa === 'chan_doan') {
+    return (
+      <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
+        <div className="flex items-center justify-between">
+          <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
+            Ca chẩn đoán · 15 phút
+          </h1>
+          <button onClick={() => setLoaiCa(null)} style={NHAN_NHO} className="tap-target">
+            ← Chọn loại ca
+          </button>
+        </div>
+        <TheNoiDung>
+          <div style={NHAN_NHO}>Lớp</div>
+          <input value={lop} onChange={(e) => setLop(e.target.value)} placeholder="11A1" style={{ ...O_NHAP, marginTop: 'var(--k2)' }} aria-label="Lớp của ca chẩn đoán" />
+        </TheNoiDung>
+        <KhoiCaChanDoan nguon={savedSources} dsEm={emChanDoan} layHoSo={layHoSoChanDoan} moCa={moCaChanDoan} showToast={showToast} />
       </div>
     )
   }

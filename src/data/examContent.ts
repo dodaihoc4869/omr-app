@@ -176,6 +176,16 @@ export interface PublicExamBank {
   phanII: TrueFalseQuestion[]
   phanIII: ShortAnswerQuestion[]
   soCau?: SoCauMoiPhan
+  /** CA CHẨN ĐOÁN (MOCAVAGOILENBANG mục 3–4): bộ câu của TỪNG em, sbd → id câu.
+   *
+   * Ca kiểm tra cắt câu cho mỗi em bằng seed `maCa:sbd` — ngẫu nhiên là đủ vì
+   * mục đích là lấy điểm. Ca chẩn đoán thì không: câu của mỗi em được CHỌN
+   * theo hồ sơ em ấy (chuyên đề đến hạn đo), nên phải gửi kèm bản đồ này.
+   *
+   * Bảng chỉ nói em nào làm câu nào — KHÔNG có đáp án, đúng như phần còn lại
+   * của gói công khai. Em không có tên trong bảng (vào muộn, ngoài danh sách)
+   * rơi về cách cắt theo seed như cũ, không bị chặn khỏi ca. */
+  boTheoEm?: Record<string, string[]>
 }
 
 /** Đề thầy soạn (1 lần tải lên = 1 TeacherExamSource), có đáp án — chỉ ở máy thầy. */

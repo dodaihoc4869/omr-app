@@ -47,6 +47,23 @@ function soDuong(v: unknown, macDinh: number): number {
 export function assignStudentQuestions(bank: PublicExamBank, maCa: string, sbd: string): StudentAssignment {
   const base = `${maCa}:${sbd}`
   const can = bank.soCau
+
+  // CA CHẨN ĐOÁN — bộ câu của em ĐÃ ĐƯỢC CHỌN sẵn theo hồ sơ em ấy, không cắt
+  // lại theo seed. Cắt lại là hỏng cả mục đích: câu cũ phải đúng chuyên đề đến
+  // hạn đo, còn lõi chung phải giống hệt nhau ở mọi em mới tính được doChum.
+  // Em không có tên trong bảng (vào muộn, ngoài danh sách) rơi về cách cũ.
+  const rieng = bank.boTheoEm?.[sbd]
+  if (rieng && rieng.length) {
+    const cua = new Set(rieng)
+    return {
+      phanI: bank.phanI
+        .filter((q) => cua.has(q.id))
+        .map((q) => ({ qid: q.id, question: q, choicePerm: seededPermutation(4, hashSeed(`choice:${base}:${q.id}`)) })),
+      phanII: bank.phanII.filter((q) => cua.has(q.id)).map((q) => ({ qid: q.id, question: q })),
+      phanIII: bank.phanIII.filter((q) => cua.has(q.id)).map((q) => ({ qid: q.id, question: q })),
+    }
+  }
+
   const phanIQs = pick(bank.phanI, soDuong(can?.I, PHAN_I_NEED), `${base}:phanI`)
   const phanIIQs = pick(bank.phanII, soDuong(can?.II, PHAN_II_NEED), `${base}:phanII`)
   const phanIIIQs = pick(bank.phanIII, soDuong(can?.III, PHAN_III_NEED), `${base}:phanIII`)
