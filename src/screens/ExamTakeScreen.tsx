@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
-import { vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, CHU_KY_LUU_TAM_GIAY, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { dungPhieuMayEm, type PhieuDayDu } from '../lib/phieu-du-lieu'
 import PhieuScreen from './PhieuScreen'
@@ -579,8 +579,6 @@ export default function ExamTakeScreen() {
 
   // Gửi trạng thái làm bài lên máy chủ theo lô mỗi 10 giây (GIAO-DIEN-LAM-BAI.md
   // "Lưu bài"): ngay khi vào thi + định kỳ, không cần đợi em thao tác gì.
-  // Đáp án chi tiết chỉ gửi lúc nộp (submitAnswers) — Apps Script hiện chỉ
-  // nhận trạng thái tiến độ giữa chừng, không nhận đáp án từng câu.
   useEffect(() => {
     if (phase !== 'exam') return
     if (attemptRef.current) pushStatusNow(attemptRef.current, true)
@@ -588,6 +586,31 @@ export default function ExamTakeScreen() {
       if (attemptRef.current) pushStatusNow(attemptRef.current, true)
     }, 10000)
     return () => clearInterval(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase])
+
+  // LƯU TẠM ĐÁP ÁN lên máy chủ mỗi 20 giây (CATHIVAGOILENBANG mục 1).
+  //
+  // Vì sao phải có: thầy khoá ca giữa giờ thì máy chủ chấm PHẦN ĐÃ LÀM của em
+  // đang làm dở. Không có bản lưu tạm này thì máy chủ chẳng có gì để chấm — em
+  // ngồi làm 30 phút xong nhận 0 điểm.
+  //
+  // Chạy nền: không spinner, không toast, mất mạng một nhịp thì bỏ qua nhịp
+  // đó — nhịp sau ghi đè đủ. Không bao giờ chặn thao tác của em.
+  useEffect(() => {
+    if (phase !== 'exam') return
+    const luu = () => {
+      const a = attemptRef.current
+      const url = scriptUrlRef.current.trim()
+      if (!a || !url) return
+      void luuTam(url, a.maCa, a.sbd, a.answers, giayCauRef.current)
+    }
+    const id = setInterval(luu, CHU_KY_LUU_TAM_GIAY * 1000)
+    return () => {
+      clearInterval(id)
+      // Rời màn làm bài (nộp, hết giờ, đóng tab) thì lưu nốt nhịp cuối.
+      luu()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
 

@@ -317,6 +317,42 @@ export async function submitAnswers(
   return { keyBank: result.keyBank ?? null, congBo: result.congBo ?? (result.keyBank ? 'ngay' : 'khong') }
 }
 
+/** Chu kỳ máy em tự lưu bài đang làm lên máy chủ. 20 giây: đủ dày để khoá ca
+ * giữa giờ không thổi bay quá một phần tư phút làm bài của em, đủ thưa để 30
+ * máy trong phòng không nện Apps Script (30 em × 3 lần/phút = 90 lần/phút). */
+export const CHU_KY_LUU_TAM_GIAY = 20
+
+/**
+ * LƯU TẠM bài đang làm (CATHIVAGOILENBANG mục 1).
+ *
+ * Gọi nền, KHÔNG chặn thao tác của em, KHÔNG hiện lỗi ra màn hình: mất mạng
+ * một nhịp thì bỏ qua nhịp đó, nhịp sau ghi đè đủ. Trả về true khi máy chủ đã
+ * nhận, để chỗ gọi biết mà không phải tự đoán.
+ */
+export async function luuTam(scriptUrl: string, maCa: string, sbd: string, dapAn: AnswerRecord, giayCau?: Record<string, number>): Promise<boolean> {
+  try {
+    const r = await postJson(scriptUrl, { action: 'luuTam', maCa, sbd, dapAn, giayCau })
+    return !!r?.ok
+  } catch {
+    return false
+  }
+}
+
+/** Thầy KHOÁ CA giữa giờ. Trả về số em đang làm bị nộp bài — để màn hình báo
+ * đúng con số thật chứ không nói chung chung. */
+export async function khoaCa(scriptUrl: string, secret: string, maCa: string, khoaBoi = 'thầy'): Promise<{ soEmBiNop: number; khoaLuc: string }> {
+  const r = await postJson(scriptUrl, { action: 'khoaCa', secret, maCa, khoaBoi })
+  if (!r.ok) throw new Error(r.error || 'Không khoá được ca')
+  return { soEmBiNop: Number(r.soEmBiNop) || 0, khoaLuc: String(r.khoaLuc || '') }
+}
+
+/** Thầy MỞ CA LẠI. Em đã bị nộp do khoá KHÔNG tự vào lại được — phải duyệt
+ * thi lại từng em, đúng như mọi trường hợp thi lại khác. */
+export async function moKhoaCa(scriptUrl: string, secret: string, maCa: string): Promise<void> {
+  const r = await postJson(scriptUrl, { action: 'moKhoaCa', secret, maCa })
+  if (!r.ok) throw new Error(r.error || 'Không mở lại được ca')
+}
+
 /** Trạng thái 1 lượt thi trên máy chủ (sheet LuotThi). */
 export type TrangThaiLuot = 'dang_lam' | 'da_nop' | 'khoa' | 'duoc_duyet_lai'
 
@@ -897,6 +933,10 @@ export interface CaTomTat {
   hanNop: string
   /** Thời điểm bị xoá mềm (chỉ có khi lấy danh sách ca đã xoá). */
   xoaLuc?: string
+  /** Dấu vết KHOÁ CA thủ công — ai khoá lúc nào, mở lại lúc nào. */
+  khoaLuc?: string
+  khoaBoi?: string
+  moKhoaLuc?: string
   daVao: number
   daNop: number
   canhBao: number

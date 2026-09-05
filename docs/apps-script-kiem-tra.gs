@@ -69,7 +69,11 @@ const DRIVE_FOLDER = 'OMR-APP-DATA'
 // Cột 18–19 thêm ở BA-APP đợt 3: Loai = 'thi' (mặc định, ô trống cũng là thi)
 // hoặc 'baitap' — BÀI TẬP VỀ NHÀ dùng CHUNG mọi thứ với ca thi, chỉ khác 5 điểm
 // (xem BA-APP.md mục 6). HanNop chỉ có nghĩa với bài tập.
-const CA_HEADERS = ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson', 'BatDau', 'HetHanVao', 'TrangThai', 'TenCa', 'PhamVi', 'DanhSachMoi', 'NguoiTao', 'XoaLuc', 'NguongLan', 'NguongGiay', 'Loai', 'HanNop']
+// KhoaLuc/KhoaBoi/MoKhoaLuc (cột 20–22): thầy KHOÁ CA thủ công giữa giờ —
+// CATHIVAGOILENBANG mục 1. Trạng thái ca vẫn dùng cột TrangThai sẵn có
+// ('mo' · 'dong' · 'da_xoa'); ba cột này chỉ ghi DẤU VẾT ai khoá lúc nào, để
+// sau còn đối chứng khi em kêu "con đang làm thì mất bài".
+const CA_HEADERS = ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson', 'BatDau', 'HetHanVao', 'TrangThai', 'TenCa', 'PhamVi', 'DanhSachMoi', 'NguoiTao', 'XoaLuc', 'NguongLan', 'NguongGiay', 'Loai', 'HanNop', 'KhoaLuc', 'KhoaBoi', 'MoKhoaLuc']
 // CHỐNG GIAN LẬN THEO MỨC (QUANLYCATHI mục 6): rời màn lần 1, 2 chỉ cảnh báo;
 // lần thứ NguongLan khoá bài; một lần rời quá NguongGiay giây khoá ngay. Thầy
 // chỉnh khi mở ca; ô trống = mặc định dưới đây.
@@ -275,7 +279,16 @@ function docCa_(sh, row) {
     nguongGiay: Number(v[16]) > 0 ? Number(v[16]) : NGUONG_GIAY_MAC_DINH,
     loai: String(v[17] || '') === 'baitap' ? 'baitap' : 'thi',
     hanNop: v[18] ? String(v[18]) : '',
+    khoaLuc: v[19] ? String(v[19]) : '',
+    khoaBoi: v[20] ? String(v[20]) : '',
+    moKhoaLuc: v[21] ? String(v[21]) : '',
   }
+}
+
+/** Ca ĐANG KHOÁ? Một chỗ trả lời, để ba lệnh vaoThi/luuTam/submit không mỗi
+ * nơi hiểu một kiểu. `da_xoa` cũng là khoá — ca đã xoá thì không nhận gì nữa. */
+function caDangKhoa_(ca) {
+  return !!ca && (ca.trangThai === 'dong' || ca.trangThai === 'da_xoa')
 }
 
 /** true = ca này là BÀI TẬP VỀ NHÀ (không đồng hồ đếm ngược, nộp muộn vẫn nhận). */
@@ -1809,7 +1822,14 @@ function doPost(e) {
     try {
       const caShS = sheetCa_()
       const caRowS = findRowByKey_(caShS, 0, body.maCa)
-      if (caRowS > 0) laBaiTapCa = laBaiTap_(docCa_(caShS, caRowS))
+      if (caRowS > 0) {
+        const caS = docCa_(caShS, caRowS)
+        // CA ĐÃ KHOÁ THÌ TỪ CHỐI (CATHIVAGOILENBANG mục 1.3). Bài của em đã
+        // được `khoaCa` nộp hộ theo bản lưu tạm rồi; nhận thêm ở đây là ghi đè
+        // lên bản đã chấm. Chặn ở máy chủ, không dựa vào giao diện đã ẩn nút.
+        if (caDangKhoa_(caS)) return jsonResponse_({ ok: false, lyDo: 'da_dong', error: 'Ca đã khoá — bài của em đã được nộp theo phần đã làm', serverNow: Date.now() })
+        laBaiTapCa = laBaiTap_(caS)
+      }
     } catch (err) {
       laBaiTapCa = false
     }
@@ -1868,6 +1888,90 @@ function doPost(e) {
       if (congBo === 'ngay' && ca.keyBankRef) keyBank = docJsonLon_(ca.keyBankRef)
     }
     return jsonResponse_({ ok: true, keyBank: keyBank, congBo: congBo, serverNow: Date.now() })
+  }
+
+  if (action === 'luuTam') {
+    // LƯU TẠM BÀI ĐANG LÀM (CATHIVAGOILENBANG mục 1). Máy em gọi mỗi 20 giây.
+    //
+    // Vì sao phải có: trước đây `DapAnJson` chỉ được ghi MỘT LẦN lúc bấm nộp.
+    // Thầy khoá ca giữa giờ thì em đang làm bị nộp với bàn tay trắng — 0 điểm
+    // cho bài em đã làm 30 phút. Có lưu tạm thì khoá ca chấm được phần đã làm.
+    //
+    // KHÔNG đổi TrangThai, KHÔNG ghi NopLuc: đây chỉ là bản nháp trên máy chủ.
+    // Ghi đè cùng dòng nên sheet không phình theo số lần lưu.
+    const maCa = String(body.maCa || '').trim()
+    const sbd = String(body.sbd || '').trim()
+    if (!maCa || !sbd) return jsonResponse_({ ok: false, lyDo: 'thieu', error: 'Thiếu mã ca hoặc số báo danh' })
+    const caShT = sheetCa_()
+    const caRowT = findRowByKey_(caShT, 0, maCa)
+    if (caRowT < 0) return jsonResponse_({ ok: false, lyDo: 'khong_co_ca', error: 'Không tìm thấy ca kiểm tra' })
+    // CHẶN Ở MÁY CHỦ, không dựa vào giao diện đã ẩn nút.
+    if (caDangKhoa_(docCa_(caShT, caRowT))) return jsonResponse_({ ok: false, lyDo: 'da_dong', error: 'Ca đã khoá — không lưu thêm được' })
+    const shT = sheetLuot_()
+    const luotT = luotMoiNhatTheoSbd_(shT, maCa)[sbd] || null
+    if (!luotT) return jsonResponse_({ ok: false, lyDo: 'chua_vao', error: 'Em này chưa vào thi' })
+    if (luotT.trangThai !== 'dang_lam') return jsonResponse_({ ok: false, lyDo: 'khong_dang_lam', error: 'Lượt này không còn đang làm (' + luotT.trangThai + ')' })
+    // Cột 9 DapAnJson · cột 21 CapNhatLuc · cột 22 GiayCauJson.
+    shT.getRange(luotT.row, 9).setValue(JSON.stringify(body.dapAn || {}))
+    shT.getRange(luotT.row, 21).setValue(new Date().toISOString())
+    if (body.giayCau) shT.getRange(luotT.row, 22).setValue(JSON.stringify(body.giayCau))
+    return jsonResponse_({ ok: true, serverNow: Date.now() })
+  }
+
+  if (action === 'khoaCa' || action === 'moKhoaCa') {
+    // KHOÁ CA / MỞ CA LẠI thủ công (CATHIVAGOILENBANG mục 1).
+    //
+    // KHOÁ làm BA việc, ĐÚNG THỨ TỰ này — đảo thứ tự là có em lọt vào giữa
+    // hai bước:
+    //   1. Đặt TrangThai = 'dong' để chặn mọi lượt vào mới NGAY LẬP TỨC
+    //   2. Mọi lượt 'dang_lam' chuyển 'da_nop', chấm theo bản LƯU TẠM gần nhất
+    //   3. Ghi KhoaLuc, KhoaBoi
+    //
+    // MỞ LẠI chỉ đưa TrangThai về 'mo'. Em đã bị nộp do khoá KHÔNG tự vào lại
+    // được — lượt của em là 'da_nop', muốn thi lại phải qua `duyetThiLai`
+    // từng em như mọi trường hợp khác.
+    const loi = kiemTraMaBiMat_(body)
+    if (loi) return jsonResponse_({ ok: false, error: loi })
+    const maCa = String(body.maCa || '').trim()
+    const caSh = sheetCa_()
+    const caRow = findRowByKey_(caSh, 0, maCa)
+    if (caRow < 0) return jsonResponse_({ ok: false, error: 'Không có ca ' + maCa })
+    const ca = docCa_(caSh, caRow)
+    if (ca.trangThai === 'da_xoa') return jsonResponse_({ ok: false, error: 'Ca này đã bị xoá' })
+    const luc = new Date().toISOString()
+    const lock = LockService.getScriptLock()
+    lock.waitLock(15000)
+    try {
+      if (action === 'moKhoaCa') {
+        if (ca.trangThai !== 'dong') return jsonResponse_({ ok: false, error: 'Ca đang mở, không cần mở lại' })
+        caSh.getRange(caRow, 10).setValue('mo')
+        caSh.getRange(caRow, 22).setValue(luc)
+        return jsonResponse_({ ok: true, trangThai: 'mo', moKhoaLuc: luc, serverNow: Date.now() })
+      }
+      if (ca.trangThai === 'dong') return jsonResponse_({ ok: false, error: 'Ca đã khoá rồi' })
+      // (1) chặn vào mới trước tiên
+      caSh.getRange(caRow, 10).setValue('dong')
+      // (2) nộp hộ em đang làm, theo bản lưu tạm gần nhất
+      const sh = sheetLuot_()
+      const data = sh.getDataRange().getValues()
+      let daNop = 0
+      for (let i = 1; i < data.length; i++) {
+        if (String(data[i][0]) !== maCa) continue
+        const l = docLuot_(data[i])
+        if (l.trangThai !== 'dang_lam') continue
+        const ghiChu = (l.ghiChu ? l.ghiChu + ' · ' : '') + 'thầy khoá ca ' + luc.slice(11, 16) + 'Z, nộp phần đã làm'
+        // Cột 7 NopLuc · 8 TrangThai. KHÔNG đụng cột 9 DapAnJson: giữ nguyên
+        // bản lưu tạm cuối cùng — đó chính là phần em đã làm.
+        sh.getRange(i + 1, 7, 1, 2).setValues([[luc, 'da_nop']])
+        sh.getRange(i + 1, 20, 1, 2).setValues([[ghiChu, luc]])
+        daNop++
+      }
+      // (3) dấu vết
+      caSh.getRange(caRow, 20, 1, 2).setValues([[luc, String(body.khoaBoi || 'thầy')]])
+      return jsonResponse_({ ok: true, trangThai: 'dong', khoaLuc: luc, soEmBiNop: daNop, serverNow: Date.now() })
+    } finally {
+      lock.releaseLock()
+    }
   }
 
   if (action === 'registerParent') {
