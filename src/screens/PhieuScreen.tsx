@@ -655,7 +655,7 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false }: { duCoSan?: Ph
 
         {/* TIẾN BỘ */}
         {du.lichSu.length >= 2 && (
-          <Khoi tieu="Tiến bộ" ten="Điểm qua các bài đã làm" ghi={laCuaEm ? `${du.lichSu.length} bài em đã làm trên máy này, cũ nhất bên trái.` : `${du.lichSu.length} bài, cũ nhất bên trái.`} tat={tat}>
+          <Khoi tieu="Tiến bộ" ten="Điểm qua các bài đã làm" ghi={laCuaEm ? `${du.lichSu.length} bài em đã làm, cũ nhất bên trái.` : `${du.lichSu.length} bài, cũ nhất bên trái.`} tat={tat}>
             <DuongTienBo ds={du.lichSu} tat={tat} />
           </Khoi>
         )}

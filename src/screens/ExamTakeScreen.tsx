@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
-import { vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { lichSuEm as lichSuEmApi, vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
 import { goiCauHoi } from '../lib/hoi-bai'
 import TamTruotHoiBai, { type CauChon } from '../components/TamTruotHoiBai'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
@@ -379,7 +379,11 @@ export default function ExamTakeScreen() {
     // thẻ rỗng phần lời giải — không phải giấu, mà là thật sự không có.
     const trong = (qid: string, phan: 'I' | 'II' | 'III', soCau: number, de: string, luaChon: string[] | null, daChon: string): CauChon => ({
       qid,
-      chiTiet: { phan, soCau, qid, chuyenDe: '', mucDo: '', giay: giayCauRef.current?.[qid] ?? null, de, luaChon, dapAnDung: '', dapAnChon: daChon, chot: '', lyDo: null, buoc: null, ketQua: '', coHinh: false },
+      // Giây từng câu lấy từ CHÍNH lượt đã lưu, KHÔNG lấy từ ref đo dấu vết:
+      // ref đó khai báo mãi dưới thân hàm, mà khối này chạy ngay lần dựng đầu
+      // → "Cannot access before initialization", vỡ luôn màn Làm bài (thầy báo
+      // 06/09). `attempt.giayCau` có sẵn ở đây và là cùng một con số.
+      chiTiet: { phan, soCau, qid, chuyenDe: '', mucDo: '', giay: a.giayCau?.[qid] ?? null, de, luaChon, dapAnDung: '', dapAnChon: daChon, chot: '', lyDo: null, buoc: null, ketQua: '', coHinh: false },
     })
     return [
       ...assignment.phanI.map((x, i) => trong(x.qid, 'I', i + 1, x.question.text, [...(x.question.choices ?? [])], a.answers.phanI[x.qid] ?? '')),
@@ -468,25 +472,44 @@ export default function ExamTakeScreen() {
     }
   }
 
-  // LỊCH SỬ ĐIỂM TRÊN CHÍNH MÁY NÀY — để báo cáo của em có đường tiến bộ như
-  // bản gửi phụ huynh, mà không mở thêm đường đọc nào trên máy chủ.
+  // LỊCH SỬ ĐIỂM — để báo cáo của em có đường tiến bộ như bản gửi phụ huynh.
+  //
+  // THẦY CHỐT 06/09: lấy từ MÁY CHỦ, vì em đổi máy là mất sạch nếu chỉ đọc
+  // trong máy. Máy chủ khoá bằng lượt đã nộp + mã thiết bị nên đổi máy vẫn đủ
+  // lịch sử, mà đọc trộm theo số báo danh thì không qua được.
+  //
+  // Bản lưu trong máy GIỮ LẠI làm đường lùi: mất mạng ngay lúc nộp thì em vẫn
+  // thấy biểu đồ của những ca đã làm trên máy này, thay vì thấy trống trơn.
   const [lichSuEm, setLichSuEm] = useState<DiemMotCa[]>([])
   useEffect(() => {
     if (!attempt || !graded) return
     let con = true
     void (async () => {
+      const nay: DiemMotCa = { maCa: attempt.maCa, tenCa: attempt.tenCa || '', ngay: attempt.submittedAt || new Date().toISOString(), tong: graded.score.total, hang: null, siSo: null }
       try {
-        await luuDiemCuaEm({ maCa: attempt.maCa, sbd: attempt.sbd, tenCa: attempt.tenCa || '', ngay: attempt.submittedAt || new Date().toISOString(), tong: graded.score.total })
-        const ds = await docLichSuDiem(attempt.sbd)
-        if (con) setLichSuEm(ds.map((d) => ({ maCa: d.maCa, tenCa: d.tenCa, ngay: d.ngay, tong: d.tong, hang: null, siSo: null })))
+        await luuDiemCuaEm({ maCa: nay.maCa, sbd: attempt.sbd, tenCa: nay.tenCa, ngay: nay.ngay, tong: nay.tong })
       } catch {
-        // IndexedDB hỏng thì báo cáo chỉ thiếu đường biểu đồ, không sai số nào.
+        // IndexedDB hỏng thì bỏ qua bản lưu, vẫn còn đường máy chủ.
+      }
+      try {
+        const tren = await lichSuEmApi(scriptUrl.trim(), attempt.maCa, attempt.sbd, attempt.idThietBi || layIdThietBi())
+        if (con && tren.length > 0) return setLichSuEm(tren)
+      } catch {
+        // Mất mạng, hoặc máy chủ chưa triển khai bản mới — rơi về bản lưu
+        // trong máy chứ không để báo cáo trống.
+      }
+      try {
+        const ds = await docLichSuDiem(attempt.sbd)
+        const co = ds.map((d) => ({ maCa: d.maCa, tenCa: d.tenCa, ngay: d.ngay, tong: d.tong, hang: null, siSo: null }))
+        if (con) setLichSuEm(co.length > 0 ? co : [nay])
+      } catch {
+        if (con) setLichSuEm([nay])
       }
     })()
     return () => {
       con = false
     }
-  }, [attempt, graded])
+  }, [attempt, graded, scriptUrl])
 
   const phieuCuaEm: PhieuDayDu | null = useMemo(() => {
     if (!keyBank || !attempt || !graded) return null

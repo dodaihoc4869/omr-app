@@ -1660,6 +1660,92 @@ function doPost(e) {
     return jsonResponse_({ ok: true, soCau: qids.length, guiLuc: nay, ghiDe: row > 0 })
   }
 
+  // ------------------------------------------------- LỊCH SỬ ĐIỂM CỦA MỘT EM
+  //
+  // Báo cáo sau thi của em cần đường tiến bộ. Thầy chốt 06/09: phải lấy từ MÁY
+  // CHỦ, vì em đổi máy là mất sạch lịch sử nếu chỉ đọc trong máy.
+  //
+  // ĐÂY LÀ LỆNH ĐỌC CÔNG KHAI, không có mã bí mật (máy em không bao giờ có mã
+  // đó). Đọc theo SỐ BÁO DANH TRẦN thì ai biết số báo danh cũng đọc được cả
+  // quá trình học của em — mà số báo danh nằm ngay trên danh sách lớp. Nên
+  // khoá HAI LỚP, cả hai đều phải qua:
+  //
+  //   1. Phải có LƯỢT ĐÃ NỘP đúng cặp (maCa, sbd) — như khoá 1 của guiCauHoi.
+  //   2. `idThietBi` phải khớp lượt đó. Mã thiết bị sinh riêng từng máy và nằm
+  //      trong máy, nên chỉ CHÍNH CÁI MÁY vừa ngồi thi mới đọc được.
+  //
+  // Vì sao khoá 2 vẫn cho em đổi máy: em thi ca kế tiếp trên máy mới thì mỏ
+  // neo chính là lượt vừa nộp trên máy mới đó, còn lịch sử trả về vẫn đủ mọi
+  // ca cũ. Đổi máy không mất gì; lấy trộm bằng số báo danh thì không qua được.
+  //
+  // Trả về ĐÚNG những gì vẽ được đường tiến bộ: mã ca, tên ca, ngày, điểm.
+  // KHÔNG trả họ tên, không trả số điện thoại, không trả bài làm.
+  if (action === 'lichSuEm') {
+    const LOI_LS = { ok: false, error: 'Không xem được lịch sử' }
+    const maCa = String(body.maCa || '').trim()
+    const sbd = String(body.sbd || '').trim()
+    const idTb = String(body.idThietBi || '').trim()
+    if (!maCa || !sbd || !idTb) return jsonResponse_(LOI_LS)
+
+    const sh = sheetLuot_()
+    const n = sh.getLastRow()
+    if (n < 2) return jsonResponse_(LOI_LS)
+    // Hai dải hẹp: MaCa..TrangThai và cột Tong. Đọc cả bảng LuotThi là kéo
+    // theo ba cột JSON nặng, mỗi ô tới 50.000 ký tự.
+    const A = sh.getRange(1, 1, n, 8).getValues()
+    const T = sh.getRange(1, 17, n, 1).getValues()
+
+    let quaCong = false
+    for (let i = 1; i < A.length; i++) {
+      if (String(A[i][0]) !== maCa || String(A[i][1]) !== sbd) continue
+      const tt = String(A[i][7])
+      if (tt !== 'da_nop' && tt !== 'khoa') continue
+      if (String(A[i][3] || '') !== idTb) continue
+      quaCong = true
+      break
+    }
+    if (!quaCong) return jsonResponse_(LOI_LS)
+
+    // Tên ca: hai cột hẹp của CaKiemTra, không mở từng dòng bằng docCa_.
+    const caSh = sheetCa_()
+    const nCa = caSh.getLastRow()
+    const tenCua = {}
+    if (nCa >= 2) {
+      const cMa = caSh.getRange(1, 1, nCa, 1).getValues()
+      const cTen = caSh.getRange(1, 11, nCa, 1).getValues()
+      for (let i = 1; i < cMa.length; i++) tenCua[String(cMa[i][0])] = String(cTen[i][0] || '')
+    }
+
+    // MỘT CA MỘT DÒNG: em thi lại thì lấy lượt NỘP SAU CÙNG, đúng con số thầy
+    // nhìn thấy ở bảng điểm.
+    const theoCa = {}
+    for (let i = 1; i < A.length; i++) {
+      if (String(A[i][1]) !== sbd) continue
+      const tt = String(A[i][7])
+      if (tt !== 'da_nop' && tt !== 'khoa') continue
+      // Ô ĐIỂM RỖNG KHÔNG PHẢI ĐIỂM 0. `Number('')` ra 0 và lọt qua isFinite,
+      // nên lượt chưa chấm sẽ vẽ thành một chấm 0 điểm trên đường tiến bộ —
+      // em nhìn tưởng mình tụt hạng. Phải chặn ngay ở ô rỗng.
+      const oTong = T[i][0]
+      if (oTong === '' || oTong === null || oTong === undefined) continue
+      const tong = Number(oTong)
+      if (!isFinite(tong)) continue
+      const mc = String(A[i][0])
+      const nop = A[i][6] ? String(A[i][6]) : ''
+      const cu = theoCa[mc]
+      if (cu && String(cu.ngay) >= nop) continue
+      theoCa[mc] = { maCa: mc, tenCa: tenCua[mc] || '', ngay: nop, tong: tong }
+    }
+
+    const ds = []
+    for (const k in theoCa) ds.push(theoCa[k])
+    ds.sort(function (a, b) { return String(a.ngay).localeCompare(String(b.ngay)) })
+    // Trần số ca: đường tiến bộ vẽ được chừng này là quá đủ, và gói trả về
+    // không phình theo số năm em học.
+    const TRAN = 40
+    return jsonResponse_({ ok: true, items: ds.slice(-TRAN) })
+  }
+
   if (action === 'danhSachCauHoi') {
     const loi = kiemTraMaBiMat_(body)
     if (loi) return jsonResponse_({ ok: false, error: loi })

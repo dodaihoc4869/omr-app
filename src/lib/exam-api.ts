@@ -5,6 +5,7 @@
 import type { PublicExamBank, TeacherExamSource } from '../data/examContent'
 import type { AnswerRecord, IntegrityLog } from './exam-db'
 import type { CauHoiCuaEm, GoiCauHoi } from './hoi-bai'
+import type { DiemMotCa } from './phieu-du-lieu'
 import { dongBoGioMayChu } from './gio-may-chu'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
@@ -1120,6 +1121,28 @@ export async function guiCauHoi(scriptUrl: string, goi: GoiCauHoi): Promise<{ so
   const r = await postJson(scriptUrl, { action: 'guiCauHoi', ...goi })
   if (!r.ok) throw new Error(r.error || 'Không gửi được câu hỏi')
   return { soCau: Number(r.soCau) || 0, guiLuc: String(r.guiLuc || '') }
+}
+
+/** LỊCH SỬ ĐIỂM CỦA CHÍNH EM — để báo cáo sau thi vẽ đường tiến bộ.
+ *
+ * KHÔNG kèm mã bí mật: máy em không bao giờ có mã đó. Máy chủ khoá bằng hai
+ * lớp — phải có lượt ĐÃ NỘP đúng cặp (maCa, sbd), và `idThietBi` phải khớp
+ * lượt đó. Nhờ vậy đọc theo số báo danh trần không lấy được gì, mà em đổi máy
+ * vẫn thấy đủ lịch sử (mỏ neo là lượt vừa nộp trên máy mới). */
+export async function lichSuEm(scriptUrl: string, maCa: string, sbd: string, idThietBi: string): Promise<DiemMotCa[]> {
+  const r = await postJson(scriptUrl, { action: 'lichSuEm', maCa, sbd, idThietBi })
+  if (!r.ok) throw new Error(r.error || 'Không xem được lịch sử')
+  const ds = Array.isArray(r.items) ? r.items : []
+  return ds.map((x: { maCa?: string; tenCa?: string; ngay?: string; tong?: number }) => ({
+    maCa: String(x.maCa || ''),
+    tenCa: String(x.tenCa || ''),
+    ngay: String(x.ngay || ''),
+    tong: Number(x.tong) || 0,
+    // Máy chủ KHÔNG trả hạng và sĩ số ở đây: tính hạng đòi đọc điểm cả lớp,
+    // mà lệnh này là lệnh công khai — không mở đường đọc điểm em khác.
+    hang: null,
+    siSo: null,
+  }))
 }
 
 /** THẦY LẤY toàn bộ câu hỏi của một ca. */
