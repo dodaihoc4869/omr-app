@@ -17,6 +17,7 @@ export type ScreenId =
   | 'lichsuca'
   | 'hocsinh'
   | 'goilenbang'
+  | 'dotinhieu'
 
 export interface ScannedSheet {
   id: string
