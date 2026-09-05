@@ -3,7 +3,7 @@
 // này CHỈ còn 3 việc: chọn đề · lớp & thời gian · cách công bố điểm → Mở ca.
 // Không còn mục dán link, không xoá đề ở đây (xoá ở Ngân hàng câu hỏi).
 import { useEffect, useMemo, useState } from 'react'
-import { CheckSquare, Square, Library, Copy, Check, ClipboardCheck, Stethoscope } from 'lucide-react'
+import { CheckSquare, Square, Library, Copy, Check } from 'lucide-react'
 import { mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
 import KhoiRutDe from '../components/KhoiRutDe'
 import HopChonDe from '../components/HopChonDe'
@@ -12,9 +12,7 @@ import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import { randomSessionCode, taoLinkMoi } from '../lib/ca-link'
 import { TheNoiDung, Hang, OThongBao, NutChinh } from '../components/DesignSystem'
 import NutDongBo from '../components/NutDongBo'
-import { chuoi, danhSachEm, hoSoEm, khoiTuNamSinh, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
-import KhoiCaChanDoan, { phang, type BoChanDoan, type EmChanDoan } from '../components/KhoiCaChanDoan'
-import { CHE_DO, rutCaKiemChung, type HoSoEm as HoSoEmChanDoan, type ThongKeChuyenDe } from '../lib/ca-chan-doan'
+import { chuoi, danhSachEm, khoiTuNamSinh, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
 import { docSoCauCa, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, luuSoCauCa, saveSessionTeacherBank } from '../lib/exam-db'
 import { dongBoNganHang } from '../lib/exam-sync'
 import { useAppStore } from '../store/appStore'
@@ -148,15 +146,10 @@ export default function ExamSetupScreen() {
   const [daCopy, setDaCopy] = useState(false)
   // Mã bí mật — mọi lệnh đọc dữ liệu học sinh của thầy đều phải kèm (BA-APP đợt 1).
   const [maBiMat, setMaBiMat] = useState('')
-  // HAI LOẠI CA (MOCAVAGOILENBANG mục 1). Một nút "Mở ca" cho hai việc khác
-  // hẳn nhau là nguồn gốc mọi rối, nên chọn loại TRƯỚC rồi mới soạn.
-  //   kiểm tra  — lấy điểm, cả lớp một đề, có chống gian lận, vào sổ điểm
-  //   chẩn đoán — lấy dữ liệu phân công lên bảng, mỗi em một bộ, 15 phút,
-  //               KHÔNG chống gian lận, KHÔNG vào sổ điểm, KHÔNG Phần III
-  const [loaiCa, setLoaiCa] = useState<'kiem_tra' | 'chan_doan' | null>(null)
-  // Bộ đề khối chẩn đoán đang tích. Nút "Mở ca" của màn này dùng chung cho cả
-  // hai loại ca, nên bộ tích phải nằm ở đây chứ không nằm trong khối con.
-  const [boChanDoan, setBoChanDoan] = useState<BoChanDoan>({ moi: [], cu: [], cheDo: null })
+  // MỘT MÀN MỞ CA DUY NHẤT (thầy chốt 05/09 chiều — bỏ tách kiểm tra/chẩn
+  // đoán). Thầy tự tay tích đề, ca ghi đủ dữ liệu như mọi ca khác, nên một ca
+  // phục vụ CẢ HAI việc: gửi phiếu cho phụ huynh và phân công gọi lên bảng.
+  // Tách hai luồng chỉ thêm rối mà không thêm dữ liệu nào.
 
   useEffect(() => {
     let huy = false
@@ -250,7 +243,7 @@ export default function ExamSetupScreen() {
 
   const handleOpenSession = async () => {
     if (!scriptUrl.trim()) return showToast('Chưa cấu hình link Apps Script — vào Ngân hàng câu hỏi → Cấu hình', 'error')
-    if (loaiCa === 'chan_doan' ? !boChanDoan.cheDo : selectedSources.length === 0) return showToast('Chưa chọn đề nào cho ca này', 'error')
+    if (selectedSources.length === 0) return showToast('Chưa chọn đề nào cho ca này', 'error')
     if (!lop.trim()) return showToast('Chưa nhập lớp', 'error')
     if (!Number.isFinite(thoiGianPhut) || thoiGianPhut <= 0) return showToast('Thời gian làm bài phải lớn hơn 0', 'error')
     if (phamVi === 'khoi' && !/^\d{4}$/.test(namSinhKhoi.trim())) return showToast('Chọn năm sinh cho phạm vi theo khối', 'error')
@@ -266,15 +259,10 @@ export default function ExamSetupScreen() {
     setOpening(true)
     try {
       const maCa = randomSessionCode()
-      // CA CHẨN ĐOÁN: bộ câu rút theo hồ sơ từng em, gói kèm bảng `boTheoEm`.
-      // Mọi thứ còn lại — lớp, giờ, công bố điểm, chống gian lận, phạm vi mời,
-      // lưu bản có đáp án để chấm lại — CHẠY Y HỆT ca kiểm tra, vì thầy vẫn phải
-      // gửi báo cáo hằng ngày cho phụ huynh từ ca này.
-      const cd = loaiCa === 'chan_doan' ? await dungGoiChanDoan() : null
-      const nguonCuoi = cd ? cd.nguonCa : nguonRaDe
-      const soCauCuoi = cd ? undefined : soCauRaDe
+      const nguonCuoi = nguonRaDe
+      const soCauCuoi = soCauRaDe
       if (nguonCuoi.length === 0) return showToast('Bộ câu ra đề đang rỗng — chỉnh lại phần Bộ câu ra đề', 'error')
-      const publicBank = cd ? { ...mergeAndStrip(nguonCuoi), boTheoEm: cd.boTheoEm } : mergeAndStrip(nguonRaDe, soCauRaDe)
+      const publicBank = mergeAndStrip(nguonCuoi, soCauCuoi)
       const keyBank = congBoDiem === 'khong' ? undefined : mergeKeepAnswers(nguonCuoi, soCauCuoi)
       const moc = await publishSession(scriptUrl.trim(), maCa, lop.trim(), thoiGianPhut, publicBank, congBoDiem, keyBank, {
         batDau: batDauIso,
@@ -292,67 +280,12 @@ export default function ExamSetupScreen() {
       if (soCauCuoi) await luuSoCauCa(maCa, soCauCuoi)
       setOpened({ maCa, joinLink: await taoLinkMoi(maCa, scriptUrl.trim()), batDau: moc.batDau, hetHanVao: moc.hetHanVao })
       setDaCopy(false)
-      showToast(cd ? `Đã mở ca chẩn đoán — ${cd.ket.giayUocTinh}s, ${cd.ket.soTinHieu} tín hiệu` : 'Đã mở ca kiểm tra', 'success')
+      showToast('Đã mở ca', 'success')
     } catch (e) {
       showToast(`Lỗi mở ca: ${e instanceof Error ? e.message : 'không rõ nguyên nhân'}`, 'error')
     } finally {
       setOpening(false)
     }
-  }
-
-  // ------------------------------------------------------- CA CHẨN ĐOÁN
-  // Em vào ca chẩn đoán = danh sách lớp đang có. Ca này không dùng phạm vi
-  // "theo khối"/"chọn từng em" của ca kiểm tra: buổi học nào thì cả lớp đó làm.
-  const emChanDoan: EmChanDoan[] = useMemo(() => (dsDangKy ?? []).filter((e) => !lop.trim() || e.lop === lop.trim()).map((e) => ({ sbd: e.sbd, hoTen: e.hoTen })), [dsDangKy, lop])
-
-  /** Hồ sơ chuyên đề của từng em, lấy song song có chặn 6 luồng — 27 lời gọi
-   * tuần tự là gần hai phút, thầy đứng lớp không đợi được.
-   *
-   * KHÔNG ĐOÁN phần máy chủ không trả về: `buoiChuaDo` và `daiDang` cần lịch sử
-   * theo buổi mà hồ sơ hiện chỉ có số cộng dồn, nên để 0 và false. Em gọi lỗi
-   * thì trả hồ sơ RỖNG (vẫn rút được câu, chỉ là không chọn được chuyên đề cũ)
-   * chứ không bịa số. */
-  const layHoSoChanDoan = async (ds: EmChanDoan[]): Promise<HoSoEmChanDoan[]> => {
-    const url = scriptUrl.trim()
-    const mat = maBiMat.trim()
-    const ra: HoSoEmChanDoan[] = []
-    const hang = [...ds]
-    const chay = async () => {
-      for (;;) {
-        const e = hang.shift()
-        if (!e) return
-        let cd: Record<string, ThongKeChuyenDe> = {}
-        if (url && mat) {
-          try {
-            const h = await hoSoEm(url, { secret: mat, sbd: e.sbd })
-            cd = Object.fromEntries(h.chuyenDe.map((c) => [c.ten, { tiLeSai: c.soCau > 0 ? c.soSai / c.soCau : 0, buoiChuaDo: 0, daiDang: false, chuaTungDo: c.soCau === 0 }]))
-          } catch {
-            cd = {}
-          }
-        }
-        ra.push({ sbd: e.sbd, ten: e.hoTen, chuyenDe: cd, daRa: qidCaTruoc })
-      }
-    }
-    await Promise.all(Array.from({ length: Math.min(6, ds.length) }, chay))
-    // Giữ đúng thứ tự danh sách để chạy lại ra kết quả y hệt.
-    const theoSbd = new Map(ra.map((h) => [h.sbd, h]))
-    return ds.map((e) => theoSbd.get(e.sbd)!).filter(Boolean)
-  }
-
-  /** Rút bộ câu của ca chẩn đoán và dựng gói đề để đẩy lên máy chủ.
-   *
-   * Gói công khai chứa HỢP của lõi chung và mọi bộ riêng; `boTheoEm` nói em nào
-   * làm câu nào. Bảng đó KHÔNG có đáp án, đúng như mọi gói gửi máy chủ. */
-  const dungGoiChanDoan = async () => {
-    if (!boChanDoan.cheDo) throw new Error('Chưa tích ĐỀ MỚI hay ĐỀ CŨ nào')
-    if (emChanDoan.length === 0) throw new Error('Chưa có em nào trong lớp này — nạp danh sách học sinh trước')
-    const hoSo = await layHoSoChanDoan(emChanDoan)
-    const ket = rutCaKiemChung(phang(boChanDoan.moi), phang(boChanDoan.cu), hoSo, CHE_DO[boChanDoan.cheDo])
-    const dungId = new Set<string>([...ket.loiChung.map((c) => c.id), ...Object.values(ket.theoEm).flatMap((r) => r.map((c) => c.id))])
-    const nguonCa = locNguonTheoId([...boChanDoan.moi, ...boChanDoan.cu], dungId)
-    const boTheoEm: Record<string, string[]> = {}
-    for (const e of emChanDoan) boTheoEm[e.sbd] = [...ket.loiChung.map((c) => c.id), ...(ket.theoEm[e.sbd] ?? []).map((c) => c.id)]
-    return { ket, nguonCa, boTheoEm }
   }
 
   const copyLink = () => {
@@ -404,62 +337,15 @@ export default function ExamSetupScreen() {
     )
   }
 
-  // ------------------------------------------------- CHỌN LOẠI CA (mục 1)
-  // Trước khi soạn phải biết đang mở ca gì: hai loại khác nhau ở TÁM chỗ, từ
-  // thời lượng tới việc có vào sổ điểm hay không.
-  if (loaiCa === null) {
-    const The = ({ id, ten, phu, icon }: { id: 'kiem_tra' | 'chan_doan'; ten: string; phu: string[]; icon: React.ReactNode }) => (
-      <button
-        type="button"
-        onClick={() => {
-          setLoaiCa(id)
-          // Ca chẩn đoán cố định 15 phút (đặc tả mục 1); thầy vẫn sửa được ở ô
-          // bên dưới nếu buổi hôm đó khác.
-          setThoiGianPhut(id === 'chan_doan' ? 15 : 45)
-        }}
-        aria-label={`Mở ca ${ten.toLowerCase()}`}
-        className="tap-target text-left flex flex-col"
-        style={{ gap: 'var(--k2)', minHeight: 132, padding: 'var(--k5)', borderRadius: 'var(--bo-3)', background: 'var(--the)', border: '2px solid var(--vien)', boxShadow: 'var(--bong-1)' }}
-      >
-        <span style={{ color: id === 'kiem_tra' ? 'var(--tim)' : 'var(--xanh)' }}>{icon}</span>
-        <span className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', color: 'var(--muc)' }}>
-          {ten}
-        </span>
-        {phu.map((d) => (
-          <span key={d} style={NHAN_NHO}>
-            {d}
-          </span>
-        ))}
-      </button>
-    )
-    return (
-      <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-        <div className="flex items-center justify-between">
-          <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
-            Mở ca
-          </h1>
-          <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target">
-            ← Kiểm tra
-          </button>
-        </div>
-        <div style={NHAN_NHO}>Hai việc khác hẳn nhau, đừng dùng chung một nút. Chọn loại ca trước.</div>
-        <div className="grid grid-cols-2" style={{ gap: 'var(--k3)' }}>
-          <The id="kiem_tra" ten="KIỂM TRA" phu={['lấy điểm', 'cả lớp một đề', 'vào sổ điểm']} icon={<ClipboardCheck size={26} />} />
-          <The id="chan_doan" ten="CHẨN ĐOÁN" phu={['lấy dữ liệu', 'mỗi em một bộ', '15 phút · không vào sổ']} icon={<Stethoscope size={26} />} />
-        </div>
-      </div>
-    )
-  }
-
   // ------------------------------------------------------------ SOẠN CA
   return (
     <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
       <div className="flex items-center justify-between">
         <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
-          {loaiCa === 'chan_doan' ? 'Mở ca chẩn đoán' : 'Mở ca kiểm tra'}
+          Mở ca kiểm tra
         </h1>
-        <button onClick={() => setLoaiCa(null)} style={NHAN_NHO} className="tap-target">
-          ← Chọn loại ca
+        <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target">
+          ← Kiểm tra
         </button>
       </div>
 
@@ -524,25 +410,19 @@ export default function ExamSetupScreen() {
               </div>
             )}
             {/* HỘP CHỌN ĐỀ gọn, cuộn trong hộp (thầy chốt 04-09 tối). Dùng chung
-                với Gọi lên bảng — sửa một chỗ, hai màn đổi theo.
-
-                CA CHẨN ĐOÁN dùng HAI cây như thế này (ĐỀ MỚI · ĐỀ CŨ), tích
-                được tới từng bài và từng dạng y hệt — thầy chốt 05/09 chiều. */}
-            {loaiCa === 'chan_doan' ? (
-              <KhoiCaChanDoan dsDeTach={dsDeTach} nhomLoc={nhomLoc} dsEm={emChanDoan} layHoSo={layHoSoChanDoan} onDoi={setBoChanDoan} showToast={showToast} />
-            ) : (
-              <HopChonDe
-                ds={dsDeTach}
-                daChon={selectedMaDe}
-                onChon={toggleSelect}
-                nhomLoc={nhomLoc}
-                chonNhieu
-                onChonTatCa={(ma) => setSelectedMaDe(new Set(ma))}
-              />
-            )}
+                với Gọi lên bảng — sửa một chỗ, hai màn đổi theo. Tích tới từng
+                bài, từng dạng: trắc nghiệm · đúng sai · trả lời ngắn. */}
+            <HopChonDe
+              ds={dsDeTach}
+              daChon={selectedMaDe}
+              onChon={toggleSelect}
+              nhomLoc={nhomLoc}
+              chonNhieu
+              onChonTatCa={(ma) => setSelectedMaDe(new Set(ma))}
+            />
           </div>
         )}
-        {loaiCa !== 'chan_doan' && selectedSources.length > 0 && <KhoiRutDe nguon={selectedSources} qidCaTruoc={qidCaTruoc} onDoi={setBoRut} />}
+        {selectedSources.length > 0 && <KhoiRutDe nguon={selectedSources} qidCaTruoc={qidCaTruoc} onDoi={setBoRut} />}
       </TheNoiDung>
 
       {/* 2. LỚP & THỜI GIAN */}
@@ -765,7 +645,7 @@ export default function ExamSetupScreen() {
       </TheNoiDung>
 
       <NutChinh onClick={handleOpenSession} disabled={opening}>
-        {opening ? 'Đang mở ca…' : loaiCa === 'chan_doan' ? 'Mở ca chẩn đoán' : 'Mở ca kiểm tra'}
+        {opening ? 'Đang mở ca…' : 'Mở ca kiểm tra'}
       </NutChinh>
     </div>
   )

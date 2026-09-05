@@ -260,3 +260,40 @@ export function phanCong(dsCau: CauChua[], baiLam: BaiLam[], dsEm: EmGoi[], yc: 
 
 /** Tên mức độ để in ra màn — thầy đọc là hiểu, không phải tra mã. */
 export const TEN_MUC_NHAM: Record<MucDo, string> = { biet: 'nhận biết', hieu: 'thông hiểu', van_dung: 'vận dụng' }
+
+/** Một câu in ra dạng chữ: "Phần I câu 4 ★★ pH và acid-base". */
+export function chuCau(c: CauChua): string {
+  return `Phần ${c.phan} câu ${c.so}${c.sao ? ' ' + '★'.repeat(c.sao) : ''}${c.chuyenDe ? ` ${c.chuyenDe}` : ''}`
+}
+
+/** Câu cả lớp cùng sai một kiểu, nói bằng số: "18/27 em cùng một phương án". */
+export function chuChum(t: ThongKeCau): string {
+  const cung = Math.round(t.doChum * t.soEmLam)
+  return `${t.soSai}/${t.soEmLam} em sai · ${cung}/${t.soEmLam} em cùng một phương án`
+}
+
+/** Bảng phân công dạng chữ để thầy copy sang giáo án hoặc nhóm Zalo. */
+export function bangChu(kq: KetQuaPhanCong, tenNguon: string): string {
+  const d: string[] = [`Gọi lên bảng · ${tenNguon}`]
+  if (kq.giangCaLop.length) {
+    d.push('', 'GIẢNG CẢ LỚP — không gọi ai lên bảng')
+    for (const t of kq.giangCaLop) d.push(`- ${chuCau(t.cau)} (${chuChum(t)})`)
+  }
+  const theoLuot = new Map<number, DongPhanCong[]>()
+  for (const p of kq.phanCong) {
+    const a = theoLuot.get(p.luot)
+    if (a) a.push(p)
+    else theoLuot.set(p.luot, [p])
+  }
+  for (const [luot, ds] of [...theoLuot.entries()].sort((a, b) => a[0] - b[0])) {
+    d.push('', `LƯỢT ${luot}`)
+    for (const p of ds) d.push(`- ${chuCau(p.cau)} → ${p.hoTen || `SBD ${p.sbd}`} (${p.viSao} · nhắm ${TEN_MUC_NHAM[p.mucDoNham]})`)
+  }
+  if (kq.chiDocDapAn.length) {
+    d.push('', 'CHỈ ĐỌC ĐÁP ÁN')
+    for (const t of kq.chiDocDapAn) d.push(`- ${chuCau(t.cau)} (${Math.round(t.tiLeDung * 100)}% em làm đúng)`)
+  }
+  if (kq.emChuaGoi.length) d.push('', `${kq.emChuaGoi.length} em chưa được gọi lượt nào: ${kq.emChuaGoi.join(', ')}`)
+  for (const c of kq.canhBao) d.push(`⚠ ${c}`)
+  return d.join('\n')
+}

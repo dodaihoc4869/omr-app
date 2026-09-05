@@ -41,12 +41,10 @@ vi.mock('../src/store/appStore', () => ({
 
 const { default: ExamSetupScreen } = await import('../src/screens/ExamSetupScreen')
 
-/** Từ 05/09 màn Mở ca hỏi LOẠI CA trước (kiểm tra / chẩn đoán). Mọi phép kiểm
- * ở đây nói về ca KIỂM TRA, nên bấm vào thẻ đó rồi mới soạn. */
+/** MỘT MÀN MỞ CA DUY NHẤT (thầy chốt 05/09 chiều) — không còn bước chọn loại
+ * ca, vào là soạn luôn. */
 function moCaKiemTra() {
-  const r = render(<ExamSetupScreen />)
-  fireEvent.click(r.getByLabelText('Mở ca kiểm tra'))
-  return r
+  return render(<ExamSetupScreen />)
 }
 
 /** Cây MẶC ĐỊNH GẬP HẾT — mở lần lượt khối, chương, bài để thấy tầng dạng. */

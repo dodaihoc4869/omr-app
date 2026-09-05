@@ -1,23 +1,27 @@
-// GỌI HỌC SINH LÊN BẢNG.
+// GỌI HỌC SINH LÊN BẢNG — MỘT MÀN, MỘT LUỒNG (thầy chốt 05/09 chiều).
 //
-// Ba bước đúng thứ tự thầy làm trên lớp:
-//   1. chọn đề trong kho (câu để chữa lấy từ đề này),
-//   2. tích em — hoặc lấy nguyên danh sách em vừa thi ca gần nhất,
-//   3. bấm "Phân công câu hỏi": mỗi em nhận một câu thuộc chuyên đề em SAI
-//      NHIỀU NHẤT trong ca gần nhất của chính em đó.
+// Nguồn duy nhất là CA thầy vừa cho lớp làm. Từ một ca ấy ra cả hai việc:
+// phiếu gửi phụ huynh (màn Theo dõi lo) và bảng phân công lên bảng (màn này).
+// Không có ca thứ hai, không có luồng thứ hai.
 //
-// Máy chủ trả chuyên đề của ca gần nhất qua `hoSoEm`, mỗi em một lượt gọi
-// 2–4 giây — nên chỉ gọi cho những em ĐÃ TÍCH, chạy song song 4 em một đợt, và
-// hiện rõ đang chạy tới đâu. Thuật toán phân công nằm ở lib/goi-len-bang.ts.
+// Khác bản cũ ở chỗ quan trọng nhất: bản cũ chỉ biết "em này yếu chuyên đề gì",
+// nên hai em cùng yếu Ester nhận hai câu Ester bất kỳ. Bản này biết EM NÀO SAI
+// CÂU NÀO và CẢ LỚP CÓ SAI GIỐNG NHAU KHÔNG, nên:
+//   · câu quá nửa lớp cùng chọn một phương án sai → GIẢNG CẢ LỚP, không gọi ai;
+//   · câu gần cả lớp làm đúng → chỉ đọc đáp án;
+//   · phần còn lại mới chia cho em, ưu tiên em SAI CHÍNH CÂU ĐÓ.
+// Thuật toán ở lib/phan-cong.ts, phần đọc dữ liệu ca ở lib/du-lieu-len-bang.ts.
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, ClipboardCopy, Check, RefreshCw, Search, Users, Wand2, Trash2, X, ThumbsUp, ThumbsDown } from 'lucide-react'
+import { ArrowLeft, ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
-import { chuoi, chiTietCa, danhSachCa, danhSachEm, ghiLenBang, hoSoEm, khoiTuNamSinh, qidDaLam, type CaTomTat, type EmTomTat } from '../lib/exam-api'
-import { loadExamSources, loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
+import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, type CaTomTat } from '../lib/exam-api'
+import { loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
+import { mergeKeepAnswers } from '../data/examContent'
+import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import HopChonDe from '../components/HopChonDe'
-import { bangPhanCongChu, phanCongCauHoi, TEN_MUC, type CauCoTheGoi, type EmDeGoi, type PhanCong } from '../lib/goi-len-bang'
-import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
+import { baiLamTuCa, cauTuBanDe, daCoBaiLam, emTuCa, luotMoiNhat, type BanDeCa, type HoSoRutGon, type LuotCa } from '../lib/du-lieu-len-bang'
+import { bangChu, chuCau, chuChum, MAC_DINH, phanCong, TEN_MUC_NHAM, type CauChua, type DongPhanCong, type KetQuaPhanCong } from '../lib/phan-cong'
 import TheCau from '../components/TheCau'
 import { useAppStore } from '../store/appStore'
 
@@ -37,31 +41,20 @@ const O_NHAP: React.CSSProperties = {
   width: '100%',
 }
 
-/** Đề đã lưu → danh sách câu có thể gọi lên bảng. Câu KHÔNG có chuyên đề vẫn
- * giữ lại: nó dùng được khi đề thiếu câu đúng chuyên đề, chỉ là không ưu tiên. */
-function cauTuDe(de: TeacherExamSource): CauCoTheGoi[] {
-  const lay = (phan: 'I' | 'II' | 'III', ds: { id: string; text: string; chuyenDe?: string; mucDo?: 'biet' | 'hieu' | 'van_dung'; canChua?: { sao: 0 | 1 | 2; ly_do: string } }[]) =>
-    ds.map((q, i) => ({
-      id: q.id,
-      phan,
-      so: i + 1,
-      viTri: i,
-      chuyenDe: q.chuyenDe,
-      mucDo: q.mucDo,
-      sao: q.canChua?.sao ?? 0,
-      lyDoSao: q.canChua?.ly_do ?? '',
-      tomTat: (q.text || '').replace(/\$\\ce\{([^}]*)\}\$/g, '$1').replace(/\s+/g, ' ').trim().slice(0, 90),
-    }))
-  return [...lay('I', de.phanI), ...lay('II', de.phanII), ...lay('III', de.phanIII)]
-}
-
-/** Câu ĐẦY ĐỦ tra ra từ kho đề đã tích. Kiểu HỢP PHÂN BIỆT theo `phan` để chỗ
- * vẽ thẻ câu biết chắc `q` là loại nào — gộp thành một kiểu chung là mất phân
- * biệt và phải ép kiểu khắp nơi. */
+/** Câu ĐẦY ĐỦ tra ra từ bản đề của ca. Kiểu hợp phân biệt theo `phan` để chỗ vẽ
+ * thẻ câu biết chắc `q` là loại nào, không phải ép kiểu khắp nơi. */
 type CauDayDu =
   | { phan: 'I'; q: TeacherMcqQuestion }
   | { phan: 'II'; q: TeacherTrueFalseQuestion }
   | { phan: 'III'; q: TeacherShortAnswerQuestion }
+
+interface DuLieuCa {
+  maCa: string
+  ten: string
+  bank: BanDeCa
+  luot: LuotCa[]
+  hoSo: Record<string, HoSoRutGon>
+}
 
 /** Chạy song song có giới hạn — 251 em mà gọi hết một lúc là máy chủ nghẹn. */
 async function songSong<T, R>(ds: T[], soLuong: number, viec: (x: T) => Promise<R>, xong?: (da: number) => void): Promise<R[]> {
@@ -84,186 +77,171 @@ export default function GoiLenBangScreen() {
   const showToast = useAppStore((s) => s.showToast)
 
   const [cauHinh, setCauHinh] = useState<{ url: string; mat: string } | null>(null)
-  const [deDaLuu, setDeDaLuu] = useState<TeacherExamSource[]>([])
-  // TÍCH NHIỀU ĐỀ (thầy chốt 05/09). Một buổi chữa bài hiếm khi bó trong đúng
-  // một mã: thầy thường lấy trắc nghiệm bài này, đúng sai bài kia. Trước đây
-  // chọn được đúng một mã nên phải chữa hai lượt.
-  const [maDeChon, setMaDeChon] = useState<Set<string>>(new Set())
-
-  const [dsEm, setDsEm] = useState<EmTomTat[] | null>(null)
-  const [tim, setTim] = useState('')
-  const [khoiLoc, setKhoiLoc] = useState<number | null>(null)
-  const [tich, setTich] = useState<Set<string>>(new Set())
-
-  const [caGanNhat, setCaGanNhat] = useState<CaTomTat | null>(null)
-  const [dangLayCa, setDangLayCa] = useState(false)
-
-  const [dangPhan, setDangPhan] = useState(false)
-  const [tienDo, setTienDo] = useState('')
-  const [ketQua, setKetQua] = useState<PhanCong[] | null>(null)
-  const [daCopy, setDaCopy] = useState(false)
   const [loi, setLoi] = useState('')
-  // Sau khi phân công: chạm tên em để xem CÂU ĐẦY ĐỦ kèm lời giải; tích để bỏ
-  // bớt em (em vắng, em thầy đổi ý) rồi xoá một lượt.
-  const [xemCauCua, setXemCauCua] = useState('')
-  const [tichXoa, setTichXoa] = useState<Set<string>>(new Set())
+
+  const [dsCa, setDsCa] = useState<CaTomTat[] | null>(null)
+  const [timCa, setTimCa] = useState('')
+  const [dangTaiCa, setDangTaiCa] = useState('')
+  const [tienDo, setTienDo] = useState('')
+  const [du, setDu] = useState<DuLieuCa | null>(null)
+
+  // Em vắng hôm nay: có bài trong ca nhưng không đứng lớp được. Bỏ tích ở đây
+  // là em không nhận câu nào, chứ dữ liệu bài làm của em vẫn tính vào tỉ lệ
+  // đúng/sai của câu — cả lớp sai giống nhau hay không là chuyện của cả lớp.
+  const [vang, setVang] = useState<Set<string>>(new Set())
+
+  // THÊM CÂU NGOÀI CA (thầy chốt 05/09): buổi chữa hiếm khi bó trong đúng bộ
+  // câu vừa thi — thầy tích thêm bài nào cũng được, tích tới từng dạng. Câu
+  // thêm KHÔNG có bài làm nên không bao giờ bị xếp "giảng cả lớp"/"đọc đáp án";
+  // nó vào thẳng danh sách chữa và xếp theo sao.
+  const [deDaLuu, setDeDaLuu] = useState<TeacherExamSource[]>([])
+  const [maDeChon, setMaDeChon] = useState<Set<string>>(new Set())
+  const [timEm, setTimEm] = useState('')
+
+  const [soLuot, setSoLuot] = useState(1)
+  const [daGoiCau, setDaGoiCau] = useState<Record<string, string[]>>({})
+  const [kq, setKq] = useState<KetQuaPhanCong | null>(null)
+  const [daCopy, setDaCopy] = useState(false)
+  const [xemCau, setXemCau] = useState('')
   const [dangCham, setDangCham] = useState('')
-  // CÂU ĐÃ GỌI trong buổi này, theo SBD. Bấm "Phân công" lần nữa thì em nhận
-  // câu KHÁC — chữa lại đúng câu vừa chữa thì em không tiến thêm bước nào.
-  // Cộng thêm câu em đã làm trong bài thi/bài tập (máy chủ trả qua qidDaLam).
-  const [daGoi, setDaGoi] = useState<Record<string, string[]>>({})
 
   useEffect(() => {
     void (async () => {
       const [url, mat, kho] = await Promise.all([loadScriptUrl(), loadTeacherSecret(), loadExamSources()])
-      // TÁCH BA MÃ THEO PHẦN, đồng bộ với Ngân hàng đề và Mở ca (thầy chốt 04-09
-      // tối). Chữa bài trên bảng thường chỉ chữa trắc nghiệm, hoặc chỉ trả lời
-      // ngắn — chọn đúng phần là máy không rút nhầm câu đúng sai lên bảng.
-      const ds = tachNhieuTheoPhan(kho)
-      setDeDaLuu(ds)
-      // KHÔNG tự tích sẵn đề nào. Tích sẵn một mã rồi thầy tích thêm mã khác là
-      // ra bộ câu thầy không định lấy, mà nhìn thanh tổng mới biết.
-      setMaDeChon(new Set())
-      if (url.trim() && mat.trim()) {
-        setCauHinh({ url: url.trim(), mat: mat.trim() })
-        try {
-          setDsEm(await danhSachEm(url.trim(), mat.trim()))
-        } catch (e) {
-          setLoi(e instanceof Error ? e.message : 'Không lấy được danh sách học sinh')
-          setDsEm([])
-        }
-      } else {
+      // Mỗi mã đề tách làm ba dạng (trắc nghiệm · đúng sai · trả lời ngắn), y
+      // hệt màn Mở ca — tích một dòng là lấy đúng dạng đó.
+      setDeDaLuu(tachNhieuTheoPhan(kho))
+      if (!url.trim() || !mat.trim()) {
         setLoi('Chưa cấu hình link Apps Script hoặc mã bí mật — vào Ngân hàng câu hỏi → Cấu hình')
-        setDsEm([])
+        setDsCa([])
+        return
+      }
+      setCauHinh({ url: url.trim(), mat: mat.trim() })
+      try {
+        const ds = await danhSachCa(url.trim(), mat.trim())
+        setDsCa(ds.filter((c) => c.loai !== 'baitap'))
+      } catch (e) {
+        setLoi(e instanceof Error ? e.message : 'Không lấy được danh sách ca')
+        setDsCa([])
       }
     })()
   }, [])
 
-  const dsDe = useMemo(() => deDaLuu.filter((d) => maDeChon.has(d.maDe)), [deDaLuu, maDeChon])
-  const cauHoi = useMemo(() => dsDe.flatMap(cauTuDe), [dsDe])
-  /** Tra câu ĐẦY ĐỦ theo id. Gộp nhiều đề thì `viTri` của hai đề trùng nhau,
-   * tra theo chỉ số là ra câu của đề khác — phải tra theo id. */
+  const dsCaLoc = useMemo(() => {
+    const q = timCa.trim().toLowerCase()
+    return (dsCa ?? []).filter((c) => !q || c.maCa.includes(q) || (c.tenCa || '').toLowerCase().includes(q) || (c.lop || '').toLowerCase().includes(q))
+  }, [dsCa, timCa])
+
+  /** MỞ MỘT CA: kéo về bản đề CÓ đáp án + đáp án từng em + hồ sơ tích luỹ.
+   *
+   * Bản đề lấy từ máy chủ khi ca có công bố điểm; ca "không công bố" thì máy chủ
+   * không giữ đáp án, rơi về bản đã lưu trên máy thầy lúc mở ca. Không có cả hai
+   * thì NÓI THẲNG chứ không phân công mò. */
+  const moCa = async (ca: CaTomTat) => {
+    if (!cauHinh) return showToast('Chưa cấu hình máy chủ', 'error')
+    setDangTaiCa(ca.maCa)
+    setLoi('')
+    setKq(null)
+    setSoLuot(1)
+    setDaGoiCau({})
+    setVang(new Set())
+    try {
+      const ct = await chiTietCa(cauHinh.url, cauHinh.mat, ca.maCa, true)
+      let bank: BanDeCa | null = ct.keyBank ? { phanI: ct.keyBank.phanI, phanII: ct.keyBank.phanII, phanIII: ct.keyBank.phanIII } : null
+      if (!bank) {
+        const cuc: TeacherExamSource[] | undefined = await loadSessionTeacherBank(ca.maCa)
+        if (cuc && cuc.length) bank = mergeKeepAnswers(cuc)
+      }
+      if (!bank) throw new Error(`Ca ${ca.tenCa || ca.maCa} không có bản đề kèm đáp án trên máy chủ lẫn trên máy này — mở ca ở máy khác thì đồng bộ đề trước`)
+
+      const luot: LuotCa[] = ct.luot.map((l) => ({ sbd: chuoi(l.sbd), hoTen: chuoi(l.hoTen), lanThu: l.lanThu, trangThai: l.trangThai, dapAn: l.dapAn, giayCau: l.giayCau }))
+      const coBai = luotMoiNhat(luot).filter(daCoBaiLam)
+      if (coBai.length === 0) throw new Error(`Ca ${ca.tenCa || ca.maCa} chưa em nào nộp bài`)
+
+      setTienDo(`0/${coBai.length}`)
+      const hs = await songSong(
+        coBai.map((l) => l.sbd),
+        4,
+        async (sbd) => {
+          try {
+            const h = await hoSoEm(cauHinh.url, { secret: cauHinh.mat, sbd })
+            return { sbd, hoTen: h.em.hoTen, chuyenDe: h.chuyenDe.map((c) => ({ ten: c.ten, soCau: c.soCau, soSai: c.soSai })) } as HoSoRutGon
+          } catch {
+            // Hồ sơ hỏng thì để RỖNG: em vẫn được gọi, chỉ là máy không biết em
+            // yếu chuyên đề nào. Bịa hồ sơ là gọi sai chỗ.
+            return null
+          }
+        },
+        (n) => setTienDo(`${n}/${coBai.length}`),
+      )
+      const hoSo: Record<string, HoSoRutGon> = {}
+      for (const h of hs) if (h) hoSo[h.sbd] = h
+
+      setDu({ maCa: ca.maCa, ten: ca.tenCa || `mã ${ca.maCa}`, bank, luot, hoSo })
+      showToast(`Ca ${ca.tenCa || ca.maCa}: ${coBai.length} em có bài`, 'success')
+    } catch (e) {
+      setDu(null)
+      setLoi(e instanceof Error ? e.message : 'Không mở được ca')
+    } finally {
+      setDangTaiCa('')
+      setTienDo('')
+    }
+  }
+
+  /** Bản đề của các mã thầy tích thêm, gộp lại thành một kho. */
+  const bankThem: BanDeCa = useMemo(() => mergeKeepAnswers(deDaLuu.filter((d) => maDeChon.has(d.maDe))), [deDaLuu, maDeChon])
+
+  /** DANH SÁCH CÂU ĐÁNG CHỮA = câu của ca + câu thầy tích thêm.
+   *
+   * Số câu của phần thêm đánh tiếp sau câu của ca, không đánh lại từ 1: hai
+   * dòng cùng ghi "Phần I câu 3" là thầy đọc nhầm câu ngay trên lớp. */
+  const dsCau: CauChua[] = useMemo(() => {
+    const cuaCa = du ? cauTuBanDe(du.bank) : []
+    const dich = { I: du?.bank.phanI.length ?? 0, II: du?.bank.phanII.length ?? 0, III: du?.bank.phanIII.length ?? 0 }
+    const daCo = new Set(cuaCa.map((c) => c.id))
+    return [...cuaCa, ...cauTuBanDe(bankThem, dich).filter((c) => !daCo.has(c.id))]
+  }, [du, bankThem])
+  const baiLam = useMemo(() => (du ? baiLamTuCa(du.bank, du.maCa, du.luot) : []), [du])
+  const dsEmCa = useMemo(() => (du ? emTuCa(du.luot, du.hoSo, dsCau, daGoiCau, vang) : []), [du, dsCau, daGoiCau, vang])
+  const dsEm = useMemo(() => {
+    const q = timEm.trim().toLowerCase()
+    return q ? dsEmCa.filter((e) => e.sbd.includes(q) || e.hoTen.toLowerCase().includes(q)) : dsEmCa
+  }, [dsEmCa, timEm])
+  const soCoMat = dsEmCa.filter((e) => e.coMat).length
+
+  /** Tra câu ĐẦY ĐỦ theo id — gộp nhiều đề thì `viTri` của hai đề trùng nhau,
+   * phải tra theo id. */
   const traCau = useMemo(() => {
     const m = new Map<string, CauDayDu>()
-    for (const d of dsDe) {
-      for (const q of d.phanI) m.set(q.id, { phan: 'I', q: q as TeacherMcqQuestion })
-      for (const q of d.phanII) m.set(q.id, { phan: 'II', q: q as TeacherTrueFalseQuestion })
-      for (const q of d.phanIII) m.set(q.id, { phan: 'III', q: q as TeacherShortAnswerQuestion })
+    for (const b of [du?.bank, bankThem]) {
+      if (!b) continue
+      for (const q of b.phanI) m.set(q.id, { phan: 'I', q })
+      for (const q of b.phanII) m.set(q.id, { phan: 'II', q })
+      for (const q of b.phanIII) m.set(q.id, { phan: 'III', q })
     }
     return m
-  }, [dsDe])
-  const tenDeDaChon = dsDe.length === 1 ? dsDe[0].maDe : `${dsDe.length} đề: ${dsDe.map((d) => d.maDe).join(', ')}`
-  // ĐỀ CHƯA CÓ SAO NÀO: gần như chắc chắn là bản đề trong máy được nạp TRƯỚC khi
-  // app biết đọc trường `can_chua`. Nói thẳng ra, đừng để thầy ngồi đoán vì sao
-  // câu nào cũng không sao.
-  const chuaCoSao = cauHoi.length > 0 && cauHoi.every((c) => !c.sao)
+  }, [du, bankThem])
 
-  const dsLoc = useMemo(() => {
-    const q = tim.trim().toLowerCase()
-    return (dsEm ?? []).filter((e) => {
-      if (khoiLoc !== null && khoiTuNamSinh(e.namSinh) !== khoiLoc) return false
-      return !q || e.sbd.includes(q) || e.hoTen.toLowerCase().includes(q) || e.lop.toLowerCase().includes(q)
-    })
-  }, [dsEm, tim, khoiLoc])
+  const chay = (luot: number) => {
+    if (!du) return showToast('Chưa mở ca nào', 'warn')
+    if (soCoMat === 0) return showToast('Không em nào có mặt — bỏ tích lại vài em', 'warn')
+    const r = phanCong(dsCau, baiLam, dsEmCa, { ...MAC_DINH, soLuot: luot })
+    setSoLuot(luot)
+    setKq(r)
+    setXemCau('')
+  }
 
-  const doiTich = (sbd: string) =>
-    setTich((cu) => {
+  const doiVang = (sbd: string) =>
+    setVang((cu) => {
       const m = new Set(cu)
       if (m.has(sbd)) m.delete(sbd)
       else m.add(sbd)
       return m
     })
 
-  /** TÍCH SẴN EM VỪA THI CA GẦN NHẤT — việc thầy làm nhiều nhất: chấm xong ca,
-   * gọi ngay mấy em vừa thi lên chữa. Chỉ lấy em ĐÃ NỘP, vì em bỏ dở thì chưa
-   * có dữ liệu chuyên đề để phân câu. */
-  const tichEmCaGanNhat = async () => {
-    if (!cauHinh) return showToast('Chưa cấu hình máy chủ', 'error')
-    setDangLayCa(true)
-    setLoi('')
-    try {
-      const ds = await danhSachCa(cauHinh.url, cauHinh.mat)
-      const thi = ds.filter((c) => c.loai !== 'baitap')
-      if (thi.length === 0) throw new Error('Chưa có ca thi nào')
-      const ca = thi[0]
-      const ct = await chiTietCa(cauHinh.url, cauHinh.mat, ca.maCa)
-      const daNop = ct.luot.filter((l) => l.trangThai === 'da_nop' || l.trangThai === 'khoa').map((l) => chuoi(l.sbd))
-      if (daNop.length === 0) throw new Error(`Ca ${ca.tenCa || ca.maCa} chưa em nào nộp bài`)
-      setCaGanNhat(ca)
-      setTich(new Set(daNop))
-      setKetQua(null)
-      showToast(`Đã tích ${daNop.length} em vừa thi ca ${ca.tenCa || ca.maCa}`, 'success')
-    } catch (e) {
-      setLoi(e instanceof Error ? e.message : 'Không lấy được ca gần nhất')
-    } finally {
-      setDangLayCa(false)
-    }
-  }
-
-  const phanCong = async () => {
-    if (!cauHinh) return showToast('Chưa cấu hình máy chủ', 'error')
-    if (cauHoi.length === 0) return showToast('Chưa tích đề nào', 'warn')
-    if (tich.size === 0) return showToast('Chưa tích em nào', 'warn')
-    setDangPhan(true)
-    setLoi('')
-    setKetQua(null)
-    try {
-      const sbds = (dsEm ?? []).filter((e) => tich.has(e.sbd)).map((e) => e.sbd)
-      setTienDo(`0/${sbds.length}`)
-      const hoSo = await songSong(
-        sbds,
-        4,
-        async (sbd) => {
-          try {
-            // Lấy CÙNG LÚC hồ sơ và tập câu em đã làm: hai lệnh nối tiếp nhau
-            // thì 30 em mất gấp đôi thời gian chờ.
-            const [h, qids] = await Promise.all([
-              hoSoEm(cauHinh.url, { secret: cauHinh.mat, sbd }),
-              qidDaLam(cauHinh.url, cauHinh.mat, sbd).catch(() => [] as string[]),
-            ])
-            return { h, qids }
-          } catch {
-            return null
-          }
-        },
-        (da) => setTienDo(`${da}/${sbds.length}`),
-      )
-      const emDeGoi: EmDeGoi[] = sbds.map((sbd, i) => {
-        const h = hoSo[i]?.h
-        const trongDs = (dsEm ?? []).find((e) => e.sbd === sbd)
-        return {
-          sbd,
-          hoTen: h?.em.hoTen || trongDs?.hoTen || '',
-          lop: h?.em.lop || trongDs?.lop || '',
-          chuyenDeCaGanNhat: h?.chuyenDeCaGanNhat ?? [],
-        }
-      })
-
-      // Câu cần tránh = câu đã gọi trong buổi này + câu em đã làm trước đó.
-      const tranh: Record<string, string[]> = {}
-      sbds.forEach((sbd, i) => {
-        tranh[sbd] = [...new Set([...(daGoi[sbd] ?? []), ...(hoSo[i]?.qids ?? [])])]
-      })
-
-      const kq = phanCongCauHoi(emDeGoi, cauHoi, tranh)
-      setKetQua(kq)
-      // Ghi nhớ ngay: lần bấm sau phải ra câu khác.
-      setDaGoi((cu) => {
-        const m = { ...cu }
-        for (const p of kq) if (p.cau) m[p.sbd] = [...new Set([...(m[p.sbd] ?? []), p.cau.id])]
-        return m
-      })
-    } catch (e) {
-      setLoi(e instanceof Error ? e.message : 'Không phân công được')
-    } finally {
-      setDangPhan(false)
-      setTienDo('')
-    }
-  }
-
   const copyBang = async () => {
-    if (!ketQua || dsDe.length === 0) return
-    const t = bangPhanCongChu(ketQua, tenDeDaChon)
+    if (!kq || !du) return
+    const t = bangChu(kq, du.ten)
     try {
       await navigator.clipboard.writeText(t)
       setDaCopy(true)
@@ -274,39 +252,20 @@ export default function GoiLenBangScreen() {
     }
   }
 
-  const soDung = ketQua?.filter((p) => p.lyDo === 'dung_chuyen_de_yeu').length ?? 0
-
-  /** Câu ĐẦY ĐỦ (phương án, hình, lời giải) từ đề đang chọn — dựng thẻ y hệt
-   * lúc em xem lại bài, không vẽ lại một kiểu hiển thị thứ hai. */
-  const cauDayDu = (c: CauCoTheGoi) => traCau.get(c.id) ?? null
-
-  const doiTichXoa = (sbd: string) =>
-    setTichXoa((cu) => {
-      const m = new Set(cu)
-      if (m.has(sbd)) m.delete(sbd)
-      else m.add(sbd)
-      return m
-    })
-
-  /** Bỏ em khỏi bảng phân công. KHÔNG phân công lại cho em còn lại: thầy đã đọc
-   * bảng rồi, câu tự nhảy sang em khác thì gọi nhầm ngay trên lớp. */
-  /** CHẤM CÂU TRÊN BẢNG: ghi đạt/không đạt vào log mạnh–yếu của em rồi bỏ em
-   * khỏi bảng — chữa xong là xong, không để lẫn với em chưa gọi.
-   *
-   * Ghi hỏng thì KHÔNG bỏ khỏi bảng: mất dòng mà không có gì trên máy chủ là
+  /** CHẤM CÂU TRÊN BẢNG: ghi đạt/không đạt vào log mạnh–yếu của em rồi bỏ dòng
+   * khỏi bảng. Ghi hỏng thì GIỮ dòng lại — mất dòng mà máy chủ chưa có gì là
    * thầy tưởng đã ghi rồi. */
-  const chamLenBang = async (p: PhanCong, dat: boolean) => {
+  const cham = async (p: DongPhanCong, dat: boolean) => {
     if (!cauHinh) return showToast('Chưa cấu hình máy chủ', 'error')
-    const cd = p.chuyenDeYeu?.ten || p.cau?.chuyenDe || ''
+    const cd = p.cau.chuyenDe
     if (!cd) return showToast('Câu này không có chuyên đề — chưa ghi được vào log mạnh–yếu', 'warn')
-    setDangCham(p.sbd)
+    setDangCham(p.sbd + p.cau.id)
     try {
-      await ghiLenBang(cauHinh.url, cauHinh.mat, { sbd: p.sbd, chuyenDe: cd, dat, qid: p.cau?.id })
+      await ghiLenBang(cauHinh.url, cauHinh.mat, { sbd: p.sbd, chuyenDe: cd, dat, qid: p.cau.id })
       showToast(`${p.hoTen || p.sbd}: ${dat ? 'đạt' : 'không đạt'} — đã ghi vào ${cd}`, dat ? 'success' : 'warn')
-      setKetQua((cu) => (cu ?? []).filter((x) => x.sbd !== p.sbd))
-      setTich((cu) => new Set([...cu].filter((x) => x !== p.sbd)))
-      setTichXoa((cu) => new Set([...cu].filter((x) => x !== p.sbd)))
-      if (xemCauCua === p.sbd) setXemCauCua('')
+      setDaGoiCau((cu) => ({ ...cu, [p.sbd]: [...new Set([...(cu[p.sbd] ?? []), p.cau.id])] }))
+      setKq((cu) => (cu ? { ...cu, phanCong: cu.phanCong.filter((x) => !(x.sbd === p.sbd && x.cau.id === p.cau.id)) } : cu))
+      if (xemCau === p.sbd + p.cau.id) setXemCau('')
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không ghi được kết quả', 'error')
     } finally {
@@ -314,14 +273,87 @@ export default function GoiLenBangScreen() {
     }
   }
 
-  const xoaKhoiBang = (sbds: Set<string>) => {
-    if (!ketQua || sbds.size === 0) return
-    const con = ketQua.filter((p) => !sbds.has(p.sbd))
-    setKetQua(con)
-    setTich((cu) => new Set([...cu].filter((x) => !sbds.has(x))))
-    setTichXoa(new Set())
-    if (xemCauCua && sbds.has(xemCauCua)) setXemCauCua('')
-    showToast(`Đã bỏ ${sbds.size} em khỏi bảng phân công`, 'success')
+  const boDong = (p: DongPhanCong) => {
+    setKq((cu) => (cu ? { ...cu, phanCong: cu.phanCong.filter((x) => !(x.sbd === p.sbd && x.cau.id === p.cau.id)) } : cu))
+    if (xemCau === p.sbd + p.cau.id) setXemCau('')
+  }
+
+  const theoLuot = useMemo(() => {
+    const m = new Map<number, DongPhanCong[]>()
+    for (const p of kq?.phanCong ?? []) {
+      const a = m.get(p.luot)
+      if (a) a.push(p)
+      else m.set(p.luot, [p])
+    }
+    return [...m.entries()].sort((a, b) => a[0] - b[0])
+  }, [kq])
+
+  /** Thẻ câu đầy đủ (phương án, hình, lời giải) — dựng bằng đúng thẻ của màn
+   * xem lại, không vẽ một kiểu hiển thị thứ hai. */
+  const veCau = (id: string, so: number) => {
+    const day = traCau.get(id)
+    if (!day) return <OThongBao tone="cam">Không tìm thấy câu này trong bản đề của ca.</OThongBao>
+    if (day.phan === 'I')
+      return (
+        <TheCau
+          cheDo="xem_lai"
+          phan="I"
+          stt={so}
+          tieuDe={day.q.tieuDe}
+          text={day.q.text}
+          thanCauImg={day.q.thanCauImg}
+          table={day.q.table}
+          imageDataUrl={day.q.imageDataUrl}
+          hinhAnh={day.q.hinhAnh}
+          choices={day.q.choices}
+          choiceImgs={day.q.choiceImgs}
+          choicePerm={[0, 1, 2, 3]}
+          selected={null}
+          correct={day.q.correct}
+          explanation={day.q.explanation}
+          loiGiai={day.q.loiGiai}
+          nhanLoiGiai={day.q.loiGiaiTrangThai}
+        />
+      )
+    if (day.phan === 'II')
+      return (
+        <TheCau
+          cheDo="xem_lai"
+          phan="II"
+          stt={so}
+          tieuDe={day.q.tieuDe}
+          text={day.q.text}
+          thanCauImg={day.q.thanCauImg}
+          table={day.q.table}
+          imageDataUrl={day.q.imageDataUrl}
+          hinhAnh={day.q.hinhAnh}
+          ideas={day.q.ideas}
+          ideaImgs={day.q.ideaImgs}
+          selected={[null, null, null, null]}
+          correct={day.q.correct}
+          explanation={day.q.explanation}
+          loiGiai={day.q.loiGiai}
+          nhanLoiGiai={day.q.loiGiaiTrangThai}
+        />
+      )
+    return (
+      <TheCau
+        cheDo="xem_lai"
+        phan="III"
+        stt={so}
+        tieuDe={day.q.tieuDe}
+        text={day.q.text}
+        thanCauImg={day.q.thanCauImg}
+        table={day.q.table}
+        imageDataUrl={day.q.imageDataUrl}
+        hinhAnh={day.q.hinhAnh}
+        selected={null}
+        correct={day.q.correct}
+        explanation={day.q.explanation}
+        loiGiai={day.q.loiGiai}
+        nhanLoiGiai={day.q.loiGiaiTrangThai}
+      />
+    )
   }
 
   return (
@@ -335,355 +367,300 @@ export default function GoiLenBangScreen() {
 
       {loi && <OThongBao tone="do">{loi}</OThongBao>}
 
-      {/* BƯỚC 1 — CHỌN ĐỀ */}
-      <TheNoiDung>
-        <div style={TIEU_DE_MUC}>1. Đề lấy câu để chữa</div>
-        {deDaLuu.length === 0 ? (
-          <OThongBao tone="cam">Chưa có đề nào trong máy — vào Ngân hàng câu hỏi bấm Đồng bộ trước.</OThongBao>
-        ) : (
-          <div style={{ marginTop: 'var(--k3)' }}>
-            {/* Hộp chọn đề gọn, cuộn trong hộp — cùng một hộp với màn Mở ca. */}
-            <HopChonDe
-              ds={deDaLuu}
-              daChon={maDeChon}
-              chonNhieu
-              onChon={(ma) => {
-                setMaDeChon((cu) => {
-                  const m = new Set(cu)
-                  if (m.has(ma)) m.delete(ma)
-                  else m.add(ma)
-                  return m
-                })
-                setKetQua(null)
-              }}
-              onChonTatCa={(ma) => {
-                setMaDeChon(new Set(ma))
-                setKetQua(null)
-              }}
-              cao={264}
-            />
-          </div>
-        )}
-      </TheNoiDung>
-
-      {/* BƯỚC 2 — TÍCH EM */}
+      {/* 1 — CA LẤY BÀI LÀM */}
       <TheNoiDung>
         <div className="flex items-center justify-between" style={{ gap: 'var(--k2)' }}>
-          <div style={TIEU_DE_MUC}>2. Em gọi lên bảng</div>
-          <span style={{ ...NHAN_NHO, ...SO }}>đã tích {tich.size}</span>
-        </div>
-
-        <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
-          <button
-            type="button"
-            onClick={() => void tichEmCaGanNhat()}
-            disabled={dangLayCa}
-            className="tap-target inline-flex items-center font-bold"
-            style={{ gap: 6, minHeight: 40, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', color: 'var(--muc)', border: 'none', fontSize: 'var(--cx-1)' }}
-          >
-            <Users size={16} /> {dangLayCa ? 'Đang lấy ca…' : 'Tích em vừa thi ca gần nhất'}
-          </button>
-          {tich.size > 0 && (
-            <button type="button" onClick={() => setTich(new Set())} className="tap-target" style={{ ...NHAN_NHO, minHeight: 40, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'transparent', border: 'none' }}>
-              Bỏ tích hết
-            </button>
+          <div style={TIEU_DE_MUC}>1. Ca lớp vừa làm</div>
+          {du && (
+            <span style={{ ...NHAN_NHO, ...SO }}>
+              {dsCau.length} câu · {dsEm.length} em có bài
+            </span>
           )}
         </div>
-        {caGanNhat && <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>Ca gần nhất: {caGanNhat.tenCa || `mã ${caGanNhat.maCa}`}</div>}
-
-        {/* Lọc khối trước rồi mới gõ tên: 251 em ba khối, không lọc thì gõ tên
-            nào cũng ra vài em trùng của khối khác. */}
-        <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
-          {([null, 10, 11, 12] as (number | null)[]).map((k) => {
-            const chon = khoiLoc === k
-            return (
-              <button
-                key={String(k)}
-                type="button"
-                onClick={() => setKhoiLoc(k)}
-                className="tap-target font-bold"
-                style={{ minHeight: 36, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: chon ? 'var(--muc)' : 'var(--the-2)', color: chon ? 'var(--muc-nguoc)' : 'var(--muc)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
-              >
-                {k === null ? 'Tất cả' : `Khối ${k}`}
-              </button>
-            )
-          })}
-          <span style={{ ...NHAN_NHO, ...SO }}>{dsLoc.length} em</span>
-        </div>
+        <div style={{ ...NHAN_NHO, marginTop: 4 }}>Câu để chữa và bài làm của em đều lấy từ ca này — cùng dữ liệu với phiếu gửi phụ huynh.</div>
 
         <div className="relative" style={{ marginTop: 'var(--k3)' }}>
           <Search size={18} style={{ position: 'absolute', left: 14, top: 15, color: 'var(--nhat)' }} />
-          <input value={tim} onChange={(e) => setTim(e.target.value)} placeholder="Tìm theo tên hoặc số báo danh…" style={O_NHAP} aria-label="Tìm học sinh" />
+          <input value={timCa} onChange={(e) => setTimCa(e.target.value)} placeholder="Tìm ca theo tên, mã hoặc lớp…" style={O_NHAP} aria-label="Tìm ca" />
         </div>
 
-        {dsEm === null ? (
-          <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>Đang tải danh sách…</div>
-        ) : dsLoc.length === 0 ? (
-          <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>Không có em nào khớp.</div>
+        {dsCa === null ? (
+          <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>Đang tải danh sách ca…</div>
+        ) : dsCaLoc.length === 0 ? (
+          <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>Chưa có ca nào khớp.</div>
         ) : (
-          <div className="flex flex-col" style={{ gap: 'var(--k1)', marginTop: 'var(--k3)', maxHeight: 380, overflowY: 'auto' }}>
-            {dsLoc.map((e) => {
-              const chon = tich.has(e.sbd)
+          <div className="flex flex-col" style={{ gap: 'var(--k1)', marginTop: 'var(--k3)', maxHeight: 300, overflowY: 'auto' }} data-hop-ca>
+            {dsCaLoc.map((c) => {
+              const chon = du?.maCa === c.maCa
               return (
-                <label key={e.sbd} className="tap-target flex items-center" style={{ gap: 'var(--k3)', padding: 'var(--k2) var(--k3)', borderRadius: 'var(--bo-1)', background: chon ? 'var(--xanh-nen)' : 'transparent', cursor: 'pointer' }}>
-                  <input type="checkbox" checked={chon} onChange={() => doiTich(e.sbd)} style={{ width: 20, height: 20, accentColor: 'var(--xanh)' }} />
+                <button
+                  key={c.maCa}
+                  type="button"
+                  onClick={() => void moCa(c)}
+                  disabled={!!dangTaiCa}
+                  aria-pressed={chon}
+                  className="tap-target text-left flex items-center"
+                  style={{ gap: 'var(--k3)', padding: 'var(--k2) var(--k3)', borderRadius: 'var(--bo-1)', background: chon ? 'var(--xanh-nen)' : 'var(--the-2)', border: 'none', color: 'var(--muc)' }}
+                >
                   <span className="flex-1 min-w-0">
-                    <span className="block truncate" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
-                      {e.hoTen || '(chưa có tên)'}
+                    <span className="block truncate font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
+                      {c.tenCa || `Ca ${c.maCa}`}
                     </span>
                     <span style={NHAN_NHO}>
-                      SBD <span style={SO}>{e.sbd}</span>
-                      {e.lop ? ` · Lớp ${e.lop}` : ''}
-                      {e.soCa > 0 ? ` · ${e.soCa} ca` : ' · chưa thi ca nào'}
+                      mã <span style={SO}>{c.maCa}</span>
+                      {c.lop ? ` · lớp ${c.lop}` : ''} · <span style={SO}>{c.daNop}</span>/<span style={SO}>{c.daVao}</span> đã nộp
                     </span>
                   </span>
-                </label>
+                  {dangTaiCa === c.maCa ? <RefreshCw size={16} className="animate-spin shrink-0" /> : chon ? <Check size={16} className="shrink-0" style={{ color: 'var(--xanh)' }} /> : null}
+                </button>
               )
             })}
           </div>
         )}
+        {dangTaiCa && tienDo && <div style={{ ...NHAN_NHO, ...SO, marginTop: 'var(--k2)' }}>Đang lấy hồ sơ chuyên đề từng em… {tienDo}</div>}
       </TheNoiDung>
 
-      {/* BƯỚC 3 — PHÂN CÔNG */}
-      <NutChinh onClick={() => void phanCong()} disabled={dangPhan || tich.size === 0 || cauHoi.length === 0}>
+      {/* 2 — THÊM CÂU NGOÀI CA */}
+      <TheNoiDung>
+        <div style={TIEU_DE_MUC}>2. Thêm câu ngoài ca</div>
+        <div style={{ ...NHAN_NHO, marginTop: 4, marginBottom: 'var(--k3)' }}>
+          Tuỳ chọn. Tích thêm bài hoặc dạng muốn chữa; câu thêm chưa có bài làm nên chỉ vào danh sách chữa, không bị xếp giảng cả lớp.
+        </div>
+        {deDaLuu.length === 0 ? (
+          <OThongBao tone="cam">Chưa có đề nào trong máy — vào Ngân hàng câu hỏi bấm Đồng bộ trước.</OThongBao>
+        ) : (
+          <HopChonDe
+            ds={deDaLuu}
+            daChon={maDeChon}
+            chonNhieu
+            onChon={(ma) =>
+              setMaDeChon((cu) => {
+                const m = new Set(cu)
+                if (m.has(ma)) m.delete(ma)
+                else m.add(ma)
+                return m
+              })
+            }
+            onChonTatCa={(ma) => setMaDeChon(new Set(ma))}
+            cao={264}
+          />
+        )}
+      </TheNoiDung>
+
+      {/* 3 — EM CÓ MẶT */}
+      {du && (
+        <TheNoiDung>
+          <div className="flex items-center justify-between" style={{ gap: 'var(--k2)' }}>
+            <div style={TIEU_DE_MUC}>3. Em có mặt hôm nay</div>
+            <span style={{ ...NHAN_NHO, ...SO }}>
+              {soCoMat}/{dsEmCa.length}
+            </span>
+          </div>
+          <div style={{ ...NHAN_NHO, marginTop: 4 }}>Bỏ tích em vắng. Bài của em vắng vẫn tính vào tỉ lệ đúng/sai của câu, chỉ là em không nhận câu nào.</div>
+          <div className="relative" style={{ marginTop: 'var(--k3)' }}>
+            <Search size={18} style={{ position: 'absolute', left: 14, top: 15, color: 'var(--nhat)' }} />
+            <input value={timEm} onChange={(e) => setTimEm(e.target.value)} placeholder="Tìm theo tên hoặc số báo danh…" style={O_NHAP} aria-label="Tìm học sinh" />
+          </div>
+          <div className="flex flex-col" style={{ gap: 'var(--k1)', marginTop: 'var(--k3)', maxHeight: 320, overflowY: 'auto' }}>
+            {dsEm.map((e) => (
+              <label key={e.sbd} className="tap-target flex items-center" style={{ gap: 'var(--k3)', padding: 'var(--k2) var(--k3)', borderRadius: 'var(--bo-1)', background: e.coMat ? 'var(--xanh-nen)' : 'transparent', cursor: 'pointer' }}>
+                <input type="checkbox" checked={e.coMat} onChange={() => doiVang(e.sbd)} aria-label={`${e.hoTen || e.sbd} có mặt`} style={{ width: 20, height: 20, accentColor: 'var(--xanh)' }} />
+                <span className="flex-1 min-w-0">
+                  <span className="block truncate" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
+                    {e.hoTen || '(chưa có tên)'}
+                  </span>
+                  <span style={NHAN_NHO}>
+                    SBD <span style={SO}>{e.sbd}</span>
+                  </span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </TheNoiDung>
+      )}
+
+      {/* 4 — PHÂN CÔNG */}
+      <NutChinh onClick={() => chay(1)} disabled={!du || soCoMat === 0}>
         <span className="inline-flex items-center" style={{ gap: 6 }}>
-          {dangPhan ? <RefreshCw size={18} className="animate-spin" /> : <Wand2 size={18} />}
-          {dangPhan ? `Đang xem chuyên đề yếu… ${tienDo}` : `Phân công câu hỏi (${tich.size} em)`}
+          <Wand2 size={18} /> Phân công lên bảng ({soCoMat} em)
         </span>
       </NutChinh>
 
-      {ketQua && (
+      {kq && (
         <TheNoiDung>
           <div className="flex items-center justify-between flex-wrap" style={{ gap: 'var(--k2)' }}>
             <div style={TIEU_DE_MUC}>Phân công</div>
-            <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
-              {tichXoa.size > 0 && (
-                <button
-                  type="button"
-                  onClick={() => xoaKhoiBang(tichXoa)}
-                  className="tap-target inline-flex items-center font-bold"
-                  style={{ gap: 6, minHeight: 40, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--do-nen)', color: 'var(--do)', border: 'none', fontSize: 'var(--cx-1)' }}
-                >
-                  <Trash2 size={16} /> Xoá {tichXoa.size} em đã tích
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => void copyBang()}
-                className="tap-target inline-flex items-center font-bold"
-                style={{ gap: 6, minHeight: 40, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: daCopy ? 'var(--xanh-nen)' : 'var(--the-2)', color: daCopy ? 'var(--xanh)' : 'var(--muc)', border: 'none', fontSize: 'var(--cx-1)' }}
-              >
-                {daCopy ? <Check size={16} /> : <ClipboardCopy size={16} />} {daCopy ? 'Đã copy' : 'Copy bảng'}
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => void copyBang()}
+              className="tap-target inline-flex items-center font-bold"
+              style={{ gap: 6, minHeight: 40, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: daCopy ? 'var(--xanh-nen)' : 'var(--the-2)', color: daCopy ? 'var(--xanh)' : 'var(--muc)', border: 'none', fontSize: 'var(--cx-1)' }}
+            >
+              {daCopy ? <Check size={16} /> : <ClipboardCopy size={16} />} {daCopy ? 'Đã copy' : 'Copy bảng'}
+            </button>
           </div>
-          <div className="flex items-center justify-between flex-wrap" style={{ ...NHAN_NHO, marginTop: 4, gap: 'var(--k2)' }}>
-            <span>
-              <span style={SO}>{soDung}</span>/<span style={SO}>{ketQua.length}</span> em nhận đúng câu chuyên đề mình yếu · chạm tên em để xem câu và lời giải · bấm phân công lần nữa là ra câu khác, khó hơn một bậc
-            </span>
-            {ketQua.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setTichXoa(tichXoa.size === ketQua.length ? new Set() : new Set(ketQua.map((p) => p.sbd)))}
-                className="tap-target"
-                style={{ ...NHAN_NHO, minHeight: 32, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', border: 'none' }}
-              >
-                {tichXoa.size === ketQua.length ? 'Bỏ tích hết' : 'Tích hết'}
-              </button>
-            )}
+          <div style={{ ...NHAN_NHO, marginTop: 4 }} data-dong-tong>
+            <span style={SO}>{kq.thongKe.length - kq.giangCaLop.length - kq.chiDocDapAn.length}</span> câu đáng chữa · <span style={SO}>{kq.giangCaLop.length}</span> giảng cả lớp ·{' '}
+            <span style={SO}>{kq.chiDocDapAn.length}</span> đọc đáp án
           </div>
 
-          {chuaCoSao && (
-            <div style={{ marginTop: 'var(--k3)' }}>
-              <OThongBao tone="cam">
-                Đề này chưa câu nào có sao cần chữa. Vào Ngân hàng đề bấm Đồng bộ để nạp lại kho — sao nằm sẵn trong file kho, bản đề đang lưu trong máy được nạp trước khi app biết đọc trường đó.
-              </OThongBao>
+          {/* GIẢNG CẢ LỚP LÊN ĐẦU — chỗ đắt nhất của buổi: một lần giảng sửa cho
+              nhiều em, còn gọi một em lên chữa thì cả lớp ngồi xem. */}
+          {kq.giangCaLop.length > 0 && (
+            <div style={{ marginTop: 'var(--k4)', padding: 'var(--k3)', borderRadius: 'var(--bo-2)', background: 'var(--cam-nen)' }} data-khoi="giang-ca-lop">
+              <div className="flex items-center font-bold" style={{ gap: 6, color: 'var(--cam)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
+                <Megaphone size={16} /> GIẢNG CẢ LỚP — không gọi ai lên bảng
+              </div>
+              <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
+                {kq.giangCaLop.map((t) => (
+                  <div key={t.cau.id}>
+                    <button
+                      type="button"
+                      onClick={() => setXemCau(xemCau === t.cau.id ? '' : t.cau.id)}
+                      className="tap-target text-left w-full"
+                      style={{ background: 'none', border: 'none', padding: 0, minHeight: 0, color: 'var(--muc)' }}
+                    >
+                      <span className="block font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
+                        {chuCau(t.cau)}
+                      </span>
+                      <span className="block" style={{ ...NHAN_NHO, ...SO }}>
+                        {chuChum(t)}
+                      </span>
+                      {t.cau.tomTat && (
+                        <span className="block" style={{ ...NHAN_NHO, color: 'var(--muc)' }}>
+                          {t.cau.tomTat}
+                        </span>
+                      )}
+                    </button>
+                    {xemCau === t.cau.id && <div style={{ marginTop: 'var(--k2)' }}>{veCau(t.cau.id, t.cau.so)}</div>}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
-          <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
-            {ketQua.map((p) => {
-              const mo = xemCauCua === p.sbd
-              const day = p.cau ? cauDayDu(p.cau) : null
-              return (
-                <div key={p.sbd} className="flex flex-col" style={{ gap: 'var(--k2)' }}>
-                  <Hang style={{ alignItems: 'flex-start' }}>
-                    <input
-                      type="checkbox"
-                      checked={tichXoa.has(p.sbd)}
-                      onChange={() => doiTichXoa(p.sbd)}
-                      aria-label={`Tích để xoá ${p.hoTen || p.sbd}`}
-                      style={{ width: 20, height: 20, accentColor: 'var(--do)', marginTop: 2, marginRight: 'var(--k3)' }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setXemCauCua(mo ? '' : p.sbd)}
-                      className="flex-1 min-w-0 text-left tap-target"
-                      style={{ background: 'none', border: 'none', padding: 0, minHeight: 0, color: 'var(--muc)' }}
-                    >
-                      <span className="block font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)', textDecoration: 'underline', textDecorationColor: 'var(--vien-dam)', textUnderlineOffset: 3 }}>
-                        {p.hoTen || `SBD ${p.sbd}`}
-                      </span>
-                      {p.chuyenDeYeu ? (
-                        <span style={NHAN_NHO}>
-                          Yếu nhất: {p.chuyenDeYeu.ten} — sai <span style={SO}>{p.chuyenDeYeu.soSai}/{p.chuyenDeYeu.soCau}</span> câu
-                        </span>
-                      ) : (
-                        <span style={NHAN_NHO}>Chưa có dữ liệu chuyên đề</span>
-                      )}
-                      {p.cau && !mo && (
-                        <span className="block" style={{ ...NHAN_NHO, color: 'var(--muc)', marginTop: 4 }}>
-                          {p.cau.tomTat}
-                        </span>
-                      )}
-                      {p.viSao && (
-                        <span className="block" style={{ ...NHAN_NHO, marginTop: 2 }}>
-                          {p.viSao}
-                        </span>
-                      )}
-                      {p.cau?.lyDoSao && !!p.cau.sao && (
-                        <span className="block" style={{ ...NHAN_NHO, color: 'var(--cam)', marginTop: 2 }}>
-                          {p.cau.lyDoSao}
-                        </span>
-                      )}
-                      {p.ghiChu && (
-                        <span className="block" style={{ ...NHAN_NHO, color: 'var(--cam)', marginTop: 4 }}>
-                          {p.ghiChu}
-                        </span>
-                      )}
-                      <span className="flex items-center flex-wrap" style={{ gap: 4, marginTop: 4 }}>
-                        {p.lyDo === 'dung_chuyen_de_yeu' && <Nhan tone="xanh">đúng chuyên đề yếu</Nhan>}
-                        {p.lyDo === 'de_khong_co_chuyen_de_nay' && <Nhan tone="cam">đề thiếu chuyên đề này</Nhan>}
-                        {p.lyDo === 'chua_co_du_lieu' && <Nhan tone="xam">chưa có dữ liệu</Nhan>}
-                        {p.lyDo === 'het_cau_moi' && <Nhan tone="cam">hết câu mới</Nhan>}
-                        {p.cau?.mucDo && <Nhan tone="tim">{TEN_MUC[p.cau.mucDo]}</Nhan>}
-                      </span>
-                    </button>
-                    <span className="shrink-0 text-right flex items-start" style={{ gap: 'var(--k2)' }}>
-                      <span>
-                        {p.cau ? (
-                          <>
-                            <span className="block font-bold" style={{ ...SO, fontSize: 'var(--cx-4)' }}>
-                              {p.cau.so}
+          {/* CÁC LƯỢT */}
+          {theoLuot.map(([luot, ds]) => (
+            <div key={luot} style={{ marginTop: 'var(--k4)' }} data-luot={luot}>
+              <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', letterSpacing: '.04em' }}>
+                LƯỢT {luot}
+              </div>
+              <div className="flex flex-col" style={{ gap: 'var(--k3)', marginTop: 'var(--k2)' }}>
+                {ds.map((p) => {
+                  const ma = p.sbd + p.cau.id
+                  return (
+                    <div key={ma} className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+                      <Hang style={{ alignItems: 'flex-start' }}>
+                        <button
+                          type="button"
+                          onClick={() => setXemCau(xemCau === ma ? '' : ma)}
+                          className="flex-1 min-w-0 text-left tap-target"
+                          style={{ background: 'none', border: 'none', padding: 0, minHeight: 0, color: 'var(--muc)' }}
+                        >
+                          <span className="block font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
+                            {chuCau(p.cau)} <span style={{ color: 'var(--nhat)' }}>→</span> {p.hoTen || `SBD ${p.sbd}`}
+                          </span>
+                          {/* VÌ SAO CHỌN EM NÀY + NHẮM MỨC NÀO — thầy đọc là biết
+                              lý do, không phải tin một con số. */}
+                          <span className="block" style={NHAN_NHO} data-vi-sao>
+                            {p.viSao} · nhắm {TEN_MUC_NHAM[p.mucDoNham]}
+                          </span>
+                          {p.cau.tomTat && (
+                            <span className="block" style={{ ...NHAN_NHO, color: 'var(--muc)' }}>
+                              {p.cau.tomTat}
                             </span>
-                            <span style={NHAN_NHO}>Phần {p.cau.phan}</span>
-                            {/* SAO CẦN CHỮA — thầy chấm sẵn trong kho. Không có
-                                sao ở đây thì thầy không biết câu máy vừa đưa ra
-                                có đáng đứng bảng chữa hay không. */}
-                            {!!p.cau.sao && (
-                              <span className="block" style={{ color: 'var(--cam)', fontSize: 'var(--cx-2)', letterSpacing: '.05em' }} title={p.cau.lyDoSao || undefined}>
-                                {'★'.repeat(p.cau.sao)}
-                              </span>
-                            )}
-                          </>
-                        ) : (
-                          <span style={{ ...NHAN_NHO, color: 'var(--mo)' }}>—</span>
-                        )}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => xoaKhoiBang(new Set([p.sbd]))}
-                        aria-label={`Bỏ ${p.hoTen || p.sbd} khỏi bảng`}
-                        className="tap-target flex items-center justify-center"
-                        style={{ width: 32, height: 32, borderRadius: 'var(--bo-tron)', background: 'transparent', border: 'none', color: 'var(--mo)' }}
-                      >
-                        <X size={16} />
-                      </button>
-                    </span>
-                  </Hang>
+                          )}
+                          {p.cau.lyDoSao && !!p.cau.sao && (
+                            <span className="block" style={{ ...NHAN_NHO, color: 'var(--cam)' }}>
+                              {p.cau.lyDoSao}
+                            </span>
+                          )}
+                          <span className="flex items-center flex-wrap" style={{ gap: 4, marginTop: 4 }}>
+                            {p.muc <= 2 && <Nhan tone="do">sai chính câu này</Nhan>}
+                            {p.muc === 3 && <Nhan tone="cam">chưa làm câu này</Nhan>}
+                            {p.cau.mucDo && <Nhan tone="xam">{TEN_MUC_NHAM[p.cau.mucDo]}</Nhan>}
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => boDong(p)}
+                          aria-label={`Bỏ ${p.hoTen || p.sbd} khỏi bảng`}
+                          className="tap-target flex items-center justify-center shrink-0"
+                          style={{ width: 32, height: 32, borderRadius: 'var(--bo-tron)', background: 'transparent', border: 'none', color: 'var(--mo)' }}
+                        >
+                          <X size={16} />
+                        </button>
+                      </Hang>
 
-                  {/* CHẤM NGAY TẠI LỚP: chữa xong bấm một nút, kết quả vào log
-                      mạnh–yếu của em và hàng này biến khỏi bảng. */}
-                  <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)', paddingLeft: 'var(--k6)' }}>
-                    <button
-                      type="button"
-                      onClick={() => void chamLenBang(p, true)}
-                      disabled={dangCham === p.sbd}
-                      className="tap-target inline-flex items-center font-bold"
-                      style={{ gap: 6, minHeight: 36, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--xanh-nen)', color: 'var(--xanh)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
-                    >
-                      <ThumbsUp size={15} /> Đạt
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void chamLenBang(p, false)}
-                      disabled={dangCham === p.sbd}
-                      className="tap-target inline-flex items-center font-bold"
-                      style={{ gap: 6, minHeight: 36, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--do-nen)', color: 'var(--do)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
-                    >
-                      <ThumbsDown size={15} /> Không đạt
-                    </button>
-                    {dangCham === p.sbd && <span style={NHAN_NHO}>Đang ghi…</span>}
-                  </div>
+                      <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)' }}>
+                        <button
+                          type="button"
+                          onClick={() => void cham(p, true)}
+                          disabled={dangCham === ma}
+                          className="tap-target inline-flex items-center font-bold"
+                          style={{ gap: 6, minHeight: 36, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--xanh-nen)', color: 'var(--xanh)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+                        >
+                          <ThumbsUp size={15} /> Đạt
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void cham(p, false)}
+                          disabled={dangCham === ma}
+                          className="tap-target inline-flex items-center font-bold"
+                          style={{ gap: 6, minHeight: 36, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--do-nen)', color: 'var(--do)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+                        >
+                          <ThumbsDown size={15} /> Không đạt
+                        </button>
+                        {dangCham === ma && <span style={NHAN_NHO}>Đang ghi…</span>}
+                      </div>
 
-                  {/* CÂU ĐẦY ĐỦ + LỜI GIẢI — dựng bằng đúng thẻ câu của màn xem
-                      lại, nên công thức, hình và lời giải hiện y như em thấy. */}
-                  {mo && (
-                    <div style={{ paddingLeft: 'var(--k2)' }}>
-                      {!day?.q ? (
-                        <OThongBao tone="cam">Không tìm thấy câu này trong đề đang chọn — thầy đổi đề rồi phân công lại.</OThongBao>
-                      ) : day.phan === 'I' ? (
-                        <TheCau
-                          cheDo="xem_lai"
-                          phan="I"
-                          stt={p.cau!.so}
-                          tieuDe={day.q.tieuDe}
-                          text={day.q.text}
-                          thanCauImg={day.q.thanCauImg}
-                          table={day.q.table}
-                          imageDataUrl={day.q.imageDataUrl}
-                          hinhAnh={day.q.hinhAnh}
-                          choices={day.q.choices}
-                          choiceImgs={day.q.choiceImgs}
-                          choicePerm={[0, 1, 2, 3]}
-                          selected={null}
-                          correct={day.q.correct}
-                          explanation={day.q.explanation}
-                          loiGiai={day.q.loiGiai}
-                          nhanLoiGiai={day.q.loiGiaiTrangThai}
-                        />
-                      ) : day.phan === 'II' ? (
-                        <TheCau
-                          cheDo="xem_lai"
-                          phan="II"
-                          stt={p.cau!.so}
-                          tieuDe={day.q.tieuDe}
-                          text={day.q.text}
-                          thanCauImg={day.q.thanCauImg}
-                          table={day.q.table}
-                          imageDataUrl={day.q.imageDataUrl}
-                          hinhAnh={day.q.hinhAnh}
-                          ideas={day.q.ideas}
-                          ideaImgs={day.q.ideaImgs}
-                          selected={[null, null, null, null]}
-                          correct={day.q.correct}
-                          explanation={day.q.explanation}
-                          loiGiai={day.q.loiGiai}
-                          nhanLoiGiai={day.q.loiGiaiTrangThai}
-                        />
-                      ) : (
-                        <TheCau
-                          cheDo="xem_lai"
-                          phan="III"
-                          stt={p.cau!.so}
-                          tieuDe={day.q.tieuDe}
-                          text={day.q.text}
-                          thanCauImg={day.q.thanCauImg}
-                          table={day.q.table}
-                          imageDataUrl={day.q.imageDataUrl}
-                          hinhAnh={day.q.hinhAnh}
-                          selected={null}
-                          correct={day.q.correct}
-                          explanation={day.q.explanation}
-                          loiGiai={day.q.loiGiai}
-                          nhanLoiGiai={day.q.loiGiaiTrangThai}
-                        />
-                      )}
+                      {xemCau === ma && <div>{veCau(p.cau.id, p.cau.so)}</div>}
                     </div>
-                  )}
-                </div>
-              )
-            })}
+                  )
+                })}
+              </div>
+            </div>
+          ))}
+
+          {/* CHỈ ĐỌC ĐÁP ÁN — cắt đầu tiên khi thiếu giờ, nên để cuối. */}
+          {kq.chiDocDapAn.length > 0 && (
+            <div style={{ marginTop: 'var(--k4)', padding: 'var(--k3)', borderRadius: 'var(--bo-2)', background: 'var(--the-2)' }} data-khoi="chi-doc-dap-an">
+              <div className="flex items-center font-bold" style={{ gap: 6, fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
+                <BookOpenCheck size={16} /> CHỈ ĐỌC ĐÁP ÁN
+              </div>
+              <div className="flex flex-col" style={{ gap: 4, marginTop: 'var(--k2)' }}>
+                {kq.chiDocDapAn.map((t) => (
+                  <div key={t.cau.id} style={{ ...NHAN_NHO, color: 'var(--muc)' }}>
+                    {chuCau(t.cau)} — <span style={SO}>{Math.round(t.tiLeDung * 100)}%</span> em làm đúng
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* CHÂN BẢNG: ai chưa được gọi, con số nào chỉ tham khảo, còn câu thì
+              gọi tiếp lượt sau. */}
+          <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k4)' }}>
+            {kq.emChuaGoi.length > 0 && (
+              <div style={NHAN_NHO} data-chua-goi>
+                <span style={SO}>{kq.emChuaGoi.length}</span> em chưa được gọi lượt nào: {kq.emChuaGoi.join(', ')}
+              </div>
+            )}
+            {kq.canhBao.map((c) => (
+              <div key={c} style={{ ...NHAN_NHO, color: 'var(--cam)' }} data-canh-bao>
+                ⚠ {c}
+              </div>
+            ))}
+            {kq.chuaPhan.length > 0 && (
+              <button
+                type="button"
+                onClick={() => chay(soLuot + 1)}
+                className="tap-target self-start inline-flex items-center font-bold"
+                style={{ gap: 6, minHeight: 44, padding: '0 var(--k5)', borderRadius: 'var(--bo-tron)', background: 'var(--muc)', color: 'var(--muc-nguoc)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}
+              >
+                GỌI LƯỢT {soLuot + 1}
+              </button>
+            )}
           </div>
         </TheNoiDung>
       )}

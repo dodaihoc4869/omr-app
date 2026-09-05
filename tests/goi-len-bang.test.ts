@@ -139,37 +139,65 @@ describe('Bảng chữ để copy', () => {
   })
 })
 
+// MÀN GỌI LÊN BẢNG từ 05/09 chiều chạy engine `phan-cong.ts` và lấy dữ liệu từ
+// CHÍNH ca lớp vừa làm — cùng một ca với phiếu gửi phụ huynh. Bản cũ chỉ biết
+// "em yếu chuyên đề gì"; bản này biết em nào sai câu nào.
 describe('Màn Gọi lên bảng', () => {
-  it('có lọc khối, tìm theo tên, và chạm em ra câu kèm lời giải', async () => {
+  it('chạy engine phân công mới trên bài làm thật của ca', async () => {
     const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
-    expect(ma).toContain('Khối ${k}')
-    expect(ma).toContain('khoiTuNamSinh(e.namSinh) !== khoiLoc')
+    expect(ma).toContain("from '../lib/phan-cong'")
+    expect(ma).toContain("from '../lib/du-lieu-len-bang'")
+    expect(ma).toContain('phanCong(dsCau, baiLam, dsEmCa,')
+    expect(ma).toContain('baiLamTuCa(du.bank, du.maCa, du.luot)')
+    // engine cũ không được sống song song trong màn này
+    expect(ma).not.toContain('phanCongCauHoi(')
+  })
+
+  it('tìm theo tên, và chạm dòng ra câu kèm lời giải', async () => {
+    const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
     expect(ma).toContain('Tìm theo tên hoặc số báo danh')
     // câu hiện bằng ĐÚNG thẻ của màn xem lại, không vẽ kiểu hiển thị thứ hai
     expect(ma).toContain('cheDo="xem_lai"')
     expect(ma).toContain('loiGiai={day.q.loiGiai}')
   })
 
-  it('bảng phân công có tích xoá và xoá hàng loạt', async () => {
+  it('khối GIẢNG CẢ LỚP đứng TRƯỚC các lượt gọi', async () => {
     const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
-    expect(ma).toContain('Xoá {tichXoa.size} em đã tích')
-    expect(ma).toContain('xoaKhoiBang(tichXoa)')
-    expect(ma).toContain('xoaKhoiBang(new Set([p.sbd]))')
-    // Xoá KHÔNG được phân công lại: thầy đã đọc bảng, câu nhảy sang em khác là gọi nhầm.
-    expect(ma).toContain('ketQua.filter((p) => !sbds.has(p.sbd))')
-    expect(ma).not.toContain('phanCongCauHoi(con')
+    const giang = ma.indexOf('data-khoi="giang-ca-lop"')
+    const luot = ma.indexOf('data-luot={luot}')
+    expect(giang).toBeGreaterThan(0)
+    expect(luot).toBeGreaterThan(giang)
+  })
+
+  it('mỗi dòng ghi VÌ SAO chọn em này và nhắm mức độ nào', async () => {
+    const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
+    expect(ma).toContain('data-vi-sao')
+    expect(ma).toContain('{p.viSao} · nhắm {TEN_MUC_NHAM[p.mucDoNham]}')
+  })
+
+  it('nút GỌI LƯỢT sau chỉ hiện khi CÒN CÂU chưa phân', async () => {
+    const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
+    const i = ma.indexOf('kq.chuaPhan.length > 0')
+    expect(i).toBeGreaterThan(0)
+    expect(ma.slice(i, i + 900)).toContain('GỌI LƯỢT {soLuot + 1}')
+  })
+
+  it('ca không có bản đề kèm đáp án thì báo thẳng, không phân công mò', async () => {
+    const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
+    expect(ma).toContain('loadSessionTeacherBank(ca.maCa)')
+    expect(ma).toContain('không có bản đề kèm đáp án')
   })
 })
 
 describe('Chấm câu trên bảng', () => {
-  it('có nút Đạt / Không đạt, ghi vào log mạnh–yếu rồi bỏ em khỏi bảng', async () => {
+  it('có nút Đạt / Không đạt, ghi vào log mạnh–yếu rồi bỏ dòng khỏi bảng', async () => {
     const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
-    expect(ma).toContain('chamLenBang(p, true)')
-    expect(ma).toContain('chamLenBang(p, false)')
+    expect(ma).toContain('cham(p, true)')
+    expect(ma).toContain('cham(p, false)')
     expect(ma).toContain('ghiLenBang(cauHinh.url, cauHinh.mat')
     // bỏ khỏi bảng CHỈ SAU khi máy chủ nhận — mất dòng mà chưa ghi là thầy tưởng xong rồi
     const i = ma.indexOf('await ghiLenBang')
-    const j = ma.indexOf('filter((x) => x.sbd !== p.sbd)')
+    const j = ma.indexOf('cu.phanCong.filter((x) => !(x.sbd === p.sbd && x.cau.id === p.cau.id))')
     expect(i).toBeGreaterThan(0)
     expect(j).toBeGreaterThan(i)
   })
@@ -254,19 +282,18 @@ describe('Phân công cho em TIẾN BỘ', () => {
 })
 
 describe('Màn nhớ câu đã gọi', () => {
-  it('lưu câu vừa phân công và tránh nó ở lần bấm sau', async () => {
+  it('câu đã chấm xong không quay lại ở lượt sau của chính em đó', async () => {
     const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
-    expect(ma).toContain('const [daGoi, setDaGoi]')
-    expect(ma).toContain('phanCongCauHoi(emDeGoi, cauHoi, tranh)')
-    // gộp cả câu em đã làm trong bài thi/bài tập
-    expect(ma).toContain('qidDaLam(cauHinh.url, cauHinh.mat, sbd)')
-    expect(ma).toContain('...(daGoi[sbd] ?? []), ...(hoSo[i]?.qids ?? [])')
+    expect(ma).toContain('const [daGoiCau, setDaGoiCau]')
+    // ghi vào daGoiCau NGAY sau khi chấm, và daGoiCau chảy vào dsEm → engine
+    expect(ma).toContain('setDaGoiCau((cu) => ({ ...cu, [p.sbd]: [...new Set([...(cu[p.sbd] ?? []), p.cau.id])] }))')
+    expect(ma).toContain('emTuCa(du.luot, du.hoSo, dsCau, daGoiCau, vang)')
   })
 
-  it('lấy hồ sơ và câu đã làm CÙNG LÚC, không nối tiếp', async () => {
+  it('lấy hồ sơ chuyên đề song song có chặn, không tuần tự 27 lời gọi', async () => {
     const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
-    expect(ma).toContain('await Promise.all([')
     expect(ma).toContain('hoSoEm(cauHinh.url, { secret: cauHinh.mat, sbd })')
+    expect(ma).toContain('songSong(')
   })
 })
 
