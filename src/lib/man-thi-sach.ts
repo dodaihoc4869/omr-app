@@ -202,6 +202,55 @@ export function duKhoaMotMinh(x: XetKhoaMotMinh): boolean {
   return x.hoLuongChinh && !x.coChamMan && x.dangLamBaiBinhThuong
 }
 
+// ============================================================================
+// HAI CÁCH THẬT SỰ HIỆU QUẢ — chốt 05/09 tối sau video thứ hai của thầy.
+// ============================================================================
+// Video cho thấy hai điều bảy kênh kia không bắt được, và chỉ ra vì sao:
+//
+//   1. CỬA SỔ NỔI GEMINI KHÔNG LẤY TIÊU ĐIỂM của Chrome. `document.hasFocus()`
+//      vẫn true, `visibilityState` vẫn 'visible', cỡ cửa sổ không đổi. Không
+//      một API web nào nhìn thấy lớp phủ của app khác — y như chuyện ảnh nhỏ ở
+//      mục 0 đặc tả. Ngồi đợi tín hiệu là đợi mãi.
+//
+//   2. CHỤP MÀN HÌNH BẰNG VUỐT BA NGÓN thì CÓ chạm màn, nên chính điều kiện
+//      "không chạm" vừa thêm lại loại nó ra.
+//
+// Nên đổi cách nghĩ: thôi cố nhìn thứ không nhìn được, quay sang hai thứ đo
+// được chắc chắn.
+//
+// ---------------------------------------------------------------------------
+// CÁCH 1 — ĐẾM SỐ NGÓN CHẠM.
+// ---------------------------------------------------------------------------
+// Chụp màn hình bằng cử chỉ trên Android là VUỐT BA NGÓN. Trang nhận đủ ba điểm
+// chạm trong `event.touches`. Em làm bài thì chạm một ngón để chọn đáp án, hai
+// ngón để phóng to ảnh — KHÔNG BAO GIỜ ba ngón. Đây là tín hiệu trực tiếp,
+// không cần suy đoán, không ngưỡng nào phải đo.
+// ---------------------------------------------------------------------------
+// CÁCH 2 — CHE ĐỀ KHI BẤT ĐỘNG.
+// ---------------------------------------------------------------------------
+// Không nhìn thấy cửa sổ nổi, nhưng nhìn thấy HẬU QUẢ của nó: suốt lúc em thao
+// tác với Gemini thì trang không nhận một cú chạm nào. Sau ngần ấy giây bất
+// động, đề tự mờ đi; chạm một cái là hiện lại ngay.
+//
+// Đây KHÔNG phải hình phạt: không khoá, không đếm, không báo thầy. Nó chỉ làm
+// cái cửa sổ nổi kia trở nên vô dụng — em không vừa hỏi AI vừa nhìn đề được
+// nữa, và ảnh chụp lần sau chỉ ra tấm che.
+
+/** Số ngón chạm cùng lúc coi là cử chỉ chụp màn hình. Ba ngón là cử chỉ chụp
+ * mặc định của nhiều máy Android; em làm bài nhiều nhất là hai ngón phóng ảnh. */
+export const SO_NGON_CHUP = 3
+
+/** Bất động quá ngần này giây thì che đề.
+ *
+ * 20 giây: đọc một câu Phần II bốn ý dài nhất cũng chưa tới, mà mở cửa sổ nổi
+ * hỏi AI thì luôn lâu hơn. Chạm là hiện lại tức thì nên đặt nhầm cũng không
+ * mất gì ngoài một cú chạm. */
+export const MS_BAT_DONG_CHE = 20000
+
+/** Câu trên tấm che khi che vì bất động. Không phải lý do khoá — không có chữ
+ * nào trách em, vì em có thể chỉ đang đọc kỹ. */
+export const LOI_CHE_BAT_DONG = 'Đề tạm ẩn vì đã lâu không có thao tác nào. Chạm vào màn hình để đọc tiếp.'
+
 // ------------------------------------------------ CỬA SỔ NỔI: XÉT TẠI CHỖ
 //
 // SỬA 05/09 tối, sau khi thầy thử thật: mở cửa sổ chat Messenger đè lên bài mà

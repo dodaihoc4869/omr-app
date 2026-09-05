@@ -15,6 +15,7 @@ import {
   MS_RAF_NGHI_CHOT,
   MUC_NGAT_CA_CU,
   NGUONG_XUNG_CHOT,
+  SO_NGON_CHUP,
   TEN_LY_DO_KHOA,
   TI_LE_CO_MAN_CHOT,
   chuNhomPhieu,
@@ -22,6 +23,8 @@ import {
   coKhoa,
   duKhoaMotMinh,
   laCuaSoNoi,
+  LOI_CHE_BAT_DONG,
+  MS_BAT_DONG_CHE,
   MS_KHONG_CHAM_QUANH_PHIEU,
   MS_NHIP_SOI_TIEU_DIEM,
   nhomDuKhoa,
@@ -286,5 +289,42 @@ describe('khoá một mình khi không chạm màn', () => {
     expect(ma).toContain('const chamSau = performance.now() - mocChamManCuoi < MS_KHONG_CHAM_QUANH_PHIEU')
     expect(ma).toContain('duKhoaMotMinh({')
     expect(ma).toContain('không chạm màn')
+  })
+})
+
+// VIDEO THỨ HAI của thầy 05/09 tối: cửa sổ nổi Gemini đè lên bài mà `hasFocus`
+// vẫn true, `visibilityState` vẫn 'visible', cỡ cửa sổ không đổi — không API
+// web nào nhìn thấy lớp phủ của app khác. Nên đổi cách: thôi cố nhìn thứ không
+// nhìn được, quay sang hai thứ đo được chắc chắn.
+describe('hai cách không dựa vào tín hiệu hệ điều hành', () => {
+  it('ba ngón chạm cùng lúc là cử chỉ chụp màn hình, không phải thao tác làm bài', () => {
+    // một ngón chọn đáp án, hai ngón phóng ảnh — ba ngón thì chỉ có chụp
+    expect(SO_NGON_CHUP).toBe(3)
+  })
+
+  it('màn làm bài đếm số ngón và khoá ngay, không cần ngưỡng nào', async () => {
+    const ma = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default
+    expect(ma).toContain('if (!t || t.length < SO_NGON_CHUP) return')
+    expect(ma).toContain("khoaVi('dau_vet_chup', `${t.length} ngón chạm cùng lúc`)")
+    // vẫn tôn trọng ân hạn 3 giây đầu và mức ngặt
+    expect(ma).toContain('if (daKhoa || conAnHan()) return')
+  })
+
+  it('che đề khi bất động — 20 giây, đủ dài để đọc câu dài nhất', () => {
+    expect(MS_BAT_DONG_CHE).toBe(20000)
+  })
+
+  it('che vì bất động KHÔNG phải hình phạt: không trách em, chạm là hiện lại', () => {
+    expect(LOI_CHE_BAT_DONG).toMatch(/Chạm vào màn hình/)
+    expect(LOI_CHE_BAT_DONG).not.toMatch(/gian lận|quay cóp|vi phạm|khoá/i)
+  })
+
+  it('chạm là bỏ che NGAY, không đợi nhịp một giây', async () => {
+    const ma = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default
+    expect(ma).toContain('if (dangCheBatDong) {')
+    expect(ma).toContain('nhipBatDong')
+    // cuộn và gõ phím cũng tính là còn làm bài
+    expect(ma).toContain("document.addEventListener('scroll', ghiChamMan")
+    expect(ma).toContain("document.addEventListener('keydown', ghiChamMan)")
   })
 })

@@ -20,6 +20,9 @@ import {
   coKhoa,
   duKhoaMotMinh,
   laCuaSoNoi,
+  LOI_CHE_BAT_DONG,
+  MS_BAT_DONG_CHE,
+  SO_NGON_CHUP,
   MS_KHONG_CHAM_QUANH_PHIEU,
   MS_NHIP_SOI_TIEU_DIEM,
   nhomDuKhoa,
@@ -874,15 +877,53 @@ export default function ExamTakeScreen() {
     }
 
     /** Mốc chạm màn gần nhất — dùng để biết ngón tay có chạm NGAY SAU nhát
-     * nghẽn hay không. */
-    let mocChamManCuoi = -1e9
+     * nghẽn hay không, và để đếm giờ bất động. */
+    let mocChamManCuoi = performance.now()
     let mocKhoaMotMinh = -1e9
+
+    let dangCheBatDong = false
+
+    // ---- CÁCH 1: ĐẾM SỐ NGÓN CHẠM.
+    // Chụp màn hình bằng cử chỉ trên Android là vuốt BA NGÓN, và trang nhận đủ
+    // ba điểm chạm. Em làm bài chạm một ngón để chọn đáp án, hai ngón để phóng
+    // ảnh — không bao giờ ba. Tín hiệu trực tiếp, không ngưỡng nào phải đo.
+    const demNgon = (e: Event) => {
+      ghiChamMan()
+      const t = (e as TouchEvent).touches
+      if (!t || t.length < SO_NGON_CHUP) return
+      if (daKhoa || conAnHan()) return
+      if (coKhoa(muc, 'dau_vet_chup')) khoaVi('dau_vet_chup', `${t.length} ngón chạm cùng lúc`)
+    }
     const ghiChamMan = () => {
       mocChamManCuoi = performance.now()
+      // Bỏ che NGAY khi có chạm, không đợi nhịp một giây: em chạm mà đề còn ẩn
+      // thêm một nhịp nữa thì bực.
+      if (dangCheBatDong) {
+        dangCheBatDong = false
+        boChe()
+      }
     }
-    document.addEventListener('touchstart', ghiChamMan, { passive: true })
-    document.addEventListener('touchmove', ghiChamMan, { passive: true })
+    document.addEventListener('touchstart', demNgon, { passive: true })
+    document.addEventListener('touchmove', demNgon, { passive: true })
     document.addEventListener('pointerdown', ghiChamMan, { passive: true })
+    document.addEventListener('scroll', ghiChamMan, { passive: true, capture: true })
+    document.addEventListener('keydown', ghiChamMan)
+
+    // ---- CÁCH 2: CHE ĐỀ KHI BẤT ĐỘNG.
+    // Không nhìn thấy cửa sổ nổi, nhưng nhìn thấy hậu quả của nó: suốt lúc em
+    // thao tác với Gemini thì trang không nhận cú chạm nào. Không khoá, không
+    // đếm — chỉ làm cái cửa sổ nổi kia thành vô dụng.
+    const nhipBatDong = window.setInterval(() => {
+      if (daKhoa) return
+      const im = performance.now() - mocChamManCuoi
+      if (im >= MS_BAT_DONG_CHE && !dangCheBatDong) {
+        dangCheBatDong = true
+        che(LOI_CHE_BAT_DONG)
+      } else if (im < MS_BAT_DONG_CHE && dangCheBatDong) {
+        dangCheBatDong = false
+        boChe()
+      }
+    }, 1000)
 
     // NHỊP SOI TIÊU ĐIỂM — đây là chỗ bắt CỬA SỔ NỔI, kiểu gian lận thầy quay
     // video ngày 05/09: em mở cửa sổ nổi Gemini đè lên bài rồi đưa ảnh chụp vào
@@ -990,9 +1031,12 @@ export default function ExamTakeScreen() {
 
     return () => {
       go()
-      document.removeEventListener('touchstart', ghiChamMan)
-      document.removeEventListener('touchmove', ghiChamMan)
+      document.removeEventListener('touchstart', demNgon)
+      document.removeEventListener('touchmove', demNgon)
       document.removeEventListener('pointerdown', ghiChamMan)
+      document.removeEventListener('scroll', ghiChamMan, true)
+      document.removeEventListener('keydown', ghiChamMan)
+      window.clearInterval(nhipBatDong)
       window.clearInterval(nhipTieuDiem)
       if (henNoi) window.clearTimeout(henNoi)
       setLyDoChe(null)
