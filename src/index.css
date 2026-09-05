@@ -13,6 +13,10 @@
      chụp, mà không được che nút bấm. Tấm che đề nằm trên tất cả. */
   --z-van-tay: 60;
   --z-man-chan: 900;
+  /* Tấm phủ "giữ để đọc" nằm TRÊN nội dung đề, DƯỚI vân tay — ảnh chụp lúc đề
+     tắt vẫn phải mang tên em. Nó bắt đầu từ dưới thanh trên nên đồng hồ không
+     bị che. */
+  --z-giu-de: 55;
 }
 
 /* Vùng cuộn phải chừa chỗ cho thanh dưới + vùng an toàn, nếu không câu cuối
@@ -486,6 +490,28 @@ body {
    ========================================================================== */
 html[data-la-chan]:not(:fullscreen) .thi-noi-dung {
   visibility: hidden;
+}
+
+/* ==========================================================================
+   GIỮ ĐỂ ĐỌC (GIUDEDOC.md mục 2.3) — nhả tay quá ân hạn thì tắt đề.
+
+   Dùng `visibility`, KHÔNG `display`, KHÔNG unmount: giữ nguyên chiều cao nên
+   vị trí cuộn không nhảy một pixel và đáp án đã chọn còn nguyên. Đây cũng là
+   lý do cả cơ chế chỉ đổi ĐÚNG MỘT thuộc tính trên thẻ <html> — không state
+   React, không render lại danh sách câu, không tụt tốc độ cuộn.
+
+   Tấm phủ mặc định ẩn; chỉ hiện cùng lúc đề tắt.
+   ========================================================================== */
+html[data-giu-de-an] .thi-noi-dung {
+  visibility: hidden;
+}
+
+[data-giu-de-phu] {
+  display: none;
+}
+
+html[data-giu-de-an] [data-giu-de-phu] {
+  display: flex;
 }
 
 /* CHẶN SAO CHÉP ĐỀ (mục 6D). `user-select` đã có sẵn ở màn thi; ở đây chặn nốt

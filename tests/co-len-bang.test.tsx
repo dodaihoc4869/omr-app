@@ -78,10 +78,14 @@ async function moCa(cach: CachLay) {
 const co = (goi: unknown[]) => (goi[7] as { lenBang?: boolean }).lenBang
 
 describe('cờ lên bảng suy từ khối Bộ câu ra đề', () => {
-  it('KHÔNG còn nút gạt riêng trên màn Mở ca', async () => {
+  it('KHÔNG còn nút gạt LÊN BẢNG riêng trên màn Mở ca', async () => {
+    // Cờ lên bảng suy từ khối Bộ câu ra đề, không có công tắc riêng nữa. Công
+    // tắc DUY NHẤT còn lại trên màn này là "Giữ để đọc" (GIUDEDOC) — việc khác
+    // hẳn, nên kiểm theo nhãn chứ không đếm tổng số công tắc.
     const r = render(<ExamSetupScreen />)
     await waitFor(() => expect(r.container.textContent).toContain('Bộ câu ra đề'))
-    expect(r.queryAllByRole('switch')).toHaveLength(0)
+    const congTac = r.queryAllByRole('switch')
+    expect(congTac.map((n) => n.getAttribute('aria-label'))).toEqual(['Giữ để đọc'])
     expect(r.container.textContent).not.toContain('Ca này dùng làm gì')
   })
 
@@ -138,7 +142,9 @@ describe('phía đọc: màn Gọi lên bảng và máy chủ', () => {
 
   it('Apps Script: ghi cờ vào ô riêng, KHÔNG nối vào rowData (giữ dấu vết khoá ca)', async () => {
     const gs = (await import('../docs/apps-script-kiem-tra.gs?raw')).default
-    expect(gs).toContain('sh.getRange(dong, 23).setValue(lenBang)')
+    // Ghi cột 23 trở đi bằng một dải riêng. rowData dừng ở cột 19; nối thêm là
+    // ghi đè KhoaLuc / KhoaBoi / MoKhoaLuc (cột 20-22) của ca mở lại cùng mã.
+    expect(gs).toContain('sh.getRange(dong, 23, 1, 3).setValues([[lenBang, giuDeDoc, anHanGiay]])')
     expect(gs).toContain("body.lenBang === false ? 'khong' : 'co'")
   })
 

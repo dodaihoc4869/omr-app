@@ -41,6 +41,14 @@ export interface IntegrityLog {
   mocMoKhoa?: number
   /** Số lần thầy đã mở khoá lượt này. */
   soLanMoKhoa?: number
+  /** GIỮ ĐỂ ĐỌC (GIUDEDOC mục 4F): tổng giây đề bị tắt và số lần tắt.
+   *
+   * KHÔNG kết luận gì — nhả tay là chuyện bình thường, và KHÔNG đếm vào bất kỳ
+   * ngưỡng khoá nào. Chỉ là hai con số thầy nhìn ở Chi tiết ca: một em đề tắt
+   * 20 phút trong ca 50 phút là điều nên hỏi. Đi theo IntegrityJson sẵn có nên
+   * không thêm cột LuotThi nào. */
+  giayTatDe?: number
+  soLanTatDe?: number
 }
 
 export function emptyIntegrityLog(): IntegrityLog {
@@ -68,6 +76,10 @@ export interface ExamAttempt {
   loai?: 'thi' | 'baitap'
   hanNop?: string
   tenCa?: string
+  /** GIỮ ĐỂ ĐỌC (GIUDEDOC mục 3). Ca mở trước bản này không có trường ⇒ tắt,
+   * đúng hành vi cũ, không đổi điểm ca đã gửi phụ huynh. */
+  giuDeDoc?: boolean
+  anHanGiay?: number
   answers: AnswerRecord
   integrity: IntegrityLog
   submitted: boolean

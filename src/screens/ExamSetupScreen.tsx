@@ -14,6 +14,7 @@ import { TheNoiDung, Hang, OThongBao, NutChinh } from '../components/DesignSyste
 import NutDongBo from '../components/NutDongBo'
 import { chuoi, danhSachEm, khoiTuNamSinh, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
 import { docSoCauCa, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, luuKhoChuaCa, luuSoCauCa, saveSessionTeacherBank } from '../lib/exam-db'
+import { AN_HAN_CHON_GIAY, BAT_MAC_DINH_CA_THI, MS_AN_HAN_NHA_TAY } from '../lib/giu-de-doc'
 import { dongBoNganHang } from '../lib/exam-sync'
 import { useAppStore } from '../store/appStore'
 
@@ -130,6 +131,11 @@ export default function ExamSetupScreen() {
   // Mặc định 10 giây (BA-APP mục 3): 2 giây gắt tới mức một cuộc gọi đến cũng
   // khoá bài, nên để 10 và cho thầy hạ xuống 2 khi cần siết ca quan trọng.
   const [nguongGiay, setNguongGiay] = useState(10)
+  // GIỮ ĐỂ ĐỌC (GIUDEDOC mục 3): đề chỉ hiện khi ngón tay em còn trên màn thi.
+  // Bật mặc định cho ca thi; bài tập về nhà tắt — không có lý do làm phiền em
+  // ngồi học ở nhà.
+  const [giuDeDoc, setGiuDeDoc] = useState(BAT_MAC_DINH_CA_THI)
+  const [anHanGiay, setAnHanGiay] = useState(MS_AN_HAN_NHA_TAY / 1000)
   const [phamVi, setPhamVi] = useState<PhamViCa>('tu_do')
   const [namSinhKhoi, setNamSinhKhoi] = useState('')
   const [chonSbd, setChonSbd] = useState<Set<string>>(new Set())
@@ -282,6 +288,8 @@ export default function ExamSetupScreen() {
         nguongLan,
         nguongGiay,
         lenBang,
+        giuDeDoc,
+        anHanGiay,
       })
       // Lưu bản CÓ đáp án trên máy thầy để màn Theo dõi chấm lại được sau này.
       // Lưu ĐÚNG bộ đã rút, không lưu cả kho: chấm lại phải tái tạo y hệt bộ
@@ -629,6 +637,45 @@ export default function ExamSetupScreen() {
             )}
           </div>
         </div>
+      </TheNoiDung>
+
+      {/* 4b. GIỮ ĐỂ ĐỌC. Màn này chỉ mở CA THI; bài tập về nhà đi đường
+        GiaoBaiTap và không bật cơ chế này. */}
+      <TheNoiDung>
+        <div className="flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
+          <div style={TIEU_DE_MUC}>Giữ để đọc</div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={giuDeDoc}
+            aria-label="Giữ để đọc"
+            onClick={() => setGiuDeDoc((v) => !v)}
+            className="tap-target"
+            style={{ width: 56, minHeight: 32, height: 32, borderRadius: 'var(--bo-tron)', border: 'none', padding: 3, background: giuDeDoc ? 'var(--muc)' : 'var(--vien-dam)', display: 'flex', justifyContent: giuDeDoc ? 'flex-end' : 'flex-start' }}
+          >
+            <span style={{ width: 26, height: 26, borderRadius: '50%', background: 'var(--the)' }} />
+          </button>
+        </div>
+        <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
+          Đề chỉ hiện khi ngón tay em còn trên màn. Nhả tay quá ân hạn thì đề tạm ẩn, chạm lại là hiện ngay. Muốn chạm vào cửa sổ nổi thì phải nhả tay khỏi bài, nên không đọc hai thứ cùng lúc được. KHÔNG khoá bài vì việc này.
+        </div>
+        {giuDeDoc && (
+          <div style={{ marginTop: 'var(--k3)' }}>
+            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Nhả tay bao lâu thì ẩn đề</div>
+            <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Ân hạn nhả tay">
+              {AN_HAN_CHON_GIAY.map((g) => (
+                <ChipChon key={g} chon={anHanGiay === g} onClick={() => setAnHanGiay(g)}>
+                  {g} giây
+                </ChipChon>
+              ))}
+            </div>
+            {anHanGiay <= 2 && (
+              <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)', color: 'var(--cam)' }}>
+                2 giây rất gắt: em nhấc tay cầm bút nháp là đề ẩn. Chạm một cái là hiện lại, nhưng lớp đông thì nhiều em sẽ hỏi.
+              </div>
+            )}
+          </div>
+        )}
       </TheNoiDung>
 
       {/* 5. CÔNG BỐ ĐIỂM */}

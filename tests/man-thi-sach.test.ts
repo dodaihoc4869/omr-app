@@ -25,6 +25,7 @@ import {
   laCuaSoNoi,
   LOI_CHE_BAT_DONG,
   MS_BAT_DONG_CHE,
+  MS_NHIP_SOI_BAT_DONG,
   MS_KHONG_CHAM_QUANH_PHIEU,
   MS_NHIP_SOI_TIEU_DIEM,
   nhomDuKhoa,
@@ -310,8 +311,14 @@ describe('hai cách không dựa vào tín hiệu hệ điều hành', () => {
     expect(ma).toContain('if (daKhoa || conAnHan()) return')
   })
 
-  it('che đề khi bất động — 20 giây, đủ dài để đọc câu dài nhất', () => {
-    expect(MS_BAT_DONG_CHE).toBe(20000)
+  it('che đề khi bất động — 3 giây, ngắn hơn mọi thao tác hỏi AI', () => {
+    expect(MS_BAT_DONG_CHE).toBe(3000)
+  })
+
+  it('nhịp soi bất động phải đủ dày, kẻo mốc 3 giây hoá 4 giây', () => {
+    expect(MS_NHIP_SOI_BAT_DONG).toBe(250)
+    // sai số che muộn nhất phải dưới 10% mốc
+    expect(MS_NHIP_SOI_BAT_DONG).toBeLessThanOrEqual(MS_BAT_DONG_CHE / 10)
   })
 
   it('che vì bất động KHÔNG phải hình phạt: không trách em, chạm là hiện lại', () => {

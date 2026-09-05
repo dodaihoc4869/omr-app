@@ -229,8 +229,8 @@ export function duKhoaMotMinh(x: XetKhoaMotMinh): boolean {
 // CÁCH 2 — CHE ĐỀ KHI BẤT ĐỘNG.
 // ---------------------------------------------------------------------------
 // Không nhìn thấy cửa sổ nổi, nhưng nhìn thấy HẬU QUẢ của nó: suốt lúc em thao
-// tác với Gemini thì trang không nhận một cú chạm nào. Sau ngần ấy giây bất
-// động, đề tự mờ đi; chạm một cái là hiện lại ngay.
+// tác với Gemini thì trang không nhận một cú chạm nào. Sau 3 giây bất động, đề
+// tự mờ đi; chạm một cái là hiện lại ngay.
 //
 // Đây KHÔNG phải hình phạt: không khoá, không đếm, không báo thầy. Nó chỉ làm
 // cái cửa sổ nổi kia trở nên vô dụng — em không vừa hỏi AI vừa nhìn đề được
@@ -242,10 +242,18 @@ export const SO_NGON_CHUP = 3
 
 /** Bất động quá ngần này giây thì che đề.
  *
- * 20 giây: đọc một câu Phần II bốn ý dài nhất cũng chưa tới, mà mở cửa sổ nổi
- * hỏi AI thì luôn lâu hơn. Chạm là hiện lại tức thì nên đặt nhầm cũng không
- * mất gì ngoài một cú chạm. */
-export const MS_BAT_DONG_CHE = 20000
+ * 3 giây, thầy chốt 05/09. Đây là mức ngặt nhất còn dùng được: mở cửa sổ nổi,
+ * chụp, dán ảnh vào AI rồi đọc đáp án thì không cách nào dưới 3 giây, nên tấm
+ * che luôn kịp đóng trước khi em đọc được gì.
+ *
+ * Đánh đổi phải biết trước: em đọc kỹ một câu dài cũng bị che. Bù lại chạm là
+ * hiện lại TỨC THÌ — không khoá, không đếm, không báo thầy — nên cái giá chỉ là
+ * một cú chạm giữ nhịp. Đề vẫn đọc được liền mạch nếu tay còn trên màn. */
+export const MS_BAT_DONG_CHE = 3000
+
+/** Nhịp soi bất động. Phải nhỏ hơn nhiều so với `MS_BAT_DONG_CHE`, kẻo mốc 3
+ * giây thành 4 giây. 250 ms: che muộn nhất 3,25 giây. */
+export const MS_NHIP_SOI_BAT_DONG = 250
 
 /** Câu trên tấm che khi che vì bất động. Không phải lý do khoá — không có chữ
  * nào trách em, vì em có thể chỉ đang đọc kỹ. */

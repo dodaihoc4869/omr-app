@@ -28,6 +28,7 @@ import { hoSoEm, type HoSoEm } from '../lib/exam-api'
 import { buildStudentEntry, downloadDuLieuJson } from '../lib/json-export'
 import { downloadBangDiem, type StudentRow } from '../lib/xlsx-export'
 import { mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
+import { chuTatDe } from '../lib/giu-de-doc'
 import { useAppStore } from '../store/appStore'
 import { cuaVaoCa } from '../lib/cua-vao-ca'
 import { trangThaiCa } from './LichSuCaScreen'
@@ -838,6 +839,11 @@ export default function ExamMonitorScreen() {
                         <span className="flex items-center flex-wrap" style={{ gap: 4, marginTop: 4 }}>
                           <Nhan tone={nh.tone}>{nh.ten}</Nhan>
                           {daNop && l.soLanRoiMan > 0 && <Nhan tone="cam">rời màn {l.soLanRoiMan} lần / {l.tongGiayRoiMan}s</Nhan>}
+                          {/* GIỮ ĐỂ ĐỌC (GIUDEDOC mục 4F): hai con số, KHÔNG tô
+                              đỏ, KHÔNG gọi là vi phạm. Nhả tay là chuyện bình
+                              thường; nhưng đề tắt 20 phút trong ca 50 phút là
+                              điều thầy nên nhìn. */}
+                          {chuTatDe(l.integrity) && <Nhan tone="xam">{chuTatDe(l.integrity)}</Nhan>}
                           {(l.trangThai === 'khoa' || l.soLanRoiMan > 0) && (
                             <button type="button" onClick={() => moBaoPhuHuynh(e.sbd, l.hoTen, l)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--cam)', minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--cam)' }}>
                               Báo phụ huynh

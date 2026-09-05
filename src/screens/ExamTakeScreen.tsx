@@ -22,6 +22,7 @@ import {
   laCuaSoNoi,
   LOI_CHE_BAT_DONG,
   MS_BAT_DONG_CHE,
+  MS_NHIP_SOI_BAT_DONG,
   SO_NGON_CHUP,
   MS_KHONG_CHAM_QUANH_PHIEU,
   MS_NHIP_SOI_TIEU_DIEM,
@@ -30,9 +31,24 @@ import {
   type LyDoKhoaMoi,
   type TrangThaiCoMan,
 } from '../lib/man-thi-sach'
+import {
+  MS_NHIP_SOI_GIU,
+  anHanMsCua,
+  batCuaCa,
+  chamDiChuyen,
+  chamLen,
+  chamXuong,
+  chuDanTruoc,
+  coCamUng,
+  coMat,
+  dangGoOnhap,
+  ghiHoatDong,
+  moTrangThaiGiu,
+} from '../lib/giu-de-doc'
 import { thuTinHieu } from '../lib/thu-tin-hieu'
 import { TEN_LY_DO_KHOA } from '../lib/man-thi-sach'
 import ManChan from '../components/ManChan'
+import ManGiuDeDoc from '../components/ManGiuDeDoc'
 import VanTay from '../components/VanTay'
 import TheCau from '../components/TheCau'
 import MaCaInput from '../components/MaCaInput'
@@ -193,6 +209,10 @@ export default function ExamTakeScreen() {
   // TÍN HIỆU MỚI (BAOMATCATHI): lý do đang che đề; null = không che.
   const [lyDoChe, setLyDoChe] = useState<string | null>(null)
   const leaveCountRef = useRef(0)
+  // GIỮ ĐỂ ĐỌC: hai con số cộng dồn cho thầy đọc ở Chi tiết ca. Để trong ref
+  // chứ không state — đếm mà render lại là mất hết cái lợi của việc không dùng
+  // state ở effect kia. Gộp vào `integrity` đúng lúc nộp bài.
+  const demTatDe = useRef({ soLan: 0, giay: 0 })
   // TOÀN MÀN HÌNH: bắt buộc trước khi vào thi (đã thêm vào màn hình chính =
   // standalone, hoặc bật Fullscreen API). Thoát toàn màn hình giữa chừng =
   // rời màn hình = khoá bài.
@@ -556,7 +576,7 @@ export default function ExamTakeScreen() {
 
       const giuLuotDo = kq.cach === 'khoi_phuc' && existing && !existing.submitted && (existing.lanThu ?? 1) === kq.lanThu
       const nguong = { lan: kq.nguongLan, giay: kq.nguongGiay }
-      const thongTinCa = { loai: kq.loai, hanNop: kq.hanNop, tenCa: kq.tenCa }
+      const thongTinCa = { loai: kq.loai, hanNop: kq.hanNop, tenCa: kq.tenCa, giuDeDoc: kq.giuDeDoc, anHanGiay: kq.anHanGiay }
       const a: ExamAttempt = giuLuotDo
         ? { ...existing, startedAt: kq.vaoLuc, hetGioLuc: kq.hetGioLuc, durationMinutes: kq.thoiGianPhut, idThietBi: idTb, nguong, ...thongTinCa }
         : {
@@ -913,8 +933,15 @@ export default function ExamTakeScreen() {
     // Không nhìn thấy cửa sổ nổi, nhưng nhìn thấy hậu quả của nó: suốt lúc em
     // thao tác với Gemini thì trang không nhận cú chạm nào. Không khoá, không
     // đếm — chỉ làm cái cửa sổ nổi kia thành vô dụng.
+    //
+    // Soi 250 ms một lần chứ không 1 giây: mốc 3 giây mà soi thưa thì hoá 4
+    // giây, đủ để đọc xong một đáp án.
+    //
+    // Ca có GIỮ ĐỂ ĐỌC thì cách này NGHỈ: cơ chế kia đã tắt đề chính xác hơn
+    // (nó biết ngón tay còn trên màn hay không), hai tấm che chồng nhau chỉ làm
+    // em rối. Ca cũ và bài tập về nhà vẫn dùng cách này.
     const nhipBatDong = window.setInterval(() => {
-      if (daKhoa) return
+      if (daKhoa || attemptRef.current?.giuDeDoc === true) return
       const im = performance.now() - mocChamManCuoi
       if (im >= MS_BAT_DONG_CHE && !dangCheBatDong) {
         dangCheBatDong = true
@@ -923,7 +950,7 @@ export default function ExamTakeScreen() {
         dangCheBatDong = false
         boChe()
       }
-    }, 1000)
+    }, MS_NHIP_SOI_BAT_DONG)
 
     // NHỊP SOI TIÊU ĐIỂM — đây là chỗ bắt CỬA SỔ NỔI, kiểu gian lận thầy quay
     // video ngày 05/09: em mở cửa sổ nổi Gemini đè lên bài rồi đưa ảnh chụp vào
@@ -1044,6 +1071,94 @@ export default function ExamTakeScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
 
+  // ==========================================================================
+  // GIỮ ĐỂ ĐỌC — GIUDEDOC.md, effect RIÊNG, không đụng một dòng nào của luật
+  // đếm rời app lẫn bốn tín hiệu khoá của BAOMATCATHI.
+  //
+  // Video 05/09 chứng minh cửa sổ nổi không để lại một bit tín hiệu nào cho
+  // web. Nên thôi tìm cách nhìn thấy nó: đề chỉ hiện khi ngón tay em còn trên
+  // màn thi. Muốn chạm vào cửa sổ nổi thì phải nhả tay, nhả tay thì đề tắt —
+  // không đọc hai thứ cùng lúc được nữa.
+  //
+  // KHÔNG state React: đổi đúng MỘT thuộc tính trên thẻ <html>. Một setState
+  // mỗi lần nhả tay là render lại cả màn 28 câu, mục 5 cấm.
+  // KHÔNG khoá bài vì việc này (mục 9) — đây là hiển thị, không phải xử phạt.
+  useEffect(() => {
+    if (phase !== 'exam') return
+    const a = attemptRef.current
+    if (!a || !batCuaCa(a)) return
+    // Máy không cảm ứng: cơ chế KHÔNG bật. Màn thi vốn dựng cho điện thoại; bật
+    // ở máy tính là khoá cứng bài của một em không làm gì sai.
+    if (!coCamUng()) return
+
+    const anHanMs = anHanMsCua(a.anHanGiay)
+    const tt = moTrangThaiGiu(performance.now())
+    const goc = document.documentElement
+    let dangAn = false
+    let tatTu: number | null = null
+
+    /** Đổi trạng thái hiện/ẩn. Chạm là hiện NGAY trong cùng nhịp xử lý sự
+     * kiện, không đợi nhịp soi — MS_HIEN_LAI = 0. */
+    const dat = (an: boolean, nay: number) => {
+      if (an === dangAn) return
+      dangAn = an
+      if (an) {
+        goc.setAttribute('data-giu-de-an', '1')
+        tatTu = nay
+        demTatDe.current.soLan += 1
+      } else {
+        goc.removeAttribute('data-giu-de-an')
+        if (tatTu !== null) demTatDe.current.giay += (nay - tatTu) / 1000
+        tatTu = null
+      }
+    }
+
+    const soi = () => {
+      const nay = performance.now()
+      dat(!coMat(tt, nay, { coCamUng: true, dangGoO: dangGoOnhap(document.activeElement), anHanMs }), nay)
+    }
+
+    const xuong = (e: TouchEvent) => {
+      const nay = performance.now()
+      for (const t of Array.from(e.changedTouches)) chamXuong(tt, t.identifier, t.clientX, t.clientY, nay)
+      dat(false, nay) // hiện lại NGAY, cùng nhịp sự kiện
+    }
+    const di = (e: TouchEvent) => {
+      const nay = performance.now()
+      for (const t of Array.from(e.changedTouches)) chamDiChuyen(tt, t.identifier, t.clientX, t.clientY, nay)
+      soi()
+    }
+    const len = (e: TouchEvent) => {
+      const nay = performance.now()
+      for (const t of Array.from(e.changedTouches)) chamLen(tt, t.identifier, nay)
+    }
+    // Cuộn quán tính và gõ bàn phím đều là bằng chứng em còn làm bài: ân hạn
+    // đếm lại từ đây, nếu không thì nhả tay cho trang trôi là đề tắt giữa lúc
+    // đang trôi.
+    const dong = () => ghiHoatDong(tt, performance.now())
+
+    document.addEventListener('touchstart', xuong, { passive: true })
+    document.addEventListener('touchmove', di, { passive: true })
+    document.addEventListener('touchend', len, { passive: true })
+    document.addEventListener('touchcancel', len, { passive: true })
+    document.addEventListener('scroll', dong, { passive: true, capture: true })
+    document.addEventListener('keydown', dong)
+    const nhip = window.setInterval(soi, MS_NHIP_SOI_GIU)
+
+    return () => {
+      document.removeEventListener('touchstart', xuong)
+      document.removeEventListener('touchmove', di)
+      document.removeEventListener('touchend', len)
+      document.removeEventListener('touchcancel', len)
+      document.removeEventListener('scroll', dong, true)
+      document.removeEventListener('keydown', dong)
+      window.clearInterval(nhip)
+      dat(false, performance.now())
+      goc.removeAttribute('data-giu-de-an')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase])
+
   // LÁ CHẮN CSS — lớp che thứ hai, tự chạy không cần JavaScript. Chỉ bật khi
   // ĐÃ THẬT SỰ vào toàn màn hình: máy chạy PWA đứng riêng (standalone) không
   // khớp `:fullscreen`, bật ở đó là ẩn đề vĩnh viễn của một em không làm gì.
@@ -1097,7 +1212,11 @@ export default function ExamTakeScreen() {
   }
 
   const doSubmit = async (a: ExamAttempt) => {
-    const updated: ExamAttempt = { ...a, giayCau: { ...(a.giayCau ?? {}), ...giayCauRef.current }, submitted: true, submittedAt: new Date().toISOString(), pendingSubmit: true }
+    // GIỮ ĐỂ ĐỌC: gộp hai con số đúng lúc này, không rắc dọc đường. Chúng KHÔNG
+    // đếm vào bất kỳ ngưỡng khoá nào — chỉ để thầy nhìn ở Chi tiết ca.
+    const dem = demTatDe.current
+    const integrity = dem.soLan > 0 ? { ...a.integrity, soLanTatDe: dem.soLan, giayTatDe: Math.round(dem.giay) } : a.integrity
+    const updated: ExamAttempt = { ...a, integrity, giayCau: { ...(a.giayCau ?? {}), ...giayCauRef.current }, submitted: true, submittedAt: new Date().toISOString(), pendingSubmit: true }
     setAttempt(updated)
     await saveAttempt(updated)
     setPhase('submitted')
@@ -1337,6 +1456,11 @@ export default function ExamTakeScreen() {
                   là cách duy nhất em tự phòng được. */}
               <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }}>
                 Bật <b>Không làm phiền</b> trước khi bắt đầu. Cuộc gọi hay thông báo kéo em ra khỏi màn làm bài đều bị tính là rời màn.
+              </div>
+              {/* GIỮ ĐỂ ĐỌC (GIUDEDOC mục 6): em biết trước thì không hoảng lúc
+                  đề tạm ẩn. Ca không bật cơ chế thì dòng này vô hại. */}
+              <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }} data-dan-giu-de>
+                {chuDanTruoc()}
               </div>
               <NutChinh onClick={handleJoin} disabled={!toanManHinh}>
                 Vào thi
@@ -1994,6 +2118,11 @@ export default function ExamTakeScreen() {
       {/* TẤM CHE — lớp React, dựng ngay trong hàm xử lý sự kiện, trước khung
           hình kế tiếp. Không chứa nội dung câu hỏi nào. */}
       {lyDoChe && <ManChan lyDo={lyDoChe} onQuayLai={() => setLyDoChe(null)} />}
+
+      {/* TẤM PHỦ "GIỮ ĐỂ ĐỌC" — LUÔN trong DOM, ẩn/hiện bằng CSS theo thuộc
+          tính `data-giu-de-an` trên <html>. Không state, không render lại danh
+          sách câu, không tụt tốc độ cuộn (GIUDEDOC mục 5). */}
+      <ManGiuDeDoc />
     </Trang>
   )
 }

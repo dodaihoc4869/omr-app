@@ -114,6 +114,10 @@ export type KetQuaVaoThi =
       loai: LoaiCa
       hanNop: string
       tenCa: string
+      /** GIỮ ĐỂ ĐỌC (GIUDEDOC mục 3): đề chỉ hiện khi ngón tay em còn trên màn.
+       * Ca cũ không có cột ⇒ false, hành vi giống hệt bản đang chạy. */
+      giuDeDoc: boolean
+      anHanGiay: number
       /** true = thầy vừa mở khoá lượt này (máy em còn giữ cờ khoá) → bỏ khoá, làm tiếp. */
       daMoKhoa: boolean
       bank?: PublicExamBank
@@ -147,6 +151,8 @@ export async function vaoThi(
       loai: r.loai === 'baitap' ? 'baitap' : 'thi',
       hanNop: String(r.hanNop ?? ''),
       tenCa: String(r.tenCa ?? ''),
+      giuDeDoc: r.giuDeDoc === true,
+      anHanGiay: Number(r.anHanGiay) || 0,
       daMoKhoa: r.daMoKhoa === true,
       bank: r.bank ?? undefined,
     }
@@ -237,6 +243,10 @@ export interface MocThoiGianCa {
    *
    * Trống = BẬT. Mọi ca mở trước 05/09 không có cột này nên phải hiện tiếp. */
   lenBang?: boolean
+  /** GIỮ ĐỂ ĐỌC (GIUDEDOC mục 3). Trống = TẮT — ca mở trước bản này phải giữ
+   * nguyên hành vi cũ. `anHanGiay` là một trong 2 / 3 / 5 / 10. */
+  giuDeDoc?: boolean
+  anHanGiay?: number
 }
 
 /** Loại ca: kiểm tra hay bài tập về nhà. Dùng CHUNG mọi thứ, khác nhau bằng cờ này. */
@@ -272,6 +282,8 @@ export async function publishSession(
     nguongLan: moc.nguongLan || 0,
     nguongGiay: moc.nguongGiay || 0,
     lenBang: moc.lenBang !== false,
+    giuDeDoc: moc.giuDeDoc === true,
+    anHanGiay: moc.giuDeDoc === true ? moc.anHanGiay || 3 : 0,
   })
   if (!result.ok) throw new Error(result.error || 'Mở ca kiểm tra thất bại')
   return { batDau: String(result.batDau || ''), hetHanVao: String(result.hetHanVao || '') }
