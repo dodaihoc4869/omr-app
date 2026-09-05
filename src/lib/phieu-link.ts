@@ -25,7 +25,8 @@ export const RE_MA_PHIEU = /^[A-Za-z0-9_-]{8,40}$/
  *
  * Dấu `~` không nằm trong bảng chữ sinh mã nên không lẫn với mã. */
 export const SO_CAU_MIN = 10
-export const SO_CAU_MAX = 40
+/** Thầy chốt 06/09: cho em tạo tới 60 câu khắc phục lỗi sai. */
+export const SO_CAU_MAX = 60
 
 export function chanSoCau(n: unknown): number {
   const v = Math.round(Number(n))

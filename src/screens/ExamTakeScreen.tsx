@@ -5,7 +5,7 @@ import { vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedbac
 import { goiCauHoi } from '../lib/hoi-bai'
 import TamTruotHoiBai, { type CauChon } from '../components/TamTruotHoiBai'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
-import { dungPhieuMayEm, type PhieuDayDu } from '../lib/phieu-du-lieu'
+import { dungCauSai, dungPhieuMayEm, type DiemMotCa, type PhieuDayDu } from '../lib/phieu-du-lieu'
 import PhieuScreen from './PhieuScreen'
 import { gioMayChu, gioNgan } from '../lib/gio-may-chu'
 import { layIdThietBi } from '../lib/thiet-bi'
@@ -61,12 +61,14 @@ import { classify } from '../engine/score'
 import { gradeFromKeyBank, type GradedSubmission } from '../lib/exam-grade'
 import {
   cacheSession,
+  docLichSuDiem,
   emptyAnswerRecord,
   emptyIntegrityLog,
   hetGioCua,
   loadAttempt,
   loadCachedSession,
   loadScriptUrlHoacMacDinh,
+  luuDiemCuaEm,
   saveAttempt,
   saveScriptUrl,
   type ExamAttempt,
@@ -362,18 +364,29 @@ export default function ExamTakeScreen() {
   // `sai` CHỈ được điền khi ca đã công bố điểm và máy em đã chấm xong. Chưa
   // công bố mà điền là lộ đáp án cho cả lớp — điều cấm số 3.
   const cauHoiBai: CauChon[] = useMemo(() => {
-    if (!assignment) return []
-    const daCongBo = Boolean(graded)
-    const saiI = new Set(graded?.wrongPhanI ?? [])
-    const saiII = new Set(graded?.wrongPhanII ?? [])
-    const saiIII = new Set(graded?.wrongPhanIII ?? [])
-    const trich = (s: string) => String(s || '').replace(/\s+/g, ' ').trim().slice(0, 160)
+    const a = attempt
+    if (!assignment || !a) return []
+
+    // CA ĐÃ CÔNG BỐ ĐIỂM: máy em có `keyBank` (đề kèm đáp án + lời giải) nên
+    // dựng được thẻ câu đầy đủ y như báo cáo, qua ĐÚNG một bộ dựng.
+    if (keyBank) {
+      const banks = [{ maDe: a.maCa, phanI: keyBank.phanI, phanII: keyBank.phanII, phanIII: keyBank.phanIII }]
+      const rows = taoChiTietCau(keyBank, a.maCa, a.sbd, a.answers, a.giayCau)
+      return dungCauSai(rows, banks, false).map((c) => ({ qid: c.qid, chiTiet: c }))
+    }
+
+    // CHƯA CÔNG BỐ: máy em CHỈ có đề công khai, không có đáp án nào để lộ. Dựng
+    // thẻ rỗng phần lời giải — không phải giấu, mà là thật sự không có.
+    const trong = (qid: string, phan: 'I' | 'II' | 'III', soCau: number, de: string, luaChon: string[] | null, daChon: string): CauChon => ({
+      qid,
+      chiTiet: { phan, soCau, qid, chuyenDe: '', mucDo: '', giay: giayCauRef.current?.[qid] ?? null, de, luaChon, dapAnDung: '', dapAnChon: daChon, chot: '', lyDo: null, buoc: null, ketQua: '', coHinh: false },
+    })
     return [
-      ...assignment.phanI.map((a, i) => ({ qid: a.qid, phan: 'I' as const, soCau: i + 1, trich: trich(a.question.text), sai: daCongBo ? saiI.has(i + 1) : undefined })),
-      ...assignment.phanII.map((a, i) => ({ qid: a.qid, phan: 'II' as const, soCau: i + 1, trich: trich(a.question.text), sai: daCongBo ? saiII.has(i + 1) : undefined })),
-      ...assignment.phanIII.map((a, i) => ({ qid: a.qid, phan: 'III' as const, soCau: i + 1, trich: trich(a.question.text), sai: daCongBo ? saiIII.has(i + 1) : undefined })),
+      ...assignment.phanI.map((x, i) => trong(x.qid, 'I', i + 1, x.question.text, [...(x.question.choices ?? [])], a.answers.phanI[x.qid] ?? '')),
+      ...assignment.phanII.map((x, i) => trong(x.qid, 'II', i + 1, x.question.text, [...(x.question.ideas ?? [])], (a.answers.phanII[x.qid] ?? []).map((v) => v ?? '-').join(''))),
+      ...assignment.phanIII.map((x, i) => trong(x.qid, 'III', i + 1, x.question.text, null, a.answers.phanIII[x.qid] ?? '')),
     ]
-  }, [assignment, graded])
+  }, [assignment, attempt, keyBank])
 
   const guiHoiBai = async (qids: string[], ghiChu: string) => {
     const a = attemptRef.current
@@ -455,6 +468,26 @@ export default function ExamTakeScreen() {
     }
   }
 
+  // LỊCH SỬ ĐIỂM TRÊN CHÍNH MÁY NÀY — để báo cáo của em có đường tiến bộ như
+  // bản gửi phụ huynh, mà không mở thêm đường đọc nào trên máy chủ.
+  const [lichSuEm, setLichSuEm] = useState<DiemMotCa[]>([])
+  useEffect(() => {
+    if (!attempt || !graded) return
+    let con = true
+    void (async () => {
+      try {
+        await luuDiemCuaEm({ maCa: attempt.maCa, sbd: attempt.sbd, tenCa: attempt.tenCa || '', ngay: attempt.submittedAt || new Date().toISOString(), tong: graded.score.total })
+        const ds = await docLichSuDiem(attempt.sbd)
+        if (con) setLichSuEm(ds.map((d) => ({ maCa: d.maCa, tenCa: d.tenCa, ngay: d.ngay, tong: d.tong, hang: null, siSo: null })))
+      } catch {
+        // IndexedDB hỏng thì báo cáo chỉ thiếu đường biểu đồ, không sai số nào.
+      }
+    })()
+    return () => {
+      con = false
+    }
+  }, [attempt, graded])
+
   const phieuCuaEm: PhieuDayDu | null = useMemo(() => {
     if (!keyBank || !attempt || !graded) return null
     try {
@@ -471,6 +504,7 @@ export default function ExamTakeScreen() {
         diemPhan: { I: graded.score.phanIScore, II: graded.score.phanIIScore, III: graded.score.phanIIIScore },
         rows,
         banks,
+        lichSu: lichSuEm,
         // Em thấy đúng thứ thầy và phụ huynh sẽ thấy. Em đã nhận cảnh báo ngay
         // lúc rời màn rồi, nên đây không phải tin dữ bất ngờ — chỉ là bản ghi.
         viPham: {
@@ -484,7 +518,7 @@ export default function ExamTakeScreen() {
     } catch {
       return null
     }
-  }, [keyBank, attempt, graded, hoTen])
+  }, [keyBank, attempt, graded, hoTen, lichSuEm])
   useEffect(() => {
     totalCountRef.current = assignment ? assignment.phanI.length + assignment.phanII.length + assignment.phanIII.length : 0
   }, [assignment])
@@ -1593,7 +1627,7 @@ export default function ExamTakeScreen() {
         >
           <ArrowLeft size={16} /> Quay lại
         </button>
-        <PhieuScreen duCoSan={phieuCuaEm} />
+        <PhieuScreen duCoSan={phieuCuaEm} laCuaEm />
       </div>
     )
   }
@@ -1808,11 +1842,6 @@ export default function ExamTakeScreen() {
           {solutionAssignment && attempt && (
             <NutChinh variant="phu" onClick={() => void taiDeCuaEm()} disabled={dangTaiDe}>
               {dangTaiDe ? 'Đang dựng đề…' : 'Xem đề & lời giải'}
-            </NutChinh>
-          )}
-          {keyBank && solutionAssignment && (
-            <NutChinh variant="phu" onClick={() => setXemLoiGiai(true)}>
-              Xem lại lời giải
             </NutChinh>
           )}
           {/* HỎI BÀI THẦY — hiện NGAY sau khi nộp, không chờ công bố điểm

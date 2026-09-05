@@ -3,28 +3,29 @@
 // Em nộp bài xong, tick những câu chưa hiểu rồi gửi. BA CHẠM: mở tấm trượt →
 // tick → Gửi (tiêu chí trải nghiệm số 1).
 //
+// THẦY CHỐT 06/09: mỗi hàng phải mở ra được ĐỀ ĐẦY ĐỦ kèm đáp án và lời giải,
+// "giống như trong các báo cáo" — em đọc lại rồi mới biết mình vướng chỗ nào mà
+// tick. Nên hàng ở đây dùng ĐÚNG thẻ `TheCauChiTiet` của báo cáo, không dựng
+// thêm một kiểu hiển thị thứ hai.
+//
 // DANH SÁCH DỰNG TẠI MÁY EM, KHÔNG GỌI MÁY CHỦ — bộ câu đã nằm sẵn trong bộ
 // nhớ màn làm bài, nên tấm trượt hiện dưới 300 ms.
 //
-// CHỖ DỄ SAI NHẤT: chấm đỏ "câu em làm sai" và nút "Tick hết câu em làm sai"
-// CHỈ hiện khi ca ĐÃ CÔNG BỐ ĐIỂM. Hiện sớm là lộ đáp án cho cả lớp — em nào
-// nộp trước mở tấm trượt ra là biết mình sai câu nào, nhắn cho bạn chưa nộp.
-// Đây là điều cấm số 3.
+// CHỖ DỄ SAI NHẤT: đáp án đúng và lời giải CHỈ hiện khi ca đã công bố điểm.
+// Hiện sớm là lộ đáp án cho cả lớp — em nào nộp trước mở tấm trượt ra là biết
+// đáp án rồi nhắn cho bạn chưa nộp. Đây là điều cấm số 3, và nó được cắt ngay
+// từ DỮ LIỆU (`anLoiGiai`), không giấu bằng CSS.
 import { useMemo, useState } from 'react'
-import { Check, Loader2, X } from 'lucide-react'
+import { Loader2, X } from 'lucide-react'
 import { NutChinh, OThongBao } from './DesignSystem'
+import TheCauChiTiet, { CSS_THE_CAU } from './TheCauChiTiet'
 import { TOI_DA_GHI_CHU, loiNhacTickNhieu } from '../lib/hoi-bai'
+import type { CauSaiChiTiet } from '../lib/phieu-du-lieu'
 
-/** Một câu trong tấm trượt — đủ để em nhận ra câu nào, không hơn. */
+/** Một câu trong tấm trượt: chi tiết đầy đủ như báo cáo, kèm mã câu để gửi. */
 export interface CauChon {
   qid: string
-  phan: 'I' | 'II' | 'III'
-  /** Số thứ tự trong phần, 1-based — đúng con số em nhìn thấy lúc làm bài. */
-  soCau: number
-  /** Hai dòng đầu của đề. Câu chỉ có ảnh thì chuỗi rỗng. */
-  trich: string
-  /** Em làm sai câu này. CHỈ được truyền vào khi ca đã công bố điểm. */
-  sai?: boolean
+  chiTiet: CauSaiChiTiet
 }
 
 export interface TamTruotHoiBaiProps {
@@ -41,7 +42,6 @@ export interface TamTruotHoiBaiProps {
 }
 
 const NHAN: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }
-const TEN_PHAN: Record<string, string> = { I: 'Phần I', II: 'Phần II', III: 'Phần III' }
 
 export default function TamTruotHoiBai({ cau, daCongBo, daHoi = [], ghiChuCu = '', dang = false, loi = '', dong, gui }: TamTruotHoiBaiProps) {
   const [chon, setChon] = useState<Set<string>>(() => new Set(daHoi))
@@ -55,23 +55,27 @@ export default function TamTruotHoiBai({ cau, daCongBo, daHoi = [], ghiChuCu = '
       return m
     })
 
-  // Chỉ có nghĩa khi đã công bố — trước đó `sai` luôn undefined nên mảng rỗng
-  // và nút chọn nhanh không dựng.
-  const cauSai = useMemo(() => (daCongBo ? cau.filter((c) => c.sai) : []), [cau, daCongBo])
+  // Chỉ có nghĩa khi đã công bố — trước đó `dapAnDung` rỗng nên mảng rỗng và
+  // nút chọn nhanh không dựng.
+  const cauSai = useMemo(
+    () => (daCongBo ? cau.filter((c) => c.chiTiet.dapAnDung && c.chiTiet.dapAnDung !== c.chiTiet.dapAnChon) : []),
+    [cau, daCongBo],
+  )
   const nhac = loiNhacTickNhieu(chon.size, cau.length)
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" style={{ background: 'var(--phu)' }}>
+      <style>{CSS_THE_CAU}</style>
       <div
         className="w-full flex flex-col"
-        style={{ maxWidth: 480, maxHeight: '90vh', background: 'var(--the)', borderRadius: 'var(--bo-3) var(--bo-3) 0 0', boxShadow: 'var(--bong-2)' }}
+        style={{ maxWidth: 520, maxHeight: '92vh', background: 'var(--the)', borderRadius: 'var(--bo-3) var(--bo-3) 0 0', boxShadow: 'var(--bong-2)' }}
       >
         <div className="shrink-0 flex items-start justify-between" style={{ padding: 'var(--k5) var(--k5) var(--k3)', borderBottom: '1px solid var(--vien)' }}>
           <div>
             <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)' }}>
               Hỏi bài Thầy
             </div>
-            <div style={NHAN}>Tick những câu em chưa hiểu</div>
+            <div style={NHAN}>Chạm vào từng câu để xem đề và lời giải. Tick câu em chưa hiểu.</div>
           </div>
           <button onClick={dong} aria-label="Đóng" className="shrink-0 flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: 'var(--the-2)', color: 'var(--nhat)' }}>
             <X size={16} />
@@ -84,60 +88,22 @@ export default function TamTruotHoiBai({ cau, daCongBo, daHoi = [], ghiChuCu = '
               type="button"
               onClick={() => setChon(new Set(cauSai.map((c) => c.qid)))}
               className="tap-target font-bold"
-              style={{ minHeight: 40, marginBottom: 'var(--k3)', padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', border: 'none', background: 'var(--the-2)', color: 'var(--muc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+              style={{ minHeight: 40, marginBottom: 'var(--k2)', padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', border: 'none', background: 'var(--the-2)', color: 'var(--muc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
             >
               Tick hết câu em làm sai ({cauSai.length})
             </button>
           )}
 
-          <div className="flex flex-col" style={{ gap: 2 }}>
-            {cau.map((c) => {
-              const daChon = chon.has(c.qid)
-              return (
-                <button
-                  key={c.qid}
-                  type="button"
-                  role="checkbox"
-                  aria-checked={daChon}
-                  onClick={() => bat(c.qid)}
-                  className="tap-target flex items-start text-left"
-                  style={{
-                    gap: 'var(--k3)',
-                    minHeight: 48,
-                    padding: 'var(--k2) var(--k3)',
-                    borderRadius: 'var(--bo-1)',
-                    border: 'none',
-                    background: daChon ? 'var(--the-2)' : 'transparent',
-                  }}
-                >
-                  <span
-                    className="shrink-0 flex items-center justify-center"
-                    style={{
-                      width: 22,
-                      height: 22,
-                      marginTop: 2,
-                      borderRadius: 6,
-                      border: daChon ? 'none' : '1.5px solid var(--vien-dam)',
-                      background: daChon ? 'var(--phu-dam)' : 'transparent',
-                      color: 'var(--muc-nguoc)',
-                    }}
-                  >
-                    {daChon && <Check size={14} />}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="flex items-center" style={{ gap: 6 }}>
-                      <b style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}>
-                        {TEN_PHAN[c.phan]} · Câu {c.soCau}
-                      </b>
-                      {daCongBo && c.sai && <span aria-label="Câu em làm sai" style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--do)' }} />}
-                    </span>
-                    <span className="block" style={{ ...NHAN, color: 'var(--muc-2)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                      {c.trich || '(câu có hình)'}
-                    </span>
-                  </span>
-                </button>
-              )
-            })}
+          <div>
+            {cau.map((c, i) => (
+              <TheCauChiTiet
+                key={c.qid}
+                c={c.chiTiet}
+                stt={i + 1}
+                anLoiGiai={!daCongBo}
+                tick={{ chon: chon.has(c.qid), bat: () => bat(c.qid), nhan: `Hỏi ${c.chiTiet.phan === 'I' ? 'Phần I' : c.chiTiet.phan === 'II' ? 'Phần II' : 'Phần III'} câu ${c.chiTiet.soCau}` }}
+              />
+            ))}
           </div>
 
           <div style={{ marginTop: 'var(--k4)' }}>

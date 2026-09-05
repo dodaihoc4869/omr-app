@@ -9,27 +9,28 @@ import { caiMotCham, coTheCaiMotCham, dangTrongTrinhDuyet, theoDoiSuKienCai } fr
 // CHỈ MỘT thẻ nổi bật — hành động chính (mở ca) — bằng nền gradient --g1;
 // tiêu đề thẻ màu --muc. Màn này sẽ được thay bằng "màn cửa vào ba vai trò"
 // (mục 3) — giữ tối giản, không thêm gì ngoài hệ thiết kế.
-function TheBam({
-  icon,
-  title,
-  sub,
-  onClick,
-  noiBat = false,
-}: {
-  icon: ReactNode
-  title: string
-  sub: string
-  onClick: () => void
-  noiBat?: boolean
-}) {
+function TheChinh({ icon, nhan, title, sub, onClick }: { icon: ReactNode; nhan: string; title: string; sub: string; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className={`the-bam tap-target w-full text-left flex items-center${noiBat ? ' the-bam-chinh' : ''}`}>
+    <button type="button" onClick={onClick} className="the-bam the-bam-chinh tap-target w-full text-left flex items-center">
       <span className="the-bam-icon shrink-0 flex items-center justify-center">{icon}</span>
       <span className="min-w-0" style={{ flex: '1 1 auto' }}>
+        <span className="the-bam-nhan">{nhan}</span>
         <span className="the-bam-ten font-bold">{title}</span>
         <span className="the-bam-phu">{sub}</span>
       </span>
-      <ChevronRight size={18} className="the-bam-mui shrink-0" />
+      <ChevronRight size={20} className="the-bam-mui shrink-0" />
+    </button>
+  )
+}
+
+/** Ô vuông trong lưới ba việc còn lại. Chữ phụ MỘT DÒNG ngắn: thẻ nào cũng ba
+ * dòng mô tả thì thầy phải đọc hết mới biết bấm cái nào. */
+function OBam({ icon, title, sub, onClick }: { icon: ReactNode; title: string; sub: string; onClick: () => void }) {
+  return (
+    <button type="button" onClick={onClick} className="hub-o tap-target">
+      <span className="hub-o-icon shrink-0">{icon}</span>
+      <span className="hub-o-ten font-bold">{title}</span>
+      <span className="hub-o-phu">{sub}</span>
     </button>
   )
 }
@@ -149,16 +150,19 @@ export default function ExamHubScreen() {
         </h1>
       </header>
 
-      <TheBam
-        noiBat
-        icon={<GraduationCap size={22} />}
-        title="Chọn đề & mở ca kiểm tra"
-        sub="Chọn đề trong ngân hàng, đặt lớp và thời gian, phát mã ca"
+      <TheChinh
+        icon={<GraduationCap size={24} />}
+        nhan="Bắt đầu ở đây"
+        title="Mở ca kiểm tra"
+        sub="Chọn đề, đặt lớp và thời gian, phát mã ca"
         onClick={() => setScreen('examsetup')}
       />
-      <TheBam icon={<Library size={22} />} title="Ngân hàng câu hỏi" sub="Đề tự về từ kho · duyệt câu nghi đáp án" onClick={() => setScreen('nganhangde')} />
-      <TheBam icon={<ClipboardList size={22} />} title="Ca thi" sub="Mọi ca đã mở, ai đã nộp, điểm, cho thi lại, xuất bảng điểm · tích chọn xoá nhiều ca" onClick={() => setScreen('lichsuca')} />
-      <TheBam icon={<Presentation size={22} />} title="Gọi lên bảng" sub="Tích em, máy chọn câu đúng chuyên đề em yếu nhất trong ca gần nhất" onClick={() => setScreen('goilenbang')} />
+
+      <div className="hub-luoi">
+        <OBam icon={<ClipboardList size={20} />} title="Ca thi" sub="Ai đã nộp, điểm, cho thi lại, xuất bảng điểm" onClick={() => setScreen('lichsuca')} />
+        <OBam icon={<Library size={20} />} title="Ngân hàng câu hỏi" sub="Đề về từ kho · duyệt câu nghi đáp án" onClick={() => setScreen('nganhangde')} />
+        <OBam icon={<Presentation size={20} />} title="Gọi lên bảng" sub="Máy chọn câu đúng chỗ em yếu nhất" onClick={() => setScreen('goilenbang')} />
+      </div>
       {/* ĐỢT 0 của BAOMATCATHI.md: trang đo, KHÔNG khoá ai. Thầy chụp thử trên
           máy thật để chấm điểm từng kênh; kênh nào đạt chuẩn mới được bật khoá. */}
       {/* Giao bài tập vẫn nằm trong hồ sơ từng em — vào bằng tab HỌC SINH ở

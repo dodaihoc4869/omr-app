@@ -269,9 +269,11 @@ describe('bìa và tổng quan', () => {
   it('tổng quan đếm đúng số câu từng phần', () => {
     const cau = [C({}), C({}), C({ phan: 'II' }), C({ phan: 'III' })]
     const h = tongQuanHtml(cau)
-    expect(h).toContain('>4</div><div class="stat-label">Tổng số câu')
-    expect(h).toContain('>2</div><div class="stat-label">Trắc nghiệm')
-    expect(h).toContain('>1</div><div class="stat-label">Đúng / Sai')
+    expect(h).toContain('>4</span><span class="stat-label">Tổng số câu')
+    expect(h).toContain('>2</span><span class="stat-label">Trắc nghiệm')
+    expect(h).toContain('>1</span><span class="stat-label">Đúng / Sai')
+    // KHÔNG EMOJI trong phiếu — quy tắc viết của thầy.
+    expect(h).not.toMatch(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u)
   })
 
   it('kho không có mức độ nào thì bỏ hẳn khối phân loại, không in khung rỗng', () => {
@@ -290,40 +292,83 @@ describe('thanhHtml', () => {
 })
 
 describe('hai lựa chọn in', () => {
-  it('thanh có ĐỦ hai nút in và nút tải tệp', () => {
+  it('thanh có nút Hiện đề và nút Tải PDF hai lựa chọn (thầy chốt 06/09)', () => {
     const h = thanhHtml(10)
-    expect(h).toContain('id="in-de"')
-    expect(h).toContain('In đề')
-    expect(h).toContain('id="in-giai"')
-    expect(h).toContain('In kèm lời giải')
-    // Tải tệp nằm TRONG phiếu chứ không ở khung ngoài, để tệp HTML rời và bản
-    // xem trong app có đúng một bộ nút giống nhau.
-    expect(h).toContain('id="tai-tep"')
+    // HIỆN ĐỀ — giấu đáp án và lời giải NGAY TRÊN MÀN HÌNH, không chỉ khi in.
+    expect(h).toContain('id="chi-de"')
+    expect(h).toContain('Hiện đề')
+    // TẢI PDF hỏi tải bản nào, không đoán hộ: hai lựa chọn ra hai tệp khác hẳn.
+    expect(h).toContain('id="tai-pdf"')
+    expect(h).toContain('id="pdf-de"')
+    expect(h).toContain('Chỉ đề bài')
+    expect(h).toContain('id="pdf-giai"')
+    expect(h).toContain('Đề và lời giải')
+    // Nói thẳng là đi qua hộp in của máy, không hứa một cú bấm ra tệp.
+    expect(h).toContain('Lưu thành PDF')
+    // KHÔNG còn nút tải tệp HTML: thầy chốt tải về phải là PDF.
+    expect(h).not.toContain('id="tai-tep"')
   })
 
-  it('in đề trần ĐÓNG hết thẻ đang mở, không chỉ trông vào CSS', () => {
-    // Thẻ đang mở mang lớp `mo`, mà luật màn hình của lớp đó ngang cơ với luật
-    // bản in — câu thầy đang đọc dở in ra vẫn tô xanh đáp án.
+  it('bản chỉ có đề KHÔNG dựng nút Hiện đề — không có gì để giấu', () => {
+    const h = thanhHtml(10, true)
+    expect(h).not.toContain('id="chi-de"')
+    expect(h).toContain('id="pdf-de"')
+    expect(h).not.toContain('id="pdf-giai"')
+  })
+
+  it('chế độ chỉ đề ĐÓNG hết thẻ đang mở, không chỉ trông vào CSS', () => {
+    // Thẻ đang mở mang lớp "mo", mà luật màn hình của lớp đó ngang cơ với luật
+    // chỉ-đề — câu đang đọc dở vẫn hở lời giải.
     const h = taiLieuHtml('', 'x')
-    expect(h).toContain('if (!coGiai)')
+    expect(h).toContain("classList.contains('mo')")
     expect(h).toContain('daMo.push')
-    // và luật bản in phải !important để chắc chắn thắng
-    expect(h).toContain('body.in-de-tran .q-opt.dung { background: #f8fafc !important;')
+    expect(h).toContain('body.chi-de .q-opt.dung { background: #f8fafc !important;')
   })
 
-  it('bản in đề trần giấu SẠCH lời giải và đáp án đã tô', () => {
+  it('chế độ chỉ đề giấu SẠCH lời giải và đáp án đã tô, ở CẢ màn hình lẫn bản in', () => {
     const h = taiLieuHtml('', 'x')
-    expect(h).toContain('body.in-de-tran .sol-wrap { display: none !important; }')
-    expect(h).toContain('body.in-de-tran .sa-answer { display: none !important; }')
-    expect(h).toContain('body.in-de-tran .sa-blank { display: block !important; }')
-    // Ô đáp án đúng phải trở lại màu thường, không thì em cầm tờ giấy vẫn
+    expect(h).toContain('body.chi-de .sol-wrap { display: none !important; }')
+    expect(h).toContain('body.chi-de .sa-answer { display: none !important; }')
+    expect(h).toContain('body.chi-de .sa-blank { display: block !important; }')
+    // Ô đáp án đúng phải trở lại màu thường, không thì em nhìn màn hình vẫn
     // thấy ô nào được tô xanh.
-    expect(h).toContain('body.in-de-tran .q-opt.dung')
-    expect(h).toContain('body.in-de-tran .tf-badge.dung')
+    expect(h).toContain('body.chi-de .q-opt.dung')
+    expect(h).toContain('body.chi-de .tf-badge.dung')
+    // Luật nằm NGOÀI mọi khối @media thì mới ăn trên màn hình. Đây là cả điểm
+    // của lần sửa này: bản cũ chỉ giấu được lúc in. Kiểm bằng cách CẮT SẠCH
+    // các khối @media rồi xem luật còn không.
+    const boMedia = (cssGoc: string) => {
+      // Cắt CHÚ THÍCH trước: chính chú thích của luật này có chữ "@media print"
+      // trong đó, không cắt là bộ quét ăn luôn cả luật cần kiểm.
+      const css = cssGoc.replace(/\/\*[\s\S]*?\*\//g, '')
+      let ra = ''
+      let i = 0
+      while (i < css.length) {
+        const k = css.indexOf('@media', i)
+        if (k < 0) {
+          ra += css.slice(i)
+          break
+        }
+        ra += css.slice(i, k)
+        let sau = css.indexOf('{', k)
+        let sau2 = sau + 1
+        let sauCap = 1
+        while (sau2 < css.length && sauCap > 0) {
+          if (css[sau2] === '{') sauCap++
+          else if (css[sau2] === '}') sauCap--
+          sau2++
+        }
+        i = sau2
+      }
+      return ra
+    }
+    expect(boMedia(h)).toContain('body.chi-de .sol-wrap { display: none !important; }')
   })
 
-  it('in xong TRẢ màn hình về như cũ, không kẹt ở chế độ đề trần', () => {
-    expect(taiLieuHtml('', 'x')).toContain("document.body.classList.remove('in-de-tran')")
+  it('tải PDF xong TRẢ màn hình về đúng trạng thái trước khi bấm', () => {
+    const h = taiLieuHtml('', 'x')
+    expect(h).toContain('var chiDeCu = document.body.classList.contains(\'chi-de\')')
+    expect(h).toContain('datChiDe(chiDeCu)')
   })
 })
 
@@ -398,7 +443,8 @@ describe('lọc theo ô tổng quan', () => {
     const chiPhanI = tongQuanHtml([MCQ])
     expect(chiPhanI).toContain('data-loc="phan:I"')
     expect(chiPhanI).not.toContain('data-loc="phan:II"')
-    expect(chiPhanI).toContain('<div class="stat-card"><div class="stat-icon">⚖️')
+    // Ô rỗng để CHẾT: không phải nút, và mờ đi cho khỏi mời bấm.
+    expect(chiPhanI).toContain('<div class="stat-card" style="opacity:.5"><span class="stat-number">0</span>')
   })
 
   it('dòng mức độ cũng là nút lọc', () => {

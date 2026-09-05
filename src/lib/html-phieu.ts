@@ -225,15 +225,21 @@ sup { font-size: .72em; vertical-align: .42em; }
 /* ================= TỔNG QUAN ================= */
 .summary-page {
   margin: -28px auto 26px; max-width: 900px; position: relative; z-index: 3;
-  border-radius: 22px; padding: 26px 22px 28px; color: #ffffff;
+  border-radius: 24px; padding: 18px 18px 20px; color: #ffffff;
   background: linear-gradient(135deg, #0f3057 0%, #00587a 55%, #008891 100%);
   box-shadow: var(--bong-cao);
 }
-.summary-title { text-align: center; font-size: clamp(20px, 5vw, 27px); font-weight: 800; letter-spacing: -.01em; margin-bottom: 20px; }
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 20px; }
+/* TIÊU ĐỀ NẰM CÙNG HÀNG với số câu, không chiếm riêng một dòng giữa trang:
+   thẻ này chỉ là bảng tóm tắt, không phải một trang bìa thứ hai (thầy chốt
+   06/09 — "gọn hàng hơn"). */
+.summary-dau { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.summary-title { font-size: clamp(15px, 3.6vw, 18px); font-weight: 800; letter-spacing: .01em; }
+.summary-tong { font-size: 13px; opacity: .72; font-variant-numeric: tabular-nums; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; margin-bottom: 12px; }
 .stat-card {
-  display: block; width: 100%; text-align: center; padding: 16px 10px; color: inherit; font: inherit;
-  background: rgba(255,255,255,.11); border: 1px solid rgba(255,255,255,.2); border-radius: var(--bo);
+  display: flex; align-items: baseline; gap: 8px; width: 100%; text-align: left;
+  padding: 11px 13px; color: inherit; font: inherit;
+  background: rgba(255,255,255,.11); border: 1px solid rgba(255,255,255,.2); border-radius: 14px;
   transition: background-color var(--muot), border-color var(--muot), transform var(--muot);
 }
 /* Ô bấm được thì phải TRÔNG như bấm được: con trỏ bàn tay, sáng lên khi rê
@@ -244,18 +250,17 @@ button.stat-card:active { transform: scale(.98); }
 button.stat-card.chon { background: #ffffff; border-color: #ffffff; color: var(--nav); }
 button.stat-card.chon .stat-label { opacity: 1; font-weight: 700; }
 button.stat-card:focus-visible, button.topic-item:focus-visible { outline: 3px solid rgba(255,255,255,.7); outline-offset: 2px; }
-.stat-loc { display: block; margin-top: 6px; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; opacity: .6; }
-button.stat-card.chon .stat-loc { opacity: .85; }
-.stat-icon { font-size: 22px; margin-bottom: 4px; }
-.stat-number { font-size: clamp(26px, 6vw, 34px); font-weight: 900; line-height: 1.1; }
-.stat-label { font-size: 12px; opacity: .82; margin-top: 3px; }
-.topics-list { background: rgba(255,255,255,.09); border-radius: var(--bo); padding: 16px 20px; }
-.topics-list h3 { font-size: 14px; font-weight: 700; opacity: .9; margin-bottom: 8px; }
+/* Nhãn "xem riêng" bỏ hẳn: ô đã có con trỏ bàn tay và sáng lên khi rê chuột,
+   thêm một dòng chữ hoa nữa chỉ làm thẻ cao gấp rưỡi mà không nói thêm gì. */
+.stat-number { font-size: clamp(19px, 4.4vw, 23px); font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+.stat-label { font-size: 12px; opacity: .82; line-height: 1.3; }
+.topics-list { background: rgba(255,255,255,.09); border-radius: 14px; padding: 11px 14px; }
+.topics-list h3 { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; opacity: .72; margin-bottom: 4px; }
 .topic-item {
-  display: flex; align-items: flex-start; gap: 10px; width: 100%; text-align: left;
-  padding: 8px 10px; margin: 0 -10px; border: none; border-bottom: 1px solid rgba(255,255,255,.12);
+  display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
+  padding: 6px 10px; margin: 0 -10px; border: none; border-bottom: 1px solid rgba(255,255,255,.12);
   border-radius: 8px; background: transparent; color: inherit; font: inherit;
-  font-size: 13.5px; line-height: 1.5;
+  font-size: 13px; line-height: 1.45;
   transition: background-color var(--muot);
 }
 .topic-item:last-child { border-bottom: none; }
@@ -272,29 +277,40 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
 /* ================= THANH ĐIỀU KHIỂN ================= */
 .thanh {
   position: sticky; top: 0; z-index: 20;
-  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  margin: 0 auto 18px; padding: 10px 12px;
-  background: rgba(255,255,255,.86);
-  -webkit-backdrop-filter: saturate(180%) blur(12px);
-  backdrop-filter: saturate(180%) blur(12px);
-  border: 1px solid var(--vien); border-radius: var(--bo);
-  box-shadow: 0 6px 20px rgba(15,48,87,.07);
+  display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
+  margin: 0 auto 18px; padding: 11px 13px;
+  background: rgba(255,255,255,.92);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  backdrop-filter: saturate(180%) blur(14px);
+  border: 1px solid var(--vien); border-radius: 22px;
+  box-shadow: 0 2px 4px rgba(15,48,87,.04), 0 14px 34px -10px rgba(15,48,87,.16);
 }
-.thanh-chu { flex: 1; min-width: 120px; font-size: 13px; font-weight: 600; color: var(--nhat); }
+.thanh-chu { flex: 1 1 100%; min-width: 120px; font-size: 13px; font-weight: 600; color: var(--nhat); }
+/* Nút chính CHIẾM CHỖ CÒN LẠI của hàng dưới — thanh nhìn cân, và trên điện
+   thoại 360px vùng chạm rộng hết cỡ thay vì một viên thuốc bé tí ở góc. */
+.thanh #mo-het { flex: 1 1 auto; justify-content: center; }
+.thanh .pdf-boc { flex: 0 0 auto; }
 .thanh-chu b { color: var(--nav); font-weight: 800; }
 .the-loc b { color: var(--luc); }
 .nut.nho { min-height: 34px; padding: 0 12px; font-size: 12.5px; border-color: var(--luc); color: var(--luc); }
 .nut.nho:hover { background: #e6f4f5; }
 .nut {
-  display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
-  min-height: 40px; padding: 0 16px; border: 1px solid var(--vien-dam); border-radius: 999px;
-  background: #ffffff; color: var(--nav); font: inherit; font-size: 13.5px; font-weight: 700;
-  cursor: pointer; transition: background-color var(--muot), border-color var(--muot), transform var(--muot);
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px; white-space: nowrap;
+  min-height: 48px; padding: 0 20px; border: 1px solid var(--vien-dam); border-radius: 999px;
+  background: #ffffff; color: var(--nav); font: inherit; font-size: 14px; font-weight: 800;
+  cursor: pointer; transition: background-color var(--muot), border-color var(--muot), transform var(--muot), box-shadow var(--muot);
 }
 .nut:hover { background: #f1f5f9; border-color: var(--nav); }
 .nut:active { transform: scale(.97); }
-.nut.chinh { background: linear-gradient(135deg, var(--nav), var(--luc)); border-color: transparent; color: #ffffff; }
+.nut.chinh {
+  background: linear-gradient(135deg, var(--nav), var(--luc)); border-color: transparent; color: #ffffff;
+  box-shadow: 0 2px 4px rgba(15,48,87,.10), 0 10px 22px -8px rgba(0,136,145,.55);
+}
 .nut.chinh:hover { filter: brightness(1.08); }
+/* Nút phụ ĐẶC, không viền rỗng: trong ảnh thầy chốt 06/09 nó là viên thuốc
+   xanh đậm đứng cạnh nút chính, không phải một cái khung trắng. */
+.nut.dam { background: var(--nav); border-color: transparent; color: #ffffff; }
+.nut.dam:hover { background: var(--nav); filter: brightness(1.14); }
 .nut:focus-visible { outline: 3px solid rgba(0,136,145,.4); outline-offset: 2px; }
 
 /* MỘT NÚT, HAI NHÃN. Nhãn "đóng" ẩn sẵn, chỉ hiện khi nút đang ở trạng thái
@@ -556,20 +572,47 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
   .sa-answer { display: inline-flex; }
   .ds-cau { gap: 4mm; }
 
-  /* IN ĐỀ TRẦN — phát cho em tự làm.
-     Cùng một tệp ra được hai bản giấy: bản này giấu sạch đáp án và lời giải,
-     bản mặc định ở trên in đủ. Khỏi phải dựng hai tệp rồi lo gửi nhầm. */
-  body.in-de-tran .sol-wrap { display: none !important; }
-  /* !important vì luật màn hình cho thẻ đang mở có ĐỘ ƯU TIÊN BẰNG
-     luật này. Thẻ nào thầy đang mở đọc dở lúc bấm In đề thì câu đó in ra vẫn
-     tô xanh đáp án — thầy bắt được đúng lỗi đó ở câu 1. */
-  body.in-de-tran .q-opt.dung { background: #f8fafc !important; border-color: var(--vien) !important; color: var(--muc-2) !important; font-weight: 400 !important; }
-  body.in-de-tran .q-opt.dung .q-opt-letter { background: var(--vien-dam) !important; }
-  body.in-de-tran .tf-badge.dung { background: #f1f5f9 !important; color: var(--rat-nhat) !important; border-color: var(--vien) !important; }
-  body.in-de-tran .q-card { border-left-color: var(--vien-dam) !important; }
-  body.in-de-tran .sa-answer { display: none !important; }
-  body.in-de-tran .sa-blank { display: block !important; }
 }
+
+/* ================= CHỈ ĐỀ =================
+   Một lớp DUY NHẤT cho cả màn hình lẫn bản in: nút "Hiện đề" bật nó để em đọc
+   đề mà không thấy đáp án, và lệnh in cũng bật đúng lớp này. Trước đây luật
+   chỉ nằm trong @media print nên trên màn hình không có cách nào giấu lời giải
+   — mà đó chính là lúc em cần đọc đề trần nhất (thầy chốt 06/09).
+
+   !important vì luật màn hình cho thẻ đang mở có ĐỘ ƯU TIÊN BẰNG luật này.
+   Thẻ nào đang mở đọc dở lúc bấm là câu đó vẫn tô xanh đáp án. */
+body.chi-de .sol-wrap { display: none !important; }
+body.chi-de .q-nut-giai { visibility: hidden; }
+body.chi-de .q-opt.dung { background: #f8fafc !important; border-color: var(--vien) !important; color: var(--muc-2) !important; font-weight: 400 !important; }
+body.chi-de .q-opt.dung .q-opt-letter { background: var(--vien-dam) !important; }
+body.chi-de .tf-badge.dung { background: #f1f5f9 !important; color: var(--rat-nhat) !important; border-color: var(--vien) !important; }
+body.chi-de .q-card { border-left-color: var(--vien-dam) !important; }
+body.chi-de .sa-answer { display: none !important; }
+body.chi-de .sa-blank { display: block !important; }
+body.chi-de #mo-het, body.chi-de .thanh-chu b { display: none; }
+
+/* HỘP CHỌN KIỂU PDF — thầy chốt 06/09: bấm Tải PDF phải hỏi tải đề trần hay
+   tải cả lời giải, thay vì đoán hộ. Hai lựa chọn ra hai tệp khác hẳn nhau:
+   một bản phát cho em tự làm, một bản để dò bài. */
+.pdf-boc { position: relative; }
+.pdf-chon {
+  position: absolute; right: 0; bottom: calc(100% + 10px); z-index: 30;
+  display: flex; flex-direction: column; gap: 10px; width: max-content; min-width: 214px; max-width: 78vw;
+  padding: 14px; border-radius: 20px; background: #fff;
+  border: 1px solid var(--vien); box-shadow: 0 4px 10px rgba(15,23,42,.06), 0 22px 50px -14px rgba(15,23,42,.32);
+}
+.pdf-chon[hidden] { display: none; }
+.pdf-chon button {
+  display: block; width: 100%; text-align: left; min-height: 48px;
+  padding: 12px 18px; border-radius: 999px; border: 1px solid var(--vien-dam); background: #fff;
+  font: inherit; font-size: 14.5px; font-weight: 800; color: var(--muc); cursor: pointer;
+  transition: background-color var(--muot), border-color var(--muot);
+}
+.pdf-chon button:hover { background: #f1f5f9; border-color: var(--nav); }
+.pdf-nhac { font-size: 12.5px; line-height: 1.5; color: var(--nhat); font-weight: 500; }
+.pdf-nhac b { color: var(--muc-2); font-weight: 800; }
+@media print { .pdf-chon, .thanh { display: none !important; } }
 `
 
 /** Mũi tên chỉ xuống, vẽ bằng SVG nội tuyến — không gọi phông biểu tượng nào,
@@ -701,6 +744,51 @@ export function oGiaiHtml(c: CauLuyen): string {
   return `<div class="sol-box">${khoi.join('')}</div>`
 }
 
+/** CÔNG THỨC IN TRÊN BÌA, CHỌN THEO CHUYÊN ĐỀ.
+ *
+ * LỖI ĐÃ DÍNH (thầy báo 06/09): bìa gõ cứng `RCOOR'` và ba phân tử ester, nên
+ * phiếu chuyên đề nào cũng in ester — bài amine, bài carbohydrate, bài kim
+ * loại đều mang một cái bìa nói sai nội dung bên trong.
+ *
+ * Không khớp chuyên đề nào thì dùng bộ TRUNG TÍNH, chứ KHÔNG rơi về ester:
+ * thà bìa chung chung còn hơn bìa nói sai. */
+export function congThucBia(tenChuyenDe: string): { chinh: string; troi: [string, string, string] } {
+  const t = goKyTuLa(String(tenChuyenDe ?? ''))
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .toLowerCase()
+  const co = (...tu: string[]) => tu.some((x) => t.includes(x))
+
+  if (co('ester', 'lipid', 'chat beo', 'xa phong')) {
+    return { chinh: "RCOOR'", troi: ['RCOOR&#39;', 'CH<sub>3</sub>COOH', 'C<sub>9</sub>H<sub>8</sub>O<sub>4</sub>'] }
+  }
+  if (co('carbohydrate', 'glucose', 'saccharose', 'tinh bot', 'cellulose')) {
+    return { chinh: 'C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>', troi: ['C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>', 'C<sub>12</sub>H<sub>22</sub>O<sub>11</sub>', '(C<sub>6</sub>H<sub>10</sub>O<sub>5</sub>)<sub>n</sub>'] }
+  }
+  if (co('nitrogen', 'amine', 'amino acid', 'peptide', 'protein')) {
+    return { chinh: 'H<sub>2</sub>N&ndash;R&ndash;COOH', troi: ['CH<sub>3</sub>NH<sub>2</sub>', 'H<sub>2</sub>N&ndash;CH<sub>2</sub>&ndash;COOH', '&ndash;CO&ndash;NH&ndash;'] }
+  }
+  if (co('polymer', 'chat deo', 'to ', 'cao su')) {
+    return { chinh: '(&ndash;CH<sub>2</sub>&ndash;CH<sub>2</sub>&ndash;)<sub>n</sub>', troi: ['(&ndash;CH<sub>2</sub>&ndash;CH<sub>2</sub>&ndash;)<sub>n</sub>', 'CH<sub>2</sub>=CHCl', 'C<sub>5</sub>H<sub>8</sub>'] }
+  }
+  if (co('dien phan', 'pin dien', 'the dien cuc', 'an mon')) {
+    return { chinh: 'E&deg;<sub>pin</sub>', troi: ['Zn | Zn<sup>2+</sup>', 'Cu<sup>2+</sup> | Cu', '2H<sub>2</sub>O &rarr; O<sub>2</sub>'] }
+  }
+  if (co('kim loai', 'hop kim', 'nhom ia', 'nhom iia', 'kiem tho', 'nuoc cung')) {
+    return { chinh: 'M &rarr; M<sup>n+</sup>', troi: ['Fe<sub>2</sub>O<sub>3</sub>', 'CaCO<sub>3</sub>', 'Al(OH)<sub>3</sub>'] }
+  }
+  if (co('phuc chat', 'nguyen to chuyen tiep', 'kim loai chuyen tiep')) {
+    return { chinh: '[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>', troi: ['[Ag(NH<sub>3</sub>)<sub>2</sub>]<sup>+</sup>', 'Fe<sup>3+</sup>', 'K<sub>2</sub>Cr<sub>2</sub>O<sub>7</sub>'] }
+  }
+  if (co('can bang', 'toc do phan ung', 'nhiet ', 'entropy', 'enthalpy')) {
+    return { chinh: '&Delta;<sub>r</sub>H&deg;<sub>298</sub>', troi: ['K<sub>C</sub>', 'v = k[A]<sup>m</sup>', 'N<sub>2</sub> + 3H<sub>2</sub> &#8652; 2NH<sub>3</sub>'] }
+  }
+  // TRUNG TÍNH — dùng cho phiếu trộn nhiều chuyên đề, hoặc chuyên đề chưa có
+  // trong bảng. Ba ký hiệu này đúng với mọi bài Hoá.
+  return { chinh: 'H&oacute;a h&#7885;c', troi: ['H<sub>2</sub>O', 'NaOH', 'CO<sub>2</sub>'] }
+}
+
 export function biaHtml(t: ThongTinPhieu, soCau: number): string {
   const oKetQua = t.ketQua
     ? `<div class="cover-info-item" style="flex:0 1 auto;background:rgba(239,68,68,.16);border-color:rgba(239,68,68,.34);">
@@ -722,16 +810,17 @@ export function biaHtml(t: ThongTinPhieu, soCau: number): string {
     .map((o) => `<div class="cover-info-item"><div class="cover-info-label">${thoat(o.nhan)}</div><div class="cover-info-value">${thoat(o.gia)}</div></div>`)
     .join('')
 
+  const ct = congThucBia(t.tenChuyenDe)
   return `<header class="cover">
   <div class="cover-blob b1"></div><div class="cover-blob b2"></div>
-  <div class="cover-molecule m1">RCOOR'</div>
-  <div class="cover-molecule m2">CH<sub>3</sub>COOH</div>
-  <div class="cover-molecule m3">C<sub>9</sub>H<sub>8</sub>O<sub>4</sub></div>
+  <div class="cover-molecule m1">${ct.troi[0]}</div>
+  <div class="cover-molecule m2">${ct.troi[1]}</div>
+  <div class="cover-molecule m3">${ct.troi[2]}</div>
   <div class="cover-content">
     <div class="cover-badge">${thoat(t.nhanBia || (t.hienDapAn ? 'Lời giải chi tiết' : 'Phiếu Bài Tập Riêng'))}</div>
     <h1 class="cover-title">${tenHaiDong}</h1>
     <div class="cover-subtitle">Bài tập Hóa học Hữu cơ</div>
-    <div class="cover-chemical">RCOOR'</div>
+    <div class="cover-chemical">${ct.chinh}</div>
     <div class="cover-info">
       ${oNhanDang}
       <div class="cover-info-item"><div class="cover-info-label">Ngày</div><div class="cover-info-value">${ngayVN(t.ngay)}</div></div>
@@ -745,10 +834,10 @@ export function biaHtml(t: ThongTinPhieu, soCau: number): string {
 /** Một ô thống kê. Có câu thì là NÚT LỌC, bấm vào chỉ còn hiện các câu của
  * phần đó; phần không có câu nào thì để ô chết, bấm vào lọc ra trang trắng là
  * vô nghĩa. */
-function oThongKe(icon: string, so: number, nhan: string, loc: string): string {
-  const trong = `<div class="stat-icon">${icon}</div><div class="stat-number">${so}</div><div class="stat-label">${nhan}</div>`
-  if (so === 0) return `<div class="stat-card">${trong}</div>`
-  return `<button type="button" class="stat-card" data-loc="${loc}" aria-pressed="false">${trong}<span class="stat-loc">${loc === 'tat' ? 'Xem tất cả' : 'Xem riêng'}</span></button>`
+function oThongKe(so: number, nhan: string, loc: string): string {
+  const trong = `<span class="stat-number">${so}</span><span class="stat-label">${nhan}</span>`
+  if (so === 0) return `<div class="stat-card" style="opacity:.5">${trong}</div>`
+  return `<button type="button" class="stat-card" data-loc="${loc}" aria-pressed="false" title="${loc === 'tat' ? 'Xem tất cả' : 'Chỉ xem phần này'}">${trong}</button>`
 }
 
 export function tongQuanHtml(cau: CauLuyen[]): string {
@@ -771,15 +860,20 @@ export function tongQuanHtml(cau: CauLuyen[]): string {
       return `<button type="button" class="topic-item" data-loc="muc:${k}" aria-pressed="false"><span class="topic-cham"><span class="topic-dot" style="background:${mau};"></span></span><span><strong>${ten}:</strong> ${nhan} · ${ds.length} câu${cd ? ` — ${thoat(cd)}` : ''}</span></button>`
     })
     .join('')
+  // KHÔNG EMOJI: quy tắc viết của thầy cấm emoji trong mọi thứ gửi phụ huynh và
+  // học sinh, mà phiếu này gửi cả hai. Bốn ô đã tự nói tên phần của mình.
   return `<section class="summary-page">
-  <div class="summary-title">Tổng Quan Đề Bài</div>
-  <div class="stats-grid">
-    ${oThongKe('📝', cau.length, 'Tổng số câu', 'tat')}
-    ${oThongKe('✅', dem('I'), 'Trắc nghiệm', 'phan:I')}
-    ${oThongKe('⚖️', dem('II'), 'Đúng / Sai', 'phan:II')}
-    ${oThongKe('✏️', dem('III'), 'Trả lời ngắn', 'phan:III')}
+  <div class="summary-dau">
+    <span class="summary-title">Tổng quan đề bài</span>
+    <span class="summary-tong">${cau.length} câu · chạm một ô để xem riêng phần đó</span>
   </div>
-  ${dong ? `<div class="topics-list"><h3>📌 Phân loại mức độ</h3>${dong}</div>` : ''}
+  <div class="stats-grid">
+    ${oThongKe(cau.length, 'Tổng số câu', 'tat')}
+    ${oThongKe(dem('I'), 'Trắc nghiệm', 'phan:I')}
+    ${oThongKe(dem('II'), 'Đúng / Sai', 'phan:II')}
+    ${oThongKe(dem('III'), 'Trả lời ngắn', 'phan:III')}
+  </div>
+  ${dong ? `<div class="topics-list"><h3>Phân loại mức độ</h3>${dong}</div>` : ''}
 </section>`
 }
 
@@ -792,17 +886,22 @@ export function thanhHtml(soCau: number, anGiai = false): string {
     return `<div class="thanh">
   <div class="thanh-chu">Phiếu chỉ có đề<span class="the-loc" id="the-loc" hidden> · <b id="ten-loc"></b></span></div>
   <button class="nut nho" type="button" id="bo-loc" hidden>Bỏ lọc</button>
-  <button class="nut chinh" type="button" id="in-de" title="In hoặc lưu PDF đề bài">In đề</button>
-  <button class="nut" type="button" id="tai-tep" title="Tải tệp HTML này về máy để gửi Zalo">Tải tệp</button>
+  <button class="nut chinh" type="button" id="pdf-de" title="Hộp thoại in mở ra, chọn Lưu thành PDF">Tải PDF</button>
 </div>`
   }
   return `<div class="thanh">
   <div class="thanh-chu">Đã xem lời giải <b id="dem-mo">0</b>/<span id="dem-tong">${soCau}</span> câu<span class="the-loc" id="the-loc" hidden> · <b id="ten-loc"></b></span></div>
   <button class="nut nho" type="button" id="bo-loc" hidden>Bỏ lọc</button>
+  <button class="nut" type="button" id="chi-de" aria-pressed="false" title="Giấu đáp án và lời giải để đọc đề trần"><span class="chu-mo">Hiện đề</span><span class="chu-dong">Hiện cả lời giải</span></button>
   <button class="nut chinh" type="button" id="mo-het" aria-pressed="false"><span class="chu-mo">Mở tất cả</span><span class="chu-dong">Đóng tất cả</span></button>
-  <button class="nut" type="button" id="in-de" title="In hoặc lưu PDF chỉ có đề bài, không lộ đáp án">In đề</button>
-  <button class="nut" type="button" id="in-giai" title="In hoặc lưu PDF có đủ đáp án và lời giải">In kèm lời giải</button>
-  <button class="nut" type="button" id="tai-tep" title="Tải tệp HTML này về máy để gửi Zalo">Tải tệp</button>
+  <span class="pdf-boc">
+    <button class="nut dam" type="button" id="tai-pdf" aria-haspopup="true" aria-expanded="false">Tải PDF</button>
+    <span class="pdf-chon" id="pdf-chon" role="menu" hidden>
+      <button type="button" id="pdf-de" role="menuitem">Chỉ đề bài</button>
+      <button type="button" id="pdf-giai" role="menuitem">Đề và lời giải</button>
+      <span class="pdf-nhac">Hộp thoại in mở ra, chọn <b>Lưu thành PDF</b>.</span>
+    </span>
+  </span>
 </div>`
 }
 
@@ -815,6 +914,11 @@ export const JS_PHIEU = `
   var dem = document.getElementById('dem-mo');
   var demTong = document.getElementById('dem-tong');
   var nutHet = document.getElementById('mo-het');
+  var nutChiDe = document.getElementById('chi-de');
+  var nutPdf = document.getElementById('tai-pdf');
+  var hopPdf = document.getElementById('pdf-chon');
+  var nutPdfDe = document.getElementById('pdf-de');
+  var nutPdfGiai = document.getElementById('pdf-giai');
   var nutBo = document.getElementById('bo-loc');
   var theLoc = document.getElementById('the-loc');
   var tenLoc = document.getElementById('ten-loc');
@@ -915,51 +1019,80 @@ export const JS_PHIEU = `
       demLai();
     });
   }
-  /** In. coGiai = false thì giấu sạch đáp án và lời giải trên giấy.
-   * In luôn in TRỌN phiếu, không in mỗi phần đang lọc: bản giấy phải đủ bài. */
-  function inPhieu(coGiai) {
-    // Phải nhớ tên lọc TRƯỚC khi xoá, vì locTheo xoá luôn ô chữ đang giữ tên.
+  /** HIỆN ĐỀ — giấu đáp án và lời giải ngay trên màn hình.
+   *
+   * Một lớp "chi-de" dùng cho CẢ màn hình lẫn bản in, nên đang xem kiểu nào
+   * thì lưu ra PDF đúng kiểu đó. Trước đây chỉ có bản in giấu được, còn trên
+   * màn hình em mở phiếu ra là thấy sẵn đáp án. */
+  function datChiDe(bat_) {
+    document.body.classList.toggle('chi-de', !!bat_);
+    if (nutChiDe) nutChiDe.setAttribute('aria-pressed', bat_ ? 'true' : 'false');
+    if (nutChiDe) nutChiDe.classList.toggle('dang-mo-het', !!bat_);
+    // ĐÓNG HẾT thẻ đang mở: thẻ đang mở mang lớp "mo", mà luật của lớp đó
+    // ngang cơ với luật "chi-de" — không đóng thì câu đó vẫn hở lời giải.
+    if (bat_) for (var i = 0; i < tatCa.length; i++) if (tatCa[i].classList.contains('mo')) bat(tatCa[i], false);
+    demLai();
+  }
+
+  /** LƯU PDF. In TRỌN phiếu, không in mỗi phần đang lọc: bản giấy phải đủ bài.
+   *
+   * coGiai = false thì in bản đề trần, phát cho em tự làm; true thì in bản đầy
+   * đủ để dò bài. Hai lựa chọn ra hai tệp khác hẳn nhau nên PHẢI hỏi, không
+   * đoán hộ theo trạng thái màn hình.
+   *
+   * Trình duyệt không cho trang web tự ghi thẳng một tệp PDF; đường duy nhất
+   * là hộp in của máy rồi chọn "Lưu thành PDF". */
+  function luuPdf(coGiai) {
+    dongChonPdf();
     var giu = locHienTai;
     var giuTen = tenLoc ? tenLoc.textContent : '';
-    if (giu) locTheo('', '');
-    document.body.classList.toggle('in-de-tran', !coGiai);
-    // ĐÓNG HẾT thẻ đang mở. Chỉ dựa vào CSS là chưa đủ chắc: thẻ đang mở mang
-    // lớp mo, mà luật màn hình của lớp đó ngang cơ với luật bản in.
+    var chiDeCu = document.body.classList.contains('chi-de');
     var daMo = [];
+    if (giu) locTheo('', '');
     if (!coGiai) {
+      document.body.classList.add('chi-de');
       for (var i = 0; i < tatCa.length; i++) {
         if (tatCa[i].classList.contains('mo')) { daMo.push(tatCa[i]); bat(tatCa[i], false); }
       }
+    } else {
+      document.body.classList.remove('chi-de');
     }
     window.print();
-    // Trả màn hình về như cũ sau khi hộp in đóng. Chrome trả quyền ngay sau
+    // Trả màn hình về đúng như trước khi bấm. Chrome trả quyền ngay sau
     // print(), Safari chậm hơn — chờ một nhịp cho chắc.
     setTimeout(function () {
-      document.body.classList.remove('in-de-tran');
+      datChiDe(chiDeCu);
       for (var j = 0; j < daMo.length; j++) bat(daMo[j], true);
       if (giu) locTheo(giu, giuTen);
       demLai();
     }, 800);
   }
 
-  // TẢI CHÍNH TRANG NÀY về máy. Tự đọc mã nguồn của mình nên tệp tải về giống
-  // hệt bản đang xem, kể cả ảnh nhúng — không cần app dựng lại lần nữa.
-  var nutTai = document.getElementById('tai-tep');
-  if (nutTai) nutTai.addEventListener('click', function () {
-    var ten = (document.title || 'phieu').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')
-      .replace(/đ/g, 'd').replace(/Đ/g, 'D').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50) || 'phieu';
-    var goc = '<!DOCTYPE html>' + document.documentElement.outerHTML;
-    var u = URL.createObjectURL(new Blob([goc], { type: 'text/html;charset=utf-8' }));
-    var a = document.createElement('a');
-    a.href = u; a.download = ten + '.html';
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function () { URL.revokeObjectURL(u); }, 8000);
-  });
+  function dongChonPdf() {
+    if (!hopPdf) return;
+    hopPdf.hidden = true;
+    if (nutPdf) nutPdf.setAttribute('aria-expanded', 'false');
+  }
 
-  var nutInDe = document.getElementById('in-de');
-  var nutInGiai = document.getElementById('in-giai');
-  if (nutInDe) nutInDe.addEventListener('click', function () { inPhieu(false); });
-  if (nutInGiai) nutInGiai.addEventListener('click', function () { inPhieu(true); });
+  if (nutPdf) nutPdf.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (!hopPdf) return;
+    var mo = hopPdf.hidden;
+    hopPdf.hidden = !mo;
+    nutPdf.setAttribute('aria-expanded', mo ? 'true' : 'false');
+  });
+  if (nutPdfDe) nutPdfDe.addEventListener('click', function () { luuPdf(false); });
+  if (nutPdfGiai) nutPdfGiai.addEventListener('click', function () { luuPdf(true); });
+  // Bấm ra ngoài hay bấm Esc thì đóng hộp chọn — không để nó treo giữa màn.
+  document.addEventListener('click', function (e) {
+    if (hopPdf && !hopPdf.hidden && !hopPdf.contains(e.target) && e.target !== nutPdf) dongChonPdf();
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') dongChonPdf(); });
+  if (nutChiDe) nutChiDe.addEventListener('click', function () {
+    datChiDe(!document.body.classList.contains('chi-de'));
+  });
+  // Phiếu CHỈ CÓ ĐỀ: bật sẵn chế độ chỉ đề, khỏi phải bấm.
+  if (!nutChiDe && !document.getElementById('mo-het')) document.body.classList.add('chi-de');
 
   demLai();
 })();

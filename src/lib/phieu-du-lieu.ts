@@ -26,6 +26,8 @@ export interface LyDoPhuongAn {
 export interface CauSaiChiTiet {
   phan: 'I' | 'II' | 'III'
   soCau: number
+  /** Mã câu trong kho đề — tấm trượt Hỏi bài Thầy gửi đúng mã này lên. */
+  qid: string
   chuyenDe: string
   mucDo: string
   giay: number | null
@@ -210,11 +212,13 @@ function lyDoCua(q: CauBatKy, phan: 'I' | 'II' | 'III'): LyDoPhuongAn[] | null {
  * KHÔNG kèm ảnh của câu: ảnh trong kho đề là base64, vài câu có hình là gói
  * phình lên hàng trăm KB và phụ huynh chờ tải trên 4G. Câu có hình được đánh
  * dấu `coHinh` để báo cáo nói thẳng là phải xem lại hình trong bài chữa. */
-export function dungCauSai(rows: ChiTietCauRow[], banks: TeacherExamSource[]): CauSaiChiTiet[] {
+export function dungCauSai(rows: ChiTietCauRow[], banks: TeacherExamSource[], chiCauSai = true): CauSaiChiTiet[] {
   const tra = timCauTheoQid(banks)
   const ra: CauSaiChiTiet[] = []
   for (const r of rows) {
-    if (r.dungSai) continue
+    // `chiCauSai = false` để tấm trượt Hỏi bài Thầy liệt kê TRỌN đề — em hỏi
+    // được cả câu mình làm đúng mà chưa hiểu vì sao đúng.
+    if (chiCauSai && r.dungSai) continue
     const q = tra.get(r.qid)
     if (!q) continue
     const mcq = q as TeacherMcqQuestion
@@ -222,6 +226,7 @@ export function dungCauSai(rows: ChiTietCauRow[], banks: TeacherExamSource[]): C
     ra.push({
       phan: r.phan,
       soCau: r.soCau,
+      qid: r.qid,
       chuyenDe: r.chuyenDe || '',
       mucDo: r.mucDo || '',
       giay: r.giay,
@@ -304,7 +309,7 @@ export interface NguonPhieu {
  *
  * Rút theo thứ tự dễ lên khó, nên lấy 10 câu đầu vẫn đúng là 10 câu dễ nhất
  * của đúng chuyên đề em yếu — không phải 10 câu ngẫu nhiên trong 40. */
-export const SO_CAU_BAI_TAP_KEM = 40
+export const SO_CAU_BAI_TAP_KEM = 60
 
 /** Nguồn để dựng báo cáo NGAY TRÊN MÁY HỌC SINH, sau khi em nộp bài.
  *
@@ -331,10 +336,37 @@ export interface NguonPhieuMayEm {
   banks: TeacherExamSource[]
   /** Nhật ký rời màn của chính lượt em vừa nộp (máy em giữ đủ). */
   viPham?: NguonViPham | null
+  /** Điểm các ca trước CỦA CHÍNH MÁY NÀY — để vẽ đường tiến bộ trong báo cáo
+   * của em. Không gọi máy chủ: mở một đường đọc công khai theo số báo danh là
+   * cho bất kỳ ai biết SBD đọc được cả lịch sử điểm của em đó. */
+  lichSu?: DiemMotCa[]
 }
 
 export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
   const cauSai = dungCauSai(n.rows, n.banks)
+
+  // BỘ CÂU KHẮC PHỤC LỖI SAI (thầy chốt 06/09) — rút ngay trên máy em.
+  //
+  // Máy em KHÔNG có kho đề của trung tâm, chỉ có ngân hàng của chính ca vừa
+  // thi. Nên bộ này nhỏ hơn bộ thầy gói theo báo cáo phụ huynh, và màn báo cáo
+  // nói thẳng còn bao nhiêu câu chứ không hứa 60.
+  const yeu = new Map<string, { soCau: number; soSai: number }>()
+  for (const r of n.rows) {
+    const ten = r.chuyenDe || ''
+    if (!ten) continue
+    const cu = yeu.get(ten) ?? { soCau: 0, soSai: 0 }
+    cu.soCau += 1
+    if (!r.dungSai) cu.soSai += 1
+    yeu.set(ten, cu)
+  }
+  const chuyenDeYeu = [...yeu.entries()]
+    .filter(([, v]) => v.soSai > 0)
+    .map(([ten, v]) => ({ ten, tiLeSai: v.soSai / Math.max(1, v.soCau) }))
+    .sort((a, b) => b.tiLeSai - a.tiLeSai)
+  const baiTapEm =
+    n.banks.length > 0 && chuyenDeYeu.length > 0
+      ? chonCauLuyen(n.banks, { chuyenDe: chuyenDeYeu, qidDaLam: [], soCau: SO_CAU_BAI_TAP_KEM }).cau
+      : []
   const tk = thongKeLamBai(n.rows, { vaoLuc: n.vaoLuc, nopLuc: n.nopLuc, thoiLuongPhut: n.thoiLuongPhut })
 
   const gom = new Map<string, { ten: string; soCau: number; soSai: number }>()
@@ -365,7 +397,7 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
     siSo: null,
     chuyenDeCa,
     chuyenDeTong: [],
-    lichSu: [],
+    lichSu: n.lichSu ?? [],
     diemLop: [],
     vieCanLam: '',
     thongKe: tk,
@@ -374,10 +406,12 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
     cauSai,
     dai: n.rows.map((r) => ({ nhan: `Phần ${r.phan} câu ${r.soCau}`, giay: r.giay, dung: Boolean(r.dungSai) })),
     viPham: dungViPham(n.viPham),
-    // KHÔNG kèm `deCuaEm`, KHÔNG kèm bài tập: thầy chốt 04-09 khuya "mục này của
-    // xem báo cáo sau thi cắt luôn". Trên máy em, sau khi nộp chỉ còn điểm, câu
-    // sai kèm lời giải và bằng chứng rời màn; đề đầy đủ và bài luyện chỉ đi
-    // theo báo cáo thầy gửi phụ huynh.
+    // KHÔNG kèm `deCuaEm`: thầy chốt 04-09 khuya "mục này của xem báo cáo sau
+    // thi cắt luôn" — đề đầy đủ chỉ đi theo báo cáo thầy gửi phụ huynh.
+    //
+    // CÓ kèm bài luyện (thầy chốt 06/09): em tự tạo bộ câu khắc phục lỗi sai
+    // ngay sau khi nộp, lúc còn nhớ mình vướng chỗ nào.
+    baiTap: baiTapEm,
   }
 }
 

@@ -386,6 +386,41 @@ export async function loadAttempt(maCa: string, sbd: string): Promise<ExamAttemp
   return db.get(STORE_ATTEMPTS, attemptKey(maCa, sbd))
 }
 
+// ---------------------------------------------------------------------------
+// LỊCH SỬ ĐIỂM CỦA EM TRÊN CHÍNH MÁY NÀY (thầy chốt 06/09)
+//
+// Báo cáo sau thi của em cần đường tiến bộ giống bản gửi phụ huynh. Nhưng máy
+// em KHÔNG được phép hỏi máy chủ lịch sử điểm theo số báo danh: mở một đường
+// đọc công khai như vậy là ai biết SBD cũng đọc được cả quá trình học của em.
+//
+// Nên lịch sử ở đây gom từ chính những ca em đã làm TRÊN MÁY NÀY. Em thi ở máy
+// khác thì báo cáo chỉ thiếu đường biểu đồ, không sai số nào.
+const KHOA_DIEM_EM = 'diemCuaEm'
+
+export interface DiemDaLuu {
+  maCa: string
+  sbd: string
+  tenCa: string
+  ngay: string
+  tong: number
+}
+
+export async function luuDiemCuaEm(d: DiemDaLuu): Promise<void> {
+  const db = await getDb()
+  const cu: Record<string, DiemDaLuu> = (await db.get(STORE_SETTINGS, KHOA_DIEM_EM)) || {}
+  cu[`${d.maCa}:${d.sbd}`] = d
+  await db.put(STORE_SETTINGS, cu, KHOA_DIEM_EM)
+}
+
+/** Lịch sử điểm của một em, cũ → mới. */
+export async function docLichSuDiem(sbd: string): Promise<DiemDaLuu[]> {
+  const db = await getDb()
+  const cu: Record<string, DiemDaLuu> = (await db.get(STORE_SETTINGS, KHOA_DIEM_EM)) || {}
+  return Object.values(cu)
+    .filter((d) => d.sbd === sbd)
+    .sort((a, b) => String(a.ngay).localeCompare(String(b.ngay)))
+}
+
 export async function listPendingAttempts(): Promise<ExamAttempt[]> {
   const db = await getDb()
   const all: ExamAttempt[] = await db.getAll(STORE_ATTEMPTS)

@@ -34,8 +34,73 @@ function isAtomBoundaryChar(ch: string | undefined): boolean {
   return /[A-Za-zĐ)\]]/.test(ch)
 }
 
+// ---------------------------------------------------------------------------
+// CÔNG THỨC TỔNG QUÁT — CnH2n+3N (thầy báo 06/09)
+//
+// LỖI ĐÃ DÍNH: kho đề ghi `$\ce{CnH2n+3N}$`. mhchem đọc `n+3` là ĐIỆN TÍCH của
+// nguyên tố "n", nên in ra `CnH₂n³⁺N` — sai hẳn nghĩa, mà em đọc phiếu rồi học
+// theo đúng cái sai đó. Kiểm bằng KaTeX thật: `\ce{CnH2n+3N}` ra "CnHX2nX3+N",
+// còn `\ce{C_{n}H_{2n+3}N}` ra đúng "C_n H_{2n+3} N".
+//
+// SỬA Ở TẦNG TRÌNH BÀY, KHÔNG SỬA KHO ĐỀ: viết lại `Cn` → `C_{n}` và `H2n+3` →
+// `H_{2n+3}` ngay trước khi đưa cho mhchem. Nhờ vậy mọi câu đã nằm trong kho
+// hiện đúng ngay, không phải sửa tay hàng trăm file — và dữ liệu gốc thầy đã
+// duyệt vẫn nguyên vẹn.
+
+/** Chữ cái dùng làm BIẾN chỉ số trong công thức tổng quát. */
+const BIEN_CHI_SO = 'nmxyzk'
+
+/** Ký hiệu nguyên tố THẬT kết thúc bằng một chữ trong `BIEN_CHI_SO` — tách ra
+ * là hỏng chất. Zn, Mn, Sn có mặt đầy trong chương trình phổ thông.
+ *
+ * CỐ Ý KHÔNG có `Cn` (copernicium) và `Cm` (curium): hai nguyên tố này không
+ * bao giờ xuất hiện trong đề phổ thông, còn `CnH2n+2` và `CmH2m+2` thì có ở
+ * mọi bài công thức tổng quát. */
+const NGUYEN_TO_DUNG_YEN = new Set(['In', 'Mn', 'Rn', 'Sn', 'Zn', 'Am', 'Fm', 'Pm', 'Sm', 'Tm', 'Bk', 'Dy'])
+
+/** Nguyên tố một chữ được phép mang chỉ số biến đứng một mình (`Cn`, `Hx`).
+ * Giới hạn danh sách này để `Zn`, `Sn` không lọt vào. */
+const NGUYEN_TO_MOT_CHU = 'CHNOSPR'
+
+/** Đưa công thức tổng quát về dạng mhchem hiểu đúng.
+ *
+ * Hai luật, luật một an toàn tuyệt đối vì đòi có dấu +/- kèm số:
+ *   1. `H2n+3` → `H_{2n+3}` · `CmH2m-2` → `CmH_{2m-2}`
+ *   2. `Cn` → `C_{n}` khi sau nó là chữ HOA hoặc hết chuỗi, và ghép lại không
+ *      thành một ký hiệu nguyên tố có thật. */
+export function chuanHoaCongThucTongQuat(raw: string): string {
+  let s = String(raw ?? '')
+  // 1 — chỉ số có phép cộng trừ. CẤM khoảng trắng quanh dấu: `Zn + 2HCl` mà
+  // cho phép khoảng trắng thì thành `Z_{n+2}HCl`, hỏng hẳn phương trình.
+  s = s.replace(new RegExp(`([A-Z][a-z]?)((?:\\d+)?[${BIEN_CHI_SO}][+-]\\d+)(?![a-z0-9])`, 'g'), (m, nt: string, chiSo: string) =>
+    NGUYEN_TO_DUNG_YEN.has(nt) || NGUYEN_TO_DUNG_YEN.has(nt + chiSo[0]) ? m : `${nt}_{${chiSo}}`,
+  )
+  // 2 — chỉ số là một biến đứng một mình.
+  s = s.replace(new RegExp(`([${NGUYEN_TO_MOT_CHU}])((?:\\d+)?[${BIEN_CHI_SO}])(?=[A-Z_]|$)`, 'g'), (m, nt: string, chiSo: string) =>
+    NGUYEN_TO_DUNG_YEN.has(nt + chiSo) ? m : `${nt}_{${chiSo}}`,
+  )
+  return s
+}
+
+/** Chuỗi liền (không khoảng trắng) chứa `-` nối vào chữ hay `[` `(` là CÔNG
+ * THỨC CẤU TẠO, mọi dấu `-` trong đó là LIÊN KẾT chứ không phải điện tích.
+ *
+ * LỖI ĐÃ DÍNH (thầy báo 06/09): `-CO-NH-` in ra `-CO⁻NH⁻`, biến liên kết
+ * peptide thành hai ion âm. Luật cũ chỉ nhìn một ký tự trước và một ký tự sau
+ * nên dấu `-` cuối `-NH-` (sau nó là dấu cách) trông y hệt `OH-`.
+ *
+ * Nhìn CẢ TỪ thì phân biệt được: `-CO-NH-` có `-C`, `-N` nối vào chữ nên cả từ
+ * là công thức cấu tạo; `OH-` thì không có dấu nối nào như vậy. */
+function laCongThucCauTao(text: string, i: number): boolean {
+  let dau = i
+  while (dau > 0 && !/\s/.test(text[dau - 1])) dau--
+  let cuoi = i
+  while (cuoi < text.length && !/\s/.test(text[cuoi])) cuoi++
+  return /-[A-Za-zĐ[(]/.test(text.slice(dau, cuoi))
+}
+
 export function parseChemText(raw: string): ChemPart[] {
-  const text = raw.replace(/<=>/g, '⇌').replace(/->/g, '→').replace(/<-/g, '←')
+  const text = chuanHoaCongThucTongQuat(raw).replace(/<=>/g, '⇌').replace(/->/g, '→').replace(/<-/g, '←')
   const parts: ChemPart[] = []
   const pushText = (ch: string) => {
     const last = parts[parts.length - 1]
@@ -87,9 +152,13 @@ export function parseChemText(raw: string): ChemPart[] {
       if (isAtomBoundaryChar(prevChar)) {
         const m = /^[0-9]+/.exec(text.slice(i))!
         const after = text[i + m[0].length]
-        if (after === '+' || after === '-') {
-          // Số đi liền dấu +/- — có thể là chỉ số NGUYÊN TỬ hay ĐIỆN TÍCH tuỳ
-          // ion cụ thể, không thể suy đoán chắc chắn → giữ nguyên chữ thường.
+        // Số đi liền dấu +/- — có thể là chỉ số NGUYÊN TỬ hay ĐIỆN TÍCH tuỳ
+        // ion cụ thể, không thể suy đoán chắc chắn → giữ nguyên chữ thường.
+        //
+        // TRỪ khi dấu đó là LIÊN KẾT trong công thức cấu tạo: `[CH2]4-CH(...)`
+        // thì `4` là chỉ số nhóm, không dính dáng gì tới điện tích.
+        const dauLaLienKet = after === '-' && laCongThucCauTao(text, i + m[0].length)
+        if ((after === '+' || after === '-') && !dauLaLienKet) {
           pushText(m[0])
           i += m[0].length
           continue
@@ -106,7 +175,9 @@ export function parseChemText(raw: string): ChemPart[] {
       const nextChar = text[i + 1]
       const boundaryBefore = isAtomBoundaryChar(prevChar)
       const boundaryAfter = !nextChar || !/[0-9+-]/.test(nextChar)
-      if (boundaryBefore && boundaryAfter) {
+      // Dấu `-` trong một công thức cấu tạo là LIÊN KẾT, không phải điện tích.
+      const laLienKet = ch === '-' && laCongThucCauTao(text, i)
+      if (boundaryBefore && boundaryAfter && !laLienKet) {
         parts.push({ t: 'sup', v: ch })
         i += 1
         continue
@@ -163,7 +234,10 @@ const KATEX_OPTS = { throwOnError: true, strict: false, displayMode: false } as 
  * phải mà không biết là mình đang thiếu. */
 const DAI_PHAI_CUON = 26
 
-function ChemFormula({ t, latex }: { t: 'ce' | 'math'; latex: string }): JSX.Element {
+function ChemFormula({ t, latex: latexGoc }: { t: 'ce' | 'math'; latex: string }): JSX.Element {
+  // Chuẩn hoá TRƯỚC khi đưa cho mhchem, nếu không `CnH2n+3N` ra sai (xem ghi
+  // chú ở `chuanHoaCongThucTongQuat`).
+  const latex = chuanHoaCongThucTongQuat(latexGoc)
   try {
     const html = katex.renderToString(t === 'ce' ? `\\ce{${latex}}` : latex, KATEX_OPTS)
     // Công thức NGẮN: KHÔNG bọc thêm inline-block/overflow/vertical-align —

@@ -262,17 +262,27 @@ describe('HOIBAITHAY.md mục 8 — định nghĩa hoàn thành', () => {
     const man = readFileSync(resolve(__dirname, '../src/screens/ExamTakeScreen.tsx'), 'utf8')
     const truot = readFileSync(resolve(__dirname, '../src/components/TamTruotHoiBai.tsx'), 'utf8')
 
-    // Máy em chỉ điền `sai` khi ĐÃ chấm xong (có `graded`, tức là ca cho xem điểm).
+    // LỚP 1 — DỮ LIỆU. Chỉ khi máy em có `keyBank` (ca cho xem điểm) mới dựng
+    // được thẻ đầy đủ; nhánh còn lại điền `dapAnDung: ''` và lời giải rỗng, tức
+    // là KHÔNG CÓ đáp án nào để lộ, chứ không phải giấu đi.
     const khoi = man.slice(man.indexOf('const cauHoiBai'), man.indexOf('const guiHoiBai'))
-    expect(khoi).toContain('const daCongBo = Boolean(graded)')
-    expect(khoi).toContain('sai: daCongBo ? saiI.has(i + 1) : undefined')
-    expect(khoi).toContain('sai: daCongBo ? saiII.has(i + 1) : undefined')
-    expect(khoi).toContain('sai: daCongBo ? saiIII.has(i + 1) : undefined')
+    expect(khoi).toContain('if (keyBank) {')
+    expect(khoi).toContain("dapAnDung: ''")
+    expect(khoi).toContain("chot: ''")
+    expect(khoi).toContain('lyDo: null')
+    expect(khoi).toContain('buoc: null')
 
-    // Và tấm trượt tự khoá thêm một lần nữa — hai lớp, vì lộ đáp án sớm là hỏng
-    // cả ca thi chứ không phải một lỗi giao diện.
-    expect(truot).toContain('daCongBo ? cau.filter((c) => c.sai) : []')
-    expect(truot).toContain('{daCongBo && c.sai && <span')
+    // LỚP 2 — TẤM TRƯỢT. Truyền `anLoiGiai` khi chưa công bố, và nút chọn nhanh
+    // chỉ dựng khi đã công bố. Hai lớp, vì lộ đáp án sớm là hỏng cả ca thi chứ
+    // không phải một lỗi giao diện.
+    expect(truot).toContain('anLoiGiai={!daCongBo}')
+    expect(truot).toContain('daCongBo ? cau.filter(')
+
+    // LỚP 3 — THẺ CÂU. `anLoiGiai` CẮT khỏi phần dựng, không giấu bằng CSS.
+    const the = readFileSync(resolve(__dirname, '../src/components/TheCauChiTiet.tsx'), 'utf8')
+    expect(the).toContain('const laDung = !anLoiGiai && k === c.dapAnDung')
+    expect(the).toContain('const coGiai = !anLoiGiai && (c.chot || c.lyDo || c.buoc)')
+    expect(the).not.toContain('display: none')
   })
 
   it('11. trang tổng hợp dùng đúng CSS_PHIEU/JS_PHIEU, KHÔNG có khối <style> tự chế', async () => {

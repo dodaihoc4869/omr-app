@@ -621,6 +621,89 @@ html[data-giu-de-an] [data-giu-de-phu] {
   opacity: 0.7;
 }
 
+/* ------------------------------------------------------------------ MÀN HUB
+   Thầy chốt 06/09: "trực quan, gọn hàng hơn". Bốn thẻ dọc dài bằng nhau bắt
+   thầy đọc hết mới biết bấm cái nào; nay MỘT thẻ chính to hẳn, ba thẻ còn lại
+   xếp lưới ô vuông nhỏ — nhìn một cái là ra việc chính, và màn ngắn lại một
+   nửa nên không phải cuộn. */
+.hub-luoi {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--k3);
+}
+
+.hub-o {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--k2);
+  text-align: left;
+  background: var(--the);
+  color: var(--muc);
+  border: none;
+  border-radius: var(--bo-3);
+  box-shadow: var(--bong-1);
+  padding: var(--k4);
+  min-height: 122px;
+  transition:
+    transform 140ms cubic-bezier(0.2, 0, 0.2, 1),
+    box-shadow 140ms cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.hub-o:active {
+  transform: scale(0.985);
+  box-shadow: none;
+}
+
+.hub-o-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--bo-2);
+  background: var(--the-2);
+  color: var(--nhat);
+}
+
+.hub-o-ten {
+  display: block;
+  font-family: var(--serif);
+  font-size: var(--cx-3);
+  line-height: 1.25;
+  margin-top: auto;
+}
+
+.hub-o-phu {
+  display: block;
+  font-family: var(--sans);
+  font-size: var(--cx-1);
+  color: var(--nhat);
+  line-height: 1.45;
+}
+
+/* Thẻ chính cao hơn, có nhãn dẫn đường ở trên tên. */
+.the-bam-chinh {
+  padding: var(--k5);
+  min-height: 96px;
+}
+
+.the-bam-nhan {
+  display: block;
+  font-family: var(--sans);
+  font-size: var(--cx-1);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  margin-bottom: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub-o {
+    transition: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .the-bam {
     transition: none;
