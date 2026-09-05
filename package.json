@@ -10,7 +10,8 @@
     "test": "vitest",
     "lint": "oxlint",
     "check:mau": "node scripts/check-mau.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "kiem:hien-thi": "vitest run tests/xuat-dom-hien-thi.test.tsx && vite build && node scripts/kiem-13.mjs"
   },
   "dependencies": {
     "@techstark/opencv-js": "^5.0.0-release.1",
@@ -24,6 +25,8 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@fontsource/be-vietnam-pro": "^5.3.0",
+    "@fontsource/noto-serif": "^5.3.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^24.13.3",

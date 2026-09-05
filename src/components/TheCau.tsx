@@ -4,8 +4,8 @@
 //                     (bank công khai không có đáp án — xem examContent.ts).
 //   cheDo "xem_lai" : xanh = ĐÚNG (✓), đỏ = em chọn sai (✗), có ô giải thích.
 // Chữ đề/phương án/ý dùng class .cau-de/.pa-noi-dung/.y-noi-dung (serif 17px,
-// giãn dòng 1.9 — index.css); chữ cái A/B/C/D rộng cố định 28px. Chạm cả
-// hàng. Ảnh cắt từ đề gốc (HinhAnh) nhúng đúng vị trí: sau đề, sau từng
+// giãn dòng 1.9 — index.css); mã A/B/C/D dùng .pa-ma cùng cỡ chữ. Chạm cả
+// hàng, mã thẳng hàng với dòng đầu của nội dung. Ảnh cắt từ đề gốc (HinhAnh) nhúng đúng vị trí: sau đề, sau từng
 // phương án/ý (đi theo chữ cái GỐC khi xáo), cuối câu. Chỉ dùng biến tokens.css.
 import { Check, X as XIcon } from 'lucide-react'
 import type { HinhAnh, LoiGiaiCauTruc, TrangThaiLoiGiai } from '../data/examContent'
@@ -69,7 +69,9 @@ interface SaProps extends BaseProps {
 
 export type TheCauProps = McqProps | TfProps | SaProps
 
-const CHU_CAI: React.CSSProperties = { fontFamily: 'var(--serif)', fontWeight: 700, width: 28, flexShrink: 0, lineHeight: 1.9 }
+// Mã phương án A./B./C./D. và mã ý a)b)c)d) nay để .pa-ma/.y-ma trong
+// index.css lo, để CÙNG cỡ chữ và CÙNG giãn dòng với nội dung — điều kiện thứ
+// hai của "thẳng tuyệt đối". Hằng CHU_CAI cũ đặt bề rộng bằng tay nên đã bỏ.
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', flexShrink: 0 }
 
 function normSo(s: string): string {
@@ -125,10 +127,10 @@ function LoiGiai({ props, nhan }: { props: TheCauProps; nhan?: TrangThaiLoiGiai 
         </Nhan>
       )}
       <div className="loi-giai">
-        <div className="loi-giai-nhan">LỜI GIẢI</div>
+        <div className="loi-giai-nhan lg-nhan">LỜI GIẢI</div>
         {!coGi && <div className="lg-chu">Thầy chưa nhập lời giải cho câu này.</div>}
         {lg?.chot && (
-          <div className="loi-giai-chot">
+          <div className="loi-giai-chot lg-chot">
             <div className="loi-giai-nhan-nho">Kiến thức cốt lõi</div>
             <ChemText text={lg.chot} />
           </div>
@@ -198,13 +200,14 @@ export default function TheCau(props: TheCauProps) {
           return (
             <div key={displayPos} className="flex flex-col">
               <Hang
+                className="pa-hang"
                 selected={laDung || chonSai || (!xemLai && daChon)}
                 tone={chonSai ? 'do' : 'xanh'}
                 onClick={!xemLai && onSelect ? () => onSelect(orig) : undefined}
                 data-trang-thai={trangThai}
               >
-                <span style={{ ...CHU_CAI, color: trangThai === 'trong' ? 'var(--nhat)' : chonSai ? 'var(--do)' : 'var(--xanh)' }}>{letter}.</span>
-                <span className="flex-1 min-w-0 pa-noi-dung" style={{ overflowWrap: 'break-word' }}>
+                <span className="pa-ma" style={{ color: trangThai === 'trong' ? 'var(--nhat)' : chonSai ? 'var(--do)' : 'var(--xanh)' }}>{letter}.</span>
+                <span className="min-w-0 pa-noi-dung" style={{ overflowWrap: 'break-word' }}>
                   {img ? <img src={img} alt={`Phương án ${letter}`} className="max-h-14 w-auto" /> : <ChemText text={choices[origIdx]} />}
                 </span>
                 {laDung && <DauDung />}
@@ -262,9 +265,9 @@ export default function TheCau(props: TheCauProps) {
           return (
             <div key={i} className="flex flex-col">
               <div className="y-hang" data-y={chu}>
-                <div className="y-noi-dung flex items-start" style={{ gap: 'var(--k2)' }}>
-                  <span style={{ ...CHU_CAI, width: 24, color: 'var(--nhat)' }}>{chu})</span>
-                  <span className="flex-1 min-w-0" style={{ overflowWrap: 'break-word' }}>
+                <div className="y-noi-dung grid" style={{ gridTemplateColumns: '24px minmax(0, 1fr)', alignItems: 'baseline', gap: 'var(--k2)' }}>
+                  <span className="y-ma" style={{ color: 'var(--nhat)' }}>{chu})</span>
+                  <span className="min-w-0" style={{ overflowWrap: 'break-word' }}>
                     {img ? <img src={img} alt={`Ý ${chu}`} className="max-h-14 w-auto" /> : <ChemText text={idea} />}
                   </span>
                 </div>
@@ -327,7 +330,7 @@ export default function TheCau(props: TheCauProps) {
   }
 
   return (
-    <TheNoiDung id={id} noPadding style={{ scrollMarginTop: 72 }}>
+    <TheNoiDung id={id} noPadding className="the-cau">
       <DauThe index={stt - 1} badge={stt} title={tieuDe?.trim() ?? ''} />
       <div className="flex flex-col" style={{ padding: 'var(--k5)', gap: 'var(--k3)' }}>
         {thanCauImg ? (

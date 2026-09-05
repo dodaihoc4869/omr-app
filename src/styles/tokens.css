@@ -49,8 +49,13 @@
   /* chữ: mọi nội dung học thuật (đề bài, phương án, nhận xét, tiêu đề) dùng
    * --serif; số liệu/đồng hồ/nhãn nút/bảng biểu dùng --sans kèm
    * font-variant-numeric: tabular-nums */
-  --serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, Georgia, serif;
-  --sans: -apple-system, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+  /* CẤM Charter · Bitstream Charter · Iowan Old Style · Palatino · EB Garamond:
+   * mấy phông này THIẾU DẤU TIẾNG VIỆT, trình duyệt phải nhặt dấu từ phông khác
+   * và dấu rơi ra khỏi chữ ("bằng" hiện thành "bă`ng"). Hai phông đầu dãy có
+   * dấu Việt đầy đủ, nạp từ Google Fonts kèm subset vietnamese (index.html);
+   * chưa tải xong hay ngoại tuyến lần đầu thì Times New Roman đỡ — cũng đủ dấu. */
+  --serif: 'Noto Serif', 'Source Serif 4', Lora, 'Times New Roman', Cambria, serif;
+  --sans: 'Be Vietnam Pro', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   --cx-1: 13px;
   --cx-2: 15px;

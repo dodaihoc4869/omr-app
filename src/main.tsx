@@ -1,6 +1,23 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { registerSW } from 'virtual:pwa-register'
+// PHÔNG CÓ DẤU TIẾNG VIỆT — tự chứa trong app, KHÔNG gọi Google Fonts.
+// Charter (phông cũ) thiếu dấu tiếng Việt nên trình duyệt phải nhặt dấu từ
+// phông khác và dấu rơi khỏi chữ. Nạp thẳng từ node_modules, chỉ hai subset
+// latin + vietnamese và đúng các nét đang dùng, để service worker cache được
+// và app vẫn đúng dấu khi mất mạng.
+import '@fontsource/noto-serif/latin-400.css'
+import '@fontsource/noto-serif/latin-700.css'
+import '@fontsource/noto-serif/latin-400-italic.css'
+import '@fontsource/noto-serif/vietnamese-400.css'
+import '@fontsource/noto-serif/vietnamese-700.css'
+import '@fontsource/noto-serif/vietnamese-400-italic.css'
+import '@fontsource/be-vietnam-pro/latin-400.css'
+import '@fontsource/be-vietnam-pro/latin-600.css'
+import '@fontsource/be-vietnam-pro/latin-700.css'
+import '@fontsource/be-vietnam-pro/vietnamese-400.css'
+import '@fontsource/be-vietnam-pro/vietnamese-600.css'
+import '@fontsource/be-vietnam-pro/vietnamese-700.css'
 import './styles/tokens.css'
 import './index.css'
 import 'katex/dist/katex.min.css'

@@ -60,14 +60,16 @@ export function ChoiceOrText({ img, text }: { img?: string; text: string }) {
  * chữ sans 13px không co nhỏ hơn. */
 export function BangSoLieu({ table }: { table?: string[][] }) {
   if (!table || table.length === 0) return null
-  const o: React.CSSProperties = { padding: 'var(--k2) var(--k3)', whiteSpace: 'nowrap', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--muc)' }
+  // Cỡ chữ, đường kẻ, nền tiêu đề nằm ở .cau-bang (index.css) — ô bảng KHÔNG
+  // được nhỏ hơn 13px, vì bảng dưới 5 cột cấm đổi thành ảnh.
+  const o: React.CSSProperties = { fontFamily: 'var(--sans)', color: 'var(--muc)' }
   return (
-    <div className="overflow-x-auto" style={{ borderRadius: 'var(--bo-1)', border: '1px solid var(--vien)' }}>
-      <table className="w-full border-collapse">
+    <div className="cau-bang" style={{ borderRadius: 'var(--bo-1)', border: '1px solid var(--vien)' }}>
+      <table>
         <thead>
-          <tr style={{ background: 'var(--the-2)' }}>
+          <tr>
             {table[0].map((cell, i) => (
-              <th key={i} className="text-left font-bold" style={{ ...o, borderBottom: '1px solid var(--vien)' }}>
+              <th key={i} className="text-left" style={o}>
                 <ChemText text={cell} />
               </th>
             ))}
@@ -75,7 +77,7 @@ export function BangSoLieu({ table }: { table?: string[][] }) {
         </thead>
         <tbody>
           {table.slice(1).map((row, r) => (
-            <tr key={r} style={{ borderTop: '1px solid var(--vien)' }}>
+            <tr key={r}>
               {row.map((cell, c) => (
                 <td key={c} style={o}>
                   <ChemText text={cell} />

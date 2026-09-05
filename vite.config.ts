@@ -52,7 +52,10 @@ export default defineConfig({
         // đúng lỗi này (bản 0eddc42 nằm chờ trong khi máy chủ đã có bản mới).
         skipWaiting: true,
         clientsClaim: true,
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data}'],
+        // woff2/woff: phông có dấu tiếng Việt và phông công thức của KaTeX.
+        // Thiếu hai đuôi này thì mất mạng là dấu tiếng Việt và chỉ số công thức
+        // rơi về phông dự phòng — đúng lỗi "bă`ng" đã gặp.
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,woff,woff2,ttf}'],
         maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
         // KHÔNG chặn /t/, /hs/, /ph/ nữa: service worker cứ trả index.html cho
         // mọi đường điều hướng, và app tự đọc vai + mã ca từ ĐƯỜNG DẪN

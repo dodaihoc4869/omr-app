@@ -75,8 +75,10 @@ function docMau(): Record<TenMau, string> {
   return ra
 }
 
-const SERIF = "Charter, 'Bitstream Charter', 'Sitka Text', Cambria, Georgia, serif"
-const SANS = "-apple-system, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+// Cùng dãy phông với tokens.css — Charter thiếu dấu tiếng Việt, vẽ lên canvas
+// thì dấu rơi ra và ảnh phiếu gửi phụ huynh mang lỗi đó đi luôn.
+const SERIF = "'Noto Serif', 'Source Serif 4', Lora, 'Times New Roman', Cambria, serif"
+const SANS = "'Be Vietnam Pro', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 
 const W = 1080 // bề rộng ảnh (px thật sau khi nhân tỉ lệ)
 const LE = 64 // lề trái/phải

@@ -16,3 +16,6 @@ kho-de/**
 # gói đồng bộ tạm từ Cowork
 _sync.tgz
 _to_delete/
+
+# Bộ chấm 13 phép kiểm hiển thị dựng DOM tạm ở đây (scripts/kiem-13.mjs)
+.kiem-hien-thi/
