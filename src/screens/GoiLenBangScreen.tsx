@@ -15,7 +15,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, type CaTomTat } from '../lib/exam-api'
-import { loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
+import { docKhoChuaCa, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { mergeKeepAnswers } from '../data/examContent'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
@@ -52,6 +52,9 @@ interface DuLieuCa {
   maCa: string
   ten: string
   bank: BanDeCa
+  /** KHO CHỮA của ca — bộ câu rộng hơn đề em làm, do màn Mở ca lưu lại khi thầy
+   * chọn "Phân công lên bảng". Không có thì rỗng, màn vẫn chạy trên bộ em làm. */
+  khoChua: BanDeCa | null
   luot: LuotCa[]
   hoSo: Record<string, HoSoRutGon>
 }
@@ -184,7 +187,11 @@ export default function GoiLenBangScreen() {
       const hoSo: Record<string, HoSoRutGon> = {}
       for (const h of hs) if (h) hoSo[h.sbd] = h
 
-      setDu({ maCa: ca.maCa, ten: ca.tenCa || `mã ${ca.maCa}`, bank, luot, hoSo })
+      // Kho chữa lưu sẵn lúc mở ca (chế độ "Phân công lên bảng") — tự nạp, thầy
+      // không phải tick lại đề ở khối bên dưới.
+      const kc = await docKhoChuaCa(ca.maCa).catch(() => undefined)
+      const khoChua = kc && kc.length ? mergeKeepAnswers(kc) : null
+      setDu({ maCa: ca.maCa, ten: ca.tenCa || `mã ${ca.maCa}`, bank, khoChua, luot, hoSo })
       showToast(`Ca ${ca.tenCa || ca.maCa}: ${coBai.length} em có bài`, 'success')
     } catch (e) {
       setDu(null)
@@ -196,7 +203,18 @@ export default function GoiLenBangScreen() {
   }
 
   /** Bản đề của các mã thầy tích thêm, gộp lại thành một kho. */
-  const bankThem: BanDeCa = useMemo(() => mergeKeepAnswers(deDaLuu.filter((d) => maDeChon.has(d.maDe))), [deDaLuu, maDeChon])
+  const bankTichTay: BanDeCa = useMemo(() => mergeKeepAnswers(deDaLuu.filter((d) => maDeChon.has(d.maDe))), [deDaLuu, maDeChon])
+
+  /** Câu chữa THÊM = kho chữa tự nạp của ca + đề thầy tích tay. Cả hai đều là
+   * câu không em nào làm, nên không bao giờ bị xếp "giảng cả lớp". */
+  const bankThem: BanDeCa = useMemo(
+    () => ({
+      phanI: [...(du?.khoChua?.phanI ?? []), ...bankTichTay.phanI],
+      phanII: [...(du?.khoChua?.phanII ?? []), ...bankTichTay.phanII],
+      phanIII: [...(du?.khoChua?.phanIII ?? []), ...bankTichTay.phanIII],
+    }),
+    [du, bankTichTay],
+  )
 
   /** DANH SÁCH CÂU ĐÁNG CHỮA = câu của ca + câu thầy tích thêm.
    *
@@ -446,6 +464,11 @@ export default function GoiLenBangScreen() {
         <div style={{ ...NHAN_NHO, marginTop: 4, marginBottom: 'var(--k3)' }}>
           Tuỳ chọn. Tích thêm bài hoặc dạng muốn chữa; câu thêm chưa có bài làm nên chỉ vào danh sách chữa, không bị xếp giảng cả lớp.
         </div>
+        {du?.khoChua && (
+          <div style={{ ...NHAN_NHO, color: 'var(--xanh)', marginBottom: 'var(--k3)' }} data-kho-chua>
+            Ca này mở bằng chế độ Phân công lên bảng nên đã tự nạp sẵn <b style={SO}>{du.khoChua.phanI.length + du.khoChua.phanII.length + du.khoChua.phanIII.length}</b> câu cùng chuyên đề để chia đủ bốn lượt. Không cần tích thêm.
+          </div>
+        )}
         {deDaLuu.length === 0 ? (
           <OThongBao tone="cam">Chưa có đề nào trong máy — vào Ngân hàng câu hỏi bấm Đồng bộ trước.</OThongBao>
         ) : (

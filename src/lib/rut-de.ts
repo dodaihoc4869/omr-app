@@ -328,34 +328,76 @@ export function tongCau(s: SoCauPhan): number {
 /** Giây trung bình một câu mỗi phần — đo trên đề thật, dùng để chia ngân sách. */
 export const GIAY_MOI_CAU: Record<PhanDe, number> = { I: 60, II: 150, III: 180 }
 
-/** Trần ngân sách mỗi phần, để không dồn cả ca vào một phần. Cộng lại = 1. */
-export const TRAN_NGAN_SACH: Record<PhanDe, number> = { I: 0.45, II: 0.35, III: 0.2 }
+/** TRẦN CỨNG 15 PHÚT (thầy chốt 05/09 chiều). Ca chẩn đoán dài hơn là ăn mất
+ * giờ chữa bài: khung buổi 120 phút chỉ dành 15 phút đầu cho việc lấy dữ liệu.
+ * Thầy đặt ca ngắn hơn thì lấy con số ngắn hơn, dài hơn thì vẫn cắt ở 15. */
+export const PHUT_TOI_DA_LEN_BANG = 15
+
+/** Trần SỐ CÂU mỗi phần. Phần II trần 3: bốn ý một câu, quá ba câu là em ngồi
+ * đọc suốt buổi chẩn đoán. Phần III trần 1: đắt nhất (180s) mà chỉ một tín
+ * hiệu — giữ đúng một câu để có thứ cho em lên bảng trình bày lời giải. */
+export const TRAN_CAU_LEN_BANG: Record<PhanDe, number> = { I: 15, II: 3, III: 1 }
+
+/** Dưới mức này thì BỎ Phần III: 180 giây cho một tín hiệu là quá đắt khi
+ * ngân sách hẹp, đổi sang Phần II được 4 tín hiệu trên 150 giây. */
+export const NGUONG_CO_PHAN_III = 600
+
+/** Bộ câu để CHỮA rộng gấp mấy lần bộ em làm. Bốn lượt gọi lên bảng, mỗi lượt
+ * vài em, nên chỉ 8 câu em làm là hết câu ngay lượt hai. Câu chữa thêm KHÔNG
+ * vào đề em làm (đề vẫn đúng 15 phút) — nó chỉ nằm trong danh sách chữa. */
+export const HE_SO_KHO_CHUA = 4
+export const TRAN_KHO_CHUA = 40
 
 export interface YeuCauLenBang {
-  /** Thời lượng làm bài của ca, phút. Ngân sách = phút × 60 giây. */
+  /** Thời lượng làm bài của ca, phút. Cắt trần ở PHUT_TOI_DA_LEN_BANG. */
   phut: number
   tranhQid?: string[]
   seed: number
 }
 
-/** SỐ CÂU mỗi phần cho buổi chữa bài: chia ngân sách giây theo trần từng phần,
- * chặn trên bằng số câu THẬT có trong kho, rồi dồn phần giây thừa sang Phần I.
+/** Ngân sách giây thật sự dùng — đã cắt trần 15 phút. */
+export function giayNganSach(phut: number): number {
+  return Math.min(Math.max(0, Math.floor(Number(phut) || 0)), PHUT_TOI_DA_LEN_BANG) * 60
+}
+
+/** SỐ CÂU mỗi phần cho buổi chữa bài.
  *
- * Dồn sang Phần I chứ không sang II/III: Phần I rẻ nhất (60s) nên tận dụng
- * được nhiều nhất phần thừa, và kho phần I bao giờ cũng dày nhất. */
+ * Xếp theo TÍN HIỆU TRÊN MỖI GIÂY, vì mục đích số một là đọc ra hồ sơ mạnh/yếu
+ * của em trong 15 phút:
+ *   Phần II  4 tín hiệu / 150s = 0,027 — dày nhất, lấy trước
+ *   Phần I   1 tín hiệu /  60s = 0,017
+ *   Phần III 1 tín hiệu / 180s = 0,006 — rẻ nhất về tín hiệu
+ *
+ * Nhưng KHÔNG xếp thuần theo con số đó: Phần III giữ đúng một câu (khi ngân
+ * sách ≥ 10 phút) vì mục đích số hai là gọi em lên bảng, mà câu đáng đứng bảng
+ * trình bày là câu trả lời ngắn chứ không phải câu bốn phương án.
+ *
+ * Thứ tự lấy: một câu Phần III → Phần II tới trần → Phần I lấp phần còn lại. */
 export function soCauLenBang(uv: Record<PhanDe, CauUngVien[]>, phut: number): SoCauPhan {
-  const nganSach = Math.max(0, Math.floor(Number(phut) || 0)) * 60
+  let con = giayNganSach(phut)
   const ra: SoCauPhan = { I: 0, II: 0, III: 0 }
-  let thua = 0
-  for (const p of PHAN_DE) {
-    const phan = nganSach * TRAN_NGAN_SACH[p]
-    const theoGiay = Math.floor(phan / GIAY_MOI_CAU[p])
-    const n = Math.min(theoGiay, uv[p].length)
-    ra[p] = n
-    thua += phan - n * GIAY_MOI_CAU[p]
+
+  if (con >= NGUONG_CO_PHAN_III && uv.III.length > 0 && con >= GIAY_MOI_CAU.III) {
+    ra.III = 1
+    con -= GIAY_MOI_CAU.III
   }
-  const themI = Math.min(Math.floor(thua / GIAY_MOI_CAU.I), uv.I.length - ra.I)
-  if (themI > 0) ra.I += themI
+  ra.II = Math.min(TRAN_CAU_LEN_BANG.II, uv.II.length, Math.floor(con / GIAY_MOI_CAU.II))
+  con -= ra.II * GIAY_MOI_CAU.II
+  ra.I = Math.min(TRAN_CAU_LEN_BANG.I, uv.I.length, Math.floor(con / GIAY_MOI_CAU.I))
+  con -= ra.I * GIAY_MOI_CAU.I
+
+  // Kho không có Phần I (thầy chỉ tích dạng đúng sai chẳng hạn) thì phần giây
+  // thừa quay lại cho Phần II và III, chứ không bỏ phí nửa ca.
+  if (con >= GIAY_MOI_CAU.II && ra.II < uv.II.length) {
+    const them = Math.min(uv.II.length - ra.II, Math.floor(con / GIAY_MOI_CAU.II))
+    ra.II += them
+    con -= them * GIAY_MOI_CAU.II
+  }
+  if (con >= GIAY_MOI_CAU.III && ra.III < uv.III.length) {
+    const them = Math.min(uv.III.length - ra.III, Math.floor(con / GIAY_MOI_CAU.III))
+    ra.III += them
+    con -= them * GIAY_MOI_CAU.III
+  }
   return ra
 }
 
@@ -431,4 +473,55 @@ export function rutDeLenBang(uv: Record<PhanDe, CauUngVien[]>, yc: YeuCauLenBang
     lapLai += c.filter((x) => tranh.has(x.id)).length
   }
   return { chon, thieu, lapLai, conLai }
+}
+
+/** KHO CHỮA: bộ câu rộng hơn bộ em làm, dùng ở màn Gọi lên bảng.
+ *
+ * Vì sao phải có: đề em làm gói trong 15 phút nên chỉ 8 câu. Bỏ ra câu cả lớp
+ * cùng sai (giảng cả lớp) và câu cả lớp làm đúng (chỉ đọc đáp án) thì còn 5–6
+ * câu để chia. Bốn lượt gọi, mỗi lượt vài em, là hết câu ngay lượt hai.
+ *
+ * Kho chữa lấy thêm câu CÙNG CHUYÊN ĐỀ với bộ em làm, theo đúng luật ưu tiên
+ * sao. Câu thêm KHÔNG vào đề em làm — đề vẫn đúng 15 phút, `doChum` và
+ * `tiLeDung` vẫn tính trên bộ cả lớp cùng làm. Em nhận câu thêm ở mức ghép 3
+ * hoặc 5 ("chưa làm câu này"), đúng như engine phân công đã tính sẵn.
+ *
+ * Trả về kho chữa ĐÃ GỒM bộ em làm, để chỗ gọi chỉ cần dùng một danh sách. */
+export function rutKhoChua(uv: Record<PhanDe, CauUngVien[]>, boLamBai: KetQuaRut, yc: YeuCauLenBang): KetQuaRut {
+  const tranh = new Set(yc.tranhQid ?? [])
+  const daCo = moiIdDaRut(boLamBai)
+  const soLam = soCauCua(boLamBai)
+  const tongLam = tongCau(soLam)
+  const muonThem = Math.max(0, Math.min(TRAN_KHO_CHUA, tongLam * HE_SO_KHO_CHUA) - tongLam)
+
+  const chon = { I: [...boLamBai.chon.I], II: [...boLamBai.chon.II], III: [...boLamBai.chon.III] } as Record<PhanDe, CauUngVien[]>
+  if (muonThem <= 0) return { chon, thieu: { I: 0, II: 0, III: 0 }, lapLai: boLamBai.lapLai, conLai: boLamBai.conLai }
+
+  // Chuyên đề của bộ em làm — chỉ lấy thêm trong đúng những chuyên đề này, kẻo
+  // thầy chữa một chuyên đề cả lớp chưa đụng tới buổi nào.
+  const cdCanLay = new Set(PHAN_DE.flatMap((p) => chon[p]).map((c) => chuanChuyenDe(c.chuyenDe)))
+
+  // Chia phần thêm theo tỉ lệ bộ em làm, nhưng Phần I gánh phần lẻ: câu Phần I
+  // rẻ nhất để đọc và nhiều nhất trong kho.
+  const themTheoPhan: SoCauPhan = { I: 0, II: 0, III: 0 }
+  let con = muonThem
+  for (const p of ['II', 'III'] as PhanDe[]) {
+    const n = Math.min(Math.round((muonThem * soLam[p]) / Math.max(1, tongLam)), con)
+    themTheoPhan[p] = n
+    con -= n
+  }
+  themTheoPhan.I = con
+
+  for (const p of PHAN_DE) {
+    const ungVien = uv[p].filter((c) => !daCo.has(c.id) && (cdCanLay.size === 0 || cdCanLay.has(chuanChuyenDe(c.chuyenDe))))
+    const them = chonChuaBai(ungVien, themTheoPhan[p], tranh, hashSeed(`${yc.seed}:khochua:${p}`))
+    chon[p] = [...chon[p], ...them]
+  }
+
+  return {
+    chon,
+    thieu: { I: 0, II: 0, III: 0 },
+    lapLai: PHAN_DE.reduce((t, p) => t + chon[p].filter((c) => tranh.has(c.id)).length, 0),
+    conLai: { I: uv.I.length - chon.I.length, II: uv.II.length - chon.II.length, III: uv.III.length - chon.III.length },
+  }
 }

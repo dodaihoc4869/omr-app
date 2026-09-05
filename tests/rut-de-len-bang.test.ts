@@ -4,7 +4,7 @@
 // giây, phủ đều chuyên đề, ưu tiên câu nhiều sao, đẩy câu nghi đáp án xuống
 // cuối, và trộn lại phải ra bộ khác.
 import { describe, expect, it } from 'vitest'
-import { dungUngVien, giayUocTinh, GIAY_MOI_CAU, PHAN_DE, rutDeLenBang, soCauCua, soCauLenBang, soTinHieu, tongCau, type CauUngVien, type PhanDe } from '../src/lib/rut-de'
+import { dungUngVien, giayUocTinh, GIAY_MOI_CAU, moiIdDaRut, PHAN_DE, PHUT_TOI_DA_LEN_BANG, rutDeLenBang, rutKhoChua, soCauCua, soCauLenBang, soTinHieu, TRAN_KHO_CHUA, tongCau, type CauUngVien, type PhanDe } from '../src/lib/rut-de'
 import type { TeacherExamSource } from '../src/data/examContent'
 
 /** Kho giả: 3 chuyên đề × 20 câu Phần I, 12 câu Phần II, 9 câu Phần III. */
@@ -52,8 +52,26 @@ describe('số câu theo ngân sách giây', () => {
     expect(tongCau(s)).toBeGreaterThan(0)
   })
 
-  it('ca dài hơn thì ra nhiều câu hơn, không phải con số cố định', () => {
-    expect(tongCau(soCauLenBang(UV, 45))).toBeGreaterThan(tongCau(soCauLenBang(UV, 15)))
+  it('CHỐT CỨNG 15 PHÚT: ca đặt 45 phút vẫn ra đúng bộ của 15 phút', () => {
+    expect(soCauLenBang(UV, 45)).toEqual(soCauLenBang(UV, 15))
+    expect(soCauLenBang(UV, 120)).toEqual(soCauLenBang(UV, 15))
+    expect(giayUocTinh(soCauLenBang(UV, 45))).toBeLessThanOrEqual(PHUT_TOI_DA_LEN_BANG * 60)
+  })
+
+  it('ca ngắn hơn 15 phút thì rút ít hơn, không tràn giờ', () => {
+    expect(giayUocTinh(soCauLenBang(UV, 5))).toBeLessThanOrEqual(5 * 60)
+    expect(tongCau(soCauLenBang(UV, 5))).toBeLessThan(tongCau(soCauLenBang(UV, 15)))
+  })
+
+  it('ưu tiên Phần II vì dày tín hiệu nhất trên mỗi giây, nhưng vẫn giữ một câu Phần III để có câu đứng bảng', () => {
+    const s = soCauLenBang(UV, 15)
+    expect(s.II).toBe(3)
+    expect(s.III).toBe(1)
+    expect(s.I).toBeGreaterThan(0)
+  })
+
+  it('ngân sách hẹp thì BỎ Phần III — 180 giây cho một tín hiệu là quá đắt', () => {
+    expect(soCauLenBang(UV, 8).III).toBe(0)
   })
 
   it('không phần nào ngốn hết ngân sách của phần khác', () => {
@@ -157,7 +175,7 @@ describe('khối Bộ câu ra đề — chế độ thứ ba', () => {
     expect(ma).toContain('Phân công lên bảng')
     expect(ma).toContain("setCheDo('lenbang')")
     // soCau báo lên = ĐÚNG cỡ kho đã rút ⇒ mỗi em làm hết ⇒ cả lớp cùng một đề
-    expect(ma).toContain('onDoi({ ids: moiIdDaRut(kq), soCau: kho, lenBang: true })')
+    expect(ma).toContain('onDoi({ ids: moiIdDaRut(kq), soCau: kho, lenBang: true, idsChua: moiIdDaRut(chua) })')
     expect(ma).toContain('Cả lớp làm CÙNG một đề')
   })
 
@@ -167,17 +185,25 @@ describe('khối Bộ câu ra đề — chế độ thứ ba', () => {
     expect(ma).toContain('phutLamBai={thoiGianPhut}'.replace('phutLamBai={thoiGianPhut}', 'phutLamBai'))
   })
 
-  it('chọn chế độ này thì màn Mở ca tự bật nút gạt lên bảng', async () => {
+  it('cờ lên bảng suy thẳng từ chế độ, không có nút gạt riêng', async () => {
     const ma = (await import('../src/screens/ExamSetupScreen.tsx?raw')).default
     expect(ma).toContain('phutLamBai={thoiGianPhut}')
-    expect(ma).toContain('if (boRut?.lenBang) setLenBang(true)')
+    expect(ma).toContain('const lenBang = boRut?.lenBang === true')
+    expect(ma).not.toContain('NutGat')
+  })
+
+  it('chế độ này lưu KHO CHỮA của ca để màn Gọi lên bảng đủ câu chia bốn lượt', async () => {
+    const ma = (await import('../src/screens/ExamSetupScreen.tsx?raw')).default
+    expect(ma).toContain('luuKhoChuaCa(maCa, locNguonTheoId(selectedSources, boRut.idsChua))')
+    const goi = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
+    expect(goi).toContain('docKhoChuaCa(ca.maCa)')
   })
 })
 
 /** Một phần thiếu câu thì phần thừa giây dồn sang Phần I — kiểm riêng vì đây là
  * chỗ dễ âm thầm rút hụt cả ca. */
 describe('bù ngân sách khi kho lệch', () => {
-  it('kho không có Phần II và III thì Phần I lấy bù, không bỏ phí giờ', () => {
+  it('kho không có Phần II và III thì Phần I lấy hết ngân sách, không bỏ phí giờ', () => {
     const chiI = dungUngVien([
       {
         maDe: 'A',
@@ -189,7 +215,7 @@ describe('bù ngân sách khi kho lệch', () => {
     const s = soCauLenBang(chiI, 15)
     expect(s.II).toBe(0)
     expect(s.III).toBe(0)
-    // 900s / 60s = 15 câu nếu dồn hết sang Phần I
+    // 900s / 60s = 15 câu, đúng trần Phần I
     expect(s.I).toBe(15)
     expect(giayUocTinh(s)).toBeLessThanOrEqual(15 * 60)
   })
@@ -197,3 +223,46 @@ describe('bù ngân sách khi kho lệch', () => {
 
 /** Kiểu PhanDe dùng tới trong file, khai báo để lint không kêu import thừa. */
 export type _P = PhanDe
+
+// KHO CHỮA — bộ câu rộng hơn đề em làm. Thiếu nó thì bốn lượt gọi lên bảng hết
+// câu ngay lượt hai, mà thầy chỉ phát hiện lúc đứng trước lớp.
+describe('kho chữa cho bốn lượt gọi', () => {
+  const lam = rutDeLenBang(UV, { phut: 15, seed: 3 })
+  const chua = rutKhoChua(UV, lam, { phut: 15, seed: 3 })
+
+  it('GỒM trọn bộ em làm, không bỏ sót câu nào', () => {
+    const idLam = moiIdDaRut(lam)
+    const idChua = moiIdDaRut(chua)
+    for (const id of idLam) expect(idChua.has(id)).toBe(true)
+  })
+
+  it('rộng hơn bộ em làm để đủ chia bốn lượt', () => {
+    expect(tongCau(soCauCua(chua))).toBeGreaterThan(tongCau(soCauCua(lam)) * 2)
+    expect(tongCau(soCauCua(chua))).toBeLessThanOrEqual(TRAN_KHO_CHUA)
+  })
+
+  it('câu thêm CÙNG CHUYÊN ĐỀ với bộ em làm — không chữa chuyên đề lớp chưa đụng', () => {
+    const cdLam = new Set(PHAN_DE.flatMap((p) => lam.chon[p]).map((c) => c.chuyenDe))
+    for (const p of PHAN_DE) for (const c of chua.chon[p]) expect(cdLam.has(c.chuyenDe)).toBe(true)
+  })
+
+  it('không câu nào lặp trong kho chữa', () => {
+    const ids = PHAN_DE.flatMap((p) => chua.chon[p].map((c) => c.id))
+    expect(new Set(ids).size).toBe(ids.length)
+  })
+
+  it('kho cạn thì kho chữa bằng đúng bộ em làm, không báo thiếu', () => {
+    const beo = dungUngVien([
+      {
+        maDe: 'B',
+        phanI: [{ id: 'p1', text: 't', choices: ['a', 'b', 'c', 'd'], correct: 'A', chuyenDe: 'Ester', mucDo: 'hieu' }],
+        phanII: [],
+        phanIII: [],
+      } as unknown as TeacherExamSource,
+    ])
+    const l = rutDeLenBang(beo, { phut: 15, seed: 1 })
+    const c = rutKhoChua(beo, l, { phut: 15, seed: 1 })
+    expect(moiIdDaRut(c).size).toBe(1)
+    expect(c.thieu).toEqual({ I: 0, II: 0, III: 0 })
+  })
+})

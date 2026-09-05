@@ -139,6 +139,22 @@ export async function luuSoCauCa(maCa: string, soCau: SoCauMoiPhan): Promise<voi
   await db.put(STORE_SETTINGS, soCau, `soCauCa:${maCa}`)
 }
 
+/** KHO CHỮA của một ca (chế độ "Phân công lên bảng"): bộ câu RỘNG hơn đề em
+ * làm, để màn Gọi lên bảng có đủ câu chia bốn lượt mà không phải tick tay.
+ *
+ * Nằm ở `settings` chứ không phải store riêng: không phải nâng phiên bản
+ * IndexedDB, mà mất nó cũng không sao — màn Gọi lên bảng vẫn chạy trên đúng bộ
+ * câu em đã làm, chỉ là ít câu hơn. */
+export async function luuKhoChuaCa(maCa: string, sources: TeacherExamSource[]): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, sources, `khoChuaCa:${maCa}`)
+}
+
+export async function docKhoChuaCa(maCa: string): Promise<TeacherExamSource[] | undefined> {
+  const db = await getDb()
+  return (await db.get(STORE_SETTINGS, `khoChuaCa:${maCa}`)) as TeacherExamSource[] | undefined
+}
+
 export async function docSoCauCa(maCa: string): Promise<SoCauMoiPhan | undefined> {
   const db = await getDb()
   const v = (await db.get(STORE_SETTINGS, `soCauCa:${maCa}`)) as SoCauMoiPhan | undefined

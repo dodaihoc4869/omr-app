@@ -10,10 +10,10 @@ import HopChonDe from '../components/HopChonDe'
 import { locNguonTheoId, qidDaRaTuCacCa, type SoCauPhan } from '../lib/rut-de'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import { randomSessionCode, taoLinkMoi } from '../lib/ca-link'
-import { TheNoiDung, Hang, OThongBao, NutChinh, NutGat } from '../components/DesignSystem'
+import { TheNoiDung, Hang, OThongBao, NutChinh } from '../components/DesignSystem'
 import NutDongBo from '../components/NutDongBo'
 import { chuoi, danhSachEm, khoiTuNamSinh, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
-import { docSoCauCa, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, luuSoCauCa, saveSessionTeacherBank } from '../lib/exam-db'
+import { docSoCauCa, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, luuKhoChuaCa, luuSoCauCa, saveSessionTeacherBank } from '../lib/exam-db'
 import { dongBoNganHang } from '../lib/exam-sync'
 import { useAppStore } from '../store/appStore'
 
@@ -123,10 +123,6 @@ export default function ExamSetupScreen() {
   const [batDauLocal, setBatDauLocal] = useState(henGioMacDinh)
   const [hanVaoPhut, setHanVaoPhut] = useState(30)
   const [congBoDiem, setCongBoDiem] = useState<CongBoDiem>('khong')
-  // NÚT GẠT "lấy dữ liệu phân công lên bảng" (thầy chốt 05/09 chiều). Mặc định
-  // BẬT: bật nhầm chỉ thừa một dòng trong danh sách ca, còn tắt nhầm thì thầy
-  // mở màn Gọi lên bảng giữa buổi và không thấy ca vừa thi đâu.
-  const [lenBang, setLenBang] = useState(true)
   // Tên ca (tuỳ chọn) + phạm vi gửi ca.
   const [tenCa, setTenCa] = useState('')
   // Chống gian lận theo mức (mục 6): rời màn lần thứ N → khoá; một lần rời quá M giây → khoá.
@@ -141,7 +137,7 @@ export default function ExamSetupScreen() {
   // Danh sách em để tích: danh sách lớp trên máy (Google Sheet) — không có thì lấy danh sách lớp đã nạp lên máy chủ.
   const [dsDangKy, setDsDangKy] = useState<{ sbd: string; hoTen: string; lop: string }[] | null>(null)
   // Bộ câu màn Rút đề chốt; null = thầy chọn lấy trọn kho (đường cũ).
-  const [boRut, setBoRut] = useState<{ ids: Set<string>; soCau: SoCauPhan; lenBang: boolean } | null>(null)
+  const [boRut, setBoRut] = useState<{ ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string> } | null>(null)
   // Câu đã ra ở các ca trước (đọc từ bản đề CÓ đáp án đã lưu của từng ca) — để
   // rút đề tránh phát lại câu lớp vừa làm tuần trước.
   const [qidCaTruoc, setQidCaTruoc] = useState<string[]>([])
@@ -236,12 +232,14 @@ export default function ExamSetupScreen() {
   const selectedSources = useMemo(() => dsDeTach.filter((c) => selectedMaDe.has(c.maDe)), [dsDeTach, selectedMaDe])
 
   /** Bộ đề THẬT SỰ gửi lên máy chủ: đã cắt xuống còn những câu thầy chốt. */
-  // Chọn "Phân công lên bảng" ở khối Bộ câu ra đề thì BẬT LUÔN nút gạt bên
-  // dưới — thầy rút bộ câu để chữa bài mà ca không ra màn Gọi lên bảng thì rút
-  // để làm gì. Vẫn tắt tay được sau đó, nên đây là gợi ý chứ không phải khoá.
-  useEffect(() => {
-    if (boRut?.lenBang) setLenBang(true)
-  }, [boRut?.lenBang])
+  // CA CÓ RA MÀN GỌI LÊN BẢNG HAY KHÔNG — suy thẳng từ lựa chọn ở khối Bộ câu
+  // ra đề, không có nút gạt riêng (thầy chốt 05/09 chiều: "có lựa chọn phân
+  // công lên bảng chỗ bộ câu ra đề rồi"). Chọn "Phân công lên bảng" là ca đẩy
+  // dữ liệu sang màn đó; ba lựa chọn còn lại thì không.
+  //
+  // Phiếu gửi phụ huynh và cộng dồn mạnh/yếu KHÔNG dính gì tới cờ này: mọi ca,
+  // mọi lựa chọn đều ghi điểm và chi tiết từng câu như nhau.
+  const lenBang = boRut?.lenBang === true
 
   const nguonRaDe = useMemo(() => (boRut ? locNguonTheoId(selectedSources, boRut.ids) : selectedSources), [selectedSources, boRut])
   const soCauRaDe = boRut ? boRut.soCau : undefined
@@ -289,6 +287,10 @@ export default function ExamSetupScreen() {
       // Lưu ĐÚNG bộ đã rút, không lưu cả kho: chấm lại phải tái tạo y hệt bộ
       // câu em đã làm, mà máy chủ chỉ giữ bộ đã rút.
       await saveSessionTeacherBank(maCa, nguonCuoi)
+      // KHO CHỮA: chỉ ở chế độ "Phân công lên bảng". Rộng hơn đề em làm để màn
+      // Gọi lên bảng đủ câu chia bốn lượt. Lưu ở máy thầy, không đẩy lên máy
+      // chủ — em không được thấy câu chưa làm.
+      if (boRut?.lenBang && boRut.idsChua) await luuKhoChuaCa(maCa, locNguonTheoId(selectedSources, boRut.idsChua))
       if (soCauCuoi) await luuSoCauCa(maCa, soCauCuoi)
       setOpened({ maCa, joinLink: await taoLinkMoi(maCa, scriptUrl.trim()), batDau: moc.batDau, hetHanVao: moc.hetHanVao })
       setDaCopy(false)
@@ -654,24 +656,6 @@ export default function ExamSetupScreen() {
             )
           })}
         </div>
-      </TheNoiDung>
-
-      {/* 6. CA NÀY DÙNG LÀM GÌ */}
-      <TheNoiDung>
-        <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k2)' }}>Ca này dùng làm gì</div>
-        <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>
-          Hai việc dưới đây chạy ở MỌI ca, không tắt được: gửi phiếu cho phụ huynh và cộng dồn mạnh/yếu của em. Nút gạt chỉ quyết định ca có ra màn Gọi lên bảng hay không.
-        </div>
-        <NutGat
-          bat={lenBang}
-          onDoi={setLenBang}
-          ten="Lấy dữ liệu phân công lên bảng"
-          mota={
-            lenBang
-              ? 'Ca hiện ở màn Gọi lên bảng: máy đọc em nào sai câu nào để chia câu chữa. Phiếu phụ huynh và cộng dồn mạnh/yếu vẫn chạy như mọi ca.'
-              : 'Ca không hiện ở màn Gọi lên bảng. Vẫn gửi phiếu phụ huynh và vẫn cộng dồn mạnh/yếu như thường.'
-          }
-        />
       </TheNoiDung>
 
       <NutChinh onClick={handleOpenSession} disabled={opening}>

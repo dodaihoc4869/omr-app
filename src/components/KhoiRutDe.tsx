@@ -11,7 +11,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Dices, RefreshCw, X, ImageIcon, ChevronDown } from 'lucide-react'
 import type { TeacherExamSource } from '../data/examContent'
 import { Nhan, OThongBao } from './DesignSystem'
-import { boMotCau, demMucDo, doiMotCau, dsChuyenDe, dungUngVien, giayUocTinh, moiIdDaRut, MOI_MUC, PHAN_DE, rutDe, rutDeLenBang, soCauCua, soCauLenBang, soTinHieu, TEN_MUC, tongCau, type CauUngVien, type KetQuaRut, type MucDoRut, type PhanDe, type SoCauPhan, type YeuCauRut } from '../lib/rut-de'
+import { boMotCau, demMucDo, doiMotCau, dsChuyenDe, dungUngVien, giayUocTinh, moiIdDaRut, MOI_MUC, PHAN_DE, PHUT_TOI_DA_LEN_BANG, rutDe, rutDeLenBang, rutKhoChua, soCauCua, soCauLenBang, soTinHieu, TEN_MUC, tongCau, type CauUngVien, type KetQuaRut, type MucDoRut, type PhanDe, type SoCauPhan, type YeuCauRut } from '../lib/rut-de'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -141,8 +141,10 @@ export interface KhoiRutDeProps {
    * sách giây theo con số này để tự quyết số câu. */
   phutLamBai: number
   /** Gọi mỗi khi bộ câu đổi. `null` = thầy chọn lấy trọn kho, không rút.
-   * `lenBang` = bộ câu này rút cho buổi chữa bài, màn Mở ca tự bật nút gạt. */
-  onDoi: (kq: { ids: Set<string>; soCau: SoCauPhan; lenBang: boolean } | null) => void
+   *
+   * `lenBang` = bộ này rút cho buổi chữa bài ⇒ ca đẩy dữ liệu sang màn Gọi lên
+   * bảng. `idsChua` = KHO CHỮA rộng hơn đề em làm, chỉ có ở chế độ đó. */
+  onDoi: (kq: { ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string> } | null) => void
 }
 
 /** Ba cách lấy câu. `lenbang` là chế độ máy tự chọn cho buổi chữa bài. */
@@ -215,14 +217,15 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi }: Khoi
     // hai chỉ số quyết định câu nào giảng cả lớp (xem đầu lib/rut-de.ts).
     if (lenBang) {
       const kho = soCauCua(kq)
-      onDoi({ ids: moiIdDaRut(kq), soCau: kho, lenBang: true })
+      const chua = rutKhoChua(uv, kq, { phut: phutLamBai, tranhQid: qidCaTruoc, seed })
+      onDoi({ ids: moiIdDaRut(kq), soCau: kho, lenBang: true, idsChua: moiIdDaRut(chua) })
       return
     }
     // soCau báo lên là SỐ CÂU MỖI EM LÀM, không phải cỡ kho. Kho lớn hơn thì
     // máy bốc riêng cho từng em; bằng nhau thì cả lớp cùng một đề.
     const kho = soCauCua(kq)
     onDoi({ ids: moiIdDaRut(kq), soCau: { I: Math.min(soCau.I, kho.I), II: Math.min(soCau.II, kho.II), III: Math.min(soCau.III, kho.III) }, lenBang: false })
-  }, [cheDo, lenBang, kq, soCau, onDoi])
+  }, [cheDo, lenBang, kq, soCau, onDoi, uv, phutLamBai, qidCaTruoc, seed])
 
   const daRut = kq ? soCauCua(kq) : { I: 0, II: 0, III: 0 }
   const thieu = kq ? PHAN_DE.filter((p) => kq.thieu[p] > 0) : []
@@ -272,9 +275,14 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi }: Khoi
             Máy tự chọn câu trong kho thầy đã tích: phủ đều chuyên đề trước, trong mỗi chuyên đề lấy câu nhiều sao nhất, đẩy câu nghi đáp án và câu đã ra ca trước xuống cuối.
           </div>
           <div style={{ ...NHAN_NHO, color: 'var(--muc)' }}>
-            <b style={SO}>{tongCau(soCauChuaBai)}</b> câu (I {soCauChuaBai.I} · II {soCauChuaBai.II} · III {soCauChuaBai.III}) · ước <b style={SO}>{Math.round(giayUocTinh(soCauChuaBai) / 60)}</b> phút trong{' '}
-            <b style={SO}>{phutLamBai}</b> phút của ca · <b style={SO}>{soTinHieu(soCauChuaBai)}</b> tín hiệu chẩn đoán
+            <b style={SO}>{tongCau(soCauChuaBai)}</b> câu (I {soCauChuaBai.I} · II {soCauChuaBai.II} · III {soCauChuaBai.III}) · ước{' '}
+            <b style={SO}>{Math.round(giayUocTinh(soCauChuaBai) / 60)}</b> phút · <b style={SO}>{soTinHieu(soCauChuaBai)}</b> tín hiệu chẩn đoán
           </div>
+          {phutLamBai > PHUT_TOI_DA_LEN_BANG && (
+            <div style={{ ...NHAN_NHO, color: 'var(--cam)' }}>
+              Ca đặt <b style={SO}>{phutLamBai}</b> phút nhưng bộ câu chẩn đoán chốt cứng tối đa <b style={SO}>{PHUT_TOI_DA_LEN_BANG}</b> phút — phần giờ còn lại để chữa bài. Nên đặt ca <b style={SO}>{PHUT_TOI_DA_LEN_BANG}</b> phút.
+            </div>
+          )}
           <OThongBao tone="xanh">
             Cả lớp làm CÙNG một đề — bắt buộc với buổi chữa bài. Có cùng đề thì máy mới đếm được bao nhiêu em cùng sai một kiểu, và đó là thứ quyết định câu nào giảng cả lớp thay vì gọi một em lên bảng.
           </OThongBao>
