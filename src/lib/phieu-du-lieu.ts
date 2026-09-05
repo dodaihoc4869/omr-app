@@ -120,6 +120,15 @@ export interface PhieuDayDu {
    * Link do MÁY THẦY tạo lúc dựng báo cáo (chỗ duy nhất có mã bí mật). Trang
    * báo cáo chỉ việc copy, không ghi được gì lên máy chủ. */
   linkBaiTap?: string
+  /** MÃ BÀI TẬP TỰ LUYỆN thầy tạo sẵn cho em lúc dựng báo cáo (LINK-BAI-LUYEN).
+   *
+   * Khác `linkBaiTap` (tờ phiếu chỉ để đọc): mã này mở ra một BÀI LÀM ĐƯỢC —
+   * con chọn đáp án, bấm nộp, máy chủ chấm và hiện lời giải ngay. Trang báo cáo
+   * chỉ ghép mã thành link; nó không có mã bí mật nên không tạo bài mới được.
+   *
+   * Gói chở tới 40 câu: phụ huynh chọn N câu, lần giao sau dịch sang cửa sổ kế
+   * tiếp nên giao lần 2 không ra đúng đề cũ. */
+  maTuLuyen?: string
   /** Bằng chứng rời màn — chỉ có khi ca ghi nhận em rời khỏi bài làm. */
   viPham?: ViPhamRoiMan | null
   /** TRỌN BỘ ĐỀ EM ĐÃ LÀM, kèm lời giải — để phụ huynh mở đúng thứ con vừa
@@ -294,6 +303,8 @@ export interface NguonPhieu {
   viPham?: NguonViPham | null
   /** Link phiếu bài tập đã cất sẵn trên kho (máy thầy tạo). */
   linkBaiTap?: string | null
+  /** Mã bài tự luyện máy thầy vừa tạo cho em (xem `PhieuDayDu.maTuLuyen`). */
+  maTuLuyen?: string | null
 }
 
 /** Số câu luyện RÚT SẴN vào báo cáo.
@@ -428,6 +439,7 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
     viPham: dungViPham(n.viPham),
     baiTap,
     linkBaiTap: n.linkBaiTap || undefined,
+    maTuLuyen: n.maTuLuyen || undefined,
     deCuaEm: deCuaEmTuRows(rows, banks),
   }
 }

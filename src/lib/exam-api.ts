@@ -4,6 +4,8 @@
 // nếu dùng application/json.
 import type { PublicExamBank, TeacherExamSource } from '../data/examContent'
 import type { AnswerRecord, IntegrityLog } from './exam-db'
+import type { CauLuyen } from './bai-tap-pdf'
+import { LOI_KHONG_TIM_THAY, type BaiTuLuyenRow, type CauTuLuyenAn, type ChonTuLuyen, type KetQuaTuLuyen } from './tu-luyen'
 import { dongBoGioMayChu } from './gio-may-chu'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
@@ -85,7 +87,7 @@ export type LyDoChan =
 
 /** Phạm vi gửi ca (QUANLYCATHI mục 4): tu_do = ai có mã đều vào · khoi = theo
  * năm sinh (hồ sơ HocSinh) · chon = danh sách SBD thầy tích. Máy chủ kiểm tra. */
-export type PhamViCa = 'tu_do' | 'khoi' | 'chon'
+export type PhamViCa = 'tu_do' | 'khoi' | 'chon' | 'sbd'
 
 /** Khối lớp suy từ năm sinh theo năm học hiện tại (vào lớp 1 lúc 6 tuổi; năm
  * học mới tính từ tháng 9). 2010 → lớp 11 trong năm học 2026–2027. */
@@ -182,7 +184,7 @@ export function thongDiepChan(kq: Extract<KetQuaVaoThi, { ok: false }>, gio: (is
     case 'khong_thuoc_khoi':
       return `Ca này dành cho khối ${khoiTuNamSinh(kq.namSinh ?? '') ?? '?'} (sinh ${kq.namSinh}). Số báo danh của em không thuộc khối này.`
     case 'khong_trong_danh_sach':
-      return 'Ca này thầy chỉ mở cho một số em — số báo danh của em không có trong danh sách.'
+      return 'Số báo danh của em không có trong danh sách lớp của ca này. Kiểm tra lại đúng như Thầy ghi trong sổ; vẫn không vào được thì báo Thầy.'
     // KHÔNG nói rõ sai ở ô nào: nói ra là cho phép dò tên từ số báo danh.
     case 'sai_ho_so':
       return 'Số báo danh, họ tên hoặc năm sinh không khớp danh sách lớp. Kiểm tra lại đúng như Thầy ghi trong sổ; vẫn không vào được thì báo Thầy.'
@@ -276,6 +278,8 @@ export async function publishSession(
     hanVaoPhut: moc.hanVaoPhut || 0,
     tenCa: moc.tenCa || '',
     phamVi: moc.phamVi || 'tu_do',
+    // Chế độ 'sbd' KHÔNG có danh sách riêng: cổng của nó là DanhSachLop trên
+    // máy chủ, nên không gửi gì lên.
     danhSachMoi: moc.phamVi === 'chon' ? (Array.isArray(moc.danhSachMoi) ? moc.danhSachMoi : []) : moc.phamVi === 'khoi' ? String(moc.danhSachMoi ?? '') : '',
     loai: moc.loai || 'thi',
     hanNop: moc.hanNop || '',
@@ -1135,4 +1139,94 @@ export async function ghiDiem(scriptUrl: string, secret: string, maCa: string, b
   const r = await postJson(scriptUrl, { action: 'ghiDiem', secret, maCa, bai })
   if (!r.ok) throw new Error(r.error || 'Không ghi được điểm')
   return { daGhi: r.daGhi ?? [], tuChoi: r.tuChoi ?? [] }
+}
+
+// ---------------------------------------------------------------------------
+// BÀI TẬP TỰ LUYỆN (LINK-BAI-LUYEN.md v2)
+//
+// `taoTuLuyen` và `danhSachTuLuyen` đòi MÃ BÍ MẬT — chỉ máy thầy ghi và liệt kê.
+// `layTuLuyen` / `nopTuLuyen` KHÔNG đòi: em chỉ có đường link, đúng như phụ
+// huynh với `layPhieu`. Bù lại chúng bị bó chặt: phải đưa đúng mã, trả về ĐÚNG
+// MỘT bài, và không có lệnh nào liệt kê mã cho người không có mã bí mật.
+
+/** Máy thầy đẩy bộ câu ĐẦY ĐỦ (có đáp án, có lời giải) lên kho. Đây là chỗ duy
+ * nhất bộ đầy đủ rời máy thầy, và nó đi thẳng vào Drive của máy chủ. */
+export async function taoTuLuyen(scriptUrl: string, secret: string, g: { ma: string; sbd: string; hoTen: string; cau: CauLuyen[] }): Promise<{ ma: string; soCau: number }> {
+  const r = await postJson(scriptUrl, { action: 'taoTuLuyen', secret, ...g })
+  if (!r.ok) throw new Error(r.error || 'Không tạo được bài luyện')
+  return { ma: String(r.ma), soCau: Number(r.soCau) || 0 }
+}
+
+export interface DeTuLuyen {
+  ma: string
+  sbd: string
+  hoTen: string
+  soCau: number
+  lanThu: number
+  cau: CauTuLuyenAn[]
+}
+
+/** Em mở link. Trả đề ĐÃ GỠ SẠCH đáp án và lời giải — xem `tu-luyen.ts` mục
+ * KHOA_BI_MAT để biết vì sao chấm ở máy chủ chứ không ở máy em. */
+export async function layTuLuyen(scriptUrl: string, ma: string): Promise<DeTuLuyen> {
+  const r = await postJson(scriptUrl, { action: 'layTuLuyen', ma })
+  if (!r.ok) throw new Error(r.error || LOI_KHONG_TIM_THAY)
+  return { ma: String(r.ma), sbd: String(r.sbd), hoTen: String(r.hoTen || ''), soCau: Number(r.soCau) || 0, lanThu: Number(r.lanThu) || 0, cau: r.cau ?? [] }
+}
+
+/** Em nộp. Máy chủ chấm ĐÚNG CỬA SỔ câu đã giao lần này rồi trả điểm + đáp án +
+ * lời giải. `batDau`/`soCau` phải khớp cửa sổ màn hình đã hiện, nếu không thì em
+ * làm câu này mà máy chủ chấm câu khác. */
+export async function nopTuLuyen(scriptUrl: string, ma: string, chon: ChonTuLuyen, idThietBi = '', cua?: { batDau: number; soCau: number }): Promise<KetQuaTuLuyen> {
+  const r = await postJson(scriptUrl, { action: 'nopTuLuyen', ma, chon, idThietBi, batDau: cua?.batDau ?? 0, soCau: cua?.soCau ?? 0 })
+  if (!r.ok) throw new Error(r.error || LOI_KHONG_TIM_THAY)
+  return { soCau: Number(r.soCau) || 0, soDung: Number(r.soDung) || 0, lanThu: Number(r.lanThu) || 1, cham: r.cham ?? [], cau: r.cau ?? [] }
+}
+
+/** Danh sách bài luyện của một em (bỏ `sbd` = cả trung tâm). `canLichSu` kéo
+ * thêm chi tiết từng câu của từng lần làm — chỉ bật khi dựng báo cáo, vì nó
+ * nặng hơn hẳn. */
+export async function danhSachTuLuyen(scriptUrl: string, secret: string, sbd = '', canLichSu = false): Promise<BaiTuLuyenRow[]> {
+  const r = await postJson(scriptUrl, { action: 'danhSachTuLuyen', secret, sbd, canLichSu })
+  if (!r.ok) throw new Error(r.error || 'Không đọc được danh sách bài luyện')
+  return (r.items ?? []) as BaiTuLuyenRow[]
+}
+
+/** Xoá một bài luyện, dọn luôn gói trên Drive. */
+export async function xoaTuLuyen(scriptUrl: string, secret: string, ma: string): Promise<void> {
+  const r = await postJson(scriptUrl, { action: 'xoaTuLuyen', secret, ma })
+  if (!r.ok) throw new Error(r.error || 'Không xoá được bài luyện')
+}
+
+export interface LanLamTomTat {
+  lanThu: number
+  nopLuc: string
+  soCau: number
+  soDung: number
+  theoChuyenDe: Record<string, { soCau: number; soDung: number }>
+}
+
+export interface DiemTuLuyen {
+  ma: string
+  hoTen: string
+  tongCauTrongGoi: number
+  lanThu: number
+  nopLuc: string
+  lan: LanLamTomTat[]
+}
+
+/** Điểm bài tự luyện của một bài. KHÔNG đòi mã bí mật — trang báo cáo phụ huynh
+ * không có mã đó, nhưng phải biết đúng mã 10 ký tự của bài. Chỉ trả CON SỐ:
+ * không câu hỏi, không đáp án, không lời giải. */
+export async function diemTuLuyen(scriptUrl: string, ma: string): Promise<DiemTuLuyen> {
+  const r = await postJson(scriptUrl, { action: 'diemTuLuyen', ma })
+  if (!r.ok) throw new Error(r.error || LOI_KHONG_TIM_THAY)
+  return {
+    ma: String(r.ma),
+    hoTen: String(r.hoTen || ''),
+    tongCauTrongGoi: Number(r.tongCauTrongGoi) || 0,
+    lanThu: Number(r.lanThu) || 0,
+    nopLuc: String(r.nopLuc || ''),
+    lan: (r.lan ?? []) as LanLamTomTat[],
+  }
 }

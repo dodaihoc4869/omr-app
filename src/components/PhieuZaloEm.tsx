@@ -20,8 +20,9 @@ import { veAnhPhieu, tenTepPhieu, type DuLieuAnhPhieu } from '../lib/anh-phieu'
 import { taoLinkPhieu } from '../lib/phieu-link'
 import KhungXemPhieu from './KhungXemPhieu'
 import { BAN_PHIEU_BT, type GoiPhieuBaiTap } from './NutPhieuHtml'
-import { dungPhieu, giamGoiPhieu, type NguonViPham } from '../lib/phieu-du-lieu'
-import { chiTietCa, luuPhieu, qidDaLam, sinhMaPhieu, xoaPhieu, type ChiTietCauRow } from '../lib/exam-api'
+import { SO_CAU_BAI_TAP_KEM, dungPhieu, giamGoiPhieu, type NguonViPham } from '../lib/phieu-du-lieu'
+import { chonCauLuyen } from '../lib/bai-tap-pdf'
+import { chiTietCa, luuPhieu, qidDaLam, sinhMaPhieu, taoTuLuyen, xoaPhieu, type ChiTietCauRow } from '../lib/exam-api'
 import { docSoCauCa, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { taoChiTietCau } from '../lib/chi-tiet-cau'
 import { mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
@@ -222,6 +223,9 @@ export default function PhieuZaloEm({
    * ca): bài luyện không phụ thuộc dòng "việc cần làm" thầy đang gõ, nên gõ
    * mỗi chữ mà đẩy lại phiếu là phí đường truyền. */
   const btRef = useRef<{ khoa: string; ma: string; link: string } | null>(null)
+  /** Mã bài tự luyện đã tạo cho đúng bộ câu này — dựng lại báo cáo cùng khoá thì
+   * dùng lại mã cũ, không đẻ thêm bài rác trên máy chủ. */
+  const tlRef = useRef<{ khoa: string; ma: string } | null>(null)
   useEffect(() => {
     if (!duPhieu || !ca) {
       setLink('')
@@ -292,6 +296,38 @@ export default function PhieuZaloEm({
                 btRef.current = { khoa, ma: maBt, link: taoLinkPhieu(`${location.origin}${import.meta.env.BASE_URL}`, maBt) }
               }
               phieu.linkBaiTap = btRef.current?.link
+
+              // BÀI TẬP TỰ LUYỆN (LINK-BAI-LUYEN.md) — cùng bộ câu, nhưng là
+              // BÀI LÀM ĐƯỢC: con chọn đáp án, bấm nộp, máy chủ chấm và hiện
+              // lời giải ngay. Đây là chỗ DUY NHẤT bộ câu có đáp án rời máy
+              // thầy, và nó đi thẳng vào Drive của máy chủ.
+              if (tlRef.current?.khoa !== khoa) {
+                // RÚT RIÊNG một bộ cho bản online, GIỮ câu có hình. Bộ trong
+                // báo cáo (`phieu.baiTap`) đã bỏ câu có hình vì phiếu in ra
+                // giấy phình lên hàng megabyte; màn làm bài thì hiện ảnh bình
+                // thường, nên bản online rút từ kho RỘNG HƠN phiếu giấy
+                // (LINK-BAI-LUYEN mục 2.5).
+                const boOnline =
+                  khoDe.length > 0
+                    ? chonCauLuyen(khoDe, {
+                        chuyenDe: phieu.chuyenDeCa.filter((c) => c.soSai > 0).map((c) => ({ ten: c.ten, tiLeSai: c.soCau > 0 ? c.soSai / c.soCau : 0 })),
+                        qidDaLam: qidCu,
+                        soCau: SO_CAU_BAI_TAP_KEM,
+                        boCauCoHinh: false,
+                      }).cau
+                    : phieu.baiTap
+                if (boOnline.length > 0) {
+                  const maTl = sinhMaPhieu()
+                  await taoTuLuyen(url.trim(), mat.trim(), {
+                    ma: maTl,
+                    sbd: hoSo.em.sbd,
+                    hoTen: hoSo.em.hoTen || `SBD ${hoSo.em.sbd}`,
+                    cau: boOnline,
+                  })
+                  tlRef.current = { khoa, ma: maTl }
+                }
+              }
+              phieu.maTuLuyen = tlRef.current?.ma
             } catch {
               // Cất phiếu bài tập hỏng thì báo cáo vẫn phải gửi được, chỉ mất
               // nút copy link. KHÔNG để một phần phụ kéo cả báo cáo xuống.

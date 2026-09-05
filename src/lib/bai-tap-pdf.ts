@@ -157,6 +157,12 @@ export interface YeuCauLuyen {
   qidDaLam?: string[]
   soCau: number
   ngauNhien?: () => number
+  /** Bỏ câu có hình. MẶC ĐỊNH BẬT vì phiếu in ra giấy phình lên hàng megabyte
+   * mỗi khi dính ảnh cắt base64.
+   *
+   * Bản ONLINE (bài tự luyện) phải tắt: màn làm bài hiện ảnh bình thường, mà
+   * loại câu có hình là tự cắt mất một mảng kho đề — LINK-BAI-LUYEN mục 2.5. */
+  boCauCoHinh?: boolean
 }
 
 /** Chọn câu cho một phiếu luyện. Thuần logic, không đụng DOM, test được. */
@@ -166,9 +172,11 @@ export function chonCauLuyen(nguon: TeacherExamSource[], yc: YeuCauLuyen): KetQu
   const tenYeu = yc.chuyenDe.map((c) => c.ten.trim()).filter(Boolean)
   const khoiDiem = yc.chuyenDe.length ? mucKhoiDiem(Math.max(...yc.chuyenDe.map((c) => c.tiLeSai))) : 'hieu'
 
-  // Kho câu dùng được: đúng chuyên đề yếu, KHÔNG có hình.
+  // Kho câu dùng được: đúng chuyên đề yếu; có bỏ câu có hình hay không thì tuỳ
+  // nơi dùng (giấy thì bỏ, online thì giữ).
+  const boHinh = yc.boCauCoHinh !== false
   const kho = goiCau(nguon)
-    .filter((c) => !coHinh(c.q as { thanCauImg?: string }))
+    .filter((c) => !boHinh || !coHinh(c.q as { thanCauImg?: string }))
     .filter((c) => (tenYeu.length === 0 ? true : tenYeu.includes(String(c.q.chuyenDe || '').trim())))
     .map(doiSang)
 

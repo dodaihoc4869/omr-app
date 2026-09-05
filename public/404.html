@@ -30,6 +30,9 @@
         // phiếu nằm trong đó; bỏ hash là phụ huynh mở ra trang trống.
         var ph = p.match(/^(.*?\/)p\/?$/)
         if (ph) return location.replace(ph[1] + '?vai=phieu' + location.hash)
+        // BÀI TẬP TỰ LUYỆN: /tl#<mã>. Cũng phải bê nguyên location.hash sang.
+        var tl = p.match(/^(.*?\/)tl\/?$/)
+        if (tl) return location.replace(tl[1] + '?vai=tuluyen' + location.hash)
         var c = p.match(/^(.*?\/)(hs|ph)\/[0-9a-zA-Z]{8,}\/?$/)
         if (c) return location.replace(c[1] + '?vai=' + c[2])
       })()

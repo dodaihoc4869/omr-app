@@ -18,6 +18,7 @@ import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
 import GoiLenBangScreen from './screens/GoiLenBangScreen'
 import DoTinHieuScreen from './screens/DoTinHieuScreen'
 import PhieuScreen from './screens/PhieuScreen'
+import TuLuyenScreen from './screens/TuLuyenScreen'
 import ChanLoi from './components/ChanLoi'
 
 // APP GIÁO VIÊN. Màn đăng ký, hồ sơ, lịch sử, bài tập và nhắn tin PHÍA HỌC SINH
@@ -52,6 +53,9 @@ function App() {
   // app quản lý. Tính một lần lúc nạp, trước mọi hiệu ứng — máy phụ huynh
   // không được chạm vào IndexedDB, danh sách lớp hay hộp thư của thầy.
   const [laPhieu] = useState(() => docDuongVao(location.search, location.pathname).vai === 'phieu')
+  // LINK BÀI TỰ LUYỆN (`/tl#<mã>`): cũng trả về đúng một trang, không dựng app
+  // quản lý — máy em không được chạm vào dữ liệu của thầy.
+  const [laTuLuyen] = useState(() => docDuongVao(location.search, location.pathname).vai === 'tuluyen')
   const screen = useAppStore((s) => s.screen)
   const setClassList = useAppStore((s) => s.setClassList)
   const setScreen = useAppStore((s) => s.setScreen)
@@ -59,15 +63,15 @@ function App() {
   // Máy em / phụ huynh cầm link cũ thì KHÔNG đọc gì của thầy — không mở
   // IndexedDB danh sách lớp, không dựng màn nào của app quản lý.
   useEffect(() => {
-    if (linkCu || laPhieu) return
+    if (linkCu || laPhieu || laTuLuyen) return
     loadClassList().then((list) => {
       if (list.length > 0) setClassList(list)
     })
-  }, [linkCu, laPhieu, setClassList])
+  }, [linkCu, laPhieu, laTuLuyen, setClassList])
 
   // Link mời làm bài (?examCode=) mở thẳng màn thi. Không có thì vào app thầy.
   useEffect(() => {
-    if (linkCu || laPhieu) return
+    if (linkCu || laPhieu || laTuLuyen) return
     const { maCa } = docDuongVao(location.search, location.pathname)
     if (maCa) setScreen('examtake')
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -77,6 +81,13 @@ function App() {
     return (
       <ChanLoi o="Phiếu kết quả">
         <PhieuScreen />
+      </ChanLoi>
+    )
+  }
+  if (laTuLuyen) {
+    return (
+      <ChanLoi o="Bài tập tự luyện">
+        <TuLuyenScreen />
       </ChanLoi>
     )
   }

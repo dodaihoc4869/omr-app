@@ -90,6 +90,10 @@ const PHAM_VI_CHON: { id: PhamViCa; ten: string; mota: string }[] = [
   { id: 'tu_do', ten: 'Tự do', mota: 'Ai có mã ca đều vào được — luyện tập, ôn ngoài giờ.' },
   { id: 'khoi', ten: 'Theo khối', mota: 'Chọn năm sinh; em không đúng khối (theo danh sách lớp đã nạp) bị chặn.' },
   { id: 'chon', ten: 'Chọn từng em', mota: 'Tích từng em trong danh sách — thi lại, phụ đạo, kiểm tra riêng nhóm yếu.' },
+  // Thầy chốt 05/09. Khác 'Tự do' ở đúng một chỗ: mã ca đúng CHƯA đủ, số báo
+  // danh phải có trong danh sách lớp thầy đã nạp. Khác 'Chọn từng em' ở chỗ
+  // không phải tích ai — cả lớp vào được, người lạ thì không.
+  { id: 'sbd', ten: 'Số báo danh', mota: 'Phải có mã ca VÀ số báo danh nằm trong danh sách lớp. Số báo danh lạ bị chặn, không phải tích từng em.' },
 ]
 
 /** Năm sinh gợi ý: 5 năm quanh khối 10–12 hiện tại. */
