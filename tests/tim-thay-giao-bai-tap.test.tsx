@@ -38,9 +38,12 @@ describe('Tab Học sinh', () => {
     expect(useAppStore.getState().screen).toBe('hocsinh')
   })
 
-  it('có dòng chỉ đường: chạm một em để xem chuyên đề mạnh yếu và ca đã thi', () => {
-    expect(maHocSinh).toContain('Chạm một em để xem hồ sơ')
+  // Dòng chỉ đường đổi khi thầy chốt hai nút mỗi em (05/09): không còn "chạm
+  // một em" chung chung, mà nói thẳng hai nút đó mở ra cái gì.
+  it('có dòng chỉ đường nói rõ hai nút của mỗi em mở ra cái gì', () => {
+    expect(maHocSinh).toContain('Mỗi em có hai nút')
     expect(maHocSinh).toContain('chuyên đề mạnh–yếu')
+    expect(maHocSinh).toContain('điểm và hạng lớp')
   })
 
   // Thầy cho gỡ mục giao bài tập. Code GIỮ NGUYÊN để gắn lại được, nhưng màn

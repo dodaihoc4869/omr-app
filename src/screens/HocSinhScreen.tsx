@@ -1,11 +1,13 @@
 // MÀN HỌC SINH của thầy (BA-APP.md đợt 2). Hai lớp trong một màn:
 //   1. Danh sách em — ô tìm theo tên/SBD, lọc khối 10/11/12, điểm gần nhất.
-//   2. Chạm một em → HỒ SƠ: tổng quan · chuyên đề mạnh–yếu (đã tổng hợp sẵn ở
-//      máy chủ, kèm mũi tên xu hướng) · lịch sử ca thi có hạng lớp.
+//   2. Mỗi em hai nút đi thẳng vào một trong hai mục của HỒ SƠ:
+//      BÁO CÁO   — tiến bộ, phiếu gửi phụ huynh, chuyên đề mạnh–yếu, bài tập
+//      LỊCH SỬ CA — mọi ca đã làm, điểm và hạng lớp
+//      Chạm tên em thì vào Báo cáo.
 // Cùng hồ sơ này sẽ dùng lại cho lối vào từ mục Phụ huynh — không dựng hai màn.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, RefreshCw, Search, Trash2 } from 'lucide-react'
+import { ArrowLeft, ChevronRight, FileText, History, RefreshCw, Search, Trash2 } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung, DauThe } from '../components/DesignSystem'
 import { KhoiChuyenDe, KhoiLichSuCa, toneXepLoai } from '../components/HoSoEmView'
 import NutBaiTapPdf from '../components/NutBaiTapPdf'
@@ -36,9 +38,26 @@ const O_NHAP: React.CSSProperties = {
 // duy nhất cho ba lối vào (BA-APP.md mục 9). Tái xuất để không đổi chỗ import cũ.
 export { toneXepLoai, laYeu, NGUONG_YEU, SO_CAU_DU_TIN, NHAN_BAI_TAP } from '../components/HoSoEmView'
 
+/** Hai mục của hồ sơ một em. Thầy chốt 05/09: mỗi tên trong danh sách có nút đi
+ * thẳng vào đúng mục cần xem, không phải mở hồ sơ rồi cuộn tìm. */
+export type MucHoSo = 'bao-cao' | 'lich-su'
+
+export const TEN_MUC_HO_SO: Record<MucHoSo, string> = {
+  'bao-cao': 'Báo cáo',
+  'lich-su': 'Lịch sử ca thi',
+}
+
 export default function HocSinhScreen() {
   const sbdDangXem = useAppStore((s) => s.sbdDangXem)
   const moHoSoEm = useAppStore((s) => s.moHoSoEm)
+  const [mucHoSo, setMucHoSo] = useState<MucHoSo>('bao-cao')
+
+  /** Mở hồ sơ một em, ĐẶT SẴN mục cần xem. Bấm tên là vào Báo cáo — câu hỏi đầu
+   * tiên về một em luôn là em ấy đang lên hay đang xuống. */
+  const moHoSo = (sbd: string, muc: MucHoSo = 'bao-cao') => {
+    setMucHoSo(muc)
+    moHoSoEm(sbd)
+  }
 
   const [cauHinh, setCauHinh] = useState<{ url: string; mat: string } | null>(null)
   const [ds, setDs] = useState<EmTomTat[] | null>(null)
@@ -149,35 +168,68 @@ export default function HocSinhScreen() {
               </div>
             </TheNoiDung>
 
-            {/* CÂU HỎI ĐẦU TIÊN khi mở hồ sơ một em luôn là "em này đang lên
-                hay đang xuống" — nên biểu đồ tiến bộ đứng ngay đây, trước mọi
-                thứ khác. */}
-            <KhoiTienBo ca={hoSo.ca} />
+            {/* HAI MỤC, KHÔNG PHẢI MỘT TRANG DÀI. Trước đây hồ sơ đổ hết mọi
+                khối xuống một cột: muốn xem lịch sử ca của em phải cuộn qua
+                biểu đồ tiến bộ, phiếu Zalo và bảng chuyên đề. Nay tách hai mục,
+                và nút trong danh sách đi thẳng vào đúng mục. */}
+            <div className="grid grid-cols-2" style={{ gap: 'var(--k2)' }} role="tablist" aria-label="Mục hồ sơ">
+              {(['bao-cao', 'lich-su'] as const).map((m) => {
+                const dang = mucHoSo === m
+                return (
+                  <button
+                    key={m}
+                    type="button"
+                    role="tab"
+                    aria-selected={dang}
+                    onClick={() => setMucHoSo(m)}
+                    className="tap-target font-bold inline-flex items-center justify-center"
+                    style={{
+                      minHeight: 48,
+                      gap: 6,
+                      borderRadius: 'var(--bo-1)',
+                      background: dang ? 'var(--tim-nen)' : 'var(--the)',
+                      border: `1.5px solid ${dang ? 'var(--tim)' : 'var(--vien)'}`,
+                      color: dang ? 'var(--tim)' : 'var(--nhat)',
+                      fontFamily: 'var(--sans)',
+                      fontSize: 'var(--cx-2)',
+                    }}
+                  >
+                    {m === 'bao-cao' ? <FileText size={16} /> : <History size={16} />}
+                    {TEN_MUC_HO_SO[m]}
+                    {m === 'lich-su' && <span style={SO}>({hoSo.ca.length})</span>}
+                  </button>
+                )
+              })}
+            </div>
 
-            {/* Mục GIAO BÀI TẬP VỀ NHÀ đã gỡ theo yêu cầu của thầy. Code vẫn
-                còn nguyên trong repo (thư mục components, lib/bai-tap.ts, ca
-                Loai=baitap ở máy chủ) — cần lại thì gắn nút vào đây, không phải
-                dựng lại từ đầu. */}
-            <PhieuZaloEm hoSo={hoSo} showToast={showToast} />
+            {mucHoSo === 'bao-cao' ? (
+              <>
+                {/* CÂU HỎI ĐẦU TIÊN khi mở hồ sơ một em luôn là "em này đang lên
+                    hay đang xuống" — nên biểu đồ tiến bộ đứng ngay đây. */}
+                <KhoiTienBo ca={hoSo.ca} />
 
-            {/* XOÁ EM KHỎI DANH SÁCH — CHỈ THẦY.
-                Em vào thi là tự có tên, nên danh sách sẽ dính cả số báo danh gõ
-                nhầm. Lệnh xoá đòi MÃ BÍ MẬT ở máy chủ, máy em và máy phụ huynh
-                không gọi được. Xoá hồ sơ thôi: bài đã làm và điểm giữ nguyên
-                trong LuotThi, em thi lại là tên lại hiện ra. */}
-            <NutChinh variant="nguyhiem" onClick={() => void xoaEm(hoSo.em.sbd, hoSo.em.hoTen)}>
-              <span className="inline-flex items-center" style={{ gap: 6 }}>
-                <Trash2 size={18} /> Xoá em khỏi danh sách
-              </span>
-            </NutChinh>
+                {/* Mục GIAO BÀI TẬP VỀ NHÀ đã gỡ theo yêu cầu của thầy. Code vẫn
+                    còn nguyên trong repo — cần lại thì gắn nút vào đây. */}
+                <PhieuZaloEm hoSo={hoSo} showToast={showToast} />
 
-            <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />
-            <TheNoiDung>
-              <NutBaiTapPdf sbd={hoSo.em.sbd} hoTen={hoSo.em.hoTen} lop={hoSo.em.lop} chuyenDe={hoSo.chuyenDe} showToast={showToast} />
-            </TheNoiDung>
+                <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />
+                <TheNoiDung>
+                  <NutBaiTapPdf sbd={hoSo.em.sbd} hoTen={hoSo.em.hoTen} lop={hoSo.em.lop} chuyenDe={hoSo.chuyenDe} showToast={showToast} />
+                </TheNoiDung>
 
-            <KhoiLichSuCa ca={hoSo.ca} />
-
+                {/* XOÁ EM KHỎI DANH SÁCH — CHỈ THẦY, và để tận đáy.
+                    Em vào thi là tự có tên, nên danh sách sẽ dính cả số báo danh
+                    gõ nhầm. Lệnh xoá đòi MÃ BÍ MẬT ở máy chủ. Xoá hồ sơ thôi:
+                    bài đã làm và điểm giữ nguyên trong LuotThi. */}
+                <NutChinh variant="nguyhiem" onClick={() => void xoaEm(hoSo.em.sbd, hoSo.em.hoTen)}>
+                  <span className="inline-flex items-center" style={{ gap: 6 }}>
+                    <Trash2 size={18} /> Xoá em khỏi danh sách
+                  </span>
+                </NutChinh>
+              </>
+            ) : (
+              <KhoiLichSuCa ca={hoSo.ca} />
+            )}
           </>
         )}
       </div>
@@ -206,8 +258,9 @@ export default function HocSinhScreen() {
           từng em (phải biết em yếu chuyên đề nào mới rút được câu), nên nhìn
           danh sách không đoán ra. */}
       <div style={NHAN_NHO}>
-        Chạm một em để xem hồ sơ: chuyên đề mạnh–yếu và toàn bộ ca thi đã làm. Em chỉ vào thi được khi nhập đúng cả ba: số báo
-        danh, họ tên, năm sinh — khớp file danh sách đã đồng bộ.
+        Mỗi em có hai nút: <b style={{ color: 'var(--muc)' }}>Báo cáo</b> (tiến bộ, phiếu gửi phụ huynh, chuyên đề mạnh–yếu) và{' '}
+        <b style={{ color: 'var(--muc)' }}>Lịch sử ca</b> (mọi ca đã làm, điểm và hạng lớp). Em chỉ vào thi được khi nhập đúng cả ba: số báo danh, họ tên, năm sinh — khớp
+        file danh sách đã đồng bộ.
       </div>
 
       <TheNoiDung>
@@ -268,12 +321,33 @@ export default function HocSinhScreen() {
             {dsLoc.map((e) => {
               const khoi = khoiTuNamSinh(e.namSinh)
               return (
-                <Hang key={e.sbd} onClick={() => moHoSoEm(e.sbd)} className="flex-col" style={{ alignItems: 'stretch' }} data-sbd={e.sbd}>
+                // KHÔNG để cả hàng là một nút nữa: hàng nay chứa ba nút con
+                // (tên · Báo cáo · Lịch sử ca) mà nút lồng trong nút là HTML sai
+                // và trình đọc màn hình đọc lẫn.
+                <Hang key={e.sbd} className="flex-col" style={{ alignItems: 'stretch' }} data-sbd={e.sbd}>
                   <span className="flex items-start justify-between" style={{ gap: 'var(--k3)' }}>
                     <span className="flex-1 min-w-0">
-                      <div className="font-bold truncate" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
+                      <button
+                        type="button"
+                        onClick={() => moHoSo(e.sbd)}
+                        className="tap-target font-bold inline-flex items-center text-left"
+                        style={{
+                          fontFamily: 'var(--serif)',
+                          fontSize: 'var(--cx-2)',
+                          color: 'var(--muc)',
+                          gap: 2,
+                          background: 'none',
+                          border: 'none',
+                          padding: 0,
+                          minHeight: 0,
+                          textDecoration: 'underline',
+                          textDecorationColor: 'var(--vien-dam)',
+                          textUnderlineOffset: 3,
+                        }}
+                      >
                         {e.hoTen || `SBD ${e.sbd}`}
-                      </div>
+                        <ChevronRight size={14} style={{ color: 'var(--mo)', flexShrink: 0 }} />
+                      </button>
                       <div style={NHAN_NHO}>
                         <span style={SO}>{e.sbd}</span>
                         {e.lop ? ` · Lớp ${e.lop}` : ''}
@@ -292,6 +366,38 @@ export default function HocSinhScreen() {
                     {!e.hoTen && <Nhan tone="cam">chưa có tên</Nhan>}
                     {e.trangThai === 'ngoai_danh_sach' && <Nhan tone="do">ngoài danh sách</Nhan>}
                     {e.soCa === 0 && <Nhan tone="xam">chưa thi ca nào</Nhan>}
+                  </span>
+                  {/* HAI NÚT MỖI EM (thầy chốt 05/09) — vào thẳng đúng mục, không
+                      phải mở hồ sơ rồi cuộn tìm. Nhãn trợ năng kèm TÊN em, vì
+                      danh sách 300 em thì "Báo cáo" trơ trọi không nói lên ai. */}
+                  <span className="grid grid-cols-2" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
+                    {(
+                      [
+                        ['bao-cao', <FileText key="i" size={15} />, 'Báo cáo'],
+                        ['lich-su', <History key="i" size={15} />, `Lịch sử ca (${e.soCa})`],
+                      ] as const
+                    ).map(([muc, icon, chu]) => (
+                      <button
+                        key={muc}
+                        type="button"
+                        onClick={() => moHoSo(e.sbd, muc)}
+                        aria-label={`${TEN_MUC_HO_SO[muc]} của ${e.hoTen || `SBD ${e.sbd}`}`}
+                        className="tap-target inline-flex items-center justify-center font-bold"
+                        style={{
+                          minHeight: 44,
+                          gap: 6,
+                          borderRadius: 'var(--bo-1)',
+                          background: 'var(--the)',
+                          border: '1.5px solid var(--vien)',
+                          color: 'var(--muc)',
+                          fontFamily: 'var(--sans)',
+                          fontSize: 'var(--cx-1)',
+                        }}
+                      >
+                        {icon}
+                        {chu}
+                      </button>
+                    ))}
                   </span>
                 </Hang>
               )
