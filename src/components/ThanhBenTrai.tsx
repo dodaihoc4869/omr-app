@@ -7,7 +7,7 @@
 // Danh sách mục ở đây PHẢI khớp với các thẻ trong màn Kiểm tra; thêm màn mới
 // thì thêm cả hai chỗ, lệch nhau là thầy tìm không ra chức năng.
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { GraduationCap, Timer, Library, ClipboardList, Presentation, FilePlus2, Users } from 'lucide-react'
+import { GraduationCap, Timer, Library, ClipboardList, Presentation, FilePlus2, Users, MessageCircleQuestion } from 'lucide-react'
 import { useAppStore, type ScreenId } from '../store/appStore'
 import { chan, datRong, docRong, luuRong, RONG_MAC_DINH, RONG_MAX, RONG_MIN } from '../lib/rong-cot'
 
@@ -37,6 +37,7 @@ const NHOM: { ten: string; icon: typeof Timer; muc: Muc[] }[] = [
       { id: 'nganhangde', ten: 'Ngân hàng câu hỏi', icon: Library },
       { id: 'lichsuca', ten: 'Ca thi', icon: ClipboardList, con: ['exammonitor'] },
       { id: 'goilenbang', ten: 'Gọi lên bảng', icon: Presentation },
+      { id: 'cauhoi', ten: 'Học sinh hỏi', icon: MessageCircleQuestion },
     ],
   },
 ]

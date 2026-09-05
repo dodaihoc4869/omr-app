@@ -733,7 +733,7 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false }: { duCoSan?: Ph
 
         {/* NHẬN ĐỊNH + TƯ VẤN */}
         {du.tinHieu.length > 0 && (
-          <Khoi tieu="Nhận định" ten={laCuaEm ? 'Thầy Đỗ Đại Học nhắc nhở em' : 'Thầy thấy gì, phụ huynh nhắc con gì'} tat={tat}>
+          <Khoi tieu="Nhận định" ten={laCuaEm ? 'Thầy Đỗ Đại Học nhắc nhở em' : 'Thầy Đỗ Đại Học nhắc con những điều sau'} tat={tat}>
             {du.tinHieu.map((t) => (
               <div className="bc-tin" key={t.ma}>
                 <div className="bc-tin-nhan">{t.nhan}</div>

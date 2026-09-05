@@ -11,7 +11,7 @@
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import type { CaCuaEm, ChiTietCauRow, ChuyenDeEm, HoSoEm } from './exam-api'
 import { ducKetKienThuc, thongKeLamBai, tinHieuLamBai, type DucKetChuyenDe, type ThongKeLamBai, type TinHieuLamBai } from './phan-tich-lam-bai'
-import { cauLuyenTuBoCau, chonCauLuyen, type CauLuyen } from './bai-tap-pdf'
+import { cauLuyenTuBoCau, cauLuyenTuNguon, chonCauLuyen, type CauLuyen } from './bai-tap-pdf'
 import { mocRoiMan } from './chong-gian-lan'
 
 /** Phiên bản gói báo cáo. Trang đọc từ chối bản lạ thay vì vẽ thiếu mục. */
@@ -363,10 +363,20 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
     .filter(([, v]) => v.soSai > 0)
     .map(([ten, v]) => ({ ten, tiLeSai: v.soSai / Math.max(1, v.soCau) }))
     .sort((a, b) => b.tiLeSai - a.tiLeSai)
-  const baiTapEm =
-    n.banks.length > 0 && chuyenDeYeu.length > 0
-      ? chonCauLuyen(n.banks, { chuyenDe: chuyenDeYeu, qidDaLam: [], soCau: SO_CAU_BAI_TAP_KEM }).cau
-      : []
+  // POOL = TOÀN BỘ CÂU CỦA CA, chuyên đề yếu xếp trước.
+  //
+  // Thầy chốt 06/09: cho em tạo tới 60 câu. Máy em chỉ có ngân hàng của CHÍNH
+  // ca vừa thi, nên trần thật là số câu của ca — ca 28 câu thì tối đa 28. Lọc
+  // thêm theo chuyên đề yếu như bản trước còn cắt xuống chỉ còn hơn chục câu,
+  // thanh kéo gần như vô dụng.
+  //
+  // Nên: lấy trước những câu thuộc chuyên đề em mất điểm, rồi NỐI phần còn lại
+  // của ca vào sau. Em kéo tới đâu cũng có câu, mà mấy câu đầu vẫn đúng chỗ em
+  // yếu nhất.
+  const uuTien = n.banks.length > 0 && chuyenDeYeu.length > 0 ? chonCauLuyen(n.banks, { chuyenDe: chuyenDeYeu, qidDaLam: [], soCau: SO_CAU_BAI_TAP_KEM }).cau : []
+  const daCo = new Set(uuTien.map((c) => c.id))
+  const conLai = n.banks.length > 0 ? cauLuyenTuNguon(n.banks).filter((c) => !daCo.has(c.id)) : []
+  const baiTapEm = [...uuTien, ...conLai].slice(0, SO_CAU_BAI_TAP_KEM)
   const tk = thongKeLamBai(n.rows, { vaoLuc: n.vaoLuc, nopLuc: n.nopLuc, thoiLuongPhut: n.thoiLuongPhut })
 
   const gom = new Map<string, { ten: string; soCau: number; soSai: number }>()

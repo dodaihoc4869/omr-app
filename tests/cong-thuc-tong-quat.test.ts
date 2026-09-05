@@ -113,6 +113,7 @@ describe('Bìa phiếu chọn công thức theo chuyên đề', () => {
     const t = { hoTen: 'A', sbd: '1', ngay: new Date('2026-09-06'), tenChuyenDe: 'Hợp chất chứa nitrogen', ketQua: '', hienDapAn: false }
     const h = biaHtml(t, 10)
     expect(h).not.toContain("RCOOR'")
-    expect(h).toContain('CH<sub>3</sub>NH<sub>2</sub>')
+    // Bìa nay in MỘT công thức, nằm cạnh nhãn — không còn ba phân tử vắt chéo.
+    expect(h).toContain('H<sub>2</sub>N&ndash;R&ndash;COOH')
   })
 })

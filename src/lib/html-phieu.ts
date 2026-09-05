@@ -183,44 +183,40 @@ sup { font-size: .72em; vertical-align: .42em; }
 .cover {
   position: relative;
   overflow: hidden;
-  min-height: 100svh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 56px 20px 84px;
+  justify-content: flex-end;
+  padding: 40px 22px 60px;
   color: #ffffff;
-  background: linear-gradient(135deg, #0f3057 0%, #00587a 40%, #008891 70%, #00b4a6 100%);
+  background: linear-gradient(150deg, #0f3057 0%, #00587a 52%, #008891 100%);
 }
+/* BÌA KHÔNG CHIẾM TRỌN MÀN NỮA (thầy chốt 06/09: "trực quan, sạch, gọn").
+   Bản cũ cao 100svh, chữ căn giữa, ba phân tử mờ nằm vắt chéo — mở phiếu ra
+   phải cuộn hết một màn mới thấy câu đầu tiên. Nay bìa cao vừa đủ nội dung,
+   chữ căn TRÁI như một tiêu đề tài liệu, và bỏ hẳn hoa văn phân tử. */
 .cover-blob { position: absolute; border-radius: 50%; pointer-events: none; }
-.cover-blob.b1 { top: -140px; right: -120px; width: 420px; height: 420px; background: rgba(255,255,255,.06); }
-.cover-blob.b2 { bottom: -180px; left: -130px; width: 520px; height: 520px; background: rgba(255,255,255,.045); }
-.cover-molecule { position: absolute; font-weight: 900; opacity: .07; pointer-events: none; white-space: nowrap; }
-.cover-molecule.m1 { top: 12%; left: 6%; font-size: clamp(48px, 11vw, 120px); transform: rotate(-15deg); }
-.cover-molecule.m2 { top: 62%; right: 4%; font-size: clamp(38px, 8vw, 90px); transform: rotate(20deg); }
-.cover-molecule.m3 { bottom: 16%; left: 10%; font-size: clamp(30px, 6vw, 70px); transform: rotate(10deg); }
-.cover-content { position: relative; z-index: 2; width: 100%; max-width: 700px; }
+.cover-blob.b1 { top: -170px; right: -130px; width: 360px; height: 360px; background: rgba(255,255,255,.07); }
+.cover-blob.b2 { bottom: -210px; left: -150px; width: 420px; height: 420px; background: rgba(255,255,255,.05); }
+.cover-content { position: relative; z-index: 2; width: 100%; max-width: 700px; margin: 0 auto; }
 .cover-badge {
-  display: inline-block; margin-bottom: 26px; padding: 8px 22px;
-  background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.34); border-radius: 999px;
-  font-size: 12px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase;
+  display: inline-flex; align-items: center; gap: 8px; margin-bottom: 18px; padding: 7px 16px;
+  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.3); border-radius: 999px;
+  font-size: 11.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
 }
-.cover-title { font-size: clamp(34px, 9vw, 60px); font-weight: 900; line-height: 1.08; letter-spacing: -.02em; text-shadow: 0 6px 34px rgba(0,0,0,.28); }
-.cover-subtitle { margin-top: 14px; font-size: clamp(15px, 3.4vw, 21px); font-weight: 300; letter-spacing: .04em; opacity: .92; }
-.cover-chemical { margin: 30px 0 34px; font-size: clamp(26px, 6.5vw, 42px); font-weight: 800; letter-spacing: .12em; color: var(--vang); }
-/* LƯỚI chứ không phải flex-wrap: bốn ô (kể cả ô Kết quả) luôn CÙNG CHIỀU CAO
-   và chia đều một hàng. Bản flex trước để ô Kết quả rơi xuống một mình, còn ô
-   tên dài hai dòng thì cao vống hơn hai ô bên cạnh. */
-.cover-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 12px; }
+/* Công thức đứng CẠNH nhãn, không chiếm một dòng khổng lồ giữa trang. */
+.cover-badge .ct { letter-spacing: 0; text-transform: none; font-size: 13px; opacity: .92; }
+.cover-title { font-size: clamp(28px, 7.4vw, 44px); font-weight: 900; line-height: 1.1; letter-spacing: -.02em; }
+.cover-subtitle { margin-top: 8px; font-size: clamp(13.5px, 3vw, 16px); font-weight: 400; opacity: .82; }
+/* LƯỚI chứ không phải flex-wrap: các ô luôn CÙNG CHIỀU CAO và chia đều hàng.
+   Bản flex trước để ô Kết quả rơi xuống một mình, còn ô tên dài hai dòng thì
+   cao vống hơn hai ô bên cạnh. */
+.cover-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: 8px; margin-top: 22px; }
 .cover-info-item {
-  padding: 14px 16px; display: flex; flex-direction: column; justify-content: center;
-  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.24); border-radius: var(--bo);
+  padding: 10px 13px; display: flex; flex-direction: column; justify-content: center;
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); border-radius: 13px;
 }
-.cover-info-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: .14em; opacity: .78; margin-bottom: 5px; }
-.cover-info-value { font-size: clamp(15px, 3.6vw, 18px); font-weight: 700; overflow-wrap: anywhere; }
-/* Neo cao hơn mép dưới vì thẻ Tổng quan trườn đè lên 28px cuối của bìa. */
-.cover-footer { position: absolute; left: 0; right: 0; bottom: 54px; z-index: 2; font-size: 13px; opacity: .68; padding: 0 16px; }
+.cover-info-label { font-size: 10px; text-transform: uppercase; letter-spacing: .12em; opacity: .72; margin-bottom: 3px; }
+.cover-info-value { font-size: clamp(13.5px, 3.2vw, 15.5px); font-weight: 700; overflow-wrap: anywhere; line-height: 1.35; }
 
 /* ================= TỔNG QUAN ================= */
 .summary-page {
@@ -811,23 +807,20 @@ export function biaHtml(t: ThongTinPhieu, soCau: number): string {
     .join('')
 
   const ct = congThucBia(t.tenChuyenDe)
+  // Công thức đứng CẠNH nhãn trong một viên thuốc, không còn chiếm một dòng
+  // khổng lồ giữa trang, và ba phân tử mờ vắt chéo đã bỏ hẳn — chúng làm bìa
+  // rối mà không nói thêm gì (thầy chốt 06/09).
   return `<header class="cover">
   <div class="cover-blob b1"></div><div class="cover-blob b2"></div>
-  <div class="cover-molecule m1">${ct.troi[0]}</div>
-  <div class="cover-molecule m2">${ct.troi[1]}</div>
-  <div class="cover-molecule m3">${ct.troi[2]}</div>
   <div class="cover-content">
-    <div class="cover-badge">${thoat(t.nhanBia || (t.hienDapAn ? 'Lời giải chi tiết' : 'Phiếu Bài Tập Riêng'))}</div>
+    <div class="cover-badge">${thoat(t.nhanBia || (t.hienDapAn ? 'Lời giải chi tiết' : 'Phiếu bài tập riêng'))}<span class="ct">${ct.chinh}</span></div>
     <h1 class="cover-title">${tenHaiDong}</h1>
-    <div class="cover-subtitle">Bài tập Hóa học Hữu cơ</div>
-    <div class="cover-chemical">${ct.chinh}</div>
+    <div class="cover-subtitle">Thầy Đỗ Đại Học · ${soCau} câu · ${ngayVN(t.ngay)}</div>
     <div class="cover-info">
       ${oNhanDang}
-      <div class="cover-info-item"><div class="cover-info-label">Ngày</div><div class="cover-info-value">${ngayVN(t.ngay)}</div></div>
       ${oKetQua}
     </div>
   </div>
-  <div class="cover-footer">Thầy Đỗ Đại Học · ${thoat(t.tenChuyenDe)} · ${soCau} Câu</div>
 </header>`
 }
 

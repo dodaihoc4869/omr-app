@@ -45,6 +45,8 @@ export const TOI_DA_TEN_HIEN = 8
 /** Một dòng `CauHoiEm` trên máy chủ — đúng những gì máy chủ giữ, không hơn. */
 export interface CauHoiCuaEm {
   maCa: string
+  /** Tên ca, máy chủ trả kèm để màn "Học sinh hỏi" gom theo ca. */
+  tenCa?: string
   sbd: string
   hoTen: string
   qids: string[]
@@ -142,6 +144,46 @@ export function dongTenEm(emHoi: { hoTen: string; sbd: string }[]): string {
   const ten = emHoi.map((e) => e.hoTen || e.sbd)
   if (ten.length <= TOI_DA_TEN_HIEN) return ten.join(' · ')
   return ten.slice(0, TOI_DA_TEN_HIEN).join(' · ') + ` và ${ten.length - TOI_DA_TEN_HIEN} em nữa`
+}
+
+/** Gom câu hỏi của MỌI ca thành từng ca một, ca có câu chưa chữa xếp trước,
+ * rồi tới ca mới gửi gần nhất.
+ *
+ * Màn "Học sinh hỏi" cần nhìn một cái là biết ca nào đang có em chờ chữa —
+ * chứ không phải mở từng ca ra dò. */
+export interface CaCoCauHoi {
+  maCa: string
+  tenCa: string
+  soEm: number
+  soCau: number
+  chuaChua: number
+  /** Lần gửi gần nhất trong ca — để xếp ca mới lên trên. */
+  moiNhat: string
+  dong: CauHoiCuaEm[]
+}
+
+export function gomTheoCa(dong: CauHoiCuaEm[]): CaCoCauHoi[] {
+  const theoCa = new Map<string, CauHoiCuaEm[]>()
+  for (const d of dong) {
+    const ds = theoCa.get(d.maCa)
+    if (ds) ds.push(d)
+    else theoCa.set(d.maCa, [d])
+  }
+  const ra: CaCoCauHoi[] = []
+  for (const [maCa, ds] of theoCa) {
+    const dem = demCauHoi(ds)
+    ra.push({
+      maCa,
+      tenCa: ds.find((d) => d.tenCa)?.tenCa || '',
+      soEm: dem.soEm,
+      soCau: dem.soCau,
+      chuaChua: dem.chuaChua,
+      moiNhat: ds.reduce((m, d) => (String(d.guiLuc) > m ? String(d.guiLuc) : m), ''),
+      dong: ds,
+    })
+  }
+  // Ca còn em CHƯA được chữa xếp trước — đó là việc thầy phải làm hôm nay.
+  return ra.sort((a, b) => (b.chuaChua > 0 ? 1 : 0) - (a.chuaChua > 0 ? 1 : 0) || b.moiNhat.localeCompare(a.moiNhat))
 }
 
 /** Số em hỏi và tổng số câu KHÁC NHAU của một ca — con số trên thẻ ở Chi tiết

@@ -1753,6 +1753,16 @@ function doPost(e) {
     const sh = getSheet_(SHEET_CAUHOI, CAUHOI_HEADERS)
     const n = sh.getLastRow()
     const items = []
+    // TÊN CA đi kèm để màn "Học sinh hỏi" gom theo ca mà không phải gọi thêm
+    // một lệnh danhSachCa nữa. Hai cột hẹp, không mở từng dòng bằng docCa_.
+    const tenCua = {}
+    const caSh = sheetCa_()
+    const nCa = caSh.getLastRow()
+    if (nCa >= 2) {
+      const cMa = caSh.getRange(1, 1, nCa, 1).getValues()
+      const cTen = caSh.getRange(1, 11, nCa, 1).getValues()
+      for (let i = 1; i < cMa.length; i++) tenCua[String(cMa[i][0])] = String(cTen[i][0] || '')
+    }
     if (n >= 2) {
       const data = sh.getRange(1, 1, n, CAUHOI_HEADERS.length).getValues()
       for (let i = 1; i < data.length; i++) {
@@ -1761,6 +1771,7 @@ function doPost(e) {
         try { qids = JSON.parse(data[i][4] || '[]') } catch (err) { qids = [] }
         items.push({
           maCa: String(data[i][1]),
+          tenCa: tenCua[String(data[i][1])] || '',
           sbd: String(data[i][2]),
           hoTen: String(data[i][3] || ''),
           qids: qids,

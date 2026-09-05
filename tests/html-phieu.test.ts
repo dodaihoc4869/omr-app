@@ -207,9 +207,21 @@ describe('bìa và tổng quan', () => {
     const h = biaHtml(TT, 20)
     expect(h).toContain('Đỗ Đại Học')
     expect(h).toContain('12121212')
-    expect(h).toContain('04/09/2026')
-    expect(h).toContain('20 Câu')
     expect(h).toContain('ESTER<br>– LIPID')
+    // NGÀY và SỐ CÂU nằm trong DÒNG PHỤ dưới tên chuyên đề, không còn là một ô
+    // riêng và một chân trang riêng — bìa gọn lại theo yêu cầu 06/09, nhưng
+    // vẫn nói đủ.
+    expect(h).toContain('20 câu')
+    expect(h).toContain('04/09/2026')
+    expect(h).toContain('<div class="cover-subtitle">Thầy Đỗ Đại Học · 20 câu · 04/09/2026</div>')
+  })
+
+  it('bìa KHÔNG còn hoa văn phân tử vắt chéo và không cao trọn màn', () => {
+    const h = biaHtml(TT, 20)
+    expect(h).not.toContain('cover-molecule')
+    expect(h).not.toContain('cover-chemical')
+    // Công thức về nằm trong viên thuốc cùng nhãn, không chiếm một dòng riêng.
+    expect(h).toContain('<span class="ct">')
   })
 
   it('không có dòng kết quả thì KHÔNG in ô kết quả rỗng', () => {
@@ -250,8 +262,12 @@ describe('bìa và tổng quan', () => {
     expect(h).toContain('>SBD</div><div class="cover-info-value">12121212<')
   })
 
-  it('ô Ngày do bìa tự thêm, chỗ gọi không phải lặp lại', () => {
-    expect(biaHtml({ ...TT, oBia: [{ nhan: 'Mã ca', gia: '99' }] }, 5)).toContain('>Ngày</div><div class="cover-info-value">04/09/2026<')
+  it('NGÀY luôn có mặt kể cả khi chỗ gọi tự khai ô bìa riêng', () => {
+    const h = biaHtml({ ...TT, oBia: [{ nhan: 'Mã ca', gia: '99' }] }, 5)
+    expect(h).toContain('04/09/2026')
+    expect(h).toContain('>Mã ca</div>')
+    // Ô "Học sinh / SBD" mặc định nhường chỗ cho lời khai của chỗ gọi.
+    expect(h).not.toContain('>Học sinh</div>')
   })
 
   it('mức độ xen kẽ thì KHÔNG ghi khoảng "Câu 1–9" — nói sai số câu', () => {

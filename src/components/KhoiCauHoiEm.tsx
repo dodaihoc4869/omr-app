@@ -10,7 +10,7 @@
 // mã câu (mục 2.1). Chưa có bản đề CÓ đáp án trên máy này thì KHÔNG dựng được
 // trang tổng hợp — nói thẳng thế, không dựng trang thiếu lời giải rồi để thầy
 // tưởng kho đề hỏng.
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Check, Loader2, MessageCircleQuestion } from 'lucide-react'
 import type { TeacherExamSource } from '../data/examContent'
 import { NutChinh, OThongBao, TheNoiDung } from './DesignSystem'
@@ -28,6 +28,9 @@ export interface KhoiCauHoiEmProps {
   /** Bản đề CÓ đáp án của ca. Không có thì chỉ xem được danh sách theo em. */
   banks: TeacherExamSource[] | null
   showToast: (chu: string, kieu?: 'success' | 'error' | 'warn') => void
+  /** Màn "Học sinh hỏi" đã biết ca này CÓ câu hỏi nên tải luôn, khỏi bắt thầy
+   * bấm thêm một nhịp. Ở Chi tiết ca thì vẫn chờ thầy bấm — màn đó đã nặng. */
+  moSan?: boolean
 }
 
 const NHAN: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }
@@ -38,7 +41,7 @@ function gio(iso: string): string {
   return Number.isNaN(d.getTime()) ? '' : d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
 }
 
-export default function KhoiCauHoiEm({ scriptUrl, secret, maCa, tenCa, lop, banks, showToast }: KhoiCauHoiEmProps) {
+export default function KhoiCauHoiEm({ scriptUrl, secret, maCa, tenCa, lop, banks, showToast, moSan = false }: KhoiCauHoiEmProps) {
   const [dong, setDong] = useState<CauHoiCuaEm[] | null>(null)
   const [dangTai, setDangTai] = useState(false)
   const [loi, setLoi] = useState('')
@@ -46,6 +49,7 @@ export default function KhoiCauHoiEm({ scriptUrl, secret, maCa, tenCa, lop, bank
   const [dangChua, setDangChua] = useState('')
 
   const deCuaCa = useMemo(() => (banks && banks.length ? cauLuyenTuNguon(banks) : []), [banks])
+
   const dem = useMemo(() => (dong ? demCauHoi(dong) : null), [dong])
 
   const tai = async () => {
@@ -59,6 +63,14 @@ export default function KhoiCauHoiEm({ scriptUrl, secret, maCa, tenCa, lop, bank
       setDangTai(false)
     }
   }
+
+  // ĐẶT SAU `tai`, không đặt trên: `tai` là một const, đọc nó ở trên là đúng
+  // cái bẫy vùng chết biến làm vỡ màn Làm bài ngày 06/09.
+  useEffect(() => {
+    if (!moSan) return
+    void tai()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [moSan, maCa])
 
   const moTongHop = () => {
     if (!dong) return

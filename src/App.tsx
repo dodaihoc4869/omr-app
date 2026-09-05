@@ -20,6 +20,7 @@ import LichSuCaScreen from './screens/LichSuCaScreen'
 import HocSinhScreen from './screens/HocSinhScreen'
 import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
 import GoiLenBangScreen from './screens/GoiLenBangScreen'
+import CauHoiScreen from './screens/CauHoiScreen'
 import PhieuScreen from './screens/PhieuScreen'
 import KhoaAppScreen from './screens/KhoaAppScreen'
 import ChanLoi from './components/ChanLoi'
@@ -42,6 +43,7 @@ const TEN_MAN: Record<string, string> = {
   lichsuca: 'Ca thi',
   hocsinh: 'Học sinh',
   goilenbang: 'Gọi lên bảng',
+  cauhoi: 'Học sinh hỏi',
 }
 
 const HIDE_FAB_ON: string[] = ['examtake', 'nganhangde']
@@ -196,6 +198,7 @@ function App() {
         {screen === 'lichsuca' && <LichSuCaScreen />}
         {screen === 'hocsinh' && <HocSinhScreen />}
         {screen === 'goilenbang' && <GoiLenBangScreen />}
+        {screen === 'cauhoi' && <CauHoiScreen />}
       </ChanLoi>
         </div>
       </div>

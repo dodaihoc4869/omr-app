@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { ChevronRight, ClipboardList, GraduationCap, Library, Smartphone, Presentation, RefreshCw } from 'lucide-react'
+import { ChevronRight, ClipboardList, GraduationCap, Library, MessageCircleQuestion, Smartphone, Presentation, RefreshCw } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { daySangBanMoi, PHIEN_BAN_APP, type DangKySW } from '../lib/cap-nhat-app'
 import { OThongBao, NutChinh } from '../components/DesignSystem'
@@ -162,6 +162,9 @@ export default function ExamHubScreen() {
         <OBam icon={<ClipboardList size={20} />} title="Ca thi" sub="Ai đã nộp, điểm, cho thi lại, xuất bảng điểm" onClick={() => setScreen('lichsuca')} />
         <OBam icon={<Library size={20} />} title="Ngân hàng câu hỏi" sub="Đề về từ kho · duyệt câu nghi đáp án" onClick={() => setScreen('nganhangde')} />
         <OBam icon={<Presentation size={20} />} title="Gọi lên bảng" sub="Máy chọn câu đúng chỗ em yếu nhất" onClick={() => setScreen('goilenbang')} />
+        {/* HỌC SINH HỎI (thầy chốt 06/09): trước đó câu hỏi nằm lẫn trong Chi
+            tiết ca, thầy phải nhớ ca nào mới mở đúng chỗ. Nay một ô ở đây. */}
+        <OBam icon={<MessageCircleQuestion size={20} />} title="Học sinh hỏi" sub="Ca nào có em chờ Thầy chữa" onClick={() => setScreen('cauhoi')} />
       </div>
       {/* ĐỢT 0 của BAOMATCATHI.md: trang đo, KHÔNG khoá ai. Thầy chụp thử trên
           máy thật để chấm điểm từng kênh; kênh nào đạt chuẩn mới được bật khoá. */}
