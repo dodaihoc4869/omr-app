@@ -55,6 +55,14 @@ function cauTuDe(de: TeacherExamSource): CauCoTheGoi[] {
   return [...lay('I', de.phanI), ...lay('II', de.phanII), ...lay('III', de.phanIII)]
 }
 
+/** Câu ĐẦY ĐỦ tra ra từ kho đề đã tích. Kiểu HỢP PHÂN BIỆT theo `phan` để chỗ
+ * vẽ thẻ câu biết chắc `q` là loại nào — gộp thành một kiểu chung là mất phân
+ * biệt và phải ép kiểu khắp nơi. */
+type CauDayDu =
+  | { phan: 'I'; q: TeacherMcqQuestion }
+  | { phan: 'II'; q: TeacherTrueFalseQuestion }
+  | { phan: 'III'; q: TeacherShortAnswerQuestion }
+
 /** Chạy song song có giới hạn — 251 em mà gọi hết một lúc là máy chủ nghẹn. */
 async function songSong<T, R>(ds: T[], soLuong: number, viec: (x: T) => Promise<R>, xong?: (da: number) => void): Promise<R[]> {
   const ra: R[] = new Array(ds.length)
@@ -77,7 +85,10 @@ export default function GoiLenBangScreen() {
 
   const [cauHinh, setCauHinh] = useState<{ url: string; mat: string } | null>(null)
   const [deDaLuu, setDeDaLuu] = useState<TeacherExamSource[]>([])
-  const [maDe, setMaDe] = useState('')
+  // TÍCH NHIỀU ĐỀ (thầy chốt 05/09). Một buổi chữa bài hiếm khi bó trong đúng
+  // một mã: thầy thường lấy trắc nghiệm bài này, đúng sai bài kia. Trước đây
+  // chọn được đúng một mã nên phải chữa hai lượt.
+  const [maDeChon, setMaDeChon] = useState<Set<string>>(new Set())
 
   const [dsEm, setDsEm] = useState<EmTomTat[] | null>(null)
   const [tim, setTim] = useState('')
@@ -110,7 +121,9 @@ export default function GoiLenBangScreen() {
       // ngắn — chọn đúng phần là máy không rút nhầm câu đúng sai lên bảng.
       const ds = tachNhieuTheoPhan(kho)
       setDeDaLuu(ds)
-      if (ds.length > 0) setMaDe(ds[0].maDe)
+      // KHÔNG tự tích sẵn đề nào. Tích sẵn một mã rồi thầy tích thêm mã khác là
+      // ra bộ câu thầy không định lấy, mà nhìn thanh tổng mới biết.
+      setMaDeChon(new Set())
       if (url.trim() && mat.trim()) {
         setCauHinh({ url: url.trim(), mat: mat.trim() })
         try {
@@ -126,8 +139,20 @@ export default function GoiLenBangScreen() {
     })()
   }, [])
 
-  const de = deDaLuu.find((d) => d.maDe === maDe) ?? null
-  const cauHoi = useMemo(() => (de ? cauTuDe(de) : []), [de])
+  const dsDe = useMemo(() => deDaLuu.filter((d) => maDeChon.has(d.maDe)), [deDaLuu, maDeChon])
+  const cauHoi = useMemo(() => dsDe.flatMap(cauTuDe), [dsDe])
+  /** Tra câu ĐẦY ĐỦ theo id. Gộp nhiều đề thì `viTri` của hai đề trùng nhau,
+   * tra theo chỉ số là ra câu của đề khác — phải tra theo id. */
+  const traCau = useMemo(() => {
+    const m = new Map<string, CauDayDu>()
+    for (const d of dsDe) {
+      for (const q of d.phanI) m.set(q.id, { phan: 'I', q: q as TeacherMcqQuestion })
+      for (const q of d.phanII) m.set(q.id, { phan: 'II', q: q as TeacherTrueFalseQuestion })
+      for (const q of d.phanIII) m.set(q.id, { phan: 'III', q: q as TeacherShortAnswerQuestion })
+    }
+    return m
+  }, [dsDe])
+  const tenDeDaChon = dsDe.length === 1 ? dsDe[0].maDe : `${dsDe.length} đề: ${dsDe.map((d) => d.maDe).join(', ')}`
   // ĐỀ CHƯA CÓ SAO NÀO: gần như chắc chắn là bản đề trong máy được nạp TRƯỚC khi
   // app biết đọc trường `can_chua`. Nói thẳng ra, đừng để thầy ngồi đoán vì sao
   // câu nào cũng không sao.
@@ -177,7 +202,7 @@ export default function GoiLenBangScreen() {
 
   const phanCong = async () => {
     if (!cauHinh) return showToast('Chưa cấu hình máy chủ', 'error')
-    if (!de) return showToast('Chưa chọn đề', 'warn')
+    if (cauHoi.length === 0) return showToast('Chưa tích đề nào', 'warn')
     if (tich.size === 0) return showToast('Chưa tích em nào', 'warn')
     setDangPhan(true)
     setLoi('')
@@ -237,8 +262,8 @@ export default function GoiLenBangScreen() {
   }
 
   const copyBang = async () => {
-    if (!ketQua || !de) return
-    const t = bangPhanCongChu(ketQua, de.maDe)
+    if (!ketQua || dsDe.length === 0) return
+    const t = bangPhanCongChu(ketQua, tenDeDaChon)
     try {
       await navigator.clipboard.writeText(t)
       setDaCopy(true)
@@ -253,12 +278,7 @@ export default function GoiLenBangScreen() {
 
   /** Câu ĐẦY ĐỦ (phương án, hình, lời giải) từ đề đang chọn — dựng thẻ y hệt
    * lúc em xem lại bài, không vẽ lại một kiểu hiển thị thứ hai. */
-  const cauDayDu = (c: CauCoTheGoi) => {
-    if (!de) return null
-    if (c.phan === 'I') return { phan: 'I' as const, q: de.phanI[c.viTri] as TeacherMcqQuestion | undefined }
-    if (c.phan === 'II') return { phan: 'II' as const, q: de.phanII[c.viTri] as TeacherTrueFalseQuestion | undefined }
-    return { phan: 'III' as const, q: de.phanIII[c.viTri] as TeacherShortAnswerQuestion | undefined }
-  }
+  const cauDayDu = (c: CauCoTheGoi) => traCau.get(c.id) ?? null
 
   const doiTichXoa = (sbd: string) =>
     setTichXoa((cu) => {
@@ -325,9 +345,19 @@ export default function GoiLenBangScreen() {
             {/* Hộp chọn đề gọn, cuộn trong hộp — cùng một hộp với màn Mở ca. */}
             <HopChonDe
               ds={deDaLuu}
-              daChon={new Set(maDe ? [maDe] : [])}
+              daChon={maDeChon}
+              chonNhieu
               onChon={(ma) => {
-                setMaDe(ma)
+                setMaDeChon((cu) => {
+                  const m = new Set(cu)
+                  if (m.has(ma)) m.delete(ma)
+                  else m.add(ma)
+                  return m
+                })
+                setKetQua(null)
+              }}
+              onChonTatCa={(ma) => {
+                setMaDeChon(new Set(ma))
                 setKetQua(null)
               }}
               cao={264}
@@ -415,7 +445,7 @@ export default function GoiLenBangScreen() {
       </TheNoiDung>
 
       {/* BƯỚC 3 — PHÂN CÔNG */}
-      <NutChinh onClick={() => void phanCong()} disabled={dangPhan || tich.size === 0 || !de}>
+      <NutChinh onClick={() => void phanCong()} disabled={dangPhan || tich.size === 0 || cauHoi.length === 0}>
         <span className="inline-flex items-center" style={{ gap: 6 }}>
           {dangPhan ? <RefreshCw size={18} className="animate-spin" /> : <Wand2 size={18} />}
           {dangPhan ? `Đang xem chuyên đề yếu… ${tienDo}` : `Phân công câu hỏi (${tich.size} em)`}
