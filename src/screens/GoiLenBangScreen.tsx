@@ -100,6 +100,13 @@ export default function GoiLenBangScreen() {
   // nó vào thẳng danh sách chữa và xếp theo sao.
   const [deDaLuu, setDeDaLuu] = useState<TeacherExamSource[]>([])
   const [maDeChon, setMaDeChon] = useState<Set<string>>(new Set())
+  // HAI CÁCH LẤY CÂU ĐỂ CHỮA (thầy chốt 05/09 tối):
+  //   'san'   — dùng bộ câu máy đã rút sẵn khi mở ca ở chế độ Kiểm tra điểm yếu;
+  //   'tu_chon' — thầy tự tích bài muốn chữa, máy dựa vào điểm yếu cộng dồn ở
+  //               ĐÚNG chuyên đề của câu đó để chọn em nào lên bảng.
+  // Mặc định TỰ CHỌN: chưa mở ca thì chưa biết ca có bộ rút sẵn hay không, mà
+  // hộp tích đề phải hiện sẵn để thầy làm việc được ngay.
+  const [cachLayCau, setCachLayCau] = useState<'san' | 'tu_chon'>('tu_chon')
   const [timEm, setTimEm] = useState('')
 
   const [soLuot, setSoLuot] = useState(1)
@@ -192,6 +199,9 @@ export default function GoiLenBangScreen() {
       const kc = await docKhoChuaCa(ca.maCa).catch(() => undefined)
       const khoChua = kc && kc.length ? mergeKeepAnswers(kc) : null
       setDu({ maCa: ca.maCa, ten: ca.tenCa || `mã ${ca.maCa}`, bank, khoChua, luot, hoSo })
+      // Ca thường (mở bằng Rút bộ câu / Lấy trọn kho) không có bộ rút sẵn — đưa
+      // thẳng thầy sang nhánh tự chọn, khỏi phải bấm thêm một chạm.
+      setCachLayCau(khoChua ? 'san' : 'tu_chon')
       showToast(`Ca ${ca.tenCa || ca.maCa}: ${coBai.length} em có bài`, 'success')
     } catch (e) {
       setDu(null)
@@ -207,14 +217,16 @@ export default function GoiLenBangScreen() {
 
   /** Câu chữa THÊM = kho chữa tự nạp của ca + đề thầy tích tay. Cả hai đều là
    * câu không em nào làm, nên không bao giờ bị xếp "giảng cả lớp". */
-  const bankThem: BanDeCa = useMemo(
-    () => ({
-      phanI: [...(du?.khoChua?.phanI ?? []), ...bankTichTay.phanI],
-      phanII: [...(du?.khoChua?.phanII ?? []), ...bankTichTay.phanII],
-      phanIII: [...(du?.khoChua?.phanIII ?? []), ...bankTichTay.phanIII],
-    }),
-    [du, bankTichTay],
-  )
+  const bankThem: BanDeCa = useMemo(() => {
+    // Thầy tự chọn thì BỎ HẲN kho tự nạp: gộp cả hai là bảng chữa lại đầy câu
+    // máy chọn, đúng chỗ thầy vừa kêu.
+    const san = cachLayCau === 'san' ? du?.khoChua : null
+    return {
+      phanI: [...(san?.phanI ?? []), ...bankTichTay.phanI],
+      phanII: [...(san?.phanII ?? []), ...bankTichTay.phanII],
+      phanIII: [...(san?.phanIII ?? []), ...bankTichTay.phanIII],
+    }
+  }, [du, bankTichTay, cachLayCau])
 
   /** DANH SÁCH CÂU ĐÁNG CHỮA = câu của ca + câu thầy tích thêm.
    *
@@ -460,16 +472,59 @@ export default function GoiLenBangScreen() {
 
       {/* 2 — THÊM CÂU NGOÀI CA */}
       <TheNoiDung>
-        <div style={TIEU_DE_MUC}>2. Thêm câu ngoài ca</div>
+        <div style={TIEU_DE_MUC}>2. Câu để chữa lấy ở đâu</div>
         <div style={{ ...NHAN_NHO, marginTop: 4, marginBottom: 'var(--k3)' }}>
-          Tuỳ chọn. Tích thêm bài hoặc dạng muốn chữa; câu thêm chưa có bài làm nên chỉ vào danh sách chữa, không bị xếp giảng cả lớp.
+          Bài làm của em ở mục 1 luôn được dùng để tính câu nào cả lớp cùng sai. Mục này chỉ quyết định LẤY CÂU NÀO RA CHỮA.
         </div>
-        {du?.khoChua && (
-          <div style={{ ...NHAN_NHO, color: 'var(--xanh)', marginBottom: 'var(--k3)' }} data-kho-chua>
-            Ca này mở bằng chế độ Phân công lên bảng nên đã tự nạp sẵn <b style={SO}>{du.khoChua.phanI.length + du.khoChua.phanII.length + du.khoChua.phanIII.length}</b> câu cùng chuyên đề để chia đủ bốn lượt. Không cần tích thêm.
+
+        <div className="flex flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k3)' }} role="radiogroup" aria-label="Cách lấy câu để chữa">
+          {(['san', 'tu_chon'] as const).map((c) => {
+            const chon = cachLayCau === c
+            const tat = c === 'san' && !du?.khoChua
+            return (
+              <button
+                key={c}
+                type="button"
+                role="radio"
+                aria-checked={chon}
+                disabled={tat}
+                onClick={() => setCachLayCau(c)}
+                className="tap-target font-bold"
+                style={{
+                  minHeight: 44,
+                  padding: '0 var(--k4)',
+                  borderRadius: 'var(--bo-tron)',
+                  background: chon ? 'var(--muc)' : 'var(--the-2)',
+                  color: tat ? 'var(--mo)' : chon ? 'var(--muc-nguoc)' : 'var(--muc)',
+                  border: 'none',
+                  fontFamily: 'var(--sans)',
+                  fontSize: 'var(--cx-1)',
+                  opacity: tat ? 0.6 : 1,
+                }}
+              >
+                {c === 'san' ? 'Kiểm tra điểm yếu cộng dồn' : 'Tôi tự chọn bài để chữa'}
+              </button>
+            )
+          })}
+        </div>
+
+        {cachLayCau === 'san' ? (
+          du?.khoChua ? (
+            <div style={{ ...NHAN_NHO, color: 'var(--xanh)' }} data-kho-chua>
+              Ca này mở bằng chế độ Kiểm tra điểm yếu nên đã tự nạp sẵn <b style={SO}>{du.khoChua.phanI.length + du.khoChua.phanII.length + du.khoChua.phanIII.length}</b> câu cùng chuyên đề để chia đủ bốn lượt. Không cần
+              tích gì thêm.
+            </div>
+          ) : (
+            <OThongBao tone="cam">Ca này không mở bằng chế độ Kiểm tra điểm yếu nên không có bộ câu rút sẵn. Chuyển sang "Tôi tự chọn bài để chữa".</OThongBao>
+          )
+        ) : (
+          <div style={{ ...NHAN_NHO, marginBottom: 'var(--k3)' }} data-tu-chon>
+            Tích bài muốn chữa. Câu thầy tích chưa em nào làm, nên máy chọn em lên bảng bằng <b>điểm yếu cộng dồn ở đúng chuyên đề của câu đó</b> — em sai nhiều chuyên đề ấy nhất được gọi trước.
           </div>
         )}
-        {deDaLuu.length === 0 ? (
+
+        {cachLayCau === 'tu_chon' &&
+          (deDaLuu.length === 0 ? (
           <OThongBao tone="cam">Chưa có đề nào trong máy — vào Ngân hàng câu hỏi bấm Đồng bộ trước.</OThongBao>
         ) : (
           <HopChonDe
@@ -487,7 +542,7 @@ export default function GoiLenBangScreen() {
             onChonTatCa={(ma) => setMaDeChon(new Set(ma))}
             cao={264}
           />
-        )}
+          ))}
       </TheNoiDung>
 
       {/* 3 — EM CÓ MẶT */}

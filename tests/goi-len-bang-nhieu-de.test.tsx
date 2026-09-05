@@ -54,7 +54,9 @@ describe('Gọi lên bảng — chọn nhiều đề', () => {
   it('hộp chọn đề dùng Ô TÍCH, không phải nút chọn một', async () => {
     const { container, queryAllByRole } = render(<GoiLenBangScreen />)
     await waitFor(() => expect(container.textContent).toContain('Khối 12'))
-    expect(queryAllByRole('radio')).toHaveLength(0)
+    // Hai chip "cách lấy câu" ở mục 2 cũng là radio, nhưng chúng không mang tên
+    // đề — cái phải là Ô TÍCH là những dòng đề trong hộp chọn.
+    expect(queryAllByRole('radio').filter((e) => /12-C1-B1|Khối 12|C1 - Ester/.test(e.textContent ?? ''))).toHaveLength(0)
     expect(queryAllByRole('checkbox').length).toBeGreaterThan(0)
   })
 

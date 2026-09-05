@@ -20,6 +20,8 @@ import {
   chuNhomPhieu,
   chuanHoaMucNgat,
   coKhoa,
+  laCuaSoNoi,
+  MS_NHIP_SOI_TIEU_DIEM,
   nhomDuKhoa,
   soHoKhacNhau,
   xetCoMan,
@@ -189,7 +191,7 @@ describe('màn làm bài nối đúng dây', () => {
     expect(ma).toContain('MS_AN_HAN_VAO_BAI')
     // 2. nhịp chờ 900 ms trước khi kết luận cửa sổ nổi
     expect(ma).toContain('MS_XAC_NHAN_CUA_SO_NOI')
-    expect(ma).toContain('if (hiddenLuc !== null) return')
+    expect(ma).toContain('laCuaSoNoi({ coTieuDiem: document.hasFocus()')
     // 3. màn khoá bảo em giơ tay gọi Thầy
     expect(ma).toContain('Em giơ tay gọi Thầy')
   })
@@ -216,5 +218,35 @@ describe('màn làm bài nối đúng dây', () => {
   it('nội dung đề nằm trong .thi-noi-dung để lá chắn CSS che được', async () => {
     const ma = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default
     expect(ma).toContain('thi-hai-cot thi-noi-dung')
+  })
+})
+
+// SỬA 05/09 tối — thầy thử thật: mở cửa sổ chat Messenger đè lên bài mà KHÔNG
+// khoá. Bản trước ghi nhớ "đã từng thấy hidden chưa" rồi dùng cái nhớ đó để
+// loại; Android bắn hidden một nhịp rồi visible lại ngay, thế là cả phiên bị
+// đóng dấu "rời app" vĩnh viễn.
+describe('cửa sổ nổi — xét trạng thái tại mốc 900 ms, không tin cái nhớ', () => {
+  it('trang CÒN HIỆN mà mất tiêu điểm → là cửa sổ nổi, dù trước đó đã có hidden', () => {
+    expect(laCuaSoNoi({ coTieuDiem: false, manConHien: true })).toBe(true)
+  })
+
+  it('trang đã khuất hẳn → KHÔNG phải cửa sổ nổi, để luật đếm rời app cũ lo', () => {
+    expect(laCuaSoNoi({ coTieuDiem: false, manConHien: false })).toBe(false)
+  })
+
+  it('còn tiêu điểm → không phải cửa sổ nổi, kể cả khi màn còn hiện', () => {
+    expect(laCuaSoNoi({ coTieuDiem: true, manConHien: true })).toBe(false)
+  })
+
+  it('soi đủ dày để khoá trong khoảng một giây, đúng tiêu chí đặc tả mục 8', () => {
+    expect(MS_NHIP_SOI_TIEU_DIEM).toBeLessThanOrEqual(250)
+  })
+
+  it('màn làm bài có NHỊP SOI tiêu điểm — bắt cả ca overlay không bắn blur lần nào', async () => {
+    const ma = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default
+    expect(ma).toContain('nhipTieuDiem')
+    expect(ma).toContain("khoaVi('cua_so_noi', 'nhịp soi tiêu điểm')")
+    // vẫn phải giữ đủ 900 ms mới khoá — không bỏ nhịp chờ
+    expect(ma).toContain('if (nay - mocMatTieuDiem < MS_XAC_NHAN_CUA_SO_NOI) return')
   })
 })

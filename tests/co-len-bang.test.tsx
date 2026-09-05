@@ -56,7 +56,7 @@ vi.mock('../src/store/appStore', () => ({
 const { default: ExamSetupScreen } = await import('../src/screens/ExamSetupScreen')
 
 type CachLay = 'rut' | 'tron' | 'lenbang'
-const TEN_CHIP: Record<CachLay, RegExp> = { rut: /^Rút bộ câu$/, tron: /^Lấy trọn kho/, lenbang: /^Phân công lên bảng$/ }
+const TEN_CHIP: Record<CachLay, RegExp> = { rut: /^Rút bộ câu$/, tron: /^Lấy trọn kho/, lenbang: /^Kiểm tra điểm yếu$/ }
 
 /** Soạn đủ một ca hợp lệ theo cách lấy câu đã chọn rồi bấm Mở ca. */
 async function moCa(cach: CachLay) {
@@ -85,7 +85,7 @@ describe('cờ lên bảng suy từ khối Bộ câu ra đề', () => {
     expect(r.container.textContent).not.toContain('Ca này dùng làm gì')
   })
 
-  it('chọn "Phân công lên bảng" → ca đẩy dữ liệu sang màn Gọi lên bảng', async () => {
+  it('chọn "Kiểm tra điểm yếu" → ca đẩy dữ liệu sang màn Gọi lên bảng', async () => {
     const { goi } = await moCa('lenbang')
     expect(co(goi)).toBe(true)
   })

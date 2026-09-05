@@ -170,9 +170,9 @@ describe('chọn câu cho buổi chữa bài', () => {
 })
 
 describe('khối Bộ câu ra đề — chế độ thứ ba', () => {
-  it('có chip "Phân công lên bảng" và ép cả lớp cùng một đề', async () => {
+  it('có chip "Kiểm tra điểm yếu" và ép cả lớp cùng một đề', async () => {
     const ma = (await import('../src/components/KhoiRutDe.tsx?raw')).default
-    expect(ma).toContain('Phân công lên bảng')
+    expect(ma).toContain('Kiểm tra điểm yếu')
     expect(ma).toContain("setCheDo('lenbang')")
     // soCau báo lên = ĐÚNG cỡ kho đã rút ⇒ mỗi em làm hết ⇒ cả lớp cùng một đề
     expect(ma).toContain('onDoi({ ids: moiIdDaRut(kq), soCau: kho, lenBang: true, idsChua: moiIdDaRut(chua) })')

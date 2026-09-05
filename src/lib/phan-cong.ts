@@ -138,6 +138,12 @@ export function topYeu(em: EmGoi, n = 3): string[] {
     .map((c) => chuanChuyenDe(c.ten))
 }
 
+/** Tỉ lệ sai của em ở MỘT chuyên đề, tính trên hồ sơ tích luỹ. Không có số thì
+ * 0,5 — không đoán em giỏi, cũng không đoán em dốt. */
+export function tiLeSaiChuyenDe(em: EmGoi, cd: string): number {
+  return tiLeSaiCd(em, cd)
+}
+
 function tiLeSaiCd(em: EmGoi, cd: string): number {
   const t = em.chuyenDe.find((c) => chuanChuyenDe(c.ten) === chuanChuyenDe(cd))
   return t && t.soCau > 0 ? t.soSai / t.soCau : 0.5
@@ -218,6 +224,13 @@ export function phanCong(dsCau: CauChua[], baiLam: BaiLam[], dsEm: EmGoi[], yc: 
         .sort(
           (a, b) =>
             a.m - b.m ||
+            // CÙNG MỨC THÌ EM YẾU CHUYÊN ĐỀ ĐÓ HƠN ĐƯỢC GỌI TRƯỚC.
+            //
+            // Chỗ này quan trọng với câu KHÔNG EM NÀO LÀM — câu thầy tự tích để
+            // chữa. Lúc ấy mọi em đều ở mức 3 hoặc 5, không có bài làm nào phân
+            // biệt; thứ duy nhất còn nói được ai cần câu này nhất là hồ sơ tích
+            // luỹ: em sai 8/10 câu Ester phải được gọi trước em sai 2/10.
+            tiLeSaiCd(b.e, t.cau.chuyenDe) - tiLeSaiCd(a.e, t.cau.chuyenDe) ||
             (soLanLuot.get(a.e.sbd) || 0) - (soLanLuot.get(b.e.sbd) || 0) ||
             a.e.soLanLenBang - b.e.soLanLenBang ||
             b.hop - a.hop ||

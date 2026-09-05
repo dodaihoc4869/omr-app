@@ -161,6 +161,39 @@ export function coKhoa(muc: MucNgat, lyDo: LyDoKhoaMoi, lanThu = 1): boolean {
   return true
 }
 
+// ------------------------------------------------ CỬA SỔ NỔI: XÉT TẠI CHỖ
+//
+// SỬA 05/09 tối, sau khi thầy thử thật: mở cửa sổ chat Messenger đè lên bài mà
+// KHÔNG khoá.
+//
+// Vì sao bản trước trượt: nó ghi nhớ "đã từng thấy `hidden` chưa" rồi dùng cái
+// nhớ đó để loại. Android bắn `hidden` một nhịp lúc lớp phủ dựng lên rồi
+// `visible` lại ngay khi trang vẫn nhìn thấy được — thế là cả phiên bị đóng dấu
+// "rời app" vĩnh viễn, và cửa sổ nổi không bao giờ khoá.
+//
+// Bản này xét TRẠNG THÁI TẠI MỐC 900 ms, đúng chữ của đặc tả 4.1: "vẫn ở ngoài,
+// màn VẪN HIỆN". Trang còn hiện mà đã mất tiêu điểm gần một giây thì chỉ có một
+// cách giải thích: có cái gì đó đè lên trên.
+//
+// Chuyển app thật thì tại mốc đó trang KHÔNG còn hiện, nên vẫn rơi đúng vào
+// nhánh rời app và luật đếm cũ vẫn nguyên.
+
+export interface AnhChupLucXet {
+  /** `document.hasFocus()` tại đúng mốc 900 ms. */
+  coTieuDiem: boolean
+  /** `document.visibilityState === 'visible'` tại đúng mốc 900 ms. */
+  manConHien: boolean
+}
+
+export function laCuaSoNoi(a: AnhChupLucXet): boolean {
+  return !a.coTieuDiem && a.manConHien
+}
+
+/** Nhịp soi tiêu điểm. 250 ms để tổng thời gian từ lúc cửa sổ nổi mở tới lúc
+ * khoá nằm trong 0,9–1,15 giây — đúng tiêu chí "khoá vì cửa sổ nổi ≤ 1 s" của
+ * đặc tả mục 8. Soi thưa hơn thì em có thêm nửa giây đọc đề. */
+export const MS_NHIP_SOI_TIEU_DIEM = 250
+
 // --------------------------------------------------- ĐO KÍCH THƯỚC (4.3)
 
 export interface TrangThaiCoMan {

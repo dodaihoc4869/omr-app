@@ -18,6 +18,8 @@ import {
   TI_LE_CO_MAN_CHOT,
   chuNhomPhieu,
   coKhoa,
+  laCuaSoNoi,
+  MS_NHIP_SOI_TIEU_DIEM,
   nhomDuKhoa,
   xetCoMan,
   type LyDoKhoaMoi,
@@ -805,7 +807,6 @@ export default function ExamTakeScreen() {
     const phieu: PhieuKenh[] = []
     let coMan: TrangThaiCoMan = { moc: window.innerWidth * window.innerHeight, nhoTu: null }
     let raTu: number | null = null
-    let hiddenLuc: number | null = null
     let soLanNoi = 0
     let daKhoa = false
     let henNoi: number | undefined
@@ -845,6 +846,33 @@ export default function ExamTakeScreen() {
       if (cuoi && coKhoa(muc, 'dau_vet_chup')) khoaVi('dau_vet_chup', chuNhomPhieu(cuoi))
     }
 
+    // NHỊP SOI TIÊU ĐIỂM — đây là chỗ bắt CỬA SỔ NỔI, kiểu gian lận thầy quay
+    // video ngày 05/09: em mở cửa sổ nổi Gemini đè lên bài rồi đưa ảnh chụp vào
+    // hỏi. Lúc đó Chrome mất tiêu điểm nhưng trang VẪN HIỆN — không sự kiện
+    // `blur` nào chắc chắn bắn, nên phải tự soi thay vì ngồi đợi.
+    //
+    // Soi 250 ms một lần: che đề gần như tức thì, và khoá trong khoảng một giây
+    // kể từ lúc cửa sổ nổi mở.
+    let mocMatTieuDiem: number | null = null
+    const nhipTieuDiem = window.setInterval(() => {
+      if (daKhoa) return
+      const noi = laCuaSoNoi({ coTieuDiem: document.hasFocus(), manConHien: document.visibilityState === 'visible' })
+      if (!noi) {
+        mocMatTieuDiem = null
+        return
+      }
+      const nay = performance.now()
+      if (mocMatTieuDiem === null) {
+        mocMatTieuDiem = nay
+        che('Bài thi tạm ẩn khi có cửa sổ khác đè lên. Quay lại để làm tiếp.')
+        return
+      }
+      if (nay - mocMatTieuDiem < MS_XAC_NHAN_CUA_SO_NOI) return
+      soLanNoi += 1
+      mocMatTieuDiem = null
+      if (!conAnHan() && coKhoa(muc, 'cua_so_noi', soLanNoi)) khoaVi('cua_so_noi', 'nhịp soi tiêu điểm')
+    }, MS_NHIP_SOI_TIEU_DIEM)
+
     const go = thuTinHieu({
       onPhieu: (p, bc) => {
         if (daKhoa) return
@@ -879,13 +907,11 @@ export default function ExamTakeScreen() {
           if (veLai) {
             if (raTu !== null && p.luc - raTu < MS_VE_SOM) xetPhieu(p) // ra rồi về ngay = một dấu vết chụp
             raTu = null
-            hiddenLuc = null
             if (henNoi) window.clearTimeout(henNoi)
             boChe()
             return
           }
           che('Bài thi tạm ẩn khi màn hình bị che. Quay lại để làm tiếp.')
-          if (p.kenh === 'an_trang') hiddenLuc = p.luc
           if (raTu === null) {
             raTu = p.luc
             // Nhịp 900 ms: chờ `hidden` báo trễ của iOS. Bỏ nhịp này là mọi
@@ -893,7 +919,11 @@ export default function ExamTakeScreen() {
             if (henNoi) window.clearTimeout(henNoi)
             henNoi = window.setTimeout(() => {
               if (daKhoa || raTu === null) return
-              if (hiddenLuc !== null) return // có hidden ⇒ rời app ⇒ luật cũ lo
+              // Xét TRẠNG THÁI TẠI ĐÂY, không tin cái nhớ "đã từng thấy hidden":
+              // Android bắn hidden một nhịp rồi visible lại, mà trang thì vẫn
+              // nhìn thấy được — xem `laCuaSoNoi` trong man-thi-sach.ts.
+              const noi = laCuaSoNoi({ coTieuDiem: document.hasFocus(), manConHien: document.visibilityState === 'visible' })
+              if (!noi) return // trang đã khuất hẳn ⇒ rời app ⇒ luật đếm cũ lo
               soLanNoi += 1
               if (!conAnHan() && coKhoa(muc, 'cua_so_noi', soLanNoi)) khoaVi('cua_so_noi', 'kênh 2')
             }, MS_XAC_NHAN_CUA_SO_NOI)
@@ -922,6 +952,7 @@ export default function ExamTakeScreen() {
 
     return () => {
       go()
+      window.clearInterval(nhipTieuDiem)
       if (henNoi) window.clearTimeout(henNoi)
       setLyDoChe(null)
     }

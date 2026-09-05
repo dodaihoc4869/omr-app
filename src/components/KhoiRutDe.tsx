@@ -276,14 +276,15 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
           }}
           mau="tim"
         >
-          Phân công lên bảng
+          Kiểm tra điểm yếu
         </Chip>
       </div>
 
       {lenBang ? (
         <div className="flex flex-col" style={{ gap: 'var(--k2)' }} data-khoi="len-bang">
           <div style={NHAN_NHO}>
-            Máy tự chọn câu trong kho thầy đã tích: phủ đều chuyên đề trước, trong mỗi chuyên đề lấy câu nhiều sao nhất, đẩy câu nghi đáp án và câu đã ra ca trước xuống cuối.
+            Máy tự chọn câu trong kho thầy đã tích: phủ đều chuyên đề trước, trong mỗi chuyên đề lấy câu nhiều sao nhất, đẩy câu nghi đáp án và câu đã ra ca trước xuống cuối. Ca này để ĐO điểm yếu; muốn tự tay chọn bài chữa thì
+            chọn ở màn Gọi lên bảng.
           </div>
           <div style={{ ...NHAN_NHO, color: 'var(--muc)' }}>
             <b style={SO}>{tongCau(soCauChuaBai)}</b> câu (I {soCauChuaBai.I} · II {soCauChuaBai.II} · III {soCauChuaBai.III}) · ước{' '}
