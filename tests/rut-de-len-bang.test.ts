@@ -266,3 +266,19 @@ describe('kho chữa cho bốn lượt gọi', () => {
     expect(c.thieu).toEqual({ I: 0, II: 0, III: 0 })
   })
 })
+
+// Thầy bấm chip "Phân công lên bảng" thì ô thời lượng ca tự về 15 phút — để ô
+// giờ không nói một đằng bộ câu một nẻo (thầy chốt 05/09 chiều, kèm ảnh màn).
+describe('chọn chế độ thì ô thời lượng ca tự đổi', () => {
+  it('chip gọi onDoiPhutLamBai với đúng trần 15 phút', async () => {
+    const ma = (await import('../src/components/KhoiRutDe.tsx?raw')).default
+    expect(ma).toContain('onDoiPhutLamBai?.(PHUT_TOI_DA_LEN_BANG)')
+    // chỉ đổi khi đang khác 15, không ghi đè liên tục
+    expect(ma).toContain('if (phutLamBai !== PHUT_TOI_DA_LEN_BANG) onDoiPhutLamBai?.(PHUT_TOI_DA_LEN_BANG)')
+  })
+
+  it('màn Mở ca nối thẳng vào ô số phút', async () => {
+    const ma = (await import('../src/screens/ExamSetupScreen.tsx?raw')).default
+    expect(ma).toContain('onDoiPhutLamBai={setThoiGianPhut}')
+  })
+})

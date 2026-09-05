@@ -436,7 +436,7 @@ export default function ExamSetupScreen() {
             />
           </div>
         )}
-        {selectedSources.length > 0 && <KhoiRutDe nguon={selectedSources} qidCaTruoc={qidCaTruoc} phutLamBai={thoiGianPhut} onDoi={setBoRut} />}
+        {selectedSources.length > 0 && <KhoiRutDe nguon={selectedSources} qidCaTruoc={qidCaTruoc} phutLamBai={thoiGianPhut} onDoi={setBoRut} onDoiPhutLamBai={setThoiGianPhut} />}
       </TheNoiDung>
 
       {/* 2. LỚP & THỜI GIAN */}

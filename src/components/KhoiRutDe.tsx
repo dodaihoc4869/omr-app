@@ -145,6 +145,10 @@ export interface KhoiRutDeProps {
    * `lenBang` = bộ này rút cho buổi chữa bài ⇒ ca đẩy dữ liệu sang màn Gọi lên
    * bảng. `idsChua` = KHO CHỮA rộng hơn đề em làm, chỉ có ở chế độ đó. */
   onDoi: (kq: { ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string> } | null) => void
+  /** Đổi thời lượng ca giúp thầy. Chỉ gọi khi thầy BẤM chip "Phân công lên
+   * bảng": bộ câu chẩn đoán chốt cứng 15 phút, để ca 45 phút thì ô giờ nói một
+   * đằng bộ câu một nẻo. Không ép sau đó — thầy vẫn sửa ô giờ tuỳ ý. */
+  onDoiPhutLamBai?: (phut: number) => void
 }
 
 /** Ba cách lấy câu. `lenbang` là chế độ máy tự chọn cho buổi chữa bài. */
@@ -154,7 +158,7 @@ type CheDoLay = 'rut' | 'tron' | 'lenbang'
  * khác nhau. Gấp 3 là mỗi em lấy 1/3 kho: đủ khác nhau mà gói đề chưa phình. */
 const HE_SO_KHO = 3
 
-export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi }: KhoiRutDeProps) {
+export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiPhutLamBai }: KhoiRutDeProps) {
   const uv = useMemo(() => dungUngVien(nguon), [nguon])
   const co: SoCauPhan = useMemo(() => ({ I: uv.I.length, II: uv.II.length, III: uv.III.length }), [uv])
   const tongKho = tongCau(co)
@@ -264,7 +268,14 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi }: Khoi
         <Chip chon={cheDo === 'tron'} onClick={() => setCheDo('tron')}>
           Lấy trọn kho ({tongKho} câu)
         </Chip>
-        <Chip chon={lenBang} onClick={() => setCheDo('lenbang')} mau="tim">
+        <Chip
+          chon={lenBang}
+          onClick={() => {
+            setCheDo('lenbang')
+            if (phutLamBai !== PHUT_TOI_DA_LEN_BANG) onDoiPhutLamBai?.(PHUT_TOI_DA_LEN_BANG)
+          }}
+          mau="tim"
+        >
           Phân công lên bảng
         </Chip>
       </div>

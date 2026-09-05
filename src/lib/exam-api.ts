@@ -897,7 +897,11 @@ export function sinhMaPhieu(): string {
  * thầy phải làm, hơn là để thầy ngồi chờ rồi nhận lỗi lạ. */
 const CO_TOI_DA_PHIEU = 4 * 1024 * 1024
 
-export async function luuPhieu(scriptUrl: string, secret: string, d: { ma: string; maCa: string; sbd: string; hoTen: string; phieu: unknown }): Promise<void> {
+/** Loại phiếu: kết quả bài kiểm tra, hay bài tập giao về nhà. Một em trong một
+ * ca có thể có cả hai, mà gửi Zalo thì phải gửi đúng loại. */
+export type LoaiPhieu = 'ketqua' | 'baitap'
+
+export async function luuPhieu(scriptUrl: string, secret: string, d: { ma: string; maCa: string; sbd: string; hoTen: string; phieu: unknown; loai?: LoaiPhieu }): Promise<void> {
   const co = new Blob([JSON.stringify(d.phieu)]).size
   if (co > CO_TOI_DA_PHIEU) {
     throw new Error(
@@ -905,7 +909,9 @@ export async function luuPhieu(scriptUrl: string, secret: string, d: { ma: strin
     )
   }
   // Gói nặng nên cho hạn rộng hơn mặc định: 4 MB qua 4G có khi mất cả phút.
-  const r = await postJson(scriptUrl, { action: 'luuPhieu', secret, ...d }, 90)
+  // `loai` đặt SAU `...d`: để trước thì `...d` rải đè lại bằng undefined khi chỗ
+  // gọi không truyền, và máy chủ nhận rỗng.
+  const r = await postJson(scriptUrl, { action: 'luuPhieu', secret, ...d, loai: d.loai || 'ketqua' }, 90)
   if (!r.ok) throw new Error(r.error || 'Không lưu được phiếu')
 }
 
@@ -913,6 +919,37 @@ export async function layPhieu(scriptUrl: string, ma: string): Promise<unknown> 
   const r = await postJson(scriptUrl, { action: 'layPhieu', ma })
   if (!r.ok) throw new Error(r.error || 'Không tìm thấy phiếu')
   return r.phieu
+}
+
+/** Một dòng trong danh sách phiếu của ca. KHÔNG kèm nội dung phiếu — gói phiếu
+ * nặng vài MB mỗi cái, kéo cả ca về là nghẹn mà thầy cũng không cần. */
+export interface PhieuCuaCa {
+  ma: string
+  sbd: string
+  hoTen: string
+  taoLuc: string
+  /** Số lần link đã được mở — thầy biết phụ huynh đã xem chưa. */
+  soLanXem: number
+  xemLanCuoi: string
+  loai: LoaiPhieu
+}
+
+/** MÃ PHIẾU CỦA CẢ MỘT CA, mới nhất trước.
+ *
+ * Trước đây muốn gửi Zalo cho 27 phụ huynh thì phải mở phiếu từng em rồi copy
+ * từng link. Lệnh này trả hết mã trong một lần gọi để màn Theo dõi dựng sẵn
+ * danh sách link. Cần mã bí mật — mã phiếu là chìa khoá mở báo cáo của em. */
+export async function phieuTheoCa(scriptUrl: string, secret: string, maCa: string): Promise<PhieuCuaCa[]> {
+  const r = await postJson(scriptUrl, { action: 'phieuTheoCa', secret, maCa })
+  if (!r.ok) throw new Error(r.error || 'Không lấy được danh sách phiếu của ca')
+  return (r.items as PhieuCuaCa[]).map((x) => ({
+    ...x,
+    ma: chuoi(x.ma),
+    sbd: chuoi(x.sbd),
+    hoTen: chuoi(x.hoTen),
+    soLanXem: Number(x.soLanXem) || 0,
+    loai: x.loai === 'baitap' ? 'baitap' : 'ketqua',
+  }))
 }
 
 export async function xoaPhieu(scriptUrl: string, secret: string, ma: string): Promise<void> {

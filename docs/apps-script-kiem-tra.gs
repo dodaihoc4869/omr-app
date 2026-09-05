@@ -77,6 +77,9 @@ const SHEET_DE = 'NganHangDe'
 // KHÔNG có lệnh nào liệt kê danh sách mã. Chỉ `layPhieu` là đọc được, và phải
 // đưa đúng mã. Xoá dòng ở đây là link đã gửi chết ngay: đó là đường thu hồi.
 const SHEET_PHIEU = 'PhieuKetQua'
+// Cột Loai (thứ 9) tách phiếu KẾT QUẢ với phiếu BÀI TẬP: một em trong một ca có
+// cả hai, mà gửi Zalo thì phải gửi đúng loại. Phiếu cũ ô trống ⇒ 'ketqua'.
+const PHIEU_HEADERS = ['Ma', 'MaCa', 'SBD', 'HoTen', 'PhieuJson', 'TaoLuc', 'SoLanXem', 'XemLanCuoi', 'Loai']
 const SHEET_LUOT = 'LuotThi'
 const DRIVE_FOLDER = 'OMR-APP-DATA'
 
@@ -1369,7 +1372,8 @@ function doPost(e) {
   if (action === 'luuPhieu' || action === 'xoaPhieu') {
     const loiP = kiemTraMaBiMat_(body)
     if (loiP) return jsonResponse_({ ok: false, error: loiP })
-    const sh = getSheet_(SHEET_PHIEU, ['Ma', 'MaCa', 'SBD', 'HoTen', 'PhieuJson', 'TaoLuc', 'SoLanXem', 'XemLanCuoi'])
+    const sh = getSheet_(SHEET_PHIEU, PHIEU_HEADERS)
+    boSungTieuDe_(sh, PHIEU_HEADERS)
     const ma = String(body.ma || '').trim()
     if (!/^[A-Za-z0-9_-]{8,40}$/.test(ma)) return jsonResponse_({ ok: false, error: 'Mã phiếu không hợp lệ' })
     const row = findRowByKey_(sh, 0, ma)
@@ -1394,14 +1398,44 @@ function doPost(e) {
       row > 0 ? sh.getRange(row, 6).getValue() : new Date().toISOString(),
       row > 0 ? sh.getRange(row, 7).getValue() : 0,
       row > 0 ? sh.getRange(row, 8).getValue() : '',
+      String(body.loai || '') === 'baitap' ? 'baitap' : 'ketqua',
     ]
-    if (row > 0) sh.getRange(row, 1, 1, 8).setValues([hang])
+    if (row > 0) sh.getRange(row, 1, 1, PHIEU_HEADERS.length).setValues([hang])
     else sh.appendRow(hang)
     return jsonResponse_({ ok: true, ma: ma })
   }
 
+  if (action === 'phieuTheoCa') {
+    // MÃ PHIẾU CỦA CẢ MỘT CA — để thầy gửi Zalo hàng loạt thay vì mở từng em.
+    // Chỉ trả DANH SÁCH MÃ, không trả nội dung phiếu: gói phiếu nặng vài MB
+    // mỗi cái, kéo cả ca về là nghẹn mà thầy cũng không cần.
+    const loiPC = kiemTraMaBiMat_(body)
+    if (loiPC) return jsonResponse_({ ok: false, error: loiPC })
+    const maCaPC = String(body.maCa || '').trim()
+    if (!maCaPC) return jsonResponse_({ ok: false, error: 'Thiếu mã ca' })
+    const shPC = getSheet_(SHEET_PHIEU, PHIEU_HEADERS)
+    boSungTieuDe_(shPC, PHIEU_HEADERS)
+    const dataPC = shPC.getDataRange().getValues()
+    const itemsPC = []
+    for (let i = 1; i < dataPC.length; i++) {
+      if (String(dataPC[i][1]) !== maCaPC) continue
+      itemsPC.push({
+        ma: String(dataPC[i][0]),
+        sbd: String(dataPC[i][2]),
+        hoTen: String(dataPC[i][3]),
+        taoLuc: dataPC[i][5] ? String(dataPC[i][5]) : '',
+        soLanXem: Number(dataPC[i][6]) || 0,
+        xemLanCuoi: dataPC[i][7] ? String(dataPC[i][7]) : '',
+        loai: String(dataPC[i][8] || '') === 'baitap' ? 'baitap' : 'ketqua',
+      })
+    }
+    // Mới nhất trước: thầy tạo lại phiếu cho một em thì bản mới đứng trên.
+    itemsPC.sort(function (a, b) { return msCua_(b.taoLuc) - msCua_(a.taoLuc) })
+    return jsonResponse_({ ok: true, items: itemsPC, serverNow: Date.now() })
+  }
+
   if (action === 'layPhieu') {
-    const sh = getSheet_(SHEET_PHIEU, ['Ma', 'MaCa', 'SBD', 'HoTen', 'PhieuJson', 'TaoLuc', 'SoLanXem', 'XemLanCuoi'])
+    const sh = getSheet_(SHEET_PHIEU, PHIEU_HEADERS)
     const ma = String(body.ma || '').trim()
     // Mã sai định dạng thì trả về ĐÚNG câu như mã không tồn tại — không để ai
     // dò được định dạng mã qua thông điệp lỗi.

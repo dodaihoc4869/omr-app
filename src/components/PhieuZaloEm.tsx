@@ -288,7 +288,7 @@ export default function PhieuZaloEm({
                   },
                   cau: phieu.baiTap,
                 }
-                await luuPhieu(url.trim(), mat.trim(), { ma: maBt, maCa: ca.maCa, sbd: hoSo.em.sbd, hoTen: hoSo.em.hoTen, phieu: goiBt })
+                await luuPhieu(url.trim(), mat.trim(), { ma: maBt, maCa: ca.maCa, sbd: hoSo.em.sbd, hoTen: hoSo.em.hoTen, phieu: goiBt, loai: 'baitap' })
                 btRef.current = { khoa, ma: maBt, link: taoLinkPhieu(`${location.origin}${import.meta.env.BASE_URL}`, maBt) }
               }
               phieu.linkBaiTap = btRef.current?.link
@@ -300,7 +300,7 @@ export default function PhieuZaloEm({
 
           // Gói nặng thì bỏ bớt phần phụ chứ đừng để cả báo cáo gửi hỏng.
           const { phieu: goiGui } = giamGoiPhieu(phieu)
-          await luuPhieu(url.trim(), mat.trim(), { ma, maCa: ca.maCa, sbd: hoSo.em.sbd, hoTen: hoSo.em.hoTen, phieu: goiGui })
+          await luuPhieu(url.trim(), mat.trim(), { ma, maCa: ca.maCa, sbd: hoSo.em.sbd, hoTen: hoSo.em.hoTen, phieu: goiGui, loai: 'ketqua' })
           if (con) setLink(taoLinkPhieu(`${location.origin}${import.meta.env.BASE_URL}`, ma))
         } catch {
           // Mất mạng hoặc chưa cấu hình: tin nhắn chữ vẫn gửi được, chỉ mất

@@ -6,13 +6,15 @@
 // xám chờ thi lại · tím đang làm · cam rời màn N lần · đỏ bị khoá · xanh đã nộp.
 // Xoá ca = xoá mềm, phải gõ đúng mã ca.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Copy, Check, RefreshCw, Trash2, ArrowLeft, ChevronRight, Images, FileSpreadsheet, FileJson, Lock, Unlock } from 'lucide-react'
+import { Copy, Check, RefreshCw, Trash2, ArrowLeft, ChevronRight, Images, FileSpreadsheet, FileJson, Lock, Unlock, Send } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
 import { chiTietCa, duyetThiLai, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { goiPhieuCaZip, tenTepZipCa, chuyenDeTuChiTiet, type EmTrongCaDeXuatPhieu } from '../lib/phieu-hang-loat'
 import { viecCanLamMacDinh } from '../lib/phieu-zalo'
+import { gomLinkPhieu, tomTatLinkPhieu, vanBanLinkPhieu } from '../lib/link-phieu-ca'
+import { phieuTheoCa } from '../lib/exam-api'
 import { docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
@@ -118,6 +120,9 @@ export default function ExamMonitorScreen() {
   // Tải phiếu cả ca: dựng ảnh cho từng em rồi gói .zip, chạy hoàn toàn tại máy
   // thầy nên không phụ thuộc mạng.
   const [dangGoiPhieu, setDangGoiPhieu] = useState('')
+  // Gom link phiếu của cả ca để dán một lượt vào Zalo (thầy chốt 05/09 chiều).
+  const [dangGomLink, setDangGomLink] = useState(false)
+  const [tomTatLink, setTomTatLink] = useState('')
   // Đã ghi điểm lên Sheet cho lượt nào (khoá `${sbd}:${lanThu}:${nopLuc}`) — không ghi lặp mỗi lần tải lại.
   const daGhiRef = useRef<Set<string>>(new Set())
 
@@ -411,6 +416,44 @@ export default function ExamMonitorScreen() {
       showToast(e instanceof Error ? e.message : 'Không tạo được phiếu hàng loạt', 'error')
     } finally {
       setDangGoiPhieu('')
+    }
+  }
+
+  /** COPY HẾT LINK PHIẾU CỦA CA. Máy chủ đã giữ mã phiếu theo mã ca, nên chỉ
+   * cần một lệnh thay vì mở phiếu từng em.
+   *
+   * Em CHƯA CÓ PHIẾU vẫn được kê tên ở cuối văn bản: im lặng bỏ qua là thầy gửi
+   * thiếu một phụ huynh mà không biết. */
+  const handleCopyLinkPhieu = async () => {
+    if (!chiTiet) return
+    const url = scriptUrl.trim()
+    const mat = secret.trim()
+    if (!url || !mat) return showToast('Chưa cấu hình link Apps Script hoặc mã bí mật', 'error')
+    setDangGomLink(true)
+    try {
+      const ds = await phieuTheoCa(url, mat, chiTiet.ca.maCa)
+      const goc = `${location.origin}${import.meta.env.BASE_URL}`
+      const g = gomLinkPhieu(
+        daCham.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen })),
+        ds,
+        goc,
+      )
+      if (g.dong.length === 0) {
+        setTomTatLink('')
+        return showToast('Ca này chưa em nào được tạo phiếu — bấm Xem phiếu ở từng em, hoặc dùng nút Phiếu để dựng ảnh', 'warn')
+      }
+      const t = vanBanLinkPhieu(g)
+      setTomTatLink(tomTatLinkPhieu(g))
+      try {
+        await navigator.clipboard.writeText(t)
+        showToast(`Đã copy ${g.dong.length} link phiếu`, 'success')
+      } catch {
+        showToast(t, 'success')
+      }
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Không lấy được danh sách phiếu', 'error')
+    } finally {
+      setDangGomLink(false)
     }
   }
 
@@ -860,6 +903,19 @@ export default function ExamMonitorScreen() {
                 <NutXuat icon={<FileSpreadsheet size={20} />} ten="Bảng điểm" phu="xlsx" onClick={handleExportXlsx} />
                 <NutXuat icon={<FileJson size={20} />} ten="Dữ liệu" phu="json" onClick={handleExportJson} />
               </div>
+              {/* LINK PHIẾU GỬI ZALO — một lệnh cho cả ca, thay vì mở phiếu
+                  từng em rồi copy từng link. */}
+              <button
+                type="button"
+                onClick={() => void handleCopyLinkPhieu()}
+                disabled={dangGomLink}
+                className="tap-target w-full inline-flex items-center justify-center font-bold"
+                style={{ gap: 8, minHeight: 48, marginTop: 'var(--k2)', borderRadius: 'var(--bo-1)', background: 'var(--the-2)', border: 'none', color: 'var(--muc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}
+              >
+                {dangGomLink ? <RefreshCw size={18} className="animate-spin" /> : <Send size={18} />}
+                {dangGomLink ? 'Đang lấy mã phiếu…' : 'Copy link phiếu gửi Zalo'}
+              </button>
+              {tomTatLink && <div style={{ ...NHAN_NHO, marginTop: 4, textAlign: 'center' }}>{tomTatLink}</div>}
             </TheNoiDung>
           )}
 
