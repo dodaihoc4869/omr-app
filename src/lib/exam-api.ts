@@ -348,9 +348,12 @@ export async function khoaCa(scriptUrl: string, secret: string, maCa: string, kh
 
 /** Thầy MỞ CA LẠI. Em đã bị nộp do khoá KHÔNG tự vào lại được — phải duyệt
  * thi lại từng em, đúng như mọi trường hợp thi lại khác. */
-export async function moKhoaCa(scriptUrl: string, secret: string, maCa: string): Promise<void> {
+/** MỞ CA: gỡ khoá thủ công VÀ gỡ hạn vào phòng, để em đến muộn vào được ngay.
+ * `goHanVao` = true khi ca có hạn vào và hạn đó vừa bị gỡ. */
+export async function moKhoaCa(scriptUrl: string, secret: string, maCa: string): Promise<{ goHanVao: boolean }> {
   const r = await postJson(scriptUrl, { action: 'moKhoaCa', secret, maCa })
   if (!r.ok) throw new Error(r.error || 'Không mở lại được ca')
+  return { goHanVao: !!(r as { goHanVao?: boolean }).goHanVao }
 }
 
 /** Trạng thái 1 lượt thi trên máy chủ (sheet LuotThi). */

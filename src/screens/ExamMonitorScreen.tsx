@@ -21,13 +21,13 @@ import { KhoiChuyenDe, KhoiLichSuCa } from '../components/HoSoEmView'
 import NutBaiTapPdf from '../components/NutBaiTapPdf'
 import NutTaiDeCa from '../components/NutTaiDeCa'
 import KhoiTienBo from '../components/KhoiTienBo'
-import KhoiGoiLenBang from '../components/KhoiGoiLenBang'
 import PhieuZaloEm from '../components/PhieuZaloEm'
 import { hoSoEm, type HoSoEm } from '../lib/exam-api'
 import { buildStudentEntry, downloadDuLieuJson } from '../lib/json-export'
 import { downloadBangDiem, type StudentRow } from '../lib/xlsx-export'
 import { mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
 import { useAppStore } from '../store/appStore'
+import { cuaVaoCa } from '../lib/cua-vao-ca'
 import { trangThaiCa } from './LichSuCaScreen'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -439,6 +439,9 @@ export default function ExamMonitorScreen() {
   const chuaVao =
     chiTiet && chiTiet.ca.phamVi === 'chon' && Array.isArray(chiTiet.ca.danhSachMoi) ? Math.max(0, chiTiet.ca.danhSachMoi.length - dsEm.length) : null
 
+  // CỬA VÀO CA — luật nằm trong `cua-vao-ca.ts`, màn này chỉ vẽ.
+  const cua = cuaVaoCa(chiTiet?.ca ?? null, now)
+
   const khoaCaNay = async () => {
     if (!chiTiet) return
     setDangKhoa(true)
@@ -458,8 +461,8 @@ export default function ExamMonitorScreen() {
     if (!chiTiet) return
     setDangKhoa(true)
     try {
-      await moKhoaCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa)
-      showToast('Đã mở ca lại — em mới vào được, em đã nộp phải duyệt thi lại', 'success')
+      const kq = await moKhoaCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa)
+      showToast(kq.goHanVao ? 'Đã mở ca — bỏ hạn giờ vào, em đến muộn vào được ngay' : 'Đã mở ca — em mới vào được, em đã nộp phải duyệt thi lại', 'success')
       await tai(chiTiet.ca.maCa, true)
     } catch (e) {
       showToast(`Không mở lại được: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
@@ -633,40 +636,79 @@ export default function ExamMonitorScreen() {
                 </div>
               ))}
             </div>
-            {/* KHOÁ CA / MỞ CA LẠI (CATHIVAGOILENBANG mục 1.2) — ngay dưới mã
-                ca, một nút đổi theo trạng thái. Đỏ là chặn, xanh là mở. */}
+            {/* CỬA VÀO CA — HAI NÚT, LUÔN THẤY CẢ HAI (thầy chốt 05/09).
+                Trước đây chỉ có MỘT nút đổi mặt theo trạng thái: đang mở thì
+                thấy nút khoá, đã khoá thì thấy nút mở. Nhìn một nút
+                không biết ca đang ở trạng thái nào, phải đọc chữ trên nút rồi
+                suy ngược — giữa giờ dễ bấm nhầm.
+
+                Nay hai nút nằm cạnh nhau, nút ứng với trạng thái ĐANG CÓ thì
+                tắt và tô nhạt. Thầy liếc là biết cửa đang mở hay đóng.
+
+                MỞ CA cũng dùng khi QUÁ GIỜ VÀO: nó gỡ luôn hạn vào phòng, nên
+                em đến muộn vào được ngay, không phải mở ca mới. */}
             <div style={{ marginTop: 'var(--k3)' }}>
-              {chiTiet.ca.trangThai === 'dong' ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={moLaiCa}
-                    disabled={dangKhoa}
-                    className="tap-target w-full font-bold"
-                    style={{ height: 52, borderRadius: 'var(--bo-1)', background: 'var(--xanh)', color: 'var(--giay)', fontSize: 'var(--cx-2)' }}
-                  >
-                    <span className="inline-flex items-center gap-2">
-                      <Unlock size={18} /> {dangKhoa ? 'Đang mở…' : 'MỞ CA LẠI'}
-                    </span>
-                  </button>
-                  <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
-                    Đã khoá {chiTiet.ca.khoaLuc ? <span style={SO}>{gio(chiTiet.ca.khoaLuc)}</span> : ''}
-                    {chiTiet.ca.khoaBoi ? ` bởi ${chiTiet.ca.khoaBoi}` : ''}. Mở lại thì em mới vào được; em đã bị nộp do khoá phải duyệt thi lại từng em.
-                  </div>
-                </>
-              ) : (
+              <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }} data-cua-vao={cua.nhan}>
+                Cửa vào ca: <b style={{ color: cua.moCua ? 'var(--xanh)' : 'var(--do)' }}>{cua.nhan}</b>
+                {cua.daKhoa && chiTiet.ca.khoaLuc ? (
+                  <>
+                    {' '}
+                    lúc <span style={SO}>{gio(chiTiet.ca.khoaLuc)}</span>
+                    {chiTiet.ca.khoaBoi ? ` bởi ${chiTiet.ca.khoaBoi}` : ''}
+                  </>
+                ) : null}
+                {cua.quaGioVao && !cua.daKhoa && chiTiet.ca.hetHanVao ? (
+                  <>
+                    {' '}
+                    (hạn <span style={SO}>{gio(chiTiet.ca.hetHanVao)}</span>)
+                  </>
+                ) : null}
+              </div>
+              <div className="grid grid-cols-2" style={{ gap: 'var(--k3)' }}>
+                <button
+                  type="button"
+                  onClick={moLaiCa}
+                  disabled={dangKhoa || !cua.moDuoc}
+                  aria-label="Mở ca cho em vào"
+                  className="tap-target font-bold flex flex-col items-center justify-center"
+                  style={{
+                    height: 72,
+                    gap: 4,
+                    borderRadius: 'var(--bo-2)',
+                    background: cua.moDuoc ? 'var(--xanh-nen)' : 'var(--the-2)',
+                    border: `2px solid ${cua.moDuoc ? 'var(--xanh)' : 'var(--vien)'}`,
+                    color: cua.moDuoc ? 'var(--xanh)' : 'var(--mo)',
+                    fontSize: 'var(--cx-2)',
+                  }}
+                >
+                  <Unlock size={22} />
+                  {dangKhoa && cua.moDuoc ? 'Đang mở…' : 'MỞ CA'}
+                </button>
                 <button
                   type="button"
                   onClick={() => setHoiKhoa(true)}
-                  disabled={dangKhoa}
-                  className="tap-target w-full font-bold"
-                  style={{ height: 52, borderRadius: 'var(--bo-1)', background: 'var(--do)', color: 'var(--giay)', fontSize: 'var(--cx-2)' }}
+                  disabled={dangKhoa || !cua.khoaDuoc}
+                  aria-label="Khoá ca"
+                  className="tap-target font-bold flex flex-col items-center justify-center"
+                  style={{
+                    height: 72,
+                    gap: 4,
+                    borderRadius: 'var(--bo-2)',
+                    background: cua.khoaDuoc ? 'var(--do-nen)' : 'var(--the-2)',
+                    border: `2px solid ${cua.khoaDuoc ? 'var(--do)' : 'var(--vien)'}`,
+                    color: cua.khoaDuoc ? 'var(--do)' : 'var(--mo)',
+                    fontSize: 'var(--cx-2)',
+                  }}
                 >
-                  <span className="inline-flex items-center gap-2">
-                    <Lock size={18} /> KHOÁ CA
-                  </span>
+                  <Lock size={22} />
+                  KHOÁ CA
                 </button>
-              )}
+              </div>
+              <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
+                {cua.moCua
+                  ? 'Khoá ca: em đang làm bị nộp ngay theo phần đã làm, em chưa vào thì không vào được nữa.'
+                  : 'Mở ca: bỏ hạn giờ vào phòng, em đến muộn vào được ngay. Em đã bị nộp do khoá phải duyệt thi lại từng em.'}
+              </div>
             </div>
             <div style={{ marginTop: 'var(--k3)' }}>
               <NutChinh variant="phu" onClick={copyLink}>
@@ -707,18 +749,10 @@ export default function ExamMonitorScreen() {
             </OThongBao>
           )}
 
-          {/* GỌI LÊN BẢNG — dựng thẳng từ bài làm của ca này, không bắt thầy
-              sang màn khác chọn lại đề và lớp. Cần ngân hàng CÓ đáp án mới
-              biết em nào sai câu nào, nên chỉ hiện khi máy này có bản đề. */}
-          {teacherBank && teacherBank.length > 0 && dsEm.some((e) => e.moiNhat.dapAn) && (
-            <KhoiGoiLenBang
-              maCa={chiTiet.ca.maCa}
-              tenCa={`${chiTiet.ca.tenCa || `Ca ${chiTiet.ca.maCa}`}${chiTiet.ca.lop ? ` · ${chiTiet.ca.lop}` : ''}`}
-              bank={mergeKeepAnswers(teacherBank, soCauCa)}
-              luot={dsEm.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen, trangThai: e.moiNhat.trangThai, dapAn: e.moiNhat.dapAn, giayCau: e.moiNhat.giayCau }))}
-              onCopy={(ok) => showToast(ok ? 'Đã copy bảng phân công' : 'Không copy được', ok ? 'success' : 'error')}
-            />
-          )}
+          {/* GỌI LÊN BẢNG đã GỠ khỏi màn này (thầy chốt 05/09). Nó có màn riêng
+              ở thanh điều hướng, chọn được nhiều đề và nhiều lớp. Nhét thêm
+              vào đây thì màn coi thi dài gấp đôi, mà lúc đang coi thi thì thầy
+              chưa chữa bài — chữa bài là việc sau khi ca xong. */}
 
           {/* DANH SÁCH EM */}
           <TheNoiDung>

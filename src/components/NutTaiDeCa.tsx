@@ -35,15 +35,16 @@ export interface NutTaiDeCaProps {
 }
 
 export default function NutTaiDeCa({ banks, maCa, tenCa, ghiChu, soCauCa, dsEm, showToast }: NutTaiDeCaProps) {
-  // Ca ghép từ nhiều đề gốc thì cho thầy chọn tải từng đề — kho 147 câu in ra
-  // là tập giấy dày, mà thường thầy chỉ cần đúng một bài.
-  const chon = useMemo(() => {
-    const ra: { khoa: string; ten: string; nguon: TeacherExamSource[]; soCau: number }[] = []
-    const tong = banks.reduce((n, s) => n + s.phanI.length + s.phanII.length + s.phanIII.length, 0)
-    if (banks.length !== 1) ra.push({ khoa: '__ca', ten: 'Cả ca', nguon: banks, soCau: tong })
-    for (const s of banks) ra.push({ khoa: s.maDe, ten: `Mã ${s.maDe}`, nguon: [s], soCau: s.phanI.length + s.phanII.length + s.phanIII.length })
-    return ra
-  }, [banks])
+  // MỘT CA MỘT ĐỀ — thầy chốt 05/09.
+  //
+  // Trước đây khối này xổ ra từng mã đề gốc: "Cả ca · 28 câu", rồi
+  // "Mã 12-C1-B1-DS · 2 câu", "Mã 12-C1-B1-P2-TN · 2 câu"... Một ca ghép 9 bài
+  // là 10 dòng nút, mà mỗi dòng chỉ 1–4 câu — không ai in riêng 2 câu.
+  // Những mã đó là cách MÁY chia kho theo bài và theo phần, không phải cách
+  // thầy nghĩ về buổi kiểm tra. Nay chỉ còn ĐÚNG MỘT đề của cả ca.
+  //
+  // Muốn xem riêng một bài thì vào Ngân hàng câu hỏi — đó mới là chỗ của nó.
+  const deCaCa = useMemo(() => banks.reduce((n, s) => n + s.phanI.length + s.phanII.length + s.phanIII.length, 0), [banks])
 
   // SỐ CÂU MỖI EM LÀM, khác số câu trong kho của ca.
   //
@@ -53,7 +54,7 @@ export default function NutTaiDeCa({ banks, maCa, tenCa, ghiChu, soCauCa, dsEm, 
   //
   // Nay nói cả hai, và nói rõ tệp tải về là cái nào — thầy khỏi in nhầm 85 câu
   // khi chỉ cần 28.
-  const tongKho = banks.reduce((n, s) => n + s.phanI.length + s.phanII.length + s.phanIII.length, 0)
+  const tongKho = deCaCa
   const moiEm = soCauCa ? Math.max(0, soCauCa.I) + Math.max(0, soCauCa.II) + Math.max(0, soCauCa.III) : 0
   const caCatBot = moiEm > 0 && moiEm < tongKho
 
@@ -115,10 +116,10 @@ export default function NutTaiDeCa({ banks, maCa, tenCa, ghiChu, soCauCa, dsEm, 
     }
   }
 
-  const goiCua = (o: (typeof chon)[number]) => async () => {
-    const cau = cauLuyenTuNguon(o.nguon)
+  const goiCaCa = () => async () => {
+    const cau = cauLuyenTuNguon(banks)
     if (cau.length === 0) {
-      showToast('Đề này không có câu nào', 'error')
+      showToast('Ca này không có câu nào', 'error')
       return null
     }
     const cd = [...new Set(cau.map((c) => c.chuyenDe).filter(Boolean))]
@@ -130,7 +131,7 @@ export default function NutTaiDeCa({ banks, maCa, tenCa, ghiChu, soCauCa, dsEm, 
         hoTen: tenCa || `Ca ${maCa}`,
         sbd: maCa,
         ngay: new Date(),
-        tenChuyenDe: cd.length === 1 ? cd[0] : o.ten,
+        tenChuyenDe: cd.length === 1 ? cd[0] : tenCa || 'Hoá học',
         ketQua: '',
         hienDapAn: true,
         nhanBia: 'Đề kiểm tra kèm lời giải',
@@ -138,7 +139,6 @@ export default function NutTaiDeCa({ banks, maCa, tenCa, ghiChu, soCauCa, dsEm, 
           { nhan: 'Bài kiểm tra', gia: tenCa || `Ca ${maCa}` },
           { nhan: 'Mã ca', gia: maCa },
           ...(ghiChu ? [{ nhan: 'Lớp', gia: ghiChu.replace(/^Lớp\s*/i, '') }] : []),
-          ...(chon.length > 1 ? [{ nhan: 'Mã đề', gia: o.ten.replace(/^Mã\s*/i, '') }] : []),
           { nhan: 'Số câu', gia: caCatBot ? `${cau.length} câu trong kho của ca, mỗi em làm ${moiEm} câu` : `${cau.length} câu` },
         ],
       },
@@ -147,7 +147,7 @@ export default function NutTaiDeCa({ banks, maCa, tenCa, ghiChu, soCauCa, dsEm, 
     }
   }
 
-  if (chon.length === 0) return null
+  if (deCaCa === 0) return null
 
   return (
     <div className="flex flex-col" style={{ gap: 'var(--k4)' }}>
@@ -176,7 +176,13 @@ export default function NutTaiDeCa({ banks, maCa, tenCa, ghiChu, soCauCa, dsEm, 
               {emLoc.length === 0 ? (
                 <div style={NHAN_NHO}>Không có em nào khớp "{tim.trim()}".</div>
               ) : (
-                <div className="flex flex-col" style={{ gap: 4, maxHeight: 208, overflowY: 'auto' }}>
+                // HỘP TRƯỢT — lớp 100–300 em thì danh sách đổ thẳng ra màn là
+                // đẩy nút xem đề xuống tận đáy. Chặn chiều cao, cuộn trong hộp.
+                <div
+                  data-hop-em
+                  className="flex flex-col"
+                  style={{ gap: 4, maxHeight: 208, overflowY: 'auto', padding: 'var(--k2)', borderRadius: 'var(--bo-1)', border: '1px solid var(--vien)' }}
+                >
                   {emLoc.slice(0, 40).map((e) => {
                     const chon = emDangChon?.sbd === e.sbd
                     return (
@@ -217,15 +223,13 @@ export default function NutTaiDeCa({ banks, maCa, tenCa, ghiChu, soCauCa, dsEm, 
           )}
         </div>
       )}
-      {chon.map((o) => (
-        <div key={o.khoa} className="flex flex-col" style={{ gap: 'var(--k2)' }}>
-          <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
-            {caCatBot ? 'Cả kho của ca · ' : `${o.ten} · `}
-            {o.soCau} câu
-          </div>
-          <NutPhieuHtml dungGoi={goiCua(o)} nhanXem="Xem đề" showToast={showToast} />
+      <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+        <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
+          {caCatBot ? 'Cả kho của ca · ' : 'Đề cả ca · '}
+          {deCaCa} câu
         </div>
-      ))}
+        <NutPhieuHtml dungGoi={goiCaCa()} nhanXem="Xem đề" showToast={showToast} />
+      </div>
     </div>
   )
 }

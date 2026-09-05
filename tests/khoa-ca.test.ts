@@ -266,8 +266,56 @@ describe('PHÉP KIỂM 6 — mở ca lại', () => {
     expect(gs.quyetDinhVaoThi_(caMo, { trangThai: 'da_nop', idThietBi: 'may-001', lanThu: 1, nopLuc: '2026-09-05T01:20:00Z' }, 'may-001', Date.now())).toMatchObject({ ok: false, lyDo: 'da_nop' })
   })
 
-  it('ca đang mở thì không có gì để mở lại', () => {
+  it('ca đang mở và không giới hạn giờ vào thì không có gì để mở thêm', () => {
     dungCa()
+    expect(goi({ action: 'moKhoaCa', secret: MAT, maCa: '123456' })).toMatchObject({ ok: false })
+  })
+})
+
+// MỘT NÚT MỞ CA MỞ ĐƯỢC CẢ HAI LÝ DO ĐÓNG CỬA (thầy chốt 05/09).
+// Cửa vào ca đóng vì thầy bấm khoá, HOẶC vì quá HetHanVao. Bản cũ chỉ mở lý do
+// thứ nhất, nên em đến muộn bấm link vẫn nhận `het_han_vao` dù thầy vừa bấm mở.
+describe('MỞ CA gỡ luôn hạn vào phòng', () => {
+  const QUA_HAN = '2026-09-05T01:10:00Z'
+  const BAY_GIO = Date.parse('2026-09-05T02:00:00Z')
+
+  it('ca CHƯA khoá nhưng QUÁ GIỜ VÀO: mở được, hạn vào bị gỡ, em muộn vào được', () => {
+    const { ca } = dungCa()
+    ca.o[1][8] = QUA_HAN // cột 9 HetHanVao
+    // Trước khi mở: máy chủ chặn đúng vì quá hạn.
+    expect(gs.quyetDinhVaoThi_({ trangThai: 'mo', batDau: '', hetHanVao: QUA_HAN, thoiGianPhut: 45 }, null, 'may-muon', BAY_GIO)).toMatchObject({
+      ok: false,
+      lyDo: 'het_han_vao',
+    })
+
+    const r = goi({ action: 'moKhoaCa', secret: MAT, maCa: '123456' })
+    expect(r).toMatchObject({ ok: true, trangThai: 'mo', goHanVao: true })
+    expect(ca.o[1][8]).toBe('')
+    expect(ca.o[1][9]).toBe('mo')
+    expect(gs.quyetDinhVaoThi_({ trangThai: 'mo', batDau: '', hetHanVao: '', thoiGianPhut: 45 }, null, 'may-muon', BAY_GIO)).toMatchObject({ ok: true })
+  })
+
+  it('ca ĐÃ khoá và có hạn vào: một lần bấm gỡ cả hai', () => {
+    const { ca } = dungCa()
+    ca.o[1][8] = QUA_HAN
+    goi({ action: 'khoaCa', secret: MAT, maCa: '123456' })
+    expect(ca.o[1][9]).toBe('dong')
+
+    expect(goi({ action: 'moKhoaCa', secret: MAT, maCa: '123456' })).toMatchObject({ ok: true, goHanVao: true })
+    expect(ca.o[1][9]).toBe('mo')
+    expect(ca.o[1][8]).toBe('')
+  })
+
+  it('ca đã khoá mà vốn không giới hạn giờ vào: vẫn mở, không báo gỡ hạn', () => {
+    const { ca } = dungCa()
+    goi({ action: 'khoaCa', secret: MAT, maCa: '123456' })
+    expect(goi({ action: 'moKhoaCa', secret: MAT, maCa: '123456' })).toMatchObject({ ok: true, goHanVao: false })
+    expect(ca.o[1][9]).toBe('mo')
+  })
+
+  it('ca đã xoá thì không mở được bằng nút này', () => {
+    const { ca } = dungCa()
+    ca.o[1][9] = 'da_xoa'
     expect(goi({ action: 'moKhoaCa', secret: MAT, maCa: '123456' })).toMatchObject({ ok: false })
   })
 })

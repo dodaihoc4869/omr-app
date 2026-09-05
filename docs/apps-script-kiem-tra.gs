@@ -1945,9 +1945,15 @@ function doPost(e) {
     //   2. Mọi lượt 'dang_lam' chuyển 'da_nop', chấm theo bản LƯU TẠM gần nhất
     //   3. Ghi KhoaLuc, KhoaBoi
     //
-    // MỞ LẠI chỉ đưa TrangThai về 'mo'. Em đã bị nộp do khoá KHÔNG tự vào lại
-    // được — lượt của em là 'da_nop', muốn thi lại phải qua `duyetThiLai`
-    // từng em như mọi trường hợp khác.
+    // MỞ LẠI đưa TrangThai về 'mo' VÀ GỠ HẠN VÀO PHÒNG (HetHanVao = rỗng).
+    //
+    // Vì sao phải gỡ cả hạn vào: cửa ca đóng vì HAI lý do khác nhau — thầy bấm
+    // khoá, hoặc quá `HetHanVao`. Bản cũ chỉ mở lý do thứ nhất, nên em đến
+    // muộn bấm link vẫn nhận `het_han_vao` dù thầy vừa bấm mở, và thầy phải
+    // mở ca MỚI. Một nút MỞ CA phải mở được cả hai.
+    //
+    // Em đã bị nộp do khoá KHÔNG tự vào lại được — lượt của em là 'da_nop',
+    // muốn thi lại phải qua `duyetThiLai` từng em như mọi trường hợp khác.
     const loi = kiemTraMaBiMat_(body)
     if (loi) return jsonResponse_({ ok: false, error: loi })
     const maCa = String(body.maCa || '').trim()
@@ -1961,10 +1967,18 @@ function doPost(e) {
     lock.waitLock(15000)
     try {
       if (action === 'moKhoaCa') {
-        if (ca.trangThai !== 'dong') return jsonResponse_({ ok: false, error: 'Ca đang mở, không cần mở lại' })
-        caSh.getRange(caRow, 10).setValue('mo')
+        // KHÔNG chặn khi ca đang 'mo': ca chưa khoá mà QUÁ HẠN VÀO thì vẫn phải
+        // mở được cửa. Bản cũ trả "Ca đang mở, không cần mở lại" đúng vào ca
+        // này — thầy bấm mà không có gì xảy ra.
+        const daKhoa = ca.trangThai === 'dong'
+        const hanCu = ca.hetHanVao || ''
+        if (!daKhoa && !hanCu) return jsonResponse_({ ok: false, error: 'Ca đang mở và không giới hạn giờ vào — không cần mở thêm' })
+        if (daKhoa) caSh.getRange(caRow, 10).setValue('mo')
+        // Cột 9 HetHanVao. Gỡ hạn = em đến muộn vào được ngay; đóng lại bằng
+        // nút KHOÁ CA, không phải bằng đồng hồ.
+        if (hanCu) caSh.getRange(caRow, 9).setValue('')
         caSh.getRange(caRow, 22).setValue(luc)
-        return jsonResponse_({ ok: true, trangThai: 'mo', moKhoaLuc: luc, serverNow: Date.now() })
+        return jsonResponse_({ ok: true, trangThai: 'mo', moKhoaLuc: luc, hetHanVao: '', goHanVao: !!hanCu, serverNow: Date.now() })
       }
       if (ca.trangThai === 'dong') return jsonResponse_({ ok: false, error: 'Ca đã khoá rồi' })
       // (1) chặn vào mới trước tiên
