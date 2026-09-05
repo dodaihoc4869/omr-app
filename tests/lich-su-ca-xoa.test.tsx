@@ -14,6 +14,11 @@ vi.mock('../src/lib/exam-api', () => ({
 vi.mock('../src/lib/exam-db', () => ({
   loadScriptUrl: async () => 'https://gia/exec',
   loadTeacherSecret: async () => 'mat',
+  // Khối "Mật khẩu mở app" trong màn Cài đặt đọc hai hàm này lúc dựng.
+  loadKhoaApp: async () => null,
+  saveKhoaApp: vi.fn(),
+  goKhoaApp: vi.fn(),
+  batKhoaApp: vi.fn(),
 }))
 vi.mock('../src/lib/gio-may-chu', () => ({ gioMayChu: () => new Date('2026-09-02T15:00:00Z').getTime() }))
 vi.mock('../src/store/appStore', () => ({

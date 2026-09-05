@@ -24,6 +24,11 @@ vi.mock('../src/lib/exam-db', () => ({
   saveTeacherSecret: vi.fn(),
   saveSessionTeacherBank: vi.fn(),
   deleteExamSource: vi.fn(),
+  // Khối "Mật khẩu mở app" trong màn Cài đặt đọc hai hàm này lúc dựng.
+  loadKhoaApp: async () => null,
+  saveKhoaApp: vi.fn(),
+  goKhoaApp: vi.fn(),
+  batKhoaApp: vi.fn(),
 }))
 vi.mock('../src/lib/exam-sync', () => ({ dongBoNganHang: async () => ({ moi: [], capNhat: [], loi: [], canXem: [] }), capNhatCaDaMo: async () => 0, caDungDe: async () => [] }))
 vi.mock('../src/lib/exam-api', () => ({ capNhatKeyBank: vi.fn(), luuDe: vi.fn(), xoaDe: vi.fn() }))

@@ -31,6 +31,11 @@ vi.mock('../src/lib/exam-db', () => ({
   docSoCauCa: async () => undefined,
   luuSoCauCa: vi.fn(),
   saveSessionTeacherBank: vi.fn(),
+  // Khối "Mật khẩu mở app" trong màn Cài đặt đọc hai hàm này lúc dựng.
+  loadKhoaApp: async () => null,
+  saveKhoaApp: vi.fn(),
+  goKhoaApp: vi.fn(),
+  batKhoaApp: vi.fn(),
 }))
 vi.mock('../src/lib/exam-sync', () => ({ dongBoNganHang: async () => null }))
 vi.mock('../src/components/NutDongBo', () => ({ default: () => null }))

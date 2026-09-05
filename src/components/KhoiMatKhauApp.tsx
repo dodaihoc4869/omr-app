@@ -41,10 +41,15 @@ export default function KhoiMatKhauApp({ showToast }: { showToast: (chu: string,
   useEffect(() => {
     let con = true
     void (async () => {
-      const [b, ma] = await Promise.all([loadKhoaApp(), loadTeacherSecret()])
-      if (!con) return
-      setGhi(b)
-      setCoMa(Boolean(ma))
+      try {
+        const [b, ma] = await Promise.all([loadKhoaApp(), loadTeacherSecret()])
+        if (!con) return
+        setGhi(b)
+        setCoMa(Boolean(ma))
+      } catch {
+        // IndexedDB hỏng thì khối này ẩn đi, KHÔNG kéo cả màn Ngân hàng câu hỏi
+        // xuống theo — thầy vẫn phải đồng bộ đề được.
+      }
     })()
     return () => {
       con = false

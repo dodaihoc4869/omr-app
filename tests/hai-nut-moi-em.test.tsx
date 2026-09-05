@@ -33,6 +33,11 @@ vi.mock('../src/lib/exam-api', async (goc) => ({
   danhSachEm: async () => DS,
   hoSoEm: async () => HO_SO,
   deleteStudentRegistration: vi.fn(),
+  // Khối "Mật khẩu mở app" trong màn Cài đặt đọc hai hàm này lúc dựng.
+  loadKhoaApp: async () => null,
+  saveKhoaApp: vi.fn(),
+  goKhoaApp: vi.fn(),
+  batKhoaApp: vi.fn(),
 }))
 vi.mock('../src/components/NutDongBoDanhSach', () => ({ default: () => null }))
 vi.mock('../src/components/NutBaiTapPdf', () => ({ default: () => null }))

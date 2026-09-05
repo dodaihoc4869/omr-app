@@ -33,6 +33,11 @@ vi.mock('../src/lib/exam-db', () => ({
   loadScriptUrl: async () => 'https://x',
   loadTeacherSecret: async () => 'mat',
   loadExamSources: async () => KHO,
+  // Khối "Mật khẩu mở app" trong màn Cài đặt đọc hai hàm này lúc dựng.
+  loadKhoaApp: async () => null,
+  saveKhoaApp: vi.fn(),
+  goKhoaApp: vi.fn(),
+  batKhoaApp: vi.fn(),
 }))
 vi.mock('../src/components/TheCau', () => ({ default: () => null }))
 vi.mock('../src/store/appStore', () => ({
