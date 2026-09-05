@@ -21,6 +21,7 @@ import { KhoiChuyenDe, KhoiLichSuCa } from '../components/HoSoEmView'
 import NutBaiTapPdf from '../components/NutBaiTapPdf'
 import NutTaiDeCa from '../components/NutTaiDeCa'
 import KhoiTienBo from '../components/KhoiTienBo'
+import KhoiGoiLenBang from '../components/KhoiGoiLenBang'
 import PhieuZaloEm from '../components/PhieuZaloEm'
 import { hoSoEm, type HoSoEm } from '../lib/exam-api'
 import { buildStudentEntry, downloadDuLieuJson } from '../lib/json-export'
@@ -704,6 +705,19 @@ export default function ExamMonitorScreen() {
             <OThongBao tone="cam">
               Máy này chưa lấy được ngân hàng CÓ đáp án của ca. Ca mở khi chưa bật "xem điểm" thì đáp án không nằm trên máy chủ, chỉ máy đã mở ca mới chấm được — điểm hiện ra là điểm đã ghi trên Sheet.
             </OThongBao>
+          )}
+
+          {/* GỌI LÊN BẢNG — dựng thẳng từ bài làm của ca này, không bắt thầy
+              sang màn khác chọn lại đề và lớp. Cần ngân hàng CÓ đáp án mới
+              biết em nào sai câu nào, nên chỉ hiện khi máy này có bản đề. */}
+          {teacherBank && teacherBank.length > 0 && dsEm.some((e) => e.moiNhat.dapAn) && (
+            <KhoiGoiLenBang
+              maCa={chiTiet.ca.maCa}
+              tenCa={`${chiTiet.ca.tenCa || `Ca ${chiTiet.ca.maCa}`}${chiTiet.ca.lop ? ` · ${chiTiet.ca.lop}` : ''}`}
+              bank={mergeKeepAnswers(teacherBank, soCauCa)}
+              luot={dsEm.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen, trangThai: e.moiNhat.trangThai, dapAn: e.moiNhat.dapAn, giayCau: e.moiNhat.giayCau }))}
+              onCopy={(ok) => showToast(ok ? 'Đã copy bảng phân công' : 'Không copy được', ok ? 'success' : 'error')}
+            />
           )}
 
           {/* DANH SÁCH EM */}

@@ -16,6 +16,9 @@
 // Mọi thứ trong file này là hàm thuần, không đụng DOM, không gọi mạng.
 import { hashSeed } from './exam-shuffle'
 import { chuanChuyenDe } from './goi-len-bang'
+import { taoChiTietCau } from './chi-tiet-cau'
+import type { AnswerRecord } from './exam-db'
+import type { CanChua, SoCauMoiPhan, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 
 // ---------------------------------------------------------- NGƯỠNG & HỆ SỐ
 // MỘT NGUỒN SỰ THẬT. Cấm rải mấy con số này ra chỗ khác.
@@ -160,6 +163,9 @@ export function phanMotLuot(
   em: EmTrongCa[],
   seed: string,
   haThapUuTien: Set<string> = new Set(),
+  /** Thầy đã bấm "Đổi em khác": câu qid này KHÔNG giao cho những sbd trong danh
+   * sách nữa. Thầy có lý do mà máy không biết (em nghỉ ốm, em vừa lên hôm qua). */
+  khongNhan: Record<string, string[]> = {},
 ): { dong: DongPhanCong[]; conCau: CauTrongCa[] } {
   const conEm = new Map<string, EmTrongCa>()
   for (const e of em) if (!e.vangMat) conEm.set(e.sbd, e)
@@ -171,9 +177,11 @@ export function phanMotLuot(
       conCau.push(c)
       continue
     }
+    const cam = new Set(khongNhan[c.qid] ?? [])
     let tot: { em: EmTrongCa; muc: MucGhep } | null = null
     let totKhoa = ''
     for (const e of conEm.values()) {
+      if (cam.has(e.sbd)) continue
       const muc = mucCua(e, c)
       // Bốc ngẫu nhiên TÁI TẠO ĐƯỢC: chạy lại cùng mã ca ra cùng kết quả, nên
       // thầy tải lại màn không thấy danh sách nhảy lung tung.
@@ -214,7 +222,13 @@ export function phanMotLuot(
  * `soLuotToiDa` chặn trên để một ca 200 câu không sinh ra tám lượt vô nghĩa —
  * hết lượt mà còn câu thì câu đó vào `chuaPhan`, hiện ra chứ không giấu.
  */
-export function phanCauLenBang(cau: CauTrongCa[], em: EmTrongCa[], seed: string, soLuotToiDa = 3): KetQuaPhanCau {
+export function phanCauLenBang(
+  cau: CauTrongCa[],
+  em: EmTrongCa[],
+  seed: string,
+  soLuotToiDa = 3,
+  khongNhan: Record<string, string[]> = {},
+): KetQuaPhanCau {
   const chiDoc = cau.filter(chiDocDapAn)
   const dangChua = xepCau(cau.filter((c) => !chiDocDapAn(c)))
   const coMat = em.filter((e) => !e.vangMat)
@@ -225,7 +239,7 @@ export function phanCauLenBang(cau: CauTrongCa[], em: EmTrongCa[], seed: string,
   for (let i = 1; i <= soLuotToiDa && conLai.length > 0 && coMat.length > 0; i++) {
     const lay = conLai.slice(0, coMat.length)
     conLai = conLai.slice(coMat.length)
-    const { dong, conCau } = phanMotLuot(lay, coMat, `${seed}|luot${i}`, new Set(daLen))
+    const { dong, conCau } = phanMotLuot(lay, coMat, `${seed}|luot${i}`, new Set(daLen), khongNhan)
     if (dong.length === 0) break
     luot.push({ luot: i, dong })
     for (const d of dong) daLen.add(d.sbd)
@@ -263,4 +277,109 @@ export function nhacHieuNhamChung(c: CauTrongCa): string {
   let n = 0
   for (const [k, v] of dem) if (v > n || (v === n && k < pa)) ((pa = k), (n = v))
   return `${n} em cùng chọn ${pa} — hiểu nhầm chung`
+}
+
+// ------------------------------------------------- DỰNG DỮ LIỆU TỪ MỘT CA
+
+/** Ngân hàng CÓ đáp án của ca (mergeKeepAnswers) — chỉ cần ba mảng câu. */
+export interface NganHangCa {
+  phanI: (TeacherMcqQuestion & { canChua?: CanChua })[]
+  phanII: (TeacherTrueFalseQuestion & { canChua?: CanChua })[]
+  phanIII: (TeacherShortAnswerQuestion & { canChua?: CanChua })[]
+  soCau?: SoCauMoiPhan
+}
+
+export interface LuotDaCham {
+  sbd: string
+  hoTen: string
+  /** Lượt chưa nộp / chưa vào thì coi là VẮNG, không ghép. */
+  trangThai: string
+  dapAn: AnswerRecord | null
+  giayCau?: Record<string, number> | null
+}
+
+/** Số chuyên đề yếu nhất lấy ra cho mỗi em — đặc tả 4.4 nói "3 chuyên đề em
+ * yếu nhất". Một nguồn sự thật, cấm viết số 3 ở chỗ khác. */
+export const SO_CHUYEN_DE_YEU = 3
+
+/**
+ * Từ một ca ĐÃ CHẤM dựng ra đầu vào cho `phanCauLenBang`.
+ *
+ * `so` của mỗi câu lấy theo thứ tự trong NGÂN HÀNG CỦA CA, không theo số câu
+ * trên giấy của từng em: mỗi em một thứ tự xáo riêng, đọc số của em này thì em
+ * khác giở nhầm câu.
+ *
+ * `chuyenDeYeu` của em mặc định tính TỪ CHÍNH CA NÀY (chuyên đề em sai nhiều
+ * nhất), không gọi máy chủ. Truyền `hoSoYeu` nếu muốn dùng hồ sơ tích luỹ.
+ */
+export function dungDuLieuTuCa(
+  bank: NganHangCa,
+  maCa: string,
+  luot: LuotDaCham[],
+  hoSoYeu?: Record<string, string[]>,
+  lichSuLenBang?: Record<string, number>,
+): { cau: CauTrongCa[]; em: EmTrongCa[] } {
+  const tomTat = (t: string) =>
+    (t || '')
+      .replace(/\$\\ce\{([^}]*)\}\$/g, '$1')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 90)
+
+  const cauTheoQid = new Map<string, CauTrongCa>()
+  const them = (phan: PhanDe, ds: { id: string; text: string; chuyenDe?: string; canChua?: CanChua }[]) =>
+    ds.forEach((q, i) =>
+      cauTheoQid.set(q.id, {
+        qid: q.id,
+        phan,
+        so: i + 1,
+        chuyenDe: (q.chuyenDe || '').trim(),
+        sao: q.canChua?.sao ?? 0,
+        tomTat: tomTat(q.text),
+        soEmLam: 0,
+        soEmDung: 0,
+        dapAnSai: [],
+      }),
+    )
+  them('I', bank.phanI)
+  them('II', bank.phanII)
+  them('III', bank.phanIII)
+
+  const em: EmTrongCa[] = []
+  for (const l of luot) {
+    // Chỉ em ĐÃ NỘP mới có bài để đối chiếu. Em đang làm dở hoặc chưa vào coi
+    // như vắng — ghép câu cho em không có mặt là gọi tên vào chỗ trống.
+    const daNop = l.trangThai === 'da_nop' || l.trangThai === 'khoa'
+    if (!daNop || !l.dapAn) {
+      em.push({ sbd: l.sbd, hoTen: l.hoTen, vangMat: true, qidSai: [], chuyenDeYeu: [], soLanLenBang: lichSuLenBang?.[l.sbd] ?? 0 })
+      continue
+    }
+    const rows = taoChiTietCau(bank, maCa, l.sbd, l.dapAn, l.giayCau)
+    const qidSai: string[] = []
+    const saiTheoCd = new Map<string, number>()
+    for (const r of rows) {
+      const c = cauTheoQid.get(r.qid)
+      if (c) {
+        c.soEmLam++
+        if (r.dungSai) c.soEmDung++
+        else c.dapAnSai.push(r.dapAnChon || '(bỏ trống)')
+      }
+      if (!r.dungSai) {
+        qidSai.push(r.qid)
+        const cd = (r.chuyenDe || '').trim()
+        if (cd) saiTheoCd.set(cd, (saiTheoCd.get(cd) ?? 0) + 1)
+      }
+    }
+    const yeu =
+      hoSoYeu?.[l.sbd] ??
+      [...saiTheoCd.entries()]
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'vi'))
+        .slice(0, SO_CHUYEN_DE_YEU)
+        .map(([ten]) => ten)
+    em.push({ sbd: l.sbd, hoTen: l.hoTen, qidSai, chuyenDeYeu: yeu, soLanLenBang: lichSuLenBang?.[l.sbd] ?? 0 })
+  }
+
+  // Câu KHÔNG em nào làm tới (kho ca rộng hơn đề mỗi em) bị loại hẳn: đưa lên
+  // bảng một câu cả lớp chưa ai đọc thì không phải là chữa bài.
+  return { cau: [...cauTheoQid.values()].filter((c) => c.soEmLam > 0), em }
 }
