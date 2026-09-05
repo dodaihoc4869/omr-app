@@ -5,7 +5,10 @@ import Toast from './components/Toast'
 import MessagesFab from './components/MessagesFab'
 import { useAppStore } from './store/appStore'
 import { loadClassList } from './lib/classlist-db'
-import { docDuongVao, laLinkAppCu } from './lib/vai-tro'
+import { datMaBiMatPhien, loadKhoaApp, loadTeacherSecret } from './lib/exam-db'
+import { datDangMoKhoa } from './lib/cap-nhat-app'
+import { phaiHoiLai, type BanGhiKhoa } from './lib/khoa-app'
+import { docDuongVao, laLinkAppCu, laManThayQuanLy } from './lib/vai-tro'
 import ClassListScreen from './screens/ClassListScreen'
 import ExamHubScreen from './screens/ExamHubScreen'
 import ExamSetupScreen from './screens/ExamSetupScreen'
@@ -17,6 +20,7 @@ import HocSinhScreen from './screens/HocSinhScreen'
 import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
 import GoiLenBangScreen from './screens/GoiLenBangScreen'
 import PhieuScreen from './screens/PhieuScreen'
+import KhoaAppScreen from './screens/KhoaAppScreen'
 import ChanLoi from './components/ChanLoi'
 
 // APP GIÁO VIÊN. Màn đăng ký, hồ sơ, lịch sử, bài tập và nhắn tin PHÍA HỌC SINH
@@ -50,18 +54,77 @@ function App() {
   // app quản lý. Tính một lần lúc nạp, trước mọi hiệu ứng — máy phụ huynh
   // không được chạm vào IndexedDB, danh sách lớp hay hộp thư của thầy.
   const [laPhieu] = useState(() => docDuongVao(location.search, location.pathname).vai === 'phieu')
+  // MẬT KHẨU MỞ APP (MATKHAUMOAPP.md). CHỈ hỏi ở app quản lý của thầy — vào
+  // thi, báo cáo phụ huynh, link riêng cũ đều không bao giờ bị hỏi.
+  const [canHoi] = useState(() => laManThayQuanLy(location.search, location.pathname))
+  // 'dang_doc' = chưa biết máy này có mật khẩu chưa. KHÔNG dựng app trong lúc
+  // đó: mục 5 đòi màn khoá hiện TRƯỚC khi bất kỳ dữ liệu học sinh nào được vẽ.
+  const [khoa, setKhoa] = useState<'dang_doc' | 'can_dat' | 'can_mo' | 'da_mo'>(() => (canHoi ? 'dang_doc' : 'da_mo'))
+  const [banGhiKhoa, setBanGhiKhoa] = useState<BanGhiKhoa | null>(null)
   const screen = useAppStore((s) => s.screen)
   const setClassList = useAppStore((s) => s.setClassList)
   const setScreen = useAppStore((s) => s.setScreen)
 
-  // Máy em / phụ huynh cầm link cũ thì KHÔNG đọc gì của thầy — không mở
-  // IndexedDB danh sách lớp, không dựng màn nào của app quản lý.
+  // Máy này đã đặt mật khẩu chưa. Đọc một lần lúc nạp.
   useEffect(() => {
-    if (linkCu || laPhieu) return
+    if (!canHoi) return
+    let con = true
+    void (async () => {
+      try {
+        const b = await loadKhoaApp()
+        if (!con) return
+        if (b) {
+          setBanGhiKhoa(b)
+          setKhoa('can_mo')
+          return
+        }
+        // Chưa có mật khẩu. Máy đã có mã bí mật ⇒ mời thầy đặt (mục 4A). Máy
+        // trắng chưa nhập mã bí mật bao giờ ⇒ vào thẳng, vì chưa có gì để khoá.
+        const ma = await loadTeacherSecret()
+        if (!con) return
+        setKhoa(ma ? 'can_dat' : 'da_mo')
+      } catch {
+        // IndexedDB hỏng thì thà cho vào còn hơn khoá cứng app của thầy.
+        if (con) setKhoa('da_mo')
+      }
+    })()
+    return () => {
+      con = false
+    }
+  }, [canHoi])
+
+  // QUAY LẠI SAU KHI ẨN (mục 4D). Nấc mặc định `moi_lan_mo` trả false ở đây,
+  // nghĩa là chuyển sang app khác vài phút rồi quay lại thì KHÔNG hỏi — chỉ
+  // đóng hẳn app mở lại mới hỏi, vì lúc đó bộ nhớ phiên đã mất theo.
+  useEffect(() => {
+    if (khoa !== 'da_mo' || !banGhiKhoa) return
+    let mocAn = 0
+    const doi = () => {
+      if (document.visibilityState === 'hidden') {
+        mocAn = Date.now()
+        return
+      }
+      if (!mocAn) return
+      const daAn = Date.now() - mocAn
+      mocAn = 0
+      if (!phaiHoiLai(banGhiKhoa.hoiLai, daAn)) return
+      datMaBiMatPhien(null)
+      datDangMoKhoa(false)
+      setKhoa('can_mo')
+    }
+    document.addEventListener('visibilitychange', doi)
+    return () => document.removeEventListener('visibilitychange', doi)
+  }, [khoa, banGhiKhoa])
+
+  // Máy em / phụ huynh cầm link cũ thì KHÔNG đọc gì của thầy — không mở
+  // IndexedDB danh sách lớp, không dựng màn nào của app quản lý. Chưa mở khoá
+  // cũng vậy: không đọc danh sách lớp trước khi thầy nhập đúng mật khẩu.
+  useEffect(() => {
+    if (linkCu || laPhieu || khoa !== 'da_mo') return
     loadClassList().then((list) => {
       if (list.length > 0) setClassList(list)
     })
-  }, [linkCu, laPhieu, setClassList])
+  }, [linkCu, laPhieu, khoa, setClassList])
 
   // Link mời làm bài (?examCode=) mở thẳng màn thi. Không có thì vào app thầy.
   useEffect(() => {
@@ -79,6 +142,28 @@ function App() {
     )
   }
   if (linkCu) return <AppDaChuyenScreen />
+
+  // Chưa biết có mật khẩu hay chưa: dựng một màn trống, KHÔNG dựng app. Vài
+  // chục mili giây, nhưng đây là chỗ mục 5 đòi — không được thấy loáng thoáng
+  // danh sách lớp rồi mới bị che.
+  if (khoa === 'dang_doc') return <div className="min-h-screen" style={{ background: 'var(--nen)' }} />
+  if (khoa === 'can_dat' || khoa === 'can_mo') {
+    return (
+      <ChanLoi o="Mở app">
+        <KhoaAppScreen
+          pha={khoa === 'can_dat' ? 'dat' : 'mo'}
+          banGhi={banGhiKhoa}
+          onMoDuoc={(ma) => {
+            datMaBiMatPhien(ma)
+            // Bản mới của app phải chờ tới lần mở sau: tải lại giữa chừng là
+            // mất mã bí mật trong bộ nhớ và thầy bị hỏi lại giữa buổi dạy.
+            datDangMoKhoa(true)
+            setKhoa('da_mo')
+          }}
+        />
+      </ChanLoi>
+    )
+  }
 
   // MÀN LÀM BÀI của học sinh không phải app quản lý: không thanh bên, không
   // thanh đáy, để em tập trung vào bài.

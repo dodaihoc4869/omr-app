@@ -91,3 +91,21 @@ export function docDuongVao(search: string, duongDan = ''): DuongVao {
   }
   return { vai: null, maCa }
 }
+
+/** ĐƯỜNG NÀY CÓ PHẢI APP QUẢN LÝ CỦA THẦY KHÔNG — MATKHAUMOAPP.md mục 2.3.
+ *
+ * Chỉ đường này mới hỏi mật khẩu. Sai chỗ này là cả ca thi đứng hình, nên nó
+ * viết theo lối LOẠI TRỪ và có phép kiểm cho từng đường của học sinh, phụ huynh:
+ *
+ *   `/t/<mã ca>` · `?examCode=…`  → vào thi
+ *   `/p#<mã>`    · `?vai=phieu`   → báo cáo phụ huynh
+ *   `/hs/<token>` · `/ph/<token>` → link riêng cũ
+ *
+ * Còn lại (`/` trần và `/gv`) là app của thầy. */
+export function laManThayQuanLy(search: string, duongDan = ''): boolean {
+  if (laLinkAppCu(search, duongDan)) return false
+  const d = docDuongVao(search, duongDan)
+  if (d.vai === 'phieu') return false
+  if (d.maCa) return false
+  return true
+}

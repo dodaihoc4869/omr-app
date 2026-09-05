@@ -24,6 +24,24 @@ export function datDangLamBai(v: boolean): void {
   dangLamBai = v
 }
 
+// ĐANG MỞ KHOÁ THÌ KHÔNG TỰ TẢI LẠI (MATKHAUMOAPP.md mục 4C và mục 9).
+//
+// Mã bí mật giải ra chỉ sống trong bộ nhớ chương trình; tải lại trang là mất,
+// và thầy bị hỏi mật khẩu giữa lúc đang theo dõi một ca thi. Cất nó ra chỗ khác
+// để sống sót qua lần tải lại thì vi phạm chính điều làm nên tính năng này.
+//
+// Nên bản mới CHỜ tới lần thầy mở app sau. Không mất gì: bản mới vẫn nằm sẵn
+// trong máy, lần mở sau là chạy ngay.
+let dangMoKhoa = false
+
+export function datDangMoKhoa(v: boolean): void {
+  dangMoKhoa = v
+}
+
+export function dangMoKhoaKhong(): boolean {
+  return dangMoKhoa
+}
+
 export function dangLamBaiKhong(): boolean {
   return dangLamBai
 }
@@ -108,7 +126,9 @@ export function batTuHoiBanMoi(
  * `controllerchange` bắn đúng lúc bản mới chiếm quyền. Nghe sự kiện đó rồi
  * tải lại là trang nhận đúng mã mới.
  *
- * BA CHỐT AN TOÀN:
+ * BỐN CHỐT AN TOÀN:
+ *   · Đang mở khoá app thì KHÔNG tải lại — mã bí mật chỉ nằm trong bộ nhớ, tải
+ *     lại là thầy phải nhập mật khẩu giữa buổi dạy (MATKHAUMOAPP mục 4C).
  *   · Đang làm bài thì KHÔNG tải lại — tải lại giữa giờ thi làm em hoảng, và
  *     máy chống gian lận có thể tính là một lần rời màn. Bài không mất
  *     (IndexedDB), nhưng chờ tới lúc em nộp xong cũng không muộn.
@@ -131,6 +151,7 @@ export function batTuTaiLaiKhiDoiBan(
   sw.addEventListener('controllerchange', () => {
     if (laLanDau) return
     if (dangLamBaiKhong()) return
+    if (dangMoKhoaKhong()) return
     try {
       const truoc = Number(kho?.getItem(KHOA_TAI_LAI) || 0)
       const t = now()

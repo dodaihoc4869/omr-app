@@ -5,6 +5,7 @@
 // câu từ (mãCa, sbd), không cần lưu thêm bộ câu đã gán cho từng em).
 import { openDB, type IDBPDatabase } from 'idb'
 import type { PublicExamBank, SoCauMoiPhan, TeacherExamSource } from '../data/examContent'
+import type { BanGhiKhoa } from './khoa-app'
 
 export interface AnswerRecord {
   phanI: Record<string, 'A' | 'B' | 'C' | 'D'> // qid -> lựa chọn (đã quy về chữ cái GỐC, chưa xáo)
@@ -212,6 +213,30 @@ export async function loadScriptUrlHoacMacDinh(): Promise<string> {
   }
 }
 
+// ---------------------------------------------------------------------------
+// MÃ BÍ MẬT (MATKHAUMOAPP.md mục 7)
+//
+// Máy CHƯA đặt mật khẩu: mã bí mật nằm chữ thường ở khoá `teacherSecret`, đúng
+// như trước — không bắt thầy làm gì thêm để app vẫn chạy.
+//
+// Máy ĐÃ đặt mật khẩu: khoá `teacherSecret` bị xoá, chỉ còn bản ghi `khoaApp` đã
+// mã hoá. Mã bí mật giải ra sống ở BIẾN DƯỚI ĐÂY — bộ nhớ chương trình, mất khi
+// đóng app. KHÔNG ghi lại xuống đĩa, không localStorage, không sessionStorage.
+//
+// Nhờ vậy `loadTeacherSecret()` giữ nguyên chữ ký và mười lăm chỗ gọi nó không
+// phải sửa một dòng nào; chưa mở khoá thì nó trả chuỗi rỗng và lệnh gọi máy chủ
+// hỏng vì ĐÚNG LÀ KHÔNG CÓ CHÌA, chứ không phải vì bị màn hình chặn.
+let maBiMatPhien: string | null = null
+
+/** Đặt mã bí mật cho phiên làm việc này (sau khi mở khoá). `null` = quên đi. */
+export function datMaBiMatPhien(ma: string | null): void {
+  maBiMatPhien = ma
+}
+
+export function coMaBiMatPhien(): boolean {
+  return maBiMatPhien !== null && maBiMatPhien !== ''
+}
+
 /** Mã bí mật kho đề (khớp MA_BI_MAT trong Apps Script) — chỉ trên máy thầy. */
 export async function saveTeacherSecret(secret: string): Promise<void> {
   const db = await getDb()
@@ -219,8 +244,40 @@ export async function saveTeacherSecret(secret: string): Promise<void> {
 }
 
 export async function loadTeacherSecret(): Promise<string> {
+  if (maBiMatPhien !== null) return maBiMatPhien
   const db = await getDb()
   return (await db.get(STORE_SETTINGS, 'teacherSecret')) || ''
+}
+
+/** Bản ghi khoá app. Không có = máy này chưa đặt mật khẩu. */
+export async function loadKhoaApp(): Promise<BanGhiKhoa | null> {
+  const db = await getDb()
+  return (await db.get(STORE_SETTINGS, 'khoaApp')) || null
+}
+
+export async function saveKhoaApp(b: BanGhiKhoa): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, b, 'khoaApp')
+}
+
+/** ĐẶT MẬT KHẨU: cất bản ghi đã mã hoá RỒI xoá mã bí mật chữ thường.
+ *
+ * Thứ tự quan trọng — xoá trước mà cất hỏng là thầy mất chìa. Xoá xong mới đưa
+ * mã bí mật vào bộ nhớ phiên để thầy làm việc tiếp không gián đoạn. */
+export async function batKhoaApp(b: BanGhiKhoa, maBiMat: string): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, b, 'khoaApp')
+  await db.delete(STORE_SETTINGS, 'teacherSecret')
+  datMaBiMatPhien(maBiMat)
+}
+
+/** GỠ MẬT KHẨU: mã bí mật quay về dạng chữ thường — đúng tình trạng trước khi
+ * có tính năng này, và màn xác nhận phải nói thẳng như vậy. */
+export async function goKhoaApp(maBiMat: string): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, maBiMat, 'teacherSecret')
+  await db.delete(STORE_SETTINGS, 'khoaApp')
+  datMaBiMatPhien(maBiMat)
 }
 
 /** Câu đã từng in ra PHIẾU BÀI TẬP PDF của một em.
