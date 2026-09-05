@@ -65,7 +65,9 @@ export interface ViPhamRoiMan {
   tongGiay: number
   /** Bài đã bị máy khoá và tự nộp. */
   daKhoa: boolean
-  lyDoKhoa?: 'qua_so_lan' | 'roi_qua_lau' | ''
+  /** BAOMATCATHI thêm bốn lý do mới; báo cáo phải chở được cả sáu, không thì
+   * bài khoá vì dấu vết chụp lại hiện ra như khoá vì rời app. */
+  lyDoKhoa?: LyDoKhoaBai | ''
   /** Ngưỡng thầy đặt cho ca — để phụ huynh biết mốc nào là quá. */
   nguong?: { lan: number; giay: number } | null
   /** Từng lần rời, theo thứ tự. Cắt bớt nếu quá dài (xem MOC_TOI_DA). */
@@ -237,12 +239,15 @@ export function dungCauSai(rows: ChiTietCauRow[], banks: TeacherExamSource[]): C
   return ra
 }
 
+/** Sáu lý do khoá bài — hai của luật rời app, bốn của BAOMATCATHI. */
+export type LyDoKhoaBai = 'qua_so_lan' | 'roi_qua_lau' | 'cua_so_noi' | 'thu_nho_man' | 'thoat_toan_man' | 'dau_vet_chup'
+
 /** Nhật ký thô một lượt thi, đúng những trường cả máy thầy lẫn máy em đều có. */
 export interface NguonViPham {
   soLan: number
   tongGiay: number
   daKhoa: boolean
-  lyDoKhoa?: 'qua_so_lan' | 'roi_qua_lau' | null
+  lyDoKhoa?: LyDoKhoaBai | null
   nguong?: { lan: number; giay: number } | null
   events?: { type: string; at: string }[] | null
 }

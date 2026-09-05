@@ -20,7 +20,9 @@ export function emptyAnswerRecord(): AnswerRecord {
  * JavaScript (không có API nào trên web làm được việc này, kể cả PWA), nên chỉ ghi lại
  * tín hiệu gần nhất có thể đo: số lần & tổng thời gian rời tab/app trong lúc làm bài. */
 export interface IntegrityEvent {
-  type: 'hidden' | 'visible' | 'blur' | 'focus'
+  /** Bốn loại sau là của BAOMATCATHI. `mocRoiMan()` phải bỏ qua chúng, không
+   * được vỡ khi gặp loại mới. */
+  type: 'hidden' | 'visible' | 'blur' | 'focus' | 'co_man' | 'het_co_man' | 'dau_vet_chup' | 'khoa'
   at: string // ISO timestamp
 }
 export interface IntegrityLog {
@@ -28,8 +30,13 @@ export interface IntegrityLog {
   totalHiddenMs: number // tổng thời gian app bị ẩn (cộng dồn)
   events: IntegrityEvent[]
   blocked: boolean // true = bài đang bị khoá (rời màn tới ngưỡng, hoặc một lần rời quá lâu) + đã tự nộp
-  /** Vì sao khoá lần gần nhất (QUANLYCATHI mục 6). */
-  lyDoKhoa?: 'qua_so_lan' | 'roi_qua_lau'
+  /** Vì sao khoá lần gần nhất (QUANLYCATHI mục 6 + BAOMATCATHI mục 3).
+   *
+   * Bốn giá trị sau là tín hiệu MỚI, khoá ngay lần đầu. Hai giá trị đầu giữ
+   * nguyên luật đếm rời app đang chạy tốt — cấm đụng vào. */
+  lyDoKhoa?: 'qua_so_lan' | 'roi_qua_lau' | 'cua_so_noi' | 'thu_nho_man' | 'thoat_toan_man' | 'dau_vet_chup'
+  /** Kênh nào đã báo, để thầy đọc ở Chi tiết ca: "kênh 5 + kênh 8". */
+  kenhBao?: string
   /** leaveCount tại lần thầy mở khoá gần nhất — đếm ngưỡng lại từ mốc này. */
   mocMoKhoa?: number
   /** Số lần thầy đã mở khoá lượt này. */

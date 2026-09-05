@@ -9,6 +9,10 @@
   --z-thanh: 50;
   --z-noi: 80;
   --z-hop: 100;
+  /* Vân tay nằm TRÊN nội dung đề nhưng DƯỚI mọi thanh — nó phải lọt vào ảnh
+     chụp, mà không được che nút bấm. Tấm che đề nằm trên tất cả. */
+  --z-van-tay: 60;
+  --z-man-chan: 900;
 }
 
 /* Vùng cuộn phải chừa chỗ cho thanh dưới + vùng an toàn, nếu không câu cuối
@@ -466,5 +470,46 @@ body {
 @media (min-width: 880px) {
   body:has(.ben-trai) .lop-xem-phieu {
     left: var(--rong-ben-trai, 232px);
+  }
+}
+
+
+/* ==========================================================================
+   LÁ CHẮN ĐỀ — lớp CSS thuần (BAOMATCATHI.md mục 4.2).
+
+   Bật một lần lúc vào toàn màn hình rồi TỰ CHẠY, không phụ thuộc JavaScript về
+   sau: JS có treo thì đề vẫn được che.
+
+   Điều kiện `:not(:fullscreen)` là chỗ quan trọng nhất — trình duyệt KHÔNG hiểu
+   `:fullscreen` thì cả khối chọn hỏng và lá chắn KHÔNG BẬT. Thà không có lá
+   chắn còn hơn ẩn đề vĩnh viễn của một em không làm gì sai.
+   ========================================================================== */
+html[data-la-chan]:not(:fullscreen) .thi-noi-dung {
+  visibility: hidden;
+}
+
+/* CHẶN SAO CHÉP ĐỀ (mục 6D). `user-select` đã có sẵn ở màn thi; ở đây chặn nốt
+   đường kéo-thả ảnh. */
+.thi-noi-dung img,
+.thi-noi-dung svg {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* IN RA GIẤY: đề không được in. */
+@media print {
+  body:has(.thi-noi-dung) * {
+    visibility: hidden !important;
+  }
+  body:has(.thi-noi-dung)::after {
+    content: 'Đề thi không được in';
+    visibility: visible !important;
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--sans);
+    font-size: 18px;
   }
 }

@@ -8,6 +8,25 @@ import PhieuScreen from './PhieuScreen'
 import { gioMayChu, gioNgan } from '../lib/gio-may-chu'
 import { layIdThietBi } from '../lib/thiet-bi'
 import { chuanHoaNguong, khoaViRoiLau, loiCanhBao, mucKhiRoiMan, soLanTinhTu, type NguongGianLan } from '../lib/chong-gian-lan'
+import { MS_AN_HAN_VAO_BAI, MS_TRUNG_KHOP, MS_VE_SOM, MS_XAC_NHAN_CO_MAN, MS_XAC_NHAN_CUA_SO_NOI, type PhieuKenh } from '../lib/do-dau-vet'
+import {
+  LOI_KHOA,
+  MUC_NGAT_MAC_DINH,
+  NGUONG_XUNG_CHOT,
+  MS_LECH_DONG_HO_CHOT,
+  MS_RAF_NGHI_CHOT,
+  TI_LE_CO_MAN_CHOT,
+  chuNhomPhieu,
+  coKhoa,
+  nhomDuKhoa,
+  xetCoMan,
+  type LyDoKhoaMoi,
+  type TrangThaiCoMan,
+} from '../lib/man-thi-sach'
+import { thuTinHieu } from '../lib/thu-tin-hieu'
+import { TEN_LY_DO_KHOA } from '../lib/man-thi-sach'
+import ManChan from '../components/ManChan'
+import VanTay from '../components/VanTay'
 import TheCau from '../components/TheCau'
 import MaCaInput from '../components/MaCaInput'
 import LogoDDH from '../components/LogoDDH'
@@ -164,6 +183,8 @@ export default function ExamTakeScreen() {
   const [remaining, setRemaining] = useState<number | null>(null)
   const retryTimer = useRef<ReturnType<typeof setInterval> | null>(null)
   const hiddenSinceRef = useRef<number | null>(null)
+  // TÍN HIỆU MỚI (BAOMATCATHI): lý do đang che đề; null = không che.
+  const [lyDoChe, setLyDoChe] = useState<string | null>(null)
   const leaveCountRef = useRef(0)
   // TOÀN MÀN HÌNH: bắt buộc trước khi vào thi (đã thêm vào màn hình chính =
   // standalone, hoặc bật Fullscreen API). Thoát toàn màn hình giữa chừng =
@@ -766,6 +787,175 @@ export default function ExamTakeScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
 
+  // ==========================================================================
+  // TÍN HIỆU MỚI — BAOMATCATHI.md mục 3. MỘT LẦN LÀ KHOÁ.
+  // ==========================================================================
+  // Effect RIÊNG, không đụng một dòng nào của luật đếm rời app phía trên.
+  //
+  // Bốn tín hiệu: thoát toàn màn hình · thu nhỏ hoặc chia đôi màn · cửa sổ nổi
+  // đè lên · dấu vết chụp màn hình. Ba tấm đệm chống oan vẫn còn nguyên: ân hạn
+  // 3 giây đầu, nhịp chờ 900 ms trước khi kết luận cửa sổ nổi, và màn khoá bảo
+  // em giơ tay gọi thầy (thầy mở khoá một chạm ở Chi tiết ca).
+  useEffect(() => {
+    if (phase !== 'exam') return
+    // Mức ngặt của ca. Ca mở trước bản này chưa có cột MucNgat trên máy chủ ⇒
+    // rơi về Bình thường, đúng hành vi cũ, không đổi điểm ca đã gửi phụ huynh.
+    const muc = MUC_NGAT_MAC_DINH
+    const vaoLuc = performance.now()
+    const phieu: PhieuKenh[] = []
+    let coMan: TrangThaiCoMan = { moc: window.innerWidth * window.innerHeight, nhoTu: null }
+    let raTu: number | null = null
+    let hiddenLuc: number | null = null
+    let soLanNoi = 0
+    let daKhoa = false
+    let henNoi: number | undefined
+
+    const conAnHan = () => performance.now() - vaoLuc < MS_AN_HAN_VAO_BAI
+
+    /** Che đề NGAY, không đợi phân loại. Việc che ở nhịp 0; ba nhịp sau chỉ
+     * hoãn việc PHÂN LOẠI. */
+    const che = (ly: string) => setLyDoChe(ly)
+    const boChe = () => setLyDoChe(null)
+
+    const khoaVi = (lyDo: LyDoKhoaMoi, kenhBao?: string) => {
+      if (daKhoa) return
+      const cur = attemptRef.current
+      if (!cur || cur.submitted) return
+      daKhoa = true
+      che(LOI_KHOA[lyDo])
+      const events = [...cur.integrity.events, { type: 'khoa' as const, at: new Date().toISOString() }].slice(-200)
+      const next: ExamAttempt = { ...cur, integrity: { ...cur.integrity, events, blocked: true, lyDoKhoa: lyDo, kenhBao } }
+      attemptRef.current = next
+      setAttempt(next)
+      saveAttempt(next)
+      pushStatusNow(next, false)
+      baoThayGianLan(next)
+      void doSubmit(next)
+    }
+
+    /** Một phiếu vừa tới: cất vào cửa sổ 300 ms rồi xét đủ HAI HỌ chưa.
+     * Hai kênh cùng đo một hiện tượng chỉ tính một phiếu — xem đầu
+     * `man-thi-sach.ts`, đây là chỗ chống khoá oan khi em cuộn nhanh. */
+    const xetPhieu = (p: PhieuKenh) => {
+      phieu.push(p)
+      while (phieu.length && phieu[0].luc < p.luc - MS_TRUNG_KHOP * 2) phieu.shift()
+      if (conAnHan()) return
+      const nhom = nhomDuKhoa(phieu)
+      const cuoi = nhom[nhom.length - 1]
+      if (cuoi && coKhoa(muc, 'dau_vet_chup')) khoaVi('dau_vet_chup', chuNhomPhieu(cuoi))
+    }
+
+    const go = thuTinHieu({
+      onPhieu: (p, bc) => {
+        if (daKhoa) return
+
+        // --- KÊNH 3: thoát toàn màn hình. Số đo trực tiếp, khoá một mình.
+        if (p.kenh === 'toan_man') {
+          if (document.fullscreenElement) return boChe()
+          che(LOI_KHOA.thoat_toan_man)
+          if (!conAnHan() && coKhoa(muc, 'thoat_toan_man')) khoaVi('thoat_toan_man', 'kênh 3')
+          return
+        }
+
+        // --- KÊNH 4: thu nhỏ / chia đôi màn. Bỏ qua tuyệt đối khi đang gõ ô
+        // nhập — bàn phím ảo lúc làm Phần III không bao giờ được gây khoá.
+        if (p.kenh === 'kich_thuoc') {
+          const dangGoO = document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLTextAreaElement
+          const kq = xetCoMan(coMan, { rong: bc.rong, cao: bc.cao, dangGoO, bayGio: p.luc, tiLe: TI_LE_CO_MAN_CHOT, msXacNhan: MS_XAC_NHAN_CO_MAN })
+          coMan = kq.tt
+          if (kq.khoa && !conAnHan() && coKhoa(muc, 'thu_nho_man')) khoaVi('thu_nho_man', 'kênh 4')
+          return
+        }
+
+        // --- KÊNH 7: phím chụp trên máy tính. Một mình đủ để khoá.
+        if (p.kenh === 'phim_chup') {
+          if (!conAnHan() && coKhoa(muc, 'dau_vet_chup')) khoaVi('dau_vet_chup', 'kênh 7')
+          return
+        }
+
+        // --- KÊNH 1 và 2: ra khỏi màn. Che ngay, phân loại sau (mục 4.1).
+        if (p.kenh === 'an_trang' || p.kenh === 'tieu_diem') {
+          const veLai = (p.kenh === 'an_trang' && bc.hienTrang) || (p.kenh === 'tieu_diem' && bc.coTieuDiem)
+          if (veLai) {
+            if (raTu !== null && p.luc - raTu < MS_VE_SOM) xetPhieu(p) // ra rồi về ngay = một dấu vết chụp
+            raTu = null
+            hiddenLuc = null
+            if (henNoi) window.clearTimeout(henNoi)
+            boChe()
+            return
+          }
+          che('Bài thi tạm ẩn khi màn hình bị che. Quay lại để làm tiếp.')
+          if (p.kenh === 'an_trang') hiddenLuc = p.luc
+          if (raTu === null) {
+            raTu = p.luc
+            // Nhịp 900 ms: chờ `hidden` báo trễ của iOS. Bỏ nhịp này là mọi
+            // cuộc gọi đến thành cửa sổ nổi → khoá ngay.
+            if (henNoi) window.clearTimeout(henNoi)
+            henNoi = window.setTimeout(() => {
+              if (daKhoa || raTu === null) return
+              if (hiddenLuc !== null) return // có hidden ⇒ rời app ⇒ luật cũ lo
+              soLanNoi += 1
+              if (!conAnHan() && coKhoa(muc, 'cua_so_noi', soLanNoi)) khoaVi('cua_so_noi', 'kênh 2')
+            }, MS_XAC_NHAN_CUA_SO_NOI)
+          }
+          return
+        }
+
+        // --- KÊNH 5, 6, 8: dấu vết chụp, chỉ góp phiếu. Ngưỡng lọc ở đây, vì
+        // bộ thu dùng ngưỡng QUAN SÁT rộng hơn để trang /do nhìn thấy nhát yếu.
+        if (p.kenh === 'nhip_ve') {
+          const gap = Number(/(\d+)/.exec(p.chiTiet)?.[1] ?? 0)
+          if (gap >= MS_RAF_NGHI_CHOT) xetPhieu(p)
+          return
+        }
+        if (p.kenh === 'lech_dong_ho') {
+          const lech = Math.abs(Number(/(-?\d+)/.exec(p.chiTiet)?.[1] ?? 0))
+          if (lech >= MS_LECH_DONG_HO_CHOT) xetPhieu(p)
+          return
+        }
+        if (p.kenh === 'xung_chuyen_dong') {
+          const xoan = Number(/([\d.]+)/.exec(p.chiTiet)?.[1] ?? 0)
+          if (xoan >= NGUONG_XUNG_CHOT.xoan) xetPhieu(p)
+        }
+      },
+    })
+
+    return () => {
+      go()
+      if (henNoi) window.clearTimeout(henNoi)
+      setLyDoChe(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase])
+
+  // LÁ CHẮN CSS — lớp che thứ hai, tự chạy không cần JavaScript. Chỉ bật khi
+  // ĐÃ THẬT SỰ vào toàn màn hình: máy chạy PWA đứng riêng (standalone) không
+  // khớp `:fullscreen`, bật ở đó là ẩn đề vĩnh viễn của một em không làm gì.
+  useEffect(() => {
+    if (phase !== 'exam') return
+    const dong = () => {
+      if (document.fullscreenElement) document.documentElement.setAttribute('data-la-chan', '1')
+      else document.documentElement.removeAttribute('data-la-chan')
+    }
+    dong()
+    document.addEventListener('fullscreenchange', dong)
+    return () => {
+      document.removeEventListener('fullscreenchange', dong)
+      document.documentElement.removeAttribute('data-la-chan')
+    }
+  }, [phase])
+
+  // CHẶN SAO CHÉP ĐỀ (mục 6D). Không chặn được ảnh chụp, nhưng chặn được đường
+  // chép chữ — đường rẻ nhất để tuồn nguyên đề ra ngoài.
+  useEffect(() => {
+    if (phase !== 'exam') return
+    const chan = (e: Event) => e.preventDefault()
+    for (const t of ['contextmenu', 'copy', 'cut', 'dragstart']) document.addEventListener(t, chan)
+    return () => {
+      for (const t of ['contextmenu', 'copy', 'cut', 'dragstart']) document.removeEventListener(t, chan)
+    }
+  }, [phase])
+
   // BÁO THẦY khi bài bị khoá — KHÔNG gửi thẳng phụ huynh (BA-APP.md mục 4D):
   // sự kiện có thể là một cuộc gọi đến, tin nhắn "cháu nhà anh chị gian lận"
   // gửi tự động thì không rút lại được. Tin này vào hộp thư của THẦY; thầy đọc,
@@ -774,10 +964,11 @@ export default function ExamTakeScreen() {
     const url = scriptUrlRef.current.trim()
     if (!url) return
     const luc = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
-    const lyDo =
-      a.integrity.lyDoKhoa === 'roi_qua_lau'
-        ? `rời khỏi màn hình làm bài quá ${chuanHoaNguong(a.nguong).giay} giây`
-        : `rời khỏi màn hình làm bài ${soLanTinhTu(a.integrity.leaveCount, a.integrity.mocMoKhoa ?? 0)} lần (đã được cảnh báo trước đó)`
+    const lyDo = laLyDoMoi(a.integrity.lyDoKhoa)
+      ? `${TEN_LY_DO_KHOA[a.integrity.lyDoKhoa as LyDoKhoaMoi]}${a.integrity.kenhBao ? ` (${a.integrity.kenhBao})` : ''}`
+      : a.integrity.lyDoKhoa === 'roi_qua_lau'
+      ? `rời khỏi màn hình làm bài quá ${chuanHoaNguong(a.nguong).giay} giây`
+      : `rời khỏi màn hình làm bài ${soLanTinhTu(a.integrity.leaveCount, a.integrity.mocMoKhoa ?? 0)} lần (đã được cảnh báo trước đó)`
     sendStudentMessage(
       url,
       a.sbd,
@@ -1213,7 +1404,12 @@ export default function ExamTakeScreen() {
                   BÀI THI ĐÃ KHOÁ
                 </div>
                 <div style={{ fontSize: 'var(--cx-2)', lineHeight: 1.7 }}>
-                  {attempt.integrity.lyDoKhoa === 'roi_qua_lau' ? (
+                  {/* Nêu ĐÚNG lý do. Bốn lý do mới của BAOMATCATHI nói bằng câu
+                      dữ kiện trần — máy đo được dấu vết, không đo được ý định,
+                      nên không có chữ nào kết luận em gian lận. */}
+                  {laLyDoMoi(attempt.integrity.lyDoKhoa) ? (
+                    <>{LOI_KHOA[attempt.integrity.lyDoKhoa as LyDoKhoaMoi]}</>
+                  ) : attempt.integrity.lyDoKhoa === 'roi_qua_lau' ? (
                     <>
                       Em đã <b>rời khỏi màn hình làm bài quá {chuanHoaNguong(attempt.nguong).giay} giây</b>.
                     </>
@@ -1222,7 +1418,7 @@ export default function ExamTakeScreen() {
                       Em đã <b>rời khỏi màn hình làm bài {soLanTinhTu(attempt.integrity.leaveCount, attempt.integrity.mocMoKhoa ?? 0)} lần</b> dù đã được cảnh báo.
                     </>
                   )}{' '}
-                  Phần đã làm được <b>nộp và khoá</b>. Hệ thống đã báo cho thầy và phụ huynh. <b>Em báo thầy</b> — thầy mở khoá thì mở lại link này trên đúng máy này để làm tiếp.
+                  Phần đã làm được <b>nộp và khoá</b>. Hệ thống đã báo cho thầy. <b>Em giơ tay gọi Thầy</b> — thầy mở khoá thì mở lại link này trên đúng máy này để làm tiếp.
                 </div>
                 {attempt?.pendingSubmit && <Nhan tone="cam">Đang gửi lên hệ thống… đừng tắt trình duyệt</Nhan>}
               </div>
@@ -1524,7 +1720,11 @@ export default function ExamTakeScreen() {
           trái là LƯỚI SỐ CÂU — thứ em thật sự cần: nhìn ra ngay còn câu nào
           chưa làm, bấm là nhảy tới. Màn hẹp thì lưới này ẩn, vẫn mở bằng nút
           ô vuông trên thanh trên như cũ. */}
-      <div className="thi-hai-cot">
+      {/* VÂN TAY — ảnh chụp luôn chứa đủ bốn góc, nên in danh tính em lên chính
+          khung hình. Ảnh trôi ra ngoài thì truy được ngay em nào. */}
+      <VanTay sbd={attempt.sbd} hoTen={hoTen.trim() || `SBD ${attempt.sbd}`} maCa={attempt.maCa} />
+
+      <div className="thi-hai-cot thi-noi-dung">
         <aside className="thi-luoi" aria-label="Danh sách câu">
           <div className="thi-luoi-dinh">
             <div className="font-bold" style={{ fontSize: 'var(--cx-2)', marginBottom: 'var(--k3)' }}>
@@ -1674,6 +1874,10 @@ export default function ExamTakeScreen() {
       )}
 
       {zoomSrc && <ZoomOverlay src={zoomSrc} onClose={() => setZoomSrc(null)} />}
+
+      {/* TẤM CHE — lớp React, dựng ngay trong hàm xử lý sự kiện, trước khung
+          hình kế tiếp. Không chứa nội dung câu hỏi nào. */}
+      {lyDoChe && <ManChan lyDo={lyDoChe} onQuayLai={() => setLyDoChe(null)} />}
     </Trang>
   )
 }
@@ -1689,6 +1893,11 @@ function Trang({ children, className = '' }: { children: React.ReactNode; classN
       {children}
     </div>
   )
+}
+
+/** Bốn lý do khoá của BAOMATCATHI — tách khỏi hai lý do rời app cũ. */
+function laLyDoMoi(v: string | undefined): boolean {
+  return v === 'cua_so_noi' || v === 'thu_nho_man' || v === 'thoat_toan_man' || v === 'dau_vet_chup'
 }
 
 function HopThoai({ children }: { children: React.ReactNode }) {

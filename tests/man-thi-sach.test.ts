@@ -1,0 +1,220 @@
+// MÀN THI SẠCH — luật khoá theo tín hiệu mới (BAOMATCATHI.md mục 3, 4.1, 4.3).
+//
+// Chỗ đáng kiểm nhất không phải "có bắt được chụp màn hình không" mà là "có
+// khoá oan em không làm gì không". Luật một-lần-là-khoá không có ân hạn, nên
+// mỗi cái sai ở đây là một em bị dừng bài giữa giờ.
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { describe, expect, it } from 'vitest'
+import { mocRoiMan } from '../src/lib/chong-gian-lan'
+import { MS_TRUNG_KHOP, type PhieuKenh } from '../src/lib/do-dau-vet'
+import {
+  HO_CUA_KENH,
+  LOI_KHOA,
+  MS_LECH_DONG_HO_CHOT,
+  MS_RAF_NGHI_CHOT,
+  MUC_NGAT_CA_CU,
+  NGUONG_XUNG_CHOT,
+  TEN_LY_DO_KHOA,
+  TI_LE_CO_MAN_CHOT,
+  chuNhomPhieu,
+  chuanHoaMucNgat,
+  coKhoa,
+  nhomDuKhoa,
+  soHoKhacNhau,
+  xetCoMan,
+  type TrangThaiCoMan,
+} from '../src/lib/man-thi-sach'
+
+const p = (kenh: PhieuKenh['kenh'], luc: number): PhieuKenh => ({ kenh, luc, chiTiet: '' })
+
+describe('HỌ KÊNH — chỗ chống khoá oan', () => {
+  it('kênh 5 và kênh 6 cùng một họ: cuộn nhanh làm cả hai cùng báo cũng KHÔNG khoá', () => {
+    // Luồng chính nghẽn thì nhịp vẽ và lệch đồng hồ luôn báo cùng nhau. Đếm
+    // theo kênh thì đủ "2 kênh" và khoá oan; đếm theo họ thì chỉ một phiếu.
+    expect(soHoKhacNhau([p('nhip_ve', 1000), p('lech_dong_ho', 1050)])).toBe(1)
+    expect(nhomDuKhoa([p('nhip_ve', 1000), p('lech_dong_ho', 1050)])).toHaveLength(0)
+  })
+
+  it('kênh 1 và kênh 2 cùng một họ: chuyển app bắn cả hai cũng KHÔNG thành dấu vết chụp', () => {
+    expect(soHoKhacNhau([p('an_trang', 1000), p('tieu_diem', 1010)])).toBe(1)
+    expect(nhomDuKhoa([p('an_trang', 1000), p('tieu_diem', 1010)])).toHaveLength(0)
+  })
+
+  it('bóp nút + lớp phủ + luồng chính nghẽn = BA họ độc lập → khoá', () => {
+    const nhom = nhomDuKhoa([p('xung_chuyen_dong', 1000), p('an_trang', 1080), p('nhip_ve', 1200)])
+    expect(nhom).toHaveLength(1)
+    expect(soHoKhacNhau(nhom[0])).toBe(3)
+  })
+
+  it('hai họ cách nhau quá 300 ms → không khoá', () => {
+    expect(nhomDuKhoa([p('xung_chuyen_dong', 1000), p('nhip_ve', 1400)])).toHaveLength(0)
+  })
+
+  it('mỗi kênh thuộc đúng một họ, không sót kênh nào', () => {
+    expect(Object.keys(HO_CUA_KENH)).toHaveLength(8)
+    expect(HO_CUA_KENH.nhip_ve).toBe(HO_CUA_KENH.lech_dong_ho)
+    expect(HO_CUA_KENH.an_trang).toBe(HO_CUA_KENH.tieu_diem)
+    expect(HO_CUA_KENH.xung_chuyen_dong).toBe('vat_ly')
+  })
+
+  it('câu ghi nhật ký nói rõ kênh nào đã báo', () => {
+    expect(chuNhomPhieu([p('nhip_ve', 1), p('xung_chuyen_dong', 2)])).toBe('kênh 5 (nhịp vẽ khung) + kênh 8 (xung chuyển động)')
+  })
+
+  it('cửa sổ gộp vẫn đúng 300 ms', () => {
+    expect(MS_TRUNG_KHOP).toBe(300)
+  })
+})
+
+describe('đo kích thước — bốn chỗ dễ khoá oan nhất', () => {
+  const nen = (rong: number, cao: number): TrangThaiCoMan => ({ moc: rong * cao, nhoTu: null })
+  const d = (rong: number, cao: number, bayGio: number, dangGoO = false) => ({ rong, cao, dangGoO, bayGio, tiLe: TI_LE_CO_MAN_CHOT, msXacNhan: 600 })
+
+  it('BÀN PHÍM ẢO lúc gõ Phần III → không bao giờ khoá', () => {
+    const kq = xetCoMan(nen(390, 844), d(390, 420, 5000, true))
+    expect(kq.khoa).toBe(false)
+  })
+
+  it('XOAY NGANG máy → không khoá, vì so diện tích chứ không so chiều', () => {
+    const kq = xetCoMan(nen(390, 844), d(844, 390, 5000))
+    expect(kq.khoa).toBe(false)
+    expect(kq.tiLeHienTai).toBe(1)
+  })
+
+  it('chia đôi màn hình giữ 600 ms → KHOÁ', () => {
+    let tt = nen(390, 844)
+    let kq = xetCoMan(tt, d(390, 400, 1000))
+    expect(kq.khoa).toBe(false)
+    tt = kq.tt
+    kq = xetCoMan(tt, d(390, 400, 1600))
+    expect(kq.khoa).toBe(true)
+  })
+
+  it('thu nhỏ rồi trả lại trong 300 ms → KHÔNG khoá', () => {
+    let tt = nen(390, 844)
+    tt = xetCoMan(tt, d(390, 400, 1000)).tt
+    const kq = xetCoMan(tt, d(390, 844, 1300))
+    expect(kq.khoa).toBe(false)
+    expect(kq.tt.nhoTu).toBeNull()
+  })
+
+  it('mốc TỰ NÂNG khi cửa sổ to hơn, KHÔNG BAO GIỜ hạ', () => {
+    const tt = xetCoMan(nen(390, 844), d(390, 900, 1000)).tt
+    expect(tt.moc).toBe(390 * 900)
+    // sau đó nhỏ lại về cỡ ban đầu vẫn tính theo mốc mới
+    const sau = xetCoMan(tt, d(390, 844, 2000))
+    expect(sau.tt.moc).toBe(390 * 900)
+    expect(sau.khoa).toBe(false)
+  })
+})
+
+describe('ba mức ngặt', () => {
+  it('Bình thường → mọi tín hiệu mới KHÔNG khoá, giống hệt bản đang chạy', () => {
+    for (const ly of ['cua_so_noi', 'thu_nho_man', 'thoat_toan_man', 'dau_vet_chup'] as const) {
+      expect(coKhoa('binh_thuong', ly)).toBe(false)
+    }
+  })
+
+  it('Ngặt → cửa sổ nổi lần đầu chỉ cảnh báo, lần hai mới khoá', () => {
+    expect(coKhoa('ngat', 'cua_so_noi', 1)).toBe(false)
+    expect(coKhoa('ngat', 'cua_so_noi', 2)).toBe(true)
+    expect(coKhoa('ngat', 'dau_vet_chup', 1)).toBe(true)
+  })
+
+  it('Rất ngặt → khoá ngay lần đầu cả bốn tín hiệu', () => {
+    for (const ly of ['cua_so_noi', 'thu_nho_man', 'thoat_toan_man', 'dau_vet_chup'] as const) {
+      expect(coKhoa('rat_ngat', ly, 1)).toBe(true)
+    }
+  })
+
+  it('ca mở trước bản này (không có cột MucNgat) rơi về Bình thường', () => {
+    expect(chuanHoaMucNgat(undefined)).toBe(MUC_NGAT_CA_CU)
+    expect(chuanHoaMucNgat('')).toBe('binh_thuong')
+    expect(chuanHoaMucNgat('rat_ngat')).toBe('rat_ngat')
+  })
+})
+
+describe('lời lẽ máy sinh ra', () => {
+  it('không câu nào kết luận gian lận', () => {
+    for (const v of [...Object.values(LOI_KHOA), ...Object.values(TEN_LY_DO_KHOA)]) {
+      expect(v).not.toMatch(/gian lận|quay cóp|vi phạm/i)
+    }
+  })
+
+  it('mỗi lý do khoá đều bảo em giơ tay gọi Thầy — khoá là dừng bài chờ thầy, không phải mất bài', () => {
+    for (const v of Object.values(LOI_KHOA)) expect(v).toContain('giơ tay gọi Thầy')
+  })
+})
+
+describe('ngưỡng chốt — nhạy nhất mà vẫn trên nhiễu', () => {
+  it('nhịp vẽ 250 ms ≈ 15 khung ở 60 fps, cao hơn hẳn nhiễu cuộn', () => {
+    expect(MS_RAF_NGHI_CHOT).toBe(250)
+    expect(MS_RAF_NGHI_CHOT / (1000 / 60)).toBeGreaterThan(10)
+  })
+
+  it('lệch đồng hồ 200 ms, cao gấp hàng chục lần jitter thường thấy', () => {
+    expect(MS_LECH_DONG_HO_CHOT).toBe(200)
+  })
+
+  it('xung bóp nút giữ đúng khoảng 40–200 ms của đặc tả, z không được trội', () => {
+    expect(NGUONG_XUNG_CHOT.msMin).toBe(40)
+    expect(NGUONG_XUNG_CHOT.msMax).toBe(200)
+    expect(NGUONG_XUNG_CHOT.tiLeZToiDa).toBeLessThan(1)
+  })
+})
+
+describe('không đụng luật rời app đang chạy tốt', () => {
+  it('mocRoiMan bỏ qua bốn loại sự kiện mới, cho kết quả y như khi không có chúng', () => {
+    const cu = [
+      { type: 'hidden', at: '2026-09-05T01:00:00.000Z' },
+      { type: 'visible', at: '2026-09-05T01:00:05.000Z' },
+    ]
+    const lanMoi = [
+      { type: 'hidden', at: '2026-09-05T01:00:00.000Z' },
+      { type: 'co_man', at: '2026-09-05T01:00:01.000Z' },
+      { type: 'dau_vet_chup', at: '2026-09-05T01:00:02.000Z' },
+      { type: 'visible', at: '2026-09-05T01:00:05.000Z' },
+      { type: 'khoa', at: '2026-09-05T01:00:06.000Z' },
+    ]
+    expect(mocRoiMan(lanMoi)).toEqual(mocRoiMan(cu))
+  })
+})
+
+describe('màn làm bài nối đúng dây', () => {
+  it('ba tấm đệm chống oan còn nguyên trong mã nguồn', async () => {
+    const ma = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default
+    // 1. ân hạn 3 giây đầu
+    expect(ma).toContain('conAnHan()')
+    expect(ma).toContain('MS_AN_HAN_VAO_BAI')
+    // 2. nhịp chờ 900 ms trước khi kết luận cửa sổ nổi
+    expect(ma).toContain('MS_XAC_NHAN_CUA_SO_NOI')
+    expect(ma).toContain('if (hiddenLuc !== null) return')
+    // 3. màn khoá bảo em giơ tay gọi Thầy
+    expect(ma).toContain('Em giơ tay gọi Thầy')
+  })
+
+  it('bàn phím ảo được loại trừ ngay tại chỗ đo kích thước', async () => {
+    const ma = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default
+    expect(ma).toContain('HTMLInputElement || document.activeElement instanceof HTMLTextAreaElement')
+  })
+
+  it('lá chắn CSS chỉ bật khi ĐÃ thật sự vào toàn màn hình', async () => {
+    const ma = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default
+    expect(ma).toContain("if (document.fullscreenElement) document.documentElement.setAttribute('data-la-chan'")
+    const css = readFileSync(resolve(process.cwd(), 'src/index.css'), 'utf8')
+    expect(css).toContain('html[data-la-chan]:not(:fullscreen) .thi-noi-dung')
+  })
+
+  it('chặn sao chép đề: contextmenu, copy, cut, dragstart và chặn in', async () => {
+    const ma = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default
+    expect(ma).toContain("'contextmenu', 'copy', 'cut', 'dragstart'")
+    const css = readFileSync(resolve(process.cwd(), 'src/index.css'), 'utf8')
+    expect(css).toContain('Đề thi không được in')
+  })
+
+  it('nội dung đề nằm trong .thi-noi-dung để lá chắn CSS che được', async () => {
+    const ma = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default
+    expect(ma).toContain('thi-hai-cot thi-noi-dung')
+  })
+})
