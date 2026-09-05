@@ -311,7 +311,21 @@ function findRowByKey_(sh, keyCol, keyVal) {
 
 /** Sheet tạo từ bản cũ thiếu cột mới → ghi bổ sung tiêu đề các cột còn thiếu
  * (dữ liệu cũ giữ nguyên, ô cột mới để trống = mặc định). */
+// Đã kiểm tiêu đề của sheet nào trong request này — xem ghi chú dưới.
+const _daKiemTieuDe = {}
+
+/** Bổ sung cột tiêu đề còn thiếu (dùng khi nâng cấp thêm cột mới).
+ *
+ * CHỈ CHẠY MỘT LẦN cho mỗi sheet trong mỗi request. Bản cũ chạy lại mỗi lần gọi
+ * `sheetCa_()` / `sheetLuot_()`, mà một request gọi chúng nhiều lần — mỗi lần
+ * tốn hai lệnh gọi dịch vụ (`getLastColumn` + `getValues`) chỉ để xác nhận một
+ * việc không đổi trong suốt request.
+ *
+ * Vẫn chạy đủ ở lần đầu nên cột mới vẫn được thêm như trước. */
 function boSungTieuDe_(sh, headers) {
+  const ten = sh.getName ? sh.getName() : String(headers[0])
+  if (_daKiemTieuDe[ten]) return
+  _daKiemTieuDe[ten] = true
   const hienCo = sh.getLastColumn()
   const cu = hienCo > 0 ? sh.getRange(1, 1, 1, hienCo).getValues()[0] : []
   for (let i = 0; i < headers.length; i++) {
@@ -473,18 +487,25 @@ function quyetDinhVaoThi_(ca, luot, idThietBi, nowMs, hocSinh) {
     const hetHan = ca.hetHanVao ? msCua_(ca.hetHanVao) : NaN
     if (isFinite(hetHan) && nowMs > hetHan) return { ok: false, lyDo: 'het_han_vao', hetHanVao: ca.hetHanVao }
   }
-  // CỔNG DANH SÁCH HỌC SINH — chặn trước mọi phạm vi ca. Phải khớp đủ ba: số
-  // báo danh, họ tên, năm sinh. hocSinh.trongDanhSach do vaoThi tra sẵn
-  // (null = chưa nạp danh sách bao giờ → mở cổng, để trung tâm không đứng hình
-  // lúc thầy chưa kịp nạp file).
-  // KHÔNG nói rõ trường nào sai: nói ra là cho phép dò tên từ số báo danh.
-  if (hocSinh && hocSinh.trongDanhSach === false) return { ok: false, lyDo: 'sai_ho_so' }
-
   // PHẠM VI GỬI CA (QUANLYCATHI mục 4) — máy chủ kiểm tra, không chỉ ẩn giao diện.
-  // khoi: DanhSachMoi = năm sinh; em phải có hồ sơ (sheet HocSinh) đúng năm sinh.
-  // chon: DanhSachMoi = JSON mảng SBD.
-  // sbd:  không tích ai; chỉ cần SBD có mặt trong DanhSachLop (thầy chốt 05/09).
+  // tu_do: AI CÓ MÃ CA ĐỀU VÀO ĐƯỢC.
+  // khoi:  DanhSachMoi = năm sinh; em phải có hồ sơ đúng năm sinh.
+  // chon:  DanhSachMoi = JSON mảng SBD thầy đã tích.
+  // sbd:   không tích ai; chỉ cần SBD có mặt trong DanhSachLop.
   const pv = ca.phamVi || 'tu_do'
+
+  // CỔNG DANH SÁCH HỌC SINH — phải khớp đủ ba: số báo danh, họ tên, năm sinh.
+  //
+  // SỬA 05/09 (thầy báo): cổng này KHÔNG áp dụng cho ca TỰ DO. Bản cũ chặn
+  // trước mọi phạm vi, nên chọn "Tự do" mà em không có trong danh sách vẫn bị
+  // chặn — trái hẳn cái tên và trái dòng mô tả "ai có mã ca đều vào được".
+  //
+  // Tự do là để luyện tập, ôn ngoài giờ, em lớp khác học ké: ở đó danh sách lớp
+  // không có nghĩa lý gì. Ba phạm vi kia vẫn giữ nguyên cổng.
+  //
+  // KHÔNG nói rõ trường nào sai: nói ra là cho phép dò tên từ số báo danh.
+  if (pv !== 'tu_do' && hocSinh && hocSinh.trongDanhSach === false) return { ok: false, lyDo: 'sai_ho_so' }
+
   if (pv === 'sbd') {
     // Chế độ SỐ BÁO DANH: mã ca đúng CHƯA đủ, số báo danh phải nằm trong danh
     // sách lớp thầy đã nạp. SBD lạ bị chặn ngay, dù có mã ca.

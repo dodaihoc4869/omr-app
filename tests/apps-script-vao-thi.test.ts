@@ -131,3 +131,42 @@ describe('Apps Script quyetDinhVaoThi_ — dữ liệu năm sinh bị bọc dấ
     expect(gs.quyetDinhVaoThi_(ca, null, 'may-A', T0 + 60_000, { sbd: 'HS01', namSinh: '2009' })).toEqual({ ok: false, lyDo: 'khong_thuoc_khoi', namSinh: '2010' })
   })
 })
+
+describe('TỰ DO là tự do ĐÚNG NGHĨA (thầy báo 05/09)', () => {
+  // Bản cũ chạy cổng danh sách lớp TRƯỚC khi xét phạm vi, nên chọn "Tự do" mà
+  // em không có trong danh sách vẫn bị chặn — trái hẳn cái tên và trái dòng mô
+  // tả "ai có mã ca đều vào được". Tự do là để luyện tập, ôn ngoài giờ, em lớp
+  // khác học ké: ở đó danh sách lớp không có nghĩa lý gì.
+  const caTuDo = { ...caMo, phamVi: 'tu_do' }
+
+  it('em KHÔNG có trong danh sách lớp vẫn vào được', () => {
+    const la = { sbd: '999999', namSinh: '', trongDanhSach: false }
+    expect(gs.quyetDinhVaoThi_(caTuDo, null, 'may-A', T0 + 60_000, la)).toEqual({ ok: true, cach: 'moi' })
+  })
+
+  it('ca không ghi phạm vi (ca cũ) cũng là tự do', () => {
+    const la = { sbd: '999999', namSinh: '', trongDanhSach: false }
+    expect(gs.quyetDinhVaoThi_(caMo, null, 'may-A', T0 + 60_000, la)).toEqual({ ok: true, cach: 'moi' })
+  })
+
+  it('chưa nạp danh sách bao giờ cũng vào được', () => {
+    expect(gs.quyetDinhVaoThi_(caTuDo, null, 'may-A', T0 + 60_000, { sbd: '1', namSinh: '', trongDanhSach: null })).toEqual({ ok: true, cach: 'moi' })
+    expect(gs.quyetDinhVaoThi_(caTuDo, null, 'may-A', T0 + 60_000)).toEqual({ ok: true, cach: 'moi' })
+  })
+
+  it('BA PHẠM VI KIA VẪN GIỮ CỔNG — nới cả bốn là hỏng ca thi thật', () => {
+    const la = { sbd: '999999', namSinh: '2009', trongDanhSach: false }
+    for (const pv of ['khoi', 'chon', 'sbd']) {
+      const kq = gs.quyetDinhVaoThi_({ ...caMo, phamVi: pv, danhSachMoi: pv === 'khoi' ? '2009' : '[]' }, null, 'may-A', T0 + 60_000, la)
+      expect(kq.ok, pv).toBe(false)
+    }
+  })
+
+  it('ca tự do vẫn chặn đúng những thứ KHÔNG liên quan danh sách', () => {
+    // đóng ca, quá hạn vào phòng, đang làm máy khác — tự do không có nghĩa là bỏ hết luật
+    expect(gs.quyetDinhVaoThi_({ ...caTuDo, trangThai: 'dong' }, null, 'may-A', T0 + 60_000)).toMatchObject({ ok: false, lyDo: 'da_dong' })
+    expect(gs.quyetDinhVaoThi_(caTuDo, null, 'may-A', T0 + 31 * 60_000)).toMatchObject({ ok: false, lyDo: 'het_han_vao' })
+    const dangLam = { trangThai: 'dang_lam', idThietBi: 'may-A', lanThu: 1, nopLuc: '' }
+    expect(gs.quyetDinhVaoThi_(caTuDo, dangLam, 'may-B', T0 + 60_000)).toMatchObject({ ok: false, lyDo: 'dang_lam_may_khac' })
+  })
+})

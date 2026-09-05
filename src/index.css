@@ -539,3 +539,93 @@ html[data-giu-de-an] [data-giu-de-phu] {
     font-size: 18px;
   }
 }
+
+/* ==========================================================================
+   MÀN CHÍNH — THẺ BẤM (05/09, thầy yêu cầu "hiện đại, xịn, mịn")
+   
+   Ba việc làm nên cảm giác mượt, không cái nào là màu mè:
+     · CHUYỂN ĐỘNG KHI CHẠM. Thẻ lún nhẹ và bóng thu lại đúng lúc ngón tay
+       chạm xuống, nên máy phản hồi tức thì thay vì đợi màn sau vẽ xong.
+     · PHÂN CẤP BẰNG BÓNG VÀ NỀN, không bằng viền màu — thẻ chính nổi lên,
+       ba thẻ còn lại lùi lại.
+     · MŨI TÊN ở mép phải nói cho mắt biết "chạm là đi tiếp".
+
+   Tôn trọng máy đặt giảm chuyển động: `prefers-reduced-motion` tắt hết.
+   ========================================================================== */
+.the-bam {
+  gap: var(--k4);
+  background: var(--the);
+  color: var(--muc);
+  border: none;
+  border-radius: var(--bo-3);
+  box-shadow: var(--bong-1);
+  padding: var(--k4) var(--k5);
+  min-height: 76px;
+  transition:
+    transform 140ms cubic-bezier(0.2, 0, 0.2, 1),
+    box-shadow 140ms cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.the-bam:active {
+  transform: scale(0.985);
+  box-shadow: none;
+}
+
+/* Thẻ hành động chính: nền chuyển sắc, bóng sâu hơn để nổi hẳn lên. */
+.the-bam-chinh {
+  background: var(--g1);
+  color: var(--giay);
+  box-shadow: var(--bong-2);
+}
+
+.the-bam-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--bo-2);
+  background: var(--the-2);
+  color: var(--nhat);
+}
+
+.the-bam-chinh .the-bam-icon {
+  background: rgb(255 255 255 / 0.18);
+  color: var(--giay);
+}
+
+.the-bam-ten {
+  display: block;
+  font-family: var(--serif);
+  font-size: var(--cx-3);
+  line-height: 1.3;
+}
+
+.the-bam-phu {
+  display: block;
+  font-family: var(--sans);
+  font-size: var(--cx-1);
+  color: var(--nhat);
+  line-height: 1.5;
+  margin-top: 3px;
+}
+
+.the-bam-chinh .the-bam-phu {
+  color: var(--giay);
+  opacity: 0.88;
+}
+
+.the-bam-mui {
+  color: var(--mo);
+}
+
+.the-bam-chinh .the-bam-mui {
+  color: var(--giay);
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .the-bam {
+    transition: none;
+  }
+  .the-bam:active {
+    transform: none;
+  }
+}

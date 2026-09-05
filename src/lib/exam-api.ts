@@ -346,6 +346,38 @@ export async function submitAnswers(
  * máy trong phòng không nện Apps Script (30 em × 3 lần/phút = 90 lần/phút). */
 export const CHU_KY_LUU_TAM_GIAY = 20
 
+// ---------------------------------------------------------------------------
+// GIẢM TẢI MÁY CHỦ TRONG CA THI (05/09, trước ca thi thật)
+//
+// ĐO ĐƯỢC: mỗi lệnh gọi Apps Script tốn 1,3 giây chi phí cố định. Một em trong
+// ca 45 phút bắn 270 lệnh trạng thái (10 giây một lần) + 135 lệnh lưu tạm (20
+// giây một lần) = 405 lệnh. Ba mươi em là hơn 12.000 lệnh, và tệ hơn: cả lớp
+// vào thi cùng lúc nên MỌI MÁY ĐẬP CÙNG MỘT NHỊP — cứ 10 giây có 30 lệnh dồn
+// vào máy chủ một lúc, trong khi Apps Script chỉ chạy được vài chục lệnh đồng
+// thời.
+//
+// Hai cách chữa, đều không đổi giao thức và không đổi thứ thầy nhìn thấy:
+//
+//   1. LỆCH PHA. Mỗi máy cộng một khoảng ngẫu nhiên vào chu kỳ, nên ba mươi máy
+//      trải đều ra thay vì dồn cục.
+//   2. BỎ NHỊP KHI KHÔNG CÓ GÌ ĐỔI. Em làm 28 câu trong 45 phút thì chỉ có 28
+//      lần đáp án thật sự đổi — 107 nhịp lưu tạm còn lại đang gửi lại y nguyên
+//      thứ máy chủ đã có.
+
+/** Khoảng lệch pha tối đa, tính theo phần của chu kỳ. 0,4 nghĩa là chu kỳ 20
+ * giây rải đều trong 20–28 giây tuỳ máy. */
+export const LECH_PHA = 0.4
+
+/** Dù không có gì đổi, vẫn báo trạng thái ít nhất ngần này một lần — thầy phải
+ * biết em còn đang làm chứ không phải đã tắt máy. */
+export const NHIP_BAO_SONG_GIAY = 60
+
+/** Chu kỳ đã lệch pha cho MÁY NÀY. Tính một lần rồi giữ nguyên cả ca: đổi mỗi
+ * nhịp thì nhịp lại xô về nhau. */
+export function chuKyLechPha(giay: number, nn: () => number = Math.random): number {
+  return Math.round(giay * (1 + nn() * LECH_PHA))
+}
+
 /**
  * LƯU TẠM bài đang làm (CATHIVAGOILENBANG mục 1).
  *

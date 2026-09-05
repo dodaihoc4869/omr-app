@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
-import { vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, CHU_KY_LUU_TAM_GIAY, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { dungPhieuMayEm, type PhieuDayDu } from '../lib/phieu-du-lieu'
 import PhieuScreen from './PhieuScreen'
@@ -209,6 +209,11 @@ export default function ExamTakeScreen() {
   // TÍN HIỆU MỚI (BAOMATCATHI): lý do đang che đề; null = không che.
   const [lyDoChe, setLyDoChe] = useState<string | null>(null)
   const leaveCountRef = useRef(0)
+  // GIẢM TẢI MÁY CHỦ (05/09): nhớ thứ đã gửi lần trước để bỏ nhịp khi không có
+  // gì đổi, và chu kỳ đã lệch pha riêng của máy này để ba mươi máy không đập
+  // cùng một nhịp. Xem ghi chú ở đầu khối này trong exam-api.ts.
+  const daGuiRef = useRef({ trangThai: '', luuTam: '', mocBaoSong: 0 })
+  const chuKyRef = useRef({ trangThai: chuKyLechPha(10), luuTam: chuKyLechPha(CHU_KY_LUU_TAM_GIAY) })
   // GIỮ ĐỂ ĐỌC: hai con số cộng dồn cho thầy đọc ở Chi tiết ca. Để trong ref
   // chứ không state — đếm mà render lại là mất hết cái lợi của việc không dùng
   // state ở effect kia. Gộp vào `integrity` đúng lúc nộp bài.
@@ -441,13 +446,23 @@ export default function ExamTakeScreen() {
   // Đẩy trạng thái làm bài (đang làm/đã làm bao nhiêu câu/số lần rời màn
   // hình/có bị khoá không) lên server để phụ huynh xem gần-thời-gian-thực —
   // không chặn luồng làm bài chính, lỗi mạng thì bỏ qua (xem pushExamStatus).
-  const pushStatusNow = (a: ExamAttempt, dangLam: boolean) => {
+  const pushStatusNow = (a: ExamAttempt, dangLam: boolean, chiKhiDoi = false) => {
     const url = scriptUrlRef.current.trim()
     if (!url) return
     const daLam =
       Object.keys(a.answers.phanI).length +
       Object.keys(a.answers.phanII).length +
       Object.values(a.answers.phanIII).filter((v) => v.trim() !== '').length
+    // BỎ NHỊP KHI KHÔNG CÓ GÌ ĐỔI. Vẫn báo sống mỗi NHIP_BAO_SONG_GIAY để thầy
+    // phân biệt "em đang nghĩ" với "em tắt máy". Nộp bài và khoá bài KHÔNG đi
+    // qua đường này (chiKhiDoi = false) nên không bao giờ bị bỏ.
+    if (chiKhiDoi) {
+      const van = `${daLam}|${a.integrity.leaveCount}|${a.integrity.blocked}|${dangLam}`
+      const nay = Date.now()
+      if (van === daGuiRef.current.trangThai && nay - daGuiRef.current.mocBaoSong < NHIP_BAO_SONG_GIAY * 1000) return
+      daGuiRef.current.trangThai = van
+      daGuiRef.current.mocBaoSong = nay
+    }
     pushExamStatus(url, {
       sbd: a.sbd,
       maCa: a.maCa,
@@ -631,8 +646,8 @@ export default function ExamTakeScreen() {
     if (phase !== 'exam') return
     if (attemptRef.current) pushStatusNow(attemptRef.current, true)
     const id = setInterval(() => {
-      if (attemptRef.current) pushStatusNow(attemptRef.current, true)
-    }, 10000)
+      if (attemptRef.current) pushStatusNow(attemptRef.current, true, true)
+    }, chuKyRef.current.trangThai * 1000)
     return () => clearInterval(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
@@ -647,13 +662,19 @@ export default function ExamTakeScreen() {
   // đó — nhịp sau ghi đè đủ. Không bao giờ chặn thao tác của em.
   useEffect(() => {
     if (phase !== 'exam') return
-    const luu = () => {
+    const luu = (chiKhiDoi = false) => {
       const a = attemptRef.current
       const url = scriptUrlRef.current.trim()
       if (!a || !url) return
+      // Em làm 28 câu trong 45 phút thì chỉ có 28 lần đáp án thật sự đổi; hơn
+      // một trăm nhịp còn lại đang gửi lại y nguyên thứ máy chủ đã có. Nhịp
+      // CUỐI lúc rời màn vẫn gửi vô điều kiện — đó là bản chốt.
+      const van = JSON.stringify(a.answers)
+      if (chiKhiDoi && van === daGuiRef.current.luuTam) return
+      daGuiRef.current.luuTam = van
       void luuTam(url, a.maCa, a.sbd, a.answers, giayCauRef.current)
     }
-    const id = setInterval(luu, CHU_KY_LUU_TAM_GIAY * 1000)
+    const id = setInterval(() => luu(true), chuKyRef.current.luuTam * 1000)
     return () => {
       clearInterval(id)
       // Rời màn làm bài (nộp, hết giờ, đóng tab) thì lưu nốt nhịp cuối.

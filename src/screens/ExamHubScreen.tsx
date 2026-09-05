@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { ClipboardList, GraduationCap, Library, Smartphone, Presentation, RefreshCw } from 'lucide-react'
+import { ChevronRight, ClipboardList, GraduationCap, Library, Smartphone, Presentation, RefreshCw } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { daySangBanMoi, PHIEN_BAN_APP, type DangKySW } from '../lib/cap-nhat-app'
 import { OThongBao, NutChinh } from '../components/DesignSystem'
@@ -23,39 +23,13 @@ function TheBam({
   noiBat?: boolean
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="tap-target w-full text-left flex items-center gap-3"
-      style={{
-        background: noiBat ? 'var(--g1)' : 'var(--the)',
-        color: noiBat ? 'var(--giay)' : 'var(--muc)',
-        borderRadius: 'var(--bo-3)',
-        boxShadow: 'var(--bong-1)',
-        padding: 'var(--k4) var(--k5)',
-        minHeight: 72,
-      }}
-    >
-      <span
-        className="shrink-0 flex items-center justify-center"
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: 'var(--bo-1)',
-          background: noiBat ? 'rgba(255,255,255,.2)' : 'var(--the-2)',
-          color: noiBat ? 'var(--giay)' : 'var(--nhat)',
-        }}
-      >
-        {icon}
+    <button type="button" onClick={onClick} className={`the-bam tap-target w-full text-left flex items-center${noiBat ? ' the-bam-chinh' : ''}`}>
+      <span className="the-bam-icon shrink-0 flex items-center justify-center">{icon}</span>
+      <span className="min-w-0" style={{ flex: '1 1 auto' }}>
+        <span className="the-bam-ten font-bold">{title}</span>
+        <span className="the-bam-phu">{sub}</span>
       </span>
-      <span className="min-w-0">
-        <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)' }}>
-          {title}
-        </div>
-        <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: noiBat ? 'var(--giay)' : 'var(--nhat)', opacity: noiBat ? 0.9 : 1, marginTop: 2 }}>
-          {sub}
-        </div>
-      </span>
+      <ChevronRight size={18} className="the-bam-mui shrink-0" />
     </button>
   )
 }
@@ -168,9 +142,12 @@ export default function ExamHubScreen() {
 
   return (
     <div className="min-h-screen pb-24 px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)' }}>
-      <h1 className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-5)' }}>
-        Kiểm tra tại lớp
-      </h1>
+      <header style={{ paddingTop: 'var(--k2)' }}>
+        <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--mo)', letterSpacing: '.16em', textTransform: 'uppercase' }}>Đỗ Đại Học</div>
+        <h1 className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-5)', lineHeight: 1.15, marginTop: 2 }}>
+          Kiểm tra tại lớp
+        </h1>
+      </header>
 
       <TheBam
         noiBat

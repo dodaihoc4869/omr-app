@@ -236,3 +236,61 @@ describe('ĐỌC ĐỀ NGOÀI KHOÁ — cả lớp vào thi cùng lúc không x�
     expect(vaoThi).toContain('if (body.canBank) out.bank = bankGui')
   })
 })
+
+// ---------------------------------------------------------------------------
+// GIẢM TẢI TỪ PHÍA MÁY HỌC SINH
+//
+// Đây mới là con số quyết định một ca thi ba mươi em: mỗi em bắn 270 lệnh trạng
+// thái + 135 lệnh lưu tạm = 405 lệnh trong 45 phút. Ba mươi em là hơn 12.000
+// lệnh, và cả lớp vào cùng lúc nên mọi máy đập cùng một nhịp.
+
+describe('lệch pha — ba mươi máy không đập cùng một nhịp', () => {
+  it('chu kỳ giãn ra trong khoảng đã định, không bao giờ ngắn hơn gốc', async () => {
+    const { LECH_PHA, chuKyLechPha } = await import('../src/lib/exam-api')
+    expect(chuKyLechPha(20, () => 0)).toBe(20)
+    expect(chuKyLechPha(20, () => 1)).toBe(Math.round(20 * (1 + LECH_PHA)))
+    for (let i = 0; i < 200; i++) {
+      const c = chuKyLechPha(20)
+      expect(c).toBeGreaterThanOrEqual(20)
+      expect(c).toBeLessThanOrEqual(Math.round(20 * (1 + LECH_PHA)))
+    }
+  })
+
+  it('ba mươi máy cho ra nhiều chu kỳ khác nhau — đó là cả mục đích', async () => {
+    const { chuKyLechPha } = await import('../src/lib/exam-api')
+    const may = new Set(Array.from({ length: 30 }, () => chuKyLechPha(20)))
+    expect(may.size).toBeGreaterThan(3)
+  })
+
+  it('màn thi tính chu kỳ MỘT LẦN rồi giữ nguyên cả ca', async () => {
+    // Tính lại mỗi nhịp thì các nhịp lại xô về nhau, mất tác dụng lệch pha.
+    const man = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default
+    expect(man).toContain('const chuKyRef = useRef({ trangThai: chuKyLechPha(10), luuTam: chuKyLechPha(CHU_KY_LUU_TAM_GIAY) })')
+    expect(man).toContain('chuKyRef.current.trangThai * 1000')
+    expect(man).toContain('chuKyRef.current.luuTam * 1000')
+  })
+})
+
+describe('bỏ nhịp khi không có gì đổi', () => {
+  const man = () => import('../src/screens/ExamTakeScreen.tsx?raw').then((m) => m.default)
+
+  it('lưu tạm bỏ nhịp khi đáp án y nguyên, nhưng nhịp CUỐI vẫn gửi', async () => {
+    const ma = await man()
+    expect(ma).toContain('if (chiKhiDoi && van === daGuiRef.current.luuTam) return')
+    // nhịp cuối lúc rời màn gọi không tham số ⇒ chiKhiDoi = false ⇒ gửi vô điều kiện
+    expect(ma).toContain('const luu = (chiKhiDoi = false) => {')
+    expect(ma).toMatch(/clearInterval\(id\)[\s\S]{0,200}luu\(\)/)
+  })
+
+  it('trạng thái vẫn BÁO SỐNG dù không đổi — thầy phải phân biệt "đang nghĩ" với "tắt máy"', async () => {
+    const ma = await man()
+    expect(ma).toContain('nay - daGuiRef.current.mocBaoSong < NHIP_BAO_SONG_GIAY * 1000')
+  })
+
+  it('nộp bài và khoá bài KHÔNG đi qua đường bỏ nhịp', async () => {
+    const ma = await man()
+    // Tham số thứ BA là `chiKhiDoi`. Chỉ đúng một chỗ truyền nó — nhịp nền.
+    // Nộp bài, khoá bài, vào bài đều gọi hai tham số ⇒ gửi vô điều kiện.
+    expect((ma.match(/pushStatusNow\([^)]*,[^,)]*,\s*true\)/g) || []).length).toBe(1)
+  })
+})
