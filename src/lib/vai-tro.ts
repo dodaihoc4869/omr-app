@@ -12,14 +12,11 @@
 //   /p#<dữ liệu> → PHIẾU KẾT QUẢ gửi phụ huynh. Dữ liệu nằm sau dấu `#` nên
 //                  không bao giờ rời máy phụ huynh (xem lib/phieu-link.ts).
 //                  Chỉ đọc, không có mã bí mật, không gọi máy chủ.
-//   /tl#<mã>     → BÀI TẬP TỰ LUYỆN của một em (LINK-BAI-LUYEN.md). Mã 10 ký tự
-//                  gắn sẵn SBD; em mở là làm ngay, không nhập gì. Máy chủ chấm,
-//                  nên trang này KHÔNG có mã bí mật và cũng không cần.
 //
 // `public/404.html` đổi hai đường trên thành `?vai=gv` / `?examCode=…` khi máy
 // chưa cài service worker; `chuanHoaDuongDan()` làm đúng việc đó ở trong app,
 // nên máy đã cài app (service worker nuốt mất 404.html) vẫn chạy đúng.
-export type VaiTro = 'gv' | 'phieu' | 'tuluyen'
+export type VaiTro = 'gv' | 'phieu'
 
 export interface DuongVao {
   vai: VaiTro | null
@@ -28,7 +25,6 @@ export interface DuongVao {
 
 const RE_GV_TREN_DUONG = /(?:^|\/)gv\/?$/
 const RE_PHIEU_TREN_DUONG = /(?:^|\/)p\/?$/
-const RE_TULUYEN_TREN_DUONG = /(?:^|\/)tl\/?$/
 const RE_CA_TREN_DUONG = /(?:^|\/)t\/(\d{4,8})\/?$/
 const RE_APP_CU = /(?:^|\/)(?:hs|ph)\/[0-9a-zA-Z]{8,}\/?$/
 
@@ -53,7 +49,6 @@ export function laLinkAppCu(search: string, duongDan = ''): boolean {
 export function docVaiTuDuongDan(duongDan: string): DuongVao {
   if (RE_GV_TREN_DUONG.test(duongDan)) return { vai: 'gv', maCa: '' }
   if (RE_PHIEU_TREN_DUONG.test(duongDan)) return { vai: 'phieu', maCa: '' }
-  if (RE_TULUYEN_TREN_DUONG.test(duongDan)) return { vai: 'tuluyen', maCa: '' }
   const c = duongDan.match(RE_CA_TREN_DUONG)
   if (c) return { vai: null, maCa: c[1] }
   return { vai: null, maCa: '' }
@@ -89,7 +84,6 @@ export function docDuongVao(search: string, duongDan = ''): DuongVao {
   const vaiQ = (q.get('vai') || '').trim()
   if (vaiQ === 'gv') return { vai: 'gv', maCa }
   if (vaiQ === 'phieu') return { vai: 'phieu', maCa: '' }
-  if (vaiQ === 'tuluyen') return { vai: 'tuluyen', maCa: '' }
 
   const tuDuong = duongDan ? docVaiTuDuongDan(duongDan) : null
   if (tuDuong && (tuDuong.vai || tuDuong.maCa)) {

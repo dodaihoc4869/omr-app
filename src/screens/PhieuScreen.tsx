@@ -17,8 +17,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { classify } from '../engine/score'
 import { chanSoCau, docLinkPhieu, SO_CAU_MAX, SO_CAU_MIN } from '../lib/phieu-link'
-import { diemTuLuyen, layPhieu, type DiemTuLuyen } from '../lib/exam-api'
-import { nhanNutGiao, taoLinkTuLuyen } from '../lib/tu-luyen'
+import { layPhieu } from '../lib/exam-api'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import { napDong } from '../lib/nap-manh'
 import KhungXemPhieu from '../components/KhungXemPhieu'
@@ -954,7 +953,7 @@ export default function PhieuScreen({ duCoSan }: { duCoSan?: PhieuDayDu } = {}) 
             không biết thầy muốn giao gì), nên em mất luôn nút xem đề vừa làm;
             thầy mở từ Hồ sơ học sinh cũng thấy cụt. Nay mỗi mục tự quyết định
             có hiện hay không. */}
-        {(du.vieCanLam.trim() || (du.deCuaEm && du.deCuaEm.length > 0) || (du.baiTap && du.baiTap.length > 0) || du.linkBaiTap || du.maTuLuyen) && (
+        {(du.vieCanLam.trim() || (du.deCuaEm && du.deCuaEm.length > 0) || (du.baiTap && du.baiTap.length > 0) || du.linkBaiTap) && (
           <section className="bc-viec">
             {du.vieCanLam.trim() && (
               <>
@@ -963,7 +962,7 @@ export default function PhieuScreen({ duCoSan }: { duCoSan?: PhieuDayDu } = {}) 
               </>
             )}
             {du.deCuaEm && du.deCuaEm.length > 0 && <NutXemDeCuaCon du={du} />}
-            {((du.baiTap && du.baiTap.length > 0) || du.linkBaiTap || du.maTuLuyen) && <NutTaiBaiTap du={du} />}
+            {((du.baiTap && du.baiTap.length > 0) || du.linkBaiTap) && <NutTaiBaiTap du={du} />}
           </section>
         )}
 
@@ -1088,50 +1087,22 @@ function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
   const [soCau, setSoCau] = useState(() => Math.min(SO_CAU_MIN, tran))
   const lay = Math.min(soCau, coSan)
 
-  // LINK BÀI LÀM ĐƯỢC, không còn là tờ phiếu chỉ để đọc (thầy chốt 05/09).
-  //
-  // Máy thầy đã tạo sẵn bài tự luyện và nhúng MÃ vào báo cáo; trang này chỉ
-  // ghép mã thành link `.../tl#<mã>~<số câu>`. Nó không có mã bí mật nên không
-  // tạo bài mới được — cũng không cần: gói chở tới 40 câu, mỗi lần giao lấy một
-  // cửa sổ N câu và lần sau dịch sang cửa sổ kế tiếp.
-  //
-  // Nút LỜI GIẢI cũ đã bỏ: con nộp bài xong là lời giải hiện ngay tại link đó,
-  // không phải chờ phụ huynh gửi thêm link thứ hai.
-  const goc = location.origin + location.pathname.replace(/[^/]*$/, '')
-  const linkDe = du.maTuLuyen ? taoLinkTuLuyen(goc, du.maTuLuyen, lay) : ''
+  // Link đã cất sẵn là `.../p#<mã>`; gắn thêm `~<số câu>` và chữ cuối là xong,
+  // không phải ghi lại phiếu nào lên máy chủ (trang này không có mã bí mật để
+  // ghi). HAI LINK (thầy chốt 04-09 khuya): `d` = chỉ có ĐỀ cho con tự làm,
+  // `g` = có LỜI GIẢI để con dò sau khi làm xong.
+  const linkDe = du.linkBaiTap ? `${du.linkBaiTap}~${chanSoCau(soCau)}d` : ''
+  const linkGiai = du.linkBaiTap ? `${du.linkBaiTap}~${chanSoCau(soCau)}g` : ''
+  const [daCopyGiai, setDaCopyGiai] = useState(false)
 
-  // Con đã nộp tới lần thứ mấy — quyết định nhãn nút giao và việc bật nút xem
-  // điểm. Hỏi mỗi lần mở báo cáo: phụ huynh mở lại sau khi con làm xong thì
-  // phải thấy ngay.
-  const [diem, setDiem] = useState<DiemTuLuyen | null>(null)
-  const [hienDiem, setHienDiem] = useState(false)
-  useEffect(() => {
-    if (!du.maTuLuyen) return
-    let con = true
-    void (async () => {
-      try {
-        const url = await loadScriptUrlHoacMacDinh()
-        const d = await diemTuLuyen(url, du.maTuLuyen as string)
-        if (con) setDiem(d)
-      } catch {
-        // Mất mạng thì nút giao vẫn dùng được, chỉ là chưa biết con đã nộp chưa.
-      }
-    })()
-    return () => {
-      con = false
-    }
-  }, [du.maTuLuyen])
-
-  const lanDaNop = diem?.lanThu ?? 0
-  const lanCuoi = diem?.lan?.[diem.lan.length - 1] ?? null
-
-  const copyLink = async (link: string) => {
+  const copyLink = async (link: string, giai: boolean) => {
     if (!link) return
+    const bao = giai ? setDaCopyGiai : setDaCopy
     try {
       if (!navigator.clipboard?.writeText) throw new Error('không có clipboard')
       await navigator.clipboard.writeText(link)
-      setDaCopy(true)
-      setTimeout(() => setDaCopy(false), 3000)
+      bao(true)
+      setTimeout(() => bao(false), 3000)
     } catch {
       setLinkTay(link)
     }
@@ -1195,47 +1166,20 @@ function NutTaiBaiTap({ du }: { du: PhieuDayDu }) {
           </button>
         )}
       </div>
-      {du.maTuLuyen && (
+      {du.linkBaiTap && (
         <div className="bc-nut-doi" style={{ marginTop: 8 }}>
-          <button type="button" className={`bc-nut vang${daCopy ? '' : ' bc-nhay'}`} onClick={() => void copyLink(linkDe)}>
-            {daCopy ? `Đã copy link ${lay} câu` : nhanNutGiao(lanDaNop)}
+          <button type="button" className={`bc-nut vang${daCopy ? '' : ' bc-nhay'}`} onClick={() => void copyLink(linkDe, false)}>
+            {daCopy ? `Đã copy link đề ${lay} câu` : 'Copy link gửi ĐỀ cho con'}
           </button>
-          {/* NÚT XEM ĐIỂM chỉ sáng khi con đã nộp — bấm được mà không có gì để
-              xem thì phụ huynh tưởng máy hỏng. */}
-          <button type="button" className="bc-nut vien" onClick={() => setHienDiem((v) => !v)} disabled={lanDaNop === 0} style={lanDaNop === 0 ? { opacity: 0.45 } : undefined}>
-            {lanDaNop === 0 ? 'Con chưa nộp bài' : hienDiem ? 'Ẩn điểm của con' : 'Xem điểm của con'}
+          <button type="button" className="bc-nut vang" onClick={() => void copyLink(linkGiai, true)}>
+            {daCopyGiai ? `Đã copy link lời giải ${lay} câu` : 'Copy link gửi LỜI GIẢI cho con'}
           </button>
-        </div>
-      )}
-      {hienDiem && lanCuoi && (
-        <div style={{ marginTop: 10, padding: '10px 12px', borderRadius: 10, background: 'var(--p-chim)' }}>
-          <div style={{ fontSize: 15, fontWeight: 700 }}>
-            Lần {lanCuoi.lanThu}: đúng <span style={{ fontVariantNumeric: 'tabular-nums' }}>{lanCuoi.soDung}/{lanCuoi.soCau}</span> câu
-          </div>
-          <div style={{ fontSize: 12, color: 'var(--p-nhat)', marginTop: 2 }}>Nộp {gioDayDu(lanCuoi.nopLuc)}</div>
-          <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {Object.entries(lanCuoi.theoChuyenDe)
-              .sort((a, b) => a[1].soDung / a[1].soCau - b[1].soDung / b[1].soCau)
-              .map(([ten, v]) => (
-                <div key={ten} style={{ fontSize: 13, display: 'flex', justifyContent: 'space-between', gap: 10 }}>
-                  <span>{ten}</span>
-                  <span style={{ fontVariantNumeric: 'tabular-nums', flex: '0 0 auto' }}>
-                    {v.soDung}/{v.soCau}
-                  </span>
-                </div>
-              ))}
-          </div>
-          {diem && diem.lan.length > 1 && (
-            <div style={{ fontSize: 12, color: 'var(--p-nhat)', marginTop: 8 }}>
-              Các lần trước: {diem.lan.slice(0, -1).map((l) => `lần ${l.lanThu} ${l.soDung}/${l.soCau}`).join(' · ')}
-            </div>
-          )}
         </div>
       )}
       <div style={{ fontSize: 12, color: 'var(--p-nhat)', marginTop: 8, lineHeight: 1.6 }}>
         Thầy đã chọn sẵn theo đúng chuyên đề em mất điểm ở bài này, xếp từ dễ lên khó.
-        {du.maTuLuyen
-          ? ' Gửi link cho con: con chọn đáp án ngay trên máy, bấm nộp là hiện điểm và lời giải từng câu. Link chỉ có bài tập, không kèm điểm ca thi và nhận xét. Con nộp xong, bấm nút bên cạnh để xem con làm được bao nhiêu; bấm nút gửi lần nữa là giao tiếp bộ câu mới.'
+        {du.linkBaiTap
+          ? ' Gửi con link ĐỀ trước để em tự làm vào vở; em làm xong mới gửi link LỜI GIẢI để em dò. Hai link chỉ có bài tập, không kèm điểm và nhận xét.'
           : ' Em làm hết rồi mới bấm vào từng câu xem lời giải.'}
       </div>
       {linkTay && (

@@ -123,45 +123,46 @@ describe('phần cuối báo cáo', () => {
   })
 })
 
-describe('bài luyện — nút giao và nút xem điểm', () => {
-  // SỬA 05/09: khối này không còn phát TỜ PHIẾU chỉ để đọc. Nó phát LINK BÀI
-  // LÀM ĐƯỢC (`/tl#<mã>`): con chọn đáp án, bấm nộp, máy chủ chấm và hiện lời
-  // giải ngay. Nút "Copy link gửi LỜI GIẢI" đã bỏ — không phải chờ phụ huynh
-  // gửi thêm link thứ hai nữa.
-  it('có mã tự luyện thì ra nút giao (nhấp nháy) và nút xem điểm', () => {
-    const { getByRole } = render(<PhieuScreen duCoSan={phieu({ baiTap: [cauLuyen('b1')], maTuLuyen: 'Abc123XyZq' })} />)
+describe('bài luyện — hai nút', () => {
+  it('có link thì ra hai nút riêng, nút copy link nhấp nháy', () => {
+    const { getByRole } = render(
+      <PhieuScreen duCoSan={phieu({ baiTap: [cauLuyen('b1')], linkBaiTap: 'https://vi.du/omr-app/p#abc123' })} />,
+    )
     expect(getByRole('button', { name: /Xem trước/ })).toBeTruthy()
-    const giao = getByRole('button', { name: /Copy link gửi ĐỀ cho con/ })
-    expect(giao.className).toContain('bc-nhay')
-    expect(giao.className).toContain('vang')
-    // KHÔNG còn nút lời giải.
-    expect(() => getByRole('button', { name: /LỜI GIẢI/ })).toThrow()
+    // HAI NÚT COPY (thầy chốt 04-09 khuya): một gửi ĐỀ, một gửi LỜI GIẢI.
+    const copy = getByRole('button', { name: /Copy link gửi ĐỀ cho con/ })
+    expect(copy.className).toContain('bc-nhay')
+    // Nút VÀNG (thầy chốt 04-09 tối), không phải tím.
+    expect(copy.className).toContain('vang')
+    const copyGiai = getByRole('button', { name: /Copy link gửi LỜI GIẢI cho con/ })
+    expect(copyGiai.className).toContain('vang')
+    expect(copyGiai.className).not.toContain('bc-nhay')
   })
 
-  it('con chưa nộp thì nút xem điểm TẮT — bấm được mà rỗng là tưởng máy hỏng', () => {
-    const { getByRole } = render(<PhieuScreen duCoSan={phieu({ baiTap: [cauLuyen('b1')], maTuLuyen: 'Abc123XyZq' })} />)
-    const xem = getByRole('button', { name: /Con chưa nộp bài/ }) as HTMLButtonElement
-    expect(xem.disabled).toBe(true)
-  })
-
-  it('chưa có mã thì chỉ còn nút xem — không dựng nút copy rồi copy chuỗi rỗng', () => {
+  it('chưa có link thì chỉ còn nút xem — không dựng nút copy rồi copy chuỗi rỗng', () => {
     const { getByRole, queryByRole } = render(<PhieuScreen duCoSan={phieu({ baiTap: [cauLuyen('b1')] })} />)
     expect(getByRole('button', { name: /Xem trước/ })).toBeTruthy()
     expect(queryByRole('button', { name: /Copy link/ })).toBeNull()
   })
 
-  it('gói bị cắt mất bài tập nhưng còn mã thì vẫn giao cho con được', () => {
-    const { queryByRole, getByRole } = render(<PhieuScreen duCoSan={phieu({ maTuLuyen: 'Abc123XyZq' })} />)
+  it('gói bị cắt mất bài tập nhưng còn link thì vẫn gửi link cho con được', () => {
+    const { queryByRole, getByRole } = render(<PhieuScreen duCoSan={phieu({ linkBaiTap: 'https://vi.du/omr-app/p#abc123' })} />)
     expect(queryByRole('button', { name: /Xem trước/ })).toBeNull()
     expect(getByRole('button', { name: /Copy link gửi ĐỀ cho con/ })).toBeTruthy()
+    expect(getByRole('button', { name: /Copy link gửi LỜI GIẢI cho con/ })).toBeTruthy()
   })
 
-  it('bấm giao là link BÀI LÀM ĐƯỢC vào bộ nhớ tạm, kèm số câu', () => {
+  it('bấm copy là link vào bộ nhớ tạm', () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
-    const { getByRole } = render(<PhieuScreen duCoSan={phieu({ baiTap: [cauLuyen('b1')], maTuLuyen: 'Abc123XyZq' })} />)
+    const { getByRole } = render(
+      <PhieuScreen duCoSan={phieu({ baiTap: [cauLuyen('b1')], linkBaiTap: 'https://vi.du/omr-app/p#abc123' })} />,
+    )
     fireEvent.click(getByRole('button', { name: /Copy link gửi ĐỀ cho con/ }))
-    // Đường `/tl`, không phải `/p`; số câu đi kèm để màn làm bài cắt đúng cửa sổ.
-    expect(String(writeText.mock.calls[0][0])).toMatch(/\/tl#Abc123XyZq~1$/)
+    // Số câu mặc định 10 đi kèm link để trang phiếu cắt đúng bấy nhiêu câu;
+    // chữ `d` cuối = phiếu CHỈ CÓ ĐỀ, `g` = phiếu có lời giải.
+    expect(writeText).toHaveBeenCalledWith('https://vi.du/omr-app/p#abc123~10d')
+    fireEvent.click(getByRole('button', { name: /Copy link gửi LỜI GIẢI cho con/ }))
+    expect(writeText).toHaveBeenCalledWith('https://vi.du/omr-app/p#abc123~10g')
   })
 })
