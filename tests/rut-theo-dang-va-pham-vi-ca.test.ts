@@ -127,10 +127,19 @@ describe('ba lựa chọn có mặt trên cả ba màn', () => {
     expect(man).toContain('soCauDung(demDang, d)')
   })
 
-  it('11. màn Giao bài tập', () => {
-    const man = doc('src/components/GiaoBaiTap.tsx')
+  it('11. màn Giao bài tập — NutBaiTapPdf, cái thật sự chạy', () => {
+    // BÀI HỌC 06/09: lần đầu tôi thêm ba nút vào `GiaoBaiTap.tsx` rồi kiểm bản
+    // live thì không thấy chữ nào. Hoá ra file đó KHÔNG được import ở đâu —
+    // code chết, bị tree-shake khỏi bundle. Màn thầy thật sự bấm là
+    // `NutBaiTapPdf`, dùng ở HocSinhScreen và ExamMonitorScreen.
+    const man = doc('src/components/NutBaiTapPdf.tsx')
     expect(man).toContain('MOI_LOC_DANG.map')
-    expect(man).toContain('dang,')
+    expect(man).toContain('chonCauLuyen(nguon, { chuyenDe: dungDe, dang,')
+  })
+
+  it('11b. NutBaiTapPdf phải còn được dùng thật — kẻo lại sửa nhầm code chết', () => {
+    const dung = ['src/screens/HocSinhScreen.tsx', 'src/screens/ExamMonitorScreen.tsx']
+    for (const f of dung) expect(doc(f)).toContain('<NutBaiTapPdf')
   })
 
   it('12. báo cáo phụ huynh và học sinh', () => {

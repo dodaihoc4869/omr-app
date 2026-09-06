@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react'
 import { OThongBao } from './DesignSystem'
 import NutPhieuHtml from './NutPhieuHtml'
 import { chonCauLuyen, tenTepBaiTap } from '../lib/bai-tap-pdf'
+import { LOC_DANG_MAC_DINH, MOI_LOC_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
 import { docQidRaPhieu, loadExamSources, loadScriptUrl, loadTeacherSecret, themQidRaPhieu, xoaQidRaPhieu } from '../lib/exam-db'
 import { qidDaLam } from '../lib/exam-api'
 import type { ChuyenDeEm } from '../lib/exam-api'
@@ -41,6 +42,7 @@ export default function NutBaiTapPdf({
   showToast: (chu: string, kieu?: 'success' | 'error' | 'warn') => void
 }) {
   const [soCau, setSoCau] = useState(SO_CAU_PDF_MAC_DINH)
+  const [dang, setDang] = useState<LocDang>(LOC_DANG_MAC_DINH)
   const [daRa, setDaRa] = useState(0)
   const [ketQua, setKetQua] = useState<{ soCau: number; lapLai: number; thieu: number; ten: string } | null>(null)
 
@@ -80,12 +82,12 @@ export default function NutBaiTapPdf({
       const daInRa = await docQidRaPhieu(sbd)
       const tranh = [...new Set([...daNop, ...daInRa])]
 
-      const kq = chonCauLuyen(nguon, { chuyenDe: dungDe, qidDaLam: tranh, soCau })
+      const kq = chonCauLuyen(nguon, { chuyenDe: dungDe, dang, qidDaLam: tranh, soCau })
       if (kq.cau.length === 0) {
         throw new Error(
           dungDe.length > 0
-            ? `Kho đề chưa có câu nào thuộc ${dungDe.map((c) => c.ten).join(', ')} (câu có hình không đưa vào phiếu in).`
-            : 'Kho đề chưa có câu nào dùng được cho phiếu in.',
+            ? `Kho đề chưa có câu nào thuộc ${dungDe.map((c) => c.ten).join(', ')}${dang === 'ngau_nhien' ? '' : ` ở dạng ${TEN_LOC_DANG[dang].toLowerCase()}`} (câu có hình không đưa vào phiếu in).`
+            : `Kho đề chưa có câu nào dùng được cho phiếu in${dang === 'ngau_nhien' ? '' : ` ở dạng ${TEN_LOC_DANG[dang].toLowerCase()}`}.`,
         )
       }
 
@@ -116,6 +118,38 @@ export default function NutBaiTapPdf({
 
   return (
     <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
+      {/* DẠNG CÂU — thầy chốt 06/09, cùng ba lựa chọn với màn Rút đề. */}
+      <div>
+        <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Dạng câu</div>
+        <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Dạng câu trong phiếu bài tập">
+          {MOI_LOC_DANG.map((d) => (
+            <button
+              key={d}
+              type="button"
+              role="radio"
+              aria-checked={dang === d}
+              onClick={() => setDang(d)}
+              className="tap-target font-bold"
+              style={{
+                minHeight: 40,
+                padding: '0 var(--k4)',
+                borderRadius: 'var(--bo-tron)',
+                border: 'none',
+                background: dang === d ? 'var(--phu-dam)' : 'var(--the-2)',
+                color: dang === d ? 'var(--muc-nguoc)' : 'var(--muc)',
+                fontFamily: 'var(--sans)',
+                fontSize: 'var(--cx-1)',
+              }}
+            >
+              {TEN_LOC_DANG[d]}
+            </button>
+          ))}
+        </div>
+        <div style={{ ...NHAN_NHO, marginTop: 'var(--k1)' }}>
+          Kho chưa có nhãn lý thuyết hay bài tập, máy tự phân loại từ đề. Câu máy chưa phân loại chắc chắn chỉ vào phiếu khi chọn Ngẫu nhiên.
+        </div>
+      </div>
+
       <div>
         <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Số câu trong phiếu</div>
         <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }}>
