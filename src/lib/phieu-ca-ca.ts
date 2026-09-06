@@ -22,6 +22,7 @@ import { chuyenDeTuChiTiet } from './phieu-hang-loat'
 import { viecCanLamMacDinh } from './phieu-zalo'
 import { dungPhieu, giamGoiPhieu } from './phieu-du-lieu'
 import { taoLinkPhieu } from './phieu-link'
+import { BAN_PHIEU_BT, type GoiPhieuBaiTap } from '../components/NutPhieuHtml'
 import { gomLinkPhieu, type DongLinkPhieu } from './link-phieu-ca'
 import { gradeSubmissionFull, type GradedSubmission } from './exam-grade'
 import { docSoCauCa, loadExamSources, loadSessionTeacherBank, luuSoCauCa, saveSessionTeacherBank } from './exam-db'
@@ -87,6 +88,8 @@ export async function dungPhieuChoEm(
   const hoSoCua = new Map(hoSoDs.map((h) => [h.em.sbd, h]))
 
   const canLuu: PhieuCanLuu[] = []
+  /** Mã của các phiếu KẾT QUẢ — để lọc khỏi phiếu bài tập lúc trả dòng link. */
+  const maKetQua = new Set<string>()
   const loi: { sbd: string; vi_sao: string }[] = []
   for (const sbd of dsSbd) {
     const e = daCham.find((x) => x.sbd === sbd)
@@ -153,8 +156,47 @@ export async function dungPhieuChoEm(
         events: e.moiNhat.integrity?.events ?? null,
       },
     })
+    // PHIẾU BÀI TẬP CẤT RIÊNG, có link riêng.
+    //
+    // HỒI QUY 06/09 — thầy báo báo cáo mất hai nút copy link đề và lời giải.
+    // Hai nút đó chỉ hiện khi phiếu có `linkBaiTap`, mà trước đây chỉ
+    // `PhieuZaloEm` (mở hồ sơ TỪNG EM) mới dựng. Lõi dựng cả ca này bỏ sót nó,
+    // nên phiếu tạo hàng loạt không có link và hai nút biến mất.
+    //
+    // Link báo cáo có điểm và nhận xét của thầy; chuyển tiếp nguyên cho con là
+    // sai đối tượng — nên bài tập phải là một phiếu riêng.
+    if (phieu.baiTap && phieu.baiTap.length > 0) {
+      const maBt = sinhMaPhieu()
+      const sai = phieu.chuyenDeCa.filter((c) => c.soSai > 0)
+      const goiBt: GoiPhieuBaiTap = {
+        v: BAN_PHIEU_BT,
+        loai: 'baitap',
+        tt: {
+          hoTen: phieu.hoTen || `SBD ${phieu.sbd}`,
+          sbd: phieu.sbd,
+          ngay: new Date(),
+          tenChuyenDe: sai[0]?.ten || phieu.chuyenDeCa[0]?.ten || 'Hoá học',
+          ketQua: '',
+          hienDapAn: false,
+          nhanBia: 'Bài luyện theo đúng chỗ em mất điểm',
+          oBia: [
+            { nhan: 'Học sinh', gia: phieu.hoTen || `SBD ${phieu.sbd}` },
+            { nhan: 'SBD', gia: phieu.sbd },
+            ...(phieu.tenCa ? [{ nhan: 'Sau bài', gia: phieu.tenCa }] : []),
+            { nhan: 'Số câu', gia: `${phieu.baiTap.length} câu` },
+          ],
+        },
+        cau: phieu.baiTap,
+      }
+      canLuu.push({ ma: maBt, maCa: ca.maCa, sbd, hoTen: e.hoTen, phieu: goiBt, loai: 'baitap' })
+      // Gắn link TRƯỚC khi gói phiếu kết quả — `linkBaiTap` nằm trong gói đó.
+      phieu.linkBaiTap = taoLinkPhieu(goc, maBt)
+    }
+
     const { phieu: goiGui } = giamGoiPhieu(phieu)
-    canLuu.push({ ma: sinhMaPhieu(), maCa: ca.maCa, sbd, hoTen: e.hoTen, phieu: goiGui, loai: 'ketqua' })
+    const maKq = sinhMaPhieu()
+    maKetQua.add(maKq)
+    canLuu.push({ ma: maKq, maCa: ca.maCa, sbd, hoTen: e.hoTen, phieu: goiGui, loai: 'ketqua' })
   }
 
   if (canLuu.length === 0) return { dong: [], loi }
@@ -162,14 +204,19 @@ export async function dungPhieuChoEm(
   tien(kq.daLuu.length, dsSbd.length)
   const nay = new Date().toISOString()
   return {
-    dong: kq.daLuu.map((x) => ({
-      sbd: x.sbd,
-      hoTen: daCham.find((e) => e.sbd === x.sbd)?.hoTen || x.sbd,
-      ma: x.ma,
-      link: taoLinkPhieu(goc, x.ma),
-      soLanXem: 0,
-      taoLuc: nay,
-    })),
+    // CHỈ dòng của phiếu KẾT QUẢ. Mỗi em nay cất hai phiếu (kết quả + bài tập);
+    // trả cả hai là thầy copy ra hai link mỗi em, và link bài tập không có
+    // điểm — gửi nhầm cho phụ huynh là gửi thiếu.
+    dong: kq.daLuu
+      .filter((x) => maKetQua.has(x.ma))
+      .map((x) => ({
+        sbd: x.sbd,
+        hoTen: daCham.find((e) => e.sbd === x.sbd)?.hoTen || x.sbd,
+        ma: x.ma,
+        link: taoLinkPhieu(goc, x.ma),
+        soLanXem: 0,
+        taoLuc: nay,
+      })),
     loi: [...loi, ...kq.loi],
   }
 }

@@ -24,6 +24,24 @@ const sa = (n: number): TeacherShortAnswerQuestion => ({ id: `Q-III-${n}`, text:
 
 const BANK = [{ maDe: MA_CA, phanI: [mcq(1, 'A'), mcq(2, 'B'), mcq(3, 'C')], phanII: [tf(1)], phanIII: [sa(1)] }]
 
+/** KHO ĐỀ để rút bài luyện. Không có kho thì `phieu.baiTap` rỗng và phiếu bài
+ * tập không được dựng — đúng hành vi, nên test phải cấp kho thật. */
+const KHO = [
+  {
+    maDe: 'KHO-1',
+    phanI: Array.from({ length: 12 }, (_, i) => ({
+      id: `K-I-${i}`,
+      text: `Câu luyện ${i}`,
+      choices: ['a', 'b', 'c', 'd'],
+      correct: 'A' as const,
+      chuyenDe: i % 2 ? 'Este – lipid' : 'Cân bằng hoá học',
+      mucDo: (i < 4 ? 'biet' : i < 8 ? 'hieu' : 'van_dung') as 'biet' | 'hieu' | 'van_dung',
+    })),
+    phanII: [],
+    phanIII: [],
+  },
+]
+
 /** Bài làm của một em: đúng hết phần I, sai phần III. */
 function dapAnCua(sbd: string) {
   const asg = assignStudentQuestions(BANK[0], MA_CA, sbd)
@@ -67,6 +85,7 @@ interface HangPhieu {
   soLanXem: number
   xemLanCuoi: string
   loai: 'ketqua' | 'baitap'
+  phieu: unknown
 }
 const kho: { phieu: HangPhieu[]; soLanLuu: number; soLanHoSo: number } = { phieu: [], soLanLuu: 0, soLanHoSo: 0 }
 const DS_EM = [
@@ -80,7 +99,7 @@ vi.mock('../src/lib/exam-db', () => ({
   loadTeacherSecret: async () => 'MA-THAT',
   loadScriptUrl: async () => 'https://may-chu-gia/exec',
   docSoCauCa: async () => undefined,
-  loadExamSources: async () => [],
+  loadExamSources: async () => KHO,
   loadSessionTeacherBank: async () => BANK,
   luuSoCauCa: async () => {},
   saveSessionTeacherBank: async () => {},
@@ -114,11 +133,11 @@ vi.mock('../src/lib/exam-api', async () => {
         soCauSaiCaGanNhat: 0,
       }))
     },
-    luuNhieuPhieu: async (_u: string, _m: string, ds: { ma: string; maCa: string; sbd: string; hoTen: string }[]) => {
+    luuNhieuPhieu: async (_u: string, _m: string, ds: { ma: string; maCa: string; sbd: string; hoTen: string; phieu: unknown; loai?: string }[]) => {
       kho.soLanLuu += 1
       const nay = new Date().toISOString()
       for (const d of ds) {
-        kho.phieu.push({ ma: d.ma, maCa: d.maCa, sbd: d.sbd, hoTen: d.hoTen, taoLuc: nay, soLanXem: 0, xemLanCuoi: '', loai: 'ketqua' })
+        kho.phieu.push({ ma: d.ma, maCa: d.maCa, sbd: d.sbd, hoTen: d.hoTen, taoLuc: nay, soLanXem: 0, xemLanCuoi: '', loai: d.loai === 'baitap' ? 'baitap' : 'ketqua', phieu: d.phieu })
       }
       return { daLuu: ds.map((d) => ({ sbd: d.sbd, ma: d.ma })), loi: [] }
     },
@@ -150,12 +169,13 @@ describe('Tiêu chí 4 — taoPhieuCaCa dựng đủ và KHÔNG dựng trùng', 
 
   it('GỌI LẠI LẦN HAI: không tạo thêm phiếu nào, mã giữ nguyên', async () => {
     const lan1 = await taoPhieuCaCa('u', 'm', MA_CA, GOC)
-    expect(kho.phieu).toHaveLength(3)
+    // Ba em × hai phiếu (kết quả + bài tập).
+    expect(kho.phieu).toHaveLength(6)
     const luuSauLan1 = kho.soLanLuu
 
     const lan2 = await taoPhieuCaCa('u', 'm', MA_CA, GOC)
     expect(lan2.soMoi).toBe(0)
-    expect(kho.phieu).toHaveLength(3)
+    expect(kho.phieu).toHaveLength(6)
     // Không gọi lệnh lưu lần nào nữa, cũng không xin hồ sơ nữa.
     expect(kho.soLanLuu).toBe(luuSauLan1)
     expect(kho.soLanHoSo).toBe(1)
@@ -176,9 +196,10 @@ describe('Tiêu chí 4 — taoPhieuCaCa dựng đủ và KHÔNG dựng trùng', 
 
   it('em đã có phiếu thì giữ số lần xem của bản cũ, không bị đặt lại về 0', async () => {
     await taoPhieuCaCa('u', 'm', MA_CA, GOC)
-    kho.phieu[0].soLanXem = 4
+    const kqCu = kho.phieu.find((p) => p.loai === 'ketqua')!
+    kqCu.soLanXem = 4
     const kq = await taoPhieuCaCa('u', 'm', MA_CA, GOC)
-    const d = kq.dong.find((x) => x.sbd === kho.phieu[0].sbd)!
+    const d = kq.dong.find((x) => x.sbd === kqCu.sbd)!
     expect(d.soLanXem).toBe(4)
   })
 })
@@ -225,3 +246,46 @@ describe('Màn Chi tiết ca dùng CHUNG lõi này, không chép lại', () => {
     expect(man).not.toContain('sinhMaPhieu()')
   })
 })
+
+describe('Hồi quy 06/09 — báo cáo mất hai nút copy link đề và lời giải', () => {
+  it('mỗi em được cất HAI phiếu: kết quả và bài tập', async () => {
+    await taoPhieuCaCa('u', 'm', MA_CA, GOC)
+    const kq = kho.phieu.filter((p) => p.loai === 'ketqua')
+    const bt = kho.phieu.filter((p) => p.loai === 'baitap')
+    expect(kq).toHaveLength(3)
+    expect(bt).toHaveLength(3)
+    // Mã khác nhau hết — không em nào dùng chung một mã cho hai loại.
+    expect(new Set(kho.phieu.map((p) => p.ma)).size).toBe(6)
+  })
+
+  it('phiếu kết quả MANG linkBaiTap trỏ đúng mã phiếu bài tập của chính em đó', async () => {
+    await taoPhieuCaCa('u', 'm', MA_CA, GOC)
+    for (const sbd of ['11004', '11005', '11006']) {
+      const kq = kho.phieu.find((p) => p.sbd === sbd && p.loai === 'ketqua')!
+      const bt = kho.phieu.find((p) => p.sbd === sbd && p.loai === 'baitap')!
+      const link = (kq.phieu as { linkBaiTap?: string }).linkBaiTap
+      expect(link, sbd).toBe(`${GOC}p#${bt.ma}`)
+    }
+  })
+
+  it('DÒNG LINK trả về chỉ có phiếu KẾT QUẢ — không lẫn link bài tập', async () => {
+    const r = await taoPhieuCaCa('u', 'm', MA_CA, GOC)
+    expect(r.dong).toHaveLength(3)
+    const maBt = new Set(kho.phieu.filter((p) => p.loai === 'baitap').map((p) => p.ma))
+    for (const d of r.dong) expect(maBt.has(d.ma)).toBe(false)
+    // Và mỗi em đúng một dòng.
+    expect(new Set(r.dong.map((d) => d.sbd)).size).toBe(3)
+  })
+
+  it('gói bài tập đủ trường màn báo cáo cần', async () => {
+    await taoPhieuCaCa('u', 'm', MA_CA, GOC)
+    const bt = kho.phieu.find((p) => p.loai === 'baitap')!
+    const g = bt.phieu as { v: number; loai: string; tt: Record<string, unknown>; cau: unknown[] }
+    expect(g.loai).toBe('baitap')
+    expect(g.v).toBeGreaterThan(0)
+    expect(g.cau.length).toBeGreaterThan(0)
+    expect(String(g.tt.hoTen)).not.toBe('')
+    expect(g.tt.hienDapAn).toBe(false)
+  })
+})
+
