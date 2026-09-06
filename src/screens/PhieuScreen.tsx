@@ -25,6 +25,7 @@ import { BAN_PHIEU, type PhieuDayDu } from '../lib/phieu-du-lieu'
 import TheCauChiTiet, { CSS_THE_CAU } from '../components/TheCauChiTiet'
 import type { ThongTinPhieu } from '../lib/html-phieu'
 import type { CauLuyen } from '../lib/bai-tap-pdf'
+import { hopDang, LOC_DANG_MAC_DINH, MOI_LOC_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
 import { TEN_MUC_DO, TEN_PHAN } from '../lib/phan-tich-lam-bai'
 import { ChemText } from '../lib/chem-format'
 
@@ -152,6 +153,10 @@ const CSS = `
    hơn hẳn chữ trắng — nút này nhấp nháy nên phải đọc được ở mọi pha sáng. */
 .bc-nut.vang{background:var(--p-cam);color:var(--p-muc)}
 .bc-nut.vien{background:var(--p-giay);color:var(--p-tim);border:1.5px solid var(--p-tim)}
+.bc-dang{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.bc-dang button{flex:1 1 90px;min-height:40px;border-radius:10px;border:none;font-family:var(--sans);font-size:13.5px;
+  font-weight:700;background:var(--p-chim);color:var(--p-nhat)}
+.bc-dang button[aria-checked="true"]{background:var(--p-tim);color:var(--p-trang)}
 .bc-nut[disabled]{opacity:.55;cursor:default}
 
 /* CHỌN SỐ CÂU cho con — thanh kéo 10..40. */
@@ -921,7 +926,16 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
   // SỐ CÂU DO PHỤ HUYNH CHỌN. Báo cáo chở sẵn tới 40 câu đã rút theo đúng
   // chuyên đề em mất điểm, xếp dễ lên khó; kéo thanh là lấy bấy nhiêu câu ĐẦU,
   // nên chọn 10 vẫn ra 10 câu dễ nhất chứ không phải 10 câu bốc ngẫu nhiên.
-  const coSan = du.baiTap?.length ?? 0
+  // BA LỰA CHỌN DẠNG CÂU ngay trong báo cáo (thầy chốt 06/09). Lọc trên đúng
+  // bộ câu đã chở sẵn trong báo cáo — trang này không có kho đề và không có mã
+  // bí mật để rút thêm.
+  //
+  // Báo cáo dựng TRƯỚC bản này không mang nhãn `dang`; lúc đó ẩn hẳn hàng nút
+  // thay vì hiện ba nút mà hai cái luôn ra 0 câu.
+  const [locDang, setLocDang] = useState<LocDang>(LOC_DANG_MAC_DINH)
+  const coNhanDang = (du.baiTap ?? []).some((c) => Boolean(c.dang))
+  const dsDaLoc = coNhanDang ? (du.baiTap ?? []).filter((c) => hopDang(c.dang ?? 'chua_ro', locDang)) : (du.baiTap ?? [])
+  const coSan = dsDaLoc.length
   const tran = Math.min(SO_CAU_MAX, Math.max(SO_CAU_MIN, coSan || SO_CAU_MIN))
   const [soCau, setSoCau] = useState(() => Math.min(SO_CAU_MIN, tran))
   const lay = Math.min(soCau, coSan)
@@ -964,7 +978,7 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
       }
       // MỘT lần dựng. Bản trước dựng hai lần (đề, lời giải) rồi nối chuỗi nên
       // phụ huynh tải về thấy bìa và trang tổng quan LẶP HAI LẦN.
-      setHtml(dungPhieu(tt, (du.baiTap ?? []).slice(0, lay)))
+      setHtml(dungPhieu(tt, dsDaLoc.slice(0, lay)))
     } catch {
       setLoi('Máy chưa mở được phiếu. Phụ huynh thử lại khi có mạng ổn định.')
     } finally {
@@ -977,6 +991,16 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
       {laCuaEm && (
         <div className="bc-viec-chu" style={{ marginTop: 6 }}>
           Em hãy tạo câu khắc phục lỗi sai để luyện tập. Máy rút đúng chuyên đề em vừa mất điểm, xếp từ dễ lên khó.
+        </div>
+      )}
+
+      {coNhanDang && (
+        <div className="bc-dang" role="radiogroup" aria-label="Dạng câu">
+          {MOI_LOC_DANG.map((d) => (
+            <button key={d} type="button" role="radio" aria-checked={locDang === d} onClick={() => setLocDang(d)}>
+              {TEN_LOC_DANG[d]}
+            </button>
+          ))}
         </div>
       )}
 

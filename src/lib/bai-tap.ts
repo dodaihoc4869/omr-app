@@ -10,6 +10,7 @@
 // tối đa 18 + 4 + 6 = 28 câu — đúng bằng ma trận một đề thi thật.
 import { PHAN_I_NEED, PHAN_II_NEED, PHAN_III_NEED, type PublicExamBank, type TeacherExamSource, type TeacherMcqQuestion, type TeacherShortAnswerQuestion, type TeacherTrueFalseQuestion } from '../data/examContent'
 import type { KeyBank } from './exam-api'
+import { dangCua, hopDang, LOC_DANG_MAC_DINH, type LocDang } from './dang-cau'
 
 export const SO_CAU_BAI_TAP_TOI_DA = PHAN_I_NEED + PHAN_II_NEED + PHAN_III_NEED
 export const SO_CAU_BAI_TAP_TOI_THIEU = 5
@@ -21,6 +22,8 @@ export interface YeuCauBaiTap {
   /** Chuyên đề thầy tick. Rỗng = lấy mọi chuyên đề. */
   chuyenDe: string[]
   mucDo: MucDoLoc
+  /** Chỉ lý thuyết, chỉ bài tập, hay ngẫu nhiên. Mặc định ngẫu nhiên. */
+  dang?: LocDang
   soCau: number
   /** Câu em ĐÃ từng làm — ưu tiên tránh, chỉ dùng lại khi không đủ câu mới. */
   qidTranh?: string[]
@@ -41,9 +44,14 @@ export interface KetQuaRutBaiTap {
 type CauBatKy = { id: string; chuyenDe?: string; mucDo?: string }
 
 /** Câu có khớp bộ lọc chuyên đề + mức độ không. */
-export function khopLoc(cau: CauBatKy, chuyenDe: string[], mucDo: MucDoLoc): boolean {
+export function khopLoc(cau: CauBatKy, chuyenDe: string[], mucDo: MucDoLoc, dang: LocDang = LOC_DANG_MAC_DINH, phan?: 'I' | 'II' | 'III'): boolean {
   if (chuyenDe.length > 0 && !chuyenDe.includes(String(cau.chuyenDe || '').trim())) return false
   if (mucDo !== 'tron' && String(cau.mucDo || '') !== mucDo) return false
+  if (dang !== 'ngau_nhien') {
+    const c = cau as { text?: string; choices?: string[]; ideas?: string[]; correct?: unknown; mucDo?: string; dang?: string }
+    const luaChon = phan === 'I' ? (c.choices ?? []) : phan === 'II' ? (c.ideas ?? []) : []
+    if (!hopDang(dangCua({ phan, text: c.text, luaChon, dapAn: phan === 'III' ? String(c.correct ?? '') : '', mucDo: c.mucDo, dang: c.dang }), dang)) return false
+  }
   return true
 }
 
@@ -101,9 +109,10 @@ export function rutBaiTap(nguon: TeacherExamSource[], yc: YeuCauBaiTap): KetQuaR
   const rnd = yc.ngauNhien ?? Math.random
   const daLam = new Set((yc.qidTranh ?? []).map(String))
 
-  const hopI = nguon.flatMap((s) => s.phanI).filter((q) => khopLoc(q, yc.chuyenDe, yc.mucDo))
-  const hopII = nguon.flatMap((s) => s.phanII).filter((q) => khopLoc(q, yc.chuyenDe, yc.mucDo))
-  const hopIII = nguon.flatMap((s) => s.phanIII).filter((q) => khopLoc(q, yc.chuyenDe, yc.mucDo))
+  const loc = yc.dang ?? LOC_DANG_MAC_DINH
+  const hopI = nguon.flatMap((s) => s.phanI).filter((q) => khopLoc(q, yc.chuyenDe, yc.mucDo, loc, 'I'))
+  const hopII = nguon.flatMap((s) => s.phanII).filter((q) => khopLoc(q, yc.chuyenDe, yc.mucDo, loc, 'II'))
+  const hopIII = nguon.flatMap((s) => s.phanIII).filter((q) => khopLoc(q, yc.chuyenDe, yc.mucDo, loc, 'III'))
   const soCauKhop = hopI.length + hopII.length + hopIII.length
 
   const can = chiaSoCau(yc.soCau, { I: hopI.length, II: hopII.length, III: hopIII.length })

@@ -11,7 +11,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Dices, RefreshCw, X, ImageIcon, ChevronDown } from 'lucide-react'
 import type { TeacherExamSource } from '../data/examContent'
 import { Nhan, OThongBao } from './DesignSystem'
-import { boMotCau, demMucDo, doiMotCau, dsChuyenDe, dungUngVien, giayUocTinh, moiIdDaRut, MOI_MUC, PHAN_DE, PHUT_TOI_DA_LEN_BANG, rutDe, rutDeLenBang, rutKhoChua, soCauCua, soCauLenBang, soTinHieu, TEN_MUC, tongCau, type CauUngVien, type KetQuaRut, type MucDoRut, type PhanDe, type SoCauPhan, type YeuCauRut } from '../lib/rut-de'
+import { boMotCau, demDangUngVien, demMucDo, doiMotCau, dsChuyenDe, dungUngVien, giayUocTinh, moiIdDaRut, MOI_MUC, PHAN_DE, PHUT_TOI_DA_LEN_BANG, rutDe, rutDeLenBang, rutKhoChua, soCauCua, soCauLenBang, soTinHieu, TEN_MUC, tongCau, type CauUngVien, type KetQuaRut, type MucDoRut, type PhanDe, type SoCauPhan, type YeuCauRut } from '../lib/rut-de'
+import { MOI_LOC_DANG, LOC_DANG_MAC_DINH, soCauDung, TEN_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -164,6 +165,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
   const tongKho = tongCau(co)
   const dsCd = useMemo(() => dsChuyenDe(uv), [uv])
   const demMuc = useMemo(() => demMucDo(uv), [uv])
+  const demDang = useMemo(() => demDangUngVien(uv), [uv])
 
   // Kho vừa đúng cỡ một đề (≤ 28 câu, cấu trúc THPT) thì mặc định lấy trọn —
   // rút đề ở đó chỉ tổ làm thầy thêm một bước. Kho lớn hơn thì mặc định RÚT,
@@ -178,6 +180,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
   // chấm lại). Bằng nhau thì cả lớp làm cùng một đề.
   const [rieng, setRieng] = useState(true)
   const [chonCd, setChonCd] = useState<string[]>([])
+  const [chonDang, setChonDang] = useState<LocDang>(LOC_DANG_MAC_DINH)
   const [chonMuc, setChonMuc] = useState<MucDoRut[]>([])
   const [seed, setSeed] = useState(() => Math.floor(Math.random() * 1e9))
   const [moChiTiet, setMoChiTiet] = useState(false)
@@ -200,7 +203,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
     [rieng, soCau, co],
   )
 
-  const yc: YeuCauRut = useMemo(() => ({ soCau: soCauKho, chuyenDe: chonCd, mucDo: chonMuc, tranhQid: qidCaTruoc, seed }), [soCauKho, chonCd, chonMuc, qidCaTruoc, seed])
+  const yc: YeuCauRut = useMemo(() => ({ soCau: soCauKho, chuyenDe: chonCd, mucDo: chonMuc, dang: chonDang, tranhQid: qidCaTruoc, seed }), [soCauKho, chonCd, chonMuc, chonDang, qidCaTruoc, seed])
 
   // BỘ CÂU CHO BUỔI CHỮA BÀI: máy tự chọn hết, thầy không gõ số nào. Số câu
   // theo ngân sách giây của chính ca này.
@@ -362,6 +365,25 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
               </div>
             </div>
           )}
+
+          {/* DẠNG CÂU — thầy chốt 06/09. Kho CHƯA có nhãn thật, chỗ này suy ra
+              từ mặt chữ, nên câu không đủ chắc bị xếp "chưa rõ" và chỉ vào đề ở
+              chế độ Ngẫu nhiên. Hiện thẳng ba con số để thầy biết chọn chặt thì
+              còn bao nhiêu câu, thay vì rút xong mới báo thiếu. */}
+          <div>
+            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Dạng câu</div>
+            <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Dạng câu được lấy">
+              {MOI_LOC_DANG.map((d) => (
+                <Chip key={d} mau="tim" chon={chonDang === d} onClick={() => setChonDang(d)}>
+                  {TEN_LOC_DANG[d]} <span style={{ opacity: 0.7 }}>{soCauDung(demDang, d)}</span>
+                </Chip>
+              ))}
+            </div>
+            <div style={{ ...NHAN_NHO, marginTop: 'var(--k1)' }}>
+              Kho đang có {demDang.ly_thuyet} câu {TEN_DANG.ly_thuyet.toLowerCase()}, {demDang.bai_tap} câu {TEN_DANG.bai_tap.toLowerCase()}
+              {demDang.chua_ro > 0 ? `, và ${demDang.chua_ro} câu máy chưa phân loại chắc chắn — số này chỉ vào đề khi chọn Ngẫu nhiên.` : '.'}
+            </div>
+          </div>
 
           <div>
             <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Mức độ được lấy {chonMuc.length === 0 ? '(tất cả)' : ''}</div>

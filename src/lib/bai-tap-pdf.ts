@@ -17,6 +17,8 @@
 // lên hàng megabyte). Một câu có hình mà in ra không có hình là câu không làm
 // được, nên thà bỏ hẳn còn hơn phát cho em một câu cụt.
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
+import { dangCua, hopDang, LOC_DANG_MAC_DINH, type DangCau, type LocDang } from './dang-cau'
+import { chuanChuyenDe } from './goi-len-bang'
 
 export type MucDoCau = 'biet' | 'hieu' | 'van_dung'
 const BAC: MucDoCau[] = ['biet', 'hieu', 'van_dung']
@@ -33,6 +35,8 @@ export interface CauLuyen {
   phan: 'I' | 'II' | 'III'
   id: string
   chuyenDe: string
+  /** Lý thuyết hay bài tập — suy ra, có thể là `chua_ro`. Xem `dang-cau.ts`. */
+  dang: DangCau
   mucDo: MucDoCau | ''
   text: string
   luaChon: string[] | null
@@ -120,6 +124,14 @@ function doiSang(c: CauNguon): CauLuyen {
     phan: c.phan,
     id: q.id,
     chuyenDe: String(q.chuyenDe || ''),
+    dang: dangCua({
+      phan: c.phan,
+      text: q.text,
+      luaChon: c.phan === 'I' ? (mcq.choices ?? []) : c.phan === 'II' ? (tf.ideas ?? []) : [],
+      dapAn: c.phan === 'III' ? String(sa.correct ?? '') : '',
+      mucDo: q.mucDo,
+      dang: (q as { dang?: string }).dang,
+    }),
     mucDo: (q.mucDo as MucDoCau) || '',
     text: q.text || '',
     luaChon: c.phan === 'I' ? [...(mcq.choices ?? [])] : c.phan === 'II' ? [...(tf.ideas ?? [])] : null,
@@ -151,10 +163,20 @@ export function cauLuyenTuBoCau(bo: { phan: 'I' | 'II' | 'III'; q: TeacherMcqQue
 }
 
 export interface YeuCauLuyen {
-  /** Chuyên đề em đang yếu, kèm tỉ lệ sai để chọn bậc khởi điểm. */
+  /** Chuyên đề em đang yếu TRONG CA NÀY, kèm tỉ lệ sai. Dùng để XẾP ƯU TIÊN và
+   * chọn bậc khởi điểm — KHÔNG phải ranh giới. */
   chuyenDe: { ten: string; tiLeSai: number }[]
+  /** RANH GIỚI CỨNG: chuyên đề của chính ca đó. Thầy chốt 06/09 —
+   * "chỉ rút bài tập từ những chuyên đề được chọn của ca đó".
+   *
+   * LỖI ĐÃ SỬA: trước đây chỉ có `chuyenDe` ở trên, và khi em KHÔNG SAI chuyên
+   * đề nào thì danh sách rỗng, hàm hiểu rỗng là "lấy toàn kho" — bài luyện rút
+   * cả những chuyên đề ca đó chưa từng đụng tới. Rỗng nay vẫn là ranh giới. */
+  chuyenDeCa?: string[]
   /** Câu em đã từng làm — tránh trước, chỉ dùng lại khi hết câu mới. */
   qidDaLam?: string[]
+  /** Chỉ lý thuyết, chỉ bài tập, hay ngẫu nhiên. Mặc định ngẫu nhiên. */
+  dang?: LocDang
   soCau: number
   ngauNhien?: () => number
 }
@@ -163,14 +185,40 @@ export interface YeuCauLuyen {
 export function chonCauLuyen(nguon: TeacherExamSource[], yc: YeuCauLuyen): KetQuaChonCau {
   const rnd = yc.ngauNhien ?? Math.random
   const daLam = new Set(yc.qidDaLam ?? [])
-  const tenYeu = yc.chuyenDe.map((c) => c.ten.trim()).filter(Boolean)
   const khoiDiem = yc.chuyenDe.length ? mucKhoiDiem(Math.max(...yc.chuyenDe.map((c) => c.tiLeSai))) : 'hieu'
+  const loc = yc.dang ?? LOC_DANG_MAC_DINH
 
-  // Kho câu dùng được: đúng chuyên đề yếu, KHÔNG có hình.
+  // RANH GIỚI: chuyên đề của ca. Không truyền thì giữ nguyên hành vi cũ (toàn
+  // kho) — ca cũ và chỗ gọi chưa cập nhật vẫn chạy.
+  const trongCa = new Set((yc.chuyenDeCa ?? []).map((t) => chuanChuyenDe(t)).filter(Boolean))
+  // ƯU TIÊN: chuyên đề em sai nhiều nhất trong ca này lên trước. Đây là chỗ
+  // "theo điểm mạnh yếu của ca thi đó" được thi hành — xếp thứ tự, không phải
+  // cắt bỏ, nên em không sai gì vẫn có bài luyện trong đúng phạm vi ca.
+  const hangYeu = new Map<string, number>()
+  ;[...yc.chuyenDe]
+    .sort((a, b) => b.tiLeSai - a.tiLeSai)
+    .forEach((c, i) => {
+      const k = chuanChuyenDe(c.ten)
+      if (k && !hangYeu.has(k)) hangYeu.set(k, i)
+    })
+  const uuTien = (c: CauLuyen) => hangYeu.get(chuanChuyenDe(c.chuyenDe)) ?? Number.MAX_SAFE_INTEGER
+
+  // Kho câu dùng được: trong phạm vi ca, đúng dạng thầy chọn, KHÔNG có hình.
+  //
+  // HAI LUẬT, tuỳ chỗ gọi có truyền phạm vi ca hay không:
+  //   · CÓ `chuyenDeCa` (báo cáo sau ca) — ranh giới là phạm vi ca, còn chuyên
+  //     đề yếu chỉ xếp thứ tự. Em không sai gì vẫn có bài trong đúng phạm vi.
+  //   · KHÔNG có — giữ NGUYÊN luật cũ: chuyên đề yếu là bộ lọc CỨNG. Hạ nó
+  //     xuống thành ưu tiên ở đây là nới âm thầm cho mọi chỗ gọi cũ.
+  const tenYeu = yc.chuyenDe.map((c) => c.ten.trim()).filter(Boolean)
+  const trongPhamVi = (cd: string) =>
+    trongCa.size > 0 ? trongCa.has(chuanChuyenDe(cd)) : tenYeu.length === 0 || tenYeu.includes(cd.trim())
+
   const kho = goiCau(nguon)
     .filter((c) => !coHinh(c.q as { thanCauImg?: string }))
-    .filter((c) => (tenYeu.length === 0 ? true : tenYeu.includes(String(c.q.chuyenDe || '').trim())))
+    .filter((c) => trongPhamVi(String(c.q.chuyenDe || '')))
     .map(doiSang)
+    .filter((c) => hopDang(c.dang, loc))
 
   const xao = <T,>(xs: T[]): T[] => {
     const a = [...xs]
@@ -181,7 +229,9 @@ export function chonCauLuyen(nguon: TeacherExamSource[], yc: YeuCauLuyen): KetQu
     return a
   }
 
-  const conLai = xao(kho)
+  // Xáo trước rồi mới xếp theo ưu tiên: trong cùng một chuyên đề vẫn ngẫu
+  // nhiên, nhưng chuyên đề yếu hơn luôn được lấy trước.
+  const conLai = xao(kho).sort((a, b) => uuTien(a) - uuTien(b))
   const daChon: CauLuyen[] = []
   const daDung = new Set<string>()
   let lapLai = 0

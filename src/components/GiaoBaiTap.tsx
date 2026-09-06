@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { CheckSquare, Square, X } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh } from './DesignSystem'
 import { demCauTheoChuyenDe, rutBaiTap, SO_CAU_BAI_TAP_MAC_DINH, SO_CAU_BAI_TAP_TOI_DA, SO_CAU_BAI_TAP_TOI_THIEU, type MucDoLoc } from '../lib/bai-tap'
+import { LOC_DANG_MAC_DINH, MOI_LOC_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
 import { publishSession, qidDaLam, danhSachYeuCau, danhDauYeuCau, type ChuyenDeEm } from '../lib/exam-api'
 import { tinBaoBaiTap } from '../lib/phieu-zalo'
 import { loadExamSources, loadScriptUrl, loadTeacherSecret, saveSessionTeacherBank } from '../lib/exam-db'
@@ -60,6 +61,7 @@ export default function GiaoBaiTap({
 
   const [nguon, setNguon] = useState<TeacherExamSource[] | null>(null)
   const [mucDo, setMucDo] = useState<MucDoLoc>('tron')
+  const [dang, setDang] = useState<LocDang>(LOC_DANG_MAC_DINH)
   const [soCau, setSoCau] = useState(SO_CAU_BAI_TAP_MAC_DINH)
   const [hanNgay, setHanNgay] = useState(() => ngayISO(HAN_NOP_NGAY_MAC_DINH))
   const [chon, setChon] = useState<string[]>(() => chuyenDeEm.filter((c) => c.tiLeSai > nguongYeu).map((c) => c.ten))
@@ -108,7 +110,7 @@ export default function GiaoBaiTap({
       } catch {
         canhBaoQid = ' (không đọc được danh sách câu em đã làm nên chưa lọc trùng)'
       }
-      const kq = rutBaiTap(nguon, { chuyenDe: chon, mucDo, soCau, qidTranh: daLam })
+      const kq = rutBaiTap(nguon, { chuyenDe: chon, mucDo, dang, soCau, qidTranh: daLam })
       if (kq.soCau === 0) throw new Error('Kho không có câu nào khớp bộ lọc này')
       const maCa = randomSessionCode()
       const tenBai = `Bài tập ${chon.length === 1 ? chon[0] : `${kq.soCau} câu`} — ${hoTen || sbd}`
@@ -237,6 +239,43 @@ export default function GiaoBaiTap({
             })}
           </div>
           <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>Không tick chuyên đề nào = lấy mọi chuyên đề.</div>
+        </div>
+
+        {/* DẠNG CÂU — cùng ba lựa chọn với màn Rút đề (thầy chốt 06/09). */}
+        <div>
+          <div className="font-bold" style={{ fontSize: 'var(--cx-2)', marginBottom: 'var(--k2)' }}>
+            Dạng câu
+          </div>
+          <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Dạng câu">
+            {MOI_LOC_DANG.map((d) => {
+              const c = dang === d
+              return (
+                <button
+                  key={d}
+                  type="button"
+                  role="radio"
+                  aria-checked={c}
+                  onClick={() => setDang(d)}
+                  className="tap-target font-bold"
+                  style={{
+                    fontFamily: 'var(--sans)',
+                    fontSize: 'var(--cx-1)',
+                    minHeight: 36,
+                    padding: '0 var(--k3)',
+                    borderRadius: 'var(--bo-tron)',
+                    border: 'none',
+                    background: c ? 'var(--muc)' : 'var(--the-2)',
+                    color: c ? 'var(--muc-nguoc)' : 'var(--nhat)',
+                  }}
+                >
+                  {TEN_LOC_DANG[d]}
+                </button>
+              )
+            })}
+          </div>
+          <div style={{ fontSize: 'var(--cx-0)', color: 'var(--nhat)', marginTop: 'var(--k1)', lineHeight: 1.5 }}>
+            Kho chưa có nhãn lý thuyết / bài tập, máy tự phân loại từ đề. Câu không phân loại chắc chắn chỉ vào bài khi chọn Ngẫu nhiên.
+          </div>
         </div>
 
         <div>

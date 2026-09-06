@@ -26,6 +26,7 @@ import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion,
 import { soSao } from '../data/examContent'
 import { hashSeed, seededPermutation } from './exam-shuffle'
 import { chuanChuyenDe } from './goi-len-bang'
+import { dangCua, hopDang, LOC_DANG_MAC_DINH, type DangCau, type LocDang } from './dang-cau'
 
 export type MucDoRut = 'biet' | 'hieu' | 'van_dung'
 export type PhanDe = 'I' | 'II' | 'III'
@@ -49,6 +50,9 @@ export interface CauUngVien {
   soGoc: number
   chuyenDe: string
   mucDo: MucDoRut | ''
+  /** Lý thuyết hay bài tập — suy ra từ mặt chữ, có thể là `chua_ro`. Kho chưa
+   * có nhãn thật; xem khối đầu `dang-cau.ts`. */
+  dang: DangCau
   text: string
   coHinh: boolean
   /** Câu pipeline tự đánh dấu cần thầy xem lại. */
@@ -65,6 +69,9 @@ export interface YeuCauRut {
   chuyenDe: string[]
   /** Mức độ được phép lấy. Rỗng = mọi mức (kể cả câu chưa gắn mức). */
   mucDo: MucDoRut[]
+  /** Chỉ lý thuyết, chỉ bài tập, hay ngẫu nhiên. Mặc định ngẫu nhiên — nhận
+   * cả câu `chua_ro`, nên không đổi hành vi của ca mở trước bản này. */
+  dang?: LocDang
   /** Câu đã ra ở các ca trước — bị đẩy xuống cuối, không bị cấm. */
   tranhQid?: string[]
   /** Đổi seed là ra bộ câu khác — nút "Trộn lại". */
@@ -100,6 +107,9 @@ export function dungUngVien(sources: TeacherExamSource[]): Record<PhanDe, CauUng
     ]
     for (const [phan, ds] of day) {
       ds.forEach((q, i) => {
+        const mcq = q as TeacherMcqQuestion
+        const tf = q as TeacherTrueFalseQuestion
+        const sa = q as TeacherShortAnswerQuestion
         ra[phan].push({
           phan,
           id: q.id,
@@ -107,6 +117,14 @@ export function dungUngVien(sources: TeacherExamSource[]): Record<PhanDe, CauUng
           soGoc: i + 1,
           chuyenDe: (q.chuyenDe || '').trim(),
           mucDo: mucCua(q.mucDo),
+          dang: dangCua({
+            phan,
+            text: q.text,
+            luaChon: phan === 'I' ? (mcq.choices ?? []) : phan === 'II' ? (tf.ideas ?? []) : [],
+            dapAn: phan === 'III' ? String(sa.correct ?? '') : '',
+            mucDo: q.mucDo,
+            dang: (q as { dang?: string }).dang,
+          }),
           text: q.text || '',
           coHinh: coHinhCua(q),
           canXem: Boolean(q.canXem),
@@ -140,11 +158,22 @@ export function demMucDo(uv: Record<PhanDe, CauUngVien[]>): Record<MucDoRut | ''
   return ra
 }
 
-/** Câu hợp bộ lọc chuyên đề + mức độ. Lọc rỗng = nhận hết. */
-export function locTheoYeuCau(ds: CauUngVien[], yc: Pick<YeuCauRut, 'chuyenDe' | 'mucDo'>): CauUngVien[] {
+/** Câu hợp bộ lọc chuyên đề + mức độ + dạng. Lọc rỗng = nhận hết. */
+export function locTheoYeuCau(ds: CauUngVien[], yc: Pick<YeuCauRut, 'chuyenDe' | 'mucDo'> & { dang?: LocDang }): CauUngVien[] {
   const cd = new Set(yc.chuyenDe.map(chuanChuyenDe).filter(Boolean))
   const md = new Set(yc.mucDo)
-  return ds.filter((c) => (cd.size === 0 || cd.has(chuanChuyenDe(c.chuyenDe))) && (md.size === 0 || (c.mucDo !== '' && md.has(c.mucDo))))
+  const loc = yc.dang ?? LOC_DANG_MAC_DINH
+  return ds.filter(
+    (c) => (cd.size === 0 || cd.has(chuanChuyenDe(c.chuyenDe))) && (md.size === 0 || (c.mucDo !== '' && md.has(c.mucDo))) && hopDang(c.dang, loc),
+  )
+}
+
+/** Đếm câu theo dạng trong kho đã chọn — để màn Rút đề hiện thẳng ba con số,
+ * thầy nhìn là biết chọn "chỉ lý thuyết" thì còn bao nhiêu câu. */
+export function demDangUngVien(uv: Record<PhanDe, CauUngVien[]>): Record<DangCau, number> {
+  const ra: Record<DangCau, number> = { ly_thuyet: 0, bai_tap: 0, chua_ro: 0 }
+  for (const p of PHAN_DE) for (const c of uv[p]) ra[c.dang] += 1
+  return ra
 }
 
 /** Lấy dần từng câu: mỗi lượt chọn câu thuộc chuyên đề đang ít nhất, rồi mức độ

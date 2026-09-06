@@ -12,6 +12,7 @@ import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion,
 import type { CaCuaEm, ChiTietCauRow, ChuyenDeEm, HoSoEm } from './exam-api'
 import { ducKetKienThuc, thongKeLamBai, tinHieuLamBai, type DucKetChuyenDe, type ThongKeLamBai, type TinHieuLamBai } from './phan-tich-lam-bai'
 import { cauLuyenTuBoCau, cauLuyenTuNguon, chonCauLuyen, type CauLuyen } from './bai-tap-pdf'
+import type { LocDang } from './dang-cau'
 import { mocRoiMan } from './chong-gian-lan'
 
 /** Phiên bản gói báo cáo. Trang đọc từ chối bản lạ thay vì vẽ thiếu mục. */
@@ -293,6 +294,8 @@ export interface NguonPhieu {
   vaoLuc?: string | null
   /** Cả kho đề trên máy thầy, để rút sẵn 10 câu luyện kèm vào báo cáo. */
   khoDe?: TeacherExamSource[] | null
+  /** Chỉ lý thuyết, chỉ bài tập, hay ngẫu nhiên. Mặc định ngẫu nhiên. */
+  dangBaiTap?: LocDang
   /** Câu em đã làm — tránh khi rút bài luyện. */
   qidDaLam?: string[] | null
   /** Nhật ký rời màn của lượt này. Không có thì báo cáo không có nút Vi phạm. */
@@ -479,14 +482,26 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
   const cauSai = rows.length && banks.length ? dungCauSai(rows, banks) : []
   const tk = rows.length ? thongKeLamBai(rows, { vaoLuc: n.vaoLuc, nopLuc: n.ca.nopLuc, thoiLuongPhut: n.thoiLuongPhut }) : null
 
-  // Bài luyện kèm sẵn: rút theo chuyên đề em sai TRONG CA NÀY, tránh câu em đã
-  // làm. Kho đề chỉ có trên máy thầy nên phải rút ở đây, lúc tạo báo cáo.
+  // BÀI LUYỆN KÈM SẴN — thầy chốt 06/09: "chỉ rút bài tập từ những chuyên đề
+  // được chọn của ca đó, theo điểm mạnh yếu của ca thi đó, không rút theo mạnh
+  // yếu cộng dồn".
+  //
+  // Hai thứ khác nhau, trước đây gộp làm một nên sinh lỗi:
+  //   · RANH GIỚI = MỌI chuyên đề của ca (`chuyenDeCa`), kể cả chuyên đề em làm
+  //     đúng hết. Trước đây chỉ truyền danh sách chuyên đề SAI, và em không sai
+  //     gì thì danh sách rỗng ⇒ `chonCauLuyen` hiểu rỗng là lấy TOÀN KHO.
+  //   · ƯU TIÊN = chuyên đề sai nhiều nhất trong CA NÀY lên trước. Tỉ lệ sai
+  //     tính từ `n.chuyenDeCa` của đúng ca, không cộng dồn ca cũ.
+  const phamViCa = n.chuyenDeCa.map((c) => c.ten).filter(Boolean)
   const yeuCa = n.chuyenDeCa
     .filter((c) => c.soSai > 0)
     .map((c) => ({ ten: c.ten, tiLeSai: c.soSai / Math.max(1, c.soCau) }))
     .sort((a, b) => b.tiLeSai - a.tiLeSai)
   const kho = n.khoDe ?? []
-  const baiTap = kho.length > 0 ? chonCauLuyen(kho, { chuyenDe: yeuCa, qidDaLam: n.qidDaLam ?? [], soCau: SO_CAU_BAI_TAP_KEM }).cau : []
+  const baiTap =
+    kho.length > 0
+      ? chonCauLuyen(kho, { chuyenDe: yeuCa, chuyenDeCa: phamViCa, dang: n.dangBaiTap, qidDaLam: n.qidDaLam ?? [], soCau: SO_CAU_BAI_TAP_KEM }).cau
+      : []
 
   return {
     v: BAN_PHIEU,

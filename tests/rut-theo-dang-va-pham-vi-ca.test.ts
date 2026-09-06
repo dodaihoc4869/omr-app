@@ -1,0 +1,145 @@
+// BA LỰA CHỌN DẠNG CÂU Ở MỌI CHỖ RÚT + RANH GIỚI CHUYÊN ĐỀ CỦA CA.
+// Thầy chốt 06/09:
+//   · "Lúc tạo đề cho tôi mục chọn chỉ rút những câu lý thuyết, hoặc chỉ rút
+//     những câu bài tập, hoặc ngẫu nhiên."
+//   · "Trong tất cả mục rút bài báo cáo phụ huynh và học sinh cũng phải có 3
+//     lựa chọn này."
+//   · "Chỉ rút bài tập từ những chuyên đề được chọn của ca đó, theo điểm mạnh
+//     yếu của ca thi đó, không rút theo mạnh yếu cộng dồn."
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { describe, expect, it } from 'vitest'
+import { chonCauLuyen } from '../src/lib/bai-tap-pdf'
+import { khopLoc, rutBaiTap } from '../src/lib/bai-tap'
+import { dungUngVien, locTheoYeuCau, demDangUngVien } from '../src/lib/rut-de'
+import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion } from '../src/data/examContent'
+
+const doc = (f: string) => readFileSync(resolve(__dirname, '..', f), 'utf8')
+
+const lyThuyet = (id: string, cd: string): TeacherMcqQuestion => ({
+  id,
+  text: 'Phản ứng thuận nghịch là phản ứng hoá học mà',
+  choices: ['cùng điều kiện.', 'mọi điều kiện.', 'nhiệt độ cao.', 'áp suất cao.'],
+  correct: 'A',
+  chuyenDe: cd,
+  mucDo: 'biet',
+})
+const baiTapIII = (id: string, cd: string): TeacherShortAnswerQuestion => ({
+  id,
+  text: 'Cho 5,6 gam Fe tan hết trong HCl dư. Tính số mol khí thu được là bao nhiêu mol?',
+  correct: '0,1',
+  chuyenDe: cd,
+  mucDo: 'van_dung',
+})
+
+/** Kho hai chuyên đề: "Trong ca" và "Ngoài ca". */
+function kho(): TeacherExamSource[] {
+  return [
+    {
+      maDe: 'D1',
+      phanI: [lyThuyet('lt-trong-1', 'Trong ca'), lyThuyet('lt-trong-2', 'Trong ca'), lyThuyet('lt-ngoai-1', 'Ngoài ca'), lyThuyet('lt-ngoai-2', 'Ngoài ca')],
+      phanII: [],
+      phanIII: [baiTapIII('bt-trong-1', 'Trong ca'), baiTapIII('bt-ngoai-1', 'Ngoài ca')],
+    } as unknown as TeacherExamSource,
+  ]
+}
+
+describe('ranh giới chuyên đề của ca — bài luyện kèm báo cáo', () => {
+  it('1. em KHÔNG SAI chuyên đề nào vẫn chỉ rút trong phạm vi ca', () => {
+    // ĐÂY LÀ LỖI THẦY BÁO. Trước đây danh sách chuyên đề yếu rỗng ⇒ hàm hiểu
+    // rỗng là "lấy toàn kho", nên bài luyện lôi cả chuyên đề ca đó chưa đụng.
+    const kq = chonCauLuyen(kho(), { chuyenDe: [], chuyenDeCa: ['Trong ca'], soCau: 10, ngauNhien: () => 0 })
+    expect(kq.cau.length).toBeGreaterThan(0)
+    for (const c of kq.cau) expect(c.chuyenDe).toBe('Trong ca')
+  })
+
+  it('2. chuyên đề em sai NHIỀU NHẤT trong ca này được lấy trước', () => {
+    const kq = chonCauLuyen(kho(), {
+      chuyenDe: [{ ten: 'Trong ca', tiLeSai: 0.8 }],
+      chuyenDeCa: ['Trong ca', 'Ngoài ca'],
+      soCau: 2,
+      ngauNhien: () => 0,
+    })
+    expect(kq.cau.length).toBe(2)
+    for (const c of kq.cau) expect(c.chuyenDe).toBe('Trong ca')
+  })
+
+  it('3. KHÔNG truyền phạm vi ca thì giữ nguyên hành vi cũ, ca cũ không vỡ', () => {
+    const kq = chonCauLuyen(kho(), { chuyenDe: [], soCau: 10, ngauNhien: () => 0 })
+    expect(new Set(kq.cau.map((c) => c.chuyenDe)).size).toBeGreaterThan(1)
+  })
+
+  it('4. báo cáo truyền MỌI chuyên đề của ca làm ranh giới, không chỉ chuyên đề sai', () => {
+    const lib = doc('src/lib/phieu-du-lieu.ts')
+    expect(lib).toContain('const phamViCa = n.chuyenDeCa.map((c) => c.ten).filter(Boolean)')
+    expect(lib).toContain('chuyenDeCa: phamViCa')
+    // và tỉ lệ sai vẫn tính từ CHÍNH ca đó
+    expect(lib).toContain('tiLeSai: c.soSai / Math.max(1, c.soCau)')
+  })
+})
+
+describe('ba lựa chọn dạng câu ở mọi chỗ rút', () => {
+  it('5. bài luyện: chỉ lý thuyết thì không dính câu bài tập', () => {
+    const kq = chonCauLuyen(kho(), { chuyenDe: [], chuyenDeCa: ['Trong ca'], dang: 'ly_thuyet', soCau: 10, ngauNhien: () => 0 })
+    expect(kq.cau.length).toBeGreaterThan(0)
+    for (const c of kq.cau) expect(c.dang).toBe('ly_thuyet')
+  })
+
+  it('6. bài luyện: chỉ bài tập thì không dính câu lý thuyết', () => {
+    const kq = chonCauLuyen(kho(), { chuyenDe: [], chuyenDeCa: ['Trong ca'], dang: 'bai_tap', soCau: 10, ngauNhien: () => 0 })
+    expect(kq.cau.length).toBeGreaterThan(0)
+    for (const c of kq.cau) expect(c.dang).toBe('bai_tap')
+  })
+
+  it('7. giao bài tập: bộ lọc dạng ăn vào cả ba phần', () => {
+    const chiLt = rutBaiTap(kho(), { chuyenDe: [], mucDo: 'tron', dang: 'ly_thuyet', soCau: 10, ngauNhien: () => 0 })
+    expect(chiLt.keyBank.phanIII.length).toBe(0) // Phần III luôn là bài tập
+    expect(chiLt.keyBank.phanI.length).toBeGreaterThan(0)
+    const chiBt = rutBaiTap(kho(), { chuyenDe: [], mucDo: 'tron', dang: 'bai_tap', soCau: 10, ngauNhien: () => 0 })
+    expect(chiBt.keyBank.phanI.length).toBe(0)
+    expect(chiBt.keyBank.phanIII.length).toBeGreaterThan(0)
+  })
+
+  it('8. khopLoc mặc định KHÔNG lọc dạng — chỗ gọi cũ không đổi hành vi', () => {
+    expect(khopLoc(lyThuyet('x', 'A'), [], 'tron')).toBe(true)
+    expect(khopLoc(baiTapIII('y', 'A'), [], 'tron')).toBe(true)
+  })
+
+  it('9. rút đề: ứng viên mang dạng, và bộ lọc cắt đúng', () => {
+    const uv = dungUngVien(kho())
+    const dem = demDangUngVien(uv)
+    expect(dem.ly_thuyet).toBe(4)
+    expect(dem.bai_tap).toBe(2)
+    const chiLt = locTheoYeuCau(uv.I, { chuyenDe: [], mucDo: [], dang: 'ly_thuyet' })
+    expect(chiLt.length).toBe(4)
+    expect(locTheoYeuCau(uv.III, { chuyenDe: [], mucDo: [], dang: 'ly_thuyet' }).length).toBe(0)
+    // không truyền dạng = ngẫu nhiên = nhận hết
+    expect(locTheoYeuCau(uv.I, { chuyenDe: [], mucDo: [] }).length).toBe(4)
+  })
+})
+
+describe('ba lựa chọn có mặt trên cả ba màn', () => {
+  it('10. màn Rút đề', () => {
+    const man = doc('src/components/KhoiRutDe.tsx')
+    expect(man).toContain('MOI_LOC_DANG.map')
+    expect(man).toContain('dang: chonDang')
+    // hiện thẳng ba con số để thầy biết chọn chặt thì còn bao nhiêu câu
+    expect(man).toContain('soCauDung(demDang, d)')
+  })
+
+  it('11. màn Giao bài tập', () => {
+    const man = doc('src/components/GiaoBaiTap.tsx')
+    expect(man).toContain('MOI_LOC_DANG.map')
+    expect(man).toContain('dang,')
+  })
+
+  it('12. báo cáo phụ huynh và học sinh', () => {
+    const man = doc('src/screens/PhieuScreen.tsx')
+    expect(man).toContain('MOI_LOC_DANG.map')
+    expect(man).toContain('hopDang(c.dang ?? ')
+    // báo cáo cũ không có nhãn thì ẩn hàng nút, không hiện ba nút mà hai cái
+    // luôn ra 0 câu
+    expect(man).toContain('const coNhanDang =')
+    expect(man).toContain('{coNhanDang && (')
+  })
+})
