@@ -87,6 +87,42 @@ describe('ranh giới chuyên đề của ca — bài luyện kèm báo cáo', (
     expect(caCa).toContain('const cdSai = cd.filter((c) => c.soSai > 0)')
   })
 
+  it('3c. RANH GIỚI CHẶT NHẤT là MÃ ĐỀ của ca — chuyên đề gộp cả chương nên không đủ', () => {
+    // Thầy bắt được 06/09: em Tuân chỉ thi Ester bài 1, bài luyện ra câu xà
+    // phòng. Câu đó KHÔNG sai nhãn — nó đúng chuyên đề "Ester – lipid". Chuyên
+    // đề trong kho là cả chương, gộp ester với xà phòng làm một.
+    const nguon: TeacherExamSource[] = [
+      { maDe: 'ESTER-B1', phanI: [lyThuyet('e1', 'Ester – lipid'), lyThuyet('e2', 'Ester – lipid')], phanII: [], phanIII: [] } as unknown as TeacherExamSource,
+      { maDe: 'ESTER-B3', phanI: [lyThuyet('x1', 'Ester – lipid'), lyThuyet('x2', 'Ester – lipid')], phanII: [], phanIII: [] } as unknown as TeacherExamSource,
+    ]
+    // Lọc theo CHUYÊN ĐỀ: cả bốn câu đều lọt — đúng là lỗi thầy thấy.
+    const theoChuyenDe = chonCauLuyen(nguon, { chuyenDe: [], chuyenDeCa: ['Ester – lipid'], soCau: 10, ngauNhien: () => 0 })
+    expect(theoChuyenDe.cau.map((c) => c.id).sort()).toEqual(['e1', 'e2', 'x1', 'x2'])
+    // Lọc theo MÃ ĐỀ: chỉ còn đúng bài thầy chọn.
+    const theoMaDe = chonCauLuyen(nguon, { chuyenDe: [], chuyenDeCa: ['Ester – lipid'], maDeCa: ['ESTER-B1'], soCau: 10, ngauNhien: () => 0 })
+    expect(theoMaDe.cau.map((c) => c.id).sort()).toEqual(['e1', 'e2'])
+  })
+
+  it('3d. hết câu trong bài thì BÁO THIẾU, KHÔNG tự nới ra cả chuyên đề', () => {
+    // Giả định đã ghi rõ: nới âm thầm chính là thứ đẻ ra câu xà phòng.
+    const nguon: TeacherExamSource[] = [
+      { maDe: 'ESTER-B1', phanI: [lyThuyet('e1', 'Ester – lipid')], phanII: [], phanIII: [] } as unknown as TeacherExamSource,
+      { maDe: 'ESTER-B3', phanI: [lyThuyet('x1', 'Ester – lipid'), lyThuyet('x2', 'Ester – lipid')], phanII: [], phanIII: [] } as unknown as TeacherExamSource,
+    ]
+    const kq = chonCauLuyen(nguon, { chuyenDe: [], maDeCa: ['ESTER-B1'], soCau: 5, ngauNhien: () => 0 })
+    expect(kq.cau.map((c) => c.id)).toEqual(['e1'])
+    expect(kq.thieu).toBe(4)
+  })
+
+  it('3e. báo cáo CHƯA bó theo mã đề — và đó là cố ý, có lý do ghi tại chỗ', () => {
+    // Suy mã đề từ `banks` cho ra rỗng (mã đề của ngân hàng ca khác mã đề của
+    // kho) ⇒ bài luyện rỗng ⇒ mất `linkBaiTap` ⇒ báo cáo mất hai nút copy.
+    // Nguồn đúng là danh sách đề thầy đã tích lúc mở ca, cất riêng.
+    const lib = doc('src/lib/phieu-du-lieu.ts')
+    expect(lib).not.toContain('maDeCa,')
+    expect(lib).toContain('RANH GIỚI THEO MÃ ĐỀ: CHƯA nối ở đây, cố ý.')
+  })
+
   it('4. báo cáo truyền MỌI chuyên đề của ca làm ranh giới, không chỉ chuyên đề sai', () => {
     const lib = doc('src/lib/phieu-du-lieu.ts')
     expect(lib).toContain('const phamViCa = n.chuyenDeCa.map((c) => c.ten).filter(Boolean)')

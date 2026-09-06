@@ -34,6 +34,9 @@ export interface HinhCau {
 export interface CauLuyen {
   phan: 'I' | 'II' | 'III'
   id: string
+  /** Mã đề nguồn — chính là BÀI câu này được rút ra. Chuyên đề gộp cả chương
+   * nên không đủ chặt; xem `maDeCa` trong `YeuCauLuyen`. */
+  maDe: string
   chuyenDe: string
   /** Lý thuyết hay bài tập — suy ra, có thể là `chua_ro`. Xem `dang-cau.ts`. */
   dang: DangCau
@@ -86,7 +89,7 @@ export function thangBac(khoiDiem: MucDoCau, soCau: number): MucDoCau[] {
   return ra
 }
 
-type CauNguon = { phan: 'I' | 'II' | 'III'; q: TeacherMcqQuestion | TeacherTrueFalseQuestion | TeacherShortAnswerQuestion }
+type CauNguon = { phan: 'I' | 'II' | 'III'; maDe: string; q: TeacherMcqQuestion | TeacherTrueFalseQuestion | TeacherShortAnswerQuestion }
 
 function coHinh(q: { thanCauImg?: string; choiceImgs?: (string | undefined)[]; ideaImgs?: (string | undefined)[] }): boolean {
   return Boolean(q.thanCauImg || q.choiceImgs?.some(Boolean) || q.ideaImgs?.some(Boolean))
@@ -95,9 +98,10 @@ function coHinh(q: { thanCauImg?: string; choiceImgs?: (string | undefined)[]; i
 function goiCau(nguon: TeacherExamSource[]): CauNguon[] {
   const ra: CauNguon[] = []
   for (const s of nguon) {
-    for (const q of s.phanI) ra.push({ phan: 'I', q })
-    for (const q of s.phanII) ra.push({ phan: 'II', q })
-    for (const q of s.phanIII) ra.push({ phan: 'III', q })
+    const maDe = String(s.maDe || '')
+    for (const q of s.phanI) ra.push({ phan: 'I', maDe, q })
+    for (const q of s.phanII) ra.push({ phan: 'II', maDe, q })
+    for (const q of s.phanIII) ra.push({ phan: 'III', maDe, q })
   }
   return ra
 }
@@ -123,6 +127,7 @@ function doiSang(c: CauNguon): CauLuyen {
   return {
     phan: c.phan,
     id: q.id,
+    maDe: c.maDe,
     chuyenDe: String(q.chuyenDe || ''),
     dang: dangCua({
       phan: c.phan,
@@ -158,8 +163,10 @@ export function cauLuyenTuNguon(nguon: TeacherExamSource[]): CauLuyen[] {
 
 /** Đổi đúng bộ câu MỘT EM đã làm sang danh sách in phiếu, theo đúng thứ tự em
  * nhìn thấy trên màn hình. */
-export function cauLuyenTuBoCau(bo: { phan: 'I' | 'II' | 'III'; q: TeacherMcqQuestion | TeacherTrueFalseQuestion | TeacherShortAnswerQuestion }[]): CauLuyen[] {
-  return bo.map(doiSang)
+export function cauLuyenTuBoCau(bo: { phan: 'I' | 'II' | 'III'; maDe?: string; q: TeacherMcqQuestion | TeacherTrueFalseQuestion | TeacherShortAnswerQuestion }[]): CauLuyen[] {
+  // Bộ câu một em không mang mã đề nguồn (nó đi ra từ ngân hàng của ca), nên
+  // để trống — chỗ này chỉ IN LẠI đúng bài em vừa làm, không rút thêm gì.
+  return bo.map((c) => doiSang({ ...c, maDe: String(c.maDe || '') }))
 }
 
 export interface YeuCauLuyen {
@@ -175,6 +182,17 @@ export interface YeuCauLuyen {
   chuyenDeCa?: string[]
   /** Câu em đã từng làm — tránh trước, chỉ dùng lại khi hết câu mới. */
   qidDaLam?: string[]
+  /** RANH GIỚI CHẶT NHẤT: mã đề của chính ca đó — tức đúng những BÀI thầy đã
+   * chọn để thi.
+   *
+   * VÌ SAO CẦN, thầy bắt được 06/09: em Tuân chỉ thi Ester bài 1, mà bài luyện
+   * ra câu xà phòng. Câu đó KHÔNG sai nhãn — nó đúng chuyên đề "Ester – lipid".
+   * Chuyên đề trong kho là cả chương, gộp ester với xà phòng làm một, nên lọc
+   * theo chuyên đề không bao giờ đủ chặt.
+   *
+   * Có `maDeCa` thì nó THẮNG `chuyenDeCa`. Rỗng = không biết ca lấy từ bài nào
+   * ⇒ rơi về ranh giới chuyên đề. */
+  maDeCa?: string[]
   /** Chỉ lý thuyết, chỉ bài tập, hay ngẫu nhiên. Mặc định ngẫu nhiên. */
   dang?: LocDang
   soCau: number
@@ -211,13 +229,20 @@ export function chonCauLuyen(nguon: TeacherExamSource[], yc: YeuCauLuyen): KetQu
   //   · KHÔNG có — giữ NGUYÊN luật cũ: chuyên đề yếu là bộ lọc CỨNG. Hạ nó
   //     xuống thành ưu tiên ở đây là nới âm thầm cho mọi chỗ gọi cũ.
   const tenYeu = yc.chuyenDe.map((c) => c.ten.trim()).filter(Boolean)
-  const trongPhamVi = (cd: string) =>
-    trongCa.size > 0 ? trongCa.has(chuanChuyenDe(cd)) : tenYeu.length === 0 || tenYeu.includes(cd.trim())
+  // BA TẦNG RANH GIỚI, chặt trước lỏng sau. Tầng nào có thì tầng đó quyết,
+  // KHÔNG cộng dồn và KHÔNG tự nới khi thiếu câu — nới âm thầm chính là thứ đã
+  // đẻ ra câu xà phòng trong bài luyện Ester bài 1.
+  const trongDe = new Set((yc.maDeCa ?? []).map((m) => String(m || '').trim()).filter(Boolean))
+  const trongPhamVi = (c: CauLuyen) => {
+    if (trongDe.size > 0) return trongDe.has(c.maDe.trim())
+    if (trongCa.size > 0) return trongCa.has(chuanChuyenDe(c.chuyenDe))
+    return tenYeu.length === 0 || tenYeu.includes(c.chuyenDe.trim())
+  }
 
   const kho = goiCau(nguon)
     .filter((c) => !coHinh(c.q as { thanCauImg?: string }))
-    .filter((c) => trongPhamVi(String(c.q.chuyenDe || '')))
     .map(doiSang)
+    .filter(trongPhamVi)
     .filter((c) => hopDang(c.dang, loc))
 
   const xao = <T,>(xs: T[]): T[] => {

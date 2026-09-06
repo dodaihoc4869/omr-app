@@ -774,44 +774,83 @@ export default function ExamMonitorScreen() {
                   </>
                 ) : null}
               </div>
-              <div className="grid grid-cols-2" style={{ gap: 'var(--k3)' }}>
+              {/* HAI NÚT MỞ / KHOÁ CA — vẽ lại 06/09 theo ý thầy.
+                  Luật vẽ: việc BẤM ĐƯỢC thì tô đặc và nổi lên; việc không bấm
+                  được thì chìm hẳn, không viền, không tranh mắt. Trạng thái ca
+                  nói bằng chữ ở nhãn trên, không bắt thầy suy từ màu. */}
+              <div className="flex items-center" style={{ gap: 'var(--k2)', marginBottom: 'var(--k2)' }}>
+                <span
+                  aria-hidden
+                  style={{ width: 8, height: 8, borderRadius: 'var(--bo-tron)', background: cua.moCua ? 'var(--xanh)' : 'var(--do)', display: 'block' }}
+                />
+                <span className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: cua.moCua ? 'var(--xanh)' : 'var(--do)' }}>
+                  {cua.moCua ? 'Ca đang mở' : 'Ca đang khoá'}
+                </span>
+              </div>
+              <div className="grid grid-cols-2" style={{ gap: 'var(--k2)' }}>
                 <button
                   type="button"
                   onClick={moLaiCa}
                   disabled={dangKhoa || !cua.moDuoc}
                   aria-label="Mở ca cho em vào"
-                  className="tap-target font-bold flex flex-col items-center justify-center"
+                  className="tap-target flex items-center"
                   style={{
-                    height: 72,
-                    gap: 4,
-                    borderRadius: 'var(--bo-2)',
-                    background: cua.moDuoc ? 'var(--xanh-nen)' : 'var(--the-2)',
-                    border: `2px solid ${cua.moDuoc ? 'var(--xanh)' : 'var(--vien)'}`,
-                    color: cua.moDuoc ? 'var(--xanh)' : 'var(--mo)',
-                    fontSize: 'var(--cx-2)',
+                    minHeight: 64,
+                    gap: 'var(--k2)',
+                    padding: '0 var(--k3)',
+                    borderRadius: 'var(--bo-3)',
+                    border: 'none',
+                    textAlign: 'left',
+                    background: cua.moDuoc ? 'var(--xanh)' : 'var(--the-2)',
+                    color: cua.moDuoc ? 'var(--muc-nguoc)' : 'var(--mo)',
+                    boxShadow: cua.moDuoc ? 'var(--bong-2)' : 'none',
+                    transition: 'transform 120ms ease, box-shadow 120ms ease',
                   }}
                 >
-                  <Unlock size={22} />
-                  {dangKhoa && cua.moDuoc ? 'Đang mở…' : 'MỞ CA'}
+                  <span
+                    className="flex items-center justify-center shrink-0"
+                    style={{ width: 36, height: 36, borderRadius: 'var(--bo-tron)', background: cua.moDuoc ? 'var(--xanh-nen)' : 'var(--the)', color: cua.moDuoc ? 'var(--xanh)' : 'var(--mo)' }}
+                  >
+                    <Unlock size={19} />
+                  </span>
+                  <span className="flex flex-col" style={{ gap: 1, minWidth: 0 }}>
+                    <span className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
+                      {dangKhoa && cua.moDuoc ? 'Đang mở…' : 'Mở ca'}
+                    </span>
+                    <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-0)', opacity: 0.85 }}>Em vào được ngay</span>
+                  </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setHoiKhoa(true)}
                   disabled={dangKhoa || !cua.khoaDuoc}
                   aria-label="Khoá ca"
-                  className="tap-target font-bold flex flex-col items-center justify-center"
+                  className="tap-target flex items-center"
                   style={{
-                    height: 72,
-                    gap: 4,
-                    borderRadius: 'var(--bo-2)',
+                    minHeight: 64,
+                    gap: 'var(--k2)',
+                    padding: '0 var(--k3)',
+                    borderRadius: 'var(--bo-3)',
+                    border: 'none',
+                    textAlign: 'left',
                     background: cua.khoaDuoc ? 'var(--do-nen)' : 'var(--the-2)',
-                    border: `2px solid ${cua.khoaDuoc ? 'var(--do)' : 'var(--vien)'}`,
                     color: cua.khoaDuoc ? 'var(--do)' : 'var(--mo)',
-                    fontSize: 'var(--cx-2)',
+                    boxShadow: cua.khoaDuoc ? 'var(--bong-1)' : 'none',
+                    transition: 'transform 120ms ease, box-shadow 120ms ease',
                   }}
                 >
-                  <Lock size={22} />
-                  KHOÁ CA
+                  <span
+                    className="flex items-center justify-center shrink-0"
+                    style={{ width: 36, height: 36, borderRadius: 'var(--bo-tron)', background: cua.khoaDuoc ? 'var(--do)' : 'var(--the)', color: cua.khoaDuoc ? 'var(--muc-nguoc)' : 'var(--mo)' }}
+                  >
+                    <Lock size={19} />
+                  </span>
+                  <span className="flex flex-col" style={{ gap: 1, minWidth: 0 }}>
+                    <span className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
+                      Khoá ca
+                    </span>
+                    <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-0)', opacity: 0.85 }}>Dừng và nộp bài</span>
+                  </span>
                 </button>
               </div>
               <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>

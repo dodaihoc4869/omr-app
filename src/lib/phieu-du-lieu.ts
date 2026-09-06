@@ -493,6 +493,15 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
   //   · ƯU TIÊN = chuyên đề sai nhiều nhất trong CA NÀY lên trước. Tỉ lệ sai
   //     tính từ `n.chuyenDeCa` của đúng ca, không cộng dồn ca cũ.
   const phamViCa = n.chuyenDeCa.map((c) => c.ten).filter(Boolean)
+  // RANH GIỚI THEO MÃ ĐỀ: CHƯA nối ở đây, cố ý.
+  //
+  // Bản nháp 06/09 suy mã đề từ `banks` rồi bó theo đó. Bốn test bắt được ngay:
+  // `banks` là ngân hàng của ca, mã đề trong đó KHÔNG khớp mã đề của kho, nên
+  // ranh giới cho ra rỗng ⇒ bài luyện rỗng ⇒ phiếu mất `linkBaiTap` ⇒ báo cáo
+  // mất hai nút copy. Đúng cơ chế lỗi thầy đang truy.
+  //
+  // Nguồn đúng là danh sách ĐỀ THẦY ĐÃ TÍCH lúc mở ca, cất riêng — xem đặc tả
+  // RUT-DE-CHUA-CAU-SAI mục 2. Nối khi cổng `rutDeChua()` có thật.
   const yeuCa = n.chuyenDeCa
     .filter((c) => c.soSai > 0)
     .map((c) => ({ ten: c.ten, tiLeSai: c.soSai / Math.max(1, c.soCau) }))
