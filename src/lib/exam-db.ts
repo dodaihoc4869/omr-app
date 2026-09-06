@@ -6,7 +6,6 @@
 import { openDB, type IDBPDatabase } from 'idb'
 import type { PublicExamBank, SoCauMoiPhan, TeacherExamSource } from '../data/examContent'
 import type { BanGhiKhoa } from './khoa-app'
-import type { BanGhiVanTay } from './khoa-van-tay'
 
 export interface AnswerRecord {
   phanI: Record<string, 'A' | 'B' | 'C' | 'D'> // qid -> lựa chọn (đã quy về chữ cái GỐC, chưa xáo)
@@ -327,33 +326,11 @@ export async function luuGiuPhien(v: boolean): Promise<void> {
   await db.put(STORE_SETTINGS, v === true, 'giuPhien')
 }
 
-// ---------------------------------------------------------------------------
-// VÂN TAY (MOBANGVANTAY.md mục 2.1)
+// VÂN TAY ĐÃ GỠ 06/09 theo lệnh của thầy — mật khẩu là đường vào duy nhất.
 //
-// `khoaVanTay` NẰM CẠNH `khoaApp`, không thay thế nó. Gỡ vân tay chỉ xoá bản
-// ghi này; mật khẩu vẫn mở app được như cũ — đó là điều cấm số 4.
-
-/** Bản ghi vân tay của MÁY NÀY. Không đồng bộ sang máy khác: IndexedDB là của
- * từng máy, và đó là điều tốt chứ không phải bất tiện (mục 11). */
-export async function loadKhoaVanTay(): Promise<BanGhiVanTay | null> {
-  const db = await getDb()
-  return (await db.get(STORE_SETTINGS, 'khoaVanTay')) || null
-}
-
-export async function saveKhoaVanTay(b: BanGhiVanTay): Promise<void> {
-  const db = await getDb()
-  await db.put(STORE_SETTINGS, b, 'khoaVanTay')
-}
-
-/** GỠ VÂN TAY. `khoaApp` giữ nguyên — mật khẩu vẫn là đường vào.
- *
- * Passkey vẫn nằm trong máy sau lệnh này: trình duyệt không cho trang web xoá
- * passkey của chính nó. Màn xác nhận nói rõ thầy tự xoá ở Cài đặt của máy nếu
- * muốn sạch hẳn. */
-export async function goKhoaVanTay(): Promise<void> {
-  const db = await getDb()
-  await db.delete(STORE_SETTINGS, 'khoaVanTay')
-}
+// Bản ghi cũ `khoaVanTay` trong IndexedDB KHÔNG bị xoá bằng một lệnh dọn dẹp:
+// nó vô hại khi không ai đọc, và `goKhoaApp` vốn đã xoá nó. Xoá dữ liệu của
+// thầy chỉ để cho gọn code là việc không được làm.
 
 /** Câu đã từng in ra PHIẾU BÀI TẬP PDF của một em.
  *
