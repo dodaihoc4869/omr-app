@@ -10,6 +10,8 @@
 // mới thì workbox (registerType 'autoUpdate') tự thay và tự tải lại trang —
 // bài làm đang dở không mất vì lưu liên tục vào IndexedDB (exam-db.ts).
 
+import { coGoiPhien } from './khoa-phien'
+
 /** Khoảng cách giữa hai lần tự hỏi máy chủ khi app cứ mở (ms). */
 export const NHIP_HOI_MS = 30 * 60 * 1000
 
@@ -26,12 +28,23 @@ export function datDangLamBai(v: boolean): void {
 
 // ĐANG MỞ KHOÁ THÌ KHÔNG TỰ TẢI LẠI (MATKHAUMOAPP.md mục 4C và mục 9).
 //
-// Mã bí mật giải ra chỉ sống trong bộ nhớ chương trình; tải lại trang là mất,
-// và thầy bị hỏi mật khẩu giữa lúc đang theo dõi một ca thi. Cất nó ra chỗ khác
-// để sống sót qua lần tải lại thì vi phạm chính điều làm nên tính năng này.
+// Lý do gốc: mã bí mật giải ra chỉ sống trong bộ nhớ chương trình; tải lại
+// trang là mất, và thầy bị hỏi mật khẩu giữa lúc đang theo dõi một ca thi.
 //
-// Nên bản mới CHỜ tới lần thầy mở app sau. Không mất gì: bản mới vẫn nằm sẵn
-// trong máy, lần mở sau là chạy ngay.
+// SỬA 06/09 — LÝ DO ĐÓ KHÔNG CÒN KHI CÓ PHIÊN THEO TAB.
+//
+// Từ GIU-DANG-NHAP-THEO-TAB, tab đã mở khoá giữ được chìa qua lần tải lại
+// (bản mã trong `sessionStorage` + khoá phiên trong IndexedDB). Tải lại KHÔNG
+// còn làm mất mã bí mật, nên cũng không còn cớ hoãn bản mới.
+//
+// Đây chính là chuyện thầy gặp 06/09: đẩy bản sửa lên rồi mà máy vẫn chạy bản
+// cũ, vì cờ này bật suốt phiên nên app không bao giờ tự thay.
+//
+// Luật mới: hoãn khi đang mở khoá MÀ KHÔNG có phiên giữ được. Có phiên thì cho
+// tải lại — thầy nhận bản mới ngay và không bị hỏi lại mật khẩu.
+//
+// `dangLamBai` thì vẫn chặn tuyệt đối, không nới: em đang thi mà trang tải lại
+// là mất toàn màn hình.
 let dangMoKhoa = false
 
 export function datDangMoKhoa(v: boolean): void {
@@ -40,6 +53,15 @@ export function datDangMoKhoa(v: boolean): void {
 
 export function dangMoKhoaKhong(): boolean {
   return dangMoKhoa
+}
+
+/** CÓ PHẢI HOÃN BẢN MỚI KHÔNG. Thuần logic, tách ra để test được.
+ *
+ * `coPhien` = tab này giữ được chìa qua lần tải lại (`coGoiPhien()`). Có phiên
+ * thì tải lại không làm thầy phải nhập mật khẩu, nên không hoãn nữa. */
+export function phaiHoanBanMoi(dangLamBaiNay: boolean, dangMoKhoaNay: boolean, coPhien: boolean): boolean {
+  if (dangLamBaiNay) return true
+  return dangMoKhoaNay && !coPhien
 }
 
 export function dangLamBaiKhong(): boolean {
@@ -127,8 +149,10 @@ export function batTuHoiBanMoi(
  * tải lại là trang nhận đúng mã mới.
  *
  * BỐN CHỐT AN TOÀN:
- *   · Đang mở khoá app thì KHÔNG tải lại — mã bí mật chỉ nằm trong bộ nhớ, tải
- *     lại là thầy phải nhập mật khẩu giữa buổi dạy (MATKHAUMOAPP mục 4C).
+ *   · Đang mở khoá app MÀ KHÔNG giữ được phiên thì không tải lại — lúc đó mã bí
+ *     mật chỉ nằm trong bộ nhớ, tải lại là thầy phải nhập mật khẩu giữa buổi
+ *     dạy (MATKHAUMOAPP mục 4C). Có phiên theo tab thì tải lại vô hại, và bản
+ *     mới tới tay thầy ngay — xem `phaiHoanBanMoi`.
  *   · Đang làm bài thì KHÔNG tải lại — tải lại giữa giờ thi làm em hoảng, và
  *     máy chống gian lận có thể tính là một lần rời màn. Bài không mất
  *     (IndexedDB), nhưng chờ tới lúc em nộp xong cũng không muộn.
@@ -150,8 +174,7 @@ export function batTuTaiLaiKhiDoiBan(
   const laLanDau = !sw.controller
   sw.addEventListener('controllerchange', () => {
     if (laLanDau) return
-    if (dangLamBaiKhong()) return
-    if (dangMoKhoaKhong()) return
+    if (phaiHoanBanMoi(dangLamBaiKhong(), dangMoKhoaKhong(), coGoiPhien())) return
     try {
       const truoc = Number(kho?.getItem(KHOA_TAI_LAI) || 0)
       const t = now()

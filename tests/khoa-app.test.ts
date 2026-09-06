@@ -287,12 +287,34 @@ describe('nấc hỏi lại', () => {
 })
 
 describe('app tự tải bản mới thì KHÔNG hỏi lại (mục 4C)', () => {
-  it('đang mở khoá là một chốt chặn tải lại, ngang với đang làm bài', () => {
+  // Mục 4C viết: "Không hỏi lại NẾU PHIÊN CÒN HIỆU LỰC trong lần chạy đó."
+  //
+  // Bản đầu bảo đảm điều đó bằng cách CHẶN HẲN tải lại khi đang mở khoá — hồi
+  // ấy mã bí mật chỉ sống trong bộ nhớ nên tải lại chắc chắn phải hỏi lại.
+  //
+  // Từ GIU-DANG-NHAP-THEO-TAB (06/09), tab đã mở khoá giữ được chìa qua lần
+  // tải lại, nên tải lại KHÔNG còn hỏi mật khẩu. Bảo đảm của mục 4C giữ
+  // nguyên; chỉ cách thực hiện đổi, và đổi theo hướng thầy nhận bản sửa sớm
+  // hơn thay vì phải đóng hẳn app mở lại.
+  it('KHÔNG có phiên thì vẫn chặn tải lại — đúng điều cấm gốc', async () => {
+    const { phaiHoanBanMoi } = await import('../src/lib/cap-nhat-app')
+    expect(phaiHoanBanMoi(false, true, false)).toBe(true)
+  })
+
+  it('CÓ phiên thì cho tải lại, vì tải lại không hỏi mật khẩu nữa', async () => {
+    const { phaiHoanBanMoi } = await import('../src/lib/cap-nhat-app')
+    expect(phaiHoanBanMoi(false, true, true)).toBe(false)
+  })
+
+  it('đang làm bài vẫn là chốt chặn tuyệt đối, không nới theo phiên', async () => {
+    const { phaiHoanBanMoi } = await import('../src/lib/cap-nhat-app')
+    expect(phaiHoanBanMoi(true, true, true)).toBe(true)
+    expect(phaiHoanBanMoi(true, false, true)).toBe(true)
+  })
+
+  it('cờ mở khoá vẫn còn và chốt tải lại vẫn hỏi tới nó', () => {
     const ma = readFileSync(resolve(process.cwd(), 'src/lib/cap-nhat-app.ts'), 'utf8')
     expect(ma).toContain('export function datDangMoKhoa')
-    expect(ma).toContain('if (dangMoKhoaKhong()) return')
-    const i = ma.indexOf('if (dangLamBaiKhong()) return')
-    const j = ma.indexOf('if (dangMoKhoaKhong()) return')
-    expect(j).toBeGreaterThan(i) // cùng một chỗ, ngay cạnh nhau
+    expect(ma).toContain('phaiHoanBanMoi(dangLamBaiKhong(), dangMoKhoaKhong(), coGoiPhien())')
   })
 })

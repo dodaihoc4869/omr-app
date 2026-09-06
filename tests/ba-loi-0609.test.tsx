@@ -12,6 +12,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { MS_XAC_NHAN_BLUR, laMayCamUng, tinhLaRoiMan, mucKhiRoiMan, NGUONG_MAC_DINH } from '../src/lib/chong-gian-lan'
 import TheCau, { doiDau, laAm } from '../src/components/TheCau'
+import { phaiHoanBanMoi } from '../src/lib/cap-nhat-app'
 
 afterEach(() => cleanup())
 
@@ -164,5 +165,35 @@ describe('Lỗi 1 — nút gạt Giữ để đọc bấm không ăn', () => {
     expect(dau).toBeGreaterThan(0)
     const khoi = kh.slice(dau, dau + 700)
     expect(khoi).toContain('minHeight: 44')
+  })
+})
+
+// ---------------------------------------------------------------------------
+
+describe('Bản mới tới tay thầy — vì sao máy vẫn chạy bản cũ', () => {
+  it('đang mở khoá MÀ CÓ phiên theo tab → KHÔNG hoãn, thầy nhận bản mới ngay', () => {
+    expect(phaiHoanBanMoi(false, true, true)).toBe(false)
+  })
+
+  it('đang mở khoá mà KHÔNG có phiên → vẫn hoãn, không hỏi mật khẩu giữa buổi dạy', () => {
+    expect(phaiHoanBanMoi(false, true, false)).toBe(true)
+  })
+
+  it('EM ĐANG LÀM BÀI thì hoãn tuyệt đối, có phiên hay không cũng vậy', () => {
+    expect(phaiHoanBanMoi(true, false, true)).toBe(true)
+    expect(phaiHoanBanMoi(true, true, true)).toBe(true)
+    expect(phaiHoanBanMoi(true, false, false)).toBe(true)
+  })
+
+  it('không mở khoá, không làm bài → tải lại bình thường', () => {
+    expect(phaiHoanBanMoi(false, false, false)).toBe(false)
+  })
+
+  it('chốt tải lại dùng đúng hàm này, không còn kiểm rời rạc', () => {
+    const ma = doc('src/lib/cap-nhat-app.ts')
+    const dau = ma.indexOf('export function batTuTaiLaiKhiDoiBan')
+    const khoi = ma.slice(dau)
+    expect(khoi).toContain('phaiHoanBanMoi(dangLamBaiKhong(), dangMoKhoaKhong(), coGoiPhien())')
+    expect(khoi).not.toContain('if (dangMoKhoaKhong()) return')
   })
 })
