@@ -85,15 +85,20 @@ function ChipChon({ chon, onClick, children }: { chon: boolean; onClick: () => v
   )
 }
 
-/** Phạm vi gửi ca (QUANLYCATHI mục 4) — máy chủ kiểm tra lúc vào thi, không chỉ ẩn giao diện. */
+/** Phạm vi gửi ca (QUANLYCATHI mục 4) — máy chủ kiểm tra lúc vào thi, không chỉ ẩn giao diện.
+ *
+ * CHỮ Ở ĐÂY PHẢI KHỚP ĐÚNG VIỆC MÁY CHỦ LÀM. Thầy hỏi 06/09: chế độ Số báo danh
+ * có kiểm năm sinh và họ tên không. CÓ — `quyetDinhVaoThi_` chạy cổng danh sách
+ * (khớp đủ SBD + họ tên + năm sinh) trước mọi phạm vi, chỉ Tự do được miễn. Cái
+ * sai là dòng mô tả nói thiếu, khiến thầy tưởng nó chỉ dò số báo danh. */
 const PHAM_VI_CHON: { id: PhamViCa; ten: string; mota: string }[] = [
-  { id: 'tu_do', ten: 'Tự do', mota: 'Ai có mã ca đều vào được — luyện tập, ôn ngoài giờ.' },
-  { id: 'khoi', ten: 'Theo khối', mota: 'Chọn năm sinh; em không đúng khối (theo danh sách lớp đã nạp) bị chặn.' },
-  { id: 'chon', ten: 'Chọn từng em', mota: 'Tích từng em trong danh sách — thi lại, phụ đạo, kiểm tra riêng nhóm yếu.' },
-  // Thầy chốt 05/09. Khác 'Tự do' ở đúng một chỗ: mã ca đúng CHƯA đủ, số báo
-  // danh phải có trong danh sách lớp thầy đã nạp. Khác 'Chọn từng em' ở chỗ
-  // không phải tích ai — cả lớp vào được, người lạ thì không.
-  { id: 'sbd', ten: 'Số báo danh', mota: 'Phải có mã ca VÀ số báo danh nằm trong danh sách lớp. Số báo danh lạ bị chặn, không phải tích từng em.' },
+  { id: 'tu_do', ten: 'Tự do', mota: 'Ai có mã ca đều vào được — luyện tập, ôn ngoài giờ. Chế độ DUY NHẤT không dò danh sách lớp.' },
+  { id: 'khoi', ten: 'Theo khối', mota: 'Đúng khối theo năm sinh thầy chọn, và khớp đủ ba: số báo danh, họ tên, năm sinh.' },
+  { id: 'chon', ten: 'Chọn từng em', mota: 'Chỉ em thầy tích, và khớp đủ ba: số báo danh, họ tên, năm sinh.' },
+  // Thầy chốt 05/09, làm rõ 06/09. Khác 'Tự do' ở chỗ mã ca đúng CHƯA đủ. Khác
+  // 'Chọn từng em' ở chỗ không phải tích ai — cả lớp vào được, người lạ thì
+  // không.
+  { id: 'sbd', ten: 'Số báo danh', mota: 'Cả lớp vào được, không phải tích ai. Em phải có mã ca và khớp đủ ba: số báo danh, họ tên, năm sinh.' },
 ]
 
 /** Năm sinh gợi ý: 5 năm quanh khối 10–12 hiện tại. */

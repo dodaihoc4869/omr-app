@@ -170,3 +170,66 @@ describe('TỰ DO là tự do ĐÚNG NGHĨA (thầy báo 05/09)', () => {
     expect(gs.quyetDinhVaoThi_(caTuDo, dangLam, 'may-B', T0 + 60_000)).toMatchObject({ ok: false, lyDo: 'dang_lam_may_khac' })
   })
 })
+
+// ---------------------------------------------------------------------------
+// THẦY HỎI 06/09: chế độ SỐ BÁO DANH có kiểm năm sinh và họ tên không.
+//
+// CÓ. Cổng danh sách (`trongDanhSach`) khớp đủ ba — số báo danh, họ tên, năm
+// sinh — và chạy TRƯỚC mọi phạm vi trừ Tự do. Cái sai chỉ là dòng mô tả trên
+// màn Mở ca nói thiếu; bộ kiểm này khoá cả hành vi lẫn dòng chữ đó lại.
+
+describe('Chế độ SỐ BÁO DANH đòi đủ mã ca + số báo danh + họ tên + năm sinh', () => {
+  const caSbd = { ...caMo, phamVi: 'sbd' }
+
+  it('khớp đủ ba → vào được', () => {
+    const dung = { sbd: '11004', namSinh: '2010', trongDanhSach: true }
+    expect(gs.quyetDinhVaoThi_(caSbd, null, 'may-A', T0 + 60_000, dung)).toEqual({ ok: true, cach: 'moi' })
+  })
+
+  it('SAI TÊN hoặc SAI NĂM SINH đều bị chặn — máy chủ trả trongDanhSach false', () => {
+    // `vaoThi` đặt `trongDanhSach: false` cho cả hai trường hợp lệch tên và
+    // lệch năm sinh, nên ở đây một phép là đủ cho cả hai.
+    const lech = { sbd: '11004', namSinh: '2010', trongDanhSach: false }
+    expect(gs.quyetDinhVaoThi_(caSbd, null, 'may-A', T0 + 60_000, lech)).toMatchObject({ ok: false, lyDo: 'sai_ho_so' })
+  })
+
+  it('SBD lạ, không có dòng nào trong danh sách → chặn', () => {
+    const la = { sbd: '999999', namSinh: '', trongDanhSach: false }
+    expect(gs.quyetDinhVaoThi_(caSbd, null, 'may-A', T0 + 60_000, la)).toMatchObject({ ok: false, lyDo: 'sai_ho_so' })
+  })
+
+  it('CHƯA NẠP danh sách bao giờ thì chế độ này CHẶN — cả mục đích của nó là cổng danh sách', () => {
+    const chuaNap = { sbd: '11004', namSinh: '2010', trongDanhSach: null }
+    expect(gs.quyetDinhVaoThi_(caSbd, null, 'may-A', T0 + 60_000, chuaNap)).toMatchObject({ ok: false, lyDo: 'khong_trong_danh_sach' })
+    // Khác hẳn 'khoi' và 'chon': hai chế độ kia mở cổng khi chưa nạp danh sách.
+    expect(gs.quyetDinhVaoThi_({ ...caMo, phamVi: 'khoi', danhSachMoi: '2010' }, null, 'may-A', T0 + 60_000, chuaNap)).toEqual({ ok: true, cach: 'moi' })
+  })
+
+  it('máy chủ so tên bỏ dấu và năm sinh 4 chữ số, dòng thầy bỏ trống thì không lấy làm cớ chặn', () => {
+    const i = gsCode.indexOf("if (action === 'vaoThi')")
+    const than = gsCode.slice(i, i + 3000)
+    expect(than).toContain('const tenKhop = !chuanTen_(dong.hoTen) || tenGoi === chuanTen_(dong.hoTen)')
+    expect(than).toContain('const namKhop = !dong.namSinh || namGoi === dong.namSinh')
+    expect(than).toContain('if (!tenKhop || !namKhop) trongDs = null')
+  })
+
+  it('DÒNG MÔ TẢ trên màn Mở ca phải nói đúng việc máy chủ làm', async () => {
+    const { readFileSync } = await import('node:fs')
+    const { resolve } = await import('node:path')
+    const man = readFileSync(resolve(__dirname, '../src/screens/ExamSetupScreen.tsx'), 'utf8')
+    const dau = man.indexOf('const PHAM_VI_CHON')
+    expect(dau).toBeGreaterThan(0)
+    // Cắt tới dấu `]` ĐẦU DÒNG — dấu `]` đầu tiên nằm trong kiểu `{...}[]`,
+    // cắt ở đó thì khối rỗng và phép kiểm tự đạt.
+    const khoi = man.slice(dau, man.indexOf('\n]', dau))
+    expect(khoi).toContain("id: 'sbd'")
+    // Ba chế độ có cổng đều phải nói ra đủ ba trường.
+    const ba = khoi.split('\n').filter((d) => /'khoi'|'chon'|'sbd'/.test(d) && d.includes('mota'))
+    expect(ba).toHaveLength(3)
+    for (const d of ba) expect(d).toContain('số báo danh, họ tên, năm sinh')
+    // Và Tự do phải nói rõ nó là chế độ DUY NHẤT không dò danh sách.
+    const tuDo = khoi.split('\n').find((d) => d.includes("'tu_do'"))!
+    expect(tuDo).toContain('DUY NHẤT')
+  })
+})
+

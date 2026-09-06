@@ -83,6 +83,25 @@ export const CAU_LY_DO: Record<Exclude<LyDoKhongDung, ''>, string> = {
   khong_co_prf: 'Trình duyệt này chưa hỗ trợ PRF — Firefox trên Android và Windows cũ nằm trong nhóm đó. Mở app bằng mật khẩu.',
 }
 
+/** ĐỌC ĐÚNG LÝ DO máy từ chối lúc quét, thay vì đổ hết cho PRF.
+ *
+ * Thầy báo 06/09: bật vân tay ra hộp "Hiện không có thông tin đăng nhập", mà
+ * app lại báo "chưa hỗ trợ PRF". Sai nguyên nhân thì thầy đi sửa nhầm chỗ, nên
+ * mỗi lỗi WebAuthn phải nói đúng việc thầy cần làm.
+ *
+ * Đây là màn CÀI ĐẶT, thầy đã nhập mật khẩu để vào tới đây — nói rõ nguyên nhân
+ * ở chỗ này không cho người dò biết thêm điều gì. Màn KHOÁ thì vẫn im lặng
+ * (`moBangVanTay` trả `null` cho mọi trường hợp). */
+export function cauLoiQuet(e: unknown): string {
+  const ten = (e as { name?: string } | null)?.name || ''
+  if (ten === 'NotAllowedError') return 'Thầy đã thoát hộp thoại, hoặc máy hết giờ chờ. Bấm lại rồi quét vân tay khi máy hỏi.'
+  if (ten === 'InvalidStateError') return 'Máy này đã có sẵn một khoá vân tay cho app. Vào phần cài đặt mã khoá của máy xoá cái cũ rồi bật lại.'
+  if (ten === 'SecurityError') return 'Trang phải chạy qua HTTPS đúng tên miền của app mới bật được vân tay.'
+  if (ten === 'NotSupportedError') return CAU_LY_DO.khong_co_prf
+  const chu = (e as { message?: string } | null)?.message
+  return chu ? `Không bật được vân tay: ${chu}` : 'Không bật được vân tay. Bấm lại một lần nữa.'
+}
+
 // ---------------------------------------------------------------------------
 // TIỆN ÍCH
 
@@ -222,24 +241,10 @@ export async function batVanTay(maBiMat: string): Promise<BanGhiVanTay> {
 
   const muoiPrf = nganNhien(DAI_MUOI_PRF)
 
-  // NHỊP 1
-  const tao = (await navigator.credentials.create({
-    publicKey: {
-      challenge: nganNhien(32) as unknown as BufferSource,
-      rp: { id: rpIdCua(), name: TEN_RP },
-      // `user.id` ngẫu nhiên, `name` trung tính: hộp thoại của máy hiện ra
-      // TRƯỚC khi vào app, người lạ cầm máy cũng nhìn thấy — không để tên thầy
-      // ở đó (cùng lý do màn khoá không hiện tên).
-      user: { id: nganNhien(32) as unknown as BufferSource, name: 'app', displayName: 'App quản lý' },
-      pubKeyCredParams: THUAT_TOAN_KHOA.map((alg) => ({ type: 'public-key' as const, alg })),
-      authenticatorSelection: {
-        authenticatorAttachment: GAN_NEN_TANG,
-        userVerification: XAC_THUC_NGUOI_DUNG,
-        residentKey: 'required',
-      },
-      timeout: MS_CHO_VAN_TAY,
-      extensions: { prf: {} } as AuthenticationExtensionsClientInputs,
-    },
+  // NHỊP 1 — lỗi ở đây cũng phải nói đúng nguyên nhân, không đẩy chuỗi lỗi thô
+  // của trình duyệt ra cho thầy đọc.
+  const tao = (await taoPasskey(muoiPrf).catch((e) => {
+    throw new Error(cauLoiQuet(e))
   })) as PublicKeyCredential | null
   if (!tao) throw new Error('Không tạo được khoá vân tay')
 
@@ -248,8 +253,19 @@ export async function batVanTay(maBiMat: string): Promise<BanGhiVanTay> {
 
   const credentialId = b64(tao.rawId)
 
-  // NHỊP 3
-  const prf = await layPrf(credentialId, muoiPrf)
+  // NHỊP 3 — KHÔNG đưa `allowCredentials`: passkey vừa tạo là discoverable, và
+  // đưa đích danh nó là chỗ Chrome trên Android trượt (xem `layPrf`).
+  //
+  // Thất bại ở đây KHÔNG được đổ cho PRF. Ba nguyên nhân khác hẳn nhau — thầy
+  // bấm Thoát, máy không tìm ra passkey, nền tảng không trả PRF — mà gộp thành
+  // một câu "chưa hỗ trợ PRF" thì thầy đi sửa nhầm chỗ. Đây chính là lỗi thầy
+  // gặp 06/09: máy có PRF, nhưng app báo là không có.
+  let prf: ArrayBuffer | null = null
+  try {
+    prf = await layPrf('', muoiPrf)
+  } catch (e) {
+    throw new Error(cauLoiQuet(e))
+  }
   if (!prf) throw new Error(CAU_LY_DO.khong_co_prf)
 
   const iv = nganNhien(DAI_IV_GCM)
@@ -269,14 +285,48 @@ export async function batVanTay(maBiMat: string): Promise<BanGhiVanTay> {
   }
 }
 
+/** Nhịp 1 tách riêng cho dễ đọc và dễ bọc lỗi. */
+function taoPasskey(_muoiPrf: Uint8Array): Promise<Credential | null> {
+  return navigator.credentials.create({
+    publicKey: {
+      challenge: nganNhien(32) as unknown as BufferSource,
+      rp: { id: rpIdCua(), name: TEN_RP },
+      // `user.id` ngẫu nhiên, `name` trung tính: hộp thoại của máy hiện ra
+      // TRƯỚC khi vào app, người lạ cầm máy cũng nhìn thấy — không để tên thầy
+      // ở đó (cùng lý do màn khoá không hiện tên).
+      user: { id: nganNhien(32) as unknown as BufferSource, name: 'app', displayName: 'App quản lý' },
+      pubKeyCredParams: THUAT_TOAN_KHOA.map((alg) => ({ type: 'public-key' as const, alg })),
+      authenticatorSelection: {
+        authenticatorAttachment: GAN_NEN_TANG,
+        userVerification: XAC_THUC_NGUOI_DUNG,
+        residentKey: 'required',
+      },
+      timeout: MS_CHO_VAN_TAY,
+      extensions: { prf: {} } as AuthenticationExtensionsClientInputs,
+    },
+  })
+}
+
+
 /** Quét vân tay rồi lấy 32 byte PRF. `null` = thầy huỷ, máy từ chối, hoặc nền
- * tảng không trả PRF. */
+ * tảng không trả PRF.
+ *
+ * `credentialId` rỗng ⇒ KHÔNG gửi `allowCredentials`. Thầy báo 06/09: bật vân
+ * tay trên Android hiện hộp *"Hiện không có thông tin đăng nhập cho
+ * dodaihoc4869.github.io"*. Nguyên nhân: nhịp 3 gọi ngay sau nhịp 1 và chỉ đích
+ * danh passkey vừa tạo, mà Google Password Manager chưa kịp lập chỉ mục nó nên
+ * `get()` không thấy gì và hiện hộp đó.
+ *
+ * Passkey của app là **discoverable** (`residentKey: 'required'`), nên ngay lúc
+ * bật KHÔNG cần đưa danh sách — trình duyệt tự tìm passkey của rpId này. Lúc MỞ
+ * APP thì vẫn đưa đích danh, vì ở đó phải đúng passkey đã cất khoá; chọn nhầm
+ * passkey khác là ra PRF khác, giải mã hỏng. */
 async function layPrf(credentialId: string, muoiPrf: Uint8Array): Promise<ArrayBuffer | null> {
   const lay = await navigator.credentials.get({
     publicKey: {
       challenge: nganNhien(32) as unknown as BufferSource,
       rpId: rpIdCua(),
-      allowCredentials: [{ id: tuB64(credentialId) as unknown as BufferSource, type: 'public-key' }],
+      ...(credentialId ? { allowCredentials: [{ id: tuB64(credentialId) as unknown as BufferSource, type: 'public-key' as const }] } : {}),
       userVerification: XAC_THUC_NGUOI_DUNG,
       timeout: MS_CHO_VAN_TAY,
       extensions: { prf: { eval: { first: muoiPrf } } } as unknown as AuthenticationExtensionsClientInputs,

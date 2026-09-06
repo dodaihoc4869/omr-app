@@ -39,6 +39,10 @@ interface May {
 
 let may: May
 let soLanGoiTao = 0
+/** Tuỳ chọn của MỌI lần gọi `get()` — để kiểm nhịp 3 có gửi allowCredentials không. */
+let optGet: { publicKey?: { allowCredentials?: unknown } }[] = []
+/** Lỗi máy ném ra ở `get()`; đặt để thử từng nhánh câu báo lỗi. */
+let loiGet: { name: string; message: string } | null = null
 
 /** PRF giả: trộn hạt giống của máy với muối. Cùng máy + cùng muối ⇒ cùng đầu
  * ra, đúng như chip thật; máy khác ⇒ khác hẳn. */
@@ -55,6 +59,8 @@ function prfGia(hatGiong: number, muoi: Uint8Array): ArrayBuffer {
 function dungMay(sua: Partial<May> = {}) {
   may = { hatGiong: 12345, chapNhan: true, coPrf: true, coSinhTrac: true, ...sua }
   soLanGoiTao = 0
+  optGet = []
+  loiGet = null
 
   const ID_KHOA = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8])
 
@@ -86,6 +92,8 @@ function dungMay(sua: Partial<May> = {}) {
         }
       },
       get: async (opt: { publicKey?: { extensions?: { prf?: { eval?: { first?: Uint8Array } } } } }) => {
+        optGet.push(opt as { publicKey?: { allowCredentials?: unknown } })
+        if (loiGet) throw Object.assign(new Error(loiGet.message), { name: loiGet.name })
         if (!may.chapNhan) return null
         const muoi = opt?.publicKey?.extensions?.prf?.eval?.first
         if (!muoi || !may.coPrf) return { getClientExtensionResults: () => ({ prf: {} }) }
@@ -262,7 +270,9 @@ describe('Điều cấm mục 9 — kiểm bằng cách đọc chính mã nguồ
 
   it('cấm bật vân tay khi prf.enabled không true — nhịp hai đứng TRƯỚC nhịp ba', () => {
     const iKiem = lib.indexOf('if (!docPrf(tao).enabled)')
-    const iLay = lib.indexOf('const prf = await layPrf(credentialId, muoiPrf)')
+    // 06/09: nhịp 3 nay gọi `layPrf('', ...)` — bỏ `allowCredentials` vì passkey
+    // vừa tạo là discoverable. Thứ tự hai nhịp không đổi, chỉ đổi đối số.
+    const iLay = lib.indexOf("prf = await layPrf('', muoiPrf)")
     expect(iKiem).toBeGreaterThan(0)
     expect(iLay).toBeGreaterThan(0)
     expect(iKiem).toBeLessThan(iLay)
@@ -323,5 +333,51 @@ describe('Một nguồn sự thật cấu hình (mục 3)', () => {
     const { rpIdCua } = await nap()
     expect(rpIdCua('dodaihoc4869.github.io')).toBe('dodaihoc4869.github.io')
     expect(rpIdCua('localhost')).toBe('localhost')
+  })
+
+  // -------------------------------------------------------------------------
+  // THẦY BÁO 06/09: bật vân tay trên Android ra hộp "Hiện không có thông tin
+  // đăng nhập cho dodaihoc4869.github.io", còn app thì báo "chưa hỗ trợ PRF".
+
+  it('nhịp 3 lúc BẬT không gửi allowCredentials — passkey vừa tạo là discoverable', async () => {
+    const { batVanTay } = await nap()
+    await batVanTay(MA_BI_MAT)
+    expect(optGet).toHaveLength(1)
+    expect(optGet[0].publicKey).not.toHaveProperty('allowCredentials')
+  })
+
+  it('nhưng lúc MỞ APP thì vẫn gửi allowCredentials — phải đúng passkey đã cất khoá', async () => {
+    const { batVanTay, moBangVanTay } = await nap()
+    const b = await batVanTay(MA_BI_MAT)
+    optGet = []
+    await moBangVanTay(b)
+    expect(optGet).toHaveLength(1)
+    expect(optGet[0].publicKey).toHaveProperty('allowCredentials')
+  })
+
+  it('thầy thoát hộp thoại thì báo ĐÚNG là thoát, KHÔNG đổ cho PRF', async () => {
+    const { batVanTay } = await nap()
+    loiGet = { name: 'NotAllowedError', message: 'The operation either timed out or was not allowed.' }
+    await expect(batVanTay(MA_BI_MAT)).rejects.toThrow(/thoát hộp thoại/)
+    await expect(batVanTay(MA_BI_MAT)).rejects.not.toThrow(/PRF/)
+  })
+
+  it('mỗi lỗi WebAuthn ra một câu khác nhau, không gộp một câu', async () => {
+    const { cauLoiQuet, CAU_LY_DO } = await nap()
+    const ten = ['NotAllowedError', 'InvalidStateError', 'SecurityError', 'NotSupportedError']
+    const cau = ten.map((name) => cauLoiQuet(Object.assign(new Error('x'), { name })))
+    expect(new Set(cau).size).toBe(4)
+    // Chỉ NotSupportedError mới được nói là không hỗ trợ PRF.
+    expect(cau[3]).toBe(CAU_LY_DO.khong_co_prf)
+    for (const c of cau.slice(0, 3)) expect(c).not.toContain('PRF')
+    // Lỗi lạ thì vẫn phải ra một câu đọc được, không ra 'undefined'.
+    expect(cauLoiQuet(new Error('mạng hỏng'))).toContain('mạng hỏng')
+    expect(cauLoiQuet(null)).toBeTruthy()
+  })
+
+  it('nền tảng THẬT SỰ không có PRF thì vẫn dừng ở nhịp hai, không cất bản ghi', async () => {
+    const { batVanTay, CAU_LY_DO } = await nap()
+    dungMay({ coPrf: false })
+    await expect(batVanTay(MA_BI_MAT)).rejects.toThrow(CAU_LY_DO.khong_co_prf)
   })
 })
