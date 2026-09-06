@@ -10,7 +10,7 @@ import { buildTeacherSourceFromKhoDe, parseKhoDeJson } from '../lib/exam-kho-de-
 import PhieuScreen from './PhieuScreen'
 import { gioMayChu, gioNgan } from '../lib/gio-may-chu'
 import { layIdThietBi } from '../lib/thiet-bi'
-import { chuanHoaNguong, khoaViRoiLau, loiCanhBao, mucKhiRoiMan, soLanTinhTu, type NguongGianLan } from '../lib/chong-gian-lan'
+import { MS_XAC_NHAN_BLUR, chuanHoaNguong, khoaViRoiLau, laMayCamUng, loiCanhBao, mucKhiRoiMan, soLanTinhTu, tinhLaRoiMan, type NguongGianLan } from '../lib/chong-gian-lan'
 import { MS_AN_HAN_VAO_BAI, MS_TRUNG_KHOP, MS_VE_SOM, MS_XAC_NHAN_CO_MAN, MS_XAC_NHAN_CUA_SO_NOI, type PhieuKenh } from '../lib/do-dau-vet'
 import {
   LOI_KHOA,
@@ -973,8 +973,29 @@ export default function ExamTakeScreen() {
       }
     }
     const onVis = () => logEvent(document.hidden ? 'hidden' : 'visible')
-    const onBlur = () => logEvent('blur')
-    const onFocus = () => logEvent('focus')
+    // BLUR KHÔNG ĐÁNG TIN (thầy báo 06/09: iPhone khoá oan). Trên máy cảm ứng
+    // bỏ hẳn; trên máy có chuột phải chờ rồi đọc lại `hasFocus()` mới tính.
+    // Xem khối luật ở đầu `chong-gian-lan.ts`.
+    const camUng = laMayCamUng()
+    let henBlur: ReturnType<typeof setTimeout> | null = null
+    const onBlur = () => {
+      if (camUng) return
+      if (henBlur) clearTimeout(henBlur)
+      henBlur = setTimeout(() => {
+        henBlur = null
+        if (tinhLaRoiMan('mat_tieu_diem', camUng, document.hasFocus())) logEvent('blur')
+      }, MS_XAC_NHAN_BLUR)
+    }
+    const onFocus = () => {
+      // Tiêu điểm về trước khi kịp xác nhận ⇒ chưa từng tính là rời màn, nên
+      // cũng không được ghi 'focus' (ghi vào là đẻ một cặp rời–về giả).
+      if (henBlur) {
+        clearTimeout(henBlur)
+        henBlur = null
+        return
+      }
+      logEvent('focus')
+    }
     // Thoát toàn màn hình (Back trên Android, vuốt xuống…) khi KHÔNG ở chế độ
     // standalone → tính là rời màn hình (quay lại toàn màn hình = quay lại).
     const onFs = () => logEvent(dangToanManHinh() ? 'focus' : 'hidden')
@@ -989,6 +1010,7 @@ export default function ExamTakeScreen() {
       window.removeEventListener('focus', onFocus)
       document.removeEventListener('fullscreenchange', onFs)
       document.removeEventListener('webkitfullscreenchange', onFs)
+      if (henBlur) clearTimeout(henBlur)
       if (roiLauTimerRef.current) clearTimeout(roiLauTimerRef.current)
       if (canhBaoTimerRef.current) clearTimeout(canhBaoTimerRef.current)
     }

@@ -24,6 +24,55 @@ export const GIAY_TOI_THIEU = 1
 
 export type MucCanhBao = 'nhe' | 'dam' | 'khoa'
 
+// ---------------------------------------------------------------------------
+// TÍN HIỆU NÀO MỚI THẬT SỰ LÀ "RỜI MÀN" — thầy báo 06/09
+//
+// Em làm bài trên iPhone bị khoá bài dù không thoát app lần nào.
+//
+// NGUYÊN NHÂN: `window` bắn `blur` ở RẤT NHIỀU tình huống không phải rời app.
+// Trên iOS, chạm vào ô nhập đáp án làm BÀN PHÍM ẢO bật lên — và iOS bắn `blur`
+// ngay lúc đó. Ba lần chạm ô trả lời ngắn là đủ ba "lần rời màn" và bài khoá.
+// Kéo trung tâm điều khiển xuống một chút rồi thả, thanh địa chỉ Safari ẩn
+// hiện, menu chọn chữ, cuộc gọi đến — cũng bắn `blur`.
+//
+// `document.hidden` thì ĐÁNG TIN: chỉ bật khi app thật sự vào nền. Bàn phím ảo
+// KHÔNG làm nó bật.
+//
+// LUẬT TỪ NAY:
+//   · `an` (visibilitychange → hidden) · `thoat_toan_man` → LUÔN tính.
+//   · `mat_tieu_diem` (window blur):
+//       - máy CẢM ỨNG (điện thoại, máy tính bảng) → KHÔNG tính. Em thoát app
+//         trên máy cảm ứng thì `document.hidden` bật, đã bắt được rồi.
+//       - máy có chuột → tính, NHƯNG phải chờ `MS_XAC_NHAN_BLUR` rồi kiểm lại
+//         `document.hasFocus()`: bật bàn phím hay hộp thoại nhỏ thì tiêu điểm
+//         quay lại ngay, còn chuyển hẳn sang cửa sổ khác thì không.
+//
+// Đánh đổi nói thẳng: máy cảm ứng nay KHÔNG bắt được trường hợp em mở cửa sổ
+// nổi đè lên bài mà không đưa app vào nền. Web vốn không phát hiện được việc
+// đó (đã ghi ở đầu file); đổi lại là không khoá oan em nào. Khoá oan một em
+// đang làm bài tốn nhiều hơn bỏ sót một mẹo mà app vốn không thấy.
+
+export type NguonRoiMan = 'an' | 'mat_tieu_diem' | 'thoat_toan_man'
+
+/** Chờ bao lâu rồi mới xác nhận một `blur` là rời màn thật (máy có chuột). */
+export const MS_XAC_NHAN_BLUR = 600
+
+/** Máy này có phải máy cảm ứng không. iPad chạy iPadOS khai `Macintosh` nhưng
+ * có `maxTouchPoints > 0`, nên đo bằng số điểm chạm chứ không đọc tên máy. */
+export function laMayCamUng(nav: { maxTouchPoints?: number } | null | undefined = typeof navigator === 'undefined' ? null : navigator): boolean {
+  return Number(nav?.maxTouchPoints ?? 0) > 0
+}
+
+/** Tín hiệu này có được tính là RỜI MÀN không.
+ *
+ * `conTieuDiem` chỉ dùng cho `mat_tieu_diem` trên máy có chuột: đó là giá trị
+ * `document.hasFocus()` ĐỌC LẠI sau `MS_XAC_NHAN_BLUR`, không phải lúc bắn. */
+export function tinhLaRoiMan(nguon: NguonRoiMan, camUng: boolean, conTieuDiem: boolean): boolean {
+  if (nguon === 'an' || nguon === 'thoat_toan_man') return true
+  if (camUng) return false
+  return !conTieuDiem
+}
+
 export function chuanHoaNguong(n?: Partial<NguongGianLan> | null): NguongGianLan {
   const lan = Number(n?.lan)
   const giay = Number(n?.giay)

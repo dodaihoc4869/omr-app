@@ -74,6 +74,21 @@ export type TheCauProps = McqProps | TfProps | SaProps
 // hai của "thẳng tuyệt đối". Hằng CHU_CAI cũ đặt bề rộng bằng tay nên đã bỏ.
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', flexShrink: 0 }
 
+/** Đáp án đang mang dấu âm chưa. Bỏ khoảng trắng đầu vì em hay gõ lỡ. */
+export function laAm(v: string | null | undefined): boolean {
+  return String(v ?? '').trimStart().startsWith('-')
+}
+
+/** ĐỔI DẤU đáp án phần III — bàn phím số của iPhone không có dấu trừ.
+ *
+ * Ô trống bấm dấu trừ vẫn ra `-`, để em bấm dấu trước rồi gõ số cũng được. */
+export function doiDau(v: string): string {
+  const s = String(v ?? '')
+  const dau = s.match(/^\s*/)?.[0] ?? ''
+  const than = s.slice(dau.length)
+  return than.startsWith('-') ? dau + than.slice(1) : dau + '-' + than
+}
+
 function normSo(s: string): string {
   return s.trim().replace(',', '.')
 }
@@ -308,24 +323,52 @@ export default function TheCau(props: TheCauProps) {
         )}
       </div>
     ) : (
-      <input
-        className="tap-target w-full"
-        style={{
-          minHeight: 56,
-          borderRadius: 'var(--bo-1)',
-          padding: 'var(--k3) var(--k4)',
-          background: 'var(--the-2)',
-          border: `1.5px solid ${daTraLoi ? 'var(--xanh)' : 'transparent'}`,
-          fontFamily: 'var(--serif)',
-          fontSize: 'var(--cx-3)',
-          color: 'var(--muc)',
-          outline: 'none',
-        }}
-        placeholder="Nhập đáp án"
-        inputMode="decimal"
-        value={selected ?? ''}
-        onChange={(e) => onChange?.(e.target.value)}
-      />
+      // BÀN PHÍM iPHONE KHÔNG CÓ DẤU TRỪ (thầy báo 06/09). `inputMode="decimal"`
+      // cho bàn phím số có dấu phẩy nhưng KHÔNG có dấu âm, mà đáp án phần III
+      // có thể âm (biến thiên enthalpy chẳng hạn) — em không gõ nổi.
+      //
+      // Giữ bàn phím số vì em gõ số là chính, và thêm nút ĐỔI DẤU bên cạnh:
+      // một chạm, không phải chuyển sang bàn phím chữ rồi tìm dấu.
+      <div className="flex items-stretch" style={{ gap: 'var(--k2)' }}>
+        <button
+          type="button"
+          className="tap-target shrink-0"
+          aria-label={laAm(selected) ? 'Bỏ dấu âm' : 'Thêm dấu âm'}
+          onClick={() => onChange?.(doiDau(selected ?? ''))}
+          style={{
+            minHeight: 56,
+            width: 56,
+            borderRadius: 'var(--bo-1)',
+            border: '1.5px solid var(--vien)',
+            background: laAm(selected) ? 'var(--muc)' : 'var(--the-2)',
+            color: laAm(selected) ? 'var(--muc-nguoc)' : 'var(--muc)',
+            fontFamily: 'var(--serif)',
+            fontSize: 'var(--cx-3)',
+            fontWeight: 700,
+            lineHeight: 1,
+          }}
+        >
+          −
+        </button>
+        <input
+          className="tap-target w-full"
+          style={{
+            minHeight: 56,
+            borderRadius: 'var(--bo-1)',
+            padding: 'var(--k3) var(--k4)',
+            background: 'var(--the-2)',
+            border: `1.5px solid ${daTraLoi ? 'var(--xanh)' : 'transparent'}`,
+            fontFamily: 'var(--serif)',
+            fontSize: 'var(--cx-3)',
+            color: 'var(--muc)',
+            outline: 'none',
+          }}
+          placeholder="Nhập đáp án"
+          inputMode="decimal"
+          value={selected ?? ''}
+          onChange={(e) => onChange?.(e.target.value)}
+        />
+      </div>
     )
   }
 

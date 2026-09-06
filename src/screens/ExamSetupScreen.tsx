@@ -651,20 +651,27 @@ export default function ExamSetupScreen() {
       {/* 4b. GIỮ ĐỂ ĐỌC. Màn này chỉ mở CA THI; bài tập về nhà đi đường
         GiaoBaiTap và không bật cơ chế này. */}
       <TheNoiDung>
-        <div className="flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
-          <div style={TIEU_DE_MUC}>Giữ để đọc</div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={giuDeDoc}
-            aria-label="Giữ để đọc"
-            onClick={() => setGiuDeDoc((v) => !v)}
-            className="tap-target"
-            style={{ width: 56, minHeight: 32, height: 32, borderRadius: 'var(--bo-tron)', border: 'none', padding: 3, background: giuDeDoc ? 'var(--muc)' : 'var(--vien-dam)', display: 'flex', justifyContent: giuDeDoc ? 'flex-end' : 'flex-start' }}
+        {/* CẢ HÀNG là nút gạt (thầy báo 06/09: bấm không ăn). Bản cũ chỉ ô
+          56×32 ở sát mép phải mới nhận chạm — dưới ngưỡng 44px, ngón tay trượt
+          ra là không đổi gì, nhìn như nút hỏng. Nay chạm đâu trong hàng cũng
+          được, và cái gạt cao 44px. */}
+        <button
+          type="button"
+          role="switch"
+          aria-checked={giuDeDoc}
+          aria-label="Giữ để đọc"
+          onClick={() => setGiuDeDoc((v) => !v)}
+          className="tap-target w-full flex items-center justify-between"
+          style={{ gap: 'var(--k3)', minHeight: 44, background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
+        >
+          <span style={TIEU_DE_MUC}>Giữ để đọc</span>
+          <span
+            aria-hidden
+            style={{ flexShrink: 0, width: 64, height: 36, borderRadius: 'var(--bo-tron)', padding: 4, background: giuDeDoc ? 'var(--muc)' : 'var(--vien-dam)', display: 'flex', alignItems: 'center', justifyContent: giuDeDoc ? 'flex-end' : 'flex-start' }}
           >
-            <span style={{ width: 26, height: 26, borderRadius: '50%', background: 'var(--the)' }} />
-          </button>
-        </div>
+            <span style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--the)' }} />
+          </span>
+        </button>
         <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
           Đề chỉ hiện khi ngón tay em còn trên màn. Nhả tay quá ân hạn, hoặc để màn hình im quá 6 giây, thì đề tạm ẩn; chạm lại là hiện ngay. Muốn chạm vào cửa sổ nổi thì phải nhả tay khỏi bài, nên không đọc hai thứ cùng lúc được. KHÔNG khoá bài vì việc này.
         </div>

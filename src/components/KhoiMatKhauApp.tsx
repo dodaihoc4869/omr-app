@@ -217,6 +217,8 @@ export default function KhoiMatKhauApp({ showToast }: { showToast: (chu: string,
           <div style={NHAN_NHO}>Mã bí mật trong máy này đang được mật khẩu mã hoá. Mật khẩu chỉ của máy này, không đồng bộ sang máy khác.</div>
 
           {/* GIỮ ĐĂNG NHẬP THEO TAB (GIU-DANG-NHAP-THEO-TAB.md mục 6). */}
+          {/* Vùng chạm 44px như nút gạt ở màn Mở ca — 30px là dưới ngưỡng, ngón
+            tay trượt ra là nhìn như nút hỏng (thầy báo 06/09). */}
           <div className="flex items-start" style={{ gap: 'var(--k3)' }}>
             <button
               type="button"
@@ -227,18 +229,19 @@ export default function KhoiMatKhauApp({ showToast }: { showToast: (chu: string,
               className="tap-target"
               style={{
                 flex: '0 0 auto',
-                width: 52,
-                height: 30,
+                width: 64,
+                minHeight: 44,
+                height: 44,
                 borderRadius: 'var(--bo-tron)',
                 border: 'none',
-                padding: 3,
+                padding: 4,
                 background: giuPhien ? 'var(--phu-dam)' : 'var(--the-2)',
                 display: 'flex',
                 justifyContent: giuPhien ? 'flex-end' : 'flex-start',
                 alignItems: 'center',
               }}
             >
-              <span style={{ width: 24, height: 24, borderRadius: 'var(--bo-tron)', background: giuPhien ? 'var(--muc-nguoc)' : 'var(--nhat)', display: 'block' }} />
+              <span style={{ width: 32, height: 32, borderRadius: 'var(--bo-tron)', background: giuPhien ? 'var(--muc-nguoc)' : 'var(--nhat)', display: 'block' }} />
             </button>
             <div>
               <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
