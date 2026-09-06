@@ -16,7 +16,6 @@ import {
   LOI_KHOA,
   MUC_NGAT_MAC_DINH,
   NGUONG_XUNG_CHOT,
-  MS_LECH_DONG_HO_CHOT,
   MS_RAF_NGHI_CHOT,
   TI_LE_CO_MAN_CHOT,
   coKhoa,
@@ -1229,11 +1228,7 @@ export default function ExamTakeScreen() {
           if (gap >= MS_RAF_NGHI_CHOT) xetPhieu(p)
           return
         }
-        if (p.kenh === 'lech_dong_ho') {
-          const lech = Math.abs(Number(/(-?\d+)/.exec(p.chiTiet)?.[1] ?? 0))
-          if (lech >= MS_LECH_DONG_HO_CHOT) xetPhieu(p)
-          return
-        }
+        // Kênh 6 (lệch đồng hồ) đã gỡ hẳn 06/09 — không còn nhánh nào ở đây.
         if (p.kenh === 'xung_chuyen_dong') {
           const xoan = Number(/([\d.]+)/.exec(p.chiTiet)?.[1] ?? 0)
           if (xoan >= NGUONG_XUNG_CHOT.xoan) xetPhieu(p)

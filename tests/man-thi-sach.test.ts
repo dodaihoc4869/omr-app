@@ -7,11 +7,10 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { mocRoiMan } from '../src/lib/chong-gian-lan'
-import { MS_TRUNG_KHOP, type PhieuKenh } from '../src/lib/do-dau-vet'
+import { MS_TRUNG_KHOP, SO_KENH, TEN_KENH, type PhieuKenh } from '../src/lib/do-dau-vet'
 import {
   HO_CUA_KENH,
   LOI_KHOA,
-  MS_LECH_DONG_HO_CHOT,
   MS_RAF_NGHI_CHOT,
   MUC_NGAT_CA_CU,
   NGUONG_XUNG_CHOT,
@@ -36,11 +35,29 @@ import {
 const p = (kenh: PhieuKenh['kenh'], luc: number): PhieuKenh => ({ kenh, luc, chiTiet: '' })
 
 describe('HỌ KÊNH — chỗ chống khoá oan', () => {
-  it('kênh 5 và kênh 6 cùng một họ: cuộn nhanh làm cả hai cùng báo cũng KHÔNG khoá', () => {
-    // Luồng chính nghẽn thì nhịp vẽ và lệch đồng hồ luôn báo cùng nhau. Đếm
-    // theo kênh thì đủ "2 kênh" và khoá oan; đếm theo họ thì chỉ một phiếu.
-    expect(soHoKhacNhau([p('nhip_ve', 1000), p('lech_dong_ho', 1050)])).toBe(1)
-    expect(nhomDuKhoa([p('nhip_ve', 1000), p('lech_dong_ho', 1050)])).toHaveLength(0)
+  it('kênh 6 đã gỡ hẳn — không còn mã kênh `lech_dong_ho` trong hệ', () => {
+    // Kênh 6 so `AudioContext.currentTime` với `performance.now()`. Trên iPhone
+    // context không bao giờ chạy nên nó báo lệch ~250 ms mỗi 250 ms — đó là
+    // nguyên nhân em Tuân bị khoá 10 lần. Thầy chốt 06/09: gỡ hẳn, không vá.
+    expect(Object.keys(HO_CUA_KENH)).not.toContain('lech_dong_ho')
+    expect(Object.keys(SO_KENH)).not.toContain('lech_dong_ho')
+    expect(Object.keys(TEN_KENH)).not.toContain('lech_dong_ho')
+  })
+
+  it('số hiệu các kênh còn lại GIỮ NGUYÊN — cấm đánh số lại', () => {
+    // Đánh số lại là làm sai mọi dòng nhật ký cũ và mọi trang đặc tả.
+    expect(SO_KENH.nhip_ve).toBe(5)
+    expect(SO_KENH.phim_chup).toBe(7)
+    expect(SO_KENH.xung_chuyen_dong).toBe(8)
+  })
+
+  it('không còn AudioContext nào được dựng trên máy học sinh', async () => {
+    const thu = (await import('../src/lib/thu-tin-hieu.ts?raw')).default
+    expect(thu).not.toContain('new AC(')
+    expect(thu).not.toContain('currentTime')
+    expect(thu).not.toContain("bao('lech_dong_ho'")
+    const man = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default
+    expect(man).not.toContain('lech_dong_ho')
   })
 
   it('kênh 1 và kênh 2 cùng một họ: chuyển app bắn cả hai cũng KHÔNG thành dấu vết chụp', () => {
@@ -59,8 +76,8 @@ describe('HỌ KÊNH — chỗ chống khoá oan', () => {
   })
 
   it('mỗi kênh thuộc đúng một họ, không sót kênh nào', () => {
-    expect(Object.keys(HO_CUA_KENH)).toHaveLength(8)
-    expect(HO_CUA_KENH.nhip_ve).toBe(HO_CUA_KENH.lech_dong_ho)
+    expect(Object.keys(HO_CUA_KENH)).toHaveLength(7) // 8 kênh trừ kênh 6 đã gỡ
+    expect(HO_CUA_KENH.nhip_ve).toBe('luong_chinh')
     expect(HO_CUA_KENH.an_trang).toBe(HO_CUA_KENH.tieu_diem)
     expect(HO_CUA_KENH.xung_chuyen_dong).toBe('vat_ly')
   })
@@ -272,7 +289,6 @@ describe('dấu vết chụp chỉ còn đến từ SỐ ĐO TRỰC TIẾP', () 
   it('họ luồng chính (kênh 5 nhịp vẽ, kênh 6 lệch đồng hồ) KHÔNG được khoá ai', () => {
     expect(hoDuocKhoa('luong_chinh')).toBe(false)
     expect(phieuDuocKhoa(p('nhip_ve', 0))).toBe(false)
-    expect(phieuDuocKhoa(p('lech_dong_ho', 0))).toBe(false)
   })
 
   it('họ chuyển động máy và họ màn bị che cũng không', () => {
@@ -318,30 +334,14 @@ describe('dấu vết chụp chỉ còn đến từ SỐ ĐO TRỰC TIẾP', () 
     expect(man).toContain("if (p.kenh === 'toan_man') {\n          if (camUngMay) return")
   })
 
-  it('ngưỡng kênh 6 hạ xuống DƯỚI số đo thật 210 ms để chắc chắn bắt được', () => {
-    expect(MS_LECH_DONG_HO_CHOT).toBeLessThan(210)
-    // nhưng vẫn cao gấp hàng chục lần jitter thường thấy (vài ms)
-    expect(MS_LECH_DONG_HO_CHOT).toBeGreaterThanOrEqual(100)
-  })
-
   it('cửa sổ tránh chạm đủ rộng để bao trọn một nhát cuộn', () => {
     expect(MS_KHONG_CHAM_QUANH_PHIEU).toBeGreaterThanOrEqual(400)
   })
 
-  it('kênh 6 không được so đồng hồ khi AudioContext chưa chạy', async () => {
-    // NGUYÊN NHÂN GỐC của 10 lần khoá oan: iOS giữ AudioContext ở `suspended`
-    // khi nó không được resume trong một cú chạm, `currentTime` đứng yên, và
-    // phép trừ hai mốc cho ra lệch ~250 ms MỖI 250 ms. Đồng hồ đứng thì không
-    // so được.
+  it('bộ thu không còn nhịp 250 ms nào của kênh 6', async () => {
     const thu = (await import('../src/lib/thu-tin-hieu.ts?raw')).default
-    expect(thu).toContain("const chay = c.state === 'running'")
-    expect(thu).toContain('if (chay && chayTruoc) {')
-    // và phải dựng lại mốc mỗi nhịp, kể cả nhịp bị bỏ, kẻo lúc bật lại là một
-    // khoảng lệch bằng cả quãng đứng yên
-    const dau = thu.indexOf('const soDongHo = window.setInterval')
-    const than = thu.slice(dau, thu.indexOf('}, 250)', dau))
-    expect(than).toContain('mocAm = am')
-    expect(than).toContain('mocChinh = chinh')
+    expect(thu).not.toContain('soDongHo')
+    expect(thu).not.toContain('mocAm')
   })
 })
 

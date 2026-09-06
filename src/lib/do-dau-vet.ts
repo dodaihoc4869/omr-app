@@ -13,7 +13,10 @@
 // ngắn quanh trục dọc. Nó không quan tâm màn hình đang hiện gì, nên em đổi sang
 // chế độ ảnh nhỏ ở góc cũng không tránh được.
 
-export type MaKenh = 'an_trang' | 'tieu_diem' | 'toan_man' | 'kich_thuoc' | 'nhip_ve' | 'lech_dong_ho' | 'phim_chup' | 'xung_chuyen_dong'
+// KÊNH 6 (`lech_dong_ho`) ĐÃ GỠ HẲN 06/09 — xem khối lý do trong
+// `thu-tin-hieu.ts`. Số hiệu các kênh còn lại GIỮ NGUYÊN: kênh 7 vẫn là kênh 7.
+// Đánh số lại là làm sai mọi dòng nhật ký cũ và mọi trang đặc tả.
+export type MaKenh = 'an_trang' | 'tieu_diem' | 'toan_man' | 'kich_thuoc' | 'nhip_ve' | 'phim_chup' | 'xung_chuyen_dong'
 
 export const TEN_KENH: Record<MaKenh, string> = {
   an_trang: 'Ẩn trang',
@@ -21,7 +24,6 @@ export const TEN_KENH: Record<MaKenh, string> = {
   toan_man: 'Toàn màn hình',
   kich_thuoc: 'Kích thước',
   nhip_ve: 'Nhịp vẽ khung',
-  lech_dong_ho: 'Lệch đồng hồ',
   phim_chup: 'Phím chụp',
   xung_chuyen_dong: 'Xung chuyển động',
 }
@@ -33,7 +35,6 @@ export const SO_KENH: Record<MaKenh, number> = {
   toan_man: 3,
   kich_thuoc: 4,
   nhip_ve: 5,
-  lech_dong_ho: 6,
   phim_chup: 7,
   xung_chuyen_dong: 8,
 }
@@ -70,7 +71,6 @@ export const TI_LE_CO_MAN = 0.72
 // khoá — `kenhDuocKhoaMotMinh` bên dưới đọc đúng chỗ này.
 
 export const MS_RAF_NGHI: number | null = null
-export const MS_LECH_DONG_HO: number | null = null
 
 export interface NguongXung {
   /** rad/s — biên độ xoắn quanh trục dọc coi là một nhát bóp. */
@@ -91,7 +91,6 @@ export const NGUONG_XUNG: NguongXung | null = null
 // chốt ngưỡng thật. KHÔNG BAO GIỜ dùng mấy số này để khoá.
 
 export const MS_RAF_QUAN_SAT = 150
-export const MS_LECH_QUAN_SAT = 120
 export const NGUONG_XUNG_QUAN_SAT: NguongXung = { xoan: 1.2, msMin: 40, msMax: 200, tiLeZToiDa: 1 }
 
 /** Cửa sổ trượt giữ mẫu chuyển động trong bộ nhớ. Không lưu đĩa, không gửi đi. */
@@ -161,7 +160,6 @@ export function xetTrungKhop(ds: PhieuKenh[], ms: number = MS_TRUNG_KHOP): KetLu
 export function kenhDuocKhoaMotMinh(kenh: MaKenh): boolean {
   if (kenh === 'toan_man' || kenh === 'kich_thuoc' || kenh === 'phim_chup') return true
   if (kenh === 'nhip_ve') return MS_RAF_NGHI !== null
-  if (kenh === 'lech_dong_ho') return MS_LECH_DONG_HO !== null
   if (kenh === 'xung_chuyen_dong') return NGUONG_XUNG !== null
   return false
 }

@@ -12,7 +12,8 @@
 //
 //   · kênh 5 (nhịp vẽ) và kênh 6 (lệch đồng hồ) đo CÙNG MỘT THỨ — luồng chính
 //     bị nghẽn. Em cuộn nhanh mười giây là cả hai cùng báo, đủ "2 kênh", khoá
-//     oan một em không làm gì.
+//     oan một em không làm gì. *(Kênh 6 đã gỡ hẳn 06/09; họ `luong_chinh` nay
+//     chỉ còn kênh 5, và cả họ không còn được khoá ai — xem khối bên dưới.)*
 //   · kênh 1 (ẩn trang) và kênh 2 (tiêu điểm) cũng đi thành cặp: mọi lần
 //     chuyển app, mọi cuộc gọi đến đều bắn cả hai.
 //
@@ -31,7 +32,6 @@ export const HO_CUA_KENH: Record<MaKenh, HoKenh> = {
   an_trang: 'che_man',
   tieu_diem: 'che_man',
   nhip_ve: 'luong_chinh',
-  lech_dong_ho: 'luong_chinh',
   xung_chuyen_dong: 'vat_ly',
   toan_man: 'do_truc_tiep',
   kich_thuoc: 'do_truc_tiep',
@@ -78,15 +78,7 @@ export function chuNhomPhieu(nhom: PhieuKenh[]): string {
  * chứ không trông cậy vào nó. */
 export const MS_RAF_NGHI_CHOT = 200
 
-/** Lệch giữa đồng hồ âm thanh và luồng chính.
- *
- * ĐO TRÊN MÁY THẦY 05/09, chụp màn hình Android: **K6 lệch −210 ms**, và là
- * kênh DUY NHẤT trong tám kênh phản ứng. Bảy kênh kia im re — kể cả kênh 8, vì
- * máy thầy chụp không phải bằng cách bóp hai nút cứng.
- *
- * Lấy 150 ms: dưới số đo thật 210 để chắc chắn bắt được, mà vẫn cao gấp hàng
- * chục lần jitter bình thường (vài ms). */
-export const MS_LECH_DONG_HO_CHOT = 150
+// Ngưỡng kênh 6 (`MS_LECH_DONG_HO_CHOT`) đã gỡ cùng kênh 6, 06/09.
 
 /** Xung bóp hai nút cứng.
  *

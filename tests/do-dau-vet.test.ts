@@ -6,7 +6,6 @@
 import { describe, expect, it } from 'vitest'
 import {
   BAT_DUNG_TOI_THIEU,
-  MS_LECH_DONG_HO,
   MS_RAF_NGHI,
   MS_TRUNG_KHOP,
   NGUONG_XUNG,
@@ -71,10 +70,8 @@ describe('chưa đo thì chưa kênh nào được khoá một mình', () => {
 
   it('kênh dấu vết chụp CHƯA được khoá một mình khi ngưỡng còn để trống', () => {
     expect(MS_RAF_NGHI).toBeNull()
-    expect(MS_LECH_DONG_HO).toBeNull()
     expect(NGUONG_XUNG).toBeNull()
     expect(kenhDuocKhoaMotMinh('nhip_ve')).toBe(false)
-    expect(kenhDuocKhoaMotMinh('lech_dong_ho')).toBe(false)
     expect(kenhDuocKhoaMotMinh('xung_chuyen_dong')).toBe(false)
     expect(kenhDuocKhoaMotMinh('an_trang')).toBe(false)
     expect(kenhDuocKhoaMotMinh('tieu_diem')).toBe(false)
@@ -180,7 +177,7 @@ describe('chấm điểm CÁI MÁY, không phải chấm học sinh', () => {
   })
 
   it('bắt dưới 3/10 → tắt hẳn, không góp phiếu', () => {
-    expect(xepLoaiKenh({ kenh: 'lech_dong_ho', batDung: 2, soLanThu: 10, baoNham: 0 })).toBe('tat_han')
+    expect(xepLoaiKenh({ kenh: 'nhip_ve', batDung: 2, soLanThu: 10, baoNham: 0 })).toBe('tat_han')
   })
 
   it('ngưỡng đậu là 9/10 đúng như đặc tả', () => {

@@ -8,7 +8,6 @@
 // mức cần cho tính năng.
 import {
   MS_CUA_SO_CHUYEN_DONG,
-  MS_LECH_QUAN_SAT,
   MS_NHIP_KIEM_CO_MAN,
   MS_RAF_QUAN_SAT,
   NGUONG_XUNG_QUAN_SAT,
@@ -134,55 +133,22 @@ export function thuTinHieu(o: TuyChonThu): () => void {
     chayRaf = false
   })
 
-  // ---- KÊNH 6: lệch đồng hồ. `AudioContext` chạy trên luồng âm thanh riêng,
-  // KHÔNG bị hệ điều hành đóng băng cùng luồng chính — nó là đồng hồ tham chiếu
-  // duy nhất còn chạy khi trang bị treo.
+  // ---- KÊNH 6 (LỆCH ĐỒNG HỒ) ĐÃ GỠ HẲN 06/09, theo lệnh của thầy.
   //
-  // LỖI ĐÃ SỬA 06/09 — nguyên nhân em Tuân bị khoá 10 lần trong 24 phút.
+  // Kênh này lấy đồng hồ của luồng âm thanh so với đồng hồ luồng chính để đo
+  // luồng chính có bị nghẽn không. Nó là nguyên nhân em Lưu Ngọc Tuân bị khoá
+  // 10 lần trong 24 phút: iOS chỉ cho đồng hồ âm thanh chạy khi nó được đánh
+  // thức bên trong một cú chạm, mà bộ thu dựng nó trong `useEffect`, nên trên
+  // iPhone nó sinh ra ở trạng thái `suspended` và đứng yên mãi mãi. Phép trừ
+  // hai mốc cho ra lệch ~250 ms MỖI 250 ms, suốt buổi.
   //
-  // iOS chỉ cho `AudioContext` chạy khi nó được `resume()` bên trong một cú chạm
-  // của người dùng. Bộ thu này dựng context trong `useEffect`, KHÔNG phải trong
-  // tay lệnh chạm, nên trên iPhone context sinh ra ở trạng thái `suspended` và
-  // `currentTime` ĐỨNG YÊN mãi mãi.
+  // Vì sao gỡ chứ không vá: kể cả khi đồng hồ ấy chạy, thứ kênh này đo là "máy
+  // có nghẽn không" — mà máy nghẽn vì trăm thứ chẳng liên quan tới bài thi, và
+  // họ `luong_chinh` từ 06/09 không còn được khoá ai nữa. Giữ lại là nuôi một
+  // đồng hồ âm thanh trên máy mọi em suốt buổi để ghi một dòng nhật ký không ai
+  // đọc — tốn pin, không đổi lấy gì.
   //
-  // Bản cũ vẫn trừ hai mốc: `0 - 0 - 250 = -250 ms`. Mỗi 250 ms một phiếu lệch
-  // 250 ms, quá ngưỡng 120, liên tục suốt buổi thi. Đó không phải dấu vết chụp
-  // màn hình — đó là cái đồng hồ tham chiếu chưa từng chạy.
-  //
-  // Đồng hồ đứng thì KHÔNG so được. Chỉ đo khi context `running`; mọi lúc khác
-  // dựng lại mốc rồi bỏ nhịp đó. Thà mất một kênh trên iPhone còn hơn kênh ấy
-  // gào lên bốn lần mỗi giây.
-  let ctx: AudioContext | null = null
-  try {
-    const AC = (window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext) as typeof AudioContext | undefined
-    if (AC) ctx = new AC()
-  } catch {
-    ctx = null
-  }
-  if (ctx) {
-    const c = ctx
-    let mocAm = c.currentTime * 1000
-    let mocChinh = performance.now()
-    let chayTruoc = c.state === 'running'
-    const soDongHo = window.setInterval(() => {
-      const am = c.currentTime * 1000
-      const chinh = performance.now()
-      const chay = c.state === 'running'
-      // Chỉ tin nhịp này khi đồng hồ tham chiếu chạy SUỐT cả nhịp. Vừa mới bật
-      // hoặc vừa tắt giữa chừng cũng cho ra một khoảng lệch bịa.
-      if (chay && chayTruoc) {
-        const lech = am - mocAm - (chinh - mocChinh)
-        if (Math.abs(lech) >= MS_LECH_QUAN_SAT) bao('lech_dong_ho', `lệch ${Math.round(lech)} ms`, chinh)
-      }
-      chayTruoc = chay
-      mocAm = am
-      mocChinh = chinh
-    }, 250)
-    bo.push(() => {
-      window.clearInterval(soDongHo)
-      void c.close().catch(() => {})
-    })
-  }
+  // Không dựng đồng hồ âm thanh nào nữa.
 
   // ---- KÊNH 8: xung chuyển động. Cửa sổ trượt 2 giây, mảng cố định, không cấp
   // phát mới mỗi khung — kênh này không được làm tụt tốc độ cuộn.
