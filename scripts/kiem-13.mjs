@@ -1,4 +1,7 @@
-// 13 PHÉP KIỂM HIỂN THỊ — mục E8 của LUATGOCKHODE.md, chạy ở KHỔ 360px.
+// PHÉP KIỂM HIỂN THỊ — mục E8 của LUATGOCKHODE.md, chạy ở KHỔ 360px.
+//
+// 13 phép gốc + 2 phép sơ đồ chuyển hoá thêm 06/09. Số phép in ra ở dòng KẾT
+// LUẬN, không chốt cứng trong tên file.
 //
 // Chạy trên DOM THẬT (tests/xuat-dom-hien-thi.test.tsx dựng ra) kèm CSS ĐÃ
 // BUILD trong dist/, bằng Chromium thật để có bố cục thật. Không chụp màn hình:
@@ -79,7 +82,22 @@ const ketQua = await trang360.evaluate(() => {
     ![...document.querySelectorAll('.pa-hang')].some((e) => e.getBoundingClientRect().height < 48),
   )
 
-  // Số liệu phụ để soi khi trượt — KHÔNG tính vào 13 phép.
+  // PHÉP KIỂM 14 và 15 — SƠ ĐỒ CHUYỂN HOÁ (thêm 06/09 sau ảnh thầy chụp).
+  //
+  // Câu cellulose `12-C2-B6` III-22 từng bị đẩy hai mũi tên thành hai KHỐI
+  // RIÊNG, mỗi mũi tên chiếm trọn một dòng nên "Cellulose", "X", "Y" mỗi thứ
+  // một dòng. Đo thật ở khổ 360px, cùng một câu:
+  //
+  //     trước:  cao 260,4px · 2 khối riêng
+  //     sau:    cao 163,8px · 0 khối riêng
+  //
+  // Ngưỡng 200px nằm giữa hai con số đó: rộng hơn bản đúng 22%, mà bản vỡ
+  // dòng thì không thể lọt.
+  const soDoDe = q('#the-2 .cau-de')
+  kt('sơ đồ nằm trong dòng', !!soDoDe && soDoDe.querySelectorAll('.ct-dai').length === 0)
+  kt('sơ đồ không vỡ dòng', !!soDoDe && soDoDe.getBoundingClientRect().height <= 200)
+
+  // Số liệu phụ để soi khi trượt — KHÔNG tính vào phép kiểm nào.
   const soLieu = {
     katex: cs('.katex')?.fontSize,
     cauDe: cs('.cau-de')?.fontSize,
@@ -90,17 +108,70 @@ const ketQua = await trang360.evaluate(() => {
     scrollWidth: document.documentElement.scrollWidth,
     innerWidth: window.innerWidth,
     caoHangThapNhat: Math.min(...[...document.querySelectorAll('.pa-hang')].map((e) => e.getBoundingClientRect().height)),
+    caoSoDo: q('#the-2 .cau-de')?.getBoundingClientRect().height,
+    khoiTrongSoDo: q('#the-2 .cau-de')?.querySelectorAll('.ct-dai').length,
   }
   return { K, soLieu }
 })
 
+// ---------------------------------------------------------------- TRANG PHIẾU
+// Mũi tên phản ứng của PHIẾU HTML (bản gửi đi) đo ở trang riêng, vì `CSS_PHIEU`
+// khai lại biến `:root` — trộn chung là đè lên tokens của app.
+const DOM_MT = resolve(GOC, '.kiem-hien-thi/mui-ten.html')
+let phepMuiTen = []
+let soLieuMuiTen = null
+if (existsSync(DOM_MT)) {
+  const trangMt = await trinh.newPage({ viewport: { width: 360, height: 800 }, deviceScaleFactor: 2 })
+  await trangMt.setContent(readFileSync(DOM_MT, 'utf8'), { waitUntil: 'load' })
+  await trangMt.evaluate(() => document.fonts.ready)
+  const raMt = await trangMt.evaluate(() => {
+    const K = []
+    const kt = (ten, dk) => K.push([ten, !!dk])
+    const o = (s) => document.querySelector(s)?.getBoundingClientRect()
+    const mt = [...document.querySelectorAll('.mt')]
+    const coNhan = mt.filter((e) => e.querySelector('.mt-tren') || e.querySelector('.mt-duoi'))
+    // Nhãn phải nằm HẲN trên và HẲN dưới thân, không đè lên nhau.
+    const xepDung = coNhan.every((e) => {
+      const tren = e.querySelector('.mt-tren')?.getBoundingClientRect()
+      const than = e.querySelector('.mt-than')?.getBoundingClientRect()
+      const duoi = e.querySelector('.mt-duoi')?.getBoundingClientRect()
+      if (!than) return false
+      if (tren && tren.bottom > than.top + 0.5) return false
+      if (duoi && duoi.top < than.bottom - 0.5) return false
+      return true
+    })
+    // Thân mũi tên phải RỘNG HƠN nhãn dài nhất trừ phần đệm, nếu không nhãn
+    // thò ra hai bên trông như chữ rời.
+    const thanDuRong = coNhan.every((e) => {
+      const than = e.querySelector('.mt-than')?.getBoundingClientRect()
+      const nhan = [...e.querySelectorAll('.mt-tren,.mt-duoi')].map((x) => x.getBoundingClientRect().width)
+      return than && than.width >= Math.max(...nhan, 0) - 1
+    })
+    kt('nhãn xếp trên dưới thân mũi tên', coNhan.length >= 3 && xepDung)
+    kt('thân mũi tên dài bằng nhãn', thanDuRong)
+    kt('phiếu không tràn ngang', document.documentElement.scrollWidth <= window.innerWidth + 1)
+    return {
+      K,
+      soLieu: {
+        soMuiTen: mt.length,
+        soMuiTenCoNhan: coNhan.length,
+        caoDoanSoDo: o('#mt-so-do')?.height,
+        scrollWidth: document.documentElement.scrollWidth,
+      },
+    }
+  })
+  phepMuiTen = raMt.K
+  soLieuMuiTen = raMt.soLieu
+}
+
 await trinh.close()
 
 const { K, soLieu } = ketQua
+K.push(...phepMuiTen)
+if (soLieuMuiTen) soLieu.phieu = soLieuMuiTen
 for (const [ten, ok] of K) console.log(`  ${ok ? '✓' : '✕'}  ${ten}`)
 const dat = K.every((x) => x[1])
-console.log('KẾT LUẬN:', dat ? 'ĐẠT' : 'CHƯA ĐẠT')
-if (!dat) {
-  console.log('Số đo:', JSON.stringify(soLieu, null, 1))
-  process.exit(1)
-}
+console.log('KẾT LUẬN:', (dat ? 'ĐẠT' : 'CHƯA ĐẠT') + '  ' + K.filter((x) => x[1]).length + '/' + K.length)
+// In số đo cả khi ĐẠT: ngưỡng nào cũng cần biết mình đang cách mép bao xa.
+console.log('Số đo:', JSON.stringify(soLieu, null, 1))
+if (!dat) process.exit(1)

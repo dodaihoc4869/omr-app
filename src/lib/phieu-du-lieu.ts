@@ -340,43 +340,55 @@ export interface NguonPhieuMayEm {
    * của em. Không gọi máy chủ: mở một đường đọc công khai theo số báo danh là
    * cho bất kỳ ai biết SBD đọc được cả lịch sử điểm của em đó. */
   lichSu?: DiemMotCa[]
+  /** CÂU KHẮC PHỤC RÚT TỪ KHO ĐỀ của trung tâm (thầy chốt 06/09). Có thì bộ
+   * bài tập lấy từ đây; mất mạng hoặc máy chủ từ chối thì rơi về ngân hàng của
+   * chính ca vừa thi như trước. */
+  khoKhacPhuc?: TeacherExamSource[]
+}
+
+/** Chuyên đề em vừa MẤT ĐIỂM, xếp theo tỉ lệ sai giảm dần.
+ *
+ * Một nơi tính, hai nơi dùng: màn Làm bài gửi danh sách này lên máy chủ để rút
+ * câu khắc phục, và `dungPhieuMayEm` dùng lại đúng thứ hạng đó khi phải rơi về
+ * ngân hàng của ca. Tách đôi là hai đường ra hai thứ tự khác nhau. */
+export function xepChuyenDeYeu(rows: ChiTietCauRow[]): { ten: string; tiLeSai: number }[] {
+  const gom = new Map<string, { soCau: number; soSai: number }>()
+  for (const r of rows) {
+    const ten = r.chuyenDe || ''
+    if (!ten) continue
+    const cu = gom.get(ten) ?? { soCau: 0, soSai: 0 }
+    cu.soCau += 1
+    if (!r.dungSai) cu.soSai += 1
+    gom.set(ten, cu)
+  }
+  return [...gom.entries()]
+    .filter(([, v]) => v.soSai > 0)
+    .map(([ten, v]) => ({ ten, tiLeSai: v.soSai / Math.max(1, v.soCau) }))
+    .sort((a, b) => b.tiLeSai - a.tiLeSai)
 }
 
 export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
   const cauSai = dungCauSai(n.rows, n.banks)
 
-  // BỘ CÂU KHẮC PHỤC LỖI SAI (thầy chốt 06/09) — rút ngay trên máy em.
+  const chuyenDeYeu = xepChuyenDeYeu(n.rows)
+  // NGUỒN CÂU KHẮC PHỤC — thầy chốt 06/09: RÚT TỪ KHO ĐỀ.
   //
-  // Máy em KHÔNG có kho đề của trung tâm, chỉ có ngân hàng của chính ca vừa
-  // thi. Nên bộ này nhỏ hơn bộ thầy gói theo báo cáo phụ huynh, và màn báo cáo
-  // nói thẳng còn bao nhiêu câu chứ không hứa 60.
-  const yeu = new Map<string, { soCau: number; soSai: number }>()
-  for (const r of n.rows) {
-    const ten = r.chuyenDe || ''
-    if (!ten) continue
-    const cu = yeu.get(ten) ?? { soCau: 0, soSai: 0 }
-    cu.soCau += 1
-    if (!r.dungSai) cu.soSai += 1
-    yeu.set(ten, cu)
-  }
-  const chuyenDeYeu = [...yeu.entries()]
-    .filter(([, v]) => v.soSai > 0)
-    .map(([ten, v]) => ({ ten, tiLeSai: v.soSai / Math.max(1, v.soCau) }))
-    .sort((a, b) => b.tiLeSai - a.tiLeSai)
-  // POOL = TOÀN BỘ CÂU CỦA CA, chuyên đề yếu xếp trước.
+  // Máy chủ đã chọn sẵn theo đúng chuyên đề em mất điểm và đã bỏ hẳn những câu
+  // em vừa làm trong ca, nên ở đây chỉ việc lấy đúng thứ tự đó. Trần thật lúc
+  // này là 60 câu chứ không còn là số câu của ca.
   //
-  // Thầy chốt 06/09: cho em tạo tới 60 câu. Máy em chỉ có ngân hàng của CHÍNH
-  // ca vừa thi, nên trần thật là số câu của ca — ca 28 câu thì tối đa 28. Lọc
-  // thêm theo chuyên đề yếu như bản trước còn cắt xuống chỉ còn hơn chục câu,
-  // thanh kéo gần như vô dụng.
-  //
-  // Nên: lấy trước những câu thuộc chuyên đề em mất điểm, rồi NỐI phần còn lại
-  // của ca vào sau. Em kéo tới đâu cũng có câu, mà mấy câu đầu vẫn đúng chỗ em
-  // yếu nhất.
+  // Không lấy được (mất mạng, máy chủ từ chối, kho chưa có câu nào của chuyên
+  // đề đó) thì RƠI VỀ ngân hàng của chính ca vừa thi: chuyên đề em mất điểm
+  // xếp trước, phần còn lại của ca nối vào sau. Thà ít câu còn hơn màn trắng.
+  const tuKho = n.khoKhacPhuc && n.khoKhacPhuc.length > 0 ? cauLuyenTuNguon(n.khoKhacPhuc) : []
+  const daLamTrongCa = new Set(n.rows.map((r) => r.qid).filter(Boolean))
   const uuTien = n.banks.length > 0 && chuyenDeYeu.length > 0 ? chonCauLuyen(n.banks, { chuyenDe: chuyenDeYeu, qidDaLam: [], soCau: SO_CAU_BAI_TAP_KEM }).cau : []
   const daCo = new Set(uuTien.map((c) => c.id))
   const conLai = n.banks.length > 0 ? cauLuyenTuNguon(n.banks).filter((c) => !daCo.has(c.id)) : []
-  const baiTapEm = [...uuTien, ...conLai].slice(0, SO_CAU_BAI_TAP_KEM)
+  const duPhong = [...uuTien, ...conLai]
+  // Kho trả về rồi thì KHÔNG trộn thêm câu của ca vào: câu của ca là câu em
+  // vừa làm, luyện lại chỉ là nhớ đáp án.
+  const baiTapEm = (tuKho.length > 0 ? tuKho.filter((c) => !daLamTrongCa.has(c.id)) : duPhong).slice(0, SO_CAU_BAI_TAP_KEM)
   const tk = thongKeLamBai(n.rows, { vaoLuc: n.vaoLuc, nopLuc: n.nopLuc, thoiLuongPhut: n.thoiLuongPhut })
 
   const gom = new Map<string, { ten: string; soCau: number; soSai: number }>()

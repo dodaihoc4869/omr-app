@@ -1145,6 +1145,55 @@ export async function lichSuEm(scriptUrl: string, maCa: string, sbd: string, idT
   }))
 }
 
+// ---------------------------------------------------------------------------
+// CÂU KHẮC PHỤC RÚT TỪ KHO ĐỀ (thầy chốt 06/09)
+
+export interface KetQuaKhacPhuc {
+  /** Từng đề gốc một khối, GIỮ NGUYÊN `ma_de` để mã câu không đụng nhau: hai
+   * đề khác nhau đều có câu I-5, gộp chung một mã đề là mất một câu. */
+  nguon: { maDe: string; json: unknown }[]
+  soCau: number
+  /** Số câu máy chủ CHỌN được. Lớn hơn `soCau` nghĩa là bị cắt vì gói quá nặng. */
+  soChon: number
+  catBotViNang: boolean
+}
+
+/** EM KÉO CÂU KHẮC PHỤC TỪ KHO ĐỀ sau khi nộp bài.
+ *
+ * Khoá y như `lichSuEm`: không kèm mã bí mật, máy chủ đòi có lượt ĐÃ NỘP đúng
+ * cặp (maCa, sbd) và `idThietBi` khớp lượt đó. Đây là lệnh công khai duy nhất
+ * trả về đề CÓ ĐÁP ÁN VÀ LỜI GIẢI nên còn thêm trần 60 câu và trần dung lượng.
+ *
+ * `loaiTru` là mã những câu em VỪA LÀM trong ca — thầy yêu cầu câu khắc phục
+ * phải khác hẳn câu vừa sai, luyện lại đúng câu cũ thì em chỉ nhớ đáp án. */
+export async function cauKhacPhuc(
+  scriptUrl: string,
+  maCa: string,
+  sbd: string,
+  idThietBi: string,
+  chuyenDe: string[],
+  loaiTru: string[],
+  soCau: number,
+): Promise<KetQuaKhacPhuc> {
+  const r = await postJson(scriptUrl, { action: 'cauKhacPhuc', maCa, sbd, idThietBi, chuyenDe, loaiTru, soCau })
+  if (!r.ok) throw new Error(r.error || 'Không lấy được câu khắc phục')
+  const items = Array.isArray(r.items) ? r.items : []
+  return {
+    nguon: items.map((x: { ma_de?: string }) => ({ maDe: String(x?.ma_de || ''), json: x })),
+    soCau: Number(r.soCau) || 0,
+    soChon: Number(r.soChon) || 0,
+    catBotViNang: r.catBotViNang === true,
+  }
+}
+
+/** THẦY dựng lại chỉ mục câu của kho đề sau khi đẩy đề mới, để em đầu tiên
+ * bấm "tạo câu khắc phục" không phải chờ máy chủ mở cả kho. */
+export async function dungChiMuc(scriptUrl: string, secret: string): Promise<number> {
+  const r = await postJson(scriptUrl, { action: 'dungChiMuc', secret })
+  if (!r.ok) throw new Error(r.error || 'Không dựng được chỉ mục')
+  return Number(r.soCau) || 0
+}
+
 /** THẦY LẤY toàn bộ câu hỏi của một ca. */
 export async function danhSachCauHoi(scriptUrl: string, secret: string, maCa: string): Promise<CauHoiCuaEm[]> {
   const r = await postJson(scriptUrl, { action: 'danhSachCauHoi', secret, maCa })

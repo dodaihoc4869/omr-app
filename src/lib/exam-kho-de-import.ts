@@ -247,6 +247,13 @@ export function parseKhoDeJsonText(raw: string): KhoDeParseResult {
   } catch {
     return { ok: false, errors: ['Không đọc được JSON — kiểm tra lại cú pháp (dấu phẩy, ngoặc, dấu nháy kép...)'] }
   }
+  return parseKhoDeJson(data)
+}
+
+/** Như `parseKhoDeJsonText` nhưng nhận object đã có sẵn — dùng cho gói câu
+ * khắc phục máy chủ trả về, khỏi phải chuyển thành chuỗi rồi đọc lại (gói tới
+ * vài MB vì có ảnh base64). Cùng một bộ cửa chặn, không nới một luật nào. */
+export function parseKhoDeJson(data: unknown): KhoDeParseResult {
   if (typeof data !== 'object' || data === null || Array.isArray(data)) return { ok: false, errors: ['JSON gốc phải là 1 object (không phải mảng)'] }
   const d = data as Record<string, unknown>
   const topErrors: string[] = []

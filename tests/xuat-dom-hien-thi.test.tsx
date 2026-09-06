@@ -13,6 +13,7 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import TheCau from '../src/components/TheCau'
+import { CSS_PHIEU, chuHtml } from '../src/lib/html-phieu'
 
 const GOC = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -63,8 +64,44 @@ describe('xuất DOM cho phép kiểm hiển thị', () => {
     for (const lop of ['cau-de', 'pa-hang', 'pa-ma', 'pa-noi-dung', 'lg-chot', 'lg-chu', 'cau-hinh', 'cau-bang', 'the-cau']) {
       expect(html).toContain(lop)
     }
+
+    // CÂU THỨ HAI: SƠ ĐỒ CHUYỂN HOÁ, chép nguyên văn `12-C2-B6` III-22 — câu
+    // thầy chụp màn 06/09. Đưa vào harness để lần sau ai sửa ngưỡng tách khối
+    // là thấy sơ đồ vỡ ngay, không phải đợi thầy phát hiện trên lớp.
+    const soDo = render(
+      <TheCau
+        cheDo="xem_lai"
+        phan="III"
+        stt={22}
+        id="cau-22"
+        text={
+          'Cho sơ đồ chuyển hoá: Cellulose $\\ce{->[+H2O][acid, t^\\circ]}$ X ' +
+          '$\\ce{->[+[Ag(NH3)2]OH][t^\\circ]}$ Y $\\ce{->[+HCl]}$ Z. Biết X là monosaccharide; ' +
+          'Y, Z là các hợp chất hữu cơ. Phân tử khối của Z là bao nhiêu?'
+        }
+        selected="196"
+        correct="196"
+      />,
+    )
+
     const ra = resolve(GOC, '.kiem-hien-thi/the-cau.html')
     mkdirSync(dirname(ra), { recursive: true })
-    writeFileSync(ra, html, 'utf8')
+    writeFileSync(ra, `<section id="the-1">${html}</section>\n<section id="the-2">${soDo.container.innerHTML}</section>`, 'utf8')
+  })
+
+  it('dựng trang PHIẾU riêng để đo mũi tên phản ứng', () => {
+    // Trang RIÊNG, không trộn vào trang thẻ câu: `CSS_PHIEU` khai lại biến
+    // `:root` của nó, trộn chung là đè lên tokens của app và 13 phép kiểm kia
+    // đo phải màu/cỡ chữ của phiếu.
+    const than =
+      `<div class="q-text" id="mt-so-do">Cho sơ đồ chuyển hoá: ` +
+      chuHtml(
+        'Cellulose $\\ce{->[+H2O][acid, t^\\circ]}$ X $\\ce{->[+[Ag(NH3)2]OH][t^\\circ]}$ Y $\\ce{->[+HCl]}$ Z',
+      ) +
+      `. Biết X là monosaccharide.</div>`
+    const ra = resolve(GOC, '.kiem-hien-thi/mui-ten.html')
+    mkdirSync(dirname(ra), { recursive: true })
+    writeFileSync(ra, `<!doctype html><html lang="vi"><head><meta charset="utf-8"><style>${CSS_PHIEU}</style></head><body style="margin:0;padding:12px">${than}</body></html>`, 'utf8')
+    expect(than).toContain('mt-than')
   })
 })

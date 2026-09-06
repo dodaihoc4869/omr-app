@@ -1032,6 +1032,164 @@ function tenHocSinh_(sbd) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// CÂU KHẮC PHỤC RÚT TỪ KHO ĐỀ — thầy chốt 06/09
+//
+// Sau khi nộp bài, em được kéo tới 60 câu luyện đúng chỗ vừa mất điểm, rút
+// THẲNG TỪ KHO ĐỀ của trung tâm chứ không còn bó trong ngân hàng của ca vừa
+// thi (ca 28 câu thì kéo mãi cũng chỉ ra 28).
+//
+// ĐÂY LÀ LỆNH CÔNG KHAI DUY NHẤT TRẢ VỀ ĐỀ CÓ ĐÁP ÁN VÀ LỜI GIẢI, nên nó bị
+// khoá đúng như `lichSuEm`, thêm hai cái trần:
+//   1. Phải có lượt đã nộp / đã khoá của ĐÚNG (maCa, sbd).
+//   2. IdThietBi của lượt đó phải khớp máy đang hỏi.
+//   3. Trần 60 câu và trần dung lượng gói trả về.
+// Thiếu (1) và (2) thì chỉ cần biết một số báo danh là kéo được cả kho.
+const TRAN_CAU_KHAC_PHUC = 60
+// Gói trả về không được vượt ngần này (câu có ảnh base64 nặng vài trăm KB).
+const TRAN_BYTE_KHAC_PHUC = 2500000
+// Mở tối đa ngần này file đề trong một lần gọi. Mỗi file là một lần đọc Drive.
+const TRAN_DE_MO = 8
+const PROP_CHI_MUC_REF = 'CHI_MUC_CAU_REF'
+const PROP_CHI_MUC_DAU = 'CHI_MUC_CAU_DAU'
+const DE_HEADERS = ['MaDe', 'Nguon', 'NgayNap', 'SoCau', 'SoNghi', 'DeJson', 'CapNhatLuc', 'Nhom']
+
+/** Em này có lượt ĐÃ NỘP của đúng ca này, gửi từ đúng máy này không.
+ * `A` là dải MaCa..TrangThai (8 cột đầu) của sheet LuotThi. */
+function quaCongLuot_(A, maCa, sbd, idTb) {
+  for (let i = 1; i < A.length; i++) {
+    if (String(A[i][0]) !== maCa || String(A[i][1]) !== sbd) continue
+    const tt = String(A[i][7])
+    if (tt !== 'da_nop' && tt !== 'khoa') continue
+    if (String(A[i][3] || '') !== idTb) continue
+    return true
+  }
+  return false
+}
+
+/** Mốc của kho đề: đổi một đề là chuỗi này đổi, chỉ mục phải dựng lại. */
+function dauKhoDe_(sh) {
+  const n = sh.getLastRow()
+  if (n < 2) return 'rong'
+  const ma = sh.getRange(2, 1, n - 1, 1).getValues()
+  const luc = sh.getRange(2, 7, n - 1, 1).getValues()
+  const ra = []
+  for (let i = 0; i < ma.length; i++) ra.push(String(ma[i][0]) + '|' + String(luc[i][0]))
+  return ra.join(';')
+}
+
+/** CHỈ MỤC CÂU: mỗi câu một dòng nhẹ (mã đề, phần, số, chuyên đề, mức độ, sao).
+ *
+ * Không có chỉ mục thì mỗi lần em bấm "tạo câu khắc phục" là mở CẢ KHO (20 file
+ * Drive, mỗi file vài trăm KB) chỉ để đọc trường `chuyen_de`. Có chỉ mục thì
+ * chọn xong mới mở đúng vài file chứa câu đã chọn.
+ *
+ * Dựng lại khi kho đổi. `luuDe` xoá mốc nên lần gọi sau tự dựng lại. */
+function chiMucCau_(batDungLai) {
+  const props = PropertiesService.getScriptProperties()
+  const sh = getSheet_(SHEET_DE, DE_HEADERS)
+  const dau = dauKhoDe_(sh)
+  const ref = props.getProperty(PROP_CHI_MUC_REF)
+  if (!batDungLai && ref && props.getProperty(PROP_CHI_MUC_DAU) === dau) {
+    try {
+      const cu = docJsonLon_(ref)
+      if (cu && cu.cau) return cu
+    } catch (err) {
+      // file chỉ mục bị xoá tay -> dựng lại
+    }
+  }
+  const data = sh.getDataRange().getValues()
+  const cau = []
+  for (let i = 1; i < data.length; i++) {
+    const maDe = String(data[i][0])
+    let de = null
+    try {
+      de = docJsonLon_(data[i][5])
+    } catch (err) {
+      continue
+    }
+    if (!de || !de.cau || !de.cau.length) continue
+    for (let k = 0; k < de.cau.length; k++) {
+      const c = de.cau[k]
+      const lg = c.loi_giai
+      cau.push({
+        d: maDe,
+        p: String(c.phan || ''),
+        s: Number(c.so),
+        cd: String(c.chuyen_de || ''),
+        md: String(c.muc_do || ''),
+        // Sao "cần chữa" — 0 khi thiếu hoặc sai kiểu, KHÔNG đoán.
+        sao: c.can_chua && (c.can_chua.sao === 1 || c.can_chua.sao === 2) ? c.can_chua.sao : 0,
+        // Có lời giải để em tự đối chiếu sau khi làm.
+        co: lg && (lg.chot || (lg.buoc && lg.buoc.length) || lg.tung_pa || lg.tung_y) ? 1 : 0,
+        // Đang nghi đáp án sai / thiếu đáp án -> KHÔNG đẩy cho em luyện.
+        ng: lg && (lg.trang_thai === 'nghi_dap_an_sai' || lg.trang_thai === 'thieu_dap_an') ? 1 : 0,
+        h: c.hinh && c.hinh.length ? 1 : 0,
+      })
+    }
+  }
+  const moi = { dau: dau, luc: new Date().toISOString(), cau: cau }
+  const refMoi = luuJsonLon_('chi-muc-cau', moi, ref)
+  props.setProperty(PROP_CHI_MUC_REF, refMoi)
+  props.setProperty(PROP_CHI_MUC_DAU, dau)
+  return moi
+}
+
+/** Chọn câu theo chuyên đề em vừa mất điểm, bỏ hẳn câu em vừa làm trong ca.
+ *
+ * Thứ tự: chuyên đề yếu nhất trước → trong cùng chuyên đề thì câu 2 sao trước
+ * → câu KHÔNG có hình trước (một ảnh base64 nặng bằng vài chục câu chữ, xếp
+ * sau thì cùng một hạn mức dung lượng em nhận được nhiều câu hơn; ảnh vẫn
+ * gửi, chỉ là khi đã đủ câu thì thôi) → rải đều các đề để em không nhận 60 câu
+ * của cùng một bài. */
+function chonCauKhacPhuc_(chiMuc, chuyenDe, loaiTru, soCau) {
+  const hangCua = {}
+  for (let i = 0; i < chuyenDe.length; i++) if (chuyenDe[i]) hangCua[String(chuyenDe[i])] = i
+  const bo = {}
+  for (let i = 0; i < loaiTru.length; i++) bo[String(loaiTru[i])] = true
+
+  const ung = []
+  for (let i = 0; i < chiMuc.cau.length; i++) {
+    const c = chiMuc.cau[i]
+    const hang = hangCua[c.cd]
+    if (hang === undefined) continue
+    if (!c.co || c.ng) continue
+    const qid = c.d + '-' + c.p + '-' + c.s
+    if (bo[qid]) continue
+    ung.push({ qid: qid, d: c.d, p: c.p, s: c.s, hang: hang, sao: c.sao, h: c.h })
+  }
+  ung.sort(function (a, b) {
+    if (a.hang !== b.hang) return a.hang - b.hang
+    if (a.sao !== b.sao) return b.sao - a.sao
+    if (a.h !== b.h) return a.h - b.h
+    if (a.d !== b.d) return a.d < b.d ? -1 : 1
+    return a.s - b.s
+  })
+
+  // Rải đều: đi vòng qua các đề, mỗi vòng lấy một câu của mỗi đề.
+  const hangDoi = {}
+  const thuTuDe = []
+  for (let i = 0; i < ung.length; i++) {
+    if (!hangDoi[ung[i].d]) {
+      hangDoi[ung[i].d] = []
+      thuTuDe.push(ung[i].d)
+    }
+    hangDoi[ung[i].d].push(ung[i])
+  }
+  const ra = []
+  let conCau = true
+  while (ra.length < soCau && conCau) {
+    conCau = false
+    for (let i = 0; i < thuTuDe.length && ra.length < soCau; i++) {
+      const q = hangDoi[thuTuDe[i]]
+      if (q.length === 0) continue
+      ra.push(q.shift())
+      conCau = true
+    }
+  }
+  return ra
+}
+
 function doGet(e) {
   const action = e.parameter.action
   // CHẶN THEO VAI (BA-APP.md đợt 1): lệnh của thầy phải kèm mã bí mật. Không
@@ -1461,6 +1619,7 @@ function doPost(e) {
         try { DriveApp.getFileById(ref.slice(6)).setTrashed(true) } catch (err) {}
       }
       sh.deleteRow(row)
+      PropertiesService.getScriptProperties().deleteProperty(PROP_CHI_MUC_DAU)
       return jsonResponse_({ ok: true })
     }
     // luuDe
@@ -1485,6 +1644,9 @@ function doPost(e) {
     ]
     if (row > 0) sh.getRange(row, 1, 1, 8).setValues([rowData])
     else sh.appendRow(rowData)
+    // Kho vừa đổi -> CHỈ MỤC CÂU cũ hết đúng. Xoá mốc để lần gọi sau dựng lại;
+    // không dựng ngay tại đây vì đẩy 20 đề thì dựng lại 20 lần thừa 19 lần.
+    PropertiesService.getScriptProperties().deleteProperty(PROP_CHI_MUC_DAU)
     return jsonResponse_({ ok: true, maDe: String(de.ma_de), soCau: de.cau.length, soNghi: soNghi })
   }
 
@@ -1695,16 +1857,7 @@ function doPost(e) {
     const A = sh.getRange(1, 1, n, 8).getValues()
     const T = sh.getRange(1, 17, n, 1).getValues()
 
-    let quaCong = false
-    for (let i = 1; i < A.length; i++) {
-      if (String(A[i][0]) !== maCa || String(A[i][1]) !== sbd) continue
-      const tt = String(A[i][7])
-      if (tt !== 'da_nop' && tt !== 'khoa') continue
-      if (String(A[i][3] || '') !== idTb) continue
-      quaCong = true
-      break
-    }
-    if (!quaCong) return jsonResponse_(LOI_LS)
+    if (!quaCongLuot_(A, maCa, sbd, idTb)) return jsonResponse_(LOI_LS)
 
     // Tên ca: hai cột hẹp của CaKiemTra, không mở từng dòng bằng docCa_.
     const caSh = sheetCa_()
@@ -1744,6 +1897,85 @@ function doPost(e) {
     // không phình theo số năm em học.
     const TRAN = 40
     return jsonResponse_({ ok: true, items: ds.slice(-TRAN) })
+  }
+
+  // CÂU KHẮC PHỤC RÚT TỪ KHO ĐỀ (xem khối ghi chú ở `chiMucCau_`).
+  if (action === 'cauKhacPhuc') {
+    const LOI_KP = { ok: false, error: 'Không lấy được câu khắc phục' }
+    const maCa = String(body.maCa || '').trim()
+    const sbd = String(body.sbd || '').trim()
+    const idTb = String(body.idThietBi || '').trim()
+    if (!maCa || !sbd || !idTb) return jsonResponse_(LOI_KP)
+
+    const shL = sheetLuot_()
+    const nL = shL.getLastRow()
+    if (nL < 2) return jsonResponse_(LOI_KP)
+    if (!quaCongLuot_(shL.getRange(1, 1, nL, 8).getValues(), maCa, sbd, idTb)) return jsonResponse_(LOI_KP)
+
+    const chuyenDe = Array.isArray(body.chuyenDe) ? body.chuyenDe.slice(0, 30) : []
+    if (chuyenDe.length === 0) return jsonResponse_({ ok: true, soCau: 0, items: [], ghiChu: 'Không có chuyên đề nào để rút' })
+    const loaiTru = Array.isArray(body.loaiTru) ? body.loaiTru.slice(0, 400) : []
+    let soCau = Number(body.soCau)
+    if (!isFinite(soCau) || soCau < 1) soCau = TRAN_CAU_KHAC_PHUC
+    soCau = Math.min(Math.floor(soCau), TRAN_CAU_KHAC_PHUC)
+
+    const chiMuc = chiMucCau_(false)
+    const chon = chonCauKhacPhuc_(chiMuc, chuyenDe, loaiTru, soCau)
+    if (chon.length === 0) return jsonResponse_({ ok: true, soCau: 0, items: [], ghiChu: 'Kho chưa có câu nào ngoài những câu em vừa làm' })
+
+    // Gom theo đề rồi mới mở file: mỗi đề mở ĐÚNG MỘT LẦN.
+    const canCua = {}
+    const thuTuDe = []
+    for (let i = 0; i < chon.length; i++) {
+      if (!canCua[chon[i].d]) {
+        canCua[chon[i].d] = {}
+        thuTuDe.push(chon[i].d)
+      }
+      canCua[chon[i].d][chon[i].p + '-' + chon[i].s] = true
+    }
+    const shDe = getSheet_(SHEET_DE, DE_HEADERS)
+    const items = []
+    let byte = 0
+    let daCat = false
+    let soRa = 0
+    for (let i = 0; i < thuTuDe.length && i < TRAN_DE_MO && !daCat; i++) {
+      const maDe = thuTuDe[i]
+      const row = findRowByKey_(shDe, 0, maDe)
+      if (row < 0) continue
+      let de = null
+      try {
+        de = docJsonLon_(shDe.getRange(row, 6, 1, 1).getValues()[0][0])
+      } catch (err) {
+        continue
+      }
+      if (!de || !de.cau) continue
+      const lay = []
+      for (let k = 0; k < de.cau.length; k++) {
+        const c = de.cau[k]
+        if (!canCua[maDe][String(c.phan) + '-' + Number(c.so)]) continue
+        const nang = JSON.stringify(c).length
+        // Cắt theo DUNG LƯỢNG chứ không theo số câu: 60 câu toàn ảnh là gói
+        // vài chục MB, máy em tải giữa buổi học là treo.
+        if (byte + nang > TRAN_BYTE_KHAC_PHUC) {
+          daCat = true
+          break
+        }
+        byte += nang
+        lay.push(c)
+        soRa++
+      }
+      if (lay.length > 0) items.push({ ma_de: maDe, nguon: String(de.nguon || ''), nhom: String(de.nhom || ''), cau: lay })
+    }
+    return jsonResponse_({ ok: true, soCau: soRa, soChon: chon.length, items: items, catBotViNang: daCat })
+  }
+
+  // Dựng lại CHỈ MỤC CÂU của kho đề. Máy thầy gọi sau khi đẩy đề mới, để em
+  // đầu tiên bấm "tạo câu khắc phục" không phải chờ máy chủ mở cả kho.
+  if (action === 'dungChiMuc') {
+    const loiCM = kiemTraMaBiMat_(body)
+    if (loiCM) return jsonResponse_({ ok: false, error: loiCM })
+    const cm = chiMucCau_(true)
+    return jsonResponse_({ ok: true, soCau: cm.cau.length, luc: cm.luc })
   }
 
   if (action === 'danhSachCauHoi') {

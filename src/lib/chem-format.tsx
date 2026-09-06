@@ -82,6 +82,161 @@ export function chuanHoaCongThucTongQuat(raw: string): string {
   return s
 }
 
+// ---------------------------------------------------------------------------
+// NHÃN MŨI TÊN CÓ NGOẶC VUÔNG LỒNG — sơ đồ chuyển hoá (thầy báo 06/09)
+//
+// LỖI ĐÃ DÍNH: kho ghi `\ce{->[+[Ag(NH3)2]OH][t^\circ]}`. mhchem đóng nhãn ở
+// dấu `]` ĐẦU TIÊN nên nhãn thành `+[Ag(NH3)2`, còn `OH]` và `[t^\circ]` rơi ra
+// ngoài thành chữ rời — đúng cái ảnh thầy chụp ở câu cellulose.
+//
+// Kiểm bằng KaTeX thật (mathml, đếm `<msub>`):
+//   `->[+[Ag(NH3)2]OH][t^\circ]`     → nhãn trên "+[Ag(NH3)2OH][t°]", MẤT nhãn dưới
+//   `->[+{[}Ag(NH3)2{]}OH][t^\circ]` → nhãn trên "+[Ag(NH₃)₂]OH", nhãn dưới "t°" ✓
+//
+// `{[}` là cách mhchem viết dấu ngoặc vuông NGUYÊN VĂN. Bọc cả nhãn trong `{}`
+// cũng hết lỗi nhưng MẤT chỉ số dưới (in ra "NH3)2" thay vì "NH₃)₂").
+const MUI_TEN_MHCHEM = /(<=>>|<<=>|<=>|<->|->|<-)(\s*)\[/g
+
+/** Đổi `[` `]` bên trong NHÃN mũi tên thành `{[}` `{]}`.
+ *
+ * Chỉ động vào chữ nằm giữa nhãn, và chỉ khi ngoặc trong nhãn CÂN — lệch ngoặc
+ * là dữ liệu đã hỏng sẵn, đoán tiếp chỉ hỏng thêm nên giữ nguyên cho hiện rõ. */
+export function chuanHoaNhanMuiTen(raw: string): string {
+  const s = String(raw ?? '')
+  if (!s.includes('[')) return s
+  let ra = ''
+  let i = 0
+  MUI_TEN_MHCHEM.lastIndex = 0
+  let m: RegExpExecArray | null
+  while ((m = MUI_TEN_MHCHEM.exec(s)) !== null) {
+    const moNhan = m.index + m[0].length - 1 // vị trí dấu `[` mở nhãn
+    if (moNhan < i) continue // nhãn này đã nằm trong phần vừa xử lý
+    ra += s.slice(i, moNhan)
+    i = moNhan
+    // Tối đa hai nhãn: `->[trên][dưới]`.
+    for (let lan = 0; lan < 2 && s[i] === '['; lan++) {
+      const dong = timNgoacDong(s, i)
+      if (dong < 0) break
+      ra += `[${thoatNgoacVuong(s.slice(i + 1, dong))}]`
+      i = dong + 1
+    }
+    MUI_TEN_MHCHEM.lastIndex = i
+  }
+  return ra + s.slice(i)
+}
+
+/** Vị trí `]` khớp với `[` ở `mo`, tính cả ngoặc lồng. Không khớp thì -1. */
+function timNgoacDong(s: string, mo: number): number {
+  let sau = 0
+  for (let j = mo; j < s.length; j++) {
+    if (s[j] === '[') sau++
+    else if (s[j] === ']') {
+      sau--
+      if (sau === 0) return j
+    }
+  }
+  return -1
+}
+
+function thoatNgoacVuong(nhan: string): string {
+  return nhan.replace(/\[/g, '{[}').replace(/\]/g, '{]}')
+}
+
+/** Một khúc của chuỗi: chữ thường, hoặc MỘT mũi tên kèm nhãn trên/nhãn dưới. */
+export type KhucMuiTen = { t: 'chu'; v: string } | { t: 'mui'; mui: '→' | '←' | '⇌'; tren: string; duoi: string }
+
+const KY_HIEU_MUI: Record<string, '→' | '←' | '⇌'> = { '->': '→', '<-': '←', '<=>': '⇌', '<->': '⇌' }
+// `<=>` và `<->` phải đứng TRƯỚC `->` và `<-`, nếu không `<->` bị đọc thành
+// `<` rồi `->` và mũi tên hai chiều biến thành mũi tên một chiều.
+const RE_MUI = /(<=>|<->|->|<-)/g
+
+/** Tách chuỗi thành chữ và MŨI TÊN KÈM NHÃN, để bên vẽ dựng nhãn nằm TRÊN và
+ * DƯỚI thân mũi tên đúng như sách viết.
+ *
+ * Bản cũ nhét điều kiện vào ngoặc ngay sau mũi tên (`→ (+H2 dư, Ni, t°)`) vì
+ * bộ vẽ PDF không xếp chồng chữ được. Phiếu nay là HTML nên xếp chồng được, và
+ * sơ đồ chuyển hoá đọc đúng như trong sách giáo khoa. */
+export function tachMuiTen(raw: string): KhucMuiTen[] {
+  const s = String(raw ?? '')
+  const ra: KhucMuiTen[] = []
+  let i = 0
+  RE_MUI.lastIndex = 0
+  let m: RegExpExecArray | null
+  while ((m = RE_MUI.exec(s)) !== null) {
+    if (m.index < i) continue
+    if (m.index > i) ra.push({ t: 'chu', v: s.slice(i, m.index) })
+    let j = m.index + m[0].length
+    const nhan: string[] = []
+    // Tối đa hai nhãn `[trên][dưới]`, cho phép một dấu cách trước mỗi nhãn.
+    for (let lan = 0; lan < 2; lan++) {
+      const sau = /^\s*\[/.exec(s.slice(j))
+      if (!sau) break
+      const mo = j + sau[0].length - 1
+      const dong = timNgoacDong(s, mo)
+      if (dong < 0) break
+      nhan.push(s.slice(mo + 1, dong))
+      j = dong + 1
+    }
+    ra.push({ t: 'mui', mui: KY_HIEU_MUI[m[0]], tren: nhan[0] ?? '', duoi: nhan[1] ?? '' })
+    i = j
+    RE_MUI.lastIndex = j
+  }
+  if (i < s.length) ra.push({ t: 'chu', v: s.slice(i) })
+  return ra.filter((k) => k.t === 'mui' || k.v !== '')
+}
+
+// ---------------------------------------------------------------------------
+// ĐỘ RỘNG ƯỚC TÍNH — quyết định công thức nằm trong dòng hay tách khối riêng.
+//
+// LỖI ĐÃ DÍNH: đo bằng `latex.length` thì `$\ce{->[+H2O][acid, t^\circ]}$` dài
+// 28 ký tự nên bị đẩy thành KHỐI RIÊNG. Hậu quả: mỗi mũi tên của sơ đồ chuyển
+// hoá rơi xuống một dòng, "Cellulose" một dòng, "X" một dòng — sơ đồ vỡ vụn.
+//
+// Đo cho đúng thứ mắt nhìn thấy: bỏ vỏ `\ce{}`, bỏ lệnh LaTeX và dấu gom, và
+// HAI NHÃN của mũi tên XẾP CHỒNG nên chỉ tính nhãn dài hơn, không cộng dồn.
+
+/** Bề rộng ước tính theo số ký tự MẮT NHÌN THẤY. */
+export function beRongUocTinh(latex: string): number {
+  let s = String(latex ?? '').trim()
+  const voCe = /^\\ce\s*\{([\s\S]*)\}$/.exec(s)
+  if (voCe) s = voCe[1]
+  let rong = 0
+  let i = 0
+  while (i < s.length) {
+    const con = s.slice(i)
+    const mui = /^(<=>>|<<=>|<=>|<->|->|<-)(\s*)\[/.exec(con)
+    if (mui) {
+      i += mui[1].length + mui[2].length
+      let daiNhat = 0
+      for (let lan = 0; lan < 2 && s[i] === '['; lan++) {
+        const dong = timNgoacDong(s, i)
+        if (dong < 0) break
+        daiNhat = Math.max(daiNhat, donDeDem(s.slice(i + 1, dong)).length)
+        i = dong + 1
+      }
+      rong += 2 + daiNhat // thân mũi tên + nhãn rộng nhất
+      continue
+    }
+    const lenh = /^\\[a-zA-Z]+/.exec(con)
+    if (lenh) {
+      rong += 1
+      i += lenh[0].length
+      continue
+    }
+    if ('{}_^'.includes(s[i])) {
+      i += 1
+      continue
+    }
+    rong += 1
+    i += 1
+  }
+  return rong
+}
+
+function donDeDem(t: string): string {
+  return t.replace(/\\[a-zA-Z]+/g, 'x').replace(/[{}_^]/g, '')
+}
+
 /** Chuỗi liền (không khoảng trắng) chứa `-` nối vào chữ hay `[` `(` là CÔNG
  * THỨC CẤU TẠO, mọi dấu `-` trong đó là LIÊN KẾT chứ không phải điện tích.
  *
@@ -231,13 +386,17 @@ const KATEX_OPTS = { throwOnError: true, strict: false, displayMode: false } as 
  * (`CH3COOC2H5` — 10 ký tự) vẫn nằm trong dòng chữ như cũ.
  *
  * Thà xuống dòng thừa còn hơn cắt cụt: chữ tràn ra ngoài thì em MẤT HẲN vế
- * phải mà không biết là mình đang thiếu. */
+ * phải mà không biết là mình đang thiếu.
+ *
+ * Đo bằng `beRongUocTinh`, KHÔNG bằng `latex.length` — xem ghi chú ở hàm đó. */
 const DAI_PHAI_CUON = 26
 
 function ChemFormula({ t, latex: latexGoc }: { t: 'ce' | 'math'; latex: string }): JSX.Element {
   // Chuẩn hoá TRƯỚC khi đưa cho mhchem, nếu không `CnH2n+3N` ra sai (xem ghi
-  // chú ở `chuanHoaCongThucTongQuat`).
-  const latex = chuanHoaCongThucTongQuat(latexGoc)
+  // chú ở `chuanHoaCongThucTongQuat`), và nhãn mũi tên có ngoặc vuông lồng thì
+  // vỡ (xem `chuanHoaNhanMuiTen`). Thoát ngoặc TRƯỚC: sau bước đó nhãn có thêm
+  // `{[}` nên luật công thức tổng quát khỏi phải đoán giữa đống ngoặc.
+  const latex = chuanHoaCongThucTongQuat(chuanHoaNhanMuiTen(latexGoc))
   try {
     const html = katex.renderToString(t === 'ce' ? `\\ce{${latex}}` : latex, KATEX_OPTS)
     // Công thức NGẮN: KHÔNG bọc thêm inline-block/overflow/vertical-align —
@@ -248,7 +407,7 @@ function ChemFormula({ t, latex: latexGoc }: { t: 'ce' | 'math'; latex: string }
     // nguyên là chữ tràn khỏi màn hình và em MẤT HẲN vế phải mà không biết —
     // đúng lỗi thầy chụp ngày 04-09. Tách thành khối riêng cuộn ngang được, có
     // đệm trên dưới để chỉ số dưới không bị cắt.
-    if (latex.length > DAI_PHAI_CUON) {
+    if (beRongUocTinh(latex) > DAI_PHAI_CUON) {
       return (
         <span
           className="ct-dai"

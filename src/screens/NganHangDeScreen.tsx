@@ -15,7 +15,7 @@ import KhoiMatKhauApp from '../components/KhoiMatKhauApp'
 import { ChemText } from '../lib/chem-format'
 import { deleteExamSource, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, saveExamSource, saveScriptUrl, saveSessionTeacherBank, saveTeacherSecret } from '../lib/exam-db'
 import { caDungDe, capNhatCaDaMo, dongBoNganHang, type KetQuaDongBo } from '../lib/exam-sync'
-import { capNhatKeyBank, luuDe, xoaDe as xoaDeTrenKho } from '../lib/exam-api'
+import { capNhatKeyBank, dungChiMuc, luuDe, xoaDe as xoaDeTrenKho } from '../lib/exam-api'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJsonText } from '../lib/exam-kho-de-import'
 import { mergeKeepAnswers, validateTeacherSource } from '../data/examContent'
 import { maDeTheoPhan, PHAN_DE_TACH, TEN_PHAN_TACH } from '../lib/tach-phan-de'
@@ -143,6 +143,10 @@ export default function NganHangDeScreen() {
       const soCa = await capNhatCaDaMo(scriptUrl.trim(), secret.trim(), source).catch(() => 0)
       if (soCa > 0) showToast(`Đã cập nhật lời giải/đáp án cho ${soCa} ca đã mở`, 'success')
       await taiLocal()
+      // DỰNG LẠI CHỈ MỤC CÂU ngay tại đây, trên máy thầy đang rảnh. Không làm
+      // thì em ĐẦU TIÊN bấm "tạo câu khắc phục" sau buổi thi phải đứng chờ máy
+      // chủ mở cả kho để dò chuyên đề. Hỏng cũng không sao: lần gọi sau tự dựng.
+      await dungChiMuc(scriptUrl.trim(), secret.trim()).catch(() => 0)
       showToast(`Đã đẩy đề ${r.maDe} lên kho (${r.soCau} câu${r.soNghi ? `, ${r.soNghi} câu nghi` : ''}) và lưu vào máy này${canXemList.length ? ` — cần xem: ${canXemList.join(', ')}` : ''}`, r.soNghi ? 'warn' : 'success')
     } catch (e) {
       showToast(`Đẩy đề lỗi: ${e instanceof Error ? e.message : 'không rõ'}`, 'error')

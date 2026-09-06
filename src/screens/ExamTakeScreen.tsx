@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
-import { lichSuEm as lichSuEmApi, vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { cauKhacPhuc, lichSuEm as lichSuEmApi, vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
 import { goiCauHoi } from '../lib/hoi-bai'
 import TamTruotHoiBai, { type CauChon } from '../components/TamTruotHoiBai'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
-import { dungCauSai, dungPhieuMayEm, type DiemMotCa, type PhieuDayDu } from '../lib/phieu-du-lieu'
+import { dungCauSai, dungPhieuMayEm, xepChuyenDeYeu, SO_CAU_BAI_TAP_KEM, type DiemMotCa, type PhieuDayDu } from '../lib/phieu-du-lieu'
+import { buildTeacherSourceFromKhoDe, parseKhoDeJson } from '../lib/exam-kho-de-import'
 import PhieuScreen from './PhieuScreen'
 import { gioMayChu, gioNgan } from '../lib/gio-may-chu'
 import { layIdThietBi } from '../lib/thiet-bi'
@@ -511,6 +512,58 @@ export default function ExamTakeScreen() {
     }
   }, [attempt, graded, scriptUrl])
 
+  // CÂU KHẮC PHỤC RÚT TỪ KHO ĐỀ (thầy chốt 06/09).
+  //
+  // Máy em chỉ giữ ngân hàng của chính ca vừa thi, nên bản trước kéo mãi cũng
+  // chỉ ra bằng số câu của ca. Nay máy chủ đọc chuyên đề em vừa mất điểm rồi
+  // rút thẳng từ kho đề của thầy, bỏ hẳn những câu em vừa làm.
+  //
+  // ĐẶT SAU `lichSuEm`, TRƯỚC `phieuCuaEm`: đọc một const khai bên dưới là
+  // đúng cái bẫy vùng chết biến làm vỡ màn Làm bài ngày 06/09.
+  const [khoKhacPhuc, setKhoKhacPhuc] = useState<TeacherExamSource[]>([])
+  const [khacPhucCatBot, setKhacPhucCatBot] = useState(false)
+  useEffect(() => {
+    if (!attempt || !graded || !keyBank) return
+    let con = true
+    void (async () => {
+      try {
+        const rows = taoChiTietCau(keyBank, attempt.maCa, attempt.sbd, attempt.answers, attempt.giayCau)
+        const yeu = xepChuyenDeYeu(rows).map((x) => x.ten)
+        if (yeu.length === 0) return
+        const kq = await cauKhacPhuc(
+          scriptUrl.trim(),
+          attempt.maCa,
+          attempt.sbd,
+          attempt.idThietBi || layIdThietBi(),
+          yeu,
+          rows.map((r) => r.qid).filter(Boolean),
+          SO_CAU_BAI_TAP_KEM,
+        )
+        if (!con) return
+        // Gói máy chủ trả về đi qua ĐÚNG cửa nạp của kho đề, không nới luật
+        // nào: câu thiếu phương án hay thiếu đáp án thì bỏ, không dựng phiếu
+        // với ô trống rồi để em ngồi đoán.
+        const nguon: TeacherExamSource[] = []
+        for (const m of kq.nguon) {
+          const doc = parseKhoDeJson(m.json)
+          if (!doc.ok || !doc.json) continue
+          const dung = buildTeacherSourceFromKhoDe(doc.json)
+          if (dung.errors.length === 0) nguon.push(dung.source)
+        }
+        if (con) {
+          setKhoKhacPhuc(nguon)
+          setKhacPhucCatBot(kq.catBotViNang)
+        }
+      } catch {
+        // Mất mạng, máy chủ chưa triển khai bản mới, hoặc từ chối vì lượt
+        // không khớp máy — rơi về ngân hàng của chính ca như trước.
+      }
+    })()
+    return () => {
+      con = false
+    }
+  }, [attempt, graded, keyBank, scriptUrl])
+
   const phieuCuaEm: PhieuDayDu | null = useMemo(() => {
     if (!keyBank || !attempt || !graded) return null
     try {
@@ -528,6 +581,7 @@ export default function ExamTakeScreen() {
         rows,
         banks,
         lichSu: lichSuEm,
+        khoKhacPhuc,
         // Em thấy đúng thứ thầy và phụ huynh sẽ thấy. Em đã nhận cảnh báo ngay
         // lúc rời màn rồi, nên đây không phải tin dữ bất ngờ — chỉ là bản ghi.
         viPham: {
@@ -541,7 +595,7 @@ export default function ExamTakeScreen() {
     } catch {
       return null
     }
-  }, [keyBank, attempt, graded, hoTen, lichSuEm])
+  }, [keyBank, attempt, graded, hoTen, lichSuEm, khoKhacPhuc])
   useEffect(() => {
     totalCountRef.current = assignment ? assignment.phanI.length + assignment.phanII.length + assignment.phanIII.length : 0
   }, [assignment])
@@ -1859,6 +1913,13 @@ export default function ExamTakeScreen() {
             <NutChinh variant="phu" onClick={() => setXemBaoCao(true)}>
               Xem báo cáo học tập
             </NutChinh>
+          )}
+          {/* NÓI THẲNG khi bộ câu bị cắt vì nặng, thay vì để em tưởng kho chỉ
+              có ngần ấy câu. Nguyên nhân gần như luôn là câu có ảnh. */}
+          {khacPhucCatBot && (
+            <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }}>
+              Bộ câu khắc phục lấy được {phieuCuaEm?.baiTap?.length ?? 0} câu. Còn câu nữa trong kho nhưng nhiều ảnh, tải hết một lượt sẽ nặng máy — làm xong bộ này rồi vào lại để lấy tiếp.
+            </div>
           )}
           {/* ĐỀ RIÊNG CỦA EM. Mỗi em một bộ câu khác nhau nên tải chung đề của
               ca là sai — phải dựng từ ĐÚNG bộ máy đã gán cho em này. */}

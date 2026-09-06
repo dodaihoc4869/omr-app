@@ -23,7 +23,7 @@
 // nhúng và luôn gập sẵn — kể cả phiếu bài tập gửi phụ huynh — vì đây là phiếu
 // ÔN, em tự bấm ra dò sau khi làm xong.
 import type { CauLuyen } from './bai-tap-pdf'
-import { doanCongThuc } from './chu-hoa-hoc-pdf'
+import { doanCongThuc, type DoanChu } from './chu-hoa-hoc-pdf'
 import { goKyTuLa } from './chu-la-pdf'
 
 /** Một ô thông tin ngoài bìa: nhãn nhỏ ở trên, giá trị đậm ở dưới. */
@@ -75,14 +75,39 @@ export function thoat(s: string): string {
  * in ra ô vuông rỗng (thầy bắt được ở câu Kc, đề 12-C1-B1). Lọc ở tầng hiển
  * thị thì mọi ca cũ và mọi link đã gửi đi tự đúng, không phải nạp lại đề. */
 export function chuHtml(s: string): string {
-  return doanCongThuc(goKyTuLa(s))
+  return doanHtml(doanCongThuc(goKyTuLa(s)))
+}
+
+/** Hướng thân mũi tên: một chiều sang phải, sang trái, hay hai chiều. */
+const HUONG_MUI: Record<string, string> = { '→': 'mt-phai', '←': 'mt-trai', '⇌': 'mt-hai' }
+
+function doanHtml(ds: DoanChu[]): string {
+  return ds
     .map((d) => {
       const v = thoat(d.v)
       if (d.t === 'sub') return `<sub>${v}</sub>`
       if (d.t === 'sup') return `<sup>${v}</sup>`
+      if (d.t === 'mui') return muiTenHtml(d)
       return v
     })
     .join('')
+}
+
+/** MŨI TÊN PHẢN ỨNG vẽ bằng nét, nhãn nằm TRÊN và DƯỚI thân.
+ *
+ * Bản trước in `→ (+H2 dư, Ni, t°)` — điều kiện tụt xuống ngang hàng với chất,
+ * đọc sơ đồ chuyển hoá phải tự đoán ngoặc nào của mũi tên nào. Nay xếp chồng
+ * đúng như sách: nhãn trên là điều kiện, nhãn dưới là phần còn lại.
+ *
+ * Thân vẽ bằng `border` chứ không dùng ký tự `→`: nét luôn sắc khi in, dài ra
+ * theo nhãn, và không phụ thuộc phông có glyph mũi tên hay không. */
+function muiTenHtml(d: DoanChu): string {
+  const huong = HUONG_MUI[d.v] || 'mt-phai'
+  const tren = d.tren && d.tren.length ? `<span class="mt-tren">${doanHtml(d.tren)}</span>` : ''
+  const duoi = d.duoi && d.duoi.length ? `<span class="mt-duoi">${doanHtml(d.duoi)}</span>` : ''
+  // Không nhãn thì không cần khung xếp chồng — giữ mũi tên trần cho nhẹ.
+  if (!tren && !duoi) return `<span class="mt mt-tran"><span class="mt-than ${huong}"></span></span>`
+  return `<span class="mt">${tren}<span class="mt-than ${huong}"></span>${duoi}</span>`
 }
 
 export function ngayVN(d: Date): string {
@@ -358,6 +383,28 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
 .q-than { padding: 10px 16px 14px; cursor: pointer; }
 .q-text { font-size: 15.5px; line-height: 1.62; color: var(--muc); font-weight: 500; overflow-wrap: break-word; }
 .q-text + .q-options, .q-text + .tf-head, .q-text + .sa-vung, .q-hinh + .q-options { margin-top: 12px; }
+
+/* MŨI TÊN PHẢN ỨNG — nhãn TRÊN và DƯỚI thân, đúng như sách.
+   Thân vẽ bằng border nên in ra giấy vẫn sắc và dài ra theo nhãn; ký tự mũi
+   tên của phông thì cố định bề ngang, nhãn dài là chữ đè lên nhau.
+   inline-grid + vertical-align:middle để mũi tên nằm ĐÚNG giữa dòng chữ, và
+   line-height riêng để nhãn không bị giãn theo giãn dòng của đoạn văn. */
+.mt {
+  display: inline-grid; justify-items: center; align-items: center;
+  vertical-align: middle; margin: 0 3px; line-height: 1.15; text-align: center;
+}
+.mt-tren, .mt-duoi { font-size: .74em; white-space: nowrap; padding: 0 4px; color: var(--nhat); }
+.mt-than { position: relative; width: 100%; min-width: 26px; height: 0; border-top: 1.4px solid currentColor; margin: 3px 0; }
+.mt-than::after, .mt-than::before { content: ""; position: absolute; top: -4px; width: 0; height: 0; border: 4px solid transparent; }
+.mt-phai::after { right: -1px; border-right: 0; border-left-color: currentColor; }
+.mt-trai::before { left: -1px; border-left: 0; border-right-color: currentColor; }
+/* Hai chiều: hai nét song song, mỗi nét một đầu nhọn ngược hướng nhau. */
+.mt-hai { height: 5px; border-bottom: 1.4px solid currentColor; }
+.mt-hai::after { top: -4px; right: -1px; border-right: 0; border-left-color: currentColor; }
+.mt-hai::before { top: 1px; left: -1px; border-left: 0; border-right-color: currentColor; }
+/* Mũi tên trần (không nhãn) đứng ngay trong dòng chữ, không cần chiều rộng lớn. */
+.mt-tran { margin: 0 5px; }
+.mt-tran .mt-than { min-width: 20px; }
 
 /* HAI CỘT CỐ ĐỊNH trên màn rộng, đúng mẫu thầy chốt. Dùng auto-fit thì màn
    1200px xếp được ba cột, mà bốn phương án chia 3+1 nhìn lệch hẳn. */
