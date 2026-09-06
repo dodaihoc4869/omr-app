@@ -121,6 +121,17 @@ export interface LoiGiaiMeta {
    * hồ sơ từng em về sau. Thiếu thì để trống, không đoán. */
   chuyenDe?: string
   mucDo?: 'biet' | 'hieu' | 'van_dung'
+  /** MÃ DẠNG BÀI — đặc tả RÚT CÂU CHỮA v3 mục 4.1. AI gán một lần lúc nạp đề,
+   * chọn trong bảng đóng `kho-de/DANG-BAI.md`, KHÔNG được tự nghĩ mã mới.
+   * Không khớp bảng thì để `null` kèm `viSaoNull` — cấm nhét đại vào mã gần
+   * giống. Câu cũ chưa gán vẫn đọc được, chỉ là chưa rút chữa được. */
+  dang?: { ma: string; ten: string } | null
+  /** Đơn vị kiến thức cần để làm được câu này. */
+  kienThuc?: string[]
+  /** Lỗi điển hình khi làm sai câu này. */
+  loiThuongGap?: string[]
+  /** Bắt buộc khi `dang === null`. */
+  viSaoNull?: string
   /** Sao cần chữa — CHỈ sống trên máy thầy. `mergeAndStrip` không chọn trường
    * này nên nó không bao giờ vào gói đề gửi máy chủ cho học sinh. */
   canChua?: CanChua

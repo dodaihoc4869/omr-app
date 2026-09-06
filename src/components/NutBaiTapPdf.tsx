@@ -13,7 +13,9 @@
 import { useEffect, useState } from 'react'
 import { OThongBao } from './DesignSystem'
 import NutPhieuHtml from './NutPhieuHtml'
-import { chonCauLuyen, tenTepBaiTap } from '../lib/bai-tap-pdf'
+import { tenTepBaiTap } from '../lib/bai-tap-pdf'
+import { rutDeChua, rutTuDo } from '../lib/rut-de-chua'
+import type { ChiTietCauRow } from '../lib/exam-api'
 import { LOC_DANG_MAC_DINH, MOI_LOC_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
 import { docQidRaPhieu, loadExamSources, loadScriptUrl, loadTeacherSecret, themQidRaPhieu, xoaQidRaPhieu } from '../lib/exam-db'
 import { qidDaLam } from '../lib/exam-api'
@@ -33,6 +35,8 @@ export default function NutBaiTapPdf({
   hoTen,
   chuyenDe,
   chuyenDeCa = [],
+  maCa,
+  rows,
   showToast,
 }: {
   sbd: string
@@ -46,6 +50,10 @@ export default function NutBaiTapPdf({
    * rút ngoài". Rỗng = không biết ca nào (màn Học sinh mở từ hồ sơ chung) ⇒
    * giữ nguyên luật cũ. */
   chuyenDeCa?: string[]
+  /** Ca em vừa thi. Có `maCa` + `rows` thì phiếu đi qua cổng `rutDeChua()`:
+   * rút đúng đề đã tích và gắn nhãn "chữa câu mấy" cho từng câu. */
+  maCa?: string
+  rows?: ChiTietCauRow[] | null
   showToast: (chu: string, kieu?: 'success' | 'error' | 'warn') => void
 }) {
   const [soCau, setSoCau] = useState(SO_CAU_PDF_MAC_DINH)
@@ -53,6 +61,10 @@ export default function NutBaiTapPdf({
   // Mặc định BÓ trong ca. Thầy vẫn nới ra được khi muốn ôn rộng, nhưng phải
   // chủ động bấm — im lặng rút ngoài ca là thứ thầy vừa bắt được.
   const [boTrongCa, setBoTrongCa] = useState(true)
+  const [thieuChua, setThieuChua] = useState<{ soCau: number; tenDang: string; vi: string }[]>([])
+  // Chữa được khi biết ca nào VÀ có bảng chấm từng câu. Thiếu một trong hai thì
+  // không có câu sai để gắn nhãn, và đặc tả cấm câu không nhãn vào phiếu chữa.
+  const chuaDuoc = Boolean(maCa && rows && rows.some((r) => r.dungSai === false))
   const coPhamViCa = chuyenDeCa.length > 0
   const phamVi = coPhamViCa && boTrongCa ? chuyenDeCa : undefined
   const [daRa, setDaRa] = useState(0)
@@ -94,7 +106,11 @@ export default function NutBaiTapPdf({
       const daInRa = await docQidRaPhieu(sbd)
       const tranh = [...new Set([...daNop, ...daInRa])]
 
-      const kq = chonCauLuyen(nguon, { chuyenDe: dungDe, chuyenDeCa: phamVi, dang, qidDaLam: tranh, soCau })
+      // ĐI QUA CỔNG (v3 mục 2). Nguồn là CẢ KHO — ranh giới không còn là đề
+      // đã tích nữa mà là MÃ DẠNG của chính câu em sai.
+      const kqChua = chuaDuoc ? rutDeChua({ khoDe: nguon, rows: rows ?? [], qidTranh: tranh, soCau }) : null
+      setThieuChua(kqChua?.thieu ?? [])
+      const kq = kqChua ?? rutTuDo(nguon, { chuyenDe: dungDe, chuyenDeCa: phamVi, dang, qidDaLam: tranh, soCau })
       if (kq.cau.length === 0) {
         throw new Error(
           dungDe.length > 0
@@ -114,7 +130,7 @@ export default function NutBaiTapPdf({
       }
       await themQidRaPhieu(sbd, kq.cau.map((c) => c.id))
       setDaRa((n) => n + kq.cau.length)
-      setKetQua({ soCau: kq.cau.length, lapLai: kq.lapLai, thieu: kq.thieu, ten: tenTepBaiTap(hoTen, sbd) })
+      setKetQua({ soCau: kq.cau.length, lapLai: 'lapLai' in kq ? kq.lapLai : 0, thieu: kq.thieu.length, ten: tenTepBaiTap(hoTen, sbd) })
       return { tt, cau: kq.cau, sbd }
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không tạo được phiếu bài tập', 'error')
@@ -146,6 +162,15 @@ export default function NutBaiTapPdf({
             {boTrongCa ? 'ĐANG BẬT' : 'ĐANG TẮT'}
           </span>
         </button>
+      )}
+
+      {/* SUẤT CHỮA KHÔNG RÚT ĐƯỢC CÂU NÀO. Bỏ trống và nói lý do, tuyệt đối
+          không thay bằng câu chuyên đề khác. */}
+      {thieuChua.length > 0 && (
+        <OThongBao tone="cam">
+          Chưa chữa được {thieuChua.length} câu sai:{' '}
+          {thieuChua.map((t) => t.vi).join('; ')}.
+        </OThongBao>
       )}
 
       {/* DẠNG CÂU — thầy chốt 06/09, cùng ba lựa chọn với màn Rút đề. */}

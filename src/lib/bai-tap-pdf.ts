@@ -57,6 +57,12 @@ export interface CauLuyen {
   hinh?: HinhCau[]
   /** Bảng số liệu thầy gõ trong đề. */
   bang?: string[][] | null
+  /** Câu này CHỮA CHO câu sai nào — RUT-DE-CHUA-CAU-SAI.md mục 4.7.
+   *
+   * Chỉ có khi câu được rút qua cổng `rutDeChua()`. Câu in lại đề em vừa làm
+   * và câu rút tự do không có nhãn, và `html-phieu.ts` / `ve-bai-tap-pdf.ts`
+   * vẫn chạy nguyên như cũ với câu không nhãn. */
+  chuaCho?: { qid: string; soCau: number; phan: 'I' | 'II' | 'III'; maDang: string; bac: 1 | 2 }
 }
 
 export interface KetQuaChonCau {

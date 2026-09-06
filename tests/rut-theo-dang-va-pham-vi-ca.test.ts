@@ -188,7 +188,10 @@ describe('ba lựa chọn có mặt trên cả ba màn', () => {
     // `NutBaiTapPdf`, dùng ở HocSinhScreen và ExamMonitorScreen.
     const man = doc('src/components/NutBaiTapPdf.tsx')
     expect(man).toContain('MOI_LOC_DANG.map')
-    expect(man).toContain('chonCauLuyen(nguon, { chuyenDe: dungDe, chuyenDeCa: phamVi, dang,')
+    // Đặc tả RÚT ĐỀ CHỮA CÂU SAI đổi đường đi: component không gọi thẳng
+    // `chonCauLuyen` nữa, mọi đường qua cổng `rut-de-chua.ts`.
+    expect(man).toContain('rutTuDo(nguon, { chuyenDe: dungDe, chuyenDeCa: phamVi, dang,')
+    expect(man).not.toMatch(/\bchonCauLuyen\s*\(/)
   })
 
   it('11b. NutBaiTapPdf phải còn được dùng thật — kẻo lại sửa nhầm code chết', () => {
