@@ -8,7 +8,8 @@
 import { useEffect, useState } from 'react'
 import { Eye, EyeOff, Fingerprint, ScanFace } from 'lucide-react'
 import { NutChinh, OThongBao } from './DesignSystem'
-import { goKhoaApp, goKhoaVanTay, loadKhoaApp, loadKhoaVanTay, loadTeacherSecret, saveKhoaApp, saveKhoaVanTay } from '../lib/exam-db'
+import { datMaBiMatPhien, docGiuPhien, goKhoaApp, goKhoaVanTay, loadKhoaApp, loadKhoaVanTay, loadTeacherSecret, luuGiuPhien, saveKhoaApp, saveKhoaVanTay } from '../lib/exam-db'
+import { catPhien, donPhien, xoaChiaPhien } from '../lib/khoa-phien'
 import { TEN_NAC, TOI_THIEU_KY_TU, datMatKhau, doiMatKhau, hopLeMatKhau, moKhoa, type BanGhiKhoa, type NacHoiLai } from '../lib/khoa-app'
 import { CAU_LY_DO, batVanTay, coTheDungVanTay, daMoBangVanTay, laKhuonMat, type BanGhiVanTay, type LyDoKhongDung } from '../lib/khoa-van-tay'
 
@@ -38,6 +39,7 @@ export default function KhoiMatKhauApp({ showToast }: { showToast: (chu: string,
   const [hien, setHien] = useState(false)
   const [dang, setDang] = useState(false)
   const [loi, setLoi] = useState('')
+  const [giuPhien, setGiuPhien] = useState(true)
   const [vanTay, setVanTay] = useState<BanGhiVanTay | null>(null)
   const [lyDoVanTay, setLyDoVanTay] = useState<LyDoKhongDung>('')
   const [dangVanTay, setDangVanTay] = useState(false)
@@ -53,10 +55,11 @@ export default function KhoiMatKhauApp({ showToast }: { showToast: (chu: string,
     let con = true
     void (async () => {
       try {
-        const [b, ma, vt, ly] = await Promise.all([loadKhoaApp(), loadTeacherSecret(), loadKhoaVanTay(), coTheDungVanTay()])
+        const [b, ma, vt, ly, gp] = await Promise.all([loadKhoaApp(), loadTeacherSecret(), loadKhoaVanTay(), coTheDungVanTay(), docGiuPhien()])
         if (!con) return
         setGhi(b)
         setCoMa(Boolean(ma))
+        setGiuPhien(gp)
         setVanTay(vt)
         setLyDoVanTay(ly)
       } catch {
@@ -100,6 +103,14 @@ export default function KhoiMatKhauApp({ showToast }: { showToast: (chu: string,
       }
       await saveKhoaApp(b)
       setGhi(b)
+      // Đổi mật khẩu ⇒ dọn phiên rồi cất lại (đặc tả mục 2.3 điều 3). Mã bí mật
+      // không đổi, nhưng để khoá phiên cũ nằm lại là để một chìa mồ côi.
+      const maNay = await loadTeacherSecret()
+      await donPhien()
+      if (maNay) {
+        datMaBiMatPhien(maNay)
+        if (await docGiuPhien()) await catPhien(maNay)
+      }
       dong()
       showToast('Đã đổi mật khẩu. Mật khẩu cũ không dùng được nữa.', 'success')
     } finally {
@@ -145,6 +156,9 @@ export default function KhoiMatKhauApp({ showToast }: { showToast: (chu: string,
     try {
       const ma = await moKhoa(cu, ghi)
       if (ma === null) return setLoi('Mật khẩu hiện tại không đúng')
+      // Dọn phiên TRƯỚC khi gỡ: `donPhien` xoá mã bí mật khỏi bộ nhớ, mà
+      // `goKhoaApp` ngay sau đó đặt lại nó — thứ tự này giữ thầy không bị văng.
+      await donPhien()
       await goKhoaApp(ma)
       setGhi(null)
       // `goKhoaApp` xoá luôn bản ghi vân tay: mã bí mật đã quay về chữ thường
@@ -165,6 +179,28 @@ export default function KhoiMatKhauApp({ showToast }: { showToast: (chu: string,
     await saveKhoaApp(b)
   }
 
+  /** Bật/tắt giữ đăng nhập. TẮT thì dọn phiên đang có ngay, không đợi tới lần
+   * mở sau — thầy tắt là muốn nó hết hiệu lực từ bây giờ. */
+  const doiGiuPhien = async (v: boolean) => {
+    setGiuPhien(v)
+    await luuGiuPhien(v)
+    if (v) {
+      const ma = await loadTeacherSecret()
+      if (ma) await catPhien(ma)
+      return
+    }
+    // Chỉ xoá hai mảnh chìa phiên, KHÔNG xoá mã bí mật khỏi bộ nhớ — thầy đang
+    // làm việc dở, tắt một ô gạt không được đá thầy ra màn khoá.
+    await xoaChiaPhien()
+  }
+
+  /** KHOÁ APP NGAY (mục 4F). Dọn đủ ba thứ rồi tải lại trang: không có phiên
+   * nữa nên app dựng lên là hiện màn khoá. */
+  const bamKhoaNgay = async () => {
+    await donPhien()
+    location.reload()
+  }
+
   // Chưa có mã bí mật thì chưa có gì để khoá — không dựng một khối rỗng.
   if (!ghi && !coMa) return null
 
@@ -179,6 +215,46 @@ export default function KhoiMatKhauApp({ showToast }: { showToast: (chu: string,
       ) : (
         <>
           <div style={NHAN_NHO}>Mã bí mật trong máy này đang được mật khẩu mã hoá. Mật khẩu chỉ của máy này, không đồng bộ sang máy khác.</div>
+
+          {/* GIỮ ĐĂNG NHẬP THEO TAB (GIU-DANG-NHAP-THEO-TAB.md mục 6). */}
+          <div className="flex items-start" style={{ gap: 'var(--k3)' }}>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={giuPhien}
+              aria-label="Giữ đăng nhập trong tab này"
+              onClick={() => void doiGiuPhien(!giuPhien)}
+              className="tap-target"
+              style={{
+                flex: '0 0 auto',
+                width: 52,
+                height: 30,
+                borderRadius: 'var(--bo-tron)',
+                border: 'none',
+                padding: 3,
+                background: giuPhien ? 'var(--phu-dam)' : 'var(--the-2)',
+                display: 'flex',
+                justifyContent: giuPhien ? 'flex-end' : 'flex-start',
+                alignItems: 'center',
+              }}
+            >
+              <span style={{ width: 24, height: 24, borderRadius: 'var(--bo-tron)', background: giuPhien ? 'var(--muc-nguoc)' : 'var(--nhat)', display: 'block' }} />
+            </button>
+            <div>
+              <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
+                Giữ đăng nhập trong tab này
+              </div>
+              <div style={NHAN_NHO}>Tải lại trang không phải nhập lại. Đóng tab thì nhập lại.</div>
+              <button
+                type="button"
+                onClick={() => void bamKhoaNgay()}
+                className="tap-target font-bold"
+                style={{ minHeight: 40, marginTop: 'var(--k2)', padding: '0 var(--k4)', borderRadius: 'var(--bo-1)', background: 'none', border: '1px solid var(--vien)', color: 'var(--muc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+              >
+                Khoá app ngay
+              </button>
+            </div>
+          </div>
 
           <div>
             <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Hỏi lại mật khẩu khi nào</div>

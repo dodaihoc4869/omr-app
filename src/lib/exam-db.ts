@@ -287,6 +287,47 @@ export async function goKhoaApp(maBiMat: string): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// KHOÁ PHIÊN (GIU-DANG-NHAP-THEO-TAB.md mục 2.1)
+//
+// Mảnh thứ hai của chìa phiên. `CryptoKey` cất thẳng vào IndexedDB được —
+// structured clone giữ nguyên đối tượng khoá. Khoá sinh với
+// `extractable: false` nên đọc bản ghi này ra cũng không lấy được byte nào của
+// khoá; nó chỉ dùng được qua `crypto.subtle`.
+//
+// KHÔNG bao giờ là nơi cất mã bí mật. Bản mã nằm ở `sessionStorage`, và đó là
+// mảnh chết theo tab.
+
+/** Khoá phiên của tab đang mở. Không có = tab này chưa mở khoá lần nào. */
+export async function loadKhoaPhien(): Promise<CryptoKey | null> {
+  const db = await getDb()
+  const v = await db.get(STORE_SETTINGS, 'khoaPhien')
+  // Bản ghi lạ (ai đó nghịch IndexedDB, hoặc bản cũ) thì coi như không có.
+  return v && typeof (v as CryptoKey).type === 'string' ? (v as CryptoKey) : null
+}
+
+export async function saveKhoaPhien(k: CryptoKey): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, k, 'khoaPhien')
+}
+
+export async function xoaKhoaPhien(): Promise<void> {
+  const db = await getDb()
+  await db.delete(STORE_SETTINGS, 'khoaPhien')
+}
+
+/** Thầy có bật "Giữ đăng nhập trong tab này" không. Ô trống = BẬT (mặc định). */
+export async function docGiuPhien(): Promise<boolean> {
+  const db = await getDb()
+  const v = await db.get(STORE_SETTINGS, 'giuPhien')
+  return v === undefined || v === null ? true : v === true
+}
+
+export async function luuGiuPhien(v: boolean): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, v === true, 'giuPhien')
+}
+
+// ---------------------------------------------------------------------------
 // VÂN TAY (MOBANGVANTAY.md mục 2.1)
 //
 // `khoaVanTay` NẰM CẠNH `khoaApp`, không thay thế nó. Gỡ vân tay chỉ xoá bản

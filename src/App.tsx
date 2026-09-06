@@ -5,7 +5,8 @@ import Toast from './components/Toast'
 import MessagesFab from './components/MessagesFab'
 import { useAppStore } from './store/appStore'
 import { loadClassList } from './lib/classlist-db'
-import { datMaBiMatPhien, loadKhoaApp, loadKhoaVanTay, loadTeacherSecret } from './lib/exam-db'
+import { datMaBiMatPhien, docGiuPhien, loadKhoaApp, loadKhoaVanTay, loadTeacherSecret } from './lib/exam-db'
+import { catPhien, donPhien, khoiPhucPhien } from './lib/khoa-phien'
 import { datDangMoKhoa } from './lib/cap-nhat-app'
 import { phaiHoiLai, type BanGhiKhoa } from './lib/khoa-app'
 import { datMoBangVanTay, type BanGhiVanTay } from './lib/khoa-van-tay'
@@ -85,6 +86,18 @@ function App() {
           // Vân tay chỉ có nghĩa khi ĐÃ có mật khẩu: nó là đường vào thứ hai
           // tới cùng mã bí mật, không phải đường thay thế.
           setBanGhiVanTay(vt)
+          // GIỮ ĐĂNG NHẬP THEO TAB (GIU-DANG-NHAP-THEO-TAB.md mục 4B). Tab này
+          // đã mở khoá rồi thì tải lại trang không hỏi lại. Không có phiên —
+          // tab mới, tab cũ đã đóng, hoặc thầy tắt ô gạt — thì hỏi như cũ.
+          // `khoiPhucPhien` tự dọn khoá phiên rác khi thiếu bản mã.
+          const maPhien = await khoiPhucPhien()
+          if (!con) return
+          if (maPhien) {
+            datMaBiMatPhien(maPhien)
+            datDangMoKhoa(true)
+            setKhoa('da_mo')
+            return
+          }
           setKhoa('can_mo')
           return
         }
@@ -118,7 +131,9 @@ function App() {
       const daAn = Date.now() - mocAn
       mocAn = 0
       if (!phaiHoiLai(banGhiKhoa.hoiLai, daAn)) return
-      datMaBiMatPhien(null)
+      // DỌN CẢ PHIÊN, không chỉ đặt màn khoá. Khoá màn hình xong mà tải lại
+      // trang vẫn vào được thì cái khoá đó là cửa sau (đặc tả mục 9).
+      void donPhien()
       datDangMoKhoa(false)
       setKhoa('can_mo')
     }
@@ -185,6 +200,11 @@ function App() {
             // mất mã bí mật trong bộ nhớ và thầy bị hỏi lại giữa buổi dạy.
             datDangMoKhoa(true)
             setKhoa('da_mo')
+            // CẤT PHIÊN cho tab này (mục 4A). Chạy nền, không chặn thầy vào
+            // app: cất hỏng thì chỉ mất tiện lợi, không mất tính năng.
+            void (async () => {
+              if (await docGiuPhien()) await catPhien(ma)
+            })()
           }}
         />
       </ChanLoi>
