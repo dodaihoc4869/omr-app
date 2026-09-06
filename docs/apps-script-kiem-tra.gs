@@ -1190,6 +1190,22 @@ function chonCauKhacPhuc_(chiMuc, chuyenDe, loaiTru, soCau) {
   return ra
 }
 
+/** CHẠY TAY TRONG TRÌNH SOẠN khi muốn dựng lại chỉ mục câu ngay: chọn hàm này
+ * → Chạy → xem Nhật ký thực thi. Chỉ ĐỌC kho đề, không sửa gì. */
+function dungChiMucNgay() {
+  const cm = chiMucCau_(true)
+  const theoDe = {}
+  for (let i = 0; i < cm.cau.length; i++) theoDe[cm.cau[i].d] = (theoDe[cm.cau[i].d] || 0) + 1
+  let coLoiGiai = 0
+  let coSao = 0
+  for (let i = 0; i < cm.cau.length; i++) {
+    if (cm.cau[i].co) coLoiGiai++
+    if (cm.cau[i].sao > 0) coSao++
+  }
+  Logger.log('Chỉ mục: ' + Object.keys(theoDe).length + ' đề | ' + cm.cau.length + ' câu | có lời giải ' + coLoiGiai + ' | có sao ' + coSao)
+  return cm.cau.length
+}
+
 function doGet(e) {
   const action = e.parameter.action
   // CHẶN THEO VAI (BA-APP.md đợt 1): lệnh của thầy phải kèm mã bí mật. Không
