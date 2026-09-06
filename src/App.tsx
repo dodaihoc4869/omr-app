@@ -10,6 +10,7 @@ import { datDangMoKhoa } from './lib/cap-nhat-app'
 import { phaiHoiLai, type BanGhiKhoa } from './lib/khoa-app'
 import { datMoBangVanTay, type BanGhiVanTay } from './lib/khoa-van-tay'
 import { docDuongVao, laLinkAppCu, laManThayQuanLy } from './lib/vai-tro'
+import { ganCauNoi, goCauNoi } from './lib/cau-noi-ddh'
 import ClassListScreen from './screens/ClassListScreen'
 import ExamHubScreen from './screens/ExamHubScreen'
 import ExamSetupScreen from './screens/ExamSetupScreen'
@@ -124,6 +125,20 @@ function App() {
     document.addEventListener('visibilitychange', doi)
     return () => document.removeEventListener('visibilitychange', doi)
   }, [khoa, banGhiKhoa])
+
+  // CẦU NỐI `window.__ddh` (APP-CAN-MO-DUONG-CHO-COWORK.md mục 3). Gắn khi app
+  // quản lý của thầy ĐANG MỞ KHOÁ, gỡ ngay khi khoá lại hoặc rời trang.
+  //
+  // Điều kiện `canHoi` là quan trọng: màn vào thi của em, báo cáo phụ huynh và
+  // link cũ đều KHÔNG được có cầu nối — những máy đó không phải máy thầy.
+  useEffect(() => {
+    if (!canHoi || linkCu || laPhieu || khoa !== 'da_mo') {
+      goCauNoi()
+      return
+    }
+    ganCauNoi()
+    return () => goCauNoi()
+  }, [canHoi, linkCu, laPhieu, khoa])
 
   // Máy em / phụ huynh cầm link cũ thì KHÔNG đọc gì của thầy — không mở
   // IndexedDB danh sách lớp, không dựng màn nào của app quản lý. Chưa mở khoá

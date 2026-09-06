@@ -272,18 +272,21 @@ describe('Màn Chi tiết ca dựng nốt phiếu còn thiếu', () => {
     const { resolve } = await import('node:path')
     const man = readFileSync(resolve(__dirname, '../src/screens/ExamMonitorScreen.tsx'), 'utf8')
     expect(man).toContain('taoPhieuChoEm(')
-    expect(man).toContain('hoSoNhieuEm(url, mat, dsSbd)')
-    expect(man).toContain('luuNhieuPhieu(url, mat, canLuu)')
+    // 06/09: lõi dựng phiếu chuyển sang `phieu-ca-ca.ts` để dùng chung với cầu
+    // nối `window.__ddh`. Hai lệnh gộp vẫn phải là hai lệnh gộp — chỉ đổi nhà.
+    const loi = readFileSync(resolve(__dirname, '../src/lib/phieu-ca-ca.ts'), 'utf8')
+    expect(loi).toContain('hoSoNhieuEm(url, mat, dsSbd)')
+    expect(loi).toContain('luuNhieuPhieu(url, mat, canLuu)')
     // Cấm gọi hồ sơ từng em trong vòng dựng phiếu cả ca.
-    // `taoPhieuChoEm` phải khai TRƯỚC `handleCopyLinkPhieu` (nơi gọi nó), nên
-    // cắt theo đúng thứ tự đó — cắt ngược sẽ ra chuỗi rỗng và test tự đạt.
-    const dau = man.indexOf('const taoPhieuChoEm')
-    const cuoi = man.indexOf('const handleCopyLinkPhieu')
+    const dau = loi.indexOf('export async function dungPhieuChoEm')
+    const cuoi = loi.indexOf('export async function gomCa')
     expect(dau).toBeGreaterThan(0)
     expect(cuoi).toBeGreaterThan(dau)
-    const ham = man.slice(dau, cuoi)
+    const ham = loi.slice(dau, cuoi)
     expect(ham).not.toContain('hoSoEm(')
     expect(ham).not.toContain('luuPhieu(')
+    // Và màn hình KHÔNG được giữ bản chép thứ hai.
+    expect(man).not.toContain('luuNhieuPhieu(')
   })
 
   it('KHÔNG hỏi lại máy chủ danh sách phiếu sau khi vừa tạo', async () => {
