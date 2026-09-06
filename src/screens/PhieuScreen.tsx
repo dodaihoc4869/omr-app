@@ -25,7 +25,7 @@ import { BAN_PHIEU, type PhieuDayDu } from '../lib/phieu-du-lieu'
 import TheCauChiTiet, { CSS_THE_CAU } from '../components/TheCauChiTiet'
 import type { ThongTinPhieu } from '../lib/html-phieu'
 import type { CauLuyen } from '../lib/bai-tap-pdf'
-import { hopDang, LOC_DANG_MAC_DINH, MOI_LOC_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
+import { dangCua, hopDang, LOC_DANG_MAC_DINH, MOI_LOC_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
 import { TEN_MUC_DO, TEN_PHAN } from '../lib/phan-tich-lam-bai'
 import { ChemText } from '../lib/chem-format'
 
@@ -930,11 +930,22 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
   // bộ câu đã chở sẵn trong báo cáo — trang này không có kho đề và không có mã
   // bí mật để rút thêm.
   //
-  // Báo cáo dựng TRƯỚC bản này không mang nhãn `dang`; lúc đó ẩn hẳn hàng nút
-  // thay vì hiện ba nút mà hai cái luôn ra 0 câu.
+  // BÁO CÁO CŨ CŨNG CHẠY, không phải ghi đè gì trên máy chủ. Thầy hỏi đúng câu
+  // đó 06/09: "đẩy luôn lên cả báo cáo cũ các ca thi trước".
+  //
+  // Cách rẻ nhất và không rủi ro nhất là PHÂN LOẠI NGAY LÚC MỞ, không phải chép
+  // thêm một trường vào hàng trăm bản ghi cũ: mỗi câu trong báo cáo vốn đã chở
+  // `phan · text · luaChon · dapAn · mucDo` — đúng và đủ thứ `dangCua` cần.
+  // Nhãn cất sẵn (báo cáo mới) vẫn được ưu tiên, nên hai đường cho cùng kết
+  // quả và về sau kho có nhãn thật thì báo cáo mới tự dùng nhãn thật.
+  //
+  // Ghi đè báo cáo cũ còn là chuyện KHÔNG NÊN LÀM: mỗi bản ghi mang nhận xét
+  // thầy tự gõ cho từng em; chạy lại hàng loạt là đặt cược chỗ đó, đổi lấy một
+  // hàng nút.
   const [locDang, setLocDang] = useState<LocDang>(LOC_DANG_MAC_DINH)
-  const coNhanDang = (du.baiTap ?? []).some((c) => Boolean(c.dang))
-  const dsDaLoc = coNhanDang ? (du.baiTap ?? []).filter((c) => hopDang(c.dang ?? 'chua_ro', locDang)) : (du.baiTap ?? [])
+  const dangCuaCau = (c: CauLuyen) =>
+    c.dang ?? dangCua({ phan: c.phan, text: c.text, luaChon: c.luaChon ?? [], dapAn: c.phan === 'III' ? c.dapAn : '', mucDo: c.mucDo })
+  const dsDaLoc = (du.baiTap ?? []).filter((c) => hopDang(dangCuaCau(c), locDang))
   const coSan = dsDaLoc.length
   const tran = Math.min(SO_CAU_MAX, Math.max(SO_CAU_MIN, coSan || SO_CAU_MIN))
   const [soCau, setSoCau] = useState(() => Math.min(SO_CAU_MIN, tran))
@@ -994,7 +1005,7 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
         </div>
       )}
 
-      {coNhanDang && (
+      {(du.baiTap?.length ?? 0) > 0 && (
         <div className="bc-dang" role="radiogroup" aria-label="Dạng câu">
           {MOI_LOC_DANG.map((d) => (
             <button key={d} type="button" role="radio" aria-checked={locDang === d} onClick={() => setLocDang(d)}>

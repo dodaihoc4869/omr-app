@@ -136,10 +136,20 @@ describe('ba lựa chọn có mặt trên cả ba màn', () => {
   it('12. báo cáo phụ huynh và học sinh', () => {
     const man = doc('src/screens/PhieuScreen.tsx')
     expect(man).toContain('MOI_LOC_DANG.map')
-    expect(man).toContain('hopDang(c.dang ?? ')
-    // báo cáo cũ không có nhãn thì ẩn hàng nút, không hiện ba nút mà hai cái
-    // luôn ra 0 câu
-    expect(man).toContain('const coNhanDang =')
-    expect(man).toContain('{coNhanDang && (')
+    expect(man).toContain('hopDang(dangCuaCau(c), locDang)')
+  })
+
+  it('13. BÁO CÁO CŨ cũng có ba nút — phân loại tại chỗ, không ghi đè máy chủ', () => {
+    // Thầy hỏi "đẩy luôn lên cả báo cáo cũ các ca thi trước". Báo cáo cũ không
+    // mang nhãn `dang`, nhưng mang đủ `phan · text · luaChon · dapAn · mucDo`
+    // để phân loại ngay lúc mở. Không chép thêm trường vào bản ghi cũ, và
+    // KHÔNG chạy lại báo cáo hàng loạt — mỗi bản ghi mang nhận xét thầy tự gõ.
+    const man = doc('src/screens/PhieuScreen.tsx')
+    expect(man).toContain('const dangCuaCau = (c: CauLuyen) =>')
+    // nhãn cất sẵn vẫn được ưu tiên hơn suy đoán
+    expect(man).toContain('c.dang ?? dangCua({')
+    // hàng nút hiện theo CÓ BÀI TẬP, không theo có nhãn
+    expect(man).toContain('{(du.baiTap?.length ?? 0) > 0 && (')
+    expect(man).not.toContain('coNhanDang')
   })
 })
