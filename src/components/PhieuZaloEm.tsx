@@ -161,11 +161,21 @@ export default function PhieuZaloEm({
   const [xemLink, setXemLink] = useState('')
   const [dangTai, setDangTai] = useState(false)
 
-  // Chuyên đề mất điểm CỦA RIÊNG CA NÀY. Phiếu gửi phụ huynh mà lấy số cộng dồn
-  // mọi ca là nói sai về bài vừa làm.
+  // MỌI chuyên đề của ca vừa thi — kể cả chuyên đề em làm đúng hết.
+  //
+  // Đây là RANH GIỚI để rút bài luyện: "chỉ rút bài tập từ những chuyên đề được
+  // chọn của ca đó" (thầy chốt 06/09). Trước đây chỗ này truyền thẳng danh sách
+  // ĐÃ LỌC `soSai > 0` xuống `dungPhieu`, nên em nào làm đúng hết thì danh sách
+  // rỗng và bài luyện lại rút toàn kho — đúng lỗi thầy báo. Đường dựng cả ca
+  // (`phieu-ca-ca.ts`) vốn đã truyền danh sách đầy đủ; chỗ này nay khớp theo.
+  const chuyenDeCaDayDu = hoSo.chuyenDeCaGanNhat
+
+  // Chuyên đề MẤT ĐIỂM của riêng ca này — dùng cho câu chữ trong tin nhắn và
+  // phần tóm tắt. Phiếu gửi phụ huynh mà lấy số cộng dồn mọi ca là nói sai về
+  // bài vừa làm.
   const chuyenDeCa = useMemo(
-    () => hoSo.chuyenDeCaGanNhat.filter((c) => c.soSai > 0).sort((a, b) => b.soSai - a.soSai),
-    [hoSo.chuyenDeCaGanNhat],
+    () => chuyenDeCaDayDu.filter((c) => c.soSai > 0).sort((a, b) => b.soSai - a.soSai),
+    [chuyenDeCaDayDu],
   )
 
   const duPhieu: DuLieuPhieu | null = useMemo(() => {
@@ -251,7 +261,8 @@ export default function PhieuZaloEm({
           const phieu = dungPhieu({
             hoSo,
             ca,
-            chuyenDeCa,
+            // ĐẦY ĐỦ, không phải danh sách đã lọc — xem khối lý do ở trên.
+            chuyenDeCa: chuyenDeCaDayDu,
             vieCanLam: viec.trim() || viecCanLamMacDinh(duPhieu),
             rows: rowsDung,
             banks: banksDung,

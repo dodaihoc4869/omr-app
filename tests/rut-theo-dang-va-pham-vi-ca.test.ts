@@ -69,6 +69,24 @@ describe('ranh giới chuyên đề của ca — bài luyện kèm báo cáo', (
     expect(new Set(kq.cau.map((c) => c.chuyenDe)).size).toBeGreaterThan(1)
   })
 
+  it('3b. CẢ HAI đường dựng báo cáo đều truyền danh sách ĐẦY ĐỦ, không lọc trước', () => {
+    // LỖ TÌM RA 06/09 khi thầy hỏi lại "đã hoàn thành cái này chưa":
+    // `phieu-ca-ca.ts` (dựng cả ca) truyền `cd` đầy đủ — đúng. Nhưng
+    // `PhieuZaloEm.tsx` (dựng từng em) lọc `soSai > 0` NGAY TỪ memo rồi mới
+    // truyền xuống, nên em làm đúng hết thì ranh giới rỗng và bài luyện lại
+    // rút toàn kho — đúng lỗi thầy báo, chỉ là ở đường khác.
+    const zalo = doc('src/components/PhieuZaloEm.tsx')
+    expect(zalo).toContain('const chuyenDeCaDayDu = hoSo.chuyenDeCaGanNhat')
+    expect(zalo).toContain('chuyenDeCa: chuyenDeCaDayDu,')
+    // danh sách ĐÃ LỌC chỉ còn dùng cho câu chữ, không phải cho ranh giới
+    expect(zalo).toContain('chuyenDeCaDayDu.filter((c) => c.soSai > 0)')
+
+    const caCa = doc('src/lib/phieu-ca-ca.ts')
+    expect(caCa).toContain('chuyenDeCa: cd,')
+    // và ở đó danh sách lọc được đặt tên riêng, không nhầm vào chỗ ranh giới
+    expect(caCa).toContain('const cdSai = cd.filter((c) => c.soSai > 0)')
+  })
+
   it('4. báo cáo truyền MỌI chuyên đề của ca làm ranh giới, không chỉ chuyên đề sai', () => {
     const lib = doc('src/lib/phieu-du-lieu.ts')
     expect(lib).toContain('const phamViCa = n.chuyenDeCa.map((c) => c.ten).filter(Boolean)')
