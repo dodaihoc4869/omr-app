@@ -305,6 +305,46 @@ describe('Chọn đúng câu cần luyện', () => {
     for (const it of r.items) expect(it.cau).toHaveLength(2)
   })
 
+  it('CÂU NẰM Ở NHIỀU ĐỀ HƠN TRẦN vẫn trả ĐỦ số câu xin — lỗi thanh kéo dừng ở 36', () => {
+    // Bản trước rải đều qua CẢ MƯỜI HAI đề rồi khâu đọc file mới cắt còn 8, nên
+    // 60 câu chia mỗi đề 5 câu thì mất hơn một phần ba. Thầy thấy thanh kéo
+    // dừng ở 36 thay vì 60.
+    const kho: Record<string, KhoCau[]> = {}
+    for (let d = 1; d <= 12; d++) {
+      kho['DE-' + d] = []
+      for (let i = 1; i <= 10; i++) kho['DE-' + d].push(cau('I', i, ESTER, 1))
+    }
+    const m = dungMayChu(bangCoBan(), kho)
+    const r = m.goi(xin({ chuyenDe: [ESTER], soCau: 60 }))
+    expect(r.soCau).toBe(60)
+    expect(r.soChon).toBe(60)
+    // Và vẫn rải ra nhiều đề, không dồn hết vào một bài.
+    expect(r.items.length).toBeGreaterThanOrEqual(3)
+    expect(r.items.length).toBeLessThanOrEqual(6)
+  })
+
+  it('DỄ LÊN KHÓ trong cùng chuyên đề — đúng như màn báo cáo hứa với em', () => {
+    const kho = {
+      'DE-A': [
+        cau('I', 1, ESTER, 2, { muc_do: 'van_dung' }),
+        cau('I', 2, ESTER, 0, { muc_do: 'biet' }),
+        cau('I', 3, ESTER, 1, { muc_do: 'hieu' }),
+      ],
+    }
+    const m = dungMayChu(bangCoBan(), kho)
+    const r = m.goi(xin({ chuyenDe: [ESTER], soCau: 3 }))
+    expect(r.items[0].cau.map((c: KhoCau) => c.muc_do)).toEqual(['biet', 'hieu', 'van_dung'])
+    // `thuTu` là hợp đồng thật: gói gom theo đề nên máy em phải xếp lại theo nó.
+    expect(r.thuTu).toEqual(['DE-A-I-2', 'DE-A-I-3', 'DE-A-I-1'])
+  })
+
+  it('THỨ TỰ gửi kèm đủ mọi câu trả về, không thiếu không thừa', () => {
+    const m = dungMayChu(bangCoBan(), khoThu())
+    const r = m.goi(xin({ chuyenDe: [ESTER, CARB] }))
+    const qids = r.items.flatMap((it: { ma_de: string; cau: KhoCau[] }) => it.cau.map((c) => `${it.ma_de}-${c.phan}-${c.so}`))
+    expect([...r.thuTu].sort()).toEqual([...qids].sort())
+  })
+
   it('không có chuyên đề nào thì trả rỗng, KHÔNG rút bừa', () => {
     const m = dungMayChu(bangCoBan(), khoThu())
     const r = m.goi(xin({ chuyenDe: [] }))

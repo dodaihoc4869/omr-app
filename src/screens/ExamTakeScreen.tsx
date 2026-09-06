@@ -5,7 +5,7 @@ import { cauKhacPhuc, lichSuEm as lichSuEmApi, vaoThi, thongDiepChan, submitAnsw
 import { goiCauHoi } from '../lib/hoi-bai'
 import TamTruotHoiBai, { type CauChon } from '../components/TamTruotHoiBai'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
-import { dungCauSai, dungPhieuMayEm, xepChuyenDeYeu, SO_CAU_BAI_TAP_KEM, type DiemMotCa, type PhieuDayDu } from '../lib/phieu-du-lieu'
+import { chuyenDeXinKho, dungCauSai, dungPhieuMayEm, SO_CAU_BAI_TAP_KEM, type DiemMotCa, type PhieuDayDu } from '../lib/phieu-du-lieu'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJson } from '../lib/exam-kho-de-import'
 import PhieuScreen from './PhieuScreen'
 import { gioMayChu, gioNgan } from '../lib/gio-may-chu'
@@ -521,6 +521,7 @@ export default function ExamTakeScreen() {
   // ĐẶT SAU `lichSuEm`, TRƯỚC `phieuCuaEm`: đọc một const khai bên dưới là
   // đúng cái bẫy vùng chết biến làm vỡ màn Làm bài ngày 06/09.
   const [khoKhacPhuc, setKhoKhacPhuc] = useState<TeacherExamSource[]>([])
+  const [thuTuKhacPhuc, setThuTuKhacPhuc] = useState<string[]>([])
   const [khacPhucCatBot, setKhacPhucCatBot] = useState(false)
   useEffect(() => {
     if (!attempt || !graded || !keyBank) return
@@ -528,7 +529,7 @@ export default function ExamTakeScreen() {
     void (async () => {
       try {
         const rows = taoChiTietCau(keyBank, attempt.maCa, attempt.sbd, attempt.answers, attempt.giayCau)
-        const yeu = xepChuyenDeYeu(rows).map((x) => x.ten)
+        const yeu = chuyenDeXinKho(rows)
         if (yeu.length === 0) return
         const kq = await cauKhacPhuc(
           scriptUrl.trim(),
@@ -552,6 +553,7 @@ export default function ExamTakeScreen() {
         }
         if (con) {
           setKhoKhacPhuc(nguon)
+          setThuTuKhacPhuc(kq.thuTu)
           setKhacPhucCatBot(kq.catBotViNang)
         }
       } catch {
@@ -582,6 +584,7 @@ export default function ExamTakeScreen() {
         banks,
         lichSu: lichSuEm,
         khoKhacPhuc,
+        thuTuKhacPhuc,
         // Em thấy đúng thứ thầy và phụ huynh sẽ thấy. Em đã nhận cảnh báo ngay
         // lúc rời màn rồi, nên đây không phải tin dữ bất ngờ — chỉ là bản ghi.
         viPham: {
@@ -595,7 +598,7 @@ export default function ExamTakeScreen() {
     } catch {
       return null
     }
-  }, [keyBank, attempt, graded, hoTen, lichSuEm, khoKhacPhuc])
+  }, [keyBank, attempt, graded, hoTen, lichSuEm, khoKhacPhuc, thuTuKhacPhuc])
   useEffect(() => {
     totalCountRef.current = assignment ? assignment.phanI.length + assignment.phanII.length + assignment.phanIII.length : 0
   }, [assignment])

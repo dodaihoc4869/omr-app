@@ -344,6 +344,11 @@ export interface NguonPhieuMayEm {
    * bài tập lấy từ đây; mất mạng hoặc máy chủ từ chối thì rơi về ngân hàng của
    * chính ca vừa thi như trước. */
   khoKhacPhuc?: TeacherExamSource[]
+  /** Mã câu theo ĐÚNG thứ tự máy chủ đã xếp (dễ lên khó). Gói trả về gom theo
+   * đề nên trong mỗi đề câu nằm theo thứ tự file gốc, không phải thứ tự đã
+   * xếp — thiếu cái này là màn báo cáo hứa "dễ lên khó" mà em mở ra thấy câu
+   * vận dụng nằm đầu. */
+  thuTuKhacPhuc?: string[]
 }
 
 /** Chuyên đề em vừa MẤT ĐIỂM, xếp theo tỉ lệ sai giảm dần.
@@ -367,6 +372,37 @@ export function xepChuyenDeYeu(rows: ChiTietCauRow[]): { ten: string; tiLeSai: n
     .sort((a, b) => b.tiLeSai - a.tiLeSai)
 }
 
+/** Danh sách chuyên đề GỬI LÊN MÁY CHỦ để rút câu khắc phục, đã xếp hạng.
+ *
+ * Chuyên đề em MẤT ĐIỂM đứng trước — đó là chỗ phải luyện. Nhưng chỉ gửi mấy
+ * chuyên đề đó thì có bài em chỉ sai đúng một chuyên đề, kho không đủ 60 câu
+ * ngoài những câu em vừa làm, thanh kéo dừng ở ba bốn chục (thầy báo 06/09).
+ * Nên NỐI THÊM các chuyên đề còn lại CỦA CHÍNH CA đó vào sau: vẫn đúng kiến
+ * thức của bài vừa thi, chỉ là ưu tiên thấp hơn. Máy chủ xếp theo đúng thứ tự
+ * này nên câu của chuyên đề yếu luôn nằm ở đầu bộ. */
+export function chuyenDeXinKho(rows: ChiTietCauRow[]): string[] {
+  const yeu = xepChuyenDeYeu(rows).map((x) => x.ten)
+  const daCo = new Set(yeu)
+  const buThem: string[] = []
+  for (const r of rows) {
+    const ten = r.chuyenDe || ''
+    if (!ten || daCo.has(ten)) continue
+    daCo.add(ten)
+    buThem.push(ten)
+  }
+  return [...yeu, ...buThem]
+}
+
+/** Xếp lại bộ câu theo đúng thứ tự máy chủ đã chọn. Câu không có trong danh
+ * sách thứ tự (dữ liệu lệch) xuống cuối chứ KHÔNG bị vứt — thà sai thứ tự còn
+ * hơn mất câu. */
+function xepTheoThuTuKho(cau: CauLuyen[], thuTu: string[] | undefined): CauLuyen[] {
+  if (!thuTu || thuTu.length === 0) return cau
+  const hang = new Map<string, number>()
+  thuTu.forEach((id, i) => hang.set(id, i))
+  return [...cau].sort((a, b) => (hang.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (hang.get(b.id) ?? Number.MAX_SAFE_INTEGER))
+}
+
 export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
   const cauSai = dungCauSai(n.rows, n.banks)
 
@@ -380,7 +416,7 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
   // Không lấy được (mất mạng, máy chủ từ chối, kho chưa có câu nào của chuyên
   // đề đó) thì RƠI VỀ ngân hàng của chính ca vừa thi: chuyên đề em mất điểm
   // xếp trước, phần còn lại của ca nối vào sau. Thà ít câu còn hơn màn trắng.
-  const tuKho = n.khoKhacPhuc && n.khoKhacPhuc.length > 0 ? cauLuyenTuNguon(n.khoKhacPhuc) : []
+  const tuKho = xepTheoThuTuKho(n.khoKhacPhuc && n.khoKhacPhuc.length > 0 ? cauLuyenTuNguon(n.khoKhacPhuc) : [], n.thuTuKhacPhuc)
   const daLamTrongCa = new Set(n.rows.map((r) => r.qid).filter(Boolean))
   const uuTien = n.banks.length > 0 && chuyenDeYeu.length > 0 ? chonCauLuyen(n.banks, { chuyenDe: chuyenDeYeu, qidDaLam: [], soCau: SO_CAU_BAI_TAP_KEM }).cau : []
   const daCo = new Set(uuTien.map((c) => c.id))

@@ -1155,6 +1155,9 @@ export interface KetQuaKhacPhuc {
   soCau: number
   /** Số câu máy chủ CHỌN được. Lớn hơn `soCau` nghĩa là bị cắt vì gói quá nặng. */
   soChon: number
+  /** Mã câu theo ĐÚNG thứ tự máy chủ đã xếp (dễ lên khó). Gói trả về gom theo
+   * đề nên tự nó không giữ được thứ tự này. */
+  thuTu: string[]
   catBotViNang: boolean
 }
 
@@ -1186,6 +1189,7 @@ export async function cauKhacPhuc(
     nguon: items.map((x: { ma_de?: string }) => ({ maDe: String(x?.ma_de || ''), json: x })),
     soCau: Number(r.soCau) || 0,
     soChon: Number(r.soChon) || 0,
+    thuTu: Array.isArray(r.thuTu) ? r.thuTu.map((x: unknown) => String(x)) : [],
     catBotViNang: r.catBotViNang === true,
   }
 }
@@ -1199,10 +1203,25 @@ export async function dungChiMuc(scriptUrl: string, secret: string): Promise<num
 }
 
 /** THẦY LẤY toàn bộ câu hỏi của một ca. */
-export async function danhSachCauHoi(scriptUrl: string, secret: string, maCa: string): Promise<CauHoiCuaEm[]> {
-  const r = await postJson(scriptUrl, { action: 'danhSachCauHoi', secret, maCa })
+export async function danhSachCauHoi(scriptUrl: string, secret: string, maCa: string, thungRac = false): Promise<CauHoiCuaEm[]> {
+  const r = await postJson(scriptUrl, { action: 'danhSachCauHoi', secret, maCa, thungRac })
   if (!r.ok) throw new Error(r.error || 'Không lấy được câu hỏi')
   return Array.isArray(r.items) ? (r.items as CauHoiCuaEm[]) : []
+}
+
+/** THẦY BỎ CA VÀO THÙNG RÁC hoặc KHÔI PHỤC lại — nhiều ca một lượt.
+ *
+ * Máy chủ chỉ ĐÁNH DẤU cột `Xoa`, không xoá dòng, nên bấm nhầm còn lấy lại
+ * được. `tatCa` dùng cho nút "Khôi phục tất cả" trong thùng rác. */
+export async function xoaCauHoi(
+  scriptUrl: string,
+  secret: string,
+  maCa: string[],
+  opt: { khoiPhuc?: boolean; tatCa?: boolean } = {},
+): Promise<{ soDong: number; soCa: number }> {
+  const r = await postJson(scriptUrl, { action: 'xoaCauHoi', secret, maCa, khoiPhuc: opt.khoiPhuc === true, tatCa: opt.tatCa === true })
+  if (!r.ok) throw new Error(r.error || (opt.khoiPhuc ? 'Không khôi phục được' : 'Không xoá được'))
+  return { soDong: Number(r.soDong) || 0, soCa: Number(r.soCa) || 0 }
 }
 
 /** ĐÁNH DẤU ĐÃ CHỮA. Không truyền `sbd` = cả ca. Dòng đã chữa KHÔNG bị xoá —

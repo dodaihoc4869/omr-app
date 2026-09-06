@@ -1023,6 +1023,9 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
       )}
       <div style={{ fontSize: 12, color: 'var(--p-nhat)', marginTop: 8, lineHeight: 1.6 }}>
         Thầy đã chọn sẵn theo đúng chuyên đề em mất điểm ở bài này, xếp từ dễ lên khó.
+        {/* NÓI RÕ SỐ CÂU KHO CÒN, thay vì để thanh kéo dừng ở một con số lạ mà
+            không ai biết vì sao (thầy hỏi đúng câu này ngày 06/09). */}
+        {laCuaEm && coSan > 0 && coSan < SO_CAU_MAX ? ` Kho còn ${coSan} câu của những chuyên đề này ngoài các câu em vừa làm.` : ''}
         {du.linkBaiTap
           ? ' Gửi con link ĐỀ trước để em tự làm vào vở; em làm xong mới gửi link LỜI GIẢI để em dò. Hai link chỉ có bài tập, không kèm điểm và nhận xét.'
           : ' Em làm hết rồi mới bấm vào từng câu xem lời giải.'}

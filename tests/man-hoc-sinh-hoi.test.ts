@@ -69,8 +69,10 @@ describe('Màn dựng đúng cách', () => {
     const man = readFileSync(resolve(__dirname, '../src/screens/CauHoiScreen.tsx'), 'utf8')
     // Mã ca rỗng = lấy mọi dòng, rồi gom tại máy. Gọi từng ca là ba chục lệnh
     // cho một lần mở màn — đi ngược hẳn việc giảm tải đã làm.
-    expect(man).toContain("danhSachCauHoi(u.trim(), m.trim(), '')")
+    expect(man).toContain("danhSachCauHoi(u.trim(), m.trim(), ''")
     expect(man).toContain('gomTheoCa(items)')
+    // Và ĐÚNG MỘT chỗ gọi: thêm thùng rác không được đẻ ra đường lấy thứ hai.
+    expect(man.split('danhSachCauHoi(').length - 1).toBe(1)
   })
 
   it('chi tiết một ca dùng ĐÚNG khối đã thiết kế, không dựng kiểu thứ hai', async () => {

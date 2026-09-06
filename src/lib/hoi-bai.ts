@@ -54,6 +54,8 @@ export interface CauHoiCuaEm {
   guiLuc: string
   daChua: boolean
   chuaLuc: string
+  /** Mốc thầy bỏ vào thùng rác. Rỗng = đang hiện ở màn chính. */
+  xoa?: string
 }
 
 /** Một câu sau khi GỘP: câu là đơn vị, tên em là thuộc tính của câu. */

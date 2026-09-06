@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest'
 import type { TeacherExamSource } from '../src/data/examContent'
 import type { ChiTietCauRow } from '../src/lib/exam-api'
-import { SO_CAU_BAI_TAP_KEM, dungPhieuMayEm, xepChuyenDeYeu } from '../src/lib/phieu-du-lieu'
+import { SO_CAU_BAI_TAP_KEM, chuyenDeXinKho, dungPhieuMayEm, xepChuyenDeYeu } from '../src/lib/phieu-du-lieu'
 
 const ESTER = 'Ester – lipid'
 const CARB = 'Carbohydrate'
@@ -34,7 +34,7 @@ function hang(qid: string, chuyenDe: string, dung: boolean): ChiTietCauRow {
 const CA = nguon('CA-DE', [1, 2, 3], ESTER)
 const ROWS: ChiTietCauRow[] = [hang('CA-DE-I-1', ESTER, false), hang('CA-DE-I-2', ESTER, false), hang('CA-DE-I-3', CARB, true)]
 
-function dung(khoKhacPhuc?: TeacherExamSource[]) {
+function dung(khoKhacPhuc?: TeacherExamSource[], thuTuKhacPhuc?: string[]) {
   return dungPhieuMayEm({
     hoTen: 'Em Thử',
     sbd: '100001',
@@ -44,6 +44,7 @@ function dung(khoKhacPhuc?: TeacherExamSource[]) {
     rows: ROWS,
     banks: [CA],
     ...(khoKhacPhuc ? { khoKhacPhuc } : {}),
+    ...(thuTuKhacPhuc ? { thuTuKhacPhuc } : {}),
   })
 }
 
@@ -92,6 +93,37 @@ describe('Bộ câu khắc phục lấy từ kho đề', () => {
 
   it('kho trả về RỖNG cũng rơi về ngân hàng của ca', () => {
     expect(dung([]).baiTap?.length).toBeGreaterThan(0)
+  })
+
+  it('XẾP LẠI theo thứ tự máy chủ gửi kèm (dễ lên khó), không theo thứ tự gói', () => {
+    const kho = [nguon('KHO-A', [10, 11], ESTER), nguon('KHO-B', [10], ESTER)]
+    const p = dung(kho, ['KHO-B-I-10', 'KHO-A-I-11', 'KHO-A-I-10'])
+    expect(p.baiTap?.map((c) => c.id)).toEqual(['KHO-B-I-10', 'KHO-A-I-11', 'KHO-A-I-10'])
+  })
+
+  it('câu KHÔNG có trong danh sách thứ tự xuống cuối, KHÔNG bị vứt', () => {
+    const kho = [nguon('KHO-A', [10, 11], ESTER)]
+    const p = dung(kho, ['KHO-A-I-11'])
+    expect(p.baiTap?.map((c) => c.id)).toEqual(['KHO-A-I-11', 'KHO-A-I-10'])
+  })
+})
+
+describe('Chuyên đề gửi lên máy chủ', () => {
+  it('chuyên đề MẤT ĐIỂM đứng trước, chuyên đề còn lại của ca nối vào sau', () => {
+    // Không nối thì bài chỉ sai một chuyên đề sẽ không đủ 60 câu ngoài những
+    // câu em vừa làm — đúng cảnh thanh kéo dừng ở 36.
+    const rows = [hang('q1', ESTER, false), hang('q2', CARB, true), hang('q3', 'Polymer', true)]
+    expect(chuyenDeXinKho(rows)).toEqual([ESTER, CARB, 'Polymer'])
+  })
+
+  it('không có chuyên đề nào bị sai thì vẫn gửi chuyên đề của ca', () => {
+    const rows = [hang('q1', ESTER, true), hang('q2', CARB, true)]
+    expect(chuyenDeXinKho(rows)).toEqual([ESTER, CARB])
+  })
+
+  it('không trùng tên chuyên đề, và bỏ câu không ghi chuyên đề', () => {
+    const rows = [hang('q1', ESTER, false), hang('q2', ESTER, true), hang('q3', '', false)]
+    expect(chuyenDeXinKho(rows)).toEqual([ESTER])
   })
 
   it('bộ dự phòng vẫn xếp chuyên đề em mất điểm lên trước', () => {
