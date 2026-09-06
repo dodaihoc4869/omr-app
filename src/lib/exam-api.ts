@@ -588,6 +588,20 @@ export async function listParentMessages(scriptUrl: string, secret: string): Pro
   return data.items || []
 }
 
+/** ĐẾM TIN CHƯA ĐỌC — dùng cho vòng hỏi lại của bong bóng nổi.
+ *
+ * Lấy `listParentMessages` để đếm là kéo cả hộp thư (mọi cột, mọi nội dung tin)
+ * về chỉ để lấy một con số, cứ vài chục giây một lần, suốt ngày. Lệnh này đọc
+ * đúng một cột trên máy chủ và trả về hai con số. */
+export async function demTinMoi(scriptUrl: string, secret: string): Promise<{ soChuaDoc: number; tong: number }> {
+  const url = `${scriptUrl}?action=demTinMoi&secret=${encodeURIComponent(secret)}`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
+  const r = await res.json()
+  if (!r.ok) throw new Error(r.error || 'Không đếm được tin')
+  return { soChuaDoc: Number(r.soChuaDoc) || 0, tong: Number(r.tong) || 0 }
+}
+
 export async function markMessagesRead(scriptUrl: string, ids: string[]): Promise<void> {
   if (ids.length === 0) return
   const result = await postJson(scriptUrl, { action: 'markMessagesRead', ids })

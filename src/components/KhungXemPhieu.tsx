@@ -25,7 +25,7 @@
 // `.lop-xem-phieu` trong index.css). Phiếu co đúng theo bề rộng nửa phải, nên
 // thầy vẫn đổi được màn khác mà không phải đóng phiếu; kéo hẹp/rộng cột trái
 // là phiếu co theo ngay.
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 
@@ -66,6 +66,22 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
     }
   }, [])
 
+  // GIỮ `dong` TRONG REF, và hiệu ứng dưới chạy ĐÚNG MỘT LẦN lúc mở.
+  //
+  // LỖI ĐÃ DÍNH (thầy báo 06/09): bấm "Xem báo cáo" lần đầu bị văng ra, bấm
+  // lần hai mới xem được. Nguyên nhân: hiệu ứng lịch sử có phụ thuộc `[dong]`,
+  // mà mọi nơi gọi đều truyền hàm nội tuyến (`dong={() => setXemLink('')}`) —
+  // mỗi lần cha vẽ lại là một hàm MỚI, hiệu ứng bị dọn rồi chạy lại. Lúc dọn
+  // nó gọi `history.back()`; `back()` chạy bất đồng bộ nên sự kiện `popstate`
+  // rơi vào bộ nghe VỪA gắn của lần chạy mới, và bộ nghe đó gọi `dong()` —
+  // đóng luôn lớp phủ vừa mở. `PhieuZaloEm` dựng ảnh phiếu bất đồng bộ nên
+  // gần như chắc chắn vẽ lại một nhịp ngay sau khi mở, đúng cảnh thầy gặp.
+  //
+  // Sửa ở ĐÂY chứ không bắt từng nơi gọi phải nhớ bọc `useCallback`: bảy chỗ
+  // đang gọi, quên một chỗ là lỗi quay lại.
+  const dongRef = useRef(dong)
+  dongRef.current = dong
+
   useEffect(() => {
     // ĐẨY MỘT MỤC LỊCH SỬ để vuốt quay lại (và nút back) đóng lớp phủ thay vì
     // thoát khỏi app.
@@ -78,10 +94,10 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
     const quayLai = () => {
       // back đã tiêu mục của mình rồi, đừng gọi back thêm lần nữa lúc dọn.
       cuaMinh = false
-      dong()
+      dongRef.current()
     }
     const phim = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') dong()
+      if (e.key === 'Escape') dongRef.current()
     }
     window.addEventListener('popstate', quayLai)
     window.addEventListener('keydown', phim)
@@ -105,7 +121,9 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
         }
       }
     }
-  }, [dong])
+    // CỐ Ý rỗng: chạy một lần lúc mở, dọn một lần lúc đóng. Xem ghi chú trên.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return createPortal(
     <div className="lop-xem-phieu" role="dialog" aria-modal="true" aria-label={ten || 'Phiếu bài tập'} style={{ left: meTrai }}>
@@ -116,7 +134,7 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
       />
       {/* Nút thoát NHỎ, nổi góc trên phải. Không phải một dải chiếm hết bề
           ngang: dải đó chồng lên nhau khi mở phiếu từ trong báo cáo. */}
-      <button className="nut-dong-phieu" type="button" onClick={dong} aria-label="Đóng" title="Đóng (Esc, hoặc vuốt quay lại)">
+      <button className="nut-dong-phieu" type="button" onClick={() => dongRef.current()} aria-label="Đóng" title="Đóng (Esc, hoặc vuốt quay lại)">
         <X size={18} />
       </button>
     </div>,

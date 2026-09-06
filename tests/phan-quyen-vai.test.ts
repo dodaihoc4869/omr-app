@@ -37,8 +37,11 @@ function sheetGia(rows: unknown[][]) {
 }
 
 describe('Máy chủ — lệnh của thầy phải có mã bí mật', () => {
-  it('kiểm chứng 1: 4 lệnh đọc dữ liệu học sinh/phụ huynh nằm trong danh sách chỉ-thầy', () => {
-    expect(gs.GET_CHI_THAY.sort()).toEqual(['listAllFeedback', 'listMessages', 'listParents', 'listStudents'])
+  it('kiểm chứng 1: mọi lệnh GET đọc dữ liệu học sinh/phụ huynh nằm trong danh sách chỉ-thầy', () => {
+    // `demTinMoi` thêm 06/09 khi tối ưu vòng hỏi tin của bong bóng nổi. Nó chỉ
+    // trả về hai con số, nhưng "có mấy tin chưa đọc" vẫn là việc của thầy —
+    // vào danh sách này như mọi lệnh đọc khác.
+    expect(gs.GET_CHI_THAY.sort()).toEqual(['demTinMoi', 'listAllFeedback', 'listMessages', 'listParents', 'listStudents'])
   })
 
   it('cột Token và TrangThai khai đúng vị trí trong tiêu đề sheet', () => {

@@ -10,7 +10,7 @@
 // cứu, hai việc khác nhau, không gộp.
 import { useEffect, useRef, useState } from 'react'
 import { MessageCircle, X, RefreshCw, Sparkles } from 'lucide-react'
-import { listParentMessages, markMessagesRead, type ParentMessage } from '../lib/exam-api'
+import { demTinMoi, listParentMessages, markMessagesRead, type ParentMessage } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 import KhoiTroLy from './KhoiTroLy'
@@ -20,7 +20,11 @@ import KhoiTroLy from './KhoiTroLy'
 export const TEN_TRO_LY = 'Trợ lý em yêu'
 
 const POS_KEY = 'omr_msgfab_pos_v1'
-const POLL_MS = 20000
+// NHỊP HỎI TIN MỚI. 20 giây là 180 lượt gọi mỗi giờ, chạy suốt cả ngày kể cả
+// lúc app nằm trong túi — nay 60 giây, và CHỈ hỏi khi màn đang hiện (tối ưu
+// 06/09). Máy ẩn đi thì im hẳn; hiện lại là hỏi ngay một lần nên thầy không
+// phải chờ hết một nhịp mới thấy số đỏ.
+const POLL_MS = 60000
 const SIZE = 52
 
 function loadPos(): { x: number; y: number } {
@@ -87,9 +91,12 @@ export default function MessagesFab() {
   }, [])
 
   const pollUnread = async (url: string) => {
+    if (!secretRef.current.trim()) return
     try {
-      const rows = await listParentMessages(url.trim(), secretRef.current.trim())
-      setUnread(rows.filter((r) => !r.daDoc).length)
+      // `demTinMoi` đọc ĐÚNG một cột trên máy chủ và trả về một con số. Bản
+      // trước gọi `listParentMessages` — kéo cả hộp thư về chỉ để đếm.
+      const { soChuaDoc } = await demTinMoi(url.trim(), secretRef.current.trim())
+      setUnread(soChuaDoc)
     } catch {
       // Poll nền — lỗi thì bỏ qua, lần sau tự thử lại.
     }
@@ -97,9 +104,33 @@ export default function MessagesFab() {
 
   useEffect(() => {
     if (!scriptUrl.trim()) return
-    pollUnread(scriptUrl)
-    const t = setInterval(() => pollUnread(scriptUrl), POLL_MS)
-    return () => clearInterval(t)
+    let nhip = 0
+    const hoi = () => {
+      // Màn đang ẩn (app trong túi, thầy đang dạy) thì KHÔNG hỏi. Số đỏ lúc đó
+      // không ai nhìn, mà máy chủ vẫn phải trả lời.
+      if (document.visibilityState === 'visible') void pollUnread(scriptUrl)
+    }
+    const batNhip = () => {
+      if (nhip) window.clearInterval(nhip)
+      nhip = window.setInterval(hoi, POLL_MS)
+    }
+    const doiHien = () => {
+      if (document.visibilityState !== 'visible') {
+        window.clearInterval(nhip)
+        nhip = 0
+        return
+      }
+      // Hiện lại thì hỏi NGAY rồi mới đặt nhịp, khỏi chờ hết một vòng.
+      hoi()
+      batNhip()
+    }
+    hoi()
+    batNhip()
+    document.addEventListener('visibilitychange', doiHien)
+    return () => {
+      window.clearInterval(nhip)
+      document.removeEventListener('visibilitychange', doiHien)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scriptUrl])
 

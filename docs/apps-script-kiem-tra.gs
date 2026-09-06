@@ -210,7 +210,7 @@ const TOI_DA_CAU_HOI = 200
 
 // Lệnh GET chỉ dành cho thầy — phải kèm secret. Trước v12 các lệnh này mở cho
 // bất kỳ ai có link /exec (đọc được cả danh bạ phụ huynh) — đó là lỗ hổng v12 vá.
-const GET_CHI_THAY = ['listParents', 'listStudents', 'listAllFeedback', 'listMessages']
+const GET_CHI_THAY = ['listParents', 'listStudents', 'listAllFeedback', 'listMessages', 'demTinMoi']
 
 // ---------------------------------------------------------------------------
 // JSON LỚN (đề có ảnh cắt base64 ~ vài trăm KB) KHÔNG nhét vừa 1 ô Sheet
@@ -1469,6 +1469,22 @@ function doGet(e) {
         capNhatLuc: v[9],
       },
     })
+  }
+
+  // ĐẾM TIN CHƯA ĐỌC — lệnh rẻ nhất của cả hệ (tối ưu 06/09).
+  //
+  // Bong bóng nổi hỏi lại đều đặn chỉ để biết CÓ MẤY TIN CHƯA ĐỌC, mà trước
+  // đây nó gọi `listMessages` — máy chủ đọc CẢ SHEET, mười cột kể cả nội dung
+  // từng tin, rồi trả về hết, để máy thầy đếm một con số. Nay đọc ĐÚNG MỘT CỘT
+  // `DaDoc` và trả về đúng hai con số.
+  if (action === 'demTinMoi') {
+    const sh = getSheet_(SHEET_TINNHAN, ['Id', 'SDT', 'HoTenPhuHuynh', 'SBD', 'Lop', 'HoTenHocSinh', 'NoiDung', 'ThoiGian', 'DaDoc', 'NguoiGui'])
+    const n = sh.getLastRow()
+    if (n < 2) return jsonResponse_({ ok: true, soChuaDoc: 0, tong: 0 })
+    const cot = sh.getRange(2, 9, n - 1, 1).getValues()
+    let chuaDoc = 0
+    for (let i = 0; i < cot.length; i++) if (String(cot[i][0]) !== 'true') chuaDoc++
+    return jsonResponse_({ ok: true, soChuaDoc: chuaDoc, tong: cot.length })
   }
 
   if (action === 'listMessages') {
