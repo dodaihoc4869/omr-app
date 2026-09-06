@@ -214,7 +214,7 @@ export default function HocSinhScreen() {
 
                 <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />
                 <TheNoiDung>
-                  <NutBaiTapPdf sbd={hoSo.em.sbd} hoTen={hoSo.em.hoTen} lop={hoSo.em.lop} chuyenDe={hoSo.chuyenDe} showToast={showToast} />
+                  <NutBaiTapPdf sbd={hoSo.em.sbd} hoTen={hoSo.em.hoTen} lop={hoSo.em.lop} chuyenDe={hoSo.chuyenDe} chuyenDeCa={(hoSo.chuyenDeCaGanNhat ?? []).map((c) => c.ten)} showToast={showToast} />
                 </TheNoiDung>
 
                 {/* XOÁ EM KHỎI DANH SÁCH — CHỈ THẦY, và để tận đáy.

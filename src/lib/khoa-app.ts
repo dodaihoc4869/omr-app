@@ -194,10 +194,21 @@ export function sauKhiDung(banGhi: BanGhiKhoa): BanGhiKhoa {
   return { ...banGhi, soLanSai: 0, mocMoLai: 0 }
 }
 
-/** Ẩn app bao lâu thì hỏi lại. Nấc `moi_lan_mo` trả 0 nghĩa là: đóng hẳn app rồi
- * mở lại thì hỏi, còn chuyển sang app khác vài phút rồi quay lại thì KHÔNG. */
-export function phaiHoiLai(nac: NacHoiLai, msDaAn: number): boolean {
-  const phut = PHUT_CUA_NAC[nac] ?? 0
-  if (phut <= 0) return false
-  return msDaAn >= phut * 60000
+/** Ẩn app bao lâu thì hỏi lại. **LUÔN LUÔN `false` TỪ 06/09.**
+ *
+ * Thầy chốt hai lần, lần sau nguyên văn: "giữ nguyên mở khoá ứng dụng, chỉ khi
+ * nào tắt tab mở lại hoặc thoát app mở lại mới phải điền mật khẩu".
+ *
+ * Nghĩa là KHÔNG có mốc thời gian nào được khoá app lại. Thầy dạy liên tục,
+ * điện thoại và máy tính chuyển qua lại suốt buổi; app tự khoá giữa giờ là bắt
+ * thầy gõ mật khẩu trước mặt lớp.
+ *
+ * Lớp bảo vệ vẫn còn và vẫn đủ: khoá phiên sống trong bộ nhớ RIÊNG CỦA TAB
+ * cộng một khoá AES không trích xuất được trong IndexedDB (chi tiết ở
+ * `khoa-phien.ts`). Đóng tab hay thoát hẳn app là khoá phiên mất theo, và lần
+ * mở sau phải gõ mật khẩu. Đó chính là ranh giới thầy muốn.
+ *
+ * Giữ nguyên chữ ký hàm và kiểu `NacHoiLai` để dữ liệu cũ đọc vào không vỡ. */
+export function phaiHoiLai(_nac: NacHoiLai, _msDaAn: number): boolean {
+  return false
 }

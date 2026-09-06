@@ -32,6 +32,7 @@ export default function NutBaiTapPdf({
   sbd,
   hoTen,
   chuyenDe,
+  chuyenDeCa = [],
   showToast,
 }: {
   sbd: string
@@ -39,10 +40,21 @@ export default function NutBaiTapPdf({
   /** Giữ trong kiểu để nơi gọi không phải sửa; bìa phiếu không in lớp. */
   lop?: string
   chuyenDe: ChuyenDeEm[]
+  /** MỌI chuyên đề của ca em vừa thi — kể cả chuyên đề em làm đúng hết.
+   *
+   * Thầy chốt 06/09: "phải rút đúng chuyên đề đã chọn thi ca đó, không được
+   * rút ngoài". Rỗng = không biết ca nào (màn Học sinh mở từ hồ sơ chung) ⇒
+   * giữ nguyên luật cũ. */
+  chuyenDeCa?: string[]
   showToast: (chu: string, kieu?: 'success' | 'error' | 'warn') => void
 }) {
   const [soCau, setSoCau] = useState(SO_CAU_PDF_MAC_DINH)
   const [dang, setDang] = useState<LocDang>(LOC_DANG_MAC_DINH)
+  // Mặc định BÓ trong ca. Thầy vẫn nới ra được khi muốn ôn rộng, nhưng phải
+  // chủ động bấm — im lặng rút ngoài ca là thứ thầy vừa bắt được.
+  const [boTrongCa, setBoTrongCa] = useState(true)
+  const coPhamViCa = chuyenDeCa.length > 0
+  const phamVi = coPhamViCa && boTrongCa ? chuyenDeCa : undefined
   const [daRa, setDaRa] = useState(0)
   const [ketQua, setKetQua] = useState<{ soCau: number; lapLai: number; thieu: number; ten: string } | null>(null)
 
@@ -82,7 +94,7 @@ export default function NutBaiTapPdf({
       const daInRa = await docQidRaPhieu(sbd)
       const tranh = [...new Set([...daNop, ...daInRa])]
 
-      const kq = chonCauLuyen(nguon, { chuyenDe: dungDe, dang, qidDaLam: tranh, soCau })
+      const kq = chonCauLuyen(nguon, { chuyenDe: dungDe, chuyenDeCa: phamVi, dang, qidDaLam: tranh, soCau })
       if (kq.cau.length === 0) {
         throw new Error(
           dungDe.length > 0
@@ -118,6 +130,24 @@ export default function NutBaiTapPdf({
 
   return (
     <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
+      {coPhamViCa && (
+        <button
+          type="button"
+          role="switch"
+          aria-checked={boTrongCa}
+          onClick={() => setBoTrongCa((v) => !v)}
+          className="tap-target flex items-center justify-between w-full"
+          style={{ minHeight: 44, padding: '0 var(--k3)', borderRadius: 'var(--bo-1)', border: '1px solid var(--vien)', background: 'none', color: 'var(--muc)', fontFamily: 'var(--sans)', textAlign: 'left' }}
+        >
+          <span style={{ fontSize: 'var(--cx-1)' }}>
+            Chỉ rút trong {chuyenDeCa.length} chuyên đề của ca này
+          </span>
+          <span className="font-bold" style={{ fontSize: 'var(--cx-0)', color: boTrongCa ? 'var(--phu-dam)' : 'var(--nhat)' }}>
+            {boTrongCa ? 'ĐANG BẬT' : 'ĐANG TẮT'}
+          </span>
+        </button>
+      )}
+
       {/* DẠNG CÂU — thầy chốt 06/09, cùng ba lựa chọn với màn Rút đề. */}
       <div>
         <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Dạng câu</div>

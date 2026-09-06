@@ -5,7 +5,7 @@ import Toast from './components/Toast'
 import MessagesFab from './components/MessagesFab'
 import { useAppStore } from './store/appStore'
 import { loadClassList } from './lib/classlist-db'
-import { datMaBiMatPhien, docGiuPhien, loadKhoaApp, loadTeacherSecret } from './lib/exam-db'
+import { datMaBiMatPhien, loadKhoaApp, loadTeacherSecret } from './lib/exam-db'
 import { catPhien, donPhien, khoiPhucPhien } from './lib/khoa-phien'
 import { datDangMoKhoa } from './lib/cap-nhat-app'
 import { phaiHoiLai, type BanGhiKhoa } from './lib/khoa-app'
@@ -196,7 +196,9 @@ function App() {
             // CẤT PHIÊN cho tab này (mục 4A). Chạy nền, không chặn thầy vào
             // app: cất hỏng thì chỉ mất tiện lợi, không mất tính năng.
             void (async () => {
-              if (await docGiuPhien()) await catPhien(ma)
+              // CẤT PHIÊN LUÔN, không hỏi ô gạt nữa (thầy chốt 06/09): app
+              // phải giữ mở khoá tới khi đóng tab hay thoát hẳn.
+              await catPhien(ma)
             })()
           }}
         />

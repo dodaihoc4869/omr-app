@@ -152,7 +152,7 @@ describe('ba lựa chọn có mặt trên cả ba màn', () => {
     // `NutBaiTapPdf`, dùng ở HocSinhScreen và ExamMonitorScreen.
     const man = doc('src/components/NutBaiTapPdf.tsx')
     expect(man).toContain('MOI_LOC_DANG.map')
-    expect(man).toContain('chonCauLuyen(nguon, { chuyenDe: dungDe, dang,')
+    expect(man).toContain('chonCauLuyen(nguon, { chuyenDe: dungDe, chuyenDeCa: phamVi, dang,')
   })
 
   it('11b. NutBaiTapPdf phải còn được dùng thật — kẻo lại sửa nhầm code chết', () => {

@@ -278,11 +278,13 @@ describe('nấc hỏi lại', () => {
     expect(phaiHoiLai('moi_lan_mo', 99 * 60000)).toBe(false)
   })
 
-  it('hai nấc kia hỏi lại đúng mốc', () => {
-    expect(phaiHoiLai('sau_15_phut', 14 * 60000)).toBe(false)
-    expect(phaiHoiLai('sau_15_phut', 15 * 60000)).toBe(true)
-    expect(phaiHoiLai('sau_60_phut', 59 * 60000)).toBe(false)
-    expect(phaiHoiLai('sau_60_phut', 60 * 60000)).toBe(true)
+  // ĐỔI 06/09 theo lệnh thầy: "giữ nguyên mở khoá ứng dụng, chỉ khi nào tắt
+  // tab mở lại hoặc thoát app mở lại mới phải điền mật khẩu". Hai nấc thời
+  // gian không còn khoá app lại nữa; chi tiết ở `tests/giu-mo-khoa-0609.ts`.
+  it('hai nấc thời gian KHÔNG còn khoá app lại giữa buổi', () => {
+    expect(phaiHoiLai('sau_15_phut', 15 * 60000)).toBe(false)
+    expect(phaiHoiLai('sau_60_phut', 60 * 60000)).toBe(false)
+    expect(phaiHoiLai('sau_60_phut', 24 * 3600000)).toBe(false)
   })
 })
 

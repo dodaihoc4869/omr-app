@@ -148,13 +148,16 @@ describe('Phép 8 — khoá lại là phải DỌN, không chỉ đổi màn hì
     expect(hieuUng).not.toContain('datMaBiMatPhien(null)')
   })
 
-  it('App.tsx: mở khoá xong có cất phiên, và tôn trọng ô gạt', async () => {
+  it('App.tsx: mở khoá xong CẤT PHIÊN KHÔNG ĐIỀU KIỆN', async () => {
+    // Ô gạt "giữ đăng nhập" đã bỏ khỏi đường này 06/09: thầy lỡ tắt nó là mỗi
+    // lần tải lại trang phải gõ mật khẩu mà không hiểu vì sao. Lệnh của thầy
+    // là giữ mở khoá tới khi đóng tab hay thoát app, không có ngoại lệ.
     const { readFileSync } = await import('node:fs')
     const { resolve } = await import('node:path')
     const app = readFileSync(resolve(__dirname, '../src/App.tsx'), 'utf8')
     expect(app).toContain('khoiPhucPhien()')
-    expect(app).toContain('catPhien(ma)')
-    expect(app).toContain('docGiuPhien()')
+    expect(app).toContain('await catPhien(ma)')
+    expect(app).not.toContain('if (await docGiuPhien())')
   })
 })
 

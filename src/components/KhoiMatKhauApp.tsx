@@ -87,7 +87,7 @@ export default function KhoiMatKhauApp({ showToast }: { showToast: (chu: string,
       await donPhien()
       if (maNay) {
         datMaBiMatPhien(maNay)
-        if (await docGiuPhien()) await catPhien(maNay)
+        await catPhien(maNay)
       }
       dong()
       showToast('Đã đổi mật khẩu. Mật khẩu cũ không dùng được nữa.', 'success')
