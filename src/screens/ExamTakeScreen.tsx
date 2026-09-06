@@ -10,7 +10,7 @@ import { buildTeacherSourceFromKhoDe, parseKhoDeJson } from '../lib/exam-kho-de-
 import PhieuScreen from './PhieuScreen'
 import { gioMayChu, gioNgan } from '../lib/gio-may-chu'
 import { layIdThietBi } from '../lib/thiet-bi'
-import { MS_XAC_NHAN_BLUR, chuanHoaNguong, khoaViRoiLau, laMayCamUng, loiCanhBao, mucKhiRoiMan, soLanTinhTu, tinhLaRoiMan, type NguongGianLan } from '../lib/chong-gian-lan'
+import { MS_XAC_NHAN_AN, MS_XAC_NHAN_BLUR, chuanHoaNguong, khoaViRoiLau, laMayCamUng, loiCanhBao, mucKhiRoiMan, soLanTinhTu, tinhLaRoiMan, type NguongGianLan } from '../lib/chong-gian-lan'
 import { MS_AN_HAN_VAO_BAI, MS_TRUNG_KHOP, MS_VE_SOM, MS_XAC_NHAN_CO_MAN, MS_XAC_NHAN_CUA_SO_NOI, type PhieuKenh } from '../lib/do-dau-vet'
 import {
   LOI_KHOA,
@@ -19,17 +19,11 @@ import {
   MS_LECH_DONG_HO_CHOT,
   MS_RAF_NGHI_CHOT,
   TI_LE_CO_MAN_CHOT,
-  chuNhomPhieu,
   coKhoa,
-  duKhoaMotMinh,
+  khoaDuocViCuaSoNoi,
   laCuaSoNoi,
-  LOI_CHE_BAT_DONG,
-  MS_BAT_DONG_CHE,
-  MS_NHIP_SOI_BAT_DONG,
   SO_NGON_CHUP,
-  MS_KHONG_CHAM_QUANH_PHIEU,
   MS_NHIP_SOI_TIEU_DIEM,
-  nhomDuKhoa,
   xetCoMan,
   type LyDoKhoaMoi,
   type TrangThaiCoMan,
@@ -923,13 +917,13 @@ export default function ExamTakeScreen() {
       baoThayGianLan(next)
       doSubmit(next)
     }
-    const logEvent = (type: 'hidden' | 'visible' | 'blur' | 'focus') => {
+    const logEvent = (type: 'hidden' | 'visible' | 'blur' | 'focus', mocBatDau?: number) => {
       const cur = attemptRef.current
       if (!cur || cur.submitted) return
       const events = [...cur.integrity.events, { type, at: new Date().toISOString() }].slice(-200)
       if (type === 'hidden' || type === 'blur') {
         if (hiddenSinceRef.current !== null) return // đã đang ẩn (blur rồi hidden) — tính 1 lần
-        hiddenSinceRef.current = Date.now()
+        hiddenSinceRef.current = mocBatDau ?? Date.now()
         const leaveCount = cur.integrity.leaveCount + 1
         leaveCountRef.current = leaveCount
         const next: ExamAttempt = { ...cur, integrity: { ...cur.integrity, leaveCount, events } }
@@ -972,7 +966,31 @@ export default function ExamTakeScreen() {
         pushStatusNow(next, true)
       }
     }
-    const onVis = () => logEvent(document.hidden ? 'hidden' : 'visible')
+    // ẨN NGẮN KHÔNG PHẢI LÀ RỜI MÀN (thầy báo 06/09: iPhone vẫn khoá oan).
+    // Kéo trung tâm điều khiển, thanh địa chỉ trượt ra, chuông báo hiện rồi
+    // tắt — iOS đều bật `document.hidden` trong tích tắc. Chỉ ghi sổ khi màn
+    // hình ẩn QUÁ `MS_XAC_NHAN_AN`; quay lại trước đó coi như chưa từng rời.
+    let henAn: ReturnType<typeof setTimeout> | null = null
+    const onVis = () => {
+      if (document.hidden) {
+        if (henAn) clearTimeout(henAn)
+        henAn = setTimeout(() => {
+          henAn = null
+          // Còn ẩn thật thì mới tính, và tính LÙI về đúng lúc bắt đầu ẩn để
+          // đồng hồ "rời quá lâu" không bị hụt mất nhịp chờ này.
+          if (document.hidden) logEvent('hidden', Date.now() - MS_XAC_NHAN_AN)
+        }, MS_XAC_NHAN_AN)
+        return
+      }
+      if (henAn) {
+        // Về trước khi kịp xác nhận ⇒ chưa từng ghi 'hidden', nên cũng không
+        // được ghi 'visible': ghi vào là đẻ một cặp rời–về giả trong nhật ký.
+        clearTimeout(henAn)
+        henAn = null
+        return
+      }
+      logEvent('visible')
+    }
     // BLUR KHÔNG ĐÁNG TIN (thầy báo 06/09: iPhone khoá oan). Trên máy cảm ứng
     // bỏ hẳn; trên máy có chuột phải chờ rồi đọc lại `hasFocus()` mới tính.
     // Xem khối luật ở đầu `chong-gian-lan.ts`.
@@ -998,7 +1016,14 @@ export default function ExamTakeScreen() {
     }
     // Thoát toàn màn hình (Back trên Android, vuốt xuống…) khi KHÔNG ở chế độ
     // standalone → tính là rời màn hình (quay lại toàn màn hình = quay lại).
-    const onFs = () => logEvent(dangToanManHinh() ? 'focus' : 'hidden')
+    //
+    // KHÔNG áp cho máy cảm ứng: iOS không cho phần tử vào toàn màn hình thật,
+    // nên `dangToanManHinh()` luôn false và mỗi lần sự kiện bắn là một lần
+    // "rời màn" bịa ra. Trên iPhone `hidden` đã đủ bắt em thoát app.
+    const onFs = () => {
+      if (camUng) return
+      logEvent(dangToanManHinh() ? 'focus' : 'hidden')
+    }
     document.addEventListener('visibilitychange', onVis)
     window.addEventListener('blur', onBlur)
     window.addEventListener('focus', onFocus)
@@ -1011,6 +1036,7 @@ export default function ExamTakeScreen() {
       document.removeEventListener('fullscreenchange', onFs)
       document.removeEventListener('webkitfullscreenchange', onFs)
       if (henBlur) clearTimeout(henBlur)
+      if (henAn) clearTimeout(henAn)
       if (roiLauTimerRef.current) clearTimeout(roiLauTimerRef.current)
       if (canhBaoTimerRef.current) clearTimeout(canhBaoTimerRef.current)
     }
@@ -1031,6 +1057,9 @@ export default function ExamTakeScreen() {
     // Mức ngặt của ca. Ca mở trước bản này chưa có cột MucNgat trên máy chủ ⇒
     // rơi về Bình thường, đúng hành vi cũ, không đổi điểm ca đã gửi phụ huynh.
     const muc = MUC_NGAT_MAC_DINH
+    // Máy cảm ứng (điện thoại, máy tính bảng) không có tín hiệu tiêu điểm và
+    // toàn màn hình đáng tin — xem `khoaDuocViCuaSoNoi` và `onFs`.
+    const camUngMay = laMayCamUng()
     const vaoLuc = performance.now()
     const phieu: PhieuKenh[] = []
     let coMan: TrangThaiCoMan = { moc: window.innerWidth * window.innerHeight, nhoTu: null }
@@ -1062,98 +1091,42 @@ export default function ExamTakeScreen() {
       void doSubmit(next)
     }
 
-    /** Một phiếu vừa tới. Hai đường dẫn tới khoá:
+    /** Một phiếu vừa tới. **KHÔNG KHOÁ AI** — chỉ giữ lại trong cửa sổ trượt để
+     * ghi bối cảnh vào nhật ký của thầy.
      *
-     *   1. ĐỦ HAI HỌ trùng trong 300 ms — hai kênh cùng đo một hiện tượng chỉ
-     *      tính một phiếu, xem đầu `man-thi-sach.ts`.
-     *   2. MỘT phiếu họ luồng-chính mà KHÔNG AI CHẠM MÀN — số đo trên máy thầy
-     *      05/09 cho thấy chụp màn hình chỉ làm kênh 6 báo, nên nếu chỉ chờ đủ
-     *      hai họ thì không bao giờ khoá. Điều kiện "không chạm" là thứ tách
-     *      được chụp màn hình khỏi cuộn và gõ.
+     * Bản trước có hai đường dẫn tới khoá từ đây: đủ hai họ trùng khớp, và một
+     * phiếu họ luồng-chính khi không ai chạm màn. Cả hai đã gỡ 06/09 — lý do
+     * đầy đủ nằm ở khối "LUỒNG CHÍNH NGHẼN KHÔNG CÒN ĐƯỢC KHOÁ" trong
+     * `man-thi-sach.ts`. Tóm tắt: đó là suy đoán từ độ nghẽn của máy, mà máy
+     * nghẽn vì trăm thứ không phải gian lận, và điều kiện "không chạm màn" bắt
+     * đúng vào em đang ngồi đọc đề.
      *
-     * Đường 2 đợi thêm 250 ms rồi mới chốt: ngón tay có thể chạm màn NGAY SAU
-     * nhát nghẽn (em vừa cuộn xong), và lúc phiếu tới thì chưa biết điều đó. */
-    const xetPhieu = (p: PhieuKenh, coChamMan: boolean) => {
+     * `phieuDuocKhoa` là cửa duy nhất còn lại: chỉ họ `do_truc_tiep`. Kênh 5, 6,
+     * 8 rơi vào đây thì dừng ở dòng ghi sổ. */
+    const xetPhieu = (p: PhieuKenh) => {
       phieu.push(p)
       while (phieu.length && phieu[0].luc < p.luc - MS_TRUNG_KHOP * 2) phieu.shift()
-      if (conAnHan()) return
-
-      const nhom = nhomDuKhoa(phieu)
-      const cuoi = nhom[nhom.length - 1]
-      if (cuoi && coKhoa(muc, 'dau_vet_chup')) return khoaVi('dau_vet_chup', chuNhomPhieu(cuoi))
-
-      const hoLuongChinh = p.kenh === 'nhip_ve' || p.kenh === 'lech_dong_ho'
-      if (!hoLuongChinh || coChamMan) return
-      if (p.luc - mocKhoaMotMinh < MS_KHONG_CHAM_QUANH_PHIEU * 5) return // không chốt dồn dập
-      window.setTimeout(() => {
-        if (daKhoa) return
-        const chamSau = performance.now() - mocChamManCuoi < MS_KHONG_CHAM_QUANH_PHIEU
-        const du = duKhoaMotMinh({
-          hoLuongChinh: true,
-          coChamMan: chamSau,
-          dangLamBaiBinhThuong: document.hasFocus() && document.visibilityState === 'visible',
-        })
-        if (!du || !coKhoa(muc, 'dau_vet_chup')) return
-        mocKhoaMotMinh = performance.now()
-        khoaVi('dau_vet_chup', `${p.kenh === 'lech_dong_ho' ? 'kênh 6' : 'kênh 5'}, không chạm màn`)
-      }, 250)
     }
-
-    /** Mốc chạm màn gần nhất — dùng để biết ngón tay có chạm NGAY SAU nhát
-     * nghẽn hay không, và để đếm giờ bất động. */
-    let mocChamManCuoi = performance.now()
-    let mocKhoaMotMinh = -1e9
-
-    let dangCheBatDong = false
 
     // ---- CÁCH 1: ĐẾM SỐ NGÓN CHẠM.
     // Chụp màn hình bằng cử chỉ trên Android là vuốt BA NGÓN, và trang nhận đủ
     // ba điểm chạm. Em làm bài chạm một ngón để chọn đáp án, hai ngón để phóng
     // ảnh — không bao giờ ba. Tín hiệu trực tiếp, không ngưỡng nào phải đo.
+    //
+    // Sau 06/09 đây là ĐƯỜNG DUY NHẤT còn khoá được vì dấu vết chụp trên điện
+    // thoại (máy tính còn kênh 7 phím chụp). Mọi đường suy đoán đã gỡ.
     const demNgon = (e: Event) => {
-      ghiChamMan()
       const t = (e as TouchEvent).touches
       if (!t || t.length < SO_NGON_CHUP) return
       if (daKhoa || conAnHan()) return
       if (coKhoa(muc, 'dau_vet_chup')) khoaVi('dau_vet_chup', `${t.length} ngón chạm cùng lúc`)
     }
-    const ghiChamMan = () => {
-      mocChamManCuoi = performance.now()
-      // Bỏ che NGAY khi có chạm, không đợi nhịp một giây: em chạm mà đề còn ẩn
-      // thêm một nhịp nữa thì bực.
-      if (dangCheBatDong) {
-        dangCheBatDong = false
-        boChe()
-      }
-    }
     document.addEventListener('touchstart', demNgon, { passive: true })
     document.addEventListener('touchmove', demNgon, { passive: true })
-    document.addEventListener('pointerdown', ghiChamMan, { passive: true })
-    document.addEventListener('scroll', ghiChamMan, { passive: true, capture: true })
-    document.addEventListener('keydown', ghiChamMan)
 
-    // ---- CÁCH 2: CHE ĐỀ KHI BẤT ĐỘNG.
-    // Không nhìn thấy cửa sổ nổi, nhưng nhìn thấy hậu quả của nó: suốt lúc em
-    // thao tác với Gemini thì trang không nhận cú chạm nào. Không khoá, không
-    // đếm — chỉ làm cái cửa sổ nổi kia thành vô dụng.
-    //
-    // Soi 250 ms một lần chứ không 1 giây: mốc 3 giây mà soi thưa thì hoá 4
-    // giây, đủ để đọc xong một đáp án.
-    //
-    // Ca có GIỮ ĐỂ ĐỌC thì cách này NGHỈ: cơ chế kia đã tắt đề chính xác hơn
-    // (nó biết ngón tay còn trên màn hay không), hai tấm che chồng nhau chỉ làm
-    // em rối. Ca cũ và bài tập về nhà vẫn dùng cách này.
-    const nhipBatDong = window.setInterval(() => {
-      if (daKhoa || attemptRef.current?.giuDeDoc === true) return
-      const im = performance.now() - mocChamManCuoi
-      if (im >= MS_BAT_DONG_CHE && !dangCheBatDong) {
-        dangCheBatDong = true
-        che(LOI_CHE_BAT_DONG)
-      } else if (im < MS_BAT_DONG_CHE && dangCheBatDong) {
-        dangCheBatDong = false
-        boChe()
-      }
-    }, MS_NHIP_SOI_BAT_DONG)
+    // ---- CÁCH 2 (CHE ĐỀ KHI BẤT ĐỘNG) ĐÃ GỠ 06/09 theo lệnh của thầy.
+    // Video ca 06/09: em Tuân bị che đề ba lần trong 23 giây chỉ vì đang đọc.
+    // Đề nay hiện suốt giờ làm bài. Lý do đầy đủ ở `man-thi-sach.ts`.
 
     // NHỊP SOI TIÊU ĐIỂM — đây là chỗ bắt CỬA SỔ NỔI, kiểu gian lận thầy quay
     // video ngày 05/09: em mở cửa sổ nổi Gemini đè lên bài rồi đưa ảnh chụp vào
@@ -1179,6 +1152,7 @@ export default function ExamTakeScreen() {
       if (nay - mocMatTieuDiem < MS_XAC_NHAN_CUA_SO_NOI) return
       soLanNoi += 1
       mocMatTieuDiem = null
+      if (!khoaDuocViCuaSoNoi(camUngMay)) return // che thì có, khoá thì không
       if (!conAnHan() && coKhoa(muc, 'cua_so_noi', soLanNoi)) khoaVi('cua_so_noi', 'nhịp soi tiêu điểm')
     }, MS_NHIP_SOI_TIEU_DIEM)
 
@@ -1187,7 +1161,13 @@ export default function ExamTakeScreen() {
         if (daKhoa) return
 
         // --- KÊNH 3: thoát toàn màn hình. Số đo trực tiếp, khoá một mình.
+        //
+        // KHÔNG áp cho máy cảm ứng: iOS không cho phần tử vào toàn màn hình
+        // thật, nên `document.fullscreenElement` luôn null và mỗi lần sự kiện
+        // bắn là một lần "thoát toàn màn" bịa ra. Cùng luật với `onFs` ở effect
+        // đếm rời màn phía trên.
         if (p.kenh === 'toan_man') {
+          if (camUngMay) return
           if (document.fullscreenElement) return boChe()
           che(LOI_KHOA.thoat_toan_man)
           if (!conAnHan() && coKhoa(muc, 'thoat_toan_man')) khoaVi('thoat_toan_man', 'kênh 3')
@@ -1214,7 +1194,7 @@ export default function ExamTakeScreen() {
         if (p.kenh === 'an_trang' || p.kenh === 'tieu_diem') {
           const veLai = (p.kenh === 'an_trang' && bc.hienTrang) || (p.kenh === 'tieu_diem' && bc.coTieuDiem)
           if (veLai) {
-            if (raTu !== null && p.luc - raTu < MS_VE_SOM) xetPhieu(p, bc.dangChamMan) // ra rồi về ngay = một dấu vết chụp
+            if (raTu !== null && p.luc - raTu < MS_VE_SOM) xetPhieu(p) // ra rồi về ngay: ghi sổ
             raTu = null
             if (henNoi) window.clearTimeout(henNoi)
             boChe()
@@ -1234,27 +1214,29 @@ export default function ExamTakeScreen() {
               const noi = laCuaSoNoi({ coTieuDiem: document.hasFocus(), manConHien: document.visibilityState === 'visible' })
               if (!noi) return // trang đã khuất hẳn ⇒ rời app ⇒ luật đếm cũ lo
               soLanNoi += 1
+              if (!khoaDuocViCuaSoNoi(camUngMay)) return // che thì có, khoá thì không
               if (!conAnHan() && coKhoa(muc, 'cua_so_noi', soLanNoi)) khoaVi('cua_so_noi', 'kênh 2')
             }, MS_XAC_NHAN_CUA_SO_NOI)
           }
           return
         }
 
-        // --- KÊNH 5, 6, 8: dấu vết chụp, chỉ góp phiếu. Ngưỡng lọc ở đây, vì
-        // bộ thu dùng ngưỡng QUAN SÁT rộng hơn để trang /do nhìn thấy nhát yếu.
+        // --- KÊNH 5, 6, 8: CHỈ GHI SỔ, không khoá ai (gỡ 06/09). Ngưỡng lọc vẫn
+        // giữ ở đây để nhật ký không ngập nhát yếu — trang /do dùng ngưỡng quan
+        // sát rộng hơn.
         if (p.kenh === 'nhip_ve') {
           const gap = Number(/(\d+)/.exec(p.chiTiet)?.[1] ?? 0)
-          if (gap >= MS_RAF_NGHI_CHOT) xetPhieu(p, bc.dangChamMan)
+          if (gap >= MS_RAF_NGHI_CHOT) xetPhieu(p)
           return
         }
         if (p.kenh === 'lech_dong_ho') {
           const lech = Math.abs(Number(/(-?\d+)/.exec(p.chiTiet)?.[1] ?? 0))
-          if (lech >= MS_LECH_DONG_HO_CHOT) xetPhieu(p, bc.dangChamMan)
+          if (lech >= MS_LECH_DONG_HO_CHOT) xetPhieu(p)
           return
         }
         if (p.kenh === 'xung_chuyen_dong') {
           const xoan = Number(/([\d.]+)/.exec(p.chiTiet)?.[1] ?? 0)
-          if (xoan >= NGUONG_XUNG_CHOT.xoan) xetPhieu(p, bc.dangChamMan)
+          if (xoan >= NGUONG_XUNG_CHOT.xoan) xetPhieu(p)
         }
       },
     })
@@ -1263,10 +1245,6 @@ export default function ExamTakeScreen() {
       go()
       document.removeEventListener('touchstart', demNgon)
       document.removeEventListener('touchmove', demNgon)
-      document.removeEventListener('pointerdown', ghiChamMan)
-      document.removeEventListener('scroll', ghiChamMan, true)
-      document.removeEventListener('keydown', ghiChamMan)
-      window.clearInterval(nhipBatDong)
       window.clearInterval(nhipTieuDiem)
       if (henNoi) window.clearTimeout(henNoi)
       setLyDoChe(null)

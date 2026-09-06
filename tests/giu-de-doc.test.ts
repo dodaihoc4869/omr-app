@@ -50,68 +50,53 @@ describe('GIỮ ĐỂ ĐỌC — máy trạng thái', () => {
     expect(coMat(tt, 1000 + MS_AN_HAN_NHA_TAY, BC)).toBe(false)
   })
 
-  it('3. ngón kê im quá ngưỡng bất động → hết coMat', () => {
-    // ĐÂY LÀ LỖ HỔNG "kê một ngón, tay kia mở Gemini".
+  // BỎ NGƯỠNG BẤT ĐỘNG — thầy chốt 06/09.
+  //
+  // Bản 05/09 có một dòng đứng trên tất cả: im quá `MS_BAT_DONG_CHE` là che,
+  // kể cả khi ngón tay VẪN ĐANG trên màn. Em giữ tay đọc một câu dài quá sáu
+  // giây là đề tắt trước mắt. Thầy yêu cầu bỏ.
+  //
+  // Đánh đổi nói thẳng: mẹo "kê một ngón im rồi soi máy khác" không còn bị
+  // chặn bằng cách này. Cái chặn đó phải trả giá bằng việc tắt đề của mọi em
+  // đọc chậm, nên không đáng.
+
+  it('3. GIỮ TAY YÊN BAO LÂU CŨNG ĐƯỢC — đề không tự tắt nữa', () => {
     const tt = moTrangThaiGiu(0)
     chamXuong(tt, 1, 100, 100, 0)
-    expect(coMat(tt, MS_BAT_DONG_CHE - 1, BC)).toBe(true)
-    expect(coMat(tt, MS_BAT_DONG_CHE, BC)).toBe(false)
+    expect(coMat(tt, MS_BAT_DONG_CHE, BC)).toBe(true)
+    expect(coMat(tt, MS_BAT_DONG_CHE * 10, BC)).toBe(true)
+    expect(coMat(tt, 999999, BC)).toBe(true)
   })
 
-  it('3b. ngón kê im KHÔNG được cấp thêm ân hạn — che đúng mốc ngưỡng cứng', () => {
+  it('3b. ngón kê im rồi NHẢ TAY thì mới tính ân hạn như thường', () => {
     const tt = moTrangThaiGiu(0)
     chamXuong(tt, 1, 100, 100, 0)
-    expect(coMat(tt, MS_BAT_DONG_CHE + 10, BC)).toBe(false)
+    chamLen(tt, 1, 60000) // kê im một phút rồi mới nhả
+    expect(coMat(tt, 60000 + MS_AN_HAN_NHA_TAY - 1, BC)).toBe(true)
+    expect(coMat(tt, 60000 + MS_AN_HAN_NHA_TAY, BC)).toBe(false)
   })
 
-  it('4. di chuyển quá 8 px trước khi hết ngưỡng → mốc bất động đếm lại', () => {
+  it('4. di chuyển ngón vẫn ghi mốc, nhưng không còn quyết định che nữa', () => {
     const tt = moTrangThaiGiu(0)
     chamXuong(tt, 1, 100, 100, 0)
     chamDiChuyen(tt, 1, 100 + PX_COI_LA_DI_CHUYEN, 100, 5000)
-    expect(coMat(tt, MS_BAT_DONG_CHE + 1000, BC)).toBe(true)
-    expect(coMat(tt, 5000 + MS_BAT_DONG_CHE, BC)).toBe(false)
+    expect(coMat(tt, 5000 + MS_BAT_DONG_CHE, BC)).toBe(true)
   })
 
-  it('5. rung tay dưới 8 px KHÔNG tính là di chuyển', () => {
+  it('5. rung tay nhỏ cũng không làm đề tắt', () => {
     const tt = moTrangThaiGiu(0)
     chamXuong(tt, 1, 100, 100, 0)
     for (let t = 500; t < MS_BAT_DONG_CHE; t += 500) {
-      // rê thật chậm quanh neo: mỗi nhát dưới ngưỡng, tổng cộng vẫn dưới ngưỡng
       chamDiChuyen(tt, 1, 100 + (t % 1000 === 0 ? 3 : -3), 100 + 2, t)
     }
-    expect(coMat(tt, MS_BAT_DONG_CHE, BC)).toBe(false)
+    expect(coMat(tt, MS_BAT_DONG_CHE, BC)).toBe(true)
   })
 
-  it('5b. rê chậm tích luỹ vượt 8 px so với NEO thì vẫn tính — không lách được', () => {
-    const tt = moTrangThaiGiu(0)
-    chamXuong(tt, 1, 100, 100, 0)
-    // mỗi nhát 3 px nhưng cùng một hướng: đến nhát thứ ba là rời neo 9 px
-    chamDiChuyen(tt, 1, 103, 100, 1000)
-    chamDiChuyen(tt, 1, 106, 100, 2000)
-    chamDiChuyen(tt, 1, 109, 100, 3000)
-    expect(coMat(tt, 3000 + MS_BAT_DONG_CHE - 1, BC)).toBe(true)
-  })
-
-  it('6. CON TRỎ NHẤP NHÁY KHÔNG CÒN LÀ MIỄN TRỪ VÔ ĐIỀU KIỆN (thầy báo 05/09)', () => {
-    // Lỗ hổng bản trước: em chạm ô nhập Phần III một cái, caret nhấp nháy ở đó,
-    // và đề KHÔNG BAO GIỜ ẩn nữa. Một cú chạm vô hiệu hoá cả cơ chế.
+  it('6. CARET TRONG Ô NHẬP: em tính toán rồi gõ đáp án, đề luôn hiện', () => {
     const tt = moTrangThaiGiu(0)
     const goO = { ...BC, dangGoO: true }
-    // dưới ngưỡng cứng vẫn hiện — em đang tính toán rồi gõ đáp án
-    expect(coMat(tt, MS_BAT_DONG_CHE - 1, goO)).toBe(true)
-    // quá ngưỡng cứng thì CHE, dù caret vẫn ở trong ô
-    expect(coMat(tt, MS_BAT_DONG_CHE, goO)).toBe(false)
-    expect(coMat(tt, 999999, goO)).toBe(false)
-  })
-
-  it('6b. gõ phím đẩy mốc lên — em gõ thật thì không bao giờ bị che', () => {
-    const tt = moTrangThaiGiu(0)
-    const goO = { ...BC, dangGoO: true }
-    for (let t = 1000; t <= 30000; t += 1000) {
-      ghiHoatDong(tt, t)
-      expect(coMat(tt, t + MS_BAT_DONG_CHE - 1, goO)).toBe(true)
-    }
-    expect(coMat(tt, 30000 + MS_BAT_DONG_CHE, goO)).toBe(false)
+    expect(coMat(tt, MS_BAT_DONG_CHE, goO)).toBe(true)
+    expect(coMat(tt, 999999, goO)).toBe(true)
   })
 
   it('7. có scroll trong ân hạn → ân hạn đếm lại từ lần cuộn cuối', () => {
@@ -137,31 +122,34 @@ describe('GIỮ ĐỂ ĐỌC — máy trạng thái', () => {
     expect(batCuaCa({ giuDeDoc: true })).toBe(true)
   })
 
-  it('nhiều ngón: chỉ cần một ngón còn động là đề còn hiện', () => {
+  it('nhiều ngón: còn ngón trên màn là đề còn hiện', () => {
     const tt = moTrangThaiGiu(0)
     chamXuong(tt, 1, 10, 10, 0) // ngón kê, nằm im
     chamXuong(tt, 2, 200, 200, 0)
     chamDiChuyen(tt, 2, 260, 260, 5000) // ngón thật vẫn cuộn
     expect(coMat(tt, MS_BAT_DONG_CHE + 500, BC)).toBe(true)
     chamLen(tt, 2, 5500)
-    // ngón 1 VẪN còn trên màn ⇒ chưa phải ca "nhả hết tay", không dùng ân hạn 3
-    // giây; nó chỉ bị che khi cả màn im quá ngưỡng cứng.
+    // ngón 1 VẪN còn trên màn ⇒ chưa phải ca "nhả hết tay", nên đề còn hiện
+    // bao lâu cũng được (ngưỡng bất động đã bỏ 06/09).
     expect(coMat(tt, 5500 + MS_AN_HAN_NHA_TAY, BC)).toBe(true)
-    expect(coMat(tt, 5500 + MS_BAT_DONG_CHE, BC)).toBe(false)
+    expect(coMat(tt, 5500 + MS_BAT_DONG_CHE * 10, BC)).toBe(true)
   })
 
-  it('nhả một ngón trong khi ngón kia còn chạm thì không cho ân hạn oan', () => {
+  it('NHẢ HẾT TAY mới tính ân hạn — còn một ngón thì chưa', () => {
     const tt = moTrangThaiGiu(0)
     chamXuong(tt, 1, 10, 10, 0)
     chamXuong(tt, 2, 20, 20, 0)
     chamLen(tt, 2, 100)
-    // ngón 1 nằm im từ mốc 0; mốc gần nhất là 100 (lúc nhả ngón 2)
-    expect(coMat(tt, 100 + MS_BAT_DONG_CHE, BC)).toBe(false)
+    // Ngón 1 còn trên màn: không phải ca nhả hết tay, đề vẫn hiện.
+    expect(coMat(tt, 100 + MS_BAT_DONG_CHE, BC)).toBe(true)
+    chamLen(tt, 1, 200)
+    expect(coMat(tt, 200 + MS_AN_HAN_NHA_TAY - 1, BC)).toBe(true)
+    expect(coMat(tt, 200 + MS_AN_HAN_NHA_TAY, BC)).toBe(false)
   })
 })
 
 describe('GIỮ ĐỂ ĐỌC — cấu hình một nguồn sự thật', () => {
-  it('bốn hằng số, ngưỡng cứng 6 giây thầy chốt 05/09', () => {
+  it('bốn hằng số; 6 giây nay chỉ còn là TRẦN ân hạn, không còn che đề', () => {
     expect(MS_AN_HAN_NHA_TAY).toBe(3000)
     expect(MS_BAT_DONG_CHE).toBe(6000)
     expect(PX_COI_LA_DI_CHUYEN).toBe(8)
@@ -197,8 +185,11 @@ describe('GIỮ ĐỂ ĐỌC — cấu hình một nguồn sự thật', () => {
     }
     expect(CHU_TAM_PHU).toBe('Chạm để đọc tiếp')
     expect(chuDanTruoc()).toContain('3 giây')
-    expect(chuDanTruoc()).toContain('6 giây')
     expect(chuDanTruoc(10)).toContain('10 giây')
+    // KHÔNG còn hứa hẹn gì về "màn hình im" — luật đó đã bỏ 06/09, mà câu dặn
+    // còn nhắc là em ngồi chờ đề tắt trong lo lắng vô cớ.
+    expect(chuDanTruoc()).not.toContain('im quá')
+    expect(chuDanTruoc()).toContain('Giữ tay yên đọc bao lâu cũng được')
   })
 
   it('dangGoOnhap nhận đúng ô nhập Phần III', () => {
@@ -288,7 +279,10 @@ describe('GIỮ ĐỂ ĐỌC — nối vào màn thi', () => {
     expect(man).toContain('if (!a || !batCuaCa(a)) return')
   })
 
-  it('che-vì-bất-động của BAOMATCATHI nghỉ khi ca này bật, tránh hai tấm che chồng nhau', () => {
-    expect(man).toContain("if (daKhoa || attemptRef.current?.giuDeDoc === true) return")
+  // 06/09: che-vì-bất-động của BAOMATCATHI đã GỠ HẲN cho mọi ca, nên không còn
+  // gì phải nhường nhau nữa. Ca không bật Giữ để đọc thì đề hiện suốt.
+  it('không còn tấm che thứ hai nào để chồng lên — che-vì-bất-động đã gỡ', () => {
+    expect(man).not.toContain('nhipBatDong')
+    expect(man).not.toContain('dangCheBatDong')
   })
 })

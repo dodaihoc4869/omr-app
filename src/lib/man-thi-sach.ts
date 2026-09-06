@@ -164,42 +164,54 @@ export function coKhoa(muc: MucNgat, lyDo: LyDoKhoaMoi, lanThu = 1): boolean {
 }
 
 // ============================================================================
-// KHOÁ MỘT MÌNH KHI KHÔNG CHẠM MÀN — chốt 05/09 tối từ số đo thật của thầy.
+// LUỒNG CHÍNH NGHẼN KHÔNG CÒN ĐƯỢC KHOÁ — gỡ 06/09 sau bằng chứng của thầy.
 // ============================================================================
-// Số đo: chụp màn hình trên Android chỉ làm K6 báo (lệch −210 ms), bảy kênh kia
-// im. Luật "≥ 2 họ" vì thế không bao giờ đạt, và chụp màn hình không bị khoá —
-// đúng như thầy thấy.
+// Luật cũ ở chỗ này: một phiếu họ `luong_chinh` (kênh 5 nhịp vẽ, kênh 6 lệch
+// đồng hồ) mà KHÔNG có ngón tay trên màn ⇒ khoá một mình vì "dấu vết chụp".
 //
-// Nhưng dòng nhật ký còn một chi tiết đáng giá hơn cả con số: **"không chạm"**.
-// Đó là chỗ tách được chụp màn hình khỏi nhiễu, mà không phải hạ ngưỡng:
+// BẰNG CHỨNG NÓ SAI. Ca 06/09: em Lưu Ngọc Tuân (SBD 12125) bị khoá 10 lần
+// trong 24 phút, thầy phải mở khoá 10 lần; em Trần Minh Đăng cùng ca, cùng loại
+// máy, bị 2 lần. Không em nào rời bài. Chênh lệch đúng bằng chênh lệch số lần
+// CHẠM MÀN: em đọc kỹ, ngồi yên lâu thì bị khoá nhiều.
 //
-//   · luồng chính nghẽn KHI TAY ĐANG CHẠM MÀN  = cuộn, gõ đáp án, kéo thả.
-//     Chuyện bình thường của một em làm bài. Chỉ góp phiếu.
-//   · luồng chính nghẽn KHI KHÔNG AI CHẠM MÀN  = máy tự dừng vẽ một nhịp.
-//     Em ngồi yên thì không có lý do gì để nghẽn 200 ms — trừ khi hệ điều hành
-//     đang làm việc gì đó nặng, mà việc nặng đúng lúc đang thi thì gần như chỉ
-//     có ghi ảnh màn hình. Đủ để khoá một mình.
+// HAI CHỖ HỎNG CHỒNG LÊN NHAU:
 //
-// Đây KHÔNG phải hạ ngưỡng để "có cái mà bắt": ngưỡng giữ nguyên tính chất,
-// chỉ thêm một điều kiện PHỦ ĐỊNH rất mạnh mà nhiễu thường ngày không qua nổi.
+//   1. Đồng hồ tham chiếu chưa từng chạy. iOS giữ `AudioContext` ở trạng thái
+//      `suspended` khi nó không được `resume()` trong một cú chạm, và
+//      `currentTime` đứng yên. Kênh 6 vẫn trừ hai mốc nên báo lệch ~250 ms MỖI
+//      250 ms, suốt buổi. Đã sửa ở `thu-tin-hieu.ts`.
+//   2. Điều kiện "không chạm màn" bắt nhầm người. Nó được chọn để tách chụp màn
+//      hình khỏi cuộn và gõ, nhưng một em đang ĐỌC ĐỀ thì cũng không chạm gì.
+//      Đọc một câu hoá 4 dòng mất 10–20 giây. Luật này biến "ngồi đọc" thành
+//      bằng chứng gian lận.
+//
+// Sửa chỗ 1 là hết cơn khoá dồn dập. Nhưng chỗ 2 vẫn còn: mọi nhát nghẽn thật
+// của iOS — thu hồi bộ nhớ, thanh địa chỉ trượt, thông báo hiện — rơi vào lúc
+// em đang đọc là lại khoá. Nên gỡ hẳn.
+//
+// TỪ NAY `dau_vet_chup` CHỈ ĐẾN TỪ SỐ ĐO TRỰC TIẾP: ba ngón chạm cùng lúc (cử
+// chỉ chụp của Android) và phím chụp trên máy tính. Hai thứ đó là hành vi cố ý,
+// không ngưỡng nào phải đoán. Kênh 5, 6, 8 vẫn ghi phiếu vào nhật ký cho thầy
+// đọc, nhưng KHÔNG khoá ai nữa — kể cả khi trùng khớp thành hai họ.
+//
+// Nói thẳng cái mất: web không phát hiện được chụp màn hình, và bản này thôi
+// giả vờ là có. Đổi lại là không còn em nào bị khoá vì ngồi đọc đề.
 
-/** Cửa sổ tránh chạm quanh một phiếu: có ngón tay trên màn trong khoảng này thì
- * phiếu chỉ góp phiếu, không được khoá một mình. Rộng hơn cửa sổ trùng khớp để
- * bao trọn một nhát cuộn. */
+/** Cửa sổ tránh chạm quanh một phiếu — vẫn dùng để ghi bối cảnh vào nhật ký. */
 export const MS_KHONG_CHAM_QUANH_PHIEU = 400
 
-export interface XetKhoaMotMinh {
-  /** Phiếu thuộc họ `luong_chinh` (kênh 5 hoặc kênh 6). */
-  hoLuongChinh: boolean
-  /** Có ngón tay chạm màn trong ±400 ms quanh phiếu không. */
-  coChamMan: boolean
-  /** Trang còn hiện và còn tiêu điểm — nếu không thì đã có nhánh cửa sổ nổi /
-   * rời app lo, không phải việc của dấu vết chụp. */
-  dangLamBaiBinhThuong: boolean
+/** Họ kênh nào được phép gây khoá. Suy đoán (`luong_chinh`, `vat_ly`) chỉ còn
+ * là ghi chép; `che_man` đi đường cửa sổ nổi / rời app riêng của nó.
+ *
+ * Giữ thành hàm có tên để lần sau ai định cho `luong_chinh` khoá lại thì phải
+ * sửa đúng dòng này và làm hỏng test, chứ không lặng lẽ thêm một nhánh mới. */
+export function hoDuocKhoa(ho: HoKenh): boolean {
+  return ho === 'do_truc_tiep'
 }
 
-export function duKhoaMotMinh(x: XetKhoaMotMinh): boolean {
-  return x.hoLuongChinh && !x.coChamMan && x.dangLamBaiBinhThuong
+/** Phiếu này có được phép tự khoá bài không. */
+export function phieuDuocKhoa(p: PhieuKenh): boolean {
+  return hoDuocKhoa(HO_CUA_KENH[p.kenh])
 }
 
 // ============================================================================
@@ -226,38 +238,26 @@ export function duKhoaMotMinh(x: XetKhoaMotMinh): boolean {
 // ngón để phóng to ảnh — KHÔNG BAO GIỜ ba ngón. Đây là tín hiệu trực tiếp,
 // không cần suy đoán, không ngưỡng nào phải đo.
 // ---------------------------------------------------------------------------
-// CÁCH 2 — CHE ĐỀ KHI BẤT ĐỘNG.
+// CÁCH 2 — CHE ĐỀ KHI BẤT ĐỘNG. **ĐÃ GỠ 06/09, theo lệnh của thầy.**
 // ---------------------------------------------------------------------------
-// Không nhìn thấy cửa sổ nổi, nhưng nhìn thấy HẬU QUẢ của nó: suốt lúc em thao
-// tác với Gemini thì trang không nhận một cú chạm nào. Sau 3 giây bất động, đề
-// tự mờ đi; chạm một cái là hiện lại ngay.
+// Ý tưởng cũ: sau 3 giây không chạm màn thì che đề, chạm lại là hiện, để cửa sổ
+// nổi Gemini thành vô dụng. Không khoá, không đếm.
 //
-// Đây KHÔNG phải hình phạt: không khoá, không đếm, không báo thầy. Nó chỉ làm
-// cái cửa sổ nổi kia trở nên vô dụng — em không vừa hỏi AI vừa nhìn đề được
-// nữa, và ảnh chụp lần sau chỉ ra tấm che.
+// Thực tế trong ca 06/09: em Tuân đọc đề bị che liên tục — video của thầy quay
+// đúng ba nhịp che trong 23 giây, giữa hai nhịp em phải chạm màn để đọc tiếp.
+// Cái giá không phải "một cú chạm giữ nhịp": nó cắt vụn việc đọc một câu hoá 4
+// dòng. Và nó dùng CHUNG một điều kiện với luật khoá "không chạm màn" phía
+// trên, nên em nào bị che nhiều thì cũng chính là em bị khoá nhiều.
+//
+// Gỡ hẳn cả hằng số lẫn câu chữ, đừng để lại chỗ bật lại bằng một dòng cấu hình.
+// Đề hiện suốt giờ làm bài.
 
 /** Số ngón chạm cùng lúc coi là cử chỉ chụp màn hình. Ba ngón là cử chỉ chụp
- * mặc định của nhiều máy Android; em làm bài nhiều nhất là hai ngón phóng ảnh. */
+ * mặc định của nhiều máy Android; em làm bài nhiều nhất là hai ngón phóng ảnh.
+ *
+ * Đây là SỐ ĐO TRỰC TIẾP một hành vi cố ý, không phải suy đoán từ độ nghẽn —
+ * nên nó là một trong hai đường duy nhất còn được khoá vì `dau_vet_chup`. */
 export const SO_NGON_CHUP = 3
-
-/** Bất động quá ngần này giây thì che đề.
- *
- * 3 giây, thầy chốt 05/09. Đây là mức ngặt nhất còn dùng được: mở cửa sổ nổi,
- * chụp, dán ảnh vào AI rồi đọc đáp án thì không cách nào dưới 3 giây, nên tấm
- * che luôn kịp đóng trước khi em đọc được gì.
- *
- * Đánh đổi phải biết trước: em đọc kỹ một câu dài cũng bị che. Bù lại chạm là
- * hiện lại TỨC THÌ — không khoá, không đếm, không báo thầy — nên cái giá chỉ là
- * một cú chạm giữ nhịp. Đề vẫn đọc được liền mạch nếu tay còn trên màn. */
-export const MS_BAT_DONG_CHE = 3000
-
-/** Nhịp soi bất động. Phải nhỏ hơn nhiều so với `MS_BAT_DONG_CHE`, kẻo mốc 3
- * giây thành 4 giây. 250 ms: che muộn nhất 3,25 giây. */
-export const MS_NHIP_SOI_BAT_DONG = 250
-
-/** Câu trên tấm che khi che vì bất động. Không phải lý do khoá — không có chữ
- * nào trách em, vì em có thể chỉ đang đọc kỹ. */
-export const LOI_CHE_BAT_DONG = 'Đề tạm ẩn vì đã lâu không có thao tác nào. Chạm vào màn hình để đọc tiếp.'
 
 // ------------------------------------------------ CỬA SỔ NỔI: XÉT TẠI CHỖ
 //
@@ -285,6 +285,21 @@ export interface AnhChupLucXet {
 
 export function laCuaSoNoi(a: AnhChupLucXet): boolean {
   return !a.coTieuDiem && a.manConHien
+}
+
+/** Cửa sổ nổi có được phép KHOÁ trên máy này không.
+ *
+ * Trên máy CẢM ỨNG: KHÔNG. `document.hasFocus()` là thứ duy nhất `laCuaSoNoi`
+ * dựa vào, mà trên điện thoại nó tắt ở đủ thứ chuyện vô hại — chạm thanh địa
+ * chỉ, bàn phím ảo bật lên, chuông báo trượt xuống. Đó đúng là lý do
+ * `chong-gian-lan.ts` đã bỏ `blur` trên máy cảm ứng từ 06/09; nhánh này dùng
+ * cùng một tín hiệu nên phải theo cùng một luật, không thì bịt một cửa mở một
+ * cửa.
+ *
+ * Tấm CHE thì vẫn giữ trên mọi máy: che không oan ai, và nó mới là thứ làm cửa
+ * sổ nổi vô dụng. Chỉ bỏ cái khoá. */
+export function khoaDuocViCuaSoNoi(camUng: boolean): boolean {
+  return !camUng
 }
 
 /** Nhịp soi tiêu điểm. 250 ms để tổng thời gian từ lúc cửa sổ nổi mở tới lúc

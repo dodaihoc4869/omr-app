@@ -57,6 +57,23 @@ export type NguonRoiMan = 'an' | 'mat_tieu_diem' | 'thoat_toan_man'
 /** Chờ bao lâu rồi mới xác nhận một `blur` là rời màn thật (máy có chuột). */
 export const MS_XAC_NHAN_BLUR = 600
 
+// SỬA TRIỆT ĐỂ 06/09 — thầy báo iPhone VẪN bị khoá không lý do sau lần sửa đầu.
+//
+// Bỏ `blur` chưa đủ. `document.hidden` trên iOS còn bật ở những lúc em KHÔNG
+// hề rời bài: kéo trung tâm điều khiển hay trung tâm thông báo xuống rồi thả,
+// thanh địa chỉ Safari trượt ra, chuông báo hiện lên rồi tắt, thậm chí lúc
+// chuyển hướng máy. Mỗi cái đó là một "lần rời màn", ba lần là khoá bài.
+//
+// Điểm phân biệt là THỜI GIAN: mấy thứ trên trả màn hình lại trong tích tắc;
+// còn em thoát app đi tra cứu thì màn hình phải ẩn lâu hơn nhiều.
+//
+// Nên từ nay `hidden` chỉ được tính khi ẩn QUÁ `MS_XAC_NHAN_AN`. Quay lại
+// trước mốc đó thì coi như chưa từng rời: không đếm, không cảnh báo, không
+// khoá, và cũng KHÔNG ghi vào nhật ký của thầy — ghi vào là thầy đọc ra một
+// danh sách vi phạm không có thật.
+/** Ẩn ngắn hơn mốc này KHÔNG phải là rời màn. */
+export const MS_XAC_NHAN_AN = 1500
+
 /** Máy này có phải máy cảm ứng không. iPad chạy iPadOS khai `Macintosh` nhưng
  * có `maxTouchPoints > 0`, nên đo bằng số điểm chạm chứ không đọc tên máy. */
 export function laMayCamUng(nav: { maxTouchPoints?: number } | null | undefined = typeof navigator === 'undefined' ? null : navigator): boolean {

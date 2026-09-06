@@ -665,15 +665,25 @@ export default function ExamSetupScreen() {
           style={{ gap: 'var(--k3)', minHeight: 44, background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
         >
           <span style={TIEU_DE_MUC}>Giữ để đọc</span>
-          <span
-            aria-hidden
-            style={{ flexShrink: 0, width: 64, height: 36, borderRadius: 'var(--bo-tron)', padding: 4, background: giuDeDoc ? 'var(--muc)' : 'var(--vien-dam)', display: 'flex', alignItems: 'center', justifyContent: giuDeDoc ? 'flex-end' : 'flex-start' }}
-          >
-            <span style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--the)' }} />
+          {/* TRẠNG THÁI BẰNG CHỮ, không bắt thầy đoán qua màu. Thầy báo 06/09
+            là gạt tắt vẫn tưởng đang bật — hai màu nút ở nền tối trông gần
+            giống nhau, mà cái gạt thì bé. */}
+          <span className="flex items-center" style={{ flexShrink: 0, gap: 'var(--k2)' }}>
+            <span className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: giuDeDoc ? 'var(--muc)' : 'var(--nhat)' }}>
+              {giuDeDoc ? 'ĐANG BẬT' : 'ĐANG TẮT'}
+            </span>
+            <span
+              aria-hidden
+              style={{ flexShrink: 0, width: 64, height: 36, borderRadius: 'var(--bo-tron)', padding: 4, background: giuDeDoc ? 'var(--muc)' : 'var(--vien-dam)', display: 'flex', alignItems: 'center', justifyContent: giuDeDoc ? 'flex-end' : 'flex-start' }}
+            >
+              <span style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--the)' }} />
+            </span>
           </span>
         </button>
         <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
-          Đề chỉ hiện khi ngón tay em còn trên màn. Nhả tay quá ân hạn, hoặc để màn hình im quá 6 giây, thì đề tạm ẩn; chạm lại là hiện ngay. Muốn chạm vào cửa sổ nổi thì phải nhả tay khỏi bài, nên không đọc hai thứ cùng lúc được. KHÔNG khoá bài vì việc này.
+          {giuDeDoc
+            ? 'Đề chỉ hiện khi ngón tay em còn trên màn. Nhả tay quá ân hạn thì đề tạm ẩn; chạm lại là hiện ngay. Giữ tay yên đọc bao lâu cũng được. Muốn chạm vào cửa sổ nổi thì phải nhả tay khỏi bài, nên không đọc hai thứ cùng lúc được. KHÔNG khoá bài vì việc này.'
+            : 'Đề hiện bình thường suốt giờ làm bài, em không phải giữ tay.'}
         </div>
         {giuDeDoc && (
           <div style={{ marginTop: 'var(--k3)' }}>

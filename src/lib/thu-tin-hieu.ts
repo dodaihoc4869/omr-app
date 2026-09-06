@@ -137,6 +137,21 @@ export function thuTinHieu(o: TuyChonThu): () => void {
   // ---- KÊNH 6: lệch đồng hồ. `AudioContext` chạy trên luồng âm thanh riêng,
   // KHÔNG bị hệ điều hành đóng băng cùng luồng chính — nó là đồng hồ tham chiếu
   // duy nhất còn chạy khi trang bị treo.
+  //
+  // LỖI ĐÃ SỬA 06/09 — nguyên nhân em Tuân bị khoá 10 lần trong 24 phút.
+  //
+  // iOS chỉ cho `AudioContext` chạy khi nó được `resume()` bên trong một cú chạm
+  // của người dùng. Bộ thu này dựng context trong `useEffect`, KHÔNG phải trong
+  // tay lệnh chạm, nên trên iPhone context sinh ra ở trạng thái `suspended` và
+  // `currentTime` ĐỨNG YÊN mãi mãi.
+  //
+  // Bản cũ vẫn trừ hai mốc: `0 - 0 - 250 = -250 ms`. Mỗi 250 ms một phiếu lệch
+  // 250 ms, quá ngưỡng 120, liên tục suốt buổi thi. Đó không phải dấu vết chụp
+  // màn hình — đó là cái đồng hồ tham chiếu chưa từng chạy.
+  //
+  // Đồng hồ đứng thì KHÔNG so được. Chỉ đo khi context `running`; mọi lúc khác
+  // dựng lại mốc rồi bỏ nhịp đó. Thà mất một kênh trên iPhone còn hơn kênh ấy
+  // gào lên bốn lần mỗi giây.
   let ctx: AudioContext | null = null
   try {
     const AC = (window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext) as typeof AudioContext | undefined
@@ -148,11 +163,18 @@ export function thuTinHieu(o: TuyChonThu): () => void {
     const c = ctx
     let mocAm = c.currentTime * 1000
     let mocChinh = performance.now()
+    let chayTruoc = c.state === 'running'
     const soDongHo = window.setInterval(() => {
       const am = c.currentTime * 1000
       const chinh = performance.now()
-      const lech = am - mocAm - (chinh - mocChinh)
-      if (Math.abs(lech) >= MS_LECH_QUAN_SAT) bao('lech_dong_ho', `lệch ${Math.round(lech)} ms`, chinh)
+      const chay = c.state === 'running'
+      // Chỉ tin nhịp này khi đồng hồ tham chiếu chạy SUỐT cả nhịp. Vừa mới bật
+      // hoặc vừa tắt giữa chừng cũng cho ra một khoảng lệch bịa.
+      if (chay && chayTruoc) {
+        const lech = am - mocAm - (chinh - mocChinh)
+        if (Math.abs(lech) >= MS_LECH_QUAN_SAT) bao('lech_dong_ho', `lệch ${Math.round(lech)} ms`, chinh)
+      }
+      chayTruoc = chay
       mocAm = am
       mocChinh = chinh
     }, 250)

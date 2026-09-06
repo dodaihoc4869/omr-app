@@ -21,11 +21,10 @@ import {
   chuNhomPhieu,
   chuanHoaMucNgat,
   coKhoa,
-  duKhoaMotMinh,
+  hoDuocKhoa,
+  khoaDuocViCuaSoNoi,
   laCuaSoNoi,
-  LOI_CHE_BAT_DONG,
-  MS_BAT_DONG_CHE,
-  MS_NHIP_SOI_BAT_DONG,
+  phieuDuocKhoa,
   MS_KHONG_CHAM_QUANH_PHIEU,
   MS_NHIP_SOI_TIEU_DIEM,
   nhomDuKhoa,
@@ -258,21 +257,65 @@ describe('cửa sổ nổi — xét trạng thái tại mốc 900 ms, không tin
 // Luật "≥ 2 họ" vì thế không bao giờ đạt. Thêm đường thứ hai: một phiếu họ
 // luồng-chính mà KHÔNG AI CHẠM MÀN cũng đủ khoá. Đây là điều kiện phủ định, chứ
 // không phải hạ ngưỡng.
-describe('khoá một mình khi không chạm màn', () => {
-  it('nghẽn luồng chính mà KHÔNG ai chạm màn → đủ khoá', () => {
-    expect(duKhoaMotMinh({ hoLuongChinh: true, coChamMan: false, dangLamBaiBinhThuong: true })).toBe(true)
+// ============================================================================
+// GỠ 06/09 — "KHOÁ MỘT MÌNH KHI KHÔNG CHẠM MÀN" ĐÃ BỊ BỎ.
+// ============================================================================
+// Bằng chứng của thầy, ca tối 06/09: em Lưu Ngọc Tuân (SBD 12125) bị khoá 10
+// lần trong 24 phút, thầy phải mở khoá 10 lần; em Trần Minh Đăng cùng ca, cùng
+// loại máy, 2 lần. Không em nào rời bài. Chênh lệch đúng bằng chênh lệch số lần
+// CHẠM MÀN — em đọc kỹ, ngồi yên lâu thì bị khoá nhiều.
+//
+// Hai chỗ hỏng chồng lên nhau: đồng hồ tham chiếu iOS chưa từng chạy (sửa ở
+// `thu-tin-hieu.ts`), và điều kiện "không chạm màn" bắt đúng vào em đang đọc.
+// Từ nay `dau_vet_chup` chỉ đến từ SỐ ĐO TRỰC TIẾP.
+describe('dấu vết chụp chỉ còn đến từ SỐ ĐO TRỰC TIẾP', () => {
+  it('họ luồng chính (kênh 5 nhịp vẽ, kênh 6 lệch đồng hồ) KHÔNG được khoá ai', () => {
+    expect(hoDuocKhoa('luong_chinh')).toBe(false)
+    expect(phieuDuocKhoa(p('nhip_ve', 0))).toBe(false)
+    expect(phieuDuocKhoa(p('lech_dong_ho', 0))).toBe(false)
   })
 
-  it('nghẽn khi TAY ĐANG CHẠM MÀN (cuộn, gõ đáp án) → KHÔNG khoá', () => {
-    expect(duKhoaMotMinh({ hoLuongChinh: true, coChamMan: true, dangLamBaiBinhThuong: true })).toBe(false)
+  it('họ chuyển động máy và họ màn bị che cũng không', () => {
+    expect(hoDuocKhoa('vat_ly')).toBe(false)
+    expect(hoDuocKhoa('che_man')).toBe(false)
+    expect(phieuDuocKhoa(p('xung_chuyen_dong', 0))).toBe(false)
+    expect(phieuDuocKhoa(p('an_trang', 0))).toBe(false)
   })
 
-  it('kênh khác họ (xung chuyển động, ẩn trang) không được khoá một mình', () => {
-    expect(duKhoaMotMinh({ hoLuongChinh: false, coChamMan: false, dangLamBaiBinhThuong: true })).toBe(false)
+  it('chỉ SỐ ĐO TRỰC TIẾP mới khoá — phím chụp, toàn màn hình, kích thước', () => {
+    expect(hoDuocKhoa('do_truc_tiep')).toBe(true)
+    expect(phieuDuocKhoa(p('phim_chup', 0))).toBe(true)
   })
 
-  it('đang mất tiêu điểm thì để nhánh cửa sổ nổi lo, không tính là dấu vết chụp', () => {
-    expect(duKhoaMotMinh({ hoLuongChinh: true, coChamMan: false, dangLamBaiBinhThuong: false })).toBe(false)
+  it('không còn hàm nào suy ra khoá từ "không chạm màn"', async () => {
+    const lib = (await import('../src/lib/man-thi-sach.ts?raw')).default
+    expect(lib).not.toContain('export function duKhoaMotMinh')
+    const man = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default
+    expect(man).not.toContain('duKhoaMotMinh')
+    expect(man).not.toContain('nhomDuKhoa(')
+    expect(man).not.toContain('không chạm màn`')
+  })
+
+  it('xetPhieu của màn làm bài chỉ ghi sổ — trong thân hàm không có lệnh khoá', async () => {
+    const man = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default
+    const dau = man.indexOf('const xetPhieu = (p: PhieuKenh) => {')
+    const cuoi = man.indexOf('// ---- CÁCH 1: ĐẾM SỐ NGÓN CHẠM')
+    expect(dau).toBeGreaterThan(0)
+    expect(cuoi).toBeGreaterThan(dau)
+    expect(man.slice(dau, cuoi)).not.toContain('khoaVi')
+  })
+
+  it('cửa sổ nổi không khoá được trên máy cảm ứng — cùng luật với blur', () => {
+    expect(khoaDuocViCuaSoNoi(true)).toBe(false)
+    expect(khoaDuocViCuaSoNoi(false)).toBe(true)
+  })
+
+  it('màn làm bài đã chặn cả hai chỗ khoá vì cửa sổ nổi', async () => {
+    const man = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default
+    const so = man.split('if (!khoaDuocViCuaSoNoi(camUngMay)) return').length - 1
+    expect(so).toBe(2) // nhịp soi tiêu điểm + kênh 2
+    // và toàn màn hình cũng nghỉ trên máy cảm ứng (iOS không có toàn màn thật)
+    expect(man).toContain("if (p.kenh === 'toan_man') {\n          if (camUngMay) return")
   })
 
   it('ngưỡng kênh 6 hạ xuống DƯỚI số đo thật 210 ms để chắc chắn bắt được', () => {
@@ -285,11 +328,20 @@ describe('khoá một mình khi không chạm màn', () => {
     expect(MS_KHONG_CHAM_QUANH_PHIEU).toBeGreaterThanOrEqual(400)
   })
 
-  it('màn làm bài đợi thêm rồi mới chốt — ngón tay có thể chạm NGAY SAU nhát nghẽn', async () => {
-    const ma = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default
-    expect(ma).toContain('const chamSau = performance.now() - mocChamManCuoi < MS_KHONG_CHAM_QUANH_PHIEU')
-    expect(ma).toContain('duKhoaMotMinh({')
-    expect(ma).toContain('không chạm màn')
+  it('kênh 6 không được so đồng hồ khi AudioContext chưa chạy', async () => {
+    // NGUYÊN NHÂN GỐC của 10 lần khoá oan: iOS giữ AudioContext ở `suspended`
+    // khi nó không được resume trong một cú chạm, `currentTime` đứng yên, và
+    // phép trừ hai mốc cho ra lệch ~250 ms MỖI 250 ms. Đồng hồ đứng thì không
+    // so được.
+    const thu = (await import('../src/lib/thu-tin-hieu.ts?raw')).default
+    expect(thu).toContain("const chay = c.state === 'running'")
+    expect(thu).toContain('if (chay && chayTruoc) {')
+    // và phải dựng lại mốc mỗi nhịp, kể cả nhịp bị bỏ, kẻo lúc bật lại là một
+    // khoảng lệch bằng cả quãng đứng yên
+    const dau = thu.indexOf('const soDongHo = window.setInterval')
+    const than = thu.slice(dau, thu.indexOf('}, 250)', dau))
+    expect(than).toContain('mocAm = am')
+    expect(than).toContain('mocChinh = chinh')
   })
 })
 
@@ -311,27 +363,20 @@ describe('hai cách không dựa vào tín hiệu hệ điều hành', () => {
     expect(ma).toContain('if (daKhoa || conAnHan()) return')
   })
 
-  it('che đề khi bất động — 3 giây, ngắn hơn mọi thao tác hỏi AI', () => {
-    expect(MS_BAT_DONG_CHE).toBe(3000)
+  // CÁCH 2 (che đề khi bất động) ĐÃ GỠ 06/09 theo lệnh thầy: "bỏ phần giữ tay
+  // vào màn hình bất động rồi khóa đi nhé". Video ca 06/09 quay đúng ba nhịp
+  // che trong 23 giây, chỉ vì em đang đọc đề.
+  it('che đề khi bất động đã gỡ hết — không còn hằng số lẫn câu chữ để bật lại', async () => {
+    const lib = (await import('../src/lib/man-thi-sach.ts?raw')).default
+    expect(lib).not.toContain('export const MS_BAT_DONG_CHE')
+    expect(lib).not.toContain('export const MS_NHIP_SOI_BAT_DONG')
+    expect(lib).not.toContain('export const LOI_CHE_BAT_DONG')
   })
 
-  it('nhịp soi bất động phải đủ dày, kẻo mốc 3 giây hoá 4 giây', () => {
-    expect(MS_NHIP_SOI_BAT_DONG).toBe(250)
-    // sai số che muộn nhất phải dưới 10% mốc
-    expect(MS_NHIP_SOI_BAT_DONG).toBeLessThanOrEqual(MS_BAT_DONG_CHE / 10)
-  })
-
-  it('che vì bất động KHÔNG phải hình phạt: không trách em, chạm là hiện lại', () => {
-    expect(LOI_CHE_BAT_DONG).toMatch(/Chạm vào màn hình/)
-    expect(LOI_CHE_BAT_DONG).not.toMatch(/gian lận|quay cóp|vi phạm|khoá/i)
-  })
-
-  it('chạm là bỏ che NGAY, không đợi nhịp một giây', async () => {
+  it('màn làm bài không còn nhịp soi bất động nào', async () => {
     const ma = (await import('../src/screens/ExamTakeScreen.tsx?raw')).default
-    expect(ma).toContain('if (dangCheBatDong) {')
-    expect(ma).toContain('nhipBatDong')
-    // cuộn và gõ phím cũng tính là còn làm bài
-    expect(ma).toContain("document.addEventListener('scroll', ghiChamMan")
-    expect(ma).toContain("document.addEventListener('keydown', ghiChamMan)")
+    expect(ma).not.toContain('nhipBatDong')
+    expect(ma).not.toContain('dangCheBatDong')
+    expect(ma).not.toContain('LOI_CHE_BAT_DONG')
   })
 })

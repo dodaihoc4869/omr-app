@@ -31,9 +31,8 @@ const DA_RA_SOAT: Record<string, string[]> = {
     'baoThayGianLan',
     // Ref đo dấu vết, chỉ đụng trong setInterval / bộ nghe sự kiện.
     'giayCauRef',
-    'mocKhoaMotMinh',
-    'mocChamManCuoi',
-    'ghiChamMan',
+    // `mocKhoaMotMinh`, `mocChamManCuoi`, `ghiChamMan` đã xoá 06/09 cùng luật
+    // khoá suy đoán "không chạm màn" — xem `man-thi-sach.ts`.
   ],
   // Gọi trong nút bấm Đồng bộ, không phải lúc dựng màn.
   'src/screens/NganHangDeScreen.tsx': ['taiLocal'],

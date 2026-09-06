@@ -10,7 +10,7 @@ import { describe, expect, it, afterEach, vi } from 'vitest'
 import { cleanup, fireEvent, render } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { MS_XAC_NHAN_BLUR, laMayCamUng, tinhLaRoiMan, mucKhiRoiMan, NGUONG_MAC_DINH } from '../src/lib/chong-gian-lan'
+import { MS_XAC_NHAN_AN, MS_XAC_NHAN_BLUR, laMayCamUng, tinhLaRoiMan, mucKhiRoiMan, NGUONG_MAC_DINH } from '../src/lib/chong-gian-lan'
 import TheCau, { doiDau, laAm } from '../src/components/TheCau'
 import { phaiHoanBanMoi } from '../src/lib/cap-nhat-app'
 
@@ -74,8 +74,22 @@ describe('Lỗi 2 — iPhone khoá bài dù em không vi phạm', () => {
     expect(khoi).toContain('if (camUng) return')
     expect(khoi).toContain('MS_XAC_NHAN_BLUR')
     expect(khoi).toContain('document.hasFocus()')
-    // `hidden` phải giữ nguyên đường cũ — không được nới cả cái này.
-    expect(khoi).toContain("logEvent(document.hidden ? 'hidden' : 'visible')")
+    // `hidden` cũng phải có NHỊP XÁC NHẬN (sửa vòng hai, 06/09): iOS bật
+    // `document.hidden` trong tích tắc lúc kéo trung tâm điều khiển, thanh địa
+    // chỉ trượt ra, chuông báo hiện rồi tắt. Ẩn ngắn hơn mốc thì coi như chưa
+    // từng rời — không đếm, không cảnh báo, KHÔNG ghi vào nhật ký của thầy.
+    expect(khoi).toContain('MS_XAC_NHAN_AN')
+    expect(khoi).toContain("if (document.hidden) logEvent('hidden', Date.now() - MS_XAC_NHAN_AN)")
+    // về trước mốc thì huỷ hẹn và KHÔNG ghi 'visible' bù
+    expect(khoi).toContain('clearTimeout(henAn)')
+    expect(khoi).not.toContain("logEvent(document.hidden ? 'hidden' : 'visible')")
+  })
+
+  it('ẩn ngắn hơn nhịp xác nhận thì không đẻ ra một lần rời màn nào', () => {
+    // 1,5 giây: dài hơn mọi cú chớp của iOS, ngắn hơn mọi lần em thoát app đi
+    // tra cứu (mở app khác, gõ, đọc, quay lại — không dưới vài giây).
+    expect(MS_XAC_NHAN_AN).toBeGreaterThanOrEqual(1000)
+    expect(MS_XAC_NHAN_AN).toBeLessThanOrEqual(3000)
   })
 
   it('nhịp chờ đủ dài để bàn phím kịp trả tiêu điểm, không dài tới mức bỏ sót', () => {

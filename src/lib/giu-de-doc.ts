@@ -43,6 +43,8 @@ export const MS_AN_HAN_NHA_TAY = 3000
  *
  * "Bất động" = không chạm, không cuộn, không gõ phím, không di ngón. */
 export const MS_BAT_DONG_CHE = 6000
+/** @deprecated Từ 06/09 KHÔNG còn dùng để che đề — chỉ còn là TRẦN cho ân hạn
+ * nhả tay (`anHanMsCua`). Giữ tên cũ để ca đã mở đọc lại không lệch. */
 
 /** Dưới ngần này pixel là rung tay, không phải di chuyển thật. So với ĐIỂM NEO
  * (chỗ ghi nhận di chuyển lần cuối) chứ không so với khung trước — nếu so
@@ -73,7 +75,7 @@ export const CHU_TAM_PHU = 'Chạm để đọc tiếp'
 
 /** Dòng dặn trước khi vào bài. Em biết trước thì không hoảng. */
 export function chuDanTruoc(anHanGiay = MS_AN_HAN_NHA_TAY / 1000): string {
-  return `Giữ ngón tay trên màn hình để đọc đề. Nhấc tay quá ${anHanGiay} giây, hoặc để màn hình im quá ${MS_BAT_DONG_CHE / 1000} giây, đề sẽ tạm ẩn; chạm lại là hiện.`
+  return `Giữ ngón tay trên màn hình để đọc đề. Nhấc tay quá ${anHanGiay} giây thì đề tạm ẩn; chạm lại là hiện. Giữ tay yên đọc bao lâu cũng được.`
 }
 
 // ---------------------------------------------------------------------------
@@ -144,27 +146,32 @@ export function ghiHoatDong(tt: TrangThaiGiu, nay: number): void {
   tt.mocHoatDong = nay
 }
 
-/** BỐN DÒNG, ĐỌC TỪ TRÊN XUỐNG.
+/** BA DÒNG, ĐỌC TỪ TRÊN XUỐNG.
  *
  * 0. Máy không có cảm ứng ⇒ cơ chế KHÔNG bật. Màn thi vốn dựng cho điện thoại;
  *    bật ở máy tính là khoá cứng bài của một em không làm gì sai.
- * 1. NGƯỠNG CỨNG: bất động quá `MS_BAT_DONG_CHE` ⇒ che, KHÔNG ngoại lệ. Đây là
- *    dòng thầy yêu cầu thêm 05/09, và nó đứng TRƯỚC mọi miễn trừ — kể cả con
- *    trỏ đang nhấp nháy trong ô nhập, kể cả ngón kê im ở góc màn.
- * 2. Caret trong ô nhập Phần III ⇒ hiện. Em đang tính toán rồi gõ đáp án thì
- *    không được nhấp nháy giữa chừng; nhưng chỉ được nới tới ngưỡng cứng.
- * 3. Tay còn trên màn ⇒ hiện.
- * 4. Nhả hết tay ⇒ còn ân hạn (mặc định 3 giây).
+ * 1. Caret trong ô nhập Phần III ⇒ hiện. Em đang tính toán rồi gõ đáp án thì
+ *    không được nhấp nháy giữa chừng.
+ * 2. Tay còn trên màn ⇒ hiện.
+ * 3. Nhả hết tay ⇒ còn ân hạn (mặc định 3 giây).
+ *
+ * BỎ NGƯỠNG BẤT ĐỘNG (thầy chốt 06/09). Bản 05/09 có thêm một dòng đứng trên
+ * tất cả: im quá `MS_BAT_DONG_CHE` là che, kể cả khi ngón tay VẪN ĐANG trên
+ * màn. Em giữ tay đọc một câu dài quá sáu giây là đề tắt trước mắt — đúng lúc
+ * em đang đọc. Thầy yêu cầu bỏ, và bỏ là đúng: giữ tay yên để đọc là hành vi
+ * bình thường nhất của một em đang làm bài.
+ *
+ * Đổi lại, mẹo "kê một ngón im ở góc màn rồi soi máy khác" không còn bị chặn
+ * bằng cách này nữa. Nói thẳng để thầy biết mình vừa đánh đổi cái gì: cái chặn
+ * đó phải trả giá bằng việc tắt đề của mọi em đọc chậm, nên không đáng.
  *
  * Cuộn quán tính đi qua `mocHoatDong` nên không lọt vào ca nào ở trên: nhả tay
  * cho trang trôi thì mỗi sự kiện cuộn đẩy mốc lên, đề không tắt giữa lúc trôi. */
 export function coMat(tt: TrangThaiGiu, nay: number, bc: BoiCanhGiu): boolean {
   if (!bc.coCamUng) return true
-  const imLang = nay - mocGanNhat(tt)
-  if (imLang >= MS_BAT_DONG_CHE) return false
   if (bc.dangGoO) return true
   if (tt.ngon.length > 0) return true
-  return imLang < bc.anHanMs
+  return nay - mocGanNhat(tt) < bc.anHanMs
 }
 
 /** Mốc hoạt động gần nhất, tính cả ngón đang chạm. */
