@@ -963,6 +963,58 @@ const CO_TOI_DA_PHIEU = 4 * 1024 * 1024
  * ca có thể có cả hai, mà gửi Zalo thì phải gửi đúng loại. */
 export type LoaiPhieu = 'ketqua' | 'baitap'
 
+/** HỒ SƠ NHIỀU EM MỘT LƯỢT — dùng khi dựng phiếu cả ca.
+ *
+ * Gọi `hoSoEm` từng em thì máy chủ đọc trọn ba sheet cho MỖI em; ca ba chục em
+ * là chín chục lượt đọc cùng một nội dung. Lệnh này đọc một lần rồi tính cho
+ * cả danh sách. */
+export async function hoSoNhieuEm(scriptUrl: string, secret: string, sbd: string[]): Promise<HoSoEm[]> {
+  if (sbd.length === 0) return []
+  const r = await postJson(scriptUrl, { action: 'hoSoNhieuEm', secret, sbd }, 90)
+  if (!r.ok) throw new Error(r.error || 'Không lấy được hồ sơ')
+  return (Array.isArray(r.items) ? r.items : []) as HoSoEm[]
+}
+
+export interface PhieuCanLuu {
+  ma: string
+  maCa: string
+  sbd: string
+  hoTen: string
+  phieu: unknown
+  loai?: LoaiPhieu
+}
+
+/** Số phiếu tối đa một gói — khớp `TRAN_PHIEU_MOT_GOI` bên máy chủ. */
+export const TRAN_PHIEU_MOT_GOI = 6
+
+/** LƯU NHIỀU PHIẾU MỘT LƯỢT. Tự chia gói, tự bỏ phiếu quá cỡ (nặng vì nhiều
+ * hình) và báo lại — một em quá cỡ không được kéo theo cả ca không có link. */
+export async function luuNhieuPhieu(
+  scriptUrl: string,
+  secret: string,
+  ds: PhieuCanLuu[],
+): Promise<{ daLuu: { sbd: string; ma: string }[]; loi: { sbd: string; vi_sao: string }[] }> {
+  const daLuu: { sbd: string; ma: string }[] = []
+  const loi: { sbd: string; vi_sao: string }[] = []
+  const vua: PhieuCanLuu[] = []
+  for (const p of ds) {
+    const co = new Blob([JSON.stringify(p.phieu)]).size
+    if (co > CO_TOI_DA_PHIEU) {
+      loi.push({ sbd: p.sbd, vi_sao: `Phiếu nặng ${(co / 1024 / 1024).toFixed(1)} MB vì nhiều hình, quá cỡ gửi bằng link` })
+      continue
+    }
+    vua.push(p)
+  }
+  for (let i = 0; i < vua.length; i += TRAN_PHIEU_MOT_GOI) {
+    const goi = vua.slice(i, i + TRAN_PHIEU_MOT_GOI).map((p) => ({ ...p, loai: p.loai || 'ketqua' }))
+    const r = await postJson(scriptUrl, { action: 'luuNhieuPhieu', secret, items: goi }, 120)
+    if (!r.ok) throw new Error(r.error || 'Không lưu được phiếu')
+    for (const x of r.daLuu || []) daLuu.push({ sbd: String(x.sbd), ma: String(x.ma) })
+    for (const x of r.loi || []) loi.push({ sbd: String(x.sbd), vi_sao: String(x.vi_sao) })
+  }
+  return { daLuu, loi }
+}
+
 export async function luuPhieu(scriptUrl: string, secret: string, d: { ma: string; maCa: string; sbd: string; hoTen: string; phieu: unknown; loai?: LoaiPhieu }): Promise<void> {
   const co = new Blob([JSON.stringify(d.phieu)]).size
   if (co > CO_TOI_DA_PHIEU) {

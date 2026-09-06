@@ -13,8 +13,11 @@ import { chiTietCa, duyetThiLai, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherM
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { goiPhieuCaZip, tenTepZipCa, chuyenDeTuChiTiet, type EmTrongCaDeXuatPhieu } from '../lib/phieu-hang-loat'
 import { viecCanLamMacDinh } from '../lib/phieu-zalo'
-import { gomLinkPhieu, tomTatLinkPhieu, vanBanLinkPhieu } from '../lib/link-phieu-ca'
-import { phieuTheoCa } from '../lib/exam-api'
+import { gomLinkPhieu, tomTatLinkPhieu, vanBanLinkPhieu, type DongLinkPhieu } from '../lib/link-phieu-ca'
+import { taoLinkPhieu } from '../lib/phieu-link'
+import { dungPhieu, giamGoiPhieu } from '../lib/phieu-du-lieu'
+import { loadExamSources } from '../lib/exam-db'
+import { hoSoNhieuEm, luuNhieuPhieu, phieuTheoCa, sinhMaPhieu, type PhieuCanLuu } from '../lib/exam-api'
 import { docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
@@ -124,6 +127,9 @@ export default function ExamMonitorScreen() {
   const [dangGoiPhieu, setDangGoiPhieu] = useState('')
   // Gom link phiếu của cả ca để dán một lượt vào Zalo (thầy chốt 05/09 chiều).
   const [dangGomLink, setDangGomLink] = useState(false)
+  /** "3/12" khi đang dựng nốt phiếu còn thiếu — nút phải nói nó đang làm gì,
+   * không thì thầy tưởng máy treo. */
+  const [tienTaoPhieu, setTienTaoPhieu] = useState('')
   const [tomTatLink, setTomTatLink] = useState('')
   // Đã ghi điểm lên Sheet cho lượt nào (khoá `${sbd}:${lanThu}:${nopLuc}`) — không ghi lặp mỗi lần tải lại.
   const daGhiRef = useRef<Set<string>>(new Set())
@@ -421,6 +427,114 @@ export default function ExamMonitorScreen() {
     }
   }
 
+  /** DỰNG VÀ CẤT PHIẾU cho những em chưa có, trả về dòng link của các em đó.
+   *
+   * Hai chỗ gộp để đỡ tải máy chủ: hồ sơ lấy MỘT lệnh cho cả danh sách
+   * (`hoSoNhieuEm`), phiếu cất theo GÓI (`luuNhieuPhieu`) chứ không từng em. */
+  const taoPhieuChoEm = async (
+    url: string,
+    mat: string,
+    dsSbd: string[],
+    goc: string,
+    tien: (da: number, tong: number) => void,
+  ): Promise<DongLinkPhieu[]> => {
+    if (!chiTiet || dsSbd.length === 0) return []
+    const bank = teacherBank
+    if (!bank || bank.length === 0) return []
+    const keyBank = mergeKeepAnswers(bank, soCauCa)
+
+    // Hạng lớp tính TẠI ĐÂY từ bảng điểm của ca, đúng cách nút Phiếu hàng loạt
+    // đang làm — cùng một con số mà lấy hai nguồn thì sớm muộn cũng lệch.
+    const xep = [...daCham].sort((a, b) => (b.diem ?? 0) - (a.diem ?? 0))
+    const hangCua = new Map<string, number>()
+    xep.forEach((e, i) => {
+      const truoc = i > 0 ? xep[i - 1] : null
+      hangCua.set(e.sbd, truoc && truoc.diem === e.diem ? hangCua.get(truoc.sbd)! : i + 1)
+    })
+
+    tien(0, dsSbd.length)
+    const [hoSoDs, khoDe] = await Promise.all([hoSoNhieuEm(url, mat, dsSbd), loadExamSources().catch(() => [])])
+    const hoSoCua = new Map(hoSoDs.map((h) => [h.em.sbd, h]))
+
+    const canLuu: PhieuCanLuu[] = []
+    const maCua = new Map<string, string>()
+    for (const sbd of dsSbd) {
+      const e = daCham.find((x) => x.sbd === sbd)
+      const ho = hoSoCua.get(sbd)
+      if (!e || !ho || !e.moiNhat.dapAn || !e.graded) continue
+      const rows = taoChiTietCau(keyBank, chiTiet.ca.maCa, sbd, e.moiNhat.dapAn, e.moiNhat.giayCau)
+      const cd = chuyenDeTuChiTiet(rows)
+      const sc = e.graded.score
+      const caCuaEm = {
+        maCa: chiTiet.ca.maCa,
+        tenCa: chiTiet.ca.tenCa || '',
+        lop: e.lop || chiTiet.ca.lop || '',
+        lanThu: e.moiNhat.lanThu,
+        nopLuc: e.moiNhat.nopLuc || new Date().toISOString(),
+        trangThai: e.moiNhat.trangThai,
+        diemI: sc.phanIScore,
+        diemII: sc.phanIIScore,
+        diemIII: sc.phanIIIScore,
+        tong: sc.total,
+        hang: hangCua.get(sbd) ?? null,
+        siSo: daCham.length,
+        soLanRoiMan: e.moiNhat.soLanRoiMan || 0,
+      }
+      const phieu = dungPhieu({
+        hoSo: ho,
+        ca: caCuaEm,
+        chuyenDeCa: cd,
+        vieCanLam: viecCanLamMacDinh({
+          hoTen: e.hoTen,
+          ngay: e.moiNhat.nopLuc,
+          diem: sc.total,
+          xepLoai: classify(sc.total),
+          soCauSai: rows.filter((r) => r.dungSai === false).length,
+          chuyenDeSai: cd.filter((c) => c.soSai > 0)[0] ? { ten: cd.filter((c) => c.soSai > 0)[0].ten, soSai: cd.filter((c) => c.soSai > 0)[0].soSai } : null,
+          baiTapDaGiao: null,
+        }),
+        rows,
+        // `mergeKeepAnswers` trả bộ đề gộp KHÔNG có `maDe`; gắn mã ca vào cho
+        // đúng kiểu, và mã câu trong phiếu cũng đọc ra đúng ca.
+        banks: [{ maDe: chiTiet.ca.maCa, ...keyBank }],
+        diemLop: daCham.map((x) => x.diem).filter((d): d is number => typeof d === 'number'),
+        thoiLuongPhut: chiTiet.ca.thoiGianPhut ?? null,
+        vaoLuc: e.moiNhat.vaoLuc ?? null,
+        khoDe,
+        // Câu em VỪA LÀM trong ca này — bài luyện kèm theo không lặp lại chúng.
+        // Không gọi `qidDaLam` từng em: thêm một lượt gọi cho mỗi em, mà phần
+        // lớn giá trị của phép loại trừ nằm ở đúng ca vừa thi.
+        qidDaLam: rows.map((r) => r.qid).filter(Boolean),
+        viPham: {
+          soLan: e.moiNhat.soLanRoiMan || 0,
+          tongGiay: e.moiNhat.tongGiayRoiMan || 0,
+          daKhoa: e.moiNhat.trangThai === 'khoa',
+          lyDoKhoa: e.moiNhat.integrity?.lyDoKhoa ?? null,
+          nguong: chiTiet.ca.nguongLan && chiTiet.ca.nguongGiay ? { lan: Number(chiTiet.ca.nguongLan), giay: Number(chiTiet.ca.nguongGiay) } : null,
+          events: e.moiNhat.integrity?.events ?? null,
+        },
+      })
+      const ma = sinhMaPhieu()
+      maCua.set(sbd, ma)
+      const { phieu: goiGui } = giamGoiPhieu(phieu)
+      canLuu.push({ ma, maCa: chiTiet.ca.maCa, sbd, hoTen: e.hoTen, phieu: goiGui, loai: 'ketqua' })
+    }
+
+    if (canLuu.length === 0) return []
+    const { daLuu, loi } = await luuNhieuPhieu(url, mat, canLuu)
+    tien(daLuu.length, dsSbd.length)
+    if (loi.length > 0) showToast(`${loi.length} em chưa cất được phiếu: ${loi[0].vi_sao}`, 'warn')
+    const nay = new Date().toISOString()
+    return daLuu.map((x) => ({
+      sbd: x.sbd,
+      hoTen: daCham.find((e) => e.sbd === x.sbd)?.hoTen || x.sbd,
+      ma: x.ma,
+      link: taoLinkPhieu(goc, x.ma),
+      soLanXem: 0,
+      taoLuc: nay,
+    }))
+  }
+
   /** COPY HẾT LINK PHIẾU CỦA CA. Máy chủ đã giữ mã phiếu theo mã ca, nên chỉ
    * cần một lệnh thay vì mở phiếu từng em.
    *
@@ -433,22 +547,45 @@ export default function ExamMonitorScreen() {
     if (!url || !mat) return showToast('Chưa cấu hình link Apps Script hoặc mã bí mật', 'error')
     setDangGomLink(true)
     try {
-      const ds = await phieuTheoCa(url, mat, chiTiet.ca.maCa)
       const goc = `${location.origin}${import.meta.env.BASE_URL}`
-      const g = gomLinkPhieu(
+      const ds = await phieuTheoCa(url, mat, chiTiet.ca.maCa)
+      let g = gomLinkPhieu(
         daCham.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen })),
         ds,
         goc,
       )
+
+      // TỰ TẠO PHIẾU CHO EM CÒN THIẾU (thầy chốt 06/09).
+      //
+      // Trước đây phiếu chỉ được cất khi thầy MỞ hồ sơ từng em — ca ba chục em
+      // là ba chục lần mở chỉ để có link gửi Zalo. Nay bấm một nút: máy dựng
+      // nốt phiếu còn thiếu rồi copy đủ cả ca.
+      if (g.chuaCoPhieu.length > 0) {
+        setDangGomLink(true)
+        const them = await taoPhieuChoEm(
+          url,
+          mat,
+          g.chuaCoPhieu.map((x) => x.sbd),
+          goc,
+          (da, tong) => setTienTaoPhieu(`${da}/${tong}`),
+        )
+        if (them.length > 0) {
+          // Ghép tại chỗ, KHÔNG gọi lại `phieuTheoCa`: mã vừa tạo đã nằm trong
+          // tay, hỏi lại máy chủ là một lượt gọi thừa.
+          const conThieu = g.chuaCoPhieu.filter((x) => !them.some((t) => t.sbd === x.sbd))
+          g = { dong: [...g.dong, ...them], chuaCoPhieu: conThieu }
+        }
+      }
+
       if (g.dong.length === 0) {
         setTomTatLink('')
-        return showToast('Ca này chưa em nào được tạo phiếu — bấm Xem phiếu ở từng em, hoặc dùng nút Phiếu để dựng ảnh', 'warn')
+        return showToast('Chưa dựng được phiếu nào — máy này cần bản đề CÓ đáp án của ca', 'warn')
       }
       const t = vanBanLinkPhieu(g)
       setTomTatLink(tomTatLinkPhieu(g))
       try {
         await navigator.clipboard.writeText(t)
-        showToast(`Đã copy ${g.dong.length} link phiếu`, 'success')
+        showToast(`Đã copy ${g.dong.length} link phiếu${g.chuaCoPhieu.length ? ` · ${g.chuaCoPhieu.length} em chưa dựng được` : ''}`, 'success')
       } catch {
         showToast(t, 'success')
       }
@@ -456,6 +593,7 @@ export default function ExamMonitorScreen() {
       showToast(e instanceof Error ? e.message : 'Không lấy được danh sách phiếu', 'error')
     } finally {
       setDangGomLink(false)
+      setTienTaoPhieu('')
     }
   }
 
@@ -920,7 +1058,7 @@ export default function ExamMonitorScreen() {
                 style={{ gap: 8, minHeight: 48, marginTop: 'var(--k2)', borderRadius: 'var(--bo-1)', background: 'var(--the-2)', border: 'none', color: 'var(--muc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}
               >
                 {dangGomLink ? <RefreshCw size={18} className="animate-spin" /> : <Send size={18} />}
-                {dangGomLink ? 'Đang lấy mã phiếu…' : 'Copy link phiếu gửi Zalo'}
+                {dangGomLink ? (tienTaoPhieu ? `Đang dựng phiếu ${tienTaoPhieu}…` : 'Đang lấy mã phiếu…') : 'Tạo & copy link phiếu gửi Zalo'}
               </button>
               {tomTatLink && <div style={{ ...NHAN_NHO, marginTop: 4, textAlign: 'center' }}>{tomTatLink}</div>}
             </TheNoiDung>

@@ -118,7 +118,9 @@ describe('lệnh máy chủ và nút trên màn Theo dõi', () => {
 
   it('màn Theo dõi có nút copy link phiếu cho cả ca', async () => {
     const ma = (await import('../src/screens/ExamMonitorScreen.tsx?raw')).default
-    expect(ma).toContain('Copy link phiếu gửi Zalo')
+    // Nhãn đổi 06/09: nút không còn chỉ "copy" mà DỰNG NỐT phiếu còn thiếu rồi
+    // mới copy, nên chữ trên nút phải nói đúng việc nó làm.
+    expect(ma).toContain('Tạo & copy link phiếu gửi Zalo')
     expect(ma).toContain('phieuTheoCa(url, mat, chiTiet.ca.maCa)')
     expect(ma).toContain('vanBanLinkPhieu(g)')
   })

@@ -1616,6 +1616,133 @@ function doGet(e) {
   return jsonResponse_({ error: 'Thiếu hoặc sai tham số action' })
 }
 
+// ---------------------------------------------------------------------------
+// HỒ SƠ HỌC SINH — đọc bảng MỘT LẦN, tính cho bao nhiêu em cũng được.
+//
+// Tách ra từ `hoSoEm` (06/09) để `hoSoNhieuEm` dùng lại NGUYÊN VẸN phép tính:
+// hai lệnh mà hai đường tính là sớm muộn cũng lệch số, mà đây là số in vào
+// phiếu gửi phụ huynh.
+const TRAN_HO_SO_NHIEU = 60
+/** Số phiếu tối đa một gói `luuNhieuPhieu`. Phiếu có ảnh nặng vài trăm KB nên
+ * gói to quá là quá cỡ POST; máy thầy tự chia gói theo số này. */
+const TRAN_PHIEU_MOT_GOI = 6
+
+/** Đọc trọn ba bảng cần cho hồ sơ. Gọi MỘT LẦN rồi truyền xuống từng em. */
+function docBangHoSo_() {
+  const caData = getSheet_(SHEET_TIENDO_CA, TIENDO_CA_HEADERS).getDataRange().getValues()
+  // Chỉ 17 cột đầu: bỏ GhiChu/CapNhatLuc và nhất là GiayCauJson — đọc cả bảng
+  // là kéo về JSON giây-từng-câu của MỌI lượt, rất nặng.
+  const luotSh = sheetLuot_()
+  const soDongLuot = luotSh.getLastRow()
+  const luotData = soDongLuot > 0 ? luotSh.getRange(1, 1, soDongLuot, 17).getValues() : []
+  const tenCa = {}
+  const caRows = getSheet_(SHEET_CA, CA_HEADERS).getDataRange().getValues()
+  for (let i = 1; i < caRows.length; i++) {
+    // Ca thầy đã xoá thì không hiện lại trong hồ sơ em nữa.
+    if (String(caRows[i][9]) === 'da_xoa') continue
+    tenCa[String(caRows[i][0])] = { tenCa: String(caRows[i][10] || ''), lop: String(caRows[i][1] || '') }
+  }
+  // Điểm theo ca để xếp hạng — cũng chỉ tính một lần cho mọi em.
+  const diemTheoCa = {}
+  for (let i = 1; i < luotData.length; i++) {
+    const tt = String(luotData[i][7])
+    if (tt !== 'da_nop' && tt !== 'khoa') continue
+    const mc = String(luotData[i][0])
+    const tong = luotData[i][16]
+    if (tong === '' || tong === null || tong === undefined) continue
+    if (!diemTheoCa[mc]) diemTheoCa[mc] = []
+    diemTheoCa[mc].push(Number(tong))
+  }
+  return { caData: caData, luotData: luotData, tenCa: tenCa, diemTheoCa: diemTheoCa }
+}
+
+/** Hồ sơ của MỘT em, tính từ bảng đã đọc sẵn. Trả về đúng khuôn `hoSoEm`. */
+function hoSoTuBang_(sbd, bang) {
+  // Em chưa thi lần nào thì chưa có dòng trong HocSinh — lấy tên từ danh sách
+  // thầy đã nạp, để bấm vào em nào cũng ra hồ sơ có tên, không phải ô trống.
+  let em = hoSoHocSinh_(sbd)
+  if (!em || !em.hoTen) {
+    const tu = timTrongDanhSachLop_(sbd)
+    if (tu) em = { sbd: sbd, hoTen: tu.hoTen, namSinh: tu.namSinh, lop: tu.lop || (em ? em.lop : '') }
+  }
+  if (!em) em = { sbd: sbd, hoTen: '', namSinh: '', lop: '' }
+
+  const caData = bang.caData
+  const dongEm = []
+  for (let i = 1; i < caData.length; i++) if (String(caData[i][0]) === sbd) dongEm.push(caData[i])
+  const xh = xuHuongChuyenDe_(dongEm)
+  const cong = {}
+  for (let i = 0; i < dongEm.length; i++) {
+    const cd = String(dongEm[i][2])
+    if (!cong[cd]) cong[cd] = { soCau: 0, soSai: 0 }
+    cong[cd].soCau += Number(dongEm[i][3]) || 0
+    cong[cd].soSai += Number(dongEm[i][4]) || 0
+  }
+  const chuyenDe = []
+  const dsCd = Object.keys(cong)
+  for (let i = 0; i < dsCd.length; i++) {
+    const v = cong[dsCd[i]]
+    if (v.soCau === 0) continue
+    chuyenDe.push({ ten: dsCd[i], soCau: v.soCau, soSai: v.soSai, tiLeSai: v.soSai / v.soCau, xuHuong: xh[dsCd[i]] || 'chua_du' })
+  }
+  chuyenDe.sort(function (a, b) { return b.tiLeSai - a.tiLeSai })
+
+  const luotData = bang.luotData
+  const tenCa = bang.tenCa
+  const diemTheoCa = bang.diemTheoCa
+  const ca = []
+  for (let i = 1; i < luotData.length; i++) {
+    if (String(luotData[i][1]) !== sbd) continue
+    const tt = String(luotData[i][7])
+    if (tt !== 'da_nop' && tt !== 'khoa') continue
+    const mc = String(luotData[i][0])
+    if (!tenCa[mc]) continue // ca đã xoá (hoặc không còn trong CaKiemTra)
+    const tong = luotData[i][16] === '' || luotData[i][16] === null ? null : Number(luotData[i][16])
+    let hang = null
+    let siSo = null
+    if (tong !== null && diemTheoCa[mc]) {
+      const dsd = diemTheoCa[mc].slice().sort(function (a, b) { return b - a })
+      siSo = dsd.length
+      hang = dsd.indexOf(tong) + 1
+    }
+    ca.push({
+      maCa: mc,
+      tenCa: (tenCa[mc] || {}).tenCa || '',
+      lop: (tenCa[mc] || {}).lop || '',
+      lanThu: Number(luotData[i][2]) || 1,
+      nopLuc: String(luotData[i][6] || ''),
+      trangThai: tt,
+      diemI: luotData[i][13] === '' ? null : Number(luotData[i][13]),
+      diemII: luotData[i][14] === '' ? null : Number(luotData[i][14]),
+      diemIII: luotData[i][15] === '' ? null : Number(luotData[i][15]),
+      tong: tong,
+      hang: hang,
+      siSo: siSo,
+      soLanRoiMan: Number(luotData[i][9]) || 0,
+    })
+  }
+  ca.sort(function (a, b) { return msCua_(b.nopLuc) - msCua_(a.nopLuc) })
+
+  // Số liệu của RIÊNG ca gần nhất đã chấm — phiếu gửi phụ huynh phải dùng số
+  // của ca đó, không được dùng số cộng dồn (BA-APP: cấm bịa/nhầm số).
+  let caGanNhat = null
+  for (let i = 0; i < ca.length; i++) {
+    if (ca[i].tong !== null) { caGanNhat = ca[i]; break }
+  }
+  const cdCaGanNhat = []
+  let soCauSaiCaGanNhat = 0
+  if (caGanNhat) {
+    for (let i = 0; i < dongEm.length; i++) {
+      if (String(dongEm[i][1]) !== caGanNhat.maCa) continue
+      const soSai = Number(dongEm[i][4]) || 0
+      soCauSaiCaGanNhat += soSai
+      cdCaGanNhat.push({ ten: String(dongEm[i][2]), soCau: Number(dongEm[i][3]) || 0, soSai: soSai })
+    }
+    cdCaGanNhat.sort(function (a, b) { return b.soSai - a.soSai })
+  }
+  return { em: em, chuyenDe: chuyenDe, ca: ca, caGanNhat: caGanNhat, chuyenDeCaGanNhat: cdCaGanNhat, soCauSaiCaGanNhat: soCauSaiCaGanNhat }
+}
+
 function doPost(e) {
   const body = JSON.parse(e.postData.contents)
   const action = body.action
@@ -1716,6 +1843,53 @@ function doPost(e) {
   // duy nhất của hệ thống, nên nó bị bó chặt: phải đưa đúng mã 16 ký tự, trả
   // về ĐÚNG MỘT phiếu, không có lệnh liệt kê, và mã không suy ra được từ mã ca
   // hay số báo danh.
+  // LƯU NHIỀU PHIẾU MỘT LƯỢT — để "Tạo & copy link cả ca" gửi một gói thay vì
+  // ba chục lượt gọi (tối ưu 06/09). Mỗi lượt gọi Apps Script tốn sẵn ~1,5 giây
+  // dựng máy, nên gộp là thứ tiết kiệm nhiều nhất, hơn cả việc đọc ít cột.
+  //
+  // Mở sheet MỘT LẦN cho cả gói. Phiếu nào hỏng thì ghi vào `loi` và đi tiếp —
+  // một em lỗi không được kéo theo cả ca không có link.
+  if (action === 'luuNhieuPhieu') {
+    const loiN = kiemTraMaBiMat_(body)
+    if (loiN) return jsonResponse_({ ok: false, error: loiN })
+    const ds = Array.isArray(body.items) ? body.items : []
+    if (ds.length === 0) return jsonResponse_({ ok: true, daLuu: [], loi: [] })
+    if (ds.length > TRAN_PHIEU_MOT_GOI) return jsonResponse_({ ok: false, error: 'Gửi quá ' + TRAN_PHIEU_MOT_GOI + ' phiếu một gói' })
+    const sh = getSheet_(SHEET_PHIEU, PHIEU_HEADERS)
+    boSungTieuDe_(sh, PHIEU_HEADERS)
+    const daLuu = []
+    const loi = []
+    for (let k = 0; k < ds.length; k++) {
+      const it = ds[k] || {}
+      const ma = String(it.ma || '').trim()
+      if (!/^[A-Za-z0-9_-]{8,40}$/.test(ma) || !it.phieu) {
+        loi.push({ sbd: String(it.sbd || ''), vi_sao: 'Mã phiếu không hợp lệ hoặc thiếu nội dung' })
+        continue
+      }
+      try {
+        const row = findRowByKey_(sh, 0, ma)
+        const cu = row > 0 ? String(sh.getRange(row, 5).getValue()) : ''
+        const hang = [
+          ma,
+          String(it.maCa || ''),
+          String(it.sbd || ''),
+          String(it.hoTen || ''),
+          luuJsonLon_('phieu_' + ma, it.phieu, cu),
+          row > 0 ? sh.getRange(row, 6).getValue() : new Date().toISOString(),
+          row > 0 ? sh.getRange(row, 7).getValue() : 0,
+          row > 0 ? sh.getRange(row, 8).getValue() : '',
+          String(it.loai || '') === 'baitap' ? 'baitap' : 'ketqua',
+        ]
+        if (row > 0) sh.getRange(row, 1, 1, PHIEU_HEADERS.length).setValues([hang])
+        else sh.appendRow(hang)
+        daLuu.push({ sbd: String(it.sbd || ''), ma: ma })
+      } catch (err) {
+        loi.push({ sbd: String(it.sbd || ''), vi_sao: String(err && err.message ? err.message : err) })
+      }
+    }
+    return jsonResponse_({ ok: true, daLuu: daLuu, loi: loi })
+  }
+
   if (action === 'luuPhieu' || action === 'xoaPhieu') {
     const loiP = kiemTraMaBiMat_(body)
     if (loiP) return jsonResponse_({ ok: false, error: loiP })
@@ -2882,122 +3056,33 @@ function doPost(e) {
       return jsonResponse_({ ok: false, error: 'Không có quyền' })
     }
     if (!sbd) return jsonResponse_({ ok: false, error: 'Thiếu số báo danh' })
+    const ho = hoSoTuBang_(sbd, docBangHoSo_())
+    ho.ok = true
+    ho.serverNow = Date.now()
+    return jsonResponse_(ho)
+  }
 
-    // Em chưa thi lần nào thì chưa có dòng trong HocSinh — lấy tên từ danh sách
-    // thầy đã nạp, để bấm vào em nào cũng ra hồ sơ có tên, không phải ô trống.
-    let em = hoSoHocSinh_(sbd)
-    if (!em || !em.hoTen) {
-      const tu = timTrongDanhSachLop_(sbd)
-      if (tu) em = { sbd: sbd, hoTen: tu.hoTen, namSinh: tu.namSinh, lop: tu.lop || (em ? em.lop : '') }
+  // HỒ SƠ NHIỀU EM MỘT LƯỢT — để máy thầy dựng phiếu cả ca mà không phải gọi
+  // `hoSoEm` từng em (tối ưu 06/09).
+  //
+  // Mỗi lượt `hoSoEm` đọc TRỌN ba sheet: TienDoCa, LuotThi 17 cột, CaKiemTra.
+  // Ca ba chục em là chín chục lượt đọc sheet, mà nội dung ba sheet đó y hệt
+  // nhau ở cả ba chục lượt. Lệnh này đọc ĐÚNG MỘT LẦN rồi tính cho từng em.
+  // Chỉ thầy gọi được: nó trả hồ sơ của nhiều em cùng lúc.
+  if (action === 'hoSoNhieuEm') {
+    const loiHS = kiemTraMaBiMat_(body)
+    if (loiHS) return jsonResponse_({ ok: false, error: loiHS })
+    const ds = Array.isArray(body.sbd) ? body.sbd : []
+    if (ds.length === 0) return jsonResponse_({ ok: true, items: [], serverNow: Date.now() })
+    if (ds.length > TRAN_HO_SO_NHIEU) return jsonResponse_({ ok: false, error: 'Xin quá ' + TRAN_HO_SO_NHIEU + ' em một lượt' })
+    const bang = docBangHoSo_()
+    const items = []
+    for (let i = 0; i < ds.length; i++) {
+      const s1 = String(ds[i] || '').trim()
+      if (!s1) continue
+      items.push(hoSoTuBang_(s1, bang))
     }
-    if (!em) em = { sbd: sbd, hoTen: '', namSinh: '', lop: '' }
-
-    // Bảng chuyên đề + xu hướng, cả hai tính từ MỘT lần đọc TienDoCa: mỗi lệnh
-    // Apps Script tốn sẵn ~1,5 giây overhead nên cắt được lần đọc sheet nào là
-    // cắt (TienDoHS vẫn giữ để các lệnh khác dùng, nhưng ở đây không cần đọc).
-    const caData = getSheet_(SHEET_TIENDO_CA, TIENDO_CA_HEADERS).getDataRange().getValues()
-    const dongEm = []
-    for (let i = 1; i < caData.length; i++) if (String(caData[i][0]) === sbd) dongEm.push(caData[i])
-    const xh = xuHuongChuyenDe_(dongEm)
-    const cong = {}
-    for (let i = 0; i < dongEm.length; i++) {
-      const cd = String(dongEm[i][2])
-      if (!cong[cd]) cong[cd] = { soCau: 0, soSai: 0 }
-      cong[cd].soCau += Number(dongEm[i][3]) || 0
-      cong[cd].soSai += Number(dongEm[i][4]) || 0
-    }
-    const chuyenDe = []
-    const dsCd = Object.keys(cong)
-    for (let i = 0; i < dsCd.length; i++) {
-      const v = cong[dsCd[i]]
-      if (v.soCau === 0) continue
-      chuyenDe.push({ ten: dsCd[i], soCau: v.soCau, soSai: v.soSai, tiLeSai: v.soSai / v.soCau, xuHuong: xh[dsCd[i]] || 'chua_du' })
-    }
-    chuyenDe.sort(function (a, b) { return b.tiLeSai - a.tiLeSai })
-
-    // Lịch sử ca thi + hạng trong ca (tính từ chính LuotThi, không lưu sẵn).
-    // Chỉ lấy 17 cột đầu: bỏ GhiChu/CapNhatLuc và nhất là GiayCauJson —
-    // getDataRange() kéo về cả JSON giây-từng-câu của MỌI lượt, rất nặng.
-    const luotSh = sheetLuot_()
-    const soDongLuot = luotSh.getLastRow()
-    const luotData = soDongLuot > 0 ? luotSh.getRange(1, 1, soDongLuot, 17).getValues() : []
-    const diemTheoCa = {}
-    for (let i = 1; i < luotData.length; i++) {
-      const tt = String(luotData[i][7])
-      if (tt !== 'da_nop' && tt !== 'khoa') continue
-      const mc = String(luotData[i][0])
-      const tong = luotData[i][16]
-      if (tong === '' || tong === null || tong === undefined) continue
-      if (!diemTheoCa[mc]) diemTheoCa[mc] = []
-      diemTheoCa[mc].push(Number(tong))
-    }
-    const tenCa = {}
-    const caRows = getSheet_(SHEET_CA, CA_HEADERS).getDataRange().getValues()
-    for (let i = 1; i < caRows.length; i++) {
-      // Ca thầy đã xoá thì không hiện lại trong hồ sơ em nữa.
-      if (String(caRows[i][9]) === 'da_xoa') continue
-      tenCa[String(caRows[i][0])] = { tenCa: String(caRows[i][10] || ''), lop: String(caRows[i][1] || '') }
-    }
-    const ca = []
-    for (let i = 1; i < luotData.length; i++) {
-      if (String(luotData[i][1]) !== sbd) continue
-      const tt = String(luotData[i][7])
-      if (tt !== 'da_nop' && tt !== 'khoa') continue
-      const mc = String(luotData[i][0])
-      if (!tenCa[mc]) continue // ca đã xoá (hoặc không còn trong CaKiemTra)
-      const tong = luotData[i][16] === '' || luotData[i][16] === null ? null : Number(luotData[i][16])
-      let hang = null
-      let siSo = null
-      if (tong !== null && diemTheoCa[mc]) {
-        const ds = diemTheoCa[mc].slice().sort(function (a, b) { return b - a })
-        siSo = ds.length
-        hang = ds.indexOf(tong) + 1
-      }
-      ca.push({
-        maCa: mc,
-        tenCa: (tenCa[mc] || {}).tenCa || '',
-        lop: (tenCa[mc] || {}).lop || '',
-        lanThu: Number(luotData[i][2]) || 1,
-        nopLuc: String(luotData[i][6] || ''),
-        trangThai: tt,
-        diemI: luotData[i][13] === '' ? null : Number(luotData[i][13]),
-        diemII: luotData[i][14] === '' ? null : Number(luotData[i][14]),
-        diemIII: luotData[i][15] === '' ? null : Number(luotData[i][15]),
-        tong: tong,
-        hang: hang,
-        siSo: siSo,
-        soLanRoiMan: Number(luotData[i][9]) || 0,
-      })
-    }
-    ca.sort(function (a, b) { return msCua_(b.nopLuc) - msCua_(a.nopLuc) })
-
-    // Số liệu của RIÊNG ca gần nhất đã chấm — phiếu gửi phụ huynh phải dùng số
-    // của ca đó, không được dùng số cộng dồn (BA-APP: cấm bịa/nhầm số).
-    let caGanNhat = null
-    for (let i = 0; i < ca.length; i++) {
-      if (ca[i].tong !== null) { caGanNhat = ca[i]; break }
-    }
-    const cdCaGanNhat = []
-    let soCauSaiCaGanNhat = 0
-    if (caGanNhat) {
-      for (let i = 0; i < dongEm.length; i++) {
-        if (String(dongEm[i][1]) !== caGanNhat.maCa) continue
-        const soSai = Number(dongEm[i][4]) || 0
-        soCauSaiCaGanNhat += soSai
-        cdCaGanNhat.push({ ten: String(dongEm[i][2]), soCau: Number(dongEm[i][3]) || 0, soSai: soSai })
-      }
-      cdCaGanNhat.sort(function (a, b) { return b.soSai - a.soSai })
-    }
-    return jsonResponse_({
-      ok: true,
-      em: em,
-      chuyenDe: chuyenDe,
-      ca: ca,
-      caGanNhat: caGanNhat,
-      chuyenDeCaGanNhat: cdCaGanNhat,
-      soCauSaiCaGanNhat: soCauSaiCaGanNhat,
-      serverNow: Date.now(),
-    })
+    return jsonResponse_({ ok: true, items: items, serverNow: Date.now() })
   }
 
   if (action === 'phDongYGiaoBai') {
