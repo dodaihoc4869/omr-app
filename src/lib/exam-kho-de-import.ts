@@ -10,6 +10,7 @@
 // kho-de/.gitignore) hay tải lên bất kỳ server nào.
 import type { CanChua, HinhAnh, LoiGiaiCauTruc, LyDoY, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion, TrangThaiLoiGiai, ViTriHinh } from '../data/examContent'
 import { donCau } from './chu-la-pdf'
+import { maDangHopLe } from './cau-hinh-chua'
 
 /** Lời giải do pipeline "giải mù" rồi đối chiếu đáp án đề (NAPDETUDONG.md
  * B2–B3). `dap_an_de` là đáp án in trong đề — luôn dùng để CHẤM. */
@@ -88,6 +89,33 @@ export interface KhoDeCau {
   /** Sao cần chữa (0/1/2) + lý do — xem `claude/GAN-SAO-CAN-CHUA.md`. Thiếu →
    * để trống, tính như 0 sao, KHÔNG đoán. */
   can_chua?: CanChua
+  /** MÃ DẠNG BÀI ba tầng — đặc tả RÚT CÂU CHỮA v3 mục 4. Gán một lượt trên máy
+   * thầy bằng `kho-de/cong-cu/gan_dang.py`, chọn trong bảng đóng
+   * `kho-de/DANG-BAI.md`. Sai khuôn ba tầng thì BỎ, không nhét đại. */
+  dang?: DangKho | null
+  /** Vì sao `dang` để trống. Bắt buộc khi `dang === null`. */
+  viSaoNull?: string | null
+  kienThuc?: string[]
+  loiThuongGap?: string[]
+}
+
+export type DangKho = { ma: string; ten: string }
+
+/** Đọc `dang` từ kho. Mã KHÔNG đúng khuôn ba tầng thì trả `null` — thà câu đó
+ * chưa rút chữa được còn hơn nhận một mã rác rồi phát nhầm phiếu. */
+export function parseDang(v: unknown): DangKho | null {
+  if (typeof v !== 'object' || v === null || Array.isArray(v)) return null
+  const o = v as Record<string, unknown>
+  const ma = String(o.ma ?? '').trim()
+  if (!maDangHopLe(ma)) return null
+  const ten = String(o.ten ?? '').trim()
+  return { ma, ten: ten || ma }
+}
+
+/** Mảng chuỗi gọn — bỏ phần tử rỗng, không có thì trả mảng rỗng. */
+function chuoiMang(v: unknown): string[] {
+  if (!Array.isArray(v)) return []
+  return v.filter((x): x is string => typeof x === 'string' && x.trim() !== '').map((x) => x.trim())
 }
 
 const DK_HOP_LE = new Set<string>(['nen', 'buoc', 'bay', 'hay_gap'])
@@ -305,6 +333,10 @@ export function parseKhoDeJson(data: unknown): KhoDeParseResult {
       chuyen_de: typeof c.chuyen_de === 'string' && c.chuyen_de.trim() ? c.chuyen_de.trim() : undefined,
       muc_do: chuanHoaMucDo(c.muc_do),
       can_chua: parseCanChua(c.can_chua),
+      dang: parseDang(c.dang),
+      viSaoNull: typeof c.viSaoNull === 'string' && c.viSaoNull.trim() ? c.viSaoNull.trim() : null,
+      kienThuc: chuoiMang(c.kienThuc),
+      loiThuongGap: chuoiMang(c.loiThuongGap),
     })
   })
   if (errors.length > 0) return { ok: false, errors }
@@ -371,6 +403,12 @@ export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherE
       chuyenDe: c.chuyen_de,
       mucDo: c.muc_do,
       canChua: c.can_chua,
+      // MÃ DẠNG đi thẳng từ kho vào câu hỏi. Thiếu chỗ này thì `rutDeChua`
+      // không thấy mã nào, kho gán xong vẫn như chưa gán.
+      dang: c.dang ?? null,
+      viSaoNull: c.viSaoNull ?? undefined,
+      kienThuc: c.kienThuc && c.kienThuc.length > 0 ? c.kienThuc : undefined,
+      loiThuongGap: c.loiThuongGap && c.loiThuongGap.length > 0 ? c.loiThuongGap : undefined,
     }
 
     if (c.phan === 'I') {
