@@ -1175,7 +1175,11 @@ export async function cauKhacPhuc(
   loaiTru: string[],
   soCau: number,
 ): Promise<KetQuaKhacPhuc> {
-  const r = await postJson(scriptUrl, { action: 'cauKhacPhuc', maCa, sbd, idThietBi, chuyenDe, loaiTru, soCau })
+  // HẠN 60 GIÂY thay vì 25 mặc định. Hai lý do: gói trả về tới 2,5 MB (câu có
+  // ảnh), và lần gọi đầu sau khi thầy đẩy đề mới còn phải chờ máy chủ dựng lại
+  // chỉ mục cả kho. Hết hạn thì em vẫn có bộ dự phòng của ca, nhưng để 25 giây
+  // là gần như chắc chắn hụt đúng lần đầu.
+  const r = await postJson(scriptUrl, { action: 'cauKhacPhuc', maCa, sbd, idThietBi, chuyenDe, loaiTru, soCau }, 60)
   if (!r.ok) throw new Error(r.error || 'Không lấy được câu khắc phục')
   const items = Array.isArray(r.items) ? r.items : []
   return {
