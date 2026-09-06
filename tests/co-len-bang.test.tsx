@@ -75,12 +75,12 @@ async function moCa(cach: CachLay) {
   // publishSession; chạy cả bộ 78 tệp song song thì bước dựng có lúc quá mốc
   // 1 giây mặc định và phép kiểm đỏ ngẫu nhiên. Điều kiện kiểm giữ nguyên,
   // chỉ cho nó đủ thời gian chạy.
-  await waitFor(() => expect(r.container.textContent).toContain('Bộ câu ra đề'), { timeout: 8000 })
+  await waitFor(() => expect(r.container.textContent).toContain('Bộ câu ra đề'), { timeout: 20000 })
   fireEvent.click(r.getByRole('checkbox', { name: TEN_CHIP[cach] }))
   fireEvent.change(r.getByPlaceholderText('Lớp (vd 12A1)'), { target: { value: '12A1' } })
   // Tiêu đề màn cũng là chữ "Mở ca kiểm tra" — lấy đúng cái NÚT.
   fireEvent.click(r.getAllByText('Mở ca kiểm tra').find((e) => e.tagName === 'BUTTON')!)
-  await waitFor(() => expect(publishSession).toHaveBeenCalled(), { timeout: 8000 })
+  await waitFor(() => expect(publishSession).toHaveBeenCalled(), { timeout: 20000 })
   return { r, goi: publishSession.mock.calls.at(-1) as unknown as unknown[] }
 }
 
@@ -92,7 +92,7 @@ describe('cờ lên bảng suy từ khối Bộ câu ra đề', () => {
     // tắc DUY NHẤT còn lại trên màn này là "Giữ để đọc" (GIUDEDOC) — việc khác
     // hẳn, nên kiểm theo nhãn chứ không đếm tổng số công tắc.
     const r = render(<ExamSetupScreen />)
-    await waitFor(() => expect(r.container.textContent).toContain('Bộ câu ra đề'))
+    await waitFor(() => expect(r.container.textContent).toContain('Bộ câu ra đề'), { timeout: 20000 })
     const congTac = r.queryAllByRole('switch')
     expect(congTac.map((n) => n.getAttribute('aria-label'))).toEqual(['Giữ để đọc'])
     expect(r.container.textContent).not.toContain('Ca này dùng làm gì')

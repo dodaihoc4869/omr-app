@@ -77,6 +77,8 @@ export default function MessagesFab() {
   const [unread, setUnread] = useState(0)
 
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number; moved: boolean } | null>(null)
+  /** Mốc lần kéo gần nhất — để cú `click` sinh ra khi thả tay không mở popup. */
+  const vuaKeoRef = useRef(0)
   const btnRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
@@ -136,22 +138,36 @@ export default function MessagesFab() {
     if (Math.abs(dx) > 4 || Math.abs(dy) > 4) d.moved = true
     if (d.moved) setPos(clampPos({ x: d.origX + dx, y: d.origY + dy }))
   }
-  const handlePointerUp = () => {
+  // KẾT THÚC CHẠM — dùng cho cả `pointerup` LẪN `pointercancel`.
+  //
+  // LỖI ĐÃ DÍNH (thầy báo 06/09): phải GIỮ bong bóng một lúc mới bật lên, chạm
+  // nhanh thì không ăn. Vì việc mở popup nằm trong `pointerup`, mà chạm nhanh
+  // trên Android hay bị trình duyệt huỷ thành `pointercancel` — `pointerup`
+  // không bao giờ chạy, nên chỉ giữ lâu (không còn bị coi là cử chỉ cuộn) mới
+  // mở được. Nay việc MỞ chuyển hẳn sang `onClick` (chạm nhanh luôn có), còn
+  // hai sự kiện này chỉ lo chuyện kéo.
+  const ketThucCham = () => {
     const d = dragRef.current
     dragRef.current = null
-    if (d?.moved) {
-      try {
-        localStorage.setItem(POS_KEY, JSON.stringify(pos))
-      } catch {
-        // bỏ qua nếu không lưu được — chỉ mất vị trí nhớ, không ảnh hưởng chức năng.
-      }
-    } else {
-      // Không kéo (chỉ bấm) -> mở popup ở thẻ Trợ lý. KHÔNG tải hộp thư ngay:
-      // mở bong bóng để hỏi một câu mà kéo luôn cả hộp thư là gọi thừa một
-      // lệnh. Sang thẻ Tin nhắn mới tải.
-      setThe('troly')
-      setOpen(true)
+    if (!d?.moved) return
+    // Vừa kéo xong: nhớ vị trí, và chặn cú `click` đi ngay sau đó kẻo thả tay
+    // là popup bật lên.
+    vuaKeoRef.current = Date.now()
+    try {
+      localStorage.setItem(POS_KEY, JSON.stringify(pos))
+    } catch {
+      // bỏ qua nếu không lưu được — chỉ mất vị trí nhớ, không ảnh hưởng chức năng.
     }
+  }
+
+  /** Mở popup. Gắn vào `onClick` nên chạm nhanh là ăn ngay. */
+  const moPopup = () => {
+    // Kéo xong thả tay cũng sinh ra một cú click — bỏ qua nó.
+    if (Date.now() - vuaKeoRef.current < 300) return
+    // Mở ở thẻ Trợ lý. KHÔNG tải hộp thư ngay: mở bong bóng để hỏi một câu mà
+    // kéo luôn cả hộp thư là gọi thừa một lệnh. Sang thẻ Tin nhắn mới tải.
+    setThe('troly')
+    setOpen(true)
   }
 
   // Popup là 1 thẻ nổi NEO NGAY CẠNH icon (không phải bottom-sheet phủ hết
@@ -188,9 +204,13 @@ export default function MessagesFab() {
     <>
       <button
         ref={btnRef}
+        type="button"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
+        onPointerUp={ketThucCham}
+        onPointerCancel={ketThucCham}
+        onLostPointerCapture={ketThucCham}
+        onClick={moPopup}
         style={{ left: pos.x, top: pos.y, width: SIZE, height: SIZE, touchAction: 'none' }}
         className="fixed z-40 rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-900/30 flex items-center justify-center active:scale-95 transition-transform"
         title={`${TEN_TRO_LY} — kéo để di chuyển, bấm để mở`}

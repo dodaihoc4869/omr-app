@@ -16,6 +16,7 @@ export type LoaiYDinh =
   | 'ca_diem'
   | 'em_ho_so'
   | 'em_diem_thap'
+  | 'em_link_phieu'
   | 'kho_tong_quan'
   | 'kho_theo_chuyen_de'
   | 'kho_nghi_dap_an'
@@ -171,6 +172,12 @@ export function docYDinh(raw: string): YDinh {
   if (co(s, 'nghi dap an', 'dap an sai')) return { loai: 'kho_nghi_dap_an' }
   if (co(s, 'de nao') && docChuyenDe(s)) return { loai: 'kho_theo_chuyen_de', chuyenDe: docChuyenDe(s) }
 
+  // LINK BÁO CÁO — đứng TRƯỚC mọi luật về em và về ca, vì câu "link báo cáo em
+  // Minh" có cả chữ "em" lẫn chữ "báo cáo"; để sau là rơi vào hồ sơ em.
+  if (co(s, 'link', 'duong dan') && co(s, 'bao cao', 'phieu', 'ket qua', 'gui phu huynh', 'zalo')) {
+    return { loai: 'em_link_phieu', maCa, em: docSbd(goc) || docTenEm(goc) }
+  }
+
   // ĐIỂM THẤP CẢ LỚP — đứng TRƯỚC hồ sơ một em: "ai dưới 5" không có tên em.
   if (co(s, 'ai duoi', 'em nao duoi', 'duoi diem', 'diem thap', 'ai truot', 'em nao yeu')) {
     return { loai: 'em_diem_thap', nguongDiem: docNguong(s) }
@@ -205,7 +212,7 @@ export function docYDinh(raw: string): YDinh {
 /** Câu gợi ý hiện lần đầu mở trợ lý, và hiện lại khi không hiểu câu hỏi. */
 export const CAU_GOI_Y = [
   'Ca nào đang mở?',
+  'Lấy link báo cáo cả ca',
   'Ca nào có em chờ Thầy chữa?',
-  'Kho có bao nhiêu câu?',
   'Ai dưới 5 điểm?',
 ]

@@ -6,7 +6,7 @@
 // Ba tầng ở `src/lib/tro-ly/` lo phần nghĩ; component này chỉ lo phần hiện.
 // Không nhét luật nhận dạng câu hỏi vào đây — một nguồn sự thật là `y-dinh.ts`.
 import { useEffect, useRef, useState } from 'react'
-import { CornerDownLeft, RefreshCw } from 'lucide-react'
+import { Check, Copy, CornerDownLeft, RefreshCw } from 'lucide-react'
 import { layDuLieu, quenHet } from '../lib/tro-ly/nguon'
 import { dungTraLoi, khongHieu, type TraLoi } from '../lib/tro-ly/tra-loi'
 import { CAU_GOI_Y, docYDinh } from '../lib/tro-ly/y-dinh'
@@ -16,6 +16,8 @@ interface Dong {
   chu: string
   dong?: string[]
   nguon?: string
+  /** Khối chữ chép một chạm — dùng cho danh sách link báo cáo. */
+  chep?: string
 }
 
 export interface KhoiTroLyProps {
@@ -29,6 +31,8 @@ export default function KhoiTroLy({ scriptUrl, secret }: KhoiTroLyProps) {
   const [hoi, setHoi] = useState('')
   const [dong, setDong] = useState<Dong[]>([])
   const [dangNghi, setDangNghi] = useState(false)
+  /** Chỉ số dòng vừa được chép — để đổi nhãn nút trong hai giây. */
+  const [daChep, setDaChep] = useState(-1)
   const cuoiRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -57,7 +61,7 @@ export default function KhoiTroLy({ scriptUrl, secret }: KhoiTroLyProps) {
         return
       }
       const t: TraLoi = y.loai === 'khong_hieu' ? khongHieu() : dungTraLoi(y, duLieu)
-      setDong((cu) => [...cu, { ai: 'may', chu: t.chu, dong: t.dong, nguon: t.nguon }])
+      setDong((cu) => [...cu, { ai: 'may', chu: t.chu, dong: t.dong, nguon: t.nguon, chep: t.chep }])
     } catch (e) {
       setDong((cu) => [...cu, { ai: 'may', chu: e instanceof Error ? e.message : 'Không tra được. Thầy thử lại khi mạng ổn.' }])
     } finally {
@@ -113,6 +117,25 @@ export default function KhoiTroLy({ scriptUrl, secret }: KhoiTroLyProps) {
                     ))}
                   </ul>
                 )}
+                {d.chep ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // Không có clipboard (trình duyệt cũ, không phải HTTPS)
+                      // thì đừng im lặng — đổi nhãn báo cho thầy biết.
+                      navigator.clipboard
+                        ?.writeText(d.chep as string)
+                        .then(() => setDaChep(i))
+                        .catch(() => setDaChep(-2))
+                      window.setTimeout(() => setDaChep(-1), 2000)
+                    }}
+                    className="tap-target inline-flex items-center font-bold"
+                    style={{ gap: 6, marginTop: 8, minHeight: 40, padding: '0 12px', borderRadius: 10, border: '1px solid var(--vien-dam)', background: 'none', color: 'var(--muc)', fontSize: 13 }}
+                  >
+                    {daChep === i ? <Check size={15} /> : <Copy size={15} />}
+                    {daChep === i ? 'Đã chép' : daChep === -2 ? 'Máy không cho chép — bôi đen ở trên' : 'Chép để dán Zalo'}
+                  </button>
+                ) : null}
                 {d.nguon ? <div style={{ ...CHU_NHO, marginTop: 6 }}>Nguồn: {d.nguon}</div> : null}
               </div>
             </div>

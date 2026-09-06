@@ -101,6 +101,20 @@ describe('Hiểu câu hỏi — mỗi nhóm ít nhất ba cách hỏi', () => {
     expect(docYDinh('còn câu nào nghi đáp án sai').loai).toBe('kho_nghi_dap_an')
   })
 
+  it('LINK BÁO CÁO — cả ca và đích danh một em', () => {
+    for (const q of ['lấy link báo cáo cả ca', 'link phieu ca ABC123', 'cho tôi đường dẫn kết quả']) {
+      expect(docYDinh(q).loai).toBe('em_link_phieu')
+    }
+    expect(docYDinh('link báo cáo em Minh')).toMatchObject({ loai: 'em_link_phieu', em: 'Minh' })
+    expect(docYDinh('link phiếu SBD 100001')).toMatchObject({ loai: 'em_link_phieu', em: '100001' })
+    expect(docYDinh('link báo cáo ca ABC123')).toMatchObject({ loai: 'em_link_phieu', maCa: 'ABC123' })
+  })
+
+  it('hỏi LINK không bị nhầm sang hồ sơ em, và ngược lại', () => {
+    expect(docYDinh('em Minh điểm thế nào').loai).toBe('em_ho_so')
+    expect(docYDinh('link báo cáo em Minh').loai).toBe('em_link_phieu')
+  })
+
   it('học sinh hỏi và tin nhắn', () => {
     for (const q of ['ca nào có em chờ Thầy chữa', 'con em nao chua chua', 'học sinh hỏi']) {
       expect(docYDinh(q).loai).toBe('hoi_bai')
@@ -262,6 +276,29 @@ describe('Trả lời đúng số — so bằng số, không so mắt', () => {
     expect(iCarb).toBeLessThan(iEster)
   })
 
+  it('link báo cáo — mỗi em một dòng, và khối CHÉP đủ cả, không bị cắt', () => {
+    const link = Array.from({ length: TRAN_DONG + 3 }, (_, i) => ({
+      sbd: String(i), hoTen: `Em ${i}`, ma: `m${i}`, link: `https://x/p#m${i}`, soLanXem: 0, taoLuc: '',
+    }))
+    const t = dungTraLoi({ loai: 'em_link_phieu' }, { caDangXem: DU.ca![0], linkPhieu: link, chuaCoPhieu: [{ sbd: 'z', hoTen: 'Em Z' }] })
+    expect(t.chu).toContain(`${TRAN_DONG + 3} link báo cáo`)
+    expect(t.chu).toContain('Còn 1 em chưa có phiếu')
+    // Phần HIỆN bị cắt cho gọn…
+    expect(t.dong).toHaveLength(TRAN_DONG + 1)
+    // …nhưng phần CHÉP phải đủ, vì đó mới là thứ dán vào Zalo.
+    expect(t.chep?.split('\n')).toHaveLength(TRAN_DONG + 3)
+    expect(t.chep).toContain('https://x/p#m0')
+    expect(t.chep).toContain(`https://x/p#m${TRAN_DONG + 2}`)
+  })
+
+  it('link báo cáo — chưa em nào có phiếu thì chỉ chỗ tạo, KHÔNG dựng link giả', () => {
+    const t = dungTraLoi({ loai: 'em_link_phieu' }, { caDangXem: DU.ca![0], linkPhieu: [], chuaCoPhieu: [{ sbd: '1', hoTen: 'A' }] })
+    expect(t.chu).toContain('chưa em nào có phiếu')
+    expect(t.chu).toContain('bấm Xem phiếu')
+    expect(t.dong).toEqual([])
+    expect(t.chep).toBeUndefined()
+  })
+
   it('cắt bớt khi quá dài và NÓI RÕ còn bao nhiêu dòng', () => {
     const nhieu = Array.from({ length: TRAN_DONG + 5 }, (_, i) => em(String(i), `Em ${i}`, 1))
     const t = dungTraLoi({ loai: 'em_diem_thap', nguongDiem: 5 }, { em: nhieu })
@@ -309,6 +346,18 @@ describe('Bong bóng nổi dựng đúng cách', () => {
     const fab = readFileSync(resolve(__dirname, '../src/components/MessagesFab.tsx'), 'utf8')
     const moPopup = fab.slice(fab.indexOf('Không kéo (chỉ bấm)'), fab.indexOf('Popup là 1 thẻ nổi'))
     expect(moPopup).not.toContain('load(scriptUrl)')
+  })
+
+  it('chạm là mở, KHÔNG phải giữ — việc mở nằm ở onClick', async () => {
+    const { readFileSync } = await import('node:fs')
+    const { resolve } = await import('node:path')
+    const fab = readFileSync(resolve(__dirname, '../src/components/MessagesFab.tsx'), 'utf8')
+    // Chạm nhanh trên Android hay bị huỷ thành `pointercancel`, `pointerup`
+    // không chạy — nên việc MỞ không được nằm ở đó.
+    expect(fab).toContain('onClick={moPopup}')
+    expect(fab).toContain('onPointerCancel={ketThucCham}')
+    const moHam = fab.slice(fab.indexOf('const ketThucCham'), fab.indexOf('const moPopup'))
+    expect(moHam).not.toContain('setOpen(true)')
   })
 
   it('trợ lý KHÔNG tự chứa luật nhận dạng câu hỏi — một nguồn sự thật', async () => {

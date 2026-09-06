@@ -8,6 +8,7 @@
 // số từ chỗ khác rồi in như thể là số thật — thầy đang đứng lớp, đọc một con
 // số sai còn tệ hơn không có số nào.
 import type { CaTomTat, EmTomTat, HoSoEm, LuotThiRow, ParentMessage } from '../exam-api'
+import type { DongLinkPhieu } from '../link-phieu-ca'
 import type { TeacherExamSource } from '../../data/examContent'
 import type { CauHoiCuaEm } from '../hoi-bai'
 import { gomTheoCa } from '../hoi-bai'
@@ -26,6 +27,9 @@ export interface TraLoi {
   nguon: string
   /** true = trợ lý không hiểu, màn hiện lại câu gợi ý. */
   khongHieu?: boolean
+  /** Khối chữ thầy chép một chạm rồi dán thẳng vào Zalo. Chỉ dùng cho link
+   * báo cáo — chép tay từng dòng trong ô nhắn trên điện thoại là cực hình. */
+  chep?: string
 }
 
 /** Dữ liệu tầng trên đã lấy về. Thiếu phần nào thì để `undefined`, tầng này tự
@@ -39,6 +43,11 @@ export interface DuLieu {
   kho?: TeacherExamSource[]
   cauHoi?: CauHoiCuaEm[]
   tinNhan?: ParentMessage[]
+  /** Link phiếu của ca đang xem, đã dựng sẵn ở tầng lấy dữ liệu (cần
+   * `location.origin` nên không dựng được ở tầng thuần này). */
+  linkPhieu?: DongLinkPhieu[]
+  /** Em chưa có phiếu — nói ra để thầy biết phải bấm tạo phiếu trước. */
+  chuaCoPhieu?: { sbd: string; hoTen: string }[]
   /** Mốc thời gian coi là "bây giờ" — test bơm vào để số liệu cố định. */
   bayGio?: number
 }
@@ -160,6 +169,28 @@ export function dungTraLoi(y: YDinh, d: DuLieu): TraLoi {
       chu: `${tenCa(d.caDangXem)}: ${daCham.length} bài đã chấm · trung bình ${so(tb)} · cao nhất ${so(diem.reduce((a, b) => Math.max(a, b)))} · thấp nhất ${so(diem.reduce((a, b) => Math.min(a, b)))}.`,
       dong: cat(xep.map((l) => `${so(l.tong as number)} — ${l.hoTen || l.sbd} (SBD ${l.sbd})`)),
       nguon: `Ca ${d.caDangXem.maCa}`,
+    }
+  }
+
+  if (y.loai === 'em_link_phieu') {
+    if (!d.linkPhieu || !d.caDangXem) return CHUA_LAY('link báo cáo')
+    if (d.linkPhieu.length === 0) {
+      const chua = d.chuaCoPhieu ?? []
+      return {
+        chu: `${tenCa(d.caDangXem)}: chưa em nào có phiếu.${chua.length > 0 ? ` ${chua.length} em đã chấm nhưng chưa tạo phiếu.` : ''} Vào Ca thi → mở ca → bấm Xem phiếu ở từng em để tạo.`,
+        dong: [],
+        nguon: `Ca ${d.caDangXem.maCa}`,
+      }
+    }
+    const dong = d.linkPhieu.map((p) => `${p.hoTen || p.sbd}: ${p.link}`)
+    const them = (d.chuaCoPhieu ?? []).length
+    return {
+      chu: `${tenCa(d.caDangXem)}: ${d.linkPhieu.length} link báo cáo.${them > 0 ? ` Còn ${them} em chưa có phiếu.` : ''}`,
+      dong: cat(dong),
+      nguon: `Ca ${d.caDangXem.maCa}`,
+      // Chép ĐỦ, không cắt theo TRAN_DONG: phần hiện ra chỉ để thầy liếc, phần
+      // chép mới là thứ dán vào Zalo.
+      chep: dong.join('\n'),
     }
   }
 

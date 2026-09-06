@@ -5,10 +5,11 @@
 //
 // KHÔNG THÊM MỘT LỆNH MÁY CHỦ NÀO — chỉ gọi lại các lệnh đọc đã có. Trợ lý là
 // lối vào thứ hai tới cùng dữ liệu, không phải một đường dữ liệu mới.
-import { chiTietCa, danhSachCa, danhSachCauHoi, danhSachEm, hoSoEm, listParentMessages } from '../exam-api'
+import { chiTietCa, danhSachCa, danhSachCauHoi, danhSachEm, hoSoEm, listParentMessages, phieuTheoCa } from '../exam-api'
 import { loadExamSources } from '../exam-db'
+import { gomLinkPhieu } from '../link-phieu-ca'
 import { timEm, type DuLieu } from './tra-loi'
-import type { YDinh } from './y-dinh'
+import { chuanHoaHoi, type YDinh } from './y-dinh'
 
 /** Nhớ dữ liệu bao lâu. Thầy hỏi liền mấy câu về cùng một ca thì không gọi lại
  * máy chủ — đúng tinh thần giảm tải đã làm. */
@@ -69,6 +70,47 @@ export async function layDuLieu(y: YDinh, url: string, mat: string): Promise<Ket
       d.caDangXem = chon
       const ct = await lay(`ct:${chon.maCa}`, () => chiTietCa(u, m, chon.maCa))
       d.luot = ct.luot
+      return { duLieu: d }
+    }
+
+    case 'em_link_phieu': {
+      const ds = await lay('ca', () => danhSachCa(u, m))
+      d.ca = ds
+      const song = ds.filter((c) => c.trangThai !== 'da_xoa')
+      const chon = y.maCa ? song.find((c) => c.maCa === y.maCa) : song[0]
+      if (!chon) return { duLieu: d, hoiLai: y.maCa ? `Không thấy ca có mã ${y.maCa}.` : 'Chưa mở ca nào nên chưa có phiếu.' }
+      d.caDangXem = chon
+      const [ct, phieu] = await Promise.all([
+        lay(`ct:${chon.maCa}`, () => chiTietCa(u, m, chon.maCa)),
+        lay(`phieu:${chon.maCa}`, () => phieuTheoCa(u, m, chon.maCa)),
+      ])
+      d.luot = ct.luot
+      // CHỈ em ĐÃ CHẤM mới có phiếu để gửi — em chưa nộp thì gửi cái gì.
+      const daCham = ct.luot.filter((l) => typeof l.tong === 'number' && isFinite(l.tong as number)).map((l) => ({ sbd: l.sbd, hoTen: l.hoTen }))
+      // `location.origin` chỉ có ở đây; tầng dựng câu trả lời thuần nên nhận
+      // link đã dựng sẵn.
+      const goc = `${location.origin}${import.meta.env.BASE_URL}`
+      const g = gomLinkPhieu(daCham, phieu, goc)
+      // Hỏi đích danh một em thì lọc còn đúng em đó.
+      if (y.em) {
+        const k = chuanHoaHoi(y.em)
+        const loc = g.dong.filter((x) => x.sbd === y.em || chuanHoaHoi(x.hoTen).includes(k))
+        if (loc.length === 0) {
+          const chuaCo = g.chuaCoPhieu.filter((x) => x.sbd === y.em || chuanHoaHoi(x.hoTen).includes(k))
+          return {
+            duLieu: d,
+            hoiLai:
+              chuaCo.length > 0
+                ? `${chuaCo[0].hoTen || chuaCo[0].sbd} chưa có phiếu ở ${chon.tenCa || chon.maCa}. Vào Ca thi → mở ca → bấm Xem phiếu cho em này để tạo.`
+                : `Không thấy em nào tên hay số báo danh giống "${y.em}" trong ${chon.tenCa || chon.maCa}.`,
+          }
+        }
+        d.linkPhieu = loc
+        d.chuaCoPhieu = []
+        return { duLieu: d }
+      }
+      d.linkPhieu = g.dong
+      d.chuaCoPhieu = g.chuaCoPhieu
       return { duLieu: d }
     }
 
