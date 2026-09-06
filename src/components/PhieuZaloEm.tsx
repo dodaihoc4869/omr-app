@@ -189,6 +189,9 @@ export default function PhieuZaloEm({
   }, [duPhieu])
 
   const [link, setLink] = useState('')
+  // BÁO CÁO ĐÃ GỬI ĐI MÀ THIẾU HAI NÚT COPY LINK — thầy phải biết TRƯỚC khi
+  // dán link vào Zalo. Xem khối lý do ở chỗ cất phiếu bài tập bên dưới.
+  const [thieuNutBaiTap, setThieuNutBaiTap] = useState(false)
   const tin = duPhieu ? soanPhieuZalo(duPhieu, viec.trim() || undefined, link) : ''
 
   const duAnh: DuLieuAnhPhieu | null = useMemo(() => {
@@ -263,8 +266,21 @@ export default function PhieuZaloEm({
           // PHIẾU BÀI TẬP CẤT RIÊNG, có link riêng — để phụ huynh copy gửi
           // thẳng cho con. Link báo cáo có điểm và nhận xét của thầy, chuyển
           // tiếp nguyên cho con là sai đối tượng.
-          if (phieu.baiTap && phieu.baiTap.length > 0) {
-            try {
+          //
+          // KHÔNG ĐƯỢC NUỐT LỖI Ở ĐÂY — thầy báo 06/09 lần thứ hai: mở báo cáo
+          // trong app thì thấy hai nút copy link đề và lời giải, bấm link từ
+          // Zalo thì mất. Vì `dungPhieu` tự dựng `baiTap` nên bản trên máy chủ
+          // vẫn có bài luyện và thanh kéo, chỉ thiếu `linkBaiTap` — nhìn qua
+          // tưởng báo cáo lành lặn.
+          //
+          // Bản cũ bắt lỗi rồi bỏ qua, chú thích ghi "chỉ mất nút copy link".
+          // Cái giá đó thầy phải được biết, không phải máy tự quyết: báo cáo
+          // thiếu hai nút là phụ huynh không gửi được bài cho con.
+          //
+          // Từ nay: thử lại MỘT lần, vẫn hỏng thì dựng cờ để màn hình nói ra.
+          const dsBaiTap = phieu.baiTap
+          if (dsBaiTap && dsBaiTap.length > 0) {
+            const catPhieuBaiTap = async () => {
               if (btRef.current?.khoa !== khoa) {
                 const maBt = sinhMaPhieu()
                 const sai = phieu.chuyenDeCa.filter((c) => c.soSai > 0)
@@ -283,21 +299,31 @@ export default function PhieuZaloEm({
                       { nhan: 'Học sinh', gia: phieu.hoTen || `SBD ${phieu.sbd}` },
                       { nhan: 'SBD', gia: phieu.sbd },
                       ...(phieu.tenCa ? [{ nhan: 'Sau bài', gia: phieu.tenCa }] : []),
-                      { nhan: 'Số câu', gia: `${phieu.baiTap.length} câu` },
+                      { nhan: 'Số câu', gia: `${dsBaiTap.length} câu` },
                     ],
                   },
-                  cau: phieu.baiTap,
+                  cau: dsBaiTap,
                 }
                 await luuPhieu(url.trim(), mat.trim(), { ma: maBt, maCa: ca.maCa, sbd: hoSo.em.sbd, hoTen: hoSo.em.hoTen, phieu: goiBt, loai: 'baitap' })
                 btRef.current = { khoa, ma: maBt, link: taoLinkPhieu(`${location.origin}${import.meta.env.BASE_URL}`, maBt) }
               }
               phieu.linkBaiTap = btRef.current?.link
+            }
+            try {
+              await catPhieuBaiTap()
             } catch {
-              // Cất phiếu bài tập hỏng thì báo cáo vẫn phải gửi được, chỉ mất
-              // nút copy link. KHÔNG để một phần phụ kéo cả báo cáo xuống.
+              // Nhịp hai: mạng chập một cái thì lần này thường qua.
+              try {
+                await catPhieuBaiTap()
+              } catch {
+                // Vẫn hỏng. Báo cáo vẫn gửi được — thà thiếu hai nút còn hơn
+                // thầy không có gì gửi phụ huynh — NHƯNG phải nói ra.
+                if (con) setThieuNutBaiTap(true)
+              }
             }
           }
 
+          if (con && phieu.linkBaiTap) setThieuNutBaiTap(false)
           // Gói nặng thì bỏ bớt phần phụ chứ đừng để cả báo cáo gửi hỏng.
           const { phieu: goiGui } = giamGoiPhieu(phieu)
           await luuPhieu(url.trim(), mat.trim(), { ma, maCa: ca.maCa, sbd: hoSo.em.sbd, hoTen: hoSo.em.hoTen, phieu: goiGui, loai: 'ketqua' })
@@ -505,6 +531,15 @@ export default function PhieuZaloEm({
               Thu hồi link
             </button>
           </div>
+        )}
+
+        {/* Báo cáo gửi đi được nhưng THIẾU hai nút copy link đề và lời giải.
+            Nói ra trước khi thầy dán link vào Zalo, chứ không để phụ huynh mở
+            ra mới phát hiện. */}
+        {link && thieuNutBaiTap && (
+          <OThongBao tone="cam">
+            Chưa cất được phiếu bài tập lên kho, nên báo cáo này <b>thiếu hai nút copy link đề và lời giải</b>. Bài luyện vẫn xem được trong báo cáo. Sửa mạng rồi bấm <b>Dựng lại</b> là có đủ nút.
+          </OThongBao>
         )}
 
         {/* ẢNH PHIẾU — PHƯƠNG ÁN DỰ PHÒNG, thầy chọn gửi kiểu nào tuỳ lúc: tin
