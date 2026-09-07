@@ -89,6 +89,25 @@ export function doiDau(v: string): string {
   return than.startsWith('-') ? dau + than.slice(1) : dau + '-' + than
 }
 
+/** THÊM DẤU PHẨY vào đáp án phần III — thầy báo 07/09: "có một số bàn phím
+ * của iPhone không hiển thị dấu ,".
+ *
+ * `inputMode="decimal"` đáng ra cho dấu thập phân, nhưng trên vài bố cục bàn
+ * phím iOS nó ra dấu chấm hoặc không ra gì. Em không gõ nổi `1,5` thì mọi câu
+ * có phần thập phân đều mất điểm oan.
+ *
+ * ĐÃ CÓ dấu thập phân rồi thì không thêm nữa: `1,,5` không phải số. */
+export function themPhay(v: string): string {
+  const s = String(v ?? '')
+  return s.includes(',') || s.includes('.') ? s : s + ','
+}
+
+/** Đáp án đã có dấu thập phân chưa — để khoá nút, không cho gõ thành `1,,5`. */
+export function coPhay(v: string | null | undefined): boolean {
+  const s = String(v ?? '')
+  return s.includes(',') || s.includes('.')
+}
+
 function normSo(s: string): string {
   return s.trim().replace(',', '.')
 }
@@ -329,6 +348,9 @@ export default function TheCau(props: TheCauProps) {
       //
       // Giữ bàn phím số vì em gõ số là chính, và thêm nút ĐỔI DẤU bên cạnh:
       // một chạm, không phải chuyển sang bàn phím chữ rồi tìm dấu.
+      //
+      // 07/09 thêm nút DẤU PHẨY cùng lý do: vài bố cục bàn phím iOS không hiện
+      // dấu phẩy, em không gõ nổi `1,5`.
       <div className="flex items-stretch" style={{ gap: 'var(--k2)' }}>
         <button
           type="button"
@@ -349,6 +371,28 @@ export default function TheCau(props: TheCauProps) {
           }}
         >
           −
+        </button>
+        <button
+          type="button"
+          className="tap-target shrink-0"
+          aria-label="Thêm dấu phẩy"
+          disabled={coPhay(selected)}
+          onClick={() => onChange?.(themPhay(selected ?? ''))}
+          style={{
+            minHeight: 56,
+            width: 48,
+            borderRadius: 'var(--bo-1)',
+            border: '1.5px solid var(--vien)',
+            background: 'var(--the-2)',
+            color: 'var(--muc)',
+            opacity: coPhay(selected) ? 0.45 : 1,
+            fontFamily: 'var(--serif)',
+            fontSize: 'var(--cx-3)',
+            fontWeight: 700,
+            lineHeight: 1,
+          }}
+        >
+          ,
         </button>
         <input
           className="tap-target w-full"

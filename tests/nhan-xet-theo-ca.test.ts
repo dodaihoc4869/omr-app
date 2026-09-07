@@ -223,3 +223,52 @@ describe('đọc thành một giọng, không lặp', () => {
     expect(t).toContain('Polymer')
   })
 })
+
+// ---------------------------------------------------------------------------
+// SỐ THẬP PHÂN KIỂU VIỆT — thầy đọc bản chạy thật 07/09 và thấy:
+//
+//   "gấp hơn 3 lần trung bình 65.9 giây"
+//
+// `65.9` là cách JavaScript in số. Tiếng Việt viết `65,9`. Câu này nằm trong
+// tin gửi phụ huynh nên sai một dấu là đọc thành số khác.
+import { soVN, thongKeLamBai, tinHieuLamBai } from '../src/lib/phan-tich-lam-bai'
+import type { ChiTietCauRow } from '../src/lib/exam-api'
+
+describe('số thập phân trong nhận xét dùng dấu PHẨY', () => {
+  it('soVN đổi dấu chấm thành dấu phẩy, số nguyên giữ nguyên', () => {
+    expect(soVN(65.9)).toBe('65,9')
+    expect(soVN(57.6)).toBe('57,6')
+    expect(soVN(399)).toBe('399')
+  })
+
+  it('câu tín hiệu THẬT không còn dấu chấm thập phân', () => {
+    // Dựng một ca có câu dừng quá lâu rồi vẫn sai, đúng ca thầy đọc phải.
+    const r = (soCau: number, dung: boolean, giay: number): ChiTietCauRow => ({
+      phan: 'III',
+      soCau,
+      qid: `q${soCau}`,
+      chuyenDe: 'Ester – lipid',
+      mucDo: 'hieu',
+      dapAnChon: '1',
+      dapAnDung: dung ? '1' : '2',
+      dungSai: dung,
+      giay,
+    })
+    const rows = [r(1, true, 30), r(2, true, 41), r(3, true, 35), r(4, true, 38), r(5, false, 399)]
+    const ds = tinHieuLamBai(thongKeLamBai(rows, { vaoLuc: null, nopLuc: null, thoiLuongPhut: null }))
+    const lau = ds.find((t) => t.ma === 'dung_lau_mot_cau')
+    expect(lau, 'không dựng được ca dừng quá lâu').toBeTruthy()
+    expect(lau!.soLieu).toContain('399 giây')
+    // Trung bình có phần thập phân và PHẢI dùng dấu phẩy.
+    expect(lau!.soLieu).toMatch(/trung bình \d+,\d+ giây/)
+    expect(lau!.soLieu, lau!.soLieu).not.toMatch(/\d+\.\d+/)
+  })
+
+  it('nhận xét ghép ra cũng không lọt dấu chấm thập phân', () => {
+    const t = nhanXetTheoCa({
+      ...NEN,
+      tinHieu: [th('dung_lau_mot_cau', 'Phần III, trả lời ngắn câu 5 tốn 399 giây, gấp hơn 3 lần trung bình 65,9 giây, và vẫn sai.')],
+    })
+    expect(t, t).not.toMatch(/\d+\.\d+/)
+  })
+})

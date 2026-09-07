@@ -110,6 +110,15 @@ function tiLe(sai: number, tong: number): number {
   return tong > 0 ? sai / tong : 0
 }
 
+/** SỐ THẬP PHÂN KIỂU VIỆT: dấu PHẨY, không phải dấu chấm.
+ *
+ * Thầy đọc bản chạy thật 07/09 và câu nhận xét ra "gấp hơn 3 lần trung bình
+ * 65.9 giây". `65.9` là cách JavaScript in số; tiếng Việt viết `65,9`. Sai một
+ * dấu trong tin gửi phụ huynh là đủ để đọc thành số khác. */
+export function soVN(n: number): string {
+  return String(n).replace('.', ',')
+}
+
 function phanTram(sai: number, tong: number): string {
   return `${Math.round(tiLe(sai, tong) * 100)}%`
 }
@@ -142,7 +151,7 @@ export function tinHieuLamBai(tk: ThongKeLamBai): TinHieuLamBai[] {
     ra.push({
       ma: 'nhanh_o_cau_sai',
       nhan: 'Làm nhanh hơn ở những câu sai',
-      soLieu: `Trung bình ${tk.giayCauSaiTB} giây cho một câu sai, so với ${tk.giayCauDungTB} giây cho một câu đúng.`,
+      soLieu: `Trung bình ${soVN(tk.giayCauSaiTB)} giây cho một câu sai, so với ${soVN(tk.giayCauDungTB)} giây cho một câu đúng.`,
       loiKhuyen: 'Nhắc em đọc lại đề một lượt trước khi tô đáp án, nhất là câu thấy quen. Câu quen là câu dễ đọc lướt nhất.',
     })
   }
@@ -152,7 +161,7 @@ export function tinHieuLamBai(tk: ThongKeLamBai): TinHieuLamBai[] {
     ra.push({
       ma: 'dung_lau_mot_cau',
       nhan: 'Dừng quá lâu ở một câu',
-      soLieu: `${TEN_PHAN[tk.cauLauNhat.phan as 'I' | 'II' | 'III'] ?? tk.cauLauNhat.phan} câu ${tk.cauLauNhat.soCau} tốn ${tk.cauLauNhat.giay} giây, gấp hơn 3 lần trung bình ${tk.giayTB} giây, và vẫn sai.`,
+      soLieu: `${TEN_PHAN[tk.cauLauNhat.phan as 'I' | 'II' | 'III'] ?? tk.cauLauNhat.phan} câu ${tk.cauLauNhat.soCau} tốn ${soVN(tk.cauLauNhat.giay)} giây, gấp hơn 3 lần trung bình ${soVN(tk.giayTB)} giây, và vẫn sai.`,
       loiKhuyen: 'Nhắc em: một câu quá 2 phút chưa ra hướng thì bỏ qua, làm hết đề rồi quay lại. Ngồi lì một câu là mất luôn mấy câu dễ ở sau.',
     })
   }

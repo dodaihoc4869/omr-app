@@ -11,7 +11,7 @@ import { cleanup, fireEvent, render } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { MS_XAC_NHAN_AN, MS_XAC_NHAN_BLUR, laMayCamUng, tinhLaRoiMan, mucKhiRoiMan, NGUONG_MAC_DINH } from '../src/lib/chong-gian-lan'
-import TheCau, { doiDau, laAm } from '../src/components/TheCau'
+import TheCau, { doiDau, laAm, themPhay, coPhay } from '../src/components/TheCau'
 import { phaiHoanBanMoi } from '../src/lib/cap-nhat-app'
 
 afterEach(() => cleanup())
@@ -135,6 +135,52 @@ describe('Lỗi 3 — bàn phím iPhone không có dấu trừ', () => {
     expect(nut).toBeTruthy()
     fireEvent.click(nut)
     expect(doi).toHaveBeenCalledWith('92,4')
+  })
+
+  // -------------------------------------------------------------------------
+  // 07/09 — CÙNG MỘT DÂY LỖI: thầy báo "có một số bàn phím của iPhone không
+  // hiển thị dấu ,". `inputMode="decimal"` đáng ra cho dấu thập phân, nhưng vài
+  // bố cục iOS ra dấu chấm hoặc không ra gì. Em không gõ nổi `1,5` thì mọi câu
+  // có phần thập phân đều mất điểm oan.
+  it('themPhay nối dấu phẩy, và KHÔNG đẻ ra hai dấu thập phân', () => {
+    expect(themPhay('1')).toBe('1,')
+    expect(themPhay('')).toBe(',')
+    expect(themPhay('-12')).toBe('-12,')
+    // Đã có dấu rồi thì giữ nguyên, `1,,5` không phải số.
+    expect(themPhay('1,5')).toBe('1,5')
+    expect(themPhay('1.5')).toBe('1.5')
+  })
+
+  it('coPhay nhận cả dấu phẩy lẫn dấu chấm', () => {
+    expect(coPhay('1,5')).toBe(true)
+    expect(coPhay('1.5')).toBe(true)
+    expect(coPhay('15')).toBe(false)
+    expect(coPhay(null)).toBe(false)
+  })
+
+  it('ô trả lời ngắn có NÚT DẤU PHẨY cạnh nút dấu âm, bấm là ra dấu', () => {
+    const doi = vi.fn()
+    render(<TheCau kieu="sa" id="c1" stt={1} text="Tính m" selected="12" onChange={doi} />)
+    const nut = document.querySelector('[aria-label="Thêm dấu phẩy"]') as HTMLButtonElement
+    expect(nut).toBeTruthy()
+    expect(nut.disabled).toBe(false)
+    fireEvent.click(nut)
+    expect(doi).toHaveBeenCalledWith('12,')
+  })
+
+  it('đã có dấu thập phân thì nút KHOÁ, không bấm được nữa', () => {
+    const doi = vi.fn()
+    render(<TheCau kieu="sa" id="c1" stt={1} text="Tính m" selected="12,5" onChange={doi} />)
+    const nut = document.querySelector('[aria-label="Thêm dấu phẩy"]') as HTMLButtonElement
+    expect(nut.disabled).toBe(true)
+    fireEvent.click(nut)
+    expect(doi).not.toHaveBeenCalled()
+  })
+
+  it('hai nút đứng cạnh nhau, KHÔNG nút nào thay chỗ nút nào', () => {
+    render(<TheCau kieu="sa" id="c1" stt={1} text="Tính m" selected="" onChange={() => {}} />)
+    expect(document.querySelector('[aria-label="Thêm dấu âm"]')).toBeTruthy()
+    expect(document.querySelector('[aria-label="Thêm dấu phẩy"]')).toBeTruthy()
   })
 
   it('vẫn giữ bàn phím số — em gõ số là chính', () => {
