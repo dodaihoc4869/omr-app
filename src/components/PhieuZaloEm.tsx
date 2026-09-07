@@ -22,7 +22,7 @@ import KhungXemPhieu from './KhungXemPhieu'
 import { BAN_PHIEU_BT, type GoiPhieuBaiTap } from './NutPhieuHtml'
 import { dungPhieu, giamGoiPhieu, type NguonViPham } from '../lib/phieu-du-lieu'
 import { chiTietCa, luuPhieu, qidDaLam, sinhMaPhieu, xoaPhieu, type ChiTietCauRow } from '../lib/exam-api'
-import { docSoCauCa, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
+import { docDeRiengCa, docSoCauCa, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { taoChiTietCau } from '../lib/chi-tiet-cau'
 import { mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
 import type { HoSoEm } from '../lib/exam-api'
@@ -88,6 +88,9 @@ export default function PhieuZaloEm({
     thoiLuongPhut: number | null
     vaoLuc: string | null
     viPham: NguonViPham | null
+    /** Ca đề riêng từng em + số lần em đã sai từng câu lặp TRƯỚC ca này. */
+    deRieng: boolean
+    lapCua: Record<string, number> | null
   } | null>(null)
   const canThem = !rows || !banks || viPham === undefined
   useEffect(() => {
@@ -110,10 +113,13 @@ export default function PhieuZaloEm({
         // lượt cuối của ca đó, không gộp các lần thi lại.
         const luot = ct.luot.filter((l) => String(l.sbd) === hoSo.em.sbd).sort((a, b) => b.lanThu - a.lanThu)[0]
         const soCau = (await docSoCauCa(ca.maCa)) ?? (ct.keyBank as { soCau?: { I: number; II: number; III: number } } | null)?.soCau
+        // CA ĐỀ RIÊNG TỪNG EM: bản đồ sbd → câu phải đi cùng, không thì bảng
+        // chấm dựng ra là bảng của người khác.
+        const rieng = await docDeRiengCa(ca.maCa).catch(() => undefined)
         let rowsMoi: ChiTietCauRow[] | null = null
         if (bank && luot?.dapAn) {
           try {
-            rowsMoi = taoChiTietCau(mergeKeepAnswers(bank, soCau), ca.maCa, hoSo.em.sbd, luot.dapAn, luot.giayCau)
+            rowsMoi = taoChiTietCau(mergeKeepAnswers(bank, soCau, rieng?.boTheoEm), ca.maCa, hoSo.em.sbd, luot.dapAn, luot.giayCau)
           } catch {
             rowsMoi = null
           }
@@ -122,6 +128,10 @@ export default function PhieuZaloEm({
         setThem({
           rows: rowsMoi,
           banks: bank,
+          // CA ĐỀ RIÊNG TỪNG EM: cờ tắt hạng lớp, và bản đồ số lần sai để báo
+          // cáo gắn nhãn "Sai lần thứ N" / "Đã sửa được" giống hệt hai chỗ kia.
+          deRieng: Boolean(rieng),
+          lapCua: rieng?.lapCua?.[hoSo.em.sbd] ?? null,
           diemLop: ct.luot.map((l) => l.tong).filter((d): d is number => typeof d === 'number'),
           thoiLuongPhut: Number(ct.ca.thoiGianPhut) || null,
           vaoLuc: luot?.vaoLuc || null,
@@ -154,6 +164,8 @@ export default function PhieuZaloEm({
   const thoiLuongDung = thoiLuongPhut ?? them?.thoiLuongPhut ?? null
   const vaoLucDung = vaoLuc ?? them?.vaoLuc ?? null
   const viPhamDung = viPham !== undefined ? viPham : (them?.viPham ?? null)
+  const deRiengDung = them?.deRieng === true
+  const lapCuaDung = them?.lapCua ?? null
 
   const khungAnh = useRef<HTMLDivElement | null>(null)
   const [daCopy, setDaCopy] = useState(false)
@@ -272,6 +284,8 @@ export default function PhieuZaloEm({
             khoDe,
             qidDaLam: qidCu,
             viPham: viPhamDung,
+            deRieng: deRiengDung,
+            lapCua: lapCuaDung,
           })
 
           // PHIẾU BÀI TẬP CẤT RIÊNG, có link riêng — để phụ huynh copy gửi

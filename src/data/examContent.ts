@@ -268,14 +268,19 @@ export function mergeAndStrip(sources: TeacherExamSource[], soCau?: SoCauMoiPhan
 export function mergeKeepAnswers(
   sources: TeacherExamSource[],
   soCau?: SoCauMoiPhan,
+  /** Ca ĐỀ RIÊNG TỪNG EM: sbd → qid của em đó. Phải đi cùng bộ đề có đáp án,
+   * không thì máy thầy chấm lại bằng luật hash và ra bộ câu của người khác. */
+  boTheoEm?: Record<string, string[]>,
 ): {
   phanI: TeacherMcqQuestion[]
   phanII: TeacherTrueFalseQuestion[]
   phanIII: TeacherShortAnswerQuestion[]
   soCau?: SoCauMoiPhan
+  boTheoEm?: Record<string, string[]>
 } {
   return {
     soCau,
+    boTheoEm,
     phanI: sources.flatMap((s) => s.phanI),
     phanII: sources.flatMap((s) => s.phanII),
     phanIII: sources.flatMap((s) => s.phanIII),

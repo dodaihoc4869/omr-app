@@ -99,6 +99,8 @@ vi.mock('../src/lib/exam-db', () => ({
   loadTeacherSecret: async () => 'MA-THAT',
   loadScriptUrl: async () => 'https://may-chu-gia/exec',
   docSoCauCa: async () => undefined,
+  // Ca thường: không có bản đồ đề riêng nào được cất.
+  docDeRiengCa: async () => undefined,
   loadExamSources: async () => KHO,
   loadSessionTeacherBank: async () => BANK,
   luuSoCauCa: async () => {},

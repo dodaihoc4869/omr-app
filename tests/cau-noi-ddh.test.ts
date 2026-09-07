@@ -23,6 +23,8 @@ vi.mock('../src/lib/exam-db', () => ({
   loadScriptUrl: async () => URL_MAY_CHU,
   // `phieu-ca-ca` nhập từ cùng module này; giả lập cho đủ, không dùng tới.
   docSoCauCa: async () => undefined,
+  // Ca thường: không có bản đồ đề riêng nào được cất.
+  docDeRiengCa: async () => undefined,
   loadExamSources: async () => [],
   loadSessionTeacherBank: async () => null,
   luuSoCauCa: async () => {},

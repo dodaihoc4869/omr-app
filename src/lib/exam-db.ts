@@ -176,6 +176,28 @@ export async function docKhoChuaCa(maCa: string): Promise<TeacherExamSource[] | 
   return (await db.get(STORE_SETTINGS, `khoChuaCa:${maCa}`)) as TeacherExamSource[] | undefined
 }
 
+/** ĐỀ RIÊNG TỪNG EM của một ca: sbd → danh sách qid, và sbd → qid → số lần em
+ * đã sai câu đó TRƯỚC ca này (DE-RIENG-TUNG-EM).
+ *
+ * Vì sao cất ở máy thầy chứ không hỏi lại máy chủ lúc dựng báo cáo: con số
+ * "sai lần thứ N" trong báo cáo phải đúng bằng con số máy đã dùng để ra đề.
+ * Đếm lại lần thứ hai từ dữ liệu đã đổi (em thi bù, thầy chấm lại) là hai chỗ
+ * ra hai con số, mà phụ huynh chỉ thấy một.
+ *
+ * Nằm ở `settings` như `soCauCa`: không phải nâng phiên bản IndexedDB. Mất nó
+ * thì báo cáo chỉ thiếu nhãn câu lặp, KHÔNG bao giờ hiện nhãn sai. */
+export async function luuDeRiengCa(maCa: string, boTheoEm: Record<string, string[]>, lapCua: Record<string, Record<string, number>>): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, { boTheoEm, lapCua }, `deRiengCa:${maCa}`)
+}
+
+export async function docDeRiengCa(maCa: string): Promise<{ boTheoEm: Record<string, string[]>; lapCua: Record<string, Record<string, number>> } | undefined> {
+  const db = await getDb()
+  const v = (await db.get(STORE_SETTINGS, `deRiengCa:${maCa}`)) as { boTheoEm?: Record<string, string[]>; lapCua?: Record<string, Record<string, number>> } | undefined
+  if (!v || !v.boTheoEm || Object.keys(v.boTheoEm).length === 0) return undefined
+  return { boTheoEm: v.boTheoEm, lapCua: v.lapCua ?? {} }
+}
+
 export async function docSoCauCa(maCa: string): Promise<SoCauMoiPhan | undefined> {
   const db = await getDb()
   const v = (await db.get(STORE_SETTINGS, `soCauCa:${maCa}`)) as SoCauMoiPhan | undefined

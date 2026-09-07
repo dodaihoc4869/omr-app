@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { CheckSquare, Square, Library, Copy, Check } from 'lucide-react'
 import { mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
-import KhoiRutDe from '../components/KhoiRutDe'
+import KhoiRutDe, { type KhoiDeRiengRaDe } from '../components/KhoiRutDe'
 import HopChonDe from '../components/HopChonDe'
 import { locNguonTheoId, qidDaRaTuCacCa, type SoCauPhan } from '../lib/rut-de'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
@@ -13,7 +13,7 @@ import { randomSessionCode, taoLinkMoi } from '../lib/ca-link'
 import { TheNoiDung, Hang, OThongBao, NutChinh } from '../components/DesignSystem'
 import NutDongBo from '../components/NutDongBo'
 import { chuoi, danhSachEm, khoiTuNamSinh, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
-import { docSoCauCa, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, luuKhoChuaCa, luuSoCauCa, saveSessionTeacherBank } from '../lib/exam-db'
+import { docSoCauCa, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, luuDeRiengCa, luuKhoChuaCa, luuSoCauCa, saveSessionTeacherBank } from '../lib/exam-db'
 import { AN_HAN_CHON_GIAY, BAT_MAC_DINH_CA_THI, MS_AN_HAN_NHA_TAY } from '../lib/giu-de-doc'
 import { dongBoNganHang } from '../lib/exam-sync'
 import { useAppStore } from '../store/appStore'
@@ -163,7 +163,7 @@ export default function ExamSetupScreen() {
   // Danh sách em để tích: danh sách lớp trên máy (Google Sheet) — không có thì lấy danh sách lớp đã nạp lên máy chủ.
   const [dsDangKy, setDsDangKy] = useState<{ sbd: string; hoTen: string; lop: string }[] | null>(null)
   // Bộ câu màn Rút đề chốt; null = thầy chọn lấy trọn kho (đường cũ).
-  const [boRut, setBoRut] = useState<{ ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string> } | null>(null)
+  const [boRut, setBoRut] = useState<{ ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string>; deRieng?: KhoiDeRiengRaDe } | null>(null)
   // Câu đã ra ở các ca trước (đọc từ bản đề CÓ đáp án đã lưu của từng ca) — để
   // rút đề tránh phát lại câu lớp vừa làm tuần trước.
   const [qidCaTruoc, setQidCaTruoc] = useState<string[]>([])
@@ -229,6 +229,13 @@ export default function ExamSetupScreen() {
     const loc = nguon.filter((r) => r.sbd && (!lop.trim() || !r.lop || r.lop.trim() === lop.trim()) && (!q || r.hoTen.toLowerCase().includes(q) || r.sbd.toLowerCase().includes(q)))
     return loc.sort((a, b) => a.hoTen.localeCompare(b.hoTen, 'vi') || a.sbd.localeCompare(b.sbd, 'vi'))
   }, [classList, dsDangKy, timTen, lop])
+  /** SBD SẼ VÀO CA — nguồn duy nhất cho chế độ đề riêng từng em.
+   *
+   * Chỉ có nghĩa ở phạm vi "tích từng em": phạm vi tự do thì đến lúc mở ca vẫn
+   * chưa biết ai vào, mà đoán bừa một danh sách rồi dựng đề riêng cho người
+   * không tới là dựng thừa và báo sai con số cho thầy. */
+  const dsSbdVaoCa = useMemo(() => (phamVi === 'chon' ? Array.from(chonSbd) : []), [phamVi, chonSbd])
+
   const toggleSbd = (sbd: string) =>
     setChonSbd((prev) => {
       const next = new Set(prev)
@@ -297,8 +304,12 @@ export default function ExamSetupScreen() {
       const nguonCuoi = nguonRaDe
       const soCauCuoi = soCauRaDe
       if (nguonCuoi.length === 0) return showToast('Bộ câu ra đề đang rỗng — chỉnh lại phần Bộ câu ra đề', 'error')
-      const publicBank = mergeAndStrip(nguonCuoi, soCauCuoi)
-      const keyBank = congBoDiem === 'khong' ? undefined : mergeKeepAnswers(nguonCuoi, soCauCuoi)
+      // ĐỀ RIÊNG TỪNG EM: bản đồ sbd → câu phải đi cùng CẢ HAI gói. Gói công
+      // khai để máy em phát đúng bộ câu; gói có đáp án để máy chấm — thiếu ở
+      // gói nào là chỗ đó chạy luật hash và ra bộ câu của người khác.
+      const boTheoEm = boRut?.deRieng?.boTheoEm
+      const publicBank = { ...mergeAndStrip(nguonCuoi, soCauCuoi), boTheoEm }
+      const keyBank = congBoDiem === 'khong' ? undefined : mergeKeepAnswers(nguonCuoi, soCauCuoi, boTheoEm)
       const moc = await publishSession(scriptUrl.trim(), maCa, lop.trim(), thoiGianPhut, publicBank, congBoDiem, keyBank, {
         batDau: batDauIso,
         hanVaoPhut,
@@ -321,6 +332,9 @@ export default function ExamSetupScreen() {
       // chủ — em không được thấy câu chưa làm.
       if (boRut?.lenBang && boRut.idsChua) await luuKhoChuaCa(maCa, locNguonTheoId(selectedSources, boRut.idsChua))
       if (soCauCuoi) await luuSoCauCa(maCa, soCauCuoi)
+      // Cất bản đồ đề riêng + số lần sai TRƯỚC ca này ở máy thầy: báo cáo lấy
+      // đúng con số máy đã dùng để ra đề, không đếm lại lần thứ hai.
+      if (boRut?.deRieng) await luuDeRiengCa(maCa, boRut.deRieng.boTheoEm, boRut.deRieng.lapCua)
       setOpened({ maCa, joinLink: await taoLinkMoi(maCa, scriptUrl.trim()), batDau: moc.batDau, hetHanVao: moc.hetHanVao })
       setDaCopy(false)
       showToast('Đã mở ca', 'success')
@@ -465,7 +479,18 @@ export default function ExamSetupScreen() {
             />
           </div>
         )}
-        {selectedSources.length > 0 && <KhoiRutDe nguon={selectedSources} qidCaTruoc={qidCaTruoc} phutLamBai={thoiGianPhut} onDoi={setBoRut} onDoiPhutLamBai={setThoiGianPhut} />}
+        {selectedSources.length > 0 && (
+          <KhoiRutDe
+            nguon={selectedSources}
+            qidCaTruoc={qidCaTruoc}
+            phutLamBai={thoiGianPhut}
+            onDoi={setBoRut}
+            onDoiPhutLamBai={setThoiGianPhut}
+            scriptUrl={scriptUrl}
+            maBiMat={maBiMat}
+            dsSbd={dsSbdVaoCa}
+          />
+        )}
       </TheNoiDung>
 
       {/* 2. LỚP & THỜI GIAN */}

@@ -73,6 +73,13 @@ export const CSS_V3 = `
   vertical-align:middle}
 .v3-chip.bay{background:var(--p3-sai);color:var(--p-trang)}
 .v3-chip.mo{background:var(--p-chim);color:var(--p-nhat)}
+.v3-chip.sua{background:var(--p3-dung);color:var(--p-trang)}
+
+/* KHỐI "ĐÃ SỬA ĐƯỢC" — tin tốt duy nhất trong báo cáo mà máy chứng minh được
+   bằng số. Đứng NGAY TRÊN mục Từng câu sai, không chôn xuống cuối. */
+.v3-sua{border:1px solid var(--p3-dung);border-radius:14px;background:var(--p-giay);padding:13px 15px;margin-bottom:10px}
+.v3-sua h3{margin:0 0 6px;font-size:14px}
+.v3-sua ul{margin:0;padding-left:18px;font-size:13px;line-height:1.75}
 
 .v3-tinh{font-size:12.5px;color:var(--p-nhat);margin-top:10px;line-height:1.7}
 @media (prefers-reduced-motion:reduce){.v3-gap>summary::after{transition:none}}
@@ -88,7 +95,11 @@ function TangNhan({ so, ten }: { so: number; ten: string }) {
 
 /** Đường tiến bộ 6 bài gần nhất. ÍT HƠN 2 BÀI THÌ KHÔNG VẼ — một đoạn thẳng nối
  * một điểm với chính nó không nói lên điều gì, chỉ chiếm chỗ. */
-function Spark({ ds }: { ds: { ngay: string; tong: number }[] }) {
+/** Đường tiến bộ. `maCaRieng` = mã những ca ĐỀ RIÊNG TỪNG EM: chấm mốc của
+ * chúng vẽ RỖNG RUỘT kèm chú thích, vì 30% đề là câu em đã gặp nên điểm nhích
+ * lên một phần vì gặp lại. Vẽ đặc như ca thường là để phụ huynh đọc ra một cú
+ * tiến bộ mạnh hơn sự thật (DE-RIENG-TUNG-EM mục 2, hệ quả hai). */
+function Spark({ ds, maCaRieng }: { ds: { ngay: string; tong: number; maCa: string }[]; maCaRieng?: Set<string> }) {
   const lay = ds.slice(-6)
   if (lay.length < 2) return null
   const W = 260
@@ -101,14 +112,26 @@ function Spark({ ds }: { ds: { ngay: string; tong: number }[] }) {
   return (
     <svg className="v3-spark" viewBox={`0 0 ${W} ${H}`} width="100%" height={H} role="img" aria-label={`Điểm ${lay.length} bài gần nhất: ${lay.map((p) => soVN(p.tong)).join(', ')}`}>
       <path d={d} fill="none" stroke="var(--p-trang)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity=".55" />
-      {lay.map((p, i) => (
-        <g key={`${p.ngay}-${i}`}>
-          <circle cx={x(i)} cy={y(p.tong)} r={i === cuoi ? 5.5 : 3} fill={i === cuoi ? 'var(--p-trang)' : 'var(--p-trang)'} opacity={i === cuoi ? 1 : 0.55}>
-            <title>{`${ngayNgan(p.ngay)}: ${soVN(p.tong)} điểm`}</title>
-          </circle>
-          {i === cuoi && <circle cx={x(i)} cy={y(p.tong)} r="8.5" fill="none" stroke="var(--p-trang)" strokeWidth="1.5" opacity=".5" />}
-        </g>
-      ))}
+      {lay.map((p, i) => {
+        const rieng = maCaRieng?.has(p.maCa) === true
+        const r = i === cuoi ? 5.5 : 3
+        return (
+          <g key={`${p.ngay}-${i}`}>
+            <circle
+              cx={x(i)}
+              cy={y(p.tong)}
+              r={r}
+              fill={rieng ? 'none' : 'var(--p-trang)'}
+              stroke={rieng ? 'var(--p-trang)' : 'none'}
+              strokeWidth={rieng ? 1.6 : 0}
+              opacity={i === cuoi ? 1 : 0.55}
+            >
+              <title>{`${ngayNgan(p.ngay)}: ${soVN(p.tong)} điểm${rieng ? ' (bài có câu hỏi lại)' : ''}`}</title>
+            </circle>
+            {i === cuoi && <circle cx={x(i)} cy={y(p.tong)} r="8.5" fill="none" stroke="var(--p-trang)" strokeWidth="1.5" opacity=".5" />}
+          </g>
+        )
+      })}
     </svg>
   )
 }
@@ -123,6 +146,12 @@ export default function PhieuV3({ du, laCuaEm = false }: { du: PhieuDayDu; laCua
   const chac = du.chuyenDeCa.filter((c) => c.soCau > 0 && c.soSai === 0)
   const roi = du.chuyenDeCa.filter((c) => c.soSai > 0).sort((a, b) => b.soSai / b.soCau - a.soSai / a.soCau)
   const xung = laCuaEm ? 'em' : 'con'
+  // Chỉ CA NÀY được biết chắc là ca đề riêng: `hoSoEm` của máy chủ không chở cờ
+  // đó cho từng ca cũ, mà bịa ra thì sai. Mỗi báo cáo dựng ở thời điểm ca của
+  // nó, nên mốc mới nhất — đúng mốc có điểm bị câu lặp đẩy lên — luôn được vẽ
+  // đúng. Ca cũ vẽ như ca thường vì đó là tất cả những gì máy biết.
+  const caRieng = useMemo(() => new Set(du.deRieng && du.maCa ? [du.maCa] : []), [du.deRieng, du.maCa])
+  const daSua = du.daSuaDuoc ?? []
 
   return (
     <div className="v3">
@@ -146,7 +175,9 @@ export default function PhieuV3({ du, laCuaEm = false }: { du: PhieuDayDu; laCua
             {du.soCauSai > 0 ? ` · sai ${du.soCauSai} câu` : ''}
             {boTrong.length > 0 ? ` · bỏ trống ${boTrong.length} câu` : ''}
           </div>
-          <Spark ds={du.lichSu.map((c) => ({ ngay: c.ngay, tong: c.tong }))} />
+          {du.dongCauLap ? <div className="v3-dem">{du.dongCauLap}</div> : null}
+          <Spark ds={du.lichSu.map((c) => ({ ngay: c.ngay, tong: c.tong, maCa: c.maCa }))} maCaRieng={caRieng} />
+          {du.deRieng && <div className="v3-hero-ca" style={{ marginTop: 6 }}>Bài này mỗi bạn một bộ câu, nên không xếp hạng trong lớp.</div>}
           {du.viPham && (
             <div style={{ marginTop: 14 }}>
               <KhoiViPham vp={du.viPham} />
@@ -268,6 +299,26 @@ export default function PhieuV3({ du, laCuaEm = false }: { du: PhieuDayDu; laCua
         <div className="v3-tang">
           <TangNhan so={3} ten="Từng câu sai" />
 
+          {/* TIN TỐT ĐỨNG TRƯỚC. Câu em từng sai mà nay làm đúng KHÔNG nằm
+              trong mục câu sai (em có sai đâu), nên nếu không có khối riêng
+              này thì việc sửa được biến mất khỏi báo cáo. */}
+          {daSua.length > 0 && (
+            <div className="v3-sua">
+              <h3>
+                {xung === 'em' ? 'Em' : 'Con'} đã sửa được {daSua.length} câu từng sai
+              </h3>
+              <ul>
+                {daSua.map((c) => (
+                  <li key={c.qid}>
+                    Câu {c.soCau} phần {c.phan}
+                    {c.chuyenDe ? ` · ${c.chuyenDe}` : ''}
+                    <span className="v3-chip sua">Đã sửa được</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {du.cauSai.length === 0 ? (
             <div className="v3-the">
               <div style={{ fontSize: 13.5 }}>Bài này {xung} không sai câu nào.</div>
@@ -289,6 +340,8 @@ export default function PhieuV3({ du, laCuaEm = false }: { du: PhieuDayDu; laCua
                   {/* Câu cả lớp cùng chọn một phương án sai là BẪY CỦA ĐỀ, không
                       phải lỗi riêng của em. Nói ra bằng số thật, không bằng
                       phần trăm làm tròn. */}
+                  {/* Nhãn "sai lần thứ N" nằm TRONG thẻ câu (`TheCauChiTiet`),
+                      không dựng lại ở đây: ba chỗ hiện nhãn phải cùng một bản. */}
                   {typeof c.tiLeLopSai === 'number' && c.tiLeLopSai >= NGUONG_LOP_CUNG_SAI && c.soLopSai && c.siSoLop ? (
                     <div style={{ fontSize: 12, marginTop: 10 }}>
                       <span className="v3-chip bay">

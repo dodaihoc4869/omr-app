@@ -54,6 +54,13 @@ export const CSS_THE_CAU = `
   display:grid;place-items:center;padding:0;cursor:pointer}
 .bc-tick[aria-checked="true"]{background:var(--p-tim);border-color:var(--p-tim)}
 .bc-tick svg{display:block}
+/* NHÃN CÂU LẶP — DE-RIENG-TUNG-EM mục 4.4. Nằm CÙNG HÀNG với số thứ tự câu,
+   thấy được mà không phải mở thẻ ra. Luôn có CHỮ, không bao giờ chỉ có màu.
+   Dựng ở đây chứ không ở từng màn: báo cáo phụ huynh, màn chi tiết ca của thầy
+   và màn em xem lại bài dùng chung thẻ này, nên ba chỗ nói giống hệt nhau. */
+.bc-lap{flex:0 0 auto;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap;margin-left:6px}
+.bc-lap.sai{background:var(--p3-sai);color:var(--p-trang)}
+.bc-lap.sua{background:var(--p3-dung);color:var(--p-trang)}
 @media (prefers-reduced-motion:reduce){.bc-hop,.bc-mui{transition:none}}
 `
 
@@ -115,6 +122,14 @@ export default function TheCauChiTiet({ c, stt, mauSo, anLoiGiai = false, tick, 
           <span className="bc-mo-giua">
             <span className="bc-mo-ten">
               {nhanPhan}, câu {c.soCau}
+              {/* CHỈ câu lặp mới có nhãn. Câu mới làm đúng thì không có gì để
+                  "sửa", gắn nhãn vào là nói sai chuyện đã xảy ra. */}
+              {c.laCauLap === true &&
+                (c.daSuaDuoc === true ? (
+                  <span className="bc-lap sua">Đã sửa được</span>
+                ) : typeof c.soLanSai === 'number' ? (
+                  <span className="bc-lap sai">Sai lần thứ {c.soLanSai}</span>
+                ) : null)}
             </span>
             <span className="bc-mo-phu">
               {c.chuyenDe || 'chưa phân loại'}

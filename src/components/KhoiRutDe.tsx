@@ -14,6 +14,9 @@ import { Nhan, OThongBao } from './DesignSystem'
 import { boMotCau, demDangUngVien, demMucDo, doiMotCau, dsChuyenDe, dungUngVien, giayUocTinh, moiIdDaRut, MOI_MUC, PHAN_DE, PHUT_TOI_DA_LEN_BANG, rutDe, rutDeLenBang, rutKhoChua, soCauCua, soCauLenBang, soTinHieu, TEN_MUC, tongCau, type CauUngVien, type KetQuaRut, type MucDoRut, type PhanDe, type SoCauPhan, type YeuCauRut } from '../lib/rut-de'
 import { MOI_LOC_DANG, LOC_DANG_MAC_DINH, soCauDung, TEN_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
 import { demSao, LOC_SAO_MAC_DINH, MOI_LOC_SAO, soCauHopSao, TEN_LOC_SAO, type LocSao } from '../lib/loc-sao'
+import { CAU_HINH_DE_RIENG_MAC_DINH, soCauLapCan } from '../lib/cau-hinh-de-rieng'
+import { CHU_LY_DO_THIEU, demLanSai, dungDeRieng, type CaTruocDaCham, type KetQuaDeRieng } from '../lib/de-rieng'
+import { docCacCaTruoc, lapCuaTungEm, type CaBoQua } from '../lib/de-rieng-nguon'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -135,6 +138,12 @@ function HangCau({ c, stt, doi, bo, conDoi }: { c: CauUngVien; stt: number; doi:
   )
 }
 
+/** Bộ đề riêng đã dựng xong, đủ để màn Mở ca gửi lên và cất lại. */
+export interface KhoiDeRiengRaDe {
+  boTheoEm: Record<string, string[]>
+  lapCua: Record<string, Record<string, number>>
+}
+
 export interface KhoiRutDeProps {
   nguon: TeacherExamSource[]
   /** Câu đã ra ở các ca trước — đẩy xuống cuối khi rút. */
@@ -146,7 +155,14 @@ export interface KhoiRutDeProps {
    *
    * `lenBang` = bộ này rút cho buổi chữa bài ⇒ ca đẩy dữ liệu sang màn Gọi lên
    * bảng. `idsChua` = KHO CHỮA rộng hơn đề em làm, chỉ có ở chế độ đó. */
-  onDoi: (kq: { ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string> } | null) => void
+  onDoi: (kq: { ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string>; deRieng?: KhoiDeRiengRaDe } | null) => void
+  /** Link Apps Script và mã bí mật — chỉ dùng cho chế độ ĐỀ RIÊNG TỪNG EM, để
+   * đọc câu sai của từng em ở mấy ca gần nhất. Thiếu thì chế độ đó tắt. */
+  scriptUrl?: string
+  maBiMat?: string
+  /** SBD sẽ vào ca — chế độ đề riêng dựng đúng chừng này bộ câu. Rỗng thì
+   * không dựng được, và khối nói thẳng chứ không im lặng. */
+  dsSbd?: string[]
   /** Đổi thời lượng ca giúp thầy. Chỉ gọi khi thầy BẤM chip "Phân công lên
    * bảng": bộ câu chẩn đoán chốt cứng 15 phút, để ca 45 phút thì ô giờ nói một
    * đằng bộ câu một nẻo. Không ép sau đó — thầy vẫn sửa ô giờ tuỳ ý. */
@@ -160,7 +176,7 @@ type CheDoLay = 'rut' | 'tron' | 'lenbang'
  * khác nhau. Gấp 3 là mỗi em lấy 1/3 kho: đủ khác nhau mà gói đề chưa phình. */
 const HE_SO_KHO = 3
 
-export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiPhutLamBai }: KhoiRutDeProps) {
+export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiPhutLamBai, scriptUrl, maBiMat, dsSbd }: KhoiRutDeProps) {
   const uv = useMemo(() => dungUngVien(nguon), [nguon])
   const co: SoCauPhan = useMemo(() => ({ I: uv.I.length, II: uv.II.length, III: uv.III.length }), [uv])
   const tongKho = tongCau(co)
@@ -191,6 +207,12 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
   const [seed, setSeed] = useState(() => Math.floor(Math.random() * 1e9))
   const [moChiTiet, setMoChiTiet] = useState(false)
   const [kq, setKq] = useState<KetQuaRut | null>(null)
+  // ĐỀ RIÊNG TỪNG EM (DE-RIENG-TUNG-EM). Không bật mặc định.
+  const [deRieng, setDeRieng] = useState(false)
+  const [dangDocCa, setDangDocCa] = useState(false)
+  const [caTruoc, setCaTruoc] = useState<CaTruocDaCham[] | null>(null)
+  const [caBoQua, setCaBoQua] = useState<CaBoQua[]>([])
+  const [loiDocCa, setLoiDocCa] = useState('')
   // Câu thầy đã bấm đổi/bỏ trong lượt này — không cho quay lại ngay.
   const [daBo, setDaBo] = useState<string[]>([])
 
@@ -220,6 +242,38 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
     setDaBo([])
   }, [uv, yc, lenBang, phutLamBai, qidCaTruoc, seed])
 
+  // ĐỌC CA TRƯỚC — chỉ khi thầy BẬT chế độ, và đúng MỘT LẦN. Ba lệnh máy chủ
+  // cho cả lớp, không phải một lệnh một em.
+  useEffect(() => {
+    if (!deRieng || caTruoc !== null || dangDocCa) return
+    if (!scriptUrl?.trim() || !maBiMat?.trim()) {
+      setLoiDocCa('Chưa cấu hình link Apps Script hoặc mã bí mật')
+      return
+    }
+    let huy = false
+    setDangDocCa(true)
+    setLoiDocCa('')
+    docCacCaTruoc(scriptUrl.trim(), maBiMat.trim())
+      .then((r) => {
+        if (huy) return
+        setCaTruoc(r.dsCa)
+        setCaBoQua(r.boQua)
+      })
+      .catch((e) => !huy && setLoiDocCa(e instanceof Error ? e.message : 'Không đọc được ca trước'))
+      .finally(() => !huy && setDangDocCa(false))
+    return () => {
+      huy = true
+    }
+  }, [deRieng, caTruoc, dangDocCa, scriptUrl, maBiMat])
+
+  // Đổi bộ lọc hay số câu thì bộ đề riêng phải dựng lại — nhưng KHÔNG phải đọc
+  // lại ca trước, dữ liệu ca cũ có đổi đâu.
+  const dsSbdChot = useMemo(() => (dsSbd ?? []).map((x) => String(x).trim()).filter(Boolean), [dsSbd])
+  const raDeRieng: KetQuaDeRieng | null = useMemo(() => {
+    if (!deRieng || !rut || !caTruoc || dsSbdChot.length === 0) return null
+    return dungDeRieng({ uv, yc: { ...yc, soCau }, dsSbd: dsSbdChot, dsCa: caTruoc })
+  }, [deRieng, rut, caTruoc, dsSbdChot, uv, yc, soCau])
+
   // Báo bộ câu lên màn Mở ca. Không rút thì báo null = giữ nguyên đường cũ.
   useEffect(() => {
     if (cheDo === 'tron' || !kq) {
@@ -237,8 +291,19 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
     // soCau báo lên là SỐ CÂU MỖI EM LÀM, không phải cỡ kho. Kho lớn hơn thì
     // máy bốc riêng cho từng em; bằng nhau thì cả lớp cùng một đề.
     const kho = soCauCua(kq)
+    // ĐỀ RIÊNG TỪNG EM: gói đề phải chứa HỢP của mọi câu mọi em, và kèm bản đồ
+    // sbd → câu. `soCau` vẫn là số câu MỖI EM làm, không phải cỡ gói.
+    if (raDeRieng) {
+      onDoi({
+        ids: raDeRieng.ids,
+        soCau,
+        lenBang: false,
+        deRieng: { boTheoEm: raDeRieng.boTheoEm, lapCua: lapCuaTungEm(raDeRieng.boTheoEm, demLanSai(caTruoc ?? [])) },
+      })
+      return
+    }
     onDoi({ ids: moiIdDaRut(kq), soCau: { I: Math.min(soCau.I, kho.I), II: Math.min(soCau.II, kho.II), III: Math.min(soCau.III, kho.III) }, lenBang: false })
-  }, [cheDo, lenBang, kq, soCau, onDoi, uv, phutLamBai, qidCaTruoc, seed])
+  }, [cheDo, lenBang, kq, soCau, onDoi, uv, phutLamBai, qidCaTruoc, seed, raDeRieng, caTruoc])
 
   const daRut = kq ? soCauCua(kq) : { I: 0, II: 0, III: 0 }
   const thieu = kq ? PHAN_DE.filter((p) => kq.thieu[p] > 0) : []
@@ -357,6 +422,56 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
                 Cả lớp cùng một đề
               </Chip>
             </div>
+          </div>
+
+          {/* ĐỀ RIÊNG TỪNG EM — DE-RIENG-TUNG-EM mục 4.3.
+              Thầy phải thấy ĐỦ CON SỐ trước khi bấm mở, không phải mở màn khác
+              để biết ai thiếu câu lặp. */}
+          <div data-khoi="de-rieng">
+            <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }}>
+              <Chip chon={deRieng} onClick={() => setDeRieng((v) => !v)} mau="tim">
+                Hỏi lại câu em từng sai
+              </Chip>
+            </div>
+            {deRieng && (
+              <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
+                <div style={NHAN_NHO}>
+                  Mỗi em một đề, trong đó ít nhất <b style={{ ...SO, color: 'var(--muc)' }}>{Math.round(CAU_HINH_DE_RIENG_MAC_DINH.TI_LE_CAU_LAP * 100)}%</b> là câu chính em đã sai ở ca gần nhất em có nộp — tức{' '}
+                  <b style={{ ...SO, color: 'var(--muc)' }}>{soCauLapCan(soCau.I + soCau.II + soCau.III)}</b> câu trên {soCau.I + soCau.II + soCau.III}. Ca này KHÔNG xếp hạng lớp.
+                </div>
+                {dangDocCa && <div style={NHAN_NHO}>Đang đọc câu sai của {CAU_HINH_DE_RIENG_MAC_DINH.SO_CA_TRA_NGUOC} ca gần nhất…</div>}
+                {loiDocCa && <OThongBao tone="cam">{loiDocCa}</OThongBao>}
+                {caBoQua.length > 0 && (
+                  <OThongBao tone="cam">
+                    Bỏ qua {caBoQua.length} ca không đọc được: {caBoQua.map((c) => `${c.maCa} (${c.vi_sao})`).join(' · ')}. Câu sai ở mấy ca đó không được hỏi lại.
+                  </OThongBao>
+                )}
+                {!dangDocCa && dsSbdChot.length === 0 && <OThongBao tone="cam">Chưa biết em nào vào ca — chọn phạm vi "tích từng em" ở dưới thì máy mới dựng được đề riêng.</OThongBao>}
+                {raDeRieng && (
+                  <>
+                    <div style={{ ...NHAN_NHO, color: 'var(--muc)' }}>
+                      <b style={SO}>{dsSbdChot.length}</b> em có đề riêng · trung bình <b style={SO}>{raDeRieng.soLapTrungBinh.toFixed(1).replace('.', ',')}</b> câu hỏi lại mỗi em · gói đề{' '}
+                      <b style={SO}>{raDeRieng.ids.size}</b> câu
+                    </div>
+                    {raDeRieng.thieuLap.length === 0 && raDeRieng.canDayLai.length === 0 && raDeRieng.soLapTrungBinh === 0 && (
+                      <OThongBao tone="cam">Không em nào có câu sai ở ca trước, ca này không có câu lặp.</OThongBao>
+                    )}
+                    {raDeRieng.thieuLap.length > 0 && (
+                      <OThongBao tone="cam">
+                        <b>{raDeRieng.thieuLap.length} em không đủ {raDeRieng.canLap} câu hỏi lại:</b>{' '}
+                        {raDeRieng.thieuLap.map((t) => `${t.sbd} — ${t.soLap}/${t.can} câu, ${CHU_LY_DO_THIEU[t.lyDo]}`).join(' · ')}
+                      </OThongBao>
+                    )}
+                    {raDeRieng.canDayLai.length > 0 && (
+                      <OThongBao tone="cam">
+                        <b>{raDeRieng.canDayLai.length} câu đã hỏi lại {CAU_HINH_DE_RIENG_MAC_DINH.TRAN_LAP_MOT_CAU} lần mà em vẫn sai</b> — thôi hỏi lại, phần này phải dạy lại:{' '}
+                        {raDeRieng.canDayLai.map((c) => `${c.qid} (${c.dsSbd.join(', ')})`).join(' · ')}
+                      </OThongBao>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           {dsCd.length > 1 && (

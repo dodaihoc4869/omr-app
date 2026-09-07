@@ -245,6 +245,39 @@ export function rutDe(uv: Record<PhanDe, CauUngVien[]>, yc: YeuCauRut): KetQuaRu
   return { chon, thieu, lapLai, conLai }
 }
 
+/** RÚT ĐỀ CÓ SẴN MỘT SỐ CÂU BẮT BUỘC — dùng cho chế độ đề riêng từng em
+ * (DE-RIENG-TUNG-EM mục 4.2).
+ *
+ * Khác `rutDe` đúng một chỗ: mỗi phần nhận trước một nắm câu đã chốt (câu em
+ * từng sai), rồi mới lấy tiếp cho đủ chỉ tiêu của CHÍNH phần đó. Câu lặp trừ
+ * vào chỉ tiêu phần nó thuộc về; phần thiếu câu lặp thì phần khác KHÔNG bù,
+ * vì bù là đổi cấu trúc đề.
+ *
+ * `rutDe` không đổi một dòng nào — ca không bật chế độ này chạy y như cũ. */
+export function rutDeCoBatBuoc(uv: Record<PhanDe, CauUngVien[]>, yc: YeuCauRut, batBuoc: Partial<Record<PhanDe, CauUngVien[]>>): KetQuaRut {
+  const tranh = new Set(yc.tranhQid ?? [])
+  const chon = { I: [], II: [], III: [] } as Record<PhanDe, CauUngVien[]>
+  const thieu = { I: 0, II: 0, III: 0 }
+  const conLai = { I: 0, II: 0, III: 0 }
+  let lapLai = 0
+  for (const p of PHAN_DE) {
+    const hop = locTheoYeuCau(uv[p], yc)
+    const can = Math.max(0, Math.floor(Number(yc.soCau[p]) || 0))
+    // Câu bắt buộc KHÔNG đi qua bộ lọc chuyên đề/mức độ/dạng: em sai câu nào
+    // thì lặp đúng câu đó. Lọc là để chọn câu MỚI, không phải để loại câu em
+    // cần làm lại. Cắt xuống `can` để không vượt chỉ tiêu phần.
+    const bat = (batBuoc[p] ?? []).slice(0, can)
+    // `chonDan` đã tự loại câu trùng với `daCo` khỏi tập lấy tiếp, nên không
+    // phải lọc trước — truyền thẳng `hop` vào.
+    const c = chonDan(hop, can, tranh, hashSeed(`${yc.seed}:${p}`), bat, new Set())
+    chon[p] = c
+    thieu[p] = Math.max(0, can - c.length)
+    conLai[p] = Math.max(0, hop.length - c.filter((x) => hop.some((h) => h.id === x.id)).length)
+    lapLai += c.filter((x) => tranh.has(x.id)).length
+  }
+  return { chon, thieu, lapLai, conLai }
+}
+
 /** Đổi một câu đã rút lấy câu khác, giữ nguyên các câu còn lại. Câu bị bỏ ra
  * KHÔNG quay lại trong lượt đổi này (`cam`), kẻo bấm đổi mà vẫn ra câu cũ. */
 export function doiMotCau(uv: Record<PhanDe, CauUngVien[]>, yc: YeuCauRut, kq: KetQuaRut, phan: PhanDe, id: string, camThem: string[] = []): KetQuaRut {

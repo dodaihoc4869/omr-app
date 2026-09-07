@@ -17,7 +17,7 @@ import { viecCanLamMacDinh } from '../lib/phieu-zalo'
 import { gomLinkPhieu, tomTatLinkPhieu, vanBanLinkPhieu, type DongLinkPhieu } from '../lib/link-phieu-ca'
 import { dungPhieuChoEm } from '../lib/phieu-ca-ca'
 import { phieuTheoCa } from '../lib/exam-api'
-import { docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
+import { docDeRiengCa, docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { soanTinRoiMan } from '../lib/phieu-zalo'
@@ -75,6 +75,9 @@ interface HangEm {
   graded: GradedSubmission | null
   /** Điểm hiện ra: chấm tại máy (ưu tiên) hoặc điểm đã ghi trên Sheet. */
   diem: number | null
+  /** CA ĐỀ RIÊNG TỪNG EM (DE-RIENG-TUNG-EM mục 6): ba con số của riêng em này.
+   * `null` ở ca thường — cột biến mất chứ không hiện số 0 giả. */
+  lap?: { tong: number; daSua: number; saiLai: number } | null
 }
 
 /** Nhãn trạng thái cho 1 em (màu theo QUANLYCATHI mục 6). */
@@ -104,6 +107,7 @@ export default function ExamMonitorScreen() {
   const [dangTai, setDangTai] = useState(false)
   const [loi, setLoi] = useState('')
   const [chiTiet, setChiTiet] = useState<ChiTietCa | null>(null)
+  const [deRiengCa, setDeRiengCa] = useState<{ boTheoEm: Record<string, string[]>; lapCua: Record<string, Record<string, number>> } | null>(null)
   const [teacherBank, setTeacherBank] = useState<TeacherExamSource[] | null>(null)
   // Số câu mỗi phần của ca này (màn Rút đề chốt lúc mở ca). Chấm lại PHẢI dùng
   // đúng con số đó, nếu không thầy rút 25 câu phần I mà máy chỉ lấy 18 ⇒ điểm
@@ -199,6 +203,10 @@ export default function ExamMonitorScreen() {
       const sc = scLocal ?? (scServer && scServer.I + scServer.II + scServer.III > 0 ? scServer : undefined)
       setSoCauCa(sc)
       if (!scLocal && sc) await luuSoCauCa(ma.trim(), sc)
+      // CA ĐỀ RIÊNG TỪNG EM: bản đồ sbd → câu PHẢI có mặt trước khi chấm. Chấm
+      // bằng luật hash trong khi em nhận bộ câu theo bản đồ là ra bộ câu của
+      // người khác — sai điểm mà màn hình không báo gì.
+      setDeRiengCa((await docDeRiengCa(ma.trim()).catch(() => undefined)) ?? null)
     } catch (e) {
       setLoi(`Không tải được ca: ${e instanceof Error ? e.message : 'lỗi không rõ'}`)
     } finally {
@@ -228,9 +236,21 @@ export default function ExamMonitorScreen() {
       let graded: GradedSubmission | null = null
       if (teacherBank && moiNhat.dapAn && (moiNhat.trangThai === 'da_nop' || moiNhat.trangThai === 'khoa')) {
         try {
-          graded = gradeSubmissionFull(teacherBank, chiTiet.ca.maCa, sbd, moiNhat.dapAn, soCauCa)
+          graded = gradeSubmissionFull(teacherBank, chiTiet.ca.maCa, sbd, moiNhat.dapAn, soCauCa, deRiengCa?.boTheoEm)
         } catch {
           graded = null
+        }
+      }
+      // Ba con số câu lặp, đếm từ ĐÚNG bảng chấm của em, không ước lượng.
+      let lap: HangEm['lap'] = null
+      const lapEm = deRiengCa?.lapCua?.[sbd]
+      if (lapEm && teacherBank && moiNhat.dapAn && graded) {
+        try {
+          const rows = taoChiTietCau(mergeKeepAnswers(teacherBank, soCauCa, deRiengCa?.boTheoEm), chiTiet.ca.maCa, sbd, moiNhat.dapAn, moiNhat.giayCau)
+          const cua = rows.filter((r) => typeof lapEm[r.qid] === 'number')
+          lap = { tong: cua.length, daSua: cua.filter((r) => r.dungSai).length, saiLai: cua.filter((r) => r.dungSai === false).length }
+        } catch {
+          lap = null
         }
       }
       out.push({
@@ -242,18 +262,19 @@ export default function ExamMonitorScreen() {
         cacLuotCu: arr.slice(1),
         graded,
         diem: graded ? graded.score.total : moiNhat.tong,
+        lap,
       })
     })
     // Đã nộp/khoá lên trước theo giờ nộp mới nhất, rồi đang làm, rồi chờ thi lại.
     const thuTu = (l: LuotThiRow) => (l.trangThai === 'dang_lam' ? 1 : l.trangThai === 'duoc_duyet_lai' ? 2 : 0)
     out.sort((a, b) => thuTu(a.moiNhat) - thuTu(b.moiNhat) || (a.hoTen || a.sbd).localeCompare(b.hoTen || b.sbd, 'vi'))
     return out
-  }, [chiTiet, teacherBank, soCauCa, classList])
+  }, [chiTiet, teacherBank, soCauCa, classList, deRiengCa])
 
   // Tự ghi điểm + chi tiết từng câu (mục 5) cho lượt vừa chấm được mà chưa ghi.
   useEffect(() => {
     if (!chiTiet || !teacherBank) return
-    const bank = mergeKeepAnswers(teacherBank, soCauCa)
+    const bank = mergeKeepAnswers(teacherBank, soCauCa, deRiengCa?.boTheoEm)
     const can = dsEm.filter((e) => e.graded && !daGhiRef.current.has(`${e.sbd}:${e.moiNhat.lanThu}:${e.moiNhat.nopLuc}`))
     if (can.length === 0) return
     const bai = can.map((e) => taoBaiGhiDiem(bank, chiTiet.ca.maCa, e.sbd, e.moiNhat.lanThu, e.moiNhat.dapAn!, e.graded!, e.moiNhat.giayCau))
@@ -478,7 +499,9 @@ export default function ExamMonitorScreen() {
     if (!bank || bank.length === 0) return showToast('Máy này chưa có bản đề CÓ đáp án của ca — không dựng được phiếu', 'error')
     setDangGoiPhieu('0/' + daCham.length)
     try {
-      const keyBank = mergeKeepAnswers(bank, soCauCa)
+      // `boTheoEm` PHẢI đi cùng ở MỌI chỗ dựng bảng chấm: thiếu ở một chỗ là
+      // chỗ đó cắt câu theo luật hash và dựng bảng của người khác.
+      const keyBank = mergeKeepAnswers(bank, soCauCa, deRiengCa?.boTheoEm)
       const xep = [...daCham].sort((a, b) => (b.diem ?? 0) - (a.diem ?? 0))
       const hangCua = new Map<string, number>()
       xep.forEach((e, i) => {
@@ -556,8 +579,13 @@ export default function ExamMonitorScreen() {
         thoiGianPhut: chiTiet.ca.thoiGianPhut ?? null,
         nguongLan: chiTiet.ca.nguongLan ?? null,
         nguongGiay: chiTiet.ca.nguongGiay ?? null,
+        // CA ĐỀ RIÊNG TỪNG EM: cờ tắt hạng lớp, và bản đồ số lần sai để báo
+        // cáo gắn đúng nhãn. Thiếu ở đây là phiếu dựng từ màn Theo dõi khác
+        // phiếu dựng từ cầu nối — hai bản cho cùng một em.
+        deRieng: Boolean(deRiengCa),
+        lapCua: deRiengCa?.lapCua,
       },
-      mergeKeepAnswers(bank, soCauCa),
+      mergeKeepAnswers(bank, soCauCa, deRiengCa?.boTheoEm),
       daCham.filter((e): e is typeof e & { graded: NonNullable<typeof e.graded> } => !!e.graded),
       dsSbd,
       goc,
@@ -698,7 +726,7 @@ export default function ExamMonitorScreen() {
     let rowsHoSo: ChiTietCauRow[] | null = null
     if (chiTiet && teacherBank && emTrongCa?.moiNhat.dapAn) {
       try {
-        rowsHoSo = taoChiTietCau(mergeKeepAnswers(teacherBank, soCauCa), chiTiet.ca.maCa, sbdHoSo, emTrongCa.moiNhat.dapAn, emTrongCa.moiNhat.giayCau)
+        rowsHoSo = taoChiTietCau(mergeKeepAnswers(teacherBank, soCauCa, deRiengCa?.boTheoEm), chiTiet.ca.maCa, sbdHoSo, emTrongCa.moiNhat.dapAn, emTrongCa.moiNhat.giayCau)
       } catch {
         rowsHoSo = null
       }
@@ -1287,6 +1315,13 @@ export default function ExamMonitorScreen() {
                           {e.diem === null ? '—' : e.diem.toFixed(2)}
                         </span>
                         {e.diem !== null && <span style={NHAN_NHO}>{classify(e.diem)}</span>}
+                        {/* CA ĐỀ RIÊNG: câu hỏi lại của riêng em này. Luôn kèm
+                            chữ, không dùng riêng màu. */}
+                        {e.lap && e.lap.tong > 0 && (
+                          <span className="block" style={{ ...NHAN_NHO, ...SO }}>
+                            {e.lap.tong} hỏi lại · {e.lap.daSua} đã sửa · {e.lap.saiLai} sai lại
+                          </span>
+                        )}
                       </span>
                     </Hang>
                   )

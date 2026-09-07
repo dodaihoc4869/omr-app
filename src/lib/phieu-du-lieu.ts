@@ -62,6 +62,17 @@ export interface CauSaiChiTiet {
   /** Cả năm em làm chuyên đề này bao nhiêu câu, sai mấy — nguồn cho dòng lịch
    * sử cuối thẻ câu. `null` khi hồ sơ chưa có số cộng dồn. */
   lichSuChuyenDe?: { soCau: number; soSai: number } | null
+  /** CÂU LẶP — chính câu em đã sai ở ca trước, nay hỏi lại (DE-RIENG-TUNG-EM
+   * mục 4.4). Câu mới thì trường này vắng mặt, KHÔNG phải `false` giả. */
+  laCauLap?: boolean
+  /** Tổng số lần em làm sai ĐÚNG câu này, tính cả lần này, đếm qua toàn bộ
+   * lịch sử. Chỉ có nghĩa khi `laCauLap`. */
+  soLanSai?: number
+  /** Câu lặp mà lần này em làm ĐÚNG. Đây là tin tốt duy nhất trong báo cáo mà
+   * máy chứng minh được bằng số.
+   *
+   * CHỈ gắn cho câu lặp: câu mới làm đúng thì không có gì để "sửa". */
+  daSuaDuoc?: boolean
 }
 
 export interface DiemMotCa {
@@ -183,6 +194,13 @@ export interface PhieuDayDu {
   /** Ca ĐỀ RIÊNG TỪNG EM: mỗi em một bộ câu, nên hạng lớp và phân bố lớp mất
    * nghĩa và bị tắt bất kể `HIEN_HANG_LOP` (DE-RIENG-TUNG-EM mục 2). */
   deRieng?: boolean
+  /** CÂU LẶP EM ĐÃ SỬA ĐƯỢC — câu từng sai, ca này làm đúng. Đứng riêng, KHÔNG
+   * nằm trong `cauSai`, và hiện thành một khối ngay TRÊN mục Từng câu sai. */
+  daSuaDuoc?: CauSaiChiTiet[]
+  /** Số câu lặp trong đề của em, và một dòng nói ra chuyện đó cho phụ huynh.
+   * Giấu con số này là để phụ huynh hiểu nhầm về tiến bộ (mục 2, hệ quả hai). */
+  soCauLap?: number
+  dongCauLap?: string
 }
 
 /** Gói báo cáo lớn nhất còn gửi lên máy chủ được (byte). Phải khớp với
@@ -270,6 +288,10 @@ export interface ThemChoCauSai {
   rowsLop?: ChiTietCauRow[] | null
   /** Chuyên đề cộng dồn cả năm của em (hồ sơ). */
   chuyenDeTong?: { ten: string; soCau: number; soSai: number }[] | null
+  /** CÂU LẶP của em trong ca này: qid → tổng số lần em từng sai câu đó TRƯỚC
+   * ca này (DE-RIENG-TUNG-EM mục 4.4). Ca thường không truyền ⇒ không câu nào
+   * mang nhãn lặp, đúng như trước. */
+  lapCua?: Record<string, number> | null
 }
 
 export function dungCauSai(rows: ChiTietCauRow[], banks: TeacherExamSource[], chiCauSai = true, them?: ThemChoCauSai | null): CauSaiChiTiet[] {
@@ -327,9 +349,40 @@ export function dungCauSai(rows: ChiTietCauRow[], banks: TeacherExamSource[], ch
         const c = cdTong.get(r.chuyenDe || '')
         return c && c.soCau > 0 ? { soCau: c.soCau, soSai: c.soSai } : null
       })(),
+      // NHÃN CÂU LẶP. Ba trường này đi cùng nhau hoặc cùng vắng mặt — chỗ hiện
+      // chỉ đọc, không tự tính, để ba nơi (báo cáo, chi tiết ca, màn em xem
+      // lại) nói giống hệt nhau.
+      ...(() => {
+        const truoc = them?.lapCua?.[r.qid]
+        if (typeof truoc !== 'number') return {}
+        if (r.dungSai) return { laCauLap: true, soLanSai: truoc, daSuaDuoc: true }
+        return { laCauLap: true, soLanSai: truoc + 1, daSuaDuoc: false }
+      })(),
     })
   }
   return ra
+}
+
+/** CÂU LẶP EM ĐÃ SỬA ĐƯỢC — câu từng sai, ca này làm đúng.
+ *
+ * Đứng riêng chứ không nằm trong `cauSai`: em làm đúng thì không phải câu sai.
+ * `dungCauSai(rows, banks, false, ...)` mới trả cả câu đúng, nên chỗ gọi đưa
+ * vào đây danh sách TRỌN đề rồi lọc — một chỗ lọc, không mỗi nơi một kiểu. */
+export function cauDaSuaDuoc(tronDe: CauSaiChiTiet[]): CauSaiChiTiet[] {
+  return tronDe.filter((c) => c.laCauLap === true && c.daSuaDuoc === true)
+}
+
+/** Dòng nói RÕ ca này có câu lặp — DE-RIENG-TUNG-EM mục 2, hệ quả hai.
+ *
+ * Ba mươi phần trăm đề là câu em đã gặp, nên điểm nhích lên một phần vì gặp
+ * lại chứ không hẳn vì giỏi lên. Giấu chuyện đó là để phụ huynh hiểu nhầm về
+ * tiến bộ của con. Không có câu lặp thì KHÔNG dựng dòng. */
+export function dongCauLap(soLap: number, tongSoCau: number | null): string {
+  const n = Math.max(0, Math.floor(Number(soLap) || 0))
+  if (n === 0) return ''
+  const tong = Number(tongSoCau)
+  const phan = Number.isFinite(tong) && tong > 0 ? ` trên ${tong} câu` : ''
+  return `Trong đó ${n} câu${phan} là câu con từng sai, nay làm lại.`
 }
 
 const TEN_PHAN_DAI: Record<'I' | 'II' | 'III', string> = {
@@ -434,6 +487,9 @@ export interface NguonPhieu {
   cauHinh?: Partial<CauHinhPhieu> | null
   /** Ca đề riêng từng em — tắt hạng và phân bố lớp bất kể cấu hình. */
   deRieng?: boolean | null
+  /** CÂU LẶP của em trong ca này: qid → số lần em từng sai câu đó TRƯỚC ca
+   * này. Ca thường không truyền ⇒ báo cáo không có nhãn lặp nào. */
+  lapCua?: Record<string, number> | null
 }
 
 /** Số câu luyện RÚT SẴN vào báo cáo.
@@ -642,7 +698,12 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
 export function dungPhieu(n: NguonPhieu): PhieuDayDu {
   const rows = n.rows ?? []
   const banks = n.banks ?? []
-  const cauSai = rows.length && banks.length ? dungCauSai(rows, banks, true, { rowsLop: n.rowsLop, chuyenDeTong: n.hoSo.chuyenDe ?? [] }) : []
+  const themCauSai: ThemChoCauSai = { rowsLop: n.rowsLop, chuyenDeTong: n.hoSo.chuyenDe ?? [], lapCua: n.lapCua ?? null }
+  const cauSai = rows.length && banks.length ? dungCauSai(rows, banks, true, themCauSai) : []
+  // TRỌN ĐỀ (kể cả câu đúng) chỉ để lọc ra câu lặp em ĐÃ SỬA ĐƯỢC. Ca thường
+  // không có `lapCua` nên bỏ qua luôn, không dựng thừa.
+  const daSuaDuoc = n.lapCua && rows.length && banks.length ? cauDaSuaDuoc(dungCauSai(rows, banks, false, themCauSai)) : []
+  const soCauLap = rows.filter((r) => typeof n.lapCua?.[r.qid] === 'number').length
   const tk = rows.length ? thongKeLamBai(rows, { vaoLuc: n.vaoLuc, nopLuc: n.ca.nopLuc, thoiLuongPhut: n.thoiLuongPhut }) : null
 
   // BÀI LUYỆN KÈM SẴN — thầy chốt 06/09: "chỉ rút bài tập từ những chuyên đề
@@ -746,6 +807,9 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
     tinHieu: tk ? tinHieuLamBai(tk) : [],
     ducKet: ducKetKienThuc(cauSai.map((c) => ({ chuyenDe: c.chuyenDe, chot: c.chot }))),
     cauSai,
+    daSuaDuoc,
+    soCauLap,
+    dongCauLap: dongCauLap(soCauLap, tk ? tk.tongCau : rows.length || null),
     dai: rows.map((r) => ({ nhan: `Phần ${r.phan} câu ${r.soCau}`, giay: r.giay, dung: Boolean(r.dungSai) })),
     viPham: dungViPham(n.viPham),
     baiTap,

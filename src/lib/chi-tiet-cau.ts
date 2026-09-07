@@ -13,6 +13,10 @@ type KeyBankLike = {
   phanI: TeacherMcqQuestion[]
   phanII: TeacherTrueFalseQuestion[]
   phanIII: TeacherShortAnswerQuestion[]
+  /** Ca đề riêng từng em: sbd → qid. THIẾU TRƯỜNG NÀY LÀ DỰNG SAI BẢNG — em
+   * nhận bộ câu theo bản đồ mà máy dựng lại bằng luật hash thì ra câu của
+   * người khác. Thiếu ⇒ cắt theo luật hash như mọi ca thường. */
+  boTheoEm?: Record<string, string[]>
 }
 
 /** Đếm số giây của một câu — làm tròn, không âm; thiếu → null (không ghi 0 giả). */

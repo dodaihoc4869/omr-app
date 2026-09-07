@@ -25,7 +25,7 @@ import { taoLinkPhieu } from './phieu-link'
 import { BAN_PHIEU_BT, type GoiPhieuBaiTap } from '../components/NutPhieuHtml'
 import { gomLinkPhieu, type DongLinkPhieu } from './link-phieu-ca'
 import { gradeSubmissionFull, type GradedSubmission } from './exam-grade'
-import { docSoCauCa, loadExamSources, loadSessionTeacherBank, luuSoCauCa, saveSessionTeacherBank } from './exam-db'
+import { docDeRiengCa, docSoCauCa, loadExamSources, loadSessionTeacherBank, luuSoCauCa, saveSessionTeacherBank } from './exam-db'
 import { loadClassList } from './classlist-db'
 
 /** Phần thông tin CA mà một phiếu cần. Chỉ những trường thật sự dùng tới. */
@@ -39,6 +39,9 @@ export interface CaChoPhieu {
   /** Ca ĐỀ RIÊNG TỪNG EM — báo cáo của ca đó tắt hạng và phân bố lớp bất kể
    * cấu hình, vì mỗi em một bộ câu thì so điểm với nhau không còn nghĩa. */
   deRieng?: boolean
+  /** CÂU LẶP của ca: sbd → qid → số lần em đã sai câu đó TRƯỚC ca này. Nguồn
+   * DUY NHẤT của nhãn "Sai lần thứ N" và "Đã sửa được". */
+  lapCua?: Record<string, Record<string, number>>
 }
 
 /** Một em ĐÃ CHẤM ĐƯỢC. `graded` là điều kiện: chưa chấm thì không có phiếu. */
@@ -169,6 +172,7 @@ export async function dungPhieuChoEm(
       qidDaLam: rows.map((r) => r.qid).filter(Boolean),
       rowsLop,
       deRieng: ca.deRieng === true,
+      lapCua: ca.lapCua?.[sbd] ?? null,
       viPham: {
         soLan: e.moiNhat.soLanRoiMan || 0,
         tongGiay: e.moiNhat.tongGiayRoiMan || 0,
@@ -299,6 +303,14 @@ export async function gomCa(url: string, mat: string, maCa: string): Promise<CaD
   const sc = scLocal ?? (scServer && scServer.I + scServer.II + scServer.III > 0 ? scServer : undefined)
   if (!scLocal && sc) await luuSoCauCa(ma, sc)
 
+  // ĐỀ RIÊNG TỪNG EM. Hai việc, không được thiếu việc nào:
+  //   · `boTheoEm` phải nằm trong keyBank, không thì chấm lại đi bằng luật hash
+  //     và ra bộ câu của người khác — sai điểm mà không báo gì.
+  //   · `lapCua` là nguồn nhãn "sai lần thứ N" cho báo cáo.
+  // Máy khác không có bản cất này thì ca hiện ra như ca thường: thiếu nhãn,
+  // KHÔNG bao giờ nhãn sai.
+  const rieng = await docDeRiengCa(ma).catch(() => undefined)
+
   const dsLop = await loadClassList().catch(() => [])
   const theoSbd = new Map<string, LuotThiRow[]>()
   for (const l of ct.luot) {
@@ -313,7 +325,7 @@ export async function gomCa(url: string, mat: string, maCa: string): Promise<CaD
     if (!moiNhat.dapAn || (moiNhat.trangThai !== 'da_nop' && moiNhat.trangThai !== 'khoa')) return
     let graded: GradedSubmission | null = null
     try {
-      graded = gradeSubmissionFull(bank!, ct.ca.maCa, sbd, moiNhat.dapAn, sc)
+      graded = gradeSubmissionFull(bank!, ct.ca.maCa, sbd, moiNhat.dapAn, sc, rieng?.boTheoEm)
     } catch {
       graded = null
     }
@@ -337,8 +349,10 @@ export async function gomCa(url: string, mat: string, maCa: string): Promise<CaD
       thoiGianPhut: ct.ca.thoiGianPhut ?? null,
       nguongLan: ct.ca.nguongLan ?? null,
       nguongGiay: ct.ca.nguongGiay ?? null,
+      deRieng: Boolean(rieng),
+      lapCua: rieng?.lapCua,
     },
-    keyBank: mergeKeepAnswers(bank, sc),
+    keyBank: mergeKeepAnswers(bank, sc, rieng?.boTheoEm),
     daCham,
   }
 }

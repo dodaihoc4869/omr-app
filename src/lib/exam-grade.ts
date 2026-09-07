@@ -34,6 +34,8 @@ type KeyBankLike = {
   phanIII: TeacherShortAnswerQuestion[]
   /** Số câu mỗi phần của ca (màn Rút đề ghi). Thiếu ⇒ luật 18/4/6 cũ. */
   soCau?: SoCauMoiPhan
+  /** Ca đề riêng từng em: sbd → qid. Thiếu ⇒ cắt theo luật hash như cũ. */
+  boTheoEm?: Record<string, string[]>
 }
 
 /** Lõi chấm điểm — nhận thẳng bank đã gộp CÓ đáp án (dùng cho cả 2 nơi: máy
@@ -85,6 +87,10 @@ export function gradeSubmissionFull(
   sbd: string,
   submitted: AnswerRecord,
   soCau?: SoCauMoiPhan,
+  /** CA ĐỀ RIÊNG TỪNG EM: bản đồ sbd → qid của ca. Thiếu ⇒ cắt câu theo luật
+   * hash như mọi ca thường, không đổi một chữ nào của ca cũ. Truyền nhầm bản
+   * đồ của ca khác là chấm sai, nên chỗ gọi phải lấy đúng bản cất theo mã ca. */
+  boTheoEm?: Record<string, string[]>,
 ): GradedSubmission {
-  return gradeFromKeyBank(mergeTeacherSources(teacherSources, soCau), maCa, sbd, submitted)
+  return gradeFromKeyBank({ ...mergeTeacherSources(teacherSources, soCau), boTheoEm }, maCa, sbd, submitted)
 }
