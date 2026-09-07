@@ -126,6 +126,9 @@ export async function dungPhieuChoEm(
       diemI: sc.phanIScore,
       diemII: sc.phanIIScore,
       diemIII: sc.phanIIIScore,
+      // Trần từng phần lấy thẳng từ bộ chấm, không tính lại ở đây — hai chỗ
+      // tính là hai chỗ lệch.
+      tranPhan: { I: sc.quota.I / 100, II: sc.quota.II / 100, III: sc.quota.III / 100 },
       tong: sc.total,
       hang: hangCua.get(sbd) ?? null,
       siSo: daCham.length,

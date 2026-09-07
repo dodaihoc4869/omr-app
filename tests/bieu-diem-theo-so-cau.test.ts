@@ -222,3 +222,19 @@ describe('cờ và ca hỏng', () => {
     expect(() => scoreStudent(answers, key)).toThrow(/3 ý/)
   })
 })
+
+describe('phiếu ghi mẫu số ĐÚNG của từng phần', () => {
+  // Thầy đọc phiếu ca 248567 thấy "Phần I 1,69/10". Mẫu số bị đóng cứng là 10
+  // nên sai với MỌI ca, kể cả đề chuẩn: Phần I tối đa 4,50 chứ không phải 10.
+  it('trần từng phần lấy từ bộ chấm, đổi cents sang điểm', () => {
+    const key = deGia(8, 2, 2)
+    const q = scoreStudent(baiLam(key, 8, 4, 2), key).quota
+    expect({ I: q.I / 100, II: q.II / 100, III: q.III / 100 }).toEqual({ I: 4.5, II: 4, III: 1.5 })
+  })
+
+  it('ca thiếu một phần thì trần hai phần còn lại phải cộng đủ 10', () => {
+    const key = deGia(8, 0, 2)
+    const q = scoreStudent(baiLam(key, 8, 0, 2), key).quota
+    expect({ I: q.I / 100, II: q.II / 100, III: q.III / 100 }).toEqual({ I: 7.5, II: 0, III: 2.5 })
+  })
+})

@@ -751,6 +751,10 @@ export interface CaCuaEm {
   diemII: number | null
   diemIII: number | null
   tong: number | null
+  /** TRẦN ĐIỂM từng phần của ca (4,50 · 4,00 · 1,50 với ca đủ ba phần). Thiếu ⇒
+   * phiếu cũ, chỗ hiển thị hiểu là 10. Máy chủ không lưu, máy thầy tính lại từ
+   * số câu của ca rồi gắn vào lúc dựng phiếu. */
+  tranPhan?: { I: number; II: number; III: number } | null
   hang: number | null
   siSo: number | null
   soLanRoiMan: number

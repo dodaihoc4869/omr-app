@@ -648,9 +648,16 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false }: { duCoSan?: Ph
                 <div className="bc-dong" key={p}>
                   <div className="bc-dtren">
                     <span className="bc-dten">{TEN_PHAN[p]}</span>
-                    <span className="bc-dso">{soVN(du.diemPhan![p])}/10</span>
+                    <span className="bc-dso">
+                      {soVN(du.diemPhan![p])}/{soVN(du.tranPhan?.[p] ?? 10)}
+                    </span>
                   </div>
-                  <Thanh tiLe={du.diemPhan![p] / 10} mau={mauDiem(du.diemPhan![p])} hoan={220 + i * 110} tat={tat} />
+                  <Thanh
+                    tiLe={du.diemPhan![p] / (du.tranPhan?.[p] || 10)}
+                    mau={mauDiem((du.diemPhan![p] / (du.tranPhan?.[p] || 10)) * 10)}
+                    hoan={220 + i * 110}
+                    tat={tat}
+                  />
                 </div>
               ))}
             </div>

@@ -95,6 +95,12 @@ export interface PhieuDayDu {
   ngay: string
   diem: number
   diemPhan: { I: number; II: number; III: number } | null
+  /** TRẦN ĐIỂM từng phần của ca này. Thiếu ⇒ phiếu cũ, hiểu là 10 cho cả ba.
+   *
+   * Bản cũ in "1,69/10" cho từng phần vì mẫu số bị đóng cứng là 10 — sai với
+   * mọi ca: Phần I tối đa 4,50 chứ không phải 10. Ca 8/2/2 của thầy (07/09)
+   * làm chỗ này lộ ra rõ nhất. */
+  tranPhan?: { I: number; II: number; III: number } | null
   soCauSai: number
   tongSoCau: number | null
   hang: number | null
@@ -350,6 +356,8 @@ export interface NguonPhieuMayEm {
   thoiLuongPhut?: number | null
   diem: number
   diemPhan?: { I: number; II: number; III: number } | null
+  /** Trần điểm từng phần — xem ghi chú ở `PhieuDuLieu.tranPhan`. */
+  tranPhan?: { I: number; II: number; III: number } | null
   rows: ChiTietCauRow[]
   banks: TeacherExamSource[]
   /** Nhật ký rời màn của chính lượt em vừa nộp (máy em giữ đủ). */
@@ -486,6 +494,7 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
     ngay: n.nopLuc || '',
     diem: n.diem,
     diemPhan: n.diemPhan ?? null,
+    tranPhan: n.tranPhan ?? null,
     soCauSai: tk.soSai,
     tongSoCau: tk.tongCau,
     // Máy em KHÔNG biết bảng điểm cả lớp — để trống, trang báo cáo tự giấu mục.
@@ -600,6 +609,7 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
     ngay: n.ca.nopLuc || '',
     diem: n.ca.tong ?? 0,
     diemPhan: n.ca.diemI !== null && n.ca.diemII !== null && n.ca.diemIII !== null ? { I: n.ca.diemI, II: n.ca.diemII, III: n.ca.diemIII } : null,
+    tranPhan: n.ca.tranPhan ?? null,
     soCauSai: tk ? tk.soSai : n.hoSo.soCauSaiCaGanNhat,
     tongSoCau: tk ? tk.tongCau : n.chuyenDeCa.reduce((s, c) => s + c.soCau, 0) || null,
     hang: n.ca.hang,
