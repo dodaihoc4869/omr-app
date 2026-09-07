@@ -79,10 +79,16 @@ export async function dungPhieuChoEm(
   dsSbd: string[],
   goc: string,
   tien: (da: number, tong: number) => void = () => {},
-  /** Mã phiếu ĐÃ CÓ của từng em, để lượt dựng lại GIỮ NGUYÊN link đã gửi phụ
-   * huynh. Thiếu map này thì mỗi lần dựng lại là một link mới, link cũ trong
-   * Zalo thành link chết. */
-  maCu?: Map<string, { ketqua?: string; baitap?: string }>,
+  /** MỌI mã phiếu ĐÃ CÓ của từng em, để lượt dựng lại GIỮ NGUYÊN link đã gửi
+   * phụ huynh. Thiếu map này thì mỗi lần dựng lại là một link mới, link cũ
+   * trong Zalo thành link chết.
+   *
+   * MẢNG chứ không phải một mã — thầy bắt được 07/09: có em mang HAI phiếu kết
+   * quả (dựng hàng loạt một lần, mở hồ sơ riêng dựng thêm một lần). Bản cũ giữ
+   * đúng một mã nên lượt dựng lại chỉ đè được một cái, cái còn lại giữ nguyên
+   * nội dung cũ. Thầy đã gửi phụ huynh mã nào thì không ai biết, nên phải đè
+   * lên TẤT CẢ. */
+  maCu?: Map<string, { ketqua: string[]; baitap: string[] }>,
 ): Promise<KetQuaDungPhieu> {
   if (dsSbd.length === 0) return { dong: [], loi: [] }
   const hangCua = hangTrongCa(daCham)
@@ -170,7 +176,8 @@ export async function dungPhieuChoEm(
     // Link báo cáo có điểm và nhận xét của thầy; chuyển tiếp nguyên cho con là
     // sai đối tượng — nên bài tập phải là một phiếu riêng.
     if (phieu.baiTap && phieu.baiTap.length > 0) {
-      const maBt = maCu?.get(sbd)?.baitap || sinhMaPhieu()
+      const dsBt = maCu?.get(sbd)?.baitap ?? []
+      const maBt = dsBt[0] || sinhMaPhieu()
       const sai = phieu.chuyenDeCa.filter((c) => c.soSai > 0)
       const goiBt: GoiPhieuBaiTap = {
         v: BAN_PHIEU_BT,
@@ -192,15 +199,23 @@ export async function dungPhieuChoEm(
         },
         cau: phieu.baiTap,
       }
-      canLuu.push({ ma: maBt, maCa: ca.maCa, sbd, hoTen: e.hoTen, phieu: goiBt, loai: 'baitap' })
+      // Đè lên MỌI mã cũ, không chỉ mã đầu: xem ghi chú ở tham số `maCu`.
+      for (const ma of dsBt.length > 0 ? dsBt : [maBt]) {
+        canLuu.push({ ma, maCa: ca.maCa, sbd, hoTen: e.hoTen, phieu: goiBt, loai: 'baitap' })
+      }
       // Gắn link TRƯỚC khi gói phiếu kết quả — `linkBaiTap` nằm trong gói đó.
       phieu.linkBaiTap = taoLinkPhieu(goc, maBt)
     }
 
     const { phieu: goiGui } = giamGoiPhieu(phieu)
-    const maKq = maCu?.get(sbd)?.ketqua || sinhMaPhieu()
-    maKetQua.add(maKq)
-    canLuu.push({ ma: maKq, maCa: ca.maCa, sbd, hoTen: e.hoTen, phieu: goiGui, loai: 'ketqua' })
+    const dsKq = maCu?.get(sbd)?.ketqua ?? []
+    const maKq = dsKq[0] || sinhMaPhieu()
+    // Đè lên MỌI mã cũ. Trả về dòng link của mã ĐẦU (bản mới nhất), nhưng mọi
+    // link cũ thầy từng gửi cũng phải mở ra đúng nội dung ấy.
+    for (const ma of dsKq.length > 0 ? dsKq : [maKq]) {
+      maKetQua.add(ma)
+      canLuu.push({ ma, maCa: ca.maCa, sbd, hoTen: e.hoTen, phieu: goiGui, loai: 'ketqua' })
+    }
   }
 
   if (canLuu.length === 0) return { dong: [], loi }
@@ -335,16 +350,25 @@ export async function taoPhieuCaCa(
   )
   const thieu = taoLai ? daCham.map((e) => e.sbd) : g.chuaCoPhieu.map((x) => x.sbd)
   // Giữ nguyên mã phiếu cũ: link thầy đã gửi Zalo phải còn sống sau khi dựng lại.
-  const maCu = new Map<string, { ketqua?: string; baitap?: string }>()
-  for (const p of daCo) {
-    const cu = maCu.get(p.sbd) ?? {}
-    if (p.loai === 'baitap') cu.baitap = p.ma
-    else cu.ketqua = p.ma
+  // GOM MỌI mã của từng em, mới nhất đứng đầu. Bản cũ chỉ giữ một mã nên em nào
+  // có hai phiếu thì một cái bị bỏ lại với nội dung cũ.
+  const maCu = new Map<string, { ketqua: string[]; baitap: string[] }>()
+  const moiTruoc = [...daCo].sort((a, b) => String(b.taoLuc ?? '').localeCompare(String(a.taoLuc ?? '')))
+  for (const p of moiTruoc) {
+    const cu = maCu.get(p.sbd) ?? { ketqua: [], baitap: [] }
+    if (p.loai === 'baitap') cu.baitap.push(p.ma)
+    else cu.ketqua.push(p.ma)
     maCu.set(p.sbd, cu)
   }
   const kq = thieu.length > 0 ? await dungPhieuChoEm(url, mat, ca, keyBank, daCham, thieu, goc, tien, taoLai ? maCu : undefined) : { dong: [], loi: [] }
+  // Một em có thể vừa được đè lên nhiều mã; chỉ giữ MỘT dòng link mỗi em, và
+  // đó phải là mã mới nhất (`maCu` đã xếp mới nhất lên đầu).
+  const maDau = new Set([...maCu.values()].map((x) => x.ketqua[0]).filter(Boolean))
   const theoSbd = new Map<string, DongLinkPhieu>()
-  for (const d of [...g.dong, ...kq.dong]) theoSbd.set(d.sbd, d)
+  for (const d of [...g.dong, ...kq.dong]) {
+    const cu = theoSbd.get(d.sbd)
+    if (!cu || maDau.has(d.ma)) theoSbd.set(d.sbd, d)
+  }
 
   const dong: DongLinkPhieu[] = []
   for (const e of daCham) {

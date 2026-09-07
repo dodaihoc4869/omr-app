@@ -41,9 +41,18 @@ describe('chữ trên nhãn', () => {
 
 describe('dựng lại phiếu cũ', () => {
   it('GIỮ NGUYÊN mã phiếu — link đã gửi Zalo không được chết', () => {
+    // ĐỔI CÁCH ĐO 07/09. Bản cũ quét đúng chuỗi `maCu?.get(sbd)?.ketqua ||
+    // sinhMaPhieu()`, tức đo MỘT mã mỗi em. Thầy bắt được trên dữ liệu thật: có
+    // em mang HAI phiếu kết quả nên lượt dựng lại chỉ đè được một cái. Nay
+    // `maCu` giữ MẢNG mã và đè lên tất cả — hành vi đo bằng test thật ở
+    // `tao-phieu-ca-ca.test.ts` ("em có nhiều phiếu cùng loại").
     const t = doc('src/lib/phieu-ca-ca.ts')
-    expect(t).toContain("maCu?.get(sbd)?.ketqua || sinhMaPhieu()")
-    expect(t).toContain("maCu?.get(sbd)?.baitap || sinhMaPhieu()")
+    expect(t).toContain('maCu?: Map<string, { ketqua: string[]; baitap: string[] }>')
+    expect(t).toContain('const dsKq = maCu?.get(sbd)?.ketqua ?? []')
+    expect(t).toContain('const dsBt = maCu?.get(sbd)?.baitap ?? []')
+    // Sinh mã mới CHỈ khi em chưa có mã nào.
+    expect(t).toContain("const maKq = dsKq[0] || sinhMaPhieu()")
+    expect(t).toContain("const maBt = dsBt[0] || sinhMaPhieu()")
   })
 
   it('chế độ tạo lại dựng cho MỌI em đã chấm, không chỉ em thiếu phiếu', () => {

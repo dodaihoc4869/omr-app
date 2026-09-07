@@ -137,7 +137,13 @@ vi.mock('../src/lib/exam-api', async () => {
       kho.soLanLuu += 1
       const nay = new Date().toISOString()
       for (const d of ds) {
-        kho.phieu.push({ ma: d.ma, maCa: d.maCa, sbd: d.sbd, hoTen: d.hoTen, taoLuc: nay, soLanXem: 0, xemLanCuoi: '', loai: d.loai === 'baitap' ? 'baitap' : 'ketqua', phieu: d.phieu })
+        // ĐÈ THEO MÃ, đúng như máy chủ thật: `luuPhieu` ghi vào hàng có mã đó.
+        // Mock cũ luôn `push` nên không đo được việc dựng lại có thật sự thay
+        // nội dung của mã cũ hay không.
+        const hang = { ma: d.ma, maCa: d.maCa, sbd: d.sbd, hoTen: d.hoTen, taoLuc: nay, soLanXem: 0, xemLanCuoi: '', loai: (d.loai === 'baitap' ? 'baitap' : 'ketqua') as HangPhieu['loai'], phieu: d.phieu }
+        const i = kho.phieu.findIndex((x) => x.ma === d.ma)
+        if (i >= 0) kho.phieu[i] = { ...kho.phieu[i], ...hang, taoLuc: kho.phieu[i].taoLuc }
+        else kho.phieu.push(hang)
       }
       return { daLuu: ds.map((d) => ({ sbd: d.sbd, ma: d.ma })), loi: [] }
     },
@@ -289,3 +295,72 @@ describe('Hồi quy 06/09 — báo cáo mất hai nút copy link đề và lời
   })
 })
 
+
+// ---------------------------------------------------------------------------
+// EM CÓ HAI PHIẾU KẾT QUẢ — thầy bắt được 07/09 trên dữ liệu thật.
+//
+// Có em mang hai phiếu kết quả cho cùng một ca: một cái do lượt dựng hàng loạt
+// tạo, một cái do mở hồ sơ riêng của em tạo thêm. Bản cũ chỉ giữ ĐÚNG MỘT mã
+// trong `maCu` nên lượt dựng lại chỉ đè được một cái; cái còn lại giữ nguyên
+// nội dung cũ.
+//
+// Đo trên kho thật: 19 phiếu kết quả cho 15 em, và 3 phiếu vẫn mang gói cũ —
+// không có `poolChua`, không có `sao`, không có nhãn `chuaCho`. Thầy đã gửi phụ
+// huynh mã nào thì không ai biết, nên phải đè lên TẤT CẢ.
+describe('em có nhiều phiếu cùng loại', () => {
+  it('dựng lại đè lên MỌI mã của em đó, không bỏ sót mã nào', async () => {
+    // Lượt 1: dựng phiếu cho cả ca.
+    await taoPhieuCaCa('https://may-chu-gia/exec', 'MA-THAT', MA_CA, 'https://app/', () => {})
+    const maLan1 = kho.phieu.filter((p) => p.loai === 'ketqua' && p.sbd === '11004').map((p) => p.ma)
+    expect(maLan1).toHaveLength(1)
+
+    // Em 11004 được mở hồ sơ riêng, sinh THÊM một phiếu kết quả nữa.
+    kho.phieu.push({
+      ma: 'MA-CU-THEM',
+      maCa: MA_CA,
+      sbd: '11004',
+      hoTen: 'Nguyễn Sơn Tùng',
+      taoLuc: '2020-01-01T00:00:00.000Z',
+      soLanXem: 0,
+      xemLanCuoi: '',
+      loai: 'ketqua',
+      phieu: { v: 0, danhDau: 'GOI-CU' },
+    })
+
+    // Lượt 2: dựng lại.
+    await taoPhieuCaCa('https://may-chu-gia/exec', 'MA-THAT', MA_CA, 'https://app/', () => {}, true)
+
+    const cua11004 = kho.phieu.filter((p) => p.loai === 'ketqua' && p.sbd === '11004')
+    // Không đẻ mã mới: vẫn đúng hai mã cũ.
+    expect(cua11004.map((p) => p.ma).sort()).toEqual([...maLan1, 'MA-CU-THEM'].sort())
+    // CẢ HAI đều phải mang gói mới — không mã nào còn `danhDau: 'GOI-CU'`.
+    for (const p of cua11004) {
+      expect((p.phieu as { danhDau?: string }).danhDau, `mã ${p.ma} còn giữ gói cũ`).toBeUndefined()
+      expect((p.phieu as { sbd?: string }).sbd).toBe('11004')
+    }
+  })
+
+  it('vẫn chỉ trả MỘT dòng link mỗi em, là mã mới nhất', async () => {
+    await taoPhieuCaCa('https://may-chu-gia/exec', 'MA-THAT', MA_CA, 'https://app/', () => {})
+    const maMoi = kho.phieu.find((p) => p.loai === 'ketqua' && p.sbd === '11004')!.ma
+    // ĐẶT MÃ CŨ LÊN ĐẦU danh sách. Không có chỗ này thì test đúng do ăn may:
+    // thứ tự sẵn có đã để mã mới trước, nên bỏ hẳn bước xếp theo `taoLuc` vẫn
+    // xanh — tôi đã phá mã để thử và nó lọt.
+    kho.phieu.unshift({
+      ma: 'MA-CU-2',
+      maCa: MA_CA,
+      sbd: '11004',
+      hoTen: 'Nguyễn Sơn Tùng',
+      taoLuc: '2020-01-01T00:00:00.000Z',
+      soLanXem: 0,
+      xemLanCuoi: '',
+      loai: 'ketqua',
+      phieu: { v: 0 },
+    })
+    const kq = await taoPhieuCaCa('https://may-chu-gia/exec', 'MA-THAT', MA_CA, 'https://app/', () => {}, true)
+    const dong = kq.dong.filter((d) => d.sbd === '11004')
+    expect(dong).toHaveLength(1)
+    // Mã mới nhất đứng đầu — `MA-CU-2` có `taoLuc` năm 2020 nên không được chọn.
+    expect(dong[0].ma).toBe(maMoi)
+  })
+})
