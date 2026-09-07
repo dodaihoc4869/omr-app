@@ -9,7 +9,8 @@
 // thầy kéo một thanh không sinh ra câu nào.
 import { useEffect } from 'react'
 import { AlertTriangle, Tags } from 'lucide-react'
-import { tenCauSai, type PoolCauSai, type SuatThieu } from '../lib/rut-de-chua'
+import type { PoolCauSai, SuatThieu } from '../lib/rut-de-chua'
+import { cauCanhBaoHetHang, cauGiaiThichThanh, cauKhongRutDuoc, soLieuThanhChua } from '../lib/noi-dung-thanh-chua'
 
 const NHAN_NHO = { fontSize: 'var(--cx-1)', color: 'var(--nhat)', fontFamily: 'var(--sans)' } as const
 
@@ -38,12 +39,12 @@ export default function ThanhSoCauChua({
 }) {
   const khoa = tongUngVien <= 0
   const hetDang = (thieu ?? []).some((t) => t.vi.includes('chưa gắn dạng'))
-  // SÀN = SỐ CÂU EM SAI (thầy chốt 07/09): "em sai 3 câu thì cho kéo tối thiểu
-  // 3 câu khắc phục". Mỗi câu sai ít nhất một câu chữa. Kho không đủ hàng thì
-  // sàn tụt theo `tongUngVien` — không hứa cái không có.
-  const san = Math.max(1, Math.min(soCauSai ?? poolTheoCauSai?.length ?? 1, Math.max(1, tongUngVien)))
-  const n = Math.min(Math.max(san, soCau), Math.max(1, tongUngVien))
-  const canhBao = (poolTheoCauSai ?? []).filter((p) => p.pool === 0)
+  // SÀN, TRẦN, KIM và mọi câu chữ lấy từ `noi-dung-thanh-chua` — cùng một nguồn
+  // với báo cáo phụ huynh và học sinh (thầy chốt 07/09: "đồng bộ phần rút câu ở
+  // đây sang hai chỗ báo cáo phụ huynh và học sinh").
+  const sai = soCauSai ?? poolTheoCauSai?.length ?? 0
+  const { san, n } = soLieuThanhChua({ soCau, soCauSai: sai, coSan: tongUngVien })
+  const canhBao = cauCanhBaoHetHang(poolTheoCauSai)
 
   // BÁO NGƯỢC SỐ ĐÃ KẸP LÊN CHO MÀN CHA.
   //
@@ -60,10 +61,9 @@ export default function ThanhSoCauChua({
           <AlertTriangle size={16} /> Chưa rút được câu chữa nào
         </div>
         <ul style={{ ...NHAN_NHO, marginTop: 'var(--k2)', paddingLeft: 18, listStyle: 'disc' }}>
-          {(thieu ?? []).slice(0, 6).map((t, i) => (
-            <li key={i}>{t.vi}</li>
+          {cauKhongRutDuoc(thieu).map((v, i) => (
+            <li key={i}>{v}</li>
           ))}
-          {(thieu ?? []).length === 0 && <li>Ca này chưa có câu nào sai.</li>}
         </ul>
         {hetDang && onSangNganHang && (
           <button
@@ -132,18 +132,9 @@ export default function ThanhSoCauChua({
       />
 
       {/* Nói MAX VÀ MIN TỪ ĐÂU RA. Không có dòng này thì hai con số là số trên trời. */}
-      <div style={{ ...NHAN_NHO, marginTop: 4 }}>
-        Kho có {tongUngVien} câu cùng dạng với {soCauSai ?? poolTheoCauSai?.length ?? 0} câu em sai
-        {choBac2 ? ' (đã tính thêm câu cùng cơ chế)' : ''}. Ít nhất {san} câu — đúng bằng số câu em làm sai.
-      </div>
+      <div style={{ ...NHAN_NHO, marginTop: 4 }}>{cauGiaiThichThanh({ tongUngVien, soCauSai: sai, san, choBac2 })}</div>
 
-      {canhBao.length > 0 && (
-        <div style={{ ...NHAN_NHO, marginTop: 4, color: 'var(--cam)' }}>
-          {/* KÈM PHẦN. Không có phần thì dòng này nói "câu 2" trong khi phiếu vẫn
-              in câu khắc phục cho một câu 2 khác — thầy bắt được 07/09. */}
-          Kho chưa có câu cùng dạng để chữa: {canhBao.map((p) => tenCauSai(p.phan, p.soCau)).join(' · ')}. Những câu này đưa lại chính đề em làm sai để em làm lại.
-        </div>
-      )}
+      {canhBao !== '' && <div style={{ ...NHAN_NHO, marginTop: 4, color: 'var(--cam)' }}>{canhBao}</div>}
     </div>
   )
 }

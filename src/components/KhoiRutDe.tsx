@@ -13,6 +13,7 @@ import type { TeacherExamSource } from '../data/examContent'
 import { Nhan, OThongBao } from './DesignSystem'
 import { boMotCau, demDangUngVien, demMucDo, doiMotCau, dsChuyenDe, dungUngVien, giayUocTinh, moiIdDaRut, MOI_MUC, PHAN_DE, PHUT_TOI_DA_LEN_BANG, rutDe, rutDeLenBang, rutKhoChua, soCauCua, soCauLenBang, soTinHieu, TEN_MUC, tongCau, type CauUngVien, type KetQuaRut, type MucDoRut, type PhanDe, type SoCauPhan, type YeuCauRut } from '../lib/rut-de'
 import { MOI_LOC_DANG, LOC_DANG_MAC_DINH, soCauDung, TEN_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
+import { demSao, LOC_SAO_MAC_DINH, MOI_LOC_SAO, soCauHopSao, TEN_LOC_SAO, type LocSao } from '../lib/loc-sao'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -166,6 +167,9 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
   const dsCd = useMemo(() => dsChuyenDe(uv), [uv])
   const demMuc = useMemo(() => demMucDo(uv), [uv])
   const demDang = useMemo(() => demDangUngVien(uv), [uv])
+  // Đếm theo sao trên CÙNG tập ứng viên với đếm theo dạng, để hai hàng chip
+  // nói về cùng một kho.
+  const demSaoKho = useMemo(() => demSao([...uv.I, ...uv.II, ...uv.III]), [uv])
 
   // Kho vừa đúng cỡ một đề (≤ 28 câu, cấu trúc THPT) thì mặc định lấy trọn —
   // rút đề ở đó chỉ tổ làm thầy thêm một bước. Kho lớn hơn thì mặc định RÚT,
@@ -181,6 +185,8 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
   const [rieng, setRieng] = useState(true)
   const [chonCd, setChonCd] = useState<string[]>([])
   const [chonDang, setChonDang] = useState<LocDang>(LOC_DANG_MAC_DINH)
+  // MỨC SAO — thầy chốt 07/09. Chồng lên lọc dạng, không thay nó.
+  const [chonSao, setChonSao] = useState<LocSao>(LOC_SAO_MAC_DINH)
   const [chonMuc, setChonMuc] = useState<MucDoRut[]>([])
   const [seed, setSeed] = useState(() => Math.floor(Math.random() * 1e9))
   const [moChiTiet, setMoChiTiet] = useState(false)
@@ -203,7 +209,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
     [rieng, soCau, co],
   )
 
-  const yc: YeuCauRut = useMemo(() => ({ soCau: soCauKho, chuyenDe: chonCd, mucDo: chonMuc, dang: chonDang, tranhQid: qidCaTruoc, seed }), [soCauKho, chonCd, chonMuc, chonDang, qidCaTruoc, seed])
+  const yc: YeuCauRut = useMemo(() => ({ soCau: soCauKho, chuyenDe: chonCd, mucDo: chonMuc, dang: chonDang, sao: chonSao, tranhQid: qidCaTruoc, seed }), [soCauKho, chonCd, chonMuc, chonDang, chonSao, qidCaTruoc, seed])
 
   // BỘ CÂU CHO BUỔI CHỮA BÀI: máy tự chọn hết, thầy không gõ số nào. Số câu
   // theo ngân sách giây của chính ca này.
@@ -382,6 +388,22 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
             <div style={{ ...NHAN_NHO, marginTop: 'var(--k1)' }}>
               Kho đang có {demDang.ly_thuyet} câu {TEN_DANG.ly_thuyet.toLowerCase()}, {demDang.bai_tap} câu {TEN_DANG.bai_tap.toLowerCase()}
               {demDang.chua_ro > 0 ? `, và ${demDang.chua_ro} câu máy chưa phân loại chắc chắn — số này chỉ vào đề khi chọn Ngẫu nhiên.` : '.'}
+            </div>
+          </div>
+
+          {/* MỨC SAO — thầy chốt 07/09. Hiện luôn số câu mỗi mức để thầy biết
+              chọn hẹp thì còn bao nhiêu, thay vì rút xong mới báo thiếu. */}
+          <div>
+            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Mức sao</div>
+            <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Mức sao được lấy">
+              {MOI_LOC_SAO.map((v) => (
+                <Chip key={v} mau="tim" chon={chonSao === v} onClick={() => setChonSao(v)}>
+                  {TEN_LOC_SAO[v]} <span style={{ opacity: 0.7 }}>{soCauHopSao(demSaoKho, v)}</span>
+                </Chip>
+              ))}
+            </div>
+            <div style={{ ...NHAN_NHO, marginTop: 'var(--k1)' }}>
+              2 sao là câu khó có bẫy, 1 sao là câu bản chất. Câu chưa gắn sao chỉ vào đề khi chọn Mọi mức.
             </div>
           </div>
 

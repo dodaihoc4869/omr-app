@@ -19,6 +19,7 @@ import { SO_CAU_MAC_DINH } from '../lib/cau-hinh-chua'
 import { rutDeChua, rutTuDo, type PoolCauSai, type SuatThieu } from '../lib/rut-de-chua'
 import type { ChiTietCauRow } from '../lib/exam-api'
 import { LOC_DANG_MAC_DINH, MOI_LOC_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
+import { LOC_SAO_MAC_DINH, MOI_LOC_SAO, TEN_LOC_SAO, type LocSao } from '../lib/loc-sao'
 import { docQidRaPhieu, loadExamSources, loadScriptUrl, loadTeacherSecret, themQidRaPhieu, xoaQidRaPhieu } from '../lib/exam-db'
 import { qidDaLam } from '../lib/exam-api'
 import type { ChuyenDeEm } from '../lib/exam-api'
@@ -61,6 +62,8 @@ export default function NutBaiTapPdf({
 }) {
   const [soCau, setSoCau] = useState(SO_CAU_MAC_DINH)
   const [dang, setDang] = useState<LocDang>(LOC_DANG_MAC_DINH)
+  // LỌC SAO (thầy chốt 07/09). Độc lập với lọc dạng — hai bộ lọc chồng nhau.
+  const [locSao, setLocSao] = useState<LocSao>(LOC_SAO_MAC_DINH)
   // Mặc định BÓ trong ca. Thầy vẫn nới ra được khi muốn ôn rộng, nhưng phải
   // chủ động bấm — im lặng rút ngoài ca là thứ thầy vừa bắt được.
   const [boTrongCa, setBoTrongCa] = useState(true)
@@ -84,7 +87,7 @@ export default function NutBaiTapPdf({
       }
       const nguon = await loadExamSources()
       const daInRa = await docQidRaPhieu(sbd)
-      const kq = rutDeChua({ khoDe: nguon, rows: rows ?? [], qidTranh: daInRa, soCau: 0 })
+      const kq = rutDeChua({ khoDe: nguon, rows: rows ?? [], qidTranh: daInRa, soCau: 0, locSao })
       if (!con) return
       setDem({ tongUngVien: kq.tongUngVien, poolTheoCauSai: kq.poolTheoCauSai, thieu: kq.thieu })
       // Kẹp vị trí thanh xuống max mới — không để thanh chỉ 60 khi kho chỉ có 8.
@@ -93,7 +96,7 @@ export default function NutBaiTapPdf({
     return () => {
       con = false
     }
-  }, [chuaDuoc, rows, sbd])
+  }, [chuaDuoc, rows, sbd, locSao])
 
   useEffect(() => {
     let con = true
@@ -133,9 +136,9 @@ export default function NutBaiTapPdf({
 
       // ĐI QUA CỔNG (v3 mục 2). Nguồn là CẢ KHO — ranh giới không còn là đề
       // đã tích nữa mà là MÃ DẠNG của chính câu em sai.
-      const kqChua = chuaDuoc ? rutDeChua({ khoDe: nguon, rows: rows ?? [], qidTranh: tranh, soCau }) : null
+      const kqChua = chuaDuoc ? rutDeChua({ khoDe: nguon, rows: rows ?? [], qidTranh: tranh, soCau, locSao }) : null
       setThieuChua(kqChua?.thieu ?? [])
-      const kq = kqChua ?? rutTuDo(nguon, { chuyenDe: dungDe, chuyenDeCa: phamVi, dang, qidDaLam: tranh, soCau })
+      const kq = kqChua ?? rutTuDo(nguon, { chuyenDe: dungDe, chuyenDeCa: phamVi, dang, sao: locSao, qidDaLam: tranh, soCau })
       if (kq.cau.length === 0) {
         throw new Error(
           dungDe.length > 0
@@ -227,6 +230,38 @@ export default function NutBaiTapPdf({
         </div>
         <div style={{ ...NHAN_NHO, marginTop: 'var(--k1)' }}>
           Nhãn lý thuyết / bài tập lấy thẳng từ kho. Đề nào chưa tải lại thì máy tạm phân loại từ mặt chữ, câu chưa chắc chỉ vào phiếu khi chọn Ngẫu nhiên.
+        </div>
+      </div>
+
+      {/* MỨC SAO — thầy chốt 07/09. Chồng lên lọc dạng, không thay nó. */}
+      <div>
+        <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Mức sao</div>
+        <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Mức sao của câu trong phiếu">
+          {MOI_LOC_SAO.map((v) => (
+            <button
+              key={v}
+              type="button"
+              role="radio"
+              aria-checked={locSao === v}
+              onClick={() => setLocSao(v)}
+              className="tap-target font-bold"
+              style={{
+                minHeight: 40,
+                padding: '0 var(--k4)',
+                borderRadius: 'var(--bo-tron)',
+                border: 'none',
+                background: locSao === v ? 'var(--phu-dam)' : 'var(--the-2)',
+                color: locSao === v ? 'var(--muc-nguoc)' : 'var(--muc)',
+                fontFamily: 'var(--sans)',
+                fontSize: 'var(--cx-1)',
+              }}
+            >
+              {TEN_LOC_SAO[v]}
+            </button>
+          ))}
+        </div>
+        <div style={{ ...NHAN_NHO, marginTop: 'var(--k1)' }}>
+          2 sao là câu khó có bẫy, 1 sao là câu bản chất. Chọn hẹp lại thì số câu tối đa ở thanh dưới tụt theo.
         </div>
       </div>
 

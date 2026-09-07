@@ -27,6 +27,7 @@ import { soSao } from '../data/examContent'
 import { hashSeed, seededPermutation } from './exam-shuffle'
 import { chuanChuyenDe } from './goi-len-bang'
 import { dangCua, hopDang, LOC_DANG_MAC_DINH, type DangCau, type LocDang } from './dang-cau'
+import { hopSao, LOC_SAO_MAC_DINH, type LocSao } from './loc-sao'
 
 export type MucDoRut = 'biet' | 'hieu' | 'van_dung'
 export type PhanDe = 'I' | 'II' | 'III'
@@ -72,6 +73,8 @@ export interface YeuCauRut {
   /** Chỉ lý thuyết, chỉ bài tập, hay ngẫu nhiên. Mặc định ngẫu nhiên — nhận
    * cả câu `chua_ro`, nên không đổi hành vi của ca mở trước bản này. */
   dang?: LocDang
+  /** Chỉ 2 sao (khó), chỉ 1 sao (bản chất), hay mọi mức — thầy chốt 07/09. */
+  sao?: LocSao
   /** Câu đã ra ở các ca trước — bị đẩy xuống cuối, không bị cấm. */
   tranhQid?: string[]
   /** Đổi seed là ra bộ câu khác — nút "Trộn lại". */
@@ -158,13 +161,14 @@ export function demMucDo(uv: Record<PhanDe, CauUngVien[]>): Record<MucDoRut | ''
   return ra
 }
 
-/** Câu hợp bộ lọc chuyên đề + mức độ + dạng. Lọc rỗng = nhận hết. */
-export function locTheoYeuCau(ds: CauUngVien[], yc: Pick<YeuCauRut, 'chuyenDe' | 'mucDo'> & { dang?: LocDang }): CauUngVien[] {
+/** Câu hợp bộ lọc chuyên đề + mức độ + dạng + sao. Lọc rỗng = nhận hết. */
+export function locTheoYeuCau(ds: CauUngVien[], yc: Pick<YeuCauRut, 'chuyenDe' | 'mucDo'> & { dang?: LocDang; sao?: LocSao }): CauUngVien[] {
   const cd = new Set(yc.chuyenDe.map(chuanChuyenDe).filter(Boolean))
   const md = new Set(yc.mucDo)
   const loc = yc.dang ?? LOC_DANG_MAC_DINH
+  const locS = yc.sao ?? LOC_SAO_MAC_DINH
   return ds.filter(
-    (c) => (cd.size === 0 || cd.has(chuanChuyenDe(c.chuyenDe))) && (md.size === 0 || (c.mucDo !== '' && md.has(c.mucDo))) && hopDang(c.dang, loc),
+    (c) => (cd.size === 0 || cd.has(chuanChuyenDe(c.chuyenDe))) && (md.size === 0 || (c.mucDo !== '' && md.has(c.mucDo))) && hopDang(c.dang, loc) && hopSao(c.sao, locS),
   )
 }
 

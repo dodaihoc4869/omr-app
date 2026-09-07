@@ -16,8 +16,10 @@
 // BỎ CÂU CÓ HÌNH: phiếu PDF không kèm ảnh cắt từ đề (ảnh base64 làm file phình
 // lên hàng megabyte). Một câu có hình mà in ra không có hình là câu không làm
 // được, nên thà bỏ hẳn còn hơn phát cho em một câu cụt.
+import { soSao } from '../data/examContent'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { dangCua, hopDang, LOC_DANG_MAC_DINH, type DangCau, type LocDang } from './dang-cau'
+import { hopSao, LOC_SAO_MAC_DINH, type LocSao } from './loc-sao'
 import { chuanChuyenDe } from './goi-len-bang'
 
 export type MucDoCau = 'biet' | 'hieu' | 'van_dung'
@@ -40,6 +42,9 @@ export interface CauLuyen {
   chuyenDe: string
   /** Lý thuyết hay bài tập — suy ra, có thể là `chua_ro`. Xem `dang-cau.ts`. */
   dang: DangCau
+  /** Sao đáng chữa: 2 = khó có bẫy · 1 = bản chất · 0 = câu thường.
+   * Độc lập với `dang` ở trên — xem `loc-sao.ts`. */
+  sao: 0 | 1 | 2
   mucDo: MucDoCau | ''
   text: string
   luaChon: string[] | null
@@ -145,6 +150,7 @@ function doiSang(c: CauNguon): CauLuyen {
       kieu: (q as { kieu?: string }).kieu,
       kieuChuaChac: (q as { kieuChuaChac?: boolean }).kieuChuaChac,
     }),
+    sao: soSao(q),
     mucDo: (q.mucDo as MucDoCau) || '',
     text: q.text || '',
     luaChon: c.phan === 'I' ? [...(mcq.choices ?? [])] : c.phan === 'II' ? [...(tf.ideas ?? [])] : null,
@@ -203,6 +209,9 @@ export interface YeuCauLuyen {
   maDeCa?: string[]
   /** Chỉ lý thuyết, chỉ bài tập, hay ngẫu nhiên. Mặc định ngẫu nhiên. */
   dang?: LocDang
+  /** Chỉ câu 2 sao (khó), chỉ 1 sao (bản chất), hay mọi mức. Mặc định mọi mức
+   * — thầy chốt 07/09, xem `loc-sao.ts`. */
+  sao?: LocSao
   soCau: number
   ngauNhien?: () => number
 }
@@ -213,6 +222,7 @@ export function chonCauLuyen(nguon: TeacherExamSource[], yc: YeuCauLuyen): KetQu
   const daLam = new Set(yc.qidDaLam ?? [])
   const khoiDiem = yc.chuyenDe.length ? mucKhoiDiem(Math.max(...yc.chuyenDe.map((c) => c.tiLeSai))) : 'hieu'
   const loc = yc.dang ?? LOC_DANG_MAC_DINH
+  const locS = yc.sao ?? LOC_SAO_MAC_DINH
 
   // RANH GIỚI: chuyên đề của ca. Không truyền thì giữ nguyên hành vi cũ (toàn
   // kho) — ca cũ và chỗ gọi chưa cập nhật vẫn chạy.
@@ -252,6 +262,7 @@ export function chonCauLuyen(nguon: TeacherExamSource[], yc: YeuCauLuyen): KetQu
     .map(doiSang)
     .filter(trongPhamVi)
     .filter((c) => hopDang(c.dang, loc))
+    .filter((c) => hopSao(c.sao, locS))
 
   const xao = <T,>(xs: T[]): T[] => {
     const a = [...xs]

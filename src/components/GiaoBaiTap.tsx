@@ -7,6 +7,7 @@ import { CheckSquare, Square, X } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh } from './DesignSystem'
 import { demCauTheoChuyenDe, rutBaiTap, SO_CAU_BAI_TAP_MAC_DINH, SO_CAU_BAI_TAP_TOI_DA, SO_CAU_BAI_TAP_TOI_THIEU, type MucDoLoc } from '../lib/bai-tap'
 import { LOC_DANG_MAC_DINH, MOI_LOC_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
+import { LOC_SAO_MAC_DINH, MOI_LOC_SAO, TEN_LOC_SAO, type LocSao } from '../lib/loc-sao'
 import { publishSession, qidDaLam, danhSachYeuCau, danhDauYeuCau, type ChuyenDeEm } from '../lib/exam-api'
 import { tinBaoBaiTap } from '../lib/phieu-zalo'
 import { loadExamSources, loadScriptUrl, loadTeacherSecret, saveSessionTeacherBank } from '../lib/exam-db'
@@ -62,6 +63,8 @@ export default function GiaoBaiTap({
   const [nguon, setNguon] = useState<TeacherExamSource[] | null>(null)
   const [mucDo, setMucDo] = useState<MucDoLoc>('tron')
   const [dang, setDang] = useState<LocDang>(LOC_DANG_MAC_DINH)
+  // MỨC SAO — thầy chốt 07/09. Chồng lên lọc dạng, không thay nó.
+  const [locSao, setLocSao] = useState<LocSao>(LOC_SAO_MAC_DINH)
   const [soCau, setSoCau] = useState(SO_CAU_BAI_TAP_MAC_DINH)
   const [hanNgay, setHanNgay] = useState(() => ngayISO(HAN_NOP_NGAY_MAC_DINH))
   const [chon, setChon] = useState<string[]>(() => chuyenDeEm.filter((c) => c.tiLeSai > nguongYeu).map((c) => c.ten))
@@ -110,7 +113,7 @@ export default function GiaoBaiTap({
       } catch {
         canhBaoQid = ' (không đọc được danh sách câu em đã làm nên chưa lọc trùng)'
       }
-      const kq = rutBaiTap(nguon, { chuyenDe: chon, mucDo, dang, soCau, qidTranh: daLam })
+      const kq = rutBaiTap(nguon, { chuyenDe: chon, mucDo, dang, sao: locSao, soCau, qidTranh: daLam })
       if (kq.soCau === 0) throw new Error('Kho không có câu nào khớp bộ lọc này')
       const maCa = randomSessionCode()
       const tenBai = `Bài tập ${chon.length === 1 ? chon[0] : `${kq.soCau} câu`} — ${hoTen || sbd}`
@@ -275,6 +278,43 @@ export default function GiaoBaiTap({
           </div>
           <div style={{ fontSize: 'var(--cx-0)', color: 'var(--nhat)', marginTop: 'var(--k1)', lineHeight: 1.5 }}>
             Nhãn lý thuyết / bài tập lấy thẳng từ kho. Đề nào chưa tải lại thì máy tạm phân loại từ mặt chữ, câu chưa chắc chỉ vào bài khi chọn Ngẫu nhiên.
+          </div>
+        </div>
+
+        {/* MỨC SAO — thầy chốt 07/09. Chồng lên lọc dạng, không thay nó. */}
+        <div>
+          <div className="font-bold" style={{ fontSize: 'var(--cx-2)', marginBottom: 'var(--k2)' }}>
+            Mức sao
+          </div>
+          <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Mức sao">
+            {MOI_LOC_SAO.map((v) => {
+              const c = locSao === v
+              return (
+                <button
+                  key={v}
+                  type="button"
+                  role="radio"
+                  aria-checked={c}
+                  onClick={() => setLocSao(v)}
+                  className="tap-target font-bold"
+                  style={{
+                    fontFamily: 'var(--sans)',
+                    fontSize: 'var(--cx-1)',
+                    minHeight: 36,
+                    padding: '0 var(--k3)',
+                    borderRadius: 'var(--bo-tron)',
+                    border: 'none',
+                    background: c ? 'var(--muc)' : 'var(--the-2)',
+                    color: c ? 'var(--muc-nguoc)' : 'var(--nhat)',
+                  }}
+                >
+                  {TEN_LOC_SAO[v]}
+                </button>
+              )
+            })}
+          </div>
+          <div style={{ fontSize: 'var(--cx-0)', color: 'var(--nhat)', marginTop: 'var(--k1)', lineHeight: 1.5 }}>
+            2 sao là câu khó có bẫy, 1 sao là câu bản chất. Mọi mức = không lọc.
           </div>
         </div>
 

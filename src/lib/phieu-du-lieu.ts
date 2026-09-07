@@ -12,7 +12,7 @@ import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion,
 import type { CaCuaEm, ChiTietCauRow, ChuyenDeEm, HoSoEm } from './exam-api'
 import { ducKetKienThuc, thongKeLamBai, tinHieuLamBai, type DucKetChuyenDe, type ThongKeLamBai, type TinHieuLamBai } from './phan-tich-lam-bai'
 import { cauLuyenTuBoCau, cauLuyenTuNguon, chonCauLuyen, type CauLuyen } from './bai-tap-pdf'
-import { rutDeChua, soCauChuaThat } from './rut-de-chua'
+import { rutDeChua, soCauChuaThat, type PoolCauSai, type SuatThieu } from './rut-de-chua'
 import { SO_CAU_KEM_PHIEU } from './cau-hinh-chua'
 import type { LocDang } from './dang-cau'
 import { mocRoiMan } from './chong-gian-lan'
@@ -123,6 +123,15 @@ export interface PhieuDayDu {
   thieuChua?: string[]
   /** Kho còn bao nhiêu câu cùng dạng với câu em sai (v4 mục 4.2). */
   tongUngVien?: number
+  /** Pool riêng từng câu sai — để trang báo cáo dựng ĐÚNG dòng cảnh báo mà màn
+   * thầy đang hiện, thay vì một chuỗi đã bị làm phẳng.
+   *
+   * Thầy chốt 07/09: "đồng bộ phần rút câu ở đây sang hai chỗ báo cáo phụ huynh
+   * và học sinh". Gói cũ chỉ chở `thieuChua: string[]` nên trang báo cáo không
+   * nói được câu nào hết hàng. */
+  poolChua?: PoolCauSai[]
+  /** `thieu[]` nguyên cấu trúc, đi kèm `poolChua`. */
+  thieuChuaChiTiet?: SuatThieu[]
   /** LINK PHIẾU BÀI TẬP đã cất sẵn trên kho, để phụ huynh copy gửi thẳng cho
    * con — con mở link là làm bài, không phải mở báo cáo của phụ huynh.
    *
@@ -500,6 +509,8 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
     // ngay sau khi nộp, lúc còn nhớ mình vướng chỗ nào.
     baiTap: baiTapEm,
     tongUngVien: kqChuaEm?.tongUngVien,
+    poolChua: kqChuaEm?.poolTheoCauSai,
+    thieuChuaChiTiet: kqChuaEm?.thieu,
     thieuChua: (() => {
       const ds = kqChuaEm ? kqChuaEm.thieu.map((t) => t.vi.charAt(0).toUpperCase() + t.vi.slice(1)) : []
       if (coCauSaiEm && (!kqChuaEm || kqChuaEm.cau.length === 0)) ds.push('Kho chưa đủ câu cùng dạng với câu em sai — phần dưới là bài luyện chung của chuyên đề, không phải câu chữa.')
@@ -611,6 +622,8 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
     viPham: dungViPham(n.viPham),
     baiTap,
     tongUngVien: kqChua?.tongUngVien,
+    poolChua: kqChua?.poolTheoCauSai,
+    thieuChuaChiTiet: kqChua?.thieu,
     thieuChua: (() => {
       const ds = kqChua ? kqChua.thieu.map((t) => t.vi.charAt(0).toUpperCase() + t.vi.slice(1)) : []
       if (luiCoSai) ds.push('Kho chưa đủ câu cùng dạng với câu em sai — phần dưới là bài luyện chung của chuyên đề, không phải câu chữa.')

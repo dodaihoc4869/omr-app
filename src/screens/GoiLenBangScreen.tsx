@@ -22,6 +22,7 @@ import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import HopChonDe from '../components/HopChonDe'
 import { baiLamTuCa, cauTuBanDe, daCoBaiLam, emTuCa, luotMoiNhat, rowsLopSai, type BanDeCa, type HoSoRutGon, type LuotCa } from '../lib/du-lieu-len-bang'
 import { rutDeChua } from '../lib/rut-de-chua'
+import { LOC_SAO_MAC_DINH, MOI_LOC_SAO, TEN_LOC_SAO, type LocSao } from '../lib/loc-sao'
 import { SO_CAU_MAC_DINH } from '../lib/cau-hinh-chua'
 import ThanhSoCauChua from '../components/ThanhSoCauChua'
 import { bangChu, chuCau, chuChum, MAC_DINH, phanCong, TEN_MUC_NHAM, type CauChua, type DongPhanCong, type KetQuaPhanCong } from '../lib/phan-cong'
@@ -113,6 +114,9 @@ export default function GoiLenBangScreen() {
   /** RÚT THEO MÃ DẠNG (v4 mục 2). Nguồn là CẢ KHO, không phải đề thầy tích. */
   const [khoDe, setKhoDe] = useState<TeacherExamSource[]>([])
   const [soCauChua, setSoCauChua] = useState(SO_CAU_MAC_DINH)
+  // MỨC SAO — thầy chốt 07/09. Áp cho cả phần đếm lẫn phần rút, nếu không thì
+  // thanh kéo hiện một trần còn bảng rút ra một bộ khác.
+  const [locSao, setLocSao] = useState<LocSao>(LOC_SAO_MAC_DINH)
   useEffect(() => {
     void loadExamSources().then(setKhoDe)
   }, [])
@@ -227,12 +231,12 @@ export default function GoiLenBangScreen() {
   /** Cổng chạy hai lần: một lần đếm (soCau 0) để biết max cho thanh kéo, một lần
    * rút thật theo số thầy kéo. Đếm rẻ và thuần máy nên không tiếc. */
   const demChua = useMemo(
-    () => (khoDe.length > 0 && rowsLop.length > 0 ? rutDeChua({ khoDe, rows: rowsLop, soCau: 0 }) : null),
-    [khoDe, rowsLop],
+    () => (khoDe.length > 0 && rowsLop.length > 0 ? rutDeChua({ khoDe, rows: rowsLop, soCau: 0, locSao }) : null),
+    [khoDe, rowsLop, locSao],
   )
   const kqChua = useMemo(
-    () => (cachLayCau === 'theo_dang' && demChua ? rutDeChua({ khoDe, rows: rowsLop, soCau: soCauChua }) : null),
-    [cachLayCau, demChua, khoDe, rowsLop, soCauChua],
+    () => (cachLayCau === 'theo_dang' && demChua ? rutDeChua({ khoDe, rows: rowsLop, soCau: soCauChua, locSao }) : null),
+    [cachLayCau, demChua, khoDe, rowsLop, soCauChua, locSao],
   )
   /** Câu cổng chọn, dựng lại thành BanDeCa để phần dưới của màn chạy nguyên. */
   const bankTheoDang: BanDeCa = useMemo((): BanDeCa => {
@@ -557,6 +561,31 @@ export default function GoiLenBangScreen() {
           <div data-theo-dang>
             <div style={{ ...NHAN_NHO, marginBottom: 'var(--k3)' }}>
               Rút từ <b>cả kho</b>, chỉ lấy câu cùng mã dạng với những câu cả lớp làm sai. Không lấy câu chuyên đề khác, không bó trong đề của ca.
+            </div>
+            {/* MỨC SAO — thầy chốt 07/09. */}
+            <div className="flex flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k3)' }} role="radiogroup" aria-label="Mức sao">
+              {MOI_LOC_SAO.map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  role="radio"
+                  aria-checked={locSao === v}
+                  onClick={() => setLocSao(v)}
+                  className="tap-target font-bold"
+                  style={{
+                    minHeight: 36,
+                    padding: '0 var(--k3)',
+                    borderRadius: 'var(--bo-tron)',
+                    border: 'none',
+                    background: locSao === v ? 'var(--phu-dam)' : 'var(--the-2)',
+                    color: locSao === v ? 'var(--muc-nguoc)' : 'var(--muc)',
+                    fontFamily: 'var(--sans)',
+                    fontSize: 'var(--cx-1)',
+                  }}
+                >
+                  {TEN_LOC_SAO[v]}
+                </button>
+              ))}
             </div>
             <ThanhSoCauChua
               soCau={soCauChua}

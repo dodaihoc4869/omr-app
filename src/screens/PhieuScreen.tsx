@@ -16,7 +16,7 @@
 // yếu. Máy bật "giảm chuyển động" thì hiện thẳng trạng thái cuối.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { classify } from '../engine/score'
-import { chanSoCau, docLinkPhieu, sanSoCau, SO_CAU_MIN } from '../lib/phieu-link'
+import { chanSoCau, docLinkPhieu, SO_CAU_MIN } from '../lib/phieu-link'
 import { layPhieu } from '../lib/exam-api'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import { napDong } from '../lib/nap-manh'
@@ -26,6 +26,8 @@ import TheCauChiTiet, { CSS_THE_CAU } from '../components/TheCauChiTiet'
 import type { ThongTinPhieu } from '../lib/html-phieu'
 import type { CauLuyen } from '../lib/bai-tap-pdf'
 import { dangCua, hopDang, LOC_DANG_MAC_DINH, MOI_LOC_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
+import { hopSao, LOC_SAO_MAC_DINH, MOI_LOC_SAO, TEN_LOC_SAO_NGAN, type LocSao } from '../lib/loc-sao'
+import { cauCanhBaoHetHang, cauGiaiThichThanh, cauKhongRutDuoc, soLieuThanhChua } from '../lib/noi-dung-thanh-chua'
 import { TEN_MUC_DO, TEN_PHAN } from '../lib/phan-tich-lam-bai'
 import { ChemText } from '../lib/chem-format'
 
@@ -167,6 +169,12 @@ const CSS = `
 .bc-so input[type=range]{width:100%;margin-top:8px;accent-color:var(--p-cam);height:26px}
 .bc-so-moc{display:flex;justify-content:space-between;font-size:11px;color:var(--p-mo);font-variant-numeric:tabular-nums}
 .bc-so-vi{margin-top:4px;font-size:11px;line-height:1.5;color:var(--p-mo)}
+.bc-so-canh{color:var(--p-cam)}
+.bc-so-nhay{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.bc-so-nhay button{min-height:32px;padding:0 12px;border:none;border-radius:999px;background:var(--p-giay);color:var(--p-muc);font-family:var(--sans);font-size:12px;font-weight:700}
+.bc-so-nhay button[aria-pressed="true"]{background:var(--p-tim);color:var(--p-trang)}
+.bc-so-do{border-left:3px solid var(--p-cam)}
+.bc-so-do ul{margin:6px 0 0;padding-left:18px;font-size:11px;line-height:1.5;color:var(--p-mo)}
 
 @media (prefers-reduced-motion:reduce){
   .bc-dau::before,.bc-dau::after{animation:none}
@@ -944,19 +952,29 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
   // thầy tự gõ cho từng em; chạy lại hàng loạt là đặt cược chỗ đó, đổi lấy một
   // hàng nút.
   const [locDang, setLocDang] = useState<LocDang>(LOC_DANG_MAC_DINH)
+  // MỨC SAO — thầy chốt 07/09. Chồng lên lọc dạng, không thay nó.
+  const [locSao, setLocSao] = useState<LocSao>(LOC_SAO_MAC_DINH)
   const dangCuaCau = (c: CauLuyen) =>
     c.dang ?? dangCua({ phan: c.phan, text: c.text, luaChon: c.luaChon ?? [], dapAn: c.phan === 'III' ? c.dapAn : '', mucDo: c.mucDo })
-  const dsDaLoc = (du.baiTap ?? []).filter((c) => hopDang(dangCuaCau(c), locDang))
+  const dsDaLoc = (du.baiTap ?? []).filter((c) => hopDang(dangCuaCau(c), locDang) && hopSao(c.sao, locSao))
   const coSan = dsDaLoc.length
-  // v4 mục 9 cấm trần cứng: trần là số câu chữa THẬT SỰ có, không phải 60.
-  const tran = Math.max(1, coSan || 1)
-  // SÀN = SỐ CÂU EM SAI (thầy chốt 07/09). Sàn 10 cứng của bản cũ vừa ép em sai
-  // 3 câu phải nhận 10 câu, vừa cho em sai 16 câu tụt xuống 10 — bỏ trắng 6 câu
-  // sai. Kho không đủ hàng thì sàn tụt theo `coSan`, không hứa cái không có.
+  // SÀN – TRẦN – KIM lấy từ ĐÚNG một nguồn với màn thầy (`noi-dung-thanh-chua`),
+  // thầy chốt 07/09: "đồng bộ phần rút câu ở đây sang hai chỗ báo cáo phụ huynh
+  // và học sinh". Trước đây màn này tự đặt sàn 10 cứng và tự viết câu chữ, nên
+  // cùng một em ra hai con số khác nhau ở hai màn.
   const soCauSai = du.cauSai?.length ?? 0
-  const san = sanSoCau(soCauSai, coSan)
-  const [soCau, setSoCau] = useState(() => Math.max(san, Math.min(SO_CAU_MIN, tran)))
-  const lay = Math.min(Math.max(soCau, san), coSan)
+  const [soCau, setSoCau] = useState(SO_CAU_MIN)
+  const { san, tran, n: lay, hienThanh } = soLieuThanhChua({ soCau, soCauSai, coSan })
+  const xung: 'em' | 'con' = laCuaEm ? 'em' : 'con'
+  // Cảnh báo và dòng giải thích: dựng bằng cùng hàm với màn thầy.
+  const cauGiaiThich = cauGiaiThichThanh({
+    tongUngVien: du.tongUngVien ?? coSan,
+    soCauSai,
+    san,
+    coSan,
+    xung,
+  })
+  const canhBaoHetHang = cauCanhBaoHetHang(du.poolChua, xung)
 
   // Link đã cất sẵn là `.../p#<mã>`; gắn thêm `~<số câu>` và chữ cuối là xong,
   // không phải ghi lại phiếu nào lên máy chủ (trang này không có mã bí mật để
@@ -1013,29 +1031,50 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
       )}
 
       {(du.baiTap?.length ?? 0) > 0 && (
-        <div className="bc-dang" role="radiogroup" aria-label="Dạng câu">
-          {MOI_LOC_DANG.map((d) => (
-            <button key={d} type="button" role="radio" aria-checked={locDang === d} onClick={() => setLocDang(d)}>
-              {TEN_LOC_DANG[d]}
-            </button>
-          ))}
-        </div>
+        <>
+          <div className="bc-dang" role="radiogroup" aria-label="Dạng câu">
+            {MOI_LOC_DANG.map((d) => (
+              <button key={d} type="button" role="radio" aria-checked={locDang === d} onClick={() => setLocDang(d)}>
+                {TEN_LOC_DANG[d]}
+              </button>
+            ))}
+          </div>
+          {/* MỨC SAO — nhãn ngắn vì màn phụ huynh chạy trên điện thoại 360px. */}
+          <div className="bc-dang" role="radiogroup" aria-label="Mức sao">
+            {MOI_LOC_SAO.map((v) => (
+              <button key={v} type="button" role="radio" aria-checked={locSao === v} onClick={() => setLocSao(v)}>
+                {TEN_LOC_SAO_NGAN[v]}
+              </button>
+            ))}
+          </div>
+        </>
       )}
 
-      {/* PHỤ HUYNH TỰ CHỌN SỐ CÂU. Sàn là SỐ CÂU EM SAI, trần là số câu kho
-          thật sự có cùng dạng (thầy chốt 07/09). */}
-      {coSan > san && (
+      {/* THANH KÉO — cùng luật, cùng câu chữ với màn thầy. Chỉ khác lớp CSS vì
+          trang phiếu có bảng màu `--p-*` riêng, không dùng token của app. */}
+      {hienThanh && (
         <div className="bc-so">
           <div className="bc-so-dau">
             <span className="bc-so-nhan">{laCuaEm ? 'Em làm bao nhiêu câu?' : 'Cho con làm bao nhiêu câu?'}</span>
             <span className="bc-so-gia">{lay} câu</span>
+          </div>
+          {/* Nút nhảy nhanh, đúng như màn thầy. */}
+          <div className="bc-so-nhay">
+            {[10, 20, 50].filter((m) => m > san && m < tran).map((m) => (
+              <button key={m} type="button" aria-pressed={lay === m} onClick={() => setSoCau(m)}>
+                {m}
+              </button>
+            ))}
+            <button type="button" aria-pressed={lay === tran} onClick={() => setSoCau(tran)}>
+              Tối đa
+            </button>
           </div>
           <input
             type="range"
             min={san}
             max={tran}
             step={1}
-            value={Math.max(san, Math.min(soCau, tran))}
+            value={lay}
             onChange={(e) => setSoCau(chanSoCau(e.target.value, san))}
             aria-label={laCuaEm ? 'Số câu em làm' : 'Số câu cho con làm'}
           />
@@ -1043,11 +1082,20 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
             <span>{san}</span>
             <span>{tran}</span>
           </div>
-          {soCauSai > 0 && (
-            <div className="bc-so-vi">
-              Ít nhất {san} câu — đúng bằng số câu {laCuaEm ? 'em' : 'con'} làm sai trong ca này.
-            </div>
-          )}
+          <div className="bc-so-vi">{cauGiaiThich}</div>
+          {canhBaoHetHang !== '' && <div className="bc-so-vi bc-so-canh">{canhBaoHetHang}</div>}
+        </div>
+      )}
+
+      {/* KHÔNG RÚT ĐƯỢC CÂU NÀO — nói đúng lý do, y như màn thầy, thay vì im. */}
+      {coSan === 0 && (du.thieuChuaChiTiet?.length ?? 0) > 0 && (
+        <div className="bc-so bc-so-do">
+          <b>Chưa rút được câu chữa nào</b>
+          <ul>
+            {cauKhongRutDuoc(du.thieuChuaChiTiet).map((v, i) => (
+              <li key={i}>{v}</li>
+            ))}
+          </ul>
         </div>
       )}
 
