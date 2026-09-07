@@ -10,6 +10,7 @@ import { danhSachCa, khoiPhucCa, xoaNhieuCa, type CaTomTat } from '../lib/exam-a
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { useAppStore } from '../store/appStore'
+import KhoiLuyenKhacPhuc from '../components/KhoiLuyenKhacPhuc'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -62,6 +63,9 @@ export default function LichSuCaScreen() {
   // THÙNG RÁC: xoá ca là xoá MỀM, bài làm còn nguyên — xem lại và khôi phục được.
   const [xemDaXoa, setXemDaXoa] = useState(false)
   const [dangKhoiPhuc, setDangKhoiPhuc] = useState('')
+  // Giữ lại link + mã để khối "Luyện câu khắc phục" hỏi thẳng máy chủ khi thầy
+  // bấm, không phải đọc IndexedDB lại một lượt nữa.
+  const [nguon, setNguon] = useState({ url: '', mat: '' })
 
   const tai = async () => {
     setDangTai(true)
@@ -70,6 +74,7 @@ export default function LichSuCaScreen() {
       const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
       if (!url.trim()) throw new Error('Chưa cấu hình link Apps Script — vào Ngân hàng câu hỏi → Cấu hình')
       if (!mat.trim()) throw new Error('Chưa nhập mã bí mật — vào Ngân hàng câu hỏi → Cấu hình')
+      setNguon({ url: url.trim(), mat: mat.trim() })
       setDsCa(await danhSachCa(url.trim(), mat.trim(), xemDaXoa))
     } catch (e) {
       setLoi(e instanceof Error ? e.message : 'Lỗi không rõ')
@@ -147,6 +152,10 @@ export default function LichSuCaScreen() {
           ← Kiểm tra
         </button>
       </div>
+
+      {/* LUYỆN CÂU KHẮC PHỤC — thầy chốt 08/09: để ngay ngoài màn Ca thi, không
+          phải mở vào từng ca. Gập sẵn nên không chiếm chỗ của danh sách ca. */}
+      {!xemDaXoa && !chonMode && nguon.url && <KhoiLuyenKhacPhuc scriptUrl={nguon.url} maBiMat={nguon.mat} />}
 
       <TheNoiDung>
         <div className="flex items-center" style={{ gap: 'var(--k3)', marginBottom: 'var(--k3)' }}>
