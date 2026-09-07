@@ -159,10 +159,14 @@ describe('bài luyện — hai nút', () => {
       <PhieuScreen duCoSan={phieu({ baiTap: [cauLuyen('b1')], linkBaiTap: 'https://vi.du/omr-app/p#abc123' })} />,
     )
     fireEvent.click(getByRole('button', { name: /Copy link gửi ĐỀ cho con/ }))
-    // Số câu mặc định 10 đi kèm link để trang phiếu cắt đúng bấy nhiêu câu;
-    // chữ `d` cuối = phiếu CHỈ CÓ ĐỀ, `g` = phiếu có lời giải.
-    expect(writeText).toHaveBeenCalledWith('https://vi.du/omr-app/p#abc123~10d')
+    // Số câu đi kèm link để trang phiếu cắt đúng bấy nhiêu câu; chữ `d` cuối =
+    // phiếu CHỈ CÓ ĐỀ, `g` = phiếu có lời giải.
+    //
+    // ĐỔI TỪ `~10` SANG `~1` (thầy chốt 07/09, sàn động): gói này chỉ có ĐÚNG
+    // MỘT câu bài tập, nên link phải nói 1. Bản cũ ghi 10 trong khi chỉ có 1 —
+    // con số trong link không khớp cái phiếu thật sự dựng ra.
+    expect(writeText).toHaveBeenCalledWith('https://vi.du/omr-app/p#abc123~1d')
     fireEvent.click(getByRole('button', { name: /Copy link gửi LỜI GIẢI cho con/ }))
-    expect(writeText).toHaveBeenCalledWith('https://vi.du/omr-app/p#abc123~10g')
+    expect(writeText).toHaveBeenCalledWith('https://vi.du/omr-app/p#abc123~1g')
   })
 })

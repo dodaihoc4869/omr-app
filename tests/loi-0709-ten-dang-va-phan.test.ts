@@ -173,3 +173,43 @@ describe('lỗi 4 — vì sao phương án em chọn là sai', () => {
     expect(viSaoChonSai(cu, 'B')).toBe('')
   })
 })
+
+// ---------------------------------------------------------------------------
+// SÀN THANH KÉO = SỐ CÂU EM SAI — thầy chốt 07/09:
+//
+//   "tất cả các thanh kéo đều phải cho chọn tối thiểu bằng với số câu sai trong
+//    ca thi và tối đa với số câu gán nhãn giống trong kho đề…
+//    ví dụ em sai 3 câu thì cho kéo tối thiểu 3 câu khắc phục"
+//
+// Sàn 10 cứng của bản cũ sai cả hai chiều: em sai 3 câu bị ép nhận 10, em sai
+// 16 câu lại được phép tụt xuống 10 — bỏ trắng 6 câu sai không ai chữa.
+import { sanSoCau, SO_CAU_MIN, SO_CAU_MAX, chanSoCau } from '../src/lib/phieu-link'
+
+describe('sàn thanh kéo bằng số câu em sai', () => {
+  it('em sai 3 câu thì sàn là 3, không phải 10', () => {
+    expect(sanSoCau(3, 60)).toBe(3)
+    expect(sanSoCau(3, 60)).toBeLessThan(SO_CAU_MIN)
+  })
+
+  it('em sai 16 câu thì sàn là 16, KHÔNG được tụt về 10', () => {
+    expect(sanSoCau(16, 60)).toBe(16)
+    expect(chanSoCau(10, sanSoCau(16, 60))).toBe(16)
+  })
+
+  it('kho không đủ hàng thì sàn tụt theo kho — không hứa cái không có', () => {
+    expect(sanSoCau(16, 5)).toBe(5)
+    expect(sanSoCau(3, 0)).toBe(1)
+  })
+
+  it('chưa biết em sai mấy câu thì về mặc định 10', () => {
+    expect(sanSoCau(0, 60)).toBe(SO_CAU_MIN)
+  })
+
+  it('trần vẫn cứng ở SO_CAU_MAX, sàn không đẩy được qua trần', () => {
+    expect(chanSoCau(999, 3)).toBe(SO_CAU_MAX)
+  })
+
+  it('đọc link KHÔNG bị sàn 10 chặn — link máy khác sinh ra có thể mang số nhỏ', () => {
+    expect(chanSoCau(3)).toBe(3)
+  })
+})

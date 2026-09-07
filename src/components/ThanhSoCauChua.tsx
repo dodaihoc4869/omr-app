@@ -7,6 +7,7 @@
 //
 // `tongUngVien = 0` thì khoá thanh và nói đúng lý do lấy từ `thieu[]`, không để
 // thầy kéo một thanh không sinh ra câu nào.
+import { useEffect } from 'react'
 import { AlertTriangle, Tags } from 'lucide-react'
 import { tenCauSai, type PoolCauSai, type SuatThieu } from '../lib/rut-de-chua'
 
@@ -37,8 +38,20 @@ export default function ThanhSoCauChua({
 }) {
   const khoa = tongUngVien <= 0
   const hetDang = (thieu ?? []).some((t) => t.vi.includes('chưa gắn dạng'))
-  const n = Math.min(Math.max(1, soCau), Math.max(1, tongUngVien))
+  // SÀN = SỐ CÂU EM SAI (thầy chốt 07/09): "em sai 3 câu thì cho kéo tối thiểu
+  // 3 câu khắc phục". Mỗi câu sai ít nhất một câu chữa. Kho không đủ hàng thì
+  // sàn tụt theo `tongUngVien` — không hứa cái không có.
+  const san = Math.max(1, Math.min(soCauSai ?? poolTheoCauSai?.length ?? 1, Math.max(1, tongUngVien)))
+  const n = Math.min(Math.max(san, soCau), Math.max(1, tongUngVien))
   const canhBao = (poolTheoCauSai ?? []).filter((p) => p.pool === 0)
+
+  // BÁO NGƯỢC SỐ ĐÃ KẸP LÊN CHO MÀN CHA.
+  //
+  // Không có chỗ này thì thanh hiện 16 (đã kẹp lên sàn) trong khi màn cha vẫn
+  // giữ 10 và dựng phiếu 10 câu — con số thầy nhìn thấy khác con số máy làm.
+  useEffect(() => {
+    if (!khoa && n !== soCau) onDoi(n)
+  }, [khoa, n, soCau, onDoi])
 
   if (khoa) {
     return (
@@ -72,7 +85,7 @@ export default function ThanhSoCauChua({
           Số câu chữa: <b style={{ fontVariantNumeric: 'tabular-nums' }}>{n}</b> / tối đa {tongUngVien}
         </span>
         <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
-          {MOC_NHAY.filter((m) => m < tongUngVien).map((m) => (
+          {MOC_NHAY.filter((m) => m > san && m < tongUngVien).map((m) => (
             <button
               key={m}
               className="tap-target font-bold"
@@ -108,8 +121,8 @@ export default function ThanhSoCauChua({
 
       <input
         type="range"
-        min={1}
-        max={tongUngVien}
+        min={san}
+        max={Math.max(san, tongUngVien)}
         step={1}
         value={n}
         onChange={(e) => onDoi(Number(e.target.value))}
@@ -118,10 +131,10 @@ export default function ThanhSoCauChua({
         aria-label="Số câu chữa"
       />
 
-      {/* Nói MAX TỪ ĐÂU RA. Không có dòng này thì con số 90 là số trên trời. */}
+      {/* Nói MAX VÀ MIN TỪ ĐÂU RA. Không có dòng này thì hai con số là số trên trời. */}
       <div style={{ ...NHAN_NHO, marginTop: 4 }}>
         Kho có {tongUngVien} câu cùng dạng với {soCauSai ?? poolTheoCauSai?.length ?? 0} câu em sai
-        {choBac2 ? ' (đã tính thêm câu cùng cơ chế)' : ''}.
+        {choBac2 ? ' (đã tính thêm câu cùng cơ chế)' : ''}. Ít nhất {san} câu — đúng bằng số câu em làm sai.
       </div>
 
       {canhBao.length > 0 && (

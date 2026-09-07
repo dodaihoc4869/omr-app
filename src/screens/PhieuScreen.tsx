@@ -16,7 +16,7 @@
 // yếu. Máy bật "giảm chuyển động" thì hiện thẳng trạng thái cuối.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { classify } from '../engine/score'
-import { chanSoCau, docLinkPhieu, SO_CAU_MIN } from '../lib/phieu-link'
+import { chanSoCau, docLinkPhieu, sanSoCau, SO_CAU_MIN } from '../lib/phieu-link'
 import { layPhieu } from '../lib/exam-api'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import { napDong } from '../lib/nap-manh'
@@ -166,6 +166,7 @@ const CSS = `
 .bc-so-gia{font-family:var(--serif);font-size:21px;font-weight:700;font-variant-numeric:tabular-nums}
 .bc-so input[type=range]{width:100%;margin-top:8px;accent-color:var(--p-cam);height:26px}
 .bc-so-moc{display:flex;justify-content:space-between;font-size:11px;color:var(--p-mo);font-variant-numeric:tabular-nums}
+.bc-so-vi{margin-top:4px;font-size:11px;line-height:1.5;color:var(--p-mo)}
 
 @media (prefers-reduced-motion:reduce){
   .bc-dau::before,.bc-dau::after{animation:none}
@@ -948,16 +949,21 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
   const dsDaLoc = (du.baiTap ?? []).filter((c) => hopDang(dangCuaCau(c), locDang))
   const coSan = dsDaLoc.length
   // v4 mục 9 cấm trần cứng: trần là số câu chữa THẬT SỰ có, không phải 60.
-  const tran = Math.max(SO_CAU_MIN, coSan || SO_CAU_MIN)
-  const [soCau, setSoCau] = useState(() => Math.min(SO_CAU_MIN, tran))
-  const lay = Math.min(soCau, coSan)
+  const tran = Math.max(1, coSan || 1)
+  // SÀN = SỐ CÂU EM SAI (thầy chốt 07/09). Sàn 10 cứng của bản cũ vừa ép em sai
+  // 3 câu phải nhận 10 câu, vừa cho em sai 16 câu tụt xuống 10 — bỏ trắng 6 câu
+  // sai. Kho không đủ hàng thì sàn tụt theo `coSan`, không hứa cái không có.
+  const soCauSai = du.cauSai?.length ?? 0
+  const san = sanSoCau(soCauSai, coSan)
+  const [soCau, setSoCau] = useState(() => Math.max(san, Math.min(SO_CAU_MIN, tran)))
+  const lay = Math.min(Math.max(soCau, san), coSan)
 
   // Link đã cất sẵn là `.../p#<mã>`; gắn thêm `~<số câu>` và chữ cuối là xong,
   // không phải ghi lại phiếu nào lên máy chủ (trang này không có mã bí mật để
   // ghi). HAI LINK (thầy chốt 04-09 khuya): `d` = chỉ có ĐỀ cho con tự làm,
   // `g` = có LỜI GIẢI để con dò sau khi làm xong.
-  const linkDe = du.linkBaiTap ? `${du.linkBaiTap}~${chanSoCau(soCau)}d` : ''
-  const linkGiai = du.linkBaiTap ? `${du.linkBaiTap}~${chanSoCau(soCau)}g` : ''
+  const linkDe = du.linkBaiTap ? `${du.linkBaiTap}~${chanSoCau(lay, san)}d` : ''
+  const linkGiai = du.linkBaiTap ? `${du.linkBaiTap}~${chanSoCau(lay, san)}g` : ''
   const [daCopyGiai, setDaCopyGiai] = useState(false)
 
   const copyLink = async (link: string, giai: boolean) => {
@@ -1016,9 +1022,9 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
         </div>
       )}
 
-      {/* PHỤ HUYNH TỰ CHỌN SỐ CÂU. Thầy chốt 04-09 tối: 10 tới 40 câu, tuỳ sức
-          con và tuỳ quỹ thời gian của gia đình. */}
-      {coSan > SO_CAU_MIN && (
+      {/* PHỤ HUYNH TỰ CHỌN SỐ CÂU. Sàn là SỐ CÂU EM SAI, trần là số câu kho
+          thật sự có cùng dạng (thầy chốt 07/09). */}
+      {coSan > san && (
         <div className="bc-so">
           <div className="bc-so-dau">
             <span className="bc-so-nhan">{laCuaEm ? 'Em làm bao nhiêu câu?' : 'Cho con làm bao nhiêu câu?'}</span>
@@ -1026,17 +1032,22 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
           </div>
           <input
             type="range"
-            min={SO_CAU_MIN}
+            min={san}
             max={tran}
             step={1}
-            value={soCau}
-            onChange={(e) => setSoCau(chanSoCau(e.target.value))}
+            value={Math.max(san, Math.min(soCau, tran))}
+            onChange={(e) => setSoCau(chanSoCau(e.target.value, san))}
             aria-label={laCuaEm ? 'Số câu em làm' : 'Số câu cho con làm'}
           />
           <div className="bc-so-moc">
-            <span>{SO_CAU_MIN}</span>
+            <span>{san}</span>
             <span>{tran}</span>
           </div>
+          {soCauSai > 0 && (
+            <div className="bc-so-vi">
+              Ít nhất {san} câu — đúng bằng số câu {laCuaEm ? 'em' : 'con'} làm sai trong ca này.
+            </div>
+          )}
         </div>
       )}
 

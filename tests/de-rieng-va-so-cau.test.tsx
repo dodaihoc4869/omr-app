@@ -7,7 +7,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import type { TeacherExamSource } from '../src/data/examContent'
-import { chanSoCau, docLinkPhieu, docMaTuHash, SO_CAU_MAX, SO_CAU_MIN, taoLinkPhieu } from '../src/lib/phieu-link'
+import { chanSoCau, sanSoCau, docLinkPhieu, docMaTuHash, SO_CAU_MAX, SO_CAU_MIN, taoLinkPhieu } from '../src/lib/phieu-link'
 import { oGiaiHtml, theCauHtml } from '../src/lib/html-phieu'
 import type { CauLuyen } from '../src/lib/bai-tap-pdf'
 
@@ -28,11 +28,34 @@ describe('link phiếu mang số câu', () => {
     expect(docLinkPhieu('#abcdefgh12')).toEqual({ ma: 'abcdefgh12', soCau: null, cheDo: 'giai' })
     expect(docMaTuHash('#abcdefgh12~30')).toBe('abcdefgh12')
   })
-  it('kẹp số câu vào 10..40, rác thì về 10', () => {
-    expect(chanSoCau(3)).toBe(SO_CAU_MIN)
+  it('sàn của thanh kéo là ĐỘNG, trần vẫn cứng, rác thì về mặc định', () => {
+    // THẦY ĐỔI LUẬT 07/09: "tất cả các thanh kéo đều phải cho chọn tối thiểu
+    // bằng với số câu sai trong ca thi… em sai 3 câu thì cho kéo tối thiểu 3
+    // câu khắc phục". Sàn 10 cứng cũ vừa ép em sai 3 câu phải nhận 10, vừa cho
+    // em sai 16 câu tụt xuống 10 — bỏ trắng 6 câu sai không ai chữa.
+    //
+    // `chanSoCau` KHÔNG có sàn thì lấy sàn tuyệt đối 1, vì nó còn dùng để ĐỌC
+    // LINK: link do máy khác sinh ra mang số nhỏ hơn 10 là hợp lệ.
+    expect(chanSoCau(3)).toBe(3)
+    // Truyền sàn vào thì nó kẹp đúng sàn ấy.
+    expect(chanSoCau(3, 10)).toBe(SO_CAU_MIN)
+    expect(chanSoCau(3, 16)).toBe(16)
+    // Trần vẫn cứng.
     expect(chanSoCau(99)).toBe(SO_CAU_MAX)
     expect(chanSoCau('abc')).toBe(SO_CAU_MIN)
     expect(docLinkPhieu('#abcdefgh12~999').soCau).toBe(SO_CAU_MAX)
+  })
+
+  it('sanSoCau: sàn bằng số câu sai, nhưng không vượt số câu kho có', () => {
+    expect(sanSoCau(3, 60)).toBe(3)
+    expect(sanSoCau(16, 60)).toBe(16)
+    // Kho chỉ còn 5 câu mà em sai 16: không hứa cái không có.
+    expect(sanSoCau(16, 5)).toBe(5)
+    // Chưa biết em sai mấy câu thì về mặc định 10, vẫn kẹp theo kho.
+    expect(sanSoCau(0, 60)).toBe(SO_CAU_MIN)
+    expect(sanSoCau(0, 4)).toBe(4)
+    // Kho rỗng.
+    expect(sanSoCau(3, 0)).toBe(1)
   })
   it('mã rác thì trả rỗng, không hỏi máy chủ bằng rác', () => {
     expect(docLinkPhieu('#a b~10')).toEqual({ ma: '', soCau: null, cheDo: 'giai' })
