@@ -59,9 +59,9 @@ export interface ThongTinPhieu {
 const CHU_PA = ['A', 'B', 'C', 'D']
 const CHU_Y = ['a', 'b', 'c', 'd']
 const TEN_MUC: Record<string, string> = { biet: 'Nhận biết', hieu: 'Thông hiểu', van_dung: 'Vận dụng' }
-const LOP_MUC: Record<string, string> = { biet: 'level-1', hieu: 'level-2', van_dung: 'level-3' }
+// LỚP MÀU CHO MỨC ĐỘ VÀ PHẦN ĐÃ BỎ (PHIEU-BAI-TAP-V2 mục 3): sáu chip màu
+// tranh nhau thì không màu nào còn nổi. Ba thứ đó nay là một dòng chữ xám.
 const TEN_LOAI: Record<string, string> = { I: 'Trắc nghiệm', II: 'Đúng / Sai', III: 'Trả lời ngắn' }
-const LOP_LOAI: Record<string, string> = { I: 'type-mc', II: 'type-tf', III: 'type-sa' }
 
 export function thoat(s: string): string {
   return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -219,9 +219,7 @@ sup { font-size: .72em; vertical-align: .42em; }
    Bản cũ cao 100svh, chữ căn giữa, ba phân tử mờ nằm vắt chéo — mở phiếu ra
    phải cuộn hết một màn mới thấy câu đầu tiên. Nay bìa cao vừa đủ nội dung,
    chữ căn TRÁI như một tiêu đề tài liệu, và bỏ hẳn hoa văn phân tử. */
-.cover-blob { position: absolute; border-radius: 50%; pointer-events: none; }
-.cover-blob.b1 { top: -170px; right: -130px; width: 360px; height: 360px; background: rgba(255,255,255,.07); }
-.cover-blob.b2 { bottom: -210px; left: -150px; width: 420px; height: 420px; background: rgba(255,255,255,.05); }
+/* Quầng sáng trên bìa đã bỏ cùng với bìa cũ — nền tối phẳng. */
 .cover-content { position: relative; z-index: 2; width: 100%; max-width: 700px; margin: 0 auto; }
 .cover-badge {
   display: inline-flex; align-items: center; gap: 8px; margin-bottom: 18px; padding: 7px 16px;
@@ -243,57 +241,12 @@ sup { font-size: .72em; vertical-align: .42em; }
 .cover-info-label { font-size: 10px; text-transform: uppercase; letter-spacing: .12em; opacity: .72; margin-bottom: 3px; }
 .cover-info-value { font-size: clamp(13.5px, 3.2vw, 15.5px); font-weight: 700; overflow-wrap: anywhere; line-height: 1.35; }
 
-/* ================= TỔNG QUAN ================= */
-.summary-page {
-  margin: -28px auto 26px; max-width: 900px; position: relative; z-index: 3;
-  border-radius: 24px; padding: 18px 18px 20px; color: #ffffff;
-  background: linear-gradient(135deg, #0f3057 0%, #00587a 55%, #008891 100%);
-  box-shadow: var(--bong-cao);
-}
-/* TIÊU ĐỀ NẰM CÙNG HÀNG với số câu, không chiếm riêng một dòng giữa trang:
-   thẻ này chỉ là bảng tóm tắt, không phải một trang bìa thứ hai (thầy chốt
-   06/09 — "gọn hàng hơn"). */
-.summary-dau { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
-.summary-title { font-size: clamp(15px, 3.6vw, 18px); font-weight: 800; letter-spacing: .01em; }
-.summary-tong { font-size: 13px; opacity: .72; font-variant-numeric: tabular-nums; }
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; margin-bottom: 12px; }
-.stat-card {
-  display: flex; align-items: baseline; gap: 8px; width: 100%; text-align: left;
-  padding: 11px 13px; color: inherit; font: inherit;
-  background: rgba(255,255,255,.11); border: 1px solid rgba(255,255,255,.2); border-radius: 14px;
-  transition: background-color var(--muot), border-color var(--muot), transform var(--muot);
-}
-/* Ô bấm được thì phải TRÔNG như bấm được: con trỏ bàn tay, sáng lên khi rê
-   chuột, và khi đang lọc thì nền trắng hẳn để biết đang xem phần nào. */
-button.stat-card, button.topic-item { cursor: pointer; }
-button.stat-card:hover { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.45); }
-button.stat-card:active { transform: scale(.98); }
-button.stat-card.chon { background: #ffffff; border-color: #ffffff; color: var(--nav); }
-button.stat-card.chon .stat-label { opacity: 1; font-weight: 700; }
-button.stat-card:focus-visible, button.topic-item:focus-visible { outline: 3px solid rgba(255,255,255,.7); outline-offset: 2px; }
-/* Nhãn "xem riêng" bỏ hẳn: ô đã có con trỏ bàn tay và sáng lên khi rê chuột,
-   thêm một dòng chữ hoa nữa chỉ làm thẻ cao gấp rưỡi mà không nói thêm gì. */
-.stat-number { font-size: clamp(19px, 4.4vw, 23px); font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
-.stat-label { font-size: 12px; opacity: .82; line-height: 1.3; }
-.topics-list { background: rgba(255,255,255,.09); border-radius: 14px; padding: 11px 14px; }
-.topics-list h3 { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; opacity: .72; margin-bottom: 4px; }
-.topic-item {
-  display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
-  padding: 6px 10px; margin: 0 -10px; border: none; border-bottom: 1px solid rgba(255,255,255,.12);
-  border-radius: 8px; background: transparent; color: inherit; font: inherit;
-  font-size: 13px; line-height: 1.45;
-  transition: background-color var(--muot);
-}
-.topic-item:last-child { border-bottom: none; }
-button.topic-item:hover { background: rgba(255,255,255,.14); }
-button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
-/* CHẤM TRÒN CÂN VỚI DÒNG CHỮ ĐẦU, KHÔNG PHẢI VỚI CẢ Ô.
-   Căn giữa cả ô (align-items:center) thì dòng nào xuống hai dòng là chấm tụt
-   xuống giữa hai dòng, nhìn như chấm của dòng khác. Nên ô chấm cao đúng MỘT
-   dòng rồi tự căn giữa bên trong: chữ dài bao nhiêu chấm vẫn nằm ngang dòng
-   đầu. Dùng em nên đổi cỡ chữ là chấm tự theo, không phải chỉnh tay. */
-.topic-cham { flex-shrink: 0; display: flex; align-items: center; height: 1.5em; }
-.topic-dot { width: 9px; height: 9px; border-radius: 50%; }
+/* ================= TỔNG QUAN =================
+   Panel bốn ô thống kê cộng bảng phân loại mức độ đã thu thành MỘT DÒNG chữ
+   xám (V2 mục 4.3); bảng kiểu của panel cũ (bốn ô thống kê và bảng phân loại
+   mức độ) không còn thẻ nào mang nữa nên xoá hẳn — để lại là bảng kiểu chết,
+   người sau đọc tưởng còn dùng.
+   Kiểu của dòng mới nằm ở khối .tong-quan phía trên. */
 
 /* ================= THANH ĐIỀU KHIỂN ================= */
 .thanh {
@@ -371,13 +324,33 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
 }
 .q-tags { display: flex; gap: 6px; flex-wrap: wrap; }
 .q-tag { font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 600; letter-spacing: .01em; white-space: nowrap; }
-.q-tag.type-mc { background: #dbeafe; color: #1e40af; }
-.q-tag.type-tf { background: #fef3c7; color: #92400e; }
-.q-tag.type-sa { background: #e0e7ff; color: #4338ca; }
-.q-tag.level-1 { background: #d1fae5; color: #065f46; }
-.q-tag.level-2 { background: #fce7f3; color: #9d174d; }
-.q-tag.level-3 { background: #fed7aa; color: #9a3412; }
-.q-tag.topic { background: #f1f5f9; color: #475569; }
+/* Phần, mức độ, chuyên đề: MỘT DÒNG CHỮ XÁM đẩy sang phải, không còn chip màu
+ * (PHIEU-BAI-TAP-V2 mục 3 — sáu màu tranh nhau thì không màu nào còn nổi). */
+.q-meta { margin-left: auto; font-size: 11.5px; color: #67646f; white-space: nowrap; align-self: center; }
+
+/* LÝ DO NẰM NGAY TRONG Ô PHƯƠNG ÁN, chỉ hiện khi mở lời giải. Bản cũ để lý do
+ * ở một khối riêng bên dưới nên em phải nhảy qua lại để dò dòng nào ứng với
+ * phương án nào. */
+.opt-ly { display: none; margin-top: 6px; font-size: 13px; line-height: 1.55; gap: 7px; align-items: flex-start; }
+.q-card.mo .opt-ly { display: flex; }
+.opt-dau { flex: 0 0 auto; font-weight: 700; }
+.opt-ly.dung .opt-dau { color: #2e8b6b; }
+.opt-ly.sai .opt-dau { color: #b42318; }
+.opt-ly.dung { color: #2e8b6b; }
+.opt-ly.sai { color: #67646f; }
+
+/* TỔNG QUAN MỘT DÒNG. Ba cụm phần vẫn là nút lọc như panel cũ. */
+.tong-quan { margin: 0 0 14px; font-size: 12.5px; color: #67646f; line-height: 1.9; }
+.tq-cum { font: inherit; color: inherit; background: none; border: none; padding: 0; cursor: pointer;
+  border-bottom: 1px dashed #d8d3c8; }
+.tq-cum.tat { border-bottom: none; opacity: .55; cursor: default; }
+.tq-muc { font: inherit; color: inherit; background: none; border: none; padding: 0; cursor: pointer;
+  border-bottom: 1px dashed #d8d3c8; }
+.tq-cum[aria-pressed="true"], .tq-muc[aria-pressed="true"] { color: #b42318; border-bottom-color: #b42318; font-weight: 600; }
+
+/* Ô kết quả trên bìa — nhãn nói rõ nó là kết quả của bài NÀO. */
+.cover-ket { flex: 0 1 auto; background: rgba(180,35,24,.16); border-color: rgba(180,35,24,.34); }
+.cover-ket .cover-info-label, .cover-ket .cover-info-value { color: #f2c9c4; }
 /* NHÃN CHỮA — lý do câu này có mặt trên phiếu, nên phải đọc thấy trước ba nhãn
    kia. Thầy chốt 07/09: "gắn màu nào cho nổi bật lên".
    Cam đậm: ba nhãn còn lại đều là màu pastel nhạt (xanh nhạt, hồng nhạt, xám),
@@ -596,7 +569,7 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
   text-box-edge: cap alphabetic;
   text-box: trim-both cap alphabetic;
 }
-.q-opt-text, .q-tag, .tf-statement, .stat-number {
+.q-opt-text, .q-tag, .tf-statement {
   text-box-trim: trim-both;
   text-box-edge: cap alphabetic;
   text-box: trim-both cap alphabetic;
@@ -632,7 +605,6 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
      ý "bấm vào đây". Để lại là tờ giấy đầy chữ vô nghĩa. */
   .thanh, .stat-loc, .chi-man { display: none; }
   .cover { min-height: auto; height: 250mm; break-after: page; border-radius: 0; }
-  .summary-page { max-width: none; margin: 0 0 8mm; break-after: page; box-shadow: none; }
   .q-card { box-shadow: none; break-inside: avoid; margin-bottom: 6mm; }
   .q-card:hover { box-shadow: none; }
   .q-nut-giai { display: none; }
@@ -701,16 +673,44 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
   // Nhãn CHỮA đứng trước mọi nhãn khác: đọc một dòng là biết câu này có mặt
   // ở đây để sửa lỗi nào, không phải "một câu Ester bất kỳ".
   const n = c.chuaCho
+  // MỘT CHIP CÓ MÀU VÀ CHỈ MỘT: "Chữa câu 3 phần I". Đó là thứ duy nhất đổi
+  // việc em phải làm với câu này. Phần, mức độ, chuyên đề trước đây mỗi thứ một
+  // chip màu — sáu màu tranh nhau thì không màu nào còn nổi; nay chúng gộp
+  // thành MỘT DÒNG CHỮ XÁM đẩy sang phải.
+  //
+  // Nhãn chữa PHẢI kèm phần: "câu 2" trần trỏ vào hai câu khác nhau của cùng
+  // một bài thi, em không biết mình đang chữa câu nào.
+  // CHỮ TRÊN CHIP GIỮ NGUYÊN "Khắc phục lỗi sai câu N phần X". Đặc tả v2 vẽ
+  // minh hoạ chip bằng chữ "Chữa câu 3 phần I", nhưng đó là hình vẽ chứ không
+  // phải yêu cầu đổi chữ — và thầy đã chốt riêng chữ này trước đó (xem
+  // `tests/tao-lai-phieu-va-chu-nhan.test.ts`). Đổi chữ ở đây là lặng lẽ lật
+  // một quyết định cũ.
   const tags = [
-    // Nhãn PHẢI kèm phần: "câu 2" trần trỏ vào hai câu khác nhau của cùng một
-    // bài thi, em không biết mình đang chữa câu nào.
     n ? `<span class="q-tag chua">${n.laLamLai ? `Làm lại câu ${n.soCau} phần ${n.phan}` : `Khắc phục lỗi sai câu ${n.soCau} phần ${n.phan}`}</span>` : '',
     n && n.laLamLai ? '<span class="q-tag chua-2">kho chưa có câu cùng dạng</span>' : '',
     n && !n.laLamLai && n.bac === 2 ? '<span class="q-tag chua-2">cùng cơ chế, khác việc</span>' : '',
-    `<span class="q-tag ${LOP_LOAI[c.phan]}">${TEN_LOAI[c.phan]}</span>`,
-    c.mucDo ? `<span class="q-tag ${LOP_MUC[c.mucDo]}">${TEN_MUC[c.mucDo]}</span>` : '',
-    c.chuyenDe ? `<span class="q-tag topic">${thoat(c.chuyenDe)}</span>` : '',
   ].join('')
+  const meta = [TEN_LOAI[c.phan], c.mucDo ? TEN_MUC[c.mucDo] : '', thoat(c.chuyenDe || '')].filter(Boolean).join(' · ')
+
+  // LÝ DO ĐI THEO PHƯƠNG ÁN CỦA NÓ — thay đổi lớn nhất của bản này.
+  //
+  // Bản cũ dựng một khối "Vì sao chọn / không chọn từng phương án" nằm riêng
+  // bên dưới, nên em phải nhảy qua lại để dò dòng nào ứng với phương án nào.
+  // Đó là split-attention: việc tìm kiếm giữa hai nguồn ngốn đúng phần trí nhớ
+  // làm việc đáng lẽ dùng để hiểu bài. Cách chữa là đưa lời giải thích tới
+  // ĐÚNG CHỖ NÓ ÁP DỤNG.
+  //
+  // Dòng lý do nằm ngay trong ô phương án nhưng chỉ hiện khi mở lời giải
+  // (`.q-card.mo`), nên bản chỉ-đề vẫn sạch.
+  const lyTheoKhoa = new Map((c.lyDo ?? []).map((l) => [l.khoa, l.ly]))
+  const dungKhoaCau = c.phan === 'II' ? CHU_Y.filter((_, i) => ysDung(c.dapAn)[i]) : [(c.dapAn || '').trim().toUpperCase()]
+  const dongLy = (khoa: string): string => {
+    if (anGiai) return ''
+    const ly = lyTheoKhoa.get(khoa)
+    if (!ly) return ''
+    const dung = dungKhoaCau.includes(khoa)
+    return `<div class="opt-ly${dung ? ' dung' : ' sai'}"><span class="opt-dau" aria-hidden="true">${dung ? '✓' : '✗'}</span><span>${chuHtml(ly)}</span></div>`
+  }
 
   let than = ''
   if (c.phan === 'I' && c.luaChon) {
@@ -723,7 +723,7 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
         const dung = CHU_PA[i] === (c.dapAn || '').trim().toUpperCase()
         const anh = c.anhLuaChon?.[i]
         const noi = anh ? anhHtml(anh, 'pa', `Phương án ${CHU_PA[i]}`) : chuHtml(pa)
-        return `<div class="q-opt${dung ? ' dung' : ''}"><div class="q-opt-letter"><span class="ky">${CHU_PA[i]}</span></div><div class="q-opt-text">${noi}${hinhTaiViTri(c, `sau_pa_${CHU_PA[i]}`)}</div></div>`
+        return `<div class="q-opt${dung ? ' dung' : ''}"><div class="q-opt-letter"><span class="ky">${CHU_PA[i]}</span></div><div class="q-opt-text">${noi}${hinhTaiViTri(c, `sau_pa_${CHU_PA[i]}`)}${dongLy(CHU_PA[i])}</div></div>`
       })
       .join('')
     than = `<div class="q-options${dai ? ' single-col' : ''}">${o}</div>`
@@ -733,7 +733,7 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
       .map((y, i) => {
         const anh = c.anhLuaChon?.[i]
         const noi = anh ? anhHtml(anh, 'pa', `Ý ${CHU_Y[i]}`) : chuHtml(y)
-        return `<div class="tf-item"><div class="tf-statement">${CHU_Y[i]}. ${noi}${hinhTaiViTri(c, `sau_y_${CHU_Y[i]}`)}</div><div class="tf-o"><div class="tf-badge d${dung[i] ? ' dung' : ''}"><span class="ky">Đ</span></div><div class="tf-badge s${dung[i] ? '' : ' dung'}"><span class="ky">S</span></div></div></div>`
+        return `<div class="tf-item"><div class="tf-statement">${CHU_Y[i]}. ${noi}${hinhTaiViTri(c, `sau_y_${CHU_Y[i]}`)}${dongLy(CHU_Y[i])}</div><div class="tf-o"><div class="tf-badge d${dung[i] ? ' dung' : ''}"><span class="ky">Đ</span></div><div class="tf-badge s${dung[i] ? '' : ' dung'}"><span class="ky">S</span></div></div></div>`
       })
       .join('')
     than = `<div class="tf-head"><span>Đ</span><span>S</span></div>${hang}`
@@ -759,7 +759,7 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
         }</div>`
       : ''
   return `<article class="q-card${n ? ' la-chua' : ''}${moSan ? ' mo' : ''}${giai ? '' : ' khong-giai'}" data-so="${stt}" data-phan="${c.phan}" data-muc="${thoat(c.mucDo || '')}">
-  <div class="q-header"><div class="q-num"><span class="ky">${stt}</span></div><div class="q-tags">${tags}</div></div>
+  <div class="q-header"><div class="q-num"><span class="ky">${stt}</span></div><div class="q-tags">${tags}</div><div class="q-meta">${meta}</div></div>
   <div class="q-than">
     ${oLamLai}
     ${deBai}
@@ -786,7 +786,6 @@ export function dapAnChu(c: CauLuyen): string {
 export function oGiaiHtml(c: CauLuyen): string {
   const khoi: string[] = [`<div class="sol-dap">Đáp án: <b>${chuHtml(dapAnChu(c))}</b></div>`]
 
-  const dungKhoa = c.phan === 'II' ? CHU_Y.filter((_, i) => ysDung(c.dapAn)[i]) : [(c.dapAn || '').trim().toUpperCase()]
   let coGiai = false
   // KIẾN THỨC CỐT LÕI in đậm TRÊN CÙNG (thầy chốt 04-09 khuya: "kiến thức cốt lõi
   // bôi đậm trên cùng để giải câu đó"), rồi mới tới vì sao chọn / không chọn
@@ -795,13 +794,10 @@ export function oGiaiHtml(c: CauLuyen): string {
     khoi.push(`<div class="sol-label">Kiến thức cốt lõi</div><div class="sol-text sol-cot-loi">${chuHtml(c.chot)}</div>`)
     coGiai = true
   }
-  if (c.lyDo && c.lyDo.length > 0) {
-    const dong = c.lyDo
-      .map((l) => `<div class="sol-pa${dungKhoa.includes(l.khoa) ? ' chon' : ''}"><strong>${thoat(l.khoa)}.</strong> ${dungKhoa.includes(l.khoa) ? '✓ ' : '✗ '}${chuHtml(l.ly)}</div>`)
-      .join('')
-    khoi.push(`<div class="sol-label">${c.phan === 'II' ? 'Vì sao từng ý đúng / sai' : 'Vì sao chọn / không chọn từng phương án'}</div><div class="sol-text">${dong}</div>`)
-    coGiai = true
-  }
+  // KHÔNG dựng lại khối "Vì sao từng phương án" ở đây: từ bản này lý do đi
+  // theo chính phương án của nó trong `theCauHtml`. Dựng cả hai là em đọc hai
+  // lần cùng một câu.
+  if (c.lyDo && c.lyDo.length > 0) coGiai = true
   const buoc = c.buoc ?? []
   if (buoc.length > 0) {
     const ds = buoc.map((b, i) => `<div class="sol-step">${i + 1}. ${chuHtml(b)}</div>`).join('')
@@ -833,64 +829,24 @@ export function oGiaiHtml(c: CauLuyen): string {
   return `<div class="sol-box">${khoi.join('')}</div>`
 }
 
-/** CÔNG THỨC IN TRÊN BÌA, CHỌN THEO CHUYÊN ĐỀ.
+/* BẢNG CÔNG THỨC IN TRÊN BÌA ĐÃ BỎ HẲN — PHIEU-BAI-TAP-V2 mục 4.1.
  *
- * LỖI ĐÃ DÍNH (thầy báo 06/09): bìa gõ cứng `RCOOR'` và ba phân tử ester, nên
- * phiếu chuyên đề nào cũng in ester — bài amine, bài carbohydrate, bài kim
- * loại đều mang một cái bìa nói sai nội dung bên trong.
+ * Bản 06/09 chữa lỗi "phiếu chuyên đề nào cũng in công thức ester" bằng cách chọn theo
+ * chuyên đề. Chọn đúng hơn gõ cứng, nhưng vẫn là một bảng chữ Hoá nằm trong mã
+ * app: chuyên đề mới thì rơi về bộ trung tính, và không chỗ gọi nào đổi được.
  *
- * Không khớp chuyên đề nào thì dùng bộ TRUNG TÍNH, chứ KHÔNG rơi về ester:
- * thà bìa chung chung còn hơn bìa nói sai. */
-export function congThucBia(tenChuyenDe: string): { chinh: string; troi: [string, string, string] } {
-  const t = goKyTuLa(String(tenChuyenDe ?? ''))
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .toLowerCase()
-  const co = (...tu: string[]) => tu.some((x) => t.includes(x))
-
-  if (co('ester', 'lipid', 'chat beo', 'xa phong')) {
-    return { chinh: "RCOOR'", troi: ['RCOOR&#39;', 'CH<sub>3</sub>COOH', 'C<sub>9</sub>H<sub>8</sub>O<sub>4</sub>'] }
-  }
-  if (co('carbohydrate', 'glucose', 'saccharose', 'tinh bot', 'cellulose')) {
-    return { chinh: 'C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>', troi: ['C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>', 'C<sub>12</sub>H<sub>22</sub>O<sub>11</sub>', '(C<sub>6</sub>H<sub>10</sub>O<sub>5</sub>)<sub>n</sub>'] }
-  }
-  if (co('nitrogen', 'amine', 'amino acid', 'peptide', 'protein')) {
-    return { chinh: 'H<sub>2</sub>N&ndash;R&ndash;COOH', troi: ['CH<sub>3</sub>NH<sub>2</sub>', 'H<sub>2</sub>N&ndash;CH<sub>2</sub>&ndash;COOH', '&ndash;CO&ndash;NH&ndash;'] }
-  }
-  if (co('polymer', 'chat deo', 'to ', 'cao su')) {
-    return { chinh: '(&ndash;CH<sub>2</sub>&ndash;CH<sub>2</sub>&ndash;)<sub>n</sub>', troi: ['(&ndash;CH<sub>2</sub>&ndash;CH<sub>2</sub>&ndash;)<sub>n</sub>', 'CH<sub>2</sub>=CHCl', 'C<sub>5</sub>H<sub>8</sub>'] }
-  }
-  if (co('dien phan', 'pin dien', 'the dien cuc', 'an mon')) {
-    return { chinh: 'E&deg;<sub>pin</sub>', troi: ['Zn | Zn<sup>2+</sup>', 'Cu<sup>2+</sup> | Cu', '2H<sub>2</sub>O &rarr; O<sub>2</sub>'] }
-  }
-  if (co('kim loai', 'hop kim', 'nhom ia', 'nhom iia', 'kiem tho', 'nuoc cung')) {
-    return { chinh: 'M &rarr; M<sup>n+</sup>', troi: ['Fe<sub>2</sub>O<sub>3</sub>', 'CaCO<sub>3</sub>', 'Al(OH)<sub>3</sub>'] }
-  }
-  if (co('phuc chat', 'nguyen to chuyen tiep', 'kim loai chuyen tiep')) {
-    return { chinh: '[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>', troi: ['[Ag(NH<sub>3</sub>)<sub>2</sub>]<sup>+</sup>', 'Fe<sup>3+</sup>', 'K<sub>2</sub>Cr<sub>2</sub>O<sub>7</sub>'] }
-  }
-  if (co('can bang', 'toc do phan ung', 'nhiet ', 'entropy', 'enthalpy')) {
-    return { chinh: '&Delta;<sub>r</sub>H&deg;<sub>298</sub>', troi: ['K<sub>C</sub>', 'v = k[A]<sup>m</sup>', 'N<sub>2</sub> + 3H<sub>2</sub> &#8652; 2NH<sub>3</sub>'] }
-  }
-  // TRUNG TÍNH — dùng cho phiếu trộn nhiều chuyên đề, hoặc chuyên đề chưa có
-  // trong bảng. Ba ký hiệu này đúng với mọi bài Hoá.
-  return { chinh: 'H&oacute;a h&#7885;c', troi: ['H<sub>2</sub>O', 'NaOH', 'CO<sub>2</sub>'] }
-}
+ * Nay bìa KHÔNG in công thức nào. Mọi chữ trên bìa đến từ tham số. */
 
 export function biaHtml(t: ThongTinPhieu, soCau: number): string {
+  // Ô KẾT QUẢ PHẢI NÓI RÕ NÓ LÀ KẾT QUẢ CỦA BÀI NÀO. Nhãn trơ "Kết quả" trên
+  // một phiếu 10 câu đọc ra "Sai 2/12 câu" là mâu thuẫn ngay trên bìa. Chỗ gọi
+  // truyền nhãn qua `oBia`; không truyền thì mặc định là "Bài trước".
   const oKetQua = t.ketQua
-    ? `<div class="cover-info-item" style="flex:0 1 auto;background:rgba(239,68,68,.16);border-color:rgba(239,68,68,.34);">
-    <div class="cover-info-label" style="color:#fecaca;">Kết quả</div>
-    <div class="cover-info-value" style="color:#fecaca;">${thoat(t.ketQua)}</div></div>`
+    ? `<div class="cover-info-item cover-ket"><div class="cover-info-label">Bài trước</div><div class="cover-info-value">${thoat(t.ketQua)}</div></div>`
     : ''
-  // Tên chuyên đề xuống DÒNG THỨ HAI ở dấu phân cách, đúng như mẫu ("ESTER" /
-  // "& LIPID"). Một dòng dài là tràn khỏi bìa với tên như "Hydrocarbon không
-  // no", và khối chữ cũng lệch hẳn so với mẫu.
-  const ten = thoat(t.tenChuyenDe || 'Hoá học').toUpperCase()
-  const tenHaiDong = ten.replace(/\s*([–—-])\s*/, '<br>$1 ').replace(/\s+&\s+/, '<br>& ')
-  // Chỗ gọi khai rõ thì dùng đúng lời khai; không khai thì mới rơi về "Học
-  // sinh / SBD" như cũ, để mọi link phiếu đã gửi đi vẫn hiện đúng như lúc gửi.
+  // Tên chuyên đề để NGUYÊN MỘT DÒNG: cỡ chữ `clamp()` tự xuống dòng đúng chỗ,
+  // còn cắt tay ở dấu gạch thì tên như "Hydrocarbon không no" xuống sai chỗ.
+  const ten = thoat(t.tenChuyenDe || 'Hoá học')
   const oNhanDang = (t.oBia && t.oBia.length > 0 ? t.oBia : [
     { nhan: 'Học sinh', gia: t.hoTen },
     { nhan: 'SBD', gia: t.sbd },
@@ -899,15 +855,10 @@ export function biaHtml(t: ThongTinPhieu, soCau: number): string {
     .map((o) => `<div class="cover-info-item"><div class="cover-info-label">${thoat(o.nhan)}</div><div class="cover-info-value">${thoat(o.gia)}</div></div>`)
     .join('')
 
-  const ct = congThucBia(t.tenChuyenDe)
-  // Công thức đứng CẠNH nhãn trong một viên thuốc, không còn chiếm một dòng
-  // khổng lồ giữa trang, và ba phân tử mờ vắt chéo đã bỏ hẳn — chúng làm bìa
-  // rối mà không nói thêm gì (thầy chốt 06/09).
   return `<header class="cover">
-  <div class="cover-blob b1"></div><div class="cover-blob b2"></div>
   <div class="cover-content">
-    <div class="cover-badge">${thoat(t.nhanBia || (t.hienDapAn ? 'Lời giải chi tiết' : 'Phiếu bài tập riêng'))}<span class="ct">${ct.chinh}</span></div>
-    <h1 class="cover-title">${tenHaiDong}</h1>
+    <div class="cover-badge">${thoat(t.nhanBia || (t.hienDapAn ? 'Lời giải chi tiết' : 'Phiếu bài tập riêng'))}</div>
+    <h1 class="cover-title">${ten}</h1>
     <div class="cover-subtitle">Thầy Đỗ Đại Học · ${soCau} câu · ${ngayVN(t.ngay)}</div>
     <div class="cover-info">
       ${oNhanDang}
@@ -917,49 +868,46 @@ export function biaHtml(t: ThongTinPhieu, soCau: number): string {
 </header>`
 }
 
-/** Một ô thống kê. Có câu thì là NÚT LỌC, bấm vào chỉ còn hiện các câu của
- * phần đó; phần không có câu nào thì để ô chết, bấm vào lọc ra trang trắng là
- * vô nghĩa. */
-function oThongKe(so: number, nhan: string, loc: string): string {
-  const trong = `<span class="stat-number">${so}</span><span class="stat-label">${nhan}</span>`
-  if (so === 0) return `<div class="stat-card" style="opacity:.5">${trong}</div>`
-  return `<button type="button" class="stat-card" data-loc="${loc}" aria-pressed="false" title="${loc === 'tat' ? 'Xem tất cả' : 'Chỉ xem phần này'}">${trong}</button>`
+/** Một cụm đếm trong dòng tổng quan. Có câu thì là NÚT LỌC (`data-loc`), bấm
+ * vào chỉ còn hiện câu của phần đó; phần 0 câu thì là chữ chết, bấm vào lọc ra
+ * trang trắng là vô nghĩa.
+ *
+ * GIỮ NGUYÊN `data-loc` và `aria-pressed` để `JS_PHIEU` chạy tiếp không phải
+ * sửa một dòng nào. */
+function cumLoc(so: number, nhan: string, loc: string): string {
+  const chu = `${so} ${nhan}`
+  if (so === 0) return `<span class="tq-cum tat">${chu}</span>`
+  return `<button type="button" class="tq-cum" data-loc="${loc}" aria-pressed="false" title="Chỉ xem phần này">${chu}</button>`
 }
 
+/** TỔNG QUAN ĐỀ BÀI — MỘT DÒNG CHỮ XÁM (PHIEU-BAI-TAP-V2 mục 4.3).
+ *
+ * Bản cũ là panel bốn ô thống kê cộng bảng phân loại mức độ, chiếm trọn một màn
+ * trước khi em thấy câu 1 — mà đó là dữ liệu của thầy chứ không phải của em.
+ *
+ * Chức năng LỌC THEO PHẦN giữ nguyên: ba cụm "7 trắc nghiệm", "2 đúng sai",
+ * "1 trả lời ngắn" trong dòng này chính là ba nút lọc cũ. */
 export function tongQuanHtml(cau: CauLuyen[]): string {
   const dem = (p: string) => cau.filter((c) => c.phan === p).length
-  const muc: [string, string, string][] = [
-    ['biet', '#34d399', 'Nhận biết'],
-    ['hieu', '#f472b6', 'Thông hiểu'],
-    ['van_dung', '#fb923c', 'Vận dụng'],
+  const mucTen: [string, string][] = [
+    ['biet', 'nhận biết'],
+    ['hieu', 'thông hiểu'],
+    ['van_dung', 'vận dụng'],
   ]
-  const dong = muc
-    .map(([k, mau, ten]) => {
-      const ds = cau.map((c, i) => ({ c, i })).filter((x) => x.c.mucDo === k)
-      if (ds.length === 0) return ''
-      const so = ds.map((x) => x.i + 1)
-      // Chỉ ghi khoảng "Câu 1–5" khi các câu ĐỨNG LIỀN NHAU. Mức độ xen kẽ mà
-      // vẫn ghi khoảng là nói sai: "Câu 1–9" trong khi mức đó chỉ có 5 câu.
-      const lien = so[so.length - 1] - so[0] + 1 === so.length
-      const nhan = so.length === 1 ? `Câu ${so[0]}` : lien ? `Câu ${so[0]}–${so[so.length - 1]}` : `Câu ${so.join(', ')}`
-      const cd = [...new Set(ds.map((x) => x.c.chuyenDe).filter(Boolean))].join(', ')
-      return `<button type="button" class="topic-item" data-loc="muc:${k}" aria-pressed="false"><span class="topic-cham"><span class="topic-dot" style="background:${mau};"></span></span><span><strong>${ten}:</strong> ${nhan} · ${ds.length} câu${cd ? ` — ${thoat(cd)}` : ''}</span></button>`
+  // Mức độ VẪN LÀ NÚT LỌC như bản cũ. Đặc tả chỉ đòi bỏ CHIP MÀU và thu panel
+  // thành một dòng; nó không đòi bỏ chức năng lọc theo mức độ, mà bỏ một thứ
+  // đang chạy thì thầy mất công cụ đã quen. Nên: chữ xám như phần còn lại của
+  // dòng, `data-loc="muc:..."` giữ nguyên cho `JS_PHIEU`.
+  const muc = mucTen
+    .map(([k, ten]) => {
+      const n = cau.filter((c) => c.mucDo === k).length
+      return n > 0 ? `<button type="button" class="tq-muc" data-loc="muc:${k}" aria-pressed="false" title="Chỉ xem mức độ này">${n} ${ten}</button>` : ''
     })
-    .join('')
-  // KHÔNG EMOJI: quy tắc viết của thầy cấm emoji trong mọi thứ gửi phụ huynh và
-  // học sinh, mà phiếu này gửi cả hai. Bốn ô đã tự nói tên phần của mình.
-  return `<section class="summary-page">
-  <div class="summary-dau">
-    <span class="summary-title">Tổng quan đề bài</span>
-    <span class="summary-tong">${cau.length} câu · chạm một ô để xem riêng phần đó</span>
-  </div>
-  <div class="stats-grid">
-    ${oThongKe(cau.length, 'Tổng số câu', 'tat')}
-    ${oThongKe(dem('I'), 'Trắc nghiệm', 'phan:I')}
-    ${oThongKe(dem('II'), 'Đúng / Sai', 'phan:II')}
-    ${oThongKe(dem('III'), 'Trả lời ngắn', 'phan:III')}
-  </div>
-  ${dong ? `<div class="topics-list"><h3>Phân loại mức độ</h3>${dong}</div>` : ''}
+    .filter(Boolean)
+    .join(', ')
+  const phan = [cumLoc(dem('I'), 'trắc nghiệm', 'phan:I'), cumLoc(dem('II'), 'đúng sai', 'phan:II'), cumLoc(dem('III'), 'trả lời ngắn', 'phan:III')].join(' · ')
+  return `<section class="tong-quan">
+  <button type="button" class="tq-cum tq-tat" data-loc="tat" aria-pressed="false" title="Xem tất cả">${cau.length} câu</button> · ${phan}${muc ? ` · ${muc}` : ''}
 </section>`
 }
 
@@ -1117,8 +1065,10 @@ export const JS_PHIEU = `
 
     var oLoc = e.target.closest('[data-loc]');
     if (oLoc) {
-      var nhan = oLoc.querySelector('.stat-label') || oLoc.querySelector('strong');
-      locTheo(oLoc.getAttribute('data-loc'), nhan ? nhan.textContent.replace(/:$/, '') : '');
+      // Dòng tổng quan v2: cụm lọc KHÔNG còn nhãn con, chữ nằm thẳng trong nút.
+      // Không lùi về chính nút đó thì thanh "đang lọc" hiện tên rỗng.
+      var nhan = oLoc.querySelector('strong') || oLoc;
+      locTheo(oLoc.getAttribute('data-loc'), nhan.textContent.replace(/:$/, '').trim());
       return;
     }
 

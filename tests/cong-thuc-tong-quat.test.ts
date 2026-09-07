@@ -94,26 +94,46 @@ describe('Dấu nối trong công thức cấu tạo', () => {
   })
 })
 
-describe('Bìa phiếu chọn công thức theo chuyên đề', () => {
-  it('mỗi chuyên đề một bộ công thức riêng, không phải ester cho tất cả', async () => {
-    const { congThucBia } = await import('../src/lib/html-phieu')
-    expect(congThucBia('Ester – lipid').chinh).toBe("RCOOR'")
-    expect(congThucBia('Hợp chất chứa nitrogen').chinh).toContain('COOH')
-    expect(congThucBia('Carbohydrate').chinh).toContain('C<sub>6</sub>')
-    expect(congThucBia('Polymer').chinh).toContain('CH<sub>2</sub>')
-    // KHÔNG khớp chuyên đề nào thì dùng bộ TRUNG TÍNH, KHÔNG rơi về ester —
-    // thà bìa chung chung còn hơn bìa nói sai nội dung bên trong.
-    const la = congThucBia('Chuyên đề chưa có trong bảng')
-    expect(la.chinh).not.toBe("RCOOR'")
-    expect(la.troi).not.toContain('RCOOR&#39;')
+describe('Bìa phiếu KHÔNG in công thức gõ cứng nào (PHIEU-BAI-TAP-V2 mục 4.1)', () => {
+  // Luật cũ (06/09) là "chọn công thức theo chuyên đề" — đúng hơn gõ cứng một
+  // bộ ester cho mọi phiếu, nhưng vẫn là một bảng chữ Hoá nằm trong mã app:
+  // chuyên đề mới thì rơi về bộ trung tính, và không chỗ gọi nào đổi được.
+  //
+  // Luật mới CHẶT HƠN: mọi chữ trên bìa phải đến từ tham số.
+  it('mã nguồn không còn bảng công thức nào', async () => {
+    const { readFileSync } = await import('node:fs')
+    const { resolve } = await import('node:path')
+    const ma = readFileSync(resolve(process.cwd(), 'src/lib/html-phieu.ts'), 'utf8')
+    expect(ma).not.toContain('congThucBia')
+    // Đúng phép grep trong bảng nghiệm thu của đặc tả.
+    expect(ma).not.toMatch(/RCOOR'|C<sub>9<\/sub>H<sub>8<\/sub>O<sub>4<\/sub>|Hóa học Hữu cơ/)
   })
 
-  it('bìa dựng ra dùng đúng bộ công thức của chuyên đề', async () => {
+  it('bìa chỉ in đúng những gì chỗ gọi truyền vào', async () => {
     const { biaHtml } = await import('../src/lib/html-phieu')
     const t = { hoTen: 'A', sbd: '1', ngay: new Date('2026-09-06'), tenChuyenDe: 'Hợp chất chứa nitrogen', ketQua: '', hienDapAn: false }
     const h = biaHtml(t, 10)
-    expect(h).not.toContain("RCOOR'")
-    // Bìa nay in MỘT công thức, nằm cạnh nhãn — không còn ba phân tử vắt chéo.
-    expect(h).toContain('H<sub>2</sub>N&ndash;R&ndash;COOH')
+    expect(h).toContain('Hợp chất chứa nitrogen')
+    expect(h).toContain('10 câu')
+    // Không một công thức nào tự mọc ra.
+    expect(h).not.toContain('<sub>')
+    expect(h).not.toContain('&ndash;R&ndash;')
+  })
+
+  it('Ô KẾT QUẢ có nhãn nói rõ nó là kết quả của bài NÀO', async () => {
+    // Nhãn trơ "Kết quả" trên phiếu 10 câu mà ghi "Sai 2/12 câu" là mâu thuẫn
+    // ngay trên bìa. Không truyền nhãn thì mặc định là "Bài trước".
+    const { biaHtml } = await import('../src/lib/html-phieu')
+    const h = biaHtml({ hoTen: 'A', sbd: '1', ngay: new Date('2026-09-06'), tenChuyenDe: 'Ester', ketQua: 'Sai 2/12 câu', hienDapAn: false }, 10)
+    expect(h).toContain('Bài trước')
+    expect(h).toContain('Sai 2/12 câu')
+    expect(h).not.toMatch(/cover-info-label">Kết quả</)
+  })
+
+  it('tên chuyên đề KHÔNG bị cắt tay xuống dòng', async () => {
+    const { biaHtml } = await import('../src/lib/html-phieu')
+    const h = biaHtml({ hoTen: 'A', sbd: '1', ngay: new Date('2026-09-06'), tenChuyenDe: 'Hydrocarbon không no – dẫn xuất', ketQua: '', hienDapAn: false }, 10)
+    expect(h).toContain('Hydrocarbon không no – dẫn xuất')
+    expect(h).not.toContain('<br>')
   })
 })
