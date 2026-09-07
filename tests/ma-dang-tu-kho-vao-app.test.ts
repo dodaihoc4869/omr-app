@@ -116,13 +116,18 @@ describe('mã dạng đi từ kho vào câu hỏi của app', () => {
 describe('chuỗi kho -> nguồn -> cổng rút câu chữa chạy thông', () => {
   it('rút được câu chữa cùng mã sau khi nạp đề từ kho', () => {
     const nguon = nguonTu([1, 2, 3, 4].map((i) => cauI(i, { ma: MA, ten: TEN })))
+    // ĐỔI YÊU CẦU 07/09 (thầy: "kéo nhiều thì ghép nhiều câu chữa"): xin 10 câu
+    // thì cổng phát tới khi hết hàng, không dừng ở 2. Kho có 4 câu cùng mã, trừ
+    // chính câu sai và câu em đã làm ⇒ còn 3.
     const kq = rutDeChua({ khoDe: [nguon], rows: rowsSaiCau2(), soCau: 10 })
     expect(kq.thieu).toEqual([])
-    expect(kq.cau.length).toBe(2)
+    expect(kq.cau.length).toBe(3)
     for (const c of kq.cau) {
       expect(c.chuaCho?.maDang).toBe(MA)
       expect(c.id).not.toBe('12-C1-B9-I-2')
     }
+    // Xin đúng 2 thì vẫn ra đúng 2 — trần do người gọi đặt, không phải do cổng.
+    expect(rutDeChua({ khoDe: [nguon], rows: rowsSaiCau2(), soCau: 2 }).cau.length).toBe(2)
   })
 
   it('kho chưa gán mã thì cổng báo thiếu chứ không rút bừa', () => {

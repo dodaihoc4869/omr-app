@@ -428,9 +428,21 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
   const daCo = new Set(uuTien.map((c) => c.id))
   const conLai = n.banks.length > 0 ? cauLuyenTuNguon(n.banks).filter((c) => !daCo.has(c.id)) : []
   const duPhong = [...uuTien, ...conLai]
+  // QUA CỔNG MÃ DẠNG, giống hệt `dungPhieu` — thầy chốt 07/09: "áp dụng cho tất
+  // cả các phiếu". Máy chủ mới chỉ lọc theo CHUYÊN ĐỀ; cổng siết tiếp theo MÃ
+  // DẠNG của đúng câu em sai và gắn nhãn "chữa câu mấy".
+  //
+  // Cùng luật lui như bên kia: cổng rỗng thì vẫn có bài luyện, nhưng những câu
+  // đó KHÔNG mang nhãn chữa.
+  const coCauSaiEm = n.rows.some((r) => r.dungSai === false)
+  const khoChua = n.khoKhacPhuc ?? []
+  const kqChuaEm = khoChua.length > 0 && coCauSaiEm ? rutDeChua({ khoDe: khoChua, rows: n.rows, qidTranh: [...daLamTrongCa] }) : null
   // Kho trả về rồi thì KHÔNG trộn thêm câu của ca vào: câu của ca là câu em
   // vừa làm, luyện lại chỉ là nhớ đáp án.
-  const baiTapEm = (tuKho.length > 0 ? tuKho.filter((c) => !daLamTrongCa.has(c.id)) : duPhong).slice(0, SO_CAU_BAI_TAP_KEM)
+  const baiTapEm =
+    kqChuaEm && kqChuaEm.cau.length > 0
+      ? kqChuaEm.cau
+      : (tuKho.length > 0 ? tuKho.filter((c) => !daLamTrongCa.has(c.id)) : duPhong).slice(0, SO_CAU_BAI_TAP_KEM)
   const tk = thongKeLamBai(n.rows, { vaoLuc: n.vaoLuc, nopLuc: n.nopLuc, thoiLuongPhut: n.thoiLuongPhut })
 
   const gom = new Map<string, { ten: string; soCau: number; soSai: number }>()
@@ -476,6 +488,11 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
     // CÓ kèm bài luyện (thầy chốt 06/09): em tự tạo bộ câu khắc phục lỗi sai
     // ngay sau khi nộp, lúc còn nhớ mình vướng chỗ nào.
     baiTap: baiTapEm,
+    thieuChua: (() => {
+      const ds = kqChuaEm ? kqChuaEm.thieu.map((t) => `Câu ${t.soCau}: ${t.vi}`) : []
+      if (coCauSaiEm && (!kqChuaEm || kqChuaEm.cau.length === 0)) ds.push('Kho chưa đủ câu cùng dạng với câu em sai — phần dưới là bài luyện chung của chuyên đề, không phải câu chữa.')
+      return ds.length > 0 ? ds : undefined
+    })(),
   }
 }
 

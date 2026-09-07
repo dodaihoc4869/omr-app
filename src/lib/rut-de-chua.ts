@@ -170,18 +170,17 @@ export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
   const daDung = new Set<string>()
   let conCho = soCau
 
+  // BƯỚC 3–6 — DỰNG SẴN xếp hạng ứng viên cho TỪNG câu sai, chưa lấy câu nào.
+  // Tách "xếp hạng" khỏi "chia suất" vì hai việc có luật khác nhau, gộp lại thì
+  // không chia đều được.
+  const xepHangCua = new Map<string, UngVien[]>()
   for (const s of daXep) {
-    if (conCho <= 0) {
-      ra.capBiCat += 1
-      continue
-    }
     // BƯỚC 2 — câu sai CHƯA GẮN DẠNG thì không rút gì cả. Cấm đoán.
     if (!s.maDang) {
       ra.thieu.push({ soCau: s.soCau, tenDang: '', vi: `câu ${s.soCau} chưa gắn dạng — vào Ngân hàng câu hỏi gán rồi rút lại` })
       continue
     }
-
-    const dungDuoc = (x: { cau: CauLuyen; ma: string }) => !tranh.has(x.cau.id) && !daDung.has(x.cau.id) && x.cau.id !== s.qid
+    const dungDuoc = (x: { cau: CauLuyen; ma: string }) => !tranh.has(x.cau.id) && x.cau.id !== s.qid
     // BẬC 1 — trùng ĐÚNG mã.
     const bac1 = kho.filter((x) => dungDuoc(x) && x.ma === s.maDang)
     // BẬC 2 — cùng chuyên đề VÀ cùng cơ chế, khác việc phải làm. Hết bậc 2 là
@@ -189,8 +188,8 @@ export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
     const nhanh = nhanhCoChe(s.maDang)
     const bac2 = CHO_BAC_2 && nhanh ? kho.filter((x) => dungDuoc(x) && x.ma !== s.maDang && nhanhCoChe(x.ma) === nhanh) : []
 
-    // BƯỚC 6 — trong cùng bậc: chưa gặp trước → mức độ gần câu sai nhất →
-    // `qid` tăng dần. Không random.
+    // Trong cùng bậc: mức độ gần câu sai nhất trước, rồi `qid` tăng dần. Không
+    // random — hai lần rút cùng dữ liệu phải ra cùng bộ câu.
     const xep = (ds: { cau: CauLuyen; ma: string }[]) =>
       [...ds].sort(
         (a, b) =>
@@ -198,28 +197,57 @@ export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
           a.cau.id.localeCompare(b.cau.id),
       )
 
-    const xepHang: UngVien[] = [
+    xepHangCua.set(s.qid, [
       ...xep(bac1).map((x) => ({ cau: x.cau, ma: x.ma, bac: 1 as const })),
       ...xep(bac2).map((x) => ({ cau: x.cau, ma: x.ma, bac: 2 as const })),
-    ]
+    ])
+  }
 
-    const can = Math.min(SO_CAU_MOI_CAU_SAI, conCho)
-    const lay = xepHang.slice(0, can)
-    for (const u of lay) {
+  // CHIA SUẤT THEO VÒNG — thầy chốt 07/09: "nếu kéo nhiều thì ghép nhiều câu
+  // chữa cho những câu sai đó".
+  //
+  // Mỗi vòng phát cho mỗi câu sai đúng MỘT câu, theo thứ tự ưu tiên, rồi mới
+  // sang vòng sau. Nhờ vậy: chỗ ít thì câu sai nào cũng có phần trước khi ai đó
+  // được câu thứ hai; thầy kéo số câu lên thì phần dư chia đều tiếp, không đổ
+  // hết vào một câu sai.
+  //
+  // `SO_CAU_MOI_CAU_SAI` do đó đổi nghĩa: từ "đúng 2 câu" thành "TỐI THIỂU 2
+  // câu mỗi câu sai" — bản v3 mục 3 ghi cứng 2 nên kéo 40 câu vẫn chỉ ra 2.
+  const demCua = new Map<string, number>()
+  const conUngVien = new Map<string, UngVien[]>()
+  for (const [qid, ds] of xepHangCua) conUngVien.set(qid, [...ds])
+
+  let phatDuoc = true
+  while (conCho > 0 && phatDuoc) {
+    phatDuoc = false
+    for (const s of daXep) {
+      if (conCho <= 0) break
+      const con = conUngVien.get(s.qid)
+      if (!con) continue
+      // Bỏ những câu đã bị câu sai khác lấy mất.
+      while (con.length > 0 && daDung.has(con[0].cau.id)) con.shift()
+      if (con.length === 0) continue
+      const u = con.shift() as UngVien
       daDung.add(u.cau.id)
+      demCua.set(s.qid, (demCua.get(s.qid) ?? 0) + 1)
       ra.cau.push({ ...u.cau, chuaCho: { qid: s.qid, soCau: s.soCau, phan: s.phan, maDang: s.maDang, bac: u.bac } })
+      conCho -= 1
+      phatDuoc = true
     }
-    conCho -= lay.length
+  }
 
-    if (lay.length < can) {
-      ra.thieu.push({
-        soCau: s.soCau,
-        tenDang: s.tenDang,
-        vi:
-          lay.length === 0
-            ? `kho chưa có câu nào cùng dạng "${s.tenDang || s.maDang}"`
-            : `kho chỉ còn ${lay.length}/${can} câu cùng dạng "${s.tenDang || s.maDang}"`,
-      })
+  // BÁO THIẾU — so với mức tối thiểu, và chỉ khi thiếu vì HẾT CÂU trong kho.
+  // Thiếu vì thầy đặt số câu quá nhỏ thì đó là `capBiCat`, không phải lỗi kho.
+  for (const s of daXep) {
+    if (!s.maDang) continue
+    const co = demCua.get(s.qid) ?? 0
+    const conLai = (conUngVien.get(s.qid) ?? []).filter((u) => !daDung.has(u.cau.id)).length
+    if (co === 0 && conLai === 0) {
+      ra.thieu.push({ soCau: s.soCau, tenDang: s.tenDang, vi: `kho chưa có câu nào cùng dạng "${s.tenDang || s.maDang}"` })
+    } else if (co === 0) {
+      ra.capBiCat += 1
+    } else if (co < SO_CAU_MOI_CAU_SAI && conLai === 0) {
+      ra.thieu.push({ soCau: s.soCau, tenDang: s.tenDang, vi: `kho chỉ còn ${co}/${SO_CAU_MOI_CAU_SAI} câu cùng dạng "${s.tenDang || s.maDang}"` })
     }
   }
 

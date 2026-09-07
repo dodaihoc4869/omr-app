@@ -1057,7 +1057,10 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
         </div>
       )}
       <div style={{ fontSize: 12, color: 'var(--p-nhat)', marginTop: 8, lineHeight: 1.6 }}>
-        Thầy đã chọn sẵn theo đúng chuyên đề em mất điểm ở bài này, xếp từ dễ lên khó.
+        {/* Nói đúng cách rút hiện tại. Câu cũ ghi "theo đúng chuyên đề em mất
+            điểm" là mô tả cách làm ĐÃ BỎ — nay rút theo MÃ DẠNG của chính câu
+            em sai, tìm trong CẢ KHO chứ không bó trong chuyên đề của ca. */}
+        Rút từ cả kho, theo đúng dạng của từng câu em làm sai, xếp từ dễ lên khó.
         {/* NÓI RÕ SỐ CÂU KHO CÒN, thay vì để thanh kéo dừng ở một con số lạ mà
             không ai biết vì sao (thầy hỏi đúng câu này ngày 06/09). */}
         {laCuaEm && coSan > 0 && coSan < SO_CAU_MAX ? ` Kho còn ${coSan} câu của những chuyên đề này ngoài các câu em vừa làm.` : ''}

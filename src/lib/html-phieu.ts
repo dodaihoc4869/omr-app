@@ -378,11 +378,27 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
 .q-tag.level-2 { background: #fce7f3; color: #9d174d; }
 .q-tag.level-3 { background: #fed7aa; color: #9a3412; }
 .q-tag.topic { background: #f1f5f9; color: #475569; }
-/* NHÃN CHỮA — câu này rút ra để chữa câu sai nào. Thầy hỏi thẳng 07/09:
-   "phải thể hiện trong báo cáo là câu này khắc phục lỗi sai cho câu sai nào".
-   Để nổi hơn ba nhãn kia vì đó là lý do câu này có mặt trên phiếu. */
-.q-tag.chua { background: #0f766e; color: #ffffff; }
-.q-tag.chua-2 { background: #ccfbf1; color: #115e59; }
+/* NHÃN CHỮA — lý do câu này có mặt trên phiếu, nên phải đọc thấy trước ba nhãn
+   kia. Thầy chốt 07/09: "gắn màu nào cho nổi bật lên".
+   Cam đậm: ba nhãn còn lại đều là màu pastel nhạt (xanh nhạt, hồng nhạt, xám),
+   nên một ô đặc màu ấm là thứ duy nhất bật lên khỏi hàng. Kèm chấm trắng và cỡ
+   chữ to hơn một bậc để không phải dò từng chữ. */
+.q-tag.chua {
+  background: #c2410c; color: #ffffff; font-size: 12px; font-weight: 800;
+  padding: 4px 12px 4px 9px; letter-spacing: .015em;
+  box-shadow: 0 1px 3px rgba(194, 65, 12, .35);
+}
+.q-tag.chua::before {
+  content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: #ffffff; margin-right: 7px; vertical-align: 1px;
+}
+/* Bậc 2 là "gần dạng", không trùng khít — cùng họ màu nhưng nhạt hẳn, để thầy
+   phân biệt được từ xa mà không phải đọc chữ. */
+.q-tag.chua-2 { background: #ffedd5; color: #9a3412; box-shadow: none; }
+.q-tag.chua-2::before { background: #c2410c; }
+/* Cả thẻ câu cũng đổi vạch trái: nhìn lướt là thấy câu nào là câu chữa. */
+.q-card.la-chua { border-left-color: #c2410c; }
+.q-card.la-chua.mo { border-left-color: var(--luc); }
 
 /* Vùng bấm: cả thân câu. Con trỏ hình bàn tay để thấy ngay là bấm được. */
 .q-than { padding: 10px 16px 14px; cursor: pointer; }
@@ -722,7 +738,7 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
   <div class="sol-wrap" id="giai-${stt}"><div class="sol-inner">${giai}</div></div>`
     : ''
 
-  return `<article class="q-card${moSan ? ' mo' : ''}${giai ? '' : ' khong-giai'}" data-so="${stt}" data-phan="${c.phan}" data-muc="${thoat(c.mucDo || '')}">
+  return `<article class="q-card${n ? ' la-chua' : ''}${moSan ? ' mo' : ''}${giai ? '' : ' khong-giai'}" data-so="${stt}" data-phan="${c.phan}" data-muc="${thoat(c.mucDo || '')}">
   <div class="q-header"><div class="q-num"><span class="ky">${stt}</span></div><div class="q-tags">${tags}</div></div>
   <div class="q-than">
     ${deBai}

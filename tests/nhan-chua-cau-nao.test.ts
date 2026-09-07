@@ -122,6 +122,21 @@ describe('phiếu HTML hiện nhãn "Chữa câu N"', () => {
     expect(theCauHtml(c(), 1)).not.toContain('Chữa câu')
   })
 
+  it('nhãn chữa mang màu riêng, không lẫn với ba nhãn pastel còn lại', () => {
+    // Thầy chốt 07/09: "gắn màu nào cho nổi bật lên". Cam đặc + chấm trắng.
+    const css = doc('src/lib/html-phieu.ts')
+    expect(css).toMatch(/\.q-tag\.chua \{[^}]*background: #c2410c/)
+    expect(css).toMatch(/\.q-tag\.chua::before \{[^}]*background: #ffffff/)
+    expect(css).toMatch(/\.q-tag\.chua-2 \{[^}]*background: #ffedd5/)
+  })
+
+  it('thẻ câu chữa đổi luôn vạch trái để nhìn lướt là thấy', () => {
+    const h = theCauHtml(c({ qid: 's', soCau: 3, phan: 'I', maDang: HS, bac: 1 }), 1)
+    expect(h).toContain('class="q-card la-chua')
+    expect(theCauHtml(c(), 1)).not.toContain('la-chua')
+    expect(doc('src/lib/html-phieu.ts')).toMatch(/\.q-card\.la-chua \{[^}]*border-left-color: #c2410c/)
+  })
+
   it('nhãn chữa đứng TRƯỚC nhãn loại câu', () => {
     const h = theCauHtml(c({ qid: 's', soCau: 3, phan: 'I', maDang: HS, bac: 1 }), 1)
     expect(h.indexOf('Chữa câu 3')).toBeLessThan(h.indexOf('Trắc nghiệm'))
@@ -133,5 +148,122 @@ describe('không lách cổng', () => {
     const t = doc('src/lib/phieu-du-lieu.ts')
     expect(t).toContain("import { rutDeChua } from './rut-de-chua'")
     expect(t).toMatch(/kqChua[\s\S]{0,200}rutDeChua\(\{ khoDe: kho, rows/)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// "ÁP DỤNG CHO TẤT CẢ CÁC PHIẾU" — thầy chốt 07/09.
+//
+// Có HAI đường dựng phiếu: `dungPhieu` (thầy dựng trên máy mình) và
+// `dungPhieuMayEm` (máy học sinh tự dựng ngay sau khi nộp). Chỉ nối cổng cho
+// một đường là nửa số phiếu vẫn rút bừa.
+import { dungPhieuMayEm } from '../src/lib/phieu-du-lieu'
+
+describe('phiếu máy học sinh cũng đi qua cổng', () => {
+  const NEN_EM = {
+    rows: [row(2, 'sai-7', false), row(1, 'hs-2', true)],
+    banks: KHO,
+    khoKhacPhuc: KHO,
+    thuTuKhacPhuc: [],
+    maCa: 'CA1',
+    sbd: '001',
+    hoTen: 'Tuân',
+    lichSuEm: [],
+  } as unknown as Parameters<typeof dungPhieuMayEm>[0]
+
+  it('em sai câu xà phòng hoá thì KHÔNG nhận câu ứng dụng xà phòng', () => {
+    const p = dungPhieuMayEm(NEN_EM)
+    const id = (p.baiTap ?? []).map((c) => c.id)
+    expect(id.length).toBeGreaterThan(0)
+    for (const x of ['xp-1', 'xp-2', 'xp-3']) expect(id).not.toContain(x)
+  })
+
+  it('mỗi câu mang nhãn chữa cho đúng câu sai', () => {
+    for (const c of dungPhieuMayEm(NEN_EM).baiTap ?? []) {
+      expect(c.chuaCho?.soCau).toBe(2)
+      expect(c.chuaCho?.maDang).toBe(HS)
+    }
+  })
+
+  it('em không sai câu nào thì vẫn có bài luyện, không để màn trắng', () => {
+    const p = dungPhieuMayEm({ ...NEN_EM, rows: [row(1, 'hs-2', true)] } as typeof NEN_EM)
+    expect((p.baiTap ?? []).length).toBeGreaterThan(0)
+  })
+
+  it('CẢ HAI đường dựng phiếu đều gọi cổng — không đường nào bị bỏ quên', () => {
+    const t = doc('src/lib/phieu-du-lieu.ts')
+    const than = (ten: string) => {
+      const i = t.indexOf(`export function ${ten}(`)
+      const j = t.indexOf('\nexport function ', i + 1)
+      return t.slice(i, j === -1 ? undefined : j)
+    }
+    expect(than('dungPhieu')).toContain('rutDeChua(')
+    expect(than('dungPhieuMayEm')).toContain('rutDeChua(')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// CHIA SUẤT THEO VÒNG — thầy chốt 07/09:
+//   "nếu kéo nhiều thì ghép nhiều câu chữa cho những câu sai đó"
+//   "không lấy trong chuyên đề tick, lấy trong cả kho nhé"
+//
+// ĐỔI YÊU CẦU so với đặc tả v3 mục 3: `SO_CAU_MOI_CAU_SAI` từ "đúng 2 câu mỗi
+// câu sai" thành "TỐI THIỂU 2". Bản cũ ghi cứng 2 nên thầy kéo 40 câu vẫn chỉ
+// ra 2 câu cho mỗi câu sai.
+import { rutDeChua } from '../src/lib/rut-de-chua'
+import { SO_CAU_MOI_CAU_SAI } from '../src/lib/cau-hinh-chua'
+
+const nhieuCau = (ma: string, n: number, tien: string) =>
+  Array.from({ length: n }, (_, i) => cau(`${tien}${i + 1}`, ma, `Câu ${tien}${i + 1}`))
+
+describe('kéo nhiều câu thì chia đều cho các câu sai', () => {
+  const K = kho([cau('s1', HS, 'sai 1'), cau('s2', XP, 'sai 2'), ...nhieuCau(HS, 6, 'hs'), ...nhieuCau(XP, 6, 'xp')])
+  const rows2 = [row(3, 's1', false), row(9, 's2', false)]
+
+  it('kéo 10 câu, 2 câu sai: mỗi câu sai được 5, không dồn hết vào một câu', () => {
+    const kq = rutDeChua({ khoDe: K, rows: rows2, soCau: 10 })
+    const dem = new Map<string, number>()
+    for (const c of kq.cau) dem.set(c.chuaCho!.qid, (dem.get(c.chuaCho!.qid) ?? 0) + 1)
+    expect(kq.cau.length).toBe(10)
+    expect(dem.get('s1')).toBe(5)
+    expect(dem.get('s2')).toBe(5)
+  })
+
+  it('chỗ ít thì chia theo vòng: câu sai nào cũng có phần trước khi ai được câu thứ hai', () => {
+    const kq = rutDeChua({ khoDe: K, rows: rows2, soCau: 3 })
+    const dem = new Map<string, number>()
+    for (const c of kq.cau) dem.set(c.chuaCho!.qid, (dem.get(c.chuaCho!.qid) ?? 0) + 1)
+    expect(kq.cau.length).toBe(3)
+    expect(Math.min(...dem.values())).toBe(1)
+    expect(Math.max(...dem.values())).toBe(2)
+  })
+
+  it('vẫn giữ mức tối thiểu khi kho đủ hàng', () => {
+    const kq = rutDeChua({ khoDe: K, rows: rows2, soCau: 4 })
+    const dem = new Map<string, number>()
+    for (const c of kq.cau) dem.set(c.chuaCho!.qid, (dem.get(c.chuaCho!.qid) ?? 0) + 1)
+    for (const n of dem.values()) expect(n).toBe(SO_CAU_MOI_CAU_SAI)
+  })
+
+  it('kéo nhiều KHÔNG được phá luật dạng: không câu nào khác mã lọt vào', () => {
+    const kq = rutDeChua({ khoDe: K, rows: [row(3, 's1', false)], soCau: 10 })
+    for (const c of kq.cau) {
+      expect(c.chuaCho!.maDang).toBe(HS)
+      expect(c.id.startsWith('hs')).toBe(true) // không có câu xp nào
+    }
+  })
+
+  it('không lấy lại câu em vừa làm, và không phát trùng câu cho hai câu sai', () => {
+    const kq = rutDeChua({ khoDe: K, rows: rows2, soCau: 10, qidTranh: ['hs1', 'xp1'] })
+    const id = kq.cau.map((c) => c.id)
+    expect(id).not.toContain('hs1')
+    expect(id).not.toContain('xp1')
+    expect(new Set(id).size).toBe(id.length)
+  })
+
+  it('báo cáo không còn nói "theo đúng chuyên đề em mất điểm" — cách đó đã bỏ', () => {
+    const t = doc('src/screens/PhieuScreen.tsx')
+    expect(t).not.toContain('Thầy đã chọn sẵn theo đúng chuyên đề em mất điểm')
+    expect(t).toContain('Rút từ cả kho, theo đúng dạng của từng câu em làm sai')
   })
 })
