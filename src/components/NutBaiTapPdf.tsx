@@ -87,7 +87,7 @@ export default function NutBaiTapPdf({
       }
       const nguon = await loadExamSources()
       const daInRa = await docQidRaPhieu(sbd)
-      const kq = rutDeChua({ khoDe: nguon, rows: rows ?? [], qidTranh: daInRa, soCau: 0, locSao })
+      const kq = rutDeChua({ khoDe: nguon, rows: rows ?? [], qidTranh: daInRa, soCau: 0, locSao, locDang: dang })
       if (!con) return
       setDem({ tongUngVien: kq.tongUngVien, poolTheoCauSai: kq.poolTheoCauSai, thieu: kq.thieu })
       // Kẹp vị trí thanh xuống max mới — không để thanh chỉ 60 khi kho chỉ có 8.
@@ -96,7 +96,7 @@ export default function NutBaiTapPdf({
     return () => {
       con = false
     }
-  }, [chuaDuoc, rows, sbd, locSao])
+  }, [chuaDuoc, rows, sbd, locSao, dang])
 
   useEffect(() => {
     let con = true
@@ -136,7 +136,7 @@ export default function NutBaiTapPdf({
 
       // ĐI QUA CỔNG (v3 mục 2). Nguồn là CẢ KHO — ranh giới không còn là đề
       // đã tích nữa mà là MÃ DẠNG của chính câu em sai.
-      const kqChua = chuaDuoc ? rutDeChua({ khoDe: nguon, rows: rows ?? [], qidTranh: tranh, soCau, locSao }) : null
+      const kqChua = chuaDuoc ? rutDeChua({ khoDe: nguon, rows: rows ?? [], qidTranh: tranh, soCau, locSao, locDang: dang }) : null
       setThieuChua(kqChua?.thieu ?? [])
       const kq = kqChua ?? rutTuDo(nguon, { chuyenDe: dungDe, chuyenDeCa: phamVi, dang, sao: locSao, qidDaLam: tranh, soCau })
       if (kq.cau.length === 0) {

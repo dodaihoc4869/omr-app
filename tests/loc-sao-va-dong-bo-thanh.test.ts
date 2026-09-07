@@ -177,3 +177,78 @@ describe('ba màn rút câu nói cùng một con số và cùng một câu chữ
     for (const k of ['poolChua', 'thieuChuaChiTiet', 'tongUngVien']) expect(t).toContain(k)
   })
 })
+
+// ---------------------------------------------------------------------------
+// LỌC LÝ THUYẾT / BÀI TẬP PHẢI ĐI QUA CỔNG — thầy bắt được 07/09:
+//
+//   "dạng câu ngẫu nhiên lý thuyết bài tập tôi bấm vào nó không báo có bao
+//    nhiêu câu giống với những câu làm sai"
+//   "chỗ rút câu của tôi chọn lý thuyết vẫn rút ra bài tập"
+//
+// Cùng MỘT gốc: `rutDeChua` không biết tới lọc dạng. Lọc ấy trước chỉ ăn ở
+// đường rút TỰ DO (`chonCauLuyen`), nên ở màn có câu sai — tức đường đi qua
+// cổng — bấm nút xong con số đứng im và phiếu vẫn ra câu bài tập.
+import { LOC_DANG_MAC_DINH } from '../src/lib/dang-cau'
+
+const cauKieu = (id: string, kieu: 'ly_thuyet' | 'bai_tap') => ({
+  ...cau(id, 0),
+  kieu,
+})
+
+describe('lọc lý thuyết / bài tập ở CỔNG rút câu chữa', () => {
+  const k = () =>
+    kho([
+      cauKieu('s1', 'ly_thuyet'),
+      cauKieu('lt1', 'ly_thuyet'),
+      cauKieu('lt2', 'ly_thuyet'),
+      cauKieu('bt1', 'bai_tap'),
+      cauKieu('bt2', 'bai_tap'),
+      cauKieu('bt3', 'bai_tap'),
+    ])
+
+  it('chọn Chỉ lý thuyết thì KHÔNG câu bài tập nào lọt vào phiếu', () => {
+    const kq = rutDeChua({ khoDe: k(), rows: [row(2, 's1')], soCau: 10, locDang: 'ly_thuyet' })
+    const ids = kq.cau.filter((c) => !c.chuaCho?.laLamLai).map((c) => c.id).sort()
+    expect(ids).toEqual(['lt1', 'lt2'])
+    for (const c of kq.cau) expect(c.dang, `câu ${c.id} lọt vào dù không phải lý thuyết`).not.toBe('bai_tap')
+  })
+
+  it('chọn Chỉ bài tập thì ngược lại', () => {
+    const kq = rutDeChua({ khoDe: k(), rows: [row(2, 's1')], soCau: 10, locDang: 'bai_tap' })
+    expect(kq.cau.filter((c) => !c.chuaCho?.laLamLai).map((c) => c.id).sort()).toEqual(['bt1', 'bt2', 'bt3'])
+  })
+
+  it('TRẦN THANH KÉO đổi theo nút vừa bấm — đây là cái thầy nói "không báo"', () => {
+    const rows = [row(2, 's1')]
+    const moi = rutDeChua({ khoDe: k(), rows, soCau: 0 }).tongUngVien
+    const lt = rutDeChua({ khoDe: k(), rows, soCau: 0, locDang: 'ly_thuyet' }).tongUngVien
+    const bt = rutDeChua({ khoDe: k(), rows, soCau: 0, locDang: 'bai_tap' }).tongUngVien
+    expect(moi).toBe(5)
+    expect(lt).toBe(2)
+    expect(bt).toBe(3)
+  })
+
+  it('mặc định KHÔNG lọc — ca cũ và chỗ gọi chưa cập nhật giữ nguyên hành vi', () => {
+    const rows = [row(2, 's1')]
+    expect(rutDeChua({ khoDe: k(), rows, soCau: 0 }).tongUngVien).toBe(
+      rutDeChua({ khoDe: k(), rows, soCau: 0, locDang: LOC_DANG_MAC_DINH }).tongUngVien,
+    )
+  })
+
+  it('hai bộ lọc CHỒNG nhau, không thay nhau', () => {
+    const k2 = kho([
+      { ...cau('s1', 0), kieu: 'ly_thuyet' },
+      { ...cau('a', 2), kieu: 'ly_thuyet' },
+      { ...cau('b', 2), kieu: 'bai_tap' },
+      { ...cau('c', 1), kieu: 'ly_thuyet' },
+    ])
+    const kq = rutDeChua({ khoDe: k2, rows: [row(2, 's1')], soCau: 10, locDang: 'ly_thuyet', locSao: 'sao_2' })
+    expect(kq.cau.filter((c) => !c.chuaCho?.laLamLai).map((c) => c.id)).toEqual(['a'])
+  })
+
+  it('MÀN THẦY và MÀN GỌI LÊN BẢNG đều truyền lọc dạng vào cổng', () => {
+    for (const f of ['src/components/NutBaiTapPdf.tsx', 'src/screens/GoiLenBangScreen.tsx']) {
+      expect(doc(f), `${f} không truyền locDang vào rutDeChua`).toMatch(/rutDeChua\([^)]*locDang/)
+    }
+  })
+})

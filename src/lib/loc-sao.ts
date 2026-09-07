@@ -39,11 +39,14 @@ export const TEN_LOC_SAO: Record<LocSao, string> = {
   sao_1: '1 sao · bản chất',
 }
 
-/** Nhãn ngắn cho màn hẹp (báo cáo phụ huynh trên điện thoại 360px). */
+/** Nhãn ngắn cho màn hẹp (báo cáo phụ huynh trên điện thoại 360px).
+ *
+ * VẪN PHẢI NÓI NGHĨA. Bản đầu rút còn "2 sao" / "1 sao" cho gọn, thầy bắt được
+ * ngay 07/09: phụ huynh không biết sao là gì, hai nút thành hai con số vô nghĩa. */
 export const TEN_LOC_SAO_NGAN: Record<LocSao, string> = {
   moi: 'Mọi mức',
-  sao_2: '2 sao',
-  sao_1: '1 sao',
+  sao_2: '2 sao khó',
+  sao_1: '1 sao bản chất',
 }
 
 export const MOI_LOC_SAO: LocSao[] = ['moi', 'sao_2', 'sao_1']

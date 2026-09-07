@@ -6,7 +6,6 @@
 // lệch, hoặc một bên quên `qidDaLam`. Màn hình có sẵn dữ liệu trong bộ nhớ nên
 // truyền thẳng vào `dungPhieuChoEm`; cầu nối không có gì trong tay nên
 // `taoPhieuCaCa` đi gom đủ trước rồi gọi đúng lõi đó.
-import { classify } from '../engine/score'
 import { mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
 import {
   chiTietCa,
@@ -19,7 +18,8 @@ import {
 } from './exam-api'
 import { taoChiTietCau } from './chi-tiet-cau'
 import { chuyenDeTuChiTiet } from './phieu-hang-loat'
-import { viecCanLamMacDinh } from './phieu-zalo'
+import { nhanXetTheoCa } from './nhan-xet-theo-ca'
+import { thongKeLamBai, tinHieuLamBai } from './phan-tich-lam-bai'
 import { dungPhieu, giamGoiPhieu } from './phieu-du-lieu'
 import { taoLinkPhieu } from './phieu-link'
 import { BAN_PHIEU_BT, type GoiPhieuBaiTap } from '../components/NutPhieuHtml'
@@ -136,15 +136,9 @@ export async function dungPhieuChoEm(
       hoSo: ho,
       ca: caCuaEm,
       chuyenDeCa: cd,
-      vieCanLam: viecCanLamMacDinh({
-        hoTen: e.hoTen,
-        ngay: e.moiNhat.nopLuc,
-        diem: sc.total,
-        xepLoai: classify(sc.total),
-        soCauSai: rows.filter((r) => r.dungSai === false).length,
-        chuyenDeSai: cdSai[0] ? { ten: cdSai[0].ten, soSai: cdSai[0].soSai } : null,
-        baiTapDaGiao: null,
-      }),
+      // NHẬN XÉT VIẾT SAU, xem ngay dưới: nó cần biết phiếu kèm bao nhiêu câu
+      // khắc phục, mà con số đó do `dungPhieu` tính ra.
+      vieCanLam: '',
       rows,
       // `mergeKeepAnswers` trả bộ đề gộp KHÔNG có `maDe`; gắn mã ca vào cho
       // đúng kiểu, và mã câu trong phiếu cũng đọc ra đúng ca.
@@ -166,6 +160,21 @@ export async function dungPhieuChoEm(
         events: e.moiNhat.integrity?.events ?? null,
       },
     })
+    // NHẬN XÉT RIÊNG CHO CA NÀY (thầy chốt 07/09). Viết SAU `dungPhieu` vì
+    // phần "việc phải làm" phải nêu đúng số câu khắc phục phiếu đang kèm.
+    phieu.vieCanLam = nhanXetTheoCa({
+      ngay: e.moiNhat.nopLuc || '',
+      tenCa: ca.tenCa || '',
+      soCauSai: rows.filter((r) => r.dungSai === false).length,
+      tongSoCau: rows.length,
+      chuyenDeSai: cdSai.map((c) => ({ ten: c.ten, soCau: c.soCau, soSai: c.soSai })),
+      tinHieu: rows.length
+        ? tinHieuLamBai(thongKeLamBai(rows, { vaoLuc: e.moiNhat.vaoLuc, nopLuc: e.moiNhat.nopLuc, thoiLuongPhut: ca.thoiGianPhut }))
+        : [],
+      soCauChua: phieu.baiTap?.length ?? 0,
+      xung: 'con',
+    })
+
     // PHIẾU BÀI TẬP CẤT RIÊNG, có link riêng.
     //
     // HỒI QUY 06/09 — thầy báo báo cáo mất hai nút copy link đề và lời giải.

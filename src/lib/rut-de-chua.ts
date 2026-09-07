@@ -36,6 +36,7 @@ import type { ChiTietCauRow } from './exam-api'
 import { cauLuyenTuNguon, chonCauLuyen, type CauLuyen, type MucDoCau } from './bai-tap-pdf'
 import { CHO_BAC_2, SO_CAU_MAC_DINH, hangUuTien, nhanhCoChe } from './cau-hinh-chua'
 import { hopSao, LOC_SAO_MAC_DINH, type LocSao } from './loc-sao'
+import { hopDang, LOC_DANG_MAC_DINH, type LocDang } from './dang-cau'
 
 /** Nhãn gắn lên MỘT câu chữa. Đúng một, không phải mảng: một câu chữa phục vụ
  * một câu sai để nhãn hiện ra không mập mờ. Chiều ngược lại mới là một–nhiều. */
@@ -171,6 +172,13 @@ export interface YeuCauRutChua {
    * em sai câu 0 sao thì vẫn phải được chữa, chỉ là chữa bằng câu 2 sao hay
    * 1 sao tuỳ thầy chọn. */
   locSao?: LocSao
+  /** LỌC LÝ THUYẾT / BÀI TẬP — cũng phải đi qua cổng.
+   *
+   * Thầy bắt được 07/09: "dạng câu ngẫu nhiên lý thuyết bài tập tôi bấm vào nó
+   * không báo có bao nhiêu câu giống với những câu làm sai". Đúng: trước đây lọc
+   * dạng chỉ ăn ở đường rút TỰ DO, còn cổng chữa thì không biết tới nó, nên bấm
+   * nút xong con số "kho có N câu cùng dạng" đứng im. */
+  locDang?: LocDang
   /** NƠI TRA ĐỀ GỐC CỦA CÂU EM SAI — ngân hàng của chính ca đó.
    *
    * Cần riêng vì kho đề và đề của ca là hai thứ khác nhau: ca có thể thi bằng
@@ -217,7 +225,11 @@ export function banDoDang(khoDe: TeacherExamSource[]): Map<string, DangCauKho> {
   return tra
 }
 
-export function ungVienChua(khoDe: TeacherExamSource[], locSao: LocSao = LOC_SAO_MAC_DINH): { cau: CauLuyen; ma: string; ten: string }[] {
+export function ungVienChua(
+  khoDe: TeacherExamSource[],
+  locSao: LocSao = LOC_SAO_MAC_DINH,
+  locDang: LocDang = LOC_DANG_MAC_DINH,
+): { cau: CauLuyen; ma: string; ten: string }[] {
   const tra = banDoDang(khoDe)
   // `cauLuyenTuNguon` chỉ ĐỔI KIỂU sang `CauLuyen`, không chọn lọc gì — luật
   // chọn nằm ở đây. (Không dùng `chonCauLuyen` cho việc này: đưa `soCau` lớn
@@ -227,6 +239,7 @@ export function ungVienChua(khoDe: TeacherExamSource[], locSao: LocSao = LOC_SAO
   return cauLuyenTuNguon(khoDe)
     .filter((c) => !c.anhThanCau && !(c.hinh && c.hinh.length > 0) && !(c.anhLuaChon && c.anhLuaChon.some(Boolean)))
     .filter((c) => hopSao(c.sao, locSao))
+    .filter((c) => hopDang(c.dang, locDang))
     .map((c) => ({ cau: c, ma: tra.get(c.id)?.ma ?? '', ten: tra.get(c.id)?.ten ?? '' }))
     .filter((x) => x.ma !== '')
 }
@@ -254,7 +267,7 @@ export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
   const ra: KetQuaRutChua = { cau: [], thieu: [], tongUngVien: 0, poolTheoCauSai: [], capBiCat: 0 }
   const choBac2 = yc.choBac2 ?? CHO_BAC_2
 
-  const kho = ungVienChua(yc.khoDe, yc.locSao ?? LOC_SAO_MAC_DINH)
+  const kho = ungVienChua(yc.khoDe, yc.locSao ?? LOC_SAO_MAC_DINH, yc.locDang ?? LOC_DANG_MAC_DINH)
   // Tra dạng của CÂU SAI trên CẢ KHO, và lấy đúng `ten` của dạng.
   //
   // Hai lỗi cũ ở đúng hai dòng này, thầy bắt được 07/09:
