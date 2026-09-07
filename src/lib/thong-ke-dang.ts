@@ -41,6 +41,11 @@ export interface ThongKeDang {
   chuaGan: number
   /** Chưa gán vì chương chưa có bảng cơ chế — không phải việc của thầy. */
   chuaGanDoChuongPhu: number
+  /** THIẾU HẲN trường `dang`: bản đề trên máy này cũ hơn kho, chưa tải lại.
+   * KHÔNG phải việc của thầy — bấm Đồng bộ là xong. */
+  chuaTaiLai: number
+  /** Mã đề còn giữ bản cũ, để nói thẳng tên cho thầy. */
+  deChuaTaiLai: string[]
   /** Chưa gán và CẦN THẦY CHỐT. */
   canThayChot: CauChuaGan[]
   /** Mã không nằm trong từ vựng đóng — phải bằng 0. */
@@ -60,6 +65,13 @@ export interface ThongKeDang {
 }
 
 type CoDangCau = { id?: string; dang?: { ma?: string } | null; viSaoNull?: string; text?: string }
+
+/** Câu chưa từng được pipeline đụng tới: KHÔNG có trường `dang`. Khác hẳn
+ * `dang === null` (cố ý để trống, có lý do). Gộp hai thứ này là đẩy thầy đi gán
+ * tay hàng nghìn câu mà kho đã gán xong. */
+function chuaCoTruong(q: CoDangCau): boolean {
+  return q.dang === undefined
+}
 
 function duyetCau(khoDe: TeacherExamSource[]): { s: TeacherExamSource; phan: 'I' | 'II' | 'III'; so: number; q: CoDangCau }[] {
   const ra: { s: TeacherExamSource; phan: 'I' | 'II' | 'III'; so: number; q: CoDangCau }[] = []
@@ -83,7 +95,14 @@ export function thongKeDang(khoDe: TeacherExamSource[]): ThongKeDang {
   let daGan = 0
   let chuaGanDoChuongPhu = 0
 
+  const deCu = new Set<string>()
+  let chuaTaiLai = 0
   for (const { s, phan, so, q } of cau) {
+    if (chuaCoTruong(q)) {
+      chuaTaiLai += 1
+      deCu.add(s.maDe)
+      continue
+    }
     const ma = String(q.dang?.ma ?? '').trim()
     if (!ma) {
       const ly = String(q.viSaoNull ?? '').trim() || 'chưa ghi lý do'
@@ -128,6 +147,8 @@ export function thongKeDang(khoDe: TeacherExamSource[]): ThongKeDang {
     daGan,
     chuaGan: cau.length - daGan,
     chuaGanDoChuongPhu,
+    chuaTaiLai,
+    deChuaTaiLai: [...deCu].sort(),
     canThayChot,
     maLa,
     soMa: dem.size,

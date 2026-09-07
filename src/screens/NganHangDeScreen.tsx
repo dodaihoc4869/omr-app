@@ -184,7 +184,7 @@ export default function NganHangDeScreen() {
     showToast('Đã lưu mã dạng trên máy này', 'success')
   }
 
-  const dongBo = async (url: string, mat: string, imLang = false) => {
+  const dongBo = async (url: string, mat: string, imLang = false, epTaiLai = false) => {
     if (!url.trim() || !mat.trim()) {
       if (!imLang) showToast('Chưa có link Apps Script hoặc mã bí mật — mở mục Cấu hình bên dưới', 'error')
       setMoCauHinh(true)
@@ -192,7 +192,7 @@ export default function NganHangDeScreen() {
     }
     setDangDongBo(true)
     try {
-      const kq = await dongBoNganHang(url.trim(), mat.trim())
+      const kq = await dongBoNganHang(url.trim(), mat.trim(), epTaiLai)
       setKetQua(kq)
       await taiLocal()
       const tomTat = [kq.moi.length ? `${kq.moi.length} đề mới` : '', kq.capNhat.length ? `${kq.capNhat.length} đề cập nhật` : ''].filter(Boolean).join(', ')
@@ -423,7 +423,9 @@ export default function NganHangDeScreen() {
 
       {/* KHỐI MÃ DẠNG — đặc tả v3 mục 4.3. Đặt NGAY SAU khối đồng bộ, trước
           danh sách đề: thầy vừa kéo đề về là thấy ngay kho đang hổng chỗ nào. */}
-      {sources.length > 0 && <KhoiMaDang sources={sources} soSua={soSua} onSua={luuSoSua} />}
+      {sources.length > 0 && (
+        <KhoiMaDang sources={sources} soSua={soSua} onSua={luuSoSua} dangDongBo={dangDongBo} onTaiLaiHet={() => dongBo(scriptUrl, secret, false, true)} />
+      )}
 
       {sources.map((s, i) => {
         const nghi = cauNghiCua(s)

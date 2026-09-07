@@ -211,3 +211,64 @@ describe('không lách, không thành mã chết', () => {
     expect(t).not.toContain('anhThanCau')
   })
 })
+
+// ---------------------------------------------------------------------------
+// MÁY CÒN GIỮ ĐỀ CŨ — 07/09.
+//
+// Thầy mở app trên máy khác, màn báo "2 205 câu cần thầy chốt" và thầy định gán
+// tay hết. Nhưng kho đã gán xong từ lâu: máy đó chỉ chưa tải bản mới về. Câu
+// THIẾU HẲN trường `dang` khác hẳn câu `dang === null` có ghi lý do, gộp hai
+// thứ đó vào một ô đếm là đẩy thầy đi làm lại việc đã xong.
+import { chonDeCanTai, thieuTruongDang } from '../src/lib/exam-sync'
+
+const cauCu = (id: string) => {
+  const c = q(id, null) as Record<string, unknown>
+  delete c.dang
+  delete c.viSaoNull
+  return c as unknown as ReturnType<typeof q>
+}
+
+describe('máy còn giữ đề cũ', () => {
+  it('câu thiếu hẳn trường dang KHÔNG bị tính là "cần thầy chốt"', () => {
+    const tk = thongKeDang(kho([q('a', HS), cauCu('b'), cauCu('c')]))
+    expect(tk.chuaTaiLai).toBe(2)
+    expect(tk.canThayChot).toHaveLength(0)
+    expect(tk.deChuaTaiLai).toEqual(['D1'])
+  })
+
+  it('vẫn tách được với câu pipeline CỐ Ý để trống kèm lý do', () => {
+    const tk = thongKeDang(kho([cauCu('a'), q('b', null, { viSaoNull: 'chưa nhận ra cơ chế' }), q('c', null, { viSaoNull: LY_DO_CHUONG_PHU })]))
+    expect(tk.chuaTaiLai).toBe(1)
+    expect(tk.canThayChot).toHaveLength(1)
+    expect(tk.chuaGanDoChuongPhu).toBe(1)
+  })
+
+  it('nhận ra đề nào trên máy còn thiếu trường dang', () => {
+    expect(thieuTruongDang(kho([q('a', HS), cauCu('b')])[0])).toBe(true)
+    expect(thieuTruongDang(kho([q('a', HS), q('b', null)])[0])).toBe(false)
+  })
+
+  it('đồng bộ TỰ tải lại đề còn thiếu trường, dù ngày nạp giống hệt', () => {
+    const tren = [{ maDe: 'D1', ngayNap: '2026-09-06' }] as Parameters<typeof chonDeCanTai>[0]
+    const { capNhat } = chonDeCanTai(tren, kho([cauCu('a')]))
+    expect(capNhat.map((x) => x.maDe)).toEqual(['D1'])
+  })
+
+  it('đề đã đủ trường thì KHÔNG tải lại — không kéo 31 MB mỗi lần mở màn', () => {
+    const tren = [{ maDe: 'D1', ngayNap: '2026-09-06' }] as Parameters<typeof chonDeCanTai>[0]
+    expect(chonDeCanTai(tren, kho([q('a', HS)])).capNhat).toHaveLength(0)
+  })
+
+  it('ép tải lại thì kéo hết, kể cả đề không đổi gì', () => {
+    const tren = [{ maDe: 'D1', ngayNap: '2026-09-06' }] as Parameters<typeof chonDeCanTai>[0]
+    expect(chonDeCanTai(tren, kho([q('a', HS)]), true).capNhat).toHaveLength(1)
+  })
+
+  it('màn có nút ép tải lại và có câu can thầy ĐỪNG gán tay', () => {
+    const t = doc('src/components/KhoiMaDang.tsx')
+    expect(t).toContain('Máy này còn giữ bản đề cũ')
+    expect(t).toContain('đừng gán tay')
+    expect(t).toContain('onTaiLaiHet')
+    expect(doc('src/screens/NganHangDeScreen.tsx')).toContain('onTaiLaiHet={() => dongBo(scriptUrl, secret, false, true)}')
+  })
+})

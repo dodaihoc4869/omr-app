@@ -50,24 +50,39 @@ export function caDungDe(banks: { maCa: string; sources: { maDe: string }[] }[],
   return banks.filter((b) => b.sources.some((s) => s.maDe === maDe)).map((b) => b.maCa)
 }
 
-/** Quyết định đề nào cần tải: chưa có local, hoặc ngayNap trên kho khác local. */
-export function chonDeCanTai(tren: KhoDeItem[], local: TeacherExamSource[]): { moi: KhoDeItem[]; capNhat: KhoDeItem[] } {
+/** Bản local có câu nào THIẾU HẲN trường `dang` không.
+ *
+ * Khác `dang === null` (pipeline cố ý để trống, có ghi lý do): thiếu hẳn trường
+ * nghĩa là bản này tải về từ trước khi kho có mã dạng. Máy nào còn giữ bản cũ
+ * thì màn Ngân hàng đếm ra hàng nghìn "câu cần thầy chốt" — thầy suýt ngồi gán
+ * tay 2 205 câu mà kho đã gán xong từ lâu. */
+export function thieuTruongDang(s: TeacherExamSource): boolean {
+  return [...s.phanI, ...s.phanII, ...s.phanIII].some((q) => (q as { dang?: unknown }).dang === undefined)
+}
+
+/** Quyết định đề nào cần tải: chưa có local · ngayNap khác · bản local còn
+ * thiếu trường `dang` · hoặc thầy bấm ép tải lại. */
+export function chonDeCanTai(
+  tren: KhoDeItem[],
+  local: TeacherExamSource[],
+  epTaiLai = false,
+): { moi: KhoDeItem[]; capNhat: KhoDeItem[] } {
   const localMap = new Map(local.map((s) => [s.maDe, s]))
   const moi: KhoDeItem[] = []
   const capNhat: KhoDeItem[] = []
   for (const item of tren) {
     const cu = localMap.get(item.maDe)
     if (!cu) moi.push(item)
-    else if ((cu.ngayNap ?? '') !== (item.ngayNap ?? '')) capNhat.push(item)
+    else if (epTaiLai || (cu.ngayNap ?? '') !== (item.ngayNap ?? '') || thieuTruongDang(cu)) capNhat.push(item)
   }
   return { moi, capNhat }
 }
 
-export async function dongBoNganHang(scriptUrl: string, secret: string): Promise<KetQuaDongBo> {
+export async function dongBoNganHang(scriptUrl: string, secret: string, epTaiLai = false): Promise<KetQuaDongBo> {
   const danhSach = await danhSachDe(scriptUrl, secret)
   const local = await loadExamSources()
   const soSua = await loadSoSuaDang()
-  const { moi, capNhat } = chonDeCanTai(danhSach, local)
+  const { moi, capNhat } = chonDeCanTai(danhSach, local, epTaiLai)
   const kq: KetQuaDongBo = { moi: [], capNhat: [], giuNguyen: danhSach.length - moi.length - capNhat.length, loi: [], canXem: [], danhSach, caCapNhat: 0 }
 
   for (const item of [...moi, ...capNhat]) {

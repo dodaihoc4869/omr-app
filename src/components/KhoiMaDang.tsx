@@ -118,10 +118,15 @@ export default function KhoiMaDang({
   sources,
   soSua,
   onSua,
+  onTaiLaiHet,
+  dangDongBo,
 }: {
   sources: TeacherExamSource[]
   soSua: SoSuaDang
   onSua: (so: SoSuaDang) => void
+  /** Ép tải lại TOÀN BỘ đề, bỏ qua phép so ngày. */
+  onTaiLaiHet?: () => void
+  dangDongBo?: boolean
 }) {
   const [moChot, setMoChot] = useState(false)
   const [moLoc, setMoLoc] = useState(false)
@@ -181,6 +186,7 @@ export default function KhoiMaDang({
       <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>
         {tk.loaiViCoHinh} câu có mã nhưng có hình nên không vào phiếu in được · {tk.chuaGanDoChuongPhu} câu để trống vì chương chưa có bảng cơ chế ·{' '}
         {tk.phuBac2}% có câu chữa cùng nhánh cơ chế
+        {tk.chuaTaiLai > 0 && ` · ${tk.chuaTaiLai} câu chưa tải bản mới`}
       </div>
 
       {tk.maLa.length > 0 && (
@@ -197,6 +203,32 @@ export default function KhoiMaDang({
           <OThongBao tone="cam">
             Nhánh mỏng, em nào sai đúng dạng này sẽ phải lấy câu bậc 2:{' '}
             {tk.nhanhMong.slice(0, 6).map((n) => `${tenCua(`${n.nhanh}.NHAN_DANG`).split(' — ')[0]} (${n.soCau} câu)`).join(' · ')}
+          </OThongBao>
+        </div>
+      )}
+
+      {/* MÁY NÀY CÒN GIỮ ĐỀ CŨ. Phải nói trước mọi thứ khác: nếu không, màn này
+          đếm ra hàng nghìn "câu cần thầy chốt" và thầy sẽ ngồi gán tay những
+          câu mà kho đã gán xong từ lâu. */}
+      {tk.chuaTaiLai > 0 && (
+        <div style={{ marginTop: 'var(--k3)' }}>
+          <OThongBao tone="do">
+            <div className="font-bold">Máy này còn giữ bản đề cũ — chưa có mã dạng.</div>
+            <div style={{ marginTop: 4 }}>
+              {tk.chuaTaiLai} câu chưa có trường mã dạng, nằm ở: {tk.deChuaTaiLai.slice(0, 8).join(' · ')}
+              {tk.deChuaTaiLai.length > 8 ? ` … và ${tk.deChuaTaiLai.length - 8} mã đề nữa` : ''}. Kho đã gán rồi —{' '}
+              <b>đừng gán tay</b>, bấm nút dưới để tải lại.
+            </div>
+            {onTaiLaiHet && (
+              <button
+                className="tap-target font-bold"
+                onClick={onTaiLaiHet}
+                disabled={dangDongBo}
+                style={{ marginTop: 'var(--k3)', padding: '8px 14px', borderRadius: 'var(--bo-1)', background: 'var(--do)', color: 'var(--nen)', fontSize: 'var(--cx-1)', fontFamily: 'var(--sans)' }}
+              >
+                {dangDongBo ? 'Đang tải…' : `Tải lại toàn bộ ${sources.length} mã đề`}
+              </button>
+            )}
           </OThongBao>
         </div>
       )}
