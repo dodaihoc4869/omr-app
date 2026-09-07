@@ -130,15 +130,48 @@ export type KetQuaVaoThi =
 /** Xin vào thi: máy chủ kiểm tra (mã ca, SBD, id thiết bị) rồi tạo/khôi phục
  * lượt và trả mốc giờ (vaoLuc, hetGioLuc theo giờ máy chủ). canBank=true khi
  * máy em chưa có đề trong cache → nhận luôn đề (không đáp án) trong cùng 1 lượt gọi. */
+/** Danh tính gửi kèm khi vào thi.
+ *
+ * `xacNhanTen` = em đã NHÌN THẤY tên của số báo danh mình gõ trên màn xác nhận
+ * và bấm Bắt đầu. Khi đó máy chủ không so tên và năm sinh nữa — cổng còn lại là
+ * "số báo danh phải nằm trong danh sách lớp". */
+export interface DanhTinhVaoThi {
+  hoTen: string
+  namSinh: string
+  xacNhanTen?: boolean
+}
+
+export interface TenTheoSbd {
+  sbd: string
+  hoTen: string
+  lop: string
+  tenCa: string
+}
+
+/** TRA TÊN TỪ SỐ BÁO DANH cho màn xác nhận trước khi vào thi (thầy chốt 07/09).
+ *
+ * Gói gửi đi chỉ có mã ca và số báo danh; máy chủ trả về HỌ TÊN và lớp, không
+ * trả năm sinh, không trả số điện thoại. */
+export async function tenTheoSbd(scriptUrl: string, maCa: string, sbd: string): Promise<TenTheoSbd> {
+  const r = await postJson(scriptUrl, { action: 'tenTheoSbd', maCa, sbd })
+  if (!r.ok) throw new Error(r.error || 'Không tra được số báo danh')
+  return {
+    sbd: String(r.sbd ?? sbd),
+    hoTen: String(r.hoTen ?? ''),
+    lop: String(r.lop ?? ''),
+    tenCa: String(r.tenCa ?? ''),
+  }
+}
+
 export async function vaoThi(
   scriptUrl: string,
   maCa: string,
   sbd: string,
   idThietBi: string,
   canBank: boolean,
-  danhTinh: { hoTen: string; namSinh: string } = { hoTen: '', namSinh: '' },
+  danhTinh: DanhTinhVaoThi = { hoTen: '', namSinh: '' },
 ): Promise<KetQuaVaoThi> {
-  const r = await postJson(scriptUrl, { action: 'vaoThi', maCa, sbd, idThietBi, canBank, hoTen: danhTinh.hoTen, namSinh: danhTinh.namSinh })
+  const r = await postJson(scriptUrl, { action: 'vaoThi', maCa, sbd, idThietBi, canBank, hoTen: danhTinh.hoTen, namSinh: danhTinh.namSinh, xacNhanTen: danhTinh.xacNhanTen === true })
   if (r.ok) {
     return {
       ok: true,

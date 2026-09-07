@@ -211,14 +211,36 @@ describe('Chế độ SỐ BÁO DANH đòi đủ mã ca + số báo danh + họ 
     const i = gsCode.indexOf("if (action === 'vaoThi')")
     const j = gsCode.indexOf("\n  if (action === '", i + 10)
     const than = gsCode.slice(i, j > 0 ? j : undefined)
-    // Tên đi qua `tenKhopNhau_` (07/09): nó nuốt thêm chữ eth ð Ð, ký tự tàng
-    // hình, dấu câu thừa và chữ dính — ba bẫy "nhìn y hệt mà khác mã".
-    expect(than).toContain('const tenKhop = !chuanTen_(dong.hoTen) || tenKhopNhau_(body.hoTen, dong.hoTen)')
-    expect(than).toContain('const namKhop = !dong.namSinh || namGoi === dong.namSinh')
+    // TỪ 07/09 màn vào thi chỉ hỏi số báo danh rồi cho em XÁC NHẬN BẰNG MẮT
+    // tên của số đó. Có cờ `xacNhanTen` thì không so tên và năm sinh nữa.
+    expect(than).toContain('const tenKhop = body.xacNhanTen === true ||')
+    expect(than).toContain('const namKhop = body.xacNhanTen === true ||')
+    // KHÔNG có cờ thì luật cũ phải còn nguyên — mọi chỗ gọi khác không đổi.
+    // Tên đi qua `tenKhopNhau_`: nó nuốt chữ eth ð Ð, ký tự tàng hình, dấu câu
+    // thừa và chữ dính — ba bẫy "nhìn y hệt mà khác mã".
+    expect(than).toContain('!chuanTen_(dong.hoTen) || tenKhopNhau_(body.hoTen, dong.hoTen)')
+    expect(than).toContain('!dong.namSinh || namGoi === dong.namSinh')
     expect(than).toContain('if (!tenKhop || !namKhop) {')
     expect(than).toContain('trongDs = null')
     // Mỗi lượt bị chặn phải để lại bằng chứng cho thầy đọc.
     expect(than).toContain('ghiChanVao_(')
+  })
+
+  it('CỜ XÁC NHẬN KHÔNG ĐƯỢC NỚI CỔNG DANH SÁCH', () => {
+    // Đây là ranh giới của lần đổi 07/09: bỏ so tên và năm sinh thì cổng còn
+    // lại CHỈ có "số báo danh phải nằm trong danh sách lớp". Nới nốt cái đó là
+    // ai gõ số nào cũng vào được.
+    const i = gsCode.indexOf('const coDs = coDanhSachHocSinh_()')
+    const than = gsCode.slice(i, gsCode.indexOf('let hoSo = hoSoHocSinh_(sbd)', i))
+    expect(than).toContain('const dong = coDs ? timTrongDanhSachLop_(sbd) : null')
+    expect(than).toContain("ghiChanVao_(maCa, sbd, body.hoTen, body.namSinh, '', '', 'khong_co_sbd')")
+    // `trongDs` chỉ được gán đúng hai lần: khởi tạo bằng dòng tìm được trong
+    // danh sách, và gán null khi bị chặn. Không có nhánh nào cho nó giá trị
+    // đúng chỉ vì có cờ xác nhận.
+    const ganTrongDs = than.match(/trongDs\s*=\s*[^=]/g) ?? []
+    expect(ganTrongDs).toHaveLength(2)
+    expect(than).toContain('let trongDs = dong')
+    expect(than).toContain('trongDs = null')
   })
 
   it('DÒNG MÔ TẢ trên màn Mở ca phải nói đúng việc máy chủ làm', async () => {
@@ -230,11 +252,19 @@ describe('Chế độ SỐ BÁO DANH đòi đủ mã ca + số báo danh + họ 
     // Cắt tới dấu `]` ĐẦU DÒNG — dấu `]` đầu tiên nằm trong kiểu `{...}[]`,
     // cắt ở đó thì khối rỗng và phép kiểm tự đạt.
     const khoi = man.slice(dau, man.indexOf('\n]', dau))
+    const dong = khoi.split('\n').filter((d) => d.includes("mota: '"))
+    // BA chế độ (thầy chốt 07/09): "Theo khối" đã bỏ vì nó lọc bằng năm sinh,
+    // mà em không gõ năm sinh nữa.
+    expect(dong).toHaveLength(3)
+    expect(khoi).not.toContain("id: 'khoi'")
     expect(khoi).toContain("id: 'sbd'")
-    // Ba chế độ có cổng đều phải nói ra đủ ba trường.
-    const ba = khoi.split('\n').filter((d) => /'khoi'|'chon'|'sbd'/.test(d) && d.includes('mota'))
-    expect(ba).toHaveLength(3)
-    for (const d of ba) expect(d).toContain('số báo danh, họ tên, năm sinh')
+    expect(khoi).toContain("id: 'chon'")
+    // Hai chế độ có cổng KHÔNG được nói là phải gõ đủ ba ô nữa — nói vậy là
+    // sai việc máy chủ đang làm, và thầy đọc xong sẽ dặn em gõ thứ không có ô.
+    for (const d of dong.filter((x) => /'chon'|'sbd'/.test(x))) {
+      expect(d).not.toContain('họ tên, năm sinh')
+      expect(d).toContain('số báo danh')
+    }
     // Và Tự do phải nói rõ nó là chế độ DUY NHẤT không dò danh sách.
     const tuDo = khoi.split('\n').find((d) => d.includes("'tu_do'"))!
     expect(tuDo).toContain('DUY NHẤT')

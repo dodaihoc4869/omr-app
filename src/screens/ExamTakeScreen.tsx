@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
-import { cauKhacPhuc, lichSuEm as lichSuEmApi, vaoThi, phieuCuaEm as layBaiDaNop, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { cauKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, vaoThi, phieuCuaEm as layBaiDaNop, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
 import { goiCauHoi } from '../lib/hoi-bai'
 import TamTruotHoiBai, { type CauChon } from '../components/TamTruotHoiBai'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
@@ -166,18 +166,6 @@ function DauPhan({ phan, soCauBaPhan }: { phan: PhanKey; soCauBaPhan: SoCauBaPha
 const KHOA_HO_TEN = 'ddh.em.hoTen'
 const KHOA_NAM_SINH = 'ddh.em.namSinh'
 
-/** Ô nhập họ tên / năm sinh ở màn vào thi — cùng kích cỡ với ô số báo danh. */
-const O_DANH_TINH: React.CSSProperties = {
-  height: 52,
-  borderRadius: 'var(--bo-1)',
-  padding: '0 var(--k4)',
-  background: 'var(--the-2)',
-  border: '1.5px solid transparent',
-  fontFamily: 'var(--serif)',
-  fontSize: 'var(--cx-3)',
-  color: 'var(--muc)',
-  outline: 'none',
-}
 
 export default function ExamTakeScreen() {
   const showToast = useAppStore((s) => s.showToast)
@@ -199,13 +187,25 @@ export default function ExamTakeScreen() {
 
   const [maCa, setMaCa] = useState('')
   const [sbd, setSbd] = useState('')
+  // MÀN XÁC NHẬN TÊN (thầy chốt 07/09). Em gõ MỖI số báo danh; bấm Vào thi thì
+  // máy tra tên của chính số đó và hiện lên cho em nhìn, rồi em bấm Bắt đầu hay
+  // Nhập lại.
+  //
+  // VÌ SAO ĐỔI: bản cũ bắt gõ đủ ba ô (số báo danh, họ tên, năm sinh) rồi so
+  // với danh sách. Gõ lệch bất cứ ô nào cũng chỉ nhận đúng một câu "thông tin
+  // không đúng" — 07/09 hai em bị chặn giữa buổi mà không ai biết sai ở đâu.
+  // Nhìn thấy TÊN MÌNH thì gõ nhầm một số là phát hiện ngay.
+  const [xacNhan, setXacNhan] = useState<{ sbd: string; hoTen: string; lop: string } | null>(null)
+  const [dangTraTen, setDangTraTen] = useState(false)
   // DANH TÍNH — máy chủ đối chiếu đủ ba (số báo danh, họ tên, năm sinh) với
   // danh sách thầy đã nạp. Nhớ trên máy để lần sau em chỉ gõ mã ca; đây là
   // tiện dùng, KHÔNG phải quyền: máy chủ vẫn kiểm lại mỗi lần vào thi.
   const [hoTen, setHoTen] = useState(() => {
     try { return localStorage.getItem(KHOA_HO_TEN) ?? '' } catch { return '' }
   })
-  const [namSinh, setNamSinh] = useState(() => {
+  // Năm sinh chỉ còn để GỬI KÈM cho ca lọc theo khối; không còn ô nhập nào từ
+  // 07/09, giá trị lấy từ lần trước em đã gõ trên chính máy này.
+  const [namSinh] = useState(() => {
     try { return localStorage.getItem(KHOA_NAM_SINH) ?? '' } catch { return '' }
   })
   const [scriptUrl, setScriptUrl] = useState('')
@@ -743,18 +743,37 @@ export default function ExamTakeScreen() {
   // mỗi ca, phân biệt máy bằng id thiết bị, 3 mốc thời gian, giờ máy chủ.
   // Không có mạng: CHỈ cho tiếp tục lượt đang làm dở trên chính máy này (đề
   // đã cache) — không tạo được lượt mới ngoài tầm máy chủ.
+  /** BƯỚC 1: em gõ số báo danh, máy tra tên rồi hiện màn xác nhận. */
+  const traTenRoiHoi = async () => {
+    const ma = maCa.trim()
+    const sb = sbd.trim()
+    if (!ma || !sb) return showToast('Nhập đủ mã ca và số báo danh', 'error')
+    const url = scriptUrl.trim()
+    if (!url) return showToast('Chưa có link kết nối — mở đúng link thầy gửi.', 'error')
+    setDangTraTen(true)
+    try {
+      const kq = await tenTheoSbd(url, ma, sb)
+      // Máy chủ nhận số báo danh nhưng danh sách chưa có tên: KHÔNG bịa, cũng
+      // không chặn — hiện thẳng để em và thầy biết.
+      setXacNhan({ sbd: kq.sbd, hoTen: kq.hoTen, lop: kq.lop })
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Không tra được số báo danh', 'error')
+    } finally {
+      setDangTraTen(false)
+    }
+  }
+
+  /** BƯỚC 2: em nhìn đúng tên mình rồi bấm Bắt đầu. */
   const handleJoin = async () => {
     const ma = maCa.trim()
     const sb = sbd.trim()
-    const ten = hoTen.trim()
+    const ten = (xacNhan?.hoTen || hoTen).trim()
     const nam = namSinh.trim()
     if (!ma || !sb) return showToast('Nhập đủ mã ca và số báo danh', 'error')
-    if (!ten) return showToast('Nhập họ tên đúng như Thầy ghi trong sổ', 'error')
-    if (!/^(19|20)\d{2}$/.test(nam)) return showToast('Nhập năm sinh 4 chữ số, ví dụ 2009', 'error')
     // Nhớ cho lần sau — em không phải gõ lại mỗi ca.
     try {
-      localStorage.setItem(KHOA_HO_TEN, ten)
-      localStorage.setItem(KHOA_NAM_SINH, nam)
+      if (ten) localStorage.setItem(KHOA_HO_TEN, ten)
+      if (nam) localStorage.setItem(KHOA_NAM_SINH, nam)
     } catch {
       // trình duyệt chặn storage — chỉ mất tiện dùng, vẫn thi được
     }
@@ -768,7 +787,7 @@ export default function ExamTakeScreen() {
       let kq: KetQuaVaoThi | null = null
       if (url) {
         try {
-          kq = await vaoThi(url, ma, sb, idTb, !cached, { hoTen: ten, namSinh: nam })
+          kq = await vaoThi(url, ma, sb, idTb, !cached, { hoTen: ten, namSinh: nam, xacNhanTen: xacNhan !== null })
         } catch {
           kq = null
         }
@@ -1650,6 +1669,58 @@ export default function ExamTakeScreen() {
     updateAndSave((a) => ({ ...a, answers: { ...a.answers, phanIII: { ...a.answers.phanIII, [qid]: text } } }))
 
   // ---------------------------------------------------------------- VÀO PHÒNG
+  // MÀN XÁC NHẬN TÊN (thầy chốt 07/09). Chỉ có đúng ba thứ: số báo danh em vừa
+  // gõ, TÊN của số đó, và hai nút. Không nhồi thêm gì — em đang đứng trước giờ
+  // thi, mỗi dòng thừa là một nhịp chậm.
+  if (phase === 'join' && !laXemDiem && xacNhan) {
+    return (
+      <Trang className="flex items-center justify-center px-4 py-8">
+        <div className="w-full" style={{ maxWidth: 400 }}>
+          <TheNoiDung>
+            <div className="text-center" style={{ marginBottom: 'var(--k5)' }}>
+              <div className="flex justify-center" style={{ color: 'var(--muc)', marginBottom: 'var(--k3)' }}>
+                <LogoDDH size={40} />
+              </div>
+              <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>Có đúng em không?</div>
+            </div>
+
+            <div className="text-center" style={{ background: 'var(--the-2)', borderRadius: 'var(--bo-2)', padding: 'var(--k5) var(--k4)' }}>
+              <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
+                Số báo danh <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 700, color: 'var(--muc)' }}>{xacNhan.sbd}</span>
+              </div>
+              {xacNhan.hoTen ? (
+                <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-5)', color: 'var(--muc)', marginTop: 'var(--k2)', lineHeight: 1.25 }}>
+                  {xacNhan.hoTen}
+                </div>
+              ) : (
+                // Danh sách chưa có tên cho số này: KHÔNG bịa tên, nói thẳng.
+                <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--cam)', marginTop: 'var(--k2)' }}>
+                  Danh sách lớp chưa ghi tên cho số báo danh này. Báo Thầy trước khi bắt đầu.
+                </div>
+              )}
+              {xacNhan.lop && (
+                <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginTop: 'var(--k2)' }}>Lớp {xacNhan.lop}</div>
+              )}
+            </div>
+
+            <div className="flex flex-col" style={{ gap: 'var(--k3)', marginTop: 'var(--k5)' }}>
+              <NutChinh onClick={handleJoin}>Bắt đầu</NutChinh>
+              <NutChinh
+                variant="phu"
+                onClick={() => {
+                  setXacNhan(null)
+                  setSbd('')
+                }}
+              >
+                Nhập lại
+              </NutChinh>
+            </div>
+          </TheNoiDung>
+        </div>
+      </Trang>
+    )
+  }
+
   if (phase === 'join') {
     return (
       <Trang className="flex items-center justify-center px-4 py-8">
@@ -1700,39 +1771,12 @@ export default function ExamTakeScreen() {
                   nộp rồi, không tạo ra em lạ nào nữa, mà bắt gõ ba ô trên điện
                   thoại thì sai một dấu là tắc. Cổng còn lại: số báo danh phải
                   có trong danh sách lớp và phải có lượt đã nộp của ca. */}
-              {!laXemDiem && (
-              <>
-              <div>
-                <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginBottom: 'var(--k2)' }}>Họ và tên</div>
-                <input
-                  className="tap-target w-full"
-                  style={O_DANH_TINH}
-                  placeholder="Họ và tên"
-                  autoComplete="name"
-                  value={hoTen}
-                  onChange={(e) => setHoTen(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleJoin()
-                  }}
-                />
-              </div>
-              <div>
-                <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginBottom: 'var(--k2)' }}>Năm sinh</div>
-                <input
-                  className="tap-target w-full"
-                  style={{ ...O_DANH_TINH, fontVariantNumeric: 'tabular-nums' }}
-                  placeholder="2009"
-                  inputMode="numeric"
-                  maxLength={4}
-                  value={namSinh}
-                  onChange={(e) => setNamSinh(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleJoin()
-                  }}
-                />
-              </div>
-              </>
-              )}
+              {/* HAI Ô HỌ TÊN VÀ NĂM SINH ĐÃ GỠ (thầy chốt 07/09).
+                  Em chỉ gõ SỐ BÁO DANH; bấm Vào thi thì máy tra tên của chính
+                  số đó và hiện lên cho em xác nhận. Gõ nhầm một số là thấy ngay
+                  tên người khác — bắt lỗi tốt hơn hẳn cách bắt gõ đủ ba ô, vì
+                  gõ ba ô thì lỗi nào cũng chỉ ra một câu "thông tin không
+                  đúng". Xem màn xác nhận ngay trên `phase === 'join'`. */}
               {!laXemDiem && !toanManHinh && (
                 <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
                   <OThongBao tone="cam">
@@ -1764,8 +1808,8 @@ export default function ExamTakeScreen() {
               {laXemDiem ? (
                 <NutChinh onClick={moLaiTuMayChu}>Xem điểm của em</NutChinh>
               ) : (
-                <NutChinh onClick={handleJoin} disabled={!toanManHinh}>
-                  Vào thi
+                <NutChinh onClick={() => void traTenRoiHoi()} disabled={!toanManHinh || dangTraTen}>
+                  {dangTraTen ? 'Đang tra số báo danh…' : 'Vào thi'}
                 </NutChinh>
               )}
             </div>

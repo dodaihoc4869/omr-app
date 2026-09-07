@@ -91,14 +91,21 @@ function ChipChon({ chon, onClick, children }: { chon: boolean; onClick: () => v
  * có kiểm năm sinh và họ tên không. CÓ — `quyetDinhVaoThi_` chạy cổng danh sách
  * (khớp đủ SBD + họ tên + năm sinh) trước mọi phạm vi, chỉ Tự do được miễn. Cái
  * sai là dòng mô tả nói thiếu, khiến thầy tưởng nó chỉ dò số báo danh. */
+// BA CHẾ ĐỘ (thầy chốt 07/09). "Theo khối" đã BỎ khỏi màn này: nó lọc bằng năm
+// sinh, mà từ 07/09 em vào thi không gõ năm sinh nữa — giữ lại là một lựa chọn
+// không còn cách nào thoả. Ca cũ đã mở ở chế độ đó vẫn chạy nguyên: máy chủ giữ
+// nhánh `pv === 'khoi'`, chỉ màn Mở ca không cho chọn mới.
+//
+// Cả ba chế độ nay chỉ đòi SỐ BÁO DANH. Em gõ số, máy hiện TÊN của số đó, em
+// nhìn rồi bấm Bắt đầu — gõ nhầm một số là thấy ngay tên người khác. Khác nhau
+// ở chỗ ai được vào, không ở chỗ phải gõ mấy ô.
 const PHAM_VI_CHON: { id: PhamViCa; ten: string; mota: string }[] = [
   { id: 'tu_do', ten: 'Tự do', mota: 'Ai có mã ca đều vào được — luyện tập, ôn ngoài giờ. Chế độ DUY NHẤT không dò danh sách lớp.' },
-  { id: 'khoi', ten: 'Theo khối', mota: 'Đúng khối theo năm sinh thầy chọn, và khớp đủ ba: số báo danh, họ tên, năm sinh.' },
-  { id: 'chon', ten: 'Chọn từng em', mota: 'Chỉ em thầy tích, và khớp đủ ba: số báo danh, họ tên, năm sinh.' },
+  { id: 'chon', ten: 'Chọn từng em', mota: 'Chỉ em thầy tích. Em gõ số báo danh rồi xác nhận đúng tên mình.' },
   // Thầy chốt 05/09, làm rõ 06/09. Khác 'Tự do' ở chỗ mã ca đúng CHƯA đủ. Khác
   // 'Chọn từng em' ở chỗ không phải tích ai — cả lớp vào được, người lạ thì
   // không.
-  { id: 'sbd', ten: 'Số báo danh', mota: 'Cả lớp vào được, không phải tích ai. Em phải có mã ca và khớp đủ ba: số báo danh, họ tên, năm sinh.' },
+  { id: 'sbd', ten: 'Số báo danh', mota: 'Cả lớp vào được, không phải tích ai. Em gõ số báo danh có trong danh sách lớp rồi xác nhận đúng tên mình.' },
 ]
 
 /** Năm sinh gợi ý: 5 năm quanh khối 10–12 hiện tại. */

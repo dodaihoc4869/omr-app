@@ -2655,8 +2655,16 @@ function doPost(e) {
         const namGoi = chuanNamSinh_(body.namSinh)
         // Dòng trong danh sách thiếu tên hoặc năm sinh thì không lấy đó làm cớ
         // chặn em — chỉ so những gì thầy đã điền.
-        const tenKhop = !chuanTen_(dong.hoTen) || tenKhopNhau_(body.hoTen, dong.hoTen)
-        const namKhop = !dong.namSinh || namGoi === dong.namSinh
+        // XÁC NHẬN BẰNG MẮT (thầy chốt 07/09). Màn vào thi mới chỉ hỏi số báo
+        // danh, rồi hiện TÊN của số báo danh đó cho em nhìn và bấm Bắt đầu.
+        // Em đã nhìn đúng tên mình thì không có gì để so thêm — cổng còn lại là
+        // "số báo danh phải nằm trong danh sách lớp", vốn đã kiểm ở trên.
+        //
+        // Cách này bắt lỗi gõ nhầm TỐT HƠN cách cũ: gõ nhầm một số là em thấy
+        // ngay tên người khác, thay vì nhận một câu "thông tin không đúng"
+        // không nói được sai ở đâu.
+        const tenKhop = body.xacNhanTen === true || !chuanTen_(dong.hoTen) || tenKhopNhau_(body.hoTen, dong.hoTen)
+        const namKhop = body.xacNhanTen === true || !dong.namSinh || namGoi === dong.namSinh
         if (!tenKhop || !namKhop) {
           trongDs = null
           // GIỮ LẠI BẰNG CHỨNG. Máy chủ cố ý KHÔNG nói cho em biết sai ô nào
@@ -2907,6 +2915,48 @@ function doPost(e) {
     try { danhSachMoi = ca.danhSachMoi && ca.phamVi === 'chon' ? JSON.parse(ca.danhSachMoi) : [] } catch (err) {}
     ca.danhSachMoi = ca.phamVi === 'chon' ? danhSachMoi : ca.danhSachMoi
     return jsonResponse_({ ok: true, ca: ca, luot: luot, keyBank: keyBank, biChan: docChanVao_(maCa), serverNow: Date.now() })
+  }
+
+  if (action === 'tenTheoSbd') {
+    // TRA HỌ TÊN TỪ SỐ BÁO DANH ĐỂ EM XÁC NHẬN TRƯỚC KHI VÀO THI (thầy chốt
+    // 07/09).
+    //
+    // Màn vào thi nay chỉ hỏi số báo danh. Bấm Vào thi thì hiện tên của số báo
+    // danh đó cho em nhìn, rồi em chọn Bắt đầu hoặc Nhập lại. Gõ nhầm một số là
+    // thấy ngay tên người khác — bắt lỗi tốt hơn hẳn cách bắt gõ đủ ba ô, vì
+    // gõ ba ô thì lỗi nào cũng chỉ ra một câu "thông tin không đúng".
+    //
+    // ĐÁNH ĐỔI, nói thẳng: ai cầm mã ca cũng dò được "số báo danh này là ai".
+    // Bản cũ cố tình giấu điều đó. Thầy chốt đổi vì phòng thi có thầy coi tại
+    // chỗ, và cái giá của việc em không vào thi được lớn hơn.
+    //
+    // Vẫn giữ ba cổng: phải có mã ca thật, ca chưa xoá, và số báo danh phải nằm
+    // trong danh sách lớp. KHÔNG trả năm sinh, KHÔNG trả số điện thoại.
+    const maCaTS = String(body.maCa || '').trim()
+    const sbdTS = String(body.sbd || '').trim()
+    if (!maCaTS || !sbdTS) return jsonResponse_({ ok: false, lyDo: 'thieu', error: 'Nhập mã ca và số báo danh' })
+    const caShTS = sheetCa_()
+    const caRowTS = findRowByKey_(caShTS, 0, maCaTS)
+    if (caRowTS < 0) return jsonResponse_({ ok: false, lyDo: 'khong_co_ca', error: 'Không tìm thấy ca kiểm tra — kiểm tra lại mã ca' })
+    const caTS = docCa_(caShTS, caRowTS)
+    if (caTS.trangThai === 'da_xoa') return jsonResponse_({ ok: false, lyDo: 'da_xoa', error: 'Ca kiểm tra này đã bị thầy xoá' })
+
+    const dongTS = coDanhSachHocSinh_() ? timTrongDanhSachLop_(sbdTS) : null
+    if (coDanhSachHocSinh_() && !dongTS) {
+      ghiChanVao_(maCaTS, sbdTS, '', '', '', '', 'khong_co_sbd')
+      return jsonResponse_({ ok: false, lyDo: 'khong_trong_danh_sach', error: 'Số báo danh này không có trong danh sách lớp. Kiểm tra lại đúng như Thầy ghi trong sổ.' })
+    }
+    // Chưa nạp danh sách bao giờ thì không chặn ai — nhưng cũng không bịa tên.
+    const hoSoTS = hoSoHocSinh_(sbdTS)
+    const tenTS = (dongTS && String(dongTS.hoTen || '').trim()) || (hoSoTS && String(hoSoTS.hoTen || '').trim()) || ''
+    return jsonResponse_({
+      ok: true,
+      sbd: sbdTS,
+      hoTen: tenTS,
+      lop: (dongTS && dongTS.lop) || caTS.lop || (hoSoTS ? hoSoTS.lop : '') || '',
+      tenCa: caTS.tenCa || '',
+      serverNow: Date.now(),
+    })
   }
 
   if (action === 'dongBoTenCa') {
