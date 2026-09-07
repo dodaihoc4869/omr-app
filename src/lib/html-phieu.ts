@@ -378,6 +378,11 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
 .q-tag.level-2 { background: #fce7f3; color: #9d174d; }
 .q-tag.level-3 { background: #fed7aa; color: #9a3412; }
 .q-tag.topic { background: #f1f5f9; color: #475569; }
+/* NHÃN CHỮA — câu này rút ra để chữa câu sai nào. Thầy hỏi thẳng 07/09:
+   "phải thể hiện trong báo cáo là câu này khắc phục lỗi sai cho câu sai nào".
+   Để nổi hơn ba nhãn kia vì đó là lý do câu này có mặt trên phiếu. */
+.q-tag.chua { background: #0f766e; color: #ffffff; }
+.q-tag.chua-2 { background: #ccfbf1; color: #115e59; }
 
 /* Vùng bấm: cả thân câu. Con trỏ hình bàn tay để thấy ngay là bấm được. */
 .q-than { padding: 10px 16px 14px; cursor: pointer; }
@@ -667,7 +672,11 @@ const MUI_TEN = '<svg class="q-mui" viewBox="0 0 24 24" fill="none" stroke="curr
  * `stt` là số thứ tự liên tục trên cả phiếu.
  * `moSan` = true thì thẻ hiện sẵn lời giải (chỉ dùng khi cần bản đọc thẳng). */
 export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = false): string {
+  // Nhãn CHỮA đứng trước mọi nhãn khác: đọc một dòng là biết câu này có mặt
+  // ở đây để sửa lỗi nào, không phải "một câu Ester bất kỳ".
+  const n = c.chuaCho
   const tags = [
+    n ? `<span class="q-tag chua${n.bac === 2 ? ' chua-2' : ''}">Chữa câu ${n.soCau}${n.bac === 2 ? ' · gần dạng' : ''}</span>` : '',
     `<span class="q-tag ${LOP_LOAI[c.phan]}">${TEN_LOAI[c.phan]}</span>`,
     c.mucDo ? `<span class="q-tag ${LOP_MUC[c.mucDo]}">${TEN_MUC[c.mucDo]}</span>` : '',
     c.chuyenDe ? `<span class="q-tag topic">${thoat(c.chuyenDe)}</span>` : '',

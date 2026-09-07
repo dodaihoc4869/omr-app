@@ -12,6 +12,7 @@ import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion,
 import type { CaCuaEm, ChiTietCauRow, ChuyenDeEm, HoSoEm } from './exam-api'
 import { ducKetKienThuc, thongKeLamBai, tinHieuLamBai, type DucKetChuyenDe, type ThongKeLamBai, type TinHieuLamBai } from './phan-tich-lam-bai'
 import { cauLuyenTuBoCau, cauLuyenTuNguon, chonCauLuyen, type CauLuyen } from './bai-tap-pdf'
+import { rutDeChua } from './rut-de-chua'
 import type { LocDang } from './dang-cau'
 import { mocRoiMan } from './chong-gian-lan'
 
@@ -117,6 +118,8 @@ export interface PhieuDayDu {
    * một nút là tải được phiếu PDF ngay trên máy mình — không phải chờ thầy gửi
    * thêm file. Rút lúc thầy tạo báo cáo, ở máy thầy, nơi có cả kho đề. */
   baiTap?: CauLuyen[]
+  /** Vì sao chưa đủ câu chữa — nói thật thay vì lấy bừa cho đủ. */
+  thieuChua?: string[]
   /** LINK PHIẾU BÀI TẬP đã cất sẵn trên kho, để phụ huynh copy gửi thẳng cho
    * con — con mở link là làm bài, không phải mở báo cáo của phụ huynh.
    *
@@ -507,10 +510,30 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
     .map((c) => ({ ten: c.ten, tiLeSai: c.soSai / Math.max(1, c.soCau) }))
     .sort((a, b) => b.tiLeSai - a.tiLeSai)
   const kho = n.khoDe ?? []
-  const baiTap =
-    kho.length > 0
-      ? chonCauLuyen(kho, { chuyenDe: yeuCa, chuyenDeCa: phamViCa, dang: n.dangBaiTap, qidDaLam: n.qidDaLam ?? [], soCau: SO_CAU_BAI_TAP_KEM }).cau
-      : []
+
+  // BÀI LUYỆN ĐI QUA CỔNG `rutDeChua` — thầy chỉ ra 07/09: "em Tuân thi Ester
+  // nhưng lại gán câu xà phòng". Đúng: `chonCauLuyen` chỉ bó theo CHUYÊN ĐỀ,
+  // mà xà phòng cũng là Ester, nên nó vào phiếu dù em không sai dạng đó. Cổng
+  // so MÃ DẠNG của đúng câu em làm sai.
+  //
+  // BƯỚC LUI, và vì sao nó phải còn.
+  //
+  // Bản nháp đầu: em có sai mà kho hết câu cùng dạng thì để phiếu TRỐNG. Test
+  // `tao-phieu-ca-ca` bắt ngay — trống thì không dựng phiếu bài tập, phiếu kết
+  // quả mất `linkBaiTap`, báo cáo mất hai nút copy. Đúng lỗi thầy đã truy mấy
+  // hôm liền. Không được đổi một lỗi lấy một lỗi.
+  //
+  // Nên: cổng ra câu nào thì dùng câu đó, và MỌI câu đó đều mang nhãn chữa. Cổng
+  // ra rỗng thì mới lui về bài luyện chung của chuyên đề — những câu ấy KHÔNG
+  // mang nhãn chữa, và `thieuChua` nói thẳng đây không phải câu chữa. Thà nói
+  // "chưa đủ câu cùng dạng" còn hơn dán nhãn chữa lên một câu khác dạng.
+  const coCauSai = rows.some((r) => r.dungSai === false)
+  const kqChua = kho.length > 0 && coCauSai ? rutDeChua({ khoDe: kho, rows, qidTranh: n.qidDaLam ?? [] }) : null
+  const phaiLui = kho.length > 0 && (kqChua === null || kqChua.cau.length === 0)
+  const baiTap = phaiLui
+    ? chonCauLuyen(kho, { chuyenDe: yeuCa, chuyenDeCa: phamViCa, dang: n.dangBaiTap, qidDaLam: n.qidDaLam ?? [], soCau: SO_CAU_BAI_TAP_KEM }).cau
+    : (kqChua?.cau ?? [])
+  const luiCoSai = phaiLui && coCauSai
 
   return {
     v: BAN_PHIEU,
@@ -543,6 +566,11 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
     dai: rows.map((r) => ({ nhan: `Phần ${r.phan} câu ${r.soCau}`, giay: r.giay, dung: Boolean(r.dungSai) })),
     viPham: dungViPham(n.viPham),
     baiTap,
+    thieuChua: (() => {
+      const ds = kqChua ? kqChua.thieu.map((t) => `Câu ${t.soCau}: ${t.vi}`) : []
+      if (luiCoSai) ds.push('Kho chưa đủ câu cùng dạng với câu em sai — phần dưới là bài luyện chung của chuyên đề, không phải câu chữa.')
+      return ds.length > 0 ? ds : undefined
+    })(),
     linkBaiTap: n.linkBaiTap || undefined,
     deCuaEm: deCuaEmTuRows(rows, banks),
   }
