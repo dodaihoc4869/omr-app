@@ -38,7 +38,10 @@ vi.mock('../src/lib/exam-api', async () => {
   }
   return {
     ...that,
-    danhSachCa: ghi('danhSachCa'),
+    danhSachCa: (url: string, mat: string, ...them: unknown[]) => {
+      goi.push({ ten: 'danhSachCa', url, mat, them })
+      return Promise.resolve(boDo.caTra)
+    },
     danhSachEm: ghi('danhSachEm'),
     phieuTheoCa: ghi('phieuTheoCa'),
     chiTietCa: (url: string, mat: string, ...them: unknown[]) => {
@@ -48,6 +51,39 @@ vi.mock('../src/lib/exam-api', async () => {
   }
 })
 
+// Đồng bộ hàng loạt: đo THỨ TỰ và SỐ LƯỢT gọi, không gọi mạng thật.
+//
+// Đặt trong `vi.hoisted` vì `vi.mock` được nâng lên đầu tệp: nhà máy giả lập
+// đọc mấy biến này, mà `let`/`const` thường thì lúc ấy chưa khởi tạo. Bộ kiểm
+// `khong-dung-bien-truoc-khi-khai` bắt đúng chỗ đó.
+const boDo = vi.hoisted(() => ({
+  nhatKy: [] as string[],
+  caTra: [] as { maCa: string; tenCa: string; trangThai: string }[],
+  caHong: '',
+}))
+const nhatKy = boDo.nhatKy
+vi.mock('../src/lib/exam-sync', () => ({
+  dongBoNganHang: (_u: string, _m: string, ep?: boolean) => {
+    nhatKy.push(`kho:${ep === true ? 'ep' : 'thuong'}`)
+    return Promise.resolve({ moi: [], capNhat: [], giuNguyen: 0, loi: [], canXem: [], danhSach: [], caCapNhat: 0 })
+  },
+}))
+vi.mock('../src/lib/phieu-ca-ca', () => ({
+  // GHI CẢ LÚC BẮT ĐẦU VÀ LÚC XONG, và cố ý nhường một nhịp ở giữa.
+  //
+  // Bản đầu tôi chỉ ghi lúc bắt đầu rồi trả `Promise.resolve` ngay. Test "chạy
+  // tuần tự" khi ấy KHÔNG đo được gì: đổi vòng lặp sang `Promise.all` vẫn xanh,
+  // tôi đã phá mã để thử và nó lọt. Có nhịp `await` ở giữa thì chạy song song
+  // sẽ đẩy mọi `bd:` lên trước mọi `xong:`, và test bắt được.
+  taoPhieuCaCa: async (_u: string, _m: string, maCa: string, _g: string, _b: unknown, taoLai?: boolean) => {
+    nhatKy.push(`bd:${maCa}:${taoLai === true ? 'taoLai' : 'giu'}`)
+    await new Promise((r) => setTimeout(r, 0))
+    nhatKy.push(`xong:${maCa}`)
+    if (maCa === boDo.caHong) throw new Error('máy chủ từ chối')
+    return { dong: [{ sbd: '1' }, { sbd: '2' }], soMoi: 2, loi: [] }
+  },
+}))
+
 import { TEN_CAU_NOI, dungCauNoi, ganCauNoi, goCauNoi, type CauNoiDdh } from '../src/lib/cau-noi-ddh'
 
 type CuaSo = { [TEN_CAU_NOI]?: CauNoiDdh }
@@ -56,6 +92,9 @@ beforeEach(() => {
   daMoKhoa = false
   maTrongDia = ''
   goi.length = 0
+  nhatKy.length = 0
+  boDo.caTra = []
+  boDo.caHong = ''
   goCauNoi()
 })
 
@@ -183,5 +222,90 @@ describe('Cầu nối gắn ĐÚNG CHỖ trong App', () => {
     expect(hieuUng).toContain('laPhieu')
     expect(hieuUng).toContain("khoa !== 'da_mo'")
     expect(hieuUng).toContain('goCauNoi()')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// ĐỒNG BỘ TỪ CŨ TỚI MỚI — thầy chốt 07/09: "làm xong hết tất cả đồng bộ từ cũ
+// tới mới rồi báo lại".
+//
+// Một lệnh phải làm đúng hai việc theo ĐÚNG THỨ TỰ: tải lại kho TRƯỚC, dựng lại
+// phiếu SAU. Đảo thứ tự là dựng lại phiếu bằng kho cũ, tức chép lại đúng cái sai
+// vừa sửa xong.
+describe('dongBoMoiCa — một lệnh đồng bộ toàn bộ ca cũ', () => {
+  it('tải lại kho TRƯỚC rồi mới dựng lại từng ca', async () => {
+    daMoKhoa = true
+    boDo.caTra = [
+      { maCa: 'CA1', tenCa: 'Ester buổi 1', trangThai: 'dong' },
+      { maCa: 'CA2', tenCa: 'Ester buổi 2', trangThai: 'mo' },
+    ]
+    const kq = await dungCauNoi().dongBoMoiCa()
+    expect(nhatKy).toEqual(['kho:ep', 'bd:CA1:taoLai', 'xong:CA1', 'bd:CA2:taoLai', 'xong:CA2'])
+    expect(kq.tongEm).toBe(4)
+    expect(kq.tongPhieuMoi).toBe(4)
+    expect(kq.caLoi).toBe(0)
+  })
+
+  it('ÉP tải lại kho, không so phiên bản — kho vừa sửa mã tại chỗ, số hiệu không đổi', async () => {
+    daMoKhoa = true
+    boDo.caTra = []
+    await dungCauNoi().dongBoMoiCa()
+    expect(nhatKy).toEqual(['kho:ep'])
+  })
+
+  it('BỎ QUA ca đã xoá', async () => {
+    daMoKhoa = true
+    boDo.caTra = [
+      { maCa: 'CA1', tenCa: 'còn', trangThai: 'dong' },
+      { maCa: 'CA9', tenCa: 'đã xoá', trangThai: 'da_xoa' },
+    ]
+    const kq = await dungCauNoi().dongBoMoiCa()
+    expect(nhatKy).toEqual(['kho:ep', 'bd:CA1:taoLai', 'xong:CA1'])
+    expect(kq.ca.map((c) => c.maCa)).toEqual(['CA1'])
+  })
+
+  it('một ca hỏng KHÔNG chặn các ca còn lại, và lỗi được ghi ra', async () => {
+    daMoKhoa = true
+    boDo.caTra = [
+      { maCa: 'CA1', tenCa: 'a', trangThai: 'dong' },
+      { maCa: 'CA2', tenCa: 'b', trangThai: 'dong' },
+      { maCa: 'CA3', tenCa: 'c', trangThai: 'dong' },
+    ]
+    boDo.caHong = 'CA2'
+    const kq = await dungCauNoi().dongBoMoiCa()
+    expect(nhatKy.filter((x) => x.startsWith('bd:'))).toEqual(['bd:CA1:taoLai', 'bd:CA2:taoLai', 'bd:CA3:taoLai'])
+    expect(kq.caLoi).toBe(1)
+    expect(kq.ca.find((c) => c.maCa === 'CA2')?.loi).toMatch(/từ chối/)
+    expect(kq.tongEm).toBe(4)
+  })
+
+  it('CHẠY TUẦN TỰ, không bắn song song vào Apps Script', async () => {
+    daMoKhoa = true
+    boDo.caTra = Array.from({ length: 5 }, (_, i) => ({ maCa: `CA${i + 1}`, tenCa: 't', trangThai: 'dong' }))
+    await dungCauNoi().dongBoMoiCa()
+    // Mỗi lượt phải ĐÓNG rồi lượt sau mới MỞ. Chạy song song thì năm dòng `bd:`
+    // dồn lên trước mọi `xong:` và dãy này lệch ngay.
+    expect(nhatKy).toEqual([
+      'kho:ep',
+      'bd:CA1:taoLai', 'xong:CA1',
+      'bd:CA2:taoLai', 'xong:CA2',
+      'bd:CA3:taoLai', 'xong:CA3',
+      'bd:CA4:taoLai', 'xong:CA4',
+      'bd:CA5:taoLai', 'xong:CA5',
+    ])
+  })
+
+  it('bỏ bước tải kho khi vừa tải xong', async () => {
+    daMoKhoa = true
+    boDo.caTra = [{ maCa: 'CA1', tenCa: 'a', trangThai: 'dong' }]
+    const kq = await dungCauNoi().dongBoMoiCa({ boTaiKho: true })
+    expect(nhatKy).toEqual(['bd:CA1:taoLai', 'xong:CA1'])
+    expect(kq.kho).toBeUndefined()
+  })
+
+  it('app đang KHOÁ thì hỏng ngay, không đụng tới ca nào', async () => {
+    daMoKhoa = false
+    await expect(dungCauNoi().dongBoMoiCa()).rejects.toThrow(/khoá/i)
+    expect(nhatKy).toEqual([])
   })
 })

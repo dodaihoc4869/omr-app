@@ -38,6 +38,11 @@ const DA_RA_SOAT: Record<string, string[]> = {
   'src/screens/NganHangDeScreen.tsx': ['taiLocal'],
   // Hằng bảng tên, dùng trong thân hàm xuất ra ngoài.
   'src/lib/goi-len-bang.ts': ['TEN_MUC'],
+  // `vi.hoisted()` — chính là CÁCH ĐÚNG để né bẫy này trong vitest: vitest cẩu
+  // khối `hoisted` lên trên mọi `vi.mock`, nên tới lúc nhà máy giả lập chạy thì
+  // `boDo` đã có giá trị. Máy soi tĩnh không biết luật cẩu riêng của vitest nên
+  // vẫn kêu; đã đọc tay và xác nhận an toàn.
+  'tests/cau-noi-ddh.test.ts': ['boDo'],
 }
 
 interface Nhan {

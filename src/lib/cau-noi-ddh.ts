@@ -26,6 +26,7 @@
 import { coMaBiMatPhien, loadScriptUrl, loadTeacherSecret } from './exam-db'
 import { chiTietCa, danhSachCa, danhSachEm, phieuTheoCa, type ChiTietCa, type CaTomTat, type EmTomTat, type PhieuCuaCa } from './exam-api'
 import { taoPhieuCaCa, type KetQuaTaoPhieuCaCa } from './phieu-ca-ca'
+import { dongBoNganHang, type KetQuaDongBo } from './exam-sync'
 import { taoLinkPhieu } from './phieu-link'
 
 /** Tên biến trên `window`. Một chỗ khai, để bộ kiểm và tài liệu không lệch. */
@@ -42,6 +43,24 @@ export interface CauNoiDdh {
   taoPhieuCaCa: (maCa: string, taoLai?: boolean) => Promise<KetQuaTaoPhieuCaCa>
   /** Dựng link `/p#<mã>` từ một mã phiếu đã có. Thuần chuỗi, không gọi máy chủ. */
   linkPhieu: (ma: string) => string
+  /** TẢI LẠI KHO ĐỀ về máy này. `epTaiLai` bỏ qua so sánh phiên bản và tải hết.
+   *
+   * Cần cho việc đồng bộ hàng loạt: kho vừa được sửa mã dạng hoặc gắn nhãn mới
+   * mà máy này còn giữ bản cũ thì dựng lại phiếu chỉ dựng lại cái sai cũ. */
+  dongBoKho: (epTaiLai?: boolean) => Promise<KetQuaDongBo>
+  /** ĐỒNG BỘ TỪ CŨ TỚI MỚI, một lệnh: tải lại kho rồi dựng lại phiếu cho MỌI
+   * ca đã thi, giữ nguyên mã phiếu cũ nên link đã gửi phụ huynh vẫn sống.
+   *
+   * `bo` để bỏ qua bước tải kho khi vừa tải xong. */
+  dongBoMoiCa: (tuyChon?: { boTaiKho?: boolean }) => Promise<TomTatDongBoMoiCa>
+}
+
+export interface TomTatDongBoMoiCa {
+  kho?: KetQuaDongBo
+  ca: { maCa: string; tenCa: string; soEm: number; soPhieuMoi: number; loi: string }[]
+  tongEm: number
+  tongPhieuMoi: number
+  caLoi: number
 }
 
 /** Gốc đường dẫn app — `taoLinkPhieu` cần nó để dựng link phụ huynh mở được. */
@@ -88,6 +107,32 @@ export function dungCauNoi(): CauNoiDdh {
       return taoPhieuCaCa(url, mat, String(maCa || '').trim(), gocApp(), () => {}, taoLai === true)
     },
     linkPhieu: (ma) => taoLinkPhieu(gocApp(), String(ma || '').trim()),
+    dongBoKho: async (epTaiLai) => {
+      const { url, mat } = await chia()
+      return dongBoNganHang(url, mat, epTaiLai === true)
+    },
+    dongBoMoiCa: async (tuyChon) => {
+      const { url, mat } = await chia()
+      // 1. Kho trước. Dựng lại phiếu bằng kho cũ là chép lại đúng cái sai cũ.
+      const kho = tuyChon?.boTaiKho === true ? undefined : await dongBoNganHang(url, mat, true)
+      // 2. Từng ca, TUẦN TỰ. Chạy song song là bắn hàng trăm lượt gọi vào Apps
+      //    Script cùng lúc rồi ăn hạn mức; chậm mà xong hơn nhanh mà hỏng.
+      const ds = await danhSachCa(url, mat)
+      const ra: TomTatDongBoMoiCa = { kho, ca: [], tongEm: 0, tongPhieuMoi: 0, caLoi: 0 }
+      for (const c of ds) {
+        if (c.trangThai === 'da_xoa') continue
+        try {
+          const kq = await taoPhieuCaCa(url, mat, c.maCa, gocApp(), () => {}, true)
+          ra.ca.push({ maCa: c.maCa, tenCa: c.tenCa, soEm: kq.dong.length, soPhieuMoi: kq.soMoi, loi: '' })
+          ra.tongEm += kq.dong.length
+          ra.tongPhieuMoi += kq.soMoi
+        } catch (e) {
+          ra.caLoi += 1
+          ra.ca.push({ maCa: c.maCa, tenCa: c.tenCa, soEm: 0, soPhieuMoi: 0, loi: e instanceof Error ? e.message : String(e) })
+        }
+      }
+      return ra
+    },
   }
 }
 
