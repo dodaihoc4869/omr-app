@@ -8,7 +8,7 @@
 // nó không phải nguồn hàng. Vì vậy phần đếm nguồn hàng gọi thẳng `ungVienChua`
 // của cổng, không tự đếm lại theo luật riêng — đếm riêng là báo số dối.
 import type { TeacherExamSource } from '../data/examContent'
-import { nhanhCoChe, SO_CAU_MOI_CAU_SAI } from './cau-hinh-chua'
+import { nhanhCoChe } from './cau-hinh-chua'
 import { ungVienChua } from './rut-de-chua'
 import { maTrongTuVung } from './tu-vung-dang'
 
@@ -125,9 +125,14 @@ export function thongKeDang(khoDe: TeacherExamSource[]): ThongKeDang {
     if (n) dungTheoNhanh.set(n, (dungTheoNhanh.get(n) ?? 0) + 1)
   }
 
-  // Một câu sai cần SO_CAU_MOI_CAU_SAI câu khác cùng mã. Chính nó cũng nằm
-  // trong kho nên phải có từ (SO_CAU_MOI_CAU_SAI + 1) câu thì mới đủ.
-  const can = SO_CAU_MOI_CAU_SAI + 1
+  // Một câu sai cần ít nhất HAI câu khác cùng mã thì phiếu chữa mới ra hồn.
+  // Chính nó cũng nằm trong kho nên phải có từ BA câu.
+  //
+  // v4 bỏ `SO_CAU_MOI_CAU_SAI` (trần cứng mỗi câu sai) — số câu giờ do thầy kéo.
+  // Nhưng thống kê vẫn cần MỘT ngưỡng để nói "mã này đủ hàng hay không", và ba
+  // là ngưỡng thấp nhất còn có nghĩa.
+  const NGUONG_DU_HANG = 3
+  const can = NGUONG_DU_HANG
   let duBac1 = 0
   let duBac2 = 0
   for (const [ma, n] of dem) {

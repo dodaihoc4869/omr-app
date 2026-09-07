@@ -63,7 +63,7 @@ function nut(chinh: boolean): React.CSSProperties {
 export interface NutPhieuHtmlProps {
   /** Dựng dữ liệu phiếu. Gọi lúc bấm nút chứ không lúc vẽ — rút câu là việc
    * nặng, không làm khi thầy chỉ đi ngang qua màn hình. */
-  dungGoi: () => Promise<{ tt: ThongTinPhieu; cau: CauLuyen[]; maCa?: string; sbd?: string } | null>
+  dungGoi: () => Promise<{ tt: ThongTinPhieu; cau: CauLuyen[]; maCa?: string; sbd?: string; thieuChua?: { soCau: number; tenDang: string; vi: string }[] } | null>
   /** Nhãn nút xem, vd "Xem phiếu bài tập". */
   nhanXem: string
   showToast: (chu: string, kieu?: 'success' | 'error' | 'warn') => void
@@ -93,7 +93,7 @@ export default function NutPhieuHtml({ dungGoi, nhanXem, showToast, choPhepLink 
       const g = await dungGoi()
       if (!g) return
       const { dungPhieu } = await napDong(() => import('../lib/html-phieu'))
-      setHtmlPhieu(dungPhieu(g.tt, g.cau))
+      setHtmlPhieu(dungPhieu(g.tt, g.cau, { thieuChua: g.thieuChua }))
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không dựng được phiếu', 'error')
     } finally {

@@ -4,18 +4,20 @@
 
 import type { MucDoCau } from './bai-tap-pdf'
 
-/** Số câu chữa cho MỖI câu sai. */
-export const SO_CAU_MOI_CAU_SAI = 2
-
-/** Tổng câu chữa một phiếu. */
-export const TRAN_CAU_CHUA = 10
-
-/** Cho phép lấy câu CÙNG NHÁNH CƠ CHẾ khi hết câu cùng mã (bậc 2).
+/** Vị trí ban đầu của thanh kéo, và số câu cho chỗ KHÔNG có màn (báo cáo phụ
+ * huynh). Đặc tả v4 mục 3.
  *
- * Tắt thì hết câu cùng mã là dừng hẳn. Bật thì được nới đúng MỘT tầng — cùng
- * chuyên đề VÀ cùng cơ chế, chỉ khác việc phải làm — và câu đó phải mang cờ
- * `bac: 2` để thầy nhìn ra ngay. Không có tầng ba. */
-export const CHO_BAC_2 = true
+ * Đây là MẶC ĐỊNH, không phải TRẦN. v3 có `TRAN_CAU_CHUA = 10` chặn cứng nên
+ * thầy kéo bao nhiêu cũng chỉ ra 10; v4 bỏ hẳn: trần là `tongUngVien` — số câu
+ * kho THẬT SỰ có cùng nhãn với những câu em sai. */
+export const SO_CAU_MAC_DINH = 10
+
+/** Tính cả câu CÙNG CƠ CHẾ khác việc phải làm vào ứng viên (bậc 2).
+ *
+ * v4 hạ xuống `false`: bậc 2 là câu gần dạng chứ không đúng dạng, bật sẵn thì
+ * thầy tưởng mọi câu trong phiếu đều trúng lỗi. Bật ở màn Cài đặt khi cần, lúc
+ * đó max của thanh kéo đổi ngay tại chỗ. */
+export const CHO_BAC_2 = false
 
 /** Thứ tự ưu tiên chữa: sai câu nhận biết là hổng nền, chữa trước. */
 export const UU_TIEN_BAC: MucDoCau[] = ['biet', 'hieu', 'van_dung']

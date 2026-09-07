@@ -398,6 +398,14 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
 .q-tag.chua-2::before { background: #c2410c; }
 /* Cả thẻ câu cũng đổi vạch trái: nhìn lướt là thấy câu nào là câu chữa. */
 .q-card.la-chua { border-left-color: #c2410c; }
+/* Khối "Phiếu này chữa gì" — đọc trước khi làm bài, nên đặt màu nhạt cùng họ
+   với nhãn chữa để mắt nối được hai thứ với nhau. */
+.chua-gi { background: #fff7ed; border: 1px solid #fed7aa; border-left: 4px solid #c2410c; border-radius: var(--bo); padding: 14px 16px; margin-bottom: 14px; }
+.chua-gi h3 { margin: 0 0 8px; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: #9a3412; }
+.chua-gi ul { margin: 0; padding-left: 18px; }
+.chua-gi li { margin: 4px 0; font-size: 14px; line-height: 1.5; }
+.chua-gi li.mo { color: #78716c; }
+.chua-gi .chua-mui { color: #c2410c; font-weight: 700; }
 .q-card.la-chua.mo { border-left-color: var(--luc); }
 
 /* Vùng bấm: cả thân câu. Con trỏ hình bàn tay để thấy ngay là bấm được. */
@@ -692,7 +700,8 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
   // ở đây để sửa lỗi nào, không phải "một câu Ester bất kỳ".
   const n = c.chuaCho
   const tags = [
-    n ? `<span class="q-tag chua${n.bac === 2 ? ' chua-2' : ''}">Chữa câu ${n.soCau}${n.bac === 2 ? ' · gần dạng' : ''}</span>` : '',
+    n ? `<span class="q-tag chua">Chữa câu ${n.soCau}</span>` : '',
+    n && n.bac === 2 ? '<span class="q-tag chua-2">cùng cơ chế, khác việc</span>' : '',
     `<span class="q-tag ${LOP_LOAI[c.phan]}">${TEN_LOAI[c.phan]}</span>`,
     c.mucDo ? `<span class="q-tag ${LOP_MUC[c.mucDo]}">${TEN_MUC[c.mucDo]}</span>` : '',
     c.chuyenDe ? `<span class="q-tag topic">${thoat(c.chuyenDe)}</span>` : '',
@@ -942,6 +951,36 @@ export function tongQuanHtml(cau: CauLuyen[]): string {
 </section>`
 }
 
+/** KHỐI "PHIẾU NÀY CHỮA GÌ" — đầu phiếu, v4 mục 6.
+ *
+ * Nhìn <= 2 giây phải biết câu nào chữa câu nào. Hiện TÊN DẠNG, KHÔNG hiện mã:
+ * mã là thứ nội bộ, phụ huynh và học sinh đọc vào chỉ thấy rối.
+ *
+ * Câu sai không có câu chữa vẫn phải có dòng, kèm lý do — im lặng bỏ qua là
+ * thầy tưởng phiếu đã chữa hết. */
+export function khoiChuaGiHtml(cau: CauLuyen[], thieu: { soCau: number; tenDang: string; vi: string }[] = []): string {
+  const gom = new Map<number, { ten: string; so: number }>()
+  for (const c of cau) {
+    const n = c.chuaCho
+    if (!n) continue
+    const cu = gom.get(n.soCau) ?? { ten: n.tenDang || '', so: 0 }
+    cu.so += 1
+    if (!cu.ten && n.tenDang) cu.ten = n.tenDang
+    gom.set(n.soCau, cu)
+  }
+  if (gom.size === 0 && thieu.length === 0) return ''
+  const dong = [...gom.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([so, v]) => `<li><b>Câu ${so}</b>${v.ten ? ` · ${thoat(v.ten)}` : ''} <span class="chua-mui">-&gt;</span> ${v.so} câu chữa</li>`)
+  const thieuDong = thieu
+    .filter((t) => !gom.has(t.soCau))
+    .map((t) => `<li class="mo"><b>Câu ${t.soCau}</b>${t.tenDang ? ` · ${thoat(t.tenDang)}` : ''} <span class="chua-mui">-&gt;</span> ${thoat(t.vi)}</li>`)
+  return `<section class="chua-gi">
+  <h3>Phiếu này chữa gì</h3>
+  <ul>${dong.join('')}${thieuDong.join('')}</ul>
+</section>`
+}
+
 /** Thanh dính đầu màn: đếm số câu đã mở + mở/đóng tất cả + in.
  *
  * `soCau` là số câu CÓ LỜI GIẢI, không phải tổng số câu — câu chưa có đáp án
@@ -1186,9 +1225,13 @@ export function boLoiGiai(c: CauLuyen): CauLuyen {
 export interface TuyChonPhieu {
   /** true = phiếu CHỈ CÓ ĐỀ (không đáp án, không lời giải, không nút mở). */
   anGiai?: boolean
+  /** Câu sai chưa có câu chữa, để khối đầu phiếu nói lý do. */
+  thieuChua?: { soCau: number; tenDang: string; vi: string }[]
 }
 
 export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChonPhieu = {}): string {
+  // `thieuChua` đi kèm phiếu để khối đầu phiếu nói được câu sai nào chưa có câu
+  // chữa — im lặng bỏ qua là thầy tưởng phiếu đã chữa hết.
   const anGiai = !!tuyChon.anGiai
   const cau = anGiai ? cauVao.map(boLoiGiai) : cauVao
   const the = cau.map((c, i) => theCauHtml(c, i + 1, false, anGiai)).join('\n')
@@ -1198,6 +1241,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
     : 'Bấm vào từng câu để xem lời giải. Muốn bản giấy thì bấm "In đề" (phát cho em tự làm) hoặc "In kèm lời giải", rồi chọn "Lưu thành PDF".'
   const than = `${biaHtml(t, cau.length)}
 <div class="khung">
+  ${khoiChuaGiHtml(cau, tuyChon.thieuChua ?? [])}
   ${tongQuanHtml(cau)}
   ${thanhHtml(coGiai, anGiai)}
   <div class="ds-cau">${the}</div>

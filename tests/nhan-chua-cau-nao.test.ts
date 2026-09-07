@@ -113,9 +113,12 @@ describe('phiếu HTML hiện nhãn "Chữa câu N"', () => {
     expect(h).toContain('Chữa câu 7')
   })
 
-  it('câu bậc 2 nói rõ là gần dạng, không giả vờ trùng khít', () => {
+  // v4 mục 6 đổi cách nói: chip riêng "cùng cơ chế, khác việc" thay cho đuôi
+  // "· gần dạng" — nói đúng bản chất bậc 2 thay vì một chữ mơ hồ.
+  it('câu bậc 2 có chip riêng nói rõ cùng cơ chế khác việc', () => {
     const h = theCauHtml(c({ qid: 'sai-7', soCau: 7, phan: 'I', maDang: HS, bac: 2 }), 1)
-    expect(h).toContain('Chữa câu 7 · gần dạng')
+    expect(h).toContain('Chữa câu 7')
+    expect(h).toContain('cùng cơ chế, khác việc')
   })
 
   it('câu luyện thường không có nhãn — không bịa ra chỗ chữa', () => {
@@ -211,7 +214,7 @@ describe('phiếu máy học sinh cũng đi qua cổng', () => {
 // câu sai" thành "TỐI THIỂU 2". Bản cũ ghi cứng 2 nên thầy kéo 40 câu vẫn chỉ
 // ra 2 câu cho mỗi câu sai.
 import { rutDeChua } from '../src/lib/rut-de-chua'
-import { SO_CAU_MOI_CAU_SAI } from '../src/lib/cau-hinh-chua'
+
 
 const nhieuCau = (ma: string, n: number, tien: string) =>
   Array.from({ length: n }, (_, i) => cau(`${tien}${i + 1}`, ma, `Câu ${tien}${i + 1}`))
@@ -238,11 +241,13 @@ describe('kéo nhiều câu thì chia đều cho các câu sai', () => {
     expect(Math.max(...dem.values())).toBe(2)
   })
 
-  it('vẫn giữ mức tối thiểu khi kho đủ hàng', () => {
+  // v4 bỏ hằng số "mỗi câu sai mấy câu". Xin 4 với 2 câu sai thì vòng tròn chia
+  // đôi: 2 mỗi câu.
+  it('xin 4 với 2 câu sai thì chia đôi, không lệch', () => {
     const kq = rutDeChua({ khoDe: K, rows: rows2, soCau: 4 })
     const dem = new Map<string, number>()
     for (const c of kq.cau) dem.set(c.chuaCho!.qid, (dem.get(c.chuaCho!.qid) ?? 0) + 1)
-    for (const n of dem.values()) expect(n).toBe(SO_CAU_MOI_CAU_SAI)
+    for (const n of dem.values()) expect(n).toBe(2)
   })
 
   it('kéo nhiều KHÔNG được phá luật dạng: không câu nào khác mã lọt vào', () => {

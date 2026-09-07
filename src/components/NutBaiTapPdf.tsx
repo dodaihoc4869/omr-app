@@ -14,7 +14,9 @@ import { useEffect, useState } from 'react'
 import { OThongBao } from './DesignSystem'
 import NutPhieuHtml from './NutPhieuHtml'
 import { tenTepBaiTap } from '../lib/bai-tap-pdf'
-import { rutDeChua, rutTuDo } from '../lib/rut-de-chua'
+import ThanhSoCauChua from './ThanhSoCauChua'
+import { SO_CAU_MAC_DINH } from '../lib/cau-hinh-chua'
+import { rutDeChua, rutTuDo, type PoolCauSai, type SuatThieu } from '../lib/rut-de-chua'
 import type { ChiTietCauRow } from '../lib/exam-api'
 import { LOC_DANG_MAC_DINH, MOI_LOC_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
 import { docQidRaPhieu, loadExamSources, loadScriptUrl, loadTeacherSecret, themQidRaPhieu, xoaQidRaPhieu } from '../lib/exam-db'
@@ -24,9 +26,10 @@ import { laYeu } from './HoSoEmView'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 
+/** v4 mục 9 cấm trần cứng số câu chữa: `SO_CAU_PDF_TOI_DA`/`TOI_THIEU` đã bỏ,
+ * trần nay là `tongUngVien` do kho quyết định. Giữ mặc định để màn không có câu
+ * sai (bài luyện thường) vẫn có điểm khởi đầu. */
 export const SO_CAU_PDF_MAC_DINH = 10
-export const SO_CAU_PDF_TOI_DA = 60
-export const SO_CAU_PDF_TOI_THIEU = 5
 /** Mức chọn nhanh — thầy bấm một cái là xong, khỏi kéo thanh trượt. */
 export const MUC_SO_CAU = [10, 20, 30, 40, 50, 60]
 
@@ -56,7 +59,7 @@ export default function NutBaiTapPdf({
   rows?: ChiTietCauRow[] | null
   showToast: (chu: string, kieu?: 'success' | 'error' | 'warn') => void
 }) {
-  const [soCau, setSoCau] = useState(SO_CAU_PDF_MAC_DINH)
+  const [soCau, setSoCau] = useState(SO_CAU_MAC_DINH)
   const [dang, setDang] = useState<LocDang>(LOC_DANG_MAC_DINH)
   // Mặc định BÓ trong ca. Thầy vẫn nới ra được khi muốn ôn rộng, nhưng phải
   // chủ động bấm — im lặng rút ngoài ca là thứ thầy vừa bắt được.
@@ -69,6 +72,28 @@ export default function NutBaiTapPdf({
   const phamVi = coPhamViCa && boTrongCa ? chuyenDeCa : undefined
   const [daRa, setDaRa] = useState(0)
   const [ketQua, setKetQua] = useState<{ soCau: number; lapLai: number; thieu: number; ten: string } | null>(null)
+  /** ĐẾM ỨNG VIÊN (v4 mục 4.2) — max của thanh kéo. Chạy thuần trên máy, không
+   * gọi mạng: đếm phải xong trước khi thầy kịp nhìn thanh. */
+  const [dem, setDem] = useState<{ tongUngVien: number; poolTheoCauSai: PoolCauSai[]; thieu: SuatThieu[] } | null>(null)
+  useEffect(() => {
+    let con = true
+    void (async () => {
+      if (!chuaDuoc) {
+        if (con) setDem(null)
+        return
+      }
+      const nguon = await loadExamSources()
+      const daInRa = await docQidRaPhieu(sbd)
+      const kq = rutDeChua({ khoDe: nguon, rows: rows ?? [], qidTranh: daInRa, soCau: 0 })
+      if (!con) return
+      setDem({ tongUngVien: kq.tongUngVien, poolTheoCauSai: kq.poolTheoCauSai, thieu: kq.thieu })
+      // Kẹp vị trí thanh xuống max mới — không để thanh chỉ 60 khi kho chỉ có 8.
+      setSoCau((n) => Math.min(n, Math.max(1, kq.tongUngVien)))
+    })()
+    return () => {
+      con = false
+    }
+  }, [chuaDuoc, rows, sbd])
 
   useEffect(() => {
     let con = true
@@ -131,7 +156,7 @@ export default function NutBaiTapPdf({
       await themQidRaPhieu(sbd, kq.cau.map((c) => c.id))
       setDaRa((n) => n + kq.cau.length)
       setKetQua({ soCau: kq.cau.length, lapLai: 'lapLai' in kq ? kq.lapLai : 0, thieu: kq.thieu.length, ten: tenTepBaiTap(hoTen, sbd) })
-      return { tt, cau: kq.cau, sbd }
+      return { tt, cau: kq.cau, sbd, maCa, thieuChua: kqChua?.thieu ?? [] }
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không tạo được phiếu bài tập', 'error')
       return null
@@ -205,45 +230,47 @@ export default function NutBaiTapPdf({
         </div>
       </div>
 
-      <div>
-        <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Số câu trong phiếu</div>
-        <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }}>
-          {MUC_SO_CAU.map((n) => (
-            <button
-              key={n}
-              type="button"
-              onClick={() => setSoCau(n)}
-              className="tap-target font-bold"
-              style={{
-                minHeight: 40,
-                padding: '0 var(--k4)',
-                borderRadius: 'var(--bo-tron)',
-                border: 'none',
-                background: soCau === n ? 'var(--phu-dam)' : 'var(--the-2)',
-                color: soCau === n ? 'var(--muc-nguoc)' : 'var(--muc)',
-                fontFamily: 'var(--sans)',
-                fontSize: 'var(--cx-2)',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {n}
-            </button>
-          ))}
-        </div>
-        <input
-          type="range"
-          min={SO_CAU_PDF_TOI_THIEU}
-          max={SO_CAU_PDF_TOI_DA}
-          step={1}
-          value={soCau}
-          onChange={(e) => setSoCau(Number(e.target.value))}
-          aria-label="Số câu trong phiếu"
-          style={{ width: '100%', marginTop: 'var(--k3)', accentColor: 'var(--phu-dam)' }}
+      {/* THANH KÉO DÙNG CHUNG (v4 mục 6). Trần là `tongUngVien`, không phải
+          một con số cứng của riêng màn này. */}
+      {chuaDuoc && dem ? (
+        <ThanhSoCauChua
+          soCau={soCau}
+          onDoi={setSoCau}
+          tongUngVien={dem.tongUngVien}
+          poolTheoCauSai={dem.poolTheoCauSai}
+          thieu={dem.thieu}
+          soCauSai={dem.poolTheoCauSai.length}
+          
         />
-        <div style={NHAN_NHO}>
-          Đang chọn <b style={{ color: 'var(--muc)' }}>{soCau} câu</b> · tối đa {SO_CAU_PDF_TOI_DA}
+      ) : (
+        <div>
+          <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Số câu trong phiếu</div>
+          <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }}>
+            {MUC_SO_CAU.map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setSoCau(n)}
+                className="tap-target font-bold"
+                style={{
+                  minHeight: 40,
+                  padding: '0 var(--k4)',
+                  borderRadius: 'var(--bo-tron)',
+                  border: 'none',
+                  background: soCau === n ? 'var(--phu-dam)' : 'var(--the-2)',
+                  color: soCau === n ? 'var(--muc-nguoc)' : 'var(--muc)',
+                  fontFamily: 'var(--sans)',
+                  fontSize: 'var(--cx-2)',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+          <div style={NHAN_NHO}>Ca này chưa có câu sai nào để chữa — phiếu là bài luyện thường.</div>
         </div>
-      </div>
+      )}
 
       <NutPhieuHtml dungGoi={dungGoi} nhanXem={`Xem phiếu ${soCau} câu`} showToast={showToast} />
 

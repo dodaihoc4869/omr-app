@@ -120,8 +120,10 @@ describe('chuỗi kho -> nguồn -> cổng rút câu chữa chạy thông', () =
     // thì cổng phát tới khi hết hàng, không dừng ở 2. Kho có 4 câu cùng mã, trừ
     // chính câu sai và câu em đã làm ⇒ còn 3.
     const kq = rutDeChua({ khoDe: [nguon], rows: rowsSaiCau2(), soCau: 10 })
-    expect(kq.thieu).toEqual([])
     expect(kq.cau.length).toBe(3)
+    // v4: xin 10 mà kho chỉ có 3 câu cùng dạng thì phải NÓI ra, không nuốt.
+    expect(kq.thieu[0].vi).toMatch(/chỉ còn 3\/10/)
+    expect(kq.tongUngVien).toBe(3)
     for (const c of kq.cau) {
       expect(c.chuaCho?.maDang).toBe(MA)
       expect(c.id).not.toBe('12-C1-B9-I-2')

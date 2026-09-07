@@ -6,7 +6,7 @@ import { readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { cauSaiTuRows, rutDeChua, xepUuTienChua } from '../src/lib/rut-de-chua'
-import { CHO_BAC_2, SO_CAU_MOI_CAU_SAI, TRAN_CAU_CHUA, maDangHopLe, nhanhCoChe } from '../src/lib/cau-hinh-chua'
+import { CHO_BAC_2, SO_CAU_MAC_DINH, maDangHopLe, nhanhCoChe } from '../src/lib/cau-hinh-chua'
 import type { TeacherExamSource, TeacherMcqQuestion } from '../src/data/examContent'
 import type { ChiTietCauRow } from '../src/lib/exam-api'
 
@@ -82,7 +82,9 @@ describe('mục 8 — KHÔNG lấy câu kiến thức khác', () => {
   })
 
   it('hết bậc 2 là DỪNG, không có tầng ba', () => {
-    const kq = rutDeChua({ khoDe: kho([q('sai-7', HS), q('kl-1', KL), q('dp-1', DP), q('am-1', AM)]), rows: rowsSaiCau7(), soCau: 10 })
+    // v4 hạ `CHO_BAC_2` xuống false, nên bậc 2 phải bật rõ ràng cho lượt này.
+    // Luật bên trong không đổi: hết bậc 2 là dừng, cấm tụt xuống chuyên đề.
+    const kq = rutDeChua({ khoDe: kho([q('sai-7', HS), q('kl-1', KL), q('dp-1', DP), q('am-1', AM)]), rows: rowsSaiCau7(), soCau: 10, choBac2: true })
     expect(kq.cau.map((c) => c.id)).toEqual(['kl-1'])
     expect(kq.cau[0].chuaCho!.bac).toBe(2)
   })
@@ -117,15 +119,18 @@ describe('mục 8 — nhãn', () => {
 })
 
 describe('mục 8 — một câu sai nhiều câu chữa', () => {
-  it('2 câu sai, mỗi câu nhận đúng SO_CAU_MOI_CAU_SAI câu', () => {
+  // v4 bỏ `SO_CAU_MOI_CAU_SAI` (trần cứng mỗi câu sai). Số câu do thầy kéo, và
+  // kho ở đây chỉ có 2 câu cho mỗi mã nên vét sạch vẫn là 2 mỗi câu sai.
+  it('2 câu sai, kho có 2 câu mỗi mã: mỗi câu sai nhận đủ 2, không ai bị bỏ', () => {
     const k = kho([q('s1', HS), q('s2', AM), q('hs-1', HS), q('hs-2', HS), q('am-1', AM), q('am-2', AM)])
     const rows = [row(3, 's1', 'hieu', false), row(9, 's2', 'hieu', false)]
-    const kq = rutDeChua({ khoDe: k, rows, soCau: TRAN_CAU_CHUA })
+    const kq = rutDeChua({ khoDe: k, rows, soCau: SO_CAU_MAC_DINH })
     const dem = new Map<string, number>()
     for (const c of kq.cau) dem.set(c.chuaCho!.qid, (dem.get(c.chuaCho!.qid) ?? 0) + 1)
-    expect(dem.get('s1')).toBe(SO_CAU_MOI_CAU_SAI)
-    expect(dem.get('s2')).toBe(SO_CAU_MOI_CAU_SAI)
-    expect(kq.cau.length).toBe(SO_CAU_MOI_CAU_SAI * 2)
+    expect(dem.get('s1')).toBe(2)
+    expect(dem.get('s2')).toBe(2)
+    expect(kq.cau.length).toBe(4)
+    expect(kq.tongUngVien).toBe(4)
   })
 })
 
@@ -134,7 +139,9 @@ describe('mục 8 — thiếu thì báo, không lấy bừa', () => {
     const kq = rutDeChua({ khoDe: kho([q('sai-7', HS), q('hs-1', HS), q('dp-1', DP)]), rows: rowsSaiCau7(), soCau: 5 })
     expect(kq.cau.map((c) => c.id)).toEqual(['hs-1'])
     expect(kq.thieu.length).toBe(1)
-    expect(kq.thieu[0].vi).toMatch(/chỉ còn 1\/2/)
+    // v4: mẫu số là SỐ THẦY XIN, không còn là hằng số 2. Thầy kéo 5 mà kho chỉ
+    // có 1 câu cùng dạng thì phải nói đúng "1/5".
+    expect(kq.thieu[0].vi).toMatch(/chỉ còn 1\/5/)
   })
 })
 
@@ -228,10 +235,10 @@ describe('luật xếp và cắt', () => {
     expect(ds.map((c) => c.qid)).toEqual(['c'])
   })
 
-  it('cấu hình v3 đúng mặc định đặc tả', () => {
-    expect(SO_CAU_MOI_CAU_SAI).toBe(2)
-    expect(TRAN_CAU_CHUA).toBe(10)
-    expect(CHO_BAC_2).toBe(true)
+  it('cấu hình v4 đúng mặc định đặc tả', () => {
+    expect(SO_CAU_MAC_DINH).toBe(10)
+    // v4 mục 3: bậc 2 TẮT sẵn — bật thì thầy tưởng mọi câu đều trúng lỗi.
+    expect(CHO_BAC_2).toBe(false)
   })
 })
 

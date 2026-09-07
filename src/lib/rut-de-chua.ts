@@ -34,7 +34,7 @@
 import type { TeacherExamSource } from '../data/examContent'
 import type { ChiTietCauRow } from './exam-api'
 import { cauLuyenTuNguon, chonCauLuyen, type CauLuyen, type MucDoCau } from './bai-tap-pdf'
-import { CHO_BAC_2, SO_CAU_MOI_CAU_SAI, TRAN_CAU_CHUA, hangUuTien, nhanhCoChe } from './cau-hinh-chua'
+import { CHO_BAC_2, SO_CAU_MAC_DINH, hangUuTien, nhanhCoChe } from './cau-hinh-chua'
 
 /** Nhãn gắn lên MỘT câu chữa. Đúng một, không phải mảng: một câu chữa phục vụ
  * một câu sai để nhãn hiện ra không mập mờ. Chiều ngược lại mới là một–nhiều. */
@@ -44,6 +44,9 @@ export interface NhanChua {
   phan: 'I' | 'II' | 'III'
   /** Mã dạng của CÂU SAI. Câu chữa bậc 1 phải trùng đúng mã này. */
   maDang: string
+  /** Tên dạng cho người đọc. Phiếu hiện TÊN, không hiện mã — mã là thứ nội bộ
+   * (v4 mục 6). */
+  tenDang: string
   /** 1 = trùng đúng mã. 2 = cùng chuyên đề và cùng cơ chế, khác việc phải làm. */
   bac: 1 | 2
 }
@@ -64,10 +67,24 @@ export interface CauSaiCanChua {
   tenDang: string
 }
 
+/** Số ứng viên riêng của một câu sai — đặc tả v4 mục 4.2. */
+export interface PoolCauSai {
+  qid: string
+  soCau: number
+  tenDang: string
+  pool: number
+}
+
 export interface KetQuaRutChua {
   cau: CauLuyen[]
   thieu: SuatThieu[]
-  /** Số câu sai bị cắt vì chạm `TRAN_CAU_CHUA` — phải nói ra, không nuốt. */
+  /** MAX CỦA THANH KÉO. Số câu PHÂN BIỆT trong cả kho mang nhãn của những câu
+   * em sai. Một câu khớp nhãn hai câu sai chỉ đếm MỘT lần — đếm hai lần là kéo
+   * tới max rồi trả thiếu câu. */
+  tongUngVien: number
+  /** Pool riêng từng câu sai, để màn hình nói được câu nào hết câu chữa. */
+  poolTheoCauSai: PoolCauSai[]
+  /** Số câu sai không được suất nào vì thầy đặt số câu quá nhỏ. */
   capBiCat: number
 }
 
@@ -119,7 +136,11 @@ export interface YeuCauRutChua {
   khoDe: TeacherExamSource[]
   rows: ChiTietCauRow[]
   qidTranh?: string[]
+  /** Thầy kéo tới bao nhiêu. Thiếu thì lấy `SO_CAU_MAC_DINH`. KHÔNG có trần
+   * cứng: kéo bao nhiêu thì phát bấy nhiêu, chỉ dừng khi hết ứng viên. */
   soCau?: number
+  /** Ghi đè `CHO_BAC_2` cho một lượt rút (thanh kéo bật/tắt tại chỗ). */
+  choBac2?: boolean
 }
 
 interface UngVien {
@@ -155,8 +176,8 @@ export function ungVienChua(khoDe: TeacherExamSource[]): { cau: CauLuyen; ma: st
 
 /** CỔNG. Thuần logic, không đọc IndexedDB, KHÔNG GỌI MẠNG. */
 export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
-  const soCau = Math.max(0, Math.min(yc.soCau ?? TRAN_CAU_CHUA, TRAN_CAU_CHUA))
-  const ra: KetQuaRutChua = { cau: [], thieu: [], capBiCat: 0 }
+  const ra: KetQuaRutChua = { cau: [], thieu: [], tongUngVien: 0, poolTheoCauSai: [], capBiCat: 0 }
+  const choBac2 = yc.choBac2 ?? CHO_BAC_2
 
   const kho = ungVienChua(yc.khoDe)
   const traDang = (qid: string) => {
@@ -164,19 +185,17 @@ export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
     return t ? { ma: t.ma, ten: t.cau.chuyenDe } : null
   }
   const daXep = xepUuTienChua(cauSaiTuRows(yc.rows, traDang))
-  if (daXep.length === 0 || soCau === 0) return ra
+  if (daXep.length === 0) return ra
 
   const tranh = new Set([...(yc.qidTranh ?? []), ...daXep.map((c) => c.qid)])
-  const daDung = new Set<string>()
-  let conCho = soCau
 
-  // BƯỚC 3–6 — DỰNG SẴN xếp hạng ứng viên cho TỪNG câu sai, chưa lấy câu nào.
-  // Tách "xếp hạng" khỏi "chia suất" vì hai việc có luật khác nhau, gộp lại thì
-  // không chia đều được.
+  // ---- MỤC 4.2 — ĐẾM ỨNG VIÊN. Làm trước, vì con số này là MAX của thanh kéo.
   const xepHangCua = new Map<string, UngVien[]>()
+  const hopUngVien = new Set<string>()
   for (const s of daXep) {
-    // BƯỚC 2 — câu sai CHƯA GẮN DẠNG thì không rút gì cả. Cấm đoán.
+    // Câu sai CHƯA GẮN DẠNG thì pool bằng 0. Cấm đoán.
     if (!s.maDang) {
+      ra.poolTheoCauSai.push({ qid: s.qid, soCau: s.soCau, tenDang: '', pool: 0 })
       ra.thieu.push({ soCau: s.soCau, tenDang: '', vi: `câu ${s.soCau} chưa gắn dạng — vào Ngân hàng câu hỏi gán rồi rút lại` })
       continue
     }
@@ -186,7 +205,7 @@ export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
     // BẬC 2 — cùng chuyên đề VÀ cùng cơ chế, khác việc phải làm. Hết bậc 2 là
     // DỪNG: cấm tụt xuống tầng chuyên đề, đó chính là cái đang hỏng.
     const nhanh = nhanhCoChe(s.maDang)
-    const bac2 = CHO_BAC_2 && nhanh ? kho.filter((x) => dungDuoc(x) && x.ma !== s.maDang && nhanhCoChe(x.ma) === nhanh) : []
+    const bac2 = choBac2 && nhanh ? kho.filter((x) => dungDuoc(x) && x.ma !== s.maDang && nhanhCoChe(x.ma) === nhanh) : []
 
     // Trong cùng bậc: mức độ gần câu sai nhất trước, rồi `qid` tăng dần. Không
     // random — hai lần rút cùng dữ liệu phải ra cùng bộ câu.
@@ -196,58 +215,80 @@ export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
           Math.abs(hangUuTien(a.cau.mucDo) - hangUuTien(s.mucDo)) - Math.abs(hangUuTien(b.cau.mucDo) - hangUuTien(s.mucDo)) ||
           a.cau.id.localeCompare(b.cau.id),
       )
-
-    xepHangCua.set(s.qid, [
+    const xepHang: UngVien[] = [
       ...xep(bac1).map((x) => ({ cau: x.cau, ma: x.ma, bac: 1 as const })),
       ...xep(bac2).map((x) => ({ cau: x.cau, ma: x.ma, bac: 2 as const })),
-    ])
+    ]
+    xepHangCua.set(s.qid, xepHang)
+    for (const u of xepHang) hopUngVien.add(u.cau.id)
+    ra.poolTheoCauSai.push({ qid: s.qid, soCau: s.soCau, tenDang: s.tenDang, pool: xepHang.length })
+    if (xepHang.length === 0) {
+      ra.thieu.push({ soCau: s.soCau, tenDang: s.tenDang, vi: `kho chưa có câu nào cùng dạng "${s.tenDang || s.maDang}"` })
+    }
+  }
+  // ĐẾM PHÂN BIỆT: hợp của mọi pool, không cộng dồn từng pool.
+  ra.tongUngVien = hopUngVien.size
+
+  // ---- MỤC 4.3 — CHIA SUẤT. Vòng tròn CÓ SỨC CHỨA, hoàn toàn tất định.
+  //
+  // Mỗi vòng phát 1 suất cho câu sai nào CÒN CHỖ (suất đang có < pool riêng).
+  // Câu hết chỗ tự rơi ra, phần dư dồn sang câu còn chỗ — không cần luật riêng.
+  // Pool [60,25,5]: kéo 30 -> [10,10,10]; kéo 80 -> [50,25,5]; kéo 90 -> [60,25,5].
+  const xin = Math.max(0, Math.floor(yc.soCau ?? SO_CAU_MAC_DINH))
+  const soCau = Math.min(xin, ra.tongUngVien)
+  if (soCau === 0) {
+    for (const s of daXep) if ((xepHangCua.get(s.qid)?.length ?? 0) > 0) ra.capBiCat += 1
+    return ra
   }
 
-  // CHIA SUẤT THEO VÒNG — thầy chốt 07/09: "nếu kéo nhiều thì ghép nhiều câu
-  // chữa cho những câu sai đó".
-  //
-  // Mỗi vòng phát cho mỗi câu sai đúng MỘT câu, theo thứ tự ưu tiên, rồi mới
-  // sang vòng sau. Nhờ vậy: chỗ ít thì câu sai nào cũng có phần trước khi ai đó
-  // được câu thứ hai; thầy kéo số câu lên thì phần dư chia đều tiếp, không đổ
-  // hết vào một câu sai.
-  //
-  // `SO_CAU_MOI_CAU_SAI` do đó đổi nghĩa: từ "đúng 2 câu" thành "TỐI THIỂU 2
-  // câu mỗi câu sai" — bản v3 mục 3 ghi cứng 2 nên kéo 40 câu vẫn chỉ ra 2.
+  const daDung = new Set<string>()
   const demCua = new Map<string, number>()
-  const conUngVien = new Map<string, UngVien[]>()
-  for (const [qid, ds] of xepHangCua) conUngVien.set(qid, [...ds])
+  const con = new Map<string, UngVien[]>()
+  for (const [qid, ds] of xepHangCua) con.set(qid, [...ds])
 
+  let conCho = soCau
   let phatDuoc = true
   while (conCho > 0 && phatDuoc) {
     phatDuoc = false
     for (const s of daXep) {
       if (conCho <= 0) break
-      const con = conUngVien.get(s.qid)
-      if (!con) continue
-      // Bỏ những câu đã bị câu sai khác lấy mất.
-      while (con.length > 0 && daDung.has(con[0].cau.id)) con.shift()
-      if (con.length === 0) continue
-      const u = con.shift() as UngVien
+      const ds = con.get(s.qid)
+      if (!ds) continue
+      // Câu khớp nhãn NHIỀU câu sai đã bị câu ưu tiên cao hơn lấy: bỏ qua, và
+      // không cho xuất hiện lần thứ hai trong phiếu.
+      while (ds.length > 0 && daDung.has(ds[0].cau.id)) ds.shift()
+      if (ds.length === 0) continue
+      const u = ds.shift() as UngVien
       daDung.add(u.cau.id)
       demCua.set(s.qid, (demCua.get(s.qid) ?? 0) + 1)
-      ra.cau.push({ ...u.cau, chuaCho: { qid: s.qid, soCau: s.soCau, phan: s.phan, maDang: s.maDang, bac: u.bac } })
+      ra.cau.push({ ...u.cau, chuaCho: { qid: s.qid, soCau: s.soCau, phan: s.phan, maDang: s.maDang, tenDang: s.tenDang, bac: u.bac } })
       conCho -= 1
       phatDuoc = true
     }
   }
 
-  // BÁO THIẾU — so với mức tối thiểu, và chỉ khi thiếu vì HẾT CÂU trong kho.
-  // Thiếu vì thầy đặt số câu quá nhỏ thì đó là `capBiCat`, không phải lỗi kho.
+  // BÁO THIẾU / BỊ CẮT — nói ra, không nuốt.
+  //
+  // Hai thứ khác nhau:
+  //   · THIẾU  = kho cạn câu cùng dạng trong khi thầy còn xin thêm. Lỗi của kho.
+  //   · BỊ CẮT = thầy đặt số câu quá nhỏ nên câu sai này chưa tới suất. Không
+  //     phải lỗi kho, chỉ cần kéo thanh lên.
+  const canMoiCau = daXep.length > 0 ? Math.ceil(xin / daXep.length) : 0
   for (const s of daXep) {
-    if (!s.maDang) continue
+    const pool = xepHangCua.get(s.qid)?.length ?? 0
+    if (pool === 0) continue // đã ghi lý do ở phần đếm ứng viên
     const co = demCua.get(s.qid) ?? 0
-    const conLai = (conUngVien.get(s.qid) ?? []).filter((u) => !daDung.has(u.cau.id)).length
-    if (co === 0 && conLai === 0) {
-      ra.thieu.push({ soCau: s.soCau, tenDang: s.tenDang, vi: `kho chưa có câu nào cùng dạng "${s.tenDang || s.maDang}"` })
-    } else if (co === 0) {
+    if (co === 0) {
       ra.capBiCat += 1
-    } else if (co < SO_CAU_MOI_CAU_SAI && conLai === 0) {
-      ra.thieu.push({ soCau: s.soCau, tenDang: s.tenDang, vi: `kho chỉ còn ${co}/${SO_CAU_MOI_CAU_SAI} câu cùng dạng "${s.tenDang || s.maDang}"` })
+      continue
+    }
+    // Đã vét sạch pool mà vẫn ít hơn phần đáng ra được chia.
+    if (co >= pool && co < canMoiCau) {
+      ra.thieu.push({
+        soCau: s.soCau,
+        tenDang: s.tenDang,
+        vi: `kho chỉ còn ${co}/${canMoiCau} câu cùng dạng "${s.tenDang || s.maDang}"`,
+      })
     }
   }
 
