@@ -10,6 +10,7 @@
 import type { TeacherExamSource } from '../data/examContent'
 import { nhanhCoChe } from './cau-hinh-chua'
 import { ungVienChua } from './rut-de-chua'
+import { cauCoAnh } from './bai-tap-pdf'
 import { maTrongTuVung } from './tu-vung-dang'
 
 /** Lý do `dang = null` mà pipeline ghi khi chương chưa có bảng cơ chế. Những
@@ -52,10 +53,15 @@ export interface ThongKeDang {
   maLa: CauCoMa[]
   soMa: number
   soNhanh: number
-  /** Câu có mã và không có hình — nguồn hàng thật để chữa. */
+  /** Câu có mã đi qua đúng cổng rút câu chữa — nguồn hàng thật.
+   *
+   * Từ 08/09 con số này ĐÃ GỒM câu có hình: phiếu in dựng được ảnh nên không
+   * loại chúng nữa. */
   dungLamCauChua: number
-  /** Có mã nhưng bị loại vì có hình. */
-  loaiViCoHinh: number
+  /** Trong số dùng được, bao nhiêu câu CÓ HÌNH. Trước 08/09 đây là số câu bị
+   * LOẠI vì có hình; nay chúng vào phiếu bình thường nên con số chỉ còn để
+   * thầy biết phiếu sẽ nặng cỡ nào. */
+  coHinhVanDung: number
   /** % câu có mã sẽ tìm được đủ câu chữa BẬC 1 (đúng mã). */
   phuBac1: number
   /** % câu có mã sẽ tìm được đủ câu chữa BẬC 2 (cùng nhánh cơ chế). */
@@ -159,7 +165,7 @@ export function thongKeDang(khoDe: TeacherExamSource[]): ThongKeDang {
     soMa: dem.size,
     soNhanh: dungTheoNhanh.size,
     dungLamCauChua: ungVien.length,
-    loaiViCoHinh: daGan - ungVien.length,
+    coHinhVanDung: ungVien.filter((x) => cauCoAnh(x.cau)).length,
     phuBac1: phanTram(duBac1),
     phuBac2: phanTram(duBac2),
     nhanhMong,

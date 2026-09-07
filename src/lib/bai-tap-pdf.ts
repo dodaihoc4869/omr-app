@@ -70,6 +70,15 @@ export interface CauLuyen {
   chuaCho?: { qid: string; soCau: number; phan: 'I' | 'II' | 'III'; maDang: string; tenDang?: string; bac: 1 | 2; laLamLai?: true; daChon?: string; viSaoSai?: string }
 }
 
+/** CÂU NÀY CÓ ẢNH KHÔNG — một chỗ trả lời cho cả app.
+ *
+ * Từ 08/09 ảnh KHÔNG còn là lý do loại câu khỏi phiếu (`html-phieu.ts` dựng đủ
+ * ảnh). Hàm này chỉ còn để ĐẾM và để báo cáo nói "câu này có hình" khi gói
+ * phiếu quá nặng phải bỏ ảnh ra. */
+export function cauCoAnh(c: Pick<CauLuyen, 'anhThanCau' | 'anhLuaChon' | 'hinh'>): boolean {
+  return Boolean(c.anhThanCau || (c.hinh && c.hinh.length > 0) || c.anhLuaChon?.some(Boolean))
+}
+
 export interface KetQuaChonCau {
   cau: CauLuyen[]
   /** Số câu phải lấy lại từ những câu em đã làm vì kho không đủ câu mới. */
@@ -101,10 +110,6 @@ export function thangBac(khoiDiem: MucDoCau, soCau: number): MucDoCau[] {
 }
 
 type CauNguon = { phan: 'I' | 'II' | 'III'; maDe: string; q: TeacherMcqQuestion | TeacherTrueFalseQuestion | TeacherShortAnswerQuestion }
-
-function coHinh(q: { thanCauImg?: string; choiceImgs?: (string | undefined)[]; ideaImgs?: (string | undefined)[] }): boolean {
-  return Boolean(q.thanCauImg || q.choiceImgs?.some(Boolean) || q.ideaImgs?.some(Boolean))
-}
 
 function goiCau(nguon: TeacherExamSource[]): CauNguon[] {
   const ra: CauNguon[] = []
@@ -257,8 +262,10 @@ export function chonCauLuyen(nguon: TeacherExamSource[], yc: YeuCauLuyen): KetQu
     return tenYeu.length === 0 || tenYeu.includes(c.chuyenDe.trim())
   }
 
+  // CÂU CÓ HÌNH KHÔNG CÒN BỊ LOẠI (thầy chốt 08/09). `html-phieu.ts` dựng đủ
+  // ảnh thân câu, ảnh phương án và ảnh theo vị trí; loại chúng ở đây là bỏ đi
+  // hàng trăm câu vì một giới hạn không còn tồn tại.
   const kho = goiCau(nguon)
-    .filter((c) => !coHinh(c.q as { thanCauImg?: string }))
     .map(doiSang)
     .filter(trongPhamVi)
     .filter((c) => hopDang(c.dang, loc))

@@ -53,8 +53,19 @@ export interface CauSaiChiTiet {
   lyDo: LyDoPhuongAn[] | null
   buoc: string[] | null
   ketQua: string
-  /** Câu có hình trong đề gốc — báo cáo không kèm ảnh nên phải nói ra. */
+  /** Câu có hình trong đề gốc. Giữ lại kể cả khi đã kèm ảnh: gói quá cỡ thì
+   * `giamGoiPhieu` bỏ ảnh ra, và lúc đó báo cáo vẫn phải nói thẳng là câu này
+   * có hình chứ không im lặng để phụ huynh tưởng đề chỉ có chữ. */
   coHinh: boolean
+  /** ẢNH CỦA CÂU, đi thẳng vào báo cáo (thầy chốt 08/09: "câu làm sai trong
+   * báo cáo của học sinh và phụ huynh cũng phải hiển thị hình đầy đủ").
+   *
+   * Ba trường giống hệt `CauLuyen` để `TheCauChiTiet` dựng một kiểu duy nhất.
+   * Ảnh là base64 nên đây là phần NẶNG NHẤT của gói; `giamGoiPhieu` bỏ chúng
+   * TRƯỚC mọi thứ khác khi gói vượt cỡ. */
+  anhThanCau?: string
+  anhLuaChon?: (string | undefined)[]
+  hinh?: { src: string; viTri: string; alt?: string }[]
   /** Bao nhiêu phần lớp chọn ĐÚNG phương án sai này (0…1). `null` khi không có
    * bảng chấm cả lớp — v3 mục 4.3: tới NGUONG_LOP_CUNG_SAI thì câu đó là bẫy
    * của đề chứ không phải lỗi riêng của em, và báo cáo phải nói ra. */
@@ -224,6 +235,16 @@ export function giamGoiPhieu(p: PhieuDayDu, toiDa: number = CO_TOI_DA): { phieu:
   if (co(p) <= toiDa) return { phieu: p, daBo: [] }
   const daBo: string[] = []
   let ra: PhieuDayDu = p
+  // ẢNH BỎ TRƯỚC TIÊN. Ảnh là base64, một câu có hình nặng bằng cả trăm câu
+  // chỉ có chữ — bỏ nó cứu được gói mà mất ít nhất. Câu vẫn giữ `coHinh` nên
+  // báo cáo còn nói được "câu này có hình, xem lại trong bài chữa".
+  const coAnh = (c: CauSaiChiTiet) => Boolean(c.anhThanCau || c.hinh?.length || c.anhLuaChon?.some(Boolean))
+  const boAnh = (ds: CauSaiChiTiet[]) => ds.map((c) => ({ ...c, anhThanCau: undefined, anhLuaChon: undefined, hinh: undefined }))
+  if (ra.cauSai.some(coAnh) || (ra.daSuaDuoc ?? []).some(coAnh)) {
+    ra = { ...ra, cauSai: boAnh(ra.cauSai), daSuaDuoc: ra.daSuaDuoc ? boAnh(ra.daSuaDuoc) : ra.daSuaDuoc }
+    daBo.push('ảnh của câu sai')
+    if (co(ra) <= toiDa) return { phieu: ra, daBo }
+  }
   if (ra.deCuaEm && ra.deCuaEm.length > 0) {
     ra = { ...ra, deCuaEm: undefined }
     daBo.push('đề của em')
@@ -261,6 +282,28 @@ export function timCauTheoQid(banks: TeacherExamSource[]): Map<string, CauBatKy>
 function coHinh(q: CauBatKy): boolean {
   const x = q as { thanCauImg?: string; choiceImgs?: (string | undefined)[]; ideaImgs?: (string | undefined)[] }
   return Boolean(x.thanCauImg || x.choiceImgs?.some(Boolean) || x.ideaImgs?.some(Boolean))
+}
+
+/** Ảnh của một câu, gom về đúng ba trường `CauSaiChiTiet` mang.
+ *
+ * Trường nào rỗng thì KHÔNG có mặt trong gói — thêm `undefined` vào JSON chỉ
+ * làm gói phình mà không nói thêm gì. */
+function anhCua(q: CauBatKy, phan: 'I' | 'II' | 'III'): Pick<CauSaiChiTiet, 'anhThanCau' | 'anhLuaChon' | 'hinh'> {
+  const x = q as {
+    thanCauImg?: string
+    choiceImgs?: (string | undefined)[]
+    ideaImgs?: (string | undefined)[]
+    hinhAnh?: { src: string; viTri: string; alt?: string }[]
+    imageDataUrl?: string
+  }
+  const hinh: { src: string; viTri: string; alt?: string }[] = [...(x.hinhAnh ?? []).map((h) => ({ src: h.src, viTri: String(h.viTri), alt: h.alt }))]
+  if (x.imageDataUrl) hinh.unshift({ src: x.imageDataUrl, viTri: 'sau_de' })
+  const anhPa = phan === 'I' ? x.choiceImgs : phan === 'II' ? x.ideaImgs : undefined
+  const ra: Pick<CauSaiChiTiet, 'anhThanCau' | 'anhLuaChon' | 'hinh'> = {}
+  if (x.thanCauImg) ra.anhThanCau = x.thanCauImg
+  if (anhPa && anhPa.some(Boolean)) ra.anhLuaChon = [...anhPa]
+  if (hinh.length > 0) ra.hinh = hinh
+  return ra
 }
 
 function lyDoCua(q: CauBatKy, phan: 'I' | 'II' | 'III'): LyDoPhuongAn[] | null {
@@ -343,6 +386,12 @@ export function dungCauSai(rows: ChiTietCauRow[], banks: TeacherExamSource[], ch
       buoc: q.loiGiai?.buoc ? [...q.loiGiai.buoc] : null,
       ketQua: q.loiGiai?.ketQua ?? '',
       coHinh: coHinh(q),
+      // ẢNH ĐI THEO CÂU. Ba nguồn, đúng như `bai-tap-pdf.doiSang` gom:
+      //   · `thanCauImg` — ảnh cắt cả thân câu, THAY chữ đề;
+      //   · `choiceImgs` / `ideaImgs` — ảnh riêng từng phương án / từng ý;
+      //   · `hinhAnh` + `imageDataUrl` — ảnh chèn theo vị trí trong câu.
+      // Gom ở đây chứ không ở màn hình: ba chỗ hiện câu dùng chung một thẻ.
+      ...anhCua(q, r.phan),
       ...(() => {
         const siSo = emCoCau.get(r.qid)?.size ?? 0
         if (!siSo) return { tiLeLopSai: null, soLopSai: null, siSoLop: null }

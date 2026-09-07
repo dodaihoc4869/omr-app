@@ -138,10 +138,16 @@ describe('lỗi 3 — câu sai CÓ HÌNH vẫn tra được mã dạng', () => {
     expect(kq.cau.map((c) => c.id).sort()).toEqual(['a1', 'a2'])
   })
 
-  it('nhưng câu có hình KHÔNG được dùng làm câu chữa cho câu khác', () => {
+  it('VÀ câu có hình NAY DÙNG ĐƯỢC làm câu chữa cho câu khác', () => {
+    // Đảo luật cũ (thầy chốt 08/09). Trước đây câu có hình bị loại vì "phiếu
+    // in không dựng được ảnh"; `html-phieu.ts` dựng đủ ảnh từ lâu, nên giữ bộ
+    // lọc là để em sai một dạng mà kho có câu chữa vẫn phát ra phiếu rỗng.
     const k = kho([cau('s1'), cau('co-hinh', { thanCauImg: 'data:image/png;base64,AAA' })])
     const kq = rutDeChua({ khoDe: k, rows: [row('I', 2, 's1')], soCau: 10 })
-    expect(kq.cau.filter((c) => !c.chuaCho?.laLamLai)).toHaveLength(0)
+    const chua = kq.cau.filter((c) => !c.chuaCho?.laLamLai)
+    expect(chua.map((c) => c.id)).toEqual(['co-hinh'])
+    // Và ảnh đi theo câu sang phiếu, không rơi mất dọc đường.
+    expect(chua[0].anhThanCau).toBe('data:image/png;base64,AAA')
   })
 })
 

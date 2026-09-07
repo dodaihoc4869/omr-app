@@ -106,11 +106,14 @@ describe('thống kê — con số báo cho thầy phải là số thật', () =
     expect(tk.canThayChot[0].viSaoNull).toBe('chưa nhận ra cơ chế')
   })
 
-  it('CÂU CÓ HÌNH không được tính là nguồn hàng chữa', () => {
+  it('CÂU CÓ HÌNH VẪN LÀ nguồn hàng chữa, và được đếm riêng', () => {
+    // Đảo hẳn luật cũ (thầy chốt 08/09). Phiếu in dựng được ảnh nên loại câu
+    // có hình là vứt hàng thật; con số còn lại chỉ để thầy biết phiếu nặng
+    // cỡ nào, không phải để báo "không dùng được".
     const tk = thongKeDang(kho([q('a', HS), q('b', HS, { hinhAnh: [{ src: 'data:,' }] }), q('c', HS)]))
     expect(tk.daGan).toBe(3)
-    expect(tk.dungLamCauChua).toBe(2)
-    expect(tk.loaiViCoHinh).toBe(1)
+    expect(tk.dungLamCauChua).toBe(3)
+    expect(tk.coHinhVanDung).toBe(1)
   })
 
   it('phủ bậc 1 chỉ tính khi đủ hàng: cần 3 câu cùng mã mới chữa được', () => {
@@ -134,10 +137,13 @@ describe('thống kê — con số báo cho thầy phải là số thật', () =
   })
 
   it('danh sách câu có mã kèm cờ dùng được hay không', () => {
+    // Câu có hình NAY DÙNG ĐƯỢC (thầy chốt 08/09) — phiếu in dựng đủ ảnh.
     const ds = dsCauCoMa(kho([q('a', HS), q('b', HS, { hinhAnh: [{ src: 'data:,' }] }), q('c', null)]))
     expect(ds.map((c) => c.qid)).toEqual(['a', 'b'])
     expect(ds.find((c) => c.qid === 'a')?.dungDuoc).toBe(true)
-    expect(ds.find((c) => c.qid === 'b')?.dungDuoc).toBe(false)
+    expect(ds.find((c) => c.qid === 'b')?.dungDuoc).toBe(true)
+    // Câu KHÔNG có mã vẫn không lọt vào danh sách — đó mới là thứ cờ này canh.
+    expect(ds.some((c) => c.qid === 'c')).toBe(false)
   })
 })
 

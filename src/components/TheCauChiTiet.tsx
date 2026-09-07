@@ -61,11 +61,36 @@ export const CSS_THE_CAU = `
 .bc-lap{flex:0 0 auto;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap;margin-left:6px}
 .bc-lap.sai{background:var(--p3-sai);color:var(--p-trang)}
 .bc-lap.sua{background:var(--p3-dung);color:var(--p-trang)}
+/* ẢNH CỦA CÂU. Nằm gọn trong bề ngang thẻ, không kéo trang cuộn ngang trên
+   điện thoại; nền trắng vì ảnh cắt từ PDF hay có nền trong suốt. */
+.bc-hinh{display:block;max-width:100%;height:auto;margin:8px 0 0;border-radius:8px;background:var(--p-trang)}
+.bc-hinh.than{margin-top:10px}
+.bc-hinh.pa{margin:4px 0 0}
 @media (prefers-reduced-motion:reduce){.bc-hop,.bc-mui{transition:none}}
 `
 
 const KHOA_Y = ['a', 'b', 'c', 'd']
 const KHOA_PA = ['A', 'B', 'C', 'D']
+
+/** Ảnh trong thẻ câu. `loading="lazy"` để báo cáo nhiều hình vẫn mở nhanh trên
+ * 4G — phụ huynh cuộn tới đâu tải tới đó. */
+function Hinh({ src, lop = '', alt = '' }: { src?: string; lop?: string; alt?: string }) {
+  if (!src) return null
+  return <img className={`bc-hinh${lop ? ` ${lop}` : ''}`} src={src} alt={alt} loading="lazy" />
+}
+
+/** Mọi ảnh chèn ở một vị trí trong câu (sau đề, sau từng phương án, cuối câu). */
+function HinhTaiViTri({ c, viTri }: { c: CauSaiChiTiet; viTri: string }) {
+  const ds = (c.hinh ?? []).filter((h) => h.viTri === viTri)
+  if (ds.length === 0) return null
+  return (
+    <>
+      {ds.map((h, i) => (
+        <Hinh key={`${viTri}-${i}`} src={h.src} alt={h.alt ?? ''} />
+      ))}
+    </>
+  )
+}
 
 export interface TheCauChiTietProps {
   c: CauSaiChiTiet
@@ -94,6 +119,7 @@ export default function TheCauChiTiet({ c, stt, mauSo, anLoiGiai = false, tick, 
     }
   }, [moSanBanDau])
   const nhanPhan = TEN_PHAN[c.phan] ?? c.phan
+  const coAnh = Boolean(c.anhThanCau || c.hinh?.length || c.anhLuaChon?.some(Boolean))
   const coGiai = !anLoiGiai && (c.chot || c.lyDo || c.buoc)
   return (
     <div style={tick ? { display: 'flex', alignItems: 'flex-start', gap: 10 } : undefined}>
@@ -143,10 +169,16 @@ export default function TheCauChiTiet({ c, stt, mauSo, anLoiGiai = false, tick, 
           <div>
             <div className="bc-hop-in">
               <div className="bc-de">
-                <ChemText text={c.de} />
-                {c.coHinh && (
+                {/* Ảnh cắt cả thân câu LÀ đề bài — có nó thì không in `de` nữa,
+                    đúng như màn làm bài của học sinh. */}
+                {c.anhThanCau ? <Hinh src={c.anhThanCau} lop="than" alt="Đề bài" /> : <ChemText text={c.de} />}
+                <HinhTaiViTri c={c} viTri="sau_de" />
+                {/* Dòng này CHỈ còn khi câu có hình mà gói phiếu đã phải bỏ ảnh
+                    ra vì quá cỡ (`giamGoiPhieu`). Còn ảnh thì nói "không kèm
+                    hình" là nói sai chuyện đang xảy ra. */}
+                {c.coHinh && !coAnh && (
                   <div style={{ marginTop: 8, fontSize: 12, color: 'var(--p-nhat)', fontFamily: 'var(--sans)' }}>
-                    Câu này có hình trong đề. Báo cáo không kèm hình, em xem lại trong bài Thầy chữa trên lớp.
+                    Câu này có hình trong đề. Bản báo cáo này quá nặng nên không kèm được hình, em xem lại trong bài Thầy chữa trên lớp.
                   </div>
                 )}
               </div>
@@ -163,7 +195,8 @@ export default function TheCauChiTiet({ c, stt, mauSo, anLoiGiai = false, tick, 
                           {k}
                         </span>
                         <span style={{ flex: 1, minWidth: 0 }}>
-                          <ChemText text={pa} />
+                          {c.anhLuaChon?.[i] ? <Hinh src={c.anhLuaChon[i]} lop="pa" alt={`Phương án ${k}`} /> : <ChemText text={pa} />}
+                          <HinhTaiViTri c={c} viTri={`sau_pa_${k}`} />
                           {laDung && (
                             <span className="bc-co" style={{ background: 'var(--p-xanh)', color: 'var(--p-trang)' }}>
                               đáp án đúng
@@ -198,7 +231,8 @@ export default function TheCauChiTiet({ c, stt, mauSo, anLoiGiai = false, tick, 
                           {KHOA_Y[i]}
                         </span>
                         <span style={{ flex: 1, minWidth: 0 }}>
-                          <ChemText text={y} />
+                          {c.anhLuaChon?.[i] ? <Hinh src={c.anhLuaChon[i]} lop="pa" alt={`Ý ${KHOA_Y[i]}`} /> : <ChemText text={y} />}
+                          <HinhTaiViTri c={c} viTri={`sau_y_${KHOA_Y[i]}`} />
                           <span className="bc-co" style={{ background: 'var(--p-chim)', color: 'var(--p-nhat)' }}>
                             {anLoiGiai ? `em: ${chon === 'D' ? 'Đúng' : chon === 'S' ? 'Sai' : 'bỏ trống'}` : `đúng: ${dung === 'D' ? 'Đúng' : 'Sai'} · em: ${chon === 'D' ? 'Đúng' : chon === 'S' ? 'Sai' : 'bỏ trống'}`}
                           </span>

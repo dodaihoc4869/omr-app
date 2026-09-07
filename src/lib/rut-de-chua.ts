@@ -235,9 +235,14 @@ export function ungVienChua(
   // chọn nằm ở đây. (Không dùng `chonCauLuyen` cho việc này: đưa `soCau` lớn
   // vào nó làm vòng thang bậc chạy tới cạn — tôi đã dính đúng bẫy đó.)
   //
-  // Câu CÓ HÌNH bị loại: phiếu in không dựng được ảnh, luật cũ mục 7.
+  // CÂU CÓ HÌNH NAY VÀO ĐƯỢC PHIẾU (thầy chốt 08/09: "phải cho đầy đủ hình vào
+  // phiếu in, không được thiếu câu nào").
+  //
+  // Luật cũ loại chúng vì "phiếu in không dựng được ảnh" — điều đó ĐÃ KHÔNG
+  // CÒN ĐÚNG: `html-phieu.ts` dựng đủ ảnh thân câu (`anhThanCau`), ảnh từng
+  // phương án (`anhLuaChon`) và ảnh theo vị trí (`hinh`). Giữ bộ lọc là đang
+  // vứt 219 câu có mã ra khỏi kho chữa vì một giới hạn không còn tồn tại.
   return cauLuyenTuNguon(khoDe)
-    .filter((c) => !c.anhThanCau && !(c.hinh && c.hinh.length > 0) && !(c.anhLuaChon && c.anhLuaChon.some(Boolean)))
     .filter((c) => hopSao(c.sao, locSao))
     .filter((c) => hopDang(c.dang, locDang))
     .map((c) => ({ cau: c, ma: tra.get(c.id)?.ma ?? '', ten: tra.get(c.id)?.ten ?? '' }))

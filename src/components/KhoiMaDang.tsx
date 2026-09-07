@@ -184,7 +184,7 @@ export default function KhoiMaDang({
       </div>
 
       <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>
-        {tk.loaiViCoHinh} câu có mã nhưng có hình nên không vào phiếu in được · {tk.chuaGanDoChuongPhu} câu để trống vì chương chưa có bảng cơ chế ·{' '}
+        {tk.coHinhVanDung} câu có hình, nay vẫn vào phiếu in đủ ảnh · {tk.chuaGanDoChuongPhu} câu để trống vì chương chưa có bảng cơ chế ·{' '}
         {tk.phuBac2}% có câu chữa cùng nhánh cơ chế
         {tk.chuaTaiLai > 0 && ` · ${tk.chuaTaiLai} câu chưa tải bản mới`}
       </div>

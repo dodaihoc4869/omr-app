@@ -3,7 +3,9 @@
 // Ba luật phải giữ, sai cái nào cũng thành "phát cho em một tờ giấy vô dụng":
 //   1. Chỉ lấy câu thuộc chuyên đề em đang yếu.
 //   2. Ưu tiên câu em CHƯA làm; phải lấy lại câu cũ thì nói ra bằng con số.
-//   3. Câu có hình bị loại — in ra không có hình là câu không làm được.
+//   3. Câu CÓ HÌNH vẫn vào phiếu, và ảnh phải đi theo câu (thầy chốt 08/09).
+//      Luật cũ loại chúng vì phiếu in không dựng được ảnh; `html-phieu.ts` nay
+//      dựng đủ ảnh thân câu, ảnh phương án và ảnh theo vị trí.
 import { describe, expect, it } from 'vitest'
 import { chonCauLuyen, chuThuan, mucKhoiDiem, tenTepBaiTap, thangBac } from '../src/lib/bai-tap-pdf'
 import type { TeacherExamSource } from '../src/data/examContent'
@@ -76,9 +78,14 @@ describe('chonCauLuyen', () => {
     expect(kq.cau.every((c) => c.chuyenDe === 'Ester – lipid')).toBe(true)
   })
 
-  it('LOẠI câu có hình — in ra không có hình là câu không làm được', () => {
-    const kq = chonCauLuyen(nguon, { chuyenDe: [{ ten: 'Ester – lipid', tiLeSai: 0.8 }], soCau: 10, ngauNhien: deu })
-    expect(kq.cau.some((c) => c.id === 'hinh1')).toBe(false)
+  it('CÂU CÓ HÌNH VẪN VÀO PHIẾU, và ảnh đi theo câu', () => {
+    // Đảo hẳn luật cũ. Bỏ 219 câu có mã ra khỏi kho chữa vì một giới hạn đã
+    // hết là mất hàng thật, không phải là cẩn thận.
+    const kq = chonCauLuyen(nguon, { chuyenDe: [{ ten: 'Ester – lipid', tiLeSai: 0.8 }], soCau: 11, ngauNhien: deu })
+    const c = kq.cau.find((x) => x.id === 'hinh1')
+    expect(c).toBeTruthy()
+    // Và ảnh phải THEO câu sang phiếu, không rơi mất dọc đường.
+    expect(c!.anhThanCau).toBe('data:image/png;base64,AAAA')
   })
 
   it('không lấy trùng một câu hai lần trong cùng phiếu', () => {
@@ -97,7 +104,11 @@ describe('chonCauLuyen', () => {
     const tatCa = ['b1', 'b2', 'b3', 'h1', 'h2', 'h3', 'v1', 'v2', 'v3', 'v4']
     const kq = chonCauLuyen(nguon, { chuyenDe: [{ ten: 'Ester – lipid', tiLeSai: 0.8 }], qidDaLam: tatCa, soCau: 5, ngauNhien: deu })
     expect(kq.cau).toHaveLength(5)
-    expect(kq.lapLai).toBe(5)
+    // `hinh1` KHÔNG nằm trong `tatCa` và nay dùng được, nên đúng 1 trong 5 câu
+    // là câu mới — bốn câu còn lại mới phải lấy lại. Con số phải nói đúng
+    // chuyện đó, không giữ số cũ cho đẹp.
+    expect(kq.lapLai).toBe(4)
+    expect(kq.cau.some((c) => c.id === 'hinh1')).toBe(true)
   })
 
   it('kho không đủ câu thì báo THIẾU bao nhiêu, không dựng câu giả', () => {
