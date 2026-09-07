@@ -88,13 +88,15 @@ const co = (goi: unknown[]) => (goi[7] as { lenBang?: boolean }).lenBang
 
 describe('cờ lên bảng suy từ khối Bộ câu ra đề', () => {
   it('KHÔNG còn nút gạt LÊN BẢNG riêng trên màn Mở ca', async () => {
-    // Cờ lên bảng suy từ khối Bộ câu ra đề, không có công tắc riêng nữa. Công
-    // tắc DUY NHẤT còn lại trên màn này là "Giữ để đọc" (GIUDEDOC) — việc khác
-    // hẳn, nên kiểm theo nhãn chứ không đếm tổng số công tắc.
+    // Cờ lên bảng suy từ khối Bộ câu ra đề, không có công tắc riêng nữa. Kiểm
+    // theo NHÃN chứ không đếm tổng số công tắc: màn này còn hai việc khác hẳn
+    // cũng dùng nút gạt — "Giữ để đọc" (GIUDEDOC) và "Phòng chờ" (07/09).
     const r = render(<ExamSetupScreen />)
     await waitFor(() => expect(r.container.textContent).toContain('Bộ câu ra đề'), { timeout: 20000 })
     const congTac = r.queryAllByRole('switch')
-    expect(congTac.map((n) => n.getAttribute('aria-label'))).toEqual(['Giữ để đọc'])
+    expect(congTac.map((n) => n.getAttribute('aria-label')).sort()).toEqual(['Giữ để đọc', 'Phòng chờ'])
+    // Điều thật sự phải khoá: KHÔNG có nút gạt nào cho việc lên bảng.
+    for (const n of congTac) expect(n.getAttribute('aria-label')).not.toMatch(/bảng/i)
     expect(r.container.textContent).not.toContain('Ca này dùng làm gì')
   })
 
@@ -153,7 +155,10 @@ describe('phía đọc: màn Gọi lên bảng và máy chủ', () => {
     const gs = (await import('../docs/apps-script-kiem-tra.gs?raw')).default
     // Ghi cột 23 trở đi bằng một dải riêng. rowData dừng ở cột 19; nối thêm là
     // ghi đè KhoaLuc / KhoaBoi / MoKhoaLuc (cột 20-22) của ca mở lại cùng mã.
-    expect(gs).toContain('sh.getRange(dong, 23, 1, 3).setValues([[lenBang, giuDeDoc, anHanGiay]])')
+    // Dải nay dài 5 ô: thêm PhongCho và BatDauThiLuc (07/09).
+    expect(gs).toContain("sh.getRange(dong, 23, 1, 5).setValues([[lenBang, giuDeDoc, anHanGiay, phongCho, '']])")
+    // rowData vẫn phải DỪNG trước cột 20 — đây mới là điều phép kiểm này giữ.
+    expect(gs).not.toMatch(/sh\.getRange\(dong, 1, 1, 2[0-9]\)/)
     expect(gs).toContain("body.lenBang === false ? 'khong' : 'co'")
   })
 

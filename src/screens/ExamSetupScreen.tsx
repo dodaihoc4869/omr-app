@@ -151,6 +151,10 @@ export default function ExamSetupScreen() {
   // Bật mặc định cho ca thi; bài tập về nhà tắt — không có lý do làm phiền em
   // ngồi học ở nhà.
   const [giuDeDoc, setGiuDeDoc] = useState(BAT_MAC_DINH_CA_THI)
+  // PHÒNG CHỜ (thầy chốt 07/09): em vào ca thì đứng ở màn chờ, chưa nhận đề;
+  // cả lớp nhận đề đúng một thời điểm khi thầy bấm "Bắt đầu thi" ở màn Theo
+  // dõi. Mặc định TẮT — ca luyện tập và bài tập về nhà không cần chờ ai.
+  const [phongCho, setPhongCho] = useState(false)
   const [anHanGiay, setAnHanGiay] = useState(MS_AN_HAN_NHA_TAY / 1000)
   const [phamVi, setPhamVi] = useState<PhamViCa>('tu_do')
   const [namSinhKhoi, setNamSinhKhoi] = useState('')
@@ -305,6 +309,7 @@ export default function ExamSetupScreen() {
         nguongGiay,
         lenBang,
         giuDeDoc,
+        phongCho,
         anHanGiay,
       })
       // Lưu bản CÓ đáp án trên máy thầy để màn Theo dõi chấm lại được sau này.
@@ -657,6 +662,37 @@ export default function ExamSetupScreen() {
 
       {/* 4b. GIỮ ĐỂ ĐỌC. Màn này chỉ mở CA THI; bài tập về nhà đi đường
         GiaoBaiTap và không bật cơ chế này. */}
+      <TheNoiDung>
+        {/* PHÒNG CHỜ (thầy chốt 07/09). Cùng khuôn nút gạt với Giữ để đọc. */}
+        <button
+          type="button"
+          role="switch"
+          aria-checked={phongCho}
+          aria-label="Phòng chờ"
+          onClick={() => setPhongCho((v) => !v)}
+          className="tap-target w-full flex items-center justify-between"
+          style={{ gap: 'var(--k3)', minHeight: 44, background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
+        >
+          <span style={TIEU_DE_MUC}>Phòng chờ</span>
+          <span className="flex items-center" style={{ flexShrink: 0, gap: 'var(--k2)' }}>
+            <span className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: phongCho ? 'var(--muc)' : 'var(--nhat)' }}>
+              {phongCho ? 'ĐANG BẬT' : 'ĐANG TẮT'}
+            </span>
+            <span
+              aria-hidden
+              style={{ flexShrink: 0, width: 64, height: 36, borderRadius: 'var(--bo-tron)', padding: 4, background: phongCho ? 'var(--muc)' : 'var(--vien-dam)', display: 'flex', alignItems: 'center', justifyContent: phongCho ? 'flex-end' : 'flex-start' }}
+            >
+              <span style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--the)' }} />
+            </span>
+          </span>
+        </button>
+        <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
+          {phongCho
+            ? 'Em vào ca thì đứng ở màn chờ, chưa nhận đề và đồng hồ chưa chạy. Thầy bấm "Bắt đầu thi" ở màn Theo dõi ca thì cả lớp hiện đề cùng một lúc. Em vào sớm không đọc trước được câu nào.'
+            : 'Em vào ca là nhận đề ngay, đồng hồ chạy từ lúc từng em vào.'}
+        </div>
+      </TheNoiDung>
+
       <TheNoiDung>
         {/* CẢ HÀNG là nút gạt (thầy báo 06/09: bấm không ăn). Bản cũ chỉ ô
           56×32 ở sát mép phải mới nhận chạm — dưới ngưỡng 44px, ngón tay trượt

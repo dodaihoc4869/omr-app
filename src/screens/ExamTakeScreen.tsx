@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
-import { cauKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, vaoThi, phieuCuaEm as layBaiDaNop, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { cauKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, trangThaiPhongCho, vaoThi, phieuCuaEm as layBaiDaNop, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
 import { goiCauHoi } from '../lib/hoi-bai'
 import TamTruotHoiBai, { type CauChon } from '../components/TamTruotHoiBai'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
@@ -170,7 +170,7 @@ const KHOA_NAM_SINH = 'ddh.em.namSinh'
 export default function ExamTakeScreen() {
   const showToast = useAppStore((s) => s.showToast)
 
-  const [phase, setPhase] = useState<'join' | 'loading' | 'exam' | 'submitted' | 'error'>('join')
+  const [phase, setPhase] = useState<'join' | 'loading' | 'cho' | 'exam' | 'submitted' | 'error'>('join')
   const [errorMsg, setErrorMsg] = useState('')
   // ĐÃ NỘP RỒI, MỞ LẠI LINK TRÊN MÁY KHÁC — thầy báo 07/09: em bấm link ca để
   // xem điểm thì nhận một ô ĐỎ như app hỏng. Bài đã nộp xong không phải lỗi,
@@ -197,6 +197,9 @@ export default function ExamTakeScreen() {
   // Nhìn thấy TÊN MÌNH thì gõ nhầm một số là phát hiện ngay.
   const [xacNhan, setXacNhan] = useState<{ sbd: string; hoTen: string; lop: string } | null>(null)
   const [dangTraTen, setDangTraTen] = useState(false)
+  // PHÒNG CHỜ (thầy chốt 07/09): em đã qua cổng nhưng thầy chưa bấm bắt đầu.
+  const [cho, setCho] = useState<{ tenCa: string; thoiGianPhut: number } | null>(null)
+  const [loiCho, setLoiCho] = useState('')
   // DANH TÍNH — máy chủ đối chiếu đủ ba (số báo danh, họ tên, năm sinh) với
   // danh sách thầy đã nạp. Nhớ trên máy để lần sau em chỉ gõ mã ca; đây là
   // tiện dùng, KHÔNG phải quyền: máy chủ vẫn kiểm lại mỗi lần vào thi.
@@ -845,6 +848,16 @@ export default function ExamTakeScreen() {
         setPhase('exam')
         return
       }
+      // PHÒNG CHỜ (thầy chốt 07/09). Em qua hết cổng nhưng thầy chưa bấm "Bắt
+      // đầu thi": máy chủ chưa tạo lượt và chưa gửi đề, nên ở đây KHÔNG có gì
+      // để dựng. Sang màn chờ và hỏi lại máy chủ vài giây một lần.
+      if (kq.cach === 'cho') {
+        setLop(kq.lop)
+        setCho({ tenCa: kq.tenCa, thoiGianPhut: kq.thoiGianPhut })
+        setPhase('cho')
+        return
+      }
+
       // Máy chủ nói "khôi phục" nhưng máy này đã nộp (mất mạng lúc nộp, máy chủ
       // chưa nhận) → về màn Đã nộp và gửi tiếp, không cho làm lại.
       if (kq.cach === 'khoi_phuc' && existing?.submitted) return moLaiDaNop(existing)
@@ -1641,6 +1654,41 @@ export default function ExamTakeScreen() {
     }
   }, [])
 
+  /** PHÒNG CHỜ — hỏi máy chủ vài giây một lần xem thầy bấm bắt đầu chưa.
+   *
+   * Ba giây một nhịp: cả lớp cùng chờ nên đây là lượt gọi đông nhất của ca,
+   * nhưng nhanh hơn thì tốn mà không ai thấy khác, chậm hơn thì em ngồi nhìn
+   * màn trắng sau khi thầy đã hô bắt đầu.
+   *
+   * Thầy bấm bắt đầu thì gọi lại chính `handleJoin` — lúc đó máy chủ mới tạo
+   * lượt, mới tính giờ, mới gửi đề. Không có đường tắt nào bỏ qua nó. */
+  useEffect(() => {
+    if (phase !== 'cho') return
+    let con = true
+    const url = scriptUrl.trim()
+    if (!url) return
+    const hoi = async () => {
+      try {
+        const tt = await trangThaiPhongCho(url, maCa.trim())
+        if (!con) return
+        if (tt.batDau) {
+          setCho(null)
+          void handleJoin()
+        }
+      } catch (e) {
+        // Ca bị thầy huỷ giữa lúc chờ: nói thẳng, đừng để em đứng mãi.
+        if (con) setLoiCho(e instanceof Error ? e.message : 'Mất kết nối — em cứ chờ, máy tự hỏi lại.')
+      }
+    }
+    void hoi()
+    const dong = setInterval(() => void hoi(), 3000)
+    return () => {
+      con = false
+      clearInterval(dong)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, scriptUrl, maCa])
+
   const updateAndSave = (mutate: (a: ExamAttempt) => ExamAttempt) => {
     setAttempt((cur) => {
       if (!cur) return cur
@@ -1814,6 +1862,33 @@ export default function ExamTakeScreen() {
               )}
             </div>
           </TheNoiDung>
+        </div>
+      </Trang>
+    )
+  }
+
+  // MÀN PHÒNG CHỜ (thầy chốt 07/09). Trắng, một dòng chữ, không có gì để bấm.
+  // Cố ý trống: em đang ngồi trong phòng thi và thầy sắp hô bắt đầu, mọi thứ
+  // hiện ra ở đây đều là thứ kéo mắt em khỏi việc chuẩn bị.
+  if (phase === 'cho') {
+    return (
+      <Trang className="flex items-center justify-center px-4">
+        <div className="w-full text-center" style={{ maxWidth: 360 }}>
+          <div className="flex justify-center" style={{ color: 'var(--nhat)', marginBottom: 'var(--k5)' }}>
+            <LogoDDH size={40} />
+          </div>
+          <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', color: 'var(--muc)' }}>
+            Đang chờ Thầy bấm bắt đầu
+          </div>
+          <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginTop: 'var(--k3)', lineHeight: 1.6 }}>
+            Em giữ nguyên màn hình này. Đề hiện ra ngay khi Thầy bắt đầu.
+            {cho?.thoiGianPhut ? ` Bài làm trong ${cho.thoiGianPhut} phút, đồng hồ chạy từ lúc đó.` : ''}
+          </div>
+          {loiCho && (
+            <div style={{ marginTop: 'var(--k4)' }}>
+              <OThongBao tone="do">{loiCho}</OThongBao>
+            </div>
+          )}
         </div>
       </Trang>
     )

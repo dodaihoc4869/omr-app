@@ -17,6 +17,7 @@ import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { classify } from '../engine/score'
 import { useAppStore } from '../store/appStore'
 import NutDongBoDanhSach from '../components/NutDongBoDanhSach'
+import NutThemHocSinh from '../components/NutThemHocSinh'
 import PhieuZaloEm from '../components/PhieuZaloEm'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -246,12 +247,22 @@ export default function HocSinhScreen() {
         {/* CÙNG MỘT NÚT VỚI KHO ĐỀ: bấm là chọn file danh sách rồi đẩy lên máy
             chủ. Danh sách này là CỔNG VÀO THI — nạp xong, số báo danh ngoài
             danh sách không thi được nữa. */}
-        <NutDongBoDanhSach
-          onXong={(soEm, tomTat) => {
-            showToast(`Đã nạp ${soEm} em lên máy chủ${tomTat ? ` — ${tomTat}` : ''}. Từ giờ chỉ những em này vào thi được.`, 'success')
-            void tai()
-          }}
-        />
+        <div className="flex flex-col items-end" style={{ gap: 'var(--k2)' }}>
+          <NutDongBoDanhSach
+            onXong={(soEm, tomTat) => {
+              showToast(`Đã nạp ${soEm} em lên máy chủ${tomTat ? ` — ${tomTat}` : ''}. Từ giờ chỉ những em này vào thi được.`, 'success')
+              void tai()
+            }}
+          />
+          {/* THÊM MỘT EM (thầy chốt 07/09). Ghi thẳng vào Google Sheet gốc của
+              khối, không chỉ vào bản sao — bản sao bị lượt Đồng bộ sau ghi đè. */}
+          <NutThemHocSinh
+            onXong={(_soEm, tomTat) => {
+              showToast(tomTat, 'success')
+              void tai()
+            }}
+          />
+        </div>
       </div>
 
       {/* Nói thẳng chạm vào đâu để giao bài — nút Giao bài tập nằm trong hồ sơ

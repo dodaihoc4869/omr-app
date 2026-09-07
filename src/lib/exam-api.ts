@@ -102,6 +102,16 @@ export function khoiTuNamSinh(namSinh: string | number, now: Date = new Date()):
 export type KetQuaVaoThi =
   | {
       ok: true
+      /** PHÒNG CHỜ (thầy chốt 07/09): em qua hết cổng nhưng thầy chưa bấm "Bắt
+       * đầu thi". Chưa có lượt, chưa có đề, đồng hồ chưa chạy. */
+      cach: 'cho'
+      lop: string
+      thoiGianPhut: number
+      congBo: CongBoDiem
+      tenCa: string
+    }
+  | {
+      ok: true
       /** moi = lượt mới · khoi_phuc = mở lại cùng máy (rớt mạng) · duyet_lai = thầy đã duyệt cho thi lại */
       cach: 'moi' | 'khoi_phuc' | 'duyet_lai'
       lop: string
@@ -161,6 +171,36 @@ export async function tenTheoSbd(scriptUrl: string, maCa: string, sbd: string): 
     lop: String(r.lop ?? ''),
     tenCa: String(r.tenCa ?? ''),
   }
+}
+
+export interface TrangThaiPhongCho {
+  phongCho: boolean
+  /** Thầy đã bấm "Bắt đầu thi" chưa. */
+  batDau: boolean
+  batDauLuc: string
+  trangThai: string
+}
+
+/** MÁY EM HỎI LẠI: thầy bấm bắt đầu chưa. Lệnh nhẹ nhất có thể — em đang đứng
+ * chờ và hỏi vài giây một lần. Ca bị thầy huỷ giữa lúc chờ thì ném lỗi để màn
+ * chờ nói thẳng, đừng để em đứng mãi. */
+export async function trangThaiPhongCho(scriptUrl: string, maCa: string): Promise<TrangThaiPhongCho> {
+  const r = await postJson(scriptUrl, { action: 'trangThaiPhongCho', maCa })
+  if (!r.ok) throw new Error(r.error || 'Không hỏi được trạng thái ca')
+  return {
+    phongCho: r.phongCho === true,
+    batDau: r.batDau === true,
+    batDauLuc: String(r.batDauLuc ?? ''),
+    trangThai: String(r.trangThai ?? ''),
+  }
+}
+
+/** THẦY BẤM BẮT ĐẦU THI. Từ giây đó máy em mới xin đề và đồng hồ mới chạy.
+ * Bấm lần hai giữ mốc lần đầu — không kéo dài giờ của em đã vào. */
+export async function batDauThi(scriptUrl: string, secret: string, maCa: string): Promise<{ batDauLuc: string; daBatTruoc: boolean }> {
+  const r = await postJson(scriptUrl, { action: 'batDauThi', secret, maCa })
+  if (!r.ok) throw new Error(r.error || 'Không bắt đầu được ca')
+  return { batDauLuc: String(r.batDauLuc ?? ''), daBatTruoc: r.daBatTruoc === true }
 }
 
 export async function vaoThi(
@@ -283,6 +323,9 @@ export interface MocThoiGianCa {
    * nguyên hành vi cũ. `anHanGiay` là một trong 2 / 3 / 5 / 10. */
   giuDeDoc?: boolean
   anHanGiay?: number
+  /** PHÒNG CHỜ (thầy chốt 07/09): em vào ca thì đứng ở màn chờ, chưa nhận đề.
+   * Cả lớp nhận đề đúng một thời điểm khi thầy bấm "Bắt đầu thi". */
+  phongCho?: boolean
 }
 
 /** Loại ca: kiểm tra hay bài tập về nhà. Dùng CHUNG mọi thứ, khác nhau bằng cờ này. */
@@ -322,6 +365,7 @@ export async function publishSession(
     lenBang: moc.lenBang !== false,
     giuDeDoc: moc.giuDeDoc === true,
     anHanGiay: moc.giuDeDoc === true ? moc.anHanGiay || 3 : 0,
+    phongCho: moc.phongCho === true,
   })
   if (!result.ok) throw new Error(result.error || 'Mở ca kiểm tra thất bại')
   return { batDau: String(result.batDau || ''), hetHanVao: String(result.hetHanVao || '') }
@@ -985,6 +1029,32 @@ export async function napDanhSachLop(
   }
 }
 
+export interface EmVuaThem {
+  sbd: string
+  hoTen: string
+  namSinh: string
+  lop: string
+  /** Tên Google Sheet khối đã ghi vào — thầy đối chiếu xem có đúng khối không. */
+  tenSheet: string
+}
+
+/** THÊM MỘT EM VÀO ĐÚNG SHEET KHỐI CỦA THẦY (thầy chốt 07/09).
+ *
+ * Ghi vào Google Sheet GỐC chứ không chỉ bản sao trên máy chủ: bản sao bị lượt
+ * Đồng bộ kế tiếp ghi đè, nên em thêm vào bản sao sẽ biến mất mà không ai biết.
+ * Ghi xong thêm luôn vào bản sao để em vào thi được ngay. */
+export async function themEmVaoSheet(scriptUrl: string, secret: string, em: { sbd: string; hoTen: string; namSinh: string }): Promise<EmVuaThem> {
+  const r = await postJson(scriptUrl, { action: 'themEmVaoSheet', secret, sbd: em.sbd, hoTen: em.hoTen, namSinh: em.namSinh })
+  if (!r.ok) throw new Error(r.error || 'Không thêm được học sinh')
+  return {
+    sbd: String(r.sbd ?? em.sbd),
+    hoTen: String(r.hoTen ?? em.hoTen),
+    namSinh: String(r.namSinh ?? em.namSinh),
+    lop: String(r.lop ?? ''),
+    tenSheet: String(r.tenSheet ?? ''),
+  }
+}
+
 /** Link danh sách lớp thầy đã lưu trên máy chủ (mỗi khối một link).
  *
  * Máy chủ chỉ GIỮ LINK hộ, không tải: `UrlFetchApp` đòi thêm quyền
@@ -1221,6 +1291,11 @@ export interface CaTomTat {
   khoaLuc?: string
   khoaBoi?: string
   moKhoaLuc?: string
+  /** PHÒNG CHỜ (thầy chốt 07/09): em vào ca thì đứng ở màn chờ, chưa nhận đề.
+   * Ca cũ không có cột này ⇒ false, chạy y như trước. */
+  phongCho?: boolean
+  /** Thầy bấm "Bắt đầu thi" lúc nào. Rỗng = chưa bấm, em vẫn đang chờ. */
+  batDauThiLuc?: string
   daVao: number
   daNop: number
   canhBao: number

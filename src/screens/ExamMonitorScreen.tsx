@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, RefreshCw, Trash2, ArrowLeft, ChevronRight, Images, FileSpreadsheet, FileJson, Lock, Unlock, Send, Pencil, LogIn, BarChart3 } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
-import { chiTietCa, doiTenCa, dongBoTenCa, duyetThiLai, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
+import { batDauThi, chiTietCa, doiTenCa, dongBoTenCa, duyetThiLai, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
 import { chuanTenCa, tenHienCua, TEN_CA_TOI_DA } from '../lib/ten-ca'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { goiPhieuCaZip, tenTepZipCa, chuyenDeTuChiTiet, type EmTrongCaDeXuatPhieu } from '../lib/phieu-hang-loat'
@@ -130,6 +130,10 @@ export default function ExamMonitorScreen() {
   // Đồng bộ họ tên từ danh sách lớp vào ca. Em vào thi chỉ gõ số báo danh nên
   // cột tên của lượt bỏ trống, phiếu gửi phụ huynh in "SBD 10038" thay vì tên.
   const [dangDongBoTen, setDangDongBoTen] = useState(false)
+  // PHÒNG CHỜ (thầy chốt 07/09): ca bật phòng chờ thì em đứng ở màn trắng cho
+  // tới khi thầy bấm Bắt đầu thi ngay tại đây.
+  const [dangBatDau, setDangBatDau] = useState(false)
+  const [hoiHuy, setHoiHuy] = useState(false)
   // Tải phiếu cả ca: dựng ảnh cho từng em rồi gói .zip, chạy hoàn toàn tại máy
   // thầy nên không phụ thuộc mạng.
   const [dangGoiPhieu, setDangGoiPhieu] = useState('')
@@ -423,6 +427,37 @@ export default function ExamMonitorScreen() {
       showToast(`Không đồng bộ được tên: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
     } finally {
       setDangDongBoTen(false)
+    }
+  }
+
+  const batDauCaNay = async () => {
+    if (!chiTiet) return
+    setDangBatDau(true)
+    try {
+      const kq = await batDauThi(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa)
+      showToast(kq.daBatTruoc ? 'Ca này đã bắt đầu từ trước.' : 'Đã bắt đầu — cả lớp hiện đề ngay bây giờ.', 'success')
+      await tai(chiTiet.ca.maCa)
+    } catch (e) {
+      showToast(`Không bắt đầu được: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
+    } finally {
+      setDangBatDau(false)
+    }
+  }
+
+  /** HUỶ CA ĐANG CHỜ. Chưa em nào làm bài nên không mất gì; xoá vẫn là xoá MỀM
+   * nên bấm nhầm thì vào Lịch sử ca khôi phục lại được. */
+  const huyCaCho = async () => {
+    if (!chiTiet) return
+    setDangXoa(true)
+    try {
+      await xoaCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, chiTiet.ca.maCa)
+      showToast('Đã huỷ ca. Em đang chờ sẽ thấy báo ca đã huỷ.', 'success')
+      setHoiHuy(false)
+      setScreen('lichsuca')
+    } catch (e) {
+      showToast(`Không huỷ được ca: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
+    } finally {
+      setDangXoa(false)
     }
   }
 
@@ -868,6 +903,58 @@ export default function ExamMonitorScreen() {
                 </div>
               ))}
             </div>
+            {/* PHÒNG CHỜ (thầy chốt 07/09). Ca bật phòng chờ mà thầy chưa bấm
+                bắt đầu thì em đang đứng ở màn trắng — đây là việc gấp nhất
+                trên màn này, nên nó đứng trên cả cửa vào ca.
+                Hai nút đúng như thầy chốt: Bắt đầu thi và Huỷ ca thi. */}
+            {chiTiet.ca.phongCho && !chiTiet.ca.batDauThiLuc && (
+              <div style={{ marginTop: 'var(--k3)', background: 'var(--tim-nen)', borderRadius: 'var(--bo-2)', padding: 'var(--k4)' }}>
+                <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
+                  Ca đang ở phòng chờ
+                </div>
+                <div style={{ ...NHAN_NHO, marginTop: 'var(--k1)' }}>
+                  Em vào ca đang thấy màn chờ, chưa nhận đề và đồng hồ chưa chạy. Bấm Bắt đầu thi thì cả lớp hiện đề cùng một lúc.
+                </div>
+                <div className="grid grid-cols-2" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
+                  <button
+                    type="button"
+                    onClick={() => void batDauCaNay()}
+                    disabled={dangBatDau}
+                    className="tap-target font-bold"
+                    style={{ minHeight: 52, borderRadius: 'var(--bo-2)', border: 'none', background: 'var(--xanh)', color: 'var(--muc-nguoc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}
+                  >
+                    {dangBatDau ? 'Đang bắt đầu…' : 'Bắt đầu thi'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setHoiHuy(true)}
+                    disabled={dangXoa}
+                    className="tap-target font-bold"
+                    style={{ minHeight: 52, borderRadius: 'var(--bo-2)', border: '1.5px solid var(--do)', background: 'transparent', color: 'var(--do)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}
+                  >
+                    Huỷ ca thi
+                  </button>
+                </div>
+                {hoiHuy && (
+                  <div style={{ marginTop: 'var(--k3)' }}>
+                    <OThongBao tone="do">Huỷ ca <b style={SO}>{chiTiet.ca.maCa}</b>? Em đang chờ sẽ thấy báo ca đã huỷ. Ca vào Lịch sử ca, khôi phục lại được.</OThongBao>
+                    <div className="flex" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
+                      <button type="button" onClick={() => setHoiHuy(false)} className="tap-target flex-1 font-bold" style={{ height: 48, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)', border: 'none' }}>
+                        Không huỷ
+                      </button>
+                      <button type="button" onClick={() => void huyCaCho()} disabled={dangXoa} className="tap-target flex-1 font-bold" style={{ height: 48, borderRadius: 'var(--bo-1)', background: 'var(--do)', color: 'var(--giay)', border: 'none' }}>
+                        {dangXoa ? 'Đang huỷ…' : 'Huỷ ca'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            {chiTiet.ca.phongCho && chiTiet.ca.batDauThiLuc && (
+              <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>
+                Phòng chờ đã mở lúc <span style={SO}>{gio(chiTiet.ca.batDauThiLuc)}</span> — em vào từ giờ nhận đề ngay.
+              </div>
+            )}
             {/* CỬA VÀO CA — HAI NÚT, LUÔN THẤY CẢ HAI (thầy chốt 05/09).
                 Trước đây chỉ có MỘT nút đổi mặt theo trạng thái: đang mở thì
                 thấy nút khoá, đã khoá thì thấy nút mở. Nhìn một nút

@@ -100,7 +100,12 @@ const DRIVE_FOLDER = 'OMR-APP-DATA'
 // Cột GiuDeDoc (24) + AnHanGiay (25) = GIUDEDOC.md: đề chỉ hiện khi ngón tay em
 // còn trên màn thi. Ô TRỐNG (mọi ca mở trước 05/09) = TẮT — ngược hẳn LenBang,
 // vì bật nhầm cho ca cũ là đổi cách làm bài của một em không biết trước.
-const CA_HEADERS = ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson', 'BatDau', 'HetHanVao', 'TrangThai', 'TenCa', 'PhamVi', 'DanhSachMoi', 'NguoiTao', 'XoaLuc', 'NguongLan', 'NguongGiay', 'Loai', 'HanNop', 'KhoaLuc', 'KhoaBoi', 'MoKhoaLuc', 'LenBang', 'GiuDeDoc', 'AnHanGiay']
+// PHÒNG CHỜ (thầy chốt 07/09) — hai cột cuối:
+//   PhongCho     'co' = em vào ca thì đứng ở màn chờ, chưa nhận đề.
+//   BatDauThiLuc thầy bấm "Bắt đầu thi" lúc nào. Rỗng = chưa bấm.
+// `boSungTieuDe_` tự thêm hai cột này vào sheet cũ, ca cũ đọc ra rỗng nên chạy
+// y như trước.
+const CA_HEADERS = ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson', 'BatDau', 'HetHanVao', 'TrangThai', 'TenCa', 'PhamVi', 'DanhSachMoi', 'NguoiTao', 'XoaLuc', 'NguongLan', 'NguongGiay', 'Loai', 'HanNop', 'KhoaLuc', 'KhoaBoi', 'MoKhoaLuc', 'LenBang', 'GiuDeDoc', 'AnHanGiay', 'PhongCho', 'BatDauThiLuc']
 
 /** Đọc cột GiuDeDoc: CHỈ chuỗi 'co' mới là BẬT. Ô trống = tắt. */
 function giuDeDocCua_(v) {
@@ -456,6 +461,8 @@ function docCa_(sh, row) {
     lenBang: lenBangCua_(v[22]),
     giuDeDoc: giuDeDocCua_(v[23]),
     anHanGiay: anHanGiayCua_(v[24]),
+    phongCho: String(v[25] || '') === 'co',
+    batDauThiLuc: v[26] ? String(v[26]) : '',
   }
 }
 
@@ -774,6 +781,65 @@ function docLinkDsLop_() {
 
 function luuLinkDsLop_(arr) {
   PropertiesService.getScriptProperties().setProperty(KHOA_LINK_DSLOP, JSON.stringify(arr || []))
+}
+
+/** Lớp suy từ năm sinh (vào lớp 1 lúc 6 tuổi; năm học mới tính từ tháng 9).
+ * Sheet khối của thầy chỉ có SBD, họ tên, năm sinh — cột Lớp tự tính. */
+function lopTuNamSinh_(namSinh) {
+  var ns = Number(namSinh)
+  if (!(ns >= 1990 && ns <= 2100)) return ''
+  var d = new Date()
+  var namHoc = d.getMonth() >= 8 ? d.getFullYear() : d.getFullYear() - 1
+  var lop = namHoc - ns - 5
+  return lop >= 1 && lop <= 12 ? String(lop) : ''
+}
+
+/** Nhận diện cột theo TÊN TIÊU ĐỀ, không theo vị trí: ba sheet khối của thầy
+ * đặt tiêu đề khác nhau ("HoTen" và "Họ tên"). Không tiêu đề nào khớp thì mới
+ * lùi về vị trí 0-1-2-3. */
+function cotDsLop_(tieuDe) {
+  var vt = { sbd: -1, hoTen: -1, namSinh: -1, lop: -1 }
+  for (var i = 0; i < tieuDe.length; i++) {
+    var t = chuanTen_(tieuDe[i]).replace(/\s/g, '')
+    if (vt.sbd < 0 && (t === 'sbd' || t === 'sobaodanh' || t === 'so')) vt.sbd = i
+    else if (vt.hoTen < 0 && (t === 'hoten' || t === 'ten' || t === 'hovaten')) vt.hoTen = i
+    else if (vt.namSinh < 0 && (t === 'namsinh' || t === 'nam' || t === 'ngaysinh')) vt.namSinh = i
+    else if (vt.lop < 0 && (t === 'lop' || t === 'khoi')) vt.lop = i
+  }
+  if (vt.sbd < 0) vt.sbd = 0
+  if (vt.hoTen < 0) vt.hoTen = 1
+  if (vt.namSinh < 0) vt.namSinh = 2
+  return vt
+}
+
+/** Khoá Script property giữ bản đồ năm sinh → id sheet khối. */
+var KHOA_SHEET_KHOI = 'SHEET_KHOI_JSON'
+
+/** Mở SHEET GỐC của một khối theo năm sinh.
+ *
+ * Nhớ id vào Script property sau lần tìm đầu, nên chỉ quét Drive một lần cho
+ * mỗi khối. Không tìm ra, hoặc tìm ra HAI tệp cùng tên, thì DỪNG và nói rõ —
+ * đoán bừa một sheet là ghi tên em vào khối khác. */
+function moSheetKhoi_(namSinh) {
+  var nam = String(namSinh || '').trim()
+  if (!/^\d{4}$/.test(nam)) return { ok: false, error: 'Năm sinh không hợp lệ' }
+  var props = PropertiesService.getScriptProperties()
+  var ban = {}
+  try { ban = JSON.parse(props.getProperty(KHOA_SHEET_KHOI) || '{}') } catch (err) { ban = {} }
+  if (ban[nam]) {
+    try { return { ok: true, ss: SpreadsheetApp.openById(ban[nam]) } } catch (err) { delete ban[nam] }
+  }
+  var it = DriveApp.getFilesByName(nam)
+  var thay = []
+  while (it.hasNext()) {
+    var f = it.next()
+    if (f.getMimeType() === MimeType.GOOGLE_SHEETS) thay.push(f.getId())
+  }
+  if (thay.length === 0) return { ok: false, error: 'Không thấy Google Sheet nào tên "' + nam + '" trong Drive của thầy' }
+  if (thay.length > 1) return { ok: false, error: 'Có ' + thay.length + ' Google Sheet cùng tên "' + nam + '" — đổi tên cho khác nhau rồi thêm lại' }
+  ban[nam] = thay[0]
+  props.setProperty(KHOA_SHEET_KHOI, JSON.stringify(ban))
+  return { ok: true, ss: SpreadsheetApp.openById(thay[0]) }
 }
 
 /** Đọc TOÀN BỘ bản sao danh sách học sinh (một lần đọc sheet). */
@@ -2612,8 +2678,11 @@ function doPost(e) {
     const lenBang = body.lenBang === false ? 'khong' : 'co'
     const giuDeDoc = body.giuDeDoc === true ? 'co' : ''
     const anHanGiay = body.giuDeDoc === true ? Number(body.anHanGiay) || AN_HAN_GIAY_MAC_DINH : ''
-    sh.getRange(dong, 23, 1, 3).setValues([[lenBang, giuDeDoc, anHanGiay]])
-    return jsonResponse_({ ok: true, batDau: batDau, hetHanVao: rowData[8], loai: rowData[17], hanNop: rowData[18], lenBang: lenBang === 'co', giuDeDoc: giuDeDoc === 'co', anHanGiay: anHanGiay || 0, serverNow: Date.now() })
+    // PHÒNG CHỜ: mở lại cùng mã ca thì BatDauThiLuc về rỗng — ca mới là chờ
+    // mới, không kế thừa lần bấm bắt đầu của lần trước.
+    const phongCho = body.phongCho === true ? 'co' : ''
+    sh.getRange(dong, 23, 1, 5).setValues([[lenBang, giuDeDoc, anHanGiay, phongCho, '']])
+    return jsonResponse_({ ok: true, batDau: batDau, hetHanVao: rowData[8], loai: rowData[17], hanNop: rowData[18], lenBang: lenBang === 'co', giuDeDoc: giuDeDoc === 'co', anHanGiay: anHanGiay || 0, phongCho: phongCho === 'co', serverNow: Date.now() })
   }
 
   if (action === 'vaoThi') {
@@ -2692,6 +2761,24 @@ function doPost(e) {
         qd.serverNow = now
         qd.thoiGianPhut = ca.thoiGianPhut
         return jsonResponse_(qd)
+      }
+      // PHÒNG CHỜ (thầy chốt 07/09). Em qua hết cổng nhưng thầy chưa bấm "Bắt
+      // đầu thi" thì DỪNG LẠI ĐÂY:
+      //   - KHÔNG tạo lượt, nên đồng hồ chưa chạy cho ai;
+      //   - KHÔNG trả đề, nên đề chưa nằm trên máy em một giây nào.
+      // Cả lớp nhận đề đúng một thời điểm, và em vào sớm không đọc trước được.
+      // Em đã có lượt (vào rồi, thoát ra vào lại) thì KHÔNG bị đẩy về phòng
+      // chờ — bài của em đang chạy dở.
+      if (ca.phongCho && !ca.batDauThiLuc && !luot) {
+        return jsonResponse_({
+          ok: true,
+          cach: 'cho',
+          lop: ca.lop,
+          thoiGianPhut: ca.thoiGianPhut,
+          tenCa: ca.tenCa || '',
+          congBo: ca.congBo,
+          serverNow: now,
+        })
       }
       let lanThu = 1
       let vaoLuc = new Date(now).toISOString()
@@ -2848,6 +2935,8 @@ function doPost(e) {
         lenBang: lenBangCua_(v[22]),
         giuDeDoc: giuDeDocCua_(v[23]),
         anHanGiay: anHanGiayCua_(v[24]),
+        phongCho: String(v[25] || '') === 'co',
+        batDauThiLuc: v[26] ? String(v[26]) : '',
         xoaLuc: v[14] ? String(v[14]) : '',
         daVao: tk.daVao,
         daNop: tk.daNop,
@@ -2915,6 +3004,101 @@ function doPost(e) {
     try { danhSachMoi = ca.danhSachMoi && ca.phamVi === 'chon' ? JSON.parse(ca.danhSachMoi) : [] } catch (err) {}
     ca.danhSachMoi = ca.phamVi === 'chon' ? danhSachMoi : ca.danhSachMoi
     return jsonResponse_({ ok: true, ca: ca, luot: luot, keyBank: keyBank, biChan: docChanVao_(maCa), serverNow: Date.now() })
+  }
+
+  if (action === 'themEmVaoSheet') {
+    // THÊM MỘT EM VÀO ĐÚNG SHEET KHỐI CỦA THẦY (thầy chốt 07/09).
+    //
+    // Thầy gõ ba ô ở màn Học sinh, bấm Thêm; máy ghi thẳng vào Google Sheet gốc
+    // của khối đó rồi thêm luôn vào bản sao DanhSachLop — em vào thi được ngay,
+    // không phải đợi lượt đồng bộ sau.
+    //
+    // GHI VÀO SHEET GỐC chứ không chỉ DanhSachLop: bản sao bị lượt Đồng bộ kế
+    // tiếp ghi đè, nên em thêm vào bản sao sẽ biến mất mà không ai biết.
+    //
+    // TÌM SHEET THEO NĂM SINH: sheet của thầy đặt tên đúng bằng năm sinh
+    // ("2009", "2010", "2011"). Tìm được thì nhớ vào Script property, lần sau
+    // không phải quét Drive nữa. Không tìm ra thì DỪNG và nói rõ — đoán bừa
+    // một sheet là ghi tên em vào khối khác.
+    const loiTE = kiemTraMaBiMat_(body)
+    if (loiTE) return jsonResponse_({ ok: false, error: loiTE })
+    const sbdTE = String(body.sbd || '').trim()
+    const tenTE = String(body.hoTen || '').replace(/\s+/g, ' ').trim()
+    const namTE = chuanNamSinh_(body.namSinh)
+    if (!/^\d{3,12}$/.test(sbdTE)) return jsonResponse_({ ok: false, error: 'Số báo danh phải là số, 3 tới 12 chữ số' })
+    if (!tenTE) return jsonResponse_({ ok: false, error: 'Chưa nhập họ tên' })
+    if (!namTE) return jsonResponse_({ ok: false, error: 'Năm sinh phải là 4 chữ số, ví dụ 2009' })
+
+    // Số báo danh đã có trong danh sách thì DỪNG — trùng số là hai em cùng một
+    // bài thi, hỏng cả buổi.
+    const daCoTE = timTrongDanhSachLop_(sbdTE)
+    if (daCoTE) {
+      return jsonResponse_({ ok: false, lyDo: 'trung_sbd', error: 'Số báo danh ' + sbdTE + ' đã có trong danh sách: ' + (daCoTE.hoTen || '(chưa có tên)') })
+    }
+
+    const ssTE = moSheetKhoi_(namTE)
+    if (!ssTE.ok) return jsonResponse_({ ok: false, error: ssTE.error })
+    const shTE = ssTE.ss.getSheets()[0]
+    const dTE = shTE.getDataRange().getValues()
+    const vtTE = cotDsLop_(dTE.length ? dTE[0] : [])
+    for (var iTE = 1; iTE < dTE.length; iTE++) {
+      if (String(dTE[iTE][vtTE.sbd]).trim() === sbdTE) {
+        return jsonResponse_({ ok: false, lyDo: 'trung_sbd', error: 'Sheet khối ' + namTE + ' đã có số báo danh ' + sbdTE })
+      }
+    }
+    const soCot = Math.max(dTE.length ? dTE[0].length : 3, vtTE.sbd + 1, vtTE.hoTen + 1, vtTE.namSinh + 1)
+    const hangTE = []
+    for (var cTE = 0; cTE < soCot; cTE++) hangTE.push('')
+    hangTE[vtTE.sbd] = sbdTE
+    hangTE[vtTE.hoTen] = tenTE
+    hangTE[vtTE.namSinh] = namTE
+    if (vtTE.lop >= 0) hangTE[vtTE.lop] = lopTuNamSinh_(namTE)
+    shTE.appendRow(hangTE)
+
+    // Thêm luôn vào bản sao để em vào thi được ngay.
+    const shDS = getSheet_(SHEET_DSLOP, DSLOP_HEADERS)
+    shDS.appendRow([sbdTE, tenTE, namTE, lopTuNamSinh_(namTE), new Date().toISOString()])
+
+    return jsonResponse_({ ok: true, sbd: sbdTE, hoTen: tenTE, namSinh: namTE, lop: lopTuNamSinh_(namTE), tenSheet: ssTE.ss.getName() })
+  }
+
+  if (action === 'trangThaiPhongCho') {
+    // MÁY EM HỎI LẠI: thầy bấm bắt đầu chưa. Lệnh nhẹ nhất có thể — em đang
+    // đứng chờ và hỏi vài giây một lần, nên chỉ đọc ĐÚNG một dòng ca và trả về
+    // ba trường. Không đề, không đáp án, không danh sách.
+    const maCaPC2 = String(body.maCa || '').trim()
+    if (!maCaPC2) return jsonResponse_({ ok: false, error: 'Thiếu mã ca' })
+    const shPC = sheetCa_()
+    const rowPC = findRowByKey_(shPC, 0, maCaPC2)
+    if (rowPC < 0) return jsonResponse_({ ok: false, lyDo: 'khong_co_ca', error: 'Không tìm thấy ca kiểm tra' })
+    const caPC = docCa_(shPC, rowPC)
+    // Ca bị thầy HUỶ giữa lúc em đang chờ: nói thẳng, đừng để em đứng mãi.
+    if (caPC.trangThai === 'da_xoa') return jsonResponse_({ ok: false, lyDo: 'da_xoa', error: 'Thầy đã huỷ ca kiểm tra này.' })
+    return jsonResponse_({
+      ok: true,
+      phongCho: !!caPC.phongCho,
+      batDau: !!caPC.batDauThiLuc,
+      batDauLuc: caPC.batDauThiLuc || '',
+      trangThai: caPC.trangThai,
+      serverNow: Date.now(),
+    })
+  }
+
+  if (action === 'batDauThi') {
+    // THẦY BẤM BẮT ĐẦU. Ghi mốc giờ; từ giây đó máy em mới xin đề và đồng hồ
+    // mới chạy. Bấm hai lần thì giữ mốc lần đầu — bấm nhầm lần hai không được
+    // kéo dài giờ của em đã vào.
+    const loiBD = kiemTraMaBiMat_(body)
+    if (loiBD) return jsonResponse_({ ok: false, error: loiBD })
+    const maCaBD = String(body.maCa || '').trim()
+    const shBD = sheetCa_()
+    const rowBD = findRowByKey_(shBD, 0, maCaBD)
+    if (rowBD < 0) return jsonResponse_({ ok: false, error: 'Không có ca ' + maCaBD })
+    const caBD = docCa_(shBD, rowBD)
+    if (caBD.batDauThiLuc) return jsonResponse_({ ok: true, batDauLuc: caBD.batDauThiLuc, daBatTruoc: true })
+    const lucBD = new Date().toISOString()
+    shBD.getRange(rowBD, 27).setValue(lucBD)
+    return jsonResponse_({ ok: true, batDauLuc: lucBD, daBatTruoc: false })
   }
 
   if (action === 'tenTheoSbd') {
