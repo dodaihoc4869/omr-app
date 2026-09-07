@@ -18,6 +18,9 @@ import { taoBaiGhiDiem } from './chi-tiet-cau'
 import { gomCa } from './phieu-ca-ca'
 import type { QuotaPhan, SoCauBaPhan } from '../engine/score'
 
+/** Số em ghi điểm trong MỘT lượt gọi máy chủ. Xem ghi chú ở `chamLaiCa`. */
+const CO_LO = 5
+
 export interface DiemBaPhan {
   I: number | null
   II: number | null
@@ -65,7 +68,16 @@ export async function chamLaiCa(url: string, mat: string, maCa: string): Promise
   const bai = goi.daCham.map((e) =>
     taoBaiGhiDiem(goi.keyBank, maCa, e.sbd, e.moiNhat.lanThu, e.moiNhat.dapAn!, e.graded, e.moiNhat.giayCau),
   )
-  const kq = await ghiDiem(url, mat, maCa, bai)
+  // GHI THEO LÔ NHỎ. Gói `ghiDiem` mang cả chi tiết TỪNG CÂU của từng em; ca
+  // 21 em gửi một lần là quá 25 giây và `postJson` cắt ngang — đo được 07/09,
+  // lượt đầu chấm lại ca 248567 hỏng đúng vì lý do này. Tuần tự chứ không song
+  // song: Apps Script khoá script theo từng lượt ghi.
+  const kq = { daGhi: [] as string[], tuChoi: [] as string[] }
+  for (let i = 0; i < bai.length; i += CO_LO) {
+    const phan = await ghiDiem(url, mat, maCa, bai.slice(i, i + CO_LO))
+    kq.daGhi.push(...phan.daGhi)
+    kq.tuChoi.push(...phan.tuChoi)
+  }
 
   const dau = goi.daCham[0]?.graded.score
   return {
