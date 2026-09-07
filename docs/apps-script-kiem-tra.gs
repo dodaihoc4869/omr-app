@@ -188,6 +188,68 @@ const SO_CAU_YEU_CAU_MAC_DINH = 10
 const SHEET_DSLOP = 'DanhSachLop'
 const DSLOP_HEADERS = ['SBD', 'HoTen', 'NamSinh', 'Lop', 'CapNhatLuc']
 
+// NHẬT KÝ BỊ CHẶN Ở CỔNG VÀO THI (thầy báo 07/09).
+//
+// Cổng vào thi so đủ ba: số báo danh, họ tên, năm sinh. Em bị chặn thì máy chủ
+// CỐ Ý không nói sai ô nào — nói ra là cho phép dò tên học sinh từ số báo danh.
+// Nhưng thầy đứng trong phòng thi thì cần biết ngay, mà bản cũ không giữ lại
+// dấu vết gì: hai em gõ đúng cả ba ô vẫn bị chặn và không lần ra được vì sao.
+//
+// Mỗi lượt chặn ghi một dòng ở đây. Màn Theo dõi ca đọc ra và bày thẳng: em gõ
+// gì, danh sách ghi gì. Chỉ thầy đọc được (lệnh `chiTietCa` đòi mã bí mật).
+const SHEET_CHANVAO = 'ChanVao'
+const CHANVAO_HEADERS = ['Luc', 'MaCa', 'SBD', 'HoTenGoi', 'NamSinhGoi', 'HoTenDs', 'NamSinhDs', 'LyDo']
+/** Số dòng nhật ký chặn giữ lại cho MỘT ca khi trả về màn Theo dõi. */
+const CHANVAO_TOI_DA = 40
+
+/** Ghi một lượt bị chặn. Ghi hỏng KHÔNG được làm hỏng lượt vào thi — em đang
+ * đứng chờ, nhật ký chỉ là chuyện phụ. */
+function ghiChanVao_(maCa, sbd, hoTenGoi, namSinhGoi, hoTenDs, namSinhDs, lyDo) {
+  try {
+    const sh = getSheet_(SHEET_CHANVAO, CHANVAO_HEADERS)
+    boSungTieuDe_(sh, CHANVAO_HEADERS)
+    sh.appendRow([
+      new Date().toISOString(),
+      String(maCa || ''),
+      String(sbd || ''),
+      String(hoTenGoi == null ? '' : hoTenGoi),
+      String(namSinhGoi == null ? '' : namSinhGoi),
+      String(hoTenDs == null ? '' : hoTenDs),
+      String(namSinhDs == null ? '' : namSinhDs),
+      String(lyDo || ''),
+    ])
+  } catch (err) {
+    // nuốt: nhật ký hỏng không được chặn em vào thi
+  }
+}
+
+/** Đọc nhật ký chặn của MỘT ca, mới nhất trước, tối đa CHANVAO_TOI_DA dòng. */
+function docChanVao_(maCa) {
+  try {
+    const ss = bang_()
+    const sh = ss.getSheetByName(SHEET_CHANVAO)
+    if (!sh || sh.getLastRow() < 2) return []
+    const d = sh.getDataRange().getValues()
+    const out = []
+    for (let i = 1; i < d.length; i++) {
+      if (String(d[i][1]).trim() !== String(maCa).trim()) continue
+      out.push({
+        luc: String(d[i][0] || ''),
+        sbd: String(d[i][2] || ''),
+        hoTenGoi: String(d[i][3] || ''),
+        namSinhGoi: String(d[i][4] || ''),
+        hoTenDs: String(d[i][5] || ''),
+        namSinhDs: String(d[i][6] || ''),
+        lyDo: String(d[i][7] || ''),
+      })
+    }
+    out.sort(function (a, b) { return msCua_(b.luc) - msCua_(a.luc) })
+    return out.slice(0, CHANVAO_TOI_DA)
+  } catch (err) {
+    return []
+  }
+}
+
 // HỎI BÀI THẦY (HOIBAITHAY.md mục 2.2). Em nộp bài xong, tick câu chưa hiểu
 // rồi gửi. MÁY CHỦ CHỈ GIỮ MÃ CÂU — không giữ đề, không giữ đáp án, không giữ
 // lời giải (mục 2.1): máy thầy đã có `ca_<mã>_bank.json` nên tự dựng nội dung.
@@ -560,13 +622,38 @@ function quyetDinhVaoThi_(ca, luot, idThietBi, nowMs, hocSinh) {
  * mật khẩu. Người khác vẫn phải biết đủ CẢ BA: số báo danh, tên, năm sinh. */
 function chuanTen_(v) {
   return String(v == null ? '' : v)
+    // KÝ TỰ TÀNG HÌNH. Tên dán từ Zalo, Word, Google Sheet hoặc gõ bằng vài bàn
+    // phím điện thoại có kèm zero-width space / soft hyphen. `\s` KHÔNG bắt
+    // được chúng, nên bản cũ so hai chuỗi NHÌN Y HỆT nhau mà vẫn báo lệch.
+    .replace(/[\u200b-\u200d\u2060\ufeff\u00ad]/g, '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'D')
+    // đ Đ (U+0111 / U+0110) VÀ ð Ð (U+00F0 / U+00D0 — chữ "eth"). Hai cặp này
+    // hiện lên màn hình GIỐNG HỆT nhau; vài bàn phím và vài bản chuyển mã cho
+    // ra eth. Bản cũ chỉ đổi cặp đầu, nên "Đồng" gõ trúng eth là trượt cổng mà
+    // thầy soi vào danh sách không thấy sai chỗ nào.
+    .replace(/[\u0111\u0110\u00f0\u00d0]/g, 'd')
     .toLowerCase()
+    // Dấu câu thừa: em gõ "Nguyễn Thành Đồng." hoặc "Nguyen-Thanh-Dong".
+    .replace(/[.,;:'’‘"“”`´\-_/\\|]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
+}
+
+/** Hai tên có phải MỘT người không.
+ *
+ * Bậc 1: khớp y nguyên sau khi chuẩn hoá.
+ * Bậc 2: khớp khi bỏ hết khoảng trắng — em gõ dính "NguyễnThànhĐồng", hoặc
+ *        ô trong danh sách lỡ mang khoảng trắng lạ. Vẫn phải đủ từng chữ cái
+ *        theo đúng thứ tự nên không mở cổng cho em lạ.
+ *
+ * KHÔNG có bậc 3 kiểu "gần giống": cổng này để chặn gõ nhầm số báo danh và
+ * chặn em lạ, hạ xuống so gần đúng là mất luôn tác dụng. */
+function tenKhopNhau_(a, b) {
+  var x = chuanTen_(a)
+  var y = chuanTen_(b)
+  if (x === y) return true
+  return x.replace(/\s/g, '') === y.replace(/\s/g, '')
 }
 
 /** Năm sinh về đúng 4 chữ số — ô Sheet có thể là số, là ngày, hay là chuỗi. */
@@ -656,6 +743,124 @@ function donEmNgoaiDanhSach() {
   const dsSbd = Object.keys(daXoa)
   Logger.log('XONG. Xoá ' + tongDong + ' dòng của ' + dsSbd.length + ' số báo danh: ' + dsSbd.join(', '))
   Logger.log('Danh sách chính thức giữ nguyên ' + dsLop.length + ' em.')
+}
+
+// ---------------------------------------------------------------------------
+// ĐỒNG BỘ DANH SÁCH LỚP TỪ GOOGLE SHEET CỦA THẦY (thầy chốt 07/09)
+//
+// Thầy dán link một lần cho mỗi khối, sau đó chỉ bấm Đồng bộ. Link nằm ở Script
+// property nên đổi máy, đổi trình duyệt vẫn còn — thầy mở app trên điện thoại
+// giữa buổi dạy cũng đồng bộ được.
+
+/** Khoá Script property giữ danh sách link (chuỗi JSON một mảng). */
+var KHOA_LINK_DSLOP = 'LINK_DANH_SACH_LOP'
+
+function docLinkDsLop_() {
+  try {
+    var v = PropertiesService.getScriptProperties().getProperty(KHOA_LINK_DSLOP)
+    if (!v) return []
+    var a = JSON.parse(v)
+    if (Object.prototype.toString.call(a) !== '[object Array]') return []
+    var out = []
+    for (var i = 0; i < a.length; i++) {
+      var s = String(a[i] || '').trim()
+      if (s) out.push(s)
+    }
+    return out
+  } catch (err) {
+    return []
+  }
+}
+
+function luuLinkDsLop_(arr) {
+  PropertiesService.getScriptProperties().setProperty(KHOA_LINK_DSLOP, JSON.stringify(arr || []))
+}
+
+/** Mọi kiểu link Google Sheet về đúng một link TẢI CSV.
+ *
+ * Ba dạng thầy có thể dán:
+ *   - link "Xuất bản lên web": /spreadsheets/d/e/<mã>/pubhtml (hoặc /pub?...)
+ *   - link sheet thường:       /spreadsheets/d/<mã>/edit#gid=123
+ *   - link CSV sẵn:            giữ nguyên
+ * `gid` giữ lại nếu có, để thầy trỏ đúng một tab chứ không phải tab đầu. */
+function linkCsvDsLop_(u) {
+  var s = String(u == null ? '' : u).trim()
+  if (!s) return ''
+  var gid = (s.match(/[#?&]gid=(\d+)/) || [])[1]
+  var pub = s.match(/\/spreadsheets\/d\/e\/([^/]+)\/pub/)
+  if (pub) return 'https://docs.google.com/spreadsheets/d/e/' + pub[1] + '/pub?output=csv' + (gid ? '&gid=' + gid : '')
+  var thuong = s.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/)
+  if (thuong) return 'https://docs.google.com/spreadsheets/d/' + thuong[1] + '/export?format=csv' + (gid ? '&gid=' + gid : '')
+  return s
+}
+
+/** Lớp suy từ năm sinh (vào lớp 1 lúc 6 tuổi; năm học mới tính từ tháng 9).
+ * Sheet của thầy chỉ có SBD, họ tên, năm sinh — cột Lớp tự tính ở đây. */
+function lopTuNamSinh_(namSinh) {
+  var ns = Number(namSinh)
+  if (!(ns >= 1990 && ns <= 2100)) return ''
+  var d = new Date()
+  var namHoc = d.getMonth() >= 8 ? d.getFullYear() : d.getFullYear() - 1
+  var lop = namHoc - ns - 5
+  return lop >= 1 && lop <= 12 ? String(lop) : ''
+}
+
+/** Nhận diện cột theo TÊN TIÊU ĐỀ, không theo vị trí: ba sheet của thầy đặt
+ * tiêu đề khác nhau ("HoTen" và "Họ tên"). Không thấy tiêu đề nào khớp thì mới
+ * lùi về vị trí 0-1-2-3. */
+function cotDsLop_(tieuDe) {
+  var vt = { sbd: -1, hoTen: -1, namSinh: -1, lop: -1 }
+  for (var i = 0; i < tieuDe.length; i++) {
+    var t = chuanTen_(tieuDe[i]).replace(/\s/g, '')
+    if (vt.sbd < 0 && (t === 'sbd' || t === 'sobaodanh' || t === 'so')) vt.sbd = i
+    else if (vt.hoTen < 0 && (t === 'hoten' || t === 'ten' || t === 'hovaten')) vt.hoTen = i
+    else if (vt.namSinh < 0 && (t === 'namsinh' || t === 'nam' || t === 'ngaysinh')) vt.namSinh = i
+    else if (vt.lop < 0 && (t === 'lop' || t === 'khoi')) vt.lop = i
+  }
+  if (vt.sbd < 0) vt.sbd = 0
+  if (vt.hoTen < 0) vt.hoTen = 1
+  if (vt.namSinh < 0) vt.namSinh = 2
+  return vt
+}
+
+/** Tải MỘT link rồi trả danh sách em. Lỗi trả về trong `loi`, không ném — một
+ * link hỏng không được làm hỏng cả lượt đồng bộ trước khi thầy kịp đọc. */
+function tuLinkRaDanhSach_(link) {
+  var url = linkCsvDsLop_(link)
+  if (!url) return { items: [], loi: 'Link rỗng' }
+  var text = ''
+  try {
+    var res = UrlFetchApp.fetch(url, { muteHttpExceptions: true, followRedirects: true })
+    var ma = res.getResponseCode()
+    if (ma !== 200) return { items: [], loi: 'Máy chủ Google trả mã ' + ma + ' — kiểm tra sheet đã "Xuất bản lên web" chưa' }
+    text = res.getContentText()
+  } catch (err) {
+    return { items: [], loi: 'Không tải được: ' + err }
+  }
+  if (text.indexOf('<html') === 0 || text.indexOf('<!DOCTYPE') === 0) {
+    return { items: [], loi: 'Link trả về trang HTML chứ không phải CSV — dùng link Xuất bản lên web' }
+  }
+  var bang
+  try {
+    bang = Utilities.parseCsv(text)
+  } catch (err) {
+    return { items: [], loi: 'Không đọc được CSV: ' + err }
+  }
+  if (!bang || bang.length < 2) return { items: [], loi: 'Sheet rỗng' }
+  var vt = cotDsLop_(bang[0])
+  var items = []
+  for (var i = 1; i < bang.length; i++) {
+    var h = bang[i]
+    var sbd = String(h[vt.sbd] == null ? '' : h[vt.sbd]).trim()
+    if (!/^\d{3,12}$/.test(sbd)) continue
+    var ten = String(h[vt.hoTen] == null ? '' : h[vt.hoTen]).replace(/\s+/g, ' ').trim()
+    var ns = chuanNamSinh_(h[vt.namSinh])
+    var lop = vt.lop >= 0 ? String(h[vt.lop] == null ? '' : h[vt.lop]).trim() : ''
+    if (!lop) lop = lopTuNamSinh_(ns)
+    items.push({ sbd: sbd, hoTen: ten, namSinh: ns, lop: lop })
+  }
+  if (!items.length) return { items: [], loi: 'Không dòng nào có số báo danh' }
+  return { items: items, loi: '' }
 }
 
 /** Đọc TOÀN BỘ bản sao danh sách học sinh (một lần đọc sheet). */
@@ -2534,13 +2739,24 @@ function doPost(e) {
       const dong = coDs ? timTrongDanhSachLop_(sbd) : null
       let trongDs = dong
       if (coDs && dong) {
-        const tenGoi = chuanTen_(body.hoTen)
         const namGoi = chuanNamSinh_(body.namSinh)
         // Dòng trong danh sách thiếu tên hoặc năm sinh thì không lấy đó làm cớ
         // chặn em — chỉ so những gì thầy đã điền.
-        const tenKhop = !chuanTen_(dong.hoTen) || tenGoi === chuanTen_(dong.hoTen)
+        const tenKhop = !chuanTen_(dong.hoTen) || tenKhopNhau_(body.hoTen, dong.hoTen)
         const namKhop = !dong.namSinh || namGoi === dong.namSinh
-        if (!tenKhop || !namKhop) trongDs = null
+        if (!tenKhop || !namKhop) {
+          trongDs = null
+          // GIỮ LẠI BẰNG CHỨNG. Máy chủ cố ý KHÔNG nói cho em biết sai ô nào
+          // (nói ra là cho phép dò tên từ số báo danh) — nhưng THẦY thì phải
+          // thấy, nếu không mỗi lần em bị chặn giữa giờ là mò trong bóng tối.
+          //
+          // Thầy báo 07/09: hai em gõ đúng cả ba ô mà vẫn bị chặn, và không
+          // còn dấu vết nào để lần. Từ nay mỗi lượt chặn ghi một dòng, màn Theo
+          // dõi ca hiện thẳng em gõ gì / danh sách ghi gì.
+          ghiChanVao_(maCa, sbd, body.hoTen, body.namSinh, dong.hoTen, dong.namSinh, tenKhop ? 'lech_nam_sinh' : 'lech_ho_ten')
+        }
+      } else if (coDs && !dong) {
+        ghiChanVao_(maCa, sbd, body.hoTen, body.namSinh, '', '', 'khong_co_sbd')
       }
       // Em qua cổng mà chưa có hồ sơ thì tạo luôn, TRƯỚC khi xét phạm vi — để
       // ca lọc theo khối đọc được năm sinh vừa lấy từ danh sách.
@@ -2777,7 +2993,37 @@ function doPost(e) {
     let danhSachMoi = []
     try { danhSachMoi = ca.danhSachMoi && ca.phamVi === 'chon' ? JSON.parse(ca.danhSachMoi) : [] } catch (err) {}
     ca.danhSachMoi = ca.phamVi === 'chon' ? danhSachMoi : ca.danhSachMoi
-    return jsonResponse_({ ok: true, ca: ca, luot: luot, keyBank: keyBank, serverNow: Date.now() })
+    return jsonResponse_({ ok: true, ca: ca, luot: luot, keyBank: keyBank, biChan: docChanVao_(maCa), serverNow: Date.now() })
+  }
+
+  if (action === 'doiTenCa') {
+    // ĐỔI TÊN CA (thầy báo 07/09). Tên ca đi theo ca suốt đời: in trong phiếu
+    // gửi phụ huynh, trong bảng điểm, trong hồ sơ em. Gõ vội một lần là sai
+    // mãi, nên phải sửa lại được.
+    //
+    // MÁY CHỦ CHUẨN HOÁ LẠI, KHÔNG TIN CHUỖI MÁY KHÁCH. Cùng luật với
+    // `chuanTenCa` bên `src/lib/ten-ca.ts`:
+    //   - gộp xuống dòng/tab/khoảng trắng thừa (dán từ Zalo, Word);
+    //   - CẮT `=` `+` `@` Ở ĐẦU — ô Sheet nuốt chuỗi mở đầu bằng chúng thành
+    //     CÔNG THỨC, đặt tên "=Ca 1" là ô hiện #NAME? và mất luôn tên ca;
+    //   - cắt còn 80 ký tự, tên dài tràn khỏi thẻ ca và ô phiếu.
+    //
+    // Tên rỗng là HỢP LỆ: ca quay về gọi theo mã. Chỉ đụng ô TenCa, không đụng
+    // đề, không đụng điểm, nên đổi tên giữa giờ thi cũng an toàn.
+    var loiTen = kiemTraMaBiMat_(body)
+    if (loiTen) return jsonResponse_({ ok: false, error: loiTen })
+    var maCaDT = String(body.maCa || '').trim()
+    var tenDT = String(body.tenCa == null ? '' : body.tenCa)
+      .replace(/[\r\n\t]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .replace(/^\s+|\s+$/g, '')
+    tenDT = tenDT.replace(/^[=+@]+\s*/, '').replace(/^\s+|\s+$/g, '')
+    if (tenDT.length > 80) tenDT = tenDT.slice(0, 80).replace(/\s+$/, '')
+    var caShDT = sheetCa_()
+    var caRowDT = findRowByKey_(caShDT, 0, maCaDT)
+    if (caRowDT < 0) return jsonResponse_({ ok: false, error: 'Không có ca ' + maCaDT })
+    caShDT.getRange(caRowDT, 11).setValue(tenDT)
+    return jsonResponse_({ ok: true, maCa: maCaDT, tenCa: tenDT })
   }
 
   if (action === 'xoaCa') {
@@ -3450,6 +3696,110 @@ function doPost(e) {
     sh.appendRow(DSLOP_HEADERS)
     sh.getRange(2, 1, rows.length, DSLOP_HEADERS.length).setValues(rows)
     return jsonResponse_({ ok: true, soDong: rows.length, capNhatLuc: luc })
+  }
+
+  if (action === 'dongBoDanhSachLop' || action === 'linkDanhSachLop') {
+    // ĐỒNG BỘ DANH SÁCH LỚP TỪ CHÍNH GOOGLE SHEET CỦA THẦY (thầy chốt 07/09).
+    //
+    // Trước đây thầy phải mở màn Danh sách lớp, dán bảng vào rồi bấm đẩy. Sổ
+    // thật của thầy nằm trên Google Sheet và sửa hằng tuần, nên bản sao trên
+    // máy chủ luôn chạy sau — đúng chỗ hỏng: em mới thêm vào sổ thì bị cổng vào
+    // thi chặn, em đã nghỉ thì vẫn vào được.
+    //
+    // Nay thầy dán LINK MỘT LẦN (mỗi khối một link), sau đó chỉ bấm Đồng bộ.
+    //
+    // VÌ SAO MÁY CHỦ TẢI CHỨ KHÔNG PHẢI MÁY THẦY: Google không gắn nhãn CORS
+    // cho tệp CSV xuất bản, nên trình duyệt của thầy không đọc trực tiếp được.
+    // `UrlFetchApp` chạy trên máy Google nên không vướng.
+    //
+    // GHI ĐÈ TOÀN BỘ, đúng như `napDanhSachLop`: sheet của thầy là nguồn sự
+    // thật duy nhất. Em bị bỏ khỏi sổ thì mất khỏi bản sao ngay — đó là cả mục
+    // đích. KHÔNG đụng sheet HocSinh: điểm, token, hồ sơ của em giữ nguyên,
+    // lệnh này chỉ báo ra em nào rơi ra ngoài để thầy tự quyết.
+    const loiDB = kiemTraMaBiMat_(body)
+    if (loiDB) return jsonResponse_({ ok: false, error: loiDB })
+
+    var linkVao = []
+    if (Object.prototype.toString.call(body.links) === '[object Array]') {
+      for (var li = 0; li < body.links.length; li++) {
+        var lk = String(body.links[li] || '').trim()
+        if (lk) linkVao.push(lk)
+      }
+      luuLinkDsLop_(linkVao)
+    } else {
+      linkVao = docLinkDsLop_()
+    }
+
+    // Chỉ hỏi link đang lưu (màn Danh sách lớp mở ra là điền sẵn).
+    if (action === 'linkDanhSachLop') {
+      return jsonResponse_({ ok: true, links: docLinkDsLop_() })
+    }
+
+    if (!linkVao.length) {
+      return jsonResponse_({ ok: false, error: 'Chưa lưu link danh sách nào — dán link Google Sheet rồi bấm Lưu link' })
+    }
+
+    var theoLink = []
+    var gom = []
+    var daCoSbd = {}
+    var trung = []
+    for (var i = 0; i < linkVao.length; i++) {
+      var kq = tuLinkRaDanhSach_(linkVao[i])
+      theoLink.push({ link: linkVao[i], so: kq.items.length, loi: kq.loi })
+      for (var j = 0; j < kq.items.length; j++) {
+        var e = kq.items[j]
+        if (daCoSbd[e.sbd]) { trung.push(e.sbd); continue }
+        daCoSbd[e.sbd] = true
+        gom.push(e)
+      }
+    }
+
+    // MỘT LINK HỎNG LÀ DỪNG HẲN. Ghi đè bằng danh sách thiếu một khối thì cả
+    // khối đó bị cổng vào thi chặn sạch ngay buổi sau — hỏng nặng hơn nhiều so
+    // với việc thầy phải sửa lại link.
+    var linkHong = []
+    for (var k = 0; k < theoLink.length; k++) if (theoLink[k].loi) linkHong.push(theoLink[k])
+    if (linkHong.length) {
+      return jsonResponse_({ ok: false, error: 'Không tải được ' + linkHong.length + '/' + theoLink.length + ' link — chưa ghi đè gì cả', theoLink: theoLink })
+    }
+    if (!gom.length) return jsonResponse_({ ok: false, error: 'Không dòng nào có số báo danh — kiểm tra lại link', theoLink: theoLink })
+
+    // So với bản đang có để BÁO RA ai vào ai ra. Thầy không phải tin lời "đã
+    // đồng bộ" — nhìn đúng tên em thêm và em bị bỏ.
+    var cu = docDanhSachLop_()
+    var cuTheoSbd = {}
+    for (var c = 0; c < cu.length; c++) cuTheoSbd[cu[c].sbd] = cu[c]
+    var moiTheoSbd = {}
+    for (var m = 0; m < gom.length; m++) moiTheoSbd[gom[m].sbd] = gom[m]
+    var them = []
+    var bo = []
+    var doiTen = []
+    for (var a = 0; a < gom.length; a++) {
+      var cuA = cuTheoSbd[gom[a].sbd]
+      if (!cuA) them.push({ sbd: gom[a].sbd, hoTen: gom[a].hoTen })
+      else if (chuanTen_(cuA.hoTen) !== chuanTen_(gom[a].hoTen)) doiTen.push({ sbd: gom[a].sbd, cu: cuA.hoTen, moi: gom[a].hoTen })
+    }
+    for (var b = 0; b < cu.length; b++) if (!moiTheoSbd[cu[b].sbd]) bo.push({ sbd: cu[b].sbd, hoTen: cu[b].hoTen })
+
+    var shDB = getSheet_(SHEET_DSLOP, DSLOP_HEADERS)
+    var lucDB = new Date().toISOString()
+    var rowsDB = []
+    for (var r = 0; r < gom.length; r++) rowsDB.push([gom[r].sbd, gom[r].hoTen, gom[r].namSinh, gom[r].lop, lucDB])
+    shDB.clear()
+    shDB.appendRow(DSLOP_HEADERS)
+    shDB.getRange(2, 1, rowsDB.length, DSLOP_HEADERS.length).setValues(rowsDB)
+
+    return jsonResponse_({
+      ok: true,
+      soDong: rowsDB.length,
+      links: linkVao,
+      theoLink: theoLink,
+      trung: trung,
+      them: them,
+      bo: bo,
+      doiTen: doiTen,
+      capNhatLuc: lucDB,
+    })
   }
 
   if (action === 'huyDuyet') {

@@ -132,6 +132,18 @@ describe('Đọc FILE danh sách học sinh của thầy', () => {
   })
 })
 
+/** Thân LỆNH `vaoThi` trong tệp .gs, cắt đúng tới lệnh kế tiếp.
+ *
+ * Trước 07/09 chỗ này cắt cứng 3000 ký tự sau chữ `action === 'vaoThi'`. Thêm
+ * mấy dòng chú thích vào lệnh là các phép kiểm rơi ra ngoài cửa sổ và báo
+ * trượt oan — trượt vì đếm ký tự, không phải vì mã sai. Cắt theo mốc thật. */
+function thanVaoThi(): string {
+  const i = gsCode.indexOf("if (action === 'vaoThi')")
+  expect(i).toBeGreaterThan(0)
+  const j = gsCode.indexOf("\n  if (action === '", i + 10)
+  return gsCode.slice(i, j > 0 ? j : undefined)
+}
+
 describe('Máy chủ — cổng vào thi theo danh sách', () => {
   it('chặn khi không khớp đủ ba, và KHÔNG nói rõ sai ô nào', () => {
     const i = gsCode.indexOf('function quyetDinhVaoThi_')
@@ -142,16 +154,15 @@ describe('Máy chủ — cổng vào thi theo danh sách', () => {
   })
 
   it('chưa nạp danh sách bao giờ thì KHÔNG chặn ai — không để trung tâm đứng hình', () => {
-    const i = gsCode.indexOf("if (action === 'vaoThi')")
-    const than = gsCode.slice(i, i + 3000)
-    expect(than).toContain('const coDs = coDanhSachHocSinh_()')
-    expect(than).toContain('trongDanhSach: coDs ? !!trongDs : null')
+    expect(thanVaoThi()).toContain('const coDs = coDanhSachHocSinh_()')
+    expect(thanVaoThi()).toContain('trongDanhSach: coDs ? !!trongDs : null')
   })
 
   it('so khớp tên bỏ dấu và bỏ khoảng trắng thừa, năm sinh so đúng 4 chữ số', () => {
-    const i = gsCode.indexOf("if (action === 'vaoThi')")
-    const than = gsCode.slice(i, i + 3000)
-    expect(than).toContain('chuanTen_(body.hoTen)')
+    const than = thanVaoThi()
+    // So tên đi qua `tenKhopNhau_` (07/09) chứ không so hai chuỗi thô: hàm đó
+    // nuốt thêm chữ eth ð Ð, ký tự tàng hình, dấu câu thừa và chữ dính.
+    expect(than).toContain('tenKhopNhau_(body.hoTen, dong.hoTen)')
     expect(than).toContain('chuanNamSinh_(body.namSinh)')
     // Dòng thầy bỏ trống thì không lấy đó làm cớ chặn em.
     expect(than).toContain('!chuanTen_(dong.hoTen)')

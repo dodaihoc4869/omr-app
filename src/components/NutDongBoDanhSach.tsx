@@ -1,119 +1,229 @@
-// NÚT ĐỒNG BỘ DANH SÁCH HỌC SINH — cùng hình dáng, cùng ba trạng thái với nút
-// Đồng bộ kho đề (NutDongBo.tsx), để thầy không phải học hai kiểu thao tác.
+// ĐỒNG BỘ DANH SÁCH HỌC SINH — dán link MỘT LẦN, sau đó chỉ bấm một nút.
 //
-// Khác một điểm: kho đề nằm sẵn trên máy chủ nên bấm là kéo về; danh sách học
-// sinh thì nằm trong FILE của thầy, nên bấm là mở hộp chọn file, đọc rồi ĐẨY
-// LÊN máy chủ. Đẩy xong, số báo danh nào không có trong danh sách sẽ không vào
-// thi được nữa — nên nút này báo rõ số em đã nạp, không báo chung chung.
+// Bản cũ mở hộp chọn file: mỗi lần thầy thêm hay bớt một em trong sổ là phải
+// xuất file, tìm file, chọn file. Sổ thật của thầy nằm trên Google Sheet và sửa
+// hằng tuần, nên bản sao trên máy chủ luôn chạy sau — đúng chỗ hỏng: em mới ghi
+// vào sổ thì bị cổng vào thi chặn, em đã nghỉ thì vẫn vào được.
+//
+// Nay: thầy dán link mỗi khối một dòng, bấm Lưu link. Từ đó về sau sửa sổ xong
+// chỉ bấm Đồng bộ. Link nằm trên máy chủ nên đổi máy, đổi điện thoại vẫn còn.
+//
+// MÁY CHỦ TẢI SHEET, KHÔNG PHẢI MÁY THẦY: Google không gắn nhãn CORS cho tệp
+// CSV xuất bản, trình duyệt đọc thẳng là hỏng. Đổi lại, thầy đồng bộ được từ
+// điện thoại giữa buổi dạy.
+//
+// Nút giữ nguyên hình dáng và ba trạng thái của nút Đồng bộ kho đề — thầy không
+// phải học hai kiểu thao tác.
 import { useEffect, useRef, useState } from 'react'
-import { RefreshCw, Check, AlertCircle } from 'lucide-react'
-import { docFileDanhSach } from '../lib/danh-sach-hs'
-import { napDanhSachLop } from '../lib/exam-api'
+import { RefreshCw, Check, AlertCircle, Link2 } from 'lucide-react'
+import { dongBoDanhSachLop, linkDanhSachLop, type KetQuaDongBoDsLop } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 
 type TrangThai = { kieu: 'nghi' } | { kieu: 'chay' } | { kieu: 'xong'; chu: string } | { kieu: 'loi'; chu: string }
+
+/** Một link mỗi dòng; bỏ dòng trống và dòng trùng. */
+export function tachLink(van: string): string[] {
+  const ra: string[] = []
+  const daCo = new Set<string>()
+  for (const dong of String(van || '').split(/[\n,\s]+/)) {
+    const s = dong.trim()
+    if (!s || daCo.has(s)) continue
+    daCo.add(s)
+    ra.push(s)
+  }
+  return ra
+}
+
+/** Một dòng tóm tắt CÓ SỐ cho thầy đối chiếu với sổ. Không nói "đã đồng bộ" suông:
+ * em thêm và em bị bỏ là hai con số thầy phải nhìn thấy. */
+export function tomTatDongBo(kq: KetQuaDongBoDsLop): string {
+  const phan = [`${kq.soDong} em`]
+  if (kq.them.length) phan.push(`+${kq.them.length} mới`)
+  if (kq.bo.length) phan.push(`−${kq.bo.length} bỏ`)
+  if (kq.doiTen.length) phan.push(`${kq.doiTen.length} đổi tên`)
+  if (kq.trung.length) phan.push(`${kq.trung.length} SBD trùng`)
+  return phan.join(' · ')
+}
 
 export default function NutDongBoDanhSach({
   onXong,
   className = '',
 }: {
-  /** Gọi sau khi đẩy xong: số em và dòng tóm tắt theo lớp để màn ngoài hiện ra. */
+  /** Gọi sau khi đồng bộ xong: số em và dòng tóm tắt để màn ngoài hiện ra. */
   onXong?: (soEm: number, tomTat: string) => void
   className?: string
 }) {
   const [tt, setTt] = useState<TrangThai>({ kieu: 'nghi' })
-  const oFile = useRef<HTMLInputElement | null>(null)
+  const [links, setLinks] = useState<string[] | null>(null)
+  const [moBang, setMoBang] = useState(false)
+  const [nhap, setNhap] = useState('')
+  const [dangLuu, setDangLuu] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   useEffect(() => () => {
     if (timer.current) clearTimeout(timer.current)
+  }, [])
+
+  // Đọc link đã lưu ngay khi mở màn: nút phải biết mình sẽ đồng bộ hay sẽ hỏi
+  // link, chứ không để thầy bấm rồi mới báo "chưa có link".
+  useEffect(() => {
+    let bo = false
+    ;(async () => {
+      try {
+        const [url, secret] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
+        if (!url.trim() || !secret.trim()) return
+        const ds = await linkDanhSachLop(url.trim(), secret.trim())
+        if (!bo) {
+          setLinks(ds)
+          setNhap(ds.join('\n'))
+        }
+      } catch {
+        // máy chủ cũ chưa có lệnh này — coi như chưa lưu link nào
+        if (!bo) setLinks([])
+      }
+    })()
+    return () => {
+      bo = true
+    }
   }, [])
 
   const bao = (next: TrangThai) => {
     setTt(next)
     if (timer.current) clearTimeout(timer.current)
-    timer.current = setTimeout(() => setTt({ kieu: 'nghi' }), next.kieu === 'loi' ? 5000 : 3000)
+    timer.current = setTimeout(() => setTt({ kieu: 'nghi' }), next.kieu === 'loi' ? 6000 : 3500)
   }
 
-  const nap = async (file: File) => {
+  const chay = async (linkMoi?: string[]) => {
     setTt({ kieu: 'chay' })
     try {
       const [url, secret] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
       if (!url.trim() || !secret.trim()) return bao({ kieu: 'loi', chu: 'Chưa cấu hình máy chủ' })
-
-      const doc = await docFileDanhSach(file)
-      if (doc.items.length === 0) return bao({ kieu: 'loi', chu: 'File không có em nào đủ 3 cột' })
-
-      const kq = await napDanhSachLop(url.trim(), secret.trim(), doc.items)
-
-      // Số em TỪNG SHEET để thầy đối chiếu với sổ — file nhiều sheet mà đọc
-      // hụt một sheet thì nhìn tổng số không phát hiện ra.
-      const tomTat = doc.theoSheet
-        .filter((t) => t.soEm > 0)
-        .map((t) => `${t.ten}: ${t.soEm}`)
-        .join(' · ')
-      onXong?.(kq.soDong, tomTat)
-
-      // Dòng hỏng KHÔNG được im lặng: em nào không lên danh sách là em đó đứng
-      // ngoài phòng thi. Báo đúng số dòng để thầy mở file sửa.
-      const canh: string[] = []
-      if (doc.boQua.length) canh.push(`${doc.boQua.length} dòng thiếu cột`)
-      if (doc.trung.length) canh.push(`${doc.trung.length} SBD trùng`)
-      bao(canh.length ? { kieu: 'loi', chu: `${kq.soDong} em · ${canh.join(', ')}` } : { kieu: 'xong', chu: `${kq.soDong} em` })
+      const kq = await dongBoDanhSachLop(url.trim(), secret.trim(), linkMoi)
+      setLinks(kq.links)
+      setNhap(kq.links.join('\n'))
+      setMoBang(false)
+      const tom = tomTatDongBo(kq)
+      onXong?.(kq.soDong, tom)
+      // Em bị BỎ khỏi danh sách là em đó đứng ngoài phòng thi từ giờ. Không
+      // trộn vào lời báo "xong" màu xanh — thầy phải nhìn thấy.
+      bao(kq.bo.length || kq.trung.length ? { kieu: 'loi', chu: tom } : { kieu: 'xong', chu: tom })
     } catch (e) {
       bao({
         kieu: 'loi',
-        chu: e instanceof Error ? (/fetch/i.test(e.message) ? 'Mất mạng' : e.message.slice(0, 46)) : 'Lỗi nạp danh sách',
+        chu: e instanceof Error ? (/fetch|mạng/i.test(e.message) ? 'Mất mạng' : e.message.slice(0, 60)) : 'Lỗi đồng bộ',
       })
     }
   }
 
+  const luuVaChay = async () => {
+    const ds = tachLink(nhap)
+    if (!ds.length) return bao({ kieu: 'loi', chu: 'Chưa dán link nào' })
+    setDangLuu(true)
+    try {
+      await chay(ds)
+    } finally {
+      setDangLuu(false)
+    }
+  }
+
+  const chuaCoLink = links !== null && links.length === 0
   const mau =
     tt.kieu === 'xong'
       ? { nen: 'var(--xanh-nen)', chu: 'var(--xanh)' }
       : tt.kieu === 'loi'
         ? { nen: 'var(--do-nen)', chu: 'var(--do)' }
         : { nen: 'var(--the-2)', chu: 'var(--muc)' }
-  const nhan = tt.kieu === 'chay' ? 'Đang nạp…' : tt.kieu === 'nghi' ? 'Đồng bộ danh sách' : tt.chu
+  const nhanNut = tt.kieu === 'chay' ? 'Đang đồng bộ…' : tt.kieu === 'nghi' ? (chuaCoLink ? 'Dán link danh sách' : 'Đồng bộ danh sách') : tt.chu
 
   return (
-    <>
-      <input
-        ref={oFile}
-        type="file"
-        accept=".xlsx,.xls,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
-        hidden
-        onChange={(e) => {
-          const f = e.target.files?.[0]
-          e.target.value = '' // chọn lại đúng file đó lần nữa vẫn chạy
-          if (f) void nap(f)
-        }}
-      />
-      <button
-        type="button"
-        onClick={() => oFile.current?.click()}
-        disabled={tt.kieu === 'chay'}
-        aria-live="polite"
-        aria-label={tt.kieu === 'nghi' ? 'Chọn file danh sách học sinh để đồng bộ' : nhan}
-        className={`tap-target inline-flex items-center justify-center font-bold whitespace-nowrap ${className}`}
-        style={{
-          gap: 'var(--k2)',
-          height: 40,
-          minHeight: 40,
-          padding: '0 var(--k4) 0 var(--k3)',
-          borderRadius: 'var(--bo-tron)',
-          background: mau.nen,
-          color: mau.chu,
-          fontFamily: 'var(--sans)',
-          fontSize: 'var(--cx-1)',
-          border: '1.5px solid transparent',
-          transitionProperty: 'background-color, color, transform',
-          transitionDuration: 'var(--nhanh)',
-          transform: tt.kieu === 'chay' ? 'scale(.98)' : 'scale(1)',
-        }}
-      >
-        {tt.kieu === 'xong' ? <Check size={16} /> : tt.kieu === 'loi' ? <AlertCircle size={16} /> : <RefreshCw size={16} className={tt.kieu === 'chay' ? 'animate-spin' : ''} />}
-        <span>{nhan}</span>
-      </button>
-    </>
+    <div className="flex flex-col items-end" style={{ gap: 'var(--k2)' }}>
+      <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
+        <button
+          type="button"
+          onClick={() => (chuaCoLink ? setMoBang(true) : void chay())}
+          disabled={tt.kieu === 'chay' || links === null}
+          aria-live="polite"
+          aria-label={chuaCoLink ? 'Dán link danh sách học sinh' : 'Đồng bộ danh sách học sinh từ Google Sheet'}
+          className={`tap-target inline-flex items-center justify-center font-bold whitespace-nowrap ${className}`}
+          style={{
+            gap: 'var(--k2)',
+            height: 40,
+            minHeight: 40,
+            padding: '0 var(--k4) 0 var(--k3)',
+            borderRadius: 'var(--bo-tron)',
+            background: mau.nen,
+            color: mau.chu,
+            fontFamily: 'var(--sans)',
+            fontSize: 'var(--cx-1)',
+            border: '1.5px solid transparent',
+            transitionProperty: 'background-color, color, transform',
+            transitionDuration: 'var(--nhanh)',
+            transform: tt.kieu === 'chay' ? 'scale(.98)' : 'scale(1)',
+          }}
+        >
+          {tt.kieu === 'xong' ? <Check size={16} /> : tt.kieu === 'loi' ? <AlertCircle size={16} /> : <RefreshCw size={16} className={tt.kieu === 'chay' ? 'animate-spin' : ''} />}
+          <span>{nhanNut}</span>
+        </button>
+        {!chuaCoLink && links !== null && (
+          <button
+            type="button"
+            onClick={() => setMoBang((v) => !v)}
+            className="tap-target inline-flex items-center justify-center"
+            aria-label="Sửa link danh sách"
+            title="Sửa link danh sách"
+            style={{ width: 40, height: 40, borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', color: 'var(--nhat)', border: 'none' }}
+          >
+            <Link2 size={16} />
+          </button>
+        )}
+      </div>
+
+      {moBang && (
+        <div style={{ background: 'var(--the-2)', borderRadius: 'var(--bo-2)', padding: 'var(--k3)', width: '100%', maxWidth: 520 }}>
+          <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginBottom: 'var(--k2)' }}>
+            Link Google Sheet danh sách, mỗi khối một dòng. Sheet phải bật Tệp → Chia sẻ → Xuất bản lên web.
+          </div>
+          <textarea
+            value={nhap}
+            onChange={(e) => setNhap(e.target.value)}
+            rows={4}
+            spellCheck={false}
+            aria-label="Link danh sách lớp"
+            placeholder={'https://docs.google.com/spreadsheets/d/e/.../pubhtml\nhttps://docs.google.com/spreadsheets/d/e/.../pubhtml'}
+            style={{
+              width: '100%',
+              borderRadius: 'var(--bo-1)',
+              padding: 'var(--k3)',
+              background: 'var(--the)',
+              border: '1.5px solid transparent',
+              fontFamily: 'var(--sans)',
+              fontSize: 'var(--cx-1)',
+              color: 'var(--muc)',
+              outline: 'none',
+              resize: 'vertical',
+            }}
+          />
+          <div className="flex items-center justify-end" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
+            <button
+              type="button"
+              onClick={() => setMoBang(false)}
+              className="tap-target"
+              style={{ height: 40, padding: '0 var(--k3)', borderRadius: 'var(--bo-1)', background: 'transparent', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}
+            >
+              Đóng
+            </button>
+            <button
+              type="button"
+              onClick={() => void luuVaChay()}
+              disabled={dangLuu || tt.kieu === 'chay'}
+              className="tap-target font-bold"
+              style={{ height: 40, padding: '0 var(--k4)', borderRadius: 'var(--bo-1)', background: 'var(--muc)', color: 'var(--muc-nguoc)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+            >
+              {dangLuu ? 'Đang lưu…' : 'Lưu link và đồng bộ'}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }

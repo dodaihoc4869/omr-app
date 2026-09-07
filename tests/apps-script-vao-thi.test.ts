@@ -206,11 +206,19 @@ describe('Chế độ SỐ BÁO DANH đòi đủ mã ca + số báo danh + họ 
   })
 
   it('máy chủ so tên bỏ dấu và năm sinh 4 chữ số, dòng thầy bỏ trống thì không lấy làm cớ chặn', () => {
+    // Cắt tới lệnh kế tiếp, không cắt cứng theo số ký tự: thêm dòng chú thích
+    // vào lệnh là phép kiểm rơi ra ngoài cửa sổ và báo trượt oan.
     const i = gsCode.indexOf("if (action === 'vaoThi')")
-    const than = gsCode.slice(i, i + 3000)
-    expect(than).toContain('const tenKhop = !chuanTen_(dong.hoTen) || tenGoi === chuanTen_(dong.hoTen)')
+    const j = gsCode.indexOf("\n  if (action === '", i + 10)
+    const than = gsCode.slice(i, j > 0 ? j : undefined)
+    // Tên đi qua `tenKhopNhau_` (07/09): nó nuốt thêm chữ eth ð Ð, ký tự tàng
+    // hình, dấu câu thừa và chữ dính — ba bẫy "nhìn y hệt mà khác mã".
+    expect(than).toContain('const tenKhop = !chuanTen_(dong.hoTen) || tenKhopNhau_(body.hoTen, dong.hoTen)')
     expect(than).toContain('const namKhop = !dong.namSinh || namGoi === dong.namSinh')
-    expect(than).toContain('if (!tenKhop || !namKhop) trongDs = null')
+    expect(than).toContain('if (!tenKhop || !namKhop) {')
+    expect(than).toContain('trongDs = null')
+    // Mỗi lượt bị chặn phải để lại bằng chứng cho thầy đọc.
+    expect(than).toContain('ghiChanVao_(')
   })
 
   it('DÒNG MÔ TẢ trên màn Mở ca phải nói đúng việc máy chủ làm', async () => {

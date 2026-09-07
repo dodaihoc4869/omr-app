@@ -6,10 +6,11 @@
 // xám chờ thi lại · tím đang làm · cam rời màn N lần · đỏ bị khoá · xanh đã nộp.
 // Xoá ca = xoá mềm, phải gõ đúng mã ca.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Copy, Check, RefreshCw, Trash2, ArrowLeft, ChevronRight, Images, FileSpreadsheet, FileJson, Lock, Unlock, Send } from 'lucide-react'
+import { Check, RefreshCw, Trash2, ArrowLeft, ChevronRight, Images, FileSpreadsheet, FileJson, Lock, Unlock, Send, Pencil, LogIn, BarChart3 } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
-import { chiTietCa, duyetThiLai, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
+import { chiTietCa, doiTenCa, duyetThiLai, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
+import { chuanTenCa, tenHienCua, TEN_CA_TOI_DA } from '../lib/ten-ca'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { goiPhieuCaZip, tenTepZipCa, chuyenDeTuChiTiet, type EmTrongCaDeXuatPhieu } from '../lib/phieu-hang-loat'
 import { viecCanLamMacDinh } from '../lib/phieu-zalo'
@@ -121,6 +122,11 @@ export default function ExamMonitorScreen() {
   const [dangXoa, setDangXoa] = useState(false)
   const [hoiKhoa, setHoiKhoa] = useState(false)
   const [dangKhoa, setDangKhoa] = useState(false)
+  // ĐỔI TÊN CA (thầy báo 07/09). `null` = đang không sửa; chuỗi = ô nhập đang
+  // mở và giữ bản nháp. Bản nháp tách khỏi `chiTiet` để thầy gõ dở rồi bấm Huỷ
+  // là tên cũ còn nguyên, không phải tải lại ca.
+  const [tenNhap, setTenNhap] = useState<string | null>(null)
+  const [dangDoiTen, setDangDoiTen] = useState(false)
   // Tải phiếu cả ca: dựng ảnh cho từng em rồi gói .zip, chạy hoàn toàn tại máy
   // thầy nên không phụ thuộc mạng.
   const [dangGoiPhieu, setDangGoiPhieu] = useState('')
@@ -355,6 +361,30 @@ export default function ExamMonitorScreen() {
       setDaCopy(true)
       showToast('Đã copy link mời vào thi', 'success')
     })
+  }
+
+  // ĐỔI TÊN CA. Ghi xong thì lấy tên MÁY CHỦ TRẢ VỀ mà hiển thị, không lấy
+  // chuỗi vừa gõ: máy chủ mới là chỗ chuẩn hoá cuối cùng (cắt 80 ký tự, cắt
+  // `=` `+` `@` đầu chuỗi), nên hai bên chỉ chắc chắn khớp khi màn hình đọc lại
+  // của máy chủ.
+  const luuTenCa = async () => {
+    if (!chiTiet || tenNhap === null) return
+    const moi = chuanTenCa(tenNhap)
+    if (moi === chuanTenCa(chiTiet.ca.tenCa)) {
+      setTenNhap(null)
+      return
+    }
+    setDangDoiTen(true)
+    try {
+      const kq = await doiTenCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, moi)
+      setChiTiet((c) => (c ? { ...c, ca: { ...c.ca, tenCa: kq.tenCa } } : c))
+      setTenNhap(null)
+      showToast(kq.tenCa ? `Đã đổi tên ca thành "${kq.tenCa}"` : 'Đã xoá tên ca, ca gọi theo mã', 'success')
+    } catch (e) {
+      showToast(`Không đổi được tên: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
+    } finally {
+      setDangDoiTen(false)
+    }
   }
 
   // LINK XEM ĐIỂM (thầy báo 07/09). Link mời vào thi `/t/…` sau khi nộp là
@@ -687,13 +717,65 @@ export default function ExamMonitorScreen() {
 
   return (
     <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-      <div className="flex items-center justify-between">
-        <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
-          {chiTiet ? chiTiet.ca.tenCa || `Ca ${chiTiet.ca.maCa}` : 'Chi tiết ca thi'}
-        </h1>
-        <button onClick={() => setScreen('lichsuca')} style={NHAN_NHO} className="tap-target">
-          ← Lịch sử
-        </button>
+      <div className="flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
+        {/* TÊN CA SỬA ĐƯỢC TẠI CHỖ (thầy báo 07/09).
+            Chạm vào tên là mở ô nhập ngay tại chỗ nó đang đứng, không nhảy sang
+            màn khác: thầy sửa tên giữa lúc coi thi, mất bảng lượt thi một nhịp
+            là mất luôn cái đang theo dõi. */}
+        {chiTiet && tenNhap !== null ? (
+          <div className="flex items-center min-w-0 flex-1" style={{ gap: 'var(--k2)' }}>
+            <input
+              autoFocus
+              value={tenNhap}
+              onChange={(e) => setTenNhap(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') void luuTenCa()
+                if (e.key === 'Escape') setTenNhap(null)
+              }}
+              maxLength={TEN_CA_TOI_DA}
+              placeholder={`Ca ${chiTiet.ca.maCa}`}
+              aria-label="Tên ca thi"
+              style={{ ...O_NHAP, fontFamily: 'var(--serif)', fontWeight: 700 }}
+            />
+            <button
+              type="button"
+              onClick={() => void luuTenCa()}
+              disabled={dangDoiTen}
+              className="tap-target shrink-0 font-bold"
+              style={{ height: 52, padding: '0 var(--k4)', borderRadius: 'var(--bo-1)', background: 'var(--muc)', color: 'var(--muc-nguoc)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}
+            >
+              {dangDoiTen ? '…' : 'Xong'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setTenNhap(null)}
+              disabled={dangDoiTen}
+              className="tap-target shrink-0"
+              style={{ height: 52, padding: '0 var(--k3)', borderRadius: 'var(--bo-1)', background: 'transparent', border: 'none', ...NHAN_NHO }}
+            >
+              Huỷ
+            </button>
+          </div>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={() => chiTiet && setTenNhap(chiTiet.ca.tenCa || '')}
+              disabled={!chiTiet}
+              className="tap-target flex items-center min-w-0"
+              style={{ gap: 'var(--k2)', background: 'transparent', border: 'none', padding: 0, textAlign: 'left', color: 'var(--muc)' }}
+              aria-label="Sửa tên ca thi"
+            >
+              <h1 className="font-bold truncate" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
+                {chiTiet ? tenHienCua(chiTiet.ca.tenCa, chiTiet.ca.maCa) : 'Chi tiết ca thi'}
+              </h1>
+              {chiTiet && <Pencil size={16} className="shrink-0" style={{ color: 'var(--nhat)' }} />}
+            </button>
+            <button onClick={() => setScreen('lichsuca')} style={NHAN_NHO} className="tap-target shrink-0">
+              ← Lịch sử
+            </button>
+          </>
+        )}
       </div>
 
       {!chiTiet && (
@@ -871,20 +953,78 @@ export default function ExamMonitorScreen() {
                   : 'Mở ca: bỏ hạn giờ vào phòng, em đến muộn vào được ngay. Em đã bị nộp do khoá phải duyệt thi lại từng em.'}
               </div>
             </div>
-            <div className="flex flex-col" style={{ marginTop: 'var(--k3)', gap: 'var(--k2)' }}>
-              <NutChinh variant="phu" onClick={copyLink}>
-                <span className="inline-flex items-center gap-2">
-                  {daCopy ? <Check size={18} /> : <Copy size={18} />} {daCopy ? 'Đã copy link mời' : 'Copy link mời vào thi'}
-                </span>
-              </NutChinh>
-              <NutChinh variant="phu" onClick={copyLinkDiem}>
-                <span className="inline-flex items-center gap-2">
-                  {daCopyDiem ? <Check size={18} /> : <Copy size={18} />} {daCopyDiem ? 'Đã copy link xem điểm' : 'Copy link XEM ĐIỂM cho em'}
-                </span>
-              </NutChinh>
-              <div style={NHAN_NHO}>
-                Link xem điểm: em nhập lại số báo danh, họ tên, năm sinh rồi vào thẳng phiếu điểm và báo cáo của
-                chính em. Gửi được sau khi đã dựng phiếu cho ca.
+            {/* HAI LINK GỬI CHO EM — vẽ lại 07/09 theo ý thầy.
+                Bản cũ là hai thanh chữ xám xếp dọc, chữ dài gần bằng nhau
+                ("Copy link mời vào thi" / "Copy link XEM ĐIỂM cho em") nên giữa
+                giờ phải đọc hết mới biết bấm cái nào.
+
+                Nay đi theo đúng luật vẽ của cặp Mở ca / Khoá ca ngay trên:
+                mỗi việc một thẻ, biểu tượng tròn nói việc, dòng phụ nói em nhận
+                được gì. Hai việc khác nhau nên hai màu khác nhau — tím là VÀO
+                THI, xanh là XEM ĐIỂM — và copy xong thì chính thẻ đó đổi nền,
+                không phải đọc chữ mới biết đã copy. */}
+            {/* EM BỊ CHẶN Ở CỔNG DANH SÁCH (thầy báo 07/09).
+                Cổng so đủ ba: số báo danh, họ tên, năm sinh. Máy chủ CỐ Ý không
+                nói cho em biết sai ô nào — nói ra là cho phép dò tên học sinh
+                từ số báo danh. Nhưng thầy đứng ngay trong phòng thì phải thấy:
+                07/09 hai em bị chặn giữa buổi mà không còn dấu vết nào để lần.
+                Bày thẳng em gõ gì / danh sách ghi gì, thầy sửa trong một phút. */}
+            {chiTiet.biChan && chiTiet.biChan.length > 0 && (
+              <div style={{ marginTop: 'var(--k3)' }}>
+                <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>
+                  Bị chặn ở cổng danh sách (<b style={SO}>{chiTiet.biChan.length}</b> lượt)
+                </div>
+                <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+                  {chiTiet.biChan.slice(0, 8).map((b, i) => (
+                    <div key={`${b.luc}-${i}`} style={{ background: 'var(--cam-nen)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)' }}>
+                      <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
+                        SBD <span style={SO}>{b.sbd}</span> · {moTaLyDoChan(b.lyDo)}
+                      </div>
+                      <div style={NHAN_NHO}>
+                        Em gõ: <b>{b.hoTenGoi || '(trống)'}</b>
+                        {b.namSinhGoi ? <> · sinh <span style={SO}>{b.namSinhGoi}</span></> : null}
+                      </div>
+                      <div style={NHAN_NHO}>
+                        {b.hoTenDs ? (
+                          <>
+                            Danh sách: <b>{b.hoTenDs}</b>
+                            {b.namSinhDs ? <> · sinh <span style={SO}>{b.namSinhDs}</span></> : null}
+                          </>
+                        ) : (
+                          'Danh sách lớp không có số báo danh này'
+                        )}
+                        {b.luc ? <> · lúc <span style={SO}>{gio(b.luc)}</span></> : null}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div style={{ marginTop: 'var(--k3)' }}>
+              <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Link gửi cho em</div>
+              <div className="grid grid-cols-2" style={{ gap: 'var(--k2)' }}>
+                <NutLinkCa
+                  icon={daCopy ? <Check size={19} /> : <LogIn size={19} />}
+                  ten={daCopy ? 'Đã copy' : 'Link vào thi'}
+                  phu="Em bấm là vào phòng"
+                  mau="var(--tim)"
+                  nen="var(--tim-nen)"
+                  daCopy={daCopy}
+                  onClick={copyLink}
+                />
+                <NutLinkCa
+                  icon={daCopyDiem ? <Check size={19} /> : <BarChart3 size={19} />}
+                  ten={daCopyDiem ? 'Đã copy' : 'Link xem điểm'}
+                  phu="Em xem điểm và báo cáo"
+                  mau="var(--xanh)"
+                  nen="var(--xanh-nen)"
+                  daCopy={daCopyDiem}
+                  onClick={copyLinkDiem}
+                />
+              </div>
+              <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
+                Link xem điểm: em chỉ nhập số báo danh, có trong danh sách lớp là mở đúng màn hình lúc vừa nộp
+                bài. Gửi được sau khi đã dựng phiếu cho ca.
               </div>
             </div>
           </TheNoiDung>
@@ -1151,6 +1291,45 @@ export default function ExamMonitorScreen() {
 
 /** Một ô xuất kết quả: biểu tượng trên, tên hai chữ ở giữa, đuôi tệp bên dưới.
  * Ba ô cùng cỡ vì ba việc cùng hạng — thầy dùng cái nào cũng như nhau. */
+/** MỘT THẺ LINK GỬI CHO EM. Cùng khuôn với cặp Mở ca / Khoá ca ngay trên nó:
+ * cao 64, biểu tượng tròn bên trái, tên việc và dòng phụ xếp dọc bên phải.
+ * Copy xong thì nền thẻ chuyển sang màu của chính việc đó — dấu hiệu nằm ở nơi
+ * ngón tay vừa chạm, không phải ở dòng thông báo trôi qua. */
+function NutLinkCa({ icon, ten, phu, mau, nen, daCopy, onClick }: { icon: React.ReactNode; ten: string; phu: string; mau: string; nen: string; daCopy: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={ten}
+      className="tap-target flex items-center"
+      style={{
+        minHeight: 64,
+        gap: 'var(--k2)',
+        padding: '0 var(--k3)',
+        borderRadius: 'var(--bo-3)',
+        border: `1.5px solid ${daCopy ? mau : 'var(--vien)'}`,
+        textAlign: 'left',
+        background: daCopy ? nen : 'var(--the-2)',
+        color: 'var(--muc)',
+        transitionProperty: 'background-color, border-color',
+        transitionDuration: 'var(--nhanh)',
+      }}
+    >
+      <span className="flex items-center justify-center shrink-0" style={{ width: 36, height: 36, borderRadius: 'var(--bo-tron)', background: daCopy ? mau : nen, color: daCopy ? 'var(--muc-nguoc)' : mau }}>
+        {icon}
+      </span>
+      <span className="flex flex-col" style={{ gap: 1, minWidth: 0 }}>
+        <span className="font-bold truncate" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
+          {ten}
+        </span>
+        <span className="truncate" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-0)', color: 'var(--nhat)' }}>
+          {phu}
+        </span>
+      </span>
+    </button>
+  )
+}
+
 function NutXuat({ icon, ten, phu, onClick, tat }: { icon: React.ReactNode; ten: string; phu: string; onClick: () => void; tat?: boolean }) {
   return (
     <button

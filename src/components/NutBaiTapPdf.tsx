@@ -224,6 +224,20 @@ export default function NutBaiTapPdf({
         </button>
       )}
 
+      {/* PHIẾU NÀY CÓ PHẢI PHIẾU KHẮC PHỤC KHÔNG — nói THẲNG (thầy báo 07/09).
+          Thầy tạo 10 câu cho một em rồi hỏi vì sao mất dòng đỏ "câu này khắc
+          phục câu nào". Lý do: chỗ mở phiếu không kèm bảng chấm từng câu của
+          một ca, nên không có câu sai nào để gắn nhãn, và đặc tả cấm câu không
+          nhãn vào phiếu chữa — máy lặng lẽ rút phiếu luyện chuyên đề thay vào.
+          Lặng lẽ đổi loại phiếu là thứ phải bỏ: nói ra và chỉ đúng lối đi. */}
+      {!chuaDuoc && (
+        <OThongBao tone="cam">
+          Đây là phiếu <b>luyện theo chuyên đề</b>, không phải phiếu khắc phục: chỗ này chưa có bảng chấm từng câu
+          của em ở một ca cụ thể, nên không câu nào gắn được nhãn "khắc phục câu mấy". Muốn phiếu có dòng đó, mở từ
+          màn <b>Theo dõi ca</b> rồi chạm tên em.
+        </OThongBao>
+      )}
+
       {/* SUẤT CHỮA KHÔNG RÚT ĐƯỢC CÂU NÀO. Bỏ trống và nói lý do, tuyệt đối
           không thay bằng câu chuyên đề khác. */}
       {thieuChua.length > 0 && (

@@ -7,6 +7,7 @@ import type { AnswerRecord, IntegrityLog } from './exam-db'
 import type { CauHoiCuaEm, GoiCauHoi } from './hoi-bai'
 import type { DiemMotCa } from './phieu-du-lieu'
 import { dongBoGioMayChu } from './gio-may-chu'
+import { chuanTenCa } from './ten-ca'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
 export interface KeyBank {
@@ -412,6 +413,18 @@ export async function moKhoaCa(scriptUrl: string, secret: string, maCa: string):
   const r = await postJson(scriptUrl, { action: 'moKhoaCa', secret, maCa })
   if (!r.ok) throw new Error(r.error || 'Không mở lại được ca')
   return { goHanVao: !!(r as { goHanVao?: boolean }).goHanVao }
+}
+
+/** ĐỔI TÊN CA (thầy báo 07/09). Tên ca đặt lúc mở ca đi theo ca suốt đời — in
+ * trong phiếu phụ huynh, bảng điểm, hồ sơ em — nên gõ vội một lần là sai mãi.
+ *
+ * Máy chủ chuẩn hoá LẠI chuỗi gửi lên rồi trả về tên nó đã ghi thật; màn hình
+ * lấy chuỗi TRẢ VỀ mà hiển thị, không lấy chuỗi mình vừa gõ. Có vậy thì cái
+ * thầy nhìn thấy mới đúng là cái nằm trong ô Sheet. */
+export async function doiTenCa(scriptUrl: string, secret: string, maCa: string, tenCa: string): Promise<{ tenCa: string }> {
+  const r = await postJson(scriptUrl, { action: 'doiTenCa', secret, maCa, tenCa: chuanTenCa(tenCa) })
+  if (!r.ok) throw new Error(r.error || 'Không đổi được tên ca')
+  return { tenCa: String((r as { tenCa?: string }).tenCa ?? '') }
 }
 
 /** Trạng thái 1 lượt thi trên máy chủ (sheet LuotThi). */
@@ -891,6 +904,53 @@ export async function napDanhSachLop(
   return { soDong: Number(r.soDong) || 0 }
 }
 
+/** Kết quả một lượt đồng bộ danh sách lớp từ link Google Sheet của thầy. */
+export interface KetQuaDongBoDsLop {
+  soDong: number
+  links: string[]
+  theoLink: { link: string; so: number; loi: string }[]
+  trung: string[]
+  them: { sbd: string; hoTen: string }[]
+  bo: { sbd: string; hoTen: string }[]
+  doiTen: { sbd: string; cu: string; moi: string }[]
+  capNhatLuc: string
+}
+
+/** Link danh sách lớp thầy đã lưu trên máy chủ (mỗi khối một link). */
+export async function linkDanhSachLop(scriptUrl: string, secret: string): Promise<string[]> {
+  const r = await postJson(scriptUrl, { action: 'linkDanhSachLop', secret })
+  if (!r.ok) throw new Error(r.error || 'Không đọc được link danh sách')
+  return Array.isArray(r.links) ? (r.links as unknown[]).map((x) => String(x)) : []
+}
+
+/** ĐỒNG BỘ DANH SÁCH LỚP TỪ GOOGLE SHEET CỦA THẦY (thầy chốt 07/09).
+ *
+ * Truyền `links` để lưu lại bộ link mới; bỏ trống để dùng bộ đang lưu.
+ *
+ * MÁY CHỦ TẢI SHEET, KHÔNG PHẢI MÁY THẦY: Google không gắn nhãn CORS cho tệp
+ * CSV xuất bản nên trình duyệt đọc thẳng là hỏng. Đổi lại, thầy đồng bộ được
+ * từ điện thoại giữa buổi dạy mà không cần mở máy tính. */
+export async function dongBoDanhSachLop(scriptUrl: string, secret: string, links?: string[]): Promise<KetQuaDongBoDsLop> {
+  const goi: Record<string, unknown> = { action: 'dongBoDanhSachLop', secret }
+  if (links) goi.links = links
+  const r = await postJson(scriptUrl, goi)
+  if (!r.ok) {
+    const theo = Array.isArray(r.theoLink) ? (r.theoLink as { link: string; loi: string }[]) : []
+    const chiTiet = theo.filter((t) => t.loi).map((t) => t.loi)
+    throw new Error([r.error || 'Không đồng bộ được danh sách', ...chiTiet].join(' — '))
+  }
+  return {
+    soDong: Number(r.soDong) || 0,
+    links: Array.isArray(r.links) ? (r.links as unknown[]).map((x) => String(x)) : [],
+    theoLink: Array.isArray(r.theoLink) ? (r.theoLink as KetQuaDongBoDsLop['theoLink']) : [],
+    trung: Array.isArray(r.trung) ? (r.trung as unknown[]).map((x) => String(x)) : [],
+    them: Array.isArray(r.them) ? (r.them as KetQuaDongBoDsLop['them']) : [],
+    bo: Array.isArray(r.bo) ? (r.bo as KetQuaDongBoDsLop['bo']) : [],
+    doiTen: Array.isArray(r.doiTen) ? (r.doiTen as KetQuaDongBoDsLop['doiTen']) : [],
+    capNhatLuc: String(r.capNhatLuc || ''),
+  }
+}
+
 export async function danhDauYeuCau(scriptUrl: string, secret: string, id: string, trangThai: 'xong' | 'huy', maCa = ''): Promise<void> {
   const r = await postJson(scriptUrl, { action: 'danhDauYeuCau', secret, id, trangThai, maCa })
   if (!r.ok) throw new Error(r.error || 'Không cập nhật được yêu cầu')
@@ -1157,6 +1217,32 @@ export interface ChiTietCa {
   /** Ngân hàng CÓ đáp án của ca — chỉ trả khi gọi với `xinKeyBank`, để máy thầy
    * chưa có bản đề (ca mở ở máy khác) vẫn chấm lại và xuất phiếu được. */
   keyBank?: KeyBank | null
+  /** Những lượt bị cổng danh sách CHẶN, mới nhất trước. Máy chủ cố ý không nói
+   * cho em biết sai ô nào, nhưng thầy đứng trong phòng thì phải thấy. */
+  biChan?: LuotBiChan[]
+}
+
+/** Một lượt bị cổng vào thi chặn. `lyDo` do máy chủ đặt:
+ * `khong_co_sbd` số báo danh không có trong danh sách lớp ·
+ * `lech_ho_ten` họ tên gõ khác danh sách · `lech_nam_sinh` năm sinh gõ khác. */
+export interface LuotBiChan {
+  luc: string
+  sbd: string
+  hoTenGoi: string
+  namSinhGoi: string
+  hoTenDs: string
+  namSinhDs: string
+  lyDo: string
+}
+
+const TEN_LY_DO_CHAN: Record<string, string> = {
+  khong_co_sbd: 'Số báo danh không có trong danh sách lớp',
+  lech_ho_ten: 'Họ tên gõ khác danh sách',
+  lech_nam_sinh: 'Năm sinh gõ khác danh sách',
+}
+
+export function moTaLyDoChan(lyDo: string): string {
+  return TEN_LY_DO_CHAN[lyDo] || 'Không khớp danh sách lớp'
 }
 
 export async function chiTietCa(scriptUrl: string, secret: string, maCa: string, xinKeyBank = false): Promise<ChiTietCa> {
@@ -1166,6 +1252,18 @@ export async function chiTietCa(scriptUrl: string, secret: string, maCa: string,
     ca: { ...r.ca, maCa: String(r.ca.maCa), lop: String(r.ca.lop ?? '') },
     luot: (r.luot as LuotThiRow[]).map((l) => ({ ...l, sbd: String(l.sbd), lanThu: Number(l.lanThu) || 1 })),
     keyBank: (r.keyBank as KeyBank) ?? null,
+    // Máy chủ cũ chưa có trường này ⇒ mảng rỗng, màn hình không vỡ.
+    biChan: Array.isArray(r.biChan)
+      ? (r.biChan as Record<string, unknown>[]).map((b) => ({
+          luc: String(b.luc ?? ''),
+          sbd: String(b.sbd ?? ''),
+          hoTenGoi: String(b.hoTenGoi ?? ''),
+          namSinhGoi: String(b.namSinhGoi ?? ''),
+          hoTenDs: String(b.hoTenDs ?? ''),
+          namSinhDs: String(b.namSinhDs ?? ''),
+          lyDo: String(b.lyDo ?? ''),
+        }))
+      : [],
   }
 }
 
