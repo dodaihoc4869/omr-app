@@ -252,3 +252,77 @@ describe('lọc lý thuyết / bài tập ở CỔNG rút câu chữa', () => {
     }
   })
 })
+
+// ---------------------------------------------------------------------------
+// CỔNG KHÔNG RÚT ĐƯỢC THÌ THẦY VẪN PHẢI RÚT ĐƯỢC BÀI — thầy bắt được 07/09:
+//
+//   "chỗ rút bài của thầy bị mất thanh chọn"
+//   "chắc do không có câu tương ứng nên thanh chọn không hiện"
+//
+// Thầy đoán đúng nguyên nhân. Đo trên máy thật: ca `352039` dùng bộ đề 12-BD7,
+// mới gán được 26/84 câu (phần còn lại thuộc chương chưa có bảng cơ chế), nên
+// mọi câu em sai đều chưa có mã và `tongUngVien = 0`.
+//
+// Cái HỎNG không phải con số 0 — con số đó đúng. Cái hỏng là màn hình khi ấy
+// nuốt luôn cách chọn số câu, và dòng kẹp `Math.max(1, 0)` bóp phiếu xuống
+// đúng MỘT câu: nút chỉ còn "Xem phiếu 1 câu".
+describe('kho chưa có câu cùng dạng thì màn thầy vẫn rút được bài', () => {
+  const t = doc('src/components/NutBaiTapPdf.tsx')
+
+  it('KHÔNG kẹp số câu xuống 1 khi cổng rút được 0 câu', () => {
+    expect(t, 'còn dòng kẹp cũ Math.max(1, tongUngVien)').not.toMatch(/Math\.max\(1,\s*kq\.tongUngVien\)/)
+    expect(t).toContain('if (kq.tongUngVien > 0) setSoCau')
+  })
+
+  it('vẫn hiện cách chọn số câu khi tongUngVien = 0', () => {
+    expect(t).toMatch(/dem\.tongUngVien <= 0[\s\S]{0,120}Số câu trong phiếu/)
+  })
+
+  it('và vẫn nói LÝ DO, không im lặng đổi sang bài luyện thường', () => {
+    expect(t).toContain('Kho chưa có câu cùng dạng với những câu em sai')
+  })
+
+  it('thanh kéo chỉ dựng khi cổng thật sự có hàng', () => {
+    // `ThanhSoCauChua` vẫn hiện để nói lý do; phần chọn số câu là khối RIÊNG.
+    expect(t).toMatch(/\{chuaDuoc && dem && \(/)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// HAI MÀN, HAI CON SỐ — thầy bắt được 07/09: "số lượng câu cùng dạng trong kho
+// của hai phần khác nhau là sao".
+//
+// Cùng một em, cùng một ca: màn thầy ghi "Kho có 67 câu", báo cáo phụ huynh ghi
+// "Kho có 92 câu". Phép tính KHÔNG sai — màn thầy đã trừ 39 câu đã in cho em,
+// báo cáo thì chưa. Cái sai là CÂU CHỮ nói y hệt nhau trong khi hai con số đếm
+// hai thứ khác nhau, nên đọc thành mâu thuẫn.
+describe('con số phải nói rõ nó đếm cái gì', () => {
+  it('đã trừ câu em từng gặp thì nói "Kho CÒN", kèm số đã trừ', () => {
+    const c = cauGiaiThichThanh({ tongUngVien: 67, soCauSai: 16, san: 16, daTru: 39 })
+    expect(c).toContain('Kho còn 67 câu')
+    expect(c).toContain('đã trừ 39 câu em từng gặp')
+    expect(c).not.toContain('Kho có 67')
+  })
+
+  it('chưa trừ gì thì vẫn nói "Kho có", không thêm mệnh đề thừa', () => {
+    const c = cauGiaiThichThanh({ tongUngVien: 92, soCauSai: 16, san: 16, daTru: 0 })
+    expect(c).toContain('Kho có 92 câu')
+    expect(c).not.toContain('đã trừ')
+  })
+
+  it('xưng hô theo màn', () => {
+    expect(cauGiaiThichThanh({ tongUngVien: 67, soCauSai: 16, san: 16, daTru: 39, xung: 'con' })).toContain('39 câu con từng gặp')
+  })
+
+  it('MÀN THẦY: phần đếm và phần rút dùng ĐÚNG một tập tránh', () => {
+    // Bản trước phần đếm chỉ trừ câu đã in, phần rút trừ cả câu đã nộp — thanh
+    // kéo hứa một con số rồi phiếu ra ít hơn.
+    const t = doc('src/components/NutBaiTapPdf.tsx')
+    expect(t).toContain('const [daGap, setDaGap] = useState<string[]>([])')
+    expect(t).toMatch(/rutDeChua\(\{ khoDe: nguon, rows: rows \?\? \[\], qidTranh: daGap, soCau: 0/)
+    expect(t).toContain('let tranh = daGap')
+    // Và con số đã trừ được đưa xuống thanh để câu chữ nói đúng.
+    expect(t).toContain('daTru: daGap.length')
+    expect(t).toContain('daTru={dem.daTru}')
+  })
+})

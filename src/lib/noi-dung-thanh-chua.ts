@@ -55,12 +55,24 @@ export function cauGiaiThichThanh(dau: {
    * chỉ chở được một phần kho. */
   coSan?: number
   choBac2?: boolean
+  /** Số câu đã BỊ TRỪ khỏi kho vì em đã gặp rồi (đã nộp hoặc đã in ra phiếu).
+   *
+   * Thầy bắt được 07/09: màn thầy ghi "Kho có 67 câu" còn báo cáo phụ huynh ghi
+   * "Kho có 92 câu" cho CÙNG một em, cùng một ca. Không sai phép tính: màn thầy
+   * đã trừ 39 câu đã in cho em, báo cáo thì chưa. Cái sai là CÂU CHỮ nói như
+   * nhau trong khi hai con số đếm hai thứ khác nhau. */
+  daTru?: number
   /** Xưng hô: `em` cho báo cáo học sinh và màn thầy, `con` cho phụ huynh. */
   xung?: 'em' | 'con'
 }): string {
   const xung = dau.xung ?? 'em'
   const co = dau.coSan
-  const phanKho = `Kho có ${dau.tongUngVien} câu cùng dạng với ${dau.soCauSai} câu ${xung} sai${dau.choBac2 ? ' (đã tính thêm câu cùng cơ chế)' : ''}.`
+  const daTru = Math.max(0, Math.floor(Number(dau.daTru) || 0))
+  // "Kho CÒN" chứ không phải "Kho CÓ" khi đã trừ: con số này là phần chưa phát
+  // cho em, không phải tổng kho.
+  const dongTu = daTru > 0 ? 'Kho còn' : 'Kho có'
+  const phanTru = daTru > 0 ? `, đã trừ ${daTru} câu ${xung} từng gặp` : ''
+  const phanKho = `${dongTu} ${dau.tongUngVien} câu cùng dạng với ${dau.soCauSai} câu ${xung} sai${dau.choBac2 ? ' (đã tính thêm câu cùng cơ chế)' : ''}${phanTru}.`
   // Gói mang sẵn ít hơn kho thì phải nói ra, nếu không phụ huynh thấy trần 60
   // trong khi dòng trên ghi 103 và không hiểu vì sao.
   const phanGoi = co !== undefined && co < dau.tongUngVien ? ` Phiếu này mang sẵn ${co} câu.` : ''

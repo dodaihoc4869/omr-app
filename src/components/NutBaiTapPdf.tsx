@@ -77,7 +77,32 @@ export default function NutBaiTapPdf({
   const [ketQua, setKetQua] = useState<{ soCau: number; lapLai: number; thieu: number; ten: string } | null>(null)
   /** ĐẾM ỨNG VIÊN (v4 mục 4.2) — max của thanh kéo. Chạy thuần trên máy, không
    * gọi mạng: đếm phải xong trước khi thầy kịp nhìn thanh. */
-  const [dem, setDem] = useState<{ tongUngVien: number; poolTheoCauSai: PoolCauSai[]; thieu: SuatThieu[] } | null>(null)
+  const [dem, setDem] = useState<{ tongUngVien: number; poolTheoCauSai: PoolCauSai[]; thieu: SuatThieu[]; daTru: number } | null>(null)
+
+  /** CÂU EM ĐÃ GẶP — máy chủ biết câu em đã NỘP, máy thầy nhớ câu đã IN.
+   *
+   * Tải MỘT LẦN cho mỗi em rồi dùng chung cho cả phần ĐẾM lẫn phần RÚT. Bản
+   * trước phần đếm chỉ trừ câu đã in, phần rút trừ cả hai, nên thanh kéo hứa
+   * một con số rồi phiếu ra ít hơn. */
+  const [daGap, setDaGap] = useState<string[]>([])
+  useEffect(() => {
+    let con = true
+    void (async () => {
+      const daInRa = await docQidRaPhieu(sbd)
+      let daNop: string[] = []
+      try {
+        const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
+        if (url.trim() && mat.trim()) daNop = await qidDaLam(url.trim(), mat.trim(), sbd)
+      } catch {
+        daNop = []
+      }
+      if (con) setDaGap([...new Set([...daNop, ...daInRa])])
+    })()
+    return () => {
+      con = false
+    }
+  }, [sbd])
+
   useEffect(() => {
     let con = true
     void (async () => {
@@ -86,17 +111,22 @@ export default function NutBaiTapPdf({
         return
       }
       const nguon = await loadExamSources()
-      const daInRa = await docQidRaPhieu(sbd)
-      const kq = rutDeChua({ khoDe: nguon, rows: rows ?? [], qidTranh: daInRa, soCau: 0, locSao, locDang: dang })
+      const kq = rutDeChua({ khoDe: nguon, rows: rows ?? [], qidTranh: daGap, soCau: 0, locSao, locDang: dang })
       if (!con) return
-      setDem({ tongUngVien: kq.tongUngVien, poolTheoCauSai: kq.poolTheoCauSai, thieu: kq.thieu })
+      setDem({ tongUngVien: kq.tongUngVien, poolTheoCauSai: kq.poolTheoCauSai, thieu: kq.thieu, daTru: daGap.length })
       // Kẹp vị trí thanh xuống max mới — không để thanh chỉ 60 khi kho chỉ có 8.
-      setSoCau((n) => Math.min(n, Math.max(1, kq.tongUngVien)))
+      //
+      // CHỈ kẹp khi cổng THẬT SỰ rút được. Thầy bắt được 07/09: ca dùng bộ đề
+      // 12-BD7 mới gán được 26/84 câu, nên `tongUngVien = 0`, và dòng kẹp cũ
+      // `Math.max(1, 0)` tụt số câu xuống 1 — thầy mất thanh kéo và nút chỉ còn
+      // "Xem phiếu 1 câu". Cổng không chạy được thì phải TRẢ LẠI cách chọn số
+      // câu thường, không được bóp phiếu xuống một câu.
+      if (kq.tongUngVien > 0) setSoCau((n) => Math.min(n, kq.tongUngVien))
     })()
     return () => {
       con = false
     }
-  }, [chuaDuoc, rows, sbd, locSao, dang])
+  }, [chuaDuoc, rows, sbd, locSao, dang, daGap])
 
   useEffect(() => {
     let con = true
@@ -122,17 +152,19 @@ export default function NutBaiTapPdf({
       const nguon = await loadExamSources()
       if (nguon.length === 0) throw new Error('Máy này chưa có đề nào. Vào Ngân hàng câu hỏi bấm Đồng bộ trước.')
 
-      // Hai nguồn "câu em đã gặp": máy chủ biết câu em đã NỘP, máy thầy nhớ câu
-      // đã IN RA PHIẾU. Thiếu vế nào cũng phát lại câu cũ.
-      let daNop: string[] = []
-      try {
-        const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
-        if (url.trim() && mat.trim()) daNop = await qidDaLam(url.trim(), mat.trim(), sbd)
-      } catch {
-        daNop = []
+      // ĐÚNG TẬP TRÁNH mà phần đếm đã dùng — xem ghi chú ở `daGap`. Tải lại ở
+      // đây phòng khi hiệu ứng trên chưa xong, nhưng kết quả phải trùng.
+      let tranh = daGap
+      if (tranh.length === 0) {
+        let daNop: string[] = []
+        try {
+          const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
+          if (url.trim() && mat.trim()) daNop = await qidDaLam(url.trim(), mat.trim(), sbd)
+        } catch {
+          daNop = []
+        }
+        tranh = [...new Set([...daNop, ...(await docQidRaPhieu(sbd))])]
       }
-      const daInRa = await docQidRaPhieu(sbd)
-      const tranh = [...new Set([...daNop, ...daInRa])]
 
       // ĐI QUA CỔNG (v3 mục 2). Nguồn là CẢ KHO — ranh giới không còn là đề
       // đã tích nữa mà là MÃ DẠNG của chính câu em sai.
@@ -267,7 +299,7 @@ export default function NutBaiTapPdf({
 
       {/* THANH KÉO DÙNG CHUNG (v4 mục 6). Trần là `tongUngVien`, không phải
           một con số cứng của riêng màn này. */}
-      {chuaDuoc && dem ? (
+      {chuaDuoc && dem && (
         <ThanhSoCauChua
           soCau={soCau}
           onDoi={setSoCau}
@@ -275,9 +307,13 @@ export default function NutBaiTapPdf({
           poolTheoCauSai={dem.poolTheoCauSai}
           thieu={dem.thieu}
           soCauSai={dem.poolTheoCauSai.length}
-          
+          daTru={dem.daTru}
         />
-      ) : (
+      )}
+      {/* CỔNG KHÔNG RÚT ĐƯỢC vẫn phải cho thầy chọn số câu.
+          `ThanhSoCauChua` ở trên đã nói LÝ DO; ở đây trả lại cách chọn số câu
+          thường để phiếu bài luyện vẫn ra đủ, thay vì tụt xuống một câu. */}
+      {(!chuaDuoc || !dem || dem.tongUngVien <= 0) && (
         <div>
           <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Số câu trong phiếu</div>
           <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }}>
@@ -303,7 +339,11 @@ export default function NutBaiTapPdf({
               </button>
             ))}
           </div>
-          <div style={NHAN_NHO}>Ca này chưa có câu sai nào để chữa — phiếu là bài luyện thường.</div>
+          <div style={NHAN_NHO}>
+            {chuaDuoc && dem && dem.tongUngVien <= 0
+              ? 'Kho chưa có câu cùng dạng với những câu em sai, nên phiếu này là bài luyện thường theo chuyên đề em yếu.'
+              : 'Ca này chưa có câu sai nào để chữa — phiếu là bài luyện thường.'}
+          </div>
         </div>
       )}
 

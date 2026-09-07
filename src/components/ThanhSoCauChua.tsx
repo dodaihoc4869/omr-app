@@ -24,6 +24,7 @@ export default function ThanhSoCauChua({
   poolTheoCauSai,
   thieu,
   soCauSai,
+  daTru,
   onSangNganHang,
   choBac2,
 }: {
@@ -33,6 +34,8 @@ export default function ThanhSoCauChua({
   poolTheoCauSai?: PoolCauSai[]
   thieu?: SuatThieu[]
   soCauSai?: number
+  /** Số câu đã trừ vì em từng gặp — xem `cauGiaiThichThanh`. */
+  daTru?: number
   /** Có nút nhảy sang màn Ngân hàng câu hỏi khi nguyên nhân là chưa gán dạng. */
   onSangNganHang?: () => void
   choBac2?: boolean
@@ -132,7 +135,7 @@ export default function ThanhSoCauChua({
       />
 
       {/* Nói MAX VÀ MIN TỪ ĐÂU RA. Không có dòng này thì hai con số là số trên trời. */}
-      <div style={{ ...NHAN_NHO, marginTop: 4 }}>{cauGiaiThichThanh({ tongUngVien, soCauSai: sai, san, choBac2 })}</div>
+      <div style={{ ...NHAN_NHO, marginTop: 4 }}>{cauGiaiThichThanh({ tongUngVien, soCauSai: sai, san, choBac2, daTru })}</div>
 
       {canhBao !== '' && <div style={{ ...NHAN_NHO, marginTop: 4, color: 'var(--cam)' }}>{canhBao}</div>}
     </div>
