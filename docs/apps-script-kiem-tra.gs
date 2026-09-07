@@ -1955,6 +1955,63 @@ function doPost(e) {
     return jsonResponse_({ ok: true, items: itemsPC, serverNow: Date.now() })
   }
 
+  if (action === 'phieuCuaEm') {
+    // LINK XEM ĐIỂM `/d/<mã ca>` — thầy báo 07/09.
+    //
+    // VÌ SAO: link vào thi `/t/<mã ca>` sau khi nộp là đường cụt. Máy chủ chặn
+    // vào lại, còn màn làm bài chỉ mở lại được điểm khi CHÍNH MÁY đó còn giữ
+    // bài; `lichSuEm` thì khoá theo id thiết bị của lượt đã nộp nên em đổi máy
+    // không lấy lại được gì.
+    //
+    // Lệnh này KHÔNG trả nội dung phiếu — chỉ trả MÃ, rồi máy em mở `/p#<mã>`
+    // bằng đúng `layPhieu` công khai đã có. Cổng danh tính y hệt `vaoThi`:
+    // phải khớp ĐỦ BA (số báo danh, họ tên, năm sinh) với danh sách lớp, và
+    // phải có lượt ĐÃ NỘP của chính ca này. Biết mỗi số báo danh không lấy
+    // được gì.
+    const maCaXD = String(body.maCa || '').trim()
+    const sbdXD = String(body.sbd || '').trim()
+    if (!maCaXD || !sbdXD) return jsonResponse_({ ok: false, lyDo: 'thieu', error: 'Thiếu mã ca hoặc số báo danh' })
+    const caShXD = sheetCa_()
+    const caRowXD = findRowByKey_(caShXD, 0, maCaXD)
+    if (caRowXD < 0) return jsonResponse_({ ok: false, lyDo: 'khong_co_ca', error: 'Không tìm thấy ca kiểm tra — kiểm tra lại mã ca' })
+    const caXD = docCa_(caShXD, caRowXD)
+    if (caXD.trangThai === 'da_xoa') return jsonResponse_({ ok: false, lyDo: 'da_xoa', error: 'Ca kiểm tra này đã bị thầy xoá' })
+
+    // KHÔNG nói rõ sai ở ô nào: nói ra là cho phép dò tên từ số báo danh.
+    const LOI_HS_XD = { ok: false, lyDo: 'sai_ho_so', error: 'Số báo danh, họ tên hoặc năm sinh không khớp danh sách lớp' }
+    if (coDanhSachHocSinh_()) {
+      const dongXD = timTrongDanhSachLop_(sbdXD)
+      if (!dongXD) return jsonResponse_(LOI_HS_XD)
+      const tenKhopXD = !chuanTen_(dongXD.hoTen) || chuanTen_(body.hoTen) === chuanTen_(dongXD.hoTen)
+      const namKhopXD = !dongXD.namSinh || chuanNamSinh_(body.namSinh) === dongXD.namSinh
+      if (!tenKhopXD || !namKhopXD) return jsonResponse_(LOI_HS_XD)
+    }
+
+    const luotXD = luotMoiNhatTheoSbd_(sheetLuot_(), maCaXD)[sbdXD] || null
+    if (!luotXD || (luotXD.trangThai !== 'da_nop' && luotXD.trangThai !== 'khoa')) {
+      return jsonResponse_({ ok: false, lyDo: 'chua_nop', error: 'Em chưa nộp bài ca này' })
+    }
+
+    const shXD = getSheet_(SHEET_PHIEU, PHIEU_HEADERS)
+    boSungTieuDe_(shXD, PHIEU_HEADERS)
+    const dXD = shXD.getDataRange().getValues()
+    // Một em có thể mang NHIỀU mã phiếu cùng loại (dựng hàng loạt một lần, mở
+    // hồ sơ riêng dựng thêm một lần). Lấy mã MỚI NHẤT theo cột TaoLuc.
+    let maKQ = '', lucKQ = '', maBT = '', lucBT = ''
+    for (let i = 1; i < dXD.length; i++) {
+      if (String(dXD[i][1]) !== maCaXD || String(dXD[i][2]) !== sbdXD) continue
+      const maD = String(dXD[i][0])
+      const lucD = dXD[i][5] ? String(dXD[i][5]) : ''
+      if (String(dXD[i][8] || 'ketqua') === 'baitap') {
+        if (!maBT || lucD > lucBT) { maBT = maD; lucBT = lucD }
+      } else {
+        if (!maKQ || lucD > lucKQ) { maKQ = maD; lucKQ = lucD }
+      }
+    }
+    if (!maKQ && !maBT) return jsonResponse_({ ok: false, lyDo: 'chua_co_phieu', error: 'Thầy chưa dựng phiếu kết quả cho ca này' })
+    return jsonResponse_({ ok: true, ma: maKQ || maBT, maBaiTap: maBT, tong: luotXD.tong })
+  }
+
   if (action === 'layPhieu') {
     const sh = getSheet_(SHEET_PHIEU, PHIEU_HEADERS)
     const ma = String(body.ma || '').trim()
