@@ -48,38 +48,80 @@ describe('đường /d/<mã ca>', () => {
   })
 })
 
-describe('phieuCuaEm', () => {
+describe('phieuCuaEm — CHỈ hỏi số báo danh', () => {
   function gia(tra: unknown) {
     const goi = vi.fn(async () => ({ ok: true, json: async () => tra }))
     vi.stubGlobal('fetch', goi)
     return goi
   }
 
-  it('gửi đủ ba thứ danh tính và trả mã phiếu', async () => {
-    const goi = gia({ ok: true, ma: 'FjcLyEs4Hh', maBaiTap: 'GsHnAARbtV', tong: 6.69 })
-    const kq = await phieuCuaEm('https://x', '248567', '12026', 'Kiều Minh Gia Huy', '2009')
-    expect(kq).toEqual({ ma: 'FjcLyEs4Hh', maBaiTap: 'GsHnAARbtV', tong: 6.69 })
-    const goiBody = JSON.parse((goi.mock.calls[0][1] as { body: string }).body)
-    expect(goiBody).toMatchObject({
-      action: 'phieuCuaEm',
-      maCa: '248567',
-      sbd: '12026',
-      hoTen: 'Kiều Minh Gia Huy',
-      namSinh: '2009',
+  const DAY_DU = {
+    ok: true,
+    ma: 'FjcLyEs4Hh',
+    maBaiTap: 'GsHnAARbtV',
+    tong: 6.69,
+    hoTen: 'Kiều Minh Gia Huy',
+    lop: '12',
+    tenCa: '2009 - L1 - L1',
+    thoiGianPhut: 20,
+    giuDeDoc: true,
+    luot: {
+      lanThu: 1,
+      vaoLuc: '2026-09-07T12:00:00.000Z',
+      nopLuc: '2026-09-07T12:15:05.144Z',
+      trangThai: 'da_nop',
+      dapAn: { phanI: { q1: 'A' }, phanII: {}, phanIII: {} },
+      giayCau: { q1: 12 },
+      integrity: { leaveCount: 0, totalHiddenMs: 0, events: [], blocked: false },
+      soLanRoiMan: 0,
+      tongGiayRoiMan: 0,
+    },
+    bank: { phanI: [], phanII: [], phanIII: [] },
+  }
+
+  it('gói gửi đi chỉ có mã ca và số báo danh — KHÔNG hỏi họ tên, năm sinh', () => {
+    const goi = gia(DAY_DU)
+    return phieuCuaEm('https://x', '248567', '12026').then(() => {
+      const b = JSON.parse((goi.mock.calls[0][1] as { body: string }).body)
+      expect(b).toEqual({ action: 'phieuCuaEm', maCa: '248567', sbd: '12026' })
+      // Thầy chốt 07/09: gõ ba ô trên điện thoại sai một dấu là tắc.
+      expect(Object.keys(b)).not.toContain('hoTen')
+      expect(Object.keys(b)).not.toContain('namSinh')
+      expect(Object.keys(b)).not.toContain('secret')
     })
-    // KHÔNG được kèm mã bí mật: đây là lệnh chạy trên MÁY EM.
-    expect(Object.keys(goiBody)).not.toContain('secret')
   })
 
-  it('máy chủ từ chối thì ném đúng câu của máy chủ, không nuốt mất', async () => {
-    gia({ ok: false, lyDo: 'sai_ho_so', error: 'Số báo danh, họ tên hoặc năm sinh không khớp danh sách lớp' })
-    await expect(phieuCuaEm('https://x', '248567', '12026', 'Sai Tên', '2009')).rejects.toThrow(
-      /không khớp danh sách lớp/,
-    )
+  it('trả đủ thứ để dựng lại màn "Đã nộp bài", không chỉ mã phiếu', async () => {
+    gia(DAY_DU)
+    const kq = await phieuCuaEm('https://x', '248567', '12026')
+    expect(kq.ma).toBe('FjcLyEs4Hh')
+    expect(kq.hoTen).toBe('Kiều Minh Gia Huy')
+    expect(kq.thoiGianPhut).toBe(20)
+    expect(kq.giuDeDoc).toBe(true)
+    expect(kq.luot.nopLuc).toBe('2026-09-07T12:15:05.144Z')
+    expect(kq.luot.dapAn).toEqual({ phanI: { q1: 'A' }, phanII: {}, phanIII: {} })
+    expect(kq.luot.giayCau).toEqual({ q1: 12 })
+    expect(kq.bank).not.toBeNull()
   })
 
-  it('chưa dựng phiếu thì nói rõ, không trả mã rỗng im lặng', async () => {
-    gia({ ok: false, lyDo: 'chua_co_phieu', error: 'Thầy chưa dựng phiếu kết quả cho ca này' })
-    await expect(phieuCuaEm('https://x', '248567', '12026', 'A', '2009')).rejects.toThrow(/chưa dựng phiếu/)
+  it('máy chủ thiếu trường nào thì trả mặc định an toàn, không ném vỡ màn', async () => {
+    gia({ ok: true })
+    const kq = await phieuCuaEm('https://x', '248567', '12026')
+    expect(kq.ma).toBe('')
+    expect(kq.tong).toBeNull()
+    expect(kq.bank).toBeNull()
+    expect(kq.luot.lanThu).toBe(1)
+    expect(kq.luot.dapAn).toBeNull()
+  })
+
+  it('số báo danh không có trong danh sách lớp thì bị chặn', async () => {
+    gia({ ok: false, lyDo: 'khong_trong_danh_sach', error: 'Số báo danh không có trong danh sách lớp' })
+    await expect(phieuCuaEm('https://x', '248567', '99999')).rejects.toThrow(/không có trong danh sách lớp/)
+  })
+
+  it('chưa nộp bài ca đó thì nói rõ, không trả bài rỗng', async () => {
+    gia({ ok: false, lyDo: 'chua_nop', error: 'Em chưa nộp bài ca này' })
+    await expect(phieuCuaEm('https://x', '248567', '12026')).rejects.toThrow(/chưa nộp bài/)
   })
 })
+

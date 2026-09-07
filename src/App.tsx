@@ -23,7 +23,6 @@ import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
 import GoiLenBangScreen from './screens/GoiLenBangScreen'
 import CauHoiScreen from './screens/CauHoiScreen'
 import PhieuScreen from './screens/PhieuScreen'
-import XemDiemScreen from './screens/XemDiemScreen'
 import KhoaAppScreen from './screens/KhoaAppScreen'
 import ChanLoi from './components/ChanLoi'
 
@@ -61,6 +60,11 @@ function App() {
   const [laPhieu] = useState(() => docDuongVao(location.search, location.pathname).vai === 'phieu')
   // LINK XEM ĐIỂM của em (`/d/<mã ca>`): cũng là máy của EM, không phải máy
   // thầy — không hỏi mật khẩu, không đọc dữ liệu của thầy, không có cầu nối.
+  //
+  // Đường này mở CHÍNH màn làm bài ở trạng thái "Đã nộp bài", không dựng một
+  // màn điểm riêng: thầy chốt 07/09 là em phải thấy đúng cái màn lúc vừa thi
+  // xong, đủ bốn nút Xem điểm chi tiết · Xem báo cáo học tập · Xem đề & lời
+  // giải · Hỏi bài Thầy.
   const [laXemDiem] = useState(() => docDuongVao(location.search, location.pathname).vai === 'diem')
   // MẬT KHẨU MỞ APP (MATKHAUMOAPP.md). CHỈ hỏi ở app quản lý của thầy — vào
   // thi, báo cáo phụ huynh, link riêng cũ đều không bao giờ bị hỏi.
@@ -166,7 +170,7 @@ function App() {
 
   // Link mời làm bài (?examCode=) mở thẳng màn thi. Không có thì vào app thầy.
   useEffect(() => {
-    if (linkCu || laPhieu || laXemDiem) return
+    if (linkCu || laPhieu) return
     const { maCa } = docDuongVao(location.search, location.pathname)
     if (maCa) setScreen('examtake')
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -176,13 +180,6 @@ function App() {
     return (
       <ChanLoi o="Phiếu kết quả">
         <PhieuScreen />
-      </ChanLoi>
-    )
-  }
-  if (laXemDiem) {
-    return (
-      <ChanLoi o="Xem điểm">
-        <XemDiemScreen />
       </ChanLoi>
     )
   }

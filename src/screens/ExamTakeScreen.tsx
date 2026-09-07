@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
-import { cauKhacPhuc, lichSuEm as lichSuEmApi, vaoThi, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { cauKhacPhuc, lichSuEm as lichSuEmApi, vaoThi, phieuCuaEm as layBaiDaNop, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
 import { goiCauHoi } from '../lib/hoi-bai'
 import TamTruotHoiBai, { type CauChon } from '../components/TamTruotHoiBai'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
@@ -52,6 +52,7 @@ import LogoDDH from '../components/LogoDDH'
 import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
 import { TriangleAlert, X, ArrowLeft, LayoutGrid } from 'lucide-react'
 import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
+import { docDuongVao } from '../lib/vai-tro'
 import { gradeFromKeyBank, type GradedSubmission } from '../lib/exam-grade'
 import {
   cacheSession,
@@ -187,6 +188,14 @@ export default function ExamTakeScreen() {
   // xem điểm thì nhận một ô ĐỎ như app hỏng. Bài đã nộp xong không phải lỗi,
   // nên tách riêng: ô vàng, nói rõ nộp lúc nào và điểm nằm ở đâu.
   const [daNopRoi, setDaNopRoi] = useState<{ nopLuc: string; lanThu: number } | null>(null)
+  // CHẾ ĐỘ XEM ĐIỂM — đường `/d/<mã ca>` (thầy chốt 07/09).
+  //
+  // Cùng màn này, khác đúng hai chỗ: ô nhập chỉ hỏi SỐ BÁO DANH, và nút bấm mở
+  // thẳng trạng thái "Đã nộp bài" bằng bài lấy từ máy chủ thay vì tạo lượt mới.
+  // Không dựng màn điểm riêng: em phải thấy ĐÚNG cái màn lúc vừa thi xong, đủ
+  // bốn nút Xem điểm chi tiết · Xem báo cáo học tập · Xem đề & lời giải · Hỏi
+  // bài Thầy — dựng màn thứ hai là hai nơi rồi lệch nhau.
+  const [laXemDiem] = useState(() => docDuongVao(location.search, location.pathname).vai === 'diem')
 
   const [maCa, setMaCa] = useState('')
   const [sbd, setSbd] = useState('')
@@ -654,6 +663,67 @@ export default function ExamTakeScreen() {
     setAttempt(existing)
     setPhase('submitted')
     if (existing.pendingSubmit) trySend(existing)
+  }
+
+  /** MỞ LẠI BÀI ĐÃ NỘP TỪ MÁY CHỦ — chế độ xem điểm.
+   *
+   * Máy này không cần giữ gì: đáp án của em, ngân hàng CÓ đáp án của ca và mốc
+   * giờ đều lấy về từ máy chủ, dựng thành đúng cái `ExamAttempt` mà màn "Đã nộp
+   * bài" vẫn đọc. Không ghi xuống IndexedDB — em mở nhờ máy bạn thì máy bạn
+   * không giữ lại bài của em. */
+  const moLaiTuMayChu = async () => {
+    const ma = maCa.trim()
+    const sb = sbd.trim()
+    if (!ma || !sb) return showToast('Nhập đủ mã ca và số báo danh', 'error')
+    const url = scriptUrl.trim()
+    if (!url) return showToast('Chưa có link kết nối — mở đúng link Thầy gửi', 'error')
+    setPhase('loading')
+    try {
+      const b = await layBaiDaNop(url, ma, sb)
+      if (!b.bank) throw new Error('Máy chủ chưa gửi đề của ca này — báo Thầy.')
+      setBank(b.bank)
+      setLop(b.lop)
+      if (b.hoTen) setHoTen(b.hoTen)
+      setAttempt({
+        key: `${ma}:${sb}`,
+        maCa: ma,
+        sbd: sb,
+        maDe: ma,
+        startedAt: b.luot.vaoLuc || b.luot.nopLuc,
+        durationMinutes: b.thoiGianPhut,
+        lanThu: b.luot.lanThu,
+        giayCau: b.luot.giayCau ?? undefined,
+        tenCa: b.tenCa,
+        giuDeDoc: b.giuDeDoc,
+        answers: b.luot.dapAn ?? { phanI: {}, phanII: {}, phanIII: {} },
+        integrity: b.luot.integrity ?? {
+          leaveCount: b.luot.soLanRoiMan,
+          totalHiddenMs: b.luot.tongGiayRoiMan * 1000,
+          events: [],
+          blocked: b.luot.trangThai === 'khoa',
+        },
+        submitted: true,
+        submittedAt: b.luot.nopLuc || null,
+        pendingSubmit: false,
+      })
+      // Chấm ngay tại máy em bằng ngân hàng CÓ đáp án vừa nhận — KHÔNG gọi
+      // `apDungKeyBank`: hàm đó còn bật popup điểm và ghi điểm lên máy chủ.
+      // Ở đây em chỉ xem lại, popup phải chờ em bấm "Xem điểm chi tiết", và
+      // điểm trên máy chủ đã có rồi, ghi đè lần nữa là thừa.
+      setKeyBank(b.bank)
+      setChoCaLop(null)
+      try {
+        setGraded(gradeFromKeyBank(b.bank, ma, sb, b.luot.dapAn ?? { phanI: {}, phanII: {}, phanIII: {} }))
+      } catch {
+        // Đề đổi sau khi em thi thì không chấm lại được — vẫn hiện màn đã nộp,
+        // chỉ thiếu điểm, chứ không ném em vào màn lỗi.
+        setGraded(null)
+      }
+      setPhase('submitted')
+    } catch (e) {
+      setErrorMsg(e instanceof Error ? e.message : 'Không mở được bài của em.')
+      setPhase('error')
+    }
   }
 
   // VÀO THI (QUANLYCATHI.md mục 1 + 3): máy chủ quyết định — một SBD một lượt
@@ -1611,7 +1681,14 @@ export default function ExamTakeScreen() {
               </div>
               {/* HỌ TÊN + NĂM SINH: máy chủ đối chiếu với danh sách của thầy.
                   Gõ nhầm một chữ số báo danh sẽ bị chặn ngay ở đây thay vì tạo
-                  ra một em lạ trong bảng điểm. Máy nhớ sẵn từ lần trước. */}
+                  ra một em lạ trong bảng điểm. Máy nhớ sẵn từ lần trước.
+
+                  CHẾ ĐỘ XEM ĐIỂM KHÔNG HỎI HAI Ô NÀY (thầy chốt 07/09): bài đã
+                  nộp rồi, không tạo ra em lạ nào nữa, mà bắt gõ ba ô trên điện
+                  thoại thì sai một dấu là tắc. Cổng còn lại: số báo danh phải
+                  có trong danh sách lớp và phải có lượt đã nộp của ca. */}
+              {!laXemDiem && (
+              <>
               <div>
                 <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginBottom: 'var(--k2)' }}>Họ và tên</div>
                 <input
@@ -1641,7 +1718,9 @@ export default function ExamTakeScreen() {
                   }}
                 />
               </div>
-              {!toanManHinh && (
+              </>
+              )}
+              {!laXemDiem && !toanManHinh && (
                 <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
                   <OThongBao tone="cam">
                     Chỉ vào thi được khi app ở <b>toàn màn hình</b>.
@@ -1657,17 +1736,25 @@ export default function ExamTakeScreen() {
               {/* Nhắc trước khi vào (BA-APP đợt 5): rời màn hình là bị khoá bài,
                   mà cuộc gọi/thông báo cũng tính là rời — bật Không làm phiền
                   là cách duy nhất em tự phòng được. */}
-              <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }}>
-                Bật <b>Không làm phiền</b> trước khi bắt đầu. Cuộc gọi hay thông báo kéo em ra khỏi màn làm bài đều bị tính là rời màn.
-              </div>
+              {!laXemDiem && (
+                <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }}>
+                  Bật <b>Không làm phiền</b> trước khi bắt đầu. Cuộc gọi hay thông báo kéo em ra khỏi màn làm bài đều bị tính là rời màn.
+                </div>
+              )}
               {/* GIỮ ĐỂ ĐỌC (GIUDEDOC mục 6): em biết trước thì không hoảng lúc
                   đề tạm ẩn. Ca không bật cơ chế thì dòng này vô hại. */}
-              <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }} data-dan-giu-de>
-                {chuDanTruoc()}
-              </div>
-              <NutChinh onClick={handleJoin} disabled={!toanManHinh}>
-                Vào thi
-              </NutChinh>
+              {!laXemDiem && (
+                <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }} data-dan-giu-de>
+                  {chuDanTruoc()}
+                </div>
+              )}
+              {laXemDiem ? (
+                <NutChinh onClick={moLaiTuMayChu}>Xem điểm của em</NutChinh>
+              ) : (
+                <NutChinh onClick={handleJoin} disabled={!toanManHinh}>
+                  Vào thi
+                </NutChinh>
+              )}
             </div>
           </TheNoiDung>
         </div>

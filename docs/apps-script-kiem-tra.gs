@@ -1963,11 +1963,14 @@ function doPost(e) {
     // bài; `lichSuEm` thì khoá theo id thiết bị của lượt đã nộp nên em đổi máy
     // không lấy lại được gì.
     //
-    // Lệnh này KHÔNG trả nội dung phiếu — chỉ trả MÃ, rồi máy em mở `/p#<mã>`
-    // bằng đúng `layPhieu` công khai đã có. Cổng danh tính y hệt `vaoThi`:
-    // phải khớp ĐỦ BA (số báo danh, họ tên, năm sinh) với danh sách lớp, và
-    // phải có lượt ĐÃ NỘP của chính ca này. Biết mỗi số báo danh không lấy
-    // được gì.
+    // Trả về ĐỦ THỨ để máy em dựng lại nguyên màn "Đã nộp bài": bài làm của
+    // chính em, ngân hàng CÓ đáp án của ca, và mã phiếu. Không dựng màn điểm
+    // thứ hai — đúng màn em thấy lúc vừa nộp.
+    //
+    // CỔNG: số báo danh phải CÓ TRONG DANH SÁCH LỚP và phải có lượt ĐÃ NỘP của
+    // đúng ca này. Thầy chốt 07/09: chỉ hỏi số báo danh, không hỏi thêm họ tên
+    // và năm sinh nữa — em nhập ba ô trên điện thoại sai một dấu là tắc.
+    // Đáp án của ca đã nộp xong vốn đã công bố cho các em, nên không mở thêm gì.
     const maCaXD = String(body.maCa || '').trim()
     const sbdXD = String(body.sbd || '').trim()
     if (!maCaXD || !sbdXD) return jsonResponse_({ ok: false, lyDo: 'thieu', error: 'Thiếu mã ca hoặc số báo danh' })
@@ -1977,14 +1980,8 @@ function doPost(e) {
     const caXD = docCa_(caShXD, caRowXD)
     if (caXD.trangThai === 'da_xoa') return jsonResponse_({ ok: false, lyDo: 'da_xoa', error: 'Ca kiểm tra này đã bị thầy xoá' })
 
-    // KHÔNG nói rõ sai ở ô nào: nói ra là cho phép dò tên từ số báo danh.
-    const LOI_HS_XD = { ok: false, lyDo: 'sai_ho_so', error: 'Số báo danh, họ tên hoặc năm sinh không khớp danh sách lớp' }
-    if (coDanhSachHocSinh_()) {
-      const dongXD = timTrongDanhSachLop_(sbdXD)
-      if (!dongXD) return jsonResponse_(LOI_HS_XD)
-      const tenKhopXD = !chuanTen_(dongXD.hoTen) || chuanTen_(body.hoTen) === chuanTen_(dongXD.hoTen)
-      const namKhopXD = !dongXD.namSinh || chuanNamSinh_(body.namSinh) === dongXD.namSinh
-      if (!tenKhopXD || !namKhopXD) return jsonResponse_(LOI_HS_XD)
+    if (coDanhSachHocSinh_() && !timTrongDanhSachLop_(sbdXD)) {
+      return jsonResponse_({ ok: false, lyDo: 'khong_trong_danh_sach', error: 'Số báo danh không có trong danh sách lớp' })
     }
 
     const luotXD = luotMoiNhatTheoSbd_(sheetLuot_(), maCaXD)[sbdXD] || null
@@ -2008,8 +2005,33 @@ function doPost(e) {
         if (!maKQ || lucD > lucKQ) { maKQ = maD; lucKQ = lucD }
       }
     }
-    if (!maKQ && !maBT) return jsonResponse_({ ok: false, lyDo: 'chua_co_phieu', error: 'Thầy chưa dựng phiếu kết quả cho ca này' })
-    return jsonResponse_({ ok: true, ma: maKQ || maBT, maBaiTap: maBT, tong: luotXD.tong })
+
+    const hsXD = hoSoHocSinh_(sbdXD)
+    return jsonResponse_({
+      ok: true,
+      ma: maKQ,
+      maBaiTap: maBT,
+      tong: luotXD.tong,
+      hoTen: luotXD.hoTen || (hsXD ? hsXD.hoTen : '') || '',
+      lop: caXD.lop || (hsXD ? hsXD.lop : '') || '',
+      tenCa: caXD.tenCa || '',
+      thoiGianPhut: caXD.thoiGianPhut || 0,
+      giuDeDoc: !!caXD.giuDeDoc,
+      luot: {
+        lanThu: luotXD.lanThu || 1,
+        vaoLuc: luotXD.vaoLuc || '',
+        nopLuc: luotXD.nopLuc || '',
+        trangThai: luotXD.trangThai,
+        // `docLuot_` trả ba cột nặng ở dạng CHUỖI JSON thô, không phải đối
+        // tượng — phải tự đọc, nếu không máy em nhận về chuỗi rồi hỏng ngầm.
+        dapAn: docJsonLon_(luotXD.dapAnJson),
+        giayCau: docJsonLon_(luotXD.giayCauJson),
+        integrity: docJsonLon_(luotXD.integrityJson),
+        soLanRoiMan: luotXD.soLanRoiMan || 0,
+        tongGiayRoiMan: luotXD.tongGiayRoiMan || 0,
+      },
+      bank: docJsonLon_(caXD.bankRef),
+    })
   }
 
   if (action === 'layPhieu') {
