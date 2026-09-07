@@ -24,7 +24,7 @@
 // thường trong IndexedDB, ai mở công cụ nhà phát triển cũng đọc được rồi gọi
 // Apps Script từ máy khác. Cầu nối chỉ sống trong tab đang mở khoá.
 import { coMaBiMatPhien, loadScriptUrl, loadTeacherSecret } from './exam-db'
-import { chiTietCa, danhSachCa, danhSachEm, phieuTheoCa, type ChiTietCa, type CaTomTat, type EmTomTat, type PhieuCuaCa } from './exam-api'
+import { chiTietCa, danhSachCa, danhSachEm, dongBoTenCa, phieuTheoCa, type ChiTietCa, type CaTomTat, type EmTomTat, type KetQuaDongBoTenCa, type PhieuCuaCa } from './exam-api'
 import { taoPhieuCaCa, type KetQuaTaoPhieuCaCa } from './phieu-ca-ca'
 import { dongBoNganHang, type KetQuaDongBo } from './exam-sync'
 import { taoLinkPhieu } from './phieu-link'
@@ -59,6 +59,10 @@ export interface CauNoiDdh {
    * Cần vì điểm trên Sheet là điểm máy EM tính lúc nộp: sửa luật chấm thì phiếu
    * đúng ngay còn bảng điểm vẫn giữ số cũ. Trả bảng đối chiếu cũ → mới. */
   chamLaiCa: (maCa: string) => Promise<KetQuaChamLaiCa>
+  /** ĐỒNG BỘ HỌ TÊN từ danh sách lớp vào một ca. Em vào thi chỉ gõ số báo danh
+   * nên cột tên của lượt bỏ trống, phiếu gửi phụ huynh in "SBD 10038" thay vì
+   * tên con. Chạy xong dựng lại phiếu là tên hiện đúng. */
+  dongBoTenCa: (maCa: string) => Promise<KetQuaDongBoTenCa>
 }
 
 export interface TomTatDongBoMoiCa {
@@ -116,6 +120,10 @@ export function dungCauNoi(): CauNoiDdh {
     chamLaiCa: async (maCa) => {
       const { url, mat } = await chia()
       return chamLaiCa(url, mat, String(maCa || '').trim())
+    },
+    dongBoTenCa: async (maCa) => {
+      const { url, mat } = await chia()
+      return dongBoTenCa(url, mat, String(maCa || '').trim())
     },
     dongBoKho: async (epTaiLai) => {
       const { url, mat } = await chia()

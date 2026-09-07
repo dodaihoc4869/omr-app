@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, RefreshCw, Trash2, ArrowLeft, ChevronRight, Images, FileSpreadsheet, FileJson, Lock, Unlock, Send, Pencil, LogIn, BarChart3 } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
-import { chiTietCa, doiTenCa, duyetThiLai, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
+import { chiTietCa, doiTenCa, dongBoTenCa, duyetThiLai, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
 import { chuanTenCa, tenHienCua, TEN_CA_TOI_DA } from '../lib/ten-ca'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { goiPhieuCaZip, tenTepZipCa, chuyenDeTuChiTiet, type EmTrongCaDeXuatPhieu } from '../lib/phieu-hang-loat'
@@ -127,6 +127,9 @@ export default function ExamMonitorScreen() {
   // là tên cũ còn nguyên, không phải tải lại ca.
   const [tenNhap, setTenNhap] = useState<string | null>(null)
   const [dangDoiTen, setDangDoiTen] = useState(false)
+  // Đồng bộ họ tên từ danh sách lớp vào ca. Em vào thi chỉ gõ số báo danh nên
+  // cột tên của lượt bỏ trống, phiếu gửi phụ huynh in "SBD 10038" thay vì tên.
+  const [dangDongBoTen, setDangDongBoTen] = useState(false)
   // Tải phiếu cả ca: dựng ảnh cho từng em rồi gói .zip, chạy hoàn toàn tại máy
   // thầy nên không phụ thuộc mạng.
   const [dangGoiPhieu, setDangGoiPhieu] = useState('')
@@ -396,6 +399,31 @@ export default function ExamMonitorScreen() {
       setDaCopyDiem(true)
       showToast('Đã copy link xem điểm', 'success')
     })
+  }
+
+  /** Em trong ca đang KHÔNG có họ tên. Phiếu của những em này in "SBD 10038"
+   * thay vì tên con, phụ huynh mở link ra không biết là phiếu của ai. */
+  const emThieuTen = useMemo(() => dsEm.filter((e) => !e.hoTen.trim()).map((e) => e.sbd), [dsEm])
+
+  const dongBoTenChoCa = async () => {
+    if (!chiTiet) return
+    setDangDongBoTen(true)
+    try {
+      const kq = await dongBoTenCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa)
+      const phan: string[] = []
+      if (kq.daDien.length) phan.push(`điền ${kq.daDien.length} tên`)
+      if (kq.daSua.length) phan.push(`sửa ${kq.daSua.length} tên lệch`)
+      if (kq.khongCo.length) phan.push(`${kq.khongCo.length} SBD không có trong danh sách`)
+      showToast(
+        phan.length ? `Đã đồng bộ: ${phan.join(' · ')}. Dựng lại phiếu để tên hiện đúng.` : 'Mọi em trong ca đã đúng tên danh sách.',
+        kq.khongCo.length ? 'error' : 'success',
+      )
+      await tai(chiTiet.ca.maCa)
+    } catch (e) {
+      showToast(`Không đồng bộ được tên: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
+    } finally {
+      setDangDongBoTen(false)
+    }
   }
 
   const daCham = dsEm.filter((e) => e.graded)
@@ -1067,6 +1095,26 @@ export default function ExamMonitorScreen() {
           {/* DANH SÁCH EM */}
           <TheNoiDung>
             <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Học sinh trong ca ({dsEm.length})</div>
+            {/* EM CHƯA CÓ TÊN (thầy báo 07/09). Em vào thi chỉ gõ số báo danh
+                nên cột tên của lượt bỏ trống, và phiếu gửi phụ huynh in
+                "SBD 10038" thay vì tên con. Danh sách lớp có sẵn tên, chỉ cần
+                một nút kéo sang. Nút chỉ hiện khi thật sự có em thiếu tên. */}
+            {emThieuTen.length > 0 && (
+              <div style={{ background: 'var(--cam-nen)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)', marginBottom: 'var(--k3)' }}>
+                <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--muc)' }}>
+                  <b style={SO}>{emThieuTen.length}</b> em trong ca chưa có họ tên, phiếu gửi phụ huynh sẽ in số báo danh thay cho tên con.
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void dongBoTenChoCa()}
+                  disabled={dangDongBoTen}
+                  className="tap-target font-bold"
+                  style={{ marginTop: 'var(--k2)', minHeight: 40, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--muc)', color: 'var(--muc-nguoc)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+                >
+                  {dangDongBoTen ? 'Đang đồng bộ…' : 'Lấy tên từ danh sách lớp'}
+                </button>
+              </div>
+            )}
             {dsEm.length === 0 ? (
               <div style={NHAN_NHO}>Chưa có em nào vào thi.</div>
             ) : (

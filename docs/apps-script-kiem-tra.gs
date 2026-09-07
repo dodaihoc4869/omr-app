@@ -2909,6 +2909,76 @@ function doPost(e) {
     return jsonResponse_({ ok: true, ca: ca, luot: luot, keyBank: keyBank, biChan: docChanVao_(maCa), serverNow: Date.now() })
   }
 
+  if (action === 'dongBoTenCa') {
+    // ĐỒNG BỘ HỌ TÊN TỪ DANH SÁCH LỚP VÀO MỘT CA (thầy báo 07/09).
+    //
+    // Em vào thi chỉ gõ số báo danh nên cột HoTen của lượt thi bỏ trống. Phiếu
+    // gửi phụ huynh khi đó in "SBD 10038" thay vì tên em — phụ huynh mở link ra
+    // không thấy tên con mình.
+    //
+    // Danh sách lớp là NGUỒN SỰ THẬT: điền tên từ đó vào lượt thi, và điền cả
+    // vào hồ sơ HocSinh nếu hồ sơ đang trống, để lần sau không phải chạy lại.
+    // Tên đang có mà lệch danh sách thì cũng sửa theo danh sách, nhưng BÁO RA
+    // từng dòng cũ → mới, không đổi lặng lẽ.
+    //
+    // Không đụng điểm, không đụng đáp án, không đụng chi tiết câu.
+    const loiDT = kiemTraMaBiMat_(body)
+    if (loiDT) return jsonResponse_({ ok: false, error: loiDT })
+    const maCaDT2 = String(body.maCa || '').trim()
+    if (!maCaDT2) return jsonResponse_({ ok: false, error: 'Thiếu mã ca' })
+    const caShDT2 = sheetCa_()
+    const caRowDT2 = findRowByKey_(caShDT2, 0, maCaDT2)
+    if (caRowDT2 < 0) return jsonResponse_({ ok: false, error: 'Không có ca ' + maCaDT2 })
+
+    var dsDT = docDanhSachLop_()
+    if (!dsDT.length) return jsonResponse_({ ok: false, error: 'Danh sách lớp trên máy chủ đang rỗng — bấm Đồng bộ danh sách trước' })
+    var tenTheoSbd = {}
+    for (var i = 0; i < dsDT.length; i++) tenTheoSbd[dsDT[i].sbd] = dsDT[i]
+
+    var shDT = sheetLuot_()
+    var dDT = shDT.getDataRange().getValues()
+    var daDien = []
+    var daSua = []
+    var khongCo = []
+    var giuNguyen = 0
+    for (var r = 1; r < dDT.length; r++) {
+      if (String(dDT[r][0]) !== maCaDT2) continue
+      var sbdR = String(dDT[r][1]).trim()
+      var tenCu = String(dDT[r][12] || '').trim()
+      var em = tenTheoSbd[sbdR]
+      if (!em || !String(em.hoTen).trim()) {
+        if (khongCo.indexOf(sbdR) < 0) khongCo.push(sbdR)
+        continue
+      }
+      var tenMoi = String(em.hoTen).trim()
+      if (!tenCu) {
+        shDT.getRange(r + 1, 13).setValue(tenMoi)
+        daDien.push({ sbd: sbdR, hoTen: tenMoi })
+      } else if (chuanTen_(tenCu) !== chuanTen_(tenMoi)) {
+        shDT.getRange(r + 1, 13).setValue(tenMoi)
+        daSua.push({ sbd: sbdR, cu: tenCu, moi: tenMoi })
+      } else {
+        giuNguyen++
+      }
+      // Hồ sơ HocSinh trống tên thì điền luôn — lần sau khỏi chạy lại lệnh này.
+      var hoSoDT = hoSoHocSinh_(sbdR)
+      if (hoSoDT && !String(hoSoDT.hoTen || '').trim()) {
+        var shHS = sheetHS_()
+        var rowHS = findRowByKey_(shHS, 0, sbdR)
+        if (rowHS > 0) shHS.getRange(rowHS, 2).setValue(tenMoi)
+      }
+    }
+    return jsonResponse_({
+      ok: true,
+      maCa: maCaDT2,
+      tenCa: docCa_(caShDT2, caRowDT2).tenCa || '',
+      daDien: daDien,
+      daSua: daSua,
+      khongCo: khongCo,
+      giuNguyen: giuNguyen,
+    })
+  }
+
   if (action === 'doiTenCa') {
     // ĐỔI TÊN CA (thầy báo 07/09). Tên ca đi theo ca suốt đời: in trong phiếu
     // gửi phụ huynh, trong bảng điểm, trong hồ sơ em. Gõ vội một lần là sai

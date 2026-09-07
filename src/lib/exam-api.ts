@@ -415,6 +415,39 @@ export async function moKhoaCa(scriptUrl: string, secret: string, maCa: string):
   return { goHanVao: !!(r as { goHanVao?: boolean }).goHanVao }
 }
 
+export interface KetQuaDongBoTenCa {
+  maCa: string
+  tenCa: string
+  /** Lượt đang bỏ trống tên, nay điền từ danh sách lớp. */
+  daDien: { sbd: string; hoTen: string }[]
+  /** Lượt có tên nhưng lệch danh sách — sửa theo danh sách, báo ra cũ → mới. */
+  daSua: { sbd: string; cu: string; moi: string }[]
+  /** Số báo danh không có trong danh sách lớp, hoặc dòng danh sách bỏ trống tên. */
+  khongCo: string[]
+  giuNguyen: number
+}
+
+/** ĐỒNG BỘ HỌ TÊN TỪ DANH SÁCH LỚP VÀO MỘT CA (thầy báo 07/09).
+ *
+ * Em vào thi chỉ gõ số báo danh nên cột HoTen của lượt bỏ trống, và phiếu gửi
+ * phụ huynh in "SBD 10038" thay vì tên con. Lệnh này lấy tên từ danh sách lớp
+ * điền vào lượt thi và vào hồ sơ em nếu hồ sơ đang trống.
+ *
+ * Không đụng điểm, đáp án hay chi tiết câu. Dựng lại phiếu sau khi chạy là tên
+ * hiện đúng. */
+export async function dongBoTenCa(scriptUrl: string, secret: string, maCa: string): Promise<KetQuaDongBoTenCa> {
+  const r = await postJson(scriptUrl, { action: 'dongBoTenCa', secret, maCa })
+  if (!r.ok) throw new Error(r.error || 'Không đồng bộ được tên')
+  return {
+    maCa: String(r.maCa || maCa),
+    tenCa: String(r.tenCa || ''),
+    daDien: Array.isArray(r.daDien) ? (r.daDien as KetQuaDongBoTenCa['daDien']) : [],
+    daSua: Array.isArray(r.daSua) ? (r.daSua as KetQuaDongBoTenCa['daSua']) : [],
+    khongCo: Array.isArray(r.khongCo) ? (r.khongCo as unknown[]).map((x) => String(x)) : [],
+    giuNguyen: Number(r.giuNguyen) || 0,
+  }
+}
+
 /** ĐỔI TÊN CA (thầy báo 07/09). Tên ca đặt lúc mở ca đi theo ca suốt đời — in
  * trong phiếu phụ huynh, bảng điểm, hồ sơ em — nên gõ vội một lần là sai mãi.
  *
