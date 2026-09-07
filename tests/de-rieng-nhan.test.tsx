@@ -165,7 +165,8 @@ describe('bảng nghiệm thu mục 8 — phần nhãn', () => {
       { maCa: '111111', tenCa: '', ngay: '2026-09-07T00:00:00Z', tong: 7, hang: null, siSo: null },
     ]
     const { container } = render(<PhieuScreen duCoSan={goi({ lichSu, deRieng: true })} />)
-    const cham = [...container.querySelectorAll('.v3-spark circle')]
+    const cham = [...container.querySelectorAll('svg[aria-label="Điểm qua các ca"] circle')]
+    expect(cham.length).toBeGreaterThan(0)
     // Mốc của chính ca đề riêng: không tô ruột, có nét viền.
     const rong = cham.filter((c) => c.getAttribute('fill') === 'none' && c.getAttribute('stroke'))
     expect(rong.length).toBeGreaterThan(0)

@@ -163,43 +163,33 @@ describe('oGiaiHtml — lời giải gộp một chỗ', () => {
     expect(h).toContain('Kết quả')
   })
 
-  // 07/09 (PHIEU-BAI-TAP-V2 mục 4.5): lý do KHÔNG còn dựng thành khối riêng
-  // trong ô lời giải — nó đi theo chính phương án của nó trong `theCauHtml`.
-  // Bản cũ bắt em nhảy qua lại giữa hai khối để dò dòng nào ứng với phương án
-  // nào; đó là split-attention. Bảo đảm cũ (mỗi phương án có lý do của nó, có
-  // dấu ✓/✗, không dùng màu một mình) giữ nguyên, chỉ đổi chỗ đứng.
-  it('lý do đi theo phương án, KHÔNG còn khối "Vì sao" riêng', () => {
-    // Lý do bây giờ SỐNG TRONG phương án, nên câu phải có phương án thì mới có
-    // chỗ cho nó đứng — bản cũ dựng khối riêng nên không cần `luaChon`.
-    const c = C({ dapAn: 'B', luaChon: ['A1', 'B1', 'C1', 'D1'], lyDo: [
+  it('in lý do TỪNG phương án, đánh dấu ✓ ở phương án đúng', () => {
+    const h = oGiaiHtml(C({ dapAn: 'B', lyDo: [
       { khoa: 'A', dung: false, ly: 'sai vì x' },
       { khoa: 'B', dung: true, ly: 'đúng vì y' },
-    ] })
-    expect(oGiaiHtml(c)).not.toContain('Vì sao chọn / không chọn từng phương án')
-    const t = theCauHtml(c, 1)
-    expect(t).toMatch(/opt-ly sai[\s\S]{0,140}sai vì x/)
-    expect(t).toMatch(/opt-ly dung[\s\S]{0,140}đúng vì y/)
-    expect(t).toContain('✓')
-    expect(t).toContain('✗')
+    ] }))
+    expect(h).toContain('<strong>A.</strong> ✗ sai vì x')
+    expect(h).toContain('<strong>B.</strong> ✓ đúng vì y')
+    expect(h).toContain('Vì sao chọn / không chọn từng phương án')
   })
 
-  it('kiến thức cốt lõi vẫn đứng TRÊN các bước', () => {
-    const h = oGiaiHtml(C({ dapAn: 'B', chot: 'COT-LOI', buoc: ['b1'] }))
-    expect(h.indexOf('COT-LOI')).toBeLessThan(h.indexOf('Làm từng bước'))
+  it('kiến thức cốt lõi đứng TRÊN phần vì sao từng phương án', () => {
+    const h = oGiaiHtml(C({ dapAn: 'B', chot: 'COT-LOI', lyDo: [{ khoa: 'B', dung: true, ly: 'đúng vì y' }] }))
+    expect(h.indexOf('COT-LOI')).toBeLessThan(h.indexOf('Vì sao chọn'))
   })
 
-  it('Phần II đổi DSSD thành Đ S S Đ, và mỗi ý mang lý do của chính nó', () => {
-    const c = C({ phan: 'II', luaChon: ['ý a', 'ý b', 'ý c', 'ý d'], dapAn: 'DSSD', lyDo: [
+  it('Phần II đổi DSSD thành Đ S S Đ và đánh ✓ đúng ý', () => {
+    const c = C({ phan: 'II', dapAn: 'DSSD', lyDo: [
       { khoa: 'a', dung: true, ly: 'la' },
       { khoa: 'b', dung: false, ly: 'lb' },
       { khoa: 'c', dung: false, ly: 'lc' },
       { khoa: 'd', dung: true, ly: 'ld' },
     ] })
-    expect(oGiaiHtml(c)).toContain('Đ S S Đ')
-    expect(oGiaiHtml(c)).not.toContain('Vì sao từng ý')
-    const t = theCauHtml(c, 1)
-    expect(t.slice(t.indexOf('ý a'), t.indexOf('ý b'))).toContain('la')
-    expect(t.slice(t.indexOf('ý b'), t.indexOf('ý c'))).toContain('lb')
+    const h = oGiaiHtml(c)
+    expect(h).toContain('Đ S S Đ')
+    expect(h).toContain('<strong>a.</strong> ✓ la')
+    expect(h).toContain('<strong>b.</strong> ✗ lb')
+    expect(h).toContain('Vì sao từng ý')
   })
 })
 
@@ -217,11 +207,7 @@ describe('bìa và tổng quan', () => {
     const h = biaHtml(TT, 20)
     expect(h).toContain('Đỗ Đại Học')
     expect(h).toContain('12121212')
-    // 07/09: tên chuyên đề để NGUYÊN MỘT DÒNG, không cắt tay ở dấu gạch — cỡ
-    // chữ clamp() tự xuống dòng đúng chỗ, còn cắt tay thì tên như
-    // "Hydrocarbon không no" xuống sai chỗ.
-    expect(h).toContain('Ester – lipid')
-    expect(h).not.toContain('<br>')
+    expect(h).toContain('ESTER<br>– LIPID')
     // NGÀY và SỐ CÂU nằm trong DÒNG PHỤ dưới tên chuyên đề, không còn là một ô
     // riêng và một chân trang riêng — bìa gọn lại theo yêu cầu 06/09, nhưng
     // vẫn nói đủ.
@@ -230,15 +216,12 @@ describe('bìa và tổng quan', () => {
     expect(h).toContain('<div class="cover-subtitle">Thầy Đỗ Đại Học · 20 câu · 04/09/2026</div>')
   })
 
-  it('bìa KHÔNG in công thức nào — mọi chữ đến từ tham số', () => {
-    // 07/09 (PHIEU-BAI-TAP-V2 mục 4.1). Bản 06/09 đã bỏ ba phân tử vắt chéo và
-    // chọn công thức theo chuyên đề; bản này bỏ nốt cả bảng công thức, vì nó
-    // vẫn là chữ Hoá nằm trong mã app mà chỗ gọi không đổi được.
+  it('bìa KHÔNG còn hoa văn phân tử vắt chéo và không cao trọn màn', () => {
     const h = biaHtml(TT, 20)
     expect(h).not.toContain('cover-molecule')
     expect(h).not.toContain('cover-chemical')
-    expect(h).not.toContain('<span class="ct">')
-    expect(h).not.toContain('<sub>')
+    // Công thức về nằm trong viên thuốc cùng nhãn, không chiếm một dòng riêng.
+    expect(h).toContain('<span class="ct">')
   })
 
   it('không có dòng kết quả thì KHÔNG in ô kết quả rỗng', () => {
@@ -287,42 +270,30 @@ describe('bìa và tổng quan', () => {
     expect(h).not.toContain('>Học sinh</div>')
   })
 
-  // 07/09 (PHIEU-BAI-TAP-V2 mục 4.3): panel bốn ô cộng bảng phân loại thu thành
-  // MỘT DÒNG, nên khoảng "Câu 1–9" không còn được in ra nữa. Bảo đảm cũ là
-  // "không nói sai câu nào thuộc mức độ nào"; bản mới giữ bảo đảm đó ở mức
-  // MẠNH HƠN: không in khoảng nào cả, chỉ in số đếm — số đếm thì không sai được.
-  it('mức độ xen kẽ: đếm đúng và KHÔNG in khoảng câu nào', () => {
+  it('mức độ xen kẽ thì KHÔNG ghi khoảng "Câu 1–9" — nói sai số câu', () => {
     const cau = [C({ mucDo: 'biet' }), C({ mucDo: 'hieu' }), C({ mucDo: 'biet' })]
     const h = tongQuanHtml(cau)
-    expect(h).toContain('2 nhận biết')
-    expect(h).toContain('1 thông hiểu')
-    expect(h).not.toMatch(/Câu \d/)
-    expect(h).not.toContain('–')
+    expect(h).toContain('Câu 1, 3 · 2 câu')
+    expect(h).not.toContain('Câu 1–3 · 2 câu')
   })
 
-  it('mức độ đứng liền nhau cũng chỉ ra số đếm, không ra khoảng', () => {
+  it('mức độ đứng liền nhau thì ghi khoảng cho gọn', () => {
     const cau = [C({ mucDo: 'biet' }), C({ mucDo: 'biet' }), C({ mucDo: 'hieu' })]
-    const h = tongQuanHtml(cau)
-    expect(h).toContain('2 nhận biết')
-    expect(h).not.toMatch(/Câu \d/)
+    expect(tongQuanHtml(cau)).toContain('Câu 1–2 · 2 câu')
   })
 
   it('tổng quan đếm đúng số câu từng phần', () => {
     const cau = [C({}), C({}), C({ phan: 'II' }), C({ phan: 'III' })]
     const h = tongQuanHtml(cau)
-    expect(h).toContain('>4 câu</button>')
-    expect(h).toContain('>2 trắc nghiệm</button>')
-    expect(h).toContain('>1 đúng sai</button>')
-    expect(h).toContain('>1 trả lời ngắn</button>')
+    expect(h).toContain('>4</span><span class="stat-label">Tổng số câu')
+    expect(h).toContain('>2</span><span class="stat-label">Trắc nghiệm')
+    expect(h).toContain('>1</span><span class="stat-label">Đúng / Sai')
     // KHÔNG EMOJI trong phiếu — quy tắc viết của thầy.
     expect(h).not.toMatch(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u)
   })
 
-  it('kho không có mức độ nào thì bỏ hẳn phần mức độ, không in dấu chấm giữa rỗng', () => {
-    const h = tongQuanHtml([C({ mucDo: '' })])
-    expect(h).not.toContain('topics-list')
-    expect(h).not.toContain('data-loc="muc:')
-    expect(h.trimEnd()).not.toMatch(/·\s*<\/section>$/)
+  it('kho không có mức độ nào thì bỏ hẳn khối phân loại, không in khung rỗng', () => {
+    expect(tongQuanHtml([C({ mucDo: '' })])).not.toContain('topics-list')
   })
 })
 
@@ -451,10 +422,7 @@ describe('dungPhieu — trọn tài liệu', () => {
   it('một tài liệu duy nhất: bìa và tổng quan chỉ xuất hiện MỘT lần', () => {
     const h = dungPhieu(TT, cau)
     expect((h.match(/class="cover"/g) || []).length).toBe(1)
-    // Panel `summary-page` đã thu thành dòng `tong-quan` (V2 mục 4.3); bảo đảm
-    // "chỉ MỘT lần" giữ nguyên, chỉ đổi tên khối.
-    expect((h.match(/class="tong-quan"/g) || []).length).toBe(1)
-    expect(h).not.toContain('summary-page')
+    expect((h.match(/class="summary-page"/g) || []).length).toBe(1)
   })
 
   it('KHÔNG còn mục Lời Giải Chi Tiết riêng ở cuối', () => {
@@ -483,23 +451,20 @@ describe('lọc theo ô tổng quan', () => {
     expect(h).toContain('data-muc="van_dung"')
   })
 
-  it('cụm CÓ câu thì là nút lọc, cụm rỗng thì để chết', () => {
+  it('ô thống kê CÓ câu thì là nút lọc, ô rỗng thì để chết', () => {
     const h = tongQuanHtml(cau)
-    expect(h).toContain('data-loc="phan:I"')
-    expect(h).toContain('data-loc="phan:II"')
-    expect(h).toContain('data-loc="tat"')
+    expect(h).toContain('class="stat-card" data-loc="phan:I"')
+    expect(h).toContain('class="stat-card" data-loc="phan:II"')
+    expect(h).toContain('class="stat-card" data-loc="tat"')
     const chiPhanI = tongQuanHtml([MCQ])
     expect(chiPhanI).toContain('data-loc="phan:I"')
     expect(chiPhanI).not.toContain('data-loc="phan:II"')
-    // Cụm rỗng để CHẾT: không phải <button>, không có data-loc, và mờ đi cho
-    // khỏi mời bấm. Bấm vào để lọc ra trang trắng là vô nghĩa.
-    expect(chiPhanI).toContain('<span class="tq-cum tat">0 đúng sai</span>')
-    expect(chiPhanI).toContain('<span class="tq-cum tat">0 trả lời ngắn</span>')
+    // Ô rỗng để CHẾT: không phải nút, và mờ đi cho khỏi mời bấm.
+    expect(chiPhanI).toContain('<div class="stat-card" style="opacity:.5"><span class="stat-number">0</span>')
   })
 
-  it('mức độ vẫn là nút lọc — bỏ chip màu, KHÔNG bỏ chức năng', () => {
-    expect(tongQuanHtml(cau)).toContain('data-loc="muc:hieu"')
-    expect(tongQuanHtml(cau)).toContain('aria-pressed="false"')
+  it('dòng mức độ cũng là nút lọc', () => {
+    expect(tongQuanHtml(cau)).toContain('class="topic-item" data-loc="muc:hieu"')
   })
 
   it('kịch bản có đủ phần lọc và bộ đếm chạy theo tập đang hiện', () => {

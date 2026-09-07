@@ -129,7 +129,11 @@ function OSo({ so, ten }: { so: string | number | null; ten: string }) {
 // ------------------------------------------------------------------ biểu đồ
 /** ĐƯỜNG ĐIỂM QUA CÁC CA. Vẽ tay: đường + vùng tô nhạt + chấm, chấm cuối to hơn.
  * Dưới 2 ca thì không vẽ — một điểm không thành xu hướng. */
-function DuongTienBo({ ds, tat }: { ds: { ngay: string; tong: number }[]; tat: boolean }) {
+/** `maCaRieng` = mã những ca ĐỀ RIÊNG TỪNG EM. Chấm mốc của chúng vẽ RỖNG RUỘT
+ * kèm chú thích, vì 30% đề là câu em đã gặp nên điểm nhích lên một phần vì gặp
+ * lại. Vẽ đặc như ca thường là để phụ huynh đọc ra một cú tiến bộ mạnh hơn sự
+ * thật (DE-RIENG-TUNG-EM mục 2, hệ quả hai). */
+function DuongTienBo({ ds, tat, maCaRieng }: { ds: { ngay: string; tong: number; maCa?: string }[]; tat: boolean; maCaRieng?: Set<string> }) {
   const [o, ra] = useHienKhiToi<HTMLDivElement>(tat)
   const W = 300
   const H = 108
@@ -166,19 +170,24 @@ function DuongTienBo({ ds, tat }: { ds: { ngay: string; tong: number }[]; tat: b
           strokeDashoffset={ra ? 0 : 1}
           style={{ transition: tat ? 'none' : 'stroke-dashoffset 1.15s cubic-bezier(.22,.9,.28,1)' }}
         />
-        {ds.map((d, i) => (
-          <circle
-            key={i}
-            cx={x(i)}
-            cy={y(d.tong)}
-            r={i === n - 1 ? 4.6 : 3}
-            fill={i === n - 1 ? mauDiem(cuoi.tong) : 'var(--p-giay)'}
-            stroke={i === n - 1 ? 'var(--p-giay)' : 'var(--p-tim)'}
-            strokeWidth="2"
-            opacity={ra ? 1 : 0}
-            style={{ transition: tat ? 'none' : `opacity .35s ease ${400 + i * 70}ms` }}
-          />
-        ))}
+        {ds.map((d, i) => {
+          const rieng = !!d.maCa && maCaRieng?.has(d.maCa) === true
+          return (
+            <circle
+              key={i}
+              cx={x(i)}
+              cy={y(d.tong)}
+              r={i === n - 1 ? 4.6 : 3}
+              fill={rieng ? 'none' : i === n - 1 ? mauDiem(cuoi.tong) : 'var(--p-giay)'}
+              stroke={rieng ? mauDiem(d.tong) : i === n - 1 ? 'var(--p-giay)' : 'var(--p-tim)'}
+              strokeWidth="2"
+              opacity={ra ? 1 : 0}
+              style={{ transition: tat ? 'none' : `opacity .35s ease ${400 + i * 70}ms` }}
+            >
+              {rieng && <title>{`${ngayNgan(d.ngay)}: ${soVN(d.tong)} điểm (bài có câu hỏi lại)`}</title>}
+            </circle>
+          )
+        })}
         {ds.map((d, i) =>
           i === 0 || i === n - 1 || n <= 5 ? (
             <text key={`t${i}`} x={x(i)} y={H - 1} textAnchor="middle" fontSize="9" fill="var(--p-mo)">
@@ -340,6 +349,10 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false }: { duCoSan?: Ph
   const tk = du.thongKe
   const dung = du.tongSoCau !== null ? du.tongSoCau - du.soCauSai : null
   const chuyenDeCa = [...du.chuyenDeCa].sort((a, b) => b.soSai / Math.max(1, b.soCau) - a.soSai / Math.max(1, a.soCau))
+  // Chỉ CA NÀY được biết chắc là ca đề riêng: `hoSoEm` của máy chủ không chở cờ
+  // đó cho từng ca cũ, mà bịa ra thì sai. Mỗi báo cáo dựng ở thời điểm ca của
+  // nó, nên mốc mới nhất — đúng mốc có điểm bị câu lặp đẩy lên — luôn vẽ đúng.
+  const caRieng = new Set(du.deRieng && du.maCa ? [du.maCa] : [])
   const saiTrongCa = chuyenDeCa.filter((c) => c.soSai > 0)
   const yeuTong = [...du.chuyenDeTong].filter((c) => c.soCau >= 4).sort((a, b) => b.tiLeSai - a.tiLeSai)
 
@@ -375,7 +388,10 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false }: { duCoSan?: Ph
                   </span>
                 </div>
               )}
-              {du.hang !== null && du.siSo !== null && (
+              {/* CA ĐỀ RIÊNG TỪNG EM: mỗi em một bộ câu nên hạng mất nghĩa —
+                  so điểm hai em làm hai đề khác nhau là so hai thứ khác nhau
+                  (DE-RIENG-TUNG-EM mục 2). */}
+              {du.deRieng !== true && du.hang !== null && du.siSo !== null && (
                 <div className="bc-doi">
                   <span>Hạng trong ca</span>
                   <span>
@@ -414,13 +430,23 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false }: { duCoSan?: Ph
               ))}
             </div>
           )}
+          {/* CA ĐỀ RIÊNG TỪNG EM: 30% đề là câu con đã gặp, nên điểm nhích lên
+              một phần vì gặp lại chứ không hẳn vì giỏi lên. Giấu chuyện đó là
+              để phụ huynh hiểu nhầm về tiến bộ (DE-RIENG-TUNG-EM mục 2). */}
+          {(du.dongCauLap || du.deRieng) && (
+            <div className="bc-ghi" style={{ marginTop: 12 }}>
+              {du.dongCauLap ? `${du.dongCauLap} ` : ''}
+              {du.deRieng ? 'Bài này mỗi bạn một bộ câu, nên không xếp hạng trong lớp.' : ''}
+            </div>
+          )}
+
           {/* VI PHẠM đứng ngay dưới điểm: phụ huynh mở báo cáo là thấy, không
               phải cuộn hết trang mới gặp. */}
           {du.viPham && <KhoiViPham vp={du.viPham} />}
         </section>
 
         {/* VỊ TRÍ TRONG LỚP */}
-        {du.diemLop.length >= 5 && (
+        {du.deRieng !== true && du.diemLop.length >= 5 && (
           <Khoi tieu="Vị trí trong lớp" ten="Cả ca này đứng ở đâu" tat={tat}>
             <PhanBoLop diemLop={du.diemLop} cuaEm={du.diem} tat={tat} />
           </Khoi>
@@ -429,7 +455,8 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false }: { duCoSan?: Ph
         {/* TIẾN BỘ */}
         {du.lichSu.length >= 2 && (
           <Khoi tieu="Tiến bộ" ten="Điểm qua các bài đã làm" ghi={laCuaEm ? `${du.lichSu.length} bài em đã làm, cũ nhất bên trái.` : `${du.lichSu.length} bài, cũ nhất bên trái.`} tat={tat}>
-            <DuongTienBo ds={du.lichSu} tat={tat} />
+            <DuongTienBo ds={du.lichSu} tat={tat} maCaRieng={caRieng} />
+            {du.deRieng && du.maCa ? <div className="bc-ghi">Chấm rỗng ruột là bài có câu hỏi lại, điểm không so thẳng với bài thường được.</div> : null}
           </Khoi>
         )}
 
@@ -514,6 +541,20 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false }: { duCoSan?: Ph
                 <div className="bc-tin-khuyen">{t.loiKhuyen}</div>
               </div>
             ))}
+          </Khoi>
+        )}
+
+        {/* CÂU TỪNG SAI, NAY LÀM ĐÚNG — đứng TRƯỚC mục câu sai.
+            Em làm đúng thì câu đó không nằm trong mục câu sai, nên không có
+            khối riêng này là việc sửa được biến mất khỏi báo cáo. Đây là tin
+            tốt duy nhất máy chứng minh được bằng số. */}
+        {(du.daSuaDuoc?.length ?? 0) > 0 && (
+          <Khoi tieu="Đã sửa được" ten={`${laCuaEm ? 'Em' : 'Con'} đã sửa được ${du.daSuaDuoc!.length} câu từng sai`} ghi="Những câu này bài trước làm sai, bài này làm đúng." tat={tat}>
+            <div style={{ marginTop: 6 }}>
+              {du.daSuaDuoc!.map((c, i) => (
+                <TheCauChiTiet key={`sua-${c.qid}-${i}`} c={c} stt={i + 1} mauSo="var(--p-xanh)" />
+              ))}
+            </div>
           </Khoi>
         )}
 

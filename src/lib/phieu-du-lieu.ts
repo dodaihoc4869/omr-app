@@ -18,12 +18,16 @@ import type { LocDang } from './dang-cau'
 import { mocRoiMan } from './chong-gian-lan'
 import type { CauHinhPhieu } from './cau-hinh-phieu'
 
-/** Phiên bản gói báo cáo. Trang đọc từ chối bản lạ thay vì vẽ thiếu mục. */
-export const BAN_PHIEU = 3
+/** Phiên bản gói báo cáo. Trang đọc từ chối bản lạ thay vì vẽ thiếu mục.
+ *
+ * VỀ LẠI 2 (thầy chốt 08/09: "khôi phục phiếu và html về bản cũ"). Phiếu dựng
+ * từ nay mang bố cục cũ. Bản `3` KHÔNG bị xoá khỏi danh sách đọc được ngay
+ * dưới: link v3 thầy đã gửi phụ huynh phải còn mở ra đúng như lúc gửi. */
+export const BAN_PHIEU = 2
 
-/** Bản gói mà trang báo cáo còn ĐỌC ĐƯỢC. Bản `2` giữ trong danh sách vì phụ
- * huynh đã cầm link đó rồi — mở ra phải ra đúng bố cục cũ, không phải bố cục
- * mới với mấy ô trống chỗ dữ liệu bản cũ không có. */
+/** Bản gói mà trang báo cáo còn ĐỌC ĐƯỢC. Giữ CẢ HAI bản, theo cả hai chiều:
+ * link v2 cũ mở ra bố cục cũ, link v3 đã gửi mở ra bố cục v3. Rút một bản ra
+ * khỏi danh sách này là giết mọi link đã gửi mang bản đó. */
 export const BAN_PHIEU_DOC_DUOC = [2, 3] as const
 
 export interface LyDoPhuongAn {

@@ -1,7 +1,16 @@
-// BÁO CÁO PHỤ HUYNH V3 — nghiệm thu theo PHIEU-PHU-HUYNH-V3.md mục 8.
+// BÁO CÁO PHỤ HUYNH — bố cục v3 nay là BỐ CỤC CŨ CỦA LINK ĐÃ GỬI, không còn là
+// bố cục của phiếu dựng mới (thầy chốt 08/09: "khôi phục phiếu và html về bản
+// cũ").
 //
-// Mỗi phép kiểm dưới đây ứng với một dòng trong bảng "định nghĩa hoàn thành"
-// của đặc tả. Thứ tự giữ nguyên thứ tự bảng để đối chiếu cho nhanh.
+// File này giữ hai việc, và chỉ hai việc đó:
+//   1. Phiếu dựng TỪ NAY là v2 → ra bố cục cũ.
+//   2. Link v3 thầy ĐÃ GỬI phụ huynh vẫn mở ra đúng bố cục v3 như lúc gửi.
+//      Rút bản 3 khỏi `BAN_PHIEU_DOC_DUOC` là giết mọi link đó, nên mấy phép
+//      kiểm dưới đây canh đúng chuyện ấy.
+//
+// Phép kiểm về NỘI DUNG mà bố cục nào cũng phải đúng (dòng tính điểm, chip "mấy
+// bạn cùng sai", khối rút bài dùng chung) giữ nguyên: chúng đo lib, không đo bố
+// cục.
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import fs from 'node:fs'
@@ -46,18 +55,20 @@ function goi(sua: Partial<PhieuDayDu> = {}): PhieuDayDu {
   } as PhieuDayDu
 }
 
-describe('bảng nghiệm thu mục 8', () => {
-  it('BẢN CŨ VẪN MỞ ĐƯỢC — v2 ra bố cục cũ, không lỗi', () => {
-    expect(BAN_PHIEU).toBe(3)
-    expect([...BAN_PHIEU_DOC_DUOC]).toEqual([2, 3])
-    render(<PhieuScreen duCoSan={goi({ v: 2 })} />)
-    // Bố cục cũ có nhãn "TRÊN 10" của vòng điểm; bố cục mới không có vòng nào.
+describe('phiếu mới về bố cục cũ, link v3 đã gửi vẫn sống', () => {
+  it('PHIẾU DỰNG TỪ NAY LÀ v2 — ra bố cục cũ', () => {
+    expect(BAN_PHIEU).toBe(2)
+    render(<PhieuScreen duCoSan={goi()} />)
     expect(document.querySelector('.bc')).not.toBeNull()
     expect(document.querySelector('.v3')).toBeNull()
   })
 
-  it('BA TẦNG CÓ MẶT — đủ ba nhãn Phần 1, 2, 3', () => {
-    render(<PhieuScreen duCoSan={goi()} />)
+  it('LINK v3 ĐÃ GỬI VẪN MỞ ĐƯỢC — và mở ra đúng bố cục v3 của lúc gửi', () => {
+    // Đây là phép kiểm quan trọng nhất của file. Bỏ bản 3 khỏi danh sách đọc
+    // được thì mọi link v3 trong Zalo thành link chết, mà thầy không biết là
+    // đã gửi đi bao nhiêu cái.
+    expect([...BAN_PHIEU_DOC_DUOC]).toEqual([2, 3])
+    render(<PhieuScreen duCoSan={goi({ v: 3 })} />)
     expect(document.querySelector('.v3')).not.toBeNull()
     const chu = document.body.textContent ?? ''
     expect(chu).toContain('Phần 1 · Việc cần làm')
@@ -65,50 +76,40 @@ describe('bảng nghiệm thu mục 8', () => {
     expect(chu).toContain('Phần 3 · Từng câu sai')
   })
 
-  it('BỎ HẲN VÒNG ĐIỂM CHẠY SỐ — số vẽ thẳng, không requestAnimationFrame', () => {
-    // Đây là lỗi đo được 07/09: thẻ không ở trước mặt thì vòng đứng ở 0,00
-    // trong khi dữ liệu là 5,75.
-    // Bỏ dòng chú thích ra trước khi soi: chú thích có NHẮC TÊN vòng lặp đó
-    // để người sau biết vì sao nó bị bỏ, nhưng mã thì không được gọi.
+  it('bản lạ vẫn bị TỪ CHỐI, không vẽ thiếu mục', () => {
+    // Cổng chặn nằm ở đường TẢI PHIẾU THEO LINK (`duCoSan` là đường thầy xem
+    // ngay trong app, đã có sẵn gói trong tay). Soi đúng đoạn mã đó.
+    const cu = fs.readFileSync(path.join(process.cwd(), 'src/screens/PhieuScreen.tsx'), 'utf8')
+    expect(cu).toContain('BAN_PHIEU_DOC_DUOC as readonly number[]).includes(Number(p.v))')
+    expect(cu).toContain('Báo cáo này thuộc phiên bản khác')
+  })
+
+  it('BỐ CỤC v3 KHÔNG CÓ VÒNG ĐIỂM CHẠY SỐ — số vẽ thẳng', () => {
+    // Lỗi đo được 07/09: thẻ không ở trước mặt thì vòng đứng ở 0,00 trong khi
+    // dữ liệu là 5,75. Link v3 đã gửi vẫn phải hiện đúng số.
     const ma = V3.replace(/^\s*\/\/.*$/gm, '')
     expect(ma).not.toContain('requestAnimationFrame')
     expect(ma).not.toContain('setInterval')
-    render(<PhieuScreen duCoSan={goi({ diem: 5.75 })} />)
+    render(<PhieuScreen duCoSan={goi({ v: 3, diem: 5.75 })} />)
     expect(screen.getByText('5,75')).toBeTruthy()
   })
 
-  it('HẠNG ĐÃ TẮT theo mặc định', () => {
-    render(<PhieuScreen duCoSan={goi()} />)
-    expect(document.body.textContent ?? '').not.toContain('hạng 10/21')
-  })
-
-  it('bật HIEN_HANG_LOP thì hiện hạng', () => {
-    render(<PhieuScreen duCoSan={goi({ cauHinh: { HIEN_HANG_LOP: true } })} />)
-    expect(document.body.textContent ?? '').toContain('hạng 10/21')
-  })
-
-  it('CA ĐỀ RIÊNG TẮT HẠNG kể cả khi cờ đang bật', () => {
-    // Mỗi em một bộ câu thì so điểm với nhau không còn nghĩa.
+  it('CA ĐỀ RIÊNG TẮT HẠNG ở CẢ HAI bố cục', () => {
+    // Mỗi em một bộ câu thì so điểm với nhau không còn nghĩa. Luật này thuộc
+    // DE-RIENG-TUNG-EM, không thuộc bố cục, nên bố cục nào cũng phải theo.
     expect(duocHienHang(cauHinhPhieu({ HIEN_HANG_LOP: true }), true)).toBe(false)
-    render(<PhieuScreen duCoSan={goi({ cauHinh: { HIEN_HANG_LOP: true }, deRieng: true })} />)
-    expect(document.body.textContent ?? '').not.toContain('hạng 10/21')
+    const cu = render(<PhieuScreen duCoSan={goi({ deRieng: true })} />)
+    expect(cu.container.textContent ?? '').not.toContain('10/21')
+    cu.unmount()
+    const moi = render(<PhieuScreen duCoSan={goi({ v: 3, cauHinh: { HIEN_HANG_LOP: true }, deRieng: true })} />)
+    expect(moi.container.textContent ?? '').not.toContain('hạng 10/21')
   })
 
-  it('SPARKLINE 1 BÀI thì ẩn hẳn, không vẽ đoạn thẳng', () => {
-    const mot = render(<PhieuScreen duCoSan={goi({ lichSu: [{ maCa: 'a', tenCa: '', ngay: '2026-09-01T00:00:00Z', tong: 5, hang: null, siSo: null }] })} />)
-    expect(mot.container.querySelector('.v3-spark')).toBeNull()
-    mot.unmount()
-    const hai = render(
-      <PhieuScreen
-        duCoSan={goi({
-          lichSu: [
-            { maCa: 'a', tenCa: '', ngay: '2026-09-01T00:00:00Z', tong: 5, hang: null, siSo: null },
-            { maCa: 'b', tenCa: '', ngay: '2026-09-07T00:00:00Z', tong: 6.69, hang: null, siSo: null },
-          ],
-        })}
-      />,
-    )
-    expect(hai.container.querySelector('.v3-spark')).not.toBeNull()
+  it('ca THƯỜNG vẫn hiện hạng ở bố cục cũ', () => {
+    // Bố cục cũ luôn hiện hạng; `HIEN_HANG_LOP` là lựa chọn của bố cục v3, đừng
+    // để nó lặng lẽ tắt hạng ở bố cục cũ.
+    render(<PhieuScreen duCoSan={goi()} />)
+    expect(document.body.textContent ?? '').toContain('10/21')
   })
 
   it('DÒNG TÍNH ĐIỂM KHỚP điểm thật, tính lại từ rows', () => {
@@ -145,7 +146,7 @@ describe('bảng nghiệm thu mục 8', () => {
     expect(khong[0].soLopSai).toBeNull()
   })
 
-  it('KHỐI RÚT BÀI DÙNG CHUNG một bản với bố cục cũ, không phải bản chép', () => {
+  it('KHỐI RÚT BÀI DÙNG CHUNG một bản giữa hai bố cục, không phải bản chép', () => {
     // Thầy chốt 07/09: "giữ nguyên mục rút bài trong phiếu mới đầy đủ như trong
     // phiếu cũ". Hai bản sao thì sớm muộn lệch nhau.
     const cu = fs.readFileSync(path.join(process.cwd(), 'src/screens/PhieuScreen.tsx'), 'utf8')
@@ -161,8 +162,7 @@ describe('bảng nghiệm thu mục 8', () => {
     expect(than).toContain('bạn cùng sai')
   })
 
-  it('không dùng màu nào ngoài bảng mục 3', () => {
-    // Mọi màu trong bố cục v3 phải là token; mã màu # nằm ở tokens.css.
+  it('không dùng màu nào ngoài bảng token', () => {
     expect(V3).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
   })
 })
