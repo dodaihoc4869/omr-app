@@ -1,3 +1,6 @@
+// 07/09: khối rút bài đã tách khỏi `PhieuScreen` sang `components/KhoiBaiLuyen`
+// để bố cục v3 dùng CHUNG một bản với bố cục cũ (thầy chốt "giữ nguyên mục rút
+// bài trong phiếu mới đầy đủ như trong phiếu cũ"). Luật không đổi, chỉ đổi tệp.
 // HAI YÊU CẦU CỦA THẦY 07/09, mỗi cái một khối nghiệm thu.
 //
 //   1. "tất cả chỗ rút đề thêm lựa chọn câu 2 sao (khó) 1 sao (bản chất) nữa"
@@ -112,7 +115,7 @@ describe('lọc sao — 2 sao (khó) và 1 sao (bản chất)', () => {
       'src/components/GiaoBaiTap.tsx',
       'src/components/KhoiRutDe.tsx',
       'src/screens/GoiLenBangScreen.tsx',
-      'src/screens/PhieuScreen.tsx',
+      'src/components/KhoiBaiLuyen.tsx',
     ]) {
       expect(doc(f), `${f} thiếu hàng nút Mức sao`).toContain('MOI_LOC_SAO')
     }
@@ -162,7 +165,7 @@ describe('ba màn rút câu nói cùng một con số và cùng một câu chữ
   })
 
   it('KHÔNG màn nào tự viết lại công thức sàn hay tự gõ lại câu giải thích', () => {
-    for (const f of ['src/components/ThanhSoCauChua.tsx', 'src/screens/PhieuScreen.tsx']) {
+    for (const f of ['src/components/ThanhSoCauChua.tsx', 'src/components/KhoiBaiLuyen.tsx']) {
       const t = doc(f)
       expect(t, `${f} phải lấy số từ noi-dung-thanh-chua`).toContain('soLieuThanhChua')
       expect(t, `${f} phải lấy câu chữ từ noi-dung-thanh-chua`).toContain('cauGiaiThichThanh')

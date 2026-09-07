@@ -71,7 +71,9 @@ describe('không gửi lặng lẽ một báo cáo thiếu nút', () => {
   it('7. hai nút trong báo cáo vẫn chỉ phụ thuộc đúng linkBaiTap', () => {
     // Nếu ai đó thêm điều kiện khác (clipboard, vai người xem) thì lỗi "trong
     // app có, ngoài Zalo không" sẽ quay lại dưới dạng khác.
-    const man = doc('src/screens/PhieuScreen.tsx')
+    // 07/09: khối rút bài tách sang `components/KhoiBaiLuyen` để bố cục v3 và
+    // bố cục cũ dùng CHUNG một bản. Luật không đổi, chỉ đổi tệp.
+    const man = doc('src/components/KhoiBaiLuyen.tsx')
     expect(man).toContain('{du.linkBaiTap && (')
     const dau = man.indexOf('{du.linkBaiTap && (')
     const doan = man.slice(dau, dau + 800)

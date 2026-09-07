@@ -16,9 +16,15 @@ import { rutDeChua, soCauChuaThat, type PoolCauSai, type SuatThieu } from './rut
 import { SO_CAU_KEM_PHIEU } from './cau-hinh-chua'
 import type { LocDang } from './dang-cau'
 import { mocRoiMan } from './chong-gian-lan'
+import type { CauHinhPhieu } from './cau-hinh-phieu'
 
 /** Phiên bản gói báo cáo. Trang đọc từ chối bản lạ thay vì vẽ thiếu mục. */
-export const BAN_PHIEU = 2
+export const BAN_PHIEU = 3
+
+/** Bản gói mà trang báo cáo còn ĐỌC ĐƯỢC. Bản `2` giữ trong danh sách vì phụ
+ * huynh đã cầm link đó rồi — mở ra phải ra đúng bố cục cũ, không phải bố cục
+ * mới với mấy ô trống chỗ dữ liệu bản cũ không có. */
+export const BAN_PHIEU_DOC_DUOC = [2, 3] as const
 
 export interface LyDoPhuongAn {
   khoa: string
@@ -45,6 +51,17 @@ export interface CauSaiChiTiet {
   ketQua: string
   /** Câu có hình trong đề gốc — báo cáo không kèm ảnh nên phải nói ra. */
   coHinh: boolean
+  /** Bao nhiêu phần lớp chọn ĐÚNG phương án sai này (0…1). `null` khi không có
+   * bảng chấm cả lớp — v3 mục 4.3: tới NGUONG_LOP_CUNG_SAI thì câu đó là bẫy
+   * của đề chứ không phải lỗi riêng của em, và báo cáo phải nói ra. */
+  tiLeLopSai?: number | null
+  /** Số em cùng chọn phương án sai đó, và sĩ số đã chấm — để in "6/10 bạn cùng
+   * sai" bằng số thật chứ không bằng phần trăm làm tròn. */
+  soLopSai?: number | null
+  siSoLop?: number | null
+  /** Cả năm em làm chuyên đề này bao nhiêu câu, sai mấy — nguồn cho dòng lịch
+   * sử cuối thẻ câu. `null` khi hồ sơ chưa có số cộng dồn. */
+  lichSuChuyenDe?: { soCau: number; soSai: number } | null
 }
 
 export interface DiemMotCa {
@@ -155,6 +172,17 @@ export interface PhieuDayDu {
    * gói quá nặng (xem `giamGoiPhieu`), báo cáo vẫn gửi được, chỉ thiếu nút xem
    * đề. */
   deCuaEm?: CauLuyen[]
+  /** CẤU HÌNH CHỐT LÚC DỰNG PHIẾU (v3 mục 3). Báo cáo mở trên máy phụ huynh,
+   * không đọc được cài đặt của thầy — nên cờ phải đi theo gói. Gói v2 không có
+   * trường này ⇒ `cauHinhPhieu()` trả bản mặc định. */
+  cauHinh?: Partial<CauHinhPhieu> | null
+  /** Một dòng nói RÕ điểm này ra từ đâu, tính lại từ `rows` (v3 mục 4.4).
+   * Nghiên cứu cùng nguồn với mục 3 ghi nhận điều phụ huynh bối rối nhất là
+   * "không có thông tin nào về việc làm sao ra được điểm đó". */
+  cachTinhDiem?: string
+  /** Ca ĐỀ RIÊNG TỪNG EM: mỗi em một bộ câu, nên hạng lớp và phân bố lớp mất
+   * nghĩa và bị tắt bất kể `HIEN_HANG_LOP` (DE-RIENG-TUNG-EM mục 2). */
+  deRieng?: boolean
 }
 
 /** Gói báo cáo lớn nhất còn gửi lên máy chủ được (byte). Phải khớp với
@@ -234,8 +262,36 @@ function lyDoCua(q: CauBatKy, phan: 'I' | 'II' | 'III'): LyDoPhuongAn[] | null {
  * KHÔNG kèm ảnh của câu: ảnh trong kho đề là base64, vài câu có hình là gói
  * phình lên hàng trăm KB và phụ huynh chờ tải trên 4G. Câu có hình được đánh
  * dấu `coHinh` để báo cáo nói thẳng là phải xem lại hình trong bài chữa. */
-export function dungCauSai(rows: ChiTietCauRow[], banks: TeacherExamSource[], chiCauSai = true): CauSaiChiTiet[] {
+/** Số liệu THÊM cho từng câu sai, v3 mục 4.3. Tuỳ chọn: thiếu thì mấy mục dùng
+ * nó biến mất khỏi báo cáo, chứ không hiện ra với số 0 giả. */
+export interface ThemChoCauSai {
+  /** Bảng chấm từng câu của CẢ LỚP trong ca — để đếm bao nhiêu bạn cùng sai
+   * đúng phương án đó. Một câu đếm một lần cho một em. */
+  rowsLop?: ChiTietCauRow[] | null
+  /** Chuyên đề cộng dồn cả năm của em (hồ sơ). */
+  chuyenDeTong?: { ten: string; soCau: number; soSai: number }[] | null
+}
+
+export function dungCauSai(rows: ChiTietCauRow[], banks: TeacherExamSource[], chiCauSai = true, them?: ThemChoCauSai | null): CauSaiChiTiet[] {
   const tra = timCauTheoQid(banks)
+  // Đếm CẢ LỚP cùng chọn phương án nào, theo từng câu. Khoá là qid + đáp án
+  // chọn; giá trị là số EM khác nhau — một em thi lại hai lần không được tính
+  // thành hai bạn.
+  const demLop = new Map<string, Set<string>>()
+  const emCoCau = new Map<string, Set<string>>()
+  for (const r of them?.rowsLop ?? []) {
+    if (!r.qid) continue
+    const sbd = String((r as { sbd?: string }).sbd ?? '')
+    if (!sbd) continue
+    const kCau = r.qid
+    if (!emCoCau.has(kCau)) emCoCau.set(kCau, new Set())
+    emCoCau.get(kCau)!.add(sbd)
+    if (r.dungSai !== false) continue
+    const k = `${r.qid}|${String(r.dapAnChon ?? '')}`
+    if (!demLop.has(k)) demLop.set(k, new Set())
+    demLop.get(k)!.add(sbd)
+  }
+  const cdTong = new Map((them?.chuyenDeTong ?? []).map((c) => [c.ten, c]))
   const ra: CauSaiChiTiet[] = []
   for (const r of rows) {
     // `chiCauSai = false` để tấm trượt Hỏi bài Thầy liệt kê TRỌN đề — em hỏi
@@ -261,9 +317,57 @@ export function dungCauSai(rows: ChiTietCauRow[], banks: TeacherExamSource[], ch
       buoc: q.loiGiai?.buoc ? [...q.loiGiai.buoc] : null,
       ketQua: q.loiGiai?.ketQua ?? '',
       coHinh: coHinh(q),
+      ...(() => {
+        const siSo = emCoCau.get(r.qid)?.size ?? 0
+        if (!siSo) return { tiLeLopSai: null, soLopSai: null, siSoLop: null }
+        const cung = demLop.get(`${r.qid}|${String(r.dapAnChon ?? '')}`)?.size ?? 0
+        return { tiLeLopSai: cung / siSo, soLopSai: cung, siSoLop: siSo }
+      })(),
+      lichSuChuyenDe: (() => {
+        const c = cdTong.get(r.chuyenDe || '')
+        return c && c.soCau > 0 ? { soCau: c.soCau, soSai: c.soSai } : null
+      })(),
     })
   }
   return ra
+}
+
+const TEN_PHAN_DAI: Record<'I' | 'II' | 'III', string> = {
+  I: 'trắc nghiệm',
+  II: 'đúng/sai',
+  III: 'trả lời ngắn',
+}
+
+function soVi(x: number, soLe = 2): string {
+  return x.toFixed(soLe).replace('.', ',')
+}
+
+/** MỘT DÒNG NÓI RÕ ĐIỂM RA TỪ ĐÂU — v3 mục 4.4.
+ *
+ * Đếm lại từ `rows`, không lấy con số nào có sẵn: dòng này tồn tại để phụ
+ * huynh đối chiếu, mà lấy lại chính con số đang cần kiểm thì kiểm cái gì.
+ *
+ * Trả chuỗi rỗng khi thiếu điểm từng phần hoặc thiếu trần từng phần — thà
+ * không có dòng còn hơn có một dòng không cộng ra điểm thật. */
+export function dongCachTinhDiem(
+  rows: ChiTietCauRow[],
+  diemPhan: { I: number; II: number; III: number } | null | undefined,
+  tranPhan: { I: number; II: number; III: number } | null | undefined,
+): string {
+  if (!diemPhan || !tranPhan) return ''
+  const phan: ('I' | 'II' | 'III')[] = ['I', 'II', 'III']
+  const manh: string[] = []
+  let coBoTrong = false
+  for (const p of phan) {
+    const cua = rows.filter((r) => r.phan === p)
+    if (cua.length === 0) continue
+    const dung = cua.filter((r) => r.dungSai === true).length
+    if (cua.some((r) => r.dungSai !== true && !String(r.dapAnChon ?? '').trim())) coBoTrong = true
+    manh.push(`Phần ${p} ${TEN_PHAN_DAI[p]}: đúng ${dung}/${cua.length} câu, được ${soVi(diemPhan[p])} trên ${soVi(tranPhan[p])}`)
+  }
+  if (manh.length === 0) return ''
+  const tong = diemPhan.I + diemPhan.II + diemPhan.III
+  return `${manh.join('. ')}. Cộng lại là ${soVi(tong)} trên 10${coBoTrong ? '. Câu bỏ trống tính như câu sai' : ''}.`
 }
 
 /** Sáu lý do khoá bài — hai của luật rời app, bốn của BAOMATCATHI. */
@@ -323,6 +427,13 @@ export interface NguonPhieu {
   viPham?: NguonViPham | null
   /** Link phiếu bài tập đã cất sẵn trên kho (máy thầy tạo). */
   linkBaiTap?: string | null
+  /** Bảng chấm từng câu của CẢ LỚP trong ca — chỉ để đếm "mấy bạn cùng sai".
+   * Không có thì chip đó biến mất khỏi báo cáo, không hiện với số 0 giả. */
+  rowsLop?: ChiTietCauRow[] | null
+  /** Cấu hình báo cáo thầy đang đặt, đóng vào gói (v3 mục 3). */
+  cauHinh?: Partial<CauHinhPhieu> | null
+  /** Ca đề riêng từng em — tắt hạng và phân bố lớp bất kể cấu hình. */
+  deRieng?: boolean | null
 }
 
 /** Số câu luyện RÚT SẴN vào báo cáo.
@@ -531,7 +642,7 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
 export function dungPhieu(n: NguonPhieu): PhieuDayDu {
   const rows = n.rows ?? []
   const banks = n.banks ?? []
-  const cauSai = rows.length && banks.length ? dungCauSai(rows, banks) : []
+  const cauSai = rows.length && banks.length ? dungCauSai(rows, banks, true, { rowsLop: n.rowsLop, chuyenDeTong: n.hoSo.chuyenDe ?? [] }) : []
   const tk = rows.length ? thongKeLamBai(rows, { vaoLuc: n.vaoLuc, nopLuc: n.ca.nopLuc, thoiLuongPhut: n.thoiLuongPhut }) : null
 
   // BÀI LUYỆN KÈM SẴN — thầy chốt 06/09: "chỉ rút bài tập từ những chuyên đề
@@ -601,6 +712,13 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
 
   return {
     v: BAN_PHIEU,
+    cauHinh: n.cauHinh ?? null,
+    deRieng: n.deRieng === true,
+    cachTinhDiem: dongCachTinhDiem(
+      rows,
+      n.ca.diemI !== null && n.ca.diemII !== null && n.ca.diemIII !== null ? { I: n.ca.diemI, II: n.ca.diemII, III: n.ca.diemIII } : null,
+      n.ca.tranPhan ?? null,
+    ),
     hoTen: n.hoSo.em.hoTen || '',
     sbd: n.hoSo.em.sbd || '',
     lop: n.hoSo.em.lop || n.ca.lop || '',

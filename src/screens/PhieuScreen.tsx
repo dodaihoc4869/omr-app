@@ -16,18 +16,17 @@
 // yếu. Máy bật "giảm chuyển động" thì hiện thẳng trạng thái cuối.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { classify } from '../engine/score'
-import { chanSoCau, docLinkPhieu, SO_CAU_MIN } from '../lib/phieu-link'
+import { chanSoCau, docLinkPhieu } from '../lib/phieu-link'
 import { layPhieu } from '../lib/exam-api'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import { napDong } from '../lib/nap-manh'
 import KhungXemPhieu from '../components/KhungXemPhieu'
-import { BAN_PHIEU, type PhieuDayDu } from '../lib/phieu-du-lieu'
-import TheCauChiTiet, { CSS_THE_CAU } from '../components/TheCauChiTiet'
+import { BAN_PHIEU_DOC_DUOC, type PhieuDayDu } from '../lib/phieu-du-lieu'
+import PhieuV3 from './PhieuV3'
+import TheCauChiTiet from '../components/TheCauChiTiet'
+import NutTaiBaiTap from '../components/KhoiBaiLuyen'
 import type { ThongTinPhieu } from '../lib/html-phieu'
 import type { CauLuyen } from '../lib/bai-tap-pdf'
-import { dangCua, hopDang, LOC_DANG_MAC_DINH, MOI_LOC_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
-import { hopSao, LOC_SAO_MAC_DINH, MOI_LOC_SAO, TEN_LOC_SAO_NGAN, type LocSao } from '../lib/loc-sao'
-import { cauCanhBaoHetHang, cauGiaiThichThanh, cauKhongRutDuoc, soLieuThanhChua } from '../lib/noi-dung-thanh-chua'
 import { TEN_MUC_DO, TEN_PHAN } from '../lib/phan-tich-lam-bai'
 import { ChemText } from '../lib/chem-format'
 
@@ -52,137 +51,7 @@ function mauDiem(diem: number): string {
   return 'var(--p-do)'
 }
 
-const CSS = `
-.bc{min-height:100vh;background:var(--p-nen);color:var(--p-muc);font-family:var(--sans);
-  -webkit-font-smoothing:antialiased;padding-bottom:56px;line-height:1.55}
-.bc *{box-sizing:border-box}
-.bc-trong{max-width:560px;margin:0 auto}
-
-.bc-dau{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--p-tim),var(--p-tim-2));
-  padding:34px 22px 88px;color:var(--p-trang)}
-.bc-dau::before,.bc-dau::after{content:'';position:absolute;width:300px;height:300px;border-radius:50%;
-  filter:blur(60px);opacity:.4;will-change:transform}
-.bc-dau::before{background:var(--p-trang);top:-150px;left:-100px;animation:bc-troi1 19s ease-in-out infinite}
-.bc-dau::after{background:var(--p-tim);bottom:-180px;right:-120px;animation:bc-troi2 23s ease-in-out infinite}
-@keyframes bc-troi1{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(60px,36px,0) scale(1.15)}}
-@keyframes bc-troi2{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-50px,-32px,0) scale(1.22)}}
-.bc-dau-noi{position:relative}
-.bc-hieu{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;opacity:.85}
-.bc-ten{font-family:var(--serif);font-size:29px;font-weight:700;line-height:1.15;margin-top:10px}
-.bc-phu{margin-top:8px;font-size:13px;opacity:.92}
-
-.bc-the{margin:16px 14px 0;background:var(--p-giay);border-radius:20px;padding:20px 18px;border:1px solid var(--p-vien)}
-.bc-the.noi{position:relative;z-index:1;margin-top:-64px;border:none;box-shadow:var(--p-bong)}
-.bc-tieu{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--p-nhat)}
-.bc-tieu-lon{font-family:var(--serif);font-size:19px;font-weight:700;margin-top:2px}
-
-.bc-diem-hang{display:flex;align-items:center;gap:16px;margin-top:16px}
-.bc-diem-dau{margin-top:0}
-.bc-vong{position:relative;width:116px;height:116px;flex:0 0 auto}
-.bc-vong svg{width:116px;height:116px;transform:rotate(-90deg)}
-.bc-vong-in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.bc-so{font-family:var(--serif);font-size:32px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
-.bc-tren{font-size:10.5px;color:var(--p-mo);margin-top:3px}
-.bc-canh{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
-.bc-nhan{display:inline-flex;align-items:center;align-self:flex-start;height:27px;padding:0 12px;border-radius:999px;
-  font-size:12.5px;font-weight:700;background:var(--p-chim)}
-.bc-doi{display:flex;justify-content:space-between;gap:10px;font-size:13px}
-.bc-doi>span:first-child{color:var(--p-nhat)}
-.bc-doi>span:last-child{font-weight:700;font-variant-numeric:tabular-nums}
-
-.bc-dong{margin-top:13px}
-.bc-dong:first-of-type{margin-top:12px}
-.bc-dtren{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:13.5px}
-.bc-dten{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bc-dso{font-weight:700;font-variant-numeric:tabular-nums;flex:0 0 auto;font-size:12.5px}
-.bc-ray{height:8px;border-radius:999px;background:var(--p-chim);margin-top:6px;overflow:hidden}
-.bc-day{height:100%;border-radius:999px;width:0;transition:width 1s cubic-bezier(.22,.9,.28,1)}
-
-.bc-o3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-.bc-o{background:var(--p-chim);border-radius:12px;padding:11px 8px;text-align:center}
-.bc-o-so{font-family:var(--serif);font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
-.bc-o-ten{font-size:10.5px;color:var(--p-nhat);margin-top:3px;line-height:1.35}
-
-
-
-.bc-tin{border-radius:14px;border:1px solid var(--p-vien);padding:13px 14px;margin-top:10px}
-.bc-tin:first-of-type{margin-top:12px}
-.bc-tin-nhan{font-family:var(--serif);font-size:15.5px;font-weight:700}
-.bc-tin-so{font-size:13px;color:var(--p-nhat);margin-top:5px;line-height:1.6}
-.bc-tin-khuyen{font-size:13.5px;margin-top:9px;line-height:1.62;background:var(--p-chim);border-radius:10px;padding:10px 11px}
-
-.bc-soan{margin-top:12px}
-.bc-soan-cd{font-size:12px;font-weight:700;color:var(--p-tim);letter-spacing:.02em}
-.bc-soan-y{display:flex;gap:9px;font-size:13.5px;line-height:1.62;margin-top:7px}
-.bc-soan-o{flex:0 0 auto;width:15px;height:15px;border:1.5px solid var(--p-mo);border-radius:4px;margin-top:3px}
-
-.bc-viec{margin:16px 14px 0;background:var(--p-giay);border-radius:18px;padding:18px 18px 18px 20px;
-  border:1px solid var(--p-vien);border-left:4px solid var(--p-tim)}
-.bc-viec-chu{font-family:var(--serif);font-size:15.5px;line-height:1.62;margin-top:9px}
-.bc-chan{margin:24px 16px 0;text-align:center;color:var(--p-mo);font-size:11.5px;line-height:1.75}
-.bc-chan b{color:var(--p-nhat)}
-
-.bc-vao{opacity:0;transform:translate3d(0,18px,0);transition:opacity .6s ease,transform .6s cubic-bezier(.22,.9,.28,1)}
-.bc-vao.ra{opacity:1;transform:none}
-
-/* NÚT NHẤP NHÁY. Hai lớp: chữ mờ dần rồi rõ lại, kèm một vòng sáng loang ra từ
-   mép nút. Chỉ động vào opacity và transform nên không bắt trình duyệt tính
-   lại bố cục — mượt cả trên điện thoại cũ của phụ huynh. */
-.bc-nhay{position:relative;isolation:isolate;animation:bc-tho 1.5s ease-in-out infinite}
-.bc-nhay::after{content:'';position:absolute;inset:0;border-radius:inherit;background:currentColor;
-  z-index:-1;opacity:0;animation:bc-loang 1.5s ease-out infinite}
-@keyframes bc-tho{0%,100%{opacity:1}50%{opacity:.72}}
-@keyframes bc-loang{0%{opacity:.32;transform:scale(1)}70%,100%{opacity:0;transform:scale(1.08)}}
-
-/* VI PHẠM — khối bằng chứng rời màn. */
-.bc-vp{margin-top:14px}
-.bc-vp-nut{width:100%;min-height:46px;border-radius:12px;border:1.5px solid var(--p-do);background:var(--p-giay);
-  color:var(--p-do);font-family:var(--sans);font-size:14.5px;font-weight:700;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:8px;padding:0 12px}
-.bc-vp-cham{width:9px;height:9px;border-radius:50%;background:currentColor;flex:0 0 auto}
-.bc-vp-in{margin-top:11px;border:1px solid var(--p-vien);border-radius:12px;padding:13px 14px}
-.bc-vp-so{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.bc-vp-hang{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:7px 0;
-  border-top:1px solid var(--p-vien);font-variant-numeric:tabular-nums}
-.bc-vp-hang:first-of-type{border-top:none}
-.bc-vp-noi{font-size:12.5px;color:var(--p-nhat);line-height:1.65;margin-top:10px}
-
-.bc-nut-doi{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.bc-nut{flex:1 1 150px;min-height:46px;border-radius:12px;font-family:var(--sans);font-size:14px;font-weight:700;
-  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 12px;border:none}
-.bc-nut.chinh{background:var(--p-tim);color:var(--p-trang)}
-/* NÚT VÀNG (thầy chốt 04-09 tối): chữ đen trên nền hổ phách, tương phản cao
-   hơn hẳn chữ trắng — nút này nhấp nháy nên phải đọc được ở mọi pha sáng. */
-.bc-nut.vang{background:var(--p-cam);color:var(--p-muc)}
-.bc-nut.vien{background:var(--p-giay);color:var(--p-tim);border:1.5px solid var(--p-tim)}
-.bc-dang{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-.bc-dang button{flex:1 1 90px;min-height:40px;border-radius:10px;border:none;font-family:var(--sans);font-size:13.5px;
-  font-weight:700;background:var(--p-chim);color:var(--p-nhat)}
-.bc-dang button[aria-checked="true"]{background:var(--p-tim);color:var(--p-trang)}
-.bc-nut[disabled]{opacity:.55;cursor:default}
-
-/* CHỌN SỐ CÂU cho con — thanh kéo 10..40. */
-.bc-so{margin-top:12px;background:var(--p-chim);border-radius:12px;padding:12px 13px}
-.bc-so-dau{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
-.bc-so-nhan{font-size:12.5px;color:var(--p-nhat)}
-.bc-so-gia{font-family:var(--serif);font-size:21px;font-weight:700;font-variant-numeric:tabular-nums}
-.bc-so input[type=range]{width:100%;margin-top:8px;accent-color:var(--p-cam);height:26px}
-.bc-so-moc{display:flex;justify-content:space-between;font-size:11px;color:var(--p-mo);font-variant-numeric:tabular-nums}
-.bc-so-vi{margin-top:4px;font-size:11px;line-height:1.5;color:var(--p-mo)}
-.bc-so-canh{color:var(--p-cam)}
-.bc-so-nhay{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
-.bc-so-nhay button{min-height:32px;padding:0 12px;border:none;border-radius:999px;background:var(--p-giay);color:var(--p-muc);font-family:var(--sans);font-size:12px;font-weight:700}
-.bc-so-nhay button[aria-pressed="true"]{background:var(--p-tim);color:var(--p-trang)}
-.bc-so-do{border-left:3px solid var(--p-cam)}
-.bc-so-do ul{margin:6px 0 0;padding-left:18px;font-size:11px;line-height:1.5;color:var(--p-mo)}
-
-@media (prefers-reduced-motion:reduce){
-  .bc-dau::before,.bc-dau::after{animation:none}
-  .bc-vao{transition:none;opacity:1;transform:none}
-  .bc-day,.bc-hop,.bc-mui{transition:none}
-  .bc-nhay,.bc-nhay::after{animation:none}
-}
-` + CSS_THE_CAU
+import { CSS_BAO_CAO as CSS } from '../lib/css-bao-cao'
 
 // ------------------------------------------------------------------ tiện ích
 /** Hiện dần khi cuộn tới. Dùng IntersectionObserver để không phải nghe sự kiện
@@ -363,136 +232,8 @@ function PhanBoLop({ diemLop, cuaEm, tat }: { diemLop: number[]; cuaEm: number; 
 }
 
 /** DẢI THỜI GIAN TỪNG CÂU: mỗi câu một cột, cao theo số giây, đỏ là câu sai. */
-function DaiThoiGian({ cau, tat }: { cau: { giay: number | null; dung: boolean; nhan: string }[]; tat: boolean }) {
-  const [o, ra] = useHienKhiToi<HTMLDivElement>(tat)
-  const co = cau.filter((c) => c.giay !== null)
-  if (co.length < 3) return null
-  const cao = Math.max(...co.map((c) => c.giay as number))
-  return (
-    <div ref={o} style={{ marginTop: 12 }}>
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 76 }}>
-        {cau.map((c, i) => (
-          <div
-            key={i}
-            title={`${c.nhan}${c.giay !== null ? ` · ${c.giay} giây` : ''}`}
-            style={{
-              flex: 1,
-              minWidth: 2,
-              height: ra ? `${c.giay === null ? 3 : Math.max(5, ((c.giay as number) / cao) * 100)}%` : '3%',
-              background: c.dung ? 'var(--p-xanh)' : 'var(--p-do)',
-              opacity: c.giay === null ? 0.25 : 1,
-              borderRadius: '3px 3px 1px 1px',
-              transition: tat ? 'none' : `height .55s cubic-bezier(.22,.9,.28,1) ${Math.min(600, i * 22)}ms`,
-            }}
-          />
-        ))}
-      </div>
-      <div className="bc-ghi" style={{ marginTop: 8 }}>
-        Mỗi cột là một câu theo đúng thứ tự em làm, cao là mất nhiều giây. Cột đỏ là câu sai, cột xanh là câu đúng.
-      </div>
-    </div>
-  )
-}
+import { DaiThoiGian, KhoiViPham } from '../components/KhoiBaoCaoChung'
 
-// ------------------------------------------------------- bằng chứng rời màn
-/** Giờ:phút:giây của một mốc. Phụ huynh đối chiếu được với việc nhà lúc đó
- * (gọi điện, sai đi lấy nước) nên phải có giây, không làm tròn. */
-function gioDayDu(iso: string): string {
-  const d = new Date(iso)
-  if (!Number.isFinite(d.getTime())) return ''
-  const p = (n: number) => String(n).padStart(2, '0')
-  return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`
-}
-
-function giayChu(g: number): string {
-  if (g < 60) return `${g} giây`
-  const p = Math.floor(g / 60)
-  const s = g % 60
-  return s === 0 ? `${p} phút` : `${p} phút ${s} giây`
-}
-
-const LY_DO_KHOA: Record<string, string> = {
-  qua_so_lan: 'rời khỏi bài quá số lần Thầy cho phép',
-  roi_qua_lau: 'một lần rời khỏi bài quá lâu',
-}
-
-/** NÚT VI PHẠM NHẤP NHÁY + BẰNG CHỨNG.
- *
- * Thầy chốt 04-09: bấm "Báo phụ huynh" thì trong báo cáo phải có nút này, bấm
- * vào ra nội dung bằng chứng thoát màn hình.
- *
- * Nút nhấp nháy vì đây là thứ phụ huynh dễ lướt qua nhất mà lại cần thấy nhất.
- * Nội dung bên trong CHỈ nêu số máy đo được và mốc giờ — không câu nào kết luận
- * gian lận, vì một cuộc gọi đến cũng cho đúng tín hiệu đó. */
-function KhoiViPham({ vp }: { vp: NonNullable<PhieuDayDu['viPham']> }) {
-  const [mo, setMo] = useState(false)
-  const coMoc = vp.moc.length > 0
-  const daiNhat = vp.moc.reduce((n, m) => (m.giay !== null && m.giay > n ? m.giay : n), 0)
-  return (
-    <div className="bc-vp">
-      <button type="button" className={`bc-vp-nut${mo ? '' : ' bc-nhay'}`} aria-expanded={mo} onClick={() => setMo((v) => !v)}>
-        <span className="bc-vp-cham" />
-        Vi phạm{vp.daKhoa ? ' — bài bị khoá' : ''}
-        <span style={{ fontWeight: 400, opacity: 0.85 }}>{mo ? '· đóng lại' : '· chạm để xem bằng chứng'}</span>
-      </button>
-      <div className={`bc-hop${mo ? ' ra' : ''}`}>
-        <div>
-          <div className="bc-vp-in">
-            <div className="bc-vp-so">
-              <OSo so={vp.soLan} ten="lần rời khỏi màn làm bài" />
-              <OSo so={vp.tongGiay > 0 ? giayChu(vp.tongGiay) : null} ten="tổng thời gian ở ngoài" />
-              <OSo so={daiNhat > 0 ? giayChu(daiNhat) : null} ten="lần rời lâu nhất" />
-            </div>
-
-            {vp.nguong && (
-              <div className="bc-vp-noi">
-                Ngưỡng Thầy đặt cho bài này: rời <b>{vp.nguong.lan}</b> lần, hoặc một lần rời quá <b>{vp.nguong.giay}</b> giây, là máy tự khoá bài.
-              </div>
-            )}
-            {vp.daKhoa && (
-              <div className="bc-vp-noi" style={{ color: 'var(--p-do)' }}>
-                Bài đã bị máy khoá và nộp tự động{vp.lyDoKhoa && LY_DO_KHOA[vp.lyDoKhoa] ? `, do ${LY_DO_KHOA[vp.lyDoKhoa]}` : ''}.
-              </div>
-            )}
-
-            {coMoc && (
-              <div style={{ marginTop: 12 }}>
-                <div className="bc-tieu">Từng lần rời</div>
-                <div style={{ marginTop: 4 }}>
-                  {vp.moc.map((m, i) => (
-                    <div className="bc-vp-hang" key={`${m.luc}-${i}`}>
-                      <span style={{ color: 'var(--p-nhat)' }}>
-                        Lần {i + 1} · {gioDayDu(m.luc)}
-                      </span>
-                      <span style={{ fontWeight: 700 }}>{m.giay === null ? 'không thấy quay lại' : giayChu(m.giay)}</span>
-                    </div>
-                  ))}
-                </div>
-                {vp.mocBiCat ? <div className="bc-vp-noi">Còn {vp.mocBiCat} lần nữa không liệt kê hết ở đây.</div> : null}
-              </div>
-            )}
-
-            <div className="bc-vp-noi">
-              Máy chỉ đo được em rời khỏi màn làm bài mấy lần, mấy giây. Một cuộc gọi đến, một thông báo, hay pin yếu cũng cho đúng tín hiệu này, nên đây là dữ kiện chứ không phải kết luận. Phụ huynh hỏi em, rồi nhắn lại cho Thầy.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ------------------------------------------------------------------- màn hình
-/** `duCoSan` = báo cáo đã dựng sẵn tại chỗ, không phải tải từ máy chủ. Dùng cho
- * màn "Đã nộp bài" của học sinh: máy em đã có đủ bài làm và ngân hàng đáp án,
- * không cần thầy tạo link trước, và cũng không mở thêm đường đọc nào trên máy
- * chủ. */
-/** `laCuaEm` = trang này đang mở cho CHÍNH EM đọc (màn đã nộp bài), không phải
- * cho phụ huynh. Cùng một trang, khác người đọc, nên khác cách xưng hô — thầy
- * chốt 06/09: bản của em phải là "Thầy Đỗ Đại Học nhắc nhở em".
- *
- * Là một prop TƯỜNG MINH chứ không suy từ `duCoSan`: báo cáo dựng sẵn tại chỗ
- * không đồng nghĩa với người đọc là em. */
 export default function PhieuScreen({ duCoSan, laCuaEm = false }: { duCoSan?: PhieuDayDu; laCuaEm?: boolean } = {}) {
   const [du, setDu] = useState<PhieuDayDu | null | undefined>(duCoSan ?? undefined)
   // Link phiếu bài tập: trang này chỉ việc hiện trọn tài liệu HTML đã dựng.
@@ -534,7 +275,13 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false }: { duCoSan?: Ph
         setPhieuBt(dungPhieu(tt, cau, { anGiai }))
         return
       }
-      if (!p || Number(p.v) !== BAN_PHIEU) throw new Error('Báo cáo này thuộc phiên bản khác, Thầy cần gửi lại link mới.')
+      // ĐỌC ĐƯỢC CẢ HAI BẢN. Bản 2 là bố cục 10 mục cũ, phụ huynh đã cầm link
+      // rồi — mở ra phải ra đúng cái họ từng thấy, không phải bố cục mới với
+      // mấy ô trống chỗ dữ liệu bản cũ không có. Bản lạ vẫn từ chối thay vì vẽ
+      // thiếu mục.
+      if (!p || !(BAN_PHIEU_DOC_DUOC as readonly number[]).includes(Number(p.v))) {
+        throw new Error('Báo cáo này thuộc phiên bản khác, Thầy cần gửi lại link mới.')
+      }
       setDu(p)
     } catch (e) {
       setLoi(e instanceof Error ? e.message : 'Không mở được báo cáo')
@@ -584,6 +331,11 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false }: { duCoSan?: Ph
       </div>
     )
   }
+
+  // BỐ CỤC BA TẦNG cho gói bản 3 trở lên. Gói bản 2 đi tiếp xuống bố cục cũ
+  // NGUYÊN VẸN: phụ huynh đã cầm link đó rồi, dựng lại bằng bố cục mới là mấy
+  // mục dữ liệu cũ không có sẽ trống trơn.
+  if (Number(du.v) >= 3) return <PhieuV3 du={du} laCuaEm={laCuaEm} />
 
   const tk = du.thongKe
   const dung = du.tongSoCau !== null ? du.tongSoCau - du.soCauSai : null
@@ -912,237 +664,6 @@ function NutXemDeCuaCon({ du }: { du: PhieuDayDu }) {
       </div>
       {loi && <div style={{ fontSize: 12.5, color: 'var(--p-do)', marginTop: 6 }}>{loi}</div>}
       {html && <KhungXemPhieu html={html} ten="Đề con vừa làm" dong={() => setHtml('')} />}
-    </div>
-  )
-}
-
-/** HAI VIỆC KHÁC NHAU, HAI NÚT (thầy chốt 04-09).
- *
- * Bản trước gộp làm một nút "Xem phiếu bài tập": phụ huynh bấm là phiếu mở ra
- * trong máy MÌNH, xong không biết đưa cho con bằng cách nào — chụp màn hình,
- * hoặc chuyển tiếp cả báo cáo có điểm và nhận xét của thầy sang cho con.
- *
- *   · XEM — phụ huynh tự xem trước xem thầy giao gì.
- *   · COPY LINK GỬI CHO CON — link CHỈ có phiếu bài tập, không kèm điểm, không
- *     kèm nhận xét. Nút này nhấp nháy vì đây mới là việc phụ huynh cần làm.
- *
- * Link do máy thầy cất sẵn lúc dựng báo cáo (`linkBaiTap`); trang này không có
- * mã bí mật nên không tự ghi lên máy chủ được. Chưa có link thì chỉ hiện nút
- * Xem — không dựng một nút copy ra rồi copy chuỗi rỗng. */
-function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boolean }) {
-  const [dang, setDang] = useState(false)
-  const [loi, setLoi] = useState('')
-  const [daCopy, setDaCopy] = useState(false)
-  /** Máy chặn copy tự động thì hiện link ra cho phụ huynh bôi đen copy tay. */
-  const [linkTay, setLinkTay] = useState('')
-  // Phiếu hiện NGAY TRONG trang, không mở thẻ mới: phụ huynh mở link từ Zalo
-  // thì đang ở trình duyệt trong ứng dụng Zalo, ở đó `window.open` bị chặn.
-  const [html, setHtml] = useState('')
-
-  // SỐ CÂU DO PHỤ HUYNH CHỌN. Báo cáo chở sẵn tới 40 câu đã rút theo đúng
-  // chuyên đề em mất điểm, xếp dễ lên khó; kéo thanh là lấy bấy nhiêu câu ĐẦU,
-  // nên chọn 10 vẫn ra 10 câu dễ nhất chứ không phải 10 câu bốc ngẫu nhiên.
-  // BA LỰA CHỌN DẠNG CÂU ngay trong báo cáo (thầy chốt 06/09). Lọc trên đúng
-  // bộ câu đã chở sẵn trong báo cáo — trang này không có kho đề và không có mã
-  // bí mật để rút thêm.
-  //
-  // BÁO CÁO CŨ CŨNG CHẠY, không phải ghi đè gì trên máy chủ. Thầy hỏi đúng câu
-  // đó 06/09: "đẩy luôn lên cả báo cáo cũ các ca thi trước".
-  //
-  // Cách rẻ nhất và không rủi ro nhất là PHÂN LOẠI NGAY LÚC MỞ, không phải chép
-  // thêm một trường vào hàng trăm bản ghi cũ: mỗi câu trong báo cáo vốn đã chở
-  // `phan · text · luaChon · dapAn · mucDo` — đúng và đủ thứ `dangCua` cần.
-  // Nhãn cất sẵn (báo cáo mới) vẫn được ưu tiên, nên hai đường cho cùng kết
-  // quả và về sau kho có nhãn thật thì báo cáo mới tự dùng nhãn thật.
-  //
-  // Ghi đè báo cáo cũ còn là chuyện KHÔNG NÊN LÀM: mỗi bản ghi mang nhận xét
-  // thầy tự gõ cho từng em; chạy lại hàng loạt là đặt cược chỗ đó, đổi lấy một
-  // hàng nút.
-  const [locDang, setLocDang] = useState<LocDang>(LOC_DANG_MAC_DINH)
-  // MỨC SAO — thầy chốt 07/09. Chồng lên lọc dạng, không thay nó.
-  const [locSao, setLocSao] = useState<LocSao>(LOC_SAO_MAC_DINH)
-  const dangCuaCau = (c: CauLuyen) =>
-    c.dang ?? dangCua({ phan: c.phan, text: c.text, luaChon: c.luaChon ?? [], dapAn: c.phan === 'III' ? c.dapAn : '', mucDo: c.mucDo })
-  const dsDaLoc = (du.baiTap ?? []).filter((c) => hopDang(dangCuaCau(c), locDang) && hopSao(c.sao, locSao))
-  const coSan = dsDaLoc.length
-  // SÀN – TRẦN – KIM lấy từ ĐÚNG một nguồn với màn thầy (`noi-dung-thanh-chua`),
-  // thầy chốt 07/09: "đồng bộ phần rút câu ở đây sang hai chỗ báo cáo phụ huynh
-  // và học sinh". Trước đây màn này tự đặt sàn 10 cứng và tự viết câu chữ, nên
-  // cùng một em ra hai con số khác nhau ở hai màn.
-  const soCauSai = du.cauSai?.length ?? 0
-  const [soCau, setSoCau] = useState(SO_CAU_MIN)
-  const { san, tran, n: lay, hienThanh } = soLieuThanhChua({ soCau, soCauSai, coSan })
-  const xung: 'em' | 'con' = laCuaEm ? 'em' : 'con'
-  // Cảnh báo và dòng giải thích: dựng bằng cùng hàm với màn thầy.
-  const cauGiaiThich = cauGiaiThichThanh({
-    tongUngVien: du.tongUngVien ?? coSan,
-    soCauSai,
-    san,
-    coSan,
-    xung,
-  })
-  const canhBaoHetHang = cauCanhBaoHetHang(du.poolChua, xung)
-
-  // Link đã cất sẵn là `.../p#<mã>`; gắn thêm `~<số câu>` và chữ cuối là xong,
-  // không phải ghi lại phiếu nào lên máy chủ (trang này không có mã bí mật để
-  // ghi). HAI LINK (thầy chốt 04-09 khuya): `d` = chỉ có ĐỀ cho con tự làm,
-  // `g` = có LỜI GIẢI để con dò sau khi làm xong.
-  const linkDe = du.linkBaiTap ? `${du.linkBaiTap}~${chanSoCau(lay, san)}d` : ''
-  const linkGiai = du.linkBaiTap ? `${du.linkBaiTap}~${chanSoCau(lay, san)}g` : ''
-  const [daCopyGiai, setDaCopyGiai] = useState(false)
-
-  const copyLink = async (link: string, giai: boolean) => {
-    if (!link) return
-    const bao = giai ? setDaCopyGiai : setDaCopy
-    try {
-      if (!navigator.clipboard?.writeText) throw new Error('không có clipboard')
-      await navigator.clipboard.writeText(link)
-      bao(true)
-      setTimeout(() => bao(false), 3000)
-    } catch {
-      setLinkTay(link)
-    }
-  }
-
-  const tai = async () => {
-    setDang(true)
-    setLoi('')
-    try {
-      const { dungPhieu } = await napDong(() => import('../lib/html-phieu'))
-      const sai = du.chuyenDeCa.filter((c) => c.soSai > 0)
-      const tt = {
-        hoTen: du.hoTen,
-        sbd: du.sbd,
-        ngay: new Date(),
-        tenChuyenDe: sai[0]?.ten || du.chuyenDeCa[0]?.ten || 'Hoá học',
-        ketQua: sai.length > 0 ? `Sai ${sai.reduce((n, c) => n + c.soSai, 0)}/${sai.reduce((n, c) => n + c.soCau, 0)} câu` : '',
-        hienDapAn: false,
-        nhanBia: laCuaEm ? 'Câu khắc phục lỗi sai' : 'Phiếu Bài Tập Riêng',
-      }
-      // MỘT lần dựng. Bản trước dựng hai lần (đề, lời giải) rồi nối chuỗi nên
-      // phụ huynh tải về thấy bìa và trang tổng quan LẶP HAI LẦN.
-      setHtml(dungPhieu(tt, dsDaLoc.slice(0, lay)))
-    } catch {
-      setLoi('Máy chưa mở được phiếu. Phụ huynh thử lại khi có mạng ổn định.')
-    } finally {
-      setDang(false)
-    }
-  }
-  return (
-    <div style={{ marginTop: 14 }}>
-      <div className="bc-tieu">{laCuaEm ? 'Bộ câu khắc phục lỗi sai' : 'Bài luyện theo đúng chỗ em mất điểm'}</div>
-      {laCuaEm && (
-        <div className="bc-viec-chu" style={{ marginTop: 6 }}>
-          Em hãy tạo câu khắc phục lỗi sai để luyện tập. Máy rút đúng chuyên đề em vừa mất điểm, xếp từ dễ lên khó.
-        </div>
-      )}
-
-      {(du.baiTap?.length ?? 0) > 0 && (
-        <>
-          <div className="bc-dang" role="radiogroup" aria-label="Dạng câu">
-            {MOI_LOC_DANG.map((d) => (
-              <button key={d} type="button" role="radio" aria-checked={locDang === d} onClick={() => setLocDang(d)}>
-                {TEN_LOC_DANG[d]}
-              </button>
-            ))}
-          </div>
-          {/* MỨC SAO — nhãn ngắn vì màn phụ huynh chạy trên điện thoại 360px. */}
-          <div className="bc-dang" role="radiogroup" aria-label="Mức sao">
-            {MOI_LOC_SAO.map((v) => (
-              <button key={v} type="button" role="radio" aria-checked={locSao === v} onClick={() => setLocSao(v)}>
-                {TEN_LOC_SAO_NGAN[v]}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* THANH KÉO — cùng luật, cùng câu chữ với màn thầy. Chỉ khác lớp CSS vì
-          trang phiếu có bảng màu `--p-*` riêng, không dùng token của app. */}
-      {hienThanh && (
-        <div className="bc-so">
-          <div className="bc-so-dau">
-            <span className="bc-so-nhan">{laCuaEm ? 'Em làm bao nhiêu câu?' : 'Cho con làm bao nhiêu câu?'}</span>
-            <span className="bc-so-gia">{lay} câu</span>
-          </div>
-          {/* Nút nhảy nhanh, đúng như màn thầy. */}
-          <div className="bc-so-nhay">
-            {[10, 20, 50].filter((m) => m > san && m < tran).map((m) => (
-              <button key={m} type="button" aria-pressed={lay === m} onClick={() => setSoCau(m)}>
-                {m}
-              </button>
-            ))}
-            <button type="button" aria-pressed={lay === tran} onClick={() => setSoCau(tran)}>
-              Tối đa
-            </button>
-          </div>
-          <input
-            type="range"
-            min={san}
-            max={tran}
-            step={1}
-            value={lay}
-            onChange={(e) => setSoCau(chanSoCau(e.target.value, san))}
-            aria-label={laCuaEm ? 'Số câu em làm' : 'Số câu cho con làm'}
-          />
-          <div className="bc-so-moc">
-            <span>{san}</span>
-            <span>{tran}</span>
-          </div>
-          <div className="bc-so-vi">{cauGiaiThich}</div>
-          {canhBaoHetHang !== '' && <div className="bc-so-vi bc-so-canh">{canhBaoHetHang}</div>}
-        </div>
-      )}
-
-      {/* KHÔNG RÚT ĐƯỢC CÂU NÀO — nói đúng lý do, y như màn thầy, thay vì im. */}
-      {coSan === 0 && (du.thieuChuaChiTiet?.length ?? 0) > 0 && (
-        <div className="bc-so bc-so-do">
-          <b>Chưa rút được câu chữa nào</b>
-          <ul>
-            {cauKhongRutDuoc(du.thieuChuaChiTiet).map((v, i) => (
-              <li key={i}>{v}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <div className="bc-nut-doi">
-        {coSan > 0 && (
-          <button type="button" className="bc-nut vien" onClick={() => void tai()} disabled={dang}>
-            {dang ? 'Đang dựng…' : laCuaEm ? `Tạo ${lay} câu khắc phục` : `Xem trước ${lay} câu`}
-          </button>
-        )}
-      </div>
-      {du.linkBaiTap && (
-        <div className="bc-nut-doi" style={{ marginTop: 8 }}>
-          <button type="button" className={`bc-nut vang${daCopy ? '' : ' bc-nhay'}`} onClick={() => void copyLink(linkDe, false)}>
-            {daCopy ? `Đã copy link đề ${lay} câu` : 'Copy link gửi ĐỀ cho con'}
-          </button>
-          <button type="button" className="bc-nut vang" onClick={() => void copyLink(linkGiai, true)}>
-            {daCopyGiai ? `Đã copy link lời giải ${lay} câu` : 'Copy link gửi LỜI GIẢI cho con'}
-          </button>
-        </div>
-      )}
-      <div style={{ fontSize: 12, color: 'var(--p-nhat)', marginTop: 8, lineHeight: 1.6 }}>
-        {/* Nói đúng cách rút hiện tại. Câu cũ ghi "theo đúng chuyên đề em mất
-            điểm" là mô tả cách làm ĐÃ BỎ — nay rút theo MÃ DẠNG của chính câu
-            em sai, tìm trong CẢ KHO chứ không bó trong chuyên đề của ca. */}
-        Rút từ cả kho, theo đúng dạng của từng câu em làm sai, xếp từ dễ lên khó.
-        {/* NÓI RÕ SỐ CÂU KHO CÒN, thay vì để thanh kéo dừng ở một con số lạ mà
-            không ai biết vì sao (thầy hỏi đúng câu này ngày 06/09). */}
-        {du.tongUngVien && du.tongUngVien > coSan ? ` Kho còn ${du.tongUngVien} câu cùng dạng với những câu em sai.` : ''}
-        {du.linkBaiTap
-          ? ' Gửi con link ĐỀ trước để em tự làm vào vở; em làm xong mới gửi link LỜI GIẢI để em dò. Hai link chỉ có bài tập, không kèm điểm và nhận xét.'
-          : ' Em làm hết rồi mới bấm vào từng câu xem lời giải.'}
-      </div>
-      {linkTay && (
-        <div style={{ fontSize: 12.5, marginTop: 8, lineHeight: 1.6 }}>
-          <div style={{ color: 'var(--p-nhat)' }}>Máy không cho copy tự động. Phụ huynh bôi đen dòng dưới rồi copy:</div>
-          <div style={{ marginTop: 4, padding: '8px 10px', borderRadius: 10, background: 'var(--p-chim)', wordBreak: 'break-all', fontVariantNumeric: 'tabular-nums' }}>{linkTay}</div>
-        </div>
-      )}
-      {loi && <div style={{ fontSize: 12.5, color: 'var(--p-do)', marginTop: 6 }}>{loi}</div>}
-      {html && <KhungXemPhieu html={html} ten="Phiếu bài tập" dong={() => setHtml('')} />}
     </div>
   )
 }

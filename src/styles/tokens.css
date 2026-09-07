@@ -108,6 +108,16 @@
   /* bóng của thẻ điểm trong phiếu HTML (screens/PhieuScreen.tsx) — đặt ở đây
    * để mã màu vẫn nằm đúng một chỗ, kể cả màu trong rgba(). */
   --p-bong: 0 18px 44px -18px rgba(26, 35, 50, 0.34), 0 2px 6px rgba(26, 35, 50, 0.06);
+
+  /* BÁO CÁO PHỤ HUYNH V3 (PHIEU-PHU-HUYNH-V3 mục 3) — bảng màu đã chạy qua bộ
+   * kiểm tương phản, CẤM ĐỔI và CẤM THÊM màu ngoài bốn dòng này.
+   * Chỉ hai màu đầu MANG NGHĨA (đúng / sai); hai màu sau là nền.
+   * Cũng KHÔNG redefine ở khối nền tối, cùng lý do với nhóm --p-* bên trên:
+   * báo cáo mở trên máy phụ huynh, luôn phải là giấy trắng mực đen. */
+  --p3-dung: #2e8b6b;
+  --p3-sai: #b42318;
+  --p3-hero: #16171a;
+  --p3-nen: #fbfaf7;
 }
 
 /* NỀN TỐI — MANCUAVAOVANENTOI.md mục 1. Giữ nguyên tên biến, chỉ đổi giá trị;

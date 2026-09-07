@@ -1,3 +1,6 @@
+// 07/09: khối rút bài đã tách khỏi `PhieuScreen` sang `components/KhoiBaiLuyen`
+// để bố cục v3 dùng CHUNG một bản với bố cục cũ (thầy chốt "giữ nguyên mục rút
+// bài trong phiếu mới đầy đủ như trong phiếu cũ"). Luật không đổi, chỉ đổi tệp.
 // BA LỰA CHỌN DẠNG CÂU Ở MỌI CHỖ RÚT + RANH GIỚI CHUYÊN ĐỀ CỦA CA.
 // Thầy chốt 06/09:
 //   · "Lúc tạo đề cho tôi mục chọn chỉ rút những câu lý thuyết, hoặc chỉ rút
@@ -200,7 +203,7 @@ describe('ba lựa chọn có mặt trên cả ba màn', () => {
   })
 
   it('12. báo cáo phụ huynh và học sinh', () => {
-    const man = doc('src/screens/PhieuScreen.tsx')
+    const man = doc('src/components/KhoiBaiLuyen.tsx')
     expect(man).toContain('MOI_LOC_DANG.map')
     expect(man).toContain('hopDang(dangCuaCau(c), locDang)')
   })
@@ -210,7 +213,7 @@ describe('ba lựa chọn có mặt trên cả ba màn', () => {
     // mang nhãn `dang`, nhưng mang đủ `phan · text · luaChon · dapAn · mucDo`
     // để phân loại ngay lúc mở. Không chép thêm trường vào bản ghi cũ, và
     // KHÔNG chạy lại báo cáo hàng loạt — mỗi bản ghi mang nhận xét thầy tự gõ.
-    const man = doc('src/screens/PhieuScreen.tsx')
+    const man = doc('src/components/KhoiBaiLuyen.tsx')
     expect(man).toContain('const dangCuaCau = (c: CauLuyen) =>')
     // nhãn cất sẵn vẫn được ưu tiên hơn suy đoán
     expect(man).toContain('c.dang ?? dangCua({')

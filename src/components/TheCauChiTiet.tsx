@@ -11,7 +11,7 @@
 // KHÔNG BAO GIỜ LỘ ĐÁP ÁN SỚM: `anLoiGiai` cắt sạch đáp án đúng, dấu đúng/sai
 // và lời giải ra khỏi phần dựng — không giấu bằng CSS. Ca chưa công bố điểm mà
 // hiện là em nộp trước biết đáp án rồi nhắn cho bạn chưa nộp.
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ChemText } from '../lib/chem-format'
 import { TEN_MUC_DO, TEN_PHAN, type MucDo } from '../lib/phan-tich-lam-bai'
 import type { CauSaiChiTiet } from '../lib/phieu-du-lieu'
@@ -70,10 +70,22 @@ export interface TheCauChiTietProps {
   anLoiGiai?: boolean
   /** Ô tick bên trái. Không truyền = không có ô tick. */
   tick?: { chon: boolean; bat: () => void; nhan: string }
+  /** Mở sẵn lời giải ngay khi dựng. Bố cục v3 mở sẵn câu sai ĐẦU TIÊN
+   * (`MO_SAN_CAU_SAI_DAU`) và mở hết khi phụ huynh bấm "Mở tất cả". */
+  moSanBanDau?: boolean
 }
 
-export default function TheCauChiTiet({ c, stt, mauSo, anLoiGiai = false, tick }: TheCauChiTietProps) {
-  const [mo, setMo] = useState(false)
+export default function TheCauChiTiet({ c, stt, mauSo, anLoiGiai = false, tick, moSanBanDau = false }: TheCauChiTietProps) {
+  const [mo, setMo] = useState(moSanBanDau)
+  // Phụ huynh bấm "Mở tất cả" thì mọi thẻ mở theo; bấm lần nữa thì gập lại.
+  // Chỉ nghe khi giá trị ĐỔI, để thẻ phụ huynh tự mở tay không bị đóng sập.
+  const moTruoc = useRef(moSanBanDau)
+  useEffect(() => {
+    if (moTruoc.current !== moSanBanDau) {
+      moTruoc.current = moSanBanDau
+      setMo(moSanBanDau)
+    }
+  }, [moSanBanDau])
   const nhanPhan = TEN_PHAN[c.phan] ?? c.phan
   const coGiai = !anLoiGiai && (c.chot || c.lyDo || c.buoc)
   return (

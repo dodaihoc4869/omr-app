@@ -1,3 +1,6 @@
+// 07/09: khối rút bài đã tách khỏi `PhieuScreen` sang `components/KhoiBaiLuyen`
+// để bố cục v3 dùng CHUNG một bản với bố cục cũ (thầy chốt "giữ nguyên mục rút
+// bài trong phiếu mới đầy đủ như trong phiếu cũ"). Luật không đổi, chỉ đổi tệp.
 // "CÂU NÀY CHỮA CHO CÂU SAI NÀO" — thầy chỉ ra 07/09.
 //
 //   "tôi thấy em Tuân thi ester nhưng lại gán câu xà phòng."
@@ -271,7 +274,7 @@ describe('kéo nhiều câu thì chia đều cho các câu sai', () => {
   })
 
   it('báo cáo không còn nói "theo đúng chuyên đề em mất điểm" — cách đó đã bỏ', () => {
-    const t = doc('src/screens/PhieuScreen.tsx')
+    const t = doc('src/components/KhoiBaiLuyen.tsx')
     expect(t).not.toContain('Thầy đã chọn sẵn theo đúng chuyên đề em mất điểm')
     expect(t).toContain('Rút từ cả kho, theo đúng dạng của từng câu em làm sai')
   })

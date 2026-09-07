@@ -36,6 +36,9 @@ export interface CaChoPhieu {
   thoiGianPhut: number | null
   nguongLan: number | string | null
   nguongGiay: number | string | null
+  /** Ca ĐỀ RIÊNG TỪNG EM — báo cáo của ca đó tắt hạng và phân bố lớp bất kể
+   * cấu hình, vì mỗi em một bộ câu thì so điểm với nhau không còn nghĩa. */
+  deRieng?: boolean
 }
 
 /** Một em ĐÃ CHẤM ĐƯỢC. `graded` là điều kiện: chưa chấm thì không có phiếu. */
@@ -97,6 +100,16 @@ export async function dungPhieuChoEm(
   const [hoSoDs, khoDe] = await Promise.all([hoSoNhieuEm(url, mat, dsSbd), loadExamSources().catch(() => [])])
   const hoSoCua = new Map(hoSoDs.map((h) => [h.em.sbd, h]))
 
+  // BẢNG CHẤM CỦA CẢ LỚP, dựng MỘT LẦN trước vòng lặp. Báo cáo v3 dùng nó để
+  // nói "6/10 bạn cùng sai câu này" — câu cả lớp cùng sai một phương án là bẫy
+  // của đề, không phải lỗi riêng của em, và phụ huynh cần biết điều đó.
+  //
+  // Dựng trong vòng lặp thì mỗi em một lần chấm lại cả lớp: 21 em thành 441
+  // lượt dựng. Ngoài vòng lặp là đúng một lượt.
+  const rowsLop = daCham
+    .filter((e) => e.moiNhat.dapAn)
+    .flatMap((e) => taoChiTietCau(keyBank, ca.maCa, e.sbd, e.moiNhat.dapAn!, e.moiNhat.giayCau))
+
   const canLuu: PhieuCanLuu[] = []
   /** Mã của các phiếu KẾT QUẢ — để lọc khỏi phiếu bài tập lúc trả dòng link. */
   const maKetQua = new Set<string>()
@@ -154,6 +167,8 @@ export async function dungPhieuChoEm(
       // Không gọi `qidDaLam` từng em: thêm một lượt gọi cho mỗi em, mà phần
       // lớn giá trị của phép loại trừ nằm ở đúng ca vừa thi.
       qidDaLam: rows.map((r) => r.qid).filter(Boolean),
+      rowsLop,
+      deRieng: ca.deRieng === true,
       viPham: {
         soLan: e.moiNhat.soLanRoiMan || 0,
         tongGiay: e.moiNhat.tongGiayRoiMan || 0,
