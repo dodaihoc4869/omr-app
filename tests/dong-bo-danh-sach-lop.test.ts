@@ -3,161 +3,214 @@
 // lần tôi thêm hay xoá học sinh tôi chỉ cần bấm vào đồng bộ là hiển thị đúng
 // như trong danh sách".
 //
-// Danh sách này là CỔNG VÀO THI: sai một dòng là em đứng ngoài phòng thi. Nên
-// bốn thứ phải khoá:
-//   1. Mọi kiểu link thầy dán đều ra đúng một link tải CSV.
-//   2. Cột nhận theo TÊN TIÊU ĐỀ — ba sheet của thầy đặt tiêu đề khác nhau.
-//   3. Một link hỏng thì KHÔNG ghi đè gì cả.
-//   4. Đồng bộ xong phải báo ra em thêm và em bị bỏ, không nói "đã xong" suông.
+// KIẾN TRÚC, và vì sao nó KHÔNG phải bản đầu tiên: bản đầu để Apps Script gọi
+// `UrlFetchApp` tải hộ. Đo trên máy chủ thật thì trả nguyên văn "Bạn không có
+// quyền thực hiện lệnh gọi UrlFetchApp.fetch — cần
+// https://www.googleapis.com/auth/script.external_request". Thêm quyền đó là
+// phải xin lại uỷ quyền cho CẢ ứng dụng web, làm giữa buổi dạy thì chặn hết em
+// đang thi. Đo tiếp thì tệp "Xuất bản lên web" CÓ gắn nhãn CORS, máy thầy đọc
+// thẳng được. Nên: MÁY THẦY TẢI, máy chủ chỉ giữ link và ghi đè bằng
+// `napDanhSachLop` vốn đã có quyền.
+//
+// Danh sách này là CỔNG VÀO THI: sai một dòng là em đứng ngoài phòng thi.
 import { describe, expect, it, vi, afterEach } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 import { tachLink, tomTatDongBo } from '../src/components/NutDongBoDanhSach'
-import { dongBoDanhSachLop, linkDanhSachLop } from '../src/lib/exam-api'
+import { linkDanhSachLop, luuLinkDanhSachLop, napDanhSachLop } from '../src/lib/exam-api'
+import { cotDanhSach, docDanhSachTuCsv, gomDanhSachTuLink, linkCsvDanhSach, lopTuNamSinh, tachCsv, taiDanhSachTuLink } from '../src/lib/danh-sach-tu-link'
 
 const GS = fs.readFileSync(path.join(process.cwd(), 'docs/apps-script-kiem-tra.gs'), 'utf8')
-
-function layHam(ten: string): string {
-  const dau = GS.indexOf(`function ${ten}(`)
-  if (dau < 0) throw new Error(`Không thấy hàm ${ten}`)
-  let i = dau
-  let ngoac = 0
-  let daVao = false
-  while (i < GS.length) {
-    if (GS[i] === '{') {
-      ngoac++
-      daVao = true
-    } else if (GS[i] === '}') {
-      ngoac--
-      if (daVao && ngoac === 0) return GS.slice(dau, i + 1)
-    }
-    i++
-  }
-  throw new Error(`Hàm ${ten} không đóng ngoặc`)
-}
-
-const sv = new Function(
-  `${layHam('chuanTen_')}\n${layHam('chuanNamSinh_')}\n${layHam('linkCsvDsLop_')}\n${layHam('lopTuNamSinh_')}\n${layHam('cotDsLop_')}\nreturn { linkCsvDsLop_, lopTuNamSinh_, cotDsLop_ }`,
-)() as {
-  linkCsvDsLop_: (u: string) => string
-  lopTuNamSinh_: (n: unknown) => string
-  cotDsLop_: (tieuDe: string[]) => { sbd: number; hoTen: number; namSinh: number; lop: number }
-}
+const HOM_NAY = new Date('2026-09-07T12:00:00Z')
 
 afterEach(() => {
   vi.unstubAllGlobals()
-  vi.useRealTimers()
 })
 
-describe('linkCsvDsLop_ — mọi kiểu link về một link tải CSV', () => {
+describe('linkCsvDanhSach — mọi kiểu link về một link tải CSV', () => {
   it('link "Xuất bản lên web" (đúng ba link thầy gửi 07/09)', () => {
-    const pub = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSeTB77Ng6G8qbjnkywhHOjA5y5RbygvzISu2C_nOpNA6_vFRdM4ynJzyA3S5RGp_xaw-CEIWVWgJr5/pubhtml'
-    expect(sv.linkCsvDsLop_(pub)).toBe(
-      'https://docs.google.com/spreadsheets/d/e/2PACX-1vSeTB77Ng6G8qbjnkywhHOjA5y5RbygvzISu2C_nOpNA6_vFRdM4ynJzyA3S5RGp_xaw-CEIWVWgJr5/pub?output=csv',
-    )
+    const pub = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSeTB77Ng/pubhtml'
+    expect(linkCsvDanhSach(pub)).toBe('https://docs.google.com/spreadsheets/d/e/2PACX-1vSeTB77Ng/pub?output=csv')
   })
 
   it('giữ gid khi thầy trỏ vào MỘT tab, không mặc kệ lấy tab đầu', () => {
-    expect(sv.linkCsvDsLop_('https://docs.google.com/spreadsheets/d/e/ABC/pubhtml?gid=577461977&single=true')).toContain('&gid=577461977')
-    expect(sv.linkCsvDsLop_('https://docs.google.com/spreadsheets/d/1w_yOiMX01/edit#gid=123')).toBe(
+    expect(linkCsvDanhSach('https://docs.google.com/spreadsheets/d/e/ABC/pubhtml?gid=577461977&single=true')).toContain('&gid=577461977')
+    expect(linkCsvDanhSach('https://docs.google.com/spreadsheets/d/1w_yOiMX01/edit#gid=123')).toBe(
       'https://docs.google.com/spreadsheets/d/1w_yOiMX01/export?format=csv&gid=123',
     )
   })
 
-  it('link sheet thường về /export?format=csv', () => {
-    expect(sv.linkCsvDsLop_('https://docs.google.com/spreadsheets/d/1w_yOiMX01/edit?usp=drivesdk')).toBe(
+  it('link sheet thường về /export?format=csv; rỗng thì trả rỗng', () => {
+    expect(linkCsvDanhSach('https://docs.google.com/spreadsheets/d/1w_yOiMX01/edit?usp=drivesdk')).toBe(
       'https://docs.google.com/spreadsheets/d/1w_yOiMX01/export?format=csv',
     )
-  })
-
-  it('rỗng thì trả rỗng, không dựng link nửa vời', () => {
-    expect(sv.linkCsvDsLop_('')).toBe('')
-    expect(sv.linkCsvDsLop_('   ')).toBe('')
+    expect(linkCsvDanhSach('')).toBe('')
+    expect(linkCsvDanhSach('   ')).toBe('')
   })
 })
 
-describe('cotDsLop_ — nhận cột theo tên tiêu đề', () => {
+describe('tachCsv — bóc đúng luật dấu ngoặc kép', () => {
+  it('ô có dấu phẩy bên trong không được cắt làm đôi', () => {
+    expect(tachCsv('a,"b,c",d')).toEqual([['a', 'b,c', 'd']])
+  })
+
+  it('ô có xuống dòng và dấu nháy đôi lồng nhau', () => {
+    expect(tachCsv('a,"hai\ndòng"\nb,c')).toEqual([['a', 'hai\ndòng'], ['b', 'c']])
+    expect(tachCsv('a,"nói ""thế"" đấy"')).toEqual([['a', 'nói "thế" đấy']])
+  })
+
+  it('CRLF của Google Sheet không để lại \\r ở cuối ô', () => {
+    expect(tachCsv('SBD,HoTen\r\n12000,A\r\n')).toEqual([['SBD', 'HoTen'], ['12000', 'A']])
+  })
+})
+
+describe('cotDanhSach — nhận cột theo tên tiêu đề', () => {
   it('ba sheet của thầy đặt tiêu đề khác nhau, đều phải nhận đúng', () => {
     // Khối 2009 ghi "HoTen,NamSinh"; khối 2010 và 2011 ghi "Họ tên,Năm sinh".
-    expect(sv.cotDsLop_(['SBD', 'HoTen', 'NamSinh'])).toMatchObject({ sbd: 0, hoTen: 1, namSinh: 2 })
-    expect(sv.cotDsLop_(['SBD', 'Họ tên', 'Năm sinh'])).toMatchObject({ sbd: 0, hoTen: 1, namSinh: 2 })
-    expect(sv.cotDsLop_(['Số báo danh', 'Họ và tên', 'Năm sinh', 'Lớp'])).toMatchObject({ sbd: 0, hoTen: 1, namSinh: 2, lop: 3 })
+    expect(cotDanhSach(['SBD', 'HoTen', 'NamSinh'])).toMatchObject({ sbd: 0, hoTen: 1, namSinh: 2 })
+    expect(cotDanhSach(['SBD', 'Họ tên', 'Năm sinh'])).toMatchObject({ sbd: 0, hoTen: 1, namSinh: 2 })
+    expect(cotDanhSach(['Số báo danh', 'Họ và tên', 'Năm sinh', 'Lớp'])).toMatchObject({ sbd: 0, hoTen: 1, namSinh: 2, lop: 3 })
   })
 
-  it('cột đảo thứ tự vẫn nhận đúng theo tên', () => {
-    expect(sv.cotDsLop_(['Họ tên', 'Năm sinh', 'SBD'])).toMatchObject({ sbd: 2, hoTen: 0, namSinh: 1 })
-  })
-
-  it('tiêu đề lạ hoàn toàn thì lùi về vị trí 0-1-2', () => {
-    expect(sv.cotDsLop_(['a', 'b', 'c'])).toMatchObject({ sbd: 0, hoTen: 1, namSinh: 2, lop: -1 })
+  it('cột đảo thứ tự vẫn nhận đúng; tiêu đề lạ thì lùi về 0-1-2', () => {
+    expect(cotDanhSach(['Họ tên', 'Năm sinh', 'SBD'])).toMatchObject({ sbd: 2, hoTen: 0, namSinh: 1 })
+    expect(cotDanhSach(['a', 'b', 'c'])).toMatchObject({ sbd: 0, hoTen: 1, namSinh: 2, lop: -1 })
   })
 })
 
-describe('lopTuNamSinh_ — sheet của thầy không có cột Lớp', () => {
+describe('lopTuNamSinh — sheet của thầy không có cột Lớp', () => {
   it('năm học 2026–2027: 2009 là lớp 12, 2010 lớp 11, 2011 lớp 10', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-09-07T12:00:00Z'))
-    expect(sv.lopTuNamSinh_('2009')).toBe('12')
-    expect(sv.lopTuNamSinh_('2010')).toBe('11')
-    expect(sv.lopTuNamSinh_('2011')).toBe('10')
+    expect(lopTuNamSinh('2009', HOM_NAY)).toBe('12')
+    expect(lopTuNamSinh('2010', HOM_NAY)).toBe('11')
+    expect(lopTuNamSinh('2011', HOM_NAY)).toBe('10')
   })
 
   it('trước tháng 9 vẫn tính theo năm học đang chạy', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-05-20T12:00:00Z'))
-    expect(sv.lopTuNamSinh_('2009')).toBe('11')
+    expect(lopTuNamSinh('2009', new Date('2026-05-20T12:00:00Z'))).toBe('11')
   })
 
   it('năm sinh vô nghĩa thì để trống, KHÔNG đoán bừa một lớp', () => {
-    expect(sv.lopTuNamSinh_('')).toBe('')
-    expect(sv.lopTuNamSinh_('abc')).toBe('')
-    expect(sv.lopTuNamSinh_('1200')).toBe('')
+    expect(lopTuNamSinh('', HOM_NAY)).toBe('')
+    expect(lopTuNamSinh('abc', HOM_NAY)).toBe('')
+    expect(lopTuNamSinh('1200', HOM_NAY)).toBe('')
   })
 })
 
-describe('máy chủ — luật ghi đè', () => {
-  const than = GS.slice(GS.indexOf("if (action === 'dongBoDanhSachLop'"), GS.indexOf("if (action === 'huyDuyet')"))
+describe('docDanhSachTuCsv — đúng ba sheet thật của thầy', () => {
+  const K2009 = 'SBD,HoTen,NamSinh\r\n12000,Hoàng Thị Kim Ngân,2009\r\n12034,Phạm Thành Nam,2009\r\n12042,Nguyễn Thành Đồng,2009\r\n'
+  const K2010 = 'SBD,Họ tên,Năm sinh\r\n11000,Nguyễn Hoàng Thành,2010\r\n11001,Đỗ Quốc Tư,2010\r\n'
 
-  it('MỘT LINK HỎNG LÀ DỪNG HẲN, chưa ghi đè gì', () => {
+  it('đọc đủ em và tự điền cột Lớp từ năm sinh', () => {
+    expect(docDanhSachTuCsv(K2009, HOM_NAY)).toEqual([
+      { sbd: '12000', hoTen: 'Hoàng Thị Kim Ngân', namSinh: '2009', lop: '12' },
+      { sbd: '12034', hoTen: 'Phạm Thành Nam', namSinh: '2009', lop: '12' },
+      { sbd: '12042', hoTen: 'Nguyễn Thành Đồng', namSinh: '2009', lop: '12' },
+    ])
+    expect(docDanhSachTuCsv(K2010, HOM_NAY).map((e) => e.lop)).toEqual(['11', '11'])
+  })
+
+  it('bỏ dòng rác: dòng trống, dòng tổng, dòng ghi chú không có số báo danh', () => {
+    const ban = 'SBD,HoTen,NamSinh\n12000,A,2009\n,Tổng cộng,\n\nghi chú,B,2009\n12001,C,2009\n'
+    expect(docDanhSachTuCsv(ban, HOM_NAY).map((e) => e.sbd)).toEqual(['12000', '12001'])
+  })
+
+  it('sheet rỗng hoặc chỉ có tiêu đề thì trả mảng rỗng, không ném', () => {
+    expect(docDanhSachTuCsv('', HOM_NAY)).toEqual([])
+    expect(docDanhSachTuCsv('SBD,HoTen,NamSinh\n', HOM_NAY)).toEqual([])
+  })
+})
+
+describe('taiDanhSachTuLink / gomDanhSachTuLink', () => {
+  const csv = (t: string) => async () => ({ ok: true, status: 200, text: async () => t })
+
+  it('link trả HTML (chưa Xuất bản lên web) bị nhận ra, không bóc bừa', async () => {
+    const tai = (async () => ({ ok: true, status: 200, text: async () => '<!DOCTYPE html><html>…' })) as unknown as typeof fetch
+    const kq = await taiDanhSachTuLink('https://docs.google.com/spreadsheets/d/e/A/pubhtml', tai)
+    expect(kq.items).toEqual([])
+    expect(kq.loi).toMatch(/HTML/)
+  })
+
+  it('mã lỗi HTTP nói rõ phải bật Xuất bản lên web', async () => {
+    const tai = (async () => ({ ok: false, status: 404, text: async () => '' })) as unknown as typeof fetch
+    expect((await taiDanhSachTuLink('https://docs.google.com/spreadsheets/d/e/A/pubhtml', tai)).loi).toMatch(/404[\s\S]*Xuất bản lên web/)
+  })
+
+  it('mất mạng thì báo lỗi, KHÔNG trả danh sách rỗng coi như thành công', async () => {
+    const tai = (async () => {
+      throw new Error('Failed to fetch')
+    }) as unknown as typeof fetch
+    const kq = await taiDanhSachTuLink('https://docs.google.com/spreadsheets/d/e/A/pubhtml', tai)
+    expect(kq.items).toEqual([])
+    expect(kq.loi).toMatch(/Không tải được/)
+  })
+
+  it('số báo danh trùng giữa hai khối: giữ dòng của link đứng trước và ghi lại', async () => {
+    const tai = (async (u: string) =>
+      String(u).includes('/A/')
+        ? { ok: true, status: 200, text: async () => 'SBD,HoTen,NamSinh\n12000,Bản A,2009\n' }
+        : { ok: true, status: 200, text: async () => 'SBD,HoTen,NamSinh\n12000,Bản B,2009\n11000,Em khối 11,2010\n' }) as unknown as typeof fetch
+    const kq = await gomDanhSachTuLink(['https://docs.google.com/spreadsheets/d/e/A/pubhtml', 'https://docs.google.com/spreadsheets/d/e/B/pubhtml'], tai, HOM_NAY)
+    expect(kq.items.map((e) => e.hoTen)).toEqual(['Bản A', 'Em khối 11'])
+    expect(kq.trung).toEqual(['12000'])
+    expect(kq.hong).toEqual([])
+  })
+
+  it('MỘT LINK HỎNG thì `hong` có dòng — màn hình dừng, chưa đẩy gì', async () => {
+    const tai = (async (u: string) =>
+      String(u).includes('/A/') ? { ok: true, status: 200, text: async () => 'SBD,HoTen,NamSinh\n12000,A,2009\n' } : { ok: false, status: 404, text: async () => '' }) as unknown as typeof fetch
+    const kq = await gomDanhSachTuLink(['https://docs.google.com/spreadsheets/d/e/A/pubhtml', 'https://docs.google.com/spreadsheets/d/e/B/pubhtml'], tai, HOM_NAY)
+    expect(kq.hong).toHaveLength(1)
+    expect(kq.items).toHaveLength(1)
+  })
+
+  it('màn hình PHẢI dừng khi có link hỏng — khoá bằng chính mã của nút', () => {
     // Ghi đè bằng danh sách thiếu một khối thì cả khối đó bị cổng vào thi chặn
-    // sạch ngay buổi sau — hỏng nặng hơn nhiều so với việc sửa lại link.
-    expect(than).toContain('chưa ghi đè gì cả')
-    const viTriChan = than.indexOf('linkHong.length')
-    const viTriGhi = than.indexOf('shDB.clear()')
-    expect(viTriChan).toBeGreaterThan(0)
-    expect(viTriGhi).toBeGreaterThan(viTriChan)
+    // sạch buổi sau. Nặng hơn nhiều so với việc thầy sửa lại một cái link.
+    const nut = fs.readFileSync(path.join(process.cwd(), 'src/components/NutDongBoDanhSach.tsx'), 'utf8')
+    const than = nut.slice(nut.indexOf('const chay = async'), nut.indexOf('const luuVaChay'))
+    expect(than.indexOf('gom.hong.length')).toBeLessThan(than.indexOf('napDanhSachLop('))
+    expect(than).toContain('return bao({ kieu: \'loi\'')
   })
 
-  it('danh sách rỗng cũng không được ghi đè', () => {
-    expect(than).toContain('if (!gom.length) return jsonResponse_({ ok: false')
-  })
-
-  it('đòi mã bí mật, và KHÔNG đụng sheet HocSinh', () => {
-    expect(than).toContain('kiemTraMaBiMat_(body)')
-    expect(than).not.toContain('sheetHS_()')
-  })
-
-  it('báo ra em thêm, em bị bỏ, em đổi tên — không nói "đã xong" suông', () => {
-    expect(than).toContain('them: them')
-    expect(than).toContain('bo: bo')
-    expect(than).toContain('doiTen: doiTen')
-  })
-
-  it('số báo danh trùng giữa hai khối thì giữ dòng đầu và ghi lại', () => {
-    expect(than).toContain('if (daCoSbd[e.sbd]) { trung.push(e.sbd); continue }')
-  })
-
-  it('link lưu ở Script property nên đổi máy vẫn còn', () => {
-    expect(GS).toContain("var KHOA_LINK_DSLOP = 'LINK_DANH_SACH_LOP'")
-    expect(layHam('luuLinkDsLop_')).toContain('PropertiesService.getScriptProperties().setProperty')
-  })
-
-  it('chỉ nhận dòng có số báo danh dạng số, bỏ dòng rác', () => {
-    expect(layHam('tuLinkRaDanhSach_')).toContain('/^\\d{3,12}$/.test(sbd)')
+  it('tải hết ba link rồi mới ghi — không ghi từng phần', async () => {
+    const goi: string[] = []
+    const tai = (async (u: string) => {
+      goi.push(String(u))
+      return csv('SBD,HoTen,NamSinh\n1200' + goi.length + ',E,2009\n')()
+    }) as unknown as typeof fetch
+    const kq = await gomDanhSachTuLink(['https://docs.google.com/spreadsheets/d/e/A/pubhtml', 'https://docs.google.com/spreadsheets/d/e/B/pubhtml', 'https://docs.google.com/spreadsheets/d/e/C/pubhtml'], tai, HOM_NAY)
+    expect(goi).toHaveLength(3)
+    expect(goi.every((u) => u.includes('output=csv'))).toBe(true)
+    expect(kq.items).toHaveLength(3)
   })
 })
 
-describe('máy khách', () => {
+describe('máy chủ', () => {
+  it('KHÔNG gọi UrlFetchApp nữa — không kéo theo quyền script.external_request', () => {
+    // Đây là ràng buộc, không phải chi tiết: thêm quyền là phải xin lại uỷ
+    // quyền cho cả ứng dụng web, mà uỷ quyền dở dang thì em đang thi bị chặn.
+    expect(GS.replace(/\/\/.*$/gm, '')).not.toContain('UrlFetchApp')
+  })
+
+  it('lệnh link chỉ giữ link, đòi mã bí mật', () => {
+    const than = GS.slice(GS.indexOf("if (action === 'linkDanhSachLop'"), GS.indexOf("if (action === 'huyDuyet')"))
+    expect(than).toContain('kiemTraMaBiMat_(body)')
+    expect(than).toContain('luuLinkDsLop_(dsLK)')
+    expect(GS).toContain("var KHOA_LINK_DSLOP = 'LINK_DANH_SACH_LOP'")
+  })
+
+  it('napDanhSachLop so bản cũ TRƯỚC khi ghi đè và báo ra em thêm / em bị bỏ', () => {
+    const than = GS.slice(GS.indexOf("if (action === 'napDanhSachLop')"), GS.indexOf("if (action === 'linkDanhSachLop'"))
+    expect(than.indexOf('docDanhSachLop_()')).toBeLessThan(than.indexOf('sh.clear()'))
+    expect(than).toContain('them: themDS')
+    expect(than).toContain('bo: boDS')
+    expect(than).toContain('doiTen: doiTenDS')
+    // Danh sách rỗng thì tuyệt đối không ghi đè.
+    expect(than).toContain("if (!rows.length) return jsonResponse_({ ok: false")
+  })
+})
+
+describe('máy khách — lệnh gửi đi', () => {
   function gia(tra: unknown) {
     const goi = vi.fn(async () => ({ ok: true, json: async () => tra }))
     vi.stubGlobal('fetch', goi)
@@ -169,45 +222,29 @@ describe('máy khách', () => {
     expect(tachLink('')).toEqual([])
   })
 
-  it('bỏ trống links thì máy chủ dùng bộ đang lưu — không xoá mất link cũ', async () => {
-    const goi = gia({ ok: true, soDong: 250, links: ['a'] })
-    await dongBoDanhSachLop('https://x', 'MAT')
-    const b = JSON.parse((goi.mock.calls[0][1] as { body: string }).body)
-    expect(b).toEqual({ action: 'dongBoDanhSachLop', secret: 'MAT' })
-    expect(Object.keys(b)).not.toContain('links')
+  it('luuLinkDanhSachLop gửi đúng lệnh và bộ link', async () => {
+    const goi = gia({ ok: true, links: ['a', 'b'] })
+    expect(await luuLinkDanhSachLop('https://x', 'MAT', ['a', 'b'])).toEqual(['a', 'b'])
+    expect(JSON.parse((goi.mock.calls[0][1] as { body: string }).body)).toEqual({ action: 'luuLinkDanhSachLop', secret: 'MAT', links: ['a', 'b'] })
   })
 
-  it('truyền links thì gửi lên để lưu', async () => {
-    const goi = gia({ ok: true, soDong: 250, links: ['a', 'b'] })
-    await dongBoDanhSachLop('https://x', 'MAT', ['a', 'b'])
-    const b = JSON.parse((goi.mock.calls[0][1] as { body: string }).body)
-    expect(b.links).toEqual(['a', 'b'])
-  })
-
-  it('lỗi của máy chủ kèm lý do TỪNG LINK, không nuốt mất', async () => {
-    gia({ ok: false, error: 'Không tải được 1/3 link — chưa ghi đè gì cả', theoLink: [{ link: 'a', so: 0, loi: 'Máy chủ Google trả mã 404' }, { link: 'b', so: 90, loi: '' }] })
-    await expect(dongBoDanhSachLop('https://x', 'MAT')).rejects.toThrow(/404/)
-  })
-
-  it('máy chủ cũ chưa có lệnh linkDanhSachLop thì ném lỗi rõ ràng', async () => {
+  it('máy chủ cũ chưa có lệnh thì ném lỗi rõ ràng, không trả rỗng im lặng', async () => {
     gia({ ok: false, error: 'Thiếu hoặc sai tham số action' })
     await expect(linkDanhSachLop('https://x', 'MAT')).rejects.toThrow(/Thiếu hoặc sai tham số action/)
   })
 
+  it('napDanhSachLop đọc được ba trường mới, máy chủ cũ thì trả mảng rỗng', async () => {
+    gia({ ok: true, soDong: 250, them: [{ sbd: '12050', hoTen: 'A' }], bo: [], doiTen: [] })
+    expect(await napDanhSachLop('https://x', 'MAT', [])).toMatchObject({ soDong: 250, them: [{ sbd: '12050', hoTen: 'A' }], bo: [], doiTen: [] })
+    gia({ ok: true, soDong: 250 })
+    expect(await napDanhSachLop('https://x', 'MAT', [])).toMatchObject({ soDong: 250, them: [], bo: [], doiTen: [] })
+  })
+
   it('tomTatDongBo nêu ĐỦ SỐ, nhất là số em bị bỏ khỏi danh sách', () => {
-    expect(
-      tomTatDongBo({
-        soDong: 250,
-        links: [],
-        theoLink: [],
-        trung: ['12000'],
-        them: [{ sbd: '12050', hoTen: 'A' }],
-        bo: [{ sbd: '12001', hoTen: 'B' }, { sbd: '12002', hoTen: 'C' }],
-        doiTen: [],
-        capNhatLuc: '',
-      }),
-    ).toBe('250 em · +1 mới · −2 bỏ · 1 SBD trùng')
-    expect(tomTatDongBo({ soDong: 250, links: [], theoLink: [], trung: [], them: [], bo: [], doiTen: [], capNhatLuc: '' })).toBe('250 em')
+    expect(tomTatDongBo({ soDong: 250, them: [{ sbd: '12050', hoTen: 'A' }], bo: [{ sbd: '12001', hoTen: 'B' }, { sbd: '12002', hoTen: 'C' }], doiTen: [] }, 1)).toBe(
+      '250 em · +1 mới · −2 bỏ · 1 SBD trùng',
+    )
+    expect(tomTatDongBo({ soDong: 250, them: [], bo: [], doiTen: [] })).toBe('250 em')
   })
 })
 

@@ -894,61 +894,49 @@ export async function danhSachYeuCau(scriptUrl: string, secret: string, tatCa = 
  * đó. Sheet danh sách lớp của thầy là nguồn sự thật; đây là bản sao chỉ-đọc để
  * máy chủ điền HỌ TÊN, NĂM SINH, LỚP cho em vào thi lần đầu. Ghi đè toàn bộ mỗi
  * lần đẩy. KHÔNG đụng tới điểm hay hồ sơ đã có. */
+export interface KetQuaNapDanhSach {
+  soDong: number
+  /** Em có trong bản mới mà bản cũ chưa có. */
+  them: { sbd: string; hoTen: string }[]
+  /** Em BỊ BỎ khỏi danh sách — từ giờ đứng ngoài phòng thi. Thầy phải nhìn thấy. */
+  bo: { sbd: string; hoTen: string }[]
+  doiTen: { sbd: string; cu: string; moi: string }[]
+}
+
 export async function napDanhSachLop(
   scriptUrl: string,
   secret: string,
   items: { sbd: string; hoTen: string; namSinh: string; lop: string }[],
-): Promise<{ soDong: number }> {
+): Promise<KetQuaNapDanhSach> {
   const r = await postJson(scriptUrl, { action: 'napDanhSachLop', secret, items })
   if (!r.ok) throw new Error(r.error || 'Không đẩy được danh sách lớp')
-  return { soDong: Number(r.soDong) || 0 }
+  return {
+    soDong: Number(r.soDong) || 0,
+    // Máy chủ cũ chưa trả ba trường này ⇒ mảng rỗng, màn hình không vỡ.
+    them: Array.isArray(r.them) ? (r.them as KetQuaNapDanhSach['them']) : [],
+    bo: Array.isArray(r.bo) ? (r.bo as KetQuaNapDanhSach['bo']) : [],
+    doiTen: Array.isArray(r.doiTen) ? (r.doiTen as KetQuaNapDanhSach['doiTen']) : [],
+  }
 }
 
-/** Kết quả một lượt đồng bộ danh sách lớp từ link Google Sheet của thầy. */
-export interface KetQuaDongBoDsLop {
-  soDong: number
-  links: string[]
-  theoLink: { link: string; so: number; loi: string }[]
-  trung: string[]
-  them: { sbd: string; hoTen: string }[]
-  bo: { sbd: string; hoTen: string }[]
-  doiTen: { sbd: string; cu: string; moi: string }[]
-  capNhatLuc: string
-}
-
-/** Link danh sách lớp thầy đã lưu trên máy chủ (mỗi khối một link). */
+/** Link danh sách lớp thầy đã lưu trên máy chủ (mỗi khối một link).
+ *
+ * Máy chủ chỉ GIỮ LINK hộ, không tải: `UrlFetchApp` đòi thêm quyền
+ * `script.external_request`, mà thêm quyền là phải xin lại uỷ quyền cho cả ứng
+ * dụng web — làm giữa buổi dạy thì chặn hết em đang thi. Máy thầy tự tải, tệp
+ * "Xuất bản lên web" của Google có gắn nhãn CORS nên đọc thẳng được. */
 export async function linkDanhSachLop(scriptUrl: string, secret: string): Promise<string[]> {
   const r = await postJson(scriptUrl, { action: 'linkDanhSachLop', secret })
   if (!r.ok) throw new Error(r.error || 'Không đọc được link danh sách')
   return Array.isArray(r.links) ? (r.links as unknown[]).map((x) => String(x)) : []
 }
 
-/** ĐỒNG BỘ DANH SÁCH LỚP TỪ GOOGLE SHEET CỦA THẦY (thầy chốt 07/09).
- *
- * Truyền `links` để lưu lại bộ link mới; bỏ trống để dùng bộ đang lưu.
- *
- * MÁY CHỦ TẢI SHEET, KHÔNG PHẢI MÁY THẦY: Google không gắn nhãn CORS cho tệp
- * CSV xuất bản nên trình duyệt đọc thẳng là hỏng. Đổi lại, thầy đồng bộ được
- * từ điện thoại giữa buổi dạy mà không cần mở máy tính. */
-export async function dongBoDanhSachLop(scriptUrl: string, secret: string, links?: string[]): Promise<KetQuaDongBoDsLop> {
-  const goi: Record<string, unknown> = { action: 'dongBoDanhSachLop', secret }
-  if (links) goi.links = links
-  const r = await postJson(scriptUrl, goi)
-  if (!r.ok) {
-    const theo = Array.isArray(r.theoLink) ? (r.theoLink as { link: string; loi: string }[]) : []
-    const chiTiet = theo.filter((t) => t.loi).map((t) => t.loi)
-    throw new Error([r.error || 'Không đồng bộ được danh sách', ...chiTiet].join(' — '))
-  }
-  return {
-    soDong: Number(r.soDong) || 0,
-    links: Array.isArray(r.links) ? (r.links as unknown[]).map((x) => String(x)) : [],
-    theoLink: Array.isArray(r.theoLink) ? (r.theoLink as KetQuaDongBoDsLop['theoLink']) : [],
-    trung: Array.isArray(r.trung) ? (r.trung as unknown[]).map((x) => String(x)) : [],
-    them: Array.isArray(r.them) ? (r.them as KetQuaDongBoDsLop['them']) : [],
-    bo: Array.isArray(r.bo) ? (r.bo as KetQuaDongBoDsLop['bo']) : [],
-    doiTen: Array.isArray(r.doiTen) ? (r.doiTen as KetQuaDongBoDsLop['doiTen']) : [],
-    capNhatLuc: String(r.capNhatLuc || ''),
-  }
+/** Lưu bộ link để lần sau thầy chỉ bấm Đồng bộ. Lưu ở Script property nên đổi
+ * máy, mở app trên điện thoại vẫn còn. */
+export async function luuLinkDanhSachLop(scriptUrl: string, secret: string, links: string[]): Promise<string[]> {
+  const r = await postJson(scriptUrl, { action: 'luuLinkDanhSachLop', secret, links })
+  if (!r.ok) throw new Error(r.error || 'Không lưu được link danh sách')
+  return Array.isArray(r.links) ? (r.links as unknown[]).map((x) => String(x)) : []
 }
 
 export async function danhDauYeuCau(scriptUrl: string, secret: string, id: string, trangThai: 'xong' | 'huy', maCa = ''): Promise<void> {

@@ -8,15 +8,19 @@
 // Nay: thầy dán link mỗi khối một dòng, bấm Lưu link. Từ đó về sau sửa sổ xong
 // chỉ bấm Đồng bộ. Link nằm trên máy chủ nên đổi máy, đổi điện thoại vẫn còn.
 //
-// MÁY CHỦ TẢI SHEET, KHÔNG PHẢI MÁY THẦY: Google không gắn nhãn CORS cho tệp
-// CSV xuất bản, trình duyệt đọc thẳng là hỏng. Đổi lại, thầy đồng bộ được từ
-// điện thoại giữa buổi dạy.
+// MÁY THẦY TẢI SHEET, MÁY CHỦ CHỈ GIỮ LINK. Bản đầu để Apps Script tải cho
+// gọn; đo trên máy chủ thật thì hỏng vì `UrlFetchApp` đòi thêm quyền
+// `script.external_request`, mà thêm quyền là phải xin lại uỷ quyền cho cả ứng
+// dụng web — làm giữa buổi dạy thì chặn hết em đang thi. Tệp "Xuất bản lên web"
+// của Google CÓ gắn nhãn CORS nên trình duyệt đọc thẳng được; đẩy lên bằng
+// `napDanhSachLop` vốn đã có quyền từ trước.
 //
 // Nút giữ nguyên hình dáng và ba trạng thái của nút Đồng bộ kho đề — thầy không
 // phải học hai kiểu thao tác.
 import { useEffect, useRef, useState } from 'react'
 import { RefreshCw, Check, AlertCircle, Link2 } from 'lucide-react'
-import { dongBoDanhSachLop, linkDanhSachLop, type KetQuaDongBoDsLop } from '../lib/exam-api'
+import { linkDanhSachLop, luuLinkDanhSachLop, napDanhSachLop, type KetQuaNapDanhSach } from '../lib/exam-api'
+import { gomDanhSachTuLink } from '../lib/danh-sach-tu-link'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 
 type TrangThai = { kieu: 'nghi' } | { kieu: 'chay' } | { kieu: 'xong'; chu: string } | { kieu: 'loi'; chu: string }
@@ -36,12 +40,12 @@ export function tachLink(van: string): string[] {
 
 /** Một dòng tóm tắt CÓ SỐ cho thầy đối chiếu với sổ. Không nói "đã đồng bộ" suông:
  * em thêm và em bị bỏ là hai con số thầy phải nhìn thấy. */
-export function tomTatDongBo(kq: KetQuaDongBoDsLop): string {
+export function tomTatDongBo(kq: KetQuaNapDanhSach, soTrung = 0): string {
   const phan = [`${kq.soDong} em`]
   if (kq.them.length) phan.push(`+${kq.them.length} mới`)
   if (kq.bo.length) phan.push(`−${kq.bo.length} bỏ`)
   if (kq.doiTen.length) phan.push(`${kq.doiTen.length} đổi tên`)
-  if (kq.trung.length) phan.push(`${kq.trung.length} SBD trùng`)
+  if (soTrung) phan.push(`${soTrung} SBD trùng`)
   return phan.join(' · ')
 }
 
@@ -98,15 +102,31 @@ export default function NutDongBoDanhSach({
     try {
       const [url, secret] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
       if (!url.trim() || !secret.trim()) return bao({ kieu: 'loi', chu: 'Chưa cấu hình máy chủ' })
-      const kq = await dongBoDanhSachLop(url.trim(), secret.trim(), linkMoi)
-      setLinks(kq.links)
-      setNhap(kq.links.join('\n'))
+
+      const ds = linkMoi ?? links ?? (await linkDanhSachLop(url.trim(), secret.trim()))
+      if (!ds.length) {
+        setMoBang(true)
+        return bao({ kieu: 'loi', chu: 'Chưa lưu link nào' })
+      }
+
+      // TẢI TRƯỚC, GHI SAU. Một link hỏng là dừng hẳn: ghi đè bằng danh sách
+      // thiếu một khối thì cả khối đó bị cổng vào thi chặn sạch buổi sau.
+      const gom = await gomDanhSachTuLink(ds)
+      if (gom.hong.length) {
+        return bao({ kieu: 'loi', chu: `Hỏng ${gom.hong.length}/${ds.length} link: ${gom.hong[0].loi}`.slice(0, 90) })
+      }
+      if (!gom.items.length) return bao({ kieu: 'loi', chu: 'Không dòng nào có số báo danh' })
+
+      if (linkMoi) await luuLinkDanhSachLop(url.trim(), secret.trim(), linkMoi)
+      const kq = await napDanhSachLop(url.trim(), secret.trim(), gom.items)
+      setLinks(ds)
+      setNhap(ds.join('\n'))
       setMoBang(false)
-      const tom = tomTatDongBo(kq)
+      const tom = tomTatDongBo(kq, gom.trung.length)
       onXong?.(kq.soDong, tom)
       // Em bị BỎ khỏi danh sách là em đó đứng ngoài phòng thi từ giờ. Không
       // trộn vào lời báo "xong" màu xanh — thầy phải nhìn thấy.
-      bao(kq.bo.length || kq.trung.length ? { kieu: 'loi', chu: tom } : { kieu: 'xong', chu: tom })
+      bao(kq.bo.length || gom.trung.length ? { kieu: 'loi', chu: tom } : { kieu: 'xong', chu: tom })
     } catch (e) {
       bao({
         kieu: 'loi',
