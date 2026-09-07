@@ -125,3 +125,22 @@ describe('phieuCuaEm — CHỈ hỏi số báo danh', () => {
   })
 })
 
+
+describe('ĐỀ TRẢ VỀ PHẢI CÓ ĐÁP ÁN', () => {
+  // Lần thử đầu 07/09: máy chủ trả `bankRef` — bản GỬI MÁY EM lúc thi, đã lược
+  // sạch đáp án. Câu Phần II không có `correct` nên bước chấm lại nổ ở
+  // `q.correct.join('')` và em nhìn thấy "Màn Làm bài gặp lỗi".
+  it('bản lược đáp án bị nhận ra: câu Phần II thiếu `correct`', () => {
+    const luoc = { phanI: [{ id: 'a', text: 't', choices: ['1', '2', '3', '4'] }], phanII: [{ id: 'b', text: 't', ideas: ['1', '2', '3', '4'] }], phanIII: [{ id: 'c', text: 't' }] }
+    const day = { phanI: [{ id: 'a', text: 't', choices: ['1', '2', '3', '4'], correct: 'A' }], phanII: [{ id: 'b', text: 't', ideas: ['1', '2', '3', '4'], correct: ['D', 'S', 'D', 'S'] }], phanIII: [{ id: 'c', text: 't', correct: '1' }] }
+    const co = (b: { phanI: { correct?: unknown }[]; phanII: { correct?: unknown }[]; phanIII: { correct?: unknown }[] }) => {
+      if (b.phanII.length > 0 && !Array.isArray(b.phanII[0]?.correct)) return false
+      if (b.phanI.length > 0 && !b.phanI[0]?.correct) return false
+      if (b.phanIII.length > 0 && b.phanIII[0]?.correct === undefined) return false
+      return b.phanI.length + b.phanII.length + b.phanIII.length > 0
+    }
+    expect(co(luoc)).toBe(false)
+    expect(co(day)).toBe(true)
+    expect(co({ phanI: [], phanII: [], phanIII: [] })).toBe(false)
+  })
+})

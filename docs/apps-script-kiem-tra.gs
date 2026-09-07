@@ -2006,6 +2006,10 @@ function doPost(e) {
       }
     }
 
+    if (!caXD.keyBankRef) {
+      return jsonResponse_({ ok: false, lyDo: 'chua_cong_bo', error: 'Ca này chưa công bố đáp án — hỏi Thầy' })
+    }
+
     const hsXD = hoSoHocSinh_(sbdXD)
     return jsonResponse_({
       ok: true,
@@ -2030,7 +2034,15 @@ function doPost(e) {
         soLanRoiMan: luotXD.soLanRoiMan || 0,
         tongGiayRoiMan: luotXD.tongGiayRoiMan || 0,
       },
-      bank: docJsonLon_(caXD.bankRef),
+      // NGÂN HÀNG CÓ ĐÁP ÁN (`keyBankRef`), KHÔNG phải `bankRef`.
+      //
+      // `bankRef` là bản GỬI CHO MÁY EM lúc thi — đã lược sạch đáp án, câu Phần
+      // II không có trường `correct`. Trả bản đó thì máy em chấm lại là nổ
+      // (`q.correct.join` trên undefined) — đo được ngay lần thử đầu 07/09.
+      //
+      // Thiếu `keyBankRef` (ca thầy đặt "không công bố điểm") thì trả null và
+      // nói rõ, chứ không đưa bản không chấm được rồi để em nhìn màn hỏng.
+      bank: caXD.keyBankRef ? docJsonLon_(caXD.keyBankRef) : null,
     })
   }
 

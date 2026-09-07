@@ -665,6 +665,14 @@ export default function ExamTakeScreen() {
     if (existing.pendingSubmit) trySend(existing)
   }
 
+  /** Ngân hàng nhận về có đáp án thật không — xem ghi chú trong `moLaiTuMayChu`. */
+  const coDapAn = (b: KeyBank): boolean => {
+    if (b.phanII.length > 0 && !Array.isArray(b.phanII[0]?.correct)) return false
+    if (b.phanI.length > 0 && !b.phanI[0]?.correct) return false
+    if (b.phanIII.length > 0 && b.phanIII[0]?.correct === undefined) return false
+    return b.phanI.length + b.phanII.length + b.phanIII.length > 0
+  }
+
   /** MỞ LẠI BÀI ĐÃ NỘP TỪ MÁY CHỦ — chế độ xem điểm.
    *
    * Máy này không cần giữ gì: đáp án của em, ngân hàng CÓ đáp án của ca và mốc
@@ -681,6 +689,11 @@ export default function ExamTakeScreen() {
     try {
       const b = await layBaiDaNop(url, ma, sb)
       if (!b.bank) throw new Error('Máy chủ chưa gửi đề của ca này — báo Thầy.')
+      // ĐỀ PHẢI CÓ ĐÁP ÁN. Máy chủ có hai bản: bản gửi máy em lúc thi đã lược
+      // sạch đáp án, bản `keyBank` mới có. Nhận nhầm bản lược thì bước chấm lại
+      // nổ giữa chừng và em nhìn thấy màn "Màn Làm bài gặp lỗi" — đúng cái đã
+      // xảy ra lần thử đầu 07/09. Kiểm ở đây để nói được câu người đọc hiểu.
+      if (!coDapAn(b.bank)) throw new Error('Ca này chưa công bố đáp án — hỏi Thầy.')
       setBank(b.bank)
       setLop(b.lop)
       if (b.hoTen) setHoTen(b.hoTen)
