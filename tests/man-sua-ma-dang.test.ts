@@ -10,7 +10,7 @@ import { resolve } from 'node:path'
 import type { TeacherExamSource } from '../src/data/examContent'
 import { thongKeDang, dsCauCoMa, LY_DO_CHUONG_PHU } from '../src/lib/thong-ke-dang'
 import { apDungSoSua, boSua, ghiSua, xuatSo, LY_DO_THAY_BO, type SoSuaDang } from '../src/lib/sua-dang'
-import { CO_CHE, VIEC, maTrongTuVung, tenCua, chuongCua } from '../src/lib/tu-vung-dang'
+import { CO_CHE, TEN_CHUONG, VIEC, maTrongTuVung, tenCua, chuongCua } from '../src/lib/tu-vung-dang'
 import { maDangHopLe } from '../src/lib/cau-hinh-chua'
 
 const doc = (f: string) => readFileSync(resolve(__dirname, '..', f), 'utf8')
@@ -62,10 +62,29 @@ describe('từ vựng đóng — app không được tự nghĩ mã', () => {
     expect(chuongCua('hỏng')).toBe('')
   })
 
+  // Con số cập nhật 07/09/2026 khi mở bảng cơ chế cho 13 chương phụ:
+  // 23 -> 25 việc (thêm XAC_DINH_SO_OXI_HOA, TINH_SUC_DIEN_DONG),
+  // 5 -> 18 chương, 37 -> 104 cơ chế. Đây là bảng ĐÓNG nên số phải khớp đúng
+  // `kho-de/DANG-BAI.md`; lệch một mã là app dựng ô chọn thiếu mã cho thầy.
   it('bảng trong app khớp bảng trong kho-de/DANG-BAI.md về số lượng', () => {
-    expect(Object.keys(VIEC)).toHaveLength(23)
-    expect(Object.keys(CO_CHE)).toHaveLength(5)
-    expect(Object.values(CO_CHE).reduce((a, c) => a + Object.keys(c).length, 0)).toBe(37)
+    expect(Object.keys(VIEC)).toHaveLength(25)
+    expect(Object.keys(CO_CHE)).toHaveLength(18)
+    expect(Object.values(CO_CHE).reduce((a, c) => a + Object.keys(c).length, 0)).toBe(104)
+  })
+
+  it('mọi chương đều có tên tiếng Việt để thầy đọc, không chương nào trơ mã', () => {
+    for (const ch of Object.keys(CO_CHE)) expect(TEN_CHUONG[ch]).toBeTruthy()
+    expect(Object.keys(TEN_CHUONG)).toHaveLength(Object.keys(CO_CHE).length)
+  })
+
+  it('mã của 13 chương mới đọc ra tiếng Việt, không trả lại mã trần', () => {
+    expect(tenCua('DIEN_PHAN.PIN_GALVANI.TINH_SUC_DIEN_DONG')).toBe('Pin Galvani, sức điện động — tính sức điện động')
+    expect(tenCua('OXI_HOA_KHU.SO_OXI_HOA.XAC_DINH_SO_OXI_HOA')).toBe('Số oxi hoá — xác định số oxi hoá')
+    expect(tenCua('KIM_LOAI_IA_IIA.NUOC_CUNG.NHAN_DANG')).toBe('Nước cứng — nhận dạng')
+    expect(chuongCua('POLYMER.TRUNG_NGUNG.NHAN_DANG')).toBe('POLYMER')
+    // Cơ chế của chương khác vẫn phải bị từ chối: bảng đóng theo TỪNG chương.
+    expect(maTrongTuVung('POLYMER.THUY_PHAN_BASE.NHAN_DANG')).toBe(false)
+    expect(maTrongTuVung('LIEN_KET.CAU_TAO.NHAN_DANG')).toBe(false)
   })
 })
 

@@ -25,6 +25,7 @@ export const VIEC: Record<string, string> = {
   XAC_DINH_CTPT: 'xác định công thức phân tử',
   XAC_DINH_CHIEU: 'xác định chiều',
   NEU_HIEN_TUONG: 'nêu hiện tượng',
+  XAC_DINH_SO_OXI_HOA: 'xác định số oxi hoá',
   TINH_KHOI_LUONG: 'tính khối lượng',
   TINH_SO_MOL: 'tính số mol',
   TINH_THE_TICH: 'tính thể tích',
@@ -34,6 +35,7 @@ export const VIEC: Record<string, string> = {
   TINH_CHI_SO: 'tính chỉ số',
   TINH_NANG_LUONG: 'tính năng lượng',
   TINH_PHAN_TRAM: 'tính phần trăm',
+  TINH_SUC_DIEN_DONG: 'tính sức điện động',
 }
 
 /** Tầng 1 + 2 — cơ chế, theo từng chương. */
@@ -85,6 +87,104 @@ export const CO_CHE: Record<string, Record<string, string>> = {
     PROTEIN: 'Protein',
     POLYMER_N: 'Polymer chứa N',
   },
+
+  // MƯỜI BA CHƯƠNG MỞ BẢNG 07/09/2026. Trước đó các chương này chỉ có tên,
+  // 262 câu trong kho mang `dang: null` vì "chương chưa có bảng cơ chế" — ca
+  // thi dùng bộ 12-BD7 chỉ có 26/84 câu có mã nên phiếu không rút được câu
+  // chữa nào. Bảng dựng từ việc đọc tay đủ 262 câu đó, chép y `DANG-BAI.md`.
+  KIM_LOAI_IA_IIA: {
+    TINH_CHAT_KIM_LOAI: 'Tính chất kim loại IA, IIA',
+    MAU_NGON_LUA: 'Màu ngọn lửa',
+    DO_TAN: 'Độ tan hợp chất',
+    NHIET_PHAN: 'Nhiệt phân muối carbonate',
+    NUOC_CUNG: 'Nước cứng',
+    SAN_XUAT: 'Solvay, chlorine – kiềm',
+    HOP_CHAT: 'Hợp chất và ứng dụng',
+  },
+  KIM_LOAI: {
+    LIEN_KET_KIM_LOAI: 'Liên kết kim loại, tinh thể',
+    TINH_CHAT_VAT_LI: 'Tính chất vật lí',
+    TINH_KHU: 'Tính khử, dãy điện hoá',
+    DIEU_CHE: 'Tách và điều chế kim loại',
+    AN_MON: 'Ăn mòn và chống ăn mòn',
+    HOP_KIM: 'Hợp kim',
+    UNG_DUNG: 'Ứng dụng kim loại',
+  },
+  POLYMER: {
+    CAU_TAO: 'Cấu tạo, mắt xích',
+    DANH_PHAP: 'Tên gọi polymer',
+    TRUNG_HOP: 'Trùng hợp',
+    TRUNG_NGUNG: 'Trùng ngưng',
+    PHAN_LOAI: 'Phân loại polymer, tơ',
+    TINH_CHAT: 'Tính chất polymer',
+    UNG_DUNG: 'Ứng dụng và môi trường',
+  },
+  DIEN_PHAN: {
+    THE_DIEN_CUC: 'Thế điện cực chuẩn',
+    PIN_GALVANI: 'Pin Galvani, sức điện động',
+    DIEN_PHAN_DD: 'Điện phân dung dịch',
+    DIEN_PHAN_NC: 'Điện phân nóng chảy',
+    MA_TINH_LUYEN: 'Mạ điện, tinh luyện',
+    AN_MON_DIEN_HOA: 'Ăn mòn điện hoá',
+    NGUON_DIEN: 'Nguồn điện hoá học khác',
+  },
+  PHUC_CHAT: {
+    KIM_LOAI_CHUYEN_TIEP: 'Kim loại chuyển tiếp dãy 1',
+    CAU_TAO_PHUC: 'Cấu tạo phức chất',
+    HINH_HOC: 'Dạng hình học phức chất',
+    MAU_SAC: 'Màu sắc phức chất',
+    TAO_PHUC: 'Phản ứng tạo phức',
+    CHUAN_DO: 'Chuẩn độ thuốc tím',
+  },
+  OXI_HOA_KHU: {
+    SO_OXI_HOA: 'Số oxi hoá',
+    CHAT_KHU_CHAT_OXH: 'Chất khử, chất oxi hoá',
+    HIEN_TUONG: 'Hiện tượng thí nghiệm',
+    CHUAN_DO: 'Chuẩn độ oxi hoá – khử',
+    HOP_CHAT_VO_CO: 'Hợp chất vô cơ thường gặp',
+  },
+  ALCOHOL_PHENOL: {
+    DAN_XUAT_HALOGEN: 'Dẫn xuất halogen',
+    CAU_TAO: 'Cấu tạo, đồng phân, danh pháp',
+    TINH_CHAT_ALCOHOL: 'Tính chất alcohol',
+    TINH_CHAT_PHENOL: 'Tính chất phenol',
+    UNG_DUNG: 'Điều chế và ứng dụng',
+  },
+  CARBONYL_ACID: {
+    CAU_TAO: 'Cấu tạo, đồng phân, danh pháp',
+    TINH_ACID: 'Tính acid',
+    PHAN_UNG_OXH: 'Tráng bạc, nhận biết',
+    DIEU_CHE: 'Điều chế, chuỗi chuyển hoá',
+    UNG_DUNG: 'Ứng dụng',
+  },
+  HYDROCARBON: {
+    CAU_TAO: 'Cấu tạo, đồng phân',
+    TINH_CHAT_VAT_LI: 'Tính chất vật lí',
+    PHAN_UNG: 'Phản ứng, nhận biết',
+    UNG_DUNG: 'Ứng dụng',
+  },
+  LIEN_KET: {
+    LIEN_KET_ION: 'Liên kết ion',
+    LIEN_KET_CHT: 'Liên kết cộng hoá trị',
+    LIEN_KET_HYDROGEN: 'Liên kết hydrogen',
+    VAN_DER_WAALS: 'Tương tác van der Waals',
+  },
+  NANG_LUONG_HH: {
+    TOA_THU_NHIET: 'Phản ứng toả nhiệt, thu nhiệt',
+    ENTHALPY_TAO_THANH: 'Nhiệt tạo thành',
+    NANG_LUONG_LIEN_KET: 'Năng lượng liên kết',
+    HESS: 'Định luật Hess',
+  },
+  TOC_DO: {
+    YEU_TO: 'Yếu tố ảnh hưởng tốc độ',
+    XUC_TAC: 'Xúc tác',
+    BIEU_THUC: 'Biểu thức tốc độ',
+  },
+  HUU_CO_DAI_CUONG: {
+    PHAN_LOAI: 'Phân loại hợp chất hữu cơ',
+    PHO: 'Phổ MS, phổ IR',
+    LAP_CTPT: 'Lập công thức phân tử',
+  },
 }
 
 /** Tên chương cho thầy đọc. */
@@ -94,6 +194,19 @@ export const TEN_CHUONG: Record<string, string> = {
   CAN_BANG: 'Cân bằng hoá học',
   CARBOHYDRATE: 'Carbohydrate',
   HOP_CHAT_N: 'Hợp chất chứa nitrogen',
+  KIM_LOAI_IA_IIA: 'Kim loại nhóm IA, IIA',
+  KIM_LOAI: 'Đại cương kim loại',
+  POLYMER: 'Polymer',
+  DIEN_PHAN: 'Pin điện và điện phân',
+  PHUC_CHAT: 'Kim loại chuyển tiếp và phức chất',
+  OXI_HOA_KHU: 'Phản ứng oxi hoá – khử',
+  ALCOHOL_PHENOL: 'Dẫn xuất halogen – alcohol – phenol',
+  CARBONYL_ACID: 'Hợp chất carbonyl – carboxylic acid',
+  HYDROCARBON: 'Hydrocarbon',
+  LIEN_KET: 'Liên kết hoá học',
+  NANG_LUONG_HH: 'Năng lượng hoá học',
+  TOC_DO: 'Tốc độ phản ứng',
+  HUU_CO_DAI_CUONG: 'Đại cương hoá hữu cơ',
 }
 
 export const DS_CHUONG = Object.keys(CO_CHE)
