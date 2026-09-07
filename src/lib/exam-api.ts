@@ -1189,6 +1189,26 @@ export async function guiCauHoi(scriptUrl: string, goi: GoiCauHoi): Promise<{ so
   return { soCau: Number(r.soCau) || 0, guiLuc: String(r.guiLuc || '') }
 }
 
+/** MÃ PHIẾU KẾT QUẢ CỦA CHÍNH EM trong một ca — cho link `/d/<mã ca>`.
+ *
+ * KHÔNG kèm mã bí mật, và cũng KHÔNG trả nội dung phiếu: chỉ trả mã, rồi máy em
+ * mở `/p#<mã>` bằng đúng lệnh `layPhieu` công khai đã có.
+ *
+ * Cổng danh tính y hệt lúc vào thi — phải khớp ĐỦ BA: số báo danh, họ tên, năm
+ * sinh với danh sách lớp thầy đã nạp. Biết mỗi số báo danh thì không lấy được
+ * gì, đúng như link vào thi. */
+export async function phieuCuaEm(
+  scriptUrl: string,
+  maCa: string,
+  sbd: string,
+  hoTen: string,
+  namSinh: string,
+): Promise<{ ma: string; maBaiTap: string; tong: number | null }> {
+  const r = await postJson(scriptUrl, { action: 'phieuCuaEm', maCa, sbd, hoTen, namSinh })
+  if (!r.ok) throw new Error(r.error || 'Không tìm được phiếu của em')
+  return { ma: String(r.ma || ''), maBaiTap: String(r.maBaiTap || ''), tong: r.tong === null || r.tong === undefined ? null : Number(r.tong) }
+}
+
 /** LỊCH SỬ ĐIỂM CỦA CHÍNH EM — để báo cáo sau thi vẽ đường tiến bộ.
  *
  * KHÔNG kèm mã bí mật: máy em không bao giờ có mã đó. Máy chủ khoá bằng hai

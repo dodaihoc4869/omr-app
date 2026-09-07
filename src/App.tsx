@@ -23,6 +23,7 @@ import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
 import GoiLenBangScreen from './screens/GoiLenBangScreen'
 import CauHoiScreen from './screens/CauHoiScreen'
 import PhieuScreen from './screens/PhieuScreen'
+import XemDiemScreen from './screens/XemDiemScreen'
 import KhoaAppScreen from './screens/KhoaAppScreen'
 import ChanLoi from './components/ChanLoi'
 
@@ -58,6 +59,9 @@ function App() {
   // app quản lý. Tính một lần lúc nạp, trước mọi hiệu ứng — máy phụ huynh
   // không được chạm vào IndexedDB, danh sách lớp hay hộp thư của thầy.
   const [laPhieu] = useState(() => docDuongVao(location.search, location.pathname).vai === 'phieu')
+  // LINK XEM ĐIỂM của em (`/d/<mã ca>`): cũng là máy của EM, không phải máy
+  // thầy — không hỏi mật khẩu, không đọc dữ liệu của thầy, không có cầu nối.
+  const [laXemDiem] = useState(() => docDuongVao(location.search, location.pathname).vai === 'diem')
   // MẬT KHẨU MỞ APP (MATKHAUMOAPP.md). CHỈ hỏi ở app quản lý của thầy — vào
   // thi, báo cáo phụ huynh, link riêng cũ đều không bao giờ bị hỏi.
   const [canHoi] = useState(() => laManThayQuanLy(location.search, location.pathname))
@@ -142,27 +146,27 @@ function App() {
   // Điều kiện `canHoi` là quan trọng: màn vào thi của em, báo cáo phụ huynh và
   // link cũ đều KHÔNG được có cầu nối — những máy đó không phải máy thầy.
   useEffect(() => {
-    if (!canHoi || linkCu || laPhieu || khoa !== 'da_mo') {
+    if (!canHoi || linkCu || laPhieu || laXemDiem || khoa !== 'da_mo') {
       goCauNoi()
       return
     }
     ganCauNoi()
     return () => goCauNoi()
-  }, [canHoi, linkCu, laPhieu, khoa])
+  }, [canHoi, linkCu, laPhieu, laXemDiem, khoa])
 
   // Máy em / phụ huynh cầm link cũ thì KHÔNG đọc gì của thầy — không mở
   // IndexedDB danh sách lớp, không dựng màn nào của app quản lý. Chưa mở khoá
   // cũng vậy: không đọc danh sách lớp trước khi thầy nhập đúng mật khẩu.
   useEffect(() => {
-    if (linkCu || laPhieu || khoa !== 'da_mo') return
+    if (linkCu || laPhieu || laXemDiem || khoa !== 'da_mo') return
     loadClassList().then((list) => {
       if (list.length > 0) setClassList(list)
     })
-  }, [linkCu, laPhieu, khoa, setClassList])
+  }, [linkCu, laPhieu, laXemDiem, khoa, setClassList])
 
   // Link mời làm bài (?examCode=) mở thẳng màn thi. Không có thì vào app thầy.
   useEffect(() => {
-    if (linkCu || laPhieu) return
+    if (linkCu || laPhieu || laXemDiem) return
     const { maCa } = docDuongVao(location.search, location.pathname)
     if (maCa) setScreen('examtake')
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -172,6 +176,13 @@ function App() {
     return (
       <ChanLoi o="Phiếu kết quả">
         <PhieuScreen />
+      </ChanLoi>
+    )
+  }
+  if (laXemDiem) {
+    return (
+      <ChanLoi o="Xem điểm">
+        <XemDiemScreen />
       </ChanLoi>
     )
   }

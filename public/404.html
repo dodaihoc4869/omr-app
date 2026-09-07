@@ -24,6 +24,9 @@
         var p = location.pathname
         var m = p.match(/^(.*?\/)t\/(\d{4,8})\/?$/)
         if (m) return location.replace(m[1] + '?examCode=' + m[2])
+        // XEM ĐIỂM: /d/<mã ca> — em nhập lại danh tính rồi sang phiếu của mình.
+        var d = p.match(/^(.*?\/)d\/(\d{4,8})\/?$/)
+        if (d) return location.replace(d[1] + '?vai=diem&examCode=' + d[2])
         var g = p.match(/^(.*?\/)gv\/?$/)
         if (g) return location.replace(g[1] + '?vai=gv')
         // PHIẾU KẾT QUẢ: /p#<dữ liệu>. Phải bê nguyên location.hash sang, cả

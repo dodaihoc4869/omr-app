@@ -54,7 +54,15 @@ describe('taoChiTietCau', () => {
     expect(bai.lanThu).toBe(2)
     expect(bai.idThietBi).toBe('may-A')
     expect(bai.diem.tong).toBe(graded.score.total)
-    expect(bai.diem.III).toBe(0.25)
+    // SỬA 07/09 cùng lượt vá biểu điểm (thầy báo ca 248567). Bộ đề mẫu ở trên
+    // là 3 câu Phần I · 1 câu Phần II · 1 câu Phần III, KHÔNG phải 18/4/6. Kỳ
+    // vọng cũ `0,25` chép nguyên con số của đề chuẩn — chính là lỗi đang sửa:
+    // một ca 3/1/1 chấm kiểu đó thì trần điểm chỉ 2,0 chứ không phải 10.
+    // Luật mới giữ tỉ lệ 4,5 · 4,0 · 1,5: Phần III một câu ăn trọn 1,50.
+    expect(bai.diem.III).toBe(1.5)
+    expect(bai.diem.I).toBe(0)
+    expect(bai.diem.II).toBe(0)
+    expect(bai.diem.tong).toBe(1.5)
     expect(bai.cau.filter((c) => c.dungSai).length).toBe(1)
   })
 })

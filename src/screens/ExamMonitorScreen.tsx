@@ -109,6 +109,7 @@ export default function ExamMonitorScreen() {
   // chấm lại khác điểm đã gửi phụ huynh mà không có dấu hiệu gì.
   const [soCauCa, setSoCauCa] = useState<SoCauMoiPhan | undefined>(undefined)
   const [daCopy, setDaCopy] = useState(false)
+  const [daCopyDiem, setDaCopyDiem] = useState(false)
   const [xacNhanSbd, setXacNhanSbd] = useState<string | null>(null)
   const [dangDuyet, setDangDuyet] = useState<string | null>(null)
   const [hoiXoa, setHoiXoa] = useState(false)
@@ -353,6 +354,17 @@ export default function ExamMonitorScreen() {
     navigator.clipboard.writeText(link).then(() => {
       setDaCopy(true)
       showToast('Đã copy link mời vào thi', 'success')
+    })
+  }
+
+  // LINK XEM ĐIỂM (thầy báo 07/09). Link mời vào thi `/t/…` sau khi nộp là
+  // đường cụt trên máy khác; link này em nhập lại danh tính rồi vào thẳng phiếu.
+  const copyLinkDiem = () => {
+    if (!chiTiet) return
+    const link = `${location.origin}${import.meta.env.BASE_URL}d/${chiTiet.ca.maCa}`
+    navigator.clipboard.writeText(link).then(() => {
+      setDaCopyDiem(true)
+      showToast('Đã copy link xem điểm', 'success')
     })
   }
 
@@ -859,12 +871,21 @@ export default function ExamMonitorScreen() {
                   : 'Mở ca: bỏ hạn giờ vào phòng, em đến muộn vào được ngay. Em đã bị nộp do khoá phải duyệt thi lại từng em.'}
               </div>
             </div>
-            <div style={{ marginTop: 'var(--k3)' }}>
+            <div className="flex flex-col" style={{ marginTop: 'var(--k3)', gap: 'var(--k2)' }}>
               <NutChinh variant="phu" onClick={copyLink}>
                 <span className="inline-flex items-center gap-2">
                   {daCopy ? <Check size={18} /> : <Copy size={18} />} {daCopy ? 'Đã copy link mời' : 'Copy link mời vào thi'}
                 </span>
               </NutChinh>
+              <NutChinh variant="phu" onClick={copyLinkDiem}>
+                <span className="inline-flex items-center gap-2">
+                  {daCopyDiem ? <Check size={18} /> : <Copy size={18} />} {daCopyDiem ? 'Đã copy link xem điểm' : 'Copy link XEM ĐIỂM cho em'}
+                </span>
+              </NutChinh>
+              <div style={NHAN_NHO}>
+                Link xem điểm: em nhập lại số báo danh, họ tên, năm sinh rồi vào thẳng phiếu điểm và báo cáo của
+                chính em. Gửi được sau khi đã dựng phiếu cho ca.
+              </div>
             </div>
           </TheNoiDung>
 

@@ -28,6 +28,7 @@ import { chiTietCa, danhSachCa, danhSachEm, phieuTheoCa, type ChiTietCa, type Ca
 import { taoPhieuCaCa, type KetQuaTaoPhieuCaCa } from './phieu-ca-ca'
 import { dongBoNganHang, type KetQuaDongBo } from './exam-sync'
 import { taoLinkPhieu } from './phieu-link'
+import { chamLaiCa, type KetQuaChamLaiCa } from './cham-lai-ca'
 
 /** Tên biến trên `window`. Một chỗ khai, để bộ kiểm và tài liệu không lệch. */
 export const TEN_CAU_NOI = '__ddh'
@@ -53,6 +54,11 @@ export interface CauNoiDdh {
    *
    * `bo` để bỏ qua bước tải kho khi vừa tải xong. */
   dongBoMoiCa: (tuyChon?: { boTaiKho?: boolean }) => Promise<TomTatDongBoMoiCa>
+  /** CHẤM LẠI một ca bằng luật chấm hiện tại rồi ghi điểm mới lên Sheet.
+   *
+   * Cần vì điểm trên Sheet là điểm máy EM tính lúc nộp: sửa luật chấm thì phiếu
+   * đúng ngay còn bảng điểm vẫn giữ số cũ. Trả bảng đối chiếu cũ → mới. */
+  chamLaiCa: (maCa: string) => Promise<KetQuaChamLaiCa>
 }
 
 export interface TomTatDongBoMoiCa {
@@ -107,6 +113,10 @@ export function dungCauNoi(): CauNoiDdh {
       return taoPhieuCaCa(url, mat, String(maCa || '').trim(), gocApp(), () => {}, taoLai === true)
     },
     linkPhieu: (ma) => taoLinkPhieu(gocApp(), String(ma || '').trim()),
+    chamLaiCa: async (maCa) => {
+      const { url, mat } = await chia()
+      return chamLaiCa(url, mat, String(maCa || '').trim())
+    },
     dongBoKho: async (epTaiLai) => {
       const { url, mat } = await chia()
       return dongBoNganHang(url, mat, epTaiLai === true)

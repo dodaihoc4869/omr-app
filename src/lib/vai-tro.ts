@@ -9,6 +9,10 @@
 //   /t/<mã ca>   → màn LÀM BÀI, giữ lại để lớp vẫn thi và làm bài tập được
 //                  trong lúc app học sinh mới chưa xong. Khi hs-app chạy thật
 //                  thì gỡ nốt màn này khỏi đây.
+//   /d/<mã ca>   → XEM ĐIỂM. Em nhập lại số báo danh, họ tên, năm sinh rồi
+//                  được đưa thẳng sang phiếu kết quả của chính em. Thêm 07/09
+//                  vì link `/t/<mã ca>` sau khi nộp chỉ mở lại được điểm TRÊN
+//                  CHÍNH MÁY đã thi; em mở ở máy khác thì cụt đường.
 //   /p#<dữ liệu> → PHIẾU KẾT QUẢ gửi phụ huynh. Dữ liệu nằm sau dấu `#` nên
 //                  không bao giờ rời máy phụ huynh (xem lib/phieu-link.ts).
 //                  Chỉ đọc, không có mã bí mật, không gọi máy chủ.
@@ -16,7 +20,7 @@
 // `public/404.html` đổi hai đường trên thành `?vai=gv` / `?examCode=…` khi máy
 // chưa cài service worker; `chuanHoaDuongDan()` làm đúng việc đó ở trong app,
 // nên máy đã cài app (service worker nuốt mất 404.html) vẫn chạy đúng.
-export type VaiTro = 'gv' | 'phieu'
+export type VaiTro = 'gv' | 'phieu' | 'diem'
 
 export interface DuongVao {
   vai: VaiTro | null
@@ -26,6 +30,7 @@ export interface DuongVao {
 const RE_GV_TREN_DUONG = /(?:^|\/)gv\/?$/
 const RE_PHIEU_TREN_DUONG = /(?:^|\/)p\/?$/
 const RE_CA_TREN_DUONG = /(?:^|\/)t\/(\d{4,8})\/?$/
+const RE_DIEM_TREN_DUONG = /(?:^|\/)d\/(\d{4,8})\/?$/
 const RE_APP_CU = /(?:^|\/)(?:hs|ph)\/[0-9a-zA-Z]{8,}\/?$/
 
 /** Link riêng CŨ của em hoặc phụ huynh (`/hs/<token>`, `/ph/<token>`), hoặc
@@ -49,6 +54,8 @@ export function laLinkAppCu(search: string, duongDan = ''): boolean {
 export function docVaiTuDuongDan(duongDan: string): DuongVao {
   if (RE_GV_TREN_DUONG.test(duongDan)) return { vai: 'gv', maCa: '' }
   if (RE_PHIEU_TREN_DUONG.test(duongDan)) return { vai: 'phieu', maCa: '' }
+  const d = duongDan.match(RE_DIEM_TREN_DUONG)
+  if (d) return { vai: 'diem', maCa: d[1] }
   const c = duongDan.match(RE_CA_TREN_DUONG)
   if (c) return { vai: null, maCa: c[1] }
   return { vai: null, maCa: '' }
@@ -84,6 +91,7 @@ export function docDuongVao(search: string, duongDan = ''): DuongVao {
   const vaiQ = (q.get('vai') || '').trim()
   if (vaiQ === 'gv') return { vai: 'gv', maCa }
   if (vaiQ === 'phieu') return { vai: 'phieu', maCa: '' }
+  if (vaiQ === 'diem') return { vai: 'diem', maCa }
 
   const tuDuong = duongDan ? docVaiTuDuongDan(duongDan) : null
   if (tuDuong && (tuDuong.vai || tuDuong.maCa)) {
@@ -105,7 +113,7 @@ export function docDuongVao(search: string, duongDan = ''): DuongVao {
 export function laManThayQuanLy(search: string, duongDan = ''): boolean {
   if (laLinkAppCu(search, duongDan)) return false
   const d = docDuongVao(search, duongDan)
-  if (d.vai === 'phieu') return false
+  if (d.vai === 'phieu' || d.vai === 'diem') return false
   if (d.maCa) return false
   return true
 }

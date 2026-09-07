@@ -51,7 +51,7 @@ import MaCaInput from '../components/MaCaInput'
 import LogoDDH from '../components/LogoDDH'
 import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
 import { TriangleAlert, X, ArrowLeft, LayoutGrid } from 'lucide-react'
-import { classify } from '../engine/score'
+import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
 import { gradeFromKeyBank, type GradedSubmission } from '../lib/exam-grade'
 import {
   cacheSession,
@@ -117,10 +117,13 @@ interface FlatRef {
 
 const SANS_SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 
-const PHAN_INFO: Record<PhanKey, { ten: string; diem: string }> = {
-  I: { ten: 'Trắc nghiệm', diem: 'Mỗi câu đúng 0,25 điểm' },
-  II: { ten: 'Đúng / Sai', diem: 'Đúng 1 ý 0,1đ · 2 ý 0,25đ · 3 ý 0,5đ · cả 4 ý 1đ' },
-  III: { ten: 'Trả lời ngắn', diem: 'Mỗi câu đúng 0,25 điểm' },
+// TÊN phần là cố định; BIỂU ĐIỂM thì không — nó phụ thuộc số câu của chính ca
+// này. Bản cũ in cứng "Mỗi câu đúng 0,25 điểm" nên ca 8/2/2 (thầy báo 07/09)
+// nói dối em ngay trên màn làm bài: em đọc 0,25 mà máy chấm 0,5625.
+const TEN_PHAN: Record<PhanKey, string> = {
+  I: 'Trắc nghiệm',
+  II: 'Đúng / Sai',
+  III: 'Trả lời ngắn',
 }
 
 function daTraLoiEntry(attempt: ExamAttempt, assignment: StudentAssignment, ref: FlatRef): boolean {
@@ -137,8 +140,8 @@ function cuonToiCau(stt: number) {
 }
 
 /** Đầu phần dính — cuộn qua phần nào thì đầu phần đó dính lên dưới thanh trên. */
-function DauPhan({ phan, soCau }: { phan: PhanKey; soCau: number }) {
-  const info = PHAN_INFO[phan]
+function DauPhan({ phan, soCauBaPhan }: { phan: PhanKey; soCauBaPhan: SoCauBaPhan }) {
+  const soCau = soCauBaPhan[phan]
   return (
     <div className="sticky z-20 flex items-center" style={{ top: 56, background: 'var(--nen)', padding: 'var(--k3) 0', gap: 'var(--k3)' }}>
       <div
@@ -149,10 +152,10 @@ function DauPhan({ phan, soCau }: { phan: PhanKey; soCau: number }) {
       </div>
       <div className="min-w-0">
         <div className="font-bold truncate" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)', color: 'var(--muc)' }}>
-          PHẦN {phan} — {info.ten} ({soCau} câu)
+          PHẦN {phan} — {TEN_PHAN[phan]} ({soCau} câu)
         </div>
         <div className="truncate" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
-          {info.diem}
+          {moTaBieuDiem(soCauBaPhan, phan)}
         </div>
       </div>
     </div>
@@ -180,6 +183,10 @@ export default function ExamTakeScreen() {
 
   const [phase, setPhase] = useState<'join' | 'loading' | 'exam' | 'submitted' | 'error'>('join')
   const [errorMsg, setErrorMsg] = useState('')
+  // ĐÃ NỘP RỒI, MỞ LẠI LINK TRÊN MÁY KHÁC — thầy báo 07/09: em bấm link ca để
+  // xem điểm thì nhận một ô ĐỎ như app hỏng. Bài đã nộp xong không phải lỗi,
+  // nên tách riêng: ô vàng, nói rõ nộp lúc nào và điểm nằm ở đâu.
+  const [daNopRoi, setDaNopRoi] = useState<{ nopLuc: string; lanThu: number } | null>(null)
 
   const [maCa, setMaCa] = useState('')
   const [sbd, setSbd] = useState('')
@@ -421,6 +428,12 @@ export default function ExamTakeScreen() {
     if (!keyBank || !attempt) return null
     return assignStudentQuestions(keyBank, attempt.maCa, attempt.sbd)
   }, [keyBank, attempt])
+
+  // SỐ CÂU BA PHẦN — biểu điểm phải tính từ đây, không in cứng 0,25.
+  const soCauBaPhan = (a: StudentAssignment | null): SoCauBaPhan =>
+    ({ I: a?.phanI.length ?? 0, II: a?.phanII.length ?? 0, III: a?.phanIII.length ?? 0 })
+  const soCauCuaBai = soCauBaPhan(assignment)
+  const soCauCuaBaiGiai = soCauBaPhan(solutionAssignment)
 
   // BÁO CÁO HỌC TẬP dựng NGAY TRÊN MÁY EM. Không gọi thêm lệnh máy chủ nào:
   // máy em đã có bài làm, giây từng câu và ngân hàng CÓ đáp án của ca. Mục nào
@@ -695,6 +708,15 @@ export default function ExamTakeScreen() {
         // Đã nộp đúng lượt này trên chính máy này → mở màn "Đã nộp" (xem điểm,
         // lời giải) thay vì báo lỗi; các trường hợp chặn khác hiện lý do rõ.
         if (kq.lyDo === 'da_nop' && existing?.submitted && (existing.lanThu ?? 1) === (kq.lanThu ?? 1)) return moLaiDaNop(existing)
+        // Máy này không giữ bài (em mở link ở máy khác, hoặc đã xoá dữ liệu
+        // trình duyệt): không có đường nào lấy lại đáp án của em từ máy chủ —
+        // `lichSuEm` khoá theo id thiết bị của chính lượt đã nộp. Nói thẳng
+        // điều đó và chỉ sang phiếu, thay vì ném một ô lỗi đỏ.
+        if (kq.lyDo === 'da_nop') {
+          setDaNopRoi({ nopLuc: kq.nopLuc || '', lanThu: kq.lanThu || 1 })
+          setPhase('error')
+          return
+        }
         throw new Error(thongDiepChan(kq, gioNgan))
       }
 
@@ -1661,6 +1683,31 @@ export default function ExamTakeScreen() {
     )
   }
 
+  if (phase === 'error' && daNopRoi) {
+    return (
+      <Trang className="flex items-center justify-center px-4">
+        <div className="w-full flex flex-col" style={{ maxWidth: 400, gap: 'var(--k4)' }}>
+          <OThongBao tone="cam">
+            Em đã nộp bài ca này{daNopRoi.nopLuc ? ` lúc ${gioNgan(daNopRoi.nopLuc)}` : ''}
+            {daNopRoi.lanThu > 1 ? ` (lần ${daNopRoi.lanThu})` : ''}. Bài đã chấm xong.
+            {'\n\n'}Máy này không giữ bài của em nên không mở lại được điểm ở đây. Điểm, bài chữa và
+            nhận xét nằm trong PHIẾU KẾT QUẢ Thầy gửi riêng cho em — mở link phiếu đó.
+            {'\n\n'}Chưa nhận được phiếu thì nhắn Thầy gửi lại.
+          </OThongBao>
+          <NutChinh
+            variant="phu"
+            onClick={() => {
+              setDaNopRoi(null)
+              setPhase('join')
+            }}
+          >
+            Quay lại
+          </NutChinh>
+        </div>
+      </Trang>
+    )
+  }
+
   if (phase === 'error') {
     return (
       <Trang className="flex items-center justify-center px-4">
@@ -1723,7 +1770,7 @@ export default function ExamTakeScreen() {
           </div>
         </div>
         <div className="px-3 sm:px-4 pb-12 flex flex-col" style={{ gap: 'var(--k5)', paddingTop: 'var(--k2)' }}>
-          <DauPhan phan="I" soCau={solutionAssignment.phanI.length} />
+          <DauPhan phan="I" soCauBaPhan={soCauCuaBaiGiai} />
           {solutionAssignment.phanI.map((item) => {
             stt += 1
             const q = item.question as TeacherMcqQuestion
@@ -1752,7 +1799,7 @@ export default function ExamTakeScreen() {
               />
             )
           })}
-          <DauPhan phan="II" soCau={solutionAssignment.phanII.length} />
+          <DauPhan phan="II" soCauBaPhan={soCauCuaBaiGiai} />
           {solutionAssignment.phanII.map((item) => {
             stt += 1
             const q = item.question as TeacherTrueFalseQuestion
@@ -1780,7 +1827,7 @@ export default function ExamTakeScreen() {
               />
             )
           })}
-          <DauPhan phan="III" soCau={solutionAssignment.phanIII.length} />
+          <DauPhan phan="III" soCauBaPhan={soCauCuaBaiGiai} />
           {solutionAssignment.phanIII.map((item) => {
             stt += 1
             const q = item.question as TeacherShortAnswerQuestion
@@ -2045,7 +2092,7 @@ export default function ExamTakeScreen() {
     if (items.length === 0) return null
     return (
       <>
-        <DauPhan phan={phan} soCau={items.length} />
+        <DauPhan phan={phan} soCauBaPhan={soCauCuaBai} />
         {phan === 'I' &&
           assignment.phanI.map((item) => {
             stt += 1
