@@ -6,6 +6,7 @@
 import { openDB, type IDBPDatabase } from 'idb'
 import type { PublicExamBank, SoCauMoiPhan, TeacherExamSource } from '../data/examContent'
 import type { BanGhiKhoa } from './khoa-app'
+import type { SoSuaDang } from './sua-dang'
 
 export interface AnswerRecord {
   phanI: Record<string, 'A' | 'B' | 'C' | 'D'> // qid -> lựa chọn (đã quy về chữ cái GỐC, chưa xáo)
@@ -383,6 +384,18 @@ export async function saveExamSource(source: TeacherExamSource): Promise<void> {
 export async function loadExamSources(): Promise<TeacherExamSource[]> {
   const db = await getDb()
   return db.getAll(STORE_SOURCES)
+}
+
+/** SỔ SỬA MÃ DẠNG — bản vá của thầy, áp lên đề sau mỗi lần đồng bộ.
+ * Xem `src/lib/sua-dang.ts`. */
+export async function saveSoSuaDang(so: SoSuaDang): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, so, 'soSuaDang')
+}
+
+export async function loadSoSuaDang(): Promise<SoSuaDang> {
+  const db = await getDb()
+  return ((await db.get(STORE_SETTINGS, 'soSuaDang')) as SoSuaDang | undefined) ?? {}
 }
 
 export async function deleteExamSource(maDe: string): Promise<void> {

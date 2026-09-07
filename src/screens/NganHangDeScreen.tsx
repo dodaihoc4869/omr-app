@@ -12,8 +12,9 @@ import { RefreshCw, Trash2, ChevronDown, ChevronUp, Upload, CheckCheck } from 'l
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { TheNoiDung, Hang, Nhan, OThongBao, NutChinh } from '../components/DesignSystem'
 import KhoiMatKhauApp from '../components/KhoiMatKhauApp'
+import KhoiMaDang from '../components/KhoiMaDang'
 import { ChemText } from '../lib/chem-format'
-import { deleteExamSource, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, saveExamSource, saveScriptUrl, saveSessionTeacherBank, saveTeacherSecret } from '../lib/exam-db'
+import { deleteExamSource, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, saveExamSource, saveScriptUrl, saveSessionTeacherBank, saveTeacherSecret, loadSoSuaDang, saveSoSuaDang} from '../lib/exam-db'
 import { caDungDe, capNhatCaDaMo, dongBoNganHang, type KetQuaDongBo } from '../lib/exam-sync'
 import { capNhatKeyBank, dungChiMuc, luuDe, xoaDe as xoaDeTrenKho } from '../lib/exam-api'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJsonText } from '../lib/exam-kho-de-import'
@@ -21,6 +22,7 @@ import { mergeKeepAnswers, validateTeacherSource } from '../data/examContent'
 import { maDeTheoPhan, PHAN_DE_TACH, TEN_PHAN_TACH } from '../lib/tach-phan-de'
 import TheCau from '../components/TheCau'
 import { useAppStore } from '../store/appStore'
+import { apDungSoSua, type SoSuaDang } from '../lib/sua-dang'
 
 type CauNghi = {
   phan: 'I' | 'II' | 'III'
@@ -117,6 +119,7 @@ export default function NganHangDeScreen() {
   /** Đang hỏi trước khi duyệt hàng loạt. `ds` = những đề sẽ duyệt. */
   const [hoiDuyet, setHoiDuyet] = useState<{ ds: TeacherExamSource[]; nhan: string } | null>(null)
   const [dangDuyet, setDangDuyet] = useState(false)
+  const [soSua, setSoSua] = useState<SoSuaDang>({})
   const fileRef = useRef<HTMLInputElement>(null)
 
   /** Dự phòng khi máy chạy pipeline không gọi được Apps Script (chặn mạng):
@@ -156,6 +159,30 @@ export default function NganHangDeScreen() {
   }
 
   const taiLocal = async () => setSources(await loadExamSources())
+
+  /** Nạp SỔ SỬA MÃ riêng một nhánh, có bọc lỗi. Sổ chỉ là bản vá phụ; nó hỏng
+   * thì thầy mất mấy dòng sửa tay, KHÔNG được kéo sập cả danh sách đề. */
+  useEffect(() => {
+    ;(async () => {
+      try {
+        setSoSua(await loadSoSuaDang())
+      } catch {
+        setSoSua({})
+      }
+    })()
+  }, [])
+
+  /** Thầy sửa mã: ghi SỔ (để sống sót lần đồng bộ sau) và áp luôn lên đề đang
+   * lưu (để cổng rút chữa thấy ngay, không phải chờ đồng bộ). Hai chỗ, một
+   * hành động — thiếu chỗ nào cũng thành sửa hụt. */
+  const luuSoSua = async (so: SoSuaDang) => {
+    setSoSua(so)
+    await saveSoSuaDang(so)
+    const moi = sources.map((s) => apDungSoSua(s, so))
+    await Promise.all(moi.map((s) => saveExamSource(s)))
+    setSources(moi)
+    showToast('Đã lưu mã dạng trên máy này', 'success')
+  }
 
   const dongBo = async (url: string, mat: string, imLang = false) => {
     if (!url.trim() || !mat.trim()) {
@@ -393,6 +420,10 @@ export default function NganHangDeScreen() {
           </div>
         )}
       </TheNoiDung>
+
+      {/* KHỐI MÃ DẠNG — đặc tả v3 mục 4.3. Đặt NGAY SAU khối đồng bộ, trước
+          danh sách đề: thầy vừa kéo đề về là thấy ngay kho đang hổng chỗ nào. */}
+      {sources.length > 0 && <KhoiMaDang sources={sources} soSua={soSua} onSua={luuSoSua} />}
 
       {sources.map((s, i) => {
         const nghi = cauNghiCua(s)

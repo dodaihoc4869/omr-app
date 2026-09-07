@@ -10,7 +10,8 @@
 import type { TeacherExamSource } from '../data/examContent'
 import { validateTeacherSource } from '../data/examContent'
 import { capNhatKeyBank, danhSachDe, layDe, type KhoDeItem } from './exam-api'
-import { loadAllSessionTeacherBanks, loadExamSources, saveExamSource, saveSessionTeacherBank } from './exam-db'
+import { apDungSoSua } from './sua-dang'
+import { loadAllSessionTeacherBanks, loadExamSources, saveExamSource, saveSessionTeacherBank, loadSoSuaDang} from './exam-db'
 import { mergeKeepAnswers } from '../data/examContent'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJsonText } from './exam-kho-de-import'
 
@@ -65,6 +66,7 @@ export function chonDeCanTai(tren: KhoDeItem[], local: TeacherExamSource[]): { m
 export async function dongBoNganHang(scriptUrl: string, secret: string): Promise<KetQuaDongBo> {
   const danhSach = await danhSachDe(scriptUrl, secret)
   const local = await loadExamSources()
+  const soSua = await loadSoSuaDang()
   const { moi, capNhat } = chonDeCanTai(danhSach, local)
   const kq: KetQuaDongBo = { moi: [], capNhat: [], giuNguyen: danhSach.length - moi.length - capNhat.length, loi: [], canXem: [], danhSach, caCapNhat: 0 }
 
@@ -77,7 +79,9 @@ export async function dongBoNganHang(scriptUrl: string, secret: string): Promise
       if (errors.length > 0) throw new Error(errors[0])
       const v = validateTeacherSource(source)
       if (v.length > 0) throw new Error(v[0])
-      await saveExamSource(source)
+      // ÁP SỔ SỬA MÃ. Không áp thì đề tải về đè mã cũ lên cái thầy vừa sửa,
+      // và thầy sẽ thấy sửa xong một lúc lại về như cũ mà không hiểu vì sao.
+      await saveExamSource(apDungSoSua(source, soSua))
       if (moi.includes(item)) kq.moi.push(item.maDe)
       else {
         kq.capNhat.push(item.maDe)

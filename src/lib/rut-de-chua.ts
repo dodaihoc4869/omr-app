@@ -130,7 +130,11 @@ interface UngVien {
 
 /** Dàn cả kho thành ứng viên kèm mã dạng. Câu chưa gán dạng không bao giờ
  * thành ứng viên — cấm đoán. */
-function dungUngVienChua(khoDe: TeacherExamSource[]): { cau: CauLuyen; ma: string }[] {
+/** Câu trong kho DÙNG ĐƯỢC làm câu chữa: có mã dạng và không có hình.
+ *
+ * Xuất ra ngoài để màn Ngân hàng đếm nguồn hàng bằng ĐÚNG luật cổng đang dùng.
+ * Đếm bằng luật riêng thì con số báo cho thầy sẽ lệch với thực tế rút được. */
+export function ungVienChua(khoDe: TeacherExamSource[]): { cau: CauLuyen; ma: string }[] {
   const tra = new Map<string, string>()
   for (const s of khoDe) {
     for (const q of [...s.phanI, ...s.phanII, ...s.phanIII]) {
@@ -154,7 +158,7 @@ export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
   const soCau = Math.max(0, Math.min(yc.soCau ?? TRAN_CAU_CHUA, TRAN_CAU_CHUA))
   const ra: KetQuaRutChua = { cau: [], thieu: [], capBiCat: 0 }
 
-  const kho = dungUngVienChua(yc.khoDe)
+  const kho = ungVienChua(yc.khoDe)
   const traDang = (qid: string) => {
     const t = kho.find((x) => x.cau.id === qid)
     return t ? { ma: t.ma, ten: t.cau.chuyenDe } : null
