@@ -123,7 +123,7 @@ export function dungUngVien(sources: TeacherExamSource[]): Record<PhanDe, CauUng
             luaChon: phan === 'I' ? (mcq.choices ?? []) : phan === 'II' ? (tf.ideas ?? []) : [],
             dapAn: phan === 'III' ? String(sa.correct ?? '') : '',
             mucDo: q.mucDo,
-            dang: (q as { dang?: string }).dang,
+            kieu: (q as { kieu?: string }).kieu,
           }),
           text: q.text || '',
           coHinh: coHinhCua(q),

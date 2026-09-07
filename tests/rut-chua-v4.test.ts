@@ -162,7 +162,11 @@ describe('mục 8 — nhãn và luật dạng', () => {
     const chuaGan = { ...cau('s9', A), dang: null }
     const k = khoNhieuDe([[chuaGan as unknown as ReturnType<typeof cau>], day(A, 5, 'a')])
     const kq = rutDeChua({ khoDe: k, rows: [row(7, 's9', false)], soCau: 10 })
-    expect(kq.cau).toHaveLength(0)
+    // Thầy đổi luật 07/09: câu chưa có câu chữa thì đưa lại chính nó cho em làm
+    // lại. Cái đang đo — CẤM ĐOÁN — vẫn nguyên: pool vẫn 0, năm câu mã A trong
+    // kho tuyệt đối không được lấy làm câu chữa cho một câu chưa gắn dạng.
+    expect(kq.cau.map((c) => c.id)).toEqual(['s9'])
+    expect(kq.cau[0].chuaCho!.laLamLai).toBe(true)
     expect(kq.tongUngVien).toBe(0)
     expect(kq.poolTheoCauSai[0].pool).toBe(0)
     expect(kq.thieu[0].vi).toContain('chưa gắn dạng')
@@ -207,5 +211,77 @@ describe('mục 9 — cấm', () => {
     for (const f of ['src/components/NutBaiTapPdf.tsx', 'src/components/ThanhSoCauChua.tsx']) {
       expect(doc(f)).not.toContain('chonCauLuyen')
     }
+  })
+})
+
+// ---------------------------------------------------------------------------
+// CÂU KHÔNG CÓ CÂU CHỮA THÌ ĐƯA LẠI CHÍNH CÂU ĐÓ — thầy chốt 07/09:
+//   "câu nào chưa có câu chữa, thì bạn lấy lại câu sai đó chữa lại và phân tích
+//    lỗi sai của em đó ở câu đó để học sinh làm lại và khắc phục được"
+import { viSaoChonSai } from '../src/lib/rut-de-chua'
+
+const cauCoGiai = (id: string, ma: string | null) => ({
+  ...cau(id, ma ?? A),
+  dang: ma ? { ma, ten: ma } : null,
+  loiGiai: { chot: 'chốt', tungPa: { B: { dung: false, viSao: 'Em quên nhân hệ số 3 của glycerol.' } } },
+})
+
+describe('không có câu chữa thì cho em làm lại chính câu đó', () => {
+  it('kho không có câu nào cùng dạng ⇒ đưa lại câu sai, gắn cờ làm lại', () => {
+    const k = khoNhieuDe([[cauCoGiai('s1', A)], day(B, 5, 'b')])
+    const kq = rutDeChua({ khoDe: k, rows: [row(7, 's1', false)], soCau: 10 })
+    expect(kq.cau.map((c) => c.id)).toEqual(['s1'])
+    const n = kq.cau[0].chuaCho!
+    expect(n.laLamLai).toBe(true)
+    expect(n.soCau).toBe(7)
+  })
+
+  it('mang theo em đã chọn gì và vì sao phương án đó sai', () => {
+    const k = khoNhieuDe([[cauCoGiai('s1', A)]])
+    const kq = rutDeChua({ khoDe: k, rows: [row(7, 's1', false)], soCau: 10 })
+    expect(kq.cau[0].chuaCho!.daChon).toBe('B')
+    expect(kq.cau[0].chuaCho!.viSaoSai).toBe('Em quên nhân hệ số 3 của glycerol.')
+  })
+
+  it('KHÔNG bịa lý do khi câu không có lời giải cho phương án đó', () => {
+    const k = khoNhieuDe([[cau('s1', A)]])
+    const kq = rutDeChua({ khoDe: k, rows: [row(7, 's1', false)], soCau: 10 })
+    expect(kq.cau[0].chuaCho!.viSaoSai).toBe('')
+  })
+
+  it('câu sai CHƯA GẮN DẠNG cũng được làm lại, không để em tay trắng', () => {
+    // Kho phải có ít nhất một câu ĐÃ GÁN MÃ thì cổng mới vận hành — đúng tình
+    // trạng kho thật (2.213/2.520 câu đã có mã). Kho trắng mã là chuyện khác:
+    // lúc ấy chỗ gọi lui hẳn về bài luyện chung, xem test ở `ma-dang-tu-kho`.
+    const chuaGan = { ...cauCoGiai('s1', null) }
+    const k = khoNhieuDe([[chuaGan as unknown as ReturnType<typeof cau>], day(B, 3, 'b')])
+    const kq = rutDeChua({ khoDe: k, rows: [row(7, 's1', false)], soCau: 10 })
+    expect(kq.cau.map((c) => c.id)).toEqual(['s1'])
+    expect(kq.cau[0].chuaCho!.laLamLai).toBe(true)
+    // Vẫn ghi lý do để thầy biết phải vào Ngân hàng gán dạng.
+    expect(kq.thieu[0].vi).toContain('chưa gắn dạng')
+  })
+
+  it('câu CÓ câu chữa thì KHÔNG đưa lại chính nó — tránh phát lại câu em vừa làm', () => {
+    const kq = rutDeChua({ khoDe: kho60_25_5(), rows: ROWS3, soCau: 30 })
+    expect(kq.cau.map((c) => c.id)).not.toContain('s1')
+    expect(kq.cau.every((c) => !c.chuaCho?.laLamLai)).toBe(true)
+  })
+
+  it('bị cắt vì thầy kéo số nhỏ thì KHÔNG đưa lại — kéo thanh lên là có', () => {
+    const kq = rutDeChua({ khoDe: kho60_25_5(), rows: ROWS3, soCau: 1 })
+    expect(kq.cau.length).toBe(1)
+    expect(kq.cau[0].chuaCho!.laLamLai).toBeUndefined()
+  })
+
+  it('viSaoChonSai đọc đúng ý của Phần II, không lẫn với phương án Phần I', () => {
+    // SỬA SAU KHI CHẠY: bản đầu tôi dựng vật thử có trường `loiGiai`. `CauLuyen`
+    // KHÔNG có trường đó — `cauLuyenTuNguon` đã dàn `loiGiai.tungY` thành mảng
+    // `lyDo` với khoá a–d. Test dựng sai hình dạng thì nó đo cái không tồn tại.
+    const c2 = { phan: 'II', lyDo: [{ khoa: 'c', dung: false, ly: 'Ý c sai vì...' }] } as unknown as Parameters<typeof viSaoChonSai>[0]
+    expect(viSaoChonSai(c2, 'C')).toBe('Ý c sai vì...')
+    // Phần I dùng khoá hoa, không được lẫn sang nhánh chữ thường.
+    const c1 = { phan: 'I', lyDo: [{ khoa: 'B', dung: false, ly: 'B sai vì...' }] } as unknown as Parameters<typeof viSaoChonSai>[0]
+    expect(viSaoChonSai(c1, 'b')).toBe('B sai vì...')
   })
 })

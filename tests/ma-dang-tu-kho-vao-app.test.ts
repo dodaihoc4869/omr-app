@@ -135,6 +135,9 @@ describe('chuỗi kho -> nguồn -> cổng rút câu chữa chạy thông', () =
   it('kho chưa gán mã thì cổng báo thiếu chứ không rút bừa', () => {
     const nguon = nguonTu([1, 2, 3, 4].map((i) => cauI(i, null, { viSaoNull: 'chưa nhận ra cơ chế' })))
     const kq = rutDeChua({ khoDe: [nguon], rows: rowsSaiCau2(), soCau: 10 })
+    // Kho KHÔNG gán mã nào ⇒ cổng chưa vận hành được. Luật "đưa lại câu sai cho
+    // em làm lại" (thầy chốt 07/09) chỉ chạy khi kho đã có mã; ở đây chỗ gọi lui
+    // hẳn về bài luyện chung, nên cổng trả rỗng đúng như cũ.
     expect(kq.cau).toEqual([])
     expect(kq.thieu.length).toBe(1)
   })

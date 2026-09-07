@@ -12,7 +12,8 @@ import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion,
 import type { CaCuaEm, ChiTietCauRow, ChuyenDeEm, HoSoEm } from './exam-api'
 import { ducKetKienThuc, thongKeLamBai, tinHieuLamBai, type DucKetChuyenDe, type ThongKeLamBai, type TinHieuLamBai } from './phan-tich-lam-bai'
 import { cauLuyenTuBoCau, cauLuyenTuNguon, chonCauLuyen, type CauLuyen } from './bai-tap-pdf'
-import { rutDeChua } from './rut-de-chua'
+import { rutDeChua, soCauChuaThat } from './rut-de-chua'
+import { SO_CAU_KEM_PHIEU } from './cau-hinh-chua'
 import type { LocDang } from './dang-cau'
 import { mocRoiMan } from './chong-gian-lan'
 
@@ -120,6 +121,8 @@ export interface PhieuDayDu {
   baiTap?: CauLuyen[]
   /** Vì sao chưa đủ câu chữa — nói thật thay vì lấy bừa cho đủ. */
   thieuChua?: string[]
+  /** Kho còn bao nhiêu câu cùng dạng với câu em sai (v4 mục 4.2). */
+  tongUngVien?: number
   /** LINK PHIẾU BÀI TẬP đã cất sẵn trên kho, để phụ huynh copy gửi thẳng cho
    * con — con mở link là làm bài, không phải mở báo cáo của phụ huynh.
    *
@@ -436,13 +439,21 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
   // đó KHÔNG mang nhãn chữa.
   const coCauSaiEm = n.rows.some((r) => r.dungSai === false)
   const khoChua = n.khoKhacPhuc ?? []
-  const kqChuaEm = khoChua.length > 0 && coCauSaiEm ? rutDeChua({ khoDe: khoChua, rows: n.rows, qidTranh: [...daLamTrongCa] }) : null
+  const kqChuaEm =
+    khoChua.length > 0 && coCauSaiEm
+      ? rutDeChua({ khoDe: khoChua, rows: n.rows, qidTranh: [...daLamTrongCa], soCau: SO_CAU_KEM_PHIEU, nguonCauSai: n.banks })
+      : null
+  // Thẻ "làm lại chính câu em sai" (thầy chốt 07/09) là PHẦN THÊM, không phải
+  // phần thay. Đếm nó như một câu chữa thì em chỉ nhận đúng một câu thay vì cả
+  // bộ luyện — nên chỗ quyết định lui hay không dùng `soCauChuaThat`.
+  const lamLaiEm = (kqChuaEm?.cau ?? []).filter((c) => c.chuaCho?.laLamLai)
   // Kho trả về rồi thì KHÔNG trộn thêm câu của ca vào: câu của ca là câu em
-  // vừa làm, luyện lại chỉ là nhớ đáp án.
+  // vừa làm, luyện lại chỉ là nhớ đáp án. Ngoại lệ duy nhất là thẻ làm lại ở
+  // trên — chính câu em sai, cố ý đưa lại.
   const baiTapEm =
-    kqChuaEm && kqChuaEm.cau.length > 0
-      ? kqChuaEm.cau
-      : (tuKho.length > 0 ? tuKho.filter((c) => !daLamTrongCa.has(c.id)) : duPhong).slice(0, SO_CAU_BAI_TAP_KEM)
+    soCauChuaThat(kqChuaEm) > 0
+      ? (kqChuaEm as NonNullable<typeof kqChuaEm>).cau
+      : [...lamLaiEm, ...(tuKho.length > 0 ? tuKho.filter((c) => !daLamTrongCa.has(c.id)) : duPhong)].slice(0, SO_CAU_BAI_TAP_KEM)
   const tk = thongKeLamBai(n.rows, { vaoLuc: n.vaoLuc, nopLuc: n.nopLuc, thoiLuongPhut: n.thoiLuongPhut })
 
   const gom = new Map<string, { ten: string; soCau: number; soSai: number }>()
@@ -488,8 +499,9 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
     // CÓ kèm bài luyện (thầy chốt 06/09): em tự tạo bộ câu khắc phục lỗi sai
     // ngay sau khi nộp, lúc còn nhớ mình vướng chỗ nào.
     baiTap: baiTapEm,
+    tongUngVien: kqChuaEm?.tongUngVien,
     thieuChua: (() => {
-      const ds = kqChuaEm ? kqChuaEm.thieu.map((t) => `Câu ${t.soCau}: ${t.vi}`) : []
+      const ds = kqChuaEm ? kqChuaEm.thieu.map((t) => t.vi.charAt(0).toUpperCase() + t.vi.slice(1)) : []
       if (coCauSaiEm && (!kqChuaEm || kqChuaEm.cau.length === 0)) ds.push('Kho chưa đủ câu cùng dạng với câu em sai — phần dưới là bài luyện chung của chuyên đề, không phải câu chữa.')
       return ds.length > 0 ? ds : undefined
     })(),
@@ -545,10 +557,25 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
   // mang nhãn chữa, và `thieuChua` nói thẳng đây không phải câu chữa. Thà nói
   // "chưa đủ câu cùng dạng" còn hơn dán nhãn chữa lên một câu khác dạng.
   const coCauSai = rows.some((r) => r.dungSai === false)
-  const kqChua = kho.length > 0 && coCauSai ? rutDeChua({ khoDe: kho, rows, qidTranh: n.qidDaLam ?? [] }) : null
-  const phaiLui = kho.length > 0 && (kqChua === null || kqChua.cau.length === 0)
+  const kqChua =
+    kho.length > 0 && coCauSai
+      ? rutDeChua({ khoDe: kho, rows, qidTranh: n.qidDaLam ?? [], soCau: SO_CAU_KEM_PHIEU, nguonCauSai: banks })
+      : null
+  // Xem ghi chú ở `dungPhieuMayEm`: thẻ làm lại KHÔNG phải câu chữa, nên nó
+  // không cứu được việc phải lui về bài luyện chung — nó đi kèm bộ ấy.
+  const lamLai = (kqChua?.cau ?? []).filter((c) => c.chuaCho?.laLamLai)
+  const phaiLui = kho.length > 0 && soCauChuaThat(kqChua) === 0
   const baiTap = phaiLui
-    ? chonCauLuyen(kho, { chuyenDe: yeuCa, chuyenDeCa: phamViCa, dang: n.dangBaiTap, qidDaLam: n.qidDaLam ?? [], soCau: SO_CAU_BAI_TAP_KEM }).cau
+    ? [
+        ...lamLai,
+        ...chonCauLuyen(kho, {
+          chuyenDe: yeuCa,
+          chuyenDeCa: phamViCa,
+          dang: n.dangBaiTap,
+          qidDaLam: [...(n.qidDaLam ?? []), ...lamLai.map((c) => c.id)],
+          soCau: SO_CAU_BAI_TAP_KEM,
+        }).cau,
+      ].slice(0, SO_CAU_BAI_TAP_KEM)
     : (kqChua?.cau ?? [])
   const luiCoSai = phaiLui && coCauSai
 
@@ -583,8 +610,9 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
     dai: rows.map((r) => ({ nhan: `Phần ${r.phan} câu ${r.soCau}`, giay: r.giay, dung: Boolean(r.dungSai) })),
     viPham: dungViPham(n.viPham),
     baiTap,
+    tongUngVien: kqChua?.tongUngVien,
     thieuChua: (() => {
-      const ds = kqChua ? kqChua.thieu.map((t) => `Câu ${t.soCau}: ${t.vi}`) : []
+      const ds = kqChua ? kqChua.thieu.map((t) => t.vi.charAt(0).toUpperCase() + t.vi.slice(1)) : []
       if (luiCoSai) ds.push('Kho chưa đủ câu cùng dạng với câu em sai — phần dưới là bài luyện chung của chuyên đề, không phải câu chữa.')
       return ds.length > 0 ? ds : undefined
     })(),

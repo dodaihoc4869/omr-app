@@ -75,9 +75,18 @@ describe('mục 8 — KHÔNG lấy câu kiến thức khác', () => {
   })
 
   it('CẤM tụt xuống "cùng chuyên đề, lấy đại" — đó chính là cái đang hỏng', () => {
-    // Kho chỉ có câu danh pháp (cùng chuyên đề Ester, khác cơ chế) ⇒ phải trả 0.
+    // Kho chỉ có câu danh pháp (cùng chuyên đề Ester, khác cơ chế) ⇒ pool = 0.
+    //
+    // THẦY ĐỔI LUẬT 07/09: "nếu câu nào chưa có câu chữa, thì bạn lấy lại câu
+    // sai đó chữa lại và phân tích lỗi sai của em đó ở câu đó để học sinh làm
+    // lại". Nên chỗ trống ấy KHÔNG còn rỗng: phiếu có đúng một câu, và câu đó
+    // là CHÍNH CÂU EM SAI, gắn cờ `laLamLai`.
+    //
+    // Điều đang đo vẫn nguyên vẹn — thậm chí chặt hơn: không một câu danh pháp
+    // nào được phép lọt vào phiếu.
     const kq = rutDeChua({ khoDe: kho([q('sai-7', HS), q('dp-1', DP), q('dp-2', DP)]), rows: rowsSaiCau7(), soCau: 5 })
-    expect(kq.cau).toHaveLength(0)
+    expect(kq.cau.map((c) => c.id)).toEqual(['sai-7'])
+    expect(kq.cau[0].chuaCho!.laLamLai).toBe(true)
     expect(kq.thieu.length).toBeGreaterThan(0)
   })
 
@@ -149,7 +158,12 @@ describe('mục 8 — câu sai chưa gắn dạng', () => {
   it('không rút câu nào cho nó, thieu[] nói rõ, KHÔNG đoán', () => {
     const k = kho([q('sai-x', null), q('hs-1', HS), q('hs-2', HS)])
     const kq = rutDeChua({ khoDe: k, rows: [row(4, 'sai-x', 'hieu', false)], soCau: 5 })
-    expect(kq.cau).toHaveLength(0)
+    // Thầy đổi luật 07/09 (xem ghi chú ở test "CẤM tụt xuống..."): câu chưa gắn
+    // dạng cũng được làm lại chính nó thay vì để em tay trắng. Luật CẤM ĐOÁN
+    // vẫn nguyên: hs-1 và hs-2 tuyệt đối không được lọt vào, và thieu[] vẫn
+    // đẩy thầy sang Ngân hàng câu hỏi gán mã.
+    expect(kq.cau.map((c) => c.id)).toEqual(['sai-x'])
+    expect(kq.cau[0].chuaCho!.laLamLai).toBe(true)
     expect(kq.thieu[0].vi).toMatch(/chưa gắn dạng/)
     expect(kq.thieu[0].vi).toMatch(/Ngân hàng câu hỏi/)
   })

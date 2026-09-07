@@ -20,7 +20,10 @@ import { mergeKeepAnswers } from '../data/examContent'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import HopChonDe from '../components/HopChonDe'
-import { baiLamTuCa, cauTuBanDe, daCoBaiLam, emTuCa, luotMoiNhat, type BanDeCa, type HoSoRutGon, type LuotCa } from '../lib/du-lieu-len-bang'
+import { baiLamTuCa, cauTuBanDe, daCoBaiLam, emTuCa, luotMoiNhat, rowsLopSai, type BanDeCa, type HoSoRutGon, type LuotCa } from '../lib/du-lieu-len-bang'
+import { rutDeChua } from '../lib/rut-de-chua'
+import { SO_CAU_MAC_DINH } from '../lib/cau-hinh-chua'
+import ThanhSoCauChua from '../components/ThanhSoCauChua'
 import { bangChu, chuCau, chuChum, MAC_DINH, phanCong, TEN_MUC_NHAM, type CauChua, type DongPhanCong, type KetQuaPhanCong } from '../lib/phan-cong'
 import TheCau from '../components/TheCau'
 import { useAppStore } from '../store/appStore'
@@ -106,7 +109,13 @@ export default function GoiLenBangScreen() {
   //               ĐÚNG chuyên đề của câu đó để chọn em nào lên bảng.
   // Mặc định TỰ CHỌN: chưa mở ca thì chưa biết ca có bộ rút sẵn hay không, mà
   // hộp tích đề phải hiện sẵn để thầy làm việc được ngay.
-  const [cachLayCau, setCachLayCau] = useState<'san' | 'tu_chon'>('tu_chon')
+  const [cachLayCau, setCachLayCau] = useState<'san' | 'tu_chon' | 'theo_dang'>('tu_chon')
+  /** RÚT THEO MÃ DẠNG (v4 mục 2). Nguồn là CẢ KHO, không phải đề thầy tích. */
+  const [khoDe, setKhoDe] = useState<TeacherExamSource[]>([])
+  const [soCauChua, setSoCauChua] = useState(SO_CAU_MAC_DINH)
+  useEffect(() => {
+    void loadExamSources().then(setKhoDe)
+  }, [])
   const [timEm, setTimEm] = useState('')
 
   const [soLuot, setSoLuot] = useState(1)
@@ -212,6 +221,33 @@ export default function GoiLenBangScreen() {
     }
   }
 
+  /** Bảng chấm gộp cả lớp: mỗi câu một dòng, câu nhiều em sai xếp trước. */
+  const rowsLop = useMemo(() => (du ? rowsLopSai(du.bank, du.maCa, du.luot) : []), [du])
+
+  /** Cổng chạy hai lần: một lần đếm (soCau 0) để biết max cho thanh kéo, một lần
+   * rút thật theo số thầy kéo. Đếm rẻ và thuần máy nên không tiếc. */
+  const demChua = useMemo(
+    () => (khoDe.length > 0 && rowsLop.length > 0 ? rutDeChua({ khoDe, rows: rowsLop, soCau: 0 }) : null),
+    [khoDe, rowsLop],
+  )
+  const kqChua = useMemo(
+    () => (cachLayCau === 'theo_dang' && demChua ? rutDeChua({ khoDe, rows: rowsLop, soCau: soCauChua }) : null),
+    [cachLayCau, demChua, khoDe, rowsLop, soCauChua],
+  )
+  /** Câu cổng chọn, dựng lại thành BanDeCa để phần dưới của màn chạy nguyên. */
+  const bankTheoDang: BanDeCa = useMemo((): BanDeCa => {
+    if (!kqChua || kqChua.cau.length === 0) return { phanI: [], phanII: [], phanIII: [] }
+    const id = new Set(kqChua.cau.map((c) => c.id))
+    return mergeKeepAnswers(
+      khoDe.map((s) => ({
+        ...s,
+        phanI: s.phanI.filter((q) => id.has(q.id)),
+        phanII: s.phanII.filter((q) => id.has(q.id)),
+        phanIII: s.phanIII.filter((q) => id.has(q.id)),
+      })),
+    )
+  }, [kqChua, khoDe])
+
   /** Bản đề của các mã thầy tích thêm, gộp lại thành một kho. */
   const bankTichTay: BanDeCa = useMemo(() => mergeKeepAnswers(deDaLuu.filter((d) => maDeChon.has(d.maDe))), [deDaLuu, maDeChon])
 
@@ -220,13 +256,14 @@ export default function GoiLenBangScreen() {
   const bankThem: BanDeCa = useMemo(() => {
     // Thầy tự chọn thì BỎ HẲN kho tự nạp: gộp cả hai là bảng chữa lại đầy câu
     // máy chọn, đúng chỗ thầy vừa kêu.
+    if (cachLayCau === 'theo_dang') return bankTheoDang
     const san = cachLayCau === 'san' ? du?.khoChua : null
     return {
       phanI: [...(san?.phanI ?? []), ...bankTichTay.phanI],
       phanII: [...(san?.phanII ?? []), ...bankTichTay.phanII],
       phanIII: [...(san?.phanIII ?? []), ...bankTichTay.phanIII],
     }
-  }, [du, bankTichTay, cachLayCau])
+  }, [du, bankTichTay, cachLayCau, bankTheoDang])
 
   /** DANH SÁCH CÂU ĐÁNG CHỮA = câu của ca + câu thầy tích thêm.
    *
@@ -239,7 +276,7 @@ export default function GoiLenBangScreen() {
     // vậy — câu của ca đã thi có bài làm nên điểm cao hơn, chen hết chỗ. Thầy
     // chọn bài nào thì bảng chữa chỉ được có bài đó, không câu nào chuyên đề
     // khác. Bài làm của ca vẫn dùng, nhưng chỉ để biết em nào yếu chỗ nào.
-    if (cachLayCau === 'tu_chon') return cauTuBanDe(bankThem)
+    if (cachLayCau === 'tu_chon' || cachLayCau === 'theo_dang') return cauTuBanDe(bankThem)
 
     const cuaCa = du ? cauTuBanDe(du.bank) : []
     const dich = { I: du?.bank.phanI.length ?? 0, II: du?.bank.phanII.length ?? 0, III: du?.bank.phanIII.length ?? 0 }
@@ -486,9 +523,9 @@ export default function GoiLenBangScreen() {
         </div>
 
         <div className="flex flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k3)' }} role="radiogroup" aria-label="Cách lấy câu để chữa">
-          {(['san', 'tu_chon'] as const).map((c) => {
+          {(['theo_dang', 'san', 'tu_chon'] as const).map((c) => {
             const chon = cachLayCau === c
-            const tat = c === 'san' && !du?.khoChua
+            const tat = (c === 'san' && !du?.khoChua) || (c === 'theo_dang' && (demChua?.tongUngVien ?? 0) === 0)
             return (
               <button
                 key={c}
@@ -510,13 +547,27 @@ export default function GoiLenBangScreen() {
                   opacity: tat ? 0.6 : 1,
                 }}
               >
-                {c === 'san' ? 'Kiểm tra điểm yếu cộng dồn' : 'Tôi tự chọn bài để chữa'}
+                {c === 'theo_dang' ? 'Theo dạng câu cả lớp sai' : c === 'san' ? 'Kiểm tra điểm yếu cộng dồn' : 'Tôi tự chọn bài để chữa'}
               </button>
             )
           })}
         </div>
 
-        {cachLayCau === 'san' ? (
+        {cachLayCau === 'theo_dang' ? (
+          <div data-theo-dang>
+            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k3)' }}>
+              Rút từ <b>cả kho</b>, chỉ lấy câu cùng mã dạng với những câu cả lớp làm sai. Không lấy câu chuyên đề khác, không bó trong đề của ca.
+            </div>
+            <ThanhSoCauChua
+              soCau={soCauChua}
+              onDoi={setSoCauChua}
+              tongUngVien={demChua?.tongUngVien ?? 0}
+              poolTheoCauSai={demChua?.poolTheoCauSai}
+              thieu={demChua?.thieu}
+              soCauSai={demChua?.poolTheoCauSai.length}
+            />
+          </div>
+        ) : cachLayCau === 'san' ? (
           du?.khoChua ? (
             <div style={{ ...NHAN_NHO, color: 'var(--xanh)' }} data-kho-chua>
               Ca này mở bằng chế độ Kiểm tra điểm yếu nên đã tự nạp sẵn <b style={SO}>{du.khoChua.phanI.length + du.khoChua.phanII.length + du.khoChua.phanIII.length}</b> câu cùng chuyên đề để chia đủ bốn lượt. Không cần

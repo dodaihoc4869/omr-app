@@ -97,6 +97,15 @@ export interface KhoDeCau {
   viSaoNull?: string | null
   kienThuc?: string[]
   loiThuongGap?: string[]
+  /** LÝ THUYẾT hay BÀI TẬP — nhãn THẬT do `kho-de/cong-cu/kieu_cau.py` ghi vào
+   * kho 07/09, phủ cả 2.520 câu.
+   *
+   * Trường riêng, KHÔNG dùng lại tên `dang`: `dang` đã là mã dạng ba tầng. Trùng
+   * tên là app đọc một object vào chỗ đợi chuỗi rồi lặng lẽ quay về đoán —
+   * đúng lỗi thầy nhìn thấy: "Kho chưa có nhãn lý thuyết hay bài tập". */
+  kieu?: 'ly_thuyet' | 'bai_tap'
+  /** Câu rơi vào dải giữa, máy phải gỡ hoà. Hiện ra để thầy soi lại. */
+  kieu_chua_chac?: boolean
 }
 
 export type DangKho = { ma: string; ten: string }
@@ -337,6 +346,8 @@ export function parseKhoDeJson(data: unknown): KhoDeParseResult {
       viSaoNull: typeof c.viSaoNull === 'string' && c.viSaoNull.trim() ? c.viSaoNull.trim() : null,
       kienThuc: chuoiMang(c.kienThuc),
       loiThuongGap: chuoiMang(c.loiThuongGap),
+      kieu: c.kieu === 'ly_thuyet' || c.kieu === 'bai_tap' ? c.kieu : undefined,
+      kieu_chua_chac: c.kieu_chua_chac === true ? true : undefined,
     })
   })
   if (errors.length > 0) return { ok: false, errors }
@@ -409,6 +420,10 @@ export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherE
       viSaoNull: c.viSaoNull ?? undefined,
       kienThuc: c.kienThuc && c.kienThuc.length > 0 ? c.kienThuc : undefined,
       loiThuongGap: c.loiThuongGap && c.loiThuongGap.length > 0 ? c.loiThuongGap : undefined,
+      // Nhãn lý thuyết/bài tập cũng phải đi qua đây, cùng lý do như `dang`:
+      // dừng ở cổng nhập là kho ghi xong vẫn như chưa ghi.
+      kieu: c.kieu,
+      kieuChuaChac: c.kieu_chua_chac,
     }
 
     if (c.phan === 'I') {

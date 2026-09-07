@@ -274,7 +274,7 @@ export default function GiaoBaiTap({
             })}
           </div>
           <div style={{ fontSize: 'var(--cx-0)', color: 'var(--nhat)', marginTop: 'var(--k1)', lineHeight: 1.5 }}>
-            Kho chưa có nhãn lý thuyết / bài tập, máy tự phân loại từ đề. Câu không phân loại chắc chắn chỉ vào bài khi chọn Ngẫu nhiên.
+            Nhãn lý thuyết / bài tập lấy thẳng từ kho. Đề nào chưa tải lại thì máy tạm phân loại từ mặt chữ, câu chưa chắc chỉ vào bài khi chọn Ngẫu nhiên.
           </div>
         </div>
 

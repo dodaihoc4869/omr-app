@@ -16,7 +16,7 @@
 // yếu. Máy bật "giảm chuyển động" thì hiện thẳng trạng thái cuối.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { classify } from '../engine/score'
-import { chanSoCau, docLinkPhieu, SO_CAU_MAX, SO_CAU_MIN } from '../lib/phieu-link'
+import { chanSoCau, docLinkPhieu, SO_CAU_MIN } from '../lib/phieu-link'
 import { layPhieu } from '../lib/exam-api'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import { napDong } from '../lib/nap-manh'
@@ -947,7 +947,8 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
     c.dang ?? dangCua({ phan: c.phan, text: c.text, luaChon: c.luaChon ?? [], dapAn: c.phan === 'III' ? c.dapAn : '', mucDo: c.mucDo })
   const dsDaLoc = (du.baiTap ?? []).filter((c) => hopDang(dangCuaCau(c), locDang))
   const coSan = dsDaLoc.length
-  const tran = Math.min(SO_CAU_MAX, Math.max(SO_CAU_MIN, coSan || SO_CAU_MIN))
+  // v4 mục 9 cấm trần cứng: trần là số câu chữa THẬT SỰ có, không phải 60.
+  const tran = Math.max(SO_CAU_MIN, coSan || SO_CAU_MIN)
   const [soCau, setSoCau] = useState(() => Math.min(SO_CAU_MIN, tran))
   const lay = Math.min(soCau, coSan)
 
@@ -1063,7 +1064,7 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
         Rút từ cả kho, theo đúng dạng của từng câu em làm sai, xếp từ dễ lên khó.
         {/* NÓI RÕ SỐ CÂU KHO CÒN, thay vì để thanh kéo dừng ở một con số lạ mà
             không ai biết vì sao (thầy hỏi đúng câu này ngày 06/09). */}
-        {laCuaEm && coSan > 0 && coSan < SO_CAU_MAX ? ` Kho còn ${coSan} câu của những chuyên đề này ngoài các câu em vừa làm.` : ''}
+        {du.tongUngVien && du.tongUngVien > coSan ? ` Kho còn ${du.tongUngVien} câu cùng dạng với những câu em sai.` : ''}
         {du.linkBaiTap
           ? ' Gửi con link ĐỀ trước để em tự làm vào vở; em làm xong mới gửi link LỜI GIẢI để em dò. Hai link chỉ có bài tập, không kèm điểm và nhận xét.'
           : ' Em làm hết rồi mới bấm vào từng câu xem lời giải.'}

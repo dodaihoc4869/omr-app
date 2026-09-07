@@ -79,6 +79,10 @@ export async function dungPhieuChoEm(
   dsSbd: string[],
   goc: string,
   tien: (da: number, tong: number) => void = () => {},
+  /** Mã phiếu ĐÃ CÓ của từng em, để lượt dựng lại GIỮ NGUYÊN link đã gửi phụ
+   * huynh. Thiếu map này thì mỗi lần dựng lại là một link mới, link cũ trong
+   * Zalo thành link chết. */
+  maCu?: Map<string, { ketqua?: string; baitap?: string }>,
 ): Promise<KetQuaDungPhieu> {
   if (dsSbd.length === 0) return { dong: [], loi: [] }
   const hangCua = hangTrongCa(daCham)
@@ -166,7 +170,7 @@ export async function dungPhieuChoEm(
     // Link báo cáo có điểm và nhận xét của thầy; chuyển tiếp nguyên cho con là
     // sai đối tượng — nên bài tập phải là một phiếu riêng.
     if (phieu.baiTap && phieu.baiTap.length > 0) {
-      const maBt = sinhMaPhieu()
+      const maBt = maCu?.get(sbd)?.baitap || sinhMaPhieu()
       const sai = phieu.chuyenDeCa.filter((c) => c.soSai > 0)
       const goiBt: GoiPhieuBaiTap = {
         v: BAN_PHIEU_BT,
@@ -194,7 +198,7 @@ export async function dungPhieuChoEm(
     }
 
     const { phieu: goiGui } = giamGoiPhieu(phieu)
-    const maKq = sinhMaPhieu()
+    const maKq = maCu?.get(sbd)?.ketqua || sinhMaPhieu()
     maKetQua.add(maKq)
     canLuu.push({ ma: maKq, maCa: ca.maCa, sbd, hoTen: e.hoTen, phieu: goiGui, loai: 'ketqua' })
   }
@@ -315,6 +319,10 @@ export async function taoPhieuCaCa(
   maCa: string,
   goc: string,
   tien: (da: number, tong: number) => void = () => {},
+  /** `true` = DỰNG LẠI phiếu cho MỌI em đã chấm, đè lên bản cũ, giữ nguyên mã
+   * phiếu nên link đã gửi vẫn mở được. Dùng khi luật rút câu đổi (v4) và thầy
+   * muốn báo cáo cũ có bản mới. */
+  taoLai = false,
 ): Promise<KetQuaTaoPhieuCaCa> {
   const { ca, keyBank, daCham } = await gomCa(url, mat, maCa)
   const daCo = await phieuTheoCa(url, mat, ca.maCa)
@@ -325,8 +333,16 @@ export async function taoPhieuCaCa(
     daCo,
     goc,
   )
-  const thieu = g.chuaCoPhieu.map((x) => x.sbd)
-  const kq = thieu.length > 0 ? await dungPhieuChoEm(url, mat, ca, keyBank, daCham, thieu, goc, tien) : { dong: [], loi: [] }
+  const thieu = taoLai ? daCham.map((e) => e.sbd) : g.chuaCoPhieu.map((x) => x.sbd)
+  // Giữ nguyên mã phiếu cũ: link thầy đã gửi Zalo phải còn sống sau khi dựng lại.
+  const maCu = new Map<string, { ketqua?: string; baitap?: string }>()
+  for (const p of daCo) {
+    const cu = maCu.get(p.sbd) ?? {}
+    if (p.loai === 'baitap') cu.baitap = p.ma
+    else cu.ketqua = p.ma
+    maCu.set(p.sbd, cu)
+  }
+  const kq = thieu.length > 0 ? await dungPhieuChoEm(url, mat, ca, keyBank, daCham, thieu, goc, tien, taoLai ? maCu : undefined) : { dong: [], loi: [] }
   const theoSbd = new Map<string, DongLinkPhieu>()
   for (const d of [...g.dong, ...kq.dong]) theoSbd.set(d.sbd, d)
 

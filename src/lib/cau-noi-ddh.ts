@@ -39,7 +39,7 @@ export interface CauNoiDdh {
   danhSachEm: () => Promise<EmTomTat[]>
   phieuTheoCa: (maCa: string) => Promise<PhieuCuaCa[]>
   /** Dựng nốt phiếu cho em chưa có rồi trả link của MỌI em đã chấm trong ca. */
-  taoPhieuCaCa: (maCa: string) => Promise<KetQuaTaoPhieuCaCa>
+  taoPhieuCaCa: (maCa: string, taoLai?: boolean) => Promise<KetQuaTaoPhieuCaCa>
   /** Dựng link `/p#<mã>` từ một mã phiếu đã có. Thuần chuỗi, không gọi máy chủ. */
   linkPhieu: (ma: string) => string
 }
@@ -83,9 +83,9 @@ export function dungCauNoi(): CauNoiDdh {
       const { url, mat } = await chia()
       return phieuTheoCa(url, mat, String(maCa || '').trim())
     },
-    taoPhieuCaCa: async (maCa) => {
+    taoPhieuCaCa: async (maCa, taoLai) => {
       const { url, mat } = await chia()
-      return taoPhieuCaCa(url, mat, String(maCa || '').trim(), gocApp())
+      return taoPhieuCaCa(url, mat, String(maCa || '').trim(), gocApp(), () => {}, taoLai === true)
     },
     linkPhieu: (ma) => taoLinkPhieu(gocApp(), String(ma || '').trim()),
   }

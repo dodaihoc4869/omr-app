@@ -49,13 +49,33 @@ export interface NhanChua {
   tenDang: string
   /** 1 = trùng đúng mã. 2 = cùng chuyên đề và cùng cơ chế, khác việc phải làm. */
   bac: 1 | 2
+  /** CHÍNH CÂU EM LÀM SAI, đưa lại vào phiếu để em làm lại — thầy chốt 07/09:
+   * "câu nào chưa có câu chữa thì lấy lại câu sai đó, phân tích lỗi sai của em".
+   * Thà cho em làm lại đúng câu đó còn hơn để trống chỗ ấy. */
+  laLamLai?: true
+  /** Em đã chọn phương án nào. */
+  daChon?: string
+  /** Vì sao phương án em chọn là sai — lấy từ lời giải của chính câu đó. */
+  viSaoSai?: string
 }
 
 export interface SuatThieu {
   soCau: number
+  /** BẮT BUỘC có phần. Số câu đánh lại từ 1 ở mỗi phần, nên "câu 2" trần là hai
+   * câu khác nhau. Thầy bắt được 07/09: thanh kéo báo "chưa có câu chữa cho câu
+   * 2" trong khi phiếu vẫn có 5 câu chữa cho câu 2 — hai câu 2 khác phần. */
+  phan: 'I' | 'II' | 'III'
+  /** Khoá thật, để đối chiếu không phải dò theo số câu. */
+  qid: string
   /** Tên dạng cho thầy đọc; rỗng khi câu sai chưa gắn dạng. */
   tenDang: string
   vi: string
+}
+
+/** Tên gọi MỘT câu sai cho người đọc. Một chỗ duy nhất sinh chuỗi này để thanh
+ * kéo, dòng cảnh báo và phiếu không nói ba kiểu khác nhau. */
+export function tenCauSai(phan: 'I' | 'II' | 'III', soCau: number): string {
+  return `câu ${soCau} phần ${phan}`
 }
 
 export interface CauSaiCanChua {
@@ -65,12 +85,16 @@ export interface CauSaiCanChua {
   mucDo: MucDoCau | ''
   maDang: string
   tenDang: string
+  /** Em đã chọn gì. Cần để phiếu nói được vì sao em sai, không chỉ nói sai. */
+  daChon: string
 }
 
 /** Số ứng viên riêng của một câu sai — đặc tả v4 mục 4.2. */
 export interface PoolCauSai {
   qid: string
   soCau: number
+  /** Xem `SuatThieu.phan` — thiếu nó là hai câu khác phần bị gộp làm một. */
+  phan: 'I' | 'II' | 'III'
   tenDang: string
   pool: number
 }
@@ -120,6 +144,7 @@ export function cauSaiTuRows(rows: ChiTietCauRow[], traDang: (qid: string) => Da
         mucDo: laMucDo(r.mucDo),
         maDang: d?.ma ?? '',
         tenDang: d?.ten ?? '',
+        daChon: String(r.dapAnChon || '').trim(),
       }
     })
     .filter((c) => c.qid !== '')
@@ -141,6 +166,20 @@ export interface YeuCauRutChua {
   soCau?: number
   /** Ghi đè `CHO_BAC_2` cho một lượt rút (thanh kéo bật/tắt tại chỗ). */
   choBac2?: boolean
+  /** NƠI TRA ĐỀ GỐC CỦA CÂU EM SAI — ngân hàng của chính ca đó.
+   *
+   * Cần riêng vì kho đề và đề của ca là hai thứ khác nhau: ca có thể thi bằng
+   * đề chưa nằm trong kho, và khi ấy `khoDe` không tra ra được câu em vừa làm
+   * sai. Không có thì rơi về `khoDe`. */
+  nguonCauSai?: TeacherExamSource[]
+}
+
+/** Số câu chữa THẬT, không tính thẻ "làm lại chính câu em sai".
+ *
+ * Chỗ gọi dùng con số này để quyết định có lui về bài luyện chung hay không.
+ * Đếm cả thẻ làm lại vào đây là em nhận đúng một câu thay vì cả bộ luyện. */
+export function soCauChuaThat(kq: KetQuaRutChua | null | undefined): number {
+  return (kq?.cau ?? []).filter((c) => !c.chuaCho?.laLamLai).length
 }
 
 interface UngVien {
@@ -155,14 +194,26 @@ interface UngVien {
  *
  * Xuất ra ngoài để màn Ngân hàng đếm nguồn hàng bằng ĐÚNG luật cổng đang dùng.
  * Đếm bằng luật riêng thì con số báo cho thầy sẽ lệch với thực tế rút được. */
-export function ungVienChua(khoDe: TeacherExamSource[]): { cau: CauLuyen; ma: string }[] {
-  const tra = new Map<string, string>()
+/** Mã dạng của MỌI câu trong kho, kể cả câu có hình.
+ *
+ * Tách khỏi `ungVienChua` vì hai câu hỏi khác nhau: "câu này mang dạng gì" hỏi
+ * cho CÂU SAI, "câu này dùng làm câu chữa được không" hỏi cho ỨNG VIÊN. Trước
+ * đây tra dạng câu sai bằng danh sách ứng viên đã lọc hình, nên câu sai có hình
+ * bị báo "chưa gắn dạng" dù kho đã gán mã cho nó — thầy thấy đúng lỗi này ở
+ * câu 1 và câu 6 ngày 07/09. */
+export function banDoDang(khoDe: TeacherExamSource[]): Map<string, DangCauKho> {
+  const tra = new Map<string, DangCauKho>()
   for (const s of khoDe) {
     for (const q of [...s.phanI, ...s.phanII, ...s.phanIII]) {
       const d = dangCuaCauKho(q as CoDang)
-      if (d) tra.set(String((q as CoDang).id ?? ''), d.ma)
+      if (d) tra.set(String((q as CoDang).id ?? ''), d)
     }
   }
+  return tra
+}
+
+export function ungVienChua(khoDe: TeacherExamSource[]): { cau: CauLuyen; ma: string; ten: string }[] {
+  const tra = banDoDang(khoDe)
   // `cauLuyenTuNguon` chỉ ĐỔI KIỂU sang `CauLuyen`, không chọn lọc gì — luật
   // chọn nằm ở đây. (Không dùng `chonCauLuyen` cho việc này: đưa `soCau` lớn
   // vào nó làm vòng thang bậc chạy tới cạn — tôi đã dính đúng bẫy đó.)
@@ -170,8 +221,26 @@ export function ungVienChua(khoDe: TeacherExamSource[]): { cau: CauLuyen; ma: st
   // Câu CÓ HÌNH bị loại: phiếu in không dựng được ảnh, luật cũ mục 7.
   return cauLuyenTuNguon(khoDe)
     .filter((c) => !c.anhThanCau && !(c.hinh && c.hinh.length > 0) && !(c.anhLuaChon && c.anhLuaChon.some(Boolean)))
-    .map((c) => ({ cau: c, ma: tra.get(c.id) ?? '' }))
+    .map((c) => ({ cau: c, ma: tra.get(c.id)?.ma ?? '', ten: tra.get(c.id)?.ten ?? '' }))
     .filter((x) => x.ma !== '')
+}
+
+/** Vì sao phương án em chọn là sai — đọc từ lời giải của CHÍNH câu đó.
+ *
+ * Không có lời giải cho phương án ấy thì trả rỗng. Cấm tự nghĩ lý do: một dòng
+ * phân tích bịa còn tệ hơn không có dòng nào. */
+export function viSaoChonSai(c: CauLuyen, daChon: string): string {
+  const ch = String(daChon || '').trim()
+  if (!ch) return ''
+  // ĐỌC `lyDo` CHỨ KHÔNG PHẢI `loiGiai`. `CauLuyen` là kiểu ĐÃ ĐỔI: `doiSang`
+  // đã dàn `loiGiai.tungPa` / `loiGiai.tungY` thành mảng `lyDo`. Bản đầu tôi
+  // viết đọc `c.loiGiai` — trường đó không tồn tại trên `CauLuyen`, nên hàm
+  // luôn trả rỗng và phần phân tích lỗi sai không bao giờ hiện ra.
+  const ds = c.lyDo ?? []
+  if (ds.length === 0) return ''
+  // Phần I khoá là A–D, Phần II khoá là a–d, Phần III không có phương án.
+  const khoa = c.phan === 'II' ? ch.toLowerCase() : ch.toUpperCase()
+  return String(ds.find((x) => x.khoa === khoa)?.ly ?? '').trim()
 }
 
 /** CỔNG. Thuần logic, không đọc IndexedDB, KHÔNG GỌI MẠNG. */
@@ -180,10 +249,16 @@ export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
   const choBac2 = yc.choBac2 ?? CHO_BAC_2
 
   const kho = ungVienChua(yc.khoDe)
-  const traDang = (qid: string) => {
-    const t = kho.find((x) => x.cau.id === qid)
-    return t ? { ma: t.ma, ten: t.cau.chuyenDe } : null
-  }
+  // Tra dạng của CÂU SAI trên CẢ KHO, và lấy đúng `ten` của dạng.
+  //
+  // Hai lỗi cũ ở đúng hai dòng này, thầy bắt được 07/09:
+  //   · tra trên `kho` (đã lọc bỏ câu có hình) ⇒ câu sai có hình bị báo "chưa
+  //     gắn dạng" dù kho đã gán mã;
+  //   · trả `cau.chuyenDe` làm tên dạng ⇒ mọi dòng cảnh báo đọc thành "kho chưa
+  //     có câu nào cùng dạng 'Ester – lipid'", tức đọc ra tên CHƯƠNG, ba câu
+  //     sai khác dạng in ra ba dòng y hệt nhau.
+  const banDo = banDoDang(yc.khoDe)
+  const traDang = (qid: string) => banDo.get(qid) ?? null
   const daXep = xepUuTienChua(cauSaiTuRows(yc.rows, traDang))
   if (daXep.length === 0) return ra
 
@@ -195,8 +270,14 @@ export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
   for (const s of daXep) {
     // Câu sai CHƯA GẮN DẠNG thì pool bằng 0. Cấm đoán.
     if (!s.maDang) {
-      ra.poolTheoCauSai.push({ qid: s.qid, soCau: s.soCau, tenDang: '', pool: 0 })
-      ra.thieu.push({ soCau: s.soCau, tenDang: '', vi: `câu ${s.soCau} chưa gắn dạng — vào Ngân hàng câu hỏi gán rồi rút lại` })
+      ra.poolTheoCauSai.push({ qid: s.qid, soCau: s.soCau, phan: s.phan, tenDang: '', pool: 0 })
+      ra.thieu.push({
+        soCau: s.soCau,
+        phan: s.phan,
+        qid: s.qid,
+        tenDang: '',
+        vi: `${tenCauSai(s.phan, s.soCau)} chưa gắn dạng — vào Ngân hàng câu hỏi gán rồi rút lại`,
+      })
       continue
     }
     const dungDuoc = (x: { cau: CauLuyen; ma: string }) => !tranh.has(x.cau.id) && x.cau.id !== s.qid
@@ -221,9 +302,15 @@ export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
     ]
     xepHangCua.set(s.qid, xepHang)
     for (const u of xepHang) hopUngVien.add(u.cau.id)
-    ra.poolTheoCauSai.push({ qid: s.qid, soCau: s.soCau, tenDang: s.tenDang, pool: xepHang.length })
+    ra.poolTheoCauSai.push({ qid: s.qid, soCau: s.soCau, phan: s.phan, tenDang: s.tenDang, pool: xepHang.length })
     if (xepHang.length === 0) {
-      ra.thieu.push({ soCau: s.soCau, tenDang: s.tenDang, vi: `kho chưa có câu nào cùng dạng "${s.tenDang || s.maDang}"` })
+      ra.thieu.push({
+        soCau: s.soCau,
+        phan: s.phan,
+        qid: s.qid,
+        tenDang: s.tenDang,
+        vi: `${tenCauSai(s.phan, s.soCau)}: kho chưa có câu nào khác cùng dạng "${s.tenDang || s.maDang}"`,
+      })
     }
   }
   // ĐẾM PHÂN BIỆT: hợp của mọi pool, không cộng dồn từng pool.
@@ -236,10 +323,6 @@ export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
   // Pool [60,25,5]: kéo 30 -> [10,10,10]; kéo 80 -> [50,25,5]; kéo 90 -> [60,25,5].
   const xin = Math.max(0, Math.floor(yc.soCau ?? SO_CAU_MAC_DINH))
   const soCau = Math.min(xin, ra.tongUngVien)
-  if (soCau === 0) {
-    for (const s of daXep) if ((xepHangCua.get(s.qid)?.length ?? 0) > 0) ra.capBiCat += 1
-    return ra
-  }
 
   const daDung = new Set<string>()
   const demCua = new Map<string, number>()
@@ -247,7 +330,7 @@ export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
   for (const [qid, ds] of xepHangCua) con.set(qid, [...ds])
 
   let conCho = soCau
-  let phatDuoc = true
+  let phatDuoc = soCau > 0
   while (conCho > 0 && phatDuoc) {
     phatDuoc = false
     for (const s of daXep) {
@@ -265,6 +348,47 @@ export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
       conCho -= 1
       phatDuoc = true
     }
+  }
+
+  // ---- CÂU KHÔNG CÓ CÂU CHỮA: ĐƯA LẠI CHÍNH CÂU EM SAI.
+  //
+  // Thầy chốt 07/09: "câu nào chưa có câu chữa thì lấy lại câu sai đó chữa lại
+  // và phân tích lỗi sai của em đó ở câu đó để học sinh làm lại".
+  //
+  // Trước đây chỗ này để trống và chỉ ghi một dòng "kho chưa có câu cùng dạng"
+  // — em không có gì để làm. Nay: chính câu đó vào phiếu, kèm em đã chọn gì và
+  // vì sao phương án ấy sai, lấy từ lời giải của chính câu đó. Không bịa: không
+  // có lời giải thì để trống phần phân tích chứ không tự nghĩ ra lý do.
+  //
+  // CHỈ áp cho câu sai mà KHO KHÔNG CÓ câu nào cùng dạng (pool = 0). Câu sai chỉ
+  // vì thầy kéo số câu quá nhỏ nên chưa tới suất thì KHÔNG đưa lại — kéo thanh
+  // lên là có ngay, đưa lại chỉ làm phồng phiếu quá số thầy chọn.
+  //
+  // ĐIỀU KIỆN CHẠY: kho phải có ÍT NHẤT MỘT câu mang mã dạng. Kho chưa gán mã
+  // nào là cổng chưa vận hành được — lúc ấy chỗ gọi lui hẳn về bài luyện chung
+  // theo chuyên đề (luật cũ), và rắc thẻ làm lại vào đó chỉ làm mọi phiếu đều
+  // mọc lại đúng đề em vừa thi. Kho thật đã gán 2.213 câu nên nhánh này chỉ còn
+  // là đường lui cho dữ liệu cũ.
+  const nguonGoc = yc.nguonCauSai && yc.nguonCauSai.length > 0 ? yc.nguonCauSai : yc.khoDe
+  const tatCa = kho.length > 0 ? new Map(cauLuyenTuNguon(nguonGoc).map((c) => [c.id, c])) : new Map<string, CauLuyen>()
+  for (const s of daXep) {
+    if ((xepHangCua.get(s.qid)?.length ?? 0) > 0) continue
+    const goc = tatCa.get(s.qid)
+    if (!goc) continue
+    ra.cau.push({
+      ...goc,
+      chuaCho: {
+        qid: s.qid,
+        soCau: s.soCau,
+        phan: s.phan,
+        maDang: s.maDang,
+        tenDang: s.tenDang,
+        bac: 1,
+        laLamLai: true,
+        daChon: s.daChon || undefined,
+        viSaoSai: viSaoChonSai(goc, s.daChon),
+      },
+    })
   }
 
   // BÁO THIẾU / BỊ CẮT — nói ra, không nuốt.
@@ -286,8 +410,10 @@ export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
     if (co >= pool && co < canMoiCau) {
       ra.thieu.push({
         soCau: s.soCau,
+        phan: s.phan,
+        qid: s.qid,
         tenDang: s.tenDang,
-        vi: `kho chỉ còn ${co}/${canMoiCau} câu cùng dạng "${s.tenDang || s.maDang}"`,
+        vi: `${tenCauSai(s.phan, s.soCau)}: kho chỉ còn ${co}/${canMoiCau} câu cùng dạng "${s.tenDang || s.maDang}"`,
       })
     }
   }
@@ -300,7 +426,9 @@ export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
 export function bangDoiChieu(kq: KetQuaRutChua, daXep: CauSaiCanChua[]): { cauSai: CauSaiCanChua; viTri: number[]; vi?: string }[] {
   return daXep.map((s) => {
     const viTri = kq.cau.map((c, i) => (c.chuaCho?.qid === s.qid ? i + 1 : 0)).filter((n) => n > 0)
-    const t = kq.thieu.find((x) => x.soCau === s.soCau)
+    // Dò theo `qid`, KHÔNG theo `soCau`: số câu đánh lại từ 1 ở mỗi phần nên
+    // dò theo số là gán lý do của câu 2 phần II vào câu 2 phần I.
+    const t = kq.thieu.find((x) => x.qid === s.qid)
     return viTri.length > 0 && !t ? { cauSai: s, viTri } : { cauSai: s, viTri, vi: t?.vi ?? 'chưa tới suất trong phiếu này' }
   })
 }

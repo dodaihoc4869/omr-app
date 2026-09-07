@@ -406,6 +406,8 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
 .chua-gi li { margin: 4px 0; font-size: 14px; line-height: 1.5; }
 .chua-gi li.mo { color: #78716c; }
 .chua-gi .chua-mui { color: #c2410c; font-weight: 700; }
+/* Ô phân tích cho câu LÀM LẠI: em phải đọc trước khi làm lại, nên đặt trên đề. */
+.lam-lai { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 14px; line-height: 1.55; color: #7c2d12; }
 .q-card.la-chua.mo { border-left-color: var(--luc); }
 
 /* Vùng bấm: cả thân câu. Con trỏ hình bàn tay để thấy ngay là bấm được. */
@@ -700,8 +702,11 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
   // ở đây để sửa lỗi nào, không phải "một câu Ester bất kỳ".
   const n = c.chuaCho
   const tags = [
-    n ? `<span class="q-tag chua">Chữa câu ${n.soCau}</span>` : '',
-    n && n.bac === 2 ? '<span class="q-tag chua-2">cùng cơ chế, khác việc</span>' : '',
+    // Nhãn PHẢI kèm phần: "câu 2" trần trỏ vào hai câu khác nhau của cùng một
+    // bài thi, em không biết mình đang chữa câu nào.
+    n ? `<span class="q-tag chua">${n.laLamLai ? `Làm lại câu ${n.soCau} phần ${n.phan}` : `Khắc phục lỗi sai câu ${n.soCau} phần ${n.phan}`}</span>` : '',
+    n && n.laLamLai ? '<span class="q-tag chua-2">kho chưa có câu cùng dạng</span>' : '',
+    n && !n.laLamLai && n.bac === 2 ? '<span class="q-tag chua-2">cùng cơ chế, khác việc</span>' : '',
     `<span class="q-tag ${LOP_LOAI[c.phan]}">${TEN_LOAI[c.phan]}</span>`,
     c.mucDo ? `<span class="q-tag ${LOP_MUC[c.mucDo]}">${TEN_MUC[c.mucDo]}</span>` : '',
     c.chuyenDe ? `<span class="q-tag topic">${thoat(c.chuyenDe)}</span>` : '',
@@ -747,9 +752,16 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
   <div class="sol-wrap" id="giai-${stt}"><div class="sol-inner">${giai}</div></div>`
     : ''
 
+  const oLamLai =
+    n && n.laLamLai
+      ? `<div class="lam-lai"><b>Lần thi vừa rồi em chọn ${n.daChon ? thoat(n.daChon) : 'sai câu này'}.</b>${
+          n.viSaoSai ? ` ${thoat(n.viSaoSai)}` : ' Em xem lại lời giải bên dưới rồi tự làm lại từ đầu.'
+        }</div>`
+      : ''
   return `<article class="q-card${n ? ' la-chua' : ''}${moSan ? ' mo' : ''}${giai ? '' : ' khong-giai'}" data-so="${stt}" data-phan="${c.phan}" data-muc="${thoat(c.mucDo || '')}">
   <div class="q-header"><div class="q-num"><span class="ky">${stt}</span></div><div class="q-tags">${tags}</div></div>
   <div class="q-than">
+    ${oLamLai}
     ${deBai}
     ${bangHtml(c.bang)}
     ${hinhTaiViTri(c, 'sau_de')}
@@ -958,25 +970,37 @@ export function tongQuanHtml(cau: CauLuyen[]): string {
  *
  * Câu sai không có câu chữa vẫn phải có dòng, kèm lý do — im lặng bỏ qua là
  * thầy tưởng phiếu đã chữa hết. */
-export function khoiChuaGiHtml(cau: CauLuyen[], thieu: { soCau: number; tenDang: string; vi: string }[] = []): string {
-  const gom = new Map<number, { ten: string; so: number }>()
+export function khoiChuaGiHtml(cau: CauLuyen[], thieu: { soCau: number; phan?: 'I' | 'II' | 'III'; tenDang: string; vi: string }[] = []): string {
+  // GOM THEO PHẦN + SỐ CÂU, không theo số câu trần. Số câu đánh lại từ 1 ở mỗi
+  // phần, nên gom theo số là dồn câu 2 phần I với câu 2 phần II vào một dòng —
+  // đúng lỗi thầy bắt được 07/09: bảng báo "chưa có câu chữa cho câu 2" trong
+  // khi phiếu vẫn in 5 câu khắc phục cho câu 2.
+  const KHOA = (p: string | undefined, s: number) => `${p ?? '?'}|${s}`
+  const THU = { I: 1, II: 2, III: 3 } as const
+  const gom = new Map<string, { phan: 'I' | 'II' | 'III'; soCau: number; ten: string; so: number }>()
   for (const c of cau) {
     const n = c.chuaCho
     if (!n) continue
-    const cu = gom.get(n.soCau) ?? { ten: n.tenDang || '', so: 0 }
+    const k = KHOA(n.phan, n.soCau)
+    const cu = gom.get(k) ?? { phan: n.phan, soCau: n.soCau, ten: n.tenDang || '', so: 0 }
     cu.so += 1
     if (!cu.ten && n.tenDang) cu.ten = n.tenDang
-    gom.set(n.soCau, cu)
+    gom.set(k, cu)
   }
   if (gom.size === 0 && thieu.length === 0) return ''
-  const dong = [...gom.entries()]
-    .sort((a, b) => a[0] - b[0])
-    .map(([so, v]) => `<li><b>Câu ${so}</b>${v.ten ? ` · ${thoat(v.ten)}` : ''} <span class="chua-mui">-&gt;</span> ${v.so} câu chữa</li>`)
+  const sapXep = (a: { phan: 'I' | 'II' | 'III'; soCau: number }, b: { phan: 'I' | 'II' | 'III'; soCau: number }) =>
+    THU[a.phan] - THU[b.phan] || a.soCau - b.soCau
+  const dong = [...gom.values()]
+    .sort(sapXep)
+    .map((v) => `<li><b>Câu ${v.soCau} phần ${v.phan}</b>${v.ten ? ` · ${thoat(v.ten)}` : ''} <span class="chua-mui">-&gt;</span> ${v.so} câu khắc phục</li>`)
   const thieuDong = thieu
-    .filter((t) => !gom.has(t.soCau))
-    .map((t) => `<li class="mo"><b>Câu ${t.soCau}</b>${t.tenDang ? ` · ${thoat(t.tenDang)}` : ''} <span class="chua-mui">-&gt;</span> ${thoat(t.vi)}</li>`)
+    .filter((t) => !gom.has(KHOA(t.phan, t.soCau)))
+    .map(
+      (t) =>
+        `<li class="mo"><b>Câu ${t.soCau}${t.phan ? ` phần ${t.phan}` : ''}</b>${t.tenDang ? ` · ${thoat(t.tenDang)}` : ''} <span class="chua-mui">-&gt;</span> ${thoat(t.vi)}</li>`,
+    )
   return `<section class="chua-gi">
-  <h3>Phiếu này chữa gì</h3>
+  <h3>Phiếu này khắc phục lỗi nào</h3>
   <ul>${dong.join('')}${thieuDong.join('')}</ul>
 </section>`
 }
@@ -1226,7 +1250,7 @@ export interface TuyChonPhieu {
   /** true = phiếu CHỈ CÓ ĐỀ (không đáp án, không lời giải, không nút mở). */
   anGiai?: boolean
   /** Câu sai chưa có câu chữa, để khối đầu phiếu nói lý do. */
-  thieuChua?: { soCau: number; tenDang: string; vi: string }[]
+  thieuChua?: { soCau: number; phan?: 'I' | 'II' | 'III'; tenDang: string; vi: string }[]
 }
 
 export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChonPhieu = {}): string {

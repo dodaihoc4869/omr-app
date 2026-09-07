@@ -33,10 +33,16 @@
 // câu hỏi lại là chọn phát biểu đúng. Máy không tách nổi bằng mặt chữ, nên
 // chúng nằm ngoài hai nút lọc chặt.
 //
-// ĐƯỜNG ĐI SAU NÀY: pipeline nạp đề đang gắn `chuyen_de`, `muc_do`, `can_chua`
-// — lúc đó nó có cả đề lẫn lời giải trong tay và phân loại chuẩn hơn hẳn. Khi
-// kho có trường `dang`, `dangCua` đọc thẳng trường đó và bỏ qua toàn bộ phần
-// suy đoán (nhánh đầu tiên trong hàm). Không phải sửa chỗ gọi nào.
+// ĐÃ LÀM XONG 07/09 — kho có nhãn thật. `kho-de/cong-cu/kieu_cau.py` chạy đúng
+// luật dưới đây lên cả 2.520 câu và ghi trường `kieu` vào từng câu:
+//
+//   lý thuyết 1.786 (145 câu máy gỡ hoà) · bài tập 734 (62 câu máy gỡ hoà)
+//
+// Nên nhánh đầu của `dangCua` giờ ăn với gần như mọi câu, và phần suy đoán bên
+// dưới chỉ còn là đường lui cho đề chưa tải lại. 207 câu máy phải gỡ hoà mang
+// thêm `kieu_chua_chac` để màn Ngân hàng liệt kê cho thầy soi — không giấu.
+//
+// TÊN TRƯỜNG LÀ `kieu`, KHÔNG PHẢI `dang`: `dang` bên kho là mã dạng ba tầng.
 
 export type DangCau = 'ly_thuyet' | 'bai_tap' | 'chua_ro'
 
@@ -102,8 +108,15 @@ export interface CauDeDoan {
   /** Đáp án đúng. Chỉ dùng để biết nó có phải một con số trần không. */
   dapAn?: string
   mucDo?: string
-  /** Nhãn thật từ pipeline nạp đề, khi kho đã có. Có thì dùng thẳng. */
-  dang?: string
+  /** Nhãn thật từ kho — `kieu` chứ KHÔNG PHẢI `dang`.
+   *
+   * `dang` bên kho đã bị mã dạng ba tầng chiếm chỗ (một object `{ma, ten}`), nên
+   * đọc `dang` ở đây là đọc một object vào chỗ đợi chuỗi: không khớp
+   * `'ly_thuyet'|'bai_tap'` nào, hàm lặng lẽ quay về đoán, và màn hình báo "Kho
+   * chưa có nhãn lý thuyết hay bài tập" trong khi kho đã ghi đủ 2.520 câu. */
+  kieu?: string
+  /** Máy phải gỡ hoà ở dải giữa. KHÔNG đổi kết quả, chỉ để màn hình nói thật. */
+  kieuChuaChac?: boolean
 }
 
 /** Điểm thô của luật đoán. Xuất ra để test và để màn hình giải thích được vì
@@ -127,7 +140,7 @@ export function diemDang(c: CauDeDoan): number {
  *      Số đo 06/09 xác nhận 578/578 câu Phần III đều là bài tập.
  *   3. Điểm từ mặt chữ. */
 export function dangCua(c: CauDeDoan): DangCau {
-  if (c.dang === 'ly_thuyet' || c.dang === 'bai_tap') return c.dang
+  if (c.kieu === 'ly_thuyet' || c.kieu === 'bai_tap') return c.kieu
   if (c.phan === 'III') return 'bai_tap'
   const d = diemDang(c)
   if (d >= MOC_BAI_TAP) return 'bai_tap'

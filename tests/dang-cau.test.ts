@@ -31,9 +31,15 @@ describe('phân loại dạng câu', () => {
   })
 
   it('nhãn thật từ kho THẮNG mọi suy đoán', () => {
-    // Khi pipeline nạp đề gắn `dang`, chỗ này thôi đoán.
-    expect(dangCua({ phan: 'III', text: 'x', dang: 'ly_thuyet' })).toBe('ly_thuyet')
-    expect(dangCua({ text: 'Tính khối lượng…', dapAn: '12', dang: 'ly_thuyet' })).toBe('ly_thuyet')
+    // Kho đã gắn nhãn 07/09 nên chỗ này thôi đoán.
+    //
+    // TÊN TRƯỜNG ĐỔI `dang` -> `kieu`: bên kho `dang` đã là mã dạng ba tầng
+    // (object `{ma, ten}`). Giữ tên cũ là app đọc object vào chỗ đợi chuỗi rồi
+    // lặng lẽ quay về đoán — đúng lỗi thầy nhìn thấy trên màn hình 07/09.
+    expect(dangCua({ phan: 'III', text: 'x', kieu: 'ly_thuyet' })).toBe('ly_thuyet')
+    expect(dangCua({ text: 'Tính khối lượng…', dapAn: '12', kieu: 'ly_thuyet' })).toBe('ly_thuyet')
+    // Mã dạng KHÔNG được cướp chỗ nhãn: một object ở đây phải bị bỏ qua.
+    expect(dangCua({ phan: 'I', text: 'Phản ứng thuận nghịch là phản ứng', mucDo: 'biet', kieu: undefined })).toBe('ly_thuyet')
   })
 
   it('câu hỏi định nghĩa mức biết → lý thuyết', () => {

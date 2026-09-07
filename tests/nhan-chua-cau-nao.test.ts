@@ -99,7 +99,10 @@ describe('phiếu chỉ lấy câu CÙNG MÃ DẠNG với câu em sai', () => {
     const it1 = kho([cau('sai-7', HS, 'Xà phòng hoá, tính khối lượng'), cau('xp-1', XP, 'Thành phần chính của xà phòng là')])
     const p = dungPhieu({ ...NEN, khoDe: it1, rows: [row(7, 'sai-7', false)] })
     expect((p.baiTap ?? []).length).toBeGreaterThan(0)
-    for (const c of p.baiTap ?? []) expect(c.chuaCho).toBeUndefined()
+    // Thầy đổi luật 07/09: câu sai không có câu chữa thì đưa lại chính nó, gắn
+    // cờ `laLamLai`. Điều đang đo vẫn nguyên: KHÔNG câu nào khác được dán nhãn
+    // chữa, và phiếu vẫn nói thẳng phần dưới không phải câu chữa.
+    for (const c of p.baiTap ?? []) expect(c.chuaCho === undefined || c.chuaCho.laLamLai === true).toBe(true)
     expect(p.thieuChua?.join(' ')).toContain('không phải câu chữa')
   })
 })
@@ -110,19 +113,19 @@ describe('phiếu HTML hiện nhãn "Chữa câu N"', () => {
 
   it('có nhãn kèm đúng số câu sai', () => {
     const h = theCauHtml(c({ qid: 'sai-7', soCau: 7, phan: 'I', maDang: HS, bac: 1 }), 1)
-    expect(h).toContain('Chữa câu 7')
+    expect(h).toContain('Khắc phục lỗi sai câu 7')
   })
 
   // v4 mục 6 đổi cách nói: chip riêng "cùng cơ chế, khác việc" thay cho đuôi
   // "· gần dạng" — nói đúng bản chất bậc 2 thay vì một chữ mơ hồ.
   it('câu bậc 2 có chip riêng nói rõ cùng cơ chế khác việc', () => {
     const h = theCauHtml(c({ qid: 'sai-7', soCau: 7, phan: 'I', maDang: HS, bac: 2 }), 1)
-    expect(h).toContain('Chữa câu 7')
+    expect(h).toContain('Khắc phục lỗi sai câu 7')
     expect(h).toContain('cùng cơ chế, khác việc')
   })
 
   it('câu luyện thường không có nhãn — không bịa ra chỗ chữa', () => {
-    expect(theCauHtml(c(), 1)).not.toContain('Chữa câu')
+    expect(theCauHtml(c(), 1)).not.toContain('Khắc phục lỗi sai')
   })
 
   it('nhãn chữa mang màu riêng, không lẫn với ba nhãn pastel còn lại', () => {
@@ -142,14 +145,15 @@ describe('phiếu HTML hiện nhãn "Chữa câu N"', () => {
 
   it('nhãn chữa đứng TRƯỚC nhãn loại câu', () => {
     const h = theCauHtml(c({ qid: 's', soCau: 3, phan: 'I', maDang: HS, bac: 1 }), 1)
-    expect(h.indexOf('Chữa câu 3')).toBeLessThan(h.indexOf('Trắc nghiệm'))
+    expect(h.indexOf('Khắc phục lỗi sai câu 3')).toBeLessThan(h.indexOf('Trắc nghiệm'))
   })
 })
 
 describe('không lách cổng', () => {
   it('phiếu bài luyện đi qua rutDeChua, không tự bó theo chuyên đề nữa', () => {
     const t = doc('src/lib/phieu-du-lieu.ts')
-    expect(t).toContain("import { rutDeChua } from './rut-de-chua'")
+    expect(t).toContain("from './rut-de-chua'")
+    expect(t).toMatch(/import \{[^}]*\brutDeChua\b[^}]*\} from '\.\/rut-de-chua'/)
     expect(t).toMatch(/kqChua[\s\S]{0,200}rutDeChua\(\{ khoDe: kho, rows/)
   })
 })

@@ -48,9 +48,9 @@ export function khopLoc(cau: CauBatKy, chuyenDe: string[], mucDo: MucDoLoc, dang
   if (chuyenDe.length > 0 && !chuyenDe.includes(String(cau.chuyenDe || '').trim())) return false
   if (mucDo !== 'tron' && String(cau.mucDo || '') !== mucDo) return false
   if (dang !== 'ngau_nhien') {
-    const c = cau as { text?: string; choices?: string[]; ideas?: string[]; correct?: unknown; mucDo?: string; dang?: string }
+    const c = cau as { text?: string; choices?: string[]; ideas?: string[]; correct?: unknown; mucDo?: string; kieu?: string }
     const luaChon = phan === 'I' ? (c.choices ?? []) : phan === 'II' ? (c.ideas ?? []) : []
-    if (!hopDang(dangCua({ phan, text: c.text, luaChon, dapAn: phan === 'III' ? String(c.correct ?? '') : '', mucDo: c.mucDo, dang: c.dang }), dang)) return false
+    if (!hopDang(dangCua({ phan, text: c.text, luaChon, dapAn: phan === 'III' ? String(c.correct ?? '') : '', mucDo: c.mucDo, kieu: c.kieu }), dang)) return false
   }
   return true
 }

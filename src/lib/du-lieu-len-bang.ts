@@ -18,6 +18,7 @@ import type { TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQu
 import { soSao } from '../data/examContent'
 import type { AnswerRecord } from './exam-db'
 import { taoChiTietCau } from './chi-tiet-cau'
+import type { ChiTietCauRow } from './exam-api'
 import { chuanChuyenDe, type BaiLam, type CauChua, type EmGoi, type PhanDe } from './phan-cong'
 import type { MucDo } from './goi-len-bang'
 
@@ -168,4 +169,28 @@ export function demTheoChuyenDe(daGoiCau: string[], dsCau: CauChua[]): Record<st
     ra[cd] = (ra[cd] || 0) + 1
   }
   return ra
+}
+
+/** BẢNG CHẤM GỘP CẢ LỚP, để rút câu chữa cho cả lớp — đặc tả v4 mục 2.
+ *
+ * Cổng `rutDeChua` nhận `rows` của MỘT em. Muốn dùng cho cả lớp thì phải gộp
+ * lại, và gộp thô là hỏng: 20 em cùng sai câu 7 sẽ thành 20 dòng "câu 7 sai",
+ * cổng tưởng đó là 20 câu sai khác nhau rồi chia suất 20 lần cho cùng một câu.
+ *
+ * Nên: MỖI CÂU MỘT DÒNG, giữ nếu có ít nhất một em sai, và xếp câu nhiều em sai
+ * lên trước — chữa cái cả lớp hổng trước cái một em hổng. */
+export function rowsLopSai(bank: BanDeCa, maCa: string, luot: LuotCa[]): ChiTietCauRow[] {
+  const dem = new Map<string, { row: ChiTietCauRow; sai: number }>()
+  for (const l of luotMoiNhat(luot)) {
+    if (!daCoBaiLam(l)) continue
+    for (const r of taoChiTietCau(bank, maCa, l.sbd, l.dapAn as AnswerRecord, l.giayCau ?? null)) {
+      const cu = dem.get(r.qid) ?? { row: { ...r, dungSai: false }, sai: 0 }
+      if (r.dungSai !== true) cu.sai += 1
+      dem.set(r.qid, cu)
+    }
+  }
+  return [...dem.values()]
+    .filter((x) => x.sai > 0)
+    .sort((a, b) => b.sai - a.sai || a.row.soCau - b.row.soCau)
+    .map((x) => x.row)
 }

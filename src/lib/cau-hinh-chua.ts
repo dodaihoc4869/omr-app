@@ -12,6 +12,14 @@ import type { MucDoCau } from './bai-tap-pdf'
  * kho THẬT SỰ có cùng nhãn với những câu em sai. */
 export const SO_CAU_MAC_DINH = 10
 
+/** Số câu chữa TỐI ĐA nhét kèm vào gói phiếu gửi máy chủ.
+ *
+ * Đây là giới hạn GÓI TIN, không phải trần sư phạm: phiếu kèm cả lời giải, một
+ * em sai 20 câu mà kho có 500 câu cùng dạng thì gói phồng tới mức Sheet không
+ * nhận. Thanh kéo của phụ huynh chạy trong số câu đã kèm; dòng dưới thanh nói
+ * kho còn bao nhiêu câu cùng dạng (`tongUngVien`) để không giấu con số thật. */
+export const SO_CAU_KEM_PHIEU = 60
+
 /** Tính cả câu CÙNG CƠ CHẾ khác việc phải làm vào ứng viên (bậc 2).
  *
  * v4 hạ xuống `false`: bậc 2 là câu gần dạng chứ không đúng dạng, bật sẵn thì

@@ -8,7 +8,7 @@
 // `tongUngVien = 0` thì khoá thanh và nói đúng lý do lấy từ `thieu[]`, không để
 // thầy kéo một thanh không sinh ra câu nào.
 import { AlertTriangle, Tags } from 'lucide-react'
-import type { PoolCauSai, SuatThieu } from '../lib/rut-de-chua'
+import { tenCauSai, type PoolCauSai, type SuatThieu } from '../lib/rut-de-chua'
 
 const NHAN_NHO = { fontSize: 'var(--cx-1)', color: 'var(--nhat)', fontFamily: 'var(--sans)' } as const
 
@@ -126,7 +126,9 @@ export default function ThanhSoCauChua({
 
       {canhBao.length > 0 && (
         <div style={{ ...NHAN_NHO, marginTop: 4, color: 'var(--cam)' }}>
-          Chưa có câu chữa cho: {canhBao.map((p) => `câu ${p.soCau}`).join(' · ')}.
+          {/* KÈM PHẦN. Không có phần thì dòng này nói "câu 2" trong khi phiếu vẫn
+              in câu khắc phục cho một câu 2 khác — thầy bắt được 07/09. */}
+          Kho chưa có câu cùng dạng để chữa: {canhBao.map((p) => tenCauSai(p.phan, p.soCau)).join(' · ')}. Những câu này đưa lại chính đề em làm sai để em làm lại.
         </div>
       )}
     </div>

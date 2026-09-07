@@ -72,6 +72,11 @@ describe('Bộ câu khắc phục lấy từ kho đề', () => {
 
   it('BỎ HẲN câu em vừa làm trong ca, kể cả khi máy chủ lỡ gửi lại', () => {
     // Kho trả về nhầm một câu em vừa làm — máy em vẫn phải loại.
+    //
+    // Kho trong bộ thử này CHƯA GÁN MÃ DẠNG nào, tức cổng `rutDeChua` chưa vận
+    // hành được, nên luật "đưa lại câu sai cho em làm lại" (thầy chốt 07/09)
+    // không chạy ở đây và câu của ca vẫn bị loại sạch. Luật ấy đo ở
+    // `rut-chua-v4.test.ts`, nơi kho có mã đúng như kho thật.
     const kho = [{ ...nguon('KHO-A', [10], ESTER), phanI: [cauI('KHO-A', 10, ESTER), cauI('CA-DE', 1, ESTER)] }]
     const ids = dung(kho).baiTap?.map((c) => c.id) ?? []
     expect(ids).toContain('KHO-A-I-10')

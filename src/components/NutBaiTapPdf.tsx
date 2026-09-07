@@ -226,7 +226,7 @@ export default function NutBaiTapPdf({
           ))}
         </div>
         <div style={{ ...NHAN_NHO, marginTop: 'var(--k1)' }}>
-          Kho chưa có nhãn lý thuyết hay bài tập, máy tự phân loại từ đề. Câu máy chưa phân loại chắc chắn chỉ vào phiếu khi chọn Ngẫu nhiên.
+          Nhãn lý thuyết / bài tập lấy thẳng từ kho. Đề nào chưa tải lại thì máy tạm phân loại từ mặt chữ, câu chưa chắc chỉ vào phiếu khi chọn Ngẫu nhiên.
         </div>
       </div>
 
