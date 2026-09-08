@@ -75,3 +75,11 @@ Lùi: `git revert 6b2956a` (và `git revert 5c7374d` nếu muốn lùi cả đ�
    phải bốc ngẫu nhiên 3 ca bất kỳ.
 4. **Báo cáo sau thi thiếu thống kê**: `dungPhieuMayEm` không nhận `lapCua`, và `vaoThi`
    không gửi bản đồ số lần sai về máy em.
+
+### Đợt 5 — bằng chứng phát hành
+
+- [x] `npx tsc -b` sạch · `npx vitest run` **2037 passed / 135 tệp** · `check:mau` đạt · `kiem:hien-thi` ĐẠT 18/18 · `build` 2,21s
+- [x] Đẩy lúc 11 ca đều daVao = daNop, không ca nào còn hạn vào (đo 09:11Z)
+- [x] Ba commit: `e1dcf5e` · `c0925d1` · `015e983` (Apps Script KHÔNG đổi, vẫn v63)
+- [x] Bản live `assets/index-DfLGupCV.js` mang đủ 7 dấu hiệu: `:not([aria-checked="true"])` · `temCham` · `Đã đồng bộ điểm` · `câu em từng sai có trong đề này` · `câu còn lại tự vào đề` · `còn sai lại câu từng sai` · `đề không đủ chỗ`
+- [x] Đo cảm ứng thật trên Chromium 360×780 `hasTouch`, phiếu do CHÍNH `dungPhieu` dựng: ô đáp án đúng và ô sai giống hệt nhau TRƯỚC khi bấm (vẫn giấu đáp án); chạm ô đúng → nền đổi `rgb(248,250,252)` → `rgb(239,242,246)`, aria bật, đếm 1, lưu `{"q1":"A"}`; chạm lại → bỏ chọn; xê ngang 18px ăn; xê dọc 15px ăn; kéo dọc 90px vẫn là cuộn; ô Đ/S 46×44, ô phương án 311×44 (đều trên ngưỡng ngón tay 44px)
