@@ -281,7 +281,12 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false }: { duCoSan?: Ph
         const anGiai = cheDo === 'de'
         if (anGiai) tt.nhanBia = 'Đề luyện theo đúng chỗ em mất điểm'
         else if (soCauLink) tt.nhanBia = 'Lời giải bài luyện của em'
-        setPhieuBt(dungPhieu(tt, cau, { anGiai }))
+        // NỘP ĐƯỢC (NOP-PHIEU-KHAC-PHUC). Chỉ bật ở bản CÓ lời giải: bản chỉ
+        // đề không có đáp án nên không chấm được. Cần đủ mã phiếu và SBD —
+        // thiếu thứ nào thì phiếu mở ra như cũ, chỉ đọc, không nộp.
+        const sbdEm = String((g as { tt?: { oBia?: { nhan: string; gia: string }[] } }).tt?.oBia?.find((o) => o.nhan === 'SBD')?.gia ?? '').trim()
+        const nop = !anGiai && ma && sbdEm ? { ma, sbd: sbdEm, url } : null
+        setPhieuBt(dungPhieu(tt, cau, { anGiai, nop }))
         return
       }
       // ĐỌC ĐƯỢC CẢ HAI BẢN. Bản 2 là bố cục 10 mục cũ, phụ huynh đã cầm link

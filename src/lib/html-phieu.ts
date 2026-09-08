@@ -23,6 +23,7 @@
 // nhúng và luôn gập sẵn — kể cả phiếu bài tập gửi phụ huynh — vì đây là phiếu
 // ÔN, em tự bấm ra dò sau khi làm xong.
 import type { CauLuyen } from './bai-tap-pdf'
+import { cauHinhNop, type CauHinhNopKhacPhuc } from './cau-hinh-nop-khac-phuc'
 import { doanCongThuc, type DoanChu } from './chu-hoa-hoc-pdf'
 import { goKyTuLa } from './chu-la-pdf'
 
@@ -294,6 +295,38 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
    đầu. Dùng em nên đổi cỡ chữ là chấm tự theo, không phải chỉnh tay. */
 .topic-cham { flex-shrink: 0; display: flex; align-items: center; height: 1.5em; }
 .topic-dot { width: 9px; height: 9px; border-radius: 50%; }
+
+/* ================= Ô LÀM BÀI (phiếu nộp được) =================
+   Cỡ chạm >= 44px: em làm trên điện thoại, ngón tay không nhắm được ô 30px. */
+.lam-vung { margin-top: 12px; padding-top: 10px; border-top: 1px dashed #d8d3c8; }
+.lam-nhan { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #67646f; margin-bottom: 6px; }
+.lam-hang { display: flex; gap: 8px; flex-wrap: wrap; }
+.lam-o {
+  min-width: 46px; height: 46px; border-radius: 12px; border: 1.5px solid #e9e5dd; background: #ffffff;
+  font: inherit; font-weight: 700; font-size: 15px; color: #1c1c20; cursor: pointer;
+}
+.lam-o[aria-pressed="true"] { background: #16171a; border-color: #16171a; color: #ffffff; }
+.lam-y { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.lam-y-ky { width: 22px; font-weight: 700; }
+.lam-nhap {
+  width: 100%; max-width: 220px; height: 46px; border-radius: 12px; border: 1.5px solid #e9e5dd;
+  padding: 0 12px; font: inherit; font-size: 15px; color: #1c1c20; background: #ffffff;
+}
+/* Sau khi nộp: khoá ô lại và tô đúng/sai. Màu KHÔNG đứng một mình — mỗi thẻ
+   mang thêm dòng chữ "Đúng"/"Sai" ngay dưới. */
+.q-card.da-cham .lam-o, .q-card.da-cham .lam-nhap { pointer-events: none; opacity: .9; }
+.q-card.cau-dung .lam-vung { border-top-color: #2e8b6b; }
+.q-card.cau-sai .lam-vung { border-top-color: #b42318; }
+.lam-ket { margin-top: 8px; font-size: 13px; font-weight: 700; }
+.q-card.cau-dung .lam-ket { color: #2e8b6b; }
+.q-card.cau-sai .lam-ket { color: #b42318; }
+
+/* Thanh nộp và dải kết quả. */
+.nop-chu { flex: 1; min-width: 0; font-size: 12.5px; color: #67646f; }
+.nut.nop { background: #16171a; color: #ffffff; }
+.nut.nop[disabled] { opacity: .5; cursor: default; }
+.nop-ket { font-weight: 700; font-size: 14px; color: #1c1c20; }
+.nop-loi { font-size: 12.5px; color: #b42318; }
 
 /* ================= THANH ĐIỀU KHIỂN ================= */
 .thanh {
@@ -697,7 +730,27 @@ const MUI_TEN = '<svg class="q-mui" viewBox="0 0 24 24" fill="none" stroke="curr
  *
  * `stt` là số thứ tự liên tục trên cả phiếu.
  * `moSan` = true thì thẻ hiện sẵn lời giải (chỉ dùng khi cần bản đọc thẳng). */
-export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = false): string {
+/** Ô LÀM BÀI của một câu — NOP-PHIEU-KHAC-PHUC mục 4.1.
+ *
+ * Chỉ dựng khi phiếu cho nộp; phiếu cũ và phiếu chỉ đọc KHÔNG mọc thêm byte
+ * nào. Cỡ chạm ≥ 44px, một chạm là chọn xong, không cuộn. */
+function oLamHtml(c: CauLuyen): string {
+  const qid = thoat(c.id || '')
+  if (c.phan === 'I') {
+    const o = CHU_PA.map((k) => `<button type="button" class="lam-o" data-chon="${k}" aria-pressed="false">${k}</button>`).join('')
+    return `<div class="lam-vung" data-qid="${qid}" data-phan="I"><div class="lam-nhan">Em chọn</div><div class="lam-hang">${o}</div></div>`
+  }
+  if (c.phan === 'II') {
+    const hang = CHU_Y.map(
+      (y) =>
+        `<div class="lam-y" data-y="${y}"><span class="lam-y-ky">${y}</span><button type="button" class="lam-o" data-chon="D" aria-pressed="false">Đ</button><button type="button" class="lam-o" data-chon="S" aria-pressed="false">S</button></div>`,
+    ).join('')
+    return `<div class="lam-vung" data-qid="${qid}" data-phan="II"><div class="lam-nhan">Em chọn</div>${hang}</div>`
+  }
+  return `<div class="lam-vung" data-qid="${qid}" data-phan="III"><div class="lam-nhan">Em điền đáp án</div><input class="lam-nhap" type="text" inputmode="decimal" autocomplete="off" aria-label="Đáp án của em"></div>`
+}
+
+export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = false, choLam = false): string {
   // Nhãn CHỮA đứng trước mọi nhãn khác: đọc một dòng là biết câu này có mặt
   // ở đây để sửa lỗi nào, không phải "một câu Ester bất kỳ".
   const n = c.chuaCho
@@ -767,6 +820,7 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
     ${hinhTaiViTri(c, 'sau_de')}
     ${than}
     ${hinhTaiViTri(c, 'cuoi_cau')}
+    ${choLam ? oLamHtml(c) : ''}
   </div>
   ${nut}
 </article>`
@@ -1223,6 +1277,189 @@ export const JS_PHIEU = `
   if (!nutChiDe && !document.getElementById('mo-het')) document.body.classList.add('chi-de');
 
   demLai();
+
+  // ==================== LÀM BÀI VÀ NỘP (NOP-PHIEU-KHAC-PHUC) ====================
+  //
+  // Chỉ chạy khi phiếu có khối dữ liệu nộp. Phiếu chỉ đọc không đụng gì tới
+  // đoạn này, và phiếu đã gửi đi từ trước cũng vậy.
+  var oNop = document.getElementById('du-nop');
+  if (oNop) {
+    var du = null;
+    try { du = JSON.parse(oNop.textContent || 'null'); } catch (e3) { du = null; }
+    if (du && du.cau && du.cau.length) {
+      var KHOA_LUU = 'ddh.lam.' + du.ma;
+      var nutNop = document.getElementById('nut-nop');
+      var demLam = document.getElementById('nop-dem');
+      var oKet = document.getElementById('nop-ket');
+      var oLoiNop = document.getElementById('nop-loi');
+      var daNop = false;
+      var lam = {};
+      try { lam = JSON.parse(localStorage.getItem(KHOA_LUU) || '{}') || {}; } catch (e4) { lam = {}; }
+
+      function luuLam() {
+        try { localStorage.setItem(KHOA_LUU, JSON.stringify(lam)); } catch (e5) {}
+      }
+      function soDaLam() {
+        var n = 0;
+        for (var i = 0; i < du.cau.length; i++) if (String(lam[du.cau[i].id] || '').trim()) n++;
+        return n;
+      }
+      function veLam() {
+        var vung = document.querySelectorAll('.lam-vung');
+        for (var i = 0; i < vung.length; i++) {
+          var v = vung[i];
+          var qid = v.getAttribute('data-qid');
+          var giaTri = String(lam[qid] || '');
+          var phan = v.getAttribute('data-phan');
+          if (phan === 'III') {
+            var o = v.querySelector('.lam-nhap');
+            if (o && o.value !== giaTri) o.value = giaTri;
+          } else if (phan === 'II') {
+            var hangY = v.querySelectorAll('.lam-y');
+            for (var j = 0; j < hangY.length; j++) {
+              var nutY = hangY[j].querySelectorAll('.lam-o');
+              for (var k = 0; k < nutY.length; k++) {
+                nutY[k].setAttribute('aria-pressed', giaTri.charAt(j) === nutY[k].getAttribute('data-chon') ? 'true' : 'false');
+              }
+            }
+          } else {
+            var nutPa = v.querySelectorAll('.lam-o');
+            for (var m = 0; m < nutPa.length; m++) {
+              nutPa[m].setAttribute('aria-pressed', giaTri === nutPa[m].getAttribute('data-chon') ? 'true' : 'false');
+            }
+          }
+        }
+        if (demLam) demLam.textContent = String(soDaLam());
+      }
+
+      document.addEventListener('click', function (e) {
+        if (daNop || !e.target || !e.target.closest) return;
+        var o = e.target.closest('.lam-o');
+        if (!o) return;
+        var v = o.closest('.lam-vung');
+        if (!v) return;
+        var qid = v.getAttribute('data-qid');
+        var phan = v.getAttribute('data-phan');
+        if (phan === 'II') {
+          var hangY = Array.prototype.slice.call(v.querySelectorAll('.lam-y'));
+          var cu = String(lam[qid] || '----');
+          while (cu.length < hangY.length) cu += '-';
+          var iY = hangY.indexOf(o.closest('.lam-y'));
+          if (iY < 0) return;
+          lam[qid] = cu.substring(0, iY) + o.getAttribute('data-chon') + cu.substring(iY + 1);
+        } else {
+          // Bấm lại đúng ô đang chọn thì BỎ chọn — em đổi ý không phải tìm nút xoá.
+          lam[qid] = lam[qid] === o.getAttribute('data-chon') ? '' : o.getAttribute('data-chon');
+        }
+        luuLam();
+        veLam();
+      });
+
+      document.addEventListener('input', function (e) {
+        if (daNop || !e.target || !e.target.classList || !e.target.classList.contains('lam-nhap')) return;
+        var v = e.target.closest('.lam-vung');
+        if (!v) return;
+        lam[v.getAttribute('data-qid')] = e.target.value;
+        luuLam();
+        if (demLam) demLam.textContent = String(soDaLam());
+      });
+
+      /** CHẤM TẠI CHỖ để hiện ngay. Máy chủ vẫn chấm LẠI và con số ghi vào
+       * Sheet là con số của máy chủ — máy em sửa được. */
+      function chamTaiCho() {
+        var dung = 0;
+        var sai = [];
+        for (var i = 0; i < du.cau.length; i++) {
+          var c = du.cau[i];
+          var chon = String(lam[c.id] || '').trim();
+          var dapAn = String(c.dapAn == null ? '' : c.dapAn).trim();
+          var khop = false;
+          if (!chon) khop = false;
+          else if (c.phan === 'III') khop = chon.replace(',', '.') === dapAn.replace(',', '.');
+          else khop = chon.toUpperCase() === dapAn.toUpperCase();
+          if (khop) dung++; else sai.push(c.id);
+        }
+        return { dung: dung, sai: sai };
+      }
+
+      function toKetQua(kq) {
+        var saiCua = {};
+        for (var i = 0; i < kq.sai.length; i++) saiCua[kq.sai[i]] = true;
+        var vung = document.querySelectorAll('.lam-vung');
+        for (var j = 0; j < vung.length; j++) {
+          var v = vung[j];
+          var the = v.closest('.q-card');
+          if (!the) continue;
+          var laSai = !!saiCua[v.getAttribute('data-qid')];
+          the.classList.add('da-cham');
+          the.classList.add(laSai ? 'cau-sai' : 'cau-dung');
+          var d = document.createElement('div');
+          d.className = 'lam-ket';
+          d.textContent = laSai ? (String(lam[v.getAttribute('data-qid')] || '').trim() ? 'Sai' : 'Bỏ trống, tính là sai') : 'Đúng';
+          v.appendChild(d);
+        }
+      }
+
+      /** GỬI LÊN MÁY CHỦ. Mất mạng thì GIỮ LẠI và tự gửi lần mở sau — nuốt bài
+       * im lặng là em làm xong mà thầy không thấy gì. */
+      function gui(choLai) {
+        var than = JSON.stringify({ action: 'nopKhacPhuc', ma: du.ma, sbd: du.sbd, dapAn: lam });
+        return fetch(du.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: than })
+          .then(function (r) { return r.json(); })
+          .then(function (j) {
+            if (!j || !j.ok) throw new Error((j && j.error) || 'Không nộp được bài');
+            try { localStorage.removeItem(KHOA_LUU + '.cho'); } catch (e6) {}
+            return j;
+          })
+          .catch(function (err) {
+            if (choLai) { try { localStorage.setItem(KHOA_LUU + '.cho', '1'); } catch (e7) {} }
+            throw err;
+          });
+      }
+
+      if (nutNop) nutNop.addEventListener('click', function () {
+        if (daNop) return;
+        var thieu = du.cau.length - soDaLam();
+        if (du.ch && du.ch.CAN_LAM_HET_MOI_NOP && thieu > 0) {
+          if (oLoiNop) { oLoiNop.hidden = false; oLoiNop.textContent = 'Còn ' + thieu + ' câu chưa làm.'; }
+          return;
+        }
+        // NÓI RÕ TRƯỚC KHI NỘP: bỏ trống tính là sai, không để em nộp nhầm.
+        if (thieu > 0 && !window.confirm('Còn ' + thieu + ' câu chưa làm, mấy câu đó tính là sai. Nộp luôn?')) return;
+        daNop = true;
+        nutNop.disabled = true;
+        nutNop.textContent = 'Đang nộp…';
+        var kq = chamTaiCho();
+        toKetQua(kq);
+        // MỞ LỜI GIẢI MỌI CÂU NGAY (thầy chốt 08/09) — em vừa làm xong là lúc
+        // muốn biết vì sao nhất. Không đợi kết quả mạng.
+        if (!du.ch || du.ch.HIEN_GIAI_SAU_NOP !== false) {
+          for (var i = 0; i < tatCa.length; i++) bat(tatCa[i], true);
+          demLai();
+        }
+        if (oKet) { oKet.hidden = false; oKet.textContent = ' · Đúng ' + kq.dung + '/' + du.cau.length; }
+        gui(true)
+          .then(function (j) {
+            nutNop.textContent = du.ch && du.ch.CHO_NOP_LAI === false ? 'Đã nộp' : 'Làm lại';
+            nutNop.disabled = false;
+            if (oKet) oKet.textContent = ' · Đúng ' + j.soDung + '/' + j.soCau + ' (lần ' + j.lanThu + ')';
+          })
+          .catch(function (err) {
+            nutNop.textContent = 'Gửi lại';
+            nutNop.disabled = false;
+            daNop = false;
+            if (oLoiNop) { oLoiNop.hidden = false; oLoiNop.textContent = 'Chưa gửi được lên máy Thầy (' + err.message + '). Bài của em vẫn được giữ, mở lại trang là gửi tiếp.'; }
+          });
+      });
+
+      // Lần mở sau: còn bài chưa gửi được thì tự gửi, im lặng nếu vẫn hỏng.
+      try {
+        if (localStorage.getItem(KHOA_LUU + '.cho') === '1') gui(false).catch(function () {});
+      } catch (e8) {}
+
+      veLam();
+    }
+  }
 })();
 `
 
@@ -1251,14 +1488,29 @@ export interface TuyChonPhieu {
   anGiai?: boolean
   /** Câu sai chưa có câu chữa, để khối đầu phiếu nói lý do. */
   thieuChua?: { soCau: number; phan?: 'I' | 'II' | 'III'; tenDang: string; vi: string }[]
+  /** PHIẾU NỘP ĐƯỢC (NOP-PHIEU-KHAC-PHUC). Thiếu ⇒ phiếu chỉ đọc như cũ, và
+   * KHÔNG mọc thêm một byte nào — phiếu đã gửi đi vẫn y nguyên. */
+  nop?: {
+    /** Mã phiếu, để máy chủ biết bài này của phiếu nào. */
+    ma: string
+    /** SBD của em — máy chủ đối chiếu, không cho nộp hộ. */
+    sbd: string
+    /** Link Apps Script. Đây là link CÔNG KHAI, không kèm mã bí mật. */
+    url: string
+    cauHinh?: Partial<CauHinhNopKhacPhuc> | null
+  } | null
 }
 
 export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChonPhieu = {}): string {
   // `thieuChua` đi kèm phiếu để khối đầu phiếu nói được câu sai nào chưa có câu
   // chữa — im lặng bỏ qua là thầy tưởng phiếu đã chữa hết.
   const anGiai = !!tuyChon.anGiai
+  // PHIẾU NỘP ĐƯỢC: chỉ khi chỗ gọi khai `nop`, và không đi cùng `anGiai`
+  // (phiếu chỉ có đề thì không có đáp án để chấm).
+  const nop = !anGiai && tuyChon.nop ? tuyChon.nop : null
+  const chNop = cauHinhNop(nop?.cauHinh)
   const cau = anGiai ? cauVao.map(boLoiGiai) : cauVao
-  const the = cau.map((c, i) => theCauHtml(c, i + 1, false, anGiai)).join('\n')
+  const the = cau.map((c, i) => theCauHtml(c, i + 1, false, anGiai, !!nop)).join('\n')
   const coGiai = anGiai ? 0 : cau.filter((c) => oGiaiHtml(c) !== '').length
   const huongDan = anGiai
     ? 'Em làm vào vở rồi đối chiếu với link lời giải bố mẹ gửi sau. Muốn bản giấy thì bấm "In đề" rồi chọn "Lưu thành PDF".'
@@ -1268,9 +1520,30 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   ${khoiChuaGiHtml(cau, tuyChon.thieuChua ?? [])}
   ${tongQuanHtml(cau)}
   ${thanhHtml(coGiai, anGiai)}
+  ${nop ? thanhNopHtml(cau.length) : ''}
   <div class="ds-cau">${the}</div>
   <div class="chan">Thầy Đỗ Đại Học · ${thoat(t.tenChuyenDe)} · ${ngayVN(t.ngay)}<span class="chi-man"><br>${huongDan}</span></div>
 </div>`
   const ai = t.oBia && t.oBia.length > 0 ? t.oBia[0].gia : t.hoTen
-  return taiLieuHtml(than, `${t.tenChuyenDe}${ai ? ` · ${ai}` : ''}`)
+  // Dữ liệu nộp đi kèm tài liệu, KHÔNG gắn vào chuỗi JS bằng nối chuỗi: đáp án
+  // và mã phiếu là dữ liệu, nhét thẳng vào mã là mở đường chèn mã lạ.
+  const goiNop = nop
+    ? `<script type="application/json" id="du-nop">${JSON.stringify({
+        ma: nop.ma,
+        sbd: nop.sbd,
+        url: nop.url,
+        ch: chNop,
+        cau: cau.map((c) => ({ id: c.id, phan: c.phan, dapAn: c.dapAn })),
+      }).replace(/</g, '\\u003c')}<\/script>`
+    : ''
+  return taiLieuHtml(than + goiNop, `${t.tenChuyenDe}${ai ? ` · ${ai}` : ''}`)
+}
+
+/** THANH NỘP — dính dưới thanh điều khiển, NOP-PHIEU-KHAC-PHUC mục 6. */
+export function thanhNopHtml(soCau: number): string {
+  return `<div class="thanh" id="thanh-nop">
+  <div class="nop-chu">Đã làm <b id="nop-dem">0</b>/<span id="nop-tong">${soCau}</span> câu<span id="nop-ket" class="nop-ket" hidden></span></div>
+  <span id="nop-loi" class="nop-loi" hidden></span>
+  <button class="nut nop" type="button" id="nut-nop">Nộp bài</button>
+</div>`
 }

@@ -40,10 +40,36 @@ describe('gom lịch sử mở phiếu khắc phục', () => {
     expect(ds.find((e) => e.sbd === '10038')!.bai.map((b) => b.tenCa)).toEqual(['Bài 1', 'Bài 2'])
   })
 
-  it('EM CHƯA MỞ LẦN NÀO ĐỨNG ĐẦU', () => {
+  it('EM CHƯA NỘP ĐỨNG ĐẦU — nộp mới là LÀM, mở chỉ là mở', () => {
     const ds = gomLuyen(CA, phieu())
+    expect(ds.every((e) => e.tongNop === 0)).toBe(true)
+    // Cùng chưa nộp thì em chưa mở đứng trước em đã mở.
     expect(ds[0].sbd).toBe('10039')
     expect(ds[0].tongMo).toBe(0)
+  })
+
+  it('LƯỢT NỘP THẬT vào đúng bài, đúng em, xếp theo lần', () => {
+    const nop = new Map([
+      [
+        'c1',
+        [
+          { ma: 'p1', sbd: '10038', lanThu: 2, nopLuc: '2026-09-03T11:00:00Z', soCau: 10, soDung: 8, qidSai: ['q3'] },
+          { ma: 'p1', sbd: '10038', lanThu: 1, nopLuc: '2026-09-02T11:00:00Z', soCau: 10, soDung: 4, qidSai: ['q1', 'q3'] },
+        ],
+      ],
+    ])
+    const ds = gomLuyen(CA, phieu(), nop)
+    const duy = ds.find((e) => e.sbd === '10038')!
+    expect(duy.tongNop).toBe(2)
+    expect(duy.soBaiDaNop).toBe(1)
+    expect(duy.bai[0].luot.map((l) => l.lanThu)).toEqual([1, 2])
+    expect(duy.bai[0].luot.map((l) => l.soDung)).toEqual([4, 8])
+    // Bài 2 chưa nộp thì rỗng, KHÔNG mượn lượt của bài 1.
+    expect(duy.bai[1].luot).toHaveLength(0)
+    // Em khác không bị dính lượt của Duy.
+    expect(ds.find((e) => e.sbd === '10039')!.tongNop).toBe(0)
+    // Và em đã nộp xuống dưới em chưa nộp.
+    expect(ds[ds.length - 1].sbd).toBe('10038')
   })
 
   it('CHỈ ĐẾM PHIẾU BÀI TẬP, không lẫn phiếu kết quả gửi phụ huynh', () => {
@@ -72,6 +98,7 @@ describe('khối đứng ở màn Ca thi', () => {
   it('BẤM LÀ ĐỒNG BỘ THẬT — hỏi máy chủ ngay, kèm mốc giờ của số liệu', () => {
     expect(KHOI).toContain('await danhSachCa(')
     expect(KHOI).toContain('await phieuTheoCa(')
+    expect(KHOI).toContain('await nopKhacPhucTheoCa(')
     expect(KHOI).toContain('setLuc(new Date().toISOString())')
     expect(KHOI).toContain('số liệu lúc')
   })
@@ -87,13 +114,22 @@ describe('khối đứng ở màn Ca thi', () => {
   it('BẤM VÀO MỘT EM ra LỊCH SỬ từng bài', () => {
     expect(KHOI).toContain('setEmMo(dangMo ? \'\' : e.sbd)')
     expect(KHOI).toContain('Lần {i + 1}')
-    expect(KHOI).toContain('lần cuối ${gioNgan(b.xemLanCuoi)}')
-    expect(KHOI).toContain('chưa mở')
+    // Mỗi bài ghi rõ lượt nộp và giờ nộp; bài chưa nộp thì nói "chưa nộp".
+    expect(KHOI).toContain('gioNgan(l.nopLuc)')
+    expect(KHOI).toContain('chưa nộp</span>')
+    expect(KHOI).toContain('mở {b.soLanXem} lần')
   })
 
-  it('KHÔNG BỊA SỐ CÂU ĐÃ LÀM — nói rõ máy chỉ đếm được lần MỞ', () => {
-    expect(KHOI).toContain('KHÔNG đếm được em làm mấy câu')
-    expect(KHOI).toContain('không có nút nộp')
+  it('KHÔNG LẪN "MỞ" VỚI "NỘP" — hai con số, nói rõ cái nào là cái nào', () => {
+    expect(KHOI).toContain('chưa nộp bài khắc phục nào')
+    expect(KHOI).toContain('lượt ${l.lanThu} đúng ${l.soDung}/${l.soCau}')
+    // Cảnh báo nói đúng chuyện: phiếu CŨ không có nút nộp nên chỉ có số mở.
+    expect(KHOI).toContain('Phiếu dựng trước 08/09 không có nút nộp')
+    // Và không có biến nào chở một con số "đã luyện" tự nghĩ ra.
     expect(KHOI).not.toMatch(/soCauDaLam|soCauLuyen|daLuyen|tongCauLam/)
+  })
+
+  it('MÁY CHỦ BẢN CŨ chưa có lệnh nộp thì KHÔNG chặn cả khối', () => {
+    expect(KHOI).toContain('.catch(() => [])')
   })
 })

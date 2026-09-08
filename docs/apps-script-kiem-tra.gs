@@ -81,6 +81,15 @@ const SHEET_PHIEU = 'PhieuKetQua'
 // cả hai, mà gửi Zalo thì phải gửi đúng loại. Phiếu cũ ô trống ⇒ 'ketqua'.
 const PHIEU_HEADERS = ['Ma', 'MaCa', 'SBD', 'HoTen', 'PhieuJson', 'TaoLuc', 'SoLanXem', 'XemLanCuoi', 'Loai']
 const SHEET_LUOT = 'LuotThi'
+// NỘP PHIẾU KHẮC PHỤC (NOP-PHIEU-KHAC-PHUC.md). Mỗi LƯỢT nộp một hàng, KHÔNG
+// đè: thầy cần thấy "lần 1 đúng 4/10, lần 2 đúng 8/10" — đè là mất tiến bộ.
+//
+// Bảng này KHÔNG dính gì tới điểm ca: không vào BangDiem, không vào ChiTietCau,
+// không lên báo cáo phụ huynh như một con điểm. Đây là dấu vết luyện tập.
+const SHEET_NOPKP = 'NopKhacPhuc'
+const NOPKP_HEADERS = ['Ma', 'MaCa', 'SBD', 'LanThu', 'NopLuc', 'SoCau', 'SoDung', 'DapAnJson', 'QidSaiJson']
+/** Trần số câu một lượt nộp — phiếu khắc phục dài nhất cũng chỉ vài chục câu. */
+const TOI_DA_CAU_NOPKP = 200
 const DRIVE_FOLDER = 'OMR-APP-DATA'
 
 // Cột sheet CaKiemTra (1-based = vị trí trong mảng + 1). 7 cột đầu có từ bản
@@ -2246,6 +2255,126 @@ function doPost(e) {
       sh.getRange(row, 8).setValue(new Date().toISOString())
     } catch (err) {}
     return jsonResponse_({ ok: true, phieu: phieu })
+  }
+
+  // -------------------------------------------------- NỘP PHIẾU KHẮC PHỤC
+  //
+  // LỆNH GHI CÔNG KHAI thứ hai (sau `guiCauHoi`). Em chỉ có cái link, không có
+  // mã bí mật, nên không thể đòi mã. Ba khoá thay cho mã:
+  //
+  //   1. `ma` phải là phiếu CÓ THẬT và đúng loại `baitap`. Phiếu kết quả gửi
+  //      phụ huynh không nộp được.
+  //   2. `sbd` phải khớp đúng SBD của phiếu đó. Không ai nộp hộ người khác, và
+  //      không ai nộp khống cho một SBD bất kỳ.
+  //   3. MÁY CHỦ TỰ CHẤM LẠI từ đáp án cất trong chính phiếu. Con số máy em
+  //      gửi lên không được tin — máy em sửa được.
+  //
+  // Sai khoá nào cũng trả CÙNG MỘT CÂU, không nói sai ở đâu.
+  if (action === 'nopKhacPhuc') {
+    const LOI_NOP = { ok: false, error: 'Không nộp được bài' }
+    const maNop = String(body.ma || '').trim()
+    const sbdNop = String(body.sbd || '').trim()
+    if (!/^[A-Za-z0-9_-]{8,40}$/.test(maNop) || !sbdNop) return jsonResponse_(LOI_NOP)
+
+    const shPhieu = getSheet_(SHEET_PHIEU, PHIEU_HEADERS)
+    boSungTieuDe_(shPhieu, PHIEU_HEADERS)
+    const dongPhieu = findRowByKey_(shPhieu, 0, maNop)
+    if (dongPhieu < 0) return jsonResponse_(LOI_NOP)
+    // KHOÁ 1 + 2 — đúng loại, đúng em.
+    if (String(shPhieu.getRange(dongPhieu, 9).getValue() || '') !== 'baitap') return jsonResponse_(LOI_NOP)
+    if (String(shPhieu.getRange(dongPhieu, 3).getValue() || '').trim() !== sbdNop) return jsonResponse_(LOI_NOP)
+    const maCaNop = String(shPhieu.getRange(dongPhieu, 2).getValue() || '').trim()
+
+    let goi = null
+    try {
+      goi = docJsonLon_(shPhieu.getRange(dongPhieu, 5).getValue())
+    } catch (err) {
+      return jsonResponse_(LOI_NOP)
+    }
+    const dsCau = goi && Array.isArray(goi.cau) ? goi.cau : []
+    if (!dsCau.length || dsCau.length > TOI_DA_CAU_NOPKP) return jsonResponse_(LOI_NOP)
+
+    const daChon = body.dapAn && typeof body.dapAn === 'object' ? body.dapAn : {}
+
+    // KHOÁ 3 — CHẤM LẠI TẠI MÁY CHỦ. Ba phần ba luật, giống hệt
+    // `taoChiTietCau` ở máy thầy để hai nơi không ra hai kết quả.
+    const chuanIII = function (v) {
+      return String(v == null ? '' : v).trim().replace(',', '.')
+    }
+    let soDung = 0
+    const qidSai = []
+    const dapAnSach = {}
+    for (let i = 0; i < dsCau.length; i++) {
+      const c = dsCau[i]
+      const qid = String(c.id || '').trim()
+      if (!qid) continue
+      const chon = String(daChon[qid] == null ? '' : daChon[qid]).trim().slice(0, 40)
+      dapAnSach[qid] = chon
+      const dung = String(c.dapAn == null ? '' : c.dapAn).trim()
+      let khop = false
+      if (!chon) khop = false
+      else if (c.phan === 'III') khop = chuanIII(chon) === chuanIII(dung)
+      else khop = chon.toUpperCase() === dung.toUpperCase()
+      if (khop) soDung += 1
+      else qidSai.push(qid)
+    }
+
+    const shNop = getSheet_(SHEET_NOPKP, NOPKP_HEADERS)
+    boSungTieuDe_(shNop, NOPKP_HEADERS)
+    const nayNop = new Date().toISOString()
+    const lockNop = LockService.getScriptLock()
+    let soLanNop = 1
+    try {
+      lockNop.waitLock(10000)
+      // LƯỢT MỚI, KHÔNG ĐÈ. Đếm lượt cũ của đúng cặp (ma, sbd).
+      const nNop = shNop.getLastRow()
+      if (nNop >= 2) {
+        const cotNop = shNop.getRange(1, 1, nNop, 4).getValues()
+        for (let j = 1; j < cotNop.length; j++) {
+          if (String(cotNop[j][0]) === maNop && String(cotNop[j][2]) === sbdNop) soLanNop += 1
+        }
+      }
+      shNop.appendRow([maNop, maCaNop, sbdNop, soLanNop, nayNop, dsCau.length, soDung, JSON.stringify(dapAnSach), JSON.stringify(qidSai)])
+    } catch (err) {
+      return jsonResponse_(LOI_NOP)
+    } finally {
+      try { lockNop.releaseLock() } catch (e2) {}
+    }
+    // Trả con số MÁY CHỦ tính, để trang phiếu hiện đúng cái đã được ghi.
+    return jsonResponse_({ ok: true, lanThu: soLanNop, soCau: dsCau.length, soDung: soDung, qidSai: qidSai, nopLuc: nayNop })
+  }
+
+  // ĐỌC LƯỢT NỘP KHẮC PHỤC CỦA MỘT CA — cần mã bí mật, chỉ thầy đọc.
+  if (action === 'nopKhacPhucTheoCa') {
+    const kt = kiemTraMaBiMat_(body)
+    if (kt) return kt
+    const maCaKP = String(body.maCa || '').trim()
+    if (!maCaKP) return jsonResponse_({ ok: false, error: 'Thiếu mã ca' })
+    const shKP = getSheet_(SHEET_NOPKP, NOPKP_HEADERS)
+    boSungTieuDe_(shKP, NOPKP_HEADERS)
+    const dataKP = shKP.getDataRange().getValues()
+    const itemsKP = []
+    for (let i = 1; i < dataKP.length; i++) {
+      if (String(dataKP[i][1]) !== maCaKP) continue
+      itemsKP.push({
+        ma: String(dataKP[i][0]),
+        sbd: String(dataKP[i][2]),
+        lanThu: Number(dataKP[i][3]) || 0,
+        nopLuc: dataKP[i][4] ? String(dataKP[i][4]) : '',
+        soCau: Number(dataKP[i][5]) || 0,
+        soDung: Number(dataKP[i][6]) || 0,
+        qidSai: (function (v) {
+          try {
+            const x = JSON.parse(String(v || '[]'))
+            return Array.isArray(x) ? x : []
+          } catch (err) {
+            return []
+          }
+        })(dataKP[i][8]),
+      })
+    }
+    itemsKP.sort(function (a, b) { return a.lanThu - b.lanThu })
+    return jsonResponse_({ ok: true, items: itemsKP, serverNow: Date.now() })
   }
 
   // ------------------------------------------------------------- HỎI BÀI THẦY

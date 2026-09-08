@@ -1,17 +1,20 @@
-// EM NÀO ĐÃ MỞ PHIẾU KHẮC PHỤC — khối đứng ngay ở màn Ca thi (thầy chốt 08/09).
+// LUYỆN CÂU KHẮC PHỤC — khối đứng ngay ở màn Ca thi (thầy chốt 08/09).
 //
-// ĐO ĐƯỢC GÌ, NÓI ĐÚNG THẾ. Máy chủ ghi mỗi phiếu bài tập hai thứ: mở mấy lần
-// và lần cuối mở lúc nào. Nó KHÔNG ghi em làm được mấy câu — phiếu khắc phục
-// là tệp HTML tĩnh, không có nút nộp. Nên khối này nói "mở" chứ không nói
-// "làm"; gọi số lần mở là số câu đã luyện là bịa một con số thầy sẽ nhắn cho
-// phụ huynh.
+// HAI CON SỐ KHÁC NHAU, KHÔNG ĐƯỢC LẪN:
+//   · MỞ  — máy chủ đếm mỗi lần link phiếu được mở. Chỉ nói em có bấm vào hay
+//           không.
+//   · NỘP — em bấm nộp, máy chủ chấm lại và ghi lượt. Đây mới là "em có LÀM
+//           không, làm được mấy câu" (NOP-PHIEU-KHAC-PHUC).
+//
+// Phiếu dựng TRƯỚC 08/09 không có nút nộp nên chỉ có số mở; khối này hiện cả
+// hai và nói rõ cái nào là cái nào, không gộp thành một con số mập mờ.
 //
 // BẤM LÀ ĐỒNG BỘ THẬT: hỏi lại máy chủ ngay tại lúc bấm, không đọc bản cũ
 // trong bộ nhớ. Một lệnh cho một ca, quét mọi ca để dựng "lần 1, lần 2…".
 import { useMemo, useState } from 'react'
 import { ChevronDown, RefreshCw, Search } from 'lucide-react'
 import { OThongBao, TheNoiDung } from './DesignSystem'
-import { danhSachCa, phieuTheoCa } from '../lib/exam-api'
+import { danhSachCa, nopKhacPhucTheoCa, phieuTheoCa, type LuotNopKhacPhuc } from '../lib/exam-api'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -22,6 +25,9 @@ export interface BaiKhacPhuc {
   moLuc: string
   soLanXem: number
   xemLanCuoi: string
+  /** LƯỢT NỘP THẬT — em bấm nộp, máy chấm, ghi lên Sheet. Đây là con số trả
+   * lời "em có LÀM không", khác hẳn `soLanXem` chỉ trả lời "em có MỞ không". */
+  luot: { lanThu: number; soCau: number; soDung: number; nopLuc: string; qidSai: string[] }[]
 }
 
 export interface EmLuyen {
@@ -29,8 +35,12 @@ export interface EmLuyen {
   hoTen: string
   /** Tổng số lần mở phiếu khắc phục, cộng mọi ca. 0 = chưa mở lần nào. */
   tongMo: number
-  /** Số bài CÓ mở ít nhất một lần — "đã làm câu khắc phục ca nào". */
+  /** Số bài CÓ mở ít nhất một lần. */
   soBaiDaMo: number
+  /** Tổng số LƯỢT NỘP, cộng mọi ca. 0 = chưa nộp bài nào. */
+  tongNop: number
+  /** Số bài em đã nộp ít nhất một lượt — "đã làm câu khắc phục ca nào". */
+  soBaiDaNop: number
   bai: BaiKhacPhuc[]
 }
 
@@ -56,9 +66,20 @@ export function khongDau(v: string): string {
  *
  * Tách khỏi component để test được bằng dữ liệu thật, không cần dựng React.
  * `dsCa` phải là danh sách ca CŨ TỚI MỚI — "lần 1" là bài đầu tiên. */
-export function gomLuyen(dsCa: { maCa: string; tenCa: string; moLuc: string }[], phieuCua: Map<string, { sbd: string; hoTen: string; soLanXem: number; xemLanCuoi: string; loai: string }[]>): EmLuyen[] {
+export function gomLuyen(
+  dsCa: { maCa: string; tenCa: string; moLuc: string }[],
+  phieuCua: Map<string, { ma?: string; sbd: string; hoTen: string; soLanXem: number; xemLanCuoi: string; loai: string }[]>,
+  nopCua: Map<string, LuotNopKhacPhuc[]> = new Map(),
+): EmLuyen[] {
   const theoEm = new Map<string, EmLuyen>()
   for (const c of dsCa) {
+    // Lượt nộp gom theo SBD của đúng ca này.
+    const nopTheoSbd = new Map<string, LuotNopKhacPhuc[]>()
+    for (const n of nopCua.get(c.maCa) ?? []) {
+      const arr = nopTheoSbd.get(n.sbd) ?? []
+      arr.push(n)
+      nopTheoSbd.set(n.sbd, arr)
+    }
     // Một em có thể có NHIỀU bản phiếu bài tập của cùng một ca (thầy dựng lại
     // nhiều lượt). Cộng số lần mở của mọi bản: em mở bản nào cũng là đã mở.
     const gom = new Map<string, { soLanXem: number; xemLanCuoi: string; hoTen: string }>()
@@ -70,17 +91,20 @@ export function gomLuyen(dsCa: { maCa: string; tenCa: string; moLuc: string }[],
       gom.set(p.sbd, cu)
     }
     gom.forEach((v, sbd) => {
-      const em = theoEm.get(sbd) ?? { sbd, hoTen: v.hoTen, tongMo: 0, soBaiDaMo: 0, bai: [] }
+      const em = theoEm.get(sbd) ?? { sbd, hoTen: v.hoTen, tongMo: 0, soBaiDaMo: 0, tongNop: 0, soBaiDaNop: 0, bai: [] }
       if (!em.hoTen && v.hoTen) em.hoTen = v.hoTen
       em.tongMo += v.soLanXem
       if (v.soLanXem > 0) em.soBaiDaMo += 1
-      em.bai.push({ maCa: c.maCa, tenCa: c.tenCa || `Ca ${c.maCa}`, moLuc: c.moLuc, soLanXem: v.soLanXem, xemLanCuoi: v.xemLanCuoi })
+      const luot = [...(nopTheoSbd.get(sbd) ?? [])].sort((a, b) => a.lanThu - b.lanThu)
+      em.tongNop += luot.length
+      if (luot.length > 0) em.soBaiDaNop += 1
+      em.bai.push({ maCa: c.maCa, tenCa: c.tenCa || `Ca ${c.maCa}`, moLuc: c.moLuc, soLanXem: v.soLanXem, xemLanCuoi: v.xemLanCuoi, luot })
       theoEm.set(sbd, em)
     })
   }
-  // EM CHƯA MỞ LẦN NÀO LÊN ĐẦU — đó là danh sách thầy cần nhắc, không phải
-  // danh sách em ngoan.
-  return [...theoEm.values()].sort((a, b) => a.tongMo - b.tongMo || (a.hoTen || a.sbd).localeCompare(b.hoTen || b.sbd, 'vi'))
+  // EM CHƯA NỘP LÊN ĐẦU — đó là danh sách thầy cần nhắc. Nộp mới là LÀM; mở
+  // chỉ là mở, nên xếp theo số lượt nộp trước, số lần mở sau.
+  return [...theoEm.values()].sort((a, b) => a.tongNop - b.tongNop || a.tongMo - b.tongMo || (a.hoTen || a.sbd).localeCompare(b.hoTen || b.sbd, 'vi'))
 }
 
 export default function KhoiLuyenKhacPhuc({ scriptUrl, maBiMat }: { scriptUrl: string; maBiMat: string }) {
@@ -101,8 +125,14 @@ export default function KhoiLuyenKhacPhuc({ scriptUrl, maBiMat }: { scriptUrl: s
         .filter((c) => c.trangThai !== 'da_xoa')
         .sort((a, b) => String(a.moLuc ?? '').localeCompare(String(b.moLuc ?? '')))
       const phieuCua = new Map<string, { sbd: string; hoTen: string; soLanXem: number; xemLanCuoi: string; loai: string }[]>()
-      for (const c of ca) phieuCua.set(c.maCa, await phieuTheoCa(scriptUrl.trim(), maBiMat.trim(), c.maCa))
-      setDs(gomLuyen(ca.map((c) => ({ maCa: c.maCa, tenCa: c.tenCa, moLuc: c.moLuc })), phieuCua))
+      const nopCua = new Map<string, LuotNopKhacPhuc[]>()
+      for (const c of ca) {
+        phieuCua.set(c.maCa, await phieuTheoCa(scriptUrl.trim(), maBiMat.trim(), c.maCa))
+        // Máy chủ bản cũ chưa có lệnh này ⇒ coi như chưa ai nộp, KHÔNG chặn cả
+        // khối. Thầy vẫn đọc được số lần mở như trước.
+        nopCua.set(c.maCa, await nopKhacPhucTheoCa(scriptUrl.trim(), maBiMat.trim(), c.maCa).catch(() => []))
+      }
+      setDs(gomLuyen(ca.map((c) => ({ maCa: c.maCa, tenCa: c.tenCa, moLuc: c.moLuc })), phieuCua, nopCua))
       setLuc(new Date().toISOString())
       setMo(true)
     } catch (e) {
@@ -118,7 +148,7 @@ export default function KhoiLuyenKhacPhuc({ scriptUrl, maBiMat }: { scriptUrl: s
     return (ds ?? []).filter((e) => khongDau(e.hoTen).includes(q) || e.sbd.includes(tim.trim()))
   }, [ds, tim])
 
-  const chuaMo = (ds ?? []).filter((e) => e.tongMo === 0).length
+  const chuaNop = (ds ?? []).filter((e) => e.tongNop === 0).length
 
   return (
     <TheNoiDung>
@@ -136,7 +166,7 @@ export default function KhoiLuyenKhacPhuc({ scriptUrl, maBiMat }: { scriptUrl: s
             {dangTai
               ? 'Đang hỏi máy chủ…'
               : mo && ds
-                ? `${ds.length} em · ${chuaMo} em chưa mở lần nào · số liệu lúc ${gioNgan(luc)}`
+                ? `${ds.length} em · ${chuaNop} em chưa nộp bài nào · số liệu lúc ${gioNgan(luc)}`
                 : 'Bấm để đồng bộ ngay từ máy chủ, quét mọi ca'}
           </span>
         </span>
@@ -153,7 +183,7 @@ export default function KhoiLuyenKhacPhuc({ scriptUrl, maBiMat }: { scriptUrl: s
         <div className="flex flex-col" style={{ gap: 'var(--k3)', marginTop: 'var(--k3)' }}>
           {/* NÓI THẲNG GIỚI HẠN, ngay chỗ thầy đọc số. */}
           <OThongBao tone="cam">
-            Máy đếm được em MỞ phiếu khắc phục mấy lần, KHÔNG đếm được em làm mấy câu — phiếu khắc phục là tệp tĩnh, không có nút nộp. Muốn đếm đúng số câu đã làm thì phải cho phiếu khắc phục nộp được như một ca bài tập.
+            <b>Nộp</b> là em bấm nộp và máy chấm — đó là "em có làm". <b>Mở</b> chỉ là em bấm vào link. Phiếu dựng trước 08/09 không có nút nộp nên chỉ có số mở; dựng lại phiếu cho ca đó là em nộp được.
           </OThongBao>
 
           <div className="relative">
@@ -200,10 +230,10 @@ export default function KhoiLuyenKhacPhuc({ scriptUrl, maBiMat }: { scriptUrl: s
                       </span>
                       <span style={{ ...NHAN_NHO, ...SO, display: 'block' }}>
                         SBD {e.sbd} ·{' '}
-                        {e.tongMo === 0 ? (
-                          <span style={{ color: 'var(--cam)' }}>chưa mở phiếu khắc phục nào, cả {e.bai.length} bài</span>
+                        {e.tongNop === 0 ? (
+                          <span style={{ color: 'var(--cam)' }}>chưa nộp bài khắc phục nào{e.tongMo > 0 ? `, mới chỉ mở ${e.tongMo} lần` : `, cả ${e.bai.length} bài chưa mở`}</span>
                         ) : (
-                          `mở ${e.tongMo} lần, ${e.soBaiDaMo}/${e.bai.length} bài`
+                          `nộp ${e.tongNop} lượt, ${e.soBaiDaNop}/${e.bai.length} bài · mở ${e.tongMo} lần`
                         )}
                       </span>
                     </span>
@@ -215,7 +245,12 @@ export default function KhoiLuyenKhacPhuc({ scriptUrl, maBiMat }: { scriptUrl: s
                       {e.bai.map((b, i) => (
                         <div key={b.maCa} style={{ ...NHAN_NHO, ...SO, color: 'var(--muc)' }}>
                           <b>Lần {i + 1}</b> · {b.tenCa} ·{' '}
-                          {b.soLanXem === 0 ? <span style={{ color: 'var(--cam)' }}>chưa mở</span> : `mở ${b.soLanXem} lần${b.xemLanCuoi ? `, lần cuối ${gioNgan(b.xemLanCuoi)}` : ''}`}
+                          {b.luot.length > 0 ? (
+                            b.luot.map((l) => `lượt ${l.lanThu} đúng ${l.soDung}/${l.soCau}${l.nopLuc ? ` (${gioNgan(l.nopLuc)})` : ''}`).join(' · ')
+                          ) : (
+                            <span style={{ color: 'var(--cam)' }}>chưa nộp</span>
+                          )}
+                          {b.soLanXem > 0 && <span style={{ color: 'var(--nhat)' }}> · mở {b.soLanXem} lần</span>}
                         </div>
                       ))}
                     </div>

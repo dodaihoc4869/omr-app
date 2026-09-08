@@ -1223,6 +1223,56 @@ export async function layPhieu(scriptUrl: string, ma: string): Promise<unknown> 
   return r.phieu
 }
 
+// ------------------------------------------------- NỘP PHIẾU KHẮC PHỤC
+// NOP-PHIEU-KHAC-PHUC.md. Lệnh nộp là lệnh GHI CÔNG KHAI: em chỉ có cái link,
+// không có mã bí mật. Máy chủ tự chấm lại nên con số trả về là con số ĐÃ GHI,
+// không phải con số máy em tính.
+
+export interface KetQuaNopKhacPhuc {
+  lanThu: number
+  soCau: number
+  soDung: number
+  qidSai: string[]
+  nopLuc: string
+}
+
+export async function nopKhacPhuc(scriptUrl: string, ma: string, sbd: string, dapAn: Record<string, string>): Promise<KetQuaNopKhacPhuc> {
+  const r = await postJson(scriptUrl, { action: 'nopKhacPhuc', ma, sbd, dapAn })
+  if (!r.ok) throw new Error(r.error || 'Không nộp được bài')
+  return {
+    lanThu: Number(r.lanThu) || 1,
+    soCau: Number(r.soCau) || 0,
+    soDung: Number(r.soDung) || 0,
+    qidSai: Array.isArray(r.qidSai) ? (r.qidSai as string[]).map(chuoi) : [],
+    nopLuc: chuoi(r.nopLuc),
+  }
+}
+
+export interface LuotNopKhacPhuc {
+  ma: string
+  sbd: string
+  lanThu: number
+  nopLuc: string
+  soCau: number
+  soDung: number
+  qidSai: string[]
+}
+
+/** Mọi lượt nộp khắc phục của một ca. Cần mã bí mật — chỉ thầy đọc. */
+export async function nopKhacPhucTheoCa(scriptUrl: string, secret: string, maCa: string): Promise<LuotNopKhacPhuc[]> {
+  const r = await postJson(scriptUrl, { action: 'nopKhacPhucTheoCa', secret, maCa })
+  if (!r.ok) throw new Error(r.error || 'Không lấy được lượt nộp khắc phục')
+  return (r.items as LuotNopKhacPhuc[]).map((x) => ({
+    ma: chuoi(x.ma),
+    sbd: chuoi(x.sbd),
+    lanThu: Number(x.lanThu) || 0,
+    nopLuc: chuoi(x.nopLuc),
+    soCau: Number(x.soCau) || 0,
+    soDung: Number(x.soDung) || 0,
+    qidSai: Array.isArray(x.qidSai) ? x.qidSai.map(chuoi) : [],
+  }))
+}
+
 /** Một dòng trong danh sách phiếu của ca. KHÔNG kèm nội dung phiếu — gói phiếu
  * nặng vài MB mỗi cái, kéo cả ca về là nghẹn mà thầy cũng không cần. */
 export interface PhieuCuaCa {
