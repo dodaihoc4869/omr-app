@@ -211,15 +211,17 @@ describe('Chế độ SỐ BÁO DANH đòi đủ mã ca + số báo danh + họ 
     const i = gsCode.indexOf("if (action === 'vaoThi')")
     const j = gsCode.indexOf("\n  if (action === '", i + 10)
     const than = gsCode.slice(i, j > 0 ? j : undefined)
+    // Phép so tách ra hàm thuần `khopHoSoDanhSach_` (08/09); thân `vaoThi` gọi nó.
+    expect(than).toContain('khopHoSoDanhSach_(body, dong)')
+    const ham = gsCode.slice(gsCode.indexOf('function khopHoSoDanhSach_('), gsCode.indexOf('function tenKhopNhau_('))
     // TỪ 07/09 màn vào thi chỉ hỏi số báo danh rồi cho em XÁC NHẬN BẰNG MẮT
     // tên của số đó. Có cờ `xacNhanTen` thì không so tên và năm sinh nữa.
-    expect(than).toContain('const tenKhop = body.xacNhanTen === true ||')
-    expect(than).toContain('const namKhop = body.xacNhanTen === true ||')
+    expect(ham).toContain('body.xacNhanTen === true')
     // KHÔNG có cờ thì luật cũ phải còn nguyên — mọi chỗ gọi khác không đổi.
     // Tên đi qua `tenKhopNhau_`: nó nuốt chữ eth ð Ð, ký tự tàng hình, dấu câu
     // thừa và chữ dính — ba bẫy "nhìn y hệt mà khác mã".
-    expect(than).toContain('!chuanTen_(dong.hoTen) || tenKhopNhau_(body.hoTen, dong.hoTen)')
-    expect(than).toContain('!dong.namSinh || namGoi === dong.namSinh')
+    expect(ham).toContain('tenKhopNhau_(body.hoTen, dong.hoTen)')
+    expect(ham).toContain('namGoi === namDs')
     expect(than).toContain('if (!tenKhop || !namKhop) {')
     expect(than).toContain('trongDs = null')
     // Mỗi lượt bị chặn phải để lại bằng chứng cho thầy đọc.

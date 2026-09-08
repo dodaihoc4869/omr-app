@@ -883,6 +883,40 @@ function chuanTen_(v) {
  *
  * KHÔNG có bậc 3 kiểu "gần giống": cổng này để chặn gõ nhầm số báo danh và
  * chặn em lạ, hạ xuống so gần đúng là mất luôn tác dụng. */
+/** CỔNG HỒ SƠ: em gõ có khớp dòng trong danh sách lớp không.
+ *
+ * HÀM THUẦN, không đọc Sheet, không ghi gì — tách ra khỏi thân `vaoThi` để phép
+ * kiểm chạy được CHÍNH đoạn mã này chứ không chạy một bản chép tay của nó.
+ *
+ * Trả `{ tenKhop, namKhop, khongGuiGi }`.
+ *
+ * BA VẾ MỞ CỔNG, mỗi vế một lý do khác nhau:
+ *   1. `xacNhanTen === true` — em đã NHÌN THẤY tên của số báo danh mình gõ trên
+ *      màn xác nhận rồi mới bấm Bắt đầu (luồng từ 07/09). Không còn gì để so.
+ *   2. Ô trong DANH SÁCH trống — thầy chưa điền thì không lấy đó làm cớ chặn.
+ *   3. Ô EM GỬI trống — máy em không gửi thì KHÔNG CÓ GÌ ĐỂ SO.
+ *
+ * Vế 3 là chỗ hỏng ngày 08/09: thiếu nó, máy chủ đem chuỗi rỗng đi so với tên
+ * trong danh sách rồi kết luận "lệch họ tên", chặn 17/36 em của ca 447479 —
+ * 37/40 dòng trong sổ ChanVao có họ tên rỗng, 40/40 có năm sinh rỗng.
+ *
+ * Cổng chặn gõ nhầm số báo danh KHÔNG yếu đi: số báo danh vẫn phải nằm trong
+ * danh sách, và client bắt em nhìn tên rồi mới cho bấm Bắt đầu. */
+function khopHoSoDanhSach_(body, dong) {
+  var daXacNhan = body && body.xacNhanTen === true
+  var tenGoi = chuanTen_(body ? body.hoTen : '')
+  var namGoi = chuanNamSinh_(body ? body.namSinh : '')
+  var tenDs = chuanTen_(dong ? dong.hoTen : '')
+  var namDs = dong && dong.namSinh ? String(dong.namSinh) : ''
+  return {
+    tenKhop: daXacNhan || !tenDs || !tenGoi || tenKhopNhau_(body.hoTen, dong.hoTen),
+    namKhop: daXacNhan || !namDs || !namGoi || namGoi === namDs,
+    // Máy em không gửi gì để so. Em vẫn vào được, nhưng thầy phải thấy: đó là
+    // dấu hiệu máy ấy còn giữ bản cũ.
+    khongGuiGi: !daXacNhan && !tenGoi && !namGoi,
+  }
+}
+
 function tenKhopNhau_(a, b) {
   var x = chuanTen_(a)
   var y = chuanTen_(b)
@@ -3275,7 +3309,6 @@ function doPost(e) {
       const dong = coDs ? timTrongDanhSachLop_(sbd) : null
       let trongDs = dong
       if (coDs && dong) {
-        const namGoi = chuanNamSinh_(body.namSinh)
         // Dòng trong danh sách thiếu tên hoặc năm sinh thì không lấy đó làm cớ
         // chặn em — chỉ so những gì thầy đã điền.
         // XÁC NHẬN BẰNG MẮT (thầy chốt 07/09). Màn vào thi mới chỉ hỏi số báo
@@ -3286,8 +3319,13 @@ function doPost(e) {
         // Cách này bắt lỗi gõ nhầm TỐT HƠN cách cũ: gõ nhầm một số là em thấy
         // ngay tên người khác, thay vì nhận một câu "thông tin không đúng"
         // không nói được sai ở đâu.
-        const tenKhop = body.xacNhanTen === true || !chuanTen_(dong.hoTen) || tenKhopNhau_(body.hoTen, dong.hoTen)
-        const namKhop = body.xacNhanTen === true || !dong.namSinh || namGoi === dong.namSinh
+        // Phép so nằm ở `khopHoSoDanhSach_` (hàm thuần, có phép kiểm riêng).
+        var kq = khopHoSoDanhSach_(body, dong)
+        var tenKhop = kq.tenKhop
+        var namKhop = kq.namKhop
+        // KHÔNG LẶNG LẼ MỞ CỔNG: em qua được vì máy không gửi gì để so thì thầy
+        // vẫn phải thấy.
+        if (kq.khongGuiGi) ghiChanVao_(maCa, sbd, '', '', dong.hoTen, dong.namSinh, 'khong_gui_ten')
         if (!tenKhop || !namKhop) {
           trongDs = null
           // GIỮ LẠI BẰNG CHỨNG. Máy chủ cố ý KHÔNG nói cho em biết sai ô nào

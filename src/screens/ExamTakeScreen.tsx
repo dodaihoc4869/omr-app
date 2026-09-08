@@ -826,13 +826,27 @@ export default function ExamTakeScreen() {
     }
   }
 
-  /** BƯỚC 2: em nhìn đúng tên mình rồi bấm Bắt đầu. */
+  /** BƯỚC 2: em nhìn đúng tên mình rồi bấm Bắt đầu.
+   *
+   * HÀNG RÀO TẠI NGUỒN — thầy báo 08/09: 17/36 em bị chặn "không khớp danh sách".
+   * Đọc sổ ChanVao của ca 447479: 37/40 dòng có họ tên RỖNG, 40/40 có năm sinh
+   * RỖNG. Máy em gửi chuỗi rỗng chứ không gửi sai.
+   *
+   * Gốc: hai ô họ tên và năm sinh đã gỡ khỏi màn nhập (07/09), nên cổng máy chủ
+   * chỉ còn mở bằng `xacNhanTen`. Mà hàm này còn một lối vào KHÔNG qua bước 1
+   * (phím Enter trong ô số báo danh), ở đó `xacNhan` là null nên gửi lên toàn
+   * chuỗi rỗng và bị máy chủ coi là khai sai tên.
+   *
+   * Không vá riêng chỗ phím Enter: vá một lối thì lối sau lại rơi đúng hố cũ.
+   * Chặn ngay đầu hàm — chưa xác nhận tên thì KHÔNG gọi máy chủ, mà quay về
+   * bước 1. Từ đây mọi lối vào, kể cả lối thêm sau này, đều đi qua xác nhận. */
   const handleJoin = async () => {
     const ma = maCa.trim()
     const sb = sbd.trim()
     const ten = (xacNhan?.hoTen || hoTen).trim()
     const nam = namSinh.trim()
     if (!ma || !sb) return showToast('Nhập đủ mã ca và số báo danh', 'error')
+    if (!laXemDiem && !xacNhan) return void traTenRoiHoi()
     // Nhớ cho lần sau — em không phải gõ lại mỗi ca.
     try {
       if (ten) localStorage.setItem(KHOA_HO_TEN, ten)
@@ -1879,7 +1893,12 @@ export default function ExamTakeScreen() {
                   value={sbd}
                   onChange={(e) => setSbd(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleJoin()
+                    // ĐI ĐÚNG ĐƯỜNG CỦA NÚT "Vào thi": tra tên rồi hiện màn xác
+                    // nhận. Bản cũ gọi thẳng `handleJoin` nên bỏ qua cả bước xác
+                    // nhận lẫn điều kiện toàn màn hình mà nút có.
+                    if (e.key !== 'Enter') return
+                    if (laXemDiem || !toanManHinh || dangTraTen) return
+                    void traTenRoiHoi()
                   }}
                 />
               </div>

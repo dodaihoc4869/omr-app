@@ -159,14 +159,21 @@ describe('Máy chủ — cổng vào thi theo danh sách', () => {
   })
 
   it('so khớp tên bỏ dấu và bỏ khoảng trắng thừa, năm sinh so đúng 4 chữ số', () => {
+    // Phép so đã TÁCH ra hàm thuần `khopHoSoDanhSach_` (08/09) để chạy được
+    // trong phép kiểm thay vì chỉ soi chuỗi. Thân `vaoThi` nay chỉ gọi nó.
     const than = thanVaoThi()
+    expect(than).toContain('khopHoSoDanhSach_(body, dong)')
+    const ham = gsCode.slice(gsCode.indexOf('function khopHoSoDanhSach_('), gsCode.indexOf('function tenKhopNhau_('))
     // So tên đi qua `tenKhopNhau_` (07/09) chứ không so hai chuỗi thô: hàm đó
     // nuốt thêm chữ eth ð Ð, ký tự tàng hình, dấu câu thừa và chữ dính.
-    expect(than).toContain('tenKhopNhau_(body.hoTen, dong.hoTen)')
-    expect(than).toContain('chuanNamSinh_(body.namSinh)')
+    expect(ham).toContain('tenKhopNhau_(body.hoTen, dong.hoTen)')
+    expect(ham).toContain('chuanNamSinh_(body ? body.namSinh : \'\')')
     // Dòng thầy bỏ trống thì không lấy đó làm cớ chặn em.
-    expect(than).toContain('!chuanTen_(dong.hoTen)')
-    expect(than).toContain('!dong.namSinh')
+    expect(ham).toContain('!tenDs')
+    expect(ham).toContain('!namDs')
+    // VÀ vế đối xứng thêm 08/09: máy em không gửi thì cũng không có gì để so.
+    expect(ham).toContain('!tenGoi')
+    expect(ham).toContain('!namGoi')
   })
 })
 

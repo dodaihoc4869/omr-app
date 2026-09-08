@@ -1578,6 +1578,9 @@ const TEN_LY_DO_CHAN: Record<string, string> = {
   khong_co_sbd: 'Số báo danh không có trong danh sách lớp',
   lech_ho_ten: 'Họ tên gõ khác danh sách',
   lech_nam_sinh: 'Năm sinh gõ khác danh sách',
+  // KHÔNG phải một lượt bị chặn: em VÀO ĐƯỢC. Dòng này để thầy biết máy em còn
+  // giữ bản cũ (bản không có màn xác nhận tên), nên máy chủ không có gì để so.
+  khong_gui_ten: 'Máy em còn bản cũ, không gửi tên để đối chiếu (em vẫn vào được)',
 }
 
 export function moTaLyDoChan(lyDo: string): string {

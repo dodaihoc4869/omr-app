@@ -87,6 +87,35 @@ function doiXung(cau: string, xung: 'em' | 'con'): string {
   return cau.replace(/(^|[.;:]\s+)Em\b/g, '$1Con').replace(/\bcủa em\b/g, 'của con')
 }
 
+/** ĐỔI NGƯỢC "con" VỀ "em" TRÊN MỘT NHẬN XÉT ĐÃ CẤT.
+ *
+ * Thầy báo 08/09: "học sinh xem báo cáo, có nhiều máy lấy nhầm báo cáo của phụ
+ * huynh" — đúng em, đúng điểm, nhưng khối Việc cần làm xưng "Con".
+ *
+ * Gốc: `phieu-ca-ca.ts` sinh nhận xét MỘT LẦN lúc dựng phiếu với `xung: 'con'`
+ * rồi CẤT chuỗi đó vào phiếu trên máy chủ. `PhieuV3` đổi được xưng hô của phần
+ * khung (`laCuaEm`) nhưng không đổi được chuỗi đã cất, nên báo cáo của em ra
+ * nửa "em" nửa "con".
+ *
+ * Vì sao đổi lúc HIỆN chứ không cất thêm một bản: 36 em tối 08/09 đã có phiếu
+ * trên máy chủ rồi. Cất thêm bản mới chỉ chữa được phiếu dựng từ nay; đổi lúc
+ * hiện chữa cả phiếu cũ mà không phải dựng lại gì.
+ *
+ * Luật ĐÓNG, chỉ phủ đúng những dạng mà bộ sinh trên đây tạo ra:
+ *   · "Con" đầu câu hoặc sau dấu chấm/chấm phẩy/hai chấm,
+ *   · "của con",
+ *   · ", con làm" và ", con sai" (phần 1).
+ * KHÔNG đổi "con" trần: "con số", "con đường" phải giữ nguyên.
+ *
+ * `tests/bao-cao-cua-em-0809.test.ts` chứng minh phép đổi này đúng bằng cách so
+ * bản đổi ngược với bản sinh thẳng `xung: 'em'` trên mọi tổ hợp dữ liệu. */
+export function doiXungVeEm(cau: string): string {
+  return String(cau == null ? '' : cau)
+    .replace(/(^|[.;:]\s+)Con\b/g, '$1Em')
+    .replace(/\bcủa con\b/g, 'của em')
+    .replace(/(,\s+)con(?=\s+(?:làm|sai)\b)/g, '$1em')
+}
+
 /** PHẦN 2 — nguyên nhân. Lấy nguyên câu số liệu của tín hiệu mạnh nhất. */
 export function phanNguyenNhan(d: DuLieuNhanXetCa): string {
   const xung = d.xung ?? 'em'

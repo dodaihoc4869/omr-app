@@ -83,3 +83,32 @@ Lùi: `git revert 6b2956a` (và `git revert 5c7374d` nếu muốn lùi cả đ�
 - [x] Ba commit: `e1dcf5e` · `c0925d1` · `015e983` (Apps Script KHÔNG đổi, vẫn v63)
 - [x] Bản live `assets/index-DfLGupCV.js` mang đủ 7 dấu hiệu: `:not([aria-checked="true"])` · `temCham` · `Đã đồng bộ điểm` · `câu em từng sai có trong đề này` · `câu còn lại tự vào đề` · `còn sai lại câu từng sai` · `đề không đủ chỗ`
 - [x] Đo cảm ứng thật trên Chromium 360×780 `hasTouch`, phiếu do CHÍNH `dungPhieu` dựng: ô đáp án đúng và ô sai giống hệt nhau TRƯỚC khi bấm (vẫn giấu đáp án); chạm ô đúng → nền đổi `rgb(248,250,252)` → `rgb(239,242,246)`, aria bật, đếm 1, lưu `{"q1":"A"}`; chạm lại → bỏ chọn; xê ngang 18px ăn; xê dọc 15px ăn; kéo dọc 90px vẫn là cuộn; ô Đ/S 46×44, ô phương án 311×44 (đều trên ngưỡng ngón tay 44px)
+
+## Phiên 08/09 tối — 17/36 em bị chặn vào thi
+
+- [x] "17 bạn học sinh/ 36 bạn bị lỗi này… khắc phục triệt để" | bằng chứng: sửa HAI TẦNG — máy em: hàng rào tại nguồn trong `handleJoin` (chưa xác nhận thì quay về bước 1) + phím Enter đi đúng đường của nút; máy chủ: tách hàm thuần `khopHoSoDanhSach_`, thêm vế "máy không gửi thì không có gì để so". `tests/chan-vao-thi-0809.test.ts` 15 phép kiểm, chạy CHÍNH hàm trong .gs, dựng từ 3 dòng thật của sổ ChanVao. Phá mã 3 lần, cả 3 đều đỏ đúng chỗ
+
+### NGUYÊN NHÂN GỐC — đọc sổ ChanVao của ca 447479 trên máy chủ
+
+40 dòng chặn, 24 số báo danh khác nhau. Phân bố:
+- `hoTenGoi` **RỖNG ở 37/40 dòng**; `namSinhGoi` **RỖNG ở 40/40 dòng**.
+- Lý do: `lech_ho_ten` 33 · `lech_nam_sinh` 3 · `khong_co_sbd` 4 (SBD "121" và "12129", gõ nhầm thật).
+
+Máy em gửi họ tên và năm sinh là chuỗi RỖNG, không phải gửi sai.
+
+Vì sao rỗng: hai ô "họ tên" và "năm sinh" ĐÃ GỠ khỏi màn nhập ngày 07/09, thay bằng
+màn xác nhận bằng mắt. Cổng máy chủ từ đó chỉ mở khi client gửi `xacNhanTen: true`,
+tức em phải đi qua bước 1 (`traTenRoiHoi` → hiện tên → bấm Bắt đầu).
+
+NHƯNG `handleJoin` còn MỘT LỐI VÀO không qua bước 1: **phím Enter trong ô số báo
+danh** (`onKeyDown` → `handleJoin()` thẳng). Ở lối đó `xacNhan === null` nên client
+gửi `xacNhanTen: false` cùng `hoTen: ''`, `namSinh: ''`; máy chủ so chuỗi rỗng với
+tên trong danh sách, thấy lệch, chặn.
+
+Đó là "17/36": em bấm nút "Vào thi" thì qua, em bấm Enter/Go/Xong trên bàn phím thì
+bị chặn. Ba dòng `lech_nam_sinh` là em còn `hoTen` nhớ trong localStorage từ bản cũ
+nhưng không có năm sinh.
+
+Lối Enter còn bỏ qua luôn điều kiện toàn màn hình mà nút "Vào thi" có (`disabled`).
+- [ ] "bạn hãy đồng bôn tên học sinh theo số báo danh vào ca 447479 cho tôi luôn nhé" | bằng chứng: (chưa có)
+- [x] "thi thật hôm nay lúc học sinh xem báo cáo, có nhiều máy lấy nhầm báo cáo của phụ huynh" | bằng chứng: NGUYÊN NHÂN GỐC — `phieu-ca-ca.ts` ghi cứng `xung: \'con\'` rồi CẤT chuỗi nhận xét vào phiếu trên máy chủ; `PhieuV3` đổi được khung bằng `laCuaEm` nhưng không đổi được chuỗi đã cất, nên báo cáo của em ra nửa "em" nửa "con". Thêm `doiXungVeEm`, áp lúc HIỆN nên chữa được cả phiếu cũ đã cất (36 em tối nay không phải dựng lại). `tests/bao-cao-cua-em-0809.test.ts`: đổi ngược bản "con" ra ĐÚNG bản sinh thẳng "em" trên **1 344 tổ hợp**. Phá mã 2 lần, cả 2 đều đỏ

@@ -22,6 +22,7 @@ import type { PhieuDayDu } from '../lib/phieu-du-lieu'
 import { cauHinhPhieu, duocHienHang, NGUONG_LOP_CUNG_SAI } from '../lib/cau-hinh-phieu'
 import TheCauChiTiet from '../components/TheCauChiTiet'
 import NutTaiBaiTap from '../components/KhoiBaiLuyen'
+import { doiXungVeEm } from '../lib/nhan-xet-theo-ca'
 import { DaiThoiGian, KhoiViPham, ngayNgan, soVN } from '../components/KhoiBaoCaoChung'
 import { TEN_PHAN } from '../lib/phan-tich-lam-bai'
 
@@ -194,7 +195,12 @@ export default function PhieuV3({ du, laCuaEm = false, xinLink }: { du: PhieuDay
           {du.vieCanLam.trim() && (
             <div className="v3-the">
               <h3>Tối nay 15 phút</h3>
-              <div style={{ fontSize: 13.5, whiteSpace: 'pre-wrap' }}>{du.vieCanLam.trim()}</div>
+              {/* NHẬN XÉT CẤT SẴN XƯNG "con" (dựng để gửi phụ huynh). Bản của
+                  em phải đổi về "em", không thì báo cáo nửa nạc nửa mỡ — đúng
+                  chỗ thầy báo 08/09. Xem doiXungVeEm trong nhan-xet-theo-ca.ts. */}
+              <div style={{ fontSize: 13.5, whiteSpace: 'pre-wrap' }}>
+                {(laCuaEm ? doiXungVeEm(du.vieCanLam) : du.vieCanLam).trim()}
+              </div>
             </div>
           )}
 

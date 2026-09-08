@@ -110,7 +110,11 @@ describe('nhật ký bị chặn', () => {
     expect(doan).toContain("'lech_nam_sinh'")
     expect(doan).toContain("'khong_co_sbd'")
     // Cổng phải dùng hàm so mới, không so bằng hai chuỗi thô như bản cũ.
-    expect(doan).toContain('tenKhopNhau_(body.hoTen, dong.hoTen)')
+    // Phép so tách ra hàm thuần `khopHoSoDanhSach_` (08/09).
+    expect(doan).toContain('khopHoSoDanhSach_(body, dong)')
+    expect(layHam('khopHoSoDanhSach_')).toContain('tenKhopNhau_(body.hoTen, dong.hoTen)')
+    // Lý do mới: máy em không gửi gì để so — em VÀO ĐƯỢC, chỉ ghi lại.
+    expect(doan).toContain("'khong_gui_ten'")
   })
 
   it('ghi nhật ký hỏng KHÔNG được chặn em vào thi', () => {

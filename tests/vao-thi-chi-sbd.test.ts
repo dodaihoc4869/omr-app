@@ -80,8 +80,9 @@ describe('vaoThi — cờ xác nhận bằng mắt', () => {
 
   it('máy chủ chỉ bỏ so tên/năm khi CÓ cờ — cổng danh sách vẫn nguyên', () => {
     const than = GS.slice(GS.indexOf('const coDs = coDanhSachHocSinh_()'), GS.indexOf('let hoSo = hoSoHocSinh_(sbd)'))
-    expect(than).toContain('const tenKhop = body.xacNhanTen === true ||')
-    expect(than).toContain('const namKhop = body.xacNhanTen === true ||')
+    expect(than).toContain('khopHoSoDanhSach_(body, dong)')
+    const ham = GS.slice(GS.indexOf('function khopHoSoDanhSach_('), GS.indexOf('function tenKhopNhau_('))
+    expect(ham).toContain('body.xacNhanTen === true')
     // Cổng "phải có trong danh sách lớp" KHÔNG được nới theo.
     expect(than).toContain('const dong = coDs ? timTrongDanhSachLop_(sbd) : null')
     expect(than).toContain("ghiChanVao_(maCa, sbd, body.hoTen, body.namSinh, '', '', 'khong_co_sbd')")
