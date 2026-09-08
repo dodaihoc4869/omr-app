@@ -29,7 +29,7 @@ export interface CaTruocDaCham {
 }
 
 /** Vì sao một em không đủ câu lặp. Rỗng = đủ, không phải báo gì. */
-export type LyDoThieuLap = '' | 'moi_vao' | 'dung_het' | 'khong_nop' | 'it_cau_sai' | 'ngoai_kho'
+export type LyDoThieuLap = '' | 'moi_vao' | 'dung_het' | 'khong_nop' | 'it_cau_sai' | 'ngoai_kho' | 'het_cho'
 
 export const CHU_LY_DO_THIEU: Record<Exclude<LyDoThieuLap, ''>, string> = {
   moi_vao: 'mới vào lớp, chưa có ca nào',
@@ -37,6 +37,7 @@ export const CHU_LY_DO_THIEU: Record<Exclude<LyDoThieuLap, ''>, string> = {
   khong_nop: 'không nộp ca nào trong khoảng quét',
   it_cau_sai: 'ca trước sai ít hơn số câu lặp cần',
   ngoai_kho: 'câu em từng sai không nằm trong kho ca này',
+  het_cho: 'đề không đủ chỗ — phần đó đã kín câu hỏi lại',
 }
 
 export interface CauLapCuaEm {
@@ -264,7 +265,23 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
       // Nói ĐÚNG chuyện đang xảy ra, không gộp mọi thứ vào "đúng hết": em sai
       // 2 câu mà cần 6 là chuyện khác hẳn em sai 0 câu, và khác hẳn em sai
       // nhiều câu nhưng mấy câu đó không nằm trong kho ca này.
-      const lyDo: Exclude<LyDoThieuLap, ''> = lap.lyDo !== '' ? lap.lyDo : soLap < lap.qids.length ? 'ngoai_kho' : 'it_cau_sai'
+      // BA CHUYỆN KHÁC HẲN NHAU, ĐỪNG GỘP (thầy hỏi đúng chỗ này 08/09: "câu
+      // em từng sai không nằm trong kho ca này nghĩa là như thế nào?"):
+      //   · `ngoai_kho` — câu đó KHÔNG có trong kho đề của ca, không rút được.
+      //   · `het_cho`   — câu đó CÓ trong kho, nhưng phần của nó đã kín chỗ.
+      //     Ca 638242: đề chỉ 8 câu phần I mà cần 9 câu lặp ⇒ cắt còn 8. Bản
+      //     trước gán nhầm thành `ngoai_kho`, nên thầy đi tìm câu thiếu trong
+      //     kho trong khi kho không thiếu gì.
+      //   · `it_cau_sai` — ca trước em sai ít hơn số câu lặp cần.
+      const coTrongKho = lap.qids.filter((q) => cauCua.has(q)).length
+      const lyDo: Exclude<LyDoThieuLap, ''> =
+        lap.lyDo !== ''
+          ? lap.lyDo
+          : soLap < coTrongKho
+            ? 'het_cho'
+            : soLap < lap.qids.length
+              ? 'ngoai_kho'
+              : 'it_cau_sai'
       thieuLap.push({ sbd, soLap, can, soSaiCaTruoc: lap.soSaiCaTruoc, lyDo })
     }
   }

@@ -244,7 +244,7 @@ describe('PHIẾU HTML: bảy sắc cầu vồng, xoay vòng', () => {
 
   it('nút Đổi màu KHÔNG bị giấu lúc chưa nộp — đổi màu không lộ đáp án', () => {
     const khoa = dungPhieu(tt, [cau('q1')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x' } })
-    expect(khoa).toContain('<body class="chua-nop">')
+    expect(khoa).toContain('<body class="co-lam chua-nop">')
     expect(khoa).toContain('id="doi-mau"')
     const giau = khoa.slice(khoa.indexOf('body.chua-nop #mo-het'))
     expect(giau.slice(0, giau.indexOf('}'))).not.toContain('#doi-mau')

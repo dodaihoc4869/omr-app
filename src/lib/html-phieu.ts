@@ -233,7 +233,9 @@ sup { font-size: .72em; vertical-align: .42em; }
   justify-content: flex-end;
   padding: 40px 22px 60px;
   color: #ffffff;
-  background: linear-gradient(150deg, #0f3057 0%, #00587a 52%, #008891 100%);
+  /* DÙNG BIẾN, KHÔNG GÕ CỨNG (thầy chốt 08/09: "đổi màu cả 2 chỗ này nữa").
+     Ba mã màu gõ thẳng ở đây chính là lý do đổi sắc mà bìa vẫn xanh navy. */
+  background: linear-gradient(150deg, var(--nav) 0%, var(--nav-2) 52%, var(--luc) 100%);
 }
 /* BÌA KHÔNG CHIẾM TRỌN MÀN NỮA (thầy chốt 06/09: "trực quan, sạch, gọn").
    Bản cũ cao 100svh, chữ căn giữa, ba phân tử mờ nằm vắt chéo — mở phiếu ra
@@ -267,7 +269,7 @@ sup { font-size: .72em; vertical-align: .42em; }
 .summary-page {
   margin: -28px auto 26px; max-width: 900px; position: relative; z-index: 3;
   border-radius: 24px; padding: 18px 18px 20px; color: #ffffff;
-  background: linear-gradient(135deg, #0f3057 0%, #00587a 55%, #008891 100%);
+  background: linear-gradient(135deg, var(--nav) 0%, var(--nav-2) 55%, var(--luc) 100%);
   box-shadow: var(--bong-cao);
 }
 /* TIÊU ĐỀ NẰM CÙNG HÀNG với số câu, không chiếm riêng một dòng giữa trang:
@@ -319,7 +321,23 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
    CHỌN NGAY TRÊN PHƯƠNG ÁN, không có hàng "EM CHỌN" riêng nữa (thầy chốt
    08/09). Hàng phương án của đề vốn đã cao hơn 44px nên cỡ chạm đã đạt; ở đây
    chỉ thêm con trỏ, viền chọn và trạng thái. */
-.lam-o { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.lam-o {
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  /* KHÔNG CHỜ CHẠM ĐÚP: thiếu dòng này thì trình duyệt di động giữ chạm lại
+     khoảng 300ms để xem có phải chạm đúp không, và em thấy nút "lì". */
+  touch-action: manipulation;
+  /* Chạm giữ lâu không được bôi đen chữ trong ô — bôi đen xong thì cú chạm
+     tính là chọn chữ, không tính là bấm. */
+  -webkit-user-select: none; user-select: none;
+}
+/* Ô Đ/S TO BẰNG NGÓN TAY khi phiếu cho làm bài (thầy bắt được 08/09: "nút Đ
+   bấm mãi không được"). Ô cũ 34x30 — dưới ngưỡng 44px, lại đứng cách nhau 10px
+   nên ngón tay rơi vào khe giữa hai ô là mất cú bấm.
+   CHỈ áp cho phiếu làm bài: phiếu đọc và bản in giữ nguyên khổ cũ. */
+body.co-lam .tf-badge { width: 46px; height: 44px; border-radius: 10px; font-size: 15px; }
+body.co-lam .tf-o { gap: 12px; }
+body.co-lam .tf-head span { width: 46px; }
+body.co-lam .tf-item { padding: 9px 10px; }
 .q-opt.lam-o { transition: background-color .12s, border-color .12s; }
 .q-opt.lam-o[aria-checked="true"] { background: #eef2f6; border-color: #2f3e46; }
 .q-opt.lam-o[aria-checked="true"] .q-opt-letter { background: #2f3e46; color: #ffffff; }
@@ -1402,10 +1420,7 @@ export const JS_PHIEU = `
         if (demLam) demLam.textContent = String(soDaLam());
       }
 
-      document.addEventListener('click', function (e) {
-        if (daNop || !e.target || !e.target.closest) return;
-        var o = e.target.closest('.lam-o');
-        if (!o) return;
+      function chonO(o) {
         var v = o.closest('.q-card[data-qid]');
         if (!v) return;
         var qid = v.getAttribute('data-qid');
@@ -1423,6 +1438,46 @@ export const JS_PHIEU = `
         }
         luuLam();
         veLam();
+      }
+
+      // NHẬN CÚ CHẠM Ở POINTERUP, KHÔNG ĐỢI CLICK (thầy bắt được 08/09: "nút Đ
+      // bấm mãi không được").
+      //
+      // Ngón tay đặt xuống rồi nhích một hai pixel là trình duyệt di động coi
+      // đó là cuộn trang và HUỶ luôn sự kiện click — em bấm thật mà máy không
+      // nhận. Chạm sạch tuyệt đối gần như không có trên điện thoại.
+      //
+      // Nay: nhớ chỗ ngón tay đặt xuống, tới lúc nhấc lên còn trong cùng một ô
+      // và xê dịch dưới 14px thì tính là bấm. Cuộn thật (kéo xa hơn) vẫn là
+      // cuộn. Chuột và bàn phím đi đường click như cũ, có khoá chống ăn hai lần.
+      var batDau = null;
+      var vuaChon = 0;
+      document.addEventListener('pointerdown', function (e) {
+        if (daNop || !e.target || !e.target.closest) { batDau = null; return; }
+        var o = e.target.closest('.lam-o');
+        batDau = o ? { o: o, x: e.clientX, y: e.clientY } : null;
+      }, true);
+      document.addEventListener('pointerup', function (e) {
+        var d = batDau;
+        batDau = null;
+        if (daNop || !d || !e.target || !e.target.closest) return;
+        var o = e.target.closest('.lam-o');
+        if (!o || o !== d.o) return;
+        // KHOẢNG CÁCH THẬT, không cộng hai trục: cộng lại thì cú chạm xê chéo
+        // 9px mỗi trục (thật ra chỉ 12,7px) bị loại oan.
+        var dx = e.clientX - d.x, dy = e.clientY - d.y;
+        if (Math.sqrt(dx * dx + dy * dy) >= 16) return;
+        vuaChon = Date.now();
+        chonO(o);
+      });
+      document.addEventListener('click', function (e) {
+        if (daNop || !e.target || !e.target.closest) return;
+        var o = e.target.closest('.lam-o');
+        if (!o) return;
+        // Cú chạm vừa xử lý ở pointerup rồi — click theo sau là ăn hai lần,
+        // và ở phần I ăn hai lần nghĩa là chọn xong tự bỏ chọn ngay.
+        if (Date.now() - vuaChon < 700) return;
+        chonO(o);
       });
 
       // Ô chọn là thẻ div (giữ nguyên bố cục hàng phương án), nên phải tự
@@ -1434,7 +1489,7 @@ export const JS_PHIEU = `
         var oPhim = e.target.closest('.lam-o');
         if (!oPhim) return;
         e.preventDefault();
-        oPhim.click();
+        chonO(oPhim);
       });
 
       document.addEventListener('input', function (e) {
@@ -1627,7 +1682,10 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
         cau: cau.map((c) => ({ id: c.id, phan: c.phan, dapAn: c.dapAn })),
       }).replace(/</g, '\\u003c')}<\/script>`
     : ''
-  return taiLieuHtml(than + goiNop, `${t.tenChuyenDe}${ai ? ` · ${ai}` : ''}`, khoaGiai ? 'chua-nop' : '')
+  // `co-lam` bật khổ ô Đ/S to bằng ngón tay. Tách khỏi `chua-nop` vì thầy có
+  // thể bật HIEN_GIAI_TRUOC_NOP — lúc đó vẫn làm bài, chỉ là không khoá giải.
+  const lopBody = [nop ? 'co-lam' : '', khoaGiai ? 'chua-nop' : ''].filter(Boolean).join(' ')
+  return taiLieuHtml(than + goiNop, `${t.tenChuyenDe}${ai ? ` · ${ai}` : ''}`, lopBody)
 }
 
 /** THANH NỘP — dính dưới thanh điều khiển, NOP-PHIEU-KHAC-PHUC mục 6. */

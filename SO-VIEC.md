@@ -1,7 +1,9 @@
 # SỔ VIỆC — phiên 08/09/2026
 
 Repo `dodaihoc4869/omr-app`. Mốc trước khi sửa: `2358409`.
-Lùi cả loạt này: `git revert <mã commit sẽ ghi ở cuối>`.
+Đã đẩy: `5c7374d` rồi `6b2956a` (trên máy thầy, sau rebase).
+Bản live: `assets/index-B037iNu4.js`. Apps Script **v63**.
+Lùi: `git revert 6b2956a` (và `git revert 5c7374d` nếu muốn lùi cả đợt trước).
 
 ## Dòng việc
 
@@ -13,7 +15,16 @@ Lùi cả loạt này: `git revert <mã commit sẽ ghi ở cuối>`.
 - [x] "chỗ rút 3 ca bạn rút ngẫu nhiên 3 ca trước đó bất kì không cần gần nhất nhé" | bằng chứng: `chonCaTheoPhamVi`; 7 phép kiểm "PHẠM VI RÚT CÂU HỎI LẠI" đạt, gồm "bốc đúng 3 ca và KHÔNG phải 3 ca gần nhất"
 - [x] "học sinh thi xong nhưng chưa thống kê là đã làm sai câu trước" | bằng chứng: `dungPhieuMayEm` nhận `lapCua`, máy chủ gửi `demLap`; 5 phép kiểm "BÁO CÁO SAU THI" đạt
 - [x] "màu của phiếu html … 7 màu 7 sắc cầu vồng để hiển thị lần lượt rồi quay vòng" | bằng chứng: 7 khối `body[data-mau]`; `tests/bam-chon-tren-de.test.ts` chạy thật: mở lần 2 nhích đúng 1 sắc, mở đủ 7 lần quay về đúng sắc cũ
+- [x] (tự phát sinh) Cập nhật nhật ký app `claude/OMR-APP-build-status.md` | bằng chứng: đã ghi mục 08/09/2026
+- [!] Hai lần chạy toàn bộ test có một phép kiểm lẻ trượt rồi tự xanh lại (`co-len-bang`, `khong-dung-bien-truoc-khi-khai`) | KẸT: chạy riêng đều đạt, hai lượt chạy toàn bộ liên tiếp sau đó đều 1981/1981 — nghi chập chờn do máy tải nặng, CHƯA truy được nguyên nhân gốc
 - [x] (tự phát sinh) Màn Ca thi chấm bằng bản đồ của riêng máy đã bấm Bắt đầu ⇒ mở ca ở máy khác thì khối "câu em sai buổi trước" đếm ra 0 và điểm lệch | bằng chứng: `chiTietCa` trả `boTheoEmCa`; cả màn dùng một `boTheoEmDung`; 2 phép kiểm "MÀN CA THI chấm bằng bản đồ MÁY CHỦ" đạt
+
+### Đợt 4 — thầy nhắn 08/09 sau khi xem lại
+
+- [x] "câu em từng sai không nằm trong kho ca này nghĩa là như thế nào?" | bằng chứng: đọc ca 638242 — đề 12 câu (I:8 II:2 III:2), em cần 9 câu lặp mà cả 8 chỗ phần I đã kín ⇒ NHÃN GÁN SAI, đúng ra là "hết chỗ" chứ không phải "ngoài kho". Thêm lý do `het_cho`; 3 phép kiểm đạt
+- [x] "rút ra 8 câu làm sai lần 2 có 1 câu là chính xác chưa?" | bằng chứng: CHƯA CHÍNH XÁC. Chấm lại 8 câu từ đáp án thật: 3 đúng · 4 sai · 1 bỏ trống. Màn hình đếm ra 1 vì chấm bằng bản đồ của riêng máy đã bấm Bắt đầu — đã sửa ở `6b2956a`
+- [x] "video nút đúng sai bấm không nhạy, nút Đ bấm mãi không được" | bằng chứng: HAI nguyên nhân — ô 34×30px (dưới ngưỡng ngón tay) và trình duyệt huỷ click khi ngón tay xê. Nay ô 46×44, nhận cú chạm ở pointerup. Chromium thật 360px có cảm ứng: 7 phép chạm đều đúng
+- [x] "ý của tôi là đổi màu cả 2 chỗ này nữa" (bìa phiếu + khối Tổng quan đề bài) | bằng chứng: hai dải màu gõ cứng mã navy, không dùng biến. Đo trên Chromium: bìa và khối Tổng quan nay ra rgb(127,29,29) theo sắc 1
 
 ## Năm cổng bắt buộc trước khi đẩy
 
@@ -23,6 +34,8 @@ Lùi cả loạt này: `git revert <mã commit sẽ ghi ở cuối>`.
 - [x] `npm run kiem:hien-thi` — ĐẠT 18/18
 - [x] `npm run build` — built in 1.84s
 - [x] Không có ca thi nào đang chạy: 11 ca, ca mới nhất (638242) hết hạn vào lúc 04:55Z, mọi ca đều daVao = daNop
+- [x] Bản live đã ra và mang đủ thay đổi: `assets/index-B037iNu4.js` có `xinLink`, `doi-mau`, 7 khối `data-mau`, `3 ca ngẫu nhiên`, `hoi-lai:`, `lấy từ ca`, `boCuaEm`, `demLap`, `boTheoEmCa`
+- [x] Apps Script v63 sống: POST 6 lệnh đều ok, cổng mã bí mật vẫn chặn, ID triển khai không đổi
 
 ## Nguyên nhân gốc đã tìm ra
 

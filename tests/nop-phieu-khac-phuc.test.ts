@@ -230,7 +230,7 @@ describe('nộp xong mới hiện lời giải (thầy chốt 08/09)', () => {
 
   it('PHIẾU NỘP ĐƯỢC: body mang lớp chua-nop, lời giải bị giấu', () => {
     const html = dungPhieu(tt, [cau('q1')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x' } })
-    expect(html).toContain('<body class="chua-nop">')
+    expect(html).toContain('<body class="co-lam chua-nop">')
     expect(html).toContain('body.chua-nop .q-nut-giai, body.chua-nop .sol-wrap { display: none !important; }')
     // Và nói rõ vì sao chưa thấy, thay vì để em tưởng phiếu hỏng.
     expect(html).toContain('Lời giải mở ra ngay sau khi em bấm Nộp bài.')
@@ -245,12 +245,12 @@ describe('nộp xong mới hiện lời giải (thầy chốt 08/09)', () => {
   it('PHIẾU THƯỜNG (không nộp được) KHÔNG bị khoá — thầy vẫn mở lời giải như cũ', () => {
     const html = dungPhieu(tt, [cau('q1')])
     expect(html).toContain('<body>')
-    expect(html).not.toContain('<body class="chua-nop">')
+    expect(html).not.toContain('<body class="co-lam chua-nop">')
   })
 
   it('thầy bật HIEN_GIAI_TRUOC_NOP thì không khoá — cấu hình vẫn là cấu hình', () => {
     const html = dungPhieu(tt, [cau('q1')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x', cauHinh: { HIEN_GIAI_TRUOC_NOP: true } } })
-    expect(html).not.toContain('<body class="chua-nop">')
+    expect(html).not.toContain('<body class="co-lam chua-nop">')
   })
 
   it('ĐANG CHỌN thì nhìn thấy được, và đã chấm rồi thì khoá tay', () => {
@@ -310,7 +310,7 @@ describe('CHƯA NỘP: bịt ĐỦ BỐN đường tới đáp án (thầy bắt
 
   it('PHIẾU THƯỜNG không mất nút nào — thầy vẫn mở tất cả như cũ', () => {
     const thuong = dungPhieu(tt, [cau('q1', 'I')])
-    expect(thuong).not.toContain('<body class="chua-nop">')
+    expect(thuong).not.toContain('<body class="co-lam chua-nop">')
     expect(thuong).toContain('id="mo-het"')
   })
 })
