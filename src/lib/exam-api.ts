@@ -6,6 +6,7 @@ import type { PublicExamBank, TeacherExamSource } from '../data/examContent'
 import type { AnswerRecord, IntegrityLog } from './exam-db'
 import type { CauHoiCuaEm, GoiCauHoi } from './hoi-bai'
 import type { DiemMotCa } from './phieu-du-lieu'
+import { LUAT_DIEM } from '../engine/score'
 import { dongBoGioMayChu } from './gio-may-chu'
 import { chuanTenCa } from './ten-ca'
 import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
@@ -734,8 +735,24 @@ export async function sendParentFeedback(
   xepLoai: string,
   cauSai: { phanI: number[]; phanII: number[]; phanIII: number[] },
   diemPhan?: { I: number; II: number; III: number },
+  /** Id thiết bị của CHÍNH lượt này. Máy chủ đối chiếu với lượt trong LuotThi —
+   * không có hoặc không khớp thì không được đặt điểm cho em khác. */
+  idThietBi?: string,
 ): Promise<void> {
-  const result = await postJson(scriptUrl, { action: 'sendFeedback', sbd, maCa, maDe, thoiGianNop, diem, xepLoai, cauSai, diemPhan })
+  const result = await postJson(scriptUrl, {
+    action: 'sendFeedback',
+    sbd,
+    maCa,
+    maDe,
+    thoiGianNop,
+    diem,
+    xepLoai,
+    cauSai,
+    diemPhan,
+    idThietBi,
+    // Tem luật chấm — xem ghi chú ở `LUAT_DIEM` trong engine/score.ts.
+    luatDiem: LUAT_DIEM,
+  })
   if (!result.ok) throw new Error(result.error || 'Gửi nhận xét thất bại')
 }
 
@@ -1906,7 +1923,9 @@ export interface BaiGhiDiem {
  * máy em: secret rỗng + idThietBi của lượt). Trả về SBD đã ghi / bị từ chối. */
 export async function ghiDiem(scriptUrl: string, secret: string, maCa: string, bai: BaiGhiDiem[]): Promise<{ daGhi: string[]; tuChoi: string[] }> {
   if (bai.length === 0) return { daGhi: [], tuChoi: [] }
-  const r = await postJson(scriptUrl, { action: 'ghiDiem', secret, maCa, bai })
+  // `luatDiem`: tem luật chấm — máy chủ chỉ nhận ĐIỂM từ máy em khi tem khớp.
+  // Xem ghi chú ở `LUAT_DIEM` trong engine/score.ts.
+  const r = await postJson(scriptUrl, { action: 'ghiDiem', secret, maCa, bai, luatDiem: LUAT_DIEM })
   if (!r.ok) throw new Error(r.error || 'Không ghi được điểm')
   return { daGhi: r.daGhi ?? [], tuChoi: r.tuChoi ?? [] }
 }

@@ -1656,6 +1656,7 @@ export default function ExamTakeScreen() {
           classify(g.score.total),
           { phanI: g.wrongPhanI, phanII: g.wrongPhanII, phanIII: g.wrongPhanIII },
           { I: g.score.phanIScore, II: g.score.phanIIScore, III: g.score.phanIIIScore },
+          done.idThietBi ?? layIdThietBi(),
         ).catch(() => {
           // Gửi nhận xét cho phụ huynh không phải luồng chính — lỗi thì bỏ qua.
         })

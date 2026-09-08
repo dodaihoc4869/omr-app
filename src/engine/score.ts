@@ -110,6 +110,24 @@ export interface SoCauBaPhan {
 }
 export type QuotaPhan = SoCauBaPhan
 
+/** TEM LUẬT CHẤM — đổi luật thì đổi chuỗi này.
+ *
+ * VÌ SAO CÓ (thầy báo tối 08/09: "điểm 9 nhưng phiếu lại ghi điểm 4").
+ *
+ * Máy học sinh cũng chấm và cũng được ghi điểm lên Sheet. Máy nào còn bản app
+ * trước 07/09 thì chấm bằng thang TUYỆT ĐỐI cũ (0,25/câu Phần I · 1,00/câu
+ * Phần II · 0,25/câu Phần III) — ca 8/2/2 trần chỉ 4,50. Mỗi lần em đó mở lại
+ * trang kết quả, máy em ghi đè con số cũ lên điểm thầy vừa chấm lại. Thầy chấm
+ * lại buổi chiều, tối vào xem thì cả 36 em lại về thang cũ.
+ *
+ * Máy chủ nay CHỈ nhận điểm từ máy em khi gói mang đúng tem này. Bản cũ không
+ * gửi tem ⇒ điểm của nó bị từ chối, chi tiết câu vẫn nhận (chuyên đề, mức độ,
+ * giây làm không phụ thuộc luật chấm). Máy thầy có mã bí mật thì luôn ghi được.
+ *
+ * Đổi biểu điểm về sau: đổi chuỗi này VÀ hằng `LUAT_DIEM` trong
+ * `docs/apps-script-kiem-tra.gs` — hai nơi phải khớp từng ký tự. */
+export const LUAT_DIEM = 'tile-450-400-150-v1'
+
 /** Tổng điểm một bài, tính bằng cents. */
 export const TONG_CENTS = 1000
 

@@ -165,6 +165,33 @@ const CHITIET_HEADERS = ['MaCa', 'SBD', 'LanThu', 'Phan', 'SoCau', 'Qid', 'Chuye
 // nộp) — quá mốc này vẫn nhận bài nhưng ghi chú "nộp muộn".
 const AN_HAN_NOP_GIAY = 120
 
+// ---------------------------------------------------------------------------
+// TEM LUẬT CHẤM — chốt chặn cho lỗi "điểm 9 mà phiếu ghi 4" (thầy báo 08/09)
+// ---------------------------------------------------------------------------
+// Máy học sinh cũng chấm bài và cũng được ghi điểm lên LuotThi. Máy nào còn bản
+// app trước 07/09 thì chấm bằng thang TUYỆT ĐỐI cũ (0,25/câu Phần I · 1,00/câu
+// Phần II · 0,25/câu Phần III), nên ca 8/2/2 trần chỉ 4,50. Mỗi lần em mở lại
+// trang kết quả, máy em ghi đè con số cũ lên điểm thầy vừa chấm lại — đo được
+// trên ca 447479: cả 36 em đều nằm dưới 4,50, đúng ba em chạm trần 4,50.
+//
+// Từ nay máy chủ CHỈ nhận ĐIỂM từ máy em khi gói mang đúng tem này. Bản cũ
+// không gửi tem ⇒ điểm bị từ chối (ghi vào `tuChoi` cho thầy đọc), còn CHI TIẾT
+// TỪNG CÂU vẫn nhận vì chuyên đề, mức độ và giây làm không phụ thuộc luật chấm.
+// Máy thầy có MA_BI_MAT thì luôn ghi được, không cần tem.
+//
+// Đổi biểu điểm về sau: đổi chuỗi này VÀ hằng `LUAT_DIEM` trong
+// `src/engine/score.ts` — hai nơi phải khớp từng ký tự, có test khoá điều này.
+const LUAT_DIEM = 'tile-450-400-150-v1'
+
+/** Gói này có được phép ĐẶT ĐIỂM chính thức không?
+ *
+ * Hai đường: máy thầy (có MA_BI_MAT) — luôn được; máy em — phải mang đúng tem
+ * luật chấm hiện hành. Trả `true` nghĩa là ghi được cột điểm. */
+function duocGhiDiem_(coMat, body) {
+  if (coMat) return true
+  return String((body && body.luatDiem) || '') === LUAT_DIEM
+}
+
 // BA VAI TRÒ (BA-APP.md đợt 1). Hồ sơ học sinh/phụ huynh có TOKEN 32 ký tự do
 // THẦY DUYỆT mới cấp; mọi lệnh đọc dữ liệu của một em đều tra token -> SBD ở
 // máy chủ, KHÔNG tin SBD/SĐT do máy khách gửi kèm.
@@ -4068,8 +4095,15 @@ function doPost(e) {
       }
       if (row < 0) { tuChoi.push(sbd + ': không có lượt ' + lanThu); continue }
       if (!coMat && !(x.idThietBi && l.idThietBi && String(x.idThietBi) === l.idThietBi)) { tuChoi.push(sbd + ': không có quyền'); continue }
+      // ĐIỂM chỉ ghi khi được phép (xem `duocGhiDiem_`). Máy em bản cũ chấm
+      // bằng thang tuyệt đối cũ nên con số của nó KHÔNG được đè lên điểm thầy;
+      // chi tiết từng câu bên dưới vẫn nhận vì không phụ thuộc luật chấm.
       const d = x.diem || {}
-      sh.getRange(row, 14, 1, 4).setValues([[d.I === undefined ? '' : d.I, d.II === undefined ? '' : d.II, d.III === undefined ? '' : d.III, d.tong === undefined ? '' : d.tong]])
+      if (duocGhiDiem_(coMat, body)) {
+        sh.getRange(row, 14, 1, 4).setValues([[d.I === undefined ? '' : d.I, d.II === undefined ? '' : d.II, d.III === undefined ? '' : d.III, d.tong === undefined ? '' : d.tong]])
+      } else {
+        tuChoi.push(sbd + ': bản app cũ, chỉ nhận chi tiết câu — điểm giữ nguyên')
+      }
       for (let i = 1; i < ctData.length; i++) {
         if (String(ctData[i][0]) === maCa && String(ctData[i][1]) === sbd && (Number(ctData[i][2]) || 1) === lanThu && xoaDong.indexOf(i + 1) < 0) xoaDong.push(i + 1)
       }
@@ -4744,6 +4778,21 @@ function doPost(e) {
   }
 
   if (action === 'sendFeedback') {
+    // AI ĐƯỢC ĐẶT ĐIỂM Ở ĐÂY. Trước 08/09 lệnh này KHÔNG kiểm gì cả mà vẫn ghi
+    // thẳng cột 14..17 của LuotThi — nghĩa là bất kỳ máy nào cũng đặt được điểm
+    // cho bất kỳ em nào, và máy em bản cũ đè điểm sai lên điểm thầy vừa chấm.
+    // Nay hai lớp: (1) đúng thiết bị của chính lượt đó, (2) đúng tem luật chấm.
+    // Máy thầy có MA_BI_MAT thì qua thẳng.
+    const coMatNX = !kiemTraMaBiMat_(body)
+    const luotNX = luotMoiNhatTheoSbd_(sheetLuot_(), body.maCa, true)[String(body.sbd)]
+    if (!coMatNX && luotNX && !(body.idThietBi && luotNX.idThietBi && String(body.idThietBi) === String(luotNX.idThietBi))) {
+      return jsonResponse_({ ok: false, lyDo: 'khong_co_quyen', error: 'Không có quyền ghi nhận xét cho lượt này' })
+    }
+    if (!duocGhiDiem_(coMatNX, body)) {
+      // Bản app cũ: KHÔNG ghi gì. Điểm cũ của thầy giữ nguyên, không đẻ dòng
+      // nhận xét mang con số sai gửi tới phụ huynh.
+      return jsonResponse_({ ok: true, boQua: 'ban_cu', serverNow: Date.now() })
+    }
     const sh = getSheet_(SHEET_NHANXET, ['SBD', 'MaCa', 'MaDe', 'ThoiGianNop', 'Diem', 'XepLoai', 'CauSai', 'GuiLuc'])
     const data = sh.getDataRange().getValues()
     let foundRow = -1
@@ -4774,10 +4823,9 @@ function doPost(e) {
     // Lịch sử ca thi hiện điểm mà không cần chấm lại. diemPhan có thể thiếu
     // (bản app cũ) → chỉ ghi Tong.
     try {
-      const luot = luotMoiNhatTheoSbd_(sheetLuot_(), body.maCa, true)[String(body.sbd)]
-      if (luot) {
+      if (luotNX) {
         const p = body.diemPhan || {}
-        sheetLuot_().getRange(luot.row, 14, 1, 4).setValues([[p.I === undefined ? '' : p.I, p.II === undefined ? '' : p.II, p.III === undefined ? '' : p.III, body.diem]])
+        sheetLuot_().getRange(luotNX.row, 14, 1, 4).setValues([[p.I === undefined ? '' : p.I, p.II === undefined ? '' : p.II, p.III === undefined ? '' : p.III, body.diem]])
       }
     } catch (err) {}
     return jsonResponse_({ ok: true })
