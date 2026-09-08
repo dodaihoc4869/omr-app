@@ -186,7 +186,12 @@ describe('màn ca thi luôn trả lời được "câu em sai buổi trước"',
 
   it('bảng biên bản in ĐỦ mẫu số, chỉ tiêu, kết quả và lý do của từng em', () => {
     const bang = MAN_CA.slice(MAN_CA.indexOf('export function BangBienBanLap'), MAN_CA.indexOf('/** Nhãn trạng thái cho 1 em'))
-    expect(bang).toContain("· lấy từ ca {bb.tuCaCua?.[sbd] || '—'} · sai {sai} câu · cần {can} · rút được {duoc}")
+    // MÃ CA CHỈ IN KHI CÓ THẬT. Biên bản cất trước 08/09 không có `tuCaCua`;
+    // in dấu gạch ở đó là nói dối rằng máy đã tra và không thấy (xem
+    // va-bien-ban-cu.ts). Nay hỏi `maCaLay` rồi mới in.
+    expect(bang).toContain('maCaLay(bb, sbd)')
+    expect(bang).not.toContain("bb.tuCaCua?.[sbd] || '—'")
+    expect(bang).toContain('· sai {sai} câu · cần {can} · rút được {duoc}')
     expect(bang).toContain('CHU_LY_DO_THIEU')
     expect(bang).toContain('Ca không đọc được')
   })

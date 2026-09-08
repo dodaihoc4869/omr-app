@@ -30,9 +30,9 @@ Lùi: `git revert 6b2956a` (và `git revert 5c7374d` nếu muốn lùi cả đ�
 
 ### Đợt 5 — thầy nhắn 08/09
 
-- [ ] "bạn đồng bộ sang tất cả các máy cho tôi" | bằng chứng: (chưa có)
-- [ ] (tự phát sinh) Hai con số vênh trên cùng màn: biên bản "rút được 8" nhưng khối đỏ "hỏi lại 9 câu" | bằng chứng: (chưa có)
-- [ ] (tự phát sinh) Biên bản CŨ vẫn hiện "lấy từ ca —" và nhãn "ngoài kho" sai, vì cất trước khi có `tuCaCua`/`phamVi`/`het_cho` | bằng chứng: (chưa có)
+- [x] "bạn đồng bộ sang tất cả các máy cho tôi" (biên bản CŨ nói sai) | bằng chứng: `src/lib/va-bien-ban-cu.ts` — VÁ LÚC ĐỌC, không sửa bản đã cất (bản cất là bằng chứng của lượt rút). Điền `phamVi` từ bản ghi ca; tính lại nhãn `ngoai_kho` → `het_cho` bằng đúng luật hiện hành (câu CÓ trong kho mà vẫn không vào được đề là hết chỗ); `tuCaCua` không suy lại được nên KHÔNG in dấu gạch giả vờ đã tra. 12 phép kiểm, dựng theo đúng hình dạng biên bản ca 638242
+- [x] (tự phát sinh) Hai con số vênh trên cùng màn: biên bản "rút được 8" nhưng khối đỏ "hỏi lại 9 câu" | bằng chứng: CẢ HAI ĐỀU ĐÚNG, đếm hai tập khác nhau — "rút được 8" là câu máy CHỦ ĐỘNG rút lại; "9" là câu trong đề của em mà em từng sai, gồm cả `12-C1-B1-II-3` tự vào đề theo lượt rút thường. Sai ở NHÃN: hai chỗ cùng gọi "câu hỏi lại". Sửa bằng gọi đúng tên, KHÔNG ép hai số bằng nhau. `src/lib/dem-cau-hoi-lai.ts`, 5 phép kiểm
+- [x] (gộp vào dòng trên) Biên bản CŨ hiện "lấy từ ca —" và nhãn "ngoài kho" sai | bằng chứng: `va-bien-ban-cu.ts`
 
 - [x] "các nút bấm vẫn không bấm được, nút bấm được nút không, bạn sửa triệt để đi" | bằng chứng: ghi nhật ký từng sự kiện trong Chromium có cảm ứng — tay xê ~18px thì Chromium HUỶ cả pointerup lẫn click, chỉ còn touchend. Chuyển sang nghe touchstart/touchend + hit-test toạ độ + mốc cuộn; khoá chống-ăn-hai-lần gắn theo ĐÚNG ô. Đo lại: xê ngang 8/18/22px đều ăn, xê dọc 6/15px đều ăn, kéo dọc 60px vẫn là cuộn
 

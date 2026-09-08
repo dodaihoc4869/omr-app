@@ -113,7 +113,8 @@ describe('BIÊN BẢN nói đúng phạm vi thầy chọn', () => {
   })
 
   it('mỗi em in ra ca THẬT SỰ lấy câu sai, không chỉ danh sách ca đã dò', () => {
-    expect(MAN_CA).toContain("· lấy từ ca {bb.tuCaCua?.[sbd] || '—'} · sai {sai} câu")
+    expect(MAN_CA).toContain('lấy từ ca ${maCaLay(bb, sbd)}')
+    expect(MAN_CA).toContain('· sai {sai} câu')
   })
 })
 

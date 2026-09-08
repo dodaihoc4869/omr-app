@@ -13,6 +13,8 @@ import { batDauThi, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, kho
 import { chuanTenCa, tenHienCua, TEN_CA_TOI_DA } from '../lib/ten-ca'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { emLechDiem, loiBaoLechDiem } from '../lib/lech-diem'
+import { dongSoCauHoiLai } from '../lib/dem-cau-hoi-lai'
+import { maCaLay, vaBienBanCu } from '../lib/va-bien-ban-cu'
 import { goiPhieuCaZip, tenTepZipCa, chuyenDeTuChiTiet, type EmTrongCaDeXuatPhieu } from '../lib/phieu-hang-loat'
 import { viecCanLamMacDinh } from '../lib/phieu-zalo'
 import { gomLinkPhieu, tomTatLinkPhieu, vanBanLinkPhieu, type DongLinkPhieu } from '../lib/link-phieu-ca'
@@ -135,7 +137,7 @@ export function BangBienBanLap({ bb, tenCua }: { bb: BienBanDeRieng; tenCua: (sb
               <b>{tenCua(sbd) || `SBD ${sbd}`}</b>
               <span style={{ ...SO, color: 'var(--nhat)' }}>
                 {' '}
-                · lấy từ ca {bb.tuCaCua?.[sbd] || '—'} · sai {sai} câu · cần {can} · rút được {duoc}
+                {maCaLay(bb, sbd) ? ` · lấy từ ca ${maCaLay(bb, sbd)}` : ''} · sai {sai} câu · cần {can} · rút được {duoc}
               </span>
               {t && (
                 <span style={{ color: 'var(--cam)' }}>
@@ -611,7 +613,22 @@ export default function ExamMonitorScreen() {
     (chiTiet?.ca as { deRieng?: boolean } | undefined)?.deRieng === true
   // Biên bản: bản ở máy này trước (đầy đủ nhất), rồi tới bản máy chủ đã cất
   // lúc bấm Bắt đầu — nhờ nó mà máy thứ hai vẫn đọc được.
-  const bienBanLap = deRiengCa?.bienBan ?? (chiTiet?.bienBanDeRieng as BienBanDeRieng | undefined) ?? null
+  const bienBanGoc = deRiengCa?.bienBan ?? (chiTiet?.bienBanDeRieng as BienBanDeRieng | undefined) ?? null
+  // BIÊN BẢN CŨ NÓI SAI THÌ VÁ LÚC ĐỌC. Bản cất trước 08/09 không có `phamVi`,
+  // `tuCaCua` và chưa biết lý do `het_cho`, nên màn này in "lấy từ ca —" và dán
+  // nhãn "ngoài kho" cho em thật ra chỉ hết chỗ trong đề (thầy hỏi đúng chỗ đó).
+  // Không sửa bản đã cất — đó là bằng chứng của lượt rút. Xem va-bien-ban-cu.ts.
+  const bienBanLap = useMemo(() => {
+    if (!bienBanGoc) return null
+    const kho = teacherBank
+      ? new Set(teacherBank.flatMap((t) => [...t.phanI, ...t.phanII, ...t.phanIII].map((q) => q.id)))
+      : null
+    return vaBienBanCu(bienBanGoc, {
+      phamViCa: (chiTiet?.ca as { phamViHoiLai?: 'gan_nhat' | 'ba_ca' } | undefined)?.phamViHoiLai ?? null,
+      lapTheoEm: deRiengCa?.lapTheoEm ?? chiTiet?.lapTheoEm ?? lapDungLai?.lapTheoEm ?? null,
+      qidTrongKho: kho,
+    })
+  }, [bienBanGoc, teacherBank, chiTiet, deRiengCa, lapDungLai])
   const tongKetLap = useMemo(() => {
     const co = dsEm.filter((e) => e.lap && e.lap.tong > 0)
     return {
@@ -1400,8 +1417,8 @@ export default function ExamMonitorScreen() {
                   {tongKetLap.soEmCoLap === 0
                     ? 'Câu em sai buổi trước · chưa rút được câu nào'
                     : tongKetLap.tongSaiLai > 0
-                      ? `${tongKetLap.emSaiLai.length} em còn sai lại câu đã hỏi lại · ${tongKetLap.tongSaiLai}/${tongKetLap.tongCauLap} câu`
-                      : `Cả ${tongKetLap.soEmCoLap} em đã sửa được hết ${tongKetLap.tongCauLap} câu hỏi lại`}
+                      ? `${tongKetLap.emSaiLai.length} em còn sai lại câu từng sai · ${tongKetLap.tongSaiLai}/${tongKetLap.tongCauLap} câu`
+                      : `Cả ${tongKetLap.soEmCoLap} em đã sửa được hết ${tongKetLap.tongCauLap} câu từng sai`}
                   <span style={{ ...NHAN_NHO, display: 'block', color: 'inherit', opacity: 0.85 }}>
                     {moSaiLai ? 'Bấm để gập lại' : tongKetLap.soEmCoLap === 0 ? 'Bấm để xem vì sao' : 'Bấm để xem chi tiết từng em, từng câu'}
                   </span>
@@ -1421,8 +1438,17 @@ export default function ExamMonitorScreen() {
                         <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
                           {e.hoTen || `SBD ${e.sbd}`} <span style={{ ...NHAN_NHO, ...SO }}>· SBD {e.sbd}</span>
                         </div>
+                        {/* GỌI ĐÚNG TÊN CON SỐ. Biên bản ghi "rút được 8" còn
+                            chỗ này từng ghi "hỏi lại 9 câu" — thầy đọc ra hai số
+                            vênh nhau (08/09). Cả hai đều đúng, chỉ đếm hai tập
+                            khác nhau. Xem dem-cau-hoi-lai.ts. */}
                         <div style={{ ...NHAN_NHO, ...SO }}>
-                          hỏi lại {e.lap!.tong} câu · sửa được {e.lap!.daSua} · còn sai {e.lap!.saiLai}
+                          {dongSoCauHoiLai({
+                            tong: e.lap!.tong,
+                            daSua: e.lap!.daSua,
+                            saiLai: e.lap!.saiLai,
+                            rutChuDong: bienBanLap?.soLapCua?.[e.sbd] ?? null,
+                          })}
                         </div>
                         <div className="flex flex-col" style={{ gap: 4, marginTop: 'var(--k2)' }}>
                           {e.lap!.saiLaiChiTiet.map((c) => (

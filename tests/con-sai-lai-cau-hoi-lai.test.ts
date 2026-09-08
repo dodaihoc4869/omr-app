@@ -33,7 +33,10 @@ const row = (qid: string, soCau: number, dung: boolean, chon: string, dungDA: st
 
 describe('màn ca thi có nút báo em còn sai lại', () => {
   it('CÓ NÚT, và nút nói ngay bao nhiêu em còn sai', () => {
-    expect(MAN).toContain('còn sai lại câu đã hỏi lại')
+    // "câu hỏi lại" bị bỏ khỏi nhãn này: nó đếm MỌI câu em từng sai có trong
+    // đề, kể cả câu tự vào đề — gọi chung một tên là chỗ thầy đọc ra hai số
+    // vênh nhau (xem dem-cau-hoi-lai.ts).
+    expect(MAN).toContain('còn sai lại câu từng sai')
     expect(MAN).toContain('setMoSaiLai')
     expect(MAN).toContain('aria-expanded={moSaiLai}')
   })
