@@ -3362,9 +3362,15 @@ function doPost(e) {
     //
     // Ghi TRƯỚC mốc giờ: mốc giờ là thứ mở cổng phát đề, ghi nó trước mà bản
     // đồ chưa có là có em nhận đề theo luật hash rồi mới có bản đồ.
+    //
+    // GÓI HAI BẢN ĐỒ VÀO MỘT Ô: `bo` là bộ câu của từng em, `lap` là những câu
+    // trong đó chính em đã sai buổi trước (máy em dùng để đánh dấu). Gói chung
+    // vì sheet đang chạy đúng 28 cột — thêm cột 29 là `getRange` ngoài phạm vi
+    // ngay giữa lúc cả lớp đứng ở phòng chờ.
     if (body.boTheoEm && typeof body.boTheoEm === 'object') {
       try {
-        shBD.getRange(rowBD, 28).setValue(luuJsonLon_('ca_' + maCaBD + '_botheoem', body.boTheoEm, caBD.boTheoEmRef))
+        const goiBD = { bo: body.boTheoEm, lap: body.lapTheoEm && typeof body.lapTheoEm === 'object' ? body.lapTheoEm : {} }
+        shBD.getRange(rowBD, 28).setValue(luuJsonLon_('ca_' + maCaBD + '_botheoem', goiBD, caBD.boTheoEmRef))
       } catch (errBD) {
         return jsonResponse_({ ok: false, error: 'Không ghi được bộ câu riêng: ' + errBD })
       }

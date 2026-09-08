@@ -97,6 +97,16 @@ describe('gói hai bản đồ trong một ô', () => {
     expect(moGoiDeRieng(goi)).toEqual({ bo: { '10001': ['q1', 'q2'] }, lap: { '10001': ['q1'] } })
   })
 
+  it('MÁY CHỦ CHƯA CẬP NHẬT VẪN CHẠY ĐÚNG — hai bản đồ gửi ở HAI trường riêng', () => {
+    // Máy chủ bản cũ ghi thẳng `body.boTheoEm` xuống ô. Trộn `lap` vào đó là
+    // máy chủ cũ ghi xuống thứ nó không hiểu ⇒ em nhận đề cắt theo luật hash,
+    // lệch hẳn bảng chấm của thầy mà không có dấu hiệu gì.
+    const api = doc('src/lib/exam-api.ts')
+    expect(api).toContain("postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm, lapTheoEm })")
+    // Việc gói lại là việc của MÁY CHỦ, làm sau khi đã nhận đủ hai trường.
+    expect(GS).toContain("const goiBD = { bo: body.boTheoEm, lap: body.lapTheoEm && typeof body.lapTheoEm === 'object' ? body.lapTheoEm : {} }")
+  })
+
   it('DẠNG CŨ VẪN ĐỌC ĐƯỢC — ca mở trước hôm nay không phải chạy lại', () => {
     // Ô cũ cất thẳng `{sbd: [...]}`. Đọc nhầm nó thành rỗng là mọi ca cũ chấm
     // lại ra bộ câu của người khác.

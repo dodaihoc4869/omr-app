@@ -8,7 +8,7 @@ import type { CauHoiCuaEm, GoiCauHoi } from './hoi-bai'
 import type { DiemMotCa } from './phieu-du-lieu'
 import { dongBoGioMayChu } from './gio-may-chu'
 import { chuanTenCa } from './ten-ca'
-import { cauLapCuaEm, dongGoiDeRieng, moGoiDeRieng } from './de-rieng-goi'
+import { cauLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
 export interface KeyBank {
@@ -213,12 +213,18 @@ export async function batDauThi(
    * kèm đúng lúc bấm Bắt đầu. Máy chủ ghi bản đồ TRƯỚC khi ghi mốc giờ, nên
    * không em nào nhận đề trước khi bản đồ có mặt. */
   boTheoEm?: Record<string, string[]>,
-  /** sbd → qid CÂU HỎI LẠI trong đề em đó. Đi chung một ô với `boTheoEm`
-   * (`dongGoiDeRieng`) để không phải thêm cột trên sheet đang chạy. */
+  /** sbd → qid CÂU HỎI LẠI trong đề em đó. Gửi ở TRƯỜNG RIÊNG, không trộn vào
+   * `boTheoEm`.
+   *
+   * VÌ SAO TÁCH: máy chủ bản cũ ghi thẳng `body.boTheoEm` xuống ô. Trộn hai
+   * bản đồ vào đó là máy chủ chưa cập nhật ghi xuống một cấu trúc nó không
+   * hiểu, `boTheoEm[sbd]` thành `undefined`, và em nhận bộ câu cắt theo luật
+   * hash — tức LỆCH ĐỀ giữa máy em và bảng chấm của thầy, không có dấu hiệu
+   * gì. Tách ra thì máy chủ cũ ghi đúng như hôm nay và chỉ thiếu phần đánh
+   * dấu; máy chủ mới gói hai bản đồ lại. */
   lapTheoEm?: Record<string, string[]>,
 ): Promise<{ batDauLuc: string; daBatTruoc: boolean }> {
-  const goi = boTheoEm ? dongGoiDeRieng(boTheoEm, lapTheoEm ?? {}) : undefined
-  const r = await postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm: goi })
+  const r = await postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm, lapTheoEm })
   if (!r.ok) throw new Error(r.error || 'Không bắt đầu được ca')
   return { batDauLuc: String(r.batDauLuc ?? ''), daBatTruoc: r.daBatTruoc === true }
 }
