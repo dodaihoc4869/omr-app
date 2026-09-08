@@ -5,10 +5,10 @@
 // SỐ LỆNH MÁY CHỦ: đúng MỘT lệnh cho MỘT CA (`chiTietCa`), không phải một lệnh
 // cho một em. Quét ngược tối đa `SO_CA_TRA_NGUOC` ca ⇒ tối đa 3 lệnh cho cả
 // lớp 40 em, đúng ngưỡng ở bảng nghiệm thu.
-import { chiTietCa, danhSachCa } from './exam-api'
+import { chiTietCa, danhSachCa, noiKhoCa } from './exam-api'
 import { taoChiTietCau } from './chi-tiet-cau'
-import { docDeRiengCa, loadSessionTeacherBank, docSoCauCa, saveSessionTeacherBank } from './exam-db'
-import { mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
+import { docDeRiengCa, loadExamSources, loadSessionTeacherBank, docSoCauCa, saveSessionTeacherBank } from './exam-db'
+import { mergeAndStrip, mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
 import { CAU_HINH_DE_RIENG_MAC_DINH, type CauHinhDeRieng } from './cau-hinh-de-rieng'
 import { demLanSai, dungDeRieng, type CaTruocDaCham, type EmThieuLap } from './de-rieng'
 import { dungUngVien } from './rut-de'
@@ -117,6 +117,8 @@ export async function docCacCaTruoc(url: string, mat: string, boCa: string[] = [
  *
  * Ca hiện tại LOẠI khỏi danh sách quét: nó chính là ca đang mở, chưa ai nộp. */
 export interface KetQuaDungDeRieng {
+  /** Câu KÉO TỪ CẢ KHO vào ca này để lặp lại được. Rỗng = kho ca đã đủ. */
+  cauNoiThem: { soCau: number; qids: string[] }
   boTheoEm: Record<string, string[]>
   /** sbd → qid câu lặp có thật trong đề em đó. Đi kèm `boTheoEm` lên máy chủ. */
   lapTheoEm: Record<string, string[]>
@@ -145,8 +147,54 @@ export async function dungDeRiengChoCa(
   const sc = await docSoCauCa(maCa)
   if (!sc) throw new Error('Ca này chưa ghi số câu mỗi phần')
 
-  const uv = dungUngVien(bank)
   const { dsCa, boQua } = await docCacCaTruoc(url, mat, [maCa], ch)
+
+  // KÉO CÂU EM TỪNG SAI TỪ CẢ KHO VÀO CA NÀY (thầy chốt 08/09: "bất kể là tôi
+  // chọn chuyên đề gì thi mà ca trước sai 9 câu phải rút đúng 3 câu đó ra vào
+  // đề mới").
+  //
+  // Trước đây câu lặp bị bó trong kho thầy vừa rút cho ca. Thầy chọn chuyên đề
+  // khác buổi trước là gần như không câu nào lặp được — đúng thứ biên bản báo
+  // "câu em từng sai không nằm trong kho ca này". Nay:
+  //   1. tìm câu đó trong CẢ KHO trên máy thầy;
+  //   2. NỐI nó vào kho của ca (cả bản gửi máy em lẫn bản có đáp án);
+  //   3. rồi mới rút.
+  //
+  // Chỉ nối THÊM, không thay câu nào, nên phần đề mới vẫn đúng chuyên đề thầy
+  // chọn — câu lặp là câu thứ 3 trong 12, không phải cả đề đổi chuyên đề.
+  const canQid = new Set<string>()
+  for (const ca of dsCa) for (const sbd of dsSbd) for (const q of ca.saiCua[sbd] ?? []) canQid.add(q)
+  const coSan = new Set<string>()
+  for (const s of bank) for (const q of [...s.phanI, ...s.phanII, ...s.phanIII]) coSan.add(q.id)
+  const thieuQid = [...canQid].filter((q) => !coSan.has(q))
+
+  let bankDung = bank
+  const cauNoiThem: { soCau: number; qids: string[] } = { soCau: 0, qids: [] }
+  if (thieuQid.length > 0) {
+    const kho = await loadExamSources().catch(() => [] as TeacherExamSource[])
+    const can = new Set(thieuQid)
+    const them: TeacherExamSource = {
+      maDe: `${maCa}-hoi-lai`,
+      phanI: kho.flatMap((s) => s.phanI.filter((q) => can.has(q.id))),
+      phanII: kho.flatMap((s) => s.phanII.filter((q) => can.has(q.id))),
+      phanIII: kho.flatMap((s) => s.phanIII.filter((q) => can.has(q.id))),
+    }
+    const soThem = them.phanI.length + them.phanII.length + them.phanIII.length
+    if (soThem > 0) {
+      // Máy chủ trước, máy thầy sau. Ghi vào máy thầy mà máy chủ hỏng là em
+      // nhận đề thiếu đúng những câu thầy vừa thêm.
+      // Gói CÓ đáp án dựng thẳng từ `them`, KHÔNG qua `mergeKeepAnswers`: hàm
+      // đó là để dựng bảng chấm (phải đi kèm `soCau` và `boTheoEm`), còn đây
+      // chỉ là mấy câu đem nối vào kho.
+      await noiKhoCa(url, mat, maCa, mergeAndStrip([them]), { phanI: them.phanI, phanII: them.phanII, phanIII: them.phanIII })
+      bankDung = [...bank, them]
+      await saveSessionTeacherBank(maCa, bankDung)
+      cauNoiThem.soCau = soThem
+      cauNoiThem.qids = [...them.phanI, ...them.phanII, ...them.phanIII].map((q) => q.id)
+    }
+  }
+
+  const uv = dungUngVien(bankDung)
   const ra = dungDeRieng({
     uv,
     yc: { soCau: sc, chuyenDe: [], mucDo: [], tranhQid: [], seed: hashSeed(maCa) },
@@ -155,6 +203,7 @@ export async function dungDeRiengChoCa(
     ch,
   })
   return {
+    cauNoiThem,
     boTheoEm: ra.boTheoEm,
     lapTheoEm: ra.lapTheoEm,
     lapCua: lapCuaTungEm(ra.boTheoEm, demLanSai(dsCa)),

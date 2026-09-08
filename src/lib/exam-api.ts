@@ -203,6 +203,26 @@ export async function trangThaiPhongCho(scriptUrl: string, maCa: string): Promis
   }
 }
 
+/** NỐI THÊM CÂU VÀO KHO CỦA MỘT CA — chỉ dùng cho đề riêng từng em.
+ *
+ * Câu em từng sai có thể nằm ngoài kho thầy vừa rút cho ca. Muốn hỏi lại đúng
+ * câu đó thì phải nối nó vào kho của ca trước khi phát đề (thầy chốt 08/09:
+ * "bất kể là tôi chọn chuyên đề gì thi mà ca trước sai 9 câu phải rút đúng 3
+ * câu đó ra vào đề mới").
+ *
+ * Máy chủ CHẶN khi ca đã bấm Bắt đầu: lúc đó kho là thứ em đang cầm. */
+export async function noiKhoCa(
+  scriptUrl: string,
+  secret: string,
+  maCa: string,
+  bank: PublicExamBank,
+  keyBank: { phanI: TeacherExamSource['phanI']; phanII: TeacherExamSource['phanII']; phanIII: TeacherExamSource['phanIII'] },
+): Promise<{ themBank: number; themKey: number }> {
+  const r = await postJson(scriptUrl, { action: 'noiKhoCa', secret, maCa, bank, keyBank })
+  if (!r.ok) throw new Error(r.error || 'Không nối được kho ca')
+  return { themBank: Number(r.themBank) || 0, themKey: Number(r.themKey) || 0 }
+}
+
 /** THẦY BẤM BẮT ĐẦU THI. Từ giây đó máy em mới xin đề và đồng hồ mới chạy.
  * Bấm lần hai giữ mốc lần đầu — không kéo dài giờ của em đã vào. */
 export async function batDauThi(
@@ -223,8 +243,13 @@ export async function batDauThi(
    * gì. Tách ra thì máy chủ cũ ghi đúng như hôm nay và chỉ thiếu phần đánh
    * dấu; máy chủ mới gói hai bản đồ lại. */
   lapTheoEm?: Record<string, string[]>,
+  /** sbd → qid → số lần em đã sai câu đó TRƯỚC ca này. */
+  demSaiTheoEm?: Record<string, Record<string, number>>,
+  /** BIÊN BẢN lúc rút. Đi lên máy chủ để MÁY NÀO mở ca cũng đọc được, không
+   * phải đúng cái máy đã bấm Bắt đầu (thầy chốt 08/09: "máy nào cũng được"). */
+  bienBan?: Record<string, unknown> | null,
 ): Promise<{ batDauLuc: string; daBatTruoc: boolean; thieuBoTheoEm: boolean }> {
-  const r = await postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm, lapTheoEm })
+  const r = await postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm, lapTheoEm, demSaiTheoEm, bienBan })
   if (!r.ok) throw new Error(r.error || 'Không bắt đầu được ca')
   return {
     batDauLuc: String(r.batDauLuc ?? ''),
@@ -1455,6 +1480,10 @@ export interface ChiTietCa {
    * im lặng — đúng lỗi thầy gặp 08/09. Lệnh này đã đòi mã bí mật nên trả cả
    * bản đồ lớp ở đây không mở thêm quyền cho ai. */
   lapTheoEm?: Record<string, string[]>
+  /** sbd → qid → số lần sai trước ca này, đọc từ máy chủ. */
+  demSaiTheoEm?: Record<string, Record<string, number>>
+  /** Biên bản lúc rút đề riêng, đọc từ máy chủ. */
+  bienBanDeRieng?: Record<string, unknown> | null
 }
 
 /** Một lượt bị cổng vào thi chặn. `lyDo` do máy chủ đặt:
@@ -1483,6 +1512,7 @@ export function moTaLyDoChan(lyDo: string): string {
 export async function chiTietCa(scriptUrl: string, secret: string, maCa: string, xinKeyBank = false): Promise<ChiTietCa> {
   const r = await postJson(scriptUrl, { action: 'chiTietCa', secret, maCa, xinKeyBank })
   if (!r.ok) throw new Error(r.error || 'Không lấy được chi tiết ca')
+  const goiDR = moGoiDeRieng(r.goiDeRieng)
   return {
     ca: { ...r.ca, maCa: String(r.ca.maCa), lop: String(r.ca.lop ?? '') },
     luot: (r.luot as LuotThiRow[]).map((l) => ({ ...l, sbd: String(l.sbd), lanThu: Number(l.lanThu) || 1 })),
@@ -1502,7 +1532,9 @@ export async function chiTietCa(scriptUrl: string, secret: string, maCa: string,
     dsCho: Array.isArray(r.dsCho)
       ? (r.dsCho as Record<string, unknown>[]).map((x) => ({ sbd: chuoi(x.sbd), hoTen: chuoi(x.hoTen), vaoLuc: chuoi(x.vaoLuc) })).filter((x) => x.sbd)
       : [],
-    lapTheoEm: moGoiDeRieng(r.goiDeRieng).lap,
+    lapTheoEm: goiDR.lap,
+    demSaiTheoEm: goiDR.dem,
+    bienBanDeRieng: goiDR.bb,
   }
 }
 

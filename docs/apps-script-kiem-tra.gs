@@ -2897,6 +2897,70 @@ function doPost(e) {
     return jsonResponse_({ ok: true, maCa: String(body.maCa), congBo: ca.congBo })
   }
 
+  if (action === 'noiKhoCa') {
+    // NỐI THÊM CÂU VÀO KHO CỦA MỘT CA — chỉ dùng cho ĐỀ RIÊNG TỪNG EM.
+    //
+    // Thầy chốt 08/09: "bất kể là tôi chọn chuyên đề gì thi mà ca trước sai 9
+    // câu phải rút đúng 3 câu đó ra vào đề mới". Câu em từng sai có thể nằm
+    // ngoài kho thầy vừa rút cho ca này; muốn lặp lại nó thì phải NỐI nó vào
+    // kho của ca, cả bản gửi máy em (BankJson) lẫn bản có đáp án (KeyBankJson).
+    //
+    // CHỈ NỐI THÊM, KHÔNG THAY THẾ: câu cũ giữ nguyên vị trí và nội dung, nên
+    // em đang làm dở không bị đổi đề. Câu trùng id thì bỏ qua.
+    //
+    // CHẶN SAU KHI ĐÃ PHÁT ĐỀ: ca đã bấm Bắt đầu thì kho là thứ em đang cầm,
+    // nối thêm vào lúc đó là hai em cùng ca nhìn hai kho khác nhau.
+    const loiNK = kiemTraMaBiMat_(body)
+    if (loiNK) return jsonResponse_({ ok: false, error: loiNK })
+    const shNK = sheetCa_()
+    const rowNK = findRowByKey_(shNK, 0, body.maCa)
+    if (rowNK < 0) return jsonResponse_({ ok: false, error: 'Không có ca ' + body.maCa })
+    const caNK = docCa_(shNK, rowNK)
+    if (caNK.trangThai === 'da_xoa') return jsonResponse_({ ok: false, error: 'Ca này đã bị xoá' })
+    if (caNK.batDauThiLuc) return jsonResponse_({ ok: false, error: 'Ca đã phát đề — không nối thêm câu được nữa' })
+
+    const noiMot = function (goiCu, them) {
+      if (!goiCu || !them) return { goi: goiCu, them: 0 }
+      let dem = 0
+      const phan = ['phanI', 'phanII', 'phanIII']
+      for (let i = 0; i < phan.length; i++) {
+        const p = phan[i]
+        const cu = Object.prototype.toString.call(goiCu[p]) === '[object Array]' ? goiCu[p] : []
+        const moi = Object.prototype.toString.call(them[p]) === '[object Array]' ? them[p] : []
+        if (moi.length === 0) { goiCu[p] = cu; continue }
+        const daCo = {}
+        for (let k = 0; k < cu.length; k++) daCo[String(cu[k] && cu[k].id)] = true
+        for (let k = 0; k < moi.length; k++) {
+          const id = String(moi[k] && moi[k].id || '')
+          if (!id || daCo[id]) continue
+          cu.push(moi[k])
+          daCo[id] = true
+          dem += 1
+        }
+        goiCu[p] = cu
+      }
+      return { goi: goiCu, them: dem }
+    }
+
+    let themBank = 0
+    let themKey = 0
+    try {
+      if (body.bank && caNK.bankRef) {
+        const ra = noiMot(docJsonLon_(caNK.bankRef), body.bank)
+        themBank = ra.them
+        if (themBank > 0) shNK.getRange(rowNK, 5).setValue(luuJsonLon_('ca_' + body.maCa + '_bank', ra.goi, caNK.bankRef))
+      }
+      if (body.keyBank && caNK.keyBankRef) {
+        const ra = noiMot(docJsonLon_(caNK.keyBankRef), body.keyBank)
+        themKey = ra.them
+        if (themKey > 0) shNK.getRange(rowNK, 7).setValue(luuJsonLon_('ca_' + body.maCa + '_key', ra.goi, caNK.keyBankRef))
+      }
+    } catch (errNK) {
+      return jsonResponse_({ ok: false, error: 'Không nối được kho ca: ' + errNK })
+    }
+    return jsonResponse_({ ok: true, maCa: String(body.maCa), themBank: themBank, themKey: themKey })
+  }
+
   if (action === 'publish') {
     const sh = sheetCa_()
     const row = findRowByKey_(sh, 0, body.maCa)
@@ -3403,7 +3467,14 @@ function doPost(e) {
     // ngay giữa lúc cả lớp đứng ở phòng chờ.
     if (body.boTheoEm && typeof body.boTheoEm === 'object') {
       try {
-        const goiBD = { bo: body.boTheoEm, lap: body.lapTheoEm && typeof body.lapTheoEm === 'object' ? body.lapTheoEm : {} }
+        const goiBD = {
+          bo: body.boTheoEm,
+          lap: body.lapTheoEm && typeof body.lapTheoEm === 'object' ? body.lapTheoEm : {},
+          // `dem` và `bb` để MÀN CA THI ở máy khác đọc được: số lần em đã sai
+          // từng câu, và biên bản nói vì sao em nào không có câu hỏi lại.
+          dem: body.demSaiTheoEm && typeof body.demSaiTheoEm === 'object' ? body.demSaiTheoEm : {},
+          bb: body.bienBan && typeof body.bienBan === 'object' ? body.bienBan : null,
+        }
         shBD.getRange(rowBD, 28).setValue(luuJsonLon_('ca_' + maCaBD + '_botheoem', goiBD, caBD.boTheoEmRef))
       } catch (errBD) {
         return jsonResponse_({ ok: false, error: 'Không ghi được bộ câu riêng: ' + errBD })

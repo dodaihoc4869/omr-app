@@ -94,7 +94,7 @@ describe('30% là 30% SỐ CÂU SAI CỦA CA TRƯỚC', () => {
 describe('gói hai bản đồ trong một ô', () => {
   it('đóng rồi mở lại ra đúng hai bản đồ', () => {
     const goi = dongGoiDeRieng({ '10001': ['q1', 'q2'] }, { '10001': ['q1'] })
-    expect(moGoiDeRieng(goi)).toEqual({ bo: { '10001': ['q1', 'q2'] }, lap: { '10001': ['q1'] } })
+    expect(moGoiDeRieng(goi)).toEqual({ bo: { '10001': ['q1', 'q2'] }, lap: { '10001': ['q1'] }, dem: {}, bb: null })
   })
 
   it('MÁY CHỦ CHƯA CẬP NHẬT VẪN CHẠY ĐÚNG — hai bản đồ gửi ở HAI trường riêng', () => {
@@ -102,21 +102,21 @@ describe('gói hai bản đồ trong một ô', () => {
     // máy chủ cũ ghi xuống thứ nó không hiểu ⇒ em nhận đề cắt theo luật hash,
     // lệch hẳn bảng chấm của thầy mà không có dấu hiệu gì.
     const api = doc('src/lib/exam-api.ts')
-    expect(api).toContain("postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm, lapTheoEm })")
+    expect(api).toContain("postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm, lapTheoEm, demSaiTheoEm, bienBan })")
     // Việc gói lại là việc của MÁY CHỦ, làm sau khi đã nhận đủ hai trường.
-    expect(GS).toContain("const goiBD = { bo: body.boTheoEm, lap: body.lapTheoEm && typeof body.lapTheoEm === 'object' ? body.lapTheoEm : {} }")
+    expect(GS).toContain("lap: body.lapTheoEm && typeof body.lapTheoEm === 'object' ? body.lapTheoEm : {},")
   })
 
   it('DẠNG CŨ VẪN ĐỌC ĐƯỢC — ca mở trước hôm nay không phải chạy lại', () => {
     // Ô cũ cất thẳng `{sbd: [...]}`. Đọc nhầm nó thành rỗng là mọi ca cũ chấm
     // lại ra bộ câu của người khác.
-    expect(moGoiDeRieng({ '10001': ['q1', 'q2'] })).toEqual({ bo: { '10001': ['q1', 'q2'] }, lap: {} })
+    expect(moGoiDeRieng({ '10001': ['q1', 'q2'] })).toEqual({ bo: { '10001': ['q1', 'q2'] }, lap: {}, dem: {}, bb: null })
   })
 
   it('rác thì ra rỗng, không nổ', () => {
-    expect(moGoiDeRieng(null)).toEqual({ bo: {}, lap: {} })
-    expect(moGoiDeRieng('chuỗi')).toEqual({ bo: {}, lap: {} })
-    expect(moGoiDeRieng([1, 2])).toEqual({ bo: {}, lap: {} })
+    expect(moGoiDeRieng(null)).toEqual({ bo: {}, lap: {}, dem: {}, bb: null })
+    expect(moGoiDeRieng('chuỗi')).toEqual({ bo: {}, lap: {}, dem: {}, bb: null })
+    expect(moGoiDeRieng([1, 2])).toEqual({ bo: {}, lap: {}, dem: {}, bb: null })
     expect(cauLapCuaEm(undefined)).toEqual([])
     expect(cauLapCuaEm(['  q1 ', '', 'q2'])).toEqual(['q1', 'q2'])
   })
@@ -192,7 +192,7 @@ describe('màn ca thi luôn trả lời được "câu em sai buổi trước"',
   })
 
   it('máy chủ trả bản đồ để máy thứ hai vẫn đếm được', () => {
-    expect(doc('src/lib/exam-api.ts')).toContain('lapTheoEm: moGoiDeRieng(r.goiDeRieng).lap')
+    expect(doc('src/lib/exam-api.ts')).toContain('lapTheoEm: goiDR.lap,')
     expect(MAN_CA).toContain('chiTiet.lapTheoEm?.[sbd]?.length')
   })
 })
@@ -256,5 +256,119 @@ describe('CHẾ ĐỘ ĐỀ RIÊNG SỐNG Ở MÁY CHỦ, không nằm lại má
     expect(GS).toContain('coBoTheoEm: !!caBD.boTheoEmRef, canBoTheoEm: !!(body.boTheoEm')
     expect(doc('src/lib/exam-api.ts')).toContain('thieuBoTheoEm: r.daBatTruoc === true && r.canBoTheoEm === true && r.coBoTheoEm === false,')
     expect(MAN_CA).toContain('Ca này đã phát đề TRƯỚC khi có bộ câu riêng — điểm chấm sẽ sai. Huỷ ca và mở lại.')
+  })
+})
+
+describe('MÁY NÀO CŨNG ĐƯỢC — biên bản và số lần sai sống ở máy chủ', () => {
+  // Thầy chốt 08/09: "bạn phải cho máy nào cũng được và đồng bộ cho tất cả các
+  // máy bấm". Ảnh chụp màn Ca thi trên điện thoại hiện đúng dòng "Máy này không
+  // giữ biên bản lúc rút đề" — tức bản đồ ở máy khác, màn này mù.
+  it('gói đề riêng chở CẢ số lần sai lẫn biên bản', () => {
+    const goi = dongGoiDeRieng({ '10001': ['q1', 'q2'] }, { '10001': ['q1'] }, { '10001': { q1: 2 } }, { canCua: { '10001': 1 } })
+    const mo = moGoiDeRieng(goi)
+    expect(mo.dem).toEqual({ '10001': { q1: 2 } })
+    expect(mo.bb).toEqual({ canCua: { '10001': 1 } })
+    // Dạng cũ vẫn mở được, hai trường mới rỗng chứ không nổ.
+    expect(moGoiDeRieng({ '10001': ['q1'] })).toEqual({ bo: { '10001': ['q1'] }, lap: {}, dem: {}, bb: null })
+  })
+
+  it('số lần sai bỏ giá trị rác, không đẩy số bịa vào nhãn', () => {
+    const mo = moGoiDeRieng({ bo: {}, lap: {}, dem: { '10001': { q1: 'ba', q2: 0, q3: -1, q4: 2 } } })
+    expect(mo.dem).toEqual({ '10001': { q4: 2 } })
+  })
+
+  it('máy chủ cất hai trường mới cùng ô, máy thầy đọc lại từ đó', () => {
+    expect(GS).toContain("dem: body.demSaiTheoEm && typeof body.demSaiTheoEm === 'object' ? body.demSaiTheoEm : {},")
+    expect(GS).toContain("bb: body.bienBan && typeof body.bienBan === 'object' ? body.bienBan : null,")
+    const api = doc('src/lib/exam-api.ts')
+    expect(api).toContain('demSaiTheoEm: goiDR.dem,')
+    expect(api).toContain('bienBanDeRieng: goiDR.bb,')
+  })
+
+  it('màn Ca thi lấy số lần sai và biên bản từ máy chủ khi máy này không có', () => {
+    expect(MAN_CA).toContain('chiTiet.demSaiTheoEm?.[sbd] ??')
+    expect(MAN_CA).toContain('deRiengCa?.bienBan ?? (chiTiet?.bienBanDeRieng as BienBanDeRieng | undefined) ?? null')
+  })
+})
+
+describe('NÚT ĐỒNG BỘ LẠI PHIẾU MỌI CA — bấm được từ mọi máy', () => {
+  const NUT = doc('src/components/NutDongBoMoiCa.tsx')
+
+  it('là NÚT trong app, không phải lệnh gõ tay qua cầu nối', () => {
+    expect(doc('src/screens/LichSuCaScreen.tsx')).toContain('<NutDongBoMoiCa />')
+    expect(NUT).toContain('loadTeacherSecret')
+  })
+
+  it('tải kho TRƯỚC rồi mới dựng phiếu, và chạy TUẦN TỰ', () => {
+    // Dựng phiếu bằng kho cũ là chép lại đúng cái sai cũ.
+    expect(NUT.indexOf('dongBoNganHang(url, mat, true)')).toBeLessThan(NUT.indexOf('taoPhieuCaCa('))
+    // Vòng for tuần tự, không Promise.all — song song là ăn hạn mức Apps Script.
+    expect(NUT).toContain('for (let i = 0; i < ds.length; i++)')
+    expect(NUT).not.toContain('Promise.all')
+  })
+
+  it('BỎ QUA ca đã xoá, và HỎI LẠI trước khi chạy', () => {
+    expect(NUT).toContain("filter((c) => c.trangThai !== 'da_xoa')")
+    expect(NUT).toContain('Chạy ngay')
+    expect(NUT).toContain('đừng chạy khi đang có ca thi mở')
+  })
+
+  it('CA LỖI PHẢI LIỆT KÊ RA, không gộp thành một con số', () => {
+    expect(NUT).toContain(".filter((c) => c.loi !== '')")
+    expect(NUT).toContain('{c.loi}')
+  })
+
+  it('nói rõ mã phiếu cũ giữ nguyên — link đã gửi phụ huynh vẫn sống', () => {
+    expect(NUT).toContain('Mã phiếu cũ giữ nguyên')
+  })
+})
+
+describe('phiếu khắc phục KHÔNG nộp được thì phải NÓI VÌ SAO', () => {
+  const KHOI = doc('src/components/KhoiBaiLuyen.tsx')
+
+  it('có ba lý do, mỗi lý do một câu chỉ đúng việc cần làm', () => {
+    expect(KHOI).toContain("setKhongNop(nop ? '' : !maPhieu ? 'thieu_ma' : !du.sbd ? 'thieu_sbd' : 'thieu_link')")
+    expect(KHOI).toContain('Đồng bộ lại phiếu mọi ca')
+  })
+
+  it('chỉ hiện khi phiếu ĐÃ dựng — không doạ người dùng trước khi họ bấm', () => {
+    expect(KHOI).toContain("{khongNop !== '' && html !== '' && (")
+  })
+})
+
+describe('CÂU EM TỪNG SAI PHẢI VÀO ĐỀ, dù thầy chọn chuyên đề nào', () => {
+  // Thầy chốt 08/09, sau khi biên bản chỉ đúng thủ phạm ("cần 3 · rút được 1 —
+  // câu em từng sai không nằm trong kho ca này"):
+  // "bất kể là tôi chọn chuyên đề gì thi mà ca trước sai 9 câu phải rút đúng 3
+  //  câu đó ra vào đề mới nhé."
+  const NGUON = doc('src/lib/de-rieng-nguon.ts')
+
+  it('tìm câu thiếu trong CẢ KHO rồi NỐI vào ca, xong mới rút', () => {
+    expect(NGUON).toContain('const thieuQid = [...canQid].filter((q) => !coSan.has(q))')
+    expect(NGUON).toContain('loadExamSources()')
+    expect(NGUON).toContain('await noiKhoCa(url, mat, maCa, mergeAndStrip([them]), { phanI: them.phanI, phanII: them.phanII, phanIII: them.phanIII })')
+    // Nối XONG mới dựng ứng viên, nếu không thì câu vừa nối không vào đề được.
+    expect(NGUON.indexOf('await noiKhoCa(')).toBeLessThan(NGUON.indexOf('const uv = dungUngVien(bankDung)'))
+  })
+
+  it('MÁY CHỦ TRƯỚC, MÁY THẦY SAU — ghi máy thầy mà máy chủ hỏng là em nhận đề thiếu', () => {
+    expect(NGUON.indexOf('await noiKhoCa(')).toBeLessThan(NGUON.indexOf('await saveSessionTeacherBank(maCa, bankDung)'))
+  })
+
+  it('CHỈ NỐI THÊM, không thay câu nào — đề mới vẫn đúng chuyên đề thầy chọn', () => {
+    expect(GS).toContain("if (!id || daCo[id]) continue")
+    expect(GS).toContain("cu.push(moi[k])")
+    // Nối cả bản gửi máy em (cột 5) lẫn bản có đáp án (cột 7): thiếu một trong
+    // hai là em thấy câu mà máy không chấm được, hoặc ngược lại.
+    expect(GS).toContain("shNK.getRange(rowNK, 5).setValue(luuJsonLon_('ca_' + body.maCa + '_bank'")
+    expect(GS).toContain("shNK.getRange(rowNK, 7).setValue(luuJsonLon_('ca_' + body.maCa + '_key'")
+  })
+
+  it('CHẶN nối kho sau khi ca đã phát đề — em đang cầm kho đó rồi', () => {
+    expect(GS).toContain("if (caNK.batDauThiLuc) return jsonResponse_({ ok: false, error: 'Ca đã phát đề — không nối thêm câu được nữa' })")
+  })
+
+  it('BÁO CHO THẦY BIẾT đã kéo bao nhiêu câu, không làm lén', () => {
+    expect(MAN_CA).toContain('Đã kéo ${ra.cauNoiThem.soCau} câu em từng sai từ kho vào đề ca này.')
   })
 })

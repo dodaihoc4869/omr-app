@@ -320,6 +320,7 @@ export default function ExamMonitorScreen() {
       // không được in "sai lần thứ 1".
       const lapEm: Record<string, number> | undefined =
         deRiengCa?.lapCua?.[sbd] ??
+        chiTiet.demSaiTheoEm?.[sbd] ??
         (chiTiet.lapTheoEm?.[sbd]?.length ? Object.fromEntries(chiTiet.lapTheoEm[sbd].map((q) => [q, 0])) : undefined)
       if (lapEm && teacherBank && moiNhat.dapAn && graded) {
         try {
@@ -538,7 +539,9 @@ export default function ExamMonitorScreen() {
    * tính không có cờ, nhưng `chiTiet.ca` vẫn nói ca có bộ câu riêng. */
   const laCaDeRieng =
     caCanDeRieng || Boolean(deRiengCa) || Object.keys(chiTiet?.lapTheoEm ?? {}).length > 0 || (chiTiet?.ca as { deRieng?: boolean } | undefined)?.deRieng === true
-  const bienBanLap = deRiengCa?.bienBan ?? null
+  // Biên bản: bản ở máy này trước (đầy đủ nhất), rồi tới bản máy chủ đã cất
+  // lúc bấm Bắt đầu — nhờ nó mà máy thứ hai vẫn đọc được.
+  const bienBanLap = deRiengCa?.bienBan ?? (chiTiet?.bienBanDeRieng as BienBanDeRieng | undefined) ?? null
   const tongKetLap = useMemo(() => {
     const co = dsEm.filter((e) => e.lap && e.lap.tong > 0)
     return {
@@ -585,6 +588,11 @@ export default function ExamMonitorScreen() {
       // độ khác thì không có bộ nào, không có gì để báo (thầy chốt 08/09).
       let boTheoEm: Record<string, string[]> | undefined
       let lapTheoEm: Record<string, string[]> | undefined
+      // BIÊN BẢN VÀ SỐ LẦN SAI ĐI LÊN MÁY CHỦ luôn. Để lại ở IndexedDB thì chỉ
+      // đúng cái máy bấm Bắt đầu mới đọc được — thầy bấm ở điện thoại rồi mở ca
+      // trên máy tính là màn hình trống (thầy chốt 08/09: "máy nào cũng được").
+      let bienBan: BienBanDeRieng | undefined
+      let demSai: Record<string, Record<string, number>> | undefined
       if (caCanDeRieng) {
         const dsCho = (chiTiet.dsCho ?? []).map((x) => x.sbd).filter(Boolean)
         if (dsCho.length === 0) {
@@ -597,7 +605,7 @@ export default function ExamMonitorScreen() {
         lapTheoEm = ra.lapTheoEm
         // BIÊN BẢN cất cùng bản đồ. Toast biến mất sau ba giây; câu hỏi "vì sao
         // em này không có câu hỏi lại" thì còn nguyên cả buổi.
-        await luuDeRiengCa(chiTiet.ca.maCa, ra.boTheoEm, ra.lapCua, ra.lapTheoEm, {
+        bienBan = {
           canCua: ra.canCua,
           soLapCua: ra.soLapCua,
           saiCaTruocCua: ra.saiCaTruocCua,
@@ -605,10 +613,13 @@ export default function ExamMonitorScreen() {
           boQua: ra.boQua,
           caDaQuet: ra.caDaQuet,
           lucRut: new Date().toISOString(),
-        })
+        }
+        demSai = ra.lapCua
+        await luuDeRiengCa(chiTiet.ca.maCa, ra.boTheoEm, ra.lapCua, ra.lapTheoEm, bienBan)
+        if (ra.cauNoiThem.soCau > 0) showToast(`Đã kéo ${ra.cauNoiThem.soCau} câu em từng sai từ kho vào đề ca này.`, 'success')
         if (ra.thieu.length > 0) showToast(`${ra.thieu.length} em không đủ câu hỏi lại — xem chi tiết trong ca.`, 'warn')
       }
-      const kq = await batDauThi(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, boTheoEm, lapTheoEm)
+      const kq = await batDauThi(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, boTheoEm, lapTheoEm, demSai, bienBan as unknown as Record<string, unknown>)
       if (kq.thieuBoTheoEm) {
         // KHÔNG NUỐT. Ca đã phát đề trước khi có bản đồ ⇒ em làm một bộ câu,
         // máy thầy chấm một bộ khác. Ghi đè bản đồ lúc này còn tệ hơn, nên

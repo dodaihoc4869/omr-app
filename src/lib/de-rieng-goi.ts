@@ -19,6 +19,28 @@ export interface GoiDeRieng {
   bo: Record<string, string[]>
   /** sbd → qid câu lặp. Máy chủ CHỈ trả phần của chính em đang thi. */
   lap: Record<string, string[]>
+  /** sbd → qid → SỐ LẦN em đã sai câu đó TRƯỚC ca này. Cần cho nhãn "sai lần
+   * thứ N"; để ở đây thì máy nào mở ca cũng đếm được, không phải đúng cái máy
+   * đã bấm Bắt đầu (thầy chốt 08/09: "máy nào cũng được"). */
+  dem: Record<string, Record<string, number>>
+  /** BIÊN BẢN lúc rút — thứ trả lời "vì sao em này không có câu hỏi lại".
+   * Dạng tự do vì nó chỉ để đọc, không có gì tính toán dựa vào nó. */
+  bb: Record<string, unknown> | null
+}
+
+function banDoSo(v: unknown): Record<string, Record<string, number>> {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return {}
+  const ra: Record<string, Record<string, number>> = {}
+  for (const [k, gia] of Object.entries(v as Record<string, unknown>)) {
+    if (!gia || typeof gia !== 'object' || Array.isArray(gia)) continue
+    const mot: Record<string, number> = {}
+    for (const [q, n] of Object.entries(gia as Record<string, unknown>)) {
+      const so = Number(n)
+      if (Number.isFinite(so) && so > 0) mot[q] = Math.floor(so)
+    }
+    if (Object.keys(mot).length > 0) ra[k] = mot
+  }
+  return ra
 }
 
 function banDo(v: unknown): Record<string, string[]> {
@@ -32,20 +54,25 @@ function banDo(v: unknown): Record<string, string[]> {
   return ra
 }
 
-export function dongGoiDeRieng(bo: Record<string, string[]>, lap: Record<string, string[]>): GoiDeRieng {
-  return { bo: banDo(bo), lap: banDo(lap) }
+export function dongGoiDeRieng(
+  bo: Record<string, string[]>,
+  lap: Record<string, string[]>,
+  dem: Record<string, Record<string, number>> = {},
+  bb: Record<string, unknown> | null = null,
+): GoiDeRieng {
+  return { bo: banDo(bo), lap: banDo(lap), dem: banDoSo(dem), bb: bb && typeof bb === 'object' ? bb : null }
 }
 
 /** Mở gói ở cả hai dạng — dạng mới `{bo, lap}` và dạng cũ phẳng `{sbd: [...]}`. */
 export function moGoiDeRieng(goi: unknown): GoiDeRieng {
-  if (!goi || typeof goi !== 'object' || Array.isArray(goi)) return { bo: {}, lap: {} }
+  if (!goi || typeof goi !== 'object' || Array.isArray(goi)) return { bo: {}, lap: {}, dem: {}, bb: null }
   const g = goi as Record<string, unknown>
   // Dạng mới nhận ra bằng khoá `bo` là ĐỐI TƯỢNG. Số báo danh toàn chữ số nên
   // không có em nào tên `bo`, và giá trị của một em là MẢNG chứ không phải đối
   // tượng — hai dấu hiệu độc lập, không nhận nhầm được.
   const co = g.bo && typeof g.bo === 'object' && !Array.isArray(g.bo)
-  if (co) return { bo: banDo(g.bo), lap: banDo(g.lap) }
-  return { bo: banDo(g), lap: {} }
+  if (co) return { bo: banDo(g.bo), lap: banDo(g.lap), dem: banDoSo(g.dem), bb: g.bb && typeof g.bb === 'object' && !Array.isArray(g.bb) ? (g.bb as Record<string, unknown>) : null }
+  return { bo: banDo(g), lap: {}, dem: {}, bb: null }
 }
 
 /** Câu lặp của MỘT em, đọc từ gói máy chủ trả về cho chính em đó. */

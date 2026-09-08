@@ -88,7 +88,7 @@ describe('màn Theo dõi ca', () => {
     expect(than).toContain('chiTiet.dsCho ?? []')
     expect(than).toContain('dungDeRiengChoCa(')
     expect(than).toContain('luuDeRiengCa(chiTiet.ca.maCa')
-    expect(than).toContain('batDauThi(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, boTheoEm, lapTheoEm)')
+    expect(than).toContain('batDauThi(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, boTheoEm, lapTheoEm, demSai, bienBan')
   })
 
   it('CHƯA EM NÀO CHỜ thì KHÔNG bắt đầu, nói thẳng', () => {

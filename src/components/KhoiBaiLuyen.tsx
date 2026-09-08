@@ -40,6 +40,8 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
   // Phiếu hiện NGAY TRONG trang, không mở thẻ mới: phụ huynh mở link từ Zalo
   // thì đang ở trình duyệt trong ứng dụng Zalo, ở đó `window.open` bị chặn.
   const [html, setHtml] = useState('')
+  /** Vì sao phiếu vừa dựng KHÔNG nộp được. Rỗng = nộp được. */
+  const [khongNop, setKhongNop] = useState('')
 
   // SỐ CÂU DO PHỤ HUYNH CHỌN. Báo cáo chở sẵn tới 40 câu đã rút theo đúng
   // chuyên đề em mất điểm, xếp dễ lên khó; kéo thanh là lấy bấy nhiêu câu ĐẦU,
@@ -124,6 +126,10 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
       const maPhieu = du.linkBaiTap ? docLinkPhieu(du.linkBaiTap.slice(du.linkBaiTap.indexOf('#') + 1)).ma : ''
       const urlNop = (await loadScriptUrlHoacMacDinh().catch(() => '')).trim()
       const nop = maPhieu && du.sbd && urlNop ? { ma: maPhieu, sbd: du.sbd, url: urlNop } : null
+      // NÓI RA KHI KHÔNG NỘP ĐƯỢC. Trước đây thiếu mã thì phiếu vẫn mở ra bình
+      // thường, chỉ là không có thanh nộp — thầy bấm mãi không thấy nút mà
+      // không có một dòng nào giải thích (thầy bắt được 08/09).
+      setKhongNop(nop ? '' : !maPhieu ? 'thieu_ma' : !du.sbd ? 'thieu_sbd' : 'thieu_link')
       const sai = du.chuyenDeCa.filter((c) => c.soSai > 0)
       const tt = {
         hoTen: du.hoTen,
@@ -257,6 +263,15 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
         </div>
       )}
       {loi && <div style={{ fontSize: 12.5, color: 'var(--p-do)', marginTop: 6 }}>{loi}</div>}
+      {khongNop !== '' && html !== '' && (
+        <div style={{ fontSize: 12.5, color: 'var(--p-cam)', marginTop: 6, lineHeight: 1.6 }}>
+          {khongNop === 'thieu_ma'
+            ? 'Phiếu này chưa có mã bài tập nên chưa nộp được — Thầy vào Lịch sử ca, bấm "Đồng bộ lại phiếu mọi ca", rồi mở lại link này.'
+            : khongNop === 'thieu_sbd'
+              ? 'Phiếu này thiếu số báo danh nên chưa nộp được. Báo Thầy để dựng lại phiếu.'
+              : 'Máy chưa có địa chỉ máy chủ nên chưa nộp được. Mở lại link khi có mạng.'}
+        </div>
+      )}
       {html && <KhungXemPhieu html={html} ten="Phiếu bài tập" dong={() => setHtml('')} />}
     </div>
   )

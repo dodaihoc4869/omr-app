@@ -11,6 +11,7 @@ import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { useAppStore } from '../store/appStore'
 import KhoiLuyenKhacPhuc from '../components/KhoiLuyenKhacPhuc'
+import NutDongBoMoiCa from '../components/NutDongBoMoiCa'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -156,6 +157,10 @@ export default function LichSuCaScreen() {
       {/* LUYỆN CÂU KHẮC PHỤC — thầy chốt 08/09: để ngay ngoài màn Ca thi, không
           phải mở vào từng ca. Gập sẵn nên không chiếm chỗ của danh sách ca. */}
       {!xemDaXoa && !chonMode && nguon.url && <KhoiLuyenKhacPhuc scriptUrl={nguon.url} maBiMat={nguon.mat} />}
+      {/* ĐỒNG BỘ LẠI PHIẾU MỌI CA — nút, không phải lệnh gõ tay ở một máy
+          (thầy chốt 08/09: "cho máy nào cũng được và đồng bộ cho tất cả các
+          máy bấm"). Đặt ở màn Lịch sử ca vì đây là chỗ nhìn thấy mọi ca. */}
+      {!xemDaXoa && !chonMode && nguon.url && <NutDongBoMoiCa />}
 
       <TheNoiDung>
         <div className="flex items-center" style={{ gap: 'var(--k3)', marginBottom: 'var(--k3)' }}>
