@@ -2452,6 +2452,87 @@ function doPost(e) {
   //      gửi lên không được tin — máy em sửa được.
   //
   // Sai khoá nào cũng trả CÙNG MỘT CÂU, không nói sai ở đâu.
+  if (action === 'ghiPhieuKhacPhuc') {
+    // MÁY EM GHI GÓI CÂU KHẮC PHỤC VỪA NHẬN, để nộp được ngay sau khi thi.
+    //
+    // VÌ SAO PHẢI CÓ LỆNH NÀY (thầy bắt được 08/09: "ca thi mới tôi bấm tạo đề
+    // khắc phục ngay sau lúc thi vẫn không có thanh nộp"):
+    //
+    // Báo cáo em xem NGAY SAU KHI NỘP do chính máy em dựng tại chỗ, không phải
+    // phiếu thầy cất trên máy chủ. Nó không có mã phiếu, mà `nopKhacPhuc` chấm
+    // theo mã — nên đúng chỗ em hay bấm nhất lại là chỗ không nộp được. Phiếu
+    // thầy dựng sau buổi thì có mã, và đó là lý do sau khi đồng bộ thì phiếu cũ
+    // nộp được còn ca mới vừa thi xong thì không.
+    //
+    // CỔNG: đúng cái cổng của `cauKhacPhuc` — phải là một lượt CÓ THẬT của
+    // chính em đó trong ca đó, đúng máy đã thi. Không có mã bí mật ở máy em.
+    //
+    // ĐÁNH ĐỔI, ghi thẳng: đáp án trong gói do máy em gửi lên, máy chủ không
+    // đối chiếu lại với kho. Ai sửa gói có thể tự cho mình "đúng hết". Chấp
+    // nhận vì (1) đây là bài TỰ LUYỆN ở nhà, không tính điểm, không xếp hạng;
+    // (2) đáp án vốn đã nằm trong chính tệp phiếu trên máy em. Đổi lấy: máy chủ
+    // không phải dựng lại cách chuẩn hoá đáp án lần thứ hai — hai cách chuẩn
+    // hoá lệch nhau là chấm sai cho MỌI em, tệ hơn hẳn.
+    const LOI_GP = { ok: false, error: 'Không ghi được phiếu khắc phục' }
+    const maCaGP = String(body.maCa || '').trim()
+    const sbdGP = String(body.sbd || '').trim()
+    const idTbGP = String(body.idThietBi || '').trim()
+    if (!maCaGP || !sbdGP || !idTbGP) return jsonResponse_(LOI_GP)
+
+    const shLGP = sheetLuot_()
+    const nLGP = shLGP.getLastRow()
+    if (nLGP < 2) return jsonResponse_(LOI_GP)
+    if (!quaCongLuot_(shLGP.getRange(1, 1, nLGP, 8).getValues(), maCaGP, sbdGP, idTbGP)) return jsonResponse_(LOI_GP)
+
+    const dsCauGP = Object.prototype.toString.call(body.cau) === '[object Array]' ? body.cau : []
+    if (dsCauGP.length === 0 || dsCauGP.length > TOI_DA_CAU_NOPKP) return jsonResponse_(LOI_GP)
+
+    const shPGP = getSheet_(SHEET_PHIEU, PHIEU_HEADERS)
+    boSungTieuDe_(shPGP, PHIEU_HEADERS)
+    // DÙNG LẠI MÃ CŨ của chính em trong ca này nếu có: mỗi em một link bài tập,
+    // không đẻ thêm mã mỗi lần em mở lại báo cáo. Thầy dựng phiếu cả ca sau đó
+    // cũng ghi đè lên đúng mã này.
+    const dataGP = shPGP.getDataRange().getValues()
+    let maGP = ''
+    let dongGP = -1
+    for (let i = 1; i < dataGP.length; i++) {
+      if (String(dataGP[i][1]) === maCaGP && String(dataGP[i][2]).trim() === sbdGP && String(dataGP[i][8] || '') === 'baitap') {
+        maGP = String(dataGP[i][0])
+        dongGP = i + 1
+        break
+      }
+    }
+    if (!maGP) maGP = sinhToken_()
+
+    const goiGP = {
+      v: 1,
+      loai: 'baitap',
+      tt: {
+        hoTen: String(body.hoTen || '') || ('SBD ' + sbdGP),
+        sbd: sbdGP,
+        ngay: new Date().toISOString(),
+        tenChuyenDe: String(body.tenChuyenDe || 'Hoá học'),
+        ketQua: '',
+        hienDapAn: false,
+        nhanBia: 'Câu khắc phục lỗi sai',
+      },
+      cau: dsCauGP,
+    }
+    const lucGP = new Date().toISOString()
+    try {
+      if (dongGP > 0) {
+        const refCu = shPGP.getRange(dongGP, 5).getValue()
+        shPGP.getRange(dongGP, 5).setValue(luuJsonLon_('phieu_' + maGP, goiGP, refCu))
+        shPGP.getRange(dongGP, 6).setValue(lucGP)
+      } else {
+        shPGP.appendRow([maGP, maCaGP, sbdGP, goiGP.tt.hoTen, luuJsonLon_('phieu_' + maGP, goiGP, ''), lucGP, 0, '', 'baitap'])
+      }
+    } catch (errGP) {
+      return jsonResponse_(LOI_GP)
+    }
+    return jsonResponse_({ ok: true, ma: maGP, soCau: dsCauGP.length, serverNow: Date.now() })
+  }
+
   if (action === 'nopKhacPhuc') {
     const LOI_NOP = { ok: false, error: 'Không nộp được bài' }
     const maNop = String(body.ma || '').trim()

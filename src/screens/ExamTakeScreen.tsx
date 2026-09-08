@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
-import { cauKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, trangThaiPhongCho, vaoThi, phieuCuaEm as layBaiDaNop, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { taoLinkPhieu } from '../lib/phieu-link'
+import { cauKhacPhuc, ghiPhieuKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, trangThaiPhongCho, vaoThi, phieuCuaEm as layBaiDaNop, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
 import { goiCauHoi } from '../lib/hoi-bai'
 import TamTruotHoiBai, { type CauChon } from '../components/TamTruotHoiBai'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
@@ -617,6 +618,50 @@ export default function ExamTakeScreen() {
       return null
     }
   }, [keyBank, attempt, graded, hoTen, lichSuEm, khoKhacPhuc, thuTuKhacPhuc])
+  // MÃ BÀI TẬP CHO BỘ CÂU KHẮC PHỤC — xin ngay khi báo cáo dựng xong.
+  //
+  // Báo cáo này do chính máy em dựng, không có mã phiếu; mà thanh Nộp bài chấm
+  // theo mã. Không xin mã thì đúng chỗ em hay bấm nhất lại là chỗ không nộp
+  // được (thầy bắt được 08/09).
+  //
+  // Xin MỘT LẦN cho mỗi bộ câu: `daXinRef` chặn gọi lại khi React dựng lại.
+  // Xin hỏng thì im lặng — phiếu vẫn mở được, chỉ là chưa nộp được, và khối
+  // bài luyện đã có sẵn dòng nói vì sao.
+  const [maBaiTapEm, setMaBaiTapEm] = useState('')
+  const daXinMaRef = useRef('')
+  const soCauKhacPhuc = phieuCuaEm?.baiTap?.length ?? 0
+  useEffect(() => {
+    const url = scriptUrl.trim()
+    const a = attempt
+    if (!url || !a || !phieuCuaEm || soCauKhacPhuc === 0) return
+    const khoa = `${a.maCa}:${a.sbd}:${soCauKhacPhuc}`
+    if (daXinMaRef.current === khoa) return
+    daXinMaRef.current = khoa
+    let huy = false
+    ghiPhieuKhacPhuc(
+      url,
+      a.maCa,
+      a.sbd,
+      a.idThietBi ?? '',
+      (phieuCuaEm.baiTap ?? []).map((c) => ({ id: c.id, phan: c.phan, dapAn: c.dapAn })),
+      { hoTen: phieuCuaEm.hoTen, tenChuyenDe: phieuCuaEm.chuyenDeCa?.[0]?.ten ?? '' },
+    )
+      .then((ma) => {
+        if (!huy && ma) setMaBaiTapEm(ma)
+      })
+      .catch(() => {})
+    return () => {
+      huy = true
+    }
+  }, [scriptUrl, attempt, phieuCuaEm, soCauKhacPhuc])
+
+  /** Báo cáo kèm link bài tập — thứ làm cho phiếu khắc phục nộp được. */
+  const phieuCuaEmCoLink: PhieuDayDu | null = useMemo(() => {
+    if (!phieuCuaEm) return null
+    if (!maBaiTapEm) return phieuCuaEm
+    return { ...phieuCuaEm, linkBaiTap: taoLinkPhieu(`${location.origin}${import.meta.env.BASE_URL}`, maBaiTapEm) }
+  }, [phieuCuaEm, maBaiTapEm])
+
   useEffect(() => {
     totalCountRef.current = assignment ? assignment.phanI.length + assignment.phanII.length + assignment.phanIII.length : 0
   }, [assignment])
@@ -1944,7 +1989,7 @@ export default function ExamTakeScreen() {
   }
 
   // ------------------------------------------------------- XEM LẠI LỜI GIẢI
-  if (phase === 'submitted' && xemBaoCao && phieuCuaEm) {
+  if (phase === 'submitted' && xemBaoCao && phieuCuaEmCoLink) {
     return (
       <div style={{ minHeight: '100vh', position: 'relative' }}>
         <button
@@ -1971,7 +2016,7 @@ export default function ExamTakeScreen() {
         >
           <ArrowLeft size={16} /> Quay lại
         </button>
-        <PhieuScreen duCoSan={phieuCuaEm} laCuaEm />
+        <PhieuScreen duCoSan={phieuCuaEmCoLink} laCuaEm />
       </div>
     )
   }

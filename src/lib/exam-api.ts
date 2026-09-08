@@ -1748,6 +1748,29 @@ export async function cauKhacPhuc(
   }
 }
 
+/** MÁY EM GHI GÓI CÂU KHẮC PHỤC vừa nhận, để nộp được ngay sau khi thi.
+ *
+ * Báo cáo em xem ngay sau khi nộp do chính máy em dựng tại chỗ — không có mã
+ * phiếu, mà `nopKhacPhuc` chấm theo mã. Lệnh này cấp mã cho đúng bộ câu em
+ * đang cầm (thầy bắt được 08/09: "ca thi mới bấm tạo đề khắc phục ngay sau lúc
+ * thi vẫn không có thanh nộp").
+ *
+ * KHÔNG kèm mã bí mật: máy em không bao giờ có. Cổng là lượt thi có thật của
+ * chính em, đúng máy đã thi — cùng cổng với `cauKhacPhuc`. */
+export async function ghiPhieuKhacPhuc(
+  scriptUrl: string,
+  maCa: string,
+  sbd: string,
+  idThietBi: string,
+  cau: { id: string; phan: 'I' | 'II' | 'III'; dapAn: string }[],
+  tt: { hoTen?: string; tenChuyenDe?: string } = {},
+): Promise<string> {
+  if (cau.length === 0) return ''
+  const r = await postJson(scriptUrl, { action: 'ghiPhieuKhacPhuc', maCa, sbd, idThietBi, cau, hoTen: tt.hoTen || '', tenChuyenDe: tt.tenChuyenDe || '' }, 45)
+  if (!r.ok) throw new Error(r.error || 'Không ghi được phiếu khắc phục')
+  return String(r.ma || '')
+}
+
 /** THẦY dựng lại chỉ mục câu của kho đề sau khi đẩy đề mới, để em đầu tiên
  * bấm "tạo câu khắc phục" không phải chờ máy chủ mở cả kho. */
 export async function dungChiMuc(scriptUrl: string, secret: string): Promise<number> {
