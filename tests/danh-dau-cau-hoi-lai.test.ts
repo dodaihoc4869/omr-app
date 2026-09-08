@@ -228,3 +228,33 @@ describe('không rò dữ liệu học sinh', () => {
     expect(PHAN_DE).toEqual(['I', 'II', 'III'])
   })
 })
+
+describe('CHẾ ĐỘ ĐỀ RIÊNG SỐNG Ở MÁY CHỦ, không nằm lại máy mở ca', () => {
+  // Lỗi thật ở ca 933467 (08/09): cờ chế độ chỉ nằm trong IndexedDB của máy mở
+  // ca. Bấm Bắt đầu ở máy khác ⇒ không rút bộ câu, không gửi bản đồ; em nhận
+  // đề cắt theo luật hash còn máy thầy chấm theo bản đồ. Điểm sai, màn hình im.
+  it('máy chủ có cột DeRieng và publish ghi vào đó', () => {
+    expect(GS).toContain("'BoTheoEmJson', 'DeRieng']")
+    expect(GS).toContain("const deRieng = body.deRieng === true ? 'co' : ''")
+    expect(GS).toContain("sh.getRange(dong, 23, 1, 7).setValues([[lenBang, giuDeDoc, anHanGiay, phongCho, '', '', deRieng]])")
+    expect(GS).toContain("deRieng: String(v[28] || '') === 'co',")
+  })
+
+  it('SHEET CŨ TỰ NỚI CỘT — thêm cột mới không làm nổ ca đang chờ', () => {
+    expect(GS).toContain('if (thieu > 0) sh.insertColumnsAfter(sh.getMaxColumns(), thieu)')
+  })
+
+  it('màn mở ca gửi cờ lên máy chủ, màn ca thi đọc cờ từ máy chủ', () => {
+    expect(doc('src/screens/ExamSetupScreen.tsx')).toContain('deRieng: deRiengBat,')
+    expect(doc('src/lib/exam-api.ts')).toContain('deRieng: moc.deRieng === true,')
+    expect(MAN_CA).toContain("const drMayChu = (ct.ca as { deRieng?: boolean }).deRieng === true")
+    expect(MAN_CA).toContain('setCaCanDeRieng(drMayChu || (await docCheDoDeRieng(ma.trim()).catch(() => false)))')
+  })
+
+  it('KHÔNG GHI ĐÈ BẢN ĐỒ khi ca đã phát đề, nhưng phải HÉT LÊN', () => {
+    // Ghi bản đồ sau khi em đã cầm đề là bảng chấm khác tờ đề em làm.
+    expect(GS).toContain('coBoTheoEm: !!caBD.boTheoEmRef, canBoTheoEm: !!(body.boTheoEm')
+    expect(doc('src/lib/exam-api.ts')).toContain('thieuBoTheoEm: r.daBatTruoc === true && r.canBoTheoEm === true && r.coBoTheoEm === false,')
+    expect(MAN_CA).toContain('Ca này đã phát đề TRƯỚC khi có bộ câu riêng — điểm chấm sẽ sai. Huỷ ca và mở lại.')
+  })
+})

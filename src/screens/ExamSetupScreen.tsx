@@ -318,6 +318,9 @@ export default function ExamSetupScreen() {
         // ĐỀ RIÊNG TỰ BẬT PHÒNG CHỜ. Không có phòng chờ thì em vào là nhận đề
         // ngay, mà lúc đó bản đồ chưa dựng — em nhận bộ câu theo luật hash.
         phongCho: phongCho || deRiengBat,
+        // Cờ chế độ lên MÁY CHỦ. `luuCheDoDeRieng` bên dưới chỉ còn là bản
+        // sao ở máy này cho nhanh, không còn là nguồn sự thật duy nhất.
+        deRieng: deRiengBat,
         anHanGiay,
       })
       // Lưu bản CÓ đáp án trên máy thầy để màn Theo dõi chấm lại được sau này.

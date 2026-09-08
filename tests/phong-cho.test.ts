@@ -35,8 +35,9 @@ function gia(tra: unknown) {
 describe('máy chủ — cột và cổng', () => {
   it('cột mới nằm CUỐI CA_HEADERS, không chen vào giữa', () => {
     // Chen vào giữa là mọi ca cũ lệch cột: điểm thành tên, tên thành phạm vi.
-    // 08/09 thêm `BoTheoEmJson` — vẫn nối vào CUỐI, sau `BatDauThiLuc`.
-    expect(GS).toMatch(/'GiuDeDoc', 'AnHanGiay', 'PhongCho', 'BatDauThiLuc', 'BoTheoEmJson'\]/)
+    // 08/09 thêm `BoTheoEmJson` rồi `DeRieng` — vẫn nối vào CUỐI, sau
+    // `BatDauThiLuc`, nên chỉ số các cột cũ không đổi.
+    expect(GS).toMatch(/'GiuDeDoc', 'AnHanGiay', 'PhongCho', 'BatDauThiLuc', 'BoTheoEmJson', 'DeRieng'\]/)
     expect(GS).toContain("phongCho: String(v[25] || '') === 'co'")
     expect(GS).toContain("batDauThiLuc: v[26] ? String(v[26]) : ''")
     expect(GS).toContain("boTheoEmRef: v[27] ? String(v[27]) : ''")
@@ -59,12 +60,18 @@ describe('máy chủ — cột và cổng', () => {
 
   it('mở lại cùng mã ca thì BatDauThiLuc về rỗng', () => {
     // Ca mới là chờ mới. Kế thừa lần bấm trước là em vào phát nhận đề ngay.
-    expect(GS).toContain("sh.getRange(dong, 23, 1, 5).setValues([[lenBang, giuDeDoc, anHanGiay, phongCho, '']])")
+    // Ô thứ 5 của dải (cột 27 = BatDauThiLuc) vẫn được ghi rỗng; dải nay dài
+    // 7 ô vì cột 29 `DeRieng` cũng thuộc lần mở ca.
+    expect(GS).toContain("sh.getRange(dong, 23, 1, 7).setValues([[lenBang, giuDeDoc, anHanGiay, phongCho, '', '', deRieng]])")
   })
 
   it('bấm bắt đầu lần hai giữ mốc lần đầu', () => {
     const than = GS.slice(GS.indexOf("if (action === 'batDauThi')"), GS.indexOf("if (action === 'tenTheoSbd')"))
-    expect(than).toContain('if (caBD.batDauThiLuc) return jsonResponse_({ ok: true, batDauLuc: caBD.batDauThiLuc, daBatTruoc: true })')
+    // Vẫn trả về NGAY khi đã bấm trước, giữ nguyên mốc giờ lần đầu; chỉ kèm
+    // thêm hai cờ chẩn đoán để màn Ca thi biết ca đề riêng nào phát đề trước
+    // khi có bản đồ.
+    expect(than).toContain('if (caBD.batDauThiLuc) {')
+    expect(than).toContain('return jsonResponse_({ ok: true, batDauLuc: caBD.batDauThiLuc, daBatTruoc: true, coBoTheoEm:')
     expect(than).toContain('kiemTraMaBiMat_(body)')
     expect(than).toContain('shBD.getRange(rowBD, 27).setValue(lucBD)')
   })

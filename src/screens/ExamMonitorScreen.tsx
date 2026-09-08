@@ -270,7 +270,12 @@ export default function ExamMonitorScreen() {
       // bằng luật hash trong khi em nhận bộ câu theo bản đồ là ra bộ câu của
       // người khác — sai điểm mà màn hình không báo gì.
       setDeRiengCa((await docDeRiengCa(ma.trim()).catch(() => undefined)) ?? null)
-      setCaCanDeRieng(await docCheDoDeRieng(ma.trim()).catch(() => false))
+      // MÁY CHỦ LÀ NGUỒN CHÍNH. IndexedDB chỉ còn là bản sao cho ca mở trước
+      // 08/09 — hồi đó cờ chế độ chỉ nằm ở máy mở ca, nên mở ca ở điện thoại
+      // rồi bấm Bắt đầu trên máy tính là máy tính im lặng coi đây là ca thường
+      // (ca 933467).
+      const drMayChu = (ct.ca as { deRieng?: boolean }).deRieng === true
+      setCaCanDeRieng(drMayChu || (await docCheDoDeRieng(ma.trim()).catch(() => false)))
     } catch (e) {
       setLoi(`Không tải được ca: ${e instanceof Error ? e.message : 'lỗi không rõ'}`)
     } finally {
@@ -531,7 +536,8 @@ export default function ExamMonitorScreen() {
    * `caCanDeRieng` là cờ máy này ghi lúc mở ca; `deRiengCa` là bản đồ máy này
    * ghi lúc bấm Bắt đầu. Thầy mở ca ở điện thoại rồi xem trên máy tính thì máy
    * tính không có cờ, nhưng `chiTiet.ca` vẫn nói ca có bộ câu riêng. */
-  const laCaDeRieng = caCanDeRieng || Boolean(deRiengCa) || Object.keys(chiTiet?.lapTheoEm ?? {}).length > 0
+  const laCaDeRieng =
+    caCanDeRieng || Boolean(deRiengCa) || Object.keys(chiTiet?.lapTheoEm ?? {}).length > 0 || (chiTiet?.ca as { deRieng?: boolean } | undefined)?.deRieng === true
   const bienBanLap = deRiengCa?.bienBan ?? null
   const tongKetLap = useMemo(() => {
     const co = dsEm.filter((e) => e.lap && e.lap.tong > 0)
@@ -603,7 +609,14 @@ export default function ExamMonitorScreen() {
         if (ra.thieu.length > 0) showToast(`${ra.thieu.length} em không đủ câu hỏi lại — xem chi tiết trong ca.`, 'warn')
       }
       const kq = await batDauThi(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, boTheoEm, lapTheoEm)
-      showToast(kq.daBatTruoc ? 'Ca này đã bắt đầu từ trước.' : 'Đã bắt đầu — cả lớp hiện đề ngay bây giờ.', 'success')
+      if (kq.thieuBoTheoEm) {
+        // KHÔNG NUỐT. Ca đã phát đề trước khi có bản đồ ⇒ em làm một bộ câu,
+        // máy thầy chấm một bộ khác. Ghi đè bản đồ lúc này còn tệ hơn, nên
+        // việc duy nhất đúng là báo thầy mở ca lại.
+        showToast('Ca này đã phát đề TRƯỚC khi có bộ câu riêng — điểm chấm sẽ sai. Huỷ ca và mở lại.', 'error')
+      } else {
+        showToast(kq.daBatTruoc ? 'Ca này đã bắt đầu từ trước.' : 'Đã bắt đầu — cả lớp hiện đề ngay bây giờ.', 'success')
+      }
       await tai(chiTiet.ca.maCa)
     } catch (e) {
       showToast(`Không bắt đầu được: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')

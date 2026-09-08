@@ -114,7 +114,7 @@ const DRIVE_FOLDER = 'OMR-APP-DATA'
 //   BatDauThiLuc thầy bấm "Bắt đầu thi" lúc nào. Rỗng = chưa bấm.
 // `boSungTieuDe_` tự thêm hai cột này vào sheet cũ, ca cũ đọc ra rỗng nên chạy
 // y như trước.
-const CA_HEADERS = ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson', 'BatDau', 'HetHanVao', 'TrangThai', 'TenCa', 'PhamVi', 'DanhSachMoi', 'NguoiTao', 'XoaLuc', 'NguongLan', 'NguongGiay', 'Loai', 'HanNop', 'KhoaLuc', 'KhoaBoi', 'MoKhoaLuc', 'LenBang', 'GiuDeDoc', 'AnHanGiay', 'PhongCho', 'BatDauThiLuc', 'BoTheoEmJson']
+const CA_HEADERS = ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson', 'BatDau', 'HetHanVao', 'TrangThai', 'TenCa', 'PhamVi', 'DanhSachMoi', 'NguoiTao', 'XoaLuc', 'NguongLan', 'NguongGiay', 'Loai', 'HanNop', 'KhoaLuc', 'KhoaBoi', 'MoKhoaLuc', 'LenBang', 'GiuDeDoc', 'AnHanGiay', 'PhongCho', 'BatDauThiLuc', 'BoTheoEmJson', 'DeRieng']
 
 /** Đọc cột GiuDeDoc: CHỈ chuỗi 'co' mới là BẬT. Ô trống = tắt. */
 function giuDeDocCua_(v) {
@@ -454,6 +454,21 @@ function getSheet_(name, headers) {
   if (!sh) {
     sh = ss.insertSheet(name)
     sh.appendRow(headers)
+  } else if (headers && headers.length) {
+    // NỚI CỘT CHO SHEET CŨ. Sheet Google mặc định 26 cột; thêm một cột vào
+    // `*_HEADERS` mà sheet đang chạy chưa đủ cột là `getRange(row, 29)` ném
+    // "range out of bounds" — giữa lúc cả lớp đứng ở phòng chờ. Nới ở đây một
+    // lần, im lặng, thay vì bắt thầy tự thêm cột bằng tay.
+    try {
+      const thieu = headers.length - sh.getMaxColumns()
+      if (thieu > 0) sh.insertColumnsAfter(sh.getMaxColumns(), thieu)
+      const dau = sh.getRange(1, 1, 1, headers.length).getValues()[0]
+      let phaiGhi = false
+      for (let i = 0; i < headers.length; i++) {
+        if (String(dau[i] || '') === '') { dau[i] = headers[i]; phaiGhi = true }
+      }
+      if (phaiGhi) sh.getRange(1, 1, 1, headers.length).setValues([dau])
+    } catch (errNoi) {}
   }
   _shCache[name] = sh
   return sh
@@ -561,6 +576,14 @@ function docCa_(sh, row) {
     // ĐỀ RIÊNG TỪNG EM ghi lúc thầy bấm BẮT ĐẦU, không phải lúc mở ca: lúc mở
     // ca chưa biết em nào tới. Xem NOP/DE-RIENG — bản đồ sbd → qid.
     boTheoEmRef: v[27] ? String(v[27]) : '',
+    // CHẾ ĐỘ ĐỀ RIÊNG TỪNG EM — ghi lúc MỞ ca, ở MÁY CHỦ.
+    //
+    // Trước 08/09 cờ này chỉ nằm trong IndexedDB của đúng cái máy mở ca. Thầy
+    // mở ca ở điện thoại rồi bấm Bắt đầu trên máy tính là máy tính không biết
+    // ca đang ở chế độ nào: không rút bộ câu, không gửi bản đồ, và em nhận đề
+    // cắt theo luật hash trong khi máy thầy chấm theo bản đồ. Không một dòng
+    // nào trên màn hình báo chuyện đó (thầy bắt được ở ca 933467).
+    deRieng: String(v[28] || '') === 'co',
   }
 }
 
@@ -2929,8 +2952,11 @@ function doPost(e) {
     // PHÒNG CHỜ: mở lại cùng mã ca thì BatDauThiLuc về rỗng — ca mới là chờ
     // mới, không kế thừa lần bấm bắt đầu của lần trước.
     const phongCho = body.phongCho === true ? 'co' : ''
-    sh.getRange(dong, 23, 1, 5).setValues([[lenBang, giuDeDoc, anHanGiay, phongCho, '']])
-    return jsonResponse_({ ok: true, batDau: batDau, hetHanVao: rowData[8], loai: rowData[17], hanNop: rowData[18], lenBang: lenBang === 'co', giuDeDoc: giuDeDoc === 'co', anHanGiay: anHanGiay || 0, phongCho: phongCho === 'co', serverNow: Date.now() })
+    // CHẾ ĐỘ ĐỀ RIÊNG đi cùng ca lên máy chủ, không nằm lại ở máy mở ca. Mở
+    // lại cùng mã ca thì lấy theo lần mở mới, không kế thừa lần trước.
+    const deRieng = body.deRieng === true ? 'co' : ''
+    sh.getRange(dong, 23, 1, 7).setValues([[lenBang, giuDeDoc, anHanGiay, phongCho, '', '', deRieng]])
+    return jsonResponse_({ ok: true, batDau: batDau, hetHanVao: rowData[8], loai: rowData[17], hanNop: rowData[18], lenBang: lenBang === 'co', giuDeDoc: giuDeDoc === 'co', anHanGiay: anHanGiay || 0, phongCho: phongCho === 'co', deRieng: deRieng === 'co', serverNow: Date.now() })
   }
 
   if (action === 'vaoThi') {
@@ -3355,7 +3381,15 @@ function doPost(e) {
     const rowBD = findRowByKey_(shBD, 0, maCaBD)
     if (rowBD < 0) return jsonResponse_({ ok: false, error: 'Không có ca ' + maCaBD })
     const caBD = docCa_(shBD, rowBD)
-    if (caBD.batDauThiLuc) return jsonResponse_({ ok: true, batDauLuc: caBD.batDauThiLuc, daBatTruoc: true })
+    // ĐÃ BẮT ĐẦU TỪ TRƯỚC thì KHÔNG ghi đè bản đồ: em đã cầm đề rồi, đổi bản
+    // đồ lúc này là bảng chấm của thầy khác hẳn tờ đề em đang làm.
+    //
+    // Nhưng phải NÓI RA khi ca đề riêng đã bắt đầu mà chưa có bản đồ nào —
+    // đó là ca em nhận đề cắt theo luật hash, và im lặng ở đây là thầy chấm
+    // bằng một bộ câu khác bộ em đã làm.
+    if (caBD.batDauThiLuc) {
+      return jsonResponse_({ ok: true, batDauLuc: caBD.batDauThiLuc, daBatTruoc: true, coBoTheoEm: !!caBD.boTheoEmRef, canBoTheoEm: !!(body.boTheoEm && typeof body.boTheoEm === 'object') })
+    }
     // ĐỀ RIÊNG TỪNG EM — bản đồ sbd → qid dựng ĐÚNG LÚC NÀY, từ danh sách em
     // đang đứng ở phòng chờ. Dựng lúc mở ca thì phải đoán trước ai tới, mà lớp
     // hôm đủ hôm thiếu (thầy chốt 08/09).

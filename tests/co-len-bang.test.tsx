@@ -156,7 +156,7 @@ describe('phía đọc: màn Gọi lên bảng và máy chủ', () => {
     // Ghi cột 23 trở đi bằng một dải riêng. rowData dừng ở cột 19; nối thêm là
     // ghi đè KhoaLuc / KhoaBoi / MoKhoaLuc (cột 20-22) của ca mở lại cùng mã.
     // Dải nay dài 5 ô: thêm PhongCho và BatDauThiLuc (07/09).
-    expect(gs).toContain("sh.getRange(dong, 23, 1, 5).setValues([[lenBang, giuDeDoc, anHanGiay, phongCho, '']])")
+    expect(gs).toContain("sh.getRange(dong, 23, 1, 7).setValues([[lenBang, giuDeDoc, anHanGiay, phongCho, '', '', deRieng]])")
     // rowData vẫn phải DỪNG trước cột 20 — đây mới là điều phép kiểm này giữ.
     expect(gs).not.toMatch(/sh\.getRange\(dong, 1, 1, 2[0-9]\)/)
     expect(gs).toContain("body.lenBang === false ? 'khong' : 'co'")

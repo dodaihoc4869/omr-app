@@ -223,10 +223,17 @@ export async function batDauThi(
    * gì. Tách ra thì máy chủ cũ ghi đúng như hôm nay và chỉ thiếu phần đánh
    * dấu; máy chủ mới gói hai bản đồ lại. */
   lapTheoEm?: Record<string, string[]>,
-): Promise<{ batDauLuc: string; daBatTruoc: boolean }> {
+): Promise<{ batDauLuc: string; daBatTruoc: boolean; thieuBoTheoEm: boolean }> {
   const r = await postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm, lapTheoEm })
   if (!r.ok) throw new Error(r.error || 'Không bắt đầu được ca')
-  return { batDauLuc: String(r.batDauLuc ?? ''), daBatTruoc: r.daBatTruoc === true }
+  return {
+    batDauLuc: String(r.batDauLuc ?? ''),
+    daBatTruoc: r.daBatTruoc === true,
+    // CA ĐỀ RIÊNG ĐÃ BẮT ĐẦU MÀ MÁY CHỦ KHÔNG CÓ BẢN ĐỒ. Em đang cầm đề cắt
+    // theo luật hash, còn máy thầy chấm theo bản đồ ⇒ điểm sai. Phải hét lên,
+    // không được nuốt.
+    thieuBoTheoEm: r.daBatTruoc === true && r.canBoTheoEm === true && r.coBoTheoEm === false,
+  }
 }
 
 export async function vaoThi(
@@ -353,6 +360,10 @@ export interface MocThoiGianCa {
   /** PHÒNG CHỜ (thầy chốt 07/09): em vào ca thì đứng ở màn chờ, chưa nhận đề.
    * Cả lớp nhận đề đúng một thời điểm khi thầy bấm "Bắt đầu thi". */
   phongCho?: boolean
+  /** ĐỀ RIÊNG TỪNG EM. Cờ này phải lên MÁY CHỦ, không nằm lại ở máy mở ca:
+   * mở ca ở điện thoại rồi bấm Bắt đầu trên máy tính thì máy tính mới biết
+   * phải rút bộ câu riêng (thầy bắt được ở ca 933467, 08/09). */
+  deRieng?: boolean
 }
 
 /** Loại ca: kiểm tra hay bài tập về nhà. Dùng CHUNG mọi thứ, khác nhau bằng cờ này. */
@@ -393,6 +404,7 @@ export async function publishSession(
     giuDeDoc: moc.giuDeDoc === true,
     anHanGiay: moc.giuDeDoc === true ? moc.anHanGiay || 3 : 0,
     phongCho: moc.phongCho === true,
+    deRieng: moc.deRieng === true,
   })
   if (!result.ok) throw new Error(result.error || 'Mở ca kiểm tra thất bại')
   return { batDau: String(result.batDau || ''), hetHanVao: String(result.hetHanVao || '') }
@@ -1373,6 +1385,9 @@ export interface CaTomTat {
   phongCho?: boolean
   /** Thầy bấm "Bắt đầu thi" lúc nào. Rỗng = chưa bấm, em vẫn đang chờ. */
   batDauThiLuc?: string
+  /** CA ĐỀ RIÊNG TỪNG EM — đọc từ máy chủ, nên máy nào mở ca cũng biết.
+   * Ca mở trước 08/09 không có cột này ⇒ false, chạy y như trước. */
+  deRieng?: boolean
   daVao: number
   daNop: number
   canhBao: number
