@@ -127,7 +127,12 @@ describe('lệnh máy chủ', () => {
     expect(GS).toContain("if (action === 'nopKhacPhuc') {")
     expect(GS).toContain("if (action === 'nopKhacPhucTheoCa') {")
     const doc = GS.slice(GS.indexOf("if (action === 'nopKhacPhucTheoCa') {"))
-    expect(doc.slice(0, 200)).toContain('kiemTraMaBiMat_(body)')
+    expect(doc.slice(0, 600)).toContain('kiemTraMaBiMat_(body)')
+    // `kiemTraMaBiMat_` trả CHUỖI lỗi, không phải phản hồi. Trả thẳng chuỗi ra
+    // khỏi doPost là 500 và trình duyệt báo "Failed to fetch" — tôi đã dính
+    // đúng lỗi này ở bản 54, nên khoá lại.
+    expect(doc.slice(0, 600)).toContain('return jsonResponse_({ ok: false, error: kt })')
+    expect(doc.slice(0, 600)).not.toMatch(/if \(kt\) return kt/)
   })
 
   it('BA KHOÁ thay cho mã bí mật: phiếu có thật · đúng loại · đúng SBD', () => {

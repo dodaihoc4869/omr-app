@@ -2410,8 +2410,11 @@ function doPost(e) {
 
   // ĐỌC LƯỢT NỘP KHẮC PHỤC CỦA MỘT CA — cần mã bí mật, chỉ thầy đọc.
   if (action === 'nopKhacPhucTheoCa') {
+    // `kiemTraMaBiMat_` trả CHUỖI lỗi (rỗng là đạt), không phải một phản hồi.
+    // Trả thẳng chuỗi ra khỏi doPost là Apps Script dựng phản hồi hỏng và trình
+    // duyệt báo "Failed to fetch" — đúng lỗi tôi vừa dính lúc kiểm bản 54.
     const kt = kiemTraMaBiMat_(body)
-    if (kt) return kt
+    if (kt) return jsonResponse_({ ok: false, error: kt })
     const maCaKP = String(body.maCa || '').trim()
     if (!maCaKP) return jsonResponse_({ ok: false, error: 'Thiếu mã ca' })
     const shKP = getSheet_(SHEET_NOPKP, NOPKP_HEADERS)
