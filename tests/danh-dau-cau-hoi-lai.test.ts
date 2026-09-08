@@ -205,7 +205,11 @@ describe('màn ca thi luôn trả lời được "câu em sai buổi trước"',
 describe('phiếu khắc phục trong báo cáo nộp được', () => {
   it('khối bài luyện dựng phiếu KÈM thanh nộp', () => {
     const khoi = doc('src/components/KhoiBaiLuyen.tsx')
-    expect(khoi).toContain('setHtml(dungPhieu(tt, dsDaLoc.slice(0, lay), { nop }))')
+    // ĐỔI 08/09 TỐI: có `nop` thì vẫn dựng phiếu nộp được như cũ, nhưng bản của
+    // EM mà KHÔNG nộp được thì dựng phiếu CHỈ ĐỀ, không tụt về bản đầy đủ có
+    // đáp án (thầy báo: "rút câu luyện của học sinh bị lỗi lời giải").
+    expect(khoi).toContain('chiDeChoEm ? { anGiai: true } : { nop }')
+    expect(khoi).toContain('const chiDeChoEm = laCuaEm && !nop')
     // Mã lấy từ link đã cất, KHÔNG tự sinh — trang này không có mã bí mật.
     expect(khoi).toContain('docLinkPhieu(link.slice(link.indexOf')
     // Thiếu bất kỳ mảnh nào thì phiếu vẫn mở, chỉ không có nút nộp.

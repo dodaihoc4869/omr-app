@@ -159,7 +159,22 @@ function NutTaiBaiTap({ du, laCuaEm = false, xinLink }: { du: PhieuDayDu; laCuaE
       }
       // MỘT lần dựng. Bản trước dựng hai lần (đề, lời giải) rồi nối chuỗi nên
       // phụ huynh tải về thấy bìa và trang tổng quan LẶP HAI LẦN.
-      setHtml(dungPhieu(tt, dsDaLoc.slice(0, lay), { nop }))
+      //
+      // MẤT MÃ NỘP KHÔNG ĐƯỢC BIẾN PHIẾU CỦA EM THÀNH PHIẾU CÓ ĐÁP ÁN.
+      // Thầy báo 08/09 tối: "rút câu luyện của học sinh bị lỗi lời giải" — ảnh
+      // cho thấy phiếu của em mở ra với thanh "Đã xem lời giải 20/20 câu" và ô
+      // đáp án đúng tô xanh lá.
+      //
+      // Gốc: `nop` rỗng (xin mã hỏng, thiếu SBD, hoặc mất link) thì `dungPhieu`
+      // nhận đúng một tuỳ chọn rỗng, nên body không mang lớp `chua-nop` lẫn
+      // `chi-de`. Không lớp nào thì không luật giấu nào chạy: đáp án tô sẵn,
+      // lời giải mở được. Phiếu tụt về BẢN ĐẦY ĐỦ của thầy, thay vì bản đề.
+      //
+      // Luật từ đây: bản của EM mà không nộp được thì dựng PHIẾU CHỈ ĐỀ. Em vẫn
+      // làm ra giấy được, và không thấy một đáp án nào. Lý do vì sao không nộp
+      // được đã nói ở `khongNop` ngay trên.
+      const chiDeChoEm = laCuaEm && !nop
+      setHtml(dungPhieu(tt, dsDaLoc.slice(0, lay), chiDeChoEm ? { anGiai: true } : { nop }))
     } catch {
       setLoi('Máy chưa mở được phiếu. Phụ huynh thử lại khi có mạng ổn định.')
     } finally {

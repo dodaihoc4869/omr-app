@@ -8,6 +8,8 @@
 // bấm như em bấm. Đây mới là bằng chứng.
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { dungPhieu } from '../src/lib/html-phieu'
 import type { CauLuyen } from '../src/lib/bai-tap-pdf'
 
@@ -274,5 +276,41 @@ describe('BẤM KHÔNG ĐƯỢC LỘ ĐÁP ÁN', () => {
     // không có chỗ nào cho CSS bám vào mà tô khác màu.
     const bo = (el: HTMLElement) => el.className.split(/\s+/).filter((x) => x && x !== 'dung').sort().join(' ')
     expect(bo(oA)).toBe(bo(oB))
+  })
+})
+
+// PHIẾU KHÔNG MANG LỚP NÀO THÌ KHÔNG GIẤU GÌ CẢ — thầy báo tối 08/09:
+// "rút câu luyện của học sinh bị lỗi lời giải".
+//
+// `dungPhieu(tt, cau, {})` cho ra body không có `chua-nop` lẫn `chi-de`, nên
+// mọi luật giấu đều không chạy: đáp án tô sẵn, lời giải mở được. Đó là bản
+// ĐẦY ĐỦ, đúng cho thầy và phụ huynh dò bài, nhưng SAI khi đưa cho em.
+//
+// `KhoiBaiLuyen` rơi vào đúng đó khi xin mã nộp hỏng: `nop` null thì nó vẫn gọi
+// `dungPhieu(..., { nop })`. Nay bản của em mà không nộp được thì dựng phiếu
+// CHỈ ĐỀ.
+describe('MẤT MÃ NỘP KHÔNG ĐƯỢC BIẾN PHIẾU CỦA EM THÀNH PHIẾU CÓ ĐÁP ÁN', () => {
+  it('phiếu không tuỳ chọn nào: body KHÔNG có lớp giấu — đây là bản đầy đủ', () => {
+    const h = dungPhieu(tt, [cau('q1', 'I')])
+    const lop = /<body class="([^"]*)"/.exec(h)?.[1] ?? ''
+    expect(lop).not.toContain('chua-nop')
+    expect(lop).not.toContain('chi-de')
+  })
+
+  it('phiếu CHỈ ĐỀ không mang một đáp án nào trong trang', () => {
+    const h = dungPhieu(tt, [cau('q1', 'I'), cau('q3', 'III')], { anGiai: true })
+    // Lớp `dung` là thứ tô ô đáp án đúng; phiếu chỉ đề không được có nó.
+    expect(h).not.toContain('q-opt dung')
+    expect(h).not.toContain('class="q-opt dung lam-o"')
+    // Cũng không có ô lời giải nào để mở.
+    expect(h).not.toContain('class="q-nut-giai"')
+  })
+
+  it('KhoiBaiLuyen: bản của EM mà không nộp được thì dựng phiếu CHỈ ĐỀ', () => {
+    const src = readFileSync(join(process.cwd(), 'src/components/KhoiBaiLuyen.tsx'), 'utf8')
+    expect(src).toContain('const chiDeChoEm = laCuaEm && !nop')
+    expect(src).toContain("chiDeChoEm ? { anGiai: true } : { nop }")
+    // Cấm quay lại lối cũ: dựng thẳng { nop } cho mọi trường hợp.
+    expect(src).not.toContain('setHtml(dungPhieu(tt, dsDaLoc.slice(0, lay), { nop }))')
   })
 })
