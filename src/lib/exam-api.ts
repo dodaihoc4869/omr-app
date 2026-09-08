@@ -85,6 +85,8 @@ export type LyDoChan =
   | 'khong_thuoc_khoi'
   | 'khong_trong_danh_sach'
   | 'sai_ho_so'
+  /** Thầy cho thi lại và khoá theo máy cũ; em đang mở ở máy khác. */
+  | 'sai_may'
   | 'thieu'
 
 /** Phạm vi gửi ca (QUANLYCATHI mục 4): tu_do = ai có mã đều vào · khoi = theo
@@ -201,6 +203,28 @@ export async function trangThaiPhongCho(scriptUrl: string, maCa: string): Promis
     batDauLuc: String(r.batDauLuc ?? ''),
     trangThai: String(r.trangThai ?? ''),
   }
+}
+
+/** CHO MỘT EM THI LẠI — xoá lịch sử lượt cũ, khoá đúng máy cũ, nhận đề mới.
+ *
+ * Thầy chốt 08/09: "nút cho thi lại sẽ xoá lịch sử của bài thi trước, khi bấm
+ * cho thi lại học sinh đăng nhập đúng máy đã thi trước và rút lại đề mới".
+ *
+ * KHÁC `duyetThiLai`: lệnh đó chỉ thêm một lượt, lượt cũ còn nguyên và em thi
+ * "lần 2". Lệnh này xoá hẳn lượt cũ, chi tiết từng câu, bản đồ sai và tổng hợp
+ * chuyên đề của ca — chỉ chừa lại phiếu đã dựng, vì link phiếu có thể đã gửi
+ * phụ huynh. */
+export async function choThiLai(
+  scriptUrl: string,
+  secret: string,
+  maCa: string,
+  sbd: string,
+  boCauMoi: string[],
+  lapMoi?: string[],
+): Promise<{ soLuotXoa: number; soCauXoa: number; khoaMay: boolean; daDoiDe: boolean }> {
+  const r = await postJson(scriptUrl, { action: 'choThiLai', secret, maCa, sbd, boCauMoi, lapMoi })
+  if (!r.ok) throw new Error(r.error || 'Không cho thi lại được')
+  return { soLuotXoa: Number(r.soLuotXoa) || 0, soCauXoa: Number(r.soCauXoa) || 0, khoaMay: r.khoaMay === true, daDoiDe: r.daDoiDe === true }
 }
 
 /** BẢN ĐỒ SAI TỪNG CÂU của mấy ca, đọc MỘT LƯỢT từ máy chủ.
@@ -329,6 +353,8 @@ export function thongDiepChan(kq: Extract<KetQuaVaoThi, { ok: false }>, gio: (is
       return 'Ca kiểm tra này đã đóng.'
     case 'dang_lam_may_khac':
       return 'Số báo danh này đang làm bài ở máy khác. Nếu đúng là em, mở lại trên máy đã bắt đầu; nếu không, báo thầy ngay.'
+    case 'sai_may':
+      return 'Thầy cho em thi lại trên ĐÚNG máy em đã thi lần trước. Mở lại link trên máy đó, hoặc báo thầy.'
     case 'da_nop':
       return `Em đã nộp bài ca này${kq.nopLuc ? ` lúc ${gio(kq.nopLuc)}` : ''}${kq.lanThu && kq.lanThu > 1 ? ` (lần ${kq.lanThu})` : ''}. Muốn thi lại, xin thầy duyệt.`
     case 'chua_mo':

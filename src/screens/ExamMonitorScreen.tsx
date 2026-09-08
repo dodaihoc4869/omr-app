@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, RefreshCw, Trash2, ArrowLeft, ChevronRight, Images, FileSpreadsheet, FileJson, Lock, Unlock, Send, Pencil, LogIn, BarChart3 } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
-import { batDauThi, chiTietCa, doiTenCa, dongBoTenCa, duyetThiLai, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
+import { batDauThi, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
 import { chuanTenCa, tenHienCua, TEN_CA_TOI_DA } from '../lib/ten-ca'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { goiPhieuCaZip, tenTepZipCa, chuyenDeTuChiTiet, type EmTrongCaDeXuatPhieu } from '../lib/phieu-hang-loat'
@@ -21,6 +21,7 @@ import { docCheDoDeRieng, docDeRiengCa, docSoCauCa, loadScriptUrl, loadSessionTe
 import { CHU_LY_DO_THIEU } from '../lib/de-rieng'
 import { CAU_HINH_DE_RIENG_MAC_DINH } from '../lib/cau-hinh-de-rieng'
 import { dungDeRiengChoCa } from '../lib/de-rieng-nguon'
+import { choEmThiLai } from '../lib/thi-lai'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { soanTinRoiMan } from '../lib/phieu-zalo'
@@ -410,8 +411,12 @@ export default function ExamMonitorScreen() {
     setXacNhanSbd(null)
     setDangDuyet(sbd)
     try {
-      const lan = await duyetThiLai(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, sbd)
-      showToast(`Đã duyệt — em vào lại link là làm lần ${lan}`, 'success')
+      // CHO THI LẠI nay là ba việc trong một (thầy chốt 08/09): xoá lịch sử
+      // lượt cũ, khoá đúng máy em đã thi, và rút ĐỀ MỚI.
+      const kq = await choEmThiLai(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, sbd)
+      const phan = [`xoá ${kq.soLuotXoa} lượt cũ`, kq.daDoiDe ? `đề mới ${kq.soCauKhac}/${kq.soCauMoi} câu khác đề cũ` : 'GIỮ ĐỀ CŨ']
+      phan.push(kq.khoaMay ? 'chỉ vào được ở máy cũ' : 'lượt cũ không ghi máy nên KHÔNG khoá được máy')
+      showToast(`Đã cho thi lại: ${phan.join(' · ')}.`, kq.daDoiDe && kq.khoaMay ? 'success' : 'warn')
       await tai(chiTiet.ca.maCa, true)
     } catch (e) {
       showToast(`Không duyệt được: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
@@ -1561,13 +1566,21 @@ export default function ExamMonitorScreen() {
                             ))}
                           {daNop &&
                             (xacNhanSbd === e.sbd ? (
-                              <span className="inline-flex items-center" style={{ gap: 4 }}>
-                                <button type="button" onClick={() => handleChoThiLai(e.sbd)} disabled={dangDuyet === e.sbd} className="tap-target font-bold" style={{ ...NHAN_NHO, minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--muc)', color: 'var(--muc-nguoc)' }}>
-                                  {dangDuyet === e.sbd ? '…' : 'Đồng ý cho thi lại'}
+                              /* NÓI RÕ NÓ XOÁ GÌ trước khi thầy bấm. Việc này
+                                 KHÔNG khôi phục được: điểm, bài làm và chi tiết
+                                 từng câu của lượt cũ mất hẳn. */
+                              <span className="inline-flex flex-col" style={{ gap: 4 }}>
+                                <span style={{ ...NHAN_NHO, color: 'var(--do)', lineHeight: 1.5 }}>
+                                  Xoá hẳn điểm và bài làm lượt này của em, rút đề mới, và em chỉ vào lại được ở đúng máy cũ. Không khôi phục được.
+                                </span>
+                                <span className="inline-flex items-center" style={{ gap: 4 }}>
+                                <button type="button" onClick={() => handleChoThiLai(e.sbd)} disabled={dangDuyet === e.sbd} className="tap-target font-bold" style={{ ...NHAN_NHO, minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--do)', color: 'var(--muc-nguoc)' }}>
+                                  {dangDuyet === e.sbd ? '…' : 'Xoá lượt cũ và cho thi lại'}
                                 </button>
                                 <button type="button" onClick={() => setXacNhanSbd(null)} className="tap-target" style={{ ...NHAN_NHO, minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)' }}>
                                   Huỷ
                                 </button>
+                                </span>
                               </span>
                             ) : (
                               <button type="button" onClick={() => setXacNhanSbd(e.sbd)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--muc)', minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien-dam)' }}>

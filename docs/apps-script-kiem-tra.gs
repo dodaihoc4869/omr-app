@@ -747,6 +747,15 @@ function quyetDinhVaoThi_(ca, luot, idThietBi, nowMs, hocSinh) {
     return { ok: false, lyDo: 'dang_lam_may_khac' }
   }
   if (luot && (luot.trangThai === 'da_nop' || luot.trangThai === 'khoa')) return { ok: false, lyDo: 'da_nop', nopLuc: luot.nopLuc, lanThu: luot.lanThu }
+  // CHO THI LẠI KHOÁ THEO MÁY (thầy chốt 08/09): lượt `duoc_duyet_lai` có ghi
+  // sẵn id thiết bị nghĩa là thầy đã chốt em thi lại ở ĐÚNG máy cũ. Máy khác
+  // gõ đúng số báo danh cũng không vào được.
+  //
+  // Chỉ khoá khi dòng CÓ id: `duyetThiLai` (đường cũ) để trống ô này, và ở đó
+  // em vào máy nào cũng được — không đổi hành vi cũ.
+  if (luot && luot.trangThai === 'duoc_duyet_lai' && luot.idThietBi && idThietBi && luot.idThietBi !== idThietBi) {
+    return { ok: false, lyDo: 'sai_may' }
+  }
   // lượt mới (chưa có, hoặc thầy đã duyệt thi lại) → xét cửa sổ vào phòng
   const batDau = ca.batDau ? msCua_(ca.batDau) : NaN
   if (isFinite(batDau) && nowMs < batDau) return { ok: false, lyDo: 'chua_mo', batDau: ca.batDau }
@@ -3286,6 +3295,120 @@ function doPost(e) {
     rowData[20] = new Date().toISOString()
     sh.appendRow(rowData)
     return jsonResponse_({ ok: true, lanThu: lanThu })
+  }
+
+  if (action === 'choThiLai') {
+    // CHO THI LẠI — ba việc trong một lệnh (thầy chốt 08/09):
+    //   1. XOÁ HẲN lịch sử bài thi trước của em trong ca này;
+    //   2. KHOÁ MÁY: em chỉ vào lại được từ đúng cái máy đã thi lượt trước;
+    //   3. ĐỀ MỚI: máy thầy rút bộ câu khác rồi gửi kèm ở `boCauMoi`.
+    //
+    // Khác hẳn `duyetThiLai` cũ (vẫn giữ, dùng cho trường hợp chỉ cần thêm một
+    // lượt mà không xoá gì): ở đó lượt cũ còn nguyên và em thi "lần 2".
+    //
+    // KHÔNG ĐỤNG PHIẾU đã dựng: link báo cáo có thể đã gửi phụ huynh rồi, xoá
+    // nó là phụ huynh bấm vào thấy trang trống. Thầy dựng lại phiếu sau khi em
+    // thi xong là phiếu tự mang số mới.
+    const loiTL = kiemTraMaBiMat_(body)
+    if (loiTL) return jsonResponse_({ ok: false, error: loiTL })
+    const maCaTL = String(body.maCa || '').trim()
+    const sbdTL = String(body.sbd || '').trim()
+    if (!maCaTL || !sbdTL) return jsonResponse_({ ok: false, error: 'Thiếu mã ca hoặc số báo danh' })
+    const shCaTL = sheetCa_()
+    const rowCaTL = findRowByKey_(shCaTL, 0, maCaTL)
+    if (rowCaTL < 0) return jsonResponse_({ ok: false, error: 'Không có ca ' + maCaTL })
+    const caTL = docCa_(shCaTL, rowCaTL)
+
+    const shTL = sheetLuot_()
+    const dataTL = shTL.getDataRange().getValues()
+    let mayCu = ''
+    let hoTenCu = ''
+    let lanCaoNhat = 0
+    const xoaTL = []
+    for (let i = 1; i < dataTL.length; i++) {
+      if (String(dataTL[i][0]) !== maCaTL || String(dataTL[i][1]) !== sbdTL) continue
+      const lan = Number(dataTL[i][2]) || 1
+      // Máy khoá = máy của lượt GẦN NHẤT có ghi id thiết bị. Em thi ở máy nào
+      // thì thi lại ở đúng máy đó.
+      if (lan >= lanCaoNhat && String(dataTL[i][3] || '')) { mayCu = String(dataTL[i][3]); lanCaoNhat = lan }
+      if (!hoTenCu && String(dataTL[i][12] || '')) hoTenCu = String(dataTL[i][12])
+      // ĐANG LÀM thì KHÔNG xoá: cắt ngang em đang làm dở là mất bài đang gõ.
+      if (String(dataTL[i][7] || '') === 'dang_lam') return jsonResponse_({ ok: false, error: 'Em này đang làm bài — khoá ca hoặc đợi em nộp rồi mới cho thi lại' })
+      xoaTL.push(i + 1)
+    }
+    if (xoaTL.length === 0) return jsonResponse_({ ok: false, error: 'Em này chưa có lượt nào trong ca' })
+
+    // Xoá TỪ DƯỚI LÊN, nếu không chỉ số các dòng sau trôi hết.
+    xoaTL.sort(function (a, b) { return b - a })
+    for (let i = 0; i < xoaTL.length; i++) shTL.deleteRow(xoaTL[i])
+
+    // Chi tiết từng câu + bản đồ sai + tổng hợp chuyên đề của ca này: xoá sạch,
+    // nếu không báo cáo và "sai lần thứ mấy" vẫn đếm lượt đã bỏ.
+    let soCtXoa = 0
+    try {
+      const ctShTL = getSheet_(SHEET_CHITIET, CHITIET_HEADERS)
+      const ctDataTL = ctShTL.getDataRange().getValues()
+      const xoaCt = []
+      for (let i = 1; i < ctDataTL.length; i++) {
+        if (String(ctDataTL[i][0]) === maCaTL && String(ctDataTL[i][1]) === sbdTL) xoaCt.push(i + 1)
+      }
+      xoaCt.sort(function (a, b) { return b - a })
+      for (let i = 0; i < xoaCt.length; i++) ctShTL.deleteRow(xoaCt[i])
+      soCtXoa = xoaCt.length
+    } catch (e1) {}
+    try {
+      const bdSh = getSheet_(SHEET_BANDO, BANDO_HEADERS)
+      const bdData = bdSh.getDataRange().getValues()
+      for (let i = bdData.length - 1; i >= 1; i--) {
+        if (String(bdData[i][0]) === maCaTL && String(bdData[i][1]) === sbdTL) bdSh.deleteRow(i + 1)
+      }
+    } catch (e2) {}
+    try {
+      const tdSh = sheetTienDoCa_()
+      const tdData = tdSh.getDataRange().getValues()
+      const lucTL = new Date().toISOString()
+      for (let i = 1; i < tdData.length; i++) {
+        if (String(tdData[i][0]) === sbdTL && String(tdData[i][1]) === maCaTL) {
+          tdSh.getRange(i + 1, 4, 1, 4).setValues([[0, 0, '', lucTL]])
+        }
+      }
+    } catch (e3) {}
+
+    // ĐỀ MỚI cho riêng em này: ghi vào chính bản đồ đề riêng của ca. Không đụng
+    // luật hash, không đổi bộ câu của bạn nào khác.
+    let daDoiDe = false
+    if (Object.prototype.toString.call(body.boCauMoi) === '[object Array]' && body.boCauMoi.length > 0) {
+      try {
+        const goiCu = caTL.boTheoEmRef ? doiGoiDeRieng_(docJsonLon_(caTL.boTheoEmRef)) : { bo: null, lap: {} }
+        const boTL = goiCu.bo && typeof goiCu.bo === 'object' ? goiCu.bo : {}
+        const lapTL = goiCu.lap && typeof goiCu.lap === 'object' ? goiCu.lap : {}
+        boTL[sbdTL] = body.boCauMoi
+        if (Object.prototype.toString.call(body.lapMoi) === '[object Array]') lapTL[sbdTL] = body.lapMoi
+        else delete lapTL[sbdTL]
+        shCaTL.getRange(rowCaTL, 28).setValue(luuJsonLon_('ca_' + maCaTL + '_botheoem', { bo: boTL, lap: lapTL, dem: goiCu.dem || {}, bb: goiCu.bb || null }, caTL.boTheoEmRef))
+        daDoiDe = true
+      } catch (errTL) {
+        return jsonResponse_({ ok: false, error: 'Đã xoá lượt cũ nhưng KHÔNG ghi được đề mới: ' + errTL })
+      }
+    }
+
+    // Lượt mới: lần 1 (lịch sử cũ đã xoá nên không còn "lần 2"), khoá theo máy.
+    const rowMoiTL = []
+    for (let i = 0; i < LUOT_HEADERS.length; i++) rowMoiTL.push('')
+    rowMoiTL[0] = maCaTL
+    rowMoiTL[1] = sbdTL
+    rowMoiTL[2] = 1
+    rowMoiTL[3] = mayCu
+    rowMoiTL[7] = 'duoc_duyet_lai'
+    rowMoiTL[9] = 0
+    rowMoiTL[10] = 0
+    rowMoiTL[12] = hoTenCu || tenHocSinh_(sbdTL)
+    rowMoiTL[17] = body.nguoiDuyet || 'thầy'
+    rowMoiTL[18] = new Date().toISOString()
+    rowMoiTL[19] = mayCu ? 'thi lại — khoá đúng máy cũ' : 'thi lại — lượt cũ không ghi máy, không khoá được'
+    rowMoiTL[20] = new Date().toISOString()
+    shTL.appendRow(rowMoiTL)
+    return jsonResponse_({ ok: true, soLuotXoa: xoaTL.length, soCauXoa: soCtXoa, khoaMay: !!mayCu, daDoiDe: daDoiDe, serverNow: Date.now() })
   }
 
   if (action === 'moKhoa') {
