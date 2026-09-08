@@ -12,6 +12,7 @@ import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from 
 import { batDauThi, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
 import { chuanTenCa, tenHienCua, TEN_CA_TOI_DA } from '../lib/ten-ca'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
+import { emLechDiem, loiBaoLechDiem } from '../lib/lech-diem'
 import { goiPhieuCaZip, tenTepZipCa, chuyenDeTuChiTiet, type EmTrongCaDeXuatPhieu } from '../lib/phieu-hang-loat'
 import { viecCanLamMacDinh } from '../lib/phieu-zalo'
 import { gomLinkPhieu, tomTatLinkPhieu, vanBanLinkPhieu, type DongLinkPhieu } from '../lib/link-phieu-ca'
@@ -432,6 +433,17 @@ export default function ExamMonitorScreen() {
         if (huy) return
         for (const e of can) if (kq.daGhi.includes(e.sbd)) daGhiRef.current.add(`${e.sbd}:${e.moiNhat.lanThu}:${e.moiNhat.nopLuc}`)
         if (kq.tuChoi.length > 0) showToast(`Không ghi được điểm ${kq.tuChoi.length} em lên Sheet`, 'error')
+        // GHI ĐÈ ĐIỂM CŨ THÌ PHẢI NÓI RA. Màn này chấm lại tại chỗ rồi ghi
+        // đè con số trên Sheet — con số mà màn Học sinh, bảng điểm, bản xuất
+        // Excel và phiếu gửi phụ huynh đều đọc. Đổi mà im lặng thì thầy thấy
+        // hai điểm khác nhau ở hai màn và không biết vì sao (đúng việc thầy
+        // báo 08/09). Xem lech-diem.ts.
+        const lech = emLechDiem(
+          can
+            .filter((e) => kq.daGhi.includes(e.sbd))
+            .map((e) => ({ sbd: e.sbd, hoTen: e.hoTen, tongSheet: e.moiNhat.tong, tongChamLai: e.graded!.score.total })),
+        )
+        if (lech.length > 0) showToast(loiBaoLechDiem(lech), 'warn')
       })
       .catch(() => {
         // mất mạng — lần tải sau ghi lại
