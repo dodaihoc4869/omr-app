@@ -769,11 +769,18 @@ body.chua-nop #mo-het, body.chua-nop #chi-de, body.chua-nop #pdf-giai, body.chua
    trúng đáp án đúng thì cú bấm VẪN ĂN (đếm lên, lưu lại) nhưng ô không đổi màu
    một chút nào — nhìn y như không bấm được, bấm lại lần nữa là bỏ chọn.
    Ba đợt trước tôi đi sửa tầng sự kiện chạm; sự kiện chưa bao giờ hỏng.
-   Bộ chọn :not([aria-checked=true]) chừa đúng ô đang chọn ra. KHÔNG lộ đáp án: ô
-   nào em chọn cũng đổi màu như nhau, đúng hay sai chưa nói gì. */
-body.chua-nop .q-opt.dung:not([aria-checked="true"]) { background: #f8fafc !important; border-color: var(--vien) !important; color: var(--muc-2) !important; font-weight: 400 !important; }
-body.chua-nop .q-opt.dung:not([aria-checked="true"]) .q-opt-letter { background: var(--vien-dam) !important; }
-body.chua-nop .tf-badge.dung:not([aria-checked="true"]) { background: #f1f5f9 !important; color: var(--rat-nhat) !important; border-color: var(--vien) !important; }
+   SỬA LẠI 08/09 TỐI. Bản trưa dùng :not([aria-checked=true]) để chừa ô đang chọn
+   ra — TẮT luật giấu cho ô đó. Hậu quả: ô đáp án ĐÚNG khi được chọn rơi về style
+   .dung (xanh lá) còn ô sai rơi về style chọn thường (xám), nên em bấm là biết
+   ngay đúng hay sai. Đo trên Chromium: ô đúng rgb(215,250,232), ô sai
+   rgb(239,243,247). Em nhắn thầy đúng chỗ này.
+   Cách đúng không phải TẮT luật giấu mà là ĐÈ LÊN nó: giấu vẫn áp cho mọi ô
+   mang lớp dung, rồi luật "đang chọn" mang !important đặt ngay sau và thắng.
+   Ô nào em chọn cũng ra CÙNG MỘT MÀU, đúng hay sai chưa nói gì.
+   (Cấm dấu huyền ngược trong khối này: cả khối nằm trong một chuỗi mẫu.) */
+body.chua-nop .q-opt.dung { background: #f8fafc !important; border-color: var(--vien) !important; color: var(--muc-2) !important; font-weight: 400 !important; }
+body.chua-nop .q-opt.dung .q-opt-letter { background: var(--vien-dam) !important; }
+body.chua-nop .tf-badge.dung { background: #f1f5f9 !important; color: var(--rat-nhat) !important; border-color: var(--vien) !important; }
 body.chua-nop .sa-answer { display: none !important; }
 body.chua-nop .sa-blank { display: block !important; }
 .giai-khoa {
@@ -783,13 +790,25 @@ body.chua-nop .sa-blank { display: block !important; }
 body:not(.chua-nop) .giai-khoa { display: none; }
 /* Chế độ "Hiện đề" cũng giấu đáp án — và cũng phải chừa ô em đang chọn, cùng
    một lý do như khối chua-nop bên trên. */
-body.chi-de .q-opt.dung:not([aria-checked="true"]) { background: #f8fafc !important; border-color: var(--vien) !important; color: var(--muc-2) !important; font-weight: 400 !important; }
-body.chi-de .q-opt.dung:not([aria-checked="true"]) .q-opt-letter { background: var(--vien-dam) !important; }
-body.chi-de .tf-badge.dung:not([aria-checked="true"]) { background: #f1f5f9 !important; color: var(--rat-nhat) !important; border-color: var(--vien) !important; }
+body.chi-de .q-opt.dung { background: #f8fafc !important; border-color: var(--vien) !important; color: var(--muc-2) !important; font-weight: 400 !important; }
+body.chi-de .q-opt.dung .q-opt-letter { background: var(--vien-dam) !important; }
+body.chi-de .tf-badge.dung { background: #f1f5f9 !important; color: var(--rat-nhat) !important; border-color: var(--vien) !important; }
 body.chi-de .q-card { border-left-color: var(--vien-dam) !important; }
 body.chi-de .sa-answer { display: none !important; }
 body.chi-de .sa-blank { display: block !important; }
 body.chi-de #mo-het, body.chi-de .thanh-chu b { display: none; }
+
+/* Ô EM ĐANG CHỌN — MỘT MÀU DUY NHẤT, ĐÚNG HAY SAI ĐỀU THẾ.
+   Đặt SAU hai khối giấu bên trên và mang !important nên thắng chúng. Nhờ vậy
+   ô bấm vẫn đổi màu (thầy báo trưa 08/09: "lựa chọn A chưa bao giờ bấm được")
+   mà không lộ đáp án (thầy báo tối 08/09: "bấm 1 đáp án ra hết 4 đáp án").
+   Hai yêu cầu ấy chỉ cùng thoả khi màu ô-đang-chọn KHÔNG phụ thuộc lớp dung. */
+body.chua-nop .q-opt.lam-o[aria-checked="true"],
+body.chi-de .q-opt.lam-o[aria-checked="true"] { background: #eef2f6 !important; border-color: #2f3e46 !important; color: var(--muc) !important; font-weight: 600 !important; }
+body.chua-nop .q-opt.lam-o[aria-checked="true"] .q-opt-letter,
+body.chi-de .q-opt.lam-o[aria-checked="true"] .q-opt-letter { background: #2f3e46 !important; color: #ffffff !important; }
+body.chua-nop .tf-badge.lam-o[aria-checked="true"],
+body.chi-de .tf-badge.lam-o[aria-checked="true"] { background: #2f3e46 !important; border-color: #2f3e46 !important; color: #ffffff !important; }
 
 /* HỘP CHỌN KIỂU PDF — thầy chốt 06/09: bấm Tải PDF phải hỏi tải đề trần hay
    tải cả lời giải, thay vì đoán hộ. Hai lựa chọn ra hai tệp khác hẳn nhau:

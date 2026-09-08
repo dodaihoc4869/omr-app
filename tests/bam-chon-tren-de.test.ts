@@ -104,17 +104,27 @@ describe('BẤM THẬT trên phiếu, không chỉ soi chuỗi', () => {
 //
 // Ba đợt trước tôi đi sửa tầng sự kiện chạm. Sự kiện chưa bao giờ hỏng.
 describe('Ô ĐÁP ÁN ĐÚNG: chọn xong phải ĐỔI MÀU, nhưng chưa chọn thì không lộ', () => {
-  it('luật giấu đáp án chừa ô đang chọn ra, ở CẢ hai chế độ giấu', () => {
+  // HỢP ĐỒNG NÀY ĐÃ ĐỔI TỐI 08/09, và đổi vì nó SAI.
+  //
+  // Bản trưa đòi luật giấu phải mang :not([aria-checked="true"]) để chừa ô đang
+  // chọn. Cách đó chữa được "bấm không đổi màu" nhưng đẻ ra lỗi nặng hơn: ô đáp
+  // án ĐÚNG khi được chọn rơi về style .dung (xanh lá) còn ô sai rơi về style
+  // chọn thường (xám), nên em bấm là biết ngay đúng hay sai. Em nhắn thầy:
+  // "đs bấm 1 đáp án ra hết 4 đáp án luôn thầy".
+  //
+  // Hợp đồng mới MẠNH HƠN, không phải nhẹ hơn: giấu áp cho MỌI ô dung, và màu
+  // ô-đang-chọn không được phụ thuộc lớp dung. Xem khối "BẤM KHÔNG ĐƯỢC LỘ ĐÁP
+  // ÁN" ở cuối tệp.
+  it('luật giấu đáp án áp cho MỌI ô đáp án đúng, ở CẢ hai chế độ giấu', () => {
     const h = dungPhieu(tt, [cau('q1', 'I'), cau('q2', 'II')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x' } })
     for (const lop of ['chua-nop', 'chi-de']) {
-      expect(h).toContain(`body.${lop} .q-opt.dung:not([aria-checked="true"]) {`)
-      expect(h).toContain(`body.${lop} .q-opt.dung:not([aria-checked="true"]) .q-opt-letter {`)
-      expect(h).toContain(`body.${lop} .tf-badge.dung:not([aria-checked="true"]) {`)
+      expect(h).toContain(`body.${lop} .q-opt.dung { background`)
+      expect(h).toContain(`body.${lop} .q-opt.dung .q-opt-letter { background`)
+      expect(h).toContain(`body.${lop} .tf-badge.dung { background`)
+      // Bộ chọn :not(...) chính là thứ đã làm lộ đáp án — cấm quay lại.
+      expect(h).not.toContain(`body.${lop} .q-opt.dung:not([aria-checked="true"])`)
+      expect(h).not.toContain(`body.${lop} .tf-badge.dung:not([aria-checked="true"])`)
     }
-    // Và KHÔNG còn luật trần nào đè lên mọi ô `dung`.
-    expect(h).not.toContain('body.chua-nop .q-opt.dung { background')
-    expect(h).not.toContain('body.chi-de .q-opt.dung { background')
-    expect(h).not.toContain('body.chua-nop .tf-badge.dung { background')
   })
 
   it('BẤM THẬT vào đúng ô đáp án đúng: aria bật, đếm lên, lưu đúng', () => {
@@ -203,5 +213,66 @@ describe('MỘT CÚ CHẠM = MỘT LẦN CHỌN, trên mọi máy', () => {
     chamVao(d, false)
     d.click()
     expect(d.getAttribute('aria-checked')).toBe('true')
+  })
+})
+
+// BẤM LÀ BIẾT ĐÚNG SAI — thầy báo tối 08/09, kèm ảnh chat của em:
+// "đs bấm 1 đáp án ra hết 4 đáp án luôn thầy".
+//
+// HỒI QUY DO CHÍNH BẢN VÁ TRƯA 08/09. Bản trưa chữa "lựa chọn A chưa bao giờ
+// bấm được" bằng cách thêm :not([aria-checked="true"]) vào luật giấu đáp án,
+// tức TẮT luật giấu cho ô đang chọn. Hậu quả: ô đáp án ĐÚNG khi được chọn rơi
+// về style .dung (xanh lá), ô sai rơi về style chọn thường (xám). Đo trên
+// Chromium: ô đúng rgb(215,250,232), ô sai rgb(239,243,247).
+//
+// Cách đúng: giấu vẫn áp cho MỌI ô dung, rồi luật "đang chọn" mang !important
+// đặt SAU và thắng. Hai yêu cầu (bấm phải đổi màu; không lộ đáp án) chỉ cùng
+// thoả khi màu ô-đang-chọn KHÔNG phụ thuộc lớp dung.
+describe('BẤM KHÔNG ĐƯỢC LỘ ĐÁP ÁN', () => {
+  it('luật giấu áp cho MỌI ô dung, KHÔNG chừa ô đang chọn', () => {
+    const h = dungPhieu(tt, [cau('q1', 'I'), cau('q2', 'II')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x' } })
+    for (const lop of ['chua-nop', 'chi-de']) {
+      expect(h).toContain(`body.${lop} .q-opt.dung {`)
+      expect(h).toContain(`body.${lop} .tf-badge.dung {`)
+      // Bộ chọn :not(...) là đúng thứ đã làm lộ đáp án — cấm quay lại.
+      expect(h).not.toContain(`body.${lop} .q-opt.dung:not([aria-checked="true"])`)
+      expect(h).not.toContain(`body.${lop} .tf-badge.dung:not([aria-checked="true"])`)
+    }
+  })
+
+  it('luật ô ĐANG CHỌN đè lên luật giấu, ở CẢ hai chế độ, và mang !important', () => {
+    const h = dungPhieu(tt, [cau('q1', 'I')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x' } })
+    // Bắt nguyên KHỐI LUẬT, không bắt chuỗi rời: chuỗi rời còn xuất hiện ở luật
+    // con .q-opt-letter nên `toContain` trần vẫn xanh khi selector chính bị phá.
+    // Đã dính đúng bẫy đó lúc phá mã lần hai.
+    const khoi = [
+      /body\.chua-nop \.q-opt\.lam-o\[aria-checked="true"\],\s*\n\s*body\.chi-de \.q-opt\.lam-o\[aria-checked="true"\] \{[^}]*!important[^}]*\}/,
+      /body\.chua-nop \.q-opt\.lam-o\[aria-checked="true"\] \.q-opt-letter,\s*\n\s*body\.chi-de \.q-opt\.lam-o\[aria-checked="true"\] \.q-opt-letter \{[^}]*!important[^}]*\}/,
+      /body\.chua-nop \.tf-badge\.lam-o\[aria-checked="true"\],\s*\n\s*body\.chi-de \.tf-badge\.lam-o\[aria-checked="true"\] \{[^}]*!important[^}]*\}/,
+    ]
+    for (const re of khoi) expect(h, `thiếu khối: ${re}`).toMatch(re)
+    // Phải đứng SAU khối giấu thì mới thắng.
+    expect(h.search(khoi[0])).toBeGreaterThan(h.indexOf('body.chua-nop .q-opt.dung {'))
+    expect(h.search(khoi[0])).toBeGreaterThan(h.indexOf('body.chi-de .q-opt.dung {'))
+    // Và màu ô-đang-chọn KHÔNG được nhắc tới lớp dung — nhắc là lại phụ thuộc
+    // đúng/sai, tức lại lộ đáp án.
+    for (const re of khoi) expect(h.match(re)![0]).not.toContain('dung')
+  })
+
+  it('BẤM THẬT: ô đúng và ô sai đổi màu NHƯ NHAU (đọc qua lớp, không đọc màu)', () => {
+    moPhieu(dungPhieu(tt, [cau('q1', 'I')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x' } }))
+    const oA = document.querySelector<HTMLElement>('.q-card[data-qid="q1"] .q-opt.lam-o[data-chon="A"]')!
+    const oB = document.querySelector<HTMLElement>('.q-card[data-qid="q1"] .q-opt.lam-o[data-chon="B"]')!
+    expect(oA.className).toContain('dung')
+    expect(oB.className).not.toContain('dung')
+    oA.click()
+    expect(oA.getAttribute('aria-checked')).toBe('true')
+    oB.click()
+    expect(oB.getAttribute('aria-checked')).toBe('true')
+    expect(oA.getAttribute('aria-checked')).toBe('false')
+    // Hai ô chỉ khác nhau ĐÚNG một lớp `dung`; mọi lớp khác phải giống hệt, để
+    // không có chỗ nào cho CSS bám vào mà tô khác màu.
+    const bo = (el: HTMLElement) => el.className.split(/\s+/).filter((x) => x && x !== 'dung').sort().join(' ')
+    expect(bo(oA)).toBe(bo(oB))
   })
 })

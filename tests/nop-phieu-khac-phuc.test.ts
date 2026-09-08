@@ -303,8 +303,8 @@ describe('CHƯA NỘP: bịt ĐỦ BỐN đường tới đáp án (thầy bắt
   })
 
   it('TÔ ĐÁP ÁN ĐÚNG trên thân câu cũng tắt — phòng khi một thẻ lọt vào trạng thái mở', () => {
-    expect(html).toContain('body.chua-nop .q-opt.dung:not([aria-checked="true"]) { background: #f8fafc !important;')
-    expect(html).toContain('body.chua-nop .tf-badge.dung:not([aria-checked="true"]) {')
+    expect(html).toContain('body.chua-nop .q-opt.dung { background: #f8fafc !important;')
+    expect(html).toContain('body.chua-nop .tf-badge.dung {')
     expect(html).toContain('body.chua-nop .sa-answer { display: none !important; }')
   })
 
