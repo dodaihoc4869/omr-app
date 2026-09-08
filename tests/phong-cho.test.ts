@@ -33,11 +33,13 @@ function gia(tra: unknown) {
 }
 
 describe('máy chủ — cột và cổng', () => {
-  it('hai cột mới nằm CUỐI CA_HEADERS, không chen vào giữa', () => {
+  it('cột mới nằm CUỐI CA_HEADERS, không chen vào giữa', () => {
     // Chen vào giữa là mọi ca cũ lệch cột: điểm thành tên, tên thành phạm vi.
-    expect(GS).toMatch(/'GiuDeDoc', 'AnHanGiay', 'PhongCho', 'BatDauThiLuc'\]/)
+    // 08/09 thêm `BoTheoEmJson` — vẫn nối vào CUỐI, sau `BatDauThiLuc`.
+    expect(GS).toMatch(/'GiuDeDoc', 'AnHanGiay', 'PhongCho', 'BatDauThiLuc', 'BoTheoEmJson'\]/)
     expect(GS).toContain("phongCho: String(v[25] || '') === 'co'")
     expect(GS).toContain("batDauThiLuc: v[26] ? String(v[26]) : ''")
+    expect(GS).toContain("boTheoEmRef: v[27] ? String(v[27]) : ''")
   })
 
   it('ĐANG CHỜ thì không tạo lượt và không gửi đề', () => {

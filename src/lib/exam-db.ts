@@ -198,6 +198,21 @@ export async function docDeRiengCa(maCa: string): Promise<{ boTheoEm: Record<str
   return { boTheoEm: v.boTheoEm, lapCua: v.lapCua ?? {} }
 }
 
+/** CA NÀY MỞ Ở CHẾ ĐỘ ĐỀ RIÊNG TỪNG EM hay không.
+ *
+ * Đánh dấu lúc MỞ ca; bộ câu thì rút lúc thầy bấm Bắt đầu, cho đúng những em
+ * đang đứng ở phòng chờ (thầy chốt 08/09). Hai việc tách nhau nên phải có cờ
+ * riêng — không suy từ `deRiengCa` được, vì lúc mở ca bản đồ chưa tồn tại. */
+export async function luuCheDoDeRieng(maCa: string, bat: boolean): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, bat === true, `cheDoDeRieng:${maCa}`)
+}
+
+export async function docCheDoDeRieng(maCa: string): Promise<boolean> {
+  const db = await getDb()
+  return (await db.get(STORE_SETTINGS, `cheDoDeRieng:${maCa}`)) === true
+}
+
 export async function docSoCauCa(maCa: string): Promise<SoCauMoiPhan | undefined> {
   const db = await getDb()
   const v = (await db.get(STORE_SETTINGS, `soCauCa:${maCa}`)) as SoCauMoiPhan | undefined

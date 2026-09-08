@@ -197,8 +197,16 @@ export async function trangThaiPhongCho(scriptUrl: string, maCa: string): Promis
 
 /** THẦY BẤM BẮT ĐẦU THI. Từ giây đó máy em mới xin đề và đồng hồ mới chạy.
  * Bấm lần hai giữ mốc lần đầu — không kéo dài giờ của em đã vào. */
-export async function batDauThi(scriptUrl: string, secret: string, maCa: string): Promise<{ batDauLuc: string; daBatTruoc: boolean }> {
-  const r = await postJson(scriptUrl, { action: 'batDauThi', secret, maCa })
+export async function batDauThi(
+  scriptUrl: string,
+  secret: string,
+  maCa: string,
+  /** ĐỀ RIÊNG TỪNG EM: bản đồ sbd → qid, dựng từ danh sách em ĐANG CHỜ và gửi
+   * kèm đúng lúc bấm Bắt đầu. Máy chủ ghi bản đồ TRƯỚC khi ghi mốc giờ, nên
+   * không em nào nhận đề trước khi bản đồ có mặt. */
+  boTheoEm?: Record<string, string[]>,
+): Promise<{ batDauLuc: string; daBatTruoc: boolean }> {
+  const r = await postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm })
   if (!r.ok) throw new Error(r.error || 'Không bắt đầu được ca')
   return { batDauLuc: String(r.batDauLuc ?? ''), daBatTruoc: r.daBatTruoc === true }
 }
@@ -1399,6 +1407,12 @@ export interface ChiTietCa {
   /** Những lượt bị cổng danh sách CHẶN, mới nhất trước. Máy chủ cố ý không nói
    * cho em biết sai ô nào, nhưng thầy đứng trong phòng thì phải thấy. */
   biChan?: LuotBiChan[]
+  /** EM ĐANG ĐỨNG Ở PHÒNG CHỜ, vào trước đứng trước.
+   *
+   * Cổng phòng chờ KHÔNG tạo lượt thi, nên đây là nguồn duy nhất trả lời "ai
+   * đang có mặt" — và chế độ đề riêng từng em rút bộ câu đúng theo danh sách
+   * này lúc thầy bấm Bắt đầu (thầy chốt 08/09). */
+  dsCho?: { sbd: string; hoTen: string; vaoLuc: string }[]
 }
 
 /** Một lượt bị cổng vào thi chặn. `lyDo` do máy chủ đặt:
@@ -1442,6 +1456,9 @@ export async function chiTietCa(scriptUrl: string, secret: string, maCa: string,
           namSinhDs: String(b.namSinhDs ?? ''),
           lyDo: String(b.lyDo ?? ''),
         }))
+      : [],
+    dsCho: Array.isArray(r.dsCho)
+      ? (r.dsCho as Record<string, unknown>[]).map((x) => ({ sbd: chuoi(x.sbd), hoTen: chuoi(x.hoTen), vaoLuc: chuoi(x.vaoLuc) })).filter((x) => x.sbd)
       : [],
   }
 }

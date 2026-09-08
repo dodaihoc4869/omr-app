@@ -10,7 +10,9 @@ import { taoChiTietCau } from './chi-tiet-cau'
 import { docDeRiengCa, loadSessionTeacherBank, docSoCauCa, saveSessionTeacherBank } from './exam-db'
 import { mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
 import { CAU_HINH_DE_RIENG_MAC_DINH, type CauHinhDeRieng } from './cau-hinh-de-rieng'
-import type { CaTruocDaCham } from './de-rieng'
+import { demLanSai, dungDeRieng, type CaTruocDaCham, type EmThieuLap } from './de-rieng'
+import { dungUngVien } from './rut-de'
+import { hashSeed } from './exam-shuffle'
 
 export interface CaBoQua {
   maCa: string
@@ -105,6 +107,43 @@ export async function docCacCaTruoc(url: string, mat: string, boCa: string[] = [
     }
   }
   return { dsCa, boQua }
+}
+
+/** DỰNG ĐỀ RIÊNG CHO ĐÚNG NHỮNG EM ĐANG CHỜ, gọi lúc thầy bấm BẮT ĐẦU.
+ *
+ * Kho lấy từ bản đề CÓ đáp án của chính ca này (đã cất lúc mở ca), số câu mỗi
+ * phần lấy từ `soCauCa`. Ca trước quét ngay tại đây — ba lệnh máy chủ, không
+ * phải một lệnh một em.
+ *
+ * Ca hiện tại LOẠI khỏi danh sách quét: nó chính là ca đang mở, chưa ai nộp. */
+export async function dungDeRiengChoCa(
+  url: string,
+  mat: string,
+  maCa: string,
+  dsSbd: string[],
+  ch: CauHinhDeRieng = CAU_HINH_DE_RIENG_MAC_DINH,
+): Promise<{ boTheoEm: Record<string, string[]>; lapCua: Record<string, Record<string, number>>; thieu: EmThieuLap[]; canLap: number; trungBinh: number }> {
+  const bank = await loadSessionTeacherBank(maCa)
+  if (!bank || bank.length === 0) throw new Error('Máy này chưa có bản đề CÓ đáp án của ca')
+  const sc = await docSoCauCa(maCa)
+  if (!sc) throw new Error('Ca này chưa ghi số câu mỗi phần')
+
+  const uv = dungUngVien(bank)
+  const { dsCa } = await docCacCaTruoc(url, mat, [maCa], ch)
+  const ra = dungDeRieng({
+    uv,
+    yc: { soCau: sc, chuyenDe: [], mucDo: [], tranhQid: [], seed: hashSeed(maCa) },
+    dsSbd,
+    dsCa,
+    ch,
+  })
+  return {
+    boTheoEm: ra.boTheoEm,
+    lapCua: lapCuaTungEm(ra.boTheoEm, demLanSai(dsCa)),
+    thieu: ra.thieuLap,
+    canLap: ra.canLap,
+    trungBinh: ra.soLapTrungBinh,
+  }
 }
 
 /** SỐ LẦN EM ĐÃ SAI TỪNG CÂU LẶP, tính TRƯỚC ca sắp mở.

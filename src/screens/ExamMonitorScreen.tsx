@@ -17,7 +17,8 @@ import { viecCanLamMacDinh } from '../lib/phieu-zalo'
 import { gomLinkPhieu, tomTatLinkPhieu, vanBanLinkPhieu, type DongLinkPhieu } from '../lib/link-phieu-ca'
 import { dungPhieuChoEm } from '../lib/phieu-ca-ca'
 import { phieuTheoCa } from '../lib/exam-api'
-import { docDeRiengCa, docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
+import { docCheDoDeRieng, docDeRiengCa, docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuDeRiengCa, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
+import { dungDeRiengChoCa } from '../lib/de-rieng-nguon'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { soanTinRoiMan } from '../lib/phieu-zalo'
@@ -117,6 +118,9 @@ export default function ExamMonitorScreen() {
   const [loi, setLoi] = useState('')
   const [chiTiet, setChiTiet] = useState<ChiTietCa | null>(null)
   const [deRiengCa, setDeRiengCa] = useState<{ boTheoEm: Record<string, string[]>; lapCua: Record<string, Record<string, number>> } | null>(null)
+  /** Ca này MỞ ở chế độ đề riêng — cờ đánh lúc mở ca. Bộ câu thì rút lúc bấm
+   * Bắt đầu, nên hai thứ này tách nhau. */
+  const [caCanDeRieng, setCaCanDeRieng] = useState(false)
   const [teacherBank, setTeacherBank] = useState<TeacherExamSource[] | null>(null)
   // Số câu mỗi phần của ca này (màn Rút đề chốt lúc mở ca). Chấm lại PHẢI dùng
   // đúng con số đó, nếu không thầy rút 25 câu phần I mà máy chỉ lấy 18 ⇒ điểm
@@ -216,6 +220,7 @@ export default function ExamMonitorScreen() {
       // bằng luật hash trong khi em nhận bộ câu theo bản đồ là ra bộ câu của
       // người khác — sai điểm mà màn hình không báo gì.
       setDeRiengCa((await docDeRiengCa(ma.trim()).catch(() => undefined)) ?? null)
+      setCaCanDeRieng(await docCheDoDeRieng(ma.trim()).catch(() => false))
     } catch (e) {
       setLoi(`Không tải được ca: ${e instanceof Error ? e.message : 'lỗi không rõ'}`)
     } finally {
@@ -492,7 +497,25 @@ export default function ExamMonitorScreen() {
     if (!chiTiet) return
     setDangBatDau(true)
     try {
-      const kq = await batDauThi(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa)
+      // ĐỀ RIÊNG TỪNG EM — rút ĐÚNG LÚC NÀY, cho ĐÚNG những em đang đứng chờ.
+      //
+      // Vì sao không rút lúc mở ca: lúc đó chưa biết em nào tới. Bản đầu bó
+      // vào phạm vi "tích từng em" và thầy bắt được ngay — mở ca test32 ở chế
+      // độ khác thì không có bộ nào, không có gì để báo (thầy chốt 08/09).
+      let boTheoEm: Record<string, string[]> | undefined
+      if (caCanDeRieng) {
+        const dsCho = (chiTiet.dsCho ?? []).map((x) => x.sbd).filter(Boolean)
+        if (dsCho.length === 0) {
+          showToast('Chưa em nào vào phòng chờ — chưa rút được đề riêng.', 'error')
+          setDangBatDau(false)
+          return
+        }
+        const ra = await dungDeRiengChoCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, dsCho)
+        boTheoEm = ra.boTheoEm
+        await luuDeRiengCa(chiTiet.ca.maCa, ra.boTheoEm, ra.lapCua)
+        if (ra.thieu.length > 0) showToast(`${ra.thieu.length} em không đủ câu hỏi lại — xem chi tiết trong ca.`, 'warn')
+      }
+      const kq = await batDauThi(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, boTheoEm)
       showToast(kq.daBatTruoc ? 'Ca này đã bắt đầu từ trước.' : 'Đã bắt đầu — cả lớp hiện đề ngay bây giờ.', 'success')
       await tai(chiTiet.ca.maCa)
     } catch (e) {
@@ -980,6 +1003,18 @@ export default function ExamMonitorScreen() {
                 <div style={{ ...NHAN_NHO, marginTop: 'var(--k1)' }}>
                   Em vào ca đang thấy màn chờ, chưa nhận đề và đồng hồ chưa chạy. Bấm Bắt đầu thi thì cả lớp hiện đề cùng một lúc.
                 </div>
+                {/* AI ĐANG CÓ MẶT. Với ca đề riêng, đây chính là danh sách máy
+                    rút bộ câu cho — thầy phải nhìn thấy trước khi bấm, không
+                    phải bấm rồi mới biết ai có phần. */}
+                <div style={{ ...NHAN_NHO, ...SO, marginTop: 'var(--k2)', color: 'var(--muc)' }}>
+                  <b>{(chiTiet.dsCho ?? []).length}</b> em đang chờ
+                  {(chiTiet.dsCho ?? []).length > 0 ? `: ${(chiTiet.dsCho ?? []).map((x) => x.hoTen || `SBD ${x.sbd}`).join(' · ')}` : ' — chưa em nào vào.'}
+                </div>
+                {caCanDeRieng && (
+                  <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)', color: 'var(--tim)' }}>
+                    Ca này hỏi lại câu em từng sai. Bấm Bắt đầu thì máy rút bộ câu riêng cho đúng {(chiTiet.dsCho ?? []).length} em đang chờ — em vào sau đó nhận đề theo luật bốc ngẫu nhiên như ca thường.
+                  </div>
+                )}
                 <div className="grid grid-cols-2" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
                   <button
                     type="button"

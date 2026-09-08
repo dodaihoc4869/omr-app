@@ -114,7 +114,7 @@ const DRIVE_FOLDER = 'OMR-APP-DATA'
 //   BatDauThiLuc thầy bấm "Bắt đầu thi" lúc nào. Rỗng = chưa bấm.
 // `boSungTieuDe_` tự thêm hai cột này vào sheet cũ, ca cũ đọc ra rỗng nên chạy
 // y như trước.
-const CA_HEADERS = ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson', 'BatDau', 'HetHanVao', 'TrangThai', 'TenCa', 'PhamVi', 'DanhSachMoi', 'NguoiTao', 'XoaLuc', 'NguongLan', 'NguongGiay', 'Loai', 'HanNop', 'KhoaLuc', 'KhoaBoi', 'MoKhoaLuc', 'LenBang', 'GiuDeDoc', 'AnHanGiay', 'PhongCho', 'BatDauThiLuc']
+const CA_HEADERS = ['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson', 'BatDau', 'HetHanVao', 'TrangThai', 'TenCa', 'PhamVi', 'DanhSachMoi', 'NguoiTao', 'XoaLuc', 'NguongLan', 'NguongGiay', 'Loai', 'HanNop', 'KhoaLuc', 'KhoaBoi', 'MoKhoaLuc', 'LenBang', 'GiuDeDoc', 'AnHanGiay', 'PhongCho', 'BatDauThiLuc', 'BoTheoEmJson']
 
 /** Đọc cột GiuDeDoc: CHỈ chuỗi 'co' mới là BẬT. Ô trống = tắt. */
 function giuDeDocCua_(v) {
@@ -215,6 +215,51 @@ const SHEET_CHANVAO = 'ChanVao'
 const CHANVAO_HEADERS = ['Luc', 'MaCa', 'SBD', 'HoTenGoi', 'NamSinhGoi', 'HoTenDs', 'NamSinhDs', 'LyDo']
 /** Số dòng nhật ký chặn giữ lại cho MỘT ca khi trả về màn Theo dõi. */
 const CHANVAO_TOI_DA = 40
+
+// AI ĐANG ĐỨNG Ở PHÒNG CHỜ.
+//
+// Cổng phòng chờ trả em về màn chờ mà KHÔNG tạo lượt thi — nên trước 08/09
+// máy chủ không biết ai đang chờ, và thầy cũng không. Chế độ ĐỀ RIÊNG TỪNG EM
+// rút bộ câu đúng lúc thầy bấm Bắt đầu, nên phải biết chính xác em nào có mặt.
+//
+// Một em một dòng, vào lại thì cập nhật giờ chứ không đẻ dòng mới.
+const SHEET_CHO = 'PhongCho'
+const CHO_HEADERS = ['Khoa', 'MaCa', 'SBD', 'HoTen', 'VaoLuc']
+
+/** Ghi em vào phòng chờ. Ghi hỏng KHÔNG được chặn em — em vẫn phải vào được
+ * màn chờ, chỉ là thầy thiếu một tên trong danh sách. */
+function ghiPhongCho_(maCa, sbd, hoTen) {
+  try {
+    const sh = getSheet_(SHEET_CHO, CHO_HEADERS)
+    boSungTieuDe_(sh, CHO_HEADERS)
+    const khoa = String(maCa || '') + '|' + String(sbd || '')
+    const dong = [khoa, String(maCa || ''), String(sbd || ''), String(hoTen == null ? '' : hoTen), new Date().toISOString()]
+    const cu = findRowByKey_(sh, 0, khoa)
+    if (cu > 0) sh.getRange(cu, 1, 1, dong.length).setValues([dong])
+    else sh.appendRow(dong)
+  } catch (err) {
+    // nuốt: nhật ký hỏng không được chặn em vào phòng chờ
+  }
+}
+
+/** Danh sách em đang chờ của MỘT ca, vào trước đứng trước. */
+function docPhongCho_(maCa) {
+  try {
+    const ss = bang_()
+    const sh = ss.getSheetByName(SHEET_CHO)
+    if (!sh || sh.getLastRow() < 2) return []
+    const d = sh.getDataRange().getValues()
+    const out = []
+    for (let i = 1; i < d.length; i++) {
+      if (String(d[i][1]).trim() !== String(maCa).trim()) continue
+      out.push({ sbd: String(d[i][2] || ''), hoTen: String(d[i][3] || ''), vaoLuc: String(d[i][4] || '') })
+    }
+    out.sort(function (a, b) { return String(a.vaoLuc).localeCompare(String(b.vaoLuc)) })
+    return out
+  } catch (err) {
+    return []
+  }
+}
 
 /** Ghi một lượt bị chặn. Ghi hỏng KHÔNG được làm hỏng lượt vào thi — em đang
  * đứng chờ, nhật ký chỉ là chuyện phụ. */
@@ -319,6 +364,20 @@ function docJsonLon_(cell) {
   if (!v) return null
   if (v.indexOf('drive:') === 0) return JSON.parse(DriveApp.getFileById(v.slice(6)).getBlob().getDataAsString('UTF-8'))
   return JSON.parse(v)
+}
+
+/** Gắn bản đồ ĐỀ RIÊNG TỪNG EM vào một gói đề đã đọc ra.
+ *
+ * Bản đồ cất ở CỘT RIÊNG chứ không nhét vào gói đề: gói đề có thể nằm trên
+ * Drive, sửa nó là phải đọc cả megabyte rồi ghi lại — mà bản đồ thì đổi vào
+ * đúng lúc thầy bấm Bắt đầu, giữa lúc cả lớp đang chờ. */
+function gopBoTheoEm_(goi, ref) {
+  if (!goi || !ref) return goi
+  try {
+    const bo = docJsonLon_(ref)
+    if (bo && typeof bo === 'object') goi.boTheoEm = bo
+  } catch (err) {}
+  return goi
 }
 
 function maBiMat_() {
@@ -472,6 +531,9 @@ function docCa_(sh, row) {
     anHanGiay: anHanGiayCua_(v[24]),
     phongCho: String(v[25] || '') === 'co',
     batDauThiLuc: v[26] ? String(v[26]) : '',
+    // ĐỀ RIÊNG TỪNG EM ghi lúc thầy bấm BẮT ĐẦU, không phải lúc mở ca: lúc mở
+    // ca chưa biết em nào tới. Xem NOP/DE-RIENG — bản đồ sbd → qid.
+    boTheoEmRef: v[27] ? String(v[27]) : '',
   }
 }
 
@@ -1465,7 +1527,9 @@ function doGet(e) {
       batDau: ca.batDau,
       hetHanVao: ca.hetHanVao,
       serverNow: Date.now(),
-      bank: docJsonLon_(ca.bankRef),
+      // Bản đồ đề riêng đi CÙNG gói đề: thiếu nó là máy em cắt câu theo luật
+      // hash và nhận bộ câu của người khác.
+      bank: gopBoTheoEm_(docJsonLon_(ca.bankRef), ca.boTheoEmRef),
     })
   }
   if (action === 'ketQua') {
@@ -2235,7 +2299,7 @@ function doPost(e) {
       //
       // Thiếu `keyBankRef` (ca thầy đặt "không công bố điểm") thì trả null và
       // nói rõ, chứ không đưa bản không chấm được rồi để em nhìn màn hỏng.
-      bank: caXD.keyBankRef ? docJsonLon_(caXD.keyBankRef) : null,
+      bank: caXD.keyBankRef ? gopBoTheoEm_(docJsonLon_(caXD.keyBankRef), caXD.boTheoEmRef) : null,
     })
   }
 
@@ -2899,6 +2963,9 @@ function doPost(e) {
       // Em đã có lượt (vào rồi, thoát ra vào lại) thì KHÔNG bị đẩy về phòng
       // chờ — bài của em đang chạy dở.
       if (ca.phongCho && !ca.batDauThiLuc && !luot) {
+        // GHI TÊN EM ĐANG CHỜ. Chế độ đề riêng rút bộ câu đúng lúc thầy bấm
+        // Bắt đầu, nên danh sách này là thứ quyết định ai có phần.
+        ghiPhongCho_(maCa, sbd, dong && dong.hoTen ? dong.hoTen : body.hoTen)
         return jsonResponse_({
           ok: true,
           cach: 'cho',
@@ -3132,7 +3199,7 @@ function doPost(e) {
     let danhSachMoi = []
     try { danhSachMoi = ca.danhSachMoi && ca.phamVi === 'chon' ? JSON.parse(ca.danhSachMoi) : [] } catch (err) {}
     ca.danhSachMoi = ca.phamVi === 'chon' ? danhSachMoi : ca.danhSachMoi
-    return jsonResponse_({ ok: true, ca: ca, luot: luot, keyBank: keyBank, biChan: docChanVao_(maCa), serverNow: Date.now() })
+    return jsonResponse_({ ok: true, ca: ca, luot: luot, keyBank: keyBank, biChan: docChanVao_(maCa), dsCho: docPhongCho_(maCa), serverNow: Date.now() })
   }
 
   if (action === 'themEmVaoSheet') {
@@ -3225,6 +3292,19 @@ function doPost(e) {
     if (rowBD < 0) return jsonResponse_({ ok: false, error: 'Không có ca ' + maCaBD })
     const caBD = docCa_(shBD, rowBD)
     if (caBD.batDauThiLuc) return jsonResponse_({ ok: true, batDauLuc: caBD.batDauThiLuc, daBatTruoc: true })
+    // ĐỀ RIÊNG TỪNG EM — bản đồ sbd → qid dựng ĐÚNG LÚC NÀY, từ danh sách em
+    // đang đứng ở phòng chờ. Dựng lúc mở ca thì phải đoán trước ai tới, mà lớp
+    // hôm đủ hôm thiếu (thầy chốt 08/09).
+    //
+    // Ghi TRƯỚC mốc giờ: mốc giờ là thứ mở cổng phát đề, ghi nó trước mà bản
+    // đồ chưa có là có em nhận đề theo luật hash rồi mới có bản đồ.
+    if (body.boTheoEm && typeof body.boTheoEm === 'object') {
+      try {
+        shBD.getRange(rowBD, 28).setValue(luuJsonLon_('ca_' + maCaBD + '_botheoem', body.boTheoEm, caBD.boTheoEmRef))
+      } catch (errBD) {
+        return jsonResponse_({ ok: false, error: 'Không ghi được bộ câu riêng: ' + errBD })
+      }
+    }
     const lucBD = new Date().toISOString()
     shBD.getRange(rowBD, 27).setValue(lucBD)
     return jsonResponse_({ ok: true, batDauLuc: lucBD, daBatTruoc: false })
