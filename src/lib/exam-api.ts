@@ -144,6 +144,15 @@ export type KetQuaVaoThi =
        * Máy chủ chỉ trả phần của em đang thi, không trả bản đồ cả lớp: gửi cả
        * bản đồ là mỗi em đọc được câu bạn từng sai. */
       cauLap?: string[]
+      /** BỘ CÂU CỦA CHÍNH EM NÀY — qid đúng tờ đề em phải nhận.
+       *
+       * Thầy bắt được 08/09: lệnh này gửi kho đề mà KHÔNG kèm bản đồ, nên máy
+       * em cắt 28 câu theo luật hash còn máy thầy chấm theo bản đồ. Hai tờ đề
+       * khác nhau ⇒ điểm sai và không câu hỏi lại nào vào được đề.
+       *
+       * Về ở TRƯỜNG RIÊNG chứ không chỉ trong `bank`: máy em có thể đã cất kho
+       * đề từ lần vào trước, lúc đó `bank` không về mà bản đồ vẫn phải tới. */
+      boCuaEm?: string[]
     }
   | { ok: false; lyDo: LyDoChan; nopLuc?: string; lanThu?: number; batDau?: string; hetHanVao?: string; namSinh?: string; error?: string }
 
@@ -337,6 +346,7 @@ export async function vaoThi(
       daMoKhoa: r.daMoKhoa === true,
       bank: r.bank ?? undefined,
       cauLap: cauLapCuaEm(r.cauLap),
+      boCuaEm: cauLapCuaEm(r.boCuaEm),
     }
   }
   return { ok: false, lyDo: r.lyDo ?? 'thieu', nopLuc: r.nopLuc, lanThu: r.lanThu, batDau: r.batDau, hetHanVao: r.hetHanVao, namSinh: r.namSinh, error: r.error }

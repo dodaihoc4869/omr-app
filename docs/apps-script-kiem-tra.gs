@@ -420,6 +420,26 @@ function cauLapCuaEm_(ref, sbd) {
   }
 }
 
+/** BỘ CÂU CỦA ĐÚNG MỘT EM — thứ quyết định em nhận tờ đề nào.
+ *
+ * Thầy bắt được 08/09: lệnh `vaoThi` gửi kho đề mà KHÔNG kèm bản đồ, nên máy em
+ * cắt 28 câu theo luật hash trong khi máy thầy chấm theo bản đồ. Hai tờ đề khác
+ * nhau ⇒ điểm sai và không câu hỏi lại nào vào được đề. `session` (đường cũ) có
+ * kèm bản đồ, `vaoThi` (đường đang chạy) thì không — nên lỗi im lặng suốt.
+ *
+ * Trả riêng phần của em, KHÔNG trả cả bản đồ lớp: bản đồ lớp nói ra bạn bên
+ * cạnh được những câu nào. */
+function boCuaEm_(ref, sbd) {
+  if (!ref) return []
+  try {
+    const bo = doiGoiDeRieng_(docJsonLon_(ref)).bo
+    const ds = bo ? bo[String(sbd).trim()] : null
+    return Object.prototype.toString.call(ds) === '[object Array]' ? ds : []
+  } catch (err) {
+    return []
+  }
+}
+
 /** GHI BẢN ĐỒ SAI — một dòng mỗi (ca, em), ĐÈ dòng cũ của chính em đó.
  *
  * Đè chứ không nối: em thi lại thì bản đồ phải là lượt mới nhất, nếu không ca
@@ -3211,6 +3231,19 @@ function doPost(e) {
     //
     // Đọc trước, ngoài khoá: khoá chỉ còn ôm đúng phần đọc-sửa-ghi LuotThi.
     const bankGui = body.canBank ? docJsonLon_(ca.bankRef) : null
+    // BẢN ĐỒ ĐỀ RIÊNG PHẢI ĐI CÙNG ĐỀ. Thiếu nó là máy em cắt 28 câu theo luật
+    // hash còn máy thầy chấm theo bản đồ — hai tờ đề khác nhau, điểm sai, và
+    // câu hỏi lại không có câu nào vào được đề (thầy bắt được 08/09).
+    //
+    // Gửi RIÊNG trường `boCuaEm` chứ không chỉ nhét vào `bankGui`: máy em có
+    // thể đã cất kho đề từ lần vào trước (`canBank` false), lúc đó `bankGui`
+    // là null mà bản đồ vẫn phải tới nơi.
+    const boCuaEm = boCuaEm_(ca.boTheoEmRef, sbd)
+    if (bankGui && boCuaEm.length > 0) {
+      const chiEm = {}
+      chiEm[sbd] = boCuaEm
+      bankGui.boTheoEm = chiEm
+    }
     const lock = LockService.getScriptLock()
     lock.waitLock(15000)
     try {
@@ -3340,6 +3373,9 @@ function doPost(e) {
       // CÂU HỎI LẠI — máy em đánh dấu "em đã sai câu này buổi trước" ngay trên
       // thẻ câu (thầy chốt 08/09). Chỉ phần của CHÍNH EM này.
       out.cauLap = cauLapCuaEm_(ca.boTheoEmRef, sbd)
+      // BỘ CÂU CỦA EM đi kèm MỌI lần vào, kể cả lần không xin lại kho đề: máy
+      // em ghép vào kho đã cất rồi mới cắt đề.
+      out.boCuaEm = boCuaEm
       // Đề (KHÔNG đáp án) chỉ gửi khi máy em chưa có bản cache — tiết kiệm băng
       // thông. Đã đọc TRƯỚC KHI VÀO KHOÁ, xem `bankGui` bên trên.
       if (body.canBank) out.bank = bankGui

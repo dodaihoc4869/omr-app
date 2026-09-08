@@ -297,33 +297,24 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
 .topic-dot { width: 9px; height: 9px; border-radius: 50%; }
 
 /* ================= Ô LÀM BÀI (phiếu nộp được) =================
-   Cỡ chạm >= 44px: em làm trên điện thoại, ngón tay không nhắm được ô 30px. */
-.lam-vung { margin-top: 10px; padding-top: 9px; border-top: 1px dashed #e2ddd3; }
-.lam-nhan { font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #9a958c; margin-bottom: 7px; }
-.lam-hang { display: flex; gap: 6px; flex-wrap: wrap; }
-/* Ô nhỏ và nhẹ hơn bản đầu: bản đó ô 46px bo 12px màu đen đặc, to hơn cả
-   phương án của đề nên mắt rơi vào ô trả lời trước khi đọc xong đề. Nay ô
-   38px, bo tròn hẳn, viền mảnh — vẫn đủ 38px cho ngón tay trên điện thoại
-   (thầy chốt 08/09: "gọn gàng phù hợp với mẫu hơn"). */
-.lam-o {
-  min-width: 38px; height: 38px; padding: 0 12px; border-radius: 999px; border: 1px solid #e4e0d7; background: #ffffff;
-  font: inherit; font-weight: 600; font-size: 14px; color: #4a4740; cursor: pointer;
-  transition: background-color .12s, border-color .12s, color .12s;
-}
-.lam-o[aria-pressed="true"] { background: #2f3e46; border-color: #2f3e46; color: #ffffff; }
-/* Phần II: mỗi ý một hàng, chữ cái căn trái, cặp Đ/S dính nhau bên phải. */
-.lam-y { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
-.lam-y-ky { width: 18px; font-weight: 600; font-size: 13px; color: #9a958c; }
+   CHỌN NGAY TRÊN PHƯƠNG ÁN, không có hàng "EM CHỌN" riêng nữa (thầy chốt
+   08/09). Hàng phương án của đề vốn đã cao hơn 44px nên cỡ chạm đã đạt; ở đây
+   chỉ thêm con trỏ, viền chọn và trạng thái. */
+.lam-o { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.q-opt.lam-o { transition: background-color .12s, border-color .12s; }
+.q-opt.lam-o[aria-checked="true"] { background: #eef2f6; border-color: #2f3e46; }
+.q-opt.lam-o[aria-checked="true"] .q-opt-letter { background: #2f3e46; color: #ffffff; }
+.tf-badge.lam-o { transition: background-color .12s, border-color .12s, color .12s; }
+.tf-badge.lam-o[aria-checked="true"] { background: #2f3e46; border-color: #2f3e46; color: #ffffff; }
+.lam-o:focus-visible { outline: 3px solid rgba(47,62,70,.35); outline-offset: 2px; }
 .lam-nhap {
-  width: 100%; max-width: 200px; height: 38px; border-radius: 999px; border: 1px solid #e4e0d7;
+  width: 100%; max-width: 260px; height: 40px; border-radius: 10px; border: 1px solid #e4e0d7;
   padding: 0 14px; font: inherit; font-size: 14px; color: #1c1c20; background: #ffffff;
 }
 .lam-nhap:focus { outline: none; border-color: #2f3e46; }
 /* Sau khi nộp: khoá ô lại và tô đúng/sai. Màu KHÔNG đứng một mình — mỗi thẻ
    mang thêm dòng chữ "Đúng"/"Sai" ngay dưới. */
-.q-card.da-cham .lam-o, .q-card.da-cham .lam-nhap { pointer-events: none; opacity: .9; }
-.q-card.cau-dung .lam-vung { border-top-color: #2e8b6b; }
-.q-card.cau-sai .lam-vung { border-top-color: #b42318; }
+.q-card.da-cham .lam-o, .q-card.da-cham .lam-nhap { pointer-events: none; opacity: .95; }
 .lam-ket { margin-top: 8px; font-size: 13px; font-weight: 700; }
 .q-card.cau-dung .lam-ket { color: #2e8b6b; }
 .q-card.cau-sai .lam-ket { color: #b42318; }
@@ -770,25 +761,16 @@ const MUI_TEN = '<svg class="q-mui" viewBox="0 0 24 24" fill="none" stroke="curr
  *
  * `stt` là số thứ tự liên tục trên cả phiếu.
  * `moSan` = true thì thẻ hiện sẵn lời giải (chỉ dùng khi cần bản đọc thẳng). */
-/** Ô LÀM BÀI của một câu — NOP-PHIEU-KHAC-PHUC mục 4.1.
+/** CHỌN NGAY TRÊN PHƯƠNG ÁN CỦA ĐỀ — thầy chốt 08/09:
+ * "làm cho chọn luôn các nút trên bài làm không cần tạo thêm dòng em chọn nữa".
  *
- * Chỉ dựng khi phiếu cho nộp; phiếu cũ và phiếu chỉ đọc KHÔNG mọc thêm byte
- * nào. Cỡ chạm ≥ 44px, một chạm là chọn xong, không cuộn. */
-function oLamHtml(c: CauLuyen): string {
-  const qid = thoat(c.id || '')
-  if (c.phan === 'I') {
-    const o = CHU_PA.map((k) => `<button type="button" class="lam-o" data-chon="${k}" aria-pressed="false">${k}</button>`).join('')
-    return `<div class="lam-vung" data-qid="${qid}" data-phan="I"><div class="lam-nhan">Em chọn</div><div class="lam-hang">${o}</div></div>`
-  }
-  if (c.phan === 'II') {
-    const hang = CHU_Y.map(
-      (y) =>
-        `<div class="lam-y" data-y="${y}"><span class="lam-y-ky">${y}</span><button type="button" class="lam-o" data-chon="D" aria-pressed="false">Đ</button><button type="button" class="lam-o" data-chon="S" aria-pressed="false">S</button></div>`,
-    ).join('')
-    return `<div class="lam-vung" data-qid="${qid}" data-phan="II"><div class="lam-nhan">Em chọn</div>${hang}</div>`
-  }
-  return `<div class="lam-vung" data-qid="${qid}" data-phan="III"><div class="lam-nhan">Em điền</div><input class="lam-nhap" type="text" inputmode="decimal" autocomplete="off" aria-label="Đáp án của em"></div>`
-}
+ * Bản trước dựng thêm một khối "EM CHỌN" bên dưới câu, tức là em đọc phương án
+ * ở trên rồi phải dóng xuống một hàng A B C D khác để chọn — hai lần đọc cho
+ * một việc, và trên điện thoại thì hai chỗ đó không nằm cùng màn hình.
+ *
+ * Nay chính hàng phương án là ô chọn. Không thêm byte nào cho phiếu chỉ đọc:
+ * mọi thứ dưới đây chỉ bật khi `choLam`.
+ */
 
 export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = false, choLam = false): string {
   // Nhãn CHỮA đứng trước mọi nhãn khác: đọc một dòng là biết câu này có mặt
@@ -816,7 +798,8 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
         const dung = CHU_PA[i] === (c.dapAn || '').trim().toUpperCase()
         const anh = c.anhLuaChon?.[i]
         const noi = anh ? anhHtml(anh, 'pa', `Phương án ${CHU_PA[i]}`) : chuHtml(pa)
-        return `<div class="q-opt${dung ? ' dung' : ''}"><div class="q-opt-letter"><span class="ky">${CHU_PA[i]}</span></div><div class="q-opt-text">${noi}${hinhTaiViTri(c, `sau_pa_${CHU_PA[i]}`)}</div></div>`
+        const chon = choLam ? ` lam-o" data-chon="${CHU_PA[i]}" role="radio" aria-checked="false" tabindex="0` : ''
+        return `<div class="q-opt${dung ? ' dung' : ''}${chon}"><div class="q-opt-letter"><span class="ky">${CHU_PA[i]}</span></div><div class="q-opt-text">${noi}${hinhTaiViTri(c, `sau_pa_${CHU_PA[i]}`)}</div></div>`
       })
       .join('')
     than = `<div class="q-options${dai ? ' single-col' : ''}">${o}</div>`
@@ -826,14 +809,20 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
       .map((y, i) => {
         const anh = c.anhLuaChon?.[i]
         const noi = anh ? anhHtml(anh, 'pa', `Ý ${CHU_Y[i]}`) : chuHtml(y)
-        return `<div class="tf-item"><div class="tf-statement">${CHU_Y[i]}. ${noi}${hinhTaiViTri(c, `sau_y_${CHU_Y[i]}`)}</div><div class="tf-o"><div class="tf-badge d${dung[i] ? ' dung' : ''}"><span class="ky">Đ</span></div><div class="tf-badge s${dung[i] ? '' : ' dung'}"><span class="ky">S</span></div></div></div>`
+        const cD = choLam ? ` lam-o" data-chon="D" role="radio" aria-checked="false" tabindex="0` : ''
+        const cS = choLam ? ` lam-o" data-chon="S" role="radio" aria-checked="false" tabindex="0` : ''
+        return `<div class="tf-item"${choLam ? ` data-y="${CHU_Y[i]}"` : ''}><div class="tf-statement">${CHU_Y[i]}. ${noi}${hinhTaiViTri(c, `sau_y_${CHU_Y[i]}`)}</div><div class="tf-o"><div class="tf-badge d${dung[i] ? ' dung' : ''}${cD}"><span class="ky">Đ</span></div><div class="tf-badge s${dung[i] ? '' : ' dung'}${cS}"><span class="ky">S</span></div></div></div>`
       })
       .join('')
     than = `<div class="tf-head"><span>Đ</span><span>S</span></div>${hang}`
   } else {
+    // Phần III cho làm bài: ô điền ĐỨNG THAY dòng kẻ, không thêm hàng mới.
+    const oDien = choLam
+      ? `<input class="lam-nhap" type="text" inputmode="decimal" autocomplete="off" aria-label="Đáp án của em" placeholder="Đáp án của em">`
+      : `<div class="sa-blank">Đáp án: ……………………………</div>`
     than = anGiai
-      ? `<div class="sa-vung"><div class="sa-blank">Đáp án: ……………………………</div></div>`
-      : `<div class="sa-vung"><div class="sa-blank">Đáp án: ……………………………</div><div class="sa-answer"><span class="ky">${chuHtml(c.dapAn || '—')}</span></div></div>`
+      ? `<div class="sa-vung">${oDien}</div>`
+      : `<div class="sa-vung">${oDien}<div class="sa-answer"><span class="ky">${chuHtml(c.dapAn || '—')}</span></div></div>`
   }
 
   // Ảnh cắt cả thân câu LÀ đề bài — có nó thì không in `text` nữa, đúng như màn
@@ -851,7 +840,7 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
           n.viSaoSai ? ` ${thoat(n.viSaoSai)}` : ' Em xem lại lời giải bên dưới rồi tự làm lại từ đầu.'
         }</div>`
       : ''
-  return `<article class="q-card${n ? ' la-chua' : ''}${moSan ? ' mo' : ''}${giai ? '' : ' khong-giai'}" data-so="${stt}" data-phan="${c.phan}" data-muc="${thoat(c.mucDo || '')}">
+  return `<article class="q-card${n ? ' la-chua' : ''}${moSan ? ' mo' : ''}${giai ? '' : ' khong-giai'}" data-so="${stt}" data-phan="${c.phan}" data-muc="${thoat(c.mucDo || '')}"${choLam ? ` data-qid="${thoat(c.id || '')}"` : ''}>
   <div class="q-header"><div class="q-num"><span class="ky">${stt}</span></div><div class="q-tags">${tags}</div></div>
   <div class="q-than">
     ${oLamLai}
@@ -860,7 +849,6 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
     ${hinhTaiViTri(c, 'sau_de')}
     ${than}
     ${hinhTaiViTri(c, 'cuoi_cau')}
-    ${choLam ? oLamHtml(c) : ''}
   </div>
   ${nut}
 </article>`
@@ -1344,8 +1332,10 @@ export const JS_PHIEU = `
         for (var i = 0; i < du.cau.length; i++) if (String(lam[du.cau[i].id] || '').trim()) n++;
         return n;
       }
+      // Ô CHỌN NẰM NGAY TRÊN PHƯƠNG ÁN, nên mọi thứ tra từ thẻ câu.
+      function theLam() { return document.querySelectorAll('.q-card[data-qid]'); }
       function veLam() {
-        var vung = document.querySelectorAll('.lam-vung');
+        var vung = theLam();
         for (var i = 0; i < vung.length; i++) {
           var v = vung[i];
           var qid = v.getAttribute('data-qid');
@@ -1355,17 +1345,17 @@ export const JS_PHIEU = `
             var o = v.querySelector('.lam-nhap');
             if (o && o.value !== giaTri) o.value = giaTri;
           } else if (phan === 'II') {
-            var hangY = v.querySelectorAll('.lam-y');
+            var hangY = v.querySelectorAll('.tf-item[data-y]');
             for (var j = 0; j < hangY.length; j++) {
               var nutY = hangY[j].querySelectorAll('.lam-o');
               for (var k = 0; k < nutY.length; k++) {
-                nutY[k].setAttribute('aria-pressed', giaTri.charAt(j) === nutY[k].getAttribute('data-chon') ? 'true' : 'false');
+                nutY[k].setAttribute('aria-checked', giaTri.charAt(j) === nutY[k].getAttribute('data-chon') ? 'true' : 'false');
               }
             }
           } else {
             var nutPa = v.querySelectorAll('.lam-o');
             for (var m = 0; m < nutPa.length; m++) {
-              nutPa[m].setAttribute('aria-pressed', giaTri === nutPa[m].getAttribute('data-chon') ? 'true' : 'false');
+              nutPa[m].setAttribute('aria-checked', giaTri === nutPa[m].getAttribute('data-chon') ? 'true' : 'false');
             }
           }
         }
@@ -1376,15 +1366,15 @@ export const JS_PHIEU = `
         if (daNop || !e.target || !e.target.closest) return;
         var o = e.target.closest('.lam-o');
         if (!o) return;
-        var v = o.closest('.lam-vung');
+        var v = o.closest('.q-card[data-qid]');
         if (!v) return;
         var qid = v.getAttribute('data-qid');
         var phan = v.getAttribute('data-phan');
         if (phan === 'II') {
-          var hangY = Array.prototype.slice.call(v.querySelectorAll('.lam-y'));
+          var hangY = Array.prototype.slice.call(v.querySelectorAll('.tf-item[data-y]'));
           var cu = String(lam[qid] || '----');
           while (cu.length < hangY.length) cu += '-';
-          var iY = hangY.indexOf(o.closest('.lam-y'));
+          var iY = hangY.indexOf(o.closest('.tf-item[data-y]'));
           if (iY < 0) return;
           lam[qid] = cu.substring(0, iY) + o.getAttribute('data-chon') + cu.substring(iY + 1);
         } else {
@@ -1395,9 +1385,21 @@ export const JS_PHIEU = `
         veLam();
       });
 
+      // Ô chọn là thẻ div (giữ nguyên bố cục hàng phương án), nên phải tự
+      // nhận Enter và Space cho em dùng bàn phím.
+      // (Cấm dấu huyền ngược trong khối này: cả khối nằm trong một chuỗi mẫu.)
+      document.addEventListener('keydown', function (e) {
+        if (daNop || !e.target || !e.target.closest) return;
+        if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+        var oPhim = e.target.closest('.lam-o');
+        if (!oPhim) return;
+        e.preventDefault();
+        oPhim.click();
+      });
+
       document.addEventListener('input', function (e) {
         if (daNop || !e.target || !e.target.classList || !e.target.classList.contains('lam-nhap')) return;
-        var v = e.target.closest('.lam-vung');
+        var v = e.target.closest('.q-card[data-qid]');
         if (!v) return;
         lam[v.getAttribute('data-qid')] = e.target.value;
         luuLam();
@@ -1425,18 +1427,18 @@ export const JS_PHIEU = `
       function toKetQua(kq) {
         var saiCua = {};
         for (var i = 0; i < kq.sai.length; i++) saiCua[kq.sai[i]] = true;
-        var vung = document.querySelectorAll('.lam-vung');
+        var vung = theLam();
         for (var j = 0; j < vung.length; j++) {
-          var v = vung[j];
-          var the = v.closest('.q-card');
-          if (!the) continue;
-          var laSai = !!saiCua[v.getAttribute('data-qid')];
+          var the = vung[j];
+          var qidT = the.getAttribute('data-qid');
+          var laSai = !!saiCua[qidT];
           the.classList.add('da-cham');
           the.classList.add(laSai ? 'cau-sai' : 'cau-dung');
           var d = document.createElement('div');
           d.className = 'lam-ket';
-          d.textContent = laSai ? (String(lam[v.getAttribute('data-qid')] || '').trim() ? 'Sai' : 'Bỏ trống, tính là sai') : 'Đúng';
-          v.appendChild(d);
+          d.textContent = laSai ? (String(lam[qidT] || '').trim() ? 'Sai' : 'Bỏ trống, tính là sai') : 'Đúng';
+          var than = the.querySelector('.q-than');
+          (than || the).appendChild(d);
         }
       }
 

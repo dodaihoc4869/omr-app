@@ -47,26 +47,41 @@ describe('chấm — một luật, hai nơi dùng', () => {
 
 describe('trang phiếu', () => {
   it('KHÔNG KHAI `nop` thì phiếu KHÔNG mọc thêm một byte nào', () => {
-    // Soi THÂN phiếu, không soi bảng kiểu: `.lam-vung` luôn có trong CSS.
+    // Soi THÂN phiếu, không soi bảng kiểu: `.lam-o` luôn có trong CSS.
     const cu = dungPhieu(TT, CAU)
-    expect(cu).not.toContain('class="lam-vung"')
+    expect(cu).not.toContain('lam-o"')
+    expect(cu).not.toContain('class="lam-nhap"')
+    expect(cu).not.toContain('data-qid=')
     expect(cu).not.toContain('id="du-nop"')
     expect(cu).not.toContain('id="nut-nop"')
+    // Phiếu đọc vẫn giữ dòng kẻ đáp án tự luận như cũ.
+    expect(cu).toContain('class="sa-blank"')
     // Và thẻ câu dựng riêng cũng vậy.
-    expect(theCauHtml(CAU[0], 1)).not.toContain('class="lam-vung"')
+    expect(theCauHtml(CAU[0], 1)).not.toContain('lam-o"')
   })
 
-  it('KHAI `nop` thì mỗi câu có ô làm, mỗi phần một kiểu ô', () => {
+  it('KHAI `nop` thì CHỌN NGAY TRÊN PHƯƠNG ÁN, không đẻ thêm dòng "em chọn"', () => {
     const h = dungPhieu(TT, CAU, { nop: NOP })
-    expect((h.match(/class="lam-vung"/g) || []).length).toBe(3)
-    // Phần I: bốn nút A–D.
+    // Không còn khối chọn riêng nào nữa (thầy chốt 08/09).
+    expect(h).not.toContain('class="lam-vung"')
+    expect(h).not.toContain('lam-nhan')
+    expect(h).not.toContain('Em chọn')
+    // Mỗi câu là một thẻ mang data-qid, ô chọn nằm ngay trên thẻ.
+    expect((h.match(/class="q-card"[^>]*data-qid="/g) || []).length).toBe(3)
+    // Phần I: bốn phương án A–D chính là bốn ô bấm.
     const oI = h.slice(h.indexOf('data-qid="q1"'), h.indexOf('data-qid="q2"'))
     for (const k of ['A', 'B', 'C', 'D']) expect(oI).toContain(`data-chon="${k}"`)
-    // Phần II: bốn ý, mỗi ý một cặp Đ/S.
+    expect((oI.match(/class="q-opt[^"]* lam-o" data-chon="/g) || []).length).toBe(4)
+    expect((oI.match(/aria-checked="false"/g) || []).length).toBe(4)
+    // Phần II: bốn ý, mỗi ý một cặp Đ/S ngay trên huy hiệu sẵn có.
     const oII = h.slice(h.indexOf('data-qid="q2"'), h.indexOf('data-qid="q3"'))
-    expect((oII.match(/class="lam-y"/g) || []).length).toBe(4)
-    // Phần III: ô gõ.
-    expect(h.slice(h.indexOf('data-qid="q3"'))).toContain('class="lam-nhap"')
+    expect((oII.match(/class="tf-item" data-y="/g) || []).length).toBe(4)
+    expect((oII.match(/data-chon="D"/g) || []).length).toBe(4)
+    expect((oII.match(/data-chon="S"/g) || []).length).toBe(4)
+    // Phần III: ô gõ thay dòng kẻ.
+    const oIII = h.slice(h.indexOf('data-qid="q3"'))
+    expect(oIII).toContain('class="lam-nhap"')
+    expect(oIII).not.toContain('class="sa-blank"')
   })
 
   it('CÓ THANH NỘP, đếm số câu đã làm', () => {
@@ -238,13 +253,15 @@ describe('nộp xong mới hiện lời giải (thầy chốt 08/09)', () => {
     expect(html).not.toContain('<body class="chua-nop">')
   })
 
-  it('khối EM CHỌN gọn theo mẫu phiếu: ô tròn 38px, không phải khối đen 46px', () => {
+  it('ĐANG CHỌN thì nhìn thấy được, và đã chấm rồi thì khoá tay', () => {
     const html = dungPhieu(tt, [cau('q1')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x' } })
-    expect(html).toContain('min-width: 38px; height: 38px; padding: 0 12px; border-radius: 999px;')
-    // Vẫn đủ 38px cho ngón tay trên điện thoại — ô làm bài KHÔNG được nhỏ hơn.
-    const khoi = html.slice(html.indexOf('.lam-o {'), html.indexOf('.lam-o[aria-pressed'))
-    const cao = /height:\s*(\d+)px/.exec(khoi)
-    expect(Number(cao?.[1])).toBeGreaterThanOrEqual(38)
+    // Ô đang chọn phải đổi nền, không chỉ đổi viền mờ.
+    expect(html).toContain('.q-opt.lam-o[aria-checked="true"] { background: #eef2f6; border-color: #2f3e46; }')
+    expect(html).toContain('.tf-badge.lam-o[aria-checked="true"] { background: #2f3e46; border-color: #2f3e46; color: #ffffff; }')
+    // Bàn phím vẫn thấy ô đang trỏ.
+    expect(html).toContain('.lam-o:focus-visible {')
+    // Chấm xong thì không bấm đổi được nữa.
+    expect(html).toContain('.q-card.da-cham .lam-o, .q-card.da-cham .lam-nhap { pointer-events: none; opacity: .95; }')
   })
 })
 

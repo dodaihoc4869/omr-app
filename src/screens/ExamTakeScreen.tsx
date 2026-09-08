@@ -907,8 +907,16 @@ export default function ExamTakeScreen() {
       // chưa nhận) → về màn Đã nộp và gửi tiếp, không cho làm lại.
       if (kq.cach === 'khoi_phuc' && existing?.submitted) return moLaiDaNop(existing)
 
-      const bank = cached?.bank ?? kq.bank
-      if (!bank) throw new Error('Máy chủ chưa gửi đề — bấm Vào thi lại.')
+      const bankGoc = cached?.bank ?? kq.bank
+      if (!bankGoc) throw new Error('Máy chủ chưa gửi đề — bấm Vào thi lại.')
+      // ĐỀ RIÊNG TỪNG EM: GHÉP BẢN ĐỒ VÀO KHO TRƯỚC KHI CẮT ĐỀ.
+      //
+      // Thầy bắt được 08/09: `vaoThi` gửi kho đề mà thiếu bản đồ, nên máy em
+      // cắt 28 câu theo luật hash còn máy thầy chấm theo bản đồ — hai tờ đề
+      // khác nhau. Ghép ở ĐÂY (không chỉ trông vào `kq.bank`) vì kho đề có thể
+      // là bản đã cất từ lần vào trước, khi đó máy chủ không gửi lại kho.
+      const boEm = kq.boCuaEm ?? []
+      const bank = boEm.length > 0 ? { ...bankGoc, boTheoEm: { [sb]: boEm } } : bankGoc
       if (!cached || kq.bank) await cacheSession({ maCa: ma, lop: kq.lop, thoiGianPhut: kq.thoiGianPhut, bank })
       setBank(bank)
       setLop(kq.lop)
