@@ -216,7 +216,7 @@ describe('nộp xong mới hiện lời giải (thầy chốt 08/09)', () => {
   it('PHIẾU NỘP ĐƯỢC: body mang lớp chua-nop, lời giải bị giấu', () => {
     const html = dungPhieu(tt, [cau('q1')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x' } })
     expect(html).toContain('<body class="chua-nop">')
-    expect(html).toContain('body.chua-nop .q-nut-giai, body.chua-nop .q-giai { display: none !important; }')
+    expect(html).toContain('body.chua-nop .q-nut-giai, body.chua-nop .sol-wrap { display: none !important; }')
     // Và nói rõ vì sao chưa thấy, thay vì để em tưởng phiếu hỏng.
     expect(html).toContain('Lời giải mở ra ngay sau khi em bấm Nộp bài.')
   })
@@ -245,5 +245,55 @@ describe('nộp xong mới hiện lời giải (thầy chốt 08/09)', () => {
     const khoi = html.slice(html.indexOf('.lam-o {'), html.indexOf('.lam-o[aria-pressed'))
     const cao = /height:\s*(\d+)px/.exec(khoi)
     expect(Number(cao?.[1])).toBeGreaterThanOrEqual(38)
+  })
+})
+
+describe('CHƯA NỘP: bịt ĐỦ BỐN đường tới đáp án (thầy bắt được 08/09)', () => {
+  const cau = (id: string, phan: 'I' | 'II' | 'III'): CauLuyen =>
+    ({
+      id,
+      phan,
+      text: 'Câu ' + id,
+      luaChon: phan === 'III' ? undefined : ['a', 'b', 'c', 'd'],
+      dapAn: phan === 'II' ? 'ĐSĐS' : phan === 'III' ? '12,5' : 'A',
+      mucDo: 'biet',
+      chuyenDe: 'Ester – lipid',
+      loiGiai: { buoc: ['Bước 1'], dapAn: 'A' },
+    }) as unknown as CauLuyen
+  const tt = { hoTen: 'Đỗ Đại Học', sbd: '12121212', ngay: new Date('2026-09-08'), tenChuyenDe: 'Ester – lipid', ketQua: '', hienDapAn: false }
+  const html = dungPhieu(tt, [cau('q1', 'I'), cau('q2', 'II'), cau('q3', 'III')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x' } })
+
+  it('1. khối lời giải THẬT (.sol-wrap) bị giấu — không phải một lớp không tồn tại', () => {
+    // Bản đầu giấu `.q-giai`, một lớp KHÔNG có trong phiếu, nên lời giải vẫn mở
+    // được. Đây là phép kiểm chống đúng lỗi đó.
+    expect(html).toContain('class="sol-wrap"')
+    expect(html).toContain('body.chua-nop .q-nut-giai, body.chua-nop .sol-wrap { display: none !important; }')
+  })
+
+  it('2. nút "Mở tất cả" và "Hiện đề" ở thanh trên bị giấu', () => {
+    expect(html).toContain('body.chua-nop #mo-het, body.chua-nop #chi-de, body.chua-nop #pdf-giai, body.chua-nop .dem-giai { display: none !important; }')
+  })
+
+  it('3. bộ đếm "Đã xem lời giải" giấu được RIÊNG, nhãn lọc vẫn còn', () => {
+    expect(html).toContain('<span class="dem-giai">Đã xem lời giải')
+    // Nhãn lọc nằm ngoài span đó nên không bị giấu lây.
+    expect(html).toContain('<span class="the-loc" id="the-loc" hidden>')
+  })
+
+  it('4. tải PDF KÈM lời giải bị giấu, chỉ còn bản đề', () => {
+    expect(html).toContain('id="pdf-de"')
+    expect(html).toContain('body.chua-nop #pdf-giai')
+  })
+
+  it('TÔ ĐÁP ÁN ĐÚNG trên thân câu cũng tắt — phòng khi một thẻ lọt vào trạng thái mở', () => {
+    expect(html).toContain('body.chua-nop .q-opt.dung { background: #f8fafc !important;')
+    expect(html).toContain('body.chua-nop .tf-badge.dung {')
+    expect(html).toContain('body.chua-nop .sa-answer { display: none !important; }')
+  })
+
+  it('PHIẾU THƯỜNG không mất nút nào — thầy vẫn mở tất cả như cũ', () => {
+    const thuong = dungPhieu(tt, [cau('q1', 'I')])
+    expect(thuong).not.toContain('<body class="chua-nop">')
+    expect(thuong).toContain('id="mo-het"')
   })
 })

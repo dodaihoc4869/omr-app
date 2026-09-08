@@ -706,8 +706,26 @@ body.chi-de .q-nut-giai { visibility: hidden; }
    không phải gọi lại máy chủ — phiếu mở từ Zalo hay lúc mất mạng vẫn chạy.
    Đánh đổi, nói thẳng: ai mở mã nguồn trang vẫn đọc được đáp án. Đây là phiếu
    tự luyện ở nhà, không phải bài thi có coi. */
-body.chua-nop .q-nut-giai, body.chua-nop .q-giai { display: none !important; }
-body.chua-nop .thanh-giai { display: none; }
+/* CHƯA NỘP: giấu MỌI đường tới đáp án, không riêng nút trên từng thẻ.
+   Bản đầu chỉ giấu .q-nut-giai và một lớp .q-giai KHÔNG TỒN TẠI (khối lời giải
+   thật tên là .sol-wrap), nên nút "Mở tất cả" ở thanh trên vẫn mở được sạch cả
+   11 câu — thầy bắt được ngay 08/09.
+
+   Bốn đường phải bịt hết:
+     1. nút lời giải trên từng thẻ và khối lời giải;
+     2. nút "Mở tất cả" và "Hiện đề" ở thanh trên (cả hai đều mở đáp án);
+     3. bộ đếm "Đã xem lời giải x/y" — nói ra là có lời giải để xem;
+     4. lựa chọn tải PDF KÈM lời giải.
+   Kèm theo: tô đáp án đúng trên thân câu cũng phải tắt, y như chế độ chi-de,
+   phòng khi một thẻ nào đó lọt vào trạng thái mở.
+   (Cấm dấu huyền ngược trong khối này: cả khối nằm trong một chuỗi mẫu.) */
+body.chua-nop .q-nut-giai, body.chua-nop .sol-wrap { display: none !important; }
+body.chua-nop #mo-het, body.chua-nop #chi-de, body.chua-nop #pdf-giai, body.chua-nop .dem-giai { display: none !important; }
+body.chua-nop .q-opt.dung { background: #f8fafc !important; border-color: var(--vien) !important; color: var(--muc-2) !important; font-weight: 400 !important; }
+body.chua-nop .q-opt.dung .q-opt-letter { background: var(--vien-dam) !important; }
+body.chua-nop .tf-badge.dung { background: #f1f5f9 !important; color: var(--rat-nhat) !important; border-color: var(--vien) !important; }
+body.chua-nop .sa-answer { display: none !important; }
+body.chua-nop .sa-blank { display: block !important; }
 .giai-khoa {
   margin: 0 0 10px; padding: 10px 14px; border-radius: 12px; background: #fdf6e7;
   color: #8a6d1f; font-size: 12.5px; font-weight: 600; line-height: 1.5;
@@ -1094,7 +1112,7 @@ export function thanhHtml(soCau: number, anGiai = false): string {
 </div>`
   }
   return `<div class="thanh">
-  <div class="thanh-chu">Đã xem lời giải <b id="dem-mo">0</b>/<span id="dem-tong">${soCau}</span> câu<span class="the-loc" id="the-loc" hidden> · <b id="ten-loc"></b></span></div>
+  <div class="thanh-chu"><span class="dem-giai">Đã xem lời giải <b id="dem-mo">0</b>/<span id="dem-tong">${soCau}</span> câu</span><span class="the-loc" id="the-loc" hidden> · <b id="ten-loc"></b></span></div>
   <button class="nut nho" type="button" id="bo-loc" hidden>Bỏ lọc</button>
   <button class="nut" type="button" id="chi-de" aria-pressed="false" title="Giấu đáp án và lời giải để đọc đề trần"><span class="chu-mo">Hiện đề</span><span class="chu-dong">Hiện cả lời giải</span></button>
   <button class="nut chinh" type="button" id="mo-het" aria-pressed="false"><span class="chu-mo">Mở tất cả</span><span class="chu-dong">Đóng tất cả</span></button>
