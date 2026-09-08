@@ -298,20 +298,27 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
 
 /* ================= Ô LÀM BÀI (phiếu nộp được) =================
    Cỡ chạm >= 44px: em làm trên điện thoại, ngón tay không nhắm được ô 30px. */
-.lam-vung { margin-top: 12px; padding-top: 10px; border-top: 1px dashed #d8d3c8; }
-.lam-nhan { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #67646f; margin-bottom: 6px; }
-.lam-hang { display: flex; gap: 8px; flex-wrap: wrap; }
+.lam-vung { margin-top: 10px; padding-top: 9px; border-top: 1px dashed #e2ddd3; }
+.lam-nhan { font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #9a958c; margin-bottom: 7px; }
+.lam-hang { display: flex; gap: 6px; flex-wrap: wrap; }
+/* Ô nhỏ và nhẹ hơn bản đầu: bản đó ô 46px bo 12px màu đen đặc, to hơn cả
+   phương án của đề nên mắt rơi vào ô trả lời trước khi đọc xong đề. Nay ô
+   38px, bo tròn hẳn, viền mảnh — vẫn đủ 38px cho ngón tay trên điện thoại
+   (thầy chốt 08/09: "gọn gàng phù hợp với mẫu hơn"). */
 .lam-o {
-  min-width: 46px; height: 46px; border-radius: 12px; border: 1.5px solid #e9e5dd; background: #ffffff;
-  font: inherit; font-weight: 700; font-size: 15px; color: #1c1c20; cursor: pointer;
+  min-width: 38px; height: 38px; padding: 0 12px; border-radius: 999px; border: 1px solid #e4e0d7; background: #ffffff;
+  font: inherit; font-weight: 600; font-size: 14px; color: #4a4740; cursor: pointer;
+  transition: background-color .12s, border-color .12s, color .12s;
 }
-.lam-o[aria-pressed="true"] { background: #16171a; border-color: #16171a; color: #ffffff; }
-.lam-y { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.lam-y-ky { width: 22px; font-weight: 700; }
+.lam-o[aria-pressed="true"] { background: #2f3e46; border-color: #2f3e46; color: #ffffff; }
+/* Phần II: mỗi ý một hàng, chữ cái căn trái, cặp Đ/S dính nhau bên phải. */
+.lam-y { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+.lam-y-ky { width: 18px; font-weight: 600; font-size: 13px; color: #9a958c; }
 .lam-nhap {
-  width: 100%; max-width: 220px; height: 46px; border-radius: 12px; border: 1.5px solid #e9e5dd;
-  padding: 0 12px; font: inherit; font-size: 15px; color: #1c1c20; background: #ffffff;
+  width: 100%; max-width: 200px; height: 38px; border-radius: 999px; border: 1px solid #e4e0d7;
+  padding: 0 14px; font: inherit; font-size: 14px; color: #1c1c20; background: #ffffff;
 }
+.lam-nhap:focus { outline: none; border-color: #2f3e46; }
 /* Sau khi nộp: khoá ô lại và tô đúng/sai. Màu KHÔNG đứng một mình — mỗi thẻ
    mang thêm dòng chữ "Đúng"/"Sai" ngay dưới. */
 .q-card.da-cham .lam-o, .q-card.da-cham .lam-nhap { pointer-events: none; opacity: .9; }
@@ -691,6 +698,21 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
    Thẻ nào đang mở đọc dở lúc bấm là câu đó vẫn tô xanh đáp án. */
 body.chi-de .sol-wrap { display: none !important; }
 body.chi-de .q-nut-giai { visibility: hidden; }
+/* CHƯA NỘP THÌ KHÔNG CÓ LỜI GIẢI (thầy chốt 08/09: "phải nộp xong mới hiện").
+   Mở sẵn lời giải trong lúc em còn đang chọn thì bài luyện thành bài chép, và
+   con số "đúng 7/10" không còn nghĩa gì.
+
+   Giấu bằng CSS chứ không cắt lời giải khỏi tệp: em nộp xong là mở ra ngay,
+   không phải gọi lại máy chủ — phiếu mở từ Zalo hay lúc mất mạng vẫn chạy.
+   Đánh đổi, nói thẳng: ai mở mã nguồn trang vẫn đọc được đáp án. Đây là phiếu
+   tự luyện ở nhà, không phải bài thi có coi. */
+body.chua-nop .q-nut-giai, body.chua-nop .q-giai { display: none !important; }
+body.chua-nop .thanh-giai { display: none; }
+.giai-khoa {
+  margin: 0 0 10px; padding: 10px 14px; border-radius: 12px; background: #fdf6e7;
+  color: #8a6d1f; font-size: 12.5px; font-weight: 600; line-height: 1.5;
+}
+body:not(.chua-nop) .giai-khoa { display: none; }
 body.chi-de .q-opt.dung { background: #f8fafc !important; border-color: var(--vien) !important; color: var(--muc-2) !important; font-weight: 400 !important; }
 body.chi-de .q-opt.dung .q-opt-letter { background: var(--vien-dam) !important; }
 body.chi-de .tf-badge.dung { background: #f1f5f9 !important; color: var(--rat-nhat) !important; border-color: var(--vien) !important; }
@@ -747,7 +769,7 @@ function oLamHtml(c: CauLuyen): string {
     ).join('')
     return `<div class="lam-vung" data-qid="${qid}" data-phan="II"><div class="lam-nhan">Em chọn</div>${hang}</div>`
   }
-  return `<div class="lam-vung" data-qid="${qid}" data-phan="III"><div class="lam-nhan">Em điền đáp án</div><input class="lam-nhap" type="text" inputmode="decimal" autocomplete="off" aria-label="Đáp án của em"></div>`
+  return `<div class="lam-vung" data-qid="${qid}" data-phan="III"><div class="lam-nhan">Em điền</div><input class="lam-nhap" type="text" inputmode="decimal" autocomplete="off" aria-label="Đáp án của em"></div>`
 }
 
 export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = false, choLam = false): string {
@@ -1434,6 +1456,11 @@ export const JS_PHIEU = `
         // MỞ LỜI GIẢI MỌI CÂU NGAY (thầy chốt 08/09) — em vừa làm xong là lúc
         // muốn biết vì sao nhất. Không đợi kết quả mạng.
         if (!du.ch || du.ch.HIEN_GIAI_SAU_NOP !== false) {
+          // NỘP XONG MỚI MỞ KHOÁ LỜI GIẢI (thầy chốt 08/09). Gỡ lớp trước,
+          // rồi mới mở từng thẻ — mở trong lúc còn lớp chua-nop là mở vào
+          // chỗ đang bị CSS giấu. (Cấm dấu huyền ngược trong khối này: cả
+          // khối nằm trong một chuỗi mẫu.)
+          document.body.classList.remove('chua-nop');
           for (var i = 0; i < tatCa.length; i++) bat(tatCa[i], true);
           demLai();
         }
@@ -1464,11 +1491,11 @@ export const JS_PHIEU = `
 `
 
 /** Tài liệu HTML hoàn chỉnh, tự chứa — mở bằng một chạm, không cần mạng. */
-export function taiLieuHtml(than: string, tieuDe: string): string {
+export function taiLieuHtml(than: string, tieuDe: string, lopBody = ''): string {
   return `<!DOCTYPE html>
 <html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${thoat(tieuDe)}</title><style>${CSS_PHIEU}</style></head>
-<body>${than}
+<body${lopBody ? ` class="${lopBody}"` : ''}>${than}
 <script>${JS_PHIEU}</script></body></html>`
 }
 
@@ -1511,6 +1538,9 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   const chNop = cauHinhNop(nop?.cauHinh)
   const cau = anGiai ? cauVao.map(boLoiGiai) : cauVao
   const the = cau.map((c, i) => theCauHtml(c, i + 1, false, anGiai, !!nop)).join('\n')
+  // KHOÁ LỜI GIẢI TỚI KHI NỘP. Chỉ áp cho phiếu nộp được và khi thầy không
+  // bật `HIEN_GIAI_TRUOC_NOP`.
+  const khoaGiai = !!nop && !chNop.HIEN_GIAI_TRUOC_NOP
   const coGiai = anGiai ? 0 : cau.filter((c) => oGiaiHtml(c) !== '').length
   const huongDan = anGiai
     ? 'Em làm vào vở rồi đối chiếu với link lời giải bố mẹ gửi sau. Muốn bản giấy thì bấm "In đề" rồi chọn "Lưu thành PDF".'
@@ -1521,6 +1551,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   ${tongQuanHtml(cau)}
   ${thanhHtml(coGiai, anGiai)}
   ${nop ? thanhNopHtml(cau.length) : ''}
+  ${khoaGiai ? '<div class="giai-khoa" id="giai-khoa">Lời giải mở ra ngay sau khi em bấm Nộp bài.</div>' : ''}
   <div class="ds-cau">${the}</div>
   <div class="chan">Thầy Đỗ Đại Học · ${thoat(t.tenChuyenDe)} · ${ngayVN(t.ngay)}<span class="chi-man"><br>${huongDan}</span></div>
 </div>`
@@ -1536,7 +1567,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
         cau: cau.map((c) => ({ id: c.id, phan: c.phan, dapAn: c.dapAn })),
       }).replace(/</g, '\\u003c')}<\/script>`
     : ''
-  return taiLieuHtml(than + goiNop, `${t.tenChuyenDe}${ai ? ` · ${ai}` : ''}`)
+  return taiLieuHtml(than + goiNop, `${t.tenChuyenDe}${ai ? ` · ${ai}` : ''}`, khoaGiai ? 'chua-nop' : '')
 }
 
 /** THANH NỘP — dính dưới thanh điều khiển, NOP-PHIEU-KHAC-PHUC mục 6. */

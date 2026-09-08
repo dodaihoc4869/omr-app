@@ -198,3 +198,52 @@ describe('nối vào trang phiếu bài tập thật', () => {
     expect(MAN).toContain('ma && sbdEm ?')
   })
 })
+
+describe('nộp xong mới hiện lời giải (thầy chốt 08/09)', () => {
+  const cau = (id: string): CauLuyen => ({
+    id,
+    phan: 'I',
+    text: 'Câu ' + id,
+    luaChon: ['a', 'b', 'c', 'd'],
+    dapAn: 'A',
+    mucDo: 'biet',
+    chuyenDe: 'Ester – lipid',
+    loiGiai: { buoc: ['Bước 1'], dapAn: 'A' },
+  }) as unknown as CauLuyen
+
+  const tt = { hoTen: 'Đỗ Đại Học', sbd: '12121212', ngay: new Date('2026-09-08'), tenChuyenDe: 'Ester – lipid', ketQua: '', hienDapAn: false }
+
+  it('PHIẾU NỘP ĐƯỢC: body mang lớp chua-nop, lời giải bị giấu', () => {
+    const html = dungPhieu(tt, [cau('q1')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x' } })
+    expect(html).toContain('<body class="chua-nop">')
+    expect(html).toContain('body.chua-nop .q-nut-giai, body.chua-nop .q-giai { display: none !important; }')
+    // Và nói rõ vì sao chưa thấy, thay vì để em tưởng phiếu hỏng.
+    expect(html).toContain('Lời giải mở ra ngay sau khi em bấm Nộp bài.')
+  })
+
+  it('NỘP XONG mới gỡ khoá, gỡ TRƯỚC khi mở từng thẻ', () => {
+    const html = dungPhieu(tt, [cau('q1')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x' } })
+    expect(html).toContain("document.body.classList.remove('chua-nop');")
+    expect(html.indexOf("classList.remove('chua-nop')")).toBeLessThan(html.indexOf('for (var i = 0; i < tatCa.length; i++) bat(tatCa[i], true);'))
+  })
+
+  it('PHIẾU THƯỜNG (không nộp được) KHÔNG bị khoá — thầy vẫn mở lời giải như cũ', () => {
+    const html = dungPhieu(tt, [cau('q1')])
+    expect(html).toContain('<body>')
+    expect(html).not.toContain('<body class="chua-nop">')
+  })
+
+  it('thầy bật HIEN_GIAI_TRUOC_NOP thì không khoá — cấu hình vẫn là cấu hình', () => {
+    const html = dungPhieu(tt, [cau('q1')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x', cauHinh: { HIEN_GIAI_TRUOC_NOP: true } } })
+    expect(html).not.toContain('<body class="chua-nop">')
+  })
+
+  it('khối EM CHỌN gọn theo mẫu phiếu: ô tròn 38px, không phải khối đen 46px', () => {
+    const html = dungPhieu(tt, [cau('q1')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x' } })
+    expect(html).toContain('min-width: 38px; height: 38px; padding: 0 12px; border-radius: 999px;')
+    // Vẫn đủ 38px cho ngón tay trên điện thoại — ô làm bài KHÔNG được nhỏ hơn.
+    const khoi = html.slice(html.indexOf('.lam-o {'), html.indexOf('.lam-o[aria-pressed'))
+    const cao = /height:\s*(\d+)px/.exec(khoi)
+    expect(Number(cao?.[1])).toBeGreaterThanOrEqual(38)
+  })
+})
