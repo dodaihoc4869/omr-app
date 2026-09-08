@@ -203,6 +203,29 @@ export async function trangThaiPhongCho(scriptUrl: string, maCa: string): Promis
   }
 }
 
+/** BẢN ĐỒ SAI TỪNG CÂU của mấy ca, đọc MỘT LƯỢT từ máy chủ.
+ *
+ * Thầy chốt 08/09: "Ca thi nào cũng phải dựng sẵn bản đồ sai từng câu". Máy
+ * chủ ghi bản đồ ngay lúc chấm, nên chế độ đề riêng không phải chấm lại từng
+ * ca cũ ở máy thầy — máy nào cũng dựng đề được, kể cả máy chưa từng mở ca đó.
+ *
+ * Trả `{ maCa: { sai: {sbd:[qid]}, lam: {sbd:[qid]} } }`. Ca chưa có bản đồ
+ * trả hai bản đồ rỗng, chỗ gọi tự biết phải dựng lại bằng cách cũ. */
+export async function banDoSaiCa(
+  scriptUrl: string,
+  secret: string,
+  dsMaCa: string[],
+): Promise<Record<string, { sai: Record<string, string[]>; lam: Record<string, string[]> }>> {
+  const ds = dsMaCa.map((x) => String(x || '').trim()).filter(Boolean)
+  if (ds.length === 0) return {}
+  const r = await postJson(scriptUrl, { action: 'banDoSaiCa', secret, dsMaCa: ds })
+  if (!r.ok) throw new Error(r.error || 'Không đọc được bản đồ sai')
+  const ra: Record<string, { sai: Record<string, string[]>; lam: Record<string, string[]> }> = {}
+  const goc = (r.ca ?? {}) as Record<string, { sai?: Record<string, string[]>; lam?: Record<string, string[]> }>
+  for (const [ma, v] of Object.entries(goc)) ra[ma] = { sai: v?.sai ?? {}, lam: v?.lam ?? {} }
+  return ra
+}
+
 /** NỐI THÊM CÂU VÀO KHO CỦA MỘT CA — chỉ dùng cho đề riêng từng em.
  *
  * Câu em từng sai có thể nằm ngoài kho thầy vừa rút cho ca. Muốn hỏi lại đúng
@@ -389,6 +412,8 @@ export interface MocThoiGianCa {
    * mở ca ở điện thoại rồi bấm Bắt đầu trên máy tính thì máy tính mới biết
    * phải rút bộ câu riêng (thầy bắt được ở ca 933467, 08/09). */
   deRieng?: boolean
+  /** Lấy câu sai của ca gần nhất hay gộp 3 ca gần nhất (thầy chốt 08/09). */
+  phamViHoiLai?: 'gan_nhat' | 'ba_ca'
 }
 
 /** Loại ca: kiểm tra hay bài tập về nhà. Dùng CHUNG mọi thứ, khác nhau bằng cờ này. */
@@ -430,6 +455,7 @@ export async function publishSession(
     anHanGiay: moc.giuDeDoc === true ? moc.anHanGiay || 3 : 0,
     phongCho: moc.phongCho === true,
     deRieng: moc.deRieng === true,
+    phamViHoiLai: moc.phamViHoiLai === 'ba_ca' ? 'ba_ca' : 'gan_nhat',
   })
   if (!result.ok) throw new Error(result.error || 'Mở ca kiểm tra thất bại')
   return { batDau: String(result.batDau || ''), hetHanVao: String(result.hetHanVao || '') }
@@ -1413,6 +1439,8 @@ export interface CaTomTat {
   /** CA ĐỀ RIÊNG TỪNG EM — đọc từ máy chủ, nên máy nào mở ca cũng biết.
    * Ca mở trước 08/09 không có cột này ⇒ false, chạy y như trước. */
   deRieng?: boolean
+  /** Phạm vi lấy câu sai của ca đề riêng: 'gan_nhat' | 'ba_ca'. */
+  phamViHoiLai?: 'gan_nhat' | 'ba_ca'
   daVao: number
   daNop: number
   canhBao: number

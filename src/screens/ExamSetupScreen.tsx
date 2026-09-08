@@ -163,7 +163,7 @@ export default function ExamSetupScreen() {
   // Danh sách em để tích: danh sách lớp trên máy (Google Sheet) — không có thì lấy danh sách lớp đã nạp lên máy chủ.
   const [dsDangKy, setDsDangKy] = useState<{ sbd: string; hoTen: string; lop: string }[] | null>(null)
   // Bộ câu màn Rút đề chốt; null = thầy chọn lấy trọn kho (đường cũ).
-  const [boRut, setBoRut] = useState<{ ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string>; deRieng?: boolean } | null>(null)
+  const [boRut, setBoRut] = useState<{ ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string>; deRieng?: boolean; phamViHoiLai?: 'gan_nhat' | 'ba_ca' } | null>(null)
   // Câu đã ra ở các ca trước (đọc từ bản đề CÓ đáp án đã lưu của từng ca) — để
   // rút đề tránh phát lại câu lớp vừa làm tuần trước.
   const [qidCaTruoc, setQidCaTruoc] = useState<string[]>([])
@@ -321,6 +321,9 @@ export default function ExamSetupScreen() {
         // Cờ chế độ lên MÁY CHỦ. `luuCheDoDeRieng` bên dưới chỉ còn là bản
         // sao ở máy này cho nhanh, không còn là nguồn sự thật duy nhất.
         deRieng: deRiengBat,
+        // Phạm vi lấy câu sai đi CÙNG cờ chế độ, để máy nào bấm Bắt đầu cũng
+        // rút đúng thứ thầy đã chọn lúc mở ca.
+        phamViHoiLai: boRut?.phamViHoiLai ?? 'gan_nhat',
         anHanGiay,
       })
       // Lưu bản CÓ đáp án trên máy thầy để màn Theo dõi chấm lại được sau này.

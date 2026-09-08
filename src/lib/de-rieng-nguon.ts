@@ -5,7 +5,7 @@
 // SỐ LỆNH MÁY CHỦ: đúng MỘT lệnh cho MỘT CA (`chiTietCa`), không phải một lệnh
 // cho một em. Quét ngược tối đa `SO_CA_TRA_NGUOC` ca ⇒ tối đa 3 lệnh cho cả
 // lớp 40 em, đúng ngưỡng ở bảng nghiệm thu.
-import { chiTietCa, danhSachCa, noiKhoCa } from './exam-api'
+import { banDoSaiCa, chiTietCa, danhSachCa, noiKhoCa } from './exam-api'
 import { taoChiTietCau } from './chi-tiet-cau'
 import { docDeRiengCa, loadExamSources, loadSessionTeacherBank, docSoCauCa, saveSessionTeacherBank } from './exam-db'
 import { mergeAndStrip, mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
@@ -97,9 +97,27 @@ export async function docCacCaTruoc(url: string, mat: string, boCa: string[] = [
     .sort((a, b) => String(b.moLuc ?? '').localeCompare(String(a.moLuc ?? '')))
     .slice(0, Math.max(0, ch.SO_CA_TRA_NGUOC))
 
+  // BẢN ĐỒ SAI DỰNG SẴN Ở MÁY CHỦ — hỏi trước, MỘT lệnh cho cả mấy ca (thầy
+  // chốt 08/09: "ca thi nào cũng phải dựng sẵn bản đồ sai từng câu").
+  //
+  // Đây là đường nhanh và chắc: không cần bản đề của ca cũ nằm trên máy này,
+  // nên máy nào cũng dựng đề được. Ca chưa có bản đồ (chấm trước khi có tính
+  // năng này) thì rơi về cách cũ — chấm lại tại máy thầy.
+  let banDo: Record<string, { sai: Record<string, string[]>; lam: Record<string, string[]> }> = {}
+  try {
+    banDo = await banDoSaiCa(url, mat, ung.map((c) => c.maCa))
+  } catch {
+    banDo = {}
+  }
+
   const dsCa: CaTruocDaCham[] = []
   const boQua: CaBoQua[] = []
   for (const c of ung) {
+    const bd = banDo[c.maCa]
+    if (bd && Object.keys(bd.lam).length > 0) {
+      dsCa.push({ maCa: c.maCa, daLamCua: bd.lam, saiCua: bd.sai })
+      continue
+    }
     try {
       dsCa.push(await docCaTruoc(url, mat, c.maCa, ch))
     } catch (e) {

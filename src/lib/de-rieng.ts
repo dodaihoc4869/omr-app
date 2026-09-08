@@ -96,14 +96,47 @@ export function chonCauLapChoEm(
     const tungCoTen = quet.some((c) => sbd in c.daLamCua || sbd in c.saiCua)
     return { sbd, tuCa: '', qids: [], canDayLai: [], soSaiCaTruoc: 0, can: 0, lyDo: tungCoTen ? 'khong_nop' : 'moi_vao' }
   }
-  const daSai = caCoNop.saiCua[sbd] ?? []
+  // PHẠM VI LẤY CÂU SAI — hai nút ở màn Mở ca (thầy chốt 08/09).
+  //
+  //   · `gan_nhat`: đúng ca gần nhất em có nộp. Đo đúng buổi vừa dạy.
+  //   · `ba_ca`   : gộp câu sai của MỌI ca trong khoảng quét mà em có nộp.
+  //                 Câu sai ở nhiều ca đứng TRƯỚC — sai đi sai lại là chỗ cần
+  //                 hỏi lại nhất, không phải chỗ mới sai một lần.
+  //
+  // Cả hai đều bỏ trùng: một câu chỉ vào đề một lần.
+  let daSai: string[]
+  let tuCa = caCoNop.maCa
+  if (ch.PHAM_VI_HOI_LAI === 'ba_ca') {
+    const dem = new Map<string, number>()
+    const thuTu: string[] = []
+    const caLay: string[] = []
+    for (const c of quet) {
+      if ((c.daLamCua[sbd] ?? []).length === 0) continue
+      caLay.push(c.maCa)
+      for (const q of c.saiCua[sbd] ?? []) {
+        if (!dem.has(q)) thuTu.push(q)
+        dem.set(q, (dem.get(q) ?? 0) + 1)
+      }
+    }
+    // Xếp theo số ca em sai câu đó, giảm dần; đồng hạng thì giữ thứ tự gặp
+    // (ca gần nhất trước) — không xáo ngẫu nhiên, để hai lần chạy ra một kết
+    // quả và thầy đối chiếu được.
+    //
+    // Thứ tự gốc chốt vào Map TRƯỚC khi sắp: `sort` sửa ngay trên mảng, nên
+    // hỏi `indexOf` giữa lúc sắp là hỏi một mảng đang đổi.
+    const goc = new Map(thuTu.map((q, i) => [q, i]))
+    daSai = [...thuTu].sort((a, b) => (dem.get(b) ?? 0) - (dem.get(a) ?? 0) || (goc.get(a) ?? 0) - (goc.get(b) ?? 0))
+    tuCa = caLay.join(' + ')
+  } else {
+    daSai = caCoNop.saiCua[sbd] ?? []
+  }
   const demCua = demSai[sbd] ?? {}
   const canDayLai = daSai.filter((q) => (demCua[q] ?? 0) >= ch.TRAN_LAP_MOT_CAU)
   const conLap = daSai.filter((q) => (demCua[q] ?? 0) < ch.TRAN_LAP_MOT_CAU)
   const can = Math.min(soCauLapCan(daSai.length, ch), Math.max(0, Math.floor(Number(tranCau) || 0)))
   return {
     sbd,
-    tuCa: caCoNop.maCa,
+    tuCa,
     qids: conLap.slice(0, can),
     canDayLai,
     soSaiCaTruoc: daSai.length,

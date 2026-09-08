@@ -22,6 +22,21 @@ export interface CauHinhDeRieng {
   /** Có tính câu BỎ TRỐNG là "đã sai" hay không. Mặc định tắt: bỏ trống do hết
    * giờ không phải là không làm được, lặp lại là lặp nhầm. */
   CHO_LAP_CAU_BO_TRONG: boolean
+  /** LẤY CÂU SAI TỪ ĐÂU (thầy chốt 08/09, hai nút ở màn Mở ca):
+   *   · `gan_nhat` — chỉ ca gần nhất em có nộp. Đo đúng buổi vừa dạy.
+   *   · `ba_ca`    — gộp câu sai của cả ba ca gần nhất em có nộp, rồi bốc.
+   *                  Bắt được lỗi cũ em vẫn chưa sửa, không chỉ lỗi hôm qua. */
+  PHAM_VI_HOI_LAI: 'gan_nhat' | 'ba_ca'
+}
+
+export const TEN_PHAM_VI_HOI_LAI: Record<CauHinhDeRieng['PHAM_VI_HOI_LAI'], string> = {
+  gan_nhat: 'Ca gần nhất',
+  ba_ca: '3 ca gần nhất',
+}
+
+export const GIAI_THICH_PHAM_VI: Record<CauHinhDeRieng['PHAM_VI_HOI_LAI'], string> = {
+  gan_nhat: 'Lấy 30% số câu em sai ở đúng ca gần nhất em có nộp. Đo đúng buổi vừa dạy.',
+  ba_ca: 'Gộp câu sai của cả 3 ca gần nhất em có nộp rồi lấy 30%. Bắt được cả lỗi cũ em vẫn chưa sửa.',
 }
 
 export const CAU_HINH_DE_RIENG_MAC_DINH: CauHinhDeRieng = {
@@ -29,6 +44,7 @@ export const CAU_HINH_DE_RIENG_MAC_DINH: CauHinhDeRieng = {
   SO_CA_TRA_NGUOC: 3,
   TRAN_LAP_MOT_CAU: 3,
   CHO_LAP_CAU_BO_TRONG: false,
+  PHAM_VI_HOI_LAI: 'gan_nhat',
 }
 
 function soDuong(v: unknown, macDinh: number): number {
@@ -46,6 +62,7 @@ export function cauHinhDeRieng(luu?: Partial<CauHinhDeRieng> | null): CauHinhDeR
     SO_CA_TRA_NGUOC: soDuong(c.SO_CA_TRA_NGUOC, CAU_HINH_DE_RIENG_MAC_DINH.SO_CA_TRA_NGUOC),
     TRAN_LAP_MOT_CAU: soDuong(c.TRAN_LAP_MOT_CAU, CAU_HINH_DE_RIENG_MAC_DINH.TRAN_LAP_MOT_CAU),
     CHO_LAP_CAU_BO_TRONG: c.CHO_LAP_CAU_BO_TRONG === true,
+    PHAM_VI_HOI_LAI: c.PHAM_VI_HOI_LAI === 'ba_ca' ? 'ba_ca' : 'gan_nhat',
   }
 }
 

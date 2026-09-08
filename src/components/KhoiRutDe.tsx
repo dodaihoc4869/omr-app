@@ -14,7 +14,7 @@ import { Nhan, OThongBao } from './DesignSystem'
 import { boMotCau, demDangUngVien, demMucDo, doiMotCau, dsChuyenDe, dungUngVien, giayUocTinh, moiIdDaRut, MOI_MUC, PHAN_DE, PHUT_TOI_DA_LEN_BANG, rutDe, rutDeLenBang, rutKhoChua, soCauCua, soCauLenBang, soTinHieu, TEN_MUC, tongCau, type CauUngVien, type KetQuaRut, type MucDoRut, type PhanDe, type SoCauPhan, type YeuCauRut } from '../lib/rut-de'
 import { MOI_LOC_DANG, LOC_DANG_MAC_DINH, soCauDung, TEN_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
 import { demSao, LOC_SAO_MAC_DINH, MOI_LOC_SAO, soCauHopSao, TEN_LOC_SAO, type LocSao } from '../lib/loc-sao'
-import { CAU_HINH_DE_RIENG_MAC_DINH } from '../lib/cau-hinh-de-rieng'
+import { CAU_HINH_DE_RIENG_MAC_DINH, GIAI_THICH_PHAM_VI, TEN_PHAM_VI_HOI_LAI, type CauHinhDeRieng } from '../lib/cau-hinh-de-rieng'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -147,7 +147,7 @@ export interface KhoiRutDeProps {
    *
    * `lenBang` = bộ này rút cho buổi chữa bài ⇒ ca đẩy dữ liệu sang màn Gọi lên
    * bảng. `idsChua` = KHO CHỮA rộng hơn đề em làm, chỉ có ở chế độ đó. */
-  onDoi: (kq: { ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string>; deRieng?: boolean } | null) => void
+  onDoi: (kq: { ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string>; deRieng?: boolean; phamViHoiLai?: CauHinhDeRieng['PHAM_VI_HOI_LAI'] } | null) => void
   /** Đổi thời lượng ca giúp thầy. Chỉ gọi khi thầy BẤM chip "Phân công lên
    * bảng": bộ câu chẩn đoán chốt cứng 15 phút, để ca 45 phút thì ô giờ nói một
    * đằng bộ câu một nẻo. Không ép sau đó — thầy vẫn sửa ô giờ tuỳ ý. */
@@ -194,6 +194,9 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
   const [kq, setKq] = useState<KetQuaRut | null>(null)
   // ĐỀ RIÊNG TỪNG EM (DE-RIENG-TUNG-EM). Không bật mặc định.
   const [deRieng, setDeRieng] = useState(false)
+  // HAI NÚT PHẠM VI (thầy chốt 08/09): lấy câu sai của ca gần nhất, hay gộp
+  // câu sai của 3 ca gần nhất. Mặc định ca gần nhất — đo đúng buổi vừa dạy.
+  const [phamViHoiLai, setPhamViHoiLai] = useState<CauHinhDeRieng['PHAM_VI_HOI_LAI']>('gan_nhat')
   // Câu thầy đã bấm đổi/bỏ trong lượt này — không cho quay lại ngay.
   const [daBo, setDaBo] = useState<string[]>([])
 
@@ -248,8 +251,9 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
       soCau: deRieng ? soCau : { I: Math.min(soCau.I, kho.I), II: Math.min(soCau.II, kho.II), III: Math.min(soCau.III, kho.III) },
       lenBang: false,
       deRieng,
+      phamViHoiLai,
     })
-  }, [cheDo, lenBang, kq, soCau, onDoi, uv, phutLamBai, qidCaTruoc, seed, deRieng])
+  }, [cheDo, lenBang, kq, soCau, onDoi, uv, phutLamBai, qidCaTruoc, seed, deRieng, phamViHoiLai])
 
   const daRut = kq ? soCauCua(kq) : { I: 0, II: 0, III: 0 }
   const thieu = kq ? PHAN_DE.filter((p) => kq.thieu[p] > 0) : []
@@ -389,9 +393,19 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
                   sai <b style={SO}>10</b> câu thì lần này gặp lại <b style={SO}>3</b> câu; sai <b style={SO}>4</b> câu thì gặp lại <b style={SO}>2</b>. Em không sai câu nào thì đề toàn câu mới. Ca này KHÔNG xếp hạng lớp.
                 </div>
                 <div style={NHAN_NHO}>
-                  Câu hỏi lại được <b>đánh dấu ngay trên đề</b> để em biết đây là câu cũ. Máy chỉ lặp được câu nào còn nằm trong kho <b style={SO}>{soCau.I + soCau.II + soCau.III}</b> câu vừa rút — kho quá hẹp thì mở rộng
-                  chuyên đề trước khi mở ca.
+                  Câu hỏi lại được <b>đánh dấu ngay trên đề</b> để em biết đây là câu cũ. Câu em từng sai mà không nằm trong kho vừa rút thì máy <b>tự kéo từ cả kho</b> vào ca này, nên chọn chuyên đề nào cũng hỏi lại
+                  được.
                 </div>
+                {/* HAI NÚT PHẠM VI — thầy chốt 08/09. Hai việc dạy khác nhau:
+                    kiểm tra đúng buổi vừa dạy, hay truy lại lỗi cũ chưa sửa. */}
+                <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Lấy câu sai từ đâu">
+                  {(['gan_nhat', 'ba_ca'] as const).map((v) => (
+                    <Chip key={v} chon={phamViHoiLai === v} onClick={() => setPhamViHoiLai(v)} mau="tim">
+                      {TEN_PHAM_VI_HOI_LAI[v]}
+                    </Chip>
+                  ))}
+                </div>
+                <div style={NHAN_NHO}>{GIAI_THICH_PHAM_VI[phamViHoiLai]}</div>
                 <OThongBao tone="xanh">
                   Ca này <b>tự bật phòng chờ</b>. Em vào thì đứng ở màn chờ; thầy bấm <b>Bắt đầu thi</b> thì máy mới rút bộ câu riêng cho ĐÚNG những em đang có mặt, rồi mới phát đề. Chạy được với cả chế độ tích từng em lẫn
                   chế độ chỉ nhập số báo danh — không phải đoán trước ai tới.

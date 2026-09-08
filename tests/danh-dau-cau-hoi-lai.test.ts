@@ -11,8 +11,8 @@ import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { cauLapCuaEm, dongGoiDeRieng, moGoiDeRieng } from '../src/lib/de-rieng-goi'
-import { soCauLapCan } from '../src/lib/cau-hinh-de-rieng'
-import { dungDeRieng, type CaTruocDaCham } from '../src/lib/de-rieng'
+import { CAU_HINH_DE_RIENG_MAC_DINH, soCauLapCan } from '../src/lib/cau-hinh-de-rieng'
+import { chonCauLapChoEm, demLanSai, dungDeRieng, type CaTruocDaCham } from '../src/lib/de-rieng'
 import { PHAN_DE, type CauUngVien, type PhanDe, type YeuCauRut } from '../src/lib/rut-de'
 
 const goc = join(__dirname, '..')
@@ -235,9 +235,9 @@ describe('CHẾ ĐỘ ĐỀ RIÊNG SỐNG Ở MÁY CHỦ, không nằm lại má
   // đề cắt theo luật hash còn máy thầy chấm theo bản đồ. Điểm sai, màn hình im.
   it('máy chủ có cột DeRieng và publish ghi vào đó', () => {
     expect(GS).toContain("'BoTheoEmJson', 'DeRieng']")
-    expect(GS).toContain("const deRieng = body.deRieng === true ? 'co' : ''")
+    expect(GS).toContain("const deRieng = body.deRieng === true ? (body.phamViHoiLai === 'ba_ca' ? 'co3' : 'co') : ''")
     expect(GS).toContain("sh.getRange(dong, 23, 1, 7).setValues([[lenBang, giuDeDoc, anHanGiay, phongCho, '', '', deRieng]])")
-    expect(GS).toContain("deRieng: String(v[28] || '') === 'co',")
+    expect(GS).toContain("deRieng: String(v[28] || '').indexOf('co') === 0,")
   })
 
   it('SHEET CŨ TỰ NỚI CỘT — thêm cột mới không làm nổ ca đang chờ', () => {
@@ -370,5 +370,79 @@ describe('CÂU EM TỪNG SAI PHẢI VÀO ĐỀ, dù thầy chọn chuyên đề 
 
   it('BÁO CHO THẦY BIẾT đã kéo bao nhiêu câu, không làm lén', () => {
     expect(MAN_CA).toContain('Đã kéo ${ra.cauNoiThem.soCau} câu em từng sai từ kho vào đề ca này.')
+  })
+})
+
+describe('HAI NÚT PHẠM VI + BẢN ĐỒ SAI DỰNG SẴN', () => {
+  // Thầy chốt 08/09:
+  //  · "khi bấm mở ca thi 30% thì hãy cho tôi 2 nút lựa chọn, nút lấy 30% câu
+  //     sai của ca thi gần nhất, nút lấy 30% của 3 ca thi ngẫu nhiên trước đó"
+  //  · "Ca thi nào cũng phải dựng sẵn bản đồ sai từng câu, để những ca thi sau
+  //     tôi chọn rút 30% câu sai ca trước thì sẵn có bản đồ để tính sai lần mấy"
+  const KHOI = doc('src/components/KhoiRutDe.tsx')
+
+  it('màn Mở ca có ĐÚNG hai nút, mặc định là ca gần nhất', () => {
+    expect(KHOI).toContain("(['gan_nhat', 'ba_ca'] as const).map")
+    expect(KHOI).toContain('TEN_PHAM_VI_HOI_LAI[v]')
+    expect(doc('src/lib/cau-hinh-de-rieng.ts')).toContain("PHAM_VI_HOI_LAI: 'gan_nhat',")
+  })
+
+  it('phạm vi đi LÊN MÁY CHỦ cùng cờ chế độ, không nằm lại máy mở ca', () => {
+    expect(doc('src/screens/ExamSetupScreen.tsx')).toContain("phamViHoiLai: boRut?.phamViHoiLai ?? 'gan_nhat',")
+    expect(GS).toContain("phamViHoiLai: String(v[28] || '') === 'co3' ? 'ba_ca' : 'gan_nhat',")
+    expect(MAN_CA).toContain("PHAM_VI_HOI_LAI: pv")
+  })
+
+  it('chế độ 3 ca GỘP câu sai, câu sai nhiều ca đứng trước', () => {
+    const ca = (ma: string, sai: string[]): CaTruocDaCham => ({ maCa: ma, daLamCua: { '10001': ['I-0', 'I-1', 'I-2', 'I-3', 'I-4'] }, saiCua: { '10001': sai } })
+    const ds = [ca('c3', ['I-0', 'I-1']), ca('c2', ['I-1', 'I-2'])]
+    const ch = { ...CAU_HINH_DE_RIENG_MAC_DINH, PHAM_VI_HOI_LAI: 'ba_ca' as const }
+    const lap = chonCauLapChoEm('10001', ds, 20, demLanSai(ds), ch)
+    // Gộp 4 lượt sai còn 3 câu khác nhau ⇒ cần ceil(0,3 × 3) = 1.
+    expect(lap.soSaiCaTruoc).toBe(3)
+    expect(lap.can).toBe(1)
+    // I-1 sai ở cả hai ca nên phải đứng đầu, được chọn trước I-0.
+    expect(lap.qids).toEqual(['I-1'])
+    expect(lap.tuCa).toBe('c3 + c2')
+  })
+
+  it('gộp 3 ca vẫn TÔN TRỌNG TRẦN LẶP — sai 3 lần rồi thì dạy lại, không hỏi lại', () => {
+    const ca = (ma: string, sai: string[]): CaTruocDaCham => ({ maCa: ma, daLamCua: { '10001': ['I-0', 'I-1', 'I-2', 'I-3', 'I-4'] }, saiCua: { '10001': sai } })
+    const ds = [ca('c3', ['I-0', 'I-1']), ca('c2', ['I-1', 'I-2']), ca('c1', ['I-1', 'I-3'])]
+    const ch = { ...CAU_HINH_DE_RIENG_MAC_DINH, PHAM_VI_HOI_LAI: 'ba_ca' as const }
+    const lap = chonCauLapChoEm('10001', ds, 20, demLanSai(ds), ch)
+    // I-1 sai đủ 3 lần = chạm trần ⇒ ra `canDayLai`, KHÔNG vào đề nữa.
+    expect(lap.canDayLai).toContain('I-1')
+    expect(lap.qids).not.toContain('I-1')
+  })
+
+  it('chế độ ca gần nhất KHÔNG gộp — chỉ đúng ca em vừa nộp', () => {
+    const ca = (ma: string, sai: string[]): CaTruocDaCham => ({ maCa: ma, daLamCua: { '10001': ['I-0', 'I-1', 'I-2', 'I-3'] }, saiCua: { '10001': sai } })
+    const ds = [ca('c3', ['I-0', 'I-1']), ca('c2', ['I-2', 'I-3'])]
+    const lap = chonCauLapChoEm('10001', ds, 20, demLanSai(ds), CAU_HINH_DE_RIENG_MAC_DINH)
+    expect(lap.soSaiCaTruoc).toBe(2)
+    expect(lap.tuCa).toBe('c3')
+  })
+
+  it('máy chủ dựng sẵn bản đồ sai NGAY LÚC CHẤM, một dòng mỗi (ca, em)', () => {
+    expect(GS).toContain("const SHEET_BANDO = 'BanDoSai'")
+    expect(GS).toContain("const BANDO_HEADERS = ['MaCa', 'SBD', 'LanThu', 'QidSaiJson', 'QidLamJson', 'GhiLuc']")
+    expect(GS).toContain('ghiBanDoSai_(banDoMoi)')
+    // ĐÈ dòng cũ chứ không nối: em thi lại thì bản đồ phải là lượt mới nhất.
+    expect(GS).toContain('if (row) sh.getRange(row, 1, 1, BANDO_HEADERS.length).setValues([dong])')
+  })
+
+  it('ghi bản đồ hỏng KHÔNG được làm hỏng việc ghi điểm', () => {
+    const than = GS.slice(GS.indexOf('function ghiBanDoSai_'), GS.indexOf('function docBanDoSai_'))
+    expect(than).toContain('try {')
+    expect(than).toContain('} catch (err) {}')
+  })
+
+  it('dựng đề HỎI MÁY CHỦ TRƯỚC, chấm lại tại máy chỉ là đường lui', () => {
+    const NGUON = doc('src/lib/de-rieng-nguon.ts')
+    expect(NGUON).toContain('banDo = await banDoSaiCa(url, mat, ung.map((c) => c.maCa))')
+    expect(NGUON).toContain('if (bd && Object.keys(bd.lam).length > 0)')
+    // Đường lui vẫn còn: ca chấm trước khi có tính năng này không có bản đồ.
+    expect(NGUON).toContain('dsCa.push(await docCaTruoc(url, mat, c.maCa, ch))')
   })
 })

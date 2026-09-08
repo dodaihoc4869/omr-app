@@ -146,6 +146,19 @@ const LUOT_HEADERS = ['MaCa', 'SBD', 'LanThu', 'IdThietBi', 'VaoLuc', 'HetGioLuc
 // CHI TIẾT TỪNG CÂU của mỗi lượt (QUANLYCATHI mục 5) — ghi bởi ghiDiem sau khi
 // chấm (máy thầy, hoặc máy em khi ca công bố điểm). Chuyên đề + mức độ lấy từ
 // đề trong kho (loi_giai/chuyen_de, muc_do) — thiếu thì để trống, không đoán.
+// BẢN ĐỒ SAI TỪNG CÂU — MỘT DÒNG MỖI (ca, em), ghi ngay lúc chấm.
+//
+// Thầy chốt 08/09: "Ca thi nào cũng phải dựng sẵn bản đồ sai từng câu, để
+// những ca thi sau tôi chọn rút 30% câu sai ca trước thì sẵn có bản đồ để
+// tính sai lần mấy".
+//
+// VÌ SAO KHÔNG ĐỌC THẲNG `ChiTietCau`: sheet đó một dòng MỘT CÂU, lớp 250 em
+// nhân 30 ca nhân 30 câu là hơn hai trăm nghìn dòng — đọc để dựng đề là treo
+// máy giữa lúc cả lớp đứng ở phòng chờ. Sheet này gọn hơn 30 lần và tra theo
+// mã ca được ngay.
+const SHEET_BANDO = 'BanDoSai'
+const BANDO_HEADERS = ['MaCa', 'SBD', 'LanThu', 'QidSaiJson', 'QidLamJson', 'GhiLuc']
+
 const SHEET_CHITIET = 'ChiTietCau'
 const CHITIET_HEADERS = ['MaCa', 'SBD', 'LanThu', 'Phan', 'SoCau', 'Qid', 'ChuyenDe', 'MucDo', 'DapAnChon', 'DapAnDung', 'DungSai', 'GiayLamCau', 'GhiLuc']
 // Thời gian ân hạn sau HẾT GIỜ làm bài (đồng hồ máy em lệch, mạng chậm lúc tự
@@ -407,6 +420,51 @@ function cauLapCuaEm_(ref, sbd) {
   }
 }
 
+/** GHI BẢN ĐỒ SAI — một dòng mỗi (ca, em), ĐÈ dòng cũ của chính em đó.
+ *
+ * Đè chứ không nối: em thi lại thì bản đồ phải là lượt mới nhất, nếu không ca
+ * sau hỏi lại câu em đã sửa được ở lượt hai. Ghi hỏng KHÔNG được làm hỏng việc
+ * ghi điểm — bản đồ dựng lại được, điểm thì không. */
+function ghiBanDoSai_(ds) {
+  if (!ds || ds.length === 0) return
+  try {
+    const sh = getSheet_(SHEET_BANDO, BANDO_HEADERS)
+    const data = sh.getDataRange().getValues()
+    const viTri = {}
+    for (let i = 1; i < data.length; i++) viTri[String(data[i][0]) + '|' + String(data[i][1])] = i + 1
+    const them = []
+    for (let k = 0; k < ds.length; k++) {
+      const x = ds[k]
+      const dong = [x.maCa, x.sbd, x.lanThu, JSON.stringify(x.sai), JSON.stringify(x.lam), x.luc]
+      const row = viTri[String(x.maCa) + '|' + String(x.sbd)]
+      if (row) sh.getRange(row, 1, 1, BANDO_HEADERS.length).setValues([dong])
+      else them.push(dong)
+    }
+    if (them.length > 0) sh.getRange(sh.getLastRow() + 1, 1, them.length, BANDO_HEADERS.length).setValues(them)
+  } catch (err) {}
+}
+
+function docBanDoSai_(dsMaCa) {
+  const ra = {}
+  for (let i = 0; i < dsMaCa.length; i++) ra[String(dsMaCa[i])] = { sai: {}, lam: {} }
+  try {
+    const sh = getSheet_(SHEET_BANDO, BANDO_HEADERS)
+    const data = sh.getDataRange().getValues()
+    for (let i = 1; i < data.length; i++) {
+      const ma = String(data[i][0])
+      if (!ra[ma]) continue
+      const sbd = String(data[i][1])
+      let sai = []
+      let lam = []
+      try { sai = JSON.parse(data[i][3] || '[]') } catch (e1) { sai = [] }
+      try { lam = JSON.parse(data[i][4] || '[]') } catch (e2) { lam = [] }
+      ra[ma].sai[sbd] = sai
+      ra[ma].lam[sbd] = lam
+    }
+  } catch (err) {}
+  return ra
+}
+
 function maBiMat_() {
   return (PropertiesService.getScriptProperties().getProperty('MA_BI_MAT') || '').trim()
 }
@@ -583,7 +641,8 @@ function docCa_(sh, row) {
     // ca đang ở chế độ nào: không rút bộ câu, không gửi bản đồ, và em nhận đề
     // cắt theo luật hash trong khi máy thầy chấm theo bản đồ. Không một dòng
     // nào trên màn hình báo chuyện đó (thầy bắt được ở ca 933467).
-    deRieng: String(v[28] || '') === 'co',
+    deRieng: String(v[28] || '').indexOf('co') === 0,
+    phamViHoiLai: String(v[28] || '') === 'co3' ? 'ba_ca' : 'gan_nhat',
   }
 }
 
@@ -2897,6 +2956,19 @@ function doPost(e) {
     return jsonResponse_({ ok: true, maCa: String(body.maCa), congBo: ca.congBo })
   }
 
+  if (action === 'banDoSaiCa') {
+    // BẢN ĐỒ SAI CỦA MẤY CA, đọc một lượt. Đây là thứ chế độ đề riêng dùng để
+    // biết em sai câu nào ở ca trước và sai lần thứ mấy — không phải chấm lại
+    // từng ca ở máy thầy như trước, nên máy nào cũng chạy được và không đòi
+    // máy đó phải có bản đề của ca cũ.
+    const loiBD2 = kiemTraMaBiMat_(body)
+    if (loiBD2) return jsonResponse_({ ok: false, error: loiBD2 })
+    const dsMa = Object.prototype.toString.call(body.dsMaCa) === '[object Array]' ? body.dsMaCa : []
+    if (dsMa.length === 0) return jsonResponse_({ ok: true, ca: {} })
+    if (dsMa.length > 20) return jsonResponse_({ ok: false, error: 'Xin quá nhiều ca một lượt' })
+    return jsonResponse_({ ok: true, ca: docBanDoSai_(dsMa), serverNow: Date.now() })
+  }
+
   if (action === 'noiKhoCa') {
     // NỐI THÊM CÂU VÀO KHO CỦA MỘT CA — chỉ dùng cho ĐỀ RIÊNG TỪNG EM.
     //
@@ -3018,9 +3090,12 @@ function doPost(e) {
     const phongCho = body.phongCho === true ? 'co' : ''
     // CHẾ ĐỘ ĐỀ RIÊNG đi cùng ca lên máy chủ, không nằm lại ở máy mở ca. Mở
     // lại cùng mã ca thì lấy theo lần mở mới, không kế thừa lần trước.
-    const deRieng = body.deRieng === true ? 'co' : ''
+    // Ô này chở HAI thứ: có bật chế độ không, và lấy câu sai từ đâu.
+    // 'co' = ca gần nhất (mặc định) · 'co3' = gộp 3 ca gần nhất.
+    // Gộp vào một ô để không phải thêm cột thứ ba cho cùng một tính năng.
+    const deRieng = body.deRieng === true ? (body.phamViHoiLai === 'ba_ca' ? 'co3' : 'co') : ''
     sh.getRange(dong, 23, 1, 7).setValues([[lenBang, giuDeDoc, anHanGiay, phongCho, '', '', deRieng]])
-    return jsonResponse_({ ok: true, batDau: batDau, hetHanVao: rowData[8], loai: rowData[17], hanNop: rowData[18], lenBang: lenBang === 'co', giuDeDoc: giuDeDoc === 'co', anHanGiay: anHanGiay || 0, phongCho: phongCho === 'co', deRieng: deRieng === 'co', serverNow: Date.now() })
+    return jsonResponse_({ ok: true, batDau: batDau, hetHanVao: rowData[8], loai: rowData[17], hanNop: rowData[18], lenBang: lenBang === 'co', giuDeDoc: giuDeDoc === 'co', anHanGiay: anHanGiay || 0, phongCho: phongCho === 'co', deRieng: deRieng.indexOf('co') === 0, serverNow: Date.now() })
   }
 
   if (action === 'vaoThi') {
@@ -3676,6 +3751,7 @@ function doPost(e) {
     const tuChoi = []
     const xoaDong = []
     const themDong = []
+    const banDoMoi = []
     const tomTat = {}
     for (let b = 0; b < bai.length; b++) {
       const x = bai[b]
@@ -3704,6 +3780,16 @@ function doPost(e) {
         themDong.push([maCa, sbd, lanThu, q.phan || '', q.soCau || '', q.qid || '', q.chuyenDe || '', q.mucDo || '', q.dapAnChon === undefined || q.dapAnChon === null ? '' : String(q.dapAnChon), q.dapAnDung === undefined || q.dapAnDung === null ? '' : String(q.dapAnDung), q.dungSai === true ? 'dung' : q.dungSai === false ? 'sai' : '', q.giay === undefined || q.giay === null ? '' : Number(q.giay), luc])
       }
       daGhi.push(sbd)
+      // BẢN ĐỒ SAI dựng ngay tại đây, từ CHÍNH mảng câu vừa chấm — cùng một
+      // nguồn với bảng thầy nhìn, nên không bao giờ lệch.
+      banDoMoi.push({
+        maCa: maCa,
+        sbd: sbd,
+        lanThu: lanThu,
+        sai: cau.filter(function (q) { return q.dungSai === false }).map(function (q) { return String(q.qid || '') }).filter(function (q) { return q }),
+        lam: cau.map(function (q) { return String(q.qid || '') }).filter(function (q) { return q }),
+        luc: luc,
+      })
       // Tổng hợp sẵn theo chuyên đề (đợt 2) — tính từ chính mảng câu vừa chấm.
       tomTat[sbd] = {
         nopLuc: l.nopLuc || luc,
@@ -3715,6 +3801,7 @@ function doPost(e) {
     xoaDong.sort(function (a, b) { return b - a })
     for (let i = 0; i < xoaDong.length; i++) ctSh.deleteRow(xoaDong[i])
     if (themDong.length > 0) ctSh.getRange(ctSh.getLastRow() + 1, 1, themDong.length, CHITIET_HEADERS.length).setValues(themDong)
+    ghiBanDoSai_(banDoMoi)
     ghiTienDo_(maCa, tomTat)
     return jsonResponse_({ ok: true, daGhi: daGhi, tuChoi: tuChoi, soCau: themDong.length, serverNow: Date.now() })
   }

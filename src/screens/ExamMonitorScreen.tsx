@@ -19,6 +19,7 @@ import { dungPhieuChoEm } from '../lib/phieu-ca-ca'
 import { phieuTheoCa } from '../lib/exam-api'
 import { docCheDoDeRieng, docDeRiengCa, docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuDeRiengCa, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret, type BienBanDeRieng, type DeRiengCaLuu } from '../lib/exam-db'
 import { CHU_LY_DO_THIEU } from '../lib/de-rieng'
+import { CAU_HINH_DE_RIENG_MAC_DINH } from '../lib/cau-hinh-de-rieng'
 import { dungDeRiengChoCa } from '../lib/de-rieng-nguon'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
@@ -600,7 +601,10 @@ export default function ExamMonitorScreen() {
           setDangBatDau(false)
           return
         }
-        const ra = await dungDeRiengChoCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, dsCho)
+        // PHẠM VI thầy chọn lúc mở ca, đọc từ máy chủ nên máy nào bấm Bắt đầu
+        // cũng rút đúng thứ thầy đã chốt.
+        const pv = (chiTiet.ca as { phamViHoiLai?: 'gan_nhat' | 'ba_ca' }).phamViHoiLai === 'ba_ca' ? 'ba_ca' : 'gan_nhat'
+        const ra = await dungDeRiengChoCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, dsCho, { ...CAU_HINH_DE_RIENG_MAC_DINH, PHAM_VI_HOI_LAI: pv })
         boTheoEm = ra.boTheoEm
         lapTheoEm = ra.lapTheoEm
         // BIÊN BẢN cất cùng bản đồ. Toast biến mất sau ba giây; câu hỏi "vì sao
