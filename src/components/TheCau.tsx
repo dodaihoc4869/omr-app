@@ -7,7 +7,7 @@
 // giãn dòng 1.9 — index.css); mã A/B/C/D dùng .pa-ma cùng cỡ chữ. Chạm cả
 // hàng, mã thẳng hàng với dòng đầu của nội dung. Ảnh cắt từ đề gốc (HinhAnh) nhúng đúng vị trí: sau đề, sau từng
 // phương án/ý (đi theo chữ cái GỐC khi xáo), cuối câu. Chỉ dùng biến tokens.css.
-import { Check, X as XIcon } from 'lucide-react'
+import { Check, RotateCcw, X as XIcon } from 'lucide-react'
 import type { HinhAnh, LoiGiaiCauTruc, TrangThaiLoiGiai } from '../data/examContent'
 import { ChemText } from '../lib/chem-format'
 import { BangSoLieu, CauHinh, HinhTaiViTri } from './QuestionMedia'
@@ -38,6 +38,12 @@ interface BaseProps {
   /** Chỉ chế độ xem lại — nhãn cảnh báo khi pipeline nghi đáp án đề sai /
    * đề thiếu đáp án (NAPDETUDONG.md "Hiển thị trong app"). */
   nhanLoiGiai?: TrangThaiLoiGiai
+  /** CÂU HỎI LẠI (thầy chốt 08/09): câu này chính em đã sai buổi trước và được
+   * rút lại vào đề lần này. Hiện một dải nhắc ngay đầu thẻ.
+   *
+   * `soLanSai` = số lần em đã sai câu này TRƯỚC lần làm này; 0 hoặc thiếu thì
+   * dải chỉ nhắc, không nêu con số — cấm bịa số. */
+  cauHoiLai?: { soLanSai?: number }
   onZoom?: (src: string) => void
 }
 
@@ -144,6 +150,40 @@ function DongLyDo({ dung, ma, chu }: { dung: boolean; ma: string; chu?: string }
  * nghiêng → mỗi phương án/ý MỘT DÒNG có ✓/✗ (Phần I theo thứ tự ĐÃ XÁO của
  * em, mã hiện là chữ đang thấy; lý do tra theo chữ GỐC) · Phần III: các bước
  * đánh số tròn + kết quả nổi màu xanh. Dữ liệu cũ (chỉ có chuỗi) vẫn hiện. */
+/** DẢI "EM ĐÃ SAI CÂU NÀY BUỔI TRƯỚC" — nằm ngay dưới đầu thẻ, trước đề bài.
+ *
+ * Đặt TRƯỚC đề chứ không phải sau: em đọc đề rồi mới thấy nhắc thì đã chọn
+ * xong theo đúng lối mòn cũ.
+ *
+ * ĐÁNH ĐỔI, nói thẳng: dải này cho em biết câu nào là câu cũ, nên em dồn sức
+ * vào đó và điểm ca có thể nhích lên so với không đánh dấu. Thầy chốt đánh dấu
+ * — mục đích ở đây là em SỬA ĐƯỢC LỖI, không phải xếp hạng.
+ *
+ * Không emoji, không màu đỏ báo động: đây là lời nhắc, không phải lời phạt. */
+function DaiHoiLai({ soLanSai }: { soLanSai?: number }) {
+  const n = Number(soLanSai)
+  const co = Number.isFinite(n) && n > 0
+  return (
+    <div
+      data-hoi-lai="1"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 'var(--k2)',
+        padding: '8px var(--k5)',
+        background: 'var(--cam-nen)',
+        color: 'var(--cam)',
+        fontSize: 13,
+        fontWeight: 600,
+        lineHeight: 1.5,
+      }}
+    >
+      <RotateCcw size={15} aria-hidden />
+      <span>{co ? `Câu em đã sai buổi trước (${n} lần) — đọc kỹ lại từ đầu` : 'Câu em đã sai buổi trước — đọc kỹ lại từ đầu'}</span>
+    </div>
+  )
+}
+
 function LoiGiai({ props, nhan }: { props: TheCauProps; nhan?: TrangThaiLoiGiai }) {
   const lg = props.loiGiai
   const text = props.explanation
@@ -419,6 +459,7 @@ export default function TheCau(props: TheCauProps) {
   return (
     <TheNoiDung id={id} noPadding className="the-cau">
       <DauThe index={stt - 1} badge={stt} title={tieuDe?.trim() ?? ''} />
+      {props.cauHoiLai && <DaiHoiLai soLanSai={props.cauHoiLai.soLanSai} />}
       <div className="flex flex-col" style={{ padding: 'var(--k5)', gap: 'var(--k3)' }}>
         {thanCauImg ? (
           <button type="button" onClick={() => onZoom?.(thanCauImg)} className="block w-full" title="Bấm để phóng to">

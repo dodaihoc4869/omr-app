@@ -41,7 +41,9 @@ describe('màn ca thi có nút báo em còn sai lại', () => {
   it('LIỆT KÊ CHI TIẾT — tên em, số câu, phần, chuyên đề, sai lần thứ mấy, em chọn gì', () => {
     const than = MAN.slice(MAN.indexOf('tongKetLap.emSaiLai.map'), MAN.indexOf('emSachTron.length > 0'))
     expect(than).toContain('Câu {c.soCau} phần {c.phan}')
-    expect(than).toContain('sai lần thứ {c.soLanSai}')
+    // Có số lần thì in số; máy này không giữ số lần cũ (thầy bấm Bắt đầu ở máy
+    // khác) thì in "lại sai" — cấm in "sai lần thứ 1" khi chưa biết là lần mấy.
+    expect(than).toContain("c.soLanSai > 0 ? `sai lần thứ ${c.soLanSai}` : 'lại sai'")
     expect(than).toContain('c.chuyenDe')
     expect(than).toContain('c.dapAnDung')
     expect(than).toContain('c.dapAnChon')
@@ -52,8 +54,17 @@ describe('màn ca thi có nút báo em còn sai lại', () => {
     expect(MAN).toContain('.sort((a, b) => (b.lap?.saiLai ?? 0) - (a.lap?.saiLai ?? 0))')
   })
 
-  it('KHÔNG CÓ CÂU HỎI LẠI THÌ KHÔNG MỌC NÚT — ca thường không phải nhìn khối rỗng', () => {
-    expect(MAN).toContain('{tongKetLap.soEmCoLap > 0 && (')
+  it('CA THƯỜNG KHÔNG MỌC NÚT, CA ĐỀ RIÊNG THÌ LUÔN CÓ — kể cả khi rút được 0 câu', () => {
+    // Bản trước gắn nút vào `soEmCoLap > 0`, nên ca đề riêng rút hụt là màn
+    // hình im lặng hoàn toàn (thầy bắt được 08/09: "vẫn chưa có nút xem lại câu
+    // đã làm sai buổi trước"). Nay nút bám vào CHẾ ĐỘ CA, không bám vào kết quả.
+    expect(MAN).toContain('{laCaDeRieng && (')
+    expect(MAN).not.toContain('{tongKetLap.soEmCoLap > 0 && (')
+    // Ca thường: cả ba nguồn đều tắt ⇒ không mọc khối rỗng.
+    expect(MAN).toContain('const laCaDeRieng = caCanDeRieng || Boolean(deRiengCa) || Object.keys(chiTiet?.lapTheoEm ?? {}).length > 0')
+    // Và khi 0 câu thì nút phải NÓI VÌ SAO, không chỉ đứng im.
+    expect(MAN).toContain('Câu em sai buổi trước · chưa rút được câu nào')
+    expect(MAN).toContain('BangBienBanLap')
   })
 
   it('SỬA ĐƯỢC HẾT thì nói ra bằng chữ khác, không im lặng', () => {
@@ -64,7 +75,7 @@ describe('màn ca thi có nút báo em còn sai lại', () => {
   it('SỐ LẦN SAI đếm CÙNG MỘT KIỂU với nhãn trong báo cáo', () => {
     // Màn ca thi: `(lapEm[r.qid] ?? 0) + 1`. Báo cáo: `truoc + 1` trong
     // `dungCauSai`. Hai chỗ lệch nhau là thầy đọc một số, phụ huynh đọc số khác.
-    expect(MAN).toContain('soLanSai: (lapEm[r.qid] ?? 0) + 1')
+    expect(MAN).toContain('soLanSai: (lapEm[r.qid] ?? 0) > 0 ? (lapEm[r.qid] ?? 0) + 1 : 0,')
     const ra = dungCauSai([row('q1', 1, false, 'B', 'C', 'Ester – lipid')], BANK, true, { lapCua: { q1: 2 } })
     expect(ra[0].soLanSai).toBe(3)
   })

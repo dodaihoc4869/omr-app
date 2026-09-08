@@ -881,7 +881,10 @@ export default function ExamTakeScreen() {
 
       const giuLuotDo = kq.cach === 'khoi_phuc' && existing && !existing.submitted && (existing.lanThu ?? 1) === kq.lanThu
       const nguong = { lan: kq.nguongLan, giay: kq.nguongGiay }
-      const thongTinCa = { loai: kq.loai, hanNop: kq.hanNop, tenCa: kq.tenCa, giuDeDoc: kq.giuDeDoc, anHanGiay: kq.anHanGiay }
+      // CÂU HỎI LẠI: giữ bản đã cất nếu lần gọi này máy chủ không trả (ca thường,
+      // hoặc máy chủ bản cũ) — mất dấu giữa chừng còn khó hiểu hơn không có dấu.
+      const cauLap = (kq.cauLap && kq.cauLap.length > 0 ? kq.cauLap : existing?.cauLap) ?? []
+      const thongTinCa = { loai: kq.loai, hanNop: kq.hanNop, tenCa: kq.tenCa, giuDeDoc: kq.giuDeDoc, anHanGiay: kq.anHanGiay, cauLap }
       const a: ExamAttempt = giuLuotDo
         ? { ...existing, startedAt: kq.vaoLuc, hetGioLuc: kq.hetGioLuc, durationMinutes: kq.thoiGianPhut, idThietBi: idTb, nguong, ...thongTinCa }
         : {
@@ -2305,6 +2308,10 @@ export default function ExamTakeScreen() {
   const dotColor = !online ? 'var(--mo)' : saveFlash ? 'var(--cam)' : 'var(--xanh)'
   const dotLabel = !online ? 'mất mạng — đã lưu trên máy' : saveFlash ? 'đang lưu…' : 'đã lưu'
 
+  // CÂU HỎI LẠI — tra bằng Set để 40 câu không thành 40 lần duyệt mảng.
+  const boHoiLai = new Set(attempt.cauLap ?? [])
+  const nhanHoiLai = (qid: string) => (boHoiLai.has(qid) ? {} : undefined)
+
   let stt = 0
   const renderPhan = (phan: PhanKey) => {
     const items = phan === 'I' ? assignment.phanI : phan === 'II' ? assignment.phanII : assignment.phanIII
@@ -2322,6 +2329,7 @@ export default function ExamTakeScreen() {
                 phan="I"
                 stt={stt}
                 id={`cau-${stt}`}
+                cauHoiLai={nhanHoiLai(item.qid)}
                 text={item.question.text}
                 thanCauImg={item.question.thanCauImg}
                 table={item.question.table}
@@ -2346,6 +2354,7 @@ export default function ExamTakeScreen() {
                 phan="II"
                 stt={stt}
                 id={`cau-${stt}`}
+                cauHoiLai={nhanHoiLai(item.qid)}
                 text={item.question.text}
                 thanCauImg={item.question.thanCauImg}
                 table={item.question.table}
@@ -2369,6 +2378,7 @@ export default function ExamTakeScreen() {
                 phan="III"
                 stt={stt}
                 id={`cau-${stt}`}
+                cauHoiLai={nhanHoiLai(item.qid)}
                 text={item.question.text}
                 thanCauImg={item.question.thanCauImg}
                 table={item.question.table}

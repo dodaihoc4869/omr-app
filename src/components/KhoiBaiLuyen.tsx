@@ -10,7 +10,8 @@
 import { useState } from 'react'
 import KhungXemPhieu from './KhungXemPhieu'
 import { napDong } from '../lib/nap-manh'
-import { chanSoCau, SO_CAU_MIN } from '../lib/phieu-link'
+import { chanSoCau, docLinkPhieu, SO_CAU_MIN } from '../lib/phieu-link'
+import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import type { PhieuDayDu } from '../lib/phieu-du-lieu'
 import type { CauLuyen } from '../lib/bai-tap-pdf'
 import { dangCua, hopDang, LOC_DANG_MAC_DINH, MOI_LOC_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
@@ -110,6 +111,19 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
     setLoi('')
     try {
       const { dungPhieu } = await napDong(() => import('../lib/html-phieu'))
+      // NỘP ĐƯỢC NGAY TRONG BÁO CÁO (thầy chốt 08/09: "câu khắc phục trong xem
+      // báo cáo của học sinh sau thi ca test33 vừa rồi vẫn không có nộp được").
+      //
+      // Bản trước chỉ nối được thanh nộp vào phiếu mở bằng LINK RIÊNG; phiếu
+      // dựng ngay tại đây thì không, nên đúng chỗ em hay bấm nhất lại là chỗ
+      // không nộp được.
+      //
+      // Mã phiếu nằm sẵn trong `linkBaiTap` (`…/p#<mã>`); thiếu mã, thiếu số
+      // báo danh hoặc thiếu địa chỉ máy chủ thì phiếu vẫn dựng nhưng KHÔNG có
+      // thanh nộp — không dựng nút bấm vào là hỏng.
+      const maPhieu = du.linkBaiTap ? docLinkPhieu(du.linkBaiTap.slice(du.linkBaiTap.indexOf('#') + 1)).ma : ''
+      const urlNop = (await loadScriptUrlHoacMacDinh().catch(() => '')).trim()
+      const nop = maPhieu && du.sbd && urlNop ? { ma: maPhieu, sbd: du.sbd, url: urlNop } : null
       const sai = du.chuyenDeCa.filter((c) => c.soSai > 0)
       const tt = {
         hoTen: du.hoTen,
@@ -122,7 +136,7 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
       }
       // MỘT lần dựng. Bản trước dựng hai lần (đề, lời giải) rồi nối chuỗi nên
       // phụ huynh tải về thấy bìa và trang tổng quan LẶP HAI LẦN.
-      setHtml(dungPhieu(tt, dsDaLoc.slice(0, lay)))
+      setHtml(dungPhieu(tt, dsDaLoc.slice(0, lay), { nop }))
     } catch {
       setLoi('Máy chưa mở được phiếu. Phụ huynh thử lại khi có mạng ổn định.')
     } finally {

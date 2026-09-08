@@ -17,7 +17,8 @@ import { viecCanLamMacDinh } from '../lib/phieu-zalo'
 import { gomLinkPhieu, tomTatLinkPhieu, vanBanLinkPhieu, type DongLinkPhieu } from '../lib/link-phieu-ca'
 import { dungPhieuChoEm } from '../lib/phieu-ca-ca'
 import { phieuTheoCa } from '../lib/exam-api'
-import { docCheDoDeRieng, docDeRiengCa, docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuDeRiengCa, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
+import { docCheDoDeRieng, docDeRiengCa, docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuDeRiengCa, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret, type BienBanDeRieng, type DeRiengCaLuu } from '../lib/exam-db'
+import { CHU_LY_DO_THIEU } from '../lib/de-rieng'
 import { dungDeRiengChoCa } from '../lib/de-rieng-nguon'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
@@ -90,6 +91,55 @@ interface HangEm {
   } | null
 }
 
+/** BIÊN BẢN LÚC RÚT ĐỀ RIÊNG — trả lời "vì sao em này không có câu hỏi lại".
+ *
+ * Trước đây mấy con số này chỉ chạy qua một toast rồi mất; thầy mở ca ra sau đó
+ * không thấy gì. Bày thẳng: mỗi em một dòng, cần mấy câu, được mấy câu, vì sao
+ * thiếu. Không có con số nào tự bịa — mọi thứ ở đây do chính lượt rút ghi lại. */
+export function BangBienBanLap({ bb, tenCua }: { bb: BienBanDeRieng; tenCua: (sbd: string) => string }) {
+  const ds = Object.keys(bb.canCua)
+  const thieuCua = new Map(bb.thieu.map((t) => [t.sbd, t]))
+  return (
+    <div style={{ background: 'var(--the-2)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)' }}>
+      <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
+        Biên bản rút câu hỏi lại
+      </div>
+      <div style={{ ...NHAN_NHO, ...SO }}>
+        {bb.caDaQuet.length > 0 ? `quét ${bb.caDaQuet.length} ca gần nhất: ${bb.caDaQuet.join(' · ')}` : 'không quét được ca nào trước đó'}
+        {bb.lucRut ? ` · rút lúc ${ngayGio(bb.lucRut)}` : ''}
+      </div>
+      {bb.boQua.length > 0 && (
+        <div style={{ ...NHAN_NHO, color: 'var(--cam)', marginTop: 4, lineHeight: 1.6 }}>
+          Ca không đọc được: {bb.boQua.map((b) => `${b.maCa} (${b.vi_sao})`).join(' · ')}
+        </div>
+      )}
+      <div className="flex flex-col" style={{ gap: 4, marginTop: 'var(--k2)' }}>
+        {ds.map((sbd) => {
+          const can = bb.canCua[sbd] ?? 0
+          const duoc = bb.soLapCua[sbd] ?? 0
+          const sai = bb.saiCaTruocCua[sbd] ?? 0
+          const t = thieuCua.get(sbd)
+          return (
+            <div key={`bb-${sbd}`} style={{ ...NHAN_NHO, color: 'var(--muc)', lineHeight: 1.6 }}>
+              <b>{tenCua(sbd) || `SBD ${sbd}`}</b>
+              <span style={{ ...SO, color: 'var(--nhat)' }}>
+                {' '}
+                · ca trước sai {sai} câu · cần {can} · rút được {duoc}
+              </span>
+              {t && (
+                <span style={{ color: 'var(--cam)' }}>
+                  {' '}
+                  — {CHU_LY_DO_THIEU[t.lyDo as keyof typeof CHU_LY_DO_THIEU] ?? t.lyDo}
+                </span>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 /** Nhãn trạng thái cho 1 em (màu theo QUANLYCATHI mục 6). */
 export function nhanCuaLuot(l: Pick<LuotThiRow, 'trangThai' | 'soLanRoiMan'>): { ten: string; tone: 'xanh' | 'cam' | 'do' | 'tim' | 'xam' } {
   if (l.trangThai === 'khoa') return { ten: 'Bị khoá', tone: 'do' }
@@ -117,7 +167,7 @@ export default function ExamMonitorScreen() {
   const [dangTai, setDangTai] = useState(false)
   const [loi, setLoi] = useState('')
   const [chiTiet, setChiTiet] = useState<ChiTietCa | null>(null)
-  const [deRiengCa, setDeRiengCa] = useState<{ boTheoEm: Record<string, string[]>; lapCua: Record<string, Record<string, number>> } | null>(null)
+  const [deRiengCa, setDeRiengCa] = useState<DeRiengCaLuu | null>(null)
   /** Ca này MỞ ở chế độ đề riêng — cờ đánh lúc mở ca. Bộ câu thì rút lúc bấm
    * Bắt đầu, nên hai thứ này tách nhau. */
   const [caCanDeRieng, setCaCanDeRieng] = useState(false)
@@ -257,7 +307,15 @@ export default function ExamMonitorScreen() {
       }
       // Ba con số câu lặp, đếm từ ĐÚNG bảng chấm của em, không ước lượng.
       let lap: HangEm['lap'] = null
-      const lapEm = deRiengCa?.lapCua?.[sbd]
+      // NGUỒN 1 (đủ nhất): bản đồ máy này ghi lúc bấm Bắt đầu — có cả SỐ LẦN
+      // em đã sai từng câu. NGUỒN 2: bản đồ máy chủ trả về, chỉ có DANH SÁCH
+      // câu lặp. Thầy bấm Bắt đầu ở điện thoại rồi mở ca trên máy tính thì chỉ
+      // còn nguồn 2 — vẫn đếm được "sửa được / còn sai", chỉ không có số lần.
+      // Số 0 ở đây nghĩa là CHƯA BIẾT, và chỗ hiển thị phải im về số lần chứ
+      // không được in "sai lần thứ 1".
+      const lapEm: Record<string, number> | undefined =
+        deRiengCa?.lapCua?.[sbd] ??
+        (chiTiet.lapTheoEm?.[sbd]?.length ? Object.fromEntries(chiTiet.lapTheoEm[sbd].map((q) => [q, 0])) : undefined)
       if (lapEm && teacherBank && moiNhat.dapAn && graded) {
         try {
           const rows = taoChiTietCau(mergeKeepAnswers(teacherBank, soCauCa, deRiengCa?.boTheoEm), chiTiet.ca.maCa, sbd, moiNhat.dapAn, moiNhat.giayCau)
@@ -270,7 +328,17 @@ export default function ExamMonitorScreen() {
             // tính với nhãn trong báo cáo (`dungCauSai`), không đếm kiểu khác.
             saiLaiChiTiet: cua
               .filter((r) => r.dungSai === false)
-              .map((r) => ({ phan: r.phan, soCau: r.soCau, qid: r.qid, chuyenDe: r.chuyenDe || '', soLanSai: (lapEm[r.qid] ?? 0) + 1, dapAnDung: r.dapAnDung || '', dapAnChon: r.dapAnChon || '' })),
+              // `soLanSai` = 0 nghĩa là máy này không giữ số lần sai cũ. In số
+              // 1 vào đó là bịa: em có thể đã sai câu này ba lần rồi.
+              .map((r) => ({
+                phan: r.phan,
+                soCau: r.soCau,
+                qid: r.qid,
+                chuyenDe: r.chuyenDe || '',
+                soLanSai: (lapEm[r.qid] ?? 0) > 0 ? (lapEm[r.qid] ?? 0) + 1 : 0,
+                dapAnDung: r.dapAnDung || '',
+                dapAnChon: r.dapAnChon || '',
+              })),
             daSuaChiTiet: cua.filter((r) => r.dungSai).map((r) => ({ phan: r.phan, soCau: r.soCau, qid: r.qid, chuyenDe: r.chuyenDe || '' })),
           }
         } catch {
@@ -458,6 +526,13 @@ export default function ExamMonitorScreen() {
   // phải có nút báo rõ những học sinh nào vẫn sai tiếp các câu đã rút, liệt kê
   // chi tiết". Gom sẵn ở đây để cả nút lẫn bảng đọc cùng một nguồn.
   const [moSaiLai, setMoSaiLai] = useState(false)
+  /** Ca này có phải ca đề riêng không — hỏi CẢ HAI nguồn.
+   *
+   * `caCanDeRieng` là cờ máy này ghi lúc mở ca; `deRiengCa` là bản đồ máy này
+   * ghi lúc bấm Bắt đầu. Thầy mở ca ở điện thoại rồi xem trên máy tính thì máy
+   * tính không có cờ, nhưng `chiTiet.ca` vẫn nói ca có bộ câu riêng. */
+  const laCaDeRieng = caCanDeRieng || Boolean(deRiengCa) || Object.keys(chiTiet?.lapTheoEm ?? {}).length > 0
+  const bienBanLap = deRiengCa?.bienBan ?? null
   const tongKetLap = useMemo(() => {
     const co = dsEm.filter((e) => e.lap && e.lap.tong > 0)
     return {
@@ -503,6 +578,7 @@ export default function ExamMonitorScreen() {
       // vào phạm vi "tích từng em" và thầy bắt được ngay — mở ca test32 ở chế
       // độ khác thì không có bộ nào, không có gì để báo (thầy chốt 08/09).
       let boTheoEm: Record<string, string[]> | undefined
+      let lapTheoEm: Record<string, string[]> | undefined
       if (caCanDeRieng) {
         const dsCho = (chiTiet.dsCho ?? []).map((x) => x.sbd).filter(Boolean)
         if (dsCho.length === 0) {
@@ -512,10 +588,21 @@ export default function ExamMonitorScreen() {
         }
         const ra = await dungDeRiengChoCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, dsCho)
         boTheoEm = ra.boTheoEm
-        await luuDeRiengCa(chiTiet.ca.maCa, ra.boTheoEm, ra.lapCua)
+        lapTheoEm = ra.lapTheoEm
+        // BIÊN BẢN cất cùng bản đồ. Toast biến mất sau ba giây; câu hỏi "vì sao
+        // em này không có câu hỏi lại" thì còn nguyên cả buổi.
+        await luuDeRiengCa(chiTiet.ca.maCa, ra.boTheoEm, ra.lapCua, ra.lapTheoEm, {
+          canCua: ra.canCua,
+          soLapCua: ra.soLapCua,
+          saiCaTruocCua: ra.saiCaTruocCua,
+          thieu: ra.thieu,
+          boQua: ra.boQua,
+          caDaQuet: ra.caDaQuet,
+          lucRut: new Date().toISOString(),
+        })
         if (ra.thieu.length > 0) showToast(`${ra.thieu.length} em không đủ câu hỏi lại — xem chi tiết trong ca.`, 'warn')
       }
-      const kq = await batDauThi(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, boTheoEm)
+      const kq = await batDauThi(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, boTheoEm, lapTheoEm)
       showToast(kq.daBatTruoc ? 'Ca này đã bắt đầu từ trước.' : 'Đã bắt đầu — cả lớp hiện đề ngay bây giờ.', 'success')
       await tai(chiTiet.ca.maCa)
     } catch (e) {
@@ -1188,7 +1275,11 @@ export default function ExamMonitorScreen() {
                 Ca đề riêng lấy ít nhất 30% là câu chính em đã sai; câu hỏi
                 duy nhất đáng giá sau ca là "em nào VẪN sai". Bày ngay ở màn ca
                 thi, không bắt thầy mở phiếu 21 em ra dò. */}
-            {tongKetLap.soEmCoLap > 0 && (
+            {/* HIỆN CẢ KHI KHÔNG RÚT ĐƯỢC CÂU NÀO. Bản trước chỉ hiện khi có em
+                có câu lặp, nên ca rút hụt thì màn hình im lặng hoàn toàn và
+                thầy không biết vì sao (thầy bắt được 08/09: "vẫn chưa có nút
+                xem lại câu đã làm sai buổi trước"). Im lặng là điều cấm. */}
+            {laCaDeRieng && (
               <div style={{ marginTop: 'var(--k3)' }}>
                 <button
                   type="button"
@@ -1201,20 +1292,31 @@ export default function ExamMonitorScreen() {
                     minHeight: 48,
                     padding: 'var(--k3)',
                     borderRadius: 'var(--bo-1)',
-                    background: tongKetLap.tongSaiLai > 0 ? 'var(--do-nen)' : 'var(--xanh-nen)',
-                    color: tongKetLap.tongSaiLai > 0 ? 'var(--do)' : 'var(--xanh)',
+                    background: tongKetLap.soEmCoLap === 0 ? 'var(--cam-nen)' : tongKetLap.tongSaiLai > 0 ? 'var(--do-nen)' : 'var(--xanh-nen)',
+                    color: tongKetLap.soEmCoLap === 0 ? 'var(--cam)' : tongKetLap.tongSaiLai > 0 ? 'var(--do)' : 'var(--xanh)',
                     border: 'none',
                     fontSize: 'var(--cx-2)',
                   }}
                 >
-                  {tongKetLap.tongSaiLai > 0
-                    ? `${tongKetLap.emSaiLai.length} em còn sai lại câu đã hỏi lại · ${tongKetLap.tongSaiLai}/${tongKetLap.tongCauLap} câu`
-                    : `Cả ${tongKetLap.soEmCoLap} em đã sửa được hết ${tongKetLap.tongCauLap} câu hỏi lại`}
-                  <span style={{ ...NHAN_NHO, display: 'block', color: 'inherit', opacity: 0.85 }}>{moSaiLai ? 'Bấm để gập lại' : 'Bấm để xem chi tiết từng em, từng câu'}</span>
+                  {tongKetLap.soEmCoLap === 0
+                    ? 'Câu em sai buổi trước · chưa rút được câu nào'
+                    : tongKetLap.tongSaiLai > 0
+                      ? `${tongKetLap.emSaiLai.length} em còn sai lại câu đã hỏi lại · ${tongKetLap.tongSaiLai}/${tongKetLap.tongCauLap} câu`
+                      : `Cả ${tongKetLap.soEmCoLap} em đã sửa được hết ${tongKetLap.tongCauLap} câu hỏi lại`}
+                  <span style={{ ...NHAN_NHO, display: 'block', color: 'inherit', opacity: 0.85 }}>
+                    {moSaiLai ? 'Bấm để gập lại' : tongKetLap.soEmCoLap === 0 ? 'Bấm để xem vì sao' : 'Bấm để xem chi tiết từng em, từng câu'}
+                  </span>
                 </button>
 
                 {moSaiLai && (
                   <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
+                    {bienBanLap && <BangBienBanLap bb={bienBanLap} tenCua={(sbd) => dsEm.find((e) => e.sbd === sbd)?.hoTen || ''} />}
+                    {!bienBanLap && tongKetLap.soEmCoLap === 0 && (
+                      <div style={{ ...NHAN_NHO, color: 'var(--cam)', lineHeight: 1.6 }}>
+                        Máy này không giữ biên bản lúc rút đề. Bấm Bắt đầu ở máy khác thì biên bản nằm ở máy đó; mở lại ca sau khi máy chủ đã ghi bản đồ thì
+                        bảng trên vẫn đếm đúng.
+                      </div>
+                    )}
                     {tongKetLap.emSaiLai.map((e) => (
                       <div key={`sailai-${e.sbd}`} style={{ background: 'var(--the-2)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)' }}>
                         <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
@@ -1229,7 +1331,7 @@ export default function ExamMonitorScreen() {
                               <b style={SO}>
                                 Câu {c.soCau} phần {c.phan}
                               </b>
-                              {c.chuyenDe ? ` · ${c.chuyenDe}` : ''} · <span style={{ color: 'var(--do)' }}>sai lần thứ {c.soLanSai}</span>
+                              {c.chuyenDe ? ` · ${c.chuyenDe}` : ''} · <span style={{ color: 'var(--do)' }}>{c.soLanSai > 0 ? `sai lần thứ ${c.soLanSai}` : 'lại sai'}</span>
                               <span style={{ ...SO, display: 'block', color: 'var(--nhat)' }}>
                                 đúng: {c.dapAnDung || '—'} · em chọn: {c.dapAnChon || 'bỏ trống'}
                               </span>

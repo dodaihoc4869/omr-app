@@ -47,6 +47,10 @@ export interface CauLapCuaEm {
   qids: string[]
   /** Câu bị bỏ vì đã lặp đủ trần mà vẫn sai — thầy phải dạy lại, không hỏi lại. */
   canDayLai: string[]
+  /** SỐ CÂU EM SAI ở ca lấy nguồn. Đây là MẪU SỐ của tỉ lệ 30%. */
+  soSaiCaTruoc: number
+  /** Số câu lặp CẦN của riêng em này = làm tròn lên 30% × `soSaiCaTruoc`. */
+  can: number
   lyDo: LyDoThieuLap
 }
 
@@ -69,11 +73,18 @@ export function demLanSai(dsCa: CaTruocDaCham[]): Record<string, Record<string, 
  *
  * Quét ngược `dsCa` (gần nhất trước) tìm ca ĐẦU TIÊN em có nộp; câu sai của em
  * ở đúng ca đó là nguồn câu lặp. Em nghỉ buổi trước thì lùi tiếp một ca — lấy
- * câu sai của ca em không làm là lấy câu của người khác. */
+ * câu sai của ca em không làm là lấy câu của người khác.
+ *
+ * SỐ CÂU LẤY tính TỪ SỐ CÂU EM SAI Ở CA ĐÓ, không phải từ độ dài đề (thầy chốt
+ * 08/09). Sai 10 câu ⇒ lấy 3. Mỗi em một con số, vì mỗi em sai một khác.
+ *
+ * `tranCau` = tổng số câu của đề lần này, chỉ để chặn trường hợp vô lý: em sai
+ * 40 câu mà đề lần này 12 câu thì không thể lấy 12 câu lặp và không còn chỗ
+ * cho câu mới. */
 export function chonCauLapChoEm(
   sbd: string,
   dsCa: CaTruocDaCham[],
-  can: number,
+  tranCau: number,
   demSai: Record<string, Record<string, number>>,
   ch: CauHinhDeRieng = CAU_HINH_DE_RIENG_MAC_DINH,
 ): CauLapCuaEm {
@@ -83,17 +94,20 @@ export function chonCauLapChoEm(
     // Phân biệt "chưa từng xuất hiện" với "có tên mà ca nào cũng vắng": hai
     // chuyện khác nhau, thầy xử lý khác nhau.
     const tungCoTen = quet.some((c) => sbd in c.daLamCua || sbd in c.saiCua)
-    return { sbd, tuCa: '', qids: [], canDayLai: [], lyDo: tungCoTen ? 'khong_nop' : 'moi_vao' }
+    return { sbd, tuCa: '', qids: [], canDayLai: [], soSaiCaTruoc: 0, can: 0, lyDo: tungCoTen ? 'khong_nop' : 'moi_vao' }
   }
   const daSai = caCoNop.saiCua[sbd] ?? []
   const demCua = demSai[sbd] ?? {}
   const canDayLai = daSai.filter((q) => (demCua[q] ?? 0) >= ch.TRAN_LAP_MOT_CAU)
   const conLap = daSai.filter((q) => (demCua[q] ?? 0) < ch.TRAN_LAP_MOT_CAU)
+  const can = Math.min(soCauLapCan(daSai.length, ch), Math.max(0, Math.floor(Number(tranCau) || 0)))
   return {
     sbd,
     tuCa: caCoNop.maCa,
-    qids: conLap.slice(0, Math.max(0, can)),
+    qids: conLap.slice(0, can),
     canDayLai,
+    soSaiCaTruoc: daSai.length,
+    can,
     // Sai hết đều quá trần cũng là "không còn câu để lặp", nhưng lý do là dạy
     // lại chứ không phải làm đúng hết — nói đúng chuyện đang xảy ra.
     lyDo: conLap.length === 0 ? 'dung_het' : '',
@@ -115,18 +129,27 @@ export interface EmThieuLap {
   sbd: string
   soLap: number
   can: number
+  /** Ca trước em sai bao nhiêu câu — mẫu số của tỉ lệ, thầy cần thấy để biết
+   * "cần 3" ở đâu ra. */
+  soSaiCaTruoc: number
   lyDo: Exclude<LyDoThieuLap, ''>
 }
 
 export interface KetQuaDeRieng {
   /** sbd → danh sách qid của em đó. Đây chính là `boTheoEm` gửi lên máy chủ. */
   boTheoEm: Record<string, string[]>
+  /** sbd → qid CÂU LẶP thật sự nằm trong đề em đó. Máy em dùng bản đồ này để
+   * đánh dấu "em đã sai câu này buổi trước" ngay trong màn làm bài. */
+  lapTheoEm: Record<string, string[]>
   /** HỢP của mọi câu mọi em — gói đề của ca phải chứa đủ chừng này câu. */
   ids: Set<string>
   /** sbd → số câu lặp THẬT SỰ có trong đề em đó. */
   soLapCua: Record<string, number>
-  /** Số câu lặp cần theo tỉ lệ. Mọi em cùng số câu nên chỉ một con số. */
-  canLap: number
+  /** sbd → số câu lặp CẦN của riêng em. Mỗi em một con số vì mẫu số là số câu
+   * chính em sai ở ca trước. */
+  canCua: Record<string, number>
+  /** sbd → số câu em sai ở ca lấy nguồn (mẫu số của 30%). */
+  saiCaTruocCua: Record<string, number>
   soLapTrungBinh: number
   /** Em không đủ câu lặp, kèm lý do — màn Mở ca in thẳng danh sách này ra. */
   thieuLap: EmThieuLap[]
@@ -147,7 +170,7 @@ function tongCauCua(yc: YeuCauRut): number {
  * luật hash cũ, nên ca không bật chế độ này chấm lại vẫn ra đúng điểm cũ. */
 export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
   const ch = y.ch ?? CAU_HINH_DE_RIENG_MAC_DINH
-  const can = soCauLapCan(tongCauCua(y.yc), ch)
+  const tongCau = tongCauCua(y.yc)
   const demSai = demLanSai(y.dsCa)
   // Tra câu theo id MỘT LẦN cho cả lớp: 40 em nhân kho vài trăm câu mà tra
   // tuyến tính là bốn vạn lượt duyệt không cần thiết.
@@ -155,14 +178,20 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
   for (const p of PHAN_DE) for (const c of y.uv[p]) cauCua.set(c.id, c)
 
   const boTheoEm: Record<string, string[]> = {}
+  const lapTheoEm: Record<string, string[]> = {}
   const soLapCua: Record<string, number> = {}
+  const canCua: Record<string, number> = {}
+  const saiCaTruocCua: Record<string, number> = {}
   const thieuLap: EmThieuLap[] = []
   const thieuCau: { sbd: string; thieu: number }[] = []
   const dayLai = new Map<string, string[]>()
   const ids = new Set<string>()
 
   for (const sbd of y.dsSbd) {
-    const lap = chonCauLapChoEm(sbd, y.dsCa, can, demSai, ch)
+    const lap = chonCauLapChoEm(sbd, y.dsCa, tongCau, demSai, ch)
+    const can = lap.can
+    canCua[sbd] = can
+    saiCaTruocCua[sbd] = lap.soSaiCaTruoc
     for (const q of lap.canDayLai) dayLai.set(q, [...(dayLai.get(q) ?? []), sbd])
 
     // Câu lặp phải CÒN TRONG KHO của ca này. Câu ca trước lấy từ đề khác mà ca
@@ -183,25 +212,33 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
     // `rutDeCoBatBuoc` phải cắt bớt câu bắt buộc vì vượt chỉ tiêu phần, con số
     // báo cho thầy phải là con số sau khi cắt.
     const trongDe = new Set(qids)
-    const soLap = lap.qids.filter((q) => trongDe.has(q)).length
+    const cauLapThat = lap.qids.filter((q) => trongDe.has(q))
+    const soLap = cauLapThat.length
+    lapTheoEm[sbd] = cauLapThat
     soLapCua[sbd] = soLap
     const thieuTong = PHAN_DE.reduce((s, p) => s + kq.thieu[p], 0)
     if (thieuTong > 0) thieuCau.push({ sbd, thieu: thieuTong })
-    if (soLap < can) {
+    // BÁO CẢ KHI `can` BẰNG 0. Em mới vào lớp, em nghỉ ca trước, em làm đúng
+    // hết — cả ba đều ra 0 câu lặp, và cả ba đều là thứ thầy cần biết. Bản
+    // trước chỉ báo khi `soLap < can`, nên đúng ba trường hợp này im lặng
+    // hoàn toàn (thầy bắt được 08/09).
+    if (soLap < can || lap.lyDo !== '') {
       // Nói ĐÚNG chuyện đang xảy ra, không gộp mọi thứ vào "đúng hết": em sai
       // 2 câu mà cần 6 là chuyện khác hẳn em sai 0 câu, và khác hẳn em sai
       // nhiều câu nhưng mấy câu đó không nằm trong kho ca này.
       const lyDo: Exclude<LyDoThieuLap, ''> = lap.lyDo !== '' ? lap.lyDo : soLap < lap.qids.length ? 'ngoai_kho' : 'it_cau_sai'
-      thieuLap.push({ sbd, soLap, can, lyDo })
+      thieuLap.push({ sbd, soLap, can, soSaiCaTruoc: lap.soSaiCaTruoc, lyDo })
     }
   }
 
   const tong = y.dsSbd.reduce((s, sbd) => s + (soLapCua[sbd] ?? 0), 0)
   return {
     boTheoEm,
+    lapTheoEm,
     ids,
     soLapCua,
-    canLap: can,
+    canCua,
+    saiCaTruocCua,
     soLapTrungBinh: y.dsSbd.length > 0 ? tong / y.dsSbd.length : 0,
     thieuLap,
     canDayLai: [...dayLai.entries()].map(([qid, dsSbd]) => ({ qid, dsSbd })),

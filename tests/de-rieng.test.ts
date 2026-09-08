@@ -57,36 +57,61 @@ function caDayDu(maCa: string, dsSbd: string[] = DS40, lech = 0): CaTruocDaCham 
 }
 
 describe('bảng nghiệm thu mục 8', () => {
-  it('ĐỦ 30% — 40 em, đề 20 câu, mỗi em ≥ 6 câu lặp', () => {
+  it('ĐỦ 30% SỐ CÂU SAI — ca trước mỗi em sai 8 câu ⇒ mỗi em 3 câu lặp', () => {
+    // MẪU SỐ LÀ SỐ CÂU EM SAI, không phải độ dài đề (thầy chốt 08/09: "lấy 30%
+    // là lấy 30% câu sai của ca thi trước đó"). Sai 8 ⇒ 0,3 × 8 = 2,4 ⇒ 3.
     const ra = dungDeRieng({ uv: UV, yc: YC, dsSbd: DS40, dsCa: [caDayDu('ca1')] })
-    expect(ra.canLap).toBe(6)
+    for (const s of DS40) {
+      expect(ra.saiCaTruocCua[s]).toBe(8)
+      expect(ra.canCua[s]).toBe(3)
+    }
     // 100% em, không phải "phần lớn em".
-    const du = DS40.filter((s) => ra.soLapCua[s] >= 6)
+    const du = DS40.filter((s) => ra.soLapCua[s] >= 3)
     expect(du).toHaveLength(40)
     expect(ra.thieuLap).toHaveLength(0)
   })
 
-  it('LÀM TRÒN LÊN — tổng 10 câu, tỉ lệ 0,30 ra 3 câu lặp, không phải 2', () => {
+  it('LÀM TRÒN LÊN — ca trước sai 10 câu ra 3, sai 4 câu ra 2, không làm tròn thường', () => {
+    // Đúng ví dụ thầy đưa: "ca trước có 10 câu sai thì lấy 3 câu, lẻ thì làm
+    // tròn lên".
     expect(soCauLapCan(10)).toBe(3)
     expect(soCauLapCan(20)).toBe(6)
-    // Kẹp trên bằng chính số câu của đề: đề 2 câu không đòi 3 câu lặp.
+    // 0,3 × 4 = 1,2 → 2, không phải 1.
+    expect(soCauLapCan(4)).toBe(2)
+    expect(soCauLapCan(1)).toBe(1)
+    // Kẹp trên bằng chính số câu em đã sai: sai 2 câu không đòi 3 câu lặp.
     expect(soCauLapCan(2)).toBe(1)
     expect(soCauLapCan(0)).toBe(0)
   })
 
-  it('THIẾU THÌ BÁO, KHÔNG ĐỘN — em chỉ sai 2 câu thì đề có đúng 2 câu lặp', () => {
+  it('KHÔNG ĐỘN — em sai 2 câu thì lấy đúng 1 câu (30% của 2, tròn lên), không lấy bừa cho đủ', () => {
     const ca: CaTruocDaCham = {
       maCa: 'ca1',
       daLamCua: { '12000': ['I-0', 'I-1', 'I-2', 'I-3'] },
       saiCua: { '12000': ['I-0', 'I-1'] },
     }
     const ra = dungDeRieng({ uv: UV, yc: YC, dsSbd: ['12000'], dsCa: [ca] })
-    expect(ra.soLapCua['12000']).toBe(2)
-    expect(ra.thieuLap).toEqual([{ sbd: '12000', soLap: 2, can: 6, lyDo: 'it_cau_sai' }])
-    // Và KHÔNG có câu ngẫu nhiên nào bị gắn cờ lặp: đúng hai câu em từng sai.
-    const trongDe = new Set(ra.boTheoEm['12000'])
-    expect(trongDe.has('I-0')).toBe(true)
-    expect(trongDe.has('I-1')).toBe(true)
+    expect(ra.canCua['12000']).toBe(1)
+    expect(ra.soLapCua['12000']).toBe(1)
+    // Đủ chỉ tiêu của chính em ⇒ KHÔNG vào danh sách thiếu.
+    expect(ra.thieuLap).toHaveLength(0)
+    // Và câu được đánh dấu lặp là CÂU EM TỪNG SAI, không phải câu ngẫu nhiên.
+    expect(ra.lapTheoEm['12000']).toEqual(['I-0'])
+    expect(new Set(ra.boTheoEm['12000']).has('I-0')).toBe(true)
+  })
+
+  it('CÂU LẶP NGOÀI KHO thì báo thiếu, không im — câu em sai không có trong kho ca này', () => {
+    // Đây chính là ca thầy gặp 08/09: kho của ca mới không chứa câu em sai ở ca
+    // cũ, nên rút ra 0 câu lặp mà màn hình không nói gì.
+    const ca: CaTruocDaCham = {
+      maCa: 'ca1',
+      daLamCua: { '12000': ['NGOAI-1', 'NGOAI-2', 'NGOAI-3', 'NGOAI-4'] },
+      saiCua: { '12000': ['NGOAI-1', 'NGOAI-2', 'NGOAI-3', 'NGOAI-4'] },
+    }
+    const ra = dungDeRieng({ uv: UV, yc: YC, dsSbd: ['12000'], dsCa: [ca] })
+    expect(ra.soLapCua['12000']).toBe(0)
+    expect(ra.lapTheoEm['12000']).toEqual([])
+    expect(ra.thieuLap[0]).toMatchObject({ sbd: '12000', soLap: 0, can: 2, soSaiCaTruoc: 4, lyDo: 'ngoai_kho' })
   })
 
   it('em mới vào lớp và em không nộp ca nào có LÝ DO KHÁC NHAU', () => {
@@ -138,20 +163,23 @@ describe('bảng nghiệm thu mục 8', () => {
     const qids = ra.boTheoEm['12000']
     expect(qids.filter((q) => q.startsWith('I-'))).toHaveLength(15)
     expect(qids.filter((q) => q.startsWith('II-'))).toHaveLength(3)
-    expect(ra.soLapCua['12000']).toBe(6)
+    // Sai 6 câu ⇒ cần 0,3 × 6 = 1,8 ⇒ 2 câu lặp, cả hai đều ở phần I.
+    expect(ra.canCua['12000']).toBe(2)
+    expect(ra.soLapCua['12000']).toBe(2)
   })
 
   it('câu lặp nhiều hơn chỉ tiêu một phần thì CẮT, không đẩy đề phồng lên', () => {
-    // Cần 6 câu lặp mà em sai 6 câu ĐỀU ở phần III — phần III chỉ có 2 chỗ.
+    // Em sai 10 câu ĐỀU ở phần III ⇒ cần 3 câu lặp, mà phần III chỉ có 2 chỗ.
     const ca: CaTruocDaCham = {
       maCa: 'ca1',
-      daLamCua: { '12000': Array.from({ length: 6 }, (_, i) => `III-${i}`) },
-      saiCua: { '12000': Array.from({ length: 6 }, (_, i) => `III-${i}`) },
+      daLamCua: { '12000': Array.from({ length: 10 }, (_, i) => `III-${i}`) },
+      saiCua: { '12000': Array.from({ length: 10 }, (_, i) => `III-${i}`) },
     }
     const ra = dungDeRieng({ uv: UV, yc: YC, dsSbd: ['12000'], dsCa: [ca] })
+    expect(ra.canCua['12000']).toBe(3)
     expect(ra.boTheoEm['12000'].filter((q) => q.startsWith('III-'))).toHaveLength(2)
     expect(ra.soLapCua['12000']).toBe(2)
-    expect(ra.thieuLap[0]).toMatchObject({ sbd: '12000', soLap: 2, can: 6 })
+    expect(ra.thieuLap[0]).toMatchObject({ sbd: '12000', soLap: 2, can: 3 })
   })
 
   it('KHÔNG DỒN ĐẦU ĐỀ — vị trí câu lặp không lệch về đầu quá 20% so với đều', () => {

@@ -8,6 +8,7 @@ import type { CauHoiCuaEm, GoiCauHoi } from './hoi-bai'
 import type { DiemMotCa } from './phieu-du-lieu'
 import { dongBoGioMayChu } from './gio-may-chu'
 import { chuanTenCa } from './ten-ca'
+import { cauLapCuaEm, dongGoiDeRieng, moGoiDeRieng } from './de-rieng-goi'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
 export interface KeyBank {
@@ -134,6 +135,13 @@ export type KetQuaVaoThi =
       /** true = thầy vừa mở khoá lượt này (máy em còn giữ cờ khoá) → bỏ khoá, làm tiếp. */
       daMoKhoa: boolean
       bank?: PublicExamBank
+      /** CÂU HỎI LẠI của CHÍNH EM NÀY — qid những câu em đã sai buổi trước và
+       * được rút vào đề lần này (thầy chốt 08/09: "phải đánh dấu trong phần
+       * làm bài thi những câu đã làm sai của ca trước đó").
+       *
+       * Máy chủ chỉ trả phần của em đang thi, không trả bản đồ cả lớp: gửi cả
+       * bản đồ là mỗi em đọc được câu bạn từng sai. */
+      cauLap?: string[]
     }
   | { ok: false; lyDo: LyDoChan; nopLuc?: string; lanThu?: number; batDau?: string; hetHanVao?: string; namSinh?: string; error?: string }
 
@@ -205,8 +213,12 @@ export async function batDauThi(
    * kèm đúng lúc bấm Bắt đầu. Máy chủ ghi bản đồ TRƯỚC khi ghi mốc giờ, nên
    * không em nào nhận đề trước khi bản đồ có mặt. */
   boTheoEm?: Record<string, string[]>,
+  /** sbd → qid CÂU HỎI LẠI trong đề em đó. Đi chung một ô với `boTheoEm`
+   * (`dongGoiDeRieng`) để không phải thêm cột trên sheet đang chạy. */
+  lapTheoEm?: Record<string, string[]>,
 ): Promise<{ batDauLuc: string; daBatTruoc: boolean }> {
-  const r = await postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm })
+  const goi = boTheoEm ? dongGoiDeRieng(boTheoEm, lapTheoEm ?? {}) : undefined
+  const r = await postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm: goi })
   if (!r.ok) throw new Error(r.error || 'Không bắt đầu được ca')
   return { batDauLuc: String(r.batDauLuc ?? ''), daBatTruoc: r.daBatTruoc === true }
 }
@@ -239,6 +251,7 @@ export async function vaoThi(
       anHanGiay: Number(r.anHanGiay) || 0,
       daMoKhoa: r.daMoKhoa === true,
       bank: r.bank ?? undefined,
+      cauLap: cauLapCuaEm(r.cauLap),
     }
   }
   return { ok: false, lyDo: r.lyDo ?? 'thieu', nopLuc: r.nopLuc, lanThu: r.lanThu, batDau: r.batDau, hetHanVao: r.hetHanVao, namSinh: r.namSinh, error: r.error }
@@ -1413,6 +1426,14 @@ export interface ChiTietCa {
    * đang có mặt" — và chế độ đề riêng từng em rút bộ câu đúng theo danh sách
    * này lúc thầy bấm Bắt đầu (thầy chốt 08/09). */
   dsCho?: { sbd: string; hoTen: string; vaoLuc: string }[]
+  /** sbd → qid CÂU HỎI LẠI của em đó, đọc từ chính ô máy chủ đã ghi lúc bấm
+   * Bắt đầu.
+   *
+   * Vì sao cần: bản đồ này được cất ở IndexedDB của MÁY BẤM BẮT ĐẦU. Thầy bấm
+   * ở điện thoại rồi mở ca trên máy tính là máy tính không có gì, và màn Ca thi
+   * im lặng — đúng lỗi thầy gặp 08/09. Lệnh này đã đòi mã bí mật nên trả cả
+   * bản đồ lớp ở đây không mở thêm quyền cho ai. */
+  lapTheoEm?: Record<string, string[]>
 }
 
 /** Một lượt bị cổng vào thi chặn. `lyDo` do máy chủ đặt:
@@ -1460,6 +1481,7 @@ export async function chiTietCa(scriptUrl: string, secret: string, maCa: string,
     dsCho: Array.isArray(r.dsCho)
       ? (r.dsCho as Record<string, unknown>[]).map((x) => ({ sbd: chuoi(x.sbd), hoTen: chuoi(x.hoTen), vaoLuc: chuoi(x.vaoLuc) })).filter((x) => x.sbd)
       : [],
+    lapTheoEm: moGoiDeRieng(r.goiDeRieng).lap,
   }
 }
 

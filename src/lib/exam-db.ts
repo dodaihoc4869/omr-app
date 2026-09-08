@@ -82,6 +82,10 @@ export interface ExamAttempt {
    * đúng hành vi cũ, không đổi điểm ca đã gửi phụ huynh. */
   giuDeDoc?: boolean
   anHanGiay?: number
+  /** CÂU HỎI LẠI — qid những câu chính em đã sai buổi trước, được rút vào đề
+   * lần này (thầy chốt 08/09). Cất cùng lượt để em rớt mạng vào lại vẫn còn
+   * dấu; ca thường không có trường này và thẻ câu không hiện gì thêm. */
+  cauLap?: string[]
   answers: AnswerRecord
   integrity: IntegrityLog
   submitted: boolean
@@ -186,16 +190,49 @@ export async function docKhoChuaCa(maCa: string): Promise<TeacherExamSource[] | 
  *
  * Nằm ở `settings` như `soCauCa`: không phải nâng phiên bản IndexedDB. Mất nó
  * thì báo cáo chỉ thiếu nhãn câu lặp, KHÔNG bao giờ hiện nhãn sai. */
-export async function luuDeRiengCa(maCa: string, boTheoEm: Record<string, string[]>, lapCua: Record<string, Record<string, number>>): Promise<void> {
-  const db = await getDb()
-  await db.put(STORE_SETTINGS, { boTheoEm, lapCua }, `deRiengCa:${maCa}`)
+/** BIÊN BẢN LÚC RÚT ĐỀ RIÊNG — cất cùng bản đồ, để màn Ca thi trả lời được câu
+ * "vì sao em này không có câu hỏi lại nào".
+ *
+ * Trước đây mấy con số này chỉ hiện một lần trong toast lúc bấm Bắt đầu rồi
+ * mất. Thầy mở ca ra sau đó không thấy nút nào, không có dòng nào giải thích —
+ * đúng thứ "lặng lẽ sai" bị cấm. */
+export interface BienBanDeRieng {
+  /** sbd → số câu lặp CẦN (làm tròn lên 30% số câu em sai ở ca trước). */
+  canCua: Record<string, number>
+  /** sbd → số câu lặp THẬT SỰ vào được đề. */
+  soLapCua: Record<string, number>
+  /** sbd → số câu em sai ở ca lấy nguồn. */
+  saiCaTruocCua: Record<string, number>
+  thieu: { sbd: string; soLap: number; can: number; soSaiCaTruoc: number; lyDo: string }[]
+  boQua: { maCa: string; vi_sao: string }[]
+  caDaQuet: string[]
+  lucRut: string
 }
 
-export async function docDeRiengCa(maCa: string): Promise<{ boTheoEm: Record<string, string[]>; lapCua: Record<string, Record<string, number>> } | undefined> {
+export interface DeRiengCaLuu {
+  boTheoEm: Record<string, string[]>
+  lapCua: Record<string, Record<string, number>>
+  /** sbd → qid câu lặp trong đề em đó. */
+  lapTheoEm: Record<string, string[]>
+  bienBan?: BienBanDeRieng
+}
+
+export async function luuDeRiengCa(
+  maCa: string,
+  boTheoEm: Record<string, string[]>,
+  lapCua: Record<string, Record<string, number>>,
+  lapTheoEm: Record<string, string[]> = {},
+  bienBan?: BienBanDeRieng,
+): Promise<void> {
   const db = await getDb()
-  const v = (await db.get(STORE_SETTINGS, `deRiengCa:${maCa}`)) as { boTheoEm?: Record<string, string[]>; lapCua?: Record<string, Record<string, number>> } | undefined
+  await db.put(STORE_SETTINGS, { boTheoEm, lapCua, lapTheoEm, bienBan }, `deRiengCa:${maCa}`)
+}
+
+export async function docDeRiengCa(maCa: string): Promise<DeRiengCaLuu | undefined> {
+  const db = await getDb()
+  const v = (await db.get(STORE_SETTINGS, `deRiengCa:${maCa}`)) as Partial<DeRiengCaLuu> | undefined
   if (!v || !v.boTheoEm || Object.keys(v.boTheoEm).length === 0) return undefined
-  return { boTheoEm: v.boTheoEm, lapCua: v.lapCua ?? {} }
+  return { boTheoEm: v.boTheoEm, lapCua: v.lapCua ?? {}, lapTheoEm: v.lapTheoEm ?? {}, bienBan: v.bienBan }
 }
 
 /** CA NÀY MỞ Ở CHẾ ĐỘ ĐỀ RIÊNG TỪNG EM hay không.

@@ -14,7 +14,7 @@ import { Nhan, OThongBao } from './DesignSystem'
 import { boMotCau, demDangUngVien, demMucDo, doiMotCau, dsChuyenDe, dungUngVien, giayUocTinh, moiIdDaRut, MOI_MUC, PHAN_DE, PHUT_TOI_DA_LEN_BANG, rutDe, rutDeLenBang, rutKhoChua, soCauCua, soCauLenBang, soTinHieu, TEN_MUC, tongCau, type CauUngVien, type KetQuaRut, type MucDoRut, type PhanDe, type SoCauPhan, type YeuCauRut } from '../lib/rut-de'
 import { MOI_LOC_DANG, LOC_DANG_MAC_DINH, soCauDung, TEN_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
 import { demSao, LOC_SAO_MAC_DINH, MOI_LOC_SAO, soCauHopSao, TEN_LOC_SAO, type LocSao } from '../lib/loc-sao'
-import { CAU_HINH_DE_RIENG_MAC_DINH, soCauLapCan } from '../lib/cau-hinh-de-rieng'
+import { CAU_HINH_DE_RIENG_MAC_DINH } from '../lib/cau-hinh-de-rieng'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -381,9 +381,16 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
             </div>
             {deRieng && (
               <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
+                {/* SỐ CÂU LẶP KHÔNG BIẾT TRƯỚC ĐƯỢC. Mẫu số là số câu CHÍNH EM
+                    sai ở ca trước (thầy chốt 08/09), mà mỗi em sai một khác —
+                    nên ở đây nói LUẬT, không in một con số chung cho cả lớp. */}
                 <div style={NHAN_NHO}>
-                  Mỗi em một đề, trong đó ít nhất <b style={{ ...SO, color: 'var(--muc)' }}>{Math.round(CAU_HINH_DE_RIENG_MAC_DINH.TI_LE_CAU_LAP * 100)}%</b> là câu chính em đã sai ở ca gần nhất em có nộp — tức{' '}
-                  <b style={{ ...SO, color: 'var(--muc)' }}>{soCauLapCan(soCau.I + soCau.II + soCau.III)}</b> câu trên {soCau.I + soCau.II + soCau.III}. Ca này KHÔNG xếp hạng lớp.
+                  Mỗi em một đề, trong đó có <b style={{ ...SO, color: 'var(--muc)' }}>{Math.round(CAU_HINH_DE_RIENG_MAC_DINH.TI_LE_CAU_LAP * 100)}%</b> số câu chính em đã sai ở ca gần nhất em có nộp, làm tròn lên. Ca trước
+                  sai <b style={SO}>10</b> câu thì lần này gặp lại <b style={SO}>3</b> câu; sai <b style={SO}>4</b> câu thì gặp lại <b style={SO}>2</b>. Em không sai câu nào thì đề toàn câu mới. Ca này KHÔNG xếp hạng lớp.
+                </div>
+                <div style={NHAN_NHO}>
+                  Câu hỏi lại được <b>đánh dấu ngay trên đề</b> để em biết đây là câu cũ. Máy chỉ lặp được câu nào còn nằm trong kho <b style={SO}>{soCau.I + soCau.II + soCau.III}</b> câu vừa rút — kho quá hẹp thì mở rộng
+                  chuyên đề trước khi mở ca.
                 </div>
                 <OThongBao tone="xanh">
                   Ca này <b>tự bật phòng chờ</b>. Em vào thì đứng ở màn chờ; thầy bấm <b>Bắt đầu thi</b> thì máy mới rút bộ câu riêng cho ĐÚNG những em đang có mặt, rồi mới phát đề. Chạy được với cả chế độ tích từng em lẫn

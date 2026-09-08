@@ -374,10 +374,37 @@ function docJsonLon_(cell) {
 function gopBoTheoEm_(goi, ref) {
   if (!goi || !ref) return goi
   try {
-    const bo = docJsonLon_(ref)
-    if (bo && typeof bo === 'object') goi.boTheoEm = bo
+    const bo = doiGoiDeRieng_(docJsonLon_(ref)).bo
+    if (bo) goi.boTheoEm = bo
   } catch (err) {}
   return goi
+}
+
+/** Ô cột 28 chở HAI bản đồ từ 08/09: `{ bo: {sbd→qid}, lap: {sbd→qid câu hỏi
+ * lại} }`. Ca mở trước đó cất thẳng `{sbd→qid}` — vẫn phải đọc được, nếu không
+ * mọi ca cũ chấm lại ra bộ câu của người khác.
+ *
+ * Nhận dạng bằng khoá `bo` là ĐỐI TƯỢNG: số báo danh toàn chữ số nên không em
+ * nào tên `bo`, và giá trị của một em là MẢNG chứ không phải đối tượng. */
+function doiGoiDeRieng_(v) {
+  if (!v || typeof v !== 'object') return { bo: null, lap: {} }
+  const co = v.bo && typeof v.bo === 'object' && Object.prototype.toString.call(v.bo) !== '[object Array]'
+  if (co) return { bo: v.bo, lap: v.lap && typeof v.lap === 'object' ? v.lap : {} }
+  return { bo: v, lap: {} }
+}
+
+/** CÂU HỎI LẠI CỦA ĐÚNG MỘT EM.
+ *
+ * Trả riêng phần của em đang thi, KHÔNG trả cả bản đồ lớp: bản đồ lớp nói ra
+ * câu nào bạn cùng lớp từng làm sai. */
+function cauLapCuaEm_(ref, sbd) {
+  if (!ref) return []
+  try {
+    const ds = doiGoiDeRieng_(docJsonLon_(ref)).lap[String(sbd).trim()]
+    return Object.prototype.toString.call(ds) === '[object Array]' ? ds : []
+  } catch (err) {
+    return []
+  }
 }
 
 function maBiMat_() {
@@ -2360,18 +2387,40 @@ function doPost(e) {
 
     const daChon = body.dapAn && typeof body.dapAn === 'object' ? body.dapAn : {}
 
+    // CHẤM ĐÚNG NHỮNG CÂU EM ĐƯỢC PHÁT, không phải cả gói 40 câu cất trên máy
+    // chủ.
+    //
+    // Vì sao: khối câu khắc phục trong báo cáo cho phụ huynh KÉO SỐ CÂU và lọc
+    // dạng, nên bộ em làm là một tập con của gói. Chấm cả gói thì mấy chục câu
+    // em không được phát đều thành câu sai — báo về "đúng 7/40" trong khi em
+    // làm 10 câu.
+    //
+    // Máy em gửi lên ĐỦ qid nó đã phát, ô nào chưa làm gửi chuỗi rỗng; nên "bỏ
+    // trống tính là sai" vẫn giữ. qid lạ bị bỏ IM LẶNG: đáp án vẫn lấy từ gói
+    // trên máy chủ, không ai chấm được câu không có trong phiếu của mình.
+    const dsGui = {}
+    let soGui = 0
+    for (const k in daChon) {
+      if (!Object.prototype.hasOwnProperty.call(daChon, k)) continue
+      dsGui[String(k).trim()] = true
+      soGui += 1
+    }
+    if (soGui === 0 || soGui > TOI_DA_CAU_NOPKP) return jsonResponse_(LOI_NOP)
+
     // KHOÁ 3 — CHẤM LẠI TẠI MÁY CHỦ. Ba phần ba luật, giống hệt
     // `taoChiTietCau` ở máy thầy để hai nơi không ra hai kết quả.
     const chuanIII = function (v) {
       return String(v == null ? '' : v).trim().replace(',', '.')
     }
     let soDung = 0
+    let soCham = 0
     const qidSai = []
     const dapAnSach = {}
     for (let i = 0; i < dsCau.length; i++) {
       const c = dsCau[i]
       const qid = String(c.id || '').trim()
-      if (!qid) continue
+      if (!qid || !dsGui[qid]) continue
+      soCham += 1
       const chon = String(daChon[qid] == null ? '' : daChon[qid]).trim().slice(0, 40)
       dapAnSach[qid] = chon
       const dung = String(c.dapAn == null ? '' : c.dapAn).trim()
@@ -2382,6 +2431,9 @@ function doPost(e) {
       if (khop) soDung += 1
       else qidSai.push(qid)
     }
+    // Không câu nào gửi lên khớp gói trên máy chủ ⇒ bài này không phải của
+    // phiếu ấy. Ghi vào là ghi một dòng 0/0 vô nghĩa.
+    if (soCham === 0) return jsonResponse_(LOI_NOP)
 
     const shNop = getSheet_(SHEET_NOPKP, NOPKP_HEADERS)
     boSungTieuDe_(shNop, NOPKP_HEADERS)
@@ -2398,14 +2450,14 @@ function doPost(e) {
           if (String(cotNop[j][0]) === maNop && String(cotNop[j][2]) === sbdNop) soLanNop += 1
         }
       }
-      shNop.appendRow([maNop, maCaNop, sbdNop, soLanNop, nayNop, dsCau.length, soDung, JSON.stringify(dapAnSach), JSON.stringify(qidSai)])
+      shNop.appendRow([maNop, maCaNop, sbdNop, soLanNop, nayNop, soCham, soDung, JSON.stringify(dapAnSach), JSON.stringify(qidSai)])
     } catch (err) {
       return jsonResponse_(LOI_NOP)
     } finally {
       try { lockNop.releaseLock() } catch (e2) {}
     }
     // Trả con số MÁY CHỦ tính, để trang phiếu hiện đúng cái đã được ghi.
-    return jsonResponse_({ ok: true, lanThu: soLanNop, soCau: dsCau.length, soDung: soDung, qidSai: qidSai, nopLuc: nayNop })
+    return jsonResponse_({ ok: true, lanThu: soLanNop, soCau: soCham, soDung: soDung, qidSai: qidSai, nopLuc: nayNop })
   }
 
   // ĐỌC LƯỢT NỘP KHẮC PHỤC CỦA MỘT CA — cần mã bí mật, chỉ thầy đọc.
@@ -3030,6 +3082,9 @@ function doPost(e) {
         daMoKhoa: qd.cach === 'khoi_phuc' && luot && luot.ghiChu.indexOf('mở khoá') >= 0,
         serverNow: Date.now(),
       }
+      // CÂU HỎI LẠI — máy em đánh dấu "em đã sai câu này buổi trước" ngay trên
+      // thẻ câu (thầy chốt 08/09). Chỉ phần của CHÍNH EM này.
+      out.cauLap = cauLapCuaEm_(ca.boTheoEmRef, sbd)
       // Đề (KHÔNG đáp án) chỉ gửi khi máy em chưa có bản cache — tiết kiệm băng
       // thông. Đã đọc TRƯỚC KHI VÀO KHOÁ, xem `bankGui` bên trên.
       if (body.canBank) out.bank = bankGui
@@ -3196,13 +3251,19 @@ function doPost(e) {
     // không có bản đề đó. Lệnh này đã đòi MA_BI_MAT; ai có mã thì `layDe` đã
     // đọc được cả kho đề, nên trả thêm đáp án của MỘT ca không mở rộng quyền gì.
     const keyBank = body.xinKeyBank && ca.keyBankRef ? docJsonLon_(ca.keyBankRef) : null
+    // GÓI ĐỀ RIÊNG trả nguyên cả hai bản đồ cho MÁY THẦY: thầy bấm Bắt đầu ở
+    // điện thoại rồi mở ca trên máy tính thì máy tính không có bản đồ nào, và
+    // màn Ca thi không có gì để báo (thầy bắt được 08/09). Lệnh này đòi mã bí
+    // mật nên không mở rộng quyền cho ai.
+    let goiDeRieng = null
+    try { goiDeRieng = ca.boTheoEmRef ? docJsonLon_(ca.boTheoEmRef) : null } catch (errGDR) {}
     delete ca.bankRef
     delete ca.keyBankRef
     delete ca.row
     let danhSachMoi = []
     try { danhSachMoi = ca.danhSachMoi && ca.phamVi === 'chon' ? JSON.parse(ca.danhSachMoi) : [] } catch (err) {}
     ca.danhSachMoi = ca.phamVi === 'chon' ? danhSachMoi : ca.danhSachMoi
-    return jsonResponse_({ ok: true, ca: ca, luot: luot, keyBank: keyBank, biChan: docChanVao_(maCa), dsCho: docPhongCho_(maCa), serverNow: Date.now() })
+    return jsonResponse_({ ok: true, ca: ca, luot: luot, keyBank: keyBank, biChan: docChanVao_(maCa), dsCho: docPhongCho_(maCa), goiDeRieng: goiDeRieng, serverNow: Date.now() })
   }
 
   if (action === 'themEmVaoSheet') {

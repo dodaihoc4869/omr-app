@@ -5,7 +5,13 @@
 // một đằng đề ra một nẻo.
 
 export interface CauHinhDeRieng {
-  /** Tỉ lệ TỐI THIỂU câu lặp trên tổng số câu của đề. */
+  /** Tỉ lệ câu lặp trên SỐ CÂU EM SAI Ở CA TRƯỚC (thầy chốt 08/09: "lấy 30% là
+   * lấy 30% câu sai của ca thi trước đó, ví dụ ca trước có 10 câu sai thì lấy
+   * 3 câu, lẻ thì làm tròn lên").
+   *
+   * KHÔNG phải tỉ lệ trên tổng số câu của đề — hai cách cho hai con số khác
+   * hẳn nhau: em sai 2 câu mà đề 20 câu, tính theo đề là đòi 6 câu lặp trong
+   * khi em chỉ có 2. */
   TI_LE_CAU_LAP: number
   /** Quét ngược mấy ca để tìm ca gần nhất em CÓ NỘP. Em nghỉ buổi trước thì
    * lùi tiếp một ca, không lấy bừa ca gần nhất của lớp. */
@@ -43,13 +49,15 @@ export function cauHinhDeRieng(luu?: Partial<CauHinhDeRieng> | null): CauHinhDeR
   }
 }
 
-/** SỐ CÂU LẶP CẦN CÓ của một đề `tong` câu.
+/** SỐ CÂU LẶP CẦN CÓ khi ca trước em sai `soSaiCaTruoc` câu.
  *
- * LÀM TRÒN LÊN, không làm tròn thường: chữ "ít nhất 30%" phải đúng nghĩa đen.
- * Đề 10 câu ra 3, không phải 2. Kẹp trên bằng chính `tong` để đề ngắn không
- * đòi nhiều câu lặp hơn số câu nó có. */
-export function soCauLapCan(tong: number, ch: CauHinhDeRieng = CAU_HINH_DE_RIENG_MAC_DINH): number {
-  const n = Math.max(0, Math.floor(Number(tong) || 0))
+ * LÀM TRÒN LÊN, không làm tròn thường: thầy chốt "lẻ thì làm tròn lên". Sai 10
+ * câu ra 3; sai 4 câu ra 2 (1,2 → 2), không phải 1.
+ *
+ * Kẹp trên bằng chính `soSaiCaTruoc`: không thể lặp nhiều câu hơn số câu em đã
+ * sai. Em sai 0 câu ⇒ 0 câu lặp, và đó là tin tốt chứ không phải lỗi. */
+export function soCauLapCan(soSaiCaTruoc: number, ch: CauHinhDeRieng = CAU_HINH_DE_RIENG_MAC_DINH): number {
+  const n = Math.max(0, Math.floor(Number(soSaiCaTruoc) || 0))
   if (n === 0) return 0
   return Math.min(n, Math.ceil(n * ch.TI_LE_CAU_LAP))
 }

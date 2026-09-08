@@ -116,20 +116,37 @@ export async function docCacCaTruoc(url: string, mat: string, boCa: string[] = [
  * phải một lệnh một em.
  *
  * Ca hiện tại LOẠI khỏi danh sách quét: nó chính là ca đang mở, chưa ai nộp. */
+export interface KetQuaDungDeRieng {
+  boTheoEm: Record<string, string[]>
+  /** sbd → qid câu lặp có thật trong đề em đó. Đi kèm `boTheoEm` lên máy chủ. */
+  lapTheoEm: Record<string, string[]>
+  lapCua: Record<string, Record<string, number>>
+  thieu: EmThieuLap[]
+  canCua: Record<string, number>
+  soLapCua: Record<string, number>
+  saiCaTruocCua: Record<string, number>
+  /** Ca cũ KHÔNG đọc được, kèm lý do. Đây thường là câu trả lời cho "vì sao
+   * không rút được câu hỏi lại nào" — im lặng bỏ qua là thầy tưởng máy hỏng. */
+  boQua: CaBoQua[]
+  /** Mã những ca đã quét được, mới nhất trước. */
+  caDaQuet: string[]
+  trungBinh: number
+}
+
 export async function dungDeRiengChoCa(
   url: string,
   mat: string,
   maCa: string,
   dsSbd: string[],
   ch: CauHinhDeRieng = CAU_HINH_DE_RIENG_MAC_DINH,
-): Promise<{ boTheoEm: Record<string, string[]>; lapCua: Record<string, Record<string, number>>; thieu: EmThieuLap[]; canLap: number; trungBinh: number }> {
+): Promise<KetQuaDungDeRieng> {
   const bank = await loadSessionTeacherBank(maCa)
   if (!bank || bank.length === 0) throw new Error('Máy này chưa có bản đề CÓ đáp án của ca')
   const sc = await docSoCauCa(maCa)
   if (!sc) throw new Error('Ca này chưa ghi số câu mỗi phần')
 
   const uv = dungUngVien(bank)
-  const { dsCa } = await docCacCaTruoc(url, mat, [maCa], ch)
+  const { dsCa, boQua } = await docCacCaTruoc(url, mat, [maCa], ch)
   const ra = dungDeRieng({
     uv,
     yc: { soCau: sc, chuyenDe: [], mucDo: [], tranhQid: [], seed: hashSeed(maCa) },
@@ -139,9 +156,14 @@ export async function dungDeRiengChoCa(
   })
   return {
     boTheoEm: ra.boTheoEm,
+    lapTheoEm: ra.lapTheoEm,
     lapCua: lapCuaTungEm(ra.boTheoEm, demLanSai(dsCa)),
     thieu: ra.thieuLap,
-    canLap: ra.canLap,
+    canCua: ra.canCua,
+    soLapCua: ra.soLapCua,
+    saiCaTruocCua: ra.saiCaTruocCua,
+    boQua,
+    caDaQuet: dsCa.map((c) => c.maCa),
     trungBinh: ra.soLapTrungBinh,
   }
 }
