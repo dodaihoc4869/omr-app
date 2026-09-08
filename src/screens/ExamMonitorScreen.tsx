@@ -20,7 +20,7 @@ import { phieuTheoCa } from '../lib/exam-api'
 import { docCheDoDeRieng, docDeRiengCa, docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuDeRiengCa, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret, type BienBanDeRieng, type DeRiengCaLuu } from '../lib/exam-db'
 import { CHU_LY_DO_THIEU } from '../lib/de-rieng'
 import { CAU_HINH_DE_RIENG_MAC_DINH } from '../lib/cau-hinh-de-rieng'
-import { dungDeRiengChoCa } from '../lib/de-rieng-nguon'
+import { dungDeRiengChoCa, dungLapTuMayChu } from '../lib/de-rieng-nguon'
 import { choEmThiLai } from '../lib/thi-lai'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
@@ -173,6 +173,10 @@ export default function ExamMonitorScreen() {
   /** Ca này MỞ ở chế độ đề riêng — cờ đánh lúc mở ca. Bộ câu thì rút lúc bấm
    * Bắt đầu, nên hai thứ này tách nhau. */
   const [caCanDeRieng, setCaCanDeRieng] = useState(false)
+  /** BẢN DỰNG LẠI TỪ MÁY CHỦ cho khối "còn sai lại" — dùng khi ô trên máy chủ
+   * không chở sẵn (ca mở trước 08/09, hoặc bấm Bắt đầu bằng máy chưa cập nhật).
+   * Nhờ nó, MÁY NÀO mở ca cũng thấy đủ khối đỏ, không phải đúng máy đã bấm. */
+  const [lapDungLai, setLapDungLai] = useState<{ lapTheoEm: Record<string, string[]>; demSai: Record<string, Record<string, number>> } | null>(null)
   const [teacherBank, setTeacherBank] = useState<TeacherExamSource[] | null>(null)
   // Số câu mỗi phần của ca này (màn Rút đề chốt lúc mở ca). Chấm lại PHẢI dùng
   // đúng con số đó, nếu không thầy rút 25 câu phần I mà máy chỉ lấy 18 ⇒ điểm
@@ -290,6 +294,32 @@ export default function ExamMonitorScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [maCaTheoDoi])
 
+  // DỰNG LẠI KHỐI ĐỎ TỪ MÁY CHỦ khi ô của ca không chở sẵn (thầy chốt 08/09:
+  // "đồng bộ phần màu đỏ đấy vào tất cả các thiết bị").
+  //
+  // Chỉ chạy khi THIẾU: có sẵn thì không tốn thêm lệnh nào. Hỏng thì im lặng —
+  // khối đỏ đã có sẵn dòng nói máy này không giữ biên bản.
+  useEffect(() => {
+    if (!chiTiet) return
+    const url = scriptUrl.trim()
+    const mat = secret.trim()
+    if (!url || !mat) return
+    const bo = (chiTiet.keyBank as { boTheoEm?: Record<string, string[]> } | null | undefined)?.boTheoEm ?? deRiengCa?.boTheoEm
+    if (!bo || Object.keys(bo).length === 0) return
+    const daCoLap = Object.keys(chiTiet.lapTheoEm ?? {}).length > 0 || Object.keys(deRiengCa?.lapTheoEm ?? {}).length > 0
+    const daCoDem = Object.keys(chiTiet.demSaiTheoEm ?? {}).length > 0 || Object.keys(deRiengCa?.lapCua ?? {}).length > 0
+    if (daCoLap && daCoDem) return
+    let huy = false
+    dungLapTuMayChu(url, mat, chiTiet.ca.maCa, bo)
+      .then((ra) => {
+        if (!huy && Object.keys(ra.lapTheoEm).length > 0) setLapDungLai(ra)
+      })
+      .catch(() => {})
+    return () => {
+      huy = true
+    }
+  }, [chiTiet, scriptUrl, secret, deRiengCa])
+
   // Gom theo SBD: lượt mới nhất + các lượt cũ; chấm tại máy nếu có ngân hàng.
   const dsEm: HangEm[] = useMemo(() => {
     if (!chiTiet) return []
@@ -323,6 +353,9 @@ export default function ExamMonitorScreen() {
       const lapEm: Record<string, number> | undefined =
         deRiengCa?.lapCua?.[sbd] ??
         chiTiet.demSaiTheoEm?.[sbd] ??
+        // Bản dựng lại từ máy chủ: có ĐỦ số lần sai, nên nhãn "sai lần thứ N"
+        // vẫn đúng trên máy chưa từng mở ca này.
+        lapDungLai?.demSai?.[sbd] ??
         (chiTiet.lapTheoEm?.[sbd]?.length ? Object.fromEntries(chiTiet.lapTheoEm[sbd].map((q) => [q, 0])) : undefined)
       if (lapEm && teacherBank && moiNhat.dapAn && graded) {
         try {
@@ -369,7 +402,7 @@ export default function ExamMonitorScreen() {
     const thuTu = (l: LuotThiRow) => (l.trangThai === 'dang_lam' ? 1 : l.trangThai === 'duoc_duyet_lai' ? 2 : 0)
     out.sort((a, b) => thuTu(a.moiNhat) - thuTu(b.moiNhat) || (a.hoTen || a.sbd).localeCompare(b.hoTen || b.sbd, 'vi'))
     return out
-  }, [chiTiet, teacherBank, soCauCa, classList, deRiengCa])
+  }, [chiTiet, teacherBank, soCauCa, classList, deRiengCa, lapDungLai])
 
   // Tự ghi điểm + chi tiết từng câu (mục 5) cho lượt vừa chấm được mà chưa ghi.
   useEffect(() => {
@@ -544,7 +577,11 @@ export default function ExamMonitorScreen() {
    * ghi lúc bấm Bắt đầu. Thầy mở ca ở điện thoại rồi xem trên máy tính thì máy
    * tính không có cờ, nhưng `chiTiet.ca` vẫn nói ca có bộ câu riêng. */
   const laCaDeRieng =
-    caCanDeRieng || Boolean(deRiengCa) || Object.keys(chiTiet?.lapTheoEm ?? {}).length > 0 || (chiTiet?.ca as { deRieng?: boolean } | undefined)?.deRieng === true
+    caCanDeRieng ||
+    Boolean(deRiengCa) ||
+    Object.keys(chiTiet?.lapTheoEm ?? {}).length > 0 ||
+    Object.keys(lapDungLai?.lapTheoEm ?? {}).length > 0 ||
+    (chiTiet?.ca as { deRieng?: boolean } | undefined)?.deRieng === true
   // Biên bản: bản ở máy này trước (đầy đủ nhất), rồi tới bản máy chủ đã cất
   // lúc bấm Bắt đầu — nhờ nó mà máy thứ hai vẫn đọc được.
   const bienBanLap = deRiengCa?.bienBan ?? (chiTiet?.bienBanDeRieng as BienBanDeRieng | undefined) ?? null

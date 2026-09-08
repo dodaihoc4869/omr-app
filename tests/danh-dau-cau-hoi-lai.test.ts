@@ -446,3 +446,44 @@ describe('HAI NÚT PHẠM VI + BẢN ĐỒ SAI DỰNG SẴN', () => {
     expect(NGUON).toContain('dsCa.push(await docCaTruoc(url, mat, c.maCa, ch))')
   })
 })
+
+describe('KHỐI ĐỎ DỰNG LẠI ĐƯỢC TRÊN MỌI MÁY', () => {
+  // Thầy chốt 08/09: "đồng bộ phần màu đỏ đấy vào tất cả các thiết bị".
+  //
+  // Bản đồ câu lặp + số lần sai được ghi lên máy chủ lúc bấm Bắt đầu, nhưng chỉ
+  // từ bản 08/09 và chỉ khi CHÍNH máy bấm Bắt đầu chạy bản đó. Ca cũ hơn thì ô
+  // rỗng, và mọi máy khác nhìn vào đều thấy trống.
+  const NGUON = doc('src/lib/de-rieng-nguon.ts')
+
+  it('dựng lại từ HAI thứ máy chủ luôn có: bộ câu của ca + bản đồ sai ca trước', () => {
+    expect(NGUON).toContain('export async function dungLapTuMayChu(')
+    expect(NGUON).toContain('const { dsCa } = await docCacCaTruoc(url, mat, [maCa], ch)')
+    expect(NGUON).toContain('const lap = (boTheoEm[sbd] ?? []).filter((q) => (cua[q] ?? 0) > 0)')
+  })
+
+  it('KHÔNG cần kho đề hay IndexedDB của máy nào', () => {
+    const than = NGUON.slice(NGUON.indexOf('export async function dungLapTuMayChu'))
+    expect(than).not.toContain('loadSessionTeacherBank')
+    expect(than).not.toContain('loadExamSources')
+  })
+
+  it('màn Ca thi CHỈ dựng lại khi THIẾU — có sẵn thì không tốn thêm lệnh', () => {
+    expect(MAN_CA).toContain('if (daCoLap && daCoDem) return')
+    expect(MAN_CA).toContain('dungLapTuMayChu(url, mat, chiTiet.ca.maCa, bo)')
+  })
+
+  it('bản dựng lại có ĐỦ số lần sai, nhãn "sai lần thứ N" vẫn đúng', () => {
+    expect(MAN_CA).toContain('lapDungLai?.demSai?.[sbd] ??')
+    // Và đứng SAU hai nguồn chính: bản máy này và bản máy chủ chở sẵn.
+    expect(MAN_CA.indexOf('chiTiet.demSaiTheoEm?.[sbd] ??')).toBeLessThan(MAN_CA.indexOf('lapDungLai?.demSai?.[sbd] ??'))
+  })
+
+  it('nút vẫn mọc khi chỉ có bản dựng lại', () => {
+    expect(MAN_CA).toContain('Object.keys(lapDungLai?.lapTheoEm ?? {}).length > 0')
+  })
+
+  it('dựng lại hỏng thì im lặng, không làm vỡ màn ca', () => {
+    const than = MAN_CA.slice(MAN_CA.indexOf('dungLapTuMayChu(url, mat'), MAN_CA.indexOf('// Gom theo SBD'))
+    expect(than).toContain('.catch(() => {})')
+  })
+})

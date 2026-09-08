@@ -250,3 +250,44 @@ export function lapCuaTungEm(boTheoEm: Record<string, string[]>, demSai: Record<
   }
   return ra
 }
+
+/** DỰNG LẠI KHỐI "CÒN SAI LẠI" TỪ MÁY CHỦ, cho máy nào cũng xem được.
+ *
+ * Thầy chốt 08/09: "đồng bộ phần màu đỏ đấy vào tất cả các thiết bị".
+ *
+ * Bản đồ câu lặp và số lần sai được ghi lên máy chủ lúc bấm Bắt đầu — nhưng chỉ
+ * từ bản app 08/09 trở đi, và chỉ khi chính máy bấm Bắt đầu chạy bản đó. Ca mở
+ * trước đó, hoặc bấm bằng máy chưa cập nhật, thì ô đó rỗng và mọi máy khác nhìn
+ * vào đều thấy trống.
+ *
+ * Hàm này dựng lại hai bản đồ ấy TẠI CHỖ, từ hai thứ máy chủ luôn có:
+ *   · `boTheoEm` — bộ câu của từng em trong ca này;
+ *   · `BanDoSai` — câu sai của từng em ở các ca trước (ghi lúc chấm).
+ *
+ * Không cần kho đề, không cần IndexedDB của máy nào, nên máy vừa mở app lần đầu
+ * cũng xem được. */
+export async function dungLapTuMayChu(
+  url: string,
+  mat: string,
+  maCa: string,
+  boTheoEm: Record<string, string[]>,
+  ch: CauHinhDeRieng = CAU_HINH_DE_RIENG_MAC_DINH,
+): Promise<{ lapTheoEm: Record<string, string[]>; demSai: Record<string, Record<string, number>> }> {
+  const dsSbd = Object.keys(boTheoEm)
+  if (dsSbd.length === 0) return { lapTheoEm: {}, demSai: {} }
+
+  const { dsCa } = await docCacCaTruoc(url, mat, [maCa], ch)
+  if (dsCa.length === 0) return { lapTheoEm: {}, demSai: {} }
+
+  const demSai = demLanSai(dsCa)
+  const lapTheoEm: Record<string, string[]> = {}
+  for (const sbd of dsSbd) {
+    const cua = demSai[sbd]
+    if (!cua) continue
+    // Câu lặp = câu trong đề em lần này MÀ em đã sai ở ca trước. Đúng định
+    // nghĩa máy đã dùng lúc ra đề, nên hai đường cho cùng một danh sách.
+    const lap = (boTheoEm[sbd] ?? []).filter((q) => (cua[q] ?? 0) > 0)
+    if (lap.length > 0) lapTheoEm[sbd] = lap
+  }
+  return { lapTheoEm, demSai }
+}

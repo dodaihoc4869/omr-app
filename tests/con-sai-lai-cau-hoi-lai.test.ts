@@ -61,7 +61,10 @@ describe('màn ca thi có nút báo em còn sai lại', () => {
     expect(MAN).toContain('{laCaDeRieng && (')
     expect(MAN).not.toContain('{tongKetLap.soEmCoLap > 0 && (')
     // Ca thường: cả ba nguồn đều tắt ⇒ không mọc khối rỗng.
-    expect(MAN).toContain('caCanDeRieng || Boolean(deRiengCa) || Object.keys(chiTiet?.lapTheoEm ?? {}).length > 0')
+    expect(MAN).toContain('caCanDeRieng ||')
+    expect(MAN).toContain('Object.keys(chiTiet?.lapTheoEm ?? {}).length > 0 ||')
+    // Và cả bản dựng lại từ máy chủ, để máy chưa từng mở ca cũng thấy nút.
+    expect(MAN).toContain('Object.keys(lapDungLai?.lapTheoEm ?? {}).length > 0 ||')
     // Và hỏi cả cờ MÁY CHỦ: máy thứ hai không có IndexedDB của máy mở ca.
     expect(MAN).toContain("(chiTiet?.ca as { deRieng?: boolean } | undefined)?.deRieng === true")
     // Và khi 0 câu thì nút phải NÓI VÌ SAO, không chỉ đứng im.
