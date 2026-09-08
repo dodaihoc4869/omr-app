@@ -82,7 +82,7 @@ describe('Ô Đ/S BẤM ĐƯỢC BẰNG NGÓN TAY', () => {
   })
 
   it('ô Đ/S đủ 44px trở lên — ô cũ 34×30 là dưới ngưỡng ngón tay', () => {
-    expect(html).toContain('body.co-lam .tf-badge { width: 46px; height: 44px; border-radius: 10px; font-size: 15px; }')
+    expect(html).toContain('body.co-lam .tf-badge { width: 46px; height: 44px; border-radius: 10px; font-size: 15px; position: relative; }')
     const khoi = html.slice(html.indexOf('body.co-lam .tf-badge {'))
     const cao = /height:\s*(\d+)px/.exec(khoi)
     const rong = /width:\s*(\d+)px/.exec(khoi)
@@ -101,19 +101,43 @@ describe('Ô Đ/S BẤM ĐƯỢC BẰNG NGÓN TAY', () => {
     expect(khoi).toContain('-webkit-user-select: none; user-select: none;')
   })
 
-  it('NHẬN CÚ CHẠM Ở POINTERUP — ngón tay nhích vài pixel vẫn tính là bấm', () => {
-    // Đây là nguyên nhân thứ hai của "bấm mãi không được": trình duyệt di động
-    // HUỶ click khi ngón tay xê dịch, mà chạm sạch tuyệt đối gần như không có.
-    expect(html).toContain("document.addEventListener('pointerdown', function (e) {")
-    expect(html).toContain("document.addEventListener('pointerup', function (e) {")
-    expect(html).toContain('if (Math.sqrt(dx * dx + dy * dy) >= 16) return;')
-    // Nhấc tay ở ô KHÁC thì không tính — kéo từ ô này sang ô kia không phải bấm.
+  it('NGHE TOUCH, KHÔNG NGHE pointer/click — vì Chromium HUỶ cả hai khi tay xê', () => {
+    // Đo bằng Chromium có cảm ứng, ghi nhật ký từng sự kiện: tay xê chừng 18px
+    // thì KHÔNG có pointerup, KHÔNG có click, chỉ còn touchend. Mọi cách vá ở
+    // tầng pointerup/click đều vô nghĩa vì không có sự kiện nào để bắt.
+    expect(html).toContain("document.addEventListener('touchstart', function (e) {")
+    expect(html).toContain("document.addEventListener('touchend', function (e) {")
+    expect(html).toContain('{ passive: true, capture: true }')
+    // Không còn nghe pointer nữa — nghe cả hai là một cú chạm ăn hai lần.
+    expect(html).not.toContain("document.addEventListener('pointerdown'")
+    expect(html).not.toContain("document.addEventListener('pointerup'")
+    // Và không còn con số ngưỡng đoán mò nào.
+    expect(html).not.toContain('Math.sqrt(dx * dx + dy * dy)')
+  })
+
+  it('HỎI TOẠ ĐỘ, không hỏi e.target — chạm di động bị pointer capture ngầm', () => {
+    expect(html).toContain('var el = document.elementFromPoint(t.clientX, t.clientY);')
+    expect(html).toContain('function oTaiCham(t) {')
+    // Nhấc tay ở ô KHÁC thì không tính.
     expect(html).toContain('if (!o || o !== d.o) return;')
   })
 
-  it('KHÔNG ĂN HAI LẦN: click theo sau pointerup bị bỏ qua', () => {
-    expect(html).toContain('if (Date.now() - vuaChon < 700) return;')
-    expect(html).toContain('vuaChon = Date.now();')
+  it('CUỘN THẬT thì không tính là bấm — so mốc cuộn trước và sau', () => {
+    expect(html).toContain('function cuonY() {')
+    expect(html).toContain('if (Math.abs(cuonY() - d.cuon) > 8) return;')
+  })
+
+  it('KHÔNG ĂN HAI LẦN, nhưng chỉ khoá ĐÚNG Ô vừa chọn', () => {
+    // Bản trước khoá theo cửa sổ thời gian phủ lên MỌI ô, nên bấm nút thứ hai
+    // trong 700ms là mất — đúng triệu chứng "nút bấm được nút không".
+    expect(html).toContain('if (o === oVuaChon && Date.now() - lucVuaChon < 700) return;')
+    expect(html).not.toContain('if (Date.now() - vuaChon < 700) return;')
+  })
+
+  it('VÙNG CHẠM rộng hơn ô nhìn thấy, nhưng không chồng sang ô bên cạnh', () => {
+    expect(html).toContain("body.co-lam .tf-badge.lam-o::after { content: ''; position: absolute; inset: -6px; border-radius: 14px; }")
+    // Nới 6px mỗi phía, hai ô cách nhau 12px ⇒ vừa khít, không chồng.
+    expect(html).toContain('body.co-lam .tf-o { gap: 12px; }')
   })
 
   it('CUỘN KHÔNG PHẢI BẤM, và chấm xong thì khoá tay', () => {
@@ -121,7 +145,7 @@ describe('Ô Đ/S BẤM ĐƯỢC BẰNG NGÓN TAY', () => {
     // `daNop` chặn cả ba đường vào.
     // Mốc cuối là dòng của khối bàn phím: `keydown` đầu tiên trong phiếu là
     // của menu PDF, nằm TRƯỚC khối làm bài, cắt theo nó ra chuỗi rỗng.
-    const kv = html.slice(html.indexOf("document.addEventListener('pointerdown'"), html.indexOf('chonO(oPhim);'))
+    const kv = html.slice(html.indexOf("document.addEventListener('touchstart'"), html.indexOf('chonO(oPhim);'))
     expect((kv.match(/if \(daNop/g) || []).length).toBeGreaterThanOrEqual(3)
   })
 

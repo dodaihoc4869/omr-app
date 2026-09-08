@@ -77,6 +77,12 @@ async function moCa(cach: CachLay) {
   // chỉ cho nó đủ thời gian chạy.
   await waitFor(() => expect(r.container.textContent).toContain('Bộ câu ra đề'), { timeout: 20000 })
   fireEvent.click(r.getByRole('checkbox', { name: TEN_CHIP[cach] }))
+  // CHỜ KHỐI RÚT BÁO XONG rồi mới bấm Mở ca. Tick chip chỉ đổi `cheDo`; phải
+  // qua HAI hiệu ứng nữa (rút bộ câu, rồi báo lên màn) thì cờ `lenBang` mới
+  // tới nơi. Bấm Mở ca ngay là gói gửi đi còn mang giá trị của chế độ CŨ —
+  // đúng kiểu trượt ngẫu nhiên khi máy tải nặng (thầy gặp 08/09).
+  // Điều kiện kiểm giữ nguyên, chỉ chờ cho đủ.
+  await waitFor(() => expect(r.getByRole('checkbox', { name: TEN_CHIP[cach] }).getAttribute('aria-checked')).toBe('true'), { timeout: 20000 })
   fireEvent.change(r.getByPlaceholderText('Lớp (vd 12A1)'), { target: { value: '12A1' } })
   // Tiêu đề màn cũng là chữ "Mở ca kiểm tra" — lấy đúng cái NÚT.
   fireEvent.click(r.getAllByText('Mở ca kiểm tra').find((e) => e.tagName === 'BUTTON')!)

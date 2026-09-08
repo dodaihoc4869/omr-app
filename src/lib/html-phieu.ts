@@ -334,7 +334,12 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
    bấm mãi không được"). Ô cũ 34x30 — dưới ngưỡng 44px, lại đứng cách nhau 10px
    nên ngón tay rơi vào khe giữa hai ô là mất cú bấm.
    CHỈ áp cho phiếu làm bài: phiếu đọc và bản in giữ nguyên khổ cũ. */
-body.co-lam .tf-badge { width: 46px; height: 44px; border-radius: 10px; font-size: 15px; }
+body.co-lam .tf-badge { width: 46px; height: 44px; border-radius: 10px; font-size: 15px; position: relative; }
+/* VÙNG CHẠM RỘNG HƠN Ô NHÌN THẤY. Đo trên Chromium có cảm ứng: tay xê ngang
+   18px là đã rơi ra rìa ô 46px và mất cú bấm. Nới thêm 6px mỗi phía cho ngón
+   tay, giao diện KHÔNG đổi. Đúng 6px vì hai ô cách nhau 12px — rộng hơn nữa là
+   hai vùng chạm chồng lên nhau, bấm Đ lại ăn sang S. */
+body.co-lam .tf-badge.lam-o::after { content: ''; position: absolute; inset: -6px; border-radius: 14px; }
 body.co-lam .tf-o { gap: 12px; }
 body.co-lam .tf-head span { width: 46px; }
 body.co-lam .tf-item { padding: 9px 10px; }
@@ -1450,33 +1455,58 @@ export const JS_PHIEU = `
       // Nay: nhớ chỗ ngón tay đặt xuống, tới lúc nhấc lên còn trong cùng một ô
       // và xê dịch dưới 14px thì tính là bấm. Cuộn thật (kéo xa hơn) vẫn là
       // cuộn. Chuột và bàn phím đi đường click như cũ, có khoá chống ăn hai lần.
-      var batDau = null;
-      var vuaChon = 0;
-      document.addEventListener('pointerdown', function (e) {
-        if (daNop || !e.target || !e.target.closest) { batDau = null; return; }
-        var o = e.target.closest('.lam-o');
-        batDau = o ? { o: o, x: e.clientX, y: e.clientY } : null;
-      }, true);
-      document.addEventListener('pointerup', function (e) {
-        var d = batDau;
-        batDau = null;
-        if (daNop || !d || !e.target || !e.target.closest) return;
-        var o = e.target.closest('.lam-o');
+      // LUẬT NHẬN CÚ CHẠM — nghe TOUCH, không nghe pointer/click.
+      //
+      // Thầy bắt được 08/09: "các nút bấm vẫn không bấm được, nút bấm được nút
+      // không". Đo bằng Chromium có cảm ứng, ghi nhật ký từng sự kiện: khi ngón
+      // tay xê chừng 18px, Chromium coi đó là kéo trang và HUỶ luôn cả chuỗi
+      // pointer lẫn click — chỉ còn touchstart / touchmove / touchend được bắn.
+      // Nên mọi cách vá ở tầng pointerup hay click đều không cứu được: không có
+      // sự kiện nào để mà bắt.
+      //
+      // Nay nghe thẳng touchend. Luật đúng thứ người bấm trông đợi:
+      //   · nhấc tay CÒN Ở TRONG Ô đã đặt tay xuống thì là bấm ô đó;
+      //   · trang trượt quá 8px giữa lúc đặt và nhấc thì đó là cuộn, bỏ qua.
+      // Hỏi elementFromPoint theo toạ độ, KHÔNG hỏi e.target: chạm trên di động
+      // bị "pointer capture" ngầm nên e.target luôn là ô lúc đặt tay xuống.
+      //
+      // Chuột và bàn phím vẫn đi đường click; khoá chống-ăn-hai-lần gắn với
+      // ĐÚNG Ô vừa chọn, không phải một cửa sổ thời gian phủ lên mọi ô — bấm
+      // nút khác ngay sau đó vẫn ăn.
+      // (Cấm dấu huyền ngược trong khối này: cả khối nằm trong một chuỗi mẫu.)
+      function cuonY() {
+        return window.pageYOffset || (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop || 0;
+      }
+      function oTaiCham(t) {
+        if (!t) return null;
+        var el = document.elementFromPoint(t.clientX, t.clientY);
+        return el && el.closest ? el.closest('.lam-o') : null;
+      }
+      var chamDau = null;
+      var oVuaChon = null;
+      var lucVuaChon = 0;
+      document.addEventListener('touchstart', function (e) {
+        if (daNop) { chamDau = null; return; }
+        var o = oTaiCham(e.touches && e.touches[0]);
+        chamDau = o ? { o: o, cuon: cuonY() } : null;
+      }, { passive: true, capture: true });
+      document.addEventListener('touchend', function (e) {
+        var d = chamDau;
+        chamDau = null;
+        if (daNop || !d) return;
+        if (Math.abs(cuonY() - d.cuon) > 8) return;
+        var o = oTaiCham(e.changedTouches && e.changedTouches[0]);
         if (!o || o !== d.o) return;
-        // KHOẢNG CÁCH THẬT, không cộng hai trục: cộng lại thì cú chạm xê chéo
-        // 9px mỗi trục (thật ra chỉ 12,7px) bị loại oan.
-        var dx = e.clientX - d.x, dy = e.clientY - d.y;
-        if (Math.sqrt(dx * dx + dy * dy) >= 16) return;
-        vuaChon = Date.now();
+        oVuaChon = o;
+        lucVuaChon = Date.now();
         chonO(o);
-      });
+      }, { passive: true, capture: true });
       document.addEventListener('click', function (e) {
         if (daNop || !e.target || !e.target.closest) return;
         var o = e.target.closest('.lam-o');
         if (!o) return;
-        // Cú chạm vừa xử lý ở pointerup rồi — click theo sau là ăn hai lần,
-        // và ở phần I ăn hai lần nghĩa là chọn xong tự bỏ chọn ngay.
-        if (Date.now() - vuaChon < 700) return;
+        // Chỉ bỏ qua click của ĐÚNG cú chạm vừa xử lý. Ô khác vẫn chạy ngay.
+        if (o === oVuaChon && Date.now() - lucVuaChon < 700) return;
         chonO(o);
       });
 

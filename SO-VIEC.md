@@ -16,15 +16,34 @@ Lùi: `git revert 6b2956a` (và `git revert 5c7374d` nếu muốn lùi cả đ�
 - [x] "học sinh thi xong nhưng chưa thống kê là đã làm sai câu trước" | bằng chứng: `dungPhieuMayEm` nhận `lapCua`, máy chủ gửi `demLap`; 5 phép kiểm "BÁO CÁO SAU THI" đạt
 - [x] "màu của phiếu html … 7 màu 7 sắc cầu vồng để hiển thị lần lượt rồi quay vòng" | bằng chứng: 7 khối `body[data-mau]`; `tests/bam-chon-tren-de.test.ts` chạy thật: mở lần 2 nhích đúng 1 sắc, mở đủ 7 lần quay về đúng sắc cũ
 - [x] (tự phát sinh) Cập nhật nhật ký app `claude/OMR-APP-build-status.md` | bằng chứng: đã ghi mục 08/09/2026
-- [!] Hai lần chạy toàn bộ test có một phép kiểm lẻ trượt rồi tự xanh lại (`co-len-bang`, `khong-dung-bien-truoc-khi-khai`) | KẸT: chạy riêng đều đạt, hai lượt chạy toàn bộ liên tiếp sau đó đều 1981/1981 — nghi chập chờn do máy tải nặng, CHƯA truy được nguyên nhân gốc
+- [x] Test `co-len-bang` chập chờn | bằng chứng: TRUY RA GỐC — tick chip chỉ đổi `cheDo`, phải qua hai hiệu ứng nữa (rút bộ câu → báo lên màn) thì cờ `lenBang` mới tới; bấm Mở ca ngay là gói gửi đi mang giá trị chế độ CŨ. Thêm `waitFor` chờ chip `aria-checked=true`, KHÔNG đổi điều kiện kiểm. Ba lượt chạy toàn bộ liên tiếp: 1999/1999
 - [x] (tự phát sinh) Màn Ca thi chấm bằng bản đồ của riêng máy đã bấm Bắt đầu ⇒ mở ca ở máy khác thì khối "câu em sai buổi trước" đếm ra 0 và điểm lệch | bằng chứng: `chiTietCa` trả `boTheoEmCa`; cả màn dùng một `boTheoEmDung`; 2 phép kiểm "MÀN CA THI chấm bằng bản đồ MÁY CHỦ" đạt
 
 ### Đợt 4 — thầy nhắn 08/09 sau khi xem lại
 
 - [x] "câu em từng sai không nằm trong kho ca này nghĩa là như thế nào?" | bằng chứng: đọc ca 638242 — đề 12 câu (I:8 II:2 III:2), em cần 9 câu lặp mà cả 8 chỗ phần I đã kín ⇒ NHÃN GÁN SAI, đúng ra là "hết chỗ" chứ không phải "ngoài kho". Thêm lý do `het_cho`; 3 phép kiểm đạt
 - [x] "rút ra 8 câu làm sai lần 2 có 1 câu là chính xác chưa?" | bằng chứng: CHƯA CHÍNH XÁC. Chấm lại 8 câu từ đáp án thật: 3 đúng · 4 sai · 1 bỏ trống. Màn hình đếm ra 1 vì chấm bằng bản đồ của riêng máy đã bấm Bắt đầu — đã sửa ở `6b2956a`
+- [x] "nút chọn đáp án đúng sai bấm cũng không nhạy" (thầy nhắc lại) | bằng chứng: chính bản vá dưới đây; thêm nhận cú chạm ở pointerup
+- [!] Video còn một dấu hiệu nữa: lựa chọn ý a BIẾN MẤT ở cuối video | KẸT: đã bóc 22 khung hình xem kỹ, đã tái hiện bằng Chromium có cảm ứng trên CẢ bản cũ lẫn bản mới với đúng kịch bản (a=S, c=Đ, b=Đ, d=Đ, đổi a=Đ) — không dựng lại được, `lam` lưu đúng "S---" → "SDDD" → "DDDD". CHƯA truy được nguyên nhân gốc, không sửa mò
 - [x] "video nút đúng sai bấm không nhạy, nút Đ bấm mãi không được" | bằng chứng: HAI nguyên nhân — ô 34×30px (dưới ngưỡng ngón tay) và trình duyệt huỷ click khi ngón tay xê. Nay ô 46×44, nhận cú chạm ở pointerup. Chromium thật 360px có cảm ứng: 7 phép chạm đều đúng
 - [x] "ý của tôi là đổi màu cả 2 chỗ này nữa" (bìa phiếu + khối Tổng quan đề bài) | bằng chứng: hai dải màu gõ cứng mã navy, không dùng biến. Đo trên Chromium: bìa và khối Tổng quan nay ra rgb(127,29,29) theo sắc 1
+
+### Đợt 5 — thầy nhắn 08/09
+
+- [ ] "bạn đồng bộ sang tất cả các máy cho tôi" | bằng chứng: (chưa có)
+- [ ] (tự phát sinh) Hai con số vênh trên cùng màn: biên bản "rút được 8" nhưng khối đỏ "hỏi lại 9 câu" | bằng chứng: (chưa có)
+- [ ] (tự phát sinh) Biên bản CŨ vẫn hiện "lấy từ ca —" và nhãn "ngoài kho" sai, vì cất trước khi có `tuCaCua`/`phamVi`/`het_cho` | bằng chứng: (chưa có)
+
+- [x] "các nút bấm vẫn không bấm được, nút bấm được nút không, bạn sửa triệt để đi" | bằng chứng: ghi nhật ký từng sự kiện trong Chromium có cảm ứng — tay xê ~18px thì Chromium HUỶ cả pointerup lẫn click, chỉ còn touchend. Chuyển sang nghe touchstart/touchend + hit-test toạ độ + mốc cuộn; khoá chống-ăn-hai-lần gắn theo ĐÚNG ô. Đo lại: xê ngang 8/18/22px đều ăn, xê dọc 6/15px đều ăn, kéo dọc 60px vẫn là cuộn
+
+- [ ] "điểm ở trong ca thi và mục học sinh chưa đồng bộ" | bằng chứng: (chưa có)
+
+### Đợt 4 — bằng chứng phát hành
+
+- [x] `npx tsc -b` sạch · `npx vitest run` 1996 passed/132 tệp · `check:mau` đạt · `kiem:hien-thi` ĐẠT 18/18 · `build` 2.34s
+- [x] Đẩy lúc 11 ca đều daVao=daNop, không ca nào còn hạn vào (đo lúc 06:44Z)
+- [x] Commit `2374f12`; bản live `assets/index-AI381o3z.js` mang đủ 6 dấu hiệu
+- [x] Cập nhật nhật ký app `claude/OMR-APP-build-status.md`
 
 ## Năm cổng bắt buộc trước khi đẩy
 
