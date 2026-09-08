@@ -38,6 +38,8 @@ Lùi: `git revert 6b2956a` (và `git revert 5c7374d` nếu muốn lùi cả đ�
 
 - [ ] "điểm ở trong ca thi và mục học sinh chưa đồng bộ" | bằng chứng: (chưa có)
 
+- [x] "nút bấm vẫn vậy không bấm được, có cái nhận có cái không" (lần 4) | ĐỔI CÁCH theo luật giậm chân: ô chọn nay là thẻ <button> THẬT (nền), cộng lưới an toàn touchend (bắt ca trình duyệt huỷ click). Đo trên Chromium có cảm ứng: chạm sạch, xê ngang 18px, xê dọc 15px, bàn phím Enter, chọn-rồi-bỏ-chọn — tất cả đúng; kéo dọc 90px vẫn là cuộn. KHAI RÕ: mọi phép đo của tôi chạy trên Chromium giả lập cảm ứng, KHÔNG phải Samsung Internet trên máy thầy
+
 ### Đợt 4 — bằng chứng phát hành
 
 - [x] `npx tsc -b` sạch · `npx vitest run` 1996 passed/132 tệp · `check:mau` đạt · `kiem:hien-thi` ĐẠT 18/18 · `build` 2.34s

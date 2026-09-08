@@ -321,6 +321,12 @@ button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
    CHỌN NGAY TRÊN PHƯƠNG ÁN, không có hàng "EM CHỌN" riêng nữa (thầy chốt
    08/09). Hàng phương án của đề vốn đã cao hơn 44px nên cỡ chạm đã đạt; ở đây
    chỉ thêm con trỏ, viền chọn và trạng thái. */
+/* Ô CHỌN LÀ THẺ <button> THẬT. Reset dáng mặc định của nút để hình y hệt bản
+   chỉ đọc, nhưng vẫn là nút với trình duyệt — đó mới là thứ làm cú chạm ăn. */
+button.lam-o {
+  appearance: none; -webkit-appearance: none;
+  font: inherit; color: inherit; text-align: left; margin: 0;
+}
 .lam-o {
   cursor: pointer; -webkit-tap-highlight-color: transparent;
   /* KHÔNG CHỜ CHẠM ĐÚP: thiếu dòng này thì trình duyệt di động giữ chạm lại
@@ -516,10 +522,12 @@ body.co-lam .tf-item { padding: 9px 10px; }
 .q-options.single-col { grid-template-columns: 1fr; }
 .q-opt {
   display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 9px 12px;
+  width: 100%; box-sizing: border-box;
   background: #f8fafc; border: 1px solid var(--vien); border-radius: var(--bo-nho);
   font-size: 14.5px; line-height: 1.5; color: var(--muc-2);
   transition: background-color var(--muot), border-color var(--muot), color var(--muot);
 }
+.q-opt-text { display: block; min-width: 0; }
 .q-opt-letter {
   flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
   background: var(--vien-dam); color: #ffffff;
@@ -546,7 +554,7 @@ body.co-lam .tf-item { padding: 9px 10px; }
 .tf-statement { flex: 1; min-width: 0; font-size: 14.5px; line-height: 1.55; color: var(--muc-2); overflow-wrap: break-word; }
 .tf-o { display: flex; gap: 10px; flex-shrink: 0; }
 .tf-badge {
-  width: 34px; height: 30px; border-radius: 8px;
+  width: 34px; height: 30px; border-radius: 8px; box-sizing: border-box; padding: 0;
   display: flex; align-items: center; justify-content: center;
   font-size: 14px; font-weight: 800;
   background: #f1f5f9; color: var(--rat-nhat); border: 1px solid var(--vien);
@@ -840,8 +848,16 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
         const dung = CHU_PA[i] === (c.dapAn || '').trim().toUpperCase()
         const anh = c.anhLuaChon?.[i]
         const noi = anh ? anhHtml(anh, 'pa', `Phương án ${CHU_PA[i]}`) : chuHtml(pa)
-        const chon = choLam ? ` lam-o" data-chon="${CHU_PA[i]}" role="radio" aria-checked="false" tabindex="0` : ''
-        return `<div class="q-opt${dung ? ' dung' : ''}${chon}"><div class="q-opt-letter"><span class="ky">${CHU_PA[i]}</span></div><div class="q-opt-text">${noi}${hinhTaiViTri(c, `sau_pa_${CHU_PA[i]}`)}</div></div>`
+        // THẺ NÚT THẬT, không phải div gắn sự kiện (thầy chốt 08/09 sau bốn
+        // lần báo "nút bấm được nút không"). Trình duyệt di động xử lý cú chạm
+        // cho <button> khác hẳn cho <div>: nó tự lo ngưỡng xê tay, tự huỷ đúng
+        // lúc, tự phát click. Mọi mã tự bắt chạm đều thua hàng gốc này.
+        // SPAN chứ không DIV: thẻ button chỉ được chứa nội dung dòng, nhét div
+        // vào là HTML sai chuẩn và trình duyệt tự cắt cấu trúc — đo được: cả
+        // phương án phần I mất hẳn cú bấm.
+        const trong = `<span class="q-opt-letter"><span class="ky">${CHU_PA[i]}</span></span><span class="q-opt-text">${noi}${hinhTaiViTri(c, `sau_pa_${CHU_PA[i]}`)}</span>`
+        if (!choLam) return `<div class="q-opt${dung ? ' dung' : ''}"><div class="q-opt-letter"><span class="ky">${CHU_PA[i]}</span></div><div class="q-opt-text">${noi}${hinhTaiViTri(c, `sau_pa_${CHU_PA[i]}`)}</div></div>`
+        return `<button type="button" class="q-opt${dung ? ' dung' : ''} lam-o" data-chon="${CHU_PA[i]}" role="radio" aria-checked="false">${trong}</button>`
       })
       .join('')
     than = `<div class="q-options${dai ? ' single-col' : ''}">${o}</div>`
@@ -851,9 +867,11 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
       .map((y, i) => {
         const anh = c.anhLuaChon?.[i]
         const noi = anh ? anhHtml(anh, 'pa', `Ý ${CHU_Y[i]}`) : chuHtml(y)
-        const cD = choLam ? ` lam-o" data-chon="D" role="radio" aria-checked="false" tabindex="0` : ''
-        const cS = choLam ? ` lam-o" data-chon="S" role="radio" aria-checked="false" tabindex="0` : ''
-        return `<div class="tf-item"${choLam ? ` data-y="${CHU_Y[i]}"` : ''}><div class="tf-statement">${CHU_Y[i]}. ${noi}${hinhTaiViTri(c, `sau_y_${CHU_Y[i]}`)}</div><div class="tf-o"><div class="tf-badge d${dung[i] ? ' dung' : ''}${cD}"><span class="ky">Đ</span></div><div class="tf-badge s${dung[i] ? '' : ' dung'}${cS}"><span class="ky">S</span></div></div></div>`
+        const oDS = (ds: 'd' | 's', ky: string, laDung: boolean) =>
+          choLam
+            ? `<button type="button" class="tf-badge ${ds}${laDung ? ' dung' : ''} lam-o" data-chon="${ds === 'd' ? 'D' : 'S'}" role="radio" aria-checked="false" aria-label="${ky === 'Đ' ? 'Đúng' : 'Sai'} — ý ${CHU_Y[i]}"><span class="ky">${ky}</span></button>`
+            : `<div class="tf-badge ${ds}${laDung ? ' dung' : ''}"><span class="ky">${ky}</span></div>`
+        return `<div class="tf-item"${choLam ? ` data-y="${CHU_Y[i]}"` : ''}><div class="tf-statement">${CHU_Y[i]}. ${noi}${hinhTaiViTri(c, `sau_y_${CHU_Y[i]}`)}</div><div class="tf-o">${oDS('d', 'Đ', dung[i])}${oDS('s', 'S', !dung[i])}</div></div>`
       })
       .join('')
     than = `<div class="tf-head"><span>Đ</span><span>S</span></div>${hang}`
@@ -1455,24 +1473,25 @@ export const JS_PHIEU = `
       // Nay: nhớ chỗ ngón tay đặt xuống, tới lúc nhấc lên còn trong cùng một ô
       // và xê dịch dưới 14px thì tính là bấm. Cuộn thật (kéo xa hơn) vẫn là
       // cuộn. Chuột và bàn phím đi đường click như cũ, có khoá chống ăn hai lần.
-      // LUẬT NHẬN CÚ CHẠM — nghe TOUCH, không nghe pointer/click.
+      // HAI LỚP, MỖI LỚP MỘT VIỆC — thầy báo BỐN lần "nút bấm được nút không".
       //
-      // Thầy bắt được 08/09: "các nút bấm vẫn không bấm được, nút bấm được nút
-      // không". Đo bằng Chromium có cảm ứng, ghi nhật ký từng sự kiện: khi ngón
-      // tay xê chừng 18px, Chromium coi đó là kéo trang và HUỶ luôn cả chuỗi
-      // pointer lẫn click — chỉ còn touchstart / touchmove / touchend được bắn.
-      // Nên mọi cách vá ở tầng pointerup hay click đều không cứu được: không có
-      // sự kiện nào để mà bắt.
+      // Lớp 1: ô chọn là thẻ <button> THẬT, không phải div gắn sự kiện. Trình
+      // duyệt xử lý cú chạm cho nút gốc theo luật riêng của nó, tự nhận Enter
+      // và Space, và đọc màn hình gọi đúng tên. Đây là nền, không phải bản vá.
       //
-      // Nay nghe thẳng touchend. Luật đúng thứ người bấm trông đợi:
-      //   · nhấc tay CÒN Ở TRONG Ô đã đặt tay xuống thì là bấm ô đó;
-      //   · trang trượt quá 8px giữa lúc đặt và nhấc thì đó là cuộn, bỏ qua.
-      // Hỏi elementFromPoint theo toạ độ, KHÔNG hỏi e.target: chạm trên di động
-      // bị "pointer capture" ngầm nên e.target luôn là ô lúc đặt tay xuống.
+      // Lớp 2: LƯỚI AN TOÀN nghe touchend. Đo bằng Chromium có cảm ứng, ghi
+      // nhật ký từng sự kiện: ngón tay xê chừng 18px thì trình duyệt coi là kéo
+      // trang và HUỶ luôn click — kể cả trên thẻ button. Lúc đó chỉ còn touchend
+      // được bắn, nên lưới này là đường duy nhất còn bắt được cú bấm ấy.
+      // Luật của lưới: nhấc tay CÒN Ở TRONG Ô đã đặt tay xuống thì là bấm;
+      // trang trượt quá 8px giữa lúc đặt và nhấc thì đó là cuộn, bỏ qua.
+      // Hỏi elementFromPoint theo toạ độ, KHÔNG hỏi e.target — chạm di động bị
+      // "pointer capture" ngầm nên e.target luôn là ô lúc đặt tay xuống.
       //
-      // Chuột và bàn phím vẫn đi đường click; khoá chống-ăn-hai-lần gắn với
-      // ĐÚNG Ô vừa chọn, không phải một cửa sổ thời gian phủ lên mọi ô — bấm
-      // nút khác ngay sau đó vẫn ăn.
+      // CHỐNG ĂN HAI LẦN TẠI NGUỒN: lưới xử lý xong thì chặn luôn cú click giả
+      // mà trình duyệt phát sau touchend. Không dùng khoá theo thời gian nữa —
+      // khoá kiểu đó nuốt mất cú bấm lại cùng một ô để BỎ CHỌN, phép kiểm bấm
+      // thật trong DOM bắt được ngay.
       // (Cấm dấu huyền ngược trong khối này: cả khối nằm trong một chuỗi mẫu.)
       function cuonY() {
         return window.pageYOffset || (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop || 0;
@@ -1483,8 +1502,6 @@ export const JS_PHIEU = `
         return el && el.closest ? el.closest('.lam-o') : null;
       }
       var chamDau = null;
-      var oVuaChon = null;
-      var lucVuaChon = 0;
       document.addEventListener('touchstart', function (e) {
         if (daNop) { chamDau = null; return; }
         var o = oTaiCham(e.touches && e.touches[0]);
@@ -1497,30 +1514,20 @@ export const JS_PHIEU = `
         if (Math.abs(cuonY() - d.cuon) > 8) return;
         var o = oTaiCham(e.changedTouches && e.changedTouches[0]);
         if (!o || o !== d.o) return;
-        oVuaChon = o;
-        lucVuaChon = Date.now();
+        // Chặn cú click giả trình duyệt phát sau touchend. Nhờ đó một cú chạm
+        // chỉ chọn ĐÚNG MỘT LẦN mà không cần khoá theo thời gian.
+        if (e.cancelable) e.preventDefault();
         chonO(o);
-      }, { passive: true, capture: true });
+      }, { passive: false, capture: true });
       document.addEventListener('click', function (e) {
         if (daNop || !e.target || !e.target.closest) return;
         var o = e.target.closest('.lam-o');
         if (!o) return;
-        // Chỉ bỏ qua click của ĐÚNG cú chạm vừa xử lý. Ô khác vẫn chạy ngay.
-        if (o === oVuaChon && Date.now() - lucVuaChon < 700) return;
         chonO(o);
       });
 
-      // Ô chọn là thẻ div (giữ nguyên bố cục hàng phương án), nên phải tự
-      // nhận Enter và Space cho em dùng bàn phím.
-      // (Cấm dấu huyền ngược trong khối này: cả khối nằm trong một chuỗi mẫu.)
-      document.addEventListener('keydown', function (e) {
-        if (daNop || !e.target || !e.target.closest) return;
-        if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
-        var oPhim = e.target.closest('.lam-o');
-        if (!oPhim) return;
-        e.preventDefault();
-        chonO(oPhim);
-      });
+      // KHÔNG có khối bàn phím riêng: thẻ button tự nhận Enter và Space rồi
+      // tự phát click. Tự bắt thêm là ăn hai lần.
 
       document.addEventListener('input', function (e) {
         if (daNop || !e.target || !e.target.classList || !e.target.classList.contains('lam-nhap')) return;

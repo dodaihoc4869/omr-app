@@ -101,14 +101,34 @@ describe('Ô Đ/S BẤM ĐƯỢC BẰNG NGÓN TAY', () => {
     expect(khoi).toContain('-webkit-user-select: none; user-select: none;')
   })
 
-  it('NGHE TOUCH, KHÔNG NGHE pointer/click — vì Chromium HUỶ cả hai khi tay xê', () => {
+  it('Ô CHỌN LÀ THẺ <button> THẬT, không phải div gắn sự kiện', () => {
+    // Bốn lần thầy báo "nút bấm được nút không". Nền của bản sửa này là dùng
+    // phần tử tương tác gốc, để trình duyệt lo phần của nó.
+    expect(html).toContain('<button type="button" class="q-opt')
+    expect(html).toContain('<button type="button" class="tf-badge')
+    // Trong button chỉ được có nội dung dòng — nhét div vào là HTML sai chuẩn
+    // và đo được: cả phương án phần I mất hẳn cú bấm.
+    expect(html).toContain('<span class="q-opt-letter">')
+    expect(html).not.toContain('<button type="button" class="q-opt dung lam-o" data-chon="A"><div')
+    // Không tự bắt bàn phím nữa: button tự nhận Enter và Space rồi phát click.
+    expect(html).not.toContain("e.key !== 'Enter'")
+  })
+
+  it('PHIẾU ĐỌC vẫn là div, không mọc thêm nút nào', () => {
+    const doc = dungPhieu(TT, CAU)
+    expect(doc).not.toContain('<button type="button" class="q-opt')
+    expect(doc).not.toContain('<button type="button" class="tf-badge')
+    expect(doc).toContain('<div class="q-opt')
+  })
+
+  it('LƯỚI AN TOÀN nghe touchend — Chromium huỷ click kể cả trên thẻ button', () => {
     // Đo bằng Chromium có cảm ứng, ghi nhật ký từng sự kiện: tay xê chừng 18px
     // thì KHÔNG có pointerup, KHÔNG có click, chỉ còn touchend. Mọi cách vá ở
     // tầng pointerup/click đều vô nghĩa vì không có sự kiện nào để bắt.
     expect(html).toContain("document.addEventListener('touchstart', function (e) {")
     expect(html).toContain("document.addEventListener('touchend', function (e) {")
     expect(html).toContain('{ passive: true, capture: true }')
-    // Không còn nghe pointer nữa — nghe cả hai là một cú chạm ăn hai lần.
+    // Không nghe pointer — nghe cả pointer lẫn touch là một cú chạm ăn hai lần.
     expect(html).not.toContain("document.addEventListener('pointerdown'")
     expect(html).not.toContain("document.addEventListener('pointerup'")
     // Và không còn con số ngưỡng đoán mò nào.
@@ -127,10 +147,12 @@ describe('Ô Đ/S BẤM ĐƯỢC BẰNG NGÓN TAY', () => {
     expect(html).toContain('if (Math.abs(cuonY() - d.cuon) > 8) return;')
   })
 
-  it('KHÔNG ĂN HAI LẦN, nhưng chỉ khoá ĐÚNG Ô vừa chọn', () => {
-    // Bản trước khoá theo cửa sổ thời gian phủ lên MỌI ô, nên bấm nút thứ hai
-    // trong 700ms là mất — đúng triệu chứng "nút bấm được nút không".
-    expect(html).toContain('if (o === oVuaChon && Date.now() - lucVuaChon < 700) return;')
+  it('KHÔNG ĂN HAI LẦN — chặn click giả tại nguồn, KHÔNG khoá theo thời gian', () => {
+    // Khoá theo thời gian nuốt mất cú bấm lại cùng một ô để BỎ CHỌN; phép kiểm
+    // bấm thật trong DOM bắt được ngay. Nay chặn thẳng cú click giả sau touchend.
+    expect(html).toContain('if (e.cancelable) e.preventDefault();')
+    expect(html).toContain('{ passive: false, capture: true }')
+    expect(html).not.toContain('lucVuaChon')
     expect(html).not.toContain('if (Date.now() - vuaChon < 700) return;')
   })
 
@@ -145,12 +167,15 @@ describe('Ô Đ/S BẤM ĐƯỢC BẰNG NGÓN TAY', () => {
     // `daNop` chặn cả ba đường vào.
     // Mốc cuối là dòng của khối bàn phím: `keydown` đầu tiên trong phiếu là
     // của menu PDF, nằm TRƯỚC khối làm bài, cắt theo nó ra chuỗi rỗng.
-    const kv = html.slice(html.indexOf("document.addEventListener('touchstart'"), html.indexOf('chonO(oPhim);'))
+    const kv = html.slice(html.indexOf("document.addEventListener('touchstart'"), html.indexOf('KHÔNG có khối bàn phím riêng'))
     expect((kv.match(/if \(daNop/g) || []).length).toBeGreaterThanOrEqual(3)
   })
 
-  it('BÀN PHÍM gọi thẳng hàm chọn, không mượn click (đang bị khoá 700ms)', () => {
-    expect(html).toContain('chonO(oPhim);')
+  it('BÀN PHÍM do chính thẻ button lo, không có khối bắt phím riêng', () => {
+    // Thẻ button tự nhận Enter và Space rồi tự phát click. Tự bắt thêm là ăn
+    // hai lần — chọn xong tự bỏ chọn ngay.
+    expect(html).toContain('KHÔNG có khối bàn phím riêng')
+    expect(html).not.toContain('chonO(oPhim);')
     expect(html).not.toContain('oPhim.click();')
   })
 
