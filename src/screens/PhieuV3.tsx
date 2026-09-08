@@ -136,7 +136,7 @@ function Spark({ ds, maCaRieng }: { ds: { ngay: string; tong: number; maCa: stri
   )
 }
 
-export default function PhieuV3({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boolean }) {
+export default function PhieuV3({ du, laCuaEm = false, xinLink }: { du: PhieuDayDu; laCuaEm?: boolean; xinLink?: () => Promise<string> }) {
   const ch = useMemo(() => cauHinhPhieu(du.cauHinh), [du.cauHinh])
   const hienHang = duocHienHang(ch, du.deRieng)
   const [moHet, setMoHet] = useState(false)
@@ -232,7 +232,7 @@ export default function PhieuV3({ du, laCuaEm = false }: { du: PhieuDayDu; laCua
               {/* KHỐI RÚT BÀI GIỮ NGUYÊN của bản cũ — cùng một component, không
                   phải bản chép. Thầy chốt 07/09: "giữ nguyên mục rút bài trong
                   phiếu mới đầy đủ như trong phiếu cũ". */}
-              <NutTaiBaiTap du={du} laCuaEm={laCuaEm} />
+              <NutTaiBaiTap du={du} laCuaEm={laCuaEm} xinLink={xinLink} />
             </div>
           )}
         </div>

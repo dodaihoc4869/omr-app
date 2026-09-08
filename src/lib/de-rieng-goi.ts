@@ -75,6 +75,24 @@ export function moGoiDeRieng(goi: unknown): GoiDeRieng {
   return { bo: banDo(g), lap: {}, dem: {}, bb: null }
 }
 
+/** SỐ LẦN SAI TỪNG CÂU của MỘT em, đọc từ gói máy chủ trả về cho chính em đó.
+ *
+ * Máy chủ bản cũ không gửi trường này. Có `cauLap` mà thiếu `dem` thì dựng
+ * `{qid: 0}` — vẫn đủ để báo cáo gắn nhãn "câu em đã sai buổi trước", chỉ là
+ * không nói được sai lần thứ mấy. Thiếu hẳn còn tệ hơn (thầy bắt được 08/09:
+ * "học sinh thi xong nhưng chưa thống kê là đã làm sai câu trước"). */
+export function demLapCuaEm(dem: unknown, cauLap: string[] = []): Record<string, number> {
+  const ra: Record<string, number> = {}
+  if (dem && typeof dem === 'object' && !Array.isArray(dem)) {
+    for (const [q, n] of Object.entries(dem as Record<string, unknown>)) {
+      const so = Number(n)
+      if (q && Number.isFinite(so) && so >= 0) ra[q] = Math.max(0, Math.floor(so))
+    }
+  }
+  for (const q of cauLap) if (q && !(q in ra)) ra[q] = 0
+  return ra
+}
+
 /** Câu lặp của MỘT em, đọc từ gói máy chủ trả về cho chính em đó. */
 export function cauLapCuaEm(danhSach: unknown): string[] {
   if (!Array.isArray(danhSach)) return []

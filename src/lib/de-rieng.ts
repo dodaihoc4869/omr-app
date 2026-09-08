@@ -183,6 +183,9 @@ export interface KetQuaDeRieng {
   canCua: Record<string, number>
   /** sbd → số câu em sai ở ca lấy nguồn (mẫu số của 30%). */
   saiCaTruocCua: Record<string, number>
+  /** sbd → mã ca THẬT SỰ lấy câu sai của em đó. Quét mấy ca không có nghĩa là
+   * dùng cả mấy ca: ở `gan_nhat` chỉ dùng ĐÚNG MỘT ca gần nhất em có nộp. */
+  tuCaCua: Record<string, string>
   soLapTrungBinh: number
   /** Em không đủ câu lặp, kèm lý do — màn Mở ca in thẳng danh sách này ra. */
   thieuLap: EmThieuLap[]
@@ -215,6 +218,7 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
   const soLapCua: Record<string, number> = {}
   const canCua: Record<string, number> = {}
   const saiCaTruocCua: Record<string, number> = {}
+  const tuCaCua: Record<string, string> = {}
   const thieuLap: EmThieuLap[] = []
   const thieuCau: { sbd: string; thieu: number }[] = []
   const dayLai = new Map<string, string[]>()
@@ -225,6 +229,7 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
     const can = lap.can
     canCua[sbd] = can
     saiCaTruocCua[sbd] = lap.soSaiCaTruoc
+    tuCaCua[sbd] = lap.tuCa
     for (const q of lap.canDayLai) dayLai.set(q, [...(dayLai.get(q) ?? []), sbd])
 
     // Câu lặp phải CÒN TRONG KHO của ca này. Câu ca trước lấy từ đề khác mà ca
@@ -272,6 +277,7 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
     soLapCua,
     canCua,
     saiCaTruocCua,
+    tuCaCua,
     soLapTrungBinh: y.dsSbd.length > 0 ? tong / y.dsSbd.length : 0,
     thieuLap,
     canDayLai: [...dayLai.entries()].map(([qid, dsSbd]) => ({ qid, dsSbd })),

@@ -107,7 +107,15 @@ export function BangBienBanLap({ bb, tenCua }: { bb: BienBanDeRieng; tenCua: (sb
         Biên bản rút câu hỏi lại
       </div>
       <div style={{ ...NHAN_NHO, ...SO }}>
-        {bb.caDaQuet.length > 0 ? `quét ${bb.caDaQuet.length} ca gần nhất: ${bb.caDaQuet.join(' · ')}` : 'không quét được ca nào trước đó'}
+        {/* NÓI ĐÚNG PHẠM VI THẦY CHỌN. Bản trước ghi cứng "quét N ca gần nhất"
+            cho cả hai chế độ, nên thầy chọn "Ca gần nhất" mà đọc ra "3 ca gần
+            nhất" và tưởng máy rút sai (thầy bắt được 08/09). Quét mấy ca là
+            chuyện tìm ca em có nộp; LẤY mấy ca mới là điều thầy chốt. */}
+        {bb.caDaQuet.length === 0
+          ? 'không quét được ca nào trước đó'
+          : bb.phamVi === 'ba_ca'
+            ? `bốc 3 ca ngẫu nhiên: ${bb.caDaQuet.join(' · ')}`
+            : `lấy ca gần nhất em có nộp — đã dò ${bb.caDaQuet.length} ca: ${bb.caDaQuet.join(' · ')}`}
         {bb.lucRut ? ` · rút lúc ${ngayGio(bb.lucRut)}` : ''}
       </div>
       {bb.boQua.length > 0 && (
@@ -126,7 +134,7 @@ export function BangBienBanLap({ bb, tenCua }: { bb: BienBanDeRieng; tenCua: (sb
               <b>{tenCua(sbd) || `SBD ${sbd}`}</b>
               <span style={{ ...SO, color: 'var(--nhat)' }}>
                 {' '}
-                · ca trước sai {sai} câu · cần {can} · rút được {duoc}
+                · lấy từ ca {bb.tuCaCua?.[sbd] || '—'} · sai {sai} câu · cần {can} · rút được {duoc}
               </span>
               {t && (
                 <span style={{ color: 'var(--cam)' }}>
@@ -173,6 +181,13 @@ export default function ExamMonitorScreen() {
   /** Ca này MỞ ở chế độ đề riêng — cờ đánh lúc mở ca. Bộ câu thì rút lúc bấm
    * Bắt đầu, nên hai thứ này tách nhau. */
   const [caCanDeRieng, setCaCanDeRieng] = useState(false)
+  /** BẢN ĐỒ BỘ CÂU DÙNG ĐỂ CHẤM — MỘT nguồn cho cả màn.
+   *
+   * Máy chủ trước, IndexedDB của máy này sau. Thầy bắt được 08/09: mọi chỗ ở
+   * đây đọc thẳng bản đồ trong IndexedDB, tức bản chỉ nằm ở đúng cái máy đã bấm
+   * Bắt đầu. Mở ca ở máy khác là chấm lại bằng luật hash — khối "câu em sai
+   * buổi trước" đếm ra 0 dù máy chủ có đủ, và điểm trên bảng cũng lệch. */
+  const boTheoEmDung = chiTiet?.boTheoEmCa ?? deRiengCa?.boTheoEm
   /** BẢN DỰNG LẠI TỪ MÁY CHỦ cho khối "còn sai lại" — dùng khi ô trên máy chủ
    * không chở sẵn (ca mở trước 08/09, hoặc bấm Bắt đầu bằng máy chưa cập nhật).
    * Nhờ nó, MÁY NÀO mở ca cũng thấy đủ khối đỏ, không phải đúng máy đã bấm. */
@@ -304,7 +319,7 @@ export default function ExamMonitorScreen() {
     const url = scriptUrl.trim()
     const mat = secret.trim()
     if (!url || !mat) return
-    const bo = (chiTiet.keyBank as { boTheoEm?: Record<string, string[]> } | null | undefined)?.boTheoEm ?? deRiengCa?.boTheoEm
+    const bo = boTheoEmDung
     if (!bo || Object.keys(bo).length === 0) return
     const daCoLap = Object.keys(chiTiet.lapTheoEm ?? {}).length > 0 || Object.keys(deRiengCa?.lapTheoEm ?? {}).length > 0
     const daCoDem = Object.keys(chiTiet.demSaiTheoEm ?? {}).length > 0 || Object.keys(deRiengCa?.lapCua ?? {}).length > 0
@@ -337,7 +352,7 @@ export default function ExamMonitorScreen() {
       let graded: GradedSubmission | null = null
       if (teacherBank && moiNhat.dapAn && (moiNhat.trangThai === 'da_nop' || moiNhat.trangThai === 'khoa')) {
         try {
-          graded = gradeSubmissionFull(teacherBank, chiTiet.ca.maCa, sbd, moiNhat.dapAn, soCauCa, deRiengCa?.boTheoEm)
+          graded = gradeSubmissionFull(teacherBank, chiTiet.ca.maCa, sbd, moiNhat.dapAn, soCauCa, boTheoEmDung)
         } catch {
           graded = null
         }
@@ -359,7 +374,7 @@ export default function ExamMonitorScreen() {
         (chiTiet.lapTheoEm?.[sbd]?.length ? Object.fromEntries(chiTiet.lapTheoEm[sbd].map((q) => [q, 0])) : undefined)
       if (lapEm && teacherBank && moiNhat.dapAn && graded) {
         try {
-          const rows = taoChiTietCau(mergeKeepAnswers(teacherBank, soCauCa, deRiengCa?.boTheoEm), chiTiet.ca.maCa, sbd, moiNhat.dapAn, moiNhat.giayCau)
+          const rows = taoChiTietCau(mergeKeepAnswers(teacherBank, soCauCa, boTheoEmDung), chiTiet.ca.maCa, sbd, moiNhat.dapAn, moiNhat.giayCau)
           const cua = rows.filter((r) => typeof lapEm[r.qid] === 'number')
           lap = {
             tong: cua.length,
@@ -407,7 +422,7 @@ export default function ExamMonitorScreen() {
   // Tự ghi điểm + chi tiết từng câu (mục 5) cho lượt vừa chấm được mà chưa ghi.
   useEffect(() => {
     if (!chiTiet || !teacherBank) return
-    const bank = mergeKeepAnswers(teacherBank, soCauCa, deRiengCa?.boTheoEm)
+    const bank = mergeKeepAnswers(teacherBank, soCauCa, boTheoEmDung)
     const can = dsEm.filter((e) => e.graded && !daGhiRef.current.has(`${e.sbd}:${e.moiNhat.lanThu}:${e.moiNhat.nopLuc}`))
     if (can.length === 0) return
     const bai = can.map((e) => taoBaiGhiDiem(bank, chiTiet.ca.maCa, e.sbd, e.moiNhat.lanThu, e.moiNhat.dapAn!, e.graded!, e.moiNhat.giayCau))
@@ -655,6 +670,8 @@ export default function ExamMonitorScreen() {
           canCua: ra.canCua,
           soLapCua: ra.soLapCua,
           saiCaTruocCua: ra.saiCaTruocCua,
+          tuCaCua: ra.tuCaCua,
+          phamVi: pv,
           thieu: ra.thieu,
           boQua: ra.boQua,
           caDaQuet: ra.caDaQuet,
@@ -718,7 +735,7 @@ export default function ExamMonitorScreen() {
     try {
       // `boTheoEm` PHẢI đi cùng ở MỌI chỗ dựng bảng chấm: thiếu ở một chỗ là
       // chỗ đó cắt câu theo luật hash và dựng bảng của người khác.
-      const keyBank = mergeKeepAnswers(bank, soCauCa, deRiengCa?.boTheoEm)
+      const keyBank = mergeKeepAnswers(bank, soCauCa, boTheoEmDung)
       const xep = [...daCham].sort((a, b) => (b.diem ?? 0) - (a.diem ?? 0))
       const hangCua = new Map<string, number>()
       xep.forEach((e, i) => {
@@ -802,7 +819,7 @@ export default function ExamMonitorScreen() {
         deRieng: Boolean(deRiengCa),
         lapCua: deRiengCa?.lapCua,
       },
-      mergeKeepAnswers(bank, soCauCa, deRiengCa?.boTheoEm),
+      mergeKeepAnswers(bank, soCauCa, boTheoEmDung),
       daCham.filter((e): e is typeof e & { graded: NonNullable<typeof e.graded> } => !!e.graded),
       dsSbd,
       goc,
@@ -943,7 +960,7 @@ export default function ExamMonitorScreen() {
     let rowsHoSo: ChiTietCauRow[] | null = null
     if (chiTiet && teacherBank && emTrongCa?.moiNhat.dapAn) {
       try {
-        rowsHoSo = taoChiTietCau(mergeKeepAnswers(teacherBank, soCauCa, deRiengCa?.boTheoEm), chiTiet.ca.maCa, sbdHoSo, emTrongCa.moiNhat.dapAn, emTrongCa.moiNhat.giayCau)
+        rowsHoSo = taoChiTietCau(mergeKeepAnswers(teacherBank, soCauCa, boTheoEmDung), chiTiet.ca.maCa, sbdHoSo, emTrongCa.moiNhat.dapAn, emTrongCa.moiNhat.giayCau)
       } catch {
         rowsHoSo = null
       }

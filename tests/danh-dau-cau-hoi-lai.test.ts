@@ -186,7 +186,7 @@ describe('màn ca thi luôn trả lời được "câu em sai buổi trước"',
 
   it('bảng biên bản in ĐỦ mẫu số, chỉ tiêu, kết quả và lý do của từng em', () => {
     const bang = MAN_CA.slice(MAN_CA.indexOf('export function BangBienBanLap'), MAN_CA.indexOf('/** Nhãn trạng thái cho 1 em'))
-    expect(bang).toContain('ca trước sai {sai} câu · cần {can} · rút được {duoc}')
+    expect(bang).toContain("· lấy từ ca {bb.tuCaCua?.[sbd] || '—'} · sai {sai} câu · cần {can} · rút được {duoc}")
     expect(bang).toContain('CHU_LY_DO_THIEU')
     expect(bang).toContain('Ca không đọc được')
   })
@@ -202,7 +202,7 @@ describe('phiếu khắc phục trong báo cáo nộp được', () => {
     const khoi = doc('src/components/KhoiBaiLuyen.tsx')
     expect(khoi).toContain('setHtml(dungPhieu(tt, dsDaLoc.slice(0, lay), { nop }))')
     // Mã lấy từ link đã cất, KHÔNG tự sinh — trang này không có mã bí mật.
-    expect(khoi).toContain('docLinkPhieu(du.linkBaiTap.slice(du.linkBaiTap.indexOf')
+    expect(khoi).toContain('docLinkPhieu(link.slice(link.indexOf')
     // Thiếu bất kỳ mảnh nào thì phiếu vẫn mở, chỉ không có nút nộp.
     expect(khoi).toContain('const nop = maPhieu && du.sbd && urlNop ? { ma: maPhieu, sbd: du.sbd, url: urlNop } : null')
   })

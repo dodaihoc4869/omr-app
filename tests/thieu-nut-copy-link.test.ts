@@ -74,8 +74,11 @@ describe('không gửi lặng lẽ một báo cáo thiếu nút', () => {
     // 07/09: khối rút bài tách sang `components/KhoiBaiLuyen` để bố cục v3 và
     // bố cục cũ dùng CHUNG một bản. Luật không đổi, chỉ đổi tệp.
     const man = doc('src/components/KhoiBaiLuyen.tsx')
-    expect(man).toContain('{du.linkBaiTap && (')
-    const dau = man.indexOf('{du.linkBaiTap && (')
+    // 08/09: link có thể là bản chở sẵn trong báo cáo HOẶC bản vừa xin được
+    // tại chỗ; `linkBai` gộp đúng hai nguồn đó và không thêm điều kiện nào.
+    expect(man).toContain('const linkBai = du.linkBaiTap || linkTuXin')
+    expect(man).toContain('{linkBai && (')
+    const dau = man.indexOf('{linkBai && (')
     const doan = man.slice(dau, dau + 800)
     expect(doan).toContain('Copy link gửi ĐỀ cho con')
     expect(doan).toContain('Copy link gửi LỜI GIẢI cho con')

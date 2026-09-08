@@ -420,6 +420,24 @@ function cauLapCuaEm_(ref, sbd) {
   }
 }
 
+/** SỐ LẦN EM ĐÃ SAI TỪNG CÂU LẶP, TRƯỚC ca này.
+ *
+ * Thầy bắt được 08/09: "học sinh thi xong nhưng chưa thống kê là đã làm sai câu
+ * trước". Báo cáo em xem ngay sau khi nộp do chính máy em dựng; không có bản đồ
+ * này thì nhãn "sai lần thứ N" và mục "Đã sửa được" biến mất sạch.
+ *
+ * Trả riêng phần của em, KHÔNG trả cả bản đồ lớp. */
+function demLapCuaEm_(ref, sbd) {
+  if (!ref) return null
+  try {
+    const goi = docJsonLon_(ref)
+    const dem = goi && goi.dem && typeof goi.dem === 'object' ? goi.dem[String(sbd).trim()] : null
+    return dem && typeof dem === 'object' ? dem : null
+  } catch (err) {
+    return null
+  }
+}
+
 /** BỘ CÂU CỦA ĐÚNG MỘT EM — thứ quyết định em nhận tờ đề nào.
  *
  * Thầy bắt được 08/09: lệnh `vaoThi` gửi kho đề mà KHÔNG kèm bản đồ, nên máy em
@@ -3376,6 +3394,10 @@ function doPost(e) {
       // BỘ CÂU CỦA EM đi kèm MỌI lần vào, kể cả lần không xin lại kho đề: máy
       // em ghép vào kho đã cất rồi mới cắt đề.
       out.boCuaEm = boCuaEm
+      // SỐ LẦN SAI TỪNG CÂU LẶP — nguồn nhãn "sai lần thứ N" ở báo cáo em xem
+      // ngay sau khi nộp. Đọc ở đây, ngoài khoá thì tốn thêm một lượt mở tệp;
+      // gói này vốn đã mở cho `cauLap` nên không thêm lần đọc nào.
+      out.demLap = demLapCuaEm_(ca.boTheoEmRef, sbd)
       // Đề (KHÔNG đáp án) chỉ gửi khi máy em chưa có bản cache — tiết kiệm băng
       // thông. Đã đọc TRƯỚC KHI VÀO KHOÁ, xem `bankGui` bên trên.
       if (body.canBank) out.bank = bankGui

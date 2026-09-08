@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
 import { taoLinkPhieu } from '../lib/phieu-link'
@@ -604,6 +604,10 @@ export default function ExamTakeScreen() {
         lichSu: lichSuEm,
         khoKhacPhuc,
         thuTuKhacPhuc,
+        // CÂU HỎI LẠI VÀO ĐƯỢC BÁO CÁO CỦA EM (thầy chốt 08/09: "học sinh thi
+        // xong nhưng chưa thống kê là đã làm sai câu trước"). Máy chủ gửi bản
+        // đồ này lúc em vào thi; ca thường thì rỗng và báo cáo không đổi.
+        lapCua: attempt.demLap && Object.keys(attempt.demLap).length > 0 ? attempt.demLap : null,
         // Em thấy đúng thứ thầy và phụ huynh sẽ thấy. Em đã nhận cảnh báo ngay
         // lúc rời màn rồi, nên đây không phải tin dữ bất ngờ — chỉ là bản ghi.
         viPham: {
@@ -628,32 +632,43 @@ export default function ExamTakeScreen() {
   // Xin hỏng thì im lặng — phiếu vẫn mở được, chỉ là chưa nộp được, và khối
   // bài luyện đã có sẵn dòng nói vì sao.
   const [maBaiTapEm, setMaBaiTapEm] = useState('')
-  const daXinMaRef = useRef('')
+  /** Lần xin đang bay: một khoá, một lời hứa. Hai chỗ cùng cần link (hiệu ứng
+   * xin trước lúc dựng báo cáo, và cú bấm của em) thì dùng chung một lượt gọi,
+   * không gọi máy chủ hai lần cho cùng một bộ câu. Xin HỎNG thì xoá đi để lần
+   * bấm sau xin lại — treo một lời hứa hỏng là em bấm mãi không bao giờ có mã. */
+  const maBaiTapRef = useRef<{ khoa: string; hua: Promise<string> } | null>(null)
   const soCauKhacPhuc = phieuCuaEm?.baiTap?.length ?? 0
-  useEffect(() => {
+  const xinLinkBaiTap = useCallback(async (): Promise<string> => {
     const url = scriptUrl.trim()
     const a = attempt
-    if (!url || !a || !phieuCuaEm || soCauKhacPhuc === 0) return
+    if (!url || !a || !phieuCuaEm || soCauKhacPhuc === 0) return ''
     const khoa = `${a.maCa}:${a.sbd}:${soCauKhacPhuc}`
-    if (daXinMaRef.current === khoa) return
-    daXinMaRef.current = khoa
-    let huy = false
-    ghiPhieuKhacPhuc(
-      url,
-      a.maCa,
-      a.sbd,
-      a.idThietBi ?? '',
-      (phieuCuaEm.baiTap ?? []).map((c) => ({ id: c.id, phan: c.phan, dapAn: c.dapAn })),
-      { hoTen: phieuCuaEm.hoTen, tenChuyenDe: phieuCuaEm.chuyenDeCa?.[0]?.ten ?? '' },
-    )
-      .then((ma) => {
-        if (!huy && ma) setMaBaiTapEm(ma)
+    if (!maBaiTapRef.current || maBaiTapRef.current.khoa !== khoa) {
+      const hua = ghiPhieuKhacPhuc(
+        url,
+        a.maCa,
+        a.sbd,
+        a.idThietBi ?? '',
+        (phieuCuaEm.baiTap ?? []).map((c) => ({ id: c.id, phan: c.phan, dapAn: c.dapAn })),
+        { hoTen: phieuCuaEm.hoTen, tenChuyenDe: phieuCuaEm.chuyenDeCa?.[0]?.ten ?? '' },
+      )
+      hua.catch(() => {
+        if (maBaiTapRef.current && maBaiTapRef.current.khoa === khoa) maBaiTapRef.current = null
       })
-      .catch(() => {})
-    return () => {
-      huy = true
+      maBaiTapRef.current = { khoa, hua }
     }
+    const ma = await maBaiTapRef.current.hua.catch(() => '')
+    if (!ma) return ''
+    setMaBaiTapEm(ma)
+    return taoLinkPhieu(`${location.origin}${import.meta.env.BASE_URL}`, ma)
   }, [scriptUrl, attempt, phieuCuaEm, soCauKhacPhuc])
+
+  // XIN TRƯỚC ngay khi báo cáo dựng xong, để trường hợp thường thấy là em bấm
+  // đã có link sẵn. Xin hỏng thì im lặng ở đây — cú bấm sẽ xin lại và khối bài
+  // luyện có sẵn dòng nói vì sao chưa nộp được.
+  useEffect(() => {
+    void xinLinkBaiTap()
+  }, [xinLinkBaiTap])
 
   /** Báo cáo kèm link bài tập — thứ làm cho phiếu khắc phục nộp được. */
   const phieuCuaEmCoLink: PhieuDayDu | null = useMemo(() => {
@@ -937,7 +952,8 @@ export default function ExamTakeScreen() {
       // CÂU HỎI LẠI: giữ bản đã cất nếu lần gọi này máy chủ không trả (ca thường,
       // hoặc máy chủ bản cũ) — mất dấu giữa chừng còn khó hiểu hơn không có dấu.
       const cauLap = (kq.cauLap && kq.cauLap.length > 0 ? kq.cauLap : existing?.cauLap) ?? []
-      const thongTinCa = { loai: kq.loai, hanNop: kq.hanNop, tenCa: kq.tenCa, giuDeDoc: kq.giuDeDoc, anHanGiay: kq.anHanGiay, cauLap }
+      const demLap = (kq.demLap && Object.keys(kq.demLap).length > 0 ? kq.demLap : existing?.demLap) ?? {}
+      const thongTinCa = { loai: kq.loai, hanNop: kq.hanNop, tenCa: kq.tenCa, giuDeDoc: kq.giuDeDoc, anHanGiay: kq.anHanGiay, cauLap, demLap }
       const a: ExamAttempt = giuLuotDo
         ? { ...existing, startedAt: kq.vaoLuc, hetGioLuc: kq.hetGioLuc, durationMinutes: kq.thoiGianPhut, idThietBi: idTb, nguong, ...thongTinCa }
         : {
@@ -2024,7 +2040,7 @@ export default function ExamTakeScreen() {
         >
           <ArrowLeft size={16} /> Quay lại
         </button>
-        <PhieuScreen duCoSan={phieuCuaEmCoLink} laCuaEm />
+        <PhieuScreen duCoSan={phieuCuaEmCoLink} laCuaEm xinLink={xinLinkBaiTap} />
       </div>
     )
   }

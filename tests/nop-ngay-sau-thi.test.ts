@@ -50,13 +50,17 @@ describe('máy em xin được mã cho bộ câu vừa nhận', () => {
 
 describe('màn làm bài gắn link vào báo cáo', () => {
   it('xin mã MỘT LẦN cho mỗi bộ câu, không gọi lại khi React dựng lại', () => {
-    expect(MAN_THI).toContain('const daXinMaRef = useRef')
-    expect(MAN_THI).toContain('if (daXinMaRef.current === khoa) return')
+    // 08/09: đổi từ "cờ đã xin" sang "giữ nguyên lời hứa đang bay" — hai chỗ
+    // cùng cần link (hiệu ứng xin trước, và cú bấm của em) thì CHỜ CHUNG một
+    // lượt gọi, thay vì chỗ thứ hai thấy cờ đã bật rồi bỏ đi tay không.
+    expect(MAN_THI).toContain('const maBaiTapRef = useRef<{ khoa: string; hua: Promise<string> } | null>(null)')
+    expect(MAN_THI).toContain('if (!maBaiTapRef.current || maBaiTapRef.current.khoa !== khoa) {')
+    expect(MAN_THI).toContain('maBaiTapRef.current = { khoa, hua }')
   })
 
   it('gắn `linkBaiTap` vào bản báo cáo đưa cho màn phiếu', () => {
     expect(MAN_THI).toContain('linkBaiTap: taoLinkPhieu(`${location.origin}${import.meta.env.BASE_URL}`, maBaiTapEm)')
-    expect(MAN_THI).toContain('<PhieuScreen duCoSan={phieuCuaEmCoLink} laCuaEm />')
+    expect(MAN_THI).toContain('<PhieuScreen duCoSan={phieuCuaEmCoLink} laCuaEm xinLink={xinLinkBaiTap} />')
   })
 
   it('KHÔNG xin mã khi chưa có câu khắc phục nào', () => {
@@ -64,7 +68,9 @@ describe('màn làm bài gắn link vào báo cáo', () => {
   })
 
   it('xin hỏng thì im lặng — phiếu vẫn mở được, chỉ chưa nộp được', () => {
-    expect(MAN_THI).toContain('.catch(() => {})')
+    expect(MAN_THI).toContain("const ma = await maBaiTapRef.current.hua.catch(() => '')")
+    // Và XIN LẠI ĐƯỢC: treo một lời hứa hỏng là em bấm mãi không bao giờ có mã.
+    expect(MAN_THI).toContain('if (maBaiTapRef.current && maBaiTapRef.current.khoa === khoa) maBaiTapRef.current = null')
     // Và khối bài luyện đã có sẵn dòng nói vì sao chưa nộp được.
     expect(doc('src/components/KhoiBaiLuyen.tsx')).toContain("setKhongNop(nop ? '' : !maPhieu ? 'thieu_ma'")
   })

@@ -9,10 +9,10 @@ import { banDoSaiCa, chiTietCa, danhSachCa, noiKhoCa } from './exam-api'
 import { taoChiTietCau } from './chi-tiet-cau'
 import { docDeRiengCa, loadExamSources, loadSessionTeacherBank, docSoCauCa, saveSessionTeacherBank } from './exam-db'
 import { mergeAndStrip, mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
-import { CAU_HINH_DE_RIENG_MAC_DINH, type CauHinhDeRieng } from './cau-hinh-de-rieng'
+import { CAU_HINH_DE_RIENG_MAC_DINH, SO_CA_BOC_NGAU_NHIEN, type CauHinhDeRieng } from './cau-hinh-de-rieng'
 import { demLanSai, dungDeRieng, type CaTruocDaCham, type EmThieuLap } from './de-rieng'
 import { dungUngVien } from './rut-de'
-import { hashSeed } from './exam-shuffle'
+import { hashSeed, seededPermutation } from './exam-shuffle'
 
 export interface CaBoQua {
   maCa: string
@@ -85,17 +85,40 @@ export async function docCaTruoc(url: string, mat: string, maCa: string, ch: Cau
   return { maCa: ct.ca.maCa, daLamCua, saiCua }
 }
 
-/** Lấy `SO_CA_TRA_NGUOC` ca THI gần nhất đã đóng, mới nhất trước.
+/** CHỌN NHỮNG CA SẼ ĐỌC, theo đúng phạm vi thầy chốt lúc mở ca.
+ *
+ *   · `gan_nhat` — giữ `SO_CA_TRA_NGUOC` ca gần nhất. Không phải để GỘP ba ca:
+ *     `chonCauLapChoEm` chỉ lấy MỘT ca — ca gần nhất em CÓ NỘP. Quét lùi là để
+ *     em nghỉ buổi trước vẫn có câu hỏi lại, không lấy bừa ca lớp vừa thi.
+ *   · `ba_ca`    — BỐC NGẪU NHIÊN 3 ca bất kỳ trong toàn bộ ca đã thi trước
+ *     đó (thầy chốt 08/09: "rút ngẫu nhiên 3 ca trước đó bất kì không cần gần
+ *     nhất"). Bốc theo HẠT GIỐNG từ mã ca chứ không `Math.random`: cùng một ca
+ *     thì lần nào cũng ra đúng ba ca ấy, nên biên bản đối chiếu lại được và mở
+ *     lại ca không đổi đề dưới chân em.
  *
  * Chỉ lấy ca `loai === 'thi'`: bài tập về nhà không phải bài kiểm tra có thầy
  * coi, lấy câu sai ở đó ra hỏi lại là hỏi lại câu em tra mạng. */
+export function chonCaTheoPhamVi<T extends { maCa: string }>(dsMoiNhatTruoc: T[], maCaNay: string, ch: CauHinhDeRieng = CAU_HINH_DE_RIENG_MAC_DINH): T[] {
+  if (ch.PHAM_VI_HOI_LAI !== 'ba_ca') return dsMoiNhatTruoc.slice(0, Math.max(0, ch.SO_CA_TRA_NGUOC))
+  const can = Math.min(SO_CA_BOC_NGAU_NHIEN, dsMoiNhatTruoc.length)
+  if (can <= 0) return []
+  if (dsMoiNhatTruoc.length <= can) return dsMoiNhatTruoc.slice()
+  const hoanVi = seededPermutation(dsMoiNhatTruoc.length, hashSeed(`hoi-lai:${maCaNay}`))
+  const boc = hoanVi.slice(0, can).map((i) => dsMoiNhatTruoc[i])
+  // Trả về theo thứ tự mới-trước như phần còn lại của luồng vẫn chờ đợi: chỉ
+  // BỘ ca là ngẫu nhiên, thứ tự trong bộ thì không.
+  const thuTu = new Map(dsMoiNhatTruoc.map((c, i) => [c.maCa, i]))
+  return boc.sort((a, b) => (thuTu.get(a.maCa) ?? 0) - (thuTu.get(b.maCa) ?? 0))
+}
+
+/** Lấy các ca THI trước đó theo phạm vi thầy chọn, mới nhất trước. */
 export async function docCacCaTruoc(url: string, mat: string, boCa: string[] = [], ch: CauHinhDeRieng = CAU_HINH_DE_RIENG_MAC_DINH): Promise<NguonCaTruoc> {
   const tatCa = await danhSachCa(url, mat)
   const bo = new Set(boCa.map((x) => x.trim()).filter(Boolean))
-  const ung = tatCa
+  const dsGoc = tatCa
     .filter((c) => c.loai !== 'baitap' && c.trangThai !== 'da_xoa' && !bo.has(c.maCa))
     .sort((a, b) => String(b.moLuc ?? '').localeCompare(String(a.moLuc ?? '')))
-    .slice(0, Math.max(0, ch.SO_CA_TRA_NGUOC))
+  const ung = chonCaTheoPhamVi(dsGoc, boCa[0] ?? '', ch)
 
   // BẢN ĐỒ SAI DỰNG SẴN Ở MÁY CHỦ — hỏi trước, MỘT lệnh cho cả mấy ca (thầy
   // chốt 08/09: "ca thi nào cũng phải dựng sẵn bản đồ sai từng câu").
@@ -145,6 +168,8 @@ export interface KetQuaDungDeRieng {
   canCua: Record<string, number>
   soLapCua: Record<string, number>
   saiCaTruocCua: Record<string, number>
+  /** sbd → mã ca THẬT SỰ lấy câu sai của em đó. */
+  tuCaCua: Record<string, string>
   /** Ca cũ KHÔNG đọc được, kèm lý do. Đây thường là câu trả lời cho "vì sao
    * không rút được câu hỏi lại nào" — im lặng bỏ qua là thầy tưởng máy hỏng. */
   boQua: CaBoQua[]
@@ -229,6 +254,7 @@ export async function dungDeRiengChoCa(
     canCua: ra.canCua,
     soLapCua: ra.soLapCua,
     saiCaTruocCua: ra.saiCaTruocCua,
+    tuCaCua: ra.tuCaCua,
     boQua,
     caDaQuet: dsCa.map((c) => c.maCa),
     trungBinh: ra.soLapTrungBinh,

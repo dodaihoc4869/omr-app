@@ -178,6 +178,25 @@ export const CSS_PHIEU = `
   --muot: .32s cubic-bezier(.4, 0, .2, 1);
 }
 
+/* BẢY SẮC CẦU VỒNG, XOAY VÒNG MỖI LẦN MỞ PHIẾU (thầy chốt 08/09: "lấy 7 màu 7
+   sắc cầu vồng để hiển thị lần lượt rồi quay vòng").
+
+   CHỈ ĐỔI MÀU THƯƠNG HIỆU — nav/nav-2 (bìa, tiêu đề), luc/luc-2 (nút chính,
+   nhãn), vang (điểm nhấn). ĐÚNG/SAI giữ nguyên xanh lá và đỏ ở mọi sắc: đây là
+   phiếu chấm bài, đổi màu dấu đúng-sai là đổi nghĩa chứ không phải đổi giao
+   diện. Đánh đổi nói thẳng: đến lượt sắc đỏ và sắc lục thì nền trang cùng hệ
+   màu với dấu sai và dấu đúng, nhưng hai dấu đó vẫn có nền nhạt và viền riêng
+   nên vẫn tách ra được.
+
+   nav phải đủ tối để chữ trắng trên nó còn đọc được (tương phản ≥ 7:1). */
+body[data-mau="1"] { --nav: #7f1d1d; --nav-2: #b91c1c; --luc: #dc2626; --luc-2: #f87171; --vang: #fca5a5; }
+body[data-mau="2"] { --nav: #7c2d12; --nav-2: #c2410c; --luc: #ea580c; --luc-2: #fb923c; --vang: #fdba74; }
+body[data-mau="3"] { --nav: #713f12; --nav-2: #a16207; --luc: #ca8a04; --luc-2: #eab308; --vang: #fde047; }
+body[data-mau="4"] { --nav: #14532d; --nav-2: #15803d; --luc: #16a34a; --luc-2: #4ade80; --vang: #86efac; }
+body[data-mau="5"] { --nav: #0c4a6e; --nav-2: #0369a1; --luc: #0284c7; --luc-2: #38bdf8; --vang: #7dd3fc; }
+body[data-mau="6"] { --nav: #1e1b4b; --nav-2: #3730a3; --luc: #4f46e5; --luc-2: #818cf8; --vang: #a5b4fc; }
+body[data-mau="7"] { --nav: #4c1d95; --nav-2: #6d28d9; --luc: #7c3aed; --luc-2: #a78bfa; --vang: #c4b5fd; }
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 /* Phải !important: .nut đặt display:inline-flex bằng class nên THẮNG luật
    [hidden]{display:none} mặc định của trình duyệt, làm nút Bỏ lọc hiện ra
@@ -1096,12 +1115,14 @@ export function thanhHtml(soCau: number, anGiai = false): string {
     return `<div class="thanh">
   <div class="thanh-chu">Phiếu chỉ có đề<span class="the-loc" id="the-loc" hidden> · <b id="ten-loc"></b></span></div>
   <button class="nut nho" type="button" id="bo-loc" hidden>Bỏ lọc</button>
+  <button class="nut nho" type="button" id="doi-mau" title="Đổi sang sắc cầu vồng tiếp theo">Đổi màu</button>
   <button class="nut chinh" type="button" id="pdf-de" title="Hộp thoại in mở ra, chọn Lưu thành PDF">Tải PDF</button>
 </div>`
   }
   return `<div class="thanh">
   <div class="thanh-chu"><span class="dem-giai">Đã xem lời giải <b id="dem-mo">0</b>/<span id="dem-tong">${soCau}</span> câu</span><span class="the-loc" id="the-loc" hidden> · <b id="ten-loc"></b></span></div>
   <button class="nut nho" type="button" id="bo-loc" hidden>Bỏ lọc</button>
+  <button class="nut nho" type="button" id="doi-mau" title="Đổi sang sắc cầu vồng tiếp theo">Đổi màu</button>
   <button class="nut" type="button" id="chi-de" aria-pressed="false" title="Giấu đáp án và lời giải để đọc đề trần"><span class="chu-mo">Hiện đề</span><span class="chu-dong">Hiện cả lời giải</span></button>
   <button class="nut chinh" type="button" id="mo-het" aria-pressed="false"><span class="chu-mo">Mở tất cả</span><span class="chu-dong">Đóng tất cả</span></button>
   <span class="pdf-boc">
@@ -1120,6 +1141,25 @@ export function thanhHtml(soCau: number, anGiai = false): string {
  * chỉ mất phần gập. */
 export const JS_PHIEU = `
 (function () {
+  // BẢY SẮC CẦU VỒNG XOAY VÒNG (thầy chốt 08/09). Mở phiếu lần nào là nhích
+  // sang sắc kế tiếp, hết 7 thì quay về 1; nút "Đổi màu" nhích ngay tại chỗ.
+  // Số thứ tự cất ở localStorage nên đóng phiếu mở lại vẫn đi tiếp, không nhảy
+  // về đầu. Máy chặn localStorage thì rơi về sắc 1, phiếu vẫn chạy đủ.
+  // (Cấm dấu huyền ngược trong khối này: cả khối nằm trong một chuỗi mẫu.)
+  var KHOA_MAU = 'ddh.phieu.mau';
+  var SO_MAU = 7;
+  function datMau(n) {
+    var v = ((Number(n) - 1) % SO_MAU + SO_MAU) % SO_MAU + 1;
+    document.body.setAttribute('data-mau', String(v));
+    try { localStorage.setItem(KHOA_MAU, String(v)); } catch (eM) {}
+    return v;
+  }
+  var mauHienTai = 0;
+  try { mauHienTai = Number(localStorage.getItem(KHOA_MAU)) || 0; } catch (eM0) { mauHienTai = 0; }
+  mauHienTai = datMau(mauHienTai + 1);
+  var nutMau = document.getElementById('doi-mau');
+  if (nutMau) nutMau.addEventListener('click', function () { mauHienTai = datMau(mauHienTai + 1); });
+
   var tatCa = Array.prototype.slice.call(document.querySelectorAll('.q-card'));
   var dem = document.getElementById('dem-mo');
   var demTong = document.getElementById('dem-tong');

@@ -86,6 +86,10 @@ export interface ExamAttempt {
    * lần này (thầy chốt 08/09). Cất cùng lượt để em rớt mạng vào lại vẫn còn
    * dấu; ca thường không có trường này và thẻ câu không hiện gì thêm. */
   cauLap?: string[]
+  /** qid → SỐ LẦN em đã sai câu đó TRƯỚC ca này. Cất cùng lượt vì báo cáo em
+   * xem ngay sau khi nộp cần nó để gắn nhãn "sai lần thứ N" và dựng mục "Đã
+   * sửa được" — không cất là thi xong mọi dấu vết câu hỏi lại biến mất. */
+  demLap?: Record<string, number>
   answers: AnswerRecord
   integrity: IntegrityLog
   submitted: boolean
@@ -206,6 +210,14 @@ export interface BienBanDeRieng {
   thieu: { sbd: string; soLap: number; can: number; soSaiCaTruoc: number; lyDo: string }[]
   boQua: { maCa: string; vi_sao: string }[]
   caDaQuet: string[]
+  /** PHẠM VI thầy chốt lúc mở ca. Thiếu trường này (biên bản cũ) thì coi như
+   * `gan_nhat` — đúng giá trị mặc định. Không có nó thì bảng biên bản phải đoán,
+   * và bản trước đoán sai: ghi "quét 3 ca gần nhất" cho cả ca thầy chọn ĐÚNG
+   * MỘT ca gần nhất (thầy bắt được 08/09). */
+  phamVi?: 'gan_nhat' | 'ba_ca'
+  /** sbd → mã ca THẬT SỰ lấy câu sai của em đó. Ở `gan_nhat` là một mã; ở
+   * `ba_ca` là các mã nối bằng " + ". Quét ba ca không có nghĩa là dùng cả ba. */
+  tuCaCua?: Record<string, string>
   lucRut: string
 }
 

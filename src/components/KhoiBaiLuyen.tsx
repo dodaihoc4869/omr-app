@@ -31,8 +31,17 @@ export default /** HAI VIỆC KHÁC NHAU, HAI NÚT (thầy chốt 04-09).
  * Link do máy thầy cất sẵn lúc dựng báo cáo (`linkBaiTap`); trang này không có
  * mã bí mật nên không tự ghi lên máy chủ được. Chưa có link thì chỉ hiện nút
  * Xem — không dựng một nút copy ra rồi copy chuỗi rỗng. */
-function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boolean }) {
+function NutTaiBaiTap({ du, laCuaEm = false, xinLink }: { du: PhieuDayDu; laCuaEm?: boolean; xinLink?: () => Promise<string> }) {
   const [dang, setDang] = useState(false)
+  /** Link vừa XIN ĐƯỢC tại chỗ, khi báo cáo chưa chở sẵn link nào.
+   *
+   * Báo cáo em xem NGAY SAU KHI NỘP do chính máy em dựng, link bài tập phải đi
+   * xin máy chủ nên về SAU khi màn hình đã hiện. Bản trước dựng phiếu bằng
+   * `du.linkBaiTap` đọc ngay lúc bấm: em bấm nhanh hơn mạng là phiếu dựng ra
+   * KHÔNG có mã ⇒ không thanh nộp, không bấm chọn được đáp án, lời giải mở
+   * toang (thầy bắt được 08/09). Nay bấm là CHỜ xin xong mới dựng. */
+  const [linkTuXin, setLinkTuXin] = useState('')
+  const linkBai = du.linkBaiTap || linkTuXin
   const [loi, setLoi] = useState('')
   const [daCopy, setDaCopy] = useState(false)
   /** Máy chặn copy tự động thì hiện link ra cho phụ huynh bôi đen copy tay. */
@@ -91,8 +100,8 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
   // không phải ghi lại phiếu nào lên máy chủ (trang này không có mã bí mật để
   // ghi). HAI LINK (thầy chốt 04-09 khuya): `d` = chỉ có ĐỀ cho con tự làm,
   // `g` = có LỜI GIẢI để con dò sau khi làm xong.
-  const linkDe = du.linkBaiTap ? `${du.linkBaiTap}~${chanSoCau(lay, san)}d` : ''
-  const linkGiai = du.linkBaiTap ? `${du.linkBaiTap}~${chanSoCau(lay, san)}g` : ''
+  const linkDe = linkBai ? `${linkBai}~${chanSoCau(lay, san)}d` : ''
+  const linkGiai = linkBai ? `${linkBai}~${chanSoCau(lay, san)}g` : ''
   const [daCopyGiai, setDaCopyGiai] = useState(false)
 
   const copyLink = async (link: string, giai: boolean) => {
@@ -123,7 +132,15 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
       // Mã phiếu nằm sẵn trong `linkBaiTap` (`…/p#<mã>`); thiếu mã, thiếu số
       // báo danh hoặc thiếu địa chỉ máy chủ thì phiếu vẫn dựng nhưng KHÔNG có
       // thanh nộp — không dựng nút bấm vào là hỏng.
-      const maPhieu = du.linkBaiTap ? docLinkPhieu(du.linkBaiTap.slice(du.linkBaiTap.indexOf('#') + 1)).ma : ''
+      //
+      // CHƯA CÓ LINK THÌ ĐI XIN, RỒI MỚI DỰNG. Đây là chỗ hỏng thầy bắt được
+      // 08/09: báo cáo ngay sau khi nộp phải xin mã ở máy chủ, em bấm nhanh
+      // hơn mạng là dựng ra phiếu không mã — không thanh nộp, không bấm chọn
+      // được đáp án, lời giải mở toang.
+      let link = linkBai
+      if (!link && xinLink) link = (await xinLink().catch(() => '')) || ''
+      if (link && link !== linkTuXin && link !== du.linkBaiTap) setLinkTuXin(link)
+      const maPhieu = link ? docLinkPhieu(link.slice(link.indexOf('#') + 1)).ma : ''
       const urlNop = (await loadScriptUrlHoacMacDinh().catch(() => '')).trim()
       const nop = maPhieu && du.sbd && urlNop ? { ma: maPhieu, sbd: du.sbd, url: urlNop } : null
       // NÓI RA KHI KHÔNG NỘP ĐƯỢC. Trước đây thiếu mã thì phiếu vẫn mở ra bình
@@ -234,7 +251,7 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
           </button>
         )}
       </div>
-      {du.linkBaiTap && (
+      {linkBai && (
         <div className="bc-nut-doi" style={{ marginTop: 8 }}>
           <button type="button" className={`bc-nut vang${daCopy ? '' : ' bc-nhay'}`} onClick={() => void copyLink(linkDe, false)}>
             {daCopy ? `Đã copy link đề ${lay} câu` : 'Copy link gửi ĐỀ cho con'}
@@ -252,7 +269,7 @@ function NutTaiBaiTap({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boole
         {/* NÓI RÕ SỐ CÂU KHO CÒN, thay vì để thanh kéo dừng ở một con số lạ mà
             không ai biết vì sao (thầy hỏi đúng câu này ngày 06/09). */}
         {du.tongUngVien && du.tongUngVien > coSan ? ` Kho còn ${du.tongUngVien} câu cùng dạng với những câu em sai.` : ''}
-        {du.linkBaiTap
+        {linkBai
           ? ' Gửi con link ĐỀ trước để em tự làm vào vở; em làm xong mới gửi link LỜI GIẢI để em dò. Hai link chỉ có bài tập, không kèm điểm và nhận xét.'
           : ' Em làm hết rồi mới bấm vào từng câu xem lời giải.'}
       </div>

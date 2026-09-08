@@ -8,7 +8,7 @@ import type { CauHoiCuaEm, GoiCauHoi } from './hoi-bai'
 import type { DiemMotCa } from './phieu-du-lieu'
 import { dongBoGioMayChu } from './gio-may-chu'
 import { chuanTenCa } from './ten-ca'
-import { cauLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
+import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
 export interface KeyBank {
@@ -153,6 +153,9 @@ export type KetQuaVaoThi =
        * Về ở TRƯỜNG RIÊNG chứ không chỉ trong `bank`: máy em có thể đã cất kho
        * đề từ lần vào trước, lúc đó `bank` không về mà bản đồ vẫn phải tới. */
       boCuaEm?: string[]
+      /** qid → SỐ LẦN em đã sai câu đó TRƯỚC ca này. Nguồn của nhãn "sai lần
+       * thứ N" và mục "Đã sửa được" trong báo cáo em xem ngay sau khi nộp. */
+      demLap?: Record<string, number>
     }
   | { ok: false; lyDo: LyDoChan; nopLuc?: string; lanThu?: number; batDau?: string; hetHanVao?: string; namSinh?: string; error?: string }
 
@@ -347,6 +350,7 @@ export async function vaoThi(
       bank: r.bank ?? undefined,
       cauLap: cauLapCuaEm(r.cauLap),
       boCuaEm: cauLapCuaEm(r.boCuaEm),
+      demLap: demLapCuaEm(r.demLap, cauLapCuaEm(r.cauLap)),
     }
   }
   return { ok: false, lyDo: r.lyDo ?? 'thieu', nopLuc: r.nopLuc, lanThu: r.lanThu, batDau: r.batDau, hetHanVao: r.hetHanVao, namSinh: r.namSinh, error: r.error }
@@ -1543,6 +1547,13 @@ export interface ChiTietCa {
    * ở điện thoại rồi mở ca trên máy tính là máy tính không có gì, và màn Ca thi
    * im lặng — đúng lỗi thầy gặp 08/09. Lệnh này đã đòi mã bí mật nên trả cả
    * bản đồ lớp ở đây không mở thêm quyền cho ai. */
+  /** BỘ CÂU TỪNG EM của ca, đọc từ máy chủ. Đây là bản đồ dùng để CHẤM.
+   *
+   * Thầy bắt được 08/09: màn Ca thi chỉ đọc bản đồ cất ở IndexedDB của đúng cái
+   * máy đã bấm Bắt đầu. Mở ca ở máy khác là chấm lại bằng luật hash ⇒ khối "câu
+   * em sai buổi trước" đếm ra 0 dù máy chủ có đủ 8 câu, và điểm hiện trên bảng
+   * cũng là điểm của một bộ câu khác. */
+  boTheoEmCa?: Record<string, string[]>
   lapTheoEm?: Record<string, string[]>
   /** sbd → qid → số lần sai trước ca này, đọc từ máy chủ. */
   demSaiTheoEm?: Record<string, Record<string, number>>
@@ -1596,6 +1607,8 @@ export async function chiTietCa(scriptUrl: string, secret: string, maCa: string,
     dsCho: Array.isArray(r.dsCho)
       ? (r.dsCho as Record<string, unknown>[]).map((x) => ({ sbd: chuoi(x.sbd), hoTen: chuoi(x.hoTen), vaoLuc: chuoi(x.vaoLuc) })).filter((x) => x.sbd)
       : [],
+    // Ưu tiên gói riêng (luôn có, mọi máy); `keyBank.boTheoEm` là đường cũ.
+    boTheoEmCa: goiDR.bo ?? (r.keyBank as { boTheoEm?: Record<string, string[]> } | null | undefined)?.boTheoEm ?? undefined,
     lapTheoEm: goiDR.lap,
     demSaiTheoEm: goiDR.dem,
     bienBanDeRieng: goiDR.bb,

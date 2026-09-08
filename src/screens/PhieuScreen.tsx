@@ -243,7 +243,7 @@ function PhanBoLop({ diemLop, cuaEm, tat }: { diemLop: number[]; cuaEm: number; 
 /** DẢI THỜI GIAN TỪNG CÂU: mỗi câu một cột, cao theo số giây, đỏ là câu sai. */
 import { DaiThoiGian, KhoiViPham } from '../components/KhoiBaoCaoChung'
 
-export default function PhieuScreen({ duCoSan, laCuaEm = false }: { duCoSan?: PhieuDayDu; laCuaEm?: boolean } = {}) {
+export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duCoSan?: PhieuDayDu; laCuaEm?: boolean; xinLink?: () => Promise<string> } = {}) {
   const [du, setDu] = useState<PhieuDayDu | null | undefined>(duCoSan ?? undefined)
   // Link phiếu bài tập: trang này chỉ việc hiện trọn tài liệu HTML đã dựng.
   const [phieuBt, setPhieuBt] = useState('')
@@ -349,7 +349,7 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false }: { duCoSan?: Ph
   // BỐ CỤC BA TẦNG cho gói bản 3 trở lên. Gói bản 2 đi tiếp xuống bố cục cũ
   // NGUYÊN VẸN: phụ huynh đã cầm link đó rồi, dựng lại bằng bố cục mới là mấy
   // mục dữ liệu cũ không có sẽ trống trơn.
-  if (Number(du.v) >= 3) return <PhieuV3 du={du} laCuaEm={laCuaEm} />
+  if (Number(du.v) >= 3) return <PhieuV3 du={du} laCuaEm={laCuaEm} xinLink={xinLink} />
 
   const tk = du.thongKe
   const dung = du.tongSoCau !== null ? du.tongSoCau - du.soCauSai : null
@@ -620,7 +620,7 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false }: { duCoSan?: Ph
               </>
             )}
             {du.deCuaEm && du.deCuaEm.length > 0 && <NutXemDeCuaCon du={du} />}
-            {((du.baiTap && du.baiTap.length > 0) || du.linkBaiTap) && <NutTaiBaiTap du={du} laCuaEm={laCuaEm} />}
+            {((du.baiTap && du.baiTap.length > 0) || du.linkBaiTap) && <NutTaiBaiTap du={du} laCuaEm={laCuaEm} xinLink={xinLink} />}
           </section>
         )}
 

@@ -595,6 +595,13 @@ export interface NguonPhieuMayEm {
    * xếp — thiếu cái này là màn báo cáo hứa "dễ lên khó" mà em mở ra thấy câu
    * vận dụng nằm đầu. */
   thuTuKhacPhuc?: string[]
+  /** qid → SỐ LẦN em đã sai câu đó TRƯỚC ca này. Đây là nguồn của nhãn "sai
+   * lần thứ N" và của mục "Đã sửa được" trong báo cáo.
+   *
+   * Thầy bắt được 08/09: "học sinh thi xong nhưng chưa thống kê là đã làm sai
+   * câu trước" — báo cáo máy em dựng tại chỗ vốn KHÔNG nhận trường này, nên ca
+   * đề riêng thi xong là mọi dấu vết câu hỏi lại biến mất ở đúng màn em xem. */
+  lapCua?: Record<string, number> | null
 }
 
 /** Chuyên đề em vừa MẤT ĐIỂM, xếp theo tỉ lệ sai giảm dần.
@@ -650,7 +657,12 @@ function xepTheoThuTuKho(cau: CauLuyen[], thuTu: string[] | undefined): CauLuyen
 }
 
 export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
-  const cauSai = dungCauSai(n.rows, n.banks)
+  const themCauSai: ThemChoCauSai = { lapCua: n.lapCua ?? null }
+  const cauSai = dungCauSai(n.rows, n.banks, true, themCauSai)
+  // TRỌN ĐỀ (kể cả câu đúng) chỉ để lọc ra câu lặp em ĐÃ SỬA ĐƯỢC — giống hệt
+  // `dungPhieu`, một luật cho cả hai đường dựng báo cáo.
+  const daSuaDuocEm = n.lapCua ? cauDaSuaDuoc(dungCauSai(n.rows, n.banks, false, themCauSai)) : []
+  const soCauLapEm = n.rows.filter((r) => typeof n.lapCua?.[r.qid] === 'number').length
 
   const chuyenDeYeu = xepChuyenDeYeu(n.rows)
   // NGUỒN CÂU KHẮC PHỤC — thầy chốt 06/09: RÚT TỪ KHO ĐỀ.
@@ -729,6 +741,9 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
     tinHieu: tinHieuLamBai(tk),
     ducKet: ducKetKienThuc(cauSai.map((c) => ({ chuyenDe: c.chuyenDe, chot: c.chot }))),
     cauSai,
+    daSuaDuoc: daSuaDuocEm,
+    soCauLap: soCauLapEm,
+    dongCauLap: dongCauLap(soCauLapEm, tk ? tk.tongCau : n.rows.length || null),
     dai: n.rows.map((r) => ({ nhan: `Phần ${r.phan} câu ${r.soCau}`, giay: r.giay, dung: Boolean(r.dungSai) })),
     viPham: dungViPham(n.viPham),
     // KHÔNG kèm `deCuaEm`: thầy chốt 04-09 khuya "mục này của xem báo cáo sau
