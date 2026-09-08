@@ -18,8 +18,13 @@ import { taoBaiGhiDiem } from './chi-tiet-cau'
 import { gomCa } from './phieu-ca-ca'
 import type { QuotaPhan, SoCauBaPhan } from '../engine/score'
 
-/** Số em ghi điểm trong MỘT lượt gọi máy chủ. Xem ghi chú ở `chamLaiCa`. */
-const CO_LO = 5
+/** Số em ghi điểm trong MỘT lượt gọi máy chủ. Xem ghi chú ở `chamLaiCa`.
+ *
+ * 5 → 3 (08/09 khuya): đo bằng hook `fetch`, một lô 5 em của ca 248567 chết ở
+ * 25,3 giây. Máy chủ nay xoá dòng chi tiết cũ theo KHỐI thay vì từng dòng nên
+ * đã nhanh hơn nhiều, nhưng bảng ChiTietCau còn tiếp tục dài ra theo mỗi ca —
+ * lô nhỏ giữ cho mỗi lượt gọi luôn có biên an toàn, đổi lại vài lượt gọi thêm. */
+const CO_LO = 3
 
 export interface DiemBaPhan {
   I: number | null

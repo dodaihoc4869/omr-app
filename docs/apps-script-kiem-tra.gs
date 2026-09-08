@@ -183,6 +183,30 @@ const AN_HAN_NOP_GIAY = 120
 // `src/engine/score.ts` — hai nơi phải khớp từng ký tự, có test khoá điều này.
 const LUAT_DIEM = 'tile-450-400-150-v1'
 
+/** Gom một danh sách CHỈ SỐ DÒNG GIẢM DẦN thành các khối liền mạch để xoá.
+ *
+ * Vào: [90, 89, 88, 50, 49, 10] (đã sắp giảm dần, không trùng).
+ * Ra:  [[88, 3], [49, 2], [10, 1]] — mỗi khối là [dòng đầu, số dòng].
+ *
+ * Xoá từ khối có chỉ số LỚN xuống nhỏ thì chỉ số của khối sau không trôi, nên
+ * thứ tự trả về giữ nguyên chiều giảm dần của đầu vào.
+ *
+ * Đầu vào rỗng trả mảng rỗng. Không tự sắp lại: bên gọi đã sắp, sắp thêm một
+ * lần nữa chỉ giấu đi lỗi nếu bên gọi quên. */
+function khoiLienMach_(dsGiamDan) {
+  const ra = []
+  let i = 0
+  while (i < dsGiamDan.length) {
+    const cuoi = dsGiamDan[i]
+    let j = i
+    while (j + 1 < dsGiamDan.length && dsGiamDan[j + 1] === dsGiamDan[j] - 1) j++
+    const dau = dsGiamDan[j]
+    ra.push([dau, cuoi - dau + 1])
+    i = j + 1
+  }
+  return ra
+}
+
 /** Gói này có được phép ĐẶT ĐIỂM chính thức không?
  *
  * Hai đường: máy thầy (có MA_BI_MAT) — luôn được; máy em — phải mang đúng tem
@@ -4132,8 +4156,17 @@ function doPost(e) {
       }
     }
     // Xoá dòng chi tiết cũ từ dưới lên (chỉ số không trôi), rồi ghi mới 1 lần.
+    //
+    // THEO KHỐI LIỀN MẠCH, không từng dòng một. Đo 08/09 khuya: `chamLaiCa` ca
+    // 248567 (21 em) hỏng ba lần "không trả lời sau 25 giây"; hook fetch chỉ
+    // đúng chỗ — `chiTietCa` xong trong 5 giây, `ghiDiem` một lô 5 em chết ở
+    // 25,3 giây. Lô 5 em có ~60 dòng chi tiết cũ, mà `deleteRow` từng dòng là
+    // ~60 lượt ghi Sheet. Chi tiết của một em được ghi liền một mạch nên các
+    // dòng đó gần như luôn liền số: gom thành khối rồi `deleteRows` một lần cắt
+    // ~60 lượt xuống còn vài lượt.
     xoaDong.sort(function (a, b) { return b - a })
-    for (let i = 0; i < xoaDong.length; i++) ctSh.deleteRow(xoaDong[i])
+    const khoi = khoiLienMach_(xoaDong)
+    for (let i = 0; i < khoi.length; i++) ctSh.deleteRows(khoi[i][0], khoi[i][1])
     if (themDong.length > 0) ctSh.getRange(ctSh.getLastRow() + 1, 1, themDong.length, CHITIET_HEADERS.length).setValues(themDong)
     ghiBanDoSai_(banDoMoi)
     ghiTienDo_(maCa, tomTat)

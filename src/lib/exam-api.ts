@@ -1929,7 +1929,12 @@ export async function ghiDiem(scriptUrl: string, secret: string, maCa: string, b
   if (bai.length === 0) return { daGhi: [], tuChoi: [] }
   // `luatDiem`: tem luật chấm — máy chủ chỉ nhận ĐIỂM từ máy em khi tem khớp.
   // Xem ghi chú ở `LUAT_DIEM` trong engine/score.ts.
-  const r = await postJson(scriptUrl, { action: 'ghiDiem', secret, maCa, bai, luatDiem: LUAT_DIEM })
+  //
+  // HẠN 90 GIÂY, không phải 25. Đo 08/09 khuya bằng hook `fetch`: `chamLaiCa`
+  // ca 248567 chết ở ĐÂY (`ghiDiem` một lô hỏng ở 25,3 giây) chứ không phải ở
+  // `chiTietCa` (xong trong 5 giây) như vòng đoán trước. Lượt này vừa xoá dòng
+  // chi tiết cũ vừa ghi hàng chục dòng mới — nặng nhất trong cả chuỗi.
+  const r = await postJson(scriptUrl, { action: 'ghiDiem', secret, maCa, bai, luatDiem: LUAT_DIEM }, 90)
   if (!r.ok) throw new Error(r.error || 'Không ghi được điểm')
   return { daGhi: r.daGhi ?? [], tuChoi: r.tuChoi ?? [] }
 }
