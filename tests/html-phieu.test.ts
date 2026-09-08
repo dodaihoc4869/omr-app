@@ -338,7 +338,7 @@ describe('hai lựa chọn in', () => {
     const h = taiLieuHtml('', 'x')
     expect(h).toContain("classList.contains('mo')")
     expect(h).toContain('daMo.push')
-    expect(h).toContain('body.chi-de .q-opt.dung { background: #f8fafc !important;')
+    expect(h).toContain('body.chi-de .q-opt.dung:not([aria-checked="true"]) { background: #f8fafc !important;')
   })
 
   it('chế độ chỉ đề giấu SẠCH lời giải và đáp án đã tô, ở CẢ màn hình lẫn bản in', () => {

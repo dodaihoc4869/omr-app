@@ -40,6 +40,11 @@ Lùi: `git revert 6b2956a` (và `git revert 5c7374d` nếu muốn lùi cả đ�
 
 - [x] "nút bấm vẫn vậy không bấm được, có cái nhận có cái không" (lần 4) | ĐỔI CÁCH theo luật giậm chân: ô chọn nay là thẻ <button> THẬT (nền), cộng lưới an toàn touchend (bắt ca trình duyệt huỷ click). Đo trên Chromium có cảm ứng: chạm sạch, xê ngang 18px, xê dọc 15px, bàn phím Enter, chọn-rồi-bỏ-chọn — tất cả đúng; kéo dọc 90px vẫn là cuộn. KHAI RÕ: mọi phép đo của tôi chạy trên Chromium giả lập cảm ứng, KHÔNG phải Samsung Internet trên máy thầy
 
+- [x] "tôi thấy … lựa chọn A chưa bao giờ bấm được" | bằng chứng: TRUY RA GỐC — cú chạm LUÔN ăn (aria bật, đếm lên, lưu ra {"q1":"A"}), chỉ MÀU không đổi: luật giấu đáp án `body.chua-nop .q-opt.dung {…!important}` đè lên màu ô đang chọn. Ô đáp án đúng vì thế trông y như chưa bấm, thầy bấm lại là BỎ chọn. Thêm `:not([aria-checked="true"])` vào cả 6 luật giấu (3 ở `chua-nop`, 3 ở `chi-de`)
+- [x] "lần này bạn làm phải bấm ngon trong mọi máy" | bằng chứng: tìm thêm một đường ăn hai lần còn sót — `preventDefault` chỉ chặn được click giả khi touchend CÒN huỷ được; máy đang cuộn thì trình duyệt phát touchend KHÔNG huỷ được, click vẫn tới và ô bị chọn rồi bỏ chọn ngay trong một cú chạm (đúng "có cái nhận có cái không"). Thêm tem chống ăn hai lần, nuốt ĐÚNG MỘT cú click rồi tự xoá nên chạm lại vẫn bỏ chọn được. 5 phép kiểm mới trong `tests/bam-chon-tren-de.test.ts`; tắt thử tem thì 2 phép kiểm ĐỎ ngay
+- [x] (tự phát sinh) Phép kiểm bấm-thật ĐANG NÓI DỐI: jsdom giữ nguyên `document` giữa các phép kiểm nên mỗi lần nạp phiếu là chồng thêm một bộ nghe sự kiện, bộ CŨ lật ngược kết quả của bộ mới; bài làm lại cất chung khoá `ddh.lam.abcd1234` nên trạng thái rò từ phép kiểm này sang phép kiểm khác. Đã gỡ cả hai trong `moPhieu`
+- [x] "Sau đó làm luôn đồng bộ phiên bản sang mọi máy" | bằng chứng: máy đã có đủ ba lớp (skipWaiting, đẩy bản nằm chờ, tự tải lại khi đổi bản). LỖ HỔNG còn lại: trong lúc em thi thì `hoi()` bỏ qua, mà NỘP XONG không có gì đánh thức nó — em vẫn mở app nên `visibilitychange`/`focus` không bắn, nhịp 30 phút có thể còn xa, máy giữ bản cũ tới hết buổi. Nay rời màn làm bài là hỏi ngay; 2 phép kiểm mới trong `tests/cap-nhat-app.test.ts`
+
 ### Đợt 4 — bằng chứng phát hành
 
 - [x] `npx tsc -b` sạch · `npx vitest run` 1996 passed/132 tệp · `check:mau` đạt · `kiem:hien-thi` ĐẠT 18/18 · `build` 2.34s

@@ -110,6 +110,30 @@ describe('batTuHoiBanMoi', () => {
     expect(update).toHaveBeenCalledTimes(1)
   })
 
+  it('NỘP BÀI XONG là hỏi ngay, không đợi hết nhịp 30 phút', () => {
+    // Em thi xong nhưng vẫn mở app: visibilitychange và focus đều KHÔNG bắn,
+    // nên trước đây máy giữ bản cũ tới hết buổi. Nay rời màn làm bài là hỏi.
+    const mt = moiTruongGia()
+    const update = vi.fn().mockResolvedValue(undefined)
+    const go = batTuHoiBanMoi({ update }, mt.moi)
+    datDangLamBai(true)
+    mt.ban('focus')
+    expect(update).not.toHaveBeenCalled()
+    datDangLamBai(false)
+    expect(update).toHaveBeenCalledTimes(1)
+    go()
+  })
+
+  it('gỡ rồi thì rời màn làm bài KHÔNG còn gọi update', () => {
+    const mt = moiTruongGia()
+    const update = vi.fn().mockResolvedValue(undefined)
+    const go = batTuHoiBanMoi({ update }, mt.moi)
+    go()
+    datDangLamBai(true)
+    datDangLamBai(false)
+    expect(update).not.toHaveBeenCalled()
+  })
+
   it('bản mới đang NẰM CHỜ thì đẩy sang ngay — chờ vô hạn là lỗi đã dính', async () => {
     const mt = moiTruongGia()
     const postMessage = vi.fn()

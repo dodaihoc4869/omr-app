@@ -21,9 +21,20 @@ export const NHIP_HOI_MS = 30 * 60 * 1000
 // Bản mới chờ tới lúc em nộp xong cũng không muộn.
 let dangLamBai = false
 
+// HỎI NGAY KHI EM RỜI MÀN LÀM BÀI.
+//
+// Trong lúc em thi thì `hoi()` bỏ qua hoàn toàn — đúng. Nhưng nộp xong thì
+// KHÔNG có gì đánh thức nó lại: em vẫn đang mở app nên `visibilitychange` và
+// `focus` không bắn, và nhịp 30 phút có thể còn xa. Máy vì thế giữ bản cũ tới
+// hết buổi, dù bản mới đã nằm sẵn trên máy chủ. Đây đúng là chỗ "phiên bản
+// không đồng bộ sang mọi máy" mà thầy báo.
+const khiXongBai: Array<() => void> = []
+
 /** ExamTakeScreen gọi khi vào/ra màn làm bài. */
 export function datDangLamBai(v: boolean): void {
+  const truoc = dangLamBai
   dangLamBai = v
+  if (truoc && !v) for (const f of khiXongBai.slice()) f()
 }
 
 // ĐANG MỞ KHOÁ THÌ KHÔNG TỰ TẢI LẠI (MATKHAUMOAPP.md mục 4C và mục 9).
@@ -127,12 +138,15 @@ export function batTuHoiBanMoi(
   moiTruong.addEventListener('visibilitychange', khiQuayLai)
   moiTruong.addEventListener('focus', khiQuayLai)
   moiTruong.addEventListener('online', hoi)
+  khiXongBai.push(hoi)
   const nhip = datNhip(hoi, NHIP_HOI_MS)
 
   return () => {
     moiTruong.removeEventListener('visibilitychange', khiQuayLai)
     moiTruong.removeEventListener('focus', khiQuayLai)
     moiTruong.removeEventListener('online', hoi)
+    const i = khiXongBai.indexOf(hoi)
+    if (i >= 0) khiXongBai.splice(i, 1)
     goNhip(nhip)
   }
 }

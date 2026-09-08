@@ -762,9 +762,18 @@ body.chi-de .q-nut-giai { visibility: hidden; }
    (Cấm dấu huyền ngược trong khối này: cả khối nằm trong một chuỗi mẫu.) */
 body.chua-nop .q-nut-giai, body.chua-nop .sol-wrap { display: none !important; }
 body.chua-nop #mo-het, body.chua-nop #chi-de, body.chua-nop #pdf-giai, body.chua-nop .dem-giai { display: none !important; }
-body.chua-nop .q-opt.dung { background: #f8fafc !important; border-color: var(--vien) !important; color: var(--muc-2) !important; font-weight: 400 !important; }
-body.chua-nop .q-opt.dung .q-opt-letter { background: var(--vien-dam) !important; }
-body.chua-nop .tf-badge.dung { background: #f1f5f9 !important; color: var(--rat-nhat) !important; border-color: var(--vien) !important; }
+/* GIẤU ĐÁP ÁN TRƯỚC KHI NỘP — nhưng CHỪA Ô EM ĐANG CHỌN.
+   Đây là nguyên nhân gốc của "lựa chọn A chưa bao giờ bấm được" (thầy chỉ ra
+   08/09). Ô đáp án đúng mang lớp "dung"; ba luật này dùng !important nên đè
+   luôn cả màu của ô ĐANG ĐƯỢC CHỌN, vốn không có !important. Hậu quả: em bấm
+   trúng đáp án đúng thì cú bấm VẪN ĂN (đếm lên, lưu lại) nhưng ô không đổi màu
+   một chút nào — nhìn y như không bấm được, bấm lại lần nữa là bỏ chọn.
+   Ba đợt trước tôi đi sửa tầng sự kiện chạm; sự kiện chưa bao giờ hỏng.
+   Bộ chọn :not([aria-checked=true]) chừa đúng ô đang chọn ra. KHÔNG lộ đáp án: ô
+   nào em chọn cũng đổi màu như nhau, đúng hay sai chưa nói gì. */
+body.chua-nop .q-opt.dung:not([aria-checked="true"]) { background: #f8fafc !important; border-color: var(--vien) !important; color: var(--muc-2) !important; font-weight: 400 !important; }
+body.chua-nop .q-opt.dung:not([aria-checked="true"]) .q-opt-letter { background: var(--vien-dam) !important; }
+body.chua-nop .tf-badge.dung:not([aria-checked="true"]) { background: #f1f5f9 !important; color: var(--rat-nhat) !important; border-color: var(--vien) !important; }
 body.chua-nop .sa-answer { display: none !important; }
 body.chua-nop .sa-blank { display: block !important; }
 .giai-khoa {
@@ -772,9 +781,11 @@ body.chua-nop .sa-blank { display: block !important; }
   color: #8a6d1f; font-size: 12.5px; font-weight: 600; line-height: 1.5;
 }
 body:not(.chua-nop) .giai-khoa { display: none; }
-body.chi-de .q-opt.dung { background: #f8fafc !important; border-color: var(--vien) !important; color: var(--muc-2) !important; font-weight: 400 !important; }
-body.chi-de .q-opt.dung .q-opt-letter { background: var(--vien-dam) !important; }
-body.chi-de .tf-badge.dung { background: #f1f5f9 !important; color: var(--rat-nhat) !important; border-color: var(--vien) !important; }
+/* Chế độ "Hiện đề" cũng giấu đáp án — và cũng phải chừa ô em đang chọn, cùng
+   một lý do như khối chua-nop bên trên. */
+body.chi-de .q-opt.dung:not([aria-checked="true"]) { background: #f8fafc !important; border-color: var(--vien) !important; color: var(--muc-2) !important; font-weight: 400 !important; }
+body.chi-de .q-opt.dung:not([aria-checked="true"]) .q-opt-letter { background: var(--vien-dam) !important; }
+body.chi-de .tf-badge.dung:not([aria-checked="true"]) { background: #f1f5f9 !important; color: var(--rat-nhat) !important; border-color: var(--vien) !important; }
 body.chi-de .q-card { border-left-color: var(--vien-dam) !important; }
 body.chi-de .sa-answer { display: none !important; }
 body.chi-de .sa-blank { display: block !important; }
@@ -1502,6 +1513,14 @@ export const JS_PHIEU = `
         return el && el.closest ? el.closest('.lam-o') : null;
       }
       var chamDau = null;
+      // Tem thời gian cú chạm ĐÃ được lưới xử lý. Cú click giả kế tiếp bị nuốt
+      // ĐÚNG MỘT LẦN rồi tem tự xoá. Không phải khoá theo thời gian: cú chạm
+      // thứ hai vào cùng ô vẫn đi đường touchend nên BỎ CHỌN vẫn chạy.
+      // Cần lớp này vì preventDefault chỉ chặn được click khi touchend còn huỷ
+      // được; máy đang cuộn thì trình duyệt phát touchend KHÔNG huỷ được, lúc
+      // ấy click vẫn tới và ô bị chọn rồi bỏ chọn ngay — đúng triệu chứng thầy
+      // báo "có cái nhận có cái không".
+      var temCham = 0;
       document.addEventListener('touchstart', function (e) {
         if (daNop) { chamDau = null; return; }
         var o = oTaiCham(e.touches && e.touches[0]);
@@ -1517,12 +1536,15 @@ export const JS_PHIEU = `
         // Chặn cú click giả trình duyệt phát sau touchend. Nhờ đó một cú chạm
         // chỉ chọn ĐÚNG MỘT LẦN mà không cần khoá theo thời gian.
         if (e.cancelable) e.preventDefault();
+        temCham = Date.now();
         chonO(o);
       }, { passive: false, capture: true });
       document.addEventListener('click', function (e) {
         if (daNop || !e.target || !e.target.closest) return;
         var o = e.target.closest('.lam-o');
         if (!o) return;
+        if (temCham && Date.now() - temCham < 900) { temCham = 0; return; }
+        temCham = 0;
         chonO(o);
       });
 
