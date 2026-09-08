@@ -1604,20 +1604,24 @@ export function moTaLyDoChan(lyDo: string): string {
   return TEN_LY_DO_CHAN[lyDo] || 'Không khớp danh sách lớp'
 }
 
-/** Hạn cho lượt xin CHI TIẾT CA KÈM NGÂN HÀNG ĐÁP ÁN.
+/** Hạn cho lượt xin CHI TIẾT CA — LUÔN dùng, không phân biệt có xin đáp án.
  *
  * Thầy báo 08/09 khuya: điểm ca 447479 sai, mà `chamLaiCa` gọi qua cầu nối
  * hỏng BA LẦN liền, cả ba đều "Máy chủ không trả lời sau 25 giây". Ca đó 36 em;
  * gói trả về mang cả đáp án của kho lẫn bài làm của từng em, không có cách nào
- * gọn dưới 25 giây.
+ * gọn dưới 25 giây. Vòng vá đầu chỉ nới cho nhánh CÓ xin đáp án.
  *
- * Hạn 25 giây hợp với lượt gọi nhỏ. Gói to thì cho nó thời gian, chứ không phải
- * để thầy ngồi chờ rồi nhận một dòng "kiểm tra mạng" trong khi mạng không sao.
- * Lấy đúng mức của `hoSoNhieuEm`, vốn cũng là lượt gọi nặng. */
-const HAN_GIAY_KEYBANK = 90
+ * ĐỢT 2, cùng đêm: `chamLaiCa('248567')` lại hỏng đúng câu đó HAI LẦN liền, dù
+ * ca chỉ 21 em. Lần này `gomCa` KHÔNG xin đáp án (máy đã cất sẵn bộ đề của ca)
+ * nên rơi vào nhánh 25 giây. Tức chỗ nặng KHÔNG phải ngân hàng đáp án: bản thân
+ * `chiTietCa` đã trả về `dapAn` đầy đủ của từng lượt rồi.
+ *
+ * Nên hạn dài áp cho CẢ HAI nhánh. Đây không phải lượt gọi nhỏ trong bất kỳ
+ * trường hợp nào. Lấy đúng mức của `hoSoNhieuEm`, vốn cũng là lượt gọi nặng. */
+const HAN_GIAY_CHI_TIET_CA = 90
 
 export async function chiTietCa(scriptUrl: string, secret: string, maCa: string, xinKeyBank = false): Promise<ChiTietCa> {
-  const r = await postJson(scriptUrl, { action: 'chiTietCa', secret, maCa, xinKeyBank }, xinKeyBank ? HAN_GIAY_KEYBANK : undefined)
+  const r = await postJson(scriptUrl, { action: 'chiTietCa', secret, maCa, xinKeyBank }, HAN_GIAY_CHI_TIET_CA)
   if (!r.ok) throw new Error(r.error || 'Không lấy được chi tiết ca')
   const goiDR = moGoiDeRieng(r.goiDeRieng)
   return {
