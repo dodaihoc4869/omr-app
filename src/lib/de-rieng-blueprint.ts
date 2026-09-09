@@ -78,12 +78,29 @@ function goc(q: CoNhan): { chuyenDe: string; mucDo: string } {
   return { chuyenDe: (q.chuyenDe ?? '').trim() || '(chưa gán)', mucDo: (q.mucDo ?? '').trim() || '(chưa gán)' }
 }
 
-/** Dựng danh sách ô cho MỘT phần. */
-export function dungOChoPhan(cau: CoNhan[], phan: TenPhan, k: number): OBlueprint[] {
+/** BA MỨC PHÂN TẦNG, từ mịn tới thô.
+ *
+ * Phân tầng càng mịn thì mọi em càng giống nhau về cấu trúc đề — nhưng ô càng
+ * nhỏ thì SÀN trùng của chính ô đó càng cao, và không thuật toán nào phá được.
+ * Kho 200 câu chẻ thành 6 ô (2 chuyên đề × 3 mức độ) thì riêng một ô đã có 30
+ * em × 3 câu = 90 suất trên 34 câu.
+ *
+ * Nên không chốt cứng một mức: thử mịn nhất trước, kho không chịu nổi thì thô
+ * dần. Kho lớn thì mức mịn nhất đã cho đỉnh 0 nên không mất gì. */
+export type MucPhanTang = 'cd_md' | 'cd' | 'phan'
+
+export const TEN_MUC_PHAN_TANG: Record<MucPhanTang, string> = {
+  cd_md: 'chuyên đề × mức độ',
+  cd: 'chuyên đề',
+  phan: 'chỉ theo phần',
+}
+
+/** Dựng danh sách ô cho MỘT phần, ở một mức phân tầng. */
+export function dungOChoPhan(cau: CoNhan[], phan: TenPhan, k: number, muc: MucPhanTang = 'cd_md'): OBlueprint[] {
   const nhom = new Map<string, { chuyenDe: string; mucDo: string; ids: string[] }>()
   for (const q of cau) {
     const g = goc(q)
-    const kh = `${g.chuyenDe}|${g.mucDo}`
+    const kh = muc === 'cd_md' ? `${g.chuyenDe}|${g.mucDo}` : muc === 'cd' ? `${g.chuyenDe}|*` : '*|*'
     const cu = nhom.get(kh)
     if (cu) cu.ids.push(q.id)
     else nhom.set(kh, { chuyenDe: g.chuyenDe, mucDo: g.mucDo, ids: [q.id] })
@@ -119,6 +136,10 @@ export interface KetQuaSinhBo {
   san: number
   msChay: number
   canhBao: string[]
+  /** Mức phân tầng thuật toán TỰ CHỌN cho ca này. */
+  mucPhanTang: MucPhanTang
+  /** Đỉnh trùng của từng mức đã thử — để thầy thấy vì sao nó chọn mức đó. */
+  daThu: { muc: MucPhanTang; dinh: number }[]
 }
 
 /** SINH BỘ CÂU CHO CẢ CA, MỘT LƯỢT.
@@ -126,12 +147,13 @@ export interface KetQuaSinhBo {
  * Chạy độc lập trong từng ô blueprint rồi gộp lại. Seed lấy từ `maCa` + khoá ô
  * nên cùng ca, cùng kho, cùng danh sách em thì luôn ra đúng một kết quả — chấm
  * lại và dựng lại đề không bao giờ lệch. */
-export function sinhBoTheoEm(
+function sinhBoMotMuc(
   nguon: TeacherExamSource[],
   sbds: string[],
   soCau: SoCauMoiPhan,
   maCa: string,
-  cauHinh: CauHinhDeRiengTranTrung = CAU_HINH_TRAN_TRUNG_MAC_DINH,
+  cauHinh: CauHinhDeRiengTranTrung,
+  muc: MucPhanTang,
 ): KetQuaSinhBo {
   const t0 = Date.now()
   // CHỪA LỀ CHO BƯỚC ĐO CUỐI. Hạn trong `haDinh` tính từ `t0` của cả lượt, nên
@@ -145,7 +167,7 @@ export function sinhBoTheoEm(
   for (const s of em) boTheoEm[s] = []
   if (m === 0) {
     canhBao.push('Không có em nào trong danh sách — không sinh được bộ câu.')
-    return { boTheoEm, dinhTrung: 0, trungBinhTrung: 0, lechTanSuat: 0, thieuDeVeKhong: 0, san: 0, msChay: 0, canhBao }
+    return { boTheoEm, dinhTrung: 0, trungBinhTrung: 0, lechTanSuat: 0, thieuDeVeKhong: 0, san: 0, msChay: 0, canhBao, mucPhanTang: muc, daThu: [] }
   }
 
   const gop = <T extends CoNhan>(lay: (s: TeacherExamSource) => T[]): T[] => {
@@ -171,7 +193,7 @@ export function sinhBoTheoEm(
   let soO = 0
   for (const p of phanIds) {
     if (p.k <= 0 || p.cau.length === 0) continue
-    for (const o of dungOChoPhan(p.cau, p.phan, p.k)) if (o.can > 0) soO++
+    for (const o of dungOChoPhan(p.cau, p.phan, p.k, muc)) if (o.can > 0) soO++
   }
   const vongMoiO = soO > 0 ? Math.max(200, Math.min(cauHinh.VONG_DOI_CHO, Math.floor(cauHinh.TONG_VONG_TOI_DA / soO))) : cauHinh.VONG_DOI_CHO
   const hanO: CauHinhDeRiengTranTrung = { ...hanTrong, VONG_DOI_CHO: vongMoiO }
@@ -191,7 +213,7 @@ export function sinhBoTheoEm(
     thieu += thieuBaoNhieuCauDeKhongTrung(p.cau.length, Math.min(p.k, p.cau.length), m)
     sanTong += sanTrungTrungBinh(p.cau.length, Math.min(p.k, p.cau.length), m)
 
-    for (const o of dungOChoPhan(p.cau, p.phan, p.k)) {
+    for (const o of dungOChoPhan(p.cau, p.phan, p.k, muc)) {
       if (o.can <= 0) continue
       const bo = sinhBoMotO(o.ids, o.can, m, hashSeed(`${maCa}:${o.khoa}`), hanO, t0)
       const l = lechTanSuat(bo, o.ids)
@@ -213,5 +235,47 @@ export function sinhBoTheoEm(
     san: sanTong,
     msChay: Date.now() - t0,
     canhBao,
+    mucPhanTang: muc,
+    daThu: [],
   }
+}
+
+/** SINH BỘ CÂU CHO CẢ CA — TỰ CHỌN MỨC PHÂN TẦNG.
+ *
+ * Thử từ mịn tới thô, dừng ngay khi đạt đỉnh 0. Chọn mức cho đỉnh nhỏ nhất;
+ * hoà thì giữ mức MỊN hơn, vì phân tầng mịn nghĩa là mọi em giống nhau hơn về
+ * cấu trúc đề — có lợi thì lấy, không có lợi thì thôi.
+ *
+ * Ngân sách chia cho số mức phải thử, nên tổng thời gian không đổi. */
+export function sinhBoTheoEm(
+  nguon: TeacherExamSource[],
+  sbds: string[],
+  soCau: SoCauMoiPhan,
+  maCa: string,
+  cauHinh: CauHinhDeRiengTranTrung = CAU_HINH_TRAN_TRUNG_MAC_DINH,
+): KetQuaSinhBo {
+  const t0 = Date.now()
+  const mucs: MucPhanTang[] = ['cd_md', 'cd', 'phan']
+  const chia: CauHinhDeRiengTranTrung = {
+    ...cauHinh,
+    TONG_VONG_TOI_DA: Math.max(1000, Math.floor(cauHinh.TONG_VONG_TOI_DA / mucs.length)),
+  }
+  const daThu: { muc: MucPhanTang; dinh: number }[] = []
+  let tot: KetQuaSinhBo | null = null
+  for (const muc of mucs) {
+    const r = sinhBoMotMuc(nguon, sbds, soCau, maCa, chia, muc)
+    daThu.push({ muc, dinh: r.dinhTrung })
+    // Hoà thì GIỮ mức mịn hơn: chỉ thay khi thô hơn cho đỉnh THẤP HƠN HẲN.
+    if (!tot || r.dinhTrung < tot.dinhTrung) tot = r
+    if (tot.dinhTrung === 0) break
+  }
+  const ra = tot as KetQuaSinhBo
+  ra.daThu = daThu
+  ra.msChay = Date.now() - t0
+  if (ra.mucPhanTang !== 'cd_md') {
+    ra.canhBao.push(
+      `Kho không đủ để chia theo ${TEN_MUC_PHAN_TANG.cd_md} — đã chuyển sang chia theo ${TEN_MUC_PHAN_TANG[ra.mucPhanTang]} để hạ trùng (đỉnh ${daThu.map((x) => `${TEN_MUC_PHAN_TANG[x.muc]} ${x.dinh}`).join(' · ')}).`,
+    )
+  }
+  return ra
 }

@@ -20,6 +20,7 @@ import { viecCanLamMacDinh } from '../lib/phieu-zalo'
 import { gomLinkPhieu, tomTatLinkPhieu, vanBanLinkPhieu, type DongLinkPhieu } from '../lib/link-phieu-ca'
 import { dungPhieuChoEm } from '../lib/phieu-ca-ca'
 import { phieuTheoCa } from '../lib/exam-api'
+import { sinhBoTheoEm, TEN_MUC_PHAN_TANG } from '../lib/de-rieng-blueprint'
 import { docCheDoDeRieng, docDeRiengCa, docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuDeRiengCa, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret, type BienBanDeRieng, type DeRiengCaLuu } from '../lib/exam-db'
 import { CHU_LY_DO_THIEU } from '../lib/de-rieng'
 import { CAU_HINH_DE_RIENG_MAC_DINH } from '../lib/cau-hinh-de-rieng'
@@ -717,7 +718,43 @@ export default function ExamMonitorScreen() {
         if (ra.cauNoiThem.soCau > 0) showToast(`Đã kéo ${ra.cauNoiThem.soCau} câu em từng sai từ kho vào đề ca này.`, 'success')
         if (ra.thieu.length > 0) showToast(`${ra.thieu.length} em không đủ câu hỏi lại — xem chi tiết trong ca.`, 'warn')
       }
+      // CHẶN TRẦN TRÙNG CÂU — DE-RIENG-CHAN-TRAN-TRUNG.md.
+      //
+      // Ca thường (không phải ca chẩn đoán) mà có phòng chờ thì ĐÚNG LÚC NÀY là
+      // chỗ duy nhất biết chính xác em nào đang ngồi trong phòng. Bốc độc lập
+      // theo `hash(maCa:sbd)` luôn để lọt một cặp xui xẻo trùng 3–7 lần trung
+      // bình (đo được: kho 600 câu vẫn còn cặp chung 3–4 câu). Điều phối cả lớp
+      // một lượt thì chặn được cái đuôi đó, và kho đủ lớn thì trùng bằng 0.
+      //
+      // Không đụng ca chẩn đoán: ca đó đã có bản đồ riêng theo hồ sơ từng em.
+      // Em vào sau khi bấm Bắt đầu không có tên trong bản đồ ⇒ rơi về bốc độc
+      // lập như cũ, vẫn thi được, chỉ là không được bảo đảm trần trùng.
+      let bcTranTrung: string[] = []
+      if (!caCanDeRieng && !boTheoEm) {
+        const dsCho = (chiTiet.dsCho ?? []).map((x) => x.sbd).filter(Boolean)
+        const kho = teacherBank ?? []
+        const sc = soCauCa
+        if (dsCho.length >= 2 && kho.length > 0 && sc && sc.I + sc.II + sc.III > 0) {
+          try {
+            const ra = sinhBoTheoEm(kho, dsCho, sc, chiTiet.ca.maCa)
+            if (Object.keys(ra.boTheoEm).length > 0) {
+              boTheoEm = ra.boTheoEm
+              bcTranTrung = [
+                ra.dinhTrung === 0
+                  ? `Đề riêng từng em: KHÔNG cặp nào trùng câu nào (${dsCho.length} em, chia theo ${TEN_MUC_PHAN_TANG[ra.mucPhanTang]}).`
+                  : `Đề riêng từng em: cặp trùng nhiều nhất ${ra.dinhTrung} câu (${dsCho.length} em, chia theo ${TEN_MUC_PHAN_TANG[ra.mucPhanTang]})` +
+                    (ra.thieuDeVeKhong > 0 ? `. Muốn về 0 cần thêm ${ra.thieuDeVeKhong} câu vào kho.` : '.'),
+                ...ra.canhBao,
+              ]
+            }
+          } catch (e) {
+            // KHÔNG NUỐT: hỏng thì ca vẫn chạy bằng luật cũ, nhưng thầy phải biết.
+            bcTranTrung = ['Không dựng được đề riêng chặn trùng — ca chạy theo luật cũ. ' + (e instanceof Error ? e.message : '')]
+          }
+        }
+      }
       const kq = await batDauThi(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, boTheoEm, lapTheoEm, demSai, bienBan as unknown as Record<string, unknown>)
+      for (const d of bcTranTrung) showToast(d, d.startsWith('Không dựng được') ? 'error' : 'success')
       if (kq.thieuBoTheoEm) {
         // KHÔNG NUỐT. Ca đã phát đề trước khi có bản đồ ⇒ em làm một bộ câu,
         // máy thầy chấm một bộ khác. Ghi đè bản đồ lúc này còn tệ hơn, nên

@@ -38,7 +38,7 @@ export const CAU_HINH_TRAN_TRUNG_MAC_DINH: CauHinhDeRiengTranTrung = {
   VONG_DOI_CHO: 20000,
   NGAN_SACH_MS: 500,
   LECH_TAN_SUAT_TOI_DA: 1,
-  TONG_VONG_TOI_DA: 60000,
+  TONG_VONG_TOI_DA: 45000,
 }
 
 /** SÀN LÝ THUYẾT của số câu trùng TRUNG BÌNH giữa hai em bất kỳ.
