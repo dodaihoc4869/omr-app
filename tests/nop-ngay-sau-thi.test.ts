@@ -72,7 +72,10 @@ describe('màn làm bài gắn link vào báo cáo', () => {
     // Và XIN LẠI ĐƯỢC: treo một lời hứa hỏng là em bấm mãi không bao giờ có mã.
     expect(MAN_THI).toContain('if (maBaiTapRef.current && maBaiTapRef.current.khoa === khoa) maBaiTapRef.current = null')
     // Và khối bài luyện đã có sẵn dòng nói vì sao chưa nộp được.
-    expect(doc('src/components/KhoiBaiLuyen.tsx')).toContain("setKhongNop(nop ? '' : !maPhieu ? 'thieu_ma'")
+    // CẬP NHẬT 09/09: đổi tên thành biến `lyDoKhongNop` vì lý do nay dùng hai
+    // nơi — dòng trên trang app, và một dòng nhét thẳng vào phiếu (lớp phủ toàn
+    // màn hình che mất dòng thứ nhất). Ý định giữ nguyên.
+    expect(doc('src/components/KhoiBaiLuyen.tsx')).toContain("const lyDoKhongNop = nop ? '' : !maPhieu ? 'thieu_ma'")
   })
 
   it('client gửi ĐÚNG ba trường máy chủ cần để chấm', () => {

@@ -208,7 +208,9 @@ describe('phiếu khắc phục trong báo cáo nộp được', () => {
     // ĐỔI 08/09 TỐI: có `nop` thì vẫn dựng phiếu nộp được như cũ, nhưng bản của
     // EM mà KHÔNG nộp được thì dựng phiếu CHỈ ĐỀ, không tụt về bản đầy đủ có
     // đáp án (thầy báo: "rút câu luyện của học sinh bị lỗi lời giải").
-    expect(khoi).toContain('chiDeChoEm ? { anGiai: true } : { nop }')
+    // CẬP NHẬT 09/09: thêm `loiNhac` — lý do chỉ đọc phải đi THEO phiếu, vì
+    // phiếu hiện trong lớp phủ toàn màn hình, mọi chữ ngoài lớp phủ đều bị che.
+    expect(khoi).toContain('chiDeChoEm ? { anGiai: true, loiNhac: nhacTrongPhieu } : { nop }')
     expect(khoi).toContain('const chiDeChoEm = laCuaEm && !nop')
     // Mã lấy từ link đã cất, KHÔNG tự sinh — trang này không có mã bí mật.
     expect(khoi).toContain('docLinkPhieu(link.slice(link.indexOf')
@@ -335,8 +337,12 @@ describe('NÚT ĐỒNG BỘ LẠI PHIẾU MỌI CA — bấm được từ mọi
 describe('phiếu khắc phục KHÔNG nộp được thì phải NÓI VÌ SAO', () => {
   const KHOI = doc('src/components/KhoiBaiLuyen.tsx')
 
+  // CẬP NHẬT 09/09: lý do nay tính vào một biến rồi dùng HAI nơi — đặt cờ cho
+  // dòng trên trang app (giữ nguyên) VÀ nhét vào chính phiếu. Ý định không đổi:
+  // vẫn đúng ba lý do, mỗi lý do chỉ đúng một việc cần làm.
   it('có ba lý do, mỗi lý do một câu chỉ đúng việc cần làm', () => {
-    expect(KHOI).toContain("setKhongNop(nop ? '' : !maPhieu ? 'thieu_ma' : !du.sbd ? 'thieu_sbd' : 'thieu_link')")
+    expect(KHOI).toContain("const lyDoKhongNop = nop ? '' : !maPhieu ? 'thieu_ma' : !du.sbd ? 'thieu_sbd' : 'thieu_link'")
+    expect(KHOI).toContain('setKhongNop(lyDoKhongNop)')
     expect(KHOI).toContain('Đồng bộ lại phiếu mọi ca')
   })
 

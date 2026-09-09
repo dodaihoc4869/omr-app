@@ -306,10 +306,14 @@ describe('MẤT MÃ NỘP KHÔNG ĐƯỢC BIẾN PHIẾU CỦA EM THÀNH PHIẾU
     expect(h).not.toContain('class="q-nut-giai"')
   })
 
-  it('KhoiBaiLuyen: bản của EM mà không nộp được thì dựng phiếu CHỈ ĐỀ', () => {
+  // CẬP NHẬT 09/09: ý định giữ nguyên (không nộp được ⇒ phiếu CHỈ ĐỀ), nhưng
+  // phiếu nay mang thêm `loiNhac` — một dòng nói VÌ SAO nó chỉ đọc. Trước đó
+  // dòng đó nằm trên trang app, bị `KhungXemPhieu` (lớp phủ toàn màn hình) che
+  // kín, nên thầy chỉ thấy một phiếu xám không giải thích gì.
+  it('KhoiBaiLuyen: bản của EM mà không nộp được thì dựng phiếu CHỈ ĐỀ, KÈM lý do', () => {
     const src = readFileSync(join(process.cwd(), 'src/components/KhoiBaiLuyen.tsx'), 'utf8')
     expect(src).toContain('const chiDeChoEm = laCuaEm && !nop')
-    expect(src).toContain("chiDeChoEm ? { anGiai: true } : { nop }")
+    expect(src).toContain('chiDeChoEm ? { anGiai: true, loiNhac: nhacTrongPhieu } : { nop }')
     // Cấm quay lại lối cũ: dựng thẳng { nop } cho mọi trường hợp.
     expect(src).not.toContain('setHtml(dungPhieu(tt, dsDaLoc.slice(0, lay), { nop }))')
   })

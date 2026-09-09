@@ -478,6 +478,14 @@ body.co-lam .tf-item { padding: 9px 10px; }
 .q-card.la-chua { border-left-color: #c2410c; }
 /* Khối "Phiếu này chữa gì" — đọc trước khi làm bài, nên đặt màu nhạt cùng họ
    với nhãn chữa để mắt nối được hai thứ với nhau. */
+/* LỜI NHẮC ĐẦU PHIẾU — vì sao phiếu này mở ra ở dạng chỉ đọc.
+   Phải nằm TRONG tài liệu phiếu, không phải trên trang app: phiếu hiện trong
+   một lớp phủ toàn màn hình (KhungXemPhieu), nên mọi dòng giải thích đặt ngoài
+   lớp phủ đều bị che kín. Thầy báo 09/09: bấm "tạo câu khắc phục" ra phiếu
+   xám không bấm được, mà không có một chữ nào nói vì sao — đúng là dòng giải
+   thích đã được dựng, chỉ là nằm dưới lớp phủ. */
+.nhac-phieu { background: var(--kem-nen); border: 1px solid var(--kem-vien); border-left: 4px solid var(--kem-nhan); border-radius: var(--bo); padding: 12px 16px; margin-bottom: 14px; color: var(--kem-muc); font-size: 14px; line-height: 1.55; }
+.nhac-phieu b { color: var(--kem-nhan); }
 .chua-gi { background: #fff7ed; border: 1px solid #fed7aa; border-left: 4px solid #c2410c; border-radius: var(--bo); padding: 14px 16px; margin-bottom: 14px; }
 .chua-gi h3 { margin: 0 0 8px; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: #9a3412; }
 .chua-gi ul { margin: 0; padding-left: 18px; }
@@ -1723,6 +1731,12 @@ export interface TuyChonPhieu {
     url: string
     cauHinh?: Partial<CauHinhNopKhacPhuc> | null
   } | null
+  /** MỘT DÒNG NÓI VÌ SAO phiếu mở ra ở dạng này — dựng ngay đầu phiếu.
+   *
+   * Bắt buộc phải nằm TRONG tài liệu: phiếu hiện trong lớp phủ toàn màn hình,
+   * nên chữ đặt trên trang app bị che kín. Không có nó thì phiếu chỉ đọc trông
+   * y hệt phiếu hỏng. */
+  loiNhac?: string | null
 }
 
 export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChonPhieu = {}): string {
@@ -1742,8 +1756,10 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   const huongDan = anGiai
     ? 'Em làm vào vở rồi đối chiếu với link lời giải bố mẹ gửi sau. Muốn bản giấy thì bấm "In đề" rồi chọn "Lưu thành PDF".'
     : 'Bấm vào từng câu để xem lời giải. Muốn bản giấy thì bấm "In đề" (phát cho em tự làm) hoặc "In kèm lời giải", rồi chọn "Lưu thành PDF".'
+  const nhac = (tuyChon.loiNhac ?? '').trim()
   const than = `${biaHtml(t, cau.length)}
 <div class="khung">
+  ${nhac ? `<div class="nhac-phieu">${thoat(nhac)}</div>` : ''}
   ${khoiChuaGiHtml(cau, tuyChon.thieuChua ?? [])}
   ${tongQuanHtml(cau)}
   ${thanhHtml(coGiai, anGiai)}

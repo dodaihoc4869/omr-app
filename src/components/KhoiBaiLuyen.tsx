@@ -146,7 +146,8 @@ function NutTaiBaiTap({ du, laCuaEm = false, xinLink }: { du: PhieuDayDu; laCuaE
       // NÓI RA KHI KHÔNG NỘP ĐƯỢC. Trước đây thiếu mã thì phiếu vẫn mở ra bình
       // thường, chỉ là không có thanh nộp — thầy bấm mãi không thấy nút mà
       // không có một dòng nào giải thích (thầy bắt được 08/09).
-      setKhongNop(nop ? '' : !maPhieu ? 'thieu_ma' : !du.sbd ? 'thieu_sbd' : 'thieu_link')
+      const lyDoKhongNop = nop ? '' : !maPhieu ? 'thieu_ma' : !du.sbd ? 'thieu_sbd' : 'thieu_link'
+      setKhongNop(lyDoKhongNop)
       const sai = du.chuyenDeCa.filter((c) => c.soSai > 0)
       const tt = {
         hoTen: du.hoTen,
@@ -174,7 +175,24 @@ function NutTaiBaiTap({ du, laCuaEm = false, xinLink }: { du: PhieuDayDu; laCuaE
       // làm ra giấy được, và không thấy một đáp án nào. Lý do vì sao không nộp
       // được đã nói ở `khongNop` ngay trên.
       const chiDeChoEm = laCuaEm && !nop
-      setHtml(dungPhieu(tt, dsDaLoc.slice(0, lay), chiDeChoEm ? { anGiai: true } : { nop }))
+      // LÝ DO PHẢI NẰM TRONG PHIẾU, không phải trên trang app.
+      //
+      // Thầy báo 09/09 tối, hai lần: bấm "rút đề tạo khắc phục" thì ra phiếu
+      // xám, bấm chọn đáp án không được, và KHÔNG có chữ nào nói vì sao. Dòng
+      // giải thích thật ra đã được dựng từ 08/09 — nhưng nó nằm trên trang
+      // app, còn phiếu hiện trong `KhungXemPhieu`, một lớp phủ TOÀN MÀN HÌNH.
+      // Lớp phủ che kín dòng đó. Người dùng chỉ thấy một phiếu hỏng.
+      //
+      // Nay lý do đi THEO phiếu, nên thấy được ở cả bản xem trong app lẫn tệp
+      // HTML tải về.
+      const nhacTrongPhieu = chiDeChoEm
+        ? lyDoKhongNop === 'thieu_ma'
+          ? 'Phiếu này chưa xin được mã bài tập từ máy chủ nên chỉ đọc được, chưa bấm chọn và chưa nộp được. Em làm ra giấy, hoặc mở lại khi mạng ổn định. Thầy vào Lịch sử ca, bấm "Đồng bộ lại phiếu mọi ca" rồi mở lại link này.'
+          : lyDoKhongNop === 'thieu_sbd'
+            ? 'Phiếu này thiếu số báo danh nên chỉ đọc được, chưa bấm chọn và chưa nộp được. Báo Thầy để dựng lại phiếu.'
+            : 'Máy chưa có địa chỉ máy chủ nên phiếu chỉ đọc được, chưa bấm chọn và chưa nộp được. Mở lại link khi có mạng.'
+        : ''
+      setHtml(dungPhieu(tt, dsDaLoc.slice(0, lay), chiDeChoEm ? { anGiai: true, loiNhac: nhacTrongPhieu } : { nop }))
     } catch {
       setLoi('Máy chưa mở được phiếu. Phụ huynh thử lại khi có mạng ổn định.')
     } finally {
