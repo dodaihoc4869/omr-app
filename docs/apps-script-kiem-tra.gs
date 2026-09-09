@@ -780,6 +780,32 @@ function docLuot_(v) {
  *
  * Đọc theo BA DẢI CỘT rồi ghép lại đúng chỉ số cũ, để `docLuot_` không phải
  * biết gì về việc này — hai bên không được hiểu khác nhau về chỉ số cột. */
+/** DÒNG NÀY CÒN ĐÚNG LƯỢT ẤY KHÔNG — hỏi lại NGAY TRƯỚC KHI GHI.
+ *
+ * VÌ SAO CÓ (rà soát 09/09 trước ca thi đông).
+ *
+ * LuotThi được ghi theo CHỈ SỐ DÒNG: đọc cả bảng, tìm ra `row`, rồi
+ * `getRange(row, ...).setValues(...)`. Giữa đọc và ghi có vài lượt gọi Sheets.
+ * `choThiLai` XOÁ dòng LuotThi, và xoá một dòng là mọi dòng bên dưới dồn lên
+ * một bậc — lệnh nào đang cầm chỉ số dòng trong cửa sổ đó sẽ ghi vào dòng CỦA
+ * EM KHÁC. Sai lặng lẽ, chéo người.
+ *
+ * Các lệnh THƯA (`submit`, `moKhoa`, `duyetThiLai`, `ghiDiem`…) đóng cửa sổ
+ * bằng khoá. `luuTam` thì KHÔNG: nó là nhịp ghi dày nhất của cả ca (mỗi em một
+ * lượt mỗi ~20 giây), khoá nó là xếp hàng cả lớp ở đúng chỗ đông nhất. Nó đóng
+ * cửa sổ bằng cách RẺ hơn: đọc lại đúng ba ô khoá của dòng và đối chiếu. Một
+ * lượt gọi Sheets, không giữ khoá, không ai phải chờ ai.
+ *
+ * Lệch thì bên gọi tự tìm lại dòng — thà tốn một lượt đọc còn hơn ghi nhầm. */
+function dungDongChua_(sh, row, maCa, sbd, lanThu) {
+  try {
+    const o = sh.getRange(row, 1, 1, 3).getValues()[0]
+    return String(o[0]) === String(maCa) && String(o[1]) === String(sbd) && (Number(o[2]) || 1) === (Number(lanThu) || 1)
+  } catch (err) {
+    return false
+  }
+}
+
 function luotMoiNhatTheoSbd_(sh, maCa, nhe) {
   const n = sh.getLastRow()
   if (n < 2) return {}
@@ -3497,6 +3523,10 @@ function doPost(e) {
   }
 
   if (action === 'duyetThiLai') {
+    // KHOÁ (thêm 09/09). Cùng lý do `moKhoa`: đọc chỉ số dòng rồi mới ghi.
+    const lockDuyetLai = LockService.getScriptLock()
+    lockDuyetLai.waitLock(15000)
+    try {
     // Thầy cho 1 em thi lại (QUANLYCATHI mục 1): thêm dòng lượt MỚI trạng thái
     // duoc_duyet_lai — lượt cũ giữ nguyên, khi em vào (vaoThi) dòng này thành
     // dang_lam. Cần MA_BI_MAT (chỉ máy thầy có).
@@ -3523,9 +3553,20 @@ function doPost(e) {
     rowData[20] = new Date().toISOString()
     sh.appendRow(rowData)
     return jsonResponse_({ ok: true, lanThu: lanThu })
+  } finally {
+      lockDuyetLai.releaseLock()
+    }
   }
 
   if (action === 'choThiLai') {
+    // KHOÁ CẢ KHỐI (thêm 09/09, rà soát trước ca thi đông). Đây là lệnh DUY
+    // NHẤT xoá dòng LuotThi trong lúc ca đang chạy. Xoá một dòng là mọi dòng
+    // bên dưới dồn lên một bậc, nên bất kỳ lệnh nào đang cầm chỉ số dòng —
+    // `submit`, `moKhoa`, `duyetThiLai` — sẽ ghi vào dòng CỦA EM KHÁC. Khoá
+    // chung với chúng thì không bao giờ có hai bên cùng đụng bảng một lúc.
+    const lockThiLai = LockService.getScriptLock()
+    lockThiLai.waitLock(15000)
+    try {
     // CHO THI LẠI — ba việc trong một lệnh (thầy chốt 08/09):
     //   1. XOÁ HẲN lịch sử bài thi trước của em trong ca này;
     //   2. KHOÁ MÁY: em chỉ vào lại được từ đúng cái máy đã thi lượt trước;
@@ -3637,9 +3678,18 @@ function doPost(e) {
     rowMoiTL[20] = new Date().toISOString()
     shTL.appendRow(rowMoiTL)
     return jsonResponse_({ ok: true, soLuotXoa: xoaTL.length, soCauXoa: soCtXoa, khoaMay: !!mayCu, daDoiDe: daDoiDe, serverNow: Date.now() })
+  } finally {
+      lockThiLai.releaseLock()
+    }
   }
 
   if (action === 'moKhoa') {
+    // KHOÁ (thêm 09/09). Lệnh này ghi LuotThi THEO CHỈ SỐ DÒNG, nên phải khoá
+    // chung với `choThiLai` — lệnh xoá dòng — nếu không thì mở khoá cho em này
+    // có thể rơi vào dòng của em khác.
+    const lockMoKhoa = LockService.getScriptLock()
+    lockMoKhoa.waitLock(15000)
+    try {
     // Thầy MỞ KHOÁ một lượt bị khoá vì rời màn (QUANLYCATHI mục 6): trạng thái
     // về dang_lam, giữ nguyên đáp án đã tự nộp + số lần rời màn, ghi ai mở lúc
     // nào. Em mở lại link trên CÙNG máy là làm tiếp (đồng hồ vẫn theo HetGioLuc).
@@ -3662,6 +3712,9 @@ function doPost(e) {
       if (r > 0 && String(st.getRange(r, 2).getValue()) === maCa) st.getRange(r, 9).setValue('false')
     } catch (err) {}
     return jsonResponse_({ ok: true, lanThu: luot.lanThu })
+  } finally {
+      lockMoKhoa.releaseLock()
+    }
   }
 
   // ------------------------------------------------------ LỊCH SỬ CA THI (mục 2)
@@ -3954,6 +4007,10 @@ function doPost(e) {
   }
 
   if (action === 'dongBoTenCa') {
+    // KHOÁ (thêm 09/09). Ghi họ tên vào LuotThi theo CHỈ SỐ DÒNG.
+    const lockDongBoTen = LockService.getScriptLock()
+    lockDongBoTen.waitLock(15000)
+    try {
     // ĐỒNG BỘ HỌ TÊN TỪ DANH SÁCH LỚP VÀO MỘT CA (thầy báo 07/09).
     //
     // Em vào thi chỉ gõ số báo danh nên cột HoTen của lượt thi bỏ trống. Phiếu
@@ -4021,6 +4078,9 @@ function doPost(e) {
       khongCo: khongCo,
       giuNguyen: giuNguyen,
     })
+  } finally {
+      lockDongBoTen.releaseLock()
+    }
   }
 
   if (action === 'doiTenCa') {
@@ -4086,6 +4146,12 @@ function doPost(e) {
   }
 
   if (action === 'ghiDiem') {
+    // KHOÁ (thêm 09/09). Ghi điểm vào LuotThi theo CHỈ SỐ DÒNG. Trong ca đang
+    // chạy, lệnh này NHANH: em mới chấm lần đầu nên không có dòng chi tiết cũ
+    // để xoá. Lượt nặng là thầy chấm lại sau ca, lúc đó không ai ghi cùng.
+    const lockGhiDiem = LockService.getScriptLock()
+    lockGhiDiem.waitLock(15000)
+    try {
     // Ghi điểm + CHI TIẾT TỪNG CÂU (mục 5) cho 1 hoặc nhiều lượt trong 1 ca.
     // Quyền: MA_BI_MAT (máy thầy) HOẶC đúng idThietBi của lượt (máy em, khi ca
     // công bố điểm và em chấm tại máy). body.bai = [{sbd, lanThu, idThietBi?,
@@ -4171,6 +4237,9 @@ function doPost(e) {
     ghiBanDoSai_(banDoMoi)
     ghiTienDo_(maCa, tomTat)
     return jsonResponse_({ ok: true, daGhi: daGhi, tuChoi: tuChoi, soCau: themDong.length, serverNow: Date.now() })
+  } finally {
+      lockGhiDiem.releaseLock()
+    }
   }
 
   if (action === 'submit') {
@@ -4197,6 +4266,23 @@ function doPost(e) {
     } catch (err) {
       laBaiTapCa = false
     }
+    // KHOÁ TỪ LÚC ĐỌC TỚI LÚC GHI XONG (thêm 09/09, rà soát trước ca thi đông).
+    //
+    // Chỗ dưới đây đọc CẢ BẢNG rồi ghi THEO CHỈ SỐ DÒNG. Giữa hai việc đó có vài
+    // lượt gọi Sheets, tức vài trăm mili giây tới hơn một giây. Trong cửa sổ ấy,
+    // `choThiLai` XOÁ dòng LuotThi: mọi dòng bên dưới dồn lên một bậc, và lượt
+    // nộp này ghi bài của em vào dòng CỦA EM KHÁC. Sai lặng lẽ, chéo người —
+    // đúng loại hỏng nặng nhất.
+    //
+    // "Cho thi lại" là việc thầy làm giữa ca khi máy một em chết, nên cửa sổ đó
+    // không phải giả tưởng. `vaoThi` và `luuTam` đã khoá đúng kiểu này từ trước;
+    // `submit` bị bỏ sót.
+    //
+    // Hết hạn chờ khoá thì lệnh ném lỗi, máy em giữ `pendingSubmit` và gửi lại —
+    // mất một lượt gửi, không mất bài.
+    const lockNopBai = LockService.getScriptLock()
+    lockNopBai.waitLock(15000)
+    try {
     const sh = sheetLuot_()
     const data = sh.getDataRange().getValues()
     let luotRow = -1
@@ -4237,6 +4323,9 @@ function doPost(e) {
       if (foundRow > 0) bl.getRange(foundRow, 1, 1, 8).setValues([rowData])
       else bl.appendRow(rowData)
     }
+    } finally {
+      lockNopBai.releaseLock()
+    }
 
     // Nếu ca này bật "xem điểm ngay sau khi nộp", trả kèm đáp án (keyBank)
     // NGAY TRONG RESPONSE của lần nộp này — chỉ em vừa nộp nhận được, không
@@ -4275,10 +4364,22 @@ function doPost(e) {
     const luotT = luotMoiNhatTheoSbd_(shT, maCa, true)[sbd] || null
     if (!luotT) return jsonResponse_({ ok: false, lyDo: 'chua_vao', error: 'Em này chưa vào thi' })
     if (luotT.trangThai !== 'dang_lam') return jsonResponse_({ ok: false, lyDo: 'khong_dang_lam', error: 'Lượt này không còn đang làm (' + luotT.trangThai + ')' })
+    // KIỂM LẠI DÒNG NGAY TRƯỚC KHI GHI — xem `dungDongChua_`. Lệch thì tìm lại
+    // một lần; vẫn lệch thì THÔI, không ghi. Máy em giữ bài trong máy và lưu
+    // lại ở nhịp sau, nên bỏ một nhịp không mất gì; ghi nhầm dòng thì mất bài
+    // của em khác.
+    let dongT = luotT.row
+    if (!dungDongChua_(shT, dongT, maCa, sbd, luotT.lanThu)) {
+      const lai = luotMoiNhatTheoSbd_(shT, maCa, true)[sbd] || null
+      if (!lai || !dungDongChua_(shT, lai.row, maCa, sbd, lai.lanThu)) {
+        return jsonResponse_({ ok: false, lyDo: 'dong_da_doi', error: 'Bảng vừa đổi chỗ — máy em lưu lại ở nhịp sau' })
+      }
+      dongT = lai.row
+    }
     // Cột 9 DapAnJson · cột 21 CapNhatLuc · cột 22 GiayCauJson.
-    shT.getRange(luotT.row, 9).setValue(JSON.stringify(body.dapAn || {}))
-    shT.getRange(luotT.row, 21).setValue(new Date().toISOString())
-    if (body.giayCau) shT.getRange(luotT.row, 22).setValue(JSON.stringify(body.giayCau))
+    shT.getRange(dongT, 9).setValue(JSON.stringify(body.dapAn || {}))
+    shT.getRange(dongT, 21).setValue(new Date().toISOString())
+    if (body.giayCau) shT.getRange(dongT, 22).setValue(JSON.stringify(body.giayCau))
     return jsonResponse_({ ok: true, serverNow: Date.now() })
   }
 
@@ -4811,6 +4912,13 @@ function doPost(e) {
   }
 
   if (action === 'sendFeedback') {
+    // KHOÁ (thêm 09/09). Lệnh này ghi ĐIỂM vào LuotThi theo CHỈ SỐ DÒNG
+    // (`luotNX.row`), và máy em gọi nó ngay sau khi nộp. Phải khoá chung với
+    // `choThiLai` — lệnh xoá dòng — nếu không thì điểm của em này rơi vào dòng
+    // của em khác. Đúng loại sai lặng lẽ, chéo người.
+    const lockNhanXet = LockService.getScriptLock()
+    lockNhanXet.waitLock(15000)
+    try {
     // AI ĐƯỢC ĐẶT ĐIỂM Ở ĐÂY. Trước 08/09 lệnh này KHÔNG kiểm gì cả mà vẫn ghi
     // thẳng cột 14..17 của LuotThi — nghĩa là bất kỳ máy nào cũng đặt được điểm
     // cho bất kỳ em nào, và máy em bản cũ đè điểm sai lên điểm thầy vừa chấm.
@@ -4862,6 +4970,9 @@ function doPost(e) {
       }
     } catch (err) {}
     return jsonResponse_({ ok: true })
+  } finally {
+      lockNhanXet.releaseLock()
+    }
   }
 
   if (action === 'examStatus') {

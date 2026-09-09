@@ -90,9 +90,15 @@ describe('Ô Đ/S BẤM ĐƯỢC BẰNG NGÓN TAY', () => {
     expect(Number(rong?.[1])).toBeGreaterThanOrEqual(44)
   })
 
-  it('hai ô cách nhau rộng hơn, và cột tiêu đề Đ/S giãn theo cho thẳng hàng', () => {
+  it('hai ô cách nhau rộng hơn — ngón tay không rơi vào khe', () => {
     expect(html).toContain('body.co-lam .tf-o { gap: 12px; }')
-    expect(html).toContain('body.co-lam .tf-head span { width: 46px; }')
+    // ĐỔI 09/09: vế thứ hai của phép kiểm này từng đòi
+    // `body.co-lam .tf-head span { width: 46px; }` — cột tiêu đề Đ/S phải giãn
+    // theo cho thẳng hàng với ô. Thầy đã BỎ HẲN hàng tiêu đề đó ("bỏ luôn 2 chữ
+    // Đ S nhỏ ở trên đầu 2 dãy"), nên yêu cầu thẳng hàng không còn đối tượng.
+    // Giữ lại vế còn nghĩa (khoảng cách hai ô), và khoá luôn việc hàng tiêu đề
+    // đã đi hẳn — để không ai lặng lẽ đưa nó về.
+    expect(html).not.toContain('tf-head')
   })
 
   it('KHÔNG chờ chạm đúp, và chạm giữ không bôi đen chữ', () => {

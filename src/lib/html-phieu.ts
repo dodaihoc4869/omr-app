@@ -347,7 +347,6 @@ body.co-lam .tf-badge { width: 46px; height: 44px; border-radius: 10px; font-siz
    hai vùng chạm chồng lên nhau, bấm Đ lại ăn sang S. */
 body.co-lam .tf-badge.lam-o::after { content: ''; position: absolute; inset: -6px; border-radius: 14px; }
 body.co-lam .tf-o { gap: 12px; }
-body.co-lam .tf-head span { width: 46px; }
 body.co-lam .tf-item { padding: 9px 10px; }
 .q-opt.lam-o { transition: background-color .12s, border-color .12s; }
 .q-opt.lam-o[aria-checked="true"] { background: #eef2f6; border-color: #2f3e46; }
@@ -492,7 +491,7 @@ body.co-lam .tf-item { padding: 9px 10px; }
 /* Vùng bấm: cả thân câu. Con trỏ hình bàn tay để thấy ngay là bấm được. */
 .q-than { padding: 10px 16px 14px; cursor: pointer; }
 .q-text { font-size: 15.5px; line-height: 1.62; color: var(--muc); font-weight: 500; overflow-wrap: break-word; }
-.q-text + .q-options, .q-text + .tf-head, .q-text + .sa-vung, .q-hinh + .q-options { margin-top: 12px; }
+.q-text + .q-options, .q-text + .sa-vung, .q-hinh + .q-options { margin-top: 12px; }
 
 /* MŨI TÊN PHẢN ỨNG — nhãn TRÊN và DƯỚI thân, đúng như sách.
    Thân vẽ bằng border nên in ra giấy vẫn sắc và dài ra theo nhãn; ký tự mũi
@@ -543,8 +542,6 @@ body.co-lam .tf-item { padding: 9px 10px; }
 .q-card.mo .q-opt.dung { background: var(--dung-nen); border-color: var(--dung); color: var(--dung-muc); font-weight: 700; }
 .q-card.mo .q-opt.dung .q-opt-letter { background: var(--dung); }
 
-.tf-head { display: flex; justify-content: flex-end; gap: 10px; padding-right: 4px; margin-bottom: 4px; }
-.tf-head span { width: 34px; text-align: center; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--rat-nhat); }
 .tf-item {
   display: flex; align-items: center; gap: 12px; padding: 7px 10px; border-radius: var(--bo-nho);
   transition: background-color var(--muot);
@@ -556,7 +553,11 @@ body.co-lam .tf-item { padding: 9px 10px; }
 .tf-badge {
   width: 34px; height: 30px; border-radius: 8px; box-sizing: border-box; padding: 0;
   display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 800;
+  /* CHU MO DEU NHAU. Thay bao 09/09: chu cai trong hai cot dung/sai bi in dam
+     san, nhin nhu da danh dau truoc. Do dam 800 la muc dung cho chu DA CHON,
+     dat san cho o chua chon la noi doi bang hinh thuc. O da chon van noi bat vi
+     no doi ca NEN lan MAU CHU, khong can muon them do dam. */
+  font-size: 14px; font-weight: 500;
   background: #f1f5f9; color: var(--rat-nhat); border: 1px solid var(--vien);
   transition: background-color var(--muot), color var(--muot), border-color var(--muot);
 }
@@ -904,7 +905,10 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
         return `<div class="tf-item"${choLam ? ` data-y="${CHU_Y[i]}"` : ''}><div class="tf-statement">${CHU_Y[i]}. ${noi}${hinhTaiViTri(c, `sau_y_${CHU_Y[i]}`)}</div><div class="tf-o">${oDS('d', 'Đ', dung[i])}${oDS('s', 'S', !dung[i])}</div></div>`
       })
       .join('')
-    than = `<div class="tf-head"><span>Đ</span><span>S</span></div>${hang}`
+    /* KHONG con hang nhan Đ / S o dau hai cot (thay bo 09/09): moi o da mang
+       san chu cai cua no, hang nhan chi lam chat them chieu ngang tren dien
+       thoai. */
+    than = hang
   } else {
     // Phần III cho làm bài: ô điền ĐỨNG THAY dòng kẻ, không thêm hàng mới.
     const oDien = choLam
