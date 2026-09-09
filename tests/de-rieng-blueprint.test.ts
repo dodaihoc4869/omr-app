@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest'
 import { chiaSuatChoO, dungOChoPhan, sinhBoTheoEm } from '../src/lib/de-rieng-blueprint'
 import type { SoCauMoiPhan, TeacherExamSource } from '../src/data/examContent'
+import { CAU_HINH_TRAN_TRUNG_MAC_DINH } from '../src/lib/de-rieng-cau-hinh'
 
 /** Kho giả: `soChuyenDe` chuyên đề × 3 mức độ × `moiO` câu, cho mỗi phần. */
 function khoThu(moiO: number, soChuyenDe = 2): TeacherExamSource[] {
@@ -181,6 +182,25 @@ describe('TẦN SUẤT VÀ TỐC ĐỘ', () => {
 })
 
 describe('TẤT ĐỊNH — chấm lại ca cũ không được ra bộ khác', () => {
+  // LỖI NÀY CI BẮT ĐƯỢC CÒN MÁY TÔI THÌ KHÔNG (`ce3dd67`).
+  //
+  // Bản đầu cho pha 2 dừng theo `Date.now()`. Máy tôi nhanh nên hai lần gọi
+  // chạy đủ vòng và ra cùng kết quả; máy CI chậm hơn nên hai lần dừng ở hai chỗ
+  // khác nhau ⇒ hai bộ câu khác nhau. Với hệ thống chấm thi thì TẤT ĐỊNH thắng
+  // tốc độ, nên ngân sách nay là SỐ VÒNG chứ không phải đồng hồ.
+  //
+  // Bỏ đồng hồ lại lộ ra sự thật đồng hồ đang che: 60 em × 40 câu cần 2 079 ms
+  // ở 20 000 vòng mỗi ô. Chia ngân sách theo SỐ Ô đưa về 424 ms — vẫn tất định.
+  it('CHẠY LẠI NHIỀU LẦN ra đúng một kết quả — không phụ thuộc máy nhanh hay chậm', () => {
+    const lan = Array.from({ length: 4 }, () => sinhBoTheoEm(khoThu(30), SBD(60), { I: 28, II: 4, III: 8 }, 'CA-LAP'))
+    for (const x of lan) expect(x.boTheoEm).toEqual(lan[0].boTheoEm)
+  })
+
+  it('CẤM quay lại lối cắt theo đồng hồ: mặc định phải TẮT', () => {
+    expect(CAU_HINH_TRAN_TRUNG_MAC_DINH.CAT_THEO_GIO).toBeFalsy()
+    expect(CAU_HINH_TRAN_TRUNG_MAC_DINH.TONG_VONG_TOI_DA).toBeGreaterThan(0)
+  })
+
   it('cùng ca, cùng kho, cùng danh sách ⇒ cùng bộ, từng em một', () => {
     const a = sinhBoTheoEm(khoThu(40), SBD(30), SO, 'CA-X')
     const b = sinhBoTheoEm(khoThu(40), SBD(30), SO, 'CA-X')

@@ -175,7 +175,7 @@ export function haDinh(
   for (let v = 0; v < cauHinh.VONG_DOI_CHO; v++) {
     goEmDinh()
     if (dinh === 0) break
-    if ((v & 31) === 0 && Date.now() - batDauMs > cauHinh.NGAN_SACH_MS) break
+    if (cauHinh.CAT_THEO_GIO && (v & 31) === 0 && Date.now() - batDauMs > cauHinh.NGAN_SACH_MS) break
 
     // Cặp tệ nhất: bốc trong túi đỉnh, không quét m² cặp.
     const tuiDinh = tui[dinh]

@@ -190,7 +190,7 @@ describe('NGÂN SÁCH THỜI GIAN — thầy không đứng chờ giữa lúc m�
 
   it('hết ngân sách thì DỪNG SỚM, vẫn trả bộ hợp lệ', () => {
     const pha1 = chiaVongTron(kho(60), 18, 30, 1)
-    const ra = haDinh(pha1, 2, { VONG_DOI_CHO: 1000000, NGAN_SACH_MS: 1, LECH_TAN_SUAT_TOI_DA: 1 }, Date.now() - 10000)
+    const ra = haDinh(pha1, 2, { VONG_DOI_CHO: 1000000, NGAN_SACH_MS: 1, LECH_TAN_SUAT_TOI_DA: 1, CAT_THEO_GIO: true }, Date.now() - 10000)
     for (const b of ra) expect(b.size).toBe(18)
     expect(lechTanSuat(ra, kho(60))).toBeLessThanOrEqual(1)
   })

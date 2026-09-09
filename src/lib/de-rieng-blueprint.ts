@@ -167,6 +167,15 @@ export function sinhBoTheoEm(
     { phan: 'III', cau: gop((s) => s.phanIII), k: soCau.III },
   ]
 
+  // ĐẾM Ô TRƯỚC để chia ngân sách vòng lặp — tất định, không nhìn đồng hồ.
+  let soO = 0
+  for (const p of phanIds) {
+    if (p.k <= 0 || p.cau.length === 0) continue
+    for (const o of dungOChoPhan(p.cau, p.phan, p.k)) if (o.can > 0) soO++
+  }
+  const vongMoiO = soO > 0 ? Math.max(200, Math.min(cauHinh.VONG_DOI_CHO, Math.floor(cauHinh.TONG_VONG_TOI_DA / soO))) : cauHinh.VONG_DOI_CHO
+  const hanO: CauHinhDeRiengTranTrung = { ...hanTrong, VONG_DOI_CHO: vongMoiO }
+
   let lech = 0
   let thieu = 0
   let sanTong = 0
@@ -184,7 +193,7 @@ export function sinhBoTheoEm(
 
     for (const o of dungOChoPhan(p.cau, p.phan, p.k)) {
       if (o.can <= 0) continue
-      const bo = sinhBoMotO(o.ids, o.can, m, hashSeed(`${maCa}:${o.khoa}`), hanTrong, t0)
+      const bo = sinhBoMotO(o.ids, o.can, m, hashSeed(`${maCa}:${o.khoa}`), hanO, t0)
       const l = lechTanSuat(bo, o.ids)
       if (l > lech) lech = l
       for (let i = 0; i < m; i++) boTheoEm[em[i]].push(...bo[i])
