@@ -137,10 +137,20 @@ describe('MÁY EM: mọi lối vào đều phải qua màn xác nhận', () => {
     expect(MAN).not.toContain("if (e.key === 'Enter') handleJoin()")
   })
 
-  it('phím Enter đi đúng đường và tôn trọng điều kiện toàn màn hình', () => {
-    const than = MAN.slice(MAN.indexOf('placeholder="Số báo danh"'), MAN.indexOf('placeholder="Số báo danh"') + 900)
-    expect(than).toContain('if (laXemDiem || !toanManHinh || dangTraTen) return')
+  // VIẾT LẠI 09/09 17:34, KHÔNG XOÁ LẶNG. Bản cũ đòi phím Enter "tôn trọng điều
+  // kiện toàn màn hình". Điều kiện đó nay đã GỠ khỏi cả nút lẫn phím Enter: trên
+  // iPhone mở link từ Zalo thì không có đường nào đạt được toàn màn hình, nên nó
+  // chặn đúng những em ngoan nhất (bấm thẳng link thầy gửi) mà không chặn được
+  // ai gian lận. Xem `tests/vao-thi-tu-zalo-iphone-0909.test.ts`.
+  //
+  // Ý ĐỊNH của phép kiểm cũ vẫn giữ nguyên và là phần quan trọng hơn: phím Enter
+  // phải đi ĐÚNG ĐƯỜNG của nút (qua màn xác nhận tên), không gọi tắt.
+  it('phím Enter đi đúng đường của nút, và cùng điều kiện với nút', () => {
+    const than = MAN.slice(MAN.indexOf('placeholder="Số báo danh"'), MAN.indexOf('placeholder="Số báo danh"') + 1100)
+    expect(than).toContain('if (laXemDiem || dangTraTen) return')
     expect(than).toContain('void traTenRoiHoi()')
+    // Cùng điều kiện với nút — lệch nhau là em bấm được mà gõ Enter thì không.
+    expect(MAN).toContain('disabled={dangTraTen}>')
   })
 
   it('gói gửi máy chủ vẫn mang xacNhanTen', () => {

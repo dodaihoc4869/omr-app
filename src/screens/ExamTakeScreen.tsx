@@ -88,6 +88,41 @@ function coTheBatToanManHinh(): boolean {
   const el = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => Promise<void> | void }
   return typeof el.requestFullscreen === 'function' || typeof el.webkitRequestFullscreen === 'function'
 }
+
+/** Đang mở trong TRÌNH DUYỆT CỦA MỘT ỨNG DỤNG KHÁC (Zalo, Messenger, Facebook)?
+ *
+ * VÌ SAO CẦN BIẾT (thầy báo 17:34 ngày 09/09, kèm ảnh: iPhone kẹt ở màn vào thi,
+ * góc trái ghi "◄ Zalo"). Em nhận link qua Zalo rồi bấm thẳng vào đó, nên trang
+ * chạy trong trình duyệt NHÚNG của Zalo. Ở đó:
+ *   · không phải standalone ⇒ `dangToanManHinh()` sai;
+ *   · iOS không cho `requestFullscreen` trên phần tử ⇒ không có nút để bật;
+ *   · và Zalo KHÔNG có mục "Thêm vào Màn hình chính" ⇒ làm đúng theo dòng chữ
+ *     app đang hiện cũng không ra.
+ * Ba cái cộng lại là em không có đường nào vào thi. Dòng nhắc cũ chỉ vào một
+ * việc KHÔNG LÀM ĐƯỢC ở đó — nên phải nói đúng việc: mở bằng Safari trước.
+ *
+ * Nhận dạng theo user agent là phỏng đoán, không chắc chắn. Nên nó chỉ đổi CHỮ
+ * hướng dẫn, không đổi quyền vào thi của ai. */
+function laTrinhDuyetTrongUngDung(nav: Navigator = navigator): boolean {
+  const ua = String(nav.userAgent || '')
+  return /\b(Zalo|FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|TikTok)\b/i.test(ua)
+}
+
+/** iPhone/iPad — nơi Apple không cho trang tự vào toàn màn hình. */
+function laIOS(nav: Navigator = navigator): boolean {
+  const ua = String(nav.userAgent || '')
+  if (/iPhone|iPad|iPod/i.test(ua)) return true
+  // iPadOS 13+ khai là Macintosh; phân biệt bằng màn hình cảm ứng.
+  return /Macintosh/i.test(ua) && (nav.maxTouchPoints ?? 0) > 1
+}
+
+/** Chữ hướng dẫn ĐÚNG VIỆC LÀM ĐƯỢC ở đúng chỗ em đang đứng. */
+export function loiKhuyenToanManHinh(coBatDuoc: boolean, trongUngDung: boolean, ios: boolean): string {
+  if (coBatDuoc) return 'Bấm nút dưới để bật toàn màn hình, bài làm đỡ bị che.'
+  if (trongUngDung) return 'Em đang mở trong ứng dụng khác. Bấm ⋯ rồi chọn "Mở trong Safari", sau đó bấm Chia sẻ → "Thêm vào Màn hình chính" và mở app từ biểu tượng đó.'
+  if (ios) return 'Bấm nút Chia sẻ ở thanh dưới rồi chọn "Thêm vào Màn hình chính", sau đó mở app từ biểu tượng vừa hiện.'
+  return 'Thêm app vào màn hình chính (hướng dẫn ở trên) rồi mở lại từ đó.'
+}
 async function batToanManHinh(): Promise<void> {
   const el = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => Promise<void> | void }
   try {
@@ -984,7 +1019,14 @@ export default function ExamTakeScreen() {
             nguong,
             ...thongTinCa,
             answers: emptyAnswerRecord(),
-            integrity: emptyIntegrityLog(),
+            // KHÔNG LẶNG LẼ: em vào thi mà máy không ở toàn màn hình thì ghi
+            // ngay một dấu vào nhật ký, để thầy đọc được ở khối Vi phạm của
+            // Chi tiết ca. Toàn màn hình nay là KHUYÊN chứ không phải cửa (xem
+            // ô nhắc ở màn vào thi), nhưng thầy vẫn phải biết em nào làm bài
+            // trong tình trạng nào — nới ra mà giấu đi thì tệ hơn cả khoá.
+            integrity: dangToanManHinh()
+              ? emptyIntegrityLog()
+              : { ...emptyIntegrityLog(), events: [{ type: 'vao_ngoai_toan_man', at: new Date().toISOString() }] },
             submitted: false,
             submittedAt: null,
             pendingSubmit: false,
@@ -1947,9 +1989,12 @@ export default function ExamTakeScreen() {
                   onKeyDown={(e) => {
                     // ĐI ĐÚNG ĐƯỜNG CỦA NÚT "Vào thi": tra tên rồi hiện màn xác
                     // nhận. Bản cũ gọi thẳng `handleJoin` nên bỏ qua cả bước xác
-                    // nhận lẫn điều kiện toàn màn hình mà nút có.
+                    // nhận mà nút có. Điều kiện toàn màn hình đã gỡ khỏi CẢ HAI
+                    // đường (xem ô nhắc ngay trên) — gỡ một chỗ mà quên chỗ kia
+                    // thì em bấm nút được còn gõ Enter thì không, đúng loại lệch
+                    // khó chịu nhất.
                     if (e.key !== 'Enter') return
-                    if (laXemDiem || !toanManHinh || dangTraTen) return
+                    if (laXemDiem || dangTraTen) return
                     void traTenRoiHoi()
                   }}
                 />
@@ -1968,11 +2013,21 @@ export default function ExamTakeScreen() {
                   tên người khác — bắt lỗi tốt hơn hẳn cách bắt gõ đủ ba ô, vì
                   gõ ba ô thì lỗi nào cũng chỉ ra một câu "thông tin không
                   đúng". Xem màn xác nhận ngay trên `phase === 'join'`. */}
+              {/* TOÀN MÀN HÌNH LÀ KHUYÊN, KHÔNG PHẢI CỬA (đổi 09/09 17:34).
+                  Trước đây nút "Vào thi" bị khoá cứng khi chưa toàn màn hình.
+                  Trên iPhone mở link từ Zalo thì KHÔNG có đường nào đạt được:
+                  không standalone, iOS không cho bật toàn màn hình, và Zalo
+                  không có mục "Thêm vào Màn hình chính". Em đứng trước một nút
+                  xám với một dòng chỉ dẫn không làm theo được — mất bài thi vì
+                  một quy tắc chống gian lận, trong khi gian lận thì không.
+                  Nay: vẫn khuyên, vẫn hướng dẫn đúng chỗ em đang đứng, nhưng
+                  cho vào. Em vào ngoài toàn màn hình thì máy GHI LẠI để thầy
+                  đọc ở Chi tiết ca — không lặng lẽ. */}
               {!laXemDiem && !toanManHinh && (
                 <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
                   <OThongBao tone="cam">
-                    Chỉ vào thi được khi app ở <b>toàn màn hình</b>.
-                    {coTheBatToanManHinh() ? ' Bấm nút dưới để bật.' : ' Thêm app vào màn hình chính (hướng dẫn ở trên) rồi mở lại từ đó.'}
+                    Nên để app ở <b>toàn màn hình</b> khi làm bài.{' '}
+                    {loiKhuyenToanManHinh(coTheBatToanManHinh(), laTrinhDuyetTrongUngDung(), laIOS())}
                   </OThongBao>
                   {coTheBatToanManHinh() && (
                     <NutChinh variant="phu" onClick={batToanManHinh}>
@@ -1999,7 +2054,7 @@ export default function ExamTakeScreen() {
               {laXemDiem ? (
                 <NutChinh onClick={moLaiTuMayChu}>Xem điểm của em</NutChinh>
               ) : (
-                <NutChinh onClick={() => void traTenRoiHoi()} disabled={!toanManHinh || dangTraTen}>
+                <NutChinh onClick={() => void traTenRoiHoi()} disabled={dangTraTen}>
                   {dangTraTen ? 'Đang tra số báo danh…' : 'Vào thi'}
                 </NutChinh>
               )}

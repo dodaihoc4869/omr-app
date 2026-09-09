@@ -23,8 +23,15 @@ export function emptyAnswerRecord(): AnswerRecord {
  * tín hiệu gần nhất có thể đo: số lần & tổng thời gian rời tab/app trong lúc làm bài. */
 export interface IntegrityEvent {
   /** Bốn loại sau là của BAOMATCATHI. `mocRoiMan()` phải bỏ qua chúng, không
-   * được vỡ khi gặp loại mới. */
-  type: 'hidden' | 'visible' | 'blur' | 'focus' | 'co_man' | 'het_co_man' | 'dau_vet_chup' | 'khoa'
+   * được vỡ khi gặp loại mới.
+   *
+   * `vao_ngoai_toan_man` (thêm 09/09 17:34): em bắt đầu lượt trong khi máy KHÔNG
+   * ở toàn màn hình. Từ hôm nay toàn màn hình là KHUYÊN chứ không phải cửa — vì
+   * iPhone mở link từ Zalo thì không có đường nào đạt được, và em mất bài thi vì
+   * một quy tắc chống gian lận trong khi gian lận không xảy ra. Nới ra thì phải
+   * ghi lại, không thì thành nới ra rồi giấu đi. Đây KHÔNG phải rời màn:
+   * `mocRoiMan()` bỏ qua nó, em không bị khoá vì dấu này. */
+  type: 'hidden' | 'visible' | 'blur' | 'focus' | 'co_man' | 'het_co_man' | 'dau_vet_chup' | 'khoa' | 'vao_ngoai_toan_man'
   at: string // ISO timestamp
 }
 export interface IntegrityLog {
