@@ -37,6 +37,7 @@ import {
   chamXuong,
   chuDanTruoc,
   coCamUng,
+  coCamUngThat,
   coMat,
   dangGoOnhap,
   ghiHoatDong,
@@ -235,7 +236,7 @@ export default function ExamTakeScreen() {
   // GIỮ ĐỂ ĐỌC: hai con số cộng dồn cho thầy đọc ở Chi tiết ca. Để trong ref
   // chứ không state — đếm mà render lại là mất hết cái lợi của việc không dùng
   // state ở effect kia. Gộp vào `integrity` đúng lúc nộp bài.
-  const demTatDe = useRef({ soLan: 0, giay: 0 })
+  const demTatDe = useRef({ soLan: 0, giay: 0, coChay: false })
   // TOÀN MÀN HÌNH: bắt buộc trước khi vào thi (đã thêm vào màn hình chính =
   // standalone, hoặc bật Fullscreen API). Thoát toàn màn hình giữa chừng =
   // rời màn hình = khoá bài.
@@ -1486,9 +1487,15 @@ export default function ExamTakeScreen() {
     if (phase !== 'exam') return
     const a = attemptRef.current
     if (!a || !batCuaCa(a)) return
-    // Máy không cảm ứng: cơ chế KHÔNG bật. Màn thi vốn dựng cho điện thoại; bật
-    // ở máy tính là khoá cứng bài của một em không làm gì sai.
-    if (!coCamUng()) return
+    // MÁY KHÔNG CẢM ỨNG: cơ chế KHÔNG bật (màn thi vốn dựng cho điện thoại; bật
+    // ở máy tính là khoá cứng bài của một em không làm gì sai).
+    //
+    // KHÔNG còn `return` sớm ở đây. Lời khai của máy có thể sai — iPhone bật
+    // "Yêu cầu trang web dành cho máy tính" khai `maxTouchPoints = 0` (thầy báo
+    // 09/09). Nên vẫn gắn tai nghe, và quyết định bằng BẰNG CHỨNG: thấy một cú
+    // `touchstart` thật thì bật. Xem `coCamUngThat`.
+    const khaiCoCamUng = coCamUng()
+    let daThayCham = false
 
     const anHanMs = anHanMsCua(a.anHanGiay)
     const tt = moTrangThaiGiu(performance.now())
@@ -1514,11 +1521,21 @@ export default function ExamTakeScreen() {
 
     const soi = () => {
       const nay = performance.now()
-      dat(!coMat(tt, nay, { coCamUng: true, dangGoO: dangGoOnhap(document.activeElement), anHanMs }), nay)
+      dat(
+        !coMat(tt, nay, {
+          coCamUng: coCamUngThat(daThayCham, khaiCoCamUng),
+          dangGoO: dangGoOnhap(document.activeElement),
+          anHanMs,
+        }),
+        nay,
+      )
     }
 
     const xuong = (e: TouchEvent) => {
       const nay = performance.now()
+      // Bằng chứng máy có cảm ứng. Từ đây cơ chế chạy dù máy khai gì đi nữa.
+      daThayCham = true
+      demTatDe.current.coChay = true
       for (const t of Array.from(e.changedTouches)) chamXuong(tt, t.identifier, t.clientX, t.clientY, nay)
       dat(false, nay) // hiện lại NGAY, cùng nhịp sự kiện
     }
@@ -1619,7 +1636,14 @@ export default function ExamTakeScreen() {
     // GIỮ ĐỂ ĐỌC: gộp hai con số đúng lúc này, không rắc dọc đường. Chúng KHÔNG
     // đếm vào bất kỳ ngưỡng khoá nào — chỉ để thầy nhìn ở Chi tiết ca.
     const dem = demTatDe.current
-    const integrity = dem.soLan > 0 ? { ...a.integrity, soLanTatDe: dem.soLan, giayTatDe: Math.round(dem.giay) } : a.integrity
+    // BÁO SỐ NGAY CẢ KHI BẰNG 0, miễn là cơ chế CÓ CHẠY trên máy em.
+    //
+    // Bản cũ chỉ gửi khi `soLan > 0`, nên hai chuyện hoàn toàn khác nhau đổ vào
+    // cùng một chỗ trống: "cơ chế chạy, em không nhả tay lần nào" và "cơ chế
+    // KHÔNG chạy trên máy này". Thầy hỏi 09/09 iPhone nào không hoạt động thì
+    // không có gì trong dữ liệu để trả lời — phải đoán. Nay đọc Chi tiết ca là
+    // biết ngay em nào cơ chế không chạy.
+    const integrity = dem.coChay ? { ...a.integrity, soLanTatDe: dem.soLan, giayTatDe: Math.round(dem.giay) } : a.integrity
     const updated: ExamAttempt = { ...a, integrity, giayCau: { ...(a.giayCau ?? {}), ...giayCauRef.current }, submitted: true, submittedAt: new Date().toISOString(), pendingSubmit: true }
     setAttempt(updated)
     await saveAttempt(updated)

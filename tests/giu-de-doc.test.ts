@@ -271,8 +271,17 @@ describe('GIỮ ĐỂ ĐỌC — nối vào màn thi', () => {
     expect(khoi).not.toContain('blocked')
   })
 
-  it('máy không cảm ứng thì effect thoát sớm, không gắn gì', () => {
-    expect(man).toContain('if (!coCamUng()) return')
+  it('máy không cảm ứng thì cơ chế KHÔNG bật — nhưng quyết bằng bằng chứng, không bằng lời khai', () => {
+    // ĐỔI 09/09. Bản cũ `return` sớm ngay khi `coCamUng()` sai, tức tin tuyệt
+    // đối vào lời khai của máy. Thầy báo "một số iPhone không hoạt động dù đã
+    // bật": iPhone bật "Yêu cầu trang web dành cho máy tính" khai
+    // `maxTouchPoints = 0`, thế là màn hình không gắn một tai nghe nào và im
+    // lặng. Ý ĐỊNH của phép kiểm này (đừng bật ở máy tính) giữ nguyên; cách
+    // bảo đảm thì đổi: vẫn gắn tai nghe, nhưng chỉ CHE khi đã có bằng chứng —
+    // một `touchstart` thật. Máy tính không bao giờ bắn sự kiện đó.
+    expect(man).not.toContain('if (!coCamUng()) return')
+    expect(man).toContain('const khaiCoCamUng = coCamUng()')
+    expect(man).toContain('coCamUng: coCamUngThat(daThayCham, khaiCoCamUng),')
   })
 
   it('ca cũ (không bật) thì effect không chạy — hành vi cũ nguyên vẹn', () => {

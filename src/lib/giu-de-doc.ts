@@ -214,8 +214,45 @@ export function dangGoOnhap(el: Element | null | undefined): boolean {
 
 /** Màn thi vốn dựng cho điện thoại. Bật cơ chế ở máy tính là khoá cứng bài của
  * một em không làm gì sai. */
-export function coCamUng(nav: { maxTouchPoints?: number } = navigator): boolean {
-  return (nav.maxTouchPoints ?? 0) > 0
+/** CỐ Ý KHÔNG hỏi `'ontouchstart' in window`. Chrome trên máy tính vẫn định
+ * nghĩa thuộc tính đó dù máy không có màn cảm ứng, nên hỏi nó là bật nhầm cơ
+ * chế ở máy tính — đúng điều mục 0 cấm. Chỉ hai câu hỏi có nghĩa: máy khai bao
+ * nhiêu điểm chạm, và con trỏ có THÔ không. */
+export function coCamUng(nav: { maxTouchPoints?: number } = navigator, w?: unknown): boolean {
+  if ((nav.maxTouchPoints ?? 0) > 0) return true
+  const win = (w ?? (typeof window === 'undefined' ? undefined : window)) as
+    | { matchMedia?: (q: string) => { matches: boolean } }
+    | undefined
+  try {
+    return win?.matchMedia?.('(any-pointer: coarse)').matches === true
+  } catch {
+    return false
+  }
+}
+
+/** MÁY ĐÃ CHỨNG MINH CÓ CẢM ỨNG CHƯA — hỏi sau khi đã thấy một cú chạm thật.
+ *
+ * VÌ SAO CÓ (thầy báo 09/09: "một số iPhone không hoạt động mặc dù tôi đã bật.
+ * Android và một số iPhone khác hoạt động bình thường").
+ *
+ * Cơ chế trước đây bật hay không hoàn toàn dựa vào việc MÁY TỰ KHAI qua
+ * `navigator.maxTouchPoints`. Con số đó có thể là 0 trên chính iPhone: Safari
+ * bật "Yêu cầu trang web dành cho máy tính" thì giả làm Safari máy Mac, và
+ * trang nhận `maxTouchPoints = 0` cùng `ontouchstart` không tồn tại. Bài vẫn
+ * làm được bình thường (chạm thành click) nên em không thấy gì lạ — chỉ riêng
+ * "giữ để đọc" im lặng không chạy. Đúng hình dạng thầy mô tả: cùng iPhone,
+ * máy chạy máy không.
+ *
+ * Sửa gốc: đừng hỏi máy nữa, HỎI BẰNG CHỨNG. Một sự kiện `touchstart` thật là
+ * chứng cứ không cãi được rằng máy có cảm ứng, và không lời khai nào giả được
+ * nó. Máy tính để bàn không bao giờ bắn `touchstart` nên vẫn không bị bật
+ * nhầm — đúng nguyên tắc cũ (mục 0: bật ở máy tính là khoá cứng bài của một em
+ * không làm gì sai).
+ *
+ * `daThayCham` do màn hình bật lên khi nhận cú chạm đầu tiên; trước đó vẫn
+ * dùng lời khai của máy, nên máy khai đúng thì chạy ngay từ giây đầu như cũ. */
+export function coCamUngThat(daThayCham: boolean, khaiCoCamUng: boolean): boolean {
+  return daThayCham || khaiCoCamUng
 }
 
 /** Hai con số thầy đọc ở Chi tiết ca. KHÔNG kết luận gì — nhả tay là chuyện
