@@ -64,6 +64,25 @@ type CachLay = 'rut' | 'tron' | 'lenbang'
 const TEN_CHIP: Record<CachLay, RegExp> = { rut: /^Rút bộ câu$/, tron: /^Lấy trọn kho/, lenbang: /^Kiểm tra điểm yếu$/ }
 
 /** Soạn đủ một ca hợp lệ theo cách lấy câu đã chọn rồi bấm Mở ca. */
+/** HẠN CHO CẢ PHÉP KIỂM, không chỉ cho từng lượt chờ bên trong.
+ *
+ * VÌ SAO CÓ (đo 09/09 từ chú thích lỗi của GitHub Actions):
+ *
+ *     Error: Test timed out in 5000ms.
+ *      ❯ tests/co-len-bang.test.tsx:126:3
+ *
+ * Những lượt `waitFor` dưới đây được nới lên 20 giây vì màn Mở ca dựng chậm khi
+ * chạy cả bộ song song. Nhưng mốc hết giờ của MỘT `it` trong vitest vẫn là
+ * 5 000 ms mặc định — tức 20 giây kia chưa bao giờ có tác dụng: máy chậm thì
+ * `it` bị giết ở giây thứ 5 trong lúc `waitFor` còn đang đợi.
+ *
+ * Máy tôi chạy 143 tệp trong ~90 giây nên không bao giờ lộ; máy CI chậm hơn thì
+ * đỏ. Đã làm hỏng HAI lần phát hành (`49d7282`, `2a0836d`) trước khi tìm ra.
+ *
+ * Nay hạn của `it` lớn hơn hạn chờ bên trong, nên thứ quyết định là điều kiện
+ * kiểm chứ không phải cái mốc nào tới trước. KHÔNG nới điều kiện kiểm. */
+const HAN_PHEP_KIEM = 30000
+
 async function moCa(cach: CachLay) {
   // Gỡ màn của lần trước: một `it` mở ca hai lần thì hai màn cùng nằm trong
   // DOM, và getByRole thấy hai chip trùng tên.
@@ -104,22 +123,22 @@ describe('cờ lên bảng suy từ khối Bộ câu ra đề', () => {
     // Điều thật sự phải khoá: KHÔNG có nút gạt nào cho việc lên bảng.
     for (const n of congTac) expect(n.getAttribute('aria-label')).not.toMatch(/bảng/i)
     expect(r.container.textContent).not.toContain('Ca này dùng làm gì')
-  })
+  }, HAN_PHEP_KIEM)
 
   it('chọn "Kiểm tra điểm yếu" → ca đẩy dữ liệu sang màn Gọi lên bảng', async () => {
     const { goi } = await moCa('lenbang')
     expect(co(goi)).toBe(true)
-  })
+  }, HAN_PHEP_KIEM)
 
   it('chọn "Rút bộ câu" → không đẩy', async () => {
     const { goi } = await moCa('rut')
     expect(co(goi)).toBe(false)
-  })
+  }, HAN_PHEP_KIEM)
 
   it('chọn "Lấy trọn kho" → không đẩy', async () => {
     const { goi } = await moCa('tron')
     expect(co(goi)).toBe(false)
-  })
+  }, HAN_PHEP_KIEM)
 })
 
 describe('mọi lựa chọn đều lấy dữ liệu phiếu phụ huynh và mạnh/yếu', () => {
@@ -128,7 +147,7 @@ describe('mọi lựa chọn đều lấy dữ liệu phiếu phụ huynh và m�
       await moCa(cach)
       expect(saveSessionTeacherBank, `cách lấy: ${cach}`).toHaveBeenCalledTimes(1)
     }
-  })
+  }, HAN_PHEP_KIEM)
 
   it('cách công bố điểm và mọi tuỳ chọn khác KHÔNG đổi theo cờ lên bảng', async () => {
     const a = (await moCa('lenbang')).goi
@@ -140,7 +159,7 @@ describe('mọi lựa chọn đều lấy dữ liệu phiếu phụ huynh và m�
     const { lenBang: _a, ...conLaiA } = a[7] as Record<string, unknown>
     const { lenBang: _b, ...conLaiB } = b[7] as Record<string, unknown>
     expect(conLaiA).toEqual(conLaiB)
-  })
+  }, HAN_PHEP_KIEM)
 })
 
 describe('phía đọc: màn Gọi lên bảng và máy chủ', () => {
@@ -148,14 +167,14 @@ describe('phía đọc: màn Gọi lên bảng và máy chủ', () => {
     const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
     expect(ma).toContain('hienCaTat || c.lenBang')
     expect(ma).toContain('ca đã tắt nút gạt')
-  })
+  }, HAN_PHEP_KIEM)
 
   it('Apps Script: ô TRỐNG là BẬT — thêm cột không được làm ca cũ biến mất', async () => {
     const gs = (await import('../docs/apps-script-kiem-tra.gs?raw')).default
     expect(gs).toContain("'MoKhoaLuc', 'LenBang'")
     expect(gs).toContain("return String(v || '') !== 'khong'")
     expect((gs.match(/lenBangCua_\(v\[22\]\)/g) || []).length).toBe(2)
-  })
+  }, HAN_PHEP_KIEM)
 
   it('Apps Script: ghi cờ vào ô riêng, KHÔNG nối vào rowData (giữ dấu vết khoá ca)', async () => {
     const gs = (await import('../docs/apps-script-kiem-tra.gs?raw')).default
@@ -166,16 +185,16 @@ describe('phía đọc: màn Gọi lên bảng và máy chủ', () => {
     // rowData vẫn phải DỪNG trước cột 20 — đây mới là điều phép kiểm này giữ.
     expect(gs).not.toMatch(/sh\.getRange\(dong, 1, 1, 2[0-9]\)/)
     expect(gs).toContain("body.lenBang === false ? 'khong' : 'co'")
-  })
+  }, HAN_PHEP_KIEM)
 
   it('Apps Script: thuộc tính SPREADSHEET_ID còn nguyên (luật sau sự cố v28)', async () => {
     const gs = (await import('../docs/apps-script-kiem-tra.gs?raw')).default
     expect(gs).toContain("PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID')")
-  })
+  }, HAN_PHEP_KIEM)
 
   it('client: máy chủ chưa cập nhật .gs thì coi như BẬT, danh sách không rỗng', async () => {
     const ma = (await import('../src/lib/exam-api.ts?raw')).default
     expect(ma).toContain('lenBang: c.lenBang !== false')
     expect(ma).toContain('lenBang: moc.lenBang !== false')
-  })
+  }, HAN_PHEP_KIEM)
 })
