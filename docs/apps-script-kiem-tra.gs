@@ -209,10 +209,24 @@ function khoiLienMach_(dsGiamDan) {
 
 /** Gói này có được phép ĐẶT ĐIỂM chính thức không?
  *
- * Hai đường: máy thầy (có MA_BI_MAT) — luôn được; máy em — phải mang đúng tem
- * luật chấm hiện hành. Trả `true` nghĩa là ghi được cột điểm. */
+ * TEM LUẬT CHẤM LÀ BẮT BUỘC VỚI MỌI MÁY, KỂ CẢ MÁY THẦY (siết 09/09 chiều).
+ *
+ * Bản đầu của hàm này (08/09) cho máy có MA_BI_MAT qua thẳng: `if (coMat) return
+ * true`. Lý do khi đó là "máy thầy thì tin được". SAI, và đây là lỗ đã cắn thật:
+ *
+ * Chiều 09/09, ca 447479 bị ghi ngược THÊM MỘT LẦN NỮA sau khi đã chấm lại đêm
+ * trước — cả 36/36 em, điểm cao nhất cả ca đúng 4,50 tức trần thang cũ. Ba mươi
+ * sáu máy em mỗi máy đè đúng dòng của mình cùng lúc là chuyện khó; MỘT màn Ca
+ * thi mở trên máy CÓ MÃ BÍ MẬT nhưng chạy bản app CŨ thì tự động ghi lại cả 36
+ * dòng trong một loạt — khớp đúng hình dạng. Máy thầy không chỉ có một cái: điện
+ * thoại, tab cũ chưa tải lại, máy tính khác đều mang mã bí mật, và bản app trong
+ * đó có thể còn cũ.
+ *
+ * Nên nay tem là cửa DUY NHẤT. Bản app hiện hành gửi tem trong mọi lượt ghi điểm
+ * (`ghiDiem` và `sendFeedback` ở exam-api.ts), nên siết chỗ này không chặn nhầm
+ * đường nào đang dùng — nó chỉ chặn đúng thứ cần chặn: BẢN CŨ, ở bất kỳ máy nào.
+ * Lượt bị chặn được BÁO RA (`tuChoi` / `boQua: 'ban_cu'`), không im lặng. */
 function duocGhiDiem_(coMat, body) {
-  if (coMat) return true
   return String((body && body.luatDiem) || '') === LUAT_DIEM
 }
 
@@ -4185,9 +4199,11 @@ function doPost(e) {
       }
       if (row < 0) { tuChoi.push(sbd + ': không có lượt ' + lanThu); continue }
       if (!coMat && !(x.idThietBi && l.idThietBi && String(x.idThietBi) === l.idThietBi)) { tuChoi.push(sbd + ': không có quyền'); continue }
-      // ĐIỂM chỉ ghi khi được phép (xem `duocGhiDiem_`). Máy em bản cũ chấm
-      // bằng thang tuyệt đối cũ nên con số của nó KHÔNG được đè lên điểm thầy;
-      // chi tiết từng câu bên dưới vẫn nhận vì không phụ thuộc luật chấm.
+      // ĐIỂM chỉ ghi khi gói MANG ĐÚNG TEM luật chấm (xem `duocGhiDiem_`).
+      // Áp cho MỌI máy, kể cả máy có mã bí mật: bản app cũ ở đâu cũng chấm bằng
+      // thang tuyệt đối cũ, và màn Ca thi mở trên một máy thầy chạy bản cũ thì
+      // tự ghi lại CẢ CA trong một loạt — đúng thứ đã cắn ca 447479 hai lần.
+      // Chi tiết từng câu bên dưới vẫn nhận vì không phụ thuộc luật chấm.
       const d = x.diem || {}
       if (duocGhiDiem_(coMat, body)) {
         sh.getRange(row, 14, 1, 4).setValues([[d.I === undefined ? '' : d.I, d.II === undefined ? '' : d.II, d.III === undefined ? '' : d.III, d.tong === undefined ? '' : d.tong]])

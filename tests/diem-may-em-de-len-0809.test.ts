@@ -64,9 +64,26 @@ describe('TEM LUẬT CHẤM — hai đầu phải khớp từng ký tự', () =>
     expect(temMayChu()).toBe(LUAT_DIEM)
   })
 
-  it('máy thầy (có mã bí mật) luôn ghi được, không cần tem', () => {
-    expect(duocGhiDiem(true, {})).toBe(true)
-    expect(duocGhiDiem(true, { luatDiem: 'linh tinh' })).toBe(true)
+  // VIẾT LẠI 09/09 chiều, KHÔNG XOÁ LẶNG. Bản cũ đòi ĐÚNG điều đã hoá ra là lỗ:
+  // "máy thầy (có mã bí mật) luôn ghi được, không cần tem". Giả định đằng sau là
+  // "máy thầy thì bản app luôn mới" — sai, vì máy thầy không chỉ có một cái:
+  // điện thoại, tab chưa tải lại, máy tính khác đều mang mã bí mật.
+  //
+  // ĐO ĐƯỢC chiều 09/09: ca 447479 bị ghi ngược LẦN THỨ HAI sau khi đã chấm lại
+  // đêm trước — 36/36 em, ô Sheet cao nhất đúng 4,50 tức trần thang cũ. Màn Ca
+  // thi tự ghi điểm cả ca ngay khi mở, nên MỘT màn mở trên một máy thầy chạy bản
+  // cũ là đè lại toàn bộ trong một loạt, và chốt này cho qua thẳng.
+  //
+  // Ý ĐỊNH của phép kiểm cũ (đừng chặn nhầm đường thầy đang dùng) vẫn giữ, nhưng
+  // bảo đảm theo cách khác: bản app hiện hành gửi tem trong MỌI lượt ghi điểm,
+  // nên đòi tem ở mọi máy không chặn nhầm gì — xem `tem-luat-cham-ap-moi-may-0909`.
+  it('máy thầy chạy bản MỚI (có tem) vẫn ghi được', () => {
+    expect(duocGhiDiem(true, { luatDiem: LUAT_DIEM })).toBe(true)
+  })
+
+  it('máy thầy chạy bản CŨ (không tem) KHÔNG còn được qua thẳng', () => {
+    expect(duocGhiDiem(true, {})).toBe(false)
+    expect(duocGhiDiem(true, { luatDiem: 'linh tinh' })).toBe(false)
   })
 
   it('máy em bản MỚI (đúng tem) ghi được', () => {
