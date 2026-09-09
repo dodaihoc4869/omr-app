@@ -230,6 +230,46 @@ function duocGhiDiem_(coMat, body) {
   return String((body && body.luatDiem) || '') === LUAT_DIEM
 }
 
+/** BIÊN AN TOÀN sau `hetGioLuc` mới chốt lượt. Hai phút đủ để một lượt nộp
+ * đang bay kịp về; ngắn hơn thì có nguy cơ chốt đè lên chính cú nộp của em. */
+const BIEN_CHOT_QUA_GIO_MS = 2 * 60 * 1000
+
+/** Chốt mọi lượt `dang_lam` đã QUÁ GIỜ của một ca thành `da_nop`.
+ *
+ * Xem ghi chú dài ở chỗ gọi trong `chiTietCa`. Trả về số lượt vừa chốt.
+ *
+ * KHÔNG đụng cột 9 (DapAnJson): giữ nguyên bản lưu tạm cuối — đó chính là phần
+ * em đã làm. Lượt không có `hetGioLuc` thì BỎ QUA, không đoán: bài tập về nhà
+ * có thể không đặt hạn, chốt bừa là cướp bài của em. */
+function chotLuotQuaGio_(maCa) {
+  const lock = LockService.getScriptLock()
+  if (!lock.tryLock(5000)) return 0
+  try {
+    const sh = sheetLuot_()
+    const data = sh.getDataRange().getValues()
+    const now = Date.now()
+    const luc = new Date().toISOString()
+    let n = 0
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][0]) !== String(maCa)) continue
+      const l = docLuot_(data[i])
+      if (l.trangThai !== 'dang_lam') continue
+      const het = msCua_(l.hetGioLuc)
+      if (!het) continue
+      if (now < het + BIEN_CHOT_QUA_GIO_MS) continue
+      const ghiChu = (l.ghiChu ? l.ghiChu + ' · ' : '') + 'hết giờ ' + String(l.hetGioLuc).slice(11, 16) + 'Z, máy tự chốt phần đã làm'
+      sh.getRange(i + 1, 7, 1, 2).setValues([[l.hetGioLuc, 'da_nop']])
+      sh.getRange(i + 1, 20, 1, 2).setValues([[ghiChu, luc]])
+      n++
+    }
+    return n
+  } catch (err) {
+    return 0
+  } finally {
+    lock.releaseLock()
+  }
+}
+
 /** Số câu mỗi phần THẬT của một ca, đọc từ chính gói đáp án máy chủ đang giữ.
  * Trả `null` khi ca chưa có gói (chưa công bố điểm) — lúc đó không đối chiếu. */
 function soCauThatCuaCa_(ca) {
@@ -3864,6 +3904,21 @@ function doPost(e) {
     const caRow = findRowByKey_(caSh, 0, maCa)
     if (caRow < 0) return jsonResponse_({ ok: false, error: 'Không có ca ' + maCa })
     const ca = docCa_(caSh, caRow)
+    // CHỐT LƯỢT ĐÃ QUÁ GIỜ trước khi trả về (thêm 09/09 19:11).
+    //
+    // Thầy báo, kèm ảnh: ca thi xong lúc 19:08 mà bốn em vào 18:00 vẫn nằm
+    // "Đang làm", ô điểm là dấu gạch. Máy em hết giờ thì tự nộp, nhưng em nào
+    // tắt app, hết pin, hay mất mạng đúng lúc đó thì KHÔNG AI đóng lượt hộ —
+    // máy chủ cứ để `dang_lam` mãi, mà màn Ca thi chỉ chấm lượt `da_nop`/`khoa`.
+    // Nút KHOÁ CA có làm việc này, nhưng đó là việc thầy PHẢI NHỚ bấm; quên là
+    // em không có điểm và không ai biết vì sao.
+    //
+    // Nay máy chủ tự chốt. Chỉ chốt lượt đã qua `hetGioLuc` cộng thêm biên an
+    // toàn — quá giờ rồi thì chắc chắn em không làm thêm được nữa, nên không
+    // cướp bài của ai. Bài giữ nguyên bản LƯU TẠM cuối cùng (cột 9 không đụng),
+    // đúng như nút KHOÁ CA vẫn làm. Ghi chú nói rõ máy tự chốt, không giả vờ em
+    // tự nộp.
+    chotLuotQuaGio_(maCa)
     const luotData = sheetLuot_().getDataRange().getValues()
     const luot = []
     for (let i = 1; i < luotData.length; i++) {
