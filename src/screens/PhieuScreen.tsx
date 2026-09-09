@@ -281,11 +281,14 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duC
         const anGiai = cheDo === 'de'
         if (anGiai) tt.nhanBia = 'Đề luyện theo đúng chỗ em mất điểm'
         else if (soCauLink) tt.nhanBia = 'Lời giải bài luyện của em'
-        // NỘP ĐƯỢC (NOP-PHIEU-KHAC-PHUC). Chỉ bật ở bản CÓ lời giải: bản chỉ
-        // đề không có đáp án nên không chấm được. Cần đủ mã phiếu và SBD —
-        // thiếu thứ nào thì phiếu mở ra như cũ, chỉ đọc, không nộp.
+        // NỘP ĐƯỢC (NOP-PHIEU-KHAC-PHUC). Bật ở CẢ bản chỉ đề (bỏ điều kiện
+        // `!anGiai` ngày 09/09 — xem ghi chú dài ở `dungPhieu`): bản chỉ đề vẫn
+        // mang `dapAn` của từng câu, chỉ giấu bằng CSS, nên chấm được. Trước
+        // đây link ĐỀ — đúng cái em nhận để LÀM — là link duy nhất em không bấm
+        // chọn được. Cần đủ mã phiếu và SBD; thiếu thứ nào thì phiếu mở ra chỉ
+        // đọc như cũ.
         const sbdEm = String((g as { tt?: { oBia?: { nhan: string; gia: string }[] } }).tt?.oBia?.find((o) => o.nhan === 'SBD')?.gia ?? '').trim()
-        const nop = !anGiai && ma && sbdEm ? { ma, sbd: sbdEm, url } : null
+        const nop = ma && sbdEm ? { ma, sbd: sbdEm, url } : null
         setPhieuBt(dungPhieu(tt, cau, { anGiai, nop }))
         return
       }
