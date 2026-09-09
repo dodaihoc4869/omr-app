@@ -34,8 +34,8 @@ function soVN(x: number, le = 2): string {
   return x.toFixed(le).replace('.', ',')
 }
 
-export default function KhoiTienBo({ ca }: { ca: HoSoEm['ca'] }) {
-  const ds = useMemo(() => chuoiTienBo(ca), [ca])
+export default function KhoiTienBo({ ca, diemDe }: { ca: HoSoEm['ca']; diemDe?: Record<string, number> | null }) {
+  const ds = useMemo(() => chuoiTienBo(ca, diemDe), [ca, diemDe])
   const cong = useMemo(() => trungBinhCongDon(ds.map((d) => d.diem)), [ds])
   const nx = useMemo(() => nhanXetTienBo(ds), [ds])
   const { cao, thap } = useMemo(() => moc(ds), [ds])

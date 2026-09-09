@@ -1025,7 +1025,13 @@ export default function ExamMonitorScreen() {
 
             {/* Biểu đồ tiến bộ đứng đầu hồ sơ: mở ra là biết em đang lên hay
                 đang xuống, trước khi đọc bất cứ số nào khác. */}
-            <KhoiTienBo ca={hoSo.ca} />
+            {/* Điểm ca đang mở lấy số TỰ CHẤM, không lấy ô Sheet — cùng con số
+                đầu màn vừa in. Ca khác giữ ô Sheet vì máy này không có bộ đề
+                của chúng để chấm lại. */}
+            <KhoiTienBo
+              ca={hoSo.ca}
+              diemDe={chiTiet && emTrongCa?.graded ? { [chiTiet.ca.maCa]: emTrongCa.graded.score.total } : null}
+            />
 
             {/* Phiếu soạn theo ĐÚNG ca đang mở, không phải ca mới nhất của em —
                 thầy đang đứng ở ca này thì tin nhắn phải nói về ca này. */}
@@ -1035,6 +1041,19 @@ export default function ExamMonitorScreen() {
               showToast={showToast}
               rows={rowsHoSo}
               banks={teacherBank}
+              // ĐIỂM TỰ CHẤM của đúng em này — CÙNG con số đầu màn đang in.
+              // Không chấm lại được thì để `undefined` (không phải `null`) để
+              // khối phiếu tự đi hỏi máy chủ và tự chấm, thay vì rơi về ô Sheet.
+              diemChamLai={
+                emTrongCa?.graded
+                  ? {
+                      tong: emTrongCa.graded.score.total,
+                      I: emTrongCa.graded.score.phanIScore,
+                      II: emTrongCa.graded.score.phanIIScore,
+                      III: emTrongCa.graded.score.phanIIIScore,
+                    }
+                  : undefined
+              }
               diemLop={dsEm.map((e) => e.diem).filter((d): d is number => typeof d === 'number')}
               thoiLuongPhut={chiTiet?.ca.thoiGianPhut ?? null}
               vaoLuc={emTrongCa?.moiNhat.vaoLuc ?? null}

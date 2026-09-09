@@ -77,6 +77,7 @@ export default function PhieuZaloEm({
   showToast,
   rows,
   banks,
+  diemChamLai,
   diemLop,
   thoiLuongPhut,
   vaoLuc,
@@ -90,6 +91,11 @@ export default function PhieuZaloEm({
    * bài và phần câu sai — không dựng phần rỗng. */
   rows?: ChiTietCauRow[] | null
   banks?: TeacherExamSource[] | null
+  /** ĐIỂM CHẤM LẠI của chỗ gọi, khi chỗ gọi đã tự chấm bằng `gradeSubmissionFull`.
+   *
+   * `undefined` = chỗ gọi KHÔNG nói gì về điểm ⇒ khối này tự đi hỏi máy chủ rồi
+   * tự chấm. Đây là mặc định an toàn: xem `canThem`. */
+  diemChamLai?: DiemChamLai | null
   /** Điểm mọi em trong ca (không kèm tên) để vẽ phân bố lớp. */
   diemLop?: number[] | null
   thoiLuongPhut?: number | null
@@ -127,7 +133,18 @@ export default function PhieuZaloEm({
     /** Hạng và sĩ số tính từ bảng điểm ĐÃ CHẤM LẠI của cả ca. */
     hangMoi: { hang: number; siSo: number } | null
   } | null>(null)
-  const canThem = !rows || !banks || viPham === undefined
+  // LỖI ĐÃ DÍNH 09/09, cùng hình dạng với lỗi 04-09 ở trên nhưng ăn vào ĐIỂM.
+  //
+  // `diemMoi` (điểm chấm lại) nằm chung trong khối "tự đi lấy phần còn thiếu",
+  // mà khối đó CỐ Ý không chạy khi chỗ gọi đã truyền đủ. Hậu quả ngược đời:
+  // đúng cái màn truyền đủ nhất — Hồ sơ em trong màn Ca thi — lại là màn DUY
+  // NHẤT in điểm lấy thẳng từ ô Sheet. Thầy chụp được cảnh đầu màn ghi "5,75
+  // điểm ca này" (số tự chấm) mà phiếu gửi phụ huynh ngay dưới ghi "2,50/10".
+  //
+  // Nay `diemChamLai === undefined` cũng tính là THIẾU. Chỗ gọi nào không nói
+  // gì về điểm thì khối này tự đi hỏi và tự chấm — thà tốn một lượt gọi còn
+  // hơn gửi phụ huynh con số của ô Sheet, thứ máy em bản cũ ghi đè được.
+  const canThem = !rows || !banks || viPham === undefined || diemChamLai === undefined
   useEffect(() => {
     if (!canThem || !ca) {
       setThem(null)
@@ -216,11 +233,18 @@ export default function PhieuZaloEm({
   const banksDung = banks ?? them?.banks ?? null
   // ĐIỂM DÙNG CHO MỌI THỨ GỬI PHỤ HUYNH. Chấm lại được thì lấy số tự tính; ô
   // trên Sheet chỉ là đường lùi. Xem ghi chú ở `DiemChamLai`.
-  const diemDung = them?.diemMoi ?? null
+  const diemDung = them?.diemMoi ?? diemChamLai ?? null
   const tongDung = diemDung?.tong ?? ca?.tong ?? null
-  const hangDung = them?.hangMoi?.hang ?? ca?.hang ?? null
-  const siSoDung = them?.hangMoi?.siSo ?? ca?.siSo ?? null
   const diemLopDung = diemLop ?? them?.diemLop ?? null
+  // Hạng phải tính từ CÙNG bảng điểm với `tongDung`. Chỗ gọi đưa điểm chấm lại
+  // thì bảng `diemLop` nó đưa cũng là bảng đã chấm lại — xếp hạng ngay tại đây
+  // thay vì mượn ô `hang` trên Sheet, thứ tính từ dãy điểm cũ.
+  const hangTuChamLai = useMemo(
+    () => (them?.hangMoi ? null : diemChamLai && diemLopDung && diemLopDung.length > 0 ? hangTheoDiem(diemChamLai.tong, diemLopDung) : null),
+    [them?.hangMoi, diemChamLai, diemLopDung],
+  )
+  const hangDung = them?.hangMoi?.hang ?? hangTuChamLai?.hang ?? ca?.hang ?? null
+  const siSoDung = them?.hangMoi?.siSo ?? hangTuChamLai?.siSo ?? ca?.siSo ?? null
   const thoiLuongDung = thoiLuongPhut ?? them?.thoiLuongPhut ?? null
   const vaoLucDung = vaoLuc ?? them?.vaoLuc ?? null
   const viPhamDung = viPham !== undefined ? viPham : (them?.viPham ?? null)

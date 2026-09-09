@@ -33,12 +33,22 @@ export interface NhanXetTienBo {
 export const NGUONG_LECH = 0.5
 
 /** Chuỗi ca ĐÃ CHẤM, sắp cũ trước mới sau. Ca chưa có điểm bị loại: vẽ nó vào
- * là bịa ra một cú tụt điểm không có thật. */
-export function chuoiTienBo(ca: HoSoEm['ca']): DiemMotCa[] {
+ * là bịa ra một cú tụt điểm không có thật.
+ *
+ * `deTheoCa` là ĐIỂM CHẤM LẠI TẠI CHỖ, mã ca → điểm. Ca nào có mặt trong đó thì
+ * lấy số này thay ô `tong` trên Sheet. Lý do: ô Sheet ghi được bởi máy em bản
+ * cũ (đã truy ra 08/09), nên khi màn đang mở đã tự chấm ra số của chính nó thì
+ * biểu đồ phải nói cùng con số — không được để đầu màn ghi một đằng, biểu đồ
+ * ngay dưới ghi một nẻo. */
+export function chuoiTienBo(ca: HoSoEm['ca'], deTheoCa?: Record<string, number> | null): DiemMotCa[] {
+  const de = (maCa: string, cu: number): number => {
+    const d = deTheoCa?.[maCa]
+    return typeof d === 'number' && Number.isFinite(d) ? d : cu
+  }
   return [...(ca ?? [])]
     .filter((c) => typeof c.tong === 'number' && Number.isFinite(c.tong))
     .sort((a, b) => new Date(a.nopLuc).getTime() - new Date(b.nopLuc).getTime())
-    .map((c) => ({ maCa: c.maCa, tenCa: c.tenCa || '', ngay: c.nopLuc, diem: c.tong as number, hang: c.hang, siSo: c.siSo }))
+    .map((c) => ({ maCa: c.maCa, tenCa: c.tenCa || '', ngay: c.nopLuc, diem: de(c.maCa, c.tong as number), hang: c.hang, siSo: c.siSo }))
 }
 
 /** Trung bình cộng dồn: phần tử thứ i là trung bình của các ca từ đầu tới i. */

@@ -30,9 +30,27 @@ describe('PhieuZaloEm KHÔNG còn tin ô điểm trên Sheet', () => {
     expect(ZALO).toContain('gradeSubmissionFull(bank, ca.maCa, sbd, dapAn, soCau, rieng?.boTheoEm).score')
   })
 
+  // VIẾT LẠI 09/09, KHÔNG XOÁ LẶNG. Bản cũ đòi đúng chuỗi
+  //
+  //     const diemDung = them?.diemMoi ?? null
+  //
+  // Ý ĐỊNH của nó vẫn đúng và giữ nguyên: điểm phải ra từ chỗ chấm lại, ô Sheet
+  // chỉ là đường lùi cuối. Nhưng GIẢ ĐỊNH của nó thiếu một vế: nó tin rằng
+  // `them` luôn có mặt. `them` chỉ được dựng khi `canThem` bật, mà `canThem`
+  // CỐ Ý tắt khi chỗ gọi truyền đủ prop — nên ở màn Ca thi, `them` là null và
+  // `diemDung` rơi thẳng về ô Sheet. Phép kiểm cũ vẫn xanh suốt trong lúc đó,
+  // vì nó chỉ soi chuỗi trong tệp chứ không dựng khối phiếu lên mà đọc.
+  //
+  // Nay có thêm một nguồn nữa: điểm chấm lại do CHỖ GỌI đưa xuống. Thứ tự ưu
+  // tiên là "tự chấm ở đây → chỗ gọi đã chấm → ô Sheet", và ô Sheet vẫn đứng
+  // cuối. Phép kiểm dựng thật nằm ở `phieu-doc-o-sheet-khi-du-prop-0909`.
   it('điểm dùng chung lấy số chấm lại TRƯỚC, ô Sheet chỉ là đường lùi', () => {
-    expect(ZALO).toContain('const diemDung = them?.diemMoi ?? null')
+    expect(ZALO).toContain('const diemDung = them?.diemMoi ?? diemChamLai ?? null')
     expect(ZALO).toContain('const tongDung = diemDung?.tong ?? ca?.tong ?? null')
+    // Ô Sheet phải đứng SAU mọi nguồn chấm lại, không được chen lên trước.
+    const dong = ZALO.slice(ZALO.indexOf('const diemDung ='), ZALO.indexOf('const tongDung =') + 80)
+    expect(dong.indexOf('them?.diemMoi')).toBeLessThan(dong.indexOf('diemChamLai'))
+    expect(dong.indexOf('diemChamLai')).toBeLessThan(dong.indexOf('ca?.tong'))
   })
 
   it('TIN NHẮN gửi phụ huynh dùng số chấm lại', () => {
