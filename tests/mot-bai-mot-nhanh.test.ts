@@ -89,7 +89,10 @@ describe('maCanXoa — đồng bộ phải BỚT chứ không chỉ THÊM', () =
   const may = (...ma: string[]): TeacherExamSource[] => ma.map((maDe) => ({ maDe }) as TeacherExamSource)
 
   it('mã còn ở máy mà kho không còn thì phải xoá', () => {
-    expect(maCanXoa(kho('12-C2-B4-D1', '12-C2-B4-D2'), may('12-C2-B4', '12-C2-B4-D1', '12-TO-01'))).toEqual(['12-C2-B4', '12-TO-01'])
+    // Phải đủ nhiều mã để không chạm chốt "kho trả thiếu quá nhiều thì cấm xoá"
+    // (xem TI_LE_TOI_THIEU trong exam-sync): 8 mã kho trên 10 mã máy là 80%.
+    const conSong = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8']
+    expect(maCanXoa(kho(...conSong), may(...conSong, '12-C2-B4', '12-TO-01'))).toEqual(['12-C2-B4', '12-TO-01'])
   })
 
   it('máy trùng khớp kho thì không xoá gì', () => {

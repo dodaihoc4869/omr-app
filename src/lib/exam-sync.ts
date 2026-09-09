@@ -34,11 +34,21 @@ export interface KetQuaDongBo {
  * kho xếp lại theo bài nên mã đề đổi hoàn toàn; máy thầy giữ luôn cả bộ mã cũ
  * lẫn bộ mới, ra 252 đề và mỗi bài hiện mấy dòng với số câu khác nhau.
  *
- * CHỐT AN TOÀN: danh sách kho rỗng thì KHÔNG xoá gì. Kho rỗng gần như chắc
- * chắn là lỗi mạng hoặc sai mã bí mật, mà xử theo nó thì xoá sạch ngân hàng
- * của thầy. */
+ * HAI CHỐT AN TOÀN, không bỏ được:
+ *
+ *  1. Danh sách kho RỖNG thì không xoá gì. Rỗng gần như chắc chắn là lỗi mạng
+ *     hoặc sai mã bí mật, mà xử theo nó thì xoá sạch ngân hàng của thầy.
+ *  2. Danh sách kho NGẮN HƠN HẲN số đề đang có ở máy (dưới 80%) thì cũng không
+ *     xoá gì. Máy chủ trả thiếu — do cắt trang, quá hạn, hay lỗi giữa chừng —
+ *     nhìn từ phía app y hệt như "thầy đã xoá bớt đề", và xử nhầm thì mất hàng
+ *     chục đề. Thà giữ thừa vài đề cũ còn hơn xoá nhầm đề đang dùng.
+ *
+ * Cả hai chốt đều trả về mảng rỗng, tức đồng bộ vẫn chạy tiếp phần tải về. */
+export const TI_LE_TOI_THIEU = 0.8
+
 export function maCanXoa(tren: KhoDeItem[], local: TeacherExamSource[]): string[] {
   if (tren.length === 0) return []
+  if (local.length > 0 && tren.length < local.length * TI_LE_TOI_THIEU) return []
   const conSong = new Set(tren.map((x) => x.maDe))
   return local.map((s) => s.maDe).filter((m) => !conSong.has(m))
 }

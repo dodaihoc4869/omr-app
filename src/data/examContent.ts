@@ -222,9 +222,17 @@ export const PHAN_III_NEED = 6
 export function validateTeacherSource(c: TeacherExamSource): string[] {
   const errors: string[] = []
   if (!c.maDe.trim()) errors.push('Thiếu tên/mã đề')
-  if (c.phanI.length === 0) errors.push('Phần I: chưa có câu nào')
-  if (c.phanII.length === 0) errors.push('Phần II: chưa có câu nào')
-  if (c.phanIII.length === 0) errors.push('Phần III: chưa có câu nào')
+  // ĐỀ CHỈ CẦN CÓ CÂU, KHÔNG BẮT ĐỦ BA PHẦN.
+  //
+  // Luật cũ đòi cả ba phần đều có câu. Đúng khi mỗi tệp là một đề thi nguyên
+  // bản, nhưng sai từ 09/09 khi kho cắt theo BÀI: bài "Cấu trúc lớp vỏ
+  // electron" không có câu trả lời ngắn nào là chuyện bình thường, mà đồng bộ
+  // lại coi đó là đề hỏng và bỏ luôn — 19/90 đề bị rụng, ngân hàng chỉ còn 71.
+  //
+  // Đủ 18 · 4 · 6 hay không là việc của lúc RA ĐỀ, và `bankSizeWarning` đã lo:
+  // nó cộng câu của mọi đề thầy tích rồi cảnh báo nếu thiếu. Kiểm ở đây là kiểm
+  // nhầm chỗ.
+  if (c.phanI.length + c.phanII.length + c.phanIII.length === 0) errors.push('Đề chưa có câu nào')
   c.phanI.forEach((q, i) => {
     if (!q.text.trim()) errors.push(`Phần I câu ${i + 1}: thiếu đề bài`)
     q.choices.forEach((ch, j) => {
