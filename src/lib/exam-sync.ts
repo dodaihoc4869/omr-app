@@ -11,7 +11,7 @@ import type { TeacherExamSource } from '../data/examContent'
 import { validateTeacherSource } from '../data/examContent'
 import { capNhatKeyBank, danhSachDe, layDe, type KhoDeItem } from './exam-api'
 import { apDungSoSua } from './sua-dang'
-import { loadAllSessionTeacherBanks, loadExamSources, saveExamSource, saveSessionTeacherBank, loadSoSuaDang} from './exam-db'
+import { deleteExamSource, loadAllSessionTeacherBanks, loadExamSources, saveExamSource, saveSessionTeacherBank, loadSoSuaDang} from './exam-db'
 import { mergeKeepAnswers } from '../data/examContent'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJsonText } from './exam-kho-de-import'
 
@@ -24,6 +24,23 @@ export interface KetQuaDongBo {
   danhSach: KhoDeItem[]
   /** Số ca đã mở được cập nhật đáp án/lời giải theo bản đề mới. */
   caCapNhat: number
+  /** Mã đề đã XOÁ khỏi máy thầy vì kho không còn. */
+  daXoa: string[]
+}
+
+/** Mã đề CÓ ở máy thầy mà kho KHÔNG CÒN — phải xoá đi.
+ *
+ * Vì sao cần: đồng bộ chỉ biết thêm và cập nhật, không biết bớt. Ngày 09/09
+ * kho xếp lại theo bài nên mã đề đổi hoàn toàn; máy thầy giữ luôn cả bộ mã cũ
+ * lẫn bộ mới, ra 252 đề và mỗi bài hiện mấy dòng với số câu khác nhau.
+ *
+ * CHỐT AN TOÀN: danh sách kho rỗng thì KHÔNG xoá gì. Kho rỗng gần như chắc
+ * chắn là lỗi mạng hoặc sai mã bí mật, mà xử theo nó thì xoá sạch ngân hàng
+ * của thầy. */
+export function maCanXoa(tren: KhoDeItem[], local: TeacherExamSource[]): string[] {
+  if (tren.length === 0) return []
+  const conSong = new Set(tren.map((x) => x.maDe))
+  return local.map((s) => s.maDe).filter((m) => !conSong.has(m))
 }
 
 /** Đề `source` vừa đổi (lời giải mới / thầy chốt đáp án) → thay bản đề trong
@@ -83,7 +100,19 @@ export async function dongBoNganHang(scriptUrl: string, secret: string, epTaiLai
   const local = await loadExamSources()
   const soSua = await loadSoSuaDang()
   const { moi, capNhat } = chonDeCanTai(danhSach, local, epTaiLai)
-  const kq: KetQuaDongBo = { moi: [], capNhat: [], giuNguyen: danhSach.length - moi.length - capNhat.length, loi: [], canXem: [], danhSach, caCapNhat: 0 }
+  const kq: KetQuaDongBo = { moi: [], capNhat: [], giuNguyen: danhSach.length - moi.length - capNhat.length, loi: [], canXem: [], danhSach, caCapNhat: 0, daXoa: [] }
+
+  // DỌN TRƯỚC KHI TẢI. Đề kho không còn thì bỏ khỏi máy thầy, không thì cây
+  // chọn đề bày cả mã cũ lẫn mã mới. Không đụng ngân hàng riêng của các ca đã
+  // mở (xem `caDungDe`): bài đã nộp, điểm và lời giải của chúng vẫn nguyên.
+  for (const m of maCanXoa(danhSach, local)) {
+    try {
+      await deleteExamSource(m)
+      kq.daXoa.push(m)
+    } catch (e) {
+      kq.loi.push(`Đề ${m}: xoá bản cũ trên máy thất bại — ${e instanceof Error ? e.message : 'lỗi không rõ'}`)
+    }
+  }
 
   for (const item of [...moi, ...capNhat]) {
     try {

@@ -60,6 +60,16 @@ export function tenBai(c: Pick<TeacherExamSource, 'maDe' | 'nguon'>): string {
 
 const soCauCua = (s: TeacherExamSource): SoCau => ({ I: s.phanI.length, II: s.phanII.length, III: s.phanIII.length })
 
+/** Đuôi phân biệt hai đề CÙNG MỘT BÀI: kho cắt bài quá 150 câu thành
+ * `...-D1`, `...-D2`. Trả 'D1' / 'D2'; mã không có đuôi ấy thì trả nguyên mã.
+ *
+ * Chỉ dùng khi trong một bài có nhiều hơn một mã gốc — bài chỉ có một mã thì
+ * không cần bày đuôi ra cho rối. */
+export function duoiPhanBiet(goc: string): string {
+  const m = /-(D\d+)$/.exec(goc)
+  return m ? m[1] : goc
+}
+
 /** Gom một danh sách theo khoá, GIỮ THỨ TỰ xuất hiện đầu tiên. Sắp lại theo
  * alphabet sẽ đảo thứ tự bài trong chương (Bài 10 lên trước Bài 8). */
 function gom<T>(ds: T[], khoa: (x: T) => string): { khoa: string; ds: T[] }[] {
@@ -88,15 +98,26 @@ export function dungCay(ds: TeacherExamSource[]): Nut[] {
   return theoKhoi.map(({ khoa: k, ds: dsK }) => {
     const theoChuong = gom(dsK, chuongCuaDe)
     const chuong = theoChuong.map(({ khoa: ch, ds: dsC }) => {
-      const theoBai = gom(dsC, (c) => goMaDeTachRa(c.maDe).goc)
+      // GOM THEO TÊN BÀI, không theo mã đề.
+      //
+      // Bản cũ gom bằng `goMaDeTachRa(maDe).goc`, đúng khi mỗi bài chỉ có đúng
+      // một mã đề. Từ 09/09 kho cắt bài quá 150 câu thành `12-C2-B4-D1` và
+      // `-D2` — hai mã gốc khác nhau nên bài "Glucose và fructose" hiện ra HAI
+      // dòng trùng tên, thầy phải tích hai lần và tưởng kho có đề trùng.
+      // Nay một bài đúng một nhánh; các mã của nó nằm dưới tầng lá.
+      const theoBai = gom(dsC, (c) => tenBai(c))
       const bai = theoBai.map(({ khoa: b, ds: dsB }) => {
+        // Bài có nhiều mã gốc thì lá phải nói rõ mã nào, không thì thầy thấy
+        // hai dòng "Trắc nghiệm" y hệt nhau mà không biết khác gì.
+        const nhieuMa = new Set(dsB.map((c) => goMaDeTachRa(c.maDe).goc)).size > 1
         const dang: Nut[] = dsB.map((c) => {
-          const { phan } = goMaDeTachRa(c.maDe)
+          const { goc, phan } = goMaDeTachRa(c.maDe)
           const sc = soCauCua(c)
           const tuCau: PhanDe | null = phan ?? (sc.I > 0 ? 'I' : sc.II > 0 ? 'II' : sc.III > 0 ? 'III' : null)
+          const ten = tuCau ? TEN_PHAN_TACH[tuCau] : c.maDe
           return {
             khoa: `${k}/${ch}/${b}/${c.maDe}`,
-            nhan: tuCau ? TEN_PHAN_TACH[tuCau] : c.maDe,
+            nhan: nhieuMa ? `${ten} · ${duoiPhanBiet(goc)}` : ten,
             tang: 'dang' as const,
             con: [],
             maDe: c.maDe,
@@ -104,7 +125,7 @@ export function dungCay(ds: TeacherExamSource[]): Nut[] {
             laMa: [c.maDe],
           }
         })
-        return nutCha(`${k}/${ch}/${b}`, tenBai(dsB[0]), 'bai', dang)
+        return nutCha(`${k}/${ch}/${b}`, b, 'bai', dang)
       })
       return nutCha(`${k}/${ch}`, ch || 'Chưa xếp chương', 'chuong', bai)
     })

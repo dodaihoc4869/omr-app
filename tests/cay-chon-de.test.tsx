@@ -56,20 +56,20 @@ describe('dựng cây bốn tầng', () => {
   })
 
   it('tầng 4 là dạng, đặt tên đúng phần và mang mã đề', () => {
-    const b1 = tim(cay, '12/C1 - Ester lipid/12-C1-B1')
+    const b1 = tim(cay, '12/C1 - Ester lipid/Bài 1. Ester')
     expect(b1.con.map((n) => n.nhan)).toEqual(['Trắc nghiệm', 'Đúng sai', 'Trả lời ngắn'])
     expect(b1.con.map((n) => n.maDe)).toEqual(['12-C1-B1-TN', '12-C1-B1-DS', '12-C1-B1-TLN'])
   })
 
   it('PHÉP KIỂM 12 — số câu cộng dồn đúng từ lá lên gốc, chia đúng ba phần', () => {
-    expect(tim(cay, '12/C1 - Ester lipid/12-C1-B1').soCau).toEqual({ I: 48, II: 16, III: 17 })
+    expect(tim(cay, '12/C1 - Ester lipid/Bài 1. Ester').soCau).toEqual({ I: 48, II: 16, III: 17 })
     expect(tim(cay, '12/C1 - Ester lipid').soCau).toEqual({ I: 101, II: 24, III: 17 })
     expect(tim(cay, '12').soCau).toEqual({ I: 131, II: 24, III: 17 })
     expect(tongCau(tim(cay, '12').soCau)).toBe(172)
   })
 
   it('bài chỉ có hai dạng thì KHÔNG sinh nút dạng rỗng', () => {
-    expect(tim(cay, '12/C1 - Ester lipid/12-C1-B2').con).toHaveLength(2)
+    expect(tim(cay, '12/C1 - Ester lipid/Bài 2. Xà phòng').con).toHaveLength(2)
   })
 })
 
@@ -87,8 +87,8 @@ describe('ô tích ba trạng thái', () => {
     const day = bamTich(chuong, new Set())
     day.delete('12-C1-B1-TLN')
     expect(trangThaiTich(chuong, day)).toBe('nua')
-    expect(trangThaiTich(tim(cay, '12/C1 - Ester lipid/12-C1-B1'), day)).toBe('nua')
-    expect(trangThaiTich(tim(cay, '12/C1 - Ester lipid/12-C1-B2'), day)).toBe('day')
+    expect(trangThaiTich(tim(cay, '12/C1 - Ester lipid/Bài 1. Ester'), day)).toBe('nua')
+    expect(trangThaiTich(tim(cay, '12/C1 - Ester lipid/Bài 2. Xà phòng'), day)).toBe('day')
   })
 
   it('bấm lại ô đang đầy thì bỏ hết con', () => {
@@ -102,7 +102,7 @@ describe('ô tích ba trạng thái', () => {
   })
 
   it('tích bài rồi tích thêm cả chương KHÔNG cộng trùng số câu', () => {
-    const chiBai = bamTich(tim(cay, '12/C1 - Ester lipid/12-C1-B1'), new Set())
+    const chiBai = bamTich(tim(cay, '12/C1 - Ester lipid/Bài 1. Ester'), new Set())
     expect(tongCau(tongDaChon(cay, chiBai))).toBe(48 + 16 + 17)
     const themChuong = bamTich(chuong, chiBai)
     expect(themChuong.size).toBe(5)
@@ -125,7 +125,7 @@ describe('ô tìm', () => {
     expect(loc[0].con[0].con[0].con.map((n) => n.maDe)).toEqual(['12-C1-B2-DS'])
     expect(moKhoa).toContain('12')
     expect(moKhoa).toContain('12/C1 - Ester lipid')
-    expect(moKhoa).toContain('12/C1 - Ester lipid/12-C1-B2')
+    expect(moKhoa).toContain('12/C1 - Ester lipid/Bài 2. Xà phòng')
   })
 
   it('bỏ dấu khi tìm — gõ không dấu vẫn ra', () => {

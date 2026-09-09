@@ -37,8 +37,13 @@ export default function NutDongBo({ onXong, className = '' }: { onXong?: (kq: Ke
       const kq = await dongBoNganHang(url.trim(), secret.trim())
       onXong?.(kq)
       const soMoi = kq.moi.length + kq.capNhat.length
-      if (kq.loi.length > 0 && soMoi === 0) bao({ kieu: 'loi', chu: `${kq.loi.length} đề lỗi` })
-      else bao({ kieu: 'xong', chu: soMoi > 0 ? `+${soMoi} đề mới` : 'Đã mới nhất' })
+      // Đồng bộ có thể chỉ DỌN mà không tải gì. Không đếm phần dọn thì nút báo
+      // "Đã mới nhất" ngay sau khi vừa bỏ mấy chục đề cũ — thầy tưởng không có
+      // gì xảy ra rồi đi tìm lỗi ở chỗ khác.
+      if (kq.loi.length > 0 && soMoi === 0 && kq.daXoa.length === 0) bao({ kieu: 'loi', chu: `${kq.loi.length} đề lỗi` })
+      else if (soMoi > 0) bao({ kieu: 'xong', chu: `+${soMoi} đề mới` })
+      else if (kq.daXoa.length > 0) bao({ kieu: 'xong', chu: `dọn ${kq.daXoa.length} đề cũ` })
+      else bao({ kieu: 'xong', chu: 'Đã mới nhất' })
     } catch (e) {
       bao({ kieu: 'loi', chu: e instanceof Error && /fetch/i.test(e.message) ? 'Mất mạng' : 'Lỗi đồng bộ' })
     }

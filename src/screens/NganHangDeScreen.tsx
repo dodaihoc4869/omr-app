@@ -195,7 +195,14 @@ export default function NganHangDeScreen() {
       const kq = await dongBoNganHang(url.trim(), mat.trim(), epTaiLai)
       setKetQua(kq)
       await taiLocal()
-      const tomTat = [kq.moi.length ? `${kq.moi.length} đề mới` : '', kq.capNhat.length ? `${kq.capNhat.length} đề cập nhật` : ''].filter(Boolean).join(', ')
+      const tomTat = [
+        kq.moi.length ? `${kq.moi.length} đề mới` : '',
+        kq.capNhat.length ? `${kq.capNhat.length} đề cập nhật` : '',
+        // Nói ra chứ không dọn lặng lẽ: thầy phải biết vì sao ngân hàng bớt đề.
+        kq.daXoa.length ? `${kq.daXoa.length} đề cũ đã bỏ (kho không còn)` : '',
+      ]
+        .filter(Boolean)
+        .join(', ')
       if (!imLang || tomTat) showToast(tomTat ? `Đồng bộ xong: ${tomTat}` : 'Ngân hàng đã mới nhất', kq.loi.length ? 'warn' : 'success')
     } catch (e) {
       showToast(`Đồng bộ lỗi: ${e instanceof Error ? e.message : 'không rõ'}`, 'error')
