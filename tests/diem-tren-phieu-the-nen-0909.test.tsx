@@ -19,64 +19,52 @@
 // `PhieuV3` đã bỏ vòng chạy số vì đúng lý do này từ 07/09, nhưng màn THẬT SỰ
 // phục vụ link `/p#` là `PhieuScreen` thì chưa — nay bỏ nốt.
 //
-// PHÉP KIỂM QUYẾT ĐỊNH: dựng component trong đúng điều kiện thẻ nền — rAF KHÔNG
-// BAO GIỜ chạy — rồi đòi con số phải đúng ngay. Phép kiểm soi chuỗi không bắt
-// được lỗi này, vì chuỗi trong tệp lúc nào cũng "đúng".
-import { describe, expect, it, afterEach, vi } from 'vitest'
+// PHÉP KIỂM QUYẾT ĐỊNH: đọc con số NGAY SAU KHI DỰNG, lúc chưa có nhịp hình nào
+// chạy. Đó đúng là tình cảnh thẻ nền. Bản cũ khởi tạo 0 và chỉ nhích lên trong
+// nhịp `requestAnimationFrame` nên ở mốc này còn 0,00; bản mới vẽ thẳng số.
+//
+// CỐ Ý KHÔNG thay thế `requestAnimationFrame` toàn cục: `vi.stubGlobal` rò sang
+// tệp khác cùng luồng chạy và làm đỏ những phép kiểm chẳng liên quan — bản đầu
+// của tệp này làm thế và đã hạ cả bộ kiểm trên CI trong khi máy tôi vẫn xanh.
+import { describe, expect, it, afterEach } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
 import { VongDiem } from '../src/screens/PhieuScreen'
 
-afterEach(() => {
-  cleanup()
-  vi.restoreAllMocks()
-  vi.useRealTimers()
-})
+afterEach(cleanup)
 
-/** Thẻ NỀN: trình duyệt nhận lời hẹn rAF nhưng không bao giờ gọi lại. */
-function theNen() {
-  vi.stubGlobal(
-    'requestAnimationFrame',
-    vi.fn(() => 1),
-  )
-  vi.stubGlobal('cancelAnimationFrame', vi.fn())
-}
-
-describe('điểm trên phiếu phụ huynh — thẻ NỀN vẫn phải đúng', () => {
-  it('TÁI HIỆN CA THẬT: 7,88 hiện ngay cả khi rAF không bao giờ chạy', () => {
-    theNen()
+describe('điểm trên phiếu phụ huynh — đúng ngay từ nhịp vẽ đầu', () => {
+  it('TÁI HIỆN CA THẬT: 7,88 hiện ngay, không chờ nhịp hình nào', () => {
     render(<VongDiem diem={7.88} tat={false} />)
     expect(screen.getByText('7,88')).toBeTruthy()
     expect(screen.queryByText('0,00')).toBeNull()
   })
 
-  it('KHÔNG gọi requestAnimationFrame nữa — không còn đường nào phụ thuộc nó', () => {
-    const raf = vi.fn(() => 1)
-    vi.stubGlobal('requestAnimationFrame', raf)
-    vi.stubGlobal('cancelAnimationFrame', vi.fn())
-    render(<VongDiem diem={5.25} tat={false} />)
-    expect(raf).not.toHaveBeenCalled()
-  })
-
   it('điểm 0 THẬT vẫn in 0,00 — không nhầm "chưa chạy xong" với "được 0 điểm"', () => {
-    theNen()
     render(<VongDiem diem={0} tat={false} />)
     expect(screen.getByText('0,00')).toBeTruthy()
   })
 
   it('máy tắt hiệu ứng (prefers-reduced-motion) vẫn đúng số', () => {
-    theNen()
     render(<VongDiem diem={10} tat={true} />)
     expect(screen.getByText('10,00')).toBeTruthy()
   })
 
   it('số lẻ giữ đúng hai chữ số thập phân kiểu Việt', () => {
-    theNen()
     render(<VongDiem diem={6.4} tat={false} />)
     expect(screen.getByText('6,40')).toBeTruthy()
   })
 
-  it('vành tròn vẫn vẽ, và vẽ theo ĐÚNG điểm chứ không phải theo số đang chạy', () => {
-    theNen()
+  it('KHÔNG còn chữ requestAnimationFrame nào trong mã màn phiếu', async () => {
+    const fs = await import('node:fs')
+    const path = await import('node:path')
+    const ma = fs.readFileSync(path.join(process.cwd(), 'src/screens/PhieuScreen.tsx'), 'utf8')
+    // Bỏ phần ghi chú rồi mới soi — ghi chú CÓ nhắc tên hàm, và nhắc là đúng.
+    const khongGhiChu = ma.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
+    expect(khongGhiChu).not.toContain('requestAnimationFrame')
+    expect(khongGhiChu).not.toContain('cancelAnimationFrame')
+  })
+
+  it('vành tròn vẫn vẽ, và vẽ theo ĐÚNG điểm chứ không theo số đang chạy', () => {
     const { container } = render(<VongDiem diem={7.88} tat={true} />)
     const vong = container.querySelectorAll('circle')
     expect(vong.length).toBe(2)
