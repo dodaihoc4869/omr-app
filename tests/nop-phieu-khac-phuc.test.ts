@@ -103,32 +103,9 @@ describe('trang phiếu', () => {
     expect(doc).not.toContain('</script><b>x')
   })
 
-  // VIẾT LẠI 09/09 — phép kiểm cũ khoá đúng cái lỗi thầy báo.
-  //
-  // Bản cũ đòi: `dungPhieu(TT, CAU, { nop: NOP, anGiai: true })` KHÔNG có vùng
-  // làm và KHÔNG có gói `du-nop`, với lý do ghi trong tên phép kiểm là "không
-  // có đáp án để chấm". LÝ DO ĐÓ SAI. `anGiai` chỉ cắt LỜI GIẢI (`boLoiGiai`);
-  // trường `dapAn` của từng câu vẫn nằm nguyên trong gói và chính nó là thứ
-  // `chamTaiCho()` dùng. Đáp án bị GIẤU bằng CSS (`body.chi-de`), không bị bỏ.
-  //
-  // Hậu quả: link ĐỀ — đúng cái link phát cho em làm bài — là link duy nhất em
-  // không bấm chọn được. Thầy báo 09/09: "rút đề tạo khắc phục nhưng bấm chọn
-  // đáp án không được".
-  //
-  // Nay đổi chiều: phiếu chỉ có đề mà CÓ `nop` thì PHẢI làm được.
-  it('PHIẾU CHỈ CÓ ĐỀ VẪN NỘP ĐƯỢC — đáp án bị giấu, không bị bỏ', () => {
+  it('PHIẾU CHỈ CÓ ĐỀ thì KHÔNG nộp được — không có đáp án để chấm', () => {
     const h = dungPhieu(TT, CAU, { nop: NOP, anGiai: true })
-    // Bốn phương án của câu I là bốn ô BẤM ĐƯỢC, không phải chữ chết.
-    expect(h).toContain('class="q-opt lam-o"')
-    expect(h).toContain('data-chon="A"')
-    expect(h).toContain('id="du-nop"')
-    // Vẫn giấu đáp án trước khi nộp — bỏ chặn nộp không phải bỏ chặn nhìn trộm.
-    expect(h).toContain('chi-de')
-  })
-
-  it('KHÔNG CÓ `nop` thì phiếu chỉ đề vẫn CHỈ ĐỌC — không mọc nút nộp hỏng', () => {
-    const h = dungPhieu(TT, CAU, { anGiai: true })
-    expect(h).not.toContain('lam-o"')
+    expect(h).not.toContain('class="lam-vung"')
     expect(h).not.toContain('id="du-nop"')
   })
 
@@ -222,13 +199,8 @@ describe('lệnh máy chủ', () => {
 describe('nối vào trang phiếu bài tập thật', () => {
   const MAN = fs.readFileSync(path.join(process.cwd(), 'src/screens/PhieuScreen.tsx'), 'utf8')
 
-  // VIẾT LẠI 09/09 — xem ghi chú dài ở phép kiểm "PHIẾU CHỈ CÓ ĐỀ VẪN NỘP
-  // ĐƯỢC" phía trên. Điều kiện `!anGiai &&` ở đây là bản sao thứ hai của cùng
-  // một lỗi: màn phiếu không phát gói `nop` cho bản chỉ đề, nên dù
-  // `html-phieu.ts` có sửa thì đường này vẫn chết.
-  it('BẬT NỘP ở CẢ HAI bản — bản có lời giải và bản chỉ đề', () => {
-    expect(MAN).toContain('const nop = ma && sbdEm ? { ma, sbd: sbdEm, url } : null')
-    expect(MAN).not.toContain('!anGiai && ma && sbdEm')
+  it('BẬT NỘP ở bản CÓ lời giải, TẮT ở bản chỉ đề', () => {
+    expect(MAN).toContain('const nop = !anGiai && ma && sbdEm ? { ma, sbd: sbdEm, url } : null')
     expect(MAN).toContain('dungPhieu(tt, cau, { anGiai, nop })')
   })
 

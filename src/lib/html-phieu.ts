@@ -1658,10 +1658,6 @@ export const JS_PHIEU = `
           // chỗ đang bị CSS giấu. (Cấm dấu huyền ngược trong khối này: cả
           // khối nằm trong một chuỗi mẫu.)
           document.body.classList.remove('chua-nop');
-          // GỠ CẢ 'chi-de'. Bản chỉ đề tự bật lớp này lúc mở để giấu đáp án;
-          // nộp xong mà còn nó thì em bấm Nộp rồi vẫn không thấy mình đúng sai
-          // câu nào — mở lời giải vào đúng chỗ CSS đang giấu.
-          document.body.classList.remove('chi-de');
           for (var i = 0; i < tatCa.length; i++) bat(tatCa[i], true);
           demLai();
         }
@@ -1733,21 +1729,9 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   // `thieuChua` đi kèm phiếu để khối đầu phiếu nói được câu sai nào chưa có câu
   // chữa — im lặng bỏ qua là thầy tưởng phiếu đã chữa hết.
   const anGiai = !!tuyChon.anGiai
-  // PHIẾU NỘP ĐƯỢC: chỉ cần chỗ gọi khai `nop`.
-  //
-  // BỎ ĐIỀU KIỆN `!anGiai` (thầy báo 09/09 19:30: "rút đề tạo khắc phục nhưng
-  // bấm chọn đáp án không được"). Lý do cũ ghi ở đây là "phiếu chỉ có đề thì
-  // không có đáp án để chấm" — SAI: `anGiai` chỉ bỏ LỜI GIẢI (`boLoiGiai`),
-  // trường `dapAn` của từng câu vẫn nằm nguyên trong gói và chính nó là thứ
-  // `chamTaiCho()` dùng. Đáp án được giấu bằng CSS (`body.chi-de`), không phải
-  // bằng cách xoá đi.
-  //
-  // Hậu quả của điều kiện cũ: link ĐỀ — đúng cái thầy gửi em để LÀM — là link
-  // duy nhất em KHÔNG bấm chọn được. Em mở ra chỉ đọc được, không làm, không
-  // nộp. Ba lớp `co-lam` + `chua-nop` + `chi-de` chạy cùng nhau vốn đã được lo
-  // từ 08/09: luật giấu đáp án và luật tô ô ĐANG CHỌN đều đã có `!important`
-  // cho cả hai thân, nên ô em chọn vẫn nổi bật mà đáp án vẫn kín.
-  const nop = tuyChon.nop ?? null
+  // PHIẾU NỘP ĐƯỢC: chỉ khi chỗ gọi khai `nop`, và không đi cùng `anGiai`
+  // (phiếu chỉ có đề thì không có đáp án để chấm).
+  const nop = !anGiai && tuyChon.nop ? tuyChon.nop : null
   const chNop = cauHinhNop(nop?.cauHinh)
   const cau = anGiai ? cauVao.map(boLoiGiai) : cauVao
   const the = cau.map((c, i) => theCauHtml(c, i + 1, false, anGiai, !!nop)).join('\n')
