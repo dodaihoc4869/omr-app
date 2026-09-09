@@ -23,7 +23,7 @@ import './index.css'
 import 'katex/dist/katex.min.css'
 import App from './App.tsx'
 
-import { chuanHoaDuongDan } from './lib/vai-tro'
+import { chuanHoaDuongDan, docDuongVao, nhoVaiDaDung } from './lib/vai-tro'
 import { donPhienCu } from './lib/don-phien-cu'
 import { batTuHoiBanMoi, batTuTaiLaiKhiDoiBan, daySangBanMoi } from './lib/cap-nhat-app'
 import { batSuKienCaiApp } from './lib/pwa-install'
@@ -37,6 +37,16 @@ donPhienCu()
 // làm, nhưng 404.html không chạy trên máy đã cài app (service worker trả thẳng
 // index.html). Sau bước này cả app chỉ thấy MỘT dạng URL.
 chuanHoaDuongDan(import.meta.env.BASE_URL)
+
+// NHỚ VAI MÁY NÀY DÙNG — để lần sau mở `/` trần (biểu tượng trên màn hình chính
+// luôn mở `/` trần vì `start_url` của manifest là `./`) app biết đưa em vào màn
+// thi thay vì màn quản lý của thầy. Xem ghi chú dài ở `laManThayQuanLy`.
+// Chỉ ghi khi đường vào NÓI RÕ vai; `/` trần không tự ghi gì.
+{
+  const dv = docDuongVao(location.search, location.pathname)
+  if (dv.vai === 'gv') nhoVaiDaDung('gv')
+  else if (dv.maCa || dv.vai === 'diem') nhoVaiDaDung('hs')
+}
 
 // beforeinstallprompt chỉ bắn MỘT LẦN và bắn trước khi React kịp mount — phải
 // nghe từ đây, không nghe được trong component. Có nó thì thẻ "Cài app lên màn

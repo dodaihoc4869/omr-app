@@ -115,5 +115,44 @@ export function laManThayQuanLy(search: string, duongDan = ''): boolean {
   const d = docDuongVao(search, duongDan)
   if (d.vai === 'phieu' || d.vai === 'diem') return false
   if (d.maCa) return false
+  // ĐƯỜNG NÓI RÕ `gv` LUÔN THẮNG CỜ. Bản đầu của bản vá này hỏi cờ trước, nên
+  // trên máy thầy từng mở link thi thử thì gõ `?vai=gv` cũng không vào được màn
+  // quản lý — phép kiểm bắt ngay.
+  if (d.vai === 'gv') return true
+  // `/` TRẦN: theo VAI MÁY NÀY ĐÃ DÙNG, không mặc định là màn thầy.
+  //
+  // Thầy báo 09/09 17:45, giữa ca thi: em làm đúng hướng dẫn "Thêm vào Màn hình
+  // chính" rồi mở từ biểu tượng thì ra APP GIÁO VIÊN, không vào thi được.
+  // Nguyên nhân: `start_url` của manifest là `./`, nên biểu tượng luôn mở
+  // `/omr-app/` TRẦN — mất sạch `/t/<mã ca>` mà em thêm từ đó. Mà `/` trần thì
+  // hàm này vẫn trả `true` ⇒ màn quản lý. Hướng dẫn của chính app dẫn em vào
+  // ngõ cụt.
+  //
+  // Nay `/` trần hỏi máy: máy này lần gần nhất vào bằng vai nào. Máy chưa từng
+  // dùng thì GIỮ NGUYÊN hành vi cũ (màn thầy) — không đổi gì cho máy mới.
+  if (vaiDaDung() === 'hs') return false
   return true
+}
+
+const KHOA_VAI_DA_DUNG = 'ddh.vaiDaDung'
+
+/** Máy này lần gần nhất vào bằng vai nào: `'hs'` (vào thi) · `'gv'` (quản lý) ·
+ * `null` (chưa từng). Chỉ dùng để quyết `/` trần — mọi đường có vai rõ ràng đều
+ * thắng cờ này. */
+export function vaiDaDung(): 'hs' | 'gv' | null {
+  try {
+    const v = localStorage.getItem(KHOA_VAI_DA_DUNG)
+    return v === 'hs' || v === 'gv' ? v : null
+  } catch {
+    return null
+  }
+}
+
+/** Ghi lại vai vừa dùng. Gọi khi app khởi động với một đường CÓ vai rõ ràng. */
+export function nhoVaiDaDung(vai: 'hs' | 'gv'): void {
+  try {
+    localStorage.setItem(KHOA_VAI_DA_DUNG, vai)
+  } catch {
+    // máy chặn localStorage — `/` trần giữ hành vi cũ, không vỡ gì
+  }
 }
