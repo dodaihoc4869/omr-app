@@ -63,13 +63,19 @@ describe('từ vựng đóng — app không được tự nghĩ mã', () => {
   })
 
   // Con số cập nhật 07/09/2026 khi mở bảng cơ chế cho 13 chương phụ:
-  // 23 -> 25 việc (thêm XAC_DINH_SO_OXI_HOA, TINH_SUC_DIEN_DONG),
-  // 5 -> 18 chương, 37 -> 104 cơ chế. Đây là bảng ĐÓNG nên số phải khớp đúng
-  // `kho-de/DANG-BAI.md`; lệch một mã là app dựng ô chọn thiếu mã cho thầy.
+  // 23 -> 25 việc, 5 -> 18 chương, 37 -> 104 cơ chế.
+  //
+  // 09/09/2026: 25 -> 27 việc, 18 -> 21 chương, 104 -> 129 cơ chế. Phép kiểm này
+  // KHÔNG bắt được lần trôi vừa rồi vì nó khoá con số của BÊN SAI: bảng TS chép
+  // tay đã thiếu 2 việc, 3 chương, 7 cơ chế mà con số ở đây lại chép theo bảng
+  // TS chứ không theo `kho-de/DANG-BAI.md`, nên hai bên khớp nhau trong khi cả
+  // hai cùng lệch kho — app báo 143 câu "mã ngoài bảng đóng" còn kho báo
+  // "Mã lạ 0". Nay bảng TS do `kho-de/cong-cu/xuat-tu-vung-app.py` SINH RA từ
+  // `tu_vung_dang.py`, nên con số dưới đây chỉ còn là mốc để thấy bảng đổi.
   it('bảng trong app khớp bảng trong kho-de/DANG-BAI.md về số lượng', () => {
-    expect(Object.keys(VIEC)).toHaveLength(25)
-    expect(Object.keys(CO_CHE)).toHaveLength(18)
-    expect(Object.values(CO_CHE).reduce((a, c) => a + Object.keys(c).length, 0)).toBe(104)
+    expect(Object.keys(VIEC)).toHaveLength(27)
+    expect(Object.keys(CO_CHE)).toHaveLength(21)
+    expect(Object.values(CO_CHE).reduce((a, c) => a + Object.keys(c).length, 0)).toBe(129)
   })
 
   it('mọi chương đều có tên tiếng Việt để thầy đọc, không chương nào trơ mã', () => {

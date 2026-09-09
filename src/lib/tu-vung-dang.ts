@@ -1,4 +1,10 @@
-// TỪ VỰNG ĐÓNG CỦA MÃ DẠNG — bản chép máy đọc được của `kho-de/DANG-BAI.md`.
+// TỪ VỰNG ĐÓNG CỦA MÃ DẠNG — bản MÁY SINH từ `kho-de/cong-cu/tu_vung_dang.py`,
+// vốn là bản máy đọc được của `kho-de/DANG-BAI.md`.
+//
+// 09/09/2026: hai khối VIEC và CO_CHE chuyển từ CHÉP TAY sang SINH RA. Chép tay
+// đã trôi mất 2 việc, 3 chương và 7 cơ chế, nên app báo "143 câu mang mã NGOÀI
+// bảng đóng" trong khi `gan_dang.py --thu` ở kho báo "Mã lạ 0" — hai bên nhìn
+// hai bảng khác nhau, không bên nào sai một mình.
 //
 // Đặc tả v3 mục 3: bảng mã đóng ở HAI TỪ VỰNG (cơ chế theo chương, việc dùng
 // chung), KHÔNG đóng ở danh sách tổ hợp — bản đầu liệt kê sẵn 43 tổ hợp chỉ phủ
@@ -7,7 +13,8 @@
 // App KHÔNG tự nghĩ mã. File này chỉ để hai việc:
 //   1. dựng ô chọn mã cho thầy sửa câu gán sai (không cho gõ tay);
 //   2. đọc mã ra tiếng Việt để thầy nhìn hiểu ngay.
-// Thêm mã mới thì sửa `kho-de/DANG-BAI.md` TRƯỚC, rồi chép sang đây.
+// Thêm mã mới: sửa `kho-de/DANG-BAI.md` TRƯỚC, rồi `tu_vung_dang.py`, rồi chạy
+// `python3 kho-de/cong-cu/xuat-tu-vung-app.py <omr-app>` để sinh lại tệp này.
 
 /** Tầng 3 — việc phải làm, dùng chung mọi chương. */
 export const VIEC: Record<string, string> = {
@@ -36,9 +43,20 @@ export const VIEC: Record<string, string> = {
   TINH_NANG_LUONG: 'tính năng lượng',
   TINH_PHAN_TRAM: 'tính phần trăm',
   TINH_SUC_DIEN_DONG: 'tính sức điện động',
+  XAC_DINH_DIEN_TICH: 'xác định điện tích',
+  TINH_TI_SO: 'tính tỉ số',
 }
 
-/** Tầng 1 + 2 — cơ chế, theo từng chương. */
+/** Tầng 1 + 2 — cơ chế, theo từng chương.
+ *
+ * MƯỜI BA CHƯƠNG ĐƯỢC MỞ BẢNG 07/09/2026. Trước đó các chương này chỉ có tên,
+ * 262 câu trong kho mang `dang: null` vì "chương chưa có bảng cơ chế" — ca thi
+ * dùng bộ 12-BD7 chỉ có 26/84 câu có mã nên phiếu không rút được câu chữa nào.
+ * Bảng dựng từ việc đọc tay đủ 262 câu đó.
+ *
+ * KHỐI DƯỚI ĐÂY DO MÁY SINH, đừng sửa tay: chạy
+ * `python3 kho-de/cong-cu/xuat-tu-vung-app.py <omr-app>` sau khi sửa
+ * `kho-de/DANG-BAI.md` và `kho-de/cong-cu/tu_vung_dang.py`. */
 export const CO_CHE: Record<string, Record<string, string>> = {
   ESTER: {
     CAU_TAO: 'Cấu tạo',
@@ -64,7 +82,7 @@ export const CO_CHE: Record<string, Record<string, string>> = {
     CAN_BANG: 'Chuyển dịch cân bằng',
     HANG_SO_K: 'Hằng số cân bằng',
     DIEN_LI: 'Sự điện li',
-    ACID_BASE: 'Thuyết acid–base',
+    ACID_BASE: 'Thuyết acid-base',
     PH_DUNG_DICH: 'pH dung dịch',
     THUY_PHAN_MUOI: 'Môi trường muối',
     CHUAN_DO: 'Chuẩn độ',
@@ -87,20 +105,6 @@ export const CO_CHE: Record<string, Record<string, string>> = {
     PROTEIN: 'Protein',
     POLYMER_N: 'Polymer chứa N',
   },
-
-  // MƯỜI BA CHƯƠNG MỞ BẢNG 07/09/2026. Trước đó các chương này chỉ có tên,
-  // 262 câu trong kho mang `dang: null` vì "chương chưa có bảng cơ chế" — ca
-  // thi dùng bộ 12-BD7 chỉ có 26/84 câu có mã nên phiếu không rút được câu
-  // chữa nào. Bảng dựng từ việc đọc tay đủ 262 câu đó, chép y `DANG-BAI.md`.
-  KIM_LOAI_IA_IIA: {
-    TINH_CHAT_KIM_LOAI: 'Tính chất kim loại IA, IIA',
-    MAU_NGON_LUA: 'Màu ngọn lửa',
-    DO_TAN: 'Độ tan hợp chất',
-    NHIET_PHAN: 'Nhiệt phân muối carbonate',
-    NUOC_CUNG: 'Nước cứng',
-    SAN_XUAT: 'Solvay, chlorine – kiềm',
-    HOP_CHAT: 'Hợp chất và ứng dụng',
-  },
   KIM_LOAI: {
     LIEN_KET_KIM_LOAI: 'Liên kết kim loại, tinh thể',
     TINH_CHAT_VAT_LI: 'Tính chất vật lí',
@@ -109,6 +113,15 @@ export const CO_CHE: Record<string, Record<string, string>> = {
     AN_MON: 'Ăn mòn và chống ăn mòn',
     HOP_KIM: 'Hợp kim',
     UNG_DUNG: 'Ứng dụng kim loại',
+  },
+  KIM_LOAI_IA_IIA: {
+    TINH_CHAT_KIM_LOAI: 'Tính chất kim loại IA, IIA',
+    MAU_NGON_LUA: 'Màu ngọn lửa',
+    DO_TAN: 'Độ tan hợp chất',
+    NHIET_PHAN: 'Nhiệt phân muối carbonate',
+    NUOC_CUNG: 'Nước cứng',
+    SAN_XUAT: 'Solvay, chlorine – kiềm',
+    HOP_CHAT: 'Hợp chất và ứng dụng',
   },
   POLYMER: {
     CAU_TAO: 'Cấu tạo, mắt xích',
@@ -158,6 +171,7 @@ export const CO_CHE: Record<string, Record<string, string>> = {
     UNG_DUNG: 'Ứng dụng',
   },
   HYDROCARBON: {
+    LIEN_KET_PHAN_TU: 'Liên kết sigma, pi và hình dạng phân tử',
     CAU_TAO: 'Cấu tạo, đồng phân',
     TINH_CHAT_VAT_LI: 'Tính chất vật lí',
     PHAN_UNG: 'Phản ứng, nhận biết',
@@ -168,6 +182,16 @@ export const CO_CHE: Record<string, Record<string, string>> = {
     LIEN_KET_CHT: 'Liên kết cộng hoá trị',
     LIEN_KET_HYDROGEN: 'Liên kết hydrogen',
     VAN_DER_WAALS: 'Tương tác van der Waals',
+    QUY_TAC_OCTET: 'Quy tắc octet',
+    XEN_PHU_AO: 'Xen phủ orbital, liên kết sigma và pi',
+    NANG_LUONG_LIEN_KET: 'Năng lượng liên kết',
+  },
+  BANG_TUAN_HOAN: {
+    CAU_TRUC_BTH: 'Cấu trúc bảng tuần hoàn, ô, chu kì, nhóm',
+    VI_TRI_TU_CAU_HINH: 'Suy vị trí từ cấu hình electron',
+    XU_HUONG_BIEN_DOI: 'Xu hướng biến đổi tính chất',
+    OXIDE_HYDROXIDE: 'Oxide cao nhất, hydroxide, hợp chất với hydrogen',
+    PHAN_LOAI_NGUYEN_TO: 'Phân loại kim loại, phi kim, khí hiếm',
   },
   NANG_LUONG_HH: {
     TOA_THU_NHIET: 'Phản ứng toả nhiệt, thu nhiệt',
@@ -179,11 +203,31 @@ export const CO_CHE: Record<string, Record<string, string>> = {
     YEU_TO: 'Yếu tố ảnh hưởng tốc độ',
     XUC_TAC: 'Xúc tác',
     BIEU_THUC: 'Biểu thức tốc độ',
+    DUONG_CONG_DONG_HOC: 'Đường cong động học',
+  },
+  HALOGEN: {
+    DON_CHAT_HALOGEN: 'Đơn chất halogen, tính chất vật lí và tính oxi hoá',
+    PHAN_UNG_HALOGEN: 'Phản ứng của halogen với hydrogen, kiềm, muối halide',
+    HYDROGEN_HALIDE: 'Hydrogen halide và hydrohalic acid',
+    ION_HALIDE: 'Ion halide, nhận biết và tính khử',
+    UNG_DUNG_DIEU_CHE: 'Ứng dụng và điều chế halogen',
+  },
+  NITROGEN_SULFUR: {
+    DON_CHAT_N2: 'Đơn chất nitrogen, cấu tạo và tính trơ',
+    AMMONIA_AMMONIUM: 'Ammonia và muối ammonium',
+    OXIDE_NITROGEN: 'Các oxide của nitrogen và mưa acid',
+    NITRIC_ACID: 'Nitric acid và muối nitrate',
+    O_NHIEM_PHU_DUONG: 'Ô nhiễm môi trường và phú dưỡng',
+    DON_CHAT_S: 'Sulfur và hợp chất sulfur dioxide',
+    SULFURIC_ACID: 'Sulfuric acid, muối sulfate và oleum',
+    SAN_XUAT_H2SO4: 'Sản xuất sulfuric acid',
   },
   HUU_CO_DAI_CUONG: {
     PHAN_LOAI: 'Phân loại hợp chất hữu cơ',
     PHO: 'Phổ MS, phổ IR',
     LAP_CTPT: 'Lập công thức phân tử',
+    TACH_CHAT: 'Tách và tinh chế hợp chất hữu cơ',
+    CAU_TAO_HH: 'Thuyết cấu tạo hoá học, đồng đẳng, đồng phân',
   },
 }
 
@@ -207,6 +251,9 @@ export const TEN_CHUONG: Record<string, string> = {
   NANG_LUONG_HH: 'Năng lượng hoá học',
   TOC_DO: 'Tốc độ phản ứng',
   HUU_CO_DAI_CUONG: 'Đại cương hoá hữu cơ',
+  BANG_TUAN_HOAN: 'Bảng tuần hoàn các nguyên tố',
+  HALOGEN: 'Nguyên tố nhóm halogen',
+  NITROGEN_SULFUR: 'Nitrogen và sulfur',
 }
 
 export const DS_CHUONG = Object.keys(CO_CHE)
