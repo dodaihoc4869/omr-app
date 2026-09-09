@@ -1662,12 +1662,21 @@ export default function ExamTakeScreen() {
       const g = gradeFromKeyBank(kb, done.maCa, done.sbd, done.answers)
       setGraded(g)
       if (!done.integrity.blocked) setGradedPopup(true)
+      // MẪU SỐ máy em vừa chia. `gradeFromKeyBank` cắt đề theo `kb.soCau`, thiếu
+      // thì rơi về mặc định 18/4/6 — đúng chỗ đã làm điểm ca 447479 lệch (xem
+      // ghi chú dài ở `ghiDiem`). Khai đúng con số ĐÃ DÙNG, không khai con số
+      // mình mong là đúng: máy chủ đối chiếu rồi mới cho ghi.
+      const soCauEmDaChia = (kb as { soCau?: { I: number; II: number; III: number } }).soCau ?? undefined
       if (scriptUrlRef.current.trim()) {
         // Ghi điểm + chi tiết từng câu (chuyên đề, mức độ, giây làm) lên máy chủ
         // — quyền bằng id thiết bị của chính lượt này, không cần mã bí mật.
-        ghiDiem(scriptUrlRef.current.trim(), '', done.maCa, [
-          taoBaiGhiDiem(kb, done.maCa, done.sbd, done.lanThu ?? 1, done.answers, g, done.giayCau, done.idThietBi ?? layIdThietBi()),
-        ]).catch(() => {
+        ghiDiem(
+          scriptUrlRef.current.trim(),
+          '',
+          done.maCa,
+          [taoBaiGhiDiem(kb, done.maCa, done.sbd, done.lanThu ?? 1, done.answers, g, done.giayCau, done.idThietBi ?? layIdThietBi())],
+          soCauEmDaChia,
+        ).catch(() => {
           // máy thầy chấm lại sẽ ghi đè — không chặn luồng
         })
         sendParentFeedback(
@@ -1681,6 +1690,7 @@ export default function ExamTakeScreen() {
           { phanI: g.wrongPhanI, phanII: g.wrongPhanII, phanIII: g.wrongPhanIII },
           { I: g.score.phanIScore, II: g.score.phanIIScore, III: g.score.phanIIIScore },
           done.idThietBi ?? layIdThietBi(),
+          soCauEmDaChia,
         ).catch(() => {
           // Gửi nhận xét cho phụ huynh không phải luồng chính — lỗi thì bỏ qua.
         })

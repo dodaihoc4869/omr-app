@@ -430,7 +430,13 @@ export default function ExamMonitorScreen() {
     if (can.length === 0) return
     const bai = can.map((e) => taoBaiGhiDiem(bank, chiTiet.ca.maCa, e.sbd, e.moiNhat.lanThu, e.moiNhat.dapAn!, e.graded!, e.moiNhat.giayCau))
     let huy = false
-    ghiDiem(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, bai)
+    // MẪU SỐ đã dùng để chấm — lấy từ CHÍNH bank vừa gộp, không lấy `soCauCa`
+    // thô, để con số khai lên máy chủ đúng bằng con số đã chia. Xem `ghiDiem`.
+    ghiDiem(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, bai, {
+      I: bank.phanI.length,
+      II: bank.phanII.length,
+      III: bank.phanIII.length,
+    })
       .then((kq) => {
         if (huy) return
         for (const e of can) if (kq.daGhi.includes(e.sbd)) daGhiRef.current.add(`${e.sbd}:${e.moiNhat.lanThu}:${e.moiNhat.nopLuc}`)

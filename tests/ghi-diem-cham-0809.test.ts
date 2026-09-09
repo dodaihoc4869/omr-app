@@ -148,7 +148,9 @@ describe('máy chủ dùng đúng hàm mới', () => {
 
 describe('máy em: hạn và cỡ lô hợp với lượt gọi nặng nhất', () => {
   it('ghiDiem dùng hạn 90 giây, không phải mặc định 25', () => {
-    expect(API).toContain("{ action: 'ghiDiem', secret, maCa, bai, luatDiem: LUAT_DIEM }, 90)")
+    // Gói nay mang thêm `soCau` (mẫu số đã dùng, siết 09/09) — con số 90 giây
+    // và lý do của nó không đổi.
+    expect(API).toContain("{ action: 'ghiDiem', secret, maCa, bai, luatDiem: LUAT_DIEM, soCau }, 90)")
   })
 
   it('chamLaiCa ghi theo lô 3 em, không phải 5', () => {

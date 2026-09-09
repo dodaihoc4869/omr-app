@@ -58,6 +58,13 @@ export interface KetQuaChamLaiCa {
  * lên Sheet. Trả bảng đối chiếu cũ → mới. */
 export async function chamLaiCa(url: string, mat: string, maCa: string): Promise<KetQuaChamLaiCa> {
   const goi = await gomCa(url, mat, maCa)
+  // MẪU SỐ đã dùng để chấm lô này — khai lên máy chủ để nó đối chiếu với số câu
+  // thật của ca. Xem ghi chú dài ở `ghiDiem`.
+  const soCauCham = {
+    I: goi.keyBank.phanI.length,
+    II: goi.keyBank.phanII.length,
+    III: goi.keyBank.phanIII.length,
+  }
   const em: DoiDiemMotEm[] = goi.daCham.map((e) => {
     const s = e.graded.score
     const cu: DiemBaPhan = {
@@ -79,7 +86,7 @@ export async function chamLaiCa(url: string, mat: string, maCa: string): Promise
   // song: Apps Script khoá script theo từng lượt ghi.
   const kq = { daGhi: [] as string[], tuChoi: [] as string[] }
   for (let i = 0; i < bai.length; i += CO_LO) {
-    const phan = await ghiDiem(url, mat, maCa, bai.slice(i, i + CO_LO))
+    const phan = await ghiDiem(url, mat, maCa, bai.slice(i, i + CO_LO), soCauCham)
     kq.daGhi.push(...phan.daGhi)
     kq.tuChoi.push(...phan.tuChoi)
   }

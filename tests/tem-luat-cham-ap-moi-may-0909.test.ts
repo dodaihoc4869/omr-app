@@ -13,20 +13,26 @@
 //       return String(body.luatDiem || '') === LUAT_DIEM
 //     }
 //
-// Lý do khi đó là "máy thầy thì tin được". Sai. Máy thầy KHÔNG chỉ có một cái:
-// điện thoại, tab chưa tải lại, máy tính khác — đều mang mã bí mật, và bản app
-// trong đó có thể còn cũ. Màn Ca thi tự ghi điểm cho MỌI em nó chấm được ngay
-// khi mở ra (`ExamMonitorScreen`), nên MỘT màn mở trên một máy chạy bản cũ là
-// ghi lại cả ca trong một loạt — khớp đúng hình dạng "36/36, toàn thang cũ".
-// Ba mươi sáu máy em mỗi máy đè đúng dòng của mình cùng lúc thì khó hơn nhiều.
+// Lý do khi đó là "máy thầy thì tin được". Sai — máy thầy không chỉ có một cái:
+// điện thoại, tab chưa tải lại, máy tính khác đều mang mã bí mật. Một bản app cũ
+// ở bất kỳ đâu, chỉ cần có mã bí mật, là đè được toàn bộ bảng điểm mà không ai
+// biết. Lỗ đó có thật và tự nó đủ lý do để bịt.
 //
 // SIẾT: tem là cửa DUY NHẤT, áp cho mọi máy. Bản app hiện hành gửi tem trong
 // MỌI lượt ghi điểm nên siết chỗ này không chặn nhầm đường nào đang dùng.
 //
-// KHAI RÕ GIỚI HẠN: đây là giả thuyết khớp hình dạng lỗi, KHÔNG phải bằng chứng
-// trực tiếp — máy chủ không ghi lại máy nào đã ghi dòng nào. Nhưng lỗ thì có
-// thật và tự nó đủ lý do để bịt: một bản app cũ ở bất kỳ đâu, chỉ cần có mã bí
-// mật, là đè được toàn bộ bảng điểm mà không ai biết.
+// ĐÍNH CHÍNH (thêm chiều 09/09, SAU khi siết): tôi từng viết ở đây rằng lỗ này
+// LÀ nguyên nhân ca 447479 bị đè. **Sai, và đã bị dữ liệu bác bỏ.** Sau khi v66
+// chạy, tôi gọi thật `ghiDiem` bỏ tem thì máy chủ TỪ CHỐI cả ba em — chốt hoạt
+// động đúng — mà điểm ca đó VẪN bị đè thêm một lần nữa. Tức thứ ghi sai mang
+// tem hợp lệ, không phải bản cũ.
+//
+// Nguyên nhân thật đo được sau đó là MẪU SỐ, không phải luật chấm: hai bên ra
+// cùng số câu đúng nhưng chia cho số câu khác nhau. Xem
+// `tests/mau-so-cham-phai-khop-0909.test.ts`.
+//
+// Phép kiểm trong tệp này vẫn giữ nguyên giá trị — nó khoá một lỗ có thật — chỉ
+// lời khai về NGUYÊN NHÂN là sai và nay đã sửa.
 import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -86,7 +92,7 @@ describe('tem luật chấm — áp cho MỌI máy, không chừa máy thầy', 
 
 describe('bản app hiện hành gửi tem ở MỌI lượt ghi điểm — siết không chặn nhầm', () => {
   it('ghiDiem gửi tem', () => {
-    expect(API).toContain("postJson(scriptUrl, { action: 'ghiDiem', secret, maCa, bai, luatDiem: LUAT_DIEM }")
+    expect(API).toContain("postJson(scriptUrl, { action: 'ghiDiem', secret, maCa, bai, luatDiem: LUAT_DIEM, soCau }")
   })
 
   it('sendParentFeedback gửi tem', () => {
@@ -115,11 +121,13 @@ describe('lượt bị chặn phải BÁO RA, không im lặng', () => {
 
   it('chi tiết TỪNG CÂU vẫn nhận — chỉ cột điểm bị giữ lại', () => {
     // Khối ghi chi tiết câu nằm NGOÀI nhánh `if (duocGhiDiem_(...))`.
-    const dau = GS.indexOf('if (duocGhiDiem_(coMat, body)) {')
+    // Hình dạng đổi 09/09 chiều: thêm chốt mẫu số nên là if / else if / else.
+    // Điều phải giữ vẫn y nguyên — chi tiết câu nằm NGOÀI mọi nhánh điểm.
+    const dau = GS.indexOf('if (!duocGhiDiem_(coMat, body)) {')
     expect(dau).toBeGreaterThan(0)
-    const sau = GS.slice(dau, dau + 900)
+    const sau = GS.slice(dau, dau + 1400)
     expect(sau).toContain("tuChoi.push(sbd + ': bản app cũ")
-    // Vòng gom dòng chi tiết cũ đứng SAU khối if/else, tức luôn chạy.
+    // Vòng gom dòng chi tiết cũ đứng SAU cả khối if/else, tức luôn chạy.
     expect(sau.indexOf('xoaDong.push(i + 1)')).toBeGreaterThan(sau.indexOf("tuChoi.push(sbd + ': bản app cũ"))
   })
 

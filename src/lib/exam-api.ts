@@ -750,6 +750,8 @@ export async function sendParentFeedback(
   /** Id thiết bị của CHÍNH lượt này. Máy chủ đối chiếu với lượt trong LuotThi —
    * không có hoặc không khớp thì không được đặt điểm cho em khác. */
   idThietBi?: string,
+  /** MẪU SỐ đã dùng để chấm — xem ghi chú dài ở `ghiDiem`. */
+  soCau?: { I: number; II: number; III: number },
 ): Promise<void> {
   const result = await postJson(scriptUrl, {
     action: 'sendFeedback',
@@ -764,6 +766,9 @@ export async function sendParentFeedback(
     idThietBi,
     // Tem luật chấm — xem ghi chú ở `LUAT_DIEM` trong engine/score.ts.
     luatDiem: LUAT_DIEM,
+    // MẪU SỐ đã dùng để chấm — xem ghi chú dài ở `ghiDiem`. Lệch số câu thật
+    // của ca thì máy chủ từ chối đặt điểm, có báo lý do.
+    soCau,
   })
   if (!result.ok) throw new Error(result.error || 'Gửi nhận xét thất bại')
 }
@@ -1937,7 +1942,25 @@ export interface BaiGhiDiem {
 
 /** Ghi điểm + chi tiết từng câu cho nhiều lượt trong 1 lần gọi (máy thầy: secret;
  * máy em: secret rỗng + idThietBi của lượt). Trả về SBD đã ghi / bị từ chối. */
-export async function ghiDiem(scriptUrl: string, secret: string, maCa: string, bai: BaiGhiDiem[]): Promise<{ daGhi: string[]; tuChoi: string[] }> {
+export async function ghiDiem(
+  scriptUrl: string,
+  secret: string,
+  maCa: string,
+  bai: BaiGhiDiem[],
+  /** MẪU SỐ đã dùng để chấm lô này — số câu mỗi phần của ca.
+   *
+   * VÌ SAO BẮT KHAI (đo 09/09 chiều, ca 447479 bị đè điểm lần thứ ba).
+   * Hai bên chấm ra CÙNG số câu đúng nhưng khác điểm, vì khác mẫu số: máy chấm
+   * đúng chia theo số câu thật của ca (8/2/2 với ca đó), bên chấm sai rơi về
+   * mặc định 18/4/6. Em 12038: 4 câu đúng phần I ra 2,25 với mẫu số đúng, ra
+   * 1,00 với mẫu số mặc định — cả ba phần đều khớp kiểu ấy.
+   *
+   * Máy chủ giữ `keyBank.soCau` của ca, tức BIẾT mẫu số đúng. Nên nay bên ghi
+   * phải khai mẫu số nó dùng; lệch là từ chối, có báo lý do. Chốt này chặn đúng
+   * nguyên nhân và KHÔNG phụ thuộc vào việc máy nào đang chấm sai — thứ tôi đã
+   * đoán sai hai lần liên tiếp. */
+  soCau?: { I: number; II: number; III: number },
+): Promise<{ daGhi: string[]; tuChoi: string[] }> {
   if (bai.length === 0) return { daGhi: [], tuChoi: [] }
   // `luatDiem`: tem luật chấm — máy chủ chỉ nhận ĐIỂM từ máy em khi tem khớp.
   // Xem ghi chú ở `LUAT_DIEM` trong engine/score.ts.
@@ -1946,7 +1969,7 @@ export async function ghiDiem(scriptUrl: string, secret: string, maCa: string, b
   // ca 248567 chết ở ĐÂY (`ghiDiem` một lô hỏng ở 25,3 giây) chứ không phải ở
   // `chiTietCa` (xong trong 5 giây) như vòng đoán trước. Lượt này vừa xoá dòng
   // chi tiết cũ vừa ghi hàng chục dòng mới — nặng nhất trong cả chuỗi.
-  const r = await postJson(scriptUrl, { action: 'ghiDiem', secret, maCa, bai, luatDiem: LUAT_DIEM }, 90)
+  const r = await postJson(scriptUrl, { action: 'ghiDiem', secret, maCa, bai, luatDiem: LUAT_DIEM, soCau }, 90)
   if (!r.ok) throw new Error(r.error || 'Không ghi được điểm')
   return { daGhi: r.daGhi ?? [], tuChoi: r.tuChoi ?? [] }
 }

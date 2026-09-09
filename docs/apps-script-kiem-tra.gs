@@ -230,6 +230,76 @@ function duocGhiDiem_(coMat, body) {
   return String((body && body.luatDiem) || '') === LUAT_DIEM
 }
 
+/** Số câu mỗi phần THẬT của một ca, đọc từ chính gói đáp án máy chủ đang giữ.
+ * Trả `null` khi ca chưa có gói (chưa công bố điểm) — lúc đó không đối chiếu. */
+function soCauThatCuaCa_(ca) {
+  try {
+    if (!ca || !ca.keyBankRef) return null
+    const kb = docJsonLon_(ca.keyBankRef)
+    if (!kb) return null
+    if (kb.soCau && (Number(kb.soCau.I) || Number(kb.soCau.II) || Number(kb.soCau.III))) {
+      return { I: Number(kb.soCau.I) || 0, II: Number(kb.soCau.II) || 0, III: Number(kb.soCau.III) || 0 }
+    }
+    return null
+  } catch (err) {
+    return null
+  }
+}
+
+/** MẪU SỐ CÓ KHỚP KHÔNG — chốt thêm 09/09 chiều, sau khi ca 447479 bị đè điểm
+ * lần thứ ba.
+ *
+ * ĐO ĐƯỢC (chi tiết từng câu của em 12052, ca 447479): hai bên chấm ra CÙNG số
+ * câu đúng — phần I 5/8, phần II 0 trọn vẹn, phần III 1/2 — nhưng ra hai điểm
+ * khác nhau. Khác ở MẪU SỐ: bên chấm đúng chia theo số câu thật của ca (8/2/2),
+ * bên chấm sai rơi về mặc định 18/4/6. Em 12038: 4 câu đúng phần I ra 2,25 với
+ * mẫu số đúng và 1,00 với mẫu số mặc định; cả ba phần đều lệch đúng kiểu ấy.
+ *
+ * Tôi đã đoán sai HAI LẦN về việc máy nào ghi (bản app cũ; thiếu bản đồ đề
+ * riêng) — cả hai đều bị dữ liệu bác bỏ. Nên chốt này KHÔNG đoán máy nào cả: nó
+ * chặn đúng cái sai đo được, là mẫu số. Bên ghi phải khai mẫu số đã dùng; lệch
+ * số câu thật của ca thì từ chối, và nói rõ lệch bao nhiêu.
+ *
+ * Không khai (bản app cũ hơn bản vá này) ⇒ CHO QUA, chỉ ghi nhật ký. Chặn cả
+ * bản chưa kịp cập nhật là tự chặn đường ghi điểm của chính mình giữa ca thi. */
+function mauSoKhop_(ca, body) {
+  const that = soCauThatCuaCa_(ca)
+  const khai = body && body.soCau
+  if (!that || !khai) return { khop: true, lyDo: '' }
+  const a = { I: Number(khai.I) || 0, II: Number(khai.II) || 0, III: Number(khai.III) || 0 }
+  if (a.I === that.I && a.II === that.II && a.III === that.III) return { khop: true, lyDo: '' }
+  return {
+    khop: false,
+    lyDo: 'chấm theo ' + a.I + '/' + a.II + '/' + a.III + ' mà ca là ' + that.I + '/' + that.II + '/' + that.III,
+  }
+}
+
+/** NHẬT KÝ GHI ĐIỂM. Máy chủ trước nay không lưu AI đã ghi dòng nào, nên mỗi
+ * lần điểm bị đè là phải ngồi đoán — tôi đã đoán sai hai lần. Nay mỗi lượt ghi
+ * để lại một dòng: lệnh nào, em nào, điểm bao nhiêu, mẫu số nào, máy nào, có mã
+ * bí mật không, có bị từ chối không.
+ *
+ * Ghi vào sheet riêng nên không đụng bảng nào đang dùng; hỏng thì nuốt lỗi, vì
+ * nhật ký không được phép làm chết luồng ghi điểm. */
+function ghiNhatKyDiem_(lenh, maCa, sbd, diem, body, coMat, ketQua) {
+  try {
+    const sh = getSheet_('NhatKyDiem', ['Luc', 'Lenh', 'MaCa', 'SBD', 'Tong', 'MauSoKhai', 'CoMat', 'IdThietBi', 'LuatDiem', 'KetQua'])
+    const s = body && body.soCau
+    sh.appendRow([
+      new Date().toISOString(),
+      lenh,
+      String(maCa || ''),
+      String(sbd || ''),
+      diem === undefined || diem === null ? '' : diem,
+      s ? (Number(s.I) || 0) + '/' + (Number(s.II) || 0) + '/' + (Number(s.III) || 0) : 'khong_khai',
+      coMat ? 'co' : 'khong',
+      String((body && body.idThietBi) || ''),
+      String((body && body.luatDiem) || ''),
+      String(ketQua || ''),
+    ])
+  } catch (err) {}
+}
+
 // BA VAI TRÒ (BA-APP.md đợt 1). Hồ sơ học sinh/phụ huynh có TOKEN 32 ký tự do
 // THẦY DUYỆT mới cấp; mọi lệnh đọc dữ liệu của một em đều tra token -> SBD ở
 // máy chủ, KHÔNG tin SBD/SĐT do máy khách gửi kèm.
@@ -4174,6 +4244,18 @@ function doPost(e) {
     const coMat = !kiemTraMaBiMat_(body)
     const maCa = String(body.maCa || '').trim()
     const bai = body.bai || []
+    // MẪU SỐ: gói khai chấm theo bao nhiêu câu mỗi phần? Lệch số câu thật của ca
+    // thì KHÔNG cho đặt điểm (xem ghi chú dài ở `mauSoKhop_`).
+    const caGD = (function () {
+      try {
+        const shCa = sheetCa_()
+        const rowCa = findRowByKey_(shCa, 0, maCa)
+        return rowCa > 0 ? docCa_(shCa, rowCa) : null
+      } catch (err) {
+        return null
+      }
+    })()
+    const mauSo = mauSoKhop_(caGD, body)
     const sh = sheetLuot_()
     const luotData = sh.getDataRange().getValues()
     const ctSh = getSheet_(SHEET_CHITIET, CHITIET_HEADERS)
@@ -4205,11 +4287,18 @@ function doPost(e) {
       // tự ghi lại CẢ CA trong một loạt — đúng thứ đã cắn ca 447479 hai lần.
       // Chi tiết từng câu bên dưới vẫn nhận vì không phụ thuộc luật chấm.
       const d = x.diem || {}
-      if (duocGhiDiem_(coMat, body)) {
-        sh.getRange(row, 14, 1, 4).setValues([[d.I === undefined ? '' : d.I, d.II === undefined ? '' : d.II, d.III === undefined ? '' : d.III, d.tong === undefined ? '' : d.tong]])
-      } else {
+      let ketQuaGhi = ''
+      if (!duocGhiDiem_(coMat, body)) {
+        ketQuaGhi = 'tu_choi_khong_tem'
         tuChoi.push(sbd + ': bản app cũ, chỉ nhận chi tiết câu — điểm giữ nguyên')
+      } else if (!mauSo.khop) {
+        ketQuaGhi = 'tu_choi_mau_so'
+        tuChoi.push(sbd + ': ' + mauSo.lyDo + ' — điểm giữ nguyên')
+      } else {
+        ketQuaGhi = 'da_ghi'
+        sh.getRange(row, 14, 1, 4).setValues([[d.I === undefined ? '' : d.I, d.II === undefined ? '' : d.II, d.III === undefined ? '' : d.III, d.tong === undefined ? '' : d.tong]])
       }
+      ghiNhatKyDiem_('ghiDiem', maCa, sbd, d.tong, body, coMat, ketQuaGhi)
       for (let i = 1; i < ctData.length; i++) {
         if (String(ctData[i][0]) === maCa && String(ctData[i][1]) === sbd && (Number(ctData[i][2]) || 1) === lanThu && xoaDong.indexOf(i + 1) < 0) xoaDong.push(i + 1)
       }
@@ -4948,7 +5037,27 @@ function doPost(e) {
     if (!duocGhiDiem_(coMatNX, body)) {
       // Bản app cũ: KHÔNG ghi gì. Điểm cũ của thầy giữ nguyên, không đẻ dòng
       // nhận xét mang con số sai gửi tới phụ huynh.
+      ghiNhatKyDiem_('sendFeedback', body.maCa, body.sbd, body.diem, body, coMatNX, 'tu_choi_khong_tem')
       return jsonResponse_({ ok: true, boQua: 'ban_cu', serverNow: Date.now() })
+    }
+    // MẪU SỐ phải khớp số câu thật của ca — `sendFeedback` là đường THỨ HAI ghi
+    // được cột điểm, nên chốt phải đứng ở CẢ HAI chỗ, không thì bịt một cửa còn
+    // cửa kia mở. Kiểm TRƯỚC khi ghi bất cứ dòng nào: dòng NhanXet là thứ phụ
+    // huynh xem gần-thời-gian-thực, ghi số sai vào đó rồi mới chặn là muộn.
+    // Xem ghi chú dài ở `mauSoKhop_`.
+    const caNX = (function () {
+      try {
+        const shCaNX = sheetCa_()
+        const rowCaNX = findRowByKey_(shCaNX, 0, String(body.maCa || '').trim())
+        return rowCaNX > 0 ? docCa_(shCaNX, rowCaNX) : null
+      } catch (err) {
+        return null
+      }
+    })()
+    const mauSoNX = mauSoKhop_(caNX, body)
+    ghiNhatKyDiem_('sendFeedback', body.maCa, body.sbd, body.diem, body, coMatNX, mauSoNX.khop ? 'da_ghi' : 'tu_choi_mau_so')
+    if (!mauSoNX.khop) {
+      return jsonResponse_({ ok: true, boQua: 'mau_so_lech', lyDo: mauSoNX.lyDo, serverNow: Date.now() })
     }
     const sh = getSheet_(SHEET_NHANXET, ['SBD', 'MaCa', 'MaDe', 'ThoiGianNop', 'Diem', 'XepLoai', 'CauSai', 'GuiLuc'])
     const data = sh.getDataRange().getValues()

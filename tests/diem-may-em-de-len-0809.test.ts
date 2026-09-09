@@ -103,15 +103,24 @@ describe('TEM LUẬT CHẤM — hai đầu phải khớp từng ký tự', () =>
 })
 
 describe('MÁY CHỦ: hai đường ghi điểm đều đi qua cổng', () => {
-  it('ghiDiem: cột điểm nằm TRONG nhánh duocGhiDiem_', () => {
+  // VIẾT LẠI 09/09 chiều, KHÔNG XOÁ LẶNG. Bản cũ đòi cột điểm nằm NGAY trong
+  // nhánh `if (duocGhiDiem_(...))`. Nay có thêm chốt thứ hai — mẫu số — nên
+  // hình dạng là if / else if / else. Ý ĐỊNH giữ nguyên và còn mạnh hơn: cột
+  // điểm chỉ được ghi ở NHÁNH CUỐI, sau khi qua ĐỦ mọi chốt.
+  it('ghiDiem: cột điểm chỉ ghi sau khi qua ĐỦ chốt tem VÀ chốt mẫu số', () => {
     const than = GS.slice(GS.indexOf("if (action === 'ghiDiem')"), GS.indexOf("if (action === 'submit')"))
-    expect(than).toMatch(/if \(duocGhiDiem_\(coMat, body\)\) \{\s*\n\s*sh\.getRange\(row, 14, 1, 4\)/)
+    const viTem = than.indexOf('if (!duocGhiDiem_(coMat, body))')
+    const viMauSo = than.indexOf('} else if (!mauSo.khop) {')
+    const viGhi = than.indexOf('sh.getRange(row, 14, 1, 4).setValues')
+    expect(viTem).toBeGreaterThan(0)
+    expect(viMauSo).toBeGreaterThan(viTem)
+    expect(viGhi).toBeGreaterThan(viMauSo)
   })
 
   it('ghiDiem: chi tiết từng câu VẪN ghi cho bản cũ (không mất dữ liệu chuyên đề)', () => {
     const than = GS.slice(GS.indexOf("if (action === 'ghiDiem')"), GS.indexOf("if (action === 'submit')"))
     // Vòng dựng `themDong` phải nằm NGOÀI nhánh điểm.
-    const viDiem = than.indexOf('if (duocGhiDiem_(coMat, body))')
+    const viDiem = than.indexOf('if (!duocGhiDiem_(coMat, body))')
     const viDongNhanh = than.indexOf('tuChoi.push(sbd + \': bản app cũ')
     const viThemDong = than.indexOf('themDong.push([maCa, sbd, lanThu')
     expect(viDiem).toBeGreaterThan(0)
@@ -141,8 +150,10 @@ describe('MÁY CHỦ: hai đường ghi điểm đều đi qua cổng', () => {
 })
 
 describe('MÁY EM: gói gửi lên mang đủ tem và id thiết bị', () => {
+  // Bản cũ khoá nguyên văn gói gửi đi. Gói nay mang thêm `soCau` (mẫu số đã
+  // dùng) nên chuỗi đổi — ý định "phải có tem" thì giữ nguyên.
   it('ghiDiem gửi luatDiem', () => {
-    expect(API).toContain("{ action: 'ghiDiem', secret, maCa, bai, luatDiem: LUAT_DIEM }")
+    expect(API).toContain("{ action: 'ghiDiem', secret, maCa, bai, luatDiem: LUAT_DIEM, soCau }")
   })
 
   it('sendFeedback gửi luatDiem và idThietBi', () => {
