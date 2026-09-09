@@ -589,6 +589,18 @@ export function chuKyLechPha(giay: number, nn: () => number = Math.random): numb
   return Math.round(giay * (1 + nn() * LECH_PHA))
 }
 
+/** Bản MILI GIÂY của `chuKyLechPha`.
+ *
+ * Phòng chờ hỏi mỗi 3 giây; làm tròn về giây như bản trên chỉ ra 3 hoặc 4 giây,
+ * tức cả lớp vẫn dồn vào hai mốc. Ở nhịp ngắn thì phải rải bằng mili giây.
+ *
+ * Đo 09/09 trước ca thi đông: `trangThaiPhongCho` mất 2,2–3,3 giây một lượt khi
+ * vắng, và 60 lượt CÙNG LÚC vẫn xong hết (0 hỏng, chậm nhất 4,3 giây). Máy chủ
+ * chịu được; thứ cần chữa là nhịp gọi của từng máy, không phải sức máy chủ. */
+export function chuKyLechPhaMs(ms: number, nn: () => number = Math.random): number {
+  return Math.round(ms * (1 + nn() * LECH_PHA))
+}
+
 /**
  * LƯU TẠM bài đang làm (CATHIVAGOILENBANG mục 1).
  *

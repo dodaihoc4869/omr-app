@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
 import { taoLinkPhieu } from '../lib/phieu-link'
-import { cauKhacPhuc, ghiPhieuKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, trangThaiPhongCho, vaoThi, phieuCuaEm as layBaiDaNop, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { cauKhacPhuc, ghiPhieuKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, trangThaiPhongCho, vaoThi, phieuCuaEm as layBaiDaNop, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, chuKyLechPhaMs, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
 import { goiCauHoi } from '../lib/hoi-bai'
 import TamTruotHoiBai, { type CauChon } from '../components/TamTruotHoiBai'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
@@ -1778,7 +1778,19 @@ export default function ExamTakeScreen() {
     let con = true
     const url = scriptUrl.trim()
     if (!url) return
+    // CHỐT CHỐNG CHỒNG LƯỢT. Đo 09/09 trước ca thi đông: `trangThaiPhongCho`
+    // mất 2,2–3,3 giây một lượt lúc vắng và 3,6 giây khi 60 máy cùng hỏi — tức
+    // LÂU HƠN chính nhịp 3 giây. `setInterval` không đợi lượt trước xong, nên
+    // máy em cứ 3 giây lại thả thêm một lượt vào hàng: chờ hai phút là chồng
+    // hàng chục lượt trên MỖI máy, rồi nhân với cả lớp. Đây đúng là lúc đông
+    // nhất của ca — cả lớp cùng đứng chờ thầy bấm Bắt đầu.
+    //
+    // Máy chủ KHÔNG phải chỗ yếu: 60 lượt cùng lúc xong hết, 0 hỏng, chậm nhất
+    // 4,3 giây. Thứ phải chữa là nhịp gọi của từng máy.
+    let dangHoi = false
     const hoi = async () => {
+      if (dangHoi) return
+      dangHoi = true
       try {
         const tt = await trangThaiPhongCho(url, maCa.trim())
         if (!con) return
@@ -1789,10 +1801,15 @@ export default function ExamTakeScreen() {
       } catch (e) {
         // Ca bị thầy huỷ giữa lúc chờ: nói thẳng, đừng để em đứng mãi.
         if (con) setLoiCho(e instanceof Error ? e.message : 'Mất kết nối — em cứ chờ, máy tự hỏi lại.')
+      } finally {
+        dangHoi = false
       }
     }
     void hoi()
-    const dong = setInterval(() => void hoi(), 3000)
+    // LỆCH PHA THEO MILI GIÂY. Cùng lý do đã lệch pha lưu tạm và báo sống: ba
+    // mươi máy cùng nhịp là ba mươi lượt gọi dồn vào một khoảnh khắc. Nhịp 3
+    // giây làm tròn về giây chỉ ra 3 hoặc 4, vẫn dồn cục — phải rải bằng ms.
+    const dong = setInterval(() => void hoi(), chuKyLechPhaMs(3000))
     return () => {
       con = false
       clearInterval(dong)

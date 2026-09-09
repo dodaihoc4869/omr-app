@@ -127,14 +127,20 @@ describe('màn của em', () => {
     expect(than).not.toContain('<button')
   })
 
-  it('hỏi lại máy chủ 3 giây một nhịp, và dọn vòng lặp khi rời màn', () => {
+  it('hỏi lại máy chủ mỗi ~3 giây (đã lệch pha), và dọn vòng lặp khi rời màn', () => {
     const dau = MAN_EM.indexOf("if (phase !== 'cho') return")
     expect(dau).toBeGreaterThan(0)
     const than = MAN_EM.slice(dau, MAN_EM.indexOf('}, [phase, scriptUrl, maCa])', dau))
     // Vòng hỏi phải đứng SAU `handleJoin` — đọc biến trước khi khai báo là lỗi
     // oxlint đã bật thành cổng riêng (`khong-dung-bien-truoc-khi-khai`).
     expect(dau).toBeGreaterThan(MAN_EM.indexOf('const handleJoin = async'))
-    expect(than).toContain('setInterval(() => void hoi(), 3000)')
+    // ĐỔI 09/09, rà soát trước ca thi đông. Nhịp GỐC vẫn đúng 3 giây — chỉ
+    // thêm lệch pha theo mili giây, tối đa +40% (`LECH_PHA`), nên ý định của
+    // phép kiểm này giữ nguyên. Lý do: đo được `trangThaiPhongCho` mất 2,2–3,6
+    // giây một lượt, tức LÂU HƠN nhịp; ba mươi máy cùng nhịp là ba mươi lượt
+    // dồn vào một khoảnh khắc. Kèm chốt chống chồng lượt ở `dangHoi`.
+    expect(than).toContain('setInterval(() => void hoi(), chuKyLechPhaMs(3000))')
+    expect(than).toContain('let dangHoi = false')
     expect(than).toContain('clearInterval(dong)')
     // Thầy bấm bắt đầu thì đi lại ĐÚNG đường vaoThi — không có đường tắt nào
     // lấy đề mà bỏ qua việc tạo lượt và tính giờ.
