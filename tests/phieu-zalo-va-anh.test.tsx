@@ -121,11 +121,25 @@ describe('Ảnh phiếu', () => {
     expect(maPhieu).toContain("a.download = ten")   // máy không chia sẻ được thì tải về
   })
 
-  it('số trên ảnh lấy từ ca đã chấm, không tự tính lại', () => {
-    // Chỉ được đọc thẳng từ hoSo/ca; nếu có phép chia hay nhân điểm ở đây là
-    // đang tự tính, phải xem lại.
-    expect(maPhieu).toContain('diem: ca.tong')
+  it('số trên ảnh KHÔNG tự bịa: phải ra từ lõi chấm của app', () => {
+    // ĐỔI 09/09 — phép kiểm này trước đây đòi `diem: ca.tong`, tức bắt lấy ô
+    // điểm trên Sheet. Ý ĐỊNH vẫn đúng (cấm component tự bịa số bằng phép nhân
+    // chia tại chỗ), nhưng GIẢ ĐỊNH đằng sau nó sai: ô `tong` trên Sheet KHÔNG
+    // phải nguồn đã chấm đáng tin — máy học sinh cũng ghi được vào đó, và máy
+    // bản cũ ghi bằng thang tuyệt đối cũ. Thầy chụp lại 09/09: tin nhắn Zalo in
+    // "ĐIỂM: 3,50/10" trong khi bài thật của em là 7,88.
+    //
+    // Nay siết đúng chỗ cần siết: số phải đến từ `gradeSubmissionFull` — chính
+    // lõi chấm mà bảng điểm và phiếu cả ca dùng — hoặc từ ô Sheet làm đường lùi.
+    // Cấm mọi phép tính điểm tự chế trong component.
+    expect(maPhieu).toContain('gradeSubmissionFull(bank, ca.maCa, sbd, dapAn, soCau, rieng?.boTheoEm).score')
+    expect(maPhieu).toContain('diem: tongDung')
+    expect(maPhieu).toContain('const tongDung = diemDung?.tong ?? ca?.tong ?? null')
     expect(maPhieu).toContain('soCauSai: hoSo.soCauSaiCaGanNhat')
+    // Không có phép nhân/chia điểm tự chế trong khối dựng ảnh.
+    const dau = maPhieu.indexOf('const duAnh: DuLieuAnhPhieu')
+    const anh = maPhieu.slice(dau, maPhieu.indexOf('}, [ca, chuyenDeCa, duPhieu, hoSo, viec', dau))
+    expect(anh).not.toMatch(/diem:\s*[^,\n]*[*/][^,\n]*/)
   })
 })
 

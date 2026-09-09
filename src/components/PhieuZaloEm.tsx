@@ -24,8 +24,39 @@ import { dungPhieu, giamGoiPhieu, type NguonViPham } from '../lib/phieu-du-lieu'
 import { chiTietCa, luuPhieu, qidDaLam, sinhMaPhieu, xoaPhieu, type ChiTietCauRow } from '../lib/exam-api'
 import { docDeRiengCa, docSoCauCa, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { taoChiTietCau } from '../lib/chi-tiet-cau'
+import { gradeSubmissionFull } from '../lib/exam-grade'
 import { mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
 import type { HoSoEm } from '../lib/exam-api'
+
+/** Điểm chấm lại tại chỗ từ đáp án thô — KHÔNG lấy ô điểm trên Sheet.
+ *
+ * VÌ SAO (thầy báo khuya 08/09, ảnh chụp màn gửi Zalo: "ĐIỂM: 3,50/10" trong
+ * khi bài thật là 7,88).
+ *
+ * Ô điểm trên Sheet KHÔNG phải nguồn tin cậy: máy học sinh cũng ghi được vào
+ * đó, và máy nào còn bản app cũ thì ghi bằng thang tuyệt đối cũ. Chấm lại rồi
+ * mở màn này ra là con số cũ đã quay về, vì màn này đọc thẳng `ca.tong`.
+ *
+ * Khối này vốn ĐÃ tải đủ đáp án của em (`luot.dapAn`), bộ đề CÓ đáp án
+ * (`bank`), số câu của ca và bản đồ đề riêng — tức đã có mọi thứ để tự chấm.
+ * Nay chấm luôn: tin nhắn và ảnh phiếu gửi phụ huynh lấy số TỰ TÍNH, ô Sheet
+ * chỉ còn là đường lùi khi không chấm lại được (mất bộ đề, mất đáp án).
+ *
+ * Hạng lớp cũng tính lại từ bảng điểm đã chấm lại của cả ca — cùng lý do, và
+ * chấm cả ca ở đây không tốn thêm lượt gọi máy chủ nào. */
+type DiemChamLai = { tong: number; I: number; II: number; III: number }
+
+/** Hạng của một điểm trong bảng điểm cả ca. Cùng điểm thì cùng hạng — giống
+ * `hangTrongCa` của lõi dựng phiếu cả ca, để hai nơi không nói hai hạng. */
+export function hangTheoDiem(diem: number, diemLop: number[]): { hang: number; siSo: number } {
+  const xep = [...diemLop].sort((a, b) => b - a)
+  let hang = 1
+  for (const d of xep) {
+    if (d > diem + 0.0001) hang++
+    else break
+  }
+  return { hang, siSo: xep.length }
+}
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const TIEU_DE: React.CSSProperties = { fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)', fontWeight: 700 }
@@ -91,6 +122,10 @@ export default function PhieuZaloEm({
     /** Ca đề riêng từng em + số lần em đã sai từng câu lặp TRƯỚC ca này. */
     deRieng: boolean
     lapCua: Record<string, number> | null
+    /** ĐIỂM CHẤM LẠI TẠI CHỖ — xem `diemDung` bên dưới. */
+    diemMoi: DiemChamLai | null
+    /** Hạng và sĩ số tính từ bảng điểm ĐÃ CHẤM LẠI của cả ca. */
+    hangMoi: { hang: number; siSo: number } | null
   } | null>(null)
   const canThem = !rows || !banks || viPham === undefined
   useEffect(() => {
@@ -124,15 +159,34 @@ export default function PhieuZaloEm({
             rowsMoi = null
           }
         }
+        // CHẤM LẠI TẠI CHỖ — xem ghi chú ở `DiemChamLai`. Thuần tính toán trên
+        // máy, không thêm một lượt gọi máy chủ nào.
+        const chamLai = (sbd: string, dapAn: NonNullable<typeof luot>['dapAn']): DiemChamLai | null => {
+          if (!bank || !dapAn) return null
+          try {
+            const s = gradeSubmissionFull(bank, ca.maCa, sbd, dapAn, soCau, rieng?.boTheoEm).score
+            return { tong: s.total, I: s.phanIScore, II: s.phanIIScore, III: s.phanIIIScore }
+          } catch {
+            return null
+          }
+        }
+        const diemMoi = luot?.dapAn ? chamLai(hoSo.em.sbd, luot.dapAn) : null
+        // Bảng điểm cả ca: ưu tiên điểm chấm lại, em nào không chấm lại được
+        // thì giữ ô Sheet — thà một dòng cũ còn hơn mất em đó khỏi bảng xếp hạng.
+        const diemLopMoi = ct.luot
+          .map((l) => (l.dapAn ? (chamLai(String(l.sbd), l.dapAn)?.tong ?? l.tong) : l.tong))
+          .filter((d): d is number => typeof d === 'number')
         if (!con) return
         setThem({
           rows: rowsMoi,
           banks: bank,
+          diemMoi,
+          hangMoi: diemMoi && diemLopMoi.length > 0 ? hangTheoDiem(diemMoi.tong, diemLopMoi) : null,
           // CA ĐỀ RIÊNG TỪNG EM: cờ tắt hạng lớp, và bản đồ số lần sai để báo
           // cáo gắn nhãn "Sai lần thứ N" / "Đã sửa được" giống hệt hai chỗ kia.
           deRieng: Boolean(rieng),
           lapCua: rieng?.lapCua?.[hoSo.em.sbd] ?? null,
-          diemLop: ct.luot.map((l) => l.tong).filter((d): d is number => typeof d === 'number'),
+          diemLop: diemLopMoi,
           thoiLuongPhut: Number(ct.ca.thoiGianPhut) || null,
           vaoLuc: luot?.vaoLuc || null,
           viPham: luot
@@ -160,6 +214,12 @@ export default function PhieuZaloEm({
 
   const rowsDung = rows ?? them?.rows ?? null
   const banksDung = banks ?? them?.banks ?? null
+  // ĐIỂM DÙNG CHO MỌI THỨ GỬI PHỤ HUYNH. Chấm lại được thì lấy số tự tính; ô
+  // trên Sheet chỉ là đường lùi. Xem ghi chú ở `DiemChamLai`.
+  const diemDung = them?.diemMoi ?? null
+  const tongDung = diemDung?.tong ?? ca?.tong ?? null
+  const hangDung = them?.hangMoi?.hang ?? ca?.hang ?? null
+  const siSoDung = them?.hangMoi?.siSo ?? ca?.siSo ?? null
   const diemLopDung = diemLop ?? them?.diemLop ?? null
   const thoiLuongDung = thoiLuongPhut ?? them?.thoiLuongPhut ?? null
   const vaoLucDung = vaoLuc ?? them?.vaoLuc ?? null
@@ -191,19 +251,23 @@ export default function PhieuZaloEm({
   )
 
   const duPhieu: DuLieuPhieu | null = useMemo(() => {
-    if (!ca || ca.tong === null) return null
+    if (!ca || tongDung === null) return null
     const yeuNhat = chuyenDeCa[0] ?? null
     return {
       hoTen: hoSo.em.hoTen || `SBD ${hoSo.em.sbd}`,
       ngay: ca.nopLuc,
-      diem: ca.tong,
-      xepLoai: classify(ca.tong),
-      diemPhan: ca.diemI !== null && ca.diemII !== null && ca.diemIII !== null ? { I: ca.diemI, II: ca.diemII, III: ca.diemIII } : null,
+      diem: tongDung,
+      xepLoai: classify(tongDung),
+      diemPhan: diemDung
+        ? { I: diemDung.I, II: diemDung.II, III: diemDung.III }
+        : ca.diemI !== null && ca.diemII !== null && ca.diemIII !== null
+          ? { I: ca.diemI, II: ca.diemII, III: ca.diemIII }
+          : null,
       soCauSai: hoSo.soCauSaiCaGanNhat,
       chuyenDeSai: yeuNhat ? { ten: yeuNhat.ten, soSai: yeuNhat.soSai } : null,
       baiTapDaGiao: null,
     }
-  }, [ca, chuyenDeCa, hoSo])
+  }, [ca, chuyenDeCa, hoSo, tongDung, diemDung])
 
   const [viec, setViec] = useState('')
   useEffect(() => {
@@ -217,7 +281,7 @@ export default function PhieuZaloEm({
   const tin = duPhieu ? soanPhieuZalo(duPhieu, viec.trim() || undefined, link) : ''
 
   const duAnh: DuLieuAnhPhieu | null = useMemo(() => {
-    if (!ca || ca.tong === null || !duPhieu) return null
+    if (!ca || tongDung === null || !duPhieu) return null
     const tong = chuyenDeCa.reduce((s, c) => s + c.soCau, 0)
     return {
       hoTen: hoSo.em.hoTen,
@@ -225,18 +289,18 @@ export default function PhieuZaloEm({
       lop: hoSo.em.lop || ca.lop,
       tenCa: ca.tenCa,
       ngay: ca.nopLuc,
-      diem: ca.tong,
-      xepLoai: classify(ca.tong),
+      diem: tongDung,
+      xepLoai: classify(tongDung),
       diemPhan: duPhieu.diemPhan,
       toiDaPhan: null,
       soCauSai: hoSo.soCauSaiCaGanNhat,
       tongSoCau: tong > 0 ? tong : null,
-      hang: ca.hang,
-      siSo: ca.siSo,
+      hang: hangDung,
+      siSo: siSoDung,
       chuyenDe: chuyenDeCa,
       vieCanLam: viec.trim() || viecCanLamMacDinh(duPhieu),
     }
-  }, [ca, chuyenDeCa, duPhieu, hoSo, viec])
+  }, [ca, chuyenDeCa, duPhieu, hoSo, viec, tongDung, hangDung, siSoDung])
 
   // LINK BÁO CÁO: đẩy báo cáo lên kho rồi lấy mã 16 ký tự. Mã giữ nguyên cho
   // một cặp (em, ca) trong suốt phiên — thầy sửa dòng "việc cần làm" thì báo
@@ -446,7 +510,7 @@ export default function PhieuZaloEm({
     }
   }
 
-  if (!ca || ca.tong === null) {
+  if (!ca || tongDung === null) {
     return (
       <TheNoiDung>
         <div style={TIEU_DE}>Gửi phụ huynh</div>
@@ -460,7 +524,7 @@ export default function PhieuZaloEm({
       <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
         <div style={TIEU_DE}>Gửi phụ huynh</div>
         <div style={NHAN_NHO}>
-          Bài {ca.tenCa || `mã ${ca.maCa}`} · {ca.tong.toFixed(2).replace('.', ',')} điểm
+          Bài {ca.tenCa || `mã ${ca.maCa}`} · {tongDung.toFixed(2).replace('.', ',')} điểm
         </div>
 
         {/* VIỆC CẦN LÀM — máy không biết nguyên nhân em sai, đoán là bịa. Thầy
