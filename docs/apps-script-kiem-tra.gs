@@ -1709,12 +1709,24 @@ const DE_HEADERS = ['MaDe', 'Nguon', 'NgayNap', 'SoCau', 'SoNghi', 'DeJson', 'Ca
 
 /** Em này có lượt ĐÃ NỘP của đúng ca này, gửi từ đúng máy này không.
  * `A` là dải MaCa..TrangThai (8 cột đầu) của sheet LuotThi. */
-function quaCongLuot_(A, maCa, sbd, idTb) {
+function quaCongLuot_(A, maCa, sbd, idTb, boQuaMay) {
   for (let i = 1; i < A.length; i++) {
     if (String(A[i][0]) !== maCa || String(A[i][1]) !== sbd) continue
     const tt = String(A[i][7])
     if (tt !== 'da_nop' && tt !== 'khoa') continue
-    if (String(A[i][3] || '') !== idTb) continue
+    // `boQuaMay` = CHỈ ĐÒI LƯỢT CÓ THẬT, không đòi đúng máy đã thi.
+    //
+    // Thầy chốt 09/09 tối, sau khi tôi hỏi thẳng: bài TỰ LUYỆN mở cho "ai có mã
+    // ca + số báo danh". Lý do: em nhận link báo cáo qua Zalo rồi mở bằng trình
+    // duyệt trong Zalo, hoặc đổi máy, hoặc xoá dữ liệu trình duyệt — cả ba đều
+    // ra một id thiết bị KHÁC id đã lưu lúc thi, và em mất luôn đường luyện tập.
+    //
+    // Đánh đổi thầy đã cân và chấp nhận: người biết mã ca và số báo danh của em
+    // khác có thể rút câu và nộp hộ. Bài tự luyện KHÔNG tính điểm, KHÔNG xếp
+    // hạng, và đáp án vốn đã nằm trong chính tệp phiếu trên máy em.
+    //
+    // CHỈ áp cho hai lệnh khắc phục. Lịch sử điểm vẫn đòi đúng máy.
+    if (!boQuaMay && String(A[i][3] || '') !== idTb) continue
     return true
   }
   return false
@@ -2755,7 +2767,7 @@ function doPost(e) {
     const shLGP = sheetLuot_()
     const nLGP = shLGP.getLastRow()
     if (nLGP < 2) return jsonResponse_(LOI_GP)
-    if (!quaCongLuot_(shLGP.getRange(1, 1, nLGP, 8).getValues(), maCaGP, sbdGP, idTbGP)) return jsonResponse_(LOI_GP)
+    if (!quaCongLuot_(shLGP.getRange(1, 1, nLGP, 8).getValues(), maCaGP, sbdGP, idTbGP, true)) return jsonResponse_(LOI_GP)
 
     const dsCauGP = Object.prototype.toString.call(body.cau) === '[object Array]' ? body.cau : []
     if (dsCauGP.length === 0 || dsCauGP.length > TOI_DA_CAU_NOPKP) return jsonResponse_(LOI_GP)
@@ -3112,7 +3124,7 @@ function doPost(e) {
     const shL = sheetLuot_()
     const nL = shL.getLastRow()
     if (nL < 2) return jsonResponse_(LOI_KP)
-    if (!quaCongLuot_(shL.getRange(1, 1, nL, 8).getValues(), maCa, sbd, idTb)) return jsonResponse_(LOI_KP)
+    if (!quaCongLuot_(shL.getRange(1, 1, nL, 8).getValues(), maCa, sbd, idTb, true)) return jsonResponse_(LOI_KP)
 
     const chuyenDe = Array.isArray(body.chuyenDe) ? body.chuyenDe.slice(0, 30) : []
     if (chuyenDe.length === 0) return jsonResponse_({ ok: true, soCau: 0, items: [], ghiChu: 'Không có chuyên đề nào để rút' })

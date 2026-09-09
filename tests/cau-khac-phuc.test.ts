@@ -204,11 +204,27 @@ const xin = (o: Record<string, unknown>) => ({
 })
 
 describe('Hai lớp khoá — kho đề không được rời máy thầy vì một số báo danh', () => {
-  it('SAI MÁY thì từ chối, dù đúng mã ca và đúng số báo danh', () => {
+  // ĐỔI CHIỀU 09/09 TỐI — THẦY CHỐT, sau khi tôi hỏi thẳng và nêu rõ đánh đổi.
+  //
+  // Luật cũ đòi ĐÚNG MÁY đã thi. Nó chặn thật, nhưng chặn nhầm người: em nhận
+  // link báo cáo qua Zalo rồi mở bằng trình duyệt trong Zalo, hoặc đổi máy,
+  // hoặc xoá dữ liệu trình duyệt — cả ba đều ra một id thiết bị KHÁC, và em
+  // mất luôn đường luyện tập. Thầy báo "tất cả học sinh đều không bấm chọn
+  // được".
+  //
+  // Luật mới: "ai có mã ca + số báo danh". Đánh đổi thầy đã cân và chấp nhận:
+  // người biết mã ca và số báo danh của em khác có thể rút câu. Bài tự luyện
+  // KHÔNG tính điểm, KHÔNG xếp hạng, và đáp án vốn đã nằm trong chính tệp
+  // phiếu trên máy em.
+  //
+  // Ý ĐỊNH GỐC CỦA TỆP NÀY GIỮ NGUYÊN và vẫn được khoá bởi ba phép kiểm dưới:
+  // kho đề không rời máy thầy vì MỘT SỐ BÁO DANH BỊA — vẫn phải là lượt CÓ
+  // THẬT, ĐÃ NỘP, đúng mã ca.
+  it('MÁY KHÁC vẫn rút được — em mở link từ Zalo là đã khác máy', () => {
     const m = dungMayChu(bangCoBan(), khoThu())
     const r = m.goi(xin({ idThietBi: MAY_LA }))
-    expect(r.ok).toBe(false)
-    expect(r.items).toBeUndefined()
+    expect(r.ok).toBe(true)
+    expect(Array.isArray(r.items)).toBe(true)
   })
 
   it('CHƯA NỘP BÀI thì từ chối, dù đúng máy', () => {
@@ -218,9 +234,24 @@ describe('Hai lớp khoá — kho đề không được rời máy thầy vì m�
     expect(m.goi(xin({})).ok).toBe(false)
   })
 
-  it('SỐ BÁO DANH CỦA BẠN KHÁC trên máy mình thì từ chối', () => {
+  // KHAI THẲNG CÁI GIÁ CỦA LUẬT MỚI, không giấu trong ghi chú:
+  // `100002` là bạn CÙNG CA, có lượt thật. Trước đây gõ số báo danh của bạn
+  // trên máy mình thì bị chặn; nay QUA. Đây đúng là thứ thầy đã cân và chấp
+  // nhận đổi lấy việc mọi em mở link từ Zalo đều luyện tập được.
+  it('SỐ BÁO DANH CỦA BẠN CÙNG CA nay QUA — đúng cái giá thầy đã chấp nhận', () => {
     const m = dungMayChu(bangCoBan(), khoThu())
-    expect(m.goi(xin({ sbd: '100002' })).ok).toBe(false)
+    expect(m.goi(xin({ sbd: '100002' })).ok).toBe(true)
+  })
+
+  it('SỐ BÁO DANH KHÔNG CÓ LƯỢT trong ca thì vẫn từ chối — nới máy, không nới hết', () => {
+    const m = dungMayChu(bangCoBan(), khoThu())
+    expect(m.goi(xin({ sbd: '100099' })).ok).toBe(false)
+    expect(m.goi(xin({ sbd: '100099', idThietBi: MAY_LA })).ok).toBe(false)
+  })
+
+  it('MÃ CA BỊA thì từ chối, kể cả số báo danh có thật', () => {
+    const m = dungMayChu(bangCoBan(), khoThu())
+    expect(m.goi(xin({ maCa: 'CA-KHONG-CO' })).ok).toBe(false)
   })
 
   it('thiếu mã ca / số báo danh / mã máy thì từ chối', () => {

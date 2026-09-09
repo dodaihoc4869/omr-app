@@ -548,7 +548,7 @@ export default function ExamTakeScreen() {
         // IndexedDB hỏng thì bỏ qua bản lưu, vẫn còn đường máy chủ.
       }
       try {
-        const tren = await lichSuEmApi(scriptUrl.trim(), attempt.maCa, attempt.sbd, attempt.idThietBi || layIdThietBi())
+        const tren = await lichSuEmApi(scriptUrl.trim(), attempt.maCa, attempt.sbd, idThietBiCuaLuot(attempt))
         if (con && tren.length > 0) return setLichSuEm(tren)
       } catch {
         // Mất mạng, hoặc máy chủ chưa triển khai bản mới — rơi về bản lưu
@@ -566,6 +566,35 @@ export default function ExamTakeScreen() {
       con = false
     }
   }, [attempt, graded, scriptUrl])
+
+/** ID THIẾT BỊ DÙNG CHO MỌI LỆNH KHẮC PHỤC — MỘT NGUỒN SỰ THẬT.
+ *
+ * NGUYÊN NHÂN GỐC CỦA "RÚT CÂU KHẮC PHỤC KHÔNG CÓ NÚT NỘP", thầy báo ba lần
+ * tối 09/09 và lần thứ ba nói rõ: quay trên máy CỦA HỌC SINH, và TẤT CẢ học
+ * sinh đều dính.
+ *
+ * Hai lệnh khắc phục đi qua ĐÚNG MỘT cổng máy chủ (`quaCongLuot_`), nhưng gửi
+ * id thiết bị theo hai cách khác nhau:
+ *
+ *   cauKhacPhuc      → `attempt.idThietBi || layIdThietBi()`   CÓ đường lùi
+ *   ghiPhieuKhacPhuc → `a.idThietBi ?? ''`                     KHÔNG có
+ *
+ * `idThietBi` là trường TUỲ CHỌN trên `ExamAttempt` (`idThietBi?: string`), chỉ
+ * được đặt lúc `vaoThi`. Lượt lưu từ bản app cũ, hoặc lượt mở lại bằng
+ * `moLaiDaNop(existing)` từ bản đã cất, thì trường này rỗng. Khi đó:
+ *
+ *   · `cauKhacPhuc` rơi về id thật của máy ⇒ CHẠY ⇒ em thấy đủ 18 câu;
+ *   · `ghiPhieuKhacPhuc` gửi chuỗi rỗng ⇒ máy chủ chặn ngay ở dòng đầu
+ *     (`if (!maCaGP || !sbdGP || !idTbGP) return LOI_GP`) ⇒ KHÔNG có mã ⇒
+ *     `nop` rỗng ⇒ phiếu tụt xuống bản chỉ đề: không nút nộp, không bấm chọn.
+ *
+ * Đúng triệu chứng thầy quay được: đề hiện ra đầy đủ mà không bấm được.
+ *
+ * Nay hai đường gọi CÙNG một hàm, không thể lệch nhau lần nữa.
+ */
+function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string {
+  return (a?.idThietBi || layIdThietBi() || '').trim()
+}
 
   // CÂU KHẮC PHỤC RÚT TỪ KHO ĐỀ (thầy chốt 06/09).
   //
@@ -590,7 +619,7 @@ export default function ExamTakeScreen() {
           scriptUrl.trim(),
           attempt.maCa,
           attempt.sbd,
-          attempt.idThietBi || layIdThietBi(),
+          idThietBiCuaLuot(attempt),
           yeu,
           rows.map((r) => r.qid).filter(Boolean),
           SO_CAU_BAI_TAP_KEM,
@@ -684,7 +713,7 @@ export default function ExamTakeScreen() {
         url,
         a.maCa,
         a.sbd,
-        a.idThietBi ?? '',
+        idThietBiCuaLuot(a),
         (phieuCuaEm.baiTap ?? []).map((c) => ({ id: c.id, phan: c.phan, dapAn: c.dapAn })),
         { hoTen: phieuCuaEm.hoTen, tenChuyenDe: phieuCuaEm.chuyenDeCa?.[0]?.ten ?? '' },
       )

@@ -33,7 +33,12 @@ const GS = doc('docs/apps-script-kiem-tra.gs')
 describe('PHIẾU KHẮC PHỤC: chờ xin xong mã rồi mới dựng', () => {
   it('khối bài luyện nhận đường đi xin mã, không chỉ đọc link đã chở sẵn', () => {
     expect(KHOI).toContain('xinLink?: () => Promise<string>')
-    expect(KHOI).toContain('if (!link && xinLink) link = (await xinLink().catch(() => \'\')) || \'\'')
+    // CẬP NHẬT 09/09: vẫn CHỜ xin xong mới dựng (ý định gốc, giữ nguyên), nhưng
+    // không còn `catch` trần — lời máy chủ được giữ lại để đưa vào dòng nhắc
+    // đầu phiếu. `catch` trần đó là thứ đã khiến tôi phải suy đoán bốn vòng.
+    expect(KHOI).toContain('if (!link && xinLink) {')
+    expect(KHOI).toContain('await xinLink().catch((e: unknown) => {')
+    expect(KHOI).not.toContain("xinLink().catch(() => '')")
     // Mã phiếu đọc từ link VỪA XIN, không đọc lại `du.linkBaiTap` cũ.
     expect(KHOI).toContain("const maPhieu = link ? docLinkPhieu(link.slice(link.indexOf('#') + 1)).ma : ''")
   })

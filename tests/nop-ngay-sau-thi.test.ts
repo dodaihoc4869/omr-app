@@ -25,9 +25,12 @@ describe('máy em xin được mã cho bộ câu vừa nhận', () => {
     expect(KHOI).not.toContain('kiemTraMaBiMat_')
   })
 
-  it('CỔNG là lượt thi CÓ THẬT của chính em, đúng máy đã thi', () => {
+  // ĐỔI CHIỀU 09/09 TỐI — thầy chốt "ai có mã ca + số báo danh". Xem ghi chú
+  // dài trong `cau-khac-phuc.test.ts`. Cổng vẫn là LƯỢT CÓ THẬT, ĐÃ NỘP; chỉ
+  // bỏ điều kiện đúng máy, vì em mở link qua Zalo là đã khác máy.
+  it('CỔNG là lượt thi CÓ THẬT của em trong ca đó — bỏ điều kiện đúng máy', () => {
     // Cùng cổng với `cauKhacPhuc`: không ai xin mã cho ca mình không thi.
-    expect(KHOI).toContain('quaCongLuot_(shLGP.getRange(1, 1, nLGP, 8).getValues(), maCaGP, sbdGP, idTbGP)')
+    expect(KHOI).toContain('quaCongLuot_(shLGP.getRange(1, 1, nLGP, 8).getValues(), maCaGP, sbdGP, idTbGP, true)')
   })
 
   it('DÙNG LẠI MÃ CŨ của em trong ca đó — không đẻ mã mới mỗi lần mở báo cáo', () => {

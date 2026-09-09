@@ -86,7 +86,8 @@ describe('dungPhieu dựng được lời nhắc đầu phiếu', () => {
 
 describe('KhoiBaiLuyen phải truyền lý do vào phiếu', () => {
   it('phiếu chỉ đề của EM luôn đi kèm loiNhac', () => {
-    expect(KHOI).toContain('chiDeChoEm ? { anGiai: true, loiNhac: nhacTrongPhieu } : { nop }')
+    // `nhacDayDu` = `nhacTrongPhieu` + nguyên văn lời máy chủ khi xin mã hỏng.
+    expect(KHOI).toContain('chiDeChoEm ? { anGiai: true, loiNhac: nhacDayDu } : { nop }')
   })
 
   it('đủ BA lý do, mỗi lý do một câu khác nhau — không gộp thành một câu chung chung', () => {

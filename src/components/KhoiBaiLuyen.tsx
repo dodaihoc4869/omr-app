@@ -137,8 +137,25 @@ function NutTaiBaiTap({ du, laCuaEm = false, xinLink }: { du: PhieuDayDu; laCuaE
       // 08/09: báo cáo ngay sau khi nộp phải xin mã ở máy chủ, em bấm nhanh
       // hơn mạng là dựng ra phiếu không mã — không thanh nộp, không bấm chọn
       // được đáp án, lời giải mở toang.
+      // KHÔNG NUỐT LỖI XIN MÃ NỮA — nguyên tắc "không lặng lẽ sai".
+      //
+      // `.catch(() => '')` trần đã làm mất đúng thứ cần để chẩn đoán. Tối 09/09
+      // thầy báo ba lần cùng một triệu chứng ("không bấm chọn đáp án được"), và
+      // mỗi lần tôi phải suy đoán vì máy không nói gì: máy chủ từ chối vì cổng
+      // thiết bị? hết giờ chờ? mất mạng? Bốn giả thuyết đều chết khi đối chiếu
+      // dữ liệu, mà cái đáng lẽ trả lời ngay thì đã bị `catch` ném đi.
+      //
+      // Nay giữ nguyên văn lời máy chủ và đưa vào dòng nhắc đầu phiếu. Vẫn
+      // KHÔNG ném ra ngoài: xin hỏng thì phiếu vẫn phải mở được để em làm giấy.
       let link = linkBai
-      if (!link && xinLink) link = (await xinLink().catch(() => '')) || ''
+      let loiXin = ''
+      if (!link && xinLink) {
+        link =
+          (await xinLink().catch((e: unknown) => {
+            loiXin = e instanceof Error ? e.message : String(e ?? '')
+            return ''
+          })) || ''
+      }
       if (link && link !== linkTuXin && link !== du.linkBaiTap) setLinkTuXin(link)
       const maPhieu = link ? docLinkPhieu(link.slice(link.indexOf('#') + 1)).ma : ''
       const urlNop = (await loadScriptUrlHoacMacDinh().catch(() => '')).trim()
@@ -192,7 +209,10 @@ function NutTaiBaiTap({ du, laCuaEm = false, xinLink }: { du: PhieuDayDu; laCuaE
             ? 'Phiếu này thiếu số báo danh nên chỉ đọc được, chưa bấm chọn và chưa nộp được. Báo Thầy để dựng lại phiếu.'
             : 'Máy chưa có địa chỉ máy chủ nên phiếu chỉ đọc được, chưa bấm chọn và chưa nộp được. Mở lại link khi có mạng.'
         : ''
-      setHtml(dungPhieu(tt, dsDaLoc.slice(0, lay), chiDeChoEm ? { anGiai: true, loiNhac: nhacTrongPhieu } : { nop }))
+      // NGUYÊN VĂN LỜI MÁY CHỦ, ghép vào cuối. Đây là thứ chỉ đúng thủ phạm
+      // trong một lần bấm, thay cho mấy vòng suy đoán.
+      const nhacDayDu = nhacTrongPhieu && loiXin ? `${nhacTrongPhieu} (máy chủ báo: ${loiXin})` : nhacTrongPhieu
+      setHtml(dungPhieu(tt, dsDaLoc.slice(0, lay), chiDeChoEm ? { anGiai: true, loiNhac: nhacDayDu } : { nop }))
     } catch {
       setLoi('Máy chưa mở được phiếu. Phụ huynh thử lại khi có mạng ổn định.')
     } finally {

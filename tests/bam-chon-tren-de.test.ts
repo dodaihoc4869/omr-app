@@ -313,7 +313,7 @@ describe('MẤT MÃ NỘP KHÔNG ĐƯỢC BIẾN PHIẾU CỦA EM THÀNH PHIẾU
   it('KhoiBaiLuyen: bản của EM mà không nộp được thì dựng phiếu CHỈ ĐỀ, KÈM lý do', () => {
     const src = readFileSync(join(process.cwd(), 'src/components/KhoiBaiLuyen.tsx'), 'utf8')
     expect(src).toContain('const chiDeChoEm = laCuaEm && !nop')
-    expect(src).toContain('chiDeChoEm ? { anGiai: true, loiNhac: nhacTrongPhieu } : { nop }')
+    expect(src).toContain('chiDeChoEm ? { anGiai: true, loiNhac: nhacDayDu } : { nop }')
     // Cấm quay lại lối cũ: dựng thẳng { nop } cho mọi trường hợp.
     expect(src).not.toContain('setHtml(dungPhieu(tt, dsDaLoc.slice(0, lay), { nop }))')
   })

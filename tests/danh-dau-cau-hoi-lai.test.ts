@@ -210,7 +210,7 @@ describe('phiếu khắc phục trong báo cáo nộp được', () => {
     // đáp án (thầy báo: "rút câu luyện của học sinh bị lỗi lời giải").
     // CẬP NHẬT 09/09: thêm `loiNhac` — lý do chỉ đọc phải đi THEO phiếu, vì
     // phiếu hiện trong lớp phủ toàn màn hình, mọi chữ ngoài lớp phủ đều bị che.
-    expect(khoi).toContain('chiDeChoEm ? { anGiai: true, loiNhac: nhacTrongPhieu } : { nop }')
+    expect(khoi).toContain('chiDeChoEm ? { anGiai: true, loiNhac: nhacDayDu } : { nop }')
     expect(khoi).toContain('const chiDeChoEm = laCuaEm && !nop')
     // Mã lấy từ link đã cất, KHÔNG tự sinh — trang này không có mã bí mật.
     expect(khoi).toContain('docLinkPhieu(link.slice(link.indexOf')
