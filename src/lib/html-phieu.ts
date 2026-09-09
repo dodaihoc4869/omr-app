@@ -1438,7 +1438,32 @@ export const JS_PHIEU = `
     var du = null;
     try { du = JSON.parse(oNop.textContent || 'null'); } catch (e3) { du = null; }
     if (du && du.cau && du.cau.length) {
-      var KHOA_LUU = 'ddh.lam.' + du.ma;
+      /* KHOÁ LƯU BÀI PHẢI GẮN VỚI BỘ CÂU, KHÔNG CHỈ GẮN VỚI MÃ PHIẾU.
+       *
+       * Thầy báo 09/09 khuya: "bấm tạo câu lần 2 thì hiện sẵn đáp án vào ô đáp
+       * án, phần đúng sai đáp án hiện chữ đậm".
+       *
+       * Gốc: mã phiếu CỐ Ý dùng lại cho cùng một em trong cùng một ca (máy chủ
+       * tìm thấy dòng cũ thì trả lại mã cũ, để link đã phát ra vẫn sống). Nhưng
+       * bấm "tạo câu" lần nữa lại rút một BỘ CÂU KHÁC. Hai bộ khác nhau dùng
+       * chung một khoá ddh.lam.<ma> nên bài làm lần 1 được đổ ngược vào phiếu
+       * lần 2: ô trả lời ngắn hiện sẵn chữ, huy hiệu Đ/S hiện sẵn đậm.
+       *
+       * Đo được (jsdom): lần 1 làm q1=B, q2=S, q3=99 rồi nộp; lần 2 rút bộ khác
+       * cùng mã thì oNhap vẫn ["99"], tfDaChon vẫn ["S"].
+       *
+       * Nay khoá mang thêm VÂN TAY của bộ câu. Cùng bộ mở lại thì vẫn khôi phục
+       * đúng như trước; bộ khác thì tờ giấy trắng.
+       */
+      function vanTayBo() {
+        var t = '';
+        for (var i = 0; i < du.cau.length; i++) t += du.cau[i].id + '|';
+        var h = 5381;
+        for (var j = 0; j < t.length; j++) { h = ((h * 33) ^ t.charCodeAt(j)) >>> 0; }
+        return h.toString(36);
+      }
+      var KHOA_CU = 'ddh.lam.' + du.ma;
+      var KHOA_LUU = KHOA_CU + '.' + vanTayBo();
       var nutNop = document.getElementById('nut-nop');
       var demLam = document.getElementById('nop-dem');
       var oKet = document.getElementById('nop-ket');
@@ -1446,6 +1471,29 @@ export const JS_PHIEU = `
       var daNop = false;
       var lam = {};
       try { lam = JSON.parse(localStorage.getItem(KHOA_LUU) || '{}') || {}; } catch (e4) { lam = {}; }
+      /* CHUYỂN BÀI CŨ SANG KHOÁ MỚI, chỉ khi CHẮC CHẮN là cùng bộ câu.
+       * Em đang làm dở bằng bản app cũ thì mở bản mới không được mất bài. Điều
+       * kiện chặt: mọi qid đã lưu đều nằm trong bộ đang mở. Lệch một câu là bỏ
+       * qua, thà tờ giấy trắng còn hơn đổ nhầm bài của bộ khác. */
+      try {
+        if (!Object.keys(lam).length) {
+          var cu = JSON.parse(localStorage.getItem(KHOA_CU) || '{}') || {};
+          var kCu = Object.keys(cu);
+          if (kCu.length) {
+            var coDu = {};
+            for (var ic = 0; ic < du.cau.length; ic++) coDu[du.cau[ic].id] = 1;
+            var hop = true;
+            for (var jc = 0; jc < kCu.length; jc++) if (!coDu[kCu[jc]]) { hop = false; break; }
+            if (hop) {
+              lam = cu;
+              localStorage.setItem(KHOA_LUU, JSON.stringify(lam));
+              if (localStorage.getItem(KHOA_CU + '.cho') === '1') localStorage.setItem(KHOA_LUU + '.cho', '1');
+            }
+          }
+          localStorage.removeItem(KHOA_CU);
+          localStorage.removeItem(KHOA_CU + '.cho');
+        }
+      } catch (e4b) {}
 
       function luuLam() {
         try { localStorage.setItem(KHOA_LUU, JSON.stringify(lam)); } catch (e5) {}

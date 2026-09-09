@@ -126,8 +126,16 @@ describe('trang phiếu', () => {
     expect(JS_PHIEU).toContain('Bài của em vẫn được giữ')
   })
 
-  it('CHỌN DỞ RỒI ĐÓNG MÁY vẫn còn — lưu theo mã phiếu', () => {
-    expect(JS_PHIEU).toContain("var KHOA_LUU = 'ddh.lam.' + du.ma")
+  // CẬP NHẬT 09/09 khuya: khoá lưu bài nay mang thêm VÂN TAY của bộ câu.
+  //
+  // Ý định gốc GIỮ NGUYÊN (chọn dở đóng máy vẫn còn) và có phép kiểm chạy thật
+  // trong DOM khoá lại ở `tao-cau-lan-hai-khong-do-bai-cu-0909.test.ts`. Sửa vì
+  // mã phiếu dùng lại cho cùng em cùng ca, nên bấm "tạo câu" lần 2 ra bộ khác
+  // mà vẫn chung khoá — bài lần 1 đổ ngược vào phiếu lần 2 (thầy báo).
+  it('CHỌN DỞ RỒI ĐÓNG MÁY vẫn còn — lưu theo mã phiếu KÈM vân tay bộ câu', () => {
+    expect(JS_PHIEU).toContain("var KHOA_CU = 'ddh.lam.' + du.ma")
+    expect(JS_PHIEU).toContain("var KHOA_LUU = KHOA_CU + '.' + vanTayBo()")
+    expect(JS_PHIEU).toContain('function vanTayBo()')
     expect(JS_PHIEU).toContain('function luuLam()')
   })
 
