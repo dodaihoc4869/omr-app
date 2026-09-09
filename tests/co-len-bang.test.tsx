@@ -81,7 +81,19 @@ const TEN_CHIP: Record<CachLay, RegExp> = { rut: /^Rút bộ câu$/, tron: /^L�
  *
  * Nay hạn của `it` lớn hơn hạn chờ bên trong, nên thứ quyết định là điều kiện
  * kiểm chứ không phải cái mốc nào tới trước. KHÔNG nới điều kiện kiểm. */
-const HAN_PHEP_KIEM = 30000
+const HAN_PHEP_KIEM = 70000
+
+// SỐ HỌC CỦA NGÂN SÁCH NÀY TỪNG SAI, và đó là lý do phép kiểm vẫn đỏ ngẫu nhiên
+// trên máy CI dù ghi chú ở trên nói đã chữa xong (đỏ lần nữa ở `3f5ed34`, đúng
+// dòng aria-checked).
+//
+// `moCa()` có BA lần `waitFor` nối tiếp, mỗi lần hạn 20 000 ms, và có `it` gọi
+// `moCa()` hai lần. Trần cũ 30 000 ms cho cả `it` nhỏ hơn tổng các hạn bên trong,
+// nên máy chạy chậm là `it` hết giờ TRƯỚC khi lần chờ thứ hai kịp xong — vitest
+// báo đúng cái `expect` đang chờ dở, trông y như điều kiện kiểm sai.
+//
+// Nay trần `it` LỚN HƠN tổng hạn bên trong (3 × 20 000 + dư). KHÔNG nới một điều
+// kiện kiểm nào, không rút hạn chờ nào — chỉ sửa đúng phép cộng.
 
 async function moCa(cach: CachLay) {
   // Gỡ màn của lần trước: một `it` mở ca hai lần thì hai màn cùng nằm trong
