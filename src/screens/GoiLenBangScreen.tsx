@@ -17,6 +17,7 @@ import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/Desig
 import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, type CaTomTat } from '../lib/exam-api'
 import { docKhoChuaCa, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { mergeKeepAnswers } from '../data/examContent'
+import { khuTrungNguon } from '../lib/khu-trung-cau'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import HopChonDe from '../components/HopChonDe'
@@ -120,7 +121,7 @@ export default function GoiLenBangScreen() {
   const [locSao, setLocSao] = useState<LocSao>(LOC_SAO_MAC_DINH)
   const [locDang, setLocDang] = useState<LocDang>(LOC_DANG_MAC_DINH)
   useEffect(() => {
-    void loadExamSources().then(setKhoDe)
+    void loadExamSources().then((ds) => setKhoDe(khuTrungNguon(ds).nguon))
   }, [])
   const [timEm, setTimEm] = useState('')
 
@@ -136,7 +137,7 @@ export default function GoiLenBangScreen() {
       const [url, mat, kho] = await Promise.all([loadScriptUrl(), loadTeacherSecret(), loadExamSources()])
       // Mỗi mã đề tách làm ba dạng (trắc nghiệm · đúng sai · trả lời ngắn), y
       // hệt màn Mở ca — tích một dòng là lấy đúng dạng đó.
-      setDeDaLuu(tachNhieuTheoPhan(kho))
+      setDeDaLuu(khuTrungNguon(tachNhieuTheoPhan(kho)).nguon)
       if (!url.trim() || !mat.trim()) {
         setLoi('Chưa cấu hình link Apps Script hoặc mã bí mật — vào Ngân hàng câu hỏi → Cấu hình')
         setDsCa([])

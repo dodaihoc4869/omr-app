@@ -16,6 +16,7 @@ import { chuoi, danhSachEm, khoiTuNamSinh, publishSession, type CongBoDiem, type
 import { docSoCauCa, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, luuCheDoDeRieng, luuKhoChuaCa, luuSoCauCa, saveSessionTeacherBank } from '../lib/exam-db'
 import { AN_HAN_CHON_GIAY, BAT_MAC_DINH_CA_THI, MS_AN_HAN_NHA_TAY } from '../lib/giu-de-doc'
 import { dongBoNganHang } from '../lib/exam-sync'
+import { khuTrungNguon, tongBoQua } from '../lib/khu-trung-cau'
 import { useAppStore } from '../store/appStore'
 
 const O_NHAP: React.CSSProperties = {
@@ -255,7 +256,13 @@ export default function ExamSetupScreen() {
   // bài, tránh câu trùng ca trước, lịch sử ca cũ đều không đụng gì.
   const dsDeTach = useMemo(() => tachNhieuTheoPhan(savedSources), [savedSources])
 
-  const selectedSources = useMemo(() => dsDeTach.filter((c) => selectedMaDe.has(c.maDe)), [dsDeTach, selectedMaDe])
+  // KHỬ TRÙNG NGAY Ở ĐÂY, trước mọi thứ khác (đếm câu, bộ rút, gói đẩy lên máy
+  // chủ), để cả màn chỉ nhìn thấy bộ câu đã sạch. Khử ở dưới sâu hơn thì con số
+  // "đề ra N câu" thầy đọc trên màn vẫn là số có trùng.
+  // Luật: trùng thì giữ bản trong nhánh "Bộ đề" (thầy chốt 09/09).
+  const kqKhuTrung = useMemo(() => khuTrungNguon(dsDeTach.filter((c) => selectedMaDe.has(c.maDe))), [dsDeTach, selectedMaDe])
+  const selectedSources = kqKhuTrung.nguon
+  const soCauTrung = tongBoQua(kqKhuTrung.boQua)
 
   /** Bộ đề THẬT SỰ gửi lên máy chủ: đã cắt xuống còn những câu thầy chốt. */
   // CA CÓ RA MÀN GỌI LÊN BẢNG HAY KHÔNG — suy thẳng từ lựa chọn ở khối Bộ câu
@@ -416,6 +423,11 @@ export default function ExamSetupScreen() {
             {selectedSources.length > 0 && (
               <div style={NHAN_NHO}>
                 Đã chọn {selectedSources.length} đề · đề ra {tongCauDaChon} câu
+              </div>
+            )}
+            {soCauTrung > 0 && (
+              <div style={{ ...NHAN_NHO, color: 'var(--g1)' }}>
+                Đã bỏ {soCauTrung} câu trùng giữa hai nhánh kho — giữ bản trong Bộ đề
               </div>
             )}
           </div>
