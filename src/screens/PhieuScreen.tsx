@@ -619,7 +619,7 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duC
                 <div className="bc-viec-chu">{du.vieCanLam}</div>
               </>
             )}
-            {du.deCuaEm && du.deCuaEm.length > 0 && <NutXemDeCuaCon du={du} />}
+            {du.deCuaEm && du.deCuaEm.length > 0 && <NutXemDeDaLam du={du} laCuaEm={laCuaEm} />}
             {((du.baiTap && du.baiTap.length > 0) || du.linkBaiTap) && <NutTaiBaiTap du={du} laCuaEm={laCuaEm} xinLink={xinLink} />}
           </section>
         )}
@@ -628,7 +628,11 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duC
           <div>
             <b>Thầy Đỗ Đại Học</b>
           </div>
-          <div>Báo cáo riêng của em {du.hoTen || du.sbd}. Phụ huynh giữ trong máy, không chuyển tiếp cho người khác.</div>
+          <div>
+            {laCuaEm
+              ? `Báo cáo riêng của em ${du.hoTen || du.sbd}. Em giữ trong máy, không chuyển tiếp cho người khác.`
+              : `Báo cáo riêng của em ${du.hoTen || du.sbd}. Phụ huynh giữ trong máy, không chuyển tiếp cho người khác.`}
+          </div>
         </footer>
       </div>
     </div>
@@ -646,10 +650,17 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duC
  * chung đề của ca được. Ca nhiều hình mà gói quá nặng thì lúc gửi đã bỏ trường
  * này ra (giamGoiPhieu) và nút không hiện — thà thiếu nút còn hơn phụ huynh
  * không nhận được báo cáo. */
-function NutXemDeCuaCon({ du }: { du: PhieuDayDu }) {
+function NutXemDeDaLam({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: boolean }) {
   const [dang, setDang] = useState(false)
   const [loi, setLoi] = useState('')
   const [html, setHtml] = useState('')
+  // XƯNG HÔ THEO NGƯỜI ĐANG ĐỌC. Khối này trước đây KHÔNG nhận `laCuaEm` nên
+  // năm chỗ chữ đều xưng kiểu gửi phụ huynh, kể cả khi chính em đang mở báo cáo
+  // của mình. Thầy báo 09/09: "phần rút đề của học sinh bị nhầm báo cáo phụ
+  // huynh". Đợt vá 08/09 chỉ chữa dòng "việc cần làm" (`doiXungVeEm`), không
+  // với tới khối này vì nó không hề biết người đọc là ai.
+  const xung = laCuaEm ? 'em' : 'con'
+  const XUNG = laCuaEm ? 'Em' : 'Phụ huynh'
 
   const mo = async () => {
     setDang(true)
@@ -666,7 +677,7 @@ function NutXemDeCuaCon({ du }: { du: PhieuDayDu }) {
             tenChuyenDe: cd.length === 1 ? cd[0] : du.tenCa || 'Hoá học',
             ketQua: `Điểm ${du.diem.toFixed(2).replace('.', ',')}/10`,
             hienDapAn: true,
-            nhanBia: 'Đề con vừa làm, kèm lời giải',
+            nhanBia: `Đề ${xung} vừa làm, kèm lời giải`,
             oBia: [
               { nhan: 'Học sinh', gia: du.hoTen },
               { nhan: 'SBD', gia: du.sbd },
@@ -677,7 +688,7 @@ function NutXemDeCuaCon({ du }: { du: PhieuDayDu }) {
         ),
       )
     } catch {
-      setLoi('Máy chưa mở được đề. Phụ huynh thử lại khi có mạng ổn định.')
+      setLoi(`Máy chưa mở được đề. ${XUNG} thử lại khi có mạng ổn định.`)
     } finally {
       setDang(false)
     }
@@ -703,13 +714,13 @@ function NutXemDeCuaCon({ du }: { du: PhieuDayDu }) {
           opacity: dang ? 0.6 : 1,
         }}
       >
-        {dang ? 'Đang dựng đề…' : `Xem đề con vừa làm (${du.deCuaEm?.length ?? 0} câu) kèm lời giải`}
+        {dang ? 'Đang dựng đề…' : `Xem đề ${xung} vừa làm (${du.deCuaEm?.length ?? 0} câu) kèm lời giải`}
       </button>
       <div style={{ fontSize: 12, color: 'var(--p-nhat)', marginTop: 7, lineHeight: 1.6 }}>
-        Đúng bộ câu máy đã gán riêng cho con. Bấm vào từng câu để xem đáp án và lời giải.
+        Đúng bộ câu máy đã gán riêng cho {xung}. Bấm vào từng câu để xem đáp án và lời giải.
       </div>
       {loi && <div style={{ fontSize: 12.5, color: 'var(--p-do)', marginTop: 6 }}>{loi}</div>}
-      {html && <KhungXemPhieu html={html} ten="Đề con vừa làm" dong={() => setHtml('')} />}
+      {html && <KhungXemPhieu html={html} ten={`Đề ${xung} vừa làm`} dong={() => setHtml('')} />}
     </div>
   )
 }
