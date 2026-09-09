@@ -714,31 +714,37 @@ function NutXemDeCuaCon({ du }: { du: PhieuDayDu }) {
   )
 }
 
-/** Vòng điểm có số chạy lên. Tách riêng để phần đếm số không dựng lại cả trang. */
-function VongDiem({ diem, tat }: { diem: number; tat: boolean }) {
+/** Vòng điểm. SỐ VẼ THẲNG, KHÔNG CHẠY LÊN.
+ *
+ * VÌ SAO BỎ VÒNG CHẠY SỐ (thầy chụp lại 09/09: link gửi phụ huynh
+ * `p#iiBopoadsq` in "0,00 trên 10" trong khi ba dòng điểm phần ngay dưới ghi
+ * 3,38 · 3,00 · 1,50 và xếp loại ghi "Khá" — tức dữ liệu đúng 7,88).
+ *
+ * Vòng chạy số cũ đi bằng `requestAnimationFrame`. Trình duyệt DỪNG HẲN rAF khi
+ * thẻ không ở trước mặt, mà `so` khởi tạo bằng 0 — nên phiếu mở trong thẻ nền
+ * (phụ huynh bấm link trong Zalo rồi chuyển sang việc khác, hay trình duyệt tự
+ * mở nền) đứng nguyên ở 0,00. Không phải hiếm: đo được lần này chỉ bằng cách mở
+ * link ở thẻ không active.
+ *
+ * `PhieuV3` đã bỏ vòng chạy số đúng vì lý do này từ 07/09; màn này — màn THẬT SỰ
+ * phục vụ link `/p#` gửi phụ huynh — thì chưa. Nay bỏ nốt.
+ *
+ * Vành tròn vẫn hiện dần bằng transition CSS, và mốc bật nó nay là `setTimeout`
+ * chứ không phải rAF, nên thẻ nền cũng về đúng trạng thái cuối.
+ *
+ * CẤM đưa lại bất kỳ cách hiển thị điểm nào phụ thuộc rAF: số gửi phụ huynh
+ * không được phép sai chỉ vì cái thẻ không nằm trước mặt. */
+export function VongDiem({ diem, tat }: { diem: number; tat: boolean }) {
   const R = 51
   const C = 2 * Math.PI * R
   const [ra, setRa] = useState(tat)
-  const [so, setSo] = useState(tat ? diem : 0)
+  const so = diem
 
   useEffect(() => {
     if (tat) return
-    let id = 0
-    const t0 = performance.now()
-    const buoc = (t: number) => {
-      const k = Math.min(1, (t - t0) / 950)
-      setSo(diem * (1 - Math.pow(1 - k, 3)))
-      if (k < 1) id = requestAnimationFrame(buoc)
-    }
-    const r = requestAnimationFrame(() => {
-      setRa(true)
-      id = requestAnimationFrame(buoc)
-    })
-    return () => {
-      cancelAnimationFrame(r)
-      cancelAnimationFrame(id)
-    }
-  }, [diem, tat])
+    const id = setTimeout(() => setRa(true), 30)
+    return () => clearTimeout(id)
+  }, [tat])
 
   return (
     <div className="bc-vong">
