@@ -15,17 +15,37 @@
 // ngay chỗ chốt danh sách đề đã chọn, rồi phần dưới chạy nguyên như cũ.
 import type { TeacherExamSource } from '../data/examContent'
 
-/** Một nguồn thuộc nhánh "Bộ đề" hay không — đọc từ `nhom`, vd
- * "12 · Bộ đề chuẩn cấu trúc". Chấp nhận cả nhóm không có phần khối phía trước.
+/** Tên chương của một nguồn — phần sau dấu chấm giữa của `nhom`, vd
+ * "12 · Bộ đề chuẩn cấu trúc" → "bộ đề chuẩn cấu trúc". Chữ thường để so.
  *
  * KHÔNG đọc từ `maDe`: mã đề trong Bộ đề là mã gốc thầy đặt (vd "100"), không
  * theo khuôn nào, nên bám vào đó là đoán mò. */
-export function laNhanhBoDe(s: Pick<TeacherExamSource, 'nhom'>): boolean {
+function chuongCua(s: Pick<TeacherExamSource, 'nhom'>): string {
   const n = (s.nhom || '').trim()
-  if (!n) return false
+  if (!n) return ''
   const i = n.indexOf('·')
-  const sau = (i >= 0 ? n.slice(i + 1) : n).trim().toLowerCase()
-  return sau.startsWith('bộ đề')
+  return (i >= 0 ? n.slice(i + 1) : n).trim().toLowerCase()
+}
+
+export function laNhanhBoDe(s: Pick<TeacherExamSource, 'nhom'>): boolean {
+  return chuongCua(s).startsWith('bộ đề')
+}
+
+/** Nhánh "Kho cũ trước 09-09": bản lưu của các đề trước khi kho xếp lại theo
+ * bài. Cùng câu với cây theo bài, chỉ khác cách chia đề. */
+export function laNhanhKhoCu(s: Pick<TeacherExamSource, 'nhom'>): boolean {
+  return chuongCua(s).startsWith('kho cũ')
+}
+
+/** THỨ TỰ ƯU TIÊN khi một câu nằm ở nhiều nhánh — số nhỏ thắng.
+ *
+ * 0 Bộ đề    — giữ được ngữ cảnh đề thi thật, thầy chốt 09/09 lấy bản này.
+ * 1 cây bài  — bản đang dùng để ra đề hằng ngày.
+ * 2 Kho cũ   — chỉ để tra lại, không bao giờ thắng bản đang dùng. */
+export function hangUuTien(s: Pick<TeacherExamSource, 'nhom'>): number {
+  if (laNhanhBoDe(s)) return 0
+  if (laNhanhKhoCu(s)) return 2
+  return 1
 }
 
 /** Gộp khoảng trắng và bỏ khoảng trắng hai đầu. Hai bản của cùng một câu đi ra
@@ -60,15 +80,16 @@ export interface KetQuaKhuTrung {
  * bỏ câu lặp y hệt (nếu có) và giữ nguyên thứ tự. Đây là đường chạy của mọi ca
  * cũ, nên phải không đổi hành vi. */
 export function khuTrungNguon(ds: TeacherExamSource[]): KetQuaKhuTrung {
-  // Vòng 1: khoá của mọi câu NẰM TRONG nhánh Bộ đề. Vòng 2 gặp lại khoá này ở
-  // nhánh theo bài thì bỏ bản theo bài, bất kể bản nào đứng trước trong danh
-  // sách — thứ tự chọn của thầy không được đổi kết quả.
-  const uuTien = new Set<string>()
+  // Vòng 1: với mỗi khoá câu, ghi lại HẠNG TỐT NHẤT mà nó xuất hiện. Vòng 2
+  // chỉ giữ bản nào đúng hạng đó — thứ tự thầy tích không được đổi kết quả.
+  const hangTot = new Map<string, number>()
   for (const s of ds) {
-    if (!laNhanhBoDe(s)) continue
-    for (const q of s.phanI) uuTien.add(khoaCau(q))
-    for (const q of s.phanII) uuTien.add(khoaCau(q))
-    for (const q of s.phanIII) uuTien.add(khoaCau(q))
+    const h = hangUuTien(s)
+    for (const q of [...s.phanI, ...s.phanII, ...s.phanIII]) {
+      const k = khoaCau(q)
+      const cu2 = hangTot.get(k)
+      if (cu2 === undefined || h < cu2) hangTot.set(k, h)
+    }
   }
 
   const daCo = new Set<string>()
@@ -76,12 +97,12 @@ export function khuTrungNguon(ds: TeacherExamSource[]): KetQuaKhuTrung {
   const nguon: TeacherExamSource[] = []
 
   for (const s of ds) {
-    const boDe = laNhanhBoDe(s)
+    const hang = hangUuTien(s)
     const giu = <T extends { text: string; choices?: string[]; ideas?: string[] }>(ds2: T[], phan: 'I' | 'II' | 'III'): T[] =>
       ds2.filter((q) => {
         const k = khoaCau(q)
-        // Bản theo bài thua bản Bộ đề; ngoài ra bản nào tới trước thì giữ.
-        if (daCo.has(k) || (!boDe && uuTien.has(k))) {
+        // Thua hạng thì bỏ; cùng hạng thì bản tới trước giữ.
+        if (daCo.has(k) || hang > (hangTot.get(k) ?? hang)) {
           boQua[phan] += 1
           return false
         }
