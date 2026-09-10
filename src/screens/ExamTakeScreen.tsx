@@ -2264,6 +2264,10 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 hinhAnh={q.hinhAnh}
                 ideas={q.ideas}
                 ideaImgs={q.ideaImgs}
+                // CÙNG thứ tự xáo với lúc làm bài. Xem lại mà đảo lại thứ tự thì
+                // "ý b) em chọn Đúng" đổi nghĩa giữa hai màn — em đọc ra một
+                // đằng, bài chấm một nẻo.
+                yPerm={item.yPerm}
                 selected={attempt.answers.phanII[item.qid] ?? [null, null, null, null]}
                 correct={q.correct}
                 explanation={q.explanation}
@@ -2586,7 +2590,10 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 hinhAnh={item.question.hinhAnh}
                 ideas={item.question.ideas}
                 ideaImgs={item.question.ideaImgs}
+                yPerm={item.yPerm}
                 selected={attempt.answers.phanII[item.qid] ?? [null, null, null, null]}
+                // `idx` là chỉ số Ý GỐC (TheCau đã quy về), nên đáp án cất đi
+                // vẫn theo thứ tự gốc và đường chấm không phải biết gì về xáo.
                 onSelect={(idx, v) => setPhanII(item.qid, idx, v)}
                 onZoom={setZoomSrc}
               />

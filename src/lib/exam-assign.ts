@@ -13,6 +13,16 @@ export interface AssignedMcq {
 export interface AssignedTrueFalse {
   qid: string
   question: TrueFalseQuestion
+  /** XÁO BỐN Ý PHẦN II — `yPerm[viTríHiểnThị] = chỉSốÝGốc(0..3)`.
+   *
+   * Cùng một cơ chế với `choicePerm` của Phần I, và cùng một chốt an toàn: đáp
+   * án em chọn LUÔN được cất theo THỨ TỰ Ý GỐC, chỉ chỗ HIỆN RA mới xáo. Nhờ
+   * vậy `correct` (đánh theo thứ tự gốc), `taoChiTietCau`, và toàn bộ đường chấm
+   * điểm KHÔNG phải đổi một dòng nào — đây là chỗ sai một tí là chấm sai cả lớp.
+   *
+   * Ca cũ mở trước bản này không có trường ⇒ chỗ vẽ rơi về `[0,1,2,3]`, tức
+   * đúng hành vi cũ, không đổi điểm ca đã gửi phụ huynh. */
+  yPerm: number[]
 }
 export interface AssignedShortAnswer {
   qid: string
@@ -59,7 +69,7 @@ export function assignStudentQuestions(bank: PublicExamBank, maCa: string, sbd: 
       phanI: bank.phanI
         .filter((q) => cua.has(q.id))
         .map((q) => ({ qid: q.id, question: q, choicePerm: seededPermutation(4, hashSeed(`choice:${base}:${q.id}`)) })),
-      phanII: bank.phanII.filter((q) => cua.has(q.id)).map((q) => ({ qid: q.id, question: q })),
+      phanII: bank.phanII.filter((q) => cua.has(q.id)).map((q) => ({ qid: q.id, question: q, yPerm: seededPermutation(4, hashSeed(`y:${base}:${q.id}`)) })),
       phanIII: bank.phanIII.filter((q) => cua.has(q.id)).map((q) => ({ qid: q.id, question: q })),
     }
   }
@@ -74,7 +84,7 @@ export function assignStudentQuestions(bank: PublicExamBank, maCa: string, sbd: 
       question: q,
       choicePerm: seededPermutation(4, hashSeed(`choice:${base}:${q.id}`)),
     })),
-    phanII: phanIIQs.map((q) => ({ qid: q.id, question: q })),
+    phanII: phanIIQs.map((q) => ({ qid: q.id, question: q, yPerm: seededPermutation(4, hashSeed(`y:${base}:${q.id}`)) })),
     phanIII: phanIIIQs.map((q) => ({ qid: q.id, question: q })),
   }
 }

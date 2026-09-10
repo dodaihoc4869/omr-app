@@ -62,8 +62,13 @@ interface TfProps extends BaseProps {
   ideas: [string, string, string, string]
   ideaImgs?: [string?, string?, string?, string?]
   selected: (DS | null)[]
+  /** `ideaIdx` LUÔN là chỉ số Ý GỐC, kể cả khi bốn ý đang hiện ra theo thứ tự
+   * xáo. Nhờ vậy đáp án cất đi vẫn theo thứ tự gốc và đường chấm không đổi. */
   onSelect?: (ideaIdx: number, v: DS) => void
   correct?: [DS, DS, DS, DS]
+  /** XÁO BỐN Ý: `yPerm[viTríHiểnThị] = chỉSốÝGốc`. Thiếu ⇒ giữ nguyên thứ tự
+   * gốc, đúng hành vi cũ của mọi chỗ đang gọi (xem lại, phiếu, ngân hàng câu). */
+  yPerm?: number[]
 }
 
 interface SaProps extends BaseProps {
@@ -225,9 +230,10 @@ function LoiGiai({ props, nhan }: { props: TheCauProps; nhan?: TrangThaiLoiGiai 
         )}
         {lg && props.phan === 'II' && lg.tungY && (
           <div>
-            {(['a', 'b', 'c', 'd'] as const).map((k, i) => (
-              <DongLyDo key={k} dung={props.correct?.[i] === 'D'} ma={`${k})`} chu={lg.tungY?.[k]?.viSao} />
-            ))}
+            {(props.yPerm && props.yPerm.length === 4 ? props.yPerm : [0, 1, 2, 3]).map((i, viTri) => {
+              const k = (['a', 'b', 'c', 'd'] as const)[i]
+              return <DongLyDo key={k} dung={props.correct?.[i] === 'D'} ma={`${'abcd'[viTri]})`} chu={lg.tungY?.[k]?.viSao} />
+            })}
           </div>
         )}
         {lg && props.phan === 'III' && (
@@ -295,10 +301,14 @@ export default function TheCau(props: TheCauProps) {
     )
   } else if (props.phan === 'II') {
     const { ideas, ideaImgs, selected, onSelect, correct } = props
+    // `viTri` chạy theo THỨ TỰ HIỆN RA; `i` là chỉ số Ý GỐC. Mọi lần đọc/ghi dữ
+    // liệu bên dưới đều dùng `i`, chỉ nhãn a) b) c) d) mới dùng `viTri`.
+    const thuTu = props.yPerm && props.yPerm.length === 4 ? props.yPerm : [0, 1, 2, 3]
     body = (
       <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
-        {ideas.map((idea, i) => {
-          const chu = 'abcd'[i] as 'a' | 'b' | 'c' | 'd'
+        {thuTu.map((i, viTri) => {
+          const idea = ideas[i]
+          const chu = 'abcd'[viTri] as 'a' | 'b' | 'c' | 'd'
           const val = selected[i] ?? null
           const dapAn = xemLai ? correct?.[i] : undefined
           const dung = xemLai && val !== null && val === dapAn
