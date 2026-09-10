@@ -28,6 +28,13 @@ import { LOC_DANG_MAC_DINH, MOI_LOC_DANG, TEN_LOC_DANG, type LocDang } from '../
 import { SO_CAU_MAC_DINH } from '../lib/cau-hinh-chua'
 import ThanhSoCauChua from '../components/ThanhSoCauChua'
 import { bangChu, chuCau, chuChum, MAC_DINH, phanCong, TEN_MUC_NHAM, type CauChua, type DongPhanCong, type KetQuaPhanCong } from '../lib/phan-cong'
+import { baiLamCoGiayTuCa } from '../lib/du-lieu-len-bang'
+import { CAU_HINH_LEN_BANG_MAC_DINH, TEN_LANE, dongHo, nganSachGiay } from '../lib/len-bang-cau-hinh'
+import { dungDoKho, vapCuaLop } from '../lib/do-kho-cau'
+import { xepGioLenBang, type KetQuaXep } from '../lib/xep-gio-len-bang'
+import { dungGiaoAn } from '../lib/giao-an-len-bang'
+import { KHO_DO_KHO_RONG, gopCaVaoKho, thongKeKho, type KhoDoKhoLuu } from '../lib/kho-do-kho'
+import { docKhoDoKho, luuKhoDoKho } from '../lib/exam-db'
 import TheCau from '../components/TheCau'
 import { useAppStore } from '../store/appStore'
 
@@ -128,6 +135,15 @@ export default function GoiLenBangScreen() {
   const [soLuot, setSoLuot] = useState(1)
   const [daGoiCau, setDaGoiCau] = useState<Record<string, string[]>>({})
   const [kq, setKq] = useState<KetQuaPhanCong | null>(null)
+
+  // ---- GIÁO ÁN 80 PHÚT (GOI-LEN-BANG-80-PHUT.md) --------------------------
+  const [kho, setKho] = useState<KhoDoKhoLuu>(KHO_DO_KHO_RONG)
+  const [dangDungKho, setDangDungKho] = useState('')
+  const [kqXep, setKqXep] = useState<KetQuaXep | null>(null)
+  const [boBatBuoc, setBoBatBuoc] = useState<string[]>([])
+  const [tranEm, setTranEm] = useState(CAU_HINH_LEN_BANG_MAC_DINH.SO_EM_LEN_BANG_TOI_DA)
+  const [giayMoiEm, setGiayMoiEm] = useState(CAU_HINH_LEN_BANG_MAC_DINH.GIAY_LANE.L3)
+  const [daCopyGiaoAn, setDaCopyGiaoAn] = useState(false)
   const [daCopy, setDaCopy] = useState(false)
   const [xemCau, setXemCau] = useState('')
   const [dangCham, setDangCham] = useState('')
@@ -310,6 +326,106 @@ export default function GoiLenBangScreen() {
     }
     return m
   }, [du, bankThem])
+
+  // ------------------------------------------------ GIÁO ÁN 80 PHÚT: dữ liệu
+  //
+  // Dùng CHUNG `dsCau` / `dsEmCa` với đường phân công cũ — một nguồn sự thật về
+  // "chữa câu nào, có mặt em nào". Chỉ thêm hai thứ đường cũ không cần: giây
+  // làm từng câu (để đọc nguyên nhân sai) và kho lịch sử (nguồn N2).
+  const baiLamGiay = useMemo(() => (du ? baiLamCoGiayTuCa(du.bank, du.maCa, du.luot) : []), [du])
+  const vapCa = useMemo(() => vapCuaLop(dsCau, baiLamGiay), [dsCau, baiLamGiay])
+  const doKhoCau = useMemo(() => dungDoKho(dsCau, baiLamGiay, kho.muc), [dsCau, baiLamGiay, kho])
+  const soBatBuoc = useMemo(() => doKhoCau.filter((d) => d.batBuoc && !boBatBuoc.includes(d.cau.id)).length, [doKhoCau, boBatBuoc])
+  const emLenBang = useMemo(
+    () => dsEmCa.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen, coMat: e.coMat, soLanLenBang: 0 })),
+    [dsEmCa],
+  )
+  const chuGiaoAn = useMemo(() => {
+    if (!kqXep || !du) return ''
+    return dungGiaoAn(kqXep, {
+      ngay: new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }),
+      maCa: du.maCa,
+      soEmNop: du.luot.filter((l) => daCoBaiLam(l)).length,
+      tenDe: du.ten,
+      // Bộ câu lấy thẳng từ ca đang mở ⇒ đường A, khớp tuyệt đối, không suy đoán.
+      duong: 'A',
+      soCauKhop: kqXep.dong.length,
+      soCauTong: dsCau.length,
+    })
+  }, [kqXep, du, dsCau])
+
+  useEffect(() => {
+    void (async () => {
+      // Đọc hỏng thì chạy tiếp với kho rỗng: mất N2 chỉ làm độ khó rơi về N1/N3
+      // kèm dòng chữ nói rõ, còn ném lỗi ở đây là gãy cả màn.
+      try {
+        const c = await docKhoDoKho<KhoDoKhoLuu>()
+        if (c && c.muc) setKho(c)
+      } catch {
+        /* kho độ khó là phần thêm, không có vẫn xếp được giờ */
+      }
+    })()
+  }, [])
+
+  /** Dựng nền kho độ khó: duyệt ca cũ trên máy chủ, cộng dồn theo qid. Chỉ nạp
+   * ca CHƯA duyệt nên bấm lại lần hai gần như tức thì. */
+  const dungKho = async () => {
+    if (!cauHinh) return showToast('Chưa cấu hình máy chủ', 'error')
+    setDangDungKho('Đang lấy danh sách ca…')
+    try {
+      const ds = await danhSachCa(cauHinh.url, cauHinh.mat)
+      let hienTai = kho
+      const canNap = ds.filter((c) => !hienTai.daDuyet.includes(c.maCa))
+      let i = 0
+      for (const c of canNap) {
+        i++
+        setDangDungKho(`Đang nạp ca ${i}/${canNap.length} — ${c.maCa}`)
+        try {
+          const ct = await chiTietCa(cauHinh.url, cauHinh.mat, c.maCa, true)
+          const bank: BanDeCa | null = ct.keyBank ? { phanI: ct.keyBank.phanI, phanII: ct.keyBank.phanII, phanIII: ct.keyBank.phanIII } : null
+          if (!bank) continue
+          hienTai = gopCaVaoKho(hienTai, c.maCa, bank, ct.luot as unknown as LuotCa[], new Date().toISOString())
+        } catch {
+          // Một ca hỏng KHÔNG chặn các ca còn lại; ca ấy đơn giản là chưa vào kho.
+        }
+      }
+      await luuKhoDoKho(hienTai)
+      setKho(hienTai)
+      const tk = thongKeKho(hienTai)
+      showToast(`Kho độ khó: ${tk.soQid} câu qua ${tk.soCa} ca · ${tk.ge8} câu đạt 8 lượt trở lên`, 'success')
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Không dựng được kho độ khó', 'error')
+    } finally {
+      setDangDungKho('')
+    }
+  }
+
+  const chayGiaoAn = () => {
+    if (!du) return showToast('Chưa mở ca nào', 'warn')
+    if (!dsCau.length) return showToast('Chưa có câu nào để chữa', 'warn')
+    const r = xepGioLenBang(doKhoCau, emLenBang, baiLamGiay, vapCa.theoEm, {
+      boBatBuoc,
+      tranEm,
+      giayMoiEm,
+      thieuGiay: !vapCa.coGiay,
+      // Máy chủ chưa giữ được lịch sử lên bảng (`ghiTienDo_` không có cột nào
+      // cho việc ấy), nên luôn khai thật thay vì in một ngày giả.
+      chuaCoLichSuLenBang: true,
+    })
+    setKqXep(r)
+  }
+
+  const copyGiaoAn = async () => {
+    if (!chuGiaoAn) return
+    try {
+      await navigator.clipboard.writeText(chuGiaoAn)
+      setDaCopyGiaoAn(true)
+      setTimeout(() => setDaCopyGiaoAn(false), 2500)
+      showToast('Đã copy giáo án', 'success')
+    } catch {
+      showToast(chuGiaoAn, 'success')
+    }
+  }
 
   const chay = (luot: number) => {
     if (!du) return showToast('Chưa mở ca nào', 'warn')
@@ -691,6 +807,158 @@ export default function GoiLenBangScreen() {
               </label>
             ))}
           </div>
+        </TheNoiDung>
+      )}
+
+      {/* 4A — GIÁO ÁN 80 PHÚT (GOI-LEN-BANG-80-PHUT.md mục 6) */}
+      {du && (
+        <TheNoiDung>
+          <div className="flex items-center justify-between flex-wrap" style={{ gap: 'var(--k2)' }}>
+            <div style={TIEU_DE_MUC}>Giáo án {CAU_HINH_LEN_BANG_MAC_DINH.NGAN_SACH_PHUT} phút</div>
+            <button
+              type="button"
+              onClick={() => void dungKho()}
+              disabled={!!dangDungKho}
+              className="tap-target inline-flex items-center font-bold"
+              style={{ gap: 6, minHeight: 40, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', color: 'var(--muc)', border: 'none', fontSize: 'var(--cx-1)' }}
+            >
+              <RefreshCw size={16} /> {dangDungKho || 'Dựng kho độ khó'}
+            </button>
+          </div>
+
+          {/* Kho lịch sử là nguồn N2. Nói thẳng nó đang có gì, đừng để thầy đoán. */}
+          <div style={{ ...NHAN_NHO, marginTop: 4 }}>
+            Kho độ khó: <span style={SO}>{Object.keys(kho.muc).length}</span> câu qua <span style={SO}>{kho.daDuyet.length}</span> ca đã duyệt
+            {Object.keys(kho.muc).length === 0 && ' — chưa dựng, độ khó đang chỉ đọc từ ca này và nhãn sao trong kho'}
+          </div>
+
+          {/* 4 — DANH SÁCH BẮT BUỘC CHỮA, hiện TRƯỚC khi xếp giờ */}
+          {doKhoCau.length > 0 && (
+            <div style={{ marginTop: 'var(--k4)', padding: 'var(--k3)', borderRadius: 'var(--bo-2)', background: 'var(--cam-nen)' }} data-khoi="bat-buoc-chua">
+              <div className="flex items-center font-bold" style={{ gap: 6, color: 'var(--cam)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
+                <BookOpenCheck size={16} /> BẮT BUỘC CHỮA — <span style={SO}>{soBatBuoc}</span>/<span style={SO}>{doKhoCau.length}</span> câu
+              </div>
+              <div className="flex flex-col" style={{ gap: 4, marginTop: 'var(--k2)' }}>
+                {doKhoCau
+                  .filter((d) => d.batBuoc)
+                  .map((d) => (
+                    <label key={d.cau.id} className="flex items-start" style={{ gap: 8, fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--muc)' }}>
+                      <input
+                        type="checkbox"
+                        checked={!boBatBuoc.includes(d.cau.id)}
+                        onChange={() =>
+                          setBoBatBuoc((cu) => (cu.includes(d.cau.id) ? cu.filter((x) => x !== d.cau.id) : [...cu, d.cau.id]))
+                        }
+                        style={{ marginTop: 3 }}
+                      />
+                      <span>
+                        <b>{chuCau(d.cau)}</b> · {d.viSaoBatBuoc}
+                      </span>
+                    </label>
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* 6 — CÀI ĐẶT: một nguồn sự thật, thầy chỉnh được đúng hai thứ mà ba
+              lựa chọn thừa giờ nhắc tới. */}
+          <div className="flex items-center flex-wrap" style={{ gap: 'var(--k3)', marginTop: 'var(--k4)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
+            <label className="flex items-center" style={{ gap: 6 }}>
+              Trần em lên bảng
+              <input
+                type="number"
+                min={0}
+                max={30}
+                value={tranEm}
+                onChange={(e) => setTranEm(Math.max(0, Math.min(30, Number(e.target.value) || 0)))}
+                style={{ ...SO, width: 64, height: 36, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', border: 'none', color: 'var(--muc)', textAlign: 'center' }}
+              />
+            </label>
+            <label className="flex items-center" style={{ gap: 6 }}>
+              Phút mỗi em
+              <input
+                type="number"
+                min={1}
+                max={20}
+                value={Math.round(giayMoiEm / 60)}
+                onChange={(e) => setGiayMoiEm(Math.max(60, Math.min(1200, (Number(e.target.value) || 1) * 60)))}
+                style={{ ...SO, width: 64, height: 36, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', border: 'none', color: 'var(--muc)', textAlign: 'center' }}
+              />
+            </label>
+            <span>
+              ngân sách chữa <span style={SO}>{Math.round(nganSachGiay(CAU_HINH_LEN_BANG_MAC_DINH) / 60)}</span> phút
+            </span>
+          </div>
+
+          <div style={{ marginTop: 'var(--k4)' }}>
+            <NutChinh onClick={chayGiaoAn} disabled={!dsCau.length}>
+              <span className="inline-flex items-center" style={{ gap: 6 }}>
+                <Wand2 size={18} /> Xếp giờ ({dsCau.length} câu · {soCoMat} em)
+              </span>
+            </NutChinh>
+          </div>
+
+          {/* 5 — CẢNH BÁO THỪA GIỜ: hiện đúng con số và ba lựa chọn, CHỜ THẦY CHẠM */}
+          {kqXep?.thuaGio && (
+            <OThongBao tone="do">
+              <b style={SO}>{kqXep.thuaGio.soCauBatBuoc}</b> câu bắt buộc · cần{' '}
+              <b style={SO}>{Math.round(kqXep.thuaGio.giayCan / 60)}</b> phút, có{' '}
+              <b style={SO}>{Math.round(kqXep.thuaGio.giayCo / 60)}</b> phút.
+              <div className="flex flex-col" style={{ gap: 4, marginTop: 6 }}>
+                {kqXep.thuaGio.luaChon.map((l) => (
+                  <div key={l.ma}>
+                    {l.ma === 1 ? '①' : l.ma === 2 ? '②' : '③'} {l.chu} → <span style={SO}>{l.phutSau}</span> phút
+                  </div>
+                ))}
+              </div>
+            </OThongBao>
+          )}
+
+          {kqXep?.canhBao.map((c) => (
+            <OThongBao key={c} tone="cam">
+              {c}
+            </OThongBao>
+          ))}
+
+          {/* 7 — GIÁO ÁN CÓ ĐỒNG HỒ */}
+          {kqXep && kqXep.dong.length > 0 && (
+            <div style={{ marginTop: 'var(--k4)' }} data-khoi="giao-an">
+              <div className="flex items-center justify-between flex-wrap" style={{ gap: 'var(--k2)' }}>
+                <div style={{ ...NHAN_NHO }}>
+                  <span style={SO}>{Math.round(kqXep.tongGiay / 60)}</span>/
+                  <span style={SO}>{CAU_HINH_LEN_BANG_MAC_DINH.NGAN_SACH_PHUT}</span> phút ·{' '}
+                  <span style={SO}>{kqXep.soEmLenBang}</span> em lên bảng ·{' '}
+                  {(['L0', 'L1', 'L2', 'L3'] as const).map((l) => `${kqXep.dong.filter((d) => d.lane === l).length} ${TEN_LANE[l].toLowerCase()}`).join(' · ')}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void copyGiaoAn()}
+                  className="tap-target inline-flex items-center font-bold"
+                  style={{ gap: 6, minHeight: 40, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: daCopyGiaoAn ? 'var(--xanh-nen)' : 'var(--the-2)', color: daCopyGiaoAn ? 'var(--xanh)' : 'var(--muc)', border: 'none', fontSize: 'var(--cx-1)' }}
+                >
+                  {daCopyGiaoAn ? <Check size={16} /> : <ClipboardCopy size={16} />} {daCopyGiaoAn ? 'Đã copy' : 'Copy giáo án'}
+                </button>
+              </div>
+              <pre
+                style={{
+                  marginTop: 'var(--k3)',
+                  padding: 'var(--k3)',
+                  borderRadius: 'var(--bo-2)',
+                  background: 'var(--the-2)',
+                  color: 'var(--muc)',
+                  fontFamily: 'var(--sans)',
+                  fontSize: 'var(--cx-1)',
+                  whiteSpace: 'pre-wrap',
+                  overflowX: 'auto',
+                }}
+              >
+                {chuGiaoAn}
+              </pre>
+              <div style={{ ...NHAN_NHO, marginTop: 4 }}>
+                Đồng hồ bắt đầu từ {dongHo(0)}. Mỗi con số trong giáo án đều kèm cỡ mẫu và tên nguồn.
+              </div>
+            </div>
+          )}
         </TheNoiDung>
       )}
 

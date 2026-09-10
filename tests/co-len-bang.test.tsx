@@ -47,6 +47,10 @@ vi.mock('../src/lib/exam-db', () => ({
   luuSoCauCa: async () => {},
   saveSessionTeacherBank,
   // Khối "Mật khẩu mở app" trong màn Cài đặt đọc hai hàm này lúc dựng.
+  // Màn Gọi lên bảng đọc kho độ khó (nguồn N2 của giáo án 80 phút) lúc dựng.
+  docKhoDoKho: async () => undefined,
+  luuKhoDoKho: async () => {},
+  docKhoChuaCa: async () => undefined,
   loadKhoaApp: async () => null,
   saveKhoaApp: vi.fn(),
   goKhoaApp: vi.fn(),

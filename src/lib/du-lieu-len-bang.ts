@@ -20,6 +20,7 @@ import type { AnswerRecord } from './exam-db'
 import { taoChiTietCau } from './chi-tiet-cau'
 import type { ChiTietCauRow } from './exam-api'
 import { chuanChuyenDe, type BaiLam, type CauChua, type EmGoi, type PhanDe } from './phan-cong'
+import type { BaiLamCoGiay } from './do-kho-cau'
 import type { MucDo } from './goi-len-bang'
 
 /** Bản đề CÓ đáp án của ca. `boTheoEm` chỉ còn để đọc lại ca mở trước 05/09;
@@ -117,6 +118,30 @@ export function baiLamTuCa(bank: BanDeCa, maCa: string, luot: LuotCa[]): BaiLam[
       // Câu bỏ trống tính là LÀM SAI, không tính là chưa làm: em đã ngồi trước
       // câu đó và không ra được đáp án — đúng chỗ cần chữa.
       ra.push({ sbd: l.sbd, idCau: r.qid, dung: r.dungSai === true, chon: r.dapAnChon || undefined })
+    }
+  }
+  return ra
+}
+
+/** Y HỆT `baiLamTuCa` NHƯNG GIỮ LẠI `giay` VÀ `dapAnDung`.
+ *
+ * Giáo án 80 phút cần hai thứ đó để đọc NGUYÊN NHÂN em sai (nhanh quá là đoán,
+ * chậm quá là chưa biết, lệch dưới 15% đáp án phần III là tính sai). `BaiLam`
+ * cũ cố tình gọn nên không mang; thêm trường vào đó thì mọi chỗ đang dùng phải
+ * đọc lại — nên tách một hàm riêng, cùng một nguồn `taoChiTietCau`. */
+export function baiLamCoGiayTuCa(bank: BanDeCa, maCa: string, luot: LuotCa[]): BaiLamCoGiay[] {
+  const ra: BaiLamCoGiay[] = []
+  for (const l of luotMoiNhat(luot)) {
+    if (!daCoBaiLam(l)) continue
+    for (const r of taoChiTietCau(bank, maCa, l.sbd, l.dapAn as AnswerRecord, l.giayCau ?? null)) {
+      ra.push({
+        sbd: l.sbd,
+        idCau: r.qid,
+        dung: r.dungSai === true,
+        chon: r.dapAnChon || undefined,
+        dapAnDung: r.dapAnDung || undefined,
+        giay: r.giay,
+      })
     }
   }
   return ra

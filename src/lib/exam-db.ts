@@ -597,3 +597,20 @@ export async function loadMyStudentSbd(): Promise<string> {
   const db = await getDb()
   return (await db.get(STORE_SETTINGS, 'myStudentSbd')) || ''
 }
+
+/** KHO ĐỘ KHÓ (nguồn N2 của giáo án 80 phút): qid → đã chạy bao nhiêu lượt,
+ * đúng bao nhiêu, qua mấy ca. Xem `kho-do-kho.ts`.
+ *
+ * Nằm ở `settings` như `soCauCa` và `khoChuaCa`: KHÔNG nâng phiên bản IndexedDB.
+ * Nâng phiên bản trên máy thầy giữa mùa là rủi ro thật, mà mất kho này cũng
+ * không sao — dựng lại được từ máy chủ, và trong lúc chưa có thì độ khó tự rơi
+ * về N1/N3 kèm dòng chữ nói rõ là chưa có lịch sử. */
+export async function luuKhoDoKho(kho: unknown): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, kho, 'khoDoKho')
+}
+
+export async function docKhoDoKho<T>(): Promise<T | undefined> {
+  const db = await getDb()
+  return (await db.get(STORE_SETTINGS, 'khoDoKho')) as T | undefined
+}
