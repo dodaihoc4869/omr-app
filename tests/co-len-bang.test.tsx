@@ -111,13 +111,27 @@ async function moCa(cach: CachLay) {
   // 1 giây mặc định và phép kiểm đỏ ngẫu nhiên. Điều kiện kiểm giữ nguyên,
   // chỉ cho nó đủ thời gian chạy.
   await waitFor(() => expect(r.container.textContent).toContain('Bộ câu ra đề'), { timeout: 20000 })
-  fireEvent.click(r.getByRole('checkbox', { name: TEN_CHIP[cach] }))
-  // CHỜ KHỐI RÚT BÁO XONG rồi mới bấm Mở ca. Tick chip chỉ đổi `cheDo`; phải
-  // qua HAI hiệu ứng nữa (rút bộ câu, rồi báo lên màn) thì cờ `lenBang` mới
-  // tới nơi. Bấm Mở ca ngay là gói gửi đi còn mang giá trị của chế độ CŨ —
-  // đúng kiểu trượt ngẫu nhiên khi máy tải nặng (thầy gặp 08/09).
-  // Điều kiện kiểm giữ nguyên, chỉ chờ cho đủ.
-  await waitFor(() => expect(r.getByRole('checkbox', { name: TEN_CHIP[cach] }).getAttribute('aria-checked')).toBe('true'), { timeout: 20000 })
+  // BẤM LẠI TRÊN NÚT VỪA TRUY VẤN, mỗi vòng chờ một lần.
+  //
+  // NGUYÊN NHÂN GỐC, tìm ra 10/09 sau khi CI đỏ ở đây còn máy tôi chạy 8 lượt
+  // đều xanh: bấm MỘT lần rồi chờ 20 giây là sai kiểu. Màn Mở ca còn vài hiệu
+  // ứng chạy sau khi chữ "Bộ câu ra đề" hiện ra; một trong số đó dựng lại khối
+  // chip, THAY nút cũ bằng nút mới. Cú bấm rơi vào nút đã rời khỏi cây DOM thì
+  // mất hẳn — `aria-checked` không bao giờ đổi, và chờ bao lâu cũng vô ích. Máy
+  // nhanh thì hai việc ấy không chen vào nhau nên không ai thấy.
+  //
+  // Nay mỗi vòng chờ TRUY VẤN LẠI rồi mới bấm, nên cú bấm luôn rơi vào nút đang
+  // sống. Bấm lại một chip đã tích KHÔNG bỏ tích (nó là radio-kiểu-chip), nên
+  // lặp là an toàn. ĐIỀU KIỆN KIỂM GIỮ NGUYÊN: chip phải `aria-checked=true`;
+  // chip không bao giờ tích được thì vẫn đỏ đúng như trước.
+  await waitFor(
+    () => {
+      const o = r.getByRole('checkbox', { name: TEN_CHIP[cach] })
+      if (o.getAttribute('aria-checked') !== 'true') fireEvent.click(o)
+      expect(r.getByRole('checkbox', { name: TEN_CHIP[cach] }).getAttribute('aria-checked')).toBe('true')
+    },
+    { timeout: 20000 },
+  )
   fireEvent.change(r.getByPlaceholderText('Lớp (vd 12A1)'), { target: { value: '12A1' } })
   // Tiêu đề màn cũng là chữ "Mở ca kiểm tra" — lấy đúng cái NÚT.
   fireEvent.click(r.getAllByText('Mở ca kiểm tra').find((e) => e.tagName === 'BUTTON')!)
