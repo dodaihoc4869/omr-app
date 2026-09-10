@@ -193,9 +193,21 @@ describe('mọi lựa chọn đều lấy dữ liệu phiếu phụ huynh và m�
 })
 
 describe('phía đọc: màn Gọi lên bảng và máy chủ', () => {
-  it('màn Gọi lên bảng ẩn ca không có cờ, nhưng vẫn với tới được', async () => {
+  // VIẾT LẠI 10/09 — giả định cũ đã bị chính dữ liệu thật bác bỏ.
+  //
+  // Bản cũ ghim NGUYÊN VĂN `hienCaTat || c.lenBang`, tức ghim luôn cả cái lỗi:
+  // biểu thức ấy lọc theo cờ KỂ CẢ khi không ca nào có cờ. Đo máy chủ sáng
+  // 10/09: 7/7 ca chưa xoá đều `LenBang='khong'` ⇒ danh sách rỗng sạch ⇒ thầy
+  // báo "trong mục gọi học sinh lên bảng tôi chưa thấy thay đổi gì".
+  //
+  // Ý ĐỊNH thì vẫn đúng và giữ nguyên: ẩn ca không có cờ, nhưng vẫn với tới
+  // được. Chỗ sai là ẩn cả khi ẩn xong chẳng còn gì. Nay điều kiện phải kèm
+  // `soCaCoNutGat > 0`. Hành vi đầy đủ được dựng ra màn mà kiểm ở
+  // `tests/man-goi-len-bang-hien-ra-1009.test.tsx` — tệp này chỉ giữ chốt nguồn.
+  it('màn Gọi lên bảng ẩn ca không có cờ CHỈ KHI còn ca có cờ, và vẫn với tới được', async () => {
     const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
-    expect(ma).toContain('hienCaTat || c.lenBang')
+    expect(ma).toContain('soCaCoNutGat > 0 && !hienCaTat')
+    expect(ma).toContain('!locTheoNutGat || c.lenBang')
     expect(ma).toContain('ca đã tắt nút gạt')
   }, HAN_PHEP_KIEM)
 

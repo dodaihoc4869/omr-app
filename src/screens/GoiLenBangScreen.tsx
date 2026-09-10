@@ -177,12 +177,27 @@ export default function GoiLenBangScreen() {
    * Vẫn với tới được bằng chip "Hiện cả ca đã tắt" — thầy đổi ý sau buổi thi
    * thì không phải mở lại ca. */
   const soCaTat = useMemo(() => (dsCa ?? []).filter((c) => !c.lenBang).length, [dsCa])
+  /** Số ca CÓ bật nút gạt "Phân công lên bảng" lúc mở ca. */
+  const soCaCoNutGat = useMemo(() => (dsCa ?? []).filter((c) => c.lenBang).length, [dsCa])
+  /** LỌC THEO NÚT GẠT CHỈ KHI CÒN GÌ ĐỂ LỌC.
+   *
+   * Thầy báo 10/09: "trong mục gọi học sinh lên bảng tôi chưa thấy thay đổi gì".
+   * Đo trên máy chủ: 7/7 ca chưa xoá đều `LenBang='khong'`, KHÔNG ca nào 'co'.
+   * Bộ lọc cũ vì thế cắt sạch danh sách, màn hiện đúng dòng "Chưa có ca nào
+   * khớp" và DỪNG ở đó — mục 2, mục 3 lẫn khối Giáo án đều treo sau `du`, mà
+   * `du` chỉ có khi mở được một ca. Nói cách khác cả màn chết, không riêng phần
+   * mới.
+   *
+   * Bộ lọc là TIỆN ÍCH cho thầy nào có dùng nút gạt; khi nó lọc hết thì nó
+   * không còn là tiện ích nữa. Không ca nào bật nút gạt ⇒ hiện tất, kèm một
+   * dòng nói rõ vì sao, thay vì bắt thầy đoán ra cái nút "Hiện cả N ca". */
+  const locTheoNutGat = soCaCoNutGat > 0 && !hienCaTat
   const dsCaLoc = useMemo(() => {
     const q = timCa.trim().toLowerCase()
     return (dsCa ?? [])
-      .filter((c) => hienCaTat || c.lenBang)
+      .filter((c) => !locTheoNutGat || c.lenBang)
       .filter((c) => !q || c.maCa.includes(q) || (c.tenCa || '').toLowerCase().includes(q) || (c.lop || '').toLowerCase().includes(q))
-  }, [dsCa, timCa, hienCaTat])
+  }, [dsCa, timCa, locTheoNutGat])
 
   /** MỞ MỘT CA: kéo về bản đề CÓ đáp án + đáp án từng em + hồ sơ tích luỹ.
    *
@@ -442,7 +457,7 @@ export default function GoiLenBangScreen() {
 
   const chayGiaoAn = () => {
     if (!du) return showToast('Chưa mở ca nào', 'warn')
-    if (!dsCau.length) return showToast('Chưa có câu nào để chữa', 'warn')
+    if (!dsCau.length) return showToast('Chưa có câu nào để chữa — lên mục 2 tích bài cần chữa trước', 'warn')
     const r = xepGioLenBang(doKhoCau, emLenBang, baiLamGiay, vapCa.theoEm, {
       boBatBuoc,
       tranEm,
@@ -700,8 +715,13 @@ export default function GoiLenBangScreen() {
           )}
         </div>
         <div style={{ ...NHAN_NHO, marginTop: 4 }}>Câu để chữa và bài làm của em đều lấy từ ca này — cùng dữ liệu với phiếu gửi phụ huynh.</div>
+        {dsCa !== null && soCaCoNutGat === 0 && soCaTat > 0 && (
+          <div style={{ ...NHAN_NHO, marginTop: 4 }}>
+            Không ca nào mở ở chế độ &ldquo;Phân công lên bảng&rdquo; nên đang hiện cả <span style={SO}>{soCaTat}</span> ca. Chọn một ca để xếp giáo án.
+          </div>
+        )}
 
-        {soCaTat > 0 && (
+        {soCaCoNutGat > 0 && soCaTat > 0 && (
           <button
             type="button"
             onClick={() => setHienCaTat((v) => !v)}
@@ -1013,7 +1033,13 @@ export default function GoiLenBangScreen() {
           </div>
 
           <div style={{ marginTop: 'var(--k4)' }}>
-            <NutChinh onClick={chayGiaoAn} disabled={!dsCau.length}>
+            {/* CÙNG ĐIỀU KIỆN MỜ VỚI NÚT PHÂN CÔNG CŨ (`!du || soCoMat === 0`).
+                Bản trước mờ theo `!dsCau.length`, mà `chayGiaoAn` đã có sẵn lời
+                nhắc cho đúng ca ấy — nút mờ chặn trước nên lời nhắc không bao giờ
+                hiện. Thầy mở ca xong thấy "Xếp giờ (0 câu · 10 em)" nằm im, không
+                câu nào nói vì sao, trong khi nút cũ ngay dưới vẫn bấm được. Nút
+                chết lặng là đúng thứ đặc tả cấm: không lặng lẽ sai. */}
+            <NutChinh onClick={chayGiaoAn} disabled={!du || soCoMat === 0}>
               <span className="inline-flex items-center" style={{ gap: 6 }}>
                 <Wand2 size={18} /> Xếp giờ ({dsCau.length} câu · {soCoMat} em)
               </span>
