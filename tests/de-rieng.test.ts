@@ -133,11 +133,28 @@ describe('bảng nghiệm thu mục 8', () => {
     expect(lap.qids).toEqual(['I-7'])
   })
 
-  it('chỉ quét ngược SO_CA_TRA_NGUOC ca, không quét cả năm', () => {
+  it('QUÉT CẢ THƯ MỤC NĂM SINH — em nghỉ mấy buổi vẫn tìm ra ca gần nhất em có nộp', () => {
+    // VIẾT LẠI 10/09 — thầy đổi PHẠM VI, không phải mã hỏng.
+    //
+    //   "khi chọn ca thi rút câu sai, bạn phải quét hết thư mục năm sinh đó,
+    //    tìm ra lần thi gần nhất của từng học sinh"
+    //
+    // Giả định cũ "chỉ quét ngược 3 ca" nay sai theo đúng nghĩa: em nghỉ ba
+    // buổi liền là mất sạch câu lặp và lặng lẽ rơi về nhãn "mới vào". Tệ hơn,
+    // ba ca gần nhất tính trên MỌI khối nên ca 2011 rút phải câu sai của ca
+    // 2009. Phạm vi nay là CẢ THƯ MỤC NĂM SINH (`docCacCaTruoc` lọc trước),
+    // `TRAN_CA_QUET` chỉ còn là trần an toàn.
     const trong = (ma: string): CaTruocDaCham => ({ maCa: ma, daLamCua: {}, saiCua: {} })
     const xa: CaTruocDaCham = { maCa: 'ca-qua-xa', daLamCua: { '12000': ['I-1'] }, saiCua: { '12000': ['I-1'] } }
     const ds = [trong('c1'), trong('c2'), trong('c3'), xa]
-    expect(CAU_HINH_DE_RIENG_MAC_DINH.SO_CA_TRA_NGUOC).toBe(3)
+    // Bản cũ trả '' ở đây — tức bỏ rơi em nghỉ ba buổi.
+    expect(chonCauLapChoEm('12000', ds, 6, demLanSai(ds)).tuCa).toBe('ca-qua-xa')
+  })
+
+  it('TRẦN AN TOÀN vẫn còn — không để một năm hàng trăm ca làm treo lượt dựng đề', () => {
+    const trong = (ma: string): CaTruocDaCham => ({ maCa: ma, daLamCua: {}, saiCua: {} })
+    const xa: CaTruocDaCham = { maCa: 'ngoai-tran', daLamCua: { '12000': ['I-1'] }, saiCua: { '12000': ['I-1'] } }
+    const ds = [...Array.from({ length: CAU_HINH_DE_RIENG_MAC_DINH.TRAN_CA_QUET }, (_, i) => trong(`c${i}`)), xa]
     expect(chonCauLapChoEm('12000', ds, 6, demLanSai(ds)).tuCa).toBe('')
   })
 

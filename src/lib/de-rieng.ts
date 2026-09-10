@@ -89,7 +89,11 @@ export function chonCauLapChoEm(
   demSai: Record<string, Record<string, number>>,
   ch: CauHinhDeRieng = CAU_HINH_DE_RIENG_MAC_DINH,
 ): CauLapCuaEm {
-  const quet = dsCa.slice(0, Math.max(0, ch.SO_CA_TRA_NGUOC))
+  // QUÉT CẢ THƯ MỤC NĂM SINH, không chặn ở ba ca (thầy chốt 10/09: "tìm ra lần
+  // thi gần nhất của từng học sinh"). `dsCa` vào đây đã lọc còn một năm sinh.
+  // Em nghỉ mấy buổi liền vẫn tìm ra ca gần nhất em CÓ nộp — bản trước nghỉ
+  // đúng ba buổi là mất sạch câu lặp và lặng lẽ rơi về "mới vào".
+  const quet = dsCa.slice(0, Math.max(0, ch.TRAN_CA_QUET))
   const caCoNop = quet.find((c) => (c.daLamCua[sbd] ?? []).length > 0)
   if (!caCoNop) {
     // Phân biệt "chưa từng xuất hiện" với "có tên mà ca nào cũng vắng": hai

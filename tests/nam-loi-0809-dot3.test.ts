@@ -62,9 +62,20 @@ describe('PHẠM VI RÚT CÂU HỎI LẠI', () => {
   const ca = (m: string) => ({ maCa: m })
   const ds = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8'].map(ca)
 
-  it('gan_nhat: giữ đúng SO_CA_TRA_NGUOC ca gần nhất, theo thứ tự', () => {
+  it('gan_nhat: giữ CẢ thư mục năm sinh, theo thứ tự', () => {
+    // VIẾT LẠI 10/09 — thầy đổi PHẠM VI, không phải mã hỏng.
+    //
+    //   "khi chọn ca thi rút câu sai, bạn phải quét hết thư mục năm sinh đó,
+    //    tìm ra lần thi gần nhất của từng học sinh"
+    //
+    // Giả định cũ "chỉ quét ngược 3 ca" nay sai theo đúng nghĩa: em nghỉ ba
+    // buổi liền là mất sạch câu lặp và lặng lẽ rơi về nhãn "mới vào". Tệ hơn,
+    // ba ca gần nhất tính trên MỌI khối nên ca 2011 rút phải câu sai của ca
+    // 2009. Phạm vi nay là CẢ THƯ MỤC NĂM SINH (`docCacCaTruoc` lọc trước),
+    // `TRAN_CA_QUET` chỉ còn là trần an toàn.
     const ra = chonCaTheoPhamVi(ds, 'moi', { ...CAU_HINH_DE_RIENG_MAC_DINH, PHAM_VI_HOI_LAI: 'gan_nhat' })
-    expect(ra.map((c) => c.maCa)).toEqual(['c1', 'c2', 'c3'])
+    // Bản cũ cắt còn ['c1','c2','c3'].
+    expect(ra.map((c) => c.maCa)).toEqual(ds.map((c) => c.maCa))
   })
 
   it('ba_ca: bốc ĐÚNG 3 ca, và KHÔNG phải 3 ca gần nhất', () => {

@@ -4,8 +4,9 @@
 // Bật "Chọn" → mỗi hàng thành ô tích, xoá được nhiều ca ngay tại màn này.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
 import { useEffect, useMemo, useState } from 'react'
-import { CheckSquare, RefreshCw, RotateCcw, Search, Square, Trash2 } from 'lucide-react'
+import { CheckSquare, RefreshCw, RotateCcw, Search, Square, Trash2, ChevronDown, ChevronRight} from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
+import { THU_MUC_KHAC, gomCaTheoNamSinh } from '../lib/nam-sinh-ca'
 import { danhSachCa, khoiPhucCa, xoaNhieuCa, type CaTomTat } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { gioMayChu } from '../lib/gio-may-chu'
@@ -104,6 +105,8 @@ export default function LichSuCaScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [xemDaXoa])
 
+  /** Thư mục năm sinh đang gấp lại. Mặc định mở hết — thầy mở màn là thấy ca ngay. */
+  const [gapNam, setGapNam] = useState<Record<string, boolean>>({})
   const dsLop = useMemo(() => Array.from(new Set((dsCa ?? []).map((c) => c.lop.trim()).filter(Boolean))).sort(), [dsCa])
   const dsLoc = useMemo(() => {
     const q = timKiem.trim().toLowerCase()
@@ -297,8 +300,26 @@ export default function LichSuCaScreen() {
             )}
           </div>
         ) : (
-          <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
-            {dsLoc.map((c) => {
+          <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
+            {gomCaTheoNamSinh(dsLoc, (c) => c.tenCa).map((tm) => (
+              <div key={tm.nam} className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+                {/* THƯ MỤC NĂM SINH. Tên ca thầy luôn để năm ở đầu, nên cây này
+                    dựng từ dữ liệu sẵn có — ca cũ vào đúng chỗ ngay, không phải
+                    sửa tay ca nào. Bấm để gấp lại cho đỡ dài. */}
+                <button
+                  type="button"
+                  onClick={() => setGapNam((cu) => ({ ...cu, [tm.nam]: !cu[tm.nam] }))}
+                  aria-expanded={!gapNam[tm.nam]}
+                  className="tap-target flex items-center font-bold self-start"
+                  style={{ gap: 6, minHeight: 36, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', border: 'none', color: 'var(--muc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}
+                >
+                  {gapNam[tm.nam] ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
+                  {tm.nam === THU_MUC_KHAC ? THU_MUC_KHAC : `Khối ${tm.nam}`}
+                  <span style={{ ...NHAN_NHO, ...SO }}>({tm.ca.length})</span>
+                </button>
+                {!gapNam[tm.nam] && (
+                  <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+                    {tm.ca.map((c) => {
               const tt = trangThaiCa(c, now)
               const tich = daChon.includes(c.maCa)
               return (
@@ -347,6 +368,10 @@ export default function LichSuCaScreen() {
                 </Hang>
               )
             })}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         )}
 

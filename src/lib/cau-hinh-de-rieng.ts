@@ -13,9 +13,17 @@ export interface CauHinhDeRieng {
    * hẳn nhau: em sai 2 câu mà đề 20 câu, tính theo đề là đòi 6 câu lặp trong
    * khi em chỉ có 2. */
   TI_LE_CAU_LAP: number
-  /** Quét ngược mấy ca để tìm ca gần nhất em CÓ NỘP. Em nghỉ buổi trước thì
-   * lùi tiếp một ca, không lấy bừa ca gần nhất của lớp. */
-  SO_CA_TRA_NGUOC: number
+  /** TRẦN AN TOÀN cho số ca quét ngược, KHÔNG phải phạm vi thường ngày.
+   *
+   * Thầy chốt 10/09: "phải quét hết thư mục năm sinh đó, tìm ra lần thi gần
+   * nhất của từng học sinh". Nên phạm vi mặc định nay là CẢ THƯ MỤC NĂM SINH,
+   * còn con số này chỉ để chặn trường hợp một năm có hàng trăm ca làm lượt dựng
+   * đề treo. Đặt rộng tay: hết năm học một khối cũng hiếm khi quá ngần này.
+   *
+   * Bản trước để 3 và dùng nó làm PHẠM VI: em nghỉ đúng ba buổi là mất sạch câu
+   * lặp, và tệ hơn — ba ca gần nhất tính trên MỌI khối, nên ca khối 10 rút phải
+   * câu sai của ca khối 12. */
+  TRAN_CA_QUET: number
   /** Một câu lặp đủ số lần này mà em vẫn sai thì THÔI LẶP. Lặp lần thứ tư là
    * đang thay việc dạy lại bằng việc hỏi lại. */
   TRAN_LAP_MOT_CAU: number
@@ -24,7 +32,7 @@ export interface CauHinhDeRieng {
   CHO_LAP_CAU_BO_TRONG: boolean
   /** LẤY CÂU SAI TỪ ĐÂU (thầy chốt 08/09, hai nút ở màn Mở ca):
    *   · `gan_nhat` — chỉ ca gần nhất em có nộp. Đo đúng buổi vừa dạy. Vẫn quét
-   *                  lùi `SO_CA_TRA_NGUOC` ca để TÌM ca đó, nhưng chỉ LẤY một.
+   *                  quét cả thư mục năm sinh để TÌM ca đó, nhưng chỉ LẤY một.
    *   · `ba_ca`    — bốc NGẪU NHIÊN 3 ca bất kỳ trong các ca đã thi trước đó,
    *                  không nhất thiết 3 ca gần nhất (thầy chốt 08/09: "chỗ rút
    *                  3 ca bạn rút ngẫu nhiên 3 ca trước đó bất kì không cần
@@ -41,13 +49,13 @@ export const TEN_PHAM_VI_HOI_LAI: Record<CauHinhDeRieng['PHAM_VI_HOI_LAI'], stri
 }
 
 export const GIAI_THICH_PHAM_VI: Record<CauHinhDeRieng['PHAM_VI_HOI_LAI'], string> = {
-  gan_nhat: 'Lấy 30% số câu em sai ở đúng ca gần nhất em có nộp. Đo đúng buổi vừa dạy.',
-  ba_ca: 'Bốc 3 ca bất kỳ trong các ca đã thi trước đó, gộp câu sai rồi lấy 30%. Bắt được cả lỗi cũ em vẫn chưa sửa.',
+  gan_nhat: 'Quét cả thư mục năm sinh, tìm ca GẦN NHẤT TỪNG EM có nộp rồi lấy 30% số câu em sai ở đúng ca đó. Em nghỉ mấy buổi vẫn tìm ra.',
+  ba_ca: 'Bốc 3 ca bất kỳ TRONG THƯ MỤC NĂM SINH, gộp câu sai rồi lấy 30%. Bắt được cả lỗi cũ em vẫn chưa sửa.',
 }
 
 export const CAU_HINH_DE_RIENG_MAC_DINH: CauHinhDeRieng = {
   TI_LE_CAU_LAP: 0.3,
-  SO_CA_TRA_NGUOC: 3,
+  TRAN_CA_QUET: 60,
   TRAN_LAP_MOT_CAU: 3,
   CHO_LAP_CAU_BO_TRONG: false,
   PHAM_VI_HOI_LAI: 'gan_nhat',
@@ -65,7 +73,7 @@ export function cauHinhDeRieng(luu?: Partial<CauHinhDeRieng> | null): CauHinhDeR
     // Kẹp trong (0, 1]: tỉ lệ 0 là tắt tính năng mà vẫn bật công tắc, tỉ lệ > 1
     // là đòi nhiều câu lặp hơn số câu của đề.
     TI_LE_CAU_LAP: Number.isFinite(ti) && ti > 0 && ti <= 1 ? ti : CAU_HINH_DE_RIENG_MAC_DINH.TI_LE_CAU_LAP,
-    SO_CA_TRA_NGUOC: soDuong(c.SO_CA_TRA_NGUOC, CAU_HINH_DE_RIENG_MAC_DINH.SO_CA_TRA_NGUOC),
+    TRAN_CA_QUET: soDuong(c.TRAN_CA_QUET, CAU_HINH_DE_RIENG_MAC_DINH.TRAN_CA_QUET),
     TRAN_LAP_MOT_CAU: soDuong(c.TRAN_LAP_MOT_CAU, CAU_HINH_DE_RIENG_MAC_DINH.TRAN_LAP_MOT_CAU),
     CHO_LAP_CAU_BO_TRONG: c.CHO_LAP_CAU_BO_TRONG === true,
     PHAM_VI_HOI_LAI: c.PHAM_VI_HOI_LAI === 'ba_ca' ? 'ba_ca' : 'gan_nhat',

@@ -3,8 +3,9 @@
 // Tách khỏi `de-rieng.ts` để lõi thuật toán test được không cần máy chủ.
 //
 // SỐ LỆNH MÁY CHỦ: đúng MỘT lệnh cho MỘT CA (`chiTietCa`), không phải một lệnh
-// cho một em. Quét ngược tối đa `SO_CA_TRA_NGUOC` ca ⇒ tối đa 3 lệnh cho cả
+// cho một em. Quét cả thư mục năm sinh, chặn trần `TRAN_CA_QUET` ⇒ vẫn gộp cho
 // lớp 40 em, đúng ngưỡng ở bảng nghiệm thu.
+import { namSinhTuTenCa } from './nam-sinh-ca'
 import { banDoSaiCa, chiTietCa, danhSachCa, noiKhoCa } from './exam-api'
 import { taoChiTietCau } from './chi-tiet-cau'
 import { docDeRiengCa, loadExamSources, loadSessionTeacherBank, docSoCauCa, saveSessionTeacherBank } from './exam-db'
@@ -87,7 +88,7 @@ export async function docCaTruoc(url: string, mat: string, maCa: string, ch: Cau
 
 /** CHỌN NHỮNG CA SẼ ĐỌC, theo đúng phạm vi thầy chốt lúc mở ca.
  *
- *   · `gan_nhat` — giữ `SO_CA_TRA_NGUOC` ca gần nhất. Không phải để GỘP ba ca:
+ *   · `gan_nhat` — giữ cả thư mục năm sinh. Không phải để GỘP mọi ca:
  *     `chonCauLapChoEm` chỉ lấy MỘT ca — ca gần nhất em CÓ NỘP. Quét lùi là để
  *     em nghỉ buổi trước vẫn có câu hỏi lại, không lấy bừa ca lớp vừa thi.
  *   · `ba_ca`    — BỐC NGẪU NHIÊN 3 ca bất kỳ trong toàn bộ ca đã thi trước
@@ -99,7 +100,10 @@ export async function docCaTruoc(url: string, mat: string, maCa: string, ch: Cau
  * Chỉ lấy ca `loai === 'thi'`: bài tập về nhà không phải bài kiểm tra có thầy
  * coi, lấy câu sai ở đó ra hỏi lại là hỏi lại câu em tra mạng. */
 export function chonCaTheoPhamVi<T extends { maCa: string }>(dsMoiNhatTruoc: T[], maCaNay: string, ch: CauHinhDeRieng = CAU_HINH_DE_RIENG_MAC_DINH): T[] {
-  if (ch.PHAM_VI_HOI_LAI !== 'ba_ca') return dsMoiNhatTruoc.slice(0, Math.max(0, ch.SO_CA_TRA_NGUOC))
+  // `gan_nhat` QUÉT CẢ THƯ MỤC NĂM SINH (thầy chốt 10/09). Danh sách vào đây đã
+  // được `docCacCaTruoc` lọc còn đúng một năm sinh, nên chỉ cần chặn trần an
+  // toàn. Việc tìm "ca gần nhất TỪNG EM có nộp" là của `chonCauLapChoEm`.
+  if (ch.PHAM_VI_HOI_LAI !== 'ba_ca') return dsMoiNhatTruoc.slice(0, Math.max(0, ch.TRAN_CA_QUET))
   const can = Math.min(SO_CA_BOC_NGAU_NHIEN, dsMoiNhatTruoc.length)
   if (can <= 0) return []
   if (dsMoiNhatTruoc.length <= can) return dsMoiNhatTruoc.slice()
@@ -115,10 +119,24 @@ export function chonCaTheoPhamVi<T extends { maCa: string }>(dsMoiNhatTruoc: T[]
 export async function docCacCaTruoc(url: string, mat: string, boCa: string[] = [], ch: CauHinhDeRieng = CAU_HINH_DE_RIENG_MAC_DINH): Promise<NguonCaTruoc> {
   const tatCa = await danhSachCa(url, mat)
   const bo = new Set(boCa.map((x) => x.trim()).filter(Boolean))
+  const maNay = (boCa[0] ?? '').trim()
+
+  // CHỈ QUÉT TRONG CÙNG THƯ MỤC NĂM SINH (thầy chốt 10/09).
+  //
+  // Bản trước xếp MỌI ca của MỌI khối chung một danh sách theo giờ mở rồi lấy
+  // ba ca gần nhất. Ngày 10/09 ca khối 10 thi 14:37 và ca khối 12 thi 17:40 nằm
+  // sát nhau, nên ca 2011 hoàn toàn có thể rút "câu em từng sai" từ một ca
+  // 2009 — khác đề, khác chương, và sai IM LẶNG vì đề vẫn dựng ra bình thường.
+  //
+  // Ca hiện tại không đọc được năm sinh ở tên thì KHÔNG lọc: thà quét rộng còn
+  // hơn quét nhầm sang khối khác vì một cái tên gõ thiếu.
+  const caNay = tatCa.find((c) => c.maCa === maNay)
+  const namNay = namSinhTuTenCa(caNay?.tenCa)
   const dsGoc = tatCa
     .filter((c) => c.loai !== 'baitap' && c.trangThai !== 'da_xoa' && !bo.has(c.maCa))
+    .filter((c) => namNay === null || namSinhTuTenCa(c.tenCa) === namNay)
     .sort((a, b) => String(b.moLuc ?? '').localeCompare(String(a.moLuc ?? '')))
-  const ung = chonCaTheoPhamVi(dsGoc, boCa[0] ?? '', ch)
+  const ung = chonCaTheoPhamVi(dsGoc, maNay, ch)
 
   // BẢN ĐỒ SAI DỰNG SẴN Ở MÁY CHỦ — hỏi trước, MỘT lệnh cho cả mấy ca (thầy
   // chốt 08/09: "ca thi nào cũng phải dựng sẵn bản đồ sai từng câu").

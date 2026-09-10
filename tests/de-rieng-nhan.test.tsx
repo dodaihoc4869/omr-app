@@ -209,9 +209,11 @@ describe('bảng nghiệm thu mục 8 — phần nhãn', () => {
     const thanEm = nguon.slice(dau, nguon.indexOf('return { maCa:', dau))
     expect(dau).toBeGreaterThan(0)
     expect(thanEm).not.toContain('await ')
-    // Và đúng MỘT lệnh đọc ca trong cả file, gọi tối đa `SO_CA_TRA_NGUOC` lần.
+    // Và đúng MỘT lệnh đọc ca trong cả file, gọi tối đa `TRAN_CA_QUET` lần.
+    // Tên hằng đổi 10/09 khi phạm vi chuyển từ "3 ca gần nhất" sang "cả thư mục
+    // năm sinh" — ý định của phép kiểm không đổi: một lệnh cho một CA.
     expect((nguon.match(/await chiTietCa\(/g) || []).length).toBe(1)
     expect((nguon.match(/await danhSachCa\(/g) || []).length).toBe(1)
-    expect(nguon).toContain('ch.SO_CA_TRA_NGUOC')
+    expect(nguon).toContain('ch.TRAN_CA_QUET')
   })
 })
