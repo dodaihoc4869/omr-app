@@ -39,9 +39,28 @@ describe('chem-format — hiển thị công thức Hoá học', () => {
     ])
   })
 
-  it('số đi liền dấu +/- (mơ hồ) giữ nguyên chữ thường, không đoán bừa', () => {
-    expect(parseChemText('Fe3+')).toEqual([{ t: 'text', v: 'Fe3+' }])
-    expect(parseChemText('SO42-')).toEqual([{ t: 'text', v: 'SO42-' }])
+  // ĐỔI 10/09/2026 — thầy duyệt. Bản cũ đòi `Fe3+` và `SO42-` GIỮ NGUYÊN chữ
+  // thường vì máy không biết cắt số ở đâu. Đúng là không được đoán, nhưng ion
+  // CÓ THẬT trong chương trình thì chỗ cắt là xác định, nên tra BẢNG ĐÓNG
+  // `ION_QUEN_THUOC` thay vì đoán. Đo trên kho: 1.201 lượt / 348 câu / 48 đề
+  // đang hiện sai. Ion ngoài bảng vẫn giữ nguyên y như cũ — xem hai phép kiểm
+  // dưới và tests/chem-format-ion.test.ts.
+  it('ion TRONG bảng đóng thì cắt đúng thân và điện tích', () => {
+    expect(parseChemText('Fe3+')).toEqual([
+      { t: 'text', v: 'Fe' },
+      { t: 'sup', v: '3+' },
+    ])
+    expect(parseChemText('SO42-')).toEqual([
+      { t: 'text', v: 'SO' },
+      { t: 'sub', v: '4' },
+      { t: 'sup', v: '2-' },
+    ])
+  })
+
+  it('số đi liền dấu +/- NGOÀI bảng vẫn giữ nguyên chữ thường, không đoán bừa', () => {
+    expect(parseChemText('Cl3-')).toEqual([{ t: 'text', v: 'Cl3-' }])
+    expect(parseChemText('Xe2+')).toEqual([{ t: 'text', v: 'Xe2+' }])
+    expect(parseChemText('C1-')).toEqual([{ t: 'text', v: 'C1-' }])
   })
 
   it('đánh dấu tường minh bằng ^{...} luôn đúng theo ý thầy gõ', () => {

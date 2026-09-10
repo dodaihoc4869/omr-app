@@ -85,7 +85,18 @@ describe('Dấu nối trong công thức cấu tạo', () => {
   it('ĐIỆN TÍCH thật vẫn lên số mũ như cũ', () => {
     expect(hien('ion OH- và Na+ trong dung dịch')).toBe('ion OH^(-) và Na^(+) trong dung dịch')
     expect(hien('Cl-')).toBe('Cl^(-)')
-    expect(hien('NH4+')).toBe('NH4+')
+    // SỬA 10/09: `NH4+` NAY LÊN SỐ MŨ, và đó mới là đúng.
+    //
+    // Dòng cũ ghim `NH4+` giữ nguyên chữ thường — nó ghim đúng GIỚI HẠN của bản
+    // cũ chứ không phải một luật hoá học: số đi kèm dấu +/- cắt được hai kiểu
+    // (`SO42-` là SO4 và 2-, hay S O và 42-?) nên máy KHÔNG đoán. Bảng ion quen
+    // thuộc bỏ chỗ phải đoán đi: ammonium là ion CÓ THẬT trong chương trình phổ
+    // thông, chỗ cắt là XÁC ĐỊNH, nên nay hiện đúng NH₄⁺.
+    expect(hien('NH4+')).toBe('NH_(4)^(+)')
+    // Và luật cũ vẫn nguyên vẹn cho chuỗi KHÔNG có trong bảng — mã đề `12-C1-B2`
+    // không được biến thành ion. Đây là nửa phải giữ.
+    expect(hien('C1-')).toBe('C1-')
+    expect(hien('Cl3-')).toBe('Cl3-')
   })
 
   it('nhóm thế -NH2, -COOH, -CHO đứng đầu từ vẫn là nhóm, không phải ion', () => {

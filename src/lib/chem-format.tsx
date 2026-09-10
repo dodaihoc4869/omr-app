@@ -316,8 +316,73 @@ function chanCauHinh(ch: string | undefined): boolean {
   return !!ch && /[A-Za-zĐ0-9]/.test(ch)
 }
 
+// ---------------------------------------------------------------------------
+// ION QUEN THUOC — bang DONG (thay bat duoc 10/09)
+//
+// LOI DA DINH: anh thay chup cau "nuoc cung" hien ra `Ca2+`, `Mg2+`, `HCO3-`,
+// `SO42-` nguyen van, trong khi `Na2CO3` ngay ben canh lai dep. Ghi chu dau
+// tep noi ro vi sao: so DI KEM dau +/- co the cat hai kieu (`SO42-` la SO4 va
+// 2-, hay S O va 42-?) nen may KHONG doan, giu nguyen chu thuong.
+//
+// Khong doan la dung. Nhung "khong doan" khac "khong biet": voi ion CO THAT
+// trong chuong trinh pho thong thi cho cat la XAC DINH. Nen thay vi doan, tra
+// BANG DONG — dung tinh than bang ma dang cua kho de.
+//
+// VI SAO KHONG DUNG LUAT SINH `<nguyen to><so><dau>`: do that tren kho ngay
+// 10/09, luat do bat nham 2.272 lan — `C1-`, `B3-`, `C2-` la manh cua MA DE
+// `12-C1-B2-D1`, khong phai ion carbon hay boron. Va no cho qua ca `Cl3-`,
+// `Br1+`, `Cs4+`, `Xe2+` — ion khong ton tai, chi la rac MathType. Bang liet
+// ke tay thi hai loai do deu khong lot.
+//
+// Sua o tang TRINH BAY, KHONG sua kho de: moi cau da nam trong kho va moi
+// phieu da gui phu huynh tu dung lai, khong phai nap lai de nao.
+
+/** Ion co that trong chuong trinh pho thong -> danh dau tuong minh cho bo
+ * phan tich san co. Chi ghi ion CO SO di kem dau; ion mot dau (`Na+`, `Cl-`,
+ * `OH-`) da chay dung tu truoc. */
+const ION_QUEN_THUOC: Record<string, string> = {
+  // --- cation kim loai ---
+  'Be2+': 'Be^{2+}', 'Mg2+': 'Mg^{2+}', 'Ca2+': 'Ca^{2+}', 'Sr2+': 'Sr^{2+}', 'Ba2+': 'Ba^{2+}',
+  'Zn2+': 'Zn^{2+}', 'Cu2+': 'Cu^{2+}', 'Fe2+': 'Fe^{2+}', 'Fe3+': 'Fe^{3+}', 'Al3+': 'Al^{3+}',
+  'Ni2+': 'Ni^{2+}', 'Pb2+': 'Pb^{2+}', 'Sn2+': 'Sn^{2+}', 'Sn4+': 'Sn^{4+}', 'Mn2+': 'Mn^{2+}',
+  'Cr2+': 'Cr^{2+}', 'Cr3+': 'Cr^{3+}', 'Co2+': 'Co^{2+}', 'Co3+': 'Co^{3+}', 'Cd2+': 'Cd^{2+}',
+  'Hg2+': 'Hg^{2+}', 'Au3+': 'Au^{3+}', 'Pt2+': 'Pt^{2+}',
+  // --- cation nhieu nguyen tu ---
+  'NH4+': 'NH_{4}^{+}',
+  // --- anion nhieu nguyen tu ---
+  'SO42-': 'SO_{4}^{2-}', 'SO32-': 'SO_{3}^{2-}', 'HSO4-': 'HSO_{4}^{-}', 'HSO3-': 'HSO_{3}^{-}',
+  'CO32-': 'CO_{3}^{2-}', 'HCO3-': 'HCO_{3}^{-}',
+  'NO3-': 'NO_{3}^{-}', 'NO2-': 'NO_{2}^{-}',
+  'PO43-': 'PO_{4}^{3-}', 'HPO42-': 'HPO_{4}^{2-}', 'H2PO4-': 'H_{2}PO_{4}^{-}',
+  'MnO4-': 'MnO_{4}^{-}', 'MnO42-': 'MnO_{4}^{2-}', 'CrO42-': 'CrO_{4}^{2-}', 'Cr2O72-': 'Cr_{2}O_{7}^{2-}',
+  'ClO3-': 'ClO_{3}^{-}', 'ClO4-': 'ClO_{4}^{-}',
+  'AlO2-': 'AlO_{2}^{-}', 'SiO32-': 'SiO_{3}^{2-}', 'S2O32-': 'S_{2}O_{3}^{2-}',
+  'CH3COO-': 'CH_{3}COO^{-}', 'HCOO-': 'HCOO^{-}',
+}
+
+/** Dai nhat truoc, de `SO42-` duoc thu truoc `SO4`; `HCO3-` truoc `CO3`. */
+const RE_ION_QUEN_THUOC = new RegExp(
+  '(?<![A-Za-z0-9])(' +
+    Object.keys(ION_QUEN_THUOC)
+      .sort((a, b) => b.length - a.length)
+      .map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('|') +
+    ')(?![A-Za-z0-9+-])',
+  'g',
+)
+
+/** Doi ion trong bang thanh danh dau tuong minh (`SO42-` -> `SO_{4}^{2-}`).
+ *
+ * Dung lai duong danh dau tuong minh von da co va da co kiem thu, nen khong
+ * dong vao bo phan tich — it rui ro nhat. */
+export function chuanHoaIonQuenThuoc(raw: string): string {
+  const s = String(raw ?? '')
+  if (!/\d[+-]/.test(s)) return s
+  return s.replace(RE_ION_QUEN_THUOC, (m) => ION_QUEN_THUOC[m] ?? m)
+}
+
 export function parseChemText(raw: string): ChemPart[] {
-  const text = chuanHoaCongThucTongQuat(raw).replace(/<=>/g, '⇌').replace(/->/g, '→').replace(/<-/g, '←')
+  const text = chuanHoaCongThucTongQuat(chuanHoaIonQuenThuoc(raw)).replace(/<=>/g, '⇌').replace(/->/g, '→').replace(/<-/g, '←')
   const parts: ChemPart[] = []
   const pushText = (ch: string) => {
     const last = parts[parts.length - 1]
