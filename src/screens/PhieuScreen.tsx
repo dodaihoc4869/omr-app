@@ -243,6 +243,17 @@ function PhanBoLop({ diemLop, cuaEm, tat }: { diemLop: number[]; cuaEm: number; 
 /** DẢI THỜI GIAN TỪNG CÂU: mỗi câu một cột, cao theo số giây, đỏ là câu sai. */
 import { DaiThoiGian, KhoiViPham } from '../components/KhoiBaoCaoChung'
 
+/** Lỗi này là MÁY CHỦ BẬN hay LINK HỎNG? Hai chuyện khác nhau, và lời khuyên
+ * cho phụ huynh cũng khác nhau.
+ *
+ * Bận thì link vẫn dùng được, bấm lại là ra. Hỏng thì bấm mấy cũng vô ích, phải
+ * xin thầy link mới. Bản cũ gộp cả hai vào một câu "nhắn lại cho Thầy để nhận
+ * link mới" — nên lúc máy chủ chỉ bận một lúc, phụ huynh tưởng mất báo cáo. */
+export function laLoiCho(loi: string): boolean {
+  const s = String(loi || '')
+  return s.includes('không trả lời sau') || s.includes('Failed to fetch') || s.includes('NetworkError') || s.includes('HTTP 5')
+}
+
 export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duCoSan?: PhieuDayDu; laCuaEm?: boolean; xinLink?: () => Promise<string> } = {}) {
   const [du, setDu] = useState<PhieuDayDu | null | undefined>(duCoSan ?? undefined)
   // Link phiếu bài tập: trang này chỉ việc hiện trọn tài liệu HTML đã dựng.
@@ -339,8 +350,22 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duC
         <div style={{ maxWidth: 340, textAlign: 'center' }}>
           <div style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 700 }}>Không mở được báo cáo</div>
           <div style={{ marginTop: 10, color: 'var(--p-nhat)', fontSize: 14, lineHeight: 1.7 }}>
-            {loi} Phụ huynh nhắn lại cho Thầy Đỗ Đại Học để nhận link mới.
+            {loi} {laLoiCho(loi) ? 'Link vẫn còn dùng được, chỉ là máy chủ đang bận. Phụ huynh bấm Thử lại.' : 'Phụ huynh nhắn lại cho Thầy Đỗ Đại Học để nhận link mới.'}
           </div>
+          {/* NÚT THỬ LẠI — thầy báo 10/09 22:05. Trước đây màn này là ĐƯỜNG CỤT:
+              phụ huynh bấm link Zalo đúng một lần, gặp lúc máy chủ bận là mất
+              hẳn cái báo cáo, mà câu chữ lại bảo họ đi xin link mới trong khi
+              link không hề hỏng. */}
+          <button
+            type="button"
+            onClick={() => location.reload()}
+            style={{
+              marginTop: 18, font: 'inherit', fontSize: 15, padding: '10px 22px',
+              border: 0, borderRadius: 10, background: 'var(--p-muc)', color: 'var(--p-giay)',
+            }}
+          >
+            Thử lại
+          </button>
         </div>
       </div>
     )

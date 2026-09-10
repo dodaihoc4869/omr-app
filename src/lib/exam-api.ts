@@ -1390,10 +1390,46 @@ export async function luuPhieu(scriptUrl: string, secret: string, d: { ma: strin
   if (!r.ok) throw new Error(r.error || 'Không lưu được phiếu')
 }
 
+/** HẠN CHỜ CỦA PHỤ HUYNH. Bằng đúng hạn của `luuPhieu` — hai đầu cùng một gói.
+ *
+ * Thầy báo 10/09 lúc 22:05, kèm ảnh màn phụ huynh: "Không mở được báo cáo —
+ * Máy chủ không trả lời sau 25 giây."
+ *
+ * Hai chỗ lệch nhau, và cái thứ hai mới là gốc:
+ *
+ *   1. Bên GHI (`luuPhieu`) đã cho 90 giây với đúng lý do "gói nặng, 4 MB qua
+ *      4G có khi mất cả phút" — mà bên ĐỌC lại chỉ được 25 giây mặc định cho
+ *      CHÍNH cái gói ấy. Phiếu ca 890691 nặng 176 KB, phiếu có hình còn nặng
+ *      hơn nhiều.
+ *   2. Apps Script khoá theo script, tức TOÀN CỤC: một ca đang nộp bài là mọi
+ *      lệnh khác xếp hàng phía sau. Đo tối 10/09, lúc 14 em ca 817428 đang nộp:
+ *      `danhSachCa` — lệnh đọc nhẹ nhất trong app — cũng quá 25 giây rồi hỏng.
+ *      Phụ huynh mở link đúng vào lúc ấy thì không có cách nào kịp.
+ *
+ * Với phụ huynh, chờ thêm nửa phút vẫn hơn hẳn một câu báo lỗi: họ bấm link
+ * trong Zalo đúng một lần rồi thôi. */
+const HAN_GIAY_LAY_PHIEU = 90
+
+/** Chờ giữa hai lượt, đủ để lượt đang tắc trên máy chủ chạy xong. */
+const CHO_THU_LAI_MS = 2500
+
 export async function layPhieu(scriptUrl: string, ma: string): Promise<unknown> {
-  const r = await postJson(scriptUrl, { action: 'layPhieu', ma })
-  if (!r.ok) throw new Error(r.error || 'Không tìm thấy phiếu')
-  return r.phieu
+  let cuoi: unknown = null
+  // THỬ LẠI ĐÚNG MỘT LƯỢT, và CHỈ khi hỏng vì mạng hoặc hết hạn chờ. Máy chủ
+  // trả lời "không có phiếu" là một CÂU TRẢ LỜI (thầy đã thu hồi link) — báo
+  // ngay, không bắt phụ huynh ngồi chờ thêm 90 giây nữa cho một kết cục đã biết.
+  for (let lan = 0; lan < 2; lan++) {
+    try {
+      const r = await postJson(scriptUrl, { action: 'layPhieu', ma }, HAN_GIAY_LAY_PHIEU)
+      if (r.ok) return r.phieu
+      throw new Error(r.error || 'Không tìm thấy phiếu')
+    } catch (e) {
+      cuoi = e
+      if (e instanceof Error && e.message.includes('Không tìm thấy phiếu')) throw e
+      if (lan === 0) await new Promise((nghi) => setTimeout(nghi, CHO_THU_LAI_MS))
+    }
+  }
+  throw cuoi instanceof Error ? cuoi : new Error('Không mở được báo cáo')
 }
 
 // ------------------------------------------------- NỘP PHIẾU KHẮC PHỤC
