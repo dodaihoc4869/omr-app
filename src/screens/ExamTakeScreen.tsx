@@ -1799,8 +1799,17 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     const url = scriptUrlRef.current.trim()
     if (!url) return
     let dung = false
+    // CHỐT CHỐNG CHỒNG LƯỢT + LỆCH PHA, cùng lý do với đường nộp bài và màn
+    // Phòng chờ (xem `src/lib/nhip-gui-lai.ts`).
+    //
+    // Đây là ĐÁM ĐÔNG THỨ HAI của ca, ngay sau đám đông nộp bài: cả lớp nộp
+    // trong vòng vài giây rồi cùng ngồi ở màn "Đã nộp", cùng hỏi máy chủ mỗi
+    // ĐÚNG 20 giây cho tới khi thầy công bố. `fetchKetQua` mất 1,3–4,4 giây một
+    // lượt; nghẹn quá 20 giây là lượt sau chồng lên lượt trước, y hệt bệnh cũ.
+    let dangHoi = false
     const hoi = async () => {
-      if (dung || document.hidden) return
+      if (dung || dangHoi || document.hidden) return
+      dangHoi = true
       try {
         const r = await fetchKetQua(url, attempt.maCa, attempt.sbd)
         if (dung) return
@@ -1809,10 +1818,12 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         else if (r.congBo === 'ca_lop_xong') setChoCaLop({ daNop: r.daNop, daVao: r.daVao })
       } catch {
         // mất mạng — lần sau hỏi lại
+      } finally {
+        dangHoi = false
       }
     }
-    hoi()
-    const id = setInterval(hoi, 20000)
+    void hoi()
+    const id = setInterval(() => void hoi(), chuKyLechPhaMs(20000))
     const onVis = () => {
       if (!document.hidden) hoi()
     }

@@ -160,3 +160,31 @@ describe('MÃ MÀN THI — ba chốt không được mất', () => {
     expect(khoi).toContain('const giam = tuDongNop ? gianNopTuDong() : 0')
   })
 })
+
+describe('MỌI NHỊP GỌI MẠNG TRONG CA đều phải có chốt và lệch pha', () => {
+  // Một ca có BỐN đám đông, không phải một. Chữa mỗi đường nộp là còn ba đường
+  // kia cùng bệnh: cả lớp cùng nhịp, không chốt chồng lượt.
+  //
+  //   · Phòng chờ      — cả lớp đứng chờ thầy bấm Bắt đầu   (đã chữa 09/09)
+  //   · Lưu tạm        — mọi máy tự lưu theo cùng chu kỳ     (đã lệch pha)
+  //   · Báo sống       — mọi máy báo trạng thái theo nhịp    (đã lệch pha)
+  //   · Hỏi đáp án     — cả lớp nộp xong cùng ngồi hỏi điểm  (chữa 10/09)
+  it('nhịp HỎI ĐÁP ÁN sau khi nộp: có chốt `dangHoi` và lệch pha', () => {
+    const khoi = MAN.slice(MAN.indexOf('const hoi = async () => {'), MAN.indexOf('const trySend'))
+    expect(khoi).toContain('if (dung || dangHoi || document.hidden) return')
+    expect(khoi).toContain('dangHoi = true')
+    expect(khoi).toContain('dangHoi = false')
+    expect(MAN).toContain('setInterval(() => void hoi(), chuKyLechPhaMs(20000))')
+    // Nhịp trần 20 giây không lệch pha là cả lớp hỏi cùng một khoảnh khắc.
+    expect(MAN).not.toContain('setInterval(hoi, 20000)')
+  })
+
+  it('lưu tạm và báo sống VẪN lệch pha — không được vô tình gỡ', () => {
+    expect(MAN).toContain('chuKyLechPha(10)')
+    expect(MAN).toContain('chuKyLechPha(CHU_KY_LUU_TAM_GIAY)')
+  })
+
+  it('phòng chờ VẪN có chốt chống chồng lượt', () => {
+    expect(MAN).toContain('chuKyLechPhaMs(3000)')
+  })
+})
