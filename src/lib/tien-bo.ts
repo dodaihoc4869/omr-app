@@ -41,14 +41,29 @@ export const NGUONG_LECH = 0.5
  * biểu đồ phải nói cùng con số — không được để đầu màn ghi một đằng, biểu đồ
  * ngay dưới ghi một nẻo. */
 export function chuoiTienBo(ca: HoSoEm['ca'], deTheoCa?: Record<string, number> | null): DiemMotCa[] {
-  const de = (maCa: string, cu: number): number => {
+  // ÁP ĐIỂM TỰ CHẤM TRƯỚC, LỌC SAU. Đảo thứ tự là bản cũ đã sai.
+  //
+  // Thầy chụp được 10/09: hồ sơ em 10016 in "5,60 điểm ca này" ngay đầu màn mà
+  // khối này ngay dưới ghi "Em chưa có bài nào đã chấm điểm". Đo máy chủ: ca
+  // 890691 của em có `Tong` RỖNG vì thầy chưa bấm ghi điểm — điểm 5,60 là số
+  // màn Ca thi TỰ CHẤM tại chỗ rồi truyền xuống qua `deTheoCa`.
+  //
+  // Bản cũ lọc `typeof c.tong === 'number'` TRƯỚC rồi mới gọi `de()`, nên ca ấy
+  // bị loại trước khi kịp nhận con số. Tức `deTheoCa` chết đúng ở ca duy nhất nó
+  // sinh ra để phục vụ: ca chưa kịp ghi lên Sheet.
+  //
+  // Có mặt trong `deTheoCa` LÀ bằng chứng ca đó đã chấm được. Nên điều kiện là
+  // "một trong hai bên có số", không phải "ô Sheet có số".
+  const de = (maCa: string, cu: number | null): number | null => {
     const d = deTheoCa?.[maCa]
-    return typeof d === 'number' && Number.isFinite(d) ? d : cu
+    if (typeof d === 'number' && Number.isFinite(d)) return d
+    return typeof cu === 'number' && Number.isFinite(cu) ? cu : null
   }
   return [...(ca ?? [])]
-    .filter((c) => typeof c.tong === 'number' && Number.isFinite(c.tong))
-    .sort((a, b) => new Date(a.nopLuc).getTime() - new Date(b.nopLuc).getTime())
-    .map((c) => ({ maCa: c.maCa, tenCa: c.tenCa || '', ngay: c.nopLuc, diem: de(c.maCa, c.tong as number), hang: c.hang, siSo: c.siSo }))
+    .map((c) => ({ c, diem: de(c.maCa, c.tong) }))
+    .filter((x): x is { c: (typeof x)['c']; diem: number } => x.diem !== null)
+    .sort((a, b) => new Date(a.c.nopLuc).getTime() - new Date(b.c.nopLuc).getTime())
+    .map(({ c, diem }) => ({ maCa: c.maCa, tenCa: c.tenCa || '', ngay: c.nopLuc, diem, hang: c.hang, siSo: c.siSo }))
 }
 
 /** Trung bình cộng dồn: phần tử thứ i là trung bình của các ca từ đầu tới i. */

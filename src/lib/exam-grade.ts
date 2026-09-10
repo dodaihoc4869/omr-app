@@ -4,7 +4,7 @@
 // logic chấm điểm lần 2.
 import type { SoCauMoiPhan, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import type { AnswerKey, Choice, DS, GradedItem, StudentAnswers } from '../engine/score'
-import { scoreStudent, type ScoreResult } from '../engine/score'
+import { normalizeNumericAnswer, scoreStudent, type ScoreResult } from '../engine/score'
 import { assignStudentQuestions } from './exam-assign'
 import type { AnswerRecord } from './exam-db'
 
@@ -73,7 +73,8 @@ export function gradeFromKeyBank(bank: KeyBankLike, maCa: string, sbd: string, s
   const wrongPhanII = phanII
     .map((row, i) => (row.some((it, j) => it.value !== key.phanII[i][j]) ? i + 1 : -1))
     .filter((n) => n > 0)
-  const norm = (s: string) => s.trim().replace(',', '.')
+  // MỘT NGUỒN SỰ THẬT — xem `normalizeNumericAnswer`.
+  const norm = normalizeNumericAnswer
   const wrongPhanIII = phanIII
     .map((it, i) => (norm(it.value ?? '') !== norm(key.phanIII[i]) ? i + 1 : -1))
     .filter((n) => n > 0)

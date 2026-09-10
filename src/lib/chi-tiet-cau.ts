@@ -4,6 +4,7 @@
 // thầy (màn Theo dõi) và máy em (khi ca công bố điểm). Không suy diễn: câu
 // thiếu chuyên đề/mức độ để trống.
 import type { TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
+import { normalizeNumericAnswer } from '../engine/score'
 import { assignStudentQuestions } from './exam-assign'
 import type { BaiGhiDiem, ChiTietCauRow } from './exam-api'
 import type { AnswerRecord } from './exam-db'
@@ -29,7 +30,9 @@ function giayCua(giayCau: Record<string, number> | null | undefined, qid: string
 export function taoChiTietCau(bank: KeyBankLike, maCa: string, sbd: string, answers: AnswerRecord, giayCau: Record<string, number> | null | undefined): ChiTietCauRow[] {
   const asg = assignStudentQuestions(bank, maCa, sbd)
   const rows: ChiTietCauRow[] = []
-  const norm = (s: string) => s.trim().replace(',', '.')
+  // MỘT NGUỒN SỰ THẬT: luật so đáp án Phần III sống ở `normalizeNumericAnswer`.
+  // Sáu bản sao rời nhau là sáu chỗ để lệch, và lệch ở đây nghĩa là chấm sai.
+  const norm = normalizeNumericAnswer
   asg.phanI.forEach((a, i) => {
     const q = a.question as TeacherMcqQuestion
     const chon = answers.phanI[a.qid] ?? ''

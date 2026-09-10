@@ -63,9 +63,21 @@ const TIEU_DE: React.CSSProperties = { fontFamily: 'var(--serif)', fontSize: 'va
 
 /** Ca dùng để soạn phiếu: mặc định ca gần nhất đã chấm; màn Chi tiết ca truyền
  * đúng mã ca đang mở để phiếu nói về CA ĐÓ, không phải ca mới nhất của em. */
-function chonCa(hoSo: HoSoEm, maCa?: string) {
+/** CHỌN CA ĐỂ SOẠN PHIẾU.
+ *
+ * `coDiemChamLai` = chỗ gọi đang CẦM sẵn điểm tự chấm của đúng ca `maCa`. Khi
+ * ấy ô `Tong` trên Sheet rỗng KHÔNG còn nghĩa là "chưa chấm" — nó chỉ nghĩa là
+ * thầy chưa bấm ghi điểm.
+ *
+ * Bản cũ đòi `x.tong !== null` bất kể, nên ca thầy đang đứng bị bỏ và khối lui
+ * về `caGanNhat`; em nào mới có đúng một ca thì lui về rỗng, ra dòng "chưa soạn
+ * được phiếu" trong khi đầu màn vẫn in điểm (thầy chụp được 10/09, em 10016).
+ *
+ * Vẫn giữ nguyên bước lui cho chỗ gọi KHÔNG có điểm tự chấm — bỏ hẳn điều kiện
+ * là màn Học sinh sẽ chọn phải một ca chưa chấm rồi cũng kẹt y như vậy. */
+function chonCa(hoSo: HoSoEm, maCa?: string, coDiemChamLai = false) {
   if (maCa) {
-    const c = hoSo.ca.find((x) => x.maCa === maCa && x.tong !== null)
+    const c = hoSo.ca.find((x) => x.maCa === maCa && (coDiemChamLai || x.tong !== null))
     if (c) return c
   }
   return hoSo.caGanNhat
@@ -104,7 +116,7 @@ export default function PhieuZaloEm({
    * tự đi hỏi máy chủ; `null` = chỗ gọi đã biết và em không rời màn lần nào. */
   viPham?: NguonViPham | null
 }) {
-  const ca = chonCa(hoSo, maCa)
+  const ca = chonCa(hoSo, maCa, typeof diemChamLai?.tong === 'number')
 
   // ---------------------------------------------------------------------
   // TỰ ĐI LẤY PHẦN CÒN THIẾU.

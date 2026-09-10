@@ -182,9 +182,36 @@ export function soCauCuaKey(key: AnswerKey): SoCauBaPhan {
   return { I: key.phanI.length, II: key.phanII.length, III: key.phanIII.length }
 }
 
-/** Chuẩn hoá số Phần III: "0,87" ≡ "0.87", bỏ khoảng trắng thừa. */
+/** MỌI KIỂU DẤU TRỪ mà Word, Google Docs và bàn phím sinh ra, quy về một.
+ *
+ * U+2010 hyphen · U+2011 non-breaking hyphen · U+2012 figure dash ·
+ * U+2013 en dash · U+2014 em dash · U+2015 horizontal bar · U+2212 minus ·
+ * U+FF0D fullwidth hyphen. Đích là U+002D, đúng ký tự bàn phím em gõ ra. */
+const MOI_DAU_TRU = /[‐‑‒–—―−－]/g
+
+/** MỌI KIỂU KHOẢNG TRẮNG, kể cả no-break space U+00A0 mà Word hay chèn. */
+const MOI_KHOANG_TRANG = /[\s   ]+/g
+
+/** CHUẨN HOÁ SỐ PHẦN III — MỘT NGUỒN SỰ THẬT cho MỌI chỗ so đáp án Phần III.
+ *
+ * "0,87" ≡ "0.87" ≡ "0. 87"; và "–1" ≡ "−1" ≡ "-1".
+ *
+ * VÌ SAO CÓ PHẦN DẤU TRỪ (thầy bắt được 10/09, ảnh chụp câu 23):
+ * đề soạn trên Word nên đáp án mang `–` (en dash, mã 8211), còn em gõ bàn phím
+ * ra `-` (mã 45). Hai chuỗi khác byte ⇒ câu em làm ĐÚNG bị chấm SAI, và sai kiểu
+ * IM LẶNG: màn xem lại in "Đáp án –1 / Em đã trả lời -1" cạnh nhau, nhìn y hệt.
+ *
+ * Quét sheet `ChiTietCau` (4 561 dòng) ngày 10/09: 10 dòng chấm oan, 10 lượt,
+ * 2 ca, tất cả ở Phần III. Đo trên 2 485 dòng ĐANG ĐÚNG làm đối chứng: luật này
+ * không lật dòng đúng nào thành sai.
+ *
+ * CỐ Ý KHÔNG so theo SỐ HỌC. `Number('0,80') === Number('0.8')` sẽ làm "0,80"
+ * bằng "0,8" — xoá mất phân biệt chữ số có nghĩa, thứ đề Hoá có tính điểm. */
 export function normalizeNumericAnswer(raw: string): string {
-  return raw.trim().replace(',', '.')
+  return String(raw ?? '')
+    .replace(MOI_DAU_TRU, '-')
+    .replace(MOI_KHOANG_TRANG, '')
+    .replace(',', '.')
 }
 
 function centsToScore(cents: number): number {

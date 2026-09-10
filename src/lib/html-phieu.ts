@@ -1642,6 +1642,15 @@ export const JS_PHIEU = `
       /** CHẤM TẠI CHỖ để hiện ngay. Máy chủ vẫn chấm LẠI và con số ghi vào
        * Sheet là con số của máy chủ — máy em sửa được. */
       function chamTaiCho() {
+        // CHUAN HOA SO PHAN III — chep DUNG luat cua normalizeNumericAnswer
+        // (src/engine/score.ts). Phieu la tep HTML roi, khong import duoc, nen
+        // day la ban sao BAT BUOC; phep kiem dau-tru-phan-ba-1009 khoa hai ben
+        // khong duoc lech nhau. De soan tren Word ra dau tru en dash con em go
+        // dau tru ban phim. Chu thich tep nay khong dau va khong backtick: ca
+        // khoi nam trong mot template literal.
+        var chuanIII = function (v) {
+          return String(v == null ? '' : v).replace(/[‐‑‒–—―−－]/g, '-').replace(/[\\s ]+/g, '').replace(',', '.');
+        };
         var dung = 0;
         var sai = [];
         for (var i = 0; i < du.cau.length; i++) {
@@ -1650,7 +1659,7 @@ export const JS_PHIEU = `
           var dapAn = String(c.dapAn == null ? '' : c.dapAn).trim();
           var khop = false;
           if (!chon) khop = false;
-          else if (c.phan === 'III') khop = chon.replace(',', '.') === dapAn.replace(',', '.');
+          else if (c.phan === 'III') khop = chuanIII(chon) === chuanIII(dapAn);
           else khop = chon.toUpperCase() === dapAn.toUpperCase();
           if (khop) dung++; else sai.push(c.id);
         }

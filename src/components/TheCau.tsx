@@ -8,6 +8,7 @@
 // hàng, mã thẳng hàng với dòng đầu của nội dung. Ảnh cắt từ đề gốc (HinhAnh) nhúng đúng vị trí: sau đề, sau từng
 // phương án/ý (đi theo chữ cái GỐC khi xáo), cuối câu. Chỉ dùng biến tokens.css.
 import { Check, RotateCcw, X as XIcon } from 'lucide-react'
+import { normalizeNumericAnswer } from '../engine/score'
 import type { HinhAnh, LoiGiaiCauTruc, TrangThaiLoiGiai } from '../data/examContent'
 import { ChemText } from '../lib/chem-format'
 import { BangSoLieu, CauHinh, HinhTaiViTri } from './QuestionMedia'
@@ -119,9 +120,12 @@ export function coPhay(v: string | null | undefined): boolean {
   return s.includes(',') || s.includes('.')
 }
 
-function normSo(s: string): string {
-  return s.trim().replace(',', '.')
-}
+/** MỘT NGUỒN SỰ THẬT — dấu ✓/✗ ở màn xem lại phải khớp từng ly với cách CHẤM.
+ *
+ * Thầy chụp được 10/09: màn này in "Đáp án –1" và "Em đã trả lời -1" cạnh nhau,
+ * gạch chéo đỏ, mà hai dòng nhìn y hệt. Bản cũ có luật so RIÊNG nên nó lệch với
+ * bộ chấm được. */
+const normSo = normalizeNumericAnswer
 
 function DauDung() {
   return (
