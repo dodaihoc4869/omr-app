@@ -60,7 +60,21 @@ export async function chamLaiCa(url: string, mat: string, maCa: string): Promise
   const goi = await gomCa(url, mat, maCa)
   // MẪU SỐ đã dùng để chấm lô này — khai lên máy chủ để nó đối chiếu với số câu
   // thật của ca. Xem ghi chú dài ở `ghiDiem`.
-  const soCauCham = {
+  //
+  // PHẢI LÀ `keyBank.soCau`, KHÔNG PHẢI ĐỘ DÀI KHO (thầy bắt được 10/09).
+  //
+  // `mergeKeepAnswers` trả về CẢ KHO trong `phanI/II/III` và để số câu MỖI EM
+  // ở thuộc tính `soCau`. Ca đề riêng rút 8/2/2 từ kho 24/6/6: lấy độ dài kho
+  // là khai 24/6/6 trong khi thật sự chấm bằng 8/2/2. Máy chủ đối chiếu thấy
+  // lệch nên TỪ CHỐI cả lô — đúng như chốt an toàn thêm sau vụ lệch điểm ca
+  // 447479 — và `chamLaiCa` KHÔNG BAO GIỜ chạy được trên ca dùng bộ câu con.
+  //
+  // Lần chấm lại ca 248567 hỏng hôm 07/09 từng bị quy cho hạn chờ 25 giây; hạn
+  // chờ có thật, nhưng đây mới là chỗ chặn thật sự.
+  //
+  // Ca thường không có `soCau` thì cả kho CHÍNH LÀ đề em làm — lúc ấy độ dài
+  // kho là mẫu số đúng, nên vẫn giữ làm đường lui.
+  const soCauCham = goi.keyBank.soCau ?? {
     I: goi.keyBank.phanI.length,
     II: goi.keyBank.phanII.length,
     III: goi.keyBank.phanIII.length,
