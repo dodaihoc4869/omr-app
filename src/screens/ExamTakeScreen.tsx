@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { choBaoLau, gianNopTuDong } from '../lib/nhip-gui-lai'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
 import { taoLinkPhieu } from '../lib/phieu-link'
@@ -258,7 +259,16 @@ export default function ExamTakeScreen() {
   // tạo 0 TRƯỚC khi effect đồng hồ kịp tính giờ thật, khiến bài tự nộp ngay
   // lập tức lúc vừa vào thi.
   const [remaining, setRemaining] = useState<number | null>(null)
-  const retryTimer = useRef<ReturnType<typeof setInterval> | null>(null)
+  const retryTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  /** ĐANG CÓ MỘT LƯỢT NỘP CHẠY DỞ. Chốt chống chồng lượt — xem `nhip-gui-lai`. */
+  const dangGui = useRef(false)
+  /** Số lần nộp hỏng liên tiếp, để giãn nhịp thử lại. Nộp được thì về 0. */
+  const lanHong = useRef(0)
+  // Nhịp thử lại đọc `attemptRef` (khai ngay dưới) chứ KHÔNG gọi `trySend`
+  // bên trong updater của `setAttempt`: updater phải thuần, và React có thể
+  // chạy nó hai lần — chạy hai lần ở đây là gửi hai lượt nộp.
+  /** Đếm cho màn hình: đã thử mấy lần rồi, để em thấy máy CÓ đang làm gì. */
+  const [soLanThuGui, setSoLanThuGui] = useState(0)
   const hiddenSinceRef = useRef<number | null>(null)
   // TÍN HIỆU MỚI (BAOMATCATHI): lý do đang che đề; null = không che.
   const [lyDoChe, setLyDoChe] = useState<string | null>(null)
@@ -1703,7 +1713,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     })
   }
 
-  const doSubmit = async (a: ExamAttempt) => {
+  const doSubmit = async (a: ExamAttempt, tuDongNop = false) => {
     // GIỮ ĐỂ ĐỌC: gộp hai con số đúng lúc này, không rắc dọc đường. Chúng KHÔNG
     // đếm vào bất kỳ ngưỡng khoá nào — chỉ để thầy nhìn ở Chi tiết ca.
     const dem = demTatDe.current
@@ -1720,7 +1730,16 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     await saveAttempt(updated)
     setPhase('submitted')
     pushStatusNow(updated, false)
-    trySend(updated)
+    // GIÃN RIÊNG CÚ GỌI MẠNG, KHÔNG giãn việc lưu. Hết giờ là mốc CHUNG của cả
+    // ca: mọi máy đếm về 0 trong cùng một giây rồi cùng bắn một lượt POST. Bài
+    // đã lưu xong trên máy em ở dòng trên, `phase` cũng đã sang "đã nộp", nên
+    // hoãn 0–2,5 giây không mất gì của em mà máy chủ đỡ hẳn cú dồn.
+    //
+    // Tự bấm Nộp bài thì KHÔNG giãn — em bấm rồi thì phải thấy máy chạy ngay,
+    // và mấy chục em không bao giờ bấm trùng đúng một khoảnh khắc như hết giờ.
+    const giam = tuDongNop ? gianNopTuDong() : 0
+    if (giam > 0) setTimeout(() => void trySend(updated), giam)
+    else void trySend(updated)
   }
 
   // Nhận keyBank (CÓ đáp án) → chấm tại máy em, hiện popup điểm (trừ bài bị
@@ -1806,15 +1825,32 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, keyBank, attempt?.pendingSubmit, congBo])
 
+  /** GỬI BÀI LÊN MÁY CHỦ, có chốt chống chồng lượt và nhịp lùi dần.
+   *
+   * Xem `src/lib/nhip-gui-lai.ts` để biết vì sao — tóm tắt: bản cũ dùng
+   * `setInterval` 15 giây trong khi một lượt nộp có hạn 25 giây, nên lượt sau
+   * chồng lên lượt trước, cả lớp lại thử lại cùng một khoảnh khắc. Máy chủ càng
+   * nghẹn thì càng nhiều lượt hết hạn, càng nhiều lượt hết hạn thì càng nhiều
+   * lượt thử lại. Em ngồi nhìn "Đang gửi lên hệ thống…" mãi không tắt. */
   const trySend = async (a: ExamAttempt) => {
+    attemptRef.current = a
+    // ① CHỐT CHỐNG CHỒNG LƯỢT. Một máy, một lượt nộp tại một thời điểm.
+    if (dangGui.current) return
+    dangGui.current = true
+    setSoLanThuGui((n) => n + 1)
     try {
       if (!scriptUrl.trim()) throw new Error('no-script-url')
       const { keyBank, congBo: cb } = await submitAnswers(scriptUrl.trim(), a.maCa, a.sbd, a.maDe, a.answers, a.integrity, a.lanThu ?? 1, a.idThietBi ?? layIdThietBi(), a.giayCau)
       const done = { ...a, pendingSubmit: false }
+      attemptRef.current = done
       setAttempt(done)
       await saveAttempt(done)
       showToast('Đã nộp bài thành công', 'success')
-      if (retryTimer.current) clearInterval(retryTimer.current)
+      lanHong.current = 0
+      if (retryTimer.current) {
+        clearTimeout(retryTimer.current)
+        retryTimer.current = null
+      }
       setCongBo(cb)
       // Thầy bật "xem điểm ngay" cho ca này — chấm ngay tại máy em bằng đúng
       // engine chấm chuẩn, không phải ước lượng. Chế độ "khi cả lớp nộp xong"
@@ -1822,27 +1858,43 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       if (keyBank) apDungKeyBank(keyBank, done)
     } catch {
       // Mất mạng — giữ pendingSubmit=true, đã lưu local, sẽ tự thử lại.
-      if (!retryTimer.current) {
-        retryTimer.current = setInterval(() => {
-          setAttempt((cur) => {
-            if (cur && cur.pendingSubmit) trySend(cur)
-            return cur
-          })
-        }, 15000)
-      }
+      // ② LÙI DẦN CÓ LỆCH PHA, và ③ HẸN MỘT lượt kế chứ không đặt nhịp lặp.
+      const cho = choBaoLau(lanHong.current)
+      lanHong.current += 1
+      if (retryTimer.current) clearTimeout(retryTimer.current)
+      retryTimer.current = setTimeout(() => {
+        retryTimer.current = null
+        const cur = attemptRef.current
+        if (cur && cur.pendingSubmit) void trySend(cur)
+      }, cho)
+    } finally {
+      dangGui.current = false
     }
+  }
+
+  /** EM TỰ BẤM GỬI LẠI. Không có nút này thì em chỉ còn cách ngồi nhìn — và
+   * dòng chữ "đang gửi" không phân biệt được "máy đang chạy" với "máy đã chết". */
+  const guiLaiNgay = () => {
+    const cur = attemptRef.current ?? attempt
+    if (!cur || !cur.pendingSubmit || dangGui.current) return
+    if (retryTimer.current) {
+      clearTimeout(retryTimer.current)
+      retryTimer.current = null
+    }
+    lanHong.current = 0
+    void trySend(cur)
   }
 
   useEffect(() => {
     if (phase !== 'exam' || !attempt) return
     if (attempt.loai === 'baitap') return // bài tập không tự nộp theo giờ
-    if (remaining !== null && remaining <= 0) doSubmit(attempt)
+    if (remaining !== null && remaining <= 0) void doSubmit(attempt, true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remaining, phase])
 
   useEffect(() => {
     return () => {
-      if (retryTimer.current) clearInterval(retryTimer.current)
+      if (retryTimer.current) clearTimeout(retryTimer.current)
     }
   }, [])
 
@@ -2338,7 +2390,14 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                   )}{' '}
                   Phần đã làm được <b>nộp và khoá</b>. Hệ thống đã báo cho thầy. <b>Em giơ tay gọi Thầy</b> — thầy mở khoá thì mở lại link này trên đúng máy này để làm tiếp.
                 </div>
-                {attempt?.pendingSubmit && <Nhan tone="cam">Đang gửi lên hệ thống… đừng tắt trình duyệt</Nhan>}
+                {attempt?.pendingSubmit && (
+                  <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+                    <Nhan tone="cam">{soLanThuGui > 1 ? `Đang gửi — đã thử ${soLanThuGui} lần` : 'Đang gửi lên hệ thống… đừng tắt trình duyệt'}</Nhan>
+                    <NutChinh variant="phu" onClick={guiLaiNgay}>
+                      Gửi lại ngay
+                    </NutChinh>
+                  </div>
+                )}
               </div>
             </TheNoiDung>
           </div>
@@ -2380,7 +2439,24 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 )}
               </div>
               {attempt?.pendingSubmit ? (
-                <OThongBao tone="cam">Đang gửi lên hệ thống… đừng tắt trình duyệt. Bài đã lưu an toàn trên máy và sẽ tự gửi lại khi có mạng.</OThongBao>
+                /* NÓI THẬT TRẠNG THÁI, VÀ CHO EM MỘT VIỆC ĐỂ LÀM.
+                   Bản cũ chỉ có đúng một dòng chữ đứng yên, nên "máy đang thử
+                   lại" và "máy đã chết" nhìn y hệt nhau — thầy gọi đó là treo.
+                   Nay hiện số lần đã thử và một nút bấm được. */
+                <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+                  <OThongBao tone="cam">
+                    Bài của em <b>đã lưu an toàn trên máy</b>, đang gửi lên hệ thống. Đừng tắt trình duyệt.
+                    {soLanThuGui > 1 && (
+                      <>
+                        {' '}
+                        Máy đã thử <b style={SANS_SO}>{soLanThuGui}</b> lần, mạng đang chậm — máy vẫn tự thử lại.
+                      </>
+                    )}
+                  </OThongBao>
+                  <NutChinh variant="phu" onClick={guiLaiNgay}>
+                    Gửi lại ngay
+                  </NutChinh>
+                </div>
               ) : graded ? (
                 <OThongBao tone="xanh">
                   Điểm của em: <b style={SANS_SO}>{graded.score.total.toFixed(2)}/10</b> — {classify(graded.score.total)}.
