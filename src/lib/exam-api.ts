@@ -60,6 +60,66 @@ async function fetchCoHan(url: string, init: RequestInit, giay: number): Promise
   }
 }
 
+/** HẠN CHỜ RIÊNG CHO `vaoThi` VÀ `submit` — KHACPHUCTREOHANGLOAT.md T5.
+ *
+ * Hai lệnh này là hai lệnh duy nhất mà cả lớp bấm CÙNG MỘT LÚC, nên chúng là
+ * hai lệnh duy nhất phải xếp hàng sau khoá toàn cục. Hết hạn sớm là máy em gửi
+ * lại, và lượt gửi lại ấy nối vào cuối chính hàng đợi đang tắc. Thà chờ thêm
+ * năm giây. Mọi lệnh khác giữ 25 giây. */
+const HAN_GIAY_DONG_NGUOI = 30
+
+/** BA NHỊP THỬ LẠI, mili giây, chưa cộng nhiễu. T5: 0,5 s → 1,5 s → 4 s. */
+const NHIP_THU_LAI_MS = [500, 1500, 4000]
+
+/** NHIỄU ±40%. Không có nhiễu thì ba mươi máy cùng hỏng cùng lúc sẽ cùng thử
+ * lại đúng nửa giây sau — vẫn là ba mươi máy húc cửa cùng lúc, chỉ muộn hơn
+ * nửa giây. Nhiễu mới là thứ biến cú húc thành dòng chảy. */
+export function nhipThuLai(lan: number, nn: () => number = Math.random): number {
+  const nen = NHIP_THU_LAI_MS[Math.min(lan, NHIP_THU_LAI_MS.length - 1)]
+  return Math.round(nen * (0.6 + nn() * 0.8))
+}
+
+/** LỖI CÓ ĐÁNG THỬ LẠI KHÔNG.
+ *
+ * Chỉ thử lại lỗi ĐƯỜNG TRUYỀN: hết hạn, mất mạng, máy chủ 5xx, máy chủ đang
+ * bận không lấy được khoá. Máy chủ trả lời tử tế "sai số báo danh" hay "ca đã
+ * khoá" thì thử lại một trăm lần cũng vậy — chỉ tổ làm nặng thêm đúng lúc đang
+ * nghẽn. */
+export function loiNenThuLai(loi: unknown): boolean {
+  const s = loi instanceof Error ? loi.message : String(loi ?? '')
+  return (
+    s.includes('không trả lời sau') ||
+    s.includes('Failed to fetch') ||
+    s.includes('NetworkError') ||
+    s.includes('Load failed') ||
+    s.includes('HTTP 5') ||
+    s.includes('đang bận')
+  )
+}
+
+/** GỬI CÓ THỬ LẠI — chỉ dùng cho lệnh AN TOÀN KHI GỬI LẠI.
+ *
+ * "An toàn khi gửi lại" nghĩa là máy chủ có khoá chống trùng cho lệnh đó:
+ *   · `vaoThi`  — gửi lại chỉ trả về đúng lượt đang có, không tạo lượt thứ hai;
+ *   · `submit`  — khoá `maCa|sbd|lanThu`, gửi lại trả `daNhan:true`, không ghi đè;
+ *   · `luuTam`  — ghi đè đúng một dòng bằng đúng nội dung ấy.
+ *
+ * CẤM dùng cho lệnh ghi chưa có khoá chống trùng (mục 4 của đặc tả). Thêm lệnh
+ * mới vào đây thì phải chỉ ra được khoá của nó trước. */
+async function postCoThuLai(scriptUrl: string, body: unknown, giay: number, soLan = NHIP_THU_LAI_MS.length): Promise<any> {
+  let cuoi: unknown = null
+  for (let lan = 0; lan < soLan; lan++) {
+    try {
+      return await postJson(scriptUrl, body, giay)
+    } catch (e) {
+      cuoi = e
+      if (!loiNenThuLai(e) || lan === soLan - 1) throw e
+      await new Promise((nghi) => setTimeout(nghi, nhipThuLai(lan)))
+    }
+  }
+  throw cuoi instanceof Error ? cuoi : new Error('Không gửi được')
+}
+
 async function postJson(scriptUrl: string, body: unknown, giay: number = HAN_GIAY): Promise<any> {
   const res = await fetchCoHan(
     scriptUrl,
@@ -338,7 +398,9 @@ export async function vaoThi(
   canBank: boolean,
   danhTinh: DanhTinhVaoThi = { hoTen: '', namSinh: '' },
 ): Promise<KetQuaVaoThi> {
-  const r = await postJson(scriptUrl, { action: 'vaoThi', maCa, sbd, idThietBi, canBank, hoTen: danhTinh.hoTen, namSinh: danhTinh.namSinh, xacNhanTen: danhTinh.xacNhanTen === true })
+  // THỬ LẠI ĐƯỢC (T5): máy chủ đã có khoá — gửi lại chỉ trả về đúng lượt đang
+  // có (`cach: 'khoi_phuc'`), không bao giờ tạo lượt thứ hai cho cùng một em.
+  const r = await postCoThuLai(scriptUrl, { action: 'vaoThi', maCa, sbd, idThietBi, canBank, hoTen: danhTinh.hoTen, namSinh: danhTinh.namSinh, xacNhanTen: danhTinh.xacNhanTen === true }, HAN_GIAY_DONG_NGUOI)
   if (r.ok) {
     return {
       ok: true,
@@ -558,7 +620,11 @@ export async function submitAnswers(
   idThietBi = '',
   giayCau?: Record<string, number>,
 ): Promise<{ keyBank: KeyBank | null; congBo: CongBoDiem }> {
-  const result = await postJson(scriptUrl, { action: 'submit', maCa, sbd, maDe, dapAn, integrity, lanThu, idThietBi, giayCau })
+  // THỬ LẠI ĐƯỢC (T5) — và CHỈ vì T4 đã có khoá chống trùng `maCa|sbd|lanThu`.
+  // Trước T4, một lượt nộp hết hạn ở máy em nhưng đã tới nơi ở máy chủ sẽ bị ghi
+  // đè lần nữa; nếu thầy vừa khoá ca giữa hai lượt thì lượt sau ăn 'da_dong' và
+  // em thấy báo lỗi cho một bài ĐÃ NỘP XONG.
+  const result = await postCoThuLai(scriptUrl, { action: 'submit', maCa, sbd, maDe, dapAn, integrity, lanThu, idThietBi, giayCau }, HAN_GIAY_DONG_NGUOI)
   if (!result.ok) throw new Error(result.error || 'Nộp bài thất bại')
   return { keyBank: result.keyBank ?? null, congBo: result.congBo ?? (result.keyBank ? 'ngay' : 'khong') }
 }
@@ -621,7 +687,9 @@ export function chuKyLechPhaMs(ms: number, nn: () => number = Math.random): numb
  */
 export async function luuTam(scriptUrl: string, maCa: string, sbd: string, dapAn: AnswerRecord, giayCau?: Record<string, number>): Promise<boolean> {
   try {
-    const r = await postJson(scriptUrl, { action: 'luuTam', maCa, sbd, dapAn, giayCau })
+    // Lưu tạm ghi ĐÈ đúng một dòng bằng đúng nội dung ấy, nên gửi lại vô hại.
+    // Chỉ thử THÊM MỘT lần: nhịp sau còn tới, không việc gì phải cố.
+    const r = await postCoThuLai(scriptUrl, { action: 'luuTam', maCa, sbd, dapAn, giayCau }, HAN_GIAY, 2)
     return !!r?.ok
   } catch {
     return false
@@ -806,12 +874,18 @@ export async function pushExamStatus(
     soLanRoiApp: number
     blocked: boolean
   },
-): Promise<void> {
+): Promise<boolean> {
   try {
-    await postJson(scriptUrl, { action: 'examStatus', ...status })
+    const r = await postJson(scriptUrl, { action: 'examStatus', ...status })
+    return !!r?.ok
   } catch {
     // Cập nhật trạng thái theo dõi không phải luồng chính — mất mạng thì bỏ
     // qua, không chặn học sinh làm bài, lần đẩy tiếp theo sẽ tự bù.
+    //
+    // TRẢ VỀ FALSE, KHÔNG PHẢI VOID: chỗ gọi dùng giá trị này để biết có được
+    // phép ghi nhớ "đã gửi rồi" hay không. Nuốt lỗi rồi im lặng báo thành công
+    // là cách chắc chắn nhất để một nhịp rớt mạng biến thành mất dữ liệu.
+    return false
   }
 }
 

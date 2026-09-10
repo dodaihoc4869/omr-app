@@ -181,7 +181,10 @@ describe('Máy chủ — em qua cổng thì có hồ sơ', () => {
   it('tạo hồ sơ TRƯỚC khi xét phạm vi ca', () => {
     // Thứ tự quan trọng: tạo sau khi xét phạm vi thì ca lọc theo khối chặn em
     // ngay lần đầu, dù danh sách có năm sinh của em.
-    const iThem = gsCode.indexOf('if (!hoSo && (!coDs || trongDs)) hoSo = themEmVaoDanhSach_(sbd, ca, trongDs)')
+    // MỐC NEO ĐỔI 10/09 khuya (T3): việc GHI hồ sơ chuyển vào trong vùng khoá,
+    // việc ĐỌC ra ngoài. Ý ĐỊNH KHÔNG ĐỔI — hồ sơ phải có TRƯỚC khi xét phạm vi,
+    // nếu không ca lọc theo khối chặn em ngay lần đầu dù danh sách có năm sinh.
+    const iThem = gsCode.indexOf('if (canThemHoSo && !hoSo) hoSo = themEmVaoDanhSach_(sbd, ca, trongDs)')
     const iXet = gsCode.indexOf('const qd = quyetDinhVaoThi_(ca, luot, idThietBi, now')
     expect(iThem).toBeGreaterThan(0)
     expect(iXet).toBeGreaterThan(iThem)
@@ -190,7 +193,8 @@ describe('Máy chủ — em qua cổng thì có hồ sơ', () => {
   it('CHỈ tạo hồ sơ cho em đã qua cổng danh sách', () => {
     // `!hoSo && (!coDs || trongDs)`: có danh sách mà không khớp thì không tạo
     // dòng nào — danh sách học sinh không phình ra vì người lạ gõ bừa.
-    expect(gsCode).toContain('if (!hoSo && (!coDs || trongDs)) hoSo = themEmVaoDanhSach_(sbd, ca, trongDs)')
+    expect(gsCode).toContain('const canThemHoSo = !hoSo && (!coDs || trongDs)')
+    expect(gsCode).toContain('if (canThemHoSo && !hoSo) hoSo = themEmVaoDanhSach_(sbd, ca, trongDs)')
   })
 
   it('em tự vào được đánh dấu tu_vao_thi và KHÔNG được cấp token', () => {

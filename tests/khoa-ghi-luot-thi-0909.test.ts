@@ -84,7 +84,11 @@ describe('mọi lệnh ghi LuotThi phải cầm CÙNG một khoá', () => {
       const than = khoiAction(ten)
       expect(ghiVaoLuotThi(than), `${ten} lẽ ra phải GHI vào LuotThi`).toBe(true)
       expect(than).toContain('LockService.getScriptLock()')
-      expect(than).toContain('.waitLock(15000)')
+      // MỐC NEO ĐỔI 10/09 khuya (T3). Hạn chờ khoá nâng 15 000 → 20 000 và gói
+      // vào `doiKhoa_` để có một lần thử lại có lùi NGẪU NHIÊN: ba mươi máy
+      // cùng hết hạn mà cùng thử lại sau đúng một giây thì vẫn là ba mươi máy
+      // húc cửa cùng lúc. Ý ĐỊNH KHÔNG ĐỔI — lệnh ghi LuotThi phải cầm khoá.
+      expect(than, `${ten} phải chờ khoá qua doiKhoa_ hoặc waitLock`).toMatch(/doiKhoa_\(|\.waitLock\(/)
       expect(than).toMatch(/finally \{[\s\S]{0,80}\.releaseLock\(\)/)
     })
   }
@@ -125,14 +129,15 @@ describe('mọi lệnh ghi LuotThi phải cầm CÙNG một khoá', () => {
 
   it('submit — khoá bao TRỌN quãng từ lúc đọc bảng tới lúc ghi xong', () => {
     const than = khoiAction('submit')
-    const viKhoa = than.indexOf('lockNopBai.waitLock(15000)')
+    const viKhoa = than.indexOf('doiKhoa_(lockNopBai)')
     // Mốc neo đổi 10/09 khuya. Vùng khoá KHÔNG còn đọc cả bảng — đó chính là
     // chỗ treo cả lớp lúc nộp bài — nay đọc ba cột khoá rồi đọc đúng một dòng.
     // Ý ĐỊNH GIỮ NGUYÊN: khoá vẫn phải bao TRỌN quãng đọc → ghi, vì `choThiLai`
     // xoá dòng giữa chừng là mọi dòng dưới dồn lên và lượt này ghi vào bài của
     // em khác.
     const viDoc = than.indexOf('sh.getRange(1, 1, soDongL, 3).getValues()')
-    const viGhi = than.indexOf('sh.getRange(luotRow, 20, 1, 3).setValues')
+    // Cột 23 `KhoaNop` thêm 10/09 (T4) ⇒ lượt ghi cuối rộng ra 4 cột.
+    const viGhi = than.indexOf('sh.getRange(luotRow, 20, 1, 4).setValues')
     const viNha = than.indexOf('lockNopBai.releaseLock()')
     expect(viKhoa).toBeGreaterThan(0)
     expect(viDoc).toBeGreaterThan(viKhoa)

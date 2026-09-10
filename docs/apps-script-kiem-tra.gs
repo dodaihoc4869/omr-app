@@ -142,7 +142,53 @@ const NGUONG_GIAY_MAC_DINH = 10
 // Mỗi LƯỢT THI một dòng: (MaCa, SBD, LanThu) là khoá. Thi lại = dòng mới, không
 // đè dòng cũ. TrangThai: dang_lam · da_nop · khoa (bị khoá vì rời màn) ·
 // duoc_duyet_lai (thầy đã duyệt, em chưa vào) · Điểm do app ghi sau khi chấm.
-const LUOT_HEADERS = ['MaCa', 'SBD', 'LanThu', 'IdThietBi', 'VaoLuc', 'HetGioLuc', 'NopLuc', 'TrangThai', 'DapAnJson', 'SoLanRoiMan', 'TongGiayRoiMan', 'IntegrityJson', 'HoTen', 'DiemI', 'DiemII', 'DiemIII', 'Tong', 'DuyetBoi', 'DuyetLuc', 'GhiChu', 'CapNhatLuc', 'GiayCauJson']
+// CỘT 23 `KhoaNop` THÊM 10/09 — KHACPHUCTREOHANGLOAT.md T4, khoá chống trùng.
+// THÊM VÀO CUỐI, không đụng cột nào đang có (mục 4 cấm đổi cấu trúc cột cũ).
+// Dòng cũ để trống cột này; xem `nopTrungRoi_` — trống nghĩa là "chưa biết", và
+// lệnh nộp cứ ghi như trước rồi đóng dấu khoá lại.
+const LUOT_HEADERS = ['MaCa', 'SBD', 'LanThu', 'IdThietBi', 'VaoLuc', 'HetGioLuc', 'NopLuc', 'TrangThai', 'DapAnJson', 'SoLanRoiMan', 'TongGiayRoiMan', 'IntegrityJson', 'HoTen', 'DiemI', 'DiemII', 'DiemIII', 'Tong', 'DuyetBoi', 'DuyetLuc', 'GhiChu', 'CapNhatLuc', 'GiayCauJson', 'KhoaNop']
+const LUOT_COT_KHOANOP = 23
+
+/** Khoá một lượt nộp: `maCa|sbd|lanThu`. Máy em gửi lại bao nhiêu lần thì khoá
+ * vẫn y nguyên, nên máy chủ nhận ra ngay "bài này nhận rồi". Thi lại là `lanThu`
+ * mới ⇒ khoá mới ⇒ vẫn ghi bình thường. */
+/** HẠN CHỜ KHOÁ, mili giây. Đặc tả T3 nâng 15 000 → 20 000.
+ *
+ * Vì sao nâng: hàng đợi dài nhất là lúc cả lớp nộp trong một phút. Hết hạn chờ
+ * thì lệnh ném lỗi, máy em gửi lại, và lượt gửi lại ấy nối vào cuối chính hàng
+ * đợi đang tắc — càng hỏng càng đông. Thà chờ thêm năm giây. */
+const HAN_CHO_KHOA_MS = 20000
+
+/** CHỜ KHOÁ CÓ LÙI NGẪU NHIÊN (T3).
+ *
+ * Hết hạn lần đầu thì nghỉ một khoảng NGẪU NHIÊN rồi thử thêm một lần. Ngẫu
+ * nhiên mới là phần quan trọng: ba mươi máy cùng hết hạn một lúc mà cùng thử
+ * lại sau đúng một giây thì vẫn là ba mươi máy húc cửa cùng lúc, chỉ chậm đi
+ * một giây. Rải ra thì chúng nối đuôi nhau.
+ *
+ * Vẫn không lấy được thì NÉM LỖI, không nuốt: máy em còn giữ bài và gửi lại. */
+function doiKhoa_(lock, hanMs) {
+  const han = hanMs || HAN_CHO_KHOA_MS
+  if (lock.tryLock(han)) return true
+  Utilities.sleep(200 + Math.floor(Math.random() * 800))
+  if (lock.tryLock(han)) return true
+  throw new Error('Máy chủ đang bận — máy em giữ bài và gửi lại')
+}
+
+function khoaNop_(maCa, sbd, lanThu) {
+  return String(maCa) + '|' + String(sbd) + '|' + String(Number(lanThu) || 1)
+}
+
+/** Lượt này đã nộp đúng bằng khoá này chưa.
+ *
+ * Trống khoá = dòng có TRƯỚC 10/09 ⇒ trả false ⇒ ghi như cũ rồi đóng dấu khoá.
+ * Đó là dòng 11 của bảng nghiệm thu: "dòng cũ chưa có cột khoá, vẫn tìm đúng
+ * dòng". */
+function nopTrungRoi_(luot, khoa) {
+  if (!luot || !luot.khoaNop) return false
+  if (luot.trangThai !== 'da_nop' && luot.trangThai !== 'khoa') return false
+  return String(luot.khoaNop) === String(khoa)
+}
 // CHI TIẾT TỪNG CÂU của mỗi lượt (QUANLYCATHI mục 5) — ghi bởi ghiDiem sau khi
 // chấm (máy thầy, hoặc máy em khi ca công bố điểm). Chuyên đề + mức độ lấy từ
 // đề trong kho (loi_giai/chuyen_de, muc_do) — thiếu thì để trống, không đoán.
@@ -986,7 +1032,7 @@ function docLuotNhe_(sh) {
   if (n < 1) return [[]]
   const A = sh.getRange(1, 1, n, 8).getValues() // MaCa..TrangThai
   const B = sh.getRange(1, 10, n, 2).getValues() // SoLanRoiMan, TongGiayRoiMan
-  const C = sh.getRange(1, 13, n, 9).getValues() // HoTen..CapNhatLuc
+  const C = sh.getRange(1, 13, n, 11).getValues() // HoTen..CapNhatLuc + GiayCauJson(bỏ) + KhoaNop
   const ra = []
   for (let i = 0; i < n; i++) {
     const d = A[i].slice()
@@ -994,7 +1040,7 @@ function docLuotNhe_(sh) {
     d[9] = B[i][0]
     d[10] = B[i][1]
     d[11] = '' // IntegrityJson — cố ý bỏ trống
-    for (let k = 0; k < 9; k++) d[12 + k] = C[i][k]
+    for (let k = 0; k < 11; k++) d[12 + k] = C[i][k]
     d[21] = '' // GiayCauJson — cố ý bỏ trống
     ra.push(d)
   }
@@ -1105,6 +1151,110 @@ function docCaNhe_(sh) {
   return ra
 }
 
+/** TRA ĐÚNG MỘT DÒNG CỦA MỘT EM — KHACPHUCTREOHANGLOAT.md T1, đích của bảng
+ * mục 3 dòng 6: "số ô đọc mỗi `luuTam`, từ `R×22` xuống `≤ 220`".
+ *
+ * VÌ SAO PHẢI CÓ, dù `luotMoiNhatTheoSbd_` đã đọc hẹp:
+ * đọc hẹp vẫn là đọc HẾT BẢNG — 19 cột nhân R dòng. R chỉ tăng, không bao giờ
+ * giảm, nên mỗi nhịp lưu tạm của mỗi em mỗi 20 giây đang kéo về vài chục nghìn
+ * ô chỉ để tra một dòng. Đó là nền tải làm mọi thứ khác sập theo.
+ *
+ * Ở đây dùng `createTextFinder`: Google tìm ngay trên máy chủ của họ và chỉ trả
+ * về VỊ TRÍ, không kéo ô nào về script. Sau đó đọc ba cột khoá của đúng khối
+ * dòng tìm được, rồi đọc trọn một dòng.
+ *
+ * ĐƯỜNG LUI BẮT BUỘC: `TextFinder` so theo GIÁ TRỊ HIỂN THỊ. Số báo danh lưu
+ * dạng số hay dạng chữ, có khoảng trắng thừa hay không, đều có thể làm nó tìm
+ * hụt. Tìm hụt mà tin ngay thì máy chủ báo "em này chưa vào thi" — chặn oan một
+ * em đang làm bài. Nên hụt là QUÉT LẠI ba cột khoá theo cách cũ: chậm hơn,
+ * nhưng không bao giờ chặn oan ai. */
+function timLuotMoiNhat_(sh, maCa, sbd) {
+  const n = sh.getLastRow()
+  if (n < 2) return null
+  const khoaSbd = String(sbd).trim()
+  const khoaCa = String(maCa).trim()
+  let hang = null
+  try {
+    // TÌM THEO CẢ HAI CỘT rồi lấy GIAO. Tìm mỗi cột SBD là không đủ: lượt của
+    // một em rải khắp bảng theo từng ca suốt mấy tháng, nên dòng đầu và dòng
+    // cuối cách nhau cả nghìn dòng — đọc khối từ đầu tới cuối là đọc lại gần cả
+    // bảng, đúng thứ vừa bỏ công tránh. Giao với các dòng CỦA CA NÀY thì chỉ còn
+    // một hai dòng nằm sát nhau.
+    const coCa = {}
+    const tCa = sh.getRange(2, 1, n - 1, 1).createTextFinder(khoaCa).matchEntireCell(true).findAll()
+    for (let i = 0; i < tCa.length; i++) coCa[tCa[i].getRow()] = true
+    if (tCa.length > 0) {
+      // TextFinder chạy được trên bảng này (nó vừa tìm ra ca) ⇒ kết quả rỗng ở
+      // cột SBD là đáng tin: em thật sự chưa có lượt nào trong ca.
+      hang = []
+      const tSbd = sh.getRange(2, 2, n - 1, 1).createTextFinder(khoaSbd).matchEntireCell(true).findAll()
+      for (let i = 0; i < tSbd.length; i++) if (coCa[tSbd[i].getRow()]) hang.push(tSbd[i].getRow())
+    }
+    // `tCa.length === 0` thì KHÔNG kết luận: có thể ca chưa có dòng nào thật,
+    // cũng có thể TextFinder tìm hụt (mã ca lưu dạng số chẳng hạn). Rơi xuống
+    // đường lui — chậm hơn, nhưng không bao giờ chặn oan một em đang làm bài.
+  } catch (err) {
+    hang = null
+  }
+  if (hang === null) {
+    // Đường lui — xem ghi chú trên. Ba cột, một lượt gọi.
+    hang = []
+    const k = sh.getRange(1, 1, n, 3).getValues()
+    for (let i = 1; i < k.length; i++) {
+      if (String(k[i][0]).trim() === khoaCa && String(k[i][1]).trim() === khoaSbd) hang.push(i + 1)
+    }
+  }
+  if (hang.length === 0) return null
+  // ĐỌC TỪNG DÒNG ỨNG VIÊN, KHÔNG ĐỌC KHỐI TỪ DÒNG ĐẦU TỚI DÒNG CUỐI.
+  //
+  // Một em trong một ca gần như luôn có đúng một dòng (thi lại mới thêm dòng).
+  // Đọc khối thì rẻ khi các dòng nằm sát nhau, nhưng KHÔNG ĐƯỢC PHÉP tin vào
+  // điều đó: chỉ cần bảng từng bị chèn hay sắp xếp lại là hai dòng của em nằm
+  // cách nhau cả nghìn dòng, và "đọc khối" âm thầm biến thành đọc lại gần cả
+  // bảng — đúng thứ vừa bỏ công tránh, mà không ai thấy vì kết quả vẫn đúng.
+  // Vài dòng thì đọc thẳng vài dòng: chi phí không phụ thuộc bảng to hay nhỏ.
+  if (hang.length <= 4) {
+    let luotTot = null
+    for (let i = 0; i < hang.length; i++) {
+      const v = sh.getRange(hang[i], 1, 1, LUOT_HEADERS.length).getValues()[0]
+      if (String(v[0]) !== String(maCa) || String(v[1]).trim() !== khoaSbd) continue
+      const l = docLuot_(v)
+      l.row = hang[i]
+      l.giayCauJson = v[21]
+      l.khoaNop = v[LUOT_COT_KHOANOP - 1] ? String(v[LUOT_COT_KHOANOP - 1]) : ''
+      if (!luotTot || l.lanThu > luotTot.lanThu) luotTot = l
+    }
+    return luotTot
+  }
+  // Nhiều ứng viên bất thường (bảng lạ, hoặc em thi lại rất nhiều lần): lúc này
+  // một lượt đọc khối ba cột rẻ hơn nhiều lượt đọc dòng.
+  let dau = hang[0]
+  let cuoi = hang[0]
+  for (let i = 1; i < hang.length; i++) {
+    if (hang[i] < dau) dau = hang[i]
+    if (hang[i] > cuoi) cuoi = hang[i]
+  }
+  const khoi = sh.getRange(dau, 1, cuoi - dau + 1, 3).getValues()
+  let row = -1
+  let lan = 0
+  for (let i = 0; i < hang.length; i++) {
+    const v = khoi[hang[i] - dau]
+    if (String(v[0]) !== String(maCa) || String(v[1]).trim() !== khoaSbd) continue
+    const l = Number(v[2]) || 1
+    if (row < 0 || l > lan) {
+      row = hang[i]
+      lan = l
+    }
+  }
+  if (row < 0) return null
+  const v = sh.getRange(row, 1, 1, LUOT_HEADERS.length).getValues()[0]
+  const luot = docLuot_(v)
+  luot.row = row
+  luot.giayCauJson = v[21]
+  luot.khoaNop = v[LUOT_COT_KHOANOP - 1] ? String(v[LUOT_COT_KHOANOP - 1]) : ''
+  return luot
+}
+
 function luotMoiNhatTheoSbd_(sh, maCa, nhe) {
   const n = sh.getLastRow()
   if (n < 2) return {}
@@ -1112,7 +1262,7 @@ function luotMoiNhatTheoSbd_(sh, maCa, nhe) {
   if (nhe) {
     const A = sh.getRange(1, 1, n, 8).getValues() // MaCa..TrangThai
     const B = sh.getRange(1, 10, n, 2).getValues() // SoLanRoiMan, TongGiayRoiMan
-    const C = sh.getRange(1, 13, n, 9).getValues() // HoTen..CapNhatLuc
+    const C = sh.getRange(1, 13, n, 11).getValues() // HoTen..CapNhatLuc + GiayCauJson(bỏ) + KhoaNop
     data = []
     for (let i = 0; i < n; i++) {
       const d = A[i].slice()
@@ -1120,7 +1270,7 @@ function luotMoiNhatTheoSbd_(sh, maCa, nhe) {
       d[9] = B[i][0]
       d[10] = B[i][1]
       d[11] = '' // IntegrityJson — cố ý bỏ trống
-      for (let k = 0; k < 9; k++) d[12 + k] = C[i][k]
+      for (let k = 0; k < 11; k++) d[12 + k] = C[i][k]
       d[21] = '' // GiayCauJson — cố ý bỏ trống
       data.push(d)
     }
@@ -3735,13 +3885,19 @@ function doPost(e) {
       chiEm[sbd] = boCuaEm
       bankGui.boTheoEm = chiEm
     }
-    const lock = LockService.getScriptLock()
-    lock.waitLock(15000)
-    try {
-      const sh = sheetLuot_()
-      const luot = luotMoiNhatTheoSbd_(sh, maCa, true)[sbd] || null
-      const now = Date.now()
-      // CỔNG DANH SÁCH trước mọi thứ khác: phải khớp ĐỦ BA — số báo danh, họ
+    // ═══ NGOÀI KHOÁ: ĐỌC HẾT ═══════════════════════════════════════════════
+    //
+    // KHACPHUCTREOHANGLOAT.md T3. `LockService.getScriptLock()` khoá TOÀN CỤC:
+    // mọi lệnh của mọi máy — kể cả `luuTam` của em khác và `danhSachCa` của thầy
+    // — xếp hàng sau lượt đang giữ khoá. Bản cũ giữ khoá suốt cả khối việc: đọc
+    // danh sách lớp, đọc hồ sơ, đọc hai gói đề riêng từ Drive, ghi nhật ký chặn.
+    // Ba mươi em bấm "Vào thi" trong hai giây là ba mươi lượt nối đuôi nhau,
+    // mỗi lượt vài giây — cả lớp đứng hình, và mọi thứ khác đứng theo.
+    //
+    // Thứ khoá phải bảo vệ chỉ có MỘT: dòng LuotThi, đọc-rồi-ghi. Còn lại là
+    // đọc thuần, đọc trước hay sau đều ra cùng kết quả.
+    const sh = sheetLuot_()
+    // CỔNG DANH SÁCH trước mọi thứ khác: phải khớp ĐỦ BA — số báo danh, họ
       // tên, năm sinh — với một dòng trong danh sách thầy đã nạp. Chưa nạp danh
       // sách bao giờ thì không chặn ai (để trung tâm không đứng hình).
       const coDs = coDanhSachHocSinh_()
@@ -3779,19 +3935,32 @@ function doPost(e) {
       } else if (coDs && !dong) {
         ghiChanVao_(maCa, sbd, body.hoTen, body.namSinh, '', '', 'khong_co_sbd')
       }
-      // Em qua cổng mà chưa có hồ sơ thì tạo luôn, TRƯỚC khi xét phạm vi — để
-      // ca lọc theo khối đọc được năm sinh vừa lấy từ danh sách.
+      // Hồ sơ: ĐỌC ở đây, ngoài khoá. Việc GHI (thêm em mới) nằm trong khoá bên
+      // dưới — hiếm khi chạy, và hai máy cùng thêm một em thì phải chỉ có một
+      // dòng.
       let hoSo = hoSoHocSinh_(sbd)
-      if (!hoSo && (!coDs || trongDs)) hoSo = themEmVaoDanhSach_(sbd, ca, trongDs)
-      const qd = quyetDinhVaoThi_(ca, luot, idThietBi, now, {
+      const canThemHoSo = !hoSo && (!coDs || trongDs)
+      const namSinhXet = hoSo ? hoSo.namSinh : trongDs ? trongDs.namSinh : ''
+      // ĐỀ RIÊNG: hai gói đọc từ Drive, CHỈ ĐỌC. Đây là hai lượt đọc nặng nhất
+      // của cả lệnh và bản cũ đọc chúng KHI ĐANG GIỮ KHOÁ — cả lớp xếp hàng chờ
+      // một việc chẳng liên quan gì tới cái khoá bảo vệ.
+      const cauLapOut = cauLapCuaEm_(ca.boTheoEmRef, sbd)
+      const demLapOut = demLapCuaEm_(ca.boTheoEmRef, sbd)
+
+      // CỔNG SƠ BỘ, NGOÀI KHOÁ. Em bị chặn (sai số báo danh, ca đã đóng, quá
+      // hạn vào) thì trả lời ngay mà KHÔNG xếp hàng. Đây đúng là đám đông tệ
+      // nhất: em bị chặn thì bấm lại, bấm lại nữa. Bản cũ cho mỗi lượt bấm ấy
+      // một chỗ trong hàng đợi toàn cục.
+      const luotThu = timLuotMoiNhat_(sh, maCa, sbd)
+      const qdThu = quyetDinhVaoThi_(ca, luotThu, idThietBi, Date.now(), {
         sbd: sbd,
-        namSinh: hoSo ? hoSo.namSinh : '',
+        namSinh: namSinhXet,
         trongDanhSach: coDs ? !!trongDs : null,
       })
-      if (!qd.ok) {
-        qd.serverNow = now
-        qd.thoiGianPhut = ca.thoiGianPhut
-        return jsonResponse_(qd)
+      if (!qdThu.ok) {
+        qdThu.serverNow = Date.now()
+        qdThu.thoiGianPhut = ca.thoiGianPhut
+        return jsonResponse_(qdThu)
       }
       // PHÒNG CHỜ (thầy chốt 07/09). Em qua hết cổng nhưng thầy chưa bấm "Bắt
       // đầu thi" thì DỪNG LẠI ĐÂY:
@@ -3800,9 +3969,50 @@ function doPost(e) {
       // Cả lớp nhận đề đúng một thời điểm, và em vào sớm không đọc trước được.
       // Em đã có lượt (vào rồi, thoát ra vào lại) thì KHÔNG bị đẩy về phòng
       // chờ — bài của em đang chạy dở.
-      if (ca.phongCho && !ca.batDauThiLuc && !luot) {
+      //
+      // KHÔNG CHẠM LuotThi ⇒ KHÔNG CẦN KHOÁ. Cả lớp vào sớm ngồi chờ thầy bấm
+      // Bắt đầu, mỗi máy hỏi lại mỗi ba giây — đó là lúc đông nhất của cả ca, và
+      // từ nay không lượt nào trong số đó chạm tới khoá toàn cục.
+      if (ca.phongCho && !ca.batDauThiLuc && !luotThu) {
         // GHI TÊN EM ĐANG CHỜ. Chế độ đề riêng rút bộ câu đúng lúc thầy bấm
         // Bắt đầu, nên danh sách này là thứ quyết định ai có phần.
+        ghiPhongCho_(maCa, sbd, dong && dong.hoTen ? dong.hoTen : body.hoTen)
+        return jsonResponse_({
+          ok: true,
+          cach: 'cho',
+          lop: ca.lop,
+          thoiGianPhut: ca.thoiGianPhut,
+          tenCa: ca.tenCa || '',
+          congBo: ca.congBo,
+          serverNow: Date.now(),
+        })
+      }
+
+    // ═══ TRONG KHOÁ: đọc lại đúng một dòng, kiểm lần cuối, rồi ghi ══════════
+    //
+    // Đích của đặc tả: `T ≤ 0,3 s`. Trong này chỉ còn tra một dòng LuotThi, một
+    // phép tính thuần, và một lượt ghi.
+    const lock = LockService.getScriptLock()
+    doiKhoa_(lock)
+    try {
+      // ĐỌC LẠI trong khoá. Bản đọc ngoài khoá ở trên chỉ để trả lời sớm cho em
+      // bị chặn; quyết định THẬT phải dựa trên dòng đọc sau khi đã cầm khoá,
+      // nếu không hai máy của cùng một em cùng thấy "chưa có lượt" và tạo hai
+      // dòng.
+      const luot = timLuotMoiNhat_(sh, maCa, sbd)
+      const now = Date.now()
+      if (canThemHoSo && !hoSo) hoSo = themEmVaoDanhSach_(sbd, ca, trongDs)
+      const qd = quyetDinhVaoThi_(ca, luot, idThietBi, now, {
+        sbd: sbd,
+        namSinh: hoSo ? hoSo.namSinh : namSinhXet,
+        trongDanhSach: coDs ? !!trongDs : null,
+      })
+      if (!qd.ok) {
+        qd.serverNow = now
+        qd.thoiGianPhut = ca.thoiGianPhut
+        return jsonResponse_(qd)
+      }
+      if (ca.phongCho && !ca.batDauThiLuc && !luot) {
         ghiPhongCho_(maCa, sbd, dong && dong.hoTen ? dong.hoTen : body.hoTen)
         return jsonResponse_({
           ok: true,
@@ -3867,14 +4077,14 @@ function doPost(e) {
       }
       // CÂU HỎI LẠI — máy em đánh dấu "em đã sai câu này buổi trước" ngay trên
       // thẻ câu (thầy chốt 08/09). Chỉ phần của CHÍNH EM này.
-      out.cauLap = cauLapCuaEm_(ca.boTheoEmRef, sbd)
+      out.cauLap = cauLapOut
       // BỘ CÂU CỦA EM đi kèm MỌI lần vào, kể cả lần không xin lại kho đề: máy
       // em ghép vào kho đã cất rồi mới cắt đề.
       out.boCuaEm = boCuaEm
       // SỐ LẦN SAI TỪNG CÂU LẶP — nguồn nhãn "sai lần thứ N" ở báo cáo em xem
       // ngay sau khi nộp. Đọc ở đây, ngoài khoá thì tốn thêm một lượt mở tệp;
       // gói này vốn đã mở cho `cauLap` nên không thêm lần đọc nào.
-      out.demLap = demLapCuaEm_(ca.boTheoEmRef, sbd)
+      out.demLap = demLapOut
       // Đề (KHÔNG đáp án) chỉ gửi khi máy em chưa có bản cache — tiết kiệm băng
       // thông. Đã đọc TRƯỚC KHI VÀO KHOÁ, xem `bankGui` bên trên.
       if (body.canBank) out.bank = bankGui
@@ -4684,8 +4894,9 @@ function doPost(e) {
     //
     // Hết hạn chờ khoá thì lệnh ném lỗi, máy em giữ `pendingSubmit` và gửi lại —
     // mất một lượt gửi, không mất bài.
+    let daNhanTruoc = false
     const lockNopBai = LockService.getScriptLock()
-    lockNopBai.waitLock(15000)
+    doiKhoa_(lockNopBai)
     try {
     const sh = sheetLuot_()
     // ĐOẠN GIỮ KHOÁ PHẢI NGẮN NHẤT CÓ THỂ — đây là chỗ treo cả lớp lúc nộp bài
@@ -4715,8 +4926,25 @@ function doPost(e) {
         lanThuCu = lan
       }
     }
-    const luotCu = luotRow > 0 ? docLuot_(sh.getRange(luotRow, 1, 1, LUOT_HEADERS.length).getValues()[0]) : null
+    let luotCu = null
     if (luotRow > 0) {
+      const vRow = sh.getRange(luotRow, 1, 1, LUOT_HEADERS.length).getValues()[0]
+      luotCu = docLuot_(vRow)
+      luotCu.khoaNop = vRow[LUOT_COT_KHOANOP - 1] ? String(vRow[LUOT_COT_KHOANOP - 1]) : ''
+    }
+    // KHOÁ CHỐNG TRÙNG (T4). Máy em thử lại sau khi hết hạn chờ — mà lượt đầu
+    // đã tới nơi và đã ghi xong. Bản cũ ghi đè lần nữa: `NopLuc` bị đẩy muộn
+    // hơn, và nếu thầy vừa khoá ca giữa hai lượt thì lượt sau ăn 'da_dong', máy
+    // em hiện lỗi cho một bài ĐÃ NỘP THÀNH CÔNG. Em hoảng, bấm nộp tiếp, càng
+    // đông.
+    //
+    // Nay: cùng `maCa|sbd|lanThu` mà dòng đã `da_nop`/`khoa` ⇒ KHÔNG ghi gì
+    // nữa, trả `daNhan:true`. Nhờ vậy T5 mới được phép bật thử-lại cho `submit`
+    // (mục 4: "cấm thử lại một hành động ghi chưa có khoá chống trùng").
+    const khoaLuotNop = khoaNop_(body.maCa, body.sbd, lanThuCu || lanThuMuon || 1)
+    if (nopTrungRoi_(luotCu, khoaLuotNop)) {
+      daNhanTruoc = true
+    } else if (luotRow > 0) {
       let ghiChu = luotCu.ghiChu
       const hetGio = msCua_(luotCu.hetGioLuc)
       if (isFinite(hetGio) && Date.now() > hetGio + AN_HAN_NOP_GIAY * 1000) {
@@ -4726,8 +4954,14 @@ function doPost(e) {
       }
       // Cột 7..12: NopLuc, TrangThai, DapAnJson, SoLanRoiMan, TongGiayRoiMan, IntegrityJson
       sh.getRange(luotRow, 7, 1, 6).setValues([[nopLuc, trangThai, JSON.stringify(body.dapAn), integrity.leaveCount || 0, Math.round((integrity.totalHiddenMs || 0) / 1000), JSON.stringify(integrity)]])
-      // Cột 20..22: GhiChu, CapNhatLuc, GiayCauJson (giây làm từng câu — mục 5)
-      sh.getRange(luotRow, 20, 1, 3).setValues([[ghiChu, nopLuc, body.giayCau ? JSON.stringify(body.giayCau) : '']])
+      // Cột 20..23: GhiChu, CapNhatLuc, GiayCauJson (giây làm từng câu — mục 5),
+      // KhoaNop (khoá chống trùng — T4).
+      //
+      // ĐÓNG DẤU KHOÁ CÙNG LƯỢT GHI CUỐI, không phải trước: ghi bài xong mới
+      // được nói "đã nhận". Đóng dấu trước rồi lượt ghi bài hỏng là mất bài mà
+      // lần thử lại nào cũng bị trả về `daNhan:true` — đúng cái bẫy của T2 lặp
+      // lại ở máy chủ.
+      sh.getRange(luotRow, 20, 1, 4).setValues([[ghiChu, nopLuc, body.giayCau ? JSON.stringify(body.giayCau) : '', khoaLuotNop]])
     } else {
       const bl = getSheet_(SHEET_BAILAM, ['MaCa', 'SBD', 'MaDe', 'ThoiGianNop', 'DapAnJson', 'SoLanRoiApp', 'TongGiayRoiApp', 'IntegrityJson'])
       // ĐƯỜNG LUI cho ca mở từ bản app rất cũ (không có dòng LuotThi). Hiếm khi
@@ -4763,7 +4997,9 @@ function doPost(e) {
       congBo = ca.congBo
       if (congBo === 'ngay' && ca.keyBankRef) keyBank = docJsonLon_(ca.keyBankRef)
     }
-    return jsonResponse_({ ok: true, keyBank: keyBank, congBo: congBo, serverNow: Date.now() })
+    // `daNhan` chỉ để đọc nhật ký và để phép kiểm đếm được. Máy em xử lý y hệt
+    // lượt nộp thành công — em không được thấy khác gì cả.
+    return jsonResponse_({ ok: true, daNhan: daNhanTruoc, keyBank: keyBank, congBo: congBo, serverNow: Date.now() })
   }
 
   if (action === 'luuTam') {
@@ -4784,7 +5020,9 @@ function doPost(e) {
     // CHẶN Ở MÁY CHỦ, không dựa vào giao diện đã ẩn nút.
     if (caDangKhoa_(docCa_(caShT, caRowT))) return jsonResponse_({ ok: false, lyDo: 'da_dong', error: 'Ca đã khoá — không lưu thêm được' })
     const shT = sheetLuot_()
-    const luotT = luotMoiNhatTheoSbd_(shT, maCa, true)[sbd] || null
+    // TRA MỘT DÒNG (T1). Đây là nhịp gọi DÀY NHẤT của cả ca — mỗi em một lượt
+    // mỗi 20 giây — nên nó cũng là chỗ mà "đọc cả bảng" gây hại nhiều nhất.
+    const luotT = timLuotMoiNhat_(shT, maCa, sbd)
     if (!luotT) return jsonResponse_({ ok: false, lyDo: 'chua_vao', error: 'Em này chưa vào thi' })
     if (luotT.trangThai !== 'dang_lam') return jsonResponse_({ ok: false, lyDo: 'khong_dang_lam', error: 'Lượt này không còn đang làm (' + luotT.trangThai + ')' })
     // KIỂM LẠI DÒNG NGAY TRƯỚC KHI GHI — xem `dungDongChua_`. Lệch thì tìm lại
@@ -4793,7 +5031,7 @@ function doPost(e) {
     // của em khác.
     let dongT = luotT.row
     if (!dungDongChua_(shT, dongT, maCa, sbd, luotT.lanThu)) {
-      const lai = luotMoiNhatTheoSbd_(shT, maCa, true)[sbd] || null
+      const lai = timLuotMoiNhat_(shT, maCa, sbd)
       if (!lai || !dungDongChua_(shT, lai.row, maCa, sbd, lai.lanThu)) {
         return jsonResponse_({ ok: false, lyDo: 'dong_da_doi', error: 'Bảng vừa đổi chỗ — máy em lưu lại ở nhịp sau' })
       }

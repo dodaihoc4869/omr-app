@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { choBaoLau, gianNopTuDong } from '../lib/nhip-gui-lai'
+import { choBaoLau, gianNopTuDong, gianVaoThi } from '../lib/nhip-gui-lai'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
 import { boCauTuBaiLam } from '../lib/bo-cau-tu-bai-lam'
 import { taoLinkPhieu } from '../lib/phieu-link'
 import { cauKhacPhuc, ghiPhieuKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, trangThaiPhongCho, vaoThi, phieuCuaEm as layBaiDaNop, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, chuKyLechPhaMs, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { CongNhip, NHIP_TIM_LUU_TAM_GIAY } from '../lib/nhip-gui'
 import { goiCauHoi } from '../lib/hoi-bai'
 import TamTruotHoiBai, { type CauChon } from '../components/TamTruotHoiBai'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
@@ -277,7 +278,14 @@ export default function ExamTakeScreen() {
   // GIẢM TẢI MÁY CHỦ (05/09): nhớ thứ đã gửi lần trước để bỏ nhịp khi không có
   // gì đổi, và chu kỳ đã lệch pha riêng của máy này để ba mươi máy không đập
   // cùng một nhịp. Xem ghi chú ở đầu khối này trong exam-api.ts.
-  const daGuiRef = useRef({ trangThai: '', luuTam: '', mocBaoSong: 0 })
+  // HAI CỔNG NHỊP. Xem `src/lib/nhip-gui.ts` — cái bẫy "ghi nhớ trước khi gửi"
+  // được mô tả ở đầu tệp đó, và đây là hai chỗ duy nhất dùng nó.
+  /** Đã giãn lượt vào thi đầu tiên chưa — chỉ giãn một lần cho mỗi phiên mở app. */
+  const daGianVaoThiRef = useRef(false)
+  const congRef = useRef({
+    trangThai: new CongNhip(NHIP_BAO_SONG_GIAY * 1000),
+    luuTam: new CongNhip(NHIP_TIM_LUU_TAM_GIAY * 1000),
+  })
   const chuKyRef = useRef({ trangThai: chuKyLechPha(10), luuTam: chuKyLechPha(CHU_KY_LUU_TAM_GIAY) })
   // GIỮ ĐỂ ĐỌC: hai con số cộng dồn cho thầy đọc ở Chi tiết ca. Để trong ref
   // chứ không state — đếm mà render lại là mất hết cái lợi của việc không dùng
@@ -789,14 +797,15 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     // BỎ NHỊP KHI KHÔNG CÓ GÌ ĐỔI. Vẫn báo sống mỗi NHIP_BAO_SONG_GIAY để thầy
     // phân biệt "em đang nghĩ" với "em tắt máy". Nộp bài và khoá bài KHÔNG đi
     // qua đường này (chiKhiDoi = false) nên không bao giờ bị bỏ.
+    const van = `${daLam}|${a.integrity.leaveCount}|${a.integrity.blocked}|${dangLam}`
+    const cong = congRef.current.trangThai
+    // Nộp bài và khoá bài đi đường `chiKhiDoi = false` — KHÔNG bao giờ qua cổng,
+    // nên không bao giờ bị bỏ.
     if (chiKhiDoi) {
-      const van = `${daLam}|${a.integrity.leaveCount}|${a.integrity.blocked}|${dangLam}`
-      const nay = Date.now()
-      if (van === daGuiRef.current.trangThai && nay - daGuiRef.current.mocBaoSong < NHIP_BAO_SONG_GIAY * 1000) return
-      daGuiRef.current.trangThai = van
-      daGuiRef.current.mocBaoSong = nay
+      if (!cong.nenGui(van)) return
+      cong.batDau()
     }
-    pushExamStatus(url, {
+    void pushExamStatus(url, {
       sbd: a.sbd,
       maCa: a.maCa,
       lop: lopRef.current,
@@ -806,6 +815,13 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       tongCauHoi: totalCountRef.current,
       soLanRoiApp: a.integrity.leaveCount,
       blocked: a.integrity.blocked,
+    }).then((xong) => {
+      // CHỈ GHI NHỚ KHI MÁY CHỦ ĐÃ NHẬN. Ghi nhớ trước lúc gửi thì một nhịp rớt
+      // mạng làm nhịp sau tưởng "đã gửi rồi, không có gì đổi" và bỏ qua luôn —
+      // màn Theo dõi của thầy đứng im ở con số cũ trong khi em vẫn đang làm.
+      if (!chiKhiDoi) return
+      if (xong) cong.xong(van)
+      else cong.hong()
     })
   }
 
@@ -963,6 +979,15 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 
       let kq: KetQuaVaoThi | null = null
       if (url) {
+        // XẾP HÀNG 0–3 GIÂY TRƯỚC LƯỢT VÀO ĐẦU TIÊN (T5). Thầy hô một tiếng là
+        // cả lớp bấm trong hai giây; rải ra thì ba mươi lượt nối đuôi nhau thay
+        // vì chồng lên nhau. Chỉ giãn LẦN ĐẦU — em bấm lại sau khi hỏng thì vào
+        // thẳng, vì lúc ấy đám đông đã tan và em đang ngồi chờ.
+        if (!daGianVaoThiRef.current) {
+          daGianVaoThiRef.current = true
+          const cho = gianVaoThi()
+          if (cho > 0) await new Promise((nghi) => setTimeout(nghi, cho))
+        }
         try {
           kq = await vaoThi(url, ma, sb, idTb, !cached, { hoTen: ten, namSinh: nam, xacNhanTen: xacNhan !== null })
         } catch {
@@ -1153,9 +1178,18 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       // một trăm nhịp còn lại đang gửi lại y nguyên thứ máy chủ đã có. Nhịp
       // CUỐI lúc rời màn vẫn gửi vô điều kiện — đó là bản chốt.
       const van = JSON.stringify(a.answers)
-      if (chiKhiDoi && van === daGuiRef.current.luuTam) return
-      daGuiRef.current.luuTam = van
-      void luuTam(url, a.maCa, a.sbd, a.answers, giayCauRef.current)
+      const cong = congRef.current.luuTam
+      // Nhịp CUỐI lúc rời màn (`chiKhiDoi` false) đi vô điều kiện — đó là bản
+      // chốt, không được phép nhường ai.
+      if (chiKhiDoi) {
+        if (!cong.nenGui(van)) return
+        cong.batDau()
+      }
+      void luuTam(url, a.maCa, a.sbd, a.answers, giayCauRef.current).then((xong) => {
+        if (!chiKhiDoi) return
+        if (xong) cong.xong(van)
+        else cong.hong()
+      })
     }
     const id = setInterval(() => luu(true), chuKyRef.current.luuTam * 1000)
     return () => {

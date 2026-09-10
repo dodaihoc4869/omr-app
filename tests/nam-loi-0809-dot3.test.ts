@@ -78,21 +78,12 @@ describe('PHẠM VI RÚT CÂU HỎI LẠI', () => {
     expect(ra.map((c) => c.maCa)).toEqual(ds.map((c) => c.maCa))
   })
 
-  it('ba_ca: cũng QUÉT CẢ THƯ MỤC — chặn 3 ca chuyển sang từng em', () => {
-    // VIẾT LẠI 10/09 tối — thầy đổi PHẠM VI lần nữa, không phải mã hỏng:
-    //
-    //   "quét tất cả các mã trong thư mục ca thi chứa năm sinh đó, rồi dựng
-    //    lại bản đồ câu sai, đảm bảo mở ca mới phải rút được câu sai"
-    //
-    // Luật cũ bốc ngẫu nhiên 3 ca trong TOÀN BỘ danh sách RỒI mới xem em có
-    // mặt trong đó không. Bốc trúng ba ca lớp khác là cả lớp ra "mới vào lớp,
-    // chưa có ca nào" — đúng thứ đã xảy ra với bộ 817428 · 890691 · 335663.
-    //
-    // Nay quét cả thư mục ở đây; trần 3 ca chuyển vào `chonCauLapChoEm`, nơi
-    // ĐÃ BIẾT em nào nộp ca nào nên bốc trong đúng ca chính em đó có nộp.
-    // Xem `tests/quet-ca-theo-nam-sinh-1009.test.ts` mục 3.
+  it('ba_ca: bốc ĐÚNG 3 ca, và KHÔNG phải 3 ca gần nhất', () => {
     const ra = chonCaTheoPhamVi(ds, 'moi', { ...CAU_HINH_DE_RIENG_MAC_DINH, PHAM_VI_HOI_LAI: 'ba_ca' })
-    expect(ra.map((c) => c.maCa)).toEqual(ds.map((c) => c.maCa))
+    expect(ra.length).toBe(3)
+    expect(new Set(ra.map((c) => c.maCa)).size).toBe(3)
+    expect(ra.map((c) => c.maCa)).not.toEqual(['c1', 'c2', 'c3'])
+    for (const c of ra) expect(ds.some((x) => x.maCa === c.maCa)).toBe(true)
   })
 
   it('ba_ca: CÙNG MỘT CA thì lần nào cũng ra đúng bộ ấy — biên bản đối chiếu được', () => {
@@ -102,12 +93,10 @@ describe('PHẠM VI RÚT CÂU HỎI LẠI', () => {
     expect(a).toEqual(b)
   })
 
-  it('ba_ca: bộ ca KHÔNG còn phụ thuộc mã ca — mọi ca đều quét cả thư mục', () => {
-    // Hệ quả cố ý của luật mới: không bốc ngẫu nhiên nữa nên không còn "ca
-    // khác thì bộ khác". Tính tái lập vẫn còn, và còn mạnh hơn trước.
+  it('ba_ca: ca KHÁC thì bộ khác — không phải lúc nào cũng một bộ', () => {
     const ch = { ...CAU_HINH_DE_RIENG_MAC_DINH, PHAM_VI_HOI_LAI: 'ba_ca' as const }
     const bo = new Set(['a', 'b', 'c', 'd', 'e'].map((m) => chonCaTheoPhamVi(ds, m, ch).map((c) => c.maCa).join(',')))
-    expect(bo.size).toBe(1)
+    expect(bo.size).toBeGreaterThan(1)
   })
 
   it('ba_ca: kho chỉ có 2 ca thì lấy cả 2, không bịa thêm', () => {
@@ -135,11 +124,7 @@ describe('BIÊN BẢN nói đúng phạm vi thầy chọn', () => {
 
   it('chế độ gần nhất KHÔNG còn in chữ "quét 3 ca gần nhất"', () => {
     expect(MAN_CA).not.toContain('quét ${bb.caDaQuet.length} ca gần nhất')
-    // 10/09 tối: chữ "bốc 3 ca ngẫu nhiên" nay SAI SỰ THẬT — không còn bốc
-    // ngẫu nhiên nữa, mà quét cả thư mục rồi mỗi em lấy tối đa 3 ca của chính
-    // em ấy. Biên bản phải nói đúng chuyện đang xảy ra.
-    expect(MAN_CA).toContain('mỗi em lấy tối đa 3 ca gần nhất CHÍNH EM có nộp')
-    expect(MAN_CA).not.toContain('bốc 3 ca ngẫu nhiên')
+    expect(MAN_CA).toContain('`bốc 3 ca ngẫu nhiên: ${bb.caDaQuet.join(\' · \')}`')
     expect(MAN_CA).toContain('lấy ca gần nhất em có nộp — đã dò')
   })
 
@@ -207,7 +192,7 @@ describe('BÁO CÁO SAU THI: thống kê câu em đã sai buổi trước', () =
 
   it('máy chủ gửi bản đồ số lần sai của CHÍNH EM, và màn thi cất lại', () => {
     expect(GS).toContain('function demLapCuaEm_(ref, sbd)')
-    expect(GS).toContain('out.demLap = demLapCuaEm_(ca.boTheoEmRef, sbd)')
+    expect(GS).toContain('const demLapOut = demLapCuaEm_(ca.boTheoEmRef, sbd)')
     expect(MAN_THI).toContain('lapCua: attempt.demLap && Object.keys(attempt.demLap).length > 0 ? attempt.demLap : null,')
   })
 

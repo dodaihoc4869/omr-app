@@ -195,7 +195,9 @@ describe('luotMoiNhatTheoSbd_ bản NHẸ bỏ ba cột JSON nặng', () => {
     gs.luotMoiNhatTheoSbd_(a, '903093')
     gs.luotMoiNhatTheoSbd_(b, '903093', true)
     expect(a.soODoc).toBe(31 * 22)
-    expect(b.soODoc).toBe(31 * (8 + 2 + 9)) // ba dải, bỏ đúng ba cột JSON
+    // Dải thứ ba rộng ra 9 → 11 cột từ 10/09: cột 23 `KhoaNop` (khoá chống trùng
+    // của T4) nằm sau `GiayCauJson`, mà `GiayCauJson` vẫn bị bỏ trống có chủ ý.
+    expect(b.soODoc).toBe(31 * (8 + 2 + 11)) // ba dải, bỏ đúng ba cột JSON
     expect(b.soODoc).toBeLessThan(a.soODoc)
     expect(b.soLanDocCaBang).toBe(0)
   })
@@ -218,14 +220,15 @@ describe('ĐỌC ĐỀ NGOÀI KHOÁ — cả lớp vào thi cùng lúc không x�
 
   it('docJsonLon_ của đề chạy TRƯỚC lock.waitLock', () => {
     const iDoc = vaoThi.indexOf('const bankGui =')
-    const iKhoa = vaoThi.indexOf('lock.waitLock(')
+    // Mốc neo đổi 10/09 khuya: `lock.waitLock(15000)` → `doiKhoa_(lock)` (T3).
+    const iKhoa = vaoThi.indexOf('doiKhoa_(lock)')
     expect(iDoc).toBeGreaterThan(0)
     expect(iKhoa).toBeGreaterThan(0)
     expect(iDoc).toBeLessThan(iKhoa)
   })
 
   it('trong vùng khoá KHÔNG còn lệnh đọc Drive nào', () => {
-    const i = vaoThi.indexOf('lock.waitLock(')
+    const i = vaoThi.indexOf('doiKhoa_(lock)')
     const j = vaoThi.indexOf('lock.releaseLock()')
     const trongKhoa = vaoThi.slice(i, j)
     expect(trongKhoa).not.toContain('docJsonLon_')
@@ -274,9 +277,19 @@ describe('lệch pha — ba mươi máy không đập cùng một nhịp', () =>
 describe('bỏ nhịp khi không có gì đổi', () => {
   const man = () => import('../src/screens/ExamTakeScreen.tsx?raw').then((m) => m.default)
 
+  // VIẾT LẠI 10/09 (T2 của KHACPHUCTREOHANGLOAT.md), KHÔNG PHẢI BỎ.
+  //
+  // Hai phép kiểm dưới đây trước ghim NGUYÊN VĂN mã cũ: một `daGuiRef` tự chế
+  // trong màn hình, nhớ chữ ký NGAY TRƯỚC khi gửi. Chính chỗ "ngay trước" ấy là
+  // lỗi: nhịp rớt mạng vẫn được ghi là đã gửi, nên nhịp sau thấy "y nguyên" rồi
+  // im luôn, và máy chủ giữ mãi bản cũ.
+  //
+  // Luật cần giữ KHÔNG đổi — bỏ nhịp khi không đổi, nhịp cuối vẫn gửi, vẫn báo
+  // sống theo nhịp tim — nên hai phép kiểm này ở lại, chỉ đổi chỗ trỏ sang
+  // `CongNhip`. Phần chứng minh HÀNH VI nằm ở `tests/nhip-gui-t2-1009.test.ts`.
   it('lưu tạm bỏ nhịp khi đáp án y nguyên, nhưng nhịp CUỐI vẫn gửi', async () => {
     const ma = await man()
-    expect(ma).toContain('if (chiKhiDoi && van === daGuiRef.current.luuTam) return')
+    expect(ma).toContain('if (!cong.nenGui(van)) return')
     // nhịp cuối lúc rời màn gọi không tham số ⇒ chiKhiDoi = false ⇒ gửi vô điều kiện
     expect(ma).toContain('const luu = (chiKhiDoi = false) => {')
     expect(ma).toMatch(/clearInterval\(id\)[\s\S]{0,200}luu\(\)/)
@@ -284,7 +297,7 @@ describe('bỏ nhịp khi không có gì đổi', () => {
 
   it('trạng thái vẫn BÁO SỐNG dù không đổi — thầy phải phân biệt "đang nghĩ" với "tắt máy"', async () => {
     const ma = await man()
-    expect(ma).toContain('nay - daGuiRef.current.mocBaoSong < NHIP_BAO_SONG_GIAY * 1000')
+    expect(ma).toContain('new CongNhip(NHIP_BAO_SONG_GIAY * 1000)')
   })
 
   it('nộp bài và khoá bài KHÔNG đi qua đường bỏ nhịp', async () => {

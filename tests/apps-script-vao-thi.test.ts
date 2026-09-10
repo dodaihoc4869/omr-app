@@ -85,7 +85,11 @@ describe('Apps Script quyetDinhVaoThi_ — một SBD một lượt', () => {
     expect(gs.LUOT_HEADERS[19]).toBe('GhiChu')
     expect(gs.LUOT_HEADERS[20]).toBe('CapNhatLuc')
     expect(gs.LUOT_HEADERS[21]).toBe('GiayCauJson')
-    expect(gs.LUOT_HEADERS).toHaveLength(22)
+    // 23 từ 10/09: cột `KhoaNop` (khoá chống trùng của T4) THÊM VÀO CUỐI. Mọi
+    // cột cũ giữ nguyên vị trí — đó mới là thứ phép kiểm này canh, vì mã ghi
+    // LuotThi theo CHỈ SỐ cột.
+    expect(gs.LUOT_HEADERS).toHaveLength(23)
+    expect(gs.LUOT_HEADERS[22]).toBe('KhoaNop')
     expect(gs.CA_HEADERS.slice(0, 7)).toEqual(['MaCa', 'Lop', 'ThoiGianPhut', 'MoLuc', 'BankJson', 'ImmediateFeedback', 'KeyBankJson'])
     expect(gs.CA_HEADERS.slice(7, 10)).toEqual(['BatDau', 'HetHanVao', 'TrangThai'])
     expect(gs.CA_HEADERS.slice(10, 15)).toEqual(['TenCa', 'PhamVi', 'DanhSachMoi', 'NguoiTao', 'XoaLuc'])

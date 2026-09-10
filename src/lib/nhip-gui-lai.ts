@@ -54,3 +54,21 @@ export const GIAN_NOP_TOI_DA_MS = 2500
 export function gianNopTuDong(nn: () => number = Math.random): number {
   return Math.round(nn() * GIAN_NOP_TOI_DA_MS)
 }
+
+/** GIÃN CÚ VÀO THI — KHACPHUCTREOHANGLOAT.md T5, "biến cú húc cửa thành dòng chảy".
+ *
+ * Thầy hô "vào thi đi" và ba mươi máy bấm trong hai giây. `vaoThi` là lệnh NẶNG
+ * NHẤT của cả ca — nó phải cầm khoá toàn cục để ghi dòng lượt — nên đúng khoảnh
+ * khắc ấy là lúc dễ tắc nhất.
+ *
+ * Trần 3 giây: rải đủ một lớp, và ngắn hơn chính một lượt gọi (1,3–4,4 giây)
+ * nên em không cảm thấy chậm hơn — em vẫn đang nhìn dòng "Đang vào phòng thi…"
+ * mà trước đây cũng phải nhìn.
+ *
+ * Chỉ giãn LƯỢT ĐẦU. Em bấm lại sau khi hỏng thì vào thẳng: lúc ấy em đang chờ
+ * và đám đông đã tan. */
+export const GIAN_VAO_THI_TOI_DA_MS = 3000
+
+export function gianVaoThi(nn: () => number = Math.random): number {
+  return Math.round(nn() * GIAN_VAO_THI_TOI_DA_MS)
+}

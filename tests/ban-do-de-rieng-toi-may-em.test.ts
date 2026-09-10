@@ -60,7 +60,7 @@ describe('MÁY CHỦ: lệnh vaoThi gửi bản đồ đề riêng kèm đề', 
   })
 
   it('vẫn trả câu hỏi lại như cũ — sửa lỗi này không được làm mất nhãn', () => {
-    expect(kv).toContain('out.cauLap = cauLapCuaEm_(ca.boTheoEmRef, sbd)')
+    expect(kv).toContain('const cauLapOut = cauLapCuaEm_(ca.boTheoEmRef, sbd)')
   })
 })
 

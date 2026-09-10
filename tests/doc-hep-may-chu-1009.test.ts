@@ -288,7 +288,7 @@ describe('MÃ NGUỒN — hai bảng nặng KHÔNG còn chỗ nào đọc cả b
   })
 
   it('VÙNG KHOÁ CỦA `submit` chỉ đọc ba cột khoá rồi đọc một dòng', () => {
-    const dau = GS.indexOf('lockNopBai.waitLock(15000)')
+    const dau = GS.indexOf('doiKhoa_(lockNopBai)')
     const cuoi = GS.indexOf('lockNopBai.releaseLock()')
     expect(dau).toBeGreaterThan(0)
     const than = GS.slice(dau, cuoi)
