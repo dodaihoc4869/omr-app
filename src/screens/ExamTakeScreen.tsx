@@ -66,6 +66,7 @@ import {
   emptyIntegrityLog,
   hetGioCua,
   loadAttempt,
+  listPendingAttempts,
   loadCachedSession,
   loadScriptUrlHoacMacDinh,
   luuDiemCuaEm,
@@ -404,6 +405,57 @@ export default function ExamTakeScreen() {
   useEffect(() => {
     lopRef.current = lop
   }, [lop])
+
+  // GỬI NỐT BÀI CÒN TỒN ĐỌNG — KHACPHUCTREOHANGLOAT.md T6 ("bài nộp không được
+  // phép mất").
+  //
+  // Bài được ghi vào IndexedDB với `pendingSubmit: true` TRƯỚC lượt gọi mạng
+  // đầu tiên, nên máy chủ chết hay mạng đứt thì bài vẫn còn nguyên trên máy em.
+  // Nhưng đường thử lại cũ chỉ sống trong lúc màn ca ấy còn mở: em tắt app rồi
+  // mở lại vào ca khác — hoặc chỉ mở app xem điểm — thì bài cũ nằm im trong
+  // hàng đợi mãi mãi. `listPendingAttempts` có sẵn từ lâu mà KHÔNG chỗ nào gọi.
+  //
+  // Nay mở app là quét hàng đợi một lượt. Gửi lại an toàn nhờ khoá chống trùng
+  // `maCa|sbd|lanThu` ở máy chủ (T4): máy chủ nhận rồi thì trả `daNhan` chứ
+  // không ghi đè.
+  useEffect(() => {
+    let huy = false
+    void (async () => {
+      const url = scriptUrlRef.current.trim()
+      if (!url) return
+      let ton: ExamAttempt[] = []
+      try {
+        ton = await listPendingAttempts()
+      } catch {
+        return // IndexedDB bị chặn — không có gì để làm, và không được nổ
+      }
+      for (const bai of ton) {
+        if (huy) return
+        // Bài của CHÍNH ca đang mở đã có đường thử lại riêng của nó.
+        const dang = attemptRef.current
+        if (dang && dang.maCa === bai.maCa && dang.sbd === bai.sbd) continue
+        try {
+          await submitAnswers(url, bai.maCa, bai.sbd, bai.maDe, bai.answers, bai.integrity, bai.lanThu ?? 1, bai.idThietBi ?? layIdThietBi(), bai.giayCau)
+          await saveAttempt({ ...bai, pendingSubmit: false })
+          showToast(`Đã gửi nốt bài ca ${bai.maCa} còn tồn trên máy`, 'success')
+        } catch (e) {
+          // CA ĐÃ KHOÁ nghĩa là thầy đã nộp hộ theo bản lưu tạm — bài của em ĐÃ
+          // được chấm. Xoá khỏi hàng đợi, nếu không máy em thử lại mỗi lần mở
+          // app cho tới hết đời.
+          const loi = e instanceof Error ? e.message : String(e)
+          if (loi.includes('Ca đã khoá') || loi.includes('da_dong')) {
+            await saveAttempt({ ...bai, pendingSubmit: false })
+          }
+          // Lỗi mạng thì để nguyên trong hàng đợi, lần mở app sau gửi tiếp.
+        }
+      }
+    })()
+    return () => {
+      huy = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const totalCountRef = useRef(0)
 
   // Đọc link mời (?examCode=...&api=...) — học sinh mở link chỉ cần gõ SBD.
