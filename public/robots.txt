@@ -1,0 +1,4 @@
+# App nội bộ của lớp — dữ liệu học sinh không có việc gì ở trên máy tìm kiếm.
+# Chặn hết, không ngoại lệ.
+User-agent: *
+Disallow: /

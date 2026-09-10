@@ -233,14 +233,22 @@ describe('4 — XẾP LẠI LẦN HAI trong buổi: em vừa lên bảng phải 
     expect(kq.dong[0].em?.sbd).toBe('S01')
   })
 
-  it('màn ĐẾM THẬT số lần trong buổi, không cắm cứng 0', () => {
-    expect(MAN).toContain('soLanLenBang: (daGoiCau[e.sbd] ?? []).length')
-    expect(MAN).toContain('[dsEmCa, daGoiCau]')
+  // HAI PHÉP KIỂM DƯỚI ĐÂY ĐÃ ĐƯỢC VIẾT LẠI, không phải xoá đi cho xanh.
+  //
+  // Bản đầu chúng khoá đúng thứ tốt nhất làm được LÚC ẤY: đếm số lần lên bảng
+  // TRONG BUỔI, và khai thật là máy chủ chưa giữ được lịch sử 30 ngày. Nay máy
+  // chủ có sheet `LenBang` riêng nên đọc được số thật, và cờ "chưa có lịch sử"
+  // theo sự thật chứ không cắm cứng. Hợp đồng đầy đủ của phần ấy khoá ở
+  // `lich-su-len-bang-1009.test.ts`; ở đây chỉ giữ đúng vế "xếp lại lần hai
+  // không gọi lại em vừa lên bảng", vế mà đợt này sinh ra để giải quyết.
+  it('màn cộng CẢ lịch sử thật LẪN số lần đã gọi trong buổi', () => {
+    expect(MAN).toContain('soLanLenBang: (lichSu?.theoEm[e.sbd]?.soLan ?? 0) + (daGoiCau[e.sbd] ?? []).length,')
+    expect(MAN).toContain('[dsEmCa, daGoiCau, lichSu]')
   })
 
-  it('và vẫn khai thật là máy chủ chưa giữ lịch sử 30 ngày', () => {
-    expect(MAN).toContain('chuaCoLichSuLenBang: true')
-    expect(MAN).toContain('danh sách đỏ, nên tôi không tự làm')
+  it('cờ "chưa có lịch sử" nay theo SỰ THẬT, không cắm cứng nữa', () => {
+    expect(MAN).not.toContain('chuaCoLichSuLenBang: true')
+    expect(MAN).toContain('chuaCoLichSuLenBang: !lichSu || Object.keys(lichSu.theoEm).length === 0,')
   })
 })
 

@@ -20,6 +20,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>ĐỖ ĐẠI HỌC</title>
+    <!-- Mô tả này KHÔNG để lên Google (xem public/robots.txt — app chặn hết bọ
+      tìm kiếm). Nó ở đây vì trình đọc màn hình và thẻ chia sẻ đọc nó. -->
+    <meta name="description" content="Công cụ nội bộ lớp luyện thi Hoá Thầy Đỗ Đại Học: mở ca kiểm tra, quét phiếu, chấm bài và dựng giáo án chữa." />
     <!-- Nền khi CSS của app chưa nạp (tránh loé trắng ở nền tối) — cùng giá trị --nen trong tokens.css -->
     <style>
       body { margin: 0; background: #f7f8fa; }
@@ -27,7 +30,7 @@
     </style>
   </head>
   <body>
-    <div id="root"></div>
+    <main id="root"></main>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

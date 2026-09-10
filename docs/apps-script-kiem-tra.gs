@@ -363,6 +363,22 @@ const SHEET_TIENDO_HS = 'TienDoHS'
 const TIENDO_HS_HEADERS = ['SBD', 'ChuyenDe', 'SoCau', 'SoSai', 'CapNhatLuc']
 const SHEET_QID = 'QidDaLam'
 const QID_HEADERS = ['SBD', 'DanhSachQid', 'SoCau', 'CapNhatLuc']
+// LỊCH SỬ LÊN BẢNG — SHEET MỚI, KHÔNG ĐỤNG SHEET NÀO ĐANG CÓ.
+//
+// Vì sao thêm sheet chứ không thêm cột vào TienDoCa: TienDoCa đang chạy với
+// header 7 cột và cả đường tiến độ đọc theo đúng thứ tự ấy. Thêm cột vào giữa
+// một bảng đang có dữ liệu thật là đổi cấu trúc dữ liệu đang chạy — thứ không
+// được phép làm khi không có cách khác. Sheet mới thì dữ liệu cũ đọc y nguyên,
+// và `getSheet_` tự tạo nên thầy không phải làm gì.
+//
+// Vì sao cần: `ghiLenBang` trước đây nhận `qid` rồi VỨT — TienDoCa không có cột
+// nào giữ nó, và cũng không có đường nào đọc ngược ra "em này lên bảng mấy lần
+// tháng qua". Hệ số `moi(e)` của giáo án 80 phút vì thế luôn bằng 1 cho mọi em.
+// Sheet này là chỗ trả lời đúng câu ấy.
+const SHEET_LENBANG = 'LenBang'
+const LENBANG_HEADERS = ['SBD', 'MaCa', 'Qid', 'ChuyenDe', 'Dat', 'GhiLuc']
+// Cửa sổ mặc định khi màn hỏi "mấy lần gần đây", tính bằng ngày.
+const NGAY_LICH_SU_LEN_BANG = 30
 // Số ca gần nhất tính là "gần đây" khi so xu hướng; mỗi bên phải có tối thiểu
 // SO_CAU_TOI_THIEU câu của chuyên đề đó thì mới dám kết luận tăng/giảm.
 const SO_CA_GAN_DAY = 3
@@ -2430,7 +2446,53 @@ function doPost(e) {
     const tomTat = {}
     tomTat[sbdLB] = { nopLuc: lucLB, theoCd: theoCd, qids: body.qid ? [String(body.qid)] : [] }
     ghiTienDo_(maCaLB, tomTat)
+    // GHI THÊM vào sheet lịch sử. Đường TienDoCa ở trên GIỮ NGUYÊN — nó vẫn là
+    // chỗ cộng vào bảng mạnh–yếu của em. Sheet này chỉ trả lời câu hỏi khác:
+    // em lên bảng bao nhiêu lần, câu nào, lúc nào.
+    try {
+      getSheet_(SHEET_LENBANG, LENBANG_HEADERS).appendRow([
+        sbdLB,
+        maCaLB,
+        String(body.qid || ''),
+        cdLB,
+        datLB ? 'dat' : 'chua',
+        lucLB,
+      ])
+    } catch (errLB) {
+      // Ghi lịch sử hỏng KHÔNG được làm hỏng việc chính: bảng mạnh–yếu đã ghi
+      // xong ở trên rồi. Báo ra để máy thầy biết mà không chặn thầy chấm tiếp.
+      return jsonResponse_({ ok: true, maCa: maCaLB, dat: datLB, canhBao: 'Không ghi được lịch sử lên bảng: ' + errLB })
+    }
     return jsonResponse_({ ok: true, maCa: maCaLB, dat: datLB })
+  }
+
+  // ĐỌC LỊCH SỬ LÊN BẢNG — trả về số lần mỗi em đã lên bảng trong `soNgay` ngày.
+  //
+  // Chỉ trả SBD và mấy con số đếm, không trả tên em, không trả nội dung câu:
+  // màn Gọi lên bảng chỉ cần bấy nhiêu để tính hệ số công bằng tần suất.
+  if (action === 'lichSuLenBang') {
+    const loiLS = kiemTraMaBiMat_(body)
+    if (loiLS) return jsonResponse_({ ok: false, error: loiLS })
+    const soNgay = Number(body.soNgay) > 0 ? Number(body.soNgay) : NGAY_LICH_SU_LEN_BANG
+    const moc = Date.now() - soNgay * 86400000
+    const shLS = getSheet_(SHEET_LENBANG, LENBANG_HEADERS)
+    const dem = {}
+    if (shLS.getLastRow() >= 2) {
+      const dLS = shLS.getRange(2, 1, shLS.getLastRow() - 1, LENBANG_HEADERS.length).getValues()
+      for (let i = 0; i < dLS.length; i++) {
+        const sbdI = String(dLS[i][0] || '').trim()
+        if (!sbdI) continue
+        const t = Date.parse(String(dLS[i][5] || ''))
+        if (!t || t < moc) continue
+        const cu = dem[sbdI] || { soLan: 0, lanCuoi: '', qids: [] }
+        cu.soLan += 1
+        if (!cu.lanCuoi || String(dLS[i][5]) > cu.lanCuoi) cu.lanCuoi = String(dLS[i][5])
+        const q = String(dLS[i][2] || '')
+        if (q && cu.qids.indexOf(q) < 0) cu.qids.push(q)
+        dem[sbdI] = cu
+      }
+    }
+    return jsonResponse_({ ok: true, soNgay: soNgay, theoEm: dem })
   }
 
   // ------------------------------------------------------------------ KHO ĐỀ

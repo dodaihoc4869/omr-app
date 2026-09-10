@@ -1678,6 +1678,30 @@ export async function ghiLenBang(scriptUrl: string, secret: string, d: { sbd: st
   if (!r.ok) throw new Error(r.error || 'Không ghi được kết quả lên bảng')
 }
 
+/** Số lần mỗi em đã lên bảng trong `soNgay` ngày gần đây.
+ *
+ * Máy chủ trả về ĐÚNG bấy nhiêu: SBD, số lần, lần cuối, và mã câu đã chữa. Không
+ * tên em, không nội dung câu — màn Gọi lên bảng chỉ cần chừng đó để tính hệ số
+ * công bằng tần suất `moi(e)`.
+ *
+ * Sheet `LenBang` là sheet MỚI (thêm, không đụng bảng nào đang chạy). Máy chủ
+ * bản cũ chưa có lệnh này ⇒ ném lỗi; chỗ gọi phải coi đó là "chưa có lịch sử"
+ * chứ không phải hỏng. */
+export interface LichSuLenBangEm {
+  soLan: number
+  lanCuoi: string
+  qids: string[]
+}
+export async function lichSuLenBang(
+  scriptUrl: string,
+  secret: string,
+  soNgay?: number,
+): Promise<{ soNgay: number; theoEm: Record<string, LichSuLenBangEm> }> {
+  const r = await postJson(scriptUrl, { action: 'lichSuLenBang', secret, soNgay: soNgay ?? 0 })
+  if (!r.ok) throw new Error(r.error || 'Không đọc được lịch sử lên bảng')
+  return { soNgay: Number(r.soNgay) || 30, theoEm: (r.theoEm ?? {}) as Record<string, LichSuLenBangEm> }
+}
+
 // ---------------------------------------------------------------------------
 // HỎI BÀI THẦY (HOIBAITHAY.md mục 2.3)
 

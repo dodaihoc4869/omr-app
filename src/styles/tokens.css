@@ -13,8 +13,15 @@
 
   /* chữ */
   --muc: #1a2332;
-  --nhat: #6b7280;
-  --mo: #9ca3af;
+  /* HAI BẬC CHỮ MỜ PHẢI ĐỌC ĐƯỢC, không chỉ phải nhạt.
+   * Đo bằng Lighthouse 10/09: `--mo` cũ (#9ca3af) chỉ đạt tương phản 2,54 trên
+   * nền trắng và 2,39 trên nền thẻ — dưới xa mức 4,5 của WCAG AA cho chữ 13px.
+   * Thầy cầm điện thoại đứng lớp, học sinh đọc trên máy cũ; chữ 2,4 là chữ để
+   * trang trí chứ không phải để đọc.
+   * Nay cả hai bậc đều ≥ 4,5 trên CẢ BA nền sáng (--the, --nen, --the-2), và
+   * vẫn cách nhau đủ để phân bậc. Khoá lại bằng `tuong-phan-mau-1009.test.ts`. */
+  --nhat: #5b6270;
+  --mo: #667085;
   --muc-nguoc: #ffffff; /* chữ đặt TRÊN nền --muc/--do/--tim đặc (nút chính, cảnh báo) */
 
   /* lớp phủ sau hộp thoại / ảnh phóng to */
@@ -132,7 +139,8 @@
 
     --muc: #e8eaed;
     --nhat: #9aa4b2;
-    --mo: #6b7482;
+    /* Nền tối cũng vậy: #6b7482 cũ chỉ đạt 3,02 trên --the-2. */
+    --mo: #8d97a5;
     --muc-nguoc: #0f1419;
 
     --phu: rgba(0, 0, 0, 0.6);

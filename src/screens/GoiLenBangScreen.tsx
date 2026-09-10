@@ -14,7 +14,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Shuffle } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
-import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, type CaTomTat } from '../lib/exam-api'
+import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, lichSuLenBang, type CaTomTat, type LichSuLenBangEm } from '../lib/exam-api'
 import { docKhoChuaCa, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { mergeKeepAnswers } from '../data/examContent'
 import { khuTrungNguon } from '../lib/khu-trung-cau'
@@ -144,6 +144,9 @@ export default function GoiLenBangScreen() {
   const [tranEm, setTranEm] = useState(CAU_HINH_LEN_BANG_MAC_DINH.SO_EM_LEN_BANG_TOI_DA)
   const [giayMoiEm, setGiayMoiEm] = useState(CAU_HINH_LEN_BANG_MAC_DINH.GIAY_LANE.L3)
   const [daCopyGiaoAn, setDaCopyGiaoAn] = useState(false)
+  /** Lịch sử lên bảng thật từ máy chủ. `null` = chưa đọc được (máy chủ bản cũ
+   * chưa có lệnh, hoặc mất mạng) ⇒ màn phải nói thật là chưa có. */
+  const [lichSu, setLichSu] = useState<{ soNgay: number; theoEm: Record<string, LichSuLenBangEm> } | null>(null)
   const [daCopy, setDaCopy] = useState(false)
   const [xemCau, setXemCau] = useState('')
   const [dangCham, setDangCham] = useState('')
@@ -336,18 +339,24 @@ export default function GoiLenBangScreen() {
   const vapCa = useMemo(() => vapCuaLop(dsCau, baiLamGiay), [dsCau, baiLamGiay])
   const doKhoCau = useMemo(() => dungDoKho(dsCau, baiLamGiay, kho.muc), [dsCau, baiLamGiay, kho])
   const soBatBuoc = useMemo(() => doKhoCau.filter((d) => d.batBuoc && !boBatBuoc.includes(d.cau.id)).length, [doKhoCau, boBatBuoc])
-  // `soLanLenBang` ĐẾM TRONG BUỔI, không phải lịch sử 30 ngày.
+  // `soLanLenBang` = LỊCH SỬ THẬT 30 NGÀY + số lần đã gọi TRONG BUỔI.
   //
-  // Máy chủ chưa giữ được lịch sử lên bảng: `ghiTienDo_` ghi vào `TienDoCa` theo
-  // header [SBD, MaCa, ChuyenDe, SoCau, SoSai, NopLuc, CapNhatLuc] — không có
-  // cột nào cho qid, và hôm nay bảng ấy có 0 dòng `LENBANG-`. Thêm cột là ĐỔI
-  // CẤU TRÚC DỮ LIỆU ĐANG CÓ, nằm trong danh sách đỏ, nên tôi không tự làm.
+  // Trước đây chỗ này cắm cứng 0 vì máy chủ vứt mất `qid` của `ghiLenBang` và
+  // `TienDoCa` không có cột nào giữ lịch sử. Nay có sheet `LenBang` riêng (thêm
+  // sheet, KHÔNG đụng bảng nào đang chạy) nên đọc được số thật.
   //
-  // Nhưng thứ đếm được thì phải đếm: thầy bấm xếp giờ lần hai trong cùng buổi
-  // thì em vừa lên bảng phải tụt hạng, không thì gọi lại đúng em ấy.
+  // Cộng cả hai vì chúng là hai chuyện khác nhau: lịch sử trả lời "tháng qua em
+  // lên mấy lần", còn đếm trong buổi trả lời "hôm nay đã gọi rồi". Thiếu vế sau
+  // thì bấm xếp lại lần hai sẽ gọi đúng em vừa lên.
   const emLenBang = useMemo(
-    () => dsEmCa.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen, coMat: e.coMat, soLanLenBang: (daGoiCau[e.sbd] ?? []).length })),
-    [dsEmCa, daGoiCau],
+    () =>
+      dsEmCa.map((e) => ({
+        sbd: e.sbd,
+        hoTen: e.hoTen,
+        coMat: e.coMat,
+        soLanLenBang: (lichSu?.theoEm[e.sbd]?.soLan ?? 0) + (daGoiCau[e.sbd] ?? []).length,
+      })),
+    [dsEmCa, daGoiCau, lichSu],
   )
   const chuGiaoAn = useMemo(() => {
     if (!kqXep || !du) return ''
@@ -376,6 +385,19 @@ export default function GoiLenBangScreen() {
     })()
   }, [])
 
+  // Lịch sử lên bảng: đọc một lần khi có cấu hình máy chủ. Máy chủ bản cũ chưa
+  // có lệnh này ⇒ để `null` và màn nói thật, KHÔNG coi là hỏng.
+  useEffect(() => {
+    if (!cauHinh) return
+    void (async () => {
+      try {
+        setLichSu(await lichSuLenBang(cauHinh.url, cauHinh.mat))
+      } catch {
+        setLichSu(null)
+      }
+    })()
+  }, [cauHinh])
+
   /** Dựng nền kho độ khó: duyệt ca cũ trên máy chủ, cộng dồn theo qid. Chỉ nạp
    * ca CHƯA duyệt nên bấm lại lần hai gần như tức thì. */
   const dungKho = async () => {
@@ -397,6 +419,14 @@ export default function GoiLenBangScreen() {
         } catch {
           // Một ca hỏng KHÔNG chặn các ca còn lại; ca ấy đơn giản là chưa vào kho.
         }
+        // CẤT DỌC ĐƯỜNG, không đợi tới cuối. Dựng kho là việc dài (mỗi ca một
+        // lượt gọi máy chủ kèm cả bản đề); cất một lần ở cuối thì thầy đóng tab
+        // ở ca 25/32 là mất trắng cả 25 ca vừa nạp. `daDuyet` giữ danh sách ca
+        // đã cộng nên lần sau bấm lại chỉ nạp phần còn thiếu.
+        if (i % 5 === 0 || i === canNap.length) {
+          await luuKhoDoKho(hienTai)
+          setKho(hienTai)
+        }
       }
       await luuKhoDoKho(hienTai)
       setKho(hienTai)
@@ -409,6 +439,7 @@ export default function GoiLenBangScreen() {
     }
   }
 
+
   const chayGiaoAn = () => {
     if (!du) return showToast('Chưa mở ca nào', 'warn')
     if (!dsCau.length) return showToast('Chưa có câu nào để chữa', 'warn')
@@ -417,9 +448,9 @@ export default function GoiLenBangScreen() {
       tranEm,
       giayMoiEm,
       thieuGiay: !vapCa.coGiay,
-      // Máy chủ chưa giữ được lịch sử lên bảng (`ghiTienDo_` không có cột nào
-      // cho việc ấy), nên luôn khai thật thay vì in một ngày giả.
-      chuaCoLichSuLenBang: true,
+      // Chỉ khai "chưa có lịch sử" khi ĐÚNG LÀ chưa có — máy chủ bản cũ chưa có
+      // lệnh đọc, hoặc có lệnh mà chưa em nào lên bảng lần nào.
+      chuaCoLichSuLenBang: !lichSu || Object.keys(lichSu.theoEm).length === 0,
     })
     setKqXep(r)
   }
@@ -459,7 +490,7 @@ export default function GoiLenBangScreen() {
         tranEm: tran,
         giayMoiEm: giay,
         thieuGiay: !vapCa.coGiay,
-        chuaCoLichSuLenBang: true,
+        chuaCoLichSuLenBang: !lichSu || Object.keys(lichSu.theoEm).length === 0,
       }),
     )
   }
@@ -539,6 +570,22 @@ export default function GoiLenBangScreen() {
       await ghiLenBang(cauHinh.url, cauHinh.mat, { sbd: p.sbd, chuyenDe: cd, dat, qid: p.cau.id })
       showToast(`${p.hoTen || p.sbd}: ${dat ? 'đạt' : 'không đạt'} — đã ghi vào ${cd}`, dat ? 'success' : 'warn')
       setDaGoiCau((cu) => ({ ...cu, [p.sbd]: [...new Set([...(cu[p.sbd] ?? []), p.cau.id])] }))
+      // Cộng ngay vào lịch sử đang giữ: máy chủ vừa ghi xong, khỏi tải lại cả bảng.
+      setLichSu((cu) =>
+        cu
+          ? {
+              ...cu,
+              theoEm: {
+                ...cu.theoEm,
+                [p.sbd]: {
+                  soLan: (cu.theoEm[p.sbd]?.soLan ?? 0) + 1,
+                  lanCuoi: new Date().toISOString(),
+                  qids: [...new Set([...(cu.theoEm[p.sbd]?.qids ?? []), p.cau.id])],
+                },
+              },
+            }
+          : cu,
+      )
       setKq((cu) => (cu ? { ...cu, phanCong: cu.phanCong.filter((x) => !(x.sbd === p.sbd && x.cau.id === p.cau.id)) } : cu))
       if (xemCau === p.sbd + p.cau.id) setXemCau('')
     } catch (e) {
@@ -901,6 +948,11 @@ export default function GoiLenBangScreen() {
             Kho độ khó: <span style={SO}>{Object.keys(kho.muc).length}</span> câu qua <span style={SO}>{kho.daDuyet.length}</span> ca đã duyệt
             {Object.keys(kho.muc).length === 0 && ' — chưa dựng, độ khó đang chỉ đọc từ ca này và nhãn sao trong kho'}
           </div>
+          <div style={{ ...NHAN_NHO, marginTop: 2 }}>
+            {lichSu
+              ? <>Lịch sử lên bảng {lichSu.soNgay} ngày: <span style={SO}>{Object.keys(lichSu.theoEm).length}</span> em, <span style={SO}>{Object.values(lichSu.theoEm).reduce((t, x) => t + x.soLan, 0)}</span> lượt</>
+              : 'Chưa đọc được lịch sử lên bảng — mọi em coi như nhau về tần suất'}
+          </div>
 
           {/* 4 — DANH SÁCH BẮT BUỘC CHỮA, hiện TRƯỚC khi xếp giờ */}
           {doKhoCau.length > 0 && (
@@ -974,6 +1026,7 @@ export default function GoiLenBangScreen() {
               <b style={SO}>{kqXep.thuaGio.soCauBatBuoc}</b> câu bắt buộc · cần{' '}
               <b style={SO}>{Math.round(kqXep.thuaGio.giayCan / 60)}</b> phút, có{' '}
               <b style={SO}>{Math.round(kqXep.thuaGio.giayCo / 60)}</b> phút.
+              {' '}Giá phải trả: chỉ <b style={SO}>{kqXep.soEmLenBang}</b>/<b style={SO}>{tranEm}</b> em được lên bảng.
               <div className="flex flex-col" style={{ gap: 6, marginTop: 8 }}>
                 {kqXep.thuaGio.luaChon.map((l) => (
                   <button
