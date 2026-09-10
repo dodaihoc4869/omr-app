@@ -5,15 +5,15 @@
 // SỐ LỆNH MÁY CHỦ: đúng MỘT lệnh cho MỘT CA (`chiTietCa`), không phải một lệnh
 // cho một em. Quét cả thư mục năm sinh, chặn trần `TRAN_CA_QUET` ⇒ vẫn gộp cho
 // lớp 40 em, đúng ngưỡng ở bảng nghiệm thu.
-import { namSinhTuTenCa } from './nam-sinh-ca'
-import { banDoSaiCa, chiTietCa, danhSachCa, noiKhoCa } from './exam-api'
+import { namSinhDaSo, namSinhTuTenCa } from './nam-sinh-ca'
+import { banDoSaiCa, chiTietCa, danhSachCa, danhSachEm, noiKhoCa } from './exam-api'
 import { taoChiTietCau } from './chi-tiet-cau'
 import { docDeRiengCa, loadExamSources, loadSessionTeacherBank, docSoCauCa, saveSessionTeacherBank } from './exam-db'
 import { mergeAndStrip, mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
-import { CAU_HINH_DE_RIENG_MAC_DINH, SO_CA_BOC_NGAU_NHIEN, type CauHinhDeRieng } from './cau-hinh-de-rieng'
+import { CAU_HINH_DE_RIENG_MAC_DINH, type CauHinhDeRieng } from './cau-hinh-de-rieng'
 import { demLanSai, dungDeRieng, type CaTruocDaCham, type EmThieuLap } from './de-rieng'
 import { dungUngVien } from './rut-de'
-import { hashSeed, seededPermutation } from './exam-shuffle'
+import { hashSeed } from './exam-shuffle'
 
 export interface CaBoQua {
   maCa: string
@@ -25,6 +25,12 @@ export interface NguonCaTruoc {
   dsCa: CaTruocDaCham[]
   /** Ca không đọc được, kèm lý do. Im lặng bỏ qua là thầy tưởng em đúng hết. */
   boQua: CaBoQua[]
+  /** Năm sinh đã dùng để lọc thư mục. `null` = KHÔNG lọc được (phải báo lên màn). */
+  namQuet: string | null
+  /** Lấy năm sinh ở đâu ra — để biên bản nói đúng chuyện đang xảy ra. */
+  nguonNam: 'hoc_sinh' | 'ten_ca' | 'khong_xac_dinh'
+  /** Tổng số ca THI trong thư mục năm sinh đó (trước khi chặn trần quét). */
+  soCaThuMuc: number
 }
 
 /** Đọc câu sai của từng em ở một ca đã chấm.
@@ -103,20 +109,29 @@ export function chonCaTheoPhamVi<T extends { maCa: string }>(dsMoiNhatTruoc: T[]
   // `gan_nhat` QUÉT CẢ THƯ MỤC NĂM SINH (thầy chốt 10/09). Danh sách vào đây đã
   // được `docCacCaTruoc` lọc còn đúng một năm sinh, nên chỉ cần chặn trần an
   // toàn. Việc tìm "ca gần nhất TỪNG EM có nộp" là của `chonCauLapChoEm`.
-  if (ch.PHAM_VI_HOI_LAI !== 'ba_ca') return dsMoiNhatTruoc.slice(0, Math.max(0, ch.TRAN_CA_QUET))
-  const can = Math.min(SO_CA_BOC_NGAU_NHIEN, dsMoiNhatTruoc.length)
-  if (can <= 0) return []
-  if (dsMoiNhatTruoc.length <= can) return dsMoiNhatTruoc.slice()
-  const hoanVi = seededPermutation(dsMoiNhatTruoc.length, hashSeed(`hoi-lai:${maCaNay}`))
-  const boc = hoanVi.slice(0, can).map((i) => dsMoiNhatTruoc[i])
-  // Trả về theo thứ tự mới-trước như phần còn lại của luồng vẫn chờ đợi: chỉ
-  // BỘ ca là ngẫu nhiên, thứ tự trong bộ thì không.
-  const thuTu = new Map(dsMoiNhatTruoc.map((c, i) => [c.maCa, i]))
-  return boc.sort((a, b) => (thuTu.get(a.maCa) ?? 0) - (thuTu.get(b.maCa) ?? 0))
+  // CẢ HAI PHẠM VI ĐỀU QUÉT CẢ THƯ MỤC (thầy chốt 10/09 và nhắc lại 10/09 tối:
+  // "quét tất cả các mã trong thư mục ca thi chứa năm sinh đó").
+  //
+  // Bản trước, `ba_ca` BỐC NGẪU NHIÊN 3 ca trong toàn bộ danh sách RỒI mới xem
+  // em có mặt trong đó không. Đó là trò may rủi: bốc trúng ba ca lớp khác thì
+  // cả lớp ra "mới vào lớp, chưa có ca nào" — đúng thứ đã xảy ra ngày 10/09 với
+  // bộ ca 817428 · 890691 · 335663.
+  //
+  // Nay quét cả thư mục ở đây, còn việc "chỉ lấy 3 ca" chuyển vào
+  // `chonCauLapChoEm` — nơi ĐÃ BIẾT em nào nộp ca nào, nên bốc trong ĐÚNG những
+  // ca chính em đó có nộp. Bốc sau khi biết dữ liệu, không bốc trước.
+  void maCaNay
+  return dsMoiNhatTruoc.slice(0, Math.max(0, ch.TRAN_CA_QUET))
 }
 
 /** Lấy các ca THI trước đó theo phạm vi thầy chọn, mới nhất trước. */
-export async function docCacCaTruoc(url: string, mat: string, boCa: string[] = [], ch: CauHinhDeRieng = CAU_HINH_DE_RIENG_MAC_DINH): Promise<NguonCaTruoc> {
+export async function docCacCaTruoc(
+  url: string,
+  mat: string,
+  boCa: string[] = [],
+  ch: CauHinhDeRieng = CAU_HINH_DE_RIENG_MAC_DINH,
+  dsSbd: string[] = [],
+): Promise<NguonCaTruoc> {
   const tatCa = await danhSachCa(url, mat)
   const bo = new Set(boCa.map((x) => x.trim()).filter(Boolean))
   const maNay = (boCa[0] ?? '').trim()
@@ -128,12 +143,36 @@ export async function docCacCaTruoc(url: string, mat: string, boCa: string[] = [
   // sát nhau, nên ca 2011 hoàn toàn có thể rút "câu em từng sai" từ một ca
   // 2009 — khác đề, khác chương, và sai IM LẶNG vì đề vẫn dựng ra bình thường.
   //
-  // Ca hiện tại không đọc được năm sinh ở tên thì KHÔNG lọc: thà quét rộng còn
-  // hơn quét nhầm sang khối khác vì một cái tên gõ thiếu.
+  // NGUỒN NĂM SINH — HAI TẦNG, hồ sơ học sinh trước, tên ca sau.
+  //
+  // Ngày 10/09 thầy đổi tên ca nên tên không còn bắt đầu bằng năm sinh. Bản
+  // trước gặp thế thì `namNay = null` rồi ÂM THẦM bỏ lọc, quét sang mọi khối —
+  // bộ ca 817428 · 890691 (2011) · 335663 (2009) lọt chung một lượt là dấu vết
+  // của đúng chỗ này. Cả lớp ra "mới vào lớp, chưa có ca nào", tức máy đổ lỗi
+  // cho học sinh thay vì khai rằng nó không lọc được.
+  //
+  // Nay lấy năm sinh từ CHÍNH CÁC EM trong ca. Thầy đổi tên ca là chuyện bình
+  // thường; năm sinh trong hồ sơ thì không đổi. Tên ca chỉ còn là đường lùi.
   const caNay = tatCa.find((c) => c.maCa === maNay)
-  const namNay = namSinhTuTenCa(caNay?.tenCa)
-  const dsGoc = tatCa
-    .filter((c) => c.loai !== 'baitap' && c.trangThai !== 'da_xoa' && !bo.has(c.maCa))
+  let namNay: string | null = null
+  let nguonNam: NguonCaTruoc['nguonNam'] = 'khong_xac_dinh'
+  if (dsSbd.length > 0) {
+    try {
+      const dsEm = await danhSachEm(url, mat)
+      const can = new Set(dsSbd.map((x) => String(x || '').trim()).filter(Boolean))
+      namNay = namSinhDaSo(dsEm.filter((e) => can.has(e.sbd)).map((e) => e.namSinh))
+      if (namNay !== null) nguonNam = 'hoc_sinh'
+    } catch {
+      namNay = null
+    }
+  }
+  if (namNay === null) {
+    namNay = namSinhTuTenCa(caNay?.tenCa)
+    if (namNay !== null) nguonNam = 'ten_ca'
+  }
+
+  const dsThi = tatCa.filter((c) => c.loai !== 'baitap' && c.trangThai !== 'da_xoa' && !bo.has(c.maCa))
+  const dsGoc = dsThi
     .filter((c) => namNay === null || namSinhTuTenCa(c.tenCa) === namNay)
     .sort((a, b) => String(b.moLuc ?? '').localeCompare(String(a.moLuc ?? '')))
   const ung = chonCaTheoPhamVi(dsGoc, maNay, ch)
@@ -144,11 +183,20 @@ export async function docCacCaTruoc(url: string, mat: string, boCa: string[] = [
   // Đây là đường nhanh và chắc: không cần bản đề của ca cũ nằm trên máy này,
   // nên máy nào cũng dựng đề được. Ca chưa có bản đồ (chấm trước khi có tính
   // năng này) thì rơi về cách cũ — chấm lại tại máy thầy.
-  let banDo: Record<string, { sai: Record<string, string[]>; lam: Record<string, string[]> }> = {}
-  try {
-    banDo = await banDoSaiCa(url, mat, ung.map((c) => c.maCa))
-  } catch {
-    banDo = {}
+  //
+  // CHIA LÔ 20 CA MỘT LƯỢT: máy chủ chặn cứng ở `dsMa.length > 20` ("Xin quá
+  // nhiều ca một lượt"). Quét cả thư mục thì vượt 20 là bình thường, và trước
+  // đây cả lượt gọi hỏng ⇒ `banDo = {}` ⇒ rơi hết về đường chấm lại tại máy
+  // thầy ⇒ máy nào không có bản đề ca cũ là không rút được câu nào.
+  const LO = 20
+  const banDo: Record<string, { sai: Record<string, string[]>; lam: Record<string, string[]> }> = {}
+  for (let i = 0; i < ung.length; i += LO) {
+    const lo = ung.slice(i, i + LO).map((c) => c.maCa)
+    try {
+      Object.assign(banDo, await banDoSaiCa(url, mat, lo))
+    } catch {
+      // Lô này hỏng thì chỉ mất lô này — các lô khác vẫn dùng được.
+    }
   }
 
   const dsCa: CaTruocDaCham[] = []
@@ -165,7 +213,62 @@ export async function docCacCaTruoc(url: string, mat: string, boCa: string[] = [
       boQua.push({ maCa: c.maCa, vi_sao: e instanceof Error ? e.message : 'không đọc được ca này' })
     }
   }
-  return { dsCa, boQua }
+  return { dsCa, boQua, namQuet: namNay, nguonNam, soCaThuMuc: dsGoc.length }
+}
+
+/** LẤY BẢN ĐỀ CÓ ĐÁP ÁN CỦA MỘT CA CŨ — máy thầy trước, máy chủ sau.
+ *
+ * Tách riêng vì `docCaTruoc` chỉ trả DANH SÁCH qid rồi vứt bản đề đi, trong khi
+ * `dungDeRiengChoCa` lại cần chính NỘI DUNG mấy câu đó. */
+async function bankCuaCa(url: string, mat: string, maCa: string): Promise<TeacherExamSource[] | null> {
+  const cu = await loadSessionTeacherBank(maCa).catch(() => null)
+  if (cu && cu.length > 0) return cu
+  try {
+    const ct = await chiTietCa(url, mat, maCa, true)
+    const kb = ct.keyBank
+    if (!kb || (kb.phanI.length === 0 && kb.phanII.length === 0 && kb.phanIII.length === 0)) return null
+    const bank: TeacherExamSource[] = [{ maDe: maCa, phanI: kb.phanI, phanII: kb.phanII, phanIII: kb.phanIII }]
+    await saveSessionTeacherBank(maCa, bank).catch(() => {})
+    return bank
+  } catch {
+    return null
+  }
+}
+
+/** GOM NỘI DUNG NHỮNG CÂU EM TỪNG SAI, LẤY TỪ CHÍNH CA CŨ.
+ *
+ * VÌ SAO PHẢI CÓ. Id câu được ghép từ `maDe` ("để ghép id câu hỏi cho không
+ * trùng giữa các đề"). Nạp lại kho là `maDe` đổi ⇒ **id đổi theo**, dù đề bài
+ * y nguyên. Ca cũ ghi lại id cũ, nên tra trong kho HIỆN TẠI là không thấy —
+ * đúng dòng "câu em từng sai không nằm trong kho ca này" thầy đang gặp, dù câu
+ * đó vẫn nằm sờ sờ trong kho dưới một cái id khác.
+ *
+ * Chữa tận gốc: KHÔNG đi tìm trong kho hiện tại nữa. Câu em làm sai đã được
+ * cất nguyên văn trong bản đề CÓ ĐÁP ÁN của chính ca cũ — lấy thẳng ở đó.
+ * Không phụ thuộc nhãn, không phụ thuộc kho còn hay mất đề ấy. */
+export async function gomCauTuCaCu(
+  url: string,
+  mat: string,
+  canTheoCa: Map<string, Set<string>>,
+): Promise<{ phanI: TeacherExamSource['phanI']; phanII: TeacherExamSource['phanII']; phanIII: TeacherExamSource['phanIII']; thieu: string[] }> {
+  const ra = { phanI: [] as TeacherExamSource['phanI'], phanII: [] as TeacherExamSource['phanII'], phanIII: [] as TeacherExamSource['phanIII'], thieu: [] as string[] }
+  const daCo = new Set<string>()
+  for (const [maCa, qids] of canTheoCa) {
+    if (qids.size === 0) continue
+    const bank = await bankCuaCa(url, mat, maCa)
+    if (!bank) {
+      for (const q of qids) if (!daCo.has(q)) ra.thieu.push(q)
+      continue
+    }
+    const conThieu = new Set(qids)
+    for (const s of bank) {
+      for (const q of s.phanI) if (conThieu.has(q.id) && !daCo.has(q.id)) { ra.phanI.push(q); daCo.add(q.id); conThieu.delete(q.id) }
+      for (const q of s.phanII) if (conThieu.has(q.id) && !daCo.has(q.id)) { ra.phanII.push(q); daCo.add(q.id); conThieu.delete(q.id) }
+      for (const q of s.phanIII) if (conThieu.has(q.id) && !daCo.has(q.id)) { ra.phanIII.push(q); daCo.add(q.id); conThieu.delete(q.id) }
+    }
+    for (const q of conThieu) if (!daCo.has(q)) ra.thieu.push(q)
+  }
+  return ra
 }
 
 /** DỰNG ĐỀ RIÊNG CHO ĐÚNG NHỮNG EM ĐANG CHỜ, gọi lúc thầy bấm BẮT ĐẦU.
@@ -193,6 +296,11 @@ export interface KetQuaDungDeRieng {
   boQua: CaBoQua[]
   /** Mã những ca đã quét được, mới nhất trước. */
   caDaQuet: string[]
+  /** Năm sinh dùng để lọc thư mục ca. `null` = không lọc được, phải báo lên màn. */
+  namQuet: string | null
+  nguonNam: NguonCaTruoc['nguonNam']
+  /** Tổng số ca THI trong thư mục năm sinh đó. */
+  soCaThuMuc: number
   trungBinh: number
 }
 
@@ -208,7 +316,7 @@ export async function dungDeRiengChoCa(
   const sc = await docSoCauCa(maCa)
   if (!sc) throw new Error('Ca này chưa ghi số câu mỗi phần')
 
-  const { dsCa, boQua } = await docCacCaTruoc(url, mat, [maCa], ch)
+  const { dsCa, boQua, namQuet, nguonNam, soCaThuMuc } = await docCacCaTruoc(url, mat, [maCa], ch, dsSbd)
 
   // KÉO CÂU EM TỪNG SAI TỪ CẢ KHO VÀO CA NÀY (thầy chốt 08/09: "bất kể là tôi
   // chọn chuyên đề gì thi mà ca trước sai 9 câu phải rút đúng 3 câu đó ra vào
@@ -223,8 +331,20 @@ export async function dungDeRiengChoCa(
   //
   // Chỉ nối THÊM, không thay câu nào, nên phần đề mới vẫn đúng chuyên đề thầy
   // chọn — câu lặp là câu thứ 3 trong 12, không phải cả đề đổi chuyên đề.
+  // Nhớ luôn câu ấy đến TỪ CA NÀO — để còn lấy nguyên văn nó ở bản đề của
+  // chính ca đó khi kho hiện tại không còn id ấy nữa (xem `gomCauTuCaCu`).
   const canQid = new Set<string>()
-  for (const ca of dsCa) for (const sbd of dsSbd) for (const q of ca.saiCua[sbd] ?? []) canQid.add(q)
+  const canTheoCa = new Map<string, Set<string>>()
+  for (const ca of dsCa) {
+    for (const sbd of dsSbd) {
+      for (const q of ca.saiCua[sbd] ?? []) {
+        canQid.add(q)
+        const bo = canTheoCa.get(ca.maCa) ?? new Set<string>()
+        bo.add(q)
+        canTheoCa.set(ca.maCa, bo)
+      }
+    }
+  }
   const coSan = new Set<string>()
   for (const s of bank) for (const q of [...s.phanI, ...s.phanII, ...s.phanIII]) coSan.add(q.id)
   const thieuQid = [...canQid].filter((q) => !coSan.has(q))
@@ -239,6 +359,21 @@ export async function dungDeRiengChoCa(
       phanI: kho.flatMap((s) => s.phanI.filter((q) => can.has(q.id))),
       phanII: kho.flatMap((s) => s.phanII.filter((q) => can.has(q.id))),
       phanIII: kho.flatMap((s) => s.phanIII.filter((q) => can.has(q.id))),
+    }
+    // ĐƯỜNG THỨ HAI, và là đường ĐÁNG TIN HƠN: câu nào kho hiện tại không có
+    // thì lấy NGUYÊN VĂN từ bản đề của ca cũ. Nạp lại kho làm đổi `maDe` ⇒ đổi
+    // id câu, nên tra theo id trong kho mới là hụt, dù đề bài y hệt.
+    const daLay = new Set([...them.phanI, ...them.phanII, ...them.phanIII].map((q) => q.id))
+    const conThieu = new Map<string, Set<string>>()
+    for (const [ma, bo] of canTheoCa) {
+      const b = new Set([...bo].filter((q) => can.has(q) && !daLay.has(q)))
+      if (b.size > 0) conThieu.set(ma, b)
+    }
+    if (conThieu.size > 0) {
+      const buCa = await gomCauTuCaCu(url, mat, conThieu)
+      them.phanI = [...them.phanI, ...buCa.phanI]
+      them.phanII = [...them.phanII, ...buCa.phanII]
+      them.phanIII = [...them.phanIII, ...buCa.phanIII]
     }
     const soThem = them.phanI.length + them.phanII.length + them.phanIII.length
     if (soThem > 0) {
@@ -275,6 +410,9 @@ export async function dungDeRiengChoCa(
     tuCaCua: ra.tuCaCua,
     boQua,
     caDaQuet: dsCa.map((c) => c.maCa),
+    namQuet,
+    nguonNam,
+    soCaThuMuc,
     trungBinh: ra.soLapTrungBinh,
   }
 }

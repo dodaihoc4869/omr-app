@@ -212,7 +212,11 @@ describe('bảng nghiệm thu mục 8 — phần nhãn', () => {
     // Và đúng MỘT lệnh đọc ca trong cả file, gọi tối đa `TRAN_CA_QUET` lần.
     // Tên hằng đổi 10/09 khi phạm vi chuyển từ "3 ca gần nhất" sang "cả thư mục
     // năm sinh" — ý định của phép kiểm không đổi: một lệnh cho một CA.
-    expect((nguon.match(/await chiTietCa\(/g) || []).length).toBe(1)
+    // HAI chỗ gọi, cả hai đều MỘT LỆNH CHO MỘT CA (không phải cho một em):
+    //   1. `docCaTruoc`  — đọc bài làm của ca cũ
+    //   2. `bankCuaCa`   — xin bản đề của ca cũ để lấy nguyên văn câu em từng
+    //      sai, khi kho hiện tại đã đổi id vì nạp lại đề (10/09).
+    expect((nguon.match(/await chiTietCa\(/g) || []).length).toBe(2)
     expect((nguon.match(/await danhSachCa\(/g) || []).length).toBe(1)
     expect(nguon).toContain('ch.TRAN_CA_QUET')
   })

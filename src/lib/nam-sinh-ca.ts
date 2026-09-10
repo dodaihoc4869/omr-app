@@ -26,6 +26,40 @@ export function namSinhTuTenCa(tenCa: string | null | undefined): string | null 
   return m ? m[1] : null
 }
 
+
+/** NĂM SINH ĐA SỐ CỦA MỘT NHÓM EM.
+ *
+ * NGUỒN SỰ THẬT THẬT SỰ của "ca này thuộc khối nào" là NĂM SINH CỦA CHÍNH CÁC
+ * EM trong ca, không phải cái nhãn thầy gõ ở tên ca. Thầy đổi tên ca là chuyện
+ * bình thường; đổi năm sinh trong hồ sơ thì không.
+ *
+ * Lấy đa số chứ không lấy em đầu tiên: một em học nhảy khối hoặc một dòng hồ sơ
+ * gõ sai năm không được phép kéo cả ca sang thư mục khác.
+ *
+ * Trả `null` khi không có em nào đọc được năm, hoặc khi không có năm nào chiếm
+ * quá nửa — hai chuyện đều nghĩa là "không chắc", và không chắc thì KHÔNG đoán.
+ */
+export function namSinhDaSo(dsNamSinh: (string | number | null | undefined)[]): string | null {
+  const dem = new Map<string, number>()
+  let tong = 0
+  for (const v of dsNamSinh) {
+    const m = /(20\d{2})/.exec(String(v ?? ''))
+    if (!m) continue
+    dem.set(m[1], (dem.get(m[1]) ?? 0) + 1)
+    tong += 1
+  }
+  if (tong === 0) return null
+  let nam: string | null = null
+  let nhieuNhat = 0
+  for (const [k, n] of dem) {
+    if (n > nhieuNhat) {
+      nhieuNhat = n
+      nam = k
+    }
+  }
+  return nhieuNhat * 2 > tong ? nam : null
+}
+
 /** Tên thư mục cho ca không đọc được năm sinh. */
 export const THU_MUC_KHAC = 'Khác'
 

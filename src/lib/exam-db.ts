@@ -225,6 +225,13 @@ export interface BienBanDeRieng {
   /** sbd → mã ca THẬT SỰ lấy câu sai của em đó. Ở `gan_nhat` là một mã; ở
    * `ba_ca` là các mã nối bằng " + ". Quét ba ca không có nghĩa là dùng cả ba. */
   tuCaCua?: Record<string, string>
+  /** NĂM SINH đã dùng để lọc thư mục ca, và lấy nó ở đâu ra. Thiếu (biên bản
+   * cũ) thì bảng không in dòng phạm vi — KHÔNG đoán. Có nó thì thầy đọc được
+   * ngay "đã quét đúng thư mục chưa", thay vì phải suy từ mã ca. */
+  namQuet?: string | null
+  nguonNam?: 'hoc_sinh' | 'ten_ca' | 'khong_xac_dinh'
+  /** Tổng số ca THI trong thư mục năm sinh đó. */
+  soCaThuMuc?: number
   lucRut: string
 }
 

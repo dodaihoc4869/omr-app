@@ -118,10 +118,29 @@ export function BangBienBanLap({ bb, tenCua }: { bb: BienBanDeRieng; tenCua: (sb
         {bb.caDaQuet.length === 0
           ? 'không quét được ca nào trước đó'
           : bb.phamVi === 'ba_ca'
-            ? `bốc 3 ca ngẫu nhiên: ${bb.caDaQuet.join(' · ')}`
+            ? `mỗi em lấy tối đa 3 ca gần nhất CHÍNH EM có nộp — đã dò ${bb.caDaQuet.length} ca: ${bb.caDaQuet.join(' · ')}`
             : `lấy ca gần nhất em có nộp — đã dò ${bb.caDaQuet.length} ca: ${bb.caDaQuet.join(' · ')}`}
         {bb.lucRut ? ` · rút lúc ${ngayGio(bb.lucRut)}` : ''}
       </div>
+      {/* PHẠM VI QUÉT — thầy phải đọc được đã quét ĐÚNG thư mục chưa.
+          Ngày 10/09 cả lớp ra "mới vào lớp, chưa có ca nào" chỉ vì tên ca không
+          còn bắt đầu bằng năm sinh nên bộ lọc tự tắt và quét sang khối khác.
+          Máy biết chuyện đó ngay lúc chạy mà không nói ra một chữ. */}
+      {bb.nguonNam !== undefined && (
+        <div
+          style={{
+            ...NHAN_NHO,
+            ...SO,
+            color: bb.nguonNam === 'khong_xac_dinh' ? 'var(--do)' : 'var(--nhat)',
+            marginTop: 2,
+            lineHeight: 1.6,
+          }}
+        >
+          {bb.nguonNam === 'khong_xac_dinh'
+            ? '⚠ KHÔNG xác định được năm sinh của ca này (hồ sơ em thiếu năm sinh, và tên ca không bắt đầu bằng năm) — đã quét MỌI khối, câu hỏi lại có thể lấy nhầm lớp. Sửa: đặt tên ca dạng "2009 - Lớp 1 - L3".'
+            : `thư mục năm sinh ${bb.namQuet} · ${bb.soCaThuMuc ?? 0} ca trong thư mục · nguồn năm sinh: ${bb.nguonNam === 'hoc_sinh' ? 'hồ sơ học sinh' : 'tên ca'}`}
+        </div>
+      )}
       {bb.boQua.length > 0 && (
         <div style={{ ...NHAN_NHO, color: 'var(--cam)', marginTop: 4, lineHeight: 1.6 }}>
           Ca không đọc được: {bb.boQua.map((b) => `${b.maCa} (${b.vi_sao})`).join(' · ')}
@@ -714,6 +733,9 @@ export default function ExamMonitorScreen() {
           thieu: ra.thieu,
           boQua: ra.boQua,
           caDaQuet: ra.caDaQuet,
+          namQuet: ra.namQuet,
+          nguonNam: ra.nguonNam,
+          soCaThuMuc: ra.soCaThuMuc,
           lucRut: new Date().toISOString(),
         }
         demSai = ra.lapCua

@@ -455,7 +455,11 @@ describe('HAI NÚT PHẠM VI + BẢN ĐỒ SAI DỰNG SẴN', () => {
 
   it('dựng đề HỎI MÁY CHỦ TRƯỚC, chấm lại tại máy chỉ là đường lui', () => {
     const NGUON = doc('src/lib/de-rieng-nguon.ts')
-    expect(NGUON).toContain('banDo = await banDoSaiCa(url, mat, ung.map((c) => c.maCa))')
+    // 10/09: quét CẢ thư mục năm sinh nên số ca vượt trần 20 ca/lượt của máy
+    // chủ ("Xin quá nhiều ca một lượt"). Nay chia lô 20. Ý định của phép kiểm
+    // KHÔNG đổi: vẫn hỏi máy chủ trước, chấm lại tại máy chỉ là đường lui.
+    expect(NGUON).toContain('await banDoSaiCa(url, mat, lo)')
+    expect(NGUON).toContain('const LO = 20')
     expect(NGUON).toContain('if (bd && Object.keys(bd.lam).length > 0)')
     // Đường lui vẫn còn: ca chấm trước khi có tính năng này không có bản đồ.
     expect(NGUON).toContain('dsCa.push(await docCaTruoc(url, mat, c.maCa, ch))')

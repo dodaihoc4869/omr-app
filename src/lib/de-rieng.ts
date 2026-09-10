@@ -16,7 +16,7 @@
 //      `canDayLai`, việc của người dạy chứ không phải của máy ra đề.
 import { hashSeed, seededPermutation } from './exam-shuffle'
 import { PHAN_DE, rutDeCoBatBuoc, type CauUngVien, type KetQuaRut, type PhanDe, type YeuCauRut } from './rut-de'
-import { CAU_HINH_DE_RIENG_MAC_DINH, soCauLapCan, type CauHinhDeRieng } from './cau-hinh-de-rieng'
+import { CAU_HINH_DE_RIENG_MAC_DINH, SO_CA_BOC_NGAU_NHIEN as SO_CA_HOI_LAI, soCauLapCan, type CauHinhDeRieng } from './cau-hinh-de-rieng'
 
 /** Một ca đã chấm, rút gọn còn đúng phần thuật toán cần. Ca gần nhất đứng
  * ĐẦU mảng — chỗ gọi sắp xếp trước, ở đây không đoán lại theo ngày. */
@@ -117,6 +117,10 @@ export function chonCauLapChoEm(
     const caLay: string[] = []
     for (const c of quet) {
       if ((c.daLamCua[sbd] ?? []).length === 0) continue
+      // BA CA CỦA CHÍNH EM NÀY, không phải ba ca bốc bừa của cả trung tâm.
+      // Danh sách `quet` nay là CẢ thư mục năm sinh, nên chặn số ca phải nằm ở
+      // đây — nơi đã biết em nào nộp ca nào. Ba ca gần nhất em CÓ NỘP.
+      if (caLay.length >= SO_CA_HOI_LAI) break
       caLay.push(c.maCa)
       for (const q of c.saiCua[sbd] ?? []) {
         if (!dem.has(q)) thuTu.push(q)

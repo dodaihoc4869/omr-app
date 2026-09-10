@@ -104,11 +104,15 @@ describe('PHẠM VI QUÉT — cả thư mục, không còn chặn ở 3 ca', () 
     expect(ra).toHaveLength(CAU_HINH_DE_RIENG_MAC_DINH.TRAN_CA_QUET)
   })
 
-  it('`ba_ca` vẫn bốc đúng 3 ca, và bốc TẤT ĐỊNH', () => {
+  it('`ba_ca` cũng quét CẢ thư mục, và vẫn TẤT ĐỊNH', () => {
+    // VIẾT LẠI 10/09 tối theo lệnh của thầy: "quét tất cả các mã trong thư mục
+    // ca thi chứa năm sinh đó". Bốc 3 ca trong toàn bộ danh sách rồi mới xem em
+    // có mặt không là trò may rủi — trần 3 ca nay nằm ở `chonCauLapChoEm`, tính
+    // trên đúng những ca CHÍNH EM có nộp.
     const c = { ...CAU_HINH_DE_RIENG_MAC_DINH, PHAM_VI_HOI_LAI: 'ba_ca' as const }
     const a = chonCaTheoPhamVi(nhieuCa, 'ca-nay', c).map((x) => x.maCa)
     const b = chonCaTheoPhamVi(nhieuCa, 'ca-nay', c).map((x) => x.maCa)
-    expect(a).toHaveLength(3)
+    expect(a).toEqual(nhieuCa.map((x) => x.maCa))
     expect(a).toEqual(b)
   })
 
@@ -128,10 +132,25 @@ describe('MÃ NGUỒN — hai chỗ chặn 3 ca đều phải bỏ, và phải l
   const NGUON = fs.readFileSync(path.join(process.cwd(), 'src/lib/de-rieng-nguon.ts'), 'utf8')
   const DUNG = fs.readFileSync(path.join(process.cwd(), 'src/lib/de-rieng.ts'), 'utf8')
 
-  it('`docCacCaTruoc` LỌC theo năm sinh của ca hiện tại', () => {
-    expect(NGUON).toContain("import { namSinhTuTenCa } from './nam-sinh-ca'")
-    expect(NGUON).toContain('const namNay = namSinhTuTenCa(caNay?.tenCa)')
+  const MAN_CA_1009 = fs.readFileSync(path.join(process.cwd(), 'src/screens/ExamMonitorScreen.tsx'), 'utf-8')
+
+  it('`docCacCaTruoc` LỌC theo năm sinh — lấy từ HỒ SƠ EM trước, tên ca chỉ là đường lùi', () => {
+    // 10/09 tối: tên ca là NHÃN GÕ TAY. Thầy đổi tên ca là bộ lọc tắt, rồi mã
+    // âm thầm quét sang mọi khối và cả lớp ra "mới vào lớp, chưa có ca nào".
+    // Nguồn sự thật nay là năm sinh của chính các em trong ca.
+    expect(NGUON).toContain("import { namSinhDaSo, namSinhTuTenCa } from './nam-sinh-ca'")
+    expect(NGUON).toContain('namNay = namSinhDaSo(')
+    expect(NGUON).toContain("nguonNam = 'hoc_sinh'")
+    expect(NGUON).toContain('namNay = namSinhTuTenCa(caNay?.tenCa)')
     expect(NGUON).toContain('.filter((c) => namNay === null || namSinhTuTenCa(c.tenCa) === namNay)')
+  })
+
+  it('KHÔNG lọc được thì phải KHAI RA, không im lặng quét rộng', () => {
+    // Chỗ chết người của bản cũ: nó biết mình không lọc được mà vẫn chạy tiếp,
+    // rồi đổ lỗi cho học sinh bằng nhãn "mới vào lớp".
+    expect(NGUON).toContain("nguonNam: 'hoc_sinh' | 'ten_ca' | 'khong_xac_dinh'")
+    expect(NGUON).toContain('namQuet: namNay')
+    expect(MAN_CA_1009).toContain('KHÔNG xác định được năm sinh của ca này')
   })
 
   it('ca hiện tại KHÔNG đọc được năm thì không lọc — thà quét rộng còn hơn quét nhầm khối', () => {
