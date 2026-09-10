@@ -74,6 +74,8 @@ export interface KetQuaXep {
   lambda: number
   soVong: number
   soEmLenBang: number
+  /** Bao nhiêu câu sao 0 đã được NỚI TRẦN lên L2 để tiêu nốt giờ thừa. */
+  soCauNoiTran: number
   /** Còn nâng được câu nào lên lane đắt hơn mà vẫn trong ngân sách không.
    * `false` = giáo án đã kịch trần luật cho phép, thừa giờ là hết nước đi. */
   conMuaDuoc: boolean
@@ -382,6 +384,7 @@ export function xepGioLenBang(
         lambda: 0,
         soVong: 0,
         soEmLenBang: 0,
+        soCauNoiTran: 0,
         conMuaDuoc: false,
         thuaGio,
         canhBao: [`${soBatBuoc} câu bắt buộc chữa cần ${Math.round((giayToiThieu + haoPhiGiay(ch)) / 60)} phút, quá ${ch.NGAN_SACH_PHUT} phút — chọn một cách rồi bấm xếp lại.`],
@@ -560,6 +563,80 @@ export function xepGioLenBang(
     lg.giaTri += tot.dV
   }
 
+  // ------------------------------------------- ĐỔI CHỖ: HẠ MỘT CÂU, NÂNG CÂU KHÁC
+  //
+  // TÌM RA BẰNG MỘT PHÉP KIỂM MỚI, không phải bằng suy đoán. Ca hai câu, ngân
+  // sách 160 giây: nới Lagrange dừng ở L1+L1 (40 giây, giá trị 0,305) trong khi
+  // lời giải tốt nhất là L2+L0 (155 giây, giá trị 0,553). Cả nới Lagrange lẫn vá
+  // tham đều không tới được, vì cả hai chỉ biết NÂNG: từ L1+L1 muốn lên L2 phải
+  // tốn 130 giây nữa thành 170 — quá ngân sách. Phải HẠ một câu xuống mới đủ chỗ.
+  //
+  // Đây là chỗ nới Lagrange kém đúng như sách vở: ngân sách bó chặt thì độ nguyên
+  // cắn. Một vòng đổi chỗ gỡ đúng chỗ ấy.
+  //
+  // Chỉ đụng L0/L1/L2. Suất lên bảng L3 do ghép cặp tối ưu và trần quyết định,
+  // xen vào đó là phá luật 1-1 mà chẳng được gì.
+  for (let vong = 0; vong < LANE.length * cau.length; vong++) {
+    let tot: { i: number; li: Lane; j: number; lj: Lane; dV: number } | null = null
+    for (let i = 0; i < cau.length; i++) {
+      if (lg.lane[i] === 'L3') continue
+      for (const li of chophep[i]) {
+        if (li === 'L3' || soBacLane(li, lg.lane[i]) >= 0) continue
+        const traLai = giayLane(lg.lane[i]) - giayLane(li)
+        const matI = giaTriLane(cau[i], lg.lane[i]) - giaTriLane(cau[i], li)
+        for (let j = 0; j < cau.length; j++) {
+          if (j === i || lg.lane[j] === 'L3') continue
+          for (const lj of chophep[j]) {
+            if (lj === 'L3' || soBacLane(lj, lg.lane[j]) <= 0) continue
+            const them = giayLane(lj) - giayLane(lg.lane[j])
+            if (lg.giay - traLai + them > B) continue
+            const duocJ = giaTriLane(cau[j], lj) - giaTriLane(cau[j], lg.lane[j])
+            const dV = duocJ - matI
+            if (dV > 1e-12 && (!tot || dV > tot.dV + 1e-12)) tot = { i, li, j, lj, dV }
+          }
+        }
+      }
+    }
+    if (!tot) break
+    lg.giay += giayLane(tot.li) - giayLane(lg.lane[tot.i]) + giayLane(tot.lj) - giayLane(lg.lane[tot.j])
+    lg.giaTri += tot.dV
+    lg.lane[tot.i] = tot.li
+    lg.lane[tot.j] = tot.lj
+  }
+
+  // ------------------------- ĐỔ NỐT GIỜ THỪA VÀO CÂU NGOÀI DANH SÁCH BẮT BUỘC
+  //
+  // CHỐT MỘT MÂU THUẪN CỦA CHÍNH ĐẶC TẢ. Mục 4.3 viết "danh sách vừa giờ ⇒ thời
+  // gian dư đổ vào câu ngoài danh sách, xếp theo doKho". Mục 4.4 lại viết
+  // "sao 0 ⇒ lane ≤ L1". Hai câu ấy đá nhau: ca 27 câu bắt buộc tiêu 4 050 giây,
+  // câu còn lại là sao 0 nên trần L1 chỉ mua thêm 20 giây, thừa 250 giây mà nước
+  // đi rẻ nhất tốn 270 ⇒ giờ chết.
+  //
+  // CHỐT: trần theo sao là MẶC ĐỊNH, không phải tường. Hết nước mua trong luật
+  // chặt thì nới, nhưng nới có kỷ luật:
+  //
+  //   · chỉ nới tới L2 (thầy chữa tại chỗ), KHÔNG bao giờ tới L3 — gọi em lên
+  //     bảng cho câu kho đã bảo "đọc đáp án là đủ" thì phí cả buổi lẫn mặt em;
+  //   · câu KHÔNG ĐỦ CĂN CỨ (không N1, không N2, sao 0) vẫn đứng nguyên L0 —
+  //     không có số nào nói nó đáng chữa thì nới cũng là đoán;
+  //   · xếp theo `doKho` giảm dần, đúng chữ trong đặc tả;
+  //   · và PHẢI KHAI RA đã nới mấy câu, không lặng lẽ phá trần của chính mình.
+  let soCauNoiTran = 0
+  if (!conMuaDuocNuocNao(lg.giay, B, lg.lane, chophep, giayLane)) {
+    const ungVienNoi = cau
+      .map((d, i) => ({ d, i }))
+      .filter(({ d, i }) => lg.lane[i] !== 'L2' && lg.lane[i] !== 'L3' && !khongDuCanCu(d) && !chophep[i].includes('L2'))
+      .sort((a, b) => b.d.doKho - a.d.doKho || (a.d.cau.id < b.d.cau.id ? -1 : 1))
+    for (const { d, i } of ungVienNoi) {
+      const dT = ch.GIAY_LANE.L2 - giayLane(lg.lane[i])
+      if (dT <= 0 || lg.giay + dT > B) continue
+      lg.giaTri += giaTriLane(d, 'L2') - giaTriLane(d, lg.lane[i])
+      lg.lane[i] = 'L2'
+      lg.giay += dT
+      soCauNoiTran++
+    }
+  }
+
   // -------------------------------------------------------------- kết quả ra
   const dong: DongXep[] = cau.map((d, i) => ({
     cau: d.cau,
@@ -573,6 +650,11 @@ export function xepGioLenBang(
     hop: lg.hop[i],
   }))
 
+  if (soCauNoiTran > 0) {
+    canhBao.push(
+      `Đã đổ giờ thừa vào ${soCauNoiTran} câu sao 0 ngoài danh sách bắt buộc (nâng lên "thầy chữa tại chỗ") — nếu không thì bấy nhiêu phút bỏ không.`,
+    )
+  }
   if (yc.thieuGiay) canhBao.push('Ca này thiếu dữ liệu thời gian — không đọc được nguyên nhân "tính sai" và "đoán".')
   if (yc.chuaCoLichSuLenBang) canhBao.push('Chưa có lịch sử lên bảng — mọi em được coi là như nhau về tần suất.')
   // Còn nước đi nào mua được bằng số giây thừa không. Dùng để trả lời câu "sao
@@ -618,9 +700,60 @@ export function xepGioLenBang(
     lambda: hi,
     soVong,
     soEmLenBang: soL3Dung,
+    soCauNoiTran,
     conMuaDuoc: conMua,
     thuaGio,
     canhBao,
+  }
+}
+
+/** ĐỔI EM CHO ĐÚNG MỘT DÒNG, giữ nguyên phần còn lại (đặc tả mục 6.7).
+ *
+ * Vì sao không xếp lại cả giáo án: thầy đã đọc qua, đã nhớ ai đứng chỗ nào; đổi
+ * một em mà cả bảng nhảy thì phải đọc lại từ đầu. Nên đây là phép thay tại chỗ:
+ * lấy em TỐT NHẤT CÒN LẠI chưa nhận câu nào, xoay vòng nếu bấm tiếp. Thời gian
+ * không đổi vì cùng lane L3, nên ngân sách không cần tính lại.
+ *
+ * Không còn em nào rảnh thì trả nguyên kết quả cũ — cấm trả về bảng rỗng hay
+ * ném lỗi giữa lúc thầy đang đứng lớp. */
+export function doiEmChoDong(
+  kq: KetQuaXep,
+  cauId: string,
+  dsDoKho: DoKhoCau[],
+  dsEm: EmLenBang[],
+  vapTheoEm: Map<string, VapCuaEm[]>,
+  ch: CauHinhLenBang = CAU_HINH_LEN_BANG_MAC_DINH,
+): KetQuaXep {
+  const iDong = kq.dong.findIndex((d) => d.cau.id === cauId && d.lane === 'L3')
+  if (iDong < 0) return kq
+  const dong = kq.dong[iDong]
+  const d = dsDoKho.find((x) => x.cau.id === cauId)
+  if (!d) return kq
+
+  const daDung = new Set(kq.dong.filter((x, i) => x.lane === 'L3' && i !== iDong).map((x) => x.em?.sbd))
+  const ungVien = dsEm
+    .filter((e) => e.coMat && !daDung.has(e.sbd))
+    .map((e) => {
+      const h = hopVoiEm(d.cau, vapTheoEm.get(e.sbd) ?? [], e.soLanLenBang, ch)
+      return { e, giaTri: giaTriLane(d, 'L3') + ch.HE_SO_SAU_L3 * h.diem, hop: h.diem, vap: h.vap }
+    })
+    .sort((a, b) => b.giaTri - a.giaTri || (a.e.sbd < b.e.sbd ? -1 : 1))
+  if (ungVien.length <= 1) return kq
+
+  // XOAY VÒNG: đứng sau em hiện tại trong danh sách; hết thì quay về đầu. Nhờ
+  // vậy bấm mãi vẫn đi hết được mọi em chứ không kẹt ở em thứ hai.
+  const iHienTai = ungVien.findIndex((u) => u.e.sbd === dong.em?.sbd)
+  const chon = ungVien[(iHienTai + 1) % ungVien.length]
+  if (chon.e.sbd === dong.em?.sbd) return kq
+
+  const dongMoi = [...kq.dong]
+  dongMoi[iDong] = { ...dong, em: { sbd: chon.e.sbd, hoTen: chon.e.hoTen }, vap: chon.vap, hop: chon.hop, giaTri: chon.giaTri }
+  const tongGiaTri = kq.tongGiaTri - dong.giaTri + chon.giaTri
+  return {
+    ...kq,
+    dong: dongMoi,
+    tongGiaTri,
+    khoangCachDoiNgau: kq.canTrenNoi > 0 ? Math.max(0, (kq.canTrenNoi - tongGiaTri) / kq.canTrenNoi) : 0,
   }
 }
 

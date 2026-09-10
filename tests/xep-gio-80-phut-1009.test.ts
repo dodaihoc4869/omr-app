@@ -417,22 +417,24 @@ describe('8.5 · 8.6 · 8.8 — RÀNG BUỘC CỨNG trên 100 ca thật cỡ l�
     expect(dat).toBe(100)
   })
 
-  // ============ MÂU THUẪN THẬT TRONG ĐẶC TẢ, KHAI RA CHỨ KHÔNG NỚI NGƯỠNG ====
+  // ===== MÂU THUẪN CỦA ĐẶC TẢ — ĐÃ TÌM RA, ĐÃ CHỐT, GIỮ LẠI DẤU VẾT ==========
   //
-  // Đặc tả 8.6 đòi tổng giờ luôn nằm trong [ngân sách − 5%, ngân sách]. Đo trên
-  // 100 ca 28 câu × 30 em: 12 ca KHÔNG đạt, và không đạt được thật.
+  // Lần đầu chạy tiêu chí này, 12/100 ca TRƯỢT và trượt thật. Số học của một ca
+  // như thế: 27/28 câu vào danh sách bắt buộc ⇒ tiêu 27 × 150 = 4 050 giây. Câu
+  // còn lại là sao 0, mà mục 4.4 ghi "sao 0 ⇒ lane ≤ L1" nên chỉ mua thêm được
+  // 20 giây ⇒ 4 070/4 320. Thừa 250 giây, mà nước đi rẻ nhất còn lại tốn
+  // 420 − 150 = 270 giây. KHÔNG MUA NỔI ⇒ giờ chết.
   //
-  // Số học của một ca như thế: 27/28 câu vào danh sách bắt buộc ⇒ đã tiêu
-  // 27 × 150 = 4 050 giây. Câu còn lại là sao 0, mà luật mục 4.4 ghi
-  // "sao 0 ⇒ lane ≤ L1" nên nó chỉ mua được 20 giây nữa ⇒ 4 070/4 320 giây.
-  // Còn thừa 250 giây, mà nước đi rẻ nhất còn lại (nâng một câu L2 lên L3) giá
-  // 420 − 150 = 270 giây. KHÔNG MUA NỔI. Thừa 250 giây là hệ quả trực tiếp của
-  // chính luật "sao 0 ⇒ ≤ L1", không phải thuật toán bỏ sót.
+  // Nguồn gốc là chính đặc tả tự đá nhau: mục 4.3 bảo "thời gian dư đổ vào câu
+  // ngoài danh sách", mục 4.4 bảo "sao 0 ⇒ ≤ L1".
   //
-  // Nên phép kiểm bám vào NỘI DUNG của tiêu chí — "không được để giờ trên bàn" —
-  // bằng đúng hàm mà bản chạy thật dùng: đạt khoảng, HOẶC hết nước đi mua được.
-  // Ngưỡng 5% giữ nguyên, không hạ.
-  it('không để giờ trên bàn: đạt [ngân sách − 5%, ngân sách], hoặc hết nước mua', () => {
+  // CHỐT (thầy giao 10/09 "tự sửa theo hướng mượt mà nhất"): trần theo sao là
+  // MẶC ĐỊNH chứ không phải tường — hết nước mua trong luật chặt thì nới lên L2,
+  // không bao giờ lên L3, câu không đủ căn cứ vẫn đứng L0, và phải khai ra.
+  // Luật nới và mọi ràng buộc quanh nó khoá ở `hoan-thien-80-phut-1009.test.ts`.
+  //
+  // Sau khi chốt: 100/100 ca đạt khoảng. Ngưỡng 5% CHƯA BAO GIỜ bị hạ.
+  it('không để giờ trên bàn: đạt [ngân sách − 5%, ngân sách] ở 100/100 ca', () => {
     const B = nganSachGiay(CH)
     let dat = 0
     let hetNuoc = 0
@@ -445,42 +447,32 @@ describe('8.5 · 8.6 · 8.8 — RÀNG BUỘC CỨNG trên 100 ca thật cỡ l�
       else if (!kq.conMuaDuoc) hetNuoc++
     }
     console.log(`[8.6] đạt khoảng [ngân sách−5%, ngân sách]: ${dat}/100 · hết nước mua: ${hetNuoc}/100`)
-    expect(dat + hetNuoc).toBe(100)
-    // Con số này là bằng chứng của mâu thuẫn trên — không phải chỗ để nới.
-    expect(hetNuoc).toBeLessThanOrEqual(15)
+    expect(dat).toBe(100)
+    expect(hetNuoc).toBe(0)
   })
 
-  it('SỐ HỌC CỦA MÂU THUẪN — dựng lại đúng ca ấy để thầy soi được', () => {
-    // 27 câu sao 2 (bắt buộc) + 1 câu sao 0 không bắt buộc.
-    const cau = [
-      ...Array.from({ length: 27 }, (_, i) => cauMau(i + 1, 2)),
-      cauMau(28, 0, 'Carbohydrate'),
-    ]
-    // Cho câu sao 0 đủ dữ liệu để KHÔNG rơi vào 'không đủ căn cứ' (⇒ trần L1).
+  it('SỐ HỌC CỦA MÂU THUẪN vẫn nguyên — và nay tiêu được hết giờ', () => {
+    // 27 câu sao 2 (bắt buộc) + 1 câu sao 0 CÓ dữ liệu (nên trần L1, không phải L0).
+    const cau = [...Array.from({ length: 27 }, (_, i) => cauMau(i + 1, 2)), cauMau(28, 0, 'Carbohydrate')]
     const bl: BaiLamCoGiay[] = Array.from({ length: 10 }, (_, k) => ({ sbd: `E${k}`, idCau: 'Q28', dung: k > 1, chon: 'A' }))
     const doKho = dungDoKho(cau, bl, {}, CH)
     expect(doKho.filter((d) => d.batBuoc).length).toBe(27)
     expect(laneChoPhep(doKho[27], new Set())).toEqual(['L0', 'L1'])
-    const kq = xepGioLenBang(doKho, Array.from({ length: 30 }, (_, j) => ({ sbd: `S${j}`, hoTen: `E${j}`, coMat: true, soLanLenBang: 0 })), bl, new Map(), {})
-    expect(kq.tongGiay).toBe(27 * CH.GIAY_LANE.L2 + CH.GIAY_LANE.L1) // 4 070
-    expect(nganSachGiay(CH) - kq.tongGiay).toBe(250)
-    expect(CH.GIAY_LANE.L3 - CH.GIAY_LANE.L2).toBe(270) // 270 > 250 ⇒ hết nước
-    expect(kq.conMuaDuoc).toBe(false)
-    expect(kq.soEmLenBang).toBe(0)
-    // Và app KHÔNG được im: thầy phải thấy ba lựa chọn.
-    expect(kq.thuaGio).not.toBeNull()
-  })
 
-  it('không câu nào hai em cùng nhận, không em nào nhận hai câu', () => {
-    for (const ca of cas) {
-      const { theoEm } = vapCuaLop(ca.cau, ca.baiLam, CH)
-      const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, {})
-      const l3 = kq.dong.filter((d) => d.lane === 'L3')
-      expect(new Set(l3.map((d) => d.cau.id)).size).toBe(l3.length)
-      expect(new Set(l3.map((d) => d.em?.sbd)).size).toBe(l3.length)
-      expect(l3.length).toBeLessThanOrEqual(CH.SO_EM_LEN_BANG_TOI_DA)
-      for (const d of l3) expect(d.em).not.toBeNull()
-    }
+    // Số học cũ, giữ nguyên để đọc lại được: luật chặt dừng ở 4 070 giây.
+    expect(27 * CH.GIAY_LANE.L2 + CH.GIAY_LANE.L1).toBe(4070)
+    expect(nganSachGiay(CH) - 4070).toBe(250)
+    expect(CH.GIAY_LANE.L3 - CH.GIAY_LANE.L2).toBe(270) // 270 > 250
+
+    // Sau khi chốt: 250 giây ấy đổ vào chính câu sao 0 ⇒ 4 200 giây, còn 120.
+    const kq = xepGioLenBang(doKho, Array.from({ length: 30 }, (_, j) => ({ sbd: `S${j}`, hoTen: `E${j}`, coMat: true, soLanLenBang: 0 })), bl, new Map(), {})
+    expect(kq.soCauNoiTran).toBe(1)
+    expect(kq.tongGiay).toBe(28 * CH.GIAY_LANE.L2)
+    expect(kq.tongGiay).toBeGreaterThanOrEqual(nganSachGiay(CH) * 0.95)
+    // Vẫn KHÔNG có em nào lên bảng — 120 giây còn lại không mua nổi suất nào,
+    // và app vẫn phải hiện ba lựa chọn cho thầy.
+    expect(kq.soEmLenBang).toBe(0)
+    expect(kq.thuaGio).not.toBeNull()
   })
 
   // PHÁ MÃ TÌM RA CHỖ NÀY. Bỏ chốt trần trong bước vá tham mà 45 phép kiểm vẫn

@@ -12,7 +12,7 @@
 //   · phần còn lại mới chia cho em, ưu tiên em SAI CHÍNH CÂU ĐÓ.
 // Thuật toán ở lib/phan-cong.ts, phần đọc dữ liệu ca ở lib/du-lieu-len-bang.ts.
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X } from 'lucide-react'
+import { ArrowLeft, ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Shuffle } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, type CaTomTat } from '../lib/exam-api'
 import { docKhoChuaCa, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
@@ -31,7 +31,7 @@ import { bangChu, chuCau, chuChum, MAC_DINH, phanCong, TEN_MUC_NHAM, type CauChu
 import { baiLamCoGiayTuCa } from '../lib/du-lieu-len-bang'
 import { CAU_HINH_LEN_BANG_MAC_DINH, TEN_LANE, dongHo, nganSachGiay } from '../lib/len-bang-cau-hinh'
 import { dungDoKho, vapCuaLop } from '../lib/do-kho-cau'
-import { xepGioLenBang, type KetQuaXep } from '../lib/xep-gio-len-bang'
+import { doiEmChoDong, xepGioLenBang, type KetQuaXep } from '../lib/xep-gio-len-bang'
 import { dungGiaoAn } from '../lib/giao-an-len-bang'
 import { KHO_DO_KHO_RONG, gopCaVaoKho, thongKeKho, type KhoDoKhoLuu } from '../lib/kho-do-kho'
 import { docKhoDoKho, luuKhoDoKho } from '../lib/exam-db'
@@ -336,9 +336,18 @@ export default function GoiLenBangScreen() {
   const vapCa = useMemo(() => vapCuaLop(dsCau, baiLamGiay), [dsCau, baiLamGiay])
   const doKhoCau = useMemo(() => dungDoKho(dsCau, baiLamGiay, kho.muc), [dsCau, baiLamGiay, kho])
   const soBatBuoc = useMemo(() => doKhoCau.filter((d) => d.batBuoc && !boBatBuoc.includes(d.cau.id)).length, [doKhoCau, boBatBuoc])
+  // `soLanLenBang` ĐẾM TRONG BUỔI, không phải lịch sử 30 ngày.
+  //
+  // Máy chủ chưa giữ được lịch sử lên bảng: `ghiTienDo_` ghi vào `TienDoCa` theo
+  // header [SBD, MaCa, ChuyenDe, SoCau, SoSai, NopLuc, CapNhatLuc] — không có
+  // cột nào cho qid, và hôm nay bảng ấy có 0 dòng `LENBANG-`. Thêm cột là ĐỔI
+  // CẤU TRÚC DỮ LIỆU ĐANG CÓ, nằm trong danh sách đỏ, nên tôi không tự làm.
+  //
+  // Nhưng thứ đếm được thì phải đếm: thầy bấm xếp giờ lần hai trong cùng buổi
+  // thì em vừa lên bảng phải tụt hạng, không thì gọi lại đúng em ấy.
   const emLenBang = useMemo(
-    () => dsEmCa.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen, coMat: e.coMat, soLanLenBang: 0 })),
-    [dsEmCa],
+    () => dsEmCa.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen, coMat: e.coMat, soLanLenBang: (daGoiCau[e.sbd] ?? []).length })),
+    [dsEmCa, daGoiCau],
   )
   const chuGiaoAn = useMemo(() => {
     if (!kqXep || !du) return ''
@@ -413,6 +422,67 @@ export default function GoiLenBangScreen() {
       chuaCoLichSuLenBang: true,
     })
     setKqXep(r)
+  }
+
+  /** Thầy chạm MỘT lựa chọn thừa giờ là áp ngay và xếp lại — không bắt tự dò ô số.
+   * Đặc tả mục 4.3 viết "chờ thầy chạm", nên nó phải chạm được. */
+  const chamLuaChon = (ma: 1 | 2 | 3) => {
+    const t = kqXep?.thuaGio
+    if (!t) return
+    let bo = boBatBuoc
+    let tran = tranEm
+    let giay = giayMoiEm
+    if (ma === 1) {
+      const canBo = Math.ceil(Math.max(0, t.giayCan - t.giayCo) / CAU_HINH_LEN_BANG_MAC_DINH.GIAY_LANE.L2)
+      bo = [
+        ...boBatBuoc,
+        ...doKhoCau
+          .filter((d) => d.batBuoc && !boBatBuoc.includes(d.cau.id))
+          .sort((a, b) => a.giaTri - b.giaTri)
+          .slice(0, canBo)
+          .map((d) => d.cau.id),
+      ]
+      setBoBatBuoc(bo)
+    } else if (ma === 2) {
+      const nen = t.giayCan - Math.min(tranEm, soCoMat) * (giayMoiEm - CAU_HINH_LEN_BANG_MAC_DINH.GIAY_LANE.L2)
+      tran = Math.max(0, Math.floor((t.giayCo - nen) / Math.max(1, giayMoiEm - CAU_HINH_LEN_BANG_MAC_DINH.GIAY_LANE.L2)))
+      setTranEm(tran)
+    } else {
+      const soL3 = Math.min(tranEm, soCoMat)
+      const nen = t.giayCan - soL3 * (giayMoiEm - CAU_HINH_LEN_BANG_MAC_DINH.GIAY_LANE.L2)
+      giay = soL3 > 0 ? Math.max(CAU_HINH_LEN_BANG_MAC_DINH.GIAY_LANE.L2, Math.floor((t.giayCo - nen) / soL3) + CAU_HINH_LEN_BANG_MAC_DINH.GIAY_LANE.L2) : giayMoiEm
+      setGiayMoiEm(giay)
+    }
+    setKqXep(
+      xepGioLenBang(doKhoCau, emLenBang, baiLamGiay, vapCa.theoEm, {
+        boBatBuoc: bo,
+        tranEm: tran,
+        giayMoiEm: giay,
+        thieuGiay: !vapCa.coGiay,
+        chuaCoLichSuLenBang: true,
+      }),
+    )
+  }
+
+  /** Đổi em cho ĐÚNG một dòng, giữ nguyên phần còn lại. */
+  const doiEm = (cauId: string) =>
+    setKqXep((cu) => (cu ? doiEmChoDong(cu, cauId, doKhoCau, emLenBang, vapCa.theoEm) : cu))
+
+  /** In giáo án: mở cửa sổ chỉ có chữ giáo án, khổ A4 dọc. Trình duyệt tự lo
+   * phần "lưu thành PDF" — không nhét thư viện PDF vào bundle cho một nút in. */
+  const inGiaoAn = () => {
+    if (!chuGiaoAn) return
+    const w = window.open('', '_blank')
+    if (!w) return showToast('Trình duyệt chặn cửa sổ in — cho phép rồi bấm lại', 'warn')
+    const thoat = (t: string) => t.replace(/[&<>]/g, (c) => (c === '&' ? '&amp;' : c === '<' ? '&lt;' : '&gt;'))
+    w.document.write(
+      `<!doctype html><meta charset="utf-8"><title>Giáo án chữa</title>` +
+        `<style>@page{size:A4 portrait;margin:14mm}body{font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap}</style>` +
+        `<body>${thoat(chuGiaoAn)}</body>`,
+    )
+    w.document.close()
+    w.focus()
+    w.print()
   }
 
   const copyGiaoAn = async () => {
@@ -904,13 +974,20 @@ export default function GoiLenBangScreen() {
               <b style={SO}>{kqXep.thuaGio.soCauBatBuoc}</b> câu bắt buộc · cần{' '}
               <b style={SO}>{Math.round(kqXep.thuaGio.giayCan / 60)}</b> phút, có{' '}
               <b style={SO}>{Math.round(kqXep.thuaGio.giayCo / 60)}</b> phút.
-              <div className="flex flex-col" style={{ gap: 4, marginTop: 6 }}>
+              <div className="flex flex-col" style={{ gap: 6, marginTop: 8 }}>
                 {kqXep.thuaGio.luaChon.map((l) => (
-                  <div key={l.ma}>
+                  <button
+                    key={l.ma}
+                    type="button"
+                    onClick={() => chamLuaChon(l.ma)}
+                    className="tap-target text-left w-full"
+                    style={{ minHeight: 44, padding: '8px var(--k3)', borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+                  >
                     {l.ma === 1 ? '①' : l.ma === 2 ? '②' : '③'} {l.chu} → <span style={SO}>{l.phutSau}</span> phút
-                  </div>
+                  </button>
                 ))}
               </div>
+              <div style={{ ...NHAN_NHO, marginTop: 6 }}>Chạm một dòng là áp ngay và xếp lại. Không chạm thì không đổi gì.</div>
             </OThongBao>
           )}
 
@@ -938,7 +1015,39 @@ export default function GoiLenBangScreen() {
                 >
                   {daCopyGiaoAn ? <Check size={16} /> : <ClipboardCopy size={16} />} {daCopyGiaoAn ? 'Đã copy' : 'Copy giáo án'}
                 </button>
+                <button
+                  type="button"
+                  onClick={inGiaoAn}
+                  className="tap-target inline-flex items-center font-bold"
+                  style={{ gap: 6, minHeight: 40, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', color: 'var(--muc)', border: 'none', fontSize: 'var(--cx-1)' }}
+                >
+                  <Printer size={16} /> In / lưu PDF
+                </button>
               </div>
+              {/* ĐỔI EM CHO MỘT DÒNG — đặc tả mục 6.7. Đứng trên bản in để thầy
+                  chốt người trước, rồi mới in ra giấy. */}
+              {kqXep.dong.some((d) => d.lane === 'L3') && (
+                <div className="flex flex-col" style={{ gap: 4, marginTop: 'var(--k3)' }} data-khoi="em-len-bang">
+                  {kqXep.dong
+                    .filter((d) => d.lane === 'L3')
+                    .map((d) => (
+                      <div key={d.cau.id} className="flex items-center justify-between flex-wrap" style={{ gap: 8, padding: '6px var(--k3)', borderRadius: 'var(--bo-1)', background: 'var(--the-2)' }}>
+                        <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--muc)' }}>
+                          <b>{chuCau(d.cau)}</b> → {d.em?.hoTen || `SBD ${d.em?.sbd ?? ''}`}
+                          {d.vap ? <span style={NHAN_NHO}> · vấp {d.vap.idCau}</span> : <span style={NHAN_NHO}> · chưa vấp câu nào cùng chuyên đề</span>}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => doiEm(d.cau.id)}
+                          className="tap-target inline-flex items-center font-bold"
+                          style={{ gap: 6, minHeight: 36, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--the-1)', color: 'var(--muc)', border: 'none', fontSize: 'var(--cx-1)' }}
+                        >
+                          <Shuffle size={14} /> Đổi em này
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              )}
               <pre
                 style={{
                   marginTop: 'var(--k3)',
