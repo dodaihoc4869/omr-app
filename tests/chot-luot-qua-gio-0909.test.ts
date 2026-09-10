@@ -83,8 +83,12 @@ function chay(rows: unknown[][], now: number) {
     msCua_: (iso: string) => { const t = new Date(iso).getTime(); return isFinite(t) ? t : NaN },
     BIEN_CHOT_QUA_GIO_MS: bienMs(),
     LUOT_HEADERS: JSON.parse((/const LUOT_HEADERS = (\[[^\]]*\])/.exec(GS) ?? ['', '[]'])[1].replace(/'/g, '"')) as string[],
-    docKhoiLuotCuaCa_: new Function('LUOT_HEADERS', `${layHam('docKhoiLuotCuaCa_')}\nreturn docKhoiLuotCuaCa_`)(
+    // Truyền ĐỦ mọi hằng hàm này dùng. Thiếu một hằng thì nó ném
+    // ReferenceError, mà `chotLuotQuaGio_` nuốt lỗi (cố ý, để màn Ca thi không
+    // chết) — nên phép kiểm sẽ thấy "chốt 0 lượt" chứ không thấy lỗi thật.
+    docKhoiLuotCuaCa_: new Function('LUOT_HEADERS', 'NGUONG_DOC_KHOI', `${layHam('docKhoiLuotCuaCa_')}\nreturn docKhoiLuotCuaCa_`)(
       JSON.parse((/const LUOT_HEADERS = (\[[^\]]*\])/.exec(GS) ?? ['', '[]'])[1].replace(/'/g, '"')),
+      Number((/const NGUONG_DOC_KHOI = (\d+)/.exec(GS) ?? ['', '1200'])[1]),
     ) as (sh: unknown, maCa: string) => unknown[][],
     Date: class extends Date { constructor(...a: unknown[]) { if (a.length === 0) super(now); else super(...(a as [])) } static now() { return now } },
   }

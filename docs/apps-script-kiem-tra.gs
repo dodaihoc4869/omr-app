@@ -1011,11 +1011,36 @@ function docLuotNhe_(sh) {
  * GIỮ NGUYÊN CHỈ SỐ DÒNG: dòng ngoài khối trả về mảng rỗng, nên chỗ gọi vẫn
  * dùng `i + 1` làm số dòng để GHI như cũ. Đây là điều kiện bắt buộc — `ghiDiem`
  * ghi theo chỉ số dòng, lệch một bậc là ghi điểm vào bài của em khác. */
+/** NGƯỠNG ĐỔI CÁCH ĐỌC — đo được 10/09 khuya, ngay sau khi triển khai v71.
+ *
+ * Cách "một cột khoá rồi một khối dòng" tốn HAI lượt gọi Sheets thay vì một.
+ * Mỗi lượt gọi Sheets bên trong Apps Script có giá cố định riêng, nên với bảng
+ * NHỎ, hai lượt gọi đắt hơn một lượt đọc cả bảng — dù số ô đọc ít hơn hẳn.
+ *
+ * ĐO THẬT, `chiTietCa` 10 lượt đồng thời:
+ *     v70 (đọc cả bảng)     p50 ~5–6 giây
+ *     v71 (luôn hai lượt)   p50 8,98 giây   ← CHẬM HƠN
+ *
+ * LuotThi hiện 282 dòng. Ở cỡ ấy `getDataRange()` chưa đủ nặng để bù cho một
+ * lượt gọi Sheets thừa. Nhưng bảng chỉ dài thêm, không bao giờ ngắn lại, nên
+ * cách hai lượt là cách ĐÚNG về lâu dài — chỉ cần bật nó lên khi bảng đủ lớn.
+ *
+ * 1 200 dòng ≈ 40 ca nữa của thầy. Chọn số này vì nó nằm giữa: đủ xa 282 để
+ * hôm nay đi đường một lượt, đủ gần để đường hai lượt bật lên trước khi bảng
+ * kịp nặng tới mức treo. */
+const NGUONG_DOC_KHOI = 1200
+
 function docKhoiLuotCuaCa_(sh, maCa) {
   const n = sh.getLastRow()
   const ra = []
   for (let i = 0; i < n; i++) ra.push([])
   if (n < 2) return ra
+  // BẢNG CÒN NHỎ: một lượt đọc cả bảng vẫn rẻ hơn hai lượt gọi Sheets.
+  if (n < NGUONG_DOC_KHOI) {
+    const het = sh.getRange(1, 1, n, LUOT_HEADERS.length).getValues()
+    for (let i = 1; i < n; i++) if (String(het[i][0]) === String(maCa)) ra[i] = het[i]
+    return ra
+  }
   const cot = sh.getRange(1, 1, n, 1).getValues()
   let dau = -1
   let cuoi = -1

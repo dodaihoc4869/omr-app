@@ -71,14 +71,25 @@ function sheetGia(bang: unknown[][], dem: Doc) {
   }
 }
 
+/** Hằng số đọc THẲNG từ .gs — không chép tay, không tin trí nhớ. (Bản đầu của
+ * phép kiểm này quên truyền `NGUONG_DOC_KHOI` vào sandbox, hàm ném
+ * ReferenceError ngay lúc dựng nên cả tệp báo "no tests" chứ không báo lỗi thật.) */
+function rutSo(ten: string): number {
+  const m = new RegExp(`const ${ten} = (\\d+)`).exec(GS)
+  if (!m) throw new Error(`Không thấy hằng ${ten}`)
+  return Number(m[1])
+}
+const NGUONG_DOC_KHOI = rutSo('NGUONG_DOC_KHOI')
+
 const chay = new Function(
   'LUOT_HEADERS',
   'CA_HEADERS',
+  'NGUONG_DOC_KHOI',
   `${rutHam('docLuotNhe_')}\n${rutHam('docKhoiLuotCuaCa_')}\n${rutHam('docCaNhe_')}\n${rutHam('docKhoaChiTiet_')}
    return { docLuotNhe_, docKhoiLuotCuaCa_, docCaNhe_, docKhoaChiTiet_ }`,
-) as (l: string[], c: string[]) => Record<string, (...a: unknown[]) => unknown[][]>
+) as (l: string[], c: string[], n: number) => Record<string, (...a: unknown[]) => unknown[][]>
 
-const H = chay(LUOT_HEADERS, CA_HEADERS)
+const H = chay(LUOT_HEADERS, CA_HEADERS, NGUONG_DOC_KHOI)
 
 /** Bảng LuotThi giả đúng dáng thật: 22 cột, ba cột JSON nặng. */
 function bangLuot(soCa: number, emMoiCa: number) {
@@ -160,11 +171,33 @@ describe('docKhoiLuotCuaCa_ — CHỈ SỐ DÒNG PHẢI GIỮ NGUYÊN', () => {
     expect(String(ra[ngoai][0])).toBe('undefined') // không khớp mã ca nào
   })
 
-  it('ĐỌC ÍT HƠN HẲN: một cột khoá cho cả bảng, cộng đúng khối dòng của ca', () => {
-    const caBang = b.length * LUOT_HEADERS.length
+  // NGƯỠNG — thêm sau khi ĐO THẬT trên bản v71 vừa triển khai.
+  //
+  // Đường "một cột khoá rồi một khối dòng" tốn HAI lượt gọi Sheets. Với bảng
+  // nhỏ, hai lượt gọi đắt hơn một lượt đọc cả bảng dù số ô ít hơn hẳn:
+  // `chiTietCa` 10 lượt đồng thời đo được p50 5–6 giây ở v70 nhưng 8,98 giây ở
+  // v71. Nên dưới ngưỡng thì đi một lượt, trên ngưỡng mới tách hai.
+  it('bảng LỚN thì đọc ít hơn hẳn — đường hai lượt bật lên', () => {
+    const to = bangLuot(60, 30) // 1 801 dòng, trên ngưỡng
+    const d = { o: 0, lan: 0 }
+    H.docKhoiLuotCuaCa_(sheetGia(to, d), 'ca5')
+    const caBang = to.length * LUOT_HEADERS.length
     // eslint-disable-next-line no-console
-    console.log(`[một ca] đọc cả bảng ${caBang} ô · đọc khối ${dem.o} ô — giảm ${(1 - dem.o / caBang) * 100 | 0}%`)
-    expect(dem.o).toBeLessThan(caBang / 3)
+    console.log(`[một ca · bảng lớn ${to.length} dòng] cả bảng ${caBang} ô · đọc khối ${d.o} ô — giảm ${(1 - d.o / caBang) * 100 | 0}%`)
+    expect(d.lan).toBe(2)
+    expect(d.o).toBeLessThan(caBang / 3)
+  })
+
+  it('bảng NHỎ thì CHỈ MỘT lượt gọi Sheets — hai lượt đắt hơn', () => {
+    const nho = bangLuot(10, 28) // 281 dòng, cỡ thật hiện nay
+    const d = { o: 0, lan: 0 }
+    const ra2 = H.docKhoiLuotCuaCa_(sheetGia(nho, d), 'ca5')
+    expect(d.lan).toBe(1)
+    // và vẫn phải trả ĐÚNG dữ liệu, đúng chỉ số dòng
+    for (let i = 1; i < nho.length; i++) {
+      if (String(nho[i][0]) === 'ca5') expect(ra2[i][1]).toBe(nho[i][1])
+      else expect(ra2[i].length).toBe(0)
+    }
   })
 
   it('ca không có dòng nào thì trả mảng rỗng an toàn, không nổ', () => {
