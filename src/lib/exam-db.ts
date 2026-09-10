@@ -614,3 +614,19 @@ export async function docKhoDoKho<T>(): Promise<T | undefined> {
   const db = await getDb()
   return (await db.get(STORE_SETTINGS, 'khoDoKho')) as T | undefined
 }
+
+/** HÀNG ĐỢI ÔN GIÃN CÁCH (RUT-CAU-CHUA-THEO-NGUYEN-NHAN): sbd::maDang → mốc ôn.
+ *
+ * Cất ở `settings` cùng chỗ `soCauCa`, `khoChuaCa`, `khoDoKho`. Đặc tả viết là
+ * thêm cột vào sheet `TienDoHS`; KHÔNG làm thế — bảng ấy đang có dữ liệu thật và
+ * cả đường tiến độ đọc theo đúng thứ tự cột hiện có. Rút đề chỉ xảy ra trên máy
+ * thầy nên hàng đợi không cần đi qua máy chủ. */
+export async function luuLichOnLai(lich: unknown): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, lich, 'lichOnLai')
+}
+
+export async function docLichOnLai<T>(): Promise<T | undefined> {
+  const db = await getDb()
+  return (await db.get(STORE_SETTINGS, 'lichOnLai')) as T | undefined
+}
