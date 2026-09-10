@@ -103,8 +103,12 @@
   --p-nen: #f7f8fa;
   --p-chim: #f3f4f6;
   --p-muc: #1a2332;
-  --p-nhat: #6b7280;
-  --p-mo: #9ca3af;
+  /* CÙNG MỘT LỖI, CHỖ CÒN TỆ HƠN. Bảng màu phiếu này in ra chữ 10,5–11,5px cho
+   * PHỤ HUYNH đọc trên điện thoại; `--p-mo` cũ (#9ca3af) chỉ đạt tương phản
+   * 2,54. Nay dùng đúng cặp đã đo của bảng màu app, đều ≥ 4,5 trên cả ba nền
+   * phiếu. Khoá bằng `tuong-phan-mau-1009.test.ts`. */
+  --p-nhat: #5b6270;
+  --p-mo: #667085;
   --p-vien: #e5e7eb;
   --p-xanh: #10b981;
   --p-do: #ef4444;

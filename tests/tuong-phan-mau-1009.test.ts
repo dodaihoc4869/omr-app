@@ -80,6 +80,26 @@ describe('MỌI BẬC CHỮ ĐỀU ĐẠT WCAG AA TRÊN MỌI BỀ MẶT', () =>
   }
 })
 
+describe('BẢNG MÀU PHIẾU GỬI PHỤ HUYNH — chỗ còn quan trọng hơn', () => {
+  // Phiếu in ra chữ 10,5–11,5px cho PHỤ HUYNH đọc trên điện thoại. Bảng màu này
+  // cố định sáng (không theo nền tối) nên phải tự nó đạt chuẩn.
+  const CHU_P = ['p-muc', 'p-nhat', 'p-mo']
+  const NEN_P = ['p-giay', 'p-nen', 'p-chim']
+  for (const chu of CHU_P) {
+    for (const nen of NEN_P) {
+      it(`--${chu} trên --${nen}`, () => {
+        const t = tuongPhan(SANG[chu], SANG[nen])
+        expect(t, `--${chu} (${SANG[chu]}) trên --${nen} (${SANG[nen]}) chỉ đạt ${t.toFixed(2)}`).toBeGreaterThanOrEqual(AA)
+      })
+    }
+  }
+
+  it('KHÔNG còn mã màu #9ca3af nào trong tokens ngoài phần ghi chú', () => {
+    const maDung = CSS.split('\n').filter((d) => !d.trim().startsWith('*') && !d.trim().startsWith('/*'))
+    expect(maDung.join('\n')).not.toContain('#9ca3af')
+  })
+})
+
 describe('HAI BẬC MỜ VẪN PHÂN BIỆT ĐƯỢC — sửa tương phản không được làm phẳng hệ', () => {
   it('nền sáng: --nhat đậm hơn --mo, --mo đậm hơn nền', () => {
     expect(doChoi(SANG.nhat)).toBeLessThan(doChoi(SANG.mo))
