@@ -126,13 +126,27 @@ describe('mọi lệnh ghi LuotThi phải cầm CÙNG một khoá', () => {
   it('submit — khoá bao TRỌN quãng từ lúc đọc bảng tới lúc ghi xong', () => {
     const than = khoiAction('submit')
     const viKhoa = than.indexOf('lockNopBai.waitLock(15000)')
-    const viDoc = than.indexOf('sh.getDataRange().getValues()')
+    // Mốc neo đổi 10/09 khuya. Vùng khoá KHÔNG còn đọc cả bảng — đó chính là
+    // chỗ treo cả lớp lúc nộp bài — nay đọc ba cột khoá rồi đọc đúng một dòng.
+    // Ý ĐỊNH GIỮ NGUYÊN: khoá vẫn phải bao TRỌN quãng đọc → ghi, vì `choThiLai`
+    // xoá dòng giữa chừng là mọi dòng dưới dồn lên và lượt này ghi vào bài của
+    // em khác.
+    const viDoc = than.indexOf('sh.getRange(1, 1, soDongL, 3).getValues()')
     const viGhi = than.indexOf('sh.getRange(luotRow, 20, 1, 3).setValues')
     const viNha = than.indexOf('lockNopBai.releaseLock()')
     expect(viKhoa).toBeGreaterThan(0)
     expect(viDoc).toBeGreaterThan(viKhoa)
     expect(viGhi).toBeGreaterThan(viDoc)
     expect(viNha).toBeGreaterThan(viGhi)
+  })
+
+  // CHỐT MỚI 10/09 khuya — đo được: 14 em đang nộp thì `danhSachCa` cũng quá 25
+  // giây. Khoá này là khoá TOÀN CỤC, nên mỗi mili giây giữ khoá là mỗi mili giây
+  // cả trung tâm đứng chờ.
+  it('vùng khoá của submit KHÔNG được đọc cả bảng', () => {
+    const than = khoiAction('submit')
+    const trongKhoa = than.slice(than.indexOf('lockNopBai.waitLock('), than.indexOf('lockNopBai.releaseLock()'))
+    expect(trongKhoa).not.toContain('getDataRange()')
   })
 
   it('đọc keyBank nằm NGOÀI khoá — không giữ khoá lâu hơn mức cần', () => {

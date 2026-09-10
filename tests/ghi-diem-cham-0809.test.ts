@@ -153,7 +153,23 @@ describe('máy em: hạn và cỡ lô hợp với lượt gọi nặng nhất', 
     expect(API).toContain("{ action: 'ghiDiem', secret, maCa, bai, luatDiem: LUAT_DIEM, soCau }, 90)")
   })
 
-  it('chamLaiCa ghi theo lô 3 em, không phải 5', () => {
-    expect(CLC).toContain('const CO_LO = 3')
+  // 3 → 8 (10/09 khuya). Con số 3 chọn khi `ghiDiem` còn ĐỌC CẢ BẢNG LuotThi và
+  // CẢ BẢNG ChiTietCau mỗi lượt gọi; nay hai chỗ ấy đọc hẹp nên lô to lên được.
+  // Ý ĐỊNH GIỮ NGUYÊN: lô phải đủ nhỏ để một lượt gọi luôn vừa hạn 90 giây —
+  // quá hạn là mất cả lô, phải chấm lại từ đầu.
+  it('chamLaiCa ghi theo lô nhỏ, đủ biên an toàn dưới hạn 90 giây', () => {
+    const m = /const CO_LO = (\d+)/.exec(CLC)
+    expect(m).not.toBeNull()
+    const co = Number(m![1])
+    expect(co).toBeGreaterThan(0)
+    expect(co).toBeLessThanOrEqual(10)
+  })
+
+  it('máy chủ đã đọc hẹp thì mới được nâng lô — hai thứ đi cùng nhau', () => {
+    const gs = fs.readFileSync(path.join(process.cwd(), 'docs/apps-script-kiem-tra.gs'), 'utf8')
+    const dau = gs.indexOf("if (action === 'ghiDiem')")
+    const than = gs.slice(dau, dau + 3000)
+    expect(than).toContain('docKhoiLuotCuaCa_(sh, maCa)')
+    expect(than).toContain('docKhoaChiTiet_(ctSh)')
   })
 })

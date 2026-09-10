@@ -246,7 +246,9 @@ function chotLuotQuaGio_(maCa) {
   if (!lock.tryLock(5000)) return 0
   try {
     const sh = sheetLuot_()
-    const data = sh.getDataRange().getValues()
+    // ĐỌC ĐÚNG KHỐI DÒNG CỦA CA, và đang GIỮ KHOÁ. Bản cũ đọc cả bảng ngay
+    // trong vùng khoá, mà hàm này chạy mỗi lượt `chiTietCa` của thầy.
+    const data = docKhoiLuotCuaCa_(sh, maCa)
     const now = Date.now()
     const luc = new Date().toISOString()
     let n = 0
@@ -944,6 +946,138 @@ function dungDongChua_(sh, row, maCa, sbd, lanThu) {
   } catch (err) {
     return false
   }
+}
+
+// ===========================================================================
+// BA CÁCH ĐỌC HẸP — thay cho `getDataRange().getValues()` ở các lệnh nóng
+// ===========================================================================
+//
+// VÌ SAO (đo 10/09 tối, ca 234641 đang mở, thầy báo "vẫn treo").
+//
+// Mỗi lượt gọi máy chủ tốn 2,5–5 giây, KỂ CẢ lệnh đọc vặt. Đo kích thước từng
+// cột trên Sheet thì ra nguyên nhân:
+//
+//   CaKiemTra    83 dòng · 2 537 KB — riêng cột BankJson 2 523 KB, tức 99%
+//   LuotThi     282 dòng ·   316 KB — DapAnJson + GiayCauJson + IntegrityJson
+//                                     chiếm 267 KB, tức 85%
+//
+// `getDataRange().getValues()` kéo về TẤT CẢ. `danhSachCa` đọc 2,85 MB chỉ để
+// in ra tên ca và đếm số em — chú thích của chính nó ghi "Không gửi BankJson",
+// đúng là không GỬI, nhưng vẫn ĐỌC. Và hai bảng ấy dài ra theo từng ca thi,
+// nên chi phí này tăng mãi: hôm nay nhẹ, tháng sau treo.
+//
+// Nặng nhất là `submit`: nó GIỮ KHOÁ TOÀN CỤC rồi mới đọc cả bảng. Khoá toàn
+// cục nghĩa là cả lớp xếp hàng một; đoạn giữ khoá ~2 giây thì 36 em nộp cùng
+// lúc xếp hàng hơn một phút, mà hạn chờ khoá chỉ 15 giây — em cuối hàng ăn lỗi
+// rồi gửi lại, càng gửi càng đông. Vòng xoáy ấy đã vá ở phía máy em (nhịp gửi
+// lại có giãn cách), nhưng gốc nằm ở đây.
+//
+// BA HÀM DƯỚI ĐÂY GIỮ NGUYÊN DÁNG TRẢ VỀ của `getDataRange().getValues()` —
+// mảng theo dòng, chỉ số 0 là tiêu đề, chỉ số cột không đổi — nên chỗ gọi chỉ
+// đổi đúng một dòng và mọi phép đánh chỉ số cũ vẫn đúng.
+
+/** ĐỌC LuotThi BỎ BA CỘT JSON NẶNG (DapAnJson · IntegrityJson · GiayCauJson).
+ *
+ * Dùng cho mọi lệnh chỉ cần ĐẾM hoặc TÌM DÒNG. Ba cột ấy trả về chuỗi rỗng —
+ * cố ý, để chỗ nào lỡ đọc tới thì thấy trống chứ không thấy dữ liệu của lượt
+ * khác. Lệnh nào THẬT SỰ cần nội dung bài làm thì dùng `docKhoiLuotCuaCa_`. */
+function docLuotNhe_(sh) {
+  const n = sh.getLastRow()
+  if (n < 1) return [[]]
+  const A = sh.getRange(1, 1, n, 8).getValues() // MaCa..TrangThai
+  const B = sh.getRange(1, 10, n, 2).getValues() // SoLanRoiMan, TongGiayRoiMan
+  const C = sh.getRange(1, 13, n, 9).getValues() // HoTen..CapNhatLuc
+  const ra = []
+  for (let i = 0; i < n; i++) {
+    const d = A[i].slice()
+    d[8] = '' // DapAnJson — cố ý bỏ trống
+    d[9] = B[i][0]
+    d[10] = B[i][1]
+    d[11] = '' // IntegrityJson — cố ý bỏ trống
+    for (let k = 0; k < 9; k++) d[12 + k] = C[i][k]
+    d[21] = '' // GiayCauJson — cố ý bỏ trống
+    ra.push(d)
+  }
+  return ra
+}
+
+/** ĐỌC ĐỦ MỌI CỘT, NHƯNG CHỈ KHỐI DÒNG CỦA MỘT CA.
+ *
+ * Cho lệnh thật sự cần bài làm (`chiTietCa`, `ghiDiem`): đọc một cột khoá để
+ * biết ca nằm ở dòng nào, rồi đọc đúng khối từ dòng đầu tới dòng cuối của ca.
+ * Lượt thi của một ca được ghi nối nhau nên khối này gần bằng đúng số dòng của
+ * ca — 40 dòng thay vì 282.
+ *
+ * GIỮ NGUYÊN CHỈ SỐ DÒNG: dòng ngoài khối trả về mảng rỗng, nên chỗ gọi vẫn
+ * dùng `i + 1` làm số dòng để GHI như cũ. Đây là điều kiện bắt buộc — `ghiDiem`
+ * ghi theo chỉ số dòng, lệch một bậc là ghi điểm vào bài của em khác. */
+function docKhoiLuotCuaCa_(sh, maCa) {
+  const n = sh.getLastRow()
+  const ra = []
+  for (let i = 0; i < n; i++) ra.push([])
+  if (n < 2) return ra
+  const cot = sh.getRange(1, 1, n, 1).getValues()
+  let dau = -1
+  let cuoi = -1
+  for (let i = 1; i < n; i++) {
+    if (String(cot[i][0]) !== String(maCa)) continue
+    if (dau < 0) dau = i
+    cuoi = i
+  }
+  if (dau < 0) return ra
+  const khoi = sh.getRange(dau + 1, 1, cuoi - dau + 1, LUOT_HEADERS.length).getValues()
+  for (let i = 0; i < khoi.length; i++) ra[dau + i] = khoi[i]
+  return ra
+}
+
+/** ĐỌC PhieuKetQua BỎ CỘT PhieuJson.
+ *
+ * Phiếu mới cất nội dung trên Drive nên cột này chỉ là một dòng `drive:<id>`,
+ * nhưng phiếu CŨ cất thẳng JSON vào ô — vài trăm KB một dòng. Lệnh chỉ đi TÌM
+ * mã phiếu thì không đụng tới nội dung, nên bỏ hẳn cột ấy ra. */
+function docPhieuNhe_(sh) {
+  const n = sh.getLastRow()
+  if (n < 1) return [[]]
+  const A = sh.getRange(1, 1, n, 4).getValues() // Ma..HoTen
+  const B = sh.getRange(1, 6, n, PHIEU_HEADERS.length - 5).getValues() // TaoLuc..Loai
+  const ra = []
+  for (let i = 0; i < n; i++) {
+    const d = A[i].slice()
+    d[4] = '' // PhieuJson — cố ý bỏ trống
+    for (let k = 0; k < B[i].length; k++) d[5 + k] = B[i][k]
+    ra.push(d)
+  }
+  return ra
+}
+
+/** ĐỌC ChiTietCau CHỈ BA CỘT KHOÁ (MaCa · SBD · LanThu).
+ *
+ * Hai chỗ dùng bảng này đều chỉ để TÌM DÒNG CẦN XOÁ, không đọc nội dung. Bảng
+ * một dòng MỘT CÂU nên nó dài ra nhanh nhất trong cả tệp (đo 10/09: 4 857 dòng)
+ * và không có gì dọn — đọc đủ 13 cột là kéo về gấp hơn bốn lần số cần. */
+function docKhoaChiTiet_(sh) {
+  const n = sh.getLastRow()
+  if (n < 1) return [[]]
+  return sh.getRange(1, 1, n, 3).getValues()
+}
+
+/** ĐỌC CaKiemTra BỎ CỘT BankJson — cột chiếm 99% khối lượng của bảng.
+ *
+ * Không lệnh nào trong nhóm dùng hàm này cần tới đề bài; lệnh cần đề thì đọc
+ * đúng MỘT dòng bằng `docCa_` rồi mở tệp trên Drive qua `bankRef`. */
+function docCaNhe_(sh) {
+  const n = sh.getLastRow()
+  if (n < 1) return [[]]
+  const A = sh.getRange(1, 1, n, 4).getValues() // MaCa..MoLuc
+  const B = sh.getRange(1, 6, n, CA_HEADERS.length - 5).getValues() // ImmediateFeedback..DeRieng
+  const ra = []
+  for (let i = 0; i < n; i++) {
+    const d = A[i].slice()
+    d[4] = '' // BankJson — cố ý bỏ trống
+    for (let k = 0; k < B[i].length; k++) d[5 + k] = B[i][k]
+    ra.push(d)
+  }
+  return ra
 }
 
 function luotMoiNhatTheoSbd_(sh, maCa, nhe) {
@@ -2312,7 +2446,7 @@ function docBangHoSo_() {
   const soDongLuot = luotSh.getLastRow()
   const luotData = soDongLuot > 0 ? luotSh.getRange(1, 1, soDongLuot, 17).getValues() : []
   const tenCa = {}
-  const caRows = getSheet_(SHEET_CA, CA_HEADERS).getDataRange().getValues()
+  const caRows = docCaNhe_(getSheet_(SHEET_CA, CA_HEADERS))
   for (let i = 1; i < caRows.length; i++) {
     // Ca thầy đã xoá thì không hiện lại trong hồ sơ em nữa.
     if (String(caRows[i][9]) === 'da_xoa') continue
@@ -2713,7 +2847,7 @@ function doPost(e) {
 
     const shXD = getSheet_(SHEET_PHIEU, PHIEU_HEADERS)
     boSungTieuDe_(shXD, PHIEU_HEADERS)
-    const dXD = shXD.getDataRange().getValues()
+    const dXD = docPhieuNhe_(shXD)
     // Một em có thể mang NHIỀU mã phiếu cùng loại (dựng hàng loạt một lần, mở
     // hồ sơ riêng dựng thêm một lần). Lấy mã MỚI NHẤT theo cột TaoLuc.
     let maKQ = '', lucKQ = '', maBT = '', lucBT = ''
@@ -2779,9 +2913,14 @@ function doPost(e) {
     const phieu = docJsonLon_(sh.getRange(row, 5).getValue())
     // Đếm lượt xem để thầy biết phụ huynh đã mở chưa. Ghi hỏng không được chặn
     // việc trả phiếu — phụ huynh đang đứng chờ.
+    //
+    // MỘT LƯỢT ĐỌC, MỘT LƯỢT GHI. Bản cũ gọi Sheets BA lần cho hai ô (đọc cột 7,
+    // ghi cột 7, ghi cột 8) — ba lượt gọi ấy nằm thẳng trên đường chờ của phụ
+    // huynh, mà đây là lệnh duy nhất họ gọi.
     try {
-      sh.getRange(row, 7).setValue((Number(sh.getRange(row, 7).getValue()) || 0) + 1)
-      sh.getRange(row, 8).setValue(new Date().toISOString())
+      const o = sh.getRange(row, 7, 1, 2)
+      const cu = o.getValues()[0]
+      o.setValues([[(Number(cu[0]) || 0) + 1, new Date().toISOString()]])
     } catch (err) {}
     return jsonResponse_({ ok: true, phieu: phieu })
   }
@@ -3787,7 +3926,7 @@ function doPost(e) {
     const caTL = docCa_(shCaTL, rowCaTL)
 
     const shTL = sheetLuot_()
-    const dataTL = shTL.getDataRange().getValues()
+    const dataTL = docKhoiLuotCuaCa_(shTL, maCaTL)
     let mayCu = ''
     let hoTenCu = ''
     let lanCaoNhat = 0
@@ -3814,7 +3953,7 @@ function doPost(e) {
     let soCtXoa = 0
     try {
       const ctShTL = getSheet_(SHEET_CHITIET, CHITIET_HEADERS)
-      const ctDataTL = ctShTL.getDataRange().getValues()
+      const ctDataTL = docKhoaChiTiet_(ctShTL)
       const xoaCt = []
       for (let i = 1; i < ctDataTL.length; i++) {
         if (String(ctDataTL[i][0]) === maCaTL && String(ctDataTL[i][1]) === sbdTL) xoaCt.push(i + 1)
@@ -3922,8 +4061,11 @@ function doPost(e) {
     const loi = kiemTraMaBiMat_(body)
     if (loi) return jsonResponse_({ ok: false, error: loi })
     const caSh = sheetCa_()
-    const data = caSh.getDataRange().getValues()
-    const luotData = sheetLuot_().getDataRange().getValues()
+    // HAI BẢNG, ĐỌC HẸP CẢ HAI. Lệnh này chạy ở MỌI màn của thầy: bản cũ kéo về
+    // 2,5 MB của CaKiemTra (99% là BankJson nó không hề gửi đi) cộng 316 KB của
+    // LuotThi (85% là ba cột JSON nó không dùng) — chỉ để in tên ca và đếm em.
+    const data = docCaNhe_(caSh)
+    const luotData = docLuotNhe_(sheetLuot_())
     // gom lượt mới nhất theo (maCa → sbd) một lần cho mọi ca
     const theoCa = {}
     for (let i = 1; i < luotData.length; i++) {
@@ -3993,7 +4135,9 @@ function doPost(e) {
     // đúng như nút KHOÁ CA vẫn làm. Ghi chú nói rõ máy tự chốt, không giả vờ em
     // tự nộp.
     chotLuotQuaGio_(maCa)
-    const luotData = sheetLuot_().getDataRange().getValues()
+    // Lệnh này CẦN nội dung bài làm, nhưng chỉ của MỘT ca — đọc đúng khối dòng
+    // của ca thay vì cả bảng.
+    const luotData = docKhoiLuotCuaCa_(sheetLuot_(), maCa)
     const luot = []
     for (let i = 1; i < luotData.length; i++) {
       if (String(luotData[i][0]) !== maCa) continue
@@ -4250,7 +4394,7 @@ function doPost(e) {
     for (var i = 0; i < dsDT.length; i++) tenTheoSbd[dsDT[i].sbd] = dsDT[i]
 
     var shDT = sheetLuot_()
-    var dDT = shDT.getDataRange().getValues()
+    var dDT = docKhoiLuotCuaCa_(shDT, maCaDT2)
     var daDien = []
     var daSua = []
     var khongCo = []
@@ -4386,9 +4530,10 @@ function doPost(e) {
     })()
     const mauSo = mauSoKhop_(caGD, body)
     const sh = sheetLuot_()
-    const luotData = sh.getDataRange().getValues()
+    // Ghi điểm theo CHỈ SỐ DÒNG nên hai hàm dưới đều giữ nguyên chỉ số.
+    const luotData = docKhoiLuotCuaCa_(sh, maCa)
     const ctSh = getSheet_(SHEET_CHITIET, CHITIET_HEADERS)
-    const ctData = ctSh.getDataRange().getValues()
+    const ctData = docKhoaChiTiet_(ctSh)
     const daGhi = []
     const tuChoi = []
     const xoaDong = []
@@ -4518,19 +4663,34 @@ function doPost(e) {
     lockNopBai.waitLock(15000)
     try {
     const sh = sheetLuot_()
-    const data = sh.getDataRange().getValues()
+    // ĐOẠN GIỮ KHOÁ PHẢI NGẮN NHẤT CÓ THỂ — đây là chỗ treo cả lớp lúc nộp bài
+    // (thầy báo 10/09 tối, và đo được: 14 em đang nộp thì `danhSachCa` cũng quá
+    // 25 giây).
+    //
+    // `LockService.getScriptLock()` khoá TOÀN CỤC: mọi lệnh của mọi máy xếp
+    // hàng một sau lượt đang giữ khoá. Bản cũ đọc CẢ BẢNG LuotThi ngay trong
+    // vùng khoá — 316 KB, mà 85% là ba cột JSON (DapAnJson · IntegrityJson ·
+    // GiayCauJson) chỉ dùng để... tìm một số dòng. Đoạn khoá vì thế dài cỡ hai
+    // giây, 36 em nộp cùng lúc là hàng đợi hơn một phút, mà hạn chờ khoá chỉ 15
+    // giây: em cuối hàng ăn lỗi rồi gửi lại, càng gửi càng đông.
+    //
+    // Nay hai bước: đọc BA CỘT KHOÁ để tìm dòng, rồi đọc ĐÚNG MỘT DÒNG ấy cho
+    // đủ dữ liệu. Kích thước đọc trong vùng khoá giảm hơn một bậc.
+    const soDongL = sh.getLastRow()
+    const khoaL = soDongL >= 2 ? sh.getRange(1, 1, soDongL, 3).getValues() : [[]]
     let luotRow = -1
-    let luotCu = null
+    let lanThuCu = 0
     const lanThuMuon = Number(body.lanThu) || 0
-    for (let i = 1; i < data.length; i++) {
-      if (String(data[i][0]) !== String(body.maCa) || String(data[i][1]) !== String(body.sbd)) continue
-      const l = docLuot_(data[i])
+    for (let i = 1; i < khoaL.length; i++) {
+      if (String(khoaL[i][0]) !== String(body.maCa) || String(khoaL[i][1]) !== String(body.sbd)) continue
+      const lan = Number(khoaL[i][2]) || 1
       // Đúng lượt em đang làm; không gửi lanThu (bản app cũ) → lượt mới nhất.
-      if (lanThuMuon ? l.lanThu === lanThuMuon : !luotCu || luotCu.lanThu < l.lanThu) {
+      if (lanThuMuon ? lan === lanThuMuon : luotRow < 0 || lanThuCu < lan) {
         luotRow = i + 1
-        luotCu = l
+        lanThuCu = lan
       }
     }
+    const luotCu = luotRow > 0 ? docLuot_(sh.getRange(luotRow, 1, 1, LUOT_HEADERS.length).getValues()[0]) : null
     if (luotRow > 0) {
       let ghiChu = luotCu.ghiChu
       const hetGio = msCua_(luotCu.hetGioLuc)
@@ -4545,7 +4705,11 @@ function doPost(e) {
       sh.getRange(luotRow, 20, 1, 3).setValues([[ghiChu, nopLuc, body.giayCau ? JSON.stringify(body.giayCau) : '']])
     } else {
       const bl = getSheet_(SHEET_BAILAM, ['MaCa', 'SBD', 'MaDe', 'ThoiGianNop', 'DapAnJson', 'SoLanRoiApp', 'TongGiayRoiApp', 'IntegrityJson'])
-      const blData = bl.getDataRange().getValues()
+      // ĐƯỜNG LUI cho ca mở từ bản app rất cũ (không có dòng LuotThi). Hiếm khi
+      // chạy, nhưng nó nằm TRONG VÙNG KHOÁ nên vẫn phải hẹp: hai cột khoá là đủ
+      // để tìm dòng, bảng này cũng mang một cột JSON bài làm.
+      const soDongBL = bl.getLastRow()
+      const blData = soDongBL >= 2 ? bl.getRange(1, 1, soDongBL, 2).getValues() : [[]]
       let foundRow = -1
       for (let i = 1; i < blData.length; i++) {
         if (String(blData[i][0]) === String(body.maCa) && String(blData[i][1]) === String(body.sbd)) {
@@ -4611,9 +4775,14 @@ function doPost(e) {
       dongT = lai.row
     }
     // Cột 9 DapAnJson · cột 21 CapNhatLuc · cột 22 GiayCauJson.
+    //
+    // GỘP HAI CỘT LIỀN NHAU LÀM MỘT LƯỢT GHI. Đây là nhịp ghi DÀY NHẤT của cả
+    // ca — mỗi em một lượt mỗi ~20 giây — nên bớt được một lượt gọi Sheets ở
+    // đây là bớt cho cả lớp nhân cả buổi.
     shT.getRange(dongT, 9).setValue(JSON.stringify(body.dapAn || {}))
-    shT.getRange(dongT, 21).setValue(new Date().toISOString())
-    if (body.giayCau) shT.getRange(dongT, 22).setValue(JSON.stringify(body.giayCau))
+    const lucT = new Date().toISOString()
+    if (body.giayCau) shT.getRange(dongT, 21, 1, 2).setValues([[lucT, JSON.stringify(body.giayCau)]])
+    else shT.getRange(dongT, 21).setValue(lucT)
     return jsonResponse_({ ok: true, serverNow: Date.now() })
   }
 
@@ -4666,7 +4835,7 @@ function doPost(e) {
       caSh.getRange(caRow, 10).setValue('dong')
       // (2) nộp hộ em đang làm, theo bản lưu tạm gần nhất
       const sh = sheetLuot_()
-      const data = sh.getDataRange().getValues()
+      const data = docKhoiLuotCuaCa_(sh, maCa)
       let daNop = 0
       for (let i = 1; i < data.length; i++) {
         if (String(data[i][0]) !== maCa) continue
@@ -4926,7 +5095,7 @@ function doPost(e) {
     }
 
     const now = Date.now()
-    const caRows = sheetCa_().getDataRange().getValues()
+    const caRows = docCaNhe_(sheetCa_())
     const items = []
     for (let i = 1; i < caRows.length; i++) {
       if (String(caRows[i][17] || '') !== 'baitap') continue
@@ -4967,7 +5136,7 @@ function doPost(e) {
     // KHÔNG bỏ sót em cũ khi danh sách mới chưa có tên em đó.
     const hsSh = sheetHS_()
     const hsData = hsSh.getDataRange().getValues()
-    const luotData = sheetLuot_().getDataRange().getValues()
+    const luotData = docLuotNhe_(sheetLuot_())
     const moiNhat = {}
     const soCa = {}
     const tenTuLuot = {}

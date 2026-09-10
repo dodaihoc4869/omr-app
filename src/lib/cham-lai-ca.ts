@@ -24,7 +24,20 @@ import type { QuotaPhan, SoCauBaPhan } from '../engine/score'
  * 25,3 giây. Máy chủ nay xoá dòng chi tiết cũ theo KHỐI thay vì từng dòng nên
  * đã nhanh hơn nhiều, nhưng bảng ChiTietCau còn tiếp tục dài ra theo mỗi ca —
  * lô nhỏ giữ cho mỗi lượt gọi luôn có biên an toàn, đổi lại vài lượt gọi thêm. */
-const CO_LO = 3
+/** 3 → 8 (10/09 khuya, cùng lượt sửa máy chủ đọc hẹp).
+ *
+ * Con số 3 được chọn khi `ghiDiem` còn ĐỌC CẢ BẢNG LuotThi (316 KB) và CẢ BẢNG
+ * ChiTietCau (394 KB, 4 857 dòng) ở MỖI lượt gọi — lô to là chắc chắn quá 90
+ * giây. Nay hai chỗ ấy đọc hẹp: LuotThi chỉ đúng khối dòng của ca, ChiTietCau
+ * chỉ ba cột khoá. Phần đọc của mỗi lượt gọi nhẹ hơn hẳn, nên lô to lên được.
+ *
+ * ĐO ĐƯỢC: chấm lại ca 41 em mất 256 giây với lô 3 (14 lượt gọi). Lô 8 còn 6
+ * lượt. Phần ghi mỗi em không đổi, chỉ bớt được cái giá cố định ~3 giây mỗi
+ * lượt gọi máy chủ — mà chính cái giá cố định ấy mới là phần lớn thời gian.
+ *
+ * KHÔNG đẩy cao hơn: hạn 90 giây là hạn CỨNG của `postJson`, quá là mất cả lô
+ * và phải chấm lại từ đầu. 8 giữ biên an toàn rộng. */
+const CO_LO = 8
 
 export interface DiemBaPhan {
   I: number | null

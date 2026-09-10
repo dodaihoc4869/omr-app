@@ -55,9 +55,26 @@ function chay(rows: unknown[][], now: number) {
   const ghi: { row: number; col: number; giaTri: unknown[][] }[] = []
   const env = {
     LockService: { getScriptLock: () => ({ tryLock: () => true, releaseLock: () => {} }) },
+    // SHEET GIẢ PHẢI THEO KỊP API THẬT (cập nhật 10/09 khuya).
+    //
+    // `chotLuotQuaGio_` nay đọc bằng `docKhoiLuotCuaCa_` — một cột khoá cho cả
+    // bảng rồi đúng khối dòng của ca — thay vì `getDataRange()`. Đổi vì hàm này
+    // chạy TRONG KHOÁ và ở mỗi lượt `chiTietCa` của thầy.
+    //
+    // Bản giả cũ chỉ có `getDataRange` và một `getRange` chỉ biết `setValues`,
+    // nên hàm mới không chạy được. Đây là bản giả của API Google, KHÔNG phải
+    // phép kiểm — mở rộng nó cho khớp API thật là đúng việc; mọi câu kiểm tra
+    // bên dưới giữ nguyên không đổi một chữ.
     sheetLuot_: () => ({
+      getLastRow: () => rows.length,
       getDataRange: () => ({ getValues: () => rows }),
-      getRange: (row: number, col: number) => ({ setValues: (v: unknown[][]) => ghi.push({ row, col, giaTri: v }) }),
+      getRange: (row: number, col: number, soDong?: number, soCot?: number) => ({
+        setValues: (v: unknown[][]) => ghi.push({ row, col, giaTri: v }),
+        getValues: () =>
+          rows
+            .slice(row - 1, row - 1 + (soDong ?? 1))
+            .map((d) => (d as unknown[]).slice(col - 1, col - 1 + (soCot ?? 1))),
+      }),
     }),
     docLuot_: (v: unknown[]) => ({
       maCa: String(v[0]), sbd: String(v[1]), lanThu: Number(v[2]) || 1,
@@ -65,6 +82,10 @@ function chay(rows: unknown[][], now: number) {
     }),
     msCua_: (iso: string) => { const t = new Date(iso).getTime(); return isFinite(t) ? t : NaN },
     BIEN_CHOT_QUA_GIO_MS: bienMs(),
+    LUOT_HEADERS: JSON.parse((/const LUOT_HEADERS = (\[[^\]]*\])/.exec(GS) ?? ['', '[]'])[1].replace(/'/g, '"')) as string[],
+    docKhoiLuotCuaCa_: new Function('LUOT_HEADERS', `${layHam('docKhoiLuotCuaCa_')}\nreturn docKhoiLuotCuaCa_`)(
+      JSON.parse((/const LUOT_HEADERS = (\[[^\]]*\])/.exec(GS) ?? ['', '[]'])[1].replace(/'/g, '"')),
+    ) as (sh: unknown, maCa: string) => unknown[][],
     Date: class extends Date { constructor(...a: unknown[]) { if (a.length === 0) super(now); else super(...(a as [])) } static now() { return now } },
   }
   const ten = Object.keys(env)
@@ -136,7 +157,11 @@ describe('chỗ gọi và chốt an toàn', () => {
     const dau = GS.indexOf("if (action === 'chiTietCa')")
     const than = GS.slice(dau, dau + 2600)
     const viChot = than.indexOf('chotLuotQuaGio_(maCa)')
-    const viDoc = than.indexOf('const luotData = sheetLuot_().getDataRange().getValues()')
+    // Mốc neo đổi 10/09 khuya: `chiTietCa` nay đọc bằng `docKhoiLuotCuaCa_`
+    // (đúng khối dòng của ca) thay vì `getDataRange()`. Ý ĐỊNH GIỮ NGUYÊN —
+    // chốt lượt quá giờ phải chạy TRƯỚC lượt đọc, bằng không lần này vẫn trả
+    // số cũ và thầy phải bấm làm mới lần nữa.
+    const viDoc = than.indexOf('const luotData = docKhoiLuotCuaCa_(sheetLuot_(), maCa)')
     expect(viChot).toBeGreaterThan(0)
     expect(viDoc).toBeGreaterThan(viChot)
   })

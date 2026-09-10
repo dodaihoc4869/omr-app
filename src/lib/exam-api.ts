@@ -516,6 +516,8 @@ export async function publishSession(
 export async function capNhatKeyBank(scriptUrl: string, secret: string, maCa: string, keyBank: KeyBank): Promise<CongBoDiem> {
   const r = await postJson(scriptUrl, { action: 'capNhatKeyBank', secret, maCa, keyBank })
   if (!r.ok) throw new Error(r.error || 'Không cập nhật được ca ' + maCa)
+  // Danh sách ca vừa đổi — bỏ đệm để lượt hỏi tiếp theo thấy ngay.
+  xoaBoDemCa()
   return r.congBo
 }
 
@@ -631,6 +633,8 @@ export async function luuTam(scriptUrl: string, maCa: string, sbd: string, dapAn
 export async function khoaCa(scriptUrl: string, secret: string, maCa: string, khoaBoi = 'thầy'): Promise<{ soEmBiNop: number; khoaLuc: string }> {
   const r = await postJson(scriptUrl, { action: 'khoaCa', secret, maCa, khoaBoi })
   if (!r.ok) throw new Error(r.error || 'Không khoá được ca')
+  // Danh sách ca vừa đổi — bỏ đệm để lượt hỏi tiếp theo thấy ngay.
+  xoaBoDemCa()
   return { soEmBiNop: Number(r.soEmBiNop) || 0, khoaLuc: String(r.khoaLuc || '') }
 }
 
@@ -641,6 +645,8 @@ export async function khoaCa(scriptUrl: string, secret: string, maCa: string, kh
 export async function moKhoaCa(scriptUrl: string, secret: string, maCa: string): Promise<{ goHanVao: boolean }> {
   const r = await postJson(scriptUrl, { action: 'moKhoaCa', secret, maCa })
   if (!r.ok) throw new Error(r.error || 'Không mở lại được ca')
+  // Danh sách ca vừa đổi — bỏ đệm để lượt hỏi tiếp theo thấy ngay.
+  xoaBoDemCa()
   return { goHanVao: !!(r as { goHanVao?: boolean }).goHanVao }
 }
 
@@ -686,6 +692,8 @@ export async function dongBoTenCa(scriptUrl: string, secret: string, maCa: strin
 export async function doiTenCa(scriptUrl: string, secret: string, maCa: string, tenCa: string): Promise<{ tenCa: string }> {
   const r = await postJson(scriptUrl, { action: 'doiTenCa', secret, maCa, tenCa: chuanTenCa(tenCa) })
   if (!r.ok) throw new Error(r.error || 'Không đổi được tên ca')
+  // Danh sách ca vừa đổi — bỏ đệm để lượt hỏi tiếp theo thấy ngay.
+  xoaBoDemCa()
   return { tenCa: String((r as { tenCa?: string }).tenCa ?? '') }
 }
 
@@ -1565,8 +1573,64 @@ export interface CaTomTat {
   canhBao: number
 }
 
+// ---------------------------------------------------------------------------
+// GỘP LƯỢT GỌI `danhSachCa` — lệnh bị gọi nhiều nhất trong app
+// ---------------------------------------------------------------------------
+//
+// 11 chỗ trong app gọi lệnh này, và thầy đổi màn là gọi lại. Đo 10/09 tối, lúc
+// máy chủ RẢNH: mỗi lượt 3,1 – 4,9 giây. Mở màn Ca thi rồi sang màn Học sinh
+// rồi quay lại là ba lượt gọi cho cùng một danh sách 10 ca — mười giây ngồi
+// nhìn vòng xoay, trong khi danh sách ấy không đổi.
+//
+// HAI LỚP, cả hai đều nhỏ và đều an toàn:
+//
+//   1. GỘP LƯỢT ĐANG BAY (single-flight). Hai màn cùng hỏi một lúc thì đi CHUNG
+//      một lượt gọi. Không có lớp này thì màn Ca thi và thanh điều hướng bắn
+//      hai lượt song song cho cùng một câu hỏi.
+//   2. ĐỆM NGẮN 8 GIÂY. Đủ để nuốt trọn một chuỗi đổi màn, và ngắn hơn nhịp
+//      làm mới của màn Theo dõi nên thầy không bao giờ nhìn phải số cũ quá một
+//      nhịp.
+//
+// VÌ SAO 8 GIÂY LÀ AN TOÀN: danh sách ca đổi khi thầy TỰ mở/khoá/xoá ca — mà
+// những việc đó đều đi qua `xoaBoDemCa()` ngay bên dưới, nên bấm xong là thấy
+// ngay, không phải chờ hết đệm. Đệm chỉ chặn những lượt hỏi LẶP trong lúc không
+// có gì thay đổi.
+const DEM_CA_MS = 8000
+
+interface DemCa {
+  luc: number
+  ds: CaTomTat[]
+}
+const demCa = new Map<string, DemCa>()
+const dangBay = new Map<string, Promise<CaTomTat[]>>()
+
+/** XOÁ ĐỆM. Gọi ngay sau mọi lệnh làm đổi danh sách ca — mở ca, khoá ca, đổi
+ * tên, xoá, khôi phục. Thà hỏi lại một lượt còn hơn để thầy nhìn số cũ. */
+export function xoaBoDemCa(): void {
+  demCa.clear()
+  dangBay.clear()
+}
+
 /** daXoa = true → lấy các ca ĐÃ XOÁ (thùng rác) thay vì ca đang dùng. */
 export async function danhSachCa(scriptUrl: string, secret: string, daXoa = false): Promise<CaTomTat[]> {
+  const khoa = `${scriptUrl}|${daXoa}`
+  const co = demCa.get(khoa)
+  if (co && Date.now() - co.luc < DEM_CA_MS) return co.ds
+  const bay = dangBay.get(khoa)
+  if (bay) return bay
+  const p = danhSachCaThat(scriptUrl, secret, daXoa)
+    .then((ds) => {
+      demCa.set(khoa, { luc: Date.now(), ds })
+      return ds
+    })
+    .finally(() => {
+      dangBay.delete(khoa)
+    })
+  dangBay.set(khoa, p)
+  return p
+}
+
+async function danhSachCaThat(scriptUrl: string, secret: string, daXoa: boolean): Promise<CaTomTat[]> {
   const r = await postJson(scriptUrl, { action: 'danhSachCa', secret, daXoa })
   if (!r.ok) throw new Error(r.error || 'Không lấy được danh sách ca')
   return (r.items as CaTomTat[]).map((c) => ({
@@ -1943,6 +2007,8 @@ export async function xoaCauHoi(
 ): Promise<{ soDong: number; soCa: number }> {
   const r = await postJson(scriptUrl, { action: 'xoaCauHoi', secret, maCa, khoiPhuc: opt.khoiPhuc === true, tatCa: opt.tatCa === true })
   if (!r.ok) throw new Error(r.error || (opt.khoiPhuc ? 'Không khôi phục được' : 'Không xoá được'))
+  // Danh sách ca vừa đổi — bỏ đệm để lượt hỏi tiếp theo thấy ngay.
+  xoaBoDemCa()
   return { soDong: Number(r.soDong) || 0, soCa: Number(r.soCa) || 0 }
 }
 
@@ -1964,6 +2030,8 @@ export async function xoaCa(scriptUrl: string, secret: string, maCa: string, xac
 export async function khoiPhucCa(scriptUrl: string, secret: string, maCa: string): Promise<void> {
   const r = await postJson(scriptUrl, { action: 'khoiPhucCa', secret, maCa })
   if (!r.ok) throw new Error(r.error || 'Không khôi phục được ca')
+  // Danh sách ca vừa đổi — bỏ đệm để lượt hỏi tiếp theo thấy ngay.
+  xoaBoDemCa()
 }
 
 /** Kết quả xoá hàng loạt: ca nào xoá được, ca nào không kèm lý do. */
