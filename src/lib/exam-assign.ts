@@ -35,7 +35,7 @@ export interface StudentAssignment {
   phanIII: AssignedShortAnswer[]
 }
 
-function pick<T extends { id: string }>(arr: T[], need: number, seedTag: string): T[] {
+export function pick<T extends { id: string }>(arr: T[], need: number, seedTag: string): T[] {
   const n = arr.length
   if (n === 0) return []
   const k = Math.min(need, n)

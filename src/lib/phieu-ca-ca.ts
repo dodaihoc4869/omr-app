@@ -17,6 +17,7 @@ import {
   type PhieuCanLuu,
 } from './exam-api'
 import { taoChiTietCau } from './chi-tiet-cau'
+import { pick } from './exam-assign'
 import { chuyenDeTuChiTiet } from './phieu-hang-loat'
 import { nhanXetTheoCa } from './nhan-xet-theo-ca'
 import { thongKeLamBai, tinHieuLamBai } from './phan-tich-lam-bai'
@@ -326,6 +327,61 @@ export async function gomCa(url: string, mat: string, maCa: string): Promise<CaD
   // KHÔNG bao giờ nhãn sai.
   const rieng = await docDeRiengCa(ma).catch(() => undefined)
 
+  // BỘ CÂU CỦA EM PHẢI LẤY TỪ BÀI LÀM, KHÔNG ĐƯỢC RÚT LẠI BẰNG HASH.
+  //
+  // Thầy bắt được 10/09, ca 890691. `assignStudentQuestions` rút 18/4/6 từ kho
+  // bằng seed hash(mãCa+SBD) — tái tạo được ĐÚNG bộ câu cũ **với điều kiện kho
+  // không đổi**. Nhưng kho của ca ấy đã phình từ 1 đề lên 3 đề (54/12/18) sau
+  // buổi thi, nên rút lại ra một bộ 18 câu KHÁC hẳn bộ em đã làm.
+  //
+  // Hậu quả đo được: điểm rơi về mức đoán mò. Chu Thanh Mai 5,85 → 1,60; cả 28
+  // em đều sai, và sai IM LẶNG vì con số vẫn trông như điểm thật.
+  //
+  // Bài làm đã ghi đáp án THEO QID, và `giayCau` ghi cả câu em xem mà bỏ trống.
+  // Gộp hai nguồn là ra đúng bộ câu đã phát. Đo trên ca 890691: 27/28 em dựng
+  // lại đủ 18/4/6; em còn lại 18/4/5 và `buDuSoCau` bù cho đủ mẫu số.
+  //
+  // NGHIỆM THU: chấm theo bộ này rồi so với điểm chính máy từng em tự tính lúc
+  // nộp (sổ `NhatKyDiem`) — 28/28 khớp, 0 lệch.
+  //
+  // Ca CÓ `boTheoEm` thì dùng bản đã lưu, vì đó là bản chốt lúc phát đề.
+  //
+  // BÙ MẪU SỐ NGAY TẠI ĐÂY, không bù trong `assignStudentQuestions`.
+  //
+  // Hai thứ trông giống nhau mà nghĩa khác hẳn, gộp lại là hỏng:
+  //   · `boTheoEm` của ca CHẨN ĐOÁN — danh sách CHỐT lúc phát đề, đã đầy đủ.
+  //     Bù thêm vào đó là nhét câu em chưa từng thấy, và làm loãng mẫu số.
+  //   · bộ dựng lại TỪ BÀI LÀM — có thể THIẾU, vì em bỏ trống hẳn một câu thì
+  //     câu ấy không để lại dấu nào.
+  // Phép kiểm `de-rieng-nhan` bắt đúng chỗ tôi gộp nhầm hai cái này.
+  //
+  // Câu bù KHÔNG đổi điểm: em không trả lời nó nên luôn tính sai, 0 điểm. Nó chỉ
+  // có mặt để mẫu số đúng bằng `soCau`. Bù tất định theo seed.
+  const buCho = (cua: Set<string>, kho: { id: string }[], can: number, tag: string): string[] => {
+    const cuaEm = kho.filter((q) => cua.has(q.id)).map((q) => q.id)
+    if (cuaEm.length >= can) return cuaEm
+    const daCo = new Set(cuaEm)
+    return [...cuaEm, ...pick(kho.filter((q) => !daCo.has(q.id)), can - cuaEm.length, tag).map((q) => q.id)]
+  }
+  const khoI = bank.flatMap((b) => b.phanI)
+  const khoII = bank.flatMap((b) => b.phanII)
+  const khoIII = bank.flatMap((b) => b.phanIII)
+  const boTuBaiLam: Record<string, string[]> = {}
+  for (const l of ct.luot) {
+    if (!l.dapAn) continue
+    const cu = new Set(boTuBaiLam[l.sbd] ?? [])
+    for (const k of Object.keys(l.dapAn.phanI ?? {})) cu.add(k)
+    for (const k of Object.keys(l.dapAn.phanII ?? {})) cu.add(k)
+    for (const k of Object.keys(l.dapAn.phanIII ?? {})) cu.add(k)
+    for (const k of Object.keys(l.giayCau ?? {})) cu.add(k)
+    boTuBaiLam[l.sbd] = [
+      ...buCho(cu, khoI, sc?.I ?? khoI.length, `${ma}:${l.sbd}:phanI:bu`),
+      ...buCho(cu, khoII, sc?.II ?? khoII.length, `${ma}:${l.sbd}:phanII:bu`),
+      ...buCho(cu, khoIII, sc?.III ?? khoIII.length, `${ma}:${l.sbd}:phanIII:bu`),
+    ]
+  }
+  const boTheoEm = rieng?.boTheoEm ?? boTuBaiLam
+
   const dsLop = await loadClassList().catch(() => [])
   const theoSbd = new Map<string, LuotThiRow[]>()
   for (const l of ct.luot) {
@@ -340,7 +396,7 @@ export async function gomCa(url: string, mat: string, maCa: string): Promise<CaD
     if (!moiNhat.dapAn || (moiNhat.trangThai !== 'da_nop' && moiNhat.trangThai !== 'khoa')) return
     let graded: GradedSubmission | null = null
     try {
-      graded = gradeSubmissionFull(bank!, ct.ca.maCa, sbd, moiNhat.dapAn, sc, rieng?.boTheoEm)
+      graded = gradeSubmissionFull(bank!, ct.ca.maCa, sbd, moiNhat.dapAn, sc, boTheoEm)
     } catch {
       graded = null
     }
@@ -367,7 +423,7 @@ export async function gomCa(url: string, mat: string, maCa: string): Promise<CaD
       deRieng: Boolean(rieng),
       lapCua: rieng?.lapCua,
     },
-    keyBank: mergeKeepAnswers(bank, sc, rieng?.boTheoEm),
+    keyBank: mergeKeepAnswers(bank, sc, boTheoEm),
     daCham,
   }
 }
