@@ -13,6 +13,7 @@ import type { CaCuaEm, ChiTietCauRow, ChuyenDeEm, HoSoEm } from './exam-api'
 import { ducKetKienThuc, thongKeLamBai, tinHieuLamBai, type DucKetChuyenDe, type ThongKeLamBai, type TinHieuLamBai } from './phan-tich-lam-bai'
 import { cauLuyenTuBoCau, cauLuyenTuNguon, chonCauLuyen, type CauLuyen } from './bai-tap-pdf'
 import { rutDeChua, soCauChuaThat, type PoolCauSai, type SuatThieu } from './rut-de-chua'
+import { chanDoanChoPhieu, type CoChanDoan, type CumChanDoan } from './chan-doan-phieu'
 import { SO_CAU_KEM_PHIEU } from './cau-hinh-chua'
 import type { LocDang } from './dang-cau'
 import { mocRoiMan } from './chong-gian-lan'
@@ -216,6 +217,19 @@ export interface PhieuDayDu {
    * Giấu con số này là để phụ huynh hiểu nhầm về tiến bộ (mục 2, hệ quả hai). */
   soCauLap?: number
   dongCauLap?: string
+  /** CHẨN ĐOÁN NGUYÊN NHÂN SAI (RUT-CAU-CHUA-THEO-NGUYEN-NHAN mục "màn hình").
+   *
+   * Một dòng cho mỗi CỤM câu cùng bệnh, viết cho em đọc và luôn kèm số. Vắng
+   * mặt khi không đủ căn cứ để chẩn — lúc đó `chanDoanCam` nói rõ vì sao, chứ
+   * phiếu không dán nhãn bằng dữ liệu rỗng. */
+  chanDoanCum?: CumChanDoan[]
+  /** Cờ cho THẦY, hiện ở màn Ca thi — không in cho phụ huynh. */
+  chanDoanCo?: CoChanDoan[]
+  /** Dòng cam nói thẳng vì sao chưa chẩn được. */
+  chanDoanCam?: string[]
+  /** Số câu chữa đã BỎ vì kê cho lỗi bừa / hết giờ. Đặc tả cấm kê câu kiến thức
+   * cho bệnh này; con số ở đây để không ai bỏ câu trong im lặng. */
+  chanDoanDaBo?: number
 }
 
 /** Gói báo cáo lớn nhất còn gửi lên máy chủ được (byte). Phải khớp với
@@ -703,6 +717,16 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
     soCauChuaThat(kqChuaEm) > 0
       ? (kqChuaEm as NonNullable<typeof kqChuaEm>).cau
       : [...lamLaiEm, ...(tuKho.length > 0 ? tuKho.filter((c) => !daLamTrongCa.has(c.id)) : duPhong)].slice(0, SO_CAU_BAI_TAP_KEM)
+  // CHẨN ĐOÁN NGUYÊN NHÂN. Máy em KHÔNG có bảng chấm cả lớp, nên đường này chỉ
+  // ra đúng một dòng nói thật thay vì nhãn bịa — xem `chanDoanChoPhieu`.
+  const cdEm = chanDoanChoPhieu({
+    rows: n.rows,
+    rowsLop: null,
+    khoDe: n.khoKhacPhuc ?? null,
+    nguonCauSai: n.banks,
+    giayRoiMan: n.viPham?.tongGiay ?? null,
+    cau: baiTapEm,
+  })
   const tk = thongKeLamBai(n.rows, { vaoLuc: n.vaoLuc, nopLuc: n.nopLuc, thoiLuongPhut: n.thoiLuongPhut })
 
   const gom = new Map<string, { ten: string; soCau: number; soSai: number }>()
@@ -751,7 +775,11 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
     //
     // CÓ kèm bài luyện (thầy chốt 06/09): em tự tạo bộ câu khắc phục lỗi sai
     // ngay sau khi nộp, lúc còn nhớ mình vướng chỗ nào.
-    baiTap: baiTapEm,
+    baiTap: cdEm.cau,
+    chanDoanCum: cdEm.cum.length > 0 ? cdEm.cum : undefined,
+    chanDoanCo: cdEm.co.length > 0 ? cdEm.co : undefined,
+    chanDoanCam: cdEm.canhBao.length > 0 ? cdEm.canhBao : undefined,
+    chanDoanDaBo: cdEm.daBo > 0 ? cdEm.daBo : undefined,
     tongUngVien: kqChuaEm?.tongUngVien,
     poolChua: kqChuaEm?.poolTheoCauSai,
     thieuChuaChiTiet: kqChuaEm?.thieu,
@@ -838,6 +866,16 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
       ].slice(0, SO_CAU_BAI_TAP_KEM)
     : (kqChua?.cau ?? [])
   const luiCoSai = phaiLui && coCauSai
+  // CHẨN ĐOÁN NGUYÊN NHÂN. Đường này chạy trên MÁY THẦY và có `rowsLop`, nên là
+  // chỗ duy nhất chẩn được thật: trung vị giây và độ chụm đều cần cả lớp.
+  const cd = chanDoanChoPhieu({
+    rows,
+    rowsLop: n.rowsLop ?? null,
+    khoDe: kho,
+    nguonCauSai: banks,
+    giayRoiMan: n.viPham?.tongGiay ?? null,
+    cau: baiTap,
+  })
 
   return {
     v: BAN_PHIEU,
@@ -880,7 +918,11 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
     dongCauLap: dongCauLap(soCauLap, tk ? tk.tongCau : rows.length || null),
     dai: rows.map((r) => ({ nhan: `Phần ${r.phan} câu ${r.soCau}`, giay: r.giay, dung: Boolean(r.dungSai) })),
     viPham: dungViPham(n.viPham),
-    baiTap,
+    baiTap: cd.cau,
+    chanDoanCum: cd.cum.length > 0 ? cd.cum : undefined,
+    chanDoanCo: cd.co.length > 0 ? cd.co : undefined,
+    chanDoanCam: cd.canhBao.length > 0 ? cd.canhBao : undefined,
+    chanDoanDaBo: cd.daBo > 0 ? cd.daBo : undefined,
     tongUngVien: kqChua?.tongUngVien,
     poolChua: kqChua?.poolTheoCauSai,
     thieuChuaChiTiet: kqChua?.thieu,

@@ -18,7 +18,7 @@ import { maCaLay, vaBienBanCu } from '../lib/va-bien-ban-cu'
 import { goiPhieuCaZip, tenTepZipCa, chuyenDeTuChiTiet, type EmTrongCaDeXuatPhieu } from '../lib/phieu-hang-loat'
 import { viecCanLamMacDinh } from '../lib/phieu-zalo'
 import { gomLinkPhieu, tomTatLinkPhieu, vanBanLinkPhieu, type DongLinkPhieu } from '../lib/link-phieu-ca'
-import { dungPhieuChoEm } from '../lib/phieu-ca-ca'
+import { dungPhieuChoEm, type CoChanDoanEm } from '../lib/phieu-ca-ca'
 import { phieuTheoCa } from '../lib/exam-api'
 import { sinhBoTheoEm, TEN_MUC_PHAN_TANG } from '../lib/de-rieng-blueprint'
 import { docCheDoDeRieng, docDeRiengCa, docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuDeRiengCa, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret, type BienBanDeRieng, type DeRiengCaLuu } from '../lib/exam-db'
@@ -231,6 +231,9 @@ export default function ExamMonitorScreen() {
   const [dangGoiPhieu, setDangGoiPhieu] = useState('')
   // Gom link phiếu của cả ca để dán một lượt vào Zalo (thầy chốt 05/09 chiều).
   const [dangGomLink, setDangGomLink] = useState(false)
+  /** CỜ CHẨN ĐOÁN của lượt dựng phiếu gần nhất — em nào bị bỏ câu chữa vì
+   * nghi hết giờ, và câu nào đáng gán nhãn mức phương án. Chỉ thầy thấy. */
+  const [coChanDoan, setCoChanDoan] = useState<CoChanDoanEm[]>([])
   /** "3/12" khi đang dựng nốt phiếu còn thiếu — nút phải nói nó đang làm gì,
    * không thì thầy tưởng máy treo. */
   const [tienTaoPhieu, setTienTaoPhieu] = useState('')
@@ -875,7 +878,7 @@ export default function ExamMonitorScreen() {
     if (!bank || bank.length === 0) return []
     // Lõi dựng phiếu nằm ở `phieu-ca-ca.ts`, dùng chung với cầu nối
     // `window.__ddh`. Màn hình chỉ đưa dữ liệu nó đã có sẵn trong bộ nhớ.
-    const { dong, loi } = await dungPhieuChoEm(
+    const { dong, loi, co } = await dungPhieuChoEm(
       url,
       mat,
       {
@@ -898,6 +901,10 @@ export default function ExamMonitorScreen() {
       tien,
     )
     if (loi.length > 0) showToast(`${loi.length} em chưa cất được phiếu: ${loi[0].vi_sao}`, 'warn')
+    // CỜ CHẨN ĐOÁN cho thầy (RUT-CAU-CHUA-THEO-NGUYEN-NHAN mục "màn hình").
+    // Em bị chẩn là hết giờ thì phiếu KHÔNG kê câu kiến thức — thầy phải thấy
+    // chuyện đó, bằng không việc bỏ câu diễn ra trong im lặng.
+    setCoChanDoan(co)
     return dong
   }
 
@@ -1791,6 +1798,21 @@ export default function ExamMonitorScreen() {
                 {dangGomLink ? (tienTaoPhieu ? `Đang dựng phiếu ${tienTaoPhieu}…` : 'Đang lấy mã phiếu…') : 'Tạo & copy link phiếu gửi Zalo'}
               </button>
               {tomTatLink && <div style={{ ...NHAN_NHO, marginTop: 4, textAlign: 'center' }}>{tomTatLink}</div>}
+              {/* CỜ CHẨN ĐOÁN — em nào bị bỏ câu chữa vì nghi hết giờ, và câu
+                  nào đáng gán nhãn mức phương án. Chỉ hiện cho thầy, không
+                  vào phiếu phụ huynh. */}
+              {coChanDoan.length > 0 && (
+                <div style={{ marginTop: 'var(--k2)', padding: 'var(--k2)', borderRadius: 'var(--bo-1)', background: 'var(--the-2)' }}>
+                  <div style={{ fontWeight: 700, fontSize: 'var(--cx-1)', marginBottom: 4 }}>Chẩn đoán nguyên nhân sai ({coChanDoan.length})</div>
+                  <ul style={{ ...NHAN_NHO, margin: 0, paddingLeft: 18, lineHeight: 1.6 }}>
+                    {coChanDoan.map((c, i) => (
+                      <li key={`${c.sbd}-${i}`}>
+                        <b>{c.hoTen}</b> ({c.sbd}): {c.chu}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </TheNoiDung>
           )}
 

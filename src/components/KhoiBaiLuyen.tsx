@@ -228,6 +228,37 @@ function NutTaiBaiTap({ du, laCuaEm = false, xinLink }: { du: PhieuDayDu; laCuaE
         </div>
       )}
 
+      {/* CHẨN ĐOÁN NGUYÊN NHÂN SAI — một dòng cho mỗi cụm câu cùng bệnh.
+          Đứng TRƯỚC thanh kéo số câu: em phải đọc được vì sao mình sai rồi mới
+          quyết làm bao nhiêu câu, chứ không phải kéo số trước rồi mới hỏi tại
+          sao. Không chẩn được thì hiện đúng dòng cam nói thật, không nhãn nào. */}
+      {(du.chanDoanCum?.length ?? 0) > 0 && (
+        <div className="bc-so" style={{ marginTop: 8 }}>
+          <div className="bc-so-nhan">
+            <b>Vì sao em sai</b>
+          </div>
+          <ul style={{ margin: '6px 0 0', paddingLeft: 18 }}>
+            {du.chanDoanCum?.map((c) => (
+              <li key={c.benh} className="bc-so-vi" style={{ marginBottom: 4 }}>
+                {c.chu}
+              </li>
+            ))}
+          </ul>
+          {(du.chanDoanDaBo ?? 0) > 0 && (
+            <div className="bc-so-vi bc-so-canh" style={{ marginTop: 6 }}>
+              Đã bỏ {du.chanDoanDaBo} câu chữa kê cho mấy câu nghi hết giờ: luyện thêm kiến thức không sửa được lỗi thiếu thời gian.
+            </div>
+          )}
+        </div>
+      )}
+      {(du.chanDoanCam?.length ?? 0) > 0 && (
+        <div className="bc-so-vi bc-so-canh" style={{ marginTop: 8 }}>
+          {du.chanDoanCam?.map((v, i) => (
+            <div key={i}>{v}</div>
+          ))}
+        </div>
+      )}
+
       {(du.baiTap?.length ?? 0) > 0 && (
         <>
           <div className="bc-dang" role="radiogroup" aria-label="Dạng câu">

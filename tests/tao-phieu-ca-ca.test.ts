@@ -247,7 +247,11 @@ describe('Màn Chi tiết ca dùng CHUNG lõi này, không chép lại', () => {
     const { readFileSync } = await import('node:fs')
     const { resolve } = await import('node:path')
     const man = readFileSync(resolve(__dirname, '../src/screens/ExamMonitorScreen.tsx'), 'utf8')
-    expect(man).toContain("import { dungPhieuChoEm } from '../lib/phieu-ca-ca'")
+    // Ghim Ý ĐỊNH chứ không ghim nguyên văn dòng import: 10/09 dòng ấy mọc thêm
+    // `type CoChanDoanEm` (cờ chẩn đoán cho thầy) và phép kiểm đỏ dù màn hình
+    // vẫn dùng đúng lõi chung. Ghim nguyên văn là mỗi lần thêm một kiểu lại
+    // phải sửa phép kiểm — sửa riết thành phản xạ sửa test cho xanh.
+    expect(man).toMatch(/import \{[^}]*\bdungPhieuChoEm\b[^}]*\} from '\.\.\/lib\/phieu-ca-ca'/)
     expect(man).toContain('dungPhieuChoEm(')
     // Không còn bản chép: màn hình không được tự gọi `dungPhieu`/`luuNhieuPhieu`.
     expect(man).not.toContain('luuNhieuPhieu(')

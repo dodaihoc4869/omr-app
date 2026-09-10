@@ -54,9 +54,21 @@ export interface EmChoPhieu {
   diem: number | null
 }
 
+/** CỜ CHẨN ĐOÁN CHO THẦY — hiện ở màn Ca thi, KHÔNG in cho phụ huynh.
+ *
+ * Đặc tả RUT-CAU-CHUA-THEO-NGUYEN-NHAN mục "màn hình": em bị chẩn là hết giờ
+ * thì phiếu KHÔNG kê câu kiến thức, và thầy phải thấy đúng một dòng nói ra
+ * chuyện đó — bằng không việc bỏ câu diễn ra trong im lặng. */
+export interface CoChanDoanEm {
+  sbd: string
+  hoTen: string
+  chu: string
+}
+
 export interface KetQuaDungPhieu {
   dong: DongLinkPhieu[]
   loi: { sbd: string; vi_sao: string }[]
+  co: CoChanDoanEm[]
 }
 
 type KeyBankGop = ReturnType<typeof mergeKeepAnswers>
@@ -96,7 +108,7 @@ export async function dungPhieuChoEm(
    * lên TẤT CẢ. */
   maCu?: Map<string, { ketqua: string[]; baitap: string[] }>,
 ): Promise<KetQuaDungPhieu> {
-  if (dsSbd.length === 0) return { dong: [], loi: [] }
+  if (dsSbd.length === 0) return { dong: [], loi: [], co: [] }
   const hangCua = hangTrongCa(daCham)
 
   tien(0, dsSbd.length)
@@ -117,6 +129,7 @@ export async function dungPhieuChoEm(
   /** Mã của các phiếu KẾT QUẢ — để lọc khỏi phiếu bài tập lúc trả dòng link. */
   const maKetQua = new Set<string>()
   const loi: { sbd: string; vi_sao: string }[] = []
+  const coChanDoan: CoChanDoanEm[] = []
   for (const sbd of dsSbd) {
     const e = daCham.find((x) => x.sbd === sbd)
     const ho = hoSoCua.get(sbd)
@@ -182,6 +195,7 @@ export async function dungPhieuChoEm(
         events: e.moiNhat.integrity?.events ?? null,
       },
     })
+    for (const c of phieu.chanDoanCo ?? []) coChanDoan.push({ sbd, hoTen: e.hoTen || sbd, chu: c.chu })
     // NHẬN XÉT RIÊNG CHO CA NÀY (thầy chốt 07/09). Viết SAU `dungPhieu` vì
     // phần "việc phải làm" phải nêu đúng số câu khắc phục phiếu đang kèm.
     phieu.vieCanLam = nhanXetTheoCa({
@@ -249,7 +263,7 @@ export async function dungPhieuChoEm(
     }
   }
 
-  if (canLuu.length === 0) return { dong: [], loi }
+  if (canLuu.length === 0) return { dong: [], loi, co: coChanDoan }
   const kq = await luuNhieuPhieu(url, mat, canLuu)
   tien(kq.daLuu.length, dsSbd.length)
   const nay = new Date().toISOString()
@@ -268,6 +282,7 @@ export async function dungPhieuChoEm(
         taoLuc: nay,
       })),
     loi: [...loi, ...kq.loi],
+    co: coChanDoan,
   }
 }
 
@@ -362,7 +377,8 @@ export interface KetQuaTaoPhieuCaCa {
   dong: DongLinkPhieu[]
   /** Số phiếu VỪA tạo trong lượt gọi này. Gọi lại lần hai phải ra 0. */
   soMoi: number
-  loi: { sbd: string; vi_sao: string }[]
+  loi: { sbd: string; vi_sao: string }[]  /** Cờ chẩn đoán cho THẦY — em nào bị bỏ câu chữa vì nghi hết giờ. */
+  co: CoChanDoanEm[]
 }
 
 /** TẠO PHIẾU CHO CẢ CA rồi trả về link của mọi em đã chấm.
@@ -401,7 +417,7 @@ export async function taoPhieuCaCa(
     else cu.ketqua.push(p.ma)
     maCu.set(p.sbd, cu)
   }
-  const kq = thieu.length > 0 ? await dungPhieuChoEm(url, mat, ca, keyBank, daCham, thieu, goc, tien, taoLai ? maCu : undefined) : { dong: [], loi: [] }
+  const kq = thieu.length > 0 ? await dungPhieuChoEm(url, mat, ca, keyBank, daCham, thieu, goc, tien, taoLai ? maCu : undefined) : { dong: [], loi: [], co: [] }
   // Một em có thể vừa được đè lên nhiều mã; chỉ giữ MỘT dòng link mỗi em, và
   // đó phải là mã mới nhất (`maCu` đã xếp mới nhất lên đầu).
   const maDau = new Set([...maCu.values()].map((x) => x.ketqua[0]).filter(Boolean))
@@ -416,5 +432,5 @@ export async function taoPhieuCaCa(
     const d = theoSbd.get(e.sbd)
     if (d) dong.push({ ...d, hoTen: e.hoTen || d.hoTen })
   }
-  return { dong, soMoi: kq.dong.length, loi: kq.loi }
+  return { dong, soMoi: kq.dong.length, loi: kq.loi, co: kq.co }
 }
