@@ -40,6 +40,20 @@ export function trangThaiCa(ca: Pick<CaTomTat, 'trangThai' | 'batDau' | 'hetHanV
   return { ten: 'Đang mở', tone: 'tim' }
 }
 
+/** CA NÀY CÒN EM CHƯA NỘP XONG KHÔNG — dùng để cảnh báo trước khi xoá.
+ *
+ * Xoá ca là xoá MỀM, nhưng máy chủ coi `da_xoa` là KHOÁ (`caDangKhoa_`), nên
+ * `nopBai` trả "Ca đã khoá — không lưu thêm được". Nghĩa là xoá một ca đang
+ * chạy thì em đang làm dở KHÔNG NỘP ĐƯỢC BÀI. Khôi phục ca lại được, nhưng
+ * mấy phút em ngồi bấm nút mà máy báo lỗi thì không lấy lại được.
+ *
+ * Dùng lại `trangThaiCa` chứ không viết luật thứ hai: hai bản đếm giờ lệch
+ * nhau là cảnh báo hiện sai lúc, còn tệ hơn không có. */
+export function caConEmDangLam(ca: Pick<CaTomTat, 'trangThai' | 'batDau' | 'hetHanVao' | 'daVao' | 'daNop'>, nowMs: number): boolean {
+  const t = trangThaiCa(ca, nowMs).ten
+  return t === 'Đang mở' || t === 'Còn em đang làm'
+}
+
 function ngayGio(iso: string): string {
   const d = new Date(iso)
   if (!Number.isFinite(d.getTime())) return ''
@@ -100,6 +114,8 @@ export default function LichSuCaScreen() {
   const chonTrongLoc = useMemo(() => dsLoc.filter((c) => daChon.includes(c.maCa)), [dsLoc, daChon])
   const tichHet = dsLoc.length > 0 && chonTrongLoc.length === dsLoc.length
   const soBaiLam = useMemo(() => chonTrongLoc.reduce((s, c) => s + c.daVao, 0), [chonTrongLoc])
+  // CA ĐANG CHẠY NẰM TRONG NHÓM SẮP XOÁ — thứ nguy hiểm nhất ở màn này.
+  const dangChay = useMemo(() => chonTrongLoc.filter((c) => caConEmDangLam(c, gioMayChu())), [chonTrongLoc])
 
   const bat = (maCa: string) => setDaChon((cu) => (cu.includes(maCa) ? cu.filter((m) => m !== maCa) : [...cu, maCa]))
   const thoatChon = () => {
@@ -340,13 +356,21 @@ export default function LichSuCaScreen() {
               <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)' }}>
                 Xoá {chonTrongLoc.length} ca?
               </div>
-              <OThongBao tone="do">
+              {/* CẢNH BÁO NẶNG NHẤT ĐỨNG TRƯỚC: ca đang chạy.
+                  Máy chủ coi ca đã xoá là ca KHOÁ, nên em đang làm dở sẽ nhận
+                  "Ca đã khoá — không lưu thêm được" ngay giữa lúc thi. */}
+              {dangChay.length > 0 && (
+                <OThongBao tone="do">
+                  <b style={SO}>{dangChay.length}</b> ca ĐANG CHẠY. Xoá là em đang làm dở không nộp được bài. Đóng ca trước, hoặc bỏ tích mấy ca này.
+                </OThongBao>
+              )}
+              <OThongBao tone='cam'>
                 {soBaiLam > 0 ? (
                   <>
-                    Trong đó có bài làm của <b style={SO}>{soBaiLam}</b> em, xoá rồi không khôi phục được.
+                    Trong đó có bài làm của <b style={SO}>{soBaiLam}</b> em. Xoá là xoá mềm: bài làm giữ nguyên, khôi phục lại được ở mục <b>Ca đã xoá</b>.
                   </>
                 ) : (
-                  <>Các ca này chưa có em nào vào làm.</>
+                  <>Các ca này chưa có em nào vào làm. Xoá là xoá mềm, khôi phục lại được ở mục <b>Ca đã xoá</b>.</>
                 )}
               </OThongBao>
               <div className="overflow-auto" style={{ ...NHAN_NHO, maxHeight: 120 }}>
@@ -354,6 +378,7 @@ export default function LichSuCaScreen() {
                   <div key={c.maCa} className="truncate">
                     <span style={SO}>{c.maCa}</span> · {c.tenCa || 'Ca chưa đặt tên'}
                     {c.daVao > 0 ? ` · ${c.daVao} em` : ''}
+                    {caConEmDangLam(c, now) ? <b style={{ color: 'var(--do)' }}> · ĐANG CHẠY</b> : ''}
                   </div>
                 ))}
               </div>

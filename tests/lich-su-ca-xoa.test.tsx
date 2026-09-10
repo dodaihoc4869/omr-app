@@ -83,6 +83,23 @@ describe('Ca thi — tích chọn xoá', () => {
     expect(xoaNhieuCa).toHaveBeenCalledWith('https://gia/exec', 'mat', ['222222'])
   })
 
+  // ĐỐI CHỨNG cho cảnh báo ĐANG CHẠY: ca đã đóng thì KHÔNG được doạ vô cớ.
+  // Cảnh báo hiện ở mọi ca thì chẳng còn là cảnh báo.
+  it('ca ĐÃ ĐÓNG: không có cảnh báo ĐANG CHẠY', async () => {
+    danhSachCa.mockResolvedValue([{ ...ca('111111', '12', 3), trangThai: 'dong' as const }])
+    const r = render(<LichSuCaScreen />)
+    await waitFor(() => expect(r.getByText('Ca 111111')).toBeTruthy())
+    fireEvent.click(r.getByLabelText('Chọn ca để xoá'))
+    fireEvent.click(r.getByText('Ca 111111'))
+    await act(async () => {
+      fireEvent.click(r.getByText('Xoá 1'))
+    })
+    expect(r.queryByText(/ca ĐANG CHẠY/)).toBeNull()
+    // Nhưng vẫn phải nói mất bao nhiêu bài làm và khôi phục được ở đâu.
+    expect(r.getByText(/bài làm của/)).toBeTruthy()
+    expect(r.getByText(/khôi phục lại được ở mục/)).toBeTruthy()
+  })
+
   // Thầy bỏ bước gõ "XOA": xoá ngay sau khi bấm, không gõ gì thêm. Hộp xác
   // nhận vẫn còn — nó liệt kê đúng ca nào và bao nhiêu bài làm sẽ mất.
   it('ca đã có em vào làm: xoá được ngay, KHÔNG bắt gõ chữ xác nhận', async () => {
@@ -93,8 +110,21 @@ describe('Ca thi — tích chọn xoá', () => {
     })
     expect((r.getByText('Xoá 1 ca') as HTMLButtonElement).disabled).toBe(false)
     expect(r.queryByLabelText('Gõ XOA để xác nhận xoá')).toBeNull()
-    // Hộp xác nhận vẫn phải nói rõ mất bao nhiêu bài làm.
-    expect(r.getByText(/xoá rồi không khôi phục được/)).toBeTruthy()
+    // CẬP NHẬT 10/09 — rà soát mục chọn ca thi.
+    //
+    // Ý ĐỊNH GIỮ NGUYÊN: hộp xác nhận phải nói rõ mất bao nhiêu bài làm. Chỉ bỏ
+    // một câu SAI SỰ THẬT. Bản cũ ghi "xoá rồi không khôi phục được" — sai:
+    // `xoaCa` trên máy chủ là XOÁ MỀM (`TrangThai='da_xoa'`, giữ nguyên
+    // LuotThi/ChiTietCau), có lệnh `khoiPhucCa`, và chính màn này có mục "Ca đã
+    // xoá" kèm nút Khôi phục. Câu sai đó vừa sai vừa dạy thầy đừng tin cảnh báo
+    // của app.
+    expect(r.getByText(/bài làm của/)).toBeTruthy()
+    expect(r.getByText(/khôi phục lại được ở mục/)).toBeTruthy()
+    expect(r.queryByText(/không khôi phục được/)).toBeNull()
+    // SIẾT THÊM: ca mẫu này đang mở (14:00 → 16:00, đồng hồ giả 15:00) nên phải
+    // có cảnh báo ĐANG CHẠY. Máy chủ coi ca đã xoá là ca KHOÁ, nên xoá một ca
+    // đang chạy là em đang làm dở không nộp được bài.
+    expect(r.getByText(/ca ĐANG CHẠY/)).toBeTruthy()
     await act(async () => {
       fireEvent.click(r.getByText('Xoá 1 ca'))
     })
