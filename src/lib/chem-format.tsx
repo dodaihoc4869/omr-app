@@ -254,6 +254,68 @@ function laCongThucCauTao(text: string, i: number): boolean {
   return /-[A-Za-zĐ[(]/.test(text.slice(dau, cuoi))
 }
 
+// ---------------------------------------------------------------------------
+// CẤU HÌNH ELECTRON — `1s22s22p3` phải ra `1s²2s²2p³` (thầy bắt được 10/09)
+//
+// Ảnh thầy chụp: câu "Cấu hình electron nguyên tử của nitrogen" hiện ra
+// `1s₂₂s₂₂p₁`. Hai chỗ sai cùng lúc, cái thứ hai nặng hơn nhiều:
+//
+//   1. SỐ ELECTRON LÀ SỐ MŨ, không phải chỉ số dưới. Chỉ số dưới là số nguyên
+//      tử trong công thức (H₂O). `1s₂` là một ký hiệu khác hẳn.
+//   2. DÃY SỐ BỊ GỘP SAI. Luật cũ vơ CẢ dãy số đứng sau chữ, nên `1s22s2` cắt
+//      thành `1s` + `22` + `s` + `2`: chữ số mở đầu lớp sau bị nuốt vào số
+//      electron của lớp trước. Hậu quả trên màn làm bài là bốn phương án
+//      `1s22s22p3` · `1s22s22p4` · `1s22p5` · `1s22s22p2` trông giống hệt nhau
+//      ở hai lớp đầu — em chọn bừa mà tưởng mình đọc kỹ.
+//
+// KHÔNG SỬA KHO ĐỀ, sửa ở tầng trình bày: mọi câu đã nằm trong kho và mọi
+// phiếu đã gửi phụ huynh tự đúng lại, không phải nạp lại đề nào.
+
+/** Cắt một dãy thành các cụm `<lớp><phân lớp><số electron>`.
+ *
+ * Trả `null` nếu dãy KHÔNG phải cấu hình electron — bên gọi rơi về luật cũ.
+ *
+ * Chỗ khó duy nhất là biết chữ số nào kết thúc cụm này và chữ số nào mở cụm
+ * sau. Luật: đang đọc số electron mà gặp một chữ số `1..7` có phân lớp
+ * (`s p d f`) đứng ngay sau thì đó là lớp mới, dừng cụm tại đây.
+ *
+ *   `1s22s22p3` → 1s² · 2s² · 2p³
+ *   `3d104s2`   → 3d¹⁰ · 4s²   (số `0` không mở được lớp nên `10` giữ nguyên)
+ *   `4f14`      → 4f¹⁴          (`4` cuối không có phân lớp theo sau)
+ */
+export function cumCauHinhElectron(day: string): { lop: string; soE: string }[] | null {
+  const s = String(day ?? '')
+  if (!s) return null
+  const ra: { lop: string; soE: string }[] = []
+  let i = 0
+  while (i < s.length) {
+    if (!/[1-7]/.test(s[i]) || !/[spdf]/.test(s[i + 1] ?? '')) return null
+    let j = i + 2
+    let soE = ''
+    while (j < s.length && /[0-9]/.test(s[j])) {
+      if (soE.length > 0 && /[1-7]/.test(s[j]) && /[spdf]/.test(s[j + 1] ?? '')) break
+      soE += s[j]
+      j++
+    }
+    if (!soE) return null
+    ra.push({ lop: s.slice(i, i + 2), soE })
+    i = j
+  }
+  return ra.length > 0 ? ra : null
+}
+
+/** Ký tự được phép nằm trong một dãy cấu hình electron. */
+const KY_TU_CAU_HINH = /[0-9spdf]/
+
+/** Ký tự đứng SÁT trước hoặc sau dãy mà làm dãy đó không còn là cấu hình.
+ *
+ * Nhờ hai chốt này mà `H2SO4`, `Fe2O3`, `Na2S2O3` không lọt (chữ đứng sau số
+ * đều là chữ HOA, mà phân lớp phải là chữ thường), và `Os`, `Np`, `Pd`, `Cf`
+ * cũng không (chữ thường của chúng đứng sau chữ HOA, không đứng sau chữ số). */
+function chanCauHinh(ch: string | undefined): boolean {
+  return !!ch && /[A-Za-zĐ0-9]/.test(ch)
+}
+
 export function parseChemText(raw: string): ChemPart[] {
   const text = chuanHoaCongThucTongQuat(raw).replace(/<=>/g, '⇌').replace(/->/g, '→').replace(/<-/g, '←')
   const parts: ChemPart[] = []
@@ -297,6 +359,25 @@ export function parseChemText(raw: string): ChemPart[] {
         parts.push({ t: 'sup', v: m[0] })
         i += 1 + m[0].length
         continue
+      }
+    }
+
+    // CẤU HÌNH ELECTRON — xét TRƯỚC luật chỉ số dưới tự động, vì luật kia sẽ
+    // vơ cả dãy số và cắt sai chỗ. Dãy phải đứng riêng: hai đầu không dính chữ
+    // hay số nào khác.
+    if (/[1-7]/.test(ch) && !chanCauHinh(text[i - 1])) {
+      let cuoi = i
+      while (cuoi < text.length && KY_TU_CAU_HINH.test(text[cuoi])) cuoi++
+      if (!chanCauHinh(text[cuoi])) {
+        const cum = cumCauHinhElectron(text.slice(i, cuoi))
+        if (cum) {
+          for (const c of cum) {
+            pushText(c.lop)
+            parts.push({ t: 'sup', v: c.soE })
+          }
+          i = cuoi
+          continue
+        }
       }
     }
 

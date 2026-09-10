@@ -2,7 +2,7 @@
 // Dùng Content-Type: text/plain cho POST để tránh trình duyệt gửi preflight
 // OPTIONS — Apps Script Web App không xử lý OPTIONS, preflight sẽ lỗi CORS
 // nếu dùng application/json.
-import type { PublicExamBank, TeacherExamSource } from '../data/examContent'
+import type { PublicExamBank, SoCauMoiPhan, TeacherExamSource } from '../data/examContent'
 import type { AnswerRecord, IntegrityLog } from './exam-db'
 import type { CauHoiCuaEm, GoiCauHoi } from './hoi-bai'
 import type { DiemMotCa } from './phieu-du-lieu'
@@ -16,6 +16,15 @@ export interface KeyBank {
   phanI: TeacherExamSource['phanI']
   phanII: TeacherExamSource['phanII']
   phanIII: TeacherExamSource['phanIII']
+  /** SỐ CÂU MỖI PHẦN của ca — mẫu số, KHÁC cỡ kho ở trên.
+   *
+   * Ca đề riêng rút 8/2/2 từ kho 26/9/9: `phanI.length` là 26, `soCau.I` là 8.
+   * Lấy nhầm con số là chấm sai cả lô (ghi chú dài ở `ghiDiem`).
+   *
+   * Trường này VẪN LUÔN CÓ trong gói máy chủ trả về; kiểu cũ bỏ sót nên chỗ gọi
+   * phải ép kiểu `(kb as { soCau?: … })` — ép kiểu thì trình biên dịch hết cửa
+   * nhắc, và đó là cách một con số quan trọng lặng lẽ bị bỏ quên. */
+  soCau?: SoCauMoiPhan
 }
 
 export interface SessionConfig {

@@ -192,14 +192,39 @@ describe('máy khách khai mẫu số ở MỌI chỗ ghi điểm', () => {
     expect((nguon[2].match(/soCauEmDaChia,/g) || []).length).toBe(2)
   })
 
+  // VIẾT LẠI 10/09 TỐI — Ý ĐỊNH GIỮ NGUYÊN, chỉ đổi chỗ neo.
+  //
+  // Bản cũ neo vào NGUYÊN VĂN hai dòng mã, và cả hai dòng ấy đều đã đổi vì lý do
+  // chính đáng:
+  //   · `gradeFromKeyBank` nay nhận thêm BỘ CÂU CỦA EM. Thiếu tham số đó thì máy
+  //     em rút lại bộ câu bằng hạt giống và chấm em theo đề em chưa từng thấy —
+  //     ca 234641 tối 10/09, điểm 5,69 bị ghi thành 2,56.
+  //   · `(kb as { soCau?… })` bỏ đi vì kiểu `KeyBank` nay khai `soCau` đàng
+  //     hoàng. Chính chỗ ép kiểu đó đã che mất việc kiểu cũ bỏ sót trường này.
+  //
+  // Neo vào nguyên văn là thứ khiến phép kiểm đỏ khi mã được sửa ĐÚNG. Nay neo
+  // vào điều thật sự cần giữ: khai mẫu số LẤY TỪ CHÍNH `kb` đã đem đi chấm, và
+  // đọc nó SAU khi chấm — chứ không phải một con số dựng ở chỗ khác.
   it('máy em khai ĐÚNG con số nó đã chia, không khai con số nó mong là đúng', () => {
     const man = fs.readFileSync(path.join(process.cwd(), 'src/screens/ExamTakeScreen.tsx'), 'utf8')
-    // Lấy từ CHÍNH `kb` đã đưa vào `gradeFromKeyBank`, không lấy nguồn khác.
-    expect(man).toContain('const soCauEmDaChia = (kb as { soCau?: { I: number; II: number; III: number } }).soCau ?? undefined')
-    const viCham = man.indexOf('const g = gradeFromKeyBank(kb, done.maCa, done.sbd, done.answers)')
+    expect(man).toMatch(/const soCauEmDaChia = kb\.soCau \?\? undefined/)
+    const viCham = man.indexOf('const g = gradeFromKeyBank(kb, done.maCa, done.sbd, done.answers,')
     const viKhai = man.indexOf('const soCauEmDaChia =')
     expect(viCham).toBeGreaterThan(0)
     expect(viKhai).toBeGreaterThan(viCham)
+  })
+
+  // CHỐT MỚI CỦA CHÍNH LẦN HỎNG NÀY: máy em KHÔNG được để `gradeFromKeyBank` tự
+  // rút lại bộ câu. Cả hai chỗ chấm ở máy em đều phải đưa bộ câu vào.
+  it('máy em LUÔN đưa bộ câu của em vào khi chấm — không để hàm tự rút lại', () => {
+    const man = fs.readFileSync(path.join(process.cwd(), 'src/screens/ExamTakeScreen.tsx'), 'utf8')
+    const goi = man.match(/gradeFromKeyBank\([^)]*\)/g) ?? []
+    expect(goi.length).toBeGreaterThan(0)
+    for (const g of goi) {
+      // Bốn tham số = bank, maCa, sbd, bài làm. Phải có tham số thứ NĂM.
+      expect(g.split(',').length).toBeGreaterThanOrEqual(5)
+    }
+    expect(man).toContain("import { boCauTuBaiLam } from '../lib/bo-cau-tu-bai-lam'")
   })
 
   it('màn Ca thi khai theo CHÍNH bank đã gộp, không theo soCauCa thô', () => {

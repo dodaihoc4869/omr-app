@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { choBaoLau, gianNopTuDong } from '../lib/nhip-gui-lai'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
+import { boCauTuBaiLam } from '../lib/bo-cau-tu-bai-lam'
 import { taoLinkPhieu } from '../lib/phieu-link'
 import { cauKhacPhuc, ghiPhieuKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, trangThaiPhongCho, vaoThi, phieuCuaEm as layBaiDaNop, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, chuKyLechPhaMs, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
 import { goiCauHoi } from '../lib/hoi-bai'
@@ -480,13 +481,32 @@ export default function ExamTakeScreen() {
     return out
   }, [assignment])
 
+  // BỘ CÂU THẬT SỰ CỦA EM — một nguồn cho cả chấm điểm lẫn màn xem lại.
+  //
+  // Ưu tiên `assignment`: đó chính là bộ câu màn làm bài vừa bày ra, không có
+  // gì thật hơn thế. Mở lại app sau khi nộp thì `assignment` không còn (bank
+  // công khai đã xoá), lúc ấy dựng lại từ bài làm.
+  //
+  // TUYỆT ĐỐI KHÔNG để rơi về `assignStudentQuestions(keyBank, …)` như bản cũ:
+  // `keyBank` máy chủ trả về là CẢ KHO của ca kèm `soCau`, KHÔNG kèm `boTheoEm`,
+  // nên nó rút lại một bộ 8 câu khác hẳn bộ em đã làm (thầy bắt được 10/09 tối,
+  // ca 234641 — điểm 5,69 thành 2,56, và màn xem lại bày ra toàn câu lạ).
+  const boCauCuaEm: string[] | null = useMemo(() => {
+    if (assignment) {
+      return [...assignment.phanI, ...assignment.phanII, ...assignment.phanIII].map((x) => x.qid)
+    }
+    if (!keyBank || !attempt) return null
+    return boCauTuBaiLam(keyBank, attempt.maCa, attempt.sbd, attempt.answers, attempt.giayCau, keyBank.soCau)
+  }, [assignment, keyBank, attempt])
+
   // Bộ câu ĐẦY ĐỦ (kèm đáp án đúng + lời giải) dùng riêng cho màn "Xem lại
-  // lời giải" — assignStudentQuestions tái tạo LẠI ĐÚNG cùng bộ câu vì cùng
-  // seed (maCa+sbd), chỉ khác nguồn có đáp án (keyBank) thay vì bank công khai.
+  // lời giải" — cùng bộ qid với bài em đã làm, chỉ khác nguồn có đáp án
+  // (keyBank) thay vì bank công khai.
   const solutionAssignment: StudentAssignment | null = useMemo(() => {
     if (!keyBank || !attempt) return null
-    return assignStudentQuestions(keyBank, attempt.maCa, attempt.sbd)
-  }, [keyBank, attempt])
+    const kho = boCauCuaEm && boCauCuaEm.length > 0 ? { ...keyBank, boTheoEm: { [attempt.sbd]: boCauCuaEm } } : keyBank
+    return assignStudentQuestions(kho, attempt.maCa, attempt.sbd)
+  }, [keyBank, attempt, boCauCuaEm])
 
   // SỐ CÂU BA PHẦN — biểu điểm phải tính từ đây, không in cứng 0,25.
   const soCauBaPhan = (a: StudentAssignment | null): SoCauBaPhan =>
@@ -864,7 +884,12 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       setKeyBank(b.bank)
       setChoCaLop(null)
       try {
-        setGraded(gradeFromKeyBank(b.bank, ma, sb, b.luot.dapAn ?? { phanI: {}, phanII: {}, phanIII: {} }))
+        // Mở lại app sau khi nộp: KHÔNG còn `assignment` để đối chiếu, nên dựng
+        // bộ câu từ chính bài đã nộp. Thiếu tham số này là chấm theo bộ câu rút
+        // lại bằng hạt giống — sai hẳn với ca đề riêng.
+        const daNop = b.luot.dapAn ?? { phanI: {}, phanII: {}, phanIII: {} }
+        const boEm = boCauTuBaiLam(b.bank, ma, sb, daNop, b.luot.giayCau, b.bank.soCau)
+        setGraded(gradeFromKeyBank(b.bank, ma, sb, daNop, boEm))
       } catch {
         // Đề đổi sau khi em thi thì không chấm lại được — vẫn hiện màn đã nộp,
         // chỉ thiếu điểm, chứ không ném em vào màn lỗi.
@@ -1749,14 +1774,19 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     setKeyBank(kb)
     setChoCaLop(null)
     try {
-      const g = gradeFromKeyBank(kb, done.maCa, done.sbd, done.answers)
+      // BỘ CÂU CỦA EM đi kèm, KHÔNG để hàm tự rút lại. `kb` là cả kho của ca
+      // (26/9/9) kèm `soCau` 8/2/2 nhưng KHÔNG kèm `boTheoEm`, nên thiếu tham
+      // số này là chấm em theo 8 câu em chưa từng thấy — đúng chỗ làm điểm
+      // popup của ca 234641 ra 2,56 trong khi bài được 5,69.
+      const boEm = boCauCuaEm ?? boCauTuBaiLam(kb, done.maCa, done.sbd, done.answers, done.giayCau, kb.soCau)
+      const g = gradeFromKeyBank(kb, done.maCa, done.sbd, done.answers, boEm)
       setGraded(g)
       if (!done.integrity.blocked) setGradedPopup(true)
       // MẪU SỐ máy em vừa chia. `gradeFromKeyBank` cắt đề theo `kb.soCau`, thiếu
       // thì rơi về mặc định 18/4/6 — đúng chỗ đã làm điểm ca 447479 lệch (xem
       // ghi chú dài ở `ghiDiem`). Khai đúng con số ĐÃ DÙNG, không khai con số
       // mình mong là đúng: máy chủ đối chiếu rồi mới cho ghi.
-      const soCauEmDaChia = (kb as { soCau?: { I: number; II: number; III: number } }).soCau ?? undefined
+      const soCauEmDaChia = kb.soCau ?? undefined
       if (scriptUrlRef.current.trim()) {
         // Ghi điểm + chi tiết từng câu (chuyên đề, mức độ, giây làm) lên máy chủ
         // — quyền bằng id thiết bị của chính lượt này, không cần mã bí mật.

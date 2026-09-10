@@ -38,13 +38,37 @@ type KeyBankLike = {
   boTheoEm?: Record<string, string[]>
 }
 
+/** BỘ CÂU CỦA EM — nguồn sự thật cho cả chấm điểm lẫn màn xem lại.
+ *
+ * Trả về danh sách qid ĐÃ PHÁT cho em. Thiếu (bên gọi không có) thì
+ * `gradeFromKeyBank` rơi về `keyBank.boTheoEm`, cuối cùng mới tới luật hash cũ. */
+export type BoCauCuaEm = string[] | null | undefined
+
 /** Lõi chấm điểm — nhận thẳng bank đã gộp CÓ đáp án (dùng cho cả 2 nơi: máy
  * thầy chấm lại từ TeacherExamSource[], và máy học sinh chấm ngay từ keyBank
- * server trả về sau khi nộp). */
-export function gradeFromKeyBank(bank: KeyBankLike, maCa: string, sbd: string, submitted: AnswerRecord): GradedSubmission {
+ * server trả về sau khi nộp).
+ *
+ * `boCuaEm` LÀ THAM SỐ QUAN TRỌNG NHẤT, dù nó không bắt buộc (thầy bắt được
+ * 10/09 tối, ca 234641).
+ *
+ * Không truyền nó thì hàm này rơi về `assignStudentQuestions`, tức RÚT LẠI bộ
+ * câu bằng `hash(mãCa + SBD)` trên kho hiện tại. Với ca đề riêng — rút 8 câu từ
+ * kho 26 câu — bộ rút lại KHÁC HẲN bộ em đã làm, nên máy chấm em theo những câu
+ * em chưa từng thấy. Điểm ra thấp mà vẫn trông như điểm thật:
+ *
+ *     Trần Minh Đăng  đúng 5,69  ·  máy em tự chấm ra 2,56
+ *     Lưu Ngọc Tuân   đúng 7,56  ·  máy em tự chấm ra 1,88
+ *
+ * `keyBank` máy chủ trả về sau khi nộp KHÔNG kèm `boTheoEm`, nên máy em không
+ * có đường nào tự biết — bên gọi phải đưa vào. Xem `boCauTuBaiLam`. */
+export function gradeFromKeyBank(bank: KeyBankLike, maCa: string, sbd: string, submitted: AnswerRecord, boCuaEm?: BoCauCuaEm): GradedSubmission {
   // assignStudentQuestions chỉ cần {id, text, choices/ideas} — TeacherExamSource là
   // superset đúng shape đó nên dùng thẳng được, không cần tách riêng phiên bản Public.
-  const assignment = assignStudentQuestions(bank, maCa, sbd)
+  const assignment = assignStudentQuestions(
+    boCuaEm && boCuaEm.length > 0 ? { ...bank, boTheoEm: { ...(bank.boTheoEm ?? {}), [sbd]: boCuaEm } } : bank,
+    maCa,
+    sbd,
+  )
 
   const key: AnswerKey = {
     madeThi: maCa,
