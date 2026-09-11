@@ -381,8 +381,53 @@ export function chuanHoaIonQuenThuoc(raw: string): string {
   return s.replace(RE_ION_QUEN_THUOC, (m) => ION_QUEN_THUOC[m] ?? m)
 }
 
+// ---------------------------------------------------------------------------
+// KÍ HIỆU ĐỒNG VỊ BỊ XEN KẼ — thầy chụp 11/09
+//
+// Kho ghi `¹₇⁴A`, `²₁⁴₂Mg`, `₁²₂⁵X`: chữ số của SỐ KHỐI và của SỐ HIỆU nằm xen
+// kẽ nhau từng chữ một, vì bộ đọc MathType đọc ô công thức xếp chồng theo CỘT
+// chứ không theo hàng. Bản viết đúng là `¹⁴₇A`, `²⁴₁₂Mg`, `²⁵₁₂X`.
+//
+// Gom lại được CHẮC CHẮN, không phải đoán: mọi chữ số ở trên ghép theo thứ tự
+// thành số khối, mọi chữ số ở dưới ghép thành số hiệu. Đã đối chiếu 15/15 ca
+// thật trong kho với bản sạch của cùng câu, gồm `₂⁶₉³Cu` → `⁶³₂₉Cu` (Cu-63,
+// Z = 29 — đúng bảng tuần hoàn).
+//
+// CHỐT CHẶN để không đụng ký hiệu viết đúng:
+//   · dãy phải dài từ 3 chữ số, và
+//   · phải ĐỔI trên↔dưới từ 2 lần trở lên (viết đúng thì nhiều nhất MỘT lần:
+//     hết số khối mới tới số hiệu), và
+//   · ngay sau dãy phải là chữ cái — tức ký hiệu nguyên tố.
+const SO_MU_TREN = '⁰¹²³⁴⁵⁶⁷⁸⁹'
+const CHI_SO_DUOI = '₀₁₂₃₄₅₆₇₈₉'
+const RE_DAY_TREN_DUOI = new RegExp(`[${SO_MU_TREN}${CHI_SO_DUOI}]{3,}(?=[A-Za-z])`, 'g')
+
+export function gomKyHieuDongViBiXen(raw: string): string {
+  const s = String(raw ?? '')
+  return s.replace(RE_DAY_TREN_DUOI, (day) => {
+    let soLanDoi = 0
+    for (let i = 1; i < day.length; i++) {
+      if (SO_MU_TREN.includes(day[i - 1]) !== SO_MU_TREN.includes(day[i])) soLanDoi++
+    }
+    if (soLanDoi < 2) return day
+    const tren = [...day].filter((c) => SO_MU_TREN.includes(c)).join('')
+    const duoi = [...day].filter((c) => CHI_SO_DUOI.includes(c)).join('')
+    return tren && duoi ? tren + duoi : day
+  })
+}
+
+// CHỮ NỐI BỊ DÍNH VÀO KÍ HIỆU — cùng tệp hỏng ấy: `¹₁Hvà⁴₂He` (bản sạch là
+// `¹₁H và ⁴₂He`). Bảng ĐÓNG ba chữ nối, và bắt buộc ngay sau phải là chữ số
+// trên/dưới — câu văn tiếng Việt bình thường không bao giờ có dạng đó, nên
+// không có đường nào chèn nhầm dấu cách vào giữa chữ của thầy.
+const RE_CHU_NOI_DINH = new RegExp(`([A-Za-z])(và|hoặc|hay)(?=[${SO_MU_TREN}${CHI_SO_DUOI}])`, 'g')
+
+export function taRaChuNoiBiDinh(raw: string): string {
+  return String(raw ?? '').replace(RE_CHU_NOI_DINH, '$1 $2 ')
+}
+
 export function parseChemText(raw: string): ChemPart[] {
-  const text = chuanHoaCongThucTongQuat(chuanHoaIonQuenThuoc(raw)).replace(/<=>/g, '⇌').replace(/->/g, '→').replace(/<-/g, '←')
+  const text = chuanHoaCongThucTongQuat(chuanHoaIonQuenThuoc(taRaChuNoiBiDinh(gomKyHieuDongViBiXen(raw)))).replace(/<=>/g, '⇌').replace(/->/g, '→').replace(/<-/g, '←')
   const parts: ChemPart[] = []
   const pushText = (ch: string) => {
     const last = parts[parts.length - 1]
