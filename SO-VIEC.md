@@ -445,3 +445,27 @@ Kho đề trên R2 KHÔNG đụng.
 **Không lỗi nào lộ ra khi đọc mã hay nhìn màn hình.** Cả bốn chỉ lộ khi đếm ở
 chỗ dữ liệu của người dùng đọng lại. Đó là lý do việc đầu tiên của đợt bỏ Apps
 Script là dựng CÁI THƯỚC, không phải chuyển lệnh.
+
+## 12/09 rạng sáng — GỠ SẠCH GOOGLE
+- [x] "không ghi điểm vào google sheet nữa" | bằng chứng: go theoGhiSheet + xoa ghi-sheet-nen.ts; test mo-ca-khong-doi-sheet 7/7
+- [x] "loại bỏ toàn bộ google ra khỏi app..." | bằng chứng: cong /goi + bang dich 61 lenh; test cat-google-1209 6/6
+- [x] "gỡ sạch google..." | bằng chứng: grep fetch script.google.com = 0; 3339 test xanh; cho thay bam phat hanh
+- [x] check:mau xanh | bằng chứng: dungPhieuBtvn dung lai html-phieu.ts; "Khong co ma mau # nao ngoai tokens.css"
+- [x] "google sheet có phải nguyên nhân vào phòng chờ và nộp bài bị chậm không" | bằng chứng: đo trong phiên: Apps Script 1,5-2,9s phí cố định; trangThaiPhongCho đỉnh 10.185ms; Worker /khoe 64ms
+- [x] "vào chi tiết ca thi cũng bị chậm phải không" | bằng chứng: chiTietCa qua Apps Script p50 5,1s
+
+## Đợt 12/09 (tiếp) — việc phát sinh từ lời thầy giữa chừng
+- [x] "chỗ chọn btvn cho chọn theo cây thư mục chuẩn theo kho đề. Cho tick nhiều" | bằng chứng: CayChonDe.tsx + cay-kho-de.ts; 13+6 test xanh
+- [x] "trong màn thi rút câu sai thì không gán nhãn câu đã sai trước đó" | bằng chứng: TheCau.tsx chỉ hiện dải khi xemLai; test danh-dau-cau-hoi-lai
+- [x] "vào chi tiết ca vẫn hiện lấy dữ liệu từ google sheet" | bằng chứng: đổi chuỗi ở LichSuCaScreen + ExamMonitorScreen
+- [x] "rút câu sai cấu hình 8/2/2 chỉ hiện một nửa" | bằng chứng: D1 cau_hoi = 0 dòng / de_kho 118 đề; sửa qidCuaCau + route /kho/chi-muc
+- [x] "Máy chủ chưa gửi đề của ca này" | bằng chứng: phieuCuaEm thiếu `bank` + 17 trường; viết lại đủ
+
+## Còn dở sau đợt 12/09
+- [ ] Thầy bấm CHUYEN-SANG-MAY-CHU-MOI.command để phát hành bản 86e6220
+- [ ] Thầy bấm "Lập lại chỉ mục câu của kho" rồi thử lại rút đề 8/2/2
+- [ ] Sau phát hành: đo lại tra SBD / phòng chờ / chi tiết ca trên máy thật
+- [ ] Xoá máy chủ Apps Script (kho đề đã chuyển xong 118/118)
+- [ ] Đổi MA_BI_MAT (đã lộ trong ảnh chụp 10/09) rồi cập nhật Secret Cloudflare
+- [x] Nút "Đồng bộ ngược" đã gỡ; bảng đối chiếu đổi thành bảng ĐẾM một bên | bằng chứng: xoá dong-bo-nguoc.ts, test cai-thuoc-doi-chieu 13 xanh
+- [ ] `nopKhacPhucTheoCa` trả `qidSai` rỗng — chưa lưu danh sách câu sai của lượt nộp khắc phục
