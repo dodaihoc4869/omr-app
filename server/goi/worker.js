@@ -384,6 +384,38 @@ async function O(e, t, n) {
 	});
 }
 async function k(e, t) {
+	if (!t) return s({
+		ok: !1,
+		error: "Thiếu mã ca"
+	});
+	let n = ((await e.DB.prepare("SELECT * FROM luot WHERE ma_ca = ? ORDER BY sbd, lan_thu").bind(t).all()).results ?? []).map((e) => ({
+		sbd: String(e.sbd ?? ""),
+		hoTen: "",
+		lanThu: Number(e.lan_thu) || 1,
+		trangThai: String(e.trang_thai ?? ""),
+		vaoLuc: String(e.vao_luc ?? ""),
+		hetGioLuc: String(e.het_gio_luc ?? ""),
+		nopLuc: String(e.nop_luc ?? ""),
+		soLanRoiMan: Number(e.so_lan_roi_man) || 0,
+		tongGiayRoiMan: Number(e.tong_giay_roi_man) || 0,
+		diemI: null,
+		diemII: null,
+		diemIII: null,
+		tong: null,
+		duyetBoi: "",
+		duyetLuc: "",
+		ghiChu: "",
+		dapAn: null,
+		integrity: null,
+		giayCau: null
+	}));
+	return s({
+		ok: !0,
+		ds: n,
+		dem: n.length
+	});
+}
+async function A(e, t) {
 	let n = await e.DB.prepare("SELECT * FROM trang_thai WHERE ma_ca = ? ORDER BY sbd").bind(t).all();
 	return s({
 		ok: !0,
@@ -391,7 +423,7 @@ async function k(e, t) {
 		dem: n.results.length
 	});
 }
-async function A(e, t) {
+async function j(e, t) {
 	let n = await e.DB.prepare("SELECT * FROM phong_cho WHERE ma_ca = ? ORDER BY ghi_luc").bind(t).all();
 	return s({
 		ok: !0,
@@ -399,7 +431,7 @@ async function A(e, t) {
 		dem: n.results.length
 	});
 }
-async function j(e, t) {
+async function M(e, t) {
 	let n = await e.DB.prepare("SELECT * FROM luot WHERE ma_ca = ? AND da_day_sheet = 0 ORDER BY sbd").bind(t).all();
 	return s({
 		ok: !0,
@@ -407,7 +439,7 @@ async function j(e, t) {
 		con: n.results.length
 	});
 }
-async function M(e, t) {
+async function N(e, t) {
 	let n = Array.isArray(t.khoa) ? t.khoa : [];
 	if (n.length === 0) return s({
 		ok: !0,
@@ -423,17 +455,17 @@ async function M(e, t) {
 		danhDau: (await e.DB.prepare(`UPDATE luot SET da_day_sheet = 1 WHERE khoa IN (${r})`).bind(...n).run()).meta.changes
 	});
 }
-async function N(t) {
+async function P(t) {
 	let n = Date.now();
 	await t.DB.prepare("INSERT INTO ca (ma_ca, ten_ca, trang_thai, bat_dau, het_han_vao, thoi_gian_phut, loai,\n                     han_nop, cong_bo, nguong_lan, nguong_giay, cap_nhat_luc)\n     VALUES (?, 'Ca đo tải (không phải ca thật)', 'mo', ?, ?, 45, 'thi', '', 'khong', 3, 10, ?)\n     ON CONFLICT(ma_ca) DO UPDATE SET trang_thai='mo', bat_dau=excluded.bat_dau,\n       het_han_vao=excluded.het_han_vao, cap_nhat_luc=excluded.cap_nhat_luc").bind(e, (/* @__PURE__ */ new Date(n - 36e5)).toISOString(), new Date(n + 864e5).toISOString(), new Date(n).toISOString()).run();
 }
-async function P(t) {
+async function F(t) {
 	return s({
 		ok: !0,
 		xoa: (await t.DB.prepare("DELETE FROM luot WHERE ma_ca = ?").bind(e).run()).meta.changes
 	});
 }
-var F = { async fetch(e, t) {
+var I = { async fetch(e, t) {
 	let n = new URL(e.url), r = n.pathname;
 	if (e.method === "OPTIONS") return new Response(null, {
 		status: 204,
@@ -448,11 +480,11 @@ var F = { async fetch(e, t) {
 		coMat: !!t.MA_BI_MAT
 	});
 	if (e.method === "GET" && r.startsWith("/de/")) return y(t, decodeURIComponent(r.slice(4)));
-	if (e.method === "GET" && r === "/do-tai") return await N(t), new Response("<!doctype html>\n<html lang=\"vi\"><head><meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>Đo tải máy chủ mới</title>\n<style>\n:root{--nen:#faf9f7;--muc:#1c1a17;--mo:#6b6560;--vien:#e3ded7;--xanh:#1a7f5a;--do:#b3261e;--vang:#9a6b00}\n*{box-sizing:border-box}\nbody{margin:0;padding:24px 16px;background:var(--nen);color:var(--muc);\n  font:15px/1.55 -apple-system,BlinkMacSystemFont,\"Segoe UI\",system-ui,sans-serif}\nmain{max-width:880px;margin:0 auto}\nh1{font-size:22px;margin:0 0 4px}\np.mo{color:var(--mo);margin:0 0 20px;font-size:14px}\n.hop{background:#fff;border:1px solid var(--vien);border-radius:10px;padding:16px;margin-bottom:16px}\nbutton{font:inherit;font-weight:600;padding:10px 18px;border-radius:8px;border:1px solid var(--muc);\n  background:var(--muc);color:#fff;cursor:pointer}\nbutton.phu{background:#fff;color:var(--muc)}\nbutton:disabled{opacity:.45;cursor:not-allowed}\ntable{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}\nth,td{text-align:right;padding:7px 8px;border-bottom:1px solid var(--vien)}\nth:first-child,td:first-child{text-align:left}\nth{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--mo);font-weight:600}\n.dat{color:var(--xanh);font-weight:600}.truot{color:var(--do);font-weight:600}\n#nhatky{font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;\n  color:var(--mo);max-height:220px;overflow:auto;margin:0}\n.cuon{overflow-x:auto}\n</style></head><body><main>\n<h1>Đo tải máy chủ mới</h1>\n<p class=\"mo\">Mỗi “em ảo” chạy đủ ba bước thật: vào thi → lưu tạm → nộp. Dữ liệu ghi vào ca <code>DOTAI</code>, không đụng ca thật.</p>\n\n<div class=\"hop\">\n  <button id=\"chay\">Đo 10 · 20 · 30 · 50 lượt đồng thời</button>\n  <button id=\"don\" class=\"phu\">Dọn dữ liệu đo</button>\n</div>\n\n<div class=\"hop cuon\">\n  <table id=\"bang\"><thead><tr>\n    <th>Đồng thời</th><th>Lệnh</th><th>p50 ms</th><th>p95 ms</th><th>Cao nhất</th><th>Lỗi</th>\n  </tr></thead><tbody><tr><td colspan=\"6\" style=\"text-align:center;color:var(--mo)\">chưa đo</td></tr></tbody></table>\n</div>\n\n<div class=\"hop\"><pre id=\"nhatky\">sẵn sàng.</pre></div>\n</main>\n<script>\nconst $ = (s) => document.querySelector(s)\nconst ghi = (t) => { $('#nhatky').textContent += '\\n' + t; $('#nhatky').scrollTop = 1e9 }\nconst phanVi = (a, p) => { if (!a.length) return 0; const b=[...a].sort((x,y)=>x-y); return Math.round(b[Math.min(b.length-1, Math.floor(b.length*p))]) }\n\nasync function goi(duong, than) {\n  const t0 = performance.now()\n  try {\n    const r = await fetch(duong, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(than) })\n    const j = await r.json()\n    return { ms: performance.now() - t0, ok: r.ok && j.ok !== false, j }\n  } catch (e) { return { ms: performance.now() - t0, ok:false, loi:String(e) } }\n}\n\nasync function motEm(i) {\n  const sbd = 'DOTAI' + String(i).padStart(4,'0')\n  const a = await goi('/vao-thi', { maCa:'DOTAI', sbd, idThietBi:'do-tai-'+i })\n  const b = await goi('/luu-tam', { maCa:'DOTAI', sbd, dapAn:{ c1:'A', c2:'B', c3:'C' } })\n  const c = await goi('/nop',     { maCa:'DOTAI', sbd, dapAn:{ c1:'A', c2:'B', c3:'C' }, integrity:{ leaveCount:0, totalHiddenMs:0 } })\n  return { a, b, c }\n}\n\nasync function mucDo(n) {\n  await fetch('/do-tai/don', { method:'POST' })\n  const t0 = performance.now()\n  const kq = await Promise.all(Array.from({length:n}, (_,i) => motEm(i+1)))\n  const tong = Math.round(performance.now() - t0)\n  const hang = []\n  for (const [ten, khoa] of [['vào thi','a'],['lưu tạm','b'],['nộp','c']]) {\n    const ds = kq.map(k => k[khoa])\n    const ms = ds.map(x => x.ms)\n    hang.push({ n, ten, p50:phanVi(ms,.5), p95:phanVi(ms,.95), max:Math.round(Math.max(...ms)), loi:ds.filter(x=>!x.ok).length })\n  }\n  ghi(n + ' lượt đồng thời — xong cả ba bước trong ' + tong + ' ms')\n  const hong = kq.flatMap(k => [k.a,k.b,k.c]).filter(x => !x.ok)\n  if (hong.length) ghi('  lỗi mẫu: ' + JSON.stringify(hong[0].loi ?? hong[0].j))\n  return hang\n}\n\n$('#chay').onclick = async () => {\n  $('#chay').disabled = $('#don').disabled = true\n  $('#nhatky').textContent = 'bắt đầu đo…'\n  const tbody = $('#bang tbody'); tbody.innerHTML = ''\n  for (const n of [10,20,30,50]) {\n    for (const h of await mucDo(n)) {\n      const tr = document.createElement('tr')\n      tr.innerHTML = '<td>' + h.n + '</td><td>' + h.ten + '</td><td>' + h.p50 + '</td><td>' + h.p95 +\n        '</td><td>' + h.max + '</td><td class=\"' + (h.loi ? 'truot':'dat') + '\">' + h.loi + '</td>'\n      tbody.appendChild(tr)\n    }\n  }\n  ghi('đo xong.')\n  $('#chay').disabled = $('#don').disabled = false\n}\n\n$('#don').onclick = async () => {\n  const r = await (await fetch('/do-tai/don', { method:'POST' })).json()\n  ghi('đã dọn ' + (r.xoa ?? 0) + ' dòng của ca DOTAI.')\n}\n<\/script></body></html>", { headers: {
+	if (e.method === "GET" && r === "/do-tai") return await P(t), new Response("<!doctype html>\n<html lang=\"vi\"><head><meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>Đo tải máy chủ mới</title>\n<style>\n:root{--nen:#faf9f7;--muc:#1c1a17;--mo:#6b6560;--vien:#e3ded7;--xanh:#1a7f5a;--do:#b3261e;--vang:#9a6b00}\n*{box-sizing:border-box}\nbody{margin:0;padding:24px 16px;background:var(--nen);color:var(--muc);\n  font:15px/1.55 -apple-system,BlinkMacSystemFont,\"Segoe UI\",system-ui,sans-serif}\nmain{max-width:880px;margin:0 auto}\nh1{font-size:22px;margin:0 0 4px}\np.mo{color:var(--mo);margin:0 0 20px;font-size:14px}\n.hop{background:#fff;border:1px solid var(--vien);border-radius:10px;padding:16px;margin-bottom:16px}\nbutton{font:inherit;font-weight:600;padding:10px 18px;border-radius:8px;border:1px solid var(--muc);\n  background:var(--muc);color:#fff;cursor:pointer}\nbutton.phu{background:#fff;color:var(--muc)}\nbutton:disabled{opacity:.45;cursor:not-allowed}\ntable{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}\nth,td{text-align:right;padding:7px 8px;border-bottom:1px solid var(--vien)}\nth:first-child,td:first-child{text-align:left}\nth{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--mo);font-weight:600}\n.dat{color:var(--xanh);font-weight:600}.truot{color:var(--do);font-weight:600}\n#nhatky{font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;\n  color:var(--mo);max-height:220px;overflow:auto;margin:0}\n.cuon{overflow-x:auto}\n</style></head><body><main>\n<h1>Đo tải máy chủ mới</h1>\n<p class=\"mo\">Mỗi “em ảo” chạy đủ ba bước thật: vào thi → lưu tạm → nộp. Dữ liệu ghi vào ca <code>DOTAI</code>, không đụng ca thật.</p>\n\n<div class=\"hop\">\n  <button id=\"chay\">Đo 10 · 20 · 30 · 50 lượt đồng thời</button>\n  <button id=\"don\" class=\"phu\">Dọn dữ liệu đo</button>\n</div>\n\n<div class=\"hop cuon\">\n  <table id=\"bang\"><thead><tr>\n    <th>Đồng thời</th><th>Lệnh</th><th>p50 ms</th><th>p95 ms</th><th>Cao nhất</th><th>Lỗi</th>\n  </tr></thead><tbody><tr><td colspan=\"6\" style=\"text-align:center;color:var(--mo)\">chưa đo</td></tr></tbody></table>\n</div>\n\n<div class=\"hop\"><pre id=\"nhatky\">sẵn sàng.</pre></div>\n</main>\n<script>\nconst $ = (s) => document.querySelector(s)\nconst ghi = (t) => { $('#nhatky').textContent += '\\n' + t; $('#nhatky').scrollTop = 1e9 }\nconst phanVi = (a, p) => { if (!a.length) return 0; const b=[...a].sort((x,y)=>x-y); return Math.round(b[Math.min(b.length-1, Math.floor(b.length*p))]) }\n\nasync function goi(duong, than) {\n  const t0 = performance.now()\n  try {\n    const r = await fetch(duong, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(than) })\n    const j = await r.json()\n    return { ms: performance.now() - t0, ok: r.ok && j.ok !== false, j }\n  } catch (e) { return { ms: performance.now() - t0, ok:false, loi:String(e) } }\n}\n\nasync function motEm(i) {\n  const sbd = 'DOTAI' + String(i).padStart(4,'0')\n  const a = await goi('/vao-thi', { maCa:'DOTAI', sbd, idThietBi:'do-tai-'+i })\n  const b = await goi('/luu-tam', { maCa:'DOTAI', sbd, dapAn:{ c1:'A', c2:'B', c3:'C' } })\n  const c = await goi('/nop',     { maCa:'DOTAI', sbd, dapAn:{ c1:'A', c2:'B', c3:'C' }, integrity:{ leaveCount:0, totalHiddenMs:0 } })\n  return { a, b, c }\n}\n\nasync function mucDo(n) {\n  await fetch('/do-tai/don', { method:'POST' })\n  const t0 = performance.now()\n  const kq = await Promise.all(Array.from({length:n}, (_,i) => motEm(i+1)))\n  const tong = Math.round(performance.now() - t0)\n  const hang = []\n  for (const [ten, khoa] of [['vào thi','a'],['lưu tạm','b'],['nộp','c']]) {\n    const ds = kq.map(k => k[khoa])\n    const ms = ds.map(x => x.ms)\n    hang.push({ n, ten, p50:phanVi(ms,.5), p95:phanVi(ms,.95), max:Math.round(Math.max(...ms)), loi:ds.filter(x=>!x.ok).length })\n  }\n  ghi(n + ' lượt đồng thời — xong cả ba bước trong ' + tong + ' ms')\n  const hong = kq.flatMap(k => [k.a,k.b,k.c]).filter(x => !x.ok)\n  if (hong.length) ghi('  lỗi mẫu: ' + JSON.stringify(hong[0].loi ?? hong[0].j))\n  return hang\n}\n\n$('#chay').onclick = async () => {\n  $('#chay').disabled = $('#don').disabled = true\n  $('#nhatky').textContent = 'bắt đầu đo…'\n  const tbody = $('#bang tbody'); tbody.innerHTML = ''\n  for (const n of [10,20,30,50]) {\n    for (const h of await mucDo(n)) {\n      const tr = document.createElement('tr')\n      tr.innerHTML = '<td>' + h.n + '</td><td>' + h.ten + '</td><td>' + h.p50 + '</td><td>' + h.p95 +\n        '</td><td>' + h.max + '</td><td class=\"' + (h.loi ? 'truot':'dat') + '\">' + h.loi + '</td>'\n      tbody.appendChild(tr)\n    }\n  }\n  ghi('đo xong.')\n  $('#chay').disabled = $('#don').disabled = false\n}\n\n$('#don').onclick = async () => {\n  const r = await (await fetch('/do-tai/don', { method:'POST' })).json()\n  ghi('đã dọn ' + (r.xoa ?? 0) + ' dòng của ca DOTAI.')\n}\n<\/script></body></html>", { headers: {
 		"content-type": "text/html;charset=utf-8",
 		...a
 	} });
-	if (e.method === "POST" && r === "/do-tai/don") return P(t);
+	if (e.method === "POST" && r === "/do-tai/don") return F(t);
 	if (e.method === "GET" && r === "/trang-thai") return g(t, (n.searchParams.get("sbd") ?? "").trim());
 	if (e.method === "GET" && r === "/phong-cho") return _(t, (n.searchParams.get("maCa") ?? "").trim());
 	if (e.method === "GET" && r === "/ten-theo-sbd") return O(t, (n.searchParams.get("maCa") ?? "").trim(), (n.searchParams.get("sbd") ?? "").trim());
@@ -469,7 +501,7 @@ var F = { async fetch(e, t) {
 			error: "Thân gói không phải JSON"
 		}, 400);
 	}
-	return r === "/vao-thi" ? f(t, i) : r === "/luu-tam" ? p(t, i) : r === "/nop" ? m(t, i) : r === "/trang-thai" ? h(t, i) : r === "/phong-cho" ? v(t, i) : c(e, t, i) ? r === "/ca/day" ? b(t, i) : r === "/danh-sach/day" ? T(t, i) : r === "/phieu/day" ? S(t, i) : r === "/phieu/xoa" ? w(t, String(i.ma ?? "")) : r === "/chua-day" ? j(t, String(i.maCa ?? "")) : r === "/da-day" ? M(t, i) : r === "/ca/bat-dau" ? x(t, String(i.maCa ?? "")) : r === "/theo-doi" ? k(t, String(i.maCa ?? "")) : r === "/cho" ? A(t, String(i.maCa ?? "")) : s({
+	return r === "/vao-thi" ? f(t, i) : r === "/luu-tam" ? p(t, i) : r === "/nop" ? m(t, i) : r === "/trang-thai" ? h(t, i) : r === "/phong-cho" ? v(t, i) : c(e, t, i) ? r === "/ca/day" ? b(t, i) : r === "/danh-sach/day" ? T(t, i) : r === "/phieu/day" ? S(t, i) : r === "/phieu/xoa" ? w(t, String(i.ma ?? "")) : r === "/chua-day" ? M(t, String(i.maCa ?? "")) : r === "/da-day" ? N(t, i) : r === "/ca/bat-dau" ? x(t, String(i.maCa ?? "")) : r === "/theo-doi" ? A(t, String(i.maCa ?? "")) : r === "/ca/luot" ? k(t, String(i.maCa ?? "")) : r === "/cho" ? j(t, String(i.maCa ?? "")) : s({
 		ok: !1,
 		error: "Không có đường này"
 	}, 404) : s({
@@ -478,4 +510,4 @@ var F = { async fetch(e, t) {
 	}, 403);
 } };
 //#endregion
-export { F as default, d as dieuKienLuot };
+export { I as default, d as dieuKienLuot };

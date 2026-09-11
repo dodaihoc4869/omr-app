@@ -12,7 +12,7 @@ import { chuanTenCa } from './ten-ca'
 import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
 import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi } from './may-chu-moi'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
-import { dayCaMoi } from './day-ca-may-chu-moi'
+import { dayCaMoi, dayDanhSachMoi, luotCuaCaMoi } from './day-ca-may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
@@ -446,6 +446,17 @@ async function vaoThiQuaMayChuMoi(
   }
 
   if (r.cach === undefined) return null
+
+  // CHẾ ĐỘ "CÔNG BỐ KHI CẢ LỚP NỘP XONG" ⇒ ĐI ĐƯỜNG CŨ, có chủ đích.
+  //
+  // Cổng công bố của chế độ này đếm `daVao` và `conDangLam` từ bảng bên Apps
+  // Script. Ca chạy trên máy chủ mới thì lượt VÀO THI không tạo dòng bên ấy
+  // (chỉ lượt NỘP mới ghi cả hai nơi), nên `conDangLam` đếm ra 0 khi cả lớp còn
+  // đang làm — và điểm công bố cho cả lớp giữa giờ.
+  //
+  // Đây đúng loại hỏng tệ nhất: không có lỗi nào hiện ra, chỉ là đáp án bung ra
+  // sớm. Chưa nối xong đường đếm bên máy chủ mới thì ca kiểu này đi đường cũ.
+  if ((r.congBo ?? 'khong') === 'ca_lop_xong') return null
 
   // PHÒNG CHỜ. Thầy chưa bấm Bắt đầu: chưa có lượt, chưa có đề, đồng hồ chưa
   // chạy cho ai. Dáng trả về KHÁC HẲN nhánh vào thi thật — thiếu nhánh này thì
@@ -1479,6 +1490,20 @@ export async function napDanhSachLop(
 ): Promise<KetQuaNapDanhSach> {
   const r = await postJson(scriptUrl, { action: 'napDanhSachLop', secret, items })
   if (!r.ok) throw new Error(r.error || 'Không đẩy được danh sách lớp')
+
+  // ĐẨY LUÔN SANG MÁY CHỦ MỚI. Đây là CỔNG CHẶN số báo danh lạ bên đó: bảng
+  // rỗng thì Worker cố ý không chặn ai (đúng luật Apps Script), nên quên bước
+  // này là ca chạy trên máy chủ mới mất hẳn cổng — ai có mã ca cũng gõ một số
+  // báo danh bất kỳ rồi vào thi.
+  //
+  // Hỏng thì BỎ QUA: danh sách đã nạp thật ở dòng trên, thầy vẫn dùng được như
+  // hôm nay.
+  try {
+    const chMoi = await layCauHinhMayChu()
+    await dayDanhSachMoi(chMoi, secret, items)
+  } catch {
+    // không chặn việc nạp danh sách vì một đường tắt
+  }
   return {
     soDong: Number(r.soDong) || 0,
     // Máy chủ cũ chưa trả ba trường này ⇒ mảng rỗng, màn hình không vỡ.
@@ -2055,9 +2080,36 @@ export async function chiTietCa(scriptUrl: string, secret: string, maCa: string,
   const r = await postJson(scriptUrl, { action: 'chiTietCa', secret, maCa, xinKeyBank }, HAN_GIAY_CHI_TIET_CA)
   if (!r.ok) throw new Error(r.error || 'Không lấy được chi tiết ca')
   const goiDR = moGoiDeRieng(r.goiDeRieng)
+
+  // TRỘN THÊM LƯỢT ĐANG NẰM Ở MÁY CHỦ MỚI.
+  //
+  // Ca chạy trên máy chủ mới thì lượt VÀO THI không tạo dòng bên Apps Script
+  // (chỉ lượt NỘP mới ghi cả hai nơi). Không trộn thì giữa ca thầy mở màn Chi
+  // tiết ca ra là thấy TRỐNG: không biết ai đã vào, ai đang làm, và không có gì
+  // để bấm mở khoá hay cho thi lại.
+  //
+  // DÒNG BÊN SHEET THẮNG khi trùng `sbd|lanThu`: bên ấy có điểm, có họ tên, có
+  // ghi chú — tức là bản đầy đủ hơn. Bên máy chủ mới chỉ bù những em Sheet chưa
+  // có.
+  const luotSheet = (r.luot as LuotThiRow[]).map((l) => ({ ...l, sbd: String(l.sbd), lanThu: Number(l.lanThu) || 1 }))
+  let luotGop = luotSheet
+  try {
+    const chMoi = await layCauHinhMayChu()
+    const themMoi = await luotCuaCaMoi(chMoi, secret, maCa)
+    if (themMoi && themMoi.length > 0) {
+      const daCo = new Set(luotSheet.map((l) => `${l.sbd}|${l.lanThu}`))
+      const bu = themMoi
+        .map((l) => l as unknown as LuotThiRow)
+        .filter((l) => !daCo.has(`${String(l.sbd)}|${Number(l.lanThu) || 1}`))
+      if (bu.length > 0) luotGop = [...luotSheet, ...bu]
+    }
+  } catch {
+    // không có gì để trộn — giữ nguyên danh sách cũ
+  }
+
   return {
     ca: { ...r.ca, maCa: String(r.ca.maCa), lop: String(r.ca.lop ?? '') },
-    luot: (r.luot as LuotThiRow[]).map((l) => ({ ...l, sbd: String(l.sbd), lanThu: Number(l.lanThu) || 1 })),
+    luot: luotGop,
     keyBank: (r.keyBank as KeyBank) ?? null,
     // Máy chủ cũ chưa có trường này ⇒ mảng rỗng, màn hình không vỡ.
     biChan: Array.isArray(r.biChan)

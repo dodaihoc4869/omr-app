@@ -214,6 +214,37 @@ describe('ĐỀ RIÊNG — chỗ sai một lần là điểm em sai lặng lẽ'
     expect(chamCu).toBeGreaterThan(0)
   })
 
+  it('CÔNG BỐ KHI CẢ LỚP NỘP XONG ⇒ đường cũ, kẻo đáp án bung ra giữa giờ', async () => {
+    // Cổng công bố của chế độ này đếm số em đang làm từ bảng bên Apps Script.
+    // Ca chạy máy chủ mới thì lượt VÀO THI không tạo dòng bên ấy, nên số ấy đếm
+    // ra 0 và điểm công bố cho cả lớp khi cả lớp còn đang làm.
+    batCoMayChuMoi()
+    let chamCu = 0
+    gaMang((u) => {
+      if (u.includes('omr.example')) return { ...CA_CO_BAN, congBo: 'ca_lop_xong' }
+      chamCu += 1
+      return { ok: true, cach: 'moi', lop: '12', thoiGianPhut: 45, lanThu: 1, vaoLuc: 'a', hetGioLuc: 'b' }
+    })
+    const { vaoThi } = await import('../src/lib/exam-api')
+    const kq = await vaoThi(URL_CU, 'ca1', '10001', 'tb', false)
+    expect(kq.ok).toBe(true)
+    expect(chamCu).toBeGreaterThan(0)
+  })
+
+  it('công bố NGAY hoặc KHÔNG ⇒ vẫn đi đường nhanh', async () => {
+    batCoMayChuMoi()
+    let chamCu = 0
+    gaMang((u) => {
+      if (u.includes('omr.example')) return { ...CA_CO_BAN, congBo: 'ngay' }
+      chamCu += 1
+      return { ok: true }
+    })
+    const { vaoThi } = await import('../src/lib/exam-api')
+    const kq = await vaoThi(URL_CU, 'ca1', '10001', 'tb', false)
+    expect(kq.ok).toBe(true)
+    expect(chamCu).toBe(0)
+  })
+
   it('ca KHÔNG đề riêng (không có bản đồ) ⇒ vẫn đi đường nhanh bình thường', async () => {
     batCoMayChuMoi()
     let chamCu = 0

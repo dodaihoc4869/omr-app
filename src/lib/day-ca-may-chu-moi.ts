@@ -81,3 +81,36 @@ export async function dayDanhSachMoi(ch: CauHinhMayChu, maBiMat: string, ds: EmD
   if (sach.length === 0) return false
   return guiJson(ch, maBiMat, '/danh-sach/day', { ds: sach }, HAN_DAY_CA_GIAY)
 }
+
+/** ĐỌC MỌI LƯỢT CỦA MỘT CA TỪ MÁY CHỦ MỚI.
+ *
+ * Dùng cho màn Chi tiết ca của thầy. Ca chạy trên máy chủ mới thì lượt VÀO THI
+ * không tạo dòng bên Apps Script, nên màn ấy đọc bảng cũ ra TRỐNG giữa ca —
+ * thầy không biết ai đã vào, ai đang làm, và không có gì để bấm.
+ *
+ * Trả `null` nghĩa là "không có gì để trộn": cờ tắt, mạng hỏng, hoặc ca này
+ * chưa từng chạy trên máy chủ mới. Chỗ gọi giữ nguyên danh sách cũ. */
+export async function luotCuaCaMoi(
+  ch: CauHinhMayChu,
+  maBiMat: string,
+  maCa: string,
+): Promise<Record<string, unknown>[] | null> {
+  if (!ch.BAT || !ch.URL || !maCa) return null
+  const bo = new AbortController()
+  const hen = setTimeout(() => bo.abort(), ch.HAN_GIAY * 1000)
+  try {
+    const res = await fetch(`${ch.URL}/ca/luot`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-ma-bi-mat': maBiMat },
+      body: JSON.stringify({ maCa }),
+      signal: bo.signal,
+    })
+    if (!res.ok) return null
+    const j = (await res.json()) as { ok?: boolean; ds?: Record<string, unknown>[] }
+    return j?.ok && Array.isArray(j.ds) ? j.ds : null
+  } catch {
+    return null
+  } finally {
+    clearTimeout(hen)
+  }
+}

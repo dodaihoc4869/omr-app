@@ -461,6 +461,45 @@ async function tenTheoSbd(env: Env, maCa: string, sbd: string): Promise<Response
   return ra({ ok: true, hoTen: String(d.ho_ten ?? '') })
 }
 
+/** MỌI LƯỢT CỦA MỘT CA — nguồn cho màn Chi tiết ca của thầy.
+ *
+ * VÌ SAO CẦN: màn ấy đọc bảng `LuotThi` bên Apps Script. Ca chạy trên máy chủ
+ * mới thì lượt VÀO THI không tạo dòng bên ấy (chỉ lượt NỘP mới ghi cả hai nơi),
+ * nên giữa ca thầy mở màn Chi tiết ca ra là thấy TRỐNG — không biết ai đã vào,
+ * ai đang làm, ai bị chặn, và không có gì để bấm mở khoá hay cho thi lại.
+ *
+ * Trả về đúng tên trường mà `LuotThiRow` ở máy em đang đọc, để chỗ gọi chỉ việc
+ * trộn vào danh sách cũ. */
+async function luotCuaCa(env: Env, maCa: string): Promise<Response> {
+  if (!maCa) return ra({ ok: false, error: 'Thiếu mã ca' })
+  const r = await env.DB.prepare('SELECT * FROM luot WHERE ma_ca = ? ORDER BY sbd, lan_thu').bind(maCa).all<Record<string, unknown>>()
+  const ds = (r.results ?? []).map((l) => ({
+    sbd: String(l.sbd ?? ''),
+    hoTen: '',
+    lanThu: Number(l.lan_thu) || 1,
+    trangThai: String(l.trang_thai ?? ''),
+    vaoLuc: String(l.vao_luc ?? ''),
+    hetGioLuc: String(l.het_gio_luc ?? ''),
+    nopLuc: String(l.nop_luc ?? ''),
+    soLanRoiMan: Number(l.so_lan_roi_man) || 0,
+    tongGiayRoiMan: Number(l.tong_giay_roi_man) || 0,
+    diemI: null,
+    diemII: null,
+    diemIII: null,
+    tong: null,
+    duyetBoi: '',
+    duyetLuc: '',
+    ghiChu: '',
+    // KHÔNG trả ba gói JSON nặng: màn Chi tiết ca chỉ cần biết AI ĐANG Ở ĐÂU.
+    // Bài làm lấy bằng đường khác, và kéo cả bài của 50 em về mỗi nhịp làm mới
+    // là dựng lại đúng cái chậm vừa bỏ.
+    dapAn: null,
+    integrity: null,
+    giayCau: null,
+  }))
+  return ra({ ok: true, ds, dem: ds.length })
+}
+
 async function xemTheoDoi(env: Env, maCa: string): Promise<Response> {
   const r = await env.DB.prepare('SELECT * FROM trang_thai WHERE ma_ca = ? ORDER BY sbd')
     .bind(maCa)
@@ -573,6 +612,7 @@ export default {
     if (p === '/da-day') return danhDauDaDay(env, b)
     if (p === '/ca/bat-dau') return batDauThi(env, String(b.maCa ?? ''))
     if (p === '/theo-doi') return xemTheoDoi(env, String(b.maCa ?? ''))
+    if (p === '/ca/luot') return luotCuaCa(env, String(b.maCa ?? ''))
     if (p === '/cho') return xemPhongCho(env, String(b.maCa ?? ''))
 
     return ra({ ok: false, error: 'Không có đường này' }, 404)
