@@ -462,7 +462,11 @@ describe('HAI NÚT PHẠM VI + BẢN ĐỒ SAI DỰNG SẴN', () => {
     expect(NGUON).toContain('const LO = 20')
     expect(NGUON).toContain('if (bd && Object.keys(bd.lam).length > 0)')
     // Đường lui vẫn còn: ca chấm trước khi có tính năng này không có bản đồ.
-    expect(NGUON).toContain('dsCa.push(await docCaTruoc(url, mat, c.maCa, ch))')
+    // 10/09 tối: đường lui tách hai dòng để ghi thêm độ phủ từng em (chặn
+    // gọi thừa khi mọi em đã đủ ca). Ý định của phép kiểm không đổi: ĐƯỜNG LUI
+    // VẪN CÒN cho ca chấm trước khi có bản đồ sai.
+    expect(NGUON).toContain('const ca = await docCaTruoc(url, mat, c.maCa, ch)')
+    expect(NGUON).toContain('if (!conThieuEm()) {')
   })
 })
 

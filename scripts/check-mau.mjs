@@ -3,8 +3,12 @@
 // Chạy: npm run check:mau — CI cũng chạy, sót là build đỏ.
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const ROOT = new URL('../src', import.meta.url).pathname
+// `.pathname` GIỮ NGUYÊN phần trăm mã hoá: kho nằm trong thư mục có dấu cách
+// hoặc dấu tiếng Việt ("/Volumes/SSD NGOÀI/…") là ra `SSD%20NGO%C3%80I` rồi
+// `ENOENT`. `fileURLToPath` giải mã đúng trên cả macOS và Windows.
+const ROOT = fileURLToPath(new URL('../src', import.meta.url))
 // Ngoại lệ: BẢN GIẤY. Phiếu bài tập PDF và ảnh phiếu rời khỏi máy thầy, in ra
 // hoặc mở trên máy người khác, nên KHÔNG được lấy màu theo nền sáng/tối của
 // app. Bảng màu của chúng là bảng màu riêng thầy đã chốt, sống ngay cạnh chỗ

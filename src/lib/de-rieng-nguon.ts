@@ -10,7 +10,7 @@ import { banDoSaiCa, chiTietCa, danhSachCa, danhSachEm, noiKhoCa } from './exam-
 import { taoChiTietCau } from './chi-tiet-cau'
 import { docDeRiengCa, loadExamSources, loadSessionTeacherBank, docSoCauCa, saveSessionTeacherBank } from './exam-db'
 import { mergeAndStrip, mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
-import { CAU_HINH_DE_RIENG_MAC_DINH, type CauHinhDeRieng } from './cau-hinh-de-rieng'
+import { CAU_HINH_DE_RIENG_MAC_DINH, SO_CA_BOC_NGAU_NHIEN, type CauHinhDeRieng } from './cau-hinh-de-rieng'
 import { demLanSai, dungDeRieng, type CaTruocDaCham, type EmThieuLap } from './de-rieng'
 import { dungUngVien } from './rut-de'
 import { hashSeed } from './exam-shuffle'
@@ -199,20 +199,53 @@ export async function docCacCaTruoc(
     }
   }
 
+  // ĐƯỜNG LUI CHỈ CHẠY KHI CÒN THIẾU — chỗ quyết định tốc độ của cả màn.
+  //
+  // Bản đồ sai lấy theo LÔ nên quét cả thư mục 60 ca cũng chỉ tốn 3 lệnh; rẻ,
+  // cứ lấy hết để `demLanSai` (trần lặp một câu) đếm đủ.
+  //
+  // `docCaTruoc` thì KHÁC HẲN: mỗi ca một lệnh `chiTietCa`. Quét cả thư mục mà
+  // ca nào cũng rơi vào đường lui là 60 lệnh — chậm gấp 20 lần bản cũ chỉ quét
+  // 3 ca. Mà phần lớn số đó vô ích: `chonCauLapChoEm` chỉ cần ca gần nhất mỗi
+  // em CÓ NỘP (`ba_ca` thì 3 ca). Em nào đủ rồi thì mọi ca cũ hơn không đổi
+  // được kết quả của em ấy.
+  //
+  // Nên: đi từ ca mới nhất, đếm số ca đã phủ cho từng em; khi MỌI em trong
+  // `dsSbd` đã đủ thì thôi gọi đường lui. Ca chưa đọc vẫn nằm trong bản đồ rẻ
+  // ở trên, không mất dữ liệu đếm.
+  const canMoiEm = ch.PHAM_VI_HOI_LAI === 'ba_ca' ? SO_CA_BOC_NGAU_NHIEN : 1
+  const daPhu = new Map<string, number>()
+  const conThieuEm = () => dsSbd.length === 0 || dsSbd.some((sbd) => (daPhu.get(sbd) ?? 0) < canMoiEm)
+  const ghiPhu = (ca: CaTruocDaCham) => {
+    for (const sbd of dsSbd) if ((ca.daLamCua[sbd] ?? []).length > 0) daPhu.set(sbd, (daPhu.get(sbd) ?? 0) + 1)
+  }
+
   const dsCa: CaTruocDaCham[] = []
   const boQua: CaBoQua[] = []
+  let boQuaVeSau = 0
   for (const c of ung) {
     const bd = banDo[c.maCa]
     if (bd && Object.keys(bd.lam).length > 0) {
-      dsCa.push({ maCa: c.maCa, daLamCua: bd.lam, saiCua: bd.sai })
+      const ca = { maCa: c.maCa, daLamCua: bd.lam, saiCua: bd.sai }
+      dsCa.push(ca)
+      ghiPhu(ca)
+      continue
+    }
+    if (!conThieuEm()) {
+      boQuaVeSau += 1
       continue
     }
     try {
-      dsCa.push(await docCaTruoc(url, mat, c.maCa, ch))
+      const ca = await docCaTruoc(url, mat, c.maCa, ch)
+      dsCa.push(ca)
+      ghiPhu(ca)
     } catch (e) {
       boQua.push({ maCa: c.maCa, vi_sao: e instanceof Error ? e.message : 'không đọc được ca này' })
     }
   }
+  // Khai ra, không im lặng: thầy phải biết vì sao vài ca cũ không nằm trong
+  // danh sách đã dò — đó là chủ ý tiết kiệm lệnh, không phải ca hỏng.
+  if (boQuaVeSau > 0) boQua.push({ maCa: `+${boQuaVeSau} ca cũ hơn`, vi_sao: 'mọi em đã đủ ca gần nhất — bỏ qua cho nhanh, không phải lỗi' })
   return { dsCa, boQua, namQuet: namNay, nguonNam, soCaThuMuc: dsGoc.length }
 }
 
