@@ -86,6 +86,11 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
   // danh sách lớp, mà cho chúng vào danh sách thì thành cửa sau thật cho người
   // ngoài. `CA_DO_TAI` là hằng số chết trong mã, không nhận từ ngoài vào.
   if (maCa !== CA_DO_TAI && ca && (await coDanhSach(env)) && !(await docDanhSach(env, sbd))) {
+    // GHI LẠI, vì thầy đứng trong phòng phải thấy. 17/36 em bị chặn hôm 11/09
+    // chỉ truy ra được nhờ nhật ký này bên Apps Script; Worker chặn mà không
+    // ghi thì màn Chi tiết ca đọc D1 mất hẳn danh sách ấy.
+    // Ghi hỏng KHÔNG được đổi câu trả lời cho em.
+    await ghiChanVao(env, maCa, sbd, String(b.hoTen ?? ''), String(b.namSinh ?? ''), 'khong_co_sbd').catch(() => {})
     return ra({ ok: false, lyDo: 'khong_co_sbd', thoiGianPhut: ca.thoi_gian_phut ?? 45 })
   }
 
@@ -337,8 +342,8 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
   await env.DB.prepare(
     `INSERT INTO ca (ma_ca, ten_ca, trang_thai, bat_dau, het_han_vao, thoi_gian_phut, loai, han_nop,
                      cong_bo, nguong_lan, nguong_giay, bank_r2, so_cau_json, bo_theo_em_json, cap_nhat_luc,
-                     lop, phong_cho, bat_dau_thi_luc, giu_de_doc, an_han_giay)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                     lop, phong_cho, bat_dau_thi_luc, giu_de_doc, an_han_giay, sinh_tai_d1)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)
      ON CONFLICT(ma_ca) DO UPDATE SET
        -- CHỐT CHẶN THỨ HAI: chuỗi RỖNG không được ghi đè chữ đang có. Lượt đẩy
        -- thiếu trường là chuyện thường (xem khối chiMoc ở trên); mất tên ca
@@ -355,6 +360,10 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
        lop=COALESCE(NULLIF(excluded.lop,''), ca.lop),
        phong_cho=excluded.phong_cho, giu_de_doc=excluded.giu_de_doc,
        an_han_giay=excluded.an_han_giay,
+       -- Ca đã mở qua đường này thì MỌI lượt của nó sinh ra ở D1 ⇒ màn Chi
+       -- tiết ca được phép đọc thẳng. Ca chép sang từ Sheet (dayNhieuCa) KHÔNG
+       -- đặt cờ này, vì bên ấy thiếu điểm, thiếu họ tên, thiếu dòng bị chặn.
+       sinh_tai_d1=1,
        -- KHÔNG ghi đè mốc bắt đầu bằng rỗng: thầy đẩy lại ca giữa giờ (sửa tên,
        -- đổi hạn) mà xoá mốc này là cả lớp bị đá về phòng chờ, đồng hồ đang chạy.
        bat_dau_thi_luc=COALESCE(excluded.bat_dau_thi_luc, ca.bat_dau_thi_luc),
@@ -687,6 +696,209 @@ async function suaCa(env: Env, b: Record<string, unknown>): Promise<Response> {
   return ra({ ok: true, coCa: true, soO: cot.length, soEmBiNop })
 }
 
+/** NHẬT KÝ LƯỢT BỊ CHẶN. Không bao giờ ném lỗi ra ngoài: chặn đúng vẫn phải
+ * chặn kể cả khi ghi nhật ký hỏng. */
+async function ghiChanVao(
+  env: Env,
+  maCa: string,
+  sbd: string,
+  hoTenGoi: string,
+  namSinhGoi: string,
+  lyDo: string,
+): Promise<void> {
+  const d = await docDanhSach(env, sbd).catch(() => null)
+  await env.DB.prepare(
+    `INSERT INTO chan_vao (ma_ca, sbd, ho_ten_goi, nam_sinh_goi, ho_ten_ds, nam_sinh_ds, ly_do, luc)
+     VALUES (?,?,?,?,?,?,?,?)`,
+  )
+    .bind(maCa, sbd, hoTenGoi, namSinhGoi, String(d?.ho_ten ?? ''), String(d?.nam_sinh ?? ''), lyDo, new Date().toISOString())
+    .run()
+}
+
+/** CHI TIẾT MỘT CA — thay `chiTietCa` bên Apps Script (p50 5,1 giây).
+ *
+ * CỔNG AN TOÀN: chỉ trả `dayDu: true` khi ca có cờ `sinh_tai_d1`. Ca chép sang
+ * từ Sheet thiếu điểm và họ tên; máy thầy thấy `dayDu: false` thì đi đường cũ,
+ * không hiện một màn Chi tiết ca thiếu điểm cả ca.
+ *
+ * HỌ TÊN lấy từ `danh_sach` bằng JOIN — không nhân bản một bản tên thứ hai để
+ * rồi hai bảng lệch nhau. Lượt nào đã có `ho_ten` riêng (máy thầy ghi lúc chấm)
+ * thì tên riêng thắng. */
+async function chiTietCaMoi(env: Env, maCa: string): Promise<Response> {
+  if (!maCa) return ra({ ok: false, error: 'Thiếu mã ca' })
+  const ca = await env.DB.prepare('SELECT * FROM ca WHERE ma_ca = ?').bind(maCa).first<Record<string, unknown>>()
+  if (!ca) return ra({ ok: true, coCa: false, dayDu: false })
+
+  const dayDu = Number(ca.sinh_tai_d1 ?? 0) === 1
+  const rLuot = await env.DB.prepare(
+    `SELECT l.*, COALESCE(NULLIF(l.ho_ten,''), d.ho_ten, '') AS ten_hien
+       FROM luot l LEFT JOIN danh_sach d ON d.sbd = l.sbd
+      WHERE l.ma_ca = ? ORDER BY l.sbd, l.lan_thu`,
+  )
+    .bind(maCa)
+    .all<Record<string, unknown>>()
+
+  const luot = (rLuot.results ?? []).map((l) => ({
+    sbd: String(l.sbd ?? ''),
+    hoTen: String(l.ten_hien ?? ''),
+    lanThu: Number(l.lan_thu) || 1,
+    trangThai: String(l.trang_thai ?? ''),
+    vaoLuc: String(l.vao_luc ?? ''),
+    hetGioLuc: String(l.het_gio_luc ?? ''),
+    nopLuc: String(l.nop_luc ?? ''),
+    soLanRoiMan: Number(l.so_lan_roi_man) || 0,
+    tongGiayRoiMan: Number(l.tong_giay_roi_man) || 0,
+    diemI: l.diem_i === null || l.diem_i === undefined ? null : Number(l.diem_i),
+    diemII: l.diem_ii === null || l.diem_ii === undefined ? null : Number(l.diem_ii),
+    diemIII: l.diem_iii === null || l.diem_iii === undefined ? null : Number(l.diem_iii),
+    tong: l.tong === null || l.tong === undefined ? null : Number(l.tong),
+    duyetBoi: String(l.duyet_boi ?? ''),
+    duyetLuc: String(l.duyet_luc ?? ''),
+    ghiChu: String(l.ghi_chu ?? ''),
+    dapAn: doJson(l.dap_an_json),
+    integrity: doJson(l.integrity_json),
+    giayCau: doJson(l.giay_cau_json),
+  }))
+
+  const rCho = await env.DB.prepare(
+    `SELECT p.sbd, COALESCE(NULLIF(p.ho_ten,''), d.ho_ten, '') AS ho_ten, p.ghi_luc
+       FROM phong_cho p LEFT JOIN danh_sach d ON d.sbd = p.sbd
+      WHERE p.ma_ca = ? ORDER BY p.ghi_luc`,
+  )
+    .bind(maCa)
+    .all<Record<string, unknown>>()
+
+  const rChan = await env.DB.prepare('SELECT * FROM chan_vao WHERE ma_ca = ? ORDER BY luc DESC LIMIT 200')
+    .bind(maCa)
+    .all<Record<string, unknown>>()
+
+  return ra({
+    ok: true,
+    coCa: true,
+    dayDu,
+    ca: {
+      maCa,
+      tenCa: String(ca.ten_ca ?? ''),
+      lop: String(ca.lop ?? ''),
+      trangThai: String(ca.trang_thai ?? 'mo'),
+      batDau: String(ca.bat_dau ?? ''),
+      hetHanVao: String(ca.het_han_vao ?? ''),
+      batDauThiLuc: String(ca.bat_dau_thi_luc ?? ''),
+      thoiGianPhut: Number(ca.thoi_gian_phut) || 45,
+      loai: String(ca.loai ?? '') === 'baitap' ? 'baitap' : 'thi',
+      hanNop: String(ca.han_nop ?? ''),
+      congBo: String(ca.cong_bo ?? 'khong'),
+      nguongLan: Number(ca.nguong_lan) || 0,
+      nguongGiay: Number(ca.nguong_giay) || 0,
+      phamVi: String(ca.pham_vi ?? 'tu_do'),
+      lenBang: Number(ca.len_bang ?? 1) !== 0,
+      giuDeDoc: Number(ca.giu_de_doc ?? 0) === 1,
+      anHanGiay: Number(ca.an_han_giay) || 0,
+      phongCho: Number(ca.phong_cho ?? 0) === 1,
+      xoaLuc: String(ca.xoa_luc ?? ''),
+      moLuc: String(ca.mo_luc ?? ''),
+    },
+    luot,
+    dsCho: (rCho.results ?? []).map((x) => ({ sbd: String(x.sbd ?? ''), hoTen: String(x.ho_ten ?? ''), vaoLuc: String(x.ghi_luc ?? '') })),
+    biChan: (rChan.results ?? []).map((x) => ({
+      luc: String(x.luc ?? ''),
+      sbd: String(x.sbd ?? ''),
+      hoTenGoi: String(x.ho_ten_goi ?? ''),
+      namSinhGoi: String(x.nam_sinh_goi ?? ''),
+      hoTenDs: String(x.ho_ten_ds ?? ''),
+      namSinhDs: String(x.nam_sinh_ds ?? ''),
+      lyDo: String(x.ly_do ?? ''),
+    })),
+    boTheoEmCa: doJson(ca.bo_theo_em_json),
+  })
+}
+
+/** GHI ĐIỂM VỀ D1 — soi đúng lượt `ghiDiem` máy thầy vừa ghi lên Sheet.
+ *
+ * Không có bước này thì D1 mãi mãi thiếu điểm, và màn Chi tiết ca không bao giờ
+ * đọc thẳng D1 được cho một ca đã chấm. CHỈ cập nhật, không tạo dòng lượt mới:
+ * lượt phải do `/vao-thi` sinh ra. */
+async function ghiDiemMoi(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const maCa = String(b.maCa ?? '').trim()
+  const bai = Array.isArray(b.bai) ? (b.bai as Record<string, unknown>[]) : []
+  if (!maCa || bai.length === 0) return ra({ ok: false, error: 'Thiếu mã ca hoặc bài' })
+  const nay = new Date().toISOString()
+  const cau: D1PreparedStatement[] = []
+  for (const x of bai) {
+    const sbd = String(x.sbd ?? '').trim()
+    if (!sbd) continue
+    const d = (x.diem ?? {}) as Record<string, unknown>
+    cau.push(
+      env.DB.prepare(
+        `UPDATE luot SET diem_i = ?, diem_ii = ?, diem_iii = ?, tong = ?,
+                         ho_ten = COALESCE(NULLIF(?,''), ho_ten),
+                         cap_nhat_luc = ?
+          WHERE ma_ca = ? AND sbd = ? AND lan_thu = ?`,
+      ).bind(
+        soHoacNull(d.I), soHoacNull(d.II), soHoacNull(d.III), soHoacNull(d.tong),
+        String(x.hoTen ?? ''), nay, maCa, sbd, Number(x.lanThu) || 1,
+      ),
+    )
+  }
+  if (cau.length === 0) return ra({ ok: false, error: 'Không có dòng nào hợp lệ' })
+  for (let i = 0; i < cau.length; i += 200) await env.DB.batch(cau.slice(i, i + 200))
+  return ra({ ok: true, soDong: cau.length })
+}
+
+function soHoacNull(v: unknown): number | null {
+  const n = Number(v)
+  return Number.isFinite(n) ? n : null
+}
+
+function doJson(v: unknown): unknown {
+  const t = String(v ?? '')
+  if (!t) return null
+  try {
+    return JSON.parse(t)
+  } catch {
+    return null
+  }
+}
+
+/** DANH SÁCH HỌC SINH + TÓM TẮT CA GẦN NHẤT — thay `danhSachEm` bên Apps Script.
+ *
+ * VÌ SAO: màn Học sinh bên máy thầy quá 25 giây rồi báo đỏ "Máy chủ không trả
+ * lời", và ngay dưới là dòng "Chưa em nào có tên trong danh sách" — thầy nhìn
+ * tưởng mất sạch dữ liệu. Thấy thật tối 11/09, giữa lúc ca 704066 đang chạy
+ * bình thường.
+ *
+ * `diemGanNhat` và `caGanNhat` lấy từ LƯỢT MỚI NHẤT CÓ ĐIỂM của em. Em chưa ca
+ * nào chấm xong thì để `null` — KHÔNG đoán, không lấy tạm điểm của ca khác. */
+async function danhSachEmMoi(env: Env): Promise<Response> {
+  const r = await env.DB.prepare(
+    `SELECT d.sbd, d.ho_ten, d.nam_sinh, d.lop,
+            (SELECT COUNT(*) FROM luot l WHERE l.sbd = d.sbd AND l.ma_ca <> 'DOTAI') AS so_ca,
+            g.tong AS diem_gan_nhat, g.ma_ca AS ca_gan_nhat, g.nop_luc AS nop_gan_nhat
+       FROM danh_sach d
+       LEFT JOIN (
+         SELECT l1.sbd, l1.tong, l1.ma_ca, l1.nop_luc
+           FROM luot l1
+           JOIN (SELECT sbd, MAX(nop_luc) AS m FROM luot
+                  WHERE tong IS NOT NULL AND ma_ca <> 'DOTAI' GROUP BY sbd) x
+             ON x.sbd = l1.sbd AND x.m = l1.nop_luc
+       ) g ON g.sbd = d.sbd
+      ORDER BY d.lop, d.ho_ten`,
+  ).all<Record<string, unknown>>()
+
+  const items = (r.results ?? []).map((v) => ({
+    sbd: String(v.sbd ?? ''),
+    hoTen: String(v.ho_ten ?? ''),
+    namSinh: String(v.nam_sinh ?? ''),
+    lop: String(v.lop ?? ''),
+    trangThai: '',
+    soCa: Number(v.so_ca) || 0,
+    diemGanNhat: v.diem_gan_nhat === null || v.diem_gan_nhat === undefined ? null : Number(v.diem_gan_nhat),
+    caGanNhat: String(v.ca_gan_nhat ?? ''),
+    nopGanNhat: String(v.nop_gan_nhat ?? ''),
+  }))
+  return ra({ ok: true, items, dem: items.length })
+}
+
 /** Mốc thời gian thành mili giây; chuỗi rỗng hay hỏng thì về 0. */
 function mocMs(s: string): number {
   const t = Date.parse(String(s || ''))
@@ -916,6 +1128,9 @@ export default {
     if (p === '/ca/nhieu') return dayNhieuCa(env, b)
     if (p === '/ca/danh-sach') return danhSachCaMoi(env, b.daXoa === true)
     if (p === '/ca/sua') return suaCa(env, b)
+    if (p === '/ca/chi-tiet') return chiTietCaMoi(env, String(b.maCa ?? ''))
+    if (p === '/diem') return ghiDiemMoi(env, b)
+    if (p === '/em/danh-sach') return danhSachEmMoi(env)
     if (p === '/dong-bo/dau') return ghiDauDongBo(env, b)
     if (p === '/cho') return xemPhongCho(env, String(b.maCa ?? ''))
 

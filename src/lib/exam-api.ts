@@ -12,7 +12,7 @@ import { chuanTenCa } from './ten-ca'
 import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
 import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi, xongNapDiaChi } from './may-chu-moi'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
-import { dayCaMoi, dayDanhSachMoi, dayMocBatDauMoi, luotCuaCaMoi, suaCaMoi, type OSuaCa } from './day-ca-may-chu-moi'
+import { chiTietCaMoi, danhSachEmMoi, dayCaMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, luotCuaCaMoi, suaCaMoi, type OSuaCa } from './day-ca-may-chu-moi'
 import { daBatDauTheoDuongCu, ghiNhoDaBatDauDuongCu, nenDoiChieu } from './doi-chieu-phong-cho'
 import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu } from './man-ca-may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
@@ -702,6 +702,12 @@ export interface MocThoiGianCa {
   phamViHoiLai?: 'gan_nhat' | 'ba_ca'
 }
 
+/** Mốc giờ hợp lệ thành mili giây; rỗng hay hỏng thì `null`. */
+function mocMsHopLe(v: unknown): number | null {
+  const t = Date.parse(String(v ?? ''))
+  return Number.isFinite(t) ? t : null
+}
+
 /** Loại ca: kiểm tra hay bài tập về nhà. Dùng CHUNG mọi thứ, khác nhau bằng cờ này. */
 export type LoaiCa = 'thi' | 'baitap'
 
@@ -715,7 +721,67 @@ export async function publishSession(
   keyBank?: KeyBank,
   moc: MocThoiGianCa = {},
 ): Promise<{ batDau: string; hetHanVao: string }> {
-  const result = await postJson(scriptUrl, {
+  // MỐC GIỜ TÍNH Ở MÁY THẦY, RỒI GỬI KÈM — không để hai nơi tự tính.
+  //
+  // Luật bên Apps Script (`publish`): `batDau = body.batDau hợp lệ ? body.batDau
+  // : Date.now()`, và `hetHanVao = hanVaoPhut > 0 ? batDau + hanVaoPhut phút :
+  // body.hetHanVao`. Tính sẵn rồi gửi kèm thì nhánh `body.batDau` luôn trúng,
+  // hai bên ra ĐÚNG MỘT chuỗi — và máy thầy biết mốc giờ TRƯỚC khi Apps Script
+  // trả lời, nên hai lượt ghi chạy song song được.
+  //
+  // Không tính sẵn thì `Date.now()` bên Apps Script khác đồng hồ máy thầy vài
+  // giây, và đó đúng là kiểu lệch âm thầm không ai thấy cho tới lúc em vào
+  // muộn bị chặn oan.
+  const batDauMs = mocMsHopLe(moc.batDau) ?? Date.now()
+  const batDauISO = new Date(batDauMs).toISOString()
+  const hanPhut = Number(moc.hanVaoPhut) || 0
+  const hetHanMs = hanPhut > 0 ? batDauMs + hanPhut * 60000 : mocMsHopLe(moc.hetHanVao)
+  const hetHanISO = hetHanMs === null ? '' : new Date(hetHanMs).toISOString()
+
+  // HAI LƯỢT GHI CHẠY SONG SONG.
+  //
+  // Bản cũ ghi Sheet xong MỚI đẩy sang máy chủ mới, nên "bấm mở ca" tốn
+  // `AppsScript + D1`. Lượt `publish` bên Apps Script ghi cả gói đề vào bảng —
+  // đó là lượt nặng nhất của cả buổi, và thầy báo "bấm bắt đầu mở ca là cực kì
+  // chậm".
+  //
+  // Nay tốn `max(AppsScript, D1)`. Và quan trọng hơn tốc độ: gói đề lên R2 và
+  // dòng ca vào D1 KHÔNG còn bị chặn sau lượt Sheet, nên Apps Script chậm hay
+  // hỏng thì ca VẪN sẵn sàng trên máy chủ mới cho cả lớp vào thi.
+  const dayMayChuMoi = (async () => {
+    try {
+      const chMoi = await layCauHinhMayChu()
+      if (!chMoi.BAT || !chMoi.URL) return
+      const matThay = await loadTeacherSecret()
+      await dayCaMoi(
+        chMoi,
+        matThay,
+        {
+          maCa,
+          tenCa: moc.tenCa || '',
+          trangThai: 'mo',
+          batDau: batDauISO,
+          hetHanVao: hetHanISO,
+          thoiGianPhut,
+          loai: moc.loai || 'thi',
+          hanNop: moc.hanNop || '',
+          congBo: congBoDiem,
+          nguongLan: moc.nguongLan || 0,
+          nguongGiay: moc.nguongGiay || 0,
+          lop,
+          phongCho: moc.phongCho === true,
+          giuDeDoc: moc.giuDeDoc === true,
+          anHanGiay: moc.giuDeDoc === true ? moc.anHanGiay || 3 : 0,
+        },
+        bank,
+      )
+    } catch {
+      // không chặn việc mở ca vì một đường tắt
+    }
+  })()
+
+  const [result] = await Promise.all([
+    postJson(scriptUrl, {
     action: 'publish',
     maCa,
     lop,
@@ -724,9 +790,9 @@ export async function publishSession(
     // Cột ImmediateFeedback trên sheet: 'true' | 'false' | 'calop' (bản cũ chỉ có true/false).
     immediateFeedback: congBoDiem === 'ngay' ? true : congBoDiem === 'ca_lop_xong' ? 'calop' : false,
     keyBank: congBoDiem === 'khong' ? undefined : keyBank,
-    batDau: moc.batDau || '',
-    hetHanVao: moc.hetHanVao || '',
-    hanVaoPhut: moc.hanVaoPhut || 0,
+    batDau: batDauISO,
+    hetHanVao: hetHanISO,
+    hanVaoPhut: 0,
     tenCa: moc.tenCa || '',
     phamVi: moc.phamVi || 'tu_do',
     // Chế độ 'sbd' KHÔNG có danh sách riêng: cổng của nó là DanhSachLop trên
@@ -742,48 +808,10 @@ export async function publishSession(
     phongCho: moc.phongCho === true,
     deRieng: moc.deRieng === true,
     phamViHoiLai: moc.phamViHoiLai === 'ba_ca' ? 'ba_ca' : 'gan_nhat',
-  })
+    }),
+    dayMayChuMoi,
+  ])
   if (!result.ok) throw new Error(result.error || 'Mở ca kiểm tra thất bại')
-
-  // ĐẨY CA LÊN MÁY CHỦ MỚI. Không có bước này thì D1 không có ca nào, mà
-  // `/vao-thi` cần ca trong D1 — nên cả đường nóng nằm im và mọi lệnh lùi về
-  // Apps Script.
-  //
-  // `bank` ở đây là bản KHÔNG ĐÁP ÁN (`PublicExamBank`), đúng thứ Worker phục
-  // vụ công khai ở `/de/:maCa`. Đẩy bản có đáp án lên đó là phát đáp án cả lớp.
-  //
-  // HỎNG THÌ BỎ QUA: ca đã mở thật ở dòng trên rồi. Đây chỉ là chỗ chạy nhanh.
-  try {
-    const chMoi = await layCauHinhMayChu()
-    // Lấy mã bí mật từ kho của CHÍNH MÁY THẦY. `publishSession` không nhận mã
-    // trong chữ ký, và đổi chữ ký lúc này là chạm vào mọi chỗ gọi — trong khi
-    // mã vẫn đang nằm sẵn ở đúng chỗ mọi lệnh của thầy vẫn đọc.
-    const matThay = await loadTeacherSecret()
-    await dayCaMoi(
-      chMoi,
-      matThay,
-      {
-        maCa,
-        tenCa: moc.tenCa || '',
-        trangThai: 'mo',
-        batDau: String(result.batDau || ''),
-        hetHanVao: String(result.hetHanVao || ''),
-        thoiGianPhut,
-        loai: moc.loai || 'thi',
-        hanNop: moc.hanNop || '',
-        congBo: congBoDiem,
-        nguongLan: moc.nguongLan || 0,
-        nguongGiay: moc.nguongGiay || 0,
-        lop,
-        phongCho: moc.phongCho === true,
-        giuDeDoc: moc.giuDeDoc === true,
-        anHanGiay: moc.giuDeDoc === true ? moc.anHanGiay || 3 : 0,
-      },
-      bank,
-    )
-  } catch {
-    // không chặn việc mở ca vì một đường tắt
-  }
 
   return { batDau: String(result.batDau || ''), hetHanVao: String(result.hetHanVao || '') }
 }
@@ -1440,6 +1468,28 @@ export interface EmTomTat {
 }
 
 export async function danhSachEm(scriptUrl: string, secret: string): Promise<EmTomTat[]> {
+  // MÁY CHỦ MỚI TRƯỚC. Đường cũ quá 25 giây rồi báo đỏ, và ngay dưới là dòng
+  // "Chưa em nào có tên trong danh sách" — thầy nhìn tưởng mất sạch dữ liệu.
+  // Thấy thật tối 11/09, giữa lúc ca 704066 vẫn chạy bình thường.
+  try {
+    const chMoi = await layCauHinhMayChu()
+    const nhanh = await danhSachEmMoi(chMoi, secret)
+    if (nhanh) {
+      return nhanh.map((x) => ({
+        ...(x as unknown as EmTomTat),
+        sbd: chuoi(x.sbd),
+        hoTen: chuoi(x.hoTen),
+        namSinh: chuoi(x.namSinh),
+        lop: chuoi(x.lop),
+        trangThai: chuoi(x.trangThai),
+        caGanNhat: chuoi(x.caGanNhat),
+        nopGanNhat: chuoi(x.nopGanNhat),
+      }))
+    }
+  } catch {
+    // rơi xuống đường cũ
+  }
+
   const r = await postJson(scriptUrl, { action: 'danhSachEm', secret })
   if (!r.ok) throw new Error(r.error || 'Không lấy được danh sách học sinh')
   return (r.items as EmTomTat[]).map((x) => ({
@@ -2152,7 +2202,55 @@ export function moTaLyDoChan(lyDo: string): string {
  * trường hợp nào. Lấy đúng mức của `hoSoNhieuEm`, vốn cũng là lượt gọi nặng. */
 const HAN_GIAY_CHI_TIET_CA = 90
 
+/** Dịch gói `/ca/chi-tiet` của Worker sang đúng dáng `ChiTietCa` mà toàn bộ màn
+ * Chi tiết ca đang đọc. Tách riêng để có chỗ canh bằng phép kiểm: thiếu một
+ * trường ở đây là màn hình hiện trống mà không có lỗi nào bật lên. */
+function doiChiTietCaMoi(j: Record<string, unknown>): ChiTietCa {
+  const c = (j.ca ?? {}) as Record<string, unknown>
+  const luot = (Array.isArray(j.luot) ? j.luot : []) as unknown as LuotThiRow[]
+  return {
+    ca: {
+      ...(c as unknown as ChiTietCa['ca']),
+      maCa: String(c.maCa ?? ''),
+      lop: String(c.lop ?? ''),
+      // Máy chủ mới KHÔNG giữ hai trường này (chúng chỉ sống trên Sheet). Trả
+      // rỗng chứ không bịa: màn hình có chỗ hiện "—", và không ô nào sai số.
+      danhSachMoi: '',
+      nguoiTao: '',
+    },
+    luot,
+    keyBank: null,
+    biChan: (Array.isArray(j.biChan) ? j.biChan : []) as unknown as LuotBiChan[],
+    dsCho: (Array.isArray(j.dsCho) ? j.dsCho : []) as { sbd: string; hoTen: string; vaoLuc: string }[],
+    boTheoEmCa: ((j.boTheoEmCa as { bo?: Record<string, string[]> } | null)?.bo) ?? undefined,
+    lapTheoEm: ((j.boTheoEmCa as { lap?: Record<string, string[]> } | null)?.lap) ?? undefined,
+    demSaiTheoEm: ((j.boTheoEmCa as { dem?: Record<string, Record<string, number>> } | null)?.dem) ?? undefined,
+    bienBanDeRieng: ((j.boTheoEmCa as { bb?: Record<string, unknown> } | null)?.bb) ?? undefined,
+  }
+}
+
 export async function chiTietCa(scriptUrl: string, secret: string, maCa: string, xinKeyBank = false): Promise<ChiTietCa> {
+  // ĐƯỜNG NHANH — ĐỌC THẲNG MÁY CHỦ MỚI.
+  //
+  // Đo đường cũ: p50 **5,1 giây**. Thầy bấm vào một ca rồi ngồi nhìn năm giây,
+  // và giữa ca thì bấm nhiều lần.
+  //
+  // HAI CỔNG AN TOÀN, thiếu một cái là sai số liệu:
+  //   1. `xinKeyBank` ⇒ ĐI ĐƯỜNG CŨ. Ngân hàng CÓ ĐÁP ÁN chỉ nằm bên Apps
+  //      Script; R2 giữ bản KHÔNG đáp án (đúng thứ phục vụ công khai cho em).
+  //      Trả về thiếu `keyBank` là máy thầy chấm lại ra điểm sai.
+  //   2. `chiTietCaMoi` tự trả `null` khi ca chưa `dayDu` — ca chép sang từ
+  //      Sheet thiếu điểm, thiếu họ tên, thiếu dòng bị chặn.
+  if (!xinKeyBank) {
+    try {
+      const chMoi = await layCauHinhMayChu()
+      const nhanh = await chiTietCaMoi(chMoi, secret, maCa)
+      if (nhanh) return doiChiTietCaMoi(nhanh)
+    } catch {
+      // rơi xuống đường cũ
+    }
+  }
+
   const r = await postJson(scriptUrl, { action: 'chiTietCa', secret, maCa, xinKeyBank }, HAN_GIAY_CHI_TIET_CA)
   if (!r.ok) throw new Error(r.error || 'Không lấy được chi tiết ca')
   const goiDR = moGoiDeRieng(r.goiDeRieng)
@@ -2568,6 +2666,29 @@ export async function ghiDiem(
   // chi tiết cũ vừa ghi hàng chục dòng mới — nặng nhất trong cả chuỗi.
   const r = await postJson(scriptUrl, { action: 'ghiDiem', secret, maCa, bai, luatDiem: LUAT_DIEM, soCau }, 90)
   if (!r.ok) throw new Error(r.error || 'Không ghi được điểm')
+
+  // SOI ĐIỂM SANG MÁY CHỦ MỚI. Không có bước này thì D1 mãi thiếu điểm, và màn
+  // Chi tiết ca không bao giờ đọc thẳng D1 được cho một ca đã chấm.
+  //
+  // CHỈ soi những lượt Apps Script ĐÃ NHẬN (`daGhi`). Lượt bị từ chối vì lệch
+  // mẫu số mà vẫn soi sang đây là hai nơi lệch điểm nhau — đúng thứ chốt mẫu
+  // số sinh ra để chặn.
+  try {
+    const daGhi = new Set((r.daGhi ?? []).map((x: unknown) => String(x)))
+    const nhan = bai.filter((x) => daGhi.size === 0 || daGhi.has(String(x.sbd)))
+    if (nhan.length > 0) {
+      const chMoi = await layCauHinhMayChu()
+      await ghiDiemMoi(
+        chMoi,
+        secret,
+        maCa,
+        nhan.map((x) => ({ sbd: String(x.sbd), lanThu: Number(x.lanThu) || 1, hoTen: String((x as { hoTen?: string }).hoTen ?? ''), diem: x.diem })),
+      )
+    }
+  } catch {
+    // đường tắt hỏng thì thôi — điểm đã ghi thật ở dòng trên
+  }
+
   return { daGhi: r.daGhi ?? [], tuChoi: r.tuChoi ?? [] }
 }
 

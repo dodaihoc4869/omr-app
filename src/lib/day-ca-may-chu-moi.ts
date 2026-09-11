@@ -183,3 +183,82 @@ export async function suaCaMoi(
     clearTimeout(hen)
   }
 }
+
+/** CHI TIẾT MỘT CA ĐỌC THẲNG TỪ MÁY CHỦ MỚI.
+ *
+ * VÌ SAO: `chiTietCa` bên Apps Script đo được p50 **5,1 giây** — thầy bấm vào
+ * một ca rồi ngồi nhìn năm giây, giữa ca thi thì nhìn nhiều lần.
+ *
+ * Trả `null` nghĩa là "đi đường cũ", dùng chung cho mọi trường hợp không chắc:
+ * cờ tắt · mạng hỏng · ca không có trên D1 · **ca chưa `dayDu`**. Vế cuối là
+ * cổng an toàn: ca chép sang từ Sheet thiếu điểm, thiếu họ tên, thiếu dòng bị
+ * chặn — hiện ra là sai số liệu, còn tệ hơn chậm. */
+export async function chiTietCaMoi(
+  ch: CauHinhMayChu,
+  maBiMat: string,
+  maCa: string,
+): Promise<Record<string, unknown> | null> {
+  if (!ch.BAT || !ch.URL || !maCa) return null
+  const bo = new AbortController()
+  const hen = setTimeout(() => bo.abort(), ch.HAN_GIAY * 1000)
+  try {
+    const res = await fetch(`${ch.URL}/ca/chi-tiet`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-ma-bi-mat': maBiMat },
+      body: JSON.stringify({ maCa }),
+      signal: bo.signal,
+    })
+    if (!res.ok) return null
+    const j = (await res.json()) as Record<string, unknown>
+    if (j?.ok !== true || j.coCa !== true || j.dayDu !== true) return null
+    return j
+  } catch {
+    return null
+  } finally {
+    clearTimeout(hen)
+  }
+}
+
+/** SOI ĐIỂM VỪA CHẤM SANG MÁY CHỦ MỚI.
+ *
+ * Không có bước này thì D1 mãi thiếu điểm, và màn Chi tiết ca không bao giờ đọc
+ * thẳng D1 được cho một ca đã chấm. Hỏng thì thôi: Apps Script vẫn là nơi điểm
+ * được ghi thật, và dòng `if (!r.ok) throw` ở chỗ gọi đã lo phần ấy. */
+export async function ghiDiemMoi(
+  ch: CauHinhMayChu,
+  maBiMat: string,
+  maCa: string,
+  bai: { sbd: string; lanThu?: number; hoTen?: string; diem?: { I?: number; II?: number; III?: number; tong?: number } }[],
+): Promise<boolean> {
+  if (!ch.BAT || !ch.URL || !maCa || bai.length === 0) return false
+  return guiJson(ch, maBiMat, '/diem', { maCa, bai }, HAN_DAY_CA_GIAY)
+}
+
+/** DANH SÁCH HỌC SINH ĐỌC TỪ MÁY CHỦ MỚI.
+ *
+ * Trả `null` = đi đường cũ. Bảng `danh_sach` RỖNG cũng trả `null`: thầy chưa
+ * đẩy danh sách thì đường cũ vẫn có dữ liệu, còn ở đây là một màn hình trống. */
+export async function danhSachEmMoi(
+  ch: CauHinhMayChu,
+  maBiMat: string,
+): Promise<Record<string, unknown>[] | null> {
+  if (!ch.BAT || !ch.URL) return null
+  const bo = new AbortController()
+  const hen = setTimeout(() => bo.abort(), ch.HAN_GIAY * 1000)
+  try {
+    const res = await fetch(`${ch.URL}/em/danh-sach`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-ma-bi-mat': maBiMat },
+      body: JSON.stringify({}),
+      signal: bo.signal,
+    })
+    if (!res.ok) return null
+    const j = (await res.json()) as { ok?: boolean; items?: Record<string, unknown>[] }
+    if (j?.ok !== true || !Array.isArray(j.items) || j.items.length === 0) return null
+    return j.items
+  } catch {
+    return null
+  } finally {
+    clearTimeout(hen)
+  }
+}
