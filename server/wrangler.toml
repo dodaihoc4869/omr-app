@@ -15,6 +15,10 @@
 name = "omr"
 main = "src/index.ts"
 compatibility_date = "2026-09-01"
+# Giữ tên miền workers.dev đang chạy. PHẢI đứng ở phần gốc — đặt sau một
+# header [[...]] là TOML hiểu nó thuộc bảng đó và wrangler cảnh báo
+# "Unexpected fields found in r2_buckets[0]".
+workers_dev = true
 
 [[d1_databases]]
 binding = "DB"
@@ -25,6 +29,3 @@ database_id = "d2e6d322-374a-45d7-83a3-9fac486b23f1"
 binding = "DE"
 bucket_name = "omr-de"
 
-# Giữ tên miền workers.dev đang chạy — không có dòng này, một bản wrangler
-# đời mới có thể tắt nó và app mất máy chủ.
-workers_dev = true
