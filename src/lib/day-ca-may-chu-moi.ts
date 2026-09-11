@@ -262,3 +262,21 @@ export async function danhSachEmMoi(
     clearTimeout(hen)
   }
 }
+
+/** NẠP ĐỦ MỘT CA SANG MÁY CHỦ MỚI SAU KHI ĐÃ ĐỌC NÓ TỪ APPS SCRIPT.
+ *
+ * TỰ CHỮA LÀNH: máy thầy vừa đi đường cũ xong là đã cầm gói đầy đủ của ca ấy —
+ * điểm, họ tên, ghi chú. Gửi luôn sang đây thì lần sau mở chính ca đó là tức
+ * thì, không cần một lượt chuyển dữ liệu 88 ca (lượt ấy đã chết ở ca thứ 6 hôm
+ * 11/09).
+ *
+ * Worker tự từ chối ca ĐANG MỞ — trường hợp duy nhất D1 mới hơn Sheet. */
+export async function napDayDuCaMoi(
+  ch: CauHinhMayChu,
+  maBiMat: string,
+  maCa: string,
+  luot: Record<string, unknown>[],
+): Promise<boolean> {
+  if (!ch.BAT || !ch.URL || !maCa || luot.length === 0) return false
+  return guiJson(ch, maBiMat, '/ca/nap-day-du', { maCa, luot }, HAN_DAY_CA_GIAY)
+}

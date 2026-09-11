@@ -899,6 +899,85 @@ async function danhSachEmMoi(env: Env): Promise<Response> {
   return ra({ ok: true, items, dem: items.length })
 }
 
+/** NẠP ĐỦ MỘT CA TỪ APPS SCRIPT — TỰ CHỮA LÀNH.
+ *
+ * VÌ SAO CẦN, đo thật 19h05 ngày 11/09 ngay sau khi phát hành đợt 5D:
+ *
+ *     SELECT COUNT(*), SUM(sinh_tai_d1) FROM ca   →  88 ca, 0 ca có cờ
+ *     SELECT COUNT(tong), COUNT(ho_ten) FROM luot →  311 lượt, 0 điểm, 0 tên
+ *
+ * Cờ `sinh_tai_d1` chỉ được đặt cho ca MỞ TỪ NAY. Mọi ca đã có đều không cờ,
+ * nên `chiTietCaMoi` trả `dayDu: false` cho tất cả và máy thầy rơi về Apps
+ * Script — **đường nhanh chưa từng chạy một lần nào**. Thầy bấm chi tiết ca
+ * vẫn mất 7 giây, đúng như trước.
+ *
+ * Chữa mà KHÔNG cần một lượt chuyển dữ liệu 88 ca (lượt ấy đã chết ở ca thứ 6
+ * hôm nay): máy thầy vừa đi đường cũ xong là đã CẦM trong tay gói đầy đủ của ca
+ * ấy — điểm, họ tên, ghi chú. Gửi luôn sang đây rồi đặt cờ. Lần sau thầy mở
+ * chính ca đó là tức thì. Ca nào thầy không bao giờ mở thì cũng không cần nhanh.
+ *
+ * CHỈ NHẬN CA ĐÃ ĐÓNG. Ca đang chạy là trường hợp DUY NHẤT D1 mới hơn Sheet —
+ * lượt vào thi sinh ra ở đây, Sheet phải đợi lượt nộp. Chép đè lúc ấy là xoá
+ * mất bài của em đang làm. */
+async function napDayDuCa(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const maCa = String(b.maCa ?? '').trim()
+  if (!maCa) return ra({ ok: false, error: 'Thiếu mã ca' })
+
+  const ca = await env.DB.prepare('SELECT trang_thai FROM ca WHERE ma_ca = ?').bind(maCa).first<{ trang_thai: string }>()
+  if (!ca) return ra({ ok: true, coCa: false, daDat: false })
+  if (String(ca.trang_thai) === 'mo') {
+    // Ca đang mở: D1 mới hơn Sheet. Không chép đè, không đặt cờ.
+    return ra({ ok: true, coCa: true, daDat: false, lyDo: 'ca_dang_mo' })
+  }
+
+  const ds = Array.isArray(b.luot) ? (b.luot as Record<string, unknown>[]) : []
+  const nay = new Date().toISOString()
+  const cau: D1PreparedStatement[] = []
+  for (const l of ds) {
+    const sbd = String(l.sbd ?? '').trim()
+    if (!sbd) continue
+    const lanThu = Number(l.lanThu) || 1
+    cau.push(
+      env.DB.prepare(
+        `INSERT INTO luot (khoa, ma_ca, sbd, lan_thu, vao_luc, het_gio_luc, nop_luc, trang_thai,
+                           so_lan_roi_man, tong_giay_roi_man, ghi_chu, ho_ten,
+                           diem_i, diem_ii, diem_iii, tong, duyet_boi, duyet_luc,
+                           cap_nhat_luc, da_day_sheet)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)
+         ON CONFLICT(khoa) DO UPDATE SET
+           het_gio_luc=COALESCE(NULLIF(excluded.het_gio_luc,''), luot.het_gio_luc),
+           nop_luc=COALESCE(NULLIF(excluded.nop_luc,''), luot.nop_luc),
+           trang_thai=excluded.trang_thai,
+           so_lan_roi_man=MAX(excluded.so_lan_roi_man, luot.so_lan_roi_man),
+           tong_giay_roi_man=MAX(excluded.tong_giay_roi_man, luot.tong_giay_roi_man),
+           ghi_chu=COALESCE(NULLIF(excluded.ghi_chu,''), luot.ghi_chu),
+           ho_ten=COALESCE(NULLIF(excluded.ho_ten,''), luot.ho_ten),
+           diem_i=COALESCE(excluded.diem_i, luot.diem_i),
+           diem_ii=COALESCE(excluded.diem_ii, luot.diem_ii),
+           diem_iii=COALESCE(excluded.diem_iii, luot.diem_iii),
+           tong=COALESCE(excluded.tong, luot.tong),
+           duyet_boi=COALESCE(NULLIF(excluded.duyet_boi,''), luot.duyet_boi),
+           duyet_luc=COALESCE(NULLIF(excluded.duyet_luc,''), luot.duyet_luc),
+           cap_nhat_luc=excluded.cap_nhat_luc,
+           da_day_sheet=1`,
+      ).bind(
+        `${maCa}|${sbd}|${lanThu}`, maCa, sbd, lanThu,
+        String(l.vaoLuc ?? '') || nay, String(l.hetGioLuc ?? ''), String(l.nopLuc ?? ''),
+        String(l.trangThai ?? 'da_nop'), Number(l.soLanRoiMan) || 0, Number(l.tongGiayRoiMan) || 0,
+        String(l.ghiChu ?? ''), String(l.hoTen ?? ''),
+        soHoacNull(l.diemI), soHoacNull(l.diemII), soHoacNull(l.diemIII), soHoacNull(l.tong),
+        String(l.duyetBoi ?? ''), String(l.duyetLuc ?? ''), nay,
+      ),
+    )
+  }
+  // KHÔNG đụng `dap_an_json`, `giay_cau_json`, `integrity_json`: bản trên D1 là
+  // bản máy em ghi thẳng, đầy đủ hơn bản chép vòng qua Sheet.
+  for (let i = 0; i < cau.length; i += 200) await env.DB.batch(cau.slice(i, i + 200))
+
+  await env.DB.prepare('UPDATE ca SET sinh_tai_d1 = 1, cap_nhat_luc = ? WHERE ma_ca = ?').bind(nay, maCa).run()
+  return ra({ ok: true, coCa: true, daDat: true, soLuot: cau.length })
+}
+
 /** Mốc thời gian thành mili giây; chuỗi rỗng hay hỏng thì về 0. */
 function mocMs(s: string): number {
   const t = Date.parse(String(s || ''))
@@ -1131,6 +1210,7 @@ export default {
     if (p === '/ca/chi-tiet') return chiTietCaMoi(env, String(b.maCa ?? ''))
     if (p === '/diem') return ghiDiemMoi(env, b)
     if (p === '/em/danh-sach') return danhSachEmMoi(env)
+    if (p === '/ca/nap-day-du') return napDayDuCa(env, b)
     if (p === '/dong-bo/dau') return ghiDauDongBo(env, b)
     if (p === '/cho') return xemPhongCho(env, String(b.maCa ?? ''))
 

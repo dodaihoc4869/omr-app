@@ -12,7 +12,7 @@ import { chuanTenCa } from './ten-ca'
 import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
 import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi, xongNapDiaChi } from './may-chu-moi'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
-import { chiTietCaMoi, danhSachEmMoi, dayCaMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, luotCuaCaMoi, suaCaMoi, type OSuaCa } from './day-ca-may-chu-moi'
+import { chiTietCaMoi, danhSachEmMoi, dayCaMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, luotCuaCaMoi, napDayDuCaMoi, suaCaMoi, type OSuaCa } from './day-ca-may-chu-moi'
 import { daBatDauTheoDuongCu, ghiNhoDaBatDauDuongCu, nenDoiChieu } from './doi-chieu-phong-cho'
 import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu } from './man-ca-may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
@@ -2280,6 +2280,24 @@ export async function chiTietCa(scriptUrl: string, secret: string, maCa: string,
   } catch {
     // không có gì để trộn — giữ nguyên danh sách cũ
   }
+
+  // TỰ CHỮA LÀNH — gửi gói vừa đọc được sang máy chủ mới rồi đặt cờ đủ dữ liệu.
+  //
+  // Đo 19h05 ngày 11/09, ngay sau khi phát hành đợt 5D: 88/88 ca `sinh_tai_d1
+  // = 0`, 311 lượt không dòng nào có điểm hay họ tên. Cờ ấy chỉ đặt cho ca mở
+  // TỪ NAY, nên đường nhanh chưa từng chạy một lần — thầy bấm chi tiết ca vẫn
+  // mất 7 giây.
+  //
+  // Không chờ, không báo lỗi: đây là đường tắt cho LẦN SAU. Worker tự từ chối
+  // ca đang mở, nên không có đường nào chép đè lên bài em đang làm.
+  void (async () => {
+    try {
+      const chMoi = await layCauHinhMayChu()
+      await napDayDuCaMoi(chMoi, secret, maCa, luotSheet as unknown as Record<string, unknown>[])
+    } catch {
+      // lần sau đọc lại vẫn có cơ hội chữa
+    }
+  })()
 
   return {
     ca: { ...r.ca, maCa: String(r.ca.maCa), lop: String(r.ca.lop ?? '') },
