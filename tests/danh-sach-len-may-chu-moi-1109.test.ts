@@ -112,7 +112,11 @@ describe('GHI ĐÈ TOÀN BỘ — em bị gạch tên phải biến mất khỏi
 describe('CỔNG CHẶN — bảng trống thì KHÔNG chặn ai', () => {
   it('Worker chỉ chặn khi bảng đã có ít nhất một dòng', () => {
     expect(MAY).toContain("SELECT 1 AS co FROM danh_sach LIMIT 1")
-    expect(MAY).toMatch(/if \(ca && \(await coDanhSach\(env\)\) && !\(await docDanhSach\(env, sbd\)\)\)/)
+    // NEO ĐỔI 11/09 (không hạ tiêu chí): thêm vế `maCa !== CA_DO_TAI` để trang
+    // đo tải chạy được sau khi bảng có dữ liệu thật — SBD `DOTAI…` cố ý không
+    // nằm trong danh sách lớp. Phép kiểm riêng cho vế ấy nằm ở
+    // `tests/day-danh-sach-khong-lang-le-1109.test.ts`.
+    expect(MAY).toMatch(/if \(maCa !== CA_DO_TAI && ca && \(await coDanhSach\(env\)\) && !\(await docDanhSach\(env, sbd\)\)\)/)
   })
 
   it('Apps Script cũng vậy — cùng một đánh đổi, không lệch', () => {
