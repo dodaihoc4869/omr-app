@@ -10,7 +10,7 @@ import { NutChinh, OThongBao } from './DesignSystem'
 import { loadCauHinhMayChu, loadScriptUrl, loadTeacherSecret, saveCauHinhMayChu } from '../lib/exam-db'
 import { MAC_DINH_MAY_CHU, type CauHinhMayChu } from '../lib/cau-hinh-may-chu'
 import { quenCauHinhMayChu, thuKetNoi } from '../lib/may-chu-moi'
-import { laySoSheet, napToanBoCaLenMayChuMoi } from '../lib/exam-api'
+import { napToanBoCaLenMayChuMoi } from '../lib/exam-api'
 import { CHUA_DUNG, daChuyenXong, dungBangDoiChieu, laySoMayChuMoi, type DongDoiChieu } from '../lib/doi-chieu-hai-ben'
 import { chuyenKhoDe } from '../lib/chuyen-kho-de'
 
@@ -110,12 +110,11 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
     setBang(null)
     setLoiDo('')
     try {
-      const url = (await loadScriptUrl()) ?? ''
       const mat = (await loadTeacherSecret()) ?? ''
-      if (!url || !mat) throw new Error('Thiếu link Apps Script hoặc mã bí mật')
-      const [sheet, moi] = await Promise.all([laySoSheet(url, mat), laySoMayChuMoi(ch, mat)])
-      if (!moi) throw new Error('Máy chủ mới không trả lời — kiểm địa chỉ rồi bấm Thử kết nối')
-      setBang(dungBangDoiChieu(sheet, moi))
+      if (!mat) throw new Error('Thiếu mã bí mật')
+      const moi = await laySoMayChuMoi(ch, mat)
+      if (!moi) throw new Error('Máy chủ không trả lời — kiểm địa chỉ rồi bấm Thử kết nối')
+      setBang(dungBangDoiChieu(moi))
     } catch (e) {
       setLoiDo(e instanceof Error ? e.message : 'Không đo được')
     } finally {
@@ -229,7 +228,7 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
 
       <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
         <NutChinh variant="phu" onClick={doHaiBen} disabled={dangDo || !ch.URL.trim()}>
-          {dangDo ? 'Đang đo…' : 'Đối chiếu Sheet ↔ máy chủ mới'}
+          {dangDo ? 'Đang đo…' : 'Đếm dữ liệu trên máy chủ'}
         </NutChinh>
       </div>
 
@@ -239,8 +238,8 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
         <div>
           <OThongBao tone={daChuyenXong(bang) ? 'xanh' : 'cam'}>
             {daChuyenXong(bang)
-              ? 'Hai bên khớp và không bảng nào còn thiếu.'
-              : 'Chưa chuyển xong — xem dòng nào còn lệch hoặc chưa dựng ở bảng dưới.'}
+              ? 'Mọi bảng đã dựng trên máy chủ. Bảng rỗng là đúng nếu thầy vừa xoá sạch ca.'
+              : 'Còn bảng CHƯA DỰNG — xem dòng nào ở bảng dưới.'}
           </OThongBao>
           <div style={{ marginTop: 'var(--k2)', display: 'grid', gap: 'var(--k2)' }}>
             {bang.map((d) => (
@@ -249,14 +248,9 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
                   <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--muc)' }}>{d.ten}</span>
                   <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', whiteSpace: 'nowrap' }}>
                     {d.mayChuMoi === CHUA_DUNG ? (
-                      <b style={{ color: 'var(--nhat)' }}>chưa dựng</b>
+                      <b style={{ color: 'var(--do)' }}>chưa dựng</b>
                     ) : (
-                      <>
-                        <span style={{ color: 'var(--nhat)' }}>{d.sheet === null ? '—' : d.sheet}</span>
-                        <span style={{ color: 'var(--nhat)' }}> → </span>
-                        <b style={{ color: d.khop === false ? 'var(--do)' : 'var(--muc)' }}>{d.mayChuMoi}</b>
-                        {d.khop === false && <span style={{ color: 'var(--do)' }}> lệch</span>}
-                      </>
+                      <b style={{ color: 'var(--muc)' }}>{d.mayChuMoi}</b>
                     )}
                   </span>
                 </div>
@@ -265,9 +259,8 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
             ))}
           </div>
           <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
-            Số bên trái là Google Sheet, bên phải là máy chủ mới. Dấu — nghĩa là Apps
-            {' '}Script không có số tương ứng để so, không phải bằng không.
-            {' '}Nút này chỉ ĐỌC, không sửa gì ở cả hai nơi.
+            Số là số dòng đang nằm trên máy chủ. "chưa dựng" khác hẳn số 0: 0 là bảng
+            {' '}có mà rỗng, chưa dựng là bảng chưa tồn tại. Nút này chỉ ĐỌC, không sửa gì.
           </div>
         </div>
       )}

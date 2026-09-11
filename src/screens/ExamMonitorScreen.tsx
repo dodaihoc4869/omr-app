@@ -11,8 +11,6 @@ import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/Desig
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
 import { batDauThi, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
 import { chuanTenCa, tenHienCua, TEN_CA_TOI_DA } from '../lib/ten-ca'
-import { demChuaDay, dongBoNguoc } from '../lib/dong-bo-nguoc'
-import { layCauHinhMayChu } from '../lib/may-chu-moi'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { emLechDiem, loiBaoLechDiem } from '../lib/lech-diem'
 import { dongSoCauHoiLai } from '../lib/dem-cau-hoi-lai'
@@ -515,55 +513,6 @@ export default function ExamMonitorScreen() {
       showToast(`Không duyệt được: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
     } finally {
       setDangDuyet(null)
-    }
-  }
-
-  // KÉO BÀI VỀ SHEET — máy chủ mới (MAY-CHU-MOI.md mục 9).
-  //
-  // VÌ SAO PHẢI CÓ NÚT NÀY, và vì sao thiếu nó là chặn cả ca: lúc em nộp, bài
-  // cất vào D1 TRƯỚC rồi mới gọi Apps Script. Gần như mọi lần cả hai đều xong.
-  // Nhưng đúng cái lúc Apps Script treo — cả lớp bấm Nộp trong mười giây cuối —
-  // thì lượt đó CHỈ nằm ở D1. Không có nút này thì bài của em kẹt lại đó: thầy
-  // không chấm được, không xuất bảng điểm, không gửi Zalo được.
-  //
-  // Mã `dong-bo-nguoc.ts` đã xong từ đợt 3 nhưng chưa nối màn hình nào.
-  const [soChuaDay, setSoChuaDay] = useState<number | null>(null)
-  const [dangKeo, setDangKeo] = useState(false)
-
-  // Đếm thử mỗi lần đổi ca. Máy chủ mới tắt hoặc không với tới được thì để
-  // `null` và KHÔNG hiện gì — thầy không dùng máy chủ mới thì không phải nhìn.
-  useEffect(() => {
-    let con = true
-    void (async () => {
-      if (!chiTiet) return
-      const ch = await layCauHinhMayChu()
-      if (!ch.BAT) return
-      const ds = await demChuaDay(ch, secret.trim(), chiTiet.ca.maCa)
-      if (con && ds) setSoChuaDay(ds.filter((l) => l.trang_thai !== 'dang_lam').length)
-    })()
-    return () => {
-      con = false
-    }
-  }, [chiTiet?.ca.maCa, secret])
-
-  const handleKeoVeSheet = async () => {
-    if (!chiTiet || dangKeo) return
-    setDangKeo(true)
-    try {
-      const ch = await layCauHinhMayChu()
-      const kq = await dongBoNguoc(ch, scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa)
-      const phan = [`đẩy ${kq.daDay} bài về Sheet`]
-      if (kq.boQua > 0) phan.push(`bỏ qua ${kq.boQua} em ĐANG LÀM DỞ`)
-      if (kq.hong.length > 0) phan.push(`HỎNG ${kq.hong.length}: ${kq.hong.map((h) => h.sbd || '?').join(', ')}`)
-      if (kq.con > 0) phan.push(`CÒN ${kq.con} chưa về`)
-      showToast(phan.join(' · '), kq.hong.length > 0 || kq.con > 0 ? 'warn' : 'success')
-      const ds = await demChuaDay(ch, secret.trim(), chiTiet.ca.maCa)
-      if (ds) setSoChuaDay(ds.filter((l) => l.trang_thai !== 'dang_lam').length)
-      await tai(chiTiet.ca.maCa, true)
-    } catch (e) {
-      showToast(`Không kéo được: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
-    } finally {
-      setDangKeo(false)
     }
   }
 
@@ -1403,23 +1352,6 @@ export default function ExamMonitorScreen() {
             {chiTiet.ca.phongCho && chiTiet.ca.batDauThiLuc && (
               <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>
                 Phòng chờ đã mở lúc <span style={SO}>{gio(chiTiet.ca.batDauThiLuc)}</span> — em vào từ giờ nhận đề ngay.
-              </div>
-            )}
-            {/* BÀI CÒN Ở MÁY CHỦ MỚI, CHƯA VỀ SHEET.
-                Chỉ hiện khi THẬT SỰ còn bài — không có gì thì không bày thêm
-                chữ cho thầy đọc. Đây là chỗ duy nhất thầy biết bài đang kẹt:
-                bảng điểm và phiếu Zalo đều đọc từ Sheet, nên bài nằm ở D1 mà
-                không kéo về là im lặng biến mất khỏi mọi báo cáo. */}
-            {soChuaDay !== null && soChuaDay > 0 && (
-              <div style={{ marginTop: 'var(--k3)' }}>
-                <OThongBao tone="cam">
-                  Còn <span style={SO}>{soChuaDay}</span> bài nằm ở máy chủ mới, chưa về Sheet. Chưa kéo về thì bảng điểm và phiếu Zalo chưa có các em này.
-                </OThongBao>
-                <div style={{ marginTop: 'var(--k2)' }}>
-                  <NutChinh onClick={() => void handleKeoVeSheet()} disabled={dangKeo}>
-                    {dangKeo ? 'Đang kéo…' : `Kéo ${soChuaDay} bài về Sheet`}
-                  </NutChinh>
-                </div>
               </div>
             )}
             {/* CỬA VÀO CA — HAI NÚT, LUÔN THẤY CẢ HAI (thầy chốt 05/09).

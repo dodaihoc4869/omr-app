@@ -1,4 +1,8 @@
-// CÁI THƯỚC — ĐẶT SỐ CỦA GOOGLE SHEET CẠNH SỐ CỦA MÁY CHỦ MỚI.
+// CÁI THƯỚC — ĐẾM Ở CHỖ DỮ LIỆU CỦA NGƯỜI DÙNG ĐỌNG LẠI.
+//
+// 12/09: Google đã bị cắt hẳn, nên không còn "bên kia" để đặt cạnh. Cái thước
+// giữ nguyên công dụng thật của nó — ĐẾM — và bỏ cột so sánh: bảng nào đã dựng,
+// bảng nào còn rỗng, và một dòng rỗng nghĩa là màn nào chưa chạy được.
 //
 // VIỆC ĐẦU TIÊN CỦA CẢ ĐỢT BỎ APPS SCRIPT, trước khi chuyển một lệnh nào.
 //
@@ -33,16 +37,15 @@ export interface SoMayChuMoi {
   tienDoHs: number
 }
 
-/** Một dòng trong bảng đối chiếu. `sheet` là `null` khi Apps Script không có số
- * tương ứng — nói thẳng "không đối chiếu được" thay vì bịa một số 0. */
+/** Một dòng của bảng đếm. */
 export interface DongDoiChieu {
   ten: string
-  sheet: number | null
   mayChuMoi: number
-  /** `true` khi hai bên khớp, `false` khi lệch, `null` khi không đối chiếu được. */
-  khop: boolean | null
-  /** Vì sao dòng này quan trọng — hiện ngay dưới, để thầy biết lệch thì mất gì. */
+  /** Vì sao dòng này quan trọng — hiện ngay dưới, để thầy biết rỗng thì mất gì. */
   nghia: string
+  /** `true` khi bảng đã có dữ liệu, `false` khi CHƯA DỰNG. Không còn nghĩa
+   * "khớp hai bên" — từ 12/09 chỉ còn một bên. */
+  daDung: boolean
 }
 
 /** Bảng chưa dựng thì Worker trả -1. Đừng hiện "0 dòng" cho một bảng chưa tồn
@@ -72,35 +75,31 @@ export async function laySoMayChuMoi(ch: CauHinhMayChu, maBiMat: string): Promis
 
 /** Dựng bảng đối chiếu từ hai bộ số. Thuần tính, không chạm mạng — để phép kiểm
  * canh được từng luật một. */
-export function dungBangDoiChieu(
-  sheet: { soCa: number; soCaChuaXoa: number; soLuot: number; soDanhSach: number | null },
-  moi: SoMayChuMoi,
-): DongDoiChieu[] {
-  const dong = (ten: string, s: number | null, m: number, nghia: string): DongDoiChieu => ({
+export function dungBangDoiChieu(moi: SoMayChuMoi): DongDoiChieu[] {
+  const dong = (ten: string, m: number, nghia: string): DongDoiChieu => ({
     ten,
-    sheet: s,
     mayChuMoi: m,
-    // Bảng chưa dựng ⇒ chưa đối chiếu được, KHÔNG phải lệch.
-    khop: m === CHUA_DUNG || s === null ? null : s === m,
     nghia,
+    daDung: m !== CHUA_DUNG,
   })
 
   return [
-    dong('Ca kiểm tra (kể cả đã xoá)', sheet.soCa, moi.ca, 'Lệch là màn Ca thi hiện thiếu ca hoặc thừa ca.'),
-    dong('Ca chưa xoá', sheet.soCaChuaXoa, moi.caChuaXoa, 'Lệch là ca thầy đã xoá vẫn còn hiện, hoặc ngược lại.'),
-    dong('Lượt thi', sheet.soLuot, moi.luot, 'Lệch là có bài của em chỉ nằm một bên.'),
-    dong('Danh sách lớp', sheet.soDanhSach, moi.danhSach, 'Lệch là cổng chặn số báo danh lạ hai bên không giống nhau.'),
-    dong('Lượt ĐÃ CÓ ĐIỂM', null, moi.luotCoDiem, 'Khối A chưa xong thì số này còn nhỏ hơn số lượt.'),
-    dong('Lượt CHƯA về Sheet', null, moi.luotChuaVeSheet, 'Khác 0 là có bài em nộp chưa tới Google Sheet — bấm Đồng bộ ngược.'),
-    dong('Ca đọc thẳng được máy chủ mới', null, moi.caSinhTaiD1, 'Ca có cờ này thì Chi tiết ca mở tức thì; ca chưa có thì đọc một lần rồi tự có.'),
-    dong('Chi tiết từng câu', null, moi.chiTietCau, 'Khối A — chưa dựng thì chấm lại vẫn phải đi Apps Script.'),
-    dong('Bản đồ câu sai', null, moi.banDoSai, 'Khối A — chưa dựng thì rút câu sai vẫn đi Apps Script.'),
-    dong('Tiến độ mạnh–yếu', null, moi.tienDoHs, 'Khối B — chưa dựng thì hồ sơ em vẫn đi Apps Script.'),
+    dong('Ca kiểm tra (kể cả đã xoá)', moi.ca, 'Đây là số ca màn Ca thi đọc ra.'),
+    dong('Ca chưa xoá', moi.caChuaXoa, 'Số ca đang hiện cho thầy chọn.'),
+    dong('Lượt thi', moi.luot, 'Mỗi lượt là một lần em vào làm bài.'),
+    dong('Danh sách lớp', moi.danhSach, 'Bảng RỖNG thì cổng chặn số báo danh lạ không hoạt động — ai có mã ca cũng vào được.'),
+    dong('Lượt ĐÃ CÓ ĐIỂM', moi.luotCoDiem, 'Nhỏ hơn số lượt nghĩa là còn bài chưa chấm.'),
+    dong('Ca đọc thẳng được máy chủ mới', moi.caSinhTaiD1, 'Ca có cờ này thì Chi tiết ca mở tức thì.'),
+    dong('Chi tiết từng câu', moi.chiTietCau, 'Nguồn của bảng câu sai từng em.'),
+    dong('Bản đồ câu sai', moi.banDoSai, 'Nguồn của rút câu khắc phục và đề riêng.'),
+    dong('Tiến độ mạnh–yếu', moi.tienDoHs, 'Nguồn bảng chuyên đề trong hồ sơ em.'),
   ]
 }
 
-/** Đã chuyển xong hẳn chưa: mọi dòng ĐỐI CHIẾU ĐƯỢC đều khớp, và không bảng nào
- * còn thiếu. Dùng cho câu trả lời một dòng ở đầu khối. */
+/** Máy chủ đã sẵn sàng chưa: không bảng nào còn ở trạng thái CHƯA DỰNG.
+ *
+ * Bảng RỖNG (0 dòng) KHÔNG phải là chưa sẵn sàng — sau khi thầy xoá sạch ca để
+ * tuần sau thi lại từ đầu thì rỗng là đúng. Chưa dựng mới là hỏng. */
 export function daChuyenXong(bang: DongDoiChieu[]): boolean {
-  return bang.every((d) => d.khop !== false) && bang.every((d) => d.mayChuMoi !== CHUA_DUNG)
+  return bang.every((d) => d.daDung)
 }

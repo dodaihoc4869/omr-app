@@ -45,12 +45,12 @@ describe('CHỈ ĐỌC — cái thước không được sửa gì ở đâu c�
     expect(WK.indexOf("p === '/doi-chieu'")).toBeGreaterThan(WK.indexOf('if (!laThay(req, env, b))'))
   })
 
-  it('số của Sheet đọc bằng `chiDuongCu` — không tự soi gương', () => {
-    // Bẫy đã mù cả ngày 11/09: đo bằng công cụ do chính máy chủ phục vụ thì lúc
-    // nào cũng đẹp. Ở đây phải ép đi ĐƯỜNG CŨ mới có số để so.
-    const han = API.slice(API.indexOf('export async function laySoSheet('), API.indexOf('export async function laySoSheet(') + 1400)
-    expect(han).toContain('danhSachCaThat(scriptUrl, secret, false, true)')
-    expect(han).toContain('danhSachCaThat(scriptUrl, secret, true, true)')
+  it('cái thước KHÔNG còn đọc Google — 12/09 không còn bên kia để so', () => {
+    // Trước 12/09 tệp này đặt số Sheet cạnh số máy chủ mới. Google bị cắt hẳn
+    // thì việc còn lại là ĐẾM, và đếm ở đúng chỗ dữ liệu đọng lại.
+    expect(DC).not.toContain('laySoSheet')
+    expect(DC).not.toContain('sheet:')
+    expect(MAN).not.toContain('laySoSheet')
   })
 })
 
@@ -60,55 +60,38 @@ describe('BẢNG CHƯA DỰNG KHÁC HẲN BẢNG RỖNG', () => {
     expect(han).toContain('return -1')
   })
 
-  it('dòng chưa dựng KHÔNG bị chấm là lệch', () => {
-    const b = dungBangDoiChieu({ soCa: 89, soCaChuaXoa: 70, soLuot: 311, soDanhSach: null }, { ...SO_DAY, chiTietCau: CHUA_DUNG })
+  it('dòng chưa dựng được đánh dấu riêng, không lẫn với số 0', () => {
+    const b = dungBangDoiChieu({ ...SO_DAY, chiTietCau: CHUA_DUNG })
     const d = b.find((x) => x.ten === 'Chi tiết từng câu')!
     expect(d.mayChuMoi).toBe(CHUA_DUNG)
-    expect(d.khop).toBeNull()
+    expect(d.daDung).toBe(false)
   })
 
-  it('nhưng CHƯA DỰNG thì cũng CHƯA XONG', () => {
-    const b = dungBangDoiChieu({ soCa: 89, soCaChuaXoa: 70, soLuot: 311, soDanhSach: null }, { ...SO_DAY, chiTietCau: CHUA_DUNG })
-    expect(daChuyenXong(b)).toBe(false)
-  })
-})
-
-describe('KHÔNG BỊA SỐ', () => {
-  it('Apps Script không có số đếm danh sách lớp ⇒ trả null, không trả 0', () => {
-    const han = API.slice(API.indexOf('export async function laySoSheet('), API.indexOf('export async function laySoSheet(') + 1400)
-    expect(han).toContain('soDanhSach: null')
+  it('CHƯA DỰNG thì máy chủ CHƯA sẵn sàng', () => {
+    expect(daChuyenXong(dungBangDoiChieu({ ...SO_DAY, chiTietCau: CHUA_DUNG }))).toBe(false)
   })
 
-  it('dòng không đối chiếu được thì `khop` là null, không phải false', () => {
-    const b = dungBangDoiChieu({ soCa: 89, soCaChuaXoa: 70, soLuot: 311, soDanhSach: null }, SO_DAY)
-    expect(b.find((x) => x.ten === 'Danh sách lớp')!.khop).toBeNull()
-  })
-})
-
-describe('CHẤM KHỚP / LỆCH', () => {
-  it('hai bên bằng nhau ⇒ khớp', () => {
-    const b = dungBangDoiChieu({ soCa: 89, soCaChuaXoa: 70, soLuot: 311, soDanhSach: 258 }, SO_DAY)
-    expect(b.find((x) => x.ten === 'Ca kiểm tra (kể cả đã xoá)')!.khop).toBe(true)
-    expect(b.find((x) => x.ten === 'Lượt thi')!.khop).toBe(true)
+  it('bảng RỖNG thì vẫn là sẵn sàng — thầy vừa xoá sạch ca là rỗng đúng', () => {
+    const b = dungBangDoiChieu({ ...SO_DAY, ca: 0, caChuaXoa: 0, luot: 0, luotCoDiem: 0, chiTietCau: 0, banDoSai: 0, tienDoHs: 0 })
     expect(daChuyenXong(b)).toBe(true)
   })
+})
 
-  it('lệch một dòng là CHƯA XONG, kể cả lệch đúng một đơn vị', () => {
-    const b = dungBangDoiChieu({ soCa: 89, soCaChuaXoa: 70, soLuot: 312, soDanhSach: 258 }, SO_DAY)
-    expect(b.find((x) => x.ten === 'Lượt thi')!.khop).toBe(false)
-    expect(daChuyenXong(b)).toBe(false)
+describe('MỖI DÒNG NÓI RÕ RỖNG THÌ MẤT GÌ', () => {
+  it('không để thầy đoán ý nghĩa của một con số', () => {
+    for (const d of dungBangDoiChieu(SO_DAY)) expect(d.nghia.length, d.ten).toBeGreaterThan(20)
   })
 
-  it('mỗi dòng nói rõ LỆCH THÌ MẤT GÌ — không để thầy đoán', () => {
-    const b = dungBangDoiChieu({ soCa: 1, soCaChuaXoa: 1, soLuot: 1, soDanhSach: 1 }, SO_DAY)
-    for (const d of b) expect(d.nghia.length, d.ten).toBeGreaterThan(20)
+  it('dòng danh sách lớp nói thẳng hậu quả khi rỗng — mất cổng chặn số báo danh lạ', () => {
+    const d = dungBangDoiChieu(SO_DAY).find((x) => x.ten === 'Danh sách lớp')!
+    expect(d.nghia).toContain('cổng chặn')
   })
 })
 
 describe('MÀN CÀI ĐẶT', () => {
-  it('có nút đối chiếu và nói rõ nút chỉ đọc', () => {
-    expect(MAN).toContain('Đối chiếu Sheet ↔ máy chủ mới')
-    expect(MAN).toContain('chỉ ĐỌC, không sửa gì ở cả hai nơi')
+  it('có nút đếm và nói rõ nút chỉ đọc', () => {
+    expect(MAN).toContain('Đếm dữ liệu trên máy chủ')
+    expect(MAN).toContain('chỉ ĐỌC, không sửa gì')
   })
 
   it('hiện "chưa dựng" chứ không hiện số 0', () => {
@@ -116,8 +99,8 @@ describe('MÀN CÀI ĐẶT', () => {
     expect(MAN).toContain('d.mayChuMoi === CHUA_DUNG')
   })
 
-  it('dấu — cho dòng không đối chiếu được, và giải thích nó', () => {
-    expect(MAN).toContain("{d.sheet === null ? '—' : d.sheet}")
-    expect(MAN).toContain('không phải bằng không')
+  it('phân biệt rõ "chưa dựng" với số 0 ngay trên màn hình', () => {
+    expect(MAN).toContain('0 là bảng')
+    expect(MAN).toContain('chưa dựng là bảng chưa tồn tại')
   })
 })

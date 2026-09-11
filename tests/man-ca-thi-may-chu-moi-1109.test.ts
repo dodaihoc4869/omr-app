@@ -105,10 +105,14 @@ describe('ĐẨY DỮ LIỆU CŨ — không được giả vờ là bài chưa v
     expect(HAM).toContain('da_day_sheet=1')
   })
 
-  it('vì sao: đánh 0 là màn Theo dõi báo "còn N bài chưa về Sheet" rồi đẩy ngược lại bài đã có', () => {
-    // Canh bằng chính chỗ đọc: `demChuaDay` lọc theo cột này.
-    const DB = fs.readFileSync(path.join(process.cwd(), 'src/lib/dong-bo-nguoc.ts'), 'utf8')
-    expect(DB).toContain('da_day_sheet')
+  it('cột `da_day_sheet` nay chỉ còn là dấu vết lịch sử, không còn đường đọc nào', () => {
+    // Trước 12/09, `dong-bo-nguoc.ts` lọc theo cột này để kéo bài về Google
+    // Sheet. Thầy chốt "gỡ sạch google" nên cả tính năng ấy đã gỡ; cột giữ
+    // nguyên trong lược đồ vì đổi cấu trúc dữ liệu đang có là việc khác hẳn,
+    // và dữ liệu cũ vẫn phải đọc được.
+    expect(fs.existsSync(path.join(process.cwd(), 'src/lib/dong-bo-nguoc.ts'))).toBe(false)
+    const MAN = fs.readFileSync(path.join(process.cwd(), 'src/screens/ExamMonitorScreen.tsx'), 'utf8')
+    expect(MAN).not.toContain('về Sheet')
   })
 
   it('ghi theo lô, không bắn từng dòng một', () => {
