@@ -70,12 +70,12 @@ export function quenDiaChiTuTep(): void {
  *
  * Máy thầy đã có cấu hình riêng thì KHÔNG đụng vào, kể cả khi thầy CHỦ Ý TẮT
  * cờ: cờ tắt khẩn giữa ca thi phải còn nguyên tác dụng. */
+let dangNap: Promise<void> | null = null
+
 export function napDiaChiMayChuMoiChoEm(): Promise<void> {
   if (!dangNap) dangNap = napThat()
   return dangNap
 }
-
-let dangNap: Promise<void> | null = null
 
 async function napThat(): Promise<void> {
   const ch = await layCauHinhMayChu()
