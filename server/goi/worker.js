@@ -367,7 +367,7 @@ async function E(e, t) {
 	let i = (/* @__PURE__ */ new Date()).toISOString(), a = [];
 	for (let t of n) {
 		let n = String(t.maCa ?? "").trim();
-		n && a.push(e.DB.prepare("INSERT INTO ca (ma_ca, ten_ca, trang_thai, bat_dau, het_han_vao, thoi_gian_phut, loai, han_nop,\n                         cong_bo, cap_nhat_luc, lop, phong_cho, bat_dau_thi_luc, giu_de_doc, an_han_giay,\n                         mo_luc, pham_vi, len_bang, xoa_luc)\n         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)\n         ON CONFLICT(ma_ca) DO UPDATE SET\n           ten_ca=excluded.ten_ca, trang_thai=excluded.trang_thai, bat_dau=excluded.bat_dau,\n           het_han_vao=excluded.het_han_vao, thoi_gian_phut=excluded.thoi_gian_phut,\n           loai=excluded.loai, han_nop=excluded.han_nop, cong_bo=excluded.cong_bo,\n           cap_nhat_luc=excluded.cap_nhat_luc, lop=excluded.lop, phong_cho=excluded.phong_cho,\n           giu_de_doc=excluded.giu_de_doc, an_han_giay=excluded.an_han_giay,\n           mo_luc=excluded.mo_luc, pham_vi=excluded.pham_vi, len_bang=excluded.len_bang,\n           xoa_luc=excluded.xoa_luc,\n           -- Giữ nguyên mốc bắt đầu và khoá gói đề: xem ghi chú ở `dayCa`.\n           bat_dau_thi_luc=COALESCE(excluded.bat_dau_thi_luc, ca.bat_dau_thi_luc)").bind(n, String(t.tenCa ?? ""), String(t.trangThai ?? "mo"), String(t.batDau ?? ""), String(t.hetHanVao ?? ""), Number(t.thoiGianPhut) || 45, String(t.loai ?? "thi"), String(t.hanNop ?? ""), String(t.congBo ?? "khong"), i, String(t.lop ?? ""), +!!t.phongCho, String(t.batDauThiLuc ?? "") || null, +!!t.giuDeDoc, Number(t.anHanGiay) || 0, String(t.moLuc ?? ""), String(t.phamVi ?? "tu_do"), t.lenBang === !1 ? 0 : 1, String(t.xoaLuc ?? "")));
+		n && a.push(e.DB.prepare("INSERT INTO ca (ma_ca, ten_ca, trang_thai, bat_dau, het_han_vao, thoi_gian_phut, loai, han_nop,\n                         cong_bo, cap_nhat_luc, lop, phong_cho, bat_dau_thi_luc, giu_de_doc, an_han_giay,\n                         mo_luc, pham_vi, len_bang, xoa_luc, dem_da_vao, dem_da_nop, dem_canh_bao, dem_luc)\n         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)\n         ON CONFLICT(ma_ca) DO UPDATE SET\n           ten_ca=excluded.ten_ca, trang_thai=excluded.trang_thai, bat_dau=excluded.bat_dau,\n           het_han_vao=excluded.het_han_vao, thoi_gian_phut=excluded.thoi_gian_phut,\n           loai=excluded.loai, han_nop=excluded.han_nop, cong_bo=excluded.cong_bo,\n           cap_nhat_luc=excluded.cap_nhat_luc, lop=excluded.lop, phong_cho=excluded.phong_cho,\n           giu_de_doc=excluded.giu_de_doc, an_han_giay=excluded.an_han_giay,\n           mo_luc=excluded.mo_luc, pham_vi=excluded.pham_vi, len_bang=excluded.len_bang,\n           xoa_luc=excluded.xoa_luc, dem_da_vao=excluded.dem_da_vao, dem_da_nop=excluded.dem_da_nop,\n           dem_canh_bao=excluded.dem_canh_bao, dem_luc=excluded.dem_luc,\n           -- Giữ nguyên mốc bắt đầu và khoá gói đề: xem ghi chú ở `dayCa`.\n           bat_dau_thi_luc=COALESCE(excluded.bat_dau_thi_luc, ca.bat_dau_thi_luc)").bind(n, String(t.tenCa ?? ""), String(t.trangThai ?? "mo"), String(t.batDau ?? ""), String(t.hetHanVao ?? ""), Number(t.thoiGianPhut) || 45, String(t.loai ?? "thi"), String(t.hanNop ?? ""), String(t.congBo ?? "khong"), i, String(t.lop ?? ""), +!!t.phongCho, String(t.batDauThiLuc ?? "") || null, +!!t.giuDeDoc, Number(t.anHanGiay) || 0, String(t.moLuc ?? ""), String(t.phamVi ?? "tu_do"), t.lenBang === !1 ? 0 : 1, String(t.xoaLuc ?? ""), Number(t.daVao) || 0, Number(t.daNop) || 0, Number(t.canhBao) || 0, i));
 	}
 	for (let t of r) {
 		let n = String(t.maCa ?? "").trim(), r = String(t.sbd ?? "").trim();
@@ -391,6 +391,10 @@ async function D(e, t) {
 			da_vao: 0,
 			da_nop: 0,
 			canh_bao: 0
+		}, r = {
+			da_vao: Number(e.dem_da_vao) || 0,
+			da_nop: Number(e.dem_da_nop) || 0,
+			canh_bao: Number(e.dem_canh_bao) || 0
 		};
 		return {
 			maCa: t,
@@ -411,9 +415,9 @@ async function D(e, t) {
 			phongCho: Number(e.phong_cho ?? 0) === 1,
 			batDauThiLuc: String(e.bat_dau_thi_luc ?? ""),
 			xoaLuc: String(e.xoa_luc ?? ""),
-			daVao: Number(n.da_vao) || 0,
-			daNop: Number(n.da_nop) || 0,
-			canhBao: Number(n.canh_bao) || 0
+			daVao: Math.max(Number(n.da_vao) || 0, r.da_vao),
+			daNop: Math.max(Number(n.da_nop) || 0, r.da_nop),
+			canhBao: Math.max(Number(n.canh_bao) || 0, r.canh_bao)
 		};
 	});
 	a.sort((e, t) => O(t.moLuc || t.batDau) - O(e.moLuc || e.batDau));

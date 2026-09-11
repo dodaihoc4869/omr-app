@@ -14,7 +14,7 @@ import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiM
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
 import { dayCaMoi, dayDanhSachMoi, luotCuaCaMoi } from './day-ca-may-chu-moi'
 import { daBatDauTheoDuongCu, ghiNhoDaBatDauDuongCu, nenDoiChieu } from './doi-chieu-phong-cho'
-import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu, type LuotDayNhieu } from './man-ca-may-chu-moi'
+import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu } from './man-ca-may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
@@ -1995,14 +1995,16 @@ export async function danhSachCa(scriptUrl: string, secret: string, daXoa = fals
   return p
 }
 
-async function danhSachCaThat(scriptUrl: string, secret: string, daXoa: boolean): Promise<CaTomTat[]> {
+async function danhSachCaThat(scriptUrl: string, secret: string, daXoa: boolean, chiDuongCu = false): Promise<CaTomTat[]> {
   // MÁY CHỦ MỚI TRƯỚC — nhưng CHỈ khi trên D1 có dấu `ca_day_du`. Chưa chuyển
   // xong dữ liệu thì `danhSachCaMoi` trả `null` và ta đi đường cũ, vì màn Ca
   // thi thiếu ca hoặc đếm sai số em còn tệ hơn màn Ca thi chậm.
   // Xem `src/lib/man-ca-may-chu-moi.ts`.
+  // `chiDuongCu` = lượt CHUYỂN DỮ LIỆU. Nó phải đọc NGUỒN SỰ THẬT là Apps
+  // Script; đọc D1 rồi ghi lại vào D1 là tự soi gương rồi bảo mình khớp.
   try {
-    const chMoi = await layCauHinhMayChu()
-    const rMoi = await danhSachCaMoi(chMoi, secret, daXoa)
+    const chMoi = chiDuongCu ? null : await layCauHinhMayChu()
+    const rMoi = chMoi ? await danhSachCaMoi(chMoi, secret, daXoa) : null
     if (rMoi) return chuanCaTomTat(rMoi.items)
   } catch {
     // máy chủ mới hỏng thì im lặng đi đường cũ — đây không phải luồng chính
@@ -2548,95 +2550,94 @@ export interface KetQuaNapCa {
  *    và xoá dấu cũ nếu có, để app quay về đường cũ.
  * ③ MỘT CA HỎNG KHÔNG LÀM HỎNG CẢ LƯỢT. Ghi tên ca ấy vào `hong` rồi đi tiếp;
  *    nhưng có tên trong `hong` là chắc chắn KHÔNG khớp ⇒ không có dấu. */
+/** CHỐT CHỐNG BẤM CHỒNG.
+ *
+ * Ngày 11/09 thầy bấm lần hai khi lần một còn đang chạy. Hai lượt ghi đè lên
+ * nhau, và lượt đối chiếu của lượt này đọc đúng lúc lượt kia đang ghi dở —
+ * kết quả là "CHƯA khớp" mà không ai lần ra vì sao. */
+let dangNapCa = false
+
 export async function napToanBoCaLenMayChuMoi(
   scriptUrl: string,
   secret: string,
   bao?: (xong: number, tong: number, viec: string) => void,
 ): Promise<KetQuaNapCa> {
-  const ch = await layCauHinhMayChu()
-  if (!ch.BAT || !ch.URL) throw new Error('Chưa bật máy chủ mới trong Cài đặt')
+  if (dangNapCa) throw new Error('Lượt chuyển trước còn đang chạy — đợi nó xong đã')
+  dangNapCa = true
+  try {
+    const ch = await layCauHinhMayChu()
+    if (!ch.BAT || !ch.URL) throw new Error('Chưa bật máy chủ mới trong Cài đặt')
 
-  // Đọc danh sách ca THẲNG từ Apps Script, bỏ qua mọi bộ đệm và mọi đường tắt.
-  const dsCa = await danhSachCaThat(scriptUrl, secret, false)
-  const dsXoa = await danhSachCaThat(scriptUrl, secret, true)
-  const tatCa = [...dsCa, ...dsXoa]
-  bao?.(0, tatCa.length + 1, `${tatCa.length} ca`)
+    // HAI lượt gọi Apps Script cho TOÀN BỘ kho, không phải một lượt mỗi ca.
+    bao?.(0, 3, 'đọc danh sách ca')
+    const dsCa = await danhSachCaThat(scriptUrl, secret, false, true)
+    const dsXoa = await danhSachCaThat(scriptUrl, secret, true, true)
+    const tatCa = [...dsCa, ...dsXoa]
 
-  // Đẩy phần CA trước, một lô. Nhẹ, và có ca rồi thì lượt mới có chỗ bám.
-  const goiCa: CaDayNhieu[] = tatCa.map((c) => ({
-    maCa: c.maCa,
-    tenCa: c.tenCa,
-    lop: c.lop,
-    thoiGianPhut: c.thoiGianPhut,
-    moLuc: c.moLuc,
-    batDau: c.batDau,
-    hetHanVao: c.hetHanVao,
-    trangThai: c.trangThai,
-    phamVi: String(c.phamVi ?? 'tu_do'),
-    congBo: c.congBo,
-    loai: c.loai,
-    hanNop: c.hanNop,
-    lenBang: c.lenBang !== false,
-    phongCho: c.phongCho === true,
-    batDauThiLuc: c.batDauThiLuc ?? '',
-    xoaLuc: c.xoaLuc ?? '',
-  }))
-  if (!(await dayNhieuCaMoi(ch, secret, { ca: goiCa }))) {
-    throw new Error('Không đẩy được danh sách ca lên máy chủ mới')
-  }
-
-  // Rồi LƯỢT, từng ca một. `chiTietCa` là lệnh nặng nhất của Apps Script nên
-  // không gọi song song — chạy song song là tự dựng lại đúng cú dồn đã gỡ.
-  const hong: string[] = []
-  // ĐẾM THEO KHOÁ DUY NHẤT `maCa|sbd|lanThu`, KHÔNG đếm dòng thô.
-  //
-  // Lỗi của lượt chạy 15h10: đếm dòng thô rồi đòi bằng đúng số dòng trên D1.
-  // Nhưng D1 khoá theo `maCa|sbd|lanThu`, nên hai dòng trùng khoá trên Sheet
-  // chỉ thành MỘT dòng ở D1 — đúng như thiết kế. `LuotThi` có dòng trùng từ
-  // thời chưa có cột `KhoaNop` (v73 mới thêm), nên phép so cũ KHÔNG BAO GIỜ
-  // khớp được dù dữ liệu đã sang đủ. Đó là cổng an toàn tự khoá chính nó.
-  const khoaSheet = new Set<string>()
-  for (let i = 0; i < tatCa.length; i++) {
-    const c = tatCa[i]
-    bao?.(i + 1, tatCa.length + 1, `ca ${c.maCa}`)
-    try {
-      const ct = await chiTietCa(scriptUrl, secret, c.maCa)
-      const luot: LuotDayNhieu[] = (ct.luot ?? []).map((l) => ({
-        maCa: c.maCa,
-        sbd: l.sbd,
-        lanThu: l.lanThu,
-        trangThai: l.trangThai,
-        vaoLuc: l.vaoLuc,
-        hetGioLuc: l.hetGioLuc,
-        nopLuc: l.nopLuc,
-        soLanRoiMan: l.soLanRoiMan,
-        tongGiayRoiMan: l.tongGiayRoiMan,
-      }))
-      for (const l of luot) if (String(l.sbd ?? '').trim()) khoaSheet.add(`${c.maCa}|${l.sbd}|${l.lanThu ?? 1}`)
-      if (luot.length > 0 && !(await dayNhieuCaMoi(ch, secret, { luot }))) hong.push(c.maCa)
-    } catch {
-      hong.push(c.maCa)
+    bao?.(1, 3, `đẩy ${tatCa.length} ca`)
+    const goiCa: CaDayNhieu[] = tatCa.map((c) => ({
+      maCa: c.maCa,
+      tenCa: c.tenCa,
+      lop: c.lop,
+      thoiGianPhut: c.thoiGianPhut,
+      moLuc: c.moLuc,
+      batDau: c.batDau,
+      hetHanVao: c.hetHanVao,
+      trangThai: c.trangThai,
+      phamVi: String(c.phamVi ?? 'tu_do'),
+      congBo: c.congBo,
+      loai: c.loai,
+      hanNop: c.hanNop,
+      lenBang: c.lenBang !== false,
+      phongCho: c.phongCho === true,
+      batDauThiLuc: c.batDauThiLuc ?? '',
+      xoaLuc: c.xoaLuc ?? '',
+      // BA SỐ ĐẾM, chép nguyên từ Apps Script. Đây là chỗ đổi cách làm ngày
+      // 11/09: bản trước đọc CHI TIẾT từng ca để tự đếm lại — 83 lượt gọi
+      // Apps Script, hơn mười phút, và chết lặng nếu thầy rời tab. Apps
+      // Script đã đếm sẵn ba số này ngay trong lượt `danhSachCa`, nên chép
+      // thẳng là xong.
+      daVao: c.daVao,
+      daNop: c.daNop,
+      canhBao: c.canhBao,
+    }))
+    if (!(await dayNhieuCaMoi(ch, secret, { ca: goiCa }))) {
+      throw new Error('Không đẩy được danh sách ca lên máy chủ mới')
     }
+
+    // ĐỐI CHIẾU — đọc lại bằng cửa KHÔNG đòi dấu, vì lúc này chưa có dấu nào.
+    bao?.(2, 3, 'đối chiếu')
+    const lai = await danhSachCaMoiThoDoiChieu(ch, secret, false)
+    const laiXoa = await danhSachCaMoiThoDoiChieu(ch, secret, true)
+    if (!lai || !laiXoa) throw new Error('Máy chủ mới không trả lời lượt đối chiếu')
+    const soCaD1 = lai.items.length + laiXoa.items.length
+
+    // So SỐ CA, và so TỔNG SỐ EM ĐÃ VÀO của mọi ca. Hai con số này đủ để bắt
+    // mọi kiểu chép thiếu: thiếu ca thì số đầu lệch, chép đúng ca mà rơi số
+    // đếm thì số sau lệch.
+    const tongVaoSheet = tatCa.reduce((t, c) => t + (Number(c.daVao) || 0), 0)
+    const tongVaoD1 = [...lai.items, ...laiXoa.items]
+      .reduce((t, x) => t + (Number((x as { daVao?: number }).daVao) || 0), 0)
+
+    const lechCa = tatCa.length - soCaD1
+    // D1 NHIỀU hơn là bình thường: em vừa vào thi qua máy chủ mới có dòng ở D1
+    // trước khi Sheet kịp biết. Chỉ THIẾU mới là hỏng.
+    const lechLuot = tongVaoSheet - tongVaoD1
+    const khop = lechCa === 0 && lechLuot <= 0
+
+    await datDauDongBo(ch, secret, khop ? { soCa: soCaD1, soLuot: tongVaoD1, ghiChu: 'da doi chieu' } : null)
+    bao?.(3, 3, khop ? 'xong' : 'KHÔNG khớp')
+    return {
+      soCa: tatCa.length,
+      soLuot: tongVaoSheet,
+      soCaD1,
+      soLuotD1: tongVaoD1,
+      khop,
+      lechCa,
+      lechLuot,
+      hong: [],
+    }
+  } finally {
+    dangNapCa = false
   }
-
-  // ĐỐI CHIẾU — đọc lại D1 bằng cửa KHÔNG đòi dấu, vì lúc này chưa có dấu nào.
-  const lai = await danhSachCaMoiThoDoiChieu(ch, secret, false)
-  const laiXoa = await danhSachCaMoiThoDoiChieu(ch, secret, true)
-  const soCaD1 = (lai?.items.length ?? 0) + (laiXoa?.items.length ?? 0)
-  const soLuotD1 = lai?.soDongLuot ?? 0
-
-  // So theo KHOÁ DUY NHẤT ở cả hai phía. `soDongLuot` là số dòng `luot` trên
-  // D1, mà D1 khoá theo `maCa|sbd|lanThu` nên mỗi dòng là một khoá. Phía Sheet
-  // cũng gom về tập khoá. Không so bằng `daVao`: nó chỉ đếm lần thử cao nhất
-  // mỗi em, mà em thi lại có nhiều lượt.
-  //
-  // `lechLuot < 0` (D1 NHIỀU hơn) là BÌNH THƯỜNG và vẫn khớp: em vừa vào thi
-  // qua máy chủ mới thì có dòng ở D1 trước khi có dòng trên Sheet.
-  const lechCa = tatCa.length - soCaD1
-  const soLuotSheet = khoaSheet.size
-  const lechLuot = soLuotSheet - soLuotD1
-  const khop = hong.length === 0 && lechCa === 0 && lechLuot <= 0
-  await datDauDongBo(ch, secret, khop ? { soCa: soCaD1, soLuot: soLuotD1, ghiChu: 'da doi chieu' } : null)
-  bao?.(tatCa.length + 1, tatCa.length + 1, khop ? 'xong' : 'KHÔNG khớp')
-  return { soCa: tatCa.length, soLuot: soLuotSheet, soLuotD1, soCaD1, khop, lechCa, lechLuot, hong }
 }

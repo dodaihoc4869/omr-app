@@ -438,8 +438,8 @@ async function dayNhieuCa(env: Env, b: Record<string, unknown>): Promise<Respons
       env.DB.prepare(
         `INSERT INTO ca (ma_ca, ten_ca, trang_thai, bat_dau, het_han_vao, thoi_gian_phut, loai, han_nop,
                          cong_bo, cap_nhat_luc, lop, phong_cho, bat_dau_thi_luc, giu_de_doc, an_han_giay,
-                         mo_luc, pham_vi, len_bang, xoa_luc)
-         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                         mo_luc, pham_vi, len_bang, xoa_luc, dem_da_vao, dem_da_nop, dem_canh_bao, dem_luc)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
          ON CONFLICT(ma_ca) DO UPDATE SET
            ten_ca=excluded.ten_ca, trang_thai=excluded.trang_thai, bat_dau=excluded.bat_dau,
            het_han_vao=excluded.het_han_vao, thoi_gian_phut=excluded.thoi_gian_phut,
@@ -447,7 +447,8 @@ async function dayNhieuCa(env: Env, b: Record<string, unknown>): Promise<Respons
            cap_nhat_luc=excluded.cap_nhat_luc, lop=excluded.lop, phong_cho=excluded.phong_cho,
            giu_de_doc=excluded.giu_de_doc, an_han_giay=excluded.an_han_giay,
            mo_luc=excluded.mo_luc, pham_vi=excluded.pham_vi, len_bang=excluded.len_bang,
-           xoa_luc=excluded.xoa_luc,
+           xoa_luc=excluded.xoa_luc, dem_da_vao=excluded.dem_da_vao, dem_da_nop=excluded.dem_da_nop,
+           dem_canh_bao=excluded.dem_canh_bao, dem_luc=excluded.dem_luc,
            -- Giữ nguyên mốc bắt đầu và khoá gói đề: xem ghi chú ở \`dayCa\`.
            bat_dau_thi_luc=COALESCE(excluded.bat_dau_thi_luc, ca.bat_dau_thi_luc)`,
       ).bind(
@@ -457,6 +458,7 @@ async function dayNhieuCa(env: Env, b: Record<string, unknown>): Promise<Respons
         c.phongCho ? 1 : 0, String(c.batDauThiLuc ?? '') || null, c.giuDeDoc ? 1 : 0,
         Number(c.anHanGiay) || 0, String(c.moLuc ?? ''), String(c.phamVi ?? 'tu_do'),
         c.lenBang === false ? 0 : 1, String(c.xoaLuc ?? ''),
+        Number(c.daVao) || 0, Number(c.daNop) || 0, Number(c.canhBao) || 0, nay,
       ),
     )
   }
@@ -527,6 +529,17 @@ async function danhSachCaMoi(env: Env, daXoa: boolean): Promise<Response> {
   const items = (rCa.results ?? []).map((v) => {
     const maCa = String(v.ma_ca ?? '')
     const t = dem[maCa] ?? { da_vao: 0, da_nop: 0, canh_bao: 0 }
+    // SỐ LỚN HƠN giữa ĐẾM SỐNG (từ bảng `luot` trên D1) và ĐẾM CHỤP (con số
+    // Apps Script đã tính, chép sang lúc chuyển dữ liệu).
+    //
+    // VÌ SAO LẤY SỐ LỚN HƠN, không lấy một trong hai:
+    //   · Ca CŨ chạy trên Apps Script: D1 không có dòng `luot` nào ⇒ đếm sống
+    //     bằng 0 ⇒ phải dùng số chụp, nếu không màn Ca thi hiện 0/36 cho mọi ca cũ.
+    //   · Ca MỚI chạy trên máy chủ mới: mỗi em vào thi tạo một dòng ở D1 ngay,
+    //     còn Sheet phải đợi lượt nộp ⇒ đếm sống LUÔN mới hơn số chụp.
+    //   · Ca chép DỞ (chuyển dữ liệu chết giữa chừng, 11/09): đếm sống là một
+    //     phần ⇒ số chụp lớn hơn và thắng. Không bao giờ đếm THIẾU.
+    const chup = { da_vao: Number(v.dem_da_vao) || 0, da_nop: Number(v.dem_da_nop) || 0, canh_bao: Number(v.dem_canh_bao) || 0 }
     return {
       maCa,
       lop: String(v.lop ?? ''),
@@ -546,9 +559,9 @@ async function danhSachCaMoi(env: Env, daXoa: boolean): Promise<Response> {
       phongCho: Number(v.phong_cho ?? 0) === 1,
       batDauThiLuc: String(v.bat_dau_thi_luc ?? ''),
       xoaLuc: String(v.xoa_luc ?? ''),
-      daVao: Number(t.da_vao) || 0,
-      daNop: Number(t.da_nop) || 0,
-      canhBao: Number(t.canh_bao) || 0,
+      daVao: Math.max(Number(t.da_vao) || 0, chup.da_vao),
+      daNop: Math.max(Number(t.da_nop) || 0, chup.da_nop),
+      canhBao: Math.max(Number(t.canh_bao) || 0, chup.canh_bao),
     }
   })
   items.sort((a, b) => mocMs(b.moLuc || b.batDau) - mocMs(a.moLuc || a.batDau))

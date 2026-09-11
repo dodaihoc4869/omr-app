@@ -24,3 +24,24 @@ CREATE TABLE IF NOT EXISTS dong_bo (
   so_luot INTEGER NOT NULL DEFAULT 0,
   ghi_chu TEXT
 );
+
+-- ===========================================================================
+-- SỬA 16h10 11/09 — CHÉP SỐ ĐẾM, KHÔNG CHÉP TỪNG LƯỢT.
+--
+-- Bản 15h đọc CHI TIẾT từng ca để tự đếm lại: 83 lượt gọi Apps Script, hơn mười
+-- phút, và chết lặng khi thầy rời tab. Nó chết thật lúc 15h46 sau đúng 6 ca.
+--
+-- Nhưng Apps Script ĐÃ đếm sẵn ba số này ngay trong lượt `danhSachCa` — một
+-- lượt gọi cho cả kho. Chép thẳng ba số ấy là xong, và lượt chuyển còn đúng
+-- HAI lượt gọi Apps Script thay vì 83.
+--
+-- Worker lấy SỐ LỚN HƠN giữa ba số chụp này và số đếm sống từ bảng `luot`:
+--   · ca cũ  ⇒ D1 không có dòng lượt nào ⇒ số chụp thắng;
+--   · ca mới ⇒ mỗi em vào thi tạo dòng ở D1 ngay ⇒ đếm sống thắng vì mới hơn;
+--   · ca chép dở ⇒ đếm sống là một phần ⇒ số chụp thắng. Không bao giờ đếm thiếu.
+-- ===========================================================================
+
+ALTER TABLE ca ADD COLUMN dem_da_vao   INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE ca ADD COLUMN dem_da_nop   INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE ca ADD COLUMN dem_canh_bao INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE ca ADD COLUMN dem_luc      TEXT;

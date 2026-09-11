@@ -38,7 +38,10 @@ describe('CỔNG AN TOÀN — chưa chuyển xong thì KHÔNG đọc D1', () => 
   it('`danhSachCaThat` hỏi máy chủ mới TRƯỚC, nhưng vẫn còn nguyên đường cũ phía sau', () => {
     const i = API.indexOf('async function danhSachCaThat')
     const than = API.slice(i, i + 1200)
-    expect(than).toContain('const rMoi = await danhSachCaMoi(chMoi, secret, daXoa)')
+    // NEO ĐỔI 16h10 (không hạ tiêu chí): thêm cửa `chiDuongCu` để lượt CHUYỂN
+    // DỮ LIỆU ép đọc Apps Script — đọc D1 rồi ghi lại vào D1 là tự soi gương
+    // rồi bảo mình khớp. Cửa ấy có phép kiểm riêng ở khối "CHUYỂN DỮ LIỆU".
+    expect(than).toContain('const rMoi = chMoi ? await danhSachCaMoi(chMoi, secret, daXoa) : null')
     expect(than).toContain('if (rMoi) return chuanCaTomTat(rMoi.items)')
     // đường cũ phải nằm SAU, và phải còn
     expect(than.indexOf('danhSachCaMoi')).toBeLessThan(than.indexOf("action: 'danhSachCa'"))
@@ -117,36 +120,77 @@ describe('ĐẨY DỮ LIỆU CŨ — không được giả vờ là bài chưa v
   })
 })
 
-describe('CHUYỂN DỮ LIỆU — tự đối chiếu, không tự phong là đủ', () => {
+describe('CHUYỂN DỮ LIỆU — hai lượt gọi cho cả kho, không phải một lượt mỗi ca', () => {
   const HAM = API.slice(API.indexOf('export async function napToanBoCaLenMayChuMoi'), API.length)
 
-  it('chỉ ĐỌC Apps Script và GHI vào D1 — không có lệnh xoá nào', () => {
-    expect(HAM).not.toMatch(/action: '(xoaCa|deleteStudent|xoaPhieu|xoaDe)'/)
+  // CHUYỆN THẬT 15h42–15h46 ngày 11/09. Bản đầu đọc CHI TIẾT từng ca để tự đếm
+  // lại: 83 lượt gọi Apps Script, mỗi lượt 1,5–8 giây, tức hơn mười phút, và cả
+  // vòng lặp ấy sống trong tab của thầy. Nhật ký Worker cho thấy nó chết sau
+  // đúng 6 ca, không chạy tới bước đối chiếu — nên dấu không bao giờ được ghi.
+  //
+  // Apps Script ĐÃ đếm sẵn ba số đã vào / đã nộp / cảnh báo ngay trong lượt
+  // `danhSachCa`, một lượt cho cả kho. Chép thẳng ba số ấy là xong.
+
+  it('KHÔNG đọc chi tiết từng ca nữa', () => {
+    expect(HAM).not.toContain('chiTietCa(')
+    expect(HAM).not.toContain('for (let i = 0; i < tatCa.length; i++)')
   })
 
-  it('so CHÍNH XÁC số ca và số dòng lượt, không so bằng `daVao`', () => {
+  it('chép ba số đếm Apps Script đã tính sẵn', () => {
+    expect(HAM).toContain('daVao: c.daVao,')
+    expect(HAM).toContain('daNop: c.daNop,')
+    expect(HAM).toContain('canhBao: c.canhBao,')
+  })
+
+  it('đọc NGUỒN SỰ THẬT là Apps Script, không đọc D1 rồi ghi lại vào D1', () => {
+    expect(HAM).toContain('danhSachCaThat(scriptUrl, secret, false, true)')
+    expect(HAM).toContain('danhSachCaThat(scriptUrl, secret, true, true)')
+    expect(API).toContain('const chMoi = chiDuongCu ? null : await layCauHinhMayChu()')
+  })
+
+  it('CHỐT CHỐNG BẤM CHỒNG — hai lượt chạy đè nhau là thứ đã làm hỏng 15h42', () => {
+    expect(API).toContain('let dangNapCa = false')
+    expect(HAM).toContain("if (dangNapCa) throw new Error('Lượt chuyển trước còn đang chạy")
+    expect(HAM).toMatch(/\} finally \{\s*\n\s*dangNapCa = false\s*\n\s*\}/)
+  })
+
+  it('máy chủ mới không trả lời lượt đối chiếu ⇒ NÉM LỖI, không lặng lẽ coi là không khớp', () => {
+    expect(HAM).toContain("if (!lai || !laiXoa) throw new Error('Máy chủ mới không trả lời lượt đối chiếu')")
+  })
+
+  it('so SỐ CA và TỔNG SỐ EM ĐÃ VÀO', () => {
     expect(HAM).toContain('const lechCa = tatCa.length - soCaD1')
-    expect(HAM).toContain('const lechLuot = soLuotSheet - soLuotD1')
-    expect(HAM).toContain('const soLuotD1 = lai?.soDongLuot ?? 0')
+    expect(HAM).toContain('const lechLuot = tongVaoSheet - tongVaoD1')
+    expect(HAM).toContain('const khop = lechCa === 0 && lechLuot <= 0')
   })
 
-  it('một ca hỏng cũng KHÔNG được ghi dấu', () => {
-    expect(HAM).toContain('const khop = hong.length === 0 && lechCa === 0 && lechLuot <= 0')
-  })
-
-  it('KHÔNG khớp ⇒ XOÁ dấu, để màn Ca thi quay về đường cũ', () => {
-    expect(HAM).toContain('await datDauDongBo(ch, secret, khop ? { soCa: soCaD1, soLuot: soLuotD1, ghiChu:')
+  it('KHÔNG khớp ⇒ XOÁ dấu, màn Ca thi quay về đường cũ', () => {
+    expect(HAM).toContain('await datDauDongBo(ch, secret, khop ?')
     expect(CLIENT).toContain("const than = dau === null\n    ? { ma: 'ca_day_du', xoa: true }")
   })
 
-  it('một ca lỗi không làm gãy cả lượt — ghi tên rồi đi tiếp', () => {
-    expect(HAM).toContain('hong.push(c.maCa)')
-    expect(HAM).toMatch(/\} catch \{\s*\n\s*hong\.push\(c\.maCa\)\s*\n\s*\}/)
+  it('chỉ ĐỌC Apps Script và GHI vào D1 — không lệnh xoá nào', () => {
+    expect(HAM).not.toMatch(/action: '(xoaCa|deleteStudent|xoaPhieu|xoaDe)'/)
+  })
+})
+
+describe('LẤY SỐ LỚN HƠN giữa đếm sống và số chụp', () => {
+  const SQL = MAY.slice(MAY.indexOf('async function danhSachCaMoi'), MAY.indexOf('async function danhSachCaMoi') + 4200)
+
+  it('ca CŨ: D1 không có dòng lượt nào ⇒ số chụp phải thắng', () => {
+    expect(SQL).toContain('const chup = { da_vao: Number(v.dem_da_vao) || 0')
+    expect(SQL).toContain('daVao: Math.max(Number(t.da_vao) || 0, chup.da_vao)')
   })
 
-  it('gọi `chiTietCa` TUẦN TỰ — chạy song song là dựng lại đúng cú dồn đã gỡ', () => {
-    expect(HAM).toContain('for (let i = 0; i < tatCa.length; i++)')
-    expect(HAM).not.toContain('Promise.all(tatCa')
+  it('cả ba ô đều lấy số lớn hơn, không chỉ mỗi ô đã vào', () => {
+    expect(SQL).toContain('daNop: Math.max(Number(t.da_nop) || 0, chup.da_nop)')
+    expect(SQL).toContain('canhBao: Math.max(Number(t.canh_bao) || 0, chup.canh_bao)')
+  })
+
+  it('số chụp được GHI lúc đẩy ca', () => {
+    const HAM = MAY.slice(MAY.indexOf('async function dayNhieuCa'), MAY.indexOf('async function dayNhieuCa') + 4200)
+    expect(HAM).toContain('dem_da_vao, dem_da_nop, dem_canh_bao, dem_luc')
+    expect(HAM).toContain('Number(c.daVao) || 0, Number(c.daNop) || 0, Number(c.canhBao) || 0, nay,')
   })
 })
 
@@ -166,45 +210,3 @@ describe('NÚT TRONG CÀI ĐẶT', () => {
   })
 })
 
-describe('ĐẾM THEO KHOÁ DUY NHẤT — cổng an toàn tự khoá chính nó, 15h10 11/09', () => {
-  const HAM = API.slice(API.indexOf('export async function napToanBoCaLenMayChuMoi'), API.length)
-
-  // CHUYỆN THẬT. Lượt chuyển chạy xong: D1 nhận 84 ca và 190 lượt — dữ liệu
-  // sang đủ. Nhưng dấu `ca_day_du` KHÔNG được ghi, và màn Ca thi vẫn đọc
-  // đường cũ.
-  //
-  // NGUYÊN NHÂN GỐC: tôi đếm DÒNG THÔ đọc từ Sheet rồi đòi nó bằng đúng số
-  // dòng trên D1. Nhưng D1 khoá theo `maCa|sbd|lanThu`, nên hai dòng trùng
-  // khoá trên `LuotThi` chỉ thành MỘT dòng ở D1 — đúng như thiết kế. Sheet có
-  // dòng trùng từ thời chưa có cột `KhoaNop` (v73 mới thêm hôm nay), nên phép
-  // so ấy KHÔNG BAO GIỜ khớp được dù dữ liệu đã sang đủ.
-  //
-  // Cổng an toàn tự khoá chính nó: càng đúng đắn về dữ liệu thì càng không mở.
-
-  it('gom về TẬP KHOÁ, không cộng dồn số dòng', () => {
-    expect(HAM).toContain('const khoaSheet = new Set<string>()')
-    expect(HAM).toContain('const soLuotSheet = khoaSheet.size')
-    expect(HAM).not.toContain('soLuotSheet += luot.length')
-  })
-
-  it('khoá dựng đúng dạng D1 dùng: maCa|sbd|lanThu', () => {
-    expect(HAM).toContain('khoaSheet.add(`${c.maCa}|${l.sbd}|${l.lanThu ?? 1}`)')
-    // và Worker khoá y hệt
-    expect(MAY).toContain('`${maCa}|${sbd}|${lanThu}`')
-  })
-
-  it('dòng KHÔNG có số báo danh thì bỏ, y như Worker bỏ', () => {
-    expect(HAM).toContain("if (String(l.sbd ?? '').trim())")
-    expect(MAY).toContain('if (!maCa || !sbd) continue')
-  })
-
-  it('D1 NHIỀU hơn Sheet vẫn là KHỚP — em vừa vào thi có dòng ở D1 trước', () => {
-    expect(HAM).toContain('const khop = hong.length === 0 && lechCa === 0 && lechLuot <= 0')
-  })
-
-  it('lời báo nói RÕ lệch ở đâu, không chỉ nói "không khớp"', () => {
-    expect(KHOI).toContain('Sheet ${kq.soCa} ca / ${kq.soLuot} lượt')
-    expect(KHOI).toContain('máy chủ mới ${kq.soCaD1} ca / ${kq.soLuotD1} lượt')
-    expect(KHOI).toContain('ĐỌC HỎNG')
-  })
-})

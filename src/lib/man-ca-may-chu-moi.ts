@@ -58,6 +58,14 @@ export interface CaDayNhieu {
   phongCho?: boolean
   batDauThiLuc?: string
   xoaLuc?: string
+  /** BA SỐ ĐẾM chép nguyên từ Apps Script — đã vào / đã nộp / cảnh báo.
+   *
+   * Máy chủ mới lấy SỐ LỚN HƠN giữa ba số này và số đếm sống từ bảng `luot`,
+   * nên ca cũ (D1 không có dòng lượt nào) vẫn hiện đúng, còn ca đang chạy
+   * trên máy chủ mới thì đếm sống thắng vì nó mới hơn Sheet. */
+  daVao?: number
+  daNop?: number
+  canhBao?: number
 }
 
 export interface LuotDayNhieu {

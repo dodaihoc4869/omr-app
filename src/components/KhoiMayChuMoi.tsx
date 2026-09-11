@@ -80,7 +80,6 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
       // NÓI RÕ LỆCH Ở ĐÂU, không chỉ nói "không khớp". Lượt chạy 15h10 báo
       // không khớp mà không ai biết vì sao — thầy không có gì để lần.
       const phan = [`Sheet ${kq.soCa} ca / ${kq.soLuot} lượt`, `máy chủ mới ${kq.soCaD1} ca / ${kq.soLuotD1} lượt`]
-      if (kq.hong.length) phan.push(`ĐỌC HỎNG ${kq.hong.length} ca: ${kq.hong.slice(0, 5).join(', ')}`)
       if (kq.lechCa !== 0) phan.push(`lệch ${kq.lechCa} ca`)
       if (kq.lechLuot > 0) phan.push(`thiếu ${kq.lechLuot} lượt`)
       setKetNap({
@@ -153,6 +152,8 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
 
       <div style={NHAN_NHO}>
         Nút trên chỉ ĐỌC Apps Script và GHI vào máy chủ mới, không xoá gì ở Google Sheet.
+        {' '}Chạy xong trong vài giây: nó chép ba số đếm Apps Script đã tính sẵn cho
+        {' '}mỗi ca, không đọc lại chi tiết từng ca.
         {' '}Chuyển xong nó tự đối chiếu số ca và số lượt hai bên; lệch một dòng là
         {' '}màn Ca thi vẫn đọc đường cũ — thà chậm còn hơn đếm sai số em.
       </div>
