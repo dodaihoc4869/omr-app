@@ -2529,6 +2529,9 @@ export interface KetQuaNapCa {
   khop: boolean
   lechCa: number
   lechLuot: number
+  /** Số ca và số lượt ĐỌC LẠI TỪ D1 — để nói rõ lệch ở đâu, không chỉ nói "không khớp". */
+  soCaD1: number
+  soLuotD1: number
   hong: string[]
 }
 
@@ -2585,7 +2588,14 @@ export async function napToanBoCaLenMayChuMoi(
   // Rồi LƯỢT, từng ca một. `chiTietCa` là lệnh nặng nhất của Apps Script nên
   // không gọi song song — chạy song song là tự dựng lại đúng cú dồn đã gỡ.
   const hong: string[] = []
-  let soLuotSheet = 0
+  // ĐẾM THEO KHOÁ DUY NHẤT `maCa|sbd|lanThu`, KHÔNG đếm dòng thô.
+  //
+  // Lỗi của lượt chạy 15h10: đếm dòng thô rồi đòi bằng đúng số dòng trên D1.
+  // Nhưng D1 khoá theo `maCa|sbd|lanThu`, nên hai dòng trùng khoá trên Sheet
+  // chỉ thành MỘT dòng ở D1 — đúng như thiết kế. `LuotThi` có dòng trùng từ
+  // thời chưa có cột `KhoaNop` (v73 mới thêm), nên phép so cũ KHÔNG BAO GIỜ
+  // khớp được dù dữ liệu đã sang đủ. Đó là cổng an toàn tự khoá chính nó.
+  const khoaSheet = new Set<string>()
   for (let i = 0; i < tatCa.length; i++) {
     const c = tatCa[i]
     bao?.(i + 1, tatCa.length + 1, `ca ${c.maCa}`)
@@ -2602,7 +2612,7 @@ export async function napToanBoCaLenMayChuMoi(
         soLanRoiMan: l.soLanRoiMan,
         tongGiayRoiMan: l.tongGiayRoiMan,
       }))
-      soLuotSheet += luot.length
+      for (const l of luot) if (String(l.sbd ?? '').trim()) khoaSheet.add(`${c.maCa}|${l.sbd}|${l.lanThu ?? 1}`)
       if (luot.length > 0 && !(await dayNhieuCaMoi(ch, secret, { luot }))) hong.push(c.maCa)
     } catch {
       hong.push(c.maCa)
@@ -2615,13 +2625,18 @@ export async function napToanBoCaLenMayChuMoi(
   const soCaD1 = (lai?.items.length ?? 0) + (laiXoa?.items.length ?? 0)
   const soLuotD1 = lai?.soDongLuot ?? 0
 
-  // So CHÍNH XÁC cả hai con số. `soDongLuot` đếm ĐÚNG số dòng `luot` trên D1,
-  // cùng nghĩa với `soLuotSheet` — số dòng đọc từ Sheet. Không so bằng `daVao`
-  // được: nó chỉ đếm lần thử cao nhất mỗi em, mà em thi lại có nhiều dòng.
+  // So theo KHOÁ DUY NHẤT ở cả hai phía. `soDongLuot` là số dòng `luot` trên
+  // D1, mà D1 khoá theo `maCa|sbd|lanThu` nên mỗi dòng là một khoá. Phía Sheet
+  // cũng gom về tập khoá. Không so bằng `daVao`: nó chỉ đếm lần thử cao nhất
+  // mỗi em, mà em thi lại có nhiều lượt.
+  //
+  // `lechLuot < 0` (D1 NHIỀU hơn) là BÌNH THƯỜNG và vẫn khớp: em vừa vào thi
+  // qua máy chủ mới thì có dòng ở D1 trước khi có dòng trên Sheet.
   const lechCa = tatCa.length - soCaD1
+  const soLuotSheet = khoaSheet.size
   const lechLuot = soLuotSheet - soLuotD1
   const khop = hong.length === 0 && lechCa === 0 && lechLuot <= 0
   await datDauDongBo(ch, secret, khop ? { soCa: soCaD1, soLuot: soLuotD1, ghiChu: 'da doi chieu' } : null)
   bao?.(tatCa.length + 1, tatCa.length + 1, khop ? 'xong' : 'KHÔNG khớp')
-  return { soCa: tatCa.length, soLuot: soLuotSheet, khop, lechCa, lechLuot, hong }
+  return { soCa: tatCa.length, soLuot: soLuotSheet, soLuotD1, soCaD1, khop, lechCa, lechLuot, hong }
 }

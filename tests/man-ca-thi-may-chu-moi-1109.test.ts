@@ -165,3 +165,46 @@ describe('NÚT TRONG CÀI ĐẶT', () => {
     expect(KHOI).toContain('không xoá gì ở Google Sheet')
   })
 })
+
+describe('ĐẾM THEO KHOÁ DUY NHẤT — cổng an toàn tự khoá chính nó, 15h10 11/09', () => {
+  const HAM = API.slice(API.indexOf('export async function napToanBoCaLenMayChuMoi'), API.length)
+
+  // CHUYỆN THẬT. Lượt chuyển chạy xong: D1 nhận 84 ca và 190 lượt — dữ liệu
+  // sang đủ. Nhưng dấu `ca_day_du` KHÔNG được ghi, và màn Ca thi vẫn đọc
+  // đường cũ.
+  //
+  // NGUYÊN NHÂN GỐC: tôi đếm DÒNG THÔ đọc từ Sheet rồi đòi nó bằng đúng số
+  // dòng trên D1. Nhưng D1 khoá theo `maCa|sbd|lanThu`, nên hai dòng trùng
+  // khoá trên `LuotThi` chỉ thành MỘT dòng ở D1 — đúng như thiết kế. Sheet có
+  // dòng trùng từ thời chưa có cột `KhoaNop` (v73 mới thêm hôm nay), nên phép
+  // so ấy KHÔNG BAO GIỜ khớp được dù dữ liệu đã sang đủ.
+  //
+  // Cổng an toàn tự khoá chính nó: càng đúng đắn về dữ liệu thì càng không mở.
+
+  it('gom về TẬP KHOÁ, không cộng dồn số dòng', () => {
+    expect(HAM).toContain('const khoaSheet = new Set<string>()')
+    expect(HAM).toContain('const soLuotSheet = khoaSheet.size')
+    expect(HAM).not.toContain('soLuotSheet += luot.length')
+  })
+
+  it('khoá dựng đúng dạng D1 dùng: maCa|sbd|lanThu', () => {
+    expect(HAM).toContain('khoaSheet.add(`${c.maCa}|${l.sbd}|${l.lanThu ?? 1}`)')
+    // và Worker khoá y hệt
+    expect(MAY).toContain('`${maCa}|${sbd}|${lanThu}`')
+  })
+
+  it('dòng KHÔNG có số báo danh thì bỏ, y như Worker bỏ', () => {
+    expect(HAM).toContain("if (String(l.sbd ?? '').trim())")
+    expect(MAY).toContain('if (!maCa || !sbd) continue')
+  })
+
+  it('D1 NHIỀU hơn Sheet vẫn là KHỚP — em vừa vào thi có dòng ở D1 trước', () => {
+    expect(HAM).toContain('const khop = hong.length === 0 && lechCa === 0 && lechLuot <= 0')
+  })
+
+  it('lời báo nói RÕ lệch ở đâu, không chỉ nói "không khớp"', () => {
+    expect(KHOI).toContain('Sheet ${kq.soCa} ca / ${kq.soLuot} lượt')
+    expect(KHOI).toContain('máy chủ mới ${kq.soCaD1} ca / ${kq.soLuotD1} lượt')
+    expect(KHOI).toContain('ĐỌC HỎNG')
+  })
+})

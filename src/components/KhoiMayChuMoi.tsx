@@ -77,8 +77,10 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
       const kq = await napToanBoCaLenMayChuMoi(url.trim(), mat.trim(), (xong, tong, viec) => {
         setTienNap(`${xong}/${tong} · ${viec}`)
       })
-      const phan = [`${kq.soCa} ca`, `${kq.soLuot} lượt`]
-      if (kq.hong.length) phan.push(`HỎNG ${kq.hong.length} ca: ${kq.hong.slice(0, 5).join(', ')}`)
+      // NÓI RÕ LỆCH Ở ĐÂU, không chỉ nói "không khớp". Lượt chạy 15h10 báo
+      // không khớp mà không ai biết vì sao — thầy không có gì để lần.
+      const phan = [`Sheet ${kq.soCa} ca / ${kq.soLuot} lượt`, `máy chủ mới ${kq.soCaD1} ca / ${kq.soLuotD1} lượt`]
+      if (kq.hong.length) phan.push(`ĐỌC HỎNG ${kq.hong.length} ca: ${kq.hong.slice(0, 5).join(', ')}`)
       if (kq.lechCa !== 0) phan.push(`lệch ${kq.lechCa} ca`)
       if (kq.lechLuot > 0) phan.push(`thiếu ${kq.lechLuot} lượt`)
       setKetNap({
