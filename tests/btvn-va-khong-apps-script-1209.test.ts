@@ -140,25 +140,13 @@ describe('HỒ SƠ EM — bảng mạnh–yếu lấy từ máy chủ mới', ()
   })
 })
 
-describe('SCRIPT PHÁT HÀNH dựng đủ bảng mới', () => {
-  it('chạy migration của đợt bỏ Apps Script', () => {
-    const CMD = doc('CHUYEN-SANG-MAY-CHU-MOI.command')
-    expect(CMD).toContain('migration-1209-toan-bo.sql')
-  })
-
-  it('tự kiểm bằng truy vấn THẬT, không tin mã thoát', () => {
-    // `ALTER TABLE` chạy lần hai báo lỗi và đó là hành vi đúng, nên mã thoát
-    // không nói lên điều gì. Chỉ truy vấn thật mới nói.
-    const CMD = doc('CHUYEN-SANG-MAY-CHU-MOI.command')
-    expect(CMD).toContain('FROM chi_tiet_cau')
-    expect(CMD).toContain('FROM de_kho')
-    expect(CMD).toContain('FROM btvn')
-    expect(CMD).toContain('KD=$?')
-  })
-
-  it('kiểm đường của EM là CÔNG KHAI, không phải 403', () => {
-    const CMD = doc('CHUYEN-SANG-MAY-CHU-MOI.command')
-    expect(CMD).toContain('/btvn/cua-em')
-    expect(CMD).toContain('CÔNG KHAI, phải 200')
-  })
-})
+// KHÔNG có phép kiểm cho `CHUYEN-SANG-MAY-CHU-MOI.command` ở đây, và đó là cố ý.
+//
+// Tệp ấy nằm NGOÀI git (nó mang `CLOUDFLARE_ACCOUNT_ID`, mà repo này CÔNG KHAI).
+// Phép kiểm đọc một tệp không có trong repo thì xanh trên máy tôi và đỏ ở mọi
+// nơi khác — đúng kiểu phép kiểm tệ nhất: nó dối.
+//
+// Việc "script phát hành phải chạy `migration-1209-toan-bo.sql`" vì thế được
+// canh bằng chính lượt phát hành: script tự tra `SELECT ... FROM chi_tiet_cau /
+// de_kho / btvn` sau khi chạy migration, và DỪNG nếu truy vấn hỏng. Tra thật
+// mạnh hơn một phép kiểm đọc chữ.
