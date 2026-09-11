@@ -8,6 +8,7 @@
 //   3. Lệnh của HỌC SINH không đòi mã bí mật (giống Apps Script hiện nay);
 //      lệnh của THẦY thì đòi. Không nới luật này ở bất kỳ đâu.
 import { CA_DO_TAI, TRANG_DO_TAI } from './do-tai'
+import { chuanHoaDanhSach } from './danh-sach'
 import type { DongCa, DongLuot, Env } from './kieu'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 
@@ -411,28 +412,28 @@ async function xoaPhieuR2(env: Env, ma: string): Promise<Response> {
 // LUẬT GIỮ NGUYÊN TỪ APPS SCRIPT: bảng RỖNG thì KHÔNG chặn ai. Thầy chưa kịp
 // đẩy danh sách mà cả lớp đứng ngoài cửa là hỏng nặng hơn hẳn việc thiếu cổng.
 async function dayDanhSach(env: Env, b: Record<string, unknown>): Promise<Response> {
-  const ds = Array.isArray(b.ds) ? (b.ds as Record<string, unknown>[]) : []
+  const ds = chuanHoaDanhSach(b.ds)
+  // Danh sách rỗng thì KHÔNG ghi gì và KHÔNG xoá gì. Một lượt gọi hỏng nửa
+  // chừng mà xoá sạch bảng là mở toang cổng vào thi ngay trước giờ thi.
   if (ds.length === 0) return ra({ ok: false, error: 'Danh sách rỗng' })
   const nay = new Date().toISOString()
-  const cau = ds
-    .map((e) => String(e.sbd ?? '').trim())
-    .filter((x) => x.length > 0)
-    .map((_, i) =>
-      env.DB.prepare(
-        `INSERT INTO danh_sach (sbd, ho_ten, nam_sinh, lop, cap_nhat_luc) VALUES (?,?,?,?,?)
-         ON CONFLICT(sbd) DO UPDATE SET ho_ten=excluded.ho_ten, nam_sinh=excluded.nam_sinh,
-           lop=excluded.lop, cap_nhat_luc=excluded.cap_nhat_luc`,
-      ).bind(
-        String(ds[i].sbd ?? '').trim(),
-        String(ds[i].hoTen ?? ''),
-        String(ds[i].namSinh ?? ''),
-        String(ds[i].lop ?? ''),
-        nay,
-      ),
-    )
+  const cau = ds.map((e) =>
+    env.DB.prepare(
+      `INSERT INTO danh_sach (sbd, ho_ten, nam_sinh, lop, cap_nhat_luc) VALUES (?,?,?,?,?)
+       ON CONFLICT(sbd) DO UPDATE SET ho_ten=excluded.ho_ten, nam_sinh=excluded.nam_sinh,
+         lop=excluded.lop, cap_nhat_luc=excluded.cap_nhat_luc`,
+    ).bind(e.sbd, e.hoTen, e.namSinh, e.lop, nay),
+  )
   // Gói $5 cho 1.000 câu mỗi lượt gọi; chia lô 500 để còn chỗ thở.
   for (let i = 0; i < cau.length; i += 500) await env.DB.batch(cau.slice(i, i + 500))
-  return ra({ ok: true, dem: cau.length })
+  // GHI ĐÈ TOÀN BỘ, đúng như `napDanhSachLop` bên Apps Script xoá trắng sheet
+  // rồi ghi lại. Chỉ upsert thôi là em thầy đã gạch tên vẫn vào thi được ở máy
+  // chủ mới — hai cổng lệch nhau, và cái lệch ấy nghiêng về phía mở.
+  //
+  // Xoá SAU khi mọi lô đã ghi xong: lô hỏng thì hàm ném lỗi ở dòng trên và
+  // không xuống tới đây, nên không bao giờ xoá trên một bảng ghi dở.
+  const xoa = await env.DB.prepare('DELETE FROM danh_sach WHERE cap_nhat_luc <> ?').bind(nay).run()
+  return ra({ ok: true, dem: ds.length, daBo: xoa.meta?.changes ?? 0 })
 }
 
 /** Một dòng danh sách, hoặc `null` khi không có. */
