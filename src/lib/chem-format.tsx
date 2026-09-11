@@ -419,7 +419,10 @@ export function parseChemText(raw: string): ChemPart[] {
       }
     }
     if (ch === '^') {
-      const m = /^[0-9+-]+/.exec(text.slice(i + 1))
+      // Dấu trừ Unicode (−, –, —) cũng tính: kho đề cũ ghi `10^−17` bằng dấu
+      // trừ toán học U+2212, bản cũ chỉ nhận dấu `-` ASCII nên cả cụm rơi ra
+      // chữ thường và em nhìn thấy nguyên chữ `10^−17`.
+      const m = /^[0-9+\-\u2212\u2013\u2014]+/.exec(text.slice(i + 1))
       if (m) {
         parts.push({ t: 'sup', v: m[0] })
         i += 1 + m[0].length
@@ -496,19 +499,127 @@ type Segment = { t: 'ce' | 'math'; latex: string } | { t: 'plain'; text: string 
 // Tách "\ce{...}" và "$...$" ra khỏi phần chữ thường xung quanh — phần chữ
 // thường vẫn qua parseChemText (giữ nguyên cách hiển thị cũ, dữ liệu thầy đã
 // gõ trước đây không cần sửa lại tay).
-const CE_OR_MATH_RE = /\\ce\{([^}]*)\}|\$([^$]*)\$/g
+/** Vị trí `}` khớp với `{` ở `mo`, tính cả ngoặc lồng. Không khớp thì -1. */
+function timNgoacNhonDong(s: string, mo: number): number {
+  let sau = 0
+  for (let j = mo; j < s.length; j++) {
+    if (s[j] === '\\') {
+      j++
+      continue
+    }
+    if (s[j] === '{') sau++
+    else if (s[j] === '}') {
+      sau--
+      if (sau === 0) return j
+    }
+  }
+  return -1
+}
+
+/** Lệnh LaTeX được phép TỰ NHẬN khi thầy quên cặp `$...$` bao quanh.
+ *
+ * BẢNG ĐÓNG — chỉ những lệnh đã thật sự gặp trong kho đề. Cấm nhận
+ * `\<chữ>` chung chung: đường dẫn tệp, kí hiệu đơn vị, chữ thầy gõ có dấu
+ * gạch chéo sẽ bị nuốt nhầm thành công thức và mất hẳn khỏi màn hình. */
+const LENH_LATEX_TOAN = new Set([
+  'bar', 'overline', 'underline', 'vec', 'hat', 'widehat', 'tilde', 'overrightarrow',
+  'frac', 'dfrac', 'tfrac', 'cfrac', 'sqrt',
+  'text', 'mathrm', 'mathit', 'mathbf', 'operatorname',
+  'times', 'cdot', 'div', 'pm', 'mp', 'approx', 'neq', 'leq', 'geq', 'le', 'ge', 'll', 'gg', 'equiv',
+  'rightarrow', 'leftarrow', 'to', 'gets', 'Rightarrow', 'Leftarrow', 'longrightarrow', 'rightleftharpoons', 'xrightarrow',
+  'alpha', 'beta', 'gamma', 'Gamma', 'delta', 'Delta', 'epsilon', 'varepsilon', 'zeta', 'eta',
+  'theta', 'Theta', 'kappa', 'lambda', 'Lambda', 'mu', 'nu', 'xi', 'pi', 'Pi', 'rho',
+  'sigma', 'Sigma', 'tau', 'phi', 'varphi', 'Phi', 'chi', 'psi', 'Psi', 'omega', 'Omega',
+  'circ', 'degree', 'infty', 'sum', 'prod', 'int', 'log', 'ln', 'exp', 'lg',
+  'left', 'right', 'quad', 'qquad', 'ce',
+])
+
+/** Đọc MỘT lệnh LaTeX bắt đầu ở `i` (phải là dấu `\`) cùng các nhóm `{...}`
+ * đi liền ngay sau. Trả về vị trí ngay SAU lệnh, hoặc -1 nếu không phải lệnh
+ * trong bảng đóng (hoặc ngoặc không khớp). */
+function docLenhLatex(s: string, i: number): number {
+  const m = /^\\([a-zA-Z]+)/.exec(s.slice(i))
+  if (!m || !LENH_LATEX_TOAN.has(m[1])) return -1
+  let j = i + m[0].length
+  while (s[j] === '{') {
+    const dong = timNgoacNhonDong(s, j)
+    if (dong === -1) return -1
+    j = dong + 1
+  }
+  return j
+}
+
+/** Ký tự được phép NỐI hai lệnh LaTeX trong cùng một công thức, ví dụ dấu
+ * `\bar{A} = \dfrac{...}{...}` có ` = ` nằm giữa. Bảng hẹp và chặn độ dài:
+ * chữ tiếng Việt và dấu chấm câu KHÔNG nằm trong đây nên một câu văn xen giữa
+ * hai công thức sẽ cắt khúc, không bị nuốt vào công thức. */
+const NOI_LATEX = /^[\s=+\-\u2212\u00d7\u00b7/()[\]0-9A-Za-z,^_{}]{0,14}$/
+
+/** Quét một khúc LaTeX viết trần (thiếu `$...$`) bắt đầu ở `i`. Trả về vị trí
+ * kết thúc khúc, hoặc -1 nếu ở đó không mở đầu một lệnh nào trong bảng. */
+function quetKhucLatex(s: string, i: number): number {
+  let cuoi = docLenhLatex(s, i)
+  if (cuoi === -1) return -1
+  for (;;) {
+    const m = /\\[a-zA-Z]+/.exec(s.slice(cuoi))
+    if (!m) break
+    if (!NOI_LATEX.test(s.slice(cuoi, cuoi + m.index))) break
+    const tiep = docLenhLatex(s, cuoi + m.index)
+    if (tiep === -1) break
+    cuoi = tiep
+  }
+  return cuoi
+}
+
+/** Đổi ký hiệu toán Unicode về lệnh LaTeX tương ứng TRƯỚC khi đưa cho KaTeX.
+ * Kho đề cũ đã bị một lượt "gỡ LaTeX" đổi `\times` thành `×` nhưng bỏ sót
+ * `\bar` và `\dfrac`, nên chuỗi còn lại lẫn cả hai kiểu. */
+function kyHieuToanVeLatex(s: string): string {
+  return s.replace(/\u00d7/g, '\\times ').replace(/\u00b7/g, '\\cdot ').replace(/\u2212/g, '-')
+}
 
 export function splitCeSegments(raw: string): Segment[] {
   const text = raw ?? ''
   const out: Segment[] = []
   let last = 0
-  let m: RegExpExecArray | null
-  CE_OR_MATH_RE.lastIndex = 0
-  while ((m = CE_OR_MATH_RE.exec(text))) {
-    if (m.index > last) out.push({ t: 'plain', text: text.slice(last, m.index) })
-    if (m[1] !== undefined) out.push({ t: 'ce', latex: m[1] })
-    else out.push({ t: 'math', latex: m[2] ?? '' })
-    last = m.index + m[0].length
+  let i = 0
+  const chot = (den: number, seg: Segment): void => {
+    if (den > last) out.push({ t: 'plain', text: text.slice(last, den) })
+    out.push(seg)
+  }
+  while (i < text.length) {
+    const ch = text[i]
+    if (ch === '$') {
+      const dong = text.indexOf('$', i + 1)
+      if (dong !== -1) {
+        chot(i, { t: 'math', latex: text.slice(i + 1, dong) })
+        i = dong + 1
+        last = i
+        continue
+      }
+    }
+    if (ch === '\\') {
+      // `\ce{...}` ĐẾM NGOẶC LỒNG. Bản cũ dùng `[^}]*` nên `\ce{^{206}_{82}Pb}`
+      // bị cắt ở dấu `}` đầu tiên: chỉ `^{206` vào mhchem, phần `_{82}Pb}` rơi
+      // ra chữ thường — đúng cái ảnh thầy chụp câu chì-206.
+      if (text.startsWith('\\ce{', i)) {
+        const dong = timNgoacNhonDong(text, i + 3)
+        if (dong !== -1) {
+          chot(i, { t: 'ce', latex: text.slice(i + 4, dong) })
+          i = dong + 1
+          last = i
+          continue
+        }
+      }
+      const cuoi = quetKhucLatex(text, i)
+      if (cuoi > i) {
+        chot(i, { t: 'math', latex: text.slice(i, cuoi) })
+        i = cuoi
+        last = i
+        continue
+      }
+    }
+    i += 1
   }
   if (last < text.length) out.push({ t: 'plain', text: text.slice(last) })
   return out
@@ -542,7 +653,7 @@ function ChemFormula({ t, latex: latexGoc }: { t: 'ce' | 'math'; latex: string }
   // chú ở `chuanHoaCongThucTongQuat`), và nhãn mũi tên có ngoặc vuông lồng thì
   // vỡ (xem `chuanHoaNhanMuiTen`). Thoát ngoặc TRƯỚC: sau bước đó nhãn có thêm
   // `{[}` nên luật công thức tổng quát khỏi phải đoán giữa đống ngoặc.
-  const latex = chuanHoaCongThucTongQuat(chuanHoaNhanMuiTen(latexGoc))
+  const latex = chuanHoaCongThucTongQuat(chuanHoaNhanMuiTen(kyHieuToanVeLatex(latexGoc)))
   try {
     const html = katex.renderToString(t === 'ce' ? `\\ce{${latex}}` : latex, KATEX_OPTS)
     // Công thức NGẮN: KHÔNG bọc thêm inline-block/overflow/vertical-align —
