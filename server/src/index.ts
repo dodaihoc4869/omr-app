@@ -1142,7 +1142,13 @@ export function goPhanKhoiMaDe(ma: string): { goc: string; phan: 'I' | 'II' | 'I
  *      "đã nộp / chưa nộp".
  */
 async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response> {
-  const maCa = String(b.maCa ?? '').trim()
+  // NHIỀU CA MỘT LƯỢT GIAO (thầy chốt 12/09: "cho tick chọn nhiều ca"). Nhận cả
+  // `maCa` một ca của bản trước — bản cũ trên máy thầy vẫn gửi dáng ấy.
+  const dsMaCa = Array.isArray(b.dsMaCa)
+    ? (b.dsMaCa as unknown[]).map((x) => String(x).trim()).filter(Boolean)
+    : String(b.maCa ?? '').trim()
+      ? [String(b.maCa).trim()]
+      : []
   // NHIỀU TỜ ĐỀ MỘT LƯỢT GIAO (thầy chốt 12/09: "cho tick nhiều"). Nhận cả
   // `maDe` một tờ của bản trước — bản cũ trên máy em vẫn gửi dáng ấy.
   //
@@ -1154,7 +1160,8 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
     : String(b.maDe ?? '').trim()
       ? [String(b.maDe).trim()]
       : []
-  if (!maCa || dsMaDe.length === 0) return ra({ ok: false, error: 'Thiếu mã ca hoặc mã đề' })
+  if (dsMaCa.length === 0 || dsMaDe.length === 0) return ra({ ok: false, error: 'Thiếu ca hoặc tờ đề' })
+  if (dsMaCa.length > 10) return ra({ ok: false, error: `Tối đa 10 ca một lượt giao, thầy đang tick ${dsMaCa.length} ca` })
   // TRẦN 12 TỜ một lượt giao: mỗi tờ tốn một lượt đọc R2 lúc đếm câu, và bài
   // của em cũng không nên là một trăm câu.
   if (dsMaDe.length > 12) return ra({ ok: false, error: `Tối đa 12 tờ một lượt giao, thầy đang tick ${dsMaDe.length} tờ` })
@@ -1193,37 +1200,57 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
   }
   if (soCau === 0) return ra({ ok: false, error: 'Những tờ đã tick không có câu nào — kiểm tra lại kho đề' })
 
-  // ĐÚNG những em có lượt trong ca. Lấy lần thử cao nhất, và bỏ lượt đã được
-  // duyệt lại — cùng luật đếm của màn Ca thi.
-  const rEm = await env.DB.prepare(
-    `SELECT l.sbd, COALESCE(NULLIF(l.ho_ten,''), d.ho_ten, '') AS ten
-       FROM luot l LEFT JOIN danh_sach d ON d.sbd = l.sbd
-      WHERE l.ma_ca = ? AND l.trang_thai <> 'duoc_duyet_lai'
-      GROUP BY l.sbd`,
-  )
-    .bind(maCa)
-    .all<{ sbd: string; ten: string }>()
-  const dsEm = rEm.results ?? []
-  if (dsEm.length === 0) return ra({ ok: false, error: 'Ca này chưa có em nào vào thi' })
-
+  // MỘT LƯỢT GIAO CHO MỖI CA, KHÔNG GỘP CHUNG MỘT DÒNG.
+  //
+  // Em mở bài bằng MÃ CA của chính mình (`btvnCuaEm` tra theo `ma_ca`), nên gộp
+  // ba ca vào một dòng là hai lớp kia không tra ra bài. Ba dòng, cùng tờ đề,
+  // cùng hạn nộp — hạn chốt MỘT lần ở đây để cả ba lớp cùng mốc.
   const nay = new Date()
   const giaoLuc = nay.toISOString()
   const hanNop = new Date(nay.getTime() + HAN_BTVN_GIO * 3600 * 1000).toISOString()
-  const maBtvn = `${maCa}-${nay.getTime().toString(36)}`
 
-  const lenh: D1PreparedStatement[] = [
-    env.DB.prepare(
-      `INSERT INTO btvn (ma_btvn, ma_ca, ma_de, so_cau, giao_luc, han_nop, da_xoa, cap_nhat_luc)
-       VALUES (?,?,?,?,?,?,0,?)`,
-    ).bind(maBtvn, maCa, dsMaDe.join(','), soCau, giaoLuc, hanNop, giaoLuc),
-  ]
-  for (const e of dsEm) {
-    lenh.push(
-      env.DB.prepare('INSERT INTO btvn_em (khoa, ma_btvn, sbd, ho_ten) VALUES (?,?,?,?)').bind(`${maBtvn}|${e.sbd}`, maBtvn, String(e.sbd), String(e.ten ?? '')),
+  const lenh: D1PreparedStatement[] = []
+  const emDaCo = new Set<string>()
+  const caRong: string[] = []
+  let soLuotGiao = 0
+
+  for (const ca of dsMaCa) {
+    const rEm = await env.DB.prepare(
+      `SELECT l.sbd, COALESCE(NULLIF(l.ho_ten,''), d.ho_ten, '') AS ten
+         FROM luot l LEFT JOIN danh_sach d ON d.sbd = l.sbd
+        WHERE l.ma_ca = ? AND l.trang_thai <> 'duoc_duyet_lai'
+        GROUP BY l.sbd`,
     )
+      .bind(ca)
+      .all<{ sbd: string; ten: string }>()
+    const dsEm = rEm.results ?? []
+    // Ca chưa em nào vào thi thì BỎ QUA ca ấy và kê tên ra, không làm hỏng cả
+    // lượt giao cho những ca còn lại.
+    if (dsEm.length === 0) {
+      caRong.push(ca)
+      continue
+    }
+    const maBtvn = `${ca}-${nay.getTime().toString(36)}`
+    lenh.push(
+      env.DB.prepare(
+        `INSERT INTO btvn (ma_btvn, ma_ca, ma_de, so_cau, giao_luc, han_nop, da_xoa, cap_nhat_luc)
+         VALUES (?,?,?,?,?,?,0,?)`,
+      ).bind(maBtvn, ca, dsMaDe.join(','), soCau, giaoLuc, hanNop, giaoLuc),
+    )
+    for (const e of dsEm) {
+      lenh.push(
+        env.DB.prepare('INSERT INTO btvn_em (khoa, ma_btvn, sbd, ho_ten) VALUES (?,?,?,?)').bind(`${maBtvn}|${e.sbd}`, maBtvn, String(e.sbd), String(e.ten ?? '')),
+      )
+      // Em thi cả hai ca thì chỉ đếm MỘT lần — con số thầy đọc là số người,
+      // không phải số lượt.
+      emDaCo.add(String(e.sbd))
+    }
+    soLuotGiao++
   }
+
+  if (soLuotGiao === 0) return ra({ ok: false, error: 'Những ca đã tick chưa có em nào vào thi' })
   for (let i = 0; i < lenh.length; i += 150) await env.DB.batch(lenh.slice(i, i + 150))
-  return ra({ ok: true, maBtvn, soEm: dsEm.length, soCau, soDe: dsMaDe.length, hanNop })
+  return ra({ ok: true, soCa: soLuotGiao, caRong, soEm: emDaCo.size, soCau, soDe: dsMaDe.length, hanNop })
 }
 
 /** EM MỞ BÀI TẬP CỦA MÌNH. Đường CÔNG KHAI — em chỉ có mã ca và số báo danh.

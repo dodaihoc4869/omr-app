@@ -9,7 +9,7 @@
 // Phần giao bài tập chạy 0% Apps Script: ca và đề đọc từ máy chủ mới, bài giao
 // và bài nộp cũng ở đó.
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ClipboardList, Presentation, RefreshCw } from 'lucide-react'
+import { CheckSquare, ClipboardList, Presentation, RefreshCw, Square } from 'lucide-react'
 import { Nhan, NutChinh, OThongBao, TheNoiDung } from '../components/DesignSystem'
 import GoiLenBangScreen from './GoiLenBangScreen'
 import { danhSachCa, type CaTomTat } from '../lib/exam-api'
@@ -22,17 +22,6 @@ import { loadExamSources } from '../lib/exam-db'
 import type { TeacherExamSource } from '../data/examContent'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }
-const O_CHON: React.CSSProperties = {
-  height: 46,
-  width: '100%',
-  borderRadius: 'var(--bo-1)',
-  padding: '0 var(--k3)',
-  background: 'var(--the-2)',
-  border: '1.5px solid transparent',
-  fontFamily: 'var(--sans)',
-  fontSize: 'var(--cx-1)',
-  color: 'var(--muc)',
-}
 
 interface DeKho {
   maDe: string
@@ -70,7 +59,9 @@ export default function PhanCongScreen() {
 function TheGiaoBtvn() {
   const [dsCa, setDsCa] = useState<CaTomTat[]>([])
   const [dsDe, setDsDe] = useState<DeKho[]>([])
-  const [maCa, setMaCa] = useState('')
+  // TICK NHIỀU CA (thầy chốt 12/09). Một lượt giao ra nhiều lớp, cùng tờ đề,
+  // cùng một mốc hạn nộp.
+  const [caChon, setCaChon] = useState<Set<string>>(new Set())
   // TICK NHIỀU TỜ (thầy chốt 12/09). Giữ theo thứ tự thầy tick: bài em nhận
   // được ghép theo đúng thứ tự ấy, không xáo.
   const [daChon, setDaChon] = useState<Set<string>>(new Set())
@@ -145,10 +136,11 @@ function TheGiaoBtvn() {
     try {
       const mat = (await loadTeacherSecret()) ?? ''
       const ch = await layCauHinhMayChu()
-      const kq = await giaoBtvn(ch, mat, maCa, [...daChon])
+      const kq = await giaoBtvn(ch, mat, [...caChon], [...daChon])
+      const boQua = kq.caRong && kq.caRong.length > 0 ? ` Bỏ qua ${kq.caRong.length} ca chưa em nào vào thi: ${kq.caRong.join(', ')}.` : ''
       setBao({
         ok: true,
-        chu: `Đã giao ${kq.soCau} câu (${daChon.size} tờ đề) cho ${kq.soEm} em. Hạn nộp ${gioVN(kq.hanNop)}.`,
+        chu: `Đã giao ${kq.soCau} câu (${daChon.size} tờ đề) cho ${kq.soEm} em ở ${kq.soCa ?? caChon.size} ca. Hạn nộp ${gioVN(kq.hanNop)}.${boQua}`,
       })
       // Kho trên MÁY THẦY — cùng nguồn màn Mở ca đọc.
       setNguonKho(await loadExamSources())
@@ -166,15 +158,76 @@ function TheGiaoBtvn() {
       <TheNoiDung>
         <div style={{ display: 'grid', gap: 'var(--k3)' }}>
           <div>
-            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k1)' }}>Ca đã thi — bài giao cho đúng những em có lượt trong ca này</div>
-            <select style={O_CHON} value={maCa} onChange={(e) => setMaCa(e.target.value)}>
-              <option value="">— chọn ca —</option>
-              {dsCa.map((c) => (
-                <option key={c.maCa} value={c.maCa}>
-                  {c.maCa} · {c.tenCa || 'không tên'} · {c.daNop}/{c.daVao} nộp
-                </option>
-              ))}
-            </select>
+            <div className="flex items-center" style={{ justifyContent: 'space-between', gap: 'var(--k2)', marginBottom: 'var(--k2)' }}>
+              <span style={NHAN_NHO}>Ca đã thi — tick nhiều ca, bài giao cho đúng những em có lượt trong các ca ấy</span>
+              {dsCa.length > 1 && (
+                <button
+                  type="button"
+                  className="tap-target"
+                  onClick={() => setCaChon(caChon.size === dsCa.length ? new Set() : new Set(dsCa.map((c) => c.maCa)))}
+                  style={{ ...NHAN_NHO, textDecoration: 'underline', whiteSpace: 'nowrap' }}
+                >
+                  {caChon.size === dsCa.length ? 'Bỏ hết' : 'Chọn hết'}
+                </button>
+              )}
+            </div>
+
+            {dsCa.length === 0 ? (
+              <div style={NHAN_NHO}>{dangNap ? 'Đang lấy danh sách ca…' : 'Chưa có ca nào đã thi.'}</div>
+            ) : (
+              <div style={{ display: 'grid', gap: 'var(--k2)', maxHeight: 280, overflowY: 'auto' }}>
+                {dsCa.map((c) => {
+                  const chon = caChon.has(c.maCa)
+                  return (
+                    <button
+                      key={c.maCa}
+                      type="button"
+                      onClick={() => {
+                        const m = new Set(caChon)
+                        if (m.has(c.maCa)) m.delete(c.maCa)
+                        else m.add(c.maCa)
+                        setCaChon(m)
+                      }}
+                      className="tap-target"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--k3)',
+                        textAlign: 'left',
+                        minHeight: 56,
+                        padding: 'var(--k2) var(--k3)',
+                        borderRadius: 'var(--bo-1)',
+                        background: chon ? 'var(--xanh-nen)' : 'var(--the-2)',
+                        border: `1.5px solid ${chon ? 'var(--xanh)' : 'transparent'}`,
+                        transitionProperty: 'background-color, border-color',
+                        transitionDuration: 'var(--nhanh)',
+                      }}
+                      aria-pressed={chon}
+                    >
+                      <span style={{ color: chon ? 'var(--xanh)' : 'var(--mo)', display: 'flex', flex: '0 0 auto' }}>
+                        {chon ? <CheckSquare size={20} /> : <Square size={20} />}
+                      </span>
+                      <span style={{ display: 'grid', gap: 2, minWidth: 0, flex: 1 }}>
+                        <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--muc)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {c.tenCa || `Ca ${c.maCa}`}
+                        </span>
+                        <span style={NHAN_NHO}>
+                          {c.maCa}
+                          {c.lop ? ` · lớp ${c.lop}` : ''} · <b style={{ fontVariantNumeric: 'tabular-nums' }}>{c.daNop}/{c.daVao}</b> nộp
+                          {c.moLuc ? ` · ${gioVN(c.moLuc)}` : ''}
+                        </span>
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+            {caChon.size > 0 && (
+              <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
+                Đã tick <b>{caChon.size}</b> ca · <b>{dsCa.filter((c) => caChon.has(c.maCa)).reduce((t, c) => t + c.daVao, 0)}</b> lượt vào thi
+                {' '}(em thi hai ca chỉ nhận một bài).
+              </div>
+            )}
           </div>
 
           <div>
@@ -253,7 +306,7 @@ function TheGiaoBtvn() {
           )}
 
           <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
-            <NutChinh onClick={giao} disabled={dangGiao || !maCa || daChon.size === 0}>
+            <NutChinh onClick={giao} disabled={dangGiao || caChon.size === 0 || daChon.size === 0}>
               {dangGiao ? 'Đang giao…' : 'Giao bài tập về nhà'}
             </NutChinh>
             <NutChinh variant="phu" onClick={() => void nap()} disabled={dangNap}>

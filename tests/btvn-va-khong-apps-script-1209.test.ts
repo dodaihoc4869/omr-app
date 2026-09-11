@@ -34,7 +34,10 @@ describe('BTVN — ba luật chốt cứng ở MÁY CHỦ', () => {
   })
 
   it('ca chưa em nào vào thi thì TỪ CHỐI, không giao bài rỗng', () => {
-    expect(GIAO).toContain("Ca này chưa có em nào vào thi")
+    // Từ 12/09 giao được nhiều ca một lượt: ca rỗng bị BỎ QUA và kê tên, còn
+    // rỗng cả lượt thì từ chối hẳn.
+    expect(GIAO).toContain('caRong.push(ca)')
+    expect(GIAO).toContain('Những ca đã tick chưa có em nào vào thi')
   })
 
   it('LUẬT 2 — trả NGUYÊN gói đề, không xáo không lọc', () => {

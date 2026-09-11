@@ -36,7 +36,7 @@ describe('THẺ GIAO BÀI — nói thẳng khi chưa chuyển kho đề', () => 
 
   it('nút Giao khoá khi chưa chọn đủ ca và đề', () => {
     // Từ 12/09 tick được NHIỀU tờ đề, nên điều kiện là "đã tick ít nhất một tờ".
-    expect(PC).toContain('disabled={dangGiao || !maCa || daChon.size === 0}')
+    expect(PC).toContain('disabled={dangGiao || caChon.size === 0 || daChon.size === 0}')
   })
 
   it('bảng theo dõi kê TÊN em chưa nộp', () => {
@@ -201,5 +201,56 @@ describe('CHỌN ĐỀ Y NHƯ MÀN MỞ CA', () => {
     expect(han).toContain("String(bt.ma_de ?? '')")
     expect(han).toContain('docCauTuGoiDe(')
     for (const cam of ['sort(', 'shuffle', 'Math.random']) expect(han, cam).not.toContain(cam)
+  })
+})
+
+// TICK NHIỀU CA — thầy chốt 12/09: "chỗ này thiết kế lại tinh tế hơn và cho
+// tick chọn nhiều ca nhé". Trước đó là một ô `<select>` một-ca, và trên điện
+// thoại nó bung ra danh sách nút tròn chiếm kín màn.
+describe('GIAO CHO NHIỀU CA MỘT LƯỢT', () => {
+  const WK = doc('server/src/index.ts')
+  const HAM = WK.slice(WK.indexOf('async function giaoBtvn('), WK.indexOf('/** EM MỞ BÀI TẬP CỦA MÌNH.'))
+
+  it('màn bỏ ô chọn một ca, dùng danh sách tick', () => {
+    expect(PC).not.toContain('— chọn ca —')
+    expect(PC).toContain('caChon')
+    expect(PC).toContain('Chọn hết')
+  })
+
+  it('mỗi ca là một nút đủ to cho ngón tay, có trạng thái tick rõ', () => {
+    expect(PC).toContain('minHeight: 56')
+    expect(PC).toContain('aria-pressed={chon}')
+  })
+
+  it('máy chủ nhận danh sách ca, và vẫn nhận dáng một ca của bản cũ', () => {
+    expect(HAM).toContain('Array.isArray(b.dsMaCa)')
+    expect(HAM).toContain("String(b.maCa ?? '').trim()")
+  })
+
+  it('MỘT DÒNG GIAO CHO MỖI CA — em tra bài bằng mã ca của chính mình', () => {
+    // Gộp ba ca vào một dòng thì hai lớp kia không tra ra bài.
+    expect(HAM).toContain('for (const ca of dsMaCa)')
+    expect(HAM).toContain('const maBtvn = `${ca}-${nay.getTime().toString(36)}`')
+  })
+
+  it('HẠN NỘP chốt MỘT lần cho cả lượt — các lớp cùng một mốc', () => {
+    const iHan = HAM.indexOf('const hanNop =')
+    const iLoop = HAM.indexOf('for (const ca of dsMaCa)')
+    expect(iHan).toBeGreaterThan(0)
+    expect(iHan).toBeLessThan(iLoop)
+  })
+
+  it('ca chưa em nào vào thi thì BỎ QUA ca ấy và kê tên, không làm hỏng cả lượt', () => {
+    expect(HAM).toContain('caRong.push(ca)')
+    expect(HAM).toContain('Những ca đã tick chưa có em nào vào thi')
+  })
+
+  it('đếm SỐ NGƯỜI, không đếm số lượt — em thi hai ca chỉ tính một', () => {
+    expect(HAM).toContain('emDaCo.add(String(e.sbd))')
+    expect(HAM).toContain('soEm: emDaCo.size')
+  })
+
+  it('có trần số ca một lượt, nói rõ thầy đang tick bao nhiêu', () => {
+    expect(HAM).toContain('dsMaCa.length > 10')
   })
 })
