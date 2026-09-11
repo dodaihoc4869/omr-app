@@ -129,7 +129,7 @@ async function p(e, t) {
 		error: "Thiếu mã ca hoặc số báo danh"
 	});
 	let l = await u(e, n);
-	if (l && await O(e) && !await D(e, o)) return c({
+	if (n !== "DOTAI" && l && await O(e) && !await D(e, o)) return c({
 		ok: !1,
 		lyDo: "khong_co_sbd",
 		thoiGianPhut: l.thoi_gian_phut ?? 45

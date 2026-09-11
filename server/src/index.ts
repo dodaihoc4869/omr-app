@@ -82,7 +82,10 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
   //
   // Bảng RỖNG thì KHÔNG chặn ai — thầy chưa kịp đẩy danh sách mà cả lớp đứng
   // ngoài cửa là hỏng nặng hơn hẳn việc thiếu cổng. Đúng luật bên Apps Script.
-  if (ca && (await coDanhSach(env)) && !(await docDanhSach(env, sbd))) {
+  // Ca ĐO TẢI được miễn: số báo danh của nó (`DOTAI0000`…) cố ý KHÔNG nằm trong
+  // danh sách lớp, mà cho chúng vào danh sách thì thành cửa sau thật cho người
+  // ngoài. `CA_DO_TAI` là hằng số chết trong mã, không nhận từ ngoài vào.
+  if (maCa !== CA_DO_TAI && ca && (await coDanhSach(env)) && !(await docDanhSach(env, sbd))) {
     return ra({ ok: false, lyDo: 'khong_co_sbd', thoiGianPhut: ca.thoi_gian_phut ?? 45 })
   }
 

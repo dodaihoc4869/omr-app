@@ -1481,6 +1481,14 @@ export interface KetQuaNapDanhSach {
   /** Em BỊ BỎ khỏi danh sách — từ giờ đứng ngoài phòng thi. Thầy phải nhìn thấy. */
   bo: { sbd: string; hoTen: string }[]
   doiTen: { sbd: string; cu: string; moi: string }[]
+  /** MÁY CHỦ MỚI CÓ NHẬN DANH SÁCH KHÔNG — `tat` cờ đang tắt · `ok` đã nhận ·
+   * `hong` cờ bật mà đẩy trượt.
+   *
+   * Trước 11/09 việc đẩy này nuốt mọi kết quả. Thầy bấm Đồng bộ, thấy báo
+   * xanh, mà bảng `danh_sach` trên D1 vẫn rỗng — tức cổng chặn số báo danh lạ
+   * của máy chủ mới KHÔNG có gì để đọc, ai có mã ca cũng vào thi được. Đúng
+   * kiểu hỏng tệ nhất: im lặng và sai. */
+  mayChuMoi: 'tat' | 'ok' | 'hong'
 }
 
 export async function napDanhSachLop(
@@ -1498,11 +1506,13 @@ export async function napDanhSachLop(
   //
   // Hỏng thì BỎ QUA: danh sách đã nạp thật ở dòng trên, thầy vẫn dùng được như
   // hôm nay.
+  let mayChuMoi: KetQuaNapDanhSach['mayChuMoi'] = 'tat'
   try {
     const chMoi = await layCauHinhMayChu()
-    await dayDanhSachMoi(chMoi, secret, items)
+    // Cờ TẮT thì không đẩy — nhưng phải NÓI RA, không được nuốt.
+    if (chMoi.BAT && chMoi.URL) mayChuMoi = (await dayDanhSachMoi(chMoi, secret, items)) ? 'ok' : 'hong'
   } catch {
-    // không chặn việc nạp danh sách vì một đường tắt
+    mayChuMoi = 'hong'
   }
   return {
     soDong: Number(r.soDong) || 0,
@@ -1510,6 +1520,7 @@ export async function napDanhSachLop(
     them: Array.isArray(r.them) ? (r.them as KetQuaNapDanhSach['them']) : [],
     bo: Array.isArray(r.bo) ? (r.bo as KetQuaNapDanhSach['bo']) : [],
     doiTen: Array.isArray(r.doiTen) ? (r.doiTen as KetQuaNapDanhSach['doiTen']) : [],
+    mayChuMoi,
   }
 }
 

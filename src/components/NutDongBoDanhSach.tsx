@@ -46,6 +46,11 @@ export function tomTatDongBo(kq: KetQuaNapDanhSach, soTrung = 0): string {
   if (kq.bo.length) phan.push(`−${kq.bo.length} bỏ`)
   if (kq.doiTen.length) phan.push(`${kq.doiTen.length} đổi tên`)
   if (soTrung) phan.push(`${soTrung} SBD trùng`)
+  // MÁY CHỦ MỚI — phải hiện ra, kể cả khi mọi thứ khác xanh. Bảng `danh_sach`
+  // bên đó là CỔNG VÀO THI; nó rỗng mà thầy tưởng đã đồng bộ thì ai có mã ca
+  // cũng gõ một số báo danh bất kỳ rồi vào thi.
+  if (kq.mayChuMoi === 'hong') phan.push('MÁY CHỦ MỚI CHƯA NHẬN')
+  else if (kq.mayChuMoi === 'ok') phan.push('máy chủ mới đã nhận')
   return phan.join(' · ')
 }
 
@@ -126,7 +131,7 @@ export default function NutDongBoDanhSach({
       onXong?.(kq.soDong, tom)
       // Em bị BỎ khỏi danh sách là em đó đứng ngoài phòng thi từ giờ. Không
       // trộn vào lời báo "xong" màu xanh — thầy phải nhìn thấy.
-      bao(kq.bo.length || gom.trung.length ? { kieu: 'loi', chu: tom } : { kieu: 'xong', chu: tom })
+      bao(kq.bo.length || gom.trung.length || kq.mayChuMoi === 'hong' ? { kieu: 'loi', chu: tom } : { kieu: 'xong', chu: tom })
     } catch (e) {
       bao({
         kieu: 'loi',

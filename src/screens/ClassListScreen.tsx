@@ -90,9 +90,13 @@ export default function ClassListScreen() {
         list.map((r) => ({ sbd: r.sbd, hoTen: r.hoTen, namSinh: r.namSinh, lop: r.lop })),
       )
       const thieuNam = list.filter((r) => !r.namSinh).length
+      // Máy chủ mới nhận danh sách hay không phải hiện ra — xem ghi chú ở
+      // `KetQuaNapDanhSach.mayChuMoi`.
+      const loiMay =
+        kq.mayChuMoi === 'hong' ? '. MÁY CHỦ MỚI CHƯA NHẬN — bấm đồng bộ lại' : kq.mayChuMoi === 'ok' ? '. Máy chủ mới đã nhận' : ''
       showToast(
-        `Đã đẩy ${kq.soDong} em lên máy chủ — em vào thi là tự có tên${thieuNam ? `. ${thieuNam} em chưa có năm sinh, ca lọc theo khối sẽ chặn các em đó` : ''}`,
-        thieuNam ? 'warn' : 'success',
+        `Đã đẩy ${kq.soDong} em lên máy chủ — em vào thi là tự có tên${thieuNam ? `. ${thieuNam} em chưa có năm sinh, ca lọc theo khối sẽ chặn các em đó` : ''}${loiMay}`,
+        kq.mayChuMoi === 'hong' ? 'error' : thieuNam ? 'warn' : 'success',
       )
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không đẩy được danh sách lên máy chủ', 'error')
