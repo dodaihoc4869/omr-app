@@ -1,0 +1,26 @@
+# Lệnh thầy chạy MỘT LẦN để dựng (xem MAY-CHU-MOI.md mục 10):
+#
+#   npm i -D wrangler
+#   npx wrangler login
+#   npx wrangler d1 create omr
+#       → chép database_id máy in ra, dán vào dưới
+#   npx wrangler r2 bucket create omr-de
+#   npx wrangler d1 execute omr --file=server/schema.sql --remote
+#   npx wrangler secret put MA_BI_MAT        # gõ đúng mã bí mật Apps Script
+#   npx wrangler deploy
+#
+# MA_BI_MAT KHÔNG bao giờ nằm trong file này. `wrangler secret` giữ nó ở
+# Cloudflare, không vào git.
+
+name = "omr"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "omr"
+database_id = "DAN_ID_VAO_DAY"
+
+[[r2_buckets]]
+binding = "DE"
+bucket_name = "omr-de"
