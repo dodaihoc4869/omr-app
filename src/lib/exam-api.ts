@@ -12,7 +12,7 @@ import { chuanTenCa } from './ten-ca'
 import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
 import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi, xongNapDiaChi } from './may-chu-moi'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
-import { chiTietCaMoi, danhSachEmMoi, dayCaMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, luotCuaCaMoi, napDayDuCaMoi, suaCaMoi, type OSuaCa } from './day-ca-may-chu-moi'
+import { chamDiemMoi, chiTietCaMoi, danhSachEmMoi, dayCaMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, ghiLenBangMoi, luotCuaCaMoi, napDayDuCaMoi, suaCaMoi, type OSuaCa } from './day-ca-may-chu-moi'
 import { theoGhiSheet } from './ghi-sheet-nen'
 import { daBatDauTheoDuongCu, ghiNhoDaBatDauDuongCu, nenDoiChieu } from './doi-chieu-phong-cho'
 import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu } from './man-ca-may-chu-moi'
@@ -2374,6 +2374,14 @@ export async function chiTietCa(scriptUrl: string, secret: string, maCa: string,
 export async function ghiLenBang(scriptUrl: string, secret: string, d: { sbd: string; chuyenDe: string; dat: boolean; qid?: string }): Promise<void> {
   const r = await postJson(scriptUrl, { action: 'ghiLenBang', secret, sbd: d.sbd, chuyenDe: d.chuyenDe, dat: d.dat, qid: d.qid || '' })
   if (!r.ok) throw new Error(r.error || 'Không ghi được kết quả lên bảng')
+  // Soi sang máy chủ mới. Một câu chữa tại lớp cộng vào bảng mạnh–yếu; không
+  // soi thì bảng bên ấy thiếu đúng những câu thầy chữa tận tay.
+  try {
+    const chMoi = await layCauHinhMayChu()
+    await ghiLenBangMoi(chMoi, secret, d)
+  } catch {
+    // đã ghi thật bên Apps Script rồi
+  }
 }
 
 /** Số lần mỗi em đã lên bảng trong `soNgay` ngày gần đây.
@@ -2736,12 +2744,20 @@ export async function ghiDiem(
     const nhan = bai.filter((x) => daGhi.size === 0 || daGhi.has(String(x.sbd)))
     if (nhan.length > 0) {
       const chMoi = await layCauHinhMayChu()
-      await ghiDiemMoi(
-        chMoi,
-        secret,
-        maCa,
-        nhan.map((x) => ({ sbd: String(x.sbd), lanThu: Number(x.lanThu) || 1, hoTen: String((x as { hoTen?: string }).hoTen ?? ''), diem: x.diem })),
-      )
+      // GỬI TRỌN GÓI, kể cả `cau` — máy chủ mới dựng luôn chi tiết từng câu,
+      // tiến độ theo ca, bảng mạnh–yếu, câu đã làm và bản đồ câu sai. Gửi mỗi
+      // điểm thôi thì năm bảng kia mãi mãi rỗng bên này.
+      const xong = await chamDiemMoi(chMoi, secret, maCa, nhan)
+      // Máy chủ mới chưa có đường `/cham-diem` (bản Worker cũ) ⇒ ít nhất đặt
+      // được điểm, để màn Chi tiết ca không hiện trống.
+      if (!xong) {
+        await ghiDiemMoi(
+          chMoi,
+          secret,
+          maCa,
+          nhan.map((x) => ({ sbd: String(x.sbd), lanThu: Number(x.lanThu) || 1, hoTen: String((x as { hoTen?: string }).hoTen ?? ''), diem: x.diem })),
+        )
+      }
     }
   } catch {
     // đường tắt hỏng thì thôi — điểm đã ghi thật ở dòng trên

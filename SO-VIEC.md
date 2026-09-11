@@ -404,3 +404,44 @@ trangThaiPhongCho  →  10 185 ms   (chiều cùng ngày: 2 600 ms)
 **Bài học lớn nhất của ngày, lặp BỐN lần:** đường nhanh có mặt trong mã không có
 nghĩa là nó chạy. Cả bốn lần đều chỉ lộ ra khi đếm ở chỗ dữ liệu của người dùng
 đọng lại — không phải khi đọc mã, không phải khi nhìn màn hình.
+
+### 11/09 21h00 — XOÁ SẠCH DỮ LIỆU CA, GIỮ KHO ĐỀ
+
+Thầy chốt qua hai câu hỏi: **xoá sạch trắng mọi thứ** (kể cả mạnh–yếu và
+QidDaLam) và **xoá cả danh sách lớp lẫn phiếu**.
+
+Đã xoá trên D1, đếm lại sau khi xoá đều bằng 0:
+
+```
+luot 312→0 · ca 90→0 · danh_sach 259→0 · phong_cho 61→0
+trang_thai 32→0 · dong_bo 1→0 · chan_vao 0→0
+```
+
+Kho đề trên R2 KHÔNG đụng.
+
+- [x] Xoá sạch bảy bảng trên máy chủ mới | bằng chứng: đếm lại = 0 cả bảy
+- [ ] Thầy tự xoá dòng dữ liệu trên Google Sheet — tôi KHÔNG viết lệnh "xoá sạch
+      mọi bảng" rồi triển khai lên máy chủ của thầy; một cái nút như thế nằm sẵn
+      trong hệ thống là rủi ro lớn hơn lợi ích. Đã đưa thầy 3 bước, kèm cảnh báo
+      giữ nguyên tab `NganHangDe`.
+- [ ] Thầy đẩy lại danh sách lớp trước ca đầu tiên tuần sau — cổng chặn đang rỗng
+      ở CẢ HAI nơi.
+- [ ] Thầy đẩy bản `878e0d2`.
+
+### Tình hình cuối ngày 11/09
+
+Đã phát hành trong tối: `cbca67b` · `3681683` · `6245216`. Chưa đẩy: `e5bf1e6`
+(vá lỗi mất bài về Sheet) và `878e0d2` (cái thước).
+
+**Bốn lỗi nặng trong ngày, cả bốn đều do tôi, và cả bốn cùng một họ:**
+
+| | Lỗi | Lộ ra nhờ |
+|---|---|---|
+| 1 | học sinh chưa bao giờ chạm máy chủ mới | đếm `luot` trên D1 giữa ca thật |
+| 2 | bấm Bắt đầu xoá trắng dòng ca | tra dòng ca giữa ca 704066 |
+| 3 | đường nhanh chi tiết ca không phục vụ ca nào | `SUM(sinh_tai_d1)` = 0 |
+| 4 | chữa lành đặt `da_day_sheet=1` ⇒ mất bài về Sheet | đếm dòng cờ sai |
+
+**Không lỗi nào lộ ra khi đọc mã hay nhìn màn hình.** Cả bốn chỉ lộ khi đếm ở
+chỗ dữ liệu của người dùng đọng lại. Đó là lý do việc đầu tiên của đợt bỏ Apps
+Script là dựng CÁI THƯỚC, không phải chuyển lệnh.

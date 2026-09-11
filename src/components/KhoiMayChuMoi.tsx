@@ -12,6 +12,7 @@ import { MAC_DINH_MAY_CHU, type CauHinhMayChu } from '../lib/cau-hinh-may-chu'
 import { quenCauHinhMayChu, thuKetNoi } from '../lib/may-chu-moi'
 import { laySoSheet, napToanBoCaLenMayChuMoi } from '../lib/exam-api'
 import { CHUA_DUNG, daChuyenXong, dungBangDoiChieu, laySoMayChuMoi, type DongDoiChieu } from '../lib/doi-chieu-hai-ben'
+import { chuyenKhoDe } from '../lib/chuyen-kho-de'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }
 const O_NHAP: React.CSSProperties = {
@@ -34,6 +35,9 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
   const [dangNap, setDangNap] = useState(false)
   const [tienNap, setTienNap] = useState('')
   const [ketNap, setKetNap] = useState<{ ok: boolean; chu: string } | null>(null)
+  const [dangKho, setDangKho] = useState(false)
+  const [tienKho, setTienKho] = useState('')
+  const [ketKho, setKetKho] = useState<{ ok: boolean; chu: string } | null>(null)
   const [dangDo, setDangDo] = useState(false)
   const [bang, setBang] = useState<DongDoiChieu[] | null>(null)
   const [loiDo, setLoiDo] = useState('')
@@ -69,6 +73,35 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
    * Chỉ ĐỌC Apps Script và GHI vào D1, không xoá gì ở Sheet. Xong thì tự đối
    * chiếu số ca và số dòng lượt hai bên; **lệch một dòng cũng không ghi dấu**,
    * và màn Ca thi tiếp tục đọc đường cũ. Không có trạng thái nào ở giữa. */
+  /** CHUYỂN KHO ĐỀ — thứ DUY NHẤT phải mang sang nguyên vẹn.
+   *
+   * Chạy lại được: mỗi lượt tự bỏ qua đề đã có trên máy chủ mới. Chết giữa
+   * chừng thì bấm lại, nó đi tiếp từ chỗ đứt — đúng thứ lượt chuyển ca hôm
+   * 15h46 ngày 11/09 KHÔNG có, nên chết ở ca thứ 6 là mất cả lượt. */
+  async function chuyenKho() {
+    setDangKho(true)
+    setKetKho(null)
+    setTienKho('Đang chuẩn bị…')
+    try {
+      const url = (await loadScriptUrl()) ?? ''
+      const mat = (await loadTeacherSecret()) ?? ''
+      if (!url || !mat) throw new Error('Thiếu link Apps Script hoặc mã bí mật')
+      const kq = await chuyenKhoDe(url, mat, setTienKho)
+      const con = kq.hong.length
+      setKetKho({
+        ok: con === 0,
+        chu:
+          `Kho đề: ${kq.tong} đề · đã có sẵn ${kq.daCo} · vừa đẩy ${kq.daDay}` +
+          (con > 0 ? ` · HỎNG ${con}: ${kq.hong.slice(0, 5).map((h) => h.maDe).join(', ')}${con > 5 ? '…' : ''}. Bấm lại để đẩy nốt.` : '. Xong, không đề nào hỏng.'),
+      })
+    } catch (e) {
+      setKetKho({ ok: false, chu: e instanceof Error ? e.message : 'Không chuyển được kho đề' })
+    } finally {
+      setDangKho(false)
+      setTienKho('')
+    }
+  }
+
   /** ĐO HAI BÊN — việc đầu tiên của cả đợt bỏ Apps Script.
    *
    * Chỉ ĐỌC, không ghi một dòng nào ở cả hai đầu. Gọi bao nhiêu lần cũng được. */
@@ -174,6 +207,23 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
       </div>
 
       {ketNap && <OThongBao tone={ketNap.ok ? 'xanh' : 'do'}>{ketNap.chu}</OThongBao>}
+
+      <div style={{ height: 1, background: 'var(--vien)', margin: 'var(--k2) 0' }} />
+
+      <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
+        <NutChinh variant="phu" onClick={chuyenKho} disabled={dangKho || !ch.URL.trim()}>
+          {dangKho ? 'Đang chuyển kho đề…' : 'Chuyển KHO ĐỀ sang máy chủ mới'}
+        </NutChinh>
+        {dangKho && <span style={NHAN_NHO}>{tienKho}</span>}
+      </div>
+
+      {ketKho && <OThongBao tone={ketKho.ok ? 'xanh' : 'do'}>{ketKho.chu}</OThongBao>}
+
+      <div style={NHAN_NHO}>
+        Chạy lại được bao nhiêu lần cũng an toàn: mỗi lượt tự bỏ qua đề đã có bên
+        {' '}máy chủ mới. Đứt giữa chừng thì bấm lại, nó đi tiếp từ chỗ đứt.
+        {' '}Kho đề trên Google Sheet KHÔNG bị xoá.
+      </div>
 
       <div style={{ height: 1, background: 'var(--vien)', margin: 'var(--k2) 0' }} />
 

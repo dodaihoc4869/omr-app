@@ -296,3 +296,64 @@ export async function napDayDuCaMoi(
   if (!ch.BAT || !ch.URL || !maCa || luot.length === 0) return false
   return guiJson(ch, maBiMat, '/ca/nap-day-du', keyBank ? { maCa, luot, keyBank } : { maCa, luot }, HAN_DAY_CA_GIAY)
 }
+
+// ---------------------------------------------------------------------------
+// KHỐI A — CHẤM ĐIỂM TRỌN VẸN TRÊN MÁY CHỦ MỚI
+//
+// Một lượt gọi `/cham-diem` làm hết chuỗi việc mà `ghiDiem` bên Apps Script
+// kéo theo: điểm · chi tiết từng câu · tiến độ theo ca · bảng mạnh–yếu · câu đã
+// làm · bản đồ câu sai. Bên Apps Script chuỗi ấy đọc và ghi lại năm bảng bằng
+// `getDataRange()`; ở đây là vài câu SQL có khoá.
+
+/** CHẤM ĐIỂM MỘT LÔ BÀI trong cùng một ca. Trả `false` nghĩa là chưa sang được
+ * — chỗ gọi vẫn còn Apps Script đỡ. */
+export async function chamDiemMoi(
+  ch: CauHinhMayChu,
+  maBiMat: string,
+  maCa: string,
+  bai: unknown[],
+): Promise<boolean> {
+  if (!ch.BAT || !ch.URL || !maCa || bai.length === 0) return false
+  return guiJson(ch, maBiMat, '/cham-diem', { maCa, bai }, HAN_DAY_CA_GIAY)
+}
+
+/** BẢNG MẠNH–YẾU + CÂU ĐÃ LÀM của một em. `null` = đi đường cũ. */
+export async function tienDoEmMoi(
+  ch: CauHinhMayChu,
+  maBiMat: string,
+  sbd: string,
+): Promise<{ chuyenDe: { ten: string; soCau: number; soSai: number }[]; qidDaLam: string[] } | null> {
+  if (!ch.BAT || !ch.URL || !sbd) return null
+  const bo = new AbortController()
+  const hen = setTimeout(() => bo.abort(), ch.HAN_GIAY * 1000)
+  try {
+    const res = await fetch(`${ch.URL}/em/tien-do`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-ma-bi-mat': maBiMat },
+      body: JSON.stringify({ sbd }),
+      signal: bo.signal,
+    })
+    if (!res.ok) return null
+    const j = (await res.json()) as { ok?: boolean; chuyenDe?: unknown; qidDaLam?: unknown }
+    if (j?.ok !== true) return null
+    return {
+      chuyenDe: Array.isArray(j.chuyenDe) ? (j.chuyenDe as { ten: string; soCau: number; soSai: number }[]) : [],
+      qidDaLam: Array.isArray(j.qidDaLam) ? (j.qidDaLam as string[]) : [],
+    }
+  } catch {
+    return null
+  } finally {
+    clearTimeout(hen)
+  }
+}
+
+/** GHI MỘT CÂU CHỮA TẠI LỚP vào bảng mạnh–yếu. KHÔNG tạo lượt thi, KHÔNG đụng
+ * điểm — đúng khuôn `ghiLenBang` bên Apps Script. */
+export async function ghiLenBangMoi(
+  ch: CauHinhMayChu,
+  maBiMat: string,
+  d: { sbd: string; chuyenDe: string; dat: boolean; qid?: string },
+): Promise<boolean> {
+  if (!ch.BAT || !ch.URL || !d.sbd || !d.chuyenDe) return false
+  return guiJson(ch, maBiMat, '/len-bang', d, HAN_DAY_CA_GIAY)
+}

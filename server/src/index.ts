@@ -1045,6 +1045,367 @@ function caDangChay(ca: { trang_thai: string; bat_dau_thi_luc: string | null; ba
   return Date.now() < bd + (phut + DEM_SAU_CA_PHUT) * 60000
 }
 
+// ===========================================================================
+// KHỐI C — KHO ĐỀ
+//
+// Đây là thứ DUY NHẤT phải chuyển sang NGUYÊN VẸN (thầy chốt 11/09 tối: "đẩy
+// kho đề sang nguyên vẹn cho tôi là được, còn lại dựng lại hết"). Mọi bảng khác
+// bắt đầu từ rỗng.
+//
+// CHỖ ĐỂ: gói đề đầy đủ nằm ở R2 `kho/<ma_de>.json` — một đề có ảnh và lời giải
+// tới vài trăm KB, nhét vào D1 là sai chỗ. D1 chỉ giữ CHỈ MỤC để tra nhanh:
+// câu nào thuộc chuyên đề nào, mức độ nào, ở đề nào.
+//
+// LUẬT ĐỎ: gói trong `kho/` CÓ ĐÁP ÁN và CÓ LỜI GIẢI. Nó chỉ ra bằng đường đòi
+// mã bí mật. Đường công khai `GET /de/:maCa` phục vụ máy em là gói ĐÃ CẮT ĐÁP
+// ÁN, dựng riêng lúc mở ca — hai thứ khác nhau, đừng bao giờ trộn.
+// ===========================================================================
+
+/** ĐẨY MỘT ĐỀ VÀO KHO. Gói đầy đủ lên R2, chỉ mục câu xuống D1. */
+async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const maDe = String(b.maDe ?? '').trim()
+  if (!maDe) return ra({ ok: false, error: 'Thiếu mã đề' })
+  if (!env.DE) return ra({ ok: false, error: 'Chưa nối R2' }, 500)
+
+  const de = b.de
+  const khoa = `kho/${maDe}.json`
+  if (de) await env.DE.put(khoa, JSON.stringify(de))
+
+  const cauDs = Array.isArray(b.cau) ? (b.cau as Record<string, unknown>[]) : []
+  const nay = new Date().toISOString()
+  const lenh: D1PreparedStatement[] = [
+    env.DB.prepare(
+      `INSERT INTO de_kho (ma_de, ten_de, lop, chuyen_de, so_cau, r2_khoa, da_xoa, cap_nhat_luc)
+       VALUES (?,?,?,?,?,?,0,?)
+       ON CONFLICT(ma_de) DO UPDATE SET
+         ten_de=COALESCE(NULLIF(excluded.ten_de,''), de_kho.ten_de),
+         lop=COALESCE(NULLIF(excluded.lop,''), de_kho.lop),
+         chuyen_de=COALESCE(NULLIF(excluded.chuyen_de,''), de_kho.chuyen_de),
+         so_cau=excluded.so_cau, r2_khoa=excluded.r2_khoa, da_xoa=0,
+         cap_nhat_luc=excluded.cap_nhat_luc`,
+    ).bind(maDe, String(b.tenDe ?? ''), String(b.lop ?? ''), String(b.chuyenDe ?? ''), cauDs.length, de ? khoa : null, nay),
+  ]
+  // Chỉ mục câu: đẩy lại một đề thì chỉ mục cũ của ĐÚNG đề ấy phải đi, kẻo câu
+  // đã xoá khỏi đề vẫn còn được rút ra cho em.
+  lenh.push(env.DB.prepare('DELETE FROM cau_hoi WHERE ma_de = ?').bind(maDe))
+  for (const c of cauDs) {
+    const qid = String(c.qid ?? c.id ?? '').trim()
+    if (!qid) continue
+    lenh.push(
+      env.DB.prepare(
+        `INSERT INTO cau_hoi (qid, ma_de, chuyen_de, muc_do, phan, lop, co_loi_giai, cap_nhat_luc)
+         VALUES (?,?,?,?,?,?,?,?)
+         ON CONFLICT(qid) DO UPDATE SET
+           ma_de=excluded.ma_de, chuyen_de=excluded.chuyen_de, muc_do=excluded.muc_do,
+           phan=excluded.phan, lop=excluded.lop, co_loi_giai=excluded.co_loi_giai,
+           cap_nhat_luc=excluded.cap_nhat_luc`,
+      ).bind(
+        qid, maDe, String(c.chuyenDe ?? ''), String(c.mucDo ?? ''), String(c.phan ?? ''),
+        String(c.lop ?? b.lop ?? ''), c.loiGiai || c.giai ? 1 : 0, nay,
+      ),
+    )
+  }
+  for (let i = 0; i < lenh.length; i += 150) await env.DB.batch(lenh.slice(i, i + 150))
+  return ra({ ok: true, maDe, soCau: cauDs.length, coGoi: !!de })
+}
+
+/** DANH SÁCH ĐỀ TRONG KHO — chỉ mục, không kéo gói. */
+async function danhSachDeKho(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const r = await env.DB.prepare(
+    b.keCaDaXoa === true ? 'SELECT * FROM de_kho ORDER BY cap_nhat_luc DESC' : 'SELECT * FROM de_kho WHERE da_xoa = 0 ORDER BY cap_nhat_luc DESC',
+  ).all<Record<string, unknown>>()
+  return ra({
+    ok: true,
+    items: (r.results ?? []).map((x) => ({
+      maDe: String(x.ma_de ?? ''),
+      tenDe: String(x.ten_de ?? ''),
+      lop: String(x.lop ?? ''),
+      chuyenDe: String(x.chuyen_de ?? ''),
+      soCau: Number(x.so_cau) || 0,
+      daXoa: Number(x.da_xoa) === 1,
+      capNhatLuc: String(x.cap_nhat_luc ?? ''),
+    })),
+  })
+}
+
+/** MỘT ĐỀ ĐẦY ĐỦ — CÓ đáp án và lời giải. Đường này đòi mã bí mật. */
+async function layDeKho(env: Env, maDe: string): Promise<Response> {
+  if (!maDe) return ra({ ok: false, error: 'Thiếu mã đề' })
+  if (!env.DE) return ra({ ok: false, error: 'Chưa nối R2' }, 500)
+  const o = await env.DE.get(`kho/${maDe}.json`)
+  if (!o?.body) return ra({ ok: false, lyDo: 'khong_co_de' }, 404)
+  return new Response(o.body, { headers: JSON_HEADERS })
+}
+
+/** XOÁ MỀM một đề. Gói trên R2 GIỮ NGUYÊN — xoá nhầm còn lấy lại được. */
+async function xoaDeKho(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const maDe = String(b.maDe ?? '').trim()
+  if (!maDe) return ra({ ok: false, error: 'Thiếu mã đề' })
+  const khoiPhuc = b.khoiPhuc === true
+  const nay = new Date().toISOString()
+  await env.DB.batch([
+    env.DB.prepare('UPDATE de_kho SET da_xoa = ?, cap_nhat_luc = ? WHERE ma_de = ?').bind(khoiPhuc ? 0 : 1, nay, maDe),
+  ])
+  return ra({ ok: true, maDe, daXoa: !khoiPhuc })
+}
+
+/** RÚT CÂU THEO CHUYÊN ĐỀ — nguồn của bài luyện và câu khắc phục.
+ *
+ * `boQua` là danh sách qid KHÔNG phát lại (câu em đã làm). Trả về CHỈ MỤC; chỗ
+ * gọi tự lấy nội dung từ gói đề. */
+async function rutCau(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const ds = Array.isArray(b.chuyenDe) ? (b.chuyenDe as unknown[]).map((x) => String(x)).filter(Boolean) : []
+  const soCau = Math.max(1, Math.min(200, Number(b.soCau) || 20))
+  const boQua = new Set(Array.isArray(b.boQua) ? (b.boQua as unknown[]).map((x) => String(x)) : [])
+  if (ds.length === 0) return ra({ ok: false, error: 'Thiếu chuyên đề' })
+
+  const oCd = ds.map(() => '?').join(',')
+  const r = await env.DB.prepare(
+    `SELECT c.qid, c.ma_de, c.chuyen_de, c.muc_do, c.phan
+       FROM cau_hoi c JOIN de_kho d ON d.ma_de = c.ma_de
+      WHERE d.da_xoa = 0 AND c.chuyen_de IN (${oCd})
+      LIMIT 2000`,
+  )
+    .bind(...ds)
+    .all<Record<string, unknown>>()
+
+  const con = (r.results ?? []).filter((x) => !boQua.has(String(x.qid ?? '')))
+  return ra({
+    ok: true,
+    // Nói rõ kho còn bao nhiêu câu dùng được: hứa 40 câu mà kho chỉ có 12 thì
+    // phải nói ra, không im lặng trả 12.
+    coSan: con.length,
+    ds: con.slice(0, soCau).map((x) => ({
+      qid: String(x.qid ?? ''),
+      maDe: String(x.ma_de ?? ''),
+      chuyenDe: String(x.chuyen_de ?? ''),
+      mucDo: String(x.muc_do ?? ''),
+      phan: String(x.phan ?? ''),
+    })),
+  })
+}
+
+// ===========================================================================
+// KHỐI A — CHẤM ĐIỂM TRỌN VẸN TRÊN MÁY CHỦ MỚI
+//
+// Thay `ghiDiem` bên Apps Script, và thay luôn cả chuỗi việc nó kéo theo:
+// chi tiết từng câu · tiến độ theo ca · tiến độ tổng (bảng mạnh–yếu) · danh
+// sách câu đã làm · bản đồ câu sai.
+//
+// LUẬT PHẢI KHỚP APPS SCRIPT, KHÔNG ĐƯỢC XÊ MỘT LY — đây là chỗ sinh ra bảng
+// mạnh–yếu, mà bảng ấy quyết định em được phát câu nào để luyện:
+//
+//   1. `tien_do_ca` khoá theo (ca, em, chuyên đề), lưu SỐ CÂU và SỐ SAI.
+//   2. `tien_do_hs` KHÔNG cộng dồn từng lần. Nó được TÍNH LẠI TỪ ĐẦU bằng cách
+//      cộng mọi dòng `tien_do_ca` của em ấy. Cộng dồn thì chấm lại một ca là
+//      cộng hai lần — đúng lỗi đã làm điểm ca 447479 sai ba lần hôm 09/09.
+//   3. Chuyên đề lần chấm trước có, lần này không còn ⇒ dòng ấy về 0, không xoá.
+//   4. `qid_da_lam` là HỢP TẬP, không bao giờ bớt đi.
+// ===========================================================================
+
+/** Ghi điểm + chi tiết từng câu + mọi bảng tiến độ, cho một hoặc nhiều lượt
+ * trong CÙNG MỘT ca. Một lượt gọi, một giao dịch. */
+async function chamDiem(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const maCa = String(b.maCa ?? '').trim()
+  const bai = Array.isArray(b.bai) ? (b.bai as Record<string, unknown>[]) : []
+  if (!maCa || bai.length === 0) return ra({ ok: false, error: 'Thiếu mã ca hoặc bài' })
+
+  const nay = new Date().toISOString()
+  const cau: D1PreparedStatement[] = []
+  const dsSbd: string[] = []
+
+  for (const x of bai) {
+    const sbd = String(x.sbd ?? '').trim()
+    if (!sbd) continue
+    const lanThu = Number(x.lanThu) || 1
+    dsSbd.push(sbd)
+    const d = (x.diem ?? {}) as Record<string, unknown>
+    const dsCau = Array.isArray(x.cau) ? (x.cau as Record<string, unknown>[]) : []
+
+    // ĐIỂM trên dòng lượt.
+    cau.push(
+      env.DB.prepare(
+        `UPDATE luot SET diem_i = ?, diem_ii = ?, diem_iii = ?, tong = ?,
+                         ho_ten = COALESCE(NULLIF(?,''), ho_ten), cap_nhat_luc = ?
+          WHERE ma_ca = ? AND sbd = ? AND lan_thu = ?`,
+      ).bind(
+        soHoacNull(d.I), soHoacNull(d.II), soHoacNull(d.III), soHoacNull(d.tong),
+        String(x.hoTen ?? ''), nay, maCa, sbd, lanThu,
+      ),
+    )
+
+    // CHI TIẾT TỪNG CÂU — xoá hết chi tiết cũ của ĐÚNG lượt này rồi ghi lại.
+    // Ghi đè theo khoá không đủ: lần chấm mới có thể ÍT câu hơn lần trước, và
+    // dòng thừa còn lại sẽ cộng nhầm vào tiến độ.
+    cau.push(env.DB.prepare('DELETE FROM chi_tiet_cau WHERE ma_ca = ? AND sbd = ? AND lan_thu = ?').bind(maCa, sbd, lanThu))
+    for (const c of dsCau) {
+      const phan = String(c.phan ?? '')
+      const soCau = Number(c.soCau) || 0
+      if (!phan || !soCau) continue
+      cau.push(
+        env.DB.prepare(
+          `INSERT INTO chi_tiet_cau (khoa, ma_ca, sbd, lan_thu, phan, so_cau, qid, chuyen_de,
+                                     muc_do, dap_an_chon, dap_an_dung, dung_sai, giay, cap_nhat_luc)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        ).bind(
+          `${maCa}|${sbd}|${lanThu}|${phan}|${soCau}`, maCa, sbd, lanThu, phan, soCau,
+          String(c.qid ?? ''), String(c.chuyenDe ?? ''), String(c.mucDo ?? ''),
+          String(c.dapAnChon ?? ''), String(c.dapAnDung ?? ''),
+          c.dungSai === true ? 1 : c.dungSai === false ? 0 : null,
+          Number(c.giay) || null, nay,
+        ),
+      )
+    }
+
+    // BẢN ĐỒ CÂU SAI — chỉ câu SAI, và chỉ câu có `qid`.
+    for (const c of dsCau) {
+      const qid = String(c.qid ?? '').trim()
+      if (!qid || c.dungSai !== false) continue
+      cau.push(
+        env.DB.prepare(
+          `INSERT INTO ban_do_sai (khoa, ma_ca, sbd, qid, chuyen_de, muc_do, so_lan_sai, da_chua, cap_nhat_luc)
+           VALUES (?,?,?,?,?,?,1,0,?)
+           ON CONFLICT(khoa) DO UPDATE SET
+             chuyen_de=excluded.chuyen_de, muc_do=excluded.muc_do, cap_nhat_luc=excluded.cap_nhat_luc`,
+        ).bind(`${maCa}|${sbd}|${qid}`, maCa, sbd, qid, String(c.chuyenDe ?? ''), String(c.mucDo ?? ''), nay),
+      )
+    }
+
+    // CÂU ĐÃ LÀM — hợp tập, không bao giờ bớt.
+    for (const c of dsCau) {
+      const qid = String(c.qid ?? '').trim()
+      if (!qid) continue
+      cau.push(
+        env.DB.prepare(
+          `INSERT INTO qid_da_lam (khoa, sbd, qid, lan_dau, so_lan) VALUES (?,?,?,?,1)
+           ON CONFLICT(khoa) DO UPDATE SET so_lan = qid_da_lam.so_lan + 1`,
+        ).bind(`${sbd}|${qid}`, sbd, qid, nay),
+      )
+    }
+
+    // TIẾN ĐỘ THEO CA — về 0 trước, rồi tính lại từ `chi_tiet_cau`.
+    // Về 0 chứ KHÔNG xoá: chuyên đề lần trước có mà lần này không còn thì dòng
+    // ấy phải còn để bảng mạnh–yếu trừ đi, đúng luật Apps Script.
+    cau.push(
+      env.DB.prepare('UPDATE tien_do_ca SET so_cau = 0, so_sai = 0, cap_nhat_luc = ? WHERE ma_ca = ? AND sbd = ?').bind(nay, maCa, sbd),
+    )
+    cau.push(
+      env.DB.prepare(
+        `INSERT INTO tien_do_ca (khoa, ma_ca, sbd, chuyen_de, so_cau, so_sai, nop_luc, cap_nhat_luc)
+         SELECT ? || '|' || chuyen_de, ?, ?, chuyen_de,
+                COUNT(*), SUM(CASE WHEN dung_sai = 0 THEN 1 ELSE 0 END),
+                (SELECT nop_luc FROM luot WHERE ma_ca = ? AND sbd = ? AND lan_thu = ?), ?
+           FROM chi_tiet_cau
+          WHERE ma_ca = ? AND sbd = ? AND lan_thu = ? AND chuyen_de <> ''
+          GROUP BY chuyen_de
+         ON CONFLICT(khoa) DO UPDATE SET
+           so_cau=excluded.so_cau, so_sai=excluded.so_sai,
+           nop_luc=COALESCE(excluded.nop_luc, tien_do_ca.nop_luc),
+           cap_nhat_luc=excluded.cap_nhat_luc`,
+      ).bind(`${maCa}|${sbd}`, maCa, sbd, maCa, sbd, lanThu, nay, maCa, sbd, lanThu),
+    )
+  }
+
+  for (let i = 0; i < cau.length; i += 100) await env.DB.batch(cau.slice(i, i + 100))
+
+  // TIẾN ĐỘ TỔNG — TÍNH LẠI TỪ ĐẦU cho từng em vừa chấm.
+  //
+  // Chạy SAU khi mọi câu trên đã ghi xong, vì nó đọc chính `tien_do_ca` vừa
+  // dựng. Và nó KHÔNG cộng dồn: cộng dồn thì chấm lại một ca là cộng hai lần.
+  const rieng = [...new Set(dsSbd)]
+  for (const sbd of rieng) {
+    await env.DB.batch([
+      env.DB.prepare('UPDATE tien_do_hs SET so_cau = 0, so_sai = 0, cap_nhat_luc = ? WHERE sbd = ?').bind(nay, sbd),
+      env.DB.prepare(
+        `INSERT INTO tien_do_hs (khoa, sbd, chuyen_de, so_cau, so_sai, cap_nhat_luc)
+         SELECT ? || '|' || chuyen_de, ?, chuyen_de, SUM(so_cau), SUM(so_sai), ?
+           FROM tien_do_ca WHERE sbd = ? GROUP BY chuyen_de
+         ON CONFLICT(khoa) DO UPDATE SET
+           so_cau=excluded.so_cau, so_sai=excluded.so_sai, cap_nhat_luc=excluded.cap_nhat_luc`,
+      ).bind(sbd, sbd, nay, sbd),
+    ])
+  }
+
+  return ra({ ok: true, soBai: rieng.length, soCau: cau.length })
+}
+
+/** BẢNG MẠNH–YẾU CỦA MỘT EM — nguồn của rút câu sai và gọi lên bảng. */
+async function tienDoEm(env: Env, sbd: string): Promise<Response> {
+  if (!sbd) return ra({ ok: false, error: 'Thiếu số báo danh' })
+  const r = await env.DB.prepare(
+    'SELECT chuyen_de, so_cau, so_sai FROM tien_do_hs WHERE sbd = ? AND so_cau > 0 ORDER BY (CAST(so_sai AS REAL) / so_cau) DESC, so_cau DESC',
+  )
+    .bind(sbd)
+    .all<{ chuyen_de: string; so_cau: number; so_sai: number }>()
+  const rQ = await env.DB.prepare('SELECT qid FROM qid_da_lam WHERE sbd = ?').bind(sbd).all<{ qid: string }>()
+  return ra({
+    ok: true,
+    chuyenDe: (r.results ?? []).map((x) => ({
+      ten: String(x.chuyen_de ?? ''),
+      soCau: Number(x.so_cau) || 0,
+      soSai: Number(x.so_sai) || 0,
+    })),
+    qidDaLam: (rQ.results ?? []).map((x) => String(x.qid ?? '')),
+  })
+}
+
+/** CÂU SAI CHƯA CHỮA của một em — để rút câu khắc phục. */
+async function cauSaiCuaEm(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const sbd = String(b.sbd ?? '').trim()
+  if (!sbd) return ra({ ok: false, error: 'Thiếu số báo danh' })
+  const maCa = String(b.maCa ?? '').trim()
+  const r = maCa
+    ? await env.DB.prepare('SELECT * FROM ban_do_sai WHERE sbd = ? AND ma_ca = ? ORDER BY cap_nhat_luc DESC').bind(sbd, maCa).all<Record<string, unknown>>()
+    : await env.DB.prepare('SELECT * FROM ban_do_sai WHERE sbd = ? AND da_chua = 0 ORDER BY cap_nhat_luc DESC LIMIT 300').bind(sbd).all<Record<string, unknown>>()
+  return ra({
+    ok: true,
+    ds: (r.results ?? []).map((x) => ({
+      maCa: String(x.ma_ca ?? ''),
+      qid: String(x.qid ?? ''),
+      chuyenDe: String(x.chuyen_de ?? ''),
+      mucDo: String(x.muc_do ?? ''),
+      soLanSai: Number(x.so_lan_sai) || 1,
+      daChua: Number(x.da_chua) === 1,
+    })),
+  })
+}
+
+/** GỌI LÊN BẢNG — ghi một câu chữa tại lớp vào bảng mạnh–yếu, KHÔNG tạo lượt
+ * thi giả và KHÔNG đụng điểm số. Đúng khuôn `ghiLenBang` bên Apps Script. */
+async function ghiLenBangMoi(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const sbd = String(b.sbd ?? '').trim()
+  const chuyenDe = String(b.chuyenDe ?? '').trim()
+  if (!sbd || !chuyenDe) return ra({ ok: false, error: 'Thiếu số báo danh hoặc chuyên đề' })
+  const nay = new Date().toISOString()
+  const dat = b.dat === true
+  const qid = String(b.qid ?? '').trim()
+
+  const cau: D1PreparedStatement[] = [
+    env.DB.prepare('INSERT INTO len_bang (sbd, chuyen_de, qid, dat, luc) VALUES (?,?,?,?,?)').bind(sbd, chuyenDe, qid, dat ? 1 : 0, nay),
+    // Cộng thẳng vào bảng tổng: một câu, một lần.
+    env.DB.prepare(
+      `INSERT INTO tien_do_hs (khoa, sbd, chuyen_de, so_cau, so_sai, cap_nhat_luc)
+       VALUES (?,?,?,1,?,?)
+       ON CONFLICT(khoa) DO UPDATE SET
+         so_cau = tien_do_hs.so_cau + 1,
+         so_sai = tien_do_hs.so_sai + ?,
+         cap_nhat_luc = excluded.cap_nhat_luc`,
+    ).bind(`${sbd}|${chuyenDe}`, sbd, chuyenDe, dat ? 0 : 1, nay, dat ? 0 : 1),
+  ]
+  if (qid) {
+    cau.push(
+      env.DB.prepare(
+        `INSERT INTO qid_da_lam (khoa, sbd, qid, lan_dau, so_lan) VALUES (?,?,?,?,1)
+         ON CONFLICT(khoa) DO UPDATE SET so_lan = qid_da_lam.so_lan + 1`,
+      ).bind(`${sbd}|${qid}`, sbd, qid, nay),
+    )
+    // Chữa đúng câu đã sai ⇒ đánh dấu đã chữa.
+    if (dat) cau.push(env.DB.prepare('UPDATE ban_do_sai SET da_chua = 1, chua_luc = ? WHERE sbd = ? AND qid = ?').bind(nay, sbd, qid))
+  }
+  await env.DB.batch(cau)
+  return ra({ ok: true })
+}
+
 /** CÁI THƯỚC — ĐẾM MỌI BẢNG TRÊN D1 ĐỂ ĐẶT CẠNH SỐ CỦA GOOGLE SHEET.
  *
  * VÌ SAO ĐÂY LÀ VIỆC ĐẦU TIÊN CỦA CẢ ĐỢT BỎ APPS SCRIPT, trước khi chuyển một
@@ -1323,6 +1684,15 @@ export default {
     if (p === '/em/danh-sach') return danhSachEmMoi(env)
     if (p === '/ca/nap-day-du') return napDayDuCa(env, b)
     if (p === '/doi-chieu') return doiChieuSo(env)
+    if (p === '/cham-diem') return chamDiem(env, b)
+    if (p === '/em/tien-do') return tienDoEm(env, String(b.sbd ?? ''))
+    if (p === '/em/cau-sai') return cauSaiCuaEm(env, b)
+    if (p === '/len-bang') return ghiLenBangMoi(env, b)
+    if (p === '/kho/day') return dayDeKho(env, b)
+    if (p === '/kho/danh-sach') return danhSachDeKho(env, b)
+    if (p === '/kho/lay') return layDeKho(env, String(b.maDe ?? ''))
+    if (p === '/kho/xoa') return xoaDeKho(env, b)
+    if (p === '/kho/rut-cau') return rutCau(env, b)
     if (p === '/dong-bo/dau') return ghiDauDongBo(env, b)
     if (p === '/cho') return xemPhongCho(env, String(b.maCa ?? ''))
 
