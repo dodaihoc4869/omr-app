@@ -41,8 +41,10 @@ describe('BTVN — ba luật chốt cứng ở MÁY CHỦ', () => {
     // Từ 12/09 một lượt giao gồm NHIỀU tờ đề (`ma_de` là danh sách nối bằng
     // dấu phẩy), nên gói được GỘP — nhưng luật không đổi: đúng thứ tự thầy
     // tick, đúng thứ tự câu trong từng tờ.
-    expect(CUA_EM).toContain('`kho/${m}.json`')
-    expect(CUA_EM).toContain('docCauTuGoiDe(g)')
+    expect(CUA_EM).toContain('`kho/${goc}.json`')
+    expect(CUA_EM).toContain('docCauTuGoiDe(')
+    // Lọc DUY NHẤT được phép: lấy đúng phần thầy đã tick (TN · ĐS · TLN).
+    expect(CUA_EM).toContain("cau.filter((x) => String(x.phan ?? '') === phan)")
     for (const cam of ['sort(', 'shuffle', 'slice(0,', 'Math.random']) {
       expect(CUA_EM, cam).not.toContain(cam)
     }

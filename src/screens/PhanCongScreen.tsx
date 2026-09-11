@@ -16,8 +16,10 @@ import { danhSachCa, type CaTomTat } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { layCauHinhMayChu } from '../lib/may-chu-moi'
 import { giaoBtvn, theoDoiBtvn, type DongTheoDoiBtvn } from '../lib/btvn-may-chu-moi'
-import CayChonDe from '../components/CayChonDe'
-import { dungCayKhoDe } from '../lib/cay-kho-de'
+import HopChonDe from '../components/HopChonDe'
+import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
+import { loadExamSources } from '../lib/exam-db'
+import type { TeacherExamSource } from '../data/examContent'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }
 const O_CHON: React.CSSProperties = {
@@ -72,6 +74,11 @@ function TheGiaoBtvn() {
   // TICK NHIỀU TỜ (thầy chốt 12/09). Giữ theo thứ tự thầy tick: bài em nhận
   // được ghép theo đúng thứ tự ấy, không xáo.
   const [daChon, setDaChon] = useState<Set<string>>(new Set())
+  // NGUỒN ĐỀ LẤY Y NHƯ MÀN MỞ CA: kho trên máy thầy, tách theo phần, rồi đưa
+  // vào ĐÚNG hộp chọn đề đang chạy ở đó (`HopChonDe`). Thầy chốt 12/09: "phần
+  // giao btvn tôi muốn hiển thị đúng như trong mở ca".
+  const [nguonKho, setNguonKho] = useState<TeacherExamSource[]>([])
+  const [nhomLoc, setNhomLoc] = useState('')
   const [dangNap, setDangNap] = useState(true)
   const [dangGiao, setDangGiao] = useState(false)
   const [bao, setBao] = useState<{ ok: boolean; chu: string } | null>(null)
@@ -100,6 +107,9 @@ function TheGiaoBtvn() {
       const j = res.ok ? ((await res.json()) as { ok?: boolean; items?: DeKho[] }) : null
       setDsDe(j?.ok && Array.isArray(j.items) ? j.items : [])
 
+      // Kho trên MÁY THẦY — cùng nguồn màn Mở ca đọc.
+      setNguonKho(await loadExamSources())
+
       setTheoDoi(await theoDoiBtvn(ch, mat))
     } catch (e) {
       setBao({ ok: false, chu: e instanceof Error ? e.message : 'Không nạp được' })
@@ -112,8 +122,22 @@ function TheGiaoBtvn() {
     void nap()
   }, [nap])
 
-  const cay = useMemo(() => dungCayKhoDe(dsDe), [dsDe])
-  const tongCauDaChon = useMemo(() => dsDe.filter((d) => daChon.has(d.maDe)).reduce((t, d) => t + d.soCau, 0), [dsDe, daChon])
+  // CHỈ HIỆN NHỮNG TỜ MÁY CHỦ ĐÃ CÓ. Kho trên máy thầy nhiều hơn kho đã chuyển
+  // sang máy chủ; cho tick một tờ máy chủ chưa có thì bấm Giao mới báo lỗi —
+  // muộn, và thầy không biết vì sao.
+  const maTrenMayChu = useMemo(() => new Set(dsDe.map((d) => d.maDe)), [dsDe])
+  const nguonGiaoDuoc = useMemo(() => nguonKho.filter((s) => maTrenMayChu.has(s.maDe)), [nguonKho, maTrenMayChu])
+  const soChuaChuyen = nguonKho.length - nguonGiaoDuoc.length
+  const dsDeTach = useMemo(() => tachNhieuTheoPhan(nguonGiaoDuoc), [nguonGiaoDuoc])
+  const dsNhom = useMemo(
+    () => Array.from(new Set(nguonGiaoDuoc.map((c) => (c.nhom || '').trim()).filter(Boolean))).sort(),
+    [nguonGiaoDuoc],
+  )
+  // Số câu của đúng những mã đã tick — mã đã tách thì chỉ đếm phần của nó.
+  const tongCauDaChon = useMemo(
+    () => dsDeTach.filter((d) => daChon.has(d.maDe)).reduce((t, d) => t + d.phanI.length + d.phanII.length + d.phanIII.length, 0),
+    [dsDeTach, daChon],
+  )
 
   async function giao() {
     setDangGiao(true)
@@ -126,6 +150,9 @@ function TheGiaoBtvn() {
         ok: true,
         chu: `Đã giao ${kq.soCau} câu (${daChon.size} tờ đề) cho ${kq.soEm} em. Hạn nộp ${gioVN(kq.hanNop)}.`,
       })
+      // Kho trên MÁY THẦY — cùng nguồn màn Mở ca đọc.
+      setNguonKho(await loadExamSources())
+
       setTheoDoi(await theoDoiBtvn(ch, mat))
     } catch (e) {
       setBao({ ok: false, chu: e instanceof Error ? e.message : 'Không giao được' })
@@ -151,24 +178,66 @@ function TheGiaoBtvn() {
           </div>
 
           <div>
-            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k1)' }}>
-              Tờ đề trong kho — tick được nhiều tờ. Em nhận TẤT CẢ câu của những tờ đã tick, đúng thứ tự kho.
+            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>
+              Tờ đề — tick được nhiều tờ, tới từng phần. Em nhận TẤT CẢ câu của những phần
+              {' '}đã tick, đúng thứ tự kho.
             </div>
-            <div
-              style={{
-                background: 'var(--the-2)',
-                borderRadius: 'var(--bo-1)',
-                padding: 'var(--k2)',
-                maxHeight: 360,
-                overflowY: 'auto',
+
+            {/* CHIP NHÓM ĐỀ — y như màn Mở ca. */}
+            {dsNhom.length > 0 && (
+              <div className="flex flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k2)' }} role="group" aria-label="Lọc theo nhóm đề">
+                {['', ...dsNhom].map((n) => {
+                  const chon = nhomLoc === n
+                  return (
+                    <button
+                      key={n || '__tat_ca'}
+                      type="button"
+                      onClick={() => setNhomLoc(n)}
+                      className="tap-target font-bold"
+                      style={{
+                        fontFamily: 'var(--sans)',
+                        fontSize: 'var(--cx-1)',
+                        minHeight: 36,
+                        padding: '0 var(--k3)',
+                        borderRadius: 'var(--bo-tron)',
+                        background: chon ? 'var(--tim-nen)' : 'var(--the-2)',
+                        color: chon ? 'var(--tim)' : 'var(--nhat)',
+                        border: `1.5px solid ${chon ? 'var(--tim)' : 'transparent'}`,
+                      }}
+                    >
+                      {n || 'Tất cả'}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+
+            {/* ĐÚNG HỘP CHỌN ĐỀ CỦA MÀN MỞ CA — lồng nguyên, không chép lại. Sửa
+                một chỗ thì ba màn (Mở ca · Gọi lên bảng · Giao bài tập) đổi theo. */}
+            <HopChonDe
+              ds={dsDeTach}
+              daChon={daChon}
+              onChon={(ma) => {
+                const m = new Set(daChon)
+                if (m.has(ma)) m.delete(ma)
+                else m.add(ma)
+                setDaChon(m)
               }}
-            >
-              <CayChonDe cay={cay} daChon={daChon} onDoi={setDaChon} />
-            </div>
+              nhomLoc={nhomLoc}
+              chonNhieu
+              onChonTatCa={(ma) => setDaChon(new Set(ma))}
+            />
+
+            {soChuaChuyen > 0 && (
+              <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
+                Ẩn <b>{soChuaChuyen}</b> tờ máy chủ chưa có — vào Cài đặt → Máy chủ mới bấm
+                {' '}“Chuyển KHO ĐỀ sang máy chủ mới” thì chúng hiện ra đây.
+              </div>
+            )}
             {daChon.size > 0 && (
               <div className="flex items-center" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
                 <span style={NHAN_NHO}>
-                  Đã tick <b>{daChon.size}</b> tờ · <b>{tongCauDaChon}</b> câu
+                  Đã tick <b>{daChon.size}</b> mục · <b>{tongCauDaChon}</b> câu
                 </span>
                 <button type="button" className="tap-target" onClick={() => setDaChon(new Set())} style={{ ...NHAN_NHO, textDecoration: 'underline' }}>
                   Bỏ hết

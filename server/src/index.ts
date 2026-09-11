@@ -1111,6 +1111,26 @@ function caDangChay(ca: { trang_thai: string; bat_dau_thi_luc: string | null; ba
  * rải số này ra chỗ khác. */
 const HAN_BTVN_GIO = 48
 
+/** GỠ HẬU TỐ PHẦN KHỎI MÃ ĐỀ.
+ *
+ * Màn chọn đề của thầy tách mỗi tờ thành ba mã con theo phần — `-TN` trắc
+ * nghiệm, `-DS` đúng sai, `-TLN` trả lời ngắn (xem `src/lib/tach-phan-de.ts`).
+ * Việc tách CHỈ ở tầng hiển thị: kho vẫn giữ nguyên một tờ. Nên máy chủ phải
+ * gỡ hậu tố ra mới tra được kho, và nhớ lại phần nào để phát đúng phần ấy.
+ *
+ * Mã không mang hậu tố ⇒ `phan = null` ⇒ cả tờ. */
+export function goPhanKhoiMaDe(ma: string): { goc: string; phan: 'I' | 'II' | 'III' | null } {
+  const bang: [string, 'I' | 'II' | 'III'][] = [
+    ['-TN', 'I'],
+    ['-DS', 'II'],
+    ['-TLN', 'III'],
+  ]
+  for (const [duoi, phan] of bang) {
+    if (ma.endsWith(duoi)) return { goc: ma.slice(0, -duoi.length), phan }
+  }
+  return { goc: ma, phan: null }
+}
+
 /** THẦY GIAO BÀI cho một ca đã thi.
  *
  * BA LUẬT TỪ ĐẶC TẢ, và cả ba đều có phép kiểm canh:
@@ -1125,23 +1145,53 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
   const maCa = String(b.maCa ?? '').trim()
   // NHIỀU TỜ ĐỀ MỘT LƯỢT GIAO (thầy chốt 12/09: "cho tick nhiều"). Nhận cả
   // `maDe` một tờ của bản trước — bản cũ trên máy em vẫn gửi dáng ấy.
+  //
+  // Mã có thể mang HẬU TỐ PHẦN (`-TN` · `-DS` · `-TLN`) vì màn chọn đề của thầy
+  // tick tới từng phần. Giữ nguyên mã đã tách trong sổ; chỗ phát bài gỡ hậu tố
+  // ra để lấy đúng phần.
   const dsMaDe = Array.isArray(b.dsMaDe)
     ? (b.dsMaDe as unknown[]).map((x) => String(x).trim()).filter(Boolean)
     : String(b.maDe ?? '').trim()
       ? [String(b.maDe).trim()]
       : []
   if (!maCa || dsMaDe.length === 0) return ra({ ok: false, error: 'Thiếu mã ca hoặc mã đề' })
+  // TRẦN 12 TỜ một lượt giao: mỗi tờ tốn một lượt đọc R2 lúc đếm câu, và bài
+  // của em cũng không nên là một trăm câu.
+  if (dsMaDe.length > 12) return ra({ ok: false, error: `Tối đa 12 tờ một lượt giao, thầy đang tick ${dsMaDe.length} tờ` })
 
-  const cho = dsMaDe.map(() => '?').join(',')
+  const goc = [...new Set(dsMaDe.map((m) => goPhanKhoiMaDe(m).goc))]
+  const cho = goc.map(() => '?').join(',')
   const rDe = await env.DB.prepare(`SELECT ma_de, so_cau FROM de_kho WHERE ma_de IN (${cho}) AND da_xoa = 0`)
-    .bind(...dsMaDe)
+    .bind(...goc)
     .all<{ ma_de: string; so_cau: number }>()
   const coDe = rDe.results ?? []
   // NÓI ĐÚNG TỜ NÀO THIẾU. "Không có đề trong kho" chung chung thì thầy tick
   // năm tờ không biết phải bỏ tờ nào.
-  const thieu = dsMaDe.filter((m) => !coDe.some((x) => String(x.ma_de) === m))
+  const thieu = goc.filter((m) => !coDe.some((x) => String(x.ma_de) === m))
   if (thieu.length > 0) return ra({ ok: false, error: `Không có trong kho: ${thieu.join(', ')}` })
-  const soCau = coDe.reduce((t, x) => t + (Number(x.so_cau) || 0), 0)
+
+  // ĐẾM CÂU THẬT, THEO PHẦN. Đọc gói trên R2 rồi đếm — không lấy `de_kho.so_cau`
+  // (tổng cả tờ) làm số câu của một phần, vì đó là bịa số cho thầy nhìn.
+  const demGoi = new Map<string, Record<string, unknown>[]>()
+  let soCau = 0
+  for (const m of dsMaDe) {
+    const { goc: g, phan } = goPhanKhoiMaDe(m)
+    if (!demGoi.has(g) && env.DE) {
+      const o = await env.DE.get(`kho/${g}.json`)
+      if (o?.body) {
+        try {
+          demGoi.set(g, docCauTuGoiDe((await new Response(o.body).json()) as Record<string, unknown>))
+        } catch {
+          demGoi.set(g, [])
+        }
+      } else {
+        demGoi.set(g, [])
+      }
+    }
+    const cau = demGoi.get(g) ?? []
+    soCau += phan ? cau.filter((c) => String(c.phan ?? '') === phan).length : cau.length
+  }
+  if (soCau === 0) return ra({ ok: false, error: 'Những tờ đã tick không có câu nào — kiểm tra lại kho đề' })
 
   // ĐÚNG những em có lượt trong ca. Lấy lần thử cao nhất, và bỏ lượt đã được
   // duyệt lại — cùng luật đếm của màn Ca thi.
@@ -1211,15 +1261,26 @@ async function btvnCuaEm(env: Env, b: Record<string, unknown>): Promise<Response
   let goi: unknown = null
   if (env.DE && dsMaDe.length > 0) {
     const gom: unknown[] = []
+    // Một tờ có thể xuất hiện nhiều lần (thầy tick cả ba phần của nó), nên đọc
+    // R2 MỘT lần rồi dùng lại — không tải cùng một gói ba lượt.
+    const daDoc = new Map<string, Record<string, unknown>[]>()
     for (const m of dsMaDe) {
-      const o = await env.DE.get(`kho/${m}.json`)
-      if (!o?.body) continue
-      try {
-        const g = (await new Response(o.body).json()) as Record<string, unknown>
-        for (const c of docCauTuGoiDe(g)) gom.push(c)
-      } catch {
-        // Một tờ hỏng thì BỎ TỜ ẤY, không làm chết cả phiếu của em.
+      const { goc, phan } = goPhanKhoiMaDe(m)
+      if (!daDoc.has(goc)) {
+        const o = await env.DE.get(`kho/${goc}.json`)
+        if (!o?.body) {
+          daDoc.set(goc, [])
+        } else {
+          try {
+            daDoc.set(goc, docCauTuGoiDe((await new Response(o.body).json()) as Record<string, unknown>))
+          } catch {
+            // Một tờ hỏng thì BỎ TỜ ẤY, không làm chết cả phiếu của em.
+            daDoc.set(goc, [])
+          }
+        }
       }
+      const cau = daDoc.get(goc) ?? []
+      for (const c of phan ? cau.filter((x) => String(x.phan ?? '') === phan) : cau) gom.push(c)
     }
     if (gom.length > 0) goi = { cau: gom, maDe: dsMaDe.join(','), soCau: gom.length }
   }

@@ -339,6 +339,18 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
         </OThongBao>
       ) : (
         <>
+          {/* VÌ SAO Ô SỐ CÂU KHÔNG LÊN ĐƯỢC — thầy chốt 12/09, sau khi gõ 8/2/2
+              mà màn vẫn giữ 3/1/1 và không nói lý do.
+              Trần của mỗi ô là SỐ CÂU CÓ THẬT trong những tờ đề đang tích; gõ
+              cao hơn thì bị kẹp xuống ngay lúc gõ, im lặng. Im lặng ở đây là
+              thầy ngồi đoán, nên nói thẳng con số và nói luôn cách chữa. */}
+          {(co.I < SO_CAU_CHUAN.I || co.II < SO_CAU_CHUAN.II || co.III < SO_CAU_CHUAN.III) && (
+            <div style={{ ...NHAN_NHO, color: 'var(--cam)' }}>
+              Đề đang tích chỉ có <b style={SO}>{co.I}</b> câu phần I · <b style={SO}>{co.II}</b> phần II ·{' '}
+              <b style={SO}>{co.III}</b> phần III. Ô số câu không vượt được con số ấy — muốn nhiều hơn thì tích
+              thêm tờ đề ở khối <b>Bộ câu ra đề</b> phía trên.
+            </div>
+          )}
           <div style={NHAN_NHO}>Mỗi em làm</div>
           <div className="flex flex-wrap items-end" style={{ gap: 'var(--k4)' }}>
             <OSo nhan="Phần I" tri={soCau.I} doi={(n) => capNhat('I', n)} tran={co.I} />

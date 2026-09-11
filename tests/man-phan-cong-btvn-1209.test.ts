@@ -124,34 +124,67 @@ describe('ĐỒNG HỒ ĐẾM NGƯỢC', () => {
   })
 })
 
-// CÂY THƯ MỤC + TICK NHIỀU — thầy chốt 12/09, sau khi nhìn ô chọn phẳng 118 tờ:
-// "chỗ chọn btvn cho chọn theo cây thư mục chuẩn theo kho đề nhé. Cho tick nhiều."
-describe('CHỌN ĐỀ BẰNG CÂY, TICK NHIỀU TỜ', () => {
-  const CAY = doc('src/components/CayChonDe.tsx')
+// CHỌN ĐỀ — DÙNG ĐÚNG HỘP CỦA MÀN MỞ CA.
+//
+// Thầy chốt 12/09, sau khi nhìn bản đầu (một cây tự viết riêng): "phần giao
+// btvn tôi muốn hiển thị đúng như trong mở ca". Nên hộp riêng ấy bị gỡ, và màn
+// này lồng NGUYÊN `HopChonDe` — thứ Mở ca và Gọi lên bảng đang dùng. Một hộp,
+// ba màn: sửa một chỗ là cả ba đổi theo, và thầy chỉ phải học một cách bấm.
+describe('CHỌN ĐỀ Y NHƯ MÀN MỞ CA', () => {
   const WK = doc('server/src/index.ts')
+  const MO_CA = doc('src/screens/ExamSetupScreen.tsx')
 
-  it('màn Phân công bỏ ô chọn phẳng, dùng cây', () => {
-    expect(PC).toContain('<CayChonDe')
-    expect(PC).toContain('dungCayKhoDe(dsDe)')
-    expect(PC).not.toContain('— chọn đề —')
+  it('lồng nguyên HopChonDe, không dựng hộp thứ hai', () => {
+    expect(PC).toContain('<HopChonDe')
+    expect(PC).toContain("import HopChonDe from '../components/HopChonDe'")
+    expect(fs.existsSync(path.join(process.cwd(), 'src/components/CayChonDe.tsx'))).toBe(false)
   })
 
-  it('hiện SỐ TỜ và SỐ CÂU đã tick — không để thầy tự đếm', () => {
-    expect(PC).toContain('tongCauDaChon')
-    expect(PC).toContain('Đã tick')
+  it('cùng NGUỒN và cùng cách tách phần với màn Mở ca', () => {
+    for (const x of ['tachNhieuTheoPhan(', 'loadExamSources()']) {
+      expect(PC, x).toContain(x)
+      expect(MO_CA, x).toContain(x)
+    }
+    // Cùng bộ tham số: tick nhiều, có chip nhóm, có nút chọn cả nhánh.
+    for (const x of ['chonNhieu', 'nhomLoc={nhomLoc}', 'onChonTatCa']) expect(PC, x).toContain(x)
   })
 
-  it('ô tick của nhánh có BA trạng thái — tick nửa nhánh không được trông như đã tick hết', () => {
-    expect(CAY).toContain("trangThaiTick(n, daChon)")
-    expect(CAY).toContain("tt === 'mot_phan'")
+  it('CHỈ hiện tờ máy chủ đã có — tick tờ chưa chuyển thì bấm Giao mới báo là quá muộn', () => {
+    expect(PC).toContain('maTrenMayChu')
+    expect(PC).toContain('nguonGiaoDuoc')
+    // Ẩn bao nhiêu tờ thì nói ra con số, kèm cách làm cho chúng hiện lên.
+    expect(PC).toContain('soChuaChuyen')
+    expect(PC).toContain('Chuyển KHO ĐỀ sang máy chủ mới')
   })
 
-  it('nút bấm đủ to cho ngón tay (≥44px)', () => {
-    expect(CAY).toContain('minHeight: 44')
+  it('đếm số câu theo ĐÚNG phần đã tick, không lấy tổng cả tờ', () => {
+    expect(PC).toContain('d.phanI.length + d.phanII.length + d.phanIII.length')
   })
 
-  it('cây mặc định ĐÓNG — mở sẵn cả cây thì vẫn là danh sách phẳng, chỉ dài hơn', () => {
-    expect(CAY).toContain('useState<Set<string>>(new Set())')
+  it('máy chủ hiểu mã đã tách theo phần — hậu tố TN · DS · TLN', () => {
+    const han = WK.slice(WK.indexOf('export function goPhanKhoiMaDe('), WK.indexOf('/** THẦY GIAO BÀI cho một ca đã thi.'))
+    expect(han).toContain("['-TN', 'I']")
+    expect(han).toContain("['-DS', 'II']")
+    expect(han).toContain("['-TLN', 'III']")
+    // Mã không hậu tố �⇒ cả tờ, để ca giao trước khi có tính năng này vẫn đọc được.
+    expect(han).toContain("return { goc: ma, phan: null }")
+  })
+
+  it('hậu tố phải khớp TỪNG KÝ TỰ với bảng bên máy thầy', () => {
+    const TP = doc('src/lib/tach-phan-de.ts')
+    expect(TP).toContain("{ I: 'TN', II: 'DS', III: 'TLN' }")
+  })
+
+  it('giao bài ĐẾM CÂU THẬT theo phần, không lấy tổng cả tờ làm số câu một phần', () => {
+    const han = WK.slice(WK.indexOf('async function giaoBtvn('), WK.indexOf('/** EM MỞ BÀI TẬP CỦA MÌNH.'))
+    expect(han).toContain("cau.filter((c) => String(c.phan ?? '') === phan).length")
+    expect(han).toContain('Những tờ đã tick không có câu nào')
+  })
+
+  it('em mở bài chỉ nhận ĐÚNG phần đã tick, và mỗi tờ chỉ tải một lần', () => {
+    const han = WK.slice(WK.indexOf('async function btvnCuaEm('), WK.indexOf('async function nopBtvn('))
+    expect(han).toContain('const daDoc = new Map<string, Record<string, unknown>[]>()')
+    expect(han).toContain("phan ? cau.filter((x) => String(x.phan ?? '') === phan) : cau")
   })
 
   it('máy chủ nhận NHIỀU tờ đề một lượt giao, và vẫn nhận dáng một tờ của bản cũ', () => {
@@ -166,7 +199,7 @@ describe('CHỌN ĐỀ BẰNG CÂY, TICK NHIỀU TỜ', () => {
   it('em mở bài thì gộp câu của mọi tờ, đúng thứ tự thầy tick, KHÔNG xáo', () => {
     const han = WK.slice(WK.indexOf('async function btvnCuaEm('), WK.indexOf('async function nopBtvn('))
     expect(han).toContain("String(bt.ma_de ?? '')")
-    expect(han).toContain('docCauTuGoiDe(g)')
+    expect(han).toContain('docCauTuGoiDe(')
     for (const cam of ['sort(', 'shuffle', 'Math.random']) expect(han, cam).not.toContain(cam)
   })
 })
