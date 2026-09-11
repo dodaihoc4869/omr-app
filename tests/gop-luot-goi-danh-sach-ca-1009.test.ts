@@ -127,10 +127,14 @@ describe('MÃ NGUỒN — mọi lệnh làm đổi danh sách ca đều phải b
     for (const ten of ['khoaCa', 'moKhoaCa', 'doiTenCa', 'xoaCa', 'khoiPhucCa', 'publishSession']) {
       const dau = s.indexOf(`export async function ${ten}`)
       expect(dau, ten).toBeGreaterThan(0)
-      // CỬA SỔ NỚI 2 600 → 5 000 ngày 11/09. `publishSession` mọc thêm đoạn đẩy
-      // ca lên máy chủ mới, đẩy lời gọi `xoaBoDemCa()` ra ngoài cửa sổ cũ. Ý
-      // ĐỊNH KHÔNG ĐỔI: lệnh làm đổi danh sách ca thì phải bỏ đệm.
-      expect(s.slice(dau, dau + 5000), ten).toContain('xoaBoDemCa()')
+      // CẮT ĐÚNG THÂN HÀM, không cắt theo số ký tự.
+      //
+      // Cửa sổ cứng đã phải nới 2 600 → 5 000 một lần ngày 11/09, rồi lại hụt
+      // lần nữa khi `publishSession` mọc thêm phần ghi Sheet ở nền. Đếm ký tự
+      // là phép kiểm đỏ mỗi lần hàm dài ra, trong khi Ý ĐỊNH không hề đổi:
+      // lệnh làm đổi danh sách ca thì phải bỏ đệm.
+      const than = s.slice(dau, s.indexOf('\n}', dau))
+      expect(than, ten).toContain('xoaBoDemCa()')
     }
   })
 

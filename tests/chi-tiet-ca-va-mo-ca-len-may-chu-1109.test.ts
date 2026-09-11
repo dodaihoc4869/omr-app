@@ -139,10 +139,18 @@ describe('③ MỞ CA — mốc giờ tính MỘT nơi, và không xếp sau lư
     expect(HAM).toContain('daLenMayChuMoi = await dayMayChuMoi')
   })
 
-  it('gói đề đẩy lên R2 là bản KHÔNG đáp án', () => {
+  it('gói đề CÔNG KHAI đẩy lên R2 là bản KHÔNG đáp án', () => {
+    // 11/09 khuya: ngân hàng CÓ đáp án nay cũng được đẩy, nhưng sang một KHOÁ
+    // KHÁC (`key/`) để `/nop` trả ngay cho em khi ca công bố điểm. Luật không
+    // đổi — `de/` là đường công khai máy em tải, và nó KHÔNG được có đáp án.
     const khoi = HAM.slice(HAM.indexOf('const dayMayChuMoi = (async ()'), HAM.indexOf('const ghiSheet = async () =>'))
     expect(khoi).toContain('bank,')
-    expect(khoi).not.toContain('keyBank')
+    // Ngân hàng đáp án chỉ gửi khi ca CÔNG BỐ NGAY, không gửi bừa.
+    expect(khoi).toContain("congBoDiem === 'ngay' ? keyBank : undefined")
+    // Và bên Worker, hai khoá phải tách hẳn.
+    const WK2 = fs.readFileSync(path.join(process.cwd(), 'server/src/index.ts'), 'utf8')
+    const layDe = WK2.slice(WK2.indexOf('async function layDe('), WK2.indexOf('async function layDe(') + 700)
+    expect(layDe).not.toContain('key/')
   })
 
   it('cờ máy chủ mới TẮT thì trả false, không ném — và chỗ gọi quay về đợi Sheet', () => {
