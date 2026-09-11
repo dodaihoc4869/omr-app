@@ -14,6 +14,7 @@ import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiM
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
 import { dayCaMoi, dayDanhSachMoi, luotCuaCaMoi } from './day-ca-may-chu-moi'
 import { daBatDauTheoDuongCu, ghiNhoDaBatDauDuongCu, nenDoiChieu } from './doi-chieu-phong-cho'
+import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu, type LuotDayNhieu } from './man-ca-may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
@@ -1995,9 +1996,26 @@ export async function danhSachCa(scriptUrl: string, secret: string, daXoa = fals
 }
 
 async function danhSachCaThat(scriptUrl: string, secret: string, daXoa: boolean): Promise<CaTomTat[]> {
+  // MÁY CHỦ MỚI TRƯỚC — nhưng CHỈ khi trên D1 có dấu `ca_day_du`. Chưa chuyển
+  // xong dữ liệu thì `danhSachCaMoi` trả `null` và ta đi đường cũ, vì màn Ca
+  // thi thiếu ca hoặc đếm sai số em còn tệ hơn màn Ca thi chậm.
+  // Xem `src/lib/man-ca-may-chu-moi.ts`.
+  try {
+    const chMoi = await layCauHinhMayChu()
+    const rMoi = await danhSachCaMoi(chMoi, secret, daXoa)
+    if (rMoi) return chuanCaTomTat(rMoi.items)
+  } catch {
+    // máy chủ mới hỏng thì im lặng đi đường cũ — đây không phải luồng chính
+  }
   const r = await postJson(scriptUrl, { action: 'danhSachCa', secret, daXoa })
   if (!r.ok) throw new Error(r.error || 'Không lấy được danh sách ca')
-  return (r.items as CaTomTat[]).map((c) => ({
+  return chuanCaTomTat(r.items as CaTomTat[])
+}
+
+/** Chuẩn hoá một danh sách ca, dùng chung cho CẢ HAI máy chủ — hai đường trả về
+ * cùng một dáng thì màn hình không phải biết mình đang đọc ở đâu. */
+function chuanCaTomTat(items: unknown): CaTomTat[] {
+  return (items as CaTomTat[]).map((c) => ({
     ...c,
     maCa: String(c.maCa),
     lop: String(c.lop ?? ''),
@@ -2500,4 +2518,110 @@ export async function ghiDiem(
   const r = await postJson(scriptUrl, { action: 'ghiDiem', secret, maCa, bai, luatDiem: LUAT_DIEM, soCau }, 90)
   if (!r.ok) throw new Error(r.error || 'Không ghi được điểm')
   return { daGhi: r.daGhi ?? [], tuChoi: r.tuChoi ?? [] }
+}
+
+/** KẾT QUẢ CHUYỂN TOÀN BỘ CA SANG MÁY CHỦ MỚI. */
+export interface KetQuaNapCa {
+  soCa: number
+  soLuot: number
+  /** Đối chiếu hai bên có khớp không. KHÔNG khớp ⇒ dấu đồng bộ bị XOÁ và màn Ca
+   * thi tiếp tục đọc Apps Script — chậm, nhưng đúng. */
+  khop: boolean
+  lechCa: number
+  lechLuot: number
+  hong: string[]
+}
+
+/** CHUYỂN TOÀN BỘ CA VÀ LƯỢT THI TỪ SHEET SANG D1 — đợt 5B, 11/09.
+ *
+ * Thầy chốt "chuyển luôn bây giờ". Đây là lượt chạy MỘT LẦN; sau đó mọi ca mới
+ * và mọi lượt mới tự lên D1 theo đường thường.
+ *
+ * BA LUẬT AN TOÀN, và cả ba đều đã có chỗ hỏng thật để phòng:
+ *
+ * ① KHÔNG XOÁ GÌ Ở SHEET. Lượt này chỉ ĐỌC Apps Script và GHI vào D1.
+ * ② ĐỐI CHIẾU TRƯỚC KHI ĐỔI CHỖ ĐỌC. Ghi xong thì đọc lại D1 và so số ca, số
+ *    lượt với chính con số vừa đọc từ Sheet. Lệch một dòng cũng KHÔNG ghi dấu —
+ *    và xoá dấu cũ nếu có, để app quay về đường cũ.
+ * ③ MỘT CA HỎNG KHÔNG LÀM HỎNG CẢ LƯỢT. Ghi tên ca ấy vào `hong` rồi đi tiếp;
+ *    nhưng có tên trong `hong` là chắc chắn KHÔNG khớp ⇒ không có dấu. */
+export async function napToanBoCaLenMayChuMoi(
+  scriptUrl: string,
+  secret: string,
+  bao?: (xong: number, tong: number, viec: string) => void,
+): Promise<KetQuaNapCa> {
+  const ch = await layCauHinhMayChu()
+  if (!ch.BAT || !ch.URL) throw new Error('Chưa bật máy chủ mới trong Cài đặt')
+
+  // Đọc danh sách ca THẲNG từ Apps Script, bỏ qua mọi bộ đệm và mọi đường tắt.
+  const dsCa = await danhSachCaThat(scriptUrl, secret, false)
+  const dsXoa = await danhSachCaThat(scriptUrl, secret, true)
+  const tatCa = [...dsCa, ...dsXoa]
+  bao?.(0, tatCa.length + 1, `${tatCa.length} ca`)
+
+  // Đẩy phần CA trước, một lô. Nhẹ, và có ca rồi thì lượt mới có chỗ bám.
+  const goiCa: CaDayNhieu[] = tatCa.map((c) => ({
+    maCa: c.maCa,
+    tenCa: c.tenCa,
+    lop: c.lop,
+    thoiGianPhut: c.thoiGianPhut,
+    moLuc: c.moLuc,
+    batDau: c.batDau,
+    hetHanVao: c.hetHanVao,
+    trangThai: c.trangThai,
+    phamVi: String(c.phamVi ?? 'tu_do'),
+    congBo: c.congBo,
+    loai: c.loai,
+    hanNop: c.hanNop,
+    lenBang: c.lenBang !== false,
+    phongCho: c.phongCho === true,
+    batDauThiLuc: c.batDauThiLuc ?? '',
+    xoaLuc: c.xoaLuc ?? '',
+  }))
+  if (!(await dayNhieuCaMoi(ch, secret, { ca: goiCa }))) {
+    throw new Error('Không đẩy được danh sách ca lên máy chủ mới')
+  }
+
+  // Rồi LƯỢT, từng ca một. `chiTietCa` là lệnh nặng nhất của Apps Script nên
+  // không gọi song song — chạy song song là tự dựng lại đúng cú dồn đã gỡ.
+  const hong: string[] = []
+  let soLuotSheet = 0
+  for (let i = 0; i < tatCa.length; i++) {
+    const c = tatCa[i]
+    bao?.(i + 1, tatCa.length + 1, `ca ${c.maCa}`)
+    try {
+      const ct = await chiTietCa(scriptUrl, secret, c.maCa)
+      const luot: LuotDayNhieu[] = (ct.luot ?? []).map((l) => ({
+        maCa: c.maCa,
+        sbd: l.sbd,
+        lanThu: l.lanThu,
+        trangThai: l.trangThai,
+        vaoLuc: l.vaoLuc,
+        hetGioLuc: l.hetGioLuc,
+        nopLuc: l.nopLuc,
+        soLanRoiMan: l.soLanRoiMan,
+        tongGiayRoiMan: l.tongGiayRoiMan,
+      }))
+      soLuotSheet += luot.length
+      if (luot.length > 0 && !(await dayNhieuCaMoi(ch, secret, { luot }))) hong.push(c.maCa)
+    } catch {
+      hong.push(c.maCa)
+    }
+  }
+
+  // ĐỐI CHIẾU — đọc lại D1 bằng cửa KHÔNG đòi dấu, vì lúc này chưa có dấu nào.
+  const lai = await danhSachCaMoiThoDoiChieu(ch, secret, false)
+  const laiXoa = await danhSachCaMoiThoDoiChieu(ch, secret, true)
+  const soCaD1 = (lai?.items.length ?? 0) + (laiXoa?.items.length ?? 0)
+  const soLuotD1 = lai?.soDongLuot ?? 0
+
+  // So CHÍNH XÁC cả hai con số. `soDongLuot` đếm ĐÚNG số dòng `luot` trên D1,
+  // cùng nghĩa với `soLuotSheet` — số dòng đọc từ Sheet. Không so bằng `daVao`
+  // được: nó chỉ đếm lần thử cao nhất mỗi em, mà em thi lại có nhiều dòng.
+  const lechCa = tatCa.length - soCaD1
+  const lechLuot = soLuotSheet - soLuotD1
+  const khop = hong.length === 0 && lechCa === 0 && lechLuot <= 0
+  await datDauDongBo(ch, secret, khop ? { soCa: soCaD1, soLuot: soLuotD1, ghiChu: 'da doi chieu' } : null)
+  bao?.(tatCa.length + 1, tatCa.length + 1, khop ? 'xong' : 'KHÔNG khớp')
+  return { soCa: tatCa.length, soLuot: soLuotSheet, khop, lechCa, lechLuot, hong }
 }

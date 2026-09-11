@@ -7,9 +7,10 @@
 // Apps Script, em không thấy gì khác ngoài chậm hơn một nhịp.
 import { useEffect, useState } from 'react'
 import { NutChinh, OThongBao } from './DesignSystem'
-import { loadCauHinhMayChu, saveCauHinhMayChu } from '../lib/exam-db'
+import { loadCauHinhMayChu, loadScriptUrl, loadTeacherSecret, saveCauHinhMayChu } from '../lib/exam-db'
 import { MAC_DINH_MAY_CHU, type CauHinhMayChu } from '../lib/cau-hinh-may-chu'
 import { quenCauHinhMayChu, thuKetNoi } from '../lib/may-chu-moi'
+import { napToanBoCaLenMayChuMoi } from '../lib/exam-api'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }
 const O_NHAP: React.CSSProperties = {
@@ -29,6 +30,9 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
   const [ch, setCh] = useState<CauHinhMayChu>(MAC_DINH_MAY_CHU)
   const [dangThu, setDangThu] = useState(false)
   const [ketQua, setKetQua] = useState<{ ok: boolean; chu: string } | null>(null)
+  const [dangNap, setDangNap] = useState(false)
+  const [tienNap, setTienNap] = useState('')
+  const [ketNap, setKetNap] = useState<{ ok: boolean; chu: string } | null>(null)
 
   useEffect(() => {
     // NUỐT LỖI Ở ĐÂY LÀ CỐ Ý. Khối cài đặt này nằm trong màn Ngân hàng đề —
@@ -54,6 +58,42 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
     const r = await thuKetNoi(ch.URL)
     setKetQua(r)
     setDangThu(false)
+  }
+
+  /** CHUYỂN TOÀN BỘ CA VÀ LƯỢT THI CŨ SANG MÁY CHỦ MỚI — chạy một lần.
+   *
+   * Chỉ ĐỌC Apps Script và GHI vào D1, không xoá gì ở Sheet. Xong thì tự đối
+   * chiếu số ca và số dòng lượt hai bên; **lệch một dòng cũng không ghi dấu**,
+   * và màn Ca thi tiếp tục đọc đường cũ. Không có trạng thái nào ở giữa. */
+  async function chuyenCa() {
+    if (dangNap) return
+    if (!ch.BAT || !ch.URL.trim()) return showToast('Bật máy chủ mới trước đã', 'error')
+    setDangNap(true)
+    setKetNap(null)
+    setTienNap('đang đọc danh sách ca…')
+    try {
+      const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
+      if (!url.trim() || !mat.trim()) throw new Error('Thiếu link Apps Script hoặc mã bí mật')
+      const kq = await napToanBoCaLenMayChuMoi(url.trim(), mat.trim(), (xong, tong, viec) => {
+        setTienNap(`${xong}/${tong} · ${viec}`)
+      })
+      const phan = [`${kq.soCa} ca`, `${kq.soLuot} lượt`]
+      if (kq.hong.length) phan.push(`HỎNG ${kq.hong.length} ca: ${kq.hong.slice(0, 5).join(', ')}`)
+      if (kq.lechCa !== 0) phan.push(`lệch ${kq.lechCa} ca`)
+      if (kq.lechLuot > 0) phan.push(`thiếu ${kq.lechLuot} lượt`)
+      setKetNap({
+        ok: kq.khop,
+        chu: kq.khop
+          ? `Đã chuyển và ĐỐI CHIẾU KHỚP: ${phan.join(' · ')}. Màn Ca thi từ giờ đọc máy chủ mới.`
+          : `CHƯA khớp — ${phan.join(' · ')}. Màn Ca thi vẫn đọc Apps Script như cũ.`,
+      })
+      showToast(kq.khop ? 'Màn Ca thi đã sang máy chủ mới' : 'Chưa khớp — vẫn đọc đường cũ', kq.khop ? 'success' : 'warn')
+    } catch (e) {
+      setKetNap({ ok: false, chu: e instanceof Error ? e.message : 'Không chuyển được' })
+    } finally {
+      setDangNap(false)
+      setTienNap('')
+    }
   }
 
   async function gatCo(bat: boolean) {
@@ -99,6 +139,21 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
       </div>
 
       {ketQua && <OThongBao tone={ketQua.ok ? 'xanh' : 'do'}>{ketQua.chu}</OThongBao>}
+
+      <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
+        <NutChinh variant="phu" onClick={chuyenCa} disabled={dangNap || !ch.BAT}>
+          {dangNap ? 'Đang chuyển…' : 'Chuyển ca cũ sang máy chủ mới'}
+        </NutChinh>
+        {dangNap && <span style={NHAN_NHO}>{tienNap}</span>}
+      </div>
+
+      {ketNap && <OThongBao tone={ketNap.ok ? 'xanh' : 'do'}>{ketNap.chu}</OThongBao>}
+
+      <div style={NHAN_NHO}>
+        Nút trên chỉ ĐỌC Apps Script và GHI vào máy chủ mới, không xoá gì ở Google Sheet.
+        {' '}Chuyển xong nó tự đối chiếu số ca và số lượt hai bên; lệch một dòng là
+        {' '}màn Ca thi vẫn đọc đường cũ — thà chậm còn hơn đếm sai số em.
+      </div>
 
       <div style={NHAN_NHO}>
         Đang chạy: <b>{ch.BAT ? 'máy chủ mới, hỏng thì tự rơi về Apps Script' : 'Apps Script như cũ'}</b>.

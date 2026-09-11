@@ -9,7 +9,7 @@
 //      lệnh của THẦY thì đòi. Không nới luật này ở bất kỳ đâu.
 import { CA_DO_TAI, TRANG_DO_TAI } from './do-tai'
 import { chuanHoaDanhSach } from './danh-sach'
-import type { DongCa, DongLuot, Env } from './kieu'
+import type { D1PreparedStatement, DongCa, DongLuot, Env } from './kieu'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 
 // CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
@@ -414,6 +414,176 @@ async function xoaPhieuR2(env: Env, ma: string): Promise<Response> {
 //
 // LUẬT GIỮ NGUYÊN TỪ APPS SCRIPT: bảng RỖNG thì KHÔNG chặn ai. Thầy chưa kịp
 // đẩy danh sách mà cả lớp đứng ngoài cửa là hỏng nặng hơn hẳn việc thiếu cổng.
+/** ĐẨY NHIỀU CA VÀ NHIỀU LƯỢT MỘT LƯỢT — dùng cho lượt chuyển dữ liệu cũ từ
+ * Sheet sang D1 (đợt 5B).
+ *
+ * VÌ SAO KHÔNG GỌI `/ca/day` NHIỀU LẦN: mỗi lượt gọi là một vòng mạng, mà kho
+ * của thầy có hàng chục ca và vài trăm lượt. Gộp lại còn vài lượt gọi.
+ *
+ * `da_day_sheet = 1` cho MỌI dòng lượt đẩy ở đây: chúng vốn ĐANG nằm trên
+ * Sheet, đó là nơi chúng được chép ra. Đánh dấu 0 là màn Theo dõi sẽ báo "còn
+ * N bài chưa về Sheet" rồi đẩy ngược lại đúng những dòng đã có — vừa sai số
+ * vừa có nguy cơ ghi đè bản trên Sheet bằng bản chép thiếu cột. */
+async function dayNhieuCa(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const dsCa = Array.isArray(b.ca) ? (b.ca as Record<string, unknown>[]) : []
+  const dsLuot = Array.isArray(b.luot) ? (b.luot as Record<string, unknown>[]) : []
+  if (dsCa.length === 0 && dsLuot.length === 0) return ra({ ok: false, error: 'Không có gì để đẩy' })
+  const nay = new Date().toISOString()
+  const cau: D1PreparedStatement[] = []
+
+  for (const c of dsCa) {
+    const maCa = String(c.maCa ?? '').trim()
+    if (!maCa) continue
+    cau.push(
+      env.DB.prepare(
+        `INSERT INTO ca (ma_ca, ten_ca, trang_thai, bat_dau, het_han_vao, thoi_gian_phut, loai, han_nop,
+                         cong_bo, cap_nhat_luc, lop, phong_cho, bat_dau_thi_luc, giu_de_doc, an_han_giay,
+                         mo_luc, pham_vi, len_bang, xoa_luc)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+         ON CONFLICT(ma_ca) DO UPDATE SET
+           ten_ca=excluded.ten_ca, trang_thai=excluded.trang_thai, bat_dau=excluded.bat_dau,
+           het_han_vao=excluded.het_han_vao, thoi_gian_phut=excluded.thoi_gian_phut,
+           loai=excluded.loai, han_nop=excluded.han_nop, cong_bo=excluded.cong_bo,
+           cap_nhat_luc=excluded.cap_nhat_luc, lop=excluded.lop, phong_cho=excluded.phong_cho,
+           giu_de_doc=excluded.giu_de_doc, an_han_giay=excluded.an_han_giay,
+           mo_luc=excluded.mo_luc, pham_vi=excluded.pham_vi, len_bang=excluded.len_bang,
+           xoa_luc=excluded.xoa_luc,
+           -- Giữ nguyên mốc bắt đầu và khoá gói đề: xem ghi chú ở \`dayCa\`.
+           bat_dau_thi_luc=COALESCE(excluded.bat_dau_thi_luc, ca.bat_dau_thi_luc)`,
+      ).bind(
+        maCa, String(c.tenCa ?? ''), String(c.trangThai ?? 'mo'), String(c.batDau ?? ''),
+        String(c.hetHanVao ?? ''), Number(c.thoiGianPhut) || 45, String(c.loai ?? 'thi'),
+        String(c.hanNop ?? ''), String(c.congBo ?? 'khong'), nay, String(c.lop ?? ''),
+        c.phongCho ? 1 : 0, String(c.batDauThiLuc ?? '') || null, c.giuDeDoc ? 1 : 0,
+        Number(c.anHanGiay) || 0, String(c.moLuc ?? ''), String(c.phamVi ?? 'tu_do'),
+        c.lenBang === false ? 0 : 1, String(c.xoaLuc ?? ''),
+      ),
+    )
+  }
+
+  for (const l of dsLuot) {
+    const maCa = String(l.maCa ?? '').trim()
+    const sbd = String(l.sbd ?? '').trim()
+    if (!maCa || !sbd) continue
+    const lanThu = Number(l.lanThu) || 1
+    cau.push(
+      env.DB.prepare(
+        `INSERT INTO luot (khoa, ma_ca, sbd, lan_thu, vao_luc, het_gio_luc, nop_luc, trang_thai,
+                           so_lan_roi_man, tong_giay_roi_man, cap_nhat_luc, da_day_sheet)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,1)
+         ON CONFLICT(khoa) DO UPDATE SET
+           vao_luc=excluded.vao_luc, het_gio_luc=excluded.het_gio_luc, nop_luc=excluded.nop_luc,
+           trang_thai=excluded.trang_thai, so_lan_roi_man=excluded.so_lan_roi_man,
+           tong_giay_roi_man=excluded.tong_giay_roi_man, cap_nhat_luc=excluded.cap_nhat_luc,
+           da_day_sheet=1`,
+      ).bind(
+        `${maCa}|${sbd}|${lanThu}`, maCa, sbd, lanThu, String(l.vaoLuc ?? '') || nay,
+        String(l.hetGioLuc ?? '') || null, String(l.nopLuc ?? '') || null,
+        String(l.trangThai ?? 'dang_lam'), Number(l.soLanRoiMan) || 0,
+        Number(l.tongGiayRoiMan) || 0, nay,
+      ),
+    )
+  }
+
+  for (let i = 0; i < cau.length; i += 200) await env.DB.batch(cau.slice(i, i + 200))
+  return ra({ ok: true, soCa: dsCa.length, soLuot: dsLuot.length, soCau: cau.length })
+}
+
+/** DANH SÁCH CA + ĐẾM ĐÃ VÀO / ĐÃ NỘP / CẢNH BÁO — thay `danhSachCa` bên Apps
+ * Script, đúng một lượt gọi và đúng một câu truy vấn cho phần đếm.
+ *
+ * LUẬT ĐẾM PHẢI KHỚP `thongKeLuot_` BÊN APPS SCRIPT, không được xê một ly:
+ *   · lấy LẦN THỬ CAO NHẤT của mỗi em trong ca;
+ *   · lượt `duoc_duyet_lai` KHÔNG tính vào bất kỳ ô nào;
+ *   · đã nộp = `da_nop` hoặc `khoa`;
+ *   · cảnh báo = `khoa` hoặc có lần rời màn.
+ * Lệch luật ở đây là thầy nhìn màn Ca thi thấy số em khác với sự thật trên
+ * Sheet — sai số liệu còn tệ hơn chậm. */
+async function danhSachCaMoi(env: Env, daXoa: boolean): Promise<Response> {
+  const rCa = await env.DB.prepare(
+    daXoa
+      ? `SELECT * FROM ca WHERE trang_thai = 'da_xoa'`
+      : `SELECT * FROM ca WHERE trang_thai <> 'da_xoa' AND ma_ca <> 'DOTAI'`,
+  ).all<Record<string, unknown>>()
+
+  const rDem = await env.DB.prepare(
+    `WITH moi AS (
+       SELECT l.ma_ca, l.trang_thai, l.so_lan_roi_man
+       FROM luot l
+       JOIN (SELECT ma_ca, sbd, MAX(lan_thu) AS m FROM luot GROUP BY ma_ca, sbd) x
+         ON l.ma_ca = x.ma_ca AND l.sbd = x.sbd AND l.lan_thu = x.m
+       WHERE l.trang_thai <> 'duoc_duyet_lai'
+     )
+     SELECT ma_ca,
+            COUNT(*) AS da_vao,
+            SUM(CASE WHEN trang_thai IN ('da_nop','khoa') THEN 1 ELSE 0 END) AS da_nop,
+            SUM(CASE WHEN trang_thai = 'khoa' OR so_lan_roi_man > 0 THEN 1 ELSE 0 END) AS canh_bao
+     FROM moi GROUP BY ma_ca`,
+  ).all<{ ma_ca: string; da_vao: number; da_nop: number; canh_bao: number }>()
+
+  const dem: Record<string, { da_vao: number; da_nop: number; canh_bao: number }> = {}
+  for (const d of rDem.results ?? []) dem[String(d.ma_ca)] = d
+
+  const items = (rCa.results ?? []).map((v) => {
+    const maCa = String(v.ma_ca ?? '')
+    const t = dem[maCa] ?? { da_vao: 0, da_nop: 0, canh_bao: 0 }
+    return {
+      maCa,
+      lop: String(v.lop ?? ''),
+      thoiGianPhut: Number(v.thoi_gian_phut) || 45,
+      moLuc: String(v.mo_luc ?? ''),
+      congBo: String(v.cong_bo ?? 'khong'),
+      batDau: String(v.bat_dau ?? ''),
+      hetHanVao: String(v.het_han_vao ?? ''),
+      trangThai: String(v.trang_thai ?? 'mo'),
+      tenCa: String(v.ten_ca ?? ''),
+      phamVi: String(v.pham_vi ?? 'tu_do'),
+      loai: String(v.loai ?? '') === 'baitap' ? 'baitap' : 'thi',
+      hanNop: String(v.han_nop ?? ''),
+      lenBang: Number(v.len_bang ?? 1) !== 0,
+      giuDeDoc: Number(v.giu_de_doc ?? 0) === 1,
+      anHanGiay: Number(v.an_han_giay) || 0,
+      phongCho: Number(v.phong_cho ?? 0) === 1,
+      batDauThiLuc: String(v.bat_dau_thi_luc ?? ''),
+      xoaLuc: String(v.xoa_luc ?? ''),
+      daVao: Number(t.da_vao) || 0,
+      daNop: Number(t.da_nop) || 0,
+      canhBao: Number(t.canh_bao) || 0,
+    }
+  })
+  items.sort((a, b) => mocMs(b.moLuc || b.batDau) - mocMs(a.moLuc || a.batDau))
+
+  const dau = await env.DB.prepare('SELECT * FROM dong_bo WHERE ma = ?').bind('ca_day_du').first<Record<string, unknown>>()
+  // SỐ DÒNG LƯỢT THẬT — để app đối chiếu CHÍNH XÁC với số dòng đọc từ Sheet.
+  // `daVao` không dùng được cho việc này: nó đếm lần thử cao nhất mỗi em, còn
+  // em thi lại có nhiều dòng.
+  const rDong = await env.DB.prepare(`SELECT COUNT(*) AS n FROM luot WHERE ma_ca <> 'DOTAI'`).first<{ n: number }>()
+  return ra({ ok: true, items, dauDongBo: dau ?? null, soDongLuot: Number(rDong?.n) || 0, serverNow: Date.now() })
+}
+
+/** Mốc thời gian thành mili giây; chuỗi rỗng hay hỏng thì về 0. */
+function mocMs(s: string): number {
+  const t = Date.parse(String(s || ''))
+  return Number.isFinite(t) ? t : 0
+}
+
+/** GHI DẤU ĐỒNG BỘ. App chỉ gọi sau khi đã tự đối chiếu số ca và số lượt hai
+ * bên khớp nhau — Worker không tự phong cho mình là đủ dữ liệu. */
+async function ghiDauDongBo(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const ma = String(b.ma ?? '').trim()
+  if (!ma) return ra({ ok: false, error: 'Thiếu mã dấu' })
+  if (b.xoa === true) {
+    await env.DB.prepare('DELETE FROM dong_bo WHERE ma = ?').bind(ma).run()
+    return ra({ ok: true, daXoa: true })
+  }
+  await env.DB.prepare(
+    `INSERT INTO dong_bo (ma, luc, so_ca, so_luot, ghi_chu) VALUES (?,?,?,?,?)
+     ON CONFLICT(ma) DO UPDATE SET luc=excluded.luc, so_ca=excluded.so_ca,
+       so_luot=excluded.so_luot, ghi_chu=excluded.ghi_chu`,
+  ).bind(ma, new Date().toISOString(), Number(b.soCa) || 0, Number(b.soLuot) || 0, String(b.ghiChu ?? '')).run()
+  return ra({ ok: true })
+}
+
 async function dayDanhSach(env: Env, b: Record<string, unknown>): Promise<Response> {
   const ds = chuanHoaDanhSach(b.ds)
   // Danh sách rỗng thì KHÔNG ghi gì và KHÔNG xoá gì. Một lượt gọi hỏng nửa
@@ -617,6 +787,9 @@ export default {
     if (p === '/ca/bat-dau') return batDauThi(env, String(b.maCa ?? ''))
     if (p === '/theo-doi') return xemTheoDoi(env, String(b.maCa ?? ''))
     if (p === '/ca/luot') return luotCuaCa(env, String(b.maCa ?? ''))
+    if (p === '/ca/nhieu') return dayNhieuCa(env, b)
+    if (p === '/ca/danh-sach') return danhSachCaMoi(env, b.daXoa === true)
+    if (p === '/dong-bo/dau') return ghiDauDongBo(env, b)
     if (p === '/cho') return xemPhongCho(env, String(b.maCa ?? ''))
 
     return ra({ ok: false, error: 'Không có đường này' }, 404)
