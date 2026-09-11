@@ -6,12 +6,17 @@
 //   2. Máy chủ mới im lặng ⇒ mọi lệnh PHẢI rơi về Apps Script, không nuốt.
 //   3. Lượt không nằm ở máy chủ mới ⇒ cũng phải rơi về, không báo "đã lưu".
 //   4. Nộp: máy chủ mới đã cất bài thì Apps Script hỏng KHÔNG được báo đỏ.
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { dieuKienLuot } from '../server/src/index'
 import { chuanHoaMayChu } from '../src/lib/cau-hinh-may-chu'
-import { luuTamMoi, nopMoi, trangThaiMoi } from '../src/lib/may-chu-moi'
+import { caDaBiGatCauDao, luuTamMoi, nopMoi, phongChoMoi, quenCaVang, trangThaiMoi } from '../src/lib/may-chu-moi'
 
 const BAT = chuanHoaMayChu({ BAT: true, URL: 'https://x.workers.dev', SO_LAN_THU: 1, HAN_GIAY: 1 })
+
+// Cầu dao sống theo tiến trình (đúng như trong app: chỉ xoá khi thầy đổi cấu
+// hình hoặc tải lại trang). Không reset ở đây thì phép kiểm trước rỉ sang phép
+// kiểm sau — và chính chỗ rỉ đó đã làm một phép kiểm đỏ, nên giữ dòng này.
+beforeEach(() => quenCaVang())
 const TAT = chuanHoaMayChu({ BAT: false, URL: '' })
 
 function gia(tra: unknown, status = 200) {
@@ -87,5 +92,89 @@ describe('nộp bài', () => {
   it('không tìm thấy lượt ⇒ null để rơi về Apps Script, KHÔNG nuốt bài', async () => {
     globalThis.fetch = gia({ ok: false, lyDo: 'khong_tim_thay' }) as typeof fetch
     expect(await nopMoi(BAT, 'C1', 'E1', { c1: 'A' }, {})).toBeNull()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// CẦU DAO — phép kiểm cho chỗ suýt làm app CHẬM HƠN lúc chưa bật cờ.
+//
+// Hôm nay vào thi vẫn đi Apps Script, nên dòng `luot` nằm ở Sheet chứ không ở
+// D1. Không có cầu dao thì mỗi nhịp lưu tạm và mỗi nhịp hỏi phòng chờ đều tốn
+// một lượt gọi Worker chắc chắn trượt trước khi đi đường cũ.
+describe('cầu dao ca chưa lên máy chủ mới', () => {
+  it('trượt một lần rồi THÔI gọi cho cả ca', async () => {
+    let goi = 0
+    globalThis.fetch = (async () => {
+      goi++
+      return new Response(JSON.stringify({ ok: false, lyDo: 'khong_dang_lam' }), {
+        headers: { 'content-type': 'application/json' },
+      })
+    }) as typeof fetch
+
+    expect(await luuTamMoi(BAT, 'CA-CU', 'E1', { c1: 'A' })).toBeNull()
+    expect(goi).toBe(1)
+    // 134 nhịp còn lại của em: KHÔNG được gọi thêm lượt nào.
+    for (let i = 0; i < 20; i++) expect(await luuTamMoi(BAT, 'CA-CU', 'E1', { c1: 'A' })).toBeNull()
+    expect(goi).toBe(1)
+    expect(caDaBiGatCauDao('CA-CU')).toBe(true)
+  })
+
+  it('cầu dao chỉ chặn ĐÚNG ca đó, ca khác vẫn gọi bình thường', async () => {
+    let goi = 0
+    globalThis.fetch = (async () => {
+      goi++
+      return new Response(JSON.stringify({ ok: false, lyDo: 'khong_dang_lam' }), {
+        headers: { 'content-type': 'application/json' },
+      })
+    }) as typeof fetch
+    await luuTamMoi(BAT, 'CA-CU', 'E1', {})
+    await luuTamMoi(BAT, 'CA-MOI', 'E1', {})
+    expect(goi).toBe(2)
+    expect(caDaBiGatCauDao('CA-MOI')).toBe(true)
+  })
+
+  it('MẠNG HỎNG thì KHÔNG gạt cầu dao — đó là sự cố tạm, không phải ca vắng', async () => {
+    // Gạt nhầm ở đây là mất máy chủ mới cho cả ca chỉ vì một nhịp rớt sóng.
+    globalThis.fetch = (async () => {
+      throw new Error('mạng')
+    }) as typeof fetch
+    expect(await luuTamMoi(BAT, 'CA-THAT', 'E1', {})).toBeNull()
+    expect(caDaBiGatCauDao('CA-THAT')).toBe(false)
+  })
+
+  it('phòng chờ: ca không có trên máy chủ ⇒ gạt ngay, em hỏi lại 3 giây một lần', async () => {
+    let goi = 0
+    globalThis.fetch = (async () => {
+      goi++
+      return new Response(JSON.stringify({ ok: false, error: 'Không tìm thấy ca kiểm tra' }), {
+        headers: { 'content-type': 'application/json' },
+      })
+    }) as typeof fetch
+    expect(await phongChoMoi(BAT, 'CA-CU')).toBeNull()
+    for (let i = 0; i < 10; i++) await phongChoMoi(BAT, 'CA-CU')
+    expect(goi).toBe(1)
+  })
+
+  it('phòng chờ MẠNG HỎNG cũng KHÔNG gạt cầu dao', async () => {
+    // Đường trượt riêng của `phongChoMoi` (không đi qua `goiWorker`), nên phải
+    // có phép kiểm riêng — phá mã lần đầu không bắt được chỗ này.
+    globalThis.fetch = (async () => {
+      throw new Error('mạng')
+    }) as typeof fetch
+    expect(await phongChoMoi(BAT, 'CA-THAT-2')).toBeNull()
+    expect(caDaBiGatCauDao('CA-THAT-2')).toBe(false)
+  })
+
+  it('lưu tạm gạt cầu dao thì phòng chờ cùng ca cũng im theo', async () => {
+    let goi = 0
+    globalThis.fetch = (async () => {
+      goi++
+      return new Response(JSON.stringify({ ok: false, lyDo: 'khong_dang_lam' }), {
+        headers: { 'content-type': 'application/json' },
+      })
+    }) as typeof fetch
+    await luuTamMoi(BAT, 'CA-CU', 'E1', {})
+    await phongChoMoi(BAT, 'CA-CU')
+    expect(goi).toBe(1)
   })
 })

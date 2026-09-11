@@ -14,6 +14,33 @@
 import { chuanHoaMayChu, gianVaoThi, type CauHinhMayChu } from './cau-hinh-may-chu'
 import { loadCauHinhMayChu } from './exam-db'
 
+// ---------------------------------------------------------------------------
+// CẦU DAO: CA NÀO MÁY CHỦ MỚI KHÔNG GIỮ THÌ THÔI GỌI CHO CẢ CA
+//
+// Hôm nay VÀO THI vẫn đi Apps Script, nên dòng `luot` của em nằm ở Sheet chứ
+// không nằm ở D1. Không có cầu dao thì mỗi nhịp lưu tạm (135 nhịp một em) và
+// mỗi nhịp hỏi phòng chờ (3 giây một lần) đều tốn MỘT lượt gọi Worker chắc chắn
+// trượt rồi mới đi đường cũ — chậm hơn lúc chưa bật cờ, đúng thứ không được phép.
+//
+// Gạt cầu dao CHỈ khi máy chủ trả lời dứt khoát "không có ở đây". Mạng hỏng hay
+// quá hạn thì KHÔNG gạt: đó là sự cố tạm, đường lùi đã lo, và ca có thể vẫn nằm
+// trên máy chủ.
+const caChuaLenMayChu = new Set<string>()
+
+/** Máy chủ mới đã nói dứt khoát là không giữ ca này. */
+function ghiNhanCaVang(maCa: string): void {
+  if (maCa) caChuaLenMayChu.add(maCa)
+}
+
+/** Chỉ dùng cho phép kiểm và cho lúc thầy đổi cấu hình. */
+export function quenCaVang(): void {
+  caChuaLenMayChu.clear()
+}
+
+export function caDaBiGatCauDao(maCa: string): boolean {
+  return caChuaLenMayChu.has(maCa)
+}
+
 /** Bộ nhớ tạm cấu hình. Sống ngắn để thầy gạt cờ là có tác dụng gần như ngay. */
 const SONG_MS = 5000
 let nhoCauHinh: { luc: number; ch: CauHinhMayChu } | null = null
@@ -29,6 +56,7 @@ export async function layCauHinhMayChu(): Promise<CauHinhMayChu> {
 /** Gọi sau khi thầy đổi cấu hình trong màn Cài đặt — bỏ bộ nhớ tạm. */
 export function quenCauHinhMayChu(): void {
   nhoCauHinh = null
+  caChuaLenMayChu.clear()
 }
 
 function ngu(ms: number): Promise<void> {
@@ -39,16 +67,42 @@ function ngu(ms: number): Promise<void> {
  *
  * Thử lại có lùi kèm nhiễu: 30 em bấm cùng lúc mà thử lại đúng nhịp nhau là lại
  * húc cửa lần nữa. */
+/** NHỊP CHO ĐƯỜNG NÓNG — bốn lệnh em gọi trong lúc thi.
+ *
+ * SỬA LỖI 11/09, trước ca thi thật. Bản đợt 3 dùng chung `HAN_GIAY = 10` và
+ * `SO_LAN_THU = 3` cho mọi lệnh, nên khi Worker không với tới được thì máy em
+ * chờ:
+ *
+ *     10s + 0,5s + 10s + 1,5s + 10s  ≈  32 GIÂY
+ *
+ * rồi MỚI bắt đầu đi Apps Script, tốn thêm 2,4–30 giây nữa. Cả lớp bấm Nộp
+ * trong mười phút cuối mà Cloudflare chập một nhịp là em ngồi nhìn màn hình
+ * hơn nửa phút — CHẬM HƠN HẲN so với khi chưa có máy chủ mới. Đây đúng là cái
+ * bẫy duy nhất khiến việc chuyển máy chủ làm mọi thứ tệ đi.
+ *
+ * Luật: trên đường nóng, **Apps Script CHÍNH LÀ lượt thử lại**, và nó chắc
+ * chắn hơn một lượt thử lại vào đúng cái máy chủ vừa im. Nên còn đường lùi thì
+ * thử một lần rồi lùi ngay. Chỉ khi thầy tự tắt đường lùi mới thử lại. */
+export function nhipNong(ch: CauHinhMayChu): { hanGiay: number; soLan: number } {
+  return {
+    hanGiay: ch.HAN_NONG_GIAY,
+    soLan: ch.LUI_VE_APPS_SCRIPT ? 1 : Math.max(1, ch.SO_LAN_THU),
+  }
+}
+
 export async function goiWorker<T = Record<string, unknown>>(
   ch: CauHinhMayChu,
   duong: string,
   than: unknown,
+  nhip?: { hanGiay: number; soLan: number },
 ): Promise<T | null> {
   if (!ch.BAT || !ch.URL) return null
-  for (let lan = 0; lan < Math.max(1, ch.SO_LAN_THU); lan++) {
+  const hanGiay = nhip?.hanGiay ?? ch.HAN_GIAY
+  const soLan = Math.max(1, nhip?.soLan ?? ch.SO_LAN_THU)
+  for (let lan = 0; lan < soLan; lan++) {
     if (lan > 0) await ngu(Math.round((500 * 3 ** (lan - 1)) * (0.6 + Math.random() * 0.8)))
     const bo = new AbortController()
-    const hen = setTimeout(() => bo.abort(), ch.HAN_GIAY * 1000)
+    const hen = setTimeout(() => bo.abort(), hanGiay * 1000)
     try {
       const res = await fetch(`${ch.URL}${duong}`, {
         method: 'POST',
@@ -102,7 +156,7 @@ export async function vaoThiMoi(
 ): Promise<KetQuaVaoThiMoi | null> {
   if (!ch.BAT) return null
   await gianVaoThi(ch)
-  const r = await goiWorker<KetQuaVaoThiMoi>(ch, '/vao-thi', { maCa, sbd, idThietBi })
+  const r = await goiWorker<KetQuaVaoThiMoi>(ch, '/vao-thi', { maCa, sbd, idThietBi }, nhipNong(ch))
   if (!r) return null
   if (r.ok && canBank && !r.deUrl) return null
   return r
@@ -115,10 +169,15 @@ export async function luuTamMoi(
   dapAn: unknown,
   giayCau?: Record<string, number>,
 ): Promise<boolean | null> {
-  const r = await goiWorker<{ ok: boolean; lyDo?: string }>(ch, '/luu-tam', { maCa, sbd, dapAn, giayCau })
+  if (caDaBiGatCauDao(maCa)) return null
+  const r = await goiWorker<{ ok: boolean; lyDo?: string }>(ch, '/luu-tam', { maCa, sbd, dapAn, giayCau }, nhipNong(ch))
   if (!r) return null
-  // Lượt không nằm ở máy chủ mới (em vào thi bằng đường cũ) ⇒ đi đường cũ.
-  if (!r.ok && r.lyDo === 'khong_dang_lam') return null
+  // Lượt không nằm ở máy chủ mới (em vào thi bằng đường cũ) ⇒ đi đường cũ, và
+  // thôi hỏi lại cho cả ca này.
+  if (!r.ok && r.lyDo === 'khong_dang_lam') {
+    ghiNhanCaVang(maCa)
+    return null
+  }
   return !!r.ok
 }
 
@@ -136,9 +195,12 @@ export async function nopMoi(
     dapAn,
     integrity,
     giayCau,
-  })
+  }, nhipNong(ch))
   if (!r) return null
-  if (!r.ok && (r.lyDo === 'khong_tim_thay' || r.lyDo === 'thieu')) return null
+  if (!r.ok && (r.lyDo === 'khong_tim_thay' || r.lyDo === 'thieu')) {
+    ghiNhanCaVang(maCa)
+    return null
+  }
   return r
 }
 
@@ -192,7 +254,7 @@ export interface TrangThaiEm {
 export async function trangThaiMoi(ch: CauHinhMayChu, tt: TrangThaiEm): Promise<boolean | null> {
   // Không cần tự kiểm cờ ở đây — `goiWorker` đã chốt `!ch.BAT || !ch.URL` ngay
   // dòng đầu. Thêm một chốt nữa chỉ tạo ra một dòng không phép kiểm nào chạm tới.
-  const r = await goiWorker<{ ok: boolean }>({ ...ch, SO_LAN_THU: 1 }, '/trang-thai', tt)
+  const r = await goiWorker<{ ok: boolean }>(ch, '/trang-thai', tt, nhipNong(ch))
   return r ? !!r.ok : null
 }
 
@@ -207,13 +269,20 @@ export interface PhongChoMoi {
  *  ba giây — nên gọi GET, một câu truy vấn, một lần thử. */
 export async function phongChoMoi(ch: CauHinhMayChu, maCa: string): Promise<PhongChoMoi | null> {
   if (!ch.BAT || !ch.URL) return null
+  if (caDaBiGatCauDao(maCa)) return null
   const bo = new AbortController()
-  const hen = setTimeout(() => bo.abort(), ch.HAN_GIAY * 1000)
+  const hen = setTimeout(() => bo.abort(), ch.HAN_NONG_GIAY * 1000)
   try {
     const res = await fetch(`${ch.URL}/phong-cho?maCa=${encodeURIComponent(maCa)}`, { signal: bo.signal })
     if (!res.ok) return null
     const j = (await res.json()) as { ok?: boolean } & PhongChoMoi
-    if (!j?.ok) return null
+    // Máy chủ TRẢ LỜI được nhưng không có ca ⇒ ca này chưa lên máy chủ mới.
+    // Em đứng chờ hỏi lại mỗi ba giây — không gạt cầu dao là cả lớp nện một
+    // lượt gọi thừa mỗi ba giây suốt lúc chờ.
+    if (!j?.ok) {
+      ghiNhanCaVang(maCa)
+      return null
+    }
     return { phongCho: !!j.phongCho, batDau: !!j.batDau, batDauLuc: String(j.batDauLuc ?? ''), trangThai: String(j.trangThai ?? '') }
   } catch {
     return null
