@@ -116,3 +116,22 @@ Lối Enter còn bỏ qua luôn điều kiện toàn màn hình mà nút "Vào t
 - [x] "phiếu dựng vẫn bị lỗi có thêm lời giải" (phần còn lại) | bằng chứng: cùng một gốc với dòng trên — đã sửa
 - [x] "rút câu luyện của học sinh bị lỗi lời giải" | bằng chứng: NGUYÊN NHÂN GỐC — `KhoiBaiLuyen` gọi `dungPhieu(..., { nop })` cả khi `nop` là null (xin mã hỏng/thiếu SBD/mất link). `nop` null thì body KHÔNG mang `chua-nop` lẫn `chi-de`, mà không lớp nào thì không luật giấu nào chạy: đáp án tô sẵn, lời giải mở được — phiếu tụt về BẢN ĐẦY ĐỦ của thầy. Nay bản của EM mà không nộp được thì dựng phiếu CHỈ ĐỀ (`anGiai`). 3 phép kiểm mới; phá mã thì đỏ
 - [x] "Đồng bộ tên học sinh trong ca thi mới nhất" (ca 447479) | bằng chứng: chạy `dongBoTenCa` — điền 22 tên, giữ nguyên 14, sửa 0, không SBD nào tra không ra. Đọc lại `chiTietCa`: 36/36 lượt CÓ TÊN, còn thiếu 0. Không đụng điểm (12052 vẫn 2,25 · 12037 vẫn 4,50)
+
+## Phiên 11/09 trưa — chuyển 100% sang máy chủ mới
+
+- [x] "tất cả làm trên máy chủ mới bỏ hẳn app scrip" → **Apps Script v73 đã triển khai** lúc 11:45, ID triển khai giữ nguyên `AKfycbyrnfvuVqJuI_...PmyZPcvvi` | bằng chứng: hộp thoại "Đã cập nhật thành công hoạt động triển khai. Phiên bản 73 lúc 11:45, 11 thg 9, 2026"
+- [x] Tạo bảng `danh_sach` trên D1 thật | bằng chứng: D1 Console — trước `/tables` ra `ca · luot · phong_cho · trang_thai`; sau hai câu CREATE ra `ca · danh_sach · luot · phong_cho · trang_thai`, cả hai câu "This query successfully executed"
+- [x] Sửa lỗi gán nhầm họ tên ở cổng danh sách máy chủ mới | bằng chứng: commit `937ae71`, `tests/danh-sach-len-may-chu-moi-1109.test.ts` 11/11 xanh, trong đó một phép TÁI HIỆN đúng lỗi cũ
+- [x] Năm cửa trên đúng cây mã sẽ phát hành (`937ae71`) | bằng chứng: `tsc` app + server sạch · **208 tệp / 3 080 phép kiểm / 0 đỏ** · `check:mau` sạch · `kiem:hien-thi` **ĐẠT 18/18** · build Pages OK
+- [x] Sửa ba lỗi trong `CHUYEN-SANG-MAY-CHU-MOI.command` sau log 11:47 của thầy | bằng chứng: `{...} | tee` làm mất TTY ⇒ bọc `script`; `wrangler whoami` thoát 0 dù chưa đăng nhập ⇒ đọc chữ; `workers_dev` đứng sau `[[r2_buckets]]` ⇒ chuyển lên phần gốc (commit `fed7e5b`)
+- [!] **Phát hành Worker**: KẸT — ô soạn thảo Worker trên dashboard trắng trơn (thử 2 phiên, tải lại + nới cửa sổ + vào lại từ nút "Edit code"). Đường thay: thầy nhấp đúp `CHUYEN-SANG-MAY-CHU-MOI.command`
+- [ ] Đẩy `may-chu-moi` → `main` (nằm trong script trên) | bằng chứng: (chưa có)
+- [ ] Đồng bộ danh sách lớp lên D1 — bảng `danh_sach` đang RỖNG nên cổng chặn SBD lạ CHƯA hoạt động | bằng chứng: (chưa có)
+- [ ] Diễn tập một ca đủ bước với SBD `TEST%` trước 18h | bằng chứng: (chưa có)
+- [ ] Đổi `MA_BI_MAT` (giá trị cũ đã lọt vào ảnh chụp 10/09) | bằng chứng: (chưa có)
+- [ ] Xây mục **Phân công** (Giao BTVN + Gọi lên bảng) theo `claude/PHAN-CONG-GIAO-BTVN.md` — hoãn sau ca thi | bằng chứng: (chưa có)
+
+### Ghi chú phải nhớ
+
+Tab Google Sheet của thầy bị tôi điều hướng sang D1 Console. Mở lại bằng:
+`https://docs.google.com/spreadsheets/d/1w_yOiMX01jdnTh7uIBYrBcT4k_sAJIkAfBIa_Ptx_mg/edit`

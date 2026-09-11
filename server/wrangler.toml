@@ -1,9 +1,7 @@
 # Lệnh thầy chạy MỘT LẦN để dựng (xem MAY-CHU-MOI.md mục 10):
 #
-#   npm i -D wrangler
 #   npx wrangler login
 #   npx wrangler d1 create omr
-#       → chép database_id máy in ra, dán vào dưới
 #   npx wrangler r2 bucket create omr-de
 #   npx wrangler d1 execute omr --file=server/schema.sql --remote
 #   npx wrangler secret put MA_BI_MAT        # gõ đúng mã bí mật Apps Script
@@ -11,14 +9,23 @@
 #
 # MA_BI_MAT KHÔNG bao giờ nằm trong file này. `wrangler secret` giữ nó ở
 # Cloudflare, không vào git.
+#
+# FILE NÀY PHẢI KHỚP CẤU HÌNH ĐANG CHẠY TRÊN DASHBOARD.
+# `wrangler deploy` GHI ĐÈ cấu hình trên máy chủ bằng file này — thiếu một khoá
+# là lặng lẽ tắt mất thứ đang bật. Ngày 11/09 suýt tắt Workers Logs đúng chiều
+# ca thi đầu tiên vì file thiếu khối `observability`.
 
 name = "omr"
 main = "src/index.ts"
-compatibility_date = "2026-09-01"
-# Giữ tên miền workers.dev đang chạy. PHẢI đứng ở phần gốc — đặt sau một
-# header [[...]] là TOML hiểu nó thuộc bảng đó và wrangler cảnh báo
-# "Unexpected fields found in r2_buckets[0]".
+compatibility_date = "2026-09-11"
+
+# Giữ tên miền workers.dev đang chạy. PHẢI đứng ở phần gốc — đặt sau một header
+# [[...]] là TOML hiểu nó thuộc bảng đó ("Unexpected fields found in
+# r2_buckets[0]").
 workers_dev = true
+
+# Không mở thêm địa chỉ công khai nào cho máy chủ thi.
+preview_urls = false
 
 [[d1_databases]]
 binding = "DB"
@@ -29,3 +36,10 @@ database_id = "d2e6d322-374a-45d7-83a3-9fac486b23f1"
 binding = "DE"
 bucket_name = "omr-de"
 
+# NHẬT KÝ MÁY CHỦ — đang BẬT trên dashboard, giữ nguyên. Đây là nhật ký lượt gọi
+# phía máy chủ để thầy soi khi có sự cố, KHÔNG phải đo đạc hành vi học sinh.
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
