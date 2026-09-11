@@ -221,7 +221,7 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
       <div style={NHAN_NHO}>
         Chạy lại được bao nhiêu lần cũng an toàn: mỗi lượt tự bỏ qua đề đã có bên
         {' '}máy chủ mới. Đứt giữa chừng thì bấm lại, nó đi tiếp từ chỗ đứt.
-        {' '}Kho đề trên Google Sheet KHÔNG bị xoá.
+        {' '}Kho đề bên Google KHÔNG bị xoá.
       </div>
 
       <div style={{ height: 1, background: 'var(--vien)', margin: 'var(--k2) 0' }} />

@@ -1,5 +1,5 @@
 // CHI TIẾT MỘT CA THI (QUANLYCATHI.md mục 2 + 5, nền cho mục 6): đi từ Lịch
-// sử ca thi hoặc ngay sau khi mở ca. Dữ liệu lượt thi từ Google Sheet
+// sử ca thi hoặc ngay sau khi mở ca. Dữ liệu lượt thi từ máy chủ
 // (chiTietCa); ĐIỂM chấm tại máy thầy bằng ngân hàng CÓ đáp án đã lưu khi mở
 // ca (đáp án không rời máy thầy) rồi tự ghi điểm + chi tiết từng câu lên
 // Sheet (ghiDiem) để phân tích về sau. Mỗi em một <Hang> kèm <Nhan>:

@@ -81,3 +81,36 @@ describe('cắt Google khỏi app', () => {
     expect(than).toContain('chưa dựng lệnh')
   })
 })
+
+// DỊCH DÁNG TRẢ VỀ — chỗ dễ hỏng nhất của cả cổng.
+//
+// Bảng dịch không chỉ đổi nơi nhận: vài đường của máy chủ mới trả DÁNG KHÁC
+// đường cũ. Không dịch thì lệnh vẫn "chạy", trả HTTP 200, và màn hình hiện
+// trống — đúng loại hỏng im lặng khó thấy nhất.
+describe('DỊCH ĐÚNG DÁNG TRẢ VỀ', () => {
+  const than = (ten: string) => {
+    const i = WORKER.indexOf(`case '${ten}':`)
+    expect(i, ten).toBeGreaterThan(0)
+    return WORKER.slice(i, i + 1200)
+  }
+
+  it('layDe bọc gói đề lại thành {ok, de} — đường /kho/lay trả thẳng dòng byte', () => {
+    expect(than('layDe')).toContain('ra({ ok: true, de })')
+  })
+
+  it('chiTietCa dịch "không có ca" về {ok:false} — chỗ gọi đọc r.ca.maCa', () => {
+    expect(than('chiTietCa')).toContain("j.coCa === false")
+  })
+
+  it('napDanhSachLop đổi khoá items → ds, đúng khoá /danh-sach/day đọc', () => {
+    expect(than('napDanhSachLop')).toContain('{ ds: b.items }')
+  })
+
+  it('luuDe tự rút mã đề và danh sách câu từ gói, và từ chối gói không có mã đề', () => {
+    const t = than('luuDe')
+    expect(t).toContain('docCauTuGoiDe(de)')
+    expect(t).toContain('Gói đề không có mã đề')
+    // KHÔNG bịa số: máy chủ mới không đoán chất lượng câu nên `soNghi` là 0.
+    expect(t).toContain('soNghi: 0')
+  })
+})

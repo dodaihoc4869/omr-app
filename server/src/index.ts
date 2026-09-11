@@ -1873,6 +1873,20 @@ const LENH_CUA_THAY = new Set([
   'sendTeacherMessage', 'listMessages', 'demTinMoi', 'listStudents', 'markMessagesRead',
 ])
 
+/** RÚT DANH SÁCH CÂU TỪ MỘT GÓI ĐỀ. Kho đi qua nhiều đời nên gói có ba dáng:
+ * `cau`, `items`, hoặc tách theo `phanI|phanII|phanIII`. Nhận cả ba, và KHÔNG
+ * đoán khi gặp dáng lạ — trả mảng rỗng để chỉ mục trống chứ không nhét bừa. */
+function docCauTuGoiDe(de: Record<string, unknown>): Record<string, unknown>[] {
+  if (Array.isArray(de.cau)) return de.cau as Record<string, unknown>[]
+  if (Array.isArray(de.items)) return de.items as Record<string, unknown>[]
+  const gom: Record<string, unknown>[] = []
+  for (const p of ['phanI', 'phanII', 'phanIII']) {
+    const v = de[p]
+    if (Array.isArray(v)) for (const c of v) gom.push(c as Record<string, unknown>)
+  }
+  return gom
+}
+
 async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promise<Response> {
   const act = String(b.action ?? '').trim()
   if (!act) return ra({ ok: false, error: 'Thiếu tên lệnh' }, 400)
@@ -1904,7 +1918,16 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
     // ---- CA THI ----------------------------------------------------------
     case 'publish': return dayCa(env, b)
     case 'batDauThi': return batDauThi(env, String(b.maCa ?? ''))
-    case 'chiTietCa': return chiTietCaMoi(env, String(b.maCa ?? ''))
+    case 'chiTietCa': {
+      // Đường cũ trả `{ok:false}` khi không có ca, và màn Theo dõi dựa vào đó.
+      // Đường mới trả `{ok:true, coCa:false}` (hình dáng riêng của nó), nên chỗ
+      // gọi sẽ đọc `r.ca.maCa` trên một thứ không tồn tại và vỡ màn hình. Dịch
+      // lại đúng dáng cũ ngay tại đây.
+      const res = await chiTietCaMoi(env, String(b.maCa ?? ''))
+      const j = (await res.clone().json()) as Record<string, unknown>
+      if (j.coCa === false) return ra({ ok: false, error: 'Không tìm thấy ca kiểm tra' })
+      return res
+    }
     case 'danhSachCa': return danhSachCaMoi(env, b.daXoa === true)
     case 'ghiDiem': return ghiDiemMoi(env, b)
     case 'khoaCa': return ra(await G.khoaCa(env, b))
@@ -1926,7 +1949,9 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
     case 'hoSoEm': return ra(await G.hoSoEm(env, b))
     case 'hoSoNhieuEm': return ra(await G.hoSoNhieuEm(env, b))
     case 'qidDaLam': return ra(await G.qidDaLam(env, b))
-    case 'napDanhSachLop': return dayDanhSach(env, { items: b.items })
+    // `napDanhSachLop` bên đường cũ gửi mảng ở khoá `items`; `/danh-sach/day`
+    // đọc khoá `ds`. Dịch tên khoá ở đây, không đổi hàm đang chạy.
+    case 'napDanhSachLop': return dayDanhSach(env, { ds: b.items })
     case 'themEmVaoSheet': return ra(await G.themEm(env, b))
     case 'deleteStudent': return ra(await G.xoaEm(env, b))
     case 'listStudents': return ra(await G.dsEmDangKy(env))
@@ -1941,8 +1966,36 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
 
     // ---- KHO ĐỀ ----------------------------------------------------------
     case 'danhSachDe': return danhSachDeKho(env, b)
-    case 'layDe': return layDeKho(env, String(b.maDe ?? ''))
-    case 'luuDe': return dayDeKho(env, { de: b.de })
+    // `/kho/lay` trả THẲNG gói đề (dòng byte từ R2, không bọc). Đường cũ thì
+    // trả `{ok:true, de:{...}}` và chỗ gọi đọc `r.de`. Bọc lại ở đây.
+    case 'layDe': {
+      const r = await layDeKho(env, String(b.maDe ?? ''))
+      if (!r.ok) return r
+      const de = await r.clone().json()
+      return ra({ ok: true, de })
+    }
+    // `luuDe` bên đường cũ gửi NGUYÊN gói đề và để máy chủ tự rút mã đề, danh
+    // sách câu, lớp, chuyên đề. `/kho/day` thì đòi sẵn từng phần. Rút ở đây —
+    // và nếu gói không có mã đề thì NÓI THẲNG, không tự đặt một mã bừa rồi để
+    // thầy đi tìm một tờ đề không ai biết tên.
+    case 'luuDe': {
+      const de = (b.de ?? {}) as Record<string, unknown>
+      const maDe = String(de.maDe ?? de.ma_de ?? '').trim()
+      if (!maDe) return ra({ ok: false, error: 'Gói đề không có mã đề' })
+      const cau = docCauTuGoiDe(de)
+      const r = await dayDeKho(env, {
+        maDe,
+        de,
+        cau,
+        tenDe: String(de.tenDe ?? de.ten_de ?? de.ten ?? ''),
+        lop: String(de.lop ?? ''),
+        chuyenDe: String(de.chuyenDe ?? de.chuyen_de ?? ''),
+      })
+      const j = (await r.clone().json()) as Record<string, unknown>
+      // Đường cũ trả thêm `soNghi` (số câu máy chủ thấy đáng ngờ). Máy chủ mới
+      // không đoán chất lượng câu, nên trả 0 chứ không bịa một con số.
+      return ra({ ...j, soNghi: 0 })
+    }
     case 'xoaDe': return xoaDeKho(env, b)
     case 'dungChiMuc': return ra(await G.dungChiMuc(env))
 

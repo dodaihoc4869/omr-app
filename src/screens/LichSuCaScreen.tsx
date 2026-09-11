@@ -289,7 +289,7 @@ export default function LichSuCaScreen() {
 
         {loi && <OThongBao tone="do">{loi}</OThongBao>}
         {dsCa === null ? (
-          <div style={{ ...NHAN_NHO, padding: 'var(--k4) 0' }}>Đang tải danh sách ca từ Google Sheet…</div>
+          <div style={{ ...NHAN_NHO, padding: 'var(--k4) 0' }}>Đang tải danh sách ca từ máy chủ…</div>
         ) : dsLoc.length === 0 ? (
           <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
             <div style={{ ...NHAN_NHO, padding: 'var(--k2) 0' }}>{dsCa.length === 0 ? (xemDaXoa ? 'Không có ca nào đã xoá.' : 'Chưa có ca nào.') : 'Không có ca khớp bộ lọc.'}</div>
