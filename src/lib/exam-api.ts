@@ -12,7 +12,7 @@ import { chuanTenCa } from './ten-ca'
 import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
 import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi, xongNapDiaChi } from './may-chu-moi'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
-import { chamDiemMoi, chiTietCaMoi, danhSachEmMoi, dayCaMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, ghiLenBangMoi, luotCuaCaMoi, napDayDuCaMoi, suaCaMoi, type OSuaCa } from './day-ca-may-chu-moi'
+import { chamDiemMoi, chiTietCaMoi, danhSachEmMoi, dayCaMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, ghiLenBangMoi, luotCuaCaMoi, napDayDuCaMoi, suaCaMoi, tienDoEmMoi, type OSuaCa } from './day-ca-may-chu-moi'
 import { theoGhiSheet } from './ghi-sheet-nen'
 import { daBatDauTheoDuongCu, ghiNhoDaBatDauDuongCu, nenDoiChieu } from './doi-chieu-phong-cho'
 import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu } from './man-ca-may-chu-moi'
@@ -1494,9 +1494,33 @@ export interface QuyenHoSo {
 export async function hoSoEm(scriptUrl: string, quyen: QuyenHoSo): Promise<HoSoEm> {
   const r = await postJson(scriptUrl, { action: 'hoSoEm', ...quyen })
   if (!r.ok) throw new Error(r.error || 'Không lấy được hồ sơ')
+
+  // BẢNG MẠNH–YẾU LẤY TỪ MÁY CHỦ MỚI KHI CÓ.
+  //
+  // Từ 11/09 tối, `/cham-diem` dựng `tien_do_hs` ngay lúc thầy chấm, còn Sheet
+  // thì đã xoá sạch để tuần sau thi lại từ đầu. Nên bảng bên máy chủ mới mới là
+  // bảng đúng; bảng bên kia rỗng.
+  //
+  // CHỈ THAY KHI BÊN MỚI CÓ SỐ. Rỗng hai bên thì thôi, và rỗng bên mới mà bên
+  // cũ có thì vẫn dùng bên cũ — không bao giờ xoá dữ liệu đang hiện của thầy
+  // bằng một bảng rỗng.
+  let chuyenDe = r.chuyenDe || []
+  try {
+    const sbd = String((quyen as { sbd?: string }).sbd ?? '').trim()
+    if (sbd) {
+      const chMoi = await layCauHinhMayChu()
+      const td = await tienDoEmMoi(chMoi, String((quyen as { secret?: string }).secret ?? ''), sbd)
+      if (td && td.chuyenDe.length > 0) {
+        chuyenDe = td.chuyenDe.map((c) => ({ ten: c.ten, soCau: c.soCau, soSai: c.soSai }))
+      }
+    }
+  } catch {
+    // giữ nguyên bảng đường cũ
+  }
+
   return {
     em: { ...r.em, sbd: chuoi(r.em.sbd), hoTen: chuoi(r.em.hoTen), namSinh: chuoi(r.em.namSinh), lop: chuoi(r.em.lop) },
-    chuyenDe: r.chuyenDe || [],
+    chuyenDe,
     ca: (r.ca || []).map((c: CaCuaEm) => ({ ...c, maCa: String(c.maCa) })),
     caGanNhat: r.caGanNhat ? { ...r.caGanNhat, maCa: String(r.caGanNhat.maCa) } : null,
     chuyenDeCaGanNhat: r.chuyenDeCaGanNhat || [],
