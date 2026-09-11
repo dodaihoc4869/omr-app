@@ -119,6 +119,39 @@ export function hopPhamVi(
   return ds.includes(sbd) ? { ok: true } : { ok: false, lyDo: 'khong_trong_danh_sach' }
 }
 
+/** CẮT GÓI ĐỀ RIÊNG XUỐNG CÒN PHẦN CỦA MỘT EM.
+ *
+ * Gói thầy đẩy lên có dạng `{ bo, lap, dem, bb }`, mỗi bản đồ khoá theo số báo
+ * danh của CẢ LỚP. Máy em chỉ cần phần của chính nó — gửi cả lớp là đưa đề của
+ * bạn vào gói em nhận.
+ *
+ * Trả `null` khi ca có bản đồ mà KHÔNG có phần của em: chỗ gọi phải từ chối cho
+ * vào, vì phát đề cắt theo luật khác với bảng chấm của thầy là điểm sai lặng lẽ.
+ * Gói dạng cũ (bản đồ phẳng `sbd → qid[]`) cũng đọc được. */
+export function locGoiDeRiengChoEm(goi: Record<string, unknown> | null, sbd: string): Record<string, unknown> | null {
+  if (!goi) return null
+  const doiTuong = (v: unknown): Record<string, unknown> =>
+    v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {}
+
+  // Dạng mới nhận ra bằng khoá `bo` là đối tượng; số báo danh toàn chữ số nên
+  // không bao giờ đụng tên khoá này.
+  const moi = goi.bo && typeof goi.bo === 'object' && !Array.isArray(goi.bo)
+  const bo = moi ? doiTuong(goi.bo) : goi
+  const cua = bo[sbd]
+  if (!Array.isArray(cua) || cua.length === 0) return null
+  if (!moi) return { [sbd]: cua }
+
+  const lap = doiTuong(goi.lap)[sbd]
+  const dem = doiTuong(goi.dem)[sbd]
+  return {
+    bo: { [sbd]: cua },
+    lap: Array.isArray(lap) ? { [sbd]: lap } : {},
+    dem: dem && typeof dem === 'object' ? { [sbd]: dem } : {},
+    // BIÊN BẢN là ghi chép của THẦY về cả lớp — không đi xuống máy em.
+    bb: null,
+  }
+}
+
 async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
   const maCa = String(b.maCa ?? '').trim()
   const sbd = String(b.sbd ?? '').trim()
@@ -180,6 +213,22 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
     })
   }
 
+  // ĐỀ RIÊNG: CHỈ ĐƯA PHẦN CỦA CHÍNH EM, và thiếu thì KHÔNG cho vào.
+  //
+  // Hai lỗi được chặn ở đây, cả hai đều từng có thật:
+  //   · bản trước trả NGUYÊN bản đồ của cả lớp cho từng em — đề của bạn nằm
+  //     trong gói máy em nhận;
+  //   · ca đề riêng mà bản đồ thiếu phần của em thì máy em cắt đề theo luật
+  //     hash, còn máy thầy chấm theo bản đồ ⇒ điểm sai LẶNG LẼ (em 12124 tụt
+  //     5,69 xuống 2,56 hôm 10/09). Trước 12/09 chỗ này lùi về Apps Script;
+  //     Apps Script đã cắt, nên nay phải TỪ CHỐI hẳn thay vì phát đề sai.
+  const goiGoc = ca.bo_theo_em_json ? (JSON.parse(String(ca.bo_theo_em_json)) as Record<string, unknown>) : null
+  const goiRieng = locGoiDeRiengChoEm(goiGoc, sbd)
+  if (Number(ca.de_rieng ?? 0) === 1 && goiGoc && !goiRieng) {
+    await ghiChanVao(env, maCa, sbd, String(b.hoTen ?? ''), String(b.namSinh ?? ''), 'thieu_bo_cau').catch(() => {})
+    return ra({ ok: false, lyDo: 'thieu_bo_cau', thoiGianPhut: ca.thoi_gian_phut ?? 45 })
+  }
+
   const lanThu = qd.lanThu ?? 1
   const khoa = khoaLuot(maCa, sbd, lanThu)
   const vaoLuc = qd.cach === 'khoi_phuc' && cu ? cu.vao_luc : new Date(now).toISOString()
@@ -223,7 +272,7 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
     giuDeDoc: Number(ca.giu_de_doc ?? 0) === 1,
     anHanGiay: Number(ca.an_han_giay ?? 0),
     soCau: ca.so_cau_json ? JSON.parse(ca.so_cau_json) : undefined,
-    boTheoEm: ca.bo_theo_em_json ? JSON.parse(ca.bo_theo_em_json) : undefined,
+    boTheoEm: goiRieng,
     // KHÔNG trả gói đề trong thân: máy em tải riêng từ /de/:maCa, qua bộ đệm biên.
     deUrl: ca.bank_r2 ? `/de/${encodeURIComponent(maCa)}` : null,
   })

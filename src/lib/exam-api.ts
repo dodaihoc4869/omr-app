@@ -199,6 +199,9 @@ export type LyDoChan =
   | 'sai_ho_so'
   /** Thầy cho thi lại và khoá theo máy cũ; em đang mở ở máy khác. */
   | 'sai_may'
+  /** CA ĐỀ RIÊNG mà máy chủ chưa có bộ câu của chính em này. KHÔNG phát đề cắt
+   * theo luật khác — điểm sẽ lệch với bảng chấm của thầy mà không ai thấy. */
+  | 'thieu_bo_cau'
   | 'thieu'
 
 /** Phạm vi gửi ca (QUANLYCATHI mục 4): tu_do = ai có mã đều vào · khoi = theo
@@ -663,6 +666,8 @@ export function thongDiepChan(kq: Extract<KetQuaVaoThi, { ok: false }>, gio: (is
       return `Ca này dành cho khối ${khoiTuNamSinh(kq.namSinh ?? '') ?? '?'} (sinh ${kq.namSinh}). Số báo danh của em không thuộc khối này.`
     case 'khong_trong_danh_sach':
       return 'Số báo danh của em không có trong danh sách lớp của ca này. Kiểm tra lại đúng như Thầy ghi trong sổ; vẫn không vào được thì báo Thầy.'
+    case 'thieu_bo_cau':
+      return 'Ca này mỗi em một đề riêng, mà máy chủ chưa có bộ câu của em. Báo Thầy bấm lại "Bắt đầu thi" — đừng làm bài khi chưa có, kẻo điểm không khớp.'
     // KHÔNG nói rõ sai ở ô nào: nói ra là cho phép dò tên từ số báo danh.
     case 'sai_ho_so':
       return 'Số báo danh, họ tên hoặc năm sinh không khớp danh sách lớp. Kiểm tra lại đúng như Thầy ghi trong sổ; vẫn không vào được thì báo Thầy.'

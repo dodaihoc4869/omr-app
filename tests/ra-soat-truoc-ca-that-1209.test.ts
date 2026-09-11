@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
-import { hopPhamVi } from '../server/src/index'
+import { hopPhamVi, locGoiDeRiengChoEm } from '../server/src/index'
 import { quyetDinhVaoThi } from '../server/src/luat-vao-thi'
 import type { DongCa, DongLuot } from '../server/src/kieu'
 
@@ -104,5 +104,51 @@ describe('LỖI 4 — cấu hình máy chủ không còn cờ tắt', () => {
     const CH = doc('src/lib/cau-hinh-may-chu.ts')
     expect(CH).toContain('BAT: url.length > 0')
     expect(CH).not.toContain('c?.BAT === true')
+  })
+})
+
+describe('LỖI 5 — đề riêng: chỉ đưa phần của chính em, thiếu thì KHÔNG phát đề', () => {
+  const GOI = {
+    bo: { '10001': ['q1', 'q2'], '10002': ['q3'] },
+    lap: { '10001': ['q1'], '10002': [] },
+    dem: { '10001': { q1: 2 }, '10002': {} },
+    bb: { ghi: 'biên bản cả lớp' },
+  }
+
+  it('cắt xuống đúng phần của em — đề của bạn không nằm trong gói em nhận', () => {
+    const ra = locGoiDeRiengChoEm(GOI, '10001')
+    expect(ra).not.toBeNull()
+    expect(Object.keys((ra as { bo: Record<string, unknown> }).bo)).toEqual(['10001'])
+    expect(Object.keys((ra as { lap: Record<string, unknown> }).lap)).toEqual(['10001'])
+    expect(Object.keys((ra as { dem: Record<string, unknown> }).dem)).toEqual(['10001'])
+  })
+
+  it('BIÊN BẢN là ghi chép của thầy về cả lớp — không đi xuống máy em', () => {
+    expect((locGoiDeRiengChoEm(GOI, '10001') as { bb: unknown }).bb).toBeNull()
+  })
+
+  it('không có phần của em ⇒ trả null để chỗ gọi TỪ CHỐI, không phát đề cắt theo luật khác', () => {
+    expect(locGoiDeRiengChoEm(GOI, '10009')).toBeNull()
+    expect(locGoiDeRiengChoEm({ bo: { '10001': [] } }, '10001')).toBeNull()
+    expect(locGoiDeRiengChoEm(null, '10001')).toBeNull()
+  })
+
+  it('gói DẠNG CŨ (bản đồ phẳng) vẫn đọc được — ca mở trước đợt này không phải chạy lại', () => {
+    const ra = locGoiDeRiengChoEm({ '10001': ['q1'] }, '10001')
+    expect(ra).toEqual({ '10001': ['q1'] })
+  })
+
+  it('máy chủ TỪ CHỐI cho vào thi khi ca đề riêng mà thiếu bộ câu của em', () => {
+    const han = WK.slice(WK.indexOf('async function vaoThi('), WK.indexOf('async function luuTam('))
+    expect(han).toContain("Number(ca.de_rieng ?? 0) === 1 && goiGoc && !goiRieng")
+    expect(han).toContain("lyDo: 'thieu_bo_cau'")
+    // Và ghi vào sổ chặn để thầy thấy ngay trong Chi tiết ca.
+    expect(han).toContain("'thieu_bo_cau').catch")
+  })
+
+  it('máy em có câu chữ cho lý do ấy, không rơi vào câu lỗi chung chung', () => {
+    const API = doc('src/lib/exam-api.ts')
+    expect(API).toContain("case 'thieu_bo_cau':")
+    expect(API).toContain('mỗi em một đề riêng')
   })
 })

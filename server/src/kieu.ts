@@ -77,4 +77,10 @@ export interface DongCa {
   bat_dau_thi_luc: string | null
   giu_de_doc: number | null
   an_han_giay: number | null
+  /** Cờ ca ĐỀ RIÊNG TỪNG EM (12/09). Ca mở trước đó không có cột ⇒ null. */
+  de_rieng: number | null
+  /** Phạm vi gửi ca: tu_do · khoi · chon · sbd. */
+  pham_vi: string | null
+  /** Danh sách SBD thầy tích (phạm vi `chon`) hoặc năm sinh (phạm vi `khoi`). */
+  danh_sach_chon_json: string | null
 }
