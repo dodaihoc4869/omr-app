@@ -8,7 +8,7 @@
 //
 // Phần giao bài tập chạy 0% Apps Script: ca và đề đọc từ máy chủ mới, bài giao
 // và bài nộp cũng ở đó.
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ClipboardList, Presentation, RefreshCw } from 'lucide-react'
 import { Nhan, NutChinh, OThongBao, TheNoiDung } from '../components/DesignSystem'
 import GoiLenBangScreen from './GoiLenBangScreen'
@@ -16,6 +16,8 @@ import { danhSachCa, type CaTomTat } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { layCauHinhMayChu } from '../lib/may-chu-moi'
 import { giaoBtvn, theoDoiBtvn, type DongTheoDoiBtvn } from '../lib/btvn-may-chu-moi'
+import CayChonDe from '../components/CayChonDe'
+import { dungCayKhoDe } from '../lib/cay-kho-de'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }
 const O_CHON: React.CSSProperties = {
@@ -67,7 +69,9 @@ function TheGiaoBtvn() {
   const [dsCa, setDsCa] = useState<CaTomTat[]>([])
   const [dsDe, setDsDe] = useState<DeKho[]>([])
   const [maCa, setMaCa] = useState('')
-  const [maDe, setMaDe] = useState('')
+  // TICK NHIỀU TỜ (thầy chốt 12/09). Giữ theo thứ tự thầy tick: bài em nhận
+  // được ghép theo đúng thứ tự ấy, không xáo.
+  const [daChon, setDaChon] = useState<Set<string>>(new Set())
   const [dangNap, setDangNap] = useState(true)
   const [dangGiao, setDangGiao] = useState(false)
   const [bao, setBao] = useState<{ ok: boolean; chu: string } | null>(null)
@@ -108,16 +112,19 @@ function TheGiaoBtvn() {
     void nap()
   }, [nap])
 
+  const cay = useMemo(() => dungCayKhoDe(dsDe), [dsDe])
+  const tongCauDaChon = useMemo(() => dsDe.filter((d) => daChon.has(d.maDe)).reduce((t, d) => t + d.soCau, 0), [dsDe, daChon])
+
   async function giao() {
     setDangGiao(true)
     setBao(null)
     try {
       const mat = (await loadTeacherSecret()) ?? ''
       const ch = await layCauHinhMayChu()
-      const kq = await giaoBtvn(ch, mat, maCa, maDe)
+      const kq = await giaoBtvn(ch, mat, maCa, [...daChon])
       setBao({
         ok: true,
-        chu: `Đã giao ${kq.soCau} câu cho ${kq.soEm} em. Hạn nộp ${gioVN(kq.hanNop)}.`,
+        chu: `Đã giao ${kq.soCau} câu (${daChon.size} tờ đề) cho ${kq.soEm} em. Hạn nộp ${gioVN(kq.hanNop)}.`,
       })
       setTheoDoi(await theoDoiBtvn(ch, mat))
     } catch (e) {
@@ -144,15 +151,30 @@ function TheGiaoBtvn() {
           </div>
 
           <div>
-            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k1)' }}>Tờ đề trong kho — em nhận TẤT CẢ câu, đúng thứ tự kho</div>
-            <select style={O_CHON} value={maDe} onChange={(e) => setMaDe(e.target.value)}>
-              <option value="">— chọn đề —</option>
-              {dsDe.map((d) => (
-                <option key={d.maDe} value={d.maDe}>
-                  {d.maDe} · {d.soCau} câu{d.tenDe ? ` · ${d.tenDe}` : ''}
-                </option>
-              ))}
-            </select>
+            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k1)' }}>
+              Tờ đề trong kho — tick được nhiều tờ. Em nhận TẤT CẢ câu của những tờ đã tick, đúng thứ tự kho.
+            </div>
+            <div
+              style={{
+                background: 'var(--the-2)',
+                borderRadius: 'var(--bo-1)',
+                padding: 'var(--k2)',
+                maxHeight: 360,
+                overflowY: 'auto',
+              }}
+            >
+              <CayChonDe cay={cay} daChon={daChon} onDoi={setDaChon} />
+            </div>
+            {daChon.size > 0 && (
+              <div className="flex items-center" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
+                <span style={NHAN_NHO}>
+                  Đã tick <b>{daChon.size}</b> tờ · <b>{tongCauDaChon}</b> câu
+                </span>
+                <button type="button" className="tap-target" onClick={() => setDaChon(new Set())} style={{ ...NHAN_NHO, textDecoration: 'underline' }}>
+                  Bỏ hết
+                </button>
+              </div>
+            )}
           </div>
 
           {!dangNap && dsDe.length === 0 && (
@@ -162,7 +184,7 @@ function TheGiaoBtvn() {
           )}
 
           <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
-            <NutChinh onClick={giao} disabled={dangGiao || !maCa || !maDe}>
+            <NutChinh onClick={giao} disabled={dangGiao || !maCa || daChon.size === 0}>
               {dangGiao ? 'Đang giao…' : 'Giao bài tập về nhà'}
             </NutChinh>
             <NutChinh variant="phu" onClick={() => void nap()} disabled={dangNap}>

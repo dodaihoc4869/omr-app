@@ -38,8 +38,12 @@ describe('BTVN — ba luật chốt cứng ở MÁY CHỦ', () => {
   })
 
   it('LUẬT 2 — trả NGUYÊN gói đề, không xáo không lọc', () => {
-    expect(CUA_EM).toContain('`kho/${String(bt.ma_de ?? \'\')}.json`')
-    for (const cam of ['sort(', 'shuffle', 'slice(0,', 'filter((c)']) {
+    // Từ 12/09 một lượt giao gồm NHIỀU tờ đề (`ma_de` là danh sách nối bằng
+    // dấu phẩy), nên gói được GỘP — nhưng luật không đổi: đúng thứ tự thầy
+    // tick, đúng thứ tự câu trong từng tờ.
+    expect(CUA_EM).toContain('`kho/${m}.json`')
+    expect(CUA_EM).toContain('docCauTuGoiDe(g)')
+    for (const cam of ['sort(', 'shuffle', 'slice(0,', 'Math.random']) {
       expect(CUA_EM, cam).not.toContain(cam)
     }
   })

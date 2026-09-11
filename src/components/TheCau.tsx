@@ -473,7 +473,14 @@ export default function TheCau(props: TheCauProps) {
   return (
     <TheNoiDung id={id} noPadding className="the-cau">
       <DauThe index={stt - 1} badge={stt} title={tieuDe?.trim() ?? ''} />
-      {props.cauHoiLai && <DaiHoiLai soLanSai={props.cauHoiLai.soLanSai} />}
+      {/* DẢI "CÂU EM ĐÃ SAI BUỔI TRƯỚC" — CHỈ Ở CHẾ ĐỘ XEM LẠI.
+          Thầy chốt 12/09: "trong màn thi rút câu sai thì không gán nhãn câu đã
+          sai trước đó". Đang làm bài mà thấy dải ấy là em biết ngay câu nào
+          mình từng sai, và đó là thứ làm hỏng phép đo: em dồn sức vào đúng
+          những câu được đánh dấu, nên kết quả không còn nói được em đã chắc
+          chưa. Sau khi nộp thì dải lại có ích — lúc ấy nó là chỉ dẫn sửa sai,
+          không còn ảnh hưởng bài làm. */}
+      {xemLai && props.cauHoiLai && <DaiHoiLai soLanSai={props.cauHoiLai.soLanSai} />}
       <div className="flex flex-col" style={{ padding: 'var(--k5)', gap: 'var(--k3)' }}>
         {thanCauImg ? (
           <button type="button" onClick={() => onZoom?.(thanCauImg)} className="block w-full" title="Bấm để phóng to">

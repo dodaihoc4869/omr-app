@@ -114,3 +114,44 @@ describe('DỊCH ĐÚNG DÁNG TRẢ VỀ', () => {
     expect(t).toContain('soNghi: 0')
   })
 })
+
+// ĐỦ TRƯỜNG, KHÔNG CHỈ ĐÚNG TÊN LỆNH.
+//
+// Lỗi thật 12/09: em bấm "xem điểm" thì hiện "Máy chủ chưa gửi đề của ca này".
+// Lệnh `phieuCuaEm` chạy, trả HTTP 200, `ok: true` — nhưng thiếu `bank`, và
+// màn của em đọc đúng trường ấy. Lệnh "có mặt" không đồng nghĩa với "dùng được".
+describe('TRẢ ĐỦ TRƯỜNG MÀN HÌNH ĐANG ĐỌC', () => {
+  const GC = doc('server/src/goi-cu.ts')
+  const than = (ten: string) => {
+    const i = GC.indexOf(`export async function ${ten}(`)
+    expect(i, ten).toBeGreaterThan(0)
+    return GC.slice(i, GC.indexOf('\n}\n', i))
+  }
+
+  it('phieuCuaEm trả đủ những trường màn "xem điểm" đọc', () => {
+    const t = than('phieuCuaEm')
+    for (const f of ['ma:', 'maBaiTap:', 'tong:', 'hoTen:', 'lop:', 'tenCa:', 'thoiGianPhut:', 'giuDeDoc:', 'luot:', 'bank,']) {
+      expect(t, f).toContain(f)
+    }
+    for (const f of ['lanThu:', 'vaoLuc:', 'nopLuc:', 'trangThai:', 'dapAn:', 'giayCau:', 'integrity:', 'soLanRoiMan:', 'tongGiayRoiMan:']) {
+      expect(t, f).toContain(f)
+    }
+  })
+
+  it('CHƯA NỘP thì KHÔNG trả ngân hàng có đáp án — đường này công khai', () => {
+    const t = than('phieuCuaEm')
+    expect(t).toContain('const daNop =')
+    expect(t).toContain('if (daNop && env.DE)')
+  })
+
+  it('ketQua trả đúng dáng KetQuaCongBo, không phải dáng tự nghĩ ra', () => {
+    const t = than('ketQuaCuaEm')
+    for (const f of ['congBo,', 'sanSang,', 'daNop,', 'daVao,', 'keyBank']) expect(t, f).toContain(f)
+  })
+
+  it('session trả dáng SessionConfig kèm gói đề KHÔNG đáp án', () => {
+    const t = than('xemCa')
+    expect(t).toContain('found: true')
+    expect(t).toContain('bank,')
+  })
+})

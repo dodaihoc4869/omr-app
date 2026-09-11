@@ -399,28 +399,62 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
   const maCa = chuoi(b.maCa).trim()
   const sbd = chuoi(b.sbd).trim()
   if (!maCa || !sbd) return { ok: false, error: 'Thiếu mã ca hoặc số báo danh' }
-  const r = await env.DB.prepare('SELECT ma, loai FROM phieu WHERE ma_ca = ? AND sbd = ? AND thu_hoi = 0 ORDER BY luu_luc DESC')
-    .bind(maCa, sbd)
-    .all<Record<string, unknown>>()
-  const ds = r.results ?? []
-  const ketQua = ds.find((x) => chuoi(x.loai) !== 'baitap')
-  const baiTap = ds.find((x) => chuoi(x.loai) === 'baitap')
+
   const l = await env.DB.prepare(
-    `SELECT l.tong, l.trang_thai, l.nop_luc, COALESCE(NULLIF(l.ho_ten,''), d.ho_ten, '') AS ho_ten, COALESCE(d.lop,'') AS lop
-       FROM luot l LEFT JOIN danh_sach d ON d.sbd = l.sbd
+    `SELECT l.*, COALESCE(NULLIF(l.ho_ten,''), d.ho_ten, '') AS ten_hien, COALESCE(c.lop, d.lop, '') AS lop_hien,
+            COALESCE(c.ten_ca,'') AS ten_ca, c.thoi_gian_phut, c.giu_de_doc
+       FROM luot l
+       LEFT JOIN danh_sach d ON d.sbd = l.sbd
+       LEFT JOIN ca c ON c.ma_ca = l.ma_ca
       WHERE l.ma_ca = ? AND l.sbd = ? ORDER BY l.lan_thu DESC LIMIT 1`,
   )
     .bind(maCa, sbd)
     .first<Record<string, unknown>>()
-  if (!ketQua && !baiTap && !l) return { ok: false, error: 'Không tìm được bài của em' }
+  if (!l) return { ok: false, error: 'Em chưa nộp bài ca này' }
+
+  const rPhieu = await env.DB.prepare('SELECT ma, loai FROM phieu WHERE ma_ca = ? AND sbd = ? AND thu_hoi = 0 ORDER BY luu_luc DESC')
+    .bind(maCa, sbd)
+    .all<Record<string, unknown>>()
+  const ds = rPhieu.results ?? []
+
+  // NGÂN HÀNG CÓ ĐÁP ÁN — chỉ trả khi em ĐÃ NỘP. Đây là đường CÔNG KHAI (máy em
+  // không có mã bí mật), nên cổng duy nhất là lượt thi có thật của chính em đã
+  // nộp xong. Chưa nộp mà trả đáp án là phát đáp án giữa giờ.
+  let bank: unknown = null
+  const daNop = chuoi(l.trang_thai) === 'da_nop' || chuoi(l.trang_thai) === 'khoa' || chuoi(l.nop_luc) !== ''
+  if (daNop && env.DE) {
+    const o = await env.DE.get(`key/${maCa}.json`)
+    if (o?.body) {
+      try {
+        bank = await new Response(o.body).json()
+      } catch {
+        bank = null
+      }
+    }
+  }
+
   return {
     ok: true,
-    ma: chuoi(ketQua?.ma),
-    maBaiTap: chuoi(baiTap?.ma),
-    tong: l ? soHoacNull(l.tong) : null,
-    hoTen: chuoi(l?.ho_ten),
-    lop: chuoi(l?.lop),
-    luot: l ? { trangThai: chuoi(l.trang_thai), nopLuc: chuoi(l.nop_luc) } : {},
+    ma: chuoi(ds.find((x) => chuoi(x.loai) !== 'baitap')?.ma),
+    maBaiTap: chuoi(ds.find((x) => chuoi(x.loai) === 'baitap')?.ma),
+    tong: soHoacNull(l.tong),
+    hoTen: chuoi(l.ten_hien),
+    lop: chuoi(l.lop_hien),
+    tenCa: chuoi(l.ten_ca),
+    thoiGianPhut: Number(l.thoi_gian_phut) || 0,
+    giuDeDoc: Number(l.giu_de_doc ?? 0) === 1,
+    luot: {
+      lanThu: Number(l.lan_thu) || 1,
+      vaoLuc: chuoi(l.vao_luc),
+      nopLuc: chuoi(l.nop_luc),
+      trangThai: chuoi(l.trang_thai),
+      dapAn: doJson(l.dap_an_json),
+      giayCau: doJson(l.giay_cau_json),
+      integrity: doJson(l.integrity_json),
+      soLanRoiMan: Number(l.so_lan_roi_man) || 0,
+      tongGiayRoiMan: Number(l.tong_giay_roi_man) || 0,
+    },
+    bank,
   }
 }
 
@@ -868,10 +902,6 @@ export async function noiKhoCa(env: Env, b: Record<string, unknown>): Promise<Re
   return { ok: true, themBank: lenh.length, themKey: Object.keys(key).length }
 }
 
-export async function dungChiMuc(env: Env): Promise<Record<string, unknown>> {
-  const r = await env.DB.prepare('SELECT COUNT(*) AS n FROM cau_hoi').first<{ n: number }>()
-  return { ok: true, soCau: Number(r?.n) || 0 }
-}
 
 // ===========================================================================
 // LỆNH ĐỌC CỦA MÁY EM (trước là GET ?action=...)

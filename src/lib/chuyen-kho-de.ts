@@ -121,3 +121,62 @@ export async function chuyenKhoDe(
     dangChay = false
   }
 }
+
+/** KẾT QUẢ DỰNG LẠI CHỈ MỤC CÂU. */
+export interface KetQuaChiMuc {
+  soDe: number
+  tongCau: number
+  hong: { maDe: string; viSao: string }[]
+}
+
+/** DỰNG LẠI CHỈ MỤC CÂU CỦA CẢ KHO, đọc từ gói đã nằm trên máy chủ.
+ *
+ * VÌ SAO CẦN (đo 12/09 lúc 23:30 trên D1 thật):
+ *
+ *     SELECT COUNT(*) FROM cau_hoi   →  0
+ *     SELECT COUNT(*), SUM(so_cau) FROM de_kho WHERE da_xoa = 0  →  118 · 6.843
+ *
+ * Kho có đủ đề, chỉ mục thì rỗng sạch. Gói kho của thầy ghi câu bằng `phan` +
+ * `so`, còn chỗ dựng chỉ mục bên máy chủ lại đòi `qid`/`id` rồi bỏ qua câu nào
+ * không có — nên không câu nào vào bảng. Mọi đường dựa chỉ mục (rút câu khắc
+ * phục, câu hỏi lại, đề riêng) vì thế trả về gần như rỗng: thầy đặt rút 8/2/2
+ * mà chỉ ra 3/1/1.
+ *
+ * KHÔNG ĐẨY LẠI KHO. Gói đã ở trên máy chủ rồi; việc còn lại là đọc và lập chỉ
+ * mục, làm theo lô để không chạm trần 50 câu truy vấn mỗi lượt gọi Worker. */
+export async function dungLaiChiMucKho(bao: (chu: string) => void = () => {}): Promise<KetQuaChiMuc> {
+  const ch = await layCauHinhMayChu()
+  if (!ch.URL) throw new Error('Chưa có địa chỉ máy chủ')
+  const mat = (await loadTeacherSecret()) ?? ''
+  if (!mat) throw new Error('Chưa có mã bí mật')
+
+  const kq: KetQuaChiMuc = { soDe: 0, tongCau: 0, hong: [] }
+  // Trần vòng lặp: 118 tờ, 6 tờ một lô ⇒ 20 lượt là đủ. Để 40 cho chắc, và có
+  // trần để một lỗi lặp vô hạn không quay máy thầy suốt đêm.
+  for (let lan = 0; lan < 40; lan++) {
+    const res = await fetch(`${ch.URL}/kho/chi-muc`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-ma-bi-mat': mat },
+      body: JSON.stringify({ gioiHan: 6 }),
+    })
+    if (!res.ok) throw new Error(`máy chủ trả ${res.status}`)
+    const j = (await res.json()) as {
+      ok?: boolean
+      error?: string
+      xong?: { maDe: string; soCau: number }[]
+      hong?: { maDe: string; viSao: string }[]
+      conLai?: number
+      tongCau?: number
+    }
+    if (j?.ok !== true) throw new Error(j?.error || 'máy chủ từ chối')
+    kq.soDe += (j.xong ?? []).length
+    kq.hong.push(...(j.hong ?? []))
+    kq.tongCau = Number(j.tongCau) || kq.tongCau
+    bao(`đã lập chỉ mục ${kq.soDe} tờ · ${kq.tongCau} câu · còn ${j.conLai ?? 0}`)
+    // Hết việc, HOẶC lô vừa rồi không nhích được tờ nào (mọi tờ còn lại đều
+    // hỏng) — dừng, không quay vòng vô ích.
+    if (!j.conLai || ((j.xong ?? []).length === 0 && (j.hong ?? []).length === 0)) break
+    if ((j.xong ?? []).length === 0 && (j.hong ?? []).length > 0) break
+  }
+  return kq
+}

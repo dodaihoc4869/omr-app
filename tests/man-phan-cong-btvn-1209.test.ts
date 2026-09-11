@@ -35,7 +35,8 @@ describe('THẺ GIAO BÀI — nói thẳng khi chưa chuyển kho đề', () => 
   })
 
   it('nút Giao khoá khi chưa chọn đủ ca và đề', () => {
-    expect(PC).toContain('disabled={dangGiao || !maCa || !maDe}')
+    // Từ 12/09 tick được NHIỀU tờ đề, nên điều kiện là "đã tick ít nhất một tờ".
+    expect(PC).toContain('disabled={dangGiao || !maCa || daChon.size === 0}')
   })
 
   it('bảng theo dõi kê TÊN em chưa nộp', () => {
@@ -120,5 +121,52 @@ describe('ĐỒNG HỒ ĐẾM NGƯỢC', () => {
   it('mốc hỏng thì trả rỗng, không nổ', () => {
     expect(demNguoc('khong-phai-ngay')).toBe('')
     expect(demNguoc('')).toBe('')
+  })
+})
+
+// CÂY THƯ MỤC + TICK NHIỀU — thầy chốt 12/09, sau khi nhìn ô chọn phẳng 118 tờ:
+// "chỗ chọn btvn cho chọn theo cây thư mục chuẩn theo kho đề nhé. Cho tick nhiều."
+describe('CHỌN ĐỀ BẰNG CÂY, TICK NHIỀU TỜ', () => {
+  const CAY = doc('src/components/CayChonDe.tsx')
+  const WK = doc('server/src/index.ts')
+
+  it('màn Phân công bỏ ô chọn phẳng, dùng cây', () => {
+    expect(PC).toContain('<CayChonDe')
+    expect(PC).toContain('dungCayKhoDe(dsDe)')
+    expect(PC).not.toContain('— chọn đề —')
+  })
+
+  it('hiện SỐ TỜ và SỐ CÂU đã tick — không để thầy tự đếm', () => {
+    expect(PC).toContain('tongCauDaChon')
+    expect(PC).toContain('Đã tick')
+  })
+
+  it('ô tick của nhánh có BA trạng thái — tick nửa nhánh không được trông như đã tick hết', () => {
+    expect(CAY).toContain("trangThaiTick(n, daChon)")
+    expect(CAY).toContain("tt === 'mot_phan'")
+  })
+
+  it('nút bấm đủ to cho ngón tay (≥44px)', () => {
+    expect(CAY).toContain('minHeight: 44')
+  })
+
+  it('cây mặc định ĐÓNG — mở sẵn cả cây thì vẫn là danh sách phẳng, chỉ dài hơn', () => {
+    expect(CAY).toContain('useState<Set<string>>(new Set())')
+  })
+
+  it('máy chủ nhận NHIỀU tờ đề một lượt giao, và vẫn nhận dáng một tờ của bản cũ', () => {
+    const han = WK.slice(WK.indexOf('async function giaoBtvn('), WK.indexOf('/** EM MỞ BÀI TẬP CỦA MÌNH.'))
+    expect(han).toContain('Array.isArray(b.dsMaDe)')
+    expect(han).toContain("String(b.maDe ?? '').trim()")
+    // Thiếu tờ nào thì NÓI ĐÚNG TỜ ẤY — tick năm tờ mà báo chung chung thì
+    // không biết bỏ tờ nào.
+    expect(han).toContain('Không có trong kho:')
+  })
+
+  it('em mở bài thì gộp câu của mọi tờ, đúng thứ tự thầy tick, KHÔNG xáo', () => {
+    const han = WK.slice(WK.indexOf('async function btvnCuaEm('), WK.indexOf('async function nopBtvn('))
+    expect(han).toContain("String(bt.ma_de ?? '')")
+    expect(han).toContain('docCauTuGoiDe(g)')
+    for (const cam of ['sort(', 'shuffle', 'Math.random']) expect(han, cam).not.toContain(cam)
   })
 })

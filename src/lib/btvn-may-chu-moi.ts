@@ -49,8 +49,9 @@ async function goi<T>(ch: CauHinhMayChu, duong: string, than: unknown, mat?: str
 }
 
 /** THẦY GIAO BÀI cho một ca đã thi. Ném lỗi có câu chữ để màn hình hiện thẳng. */
-export async function giaoBtvn(ch: CauHinhMayChu, mat: string, maCa: string, maDe: string): Promise<KetQuaGiaoBtvn> {
-  const r = await goi<{ ok?: boolean; error?: string } & KetQuaGiaoBtvn>(ch, '/btvn/giao', { maCa, maDe }, mat)
+export async function giaoBtvn(ch: CauHinhMayChu, mat: string, maCa: string, dsMaDe: string[]): Promise<KetQuaGiaoBtvn> {
+  if (dsMaDe.length === 0) throw new Error('Chưa tick tờ đề nào')
+  const r = await goi<{ ok?: boolean; error?: string } & KetQuaGiaoBtvn>(ch, '/btvn/giao', { maCa, dsMaDe }, mat)
   if (!r) throw new Error('Máy chủ không trả lời')
   if (!r.ok) throw new Error(r.error || 'Không giao được bài tập')
   return { maBtvn: r.maBtvn, soEm: r.soEm, soCau: r.soCau, hanNop: r.hanNop }

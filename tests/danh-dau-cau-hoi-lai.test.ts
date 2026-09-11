@@ -142,10 +142,18 @@ describe('máy chủ chỉ trả câu lặp CỦA CHÍNH EM', () => {
 describe('thẻ câu đánh dấu câu em đã sai buổi trước', () => {
   it('có dải nhắc, đặt TRƯỚC đề bài chứ không phải sau', () => {
     expect(THE_CAU).toContain('Câu em đã sai buổi trước')
-    const dau = THE_CAU.indexOf('{props.cauHoiLai && <DaiHoiLai')
+    const dau = THE_CAU.indexOf('{xemLai && props.cauHoiLai && <DaiHoiLai')
     const de = THE_CAU.indexOf('{thanCauImg ? (')
     expect(dau).toBeGreaterThan(0)
     expect(dau).toBeLessThan(de)
+  })
+
+  it('ĐANG LÀM BÀI THÌ KHÔNG HIỆN DẢI — thầy chốt 12/09', () => {
+    // "trong màn thi rút câu sai thì không gán nhãn câu đã sai trước đó".
+    // Em thấy dải là biết ngay câu nào mình từng sai, nên dồn sức vào đúng
+    // những câu ấy — phép đo hỏng. Sau khi nộp thì dải lại có ích.
+    expect(THE_CAU).toContain('{xemLai && props.cauHoiLai && <DaiHoiLai')
+    expect(THE_CAU).not.toContain('{props.cauHoiLai && <DaiHoiLai')
   })
 
   it('CẤM BỊA SỐ LẦN — chưa biết là lần mấy thì không in số', () => {
@@ -172,7 +180,7 @@ describe('thẻ câu đánh dấu câu em đã sai buổi trước', () => {
     // `nhanHoiLai` trả undefined khi qid không nằm trong bộ, và `cauHoiLai`
     // undefined thì `DaiHoiLai` không dựng.
     expect(MAN_THI).toContain('const nhanHoiLai = (qid: string) => (boHoiLai.has(qid) ? {} : undefined)')
-    expect(THE_CAU).toContain('{props.cauHoiLai && <DaiHoiLai')
+    expect(THE_CAU).toContain('props.cauHoiLai && <DaiHoiLai')
   })
 })
 

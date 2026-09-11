@@ -12,7 +12,7 @@ import { MAC_DINH_MAY_CHU, type CauHinhMayChu } from '../lib/cau-hinh-may-chu'
 import { quenCauHinhMayChu, thuKetNoi } from '../lib/may-chu-moi'
 import { napToanBoCaLenMayChuMoi } from '../lib/exam-api'
 import { CHUA_DUNG, daChuyenXong, dungBangDoiChieu, laySoMayChuMoi, type DongDoiChieu } from '../lib/doi-chieu-hai-ben'
-import { chuyenKhoDe } from '../lib/chuyen-kho-de'
+import { chuyenKhoDe, dungLaiChiMucKho } from '../lib/chuyen-kho-de'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }
 const O_NHAP: React.CSSProperties = {
@@ -78,6 +78,35 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
    * Chạy lại được: mỗi lượt tự bỏ qua đề đã có trên máy chủ mới. Chết giữa
    * chừng thì bấm lại, nó đi tiếp từ chỗ đứt — đúng thứ lượt chuyển ca hôm
    * 15h46 ngày 11/09 KHÔNG có, nên chết ở ca thứ 6 là mất cả lượt. */
+  // DỰNG LẠI CHỈ MỤC CÂU. Tách khỏi nút chuyển kho vì hai việc khác nhau: một
+  // bên chuyển GÓI ĐỀ sang, một bên lập MỤC LỤC cho gói đã sang. Kho có đủ 118
+  // tờ mà mục lục rỗng thì rút câu khắc phục, câu hỏi lại và đề riêng đều trả
+  // về gần như rỗng — đúng thứ thầy thấy tối 11/09 ("đặt 8/2/2 mà ra 3/1/1").
+  const [dangChiMuc, setDangChiMuc] = useState(false)
+  const [tienChiMuc, setTienChiMuc] = useState('')
+  const [ketChiMuc, setKetChiMuc] = useState<{ ok: boolean; chu: string } | null>(null)
+
+  async function lapChiMuc() {
+    setDangChiMuc(true)
+    setKetChiMuc(null)
+    setTienChiMuc('Đang đọc kho…')
+    try {
+      const kq = await dungLaiChiMucKho(setTienChiMuc)
+      const con = kq.hong.length
+      setKetChiMuc({
+        ok: con === 0,
+        chu:
+          `Đã lập chỉ mục ${kq.soDe} tờ đề · tổng ${kq.tongCau} câu tra được` +
+          (con > 0 ? ` · HỎNG ${con}: ${kq.hong.slice(0, 5).map((h) => h.maDe).join(', ')}${con > 5 ? '…' : ''}` : '.'),
+      })
+    } catch (e) {
+      setKetChiMuc({ ok: false, chu: e instanceof Error ? e.message : 'Không lập được chỉ mục' })
+    } finally {
+      setDangChiMuc(false)
+      setTienChiMuc('')
+    }
+  }
+
   async function chuyenKho() {
     setDangKho(true)
     setKetKho(null)
@@ -217,6 +246,21 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
       </div>
 
       {ketKho && <OThongBao tone={ketKho.ok ? 'xanh' : 'do'}>{ketKho.chu}</OThongBao>}
+
+      <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
+        <NutChinh variant="phu" onClick={() => void lapChiMuc()} disabled={dangChiMuc || !ch.URL.trim()}>
+          {dangChiMuc ? 'Đang lập chỉ mục…' : 'Lập lại chỉ mục câu của kho'}
+        </NutChinh>
+        {dangChiMuc && <span style={NHAN_NHO}>{tienChiMuc}</span>}
+      </div>
+
+      {ketChiMuc && <OThongBao tone={ketChiMuc.ok ? 'xanh' : 'do'}>{ketChiMuc.chu}</OThongBao>}
+
+      <div style={NHAN_NHO}>
+        Chỉ mục câu là MỤC LỤC của kho: rút câu khắc phục, câu hỏi lại và đề riêng
+        {' '}đều tra ở đó. Kho có đủ đề mà mục lục rỗng thì các mục ấy trả về gần như
+        {' '}rỗng. Nút này KHÔNG đẩy lại đề — nó đọc gói đã nằm trên máy chủ.
+      </div>
 
       <div style={NHAN_NHO}>
         Chạy lại được bao nhiêu lần cũng an toàn: mỗi lượt tự bỏ qua đề đã có bên

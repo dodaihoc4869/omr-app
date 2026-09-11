@@ -1123,11 +1123,25 @@ const HAN_BTVN_GIO = 48
  */
 async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response> {
   const maCa = String(b.maCa ?? '').trim()
-  const maDe = String(b.maDe ?? '').trim()
-  if (!maCa || !maDe) return ra({ ok: false, error: 'Thiếu mã ca hoặc mã đề' })
+  // NHIỀU TỜ ĐỀ MỘT LƯỢT GIAO (thầy chốt 12/09: "cho tick nhiều"). Nhận cả
+  // `maDe` một tờ của bản trước — bản cũ trên máy em vẫn gửi dáng ấy.
+  const dsMaDe = Array.isArray(b.dsMaDe)
+    ? (b.dsMaDe as unknown[]).map((x) => String(x).trim()).filter(Boolean)
+    : String(b.maDe ?? '').trim()
+      ? [String(b.maDe).trim()]
+      : []
+  if (!maCa || dsMaDe.length === 0) return ra({ ok: false, error: 'Thiếu mã ca hoặc mã đề' })
 
-  const de = await env.DB.prepare('SELECT so_cau FROM de_kho WHERE ma_de = ? AND da_xoa = 0').bind(maDe).first<{ so_cau: number }>()
-  if (!de) return ra({ ok: false, error: `Không có đề ${maDe} trong kho` })
+  const cho = dsMaDe.map(() => '?').join(',')
+  const rDe = await env.DB.prepare(`SELECT ma_de, so_cau FROM de_kho WHERE ma_de IN (${cho}) AND da_xoa = 0`)
+    .bind(...dsMaDe)
+    .all<{ ma_de: string; so_cau: number }>()
+  const coDe = rDe.results ?? []
+  // NÓI ĐÚNG TỜ NÀO THIẾU. "Không có đề trong kho" chung chung thì thầy tick
+  // năm tờ không biết phải bỏ tờ nào.
+  const thieu = dsMaDe.filter((m) => !coDe.some((x) => String(x.ma_de) === m))
+  if (thieu.length > 0) return ra({ ok: false, error: `Không có trong kho: ${thieu.join(', ')}` })
+  const soCau = coDe.reduce((t, x) => t + (Number(x.so_cau) || 0), 0)
 
   // ĐÚNG những em có lượt trong ca. Lấy lần thử cao nhất, và bỏ lượt đã được
   // duyệt lại — cùng luật đếm của màn Ca thi.
@@ -1145,13 +1159,13 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
   const nay = new Date()
   const giaoLuc = nay.toISOString()
   const hanNop = new Date(nay.getTime() + HAN_BTVN_GIO * 3600 * 1000).toISOString()
-  const maBtvn = `${maCa}-${maDe}-${nay.getTime().toString(36)}`
+  const maBtvn = `${maCa}-${nay.getTime().toString(36)}`
 
   const lenh: D1PreparedStatement[] = [
     env.DB.prepare(
       `INSERT INTO btvn (ma_btvn, ma_ca, ma_de, so_cau, giao_luc, han_nop, da_xoa, cap_nhat_luc)
        VALUES (?,?,?,?,?,?,0,?)`,
-    ).bind(maBtvn, maCa, maDe, Number(de.so_cau) || 0, giaoLuc, hanNop, giaoLuc),
+    ).bind(maBtvn, maCa, dsMaDe.join(','), soCau, giaoLuc, hanNop, giaoLuc),
   ]
   for (const e of dsEm) {
     lenh.push(
@@ -1159,7 +1173,7 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
     )
   }
   for (let i = 0; i < lenh.length; i += 150) await env.DB.batch(lenh.slice(i, i + 150))
-  return ra({ ok: true, maBtvn, soEm: dsEm.length, soCau: Number(de.so_cau) || 0, hanNop })
+  return ra({ ok: true, maBtvn, soEm: dsEm.length, soCau, soDe: dsMaDe.length, hanNop })
 }
 
 /** EM MỞ BÀI TẬP CỦA MÌNH. Đường CÔNG KHAI — em chỉ có mã ca và số báo danh.
@@ -1186,16 +1200,28 @@ async function btvnCuaEm(env: Env, b: Record<string, unknown>): Promise<Response
   }
 
   // Gói đề đầy đủ nằm ở R2 `kho/`. TRẢ NGUYÊN GÓI, đúng thứ tự kho.
+  //
+  // Từ 12/09 một lượt giao có thể gồm NHIỀU tờ đề (`ma_de` là danh sách nối
+  // bằng dấu phẩy). Gộp theo ĐÚNG THỨ TỰ THẦY TÍCH, và giữ nguyên thứ tự câu
+  // trong từng tờ — cấm xáo, cấm lọc, đúng luật của phiếu bài tập.
+  const dsMaDe = String(bt.ma_de ?? '')
+    .split(',')
+    .map((x) => x.trim())
+    .filter(Boolean)
   let goi: unknown = null
-  if (env.DE) {
-    const o = await env.DE.get(`kho/${String(bt.ma_de ?? '')}.json`)
-    if (o?.body) {
+  if (env.DE && dsMaDe.length > 0) {
+    const gom: unknown[] = []
+    for (const m of dsMaDe) {
+      const o = await env.DE.get(`kho/${m}.json`)
+      if (!o?.body) continue
       try {
-        goi = await new Response(o.body).json()
+        const g = (await new Response(o.body).json()) as Record<string, unknown>
+        for (const c of docCauTuGoiDe(g)) gom.push(c)
       } catch {
-        goi = null
+        // Một tờ hỏng thì BỎ TỜ ẤY, không làm chết cả phiếu của em.
       }
     }
+    if (gom.length > 0) goi = { cau: gom, maDe: dsMaDe.join(','), soCau: gom.length }
   }
   if (!goi) return ra({ ok: false, lyDo: 'mat_goi_de', error: 'Chưa tải được đề bài tập' })
 
@@ -1286,7 +1312,29 @@ async function theoDoiBtvn(env: Env, b: Record<string, unknown>): Promise<Respon
 // ÁN, dựng riêng lúc mở ca — hai thứ khác nhau, đừng bao giờ trộn.
 // ===========================================================================
 
+/** MÃ CÂU — phải ra ĐÚNG mã máy thầy đang dùng, nếu không thì hai bên nói về
+ * hai câu khác nhau và mọi thứ dựa trên mã (câu đã làm, bản đồ sai, rút câu
+ * khắc phục) sai lặng lẽ.
+ *
+ * LỖI ĐÃ DÍNH, đo 12/09 lúc 23:30: `cau_hoi` có **0 dòng** trong khi kho có 118
+ * đề / 6.843 câu. Vì gói kho của thầy ghi câu bằng `phan` + `so` (xem
+ * `KhoDeCau`), không có `qid` lẫn `id` — mà chỗ dựng chỉ mục lại đòi đúng hai
+ * khoá ấy rồi `continue`. Kết quả: mọi đường dựa chỉ mục đều rỗng, nên thầy đặt
+ * rút 8/2/2 mà chỉ ra 3/1/1.
+ *
+ * Công thức dưới đây chép đúng `buildTeacherSourceFromKhoDe` ở máy thầy:
+ * `<mã đề>-<phần>-<số>`. */
+export function qidCuaCau(maDe: string, c: Record<string, unknown>): string {
+  const san = String(c.qid ?? c.id ?? '').trim()
+  if (san) return san
+  const phan = String(c.phan ?? '').trim().toUpperCase()
+  const so = String(c.so ?? '').trim()
+  if (!phan || !so) return ''
+  return `${maDe}-${phan}-${so}`
+}
+
 /** ĐẨY MỘT ĐỀ VÀO KHO. Gói đầy đủ lên R2, chỉ mục câu xuống D1. */
+
 async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response> {
   const maDe = String(b.maDe ?? '').trim()
   if (!maDe) return ra({ ok: false, error: 'Thiếu mã đề' })
@@ -1314,7 +1362,7 @@ async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
   // đã xoá khỏi đề vẫn còn được rút ra cho em.
   lenh.push(env.DB.prepare('DELETE FROM cau_hoi WHERE ma_de = ?').bind(maDe))
   for (const c of cauDs) {
-    const qid = String(c.qid ?? c.id ?? '').trim()
+    const qid = qidCuaCau(maDe, c)
     if (!qid) continue
     lenh.push(
       env.DB.prepare(
@@ -1372,6 +1420,90 @@ async function xoaDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
     env.DB.prepare('UPDATE de_kho SET da_xoa = ?, cap_nhat_luc = ? WHERE ma_de = ?').bind(khoiPhuc ? 0 : 1, nay, maDe),
   ])
   return ra({ ok: true, maDe, daXoa: !khoiPhuc })
+}
+
+/** DỰNG LẠI CHỈ MỤC CÂU TỪ GÓI ĐỀ ĐANG NẰM TRÊN R2.
+ *
+ * Vì sao cần một đường riêng: 118 tờ đề đã ở trên R2 từ lượt chuyển kho, nhưng
+ * chỉ mục của chúng rỗng (xem ghi chú ở `qidCuaCau`). Đẩy lại cả kho từ máy
+ * thầy là tải lại vài chục megabyte cho thứ máy chủ đã có sẵn.
+ *
+ * LÀM THEO LÔ, mặc định 6 tờ một lượt: mỗi tờ là một lượt đọc R2 cộng tới vài
+ * trăm câu ghi xuống D1, và trần Worker là 50 câu truy vấn — nên lô lớn hơn là
+ * chạm trần giữa chừng rồi bỏ dở một tờ. Chỗ gọi lặp tới khi `conLai` về 0. */
+async function dungChiMucKho(env: Env, b: Record<string, unknown>): Promise<Response> {
+  if (!env.DE) return ra({ ok: false, error: 'Chưa nối R2' }, 500)
+  const gioiHan = Math.max(1, Math.min(10, Number(b.gioiHan) || 6))
+
+  // Chọn ĐÚNG những tờ chưa có chỉ mục. Nhờ vậy chạy lại bao nhiêu lần cũng
+  // không dựng lại thứ đã dựng, và đứt giữa chừng thì bấm lại là đi tiếp.
+  const dsVao = Array.isArray(b.dsMaDe) ? (b.dsMaDe as unknown[]).map((x) => String(x).trim()).filter(Boolean) : []
+  const rChon = dsVao.length
+    ? { results: dsVao.map((m) => ({ ma_de: m })) }
+    : await env.DB.prepare(
+        `SELECT d.ma_de FROM de_kho d
+          WHERE d.da_xoa = 0 AND d.r2_khoa IS NOT NULL
+            AND NOT EXISTS (SELECT 1 FROM cau_hoi c WHERE c.ma_de = d.ma_de)
+          ORDER BY d.ma_de LIMIT ?`,
+      )
+        .bind(gioiHan)
+        .all<{ ma_de: string }>()
+
+  const ds = (rChon.results ?? []).map((x) => String(x.ma_de))
+  const nay = new Date().toISOString()
+  const xong: { maDe: string; soCau: number }[] = []
+  const hong: { maDe: string; viSao: string }[] = []
+
+  for (const maDe of ds.slice(0, gioiHan)) {
+    const o = await env.DE.get(`kho/${maDe}.json`)
+    if (!o?.body) {
+      hong.push({ maDe, viSao: 'không còn gói trên R2' })
+      continue
+    }
+    let cau: Record<string, unknown>[] = []
+    try {
+      cau = docCauTuGoiDe((await new Response(o.body).json()) as Record<string, unknown>)
+    } catch {
+      hong.push({ maDe, viSao: 'gói hỏng, không đọc được' })
+      continue
+    }
+    const lenh: D1PreparedStatement[] = [env.DB.prepare('DELETE FROM cau_hoi WHERE ma_de = ?').bind(maDe)]
+    for (const c of cau) {
+      const qid = qidCuaCau(maDe, c)
+      if (!qid) continue
+      lenh.push(
+        env.DB.prepare(
+          `INSERT INTO cau_hoi (qid, ma_de, chuyen_de, muc_do, phan, lop, co_loi_giai, cap_nhat_luc)
+           VALUES (?,?,?,?,?,?,?,?)
+           ON CONFLICT(qid) DO UPDATE SET ma_de=excluded.ma_de, chuyen_de=excluded.chuyen_de,
+             muc_do=excluded.muc_do, phan=excluded.phan, lop=excluded.lop,
+             co_loi_giai=excluded.co_loi_giai, cap_nhat_luc=excluded.cap_nhat_luc`,
+        ).bind(
+          qid, maDe,
+          String(c.chuyen_de ?? c.chuyenDe ?? ''),
+          String(c.muc_do ?? c.mucDo ?? ''),
+          String(c.phan ?? ''),
+          String(c.lop ?? ''),
+          c.loi_giai || c.loiGiai ? 1 : 0,
+          nay,
+        ),
+      )
+    }
+    for (let i = 0; i < lenh.length; i += 40) await env.DB.batch(lenh.slice(i, i + 40))
+    // Số câu THẬT của tờ đề lấy luôn từ gói — cột `so_cau` trước đây đếm theo
+    // mảng máy thầy gửi, hai con số phải khớp nhau.
+    await env.DB.prepare('UPDATE de_kho SET so_cau = ?, cap_nhat_luc = ? WHERE ma_de = ?').bind(cau.length, nay, maDe).run()
+    xong.push({ maDe, soCau: cau.length })
+  }
+
+  const rCon = await env.DB.prepare(
+    `SELECT COUNT(*) AS n FROM de_kho d
+      WHERE d.da_xoa = 0 AND d.r2_khoa IS NOT NULL
+        AND NOT EXISTS (SELECT 1 FROM cau_hoi c WHERE c.ma_de = d.ma_de)`,
+  ).first<{ n: number }>()
+  const tong = await env.DB.prepare('SELECT COUNT(*) AS n FROM cau_hoi').first<{ n: number }>()
+
+  return ra({ ok: true, xong, hong, conLai: Number(rCon?.n) || 0, tongCau: Number(tong?.n) || 0 })
 }
 
 /** RÚT CÂU THEO CHUYÊN ĐỀ — nguồn của bài luyện và câu khắc phục.
@@ -1997,7 +2129,9 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
       return ra({ ...j, soNghi: 0 })
     }
     case 'xoaDe': return xoaDeKho(env, b)
-    case 'dungChiMuc': return ra(await G.dungChiMuc(env))
+    // `dungChiMuc` bên đường cũ DỰNG THẬT chỉ mục cả kho. Ở đây nó chạy một lô
+    // và trả `conLai` để chỗ gọi lặp — không đếm suông rồi báo xong.
+    case 'dungChiMuc': return dungChiMucKho(env, b)
 
     // ---- PHIẾU -----------------------------------------------------------
     case 'luuPhieu': return ra(await G.luuPhieu(env, b))
@@ -2094,6 +2228,7 @@ export default {
     if (p === '/kho/lay') return layDeKho(env, String(b.maDe ?? ''))
     if (p === '/kho/xoa') return xoaDeKho(env, b)
     if (p === '/kho/rut-cau') return rutCau(env, b)
+    if (p === '/kho/chi-muc') return dungChiMucKho(env, b)
     if (p === '/btvn/giao') return giaoBtvn(env, b)
     if (p === '/btvn/theo-doi') return theoDoiBtvn(env, b)
     if (p === '/dong-bo/dau') return ghiDauDongBo(env, b)
