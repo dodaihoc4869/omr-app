@@ -78,9 +78,24 @@ export async function dayMocBatDauMoi(
   maCa: string,
   batDauThiLuc: string,
   boTheoEm?: unknown,
+  soLan = 3,
 ): Promise<boolean> {
   if (!maCa) return false
-  return guiJson(ch, maBiMat, '/ca/day', { ca: { maCa, batDauThiLuc, boTheoEm }, chiMoc: true }, HAN_DAY_CA_GIAY)
+  // THỬ LẠI TỚI CÙNG — đây là lượt gọi quan trọng nhất của cả ca.
+  //
+  // Mốc này không sang được thì máy chủ mới giữ cả lớp trong phòng chờ, và chốt
+  // đối chiếu ở máy em (`doi-chieu-phong-cho.ts`) phải gánh — mà chốt ấy đổ tải
+  // vào Apps Script đúng lúc Apps Script đang nặng nhất. Chữa ở ĐÂY, một máy,
+  // rẻ hơn hẳn chữa ở bốn mươi máy.
+  //
+  // Lượt đẩy mang cờ `chiMoc` nên gửi lại bao nhiêu lần cũng ra một kết quả:
+  // Worker chỉ `UPDATE` đúng hai cột, không tạo dòng nào.
+  for (let i = 0; i < Math.max(1, soLan); i++) {
+    const xong = await guiJson(ch, maBiMat, '/ca/day', { ca: { maCa, batDauThiLuc, boTheoEm }, chiMoc: true }, HAN_DAY_CA_GIAY)
+    if (xong) return true
+    if (i < soLan - 1) await new Promise((r) => setTimeout(r, 700 * (i + 1)))
+  }
+  return false
 }
 
 export interface EmDanhSach {

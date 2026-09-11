@@ -47,26 +47,44 @@ describe('VẾ 1 — "chưa bắt đầu" chỉ được tin trong MỘT NHỊP'
   })
 
   it('hỏi xong thì đếm lại từ đầu, không hỏi dồn', () => {
+    // Mốc tính THEO `NHIP_DOI_CHIEU_MS`, không gõ cứng con số — nhịp đổi thì
+    // phép kiểm đi theo, còn LUẬT thì không đổi.
     nenDoiChieu('CA1', 1_000_000)
-    expect(nenDoiChieu('CA1', 1_016_000)).toBe(true)
-    expect(nenDoiChieu('CA1', 1_017_000)).toBe(false)
+    expect(nenDoiChieu('CA1', 1_000_000 + NHIP_DOI_CHIEU_MS + 1_000)).toBe(true)
+    expect(nenDoiChieu('CA1', 1_000_000 + NHIP_DOI_CHIEU_MS + 2_000)).toBe(false)
   })
 
   it('mỗi ca đếm riêng', () => {
     nenDoiChieu('CA1', 1_000_000)
     // CA2 lần đầu ⇒ chỉ ghi mốc
-    expect(nenDoiChieu('CA2', 1_020_000)).toBe(false)
-    expect(nenDoiChieu('CA1', 1_020_000)).toBe(true)
+    expect(nenDoiChieu('CA2', 1_000_000 + NHIP_DOI_CHIEU_MS + 5_000)).toBe(false)
+    expect(nenDoiChieu('CA1', 1_000_000 + NHIP_DOI_CHIEU_MS + 5_000)).toBe(true)
   })
 
   it('mã ca rỗng thì thôi, không nổ', () => {
     expect(nenDoiChieu('', 1_000_000)).toBe(false)
   })
 
-  it('NHỊP LÀ 15 GIÂY — treo tối đa 15 giây, và tải bằng 1/5 nhịp hỏi hôm nay', () => {
-    expect(NHIP_DOI_CHIEU_MS).toBe(15000)
-    // Nhịp hỏi phòng chờ hiện tại là 3 giây; 15/3 = 5.
-    expect(NHIP_DOI_CHIEU_MS / 3000).toBe(5)
+  it('NHỊP LÀ 90 GIÂY — giãn ra sau khi đo Apps Script 10,2 giây một lượt', () => {
+    // Đặt 15 giây lúc sáng 11/09. Đo lúc 20h05, đúng lúc thầy hỏi "40 em vào
+    // phòng chờ có quá tải không": `trangThaiPhongCho` bên Apps Script mất
+    // **10 185 ms** một lượt (chiều cùng ngày là 2,6 giây). 40 em × nhịp 15
+    // giây = 2,7 lượt/giây đổ vào cửa ấy — đúng công thức của cú treo hàng loạt
+    // mà chốt này sinh ra để chặn.
+    //
+    // 90 giây ⇒ 40 em còn 0,44 lượt/giây. Đổi lại: trường hợp xấu nhất em chờ
+    // thêm 90 giây thay vì 15. Chấp nhận được, vì máy thầy nay thử lại lượt đẩy
+    // mốc 3 lần (`dayMocBatDauMoi`) nên trường hợp ấy hiếm hẳn đi.
+    expect(NHIP_DOI_CHIEU_MS).toBe(90000)
+    // 40 em chia cho nhịp: phải dưới 0,5 lượt mỗi giây.
+    expect(40 / (NHIP_DOI_CHIEU_MS / 1000)).toBeLessThan(0.5)
+  })
+
+  it('máy thầy THỬ LẠI lượt đẩy mốc — chữa ở một máy, không chữa ở bốn mươi máy', () => {
+    const DAY = fs.readFileSync(path.join(process.cwd(), 'src/lib/day-ca-may-chu-moi.ts'), 'utf8')
+    const han = DAY.slice(DAY.indexOf('export async function dayMocBatDauMoi('), DAY.indexOf('export async function dayMocBatDauMoi(') + 1600)
+    expect(han).toContain('for (let i = 0; i < Math.max(1, soLan); i++)')
+    expect(han).toContain('if (xong) return true')
   })
 })
 

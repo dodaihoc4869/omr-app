@@ -32,11 +32,25 @@ describe('WORKER — `/ca/nap-day-du`', () => {
     expect(WK.indexOf("p === '/ca/nap-day-du'")).toBeGreaterThan(WK.indexOf('if (!laThay(req, env, b))'))
   })
 
-  it('TỪ CHỐI ca ĐANG MỞ — đó là lúc D1 mới hơn Sheet', () => {
-    expect(HAM).toContain("if (String(ca.trang_thai) === 'mo')")
-    expect(HAM).toContain("lyDo: 'ca_dang_mo'")
+  it('TỪ CHỐI ca ĐANG CHẠY — đó là lúc D1 mới hơn Sheet', () => {
+    // 19h45 cùng ngày: cửa này từng so nhãn `trang_thai = 'mo'`. Kho của thầy
+    // có 12 ca mang nhãn ấy từ mấy hôm trước, chưa bao giờ đóng — chúng không
+    // chạy, mà vĩnh viễn không được chữa lành. Nay tính bằng đồng hồ.
+    expect(HAM).toContain('if (caDangChay(ca))')
+    expect(HAM).toContain("lyDo: 'ca_dang_chay'")
     // và phải từ chối TRƯỚC khi ghi dòng nào
-    expect(HAM.indexOf("lyDo: 'ca_dang_mo'")).toBeLessThan(HAM.indexOf('INSERT INTO luot'))
+    expect(HAM.indexOf("lyDo: 'ca_dang_chay'")).toBeLessThan(HAM.indexOf('INSERT INTO luot'))
+  })
+
+  it('TUYỆT ĐỐI không đụng `da_day_sheet` — cờ ấy nói bài đã VỀ Sheet chưa', () => {
+    // LỖI NẶNG NHẤT tối 11/09: bản đầu đặt cờ này = 1 vì "dòng đọc từ Sheet ra
+    // thì đã có trên Sheet". Sai: cờ nói lượt ĐỒNG BỘ NGƯỢC đã đưa bài của em
+    // về Sheet chưa. Đặt bừa là `dong-bo-nguoc` bỏ qua lượt ấy vĩnh viễn — em
+    // nộp bài xong bấm xem điểm thì nghe "Em chưa nộp bài ca này", và điểm mất
+    // khỏi đường ra Excel lẫn đường gửi Zalo.
+    const ghi = HAM.slice(HAM.indexOf('INSERT INTO luot'), HAM.indexOf(').bind(', HAM.indexOf('INSERT INTO luot')))
+    expect(ghi).not.toContain('da_day_sheet=1')
+    expect(ghi).not.toContain('da_day_sheet=excluded')
   })
 
   it('ca chưa có trên D1 thì KHÔNG tự dựng — không đẻ ca rỗng', () => {
@@ -78,12 +92,13 @@ describe('MÁY THẦY — chữa lành ngay trong lượt đọc đường cũ',
   it('`chiTietCa` gửi gói vừa đọc được sang máy chủ mới', () => {
     const i = API.indexOf('export async function chiTietCa(')
     const than = API.slice(i, API.indexOf('/** GHI KẾT QUẢ CHỮA BÀI TRÊN BẢNG', i))
-    expect(than).toContain('napDayDuCaMoi(chMoi, secret, maCa,')
+    expect(than).toContain('await napDayDuCaMoi(')
+    expect(than).toContain('luotSheet as unknown as Record<string, unknown>[]')
   })
 
   it('KHÔNG chờ và KHÔNG ném lỗi — đây là đường tắt cho lần sau', () => {
-    const i = API.indexOf('napDayDuCaMoi(chMoi, secret, maCa,')
-    const khoi = API.slice(i - 400, i + 300)
+    const i = API.indexOf('await napDayDuCaMoi(')
+    const khoi = API.slice(i - 400, i + 500)
     expect(khoi).toContain('void (async () => {')
     expect(khoi).toContain('} catch {')
   })
@@ -91,8 +106,8 @@ describe('MÁY THẦY — chữa lành ngay trong lượt đọc đường cũ',
   it('gửi bản đọc từ SHEET, không gửi bản đã trộn với D1', () => {
     // `luotGop` có thể mang dòng do chính D1 sinh ra; gửi ngược lại là thừa và
     // dễ ghi đè nhầm. `luotSheet` mới là thứ D1 đang thiếu.
-    const i = API.indexOf('napDayDuCaMoi(chMoi, secret, maCa,')
-    expect(API.slice(i, i + 200)).toContain('luotSheet')
+    const i = API.indexOf('await napDayDuCaMoi(')
+    expect(API.slice(i, i + 300)).toContain('luotSheet')
   })
 
   it('máy chủ mới tắt cờ thì thôi, không kêu gì', () => {

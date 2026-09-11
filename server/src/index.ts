@@ -959,7 +959,7 @@ async function napDayDuCa(env: Env, b: Record<string, unknown>): Promise<Respons
                            so_lan_roi_man, tong_giay_roi_man, ghi_chu, ho_ten,
                            diem_i, diem_ii, diem_iii, tong, duyet_boi, duyet_luc,
                            cap_nhat_luc, da_day_sheet)
-         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)
          ON CONFLICT(khoa) DO UPDATE SET
            het_gio_luc=COALESCE(NULLIF(excluded.het_gio_luc,''), luot.het_gio_luc),
            nop_luc=COALESCE(NULLIF(excluded.nop_luc,''), luot.nop_luc),
@@ -974,8 +974,7 @@ async function napDayDuCa(env: Env, b: Record<string, unknown>): Promise<Respons
            tong=COALESCE(excluded.tong, luot.tong),
            duyet_boi=COALESCE(NULLIF(excluded.duyet_boi,''), luot.duyet_boi),
            duyet_luc=COALESCE(NULLIF(excluded.duyet_luc,''), luot.duyet_luc),
-           cap_nhat_luc=excluded.cap_nhat_luc,
-           da_day_sheet=1`,
+           cap_nhat_luc=excluded.cap_nhat_luc`,
       ).bind(
         `${maCa}|${sbd}|${lanThu}`, maCa, sbd, lanThu,
         String(l.vaoLuc ?? '') || nay, String(l.hetGioLuc ?? ''), String(l.nopLuc ?? ''),
@@ -988,6 +987,20 @@ async function napDayDuCa(env: Env, b: Record<string, unknown>): Promise<Respons
   }
   // KHÔNG đụng `dap_an_json`, `giay_cau_json`, `integrity_json`: bản trên D1 là
   // bản máy em ghi thẳng, đầy đủ hơn bản chép vòng qua Sheet.
+  //
+  // VÀ TUYỆT ĐỐI KHÔNG ĐỤNG `da_day_sheet`.
+  //
+  // Bản đầu của hàm này đặt `da_day_sheet = 1`, với lý lẽ "dòng này đọc từ
+  // Sheet ra thì hiển nhiên đã có trên Sheet". Lý lẽ ấy SAI ở đúng một chỗ, và
+  // chỗ ấy là chỗ chết người: cờ này không nói dòng có trên Sheet hay không, nó
+  // nói **lượt đồng bộ ngược đã đưa bài của em về Sheet chưa**. Đặt bừa thành 1
+  // là `dong-bo-nguoc.ts` bỏ qua lượt ấy VĨNH VIỄN — em nộp bài, bài nằm yên
+  // trong D1, Sheet không bao giờ nhận, và em bấm xem điểm thì nghe "chưa nộp
+  // bài ca này". Điểm mất khỏi đường ra Excel và đường gửi Zalo.
+  //
+  // Cờ ấy chỉ có HAI nơi được phép đặt: `/nop` đặt về 0 khi em nộp, và `/da-day`
+  // đặt lên 1 sau khi Apps Script XÁC NHẬN đã nhận. Lượt chữa lành không phải
+  // một trong hai.
   for (let i = 0; i < cau.length; i += 200) await env.DB.batch(cau.slice(i, i + 200))
 
   // NGÂN HÀNG CÓ ĐÁP ÁN — cất sau khoá RIÊNG, chỉ mở bằng mã bí mật.

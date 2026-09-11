@@ -26,13 +26,28 @@
 // Vế ② phải có, vì nếu chỉ sửa phòng chờ thì em thoát khỏi màn chờ rồi lại bị
 // `/vao-thi` của máy chủ mới đẩy về chờ tiếp — `bat_dau_thi_luc` vẫn rỗng mà.
 //
-// GIÁ PHẢI TRẢ, tính bằng số: một lượt gọi Apps Script mỗi 15 giây cho mỗi em
-// ĐANG CHỜ, và chỉ khi máy chủ mới nói chưa bắt đầu. Nhịp hỏi phòng chờ hôm nay
-// là 3 giây, nên đây là **1/5 tải của chính hôm nay**. Đổi lại: cú treo dài vô
-// hạn thành cú chậm tối đa 15 giây.
+// GIÁ PHẢI TRẢ — và tối 11/09 nó suýt thành cái bẫy mới.
+//
+// Nhịp 15 giây đặt lúc sáng nghe rẻ. Nhưng đo lúc 20h05, đúng lúc thầy hỏi
+// "40 em vào phòng chờ có bị quá tải không":
+//
+//     trangThaiPhongCho (Apps Script)  →  10 185 ms
+//
+// Hơn MƯỜI GIÂY một lượt, trong khi chiều cùng ngày là 2,6 giây. Với 40 em,
+// nhịp 15 giây là 2,7 lượt/giây đổ vào một cửa đang mất 10 giây mỗi lượt —
+// đúng công thức của cú treo hàng loạt mà cái chốt này sinh ra để chặn.
+//
+// SỬA ĐÚNG CHỖ: chữa ở MỘT máy biết sự thật, không chữa ở 40 máy không biết.
+// Máy thầy là máy duy nhất biết lượt đẩy mốc có sang được hay không — nên nó
+// thử lại tới cùng (`dayMocBatDauMoi`), và chỉ khi nó chịu thua mới cần tới
+// lưới đỡ ở máy em. Lưới ấy giãn 15 s → 90 s: 40 em còn 0,44 lượt/giây.
+//
+// Vì sao KHÔNG bỏ hẳn: bỏ sạch thì chỉ cần một lượt đẩy mốc trượt mà thầy
+// không để ý là cả lớp đứng chờ KHÔNG BAO GIỜ vào được. Treo vô hạn tệ hơn hẳn
+// chậm 90 giây.
 
 /** Bao lâu mới đối chiếu đường cũ một lần, mili giây. */
-export const NHIP_DOI_CHIEU_MS = 15000
+export const NHIP_DOI_CHIEU_MS = 90000
 
 const mocHoi = new Map<string, number>()
 const daBatDauDuongCu = new Set<string>()

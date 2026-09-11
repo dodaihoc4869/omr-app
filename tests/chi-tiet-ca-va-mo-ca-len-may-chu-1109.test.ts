@@ -55,11 +55,14 @@ describe('① CHI TIẾT CA — đường nhanh và hai cổng an toàn', () => 
     expect(kh).toContain("j.dayDu !== true) return null")
   })
 
-  it('CỔNG 2 — xin ngân hàng CÓ ĐÁP ÁN thì đi đường cũ, R2 chỉ giữ bản không đáp án', () => {
+  it('CỔNG 2 — chưa có ngân hàng CÓ ĐÁP ÁN thì đi đường cũ', () => {
+    // 20h10 cùng ngày: cổng này từng là `if (!xinKeyBank)`, tức chặn đường
+    // nhanh VĨNH VIỄN trên điện thoại thầy (máy ấy không bao giờ có sẵn ngân
+    // hàng của ca cũ). Nay lượt chữa lành cất ngân hàng lên R2 sau khoá riêng,
+    // nên chỉ lùi khi thật sự chưa có.
     const i = API.indexOf('export async function chiTietCa(')
-    const than = API.slice(i, i + 1800)
-    expect(than).toContain('if (!xinKeyBank) {')
-    expect(than.indexOf('if (!xinKeyBank) {')).toBeLessThan(than.indexOf('chiTietCaMoi('))
+    const than = API.slice(i, i + 2400)
+    expect(than).toContain('if (nhanh && (!xinKeyBank || nhanh.keyBank)) return doiChiTietCaMoi(nhanh)')
   })
 
   it('`dayCa` đặt cờ sinh_tai_d1, `dayNhieuCa` KHÔNG', () => {
@@ -79,7 +82,8 @@ describe('① CHI TIẾT CA — đường nhanh và hai cổng an toàn', () => 
     const han = API.slice(API.indexOf('function doiChiTietCaMoi('), API.indexOf('function doiChiTietCaMoi(') + 1400)
     expect(han).toContain("danhSachMoi: ''")
     expect(han).toContain("nguoiTao: ''")
-    expect(han).toContain('keyBank: null')
+    // Ngân hàng thì KHÔNG bịa rỗng nữa — trả đúng cái R2 giữ, hoặc null.
+    expect(han).toContain('keyBank: (j.keyBank as KeyBank | null) ?? null')
   })
 
   it('lượt bị cổng danh sách chặn ĐƯỢC GHI LẠI — thầy đứng trong phòng phải thấy', () => {
