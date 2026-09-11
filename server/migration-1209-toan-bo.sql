@@ -222,3 +222,36 @@ CREATE TABLE IF NOT EXISTS nop_khac_phuc (
   nop_luc    TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_nkp_em ON nop_khac_phuc(sbd, nop_luc);
+
+-- ===========================================================================
+-- BÀI TẬP VỀ NHÀ — dựng mới trọn trên máy chủ mới (thầy chốt 11/09 tối).
+-- Đặc tả: claude/PHAN-CONG-GIAO-BTVN.md
+-- ===========================================================================
+
+-- MỘT LƯỢT GIAO BÀI cho một ca. Hạn chốt NGAY LÚC BẤM, chung cho cả lớp.
+CREATE TABLE IF NOT EXISTS btvn (
+  ma_btvn      TEXT PRIMARY KEY,
+  ma_ca        TEXT NOT NULL,      -- ca đã thi, dùng để biết giao cho những em nào
+  ma_de        TEXT NOT NULL,      -- tờ đề trong kho
+  so_cau       INTEGER NOT NULL DEFAULT 0,
+  giao_luc     TEXT NOT NULL,
+  han_nop      TEXT NOT NULL,      -- giao_luc + HAN_BTVN_GIO
+  da_xoa       INTEGER NOT NULL DEFAULT 0,
+  cap_nhat_luc TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_btvn_ca ON btvn(ma_ca, da_xoa);
+
+-- EM NÀO ĐƯỢC GIAO. Chốt danh sách NGAY LÚC GIAO, không tính lại về sau: em
+-- được duyệt thi lại sau đó không tự nhiên bị giao thêm bài.
+CREATE TABLE IF NOT EXISTS btvn_em (
+  khoa      TEXT PRIMARY KEY,      -- ma_btvn|sbd
+  ma_btvn   TEXT NOT NULL,
+  sbd       TEXT NOT NULL,
+  ho_ten    TEXT,
+  nop_luc   TEXT,
+  so_dung   INTEGER,
+  so_cau    INTEGER,
+  dap_an_json TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_btvn_em ON btvn_em(sbd);
+CREATE INDEX IF NOT EXISTS idx_btvn_lo ON btvn_em(ma_btvn);

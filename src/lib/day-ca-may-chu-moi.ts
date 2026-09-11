@@ -35,6 +35,13 @@ export interface CaDay {
   boTheoEm?: unknown
 }
 
+/** Gói đẩy ca: ngoài `ca` và gói đề KHÔNG đáp án, còn ngân hàng CÓ đáp án để
+ * Worker trả ngay cho em lúc nộp khi ca công bố điểm. Cất sau khoá riêng. */
+export interface GoiDayCa {
+  bank?: unknown
+  keyBank?: unknown
+}
+
 async function guiJson(ch: CauHinhMayChu, maBiMat: string, duong: string, than: unknown, giay: number): Promise<boolean> {
   if (!ch.BAT || !ch.URL) return false
   const bo = new AbortController()
@@ -60,9 +67,14 @@ async function guiJson(ch: CauHinhMayChu, maBiMat: string, duong: string, than: 
  *
  * `bank` là bản KHÔNG ĐÁP ÁN — Worker cất vào R2 và phục vụ công khai ở
  * `/de/:maCa`. Đẩy bản có đáp án lên đó là phát đáp án cho cả lớp. */
-export async function dayCaMoi(ch: CauHinhMayChu, maBiMat: string, ca: CaDay, bank?: unknown): Promise<boolean> {
+export async function dayCaMoi(ch: CauHinhMayChu, maBiMat: string, ca: CaDay, bank?: unknown, keyBank?: unknown): Promise<boolean> {
   if (!ca?.maCa) return false
-  return guiJson(ch, maBiMat, '/ca/day', bank ? { ca, bank } : { ca }, HAN_DAY_CA_GIAY)
+  const than: Record<string, unknown> = { ca }
+  if (bank) than.bank = bank
+  // NGÂN HÀNG CÓ ĐÁP ÁN — chỉ gửi khi ca công bố điểm. Ca không công bố mà vẫn
+  // đẩy đáp án lên là để sẵn một thứ không ai được đọc; không cần thì đừng cất.
+  if (keyBank) than.keyBank = keyBank
+  return guiJson(ch, maBiMat, '/ca/day', than, HAN_DAY_CA_GIAY)
 }
 
 /** ĐẨY RIÊNG MỐC BẮT ĐẦU (và bản đồ đề riêng) — KHÔNG đụng phần còn lại của ca.

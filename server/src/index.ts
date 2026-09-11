@@ -206,11 +206,44 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
       .bind(...dk.tham)
       .first<DongLuot>()
     if (da && (da.trang_thai === 'da_nop' || da.trang_thai === 'khoa')) {
-      return ra({ ok: true, daNhan: true, nopLuc: da.nop_luc })
+      return ra({ ok: true, daNhan: true, nopLuc: da.nop_luc, ...(await congBoSauNop(env, b)) })
     }
     return ra({ ok: false, lyDo: 'khong_tim_thay' })
   }
-  return ra({ ok: true, nopLuc })
+  return ra({ ok: true, nopLuc, ...(await congBoSauNop(env, b)) })
+}
+
+/** ĐÁP ÁN TRẢ NGAY SAU KHI EM NỘP — chỗ CUỐI CÙNG buộc máy em phải gọi Apps
+ * Script.
+ *
+ * Trước đợt này, `submitAnswers` cất bài vào D1 rồi VẪN gọi Apps Script, chỉ vì
+ * `keyBank` và cờ `congBo` do bên ấy trả. Nghĩa là mỗi lượt nộp của mỗi em vẫn
+ * là một lượt vào cái cửa xếp hàng theo khoá toàn cục — đúng chỗ treo mà cả đợt
+ * chuyển máy chủ sinh ra để bỏ.
+ *
+ * Nay ngân hàng CÓ đáp án được cất lên R2 `key/<maCa>.json` ngay lúc mở ca, nên
+ * Worker tự trả được.
+ *
+ * BA LUẬT:
+ *   1. Ca `cong_bo = 'khong'` ⇒ KHÔNG trả gì. Em không được thấy đáp án.
+ *   2. Ca `ca_lop_xong` ⇒ cũng không trả ngay; màn hỏi lại sau bằng đường khác.
+ *   3. Chưa cất được ngân hàng ⇒ trả `congBo` nhưng `keyBank: null`. Chỗ gọi
+ *      thấy thiếu thì tự đi đường cũ — thà chậm còn hơn em nộp xong nhìn màn
+ *      trắng. */
+async function congBoSauNop(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const maCa = String(b.maCa ?? '').trim()
+  if (!maCa) return {}
+  const ca = await docCa(env, maCa)
+  const congBo = String(ca?.cong_bo ?? 'khong')
+  if (congBo !== 'ngay') return { congBo }
+  if (!env.DE) return { congBo, keyBank: null }
+  const o = await env.DE.get(`key/${maCa}.json`)
+  if (!o?.body) return { congBo, keyBank: null }
+  try {
+    return { congBo, keyBank: await new Response(o.body).json() }
+  } catch {
+    return { congBo, keyBank: null }
+  }
 }
 
 /**
@@ -307,6 +340,12 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
     bankKey = `de/${maCa}.json`
     await env.DE.put(bankKey, JSON.stringify(b.bank))
   }
+  // NGÂN HÀNG CÓ ĐÁP ÁN — khoá RIÊNG, để `/nop` trả ngay cho em khi ca công bố
+  // điểm. Đây là thứ gỡ nốt lượt gọi Apps Script cuối cùng khỏi đường của em.
+  //
+  // `key/` KHÔNG BAO GIỜ đi ra đường công khai `GET /de/:maCa`. Hai khoá khác
+  // nhau, và chỉ `de/` được phục vụ công khai.
+  if (b.keyBank && env.DE) await env.DE.put(`key/${maCa}.json`, JSON.stringify(b.keyBank))
 
   // ĐẨY MỘT PHẦN — CHỈ MỐC BẮT ĐẦU VÀ BẢN ĐỒ ĐỀ RIÊNG.
   //
@@ -1046,6 +1085,174 @@ function caDangChay(ca: { trang_thai: string; bat_dau_thi_luc: string | null; ba
 }
 
 // ===========================================================================
+// BÀI TẬP VỀ NHÀ — dựng mới trọn trên máy chủ mới.
+// Đặc tả: claude/PHAN-CONG-GIAO-BTVN.md
+// ===========================================================================
+
+/** Hạn nộp bài tập về nhà, tính từ lúc thầy bấm Giao. MỘT NGUỒN SỰ THẬT — cấm
+ * rải số này ra chỗ khác. */
+const HAN_BTVN_GIO = 48
+
+/** THẦY GIAO BÀI cho một ca đã thi.
+ *
+ * BA LUẬT TỪ ĐẶC TẢ, và cả ba đều có phép kiểm canh:
+ *   1. Chỉ giao cho em CÓ LƯỢT trong ca ấy — em vắng hôm đó không bị giao.
+ *   2. Lấy TẤT CẢ câu của tờ đề, ĐÚNG THỨ TỰ KHO. Không xáo, không lọc, không
+ *      cắt theo từng em (khác hẳn phiếu khắc phục).
+ *   3. Hạn chốt NGAY LÚC BẤM, chung cho cả lớp — không đếm từ lúc em mở. Đếm
+ *      từ lúc mở thì em mở muộn được nộp muộn, và thầy mất mốc chung để đếm
+ *      "đã nộp / chưa nộp".
+ */
+async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const maCa = String(b.maCa ?? '').trim()
+  const maDe = String(b.maDe ?? '').trim()
+  if (!maCa || !maDe) return ra({ ok: false, error: 'Thiếu mã ca hoặc mã đề' })
+
+  const de = await env.DB.prepare('SELECT so_cau FROM de_kho WHERE ma_de = ? AND da_xoa = 0').bind(maDe).first<{ so_cau: number }>()
+  if (!de) return ra({ ok: false, error: `Không có đề ${maDe} trong kho` })
+
+  // ĐÚNG những em có lượt trong ca. Lấy lần thử cao nhất, và bỏ lượt đã được
+  // duyệt lại — cùng luật đếm của màn Ca thi.
+  const rEm = await env.DB.prepare(
+    `SELECT l.sbd, COALESCE(NULLIF(l.ho_ten,''), d.ho_ten, '') AS ten
+       FROM luot l LEFT JOIN danh_sach d ON d.sbd = l.sbd
+      WHERE l.ma_ca = ? AND l.trang_thai <> 'duoc_duyet_lai'
+      GROUP BY l.sbd`,
+  )
+    .bind(maCa)
+    .all<{ sbd: string; ten: string }>()
+  const dsEm = rEm.results ?? []
+  if (dsEm.length === 0) return ra({ ok: false, error: 'Ca này chưa có em nào vào thi' })
+
+  const nay = new Date()
+  const giaoLuc = nay.toISOString()
+  const hanNop = new Date(nay.getTime() + HAN_BTVN_GIO * 3600 * 1000).toISOString()
+  const maBtvn = `${maCa}-${maDe}-${nay.getTime().toString(36)}`
+
+  const lenh: D1PreparedStatement[] = [
+    env.DB.prepare(
+      `INSERT INTO btvn (ma_btvn, ma_ca, ma_de, so_cau, giao_luc, han_nop, da_xoa, cap_nhat_luc)
+       VALUES (?,?,?,?,?,?,0,?)`,
+    ).bind(maBtvn, maCa, maDe, Number(de.so_cau) || 0, giaoLuc, hanNop, giaoLuc),
+  ]
+  for (const e of dsEm) {
+    lenh.push(
+      env.DB.prepare('INSERT INTO btvn_em (khoa, ma_btvn, sbd, ho_ten) VALUES (?,?,?,?)').bind(`${maBtvn}|${e.sbd}`, maBtvn, String(e.sbd), String(e.ten ?? '')),
+    )
+  }
+  for (let i = 0; i < lenh.length; i += 150) await env.DB.batch(lenh.slice(i, i + 150))
+  return ra({ ok: true, maBtvn, soEm: dsEm.length, soCau: Number(de.so_cau) || 0, hanNop })
+}
+
+/** EM MỞ BÀI TẬP CỦA MÌNH. Đường CÔNG KHAI — em chỉ có mã ca và số báo danh.
+ *
+ * CHẶN QUÁ HẠN Ở ĐÂY, không chỉ ẩn nút bên máy em: giờ máy em chỉnh được. */
+async function btvnCuaEm(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const maCa = String(b.maCa ?? '').trim()
+  const sbd = String(b.sbd ?? '').trim()
+  if (!maCa || !sbd) return ra({ ok: false, lyDo: 'thieu' })
+
+  const bt = await env.DB.prepare('SELECT * FROM btvn WHERE ma_ca = ? AND da_xoa = 0 ORDER BY giao_luc DESC LIMIT 1')
+    .bind(maCa)
+    .first<Record<string, unknown>>()
+  if (!bt) return ra({ ok: false, lyDo: 'chua_giao', error: 'Ca này chưa được giao bài tập về nhà' })
+
+  const maBtvn = String(bt.ma_btvn ?? '')
+  const em = await env.DB.prepare('SELECT * FROM btvn_em WHERE khoa = ?').bind(`${maBtvn}|${sbd}`).first<Record<string, unknown>>()
+  if (!em) return ra({ ok: false, lyDo: 'khong_duoc_giao', error: 'Em không có bài tập của ca này' })
+
+  const hanMs = mocMs(String(bt.han_nop ?? ''))
+  const quaHan = hanMs > 0 && Date.now() > hanMs
+  if (quaHan && !em.nop_luc) {
+    return ra({ ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN', hanNop: String(bt.han_nop ?? '') })
+  }
+
+  // Gói đề đầy đủ nằm ở R2 `kho/`. TRẢ NGUYÊN GÓI, đúng thứ tự kho.
+  let goi: unknown = null
+  if (env.DE) {
+    const o = await env.DE.get(`kho/${String(bt.ma_de ?? '')}.json`)
+    if (o?.body) {
+      try {
+        goi = await new Response(o.body).json()
+      } catch {
+        goi = null
+      }
+    }
+  }
+  if (!goi) return ra({ ok: false, lyDo: 'mat_goi_de', error: 'Chưa tải được đề bài tập' })
+
+  return ra({
+    ok: true,
+    maBtvn,
+    hanNop: String(bt.han_nop ?? ''),
+    giaoLuc: String(bt.giao_luc ?? ''),
+    daNop: !!em.nop_luc,
+    nopLuc: String(em.nop_luc ?? ''),
+    soDung: em.so_dung === null || em.so_dung === undefined ? null : Number(em.so_dung),
+    soCau: Number(bt.so_cau) || 0,
+    de: goi,
+  })
+}
+
+/** EM NỘP BÀI TẬP. Đường công khai; chặn quá hạn lần nữa ở đây. */
+async function nopBtvn(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const maBtvn = String(b.maBtvn ?? '').trim()
+  const sbd = String(b.sbd ?? '').trim()
+  if (!maBtvn || !sbd) return ra({ ok: false, lyDo: 'thieu' })
+
+  const bt = await env.DB.prepare('SELECT han_nop FROM btvn WHERE ma_btvn = ? AND da_xoa = 0').bind(maBtvn).first<{ han_nop: string }>()
+  if (!bt) return ra({ ok: false, lyDo: 'khong_co' })
+  const hanMs = mocMs(String(bt.han_nop ?? ''))
+  if (hanMs > 0 && Date.now() > hanMs) return ra({ ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN' })
+
+  const nay = new Date().toISOString()
+  // KHOÁ CHỐNG TRÙNG nằm trong WHERE: nộp rồi thì câu này không đổi dòng nào.
+  const r = await env.DB.prepare(
+    `UPDATE btvn_em SET nop_luc = ?, so_dung = ?, so_cau = ?, dap_an_json = ?
+      WHERE khoa = ? AND nop_luc IS NULL`,
+  )
+    .bind(nay, Number(b.soDung) || 0, Number(b.soCau) || 0, JSON.stringify(b.dapAn ?? {}), `${maBtvn}|${sbd}`)
+    .run()
+  if (r.meta.changes === 0) {
+    const da = await env.DB.prepare('SELECT nop_luc FROM btvn_em WHERE khoa = ?').bind(`${maBtvn}|${sbd}`).first<{ nop_luc: string }>()
+    if (da?.nop_luc) return ra({ ok: true, daNhan: true, nopLuc: da.nop_luc })
+    return ra({ ok: false, lyDo: 'khong_duoc_giao' })
+  }
+  return ra({ ok: true, nopLuc: nay })
+}
+
+/** THẦY THEO DÕI — đã nộp / chưa nộp, kèm tên em chưa nộp để nhắc. */
+async function theoDoiBtvn(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const maCa = String(b.maCa ?? '').trim()
+  const r = maCa
+    ? await env.DB.prepare('SELECT * FROM btvn WHERE ma_ca = ? AND da_xoa = 0 ORDER BY giao_luc DESC').bind(maCa).all<Record<string, unknown>>()
+    : await env.DB.prepare('SELECT * FROM btvn WHERE da_xoa = 0 ORDER BY giao_luc DESC LIMIT 50').all<Record<string, unknown>>()
+
+  const ds = []
+  for (const bt of r.results ?? []) {
+    const maBtvn = String(bt.ma_btvn ?? '')
+    const em = await env.DB.prepare('SELECT sbd, ho_ten, nop_luc, so_dung, so_cau FROM btvn_em WHERE ma_btvn = ? ORDER BY sbd')
+      .bind(maBtvn)
+      .all<Record<string, unknown>>()
+    const dsEm = em.results ?? []
+    ds.push({
+      maBtvn,
+      maCa: String(bt.ma_ca ?? ''),
+      maDe: String(bt.ma_de ?? ''),
+      soCau: Number(bt.so_cau) || 0,
+      giaoLuc: String(bt.giao_luc ?? ''),
+      hanNop: String(bt.han_nop ?? ''),
+      quaHan: mocMs(String(bt.han_nop ?? '')) > 0 && Date.now() > mocMs(String(bt.han_nop ?? '')),
+      tong: dsEm.length,
+      daNop: dsEm.filter((x) => x.nop_luc).length,
+      // Tên em CHƯA nộp, để thầy nhắc đúng người.
+      chuaNop: dsEm.filter((x) => !x.nop_luc).map((x) => ({ sbd: String(x.sbd ?? ''), hoTen: String(x.ho_ten ?? '') })),
+    })
+  }
+  return ra({ ok: true, ds })
+}
+
+// ===========================================================================
 // KHỐI C — KHO ĐỀ
 //
 // Đây là thứ DUY NHẤT phải chuyển sang NGUYÊN VẸN (thầy chốt 11/09 tối: "đẩy
@@ -1664,6 +1871,8 @@ export default {
     if (p === '/nop') return nop(env, b)
     if (p === '/trang-thai') return dayTrangThai(env, b)
     if (p === '/phong-cho') return ghiPhongCho(env, b)
+    if (p === '/btvn/cua-em') return btvnCuaEm(env, b)
+    if (p === '/btvn/nop') return nopBtvn(env, b)
 
     // Lệnh của THẦY — đòi mã bí mật.
     if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
@@ -1693,6 +1902,8 @@ export default {
     if (p === '/kho/lay') return layDeKho(env, String(b.maDe ?? ''))
     if (p === '/kho/xoa') return xoaDeKho(env, b)
     if (p === '/kho/rut-cau') return rutCau(env, b)
+    if (p === '/btvn/giao') return giaoBtvn(env, b)
+    if (p === '/btvn/theo-doi') return theoDoiBtvn(env, b)
     if (p === '/dong-bo/dau') return ghiDauDongBo(env, b)
     if (p === '/cho') return xemPhongCho(env, String(b.maCa ?? ''))
 

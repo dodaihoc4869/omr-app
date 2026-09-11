@@ -774,6 +774,10 @@ export async function publishSession(
           anHanGiay: moc.giuDeDoc === true ? moc.anHanGiay || 3 : 0,
         },
         bank,
+        // Ngân hàng CÓ đáp án — chỉ gửi khi ca công bố điểm NGAY. Worker cất sau
+        // khoá riêng để trả cho em lúc nộp, và nhờ đó máy em thôi phải gọi Apps
+        // Script ở lượt cuối cùng còn lại.
+        congBoDiem === 'ngay' ? keyBank : undefined,
       )
       return true
   })()
@@ -905,6 +909,23 @@ export async function submitAnswers(
   // Vẫn gọi Apps Script sau: điểm và đáp án công bố ngay do bên đó tính.
   const chMoi = await layCauHinhMayChu()
   const daCat = await nopMoi(chMoi, maCa, sbd, dapAn, integrity, giayCau)
+
+  // MÁY CHỦ MỚI ĐÃ TRẢ LỜI ĐỦ ⇒ THÔI GỌI APPS SCRIPT.
+  //
+  // Đây là lượt gọi Apps Script CUỐI CÙNG còn sót trong đường của em. Trước
+  // đợt này, bài đã cất vào D1 xong mà vẫn phải gọi sang bên kia chỉ để lấy
+  // `keyBank` và cờ `congBo` — tức mỗi em vẫn nện một lượt vào cái cửa xếp
+  // hàng theo khoá toàn cục, đúng chỗ treo mà cả việc chuyển máy chủ sinh ra
+  // để bỏ.
+  //
+  // ĐỦ nghĩa là: ca KHÔNG công bố điểm (không cần đáp án), hoặc có công bố và
+  // ngân hàng đã nằm sẵn trên máy chủ mới. Thiếu một trong hai thì vẫn đi
+  // đường cũ — em nộp xong nhìn màn trắng còn tệ hơn chậm.
+  if (daCat?.ok) {
+    const cb = String(daCat.congBo ?? '')
+    if (cb === 'khong' || cb === 'ca_lop_xong') return { keyBank: null, congBo: cb as CongBoDiem }
+    if (cb === 'ngay' && daCat.keyBank) return { keyBank: daCat.keyBank as KeyBank, congBo: 'ngay' }
+  }
 
   try {
     const result = await postCoThuLai(scriptUrl, { action: 'submit', maCa, sbd, maDe, dapAn, integrity, lanThu, idThietBi, giayCau }, HAN_GIAY_DONG_NGUOI)
