@@ -191,3 +191,37 @@ chỉ trên phần của mình. Cây kiểm lấy bằng `git archive HEAD` nên
 **Bài học ghi to:** trước khi viết vòng lặp gọi máy chủ N lần, hỏi xem máy chủ
 đã trả sẵn thứ mình định tự tính chưa. Ở đây câu trả lời là **rồi**, và nó nằm
 ngay trong lượt gọi đầu tiên.
+
+### 11/09 16h40 — PHÁT HIỆN LỚN: học sinh chưa bao giờ chạm máy chủ mới
+
+Tra ca thật 237124 đang chạy:
+
+```
+ca có trên D1 : có    mốc bắt đầu : 16h10:24 (đã sang)    trạng thái : mở
+lượt thi trên D1 : 0    em ở phòng chờ : 0    báo trạng thái : 0
+```
+
+**NGUYÊN NHÂN GỐC:** `MAC_DINH_MAY_CHU.BAT = false`, và chỗ DUY NHẤT ghi cấu
+hình là `KhoiMayChuMoi.tsx` — màn Cài đặt trong app của thầy. Không có đường nào
+đưa cấu hình ấy sang máy học sinh. Nên với mọi máy của em, cờ luôn TẮT và
+`vaoThiQuaMayChuMoi` trả `null` ngay dòng đầu (`if (!ch.BAT) return null`).
+
+**Toàn bộ phần tăng tốc của ngày 11/09 chưa tới được học sinh một giây nào.**
+Máy chủ mới tới giờ chỉ phục vụ: lượt thầy đẩy ca, và các lượt đo tải.
+
+**Vì sao tôi không thấy sớm hơn:** tôi đo bằng trang `/do-tai` do chính Worker
+phục vụ — nó gọi thẳng Worker nên lúc nào cũng 0 lỗi, và che mất câu hỏi đáng
+lẽ phải hỏi từ sáng: *máy của em lấy địa chỉ máy chủ mới ở đâu?* Câu trả lời là
+**không ở đâu cả**.
+
+**Cách chữa:** link mời đã mang sẵn `?examCode=...&api=<Apps Script>`, và
+`ExamTakeScreen` đọc tham số `api` rồi `saveScriptUrl`. Thêm địa chỉ máy chủ mới
+vào link y hệt cách ấy là mọi máy em tự có. Một tham số.
+
+- [ ] Đưa địa chỉ máy chủ mới vào link của em (làm TRƯỚC mọi việc khác) | bằng chứng: (chưa có)
+- [ ] Chuyển `chiTietCa` sang D1 — thầy báo 16h30 "vào chi tiết ca vẫn chậm" | bằng chứng: (chưa có)
+- [ ] Mục Phân công + giao BTVN | bằng chứng: (chưa có)
+
+**Bài học ghi to thứ hai trong ngày:** đo bằng công cụ chạy trên máy chủ thì chỉ
+chứng minh máy chủ sống. Muốn biết NGƯỜI DÙNG có đi qua đó không thì phải đếm ở
+chỗ dữ liệu của người dùng đọng lại — ở đây là bảng `luot` và `phong_cho`.
