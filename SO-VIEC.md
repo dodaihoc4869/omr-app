@@ -469,3 +469,18 @@ Script là dựng CÁI THƯỚC, không phải chuyển lệnh.
 - [ ] Đổi MA_BI_MAT (đã lộ trong ảnh chụp 10/09) rồi cập nhật Secret Cloudflare
 - [x] Nút "Đồng bộ ngược" đã gỡ; bảng đối chiếu đổi thành bảng ĐẾM một bên | bằng chứng: xoá dong-bo-nguoc.ts, test cai-thuoc-doi-chieu 13 xanh
 - [ ] `nopKhacPhucTheoCa` trả `qidSai` rỗng — chưa lưu danh sách câu sai của lượt nộp khắc phục
+
+## 12/09 rạng sáng — RÀ SOÁT TRƯỚC CA THẬT 9H
+- [x] "rà soát lại toàn bộ... kể cả thuật toán ẩn sau việc rút đề, phân câu" | bằng chứng: 6 lỗi thật tìm ra, test ra-soat-truoc-ca-that-1209 (22 phép kiểm)
+- [x] "những thứ trong ảnh đã xong thì xoá bỏ hoặc làm gọn lại" | bằng chứng: KhoiMayChuMoi 330 → 211 dòng, còn 3 việc; hàng chip nhóm thành một dòng vuốt ngang
+- [x] "phần nộp btvn làm chuẩn html... theo chuẩn của html rút câu hỏi khắc phục" | bằng chứng: dungPhieuBtvn đi qua parseKhoDeJson → buildTeacherSourceFromKhoDe → cauLuyenTuNguon → dungPhieu
+- [x] "thiết kế lại tinh tế hơn và cho tick chọn nhiều ca" | bằng chứng: thẻ ca 56px, tick nhiều, một dòng giao cho mỗi ca
+- [ ] "xoá máy chủ scrip" — app đã 0% Google; ngừng deployment trên Google hoãn tới SAU ca 9h (Sheet là nơi duy nhất còn lịch sử điểm trước 11/09)
+
+### Sáu lỗi tìm ra trong lượt rà (đều đã sửa)
+1. Bấm "Bắt đầu thi" lần hai ghi đè mốc ⇒ đồng hồ cả lớp chạy lại từ đầu
+2. Cổng PHẠM VI ca không được kiểm ⇒ ca "chọn từng em"/"theo khối" ai cũng vào
+3. Em được duyệt thi lại vào sai lượt, bài rơi vào khoảng không
+4. Cấu hình còn cờ tắt ⇒ một bản ghi cũ đủ hỏng cả ca
+5. Bản đồ đề riêng gửi cả lớp cho từng em; thiếu phần của em thì phát đề sai
+6. Phiếu BTVN mất sạch phương án (đọc sai khoá gói kho)
