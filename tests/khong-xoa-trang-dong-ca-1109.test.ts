@@ -68,7 +68,8 @@ describe('① ĐẨY MỘT PHẦN KHÔNG ĐƯỢC XOÁ PHẦN CÒN LẠI', () =>
   })
 
   it('`dayMocBatDauMoi` gửi cờ chiMoc', () => {
-    const han = DAY.slice(DAY.indexOf('export async function dayMocBatDauMoi('), DAY.indexOf('export async function dayMocBatDauMoi(') + 700)
+    const i = DAY.indexOf('export async function dayMocBatDauMoi(')
+    const han = DAY.slice(i, DAY.indexOf('\n}', i))
     expect(han).toContain('chiMoc: true')
   })
 })
