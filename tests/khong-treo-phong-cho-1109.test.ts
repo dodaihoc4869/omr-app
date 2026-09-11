@@ -121,7 +121,10 @@ describe('VẾ 3 — nối đúng vào đường đi thật', () => {
 describe('VẾ 4 — thầy phải biết ngay lúc bấm Bắt đầu', () => {
   it('`batDauThi` ĐỌC kết quả đẩy, không gọi suông', () => {
     expect(API).toContain('chuaSangMayChuMoi = !xong')
-    expect(API).toContain('const xong = await dayCaMoi(chMoi, secret, {')
+    // 11/09 tối: lượt đẩy này đổi sang `dayMocBatDauMoi` — đẩy đầy đủ ở đây ghi
+    // đè tên ca, lớp, hạn vào phòng bằng rỗng (ca thật 704066). Luật cũ giữ
+    // nguyên: phải ĐỌC kết quả, không gọi suông.
+    expect(API).toContain('const xong = await dayMocBatDauMoi(')
   })
 
   it('lỗi ném ra cũng tính là chưa sang', () => {
