@@ -152,3 +152,53 @@ describe('LỖI 5 — đề riêng: chỉ đưa phần của chính em, thiếu 
     expect(API).toContain('mỗi em một đề riêng')
   })
 })
+
+describe('CÂU GHI CA — số cột, số dấu hỏi và số tham số phải khớp', () => {
+  // Đợt này thêm 5 cột vào câu ghi ca. Lệch một dấu hỏi là D1 ném lỗi giữa lúc
+  // thầy bấm Mở ca, và TypeScript không bắt được vì SQL chỉ là chuỗi.
+  const HAM = WK.slice(WK.indexOf('async function dayCa('), WK.indexOf('async function batDauThi('))
+
+  it('số cột = số dấu hỏi + số hằng trong VALUES', () => {
+    const cot = HAM.slice(HAM.indexOf('INSERT INTO ca ('), HAM.indexOf(')\n     VALUES'))
+      .replace('INSERT INTO ca (', '')
+      .split(',')
+      .map((x) => x.trim())
+      .filter(Boolean)
+    const values = HAM.slice(HAM.indexOf('VALUES ('), HAM.indexOf(')\n     ON CONFLICT'))
+    const oTrong = (values.match(/\?/g) ?? []).length
+    const hang = (values.match(/,1\)?$|,1,/g) ?? []).length
+    expect(cot.length, `cột: ${cot.length}, ? : ${oTrong}`).toBe(oTrong + hang)
+  })
+
+  it('số tham số bind = số dấu hỏi', () => {
+    const values = HAM.slice(HAM.indexOf('VALUES ('), HAM.indexOf(')\n     ON CONFLICT'))
+    const oTrong = (values.match(/\?/g) ?? []).length
+    const iBind = HAM.indexOf('.bind(', HAM.indexOf('ON CONFLICT(ma_ca)'))
+    const bind = HAM.slice(iBind + '.bind('.length)
+    // Đếm tham số ở mức ngoài cùng, dừng đúng ở dấu ngoặc đóng của `.bind(`.
+    let sau = 0
+    let dem = 1
+    let coChu = false
+    for (const ch of bind) {
+      if (ch === '(' || ch === '{' || ch === '[') sau++
+      else if (ch === ')' && sau === 0) break
+      else if (ch === ')' || ch === '}' || ch === ']') sau--
+      else if (ch === ',' && sau === 0) {
+        // Dấu phẩy cuối cùng (trailing comma) không mở thêm tham số: chỉ tính
+        // khi sau nó còn có chữ.
+        dem += coChu ? 1 : 0
+        coChu = false
+        continue
+      }
+      if (!/\s/.test(ch)) coChu = true
+    }
+    if (!coChu) dem--
+    expect(dem, `bind: ${dem}, ? : ${oTrong}`).toBe(oTrong)
+  })
+
+  it('năm cột mới đều có mặt ở cả ba chỗ: danh sách cột, nhánh cập nhật, và bind', () => {
+    for (const c of ['pham_vi', 'len_bang', 'de_rieng', 'pham_vi_hoi_lai', 'danh_sach_chon_json']) {
+      expect(HAM.split(c).length - 1, c).toBeGreaterThanOrEqual(2)
+    }
+  })
+})
