@@ -13,6 +13,7 @@ import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
 import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi, xongNapDiaChi } from './may-chu-moi'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
 import { chiTietCaMoi, danhSachEmMoi, dayCaMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, luotCuaCaMoi, napDayDuCaMoi, suaCaMoi, type OSuaCa } from './day-ca-may-chu-moi'
+import { theoGhiSheet } from './ghi-sheet-nen'
 import { daBatDauTheoDuongCu, ghiNhoDaBatDauDuongCu, nenDoiChieu } from './doi-chieu-phong-cho'
 import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu } from './man-ca-may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
@@ -748,10 +749,9 @@ export async function publishSession(
   // Nay tốn `max(AppsScript, D1)`. Và quan trọng hơn tốc độ: gói đề lên R2 và
   // dòng ca vào D1 KHÔNG còn bị chặn sau lượt Sheet, nên Apps Script chậm hay
   // hỏng thì ca VẪN sẵn sàng trên máy chủ mới cho cả lớp vào thi.
-  const dayMayChuMoi = (async () => {
-    try {
+  const dayMayChuMoi = (async (): Promise<boolean> => {
       const chMoi = await layCauHinhMayChu()
-      if (!chMoi.BAT || !chMoi.URL) return
+      if (!chMoi.BAT || !chMoi.URL) return false
       const matThay = await loadTeacherSecret()
       await dayCaMoi(
         chMoi,
@@ -775,13 +775,20 @@ export async function publishSession(
         },
         bank,
       )
-    } catch {
-      // không chặn việc mở ca vì một đường tắt
-    }
+      return true
   })()
 
-  const [result] = await Promise.all([
-    postJson(scriptUrl, {
+  // LƯỢT GHI SHEET — DỰNG SẴN, CHẠY NỀN, KHÔNG ĐỢI.
+  //
+  // Đo ca 112480 lúc 19h07: D1 có ca sau 1,15 giây; phần còn lại thầy ngồi chờ
+  // là Apps Script ghi gói đề vào bảng. Đợi nó xong mới trả về thì mở ca không
+  // bao giờ nhanh được, dù hai lượt đã chạy song song.
+  //
+  // ĐÁNH ĐỔI, và nó được canh bằng `ghi-sheet-nen.ts`: ca không lên Sheet là
+  // hỏng đường điểm và đường Zalo. Nên trạng thái từng ca được giữ lại, màn
+  // hình HIỆN RA, và có nút thử lại. Im lặng là thứ duy nhất bị cấm.
+  const ghiSheet = async () => {
+    const kq = await postJson(scriptUrl, {
     action: 'publish',
     maCa,
     lop,
@@ -808,12 +815,33 @@ export async function publishSession(
     phongCho: moc.phongCho === true,
     deRieng: moc.deRieng === true,
     phamViHoiLai: moc.phamViHoiLai === 'ba_ca' ? 'ba_ca' : 'gan_nhat',
-    }),
-    dayMayChuMoi,
-  ])
-  if (!result.ok) throw new Error(result.error || 'Mở ca kiểm tra thất bại')
+    })
+    if (!kq.ok) throw new Error(kq.error || 'Mở ca kiểm tra thất bại')
+  }
 
-  return { batDau: String(result.batDau || ''), hetHanVao: String(result.hetHanVao || '') }
+  // CHỜ MÁY CHỦ MỚI, KHÔNG CHỜ SHEET — nhưng CHỈ khi máy chủ mới thật sự nhận
+  // được ca. Ca có trên D1 và gói đề có trên R2 là cả lớp vào thi được, đúng
+  // đường 29 lượt của ca 704066 tối nay đã đi.
+  //
+  // Cờ TẮT, hoặc đẩy hỏng ⇒ QUAY VỀ LUẬT CŨ: đợi Sheet ghi xong rồi mới trả
+  // lời. Chậm, nhưng ca chắc chắn tồn tại ở một nơi nào đó. Trả lời "đã mở" khi
+  // ca không nằm ở đâu cả là thứ tệ nhất có thể làm ở màn này.
+  let daLenMayChuMoi = false
+  try {
+    daLenMayChuMoi = await dayMayChuMoi
+  } catch {
+    daLenMayChuMoi = false
+  }
+
+  if (!daLenMayChuMoi) {
+    await ghiSheet()
+    xoaBoDemCa()
+    return { batDau: batDauISO, hetHanVao: hetHanISO }
+  }
+
+  theoGhiSheet(maCa, ghiSheet)
+  xoaBoDemCa()
+  return { batDau: batDauISO, hetHanVao: hetHanISO }
 }
 
 /** Cập nhật bản CÓ đáp án + lời giải của một ca ĐÃ MỞ (thầy chốt đáp án, hoặc
