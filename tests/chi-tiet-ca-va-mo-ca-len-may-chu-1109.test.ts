@@ -112,7 +112,7 @@ describe('② GHI ĐIỂM SOI SANG D1 — nhưng chỉ lượt Apps Script ĐÃ 
   })
 })
 
-describe('③ MỞ CA — hai lượt ghi chạy SONG SONG, mốc giờ tính MỘT nơi', () => {
+describe('③ MỞ CA — mốc giờ tính MỘT nơi, và không xếp sau lượt ghi Sheet', () => {
   const HAM = API.slice(API.indexOf('export async function publishSession('), API.indexOf('export async function capNhatKeyBank('))
 
   it('mốc bắt đầu tính ở máy thầy rồi GỬI KÈM, để hai bên ra đúng một chuỗi', () => {
@@ -127,23 +127,23 @@ describe('③ MỞ CA — hai lượt ghi chạy SONG SONG, mốc giờ tính M�
     expect(HAM).toContain('hanPhut > 0 ? batDauMs + hanPhut * 60000 : mocMsHopLe(moc.hetHanVao)')
   })
 
-  it('đẩy máy chủ mới KHÔNG còn xếp sau lượt ghi Sheet', () => {
-    expect(HAM).toContain('const [result] = await Promise.all([')
-    expect(HAM).toContain('dayMayChuMoi,')
-    // và nó phải được dựng TRƯỚC lượt gọi Apps Script
-    expect(HAM.indexOf('const dayMayChuMoi = (async () => {')).toBeLessThan(HAM.indexOf('await Promise.all(['))
-  })
-
-  it('đẩy máy chủ mới hỏng KHÔNG chặn việc mở ca', () => {
-    const khoi = HAM.slice(HAM.indexOf('const dayMayChuMoi = (async () => {'), HAM.indexOf('const [result] = await Promise.all(['))
-    expect(khoi).toContain('} catch {')
-    expect(khoi).not.toContain('throw')
+  it('đẩy máy chủ mới dựng TRƯỚC lượt ghi Sheet, không xếp sau nó', () => {
+    // Đợt 5D cho hai lượt chạy song song. Đợt 5E (19h15 cùng ngày) đi xa hơn:
+    // trả lời NGAY khi máy chủ mới có ca, Sheet ghi ở nền. Luật giữ nguyên —
+    // lượt đẩy máy chủ mới không bao giờ được xếp sau lượt ghi Sheet.
+    expect(HAM.indexOf('const dayMayChuMoi = (async ()')).toBeLessThan(HAM.indexOf('const ghiSheet = async () =>'))
+    expect(HAM).toContain('daLenMayChuMoi = await dayMayChuMoi')
   })
 
   it('gói đề đẩy lên R2 là bản KHÔNG đáp án', () => {
-    const khoi = HAM.slice(HAM.indexOf('const dayMayChuMoi = (async () => {'), HAM.indexOf('const [result] = await Promise.all(['))
+    const khoi = HAM.slice(HAM.indexOf('const dayMayChuMoi = (async ()'), HAM.indexOf('const ghiSheet = async () =>'))
     expect(khoi).toContain('bank,')
     expect(khoi).not.toContain('keyBank')
+  })
+
+  it('cờ máy chủ mới TẮT thì trả false, không ném — và chỗ gọi quay về đợi Sheet', () => {
+    expect(HAM).toContain('if (!chMoi.BAT || !chMoi.URL) return false')
+    expect(HAM).toContain('if (!daLenMayChuMoi) {')
   })
 })
 
