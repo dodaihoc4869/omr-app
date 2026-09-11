@@ -12,7 +12,7 @@ import { chuanTenCa } from './ten-ca'
 import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
 import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi } from './may-chu-moi'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
-import { dayCaMoi, dayDanhSachMoi, luotCuaCaMoi } from './day-ca-may-chu-moi'
+import { dayCaMoi, dayDanhSachMoi, luotCuaCaMoi, suaCaMoi, type OSuaCa } from './day-ca-may-chu-moi'
 import { daBatDauTheoDuongCu, ghiNhoDaBatDauDuongCu, nenDoiChieu } from './doi-chieu-phong-cho'
 import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu } from './man-ca-may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
@@ -935,6 +935,7 @@ export async function luuTam(scriptUrl: string, maCa: string, sbd: string, dapAn
 export async function khoaCa(scriptUrl: string, secret: string, maCa: string, khoaBoi = 'thầy'): Promise<{ soEmBiNop: number; khoaLuc: string }> {
   const r = await postJson(scriptUrl, { action: 'khoaCa', secret, maCa, khoaBoi })
   if (!r.ok) throw new Error(r.error || 'Không khoá được ca')
+  await soiCaSangMayChuMoi(secret, maCa, { trangThai: String(r.trangThai || 'dong') })
   // Danh sách ca vừa đổi — bỏ đệm để lượt hỏi tiếp theo thấy ngay.
   xoaBoDemCa()
   return { soEmBiNop: Number(r.soEmBiNop) || 0, khoaLuc: String(r.khoaLuc || '') }
@@ -947,6 +948,11 @@ export async function khoaCa(scriptUrl: string, secret: string, maCa: string, kh
 export async function moKhoaCa(scriptUrl: string, secret: string, maCa: string): Promise<{ goHanVao: boolean }> {
   const r = await postJson(scriptUrl, { action: 'moKhoaCa', secret, maCa })
   if (!r.ok) throw new Error(r.error || 'Không mở lại được ca')
+  // Mở khoá có thể kèm GỠ HẠN VÀO PHÒNG — gỡ rồi thì HetHanVao bên Sheet trống.
+  await soiCaSangMayChuMoi(secret, maCa, {
+    trangThai: String(r.trangThai || 'mo'),
+    ...((r as { goHanVao?: boolean }).goHanVao ? { hetHanVao: '' } : {}),
+  })
   // Danh sách ca vừa đổi — bỏ đệm để lượt hỏi tiếp theo thấy ngay.
   xoaBoDemCa()
   return { goHanVao: !!(r as { goHanVao?: boolean }).goHanVao }
@@ -994,6 +1000,7 @@ export async function dongBoTenCa(scriptUrl: string, secret: string, maCa: strin
 export async function doiTenCa(scriptUrl: string, secret: string, maCa: string, tenCa: string): Promise<{ tenCa: string }> {
   const r = await postJson(scriptUrl, { action: 'doiTenCa', secret, maCa, tenCa: chuanTenCa(tenCa) })
   if (!r.ok) throw new Error(r.error || 'Không đổi được tên ca')
+  await soiCaSangMayChuMoi(secret, maCa, { tenCa: String((r as { tenCa?: string }).tenCa ?? chuanTenCa(tenCa)) })
   // Danh sách ca vừa đổi — bỏ đệm để lượt hỏi tiếp theo thấy ngay.
   xoaBoDemCa()
   return { tenCa: String((r as { tenCa?: string }).tenCa ?? '') }
@@ -2431,16 +2438,38 @@ export async function danhDauDaChua(scriptUrl: string, secret: string, maCa: str
   return Number(r.soDong) || 0
 }
 
+/** SOI MỘT THAO TÁC CỦA THẦY SANG MÁY CHỦ MỚI.
+ *
+ * Màn Ca thi đọc D1 từ 11/09. Lệnh nào đổi dòng ca bên Apps Script mà không soi
+ * sang đây thì thầy nhìn màn hình thấy y như chưa làm gì — đúng lỗi "tôi không
+ * xoá được ca này" (ca 432566, 11/09).
+ *
+ * Không bao giờ ném lỗi: việc bên Apps Script đã xong, soi hỏng thì lượt tải
+ * danh sách sau sẽ chép lại. Trả `false` để chỗ gọi ghi nhật ký nếu muốn. */
+async function soiCaSangMayChuMoi(secret: string, maCa: string, dat: OSuaCa): Promise<boolean> {
+  try {
+    const chMoi = await layCauHinhMayChu()
+    return await suaCaMoi(chMoi, secret, maCa, dat)
+  } catch {
+    return false
+  }
+}
+
 /** Xoá MỀM một ca — phải gõ lại đúng mã ca (xacNhan). Bài làm/điểm giữ nguyên trên Sheet. */
 export async function xoaCa(scriptUrl: string, secret: string, maCa: string, xacNhan: string): Promise<void> {
   const r = await postJson(scriptUrl, { action: 'xoaCa', secret, maCa, xacNhan })
   if (!r.ok) throw new Error(r.error || 'Không xoá được ca')
+  // Apps Script ghi đúng hai ô: TrangThai = 'da_xoa' và XoaLuc = lúc này.
+  await soiCaSangMayChuMoi(secret, maCa, { trangThai: 'da_xoa', xoaLuc: new Date().toISOString() })
+  xoaBoDemCa()
 }
 
 /** Khôi phục một ca đã xoá mềm — bài làm vẫn còn nguyên nên lấy lại được. */
 export async function khoiPhucCa(scriptUrl: string, secret: string, maCa: string): Promise<void> {
   const r = await postJson(scriptUrl, { action: 'khoiPhucCa', secret, maCa })
   if (!r.ok) throw new Error(r.error || 'Không khôi phục được ca')
+  // Apps Script đưa về đúng 'mo' và xoá trắng XoaLuc — không đoán, đọc thẳng mã.
+  await soiCaSangMayChuMoi(secret, maCa, { trangThai: 'mo', xoaLuc: '' })
   // Danh sách ca vừa đổi — bỏ đệm để lượt hỏi tiếp theo thấy ngay.
   xoaBoDemCa()
 }

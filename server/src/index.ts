@@ -574,6 +574,52 @@ async function danhSachCaMoi(env: Env, daXoa: boolean): Promise<Response> {
   return ra({ ok: true, items, dauDongBo: dau ?? null, soDongLuot: Number(rDong?.n) || 0, serverNow: Date.now() })
 }
 
+/** SỬA MỘT Ô CỦA DÒNG CA — dùng cho mọi thao tác THẦY làm trên một ca đã có:
+ * xoá mềm, khôi phục, khoá, mở khoá, đổi tên.
+ *
+ * VÌ SAO PHẢI CÓ (lỗi thầy báo 11/09: "tôi không xoá được ca này"):
+ * màn Ca thi đã đọc D1, nhưng `xoaCa` và mấy lệnh cùng loại vẫn CHỈ ghi sang
+ * Apps Script. Sheet đánh dấu `da_xoa`, D1 không biết gì, và ca xoá rồi vẫn
+ * nằm nguyên trên màn hình — bấm xoá bao nhiêu lần cũng vậy.
+ *
+ * CHỈ `UPDATE`, KHÔNG `INSERT`: ca chưa có trên D1 thì trả `coCa: false` để
+ * app biết mà đẩy cả ca sang, chứ tuyệt đối không tự dựng một dòng ca thiếu
+ * dữ liệu rồi để màn Ca thi hiện ca rỗng.
+ *
+ * CHỈ những cột trong bảng dưới mới sửa được. Khoá gói đề, mốc bắt đầu thi,
+ * ba số đếm và danh sách lượt KHÔNG nằm trong đây. */
+const O_SUA_DUOC: Record<string, string> = {
+  trangThai: 'trang_thai',
+  tenCa: 'ten_ca',
+  xoaLuc: 'xoa_luc',
+  hetHanVao: 'het_han_vao',
+  congBo: 'cong_bo',
+  hanNop: 'han_nop',
+  phamVi: 'pham_vi',
+}
+
+async function suaCa(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const maCa = String(b.maCa ?? '').trim()
+  if (!maCa) return ra({ ok: false, error: 'Thiếu mã ca' })
+  const dat = (b.dat ?? {}) as Record<string, unknown>
+  const cot: string[] = []
+  const giaTri: unknown[] = []
+  for (const [ten, o] of Object.entries(O_SUA_DUOC)) {
+    if (!(ten in dat)) continue
+    cot.push(`${o} = ?`)
+    giaTri.push(String(dat[ten] ?? ''))
+  }
+  if (cot.length === 0) return ra({ ok: false, error: 'Không có ô nào để sửa' })
+
+  const co = await env.DB.prepare('SELECT ma_ca FROM ca WHERE ma_ca = ?').bind(maCa).first<{ ma_ca: string }>()
+  if (!co) return ra({ ok: true, coCa: false, soO: 0 })
+
+  await env.DB.prepare(`UPDATE ca SET ${cot.join(', ')}, cap_nhat_luc = ? WHERE ma_ca = ?`)
+    .bind(...giaTri, new Date().toISOString(), maCa)
+    .run()
+  return ra({ ok: true, coCa: true, soO: cot.length })
+}
+
 /** Mốc thời gian thành mili giây; chuỗi rỗng hay hỏng thì về 0. */
 function mocMs(s: string): number {
   const t = Date.parse(String(s || ''))
@@ -802,6 +848,7 @@ export default {
     if (p === '/ca/luot') return luotCuaCa(env, String(b.maCa ?? ''))
     if (p === '/ca/nhieu') return dayNhieuCa(env, b)
     if (p === '/ca/danh-sach') return danhSachCaMoi(env, b.daXoa === true)
+    if (p === '/ca/sua') return suaCa(env, b)
     if (p === '/dong-bo/dau') return ghiDauDongBo(env, b)
     if (p === '/cho') return xemPhongCho(env, String(b.maCa ?? ''))
 

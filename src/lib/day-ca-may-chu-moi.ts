@@ -114,3 +114,53 @@ export async function luotCuaCaMoi(
     clearTimeout(hen)
   }
 }
+
+/** Ô của dòng ca mà máy thầy được phép sửa trên máy chủ mới. Khớp đúng bảng
+ * `O_SUA_DUOC` bên Worker — thêm ô ở một bên mà quên bên kia là sửa vào khoảng
+ * không, không báo lỗi. */
+export interface OSuaCa {
+  trangThai?: string
+  tenCa?: string
+  xoaLuc?: string
+  hetHanVao?: string
+  congBo?: string
+  hanNop?: string
+  phamVi?: string
+}
+
+/** SỬA DÒNG CA TRÊN MÁY CHỦ MỚI cho khớp với việc thầy vừa làm bên Apps Script.
+ *
+ * LỖI ĐÃ DÍNH, 11/09: thầy bấm xoá ca 432566, Apps Script đánh dấu `da_xoa`,
+ * nhưng màn Ca thi nay đọc D1 nên ca vẫn nằm nguyên đó. Bấm mấy lần cũng vậy.
+ * Mọi lệnh thầy tác động lên MỘT ca đã có — xoá, khôi phục, khoá, mở khoá, đổi
+ * tên — đều phải soi sang đây.
+ *
+ * Trả `false` nghĩa là chưa soi được (cờ tắt, mạng hỏng, ca chưa lên D1). KHÔNG
+ * ném lỗi: việc bên Apps Script đã xong rồi, không được vì lượt soi này mà báo
+ * cho thầy là thao tác thất bại. */
+export async function suaCaMoi(
+  ch: CauHinhMayChu,
+  maBiMat: string,
+  maCa: string,
+  dat: OSuaCa,
+): Promise<boolean> {
+  if (!ch.BAT || !ch.URL || !maCa) return false
+  if (Object.keys(dat).length === 0) return false
+  const bo = new AbortController()
+  const hen = setTimeout(() => bo.abort(), ch.HAN_GIAY * 1000)
+  try {
+    const res = await fetch(`${ch.URL}/ca/sua`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-ma-bi-mat': maBiMat },
+      body: JSON.stringify({ maCa, dat }),
+      signal: bo.signal,
+    })
+    if (!res.ok) return false
+    const j = (await res.json()) as { ok?: boolean; coCa?: boolean }
+    return j?.ok === true && j.coCa === true
+  } catch {
+    return false
+  } finally {
+    clearTimeout(hen)
+  }
+}
