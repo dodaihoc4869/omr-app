@@ -7,7 +7,6 @@
 // Phiếu dựng bằng chính bộ `html-phieu.ts` đang dùng cho phiếu khắc phục, để
 // em nhìn thấy đúng một kiểu trang, và để không đẻ thêm một bộ dựng thứ hai.
 import type { CauHinhMayChu } from './cau-hinh-may-chu'
-import type { CauLuyen } from './bai-tap-pdf'
 import { layCauHinhMayChu, xongNapDiaChi } from './may-chu-moi'
 
 /** Cấu hình máy chủ cho đường BTVN của em. Dùng chung đường máy em vẫn tự tìm
@@ -21,65 +20,83 @@ export async function layCauHinhChoEmBtvn(): Promise<CauHinhMayChu> {
 
 /** Dựng trang bài tập về nhà.
  *
- * DÙNG LẠI KHUNG PHIẾU ĐANG CHẠY (`html-phieu.ts`), không dựng khung thứ hai:
- *   · em nhìn thấy đúng một kiểu trang, dù là phiếu khắc phục hay bài về nhà;
- *   · màu sắc lấy từ bộ mã màu chung — `npm run check:mau` cấm mã màu gõ tay
- *     ở mọi tệp ngoài `styles/tokens.css` và `lib/html-phieu.ts`, và đó là luật
- *     đúng: hai bảng màu song song là hai lần phải sửa mỗi lần đổi giao diện.
+ * DÙNG ĐÚNG BỘ PHIẾU KHẮC PHỤC (thầy chốt 12/09: "làm chuẩn html và hiển thị
+ * đầy đủ đề ảnh, công thức. Nộp được chọn đáp án được theo chuẩn của html rút
+ * câu hỏi khắc phục"). Nghĩa là gói đề đi qua ĐÚNG cửa nạp kho đang chạy:
  *
- * Gói đề trả về NGUYÊN VẸN từ kho, nên ở đây chỉ bọc lại và gắn hạn nộp —
- * KHÔNG lọc, KHÔNG xáo, KHÔNG cắt. `boLoiGiai` xoá đáp án và lời giải khỏi DỮ
- * LIỆU trước khi dựng: em bấm "xem mã nguồn" cũng không thấy đáp án. */
+ *     gói kho → parseKhoDeJson → buildTeacherSourceFromKhoDe → cauLuyenTuNguon
+ *             → dungPhieu(..., { nop })
+ *
+ * VÌ SAO PHẢI ĐI QUA CỬA ẤY, và đây là lỗi bản đầu đã dính: gói kho ghi phương
+ * án ở khoá `pa: {A,B,C,D}`, đáp án ở `dap_an`, ảnh ở `hinh`. Bản đầu tự đọc
+ * `luaChon` nên phương án MẤT SẠCH — em mở phiếu ra chỉ thấy đề bài và một ô
+ * "Đáp án: ......", không có gì để chọn. Cửa nạp kho biết đủ mọi khuôn ấy, và
+ * còn LOẠI câu thiếu phương án hay thiếu đáp án ngay tại cửa thay vì dựng một
+ * ô trống cho em ngồi đoán.
+ *
+ * Phiếu nộp được: `dungPhieu` gắn thanh nộp, chấm tại chỗ rồi gửi lên máy chủ.
+ * Đáp án KHÔNG nằm trong dữ liệu phiếu cho tới lúc em bấm nộp — máy chủ chấm
+ * lại bằng kho, không tin con số máy em gửi. */
 export async function dungPhieuBtvn(
-  r: { hanNop?: string; soCau?: number; de?: unknown; daNop?: boolean },
+  r: { hanNop?: string; soCau?: number; de?: unknown; daNop?: boolean; maBtvn?: string },
   maCa: string,
   sbd: string,
 ): Promise<string> {
-  const { taiLieuHtml, theCauHtml, boLoiGiai, thoat } = await import('./html-phieu')
-  const de = (r.de ?? {}) as Record<string, unknown>
-  const cau = docCauBtvn(de).map(veCauLuyen)
-  const han = String(r.hanNop ?? '')
-  const the = cau.map((c, i) => theCauHtml(boLoiGiai(c), i + 1, false, true, false)).join('\n')
+  const [{ dungPhieu }, { parseKhoDeJson, buildTeacherSourceFromKhoDe }, { cauLuyenTuNguon }, { layCauHinhChoEmBtvn: layCh }] = await Promise.all([
+    import('./html-phieu'),
+    import('./exam-kho-de-import'),
+    import('./bai-tap-pdf'),
+    Promise.resolve({ layCauHinhChoEmBtvn }),
+  ])
 
-  const than = `<div class="khung">
-  <div class="nhac-phieu">Bài tập về nhà · ca ${thoat(maCa)} · số báo danh ${thoat(sbd)} · ${cau.length} câu${
-    han ? ` · hạn nộp ${thoat(han)}` : ''
-  }${r.daNop ? ' · em đã nộp bài này rồi' : ''}</div>
-  <div class="ds-cau">${the}</div>
-  <div class="chan">Thầy Đỗ Đại Học · bài tập về nhà</div>
-</div>`
-  return taiLieuHtml(than, 'Bài tập về nhà')
+  const doc = parseKhoDeJson(r.de)
+  if (!doc.ok || !doc.json) {
+    // Kê hai lỗi đầu là đủ để thầy biết hỏng ở đâu; kê hết thì câu báo dài
+    // hơn màn điện thoại. Đây là cắt DANH SÁCH LỖI, không phải cắt câu hỏi.
+    const viSao = (doc.errors ?? []).filter((_, i) => i < 2).join('; ')
+    throw new Error(`Gói bài tập không đọc được: ${viSao || 'khuôn lạ'}`)
+  }
+  const dung = buildTeacherSourceFromKhoDe(doc.json)
+  const cau = cauLuyenTuNguon([dung.source])
+  if (cau.length === 0) throw new Error('Gói bài tập không có câu nào dùng được')
+
+  const ch = await layCh()
+  const han = String(r.hanNop ?? '')
+  const maBtvn = String(r.maBtvn ?? '').trim()
+
+  return dungPhieu(
+    {
+      hoTen: '',
+      sbd,
+      ngay: new Date(),
+      tenChuyenDe: 'Bài tập về nhà',
+      ketQua: '',
+      hienDapAn: false,
+      nhanBia: 'BÀI TẬP VỀ NHÀ',
+      oBia: [
+        { nhan: 'Số báo danh', gia: sbd },
+        { nhan: 'Ca', gia: maCa },
+        { nhan: 'Hạn nộp', gia: han ? gioVN(han) : '—' },
+      ],
+    },
+    cau,
+    {
+      // Đã nộp rồi thì mở thành phiếu CHỈ ĐỌC kèm lời giải — em xem lại bài,
+      // không nộp thêm lần nữa.
+      nop: r.daNop || !maBtvn ? null : { ma: maBtvn, sbd, url: `${String(ch.URL ?? '').replace(/\/+$/, '')}/goi` },
+      loiNhac: r.daNop
+        ? 'Em đã nộp bài này rồi — đây là bản xem lại, bấm vào từng câu để mở lời giải.'
+        : `Bài tập về nhà · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Làm xong bấm Nộp bài ở thanh trên.`,
+    },
+  )
 }
 
-/** Chuẩn hoá một câu của kho về khuôn `CauLuyen` mà khung phiếu đang đọc.
- *
- * Kho đề đi qua nhiều đời nên câu có hai khuôn: khuôn phiếu (`text`/`luaChon`)
- * và khuôn đề thi (`noiDung`/`phuongAn`). Nhận cả hai, và KHÔNG đoán khi lạ:
- * thiếu trường nào thì để rỗng, chỗ hiển thị tự bỏ qua. */
-function veCauLuyen(c: Record<string, unknown>): CauLuyen {
-  const phanTho = String(c.phan ?? 'I')
-  const phan: 'I' | 'II' | 'III' = phanTho === 'II' ? 'II' : phanTho === 'III' ? 'III' : 'I'
-  const pa = Array.isArray(c.luaChon) ? (c.luaChon as unknown[]) : Array.isArray(c.phuongAn) ? (c.phuongAn as unknown[]) : null
-  return {
-    phan,
-    id: String(c.id ?? c.qid ?? ''),
-    maDe: String(c.maDe ?? c.ma_de ?? ''),
-    chuyenDe: String(c.chuyenDe ?? c.chuyen_de ?? ''),
-    dang: (c.dang as CauLuyen['dang']) ?? 'chua_ro',
-    sao: (Number(c.sao) === 2 ? 2 : Number(c.sao) === 1 ? 1 : 0) as 0 | 1 | 2,
-    mucDo: (String(c.mucDo ?? c.muc_do ?? '') as CauLuyen['mucDo']) ?? '',
-    text: String(c.text ?? c.noiDung ?? c.de ?? ''),
-    luaChon: pa ? pa.map((x) => String(x ?? '')) : null,
-    dapAn: String(c.dapAn ?? c.dap_an ?? ''),
-    chot: String(c.chot ?? ''),
-    lyDo: (c.lyDo as CauLuyen['lyDo']) ?? null,
-    buoc: Array.isArray(c.buoc) ? (c.buoc as unknown[]).map((x) => String(x)) : null,
-    ketQua: String(c.ketQua ?? ''),
-    anhThanCau: typeof c.anhThanCau === 'string' ? c.anhThanCau : undefined,
-    anhLuaChon: Array.isArray(c.anhLuaChon) ? (c.anhLuaChon as (string | undefined)[]) : undefined,
-    hinh: Array.isArray(c.hinh) ? (c.hinh as CauLuyen['hinh']) : undefined,
-    bang: Array.isArray(c.bang) ? (c.bang as string[][]) : null,
-  }
+/** Giờ Việt Nam gọn cho phiếu: 20:30 ngày 13/09. */
+function gioVN(iso: string): string {
+  const d = new Date(iso)
+  if (!Number.isFinite(d.getTime())) return ''
+  const hai = (n: number) => String(n).padStart(2, '0')
+  return `${hai(d.getHours())}:${hai(d.getMinutes())} ngày ${hai(d.getDate())}/${hai(d.getMonth() + 1)}`
 }
 
 /** Rút câu từ gói đề. Nhận mọi dạng gói qua các đời, và KHÔNG đoán khi lạ. */

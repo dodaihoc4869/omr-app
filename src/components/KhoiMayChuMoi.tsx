@@ -1,18 +1,17 @@
-// CÀI ĐẶT → MÁY CHỦ MỚI (MAY-CHU-MOI.md mục 8).
+// CÀI ĐẶT → MÁY CHỦ.
 //
-// Ba thứ và chỉ ba thứ: địa chỉ · cờ bật · nút thử. Không giấu trạng thái nào
-// sau lớp chữ đẹp — thầy phải nhìn ra ngay là đang chạy đường nào.
-//
-// CỜ MẶC ĐỊNH TẮT. Bật rồi mà máy chủ mới hỏng thì từng lượt gọi TỰ rơi về
-// Apps Script, em không thấy gì khác ngoài chậm hơn một nhịp.
+// 12/09: Google đã bị cắt hẳn, nên khối này chỉ còn ba việc còn sống —
+// ĐỊA CHỈ · LẬP LẠI MỤC LỤC KHO · ĐẾM DỮ LIỆU. Những nút của thời hai máy chủ
+// (bật/tắt cờ, chuyển ca cũ, chuyển kho đề) đã làm xong việc của chúng và bị gỡ:
+// một nút không còn tác dụng nhưng vẫn nằm đó là thứ thầy sẽ bấm nhầm giữa giờ
+// dạy.
 import { useEffect, useState } from 'react'
 import { NutChinh, OThongBao } from './DesignSystem'
-import { loadCauHinhMayChu, loadScriptUrl, loadTeacherSecret, saveCauHinhMayChu } from '../lib/exam-db'
+import { loadCauHinhMayChu, loadTeacherSecret, saveCauHinhMayChu } from '../lib/exam-db'
 import { MAC_DINH_MAY_CHU, type CauHinhMayChu } from '../lib/cau-hinh-may-chu'
 import { quenCauHinhMayChu, thuKetNoi } from '../lib/may-chu-moi'
-import { napToanBoCaLenMayChuMoi } from '../lib/exam-api'
 import { CHUA_DUNG, daChuyenXong, dungBangDoiChieu, laySoMayChuMoi, type DongDoiChieu } from '../lib/doi-chieu-hai-ben'
-import { chuyenKhoDe, dungLaiChiMucKho } from '../lib/chuyen-kho-de'
+import { dungLaiChiMucKho } from '../lib/chuyen-kho-de'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }
 const O_NHAP: React.CSSProperties = {
@@ -32,12 +31,6 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
   const [ch, setCh] = useState<CauHinhMayChu>(MAC_DINH_MAY_CHU)
   const [dangThu, setDangThu] = useState(false)
   const [ketQua, setKetQua] = useState<{ ok: boolean; chu: string } | null>(null)
-  const [dangNap, setDangNap] = useState(false)
-  const [tienNap, setTienNap] = useState('')
-  const [ketNap, setKetNap] = useState<{ ok: boolean; chu: string } | null>(null)
-  const [dangKho, setDangKho] = useState(false)
-  const [tienKho, setTienKho] = useState('')
-  const [ketKho, setKetKho] = useState<{ ok: boolean; chu: string } | null>(null)
   const [dangDo, setDangDo] = useState(false)
   const [bang, setBang] = useState<DongDoiChieu[] | null>(null)
   const [loiDo, setLoiDo] = useState('')
@@ -68,16 +61,6 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
     setDangThu(false)
   }
 
-  /** CHUYỂN TOÀN BỘ CA VÀ LƯỢT THI CŨ SANG MÁY CHỦ MỚI — chạy một lần.
-   *
-   * Chỉ ĐỌC Apps Script và GHI vào D1, không xoá gì ở Sheet. Xong thì tự đối
-   * chiếu số ca và số dòng lượt hai bên; **lệch một dòng cũng không ghi dấu**,
-   * và màn Ca thi tiếp tục đọc đường cũ. Không có trạng thái nào ở giữa. */
-  /** CHUYỂN KHO ĐỀ — thứ DUY NHẤT phải mang sang nguyên vẹn.
-   *
-   * Chạy lại được: mỗi lượt tự bỏ qua đề đã có trên máy chủ mới. Chết giữa
-   * chừng thì bấm lại, nó đi tiếp từ chỗ đứt — đúng thứ lượt chuyển ca hôm
-   * 15h46 ngày 11/09 KHÔNG có, nên chết ở ca thứ 6 là mất cả lượt. */
   // DỰNG LẠI CHỈ MỤC CÂU. Tách khỏi nút chuyển kho vì hai việc khác nhau: một
   // bên chuyển GÓI ĐỀ sang, một bên lập MỤC LỤC cho gói đã sang. Kho có đủ 118
   // tờ mà mục lục rỗng thì rút câu khắc phục, câu hỏi lại và đề riêng đều trả
@@ -107,33 +90,11 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
     }
   }
 
-  async function chuyenKho() {
-    setDangKho(true)
-    setKetKho(null)
-    setTienKho('Đang chuẩn bị…')
-    try {
-      const url = (await loadScriptUrl()) ?? ''
-      const mat = (await loadTeacherSecret()) ?? ''
-      if (!url || !mat) throw new Error('Thiếu địa chỉ máy chủ hoặc mã bí mật')
-      const kq = await chuyenKhoDe(url, mat, setTienKho)
-      const con = kq.hong.length
-      setKetKho({
-        ok: con === 0,
-        chu:
-          `Kho đề: ${kq.tong} đề · đã có sẵn ${kq.daCo} · vừa đẩy ${kq.daDay}` +
-          (con > 0 ? ` · HỎNG ${con}: ${kq.hong.slice(0, 5).map((h) => h.maDe).join(', ')}${con > 5 ? '…' : ''}. Bấm lại để đẩy nốt.` : '. Xong, không đề nào hỏng.'),
-      })
-    } catch (e) {
-      setKetKho({ ok: false, chu: e instanceof Error ? e.message : 'Không chuyển được kho đề' })
-    } finally {
-      setDangKho(false)
-      setTienKho('')
-    }
-  }
 
-  /** ĐO HAI BÊN — việc đầu tiên của cả đợt bỏ Apps Script.
+
+  /** ĐẾM DỮ LIỆU TRÊN MÁY CHỦ.
    *
-   * Chỉ ĐỌC, không ghi một dòng nào ở cả hai đầu. Gọi bao nhiêu lần cũng được. */
+   * Chỉ ĐỌC, không ghi một dòng nào. Gọi bao nhiêu lần cũng được. */
   async function doHaiBen() {
     setDangDo(true)
     setBang(null)
@@ -151,52 +112,9 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
     }
   }
 
-  async function chuyenCa() {
-    if (dangNap) return
-    if (!ch.BAT || !ch.URL.trim()) return showToast('Bật máy chủ mới trước đã', 'error')
-    setDangNap(true)
-    setKetNap(null)
-    setTienNap('đang đọc danh sách ca…')
-    try {
-      const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
-      if (!url.trim() || !mat.trim()) throw new Error('Thiếu địa chỉ máy chủ hoặc mã bí mật')
-      const kq = await napToanBoCaLenMayChuMoi(url.trim(), mat.trim(), (xong, tong, viec) => {
-        setTienNap(`${xong}/${tong} · ${viec}`)
-      })
-      // NÓI RÕ LỆCH Ở ĐÂU, không chỉ nói "không khớp". Lượt chạy 15h10 báo
-      // không khớp mà không ai biết vì sao — thầy không có gì để lần.
-      const phan = [`Sheet ${kq.soCa} ca / ${kq.soLuot} lượt`, `máy chủ mới ${kq.soCaD1} ca / ${kq.soLuotD1} lượt`]
-      if (kq.lechCa !== 0) phan.push(`lệch ${kq.lechCa} ca`)
-      if (kq.lechLuot > 0) phan.push(`thiếu ${kq.lechLuot} lượt`)
-      setKetNap({
-        ok: kq.khop,
-        chu: kq.khop
-          ? `Đã chuyển và ĐỐI CHIẾU KHỚP: ${phan.join(' · ')}. Màn Ca thi từ giờ đọc máy chủ mới.`
-          : `CHƯA khớp — ${phan.join(' · ')}. Màn Ca thi vẫn đọc Apps Script như cũ.`,
-      })
-      showToast(kq.khop ? 'Màn Ca thi đã sang máy chủ mới' : 'Chưa khớp — vẫn đọc đường cũ', kq.khop ? 'success' : 'warn')
-    } catch (e) {
-      setKetNap({ ok: false, chu: e instanceof Error ? e.message : 'Không chuyển được' })
-    } finally {
-      setDangNap(false)
-      setTienNap('')
-    }
-  }
 
-  async function gatCo(bat: boolean) {
-    if (bat && !ch.URL.trim()) return showToast('Điền địa chỉ máy chủ trước đã', 'error')
-    if (bat) {
-      // KHÔNG cho bật mù. Bật khi máy chủ chưa sẵn sàng là cả lớp vào ca rồi mới
-      // phát hiện, giữa giờ thi.
-      setDangThu(true)
-      const r = await thuKetNoi(ch.URL)
-      setDangThu(false)
-      setKetQua(r)
-      if (!r.ok) return showToast('Chưa bật được — ' + r.chu, 'error')
-    }
-    await luu({ ...ch, BAT: bat })
-    showToast(bat ? 'Đã bật máy chủ mới' : 'Đã tắt — quay về Apps Script', bat ? 'success' : 'warn')
-  }
+
+
 
   return (
     <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
@@ -220,32 +138,12 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
         <NutChinh variant="phu" onClick={thu} disabled={dangThu || !ch.URL.trim()}>
           {dangThu ? 'Đang thử…' : 'Thử kết nối'}
         </NutChinh>
-        <NutChinh variant={ch.BAT ? 'nguyhiem' : undefined} onClick={() => gatCo(!ch.BAT)} disabled={dangThu}>
-          {ch.BAT ? 'Tắt, quay về Apps Script' : 'Bật máy chủ mới'}
-        </NutChinh>
+        <span style={NHAN_NHO}>{ch.URL.trim() ? 'Có địa chỉ là app chạy — không còn cờ bật/tắt.' : 'Chưa có địa chỉ thì app không gọi được lệnh nào.'}</span>
       </div>
 
       {ketQua && <OThongBao tone={ketQua.ok ? 'xanh' : 'do'}>{ketQua.chu}</OThongBao>}
 
-      <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
-        <NutChinh variant="phu" onClick={chuyenCa} disabled={dangNap || !ch.BAT}>
-          {dangNap ? 'Đang chuyển…' : 'Chuyển ca cũ sang máy chủ mới'}
-        </NutChinh>
-        {dangNap && <span style={NHAN_NHO}>{tienNap}</span>}
-      </div>
-
-      {ketNap && <OThongBao tone={ketNap.ok ? 'xanh' : 'do'}>{ketNap.chu}</OThongBao>}
-
       <div style={{ height: 1, background: 'var(--vien)', margin: 'var(--k2) 0' }} />
-
-      <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
-        <NutChinh variant="phu" onClick={chuyenKho} disabled={dangKho || !ch.URL.trim()}>
-          {dangKho ? 'Đang chuyển kho đề…' : 'Chuyển KHO ĐỀ sang máy chủ mới'}
-        </NutChinh>
-        {dangKho && <span style={NHAN_NHO}>{tienKho}</span>}
-      </div>
-
-      {ketKho && <OThongBao tone={ketKho.ok ? 'xanh' : 'do'}>{ketKho.chu}</OThongBao>}
 
       <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
         <NutChinh variant="phu" onClick={() => void lapChiMuc()} disabled={dangChiMuc || !ch.URL.trim()}>
@@ -257,15 +155,9 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
       {ketChiMuc && <OThongBao tone={ketChiMuc.ok ? 'xanh' : 'do'}>{ketChiMuc.chu}</OThongBao>}
 
       <div style={NHAN_NHO}>
-        Chỉ mục câu là MỤC LỤC của kho: rút câu khắc phục, câu hỏi lại và đề riêng
-        {' '}đều tra ở đó. Kho có đủ đề mà mục lục rỗng thì các mục ấy trả về gần như
-        {' '}rỗng. Nút này KHÔNG đẩy lại đề — nó đọc gói đã nằm trên máy chủ.
-      </div>
-
-      <div style={NHAN_NHO}>
-        Chạy lại được bao nhiêu lần cũng an toàn: mỗi lượt tự bỏ qua đề đã có bên
-        {' '}máy chủ mới. Đứt giữa chừng thì bấm lại, nó đi tiếp từ chỗ đứt.
-        {' '}Kho đề bên Google KHÔNG bị xoá.
+        Chỉ mục câu là MỤC LỤC của kho: rút câu khắc phục, câu hỏi lại và đề riêng đều
+        {' '}tra ở đó. Bấm lại sau mỗi lần nạp đề mới. Nút này KHÔNG đẩy lại đề — nó đọc
+        {' '}gói đã nằm trên máy chủ, và chạy lại bao nhiêu lần cũng an toàn.
       </div>
 
       <div style={{ height: 1, background: 'var(--vien)', margin: 'var(--k2) 0' }} />
@@ -310,21 +202,10 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
       )}
 
       <div style={NHAN_NHO}>
-        Nút trên chỉ ĐỌC Apps Script và GHI vào máy chủ mới, không xoá gì ở Google Sheet.
-        {' '}Chạy xong trong vài giây: nó chép ba số đếm Apps Script đã tính sẵn cho
-        {' '}mỗi ca, không đọc lại chi tiết từng ca.
-        {' '}Chuyển xong nó tự đối chiếu số ca và số lượt hai bên; lệch một dòng là
-        {' '}màn Ca thi vẫn đọc đường cũ — thà chậm còn hơn đếm sai số em.
+        Nút đếm chỉ ĐỌC, không sửa gì. Dùng nó khi muốn biết máy chủ đang giữ bao nhiêu
+        {' '}ca, bao nhiêu lượt, bao nhiêu câu tra được.
       </div>
 
-      <div style={NHAN_NHO}>
-        Đang chạy: <b>{ch.BAT ? 'máy chủ mới, hỏng thì tự rơi về Apps Script' : 'Apps Script như cũ'}</b>.
-        {' '}Bật cờ chỉ đổi bốn lệnh lúc thi (hỏi phòng chờ · đẩy trạng thái · lưu tạm · nộp).
-        Mọi việc khác của thầy vẫn đi Apps Script.
-      </div>
-      <div style={NHAN_NHO}>
-        Ca thật đầu tiên bật cờ nên là một lớp nhỏ và thầy ngồi xem.
-      </div>
     </div>
   )
 }

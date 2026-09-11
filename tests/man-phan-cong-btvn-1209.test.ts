@@ -79,23 +79,39 @@ describe('NÚT NỘP BTVN trên màn của em', () => {
   })
 
   it('KHÔNG lọc, KHÔNG xáo, KHÔNG cắt câu của tờ đề', () => {
-    const h = CHO_EM.slice(CHO_EM.indexOf('export async function dungPhieuBtvn('), CHO_EM.indexOf('function veCauLuyen('))
-    for (const cam of ['sort(', 'shuffle', 'slice(0,']) {
+    const h = CHO_EM.slice(CHO_EM.indexOf('export async function dungPhieuBtvn('), CHO_EM.indexOf('function gioVN('))
+    for (const cam of ['sort(', 'shuffle', '.slice(0, ']) {
       expect(h, cam).not.toContain(cam)
     }
   })
 
-  it('thoát HTML khi in nội dung câu — đề của thầy có dấu < >', () => {
-    // Phiếu nay dựng bằng CHÍNH bộ `html-phieu.ts` đang chạy cho phiếu khắc
-    // phục, nên việc thoát chữ do `thoat`/`chuHtml` bên ấy lo — một chỗ, không
-    // hai bộ dựng song song (và nhờ vậy `check:mau` không còn bắt mã màu gõ tay).
-    expect(CHO_EM).toContain("await import('./html-phieu')")
-    expect(CHO_EM).toContain('taiLieuHtml(')
-    expect(CHO_EM).toContain('theCauHtml(')
-    // Đáp án bị xoá khỏi DỮ LIỆU trước khi dựng — em xem mã nguồn cũng không thấy.
-    expect(CHO_EM).toContain('boLoiGiai(')
+  it('đi qua ĐÚNG cửa nạp kho, không tự đọc khuôn gói', () => {
+    // Lỗi bản đầu (ảnh thầy gửi 12/09): tự đọc `luaChon` trong khi gói kho ghi
+    // phương án ở `pa: {A,B,C,D}` — em mở phiếu chỉ thấy đề bài và một ô
+    // "Đáp án: ......", không có gì để chọn. Cửa nạp kho biết mọi khuôn, và
+    // còn loại câu thiếu phương án hay thiếu đáp án ngay tại cửa.
+    expect(CHO_EM).toContain("import('./exam-kho-de-import')")
+    expect(CHO_EM).toContain('parseKhoDeJson(r.de)')
+    expect(CHO_EM).toContain('buildTeacherSourceFromKhoDe(doc.json)')
+    expect(CHO_EM).toContain('cauLuyenTuNguon([dung.source])')
+    // Dựng bằng CHÍNH bộ phiếu khắc phục, nên thoát chữ, ảnh, công thức và
+    // thanh nộp đều dùng chung một chỗ.
+    expect(CHO_EM).toContain("import('./html-phieu')")
+    expect(CHO_EM).toContain('return dungPhieu(')
     const HP = fs.readFileSync(path.join(process.cwd(), 'src/lib/html-phieu.ts'), 'utf8')
     expect(HP).toContain("replace(/</g, '&lt;')")
+  })
+
+  it('phiếu NỘP ĐƯỢC, và nộp rồi thì mở ra là bản xem lại', () => {
+    expect(CHO_EM).toContain('nop: r.daNop || !maBtvn ? null :')
+    expect(CHO_EM).toContain('Em đã nộp bài này rồi')
+  })
+
+  it('hiện TRONG APP, không mở thẻ mới', () => {
+    // `window.open` trên app đã cài vào màn hình chính cho ra một thẻ
+    // `about:blank` — đúng thứ thầy chụp lại tối 12/09.
+    expect(NUT).toContain('<KhungXemPhieu')
+    expect(NUT).not.toContain('window.open')
   })
 })
 

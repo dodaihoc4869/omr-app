@@ -17,6 +17,7 @@ import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { layCauHinhMayChu } from '../lib/may-chu-moi'
 import { giaoBtvn, theoDoiBtvn, type DongTheoDoiBtvn } from '../lib/btvn-may-chu-moi'
 import HopChonDe from '../components/HopChonDe'
+import HangNhomDe from '../components/HangNhomDe'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import { loadExamSources } from '../lib/exam-db'
 import type { TeacherExamSource } from '../data/examContent'
@@ -236,34 +237,10 @@ function TheGiaoBtvn() {
               {' '}đã tick, đúng thứ tự kho.
             </div>
 
-            {/* CHIP NHÓM ĐỀ — y như màn Mở ca. */}
-            {dsNhom.length > 0 && (
-              <div className="flex flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k2)' }} role="group" aria-label="Lọc theo nhóm đề">
-                {['', ...dsNhom].map((n) => {
-                  const chon = nhomLoc === n
-                  return (
-                    <button
-                      key={n || '__tat_ca'}
-                      type="button"
-                      onClick={() => setNhomLoc(n)}
-                      className="tap-target font-bold"
-                      style={{
-                        fontFamily: 'var(--sans)',
-                        fontSize: 'var(--cx-1)',
-                        minHeight: 36,
-                        padding: '0 var(--k3)',
-                        borderRadius: 'var(--bo-tron)',
-                        background: chon ? 'var(--tim-nen)' : 'var(--the-2)',
-                        color: chon ? 'var(--tim)' : 'var(--nhat)',
-                        border: `1.5px solid ${chon ? 'var(--tim)' : 'transparent'}`,
-                      }}
-                    >
-                      {n || 'Tất cả'}
-                    </button>
-                  )
-                })}
-              </div>
-            )}
+            {/* HÀNG LỌC NHÓM — dùng chung với màn Mở ca, một dòng vuốt ngang. */}
+            <div style={{ marginBottom: 'var(--k2)' }}>
+              <HangNhomDe ds={dsNhom} chon={nhomLoc} onChon={setNhomLoc} />
+            </div>
 
             {/* ĐÚNG HỘP CHỌN ĐỀ CỦA MÀN MỞ CA — lồng nguyên, không chép lại. Sửa
                 một chỗ thì ba màn (Mở ca · Gọi lên bảng · Giao bài tập) đổi theo. */}

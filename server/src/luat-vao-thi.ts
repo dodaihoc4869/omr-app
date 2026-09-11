@@ -44,6 +44,12 @@ export function quyetDinhVaoThi(ca: DongCa | null, luot: DongLuot | null, idThie
       }
       return { ok: true, cach: 'khoi_phuc', lanThu: luot.lan_thu }
     }
+    // THẦY VỪA DUYỆT CHO THI LẠI. Lượt mới đã được tạo sẵn ở trạng thái chờ,
+    // nên em vào ĐÚNG lượt ấy — không đẻ thêm lần thử thứ ba, và KHÔNG bị hạn
+    // vào phòng chặn: thầy duyệt sau giờ đóng cửa là chuyện thường.
+    if (luot.trang_thai === 'duoc_duyet_lai') {
+      return { ok: true, cach: 'duyet_lai', lanThu: luot.lan_thu }
+    }
   }
 
   const hetHan = ms(ca.het_han_vao)

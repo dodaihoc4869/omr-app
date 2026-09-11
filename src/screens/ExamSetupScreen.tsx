@@ -7,6 +7,7 @@ import { CheckSquare, Square, Library, Copy, Check } from 'lucide-react'
 import { mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
 import KhoiRutDe from '../components/KhoiRutDe'
 import HopChonDe from '../components/HopChonDe'
+import HangNhomDe from '../components/HangNhomDe'
 import { locNguonTheoId, qidDaRaTuCacCa, type SoCauPhan } from '../lib/rut-de'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import { randomSessionCode, taoLinkMoi } from '../lib/ca-link'
@@ -451,35 +452,7 @@ export default function ExamSetupScreen() {
           </div>
         ) : (
           <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
-            {dsNhom.length > 0 && (
-              <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="group" aria-label="Lọc theo nhóm đề">
-                {['', ...dsNhom].map((n) => {
-                  const chon = nhomLoc === n
-                  return (
-                    <button
-                      key={n || '__tat_ca'}
-                      type="button"
-                      onClick={() => setNhomLoc(n)}
-                      className="tap-target font-bold"
-                      style={{
-                        fontFamily: 'var(--sans)',
-                        fontSize: 'var(--cx-1)',
-                        minHeight: 36,
-                        padding: '0 var(--k3)',
-                        borderRadius: 'var(--bo-tron)',
-                        background: chon ? 'var(--tim-nen)' : 'var(--the-2)',
-                        color: chon ? 'var(--tim)' : 'var(--nhat)',
-                        border: `1.5px solid ${chon ? 'var(--tim)' : 'transparent'}`,
-                        transitionProperty: 'background-color, color, border-color',
-                        transitionDuration: 'var(--nhanh)',
-                      }}
-                    >
-                      {n || 'Tất cả'}
-                    </button>
-                  )
-                })}
-              </div>
-            )}
+            <HangNhomDe ds={dsNhom} chon={nhomLoc} onChon={setNhomLoc} />
             {/* HỘP CHỌN ĐỀ gọn, cuộn trong hộp (thầy chốt 04-09 tối). Dùng chung
                 với Gọi lên bảng — sửa một chỗ, hai màn đổi theo. Tích tới từng
                 bài, từng dạng: trắc nghiệm · đúng sai · trả lời ngắn. */}

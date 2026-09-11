@@ -519,11 +519,119 @@ export async function baiTapCuaEm(env: Env, b: Record<string, unknown>): Promise
 // NỘP PHIẾU KHẮC PHỤC — máy chủ TỰ CHẤM, không tin con số máy em gửi lên.
 // ===========================================================================
 
+/** CHẤM VÀ GHI MỘT LƯỢT NỘP BÀI TẬP VỀ NHÀ.
+ *
+ * ĐÁP ÁN LẤY TỪ KHO, không lấy từ gói máy em gửi lên — máy em cầm bản đã xoá
+ * đáp án. Đọc đúng những tờ đề của lượt giao ấy, lọc đúng phần thầy đã tick.
+ *
+ * QUÁ HẠN THÌ TỪ CHỐI Ở ĐÂY, không chỉ ẩn nút bên máy em: giờ máy em chỉnh được. */
+async function nopBtvnQuaPhieu(
+  env: Env,
+  bt: Record<string, unknown>,
+  sbd: string,
+  lam: Record<string, unknown>,
+): Promise<Record<string, unknown>> {
+  const maBtvn = chuoi(bt.ma_btvn)
+  const han = chuoi(bt.han_nop)
+  const hanMs = han ? Date.parse(han) : NaN
+  if (Number.isFinite(hanMs) && Date.now() > hanMs) {
+    return { ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN' }
+  }
+
+  const dapAnDung: Record<string, string> = {}
+  if (env.DE) {
+    const daDoc = new Map<string, Record<string, unknown>[]>()
+    for (const m of chuoi(bt.ma_de).split(',').map((x) => x.trim()).filter(Boolean)) {
+      const { goc, phan } = goPhanMa(m)
+      if (!daDoc.has(goc)) {
+        const o = await env.DE.get(`kho/${goc}.json`)
+        if (!o?.body) {
+          daDoc.set(goc, [])
+        } else {
+          try {
+            const g = (await new Response(o.body).json()) as Record<string, unknown>
+            daDoc.set(goc, Array.isArray(g.cau) ? (g.cau as Record<string, unknown>[]) : [])
+          } catch {
+            daDoc.set(goc, [])
+          }
+        }
+      }
+      const cau = daDoc.get(goc) ?? []
+      for (const c of phan ? cau.filter((x) => chuoi(x.phan) === phan) : cau) {
+        const qid = `${goc}-${chuoi(c.phan)}-${chuoi(c.so)}`
+        const da = c.dap_an ?? c.dapAn
+        // Phần II có đáp án dạng đối tượng {a,b,c,d}; ép về chuỗi "DSDS" đúng
+        // như máy em chấm, không đoán kiểu khác.
+        dapAnDung[qid] = (typeof da === 'object' && da !== null
+          ? ['a', 'b', 'c', 'd'].map((k) => chuoi((da as Record<string, unknown>)[k])).join('')
+          : chuoi(da)
+        )
+          .trim()
+          .toUpperCase()
+      }
+    }
+  }
+
+  const qidSai: string[] = []
+  let soDung = 0
+  let soCau = 0
+  for (const [qid, dung] of Object.entries(dapAnDung)) {
+    if (!dung) continue
+    soCau++
+    const chon = chuoi(lam[qid]).trim().toUpperCase()
+    if (chon && chon === dung) soDung++
+    else qidSai.push(qid)
+  }
+
+  const nay = NAY()
+  const khoa = `${maBtvn}|${sbd}`
+  const r = await env.DB.prepare(
+    `UPDATE btvn_em SET nop_luc = ?, so_dung = ?, so_cau = ?, dap_an_json = ? WHERE khoa = ? AND nop_luc IS NULL`,
+  )
+    .bind(nay, soDung, soCau, JSON.stringify(lam), khoa)
+    .run()
+  if ((r.meta.changes ?? 0) === 0) {
+    const da = await env.DB.prepare('SELECT nop_luc, so_dung, so_cau FROM btvn_em WHERE khoa = ?').bind(khoa).first<Record<string, unknown>>()
+    // NỘP RỒI THÌ KHÔNG GHI ĐÈ. Trả lại đúng kết quả lần nộp đầu, và nói rõ là
+    // đã nhận — báo lỗi lúc này là em tưởng mất bài rồi bấm nộp lại mãi.
+    if (da?.nop_luc) {
+      return { ok: true, daNhan: true, nopLuc: chuoi(da.nop_luc), soDung: Number(da.so_dung) || 0, soCau: Number(da.so_cau) || 0, qidSai: [], lanThu: 1 }
+    }
+    return { ok: false, lyDo: 'khong_duoc_giao', error: 'Em không có bài tập của lượt này' }
+  }
+  return { ok: true, lanThu: 1, soCau, soDung, qidSai, nopLuc: nay }
+}
+
+/** Gỡ hậu tố phần khỏi mã đề — bản dùng trong tệp này (xem `goPhanKhoiMaDe`
+ * bên `index.ts`; hai nơi phải cùng một bảng hậu tố). */
+function goPhanMa(ma: string): { goc: string; phan: 'I' | 'II' | 'III' | null } {
+  const bang: [string, 'I' | 'II' | 'III'][] = [
+    ['-TN', 'I'],
+    ['-DS', 'II'],
+    ['-TLN', 'III'],
+  ]
+  for (const [duoi, phan] of bang) {
+    if (ma.endsWith(duoi)) return { goc: ma.slice(0, -duoi.length), phan }
+  }
+  return { goc: ma, phan: null }
+}
+
 export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const ma = chuoi(b.ma).trim()
   const sbd = chuoi(b.sbd).trim()
   if (!ma || !sbd) return { ok: false, error: 'Thiếu mã phiếu hoặc số báo danh' }
   const lam = (b.dapAn ?? {}) as Record<string, unknown>
+
+  // BÀI TẬP VỀ NHÀ ĐI CHUNG CỬA NÀY.
+  //
+  // Phiếu bài tập về nhà dựng bằng CHÍNH bộ phiếu khắc phục (thầy chốt 12/09:
+  // "nộp được chọn đáp án được theo chuẩn của html rút câu hỏi khắc phục"), nên
+  // nút Nộp của nó bắn ra đúng lệnh này với `ma` là MÃ LƯỢT GIAO. Viết một cửa
+  // nộp thứ hai chỉ để đổi tên trường là hai chỗ phải sửa mỗi lần đổi luật.
+  const bt = await env.DB.prepare('SELECT ma_btvn, ma_ca, ma_de, han_nop FROM btvn WHERE ma_btvn = ? AND da_xoa = 0')
+    .bind(ma)
+    .first<Record<string, unknown>>()
+  if (bt) return nopBtvnQuaPhieu(env, bt, sbd, lam)
 
   // ĐÁP ÁN LẤY TỪ GÓI PHIẾU trên R2 — không lấy từ gói máy em gửi lên.
   let dapAnDung: Record<string, string> = {}

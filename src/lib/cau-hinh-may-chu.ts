@@ -49,9 +49,17 @@ function soDuong(v: unknown, macDinh: number): number {
 export function chuanHoaMayChu(c?: Partial<CauHinhMayChu> | null): CauHinhMayChu {
   const url = String(c?.URL ?? '').trim()
   return {
-    // Không có URL thì BẬT cũng vô nghĩa — chốt ngay ở đây để mọi chỗ gọi khỏi
-    // phải nhớ kiểm hai điều kiện.
-    BAT: c?.BAT === true && url.length > 0,
+    // CÓ ĐỊA CHỈ LÀ BẬT. Không còn cờ tắt nữa.
+    //
+    // Trước 12/09, `BAT` là công tắc chuyển giữa máy chủ mới và Apps Script, và
+    // tắt thì app quay về đường cũ. Nay Apps Script đã bị cắt hẳn, nên `BAT =
+    // false` không còn nghĩa "dùng đường kia" mà thành "không dùng đường nào":
+    // máy thầy mở ca sẽ báo đẩy hỏng, máy em mất đường nhanh. Một cấu hình cũ
+    // còn sót `BAT: false` trong IndexedDB là đủ để hỏng cả một ca thi.
+    //
+    // Giữ tên trường để dữ liệu cũ đọc được, nhưng giá trị chỉ còn phụ thuộc
+    // một điều: đã điền địa chỉ hay chưa.
+    BAT: url.length > 0,
     URL: url.replace(/\/+$/, ''),
     HAN_GIAY: soDuong(c?.HAN_GIAY, MAC_DINH_MAY_CHU.HAN_GIAY),
     HAN_NONG_GIAY: soDuong(c?.HAN_NONG_GIAY, MAC_DINH_MAY_CHU.HAN_NONG_GIAY),

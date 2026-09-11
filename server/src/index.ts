@@ -70,6 +70,55 @@ export function dieuKienLuot(b: Record<string, unknown>): { sql: string; tham: u
 
 // ---------------------------------------------------------------- HỌC SINH
 
+/** CỔNG PHẠM VI CỦA CA — ai được vào ca này.
+ *
+ * LỖ HỔNG ĐÃ CÓ THẬT cho tới 12/09: Worker chỉ kiểm danh sách lớp, không kiểm
+ * phạm vi. Ca thầy mở ở chế độ "chọn từng em" hay "theo khối" thì BẤT KỲ em nào
+ * có mã ca và có tên trong danh sách lớp đều vào thi được — cổng nằm bên Apps
+ * Script, và Apps Script thì vừa bị cắt.
+ *
+ * Bốn phạm vi, đúng như màn Mở ca:
+ *   · tu_do  — ai có mã ca đều vào (cổng duy nhất là danh sách lớp);
+ *   · sbd    — cũng vậy: cổng của nó CHÍNH LÀ danh sách lớp;
+ *   · khoi   — năm sinh của em phải khớp năm sinh thầy chọn;
+ *   · chon   — số báo danh phải nằm trong danh sách thầy đã tích.
+ *
+ * THIẾU DỮ LIỆU THÌ KHÔNG CHẶN. Ca `chon` mà bảng chọn rỗng nghĩa là lượt đẩy
+ * ca thiếu trường, không phải "thầy không cho em nào vào" — chặn cả lớp vì một
+ * trường thiếu là hỏng nặng hơn hẳn việc thiếu cổng. */
+export function hopPhamVi(
+  ca: { pham_vi?: unknown; danh_sach_chon_json?: unknown },
+  em: { nam_sinh?: unknown } | null,
+  sbd: string,
+): { ok: true } | { ok: false; lyDo: 'khong_thuoc_khoi' | 'khong_trong_danh_sach'; namSinh?: string } {
+  const pv = String(ca.pham_vi ?? '').trim() || 'tu_do'
+  if (pv !== 'khoi' && pv !== 'chon') return { ok: true }
+
+  const goc = ca.danh_sach_chon_json
+  let chon: unknown = null
+  if (typeof goc === 'string' && goc.trim() !== '') {
+    try {
+      chon = JSON.parse(goc)
+    } catch {
+      chon = null
+    }
+  }
+
+  if (pv === 'khoi') {
+    const nam = String(chon ?? '').trim()
+    if (!/^\d{4}$/.test(nam)) return { ok: true }
+    const cuaEm = String(em?.nam_sinh ?? '').trim()
+    // Em chưa có năm sinh trong danh sách lớp ⇒ KHÔNG chặn: thiếu dữ liệu là
+    // lỗi của hồ sơ, và chặn ở đây thì em đứng ngoài cửa mà không ai sửa kịp.
+    if (!cuaEm) return { ok: true }
+    return cuaEm === nam ? { ok: true } : { ok: false, lyDo: 'khong_thuoc_khoi', namSinh: nam }
+  }
+
+  const ds = Array.isArray(chon) ? chon.map((x) => String(x).trim()).filter(Boolean) : []
+  if (ds.length === 0) return { ok: true }
+  return ds.includes(sbd) ? { ok: true } : { ok: false, lyDo: 'khong_trong_danh_sach' }
+}
+
 async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
   const maCa = String(b.maCa ?? '').trim()
   const sbd = String(b.sbd ?? '').trim()
@@ -93,6 +142,16 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
     // Ghi hỏng KHÔNG được đổi câu trả lời cho em.
     await ghiChanVao(env, maCa, sbd, String(b.hoTen ?? ''), String(b.namSinh ?? ''), 'khong_co_sbd').catch(() => {})
     return ra({ ok: false, lyDo: 'khong_co_sbd', thoiGianPhut: ca.thoi_gian_phut ?? 45 })
+  }
+
+  // CỔNG PHẠM VI, ngay sau cổng danh sách lớp. Ca đo tải được miễn như trên.
+  if (maCa !== CA_DO_TAI && ca) {
+    const em = await docDanhSach(env, sbd)
+    const pv = hopPhamVi(ca as unknown as { pham_vi?: unknown; danh_sach_chon_json?: unknown }, em, sbd)
+    if (!pv.ok) {
+      await ghiChanVao(env, maCa, sbd, String(b.hoTen ?? ''), String(b.namSinh ?? ''), pv.lyDo).catch(() => {})
+      return ra({ ok: false, lyDo: pv.lyDo, namSinh: pv.namSinh ?? '', thoiGianPhut: ca.thoi_gian_phut ?? 45 })
+    }
   }
 
   const cu = await docLuotMoiNhat(env, maCa, sbd)
@@ -128,10 +187,20 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
 
   // MỘT câu ghi, nguyên tử theo dòng. Không khoá toàn cục, nên 50 em vào cùng
   // lúc là 50 dòng khác nhau, không ai chờ ai.
+  //
+  // LƯỢT ĐƯỢC DUYỆT THI LẠI đã có sẵn dòng ở trạng thái chờ, nên nhánh xung đột
+  // phải ĐỔI CẢ TRẠNG THÁI VÀ ĐỒNG HỒ. Chỉ cập nhật mã máy như bản trước thì
+  // dòng ấy nằm mãi ở `duoc_duyet_lai`: em làm bài mà `/luu-tam` và `/nop` không
+  // tìm ra lượt đang làm, bài rơi vào khoảng không.
   await env.DB.prepare(
     `INSERT INTO luot (khoa, ma_ca, sbd, lan_thu, id_thiet_bi, vao_luc, het_gio_luc, trang_thai, cap_nhat_luc)
      VALUES (?, ?, ?, ?, ?, ?, ?, 'dang_lam', ?)
-     ON CONFLICT(khoa) DO UPDATE SET id_thiet_bi = excluded.id_thiet_bi, cap_nhat_luc = excluded.cap_nhat_luc`,
+     ON CONFLICT(khoa) DO UPDATE SET
+       id_thiet_bi = excluded.id_thiet_bi,
+       trang_thai = CASE WHEN luot.trang_thai = 'duoc_duyet_lai' THEN 'dang_lam' ELSE luot.trang_thai END,
+       vao_luc = CASE WHEN luot.trang_thai = 'duoc_duyet_lai' THEN excluded.vao_luc ELSE luot.vao_luc END,
+       het_gio_luc = CASE WHEN luot.trang_thai = 'duoc_duyet_lai' THEN excluded.het_gio_luc ELSE luot.het_gio_luc END,
+       cap_nhat_luc = excluded.cap_nhat_luc`,
   )
     .bind(khoa, maCa, sbd, lanThu, idThietBi, vaoLuc, hetGio, new Date(now).toISOString())
     .run()
@@ -436,12 +505,30 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
 /** Thầy bấm BẮT ĐẦU THI — cả lớp nhận đề đúng một thời điểm. */
 async function batDauThi(env: Env, maCa: string): Promise<Response> {
   if (!maCa) return ra({ ok: false, error: 'Thiếu mã ca' })
+  const ca = await env.DB.prepare('SELECT bat_dau_thi_luc, de_rieng, bo_theo_em_json FROM ca WHERE ma_ca = ?')
+    .bind(maCa)
+    .first<Record<string, unknown>>()
+  if (!ca) return ra({ ok: false, error: 'Không tìm thấy ca kiểm tra' })
+
+  // BẤM LẦN HAI GIỮ MỐC LẦN ĐẦU.
+  //
+  // Bản trước ghi đè mốc mỗi lần bấm. Giữa ca thầy bấm nhầm lần nữa là ĐỒNG HỒ
+  // CỦA CẢ LỚP CHẠY LẠI TỪ ĐẦU: em đã làm 30 phút bỗng được thêm 45 phút, còn
+  // `het_gio_luc` của những lượt đã vào thì tính theo mốc cũ — hai bên lệch
+  // nhau, và không có dấu hiệu nào trên màn.
+  const cu = chuoiRong(ca.bat_dau_thi_luc)
+  const canBoTheoEm = Number(ca.de_rieng ?? 0) === 1
+  const coBoTheoEm = chuoiRong(ca.bo_theo_em_json) !== ''
+  if (cu) return ra({ ok: true, batDauLuc: cu, daBatTruoc: true, canBoTheoEm, coBoTheoEm })
+
   const luc = new Date().toISOString()
-  const r = await env.DB.prepare('UPDATE ca SET bat_dau_thi_luc = ?, cap_nhat_luc = ? WHERE ma_ca = ?')
-    .bind(luc, luc, maCa)
-    .run()
-  if (r.meta.changes === 0) return ra({ ok: false, error: 'Không tìm thấy ca kiểm tra' })
-  return ra({ ok: true, batDauLuc: luc })
+  await env.DB.prepare('UPDATE ca SET bat_dau_thi_luc = ?, cap_nhat_luc = ? WHERE ma_ca = ?').bind(luc, luc, maCa).run()
+  return ra({ ok: true, batDauLuc: luc, daBatTruoc: false, canBoTheoEm, coBoTheoEm })
+}
+
+/** Đọc một ô có thể null thành chuỗi đã cắt khoảng trắng. */
+function chuoiRong(v: unknown): string {
+  return v === null || v === undefined ? '' : String(v).trim()
 }
 
 /** Màn theo dõi phòng thi của thầy. ĐÒI mã bí mật: đây là danh sách tên và
@@ -1309,7 +1396,11 @@ async function btvnCuaEm(env: Env, b: Record<string, unknown>): Promise<Response
       const cau = daDoc.get(goc) ?? []
       for (const c of phan ? cau.filter((x) => String(x.phan ?? '') === phan) : cau) gom.push(c)
     }
-    if (gom.length > 0) goi = { cau: gom, maDe: dsMaDe.join(','), soCau: gom.length }
+    // DÁNG GÓI PHẢI LÀ KHUÔN KHO (`ma_de` + `cau`): máy em nạp nó qua ĐÚNG cửa
+    // `parseKhoDeJson` đang dùng cho phiếu khắc phục, nên câu thiếu phương án
+    // hay thiếu đáp án bị loại ngay tại cửa thay vì hiện ra một ô trống cho em
+    // ngồi đoán.
+    if (gom.length > 0) goi = { ma_de: dsMaDe.join(','), cau: gom }
   }
   if (!goi) return ra({ ok: false, lyDo: 'mat_goi_de', error: 'Chưa tải được đề bài tập' })
 

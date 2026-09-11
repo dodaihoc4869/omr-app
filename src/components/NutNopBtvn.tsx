@@ -9,6 +9,7 @@
 // chốt: "Bạn đã quá hạn nộp BTVN".
 import { useEffect, useState } from 'react'
 import { NutChinh, OThongBao } from './DesignSystem'
+import KhungXemPhieu from './KhungXemPhieu'
 import { layCauHinhChoEmBtvn } from '../lib/btvn-cho-em'
 import { btvnCuaEm } from '../lib/btvn-may-chu-moi'
 
@@ -33,6 +34,13 @@ export default function NutNopBtvn({ maCa, sbd }: { maCa: string; sbd: string })
   const [loi, setLoi] = useState('')
   const [han, setHan] = useState('')
   const [nhip, setNhip] = useState(0)
+  // PHIẾU HIỆN TRONG APP, KHÔNG MỞ THẺ MỚI.
+  //
+  // Bản đầu mở một thẻ trình duyệt mới rồi ghi thẳng HTML vào đó: trên điện
+  // thoại thầy nhận ra một thẻ `about:blank`, và app đã cài vào màn hình chính
+  // thì không mở nổi thẻ mới. `KhungXemPhieu` là đúng thứ màn Làm bài và màn
+  // Phiếu đang dùng — lớp phủ iframe, đóng bằng nút back quen tay.
+  const [htmlPhieu, setHtmlPhieu] = useState('')
 
   // Đồng hồ nhích mỗi phút. Không cần nhanh hơn: hạn tính bằng giờ.
   useEffect(() => {
@@ -54,15 +62,8 @@ export default function NutNopBtvn({ maCa, sbd }: { maCa: string; sbd: string })
         return
       }
       setHan(String(r.hanNop ?? ''))
-      // Mở phiếu bằng chính đường phiếu đang chạy: gói đề đã có trong tay.
-      const w = window.open('', '_blank')
-      if (!w) {
-        setLoi('Trình duyệt chặn mở cửa sổ. Bấm lại và cho phép mở.')
-        return
-      }
       const { dungPhieuBtvn } = await import('../lib/btvn-cho-em')
-      w.document.write(await dungPhieuBtvn(r, maCa, sbd))
-      w.document.close()
+      setHtmlPhieu(await dungPhieuBtvn(r, maCa, sbd))
     } catch (e) {
       setLoi(e instanceof Error ? e.message : 'Không mở được bài tập')
     } finally {
@@ -83,6 +84,7 @@ export default function NutNopBtvn({ maCa, sbd }: { maCa: string; sbd: string })
         </div>
       )}
       {loi && <OThongBao tone="do">{loi}</OThongBao>}
+      {htmlPhieu && <KhungXemPhieu html={htmlPhieu} ten="Bài tập về nhà" dong={() => setHtmlPhieu('')} />}
     </div>
   )
 }

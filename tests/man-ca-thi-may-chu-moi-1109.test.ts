@@ -198,19 +198,24 @@ describe('LẤY SỐ LỚN HƠN giữa đếm sống và số chụp', () => {
   })
 })
 
-describe('NÚT TRONG CÀI ĐẶT', () => {
-  it('chỉ bấm được khi cờ máy chủ mới đang BẬT', () => {
-    expect(KHOI).toContain('disabled={dangNap || !ch.BAT}')
+// KHỐI CÀI ĐẶT ĐÃ RÚT GỌN (12/09). Ba nút của thời hai máy chủ — bật/tắt cờ,
+// chuyển ca cũ, chuyển kho đề — đã làm xong việc và bị gỡ. Nút không còn tác
+// dụng nhưng vẫn nằm đó là thứ thầy sẽ bấm nhầm giữa giờ dạy.
+describe('KHỐI CÀI ĐẶT SAU KHI CẮT GOOGLE', () => {
+  it('không còn nút bật/tắt cờ, không còn nút chuyển ca cũ và chuyển kho đề', () => {
+    for (const cam of ['Tắt, quay về Apps Script', 'Chuyển ca cũ sang máy chủ mới', 'Chuyển KHO ĐỀ sang máy chủ mới']) {
+      expect(KHOI, cam).not.toContain(cam)
+    }
   })
 
-  it('nói rõ kết quả đối chiếu, không chỉ nói "đã chuyển"', () => {
-    expect(KHOI).toContain('Đã chuyển và ĐỐI CHIẾU KHỚP')
-    expect(KHOI).toContain('CHƯA khớp')
-    expect(KHOI).toContain('Màn Ca thi vẫn đọc Apps Script như cũ')
+  it('không còn một dòng chữ nào nhắc Apps Script hay Google Sheet', () => {
+    for (const cam of ['Apps Script', 'Google Sheet']) expect(KHOI, cam).not.toContain(cam)
   })
 
-  it('nói rõ là KHÔNG xoá gì ở Google Sheet', () => {
-    expect(KHOI).toContain('không xoá gì ở Google Sheet')
+  it('giữ đúng ba việc còn sống: địa chỉ · lập lại chỉ mục · đếm dữ liệu', () => {
+    expect(KHOI).toContain('Thử kết nối')
+    expect(KHOI).toContain('Lập lại chỉ mục câu của kho')
+    expect(KHOI).toContain('Đếm dữ liệu trên máy chủ')
   })
 })
 

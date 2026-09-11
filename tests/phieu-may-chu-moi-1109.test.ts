@@ -15,7 +15,11 @@ import { HAN_DOC_PHIEU_GIAY, dayPhieuMoi, layPhieuMoi } from '../src/lib/phieu-m
 import { chuanHoaMayChu } from '../src/lib/cau-hinh-may-chu'
 
 const BAT = chuanHoaMayChu({ BAT: true, URL: 'https://omr.example' })
-const TAT = chuanHoaMayChu({ BAT: false, URL: 'https://omr.example' })
+// KHÔNG CÓ ĐỊA CHỈ = KHÔNG GỌI ĐƯỢC. Từ 12/09 cờ `BAT` không còn là công tắc
+// riêng: Google đã bị cắt nên "tắt" sẽ là "không dùng đường nào", và một cấu
+// hình cũ còn sót `BAT: false` đủ để hỏng cả một ca thi. Nay cờ chỉ còn phụ
+// thuộc địa chỉ, nên trạng thái tắt duy nhất là CHƯA ĐIỀN ĐỊA CHỈ.
+const TAT = chuanHoaMayChu({ URL: '' })
 const API = fs.readFileSync(path.join(process.cwd(), 'src/lib/exam-api.ts'), 'utf8')
 const GS = fs.readFileSync(path.join(process.cwd(), 'server/src/index.ts'), 'utf8')
 
@@ -29,7 +33,7 @@ describe('ĐỌC PHIẾU — đường tắt', () => {
     expect(await layPhieuMoi(BAT, 'abc')).toEqual({ diem: 8.5 })
   })
 
-  it('CỜ TẮT ⇒ không chạm mạng, trả null để đi đường cũ', async () => {
+  it('CHƯA CÓ ĐỊA CHỈ ⇒ không chạm mạng, trả null', async () => {
     let cham = 0
     vi.stubGlobal('fetch', async () => {
       cham += 1
