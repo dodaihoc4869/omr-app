@@ -139,3 +139,26 @@ Lối Enter còn bỏ qua luôn điều kiện toàn màn hình mà nút "Vào t
 
 Tab Google Sheet của thầy bị tôi điều hướng sang D1 Console. Mở lại bằng:
 `https://docs.google.com/spreadsheets/d/1w_yOiMX01jdnTh7uIBYrBcT4k_sAJIkAfBIa_Ptx_mg/edit`
+
+### Phiên 11/09 chiều — chuyển tiếp sang máy chủ mới
+
+- [x] "ca thi vẫn tải trên google sheet, chuyển hết sang máy chủ mới đi cho nhanh" | bằng chứng: commit `8ff3c74`. Đo trước khi sửa, từ trình duyệt của thầy: Apps Script gọi một lệnh KHÔNG tồn tại mất **1.552 / 1.666 / 1.798 ms**; máy chủ mới `/khoe` **109 / 333 / 547 ms**. Worker thêm `/ca/nhieu`, `/ca/danh-sach`, `/dong-bo/dau`; D1 thêm 4 cột vào `ca` + bảng `dong_bo` (chạy thẳng trên D1 Console, cả 5 câu "successfully executed"). **23 phép kiểm mới.** Sáu cửa tại `8ff3c74`: 211 tệp / 3.135 phép kiểm / 0 đỏ
+- [x] Chặn cú treo cả lớp ở phòng chờ | bằng chứng: commit `d8a9c3c`, 18 phép kiểm, 210 tệp / 3.112 phép kiểm / 0 đỏ
+- [x] Kiểm bản GỘP với phiên Claude khác trước mỗi lượt đẩy | bằng chứng: `7561882` → 211 tệp / 3.138 phép kiểm / 0 đỏ; `cf552af` → 211 tệp / 3.139 phép kiểm / 0 đỏ. Cả hai đều `tsc` sạch, check:mau sạch, hiển thị ĐẠT 18/18, build Pages OK
+- [x] Phát hành | bằng chứng: Worker `d005192f` rồi `70c98113`; `origin/main = cf552af`
+- [ ] Thầy bấm "Chuyển ca cũ sang máy chủ mới" | bằng chứng: (chưa có) — đếm trên D1 lúc 15h00 vẫn `so_ca 1 · so_luot 0 · dau null`
+- [ ] Bật cờ máy chủ mới TRÊN MÁY THẦY DÙNG TỐI NAY | bằng chứng: (chưa có)
+- [ ] Mở ca 18h rồi đếm ca trên D1 trước khi em vào | bằng chứng: (chưa có)
+- [ ] Mục Phân công + giao BTVN theo `claude/PHAN-CONG-GIAO-BTVN.md` — hoãn tới sau ca | bằng chứng: (chưa có)
+
+### Hai điều phải nhớ
+
+**Cấu hình máy chủ mới nằm trên TỪNG MÁY** (IndexedDB `omr-exam/settings` khoá
+`mayChuMoi`), không nằm trên máy chủ. Thầy điều khiển ca ở máy nào thì phải bật
+cờ ở đúng máy ấy. Đợt sau nên đưa cấu hình này lên máy chủ.
+
+**Có phiên Claude khác cùng sửa kho mã** (cây chọn đề: `cay-chon-de.ts`,
+`HopChonDe.tsx`, `tests/cay-chon-de.test.tsx`). Luật từ nay: chỉ `git add` đúng
+tệp mình sửa, và **chạy lại đủ sáu cửa trên bản GỘP** trước mỗi lượt đẩy, không
+chỉ trên phần của mình. Cây kiểm lấy bằng `git archive HEAD` nên không dính sửa
+đổi dở dang của phiên kia.
