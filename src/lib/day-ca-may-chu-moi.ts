@@ -276,7 +276,8 @@ export async function napDayDuCaMoi(
   maBiMat: string,
   maCa: string,
   luot: Record<string, unknown>[],
+  keyBank?: unknown,
 ): Promise<boolean> {
   if (!ch.BAT || !ch.URL || !maCa || luot.length === 0) return false
-  return guiJson(ch, maBiMat, '/ca/nap-day-du', { maCa, luot }, HAN_DAY_CA_GIAY)
+  return guiJson(ch, maBiMat, '/ca/nap-day-du', keyBank ? { maCa, luot, keyBank } : { maCa, luot }, HAN_DAY_CA_GIAY)
 }

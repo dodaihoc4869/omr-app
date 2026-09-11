@@ -2247,7 +2247,7 @@ function doiChiTietCaMoi(j: Record<string, unknown>): ChiTietCa {
       nguoiTao: '',
     },
     luot,
-    keyBank: null,
+    keyBank: (j.keyBank as KeyBank | null) ?? null,
     biChan: (Array.isArray(j.biChan) ? j.biChan : []) as unknown as LuotBiChan[],
     dsCho: (Array.isArray(j.dsCho) ? j.dsCho : []) as { sbd: string; hoTen: string; vaoLuc: string }[],
     boTheoEmCa: ((j.boTheoEmCa as { bo?: Record<string, string[]> } | null)?.bo) ?? undefined,
@@ -2269,14 +2269,20 @@ export async function chiTietCa(scriptUrl: string, secret: string, maCa: string,
   //      Trả về thiếu `keyBank` là máy thầy chấm lại ra điểm sai.
   //   2. `chiTietCaMoi` tự trả `null` khi ca chưa `dayDu` — ca chép sang từ
   //      Sheet thiếu điểm, thiếu họ tên, thiếu dòng bị chặn.
-  if (!xinKeyBank) {
-    try {
-      const chMoi = await layCauHinhMayChu()
-      const nhanh = await chiTietCaMoi(chMoi, secret, maCa)
-      if (nhanh) return doiChiTietCaMoi(nhanh)
-    } catch {
-      // rơi xuống đường cũ
-    }
+  try {
+    const chMoi = await layCauHinhMayChu()
+    const nhanh = await chiTietCaMoi(chMoi, secret, maCa)
+    // XIN NGÂN HÀNG CÓ ĐÁP ÁN mà gói nhanh chưa cất được nó ⇒ đi đường cũ.
+    //
+    // LỖI ĐÃ DÍNH, 19h45 ngày 11/09: bản trước đặt cả đường nhanh sau
+    // `if (!xinKeyBank)`. Màn Chi tiết ca gọi với `xinKeyBank = !banksCu`, mà
+    // điện thoại thầy không có sẵn ngân hàng của ca cũ nên cờ ấy LUÔN bật —
+    // đường nhanh bị bỏ qua vĩnh viễn trên điện thoại, dù D1 đủ dữ liệu.
+    // Nay lượt chữa lành cất ngân hàng lên R2 sau khoá riêng, nên đường nhanh
+    // phục vụ được cả nó; chỉ lùi khi thật sự chưa có.
+    if (nhanh && (!xinKeyBank || nhanh.keyBank)) return doiChiTietCaMoi(nhanh)
+  } catch {
+    // rơi xuống đường cũ
   }
 
   const r = await postJson(scriptUrl, { action: 'chiTietCa', secret, maCa, xinKeyBank }, HAN_GIAY_CHI_TIET_CA)
@@ -2321,7 +2327,13 @@ export async function chiTietCa(scriptUrl: string, secret: string, maCa: string,
   void (async () => {
     try {
       const chMoi = await layCauHinhMayChu()
-      await napDayDuCaMoi(chMoi, secret, maCa, luotSheet as unknown as Record<string, unknown>[])
+      await napDayDuCaMoi(
+        chMoi,
+        secret,
+        maCa,
+        luotSheet as unknown as Record<string, unknown>[],
+        (r.keyBank as KeyBank) ?? undefined,
+      )
     } catch {
       // lần sau đọc lại vẫn có cơ hội chữa
     }

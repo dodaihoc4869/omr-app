@@ -772,10 +772,25 @@ async function chiTietCaMoi(env: Env, maCa: string): Promise<Response> {
     .bind(maCa)
     .all<Record<string, unknown>>()
 
+  // NGÂN HÀNG CÓ ĐÁP ÁN của ca, nếu lượt chữa lành đã cất. Đường này ĐÒI mã bí
+  // mật (xem bảng định tuyến), khác hẳn `GET /de/:maCa` công khai.
+  let keyBank: unknown = null
+  if (env.DE) {
+    const o = await env.DE.get(`key/${maCa}.json`)
+    if (o?.body) {
+      try {
+        keyBank = await new Response(o.body).json()
+      } catch {
+        keyBank = null
+      }
+    }
+  }
+
   return ra({
     ok: true,
     coCa: true,
     dayDu,
+    keyBank,
     ca: {
       maCa,
       tenCa: String(ca.ten_ca ?? ''),
@@ -923,11 +938,12 @@ async function napDayDuCa(env: Env, b: Record<string, unknown>): Promise<Respons
   const maCa = String(b.maCa ?? '').trim()
   if (!maCa) return ra({ ok: false, error: 'Thiếu mã ca' })
 
-  const ca = await env.DB.prepare('SELECT trang_thai FROM ca WHERE ma_ca = ?').bind(maCa).first<{ trang_thai: string }>()
+  const ca = await env.DB.prepare('SELECT trang_thai, bat_dau_thi_luc, bat_dau, thoi_gian_phut FROM ca WHERE ma_ca = ?')
+    .bind(maCa)
+    .first<{ trang_thai: string; bat_dau_thi_luc: string | null; bat_dau: string | null; thoi_gian_phut: number | null }>()
   if (!ca) return ra({ ok: true, coCa: false, daDat: false })
-  if (String(ca.trang_thai) === 'mo') {
-    // Ca đang mở: D1 mới hơn Sheet. Không chép đè, không đặt cờ.
-    return ra({ ok: true, coCa: true, daDat: false, lyDo: 'ca_dang_mo' })
+  if (caDangChay(ca)) {
+    return ra({ ok: true, coCa: true, daDat: false, lyDo: 'ca_dang_chay' })
   }
 
   const ds = Array.isArray(b.luot) ? (b.luot as Record<string, unknown>[]) : []
@@ -974,8 +990,46 @@ async function napDayDuCa(env: Env, b: Record<string, unknown>): Promise<Respons
   // bản máy em ghi thẳng, đầy đủ hơn bản chép vòng qua Sheet.
   for (let i = 0; i < cau.length; i += 200) await env.DB.batch(cau.slice(i, i + 200))
 
+  // NGÂN HÀNG CÓ ĐÁP ÁN — cất sau khoá RIÊNG, chỉ mở bằng mã bí mật.
+  //
+  // VÌ SAO PHẢI CÓ, lỗi 19h45 ngày 11/09: màn Chi tiết ca gọi
+  // `chiTietCa(..., xinKeyBank = !banksCu)`. Điện thoại thầy không có sẵn ngân
+  // hàng của ca cũ nên `xinKeyBank` luôn `true`, mà đường nhanh lại đứng sau
+  // `if (!xinKeyBank)` — tức đường nhanh bị bỏ qua VĨNH VIỄN trên điện thoại,
+  // dù D1 có đủ dữ liệu hay không.
+  //
+  // Khoá `key/<maCa>.json` KHÔNG dùng chung với `de/<maCa>.json`. Cái sau phục
+  // vụ công khai cho máy em ở `GET /de/:maCa` và TUYỆT ĐỐI không được có đáp án.
+  if (b.keyBank && env.DE) {
+    await env.DE.put(`key/${maCa}.json`, JSON.stringify(b.keyBank))
+  }
+
   await env.DB.prepare('UPDATE ca SET sinh_tai_d1 = 1, cap_nhat_luc = ? WHERE ma_ca = ?').bind(nay, maCa).run()
-  return ra({ ok: true, coCa: true, daDat: true, soLuot: cau.length })
+  return ra({ ok: true, coCa: true, daDat: true, soLuot: cau.length, coKey: !!(b.keyBank && env.DE) })
+}
+
+/** Ca xong rồi bao lâu thì chắc chắn không ai còn làm bài. Rộng tay: thầy có
+ * thể mở khoá cho một em làm nốt sau giờ. */
+const DEM_SAU_CA_PHUT = 30
+
+/** CA NÀY CÓ ĐANG CHẠY KHÔNG — tính bằng ĐỒNG HỒ, không tin cái nhãn.
+ *
+ * LỖI ĐÃ DÍNH, 19h45 ngày 11/09: cửa cũ chặn theo `trang_thai = 'mo'`. Nhưng
+ * kho ca của thầy có **12 ca vẫn mang nhãn `mo`** từ mấy hôm trước, chưa bao
+ * giờ được đóng. Chúng không hề đang chạy, mà nhãn thì vẫn `mo` — nên không ca
+ * nào trong số ấy được chữa lành, và thầy bấm vào lần thứ hai vẫn 7 giây.
+ *
+ * Nhãn `mo` nói ca chưa bị đóng. Nó KHÔNG nói có ai đang làm bài. Thứ nói được
+ * điều đó là đồng hồ: chưa bấm Bắt đầu thì chưa ai làm; bấm rồi thì hết giờ
+ * cộng thêm ${DEM_SAU_CA_PHUT} phút là xong. */
+function caDangChay(ca: { trang_thai: string; bat_dau_thi_luc: string | null; bat_dau: string | null; thoi_gian_phut: number | null }): boolean {
+  if (String(ca.trang_thai) !== 'mo') return false
+  const bd = mocMs(String(ca.bat_dau_thi_luc ?? ''))
+  // Ca mở nhưng CHƯA bấm Bắt đầu: không ai làm bài, nhưng cũng đừng đụng vào —
+  // thầy sắp bấm tới nơi.
+  if (!bd) return true
+  const phut = Number(ca.thoi_gian_phut) || 45
+  return Date.now() < bd + (phut + DEM_SAU_CA_PHUT) * 60000
 }
 
 /** Mốc thời gian thành mili giây; chuỗi rỗng hay hỏng thì về 0. */
