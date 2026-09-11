@@ -1,4 +1,4 @@
-// CÂY CHỌN ĐỀ — khối → [thư mục] → chương → bài → dạng.
+// CÂY CHỌN ĐỀ — [thư mục →] khối → chương → bài → dạng.
 //
 // Vì sao có file này: kho 19 bài × 3 dạng là 45 dòng phẳng. Thầy muốn cả
 // chương thì phải tích 15 lần, và giữa giờ ra chơi thì không kịp. Tích một ô
@@ -114,57 +114,65 @@ function nutCha(khoa: string, nhan: string, tang: Tang, con: Nut[]): Nut {
 
 /**
  * Dựng cây từ danh sách đề ĐÃ TÁCH THEO PHẦN (`tachNhieuTheoPhan`):
- * khối → [thư mục] → chương → bài → dạng. Tầng thư mục chỉ có khi nhóm ghi "/".
+ * [thư mục →] khối → chương → bài → dạng. Thư mục chỉ có khi nhóm ghi "/".
  *
  * Đề chưa tách (chỉ có một phần sẵn) vẫn thành một nút lá tầng "dang", nhãn
  * lấy theo phần thực có — không sinh nút rỗng.
  */
 export function dungCay(ds: TeacherExamSource[]): Nut[] {
-  const theoKhoi = gom(ds, khoiCuaDe)
-  return theoKhoi.map(({ khoa: k, ds: dsK }) => {
-    const goc = k || '?'
-
-    // Dựng các nút CHƯƠNG của một danh sách đề, dưới một tiền tố khoá cho trước.
-    const dungChuong = (dsX: TeacherExamSource[], tienTo: string): Nut[] =>
-      gom(dsX, chuongCuaDe).map(({ khoa: ch, ds: dsC }) => {
-        // GOM THEO TÊN BÀI, không theo mã đề.
-        //
-        // Bản cũ gom bằng `goMaDeTachRa(maDe).goc`, đúng khi mỗi bài chỉ có đúng
-        // một mã đề. Từ 09/09 kho cắt bài quá 150 câu thành `12-C2-B4-D1` và
-        // `-D2` — hai mã gốc khác nhau nên bài "Glucose và fructose" hiện ra HAI
-        // dòng trùng tên, thầy phải tích hai lần và tưởng kho có đề trùng.
-        // Nay một bài đúng một nhánh; các mã của nó nằm dưới tầng lá.
-        const bai = gom(dsC, (c) => tenBai(c)).map(({ khoa: b, ds: dsB }) => {
-          // Bài có nhiều mã gốc thì lá phải nói rõ mã nào, không thì thầy thấy
-          // hai dòng "Trắc nghiệm" y hệt nhau mà không biết khác gì.
-          const nhieuMa = new Set(dsB.map((c) => goMaDeTachRa(c.maDe).goc)).size > 1
-          const dang: Nut[] = dsB.map((c) => {
-            const { goc: gocMa, phan } = goMaDeTachRa(c.maDe)
-            const sc = soCauCua(c)
-            const tuCau: PhanDe | null = phan ?? (sc.I > 0 ? 'I' : sc.II > 0 ? 'II' : sc.III > 0 ? 'III' : null)
-            const ten = tuCau ? TEN_PHAN_TACH[tuCau] : c.maDe
-            return {
-              khoa: `${tienTo}/${ch}/${b}/${c.maDe}`,
-              nhan: nhieuMa ? `${ten} · ${duoiPhanBiet(gocMa)}` : ten,
-              tang: 'dang' as const,
-              con: [],
-              maDe: c.maDe,
-              soCau: sc,
-              laMa: [c.maDe],
-            }
-          })
-          return nutCha(`${tienTo}/${ch}/${b}`, b, 'bai', dang)
+  // Dựng các nút CHƯƠNG của một danh sách đề, dưới một tiền tố khoá cho trước.
+  const dungChuong = (dsX: TeacherExamSource[], tienTo: string): Nut[] =>
+    gom(dsX, chuongCuaDe).map(({ khoa: ch, ds: dsC }) => {
+      // GOM THEO TÊN BÀI, không theo mã đề.
+      //
+      // Bản cũ gom bằng `goMaDeTachRa(maDe).goc`, đúng khi mỗi bài chỉ có đúng
+      // một mã đề. Từ 09/09 kho cắt bài quá 150 câu thành `12-C2-B4-D1` và
+      // `-D2` — hai mã gốc khác nhau nên bài "Glucose và fructose" hiện ra HAI
+      // dòng trùng tên, thầy phải tích hai lần và tưởng kho có đề trùng.
+      // Nay một bài đúng một nhánh; các mã của nó nằm dưới tầng lá.
+      const bai = gom(dsC, (c) => tenBai(c)).map(({ khoa: b, ds: dsB }) => {
+        // Bài có nhiều mã gốc thì lá phải nói rõ mã nào, không thì thầy thấy
+        // hai dòng "Trắc nghiệm" y hệt nhau mà không biết khác gì.
+        const nhieuMa = new Set(dsB.map((c) => goMaDeTachRa(c.maDe).goc)).size > 1
+        const dang: Nut[] = dsB.map((c) => {
+          const { goc, phan } = goMaDeTachRa(c.maDe)
+          const sc = soCauCua(c)
+          const tuCau: PhanDe | null = phan ?? (sc.I > 0 ? 'I' : sc.II > 0 ? 'II' : sc.III > 0 ? 'III' : null)
+          const ten = tuCau ? TEN_PHAN_TACH[tuCau] : c.maDe
+          return {
+            khoa: `${tienTo}/${ch}/${b}/${c.maDe}`,
+            nhan: nhieuMa ? `${ten} · ${duoiPhanBiet(goc)}` : ten,
+            tang: 'dang' as const,
+            con: [],
+            maDe: c.maDe,
+            soCau: sc,
+            laMa: [c.maDe],
+          }
         })
-        return nutCha(`${tienTo}/${ch}`, ch || 'Chưa xếp chương', 'chuong', bai)
+        return nutCha(`${tienTo}/${ch}/${b}`, b, 'bai', dang)
       })
+      return nutCha(`${tienTo}/${ch}`, ch || 'Chưa xếp chương', 'chuong', bai)
+    })
 
-    // TẦNG THƯ MỤC — chỉ sinh ra khi nhóm có dấu "/". Đề không có thư mục thì
-    // chương của nó vẫn nằm thẳng dưới khối, đúng như trước.
-    const con: Nut[] = gom(dsK, thuMucCuaDe).flatMap(({ khoa: tm, ds: dsT }) =>
-      tm ? [nutCha(`${goc}/${tm}`, tm, 'thumuc', dungChuong(dsT, `${goc}/${tm}`))] : dungChuong(dsT, goc),
-    )
-    return nutCha(goc, k ? `Khối ${k}` : 'Chưa rõ khối', 'khoi', con)
-  })
+  // Các nút KHỐI của một danh sách đề.
+  const dungKhoi = (dsX: TeacherExamSource[], tienTo: string): Nut[] =>
+    gom(dsX, khoiCuaDe).map(({ khoa: k, ds: dsK }) => {
+      const goc = tienTo ? `${tienTo}/${k || '?'}` : k || '?'
+      return nutCha(goc, k ? `Khối ${k}` : 'Chưa rõ khối', 'khoi', dungChuong(dsK, goc))
+    })
+
+  // TẦNG THƯ MỤC đứng NGOÀI khối, ngang hàng với "Khối 10/11/12" — đúng cây
+  // thư mục gốc trên ổ cứng: DẠY HỌC ▸ 10 / 11 / 12 ▸ chương ▸ bài.
+  //
+  // Vì sao: lô bài dạy thêm trải khắp ba khối và mười mấy chương. Để lẫn thì
+  // mỗi chương thành một dòng nằm xen với chương của đề kiểm tra, cây dài ra và
+  // thầy phải dò từng dòng. Nay cả lô gom đúng MỘT dòng.
+  //
+  // Nhóm không ghi dấu "/" thì khối của nó vẫn nằm ở tầng ngoài cùng như cũ,
+  // không sinh thêm tầng rỗng.
+  return gom(ds, thuMucCuaDe).flatMap(({ khoa: tm, ds: dsT }) =>
+    tm ? [nutCha(tm, tm, 'thumuc', dungKhoi(dsT, tm))] : dungKhoi(dsT, ''),
+  )
 }
 
 export type TrangThaiTich = 'trong' | 'day' | 'nua'

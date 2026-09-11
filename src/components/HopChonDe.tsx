@@ -21,9 +21,9 @@ export const KHOI_CO_THE = ['10', '11', '12'] as const
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 
-/** Thụt lề theo tầng. Các tầng mà thụt đều nhau thì nhìn ra một khối chữ.
- * Tầng "thumuc" là thư mục lớn gom cả một lô đề, chỉ có khi nhóm ghi "/". */
-const THUT: Record<Nut['tang'], number> = { khoi: 0, thumuc: 12, chuong: 24, bai: 36, dang: 48 }
+/** Thụt lề theo ĐỘ SÂU thật, không theo tầng: thư mục "DẠY HỌC" và "Khối 12"
+ * cùng đứng ở ngoài cùng, nên thụt theo tên tầng sẽ lệch nhau một bậc. */
+const THUT_MOI_BAC = 14
 const CO_CHU: Record<Nut['tang'], string> = { khoi: 'var(--cx-2)', thumuc: 'var(--cx-2)', chuong: 'var(--cx-2)', bai: 'var(--cx-1)', dang: 'var(--cx-1)' }
 
 function OTich({ tt }: { tt: 'trong' | 'day' | 'nua' }) {
@@ -33,6 +33,7 @@ function OTich({ tt }: { tt: 'trong' | 'day' | 'nua' }) {
 
 function Hang({
   n,
+  sau = 0,
   moRong,
   daChon,
   chonNhieu,
@@ -40,6 +41,7 @@ function Hang({
   onTich,
 }: {
   n: Nut
+  sau?: number
   moRong: Set<string>
   daChon: Set<string>
   chonNhieu: boolean
@@ -61,7 +63,7 @@ function Hang({
         style={{
           gap: 'var(--k2)',
           minHeight: 40,
-          paddingLeft: 8 + THUT[n.tang],
+          paddingLeft: 8 + sau * THUT_MOI_BAC,
           paddingRight: 'var(--k3)',
           background: la && tt === 'day' ? 'var(--xanh-nen)' : 'transparent',
           borderLeft: `3px solid ${la && tt === 'day' ? 'var(--xanh)' : 'transparent'}`,
@@ -112,7 +114,7 @@ function Hang({
         </span>
       </div>
 
-      {mo && n.con.map((c) => <Hang key={c.khoa} n={c} moRong={moRong} daChon={daChon} chonNhieu={chonNhieu} onGap={onGap} onTich={onTich} />)}
+      {mo && n.con.map((c) => <Hang key={c.khoa} n={c} sau={sau + 1} moRong={moRong} daChon={daChon} chonNhieu={chonNhieu} onGap={onGap} onTich={onTich} />)}
     </>
   )
 }

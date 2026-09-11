@@ -182,22 +182,42 @@ describe('tầng thư mục', () => {
   const de = (maDe: string, nhom: string, nguon: string): TeacherExamSource =>
     ({ maDe, nhom, nguon, phanI: [{}], phanII: [], phanIII: [] }) as unknown as TeacherExamSource
 
-  it('gom mọi nhóm có "/" vào ĐÚNG MỘT nút thư mục trong khối', () => {
+  it('thư mục đứng NGOÀI khối, ngang hàng với "Khối 12", bên trong mới chia khối', () => {
     const cay = dungCay([
       de('12-C7-B1', '12 · C7 - Nguyên tố nhóm IA', 'Bài A'),
       de('DH-12-C1-B1', '12 · DẠY HỌC/C1 - Ester lipid', 'Bài 1. Ester'),
+      de('DH-10-C1-B1', '10 · DẠY HỌC/C1 - Nguyên Tử', 'Bài 1. Thành phần nguyên tử'),
       de('DH-12-C3-B8', '12 · DẠY HỌC/C3 - Hợp chất chứa N', 'Bài 8. Amine'),
     ])
-    const khoi12 = cay.find((n) => n.nhan === 'Khối 12')!
-    expect(khoi12.con.map((n) => `${n.tang}:${n.nhan}`)).toEqual(['chuong:C7 - Nguyên tố nhóm IA', 'thumuc:DẠY HỌC'])
-    const tm = khoi12.con[1]
-    expect(tm.con.map((n) => n.nhan)).toEqual(['C1 - Ester lipid', 'C3 - Hợp chất chứa N'])
-    expect(tm.laMa).toEqual(['DH-12-C1-B1', 'DH-12-C3-B8'])
+    expect(cay.map((n) => `${n.tang}:${n.nhan}`)).toEqual(['khoi:Khối 12', 'thumuc:DẠY HỌC'])
+
+    const tm = cay[1]
+    expect(tm.con.map((n) => `${n.tang}:${n.nhan}`)).toEqual(['khoi:Khối 12', 'khoi:Khối 10'])
+    expect(tm.con[0].con.map((n) => n.nhan)).toEqual(['C1 - Ester lipid', 'C3 - Hợp chất chứa N'])
+    expect(tm.con[1].con.map((n) => n.nhan)).toEqual(['C1 - Nguyên Tử'])
+    expect(tm.laMa).toEqual(['DH-12-C1-B1', 'DH-12-C3-B8', 'DH-10-C1-B1'])
   })
 
-  it('nhóm không có "/" thì chương vẫn nằm thẳng dưới khối, không sinh tầng rỗng', () => {
+  it('nhóm không có "/" thì khối vẫn ở ngoài cùng, không sinh tầng rỗng', () => {
     const cay = dungCay([de('12-C7-B1', '12 · C7 - Nguyên tố nhóm IA', 'Bài A')])
+    expect(cay[0].tang).toBe('khoi')
     expect(cay[0].con[0].tang).toBe('chuong')
+  })
+
+  it('khoá của nút không đụng nhau giữa trong và ngoài thư mục', () => {
+    const cay = dungCay([
+      de('12-C1-B1', '12 · C1 - Ester lipid', 'Bài 1. Ester'),
+      de('DH-12-C1-B1', '12 · DẠY HỌC/C1 - Ester lipid', 'Bài 1. Ester'),
+    ])
+    const khoa = new Set<string>()
+    const di = (ds: Nut[]) => {
+      for (const n of ds) {
+        expect(khoa.has(n.khoa)).toBe(false)
+        khoa.add(n.khoa)
+        di(n.con)
+      }
+    }
+    di(cay)
   })
 
   it('thuMucCuaDe và chuongCuaDe tách đúng', () => {
