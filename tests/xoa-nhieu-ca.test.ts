@@ -1,7 +1,11 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { xoaNhieuCa } from '../src/lib/exam-api'
 
-const URL_GIA = 'https://script.google.com/macros/s/GIA/exec'
+// ĐỊA CHỈ MÁY CHỦ MỚI. Trước 12/09 chỗ này là link Apps Script; từ khi thầy
+// chốt "gỡ sạch google", `postJson` TỪ CHỐI mọi địa chỉ Google — nên một link
+// `script.google.com` ở đây sẽ không gọi được lượt nào, và đó là hành vi đúng
+// (xem phép kiểm cuối tệp).
+const URL_GIA = 'https://omr.example'
 
 function gaFetch(ketQua: Record<string, { ok: boolean; error?: string }>) {
   const goi: { maCa: string; xacNhan: string }[] = []
@@ -42,5 +46,15 @@ describe('xoaNhieuCa — xoá lô nhiều ca', () => {
     const kq = await xoaNhieuCa(URL_GIA, 'mat', [])
     expect(kq).toEqual({ ok: [], loi: [] })
     expect(goi).toEqual([])
+  })
+})
+
+describe('ĐỊA CHỈ GOOGLE BỊ TỪ CHỐI', () => {
+  it('link Apps Script không gọi được lượt nào — app không còn đường về Google', async () => {
+    const goi = gaFetch({})
+    const kq = await xoaNhieuCa('https://script.google.com/macros/s/GIA/exec', 'mat', ['111111'])
+    expect(goi).toEqual([])
+    expect(kq.ok).toEqual([])
+    expect(kq.loi[0]?.loi).toContain('máy chủ')
   })
 })

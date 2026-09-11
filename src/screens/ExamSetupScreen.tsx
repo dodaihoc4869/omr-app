@@ -16,7 +16,6 @@ import { chuoi, danhSachEm, khoiTuNamSinh, publishSession, type CongBoDiem, type
 import { docSoCauCa, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, luuCheDoDeRieng, luuKhoChuaCa, luuSoCauCa, saveSessionTeacherBank } from '../lib/exam-db'
 import { AN_HAN_CHON_GIAY, BAT_MAC_DINH_CA_THI, MS_AN_HAN_NHA_TAY } from '../lib/giu-de-doc'
 import { dongBoNganHang } from '../lib/exam-sync'
-import { ngheGhiSheet, trangThaiGhiSheet } from '../lib/ghi-sheet-nen'
 import { khuTrungNguon, tongBoQua } from '../lib/khu-trung-cau'
 import { useAppStore } from '../store/appStore'
 
@@ -383,7 +382,6 @@ export default function ExamSetupScreen() {
             {phamVi === 'khoi' ? ` · khối ${khoiTuNamSinh(namSinhKhoi) ?? '?'} (sinh ${namSinhKhoi})` : phamVi === 'chon' ? ` · ${chonSbd.size} em được mời` : ' · tự do'}
           </div>
         </div>
-        <DongGhiSheet maCa={opened.maCa} />
         <TheNoiDung>
           <div style={NHAN_NHO}>Gửi link này vào nhóm Zalo lớp — em mở link, gõ số báo danh là vào thi:</div>
           <div className="break-all" style={{ ...SO, fontSize: 'var(--cx-1)', background: 'var(--the-2)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)', marginTop: 'var(--k2)', marginBottom: 'var(--k3)' }}>
@@ -824,46 +822,3 @@ export default function ExamSetupScreen() {
   )
 }
 
-/** CA ĐÃ LÊN MÁY CHỦ MỚI RỒI, CÒN SHEET THÌ ĐANG GHI Ở NỀN.
- *
- * Từ 11/09 tối, `publishSession` trả lời ngay khi D1 và R2 có ca — đo được máy
- * chủ mới nhận ca sau 1,15 giây, còn lượt ghi Sheet là phần thầy phải ngồi chờ.
- *
- * Nhưng ca không lên được Sheet là hỏng đường điểm (`BangDiem.xlsx`) và đường
- * gửi Zalo. Nên nó phải HIỆN RA ở đây, ngay dưới mã ca, kèm nút thử lại. Đổi
- * lấy tốc độ bằng một lỗi thầm lặng là đổi hỏng. */
-function DongGhiSheet({ maCa }: { maCa: string }) {
-  const [, ve] = useState(0)
-  useEffect(() => ngheGhiSheet(() => ve((n) => n + 1)), [])
-  const d = trangThaiGhiSheet(maCa)
-  if (!d || d.trangThai === 'xong') return null
-
-  const hong = d.trangThai === 'hong'
-  return (
-    <div
-      style={{
-        fontFamily: 'var(--sans)',
-        fontSize: 'var(--cx-1)',
-        borderRadius: 'var(--bo-1)',
-        padding: 'var(--k3)',
-        background: hong ? 'var(--do-nen)' : 'var(--the-2)',
-        color: hong ? 'var(--do)' : 'var(--nhat)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 'var(--k2)',
-      }}
-    >
-      <span>
-        {hong
-          ? `CHƯA lên Google Sheet — điểm và tin Zalo của ca này sẽ thiếu. ${d.loi}`
-          : 'Ca đã sẵn sàng cho em vào thi. Đang ghi nốt lên Google Sheet…'}
-      </span>
-      {hong && (
-        <button className="tap-target" onClick={() => void d.thuLai()} style={{ textDecoration: 'underline', whiteSpace: 'nowrap' }}>
-          Thử lại
-        </button>
-      )}
-    </div>
-  )
-}

@@ -114,11 +114,17 @@ describe('ĐƯỜNG NHANH CHẠY ĐƯỢC', () => {
   })
 })
 
-describe('ĐƯỜNG LÙI — em KHÔNG BAO GIỜ kẹt vì máy chủ mới', () => {
+// ĐƯỜNG LÙI ĐỔI ĐÍCH TỪ 12/09.
+//
+// Thầy chốt "gỡ sạch google": không còn Apps Script để lùi về. Đường lùi bây
+// giờ là cổng tương thích `/goi` của CHÍNH máy chủ mới — nó nhận nguyên dáng
+// lệnh cũ và đọc thẳng D1. Ý nghĩa của mọi phép kiểm dưới đây giữ nguyên: em
+// KHÔNG BAO GIỜ kẹt vì đường nhanh hỏng; chỉ có đích của đường lùi là đổi.
+describe('ĐƯỜNG LÙI — em KHÔNG BAO GIỜ kẹt vì đường nhanh hỏng', () => {
   it('cờ TẮT ⇒ đi thẳng Apps Script', async () => {
     let chamMoi = 0
     gaMang((u) => {
-      if (u.includes('omr.example')) chamMoi += 1
+      if (u.includes('omr.example') && !u.includes('/goi')) chamMoi += 1
       return { ok: true, cach: 'moi', lop: '12', thoiGianPhut: 45, lanThu: 1, vaoLuc: 'a', hetGioLuc: 'b' }
     })
     const { vaoThi } = await import('../src/lib/exam-api')
@@ -127,11 +133,11 @@ describe('ĐƯỜNG LÙI — em KHÔNG BAO GIỜ kẹt vì máy chủ mới', ()
     expect(chamMoi).toBe(0)
   })
 
-  it('máy chủ mới CHẾT ⇒ vẫn vào thi được qua Apps Script', async () => {
+  it('đường nhanh CHẾT ⇒ vẫn vào thi được qua cổng /goi', async () => {
     batCoMayChuMoi()
     let chamCu = 0
     gaMang((u) => {
-      if (u.includes('omr.example')) return null // 500
+      if (u.includes('omr.example') && !u.includes('/goi')) return null // 500
       chamCu += 1
       return { ok: true, cach: 'moi', lop: '12', thoiGianPhut: 45, lanThu: 1, vaoLuc: 'a', hetGioLuc: 'b' }
     })
@@ -141,11 +147,11 @@ describe('ĐƯỜNG LÙI — em KHÔNG BAO GIỜ kẹt vì máy chủ mới', ()
     expect(chamCu).toBeGreaterThan(0)
   })
 
-  it('em CẦN đề mà máy chủ mới KHÔNG có gói đề ⇒ đường cũ, KHÔNG để em vào phòng tay không', async () => {
+  it('em CẦN đề mà máy chủ mới KHÔNG có gói đề ⇒ cổng /goi, KHÔNG để em vào phòng tay không', async () => {
     batCoMayChuMoi()
     let chamCu = 0
     gaMang((u) => {
-      if (u.includes('omr.example')) return { ...CA_CO_BAN, deUrl: null }
+      if (u.includes('omr.example') && !u.includes('/goi')) return { ...CA_CO_BAN, deUrl: null }
       chamCu += 1
       return { ok: true, cach: 'moi', lop: '12', thoiGianPhut: 45, lanThu: 1, vaoLuc: 'a', hetGioLuc: 'b', bank: DE }
     })
@@ -155,12 +161,12 @@ describe('ĐƯỜNG LÙI — em KHÔNG BAO GIỜ kẹt vì máy chủ mới', ()
     expect(chamCu).toBeGreaterThan(0)
   })
 
-  it('tải gói đề HỎNG giữa chừng ⇒ cũng về đường cũ', async () => {
+  it('tải gói đề HỎNG giữa chừng ⇒ cũng về cổng /goi', async () => {
     batCoMayChuMoi()
     let chamCu = 0
     gaMang((u) => {
       if (u.includes('/de/')) return null
-      if (u.includes('omr.example')) return { ...CA_CO_BAN, deUrl: '/de/ca1' }
+      if (u.includes('omr.example') && !u.includes('/goi')) return { ...CA_CO_BAN, deUrl: '/de/ca1' }
       chamCu += 1
       return { ok: true, cach: 'moi', lop: '12', thoiGianPhut: 45, lanThu: 1, vaoLuc: 'a', hetGioLuc: 'b', bank: DE }
     })
@@ -187,11 +193,11 @@ describe('ĐỀ RIÊNG — chỗ sai một lần là điểm em sai lặng lẽ'
     }
   })
 
-  it('ca có bản đồ mà THIẾU phần của CHÍNH EM NÀY ⇒ đường cũ, thà chậm còn hơn sai đề', async () => {
+  it('ca có bản đồ mà THIẾU phần của CHÍNH EM NÀY ⇒ cổng /goi, thà chậm còn hơn sai đề', async () => {
     batCoMayChuMoi()
     let chamCu = 0
     gaMang((u) => {
-      if (u.includes('omr.example')) return { ...CA_CO_BAN, boTheoEm: { bo: { '99999': ['q1'] } } }
+      if (u.includes('omr.example') && !u.includes('/goi')) return { ...CA_CO_BAN, boTheoEm: { bo: { '99999': ['q1'] } } }
       chamCu += 1
       return { ok: true, cach: 'moi', lop: '12', thoiGianPhut: 45, lanThu: 1, vaoLuc: 'a', hetGioLuc: 'b' }
     })
@@ -201,11 +207,11 @@ describe('ĐỀ RIÊNG — chỗ sai một lần là điểm em sai lặng lẽ'
     expect(chamCu).toBeGreaterThan(0)
   })
 
-  it('bộ câu của em RỖNG cũng tính là thiếu ⇒ đường cũ', async () => {
+  it('bộ câu của em RỖNG cũng tính là thiếu ⇒ cổng /goi', async () => {
     batCoMayChuMoi()
     let chamCu = 0
     gaMang((u) => {
-      if (u.includes('omr.example')) return { ...CA_CO_BAN, boTheoEm: { bo: { '10001': [] } } }
+      if (u.includes('omr.example') && !u.includes('/goi')) return { ...CA_CO_BAN, boTheoEm: { bo: { '10001': [] } } }
       chamCu += 1
       return { ok: true, cach: 'moi', lop: '12', thoiGianPhut: 45, lanThu: 1, vaoLuc: 'a', hetGioLuc: 'b' }
     })
@@ -214,14 +220,14 @@ describe('ĐỀ RIÊNG — chỗ sai một lần là điểm em sai lặng lẽ'
     expect(chamCu).toBeGreaterThan(0)
   })
 
-  it('CÔNG BỐ KHI CẢ LỚP NỘP XONG ⇒ đường cũ, kẻo đáp án bung ra giữa giờ', async () => {
+  it('CÔNG BỐ KHI CẢ LỚP NỘP XONG ⇒ cổng /goi, kẻo đáp án bung ra giữa giờ', async () => {
     // Cổng công bố của chế độ này đếm số em đang làm từ bảng bên Apps Script.
     // Ca chạy máy chủ mới thì lượt VÀO THI không tạo dòng bên ấy, nên số ấy đếm
     // ra 0 và điểm công bố cho cả lớp khi cả lớp còn đang làm.
     batCoMayChuMoi()
     let chamCu = 0
     gaMang((u) => {
-      if (u.includes('omr.example')) return { ...CA_CO_BAN, congBo: 'ca_lop_xong' }
+      if (u.includes('omr.example') && !u.includes('/goi')) return { ...CA_CO_BAN, congBo: 'ca_lop_xong' }
       chamCu += 1
       return { ok: true, cach: 'moi', lop: '12', thoiGianPhut: 45, lanThu: 1, vaoLuc: 'a', hetGioLuc: 'b' }
     })
@@ -235,7 +241,7 @@ describe('ĐỀ RIÊNG — chỗ sai một lần là điểm em sai lặng lẽ'
     batCoMayChuMoi()
     let chamCu = 0
     gaMang((u) => {
-      if (u.includes('omr.example')) return { ...CA_CO_BAN, congBo: 'ngay' }
+      if (u.includes('omr.example') && !u.includes('/goi')) return { ...CA_CO_BAN, congBo: 'ngay' }
       chamCu += 1
       return { ok: true }
     })
@@ -249,7 +255,7 @@ describe('ĐỀ RIÊNG — chỗ sai một lần là điểm em sai lặng lẽ'
     batCoMayChuMoi()
     let chamCu = 0
     gaMang((u) => {
-      if (u.includes('omr.example')) return CA_CO_BAN
+      if (u.includes('omr.example') && !u.includes('/goi')) return CA_CO_BAN
       chamCu += 1
       return { ok: true }
     })

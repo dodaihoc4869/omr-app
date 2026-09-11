@@ -13,7 +13,6 @@ import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
 import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi, xongNapDiaChi } from './may-chu-moi'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
 import { chamDiemMoi, chiTietCaMoi, danhSachEmMoi, dayCaMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, ghiLenBangMoi, luotCuaCaMoi, napDayDuCaMoi, suaCaMoi, tienDoEmMoi, type OSuaCa } from './day-ca-may-chu-moi'
-import { theoGhiSheet } from './ghi-sheet-nen'
 import { daBatDauTheoDuongCu, ghiNhoDaBatDauDuongCu, nenDoiChieu } from './doi-chieu-phong-cho'
 import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu } from './man-ca-may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
@@ -127,9 +126,45 @@ async function postCoThuLai(scriptUrl: string, body: unknown, giay: number, soLa
   throw cuoi instanceof Error ? cuoi : new Error('Không gửi được')
 }
 
-async function postJson(scriptUrl: string, body: unknown, giay: number = HAN_GIAY): Promise<any> {
+/** CHẶN CỨNG ĐƯỜNG VỀ GOOGLE.
+ *
+ * Đây là chỗ DUY NHẤT trong app quyết định một địa chỉ có được gọi hay không,
+ * nên luật nằm ở đây chứ không rải rác: bất kỳ địa chỉ nào thuộc Google đều bị
+ * loại, dù nó tới từ cấu hình cũ trong máy thầy hay từ một màn hình quên sửa. */
+function laMayChuThat(url: string): boolean {
+  const u = (url || '').trim()
+  if (!u.startsWith('http')) return false
+  return !/(^|\.)google\.com|googleusercontent|script\.googleapis/i.test(u)
+}
+
+/** GỬI MỘT LỆNH LÊN MÁY CHỦ.
+ *
+ * GOOGLE ĐÃ BỊ CẮT — thầy chốt 12/09 rạng sáng: "gỡ sạch google, toàn bộ app
+ * phải được chạy trên máy chủ mới". Trước đây hàm này POST thẳng vào Apps
+ * Script và trả về sau 1,5–2,9 giây cho MỌI lệnh, kể cả lệnh chỉ đọc một ô
+ * (tra số báo danh). `trangThaiPhongCho` đo được 10.185 ms lúc 20:05 ngày
+ * 11/09, vì Apps Script chạy một luồng và cả lớp xếp hàng chung.
+ *
+ * Bây giờ mọi lệnh đi vào cổng `/goi` của máy chủ mới, giữ NGUYÊN dáng
+ * `{action: ...}` — nhờ vậy 61 chỗ gọi ở trên và mọi màn hình không phải sửa
+ * một dòng nào, mà không còn một byte nào chạm Google.
+ *
+ * Tham số `scriptUrl` GIỮ LẠI trong chữ ký để chỗ gọi không phải đổi, nhưng
+ * KHÔNG còn được dùng làm địa chỉ. Địa chỉ máy chủ đọc từ cấu hình. */
+async function postJson(_scriptUrl: string, body: unknown, giay: number = HAN_GIAY): Promise<any> {
+  await xongNapDiaChi()
+  const ch = await layCauHinhMayChu()
+  // Địa chỉ lấy từ cấu hình máy chủ. Tham số truyền vào chỉ được dùng khi cấu
+  // hình còn trống VÀ nó không trỏ về Google — nhờ đó bản thử vẫn trỏ được sang
+  // một máy chủ khác, còn đường về Apps Script thì bịt cứng:
+  const duPhong = laMayChuThat(_scriptUrl) ? _scriptUrl.trim() : ''
+  const diaChi = String(ch.URL ?? '').trim() || duPhong
+  // KHÔNG ÂM THẦM QUAY VỀ GOOGLE. Thiếu địa chỉ thì nói thẳng, vì cái sai ở đây
+  // là cấu hình chứ không phải mạng — và im lặng đi đường cũ là đúng thứ thầy
+  // vừa bảo dẹp.
+  if (!diaChi) throw new Error('Chưa có địa chỉ máy chủ mới — vào Ngân hàng câu hỏi → Cấu hình')
   const res = await fetchCoHan(
-    scriptUrl,
+    `${diaChi}/goi`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -713,7 +748,9 @@ function mocMsHopLe(v: unknown): number | null {
 export type LoaiCa = 'thi' | 'baitap'
 
 export async function publishSession(
-  scriptUrl: string,
+  /** GIỮ TRONG CHỮ KÝ để chỗ gọi không phải sửa; từ 12/09 không còn được dùng
+   * làm địa chỉ — ca chỉ còn đi một nơi là máy chủ mới. */
+  _scriptUrl: string,
   maCa: string,
   lop: string,
   thoiGianPhut: number,
@@ -772,6 +809,21 @@ export async function publishSession(
           phongCho: moc.phongCho === true,
           giuDeDoc: moc.giuDeDoc === true,
           anHanGiay: moc.giuDeDoc === true ? moc.anHanGiay || 3 : 0,
+          // BỐN CỜ NÀY TRƯỚC ĐÂY CHỈ SỐNG BÊN SHEET. Cắt Sheet mà quên chúng là
+          // mất cổng chặn phạm vi, mất chế độ đề riêng và mất cờ gọi lên bảng —
+          // đúng loại hỏng chỉ lộ ra giữa ca thật.
+          phamVi: moc.phamVi || 'tu_do',
+          danhSachMoi:
+            moc.phamVi === 'chon'
+              ? Array.isArray(moc.danhSachMoi)
+                ? moc.danhSachMoi
+                : []
+              : moc.phamVi === 'khoi'
+                ? String(moc.danhSachMoi ?? '')
+                : '',
+          lenBang: moc.lenBang !== false,
+          deRieng: moc.deRieng === true,
+          phamViHoiLai: moc.phamViHoiLai === 'ba_ca' ? 'ba_ca' : 'gan_nhat',
         },
         bank,
         // Ngân hàng CÓ đáp án — chỉ gửi khi ca công bố điểm NGAY. Worker cất sau
@@ -782,68 +834,24 @@ export async function publishSession(
       return true
   })()
 
-  // LƯỢT GHI SHEET — DỰNG SẴN, CHẠY NỀN, KHÔNG ĐỢI.
+  // KHÔNG CÒN LƯỢT GHI GOOGLE SHEET.
   //
-  // Đo ca 112480 lúc 19h07: D1 có ca sau 1,15 giây; phần còn lại thầy ngồi chờ
-  // là Apps Script ghi gói đề vào bảng. Đợi nó xong mới trả về thì mở ca không
-  // bao giờ nhanh được, dù hai lượt đã chạy song song.
+  // Thầy chốt 12/09 rạng sáng: "không ghi điểm vào google sheet nữa" và "gỡ
+  // sạch google". Trước đây mở một ca là ghi HAI nơi: D1 (nhanh) và Sheet
+  // (chậm, chạy nền, có sổ theo dõi ở `ghi-sheet-nen.ts`). Giờ chỉ còn D1.
   //
-  // ĐÁNH ĐỔI, và nó được canh bằng `ghi-sheet-nen.ts`: ca không lên Sheet là
-  // hỏng đường điểm và đường Zalo. Nên trạng thái từng ca được giữ lại, màn
-  // hình HIỆN RA, và có nút thử lại. Im lặng là thứ duy nhất bị cấm.
-  const ghiSheet = async () => {
-    const kq = await postJson(scriptUrl, {
-    action: 'publish',
-    maCa,
-    lop,
-    thoiGianPhut,
-    bank,
-    // Cột ImmediateFeedback trên sheet: 'true' | 'false' | 'calop' (bản cũ chỉ có true/false).
-    immediateFeedback: congBoDiem === 'ngay' ? true : congBoDiem === 'ca_lop_xong' ? 'calop' : false,
-    keyBank: congBoDiem === 'khong' ? undefined : keyBank,
-    batDau: batDauISO,
-    hetHanVao: hetHanISO,
-    hanVaoPhut: 0,
-    tenCa: moc.tenCa || '',
-    phamVi: moc.phamVi || 'tu_do',
-    // Chế độ 'sbd' KHÔNG có danh sách riêng: cổng của nó là DanhSachLop trên
-    // máy chủ, nên không gửi gì lên.
-    danhSachMoi: moc.phamVi === 'chon' ? (Array.isArray(moc.danhSachMoi) ? moc.danhSachMoi : []) : moc.phamVi === 'khoi' ? String(moc.danhSachMoi ?? '') : '',
-    loai: moc.loai || 'thi',
-    hanNop: moc.hanNop || '',
-    nguongLan: moc.nguongLan || 0,
-    nguongGiay: moc.nguongGiay || 0,
-    lenBang: moc.lenBang !== false,
-    giuDeDoc: moc.giuDeDoc === true,
-    anHanGiay: moc.giuDeDoc === true ? moc.anHanGiay || 3 : 0,
-    phongCho: moc.phongCho === true,
-    deRieng: moc.deRieng === true,
-    phamViHoiLai: moc.phamViHoiLai === 'ba_ca' ? 'ba_ca' : 'gan_nhat',
-    })
-    if (!kq.ok) throw new Error(kq.error || 'Mở ca kiểm tra thất bại')
-  }
-
-  // CHỜ MÁY CHỦ MỚI, KHÔNG CHỜ SHEET — nhưng CHỈ khi máy chủ mới thật sự nhận
-  // được ca. Ca có trên D1 và gói đề có trên R2 là cả lớp vào thi được, đúng
-  // đường 29 lượt của ca 704066 tối nay đã đi.
-  //
-  // Cờ TẮT, hoặc đẩy hỏng ⇒ QUAY VỀ LUẬT CŨ: đợi Sheet ghi xong rồi mới trả
-  // lời. Chậm, nhưng ca chắc chắn tồn tại ở một nơi nào đó. Trả lời "đã mở" khi
-  // ca không nằm ở đâu cả là thứ tệ nhất có thể làm ở màn này.
+  // ĐẨY HỎNG THÌ BÁO ĐỎ, KHÔNG có đường dự phòng nào nữa. Đó là điều phải nói
+  // thẳng: trước kia Sheet đỡ cho lượt đẩy hỏng, giờ thì không. Trả lời "đã mở"
+  // khi ca không nằm ở đâu cả là thứ tệ nhất có thể làm ở màn này, nên thà báo
+  // hỏng ngay lúc thầy còn đứng trước máy.
   let daLenMayChuMoi = false
   try {
     daLenMayChuMoi = await dayMayChuMoi
-  } catch {
-    daLenMayChuMoi = false
+  } catch (e) {
+    throw e instanceof Error ? e : new Error('Mở ca kiểm tra thất bại')
   }
+  if (!daLenMayChuMoi) throw new Error('Không đẩy được ca lên máy chủ — kiểm tra địa chỉ máy chủ và mã bí mật rồi mở lại')
 
-  if (!daLenMayChuMoi) {
-    await ghiSheet()
-    xoaBoDemCa()
-    return { batDau: batDauISO, hetHanVao: hetHanISO }
-  }
-
-  theoGhiSheet(maCa, ghiSheet)
   xoaBoDemCa()
   return { batDau: batDauISO, hetHanVao: hetHanISO }
 }
@@ -869,19 +877,13 @@ export interface KetQuaCongBo {
 }
 
 export async function fetchKetQua(scriptUrl: string, maCa: string, sbd: string): Promise<KetQuaCongBo> {
-  const url = `${scriptUrl}?action=ketQua&maCa=${encodeURIComponent(maCa)}&sbd=${encodeURIComponent(sbd)}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
-  const r = await res.json()
+  const r = await postJson(scriptUrl, { action: 'ketQua', maCa, sbd })
   if (!r.ok) throw new Error(r.error || 'Không hỏi được kết quả')
   return { congBo: r.congBo, sanSang: !!r.sanSang, daNop: r.daNop ?? 0, daVao: r.daVao ?? 0, keyBank: r.keyBank ?? null }
 }
 
 export async function fetchSession(scriptUrl: string, maCa: string): Promise<SessionConfig> {
-  const url = `${scriptUrl}?action=session&maCa=${encodeURIComponent(maCa)}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
-  return res.json()
+  return postJson(scriptUrl, { action: 'session', maCa })
 }
 
 export async function submitAnswers(
@@ -1119,12 +1121,8 @@ export interface SubmissionRow {
 /** Lượt MỚI NHẤT của mỗi SBD trong ca — mọi trạng thái (đang làm, đã nộp, bị
  * khoá, đã duyệt thi lại). Màn Theo dõi tự lọc đã nộp để chấm. */
 export async function listSubmissions(scriptUrl: string, maCa: string): Promise<SubmissionRow[]> {
-  const url = `${scriptUrl}?action=listSubmissions&maCa=${encodeURIComponent(maCa)}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
-  const data = await res.json()
-  if (typeof data.serverNow === 'number') dongBoGioMayChu(data.serverNow)
-  return (data.rows || []).map((r: SubmissionRow) => ({ ...r, lanThu: Number(r.lanThu) || 1, trangThai: r.trangThai || 'da_nop' }))
+  const data = await postJson(scriptUrl, { action: 'listSubmissions', maCa })
+  return (data.rows || data.items || []).map((r: SubmissionRow) => ({ ...r, lanThu: Number(r.lanThu) || 1, trangThai: r.trangThai || 'da_nop' }))
 }
 
 // ============================================================================
@@ -1292,10 +1290,7 @@ export interface ParentMessage {
 }
 
 export async function listParentMessages(scriptUrl: string, secret: string): Promise<ParentMessage[]> {
-  const url = `${scriptUrl}?action=listMessages&secret=${encodeURIComponent(secret)}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
-  const data = await res.json()
+  const data = await postJson(scriptUrl, { action: 'listMessages', secret })
   return data.items || []
 }
 
@@ -1305,10 +1300,7 @@ export async function listParentMessages(scriptUrl: string, secret: string): Pro
  * về chỉ để lấy một con số, cứ vài chục giây một lần, suốt ngày. Lệnh này đọc
  * đúng một cột trên máy chủ và trả về hai con số. */
 export async function demTinMoi(scriptUrl: string, secret: string): Promise<{ soChuaDoc: number; tong: number }> {
-  const url = `${scriptUrl}?action=demTinMoi&secret=${encodeURIComponent(secret)}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
-  const r = await res.json()
+  const r = await postJson(scriptUrl, { action: 'demTinMoi', secret })
   if (!r.ok) throw new Error(r.error || 'Không đếm được tin')
   return { soChuaDoc: Number(r.soChuaDoc) || 0, tong: Number(r.tong) || 0 }
 }
@@ -1376,10 +1368,7 @@ export function chuoi(v: unknown): string {
 }
 
 export async function listRegisteredStudents(scriptUrl: string, secret: string): Promise<RegisteredStudent[]> {
-  const url = `${scriptUrl}?action=listStudents&secret=${encodeURIComponent(secret)}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
-  const data = await res.json()
+  const data = await postJson(scriptUrl, { action: 'listStudents', secret })
   return ((data.items || []) as RegisteredStudent[]).map((x) => ({
     ...x,
     sbd: chuoi(x.sbd),

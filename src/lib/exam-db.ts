@@ -311,9 +311,27 @@ export async function saveCauHinhMayChu(c: Partial<CauHinhMayChu>): Promise<CauH
   return chuan
 }
 
+/** ĐỊA CHỈ MÁY CHỦ đã lưu trên máy này.
+ *
+ * TỪ 12/09 GIÁ TRỊ NÀY KHÔNG CÒN LÀ ĐỊA CHỈ GỬI LỆNH. Thầy chốt "gỡ sạch
+ * google": mọi lệnh đi vào cổng `/goi` của máy chủ mới, địa chỉ lấy từ cấu hình
+ * máy chủ mới (xem `postJson` trong `exam-api.ts`).
+ *
+ * Hàm này còn sống vì hơn 60 chỗ trong app dùng nó để hỏi MỘT câu duy nhất: "đã
+ * cấu hình máy chủ chưa?" — chưa thì màn hình chặn sớm và bảo thầy vào Cấu
+ * hình. Nên khi ô cũ trống mà máy chủ mới ĐÃ có địa chỉ, trả địa chỉ ấy: cổng
+ * chặn giữ nguyên ý nghĩa, và thầy không phải nhập lại một cái link đã bỏ. */
 export async function loadScriptUrl(): Promise<string> {
   const db = await getDb()
-  return (await db.get(STORE_SETTINGS, 'scriptUrl')) || ''
+  const cu = (await db.get(STORE_SETTINGS, 'scriptUrl')) || ''
+  if (cu) return cu
+  try {
+    const { layCauHinhMayChu } = await import('./may-chu-moi')
+    const ch = await layCauHinhMayChu()
+    return String(ch.URL ?? '').trim()
+  } catch {
+    return ''
+  }
 }
 
 /** Link Apps Script cho MÁY HỌC SINH mở link ngắn /t/<mã ca> (không kèm

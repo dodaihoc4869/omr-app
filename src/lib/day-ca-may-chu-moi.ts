@@ -33,6 +33,14 @@ export interface CaDay {
   anHanGiay?: number
   soCau?: unknown
   boTheoEm?: unknown
+  /** PHẠM VI GỬI CA: tu_do · khoi · chon · sbd. Trước 12/09 cờ này chỉ sống bên
+   * Sheet; Sheet mất thì cổng chặn mất theo, nên nó phải đi cùng ca. */
+  phamVi?: string
+  /** Danh sách SBD thầy tích (phamVi = 'chon') hoặc khối (phamVi = 'khoi'). */
+  danhSachMoi?: unknown
+  lenBang?: boolean
+  deRieng?: boolean
+  phamViHoiLai?: string
 }
 
 /** Gói đẩy ca: ngoài `ca` và gói đề KHÔNG đáp án, còn ngân hàng CÓ đáp án để

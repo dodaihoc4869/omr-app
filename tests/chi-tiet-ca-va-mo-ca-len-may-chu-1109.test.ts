@@ -116,34 +116,37 @@ describe('② GHI ĐIỂM SOI SANG D1 — nhưng chỉ lượt Apps Script ĐÃ 
   })
 })
 
-describe('③ MỞ CA — mốc giờ tính MỘT nơi, và không xếp sau lượt ghi Sheet', () => {
+// TỪ 12/09 KHÔNG CÒN LƯỢT GHI SHEET: thầy chốt "gỡ sạch google". Ba mệnh đề
+// dưới đây trước kia canh thứ tự giữa lượt đẩy máy chủ mới và lượt ghi Sheet;
+// nay chỉ còn một lượt, nên chúng canh chính lượt ấy.
+describe('③ MỞ CA — mốc giờ tính MỘT nơi, và chỉ còn MỘT đích', () => {
   const HAM = API.slice(API.indexOf('export async function publishSession('), API.indexOf('export async function capNhatKeyBank('))
 
   it('mốc bắt đầu tính ở máy thầy rồi GỬI KÈM, để hai bên ra đúng một chuỗi', () => {
     expect(HAM).toContain('const batDauISO = new Date(batDauMs).toISOString()')
     expect(HAM).toContain('batDau: batDauISO')
     expect(HAM).toContain('hetHanVao: hetHanISO')
-    // gửi mốc tuyệt đối rồi thì KHÔNG gửi kèm số phút nữa, kẻo máy chủ tự tính lại
-    expect(HAM).toContain('hanVaoPhut: 0')
+    // Gửi mốc tuyệt đối rồi thì KHÔNG gửi kèm số phút nữa, kẻo máy chủ tự tính
+    // lại. Gói gửi máy chủ mới không có trường `hanVaoPhut` — đó là cách chắc
+    // hơn cả việc gửi số 0.
+    expect(HAM).not.toContain('hanVaoPhut:')
   })
 
   it('luật tính hạn vào phòng khớp Apps Script: có số phút thì cộng vào mốc bắt đầu', () => {
     expect(HAM).toContain('hanPhut > 0 ? batDauMs + hanPhut * 60000 : mocMsHopLe(moc.hetHanVao)')
   })
 
-  it('đẩy máy chủ mới dựng TRƯỚC lượt ghi Sheet, không xếp sau nó', () => {
-    // Đợt 5D cho hai lượt chạy song song. Đợt 5E (19h15 cùng ngày) đi xa hơn:
-    // trả lời NGAY khi máy chủ mới có ca, Sheet ghi ở nền. Luật giữ nguyên —
-    // lượt đẩy máy chủ mới không bao giờ được xếp sau lượt ghi Sheet.
-    expect(HAM.indexOf('const dayMayChuMoi = (async ()')).toBeLessThan(HAM.indexOf('const ghiSheet = async () =>'))
-    expect(HAM).toContain('daLenMayChuMoi = await dayMayChuMoi')
+  it('lượt đẩy máy chủ mới dựng xong rồi mới chờ — và không còn lượt nào khác', () => {
+    expect(HAM.indexOf('const dayMayChuMoi = (async ()')).toBeGreaterThan(0)
+    expect(HAM.indexOf('const dayMayChuMoi = (async ()')).toBeLessThan(HAM.indexOf('daLenMayChuMoi = await dayMayChuMoi'))
+    expect(HAM).not.toContain('const ghiSheet = async () =>')
   })
 
   it('gói đề CÔNG KHAI đẩy lên R2 là bản KHÔNG đáp án', () => {
     // 11/09 khuya: ngân hàng CÓ đáp án nay cũng được đẩy, nhưng sang một KHOÁ
     // KHÁC (`key/`) để `/nop` trả ngay cho em khi ca công bố điểm. Luật không
     // đổi — `de/` là đường công khai máy em tải, và nó KHÔNG được có đáp án.
-    const khoi = HAM.slice(HAM.indexOf('const dayMayChuMoi = (async ()'), HAM.indexOf('const ghiSheet = async () =>'))
+    const khoi = HAM.slice(HAM.indexOf('const dayMayChuMoi = (async ()'), HAM.indexOf('KHÔNG CÒN LƯỢT GHI GOOGLE SHEET'))
     expect(khoi).toContain('bank,')
     // Ngân hàng đáp án chỉ gửi khi ca CÔNG BỐ NGAY, không gửi bừa.
     expect(khoi).toContain("congBoDiem === 'ngay' ? keyBank : undefined")
@@ -153,9 +156,11 @@ describe('③ MỞ CA — mốc giờ tính MỘT nơi, và không xếp sau lư
     expect(layDe).not.toContain('key/')
   })
 
-  it('cờ máy chủ mới TẮT thì trả false, không ném — và chỗ gọi quay về đợi Sheet', () => {
+  it('cờ máy chủ mới TẮT thì trả false, không ném — và chỗ gọi BÁO ĐỎ', () => {
     expect(HAM).toContain('if (!chMoi.BAT || !chMoi.URL) return false')
-    expect(HAM).toContain('if (!daLenMayChuMoi) {')
+    const i = HAM.indexOf('if (!daLenMayChuMoi)')
+    expect(i).toBeGreaterThan(0)
+    expect(HAM.slice(i, i + 200)).toContain('throw new Error')
   })
 })
 

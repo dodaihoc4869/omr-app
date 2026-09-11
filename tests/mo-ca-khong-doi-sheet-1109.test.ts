@@ -1,88 +1,72 @@
-// MỞ CA KHÔNG ĐỢI GOOGLE SHEET — đo ca thật 112480, 19h07 ngày 11/09.
+// MỞ CA — TỪ 12/09 KHÔNG CÒN GOOGLE SHEET TRONG ĐƯỜNG ĐI.
 //
-//     bat_dau       12:07:06.336Z
-//     cap_nhat_luc  12:07:07.482Z   ← máy chủ mới đã có ca
+// Lịch sử của tệp này: 11/09 mở một ca ghi HAI nơi — D1 (1,15 giây, đo ở ca
+// thật 112480) và Apps Script ghi gói đề vào bảng `CaKiemTra` (phần thầy ngồi
+// chờ). Đợt 5D cho hai lượt chạy song song rồi trả lời ngay khi D1 xong, và giữ
+// một sổ theo dõi `ghi-sheet-nen.ts` để ca chưa lên Sheet không trôi đi im lặng.
 //
-// Máy chủ mới nhận ca sau **1,15 giây**. Toàn bộ phần thầy ngồi chờ còn lại là
-// Apps Script ghi gói đề vào bảng `CaKiemTra`. Chạy song song (đợt 5D) cắt được
-// phần D1 nhưng không cắt được phần ấy — thầy vẫn kêu "mở rất chậm".
+// 12/09 rạng sáng thầy chốt: "không ghi điểm vào google sheet nữa" · "gỡ sạch
+// google". Nên lượt ghi Sheet bị gỡ HẲN, cùng với sổ theo dõi và dòng báo của
+// nó — giữ lại là để một nhánh mã không bao giờ chạy nhưng vẫn đọc như thật.
 //
-// Nay trả lời NGAY khi D1 và R2 có ca. Cơ sở: ca 704066 tối nay chứng minh mọi
-// lượt của em đọng ở D1, không dòng nào cần Sheet để vào thi.
-//
-// HAI CHỐT CHẶN, và tệp này tồn tại vì chúng:
-//   ① cờ TẮT hay đẩy HỎNG ⇒ quay về luật cũ, ĐỢI Sheet. Trả lời "đã mở" khi ca
-//     không nằm ở đâu cả là thứ tệ nhất có thể làm ở màn này.
-//   ② ca chưa lên Sheet phải HIỆN RA kèm nút thử lại. Đổi tốc độ lấy một lỗi
-//     thầm lặng là đổi hỏng: thiếu ca trên Sheet là thiếu điểm và thiếu tin Zalo.
+// HAI CHỐT CHẶN MỚI, và tệp này tồn tại vì chúng:
+//   ① mở ca chỉ còn MỘT đích. Đẩy hỏng thì BÁO ĐỎ ngay, không có đường lùi nào
+//     nuốt lỗi — trả lời "đã mở" khi ca không nằm ở đâu cả là thứ tệ nhất.
+//   ② không còn một dòng nào trong màn mở ca nhắc tới Google Sheet.
 import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 
 const API = fs.readFileSync(path.join(process.cwd(), 'src/lib/exam-api.ts'), 'utf8')
-const NEN = fs.readFileSync(path.join(process.cwd(), 'src/lib/ghi-sheet-nen.ts'), 'utf8')
 const MAN = fs.readFileSync(path.join(process.cwd(), 'src/screens/ExamSetupScreen.tsx'), 'utf8')
 const HAM = API.slice(API.indexOf('export async function publishSession('), API.indexOf('export async function capNhatKeyBank('))
 
-describe('MỞ CA TRẢ LỜI NGAY KHI MÁY CHỦ MỚI CÓ CA', () => {
-  it('chờ máy chủ mới, KHÔNG chờ lượt ghi Sheet', () => {
+describe('MỞ CA CHỈ CÒN MỘT ĐÍCH', () => {
+  it('không còn lượt ghi Google Sheet nào trong hàm mở ca', () => {
+    expect(HAM).not.toContain('theoGhiSheet')
+    expect(HAM).not.toContain('ghiSheet')
+    expect(HAM).not.toContain("action: 'publish'")
+  })
+
+  it('vẫn chờ máy chủ mới nhận ca rồi mới trả lời', () => {
     expect(HAM).toContain('daLenMayChuMoi = await dayMayChuMoi')
-    expect(HAM).toContain('theoGhiSheet(maCa, ghiSheet)')
-    // `theoGhiSheet` bắn lượt ghi đi rồi trả về ngay — không `await ghiSheet()`
-    // ở nhánh thành công.
-    const nhanhOk = HAM.slice(HAM.indexOf('theoGhiSheet(maCa, ghiSheet)'))
-    expect(nhanhOk).not.toContain('await ghiSheet()')
   })
 
-  it('CHỐT ① — cờ tắt hoặc đẩy hỏng thì QUAY VỀ đợi Sheet', () => {
-    expect(HAM).toContain('if (!daLenMayChuMoi) {')
-    const nhanhLui = HAM.slice(HAM.indexOf('if (!daLenMayChuMoi) {'), HAM.indexOf('theoGhiSheet(maCa, ghiSheet)'))
-    expect(nhanhLui).toContain('await ghiSheet()')
-  })
-
-  it('đẩy máy chủ mới ném lỗi cũng tính là CHƯA lên — không nuốt rồi đi tiếp', () => {
-    expect(HAM).toMatch(/catch \{\s*\n\s*daLenMayChuMoi = false\s*\n\s*\}/)
+  it('CHỐT ① — đẩy hỏng thì NÉM LỖI, không âm thầm báo đã mở', () => {
+    const i = HAM.indexOf('if (!daLenMayChuMoi)')
+    expect(i).toBeGreaterThan(0)
+    expect(HAM.slice(i, i + 200)).toContain('throw new Error')
+    // Lỗi ném ra từ lượt đẩy cũng phải nổi lên, không bị nuốt thành `false`.
+    expect(HAM).not.toMatch(/catch \{\s*\n\s*daLenMayChuMoi = false\s*\n\s*\}/)
   })
 
   it('cờ TẮT trả về false chứ không ném — tắt là thầy chủ ý tắt', () => {
     expect(HAM).toContain('if (!chMoi.BAT || !chMoi.URL) return false')
   })
 
-  it('lượt ghi Sheet vẫn ném lỗi khi máy chủ từ chối — không coi là xong', () => {
-    expect(HAM).toContain("if (!kq.ok) throw new Error(kq.error || 'Mở ca kiểm tra thất bại')")
+  it('BỐN CỜ TỪNG CHỈ SỐNG BÊN SHEET nay đi cùng ca', () => {
+    // Quên chúng là mất cổng chặn phạm vi, mất chế độ đề riêng, mất cờ gọi lên
+    // bảng — loại hỏng chỉ lộ ra giữa ca thật.
+    expect(HAM).toContain('phamVi: moc.phamVi')
+    expect(HAM).toContain('lenBang: moc.lenBang !== false')
+    expect(HAM).toContain('deRieng: moc.deRieng === true')
+    expect(HAM).toContain('phamViHoiLai:')
+    expect(HAM).toContain('danhSachMoi:')
   })
 })
 
-describe('CHỐT ② — ca chưa lên Sheet KHÔNG được im lặng', () => {
-  it('giữ trạng thái từng ca và báo cho màn hình vẽ lại', () => {
-    expect(NEN).toContain('export function ngheGhiSheet(')
-    expect(NEN).toContain('export function trangThaiGhiSheet(')
-    expect(NEN).toContain("export type TrangThaiSheet = 'dang_ghi' | 'xong' | 'hong'")
+describe('CHỐT ② — màn mở ca không còn nhắc Google Sheet', () => {
+  it('sổ theo dõi ghi Sheet đã bị gỡ khỏi mã nguồn', () => {
+    expect(fs.existsSync(path.join(process.cwd(), 'src/lib/ghi-sheet-nen.ts'))).toBe(false)
   })
 
-  it('có đường hỏi MỌI ca chưa lên Sheet, để không ca nào trôi đi', () => {
-    expect(NEN).toContain('export function caChuaLenSheet(')
-  })
-
-  it('nút Thử lại chạy ĐÚNG lượt ghi cũ, không dựng lại gói', () => {
-    // Dựng lại gói là mở đường cho hai gói khác nhau cùng mang một mã ca.
-    expect(NEN).toContain('thuLai: async () => {')
-    expect(NEN).toContain('await chay_(maCa, chay)')
-  })
-
-  it('một người nghe hỏng không làm hỏng những người còn lại', () => {
-    const bao = NEN.slice(NEN.indexOf('function bao()'), NEN.indexOf('function bao()') + 300)
-    expect(bao).toContain('} catch {')
-  })
-
-  it('màn mở ca HIỆN dòng trạng thái ngay dưới mã ca', () => {
-    expect(MAN).toContain('<DongGhiSheet maCa={opened.maCa} />')
-    expect(MAN).toContain('CHƯA lên Google Sheet')
-    expect(MAN).toContain('Thử lại')
-  })
-
-  it('ghi xong thì dòng ấy biến mất, không để lại rác trên màn', () => {
-    const tp = MAN.slice(MAN.indexOf('function DongGhiSheet('))
-    expect(tp).toContain("if (!d || d.trangThai === 'xong') return null")
+  it('màn mở ca không còn dòng báo "đang ghi lên Google Sheet"', () => {
+    expect(MAN).not.toContain('DongGhiSheet')
+    expect(MAN).not.toContain('ghi-sheet-nen')
+    // Hai chú thích còn nhắc tên Sheet là nói về NGUỒN danh sách lớp thầy tự
+    // nạp — không phải đường chạy của app. Thứ phải biến mất là dòng báo trạng
+    // thái ghi Sheet.
+    expect(MAN).not.toContain('Đang ghi nốt lên Google Sheet')
+    expect(MAN).not.toContain('CHƯA lên Google Sheet')
   })
 })

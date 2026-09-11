@@ -9,6 +9,7 @@
 //      lệnh của THẦY thì đòi. Không nới luật này ở bất kỳ đâu.
 import { CA_DO_TAI, TRANG_DO_TAI } from './do-tai'
 import { chuanHoaDanhSach } from './danh-sach'
+import * as G from './goi-cu'
 import type { D1PreparedStatement, DongCa, DongLuot, Env } from './kieu'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 
@@ -381,8 +382,9 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
   await env.DB.prepare(
     `INSERT INTO ca (ma_ca, ten_ca, trang_thai, bat_dau, het_han_vao, thoi_gian_phut, loai, han_nop,
                      cong_bo, nguong_lan, nguong_giay, bank_r2, so_cau_json, bo_theo_em_json, cap_nhat_luc,
-                     lop, phong_cho, bat_dau_thi_luc, giu_de_doc, an_han_giay, sinh_tai_d1)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)
+                     lop, phong_cho, bat_dau_thi_luc, giu_de_doc, an_han_giay,
+                     pham_vi, len_bang, de_rieng, pham_vi_hoi_lai, danh_sach_chon_json, sinh_tai_d1)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)
      ON CONFLICT(ma_ca) DO UPDATE SET
        -- CHỐT CHẶN THỨ HAI: chuỗi RỖNG không được ghi đè chữ đang có. Lượt đẩy
        -- thiếu trường là chuyện thường (xem khối chiMoc ở trên); mất tên ca
@@ -406,7 +408,14 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
        -- KHÔNG ghi đè mốc bắt đầu bằng rỗng: thầy đẩy lại ca giữa giờ (sửa tên,
        -- đổi hạn) mà xoá mốc này là cả lớp bị đá về phòng chờ, đồng hồ đang chạy.
        bat_dau_thi_luc=COALESCE(excluded.bat_dau_thi_luc, ca.bat_dau_thi_luc),
-       bank_r2=COALESCE(excluded.bank_r2, ca.bank_r2)`,
+       bank_r2=COALESCE(excluded.bank_r2, ca.bank_r2),
+       -- BỐN CỜ CHUYỂN TỪ SHEET SANG (12/09). Cùng luật với tên ca: rỗng không
+       -- ghi đè, vì lượt đẩy lại giữa giờ vẫn có thể thiếu trường.
+       pham_vi=COALESCE(NULLIF(excluded.pham_vi,''), ca.pham_vi),
+       len_bang=excluded.len_bang,
+       de_rieng=excluded.de_rieng,
+       pham_vi_hoi_lai=COALESCE(NULLIF(excluded.pham_vi_hoi_lai,''), ca.pham_vi_hoi_lai),
+       danh_sach_chon_json=COALESCE(excluded.danh_sach_chon_json, ca.danh_sach_chon_json)`,
   )
     .bind(
       maCa, String(ca.tenCa ?? ''), String(ca.trangThai ?? 'mo'), String(ca.batDau ?? ''),
@@ -416,6 +425,9 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
       ca.boTheoEm ? JSON.stringify(ca.boTheoEm) : null, new Date().toISOString(),
       String(ca.lop ?? ''), ca.phongCho ? 1 : 0, String(ca.batDauThiLuc ?? '') || null,
       ca.giuDeDoc ? 1 : 0, Number(ca.anHanGiay) || 0,
+      String(ca.phamVi ?? ''), ca.lenBang === false ? 0 : 1, ca.deRieng === true ? 1 : 0,
+      String(ca.phamViHoiLai ?? ''),
+      ca.danhSachMoi === undefined || ca.danhSachMoi === '' ? null : JSON.stringify(ca.danhSachMoi),
     )
     .run()
   return ra({ ok: true, maCa, coDe: !!bankKey })
@@ -851,6 +863,12 @@ async function chiTietCaMoi(env: Env, maCa: string): Promise<Response> {
       phongCho: Number(ca.phong_cho ?? 0) === 1,
       xoaLuc: String(ca.xoa_luc ?? ''),
       moLuc: String(ca.mo_luc ?? ''),
+      // BỐN CỜ CHUYỂN TỪ SHEET SANG (12/09). Màn Theo dõi đọc `deRieng` để biết
+      // ca này phát đề riêng từng em; thiếu nó là thầy bấm Bắt đầu mà cả lớp
+      // nhận chung một đề.
+      deRieng: Number(ca.de_rieng ?? 0) === 1,
+      phamViHoiLai: String(ca.pham_vi_hoi_lai ?? '') === 'ba_ca' ? 'ba_ca' : 'gan_nhat',
+      danhSachChon: doJson(ca.danh_sach_chon_json),
     },
     luot,
     dsCho: (rCho.results ?? []).map((x) => ({ sbd: String(x.sbd ?? ''), hoTen: String(x.ho_ten ?? ''), vaoLuc: String(x.ghi_luc ?? '') })),
@@ -1832,6 +1850,125 @@ async function donDoTai(env: Env): Promise<Response> {
 
 // ------------------------------------------------------------------ ĐỊNH TUYẾN
 
+
+// ===========================================================================
+// CỔNG `/goi` — BẢNG DỊCH LỆNH CŨ. CẮT HẲN GOOGLE (thầy chốt 12/09 rạng sáng).
+//
+// App đang gọi Apps Script bằng 67 lệnh `{action: '...'}`. Viết lại 67 chỗ gọi
+// trong một đêm là cách chắc chắn nhất để làm hỏng một thứ đang chạy, nên đi
+// đường ngược lại: GIỮ NGUYÊN DÁNG LỆNH, ĐỔI NƠI NHẬN. Đây là bảng dịch ấy.
+//
+// Mỗi lệnh trả về ĐÚNG DÁNG cũ — tên trường, kiểu, cả trường rỗng — vì màn hình
+// không được sửa một dòng nào trong đợt này. Lệnh nào chưa dựng thì trả lỗi nói
+// thẳng tên lệnh, KHÔNG trả `{ok:true}` rỗng: im lặng trả rỗng là thầy nhìn màn
+// hình thấy "không có dữ liệu" và tưởng mất sạch.
+const LENH_CUA_THAY = new Set([
+  'publish', 'batDauThi', 'chiTietCa', 'danhSachCa', 'ghiDiem', 'khoaCa', 'moKhoaCa',
+  'xoaCa', 'khoiPhucCa', 'doiTenCa', 'dongBoTenCa', 'moKhoa', 'duyetThiLai', 'choThiLai',
+  'capNhatKeyBank', 'noiKhoCa', 'banDoSaiCa', 'danhSachEm', 'hoSoEm', 'hoSoNhieuEm',
+  'qidDaLam', 'danhSachYeuCau', 'danhDauYeuCau', 'napDanhSachLop', 'themEmVaoSheet',
+  'linkDanhSachLop', 'luuLinkDanhSachLop', 'deleteStudent', 'danhSachDe', 'layDe', 'luuDe',
+  'xoaDe', 'luuPhieu', 'luuNhieuPhieu', 'xoaPhieu', 'phieuTheoCa', 'nopKhacPhucTheoCa',
+  'dungChiMuc', 'danhSachCauHoi', 'xoaCauHoi', 'danhDauDaChua', 'ghiLenBang', 'lichSuLenBang',
+  'sendTeacherMessage', 'listMessages', 'demTinMoi', 'listStudents', 'markMessagesRead',
+])
+
+async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promise<Response> {
+  const act = String(b.action ?? '').trim()
+  if (!act) return ra({ ok: false, error: 'Thiếu tên lệnh' }, 400)
+  const thay = laThay(req, env, b)
+  if (LENH_CUA_THAY.has(act) && !thay) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
+
+  switch (act) {
+    // ---- MÁY EM ----------------------------------------------------------
+    case 'vaoThi': return vaoThi(env, b)
+    case 'luuTam': return luuTam(env, b)
+    case 'submit': return nop(env, b)
+    case 'examStatus': return dayTrangThai(env, b)
+    case 'trangThaiPhongCho': return hoiPhongCho(env, String(b.maCa ?? ''))
+    case 'tenTheoSbd': return ra(await G.traSbd(env, b))
+    case 'ketQua': return ra(await G.ketQuaCuaEm(env, b))
+    case 'session': return ra(await G.xemCa(env, b))
+    case 'layPhieu': return ra(await G.layPhieu(env, b))
+    case 'phieuCuaEm': return ra(await G.phieuCuaEm(env, b))
+    case 'lichSuEm': return ra(await G.lichSuEm(env, b))
+    case 'baiTapCuaEm': return ra(await G.baiTapCuaEm(env, b))
+    case 'guiCauHoi': return ra(await G.guiCauHoi(env, b))
+    case 'nopKhacPhuc': return ra(await G.nopKhacPhuc(env, b))
+    case 'cauKhacPhuc': return ra(await G.cauKhacPhucGoi(env, b))
+    case 'ghiPhieuKhacPhuc': return ra(await G.ghiPhieuKhacPhuc(env, b))
+    case 'sendMessage': return ra(await G.guiTin(env, b))
+    case 'sendFeedback': return ra(await G.guiNhanXetCoQuyen(env, b, thay))
+    case 'xinGiaoBai': return ra(await G.xinGiaoBai(env, b))
+
+    // ---- CA THI ----------------------------------------------------------
+    case 'publish': return dayCa(env, b)
+    case 'batDauThi': return batDauThi(env, String(b.maCa ?? ''))
+    case 'chiTietCa': return chiTietCaMoi(env, String(b.maCa ?? ''))
+    case 'danhSachCa': return danhSachCaMoi(env, b.daXoa === true)
+    case 'ghiDiem': return ghiDiemMoi(env, b)
+    case 'khoaCa': return ra(await G.khoaCa(env, b))
+    case 'moKhoaCa': return ra(await G.moKhoaCa(env, b))
+    case 'xoaCa': return ra(await G.xoaCa(env, b))
+    case 'khoiPhucCa': return ra(await G.khoiPhucCa(env, b))
+    case 'doiTenCa': return ra(await G.doiTenCa(env, b))
+    case 'dongBoTenCa': return ra(await G.dongBoTenCa(env, b))
+    case 'moKhoa': return ra(await G.moKhoaEm(env, b))
+    case 'duyetThiLai': return ra(await G.duyetThiLai(env, b))
+    case 'choThiLai': return ra(await G.choThiLai(env, b))
+    case 'capNhatKeyBank': return ra(await G.capNhatKeyBank(env, b))
+    case 'noiKhoCa': return ra(await G.noiKhoCa(env, b))
+    case 'banDoSaiCa': return ra(await G.banDoSaiCa(env, b))
+    case 'listSubmissions': return ra(await G.dsNopCuaCa(env, b))
+
+    // ---- HỒ SƠ · DANH SÁCH ----------------------------------------------
+    case 'danhSachEm': return danhSachEmMoi(env)
+    case 'hoSoEm': return ra(await G.hoSoEm(env, b))
+    case 'hoSoNhieuEm': return ra(await G.hoSoNhieuEm(env, b))
+    case 'qidDaLam': return ra(await G.qidDaLam(env, b))
+    case 'napDanhSachLop': return dayDanhSach(env, { items: b.items })
+    case 'themEmVaoSheet': return ra(await G.themEm(env, b))
+    case 'deleteStudent': return ra(await G.xoaEm(env, b))
+    case 'listStudents': return ra(await G.dsEmDangKy(env))
+    case 'linkDanhSachLop': return ra({ ok: true, links: (await G.layCauHinh(env, 'link_danh_sach_lop')) ?? [] })
+    case 'luuLinkDanhSachLop': {
+      const links = Array.isArray(b.links) ? (b.links as unknown[]).map((x) => String(x)).filter(Boolean) : []
+      await G.ghiCauHinh(env, 'link_danh_sach_lop', links)
+      return ra({ ok: true, links })
+    }
+    case 'danhSachYeuCau': return ra(await G.danhSachYeuCau(env, b))
+    case 'danhDauYeuCau': return ra(await G.danhDauYeuCau(env, b))
+
+    // ---- KHO ĐỀ ----------------------------------------------------------
+    case 'danhSachDe': return danhSachDeKho(env, b)
+    case 'layDe': return layDeKho(env, String(b.maDe ?? ''))
+    case 'luuDe': return dayDeKho(env, { de: b.de })
+    case 'xoaDe': return xoaDeKho(env, b)
+    case 'dungChiMuc': return ra(await G.dungChiMuc(env))
+
+    // ---- PHIẾU -----------------------------------------------------------
+    case 'luuPhieu': return ra(await G.luuPhieu(env, b))
+    case 'luuNhieuPhieu': return ra(await G.luuNhieuPhieu(env, b))
+    case 'xoaPhieu': return ra(await G.xoaPhieu(env, b))
+    case 'phieuTheoCa': return ra(await G.phieuTheoCa(env, b))
+    case 'nopKhacPhucTheoCa': return ra(await G.nopKhacPhucTheoCa(env, b))
+
+    // ---- HỎI BÀI · TIN NHẮN · LÊN BẢNG ----------------------------------
+    case 'danhSachCauHoi': return ra(await G.danhSachCauHoi(env, b))
+    case 'xoaCauHoi': return ra(await G.xoaCauHoi(env, b))
+    case 'danhDauDaChua': return ra(await G.danhDauDaChua(env, b))
+    case 'sendTeacherMessage': return ra(await G.guiTinCuaThay(env, b))
+    case 'listMessages': return ra(await G.hopThu(env))
+    case 'demTinMoi': return ra(await G.demTinMoi(env))
+    case 'markMessagesRead': return ra(await G.danhDauDaDoc(env, b))
+    case 'ghiLenBang': return ghiLenBangMoi(env, b)
+    case 'lichSuLenBang': return ra(await G.lichSuLenBang(env, b))
+
+    default:
+      return ra({ ok: false, error: `Máy chủ mới chưa dựng lệnh "${act}"` }, 400)
+  }
+}
+
 export default {
   async fetch(req: Request, env: Env): Promise<Response> {
     const url = new URL(req.url)
@@ -1871,6 +2008,8 @@ export default {
     if (p === '/nop') return nop(env, b)
     if (p === '/trang-thai') return dayTrangThai(env, b)
     if (p === '/phong-cho') return ghiPhongCho(env, b)
+    // CỔNG TƯƠNG THÍCH — tự phân quyền bên trong, nên đứng TRƯỚC cổng mã bí mật.
+    if (p === '/goi') return goiCu(req, env, b)
     if (p === '/btvn/cua-em') return btvnCuaEm(env, b)
     if (p === '/btvn/nop') return nopBtvn(env, b)
 

@@ -78,15 +78,23 @@ describe('NÚT NỘP BTVN trên màn của em', () => {
   })
 
   it('KHÔNG lọc, KHÔNG xáo, KHÔNG cắt câu của tờ đề', () => {
-    const h = CHO_EM.slice(CHO_EM.indexOf('export function dungPhieuBtvn('), CHO_EM.indexOf('function thoatHtml('))
+    const h = CHO_EM.slice(CHO_EM.indexOf('export async function dungPhieuBtvn('), CHO_EM.indexOf('function veCauLuyen('))
     for (const cam of ['sort(', 'shuffle', 'slice(0,']) {
       expect(h, cam).not.toContain(cam)
     }
   })
 
   it('thoát HTML khi in nội dung câu — đề của thầy có dấu < >', () => {
-    expect(CHO_EM).toContain('function thoatHtml(')
-    expect(CHO_EM).toContain("replace(/</g, '&lt;')")
+    // Phiếu nay dựng bằng CHÍNH bộ `html-phieu.ts` đang chạy cho phiếu khắc
+    // phục, nên việc thoát chữ do `thoat`/`chuHtml` bên ấy lo — một chỗ, không
+    // hai bộ dựng song song (và nhờ vậy `check:mau` không còn bắt mã màu gõ tay).
+    expect(CHO_EM).toContain("await import('./html-phieu')")
+    expect(CHO_EM).toContain('taiLieuHtml(')
+    expect(CHO_EM).toContain('theCauHtml(')
+    // Đáp án bị xoá khỏi DỮ LIỆU trước khi dựng — em xem mã nguồn cũng không thấy.
+    expect(CHO_EM).toContain('boLoiGiai(')
+    const HP = fs.readFileSync(path.join(process.cwd(), 'src/lib/html-phieu.ts'), 'utf8')
+    expect(HP).toContain("replace(/</g, '&lt;')")
   })
 })
 

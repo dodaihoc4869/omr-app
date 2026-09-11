@@ -143,8 +143,15 @@ describe('CUỘC ĐUA LÚC MỞ APP — lượt gọi ĐẦU TIÊN không đư�
     expect(than.indexOf('await xongNapDiaChi()')).toBeLessThan(than.indexOf('await layCauHinhMayChu()'))
   })
 
-  it('CHỈ hai chỗ ấy được chờ — đường nóng lặp lại (lưu tạm, nộp, trạng thái) thì không', () => {
-    expect(API.match(/await xongNapDiaChi\(\)/g)?.length).toBe(2)
+  it('BA chỗ được chờ: hai đường mở app, và cổng /goi — đường nóng lặp lại thì không', () => {
+    // Từ 12/09 mọi lệnh cũ đi qua `postJson` → cổng `/goi` của máy chủ mới, nên
+    // chính `postJson` cũng phải chờ nạp địa chỉ xong. Không chờ thì lệnh đầu
+    // tiên sau khi mở app bắn đi lúc cấu hình còn rỗng và hỏng đúng một lượt —
+    // đúng kiểu lỗi chỉ xuất hiện ở máy vừa mở, không bao giờ tái hiện ở máy thầy.
+    expect(API.match(/await xongNapDiaChi\(\)/g)?.length).toBe(3)
+    const i = API.indexOf('async function postJson(')
+    const than = API.slice(i, API.indexOf('\n}', i))
+    expect(than).toContain('await xongNapDiaChi()')
   })
 })
 

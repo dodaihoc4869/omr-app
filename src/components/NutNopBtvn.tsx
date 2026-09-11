@@ -61,7 +61,7 @@ export default function NutNopBtvn({ maCa, sbd }: { maCa: string; sbd: string })
         return
       }
       const { dungPhieuBtvn } = await import('../lib/btvn-cho-em')
-      w.document.write(dungPhieuBtvn(r, maCa, sbd))
+      w.document.write(await dungPhieuBtvn(r, maCa, sbd))
       w.document.close()
     } catch (e) {
       setLoi(e instanceof Error ? e.message : 'Không mở được bài tập')
