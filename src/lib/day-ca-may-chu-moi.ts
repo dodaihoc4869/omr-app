@@ -65,6 +65,24 @@ export async function dayCaMoi(ch: CauHinhMayChu, maBiMat: string, ca: CaDay, ba
   return guiJson(ch, maBiMat, '/ca/day', bank ? { ca, bank } : { ca }, HAN_DAY_CA_GIAY)
 }
 
+/** ĐẨY RIÊNG MỐC BẮT ĐẦU (và bản đồ đề riêng) — KHÔNG đụng phần còn lại của ca.
+ *
+ * LỖI ĐÃ DÍNH, ca thật 704066 tối 11/09: `batDauThi` gọi `dayCaMoi` với đúng
+ * hai trường, và câu upsert bên Worker ghi đè mọi cột không gửi bằng rỗng. Tra
+ * D1 giữa ca: `ten_ca ''`, `lop ''`, `bat_dau ''`, `het_han_vao ''`,
+ * `phong_cho 0` — tức HẠN VÀO PHÒNG và cờ PHÒNG CHỜ bị xoá ngay giữa ca, còn
+ * màn Ca thi thì hiện một ca không tên. */
+export async function dayMocBatDauMoi(
+  ch: CauHinhMayChu,
+  maBiMat: string,
+  maCa: string,
+  batDauThiLuc: string,
+  boTheoEm?: unknown,
+): Promise<boolean> {
+  if (!maCa) return false
+  return guiJson(ch, maBiMat, '/ca/day', { ca: { maCa, batDauThiLuc, boTheoEm }, chiMoc: true }, HAN_DAY_CA_GIAY)
+}
+
 export interface EmDanhSach {
   sbd: string
   hoTen?: string
@@ -143,6 +161,7 @@ export async function suaCaMoi(
   maBiMat: string,
   maCa: string,
   dat: OSuaCa,
+  them: { khoaLuot?: boolean; ghiChu?: string } = {},
 ): Promise<boolean> {
   if (!ch.BAT || !ch.URL || !maCa) return false
   if (Object.keys(dat).length === 0) return false
@@ -152,7 +171,7 @@ export async function suaCaMoi(
     const res = await fetch(`${ch.URL}/ca/sua`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-ma-bi-mat': maBiMat },
-      body: JSON.stringify({ maCa, dat }),
+      body: JSON.stringify({ maCa, dat, ...them }),
       signal: bo.signal,
     })
     if (!res.ok) return false

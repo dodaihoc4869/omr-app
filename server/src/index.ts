@@ -302,18 +302,58 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
     bankKey = `de/${maCa}.json`
     await env.DE.put(bankKey, JSON.stringify(b.bank))
   }
+
+  // ĐẨY MỘT PHẦN — CHỈ MỐC BẮT ĐẦU VÀ BẢN ĐỒ ĐỀ RIÊNG.
+  //
+  // LỖI ĐÃ DÍNH, ca thật 704066 tối 11/09: thầy bấm Bắt đầu, `batDauThi` bên
+  // máy thầy gọi `dayCaMoi` với ĐÚNG hai trường `maCa` + `batDauThiLuc`. Câu
+  // upsert bên dưới lấy `excluded.*` cho mọi cột, nên mọi trường không gửi bị
+  // ghi đè bằng rỗng. Tra D1 giữa ca:
+  //
+  //     ten_ca '' · lop '' · bat_dau '' · het_han_vao '' · phong_cho 0
+  //
+  // trong khi `bat_dau_thi_luc` có. Hậu quả: màn Ca thi (đọc D1 từ sáng nay)
+  // hiện ca không tên, không lớp, không giờ; và tệ hơn, HẠN VÀO PHÒNG với cờ
+  // PHÒNG CHỜ bị xoá ngay giữa ca.
+  //
+  // Nay lượt đẩy một phần đi đường riêng, đụng đúng hai cột.
+  if (b.chiMoc === true) {
+    const r = await env.DB.prepare(
+      `UPDATE ca SET bat_dau_thi_luc = COALESCE(?, bat_dau_thi_luc),
+                     bo_theo_em_json = COALESCE(?, bo_theo_em_json),
+                     cap_nhat_luc = ?
+       WHERE ma_ca = ?`,
+    )
+      .bind(
+        String(ca.batDauThiLuc ?? '') || null,
+        ca.boTheoEm ? JSON.stringify(ca.boTheoEm) : null,
+        new Date().toISOString(),
+        maCa,
+      )
+      .run()
+    return ra({ ok: true, maCa, coDe: !!bankKey, chiMoc: true, coCa: r.meta.changes > 0 })
+  }
+
   await env.DB.prepare(
     `INSERT INTO ca (ma_ca, ten_ca, trang_thai, bat_dau, het_han_vao, thoi_gian_phut, loai, han_nop,
                      cong_bo, nguong_lan, nguong_giay, bank_r2, so_cau_json, bo_theo_em_json, cap_nhat_luc,
                      lop, phong_cho, bat_dau_thi_luc, giu_de_doc, an_han_giay)
      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
      ON CONFLICT(ma_ca) DO UPDATE SET
-       ten_ca=excluded.ten_ca, trang_thai=excluded.trang_thai, bat_dau=excluded.bat_dau,
-       het_han_vao=excluded.het_han_vao, thoi_gian_phut=excluded.thoi_gian_phut, loai=excluded.loai,
-       han_nop=excluded.han_nop, cong_bo=excluded.cong_bo, nguong_lan=excluded.nguong_lan,
+       -- CHỐT CHẶN THỨ HAI: chuỗi RỖNG không được ghi đè chữ đang có. Lượt đẩy
+       -- thiếu trường là chuyện thường (xem khối chiMoc ở trên); mất tên ca
+       -- và mất hạn vào phòng giữa ca thì không.
+       ten_ca=COALESCE(NULLIF(excluded.ten_ca,''), ca.ten_ca),
+       trang_thai=excluded.trang_thai,
+       bat_dau=COALESCE(NULLIF(excluded.bat_dau,''), ca.bat_dau),
+       het_han_vao=COALESCE(NULLIF(excluded.het_han_vao,''), ca.het_han_vao),
+       thoi_gian_phut=excluded.thoi_gian_phut, loai=excluded.loai,
+       han_nop=COALESCE(NULLIF(excluded.han_nop,''), ca.han_nop),
+       cong_bo=excluded.cong_bo, nguong_lan=excluded.nguong_lan,
        nguong_giay=excluded.nguong_giay, so_cau_json=excluded.so_cau_json,
        bo_theo_em_json=excluded.bo_theo_em_json, cap_nhat_luc=excluded.cap_nhat_luc,
-       lop=excluded.lop, phong_cho=excluded.phong_cho, giu_de_doc=excluded.giu_de_doc,
+       lop=COALESCE(NULLIF(excluded.lop,''), ca.lop),
+       phong_cho=excluded.phong_cho, giu_de_doc=excluded.giu_de_doc,
        an_han_giay=excluded.an_han_giay,
        -- KHÔNG ghi đè mốc bắt đầu bằng rỗng: thầy đẩy lại ca giữa giờ (sửa tên,
        -- đổi hạn) mà xoá mốc này là cả lớp bị đá về phòng chờ, đồng hồ đang chạy.
@@ -614,10 +654,37 @@ async function suaCa(env: Env, b: Record<string, unknown>): Promise<Response> {
   const co = await env.DB.prepare('SELECT ma_ca FROM ca WHERE ma_ca = ?').bind(maCa).first<{ ma_ca: string }>()
   if (!co) return ra({ ok: true, coCa: false, soO: 0 })
 
+  const nay = new Date().toISOString()
   await env.DB.prepare(`UPDATE ca SET ${cot.join(', ')}, cap_nhat_luc = ? WHERE ma_ca = ?`)
-    .bind(...giaTri, new Date().toISOString(), maCa)
+    .bind(...giaTri, nay, maCa)
     .run()
-  return ra({ ok: true, coCa: true, soO: cot.length })
+
+  // KHOÁ CA: NỘP HỘ EM ĐANG LÀM, y như Apps Script làm bên Sheet.
+  //
+  // LỖI ĐÃ DÍNH, ca thật 704066 tối 11/09: thầy bấm Khoá ca. Apps Script nộp hộ
+  // 25 em và ghi `da_nop` lên Sheet; dòng ca bên D1 sang `dong` nhờ lượt soi,
+  // nhưng 25 dòng LƯỢT bên D1 vẫn nằm `dang_lam`. Màn Ca thi đếm từ D1 ⇒ hiện
+  // 4/29 nộp trong khi thật là 29/29. Sai số liệu còn tệ hơn chậm.
+  //
+  // KHÔNG đụng `dap_an_json`: đó chính là phần em đã làm, giữ nguyên bản lưu
+  // tạm cuối cùng — đúng luật bên Apps Script.
+  let soEmBiNop = 0
+  if (b.khoaLuot === true) {
+    const ghi = String(b.ghiChu ?? '') || `thầy khoá ca ${nay.slice(11, 16)}Z, nộp phần đã làm`
+    const r = await env.DB.prepare(
+      `UPDATE luot
+          SET trang_thai = 'da_nop',
+              nop_luc = ?,
+              ghi_chu = CASE WHEN ghi_chu IS NULL OR ghi_chu = '' THEN ? ELSE ghi_chu || ' · ' || ? END,
+              cap_nhat_luc = ?
+        WHERE ma_ca = ? AND trang_thai = 'dang_lam'`,
+    )
+      .bind(nay, ghi, ghi, nay, maCa)
+      .run()
+    soEmBiNop = r.meta.changes ?? 0
+  }
+
+  return ra({ ok: true, coCa: true, soO: cot.length, soEmBiNop })
 }
 
 /** Mốc thời gian thành mili giây; chuỗi rỗng hay hỏng thì về 0. */

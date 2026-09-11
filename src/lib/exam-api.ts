@@ -12,7 +12,7 @@ import { chuanTenCa } from './ten-ca'
 import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
 import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi, xongNapDiaChi } from './may-chu-moi'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
-import { dayCaMoi, dayDanhSachMoi, luotCuaCaMoi, suaCaMoi, type OSuaCa } from './day-ca-may-chu-moi'
+import { dayCaMoi, dayDanhSachMoi, dayMocBatDauMoi, luotCuaCaMoi, suaCaMoi, type OSuaCa } from './day-ca-may-chu-moi'
 import { daBatDauTheoDuongCu, ghiNhoDaBatDauDuongCu, nenDoiChieu } from './doi-chieu-phong-cho'
 import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu } from './man-ca-may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
@@ -415,11 +415,16 @@ export async function batDauThi(
   try {
     const chMoi = await layCauHinhMayChu()
     if (chMoi.BAT && chMoi.URL) {
-      const xong = await dayCaMoi(chMoi, secret, {
+      // ĐẨY RIÊNG MỐC — KHÔNG dùng `dayCaMoi`. Lượt đẩy này chỉ mang hai trường,
+      // và upsert đầy đủ sẽ ghi đè tên ca, lớp, hạn vào phòng, cờ phòng chờ
+      // bằng rỗng. Đã xảy ra thật ở ca 704066 tối 11/09.
+      const xong = await dayMocBatDauMoi(
+        chMoi,
+        secret,
         maCa,
-        batDauThiLuc: String(r.batDauLuc ?? ''),
-        boTheoEm: boTheoEm ? { bo: boTheoEm, lap: lapTheoEm ?? {}, dem: demSaiTheoEm ?? {}, bb: bienBan ?? null } : undefined,
-      })
+        String(r.batDauLuc ?? ''),
+        boTheoEm ? { bo: boTheoEm, lap: lapTheoEm ?? {}, dem: demSaiTheoEm ?? {}, bb: bienBan ?? null } : undefined,
+      )
       chuaSangMayChuMoi = !xong
     }
   } catch {
@@ -938,7 +943,9 @@ export async function luuTam(scriptUrl: string, maCa: string, sbd: string, dapAn
 export async function khoaCa(scriptUrl: string, secret: string, maCa: string, khoaBoi = 'thầy'): Promise<{ soEmBiNop: number; khoaLuc: string }> {
   const r = await postJson(scriptUrl, { action: 'khoaCa', secret, maCa, khoaBoi })
   if (!r.ok) throw new Error(r.error || 'Không khoá được ca')
-  await soiCaSangMayChuMoi(secret, maCa, { trangThai: String(r.trangThai || 'dong') })
+  // Khoá ca bên Apps Script NỘP HỘ mọi em đang làm. Không soi phần ấy sang D1
+  // thì màn Ca thi (đếm từ D1) hiện 4/29 nộp trong khi thật là 29/29.
+  await soiCaSangMayChuMoi(secret, maCa, { trangThai: String(r.trangThai || 'dong') }, { khoaLuot: true })
   // Danh sách ca vừa đổi — bỏ đệm để lượt hỏi tiếp theo thấy ngay.
   xoaBoDemCa()
   return { soEmBiNop: Number(r.soEmBiNop) || 0, khoaLuc: String(r.khoaLuc || '') }
@@ -2454,10 +2461,15 @@ export async function danhDauDaChua(scriptUrl: string, secret: string, maCa: str
  *
  * Không bao giờ ném lỗi: việc bên Apps Script đã xong, soi hỏng thì lượt tải
  * danh sách sau sẽ chép lại. Trả `false` để chỗ gọi ghi nhật ký nếu muốn. */
-async function soiCaSangMayChuMoi(secret: string, maCa: string, dat: OSuaCa): Promise<boolean> {
+async function soiCaSangMayChuMoi(
+  secret: string,
+  maCa: string,
+  dat: OSuaCa,
+  them: { khoaLuot?: boolean } = {},
+): Promise<boolean> {
   try {
     const chMoi = await layCauHinhMayChu()
-    return await suaCaMoi(chMoi, secret, maCa, dat)
+    return await suaCaMoi(chMoi, secret, maCa, dat, them)
   } catch {
     return false
   }

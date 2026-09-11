@@ -225,3 +225,52 @@ vào link y hệt cách ấy là mọi máy em tự có. Một tham số.
 **Bài học ghi to thứ hai trong ngày:** đo bằng công cụ chạy trên máy chủ thì chỉ
 chứng minh máy chủ sống. Muốn biết NGƯỜI DÙNG có đi qua đó không thì phải đếm ở
 chỗ dữ liệu của người dùng đọng lại — ở đây là bảng `luot` và `phong_cho`.
+
+### 11/09 17h25 — ĐỢT 5C: địa chỉ tới máy em · xoá ca không ăn
+
+**Việc 1 — địa chỉ máy chủ mới tới máy em.** Không đi đường link mời như dự
+tính: link chỉ tới máy em, còn **máy phụ huynh** mở `/p#<mã>` thì không có tham
+số nào cả, mà phiếu cũng đã nằm trên R2. Nên nạp từ `public/cau-hinh.json` —
+đúng đường máy em vẫn dùng để biết link Apps Script.
+
+Vòng 1 sai và **phép kiểm bắt được**: bản đầu tải tệp ấy NGAY TRONG lượt gọi máy
+chủ, tức cộng một vòng mạng vào đúng lượt vào thi và nhân lên 135 nhịp lưu tạm
+mỗi em. 14 phép kiểm đỏ ở 5 tệp, tất cả đều là phép đếm số lượt gọi. Sửa: nạp
+**một lần lúc khởi động** (`main.tsx`), cất vào IndexedDB; đường nóng chỉ đọc
+IndexedDB.
+
+Vòng 2 sai và **phép kiểm khác bắt được**: `dangNap` bị dùng trước dòng khai báo
+(`tests/khong-dung-bien-truoc-khi-khai.test.ts`). Đổi thứ tự.
+
+- [x] Đưa địa chỉ máy chủ mới tới máy em VÀ máy phụ huynh | bằng chứng: `cbca67b`, 3190/3190 phép kiểm đạt
+- [x] Lượt gọi đầu tiên của phụ huynh/của em không thua cuộc đua nạp địa chỉ (`xongNapDiaChi`) | bằng chứng: 4 phép kiểm mới trong `co-may-chu-toi-may-em-1109.test.ts`
+
+**Việc 2 — "tôi không xoá được ca này" (ca 432566).** Tra thẳng D1:
+
+```
+ma_ca 432566 · ten_ca "2011 - Lớp 1 - L1 (bù)" · trang_thai 'mo' · xoa_luc ''
+```
+
+**NGUYÊN NHÂN GỐC:** màn Ca thi đã đọc `/ca/danh-sach` trên D1 từ sáng, nhưng
+`xoaCa` vẫn CHỈ ghi sang Apps Script. Sheet đánh dấu `da_xoa` đúng như mọi khi,
+D1 không biết gì, và ca vẫn nằm nguyên trên màn hình. Bấm mười lần cũng vậy — vì
+lần nào cũng xoá thành công ở chỗ không ai nhìn.
+
+Cùng lỗ hổng có **năm cửa**, không phải một: xoá · khôi phục · khoá · mở khoá ·
+đổi tên. Chữa bằng đường `/ca/sua` trên Worker (chỉ `UPDATE`, danh sách trắng 7
+ô) và `soiCaSangMayChuMoi` gọi sau mỗi lượt Apps Script trả `ok`.
+
+- [x] Xoá/khôi phục/khoá/mở khoá/đổi tên ca soi sang D1 | bằng chứng: `tests/soi-thao-tac-ca-sang-may-chu-moi-1109.test.ts` 13/13 đạt
+- [ ] Thầy bấm Xoá lại ca 432566 sau khi phát hành — lần này phải biến mất | bằng chứng: (chưa có)
+
+**Bài học ghi to thứ ba trong ngày:** chuyển một màn sang đọc nguồn mới thì phải
+rà **mọi lệnh GHI** vào nguồn cũ mà màn ấy hiển thị. Đọc và ghi lệch nguồn là
+thao tác của thầy thành công ở chỗ không ai nhìn thấy.
+
+### Còn lại
+
+- [ ] `chiTietCa` sang D1 — thầy báo "vào chi tiết ca vẫn chậm". Kẹt thật: D1 chưa có `hoTen`, `diemI/II/III`, `tong`, `duyetBoi/Luc` của lượt; chép sang là một lượt chuyển dữ liệu điểm nữa | bằng chứng: (chưa có)
+- [ ] Mở ca / bấm Bắt đầu chậm — `publishSession` vẫn ghi đề vào Sheet trước | bằng chứng: (chưa có)
+- [!] "Sửa phần tin nhắn gửi cho phụ huynh" — CHƯA RÕ sửa gì. Đã đọc `src/lib/phieu-zalo.ts`, không tự đoán. Phải hỏi thầy.
+- [ ] Mục Phân công + giao BTVN theo `claude/PHAN-CONG-GIAO-BTVN.md` | bằng chứng: (chưa có)
+- [ ] Đổi `MA_BI_MAT` (lộ vào ảnh chụp 10/09) rồi cập nhật Secret trên Cloudflare | bằng chứng: (chưa có)
