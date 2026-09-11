@@ -274,3 +274,42 @@ thao tác của thầy thành công ở chỗ không ai nhìn thấy.
 - [!] "Sửa phần tin nhắn gửi cho phụ huynh" — CHƯA RÕ sửa gì. Đã đọc `src/lib/phieu-zalo.ts`, không tự đoán. Phải hỏi thầy.
 - [ ] Mục Phân công + giao BTVN theo `claude/PHAN-CONG-GIAO-BTVN.md` | bằng chứng: (chưa có)
 - [ ] Đổi `MA_BI_MAT` (lộ vào ảnh chụp 10/09) rồi cập nhật Secret trên Cloudflare | bằng chứng: (chưa có)
+
+### 11/09 18h30 — ĐỢT 5D: chi tiết ca · mở ca · màn Học sinh lên máy chủ mới
+
+**CA 704066 — ca ĐẦU TIÊN chạy trọn trên máy chủ mới.** Tra D1 lúc 18:05, giữa ca:
+30 em vào phòng chờ · 29 lượt vào thi · 25 đang làm · 4 đã nộp · 28 lượt đã có
+đáp án lưu tạm · 31 dòng trạng thái sống. Vào thi, phòng chờ, lưu tạm, nộp —
+tất cả đọng ở D1, không phải Sheet.
+
+Thầy báo "lớp không thể thi được" trong khi 25 em đang làm bài bình thường. Thứ
+thầy nhìn thấy đỏ là **màn Học sinh** (`danhSachEm` đi Apps Script, quá 25 giây),
+không phải đường thi. Bài học: hỏi "dữ liệu của người dùng đọng ở đâu" trước khi
+tin một màn hình báo lỗi.
+
+**Hai lỗi bắt được từ chính ca ấy, cả hai đều do tôi gây ra trong ngày:**
+
+1. **Bấm Bắt đầu XOÁ TRẮNG dòng ca.** `batDauThi` đẩy đúng hai trường, câu upsert
+   lấy `excluded.*` cho mọi cột ⇒ `ten_ca '' · lop '' · bat_dau '' · het_han_vao ''
+   · phong_cho 0` ngay giữa ca. Chữa: đường đẩy MỘT PHẦN (`chiMoc`) đụng đúng hai
+   cột, cộng chốt chặn `COALESCE(NULLIF(...))` cho mọi cột chữ.
+2. **Khoá ca không đóng nổi lượt bên D1.** Apps Script nộp hộ 25 em lên Sheet,
+   D1 vẫn `dang_lam` ⇒ màn Ca thi đếm 4/29 thay vì 29/29. Chữa: `khoaLuot` trên
+   `/ca/sua`, không đụng `dap_an_json`.
+
+- [x] Chi tiết ca đọc thẳng D1 (`/ca/chi-tiet`) | bằng chứng: `1950e7e`, 3226/3226 đạt
+- [x] Ghi điểm soi sang D1, chỉ lượt Apps Script đã nhận | bằng chứng: cùng trên
+- [x] Lượt bị cổng danh sách chặn được ghi vào `chan_vao` | bằng chứng: cùng trên
+- [x] Mở ca: hai lượt ghi song song, mốc giờ tính một nơi rồi gửi kèm | bằng chứng: cùng trên
+- [x] Màn Học sinh đọc `/em/danh-sach` | bằng chứng: cùng trên
+- [x] Bấm Bắt đầu không xoá trắng dòng ca | bằng chứng: `tests/khong-xoa-trang-dong-ca-1109.test.ts` 12/12
+- [x] Khoá ca đóng nốt lượt bên D1 | bằng chứng: cùng tệp
+- [ ] Thầy bấm Xoá lại ca 432566 sau khi phát hành | bằng chứng: (chưa có)
+- [ ] Ca 704066 trên D1 còn thiếu tên/lớp — bấm "Chuyển ca cũ sang máy chủ mới" là chép lại đủ từ Sheet | bằng chứng: (chưa có)
+
+### Còn lại
+
+- [!] "Sửa cái link trong tin nhắn phụ huynh" — CHƯA RÕ sửa gì. Đã hỏi bốn phương án, chưa có trả lời.
+- [ ] Thầy yêu cầu BỎ HẲN Apps Script. Chưa làm được trong đêm: Sheet còn giữ điểm (đường ra `BangDiem.xlsx` + Zalo), kho đề có đáp án, và chi tiết câu / nhật ký điểm / tiến độ mạnh–yếu chưa có bảng trên D1. Cần một đặc tả riêng, chuyển từng khối kèm đối chiếu số liệu trước khi cắt.
+- [ ] Mục Phân công + giao BTVN theo `claude/PHAN-CONG-GIAO-BTVN.md`
+- [ ] Đổi `MA_BI_MAT` (lộ vào ảnh chụp 10/09) rồi cập nhật Secret trên Cloudflare

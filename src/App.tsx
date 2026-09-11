@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import BottomNav from './components/BottomNav'
 import ThanhBenTrai from './components/ThanhBenTrai'
 import Toast from './components/Toast'
@@ -11,18 +11,37 @@ import { datDangMoKhoa } from './lib/cap-nhat-app'
 import { phaiHoiLai, type BanGhiKhoa } from './lib/khoa-app'
 import { docDuongVao, laLinkAppCu, laManThayQuanLy } from './lib/vai-tro'
 import { ganCauNoi, goCauNoi } from './lib/cau-noi-ddh'
-import ClassListScreen from './screens/ClassListScreen'
-import ExamHubScreen from './screens/ExamHubScreen'
-import ExamSetupScreen from './screens/ExamSetupScreen'
-import NganHangDeScreen from './screens/NganHangDeScreen'
 import ExamTakeScreen from './screens/ExamTakeScreen'
-import ExamMonitorScreen from './screens/ExamMonitorScreen'
-import LichSuCaScreen from './screens/LichSuCaScreen'
-import HocSinhScreen from './screens/HocSinhScreen'
-import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
-import GoiLenBangScreen from './screens/GoiLenBangScreen'
-import CauHoiScreen from './screens/CauHoiScreen'
 import PhieuScreen from './screens/PhieuScreen'
+
+// TÁM MÀN CHỈ THẦY DÙNG — NẠP MUỘN.
+//
+// Đo trên bản live 11/09: gói mã `index-D2jFOak-.js` nặng **1 527 KB** (465 KB
+// qua gzip), và MỌI máy tải trọn gói ấy — kể cả điện thoại phụ huynh chỉ mở một
+// trang báo cáo, kể cả máy em chỉ làm bài. Thầy chốt: "phụ huynh mở bị chậm".
+//
+// Tách ở đây là chỗ rẻ nhất và an toàn nhất: Vite cắt mỗi màn thành một mảnh
+// riêng, phụ huynh và học sinh không tải mảnh nào của app quản lý. Thầy tốn
+// thêm một lượt tải nhỏ lần đầu vào mỗi màn, và service worker cất lại ngay.
+//
+// HAI MÀN GIỮ NGUYÊN NẠP SỚM, và chỉ hai:
+//   · `PhieuScreen` — trang phụ huynh mở. Nạp muộn thì đúng người cần nhanh
+//     nhất lại phải chờ thêm một vòng mạng.
+//   · `ExamTakeScreen` — màn em làm bài. Ngày thi không đánh cược vào một mảnh
+//     mã tải muộn.
+//
+// Mảnh nạp muộn hỏng vì thầy đang mở bản cũ đã được `batLoiThieuManh()` trong
+// `main.tsx` lo: bắt đúng lỗi thiếu mảnh rồi tự tải lại một lần.
+const ExamHubScreen = lazy(() => import('./screens/ExamHubScreen'))
+const AppDaChuyenScreen = lazy(() => import('./screens/AppDaChuyenScreen'))
+const ClassListScreen = lazy(() => import('./screens/ClassListScreen'))
+const ExamSetupScreen = lazy(() => import('./screens/ExamSetupScreen'))
+const NganHangDeScreen = lazy(() => import('./screens/NganHangDeScreen'))
+const ExamMonitorScreen = lazy(() => import('./screens/ExamMonitorScreen'))
+const LichSuCaScreen = lazy(() => import('./screens/LichSuCaScreen'))
+const HocSinhScreen = lazy(() => import('./screens/HocSinhScreen'))
+const GoiLenBangScreen = lazy(() => import('./screens/GoiLenBangScreen'))
+const CauHoiScreen = lazy(() => import('./screens/CauHoiScreen'))
 import KhoaAppScreen from './screens/KhoaAppScreen'
 import ChanLoi from './components/ChanLoi'
 
@@ -183,7 +202,13 @@ function App() {
       </ChanLoi>
     )
   }
-  if (linkCu) return <AppDaChuyenScreen />
+  if (linkCu) {
+    return (
+      <Suspense fallback={null}>
+        <AppDaChuyenScreen />
+      </Suspense>
+    )
+  }
 
   // Chưa biết có mật khẩu hay chưa: dựng một màn trống, KHÔNG dựng app. Vài
   // chục mili giây, nhưng đây là chỗ mục 5 đòi — không được thấy loáng thoáng
@@ -227,6 +252,7 @@ function App() {
       {/* Một màn ném lỗi thì chỉ màn đó hiện báo lỗi, app KHÔNG trắng. key theo
           `screen` để lỗi cũ không dính lại khi thầy sang màn khác. */}
       <ChanLoi key={screen} o={TEN_MAN[screen]} veManChinh={() => setScreen('examhub')}>
+        <Suspense fallback={<div style={{ padding: 24, fontFamily: 'var(--sans)', color: 'var(--nhat)' }}>Đang mở…</div>}>
         {screen === 'classlist' && <ClassListScreen />}
         {screen === 'examhub' && <ExamHubScreen />}
         {screen === 'examsetup' && <ExamSetupScreen />}
@@ -237,6 +263,7 @@ function App() {
         {screen === 'hocsinh' && <HocSinhScreen />}
         {screen === 'goilenbang' && <GoiLenBangScreen />}
         {screen === 'cauhoi' && <CauHoiScreen />}
+        </Suspense>
       </ChanLoi>
         </div>
       </div>
