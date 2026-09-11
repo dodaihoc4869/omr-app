@@ -162,3 +162,18 @@ cờ ở đúng máy ấy. Đợt sau nên đưa cấu hình này lên máy ch�
 tệp mình sửa, và **chạy lại đủ sáu cửa trên bản GỘP** trước mỗi lượt đẩy, không
 chỉ trên phần của mình. Cây kiểm lấy bằng `git archive HEAD` nên không dính sửa
 đổi dở dang của phiên kia.
+
+### 11/09 16h10 — màn Ca thi: KẸT ở bước đối chiếu, hoãn tới sau ca 18h
+
+- [x] Chuyển dữ liệu ca cũ sang D1 | bằng chứng: đếm trên D1 **84 ca · 282 lượt**, không xoá gì ở Sheet
+- [!] **KẸT: dấu `ca_day_du` không được ghi.** Lời báo: *"CHƯA khớp — 83 ca · 282 lượt · HỎNG 12 ca: 999950, 999904, 984033, 164909, 701254 · lệch 83 ca · thiếu 282 lượt"*
+  - `lệch 83 ca` và `thiếu 282 lượt` nghĩa là `soCaD1 = 0` và `soLuotD1 = 0` — lượt ĐỌC LẠI từ `/ca/danh-sach` trả về **rỗng hoàn toàn**, không phải thiếu một ít
+  - Nhật ký Worker: **0 lỗi** trong cả giờ đó, và thấy đúng hai lượt `/ca/danh-sach` ở ĐẦU lượt chạy (do `danhSachCaThat` nay hỏi máy chủ mới trước) — chưa thấy hai lượt ở CUỐI vì trang nhật ký bị đệm, chưa làm mới được
+  - **CHƯA xác định** là endpoint trả rỗng hay lượt gọi cuối không tới nơi. Không đoán rồi vá mò
+- [!] Luật `hong.length === 0` quá chặt: 12 ca hỏng đều là **ca đã xoá** trong thùng rác, đọc chi tiết hỏng là chuyện thường. Phải cho phép ca `da_xoa` hỏng mà vẫn khớp
+- [x] Đã sửa phép đếm theo TẬP KHOÁ (commit `46b4c83`) — cần, nhưng chưa đủ để mở cổng
+
+**Việc tiếp, sau ca 18h:**
+1. Cho Worker trả lý do khi `/ca/danh-sach` ra rỗng, và cho app in lý do ấy ra.
+2. Nới luật: ca `da_xoa` đọc hỏng thì bỏ qua, ca đang sống hỏng thì vẫn chặn.
+3. Chạy lại, đối chiếu, rồi mới mở cổng.
