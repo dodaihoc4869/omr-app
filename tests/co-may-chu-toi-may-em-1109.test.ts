@@ -75,57 +75,65 @@ describe('ĐƯỜNG DẪN ĐỊA CHỈ TỚI MÁY EM', () => {
   })
 })
 
-describe('LUẬT CỦA `layCauHinhChoEm`', () => {
-  const HAM = MCM.slice(MCM.indexOf('export async function layCauHinhChoEm()'), MCM.indexOf('export async function layCauHinhChoEm()') + 900)
+describe('LUẬT NẠP ĐỊA CHỈ LÚC KHỞI ĐỘNG', () => {
+  const MOC = 'export async function napDiaChiMayChuMoiChoEm()'
+  const HAM = MCM.slice(MCM.indexOf(MOC), MCM.indexOf(MOC) + 900)
 
-  it('máy thầy đã bật ⇒ dùng nguyên cấu hình của thầy', () => {
-    expect(HAM).toContain('if (ch.BAT && ch.URL) return ch')
-  })
-
-  it('máy thầy CHỦ Ý TẮT ⇒ tôn trọng, KHÔNG lén bật lại bằng đường tệp', () => {
-    expect(HAM).toContain('if (ch.URL) return ch')
+  it('máy thầy đã có cấu hình ⇒ KHÔNG đụng vào, cờ tắt khẩn còn nguyên tác dụng', () => {
+    expect(HAM).toContain('if (ch.URL) return')
     // và vế ấy phải đứng TRƯỚC lượt đọc tệp
-    expect(HAM.indexOf('if (ch.URL) return ch')).toBeLessThan(HAM.indexOf('loadDiaChiMayChuMoiChoEm()'))
+    expect(HAM.indexOf('if (ch.URL) return')).toBeLessThan(HAM.indexOf('loadDiaChiMayChuMoiChoEm()'))
   })
 
   it('máy chưa có cấu hình ⇒ đọc tệp, và CẤT LẠI để lần sau offline vẫn có', () => {
     expect(HAM).toContain('const url = await loadDiaChiMayChuMoiChoEm()')
-    expect(HAM).toContain('if (!url) return ch')
+    expect(HAM).toContain('if (!url) return')
     expect(HAM).toContain('await saveCauHinhMayChu(moi)')
   })
 
   it('đi qua `chuanHoaMayChu`, không tự chế cấu hình', () => {
     expect(HAM).toContain('chuanHoaMayChu({ ...ch, BAT: true, URL: url })')
   })
+
+  it('app gọi đúng MỘT LẦN lúc khởi động, và không chờ nó', () => {
+    const MAIN = fs.readFileSync(path.join(process.cwd(), 'src/main.tsx'), 'utf8')
+    expect(MAIN.match(/napDiaChiMayChuMoiChoEm\(\)/g)?.length).toBe(1)
+    expect(MAIN).toContain('void napDiaChiMayChuMoiChoEm()')
+  })
+
+  it('ĐƯỜNG NÓNG CẤM TẢI TỆP — lượt vào thi không được cộng thêm vòng mạng', () => {
+    // Bản đầu tôi viết cho `layCauHinhChoEm` tải `cau-hinh.json` ngay trong lượt
+    // gọi. Mỗi em 135 nhịp lưu tạm là 135 lượt tải thừa, và lượt vào thi gánh
+    // thêm một vòng mạng ở đúng chỗ không được phép chậm. Nạp lúc khởi động.
+    expect(API).not.toContain('loadDiaChiMayChuMoiChoEm')
+    expect(MCM.slice(MCM.indexOf('export async function goiWorker'))).not.toContain('loadDiaChiMayChuMoiChoEm')
+  })
+
+  it('IndexedDB ghi hỏng thì địa chỉ trong bộ nhớ vẫn cứu được lượt của em', () => {
+    expect(MCM).toContain('if (!ch.URL && diaChiTuTep)')
+  })
 })
 
-describe('ĐÚNG NHỮNG LỆNH CỦA EM MỚI DÙNG ĐƯỜNG NÀY', () => {
-  const CUA_EM: [string, string][] = [
+describe('MỌI LỆNH ĐI WORKER ĐỀU ĐỌC CẤU HÌNH TRƯỚC', () => {
+  const DS: [string, string][] = [
     ['vaoThiQuaMayChuMoi', 'vaoThiMoi(ch, maCa, sbd, idThietBi, canBank)'],
     ['trangThaiPhongCho', 'phongChoMoi(chMoi, maCa)'],
     ['submitAnswers', 'nopMoi(chMoi, maCa, sbd, dapAn, integrity, giayCau)'],
     ['luuTam', 'luuTamMoi(chMoi, maCa, sbd, dapAn, giayCau)'],
     ['pushExamStatus', 'trangThaiMoi(chMoi, status)'],
     ['layPhieu', 'layPhieuMoi(chMoi, ma)'],
+    ['dayCaMoi', 'dayCaMoi(chMoi, secret, {'],
+    ['dayDanhSachMoi', 'dayDanhSachMoi(chMoi, secret, items)'],
+    ['dayPhieuMoi', 'dayPhieuMoi(chMoi, secret,'],
   ]
 
-  for (const [ten, moc] of CUA_EM) {
-    it(`${ten} dùng layCauHinhChoEm`, () => {
+  for (const [ten, moc] of DS) {
+    it(`${ten} đọc cấu hình bằng layCauHinhMayChu`, () => {
       const i = API.indexOf(moc)
       expect(i, moc).toBeGreaterThan(0)
-      const truoc = API.slice(Math.max(0, i - 260), i)
-      expect(truoc).toContain('layCauHinhChoEm()')
+      expect(API.slice(Math.max(0, i - 400), i), moc).toContain('layCauHinhMayChu()')
     })
   }
-
-  it('LỆNH CỦA THẦY vẫn dùng cờ của thầy — cờ tắt khẩn phải còn nguyên tác dụng', () => {
-    for (const moc of ['dayCaMoi(chMoi, secret, {', 'dayDanhSachMoi(chMoi, secret, items)', 'dayPhieuMoi(chMoi, secret,']) {
-      const i = API.indexOf(moc)
-      expect(i, moc).toBeGreaterThan(0)
-      const truoc = API.slice(Math.max(0, i - 400), i)
-      expect(truoc, moc).toContain('layCauHinhMayChu()')
-    }
-  })
 })
 
 describe('ĐƯỜNG LÙI KHÔNG ĐƯỢC MẤT', () => {

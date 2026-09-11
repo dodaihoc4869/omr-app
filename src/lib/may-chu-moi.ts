@@ -45,41 +45,49 @@ export function caDaBiGatCauDao(maCa: string): boolean {
 const SONG_MS = 5000
 let nhoCauHinh: { luc: number; ch: CauHinhMayChu } | null = null
 
-/** CẤU HÌNH MÁY CHỦ MỚI CHO ĐƯỜNG THI CỦA EM.
+// ---------------------------------------------------------------------------
+// ĐỊA CHỈ MÁY CHỦ MỚI PHẢI TỚI ĐƯỢC MÁY EM
+//
+// Lỗi 11/09, thấy giữa ca thật 237124: máy nào KHÔNG phải máy thầy thì không có
+// cấu hình trong IndexedDB, nên `BAT` luôn false và mọi lượt của em rơi về Apps
+// Script — kể cả khi máy chủ mới đang chạy tốt. Tra D1 lúc ấy: ca có, mốc bắt
+// đầu đã sang, mà 0 lượt thi · 0 em ở phòng chờ · 0 báo trạng thái.
+//
+// Cách chữa: nạp địa chỉ từ `public/cau-hinh.json` MỘT LẦN lúc khởi động app —
+// đúng đường máy em vẫn dùng để biết link Apps Script — rồi cất vào IndexedDB.
+// Đường nóng (vào thi, phòng chờ, lưu tạm, nộp) sau đó chỉ đọc IndexedDB.
+//
+// CẤM tải tệp ấy trong lượt vào thi: đó là cộng thêm một vòng mạng vào đúng
+// chỗ không được phép chậm, và nhân lên 135 nhịp lưu tạm mỗi em.
+let diaChiTuTep = ''
+
+/** Chỉ dùng cho phép kiểm. */
+export function quenDiaChiTuTep(): void {
+  diaChiTuTep = ''
+}
+
+/** NẠP ĐỊA CHỈ CHO MÁY EM — gọi đúng một lần lúc khởi động app (`src/main.tsx`).
  *
- * Khác `layCauHinhMayChu` ở đúng một chỗ, và chỗ ấy là cả vấn đề của ngày
- * 11/09: máy nào KHÔNG phải máy thầy thì không có cấu hình trong IndexedDB,
- * nên `BAT` luôn false và mọi lượt của em rơi về Apps Script — kể cả khi máy
- * chủ mới đang chạy tốt. Tra D1 giữa ca thật 237124: ca có trên D1, mốc bắt
- * đầu đã sang, mà 0 lượt thi · 0 em ở phòng chờ · 0 báo trạng thái.
- *
- * Nay: máy thầy dùng cấu hình của thầy (cờ bật/tắt vẫn là cờ tắt khẩn của
- * thầy); máy nào chưa có cấu hình thì đọc địa chỉ từ `public/cau-hinh.json`
- * — đúng đường máy em vẫn dùng để biết link Apps Script.
- *
- * Địa chỉ đọc được cất lại vào IndexedDB để lần sau offline vẫn có, và để
- * không phải tải tệp ấy mỗi lượt gọi.
- *
- * CHỈ dùng cho bốn lệnh của EM. Lệnh của THẦY (đẩy ca, đẩy danh sách, chuyển
- * dữ liệu) vẫn dùng `layCauHinhMayChu` để cờ tắt khẩn của thầy còn nguyên
- * tác dụng. */
-export async function layCauHinhChoEm(): Promise<CauHinhMayChu> {
+ * Máy thầy đã có cấu hình riêng thì KHÔNG đụng vào, kể cả khi thầy CHỦ Ý TẮT
+ * cờ: cờ tắt khẩn giữa ca thi phải còn nguyên tác dụng. */
+export async function napDiaChiMayChuMoiChoEm(): Promise<void> {
   const ch = await layCauHinhMayChu()
-  if (ch.BAT && ch.URL) return ch
-  // Máy thầy CHỦ Ý TẮT cờ: tôn trọng, không lén bật lại bằng đường tệp.
-  if (ch.URL) return ch
+  if (ch.URL) return
   const url = await loadDiaChiMayChuMoiChoEm()
-  if (!url) return ch
+  if (!url) return
+  diaChiTuTep = url
   const moi = chuanHoaMayChu({ ...ch, BAT: true, URL: url })
   await saveCauHinhMayChu(moi).catch(() => {})
   quenCauHinhMayChu()
-  return moi
 }
 
 export async function layCauHinhMayChu(): Promise<CauHinhMayChu> {
   const nay = Date.now()
   if (nhoCauHinh && nay - nhoCauHinh.luc < SONG_MS) return nhoCauHinh.ch
-  const ch = await loadCauHinhMayChu()
+  let ch = await loadCauHinhMayChu()
+  // IndexedDB ghi hỏng (máy em ở chế độ riêng tư, hết chỗ) thì địa chỉ đọc được
+  // lúc khởi động vẫn còn trong bộ nhớ — dùng nó, đừng bỏ em lại đường cũ.
+  if (!ch.URL && diaChiTuTep) ch = chuanHoaMayChu({ ...ch, BAT: true, URL: diaChiTuTep })
   nhoCauHinh = { luc: nay, ch }
   return ch
 }

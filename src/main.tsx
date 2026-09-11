@@ -28,6 +28,7 @@ import { donPhienCu } from './lib/don-phien-cu'
 import { batTuHoiBanMoi, batTuTaiLaiKhiDoiBan, daySangBanMoi } from './lib/cap-nhat-app'
 import { batSuKienCaiApp } from './lib/pwa-install'
 import { batLoiThieuManh } from './lib/nap-manh'
+import { napDiaChiMayChuMoiChoEm } from './lib/may-chu-moi'
 
 // Dọn thiết lập cũ nếu cấu trúc dữ liệu đã đổi. Chạy trước mọi logic khác;
 // KHÔNG đụng id thiết bị và IndexedDB (xem don-phien-cu.ts).
@@ -58,6 +59,12 @@ batSuKienCaiApp()
 // Bắt đúng lỗi ấy rồi tự tải lại một lần, thay vì để thầy nhìn dòng lỗi tiếng
 // Anh và tưởng hỏng app. Xem nap-manh.ts.
 batLoiThieuManh()
+
+// ĐỊA CHỈ MÁY CHỦ MỚI CHO MÁY EM. Máy học sinh không mở được màn Cài đặt của
+// thầy nên không có cấu hình nào trong IndexedDB; nạp một lần ở đây từ
+// `public/cau-hinh.json` rồi cất lại, để đường nóng lúc thi chỉ đọc IndexedDB.
+// Không chờ: hỏng thì em đi Apps Script như cũ.
+void napDiaChiMayChuMoiChoEm()
 
 // BẢN MỚI PHẢI VỀ NGAY LẦN MỞ ĐẦU. Ba lớp cùng lo việc này:
 //   1. sw.js tự gọi skipWaiting + clientsClaim lúc cài (vite.config.ts) — bản
