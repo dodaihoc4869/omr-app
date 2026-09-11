@@ -10,8 +10,10 @@ import { LUAT_DIEM } from '../engine/score'
 import { dongBoGioMayChu } from './gio-may-chu'
 import { chuanTenCa } from './ten-ca'
 import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
-import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi } from './may-chu-moi'
+import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi } from './may-chu-moi'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
+import { dayCaMoi } from './day-ca-may-chu-moi'
+import { loadTeacherSecret } from './exam-db'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
 export interface KeyBank {
@@ -389,6 +391,21 @@ export async function batDauThi(
 ): Promise<{ batDauLuc: string; daBatTruoc: boolean; thieuBoTheoEm: boolean }> {
   const r = await postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm, lapTheoEm, demSaiTheoEm, bienBan })
   if (!r.ok) throw new Error(r.error || 'Không bắt đầu được ca')
+
+  // ĐẨY MỐC BẮT ĐẦU VÀ BẢN ĐỒ ĐỀ RIÊNG sang máy chủ mới.
+  //
+  // Thiếu bước này thì em ở phòng chờ bên máy chủ mới không bao giờ được phát
+  // đề: `/vao-thi` xem `bat_dau_thi_luc` còn rỗng nên giữ em lại mãi.
+  try {
+    const chMoi = await layCauHinhMayChu()
+    await dayCaMoi(chMoi, secret, {
+      maCa,
+      batDauThiLuc: String(r.batDauLuc ?? ''),
+      boTheoEm: boTheoEm ? { bo: boTheoEm, lap: lapTheoEm ?? {}, dem: demSaiTheoEm ?? {}, bb: bienBan ?? null } : undefined,
+    })
+  } catch {
+    // không chặn việc bắt đầu ca
+  }
   return {
     batDauLuc: String(r.batDauLuc ?? ''),
     daBatTruoc: r.daBatTruoc === true,
@@ -396,6 +413,96 @@ export async function batDauThi(
     // theo luật hash, còn máy thầy chấm theo bản đồ ⇒ điểm sai. Phải hét lên,
     // không được nuốt.
     thieuBoTheoEm: r.daBatTruoc === true && r.canBoTheoEm === true && r.coBoTheoEm === false,
+  }
+}
+
+/** VÀO THI QUA MÁY CHỦ MỚI — dịch câu trả lời của Worker sang đúng dáng
+ * `KetQuaVaoThi` mà toàn bộ màn làm bài đang đọc.
+ *
+ * TRẢ `null` NGHĨA LÀ "ĐI ĐƯỜNG CŨ". Mọi chỗ không chắc đều trả `null`, vì một
+ * lượt chậm hơn thì em chỉ chờ thêm hai giây, còn một lượt SAI ĐỀ thì điểm của
+ * em sai mà không ai thấy.
+ *
+ * CHỖ NGUY HIỂM NHẤT, và vì sao nó được canh riêng: ca ĐỀ RIÊNG. Máy em cắt đề
+ * theo `boCuaEm`; máy thầy chấm theo bản đồ trên máy chủ. Hai bên lệch nhau là
+ * điểm sai LẶNG LẼ — đúng lỗi đã làm em 12124 tụt từ 5,69 xuống 2,56 hôm 10/09.
+ * Nên: ca có bản đồ mà bản đồ KHÔNG có phần của chính em này ⇒ trả `null`, đi
+ * đường cũ, chấp nhận chậm. */
+async function vaoThiQuaMayChuMoi(
+  maCa: string,
+  sbd: string,
+  idThietBi: string,
+  canBank: boolean,
+): Promise<KetQuaVaoThi | null> {
+  const ch = await layCauHinhMayChu()
+  if (!ch.BAT) return null
+  const r = await vaoThiMoi(ch, maCa, sbd, idThietBi, canBank)
+  if (!r) return null
+
+  if (!r.ok) {
+    // Máy chủ mới TỪ CHỐI có lý do rõ ⇒ tin và báo cho em. Đây là câu trả lời,
+    // không phải sự cố.
+    return { ok: false, lyDo: (r.lyDo ?? 'thieu') as never, lanThu: r.lanThu }
+  }
+
+  if (r.cach === undefined) return null
+
+  // PHÒNG CHỜ. Thầy chưa bấm Bắt đầu: chưa có lượt, chưa có đề, đồng hồ chưa
+  // chạy cho ai. Dáng trả về KHÁC HẲN nhánh vào thi thật — thiếu nhánh này thì
+  // màn chờ nhận một gói có `lanThu` và `hetGioLuc` rỗng rồi dựng đề từ hư
+  // không.
+  if ((r.cach as string) === 'cho') {
+    return {
+      ok: true,
+      cach: 'cho',
+      lop: String((r as { lop?: string }).lop ?? ''),
+      thoiGianPhut: Number(r.thoiGianPhut) || 45,
+      congBo: (r.congBo ?? 'khong') as CongBoDiem,
+      tenCa: String(r.tenCa ?? ''),
+    }
+  }
+
+  const goi = (r.boTheoEm ?? null) as { bo?: Record<string, string[]>; lap?: Record<string, string[]>; dem?: Record<string, Record<string, number>> } | null
+  const coBanDo = !!goi && !!goi.bo && Object.keys(goi.bo).length > 0
+  const boEm = coBanDo ? goi!.bo![sbd] : undefined
+  // CA ĐỀ RIÊNG MÀ THIẾU PHẦN CỦA EM ⇒ đi đường cũ. Xem ghi chú trên.
+  if (coBanDo && (!Array.isArray(boEm) || boEm.length === 0)) return null
+
+  // GÓI ĐỀ. Em chưa có bản trên máy mà máy chủ mới không đưa được ⇒ đường cũ.
+  let bank: PublicExamBank | undefined
+  if (canBank) {
+    if (!r.deUrl) return null
+    try {
+      const res = await fetch(`${ch.URL}${r.deUrl}`)
+      if (!res.ok) return null
+      bank = (await res.json()) as PublicExamBank
+    } catch {
+      return null
+    }
+    if (!bank) return null
+  }
+
+  return {
+    ok: true,
+    cach: r.cach,
+    lop: String((r as { lop?: string }).lop ?? ''),
+    thoiGianPhut: Number(r.thoiGianPhut) || 45,
+    congBo: (r.congBo ?? 'khong') as CongBoDiem,
+    lanThu: Number(r.lanThu) || 1,
+    vaoLuc: String(r.vaoLuc ?? ''),
+    hetGioLuc: String(r.hetGioLuc ?? ''),
+    nguongLan: Number(r.nguongLan) || 3,
+    nguongGiay: Number(r.nguongGiay) || 10,
+    loai: r.loai === 'baitap' ? 'baitap' : 'thi',
+    hanNop: String(r.hanNop ?? ''),
+    tenCa: String(r.tenCa ?? ''),
+    giuDeDoc: (r as { giuDeDoc?: boolean }).giuDeDoc === true,
+    anHanGiay: Number((r as { anHanGiay?: number }).anHanGiay) || 0,
+    daMoKhoa: false,
+    bank,
+    cauLap: cauLapCuaEm(goi?.lap?.[sbd]),
+    boCuaEm: cauLapCuaEm(boEm),
+    demLap: demLapCuaEm(goi?.dem?.[sbd], cauLapCuaEm(goi?.lap?.[sbd])),
   }
 }
 
@@ -407,6 +514,21 @@ export async function vaoThi(
   canBank: boolean,
   danhTinh: DanhTinhVaoThi = { hoTen: '', namSinh: '' },
 ): Promise<KetQuaVaoThi> {
+  // ── MÁY CHỦ MỚI TRƯỚC ────────────────────────────────────────────────────
+  //
+  // Đây là lệnh MỞ KHOÁ cho cả đường nóng: `luu-tam` và `nop` chỉ cập nhật dòng
+  // lượt do `/vao-thi` tạo ra, nên vào thi còn ở Apps Script thì hai lệnh kia
+  // nằm im và mọi thứ lùi về đường cũ.
+  //
+  // MỌI trục trặc trả `null` ⇒ rơi xuống đúng đường Apps Script bên dưới, cho
+  // ĐÚNG lượt đó. Em không bao giờ kẹt vì máy chủ mới.
+  try {
+    const kqMoi = await vaoThiQuaMayChuMoi(maCa, sbd, idThietBi, canBank)
+    if (kqMoi) return kqMoi
+  } catch {
+    // rơi xuống đường cũ
+  }
+
   // THỬ LẠI ĐƯỢC (T5): máy chủ đã có khoá — gửi lại chỉ trả về đúng lượt đang
   // có (`cach: 'khoi_phuc'`), không bao giờ tạo lượt thứ hai cho cùng một em.
   const r = await postCoThuLai(scriptUrl, { action: 'vaoThi', maCa, sbd, idThietBi, canBank, hoTen: danhTinh.hoTen, namSinh: danhTinh.namSinh, xacNhanTen: danhTinh.xacNhanTen === true }, HAN_GIAY_DONG_NGUOI)
@@ -579,6 +701,47 @@ export async function publishSession(
     phamViHoiLai: moc.phamViHoiLai === 'ba_ca' ? 'ba_ca' : 'gan_nhat',
   })
   if (!result.ok) throw new Error(result.error || 'Mở ca kiểm tra thất bại')
+
+  // ĐẨY CA LÊN MÁY CHỦ MỚI. Không có bước này thì D1 không có ca nào, mà
+  // `/vao-thi` cần ca trong D1 — nên cả đường nóng nằm im và mọi lệnh lùi về
+  // Apps Script.
+  //
+  // `bank` ở đây là bản KHÔNG ĐÁP ÁN (`PublicExamBank`), đúng thứ Worker phục
+  // vụ công khai ở `/de/:maCa`. Đẩy bản có đáp án lên đó là phát đáp án cả lớp.
+  //
+  // HỎNG THÌ BỎ QUA: ca đã mở thật ở dòng trên rồi. Đây chỉ là chỗ chạy nhanh.
+  try {
+    const chMoi = await layCauHinhMayChu()
+    // Lấy mã bí mật từ kho của CHÍNH MÁY THẦY. `publishSession` không nhận mã
+    // trong chữ ký, và đổi chữ ký lúc này là chạm vào mọi chỗ gọi — trong khi
+    // mã vẫn đang nằm sẵn ở đúng chỗ mọi lệnh của thầy vẫn đọc.
+    const matThay = await loadTeacherSecret()
+    await dayCaMoi(
+      chMoi,
+      matThay,
+      {
+        maCa,
+        tenCa: moc.tenCa || '',
+        trangThai: 'mo',
+        batDau: String(result.batDau || ''),
+        hetHanVao: String(result.hetHanVao || ''),
+        thoiGianPhut,
+        loai: moc.loai || 'thi',
+        hanNop: moc.hanNop || '',
+        congBo: congBoDiem,
+        nguongLan: moc.nguongLan || 0,
+        nguongGiay: moc.nguongGiay || 0,
+        lop,
+        phongCho: moc.phongCho === true,
+        giuDeDoc: moc.giuDeDoc === true,
+        anHanGiay: moc.giuDeDoc === true ? moc.anHanGiay || 3 : 0,
+      },
+      bank,
+    )
+  } catch {
+    // không chặn việc mở ca vì một đường tắt
+  }
+
   return { batDau: String(result.batDau || ''), hetHanVao: String(result.hetHanVao || '') }
 }
 

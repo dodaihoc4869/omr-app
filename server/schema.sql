@@ -95,3 +95,17 @@ CREATE TABLE IF NOT EXISTS phong_cho (
   ghi_luc TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_phong_cho_ca ON phong_cho(ma_ca);
+
+-- DANH SÁCH LỚP — cổng chặn số báo danh lạ, 11/09.
+--
+-- Cùng vai với sheet `DanhSachLop` bên Apps Script. Thiếu bảng này thì Worker
+-- cho mọi SBD vào thi, tức là ai có mã ca cũng thi được — đúng lỗ hổng mà cổng
+-- bên Apps Script sinh ra để bịt.
+CREATE TABLE IF NOT EXISTS danh_sach (
+  sbd          TEXT PRIMARY KEY,
+  ho_ten       TEXT,
+  nam_sinh     TEXT,
+  lop          TEXT,
+  cap_nhat_luc TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_danh_sach_lop ON danh_sach(lop);

@@ -75,6 +75,16 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
   if (!maCa || !sbd) return ra({ ok: false, lyDo: 'thieu', error: 'Thiếu mã ca hoặc số báo danh' })
 
   const ca = await docCa(env, maCa)
+
+  // CỔNG DANH SÁCH LỚP, trước mọi thứ khác. Thiếu cổng này thì ai có mã ca cũng
+  // gõ một số báo danh bất kỳ rồi vào thi được.
+  //
+  // Bảng RỖNG thì KHÔNG chặn ai — thầy chưa kịp đẩy danh sách mà cả lớp đứng
+  // ngoài cửa là hỏng nặng hơn hẳn việc thiếu cổng. Đúng luật bên Apps Script.
+  if (ca && (await coDanhSach(env)) && !(await docDanhSach(env, sbd))) {
+    return ra({ ok: false, lyDo: 'khong_co_sbd', thoiGianPhut: ca.thoi_gian_phut ?? 45 })
+  }
+
   const cu = await docLuotMoiNhat(env, maCa, sbd)
   const now = Date.now()
   const qd = quyetDinhVaoThi(ca, cu, idThietBi, now)
@@ -391,6 +401,66 @@ async function xoaPhieuR2(env: Env, ma: string): Promise<Response> {
   return ra({ ok: true })
 }
 
+// ---------------------------------------------------------------------------
+// DANH SÁCH LỚP — cổng chặn số báo danh lạ, 11/09.
+//
+// Bên Apps Script, `vaoThi` chặn em không có trong `DanhSachLop`. Worker chưa
+// có cổng ấy, nên chuyển vào thi sang đây mà quên nó là ai có mã ca cũng gõ
+// một số báo danh bất kỳ rồi vào thi được.
+//
+// LUẬT GIỮ NGUYÊN TỪ APPS SCRIPT: bảng RỖNG thì KHÔNG chặn ai. Thầy chưa kịp
+// đẩy danh sách mà cả lớp đứng ngoài cửa là hỏng nặng hơn hẳn việc thiếu cổng.
+async function dayDanhSach(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const ds = Array.isArray(b.ds) ? (b.ds as Record<string, unknown>[]) : []
+  if (ds.length === 0) return ra({ ok: false, error: 'Danh sách rỗng' })
+  const nay = new Date().toISOString()
+  const cau = ds
+    .map((e) => String(e.sbd ?? '').trim())
+    .filter((x) => x.length > 0)
+    .map((_, i) =>
+      env.DB.prepare(
+        `INSERT INTO danh_sach (sbd, ho_ten, nam_sinh, lop, cap_nhat_luc) VALUES (?,?,?,?,?)
+         ON CONFLICT(sbd) DO UPDATE SET ho_ten=excluded.ho_ten, nam_sinh=excluded.nam_sinh,
+           lop=excluded.lop, cap_nhat_luc=excluded.cap_nhat_luc`,
+      ).bind(
+        String(ds[i].sbd ?? '').trim(),
+        String(ds[i].hoTen ?? ''),
+        String(ds[i].namSinh ?? ''),
+        String(ds[i].lop ?? ''),
+        nay,
+      ),
+    )
+  // Gói $5 cho 1.000 câu mỗi lượt gọi; chia lô 500 để còn chỗ thở.
+  for (let i = 0; i < cau.length; i += 500) await env.DB.batch(cau.slice(i, i + 500))
+  return ra({ ok: true, dem: cau.length })
+}
+
+/** Một dòng danh sách, hoặc `null` khi không có. */
+async function docDanhSach(env: Env, sbd: string): Promise<Record<string, unknown> | null> {
+  return await env.DB.prepare('SELECT * FROM danh_sach WHERE sbd = ?').bind(sbd).first<Record<string, unknown>>()
+}
+
+/** Bảng danh sách có dữ liệu chưa. Rỗng ⇒ KHÔNG chặn ai. */
+async function coDanhSach(env: Env): Promise<boolean> {
+  const r = await env.DB.prepare('SELECT 1 AS co FROM danh_sach LIMIT 1').first<{ co: number }>()
+  return !!r
+}
+
+/** TRA TÊN THEO SỐ BÁO DANH — để em nhìn đúng tên mình rồi mới bấm Bắt đầu.
+ *
+ * Cùng đánh đổi đã chốt 07/09 bên Apps Script: ai cầm mã ca cũng dò được "số
+ * báo danh này là ai". Chấp nhận, vì phòng thi có thầy coi tại chỗ, và cái giá
+ * của việc em không vào thi được lớn hơn. KHÔNG trả năm sinh, KHÔNG trả SĐT. */
+async function tenTheoSbd(env: Env, maCa: string, sbd: string): Promise<Response> {
+  if (!maCa || !sbd) return ra({ ok: false, lyDo: 'thieu' })
+  const ca = await docCa(env, maCa)
+  if (!ca) return ra({ ok: false, lyDo: 'khong_co_ca' })
+  if (!(await coDanhSach(env))) return ra({ ok: true, hoTen: '' })
+  const d = await docDanhSach(env, sbd)
+  if (!d) return ra({ ok: false, lyDo: 'khong_co_sbd' })
+  return ra({ ok: true, hoTen: String(d.ho_ten ?? '') })
+}
+
 async function xemTheoDoi(env: Env, maCa: string): Promise<Response> {
   const r = await env.DB.prepare('SELECT * FROM trang_thai WHERE ma_ca = ? ORDER BY sbd')
     .bind(maCa)
@@ -474,6 +544,9 @@ export default {
     if (req.method === 'POST' && p === '/do-tai/don') return donDoTai(env)
     if (req.method === 'GET' && p === '/trang-thai') return xemTrangThai(env, (url.searchParams.get('sbd') ?? '').trim())
     if (req.method === 'GET' && p === '/phong-cho') return hoiPhongCho(env, (url.searchParams.get('maCa') ?? '').trim())
+    if (req.method === 'GET' && p === '/ten-theo-sbd') {
+      return tenTheoSbd(env, (url.searchParams.get('maCa') ?? '').trim(), (url.searchParams.get('sbd') ?? '').trim())
+    }
     if (req.method !== 'POST') return ra({ ok: false, error: 'Chỉ nhận POST' }, 405)
 
     let b: Record<string, unknown>
@@ -493,6 +566,7 @@ export default {
     // Lệnh của THẦY — đòi mã bí mật.
     if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
     if (p === '/ca/day') return dayCa(env, b)
+    if (p === '/danh-sach/day') return dayDanhSach(env, b)
     if (p === '/phieu/day') return dayPhieu(env, b)
     if (p === '/phieu/xoa') return xoaPhieuR2(env, String(b.ma ?? ''))
     if (p === '/chua-day') return chuaDay(env, String(b.maCa ?? ''))

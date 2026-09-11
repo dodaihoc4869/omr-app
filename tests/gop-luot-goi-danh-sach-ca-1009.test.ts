@@ -127,7 +127,10 @@ describe('MÃ NGUỒN — mọi lệnh làm đổi danh sách ca đều phải b
     for (const ten of ['khoaCa', 'moKhoaCa', 'doiTenCa', 'xoaCa', 'khoiPhucCa', 'publishSession']) {
       const dau = s.indexOf(`export async function ${ten}`)
       expect(dau, ten).toBeGreaterThan(0)
-      expect(s.slice(dau, dau + 2600), ten).toContain('xoaBoDemCa()')
+      // CỬA SỔ NỚI 2 600 → 5 000 ngày 11/09. `publishSession` mọc thêm đoạn đẩy
+      // ca lên máy chủ mới, đẩy lời gọi `xoaBoDemCa()` ra ngoài cửa sổ cũ. Ý
+      // ĐỊNH KHÔNG ĐỔI: lệnh làm đổi danh sách ca thì phải bỏ đệm.
+      expect(s.slice(dau, dau + 5000), ten).toContain('xoaBoDemCa()')
     }
   })
 
