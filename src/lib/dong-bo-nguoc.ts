@@ -13,6 +13,7 @@
 //   3. Lượt còn `dang_lam` thì BỎ QUA. Em đang làm bài dở, đẩy về Sheet là
 //      chốt sổ sớm cho em.
 import { submitAnswers } from './exam-api'
+import { emptyAnswerRecord, emptyIntegrityLog } from './exam-db'
 import type { CauHinhMayChu } from './cau-hinh-may-chu'
 
 export interface LuotChuaDay {
@@ -93,8 +94,16 @@ export async function dongBoNguoc(
         l.ma_ca,
         l.sbd,
         String(l.ma_de ?? ''),
-        doc(l.dap_an_json, {}),
-        doc(l.integrity_json, {}),
+        // DÙNG ĐÚNG DÁNG RỖNG, không phải `{}`.
+        //
+        // `{}` thiếu cả ba phần I/II/III. Lỗi này nằm im từ đợt 3 vì chưa tệp
+        // nào của app nhập `dong-bo-nguoc.ts`, nên `tsc` chưa soi tới. Nối nút
+        // "Kéo bài về Sheet" vào màn hình là nó lộ ra ngay.
+        //
+        // Hậu quả nếu để nguyên: một lượt có `dap_an_json` hỏng sẽ đẩy về Sheet
+        // một bản ghi thiếu phần, và đường chấm đọc `dapAn.phanII` ra `undefined`.
+        doc(l.dap_an_json, emptyAnswerRecord()),
+        doc(l.integrity_json, emptyIntegrityLog()),
         l.lan_thu,
         '',
         doc(l.giay_cau_json, undefined) as Record<string, number> | undefined,

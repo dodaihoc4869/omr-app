@@ -11,6 +11,7 @@ import { dongBoGioMayChu } from './gio-may-chu'
 import { chuanTenCa } from './ten-ca'
 import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
 import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi } from './may-chu-moi'
+import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
 export interface KeyBank {
@@ -1508,6 +1509,18 @@ export async function luuPhieu(scriptUrl: string, secret: string, d: { ma: strin
   // Gói nặng nên cho hạn rộng hơn mặc định: 4 MB qua 4G có khi mất cả phút.
   // `loai` đặt SAU `...d`: để trước thì `...d` rải đè lại bằng undefined khi chỗ
   // gọi không truyền, và máy chủ nhận rỗng.
+  // MÁY CHỦ MỚI TRƯỚC — phụ huynh mở link sẽ đọc từ đây, nhanh hơn ~30 lần.
+  // Hỏng thì BỎ QUA: đây là đường tắt, không phải nghĩa vụ. Phiếu vẫn lưu như
+  // hôm nay ở dòng dưới, chỉ là mở chậm hơn.
+  try {
+    const chMoi = await layCauHinhMayChu()
+    await dayPhieuMoi(chMoi, secret, { ma: d.ma, maCa: d.maCa, sbd: d.sbd, hoTen: d.hoTen, loai: d.loai || 'ketqua', phieu: d.phieu })
+  } catch {
+    // không chặn việc lưu vì một đường tắt
+  }
+
+  // APPS SCRIPT VẪN LÀ NGUỒN SỰ THẬT. Chỉ dòng này được phép ném lỗi: lưu hỏng
+  // ở đây mới thật sự là chưa có phiếu.
   const r = await postJson(scriptUrl, { action: 'luuPhieu', secret, ...d, loai: d.loai || 'ketqua' }, 90)
   if (!r.ok) throw new Error(r.error || 'Không lưu được phiếu')
 }
@@ -1536,6 +1549,21 @@ const HAN_GIAY_LAY_PHIEU = 90
 const CHO_THU_LAI_MS = 2500
 
 export async function layPhieu(scriptUrl: string, ma: string): Promise<unknown> {
+  // MÁY CHỦ MỚI TRƯỚC. Đo đường cũ sau khi đã tối ưu: p50 5,13 s · p95 5,85 s —
+  // phụ huynh bấm link rồi ngồi nhìn năm giây. R2 trả cùng gói ấy trong vài
+  // trăm mili giây.
+  //
+  // `null` nghĩa là "hỏi chỗ cũ", dùng chung cho cả ba ca: cờ tắt · phiếu tạo
+  // trước hôm nay nên chỉ có bên Apps Script · mạng hỏng. Không ca nào được
+  // biến thành báo đỏ cho phụ huynh.
+  try {
+    const chMoi = await layCauHinhMayChu()
+    const nhanh = await layPhieuMoi(chMoi, ma)
+    if (nhanh !== null && nhanh !== undefined) return nhanh
+  } catch {
+    // rơi xuống đường cũ
+  }
+
   let cuoi: unknown = null
   // THỬ LẠI ĐÚNG MỘT LƯỢT, và CHỈ khi hỏng vì mạng hoặc hết hạn chờ. Máy chủ
   // trả lời "không có phiếu" là một CÂU TRẢ LỜI (thầy đã thu hồi link) — báo

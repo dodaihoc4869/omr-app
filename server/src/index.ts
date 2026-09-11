@@ -332,6 +332,65 @@ async function batDauThi(env: Env, maCa: string): Promise<Response> {
 
 /** Màn theo dõi phòng thi của thầy. ĐÒI mã bí mật: đây là danh sách tên và
  *  tiến độ của cả lớp, không phải thứ để ngỏ. */
+// ---------------------------------------------------------------------------
+// PHIẾU BÁO CÁO GỬI PHỤ HUYNH — 11/09.
+//
+// VÌ SAO CHUYỂN: phiếu đang nằm trong sheet `PhieuKetQua`, mỗi gói tới 4 MB.
+// Đo trên máy chủ cũ sau khi đã tối ưu: `layPhieu` 20 lượt đồng thời cho
+// p50 5,13 s · p95 5,85 s. Phụ huynh bấm link rồi ngồi nhìn năm giây.
+//
+// R2 đọc thẳng ở biên, cùng gói dữ liệu ấy, tính bằng trăm mili giây.
+//
+// MÔ HÌNH TIN CẬY GIỮ NGUYÊN: đường `GET /phieu/:ma` là CÔNG KHAI, đúng như
+// `layPhieu` bên Apps Script — ai có mã phiếu thì mở được, mã là chìa khoá.
+// KHÔNG liệt kê được: không có đường nào trả danh sách mã.
+//
+// KHÔNG ĐẶT BỘ ĐỆM: thầy sửa rồi lưu lại phiếu là phụ huynh phải thấy bản mới
+// ngay. Tốc độ ở đây tới từ R2 thay cho Sheets, không phải từ bộ đệm.
+async function dayPhieu(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const ma = String(b.ma ?? '').trim()
+  if (!ma) return ra({ ok: false, error: 'Thiếu mã phiếu' })
+  if (!env.DE) return ra({ ok: false, error: 'Chưa nối R2 — chưa đẩy phiếu được' }, 500)
+  const goi = {
+    ma,
+    maCa: String(b.maCa ?? ''),
+    sbd: String(b.sbd ?? ''),
+    hoTen: String(b.hoTen ?? ''),
+    loai: String(b.loai ?? 'ketqua'),
+    phieu: b.phieu ?? null,
+    ghiLuc: new Date().toISOString(),
+  }
+  await env.DE.put(`phieu/${ma}.json`, JSON.stringify(goi))
+  return ra({ ok: true })
+}
+
+async function layPhieuR2(env: Env, ma: string): Promise<Response> {
+  const khoa = String(ma ?? '').trim()
+  if (!khoa) return ra({ ok: false, lyDo: 'thieu' }, 400)
+  if (!env.DE) return ra({ ok: false, lyDo: 'khong_co' }, 404)
+  const o = await env.DE.get(`phieu/${khoa}.json`)
+  // KHÔNG CÓ Ở ĐÂY KHÔNG CÓ NGHĨA LÀ KHÔNG CÓ. Phiếu cũ vẫn nằm bên Apps
+  // Script, nên máy em phải hiểu 404 là "hỏi chỗ cũ", không phải "báo đỏ".
+  if (!o) return ra({ ok: false, lyDo: 'khong_co' }, 404)
+  return new Response(o.body, {
+    status: 200,
+    headers: { ...JSON_HEADERS, 'cache-control': 'no-store' },
+  })
+}
+
+/** THU HỒI PHIẾU. Ghi đè bằng gói RỖNG thay vì xoá đối tượng R2.
+ *
+ * Vì sao không xoá: thu hồi là việc thầy làm khi gửi nhầm link, và thứ phải bảo
+ * đảm là "mở ra không còn nội dung", không phải "đối tượng biến mất". Ghi đè
+ * đạt đúng điều đó bằng một lệnh đã có, và để lại dấu vết thời điểm thu hồi. */
+async function xoaPhieuR2(env: Env, ma: string): Promise<Response> {
+  const khoa = String(ma ?? '').trim()
+  if (!khoa) return ra({ ok: false, error: 'Thiếu mã phiếu' })
+  if (!env.DE) return ra({ ok: true })
+  await env.DE.put(`phieu/${khoa}.json`, JSON.stringify({ ma: khoa, thuHoi: true, phieu: null, ghiLuc: new Date().toISOString() }))
+  return ra({ ok: true })
+}
+
 async function xemTheoDoi(env: Env, maCa: string): Promise<Response> {
   const r = await env.DB.prepare('SELECT * FROM trang_thai WHERE ma_ca = ? ORDER BY sbd')
     .bind(maCa)
@@ -400,6 +459,10 @@ export default {
     const p = url.pathname
 
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS })
+    // PHIẾU: đường đọc CÔNG KHAI, đặt trước mọi cổng mã bí mật.
+    if (req.method === 'GET' && p.startsWith('/phieu/')) {
+      return layPhieuR2(env, decodeURIComponent(p.slice('/phieu/'.length)))
+    }
     if (req.method === 'GET' && p === '/khoe') {
       return ra({ ok: true, ten: 'may-chu-moi', coDB: !!env.DB, coR2: !!env.DE, coMat: !!env.MA_BI_MAT })
     }
@@ -430,6 +493,8 @@ export default {
     // Lệnh của THẦY — đòi mã bí mật.
     if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
     if (p === '/ca/day') return dayCa(env, b)
+    if (p === '/phieu/day') return dayPhieu(env, b)
+    if (p === '/phieu/xoa') return xoaPhieuR2(env, String(b.ma ?? ''))
     if (p === '/chua-day') return chuaDay(env, String(b.maCa ?? ''))
     if (p === '/da-day') return danhDauDaDay(env, b)
     if (p === '/ca/bat-dau') return batDauThi(env, String(b.maCa ?? ''))
