@@ -45,7 +45,7 @@ export default function NutDongBoMoiCa() {
     try {
       const url = (await loadScriptUrl()).trim()
       const mat = (await loadTeacherSecret()).trim()
-      if (!url) throw new Error('Chưa cấu hình link Apps Script — vào Ngân hàng câu hỏi → Cấu hình')
+      if (!url) throw new Error('Chưa cấu hình địa chỉ máy chủ — vào Ngân hàng câu hỏi → Cấu hình')
       if (!mat) throw new Error('Chưa nhập mã bí mật — vào Ngân hàng câu hỏi → Cấu hình')
 
       setTien('đang tải lại kho đề…')

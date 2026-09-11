@@ -117,7 +117,7 @@ export default function KhoiLuyenKhacPhuc({ scriptUrl, maBiMat }: { scriptUrl: s
   const [emMo, setEmMo] = useState('')
 
   const tai = async () => {
-    if (!scriptUrl.trim() || !maBiMat.trim()) return setLoi('Chưa có link Apps Script hoặc mã bí mật')
+    if (!scriptUrl.trim() || !maBiMat.trim()) return setLoi('Chưa có địa chỉ máy chủ hoặc mã bí mật')
     setDangTai(true)
     setLoi('')
     try {

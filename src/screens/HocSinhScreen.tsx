@@ -76,7 +76,7 @@ export default function HocSinhScreen() {
     setLoi('')
     try {
       const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
-      if (!url.trim()) throw new Error('Chưa cấu hình link Apps Script — vào Ngân hàng câu hỏi → Cấu hình')
+      if (!url.trim()) throw new Error('Chưa cấu hình địa chỉ máy chủ — vào Ngân hàng câu hỏi → Cấu hình')
       if (!mat.trim()) throw new Error('Chưa nhập mã bí mật — vào Ngân hàng câu hỏi → Cấu hình')
       setCauHinh({ url: url.trim(), mat: mat.trim() })
       setDs(await danhSachEm(url.trim(), mat.trim()))
@@ -113,7 +113,7 @@ export default function HocSinhScreen() {
    * danh sách sẽ đông, chạm nhầm rất dễ. Xoá hồ sơ chứ KHÔNG xoá bài làm —
    * điểm và lịch sử ca vẫn nằm trong LuotThi, em thi lại là tên hiện ra lại. */
   const xoaEm = async (sbd: string, hoTen: string) => {
-    if (!cauHinh) return showToast('Chưa có link Apps Script hoặc mã bí mật', 'error')
+    if (!cauHinh) return showToast('Chưa có địa chỉ máy chủ hoặc mã bí mật', 'error')
     const go = prompt(`Xoá "${hoTen || `SBD ${sbd}`}" khỏi danh sách học sinh?\n\nBài làm và điểm của em GIỮ NGUYÊN; em thi ca tiếp theo là tên tự hiện lại.\n\nGõ đúng số báo danh ${sbd} để xoá:`)
     if (go === null) return
     if (go.trim() !== sbd) return showToast('Số báo danh gõ vào không khớp — chưa xoá gì', 'warn')

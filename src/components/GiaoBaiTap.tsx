@@ -103,7 +103,7 @@ export default function GiaoBaiTap({
     setLoi('')
     try {
       const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
-      if (!url.trim() || !mat.trim()) throw new Error('Chưa cấu hình link Apps Script hoặc mã bí mật')
+      if (!url.trim() || !mat.trim()) throw new Error('Chưa cấu hình địa chỉ máy chủ hoặc mã bí mật')
       // Câu em đã làm — lỗi mạng ở bước này không chặn việc giao bài, chỉ mất
       // ưu tiên tránh câu cũ (báo rõ cho thầy biết).
       let daLam: string[] = []

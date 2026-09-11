@@ -128,7 +128,7 @@ export default function NganHangDeScreen() {
    * luôn vào ngân hàng máy này. Cùng khuôn JSON, cùng kiểm tra. */
   const dayFileJson = async (file: File) => {
     if (!scriptUrl.trim() || !secret.trim()) {
-      showToast('Cần link Apps Script + mã bí mật trước (mục Cấu hình)', 'error')
+      showToast('Cần địa chỉ máy chủ + mã bí mật trước (mục Cấu hình)', 'error')
       setMoCauHinh(true)
       return
     }
@@ -187,7 +187,7 @@ export default function NganHangDeScreen() {
 
   const dongBo = async (url: string, mat: string, imLang = false, epTaiLai = false) => {
     if (!url.trim() || !mat.trim()) {
-      if (!imLang) showToast('Chưa có link Apps Script hoặc mã bí mật — mở mục Cấu hình bên dưới', 'error')
+      if (!imLang) showToast('Chưa có địa chỉ máy chủ hoặc mã bí mật — mở mục Cấu hình bên dưới', 'error')
       setMoCauHinh(true)
       return
     }
@@ -256,7 +256,7 @@ export default function NganHangDeScreen() {
    * để thầy thử lại, không để rơi vào cảnh máy mất đề mà kho vẫn còn. */
   const xoaHanKhoiKho = async (maDe: string) => {
     if (!scriptUrl.trim() || !secret.trim()) {
-      showToast('Cần link Apps Script + mã bí mật mới xoá được ở kho (mục Cấu hình)', 'error')
+      showToast('Cần địa chỉ máy chủ + mã bí mật mới xoá được ở kho (mục Cấu hình)', 'error')
       return
     }
     setDangXoa(true)
@@ -567,8 +567,8 @@ export default function NganHangDeScreen() {
         {moCauHinh && (
           <div className="flex flex-col" style={{ gap: 'var(--k3)', marginTop: 'var(--k3)' }}>
             <div>
-              <div style={{ ...NHAN_NHO, marginBottom: 'var(--k1)' }}>Link Apps Script (/exec)</div>
-              <input style={O_NHAP} value={scriptUrl} onChange={(e) => setScriptUrl(e.target.value)} placeholder="https://script.google.com/macros/s/.../exec" />
+              <div style={{ ...NHAN_NHO, marginBottom: 'var(--k1)' }}>Địa chỉ máy chủ (bỏ trống = dùng máy chủ mới đã cấu hình)</div>
+              <input style={O_NHAP} value={scriptUrl} onChange={(e) => setScriptUrl(e.target.value)} placeholder="https://omr.ttadodaihoc.workers.dev" />
             </div>
             <div>
               <div style={{ ...NHAN_NHO, marginBottom: 'var(--k1)' }}>Mã bí mật kho đề (đúng bằng MA_BI_MAT đã đặt trong Apps Script)</div>

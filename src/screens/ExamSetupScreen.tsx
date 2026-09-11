@@ -286,7 +286,7 @@ export default function ExamSetupScreen() {
 
 
   const handleOpenSession = async () => {
-    if (!scriptUrl.trim()) return showToast('Chưa cấu hình link Apps Script — vào Ngân hàng câu hỏi → Cấu hình', 'error')
+    if (!scriptUrl.trim()) return showToast('Chưa cấu hình địa chỉ máy chủ — vào Ngân hàng câu hỏi → Cấu hình', 'error')
     if (selectedSources.length === 0) return showToast('Chưa chọn đề nào cho ca này', 'error')
     if (!lop.trim()) return showToast('Chưa nhập lớp', 'error')
     if (!Number.isFinite(thoiGianPhut) || thoiGianPhut <= 0) return showToast('Thời gian làm bài phải lớn hơn 0', 'error')

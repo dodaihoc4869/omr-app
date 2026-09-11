@@ -158,7 +158,7 @@ export default function GoiLenBangScreen() {
       // hệt màn Mở ca — tích một dòng là lấy đúng dạng đó.
       setDeDaLuu(khuTrungNguon(tachNhieuTheoPhan(kho)).nguon)
       if (!url.trim() || !mat.trim()) {
-        setLoi('Chưa cấu hình link Apps Script hoặc mã bí mật — vào Ngân hàng câu hỏi → Cấu hình')
+        setLoi('Chưa cấu hình địa chỉ máy chủ hoặc mã bí mật — vào Ngân hàng câu hỏi → Cấu hình')
         setDsCa([])
         return
       }

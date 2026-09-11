@@ -87,7 +87,7 @@ async function chia(): Promise<{ url: string; mat: string }> {
     throw new Error('App đang khoá — thầy nhập mật khẩu rồi gọi lại')
   }
   const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
-  if (!url.trim()) throw new Error('Chưa cấu hình link Apps Script')
+  if (!url.trim()) throw new Error('Chưa cấu hình địa chỉ máy chủ')
   if (!mat.trim()) throw new Error('App đang khoá — thầy nhập mật khẩu rồi gọi lại')
   return { url: url.trim(), mat: mat.trim() }
 }

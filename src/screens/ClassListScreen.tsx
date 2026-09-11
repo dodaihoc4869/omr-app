@@ -81,7 +81,7 @@ export default function ClassListScreen() {
     try {
       const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
       if (!url.trim() || !mat.trim()) {
-        showToast('Đã lưu ở máy. Chưa có link Apps Script hoặc mã bí mật nên chưa đẩy lên máy chủ.', 'warn')
+        showToast('Đã lưu ở máy. Chưa có địa chỉ máy chủ hoặc mã bí mật nên chưa đẩy lên máy chủ.', 'warn')
         return
       }
       const kq = await napDanhSachLop(

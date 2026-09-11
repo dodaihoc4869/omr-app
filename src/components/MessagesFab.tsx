@@ -323,7 +323,7 @@ export default function MessagesFab() {
             {the === 'thu' && (
             <div className="overflow-y-auto px-4 py-3 space-y-3">
               {!scriptUrl.trim() && (
-                <div className="text-sm text-slate-500">Chưa có link Apps Script — vào màn Soạn đề để cấu hình trước.</div>
+                <div className="text-sm text-slate-500">Chưa có địa chỉ máy chủ — vào màn Soạn đề để cấu hình trước.</div>
               )}
               {scriptUrl.trim() && loading && <div className="text-sm text-slate-500">Đang tải…</div>}
               {scriptUrl.trim() && !loading && items && items.length === 0 && (

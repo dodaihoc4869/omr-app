@@ -107,7 +107,7 @@ export default function NutPhieuHtml({ dungGoi, nhanXem, showToast, choPhepLink 
       const g = await dungGoi()
       if (!g) return
       const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
-      if (!url.trim() || !mat.trim()) throw new Error('Chưa cấu hình link Apps Script và mã bí mật')
+      if (!url.trim() || !mat.trim()) throw new Error('Chưa cấu hình địa chỉ máy chủ và mã bí mật')
       const ma = sinhMaPhieu()
       const goi: GoiPhieuBaiTap = { v: BAN_PHIEU_BT, loai: 'baitap', tt: { ...g.tt, ngay: g.tt.ngay }, cau: g.cau }
       await luuPhieu(url.trim(), mat.trim(), { ma, maCa: g.maCa || '', sbd: g.sbd || '', hoTen: g.tt.hoTen, phieu: goi })

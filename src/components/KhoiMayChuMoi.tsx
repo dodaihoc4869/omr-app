@@ -85,7 +85,7 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
     try {
       const url = (await loadScriptUrl()) ?? ''
       const mat = (await loadTeacherSecret()) ?? ''
-      if (!url || !mat) throw new Error('Thiếu link Apps Script hoặc mã bí mật')
+      if (!url || !mat) throw new Error('Thiếu địa chỉ máy chủ hoặc mã bí mật')
       const kq = await chuyenKhoDe(url, mat, setTienKho)
       const con = kq.hong.length
       setKetKho({
@@ -130,7 +130,7 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
     setTienNap('đang đọc danh sách ca…')
     try {
       const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
-      if (!url.trim() || !mat.trim()) throw new Error('Thiếu link Apps Script hoặc mã bí mật')
+      if (!url.trim() || !mat.trim()) throw new Error('Thiếu địa chỉ máy chủ hoặc mã bí mật')
       const kq = await napToanBoCaLenMayChuMoi(url.trim(), mat.trim(), (xong, tong, viec) => {
         setTienNap(`${xong}/${tong} · ${viec}`)
       })

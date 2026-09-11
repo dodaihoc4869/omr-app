@@ -52,7 +52,7 @@ export default function KhoiTroLy({ scriptUrl, secret }: KhoiTroLyProps) {
       // Câu hỏi cần dữ liệu mà máy chưa có cấu hình thì NÓI THẲNG, không dựng
       // câu trả lời rỗng rồi để thầy tưởng là chưa có dữ liệu thật.
       if (y.loai !== 'huong_dan' && y.loai !== 'khong_hieu' && chuaCauHinh) {
-        setDong((cu) => [...cu, { ai: 'may', chu: 'Chưa có link Apps Script hoặc mã bí mật. Vào Ngân hàng câu hỏi → Cấu hình để nhập, rồi hỏi lại.' }])
+        setDong((cu) => [...cu, { ai: 'may', chu: 'Chưa có địa chỉ máy chủ hoặc mã bí mật. Vào Ngân hàng câu hỏi → Cấu hình để nhập, rồi hỏi lại.' }])
         return
       }
       const { duLieu, hoiLai } = await layDuLieu(y, scriptUrl, secret)

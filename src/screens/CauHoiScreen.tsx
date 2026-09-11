@@ -102,7 +102,7 @@ export default function CauHoiScreen() {
       if (!con) return
       setUrl(u || '')
       setMat(m || '')
-      if (!u || !m) return setLoi('Chưa có link Apps Script hoặc mã bí mật. Vào Ngân hàng câu hỏi → Cấu hình để nhập.')
+      if (!u || !m) return setLoi('Chưa có địa chỉ máy chủ hoặc mã bí mật. Vào Ngân hàng câu hỏi → Cấu hình để nhập.')
       await tai(u, m, 'chinh')
     })()
     return () => {
