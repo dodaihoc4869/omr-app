@@ -36,7 +36,7 @@ const NHOM: { ten: string; icon: typeof Timer; muc: Muc[] }[] = [
       { id: 'examsetup', ten: 'Mở ca kiểm tra', icon: FilePlus2 },
       { id: 'nganhangde', ten: 'Ngân hàng câu hỏi', icon: Library },
       { id: 'lichsuca', ten: 'Ca thi', icon: ClipboardList, con: ['exammonitor'] },
-      { id: 'goilenbang', ten: 'Gọi lên bảng', icon: Presentation },
+      { id: 'goilenbang', ten: 'Phân công', icon: Presentation },
       { id: 'cauhoi', ten: 'Học sinh hỏi', icon: MessageCircleQuestion },
     ],
   },

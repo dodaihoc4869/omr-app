@@ -78,6 +78,7 @@ import { useAppStore } from '../store/appStore'
 import { datDangLamBai } from '../lib/cap-nhat-app'
 import { napDong } from '../lib/nap-manh'
 import KhungXemPhieu from '../components/KhungXemPhieu'
+import NutNopBtvn from '../components/NutNopBtvn'
 
 /** Đang toàn màn hình: đã thêm vào màn hình chính (standalone) HOẶC Fullscreen API đang bật. */
 function dangToanManHinh(): boolean {
@@ -2317,7 +2318,13 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 </div>
               )}
               {laXemDiem ? (
-                <NutChinh onClick={moLaiTuMayChu}>Xem điểm của em</NutChinh>
+                <>
+                  <NutChinh onClick={moLaiTuMayChu}>Xem điểm của em</NutChinh>
+                  {/* HAI NÚT dưới ô số báo danh (đặc tả PHAN-CONG-GIAO-BTVN):
+                      Xem điểm y như cũ, và Nộp BTVN mở phiếu bài tập của chính
+                      em đó. Ca chưa giao bài thì nút báo thẳng, không im lặng. */}
+                  <NutNopBtvn maCa={maCa.trim()} sbd={sbd.trim()} />
+                </>
               ) : (
                 <NutChinh onClick={() => void traTenRoiHoi()} disabled={dangTraTen}>
                   {dangTraTen ? 'Đang tra số báo danh…' : 'Vào thi'}

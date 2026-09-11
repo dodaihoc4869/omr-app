@@ -43,7 +43,7 @@ const NganHangDeScreen = lazy(() => import('./screens/NganHangDeScreen'))
 const ExamMonitorScreen = lazy(() => import('./screens/ExamMonitorScreen'))
 const LichSuCaScreen = lazy(() => import('./screens/LichSuCaScreen'))
 const HocSinhScreen = lazy(() => import('./screens/HocSinhScreen'))
-const GoiLenBangScreen = lazy(() => import('./screens/GoiLenBangScreen'))
+const GoiLenBangScreen = lazy(() => import('./screens/PhanCongScreen'))
 const CauHoiScreen = lazy(() => import('./screens/CauHoiScreen'))
 import KhoaAppScreen from './screens/KhoaAppScreen'
 import ChanLoi from './components/ChanLoi'
@@ -65,7 +65,7 @@ const TEN_MAN: Record<string, string> = {
   exammonitor: 'Theo dõi ca',
   lichsuca: 'Ca thi',
   hocsinh: 'Học sinh',
-  goilenbang: 'Gọi lên bảng',
+  goilenbang: 'Phân công',
   cauhoi: 'Học sinh hỏi',
 }
 
