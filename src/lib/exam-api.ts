@@ -13,6 +13,7 @@ import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
 import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi } from './may-chu-moi'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
 import { dayCaMoi, dayDanhSachMoi, luotCuaCaMoi } from './day-ca-may-chu-moi'
+import { daBatDauTheoDuongCu, ghiNhoDaBatDauDuongCu, nenDoiChieu } from './doi-chieu-phong-cho'
 import { loadTeacherSecret } from './exam-db'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
@@ -286,10 +287,19 @@ export async function trangThaiPhongCho(scriptUrl: string, maCa: string): Promis
   // trong chính lượt này, em không thấy gì khác ngoài việc chậm hơn một nhịp.
   const chMoi = await layCauHinhMayChu()
   const rMoi = await phongChoMoi(chMoi, maCa)
-  if (rMoi) return rMoi
+  // ĐÃ BẮT ĐẦU ⇒ tin ngay, không đối chiếu. Tin tốt thì không cần kiểm lại.
+  if (rMoi?.batDau) return rMoi
+  // CHƯA BẮT ĐẦU ⇒ chỉ tin trong một nhịp. Lượt đẩy mốc bắt đầu sang máy chủ
+  // mới có thể đã trượt, và khi ấy tin nó là để cả lớp đứng chờ vĩnh viễn.
+  // Xem `src/lib/doi-chieu-phong-cho.ts`.
+  if (rMoi && !nenDoiChieu(maCa)) return rMoi
 
   const r = await postJson(scriptUrl, { action: 'trangThaiPhongCho', maCa })
   if (!r.ok) throw new Error(r.error || 'Không hỏi được trạng thái ca')
+  // ĐƯỜNG CŨ BẢO ĐÃ BẮT ĐẦU MÀ MÁY CHỦ MỚI BẢO CHƯA: máy chủ mới thiếu mốc bắt
+  // đầu. Nhớ lại, để `vaoThi` của ca này đi thẳng đường cũ thay vì bị đẩy về
+  // phòng chờ lần nữa.
+  if (r.batDau === true) ghiNhoDaBatDauDuongCu(maCa)
   return {
     phongCho: r.phongCho === true,
     batDau: r.batDau === true,
@@ -388,7 +398,7 @@ export async function batDauThi(
   /** BIÊN BẢN lúc rút. Đi lên máy chủ để MÁY NÀO mở ca cũng đọc được, không
    * phải đúng cái máy đã bấm Bắt đầu (thầy chốt 08/09: "máy nào cũng được"). */
   bienBan?: Record<string, unknown> | null,
-): Promise<{ batDauLuc: string; daBatTruoc: boolean; thieuBoTheoEm: boolean }> {
+): Promise<{ batDauLuc: string; daBatTruoc: boolean; thieuBoTheoEm: boolean; chuaSangMayChuMoi: boolean }> {
   const r = await postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm, lapTheoEm, demSaiTheoEm, bienBan })
   if (!r.ok) throw new Error(r.error || 'Không bắt đầu được ca')
 
@@ -396,15 +406,23 @@ export async function batDauThi(
   //
   // Thiếu bước này thì em ở phòng chờ bên máy chủ mới không bao giờ được phát
   // đề: `/vao-thi` xem `bat_dau_thi_luc` còn rỗng nên giữ em lại mãi.
+  // KHÔNG NUỐT KẾT QUẢ. Lượt đẩy này trượt thì máy chủ mới không có mốc bắt
+  // đầu, và mọi em hỏi phòng chờ bên đó đều nghe 'chưa bắt đầu'. Đường đối
+  // chiếu trong `doi-chieu-phong-cho.ts` cắt cú treo sau 15 giây, nhưng cả lớp
+  // vẫn tụt về Apps Script cho hết ca — thầy phải biết ngay để bấm lại.
+  let chuaSangMayChuMoi = false
   try {
     const chMoi = await layCauHinhMayChu()
-    await dayCaMoi(chMoi, secret, {
-      maCa,
-      batDauThiLuc: String(r.batDauLuc ?? ''),
-      boTheoEm: boTheoEm ? { bo: boTheoEm, lap: lapTheoEm ?? {}, dem: demSaiTheoEm ?? {}, bb: bienBan ?? null } : undefined,
-    })
+    if (chMoi.BAT && chMoi.URL) {
+      const xong = await dayCaMoi(chMoi, secret, {
+        maCa,
+        batDauThiLuc: String(r.batDauLuc ?? ''),
+        boTheoEm: boTheoEm ? { bo: boTheoEm, lap: lapTheoEm ?? {}, dem: demSaiTheoEm ?? {}, bb: bienBan ?? null } : undefined,
+      })
+      chuaSangMayChuMoi = !xong
+    }
   } catch {
-    // không chặn việc bắt đầu ca
+    chuaSangMayChuMoi = true
   }
   return {
     batDauLuc: String(r.batDauLuc ?? ''),
@@ -413,6 +431,7 @@ export async function batDauThi(
     // theo luật hash, còn máy thầy chấm theo bản đồ ⇒ điểm sai. Phải hét lên,
     // không được nuốt.
     thieuBoTheoEm: r.daBatTruoc === true && r.canBoTheoEm === true && r.coBoTheoEm === false,
+    chuaSangMayChuMoi,
   }
 }
 
@@ -463,6 +482,10 @@ async function vaoThiQuaMayChuMoi(
   // màn chờ nhận một gói có `lanThu` và `hetGioLuc` rỗng rồi dựng đề từ hư
   // không.
   if ((r.cach as string) === 'cho') {
+    // ĐƯỜNG CŨ ĐÃ XÁC NHẬN CA BẮT ĐẦU ⇒ máy chủ mới đang thiếu mốc bắt đầu.
+    // Trả dáng 'cho' lúc này là đẩy em về phòng chờ một lần nữa, đúng cái vòng
+    // treo mà `doi-chieu-phong-cho.ts` sinh ra để cắt.
+    if (daBatDauTheoDuongCu(maCa)) return null
     return {
       ok: true,
       cach: 'cho',

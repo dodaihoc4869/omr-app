@@ -839,6 +839,11 @@ export default function ExamMonitorScreen() {
       } else {
         showToast(kq.daBatTruoc ? 'Ca này đã bắt đầu từ trước.' : 'Đã bắt đầu — cả lớp hiện đề ngay bây giờ.', 'success')
       }
+      // KHÔNG NUỐT. Mốc bắt đầu chưa sang máy chủ mới thì cả lớp tụt về đường
+      // cũ suốt ca — chạy được, nhưng chậm như trước và thầy phải biết.
+      if (kq.chuaSangMayChuMoi) {
+        showToast('Mốc bắt đầu CHƯA sang máy chủ mới — cả lớp sẽ chạy bằng đường cũ. Bấm Bắt đầu lại một lần.', 'error')
+      }
       await tai(chiTiet.ca.maCa)
     } catch (e) {
       showToast(`Không bắt đầu được: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
