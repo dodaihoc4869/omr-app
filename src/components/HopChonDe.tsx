@@ -21,9 +21,10 @@ export const KHOI_CO_THE = ['10', '11', '12'] as const
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 
-/** Thụt lề theo tầng. Bốn tầng mà thụt đều nhau thì nhìn ra một khối chữ. */
-const THUT: Record<Nut['tang'], number> = { khoi: 0, chuong: 14, bai: 28, dang: 42 }
-const CO_CHU: Record<Nut['tang'], string> = { khoi: 'var(--cx-2)', chuong: 'var(--cx-2)', bai: 'var(--cx-1)', dang: 'var(--cx-1)' }
+/** Thụt lề theo tầng. Các tầng mà thụt đều nhau thì nhìn ra một khối chữ.
+ * Tầng "thumuc" là thư mục lớn gom cả một lô đề, chỉ có khi nhóm ghi "/". */
+const THUT: Record<Nut['tang'], number> = { khoi: 0, thumuc: 12, chuong: 24, bai: 36, dang: 48 }
+const CO_CHU: Record<Nut['tang'], string> = { khoi: 'var(--cx-2)', thumuc: 'var(--cx-2)', chuong: 'var(--cx-2)', bai: 'var(--cx-1)', dang: 'var(--cx-1)' }
 
 function OTich({ tt }: { tt: 'trong' | 'day' | 'nua' }) {
   const mau = tt === 'trong' ? 'var(--mo)' : 'var(--xanh)'
@@ -94,7 +95,7 @@ function Hang({
           ) : (
             <span style={{ width: 18, flex: '0 0 auto' }} />
           )}
-          <span className={n.tang === 'dang' ? 'truncate' : 'truncate font-bold'} style={{ fontFamily: n.tang === 'khoi' || n.tang === 'chuong' ? 'var(--serif)' : 'var(--sans)', fontSize: CO_CHU[n.tang] }} title={la ? n.nhan : undefined}>
+          <span className={n.tang === 'dang' ? 'truncate' : 'truncate font-bold'} style={{ fontFamily: n.tang === 'khoi' || n.tang === 'thumuc' || n.tang === 'chuong' ? 'var(--serif)' : 'var(--sans)', fontSize: CO_CHU[n.tang] }} title={la ? n.nhan : undefined}>
             {n.nhan}
           </span>
           {/* Mã đề vẫn phải hiện ở lá: thầy đối chiếu với file trên máy và với

@@ -4,7 +4,7 @@
 // HopChonDe. Không chụp màn hình.
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render } from '@testing-library/react'
-import { bamTich, chuongCuaDe, dungCay, locCay, tenBai, tongCau, tongDaChon, trangThaiTich, type Nut } from '../src/lib/cay-chon-de'
+import { bamTich, chuongCuaDe, dungCay, locCay, tenBai, thuMucCuaDe, tongCau, tongDaChon, trangThaiTich, type Nut } from '../src/lib/cay-chon-de'
 import HopChonDe from '../src/components/HopChonDe'
 import type { TeacherExamSource } from '../src/data/examContent'
 
@@ -175,5 +175,35 @@ describe('HopChonDe — vẽ cây', () => {
     expect(la).toHaveLength(1)
     fireEvent.click(la[0])
     expect(goi).toHaveBeenCalledWith('12-C1-B2-DS')
+  })
+})
+
+describe('tầng thư mục', () => {
+  const de = (maDe: string, nhom: string, nguon: string): TeacherExamSource =>
+    ({ maDe, nhom, nguon, phanI: [{}], phanII: [], phanIII: [] }) as unknown as TeacherExamSource
+
+  it('gom mọi nhóm có "/" vào ĐÚNG MỘT nút thư mục trong khối', () => {
+    const cay = dungCay([
+      de('12-C7-B1', '12 · C7 - Nguyên tố nhóm IA', 'Bài A'),
+      de('DH-12-C1-B1', '12 · DẠY HỌC/C1 - Ester lipid', 'Bài 1. Ester'),
+      de('DH-12-C3-B8', '12 · DẠY HỌC/C3 - Hợp chất chứa N', 'Bài 8. Amine'),
+    ])
+    const khoi12 = cay.find((n) => n.nhan === 'Khối 12')!
+    expect(khoi12.con.map((n) => `${n.tang}:${n.nhan}`)).toEqual(['chuong:C7 - Nguyên tố nhóm IA', 'thumuc:DẠY HỌC'])
+    const tm = khoi12.con[1]
+    expect(tm.con.map((n) => n.nhan)).toEqual(['C1 - Ester lipid', 'C3 - Hợp chất chứa N'])
+    expect(tm.laMa).toEqual(['DH-12-C1-B1', 'DH-12-C3-B8'])
+  })
+
+  it('nhóm không có "/" thì chương vẫn nằm thẳng dưới khối, không sinh tầng rỗng', () => {
+    const cay = dungCay([de('12-C7-B1', '12 · C7 - Nguyên tố nhóm IA', 'Bài A')])
+    expect(cay[0].con[0].tang).toBe('chuong')
+  })
+
+  it('thuMucCuaDe và chuongCuaDe tách đúng', () => {
+    expect(thuMucCuaDe({ nhom: '12 · DẠY HỌC/C1 - Ester lipid' })).toBe('DẠY HỌC')
+    expect(chuongCuaDe({ nhom: '12 · DẠY HỌC/C1 - Ester lipid' })).toBe('C1 - Ester lipid')
+    expect(thuMucCuaDe({ nhom: '12 · C1 - Ester lipid' })).toBe('')
+    expect(thuMucCuaDe({ nhom: '' })).toBe('')
   })
 })
