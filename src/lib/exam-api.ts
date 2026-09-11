@@ -10,7 +10,7 @@ import { LUAT_DIEM } from '../engine/score'
 import { dongBoGioMayChu } from './gio-may-chu'
 import { chuanTenCa } from './ten-ca'
 import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
-import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi } from './may-chu-moi'
+import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi, xongNapDiaChi } from './may-chu-moi'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
 import { dayCaMoi, dayDanhSachMoi, luotCuaCaMoi, suaCaMoi, type OSuaCa } from './day-ca-may-chu-moi'
 import { daBatDauTheoDuongCu, ghiNhoDaBatDauDuongCu, nenDoiChieu } from './doi-chieu-phong-cho'
@@ -454,6 +454,9 @@ async function vaoThiQuaMayChuMoi(
   idThietBi: string,
   canBank: boolean,
 ): Promise<KetQuaVaoThi | null> {
+  // Em bấm Vào thi ngay khi app vừa mở: chờ lượt nạp địa chỉ xong rồi hãy đọc
+  // cấu hình, nếu không lượt vào thi đầu tiên rơi về Apps Script oan.
+  await xongNapDiaChi()
   const ch = await layCauHinhMayChu()
   if (!ch.BAT) return null
   const r = await vaoThiMoi(ch, maCa, sbd, idThietBi, canBank)
@@ -1787,6 +1790,11 @@ export async function layPhieu(scriptUrl: string, ma: string): Promise<unknown> 
   // trước hôm nay nên chỉ có bên Apps Script · mạng hỏng. Không ca nào được
   // biến thành báo đỏ cho phụ huynh.
   try {
+    // Máy phụ huynh mở link LẦN ĐẦU: địa chỉ máy chủ mới đang được nạp ở
+    // `main.tsx` ngay lúc này. Không chờ nó xong thì lượt đọc dưới đây thấy cấu
+    // hình rỗng và rơi thẳng về Apps Script — mất trắng cả việc chuyển phiếu
+    // sang R2. Tệp cấu hình cùng gốc và đã nằm trong đệm, chờ là vài mili giây.
+    await xongNapDiaChi()
     const chMoi = await layCauHinhMayChu()
     const nhanh = await layPhieuMoi(chMoi, ma)
     if (nhanh !== null && nhanh !== undefined) return nhanh

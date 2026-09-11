@@ -76,7 +76,9 @@ describe('ĐƯỜNG DẪN ĐỊA CHỈ TỚI MÁY EM', () => {
 })
 
 describe('LUẬT NẠP ĐỊA CHỈ LÚC KHỞI ĐỘNG', () => {
-  const MOC = 'export async function napDiaChiMayChuMoiChoEm()'
+  // Thân việc nằm ở `napThat()`; `napDiaChiMayChuMoiChoEm()` chỉ giữ lời hứa
+  // dùng chung để `xongNapDiaChi()` chờ ké được.
+  const MOC = 'async function napThat()'
   const HAM = MCM.slice(MCM.indexOf(MOC), MCM.indexOf(MOC) + 900)
 
   it('máy thầy đã có cấu hình ⇒ KHÔNG đụng vào, cờ tắt khẩn còn nguyên tác dụng', () => {
@@ -111,6 +113,38 @@ describe('LUẬT NẠP ĐỊA CHỈ LÚC KHỞI ĐỘNG', () => {
 
   it('IndexedDB ghi hỏng thì địa chỉ trong bộ nhớ vẫn cứu được lượt của em', () => {
     expect(MCM).toContain('if (!ch.URL && diaChiTuTep)')
+  })
+})
+
+describe('CUỘC ĐUA LÚC MỞ APP — lượt gọi ĐẦU TIÊN không được thua', () => {
+  // `napDiaChiMayChuMoiChoEm()` ở `main.tsx` KHÔNG được chờ (chờ là chặn lượt
+  // vẽ đầu). Nhưng phụ huynh mở link báo cáo thì màn phiếu gọi `layPhieu` gần
+  // như cùng lúc — thua cuộc đua ấy là rơi về Apps Script và ngồi nhìn 5 giây,
+  // đúng thứ việc chuyển phiếu sang R2 sinh ra để bỏ.
+  it('`xongNapDiaChi` dùng chung một lời hứa, KHÔNG tự khởi động lượt nạp mới', () => {
+    const han = MCM.slice(MCM.indexOf('export function xongNapDiaChi()'), MCM.indexOf('export function xongNapDiaChi()') + 200)
+    expect(han).toContain('return dangNap ?? Promise.resolve()')
+    expect(MCM).toContain('if (!dangNap) dangNap = napThat()')
+  })
+
+  it('layPhieu (phụ huynh) chờ nạp xong rồi mới đọc cấu hình', () => {
+    const i = API.indexOf('export async function layPhieu(')
+    expect(i).toBeGreaterThan(0)
+    const than = API.slice(i, i + 1400)
+    expect(than).toContain('await xongNapDiaChi()')
+    expect(than.indexOf('await xongNapDiaChi()')).toBeLessThan(than.indexOf('await layCauHinhMayChu()'))
+  })
+
+  it('vaoThiQuaMayChuMoi (em) chờ nạp xong rồi mới đọc cấu hình', () => {
+    const i = API.indexOf('async function vaoThiQuaMayChuMoi(')
+    expect(i).toBeGreaterThan(0)
+    const than = API.slice(i, i + 900)
+    expect(than).toContain('await xongNapDiaChi()')
+    expect(than.indexOf('await xongNapDiaChi()')).toBeLessThan(than.indexOf('await layCauHinhMayChu()'))
+  })
+
+  it('CHỈ hai chỗ ấy được chờ — đường nóng lặp lại (lưu tạm, nộp, trạng thái) thì không', () => {
+    expect(API.match(/await xongNapDiaChi\(\)/g)?.length).toBe(2)
   })
 })
 

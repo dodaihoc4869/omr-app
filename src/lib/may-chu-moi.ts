@@ -70,7 +70,14 @@ export function quenDiaChiTuTep(): void {
  *
  * Máy thầy đã có cấu hình riêng thì KHÔNG đụng vào, kể cả khi thầy CHỦ Ý TẮT
  * cờ: cờ tắt khẩn giữa ca thi phải còn nguyên tác dụng. */
-export async function napDiaChiMayChuMoiChoEm(): Promise<void> {
+export function napDiaChiMayChuMoiChoEm(): Promise<void> {
+  if (!dangNap) dangNap = napThat()
+  return dangNap
+}
+
+let dangNap: Promise<void> | null = null
+
+async function napThat(): Promise<void> {
   const ch = await layCauHinhMayChu()
   if (ch.URL) return
   const url = await loadDiaChiMayChuMoiChoEm()
@@ -79,6 +86,23 @@ export async function napDiaChiMayChuMoiChoEm(): Promise<void> {
   const moi = chuanHoaMayChu({ ...ch, BAT: true, URL: url })
   await saveCauHinhMayChu(moi).catch(() => {})
   quenCauHinhMayChu()
+}
+
+/** CHỜ LƯỢT NẠP ĐỊA CHỈ LÚC KHỞI ĐỘNG XONG.
+ *
+ * Chỉ hai chỗ được dùng, và cả hai đều là lượt gọi ĐẦU TIÊN của một người:
+ *   · phụ huynh mở link báo cáo (`layPhieu`);
+ *   · em bấm Vào thi (`vaoThiQuaMayChuMoi`).
+ *
+ * Vì sao cần: `napDiaChiMayChuMoiChoEm()` chạy ở `main.tsx` và KHÔNG được chờ —
+ * chờ nó là chặn lượt vẽ đầu tiên của app. Máy phụ huynh mở link lần đầu thì
+ * màn báo cáo gọi `layPhieu` gần như cùng lúc; thua cuộc đua ấy là phụ huynh
+ * rơi về Apps Script và ngồi nhìn 5 giây, đúng thứ cả việc này sinh ra để bỏ.
+ *
+ * Rẻ: tệp `cau-hinh.json` cùng gốc và đã nằm trong bộ nhớ đệm của service
+ * worker. Chưa ai gọi nạp thì trả về ngay, không tự khởi động lượt nạp nào. */
+export function xongNapDiaChi(): Promise<void> {
+  return dangNap ?? Promise.resolve()
 }
 
 export async function layCauHinhMayChu(): Promise<CauHinhMayChu> {
