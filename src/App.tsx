@@ -12,6 +12,7 @@ import { phaiHoiLai, type BanGhiKhoa } from './lib/khoa-app'
 import { docDuongVao, laLinkAppCu, laManThayQuanLy } from './lib/vai-tro'
 import { ganCauNoi, goCauNoi } from './lib/cau-noi-ddh'
 import ExamTakeScreen from './screens/ExamTakeScreen'
+import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
 import PhieuScreen from './screens/PhieuScreen'
 
 // TÁM MÀN CHỈ THẦY DÙNG — NẠP MUỘN.
@@ -29,11 +30,13 @@ import PhieuScreen from './screens/PhieuScreen'
 //     nhất lại phải chờ thêm một vòng mạng.
 //   · `ExamTakeScreen` — màn em làm bài. Ngày thi không đánh cược vào một mảnh
 //     mã tải muộn.
+//   · `AppDaChuyenScreen` — tấm biển "link này đã ngừng dùng". Nạp muộn thì em
+//     bấm link cũ thấy một khoảnh trắng rồi mới thấy chữ; màn này nhỏ xíu nên
+//     tách ra chẳng được bao nhiêu. Phép kiểm `link-cu-hs-ph` bắt đúng chỗ này.
 //
 // Mảnh nạp muộn hỏng vì thầy đang mở bản cũ đã được `batLoiThieuManh()` trong
 // `main.tsx` lo: bắt đúng lỗi thiếu mảnh rồi tự tải lại một lần.
 const ExamHubScreen = lazy(() => import('./screens/ExamHubScreen'))
-const AppDaChuyenScreen = lazy(() => import('./screens/AppDaChuyenScreen'))
 const ClassListScreen = lazy(() => import('./screens/ClassListScreen'))
 const ExamSetupScreen = lazy(() => import('./screens/ExamSetupScreen'))
 const NganHangDeScreen = lazy(() => import('./screens/NganHangDeScreen'))
@@ -202,13 +205,7 @@ function App() {
       </ChanLoi>
     )
   }
-  if (linkCu) {
-    return (
-      <Suspense fallback={null}>
-        <AppDaChuyenScreen />
-      </Suspense>
-    )
-  }
+  if (linkCu) return <AppDaChuyenScreen />
 
   // Chưa biết có mật khẩu hay chưa: dựng một màn trống, KHÔNG dựng app. Vài
   // chục mili giây, nhưng đây là chỗ mục 5 đòi — không được thấy loáng thoáng
