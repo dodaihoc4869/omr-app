@@ -19,7 +19,7 @@ compatibility_date = "2026-09-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "omr"
-database_id = "DAN_ID_VAO_DAY"
+database_id = "d2e6d322-374a-45d7-83a3-9fac486b23f1"
 
 [[r2_buckets]]
 binding = "DE"

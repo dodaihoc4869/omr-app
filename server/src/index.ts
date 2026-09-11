@@ -10,7 +10,19 @@
 import type { DongCa, DongLuot, Env } from './kieu'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 
-const JSON_HEADERS = { 'content-type': 'application/json;charset=utf-8' }
+// CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
+// lượt gọi đều là chéo nguồn. Thiếu mấy dòng này là trình duyệt chặn sạch và
+// máy em chỉ thấy "lỗi mạng" — không có cách nào đoán ra từ phía em.
+//
+// Mở cho mọi nguồn, đúng như Apps Script đang làm: lệnh của học sinh vốn không
+// đòi mã bí mật, khoá theo nguồn không thêm an toàn mà chỉ thêm chỗ hỏng.
+const CORS = {
+  'access-control-allow-origin': '*',
+  'access-control-allow-methods': 'GET, POST, OPTIONS',
+  'access-control-allow-headers': 'content-type, x-ma-bi-mat',
+  'access-control-max-age': '86400',
+}
+const JSON_HEADERS = { 'content-type': 'application/json;charset=utf-8', ...CORS }
 
 function ra(data: unknown, status = 200): Response {
   return new Response(JSON.stringify({ ...(data as object), serverNow: Date.now() }), { status, headers: JSON_HEADERS })
@@ -135,6 +147,7 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
 async function layDe(env: Env, maCa: string): Promise<Response> {
   const ca = await docCa(env, maCa)
   if (!ca?.bank_r2) return ra({ ok: false, lyDo: 'chua_co_de' }, 404)
+  if (!env.DE) return ra({ ok: false, lyDo: 'chua_noi_r2' }, 500)
   const o = await env.DE.get(ca.bank_r2)
   if (!o) return ra({ ok: false, lyDo: 'mat_goi_de' }, 404)
   // Gói đề của một ca không đổi sau khi phát ⇒ cho bộ đệm biên giữ lâu.
@@ -152,6 +165,7 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
 
   let bankKey: string | null = null
   if (b.bank) {
+    if (!env.DE) return ra({ ok: false, error: 'Chưa nối R2 — chưa đẩy gói đề được' }, 500)
     bankKey = `de/${maCa}.json`
     await env.DE.put(bankKey, JSON.stringify(b.bank))
   }
@@ -203,7 +217,10 @@ export default {
     const url = new URL(req.url)
     const p = url.pathname
 
-    if (req.method === 'GET' && p === '/khoe') return ra({ ok: true, ten: 'may-chu-moi' })
+    if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS })
+    if (req.method === 'GET' && p === '/khoe') {
+      return ra({ ok: true, ten: 'may-chu-moi', coDB: !!env.DB, coR2: !!env.DE, coMat: !!env.MA_BI_MAT })
+    }
     if (req.method === 'GET' && p.startsWith('/de/')) return layDe(env, decodeURIComponent(p.slice(4)))
     if (req.method !== 'POST') return ra({ ok: false, error: 'Chỉ nhận POST' }, 405)
 
