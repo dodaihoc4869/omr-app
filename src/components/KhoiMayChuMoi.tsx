@@ -10,7 +10,8 @@ import { NutChinh, OThongBao } from './DesignSystem'
 import { loadCauHinhMayChu, loadScriptUrl, loadTeacherSecret, saveCauHinhMayChu } from '../lib/exam-db'
 import { MAC_DINH_MAY_CHU, type CauHinhMayChu } from '../lib/cau-hinh-may-chu'
 import { quenCauHinhMayChu, thuKetNoi } from '../lib/may-chu-moi'
-import { napToanBoCaLenMayChuMoi } from '../lib/exam-api'
+import { laySoSheet, napToanBoCaLenMayChuMoi } from '../lib/exam-api'
+import { CHUA_DUNG, daChuyenXong, dungBangDoiChieu, laySoMayChuMoi, type DongDoiChieu } from '../lib/doi-chieu-hai-ben'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }
 const O_NHAP: React.CSSProperties = {
@@ -33,6 +34,9 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
   const [dangNap, setDangNap] = useState(false)
   const [tienNap, setTienNap] = useState('')
   const [ketNap, setKetNap] = useState<{ ok: boolean; chu: string } | null>(null)
+  const [dangDo, setDangDo] = useState(false)
+  const [bang, setBang] = useState<DongDoiChieu[] | null>(null)
+  const [loiDo, setLoiDo] = useState('')
 
   useEffect(() => {
     // NUỐT LỖI Ở ĐÂY LÀ CỐ Ý. Khối cài đặt này nằm trong màn Ngân hàng đề —
@@ -65,6 +69,27 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
    * Chỉ ĐỌC Apps Script và GHI vào D1, không xoá gì ở Sheet. Xong thì tự đối
    * chiếu số ca và số dòng lượt hai bên; **lệch một dòng cũng không ghi dấu**,
    * và màn Ca thi tiếp tục đọc đường cũ. Không có trạng thái nào ở giữa. */
+  /** ĐO HAI BÊN — việc đầu tiên của cả đợt bỏ Apps Script.
+   *
+   * Chỉ ĐỌC, không ghi một dòng nào ở cả hai đầu. Gọi bao nhiêu lần cũng được. */
+  async function doHaiBen() {
+    setDangDo(true)
+    setBang(null)
+    setLoiDo('')
+    try {
+      const url = (await loadScriptUrl()) ?? ''
+      const mat = (await loadTeacherSecret()) ?? ''
+      if (!url || !mat) throw new Error('Thiếu link Apps Script hoặc mã bí mật')
+      const [sheet, moi] = await Promise.all([laySoSheet(url, mat), laySoMayChuMoi(ch, mat)])
+      if (!moi) throw new Error('Máy chủ mới không trả lời — kiểm địa chỉ rồi bấm Thử kết nối')
+      setBang(dungBangDoiChieu(sheet, moi))
+    } catch (e) {
+      setLoiDo(e instanceof Error ? e.message : 'Không đo được')
+    } finally {
+      setDangDo(false)
+    }
+  }
+
   async function chuyenCa() {
     if (dangNap) return
     if (!ch.BAT || !ch.URL.trim()) return showToast('Bật máy chủ mới trước đã', 'error')
@@ -149,6 +174,53 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
       </div>
 
       {ketNap && <OThongBao tone={ketNap.ok ? 'xanh' : 'do'}>{ketNap.chu}</OThongBao>}
+
+      <div style={{ height: 1, background: 'var(--vien)', margin: 'var(--k2) 0' }} />
+
+      <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
+        <NutChinh variant="phu" onClick={doHaiBen} disabled={dangDo || !ch.URL.trim()}>
+          {dangDo ? 'Đang đo…' : 'Đối chiếu Sheet ↔ máy chủ mới'}
+        </NutChinh>
+      </div>
+
+      {loiDo && <OThongBao tone="do">{loiDo}</OThongBao>}
+
+      {bang && (
+        <div>
+          <OThongBao tone={daChuyenXong(bang) ? 'xanh' : 'cam'}>
+            {daChuyenXong(bang)
+              ? 'Hai bên khớp và không bảng nào còn thiếu.'
+              : 'Chưa chuyển xong — xem dòng nào còn lệch hoặc chưa dựng ở bảng dưới.'}
+          </OThongBao>
+          <div style={{ marginTop: 'var(--k2)', display: 'grid', gap: 'var(--k2)' }}>
+            {bang.map((d) => (
+              <div key={d.ten} style={{ background: 'var(--the-2)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)' }}>
+                <div className="flex items-center" style={{ justifyContent: 'space-between', gap: 'var(--k2)' }}>
+                  <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--muc)' }}>{d.ten}</span>
+                  <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', whiteSpace: 'nowrap' }}>
+                    {d.mayChuMoi === CHUA_DUNG ? (
+                      <b style={{ color: 'var(--nhat)' }}>chưa dựng</b>
+                    ) : (
+                      <>
+                        <span style={{ color: 'var(--nhat)' }}>{d.sheet === null ? '—' : d.sheet}</span>
+                        <span style={{ color: 'var(--nhat)' }}> → </span>
+                        <b style={{ color: d.khop === false ? 'var(--do)' : 'var(--muc)' }}>{d.mayChuMoi}</b>
+                        {d.khop === false && <span style={{ color: 'var(--do)' }}> lệch</span>}
+                      </>
+                    )}
+                  </span>
+                </div>
+                <div style={{ ...NHAN_NHO, marginTop: 4 }}>{d.nghia}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
+            Số bên trái là Google Sheet, bên phải là máy chủ mới. Dấu — nghĩa là Apps
+            {' '}Script không có số tương ứng để so, không phải bằng không.
+            {' '}Nút này chỉ ĐỌC, không sửa gì ở cả hai nơi.
+          </div>
+        </div>
+      )}
 
       <div style={NHAN_NHO}>
         Nút trên chỉ ĐỌC Apps Script và GHI vào máy chủ mới, không xoá gì ở Google Sheet.

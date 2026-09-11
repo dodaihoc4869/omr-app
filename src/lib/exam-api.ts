@@ -2750,6 +2750,32 @@ export async function ghiDiem(
   return { daGhi: r.daGhi ?? [], tuChoi: r.tuChoi ?? [] }
 }
 
+/** ĐỌC SỐ CỦA GOOGLE SHEET CHO BẢNG ĐỐI CHIẾU.
+ *
+ * CHỈ ĐỌC, không ghi gì. Đi bằng `chiDuongCu = true` để chắc chắn lấy số của
+ * Apps Script chứ không vô tình đọc lại chính máy chủ mới rồi tự so với mình.
+ * Đó đúng là cái bẫy đã làm tôi mù cả ngày 11/09: đo bằng công cụ do chính máy
+ * chủ phục vụ thì lúc nào cũng đẹp. */
+export async function laySoSheet(
+  scriptUrl: string,
+  secret: string,
+): Promise<{ soCa: number; soCaChuaXoa: number; soLuot: number; soDanhSach: number | null }> {
+  const dsCon = await danhSachCaThat(scriptUrl, secret, false, true)
+  const dsXoa = await danhSachCaThat(scriptUrl, secret, true, true)
+  // Số LƯỢT: cộng `daVao` của mọi ca. Apps Script đã đếm sẵn trong chính lượt
+  // `danhSachCa`, nên không phải mở từng ca — đúng bài học 15h46 ngày 11/09,
+  // lượt chuyển đọc chi tiết 83 ca đã chết ở ca thứ 6.
+  const congVao = (ds: CaTomTat[]): number => ds.reduce((t, c) => t + (Number(c.daVao) || 0), 0)
+  return {
+    soCa: dsCon.length + dsXoa.length,
+    soCaChuaXoa: dsCon.length,
+    soLuot: congVao(dsCon) + congVao(dsXoa),
+    // Apps Script không có lệnh đếm danh sách lớp ⇒ nói thẳng là không đối
+    // chiếu được, không bịa số 0.
+    soDanhSach: null,
+  }
+}
+
 /** KẾT QUẢ CHUYỂN TOÀN BỘ CA SANG MÁY CHỦ MỚI. */
 export interface KetQuaNapCa {
   soCa: number

@@ -313,3 +313,94 @@ tin một màn hình báo lỗi.
 - [ ] Thầy yêu cầu BỎ HẲN Apps Script. Chưa làm được trong đêm: Sheet còn giữ điểm (đường ra `BangDiem.xlsx` + Zalo), kho đề có đáp án, và chi tiết câu / nhật ký điểm / tiến độ mạnh–yếu chưa có bảng trên D1. Cần một đặc tả riêng, chuyển từng khối kèm đối chiếu số liệu trước khi cắt.
 - [ ] Mục Phân công + giao BTVN theo `claude/PHAN-CONG-GIAO-BTVN.md`
 - [ ] Đổi `MA_BI_MAT` (lộ vào ảnh chụp 10/09) rồi cập nhật Secret trên Cloudflare
+
+### 11/09 19h30 — ĐỢT 5E: mở ca thôi đợi Sheet · chi tiết ca tự chữa lành
+
+**LỖI PHÁT HIỆN 19h05, ngay sau khi đẩy đợt 5D.** Thầy quay màn hình: bấm chi
+tiết ca vẫn **7 giây**. Tra thẳng D1:
+
+```
+SELECT COUNT(*), SUM(sinh_tai_d1) FROM ca    →  88 ca, 0 ca có cờ
+SELECT COUNT(tong), COUNT(ho_ten) FROM luot  →  311 lượt, 0 điểm, 0 tên
+```
+
+**Đường nhanh chi tiết ca chưa từng chạy một lần nào.** Cờ `sinh_tai_d1` chỉ
+đặt cho ca mở TỪ NAY, nên cả 88 ca đã có đều trả `dayDu: false` và máy thầy rơi
+về Apps Script mọi lần.
+
+> **Bài học lặp lại lần thứ ba trong ngày: đường nhanh có mặt trong mã KHÔNG có
+> nghĩa là nó chạy.** Lần 1: học sinh không có địa chỉ máy chủ. Lần 2: đo bằng
+> trang do chính Worker phục vụ. Lần 3: cờ chỉ bật cho ca tương lai.
+
+Chữa bằng **tự chữa lành** thay vì một lượt chuyển 88 ca (lượt ấy chết ở ca thứ
+6 lúc 15h46): máy thầy vừa đi đường cũ xong là đã cầm gói đầy đủ — gửi luôn
+sang D1 rồi đặt cờ. Lần sau mở chính ca đó là tức thì.
+
+**MỞ CA — đo ca thật 112480 lúc 19h07:**
+
+```
+bat_dau       12:07:06.336Z
+cap_nhat_luc  12:07:07.482Z   ← máy chủ mới đã có ca
+```
+
+Máy chủ mới nhận ca sau **1,15 giây**; phần còn lại thầy ngồi chờ là Apps Script.
+Chạy song song (5D) không cắt được phần ấy. Nay trả lời ngay khi D1 và R2 có ca.
+
+- [x] Chi tiết ca tự chữa lành (`/ca/nap-day-du`) | bằng chứng: `6245216`, 3248/3248 đạt
+- [x] Mở ca thôi đợi Sheet, có dòng báo trạng thái + nút Thử lại | bằng chứng: cùng trên
+- [x] Ca 112480 có `sinh_tai_d1 = 1` — cờ chạy đúng cho ca mở từ nay | bằng chứng: tra D1 19h10
+- [ ] Thầy thử: bấm chi tiết một ca cũ HAI LẦN, lần hai phải tức thì | bằng chứng: (chưa có)
+
+**CA 704066 — trả lời câu "40 em có bị văng không":**
+
+| | |
+|---|---|
+| Phòng chờ | 30 em |
+| Vào thi | 29 lượt, **tất cả `lan_thu = 1`** |
+| Em phải vào lại | **0** |
+| Số lần rời màn | **0** trên cả 29 em |
+| Rải vào thi | 29 em trong 51 giây |
+
+- [ ] CÒN MỘT CHỖ CHƯA SẠCH: lúc em ở phòng chờ, mỗi 15 giây vẫn đối chiếu một
+      lượt sang Apps Script (`doi-chieu-phong-cho.ts`, chốt đặt sáng nay). 40 em
+      = 2,7 lượt/giây vào Apps Script, mỗi lượt bên ấy 2,6 giây. Đã hỏi thầy có
+      bỏ không, chờ trả lời.
+
+### 11/09 20h20 — ĐỢT 5F: lỗi NẶNG NHẤT trong ngày, do chính tôi gây ra
+
+**"Bấm đã nộp rồi nhưng xem điểm báo chưa nộp."**
+
+Hàm chữa lành viết lúc 20h đặt `da_day_sheet = 1` cho mọi dòng lượt nó chạm,
+với lý lẽ "dòng đọc từ Sheet ra thì đã có trên Sheet". **Lý lẽ sai.** Cờ ấy
+không nói dòng có trên Sheet; nó nói **lượt đồng bộ ngược đã đưa bài của em về
+Sheet chưa**. Đặt bừa thành 1 ⇒ `dong-bo-nguoc` bỏ qua lượt ấy vĩnh viễn ⇒ em
+nộp bài, bài nằm yên trong D1, Sheet không bao giờ nhận, em xem điểm nghe "chưa
+nộp", và điểm mất khỏi đường ra Excel lẫn đường Zalo.
+
+Phạm vi thiệt hại, tra D1: **đúng 1 dòng** — ca 264066 · sbd 12121212 (số test
+của thầy). Không em thật nào bị.
+
+- [x] Chữa lành KHÔNG đụng `da_day_sheet` nữa | bằng chứng: `e5bf1e6`, 3260/3260 đạt
+- [ ] Hạ cờ dòng 264066/12121212 về 0 rồi bấm Đồng bộ ngược — ĐANG CHỜ THẦY DUYỆT
+
+**Đo Apps Script lúc 20h05** (thầy hỏi "40 em vào phòng chờ có quá tải không"):
+
+```
+trangThaiPhongCho  →  10 185 ms   (chiều cùng ngày: 2 600 ms)
+```
+
+- [x] Nhịp đối chiếu phòng chờ 15 s → 90 s (40 em: 2,7 → 0,44 lượt/giây) | bằng chứng: cùng trên
+- [x] Lượt đẩy mốc Bắt đầu thử lại 3 lần có lùi ở máy thầy | bằng chứng: cùng trên
+- [x] Hai cửa khoá chết đường nhanh chi tiết ca đã mở (`xinKeyBank`, nhãn `mo`) | bằng chứng: cùng trên
+
+### 11/09 20h30 — Thầy yêu cầu BỎ HẾT APPS SCRIPT
+
+Đếm thật: **85 lệnh · 23 bảng · 27 đường đã có ⇒ còn ~58 lệnh.**
+
+- [x] Viết đặc tả `claude/DAC-TA-BO-HAN-APPS-SCRIPT.md` — chia 4 khối, mỗi khối
+      dựng bảng → chép → chạy song song đối chiếu → cắt | bằng chứng: đã ghi project
+- [ ] CHỜ THẦY DUYỆT đặc tả. Chưa build dòng nào.
+
+**Bài học lớn nhất của ngày, lặp BỐN lần:** đường nhanh có mặt trong mã không có
+nghĩa là nó chạy. Cả bốn lần đều chỉ lộ ra khi đếm ở chỗ dữ liệu của người dùng
+đọng lại — không phải khi đọc mã, không phải khi nhìn màn hình.

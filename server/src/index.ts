@@ -1045,6 +1045,50 @@ function caDangChay(ca: { trang_thai: string; bat_dau_thi_luc: string | null; ba
   return Date.now() < bd + (phut + DEM_SAU_CA_PHUT) * 60000
 }
 
+/** CÁI THƯỚC — ĐẾM MỌI BẢNG TRÊN D1 ĐỂ ĐẶT CẠNH SỐ CỦA GOOGLE SHEET.
+ *
+ * VÌ SAO ĐÂY LÀ VIỆC ĐẦU TIÊN CỦA CẢ ĐỢT BỎ APPS SCRIPT, trước khi chuyển một
+ * lệnh nào: ngày 11/09 tôi đưa ra BỐN đường nhanh, cả bốn đều có mặt trong mã,
+ * chạy đúng logic, và KHÔNG đường nào thật sự phục vụ được ai. Cả bốn lần chỉ
+ * lộ ra khi đếm ở chỗ dữ liệu của người dùng đọng lại.
+ *
+ * Không có cái thước này thì mỗi lần cắt một khối là một lần tin lời nhau.
+ *
+ * CHỈ ĐẾM, không sửa gì. An toàn tuyệt đối, gọi bao nhiêu lần cũng được. */
+async function doiChieuSo(env: Env): Promise<Response> {
+  const dem = async (sql: string): Promise<number> => {
+    try {
+      const r = await env.DB.prepare(sql).first<{ n: number }>()
+      return Number(r?.n) || 0
+    } catch {
+      // Bảng chưa dựng (khối chưa tới lượt) ⇒ 0, không nổ.
+      return -1
+    }
+  }
+
+  return ra({
+    ok: true,
+    luc: new Date().toISOString(),
+    so: {
+      ca: await dem("SELECT COUNT(*) n FROM ca WHERE ma_ca <> 'DOTAI'"),
+      caChuaXoa: await dem("SELECT COUNT(*) n FROM ca WHERE trang_thai <> 'da_xoa' AND ma_ca <> 'DOTAI'"),
+      luot: await dem("SELECT COUNT(*) n FROM luot WHERE ma_ca <> 'DOTAI'"),
+      luotCoDiem: await dem("SELECT COUNT(*) n FROM luot WHERE tong IS NOT NULL AND ma_ca <> 'DOTAI'"),
+      luotCoTen: await dem("SELECT COUNT(*) n FROM luot WHERE ho_ten IS NOT NULL AND ho_ten <> '' AND ma_ca <> 'DOTAI'"),
+      luotChuaVeSheet: await dem("SELECT COUNT(*) n FROM luot WHERE da_day_sheet = 0 AND trang_thai IN ('da_nop','khoa') AND ma_ca <> 'DOTAI'"),
+      danhSach: await dem('SELECT COUNT(*) n FROM danh_sach'),
+      phongCho: await dem('SELECT COUNT(*) n FROM phong_cho'),
+      trangThai: await dem('SELECT COUNT(*) n FROM trang_thai'),
+      chanVao: await dem('SELECT COUNT(*) n FROM chan_vao'),
+      caSinhTaiD1: await dem('SELECT COUNT(*) n FROM ca WHERE sinh_tai_d1 = 1'),
+      // Bảng của các khối chưa tới lượt: trả -1 nghĩa là CHƯA DỰNG.
+      chiTietCau: await dem('SELECT COUNT(*) n FROM chi_tiet_cau'),
+      banDoSai: await dem('SELECT COUNT(*) n FROM ban_do_sai'),
+      tienDoHs: await dem('SELECT COUNT(*) n FROM tien_do_hs'),
+    },
+  })
+}
+
 /** Mốc thời gian thành mili giây; chuỗi rỗng hay hỏng thì về 0. */
 function mocMs(s: string): number {
   const t = Date.parse(String(s || ''))
@@ -1278,6 +1322,7 @@ export default {
     if (p === '/diem') return ghiDiemMoi(env, b)
     if (p === '/em/danh-sach') return danhSachEmMoi(env)
     if (p === '/ca/nap-day-du') return napDayDuCa(env, b)
+    if (p === '/doi-chieu') return doiChieuSo(env)
     if (p === '/dong-bo/dau') return ghiDauDongBo(env, b)
     if (p === '/cho') return xemPhongCho(env, String(b.maCa ?? ''))
 
