@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { choBaoLau, gianNopTuDong, gianVaoThi } from '../lib/nhip-gui-lai'
+import { choBaoLau, gianNopTuDong, gianVaoSauBatDau, gianVaoThi, laLoiDongNguoi } from '../lib/nhip-gui-lai'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
 import { boCauTuBaiLam } from '../lib/bo-cau-tu-bai-lam'
@@ -212,6 +212,15 @@ export default function ExamTakeScreen() {
   const showToast = useAppStore((s) => s.showToast)
 
   const [phase, setPhase] = useState<'join' | 'loading' | 'cho' | 'exam' | 'submitted' | 'error'>('join')
+  /** Bản ref của `phase`. Vòng thử lại của phòng chờ chạy ngoài chu kỳ vẽ lại,
+   * nên nó phải đọc được màn HIỆN TẠI chứ không phải màn lúc nó khởi hành —
+   * em đã vào thi được rồi mà vòng lặp vẫn tưởng chưa thì nó kéo em ra lại. */
+  const phaseRef = useRef(phase)
+  phaseRef.current = phase
+  /** Câu lỗi cuối cùng của `handleJoin`, để vòng thử lại phân biệt được
+   * "máy chủ đang đông" với "em bị chặn thật". Thử lại một lỗi không bao giờ
+   * hết là hành em sáu lần rồi vẫn ra đúng câu ấy. */
+  const loiVaoThiRef = useRef('')
   const [errorMsg, setErrorMsg] = useState('')
   // ĐÃ NỘP RỒI, MỞ LẠI LINK TRÊN MÁY KHÁC — thầy báo 07/09: em bấm link ca để
   // xem điểm thì nhận một ô ĐỎ như app hỏng. Bài đã nộp xong không phải lỗi,
@@ -1177,7 +1186,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       if (kq.cach === 'duyet_lai') showToast(`Thầy đã duyệt cho thi lại — lần ${kq.lanThu}`, 'success')
       setPhase('exam')
     } catch (e) {
-      setErrorMsg(e instanceof Error ? e.message : 'Lỗi không rõ nguyên nhân')
+      loiVaoThiRef.current = e instanceof Error ? e.message : 'Lỗi không rõ nguyên nhân'
+      setErrorMsg(loiVaoThiRef.current)
       setPhase('error')
     }
   }
@@ -2033,6 +2043,51 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
    *
    * Thầy bấm bắt đầu thì gọi lại chính `handleJoin` — lúc đó máy chủ mới tạo
    * lượt, mới tính giờ, mới gửi đề. Không có đường tắt nào bỏ qua nó. */
+  /** VÀO THI SAU KHI THẦY BẤM BẮT ĐẦU — đường riêng, KHÔNG dùng lại đường em
+   * tự bấm. Thầy báo 11/09: "bấm duyệt bắt đầu ở phòng chờ, rất chậm và học
+   * sinh bị văng ra thử lại nhiều lần".
+   *
+   * Hai chỗ hỏng, và cả hai đều nằm ở đây chứ không phải ở máy chủ:
+   *
+   *   ① GIÃN NHẦM CHỖ. `handleJoin` có sẵn cú giãn 0–3 giây, nhưng nó chỉ chạy
+   *      LẦN ĐẦU trong phiên. Em vào phòng chờ đã tiêu mất lần ấy rồi, nên đúng
+   *      lúc cả lớp ùa vào thì KHÔNG còn giãn nữa — giãn đúng lúc không cần, và
+   *      không giãn đúng lúc cần.
+   *
+   *   ② HỎNG LÀ NÉM EM RA. `handleJoin` hỏng thì `setPhase('error')` kèm câu
+   *      "bấm Vào thi lại" — em phải tự chạm, mà cả lớp cùng chạm lại thì lượt
+   *      bấm lại nối vào cuối chính hàng đợi đang tắc.
+   *
+   * VÌ SAO HÀM NÀY ĐỨNG Ở CẤP COMPONENT, KHÔNG NẰM TRONG EFFECT PHÒNG CHỜ:
+   * effect ấy phụ thuộc `phase`, mà `handleJoin` đổi `phase` sang 'loading'
+   * ngay câu đầu ⇒ effect bị dọn và vòng thử lại chết giữa chừng ngay lần thử
+   * thứ nhất. Đặt ở đây thì nó sống qua mọi lần đổi màn. */
+  const dangVaoSauBatDauRef = useRef(false)
+  const vaoSauBatDau = async () => {
+    if (dangVaoSauBatDauRef.current) return
+    dangVaoSauBatDauRef.current = true
+    try {
+      for (let lan = 0; lan < 6; lan++) {
+        setLoiCho(lan === 0 ? 'Thầy đã bắt đầu — đang xếp hàng vào phòng thi…' : 'Máy chủ đang đông — máy tự thử lại, em không phải bấm gì.')
+        await new Promise((r) => setTimeout(r, lan === 0 ? gianVaoSauBatDau() : choBaoLau(lan - 1)))
+        loiVaoThiRef.current = ''
+        try {
+          await handleJoin()
+        } catch {
+          // `handleJoin` tự nuốt lỗi rồi chuyển sang màn lỗi, nên nhánh này gần
+          // như không chạy. Giữ để một lần ném lọt ra ngoài không giết cả vòng.
+        }
+        if (phaseRef.current !== 'error') return
+        // CHỈ THỬ LẠI LỖI ĐƯỜNG TRUYỀN — xem `laLoiDongNguoi`.
+        if (!laLoiDongNguoi(loiVaoThiRef.current)) return
+        setPhase('cho')
+      }
+      setLoiCho('Chưa vào được sau nhiều lần thử. Em bấm Vào thi lại, hoặc báo thầy.')
+    } finally {
+      dangVaoSauBatDauRef.current = false
+    }
+  }
+
   useEffect(() => {
     if (phase !== 'cho') return
     let con = true
@@ -2049,15 +2104,12 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     // 4,3 giây. Thứ phải chữa là nhịp gọi của từng máy.
     let dangHoi = false
     const hoi = async () => {
-      if (dangHoi) return
+      if (dangHoi || dangVaoSauBatDauRef.current) return
       dangHoi = true
       try {
         const tt = await trangThaiPhongCho(url, maCa.trim())
         if (!con) return
-        if (tt.batDau) {
-          setCho(null)
-          void handleJoin()
-        }
+        if (tt.batDau) void vaoSauBatDau()
       } catch (e) {
         // Ca bị thầy huỷ giữa lúc chờ: nói thẳng, đừng để em đứng mãi.
         if (con) setLoiCho(e instanceof Error ? e.message : 'Mất kết nối — em cứ chờ, máy tự hỏi lại.')
@@ -2069,7 +2121,12 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     // LỆCH PHA THEO MILI GIÂY. Cùng lý do đã lệch pha lưu tạm và báo sống: ba
     // mươi máy cùng nhịp là ba mươi lượt gọi dồn vào một khoảnh khắc. Nhịp 3
     // giây làm tròn về giây chỉ ra 3 hoặc 4, vẫn dồn cục — phải rải bằng ms.
-    const dong = setInterval(() => void hoi(), chuKyLechPhaMs(3000))
+    const dong = setInterval(() => {
+      // Thấy `batDau` rồi thì THÔI HỎI. Mỗi lượt hỏi thừa lúc này là một lượt
+      // tranh chỗ chạy với chính cú `vaoThi` của cả lớp.
+      if (dangVaoSauBatDauRef.current) return
+      void hoi()
+    }, chuKyLechPhaMs(3000))
     return () => {
       con = false
       clearInterval(dong)

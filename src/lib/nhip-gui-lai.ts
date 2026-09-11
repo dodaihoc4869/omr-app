@@ -72,3 +72,49 @@ export const GIAN_VAO_THI_TOI_DA_MS = 3000
 export function gianVaoThi(nn: () => number = Math.random): number {
   return Math.round(nn() * GIAN_VAO_THI_TOI_DA_MS)
 }
+
+/** GIÃN CÚ VÀO THI SAU KHI THẦY BẤM BẮT ĐẦU — cú dồn LỚN NHẤT của cả ca.
+ *
+ * Thầy báo 11/09: "bấm duyệt bắt đầu ở phòng chờ, rất chậm và học sinh bị văng
+ * ra thử lại nhiều lần".
+ *
+ * ĐÂY LÀ CÚ DỒN TỆ NHẤT, tệ hơn hẳn lúc em tự bấm Vào thi, và vì một lý do
+ * ĐÚNG NGƯỢC với trực giác: em tự bấm thì rải ra theo tay từng em, còn ở phòng
+ * chờ thì MÁY bấm hộ. Ba mươi máy đang hỏi `trangThaiPhongCho` mỗi 3 giây, thầy
+ * bấm một cái là trong vòng đúng một nhịp 3 giây cả ba mươi máy cùng thấy
+ * `batDau` và cùng gọi `vaoThi` — mà `vaoThi` là lệnh DUY NHẤT phải cầm khoá
+ * toàn cục để ghi dòng lượt. Ba mươi lượt ghi nối đuôi nhau, em cuối hàng hết
+ * hạn chờ, bị ném về màn nhập mã, phải tự bấm lại — rồi lượt bấm lại ấy nối vào
+ * cuối chính hàng đợi đang tắc.
+ *
+ * Cửa sổ 8 giây, KHÔNG phải 3: ba mươi em rải trong 8 giây là ~4 lượt/giây,
+ * vừa đúng sức nuốt của khoá (mỗi lượt giữ khoá 0,3–0,5 giây). Rải trong 3 giây
+ * thì vẫn còn 10 lượt/giây, tức vẫn dồn.
+ *
+ * Tám giây KHÔNG làm em thiệt: đồng hồ của em chỉ chạy từ lúc máy chủ tạo lượt,
+ * nên chờ ở đây không ăn vào giờ làm bài của ai. */
+export const GIAN_VAO_SAU_BAT_DAU_MS = 8000
+
+export function gianVaoSauBatDau(nn: () => number = Math.random): number {
+  return Math.round(nn() * GIAN_VAO_SAU_BAT_DAU_MS)
+}
+
+/** LỖI NÀY CÓ PHẢI "MÁY CHỦ ĐANG ĐÔNG" KHÔNG — dùng để quyết định có tự thử
+ * lại hộ em hay không.
+ *
+ * Chỉ đúng với lỗi ĐƯỜNG TRUYỀN và lỗi HÀNG ĐỢI. Em bị chặn vì sai số báo
+ * danh, vì ca đã khoá, vì đã nộp rồi — thử lại là hành em sáu lần rồi vẫn ra
+ * đúng câu ấy, mà mỗi lượt lại thêm một lượt gọi vào đúng lúc đang tắc. */
+export function laLoiDongNguoi(loi: string): boolean {
+  const s = String(loi || '')
+  return (
+    s.includes('Không kết nối được máy chủ') ||
+    s.includes('không trả lời sau') ||
+    s.includes('đang bận') ||
+    s.includes('Failed to fetch') ||
+    s.includes('NetworkError') ||
+    s.includes('Load failed') ||
+    s.includes('HTTP 5') ||
+    s.includes('Máy chủ chưa gửi đề')
+  )
+}

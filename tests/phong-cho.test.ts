@@ -139,12 +139,19 @@ describe('màn của em', () => {
     // phép kiểm này giữ nguyên. Lý do: đo được `trangThaiPhongCho` mất 2,2–3,6
     // giây một lượt, tức LÂU HƠN nhịp; ba mươi máy cùng nhịp là ba mươi lượt
     // dồn vào một khoảnh khắc. Kèm chốt chống chồng lượt ở `dangHoi`.
-    expect(than).toContain('setInterval(() => void hoi(), chuKyLechPhaMs(3000))')
+    // Mốc neo đổi 11/09 — xem ghi chú trong `phong-cho-ca-dong-0909.test.ts`.
+    expect(than).toContain('chuKyLechPhaMs(3000)')
     expect(than).toContain('let dangHoi = false')
     expect(than).toContain('clearInterval(dong)')
     // Thầy bấm bắt đầu thì đi lại ĐÚNG đường vaoThi — không có đường tắt nào
     // lấy đề mà bỏ qua việc tạo lượt và tính giờ.
-    expect(than).toContain('void handleJoin()')
+    //
+    // MỐC NEO ĐỔI 11/09: nhịp hỏi nay gọi `vaoSauBatDau`, và chính hàm ấy gọi
+    // `handleJoin`. Ý ĐỊNH KHÔNG ĐỔI, nên kiểm CẢ HAI CHẶNG — mạnh hơn mốc cũ,
+    // vì mốc cũ không chặn được ai chèn một đường tắt vào giữa.
+    expect(than).toContain('void vaoSauBatDau()')
+    const thanVao = MAN_EM.slice(MAN_EM.indexOf('const vaoSauBatDau = async ()'), MAN_EM.indexOf("if (phase !== 'cho') return"))
+    expect(thanVao).toContain('await handleJoin()')
   })
 })
 

@@ -69,15 +69,21 @@ describe('màn chờ: không chồng lượt, có lệch pha', () => {
   it('có chốt chống chồng lượt và chốt được nhả trong finally', () => {
     const than = thanPhongCho()
     expect(than).toContain('let dangHoi = false')
-    expect(than).toContain('if (dangHoi) return')
+    // MỐC NEO ĐỔI 11/09: chốt nay còn phải nhường cả vòng vào-sau-bắt-đầu, nếu
+    // không thì trong lúc em đang xếp hàng vào thi, nhịp hỏi phòng chờ vẫn thả
+    // thêm lượt vào đúng hàng đợi đang tắc. Ý ĐỊNH KHÔNG ĐỔI — một máy, một
+    // lượt hỏi tại một thời điểm.
+    expect(than).toContain('if (dangHoi || dangVaoSauBatDauRef.current) return')
     expect(than).toContain('dangHoi = true')
     expect(than).toMatch(/finally \{\s*\n\s*dangHoi = false/)
   })
 
   it('nhịp đã lệch pha, KHÔNG còn hằng 3000 trần', () => {
     const than = thanPhongCho()
-    expect(than).toContain('setInterval(() => void hoi(), chuKyLechPhaMs(3000))')
-    expect(than).not.toContain('setInterval(() => void hoi(), 3000)')
+    // Mốc neo đổi 11/09: thân `setInterval` nay có thêm chốt ngừng hỏi khi đã
+    // thấy `batDau`. Nhịp vẫn phải LỆCH PHA và vẫn là 3 giây.
+    expect(than).toContain('chuKyLechPhaMs(3000)')
+    expect(than).not.toContain('}, 3000)')
   })
 
   it('vẫn hỏi NGAY một lượt lúc vào chờ — em không đứng nhìn màn trắng 3 giây', () => {
