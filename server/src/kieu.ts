@@ -72,4 +72,9 @@ export interface DongCa {
   so_cau_json: string | null
   bo_theo_em_json: string | null
   cap_nhat_luc: string
+  lop: string | null
+  phong_cho: number | null
+  bat_dau_thi_luc: string | null
+  giu_de_doc: number | null
+  an_han_giay: number | null
 }

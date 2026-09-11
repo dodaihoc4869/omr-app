@@ -6,6 +6,7 @@
 import { openDB, type IDBPDatabase } from 'idb'
 import type { PublicExamBank, SoCauMoiPhan, TeacherExamSource } from '../data/examContent'
 import type { BanGhiKhoa } from './khoa-app'
+import { chuanHoaMayChu, type CauHinhMayChu } from './cau-hinh-may-chu'
 import type { SoSuaDang } from './sua-dang'
 
 export interface AnswerRecord {
@@ -288,6 +289,26 @@ export async function docSoCauCa(maCa: string): Promise<SoCauMoiPhan | undefined
 export async function saveScriptUrl(url: string): Promise<void> {
   const db = await getDb()
   await db.put(STORE_SETTINGS, url, 'scriptUrl')
+}
+
+/** CẤU HÌNH MÁY CHỦ MỚI — cất cùng chỗ với `scriptUrl`, không thêm kho mới.
+ *
+ * Đọc qua `chuanHoaMayChu` nên bản ghi hỏng hoặc thiếu trường vẫn ra cấu hình
+ * AN TOÀN (BAT=false, có đường lùi), thay vì làm vỡ màn vào thi. */
+export async function loadCauHinhMayChu(): Promise<CauHinhMayChu> {
+  try {
+    const db = await getDb()
+    return chuanHoaMayChu((await db.get(STORE_SETTINGS, 'mayChuMoi')) as Partial<CauHinhMayChu> | undefined)
+  } catch {
+    return chuanHoaMayChu(null)
+  }
+}
+
+export async function saveCauHinhMayChu(c: Partial<CauHinhMayChu>): Promise<CauHinhMayChu> {
+  const chuan = chuanHoaMayChu(c)
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, chuan, 'mayChuMoi')
+  return chuan
 }
 
 export async function loadScriptUrl(): Promise<string> {

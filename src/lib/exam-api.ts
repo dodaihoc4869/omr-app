@@ -10,6 +10,7 @@ import { LUAT_DIEM } from '../engine/score'
 import { dongBoGioMayChu } from './gio-may-chu'
 import { chuanTenCa } from './ten-ca'
 import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
+import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi } from './may-chu-moi'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
 export interface KeyBank {
@@ -277,6 +278,13 @@ export interface TrangThaiPhongCho {
  * chờ và hỏi vài giây một lần. Ca bị thầy huỷ giữa lúc chờ thì ném lỗi để màn
  * chờ nói thẳng, đừng để em đứng mãi. */
 export async function trangThaiPhongCho(scriptUrl: string, maCa: string): Promise<TrangThaiPhongCho> {
+  // MÁY CHỦ MỚI TRƯỚC. Cả lớp đứng chờ và hỏi lại mỗi ba giây — đây là nhịp dày
+  // nhất của cả ca. Máy chủ mới không trả lời được thì rơi về Apps Script ngay
+  // trong chính lượt này, em không thấy gì khác ngoài việc chậm hơn một nhịp.
+  const chMoi = await layCauHinhMayChu()
+  const rMoi = await phongChoMoi(chMoi, maCa)
+  if (rMoi) return rMoi
+
   const r = await postJson(scriptUrl, { action: 'trangThaiPhongCho', maCa })
   if (!r.ok) throw new Error(r.error || 'Không hỏi được trạng thái ca')
   return {
@@ -624,9 +632,28 @@ export async function submitAnswers(
   // Trước T4, một lượt nộp hết hạn ở máy em nhưng đã tới nơi ở máy chủ sẽ bị ghi
   // đè lần nữa; nếu thầy vừa khoá ca giữa hai lượt thì lượt sau ăn 'da_dong' và
   // em thấy báo lỗi cho một bài ĐÃ NỘP XONG.
-  const result = await postCoThuLai(scriptUrl, { action: 'submit', maCa, sbd, maDe, dapAn, integrity, lanThu, idThietBi, giayCau }, HAN_GIAY_DONG_NGUOI)
-  if (!result.ok) throw new Error(result.error || 'Nộp bài thất bại')
-  return { keyBank: result.keyBank ?? null, congBo: result.congBo ?? (result.keyBank ? 'ngay' : 'khong') }
+  // CẤT BÀI VÀO MÁY CHỦ MỚI TRƯỚC, rồi mới đi Apps Script.
+  //
+  // Đây chính là chỗ thầy báo treo: cả lớp bấm Nộp trong mười giây cuối, ba
+  // mươi lượt dồn vào một cửa Apps Script xếp hàng theo khoá toàn cục. Ghi vào
+  // D1 xong trước nghĩa là DÙ Apps Script có treo thì bài em VẪN AN TOÀN — bản
+  // đồng bộ ngược sẽ đưa về Sheet sau, không mất chữ nào.
+  //
+  // Vẫn gọi Apps Script sau: điểm và đáp án công bố ngay do bên đó tính.
+  const chMoi = await layCauHinhMayChu()
+  const daCat = await nopMoi(chMoi, maCa, sbd, dapAn, integrity, giayCau)
+
+  try {
+    const result = await postCoThuLai(scriptUrl, { action: 'submit', maCa, sbd, maDe, dapAn, integrity, lanThu, idThietBi, giayCau }, HAN_GIAY_DONG_NGUOI)
+    if (!result.ok) throw new Error(result.error || 'Nộp bài thất bại')
+    return { keyBank: result.keyBank ?? null, congBo: result.congBo ?? (result.keyBank ? 'ngay' : 'khong') }
+  } catch (e) {
+    // Apps Script hỏng NHƯNG máy chủ mới đã nhận bài ⇒ KHÔNG báo lỗi cho em.
+    // Báo đỏ lúc này là em tưởng mất bài và bấm nộp lại — đúng lúc máy chủ đang
+    // quá tải nhất. Bài đã nằm trong D1, thầy kéo về sau.
+    if (daCat?.ok) return { keyBank: null, congBo: 'khong' }
+    throw e
+  }
 }
 
 /** Chu kỳ máy em tự lưu bài đang làm lên máy chủ. 20 giây: đủ dày để khoá ca
@@ -687,6 +714,14 @@ export function chuKyLechPhaMs(ms: number, nn: () => number = Math.random): numb
  */
 export async function luuTam(scriptUrl: string, maCa: string, sbd: string, dapAn: AnswerRecord, giayCau?: Record<string, number>): Promise<boolean> {
   try {
+    // MÁY CHỦ MỚI TRƯỚC — 135 lượt một em một ca.
+    //
+    // `null` nghĩa là "lượt này không nằm ở máy chủ mới" (em vào thi bằng đường
+    // cũ) hoặc máy chủ mới không với tới được — cả hai đều đi tiếp xuống dưới.
+    const chMoi = await layCauHinhMayChu()
+    const rMoi = await luuTamMoi(chMoi, maCa, sbd, dapAn, giayCau)
+    if (rMoi !== null) return rMoi
+
     // Lưu tạm ghi ĐÈ đúng một dòng bằng đúng nội dung ấy, nên gửi lại vô hại.
     // Chỉ thử THÊM MỘT lần: nhịp sau còn tới, không việc gì phải cố.
     const r = await postCoThuLai(scriptUrl, { action: 'luuTam', maCa, sbd, dapAn, giayCau }, HAN_GIAY, 2)
@@ -876,6 +911,11 @@ export async function pushExamStatus(
   },
 ): Promise<boolean> {
   try {
+    // MÁY CHỦ MỚI TRƯỚC — 270 lượt một em một ca, lệnh dày nhất trong toàn bộ hệ.
+    const chMoi = await layCauHinhMayChu()
+    const rMoi = await trangThaiMoi(chMoi, status)
+    if (rMoi !== null) return rMoi
+
     const r = await postJson(scriptUrl, { action: 'examStatus', ...status })
     return !!r?.ok
   } catch {

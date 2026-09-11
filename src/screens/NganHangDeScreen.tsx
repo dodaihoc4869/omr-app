@@ -12,6 +12,7 @@ import { RefreshCw, Trash2, ChevronDown, ChevronUp, Upload, CheckCheck } from 'l
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { TheNoiDung, Hang, Nhan, OThongBao, NutChinh } from '../components/DesignSystem'
 import KhoiMatKhauApp from '../components/KhoiMatKhauApp'
+import KhoiMayChuMoi from '../components/KhoiMayChuMoi'
 import KhoiMaDang from '../components/KhoiMaDang'
 import { ChemText } from '../lib/chem-format'
 import { deleteExamSource, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, saveExamSource, saveScriptUrl, saveSessionTeacherBank, saveTeacherSecret, loadSoSuaDang, saveSoSuaDang} from '../lib/exam-db'
@@ -579,6 +580,8 @@ export default function NganHangDeScreen() {
             <div style={NHAN_NHO}>
               Mã chỉ lưu trên máy này (IndexedDB), không nằm trong code app, không gửi cho học sinh. Cách đặt MA_BI_MAT: xem đầu file <code>docs/apps-script-kiem-tra.gs</code>.
             </div>
+            <div style={{ height: 1, background: 'var(--vien)' }} />
+            <KhoiMayChuMoi showToast={showToast} />
             <div style={{ height: 1, background: 'var(--vien)' }} />
             <KhoiMatKhauApp showToast={showToast} />
           </div>

@@ -7,6 +7,7 @@
 //      nằm ở R2, D1 chỉ giữ khoá đối tượng.
 //   3. Lệnh của HỌC SINH không đòi mã bí mật (giống Apps Script hiện nay);
 //      lệnh của THẦY thì đòi. Không nới luật này ở bất kỳ đâu.
+import { CA_DO_TAI, TRANG_DO_TAI } from './do-tai'
 import type { DongCa, DongLuot, Env } from './kieu'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 
@@ -44,6 +45,27 @@ async function docLuotMoiNhat(env: Env, maCa: string, sbd: string): Promise<Dong
     .first<DongLuot>()
 }
 
+/**
+ * Điều kiện SQL tìm đúng một lượt, KHÔNG tốn thêm câu truy vấn.
+ *
+ * Máy em vẫn gọi bằng `maCa` + `sbd` như xưa (chữ ký hàm cũ giữ nguyên), nên
+ * Worker phải tự suy ra lượt. Cách rẻ nhất là nhét câu con vào mệnh đề WHERE
+ * của chính câu UPDATE — một lượt gọi Worker vẫn chỉ 1 câu, không chạm trần 50.
+ *
+ * Có `khoaLuot` thì dùng luôn: đó là khoá chính, nhanh nhất.
+ */
+export function dieuKienLuot(b: Record<string, unknown>): { sql: string; tham: unknown[] } | null {
+  const khoa = String(b.khoaLuot ?? '').trim()
+  if (khoa) return { sql: 'khoa = ?', tham: [khoa] }
+  const maCa = String(b.maCa ?? '').trim()
+  const sbd = String(b.sbd ?? '').trim()
+  if (!maCa || !sbd) return null
+  return {
+    sql: 'ma_ca = ? AND sbd = ? AND lan_thu = (SELECT MAX(lan_thu) FROM luot WHERE ma_ca = ? AND sbd = ?)',
+    tham: [maCa, sbd, maCa, sbd],
+  }
+}
+
 // ---------------------------------------------------------------- HỌC SINH
 
 async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
@@ -57,6 +79,27 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
   const now = Date.now()
   const qd = quyetDinhVaoThi(ca, cu, idThietBi, now)
   if (!qd.ok || !ca) return ra({ ok: false, lyDo: qd.lyDo, lanThu: qd.lanThu, thoiGianPhut: ca?.thoi_gian_phut ?? 45 })
+
+  // PHÒNG CHỜ. Em qua hết cổng nhưng thầy chưa bấm "Bắt đầu thi" thì DỪNG ở
+  // đây: không tạo lượt (đồng hồ chưa chạy cho ai) và không trả đề (đề chưa nằm
+  // trên máy em một giây nào). Em đã có lượt thì KHÔNG bị đẩy về chờ — bài của
+  // em đang chạy dở.
+  if (Number(ca.phong_cho ?? 0) === 1 && !ca.bat_dau_thi_luc && !cu) {
+    await env.DB.prepare(
+      `INSERT INTO phong_cho (khoa, ma_ca, sbd, ho_ten, ghi_luc) VALUES (?,?,?,?,?)
+       ON CONFLICT(khoa) DO UPDATE SET ho_ten=excluded.ho_ten, ghi_luc=excluded.ghi_luc`,
+    )
+      .bind(`${maCa}|${sbd}`, maCa, sbd, String(b.hoTen ?? ''), new Date(now).toISOString())
+      .run()
+    return ra({
+      ok: true,
+      cach: 'cho',
+      lop: ca.lop ?? '',
+      thoiGianPhut: ca.thoi_gian_phut ?? 45,
+      tenCa: ca.ten_ca ?? '',
+      congBo: ca.cong_bo ?? 'khong',
+    })
+  }
 
   const lanThu = qd.lanThu ?? 1
   const khoa = khoaLuot(maCa, sbd, lanThu)
@@ -87,6 +130,9 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
     tenCa: ca.ten_ca ?? '',
     nguongLan: ca.nguong_lan ?? 3,
     nguongGiay: ca.nguong_giay ?? 10,
+    lop: ca.lop ?? '',
+    giuDeDoc: Number(ca.giu_de_doc ?? 0) === 1,
+    anHanGiay: Number(ca.an_han_giay ?? 0),
     soCau: ca.so_cau_json ? JSON.parse(ca.so_cau_json) : undefined,
     boTheoEm: ca.bo_theo_em_json ? JSON.parse(ca.bo_theo_em_json) : undefined,
     // KHÔNG trả gói đề trong thân: máy em tải riêng từ /de/:maCa, qua bộ đệm biên.
@@ -95,21 +141,21 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
 }
 
 async function luuTam(env: Env, b: Record<string, unknown>): Promise<Response> {
-  const khoa = String(b.khoaLuot ?? '').trim()
-  if (!khoa) return ra({ ok: false, lyDo: 'thieu' })
+  const dk = dieuKienLuot(b)
+  if (!dk) return ra({ ok: false, lyDo: 'thieu' })
   const r = await env.DB.prepare(
     `UPDATE luot SET dap_an_json = ?, giay_cau_json = ?, cap_nhat_luc = ?
-     WHERE khoa = ? AND trang_thai = 'dang_lam'`,
+     WHERE ${dk.sql} AND trang_thai = 'dang_lam'`,
   )
-    .bind(JSON.stringify(b.dapAn ?? {}), b.giayCau ? JSON.stringify(b.giayCau) : null, new Date().toISOString(), khoa)
+    .bind(JSON.stringify(b.dapAn ?? {}), b.giayCau ? JSON.stringify(b.giayCau) : null, new Date().toISOString(), ...dk.tham)
     .run()
   if (r.meta.changes === 0) return ra({ ok: false, lyDo: 'khong_dang_lam' })
   return ra({ ok: true })
 }
 
 async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
-  const khoa = String(b.khoaLuot ?? '').trim()
-  if (!khoa) return ra({ ok: false, lyDo: 'thieu' })
+  const dk = dieuKienLuot(b)
+  if (!dk) return ra({ ok: false, lyDo: 'thieu' })
   const integrity = (b.integrity ?? {}) as { leaveCount?: number; totalHiddenMs?: number; blocked?: boolean }
   const nopLuc = new Date().toISOString()
   const trangThai = integrity.blocked ? 'khoa' : 'da_nop'
@@ -119,7 +165,7 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
   const r = await env.DB.prepare(
     `UPDATE luot SET nop_luc = ?, trang_thai = ?, dap_an_json = ?, giay_cau_json = ?,
             integrity_json = ?, so_lan_roi_man = ?, tong_giay_roi_man = ?, cap_nhat_luc = ?, da_day_sheet = 0
-     WHERE khoa = ? AND trang_thai = 'dang_lam'`,
+     WHERE ${dk.sql} AND trang_thai = 'dang_lam'`,
   )
     .bind(
       nopLuc,
@@ -130,18 +176,91 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
       Number(integrity.leaveCount ?? 0),
       Math.round(Number(integrity.totalHiddenMs ?? 0) / 1000),
       nopLuc,
-      khoa,
+      ...dk.tham,
     )
     .run()
 
   if (r.meta.changes === 0) {
-    const da = await env.DB.prepare('SELECT trang_thai, nop_luc FROM luot WHERE khoa = ?').bind(khoa).first<DongLuot>()
+    // Đã nộp rồi thì TRẢ OK, không báo lỗi: máy em mất sóng rồi gửi lại là
+    // chuyện thường, báo đỏ ở đây là em tưởng mất bài và nộp lại lần nữa.
+    const da = await env.DB.prepare(`SELECT trang_thai, nop_luc FROM luot WHERE ${dk.sql}`)
+      .bind(...dk.tham)
+      .first<DongLuot>()
     if (da && (da.trang_thai === 'da_nop' || da.trang_thai === 'khoa')) {
       return ra({ ok: true, daNhan: true, nopLuc: da.nop_luc })
     }
     return ra({ ok: false, lyDo: 'khong_tim_thay' })
   }
   return ra({ ok: true, nopLuc })
+}
+
+/**
+ * TRẠNG THÁI LÀM BÀI — lệnh EM BẮN NHIỀU NHẤT: 270 lượt một ca 45 phút, nhân
+ * ba mươi em là hơn tám nghìn lượt. Chuyển đúng lệnh này đi là đã bỏ được hai
+ * phần ba toàn bộ tải của cả ca.
+ *
+ * MỘT câu ghi, khoá theo SBD nên hai máy của cùng một em cũng không sinh hai
+ * dòng. Không khoá toàn cục ⇒ ba mươi em đẩy cùng lúc là ba mươi dòng riêng.
+ */
+async function dayTrangThai(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const sbd = String(b.sbd ?? '').trim()
+  if (!sbd) return ra({ ok: false, lyDo: 'thieu' })
+  const nay = new Date().toISOString()
+  await env.DB.prepare(
+    `INSERT INTO trang_thai (sbd, ma_ca, lop, dang_lam, bat_dau_luc, da_lam_cau_hoi,
+                             tong_cau_hoi, so_lan_roi_app, blocked, cap_nhat_luc, da_day_sheet)
+     VALUES (?,?,?,?,?,?,?,?,?,?,0)
+     ON CONFLICT(sbd) DO UPDATE SET
+       ma_ca=excluded.ma_ca, lop=excluded.lop, dang_lam=excluded.dang_lam,
+       bat_dau_luc=excluded.bat_dau_luc, da_lam_cau_hoi=excluded.da_lam_cau_hoi,
+       tong_cau_hoi=excluded.tong_cau_hoi, so_lan_roi_app=excluded.so_lan_roi_app,
+       blocked=excluded.blocked, cap_nhat_luc=excluded.cap_nhat_luc, da_day_sheet=0`,
+  )
+    .bind(
+      sbd, String(b.maCa ?? ''), String(b.lop ?? ''), b.dangLam ? 1 : 0,
+      String(b.batDauLuc ?? nay), Number(b.daLamCauHoi ?? 0), Number(b.tongCauHoi ?? 0),
+      Number(b.soLanRoiApp ?? 0), b.blocked ? 1 : 0, nay,
+    )
+    .run()
+  return ra({ ok: true })
+}
+
+/** Phụ huynh xem con đang làm tới đâu. Không đòi mã bí mật — giống Apps Script
+ *  hiện nay, phụ huynh chỉ tra được đúng SBD của con mình. */
+async function xemTrangThai(env: Env, sbd: string): Promise<Response> {
+  if (!sbd) return ra({ ok: false, lyDo: 'thieu' })
+  const r = await env.DB.prepare('SELECT * FROM trang_thai WHERE sbd = ?').bind(sbd).first<Record<string, unknown>>()
+  return ra({ ok: true, found: !!r, trangThai: r ?? null })
+}
+
+/** PHÒNG CHỜ — em qua cổng nhưng thầy chưa bấm Bắt đầu.
+ *
+ * KHÔNG tạo lượt, KHÔNG trả đề: đồng hồ chưa chạy cho ai và đề chưa nằm trên
+ * máy em một giây nào. Đây là lúc ĐÔNG NHẤT của cả ca — cả lớp hỏi lại mỗi ba
+ * giây — nên nó phải là câu nhẹ nhất trong toàn bộ máy chủ. */
+async function hoiPhongCho(env: Env, maCa: string): Promise<Response> {
+  const ca = await docCa(env, maCa)
+  if (!ca) return ra({ ok: false, error: 'Không tìm thấy ca kiểm tra' })
+  return ra({
+    ok: true,
+    phongCho: Number(ca.phong_cho ?? 0) === 1,
+    batDau: !!ca.bat_dau_thi_luc,
+    batDauLuc: ca.bat_dau_thi_luc ?? '',
+    trangThai: ca.trang_thai,
+  })
+}
+
+async function ghiPhongCho(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const maCa = String(b.maCa ?? '').trim()
+  const sbd = String(b.sbd ?? '').trim()
+  if (!maCa || !sbd) return ra({ ok: false, lyDo: 'thieu' })
+  await env.DB.prepare(
+    `INSERT INTO phong_cho (khoa, ma_ca, sbd, ho_ten, ghi_luc) VALUES (?,?,?,?,?)
+     ON CONFLICT(khoa) DO UPDATE SET ho_ten=excluded.ho_ten, ghi_luc=excluded.ghi_luc`,
+  )
+    .bind(`${maCa}|${sbd}`, maCa, sbd, String(b.hoTen ?? ''), new Date().toISOString())
+    .run()
+  return ra({ ok: true })
 }
 
 async function layDe(env: Env, maCa: string): Promise<Response> {
@@ -171,14 +290,20 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
   }
   await env.DB.prepare(
     `INSERT INTO ca (ma_ca, ten_ca, trang_thai, bat_dau, het_han_vao, thoi_gian_phut, loai, han_nop,
-                     cong_bo, nguong_lan, nguong_giay, bank_r2, so_cau_json, bo_theo_em_json, cap_nhat_luc)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                     cong_bo, nguong_lan, nguong_giay, bank_r2, so_cau_json, bo_theo_em_json, cap_nhat_luc,
+                     lop, phong_cho, bat_dau_thi_luc, giu_de_doc, an_han_giay)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
      ON CONFLICT(ma_ca) DO UPDATE SET
        ten_ca=excluded.ten_ca, trang_thai=excluded.trang_thai, bat_dau=excluded.bat_dau,
        het_han_vao=excluded.het_han_vao, thoi_gian_phut=excluded.thoi_gian_phut, loai=excluded.loai,
        han_nop=excluded.han_nop, cong_bo=excluded.cong_bo, nguong_lan=excluded.nguong_lan,
        nguong_giay=excluded.nguong_giay, so_cau_json=excluded.so_cau_json,
        bo_theo_em_json=excluded.bo_theo_em_json, cap_nhat_luc=excluded.cap_nhat_luc,
+       lop=excluded.lop, phong_cho=excluded.phong_cho, giu_de_doc=excluded.giu_de_doc,
+       an_han_giay=excluded.an_han_giay,
+       -- KHÔNG ghi đè mốc bắt đầu bằng rỗng: thầy đẩy lại ca giữa giờ (sửa tên,
+       -- đổi hạn) mà xoá mốc này là cả lớp bị đá về phòng chờ, đồng hồ đang chạy.
+       bat_dau_thi_luc=COALESCE(excluded.bat_dau_thi_luc, ca.bat_dau_thi_luc),
        bank_r2=COALESCE(excluded.bank_r2, ca.bank_r2)`,
   )
     .bind(
@@ -187,9 +312,38 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
       String(ca.hanNop ?? ''), String(ca.congBo ?? 'khong'), Number(ca.nguongLan) || 3,
       Number(ca.nguongGiay) || 10, bankKey, ca.soCau ? JSON.stringify(ca.soCau) : null,
       ca.boTheoEm ? JSON.stringify(ca.boTheoEm) : null, new Date().toISOString(),
+      String(ca.lop ?? ''), ca.phongCho ? 1 : 0, String(ca.batDauThiLuc ?? '') || null,
+      ca.giuDeDoc ? 1 : 0, Number(ca.anHanGiay) || 0,
     )
     .run()
   return ra({ ok: true, maCa, coDe: !!bankKey })
+}
+
+/** Thầy bấm BẮT ĐẦU THI — cả lớp nhận đề đúng một thời điểm. */
+async function batDauThi(env: Env, maCa: string): Promise<Response> {
+  if (!maCa) return ra({ ok: false, error: 'Thiếu mã ca' })
+  const luc = new Date().toISOString()
+  const r = await env.DB.prepare('UPDATE ca SET bat_dau_thi_luc = ?, cap_nhat_luc = ? WHERE ma_ca = ?')
+    .bind(luc, luc, maCa)
+    .run()
+  if (r.meta.changes === 0) return ra({ ok: false, error: 'Không tìm thấy ca kiểm tra' })
+  return ra({ ok: true, batDauLuc: luc })
+}
+
+/** Màn theo dõi phòng thi của thầy. ĐÒI mã bí mật: đây là danh sách tên và
+ *  tiến độ của cả lớp, không phải thứ để ngỏ. */
+async function xemTheoDoi(env: Env, maCa: string): Promise<Response> {
+  const r = await env.DB.prepare('SELECT * FROM trang_thai WHERE ma_ca = ? ORDER BY sbd')
+    .bind(maCa)
+    .all<Record<string, unknown>>()
+  return ra({ ok: true, ds: r.results, dem: r.results.length })
+}
+
+async function xemPhongCho(env: Env, maCa: string): Promise<Response> {
+  const r = await env.DB.prepare('SELECT * FROM phong_cho WHERE ma_ca = ? ORDER BY ghi_luc')
+    .bind(maCa)
+    .all<Record<string, unknown>>()
+  return ra({ ok: true, ds: r.results, dem: r.results.length })
 }
 
 /** Lượt CHƯA đẩy về Sheet. Máy thầy kéo về rồi tự phát lại lên Apps Script —
@@ -210,6 +364,34 @@ async function danhDauDaDay(env: Env, b: Record<string, unknown>): Promise<Respo
   return ra({ ok: true, danhDau: r.meta.changes })
 }
 
+// ------------------------------------------------------------------ ĐO TẢI
+
+/** Mở sẵn ca đo. `CA_DO_TAI` là hằng số chết trong mã — không nhận từ ngoài,
+ *  nên không có đường nào để trang đo chạm vào ca thật của thầy. */
+async function moCaDoTai(env: Env): Promise<void> {
+  const now = Date.now()
+  await env.DB.prepare(
+    `INSERT INTO ca (ma_ca, ten_ca, trang_thai, bat_dau, het_han_vao, thoi_gian_phut, loai,
+                     han_nop, cong_bo, nguong_lan, nguong_giay, cap_nhat_luc)
+     VALUES (?, 'Ca đo tải (không phải ca thật)', 'mo', ?, ?, 45, 'thi', '', 'khong', 3, 10, ?)
+     ON CONFLICT(ma_ca) DO UPDATE SET trang_thai='mo', bat_dau=excluded.bat_dau,
+       het_han_vao=excluded.het_han_vao, cap_nhat_luc=excluded.cap_nhat_luc`,
+  )
+    .bind(
+      CA_DO_TAI,
+      new Date(now - 3600_000).toISOString(),
+      new Date(now + 86400_000).toISOString(),
+      new Date(now).toISOString(),
+    )
+    .run()
+}
+
+/** Xoá SẠCH dòng của ca đo. Điều kiện là hằng số, không ghép chuỗi từ ngoài. */
+async function donDoTai(env: Env): Promise<Response> {
+  const r = await env.DB.prepare('DELETE FROM luot WHERE ma_ca = ?').bind(CA_DO_TAI).run()
+  return ra({ ok: true, xoa: r.meta.changes })
+}
+
 // ------------------------------------------------------------------ ĐỊNH TUYẾN
 
 export default {
@@ -222,6 +404,13 @@ export default {
       return ra({ ok: true, ten: 'may-chu-moi', coDB: !!env.DB, coR2: !!env.DE, coMat: !!env.MA_BI_MAT })
     }
     if (req.method === 'GET' && p.startsWith('/de/')) return layDe(env, decodeURIComponent(p.slice(4)))
+    if (req.method === 'GET' && p === '/do-tai') {
+      await moCaDoTai(env)
+      return new Response(TRANG_DO_TAI, { headers: { 'content-type': 'text/html;charset=utf-8', ...CORS } })
+    }
+    if (req.method === 'POST' && p === '/do-tai/don') return donDoTai(env)
+    if (req.method === 'GET' && p === '/trang-thai') return xemTrangThai(env, (url.searchParams.get('sbd') ?? '').trim())
+    if (req.method === 'GET' && p === '/phong-cho') return hoiPhongCho(env, (url.searchParams.get('maCa') ?? '').trim())
     if (req.method !== 'POST') return ra({ ok: false, error: 'Chỉ nhận POST' }, 405)
 
     let b: Record<string, unknown>
@@ -235,12 +424,17 @@ export default {
     if (p === '/vao-thi') return vaoThi(env, b)
     if (p === '/luu-tam') return luuTam(env, b)
     if (p === '/nop') return nop(env, b)
+    if (p === '/trang-thai') return dayTrangThai(env, b)
+    if (p === '/phong-cho') return ghiPhongCho(env, b)
 
     // Lệnh của THẦY — đòi mã bí mật.
     if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
     if (p === '/ca/day') return dayCa(env, b)
     if (p === '/chua-day') return chuaDay(env, String(b.maCa ?? ''))
     if (p === '/da-day') return danhDauDaDay(env, b)
+    if (p === '/ca/bat-dau') return batDauThi(env, String(b.maCa ?? ''))
+    if (p === '/theo-doi') return xemTheoDoi(env, String(b.maCa ?? ''))
+    if (p === '/cho') return xemPhongCho(env, String(b.maCa ?? ''))
 
     return ra({ ok: false, error: 'Không có đường này' }, 404)
   },

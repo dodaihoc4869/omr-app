@@ -15,7 +15,10 @@ export default defineConfig({
     lib: { entry: resolve(__dirname, '../src/index.ts'), formats: ['es'], fileName: () => 'worker.js' },
     outDir: resolve(__dirname),
     emptyOutDir: false,
-    minify: false,
+    // RÚT GỌN. Bản đầy đủ 24 KB, rút gọn còn 19 KB — và quan trọng hơn, nén lại
+    // chỉ 6,6 KB, vừa đủ để đẩy thẳng lên Cloudflare bằng một lượt gọi API thay
+    // vì dán tay vào trình soạn trên dashboard. Mã gốc đọc ở `server/src/*.ts`.
+    minify: true,
     target: 'es2022',
   },
 })

@@ -24,6 +24,10 @@ vi.mock('../src/lib/exam-db', () => ({
   saveTeacherSecret: vi.fn(),
   saveSessionTeacherBank: vi.fn(),
   deleteExamSource: vi.fn(),
+  // Khối "Máy chủ mới" trong màn Cài đặt đọc/ghi cấu hình lúc dựng (11/09).
+  // KHÔNG đổi phép kiểm nào — chỉ vá lỗ của bản giả cho khớp thứ màn hình gọi.
+  loadCauHinhMayChu: async () => ({ BAT: false, URL: '', HAN_GIAY: 10, SO_LAN_THU: 3, LUI_VE_APPS_SCRIPT: true, GIAN_VAO_THI_GIAY: 3 }),
+  saveCauHinhMayChu: vi.fn(),
   // Khối "Mật khẩu mở app" trong màn Cài đặt đọc hai hàm này lúc dựng.
   loadKhoaApp: async () => null,
   saveKhoaApp: vi.fn(),
