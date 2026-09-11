@@ -124,10 +124,14 @@ Lối Enter còn bỏ qua luôn điều kiện toàn màn hình mà nút "Vào t
 - [x] Sửa lỗi gán nhầm họ tên ở cổng danh sách máy chủ mới | bằng chứng: commit `937ae71`, `tests/danh-sach-len-may-chu-moi-1109.test.ts` 11/11 xanh, trong đó một phép TÁI HIỆN đúng lỗi cũ
 - [x] Năm cửa trên đúng cây mã sẽ phát hành (`937ae71`) | bằng chứng: `tsc` app + server sạch · **208 tệp / 3 080 phép kiểm / 0 đỏ** · `check:mau` sạch · `kiem:hien-thi` **ĐẠT 18/18** · build Pages OK
 - [x] Sửa ba lỗi trong `CHUYEN-SANG-MAY-CHU-MOI.command` sau log 11:47 của thầy | bằng chứng: `{...} | tee` làm mất TTY ⇒ bọc `script`; `wrangler whoami` thoát 0 dù chưa đăng nhập ⇒ đọc chữ; `workers_dev` đứng sau `[[r2_buckets]]` ⇒ chuyển lên phần gốc (commit `fed7e5b`)
-- [!] **Phát hành Worker**: KẸT — ô soạn thảo Worker trên dashboard trắng trơn (thử 2 phiên, tải lại + nới cửa sổ + vào lại từ nút "Edit code"). Đường thay: thầy nhấp đúp `CHUYEN-SANG-MAY-CHU-MOI.command`
-- [ ] Đẩy `may-chu-moi` → `main` (nằm trong script trên) | bằng chứng: (chưa có)
-- [ ] Đồng bộ danh sách lớp lên D1 — bảng `danh_sach` đang RỖNG nên cổng chặn SBD lạ CHƯA hoạt động | bằng chứng: (chưa có)
-- [ ] Diễn tập một ca đủ bước với SBD `TEST%` trước 18h | bằng chứng: (chưa có)
+- [x] **Phát hành Worker** | bằng chứng: version `83a8a467-f31b-4f72-8311-352a544c1752`, ràng buộc `env.DB (omr)` D1 + `env.DE (omr-de)` R2. Đo lại từ tab app: `/khoe` coDB/coR2/coMat đều true · `/ten-theo-sbd` 200 (trước phát hành 405) · `/phieu/:ma` 404 (trước 405)
+  - Ô soạn thảo Worker trên dashboard TRẮNG TRƠN, thử 2 phiên (tải lại · nới cửa sổ · vào lại từ nút "Edit code"). Bỏ hẳn đường dán tay, chuyển sang `wrangler deploy` từ mã nguồn — chắc hơn vì không dán thiếu ký tự được
+- [x] Đẩy `may-chu-moi` → `main` | bằng chứng: `3622cf0..a68f05a  may-chu-moi -> main`; Actions #297 dựng 2m46s; bó mã live `index-D3ifpgC1.js` có đủ chuỗi mới `MÁY CHỦ MỚI CHƯA NHẬN` và `máy chủ mới đã nhận`
+- [x] Đồng bộ danh sách lớp lên D1 | bằng chứng: `SELECT COUNT(*) FROM danh_sach` → **257 em · 4 lớp · 0 em thiếu tên · cập nhật 2026-09-11T05:04:16.573Z**. Lượt bấm đầu KHÔNG tới nơi (0 dòng) vì cờ còn tắt — xem dòng dưới
+- [x] Sửa lỗi NUỐT kết quả đẩy danh sách sang máy chủ mới | bằng chứng: commit `dee50ef`, 14 phép kiểm; nay mỗi lượt đồng bộ kết luận `tat`/`ok`/`hong`, `hong` thì nút ĐỎ
+- [x] Miễn cổng danh sách cho ca đo tải | bằng chứng: cùng commit; trang `/do-tai` chạy lại được sau khi bảng có 257 dòng thật
+- [x] Đo tải thật trên máy chủ vừa phát hành | bằng chứng: 10/20/30/50 đồng thời, mỗi em ảo đủ ba bước — **0 lỗi ở cả 12 dòng**; 50 em xong cả ba bước trong **1.430 ms** (hôm qua 1.723 ms, dù nay thêm một lượt tra cổng). Dọn sạch ngay: `luot` ca DOTAI = 0, `luot` ca thật = 0, `danh_sach` vẫn 257
+- [ ] Mở ca 18h và kiểm ca đã lên D1 trước khi em vào — nay `số ca = 1` và ca đó là ca đo | bằng chứng: (chưa có)
 - [ ] Đổi `MA_BI_MAT` (giá trị cũ đã lọt vào ảnh chụp 10/09) | bằng chứng: (chưa có)
 - [ ] Xây mục **Phân công** (Giao BTVN + Gọi lên bảng) theo `claude/PHAN-CONG-GIAO-BTVN.md` — hoãn sau ca thi | bằng chứng: (chưa có)
 
