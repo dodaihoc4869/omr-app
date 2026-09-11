@@ -228,59 +228,70 @@ export async function guiCauHoi(env: Env, b: Record<string, unknown>): Promise<R
   const sbd = chuoi(b.sbd).trim()
   const maCa = chuoi(b.maCa).trim()
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
-  const cau = Array.isArray(b.cau) ? (b.cau as Record<string, unknown>[]) : []
-  const noi = chuoi(b.noiDung).trim()
+  // Máy em gửi `qids` (mảng mã câu em tick) + `ghiChu`. Giữ NGUYÊN thứ tự em
+  // tick — thứ tự ấy là thứ tự em muốn hỏi.
+  const qids = Array.isArray(b.qids) ? (b.qids as unknown[]).map((x) => chuoi(x).trim()).filter(Boolean) : []
+  const ghiChu = chuoi(b.ghiChu).trim()
+  if (qids.length === 0 && !ghiChu) return { ok: false, error: 'Không có câu hỏi nào' }
+
+  // MỘT LƯỢT GỬI = MỘT MỐC THỜI GIAN, dùng chung cho mọi dòng. Nhờ vậy chỗ đọc
+  // gom lại được đúng một lượt bấm gửi của em.
   const nay = NAY()
-  const lenh = []
-  if (cau.length > 0) {
-    for (const c of cau.slice(0, 40)) {
-      lenh.push(
-        env.DB.prepare('INSERT INTO cau_hoi_em (sbd, ma_ca, qid, noi_dung, da_chua, luc) VALUES (?, ?, ?, ?, 0, ?)').bind(
-          sbd,
-          maCa,
-          chuoi((c as { qid?: string }).qid),
-          chuoi((c as { noiDung?: string }).noiDung ?? (c as { hoi?: string }).hoi),
-          nay,
-        ),
-      )
-    }
-  } else if (noi) {
-    lenh.push(env.DB.prepare('INSERT INTO cau_hoi_em (sbd, ma_ca, qid, noi_dung, da_chua, luc) VALUES (?, ?, ?, ?, 0, ?)').bind(sbd, maCa, chuoi(b.qid), noi, nay))
+  const lenh = qids.map((q) =>
+    env.DB.prepare('INSERT INTO cau_hoi_em (sbd, ma_ca, qid, noi_dung, da_chua, da_xoa, luc) VALUES (?, ?, ?, ?, 0, 0, ?)').bind(sbd, maCa, q, '', nay),
+  )
+  if (ghiChu) {
+    lenh.push(
+      env.DB.prepare('INSERT INTO cau_hoi_em (sbd, ma_ca, qid, noi_dung, da_chua, da_xoa, luc) VALUES (?, ?, ?, ?, 0, 0, ?)').bind(sbd, maCa, '', ghiChu, nay),
+    )
   }
-  if (lenh.length === 0) return { ok: false, error: 'Không có câu hỏi nào' }
   for (let i = 0; i < lenh.length; i += 40) await env.DB.batch(lenh.slice(i, i + 40))
-  return { ok: true, soCau: lenh.length, guiLuc: nay }
+  return { ok: true, soCau: qids.length, guiLuc: nay }
 }
 
 export async function danhSachCauHoi(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const maCa = chuoi(b.maCa).trim()
   const thungRac = b.thungRac === true
-  const r = maCa
-    ? await env.DB.prepare(
-        `SELECT q.*, COALESCE(d.ho_ten,'') AS ho_ten FROM cau_hoi_em q LEFT JOIN danh_sach d ON d.sbd = q.sbd
-          WHERE q.ma_ca = ? AND q.da_xoa = ? ORDER BY q.luc DESC LIMIT 500`,
-      )
-        .bind(maCa, thungRac ? 1 : 0)
-        .all<Record<string, unknown>>()
-    : await env.DB.prepare(
-        `SELECT q.*, COALESCE(d.ho_ten,'') AS ho_ten FROM cau_hoi_em q LEFT JOIN danh_sach d ON d.sbd = q.sbd
-          WHERE q.da_xoa = ? ORDER BY q.luc DESC LIMIT 500`,
-      )
-        .bind(thungRac ? 1 : 0)
-        .all<Record<string, unknown>>()
-  return {
-    ok: true,
-    items: (r.results ?? []).map((x) => ({
-      id: chuoi(x.id),
-      sbd: chuoi(x.sbd),
-      hoTen: chuoi(x.ho_ten),
-      maCa: chuoi(x.ma_ca),
-      qid: chuoi(x.qid),
-      noiDung: chuoi(x.noi_dung),
-      daChua: Number(x.da_chua) === 1,
-      thoiGian: chuoi(x.luc),
-    })),
+  const dk = maCa ? 'q.ma_ca = ? AND q.da_xoa = ?' : 'q.da_xoa = ?'
+  const tham = maCa ? [maCa, thungRac ? 1 : 0] : [thungRac ? 1 : 0]
+  const r = await env.DB.prepare(
+    `SELECT q.*, COALESCE(d.ho_ten,'') AS ho_ten, COALESCE(c.ten_ca,'') AS ten_ca
+       FROM cau_hoi_em q
+       LEFT JOIN danh_sach d ON d.sbd = q.sbd
+       LEFT JOIN ca c ON c.ma_ca = q.ma_ca
+      WHERE ${dk} ORDER BY q.luc DESC LIMIT 500`,
+  )
+    .bind(...tham)
+    .all<Record<string, unknown>>()
+
+  // GOM THEO (ca, em, lúc gửi): màn "Học sinh hỏi" đọc MỘT dòng cho một lượt
+  // em bấm gửi, kèm danh sách mã câu — không phải mỗi câu một dòng.
+  const theo = new Map<string, Record<string, unknown>>()
+  for (const x of r.results ?? []) {
+    const khoa = `${chuoi(x.ma_ca)}|${chuoi(x.sbd)}|${chuoi(x.luc)}`
+    let d = theo.get(khoa)
+    if (!d) {
+      d = {
+        maCa: chuoi(x.ma_ca),
+        tenCa: chuoi(x.ten_ca),
+        sbd: chuoi(x.sbd),
+        hoTen: chuoi(x.ho_ten),
+        qids: [] as string[],
+        ghiChu: '',
+        guiLuc: chuoi(x.luc),
+        daChua: Number(x.da_chua) === 1,
+        chuaLuc: '',
+        xoa: Number(x.da_xoa) === 1 ? chuoi(x.luc) : '',
+      }
+      theo.set(khoa, d)
+    }
+    const qid = chuoi(x.qid)
+    if (qid) (d.qids as string[]).push(qid)
+    // Ghi chú của em: nối các dòng có nội dung, KHÔNG cắt bớt.
+    const noi = chuoi(x.noi_dung).trim()
+    if (noi) d.ghiChu = d.ghiChu ? `${d.ghiChu}\n${noi}` : noi
   }
+  return { ok: true, items: [...theo.values()] }
 }
 
 export async function xoaCauHoi(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
@@ -854,19 +865,19 @@ export async function qidDaLam(env: Env, b: Record<string, unknown>): Promise<Re
 export async function lichSuLenBang(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const soNgay = Number(b.soNgay) > 0 ? Number(b.soNgay) : 30
   const tu = new Date(Date.now() - soNgay * 86400000).toISOString()
-  const r = await env.DB.prepare('SELECT sbd, chuyen_de, dat, luc FROM len_bang WHERE luc >= ? ORDER BY luc DESC LIMIT 2000')
+  const r = await env.DB.prepare('SELECT sbd, qid, luc FROM len_bang WHERE luc >= ? ORDER BY luc DESC LIMIT 2000')
     .bind(tu)
     .all<Record<string, unknown>>()
-  const theoEm: Record<string, { soLan: number; soDat: number; lanCuoi: string; chuyenDe: Record<string, number> }> = {}
+  const theoEm: Record<string, { soLan: number; lanCuoi: string; qids: string[] }> = {}
   for (const x of r.results ?? []) {
     const s = chuoi(x.sbd)
-    const e = (theoEm[s] ??= { soLan: 0, soDat: 0, lanCuoi: '', chuyenDe: {} })
+    if (!s) continue
+    const e = (theoEm[s] ??= { soLan: 0, lanCuoi: '', qids: [] })
     e.soLan++
-    if (Number(x.dat) === 1) e.soDat++
     const luc = chuoi(x.luc)
     if (luc > e.lanCuoi) e.lanCuoi = luc
-    const cd = chuoi(x.chuyen_de)
-    if (cd) e.chuyenDe[cd] = (e.chuyenDe[cd] ?? 0) + 1
+    const qid = chuoi(x.qid)
+    if (qid) e.qids.push(qid)
   }
   return { ok: true, soNgay, theoEm }
 }
