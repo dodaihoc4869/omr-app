@@ -12,7 +12,7 @@
 //   3. Cấm nhớ cấu hình quá lâu: thầy tắt cờ giữa ca thì lượt gọi tiếp theo
 //      phải đi đường cũ ngay.
 import { chuanHoaMayChu, gianVaoThi, type CauHinhMayChu } from './cau-hinh-may-chu'
-import { loadCauHinhMayChu } from './exam-db'
+import { loadCauHinhMayChu, loadDiaChiMayChuMoiChoEm, saveCauHinhMayChu } from './exam-db'
 
 // ---------------------------------------------------------------------------
 // CẦU DAO: CA NÀO MÁY CHỦ MỚI KHÔNG GIỮ THÌ THÔI GỌI CHO CẢ CA
@@ -44,6 +44,37 @@ export function caDaBiGatCauDao(maCa: string): boolean {
 /** Bộ nhớ tạm cấu hình. Sống ngắn để thầy gạt cờ là có tác dụng gần như ngay. */
 const SONG_MS = 5000
 let nhoCauHinh: { luc: number; ch: CauHinhMayChu } | null = null
+
+/** CẤU HÌNH MÁY CHỦ MỚI CHO ĐƯỜNG THI CỦA EM.
+ *
+ * Khác `layCauHinhMayChu` ở đúng một chỗ, và chỗ ấy là cả vấn đề của ngày
+ * 11/09: máy nào KHÔNG phải máy thầy thì không có cấu hình trong IndexedDB,
+ * nên `BAT` luôn false và mọi lượt của em rơi về Apps Script — kể cả khi máy
+ * chủ mới đang chạy tốt. Tra D1 giữa ca thật 237124: ca có trên D1, mốc bắt
+ * đầu đã sang, mà 0 lượt thi · 0 em ở phòng chờ · 0 báo trạng thái.
+ *
+ * Nay: máy thầy dùng cấu hình của thầy (cờ bật/tắt vẫn là cờ tắt khẩn của
+ * thầy); máy nào chưa có cấu hình thì đọc địa chỉ từ `public/cau-hinh.json`
+ * — đúng đường máy em vẫn dùng để biết link Apps Script.
+ *
+ * Địa chỉ đọc được cất lại vào IndexedDB để lần sau offline vẫn có, và để
+ * không phải tải tệp ấy mỗi lượt gọi.
+ *
+ * CHỈ dùng cho bốn lệnh của EM. Lệnh của THẦY (đẩy ca, đẩy danh sách, chuyển
+ * dữ liệu) vẫn dùng `layCauHinhMayChu` để cờ tắt khẩn của thầy còn nguyên
+ * tác dụng. */
+export async function layCauHinhChoEm(): Promise<CauHinhMayChu> {
+  const ch = await layCauHinhMayChu()
+  if (ch.BAT && ch.URL) return ch
+  // Máy thầy CHỦ Ý TẮT cờ: tôn trọng, không lén bật lại bằng đường tệp.
+  if (ch.URL) return ch
+  const url = await loadDiaChiMayChuMoiChoEm()
+  if (!url) return ch
+  const moi = chuanHoaMayChu({ ...ch, BAT: true, URL: url })
+  await saveCauHinhMayChu(moi).catch(() => {})
+  quenCauHinhMayChu()
+  return moi
+}
 
 export async function layCauHinhMayChu(): Promise<CauHinhMayChu> {
   const nay = Date.now()

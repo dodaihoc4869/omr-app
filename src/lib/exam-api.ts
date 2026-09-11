@@ -10,7 +10,7 @@ import { LUAT_DIEM } from '../engine/score'
 import { dongBoGioMayChu } from './gio-may-chu'
 import { chuanTenCa } from './ten-ca'
 import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
-import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi } from './may-chu-moi'
+import { layCauHinhChoEm, layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi } from './may-chu-moi'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
 import { dayCaMoi, dayDanhSachMoi, luotCuaCaMoi } from './day-ca-may-chu-moi'
 import { daBatDauTheoDuongCu, ghiNhoDaBatDauDuongCu, nenDoiChieu } from './doi-chieu-phong-cho'
@@ -286,7 +286,7 @@ export async function trangThaiPhongCho(scriptUrl: string, maCa: string): Promis
   // MÁY CHỦ MỚI TRƯỚC. Cả lớp đứng chờ và hỏi lại mỗi ba giây — đây là nhịp dày
   // nhất của cả ca. Máy chủ mới không trả lời được thì rơi về Apps Script ngay
   // trong chính lượt này, em không thấy gì khác ngoài việc chậm hơn một nhịp.
-  const chMoi = await layCauHinhMayChu()
+  const chMoi = await layCauHinhChoEm()
   const rMoi = await phongChoMoi(chMoi, maCa)
   // ĐÃ BẮT ĐẦU ⇒ tin ngay, không đối chiếu. Tin tốt thì không cần kiểm lại.
   if (rMoi?.batDau) return rMoi
@@ -454,7 +454,7 @@ async function vaoThiQuaMayChuMoi(
   idThietBi: string,
   canBank: boolean,
 ): Promise<KetQuaVaoThi | null> {
-  const ch = await layCauHinhMayChu()
+  const ch = await layCauHinhChoEm()
   if (!ch.BAT) return null
   const r = await vaoThiMoi(ch, maCa, sbd, idThietBi, canBank)
   if (!r) return null
@@ -839,7 +839,7 @@ export async function submitAnswers(
   // đồng bộ ngược sẽ đưa về Sheet sau, không mất chữ nào.
   //
   // Vẫn gọi Apps Script sau: điểm và đáp án công bố ngay do bên đó tính.
-  const chMoi = await layCauHinhMayChu()
+  const chMoi = await layCauHinhChoEm()
   const daCat = await nopMoi(chMoi, maCa, sbd, dapAn, integrity, giayCau)
 
   try {
@@ -917,7 +917,7 @@ export async function luuTam(scriptUrl: string, maCa: string, sbd: string, dapAn
     //
     // `null` nghĩa là "lượt này không nằm ở máy chủ mới" (em vào thi bằng đường
     // cũ) hoặc máy chủ mới không với tới được — cả hai đều đi tiếp xuống dưới.
-    const chMoi = await layCauHinhMayChu()
+    const chMoi = await layCauHinhChoEm()
     const rMoi = await luuTamMoi(chMoi, maCa, sbd, dapAn, giayCau)
     if (rMoi !== null) return rMoi
 
@@ -1111,7 +1111,7 @@ export async function pushExamStatus(
 ): Promise<boolean> {
   try {
     // MÁY CHỦ MỚI TRƯỚC — 270 lượt một em một ca, lệnh dày nhất trong toàn bộ hệ.
-    const chMoi = await layCauHinhMayChu()
+    const chMoi = await layCauHinhChoEm()
     const rMoi = await trangThaiMoi(chMoi, status)
     if (rMoi !== null) return rMoi
 
@@ -1780,7 +1780,7 @@ export async function layPhieu(scriptUrl: string, ma: string): Promise<unknown> 
   // trước hôm nay nên chỉ có bên Apps Script · mạng hỏng. Không ca nào được
   // biến thành báo đỏ cho phụ huynh.
   try {
-    const chMoi = await layCauHinhMayChu()
+    const chMoi = await layCauHinhChoEm()
     const nhanh = await layPhieuMoi(chMoi, ma)
     if (nhanh !== null && nhanh !== undefined) return nhanh
   } catch {

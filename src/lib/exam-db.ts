@@ -320,6 +320,40 @@ export async function loadScriptUrl(): Promise<string> {
  * &api=...): thứ tự ưu tiên IndexedDB (đã lưu từ lần trước) → file
  * public/cau-hinh.json cùng thư mục app (do thầy push kèm code). Lấy được từ
  * file thì lưu lại để lần sau offline vẫn có. */
+/** ĐỊA CHỈ MÁY CHỦ MỚI CHO **MÁY HỌC SINH** — đọc từ `public/cau-hinh.json`.
+ *
+ * VÌ SAO PHẢI CÓ (phát hiện 16h40 ngày 11/09, giữa ca thật 237124):
+ *
+ * Cờ `BAT` và địa chỉ Worker nằm trong IndexedDB của TỪNG THIẾT BỊ, và chỗ
+ * duy nhất ghi vào đó là khối Cài đặt trong app quản lý của thầy — app mà học
+ * sinh không mở được. Nên với MỌI máy của em, cờ luôn TẮT, và `vaoThi` dừng
+ * ngay ở dòng `if (!ch.BAT) return null`.
+ *
+ * Tra D1 lúc ca 237124 đang chạy: ca có trên D1, mốc bắt đầu đã sang, mà
+ * **0 lượt thi · 0 em ở phòng chờ · 0 báo trạng thái**. Toàn bộ phần tăng tốc
+ * chưa tới được học sinh một giây nào.
+ *
+ * Chữa bằng đúng đường máy em đã dùng mấy tháng nay để biết link Apps Script:
+ * đọc `public/cau-hinh.json`. Thêm một khoá, không đổi giao thức, không đụng
+ * link đã gửi.
+ *
+ * TẮT KHẨN CẤP: xoá giá trị `mayChuMoi` trong tệp ấy rồi push — mọi máy em
+ * quay về Apps Script ở lần tải sau. Trong một ca đang chạy thì đường lùi
+ * từng-lượt vẫn là thứ cứu: Worker hỏng là lượt ấy tự đi đường cũ.
+ *
+ * CẤM đưa `MA_BI_MAT` vào tệp này. Lệnh của em vốn không đòi mã bí mật. */
+export async function loadDiaChiMayChuMoiChoEm(): Promise<string> {
+  try {
+    const res = await fetch(`${import.meta.env.BASE_URL}cau-hinh.json`, { cache: 'no-cache' })
+    if (!res.ok) return ''
+    const cfg = (await res.json()) as { mayChuMoi?: string }
+    const url = (cfg.mayChuMoi || '').trim()
+    return url.startsWith('https://') ? url.replace(/\/+$/, '') : ''
+  } catch {
+    return ''
+  }
+}
+
 export async function loadScriptUrlHoacMacDinh(): Promise<string> {
   const daLuu = await loadScriptUrl()
   if (daLuu) return daLuu
