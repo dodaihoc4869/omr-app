@@ -177,3 +177,17 @@ chỉ trên phần của mình. Cây kiểm lấy bằng `git archive HEAD` nên
 1. Cho Worker trả lý do khi `/ca/danh-sach` ra rỗng, và cho app in lý do ấy ra.
 2. Nới luật: ca `da_xoa` đọc hỏng thì bỏ qua, ca đang sống hỏng thì vẫn chặn.
 3. Chạy lại, đối chiếu, rồi mới mở cổng.
+
+### 11/09 17h15 — màn Ca thi ĐÃ sang máy chủ mới
+
+- [x] "sửa luôn ca thi. chuyển sang hết cho tôi" | bằng chứng: commit `1d57d3c`, dấu `ca_day_du` trên D1 ghi **"da doi chieu · 85 ca · 277 lượt"**; bảng `ca` 86 dòng (85 ca thật + ca đo), tổng đã vào 277, đã nộp 275
+- [x] NGUYÊN NHÂN GỐC của hai lượt chuyển hỏng trước: tôi đi **đếm lại** một thứ Apps Script **đã đếm sẵn**. `danhSachCa` trả về ba số đã vào / đã nộp / cảnh báo cho mọi ca trong đúng một lượt gọi; tôi lại mở chi tiết từng ca — 83 lượt gọi × 1,5–8 s = hơn 10 phút, chạy trong tab của thầy, chết lặng lúc 15h46 sau đúng 6 ca (đọc từ nhật ký Worker)
+- [x] Bốn chỗ vá kèm: chốt chống bấm chồng · lượt chuyển ép đọc Apps Script (đọc D1 rồi ghi lại vào D1 là tự soi gương) · máy chủ không trả lời lượt đối chiếu thì NÉM LỖI · Worker lấy số lớn hơn giữa đếm sống và số chụp
+- [x] Sáu cửa tại `1d57d3c`: `tsc` app + server sạch · **211 tệp / 3.144 phép kiểm / 0 đỏ** · check:mau sạch · hiển thị ĐẠT 18/18 · build Pages OK
+- [ ] Mở ca 18h rồi đếm ca trên D1 trước khi em vào | bằng chứng: (chưa có)
+- [ ] Mục Phân công + giao BTVN theo `claude/PHAN-CONG-GIAO-BTVN.md` — sau ca | bằng chứng: (chưa có)
+- [ ] Đổi `MA_BI_MAT` — sau ca | bằng chứng: (chưa có)
+
+**Bài học ghi to:** trước khi viết vòng lặp gọi máy chủ N lần, hỏi xem máy chủ
+đã trả sẵn thứ mình định tự tính chưa. Ở đây câu trả lời là **rồi**, và nó nằm
+ngay trong lượt gọi đầu tiên.
