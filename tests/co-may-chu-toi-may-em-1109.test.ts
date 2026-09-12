@@ -61,7 +61,8 @@ describe('ĐƯỜNG DẪN ĐỊA CHỈ TỚI MÁY EM', () => {
       expect(giaTri, xau).not.toContain(xau)
     }
     // Và đúng hai khoá có giá trị: link Apps Script, địa chỉ Worker.
-    expect(Object.keys(CFG).filter((k) => !k.startsWith('ghi_chu')).sort()).toEqual(['mayChuMoi', 'scriptUrl'])
+    // 12/09: khoá `scriptUrl` đã bị gỡ cùng lúc cắt Google.
+    expect(Object.keys(CFG).filter((k) => !k.startsWith('ghi_chu')).sort()).toEqual(['mayChuMoi'])
   })
 
   it('chỉ nhận địa chỉ https, và cắt dấu gạch chéo thừa ở cuối', () => {
@@ -157,7 +158,7 @@ describe('CUỘC ĐUA LÚC MỞ APP — lượt gọi ĐẦU TIÊN không đư�
 
 describe('MỌI LỆNH ĐI WORKER ĐỀU ĐỌC CẤU HÌNH TRƯỚC', () => {
   const DS: [string, string][] = [
-    ['vaoThiQuaMayChuMoi', 'vaoThiMoi(ch, maCa, sbd, idThietBi, canBank)'],
+    ['vaoThiQuaMayChuMoi', 'vaoThiMoi(ch, maCa, sbd, idThietBi, danhTinh)'],
     ['trangThaiPhongCho', 'phongChoMoi(chMoi, maCa)'],
     ['submitAnswers', 'nopMoi(chMoi, maCa, sbd, dapAn, integrity, giayCau)'],
     ['luuTam', 'luuTamMoi(chMoi, maCa, sbd, dapAn, giayCau)'],
@@ -173,20 +174,24 @@ describe('MỌI LỆNH ĐI WORKER ĐỀU ĐỌC CẤU HÌNH TRƯỚC', () => {
     it(`${ten} đọc cấu hình bằng layCauHinhMayChu`, () => {
       const i = API.indexOf(moc)
       expect(i, moc).toBeGreaterThan(0)
-      expect(API.slice(Math.max(0, i - 400), i), moc).toContain('layCauHinhMayChu()')
+      // Cửa sổ 900 ký tự: các hàm này có ghi chú dài phía trên lượt gọi.
+      expect(API.slice(Math.max(0, i - 900), i), moc).toContain('layCauHinhMayChu()')
     })
   }
 })
 
-describe('ĐƯỜNG LÙI KHÔNG ĐƯỢC MẤT', () => {
-  it('máy em nhận được địa chỉ nhưng Worker hỏng thì VẪN rơi về Apps Script', () => {
-    // `vaoThiMoi` trả null khi hỏng, và chỗ gọi phải đi tiếp xuống đường cũ.
-    const i = API.indexOf('const r = await vaoThiMoi(ch, maCa, sbd, idThietBi, canBank)')
-    expect(API.slice(i, i + 120)).toContain('if (!r) return null')
+describe('KHÔNG CÒN ĐƯỜNG LÙI ⇒ HỎNG PHẢI NÓI THÀNH LỜI', () => {
+  // 12/09: Apps Script bị gỡ. Mọi chỗ trước đây "im lặng lùi" nay phải nói ra,
+  // vì lùi về đâu cũng không còn.
+  it('Worker không trả lời ⇒ ném lỗi nói rõ việc em phải làm', () => {
+    const i = API.indexOf('const r = await vaoThiMoi(ch, maCa, sbd, idThietBi, danhTinh)')
+    expect(i).toBeGreaterThan(0)
+    expect(API.slice(i, i + 200)).toContain('Không kết nối được máy chủ')
   })
 
-  it('cờ LUI_VE_APPS_SCRIPT vẫn mặc định bật', () => {
-    const CH = fs.readFileSync(path.join(process.cwd(), 'src/lib/cau-hinh-may-chu.ts'), 'utf8')
-    expect(CH).toContain('LUI_VE_APPS_SCRIPT: true')
+  it('đường nóng thử lại, không phó thác cho một lượt duy nhất', () => {
+    const MC = fs.readFileSync(path.join(process.cwd(), 'src/lib/may-chu-moi.ts'), 'utf8')
+    const i = MC.indexOf('export function nhipNong(')
+    expect(MC.slice(i, i + 220)).toContain('soLan: Math.max(1, ch.SO_LAN_THU)')
   })
 })

@@ -190,7 +190,20 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
   const cu = await docLuotMoiNhat(env, maCa, sbd)
   const now = Date.now()
   const qd = quyetDinhVaoThi(ca, cu, idThietBi, now)
-  if (!qd.ok || !ca) return ra({ ok: false, lyDo: qd.lyDo, lanThu: qd.lanThu, thoiGianPhut: ca?.thoi_gian_phut ?? 45 })
+  if (!qd.ok || !ca) {
+    // BA MỐC GIỜ ĐI KÈM LÝ DO. Màn của em nói "đã nộp lúc 9h12", "ca bắt đầu
+    // lúc 9h00", "hết hạn vào lúc 9h15" — thiếu ba trường này thì em chỉ đọc
+    // được một câu cụt và gọi Thầy giữa giờ thi.
+    return ra({
+      ok: false,
+      lyDo: qd.lyDo,
+      lanThu: qd.lanThu,
+      thoiGianPhut: ca?.thoi_gian_phut ?? 45,
+      nopLuc: qd.lyDo === 'da_nop' ? (cu?.nop_luc ?? '') : '',
+      batDau: ca?.bat_dau ?? '',
+      hetHanVao: ca?.het_han_vao ?? '',
+    })
+  }
 
   // PHÒNG CHỜ. Em qua hết cổng nhưng thầy chưa bấm "Bắt đầu thi" thì DỪNG ở
   // đây: không tạo lượt (đồng hồ chưa chạy cho ai) và không trả đề (đề chưa nằm

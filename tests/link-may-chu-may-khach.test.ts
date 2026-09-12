@@ -19,7 +19,7 @@ const MAN_KHACH: Record<string, string> = {
   'màn vào thi': manThi,
 }
 
-describe('Màn của KHÁCH (em vào làm bài) tự tìm được link Apps Script', () => {
+describe('Màn của KHÁCH (em vào làm bài) tự tìm được địa chỉ máy chủ', () => {
   it('dùng loadScriptUrlHoacMacDinh, KHÔNG dùng loadScriptUrl trần', () => {
     for (const [ten, ma] of Object.entries(MAN_KHACH)) {
       expect(ma, ten).toContain('loadScriptUrlHoacMacDinh')
@@ -28,16 +28,16 @@ describe('Màn của KHÁCH (em vào làm bài) tự tìm được link Apps Scr
     }
   })
 
-  it('public/cau-hinh.json có link /exec thật để máy khách đọc', () => {
-    expect(cauHinh.scriptUrl).toMatch(/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/)
+  it('public/cau-hinh.json KHÔNG còn địa chỉ Google — đã cắt hẳn 12/09', () => {
+    expect(cauHinh.scriptUrl).toBeUndefined()
+    expect(JSON.stringify(cauHinh)).not.toContain('script.google.com')
   })
 
   it('cau-hinh.json KHÔNG chứa mã bí mật — file này ai cũng tải được', () => {
-    // Đúng BỐN khoá: hai lời ghi chú và hai ĐỊA CHỈ (link Apps Script, địa chỉ
-    // Worker). Cả hai địa chỉ đều công khai — mọi link mời vào thi đã chứa link
-    // Apps Script, và lệnh của em vốn không đòi mã bí mật. Thêm khoá nào nữa là
-    // phải xem lại có đang lỡ đẩy bí mật lên repo public không.
-    expect(Object.keys(cauHinh).sort()).toEqual(['ghi_chu', 'ghi_chu_may_chu_moi', 'mayChuMoi', 'scriptUrl'])
+    // Đúng MỘT địa chỉ và mấy lời ghi chú. Địa chỉ Worker là công khai (lệnh
+    // của em vốn không đòi mã bí mật). Thêm khoá nào nữa là phải xem lại có
+    // đang lỡ đẩy bí mật lên repo public không — đây là repo CÔNG KHAI.
+    expect(Object.keys(cauHinh).filter((k) => !k.startsWith('ghi_chu')).sort()).toEqual(['mayChuMoi'])
     expect(cauHinh.mayChuMoi).toMatch(/^https:\/\/[a-z0-9.-]+$/)
     // Ghi chú là văn xuôi, nhưng giá trị thì không được là chuỗi kiểu mã bí mật.
     expect(/^[A-Za-z0-9]{16,}$/.test(cauHinh.ghi_chu.trim())).toBe(false)

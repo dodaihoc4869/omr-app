@@ -1,147 +1,126 @@
-// CẢ LỚP ĐỨNG CHỜ VĨNH VIỄN — cú treo im lặng cuối cùng, bịt trước ca 18h 11/09.
+// PHÒNG CHỜ KHÔNG ĐƯỢC TREO — luật viết 11/09, VIẾT LẠI 12/09 sau khi cắt Google.
 //
-// ĐƯỜNG ĐI CỦA LỖI, cả bốn bước đều "chạy đúng" theo mã của chính nó:
+// LUẬT CŨ (11/09), khi còn HAI nơi giữ mốc bắt đầu:
+//   Apps Script giữ một bản, D1 giữ một bản. Lượt đẩy mốc sang D1 nằm trong
+//   `try {} catch {}` không đọc kết quả, chập mạng một nhịp là trượt — D1 còn
+//   `bat_dau_thi_luc` rỗng, `/phong-cho` trả `batDau: false`, cả lớp đứng chờ
+//   vĩnh viễn mà không một dòng lỗi nào hiện ra. Chốt chặn khi ấy là ĐỐI CHIẾU:
+//   máy em bảo "chưa bắt đầu" thì cứ 90 giây hỏi lại đường cũ một lần.
 //
-//   ① `batDauThi` gọi Apps Script → ca ĐÃ bắt đầu. Thầy nhìn màn Theo dõi thấy
-//      "đã bắt đầu", không có gì bất thường.
-//   ② Lượt đẩy mốc bắt đầu sang máy chủ mới nằm trong `try {} catch {}` KHÔNG
-//      đọc kết quả. Chập mạng một nhịp là trượt, không ai biết.
-//   ③ D1 còn `bat_dau_thi_luc` rỗng ⇒ `/phong-cho` trả `batDau: false`.
-//   ④ `trangThaiPhongCho` thấy máy chủ mới TRẢ LỜI ĐƯỢC nên tin luôn và không
-//      hỏi Apps Script nữa.
+// LUẬT MỚI (12/09): CHỈ CÒN MỘT NƠI GIỮ MỐC — bảng `ca` trong D1.
+//   Đối chiếu bây giờ là gọi ĐÚNG MỘT máy chủ hai lần cho cùng một câu trả lời,
+//   tức nhân đôi tải đúng vào lúc đông người nhất. Nên bỏ. Cú treo cũ không thể
+//   tái diễn vì không còn hai bản để lệch nhau.
 //
-// Cả lớp đứng trong phòng chờ, không hết. Không một dòng lỗi ở cả hai phía.
-//
-// Sửa KHÔNG phải bằng cách bỏ máy chủ mới khỏi phòng chờ — làm thế là trả lại
-// đúng nhịp 3 giây nện Apps Script mà đợt 3 vừa gỡ. Sửa bằng ba vế dưới đây.
-import { beforeEach, describe, expect, it } from 'vitest'
+// `src/lib/doi-chieu-phong-cho.ts` từ nay KHÔNG còn chỗ nào trong `src/` dùng
+// tới; phép kiểm dưới canh đúng điều đó, để không ai nối lại nhầm.
+import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
-import {
-  NHIP_DOI_CHIEU_MS,
-  daBatDauTheoDuongCu,
-  ghiNhoDaBatDauDuongCu,
-  nenDoiChieu,
-  quenDoiChieu,
-} from '../src/lib/doi-chieu-phong-cho'
 
-const API = fs.readFileSync(path.join(process.cwd(), 'src/lib/exam-api.ts'), 'utf8')
-const MAN = fs.readFileSync(path.join(process.cwd(), 'src/screens/ExamMonitorScreen.tsx'), 'utf8')
+const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
+const API = doc('src/lib/exam-api.ts')
+const MAN = doc('src/screens/ExamMonitorScreen.tsx')
 
-beforeEach(() => quenDoiChieu())
-
-describe('VẾ 1 — "chưa bắt đầu" chỉ được tin trong MỘT NHỊP', () => {
-  it('lần thấy đầu tiên KHÔNG hỏi lại: câu trả lời của máy chủ mới còn mới', () => {
-    expect(nenDoiChieu('CA1', 1_000_000)).toBe(false)
+describe('VẾ 1 — MỘT nguồn sự thật cho mốc bắt đầu', () => {
+  it('phòng chờ hỏi MỘT lượt rồi tin, không đối chiếu', () => {
+    expect(API).toContain('const rMoi = await phongChoMoi(chMoi, maCa)')
+    expect(API).toContain('if (rMoi) return rMoi')
   })
 
-  it('trong nhịp thì vẫn không hỏi — không nện Apps Script mỗi 3 giây', () => {
-    nenDoiChieu('CA1', 1_000_000)
-    expect(nenDoiChieu('CA1', 1_000_000 + 3_000)).toBe(false)
-    expect(nenDoiChieu('CA1', 1_000_000 + 14_999)).toBe(false)
+  it('không còn cửa đối chiếu nào trong đường phòng chờ', () => {
+    expect(API).not.toContain('nenDoiChieu')
+    expect(API).not.toContain('ghiNhoDaBatDauDuongCu')
+    expect(API).not.toContain('daBatDauTheoDuongCu')
   })
 
-  it('quá nhịp thì HỎI — đây là chỗ cắt cú treo', () => {
-    nenDoiChieu('CA1', 1_000_000)
-    expect(nenDoiChieu('CA1', 1_000_000 + NHIP_DOI_CHIEU_MS)).toBe(true)
-  })
-
-  it('hỏi xong thì đếm lại từ đầu, không hỏi dồn', () => {
-    // Mốc tính THEO `NHIP_DOI_CHIEU_MS`, không gõ cứng con số — nhịp đổi thì
-    // phép kiểm đi theo, còn LUẬT thì không đổi.
-    nenDoiChieu('CA1', 1_000_000)
-    expect(nenDoiChieu('CA1', 1_000_000 + NHIP_DOI_CHIEU_MS + 1_000)).toBe(true)
-    expect(nenDoiChieu('CA1', 1_000_000 + NHIP_DOI_CHIEU_MS + 2_000)).toBe(false)
-  })
-
-  it('mỗi ca đếm riêng', () => {
-    nenDoiChieu('CA1', 1_000_000)
-    // CA2 lần đầu ⇒ chỉ ghi mốc
-    expect(nenDoiChieu('CA2', 1_000_000 + NHIP_DOI_CHIEU_MS + 5_000)).toBe(false)
-    expect(nenDoiChieu('CA1', 1_000_000 + NHIP_DOI_CHIEU_MS + 5_000)).toBe(true)
-  })
-
-  it('mã ca rỗng thì thôi, không nổ', () => {
-    expect(nenDoiChieu('', 1_000_000)).toBe(false)
-  })
-
-  it('NHỊP LÀ 90 GIÂY — giãn ra sau khi đo Apps Script 10,2 giây một lượt', () => {
-    // Đặt 15 giây lúc sáng 11/09. Đo lúc 20h05, đúng lúc thầy hỏi "40 em vào
-    // phòng chờ có quá tải không": `trangThaiPhongCho` bên Apps Script mất
-    // **10 185 ms** một lượt (chiều cùng ngày là 2,6 giây). 40 em × nhịp 15
-    // giây = 2,7 lượt/giây đổ vào cửa ấy — đúng công thức của cú treo hàng loạt
-    // mà chốt này sinh ra để chặn.
-    //
-    // 90 giây ⇒ 40 em còn 0,44 lượt/giây. Đổi lại: trường hợp xấu nhất em chờ
-    // thêm 90 giây thay vì 15. Chấp nhận được, vì máy thầy nay thử lại lượt đẩy
-    // mốc 3 lần (`dayMocBatDauMoi`) nên trường hợp ấy hiếm hẳn đi.
-    expect(NHIP_DOI_CHIEU_MS).toBe(90000)
-    // 40 em chia cho nhịp: phải dưới 0,5 lượt mỗi giây.
-    expect(40 / (NHIP_DOI_CHIEU_MS / 1000)).toBeLessThan(0.5)
-  })
-
-  it('máy thầy THỬ LẠI lượt đẩy mốc — chữa ở một máy, không chữa ở bốn mươi máy', () => {
-    const DAY = fs.readFileSync(path.join(process.cwd(), 'src/lib/day-ca-may-chu-moi.ts'), 'utf8')
-    const han = DAY.slice(DAY.indexOf('export async function dayMocBatDauMoi('), DAY.indexOf('export async function dayMocBatDauMoi(') + 1600)
-    expect(han).toContain('for (let i = 0; i < Math.max(1, soLan); i++)')
-    expect(han).toContain('if (xong) return true')
+  it('không màn nào trong src/ còn nhập module đối chiếu', () => {
+    const nhap: string[] = []
+    const quet = (thuMuc: string) => {
+      for (const ten of fs.readdirSync(path.join(process.cwd(), thuMuc))) {
+        const duong = `${thuMuc}/${ten}`
+        if (fs.statSync(path.join(process.cwd(), duong)).isDirectory()) quet(duong)
+        else if (/\.tsx?$/.test(ten) && duong !== 'src/lib/doi-chieu-phong-cho.ts') {
+          if (/from '.*doi-chieu-phong-cho'/.test(doc(duong))) nhap.push(duong)
+        }
+      }
+    }
+    quet('src')
+    expect(nhap).toEqual([])
   })
 })
 
-describe('VẾ 2 — nhớ rằng đường cũ đã xác nhận', () => {
-  it('chưa ghi thì chưa nhớ', () => {
-    expect(daBatDauTheoDuongCu('CA1')).toBe(false)
+describe('VẾ 2 — VÀO THI phải trả lời thật, cấm bỏ cuộc im lặng', () => {
+  // Ca Test6 (455713) tối 11/09: ca lành, R2 có `de/455713.json`, bản đồ đề
+  // riêng có đủ em 12121212 — em vẫn đọc "Máy chủ chưa gửi đề". Vì ca đặt công
+  // bố `ca_lop_xong`, và dòng `if (... === 'ca_lop_xong') return null` bắt lượt
+  // ấy "đi đường cũ" — trong khi đường cũ đã bị gỡ và chỉ trả `deUrl`, không
+  // trả gói đề.
+  const than = API.slice(
+    API.indexOf('async function vaoThiQuaMayChuMoi('),
+    API.indexOf('export async function vaoThi('),
+  )
+
+  it('khoanh đúng được thân hàm', () => {
+    expect(than.length).toBeGreaterThan(500)
   })
 
-  it('ghi rồi thì nhớ, và chỉ nhớ đúng ca ấy', () => {
-    ghiNhoDaBatDauDuongCu('CA1')
-    expect(daBatDauTheoDuongCu('CA1')).toBe(true)
-    expect(daBatDauTheoDuongCu('CA2')).toBe(false)
+  it('KHÔNG còn một câu `return null` nào trong thân hàm', () => {
+    expect(than).not.toContain('return null')
   })
 
-  it('dọn được từng ca một', () => {
-    ghiNhoDaBatDauDuongCu('CA1')
-    ghiNhoDaBatDauDuongCu('CA2')
-    quenDoiChieu('CA1')
-    expect(daBatDauTheoDuongCu('CA1')).toBe(false)
-    expect(daBatDauTheoDuongCu('CA2')).toBe(true)
+  it('chế độ công bố `ca_lop_xong` KHÔNG còn bị chặn — cổng ấy nay nằm ở D1', () => {
+    expect(than).not.toContain("'ca_lop_xong'")
+  })
+
+  it('ca đề riêng thiếu phần của em ⇒ TỪ CHỐI có lý do, không phát đề sai', () => {
+    expect(than).toContain("return { ok: false, lyDo: 'thieu_bo_cau' }")
+  })
+
+  it('thiếu đề, tải hỏng, gói hỏng ⇒ mỗi thứ một câu nói rõ việc phải làm', () => {
+    expect(than).toContain('Ca này chưa được phát đề')
+    expect(than).toContain('Không tải được đề')
+    expect(than).toContain('Gói đề tải về bị hỏng')
+  })
+
+  it('`vaoThi` không còn đường lùi nào khác', () => {
+    const ngoai = API.slice(API.indexOf('export async function vaoThi('))
+    const het = ngoai.indexOf('\n}\n')
+    expect(ngoai.slice(0, het)).not.toContain('postCoThuLai')
   })
 })
 
-describe('VẾ 3 — nối đúng vào đường đi thật', () => {
-  it('phòng chờ: "ĐÃ bắt đầu" tin ngay, không tốn thêm lượt gọi nào', () => {
-    expect(API).toContain('if (rMoi?.batDau) return rMoi')
-  })
+describe('VẾ 3 — lượt bị từ chối phải kèm mốc giờ', () => {
+  // "Em đã nộp bài ca này." không nói được lúc nào thì em gọi Thầy giữa giờ thi.
+  const SRV = doc('server/src/index.ts')
 
-  it('phòng chờ: "CHƯA bắt đầu" mới phải qua cửa đối chiếu', () => {
-    expect(API).toContain('if (rMoi && !nenDoiChieu(maCa)) return rMoi')
-    // và hai dòng ấy phải đứng ĐÚNG THỨ TỰ này, nếu không thì "đã bắt đầu"
-    // cũng bị giữ lại chờ đối chiếu.
-    expect(API.indexOf('if (rMoi?.batDau) return rMoi')).toBeLessThan(
-      API.indexOf('if (rMoi && !nenDoiChieu(maCa)) return rMoi'),
-    )
-  })
-
-  it('đường cũ bảo đã bắt đầu ⇒ GHI NHỚ', () => {
-    expect(API).toContain('if (r.batDau === true) ghiNhoDaBatDauDuongCu(maCa)')
-  })
-
-  it('VÀO THI: nhớ rồi thì KHÔNG trả dáng "cho" nữa — chỗ này mới thật sự cắt vòng treo', () => {
-    const i = API.indexOf("if ((r.cach as string) === 'cho') {")
+  it('máy chủ trả nopLuc / batDau / hetHanVao kèm lý do chặn', () => {
+    const i = SRV.indexOf('if (!qd.ok || !ca) {')
     expect(i).toBeGreaterThan(0)
-    const than = API.slice(i, i + 400)
-    expect(than).toContain('if (daBatDauTheoDuongCu(maCa)) return null')
-    // phải đứng TRƯỚC câu return dáng chờ
-    expect(than.indexOf('daBatDauTheoDuongCu')).toBeLessThan(than.indexOf('cach: \x27cho\x27'))
+    const khoi = SRV.slice(i, i + 900)
+    expect(khoi).toContain("nopLuc: qd.lyDo === 'da_nop' ? (cu?.nop_luc ?? '') : ''")
+    expect(khoi).toContain('batDau: ca?.bat_dau')
+    expect(khoi).toContain('hetHanVao: ca?.het_han_vao')
+  })
+
+  it('máy em chuyển tiếp cả ba mốc sang thông điệp cho em', () => {
+    const i = API.indexOf('if (!r.ok) {')
+    const khoi = API.slice(i, i + 400)
+    expect(khoi).toContain('nopLuc: r.nopLuc')
+    expect(khoi).toContain('batDau: r.batDau')
+    expect(khoi).toContain('hetHanVao: r.hetHanVao')
+  })
+
+  it('họ tên và năm sinh được gửi lên để nhật ký chặn vào đọc được', () => {
+    const MC = doc('src/lib/may-chu-moi.ts')
+    expect(MC).toContain("hoTen: danhTinh.hoTen ?? ''")
+    expect(MC).toContain("namSinh: danhTinh.namSinh ?? ''")
   })
 })
 
 describe('VẾ 4 — thầy phải biết ngay lúc bấm Bắt đầu', () => {
   it('`batDauThi` ĐỌC kết quả đẩy, không gọi suông', () => {
     expect(API).toContain('chuaSangMayChuMoi = !xong')
-    // 11/09 tối: lượt đẩy này đổi sang `dayMocBatDauMoi` — đẩy đầy đủ ở đây ghi
-    // đè tên ca, lớp, hạn vào phòng bằng rỗng (ca thật 704066). Luật cũ giữ
-    // nguyên: phải ĐỌC kết quả, không gọi suông.
     expect(API).toContain('const xong = await dayMocBatDauMoi(')
   })
 
@@ -154,6 +133,14 @@ describe('VẾ 4 — thầy phải biết ngay lúc bấm Bắt đầu', () => {
   it('cờ TẮT thì KHÔNG kêu hỏng — tắt là thầy chủ ý tắt', () => {
     const i = API.indexOf('let chuaSangMayChuMoi = false')
     expect(API.slice(i, i + 400)).toContain('if (chMoi.BAT && chMoi.URL) {')
+  })
+
+  it('máy thầy THỬ LẠI lượt đẩy mốc — chữa ở một máy, không chữa ở bốn mươi máy', () => {
+    const DAY = doc('src/lib/day-ca-may-chu-moi.ts')
+    const i = DAY.indexOf('export async function dayMocBatDauMoi(')
+    const han = DAY.slice(i, i + 1600)
+    expect(han).toContain('for (let i = 0; i < Math.max(1, soLan); i++)')
+    expect(han).toContain('if (xong) return true')
   })
 
   it('màn Theo dõi hét lên bằng toast ĐỎ', () => {

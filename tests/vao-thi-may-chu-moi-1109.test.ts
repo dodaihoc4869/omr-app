@@ -114,66 +114,70 @@ describe('ĐƯỜNG NHANH CHẠY ĐƯỢC', () => {
   })
 })
 
-// ĐƯỜNG LÙI ĐỔI ĐÍCH TỪ 12/09.
+// KHÔNG CÒN ĐƯỜNG LÙI — ĐỔI LUẬT 12/09.
 //
-// Thầy chốt "gỡ sạch google": không còn Apps Script để lùi về. Đường lùi bây
-// giờ là cổng tương thích `/goi` của CHÍNH máy chủ mới — nó nhận nguyên dáng
-// lệnh cũ và đọc thẳng D1. Ý nghĩa của mọi phép kiểm dưới đây giữ nguyên: em
-// KHÔNG BAO GIỜ kẹt vì đường nhanh hỏng; chỉ có đích của đường lùi là đổi.
-describe('ĐƯỜNG LÙI — em KHÔNG BAO GIỜ kẹt vì đường nhanh hỏng', () => {
-  it('cờ TẮT ⇒ đi thẳng Apps Script', async () => {
-    let chamMoi = 0
-    gaMang((u) => {
-      if (u.includes('omr.example') && !u.includes('/goi')) chamMoi += 1
+// Bản 11/09 để mọi trục trặc "im lặng lùi về Apps Script": em chỉ chậm, không
+// hỏng. Thầy chốt "gỡ sạch google", nên lùi về đâu cũng không còn. Bản trước
+// vẫn giữ nguyên các câu `return null` ấy, và chúng rơi vào cổng `/goi` của
+// CHÍNH máy chủ này — mà `/goi` trả `deUrl` chứ không trả gói đề. Kết quả: ca
+// Test6 (455713) tối 11/09 mở bình thường, đề nằm sẵn trong R2, bản đồ có đủ
+// em, mà em vẫn đọc "Máy chủ chưa gửi đề — bấm Vào thi lại".
+//
+// LUẬT MỚI: hỏng thì NÓI THÀNH LỜI, nói đúng chỗ hỏng và việc em phải làm.
+describe('KHÔNG CÒN ĐƯỜNG LÙI — hỏng phải nói thành lời', () => {
+  it('CẤU HÌNH TRỐNG nhưng chỗ gọi có địa chỉ thật ⇒ vẫn vào thi được', async () => {
+    // Máy em vừa mở app, cấu hình trong IndexedDB chưa kịp nạp. Một luật địa
+    // chỉ cho cả app (giống `postJson`): lấy cấu hình trước, trống thì dùng địa
+    // chỉ chỗ gọi truyền vào — miễn là nó không trỏ về Google.
+    gaMang(() => ({ ok: true, cach: 'moi', lop: '12', thoiGianPhut: 45, lanThu: 1, vaoLuc: 'a', hetGioLuc: 'b' }))
+    const { vaoThi } = await import('../src/lib/exam-api')
+    const kq = await vaoThi('https://may-chu-that.example', 'ca1', '10001', 'tb', false)
+    expect(kq.ok).toBe(true)
+  })
+
+  it('KHÔNG CÓ ĐỊA CHỈ Ở ĐÂU CẢ ⇒ nói thẳng, không gọi đi đâu hết', async () => {
+    let cham = 0
+    gaMang(() => {
+      cham += 1
       return { ok: true, cach: 'moi', lop: '12', thoiGianPhut: 45, lanThu: 1, vaoLuc: 'a', hetGioLuc: 'b' }
     })
     const { vaoThi } = await import('../src/lib/exam-api')
-    const kq = await vaoThi(URL_CU, 'ca1', '10001', 'tb', false)
-    expect(kq.ok).toBe(true)
-    expect(chamMoi).toBe(0)
+    await expect(vaoThi('', 'ca1', '10001', 'tb', false)).rejects.toThrow(/chưa có địa chỉ máy chủ/i)
+    expect(cham).toBe(0)
   })
 
-  it('đường nhanh CHẾT ⇒ vẫn vào thi được qua cổng /goi', async () => {
-    batCoMayChuMoi()
-    let chamCu = 0
-    gaMang((u) => {
-      if (u.includes('omr.example') && !u.includes('/goi')) return null // 500
-      chamCu += 1
+  it('địa chỉ trỏ VỀ GOOGLE ⇒ bị chặn cứng, không một byte nào chạm Apps Script', async () => {
+    let cham = 0
+    gaMang(() => {
+      cham += 1
       return { ok: true, cach: 'moi', lop: '12', thoiGianPhut: 45, lanThu: 1, vaoLuc: 'a', hetGioLuc: 'b' }
     })
     const { vaoThi } = await import('../src/lib/exam-api')
-    const kq = await vaoThi(URL_CU, 'ca1', '10001', 'tb', false)
-    expect(kq.ok).toBe(true)
-    expect(chamCu).toBeGreaterThan(0)
+    await expect(
+      vaoThi('https://script.google.com/macros/s/AKfy/exec', 'ca1', '10001', 'tb', false),
+    ).rejects.toThrow(/chưa có địa chỉ máy chủ/i)
+    expect(cham).toBe(0)
   })
 
-  it('em CẦN đề mà máy chủ mới KHÔNG có gói đề ⇒ cổng /goi, KHÔNG để em vào phòng tay không', async () => {
+  it('máy chủ CHẾT ⇒ báo "không kết nối được", không treo im lặng', async () => {
     batCoMayChuMoi()
-    let chamCu = 0
-    gaMang((u) => {
-      if (u.includes('omr.example') && !u.includes('/goi')) return { ...CA_CO_BAN, deUrl: null }
-      chamCu += 1
-      return { ok: true, cach: 'moi', lop: '12', thoiGianPhut: 45, lanThu: 1, vaoLuc: 'a', hetGioLuc: 'b', bank: DE }
-    })
+    gaMang(() => null) // mọi đường đều 500
     const { vaoThi } = await import('../src/lib/exam-api')
-    const kq = await vaoThi(URL_CU, 'ca1', '10001', 'tb', true)
-    expect(kq.ok).toBe(true)
-    expect(chamCu).toBeGreaterThan(0)
+    await expect(vaoThi(URL_CU, 'ca1', '10001', 'tb', false)).rejects.toThrow(/Không kết nối được máy chủ/)
+  }, 20000)
+
+  it('em CẦN đề mà ca CHƯA được phát đề ⇒ chỉ đúng việc Thầy phải làm', async () => {
+    batCoMayChuMoi()
+    gaMang(() => ({ ...CA_CO_BAN, deUrl: null }))
+    const { vaoThi } = await import('../src/lib/exam-api')
+    await expect(vaoThi(URL_CU, 'ca1', '10001', 'tb', true)).rejects.toThrow(/chưa được phát đề/)
   })
 
-  it('tải gói đề HỎNG giữa chừng ⇒ cũng về cổng /goi', async () => {
+  it('tải gói đề HỎNG giữa chừng ⇒ báo đúng "không tải được đề"', async () => {
     batCoMayChuMoi()
-    let chamCu = 0
-    gaMang((u) => {
-      if (u.includes('/de/')) return null
-      if (u.includes('omr.example') && !u.includes('/goi')) return { ...CA_CO_BAN, deUrl: '/de/ca1' }
-      chamCu += 1
-      return { ok: true, cach: 'moi', lop: '12', thoiGianPhut: 45, lanThu: 1, vaoLuc: 'a', hetGioLuc: 'b', bank: DE }
-    })
+    gaMang((u) => (u.includes('/de/') ? null : { ...CA_CO_BAN, deUrl: '/de/ca1' }))
     const { vaoThi } = await import('../src/lib/exam-api')
-    const kq = await vaoThi(URL_CU, 'ca1', '10001', 'tb', true)
-    expect(kq.ok).toBe(true)
-    expect(chamCu).toBeGreaterThan(0)
+    await expect(vaoThi(URL_CU, 'ca1', '10001', 'tb', true)).rejects.toThrow(/Không tải được đề/)
   })
 })
 
@@ -193,48 +197,46 @@ describe('ĐỀ RIÊNG — chỗ sai một lần là điểm em sai lặng lẽ'
     }
   })
 
-  it('ca có bản đồ mà THIẾU phần của CHÍNH EM NÀY ⇒ cổng /goi, thà chậm còn hơn sai đề', async () => {
+  it('ca có bản đồ mà THIẾU phần của CHÍNH EM NÀY ⇒ TỪ CHỐI hẳn, không phát đề sai', async () => {
+    batCoMayChuMoi()
+    gaMang(() => ({ ...CA_CO_BAN, boTheoEm: { bo: { '99999': ['q1'] } } }))
+    const { vaoThi } = await import('../src/lib/exam-api')
+    const kq = await vaoThi(URL_CU, 'ca1', '10001', 'tb', false)
+    expect(kq.ok).toBe(false)
+    if (!kq.ok) expect(kq.lyDo).toBe('thieu_bo_cau')
+  })
+
+  it('bộ câu của em RỖNG cũng tính là thiếu ⇒ TỪ CHỐI hẳn', async () => {
+    batCoMayChuMoi()
+    gaMang(() => ({ ...CA_CO_BAN, boTheoEm: { bo: { '10001': [] } } }))
+    const { vaoThi } = await import('../src/lib/exam-api')
+    const kq = await vaoThi(URL_CU, 'ca1', '10001', 'tb', false)
+    expect(kq.ok).toBe(false)
+    if (!kq.ok) expect(kq.lyDo).toBe('thieu_bo_cau')
+  })
+
+  it('CÔNG BỐ KHI CẢ LỚP NỘP XONG ⇒ VẪN đi đường nhanh — cổng ấy nay nằm ở D1', async () => {
+    // LUẬT CŨ: chế độ này phải đi đường cũ, vì cổng công bố đếm số em đang làm
+    // từ bảng bên Apps Script, mà lượt vào thi trên máy chủ mới không ghi sang
+    // đó ⇒ đếm ra 0 và đáp án bung ra giữa giờ.
+    //
+    // LUẬT MỚI: `ketQuaCuaEm` đếm thẳng bảng `luot` trong D1 — đúng nơi lượt vào
+    // thi được ghi. Bỏ cuộc ở đây chính là lỗi ca Test6: ca lành mà em không vào
+    // được. Phép kiểm này canh để không ai nối lại chốt cũ.
     batCoMayChuMoi()
     let chamCu = 0
     gaMang((u) => {
-      if (u.includes('omr.example') && !u.includes('/goi')) return { ...CA_CO_BAN, boTheoEm: { bo: { '99999': ['q1'] } } }
-      chamCu += 1
-      return { ok: true, cach: 'moi', lop: '12', thoiGianPhut: 45, lanThu: 1, vaoLuc: 'a', hetGioLuc: 'b' }
+      if (u.includes('script.example') || u.includes('/goi')) {
+        chamCu += 1
+        return { ok: true, cach: 'moi', lop: '12', thoiGianPhut: 45, lanThu: 1, vaoLuc: 'a', hetGioLuc: 'b' }
+      }
+      return { ...CA_CO_BAN, congBo: 'ca_lop_xong' }
     })
     const { vaoThi } = await import('../src/lib/exam-api')
     const kq = await vaoThi(URL_CU, 'ca1', '10001', 'tb', false)
     expect(kq.ok).toBe(true)
-    expect(chamCu).toBeGreaterThan(0)
-  })
-
-  it('bộ câu của em RỖNG cũng tính là thiếu ⇒ cổng /goi', async () => {
-    batCoMayChuMoi()
-    let chamCu = 0
-    gaMang((u) => {
-      if (u.includes('omr.example') && !u.includes('/goi')) return { ...CA_CO_BAN, boTheoEm: { bo: { '10001': [] } } }
-      chamCu += 1
-      return { ok: true, cach: 'moi', lop: '12', thoiGianPhut: 45, lanThu: 1, vaoLuc: 'a', hetGioLuc: 'b' }
-    })
-    const { vaoThi } = await import('../src/lib/exam-api')
-    await vaoThi(URL_CU, 'ca1', '10001', 'tb', false)
-    expect(chamCu).toBeGreaterThan(0)
-  })
-
-  it('CÔNG BỐ KHI CẢ LỚP NỘP XONG ⇒ cổng /goi, kẻo đáp án bung ra giữa giờ', async () => {
-    // Cổng công bố của chế độ này đếm số em đang làm từ bảng bên Apps Script.
-    // Ca chạy máy chủ mới thì lượt VÀO THI không tạo dòng bên ấy, nên số ấy đếm
-    // ra 0 và điểm công bố cho cả lớp khi cả lớp còn đang làm.
-    batCoMayChuMoi()
-    let chamCu = 0
-    gaMang((u) => {
-      if (u.includes('omr.example') && !u.includes('/goi')) return { ...CA_CO_BAN, congBo: 'ca_lop_xong' }
-      chamCu += 1
-      return { ok: true, cach: 'moi', lop: '12', thoiGianPhut: 45, lanThu: 1, vaoLuc: 'a', hetGioLuc: 'b' }
-    })
-    const { vaoThi } = await import('../src/lib/exam-api')
-    const kq = await vaoThi(URL_CU, 'ca1', '10001', 'tb', false)
-    expect(kq.ok).toBe(true)
-    expect(chamCu).toBeGreaterThan(0)
+    if (kq.ok && kq.cach !== 'cho') expect(kq.congBo).toBe('ca_lop_xong')
+    expect(chamCu).toBe(0)
   })
 
   it('công bố NGAY hoặc KHÔNG ⇒ vẫn đi đường nhanh', async () => {

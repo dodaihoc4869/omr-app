@@ -13,7 +13,6 @@ import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
 import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi, xongNapDiaChi } from './may-chu-moi'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
 import { chamDiemMoi, chiTietCaMoi, danhSachEmMoi, dayCaMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, ghiLenBangMoi, luotCuaCaMoi, napDayDuCaMoi, suaCaMoi, tienDoEmMoi, type OSuaCa } from './day-ca-may-chu-moi'
-import { daBatDauTheoDuongCu, ghiNhoDaBatDauDuongCu, nenDoiChieu } from './doi-chieu-phong-cho'
 import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu } from './man-ca-may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
 
@@ -322,24 +321,21 @@ export interface TrangThaiPhongCho {
  * chờ và hỏi vài giây một lần. Ca bị thầy huỷ giữa lúc chờ thì ném lỗi để màn
  * chờ nói thẳng, đừng để em đứng mãi. */
 export async function trangThaiPhongCho(scriptUrl: string, maCa: string): Promise<TrangThaiPhongCho> {
-  // MÁY CHỦ MỚI TRƯỚC. Cả lớp đứng chờ và hỏi lại mỗi ba giây — đây là nhịp dày
-  // nhất của cả ca. Máy chủ mới không trả lời được thì rơi về Apps Script ngay
-  // trong chính lượt này, em không thấy gì khác ngoài việc chậm hơn một nhịp.
+  // MỘT LƯỢT HỎI, KHÔNG ĐỐI CHIẾU. Cả lớp đứng chờ và hỏi lại mỗi ba giây —
+  // đây là nhịp dày nhất của cả ca.
+  //
+  // Bản trước hỏi máy chủ mới rồi hỏi LẠI đường cũ để đối chiếu, vì hai nơi giữ
+  // hai bản mốc bắt đầu khác nhau. Nay chỉ còn MỘT nơi giữ mốc ấy (bảng `ca`
+  // trong D1), nên đối chiếu là gọi đúng một máy chủ hai lần cho cùng một câu
+  // trả lời — nhân đôi tải đúng vào lúc đông người nhất.
   const chMoi = await layCauHinhMayChu()
   const rMoi = await phongChoMoi(chMoi, maCa)
-  // ĐÃ BẮT ĐẦU ⇒ tin ngay, không đối chiếu. Tin tốt thì không cần kiểm lại.
-  if (rMoi?.batDau) return rMoi
-  // CHƯA BẮT ĐẦU ⇒ chỉ tin trong một nhịp. Lượt đẩy mốc bắt đầu sang máy chủ
-  // mới có thể đã trượt, và khi ấy tin nó là để cả lớp đứng chờ vĩnh viễn.
-  // Xem `src/lib/doi-chieu-phong-cho.ts`.
-  if (rMoi && !nenDoiChieu(maCa)) return rMoi
+  if (rMoi) return rMoi
 
+  // Không gọi được đường nhanh (mạng chớp) ⇒ hỏi lại qua cổng `/goi` của CHÍNH
+  // máy chủ ấy. Cùng một bảng, chỉ khác cửa vào.
   const r = await postJson(scriptUrl, { action: 'trangThaiPhongCho', maCa })
   if (!r.ok) throw new Error(r.error || 'Không hỏi được trạng thái ca')
-  // ĐƯỜNG CŨ BẢO ĐÃ BẮT ĐẦU MÀ MÁY CHỦ MỚI BẢO CHƯA: máy chủ mới thiếu mốc bắt
-  // đầu. Nhớ lại, để `vaoThi` của ca này đi thẳng đường cũ thay vì bị đẩy về
-  // phòng chờ lần nữa.
-  if (r.batDau === true) ghiNhoDaBatDauDuongCu(maCa)
   return {
     phongCho: r.phongCho === true,
     batDau: r.batDau === true,
@@ -480,94 +476,112 @@ export async function batDauThi(
   }
 }
 
-/** VÀO THI QUA MÁY CHỦ MỚI — dịch câu trả lời của Worker sang đúng dáng
- * `KetQuaVaoThi` mà toàn bộ màn làm bài đang đọc.
+/** VÀO THI — MỘT ĐƯỜNG DUY NHẤT: MÁY CHỦ MỚI.
  *
- * TRẢ `null` NGHĨA LÀ "ĐI ĐƯỜNG CŨ". Mọi chỗ không chắc đều trả `null`, vì một
- * lượt chậm hơn thì em chỉ chờ thêm hai giây, còn một lượt SAI ĐỀ thì điểm của
- * em sai mà không ai thấy.
+ * Trước 12/09 mọi chỗ "không chắc" trong hàm này trả `null` để lượt ấy rơi về
+ * Apps Script. Google đã bị gỡ, nên `null` không còn dẫn đi đâu cả: nó rơi vào
+ * `/goi` của chính máy chủ này, mà `/goi` trả `deUrl` chứ KHÔNG trả gói đề —
+ * màn thi thấy `bank` rỗng rồi ném "Máy chủ chưa gửi đề — bấm Vào thi lại".
  *
- * CHỖ NGUY HIỂM NHẤT, và vì sao nó được canh riêng: ca ĐỀ RIÊNG. Máy em cắt đề
- * theo `boCuaEm`; máy thầy chấm theo bản đồ trên máy chủ. Hai bên lệch nhau là
- * điểm sai LẶNG LẼ — đúng lỗi đã làm em 12124 tụt từ 5,69 xuống 2,56 hôm 10/09.
- * Nên: ca có bản đồ mà bản đồ KHÔNG có phần của chính em này ⇒ trả `null`, đi
- * đường cũ, chấp nhận chậm. */
+ * Đúng lỗi ca Test6 (455713) tối 11/09: ca lành, R2 có `de/455713.json`, bản đồ
+ * đề riêng có đủ em 12121212 — em vẫn không vào được, chỉ vì ca đặt công bố
+ * `ca_lop_xong` và dòng bỏ cuộc cũ bắt nó "đi đường cũ".
+ *
+ * LUẬT TỪ NAY: mọi nhánh phải kết thúc bằng một câu trả lời thật — cho vào, từ
+ * chối có lý do, hoặc ném lỗi nói rõ em phải làm gì. CẤM trả `null`. */
 async function vaoThiQuaMayChuMoi(
+  scriptUrl: string,
   maCa: string,
   sbd: string,
   idThietBi: string,
   canBank: boolean,
-): Promise<KetQuaVaoThi | null> {
+  danhTinh: DanhTinhVaoThi,
+): Promise<KetQuaVaoThi> {
   // Em bấm Vào thi ngay khi app vừa mở: chờ lượt nạp địa chỉ xong rồi hãy đọc
-  // cấu hình, nếu không lượt vào thi đầu tiên rơi về Apps Script oan.
+  // cấu hình, nếu không lượt đầu tiên đọc phải một cấu hình rỗng.
   await xongNapDiaChi()
-  const ch = await layCauHinhMayChu()
-  if (!ch.BAT) return null
-  const r = await vaoThiMoi(ch, maCa, sbd, idThietBi, canBank)
-  if (!r) return null
+  const goc = await layCauHinhMayChu()
+  // MỘT LUẬT ĐỊA CHỈ CHO CẢ APP, đúng như `postJson`: lấy từ cấu hình; cấu hình
+  // còn trống thì dùng địa chỉ chỗ gọi truyền vào, MIỄN LÀ nó không trỏ về
+  // Google. Nhờ vậy máy em vừa mở app, cấu hình chưa kịp nạp, vẫn vào thi được.
+  const duPhong = laMayChuThat(scriptUrl) ? scriptUrl.trim().replace(/\/+$/, '') : ''
+  const diaChi = String(goc.URL ?? '').trim() || duPhong
+  if (!diaChi) {
+    throw new Error('Máy này chưa có địa chỉ máy chủ — mở đúng link Thầy gửi, hoặc báo Thầy.')
+  }
+  const ch = { ...goc, BAT: true, URL: diaChi }
 
+  const r = await vaoThiMoi(ch, maCa, sbd, idThietBi, danhTinh)
+  if (!r) throw new Error('Không kết nối được máy chủ — kiểm tra mạng rồi bấm Vào thi lại.')
+
+  // MÁY CHỦ TỪ CHỐI CÓ LÝ DO RÕ ⇒ đây là câu trả lời, không phải sự cố. Chuyển
+  // nguyên ba mốc giờ để `thongDiepChan` nói được "đã nộp lúc…", "bắt đầu
+  // lúc…", "hết hạn vào lúc…" thay vì một câu cụt.
   if (!r.ok) {
-    // Máy chủ mới TỪ CHỐI có lý do rõ ⇒ tin và báo cho em. Đây là câu trả lời,
-    // không phải sự cố.
-    return { ok: false, lyDo: (r.lyDo ?? 'thieu') as never, lanThu: r.lanThu }
+    return {
+      ok: false,
+      lyDo: (r.lyDo ?? 'thieu') as LyDoChan,
+      lanThu: r.lanThu,
+      nopLuc: r.nopLuc,
+      batDau: r.batDau,
+      hetHanVao: r.hetHanVao,
+      namSinh: r.namSinh,
+    }
   }
 
-  if (r.cach === undefined) return null
-
-  // CHẾ ĐỘ "CÔNG BỐ KHI CẢ LỚP NỘP XONG" ⇒ ĐI ĐƯỜNG CŨ, có chủ đích.
-  //
-  // Cổng công bố của chế độ này đếm `daVao` và `conDangLam` từ bảng bên Apps
-  // Script. Ca chạy trên máy chủ mới thì lượt VÀO THI không tạo dòng bên ấy
-  // (chỉ lượt NỘP mới ghi cả hai nơi), nên `conDangLam` đếm ra 0 khi cả lớp còn
-  // đang làm — và điểm công bố cho cả lớp giữa giờ.
-  //
-  // Đây đúng loại hỏng tệ nhất: không có lỗi nào hiện ra, chỉ là đáp án bung ra
-  // sớm. Chưa nối xong đường đếm bên máy chủ mới thì ca kiểu này đi đường cũ.
-  if ((r.congBo ?? 'khong') === 'ca_lop_xong') return null
-
-  // PHÒNG CHỜ. Thầy chưa bấm Bắt đầu: chưa có lượt, chưa có đề, đồng hồ chưa
-  // chạy cho ai. Dáng trả về KHÁC HẲN nhánh vào thi thật — thiếu nhánh này thì
-  // màn chờ nhận một gói có `lanThu` và `hetGioLuc` rỗng rồi dựng đề từ hư
-  // không.
+  // PHÒNG CHỜ. Em qua hết cổng nhưng Thầy chưa bấm "Bắt đầu thi": máy chủ chưa
+  // tạo lượt và chưa gửi đề. Dáng trả về KHÁC HẲN nhánh vào thi thật — thiếu
+  // nhánh này thì màn chờ nhận một gói `hetGioLuc` rỗng rồi dựng đề từ hư không.
   if ((r.cach as string) === 'cho') {
-    // ĐƯỜNG CŨ ĐÃ XÁC NHẬN CA BẮT ĐẦU ⇒ máy chủ mới đang thiếu mốc bắt đầu.
-    // Trả dáng 'cho' lúc này là đẩy em về phòng chờ một lần nữa, đúng cái vòng
-    // treo mà `doi-chieu-phong-cho.ts` sinh ra để cắt.
-    if (daBatDauTheoDuongCu(maCa)) return null
     return {
       ok: true,
       cach: 'cho',
-      lop: String((r as { lop?: string }).lop ?? ''),
+      lop: String(r.lop ?? ''),
       thoiGianPhut: Number(r.thoiGianPhut) || 45,
       congBo: (r.congBo ?? 'khong') as CongBoDiem,
       tenCa: String(r.tenCa ?? ''),
     }
   }
+  // Máy chủ nói "được vào" mà không nói vào bằng cách nào: dáng trả lời hỏng.
+  // Không đoán, vì đoán sai ở đây là em làm bài trên một lượt không tồn tại.
+  if (!r.cach) throw new Error('Máy chủ trả lời thiếu trường "cách vào" — báo Thầy.')
 
   const goi = (r.boTheoEm ?? null) as { bo?: Record<string, string[]>; lap?: Record<string, string[]>; dem?: Record<string, Record<string, number>> } | null
   const coBanDo = !!goi && !!goi.bo && Object.keys(goi.bo).length > 0
   const boEm = coBanDo ? goi!.bo![sbd] : undefined
-  // CA ĐỀ RIÊNG MÀ THIẾU PHẦN CỦA EM ⇒ đi đường cũ. Xem ghi chú trên.
-  if (coBanDo && (!Array.isArray(boEm) || boEm.length === 0)) return null
+  // CA ĐỀ RIÊNG MÀ BẢN ĐỒ THIẾU PHẦN CỦA EM ⇒ TỪ CHỐI HẲN, không phát đề.
+  //
+  // Máy em cắt đề theo luật hash còn máy Thầy chấm theo bản đồ ⇒ điểm sai LẶNG
+  // LẼ: em 12124 tụt từ 5,69 xuống 2,56 hôm 10/09 vì đúng chỗ này. Thà em
+  // không vào được và gọi Thầy, còn hơn làm xong rồi nhận điểm sai.
+  if (coBanDo && (!Array.isArray(boEm) || boEm.length === 0)) {
+    return { ok: false, lyDo: 'thieu_bo_cau' }
+  }
 
-  // GÓI ĐỀ. Em chưa có bản trên máy mà máy chủ mới không đưa được ⇒ đường cũ.
+  // GÓI ĐỀ. Gói nằm ở R2 sau bộ đệm biên, máy chủ chỉ đưa đường dẫn. Hỏng ở
+  // đâu thì nói đúng chỗ đó — cả ba câu dưới đều nêu việc em phải làm.
   let bank: PublicExamBank | undefined
   if (canBank) {
-    if (!r.deUrl) return null
+    if (!r.deUrl) throw new Error('Ca này chưa được phát đề — báo Thầy bấm lại "Bắt đầu thi".')
+    let res: Response
     try {
-      const res = await fetch(`${ch.URL}${r.deUrl}`)
-      if (!res.ok) return null
+      res = await fetch(`${ch.URL}${r.deUrl}`)
+    } catch {
+      throw new Error('Không tải được đề — kiểm tra mạng rồi bấm Vào thi lại.')
+    }
+    if (!res.ok) throw new Error(`Không tải được đề (máy chủ trả ${res.status}) — bấm Vào thi lại, vẫn lỗi thì báo Thầy.`)
+    try {
       bank = (await res.json()) as PublicExamBank
     } catch {
-      return null
+      throw new Error('Gói đề tải về bị hỏng — báo Thầy đẩy lại đề cho ca này.')
     }
-    if (!bank) return null
+    if (!bank) throw new Error('Gói đề rỗng — báo Thầy đẩy lại đề cho ca này.')
   }
 
   return {
     ok: true,
     cach: r.cach,
-    lop: String((r as { lop?: string }).lop ?? ''),
+    lop: String(r.lop ?? ''),
     thoiGianPhut: Number(r.thoiGianPhut) || 45,
     congBo: (r.congBo ?? 'khong') as CongBoDiem,
     lanThu: Number(r.lanThu) || 1,
@@ -578,8 +592,8 @@ async function vaoThiQuaMayChuMoi(
     loai: r.loai === 'baitap' ? 'baitap' : 'thi',
     hanNop: String(r.hanNop ?? ''),
     tenCa: String(r.tenCa ?? ''),
-    giuDeDoc: (r as { giuDeDoc?: boolean }).giuDeDoc === true,
-    anHanGiay: Number((r as { anHanGiay?: number }).anHanGiay) || 0,
+    giuDeDoc: r.giuDeDoc === true,
+    anHanGiay: Number(r.anHanGiay) || 0,
     daMoKhoa: false,
     bank,
     cauLap: cauLapCuaEm(goi?.lap?.[sbd]),
@@ -588,6 +602,7 @@ async function vaoThiQuaMayChuMoi(
   }
 }
 
+/** VÀO THI. Một đường duy nhất, không còn đường lùi. */
 export async function vaoThi(
   scriptUrl: string,
   maCa: string,
@@ -596,49 +611,7 @@ export async function vaoThi(
   canBank: boolean,
   danhTinh: DanhTinhVaoThi = { hoTen: '', namSinh: '' },
 ): Promise<KetQuaVaoThi> {
-  // ── MÁY CHỦ MỚI TRƯỚC ────────────────────────────────────────────────────
-  //
-  // Đây là lệnh MỞ KHOÁ cho cả đường nóng: `luu-tam` và `nop` chỉ cập nhật dòng
-  // lượt do `/vao-thi` tạo ra, nên vào thi còn ở Apps Script thì hai lệnh kia
-  // nằm im và mọi thứ lùi về đường cũ.
-  //
-  // MỌI trục trặc trả `null` ⇒ rơi xuống đúng đường Apps Script bên dưới, cho
-  // ĐÚNG lượt đó. Em không bao giờ kẹt vì máy chủ mới.
-  try {
-    const kqMoi = await vaoThiQuaMayChuMoi(maCa, sbd, idThietBi, canBank)
-    if (kqMoi) return kqMoi
-  } catch {
-    // rơi xuống đường cũ
-  }
-
-  // THỬ LẠI ĐƯỢC (T5): máy chủ đã có khoá — gửi lại chỉ trả về đúng lượt đang
-  // có (`cach: 'khoi_phuc'`), không bao giờ tạo lượt thứ hai cho cùng một em.
-  const r = await postCoThuLai(scriptUrl, { action: 'vaoThi', maCa, sbd, idThietBi, canBank, hoTen: danhTinh.hoTen, namSinh: danhTinh.namSinh, xacNhanTen: danhTinh.xacNhanTen === true }, HAN_GIAY_DONG_NGUOI)
-  if (r.ok) {
-    return {
-      ok: true,
-      cach: r.cach,
-      lop: String(r.lop ?? ''),
-      thoiGianPhut: Number(r.thoiGianPhut) || 45,
-      congBo: r.congBo ?? 'khong',
-      lanThu: Number(r.lanThu) || 1,
-      vaoLuc: String(r.vaoLuc),
-      hetGioLuc: String(r.hetGioLuc),
-      nguongLan: Number(r.nguongLan) || 3,
-      nguongGiay: Number(r.nguongGiay) || 10,
-      loai: r.loai === 'baitap' ? 'baitap' : 'thi',
-      hanNop: String(r.hanNop ?? ''),
-      tenCa: String(r.tenCa ?? ''),
-      giuDeDoc: r.giuDeDoc === true,
-      anHanGiay: Number(r.anHanGiay) || 0,
-      daMoKhoa: r.daMoKhoa === true,
-      bank: r.bank ?? undefined,
-      cauLap: cauLapCuaEm(r.cauLap),
-      boCuaEm: cauLapCuaEm(r.boCuaEm),
-      demLap: demLapCuaEm(r.demLap, cauLapCuaEm(r.cauLap)),
-    }
-  }
-  return { ok: false, lyDo: r.lyDo ?? 'thieu', nopLuc: r.nopLuc, lanThu: r.lanThu, batDau: r.batDau, hetHanVao: r.hetHanVao, namSinh: r.namSinh, error: r.error }
+  return vaoThiQuaMayChuMoi(scriptUrl, maCa, sbd, idThietBi, canBank, danhTinh)
 }
 
 /** Thông điệp cho học sinh khi bị chặn — nêu rõ lý do + việc cần làm, không vòng vo. */

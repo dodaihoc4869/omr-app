@@ -66,7 +66,10 @@ describe('MÁY CHỦ: lệnh vaoThi gửi bản đồ đề riêng kèm đề', 
 
 describe('MÁY EM: ghép bản đồ vào kho TRƯỚC KHI cắt đề', () => {
   it('lệnh vaoThi đọc trường boCuaEm', () => {
-    expect(API).toContain('boCuaEm: cauLapCuaEm(r.boCuaEm)')
+    // 12/09: nhánh Apps Script đã bị gỡ, nên bộ câu không còn được máy chủ cũ
+    // gửi kèm nữa. Máy em tự cắt ra từ bản đồ `boTheoEm` của chính em.
+    expect(API).toContain('boCuaEm: cauLapCuaEm(boEm)')
+    expect(API).toContain("const boEm = coBanDo ? goi!.bo![sbd] : undefined")
   })
 
   it('màn thi ghép bản đồ vào kho, kể cả kho đã cất sẵn trên máy', () => {

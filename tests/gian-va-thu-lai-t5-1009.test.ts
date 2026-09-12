@@ -159,13 +159,30 @@ describe('② THỬ LẠI CHẠY THẬT', () => {
 })
 
 describe('③ RÀNG BUỘC AN TOÀN — cấm thử lại lệnh ghi chưa có khoá chống trùng', () => {
-  it('CHỈ ba lệnh được dùng `postCoThuLai`, đúng ba lệnh có khoá', () => {
-    const duocPhep = ['vaoThi', 'submit', 'luuTam']
+  it('CHỈ hai lệnh còn dùng `postCoThuLai`, và cả hai đều có khoá chống trùng', () => {
+    // 12/09: `vaoThi` rời khỏi danh sách này — nó không đi qua cổng `/goi` nữa
+    // mà gọi thẳng `/vao-thi`, nên lượt thử lại của nó do `nhipNong` lo (xem
+    // phép kiểm ngay dưới). Luật KHÔNG đổi: chỉ lệnh có khoá chống trùng mới
+    // được thử lại.
+    const duocPhep = ['submit', 'luuTam']
     const dungO: string[] = []
     const re = /postCoThuLai\(scriptUrl, \{ action: '(\w+)'/g
     let m: RegExpExecArray | null
     while ((m = re.exec(API)) !== null) dungO.push(m[1])
     expect(dungO.sort()).toEqual([...duocPhep].sort())
+  })
+
+  it('`vaoThi` vẫn được thử lại — qua nhịp nóng, vì khoá lượt nằm ở máy chủ', () => {
+    // Khoá chống trùng của vào thi là `maCa|sbd|lanThu` trong bảng `luot`: gửi
+    // lại chỉ trả về đúng lượt đang có, không đẻ lượt thứ hai. Nên thử lại an toàn.
+    const MC = fs.readFileSync(path.join(process.cwd(), 'src/lib/may-chu-moi.ts'), 'utf8')
+    const i = MC.indexOf("'/vao-thi'")
+    expect(i).toBeGreaterThan(0)
+    expect(MC.slice(i, i + 600)).toContain('nhipNong(ch)')
+    expect(MC.slice(MC.indexOf('export function nhipNong('), MC.indexOf('export function nhipNong(') + 220))
+      .toContain('soLan: Math.max(1, ch.SO_LAN_THU)')
+    const SRV = fs.readFileSync(path.join(process.cwd(), 'server/src/index.ts'), 'utf8')
+    expect(SRV).toContain('ON CONFLICT(khoa) DO UPDATE SET')
   })
 
   it('máy chủ THẬT SỰ có khoá chống trùng cho `submit` — nếu không, ③ chỉ là lời hứa', () => {
@@ -176,10 +193,13 @@ describe('③ RÀNG BUỘC AN TOÀN — cấm thử lại lệnh ghi chưa có k
     expect(GS).toContain("'KhoaNop'")
   })
 
-  it('hạn chờ 30 giây CHỈ cho `vaoThi` và `submit`, phần còn lại giữ 25', () => {
+  it('hạn chờ 30 giây nay CHỈ còn cho `submit` — vào thi đi hạn nóng 3 giây', () => {
+    // Vào thi rời sang đường `/vao-thi` với hạn nóng 3 giây × 3 lượt. Ngắn hơn
+    // 30 giây rất nhiều, mà không yếu đi: 30 giây kia sinh ra để chờ Apps
+    // Script xếp hàng một luồng, còn D1 trả lời trong khoảng 120 ms.
     expect(API).toContain('const HAN_GIAY_DONG_NGUOI = 30')
     expect(API).toContain('const HAN_GIAY = 25')
     const soLan = (API.match(/HAN_GIAY_DONG_NGUOI\)/g) || []).length
-    expect(soLan).toBe(2)
+    expect(soLan).toBe(1)
   })
 })

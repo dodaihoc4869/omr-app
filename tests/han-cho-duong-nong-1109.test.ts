@@ -27,13 +27,21 @@ describe('NHỊP ĐƯỜNG NÓNG', () => {
     expect(MAC_DINH_MAY_CHU.HAN_GIAY).toBe(10)
   })
 
-  it('CÒN đường lùi ⇒ thử ĐÚNG MỘT lần: Apps Script chính là lượt thử lại', () => {
-    expect(nhipNong(chuanHoaMayChu({ BAT: true, URL: 'https://x', LUI_VE_APPS_SCRIPT: true })).soLan).toBe(1)
+  // 12/09: KHÔNG CÒN ĐƯỜNG LÙI. Luật cũ cho thử đúng một lần vì "Apps Script
+  // chính là lượt thử lại"; nay lượt ấy không tồn tại, nên một nhịp mạng chập
+  // của điện thoại em là hỏng hẳn giữa giờ thi. Phải thử lại.
+  it('đường nóng thử lại đủ SO_LAN_THU lần — không còn gì đỡ phía sau', () => {
+    expect(nhipNong(chuanHoaMayChu({ BAT: true, URL: 'https://x', SO_LAN_THU: 3 })).soLan).toBe(3)
   })
 
-  it('thầy TẮT đường lùi ⇒ mới được thử lại, vì lúc đó không còn gì đỡ', () => {
-    const ch = chuanHoaMayChu({ BAT: true, URL: 'https://x', LUI_VE_APPS_SCRIPT: false, SO_LAN_THU: 3 })
-    expect(nhipNong(ch).soLan).toBe(3)
+  it('cờ LUI_VE_APPS_SCRIPT không còn ảnh hưởng tới nhịp', () => {
+    const bat = chuanHoaMayChu({ BAT: true, URL: 'https://x', SO_LAN_THU: 3, LUI_VE_APPS_SCRIPT: true })
+    const tat = chuanHoaMayChu({ BAT: true, URL: 'https://x', SO_LAN_THU: 3, LUI_VE_APPS_SCRIPT: false })
+    expect(nhipNong(bat).soLan).toBe(nhipNong(tat).soLan)
+  })
+
+  it('thầy đặt số lần thử thì nhịp đi theo, không gõ cứng', () => {
+    expect(nhipNong(chuanHoaMayChu({ BAT: true, URL: 'https://x', SO_LAN_THU: 5 })).soLan).toBe(5)
   })
 
   it('thầy nới hạn nóng thì nhịp đi theo, không hard-code', () => {
@@ -41,7 +49,18 @@ describe('NHỊP ĐƯỜNG NÓNG', () => {
   })
 })
 
-describe('ĐO THỜI GIAN THẬT TỚI LÚC ĐƯỜNG LÙI ĐƯỢC CHẠY', () => {
+// ĐO THỜI GIAN THẬT EM PHẢI CHỜ TRƯỚC KHI ĐƯỢC BÁO HỎNG.
+//
+// Đích cũ là 3,5 giây, vì sau 3,5 giây ấy Apps Script gánh tiếp — em không hỏng,
+// chỉ chậm. Apps Script đã bị gỡ 12/09, nên "thời gian tới lúc đường lùi chạy"
+// không còn là đại lượng có thật. Đại lượng thật bây giờ là: em ngồi chờ bao lâu
+// trước khi màn hình nói "không kết nối được".
+//
+// Đích mới ≤ 12 giây, và đây KHÔNG phải hạ đích cho vừa số đo: ba lượt thử là
+// thứ thay chỗ cho đường lùi đã mất. Thử một lần rồi báo hỏng sau 3 giây thì
+// nhanh hơn thật, nhưng một nhịp mạng chập của điện thoại em giữa giờ thi là
+// hỏng hẳn — đổi 8 giây lấy việc đó là đúng.
+describe('ĐO THỜI GIAN THẬT EM CHỜ TRƯỚC KHI ĐƯỢC BÁO HỎNG', () => {
   /** Worker "chết lặng": không trả lời, không từ chối — ca tệ nhất, vì chỉ có
    * hạn chờ mới cắt được. Tôn trọng AbortSignal đúng như `fetch` thật. */
   function workerCamNhu() {
@@ -52,28 +71,37 @@ describe('ĐO THỜI GIAN THẬT TỚI LÚC ĐƯỜNG LÙI ĐƯỢC CHẠY', () 
     )
   }
 
-  it('ĐÍCH: ≤ 3,5 giây (bản cũ ≈ 32 giây)', async () => {
-    workerCamNhu()
+  it('ĐÍCH: ≤ 12 giây, và phải THỬ ĐỦ BA LƯỢT chứ không bỏ cuộc sau lượt đầu', async () => {
+    let soLuot = 0
+    vi.stubGlobal('fetch', (_u: string, init: RequestInit) => {
+      soLuot += 1
+      return new Promise((_res, rej) => {
+        init.signal?.addEventListener('abort', () => rej(new DOMException('aborted', 'AbortError')))
+      })
+    })
     const t0 = Date.now()
     const r = await goiWorker(CH, '/nop', {}, nhipNong(CH))
     const giay = (Date.now() - t0) / 1000
     // eslint-disable-next-line no-console
-    console.log(`[hạn nóng] Worker chết lặng · đường lùi chạy sau ${giay.toFixed(2)}s`)
-    expect(r).toBeNull() // null = "đi đường cũ"
-    expect(giay).toBeLessThanOrEqual(3.5)
-  }, 15000)
+    console.log(`[hạn nóng] Worker chết lặng · ${soLuot} lượt thử · báo hỏng sau ${giay.toFixed(2)}s`)
+    expect(r).toBeNull()
+    // BA lượt: đây mới là thứ thay chỗ cho đường lùi đã mất. Một lượt là hỏng
+    // hẳn vì một nhịp chập; đó chính là điều phép kiểm này canh.
+    expect(soLuot).toBe(3)
+    expect(giay).toBeLessThanOrEqual(12)
+    // và vẫn phải ngắn hơn hẳn 32 giây của bản đợt 3.
+    expect(giay).toBeLessThan(32)
+  }, 20000)
 
-  it('BẢN CŨ nếu ai đó gỡ nhịp nóng ra: chờ hơn 9 giây — phép kiểm này canh điều đó', async () => {
+  it('KHÔNG kèm nhịp nóng thì rơi về hạn thường — canh để không ai gỡ nhịp nóng ra', async () => {
     workerCamNhu()
     const t0 = Date.now()
-    // Cố tình gọi KHÔNG kèm nhịp nóng ⇒ rơi về hạn 10 giây, 3 lần.
-    const p = goiWorker(chuanHoaMayChu({ BAT: true, URL: 'https://x', HAN_GIAY: 3, SO_LAN_THU: 3 }), '/nop', {})
-    const r = await p
+    const r = await goiWorker(chuanHoaMayChu({ BAT: true, URL: 'https://x', HAN_GIAY: 6, SO_LAN_THU: 3 }), '/nop', {})
     const giay = (Date.now() - t0) / 1000
     expect(r).toBeNull()
-    // Ba lần × 3 giây + hai lần nghỉ ⇒ chắc chắn hơn 9 giây.
-    expect(giay).toBeGreaterThan(9)
-  }, 30000)
+    // Hạn thường 6 giây × 3 lượt ⇒ chắc chắn dài hơn hẳn nhịp nóng.
+    expect(giay).toBeGreaterThan(12)
+  }, 40000)
 })
 
 describe('MÃ NGUỒN — BỐN LỆNH NÓNG đều phải đi nhịp nóng', () => {
@@ -87,7 +115,7 @@ describe('MÃ NGUỒN — BỐN LỆNH NÓNG đều phải đi nhịp nóng', ()
       const j = s.indexOf(duong)
       expect(j, duong).toBeGreaterThan(0)
       // Từ chỗ nêu đường tới hết lượt gọi phải thấy `nhipNong(ch)`.
-      expect(s.slice(j, j + 400), duong).toContain('nhipNong(ch)')
+      expect(s.slice(j, j + 900), duong).toContain('nhipNong(ch)')
     }
   })
 

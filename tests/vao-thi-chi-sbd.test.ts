@@ -68,13 +68,14 @@ describe('tenTheoSbd — lệnh tra tên', () => {
 describe('vaoThi — cờ xác nhận bằng mắt', () => {
   it('gửi kèm xacNhanTen', async () => {
     const goi = gia({ ok: true, cach: 'moi', lop: '10', thoiGianPhut: 45, congBo: 'khong', lanThu: 1 })
-    await vaoThi('https://x', '371304', '10038', 'may-A', true, { hoTen: 'Triệu Đức Duy', namSinh: '', xacNhanTen: true })
+    // canBank=false: phép kiểm này soi GÓI GỬI ĐI, không soi đường tải đề.
+    await vaoThi('https://x', '371304', '10038', 'may-A', false, { hoTen: 'Triệu Đức Duy', namSinh: '', xacNhanTen: true })
     expect(JSON.parse((goi.mock.calls[0][1] as { body: string }).body).xacNhanTen).toBe(true)
   })
 
   it('không truyền thì mặc định false — luật cũ giữ nguyên cho mọi chỗ gọi khác', async () => {
     const goi = gia({ ok: true, cach: 'moi', lop: '', thoiGianPhut: 45, congBo: 'khong', lanThu: 1 })
-    await vaoThi('https://x', '371304', '10038', 'may-A', true)
+    await vaoThi('https://x', '371304', '10038', 'may-A', false)
     expect(JSON.parse((goi.mock.calls[0][1] as { body: string }).body).xacNhanTen).toBe(false)
   })
 

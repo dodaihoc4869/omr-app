@@ -143,13 +143,21 @@ function ngu(ms: number): Promise<void> {
  * hơn nửa phút — CHẬM HƠN HẲN so với khi chưa có máy chủ mới. Đây đúng là cái
  * bẫy duy nhất khiến việc chuyển máy chủ làm mọi thứ tệ đi.
  *
- * Luật: trên đường nóng, **Apps Script CHÍNH LÀ lượt thử lại**, và nó chắc
- * chắn hơn một lượt thử lại vào đúng cái máy chủ vừa im. Nên còn đường lùi thì
- * thử một lần rồi lùi ngay. Chỉ khi thầy tự tắt đường lùi mới thử lại. */
+ * LUẬT CŨ (11/09): "Apps Script CHÍNH LÀ lượt thử lại" — còn đường lùi thì thử
+ * ĐÚNG MỘT lần rồi lùi ngay, vì thử lại vào đúng cái máy chủ vừa im thì vô ích.
+ *
+ * LUẬT MỚI (12/09): KHÔNG CÒN ĐƯỜNG LÙI. Một lượt thử duy nhất với hạn 3 giây
+ * nghĩa là một nhịp mạng chập của điện thoại em = hỏng hẳn, em đọc "Không kết
+ * nối được máy chủ" giữa giờ thi. Nay phải thử lại đủ `SO_LAN_THU` lần: 3 lượt
+ * × 3 giây + hai nhịp nghỉ ≈ 11 giây trường hợp xấu nhất, vẫn ngắn hơn hẳn 32
+ * giây của bản đợt 3, mà không còn cửa hỏng vì một nhịp chập.
+ *
+ * `LUI_VE_APPS_SCRIPT` giữ trong cấu hình để bản ghi cũ trong IndexedDB đọc
+ * được, nhưng KHÔNG còn ảnh hưởng tới nhịp. */
 export function nhipNong(ch: CauHinhMayChu): { hanGiay: number; soLan: number } {
   return {
     hanGiay: ch.HAN_NONG_GIAY,
-    soLan: ch.LUI_VE_APPS_SCRIPT ? 1 : Math.max(1, ch.SO_LAN_THU),
+    soLan: Math.max(1, ch.SO_LAN_THU),
   }
 }
 
@@ -204,25 +212,51 @@ export interface KetQuaVaoThiMoi {
   soCau?: { I: number; II: number; III: number }
   boTheoEm?: Record<string, string[]>
   deUrl?: string | null
+  lop?: string
+  giuDeDoc?: boolean
+  anHanGiay?: number
+  // Ba mốc giờ của lượt BỊ TỪ CHỐI. Thiếu chúng thì màn của em chỉ hiện câu
+  // cụt "Em đã nộp bài ca này." mà không nói được lúc nào.
+  nopLuc?: string
+  batDau?: string
+  hetHanVao?: string
+  namSinh?: string
 }
 
-/** VÀO THI qua máy chủ mới. `null` ⇒ chỗ gọi đi Apps Script.
+/** VÀO THI qua máy chủ. `null` ⇒ KHÔNG gọi được máy chủ (mạng hỏng, quá hạn).
  *
- * `canBank` = em chưa có gói đề trên máy. Worker chưa có gói đề (`deUrl` rỗng)
- * thì TRẢ NULL — thà chậm còn hơn em vào phòng mà không có đề. */
+ * GỬI CẢ HỌ TÊN VÀ NĂM SINH: máy chủ cần hai trường này để ghi nhật ký chặn
+ * vào. Thiếu chúng thì màn Chi tiết ca của Thầy chỉ thấy một số báo danh trần,
+ * không biết em nào đứng ngoài cửa.
+ *
+ * KHÔNG còn nhánh "thiếu đề thì trả null": trước đây null nghĩa là đi Apps
+ * Script, nay Apps Script không còn nên null chỉ làm mất lý do thật. Chỗ gọi
+ * tự nói rõ thiếu gì. */
 export async function vaoThiMoi(
   ch: CauHinhMayChu,
   maCa: string,
   sbd: string,
   idThietBi: string,
-  canBank: boolean,
+  danhTinh: { hoTen?: string; namSinh?: string; xacNhanTen?: boolean } = {},
 ): Promise<KetQuaVaoThiMoi | null> {
   if (!ch.BAT) return null
   await gianVaoThi(ch)
-  const r = await goiWorker<KetQuaVaoThiMoi>(ch, '/vao-thi', { maCa, sbd, idThietBi }, nhipNong(ch))
-  if (!r) return null
-  if (r.ok && canBank && !r.deUrl) return null
-  return r
+  return goiWorker<KetQuaVaoThiMoi>(
+    ch,
+    '/vao-thi',
+    {
+      maCa,
+      sbd,
+      idThietBi,
+      hoTen: danhTinh.hoTen ?? '',
+      namSinh: danhTinh.namSinh ?? '',
+      // Em đã NHÌN THẤY tên của số báo danh mình gõ rồi mới bấm Bắt đầu (luật
+      // thầy chốt 07/09). Máy chủ hiện không so tên nữa, nhưng cờ vẫn gửi để
+      // nhật ký chặn vào ghi lại được em đã qua bước xác nhận hay chưa.
+      xacNhanTen: danhTinh.xacNhanTen === true,
+    },
+    nhipNong(ch),
+  )
 }
 
 export async function luuTamMoi(

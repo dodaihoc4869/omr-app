@@ -1,3 +1,18 @@
+// ===========================================================================
+// NGUNG CHAY TU 12/09/2026 — TEP NAY KHONG CON LA MAY CHU DANG PHUC VU.
+//
+// App da cat han Google: moi lenh di vao cong `/goi` cua Worker Cloudflare, va
+// `postJson` ben may thay chan cung moi dia chi Google. Khong mot man hinh nao
+// con goi toi day.
+//
+// GIU LAI LAM DOI CHUNG LUAT, khong phai de chay: Worker chep luat vao thi,
+// luat cham diem va luat cong bo diem tu chinh tep nay, va
+// `tests/apps-script-vao-thi.test.ts` van doi chieu hai ben. Xoa tep di la mat
+// cho duy nhat con ghi lai vi sao tung luat lai nhu vay.
+//
+// Ban trien khai tren Google do thay tu dung — xem `claude/XOA-MAY-CHU-SCRIPT.md`.
+// ===========================================================================
+
 // ============================================================================
 // APPS SCRIPT NHẬN BÀI KIỂM TRA — dán file này vào script.google.com
 // ============================================================================
