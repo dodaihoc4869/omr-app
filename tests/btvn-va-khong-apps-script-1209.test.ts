@@ -110,8 +110,13 @@ describe('0% APPS SCRIPT — chốt cứng, không để trôi lại', () => {
 
   it('ngân hàng CÓ đáp án được cất lúc mở ca, sau khoá RIÊNG', () => {
     expect(WK).toContain('`key/${maCa}.json`')
-    // và CHỈ khi ca công bố điểm ngay — không cất sẵn thứ không ai được đọc
-    expect(API).toContain("congBoDiem === 'ngay' ? keyBank : undefined")
+    // LUẬT CŨ: chỉ cất khi ca công bố điểm NGAY — "không cất sẵn thứ không ai
+    // được đọc". Sai ở chỗ CÓ người được đọc: chính em, sau khi đã nộp, qua
+    // link xem điểm. Ca 195422 (`ca_lop_xong`) sáng 12/09 vì thế mất sạch link
+    // xem điểm. Nay LUÔN cất; cổng nằm ở chỗ ĐỌC, không ở chỗ ghi.
+    expect(API).not.toContain("congBoDiem === 'ngay' ? keyBank : undefined")
+    const i = API.indexOf('        bank,\n')
+    expect(API.slice(i, i + 900)).toContain('keyBank,')
   })
 
   it('đáp án KHÔNG BAO GIỜ đi ra đường công khai của học sinh', () => {

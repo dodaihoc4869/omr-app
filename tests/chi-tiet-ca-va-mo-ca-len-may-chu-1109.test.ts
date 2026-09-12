@@ -148,8 +148,12 @@ describe('③ MỞ CA — mốc giờ tính MỘT nơi, và chỉ còn MỘT đ�
     // đổi — `de/` là đường công khai máy em tải, và nó KHÔNG được có đáp án.
     const khoi = HAM.slice(HAM.indexOf('const dayMayChuMoi = (async ()'), HAM.indexOf('KHÔNG CÒN LƯỢT GHI GOOGLE SHEET'))
     expect(khoi).toContain('bank,')
-    // Ngân hàng đáp án chỉ gửi khi ca CÔNG BỐ NGAY, không gửi bừa.
-    expect(khoi).toContain("congBoDiem === 'ngay' ? keyBank : undefined")
+    // 12/09: ngân hàng đáp án LUÔN được gửi. Luật cũ "chỉ gửi khi ca công bố
+    // NGAY" làm ca 195422 (`ca_lop_xong`) không có `key/195422.json`, và link
+    // xem điểm của cả ca báo "Máy chủ chưa gửi đề của ca này". Cổng bảo mật
+    // chuyển hẳn sang chỗ ĐỌC — `phieuCuaEm` chỉ trả cho lượt ĐÃ NỘP của chính
+    // em — chứ không nằm ở chỗ ghi nữa. Dòng dưới canh đúng luật `de/` không
+    // đổi: đường công khai vẫn là bản KHÔNG đáp án.
     // Và bên Worker, hai khoá phải tách hẳn.
     const WK2 = fs.readFileSync(path.join(process.cwd(), 'server/src/index.ts'), 'utf8')
     const layDe = WK2.slice(WK2.indexOf('async function layDe('), WK2.indexOf('async function layDe(') + 700)

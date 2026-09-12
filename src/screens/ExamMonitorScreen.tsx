@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, RefreshCw, Trash2, ArrowLeft, ChevronRight, Images, FileSpreadsheet, FileJson, Lock, Unlock, Send, Pencil, LogIn, BarChart3 } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
-import { batDauThi, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
+import { batDauThi, capNhatKeyBank, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
 import { chuanTenCa, tenHienCua, TEN_CA_TOI_DA } from '../lib/ten-ca'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { emLechDiem, loiBaoLechDiem } from '../lib/lech-diem'
@@ -838,6 +838,19 @@ export default function ExamMonitorScreen() {
       // `boTheoEm` PHẢI đi cùng ở MỌI chỗ dựng bảng chấm: thiếu ở một chỗ là
       // chỗ đó cắt câu theo luật hash và dựng bảng của người khác.
       const keyBank = mergeKeepAnswers(bank, soCauCa, boTheoEmDung)
+
+      // VÁ NGƯỢC KHOÁ `key/<maCa>.json` CHO CA CŨ.
+      //
+      // Trước 12/09, ngân hàng CÓ đáp án chỉ được đẩy lên máy chủ khi ca công
+      // bố NGAY. Ca 195422 sáng 12/09 đặt `ca_lop_xong`, nên máy chủ không có
+      // khoá ấy và LINK XEM ĐIỂM của cả ca báo "Máy chủ chưa gửi đề của ca này".
+      // Ca mở từ nay đã luôn đẩy; còn ca CŨ thì tự lành ở đây — Thầy mở màn
+      // chấm là đẩy lên, vì đúng lúc này máy Thầy vừa dựng xong `keyBank`.
+      //
+      // Lệnh `capNhatKeyBank` chỉ ghi MỘT đối tượng R2, không đụng dòng ca.
+      // Hỏng thì im lặng: việc chính ở đây là dựng phiếu, không được chặn.
+      void capNhatKeyBank(scriptUrl, secret, chiTiet.ca.maCa, keyBank).catch(() => {})
+
       const xep = [...daCham].sort((a, b) => (b.diem ?? 0) - (a.diem ?? 0))
       const hangCua = new Map<string, number>()
       xep.forEach((e, i) => {

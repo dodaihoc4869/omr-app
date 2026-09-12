@@ -24,6 +24,7 @@ import {
   TI_LE_CO_MAN_CHOT,
   coKhoa,
   khoaDuocViCuaSoNoi,
+  khoaDuocViThuNhoMan,
   laCuaSoNoi,
   SO_NGON_CHUP,
   MS_NHIP_SOI_TIEU_DIEM,
@@ -1088,7 +1089,15 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 
       // Thầy vừa MỞ KHOÁ (mục 6): máy này đang giữ bài bị khoá → bỏ khoá, đếm
       // ngưỡng lại từ mốc hiện tại, giữ nguyên đáp án + lịch sử rời màn, làm tiếp.
-      if (kq.cach === 'khoi_phuc' && existing?.submitted && existing.integrity.blocked && kq.daMoKhoa) {
+      // THẦY VỪA MỞ KHOÁ. Không đòi cờ `daMoKhoa` nữa: cờ ấy do Apps Script
+      // trả, máy chủ mới không có nên nó LUÔN false — em Nguyễn Anh Tùng và em
+      // Đào Khánh Ngọc sáng 12/09 được mở khoá mà vào lại vẫn rơi vào màn "Đã
+      // nộp" (dòng ghi_chu trong D1: "mở khoá bởi thầy", trạng thái vẫn da_nop).
+      //
+      // `cach === 'khoi_phuc'` đã đủ và chặt: em nộp thật thì máy chủ trả
+      // `lyDo: 'da_nop'` (ok:false) chứ không bao giờ trả `khoi_phuc`. Nên
+      // khoi_phuc + máy này đang giữ bài bị khoá ⇒ đúng là thầy đã mở khoá.
+      if (kq.cach === 'khoi_phuc' && existing?.submitted && existing.integrity.blocked) {
         const bankMo = cached?.bank ?? kq.bank
         if (!bankMo) throw new Error('Máy chủ chưa gửi đề — bấm Vào thi lại.')
         setBank(bankMo)
@@ -1606,7 +1615,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           const dangGoO = document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLTextAreaElement
           const kq = xetCoMan(coMan, { rong: bc.rong, cao: bc.cao, dangGoO, bayGio: p.luc, tiLe: TI_LE_CO_MAN_CHOT, msXacNhan: MS_XAC_NHAN_CO_MAN })
           coMan = kq.tt
-          if (kq.khoa && !conAnHan() && coKhoa(muc, 'thu_nho_man')) khoaVi('thu_nho_man', 'kênh 4')
+          // MÁY CẢM ỨNG KHÔNG BỊ KHOÁ VÌ KÊNH NÀY — xem `khoaDuocViThuNhoMan`.
+          // Che đề thì vẫn che, chỉ không khoá bài.
+          if (kq.khoa && !conAnHan() && khoaDuocViThuNhoMan(camUngMay) && coKhoa(muc, 'thu_nho_man')) khoaVi('thu_nho_man', 'kênh 4')
           return
         }
 

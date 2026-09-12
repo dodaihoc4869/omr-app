@@ -294,6 +294,25 @@ export function khoaDuocViCuaSoNoi(camUng: boolean): boolean {
   return !camUng
 }
 
+/** THU NHỎ / CHIA ĐÔI MÀN CÓ ĐƯỢC KHOÁ KHÔNG — cùng luật với cửa sổ nổi và
+ * thoát toàn màn: **máy cảm ứng thì KHÔNG**.
+ *
+ * Trên điện thoại, khung nhìn co giãn suốt buổi mà chẳng liên quan gì tới gian
+ * lận: bàn phím ảo bật lên, thanh địa chỉ của trình duyệt thu vào khi cuộn,
+ * xoay ngang xoay dọc, thanh gợi ý gõ phím. Bất cứ cái nào trong đó cũng cắt
+ * quá 28% diện tích, tức lọt dưới ngưỡng 0,72 và khoá bài ngay lần đầu ở mức
+ * Rất ngặt.
+ *
+ * ĐO ĐƯỢC, ca 195422 sáng 12/09: em Khổng Minh Huyền và em Nguyễn Tiến Nam bị
+ * khoá với `leaveCount: 0`, `totalHiddenMs: 0` — không rời màn một giây nào —
+ * `lyDoKhoa: "thu_nho_man"`, `kenhBao: "kênh 4"`.
+ *
+ * Máy tính giữ nguyên: chia đôi màn trên Windows hay macOS là thao tác cố ý,
+ * không có nguồn co giãn nào khác. */
+export function khoaDuocViThuNhoMan(camUng: boolean): boolean {
+  return !camUng
+}
+
 /** Nhịp soi tiêu điểm. 250 ms để tổng thời gian từ lúc cửa sổ nổi mở tới lúc
  * khoá nằm trong 0,9–1,15 giây — đúng tiêu chí "khoá vì cửa sổ nổi ≤ 1 s" của
  * đặc tả mục 8. Soi thưa hơn thì em có thêm nửa giây đọc đề. */

@@ -804,10 +804,18 @@ export async function publishSession(
           phamViHoiLai: moc.phamViHoiLai === 'ba_ca' ? 'ba_ca' : 'gan_nhat',
         },
         bank,
-        // Ngân hàng CÓ đáp án — chỉ gửi khi ca công bố điểm NGAY. Worker cất sau
-        // khoá riêng để trả cho em lúc nộp, và nhờ đó máy em thôi phải gọi Apps
-        // Script ở lượt cuối cùng còn lại.
-        congBoDiem === 'ngay' ? keyBank : undefined,
+        // NGÂN HÀNG CÓ ĐÁP ÁN — LUÔN GỬI, không phụ thuộc cách công bố.
+        //
+        // Bản trước chỉ gửi khi ca công bố NGAY. Hậu quả bắt được ở ca 195422
+        // sáng 12/09 (`cong_bo = 'ca_lop_xong'`): R2 không có `key/195422.json`,
+        // nên `phieuCuaEm` trả `bank: null` và LINK XEM ĐIỂM của cả ca báo "Máy
+        // chủ chưa gửi đề của ca này — báo Thầy". Xem điểm cần đáp án dù ca
+        // công bố kiểu gì.
+        //
+        // Vẫn kín: khoá `key/` không bao giờ đi ra đường công khai `GET
+        // /de/:maCa`; `phieuCuaEm` chỉ trả nó cho lượt ĐÃ NỘP của chính em;
+        // `congBoSauNop` vẫn chỉ trả khi ca công bố NGAY.
+        keyBank,
       )
       return true
   })()
