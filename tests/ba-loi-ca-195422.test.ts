@@ -150,3 +150,69 @@ describe('LỖI 3 — đang làm tự bị khoá, không rời màn lần nào',
     expect(kq.khoa).toBe(true)
   })
 })
+
+// ---------------------------------------------------------------------------
+// ĐỢT 2 — 12/09 chiều
+// ---------------------------------------------------------------------------
+describe('LỖI 4 — bài BỊ KHOÁ bấm link xem điểm không thấy điểm', () => {
+  // Em Nguyễn Tiến Nam (11034, 7,5 điểm) và em Khổng Minh Huyền (12021).
+  // `phieuCuaEm` trả đủ ngân hàng, nhưng màn "Đã nộp" lấy `integrity.blocked`
+  // để hiện tấm cảnh báo đỏ THAY CHO bảng điểm — đúng lúc đang thi, sai hẳn
+  // lúc xem lại.
+  it('mở bằng link xem điểm thì bật cờ `xemLai`', () => {
+    expect(MAN).toContain('const [xemLai, setXemLai] = useState(false)')
+    const i = MAN.indexOf('const moLaiTuMayChu = async ()')
+    expect(MAN.slice(i, i + 900)).toContain('setXemLai(true)')
+  })
+
+  it('màn khoá bị bỏ qua, và bảng điểm được hiện, khi đang xem lại', () => {
+    expect(MAN).toContain('if (attempt?.integrity.blocked && !xemLai) {')
+    expect(MAN).toContain('{graded && (!attempt?.integrity.blocked || xemLai) && (')
+  })
+
+  it('KHÔNG xoá dấu vết: `integrity.blocked` giữ nguyên trong bản ghi', () => {
+    const i = MAN.indexOf('const moLaiTuMayChu = async ()')
+    const than = MAN.slice(i, i + 3000)
+    expect(than).toContain('integrity: b.luot.integrity ??')
+    expect(than).not.toContain('blocked: false')
+  })
+})
+
+describe('LỖI 5 — đề khắc phục không nói nó chữa cho câu nào', () => {
+  const PDL = doc('src/lib/phieu-du-lieu.ts')
+  const ham = PDL.slice(PDL.indexOf('function ganNhanTheoChuyenDe('), PDL.indexOf('function xepTheoThuTuKho('))
+
+  it('nhãn được gắn cho CẢ HAI đường dựng phiếu: máy em và máy thầy', () => {
+    expect((PDL.match(/ganNhanTheoChuyenDe\(/g) || []).length).toBe(3) // 1 khai báo + 2 chỗ dùng
+    expect(PDL).toContain('const baiTapEm = ganNhanTheoChuyenDe(')
+    expect(PDL).toContain('const baiTap = ganNhanTheoChuyenDe(')
+  })
+
+  it('không đè lên nhãn theo MÃ DẠNG — đường chặt hơn luôn được giữ', () => {
+    expect(ham).toContain('if (c.chuaCho) return c')
+  })
+
+  it('CẤM BỊA: chỉ nối câu SAI THẬT, cùng chuyên đề, đủ số câu và phần', () => {
+    expect(ham).toContain('r.dungSai === false')
+    expect(ham).toContain("(r.chuyenDe || '').trim() !== ''")
+    expect(ham).toContain('if (!r.phan || !r.soCau) return c')
+    // Không tìm được câu sai cùng chuyên đề thì để TRỐNG, không gắn bừa.
+    expect(ham).toContain('if (!ds || ds.length === 0) return c')
+  })
+
+  it('chia vòng tròn để mọi câu sai đều được phủ', () => {
+    expect(ham).toContain('ds[i % ds.length]')
+  })
+
+  it('nói ĐÚNG MỨC: cùng mã dạng mới là "khắc phục", cùng chuyên đề là "luyện thêm"', () => {
+    const HP = doc('src/lib/html-phieu.ts')
+    expect(HP).toContain('Khắc phục lỗi sai câu ${n.soCau} phần ${n.phan}')
+    expect(HP).toContain('Luyện thêm cho câu ${n.soCau} phần ${n.phan}')
+    expect(HP).toContain('cùng chuyên đề, chưa chắc cùng dạng')
+  })
+
+  it('bảng "Phiếu này khắc phục lỗi nào" KHÔNG đếm câu chỉ cùng chuyên đề', () => {
+    const HP = doc('src/lib/html-phieu.ts')
+    expect(HP).toContain('if (!n || n.theoChuyenDe) continue')
+  })
+})

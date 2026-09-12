@@ -105,7 +105,11 @@ describe('phiếu chỉ lấy câu CÙNG MÃ DẠNG với câu em sai', () => {
     // Thầy đổi luật 07/09: câu sai không có câu chữa thì đưa lại chính nó, gắn
     // cờ `laLamLai`. Điều đang đo vẫn nguyên: KHÔNG câu nào khác được dán nhãn
     // chữa, và phiếu vẫn nói thẳng phần dưới không phải câu chữa.
-    for (const c of p.baiTap ?? []) expect(c.chuaCho === undefined || c.chuaCho.laLamLai === true).toBe(true)
+    // 12/09: câu cùng CHUYÊN ĐỀ nay được gắn nhãn riêng "Luyện thêm cho câu N"
+    // — link xem báo cáo trước đó không nói câu khắc phục chữa cho câu nào.
+    // Luật đang đo KHÔNG đổi: không câu nào được mang nhãn CHỮA (cùng mã dạng).
+    for (const c of p.baiTap ?? [])
+      expect(c.chuaCho === undefined || c.chuaCho.laLamLai === true || c.chuaCho.theoChuyenDe === true).toBe(true)
     expect(p.thieuChua?.join(' ')).toContain('không phải câu chữa')
   })
 })

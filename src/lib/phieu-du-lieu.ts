@@ -663,6 +663,46 @@ export function chuyenDeXinKho(rows: ChiTietCauRow[]): string[] {
 /** Xếp lại bộ câu theo đúng thứ tự máy chủ đã chọn. Câu không có trong danh
  * sách thứ tự (dữ liệu lệch) xuống cuối chứ KHÔNG bị vứt — thà sai thứ tự còn
  * hơn mất câu. */
+/** GẮN NHÃN "KHẮC PHỤC CHO CÂU NÀO" THEO CHUYÊN ĐỀ — lưới đỡ cuối cùng.
+ *
+ * `rutDeChua` gắn nhãn theo MÃ DẠNG, chặt và đúng nhất. Nhưng máy chủ chỉ lọc
+ * kho khắc phục theo CHUYÊN ĐỀ, nên rất thường không câu nào khớp mã dạng:
+ * `kqChuaEm` rỗng, phiếu rơi về bộ `tuKho` — và cả bộ ấy KHÔNG câu nào mang
+ * nhãn. Đó là thứ thầy thấy trong link xem báo cáo: đề khắc phục không nói nó
+ * chữa cho câu nào.
+ *
+ * Ở đây gắn theo chuyên đề. Vẫn là liên kết THẬT chứ không bịa: câu này có mặt
+ * trong phiếu ĐÚNG VÌ em sai câu kia, cùng chuyên đề. Câu nào không tìm được
+ * câu sai cùng chuyên đề thì để trống — thà không nhãn còn hơn nhãn sai.
+ *
+ * Chia vòng tròn để mỗi câu sai đều được phủ, không dồn hết vào câu đầu. */
+function ganNhanTheoChuyenDe(
+  cau: CauLuyen[],
+  rows: { qid?: string; soCau?: number; phan?: 'I' | 'II' | 'III'; chuyenDe?: string; dungSai?: boolean | null }[],
+): CauLuyen[] {
+  const sai = rows.filter((r) => r.dungSai === false && (r.chuyenDe || '').trim() !== '')
+  if (sai.length === 0) return cau
+  const theoCd = new Map<string, typeof sai>()
+  for (const r of sai) {
+    const k = (r.chuyenDe || '').trim()
+    const cu = theoCd.get(k) ?? []
+    cu.push(r)
+    theoCd.set(k, cu)
+  }
+  const dem = new Map<string, number>()
+  return cau.map((c) => {
+    if (c.chuaCho) return c
+    const k = (c.chuyenDe || '').trim()
+    const ds = theoCd.get(k)
+    if (!ds || ds.length === 0) return c
+    const i = dem.get(k) ?? 0
+    dem.set(k, i + 1)
+    const r = ds[i % ds.length]
+    if (!r.phan || !r.soCau) return c
+    return { ...c, chuaCho: { qid: r.qid ?? '', soCau: r.soCau, phan: r.phan, maDang: '', tenDang: k, bac: 1 as const, theoChuyenDe: true as const } }
+  })
+}
+
 function xepTheoThuTuKho(cau: CauLuyen[], thuTu: string[] | undefined): CauLuyen[] {
   if (!thuTu || thuTu.length === 0) return cau
   const hang = new Map<string, number>()
@@ -713,10 +753,12 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
   // Kho trả về rồi thì KHÔNG trộn thêm câu của ca vào: câu của ca là câu em
   // vừa làm, luyện lại chỉ là nhớ đáp án. Ngoại lệ duy nhất là thẻ làm lại ở
   // trên — chính câu em sai, cố ý đưa lại.
-  const baiTapEm =
+  const baiTapEm = ganNhanTheoChuyenDe(
     soCauChuaThat(kqChuaEm) > 0
       ? (kqChuaEm as NonNullable<typeof kqChuaEm>).cau
-      : [...lamLaiEm, ...(tuKho.length > 0 ? tuKho.filter((c) => !daLamTrongCa.has(c.id)) : duPhong)].slice(0, SO_CAU_BAI_TAP_KEM)
+      : [...lamLaiEm, ...(tuKho.length > 0 ? tuKho.filter((c) => !daLamTrongCa.has(c.id)) : duPhong)].slice(0, SO_CAU_BAI_TAP_KEM),
+    n.rows,
+  )
   // CHẨN ĐOÁN NGUYÊN NHÂN. Máy em KHÔNG có bảng chấm cả lớp, nên đường này chỉ
   // ra đúng một dòng nói thật thay vì nhãn bịa — xem `chanDoanChoPhieu`.
   const cdEm = chanDoanChoPhieu({
@@ -853,18 +895,21 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
   // không cứu được việc phải lui về bài luyện chung — nó đi kèm bộ ấy.
   const lamLai = (kqChua?.cau ?? []).filter((c) => c.chuaCho?.laLamLai)
   const phaiLui = kho.length > 0 && soCauChuaThat(kqChua) === 0
-  const baiTap = phaiLui
-    ? [
-        ...lamLai,
-        ...chonCauLuyen(kho, {
-          chuyenDe: yeuCa,
-          chuyenDeCa: phamViCa,
-          dang: n.dangBaiTap,
-          qidDaLam: [...(n.qidDaLam ?? []), ...lamLai.map((c) => c.id)],
-          soCau: SO_CAU_BAI_TAP_KEM,
-        }).cau,
-      ].slice(0, SO_CAU_BAI_TAP_KEM)
-    : (kqChua?.cau ?? [])
+  const baiTap = ganNhanTheoChuyenDe(
+    phaiLui
+      ? [
+          ...lamLai,
+          ...chonCauLuyen(kho, {
+            chuyenDe: yeuCa,
+            chuyenDeCa: phamViCa,
+            dang: n.dangBaiTap,
+            qidDaLam: [...(n.qidDaLam ?? []), ...lamLai.map((c) => c.id)],
+            soCau: SO_CAU_BAI_TAP_KEM,
+          }).cau,
+        ].slice(0, SO_CAU_BAI_TAP_KEM)
+      : (kqChua?.cau ?? []),
+    rows,
+  )
   const luiCoSai = phaiLui && coCauSai
   // CHẨN ĐOÁN NGUYÊN NHÂN. Đường này chạy trên MÁY THẦY và có `rowsLop`, nên là
   // chỗ duy nhất chẩn được thật: trung vị giây và độ chụm đều cần cả lớp.

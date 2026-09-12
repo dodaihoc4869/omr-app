@@ -868,9 +868,21 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
   const tags = [
     // Nhãn PHẢI kèm phần: "câu 2" trần trỏ vào hai câu khác nhau của cùng một
     // bài thi, em không biết mình đang chữa câu nào.
-    n ? `<span class="q-tag chua">${n.laLamLai ? `Làm lại câu ${n.soCau} phần ${n.phan}` : `Khắc phục lỗi sai câu ${n.soCau} phần ${n.phan}`}</span>` : '',
+    // Ba mức, nói đúng mức của mình — nhãn "khắc phục" chỉ dành cho câu CÙNG
+    // MÃ DẠNG. Câu chỉ cùng chuyên đề thì nói là luyện thêm, không được đội lốt
+    // câu chữa: thầy nhìn phiếu phải biết ngay câu nào chữa đúng bệnh.
+    n
+      ? `<span class="q-tag chua">${
+          n.laLamLai
+            ? `Làm lại câu ${n.soCau} phần ${n.phan}`
+            : n.theoChuyenDe
+              ? `Luyện thêm cho câu ${n.soCau} phần ${n.phan}`
+              : `Khắc phục lỗi sai câu ${n.soCau} phần ${n.phan}`
+        }</span>`
+      : '',
     n && n.laLamLai ? '<span class="q-tag chua-2">kho chưa có câu cùng dạng</span>' : '',
-    n && !n.laLamLai && n.bac === 2 ? '<span class="q-tag chua-2">cùng cơ chế, khác việc</span>' : '',
+    n && n.theoChuyenDe ? '<span class="q-tag chua-2">cùng chuyên đề, chưa chắc cùng dạng</span>' : '',
+    n && !n.laLamLai && !n.theoChuyenDe && n.bac === 2 ? '<span class="q-tag chua-2">cùng cơ chế, khác việc</span>' : '',
     `<span class="q-tag ${LOP_LOAI[c.phan]}">${TEN_LOAI[c.phan]}</span>`,
     c.mucDo ? `<span class="q-tag ${LOP_MUC[c.mucDo]}">${TEN_MUC[c.mucDo]}</span>` : '',
     c.chuyenDe ? `<span class="q-tag topic">${thoat(c.chuyenDe)}</span>` : '',
@@ -1164,7 +1176,9 @@ export function khoiChuaGiHtml(cau: CauLuyen[], thieu: { soCau: number; phan?: '
   const gom = new Map<string, { phan: 'I' | 'II' | 'III'; soCau: number; ten: string; so: number }>()
   for (const c of cau) {
     const n = c.chuaCho
-    if (!n) continue
+    // Câu chỉ cùng chuyên đề KHÔNG được đếm vào bảng "chữa câu nào" — bảng ấy
+    // là lời hứa đã chữa đúng bệnh.
+    if (!n || n.theoChuyenDe) continue
     const k = KHOA(n.phan, n.soCau)
     const cu = gom.get(k) ?? { phan: n.phan, soCau: n.soCau, ten: n.tenDang || '', so: 0 }
     cu.so += 1

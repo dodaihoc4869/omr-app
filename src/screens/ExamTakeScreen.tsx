@@ -916,6 +916,18 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
    * giờ đều lấy về từ máy chủ, dựng thành đúng cái `ExamAttempt` mà màn "Đã nộp
    * bài" vẫn đọc. Không ghi xuống IndexedDB — em mở nhờ máy bạn thì máy bạn
    * không giữ lại bài của em. */
+  /** Em mở bài bằng LINK XEM ĐIỂM, không phải vừa thi xong.
+   *
+   * Bài từng bị khoá thì `integrity.blocked` còn nguyên trong bản ghi, và màn
+   * "Đã nộp" lấy cờ ấy để hiện tấm cảnh báo đỏ "giơ tay gọi thầy" THAY CHO
+   * bảng điểm. Đúng lúc đang thi, sai hẳn lúc xem lại: em Nguyễn Tiến Nam
+   * (7,5 điểm) và em Khổng Minh Huyền ca 195422 bấm link xem điểm chỉ thấy
+   * tấm cảnh báo, không thấy điểm đâu.
+   *
+   * Cờ này chỉ đổi phần HIỂN THỊ. `attempt.integrity.blocked` giữ nguyên, nên
+   * mọi chỗ ghi sổ, đẩy trạng thái và dựng phiếu vẫn biết bài từng bị khoá. */
+  const [xemLai, setXemLai] = useState(false)
+
   const moLaiTuMayChu = async () => {
     const ma = maCa.trim()
     const sb = sbd.trim()
@@ -924,6 +936,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     if (!url) return showToast('Chưa có link kết nối — mở đúng link Thầy gửi', 'error')
     setPhase('loading')
     try {
+      setXemLai(true)
       const b = await layBaiDaNop(url, ma, sb)
       if (!b.bank) throw new Error('Máy chủ chưa gửi đề của ca này — báo Thầy.')
       // ĐỀ PHẢI CÓ ĐÁP ÁN. Máy chủ có hai bản: bản gửi máy em lúc thi đã lược
@@ -2565,7 +2578,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 
   // ------------------------------------------------------------- ĐÃ NỘP BÀI
   if (phase === 'submitted') {
-    if (attempt?.integrity.blocked) {
+    if (attempt?.integrity.blocked && !xemLai) {
       return (
         <Trang className="flex items-center justify-center px-4">
           <div className="w-full" style={{ maxWidth: 400 }}>
@@ -2677,7 +2690,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
             </div>
           </TheNoiDung>
 
-          {graded && !attempt?.integrity.blocked && (
+          {graded && (!attempt?.integrity.blocked || xemLai) && (
             <NutChinh onClick={() => setGradedPopup(true)}>
               Xem điểm chi tiết
             </NutChinh>
