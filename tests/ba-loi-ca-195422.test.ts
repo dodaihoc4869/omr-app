@@ -35,6 +35,47 @@ describe('LỖI 1 — link xem điểm báo "Máy chủ chưa gửi đề của 
     expect(than).not.toContain('key/')
   })
 
+  // Đẩy khi mở ca chỉ cứu ca MỚI. Ca 195422 đã đóng, và bắt Thầy mở màn chấm
+  // từng ca cũ là làm tay. Máy chủ tự dựng lại từ bảng chấm.
+  describe('ca CŨ: máy chủ tự dựng ngân hàng đáp án từ bảng chấm', () => {
+    const SRV = doc('server/src/goi-cu.ts')
+    const ham = SRV.slice(SRV.indexOf('async function keyBankTuBangCham('), SRV.indexOf('async function keyBankTuBangCham(') + 3000)
+
+    it('thiếu khoá `key/` thì mới dựng, và chỉ cho lượt ĐÃ NỘP', () => {
+      const pc = SRV.slice(SRV.indexOf('export async function phieuCuaEm'), SRV.indexOf('export async function phieuCuaEm') + 2600)
+      expect(pc).toContain('if (daNop && env.DE)')
+      expect(pc).toContain('if (!bank) bank = await keyBankTuBangCham(env, maCa, sbd)')
+    })
+
+    it('đi theo BẢNG CHẤM của chính em, không theo gói đề — ca đề riêng mới đúng tờ', () => {
+      expect(ham).toContain('FROM chi_tiet_cau')
+      expect(ham).toContain('WHERE ma_ca = ? AND sbd = ? ORDER BY so_cau')
+    })
+
+    it('nội dung câu lấy từ gói đề công khai, ghép theo qid', () => {
+      expect(ham).toContain('de/${maCa}.json')
+      expect(ham).toContain('noiDung.get(chuoi(x.qid))')
+    })
+
+    it('CẤM BỊA: thiếu nội dung hoặc thiếu đáp án là bỏ cả bản', () => {
+      expect(ham).toContain('if (!cau || !d) return null')
+      // Phần I chỉ nhận A/B/C/D, phần II phải đủ 4 ký tự Đ/S.
+      expect(ham).toContain("if (c !== 'A' && c !== 'B' && c !== 'C' && c !== 'D') return null")
+      expect(ham).toContain('if (t.length < 4) return null')
+      expect(ham).toContain("if (y.some((v) => v === '')) return null")
+    })
+
+    it('dựng đúng ba dáng `correct` mà máy em đọc', () => {
+      // I: 'A'|'B'|'C'|'D' · II: mảng 4 'D'|'S' · III: chuỗi
+      expect(ham).toContain('phanI.push({ ...cau, correct: c })')
+      expect(ham).toContain("[0, 1, 2, 3].map((i) => (t[i] === 'S' ? 'S' : t[i] === 'D' ? 'D' : ''))")
+      expect(ham).toContain('phanIII.push({ ...cau, correct: d })')
+      const EX = doc('src/data/examContent.ts')
+      expect(EX).toContain("correct: 'A' | 'B' | 'C' | 'D'")
+      expect(EX).toContain("correct: ['D' | 'S', 'D' | 'S', 'D' | 'S', 'D' | 'S']")
+    })
+  })
+
   it('ca CŨ tự lành: màn chấm đẩy keyBank lên bằng lệnh chỉ ghi một đối tượng R2', () => {
     expect(THEODOI).toContain('void capNhatKeyBank(scriptUrl, secret, chiTiet.ca.maCa, keyBank).catch(() => {})')
     const SRV = doc('server/src/goi-cu.ts')

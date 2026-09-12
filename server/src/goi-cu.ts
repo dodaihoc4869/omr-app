@@ -442,6 +442,16 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
         bank = null
       }
     }
+    // CA CŨ KHÔNG CÓ KHOÁ `key/` ⇒ DỰNG LẠI TỪ BẢNG CHẤM.
+    //
+    // Trước 12/09 ngân hàng CÓ đáp án chỉ được đẩy lên khi ca công bố NGAY, nên
+    // mọi ca `khong` và `ca_lop_xong` mở trước đó đều không có khoá ấy — link
+    // xem điểm của cả ca báo "Máy chủ chưa gửi đề của ca này" (ca 195422,
+    // 12/09). Chờ thầy mở màn chấm để đẩy lên là bắt thầy làm tay từng ca.
+    //
+    // Ở đây máy chủ tự dựng: nội dung câu lấy từ `de/<maCa>.json`, đáp án đúng
+    // lấy từ `chi_tiet_cau` — đúng bảng thầy đã chấm, không suy ra từ đâu khác.
+    if (!bank) bank = await keyBankTuBangCham(env, maCa, sbd)
   }
 
   return {
@@ -1063,6 +1073,79 @@ export async function ketQuaCuaEm(env: Env, b: Record<string, unknown>): Promise
     }
   }
   return { ok: true, congBo, sanSang, daNop, daVao, keyBank }
+}
+
+/** DỰNG NGÂN HÀNG CÓ ĐÁP ÁN TỪ BẢNG CHẤM, cho ca cũ thiếu khoá `key/<maCa>.json`.
+ *
+ * NGUỒN: `chi_tiet_cau` — mỗi dòng là một câu của CHÍNH EM ẤY, có `qid`, `phan`,
+ * `so_cau` và `dap_an_dung` do máy thầy chấm ghi lên. Nội dung câu (đề bài, các
+ * lựa chọn, ảnh) lấy từ gói đề công khai `de/<maCa>.json`.
+ *
+ * DỰNG THEO BẢNG CHẤM, KHÔNG THEO GÓI ĐỀ: ca đề riêng thì gói đề chứa cả kho
+ * câu của lớp, còn bảng chấm chỉ có đúng phần của em — đi theo bảng chấm là ra
+ * đúng tờ đề của em, cả ca chung lẫn ca đề riêng.
+ *
+ * CẤM BỊA: câu nào không tra được nội dung trong gói đề, hoặc không có đáp án
+ * đúng, thì BỎ CẢ BẢN — trả `null` để màn của em hiện đúng câu "chưa có đáp án"
+ * thay vì hiện một tờ đề chấm sai. */
+async function keyBankTuBangCham(env: Env, maCa: string, sbd: string): Promise<unknown> {
+  if (!env.DE) return null
+  const o = await env.DE.get(`de/${maCa}.json`)
+  if (!o?.body) return null
+  let de: Record<string, unknown> | null = null
+  try {
+    de = (await new Response(o.body).json()) as Record<string, unknown>
+  } catch {
+    return null
+  }
+  if (!de) return null
+
+  const noiDung = new Map<string, Record<string, unknown>>()
+  for (const khoa of ['phanI', 'phanII', 'phanIII']) {
+    const ds = de[khoa]
+    if (!Array.isArray(ds)) continue
+    for (const c of ds) {
+      const id = chuoi((c as Record<string, unknown>)?.id)
+      if (id) noiDung.set(id, c as Record<string, unknown>)
+    }
+  }
+  if (noiDung.size === 0) return null
+
+  const r = await env.DB.prepare(
+    `SELECT qid, phan, so_cau, dap_an_dung FROM chi_tiet_cau
+      WHERE ma_ca = ? AND sbd = ? ORDER BY so_cau`,
+  )
+    .bind(maCa, sbd)
+    .all<Record<string, unknown>>()
+  const dong = r.results ?? []
+  if (dong.length === 0) return null
+
+  const phanI: unknown[] = []
+  const phanII: unknown[] = []
+  const phanIII: unknown[] = []
+  for (const x of dong) {
+    const cau = noiDung.get(chuoi(x.qid))
+    const d = chuoi(x.dap_an_dung).trim()
+    if (!cau || !d) return null
+    const phan = chuoi(x.phan)
+    if (phan === 'I') {
+      const c = d.toUpperCase().slice(0, 1)
+      if (c !== 'A' && c !== 'B' && c !== 'C' && c !== 'D') return null
+      phanI.push({ ...cau, correct: c })
+    } else if (phan === 'II') {
+      const t = d.toUpperCase()
+      if (t.length < 4) return null
+      const y = [0, 1, 2, 3].map((i) => (t[i] === 'S' ? 'S' : t[i] === 'D' ? 'D' : ''))
+      if (y.some((v) => v === '')) return null
+      phanII.push({ ...cau, correct: y })
+    } else if (phan === 'III') {
+      phanIII.push({ ...cau, correct: d })
+    } else {
+      return null
+    }
+  }
+  if (phanI.length + phanII.length + phanIII.length === 0) return null
+  return { soCau: { I: phanI.length, II: phanII.length, III: phanIII.length }, phanI, phanII, phanIII }
 }
 
 /** CẤU HÌNH MỘT CA cho máy em (`SessionConfig`) — kèm luôn gói đề KHÔNG đáp án.
