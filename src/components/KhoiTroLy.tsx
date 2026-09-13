@@ -10,6 +10,7 @@ import { Check, Copy, CornerDownLeft, RefreshCw } from 'lucide-react'
 import { layDuLieu, quenHet } from '../lib/tro-ly/nguon'
 import { dungTraLoi, khongHieu, type TraLoi } from '../lib/tro-ly/tra-loi'
 import { CAU_GOI_Y, docYDinh } from '../lib/tro-ly/y-dinh'
+import { giaiBaiTapAI } from '../lib/tro-ly/ai-giai-bai'
 
 interface Dong {
   ai: 'thay' | 'may'
@@ -18,6 +19,8 @@ interface Dong {
   nguon?: string
   /** Khối chữ chép một chạm — dùng cho danh sách link báo cáo. */
   chep?: string
+  /** Lời giải dạng HTML chuẩn cho bài tập */
+  html?: string
 }
 
 export interface KhoiTroLyProps {
@@ -49,6 +52,25 @@ export default function KhoiTroLy({ scriptUrl, secret }: KhoiTroLyProps) {
     setDangNghi(true)
     try {
       const y = docYDinh(q)
+
+      // Xử lý Giải bài tập A.I bằng module chuyên sâu khi câu hỏi mang tính chất giải bài
+      const laGiaiBai = /^(?:giải|giai|giúp giải|hướng dẫn giải|lời giải)\b/i.test(q.trim()) ||
+        (/\b(?:mol|gam|este|axit|ancol|hiđrocacbon|nung|kết tủa|đktc)\b/i.test(q) && !/bao nhiêu câu|ngân hàng|kho đề/i.test(q))
+
+      if (laGiaiBai) {
+        const kq = await giaiBaiTapAI({ noiDung: q })
+        setDong((cu) => [
+          ...cu,
+          {
+            ai: 'may',
+            chu: `${kq.tieuDe}\n${kq.phuongPhap}\n\n${kq.loiGiaiChiTiet}\n\nĐáp án: ${kq.dapAn}`,
+            html: kq.htmlToanBo,
+            chep: kq.loiGiaiChiTiet,
+          },
+        ])
+        return
+      }
+
       // Câu hỏi cần dữ liệu mà máy chưa có cấu hình thì NÓI THẲNG, không dựng
       // câu trả lời rỗng rồi để thầy tưởng là chưa có dữ liệu thật.
       if (y.loai !== 'huong_dan' && y.loai !== 'khong_hieu' && chuaCauHinh) {
@@ -107,7 +129,11 @@ export default function KhoiTroLy({ scriptUrl, secret }: KhoiTroLyProps) {
                   lineHeight: 1.6,
                 }}
               >
-                <div style={{ whiteSpace: 'pre-wrap' }}>{d.chu}</div>
+                {d.html ? (
+                  <div dangerouslySetInnerHTML={{ __html: d.html }} />
+                ) : (
+                  <div style={{ whiteSpace: 'pre-wrap' }}>{d.chu}</div>
+                )}
                 {d.dong && d.dong.length > 0 && (
                   <ul style={{ margin: '6px 0 0', paddingLeft: 18, listStyle: 'disc' }}>
                     {d.dong.map((x, k) => (

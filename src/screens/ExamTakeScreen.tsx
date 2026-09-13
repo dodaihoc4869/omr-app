@@ -56,6 +56,8 @@ import VanTay from '../components/VanTay'
 import TheCau from '../components/TheCau'
 import MaCaInput from '../components/MaCaInput'
 import LogoHocSinh from '../components/LogoHocSinh'
+import PhongChoGame from '../components/PhongChoGame'
+import BongBongChatHocSinh from '../components/BongBongChatHocSinh'
 import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
 import { TriangleAlert, X, ArrowLeft, LayoutGrid } from 'lucide-react'
 import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
@@ -2513,24 +2515,10 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   // hiện ra ở đây đều là thứ kéo mắt em khỏi việc chuẩn bị.
   if (phase === 'cho') {
     return (
-      <Trang className="flex items-center justify-center px-4">
-        <div className="w-full text-center" style={{ maxWidth: 360 }}>
-          <div className="flex justify-center" style={{ marginBottom: 'var(--k5)' }}>
-            <LogoHocSinh size={48} hienChu={false} />
-          </div>
-          <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', color: 'var(--muc)' }}>
-            Đang chờ Thầy bấm bắt đầu
-          </div>
-          <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginTop: 'var(--k3)', lineHeight: 1.6 }}>
-            Em giữ nguyên màn hình này. Đề hiện ra ngay khi Thầy bắt đầu.
-            {cho?.thoiGianPhut ? ` Bài làm trong ${cho.thoiGianPhut} phút, đồng hồ chạy từ lúc đó.` : ''}
-          </div>
-          {loiCho && (
-            <div style={{ marginTop: 'var(--k4)' }}>
-              <OThongBao tone="do">{loiCho}</OThongBao>
-            </div>
-          )}
-        </div>
+      <Trang className="flex items-center justify-center px-2 sm:px-4 py-4">
+        {/* Đang chờ Thầy bấm bắt đầu */}
+        <PhongChoGame cho={cho} loiCho={loiCho} />
+        {sbd && <BongBongChatHocSinh sbd={sbd} hoTen={hoTen} lop={lop} />}
       </Trang>
     )
   }
@@ -3300,6 +3288,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           tính `data-giu-de-an` trên <html>. Không state, không render lại danh
           sách câu, không tụt tốc độ cuộn (GIUDEDOC mục 5). */}
       <ManGiuDeDoc />
+
+      {/* Bong bóng chat học sinh */}
+      {sbd && <BongBongChatHocSinh sbd={sbd} hoTen={hoTen} lop={lop} />}
     </Trang>
   )
 }

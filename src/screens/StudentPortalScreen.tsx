@@ -17,6 +17,9 @@ import {
   ArrowRight,
   Clock,
   RotateCcw,
+  Heart,
+  Timer,
+  Check,
 } from 'lucide-react'
 import {
   hsDangNhapApi,
@@ -34,8 +37,24 @@ import { dungPhieu, type ThongTinPhieu } from '../lib/html-phieu'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import LogoHocSinh from '../components/LogoHocSinh'
+import BongBongChatHocSinh from '../components/BongBongChatHocSinh'
 
 const KHOA_LUU_AUTH = 'omr_student_portal_auth'
+
+export interface BaiMomGiao {
+  id: string
+  tieuDe: string
+  ngayGiao: string
+  soCau: number
+  thoiGianPhut: number
+  dsCau: any[]
+  trangThai: 'chua_lam' | 'dang_lam' | 'da_nop'
+  batDauLuc?: string
+  nopLuc?: string
+  diem?: number
+  soCauDung?: number
+  htmlKetQua?: string
+}
 
 interface ThongTinHs {
   sbd: string
@@ -65,7 +84,7 @@ function mauDiem(diem: number | null): string {
   return 'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/40 dark:border-rose-800'
 }
 
-type TabType = 'diem' | 'btvn' | 'khacphuc' | 'vaothi'
+type TabType = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi'
 
 export default function StudentPortalScreen() {
   const [auth, setAuth] = useState<ThongTinHs | null>(() => {
@@ -113,6 +132,175 @@ export default function StudentPortalScreen() {
   const [maCaVaoThi, setMaCaVaoThi] = useState('')
   const [matKhauCaVaoThi, setMatKhauCaVaoThi] = useState('')
   const [loiVaoThi, setLoiVaoThi] = useState('')
+
+  // Bài của Mom giao (Đồng hồ đếm ngược 2 tiếng)
+  const [dsMomGiao, setDsMomGiao] = useState<BaiMomGiao[]>([])
+  const [dangLamMom, setDangLamMom] = useState<BaiMomGiao | null>(null)
+  const [giayConLaiMom, setGiayConLaiMom] = useState<number>(7200)
+  const [cauTraLoiMom, setCauTraLoiMom] = useState<Record<string, string>>({})
+  const [thongBaoNopMom, setThongBaoNopMom] = useState<string | null>(null)
+
+  const napDsMom = useCallback(() => {
+    if (!auth) return
+    try {
+      const raw = localStorage.getItem(`omr_mom_btvn_${auth.sbd}`)
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        if (Array.isArray(parsed)) {
+          setDsMomGiao(parsed)
+        }
+      } else {
+        setDsMomGiao([])
+      }
+    } catch {
+      setDsMomGiao([])
+    }
+  }, [auth])
+
+  useEffect(() => {
+    napDsMom()
+  }, [napDsMom, tab])
+
+  // Đếm ngược 2 tiếng (7200 giây) kể từ khi bấm vào làm bài
+  useEffect(() => {
+    if (!dangLamMom || dangLamMom.trangThai === 'da_nop') return
+
+    const capNhatDongHo = () => {
+      if (!dangLamMom.batDauLuc) return
+      const daTroiQua = Math.floor((Date.now() - new Date(dangLamMom.batDauLuc).getTime()) / 1000)
+      const conLai = Math.max(0, 7200 - daTroiQua)
+      setGiayConLaiMom(conLai)
+      if (conLai === 0) {
+        void nopBaiCuaMom()
+      }
+    }
+
+    capNhatDongHo()
+    const timer = setInterval(capNhatDongHo, 1000)
+    return () => clearInterval(timer)
+  }, [dangLamMom])
+
+  const dinhDangThoiGianMom = (tongGiay: number): string => {
+    const gio = Math.floor(tongGiay / 3600)
+    const phut = Math.floor((tongGiay % 3600) / 60)
+    const giay = tongGiay % 60
+    return `${String(gio).padStart(2, '0')}:${String(phut).padStart(2, '0')}:${String(giay).padStart(2, '0')}`
+  }
+
+  const batDauLamBaiMom = (bai: BaiMomGiao) => {
+    const batDauLuc = bai.batDauLuc || new Date().toISOString()
+    const capNhat: BaiMomGiao = {
+      ...bai,
+      trangThai: 'dang_lam',
+      batDauLuc,
+    }
+    setDangLamMom(capNhat)
+    setCauTraLoiMom({})
+    setThongBaoNopMom(null)
+
+    if (auth) {
+      const danhSach = dsMomGiao.map((b) => (b.id === bai.id ? capNhat : b))
+      localStorage.setItem(`omr_mom_btvn_${auth.sbd}`, JSON.stringify(danhSach))
+      setDsMomGiao(danhSach)
+    }
+  }
+
+  async function nopBaiCuaMom() {
+    if (!dangLamMom || !auth) return
+
+    let soDung = 0
+    const tongSo = dangLamMom.dsCau.length || 1
+    const chiTietKq: any[] = []
+
+    for (let i = 0; i < dangLamMom.dsCau.length; i++) {
+      const cau = dangLamMom.dsCau[i]
+      const dapAnEm = (cauTraLoiMom[cau.id] || '').trim().toUpperCase()
+      const dapAnDung = (cau.dapAn || cau.dapAnDung || 'A').trim().toUpperCase()
+      const laDung = dapAnEm === dapAnDung
+      if (laDung) soDung++
+
+      chiTietKq.push({
+        stt: i + 1,
+        text: cau.text,
+        choices: cau.choices || [],
+        dapAnEm,
+        dapAnDung,
+        dungSai: laDung,
+        loiGiai: cau.loiGiai || 'Lời giải chi tiết theo chuẩn hoá học chương trình mới.',
+        chuyenDe: cau.chuyenDe || 'Chuyên đề ôn tập',
+      })
+    }
+
+    const diem = Number(((soDung / tongSo) * 10).toFixed(2))
+
+    // Dựng cấu trúc HTML báo cáo kết quả đồng bộ sang app Phụ huynh
+    const htmlKetQua = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 780px; margin: 0 auto; padding: 24px; color: var(--muc, rgb(30, 41, 59)); background: var(--the, rgb(255, 255, 255));">
+        <div style="text-align: center; border-bottom: 2px solid var(--vien, rgb(226, 232, 240)); padding-bottom: 20px; margin-bottom: 24px;">
+          <div style="font-size: 24px; font-weight: 800; color: var(--gg-do, rgb(225, 29, 72)); margin-bottom: 6px;">💖 KẾT QUẢ BÀI CỦA MOM GIAO</div>
+          <div style="font-size: 14px; color: var(--nhat, rgb(100, 116, 139));">Học sinh: <strong>${auth.hoTen}</strong> (SBD: <strong>${auth.sbd}</strong>) ${auth.lop ? `· Lớp: ${auth.lop}` : ''}</div>
+          <div style="font-size: 13px; color: var(--chim, rgb(148, 163, 184)); margin-top: 4px;">Thời gian nộp: ${new Date().toLocaleString('vi-VN')}</div>
+          <div style="display: inline-block; margin-top: 16px; padding: 12px 28px; background: rgba(225, 29, 72, 0.08); border: 2px solid rgba(225, 29, 72, 0.2); border-radius: 9999px;">
+            <span style="font-size: 15px; font-weight: 600; color: var(--gg-do, rgb(190, 18, 60));">Điểm số: </span>
+            <span style="font-size: 28px; font-weight: 900; color: var(--gg-do, rgb(225, 29, 72));">${diem}</span>
+            <span style="font-size: 15px; color: var(--gg-do, rgb(136, 19, 55));"> / 10 (${soDung}/${tongSo} câu đúng)</span>
+          </div>
+        </div>
+
+        <div style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--muc, rgb(15, 23, 42));">LỜI GIẢI CHI TIẾT TỪNG CÂU:</div>
+        ${chiTietKq
+          .map(
+            (c) => `
+          <div style="margin-bottom: 20px; padding: 16px; border: 1px solid ${c.dungSai ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)'}; border-radius: 16px; background: ${c.dungSai ? 'rgba(34, 197, 94, 0.05)' : 'rgba(239, 68, 68, 0.05)'};">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 700; font-size: 14px; color: var(--muc, rgb(30, 41, 59));">Câu ${c.stt}: ${c.chuyenDe}</span>
+              <span style="font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 9999px; background: ${c.dungSai ? 'var(--gg-luc, rgb(34, 197, 94))' : 'var(--gg-do, rgb(239, 68, 68))'}; color: rgb(255, 255, 255);">
+                ${c.dungSai ? '✓ ĐÚNG' : '✗ SAI'}
+              </span>
+            </div>
+            <div style="font-size: 14px; line-height: 1.6; margin-bottom: 12px; color: var(--muc, rgb(51, 65, 85));">${c.text}</div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 13px; margin-bottom: 12px;">
+              ${c.choices
+                .map(
+                  (ch: string, idx: number) => {
+                    const kyTu = String.fromCharCode(65 + idx)
+                    const laDung = kyTu === c.dapAnDung
+                    const laChon = kyTu === c.dapAnEm
+                    let bg = 'var(--the, rgb(255, 255, 255))'
+                    let border = 'var(--vien, rgb(226, 232, 240))'
+                    if (laDung) { bg = 'rgba(34, 197, 94, 0.15)'; border = 'var(--gg-luc, rgb(134, 239, 172))'; }
+                    else if (laChon) { bg = 'rgba(239, 68, 68, 0.15)'; border = 'var(--gg-do, rgb(252, 165, 165))'; }
+                    return `<div style="padding: 6px 10px; border-radius: 8px; border: 1px solid ${border}; background: ${bg};">${kyTu}. ${ch}</div>`
+                  }
+                )
+                .join('')}
+            </div>
+            <div style="font-size: 13px; line-height: 1.5; padding: 10px; background: var(--the, rgb(255, 255, 255)); border-radius: 8px; border: 1px dashed var(--vien, rgb(203, 213, 225));">
+              <div style="font-weight: 600; color: var(--gg-xanh, rgb(37, 99, 235)); margin-bottom: 4px;">💡 Phương pháp & Lời giải:</div>
+              <div style="color: var(--nhat, rgb(71, 85, 105));">${c.loiGiai}</div>
+            </div>
+          </div>
+        `
+          )
+          .join('')}
+      </div>
+    `
+
+    const baiDaNop: BaiMomGiao = {
+      ...dangLamMom,
+      trangThai: 'da_nop',
+      nopLuc: new Date().toISOString(),
+      diem,
+      soCauDung: soDung,
+      htmlKetQua,
+    }
+
+    const danhSachMoi = dsMomGiao.map((b) => (b.id === dangLamMom.id ? baiDaNop : b))
+    localStorage.setItem(`omr_mom_btvn_${auth.sbd}`, JSON.stringify(danhSachMoi))
+    setDsMomGiao(danhSachMoi)
+    setDangLamMom(null)
+    setThongBaoNopMom(`🎉 Chúc mừng em đã hoàn thành bài của Mom! Điểm: ${diem}/10. Kết quả đã tự động gửi về App của Mom.`)
+  }
 
   // Ghi nhớ vai hs
   useEffect(() => {
@@ -664,9 +852,9 @@ export default function StudentPortalScreen() {
         </div>
       </header>
 
-      {/* Navigation 4 mục theo phong cách Google Material 3 Segmented Pill Tabs */}
+      {/* Navigation 5 mục theo phong cách Google Material 3 Segmented Pill Tabs */}
       <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-5 pb-1">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
           <button
             onClick={() => setTab('diem')}
             className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
@@ -711,6 +899,30 @@ export default function StudentPortalScreen() {
               <div className="font-bold text-sm leading-tight">Bài tập về nhà</div>
               <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'btvn' ? 'text-emerald-700/80 dark:text-emerald-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
                 Giao & nộp bài
+              </div>
+            </div>
+          </button>
+
+          <button
+            onClick={() => { setTab('mom'); setDangLamMom(null); }}
+            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
+              tab === 'mom'
+                ? 'bg-rose-50 text-rose-900 border-rose-200 dark:bg-rose-950/70 dark:text-rose-200 dark:border-rose-800 shadow-xs'
+                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform ${tab === 'mom' ? 'bg-rose-600 text-white scale-105' : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'}`}>
+                <Heart size={18} strokeWidth={tab === 'mom' ? 2.4 : 2} />
+              </div>
+              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'mom' ? 'bg-rose-200/70 text-rose-800 dark:bg-rose-900 dark:text-rose-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
+                {dsMomGiao.length} bài
+              </span>
+            </div>
+            <div>
+              <div className="font-bold text-sm leading-tight">Bài của Mom giao</div>
+              <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'mom' ? 'text-rose-700/80 dark:text-rose-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
+                Hạn 2 tiếng (Mom giao)
               </div>
             </div>
           </button>
@@ -1044,6 +1256,274 @@ export default function StudentPortalScreen() {
           </div>
         )}
 
+        {/* TAB 2.5: BÀI CỦA MOM GIAO (HẠN 2 TIẾNG) */}
+        {tab === 'mom' && (
+          <div className="space-y-4 animate-google-fade">
+            {dangLamMom ? (
+              /* MÀN HÌNH ĐANG LÀM BÀI CỦA MOM GIAO */
+              <div className="space-y-4">
+                {/* Thanh điều khiển đếm ngược 2 tiếng ghim trên */}
+                <div className="sticky top-16 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-4 rounded-2xl border border-rose-200 dark:border-rose-900/60 shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        if (confirm('Em có chắc muốn tạm dừng bài làm không? Đồng hồ 2 tiếng vẫn tiếp tục đếm ngược.')) {
+                          setDangLamMom(null)
+                        }
+                      }}
+                      className="btn-google-outlined text-xs py-1.5 px-3 rounded-full cursor-pointer"
+                    >
+                      ← Danh sách bài
+                    </button>
+                    <div className="font-bold text-sm text-slate-800 dark:text-slate-100 line-clamp-1">
+                      {dangLamMom.tieuDe}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    {/* Đồng hồ đếm ngược 2 tiếng */}
+                    <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full font-mono text-xs font-bold border transition-colors ${
+                      giayConLaiMom < 900
+                        ? 'bg-rose-100 text-rose-700 border-rose-300 dark:bg-rose-950/80 dark:text-rose-300 dark:border-rose-800 animate-pulse'
+                        : 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800'
+                    }`}>
+                      <Timer className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                      <span>Hạn 2h: {dinhDangThoiGianMom(giayConLaiMom)}</span>
+                    </div>
+
+                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                      Đã làm: <strong className="text-slate-800 dark:text-slate-200">{Object.keys(cauTraLoiMom).length}</strong>/{dangLamMom.dsCau.length}
+                    </div>
+
+                    <button
+                      onClick={nopBaiCuaMom}
+                      className="btn-google-primary !bg-rose-600 hover:!bg-rose-700 text-white font-bold text-xs py-2 px-4 rounded-full flex items-center gap-1.5 shadow-sm cursor-pointer"
+                    >
+                      <Check className="w-4 h-4" />
+                      <span>Nộp bài cho Mom</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Danh sách các câu hỏi của bài */}
+                <div className="space-y-4">
+                  {dangLamMom.dsCau.map((cau: any, idx: number) => {
+                    const daChon = cauTraLoiMom[cau.id]
+                    return (
+                      <div
+                        key={cau.id || idx}
+                        className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-sm text-slate-900 dark:text-white">
+                            Câu {idx + 1}
+                          </span>
+                          {cau.chuyenDe && (
+                            <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                              {cau.chuyenDe}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="text-sm text-slate-800 dark:text-slate-200 leading-relaxed">
+                          {cau.text}
+                        </div>
+
+                        {cau.choices && cau.choices.length > 0 ? (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                            {cau.choices.map((choice: string, cIdx: number) => {
+                              const kyTu = String.fromCharCode(65 + cIdx)
+                              const duocChon = daChon === kyTu
+                              return (
+                                <button
+                                  key={cIdx}
+                                  type="button"
+                                  onClick={() =>
+                                    setCauTraLoiMom((prev) => ({ ...prev, [cau.id]: kyTu }))
+                                  }
+                                  className={`p-3 rounded-2xl border text-left text-xs transition-all flex items-start gap-2.5 cursor-pointer ${
+                                    duocChon
+                                      ? 'bg-rose-50 text-rose-900 border-rose-300 dark:bg-rose-950/60 dark:text-rose-200 dark:border-rose-700 font-semibold shadow-xs'
+                                      : 'bg-slate-50/70 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200/80 dark:border-slate-700/80'
+                                  }`}
+                                >
+                                  <span
+                                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0 ${
+                                      duocChon
+                                        ? 'bg-rose-600 text-white'
+                                        : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                                    }`}
+                                  >
+                                    {kyTu}
+                                  </span>
+                                  <span className="leading-snug">{choice}</span>
+                                </button>
+                              )
+                            })}
+                          </div>
+                        ) : (
+                          <div className="pt-2">
+                            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+                              Điền câu trả lời ngắn:
+                            </label>
+                            <input
+                              type="text"
+                              value={daChon || ''}
+                              onChange={(e) =>
+                                setCauTraLoiMom((prev) => ({ ...prev, [cau.id]: e.target.value }))
+                              }
+                              placeholder="Nhập đáp án số hoặc chữ..."
+                              className="w-full sm:w-64 px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+
+                {/* Nút nộp bài dưới cùng */}
+                <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-900/60 text-center space-y-3">
+                  <div className="text-sm font-bold text-slate-900 dark:text-white">
+                    Em đã hoàn thành bài của Mom chưa?
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+                    Khi nộp bài, hệ thống sẽ tự động chấm điểm, tạo cấu trúc lời giải chi tiết chuẩn HTML và gửi kết quả về cho Mom xem.
+                  </p>
+                  <button
+                    onClick={nopBaiCuaMom}
+                    className="btn-google-primary !bg-rose-600 hover:!bg-rose-700 text-white font-bold text-sm py-2.5 px-6 rounded-full inline-flex items-center gap-2 shadow-sm cursor-pointer"
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>Nộp bài ngay cho Mom</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* DANH SÁCH BÀI CỦA MOM GIAO */
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                      <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
+                      <span>Bài của Mom giao (Hạn 2 tiếng)</span>
+                    </h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      Mom tạo bài từ Cổng Phụ Huynh dựa trên các câu con sai trước đó để con ôn luyện khắc phục.
+                    </p>
+                  </div>
+                  <button
+                    onClick={napDsMom}
+                    className="btn-google-outlined inline-flex items-center gap-1.5 text-xs px-3.5 py-1.5 font-semibold self-start sm:self-auto cursor-pointer"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>Làm mới</span>
+                  </button>
+                </div>
+
+                {thongBaoNopMom && (
+                  <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center justify-between">
+                    <span>{thongBaoNopMom}</span>
+                    <button
+                      onClick={() => setThongBaoNopMom(null)}
+                      className="text-emerald-600 hover:text-emerald-900 font-bold ml-2 cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+
+                {dsMomGiao.length === 0 ? (
+                  <div className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-center space-y-3">
+                    <div className="w-12 h-12 rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-500 flex items-center justify-center mx-auto">
+                      <Heart className="w-6 h-6" />
+                    </div>
+                    <div className="font-bold text-sm text-slate-900 dark:text-white">
+                      Chưa có bài tập nào do Mom giao
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
+                      Mom có thể vào <strong>Cổng Phụ Huynh (/phu-huynh)</strong> chỉ bằng Số báo danh của con, kéo thanh chọn câu (tối đa 99 câu) để tự động tạo và gửi bài cho con làm bất kỳ lúc nào.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    {dsMomGiao.map((bai) => {
+                      const daNop = bai.trangThai === 'da_nop'
+                      const dangLam = bai.trangThai === 'dang_lam'
+                      return (
+                        <div
+                          key={bai.id}
+                          className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-xs flex flex-col justify-between space-y-4"
+                        >
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs font-mono text-slate-400">
+                                {dinhDangNgayGio(bai.ngayGiao)}
+                              </span>
+                              {daNop ? (
+                                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800">
+                                  ✓ Đã nộp ({bai.diem}/10đ)
+                                </span>
+                              ) : dangLam ? (
+                                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800">
+                                  ⏳ Đang làm
+                                </span>
+                              ) : (
+                                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800">
+                                  Chưa làm
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="font-bold text-sm text-slate-900 dark:text-white">
+                              {bai.tieuDe}
+                            </div>
+
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-3">
+                              <span>Số câu: <strong>{bai.soCau || bai.dsCau?.length}</strong> câu</span>
+                              <span>·</span>
+                              <span className="flex items-center gap-1 text-rose-600 dark:text-rose-400 font-medium">
+                                <Timer className="w-3.5 h-3.5" />
+                                <span>Hạn 2 tiếng (120p)</span>
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                            {daNop ? (
+                              <button
+                                onClick={() => {
+                                  if (bai.htmlKetQua) {
+                                    setPhieuHtml(bai.htmlKetQua)
+                                  } else {
+                                    alert(`Điểm của em: ${bai.diem}/10 (${bai.soCauDung}/${bai.soCau} câu đúng)`)
+                                  }
+                                }}
+                                className="btn-google-outlined text-xs py-2 px-3.5 rounded-full font-semibold flex items-center gap-1.5 cursor-pointer"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                <span>Xem kết quả & Lời giải HTML</span>
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => batDauLamBaiMom(bai)}
+                                className="btn-google-primary !bg-rose-600 hover:!bg-rose-700 text-white text-xs py-2 px-4 rounded-full font-bold flex items-center gap-1.5 shadow-sm cursor-pointer"
+                              >
+                                <span>{dangLam ? 'Tiếp tục làm bài' : 'Bắt đầu làm bài (2 tiếng)'}</span>
+                                <ArrowRight className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* TAB 3: KHẮC PHỤC CÂU SAI */}
         {tab === 'khacphuc' && (
           <div className="space-y-4 animate-google-fade">
@@ -1235,6 +1715,9 @@ export default function StudentPortalScreen() {
           }}
         />
       )}
+
+      {/* Bong bóng chat học sinh hỏi bài Trợ lý Em Yêu AI & Thầy */}
+      {auth?.sbd && <BongBongChatHocSinh sbd={auth.sbd} hoTen={auth.hoTen} lop={auth.lop} />}
     </div>
   )
 }

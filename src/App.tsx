@@ -15,6 +15,7 @@ import ExamTakeScreen from './screens/ExamTakeScreen'
 import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
 import PhieuScreen from './screens/PhieuScreen'
 import StudentPortalScreen from './screens/StudentPortalScreen'
+import ParentPortalScreen from './screens/ParentPortalScreen'
 
 // TÁM MÀN CHỈ THẦY DÙNG — NẠP MUỘN.
 //
@@ -92,6 +93,8 @@ function App() {
   // CỔNG HỌC SINH (/hoc-sinh, /hs): cổng thông tin riêng của em — đăng nhập,
   // xem điểm, nộp BTVN, khắc phục câu sai, vào thi.
   const [laHocSinh] = useState(() => docDuongVao(location.search, location.pathname).vai === 'hocsinh')
+  // CỔNG PHỤ HUYNH (/phu-huynh, /ph): cổng thông tin cho phụ huynh — tra cứu điểm của con bằng SBD, giao bài tập.
+  const [laPhuHuynh] = useState(() => docDuongVao(location.search, location.pathname).vai === 'phuhuynh')
   // MẬT KHẨU MỞ APP (MATKHAUMOAPP.md). CHỈ hỏi ở app quản lý của thầy — vào
   // thi, báo cáo phụ huynh, link riêng cũ đều không bao giờ bị hỏi.
   const [canHoi] = useState(() => laManThayQuanLy(location.search, location.pathname))
@@ -188,19 +191,19 @@ function App() {
   // IndexedDB danh sách lớp, không dựng màn nào của app quản lý. Chưa mở khoá
   // cũng vậy: không đọc danh sách lớp trước khi thầy nhập đúng mật khẩu.
   useEffect(() => {
-    if (linkCu || laPhieu || laXemDiem || laHocSinh || khoa !== 'da_mo') return
+    if (linkCu || laPhieu || laXemDiem || laHocSinh || laPhuHuynh || khoa !== 'da_mo') return
     loadClassList().then((list) => {
       if (list.length > 0) setClassList(list)
     })
-  }, [linkCu, laPhieu, laXemDiem, laHocSinh, khoa, setClassList])
+  }, [linkCu, laPhieu, laXemDiem, laHocSinh, laPhuHuynh, khoa, setClassList])
 
   // Link mời làm bài (?examCode=) mở thẳng màn thi. Không có thì vào app thầy.
   useEffect(() => {
-    if (linkCu || laPhieu || laHocSinh) return
+    if (linkCu || laPhieu || laHocSinh || laPhuHuynh) return
     const { maCa } = docDuongVao(location.search, location.pathname)
     if (maCa) setScreen('examtake')
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [linkCu, laPhieu, laHocSinh, laPhuHuynh])
 
   if (laPhieu) {
     return (
@@ -214,6 +217,13 @@ function App() {
     return (
       <ChanLoi o="Cổng học sinh">
         <StudentPortalScreen />
+      </ChanLoi>
+    )
+  }
+  if (laPhuHuynh) {
+    return (
+      <ChanLoi o="Cổng phụ huynh">
+        <ParentPortalScreen />
       </ChanLoi>
     )
   }
