@@ -10,6 +10,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { GraduationCap, Timer, Library, ClipboardList, Presentation, FilePlus2, Users, MessageCircleQuestion } from 'lucide-react'
 import { useAppStore, type ScreenId } from '../store/appStore'
 import { chan, datRong, docRong, luuRong, RONG_MAC_DINH, RONG_MAX, RONG_MIN } from '../lib/rong-cot'
+import LogoGiaoVien from './LogoGiaoVien'
 
 interface Muc {
   id: ScreenId
@@ -126,55 +127,71 @@ export default function ThanhBenTrai() {
 
   return (
     <nav className="ben-trai" aria-label="Điều hướng chính">
-      <button
-        type="button"
-        onClick={() => setScreen('examhub')}
-        className="tap-target text-left"
-        style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', fontWeight: 700, color: 'var(--muc)', padding: '0 var(--k3)', marginBottom: 'var(--k5)' }}
-      >
-        Đỗ Đại Học
-      </button>
+      {/* Brand Header với Logo Giáo viên phong cách Google */}
+      <div className="pb-4 mb-3 border-b border-slate-100 dark:border-slate-800">
+        <button
+          type="button"
+          onClick={() => setScreen('examhub')}
+          className="tap-target text-left w-full rounded-2xl hover:bg-slate-100/70 dark:hover:bg-slate-800/60 transition p-2 -m-2 flex items-center"
+          title="Trang chủ kiểm tra tại lớp"
+        >
+          <LogoGiaoVien size={38} hienChu={true} />
+        </button>
+      </div>
 
-      {NHOM.map((n) => (
-        <div key={n.ten} style={{ marginBottom: 'var(--k5)' }}>
-          <div
-            className="font-bold"
-            style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--mo)', padding: '0 var(--k3)', marginBottom: 'var(--k2)' }}
-          >
-            {n.ten}
+      <div className="flex-1 space-y-5 overflow-y-auto pr-1">
+        {NHOM.map((n) => (
+          <div key={n.ten} className="space-y-1">
+            <div
+              className="font-bold px-3 py-1 text-[11px] tracking-wider uppercase text-slate-400 dark:text-slate-500 select-none"
+              style={{ fontFamily: 'var(--sans)' }}
+            >
+              {n.ten}
+            </div>
+            <div className="flex flex-col gap-0.5">
+              {n.muc.map((m) => {
+                const Icon = m.icon
+                const dang = screen === m.id || (m.con ?? []).includes(screen)
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => setScreen(m.id)}
+                    aria-current={dang ? 'page' : undefined}
+                    className={`tap-target flex items-center gap-3 px-3.5 py-2.5 rounded-full font-medium text-left transition-all duration-150 ${
+                      dang
+                        ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 font-semibold shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                    style={{
+                      fontFamily: 'var(--sans)',
+                      fontSize: 'var(--cx-2)',
+                    }}
+                  >
+                    <Icon
+                      size={19}
+                      strokeWidth={dang ? 2.3 : 1.8}
+                      className={`shrink-0 transition-colors ${
+                        dang ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'
+                      }`}
+                    />
+                    <span className="truncate">{m.ten}</span>
+                  </button>
+                )
+              })}
+            </div>
           </div>
-          <div className="flex flex-col" style={{ gap: 2 }}>
-            {n.muc.map((m) => {
-              const Icon = m.icon
-              const dang = screen === m.id || (m.con ?? []).includes(screen)
-              return (
-                <button
-                  key={m.id}
-                  type="button"
-                  onClick={() => setScreen(m.id)}
-                  aria-current={dang ? 'page' : undefined}
-                  className="tap-target flex items-center font-bold text-left"
-                  style={{
-                    gap: 'var(--k3)',
-                    minHeight: 42,
-                    padding: '0 var(--k3)',
-                    borderRadius: 'var(--bo-1)',
-                    background: dang ? 'var(--tim-nen)' : 'transparent',
-                    color: dang ? 'var(--tim)' : 'var(--nhat)',
-                    fontFamily: 'var(--sans)',
-                    fontSize: 'var(--cx-2)',
-                    transitionProperty: 'background-color, color',
-                    transitionDuration: 'var(--nhanh)',
-                  }}
-                >
-                  <Icon size={18} strokeWidth={dang ? 2.4 : 2} />
-                  {m.ten}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
+
+      {/* Footer nhỏ phiên làm việc Google style */}
+      <div className="pt-3 mt-auto border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 px-2">
+        <span className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+          <span>Sẵn sàng giảng dạy</span>
+        </span>
+      </div>
+
       <TayKeo />
     </nav>
   )

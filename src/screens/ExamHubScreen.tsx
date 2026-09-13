@@ -4,6 +4,7 @@ import { useAppStore } from '../store/appStore'
 import { daySangBanMoi, PHIEN_BAN_APP, type DangKySW } from '../lib/cap-nhat-app'
 import { OThongBao, NutChinh } from '../components/DesignSystem'
 import { caiMotCham, coTheCaiMotCham, dangTrongTrinhDuyet, theoDoiSuKienCai } from '../lib/pwa-install'
+import LogoGiaoVien from '../components/LogoGiaoVien'
 
 // MANCUAVAOVANENTOI.md mục 2: thẻ KHÔNG viền màu, phân cấp bằng bóng --bong-1;
 // CHỈ MỘT thẻ nổi bật — hành động chính (mở ca) — bằng nền gradient --g1;
@@ -143,11 +144,21 @@ export default function ExamHubScreen() {
 
   return (
     <div className="min-h-screen pb-24 px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)' }}>
-      <header style={{ paddingTop: 'var(--k2)' }}>
-        <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--mo)', letterSpacing: '.16em', textTransform: 'uppercase' }}>Đỗ Đại Học</div>
-        <h1 className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-5)', lineHeight: 1.15, marginTop: 2 }}>
-          Kiểm tra tại lớp
-        </h1>
+      <header className="flex items-center justify-between gap-4 pt-2 pb-1">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <LogoGiaoVien size={28} />
+            <span
+              className="text-xs font-bold tracking-wider uppercase text-slate-500 dark:text-slate-400"
+              style={{ fontFamily: 'var(--sans)' }}
+            >
+              Đỗ Đại Học · Giáo Viên
+            </span>
+          </div>
+          <h1 className="font-bold text-2xl tracking-tight text-slate-900 dark:text-white" style={{ fontFamily: 'var(--sans)' }}>
+            Kiểm tra tại lớp
+          </h1>
+        </div>
       </header>
 
       <TheChinh

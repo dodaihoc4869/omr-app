@@ -47,6 +47,16 @@
   --tim-nen: #eef2ff;
   --gap: #dc2626; /* CHỈ một việc: đồng hồ làm bài còn dưới 5 phút (GIAO-DIEN-LAM-BAI.md) */
 
+  /* màu phong cách Google Material 3 */
+  --gg-xanh: #1a73e8;
+  --gg-do: #ea4335;
+  --gg-vang: #fbbc04;
+  --gg-luc: #34a853;
+  --gg-xanh-nen: #e8f0fe;
+  --gg-luc-nen: #e6f4ea;
+  --gg-vang-nen: #fef7e0;
+  --gg-do-nen: #fce8e6;
+
   /* gradient đầu thẻ — xoay vòng theo số câu (chỉ số modulo 4) */
   --g1: linear-gradient(135deg, #6366f1, #8b5cf6);
   --g2: linear-gradient(135deg, #f59e0b, #fbbf24);
@@ -161,6 +171,15 @@
     --cam-nen: #2d2411;
     --tim: #818cf8;
     --tim-nen: #1e1f3d;
+
+    --gg-xanh: #8ab4f8;
+    --gg-do: #f28b82;
+    --gg-vang: #fdd663;
+    --gg-luc: #81c995;
+    --gg-xanh-nen: #172b4d;
+    --gg-luc-nen: #0f3822;
+    --gg-vang-nen: #3a2e0a;
+    --gg-do-nen: #3c1e1e;
 
     --bong-1: 0 1px 3px rgba(0, 0, 0, 0.4);
     --bong-2: 0 4px 16px rgba(0, 0, 0, 0.5);

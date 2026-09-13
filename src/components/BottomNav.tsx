@@ -19,8 +19,8 @@ export default function BottomNav() {
   const activeTab: ScreenId = CON_CUA_HOC_SINH.includes(screen) ? 'hocsinh' : CON_CUA_KIEM_TRA.includes(screen) ? 'examhub' : screen
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-40 flex justify-center pb-[calc(env(safe-area-inset-bottom)+12px)] pt-2 pointer-events-none">
-      <div className="pointer-events-auto flex gap-1 p-1.5 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg shadow-slate-900/10">
+    <nav className="fixed bottom-0 inset-x-0 z-40 flex justify-center pb-[calc(env(safe-area-inset-bottom)+14px)] pt-2 pointer-events-none">
+      <div className="pointer-events-auto flex items-center gap-1.5 p-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-900/10 transition-all">
         {TABS.map((tab) => {
           const Icon = tab.icon
           const active = activeTab === tab.id
@@ -28,14 +28,14 @@ export default function BottomNav() {
             <button
               key={tab.id}
               onClick={() => setScreen(tab.id)}
-              className={`tap-target flex items-center gap-2 rounded-full px-5 py-2.5 font-semibold text-sm transition-colors duration-150 ${
+              className={`tap-target flex items-center gap-2 rounded-full px-5 py-2.5 font-semibold text-sm transition-all duration-150 ${
                 active
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/80 dark:text-blue-300 shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
-              <Icon size={18} strokeWidth={active ? 2.4 : 2} />
-              {tab.label}
+              <Icon size={19} strokeWidth={active ? 2.3 : 1.9} className={active ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'} />
+              <span>{tab.label}</span>
             </button>
           )
         })}

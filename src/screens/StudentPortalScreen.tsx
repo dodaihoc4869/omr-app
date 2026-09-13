@@ -11,7 +11,6 @@ import {
   LogOut,
   RefreshCw,
   Sparkles,
-  User,
   AlertCircle,
   CheckSquare,
   Square,
@@ -34,6 +33,7 @@ import { dangCua } from '../lib/dang-cau'
 import { dungPhieu, type ThongTinPhieu } from '../lib/html-phieu'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import { nhoVaiDaDung } from '../lib/vai-tro'
+import LogoHocSinh from '../components/LogoHocSinh'
 
 const KHOA_LUU_AUTH = 'omr_student_portal_auth'
 
@@ -476,31 +476,34 @@ export default function StudentPortalScreen() {
   // NẾU CHƯA ĐĂNG NHẬP
   if (!auth) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex flex-col justify-center items-center p-4">
-        <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200/80 dark:border-slate-800 p-7 transition-all">
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-50 to-blue-50/20 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 flex flex-col justify-center items-center p-4">
+        <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200/80 dark:border-slate-800 p-8 transition-all">
           <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-600/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400 mb-3 shadow-inner">
-              <User className="w-7 h-7" />
+            <div className="flex justify-center mb-3">
+              <LogoHocSinh size={54} />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            <h1
+              className="text-2xl font-black tracking-tight text-slate-900 dark:text-white"
+              style={{ fontFamily: 'var(--sans)' }}
+            >
               Cổng Thông Tin Học Sinh
             </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Thầy Đỗ Đại Học · Đăng nhập để xem điểm và học tập
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5" style={{ fontFamily: 'var(--sans)' }}>
+              Luyện thi Hoá Thầy Đỗ Đại Học · Đăng nhập để học tập
             </p>
           </div>
 
           {chuaCoMatKhau ? (
             <form onSubmit={xuLyDatMatKhau} className="space-y-4">
-              <div className="p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl text-amber-800 dark:text-amber-300 text-xs leading-relaxed flex items-start gap-2.5">
-                <Sparkles className="w-4 h-4 flex-shrink-0 mt-0.5" />
+              <div className="p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-2xl text-amber-800 dark:text-amber-300 text-xs leading-relaxed flex items-start gap-2.5">
+                <Sparkles className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
                 <div>
                   <strong>Thiết lập mật khẩu lần đầu:</strong> SBD <strong>{sbdInput}</strong> chưa có mật khẩu. Em hãy tạo mật khẩu mới (tối thiểu 6 ký tự) để đăng nhập vào các lần sau.
                 </div>
               </div>
 
               {loiDatMatKhau && (
-                <div className="p-3 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 rounded-xl text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+                <div className="p-3 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 rounded-2xl text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
                   <span>{loiDatMatKhau}</span>
                 </div>
@@ -515,7 +518,7 @@ export default function StudentPortalScreen() {
                   value={matKhauMoi}
                   onChange={(e) => setMatKhauMoi(e.target.value)}
                   placeholder="Nhập mật khẩu mới..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition"
                   required
                 />
               </div>
@@ -529,23 +532,23 @@ export default function StudentPortalScreen() {
                   value={xacNhanMatKhau}
                   onChange={(e) => setXacNhanMatKhau(e.target.value)}
                   placeholder="Nhập lại mật khẩu..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition"
                   required
                 />
               </div>
 
-              <div className="pt-2 flex gap-2">
+              <div className="pt-2 flex gap-2.5">
                 <button
                   type="button"
                   onClick={() => setChuaCoMatKhau(false)}
-                  className="w-1/3 py-2.5 px-3 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium transition"
+                  className="w-1/3 py-2.5 px-3 rounded-full border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-semibold transition"
                 >
                   Quay lại
                 </button>
                 <button
                   type="submit"
                   disabled={dangDatMatKhau}
-                  className="w-2/3 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm transition shadow-sm flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-2/3 py-2.5 px-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition shadow-sm flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {dangDatMatKhau ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
                   <span>Xác nhận & Đăng nhập</span>
@@ -555,7 +558,7 @@ export default function StudentPortalScreen() {
           ) : (
             <form onSubmit={xuLyDangNhap} className="space-y-4">
               {loiDangNhap && (
-                <div className="p-3 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 rounded-xl text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+                <div className="p-3 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 rounded-2xl text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
                   <span>{loiDangNhap}</span>
                 </div>
@@ -570,7 +573,7 @@ export default function StudentPortalScreen() {
                   value={sbdInput}
                   onChange={(e) => setSbdInput(e.target.value)}
                   placeholder="Ví dụ: 110234 hoặc 12026"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-mono"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-mono transition"
                   required
                   autoFocus
                 />
@@ -591,12 +594,12 @@ export default function StudentPortalScreen() {
                     value={matKhauInput}
                     onChange={(e) => setMatKhauInput(e.target.value)}
                     placeholder="Nhập mật khẩu của em..."
-                    className="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    className="w-full px-4 py-2.5 pr-10 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition"
                   />
                   <button
                     type="button"
                     onClick={() => setHienMatKhau(!hienMatKhau)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                   >
                     {hienMatKhau ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -606,7 +609,7 @@ export default function StudentPortalScreen() {
               <button
                 type="submit"
                 disabled={dangXuLyDangNhap}
-                className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm transition shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
+                className="w-full py-3 px-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 mt-3"
               >
                 {dangXuLyDangNhap ? <RefreshCw className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
                 <span>Đăng nhập</span>
@@ -627,63 +630,62 @@ export default function StudentPortalScreen() {
   // KHI ĐÃ ĐĂNG NHẬP THÀNH CÔNG
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
-      {/* Header */}
-      <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 dark:border-slate-800 px-4 py-3 sm:px-6">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
-              {auth.hoTen.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="font-bold text-slate-900 dark:text-white text-base leading-tight">
-                  {auth.hoTen}
-                </h1>
-                {auth.lop && (
-                  <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                    {auth.lop}
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">
-                SBD: {auth.sbd}
-              </p>
-            </div>
-          </div>
+      {/* Header Google Workspace style */}
+      <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200/80 dark:border-slate-800 px-4 py-2.5 sm:px-6">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
+          {/* Logo Học sinh phong cách Google */}
+          <LogoHocSinh size={38} hienChu={true} />
 
-          <div className="flex items-center gap-2">
+          {/* Thông tin học sinh dạng Google Account Pill */}
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60">
+              <div className="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                {auth.hoTen.charAt(0).toUpperCase()}
+              </div>
+              <div className="hidden sm:flex flex-col text-left leading-tight">
+                <span className="font-bold text-slate-900 dark:text-white text-xs">
+                  {auth.hoTen}
+                </span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
+                  SBD: {auth.sbd} {auth.lop ? `· ${auth.lop}` : ''}
+                </span>
+              </div>
+            </div>
+
             <button
               onClick={dangXuat}
               title="Đăng xuất"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-medium transition"
+              className="tap-target inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold transition"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Đăng xuất</span>
+              <span className="hidden md:inline">Đăng xuất</span>
             </button>
           </div>
         </div>
       </header>
 
-      {/* Navigation 4 mục */}
-      <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-6 pb-2">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {/* Navigation 4 mục theo phong cách Google Material 3 Segmented Pill Tabs */}
+      <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-5 pb-1">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           <button
             onClick={() => setTab('diem')}
-            className={`p-4 rounded-2xl border text-left transition-all flex flex-col justify-between ${
+            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between ${
               tab === 'diem'
-                ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-600/20'
-                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700'
+                ? 'bg-blue-50 text-blue-900 border-blue-200 dark:bg-blue-950/70 dark:text-blue-200 dark:border-blue-800 shadow-xs'
+                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
             }`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <Award className={`w-6 h-6 ${tab === 'diem' ? 'text-indigo-200' : 'text-indigo-600 dark:text-indigo-400'}`} />
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${tab === 'diem' ? 'bg-indigo-500/50 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'}`}>
+            <div className="flex items-center justify-between mb-2">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${tab === 'diem' ? 'bg-blue-600 text-white' : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'}`}>
+                <Award size={18} strokeWidth={tab === 'diem' ? 2.4 : 2} />
+              </div>
+              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'diem' ? 'bg-blue-200/70 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
                 {dsLichSu.length} ca
               </span>
             </div>
             <div>
-              <div className="font-bold text-sm">Xem điểm</div>
-              <div className={`text-xs mt-0.5 line-clamp-1 ${tab === 'diem' ? 'text-indigo-100' : 'text-slate-500 dark:text-slate-400'}`}>
+              <div className="font-bold text-sm leading-tight">Xem điểm</div>
+              <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'diem' ? 'text-blue-700/80 dark:text-blue-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
                 Báo cáo các ca thi
               </div>
             </div>
@@ -691,21 +693,23 @@ export default function StudentPortalScreen() {
 
           <button
             onClick={() => setTab('btvn')}
-            className={`p-4 rounded-2xl border text-left transition-all flex flex-col justify-between ${
+            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between ${
               tab === 'btvn'
-                ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-600/20'
-                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700'
+                ? 'bg-emerald-50 text-emerald-900 border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-200 dark:border-emerald-800 shadow-xs'
+                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
             }`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <BookOpen className={`w-6 h-6 ${tab === 'btvn' ? 'text-indigo-200' : 'text-emerald-600 dark:text-emerald-400'}`} />
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${tab === 'btvn' ? 'bg-indigo-500/50 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'}`}>
+            <div className="flex items-center justify-between mb-2">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${tab === 'btvn' ? 'bg-emerald-600 text-white' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'}`}>
+                <BookOpen size={18} strokeWidth={tab === 'btvn' ? 2.4 : 2} />
+              </div>
+              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'btvn' ? 'bg-emerald-200/70 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
                 {dsBtvn.length} bài
               </span>
             </div>
             <div>
-              <div className="font-bold text-sm">Bài tập về nhà</div>
-              <div className={`text-xs mt-0.5 line-clamp-1 ${tab === 'btvn' ? 'text-indigo-100' : 'text-slate-500 dark:text-slate-400'}`}>
+              <div className="font-bold text-sm leading-tight">Bài tập về nhà</div>
+              <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'btvn' ? 'text-emerald-700/80 dark:text-emerald-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
                 Giao & nộp bài
               </div>
             </div>
@@ -713,21 +717,23 @@ export default function StudentPortalScreen() {
 
           <button
             onClick={() => setTab('khacphuc')}
-            className={`p-4 rounded-2xl border text-left transition-all flex flex-col justify-between ${
+            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between ${
               tab === 'khacphuc'
-                ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-600/20'
-                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700'
+                ? 'bg-amber-50 text-amber-900 border-amber-200 dark:bg-amber-950/70 dark:text-amber-200 dark:border-amber-800 shadow-xs'
+                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
             }`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <Sparkles className={`w-6 h-6 ${tab === 'khacphuc' ? 'text-indigo-200' : 'text-amber-500 dark:text-amber-400'}`} />
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${tab === 'khacphuc' ? 'bg-indigo-500/50 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'}`}>
+            <div className="flex items-center justify-between mb-2">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${tab === 'khacphuc' ? 'bg-amber-500 text-white' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'}`}>
+                <Sparkles size={18} strokeWidth={tab === 'khacphuc' ? 2.4 : 2} />
+              </div>
+              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'khacphuc' ? 'bg-amber-200/70 text-amber-800 dark:bg-amber-900 dark:text-amber-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
                 {tongSoCauSaiDaChon} câu sai
               </span>
             </div>
             <div>
-              <div className="font-bold text-sm">Khắc phục câu sai</div>
-              <div className={`text-xs mt-0.5 line-clamp-1 ${tab === 'khacphuc' ? 'text-indigo-100' : 'text-slate-500 dark:text-slate-400'}`}>
+              <div className="font-bold text-sm leading-tight">Khắc phục câu sai</div>
+              <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'khacphuc' ? 'text-amber-700/80 dark:text-amber-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
                 Tự tạo đề ôn tập
               </div>
             </div>
@@ -735,21 +741,23 @@ export default function StudentPortalScreen() {
 
           <button
             onClick={() => setTab('vaothi')}
-            className={`p-4 rounded-2xl border text-left transition-all flex flex-col justify-between ${
+            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between ${
               tab === 'vaothi'
-                ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-600/20'
-                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700'
+                ? 'bg-purple-50 text-purple-900 border-purple-200 dark:bg-purple-950/70 dark:text-purple-200 dark:border-purple-800 shadow-xs'
+                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
             }`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <LogIn className={`w-6 h-6 ${tab === 'vaothi' ? 'text-indigo-200' : 'text-purple-600 dark:text-purple-400'}`} />
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${tab === 'vaothi' ? 'bg-indigo-500/50 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'}`}>
+            <div className="flex items-center justify-between mb-2">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${tab === 'vaothi' ? 'bg-purple-600 text-white' : 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400'}`}>
+                <LogIn size={18} strokeWidth={tab === 'vaothi' ? 2.4 : 2} />
+              </div>
+              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'vaothi' ? 'bg-purple-200/70 text-purple-800 dark:bg-purple-900 dark:text-purple-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
                 Trực tuyến
               </span>
             </div>
             <div>
-              <div className="font-bold text-sm">Vào thi</div>
-              <div className={`text-xs mt-0.5 line-clamp-1 ${tab === 'vaothi' ? 'text-indigo-100' : 'text-slate-500 dark:text-slate-400'}`}>
+              <div className="font-bold text-sm leading-tight">Vào thi</div>
+              <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'vaothi' ? 'text-purple-700/80 dark:text-purple-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
                 Nhập mã ca & mật khẩu
               </div>
             </div>
@@ -854,17 +862,17 @@ export default function StudentPortalScreen() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                    <div className="flex items-center gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
                       <a
                         href={`/d/${item.maCa}?sbd=${auth.sbd}`}
-                        className="flex-1 py-2 px-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-xs font-semibold text-center transition flex items-center justify-center gap-1.5"
+                        className="flex-1 py-2 px-4 rounded-full bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-xs font-semibold text-center transition flex items-center justify-center gap-1.5"
                       >
                         <span>Xem báo cáo</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </a>
                       <a
                         href={`/t/${item.maCa}?sbd=${auth.sbd}`}
-                        className="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-medium text-center transition"
+                        className="py-2 px-4 rounded-full border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-medium text-center transition"
                       >
                         Mở lại bài thi
                       </a>
@@ -980,7 +988,7 @@ export default function StudentPortalScreen() {
                             type="button"
                             onClick={() => void moBaiTap(bt, false)}
                             disabled={dangMoBai === (bt.maBtvn || bt.maCa)}
-                            className="px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
+                            className="px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
                             title="Xem lại bài làm và lời giải chi tiết"
                           >
                             <Eye className="w-3.5 h-3.5" />
@@ -992,7 +1000,7 @@ export default function StudentPortalScreen() {
                               type="button"
                               onClick={() => void moBaiTap(bt, true)}
                               disabled={dangMoBai === (bt.maBtvn || bt.maCa)}
-                              className="px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer bg-amber-500 hover:bg-amber-600 text-white shadow-sm"
+                              className="px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer bg-amber-500 hover:bg-amber-600 text-white shadow-xs"
                               title={`Làm lại bài tập này (còn ${bt.soLanLamLaiConLai ?? 3}/3 lượt)`}
                             >
                               {dangMoBai === (bt.maBtvn || bt.maCa) ? (
@@ -1003,7 +1011,7 @@ export default function StudentPortalScreen() {
                               <span>Làm lại (còn {bt.soLanLamLaiConLai ?? 3}/3 lần)</span>
                             </button>
                           ) : (
-                            <span className="text-[11px] text-slate-400 italic px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg">
+                            <span className="text-[11px] text-slate-400 italic px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-full">
                               Hết lượt làm lại (3/3)
                             </span>
                           )}
@@ -1013,7 +1021,7 @@ export default function StudentPortalScreen() {
                           type="button"
                           onClick={() => void moBaiTap(bt, false)}
                           disabled={dangMoBai === (bt.maBtvn || bt.maCa)}
-                          className="px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+                          className="px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
                         >
                           {dangMoBai === (bt.maBtvn || bt.maCa) ? (
                             <>
