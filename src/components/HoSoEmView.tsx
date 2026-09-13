@@ -6,7 +6,7 @@
 //   · phụ huynh → ParentScreen (link riêng /ph/<token>)
 // Nội dung y hệt nhau; chỉ khác cách xưng hô và các nút hành động của thầy —
 // những nút đó do màn cha vẽ thêm, không nằm ở đây.
-import { TrendingDown, TrendingUp, Minus } from 'lucide-react'
+import { TrendingDown, TrendingUp, Minus, FileText } from 'lucide-react'
 import { Hang, Nhan, OThongBao, TheNoiDung } from './DesignSystem'
 import type { BaiTapCuaEm, ChuyenDeEm, HoSoEm, TrangThaiBaiTap, XuHuong } from '../lib/exam-api'
 import { classify } from '../engine/score'
@@ -44,7 +44,7 @@ function phanTram(x: number): string {
   return `${Math.round(x * 100)}%`
 }
 
-function ngayGio(iso: string): string {
+export function ngayGio(iso: string): string {
   const d = new Date(iso)
   if (!Number.isFinite(d.getTime())) return ''
   return d.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
@@ -115,7 +115,13 @@ export function KhoiChuyenDe({ chuyenDe }: { chuyenDe: ChuyenDeEm[] }) {
   )
 }
 
-export function KhoiLichSuCa({ ca }: { ca: HoSoEm['ca'] }) {
+export function KhoiLichSuCa({
+  ca,
+  onXemBaoCao,
+}: {
+  ca: HoSoEm['ca']
+  onXemBaoCao?: (c: HoSoEm['ca'][number]) => void
+}) {
   return (
     <TheNoiDung>
       <h2 className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', marginBottom: 'var(--k3)' }}>
@@ -157,11 +163,32 @@ export function KhoiLichSuCa({ ca }: { ca: HoSoEm['ca'] }) {
                   {c.tong === null ? 'chưa chấm' : c.tong.toFixed(2).replace('.', ',')}
                 </span>
               </span>
-              <span className="flex items-center flex-wrap" style={{ gap: 4, marginTop: 6 }}>
-                {c.tong !== null && <Nhan tone={toneXepLoai(c.tong)}>{classify(c.tong)}</Nhan>}
-                {c.trangThai === 'khoa' && <Nhan tone="do">bị khoá</Nhan>}
-                {c.trangThai !== 'khoa' && c.soLanRoiMan > 0 && <Nhan tone="cam">rời màn {c.soLanRoiMan} lần</Nhan>}
-              </span>
+              <div className="flex items-center justify-between flex-wrap" style={{ gap: 4, marginTop: 6 }}>
+                <span className="flex items-center flex-wrap" style={{ gap: 4 }}>
+                  {c.tong !== null && <Nhan tone={toneXepLoai(c.tong)}>{classify(c.tong)}</Nhan>}
+                  {c.trangThai === 'khoa' && <Nhan tone="do">bị khoá</Nhan>}
+                  {c.trangThai !== 'khoa' && c.soLanRoiMan > 0 && <Nhan tone="cam">rời màn {c.soLanRoiMan} lần</Nhan>}
+                </span>
+                {onXemBaoCao && (
+                  <button
+                    type="button"
+                    onClick={() => onXemBaoCao(c)}
+                    className="tap-target font-bold inline-flex items-center justify-center shrink-0 cursor-pointer shadow-xs transition-all active:scale-95 hover:opacity-90"
+                    style={{
+                      minHeight: 32,
+                      padding: '0 var(--k3)',
+                      borderRadius: 'var(--bo-tron)',
+                      background: 'var(--gg-xanh)',
+                      color: 'var(--giay)',
+                      fontSize: 'var(--cx-1)',
+                      gap: 4,
+                      border: 'none',
+                    }}
+                  >
+                    <FileText size={14} /> Xem báo cáo
+                  </button>
+                )}
+              </div>
             </Hang>
           ))}
         </div>

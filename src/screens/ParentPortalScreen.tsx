@@ -15,7 +15,6 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import LogoApp from '../components/LogoApp'
-import BongBongChatPhuHuynh from '../components/BongBongChatPhuHuynh'
 import InfographicHuongDan from '../components/InfographicHuongDan'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import BaoCaoCaThiPhuHuynhModal from '../components/BaoCaoCaThiPhuHuynhModal'
@@ -716,11 +715,6 @@ export default function ParentPortalScreen() {
           </section>
         </div>
       </main>
-
-      {/* BONG BÓNG CHAT PHỤ HUYNH VỚI THẦY */}
-      {sbdHienTai && (
-        <BongBongChatPhuHuynh sbd={sbdHienTai} hoTenHocSinh={hoTenCon} lop={lopCon} />
-      )}
 
       {/* MODAL INFOGRAPHIC HƯỚNG DẪN */}
       {hienHuongDan && (

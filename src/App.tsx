@@ -2,7 +2,6 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import BottomNav from './components/BottomNav'
 import ThanhBenTrai from './components/ThanhBenTrai'
 import Toast from './components/Toast'
-import MessagesFab from './components/MessagesFab'
 import { useAppStore } from './store/appStore'
 import { loadClassList } from './lib/classlist-db'
 import { datMaBiMatPhien, loadKhoaApp, loadTeacherSecret } from './lib/exam-db'
@@ -71,7 +70,6 @@ const TEN_MAN: Record<string, string> = {
   cauhoi: 'Học sinh hỏi',
 }
 
-const HIDE_FAB_ON: string[] = ['examtake', 'nganhangde']
 const HIDE_BOTTOMNAV_ON: string[] = ['examtake']
 
 function App() {
@@ -298,7 +296,6 @@ function App() {
       </ChanLoi>
         </div>
       </div>
-      {!HIDE_FAB_ON.includes(screen) && <MessagesFab />}
       {!HIDE_BOTTOMNAV_ON.includes(screen) && <BottomNav />}
     </div>
   )

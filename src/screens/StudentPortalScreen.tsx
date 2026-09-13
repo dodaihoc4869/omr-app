@@ -39,7 +39,6 @@ import KhungXemPhieu from '../components/KhungXemPhieu'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
 import LogoHocSinh from '../components/LogoHocSinh'
-import BongBongChatHocSinh from '../components/BongBongChatHocSinh'
 import DauTruongGame from '../components/DauTruongGame'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
@@ -364,47 +363,62 @@ export default function StudentPortalScreen() {
               </span>
             </div>
             <div style="font-size: 15px; line-height: 1.65; margin-bottom: 14px; color: var(--muc, rgb(51, 65, 85)); font-weight: 500;">${c.text}</div>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 13.5px; margin-bottom: 14px;">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 14.5px; margin-bottom: 16px;">
               ${c.choices
                 .map(
                   (ch: string, idx: number) => {
                     const kyTu = String.fromCharCode(65 + idx)
                     const laDung = kyTu === c.dapAnDung
                     const laChon = kyTu === c.dapAnEm
-                    let bg = 'var(--the, rgb(255, 255, 255))'
-                    let border = 'var(--vien, rgb(226, 232, 240))'
-                    let color = 'var(--muc, rgb(30, 41, 59))'
+                    let bg = 'rgb(255, 255, 255)'
+                    let border = 'rgb(226, 232, 240)'
+                    let color = 'rgb(51, 65, 85)'
+                    let badgeBg = 'rgb(241, 245, 249)'
+                    let badgeColor = 'rgb(71, 85, 105)'
                     let fw = '500'
-                    if (laDung) { bg = 'rgba(52, 168, 83, 0.12)'; border = 'rgba(52, 168, 83, 0.5)'; color = 'rgb(19, 115, 51)'; fw = '700'; }
-                    else if (laChon) { bg = 'rgba(234, 67, 53, 0.12)'; border = 'rgba(234, 67, 53, 0.5)'; color = 'rgb(197, 34, 31)'; fw = '700'; }
-                    return `<div style="padding: 8px 12px; border-radius: 12px; border: 1px solid ${border}; background: ${bg}; color: ${color}; font-weight: ${fw};"><strong style="margin-right: 4px;">${kyTu}.</strong> ${ch}</div>`
+                    if (laDung) {
+                      bg = 'rgb(240, 253, 244)'
+                      border = 'rgb(167, 243, 208)'
+                      color = 'rgb(22, 101, 52)'
+                      badgeBg = 'rgb(220, 252, 231)'
+                      badgeColor = 'rgb(22, 101, 52)'
+                      fw = '700'
+                    } else if (laChon) {
+                      bg = 'rgb(254, 242, 242)'
+                      border = 'rgb(254, 202, 202)'
+                      color = 'rgb(153, 27, 27)'
+                      badgeBg = 'rgb(254, 226, 226)'
+                      badgeColor = 'rgb(153, 27, 27)'
+                      fw = '700'
+                    }
+                    return `<div style="padding: 10px 16px; border-radius: 16px; border: 1.5px solid ${border}; background: ${bg}; color: ${color}; font-weight: ${fw}; display: flex; align-items: center; gap: 12px;"><span style="width: 28px; height: 28px; border-radius: 50%; background: ${badgeBg}; color: ${badgeColor}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; flex-shrink: 0;">${kyTu}</span><span style="flex: 1; min-width: 0;">${ch}</span></div>`
                   }
                 )
                 .join('')}
             </div>
 
             <!-- HỘP LỜI GIẢI ĐÚNG CHUẨN ẢNH 4 (MÀU KEM / HỔ PHÁCH) -->
-            <div style="padding: 16px; background: rgb(255, 251, 235); border: 1px solid rgb(253, 230, 138); border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
-              <div style="font-size: 14.5px; color: rgb(146, 64, 14); font-weight: 600; margin-bottom: 8px;">
-                Đáp án: <b style="font-size: 16px; font-weight: 900; color: rgb(120, 53, 15); letter-spacing: 0.04em;">${c.dapAnDung}</b>
+            <div style="padding: 22px 24px; background: rgb(255, 253, 245); border: 1.5px solid rgb(253, 230, 138); border-radius: 20px; box-shadow: 0 4px 14px rgba(217,119,6,0.06);">
+              <div style="font-size: 16px; color: rgb(120, 53, 15); font-weight: 700; margin-bottom: 12px;">
+                Đáp án: <b style="font-size: 18px; font-weight: 900; color: rgb(120, 53, 15); letter-spacing: 0.04em;">${c.dapAnDung}</b>
               </div>
               ${c.chot ? `
-                <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: rgb(146, 64, 14); margin-top: 10px; margin-bottom: 4px;">
+                <div style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: rgb(146, 64, 14); margin-top: 10px; margin-bottom: 6px;">
                   KIẾN THỨC CỐT LÕI
                 </div>
-                <div style="font-size: 14.5px; font-weight: 800; line-height: 1.6; color: rgb(59, 29, 5); margin-bottom: 12px;">
+                <div style="font-size: 15px; font-weight: 800; line-height: 1.65; color: rgb(59, 29, 5); margin-bottom: 14px;">
                   ${c.chot}
                 </div>
               ` : ''}
               ${c.lyDo && c.lyDo.length > 0 ? `
-                <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: rgb(146, 64, 14); margin-top: 10px; margin-bottom: 6px;">
+                <div style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: rgb(146, 64, 14); margin-top: 10px; margin-bottom: 8px;">
                   VÌ SAO CHỌN / KHÔNG CHỌN TỪNG PHƯƠNG ÁN
                 </div>
-                <div style="font-size: 14px; line-height: 1.6; color: rgb(120, 53, 15);">
+                <div style="font-size: 14px; line-height: 1.65; color: rgb(120, 53, 15);">
                   ${c.lyDo.map((l: any) => `
-                    <div style="padding: 4px 0; border-top: 1px dashed rgba(146, 64, 14, 0.2);">
-                      <strong style="color: rgb(91, 42, 6);">${l.khoa}.</strong>
-                      <span style="font-weight: 700; color: ${l.dung ? 'rgb(21, 128, 61)' : 'rgb(185, 28, 28)'}; margin: 0 4px;">
+                    <div style="padding: 6px 0; border-top: 1px dashed rgba(146, 64, 14, 0.18);">
+                      <strong style="color: rgb(120, 53, 15);">${l.khoa}.</strong>
+                      <span style="font-weight: 800; color: ${l.dung ? 'rgb(22, 163, 74)' : 'rgb(220, 38, 38)'}; margin: 0 4px;">
                         ${l.dung ? '✓' : '✗'}
                       </span>
                       <span>${l.ly}</span>
@@ -413,10 +427,10 @@ export default function StudentPortalScreen() {
                 </div>
               ` : ''}
               ${c.buoc && c.buoc.length > 0 ? `
-                <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: rgb(146, 64, 14); margin-top: 12px; margin-bottom: 6px;">
+                <div style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: rgb(146, 64, 14); margin-top: 14px; margin-bottom: 6px;">
                   LÀM TỪNG BƯỚC
                 </div>
-                <div style="font-size: 14px; line-height: 1.6; color: rgb(120, 53, 15);">
+                <div style="font-size: 14px; line-height: 1.65; color: rgb(120, 53, 15);">
                   ${c.buoc.map((b: string, bIdx: number) => `<div style="margin-bottom: 4px;">${bIdx + 1}. ${b}</div>`).join('')}
                 </div>
               ` : ''}
@@ -1945,9 +1959,6 @@ export default function StudentPortalScreen() {
           }}
         />
       )}
-
-      {/* Bong bóng chat học sinh hỏi bài Trợ lý Em Yêu AI & Thầy */}
-      {auth?.sbd && <BongBongChatHocSinh sbd={auth.sbd} hoTen={auth.hoTen} lop={auth.lop} />}
     </div>
   )
 }

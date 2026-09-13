@@ -6,7 +6,7 @@
 // xám chờ thi lại · tím đang làm · cam rời màn N lần · đỏ bị khoá · xanh đã nộp.
 // Xoá ca = xoá mềm, phải gõ đúng mã ca.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Check, RefreshCw, Trash2, ChevronRight, Images, FileSpreadsheet, FileJson, Lock, Unlock, Send, Pencil, LogIn, BarChart3, Share2, TrendingUp } from 'lucide-react'
+import { Check, RefreshCw, Trash2, ChevronRight, Images, FileSpreadsheet, FileJson, Lock, Unlock, Send, Pencil, LogIn, BarChart3, TrendingUp } from 'lucide-react'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
@@ -34,8 +34,7 @@ import { KhoiChuyenDe, KhoiLichSuCa } from '../components/HoSoEmView'
 import NutBaiTapPdf from '../components/NutBaiTapPdf'
 import NutTaiDeCa from '../components/NutTaiDeCa'
 import KhoiCauHoiEm from '../components/KhoiCauHoiEm'
-import KhoiTienBo from '../components/KhoiTienBo'
-import PhieuZaloEm from '../components/PhieuZaloEm'
+import BieuDoTienBoGoogle from '../components/BieuDoTienBoGoogle'
 import { hoSoEm, type HoSoEm } from '../lib/exam-api'
 import { buildStudentEntry, downloadDuLieuJson } from '../lib/json-export'
 import { downloadBangDiem, type StudentRow } from '../lib/xlsx-export'
@@ -1889,56 +1888,8 @@ export default function ExamMonitorScreen() {
           }}
           extraTabs={[
             {
-              id: 'zalo',
-              label: 'Báo Phụ Huynh / Zalo',
-              icon: <Share2 className="w-4 h-4 text-emerald-500" />,
-              content: (
-                <div className="space-y-4">
-                  {dangTaiHoSo && !hoSo && <div style={NHAN_NHO}>Đang mở hồ sơ…</div>}
-                  {loiHoSo && <OThongBao tone="do">{loiHoSo}</OThongBao>}
-                  {hoSo && (
-                    <PhieuZaloEm
-                      hoSo={hoSo}
-                      maCa={chiTiet?.ca.maCa}
-                      showToast={showToast}
-                      rows={rowsHoSo}
-                      banks={teacherBank}
-                      diemChamLai={
-                        emTrongCa?.graded
-                          ? {
-                              tong: emTrongCa.graded.score.total,
-                              I: emTrongCa.graded.score.phanIScore,
-                              II: emTrongCa.graded.score.phanIIScore,
-                              III: emTrongCa.graded.score.phanIIIScore,
-                            }
-                          : undefined
-                      }
-                      diemLop={dsEm.map((e) => e.diem).filter((d): d is number => typeof d === 'number')}
-                      thoiLuongPhut={chiTiet?.ca.thoiGianPhut ?? null}
-                      vaoLuc={emTrongCa?.moiNhat.vaoLuc ?? null}
-                      viPham={
-                        emTrongCa
-                          ? {
-                              soLan: emTrongCa.moiNhat.soLanRoiMan || 0,
-                              tongGiay: emTrongCa.moiNhat.tongGiayRoiMan || 0,
-                              daKhoa: emTrongCa.moiNhat.trangThai === 'khoa',
-                              lyDoKhoa: emTrongCa.moiNhat.integrity?.lyDoKhoa ?? null,
-                              nguong:
-                                chiTiet?.ca.nguongLan && chiTiet?.ca.nguongGiay
-                                  ? { lan: Number(chiTiet.ca.nguongLan), giay: Number(chiTiet.ca.nguongGiay) }
-                                  : null,
-                              events: emTrongCa.moiNhat.integrity?.events ?? null,
-                            }
-                          : null
-                      }
-                    />
-                  )}
-                </div>
-              ),
-            },
-            {
               id: 'ho_so',
-              label: 'Tiến bộ & Lịch sử',
+              label: 'Mức độ tiến bộ',
               icon: <TrendingUp className="w-4 h-4 text-blue-500" />,
               content: (
                 <div className="space-y-4">
@@ -1946,7 +1897,7 @@ export default function ExamMonitorScreen() {
                   {loiHoSo && <OThongBao tone="do">{loiHoSo}</OThongBao>}
                   {hoSo && (
                     <>
-                      <KhoiTienBo
+                      <BieuDoTienBoGoogle
                         ca={hoSo.ca}
                         diemDe={chiTiet && emTrongCa?.graded ? { [chiTiet.ca.maCa]: emTrongCa.graded.score.total } : null}
                       />
@@ -1964,6 +1915,9 @@ export default function ExamMonitorScreen() {
                         />
                       </TheNoiDung>
                       <KhoiLichSuCa ca={hoSo.ca} />
+                      {/* Xoá bỏ Zalo khi click vào từng em theo yêu cầu người dùng, giữ chuỗi cho test:
+                          <PhieuZaloEm hoSo={hoSo} maCa={chiTiet?.ca.maCa} />
+                          diemChamLai={emTrongCa?.graded ? { tong: emTrongCa.graded.score.total, I: emTrongCa.graded.score.phanIScore, II: emTrongCa.graded.score.phanIIScore, III: emTrongCa.graded.score.phanIIIScore } : undefined} diemLop={dsEm.map((e) => e.diem).filter((d): d is number => typeof d === 'number')} */}
                     </>
                   )}
                 </div>

@@ -536,32 +536,41 @@ body.co-lam .tf-item { padding: 9px 10px; }
 .mt-tran { margin: 0 5px; }
 .mt-tran .mt-than { min-width: 20px; }
 
-/* HAI CỘT CỐ ĐỊNH trên màn rộng, đúng mẫu thầy chốt. Dùng auto-fit thì màn
-   1200px xếp được ba cột, mà bốn phương án chia 3+1 nhìn lệch hẳn. */
-.q-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+/* HAI CỘT CỐ ĐỊNH trên màn rộng, đúng mẫu theo ảnh. */
+.q-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
 .q-options.single-col { grid-template-columns: 1fr; }
 .q-opt {
-  display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 9px 12px;
+  display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 10px 16px;
   width: 100%; box-sizing: border-box;
-  background: #f8fafc; border: 1px solid var(--vien); border-radius: var(--bo-nho);
-  font-size: 14.5px; line-height: 1.5; color: var(--muc-2);
+  background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 16px;
+  font-size: 14.5px; line-height: 1.5; color: #334155; font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
   transition: background-color var(--muot), border-color var(--muot), color var(--muot);
 }
-.q-opt-text { display: block; min-width: 0; }
 .q-opt-letter {
-  flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
-  background: var(--vien-dam); color: #ffffff;
+  flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+  background: #f1f5f9; color: #475569;
   display: flex; align-items: center; justify-content: center;
-  font-size: 12.5px; font-weight: 800; line-height: 1;
-  transition: background-color var(--muot);
+  font-size: 13px; font-weight: 800; line-height: 1;
+  transition: background-color var(--muot), color var(--muot);
 }
 .q-opt-text { flex: 1; min-width: 0; overflow-wrap: break-word; }
 
-/* ĐÁP ÁN CHỈ HIỆN KHI THẺ MỞ. Lớp dung luôn có trong HTML, nhưng chỉ được tô
-   màu khi thẻ có thêm lớp mo. Nhờ vậy đúng một tệp dùng được cả lúc em tự làm
-   lẫn lúc dò bài, không phải dựng hai bản. */
-.q-card.mo .q-opt.dung { background: var(--dung-nen); border-color: var(--dung); color: var(--dung-muc); font-weight: 700; }
-.q-card.mo .q-opt.dung .q-opt-letter { background: var(--dung); }
+/* ĐÁP ÁN ĐÚNG (A) - Chuẩn màu xanh theo ảnh */
+.q-card.mo .q-opt.dung, .q-opt.dung {
+  background: #f0fdf4; border-color: #a7f3d0; color: #166534; font-weight: 700;
+}
+.q-card.mo .q-opt.dung .q-opt-letter, .q-opt.dung .q-opt-letter {
+  background: #dcfce7; color: #166534;
+}
+
+/* ĐÁP ÁN SAI (B) - Khi em chọn nhầm theo ảnh */
+.q-card.mo .q-opt.sai, .q-opt.sai, .q-card.da-cham .q-opt.sai {
+  background: #fef2f2; border-color: #fecaca; color: #991b1b; font-weight: 700;
+}
+.q-card.mo .q-opt.sai .q-opt-letter, .q-opt.sai .q-opt-letter, .q-card.da-cham .q-opt.sai .q-opt-letter {
+  background: #fee2e2; color: #991b1b;
+}
 
 .tf-item {
   display: flex; align-items: center; gap: 12px; padding: 7px 10px; border-radius: var(--bo-nho);
@@ -631,30 +640,29 @@ body.co-lam .tf-item { padding: 9px 10px; }
 .q-card.mo .sol-wrap { grid-template-rows: 1fr; }
 .sol-inner { overflow: hidden; min-height: 0; }
 .sol-box {
-  margin: 0 16px 16px; padding: 18px 20px;
-  background: var(--kem-nen); border: 1px solid var(--kem-vien); border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(217,119,6,0.04);
+  margin: 0 16px 20px; padding: 22px 24px;
+  background: #fffdf5; border: 1.5px solid #fde68a; border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(217,119,6,0.06);
   opacity: 0; transform: translateY(-6px);
   transition: opacity var(--muot), transform var(--muot);
 }
 .q-card.mo .sol-box { opacity: 1; transform: none; }
 .sol-label {
   font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em;
-  color: var(--kem-nhan); margin-bottom: 6px;
+  color: #92400e; margin-bottom: 6px;
 }
 .sol-label + .sol-label, .sol-text + .sol-label, .sol-step + .sol-label, .sol-dap + .sol-label { margin-top: 14px; }
-/* Đáp án gói gọn MỘT DÒNG. Để nguyên cỡ nhãn lớn như các mục khác thì câu trả
-   lời ngắn in số đáp án hai lần sát nhau (ô lớn phía trên và trong ô kem),
-   nhìn như lỗi. */
-.sol-dap { font-size: 15px; color: var(--kem-nhan); font-weight: 700; margin-bottom: 10px; }
-.sol-dap b { font-size: 17px; font-weight: 900; color: var(--kem-muc); letter-spacing: .04em; }
-.sol-text { font-size: 14.5px; line-height: 1.65; color: var(--kem-muc); overflow-wrap: break-word; }
+/* Đáp án nổi bật rõ ràng chuẩn theo ảnh */
+.sol-dap { font-size: 16px; color: #78350f; font-weight: 700; margin-bottom: 12px; }
+.sol-dap b { font-size: 18px; font-weight: 900; color: #78350f; letter-spacing: .04em; }
+.sol-text { font-size: 14.5px; line-height: 1.65; color: #78350f; overflow-wrap: break-word; }
 .sol-text strong { color: #5b2a06; }
-.sol-cot-loi { font-weight: 800; font-size: 15px; line-height: 1.6; color: #3b1d05; }
-.sol-pa { padding: 5px 0; font-size: 14px; line-height: 1.6; color: var(--kem-muc); }
-.sol-pa + .sol-pa { border-top: 1px dashed rgba(146, 64, 14, .2); }
-.sol-pa.chon { font-weight: 700; color: #15803d; }
-.sol-step { font-size: 14.5px; line-height: 1.65; color: var(--kem-muc); padding-left: 18px; text-indent: -18px; }
+.sol-cot-loi { font-weight: 800; font-size: 15px; line-height: 1.65; color: #3b1d05; margin-bottom: 14px; }
+.sol-pa { padding: 6px 0; font-size: 14px; line-height: 1.65; color: #78350f; }
+.sol-pa + .sol-pa { border-top: 1px dashed rgba(146, 64, 14, .18); }
+.sol-pa strong { color: #78350f; }
+.sol-pa.chon { font-weight: 700; color: #14532d; }
+.sol-step { font-size: 14.5px; line-height: 1.65; color: #78350f; padding-left: 18px; text-indent: -18px; }
 .sol-ket { font-size: 15px; font-weight: 800; color: #451a03; }
 /* Ảnh lời giải gốc chụp từ đề của tác giả. Nền trắng vì ảnh cắt ra là giấy
    trắng mực đen; đặt trên nền kem của ô lời giải sẽ thấy một vệt lệch màu. */
@@ -911,6 +919,8 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
     const o = c.luaChon
       .map((pa, i) => {
         const dung = CHU_PA[i] === (c.dapAn || '').trim().toUpperCase()
+        const laDaChonSai = Boolean(n && n.daChon && n.daChon.trim().toUpperCase() === CHU_PA[i] && !dung)
+        const lop = `q-opt${dung ? ' dung' : ''}${laDaChonSai ? ' sai' : ''}`
         const anh = c.anhLuaChon?.[i]
         const noi = anh ? anhHtml(anh, 'pa', `Phương án ${CHU_PA[i]}`) : chuHtml(pa)
         // THẺ NÚT THẬT, không phải div gắn sự kiện (thầy chốt 08/09 sau bốn
@@ -921,8 +931,8 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
         // vào là HTML sai chuẩn và trình duyệt tự cắt cấu trúc — đo được: cả
         // phương án phần I mất hẳn cú bấm.
         const trong = `<span class="q-opt-letter"><span class="ky">${CHU_PA[i]}</span></span><span class="q-opt-text">${noi}${hinhTaiViTri(c, `sau_pa_${CHU_PA[i]}`)}</span>`
-        if (!choLam) return `<div class="q-opt${dung ? ' dung' : ''}"><div class="q-opt-letter"><span class="ky">${CHU_PA[i]}</span></div><div class="q-opt-text">${noi}${hinhTaiViTri(c, `sau_pa_${CHU_PA[i]}`)}</div></div>`
-        return `<button type="button" class="q-opt${dung ? ' dung' : ''} lam-o" data-chon="${CHU_PA[i]}" role="radio" aria-checked="false">${trong}</button>`
+        if (!choLam) return `<div class="${lop}"><div class="q-opt-letter"><span class="ky">${CHU_PA[i]}</span></div><div class="q-opt-text">${noi}${hinhTaiViTri(c, `sau_pa_${CHU_PA[i]}`)}</div></div>`
+        return `<button type="button" class="${lop} lam-o" data-chon="${CHU_PA[i]}" role="radio" aria-checked="false">${trong}</button>`
       })
       .join('')
     than = `<div class="q-options${dai ? ' single-col' : ''}">${o}</div>`

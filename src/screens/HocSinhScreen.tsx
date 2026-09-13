@@ -7,11 +7,13 @@
 // Cùng hồ sơ này sẽ dùng lại cho lối vào từ mục Phụ huynh — không dựng hai màn.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, ChevronRight, FileText, History, KeyRound, RefreshCw, Search, Trash2 } from 'lucide-react'
+import { ArrowLeft, ChevronRight, FileText, History, KeyRound, RefreshCw, Search, Trash2, Sparkles } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung, DauThe } from '../components/DesignSystem'
-import { KhoiChuyenDe, KhoiLichSuCa, toneXepLoai } from '../components/HoSoEmView'
+import { KhoiChuyenDe, KhoiLichSuCa, toneXepLoai, ngayGio } from '../components/HoSoEmView'
 import NutBaiTapPdf from '../components/NutBaiTapPdf'
 import KhoiTienBo from '../components/KhoiTienBo'
+import BieuDoTienBoGoogle from '../components/BieuDoTienBoGoogle'
+import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import { danhSachEm, deleteStudentRegistration, hoSoEm, khoiTuNamSinh, resetMatKhauHsApi, type EmTomTat, type HoSoEm } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { classify } from '../engine/score'
@@ -70,6 +72,7 @@ export default function HocSinhScreen() {
 
   const [hoSo, setHoSo] = useState<HoSoEm | null>(null)
   const [dangTaiHoSo, setDangTaiHoSo] = useState(false)
+  const [caBaoCao, setCaBaoCao] = useState<HoSoEm['ca'][number] | null>(null)
   const showToast = useAppStore((s) => s.showToast)
 
   const tai = async () => {
@@ -156,6 +159,11 @@ export default function HocSinhScreen() {
     })
   }, [ds, timKiem, khoiLoc])
 
+  const caMoiNhat = useMemo(() => {
+    if (!hoSo?.ca || hoSo.ca.length === 0) return null
+    return hoSo.ca.find((c) => c.tong !== null) ?? hoSo.ca[0]
+  }, [hoSo?.ca])
+
   // ------------------------------------------------------------------ HỒ SƠ
   if (sbdDangXem) {
     const diemGanNhat = hoSo?.ca.find((c) => c.tong !== null)?.tong ?? null
@@ -226,6 +234,40 @@ export default function HocSinhScreen() {
 
             {mucHoSo === 'bao-cao' ? (
               <>
+                {/* BÁO CÁO CA THI GẦN NHẤT — CHUẨN GOOGLE MATERIAL 3 */}
+                {caMoiNhat && (
+                  <TheNoiDung>
+                    <div className="flex items-center justify-between flex-wrap" style={{ gap: 'var(--k3)' }}>
+                      <div>
+                        <div className="font-bold flex items-center" style={{ fontSize: 'var(--cx-2)', color: 'var(--muc)', gap: 6 }}>
+                          <Sparkles size={16} className="text-amber-500" />
+                          Báo cáo ca thi gần nhất
+                        </div>
+                        <div style={NHAN_NHO}>
+                          Điểm: <b style={{ ...SO, color: 'var(--muc)' }}>{caMoiNhat.tong !== null ? caMoiNhat.tong.toFixed(2).replace('.', ',') : '—'}</b>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setCaBaoCao(caMoiNhat)}
+                        className="tap-target font-bold inline-flex items-center justify-center shrink-0 cursor-pointer shadow-xs transition-all active:scale-95 hover:opacity-90"
+                        style={{
+                          minHeight: 40,
+                          padding: '0 var(--k4)',
+                          borderRadius: 'var(--bo-1)',
+                          background: 'var(--gg-xanh)',
+                          color: 'var(--giay)',
+                          fontSize: 'var(--cx-1)',
+                          gap: 6,
+                          border: 'none',
+                        }}
+                      >
+                        <FileText size={16} /> Xem báo cáo chi tiết
+                      </button>
+                    </div>
+                  </TheNoiDung>
+                )}
+
                 {/* CÂU HỎI ĐẦU TIÊN khi mở hồ sơ một em luôn là "em này đang lên
                     hay đang xuống" — nên biểu đồ tiến bộ đứng ngay đây. */}
                 <KhoiTienBo ca={hoSo.ca} />
@@ -281,9 +323,34 @@ export default function HocSinhScreen() {
                 </NutChinh>
               </>
             ) : (
-              <KhoiLichSuCa ca={hoSo.ca} />
+              <>
+                <BieuDoTienBoGoogle ca={hoSo.ca} />
+                <KhoiLichSuCa ca={hoSo.ca} onXemBaoCao={(c) => setCaBaoCao(c)} />
+              </>
             )}
           </>
+        )}
+
+        {/* MODAL BÁO CÁO CA THI HỌC SINH CHUẨN GOOGLE MATERIAL 3 */}
+        {caBaoCao && hoSo && (
+          <BaoCaoCaThiHocSinhModal
+            baiThi={{
+              maCa: caBaoCao.maCa,
+              tenCa: caBaoCao.tenCa || `Ca ${caBaoCao.maCa}`,
+              ngayThi: caBaoCao.nopLuc ? ngayGio(caBaoCao.nopLuc) : undefined,
+              diem: caBaoCao.tong ?? 0,
+              diemI: caBaoCao.diemI ?? null,
+              diemII: caBaoCao.diemII ?? null,
+              diemIII: caBaoCao.diemIII ?? null,
+              tongCau: 40,
+            }}
+            hoTen={hoSo.em.hoTen || `SBD ${hoSo.em.sbd}`}
+            sbd={hoSo.em.sbd}
+            lop={hoSo.em.lop}
+            scriptUrl={cauHinh?.url || ''}
+            onClose={() => setCaBaoCao(null)}
+            onBatDauKhacPhuc={() => setCaBaoCao(null)}
+          />
         )}
       </div>
     )
