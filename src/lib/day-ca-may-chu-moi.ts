@@ -41,6 +41,8 @@ export interface CaDay {
   lenBang?: boolean
   deRieng?: boolean
   phamViHoiLai?: string
+  matKhau?: string
+  chiNop3PhutCuoi?: boolean
 }
 
 /** Gói đẩy ca: ngoài `ca` và gói đề KHÔNG đáp án, còn ngân hàng CÓ đáp án để

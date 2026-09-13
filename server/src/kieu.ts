@@ -83,4 +83,6 @@ export interface DongCa {
   pham_vi: string | null
   /** Danh sách SBD thầy tích (phạm vi `chon`) hoặc năm sinh (phạm vi `khoi`). */
   danh_sach_chon_json: string | null
+  mat_khau?: string | null
+  chi_nop_3_phut_cuoi?: number | null
 }

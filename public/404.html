@@ -33,6 +33,9 @@
         // phiếu nằm trong đó; bỏ hash là phụ huynh mở ra trang trống.
         var ph = p.match(/^(.*?\/)p\/?$/)
         if (ph) return location.replace(ph[1] + '?vai=phieu' + location.hash)
+        // CỔNG HỌC SINH: /hoc-sinh hoặc /hs
+        var hs = p.match(/^(.*?\/)(?:hoc-sinh|hs)\/?$/)
+        if (hs) return location.replace(hs[1] + '?vai=hocsinh')
         var c = p.match(/^(.*?\/)(hs|ph)\/[0-9a-zA-Z]{8,}\/?$/)
         if (c) return location.replace(c[1] + '?vai=' + c[2])
       })()

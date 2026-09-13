@@ -7,12 +7,12 @@
 // Cùng hồ sơ này sẽ dùng lại cho lối vào từ mục Phụ huynh — không dựng hai màn.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, ChevronRight, FileText, History, RefreshCw, Search, Trash2 } from 'lucide-react'
+import { ArrowLeft, ChevronRight, FileText, History, KeyRound, RefreshCw, Search, Trash2 } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung, DauThe } from '../components/DesignSystem'
 import { KhoiChuyenDe, KhoiLichSuCa, toneXepLoai } from '../components/HoSoEmView'
 import NutBaiTapPdf from '../components/NutBaiTapPdf'
 import KhoiTienBo from '../components/KhoiTienBo'
-import { danhSachEm, deleteStudentRegistration, hoSoEm, khoiTuNamSinh, type EmTomTat, type HoSoEm } from '../lib/exam-api'
+import { danhSachEm, deleteStudentRegistration, hoSoEm, khoiTuNamSinh, resetMatKhauHsApi, type EmTomTat, type HoSoEm } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { classify } from '../engine/score'
 import { useAppStore } from '../store/appStore'
@@ -127,6 +127,26 @@ export default function HocSinhScreen() {
     }
   }
 
+  const [dangResetMk, setDangResetMk] = useState(false)
+  const resetMatKhau = async (sbd: string, hoTen: string) => {
+    if (!cauHinh) return showToast('Chưa có địa chỉ máy chủ hoặc mã bí mật', 'error')
+    const xn = confirm(`Đặt lại mật khẩu cho ${hoTen || `SBD ${sbd}`} về mặc định "12121212"?`)
+    if (!xn) return
+    setDangResetMk(true)
+    try {
+      const res = await resetMatKhauHsApi(cauHinh.url, cauHinh.mat, sbd)
+      if (res.ok) {
+        showToast(`Đã reset mật khẩu của ${hoTen || sbd} về mặc định (12121212)`, 'success')
+      } else {
+        showToast(res.error || 'Không reset được mật khẩu', 'error')
+      }
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi kết nối máy chủ', 'error')
+    } finally {
+      setDangResetMk(false)
+    }
+  }
+
   const dsLoc = useMemo(() => {
     const q = timKiem.trim().toLowerCase()
     return (ds ?? []).filter((e) => {
@@ -216,6 +236,37 @@ export default function HocSinhScreen() {
                 <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />
                 <TheNoiDung>
                   <NutBaiTapPdf sbd={hoSo.em.sbd} hoTen={hoSo.em.hoTen} lop={hoSo.em.lop} chuyenDe={hoSo.chuyenDe} chuyenDeCa={(hoSo.chuyenDeCaGanNhat ?? []).map((c) => c.ten)} showToast={showToast} />
+                </TheNoiDung>
+
+                <TheNoiDung>
+                  <div className="flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
+                    <div>
+                      <div className="font-bold" style={{ fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
+                        Mật khẩu tài khoản học sinh
+                      </div>
+                      <div style={NHAN_NHO}>
+                        Khôi phục mật khẩu đăng nhập cổng học sinh về mặc định (12121212)
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      disabled={dangResetMk}
+                      onClick={() => void resetMatKhau(hoSo.em.sbd, hoSo.em.hoTen)}
+                      className="tap-target font-bold inline-flex items-center justify-center shrink-0"
+                      style={{
+                        height: 40,
+                        padding: '0 var(--k3)',
+                        borderRadius: 'var(--bo-1)',
+                        background: 'var(--the-2)',
+                        border: '1.5px solid var(--vien)',
+                        color: 'var(--muc)',
+                        fontSize: 'var(--cx-1)',
+                        gap: 6,
+                      }}
+                    >
+                      <KeyRound size={16} /> {dangResetMk ? 'Đang reset…' : 'Reset mật khẩu (12121212)'}
+                    </button>
+                  </div>
                 </TheNoiDung>
 
                 {/* XOÁ EM KHỎI DANH SÁCH — CHỈ THẦY, và để tận đáy.

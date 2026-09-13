@@ -20,7 +20,7 @@
 // `public/404.html` đổi hai đường trên thành `?vai=gv` / `?examCode=…` khi máy
 // chưa cài service worker; `chuanHoaDuongDan()` làm đúng việc đó ở trong app,
 // nên máy đã cài app (service worker nuốt mất 404.html) vẫn chạy đúng.
-export type VaiTro = 'gv' | 'phieu' | 'diem'
+export type VaiTro = 'gv' | 'phieu' | 'diem' | 'hocsinh'
 
 export interface DuongVao {
   vai: VaiTro | null
@@ -29,6 +29,7 @@ export interface DuongVao {
 
 const RE_GV_TREN_DUONG = /(?:^|\/)gv\/?$/
 const RE_PHIEU_TREN_DUONG = /(?:^|\/)p\/?$/
+const RE_HOCSINH_TREN_DUONG = /(?:^|\/)(?:hoc-sinh|hs)\/?$/
 const RE_CA_TREN_DUONG = /(?:^|\/)t\/(\d{4,8})\/?$/
 const RE_DIEM_TREN_DUONG = /(?:^|\/)d\/(\d{4,8})\/?$/
 const RE_APP_CU = /(?:^|\/)(?:hs|ph)\/[0-9a-zA-Z]{8,}\/?$/
@@ -54,6 +55,7 @@ export function laLinkAppCu(search: string, duongDan = ''): boolean {
 export function docVaiTuDuongDan(duongDan: string): DuongVao {
   if (RE_GV_TREN_DUONG.test(duongDan)) return { vai: 'gv', maCa: '' }
   if (RE_PHIEU_TREN_DUONG.test(duongDan)) return { vai: 'phieu', maCa: '' }
+  if (RE_HOCSINH_TREN_DUONG.test(duongDan)) return { vai: 'hocsinh', maCa: '' }
   const d = duongDan.match(RE_DIEM_TREN_DUONG)
   if (d) return { vai: 'diem', maCa: d[1] }
   const c = duongDan.match(RE_CA_TREN_DUONG)
@@ -92,6 +94,7 @@ export function docDuongVao(search: string, duongDan = ''): DuongVao {
   if (vaiQ === 'gv') return { vai: 'gv', maCa }
   if (vaiQ === 'phieu') return { vai: 'phieu', maCa: '' }
   if (vaiQ === 'diem') return { vai: 'diem', maCa }
+  if (vaiQ === 'hocsinh') return { vai: 'hocsinh', maCa: '' }
 
   const tuDuong = duongDan ? docVaiTuDuongDan(duongDan) : null
   if (tuDuong && (tuDuong.vai || tuDuong.maCa)) {
@@ -108,12 +111,13 @@ export function docDuongVao(search: string, duongDan = ''): DuongVao {
  *   `/t/<mã ca>` · `?examCode=…`  → vào thi
  *   `/p#<mã>`    · `?vai=phieu`   → báo cáo phụ huynh
  *   `/hs/<token>` · `/ph/<token>` → link riêng cũ
+ *   `/hoc-sinh`  · `/hs`          → cổng học sinh
  *
  * Còn lại (`/` trần và `/gv`) là app của thầy. */
 export function laManThayQuanLy(search: string, duongDan = ''): boolean {
   if (laLinkAppCu(search, duongDan)) return false
   const d = docDuongVao(search, duongDan)
-  if (d.vai === 'phieu' || d.vai === 'diem') return false
+  if (d.vai === 'phieu' || d.vai === 'diem' || d.vai === 'hocsinh') return false
   if (d.maCa) return false
   // ĐƯỜNG NÓI RÕ `gv` LUÔN THẮNG CỜ. Bản đầu của bản vá này hỏi cờ trước, nên
   // trên máy thầy từng mở link thi thử thì gõ `?vai=gv` cũng không vào được màn

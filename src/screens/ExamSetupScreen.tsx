@@ -158,6 +158,8 @@ export default function ExamSetupScreen() {
   // dõi. Mặc định TẮT — ca luyện tập và bài tập về nhà không cần chờ ai.
   const [phongCho, setPhongCho] = useState(false)
   const [anHanGiay, setAnHanGiay] = useState(MS_AN_HAN_NHA_TAY / 1000)
+  const [matKhauCa, setMatKhauCa] = useState('')
+  const [chiNop3PhutCuoi, setChiNop3PhutCuoi] = useState(false)
   const [phamVi, setPhamVi] = useState<PhamViCa>('tu_do')
   const [namSinhKhoi, setNamSinhKhoi] = useState('')
   const [chonSbd, setChonSbd] = useState<Set<string>>(new Set())
@@ -277,7 +279,7 @@ export default function ExamSetupScreen() {
   /** Ca mở ở chế độ ĐỀ RIÊNG TỪNG EM — kéo theo phòng chờ, bắt buộc. */
   const deRiengBat = boRut?.deRieng === true
 
-  const nguonRaDe = useMemo(() => (boRut ? locNguonTheoId(selectedSources, boRut.ids) : selectedSources), [selectedSources, boRut])
+  const nguonRaDe = useMemo(() => (boRut && !deRiengBat ? locNguonTheoId(selectedSources, boRut.ids) : selectedSources), [selectedSources, boRut, deRiengBat])
   const soCauRaDe = boRut ? boRut.soCau : undefined
 
   const dsNhom = useMemo(() => Array.from(new Set(savedSources.map((c) => (c.nhom || '').trim()).filter(Boolean))).sort(), [savedSources])
@@ -333,6 +335,8 @@ export default function ExamSetupScreen() {
         // rút đúng thứ thầy đã chọn lúc mở ca.
         phamViHoiLai: boRut?.phamViHoiLai ?? 'gan_nhat',
         anHanGiay,
+        matKhau: matKhauCa.trim() || undefined,
+        chiNop3PhutCuoi,
       })
       // Lưu bản CÓ đáp án trên máy thầy để màn Theo dõi chấm lại được sau này.
       // Lưu ĐÚNG bộ đã rút, không lưu cả kho: chấm lại phải tái tạo y hệt bộ
@@ -544,6 +548,22 @@ export default function ExamSetupScreen() {
             </div>
             <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
               {hanVaoPhut > 0 ? `Sau ${hanVaoPhut} phút kể từ giờ bắt đầu, mã ca vô hiệu — kể cả em đã có link. Em đã vào vẫn đủ ${thoiGianPhut || 0} phút làm bài.` : 'Ai có mã ca vào lúc nào cũng được — dùng cho luyện tập ngoài giờ.'}
+            </div>
+          </div>
+
+          {/* MẬT KHẨU CA THI */}
+          <div>
+            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Mật khẩu ca thi (tùy chọn)</div>
+            <input
+              style={O_NHAP}
+              type="text"
+              placeholder="Để trống nếu không đặt mật khẩu ca thi"
+              value={matKhauCa}
+              onChange={(e) => setMatKhauCa(e.target.value)}
+              aria-label="Mật khẩu ca thi"
+            />
+            <div style={{ ...NHAN_NHO, marginTop: 'var(--k1)' }}>
+              Nếu đặt mật khẩu, học sinh phải nhập đúng mật khẩu này mới được vào làm bài.
             </div>
           </div>
         </div>
@@ -759,6 +779,46 @@ export default function ExamSetupScreen() {
             )}
           </div>
         )}
+      </TheNoiDung>
+
+      {/* CHỈ CHO NỘP TRONG 3 PHÚT CUỐI */}
+      <TheNoiDung>
+        <button
+          type="button"
+          aria-pressed={chiNop3PhutCuoi}
+          aria-label="Chỉ cho nộp bài trong 3 phút cuối"
+          onClick={() => setChiNop3PhutCuoi((v) => !v)}
+          className="tap-target w-full flex items-center justify-between"
+          style={{ gap: 'var(--k3)', minHeight: 44, background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
+        >
+          <span style={TIEU_DE_MUC}>Chỉ nộp bài trong 3 phút cuối</span>
+          <span className="flex items-center" style={{ flexShrink: 0, gap: 'var(--k2)' }}>
+            <span className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: chiNop3PhutCuoi ? 'var(--muc)' : 'var(--nhat)' }}>
+              {chiNop3PhutCuoi ? 'ĐANG BẬT' : 'ĐANG TẮT'}
+            </span>
+            <span
+              aria-hidden
+              style={{
+                flexShrink: 0,
+                width: 64,
+                height: 36,
+                borderRadius: 'var(--bo-tron)',
+                padding: 4,
+                background: chiNop3PhutCuoi ? 'var(--muc)' : 'var(--vien-dam)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: chiNop3PhutCuoi ? 'flex-end' : 'flex-start',
+              }}
+            >
+              <span style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--the)' }} />
+            </span>
+          </span>
+        </button>
+        <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
+          {chiNop3PhutCuoi
+            ? 'Học sinh chỉ có thể bấm nộp bài khi thời gian làm bài còn lại ≤ 3 phút (180 giây). Nút nộp bài sẽ bị khoá và hiển thị đồng hồ đếm ngược trước đó. Tránh học sinh nộp bài vội vàng hoặc nộp sớm.'
+            : 'Học sinh có thể bấm nộp bài bất kỳ lúc nào trong thời gian làm bài.'}
+        </div>
       </TheNoiDung>
 
       {/* 5. CÔNG BỐ ĐIỂM */}

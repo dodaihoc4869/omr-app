@@ -215,6 +215,7 @@ export interface KetQuaVaoThiMoi {
   lop?: string
   giuDeDoc?: boolean
   anHanGiay?: number
+  chiNop3PhutCuoi?: boolean
   // Ba mốc giờ của lượt BỊ TỪ CHỐI. Thiếu chúng thì màn của em chỉ hiện câu
   // cụt "Em đã nộp bài ca này." mà không nói được lúc nào.
   nopLuc?: string
@@ -237,7 +238,7 @@ export async function vaoThiMoi(
   maCa: string,
   sbd: string,
   idThietBi: string,
-  danhTinh: { hoTen?: string; namSinh?: string; xacNhanTen?: boolean } = {},
+  danhTinh: { hoTen?: string; namSinh?: string; xacNhanTen?: boolean; matKhau?: string } = {},
 ): Promise<KetQuaVaoThiMoi | null> {
   if (!ch.BAT) return null
   await gianVaoThi(ch)
@@ -254,6 +255,7 @@ export async function vaoThiMoi(
       // thầy chốt 07/09). Máy chủ hiện không so tên nữa, nhưng cờ vẫn gửi để
       // nhật ký chặn vào ghi lại được em đã qua bước xác nhận hay chưa.
       xacNhanTen: danhTinh.xacNhanTen === true,
+      matKhau: danhTinh.matKhau ?? '',
     },
     nhipNong(ch),
   )

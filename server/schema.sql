@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS ca (
   bank_r2          TEXT,                   -- khoá đối tượng R2, KHÔNG phải gói đề
   so_cau_json      TEXT,
   bo_theo_em_json  TEXT,
+  mat_khau         TEXT,
+  chi_nop_3_phut_cuoi INTEGER NOT NULL DEFAULT 0,
   cap_nhat_luc     TEXT NOT NULL
 );
 
@@ -109,3 +111,17 @@ CREATE TABLE IF NOT EXISTS danh_sach (
   cap_nhat_luc TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_danh_sach_lop ON danh_sach(lop);
+
+CREATE TABLE IF NOT EXISTS hoc_sinh (
+  sbd          TEXT PRIMARY KEY,
+  ho_ten       TEXT,
+  nam_sinh     TEXT,
+  lop          TEXT,
+  sdt          TEXT,
+  trang_thai   TEXT,
+  token        TEXT,
+  mat_khau     TEXT,
+  tao_luc      TEXT,
+  cap_nhat_luc TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_hs_lop ON hoc_sinh(lop, trang_thai);

@@ -187,6 +187,15 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
     }
   }
 
+  // CỔNG MẬT KHẨU CA THI (nếu ca đặt mật khẩu)
+  const matKhauCa = String(ca?.mat_khau ?? '').trim()
+  if (matKhauCa) {
+    const nhapMatKhau = String(b.matKhauCa ?? '').trim()
+    if (nhapMatKhau !== matKhauCa) {
+      return ra({ ok: false, lyDo: 'sai_mat_khau_ca', error: 'Mật khẩu ca thi không chính xác' })
+    }
+  }
+
   const cu = await docLuotMoiNhat(env, maCa, sbd)
   const now = Date.now()
   const qd = quyetDinhVaoThi(ca, cu, idThietBi, now)
@@ -223,6 +232,7 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
       thoiGianPhut: ca.thoi_gian_phut ?? 45,
       tenCa: ca.ten_ca ?? '',
       congBo: ca.cong_bo ?? 'khong',
+      chiNop3PhutCuoi: Number((ca as any).chi_nop_3_phut_cuoi ?? 0) === 1,
     })
   }
 
@@ -288,6 +298,7 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
     boTheoEm: goiRieng,
     // KHÔNG trả gói đề trong thân: máy em tải riêng từ /de/:maCa, qua bộ đệm biên.
     deUrl: ca.bank_r2 ? `/de/${encodeURIComponent(maCa)}` : null,
+    chiNop3PhutCuoi: Number((ca as any).chi_nop_3_phut_cuoi ?? 0) === 1,
   })
 }
 
@@ -310,6 +321,22 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
   const integrity = (b.integrity ?? {}) as { leaveCount?: number; totalHiddenMs?: number; blocked?: boolean }
   const nopLuc = new Date().toISOString()
   const trangThai = integrity.blocked ? 'khoa' : 'da_nop'
+
+  const maCa = String(b.maCa ?? '').trim()
+  if (maCa && !integrity.blocked) {
+    const ca = await docCa(env, maCa)
+    if (ca && Number((ca as any).chi_nop_3_phut_cuoi ?? 0) === 1) {
+      const luot = await env.DB.prepare(`SELECT het_gio_luc FROM luot WHERE ${dk.sql}`).bind(...dk.tham).first<{ het_gio_luc?: string }>()
+      if (luot?.het_gio_luc) {
+        const hetGio = new Date(luot.het_gio_luc).getTime()
+        const conLaiGiay = Math.round((hetGio - Date.now()) / 1000)
+        // Chỉ nộp trong 3 phút cuối (180 giây), cộng 10 giây độ trễ mạng
+        if (conLaiGiay > 190) {
+          return ra({ ok: false, lyDo: 'chua_den_3_phut_cuoi', error: 'Chỉ được nộp bài trong 3 phút cuối của ca thi' }, 400)
+        }
+      }
+    }
+  }
 
   // KHOÁ CHỐNG TRÙNG nằm ngay trong mệnh đề WHERE: lượt đã nộp thì câu này
   // không đổi dòng nào, nên máy em thử lại bao nhiêu lần cũng an toàn.
@@ -514,8 +541,9 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
     `INSERT INTO ca (ma_ca, ten_ca, trang_thai, bat_dau, het_han_vao, thoi_gian_phut, loai, han_nop,
                      cong_bo, nguong_lan, nguong_giay, bank_r2, so_cau_json, bo_theo_em_json, cap_nhat_luc,
                      lop, phong_cho, bat_dau_thi_luc, giu_de_doc, an_han_giay,
-                     pham_vi, len_bang, de_rieng, pham_vi_hoi_lai, danh_sach_chon_json, sinh_tai_d1)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)
+                     pham_vi, len_bang, de_rieng, pham_vi_hoi_lai, danh_sach_chon_json,
+                     mat_khau, chi_nop_3_phut_cuoi, sinh_tai_d1)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)
      ON CONFLICT(ma_ca) DO UPDATE SET
        -- CHỐT CHẶN THỨ HAI: chuỗi RỖNG không được ghi đè chữ đang có. Lượt đẩy
        -- thiếu trường là chuyện thường (xem khối chiMoc ở trên); mất tên ca
@@ -546,7 +574,9 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
        len_bang=excluded.len_bang,
        de_rieng=excluded.de_rieng,
        pham_vi_hoi_lai=COALESCE(NULLIF(excluded.pham_vi_hoi_lai,''), ca.pham_vi_hoi_lai),
-       danh_sach_chon_json=COALESCE(excluded.danh_sach_chon_json, ca.danh_sach_chon_json)`,
+       danh_sach_chon_json=COALESCE(excluded.danh_sach_chon_json, ca.danh_sach_chon_json),
+       mat_khau=COALESCE(NULLIF(excluded.mat_khau,''), ca.mat_khau),
+       chi_nop_3_phut_cuoi=excluded.chi_nop_3_phut_cuoi`,
   )
     .bind(
       maCa, String(ca.tenCa ?? ''), String(ca.trangThai ?? 'mo'), String(ca.batDau ?? ''),
@@ -559,6 +589,8 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
       String(ca.phamVi ?? ''), ca.lenBang === false ? 0 : 1, ca.deRieng === true ? 1 : 0,
       String(ca.phamViHoiLai ?? ''),
       ca.danhSachMoi === undefined || ca.danhSachMoi === '' ? null : JSON.stringify(ca.danhSachMoi),
+      String(ca.matKhau ?? '') || null,
+      ca.chiNop3PhutCuoi ? 1 : 0,
     )
     .run()
   return ra({ ok: true, maCa, coDe: !!bankKey })
@@ -2244,6 +2276,7 @@ const LENH_CUA_THAY = new Set([
   'xoaDe', 'luuPhieu', 'luuNhieuPhieu', 'xoaPhieu', 'phieuTheoCa', 'nopKhacPhucTheoCa',
   'dungChiMuc', 'danhSachCauHoi', 'xoaCauHoi', 'danhDauDaChua', 'ghiLenBang', 'lichSuLenBang',
   'sendTeacherMessage', 'listMessages', 'demTinMoi', 'listStudents', 'markMessagesRead',
+  'resetMatKhauHs',
 ])
 
 /** RÚT DANH SÁCH CÂU TỪ MỘT GÓI ĐỀ. Kho đi qua nhiều đời nên gói có ba dáng:
@@ -2287,6 +2320,12 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
     case 'sendMessage': return ra(await G.guiTin(env, b))
     case 'sendFeedback': return ra(await G.guiNhanXetCoQuyen(env, b, thay))
     case 'xinGiaoBai': return ra(await G.xinGiaoBai(env, b))
+    case 'hsDangNhap': return ra(await G.hsDangNhap(env, b))
+    case 'hsDatMatKhau': return ra(await G.hsDatMatKhau(env, b))
+    case 'resetMatKhauHs': return ra(await G.resetMatKhauHs(env, b))
+    case 'hsLichSuCa': return ra(await G.hsLichSuCa(env, b))
+    case 'hsBtvn': return ra(await G.hsBtvn(env, b))
+    case 'hsCauSai': return ra(await G.hsCauSai(env, b))
 
     // ---- CA THI ----------------------------------------------------------
     case 'publish': return dayCa(env, b)
@@ -2436,6 +2475,11 @@ export default {
     if (p === '/nop') return nop(env, b)
     if (p === '/trang-thai') return dayTrangThai(env, b)
     if (p === '/phong-cho') return ghiPhongCho(env, b)
+    if (p === '/hs/dang-nhap') return ra(await G.hsDangNhap(env, b))
+    if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))
+    if (p === '/hs/lich-su') return ra(await G.hsLichSuCa(env, b))
+    if (p === '/hs/cau-sai') return ra(await G.hsCauSai(env, b))
+    if (p === '/hs/btvn') return ra(await G.hsBtvn(env, b))
     // CỔNG TƯƠNG THÍCH — tự phân quyền bên trong, nên đứng TRƯỚC cổng mã bí mật.
     if (p === '/goi') return goiCu(req, env, b)
     if (p === '/btvn/cua-em') return btvnCuaEm(env, b)

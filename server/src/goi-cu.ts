@@ -437,6 +437,25 @@ function trichBoCauCuaEm(goi: Record<string, unknown> | null, sbd: string): stri
   return null
 }
 
+async function layChiTietCauD1(env: Env, maCa: string, sbd: string, lanThu: number) {
+  const r = await env.DB.prepare(
+    `SELECT phan, so_cau, qid, chuyen_de, muc_do, dap_an_chon, dap_an_dung, dung_sai, giay
+       FROM chi_tiet_cau WHERE ma_ca = ? AND sbd = ? AND lan_thu = ?
+      ORDER BY CASE phan WHEN 'I' THEN 1 WHEN 'II' THEN 2 WHEN 'III' THEN 3 ELSE 4 END, so_cau ASC`,
+  ).bind(maCa, sbd, lanThu).all<Record<string, unknown>>()
+  return (r.results ?? []).map((x) => ({
+    phan: chuoi(x.phan),
+    soCau: Number(x.so_cau) || 0,
+    qid: chuoi(x.qid),
+    chuyenDe: chuoi(x.chuyen_de),
+    mucDo: chuoi(x.muc_do),
+    dapAnChon: chuoi(x.dap_an_chon),
+    dapAnDung: chuoi(x.dap_an_dung),
+    dungSai: x.dung_sai === null ? null : Number(x.dung_sai) === 1,
+    giay: x.giay === null ? null : Number(x.giay),
+  }))
+}
+
 export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const maCa = chuoi(b.maCa).trim()
   const sbd = chuoi(b.sbd).trim()
@@ -454,6 +473,9 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
     .bind(maCa, sbd)
     .first<Record<string, unknown>>()
   if (!l) return { ok: false, error: 'Em chưa nộp bài ca này' }
+
+  const lanThu = Number(l.lan_thu) || 1
+  const dsCtc = await layChiTietCauD1(env, maCa, sbd, lanThu)
 
   const rPhieu = await env.DB.prepare('SELECT ma, loai FROM phieu WHERE ma_ca = ? AND sbd = ? AND thu_hoi = 0 ORDER BY luu_luc DESC')
     .bind(maCa, sbd)
@@ -478,12 +500,21 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
   const rawBoGoc = l.bo_theo_em_json ? doJson(l.bo_theo_em_json) : null
   const goiGoc = rawBoGoc && typeof rawBoGoc === 'object' ? (rawBoGoc as Record<string, unknown>) : null
   const goiRieng = locGoiDeRiengChoEm(goiGoc, sbd)
-  const boCuaEm = trichBoCauCuaEm(goiRieng ?? goiGoc, sbd)
-  const soCauCa = l.so_cau_json ? doJson(l.so_cau_json) : null
+  let boCuaEm = trichBoCauCuaEm(goiRieng ?? goiGoc, sbd)
+  if ((!boCuaEm || boCuaEm.length === 0) && dsCtc.length > 0) {
+    boCuaEm = dsCtc.map((x) => x.qid).filter(Boolean)
+  }
 
-  // NGÂN HÀNG CÓ ĐÁP ÁN — chỉ trả khi em ĐÃ NỘP. Đây là đường CÔNG KHAI (máy em
-  // không có mã bí mật), nên cổng duy nhất là lượt thi có thật của chính em đã
-  // nộp xong. Chưa nộp mà trả đáp án là phát đáp án giữa giờ.
+  let soCauCa = l.so_cau_json ? (doJson(l.so_cau_json) as Record<string, number> | null) : null
+  if (!soCauCa && dsCtc.length > 0) {
+    soCauCa = {
+      I: dsCtc.filter((x) => x.phan === 'I').length,
+      II: dsCtc.filter((x) => x.phan === 'II').length,
+      III: dsCtc.filter((x) => x.phan === 'III').length,
+    }
+  }
+
+  // NGÂN HÀNG CÓ ĐÁP ÁN — chỉ trả khi em ĐÃ NỘP.
   let bank: unknown = null
   const daNop = chuoi(l.trang_thai) === 'da_nop' || chuoi(l.trang_thai) === 'khoa' || chuoi(l.nop_luc) !== ''
   if (daNop && env.DE) {
@@ -495,15 +526,6 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
         bank = null
       }
     }
-    // CA CŨ KHÔNG CÓ KHOÁ `key/` ⇒ DỰNG LẠI TỪ BẢNG CHẤM.
-    //
-    // Trước 12/09 ngân hàng CÓ đáp án chỉ được đẩy lên khi ca công bố NGAY, nên
-    // mọi ca `khong` và `ca_lop_xong` mở trước đó đều không có khoá ấy — link
-    // xem điểm của cả ca báo "Máy chủ chưa gửi đề của ca này" (ca 195422,
-    // 12/09). Chờ thầy mở màn chấm để đẩy lên là bắt thầy làm tay từng ca.
-    //
-    // Ở đây máy chủ tự dựng: nội dung câu lấy từ `de/<maCa>.json`, đáp án đúng
-    // lấy từ `chi_tiet_cau` — đúng bảng thầy đã chấm, không suy ra từ đâu khác.
     if (!bank) bank = await keyBankTuBangCham(env, maCa, sbd)
   }
 
@@ -514,6 +536,8 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
     }
     if (goiRieng && !bObj.boTheoEm) {
       bObj.boTheoEm = goiRieng
+    } else if (boCuaEm && boCuaEm.length > 0 && !bObj.boTheoEm) {
+      bObj.boTheoEm = { [sbd]: boCuaEm }
     }
   }
 
@@ -525,6 +549,10 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
     boTheoEm: goiRieng,
     boCuaEm,
     soCau: soCauCa,
+    chiTietCau: dsCtc,
+    diemI: soHoacNull(l.diem_i),
+    diemII: soHoacNull(l.diem_ii),
+    diemIII: soHoacNull(l.diem_iii),
     tong: soHoacNull(l.tong),
     hoTen: chuoi(l.ten_hien),
     lop: chuoi(l.lop_hien),
@@ -532,7 +560,7 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
     thoiGianPhut: Number(l.thoi_gian_phut) || 0,
     giuDeDoc: Number(l.giu_de_doc ?? 0) === 1,
     luot: {
-      lanThu: Number(l.lan_thu) || 1,
+      lanThu: lanThu,
       vaoLuc: chuoi(l.vao_luc),
       nopLuc: chuoi(l.nop_luc),
       trangThai: chuoi(l.trang_thai),
@@ -1447,3 +1475,253 @@ export function maNgauNhien(): string {
   for (const x of b) s += 'abcdefghijkmnpqrstuvwxyz23456789'[x % 32]
   return s
 }
+
+// ===========================================================================
+// CỔNG THÔNG TIN HỌC SINH — ĐĂNG NHẬP, ĐẶT MẬT KHẨU, LỊCH SỬ & KHẮC PHỤC
+// ===========================================================================
+
+export async function hsDangNhap(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const sbd = chuoi(b.sbd).trim()
+  const matKhau = chuoi(b.matKhau).trim()
+  if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
+
+  let em = await env.DB.prepare('SELECT sbd, ho_ten, nam_sinh, lop, mat_khau FROM hoc_sinh WHERE sbd = ?')
+    .bind(sbd)
+    .first<Record<string, unknown>>()
+
+  if (!em) {
+    const ds = await env.DB.prepare('SELECT sbd, ho_ten, nam_sinh, lop FROM danh_sach WHERE sbd = ?')
+      .bind(sbd)
+      .first<Record<string, unknown>>()
+    if (ds) {
+      await env.DB.prepare('INSERT OR IGNORE INTO hoc_sinh (sbd, ho_ten, nam_sinh, lop, cap_nhat_luc) VALUES (?, ?, ?, ?, ?)')
+        .bind(sbd, chuoi(ds.ho_ten), chuoi(ds.nam_sinh), chuoi(ds.lop), NAY())
+        .run()
+      em = { ...ds, mat_khau: null }
+    }
+  }
+
+  if (!em) {
+    const lt = await env.DB.prepare('SELECT sbd, ho_ten FROM luot WHERE sbd = ? LIMIT 1')
+      .bind(sbd)
+      .first<Record<string, unknown>>()
+    if (lt) {
+      await env.DB.prepare('INSERT OR IGNORE INTO hoc_sinh (sbd, ho_ten, cap_nhat_luc) VALUES (?, ?, ?)')
+        .bind(sbd, chuoi(lt.ho_ten), NAY())
+        .run()
+      em = { sbd, ho_ten: chuoi(lt.ho_ten), nam_sinh: '', lop: '', mat_khau: null }
+    }
+  }
+
+  if (!em) return { ok: false, error: 'Số báo danh không tồn tại trong hệ thống' }
+
+  const daCoMatKhau = em.mat_khau !== null && chuoi(em.mat_khau).trim().length > 0
+  if (!daCoMatKhau) {
+    return {
+      ok: true,
+      chuaCoMatKhau: true,
+      sbd,
+      hoTen: chuoi(em.ho_ten),
+      lop: chuoi(em.lop),
+      namSinh: chuoi(em.nam_sinh),
+    }
+  }
+
+  if (!matKhau) {
+    return { ok: false, error: 'Vui lòng nhập mật khẩu' }
+  }
+
+  if (matKhau !== chuoi(em.mat_khau).trim()) {
+    return { ok: false, error: 'Mật khẩu không chính xác' }
+  }
+
+  return {
+    ok: true,
+    chuaCoMatKhau: false,
+    sbd,
+    hoTen: chuoi(em.ho_ten),
+    lop: chuoi(em.lop),
+    namSinh: chuoi(em.nam_sinh),
+  }
+}
+
+export async function hsDatMatKhau(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const sbd = chuoi(b.sbd).trim()
+  const matKhauMoi = chuoi(b.matKhauMoi).trim()
+  const matKhauCu = chuoi(b.matKhauCu).trim()
+  if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
+  if (!matKhauMoi || matKhauMoi.length < 4) return { ok: false, error: 'Mật khẩu mới phải từ 4 ký tự trở lên' }
+
+  const em = await env.DB.prepare('SELECT sbd, mat_khau FROM hoc_sinh WHERE sbd = ?')
+    .bind(sbd)
+    .first<Record<string, unknown>>()
+  if (!em) return { ok: false, error: 'Không tìm thấy học sinh' }
+
+  const daCoMatKhau = em.mat_khau !== null && chuoi(em.mat_khau).trim().length > 0
+  if (daCoMatKhau && chuoi(em.mat_khau).trim() !== matKhauCu) {
+    return { ok: false, error: 'Mật khẩu cũ không chính xác' }
+  }
+
+  await env.DB.prepare('UPDATE hoc_sinh SET mat_khau = ?, cap_nhat_luc = ? WHERE sbd = ?')
+    .bind(matKhauMoi, NAY(), sbd)
+    .run()
+
+  return { ok: true, message: 'Cập nhật mật khẩu thành công' }
+}
+
+export async function resetMatKhauHs(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const sbd = chuoi(b.sbd).trim()
+  if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
+
+  await env.DB.prepare("UPDATE hoc_sinh SET mat_khau = '12121212', cap_nhat_luc = ? WHERE sbd = ?")
+    .bind(NAY(), sbd)
+    .run()
+
+  return { ok: true, sbd, matKhauMoi: '12121212' }
+}
+
+export async function hsLichSuCa(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const sbd = chuoi(b.sbd).trim()
+  if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
+
+  const r = await env.DB.prepare(
+    `SELECT l.ma_ca, l.lan_thu, l.nop_luc, l.vao_luc, l.diem_i, l.diem_ii, l.diem_iii, l.tong,
+            COALESCE(c.ten_ca, '') AS ten_ca, COALESCE(c.lop, '') AS lop, c.thoi_gian_phut, c.cong_bo,
+            (SELECT COUNT(*) FROM chi_tiet_cau WHERE ma_ca = l.ma_ca AND sbd = l.sbd AND lan_thu = l.lan_thu AND dung_sai = 0) AS so_cau_sai,
+            (SELECT COUNT(*) FROM chi_tiet_cau WHERE ma_ca = l.ma_ca AND sbd = l.sbd AND lan_thu = l.lan_thu AND dung_sai = 1) AS so_cau_dung,
+            (SELECT COUNT(*) FROM chi_tiet_cau WHERE ma_ca = l.ma_ca AND sbd = l.sbd AND lan_thu = l.lan_thu) AS tong_cau
+       FROM luot l
+       LEFT JOIN ca c ON c.ma_ca = l.ma_ca
+      WHERE l.sbd = ? AND (l.trang_thai = 'da_nop' OR l.trang_thai = 'khoa' OR l.nop_luc IS NOT NULL)
+      ORDER BY l.nop_luc DESC LIMIT 100`,
+  )
+    .bind(sbd)
+    .all<Record<string, unknown>>()
+
+  return {
+    ok: true,
+    items: (r.results ?? []).map((x) => ({
+      maCa: chuoi(x.ma_ca),
+      tenCa: chuoi(x.ten_ca) || `Ca ${chuoi(x.ma_ca)}`,
+      lanThu: Number(x.lan_thu) || 1,
+      nopLuc: chuoi(x.nop_luc),
+      tong: soHoacNull(x.tong),
+      diemI: soHoacNull(x.diem_i),
+      diemII: soHoacNull(x.diem_ii),
+      diemIII: soHoacNull(x.diem_iii),
+      thoiGianPhut: Number(x.thoi_gian_phut) || 0,
+      soCauSai: Number(x.so_cau_sai) || 0,
+      soCauDung: Number(x.so_cau_dung) || 0,
+      tongCau: Number(x.tong_cau) || 0,
+    })),
+  }
+}
+
+export async function hsBtvn(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const sbd = chuoi(b.sbd).trim()
+  if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
+
+  const r = await env.DB.prepare(
+    `SELECT be.ma_btvn, be.sbd, be.nop_luc, be.diem, be.so_dung, be.so_sai,
+            b.ma_ca, b.ten_btvn, b.han_nop, b.so_cau, b.giao_luc
+       FROM btvn_em be
+       JOIN btvn b ON b.ma_btvn = be.ma_btvn
+      WHERE be.sbd = ? AND b.da_xoa = 0
+      ORDER BY b.giao_luc DESC LIMIT 100`,
+  )
+    .bind(sbd)
+    .all<Record<string, unknown>>()
+
+  return {
+    ok: true,
+    items: (r.results ?? []).map((x) => ({
+      maBtvn: chuoi(x.ma_btvn),
+      maCa: chuoi(x.ma_ca),
+      tenBtvn: chuoi(x.ten_btvn) || 'Bài tập về nhà',
+      hanNop: chuoi(x.han_nop),
+      giaoLuc: chuoi(x.giao_luc),
+      nopLuc: chuoi(x.nop_luc),
+      daNop: Boolean(x.nop_luc),
+      diem: soHoacNull(x.diem),
+      soDung: soHoacNull(x.so_dung),
+      soSai: soHoacNull(x.so_sai),
+      soCau: Number(x.so_cau) || 0,
+    })),
+  }
+}
+
+export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const sbd = chuoi(b.sbd).trim()
+  const dsMaCa = Array.isArray(b.dsMaCa) ? (b.dsMaCa as string[]).map(chuoi).filter(Boolean) : []
+  if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
+  if (dsMaCa.length === 0) return { ok: true, items: [] }
+
+  const placeholders = dsMaCa.map(() => '?').join(',')
+  const r = await env.DB.prepare(
+    `SELECT c.ma_ca, c.sbd, c.phan, c.so_cau, c.qid, c.chuyen_de, c.muc_do,
+            c.dap_an_chon, c.dap_an_dung, c.dung_sai, ca.ten_ca
+       FROM chi_tiet_cau c
+       LEFT JOIN ca ON ca.ma_ca = c.ma_ca
+      WHERE c.sbd = ? AND c.dung_sai = 0 AND c.ma_ca IN (${placeholders})
+      ORDER BY c.ma_ca DESC, CASE c.phan WHEN 'I' THEN 1 WHEN 'II' THEN 2 WHEN 'III' THEN 3 ELSE 4 END, c.so_cau ASC`,
+  )
+    .bind(sbd, ...dsMaCa)
+    .all<Record<string, unknown>>()
+
+  const rows = r.results ?? []
+  const banksCache = new Map<string, Record<string, unknown>>()
+  const qMap = new Map<string, Record<string, unknown>>()
+
+  for (const row of rows) {
+    const maCa = chuoi(row.ma_ca)
+    if (!banksCache.has(maCa) && env.DE) {
+      let bData: Record<string, unknown> | null = null
+      try {
+        const oKey = await env.DE.get(`key/${maCa}.json`)
+        if (oKey?.body) bData = (await new Response(oKey.body).json()) as Record<string, unknown>
+      } catch {}
+      if (!bData) {
+        try {
+          const oDe = await env.DE.get(`de/${maCa}.json`)
+          if (oDe?.body) bData = (await new Response(oDe.body).json()) as Record<string, unknown>
+        } catch {}
+      }
+      if (bData) {
+        banksCache.set(maCa, bData)
+        for (const p of ['phanI', 'phanII', 'phanIII']) {
+          const arr = Array.isArray(bData[p]) ? (bData[p] as Record<string, unknown>[]) : []
+          for (const q of arr) {
+            if (q && q.id) qMap.set(chuoi(q.id), q)
+          }
+        }
+      }
+    }
+  }
+
+  const items = rows.map((row) => {
+    const qid = chuoi(row.qid)
+    const fullQ = qMap.get(qid)
+    return {
+      maCa: chuoi(row.ma_ca),
+      tenCa: chuoi(row.ten_ca) || `Ca ${chuoi(row.ma_ca)}`,
+      phan: chuoi(row.phan),
+      soCau: Number(row.so_cau) || 0,
+      qid,
+      chuyenDe: chuoi(row.chuyen_de),
+      mucDo: chuoi(row.muc_do),
+      dapAnChon: chuoi(row.dap_an_chon),
+      dapAnDung: chuoi(row.dap_an_dung),
+      text: fullQ ? chuoi(fullQ.text) : '',
+      choices: fullQ && Array.isArray(fullQ.choices) ? fullQ.choices : undefined,
+      ideas: fullQ && Array.isArray(fullQ.ideas) ? fullQ.ideas : undefined,
+      table: fullQ ? fullQ.table : undefined,
+      imageDataUrl: fullQ ? fullQ.imageDataUrl : undefined,
+      hinhAnh: fullQ ? fullQ.hinhAnh : undefined,
+      loiGiai: fullQ ? chuoi(fullQ.loiGiai || fullQ.explanation || fullQ.giaiThich || '') : '',
+      dang: fullQ ? chuoi(fullQ.dang ?? '') : '',
+    }
+  })
+
+  return { ok: true, items }
+}
+

@@ -5,7 +5,7 @@ import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assi
 import { boCauTuBaiLam } from '../lib/bo-cau-tu-bai-lam'
 import { qidDaGap, type SoCauMoiPhan } from '../lib/bo-cau-tu-bai-lam'
 import { taoLinkPhieu } from '../lib/phieu-link'
-import { cauKhacPhuc, ghiPhieuKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, trangThaiPhongCho, vaoThi, phieuCuaEm as layBaiDaNop, layPhieu, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, chuKyLechPhaMs, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { cauKhacPhuc, ghiPhieuKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, trangThaiPhongCho, vaoThi, phieuCuaEm as layBaiDaNop, layPhieu, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, chuKyLechPhaMs, type KeyBank, type CongBoDiem, type KetQuaVaoThi, type ChiTietCauRow, type BaiDaNopCuaEm } from '../lib/exam-api'
 import { CongNhip, NHIP_TIM_LUU_TAM_GIAY } from '../lib/nhip-gui'
 import { goiCauHoi } from '../lib/hoi-bai'
 import TamTruotHoiBai, { type CauChon } from '../components/TamTruotHoiBai'
@@ -240,6 +240,7 @@ export default function ExamTakeScreen() {
 
   const [maCa, setMaCa] = useState('')
   const [sbd, setSbd] = useState('')
+  const [matKhauCa, setMatKhauCa] = useState('')
   // MÀN XÁC NHẬN TÊN (thầy chốt 07/09). Em gõ MỖI số báo danh; bấm Vào thi thì
   // máy tra tên của chính số đó và hiện lên cho em nhìn, rồi em bấm Bắt đầu hay
   // Nhập lại.
@@ -476,7 +477,11 @@ export default function ExamTakeScreen() {
     const params = new URLSearchParams(location.search)
     const codeFromUrl = params.get('examCode')
     const apiFromUrl = params.get('api')
+    const sbdFromUrl = params.get('sbd')
+    const mkFromUrl = params.get('matKhau') || params.get('pass')
     if (codeFromUrl) setMaCa(codeFromUrl)
+    if (sbdFromUrl) setSbd(sbdFromUrl)
+    if (mkFromUrl) setMatKhauCa(mkFromUrl)
     if (apiFromUrl) {
       setScriptUrl(apiFromUrl)
       saveScriptUrl(apiFromUrl)
@@ -949,6 +954,49 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
    * mọi chỗ ghi sổ, đẩy trạng thái và dựng phiếu vẫn biết bài từng bị khoá. */
   const [xemLai, setXemLai] = useState(false)
 
+  const dungPhieuTuCtcMayChu = (
+    b: BaiDaNopCuaEm,
+    ma: string,
+    sb: string,
+    hoTen: string,
+    bankCoBo: any,
+  ): PhieuDayDu | null => {
+    if (!b.chiTietCau || b.chiTietCau.length === 0) return null
+    try {
+      const rows = b.chiTietCau as ChiTietCauRow[]
+      const dI = typeof b.diemI === 'number' ? b.diemI : 0
+      const dII = typeof b.diemII === 'number' ? b.diemII : 0
+      const dIII = typeof b.diemIII === 'number' ? b.diemIII : 0
+      const tongDiem = typeof b.tong === 'number' ? b.tong : dI + dII + dIII
+      const banks: TeacherExamSource[] = [{ maDe: ma, phanI: bankCoBo.phanI, phanII: bankCoBo.phanII, phanIII: bankCoBo.phanIII }]
+      return dungPhieuMayEm({
+        hoTen: (b.hoTen || hoTen).trim(),
+        sbd: sb,
+        maCa: ma,
+        nopLuc: b.luot.nopLuc || new Date().toISOString(),
+        vaoLuc: b.luot.vaoLuc,
+        thoiLuongPhut: b.thoiGianPhut,
+        diem: tongDiem,
+        diemPhan: { I: dI, II: dII, III: dIII },
+        rows,
+        banks,
+        lichSu: [],
+        khoKhacPhuc: [],
+        thuTuKhacPhuc: [],
+        lapCua: null,
+        viPham: {
+          soLan: b.luot.soLanRoiMan || 0,
+          tongGiay: b.luot.tongGiayRoiMan || 0,
+          daKhoa: b.luot.trangThai === 'khoa',
+          lyDoKhoa: null,
+          events: null,
+        },
+      })
+    } catch {
+      return null
+    }
+  }
+
   const moLaiTuMayChu = async () => {
     const ma = maCa.trim()
     const sb = sbd.trim()
@@ -966,7 +1014,17 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       // xảy ra lần thử đầu 07/09. Kiểm ở đây để nói được câu người đọc hiểu.
       if (!coDapAn(b.bank)) throw new Error('Ca này chưa công bố đáp án — hỏi Thầy.')
 
-      if (b.phieu && typeof b.phieu === 'object') {
+      const daNop = b.luot.dapAn ?? { phanI: {}, phanII: {}, phanIII: {} }
+      const soCauCa = (b.bank.soCau ?? b.soCau) as SoCauMoiPhan | undefined
+      const boEm = (b.boCuaEm && b.boCuaEm.length > 0)
+        ? b.boCuaEm
+        : boCauTuBaiLam(b.bank, ma, sb, daNop, b.luot.giayCau, soCauCa)
+      const bankCoBo = boEm && boEm.length > 0 ? { ...b.bank, boTheoEm: { [sb]: boEm }, soCau: soCauCa } : b.bank
+
+      const pCtc = dungPhieuTuCtcMayChu(b, ma, sb, hoTen, bankCoBo)
+      if (pCtc) {
+        setPhieuSan(pCtc)
+      } else if (b.phieu && typeof b.phieu === 'object') {
         setPhieuSan(b.phieu as PhieuDayDu)
       } else if (b.ma) {
         try {
@@ -978,13 +1036,6 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           }
         } catch {}
       }
-
-      const daNop = b.luot.dapAn ?? { phanI: {}, phanII: {}, phanIII: {} }
-      const soCauCa = (b.bank.soCau ?? b.soCau) as SoCauMoiPhan | undefined
-      const boEm = (b.boCuaEm && b.boCuaEm.length > 0)
-        ? b.boCuaEm
-        : boCauTuBaiLam(b.bank, ma, sb, daNop, b.luot.giayCau, soCauCa)
-      const bankCoBo = boEm && boEm.length > 0 ? { ...b.bank, boTheoEm: { [sb]: boEm }, soCau: soCauCa } : b.bank
 
       setBank(bankCoBo)
       setLop(b.lop)
@@ -1021,11 +1072,36 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         // Mở lại app sau khi nộp: KHÔNG còn `assignment` để đối chiếu, nên dựng
         // bộ câu từ chính bài đã nộp. Thiếu tham số này là chấm theo bộ câu rút
         // lại bằng hạt giống — sai hẳn với ca đề riêng.
-        setGraded(gradeFromKeyBank(bankCoBo, ma, sb, daNop, boEm))
+        const gr = gradeFromKeyBank(bankCoBo, ma, sb, daNop, boEm)
+        if (typeof b.tong === 'number') {
+          gr.score.total = b.tong
+          if (typeof b.diemI === 'number') gr.score.phanIScore = b.diemI
+          if (typeof b.diemII === 'number') gr.score.phanIIScore = b.diemII
+          if (typeof b.diemIII === 'number') gr.score.phanIIIScore = b.diemIII
+        }
+        setGraded(gr)
       } catch {
-        // Đề đổi sau khi em thi thì không chấm lại được — vẫn hiện màn đã nộp,
-        // chỉ thiếu điểm, chứ không ném em vào màn lỗi.
-        setGraded(null)
+        if (typeof b.tong === 'number') {
+          setGraded({
+            score: {
+              total: b.tong,
+              phanIScore: typeof b.diemI === 'number' ? b.diemI : 0,
+              phanIIScore: typeof b.diemII === 'number' ? b.diemII : 0,
+              phanIIIScore: typeof b.diemIII === 'number' ? b.diemIII : 0,
+              totalMax: 10,
+              phanIMax: 4.5,
+              phanIIMax: 4.0,
+              phanIIIMax: 1.5,
+            } as any,
+            answers: daNop,
+            keys: {} as any,
+            phanI: [],
+            phanII: [],
+            phanIII: [],
+          } as any)
+        } else {
+          setGraded(null)
+        }
       }
       setPhase('submitted')
     } catch (e) {
@@ -1105,7 +1181,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           if (cho > 0) await new Promise((nghi) => setTimeout(nghi, cho))
         }
         try {
-          kq = await vaoThi(url, ma, sb, idTb, !cached, { hoTen: ten, namSinh: nam, xacNhanTen: xacNhan !== null })
+          kq = await vaoThi(url, ma, sb, idTb, !cached, { hoTen: ten, namSinh: nam, xacNhanTen: xacNhan !== null, matKhau: matKhauCa.trim() })
         } catch {
           kq = null
         }
@@ -1216,7 +1292,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       // hoặc máy chủ bản cũ) — mất dấu giữa chừng còn khó hiểu hơn không có dấu.
       const cauLap = (kq.cauLap && kq.cauLap.length > 0 ? kq.cauLap : existing?.cauLap) ?? []
       const demLap = (kq.demLap && Object.keys(kq.demLap).length > 0 ? kq.demLap : existing?.demLap) ?? {}
-      const thongTinCa = { loai: kq.loai, hanNop: kq.hanNop, tenCa: kq.tenCa, giuDeDoc: kq.giuDeDoc, anHanGiay: kq.anHanGiay, cauLap, demLap }
+      const thongTinCa = { loai: kq.loai, hanNop: kq.hanNop, tenCa: kq.tenCa, giuDeDoc: kq.giuDeDoc, anHanGiay: kq.anHanGiay, chiNop3PhutCuoi: kq.chiNop3PhutCuoi === true, cauLap, demLap }
       const a: ExamAttempt = giuLuotDo
         ? { ...existing, startedAt: kq.vaoLuc, hetGioLuc: kq.hetGioLuc, durationMinutes: kq.thoiGianPhut, idThietBi: idTb, nguong, ...thongTinCa }
         : {
@@ -1900,6 +1976,10 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   }
 
   const doSubmit = async (a: ExamAttempt, tuDongNop = false) => {
+    if (!tuDongNop && a.chiNop3PhutCuoi && typeof remaining === 'number' && remaining > 180) {
+      showToast(`Chỉ được nộp bài trong 3 phút cuối của ca thi (còn ${Math.ceil((remaining - 180) / 60)} phút)`, 'warn')
+      return
+    }
     // GIỮ ĐỂ ĐỌC: gộp hai con số đúng lúc này, không rắc dọc đường. Chúng KHÔNG
     // đếm vào bất kỳ ngưỡng khoá nào — chỉ để thầy nhìn ở Chi tiết ca.
     const dem = demTatDe.current
@@ -2329,6 +2409,31 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                   }}
                 />
               </div>
+              {!laXemDiem && (
+                <div>
+                  <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginBottom: 'var(--k2)' }}>
+                    Mật khẩu ca thi (nếu ca yêu cầu)
+                  </div>
+                  <input
+                    className="tap-target w-full"
+                    type="password"
+                    style={{
+                      height: 52,
+                      borderRadius: 'var(--bo-1)',
+                      padding: '0 var(--k4)',
+                      background: 'var(--the-2)',
+                      border: '1.5px solid transparent',
+                      fontFamily: 'var(--sans)',
+                      fontSize: 'var(--cx-2)',
+                      color: 'var(--muc)',
+                      outline: 'none',
+                    }}
+                    placeholder="Để trống nếu ca không đặt mật khẩu"
+                    value={matKhauCa}
+                    onChange={(e) => setMatKhauCa(e.target.value)}
+                  />
+                </div>
+              )}
               {/* HỌ TÊN + NĂM SINH: máy chủ đối chiếu với danh sách của thầy.
                   Gõ nhầm một chữ số báo danh sẽ bị chặn ngay ở đây thay vì tạo
                   ra một em lạ trong bảng điểm. Máy nhớ sẵn từ lần trước.
@@ -2956,6 +3061,14 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     )
   }
 
+  const camNopSom = Boolean(attempt.chiNop3PhutCuoi && typeof remaining === 'number' && remaining > 180)
+  const giayChoPhepNop = camNopSom ? Math.max(0, Math.floor((remaining ?? 0) - 180)) : 0
+  const phutChoPhepNop = Math.floor(giayChoPhepNop / 60)
+  const leGiayChoPhepNop = giayChoPhepNop % 60
+  const nhanNutNop = camNopSom
+    ? `Nộp bài (còn ${phutChoPhepNop}:${leGiayChoPhepNop < 10 ? '0' : ''}${leGiayChoPhepNop})`
+    : 'Nộp bài'
+
   return (
     <Trang className="man-lam-bai">
       {/* THANH TRÊN — 56px, dính, mờ; tiến độ 3px sát mép trên; chấm lưu 6px góc phải */}
@@ -3031,7 +3144,12 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               })}
             </div>
             <div style={{ marginTop: 'var(--k4)' }}>
-              <NutChinh onClick={() => setShowConfirm(true)}>Nộp bài</NutChinh>
+              {camNopSom && (
+                <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--cam)', marginBottom: 'var(--k2)', textAlign: 'center' }}>
+                  Chỉ nộp bài trong 3 phút cuối
+                </div>
+              )}
+              <NutChinh disabled={camNopSom} onClick={() => { if (!camNopSom) setShowConfirm(true) }}>{nhanNutNop}</NutChinh>
             </div>
           </div>
         </aside>
@@ -3042,7 +3160,12 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           {renderPhan('II')}
           {renderPhan('III')}
           <div style={{ paddingTop: 'var(--k3)' }}>
-            <NutChinh onClick={() => setShowConfirm(true)}>Nộp bài</NutChinh>
+            {camNopSom && (
+              <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--cam)', marginBottom: 'var(--k2)', textAlign: 'center' }}>
+                Chỉ nộp bài trong 3 phút cuối
+              </div>
+            )}
+            <NutChinh disabled={camNopSom} onClick={() => { if (!camNopSom) setShowConfirm(true) }}>{nhanNutNop}</NutChinh>
           </div>
         </div>
       </div>
@@ -3084,13 +3207,20 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 )
               })}
             </div>
+            {camNopSom && (
+              <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--cam)', marginBottom: 'var(--k2)', textAlign: 'center' }}>
+                Chỉ nộp bài trong 3 phút cuối
+              </div>
+            )}
             <NutChinh
+              disabled={camNopSom}
               onClick={() => {
+                if (camNopSom) return
                 setShowGrid(false)
                 setShowConfirm(true)
               }}
             >
-              Nộp bài
+              {nhanNutNop}
             </NutChinh>
           </div>
         </div>
@@ -3123,12 +3253,14 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               Xem lại
             </NutChinh>
             <NutChinh
+              disabled={camNopSom}
               onClick={() => {
+                if (camNopSom) return
                 setShowConfirm(false)
                 doSubmit(attempt)
               }}
             >
-              Nộp bài
+              {nhanNutNop}
             </NutChinh>
           </div>
         </HopThoai>
@@ -3143,12 +3275,14 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               Tiếp tục làm
             </NutChinh>
             <NutChinh
+              disabled={camNopSom}
               onClick={() => {
+                if (camNopSom) return
                 setShowBackDialog(false)
                 doSubmit(attempt)
               }}
             >
-              Nộp bài
+              {nhanNutNop}
             </NutChinh>
           </div>
         </HopThoai>

@@ -90,6 +90,7 @@ export interface ExamAttempt {
    * đúng hành vi cũ, không đổi điểm ca đã gửi phụ huynh. */
   giuDeDoc?: boolean
   anHanGiay?: number
+  chiNop3PhutCuoi?: boolean
   /** CÂU HỎI LẠI — qid những câu chính em đã sai buổi trước, được rút vào đề
    * lần này (thầy chốt 08/09). Cất cùng lượt để em rớt mạng vào lại vẫn còn
    * dấu; ca thường không có trường này và thẻ câu không hiện gì thêm. */

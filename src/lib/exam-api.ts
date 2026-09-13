@@ -198,6 +198,7 @@ export type LyDoChan =
   | 'sai_ho_so'
   /** Thầy cho thi lại và khoá theo máy cũ; em đang mở ở máy khác. */
   | 'sai_may'
+  | 'sai_mat_khau_ca'
   /** CA ĐỀ RIÊNG mà máy chủ chưa có bộ câu của chính em này. KHÔNG phát đề cắt
    * theo luật khác — điểm sẽ lệch với bảng chấm của thầy mà không ai thấy. */
   | 'thieu_bo_cau'
@@ -248,6 +249,7 @@ export type KetQuaVaoThi =
        * Ca cũ không có cột ⇒ false, hành vi giống hệt bản đang chạy. */
       giuDeDoc: boolean
       anHanGiay: number
+      chiNop3PhutCuoi?: boolean
       /** true = thầy vừa mở khoá lượt này (máy em còn giữ cờ khoá) → bỏ khoá, làm tiếp. */
       daMoKhoa: boolean
       bank?: PublicExamBank
@@ -285,6 +287,7 @@ export interface DanhTinhVaoThi {
   hoTen: string
   namSinh: string
   xacNhanTen?: boolean
+  matKhau?: string
 }
 
 export interface TenTheoSbd {
@@ -594,6 +597,7 @@ async function vaoThiQuaMayChuMoi(
     tenCa: String(r.tenCa ?? ''),
     giuDeDoc: r.giuDeDoc === true,
     anHanGiay: Number(r.anHanGiay) || 0,
+    chiNop3PhutCuoi: r.chiNop3PhutCuoi === true,
     daMoKhoa: false,
     bank,
     cauLap: cauLapCuaEm(goi?.lap?.[sbd]),
@@ -623,6 +627,8 @@ export function thongDiepChan(kq: Extract<KetQuaVaoThi, { ok: false }>, gio: (is
       return 'Ca kiểm tra này đã bị thầy xoá.'
     case 'da_dong':
       return 'Ca kiểm tra này đã đóng.'
+    case 'sai_mat_khau_ca':
+      return 'Mật khẩu ca thi không đúng hoặc chưa nhập. Vui lòng nhập đúng mật khẩu ca thi.'
     case 'dang_lam_may_khac':
       return 'Số báo danh này đang làm bài ở máy khác. Nếu đúng là em, mở lại trên máy đã bắt đầu; nếu không, báo thầy ngay.'
     case 'sai_may':
@@ -714,6 +720,8 @@ export interface MocThoiGianCa {
   deRieng?: boolean
   /** Lấy câu sai của ca gần nhất hay gộp 3 ca gần nhất (thầy chốt 08/09). */
   phamViHoiLai?: 'gan_nhat' | 'ba_ca'
+  matKhau?: string
+  chiNop3PhutCuoi?: boolean
 }
 
 /** Mốc giờ hợp lệ thành mili giây; rỗng hay hỏng thì `null`. */
@@ -802,6 +810,8 @@ export async function publishSession(
           lenBang: moc.lenBang !== false,
           deRieng: moc.deRieng === true,
           phamViHoiLai: moc.phamViHoiLai === 'ba_ca' ? 'ba_ca' : 'gan_nhat',
+          matKhau: moc.matKhau?.trim() || undefined,
+          chiNop3PhutCuoi: moc.chiNop3PhutCuoi === true,
         },
         bank,
         // NGÂN HÀNG CÓ ĐÁP ÁN — LUÔN GỬI, không phụ thuộc cách công bố.
@@ -2478,6 +2488,10 @@ export interface BaiDaNopCuaEm {
   boTheoEm?: Record<string, unknown> | null
   boCuaEm?: string[] | null
   soCau?: SoCauMoiPhan | null
+  chiTietCau?: ChiTietCauRow[] | null
+  diemI?: number | null
+  diemII?: number | null
+  diemIII?: number | null
 }
 
 export async function phieuCuaEm(scriptUrl: string, maCa: string, sbd: string): Promise<BaiDaNopCuaEm> {
@@ -2488,6 +2502,10 @@ export async function phieuCuaEm(scriptUrl: string, maCa: string, sbd: string): 
     ma: String(r.ma || ''),
     maBaiTap: String(r.maBaiTap || ''),
     tong: r.tong === null || r.tong === undefined ? null : Number(r.tong),
+    diemI: r.diemI === null || r.diemI === undefined ? null : Number(r.diemI),
+    diemII: r.diemII === null || r.diemII === undefined ? null : Number(r.diemII),
+    diemIII: r.diemIII === null || r.diemIII === undefined ? null : Number(r.diemIII),
+    chiTietCau: (r.chiTietCau as ChiTietCauRow[] | undefined) ?? null,
     hoTen: String(r.hoTen || ''),
     lop: String(r.lop || ''),
     tenCa: String(r.tenCa || ''),
@@ -2943,3 +2961,170 @@ export async function napToanBoCaLenMayChuMoi(
     dangNapCa = false
   }
 }
+
+// ---------------------------------------------------------------------------
+// CỔNG THÔNG TIN HỌC SINH — GỌI MÁY CHỦ
+// ---------------------------------------------------------------------------
+
+export async function hsDangNhapApi(scriptUrl: string, sbd: string, matKhau?: string): Promise<{
+  ok: boolean
+  chuaCoMatKhau?: boolean
+  sbd?: string
+  hoTen?: string
+  lop?: string
+  namSinh?: string
+  error?: string
+}> {
+  const ch = await layCauHinhMayChu()
+  const base = ch.BAT && ch.URL ? ch.URL : (scriptUrl ? scriptUrl.replace(/\/$/, '') : '')
+  try {
+    const res = await fetch(`${base}/hs/dang-nhap`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ sbd: sbd.trim(), matKhau: (matKhau ?? '').trim() }),
+    })
+    return (await res.json()) as any
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
+  }
+}
+
+export async function hsDatMatKhauApi(scriptUrl: string, sbd: string, matKhauMoi: string, matKhauCu?: string): Promise<{
+  ok: boolean
+  message?: string
+  error?: string
+}> {
+  const ch = await layCauHinhMayChu()
+  const base = ch.BAT && ch.URL ? ch.URL : (scriptUrl ? scriptUrl.replace(/\/$/, '') : '')
+  try {
+    const res = await fetch(`${base}/hs/dat-mat-khau`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ sbd: sbd.trim(), matKhauMoi: matKhauMoi.trim(), matKhauCu: (matKhauCu ?? '').trim() }),
+    })
+    return (await res.json()) as any
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
+  }
+}
+
+export async function resetMatKhauHsApi(scriptUrl: string, secret: string, sbd: string): Promise<{
+  ok: boolean
+  sbd?: string
+  matKhauMoi?: string
+  error?: string
+}> {
+  const ch = await layCauHinhMayChu()
+  const base = ch.BAT && ch.URL ? ch.URL : (scriptUrl ? scriptUrl.replace(/\/$/, '') : '')
+  try {
+    const res = await fetch(`${base}/goi`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-ma-bi-mat': secret.trim() },
+      body: JSON.stringify({ action: 'resetMatKhauHs', secret: secret.trim(), sbd: sbd.trim() }),
+    })
+    return (await res.json()) as any
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
+  }
+}
+
+export async function hsLichSuCaApi(scriptUrl: string, sbd: string): Promise<{
+  ok: boolean
+  items?: Array<{
+    maCa: string
+    tenCa: string
+    lanThu: number
+    nopLuc: string
+    tong: number | null
+    diemI: number | null
+    diemII: number | null
+    diemIII: number | null
+    thoiGianPhut: number
+    soCauSai: number
+    soCauDung: number
+    tongCau: number
+  }>
+  error?: string
+}> {
+  const ch = await layCauHinhMayChu()
+  const base = ch.BAT && ch.URL ? ch.URL : (scriptUrl ? scriptUrl.replace(/\/$/, '') : '')
+  try {
+    const res = await fetch(`${base}/hs/lich-su`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ sbd: sbd.trim() }),
+    })
+    return (await res.json()) as any
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
+  }
+}
+
+export async function hsBtvnApi(scriptUrl: string, sbd: string): Promise<{
+  ok: boolean
+  items?: Array<{
+    maBtvn: string
+    maCa: string
+    tenBtvn: string
+    hanNop: string
+    giaoLuc: string
+    nopLuc: string
+    daNop: boolean
+    diem: number | null
+    soDung: number | null
+    soSai: number | null
+    soCau: number
+  }>
+  error?: string
+}> {
+  const ch = await layCauHinhMayChu()
+  const base = ch.BAT && ch.URL ? ch.URL : (scriptUrl ? scriptUrl.replace(/\/$/, '') : '')
+  try {
+    const res = await fetch(`${base}/hs/btvn`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ sbd: sbd.trim() }),
+    })
+    return (await res.json()) as any
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
+  }
+}
+
+export async function hsCauSaiApi(scriptUrl: string, sbd: string, dsMaCa: string[]): Promise<{
+  ok: boolean
+  items?: Array<{
+    maCa: string
+    tenCa: string
+    phan: 'I' | 'II' | 'III'
+    soCau: number
+    qid: string
+    chuyenDe: string
+    mucDo: string
+    dapAnChon: string
+    dapAnDung: string
+    text: string
+    choices?: string[]
+    ideas?: string[]
+    table?: string[][]
+    imageDataUrl?: string
+    hinhAnh?: string
+    loiGiai?: string
+    dang?: string
+  }>
+  error?: string
+}> {
+  const ch = await layCauHinhMayChu()
+  const base = ch.BAT && ch.URL ? ch.URL : (scriptUrl ? scriptUrl.replace(/\/$/, '') : '')
+  try {
+    const res = await fetch(`${base}/hs/cau-sai`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ sbd: sbd.trim(), dsMaCa }),
+    })
+    return (await res.json()) as any
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
+  }
+}
+

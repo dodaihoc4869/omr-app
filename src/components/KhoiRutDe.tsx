@@ -243,17 +243,17 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
     // soCau báo lên là SỐ CÂU MỖI EM LÀM, không phải cỡ kho. Kho lớn hơn thì
     // máy bốc riêng cho từng em; bằng nhau thì cả lớp cùng một đề.
     const kho = soCauCua(kq)
-    // ĐỀ RIÊNG TỪNG EM: đẩy lên KHO RỘNG (cả bộ đã rút), không cắt xuống số
-    // câu mỗi em. Bộ câu của từng em rút lúc thầy bấm Bắt đầu, từ đúng những
-    // em đang đứng ở phòng chờ — nên gói đề phải đủ rộng để rút.
+    // ĐỀ RIÊNG TỪNG EM: đẩy lên KHO RỘNG (toàn bộ các câu trong những đề đã tích),
+    // không cắt xuống số câu mỗi em hay bộ câu đã rút trước. Bộ câu của từng em
+    // rút lúc thầy bấm Bắt đầu, từ đúng những em đang đứng ở phòng chờ.
     onDoi({
-      ids: moiIdDaRut(kq),
+      ids: deRieng ? new Set(nguon.flatMap((s) => [...s.phanI, ...s.phanII, ...s.phanIII].map((q) => q.id))) : moiIdDaRut(kq),
       soCau: deRieng ? soCau : { I: Math.min(soCau.I, kho.I), II: Math.min(soCau.II, kho.II), III: Math.min(soCau.III, kho.III) },
       lenBang: false,
       deRieng,
       phamViHoiLai,
     })
-  }, [cheDo, lenBang, kq, soCau, onDoi, uv, phutLamBai, qidCaTruoc, seed, deRieng, phamViHoiLai])
+  }, [cheDo, lenBang, kq, soCau, onDoi, uv, phutLamBai, qidCaTruoc, seed, deRieng, phamViHoiLai, nguon])
 
   const daRut = kq ? soCauCua(kq) : { I: 0, II: 0, III: 0 }
   const thieu = kq ? PHAN_DE.filter((p) => kq.thieu[p] > 0) : []

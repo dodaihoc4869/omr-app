@@ -424,8 +424,29 @@ export async function dungDeRiengChoCa(
   }
 
   const uv = dungUngVien(bankDung)
+  let uvCuoi = uv
+  const thieuI = Math.max(0, sc.I - uv.I.length)
+  const thieuII = Math.max(0, sc.II - uv.II.length)
+  const thieuIII = Math.max(0, sc.III - uv.III.length)
+  if (thieuI > 0 || thieuII > 0 || thieuIII > 0) {
+    const khoToanBo = await loadExamSources().catch(() => [] as TeacherExamSource[])
+    const daCo = new Set([...bankDung.flatMap((s) => [...s.phanI, ...s.phanII, ...s.phanIII].map((q) => q.id))])
+    const bu: TeacherExamSource = {
+      maDe: `${maCa}-bu-kho`,
+      phanI: khoToanBo.flatMap((s) => s.phanI.filter((q) => !daCo.has(q.id))).slice(0, thieuI),
+      phanII: khoToanBo.flatMap((s) => s.phanII.filter((q) => !daCo.has(q.id))).slice(0, thieuII),
+      phanIII: khoToanBo.flatMap((s) => s.phanIII.filter((q) => !daCo.has(q.id))).slice(0, thieuIII),
+    }
+    if (bu.phanI.length > 0 || bu.phanII.length > 0 || bu.phanIII.length > 0) {
+      bankDung = [...bankDung, bu]
+      await noiKhoCa(url, mat, maCa, mergeAndStrip([bu]), { phanI: bu.phanI, phanII: bu.phanII, phanIII: bu.phanIII })
+      await saveSessionTeacherBank(maCa, bankDung)
+      uvCuoi = dungUngVien(bankDung)
+    }
+  }
+
   const ra = dungDeRieng({
-    uv,
+    uv: uvCuoi,
     yc: { soCau: sc, chuyenDe: [], mucDo: [], tranhQid: [], seed: hashSeed(maCa) },
     dsSbd,
     dsCa,

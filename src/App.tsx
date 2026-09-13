@@ -14,6 +14,7 @@ import { ganCauNoi, goCauNoi } from './lib/cau-noi-ddh'
 import ExamTakeScreen from './screens/ExamTakeScreen'
 import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
 import PhieuScreen from './screens/PhieuScreen'
+import StudentPortalScreen from './screens/StudentPortalScreen'
 
 // TÁM MÀN CHỈ THẦY DÙNG — NẠP MUỘN.
 //
@@ -88,6 +89,9 @@ function App() {
   // xong, đủ bốn nút Xem điểm chi tiết · Xem báo cáo học tập · Xem đề & lời
   // giải · Hỏi bài Thầy.
   const [laXemDiem] = useState(() => docDuongVao(location.search, location.pathname).vai === 'diem')
+  // CỔNG HỌC SINH (/hoc-sinh, /hs): cổng thông tin riêng của em — đăng nhập,
+  // xem điểm, nộp BTVN, khắc phục câu sai, vào thi.
+  const [laHocSinh] = useState(() => docDuongVao(location.search, location.pathname).vai === 'hocsinh')
   // MẬT KHẨU MỞ APP (MATKHAUMOAPP.md). CHỈ hỏi ở app quản lý của thầy — vào
   // thi, báo cáo phụ huynh, link riêng cũ đều không bao giờ bị hỏi.
   const [canHoi] = useState(() => laManThayQuanLy(location.search, location.pathname))
@@ -172,27 +176,27 @@ function App() {
   // Điều kiện `canHoi` là quan trọng: màn vào thi của em, báo cáo phụ huynh và
   // link cũ đều KHÔNG được có cầu nối — những máy đó không phải máy thầy.
   useEffect(() => {
-    if (!canHoi || linkCu || laPhieu || laXemDiem || khoa !== 'da_mo') {
+    if (!canHoi || linkCu || laPhieu || laXemDiem || laHocSinh || khoa !== 'da_mo') {
       goCauNoi()
       return
     }
     ganCauNoi()
     return () => goCauNoi()
-  }, [canHoi, linkCu, laPhieu, laXemDiem, khoa])
+  }, [canHoi, linkCu, laPhieu, laXemDiem, laHocSinh, khoa])
 
   // Máy em / phụ huynh cầm link cũ thì KHÔNG đọc gì của thầy — không mở
   // IndexedDB danh sách lớp, không dựng màn nào của app quản lý. Chưa mở khoá
   // cũng vậy: không đọc danh sách lớp trước khi thầy nhập đúng mật khẩu.
   useEffect(() => {
-    if (linkCu || laPhieu || laXemDiem || khoa !== 'da_mo') return
+    if (linkCu || laPhieu || laXemDiem || laHocSinh || khoa !== 'da_mo') return
     loadClassList().then((list) => {
       if (list.length > 0) setClassList(list)
     })
-  }, [linkCu, laPhieu, laXemDiem, khoa, setClassList])
+  }, [linkCu, laPhieu, laXemDiem, laHocSinh, khoa, setClassList])
 
   // Link mời làm bài (?examCode=) mở thẳng màn thi. Không có thì vào app thầy.
   useEffect(() => {
-    if (linkCu || laPhieu) return
+    if (linkCu || laPhieu || laHocSinh) return
     const { maCa } = docDuongVao(location.search, location.pathname)
     if (maCa) setScreen('examtake')
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -206,6 +210,13 @@ function App() {
     )
   }
   if (linkCu) return <AppDaChuyenScreen />
+  if (laHocSinh) {
+    return (
+      <ChanLoi o="Cổng học sinh">
+        <StudentPortalScreen />
+      </ChanLoi>
+    )
+  }
 
   // Chưa biết có mật khẩu hay chưa: dựng một màn trống, KHÔNG dựng app. Vài
   // chục mili giây, nhưng đây là chỗ mục 5 đòi — không được thấy loáng thoáng
