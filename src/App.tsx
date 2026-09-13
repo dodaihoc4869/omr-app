@@ -90,19 +90,21 @@ function App() {
   // xong, đủ bốn nút Xem điểm chi tiết · Xem báo cáo học tập · Xem đề & lời
   // giải · Hỏi bài Thầy.
   const [laXemDiem] = useState(() => docDuongVao(location.search, location.pathname).vai === 'diem')
-  // CỔNG HỌC SINH (/hoc-sinh, /hs): cổng thông tin riêng của em — đăng nhập,
+  // CỔNG HỌC SINH (/hoc-sinh, /hs, ?vai=hocsinh): cổng thông tin riêng của em — đăng nhập,
   // xem điểm, nộp BTVN, khắc phục câu sai, vào thi.
   // Khi mở từ màn hình chính iOS (start_url="./" mở "/" trần), nếu máy đã dùng vai 'hs' thì vào thẳng cổng học sinh.
   const [laHocSinh] = useState(() => {
     const d = docDuongVao(location.search, location.pathname)
     if (d.vai === 'hocsinh') return true
+    if (d.vai === 'phuhuynh' || d.vai === 'gv') return false
     if (!d.vai && !d.maCa && vaiDaDung() === 'hs') return true
     return false
   })
-  // CỔNG PHỤ HUYNH (/phu-huynh, /ph): cổng thông tin cho phụ huynh — tra cứu điểm của con bằng SBD, giao bài tập.
+  // CỔNG PHỤ HUYNH (/phu-huynh, /ph, ?vai=phuhuynh): cổng thông tin cho phụ huynh — tra cứu điểm của con bằng SBD, giao bài tập.
   const [laPhuHuynh] = useState(() => {
     const d = docDuongVao(location.search, location.pathname)
     if (d.vai === 'phuhuynh') return true
+    if (d.vai === 'hocsinh' || d.vai === 'gv') return false
     if (!d.vai && !d.maCa && vaiDaDung() === 'ph') return true
     return false
   })

@@ -212,7 +212,7 @@ function LoiGiai({ props, nhan }: { props: TheCauProps; nhan?: TrangThaiLoiGiai 
       <div className="loi-giai">
         <div className="loi-giai-nhan lg-nhan">LỜI GIẢI</div>
         {!coGi && <div className="lg-chu">Thầy chưa nhập lời giải cho câu này.</div>}
-        {lg?.chot && (
+        {lg?.chot && typeof lg.chot === 'string' && !lg.chot.includes('[object Object]') && lg.chot.trim() && (
           <div className="loi-giai-chot lg-chot">
             <div className="loi-giai-nhan-nho">Kiến thức cốt lõi</div>
             <ChemText text={lg.chot} />

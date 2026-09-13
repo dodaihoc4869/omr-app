@@ -3,6 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { chuHtml } from '../src/lib/html-phieu'
 import { chuanHoaBaiMom } from '../src/screens/StudentPortalScreen'
+import { docVaiTuDuongDan, docDuongVao } from '../src/lib/vai-tro'
 
 describe('1. Mật khẩu ca thi', () => {
   it('vaoThiMoi gửi cả matKhau và matKhauCa đã trim', () => {
@@ -84,5 +85,37 @@ describe('5. Modal báo cáo học tập ca thi của con cho phụ huynh chuẩ
     const file = fs.readFileSync(path.join(__dirname, '../src/screens/ParentPortalScreen.tsx'), 'utf-8')
     expect(file).toContain('<BaoCaoCaThiPhuHuynhModal')
     expect(file).toContain('setCaDangXem(b)')
+  })
+})
+
+describe('6. Tách biệt tuyệt đối 3 App (Giáo Viên, Học Sinh, Phụ Huynh)', () => {
+  it('docVaiTuDuongDan nhận diện chính xác các đường dẫn của 3 app', () => {
+    expect(docVaiTuDuongDan('/hoc-sinh').vai).toBe('hocsinh')
+    expect(docVaiTuDuongDan('/hocsinh').vai).toBe('hocsinh')
+
+    expect(docVaiTuDuongDan('/phu-huynh').vai).toBe('phuhuynh')
+    expect(docVaiTuDuongDan('/phuhuynh').vai).toBe('phuhuynh')
+
+    expect(docVaiTuDuongDan('/gv').vai).toBe('gv')
+    expect(docVaiTuDuongDan('/giaovien').vai).toBe('gv')
+  })
+
+  it('docDuongVao nhận diện tham số truy vấn của 3 app', () => {
+    expect(docDuongVao('?vai=hocsinh').vai).toBe('hocsinh')
+    expect(docDuongVao('?vai=phuhuynh').vai).toBe('phuhuynh')
+    expect(docDuongVao('?vai=gv').vai).toBe('gv')
+    expect(docDuongVao('?vai=giaovien').vai).toBe('gv')
+  })
+
+  it('public/_redirects tồn tại và chứa cấu hình SPA rewrite cho Cloudflare Pages', () => {
+    const content = fs.readFileSync(path.join(__dirname, '../public/_redirects'), 'utf-8')
+    expect(content).toContain('/* /index.html 200')
+  })
+
+  it('public/404.html hỗ trợ chuyển hướng cho cả phu-huynh, hoc-sinh và gv', () => {
+    const content = fs.readFileSync(path.join(__dirname, '../public/404.html'), 'utf-8')
+    expect(content).toContain('phu-huynh')
+    expect(content).toContain('hoc-sinh')
+    expect(content).toContain('gv')
   })
 })

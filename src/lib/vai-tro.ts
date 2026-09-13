@@ -27,16 +27,16 @@ export interface DuongVao {
   maCa: string
 }
 
-const RE_GV_TREN_DUONG = /(?:^|\/)gv\/?$/
+const RE_GV_TREN_DUONG = /(?:^|\/)(?:gv|giaovien)\/?$/
 const RE_PHIEU_TREN_DUONG = /(?:^|\/)p\/?$/
-const RE_HOCSINH_TREN_DUONG = /(?:^|\/)hoc-sinh\/?$/
-const RE_PHUHUYNH_TREN_DUONG = /(?:^|\/)phu-huynh\/?$/
+const RE_HOCSINH_TREN_DUONG = /(?:^|\/)(?:hoc-sinh|hocsinh)\/?$/
+const RE_PHUHUYNH_TREN_DUONG = /(?:^|\/)(?:phu-huynh|phuhuynh)\/?$/
 const RE_CA_TREN_DUONG = /(?:^|\/)t\/(\d{4,8})\/?$/
 const RE_DIEM_TREN_DUONG = /(?:^|\/)d\/(\d{4,8})\/?$/
 const RE_APP_CU = /(?:^|\/)(?:hs|ph)\/[0-9a-zA-Z]{8,}\/?$/
 
 /** Link riêng CŨ của em hoặc phụ huynh (`/hs/<token>`, `/ph/<token>`), hoặc
- * app cũ đã cài trên máy các em (`?vai=hs`). */
+ * app cũ đã cài trên máy các em (`?vai=hs`, `?vai=ph`). */
 export function laLinkAppCu(search: string, duongDan = ''): boolean {
   const v = (new URLSearchParams(search).get('vai') || '').trim()
   if (v === 'hs' || v === 'ph') return true
@@ -83,8 +83,8 @@ export function chuanHoaDuongDan(goc = '/'): void {
 export function docDuongVao(search: string, duongDan = ''): DuongVao {
   const q = new URLSearchParams(search)
   const maCa = (q.get('examCode') || '').trim()
-  const vaiQ = (q.get('vai') || '').trim()
-  if (vaiQ === 'gv') return { vai: 'gv', maCa }
+  const vaiQ = (q.get('vai') || '').trim().toLowerCase()
+  if (vaiQ === 'gv' || vaiQ === 'giaovien') return { vai: 'gv', maCa }
   if (vaiQ === 'phieu') return { vai: 'phieu', maCa: '' }
   if (vaiQ === 'diem') return { vai: 'diem', maCa }
   if (vaiQ === 'hocsinh') return { vai: 'hocsinh', maCa: '' }

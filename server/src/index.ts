@@ -2608,11 +2608,14 @@ export default {
     if (req.method === 'GET' && (p === '' || p === '/')) {
       return Response.redirect('https://omr-app-b3u.pages.dev', 302)
     }
-    if (req.method === 'GET' && (p === '/hs' || p === '/hoc-sinh')) {
-      return Response.redirect('https://omr-app-b3u.pages.dev/hs', 302)
+    if (req.method === 'GET' && (p === '/hs' || p === '/hoc-sinh' || p === '/hocsinh')) {
+      return Response.redirect('https://omr-app-b3u.pages.dev/?vai=hocsinh', 302)
     }
-    if (req.method === 'GET' && p === '/gv') {
-      return Response.redirect('https://omr-app-b3u.pages.dev/gv', 302)
+    if (req.method === 'GET' && (p === '/ph' || p === '/phu-huynh' || p === '/phuhuynh')) {
+      return Response.redirect('https://omr-app-b3u.pages.dev/?vai=phuhuynh', 302)
+    }
+    if (req.method === 'GET' && (p === '/gv' || p === '/giaovien')) {
+      return Response.redirect('https://omr-app-b3u.pages.dev/?vai=gv', 302)
     }
     if (req.method === 'GET' && (p.startsWith('/t/') || p.startsWith('/d/'))) {
       return Response.redirect(`https://omr-app-b3u.pages.dev${p}`, 302)

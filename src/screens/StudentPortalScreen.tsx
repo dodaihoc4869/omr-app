@@ -1465,7 +1465,7 @@ export default function StudentPortalScreen() {
                           {cau.text}
                         </div>
 
-                        {cau.choices && cau.choices.length > 0 ? (
+                        {Array.isArray(cau?.choices) && cau.choices.length > 0 ? (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                             {cau.choices.map((choice: string, cIdx: number) => {
                               const kyTu = String.fromCharCode(65 + cIdx)

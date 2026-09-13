@@ -83,20 +83,25 @@ export function thoat(s: unknown): string {
  * in ra ô vuông rỗng (thầy bắt được ở câu Kc, đề 12-C1-B1). Lọc ở tầng hiển
  * thị thì mọi ca cũ và mọi link đã gửi đi tự đúng, không phải nạp lại đề. */
 export function chuHtml(s: unknown): string {
-  if (typeof s === 'object' && s !== null) {
+  if (s === null || s === undefined) return ''
+  if (typeof s === 'object') {
     const obj = s as Record<string, unknown>
-    const str = obj.chot || obj.text || obj.loiGiai || obj.giaiThich || obj.explanation || obj.noiDung
-    if (typeof str === 'string' && str.trim() !== '[object Object]') return chuHtml(str)
+    const str = obj.chot || obj.text || obj.loiGiai || obj.giaiThich || obj.explanation || obj.noiDung || obj.viSao
+    if (typeof str === 'string' && !str.includes('[object Object]')) return chuHtml(str)
+    if (typeof str === 'object' && str !== null) return chuHtml(str)
     return ''
   }
   let str = String(s ?? '')
-  if (str.trim() === '[object Object]') return ''
+  if (str.includes('[object Object]')) {
+    str = str.replace(/\[object Object\]/g, '').trim()
+    if (!str) return ''
+  }
   const trimmed = str.trim()
   if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
     try {
       const obj = JSON.parse(trimmed) as Record<string, unknown>
-      const inner = obj.chot || obj.text || obj.loiGiai || obj.giaiThich || obj.explanation || obj.noiDung
-      if (typeof inner === 'string' && inner.trim() !== '[object Object]') return chuHtml(inner)
+      const inner = obj.chot || obj.text || obj.loiGiai || obj.giaiThich || obj.explanation || obj.noiDung || obj.viSao
+      if (inner) return chuHtml(inner)
     } catch {}
   }
   return doanHtml(doanCongThuc(goKyTuLa(str)))
@@ -1010,8 +1015,8 @@ export function oGiaiHtml(c: CauLuyen): string {
   // KIẾN THỨC CỐT LÕI in đậm TRÊN CÙNG (thầy chốt 04-09 khuya: "kiến thức cốt lõi
   // bôi đậm trên cùng để giải câu đó"), rồi mới tới vì sao chọn / không chọn
   // từng phương án.
-  const chuChot = c.chot && String(c.chot).trim() !== '[object Object]' ? chuHtml(c.chot) : ''
-  if (chuChot && chuChot.trim() !== '[object Object]') {
+  const chuChot = c.chot ? chuHtml(c.chot).trim() : ''
+  if (chuChot && !chuChot.includes('[object Object]')) {
     khoi.push(`<div class="sol-label">Kiến thức cốt lõi</div><div class="sol-text sol-cot-loi">${chuChot}</div>`)
     coGiai = true
   }

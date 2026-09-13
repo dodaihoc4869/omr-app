@@ -260,7 +260,7 @@ export default function TheCauChiTiet({ c, stt, mauSo, anLoiGiai = false, tick, 
 
               {coGiai && (
                 <div className="bc-giai">
-                  {c.chot && (
+                  {c.chot && typeof c.chot === 'string' && !c.chot.includes('[object Object]') && c.chot.trim() && (
                     <div className="bc-giai-chot">
                       <span className="bc-giai-nhan">Kiến thức cốt lõi</span>
                       <ChemText text={c.chot} />
