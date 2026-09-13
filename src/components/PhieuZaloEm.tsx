@@ -179,11 +179,13 @@ export default function PhieuZaloEm({
         const soCau = (await docSoCauCa(ca.maCa)) ?? (ct.keyBank as { soCau?: { I: number; II: number; III: number } } | null)?.soCau
         // CA ĐỀ RIÊNG TỪNG EM: bản đồ sbd → câu phải đi cùng, không thì bảng
         // chấm dựng ra là bảng của người khác.
-        const rieng = await docDeRiengCa(ca.maCa).catch(() => undefined)
+        const riengDoc = await docDeRiengCa(ca.maCa).catch(() => undefined)
+        const boTheoEm = riengDoc?.boTheoEm ?? (ct.boTheoEmCa as any)?.bo ?? ct.boTheoEmCa ?? (ct.keyBank as any)?.boTheoEm
+        const rieng = riengDoc ?? (boTheoEm ? ({ boTheoEm } as any) : undefined)
         let rowsMoi: ChiTietCauRow[] | null = null
         if (bank && luot?.dapAn) {
           try {
-            rowsMoi = taoChiTietCau(mergeKeepAnswers(bank, soCau, rieng?.boTheoEm), ca.maCa, hoSo.em.sbd, luot.dapAn, luot.giayCau)
+            rowsMoi = taoChiTietCau(mergeKeepAnswers(bank, soCau, boTheoEm), ca.maCa, hoSo.em.sbd, luot.dapAn, luot.giayCau)
           } catch {
             rowsMoi = null
           }
@@ -213,8 +215,8 @@ export default function PhieuZaloEm({
           hangMoi: diemMoi && diemLopMoi.length > 0 ? hangTheoDiem(diemMoi.tong, diemLopMoi) : null,
           // CA ĐỀ RIÊNG TỪNG EM: cờ tắt hạng lớp, và bản đồ số lần sai để báo
           // cáo gắn nhãn "Sai lần thứ N" / "Đã sửa được" giống hệt hai chỗ kia.
-          deRieng: Boolean(rieng),
-          lapCua: rieng?.lapCua?.[hoSo.em.sbd] ?? null,
+          deRieng: Boolean(rieng || ct.ca?.deRieng || ct.boTheoEmCa),
+          lapCua: rieng?.lapCua?.[hoSo.em.sbd] ?? (ct.boTheoEmCa as any)?.lapCua?.[hoSo.em.sbd] ?? null,
           diemLop: diemLopMoi,
           thoiLuongPhut: Number(ct.ca.thoiGianPhut) || null,
           vaoLuc: luot?.vaoLuc || null,

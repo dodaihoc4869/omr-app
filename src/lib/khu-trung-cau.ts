@@ -52,7 +52,7 @@ export function hangUuTien(s: Pick<TeacherExamSource, 'nhom'>): number {
  * từ CÙNG một JSON gốc nên chữ giống hệt nhau; chuẩn hoá ở đây chỉ để một lần
  * xuống dòng thừa lúc soạn tay không làm sổng câu trùng. Cố ý KHÔNG bỏ dấu và
  * KHÔNG hạ chữ thường: "Cl" và "cl" là hai thứ khác nhau trong Hoá. */
-const rut = (s: string) => (s || '').replace(/\s+/g, ' ').trim()
+const rut = (s: unknown) => String(s ?? '').replace(/\s+/g, ' ').trim()
 
 /** KHOÁ NHẬN DẠNG một câu, dựng từ NỘI DUNG chứ không từ `id`.
  *

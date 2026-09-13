@@ -64,8 +64,15 @@ const LOP_MUC: Record<string, string> = { biet: 'level-1', hieu: 'level-2', van_
 const TEN_LOAI: Record<string, string> = { I: 'Trắc nghiệm', II: 'Đúng / Sai', III: 'Trả lời ngắn' }
 const LOP_LOAI: Record<string, string> = { I: 'type-mc', II: 'type-tf', III: 'type-sa' }
 
-export function thoat(s: string): string {
-  return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+export function thoat(s: unknown): string {
+  if (typeof s === 'object' && s !== null) {
+    const obj = s as Record<string, unknown>
+    if (typeof obj.ten === 'string') return thoat(obj.ten)
+    if (typeof obj.name === 'string') return thoat(obj.name)
+    if (typeof obj.ma === 'string') return thoat(obj.ma)
+    if (typeof obj.text === 'string') return thoat(obj.text)
+  }
+  return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 /** Chuỗi có công thức Hoá → HTML có <sub>/<sup>, mũi tên là ký tự thật.
@@ -75,8 +82,12 @@ export function thoat(s: string): string {
  * đang giữ bản chưa lọc trong máy và trên máy chủ, nên phiếu của những ca đó
  * in ra ô vuông rỗng (thầy bắt được ở câu Kc, đề 12-C1-B1). Lọc ở tầng hiển
  * thị thì mọi ca cũ và mọi link đã gửi đi tự đúng, không phải nạp lại đề. */
-export function chuHtml(s: string): string {
-  return doanHtml(doanCongThuc(goKyTuLa(s)))
+export function chuHtml(s: unknown): string {
+  if (typeof s === 'object' && s !== null) {
+    const obj = s as Record<string, unknown>
+    if (typeof obj.text === 'string') return chuHtml(obj.text)
+  }
+  return doanHtml(doanCongThuc(goKyTuLa(String(s ?? ''))))
 }
 
 /** Hướng thân mũi tên: một chiều sang phải, sang trái, hay hai chiều. */

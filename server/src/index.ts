@@ -659,6 +659,62 @@ async function dayPhieu(env: Env, b: Record<string, unknown>): Promise<Response>
   return ra({ ok: true })
 }
 
+async function tuChuaLanhPhieu(env: Env, o: { body: ReadableStream }, khoa: string): Promise<string | ReadableStream> {
+  try {
+    const doc = (await new Response(o.body).json()) as Record<string, unknown>
+    // TỰ ĐỘNG CHỮA LÀNH PHIẾU NẾU LỆCH VỚI BẢNG CHI_TIET_CAU CHÍNH THỨC
+    if (doc && doc.phieu && typeof doc.phieu === 'object' && doc.maCa && doc.sbd && String(doc.loai) !== 'baitap') {
+      const p = doc.phieu as Record<string, unknown>
+      const ctcRows = await env.DB.prepare(
+        `SELECT phan, so_cau, qid, chuyen_de, muc_do, dap_an_chon, dap_an_dung, dung_sai, giay
+           FROM chi_tiet_cau WHERE ma_ca = ? AND sbd = ? ORDER BY CASE phan WHEN 'I' THEN 1 WHEN 'II' THEN 2 WHEN 'III' THEN 3 ELSE 4 END, so_cau ASC`,
+      )
+        .bind(String(doc.maCa), String(doc.sbd))
+        .all<Record<string, unknown>>()
+      const ctc = ctcRows.results ?? []
+      const ctcSai = ctc.filter((x) => Number(x.dung_sai) === 0)
+      if (ctc.length > 0 && Array.isArray(p.cauSai)) {
+        const saiCountLech = p.cauSai.length !== ctcSai.length
+        const qidSaiCtc = new Set(ctcSai.map((x) => String(x.qid)))
+        const pQidSai = new Set((p.cauSai as Record<string, unknown>[]).map((x) => String(x?.qid ?? '')))
+        let qidLech = false
+        for (const q of qidSaiCtc) {
+          if (!pQidSai.has(q)) {
+            qidLech = true
+            break
+          }
+        }
+        if (saiCountLech || qidLech) {
+          p.soCauSai = ctcSai.length
+          p.tongSoCau = ctc.length
+          const mapCauSai = new Map<string, Record<string, unknown>>()
+          for (const cs of p.cauSai as Record<string, unknown>[]) {
+            if (cs && cs.qid) mapCauSai.set(String(cs.qid), cs)
+          }
+          p.cauSai = ctcSai.map((r) => {
+            const cu = mapCauSai.get(String(r.qid))
+            return {
+              ...(cu || {}),
+              phan: String(r.phan),
+              soCau: Number(r.so_cau),
+              qid: String(r.qid),
+              chuyenDe: String(r.chuyen_de || cu?.chuyenDe || ''),
+              mucDo: String(r.muc_do || cu?.mucDo || ''),
+              giay: r.giay === null || r.giay === undefined ? null : Number(r.giay),
+              dapAnChon: String(r.dap_an_chon ?? cu?.dapAnChon ?? ''),
+              dapAnDung: String(r.dap_an_dung ?? cu?.dapAnDung ?? ''),
+            }
+          })
+          await env.DE.put(`phieu/${khoa}.json`, JSON.stringify(doc))
+        }
+      }
+    }
+    return JSON.stringify(doc)
+  } catch {
+    return o.body
+  }
+}
+
 async function layPhieuR2(env: Env, ma: string): Promise<Response> {
   const khoa = String(ma ?? '').trim()
   if (!khoa) return ra({ ok: false, lyDo: 'thieu' }, 400)
@@ -667,7 +723,8 @@ async function layPhieuR2(env: Env, ma: string): Promise<Response> {
   // KHÔNG CÓ Ở ĐÂY KHÔNG CÓ NGHĨA LÀ KHÔNG CÓ. Phiếu cũ vẫn nằm bên Apps
   // Script, nên máy em phải hiểu 404 là "hỏi chỗ cũ", không phải "báo đỏ".
   if (!o) return ra({ ok: false, lyDo: 'khong_co' }, 404)
-  return new Response(o.body, {
+  const body = await tuChuaLanhPhieu(env, o, khoa)
+  return new Response(body, {
     status: 200,
     headers: { ...JSON_HEADERS, 'cache-control': 'no-store' },
   })

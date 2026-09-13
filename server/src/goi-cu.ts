@@ -456,6 +456,15 @@ async function layChiTietCauD1(env: Env, maCa: string, sbd: string, lanThu: numb
   }))
 }
 
+function kiemTraPhieuSan(phieu: unknown, dsCtc: { dungSai: boolean | null }[]): unknown {
+  if (dsCtc.length > 0 && phieu && typeof phieu === 'object') {
+    const p = phieu as Record<string, unknown>
+    const soSai = dsCtc.filter((x) => x.dungSai === false).length
+    if (Array.isArray(p.cauSai) && p.cauSai.length !== soSai) return null
+  }
+  return phieu
+}
+
 export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const maCa = chuoi(b.maCa).trim()
   const sbd = chuoi(b.sbd).trim()
@@ -491,7 +500,7 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
       if (oP?.body) {
         const doc = (await new Response(oP.body).json()) as Record<string, unknown>
         if (doc && !doc.thuHoi && doc.phieu) {
-          phieuSan = doc.phieu
+          phieuSan = kiemTraPhieuSan(doc.phieu, dsCtc)
         }
       }
     } catch {}
@@ -1718,7 +1727,11 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
       imageDataUrl: fullQ ? fullQ.imageDataUrl : undefined,
       hinhAnh: fullQ ? fullQ.hinhAnh : undefined,
       loiGiai: fullQ ? chuoi(fullQ.loiGiai || fullQ.explanation || fullQ.giaiThich || '') : '',
-      dang: fullQ ? chuoi(fullQ.dang ?? '') : '',
+      dang: fullQ
+        ? typeof fullQ.dang === 'object' && fullQ.dang !== null
+          ? chuoi((fullQ.dang as Record<string, unknown>).ten || (fullQ.dang as Record<string, unknown>).ma || '')
+          : (chuoi(fullQ.dang ?? '') === '[object Object]' ? '' : chuoi(fullQ.dang ?? ''))
+        : '',
     }
   })
 

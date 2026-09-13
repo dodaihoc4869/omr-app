@@ -20,14 +20,15 @@ const DAI_SYMBOL = /[\uF020-\uF0FF]/g
 const CON_LA = /[\uE000-\uF8FF]/
 
 /** Thay ký tự Symbol (U+F020–U+F0FF) bằng ASCII tương ứng. */
-export function goKyTuLa(s: string): string {
-  if (!s) return s
-  return s.replace(DAI_SYMBOL, (c) => String.fromCharCode(c.charCodeAt(0) - 0xf000))
+export function goKyTuLa(s: unknown): string {
+  const str = String(s ?? '')
+  if (!str) return ''
+  return str.replace(DAI_SYMBOL, (c) => String.fromCharCode(c.charCodeAt(0) - 0xf000))
 }
 
 /** Còn ký tự vùng dùng riêng nào KHÔNG gỡ được không — chỗ này phải cờ hoá. */
-export function conKyTuLa(s: string): boolean {
-  return CON_LA.test(s || '')
+export function conKyTuLa(s: unknown): boolean {
+  return CON_LA.test(String(s ?? ''))
 }
 
 /** Gỡ ký tự lạ trong mọi trường chữ của một câu, và cho biết câu có còn ký tự

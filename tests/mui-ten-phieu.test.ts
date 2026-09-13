@@ -71,4 +71,16 @@ describe('Mũi tên mang theo nhãn của nó', () => {
   it('câu chữ thuần không mọc thêm mũi tên nào', () => {
     expect(chuHtml('Ester nào sau đây có mùi chuối chín?')).not.toContain('mt-than')
   })
+
+  it('thoat và chuHtml không quăng lỗi khi nhận số, object hay null/undefined', async () => {
+    const { thoat } = await import('../src/lib/html-phieu')
+    expect(thoat(123 as any)).toBe('123')
+    expect(thoat(null as any)).toBe('')
+    expect(thoat(undefined as any)).toBe('')
+    expect(thoat({ ten: 'Este hoá' } as any)).toBe('Este hoá')
+    expect(thoat({ ma: 'EST_01' } as any)).toBe('EST_01')
+    expect(chuHtml(123 as any)).toBe('123')
+    expect(chuHtml({ text: 'Thí nghiệm' } as any)).toBe('Thí nghiệm')
+  })
 })
+

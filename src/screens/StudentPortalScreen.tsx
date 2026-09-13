@@ -324,40 +324,52 @@ export default function StudentPortalScreen() {
       const qidDaCo = new Set(dsCauLuyen.map((c) => c.id))
       for (const it of res.items) {
         if (!qidDaCo.has(it.qid)) {
+          const rawDang = typeof it.dang === 'string'
+            ? (it.dang === '[object Object]' ? '' : it.dang)
+            : (it.dang && typeof it.dang === 'object' ? (it.dang as any).ten || (it.dang as any).ma || '' : '')
+          const tenDang = rawDang || it.chuyenDe || 'Lỗi sai cần khắc phục'
+          const maDang = rawDang
+          const rawChoices = it.choices && it.choices.length > 0
+            ? it.choices
+            : (it.ideas && it.ideas.length > 0 ? it.ideas : null)
+          const luaChon = rawChoices ? rawChoices.map((x: unknown) => String(x ?? '')) : null
+          const textCau = String(it.text ?? '')
+          const daDung = String(it.dapAnDung ?? '')
+          const daChon = String(it.dapAnChon ?? '')
           const cl: CauLuyen = {
             phan: it.phan,
             id: it.qid,
             maDe: it.maCa,
             chuyenDe: it.chuyenDe || 'Hoá học',
             dang:
-              (it.dang as any) ||
+              tenDang ||
               dangCua({
                 phan: it.phan,
-                text: it.text,
-                luaChon: it.choices ?? [],
-                dapAn: it.dapAnDung,
+                text: textCau,
+                luaChon: luaChon ?? [],
+                dapAn: daDung,
                 mucDo: it.mucDo as any,
               }),
             sao: 1,
             mucDo: (it.mucDo as any) || 'hieu',
-            text: it.text,
-            luaChon: it.choices || null,
-            dapAn: it.dapAnDung,
-            chot: it.loiGiai || '',
+            text: textCau,
+            luaChon,
+            dapAn: daDung,
+            chot: String(it.loiGiai || ''),
             lyDo: null,
             buoc: null,
-            ketQua: it.dapAnDung,
+            ketQua: daDung,
             anhThanCau: it.imageDataUrl || it.hinhAnh,
             chuaCho: {
               qid: it.qid,
-              soCau: it.soCau,
+              soCau: Number(it.soCau) || 1,
               phan: it.phan,
-              maDang: it.dang || '',
-              tenDang: it.dang || it.chuyenDe || 'Lỗi sai cần khắc phục',
+              maDang: maDang || '',
+              tenDang: tenDang || it.chuyenDe || 'Lỗi sai cần khắc phục',
               bac: 1,
               laLamLai: true,
-              daChon: it.dapAnChon,
-              viSaoSai: it.dapAnChon ? `Em đã chọn ${it.dapAnChon}, đáp án đúng là ${it.dapAnDung}` : undefined,
+              daChon,
+              viSaoSai: daChon ? `Em đã chọn ${daChon}, đáp án đúng là ${daDung}` : undefined,
             },
           }
           dsCauLuyen.push(cl)
