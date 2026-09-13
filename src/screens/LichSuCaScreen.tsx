@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { CheckSquare, RefreshCw, RotateCcw, Search, Square, Trash2, ChevronDown, ChevronRight} from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { THU_MUC_KHAC, gomCaTheoNamSinh } from '../lib/nam-sinh-ca'
-import { danhSachCa, khoiPhucCa, xoaNhieuCa, type CaTomTat } from '../lib/exam-api'
+import { danhSachCa, khoiPhucCa, xoaNhieuCa, xoaVinhVienCa, type CaTomTat } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { useAppStore } from '../store/appStore'
@@ -79,6 +79,8 @@ export default function LichSuCaScreen() {
   // THÙNG RÁC: xoá ca là xoá MỀM, bài làm còn nguyên — xem lại và khôi phục được.
   const [xemDaXoa, setXemDaXoa] = useState(false)
   const [dangKhoiPhuc, setDangKhoiPhuc] = useState('')
+  const [dsXoaVinhVien, setDsXoaVinhVien] = useState<string[]>([])
+  const [dangXoaVinhVien, setDangXoaVinhVien] = useState(false)
   // Giữ lại link + mã để khối "Luyện câu khắc phục" hỏi thẳng máy chủ khi thầy
   // bấm, không phải đọc IndexedDB lại một lượt nữa.
   const [nguon, setNguon] = useState({ url: '', mat: '' })
@@ -125,6 +127,7 @@ export default function LichSuCaScreen() {
     setChonMode(false)
     setDaChon([])
     setHoiXoa(false)
+    setDsXoaVinhVien([])
   }
 
   const handleKhoiPhuc = async (maCa: string) => {
@@ -138,6 +141,42 @@ export default function LichSuCaScreen() {
       showToast(e instanceof Error ? e.message : 'Không khôi phục được', 'error')
     } finally {
       setDangKhoiPhuc('')
+    }
+  }
+
+  const handleKhoiPhucNhieu = async () => {
+    const ds = chonTrongLoc.map((c) => c.maCa)
+    if (ds.length === 0) return
+    setDangKhoiPhuc('nhieu')
+    try {
+      const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
+      for (const maCa of ds) {
+        await khoiPhucCa(url.trim(), mat.trim(), maCa).catch(() => {})
+      }
+      showToast(`Đã khôi phục ${ds.length} ca`, 'success')
+      thoatChon()
+      await tai()
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Không khôi phục được', 'error')
+    } finally {
+      setDangKhoiPhuc('')
+    }
+  }
+
+  const handleXoaVinhVien = async () => {
+    if (dsXoaVinhVien.length === 0) return
+    setDangXoaVinhVien(true)
+    try {
+      const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
+      await xoaVinhVienCa(url.trim(), mat.trim(), dsXoaVinhVien)
+      showToast(`Đã xoá vĩnh viễn ${dsXoaVinhVien.length} ca`, 'success')
+      setDsXoaVinhVien([])
+      thoatChon()
+      await tai()
+    } catch (e) {
+      showToast(`Không xoá được: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
+    } finally {
+      setDangXoaVinhVien(false)
     }
   }
 
@@ -190,7 +229,6 @@ export default function LichSuCaScreen() {
           <button
             type="button"
             onClick={() => (chonMode ? thoatChon() : setChonMode(true))}
-            disabled={xemDaXoa}
             className="tap-target shrink-0 flex items-center justify-center"
             style={{ width: 48, height: 48, borderRadius: 'var(--bo-1)', background: chonMode ? 'var(--muc)' : 'var(--the-2)', color: chonMode ? 'var(--muc-nguoc)' : 'var(--muc)' }}
             aria-label={chonMode ? 'Thoát chế độ chọn' : 'Chọn ca để xoá'}
@@ -287,6 +325,84 @@ export default function LichSuCaScreen() {
           </div>
         )}
 
+        {chonMode && xemDaXoa && (
+          <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k3)' }}>
+            <button
+              type="button"
+              onClick={() => setDaChon(tichHet ? [] : dsLoc.map((c) => c.maCa))}
+              className="tap-target font-bold inline-flex items-center"
+              style={{ ...SO, gap: 6, fontSize: 'var(--cx-1)', minHeight: 36, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', color: 'var(--muc)' }}
+            >
+              {tichHet ? <CheckSquare size={16} /> : <Square size={16} />}
+              {tichHet ? 'Bỏ chọn tất cả' : `Chọn tất cả (${dsLoc.length})`}
+            </button>
+            <span className="flex-1" style={{ ...NHAN_NHO, ...SO }}>
+              Đã chọn {chonTrongLoc.length}
+            </span>
+            <button
+              type="button"
+              onClick={handleKhoiPhucNhieu}
+              disabled={chonTrongLoc.length === 0 || dangKhoiPhuc === 'nhieu'}
+              className="tap-target font-bold inline-flex items-center"
+              style={{
+                ...SO,
+                gap: 6,
+                fontSize: 'var(--cx-1)',
+                minHeight: 36,
+                padding: '0 var(--k3)',
+                borderRadius: 'var(--bo-tron)',
+                background: 'var(--the-2)',
+                color: chonTrongLoc.length === 0 ? 'var(--mo)' : 'var(--muc)',
+              }}
+            >
+              <RotateCcw size={16} /> Khôi phục {chonTrongLoc.length > 0 ? chonTrongLoc.length : ''}
+            </button>
+            <button
+              type="button"
+              onClick={() => setDsXoaVinhVien(chonTrongLoc.map((c) => c.maCa))}
+              disabled={chonTrongLoc.length === 0}
+              className="tap-target font-bold inline-flex items-center"
+              style={{
+                ...SO,
+                gap: 6,
+                fontSize: 'var(--cx-1)',
+                minHeight: 36,
+                padding: '0 var(--k3)',
+                borderRadius: 'var(--bo-tron)',
+                background: chonTrongLoc.length === 0 ? 'var(--the-2)' : 'var(--do-nen)',
+                color: chonTrongLoc.length === 0 ? 'var(--mo)' : 'var(--do)',
+              }}
+            >
+              <Trash2 size={16} /> Xoá vĩnh viễn {chonTrongLoc.length > 0 ? chonTrongLoc.length : ''}
+            </button>
+          </div>
+        )}
+
+        {!chonMode && xemDaXoa && dsLoc.length > 0 && (
+          <div className="flex items-center justify-between flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k3)' }}>
+            <button
+              type="button"
+              onClick={() => setDsXoaVinhVien(dsLoc.map((c) => c.maCa))}
+              className="tap-target font-bold inline-flex items-center"
+              style={{
+                ...NHAN_NHO,
+                gap: 6,
+                color: 'var(--do)',
+                background: 'var(--do-nen)',
+                minHeight: 36,
+                padding: '0 var(--k3)',
+                borderRadius: 'var(--bo-tron)',
+                border: '1px solid var(--do)',
+              }}
+            >
+              <Trash2 size={16} /> Xoá vĩnh viễn tất cả ({dsLoc.length} ca)
+            </button>
+            <span style={NHAN_NHO}>
+              Hoặc bấm nút <b>Xoá vĩnh viễn</b> ở từng ca bên dưới
+            </span>
+          </div>
+        )}
+
         {loi && <OThongBao tone="do">{loi}</OThongBao>}
         {dsCa === null ? (
           <div style={{ ...NHAN_NHO, padding: 'var(--k4) 0' }}>Đang tải danh sách ca từ máy chủ…</div>
@@ -325,14 +441,14 @@ export default function LichSuCaScreen() {
               return (
                 <Hang
                   key={c.maCa}
-                  onClick={xemDaXoa ? undefined : () => (chonMode ? bat(c.maCa) : moChiTietCa(c.maCa))}
+                  onClick={chonMode ? () => bat(c.maCa) : (!xemDaXoa ? () => moChiTietCa(c.maCa) : undefined)}
                   selected={chonMode && tich}
                   data-trang-thai={tt.ten}
                   className="flex-col"
                   style={{ alignItems: 'stretch' }}
                 >
                   <span className="flex items-start justify-between" style={{ gap: 'var(--k3)' }}>
-                    {chonMode && !xemDaXoa && (
+                    {chonMode && (
                       <span className="shrink-0" style={{ color: tich ? 'var(--xanh)' : 'var(--mo)', marginTop: 2 }} aria-hidden="true">
                         {tich ? <CheckSquare size={20} /> : <Square size={20} />}
                       </span>
@@ -350,19 +466,45 @@ export default function LichSuCaScreen() {
                       {c.daNop}/{c.daVao} nộp
                     </span>
                   </span>
-                  <span className="flex items-center flex-wrap" style={{ gap: 4, marginTop: 6 }}>
+                  <span className="flex items-center flex-wrap" style={{ gap: 6, marginTop: 6 }}>
                     <Nhan tone={xemDaXoa ? 'xam' : tt.tone}>{xemDaXoa ? 'đã xoá' : tt.ten}</Nhan>
                     {c.canhBao > 0 && <Nhan tone="cam">{c.canhBao} cảnh báo</Nhan>}
                     {xemDaXoa && (
-                      <button
-                        type="button"
-                        onClick={() => handleKhoiPhuc(c.maCa)}
-                        disabled={dangKhoiPhuc === c.maCa}
-                        className="tap-target font-bold inline-flex items-center"
-                        style={{ ...NHAN_NHO, gap: 4, color: 'var(--muc)', minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien-dam)' }}
-                      >
-                        <RotateCcw size={14} /> {dangKhoiPhuc === c.maCa ? 'Đang khôi phục…' : 'Khôi phục'}
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleKhoiPhuc(c.maCa)
+                          }}
+                          disabled={dangKhoiPhuc === c.maCa}
+                          className="tap-target font-bold inline-flex items-center"
+                          style={{ ...NHAN_NHO, gap: 4, color: 'var(--muc)', minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien-dam)' }}
+                        >
+                          <RotateCcw size={14} /> {dangKhoiPhuc === c.maCa ? 'Đang khôi phục…' : 'Khôi phục'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setDsXoaVinhVien([c.maCa])
+                          }}
+                          disabled={dangXoaVinhVien}
+                          className="tap-target font-bold inline-flex items-center"
+                          style={{
+                            ...NHAN_NHO,
+                            gap: 4,
+                            color: 'var(--do)',
+                            background: 'var(--do-nen)',
+                            minHeight: 32,
+                            padding: '0 10px',
+                            borderRadius: 'var(--bo-tron)',
+                            border: '1px solid var(--do)',
+                          }}
+                        >
+                          <Trash2 size={14} /> Xoá vĩnh viễn
+                        </button>
+                      </>
                     )}
                   </span>
                 </Hang>
@@ -418,6 +560,42 @@ export default function LichSuCaScreen() {
                 </NutChinh>
                 <NutChinh variant="nguyhiem" onClick={handleXoa} disabled={dangXoa}>
                   {dangXoa ? 'Đang xoá…' : `Xoá ${chonTrongLoc.length} ca`}
+                </NutChinh>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {dsXoaVinhVien.length > 0 && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'var(--phu)' }}>
+            <div className="w-full flex flex-col" style={{ maxWidth: 420, background: 'var(--the)', borderRadius: 'var(--bo-3)', padding: 'var(--k5)', gap: 'var(--k3)', boxShadow: 'var(--bong-2)' }}>
+              <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', color: 'var(--do)' }}>
+                Xoá vĩnh viễn {dsXoaVinhVien.length} ca?
+              </div>
+              <OThongBao tone="do">
+                <b>Hành động này KHÔNG THỂ HOÀN TÁC!</b> Toàn bộ bài làm của học sinh, kết quả chấm điểm, link phiếu và cấu hình đề thi của {dsXoaVinhVien.length} ca này sẽ bị xoá sạch vĩnh viễn khỏi máy chủ.
+              </OThongBao>
+              <div className="overflow-auto" style={{ ...NHAN_NHO, maxHeight: 150 }}>
+                {dsXoaVinhVien.map((ma) => {
+                  const c = (dsCa ?? []).find((x) => x.maCa === ma)
+                  return (
+                    <div key={ma} className="truncate" style={{ padding: '2px 0' }}>
+                      <span style={SO}>{ma}</span> · {c?.tenCa || 'Ca chưa đặt tên'}
+                      {c && c.daVao > 0 ? ` · ${c.daVao} em` : ''}
+                    </div>
+                  )
+                })}
+              </div>
+              <div className="flex" style={{ gap: 'var(--k2)' }}>
+                <NutChinh
+                  variant="phu"
+                  onClick={() => setDsXoaVinhVien([])}
+                  disabled={dangXoaVinhVien}
+                >
+                  Huỷ
+                </NutChinh>
+                <NutChinh variant="nguyhiem" onClick={handleXoaVinhVien} disabled={dangXoaVinhVien}>
+                  {dangXoaVinhVien ? 'Đang xoá vĩnh viễn…' : `Xoá vĩnh viễn ${dsXoaVinhVien.length} ca`}
                 </NutChinh>
               </div>
             </div>

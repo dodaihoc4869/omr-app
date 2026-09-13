@@ -2326,7 +2326,7 @@ async function donDoTai(env: Env): Promise<Response> {
 // hình thấy "không có dữ liệu" và tưởng mất sạch.
 const LENH_CUA_THAY = new Set([
   'publish', 'batDauThi', 'chiTietCa', 'danhSachCa', 'ghiDiem', 'khoaCa', 'moKhoaCa',
-  'xoaCa', 'khoiPhucCa', 'doiTenCa', 'dongBoTenCa', 'moKhoa', 'duyetThiLai', 'choThiLai',
+  'xoaCa', 'khoiPhucCa', 'xoaVinhVienCa', 'doiTenCa', 'dongBoTenCa', 'moKhoa', 'duyetThiLai', 'choThiLai',
   'capNhatKeyBank', 'noiKhoCa', 'banDoSaiCa', 'danhSachEm', 'hoSoEm', 'hoSoNhieuEm',
   'qidDaLam', 'danhSachYeuCau', 'danhDauYeuCau', 'napDanhSachLop', 'themEmVaoSheet',
   'linkDanhSachLop', 'luuLinkDanhSachLop', 'deleteStudent', 'danhSachDe', 'layDe', 'luuDe',
@@ -2403,6 +2403,7 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
     case 'moKhoaCa': return ra(await G.moKhoaCa(env, b))
     case 'xoaCa': return ra(await G.xoaCa(env, b))
     case 'khoiPhucCa': return ra(await G.khoiPhucCa(env, b))
+    case 'xoaVinhVienCa': return ra(await G.xoaVinhVienCa(env, b))
     case 'doiTenCa': return ra(await G.doiTenCa(env, b))
     case 'dongBoTenCa': return ra(await G.dongBoTenCa(env, b))
     case 'moKhoa': return ra(await G.moKhoaEm(env, b))
@@ -2568,6 +2569,7 @@ export default {
     if (p === '/ca/nhieu') return dayNhieuCa(env, b)
     if (p === '/ca/danh-sach') return danhSachCaMoi(env, b.daXoa === true)
     if (p === '/ca/sua') return suaCa(env, b)
+    if (p === '/ca/xoa-vinh-vien') return ra(await G.xoaVinhVienCa(env, b))
     if (p === '/ca/chi-tiet') return chiTietCaMoi(env, String(b.maCa ?? ''))
     if (p === '/diem') return ghiDiemMoi(env, b)
     if (p === '/em/danh-sach') return danhSachEmMoi(env)

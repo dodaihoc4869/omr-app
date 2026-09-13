@@ -2730,6 +2730,30 @@ export async function xoaNhieuCa(scriptUrl: string, secret: string, dsMaCa: stri
   return kq
 }
 
+/** Xoá VĨNH VIỄN một hoặc nhiều ca thi khỏi hệ thống — toàn bộ bài làm và dữ liệu ca bị xoá sạch, không thể khôi phục. */
+export async function xoaVinhVienCa(scriptUrl: string, secret: string, dsMaCa: string[]): Promise<void> {
+  const chMoi = await layCauHinhMayChu()
+  if (chMoi.BAT && chMoi.URL) {
+    const r = await fetchCoHan(
+      `${chMoi.URL}/ca/xoa-vinh-vien`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ secret, dsMaCa }),
+      },
+      HAN_GIAY,
+    )
+    if (!r.ok) throw new Error(`Máy chủ trả lỗi HTTP ${r.status}`)
+    const j = (await r.json()) as { ok?: boolean; error?: string }
+    if (!j.ok) throw new Error(j.error || 'Không xoá vĩnh viễn được')
+    xoaBoDemCa()
+    return
+  }
+  const res = await postJson(scriptUrl, { action: 'xoaVinhVienCa', secret, dsMaCa })
+  if (!res.ok) throw new Error(res.error || 'Không xoá vĩnh viễn được')
+  xoaBoDemCa()
+}
+
 /** Một dòng ChiTietCau (mục 5). soCau = số thứ tự em nhìn thấy (1..n trong phần). */
 export interface ChiTietCauRow {
   phan: 'I' | 'II' | 'III'
