@@ -6,9 +6,15 @@ interface LogoGiaoVienProps {
 }
 
 /**
- * LOGO APP GIÁO VIÊN — Chuẩn Google Material 3 / Workspace.
- * Biểu tượng bảng giảng dạy & mũ cử nhân điều phối lớp học phối 4 màu đặc trưng Google.
- * Không chứa mã hex thô (tuân thủ check:mau).
+ * LOGO APP GIÁO VIÊN — Chuẩn Google Material 3 / Google Workspace.
+ * Tái thiết kế từ Logo gốc thương hiệu ĐỖ ĐẠI HỌC:
+ * - Khối chữ số "4" cách điệu đặc trưng thương hiệu.
+ * - Trụ đứng mang dòng chữ "ĐỖ ĐẠI HỌC" màu Google Blue uy quyền học thuật.
+ * - Hằng số hoá học Avogadro "6,022 · 10²³" chạy dọc thanh ngang.
+ * - Vết gạch chéo nghiêng "/" góc dưới trái.
+ * - Mũ Cử Nhân (Mortarboard Cap) giáo viên đỉnh chóp.
+ * - Vòng tròn 4 dải màu Google (Lam - Đỏ - Vàng - Lục) bao quanh.
+ * TUÂN THỦ: Không chứa mã hex thô (vượt qua check:mau bằng CSS variables).
  */
 export default function LogoGiaoVien({
   size = 36,
@@ -19,7 +25,7 @@ export default function LogoGiaoVien({
   return (
     <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
       <svg
-        viewBox="0 0 48 48"
+        viewBox="0 0 512 512"
         width={size}
         height={size}
         className="shrink-0 drop-shadow-sm"
@@ -30,48 +36,128 @@ export default function LogoGiaoVien({
       >
         {/* Nền Squircle bo góc chuẩn Google */}
         <rect
-          x="2"
-          y="2"
-          width="44"
-          height="44"
-          rx="12"
+          x="16"
+          y="16"
+          width="480"
+          height="480"
+          rx="112"
           className="fill-white dark:fill-slate-900 stroke-slate-200 dark:stroke-slate-800"
-          strokeWidth="1.5"
+          strokeWidth="3"
         />
 
-        {/* 4 dải màu Google xếp hình bảng quản lý & chấm thi OMR */}
-        {/* Dải xanh dương: Bảng / Đế bục giảng */}
-        <path
-          d="M10 32C10 29.7909 11.7909 28 14 28H34C36.2091 28 38 29.7909 38 32V34C38 36.2091 36.2091 38 34 38H14C11.7909 38 10 36.2091 10 34V32Z"
-          fill="var(--gg-xanh)"
-        />
+        {/* Vòng tròn 4 màu Google chuẩn nhận diện */}
+        <g transform="translate(256, 256) rotate(-45)">
+          <circle
+            cx="0"
+            cy="0"
+            r="216"
+            fill="none"
+            stroke="var(--gg-xanh)"
+            strokeWidth="9"
+            strokeDasharray="320 1050"
+            strokeLinecap="round"
+          />
+          <circle
+            cx="0"
+            cy="0"
+            r="216"
+            fill="none"
+            stroke="var(--gg-do)"
+            strokeWidth="9"
+            strokeDasharray="320 1050"
+            strokeDashoffset="-340"
+            strokeLinecap="round"
+          />
+          <circle
+            cx="0"
+            cy="0"
+            r="216"
+            fill="none"
+            stroke="var(--gg-vang)"
+            strokeWidth="9"
+            strokeDasharray="320 1050"
+            strokeDashoffset="-680"
+            strokeLinecap="round"
+          />
+          <circle
+            cx="0"
+            cy="0"
+            r="216"
+            fill="none"
+            stroke="var(--gg-luc)"
+            strokeWidth="9"
+            strokeDasharray="320 1050"
+            strokeDashoffset="-1020"
+            strokeLinecap="round"
+          />
+        </g>
 
-        {/* Mũ cử nhân - Cánh trái (Google Lục) */}
-        <path
-          d="M10 20L24 13L24 23L13 23C11.3431 23 10 21.6569 10 20Z"
-          fill="var(--gg-luc)"
-        />
+        {/* Cốt lõi thương hiệu: Chữ "4" cách điệu chuẩn Google */}
+        {/* 1. Cánh chéo đỉnh: Google Đỏ */}
+        <path d="M336 92 L336 142 L198 280 L154 240 Z" fill="var(--gg-do)" />
 
-        {/* Mũ cử nhân - Cánh phải (Google Đỏ) */}
-        <path
-          d="M24 13L38 20C38 21.6569 36.6569 23 35 23L24 23L24 13Z"
-          fill="var(--gg-do)"
-        />
+        {/* 2. Thanh ngang liên kết: Google Vàng */}
+        <path d="M154 240 L198 280 L300 326 L300 274 Z" fill="var(--gg-vang)" />
 
-        {/* Đỉnh chóp & Tua mũ (Google Vàng / Hổ phách) */}
-        <circle cx="24" cy="13" r="2.5" fill="var(--gg-vang)" />
-        <path
-          d="M24 13.5V22C24 22 25.5 23 27 23"
-          stroke="var(--gg-vang)"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
+        {/* 3. Trụ đứng ĐỖ ĐẠI HỌC: Google Lam (Giáo viên) */}
+        <path d="M300 128 L336 92 L344 92 L344 456 L300 440 Z" fill="var(--gg-xanh)" />
 
-        {/* 3 chấm OMR tượng trưng cho quét phiếu trắc nghiệm */}
-        <circle cx="17" cy="33" r="1.8" fill="white" />
-        <circle cx="24" cy="33" r="1.8" fill="white" />
-        <circle cx="31" cy="33" r="1.8" fill="white" />
+        {/* Dòng chữ dọc ĐỖ ĐẠI HỌC khắc trên trụ đứng */}
+        <g
+          fill="white"
+          fontFamily="var(--sans)"
+          fontWeight="900"
+          fontSize="16.5"
+          textAnchor="middle"
+        >
+          <text x="322" y="156">Đ</text>
+          <text x="322" y="186">Ỗ</text>
+          <text x="322" y="224">Đ</text>
+          <text x="322" y="254">Ạ</text>
+          <text x="322" y="282">I</text>
+          <text x="322" y="320">H</text>
+          <text x="322" y="350">Ọ</text>
+          <text x="322" y="378">C</text>
+        </g>
+
+        {/* 4. Hằng số Avogadro Hoá học 6,022 · 10²³ dưới thanh ngang */}
+        <g transform="translate(68, 252) rotate(20.5)">
+          <text
+            x="22"
+            y="34"
+            fontFamily="var(--sans)"
+            fontWeight="800"
+            fontSize="24"
+            fill="var(--gg-xanh)"
+            letterSpacing="0.5"
+          >
+            6,022 · 10<tspan dy="-10" fontSize="16" fontWeight="900">23</tspan>
+          </text>
+        </g>
+
+        {/* 5. Dấu gạch chéo thương hiệu góc dưới trái: Google Lục */}
+        <path d="M106 324 L126 344 L80 390 L60 370 Z" fill="var(--gg-luc)" rx="5" />
+
+        {/* 6. Biểu tượng vai trò Giáo Viên: Mũ cử nhân trên đỉnh chóp */}
+        <g transform="translate(336, 74)">
+          <path d="M-44 -14 L0 -28 L44 -14 L0 0 Z" fill="var(--gg-do)" />
+          <path
+            d="M-26 -6 L-26 16 C-26 24 26 24 26 16 L26 -6"
+            fill="none"
+            stroke="var(--gg-xanh)"
+            strokeWidth="5"
+            strokeLinecap="round"
+          />
+          <circle cx="0" cy="-14" r="4.5" fill="var(--gg-vang)" />
+          <path
+            d="M0 -14 C18 -10 32 4 32 20"
+            fill="none"
+            stroke="var(--gg-vang)"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+          />
+          <rect x="28" y="19" width="8" height="11" rx="2.5" fill="var(--gg-vang)" />
+        </g>
       </svg>
 
       {hienChu && (

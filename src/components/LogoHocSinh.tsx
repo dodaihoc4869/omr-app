@@ -6,10 +6,15 @@ interface LogoHocSinhProps {
 }
 
 /**
- * LOGO APP HỌC SINH — Chuẩn Google Material 3 / Classroom.
- * Biểu tượng cuốn sách tri thức mở ra và ngôi sao tiến bộ 4 màu Google.
- * Đồng nhất hình khối với Logo Giáo viên nhưng mang bản sắc học tập rõ rệt.
- * Không chứa mã hex thô (tuân thủ check:mau).
+ * LOGO APP HỌC SINH — Chuẩn Google Material 3 / Google Classroom.
+ * Tái thiết kế từ Logo gốc thương hiệu ĐỖ ĐẠI HỌC:
+ * - Khối chữ số "4" cách điệu đặc trưng thương hiệu.
+ * - Trụ đứng mang dòng chữ "ĐỖ ĐẠI HỌC" màu Google Green biểu trưng cho sự tiến bộ và sức trẻ.
+ * - Hằng số hoá học Avogadro "6,022 · 10²³" chạy dọc thanh ngang màu Google Green.
+ * - Vết gạch chéo nghiêng "/" góc dưới trái màu Google Red năng động.
+ * - Ngôi Sao Tiến Bộ 4 cánh (Google Sparkle Star) đỉnh chóp.
+ * - Vòng tròn 4 dải màu Google (Vàng - Lục - Lam - Đỏ) bao quanh.
+ * TUÂN THỦ: Không chứa mã hex thô (vượt qua check:mau bằng CSS variables).
  */
 export default function LogoHocSinh({
   size = 36,
@@ -20,7 +25,7 @@ export default function LogoHocSinh({
   return (
     <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
       <svg
-        viewBox="0 0 48 48"
+        viewBox="0 0 512 512"
         width={size}
         height={size}
         className="shrink-0 drop-shadow-sm"
@@ -29,61 +34,120 @@ export default function LogoHocSinh({
         aria-hidden="true"
         focusable="false"
       >
-        {/* Nền Squircle bo góc đồng nhất với logo Giáo viên */}
+        {/* Nền Squircle bo góc chuẩn Google */}
         <rect
-          x="2"
-          y="2"
-          width="44"
-          height="44"
-          rx="12"
+          x="16"
+          y="16"
+          width="480"
+          height="480"
+          rx="112"
           className="fill-white dark:fill-slate-900 stroke-slate-200 dark:stroke-slate-800"
-          strokeWidth="1.5"
+          strokeWidth="3"
         />
 
-        {/* Ngôi sao tri thức / Tiến bộ bay lên từ trang sách (Google Vàng / Hổ phách) */}
-        <path
-          d="M24 8L25.8 13.2L31 15L25.8 16.8L24 22L22.2 16.8L17 15L22.2 13.2L24 8Z"
-          fill="var(--gg-vang)"
-        />
+        {/* Vòng tròn 4 màu Google chuẩn nhận diện (xoay màu chủ đạo Lục cho Học sinh) */}
+        <g transform="translate(256, 256) rotate(45)">
+          <circle
+            cx="0"
+            cy="0"
+            r="216"
+            fill="none"
+            stroke="var(--gg-luc)"
+            strokeWidth="9"
+            strokeDasharray="320 1050"
+            strokeLinecap="round"
+          />
+          <circle
+            cx="0"
+            cy="0"
+            r="216"
+            fill="none"
+            stroke="var(--gg-xanh)"
+            strokeWidth="9"
+            strokeDasharray="320 1050"
+            strokeDashoffset="-340"
+            strokeLinecap="round"
+          />
+          <circle
+            cx="0"
+            cy="0"
+            r="216"
+            fill="none"
+            stroke="var(--gg-do)"
+            strokeWidth="9"
+            strokeDasharray="320 1050"
+            strokeDashoffset="-680"
+            strokeLinecap="round"
+          />
+          <circle
+            cx="0"
+            cy="0"
+            r="216"
+            fill="none"
+            stroke="var(--gg-vang)"
+            strokeWidth="9"
+            strokeDasharray="320 1050"
+            strokeDashoffset="-1020"
+            strokeLinecap="round"
+          />
+        </g>
 
-        {/* Tia sáng nhỏ phụ bên phải (Google Đỏ) */}
-        <circle cx="34" cy="11" r="1.5" fill="var(--gg-do)" />
+        {/* Cốt lõi thương hiệu: Chữ "4" cách điệu chuẩn Google */}
+        {/* 1. Cánh chéo đỉnh: Google Lam */}
+        <path d="M336 92 L336 142 L198 280 L154 240 Z" fill="var(--gg-xanh)" />
 
-        {/* Cuốn sách tri thức mở ra: Trang trái (Google Lam) */}
-        <path
-          d="M23 25.5C18.5 24 13 24.8 10 26.5V36.5C13 34.8 18.5 34 23 35.5V25.5Z"
-          fill="var(--gg-xanh)"
-        />
+        {/* 2. Thanh ngang liên kết: Google Vàng */}
+        <path d="M154 240 L198 280 L300 326 L300 274 Z" fill="var(--gg-vang)" />
 
-        {/* Trang phải (Google Lục) */}
-        <path
-          d="M25 25.5C29.5 24 35 24.8 38 26.5V36.5C35 34.8 29.5 34 25 35.5V25.5Z"
-          fill="var(--gg-luc)"
-        />
+        {/* 3. Trụ đứng ĐỖ ĐẠI HỌC: Google Lục (Học sinh) */}
+        <path d="M300 128 L336 92 L344 92 L344 456 L300 440 Z" fill="var(--gg-luc)" />
 
-        {/* Gáy sách và dải đánh dấu trang (Google Đỏ) */}
-        <path
-          d="M23 25.5V37.5C23 38.3 25 38.3 25 37.5V25.5"
-          stroke="var(--gg-do)"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
+        {/* Dòng chữ dọc ĐỖ ĐẠI HỌC khắc trên trụ đứng */}
+        <g
+          fill="white"
+          fontFamily="var(--sans)"
+          fontWeight="900"
+          fontSize="16.5"
+          textAnchor="middle"
+        >
+          <text x="322" y="156">Đ</text>
+          <text x="322" y="186">Ỗ</text>
+          <text x="322" y="224">Đ</text>
+          <text x="322" y="254">Ạ</text>
+          <text x="322" y="282">I</text>
+          <text x="322" y="320">H</text>
+          <text x="322" y="350">Ọ</text>
+          <text x="322" y="378">C</text>
+        </g>
 
-        {/* Đường gân trang sách tinh tế */}
-        <path
-          d="M13 29.5C16 28.5 19.5 28.8 21 29.5"
-          stroke="white"
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          strokeOpacity="0.75"
-        />
-        <path
-          d="M27 29.5C28.5 28.8 32 28.5 35 29.5"
-          stroke="white"
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          strokeOpacity="0.75"
-        />
+        {/* 4. Hằng số Avogadro Hoá học 6,022 · 10²³ dưới thanh ngang */}
+        <g transform="translate(68, 252) rotate(20.5)">
+          <text
+            x="22"
+            y="34"
+            fontFamily="var(--sans)"
+            fontWeight="800"
+            fontSize="24"
+            fill="var(--gg-luc)"
+            letterSpacing="0.5"
+          >
+            6,022 · 10<tspan dy="-10" fontSize="16" fontWeight="900">23</tspan>
+          </text>
+        </g>
+
+        {/* 5. Dấu gạch chéo thương hiệu góc dưới trái: Google Đỏ */}
+        <path d="M106 324 L126 344 L80 390 L60 370 Z" fill="var(--gg-do)" rx="5" />
+
+        {/* 6. Biểu tượng vai trò Học Sinh: Ngôi sao 4 cánh tiến bộ đỉnh chóp */}
+        <g transform="translate(336, 72)">
+          <path
+            d="M0 -34 C1 -12 12 -1 34 0 C12 1 1 12 0 34 C-1 12 -12 1 -34 0 C-12 -1 -1 -12 0 -34 Z"
+            fill="var(--gg-vang)"
+          />
+          <circle cx="0" cy="0" r="6" fill="var(--gg-do)" />
+          <circle cx="20" cy="-18" r="4" fill="var(--gg-luc)" />
+          <circle cx="-18" cy="18" r="3" fill="var(--gg-xanh)" />
+        </g>
       </svg>
 
       {hienChu && (
