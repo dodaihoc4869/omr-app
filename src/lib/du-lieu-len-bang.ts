@@ -30,7 +30,7 @@ export interface BanDeCa {
   phanII: TeacherTrueFalseQuestion[]
   phanIII: TeacherShortAnswerQuestion[]
   soCau?: { I: number; II: number; III: number }
-  boTheoEm?: Record<string, string[]>
+  boTheoEm?: Record<string, string[]> | Record<string, unknown>
 }
 
 /** Một lượt thi lấy từ `chiTietCa`. Chỉ giữ đúng những trường dùng tới. */

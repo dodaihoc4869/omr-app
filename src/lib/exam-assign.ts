@@ -62,7 +62,11 @@ export function assignStudentQuestions(bank: PublicExamBank, maCa: string, sbd: 
   // lại theo seed. Cắt lại là hỏng cả mục đích: câu cũ phải đúng chuyên đề đến
   // hạn đo, còn lõi chung phải giống hệt nhau ở mọi em mới tính được doChum.
   // Em không có tên trong bảng (vào muộn, ngoài danh sách) rơi về cách cũ.
-  const rieng = bank.boTheoEm?.[sbd]
+  const rawBo = bank.boTheoEm as Record<string, unknown> | undefined
+  const boMap = (rawBo && typeof rawBo === 'object' && rawBo.bo && typeof rawBo.bo === 'object' && !Array.isArray(rawBo.bo)
+    ? rawBo.bo
+    : rawBo) as Record<string, string[]> | undefined
+  const rieng = boMap?.[sbd] ?? (bank.boTheoEm as Record<string, string[]> | undefined)?.[sbd]
   if (rieng && rieng.length) {
     const cua = new Set(rieng)
     return {

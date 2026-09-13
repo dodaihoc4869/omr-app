@@ -196,7 +196,7 @@ export interface PublicExamBank {
    * Bảng chỉ nói em nào làm câu nào — KHÔNG có đáp án, đúng như phần còn lại
    * của gói công khai. Em không có tên trong bảng (vào muộn, ngoài danh sách)
    * rơi về cách cắt theo seed như cũ, không bị chặn khỏi ca. */
-  boTheoEm?: Record<string, string[]>
+  boTheoEm?: Record<string, string[]> | Record<string, unknown>
 }
 
 /** Đề thầy soạn (1 lần tải lên = 1 TeacherExamSource), có đáp án — chỉ ở máy thầy. */
@@ -278,13 +278,13 @@ export function mergeKeepAnswers(
   soCau?: SoCauMoiPhan,
   /** Ca ĐỀ RIÊNG TỪNG EM: sbd → qid của em đó. Phải đi cùng bộ đề có đáp án,
    * không thì máy thầy chấm lại bằng luật hash và ra bộ câu của người khác. */
-  boTheoEm?: Record<string, string[]>,
+  boTheoEm?: Record<string, string[]> | Record<string, unknown>,
 ): {
   phanI: TeacherMcqQuestion[]
   phanII: TeacherTrueFalseQuestion[]
   phanIII: TeacherShortAnswerQuestion[]
   soCau?: SoCauMoiPhan
-  boTheoEm?: Record<string, string[]>
+  boTheoEm?: Record<string, string[]> | Record<string, unknown>
 } {
   return {
     soCau,

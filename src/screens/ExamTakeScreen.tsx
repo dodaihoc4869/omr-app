@@ -3,8 +3,9 @@ import { choBaoLau, gianNopTuDong, gianVaoSauBatDau, gianVaoThi, laLoiDongNguoi 
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
 import { boCauTuBaiLam } from '../lib/bo-cau-tu-bai-lam'
+import { qidDaGap, type SoCauMoiPhan } from '../lib/bo-cau-tu-bai-lam'
 import { taoLinkPhieu } from '../lib/phieu-link'
-import { cauKhacPhuc, ghiPhieuKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, trangThaiPhongCho, vaoThi, phieuCuaEm as layBaiDaNop, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, chuKyLechPhaMs, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
+import { cauKhacPhuc, ghiPhieuKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, trangThaiPhongCho, vaoThi, phieuCuaEm as layBaiDaNop, layPhieu, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, chuKyLechPhaMs, type KeyBank, type CongBoDiem, type KetQuaVaoThi } from '../lib/exam-api'
 import { CongNhip, NHIP_TIM_LUU_TAM_GIAY } from '../lib/nhip-gui'
 import { goiCauHoi } from '../lib/hoi-bai'
 import TamTruotHoiBai, { type CauChon } from '../components/TamTruotHoiBai'
@@ -268,6 +269,7 @@ export default function ExamTakeScreen() {
   const [bank, setBank] = useState<PublicExamBank | null>(null)
   const [lop, setLop] = useState('')
   const [attempt, setAttempt] = useState<ExamAttempt | null>(null)
+  const [phieuSan, setPhieuSan] = useState<PhieuDayDu | null>(null)
   // null = chưa tính lần nào (mới vào thi) — PHẢI phân biệt với 0 (đã hết giờ
   // thật sự), nếu không effect tự-nộp-bài bên dưới sẽ chạy với giá trị khởi
   // tạo 0 TRƯỚC khi effect đồng hồ kịp tính giờ thật, khiến bài tự nộp ngay
@@ -488,6 +490,41 @@ export default function ExamTakeScreen() {
     return assignStudentQuestions(bank, maCa.trim(), sbd.trim())
   }, [bank, maCa, sbd])
 
+  // BỘ CÂU THẬT SỰ CỦA EM — một nguồn cho cả chấm điểm lẫn màn xem lại.
+  //
+  // Ưu tiên `assignment`: đó chính là bộ câu màn làm bài vừa bày ra, không có
+  // gì thật hơn thế. Mở lại app sau khi nộp thì `assignment` không còn (bank
+  // công khai đã xoá), lúc ấy dựng lại từ bài làm.
+  //
+  // TUYỆT ĐỐI KHÔNG để rơi về `assignStudentQuestions(keyBank, …)` như bản cũ:
+  // `keyBank` máy chủ trả về là CẢ KHO của ca kèm `soCau`, KHÔNG kèm `boTheoEm`,
+  // nên nó rút lại một bộ 8 câu khác hẳn bộ em đã làm (thầy bắt được 10/09 tối,
+  // ca 234641 — điểm 5,69 thành 2,56, và màn xem lại bày ra toàn câu lạ).
+  const boCauCuaEm: string[] | null = useMemo(() => {
+    if (assignment) {
+      if (attempt?.answers) {
+        const setBaiLam = qidDaGap(attempt.answers, attempt.giayCau)
+        if (setBaiLam.size > 0) {
+          const asgSet = new Set([...assignment.phanI, ...assignment.phanII, ...assignment.phanIII].map((x) => x.qid))
+          let coLech = false
+          for (const q of setBaiLam) {
+            if (!asgSet.has(q)) {
+              coLech = true
+              break
+            }
+          }
+          if (!coLech) {
+            return [...assignment.phanI, ...assignment.phanII, ...assignment.phanIII].map((x) => x.qid)
+          }
+        }
+      } else {
+        return [...assignment.phanI, ...assignment.phanII, ...assignment.phanIII].map((x) => x.qid)
+      }
+    }
+    if (!keyBank || !attempt) return null
+    return boCauTuBaiLam(keyBank, attempt.maCa, attempt.sbd, attempt.answers, attempt.giayCau, keyBank.soCau)
+  }, [assignment, keyBank, attempt])
+
   // Gộp cả 3 phần thành 1 danh sách phẳng, đánh số liên tục 1..tổng (đúng số
   // hiện trong "12/28", lưới số câu và id cuộn tới "cau-N").
   // DANH SÁCH CÂU CHO TẤM TRƯỢT HỎI BÀI — dựng TẠI MÁY EM từ bộ câu đã có
@@ -503,7 +540,7 @@ export default function ExamTakeScreen() {
     // dựng được thẻ câu đầy đủ y như báo cáo, qua ĐÚNG một bộ dựng.
     if (keyBank) {
       const banks = [{ maDe: a.maCa, phanI: keyBank.phanI, phanII: keyBank.phanII, phanIII: keyBank.phanIII }]
-      const rows = taoChiTietCau(keyBank, a.maCa, a.sbd, a.answers, a.giayCau)
+      const rows = taoChiTietCau(keyBank, a.maCa, a.sbd, a.answers, a.giayCau, boCauCuaEm)
       return dungCauSai(rows, banks, false).map((c) => ({ qid: c.qid, chiTiet: c }))
     }
 
@@ -522,7 +559,7 @@ export default function ExamTakeScreen() {
       ...assignment.phanII.map((x, i) => trong(x.qid, 'II', i + 1, x.question.text, [...(x.question.ideas ?? [])], (a.answers.phanII[x.qid] ?? []).map((v) => v ?? '-').join(''))),
       ...assignment.phanIII.map((x, i) => trong(x.qid, 'III', i + 1, x.question.text, null, a.answers.phanIII[x.qid] ?? '')),
     ]
-  }, [assignment, attempt, keyBank])
+  }, [assignment, attempt, keyBank, boCauCuaEm])
 
   const guiHoiBai = async (qids: string[], ghiChu: string) => {
     const a = attemptRef.current
@@ -551,24 +588,6 @@ export default function ExamTakeScreen() {
     assignment.phanIII.forEach((_, i) => out.push({ phan: 'III', i }))
     return out
   }, [assignment])
-
-  // BỘ CÂU THẬT SỰ CỦA EM — một nguồn cho cả chấm điểm lẫn màn xem lại.
-  //
-  // Ưu tiên `assignment`: đó chính là bộ câu màn làm bài vừa bày ra, không có
-  // gì thật hơn thế. Mở lại app sau khi nộp thì `assignment` không còn (bank
-  // công khai đã xoá), lúc ấy dựng lại từ bài làm.
-  //
-  // TUYỆT ĐỐI KHÔNG để rơi về `assignStudentQuestions(keyBank, …)` như bản cũ:
-  // `keyBank` máy chủ trả về là CẢ KHO của ca kèm `soCau`, KHÔNG kèm `boTheoEm`,
-  // nên nó rút lại một bộ 8 câu khác hẳn bộ em đã làm (thầy bắt được 10/09 tối,
-  // ca 234641 — điểm 5,69 thành 2,56, và màn xem lại bày ra toàn câu lạ).
-  const boCauCuaEm: string[] | null = useMemo(() => {
-    if (assignment) {
-      return [...assignment.phanI, ...assignment.phanII, ...assignment.phanIII].map((x) => x.qid)
-    }
-    if (!keyBank || !attempt) return null
-    return boCauTuBaiLam(keyBank, attempt.maCa, attempt.sbd, attempt.answers, attempt.giayCau, keyBank.soCau)
-  }, [assignment, keyBank, attempt])
 
   // Bộ câu ĐẦY ĐỦ (kèm đáp án đúng + lời giải) dùng riêng cho màn "Xem lại
   // lời giải" — cùng bộ qid với bài em đã làm, chỉ khác nguồn có đáp án
@@ -713,7 +732,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     let con = true
     void (async () => {
       try {
-        const rows = taoChiTietCau(keyBank, attempt.maCa, attempt.sbd, attempt.answers, attempt.giayCau)
+        const rows = taoChiTietCau(keyBank, attempt.maCa, attempt.sbd, attempt.answers, attempt.giayCau, boCauCuaEm)
         const yeu = chuyenDeXinKho(rows)
         if (yeu.length === 0) return
         const kq = await cauKhacPhuc(
@@ -749,13 +768,14 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     return () => {
       con = false
     }
-  }, [attempt, graded, keyBank, scriptUrl])
+  }, [attempt, graded, keyBank, scriptUrl, boCauCuaEm])
 
   const phieuCuaEm: PhieuDayDu | null = useMemo(() => {
+    if (phieuSan) return phieuSan
     if (!keyBank || !attempt || !graded) return null
     try {
       const banks: TeacherExamSource[] = [{ maDe: attempt.maDe || attempt.maCa, phanI: keyBank.phanI, phanII: keyBank.phanII, phanIII: keyBank.phanIII }]
-      const rows = taoChiTietCau(keyBank, attempt.maCa, attempt.sbd, attempt.answers, attempt.giayCau)
+      const rows = taoChiTietCau(keyBank, attempt.maCa, attempt.sbd, attempt.answers, attempt.giayCau, boCauCuaEm)
       return dungPhieuMayEm({
         hoTen: hoTen.trim(),
         sbd: attempt.sbd,
@@ -787,7 +807,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     } catch {
       return null
     }
-  }, [keyBank, attempt, graded, hoTen, lichSuEm, khoKhacPhuc, thuTuKhacPhuc])
+  }, [keyBank, attempt, graded, hoTen, lichSuEm, khoKhacPhuc, thuTuKhacPhuc, phieuSan, boCauCuaEm])
   // MÃ BÀI TẬP CHO BỘ CÂU KHẮC PHỤC — xin ngay khi báo cáo dựng xong.
   //
   // Báo cáo này do chính máy em dựng, không có mã phiếu; mà thanh Nộp bài chấm
@@ -839,6 +859,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   /** Báo cáo kèm link bài tập — thứ làm cho phiếu khắc phục nộp được. */
   const phieuCuaEmCoLink: PhieuDayDu | null = useMemo(() => {
     if (!phieuCuaEm) return null
+    if (phieuCuaEm.linkBaiTap) return phieuCuaEm
     if (!maBaiTapEm) return phieuCuaEm
     return { ...phieuCuaEm, linkBaiTap: taoLinkPhieu(`${location.origin}${import.meta.env.BASE_URL}`, maBaiTapEm) }
   }, [phieuCuaEm, maBaiTapEm])
@@ -944,7 +965,28 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       // nổ giữa chừng và em nhìn thấy màn "Màn Làm bài gặp lỗi" — đúng cái đã
       // xảy ra lần thử đầu 07/09. Kiểm ở đây để nói được câu người đọc hiểu.
       if (!coDapAn(b.bank)) throw new Error('Ca này chưa công bố đáp án — hỏi Thầy.')
-      setBank(b.bank)
+
+      if (b.phieu && typeof b.phieu === 'object') {
+        setPhieuSan(b.phieu as PhieuDayDu)
+      } else if (b.ma) {
+        try {
+          const p = (await layPhieu(url, b.ma)) as { ok?: boolean; phieu?: PhieuDayDu } | null
+          if (p && typeof p === 'object' && 'ok' in p && p.ok && p.phieu) {
+            setPhieuSan(p.phieu)
+          } else if (p && typeof p === 'object' && 'diem' in p) {
+            setPhieuSan(p as unknown as PhieuDayDu)
+          }
+        } catch {}
+      }
+
+      const daNop = b.luot.dapAn ?? { phanI: {}, phanII: {}, phanIII: {} }
+      const soCauCa = (b.bank.soCau ?? b.soCau) as SoCauMoiPhan | undefined
+      const boEm = (b.boCuaEm && b.boCuaEm.length > 0)
+        ? b.boCuaEm
+        : boCauTuBaiLam(b.bank, ma, sb, daNop, b.luot.giayCau, soCauCa)
+      const bankCoBo = boEm && boEm.length > 0 ? { ...b.bank, boTheoEm: { [sb]: boEm }, soCau: soCauCa } : b.bank
+
+      setBank(bankCoBo)
       setLop(b.lop)
       if (b.hoTen) setHoTen(b.hoTen)
       setAttempt({
@@ -958,7 +1000,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         giayCau: b.luot.giayCau ?? undefined,
         tenCa: b.tenCa,
         giuDeDoc: b.giuDeDoc,
-        answers: b.luot.dapAn ?? { phanI: {}, phanII: {}, phanIII: {} },
+        answers: daNop,
         integrity: b.luot.integrity ?? {
           leaveCount: b.luot.soLanRoiMan,
           totalHiddenMs: b.luot.tongGiayRoiMan * 1000,
@@ -973,15 +1015,13 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       // `apDungKeyBank`: hàm đó còn bật popup điểm và ghi điểm lên máy chủ.
       // Ở đây em chỉ xem lại, popup phải chờ em bấm "Xem điểm chi tiết", và
       // điểm trên máy chủ đã có rồi, ghi đè lần nữa là thừa.
-      setKeyBank(b.bank)
+      setKeyBank(bankCoBo)
       setChoCaLop(null)
       try {
         // Mở lại app sau khi nộp: KHÔNG còn `assignment` để đối chiếu, nên dựng
         // bộ câu từ chính bài đã nộp. Thiếu tham số này là chấm theo bộ câu rút
         // lại bằng hạt giống — sai hẳn với ca đề riêng.
-        const daNop = b.luot.dapAn ?? { phanI: {}, phanII: {}, phanIII: {} }
-        const boEm = boCauTuBaiLam(b.bank, ma, sb, daNop, b.luot.giayCau, b.bank.soCau)
-        setGraded(gradeFromKeyBank(b.bank, ma, sb, daNop, boEm))
+        setGraded(gradeFromKeyBank(bankCoBo, ma, sb, daNop, boEm))
       } catch {
         // Đề đổi sau khi em thi thì không chấm lại được — vẫn hiện màn đã nộp,
         // chỉ thiếu điểm, chứ không ném em vào màn lỗi.

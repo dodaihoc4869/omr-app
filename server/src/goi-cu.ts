@@ -406,6 +406,37 @@ export async function phieuTheoCa(env: Env, b: Record<string, unknown>): Promise
 
 /** MÃ PHIẾU CỦA CHÍNH EM trong một ca — cho link `/d/<mã ca>`. Không trả nội
  * dung phiếu, chỉ trả mã; máy em mở tiếp bằng `layPhieu` công khai. */
+function locGoiDeRiengChoEm(goi: Record<string, unknown> | null, sbd: string): Record<string, unknown> | null {
+  if (!goi) return null
+  const doiTuong = (v: unknown): Record<string, unknown> =>
+    v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {}
+
+  const moi = goi.bo && typeof goi.bo === 'object' && !Array.isArray(goi.bo)
+  const bo = moi ? doiTuong(goi.bo) : goi
+  const cua = bo[sbd]
+  if (!Array.isArray(cua) || cua.length === 0) return null
+  if (!moi) return { [sbd]: cua }
+
+  const lap = doiTuong(goi.lap)[sbd]
+  const dem = doiTuong(goi.dem)[sbd]
+  return {
+    bo: { [sbd]: cua },
+    lap: Array.isArray(lap) ? { [sbd]: lap } : {},
+    dem: dem && typeof dem === 'object' ? { [sbd]: dem } : {},
+    bb: null,
+  }
+}
+
+function trichBoCauCuaEm(goi: Record<string, unknown> | null, sbd: string): string[] | null {
+  if (!goi) return null
+  if (Array.isArray(goi[sbd])) return goi[sbd] as string[]
+  if (goi.bo && typeof goi.bo === 'object' && !Array.isArray(goi.bo)) {
+    const bo = goi.bo as Record<string, unknown>
+    if (Array.isArray(bo[sbd])) return bo[sbd] as string[]
+  }
+  return null
+}
+
 export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const maCa = chuoi(b.maCa).trim()
   const sbd = chuoi(b.sbd).trim()
@@ -413,7 +444,8 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
 
   const l = await env.DB.prepare(
     `SELECT l.*, COALESCE(NULLIF(l.ho_ten,''), d.ho_ten, '') AS ten_hien, COALESCE(c.lop, d.lop, '') AS lop_hien,
-            COALESCE(c.ten_ca,'') AS ten_ca, c.thoi_gian_phut, c.giu_de_doc
+            COALESCE(c.ten_ca,'') AS ten_ca, c.thoi_gian_phut, c.giu_de_doc,
+            c.bo_theo_em_json, c.so_cau_json, c.de_rieng
        FROM luot l
        LEFT JOIN danh_sach d ON d.sbd = l.sbd
        LEFT JOIN ca c ON c.ma_ca = l.ma_ca
@@ -427,6 +459,27 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
     .bind(maCa, sbd)
     .all<Record<string, unknown>>()
   const ds = rPhieu.results ?? []
+  const maKetQua = chuoi(ds.find((x) => chuoi(x.loai) !== 'baitap')?.ma)
+  const maBaiTap = chuoi(ds.find((x) => chuoi(x.loai) === 'baitap')?.ma)
+
+  let phieuSan: unknown = null
+  if (maKetQua && env.DE) {
+    try {
+      const oP = await env.DE.get(`phieu/${maKetQua}.json`)
+      if (oP?.body) {
+        const doc = (await new Response(oP.body).json()) as Record<string, unknown>
+        if (doc && !doc.thuHoi && doc.phieu) {
+          phieuSan = doc.phieu
+        }
+      }
+    } catch {}
+  }
+
+  const rawBoGoc = l.bo_theo_em_json ? doJson(l.bo_theo_em_json) : null
+  const goiGoc = rawBoGoc && typeof rawBoGoc === 'object' ? (rawBoGoc as Record<string, unknown>) : null
+  const goiRieng = locGoiDeRiengChoEm(goiGoc, sbd)
+  const boCuaEm = trichBoCauCuaEm(goiRieng ?? goiGoc, sbd)
+  const soCauCa = l.so_cau_json ? doJson(l.so_cau_json) : null
 
   // NGÂN HÀNG CÓ ĐÁP ÁN — chỉ trả khi em ĐÃ NỘP. Đây là đường CÔNG KHAI (máy em
   // không có mã bí mật), nên cổng duy nhất là lượt thi có thật của chính em đã
@@ -454,10 +507,24 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
     if (!bank) bank = await keyBankTuBangCham(env, maCa, sbd)
   }
 
+  if (bank && typeof bank === 'object') {
+    const bObj = bank as Record<string, unknown>
+    if (soCauCa && !bObj.soCau) {
+      bObj.soCau = soCauCa
+    }
+    if (goiRieng && !bObj.boTheoEm) {
+      bObj.boTheoEm = goiRieng
+    }
+  }
+
   return {
     ok: true,
-    ma: chuoi(ds.find((x) => chuoi(x.loai) !== 'baitap')?.ma),
-    maBaiTap: chuoi(ds.find((x) => chuoi(x.loai) === 'baitap')?.ma),
+    ma: maKetQua,
+    maBaiTap: maBaiTap,
+    phieu: phieuSan,
+    boTheoEm: goiRieng,
+    boCuaEm,
+    soCau: soCauCa,
     tong: soHoacNull(l.tong),
     hoTen: chuoi(l.ten_hien),
     lop: chuoi(l.lop_hien),

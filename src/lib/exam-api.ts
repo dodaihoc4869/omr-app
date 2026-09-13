@@ -2473,6 +2473,11 @@ export interface BaiDaNopCuaEm {
   }
   /** Ngân hàng CÓ đáp án của ca — để máy em chấm lại và mở đề, lời giải. */
   bank: KeyBank | null
+  /** Phiếu kết quả chính thức đã lưu trên máy chủ (nếu có). */
+  phieu?: unknown
+  boTheoEm?: Record<string, unknown> | null
+  boCuaEm?: string[] | null
+  soCau?: SoCauMoiPhan | null
 }
 
 export async function phieuCuaEm(scriptUrl: string, maCa: string, sbd: string): Promise<BaiDaNopCuaEm> {
@@ -2500,6 +2505,10 @@ export async function phieuCuaEm(scriptUrl: string, maCa: string, sbd: string): 
       tongGiayRoiMan: Number(l.tongGiayRoiMan) || 0,
     },
     bank: r.bank ?? null,
+    phieu: r.phieu ?? null,
+    boTheoEm: (r.boTheoEm as Record<string, unknown> | undefined) ?? null,
+    boCuaEm: Array.isArray(r.boCuaEm) ? (r.boCuaEm as string[]) : null,
+    soCau: (r.soCau as SoCauMoiPhan | undefined) ?? null,
   }
 }
 
