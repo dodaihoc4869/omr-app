@@ -2517,6 +2517,18 @@ export default {
     if (req.method === 'GET' && p === '/ten-theo-sbd') {
       return tenTheoSbd(env, (url.searchParams.get('maCa') ?? '').trim(), (url.searchParams.get('sbd') ?? '').trim())
     }
+    if (req.method === 'GET' && (p === '' || p === '/')) {
+      return Response.redirect('https://omr-app-b3u.pages.dev', 302)
+    }
+    if (req.method === 'GET' && (p === '/hs' || p === '/hoc-sinh')) {
+      return Response.redirect('https://omr-app-b3u.pages.dev/hs', 302)
+    }
+    if (req.method === 'GET' && p === '/gv') {
+      return Response.redirect('https://omr-app-b3u.pages.dev/gv', 302)
+    }
+    if (req.method === 'GET' && (p.startsWith('/t/') || p.startsWith('/d/'))) {
+      return Response.redirect(`https://omr-app-b3u.pages.dev${p}`, 302)
+    }
     if (req.method !== 'POST') return ra({ ok: false, error: 'Chỉ nhận POST' }, 405)
 
     let b: Record<string, unknown>
