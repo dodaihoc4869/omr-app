@@ -9,7 +9,7 @@
 // Phần giao bài tập chạy 0% Apps Script: ca và đề đọc từ máy chủ mới, bài giao
 // và bài nộp cũng ở đó.
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { CheckSquare, ClipboardList, Presentation, RefreshCw, Search, Send, Square, UserCheck, Users } from 'lucide-react'
+import { CheckSquare, ClipboardList, Presentation, RefreshCw, Search, Square, UserCheck, Users } from 'lucide-react'
 import { Nhan, NutChinh, OThongBao, TheNoiDung } from '../components/DesignSystem'
 import GoiLenBangScreen from './GoiLenBangScreen'
 import { danhSachCa, danhSachEm, type CaTomTat, type EmTomTat } from '../lib/exam-api'
@@ -687,121 +687,109 @@ function TheGiaoBtvn() {
             </OThongBao>
           )}
 
-          {/* KHUNG THAO TÁC GIAO BÀI TẬP — GỌN GÀNG & TRỰC QUAN */}
+          {/* TÓM TẮT CHỌN GIAO */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               flexWrap: 'wrap',
-              gap: 'var(--k3)',
-              padding: '12px 16px',
-              borderRadius: 'var(--bo-2)',
+              gap: 'var(--k2)',
+              padding: '10px 14px',
+              borderRadius: 'var(--bo-1)',
               background: 'var(--the-2)',
               border: '1px solid var(--vien)',
             }}
           >
-            <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)' }}>
-              <span style={{ fontSize: 'var(--cx-1)', fontWeight: 600, color: 'var(--muc)' }}>
-                {cheDo === 'ca' ? `Đã chọn: ${caChon.size} ca` : `Đã chọn: ${sbdChon.size} học sinh`}
-              </span>
-              <span style={{ color: 'var(--mo)' }}>•</span>
-              <span style={{ fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
-                {daChon.size > 0 ? `${daChon.size} tờ đề (${tongCauDaChon} câu)` : 'Chưa tick tờ đề'}
-              </span>
-            </div>
+            <span style={{ fontSize: 'var(--cx-1)', fontWeight: 600, color: 'var(--muc)' }}>
+              {cheDo === 'ca' ? `Đã chọn: ${caChon.size} ca` : `Đã chọn: ${sbdChon.size} học sinh`}
+            </span>
+            <span style={{ fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
+              {daChon.size > 0 ? `${daChon.size} tờ đề (${tongCauDaChon} câu)` : 'Chưa tick tờ đề nào'}
+            </span>
+          </div>
 
-            <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)' }}>
-              {cheDo === 'ca' ? (
-                <button
-                  type="button"
-                  onClick={giao}
-                  disabled={dangGiao || caChon.size === 0 || daChon.size === 0}
-                  className="tap-target font-bold"
-                  style={{
-                    height: 44,
-                    padding: '0 20px',
-                    borderRadius: 'var(--bo-1)',
-                    fontFamily: 'var(--sans)',
-                    fontSize: 'var(--cx-1)',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    cursor: dangGiao || caChon.size === 0 || daChon.size === 0 ? 'not-allowed' : 'pointer',
-                    background: dangGiao || caChon.size === 0 || daChon.size === 0 ? 'var(--the)' : 'var(--muc)',
-                    color: dangGiao || caChon.size === 0 || daChon.size === 0 ? 'var(--mo)' : 'var(--muc-nguoc)',
-                    border: '1px solid ' + (dangGiao || caChon.size === 0 || daChon.size === 0 ? 'var(--vien-dam)' : 'var(--muc)'),
-                    opacity: dangGiao || caChon.size === 0 || daChon.size === 0 ? 0.6 : 1,
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  <Send size={16} />
-                  {dangGiao
-                    ? 'Đang giao…'
-                    : caChon.size === 0
-                    ? 'Chưa chọn ca thi'
-                    : daChon.size === 0
-                    ? 'Chưa chọn tờ đề'
-                    : `Giao bài tập (${caChon.size} ca · ${tongCauDaChon} câu)`}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={giao}
-                  disabled={dangGiao || sbdChon.size === 0 || daChon.size === 0}
-                  className="tap-target font-bold"
-                  style={{
-                    height: 44,
-                    padding: '0 20px',
-                    borderRadius: 'var(--bo-1)',
-                    fontFamily: 'var(--sans)',
-                    fontSize: 'var(--cx-1)',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    cursor: dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 'not-allowed' : 'pointer',
-                    background: dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 'var(--the)' : 'var(--muc)',
-                    color: dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 'var(--mo)' : 'var(--muc-nguoc)',
-                    border: '1px solid ' + (dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 'var(--vien-dam)' : 'var(--muc)'),
-                    opacity: dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 0.6 : 1,
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  <Send size={16} />
-                  {dangGiao
-                    ? 'Đang giao…'
-                    : sbdChon.size === 0
-                    ? 'Chưa chọn học sinh'
-                    : daChon.size === 0
-                    ? 'Chưa chọn tờ đề'
-                    : `Giao bài tập (${sbdChon.size} học sinh · ${tongCauDaChon} câu)`}
-                </button>
-              )}
-
+          {/* HÀNG NÚT BẤM GIAO BÀI TẬP VỀ NHÀ — TO RÕ, NỔI BẬT & TRỰC QUAN */}
+          <div className="flex items-center gap-3 flex-wrap" style={{ marginTop: 'var(--k1)' }}>
+            {cheDo === 'ca' ? (
               <button
                 type="button"
-                onClick={() => void nap()}
-                disabled={dangNap}
-                className="tap-target font-semibold"
+                onClick={giao}
+                disabled={dangGiao || caChon.size === 0 || daChon.size === 0}
+                className="tap-target font-bold inline-flex items-center justify-center gap-2 flex-1 sm:flex-initial"
                 style={{
-                  height: 44,
-                  padding: '0 16px',
+                  minHeight: 48,
+                  padding: '0 24px',
                   borderRadius: 'var(--bo-1)',
                   fontFamily: 'var(--sans)',
-                  fontSize: 'var(--cx-1)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  background: 'var(--the)',
-                  color: 'var(--muc)',
-                  border: '1px solid var(--vien-dam)',
-                  cursor: dangNap ? 'not-allowed' : 'pointer',
+                  fontSize: 'var(--cx-2)',
+                  cursor: dangGiao || caChon.size === 0 || daChon.size === 0 ? 'not-allowed' : 'pointer',
+                  background: dangGiao || caChon.size === 0 || daChon.size === 0 ? 'var(--the-2)' : 'var(--muc)',
+                  color: dangGiao || caChon.size === 0 || daChon.size === 0 ? 'var(--mo)' : 'var(--muc-nguoc)',
+                  border: '1.5px solid ' + (dangGiao || caChon.size === 0 || daChon.size === 0 ? 'var(--vien)' : 'var(--muc)'),
+                  opacity: dangGiao || caChon.size === 0 || daChon.size === 0 ? 0.65 : 1,
+                  transition: 'all 0.15s ease',
                 }}
               >
-                <RefreshCw size={15} className={dangNap ? 'animate-spin' : ''} />
-                Làm mới
+                <ClipboardList size={20} />
+                {dangGiao
+                  ? 'Đang giao…'
+                  : caChon.size === 0
+                  ? 'Tick chọn ít nhất 1 ca thi'
+                  : daChon.size === 0
+                  ? 'Tick chọn ít nhất 1 tờ đề'
+                  : `Giao bài tập về nhà (${caChon.size} ca · ${tongCauDaChon} câu)`}
               </button>
-            </div>
+            ) : (
+              <button
+                type="button"
+                onClick={giao}
+                disabled={dangGiao || sbdChon.size === 0 || daChon.size === 0}
+                className="tap-target font-bold inline-flex items-center justify-center gap-2 flex-1 sm:flex-initial"
+                style={{
+                  minHeight: 48,
+                  padding: '0 24px',
+                  borderRadius: 'var(--bo-1)',
+                  fontFamily: 'var(--sans)',
+                  fontSize: 'var(--cx-2)',
+                  cursor: dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 'not-allowed' : 'pointer',
+                  background: dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 'var(--the-2)' : 'var(--xanh)',
+                  color: dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 'var(--mo)' : '#ffffff',
+                  border: '1.5px solid ' + (dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 'var(--vien)' : 'var(--xanh)'),
+                  opacity: dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 0.65 : 1,
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <ClipboardList size={20} />
+                {dangGiao
+                  ? 'Đang giao…'
+                  : sbdChon.size === 0
+                  ? 'Tick chọn ít nhất 1 học sinh'
+                  : daChon.size === 0
+                  ? 'Tick chọn ít nhất 1 tờ đề'
+                  : `Giao bài tập về nhà cho ${sbdChon.size} học sinh (${tongCauDaChon} câu)`}
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={() => void nap()}
+              disabled={dangNap}
+              className="tap-target font-semibold inline-flex items-center gap-2"
+              style={{
+                minHeight: 48,
+                padding: '0 18px',
+                borderRadius: 'var(--bo-1)',
+                fontFamily: 'var(--sans)',
+                fontSize: 'var(--cx-1)',
+                background: 'transparent',
+                color: 'var(--muc)',
+                border: '1.5px solid var(--vien-dam)',
+                cursor: dangNap ? 'not-allowed' : 'pointer',
+              }}
+            >
+              <RefreshCw size={16} className={dangNap ? 'animate-spin' : ''} /> Làm mới
+            </button>
           </div>
 
           {bao && <OThongBao tone={bao.ok ? 'xanh' : 'do'}>{bao.chu}</OThongBao>}
