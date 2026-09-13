@@ -32,6 +32,7 @@ export function TheNoiDung({
       style={{
         background: 'var(--the)',
         borderRadius: 'var(--bo-3)',
+        border: '1px solid var(--vien)',
         boxShadow: 'var(--bong-1)',
         overflow: 'hidden',
         ...(noPadding ? {} : { padding: 'var(--k5)' }),
@@ -128,19 +129,19 @@ export function Hang({
   'data-trang-thai'?: string
 }) {
   const Comp = onClick ? 'button' : 'div'
-  const mau = tone === 'do' ? { nen: 'var(--do-nen)', vien: 'var(--do)' } : { nen: 'var(--xanh-nen)', vien: 'var(--xanh)' }
+  const mau = tone === 'do' ? { nen: 'var(--gg-do-nen)', vien: 'var(--gg-do)' } : { nen: 'var(--gg-xanh-nen)', vien: 'var(--gg-xanh)' }
   return (
     <Comp
       type={onClick ? 'button' : undefined}
       onClick={onClick}
-      className={`tap-target w-full text-left flex items-center gap-2 ${className}`}
+      className={`tap-target w-full text-left flex items-center gap-2 transition-all ${className}`}
       style={{
         minHeight: 56,
-        borderRadius: 'var(--bo-1)',
+        borderRadius: 'var(--bo-2)',
         padding: 'var(--k3) var(--k4)',
         background: selected ? mau.nen : 'var(--the-2)',
-        border: selected ? `1.5px solid ${mau.vien}` : '1.5px solid transparent',
-        transitionProperty: 'background-color, border-color',
+        border: selected ? `1.5px solid ${mau.vien}` : '1px solid var(--vien)',
+        transitionProperty: 'background-color, border-color, box-shadow',
         transitionDuration: 'var(--nhanh)',
         ...style,
       }}
@@ -152,13 +153,13 @@ export function Hang({
 }
 
 // ---------------------------------------------------------------------------
-// <Nhan> — nhãn trạng thái nhỏ, bo tròn. xanh=xong · cam=cần xem · đỏ=lỗi ·
+// <Nhan> — nhãn trạng thái nhỏ, bo tròn chuẩn Google Chip. xanh=xong · cam=cần xem · đỏ=lỗi ·
 // tím=đang chạy · xám=chưa bắt đầu.
 // ---------------------------------------------------------------------------
 const NHAN_TONE: Record<'xanh' | 'cam' | 'do' | 'tim' | 'xam', { bg: string; fg: string }> = {
-  xanh: { bg: 'var(--xanh-nen)', fg: 'var(--xanh)' },
-  cam: { bg: 'var(--cam-nen)', fg: 'var(--cam)' },
-  do: { bg: 'var(--do-nen)', fg: 'var(--do)' },
+  xanh: { bg: 'var(--gg-luc-nen)', fg: 'var(--gg-luc)' },
+  cam: { bg: 'var(--gg-vang-nen)', fg: 'var(--cam)' },
+  do: { bg: 'var(--gg-do-nen)', fg: 'var(--gg-do)' },
   tim: { bg: 'var(--tim-nen)', fg: 'var(--tim)' },
   xam: { bg: 'var(--the-2)', fg: 'var(--nhat)' },
 }
@@ -168,12 +169,12 @@ export function Nhan({ tone, children, className = '', wrap = false, ...rest }: 
   return (
     <span
       {...rest}
-      className={`inline-flex items-center font-bold ${className}`}
+      className={`inline-flex items-center font-bold tracking-wide ${className}`}
       style={{
         whiteSpace: wrap ? 'normal' : 'nowrap',
         lineHeight: wrap ? 1.4 : undefined,
-        borderRadius: wrap ? 'var(--bo-1)' : 'var(--bo-tron)',
-        padding: wrap ? '6px 10px' : '2px 10px',
+        borderRadius: 'var(--bo-tron)',
+        padding: wrap ? '6px 12px' : '3px 12px',
         background: t.bg,
         color: t.fg,
         fontFamily: 'var(--sans)',
@@ -186,13 +187,13 @@ export function Nhan({ tone, children, className = '', wrap = false, ...rest }: 
 }
 
 // ---------------------------------------------------------------------------
-// <OThongBao> — ô ghi chú viền trái. Dùng cho: giải thích lời giải, cảnh
+// <OThongBao> — ô ghi chú viền trái chuẩn Google Callout. Dùng cho: giải thích lời giải, cảnh
 // báo, hướng dẫn. Mặc định cam; xanh=thành công, đỏ=lỗi.
 // ---------------------------------------------------------------------------
 const OTHONGBAO_TONE: Record<'cam' | 'xanh' | 'do', { bg: string; border: string }> = {
-  cam: { bg: 'var(--cam-nen)', border: 'var(--cam)' },
-  xanh: { bg: 'var(--xanh-nen)', border: 'var(--xanh)' },
-  do: { bg: 'var(--do-nen)', border: 'var(--do)' },
+  cam: { bg: 'var(--gg-vang-nen)', border: 'var(--gg-vang)' },
+  xanh: { bg: 'var(--gg-luc-nen)', border: 'var(--gg-luc)' },
+  do: { bg: 'var(--gg-do-nen)', border: 'var(--gg-do)' },
 }
 
 export function OThongBao({ tone = 'cam', children, className = '' }: { tone?: 'cam' | 'xanh' | 'do'; children: ReactNode; className?: string }) {
@@ -201,8 +202,8 @@ export function OThongBao({ tone = 'cam', children, className = '' }: { tone?: '
     <div
       className={`italic ${className}`}
       style={{
-        borderRadius: 'var(--bo-1)',
-        borderLeft: `3px solid ${t.border}`,
+        borderRadius: 'var(--bo-2)',
+        borderLeft: `4px solid ${t.border}`,
         padding: 'var(--k3) var(--k4)',
         background: t.bg,
         fontFamily: 'var(--serif)',
@@ -216,15 +217,13 @@ export function OThongBao({ tone = 'cam', children, className = '' }: { tone?: '
 }
 
 // ---------------------------------------------------------------------------
-// <NutChinh> — nút hành động cao 56px, rộng hết bề ngang. chinh=nền --muc
-// đặc; phu=viền, nền trong suốt; nguyhiem=chữ/viền đỏ. Nhãn nút dùng --sans
-// (quy ước tokens.css: serif cho tiêu đề & nội dung học thuật, sans cho nhãn
-// nút/số liệu/mô tả) — thầy yêu cầu đồng bộ font 2026-09-02.
+// <NutChinh> — nút hành động chuẩn Google Pill Button.
+// chinh=viên thuốc Google Blue; phu=Google Tonal viền xám; nguyhiem=Google Red.
 // ---------------------------------------------------------------------------
 const NUT_CHINH_STYLE: Record<'chinh' | 'phu' | 'nguyhiem', React.CSSProperties> = {
-  chinh: { background: 'var(--muc)', color: 'var(--muc-nguoc)', border: '1px solid var(--muc)' },
-  phu: { background: 'transparent', color: 'var(--muc)', border: '1px solid var(--vien-dam)' },
-  nguyhiem: { background: 'transparent', color: 'var(--do)', border: '1px solid var(--do)' },
+  chinh: { background: 'var(--gg-xanh)', color: 'var(--giay)', border: '1px solid var(--gg-xanh)', boxShadow: 'var(--bong-1)' },
+  phu: { background: 'var(--the)', color: 'var(--muc)', border: '1px solid var(--vien-dam)' },
+  nguyhiem: { background: 'var(--the)', color: 'var(--gg-do)', border: '1px solid var(--gg-do)' },
 }
 
 export function NutChinh({
@@ -247,13 +246,13 @@ export function NutChinh({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`tap-target w-full font-bold disabled:opacity-40 disabled:cursor-not-allowed ${className}`}
+      className={`tap-target w-full font-bold shadow-xs hover:shadow-sm active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed ${className}`}
       style={{
-        height: 56,
-        borderRadius: 'var(--bo-1)',
+        height: 52,
+        borderRadius: 'var(--bo-tron)',
         fontFamily: 'var(--sans)',
         fontSize: 'var(--cx-2)',
-        transitionProperty: 'background-color, opacity',
+        transitionProperty: 'background-color, opacity, transform, box-shadow',
         transitionDuration: 'var(--nhanh)',
         ...NUT_CHINH_STYLE[variant],
       }}

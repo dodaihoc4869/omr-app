@@ -55,7 +55,7 @@ import ManGiuDeDoc from '../components/ManGiuDeDoc'
 import VanTay from '../components/VanTay'
 import TheCau from '../components/TheCau'
 import MaCaInput from '../components/MaCaInput'
-import LogoDDH from '../components/LogoDDH'
+import LogoHocSinh from '../components/LogoHocSinh'
 import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
 import { TriangleAlert, X, ArrowLeft, LayoutGrid } from 'lucide-react'
 import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
@@ -2316,8 +2316,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         <div className="w-full" style={{ maxWidth: 400 }}>
           <TheNoiDung>
             <div className="text-center" style={{ marginBottom: 'var(--k5)' }}>
-              <div className="flex justify-center" style={{ color: 'var(--muc)', marginBottom: 'var(--k3)' }}>
-                <LogoDDH size={40} />
+              <div className="flex justify-center" style={{ marginBottom: 'var(--k3)' }}>
+                <LogoHocSinh size={48} hienChu={false} />
               </div>
               <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>Có đúng em không?</div>
             </div>
@@ -2365,13 +2365,15 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         <div className="w-full" style={{ maxWidth: 400 }}>
           <TheNoiDung>
             <div className="text-center" style={{ marginBottom: 'var(--k6)' }}>
-              <div className="flex justify-center" style={{ color: 'var(--muc)', marginBottom: 'var(--k3)' }}>
-                <LogoDDH size={44} />
+              <div className="flex justify-center" style={{ marginBottom: 'var(--k3)' }}>
+                <LogoHocSinh size={54} hienChu={false} />
               </div>
-              <div className="font-bold" style={{ fontSize: 'var(--cx-5)', letterSpacing: '.28em', color: 'var(--muc)' }}>
+              <div className="font-bold tracking-tight text-slate-900 dark:text-white" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-5)' }}>
                 ĐỖ ĐẠI HỌC
               </div>
-              <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--mo)', letterSpacing: '.1em' }}>KIÊN TRÌ</div>
+              <div className="text-xs font-bold tracking-wider uppercase text-emerald-600 dark:text-emerald-400 mt-1" style={{ fontFamily: 'var(--sans)' }}>
+                Học Sinh · Phòng Thi Trực Tuyến
+              </div>
             </div>
             <div className="flex flex-col" style={{ gap: 'var(--k4)' }}>
               <div>
@@ -2513,8 +2515,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     return (
       <Trang className="flex items-center justify-center px-4">
         <div className="w-full text-center" style={{ maxWidth: 360 }}>
-          <div className="flex justify-center" style={{ color: 'var(--nhat)', marginBottom: 'var(--k5)' }}>
-            <LogoDDH size={40} />
+          <div className="flex justify-center" style={{ marginBottom: 'var(--k5)' }}>
+            <LogoHocSinh size={48} hienChu={false} />
           </div>
           <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', color: 'var(--muc)' }}>
             Đang chờ Thầy bấm bắt đầu

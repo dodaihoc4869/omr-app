@@ -13,7 +13,7 @@
 // nhìn thấy.
 import { useEffect, useState } from 'react'
 import { Eye, EyeOff, KeyRound, Loader2 } from 'lucide-react'
-import LogoDDH from '../components/LogoDDH'
+import LogoGiaoVien from '../components/LogoGiaoVien'
 import { NutChinh, OThongBao, TheNoiDung } from '../components/DesignSystem'
 import { batKhoaApp, loadTeacherSecret, saveKhoaApp } from '../lib/exam-db'
 import { LOI_SAI_MAT_KHAU, TOI_THIEU_KY_TU, conChoGiay, datMatKhau, hopLeMatKhau, moKhoa, sauKhiDung, sauKhiSai, type BanGhiKhoa } from '../lib/khoa-app'
@@ -22,11 +22,11 @@ const NHAN: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--
 const O_NHAP: React.CSSProperties = {
   height: 52,
   width: '100%',
-  borderRadius: 'var(--bo-1)',
+  borderRadius: 'var(--bo-2)',
   padding: '0 var(--k4)',
-  background: 'var(--the-2)',
-  border: '1.5px solid transparent',
-  fontFamily: 'var(--serif)',
+  background: 'var(--the)',
+  border: '1.5px solid var(--vien-dam)',
+  fontFamily: 'var(--sans)',
   fontSize: 'var(--cx-3)',
   color: 'var(--muc)',
   outline: 'none',
@@ -165,12 +165,15 @@ export default function KhoaAppScreen({ pha, banGhi, onMoDuoc }: KhoaAppScreenPr
     <div className="min-h-screen flex items-center justify-center px-4 py-8" style={{ background: 'var(--nen)', color: 'var(--muc)', fontFamily: 'var(--serif)' }}>
       <div className="w-full" style={{ maxWidth: 400 }}>
         <TheNoiDung>
-          <div className="text-center" style={{ marginBottom: 'var(--k6)' }}>
-            <div className="flex justify-center" style={{ color: 'var(--muc)', marginBottom: 'var(--k3)' }}>
-              <LogoDDH size={44} />
+          <div className="text-center" style={{ marginBottom: 'var(--k5)' }}>
+            <div className="flex justify-center" style={{ marginBottom: 'var(--k3)' }}>
+              <LogoGiaoVien size={52} hienChu={false} />
             </div>
-            <div className="font-bold" style={{ fontSize: 'var(--cx-5)', letterSpacing: '.28em' }}>
+            <div className="font-bold tracking-tight text-slate-900 dark:text-white" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-5)' }}>
               ĐỖ ĐẠI HỌC
+            </div>
+            <div className="text-xs font-bold tracking-wider uppercase text-blue-600 dark:text-blue-400 mt-1" style={{ fontFamily: 'var(--sans)' }}>
+              Giáo Viên · Mở Khoá Thiết Bị
             </div>
           </div>
 

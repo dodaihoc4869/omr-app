@@ -26,10 +26,22 @@ function TheChinh({ icon, nhan, title, sub, onClick }: { icon: ReactNode; nhan: 
 
 /** Ô vuông trong lưới ba việc còn lại. Chữ phụ MỘT DÒNG ngắn: thẻ nào cũng ba
  * dòng mô tả thì thầy phải đọc hết mới biết bấm cái nào. */
-function OBam({ icon, title, sub, onClick }: { icon: ReactNode; title: string; sub: string; onClick: () => void }) {
+function OBam({
+  icon,
+  title,
+  sub,
+  onClick,
+  iconStyle,
+}: {
+  icon: ReactNode
+  title: string
+  sub: string
+  onClick: () => void
+  iconStyle?: React.CSSProperties
+}) {
   return (
     <button type="button" onClick={onClick} className="hub-o tap-target">
-      <span className="hub-o-icon shrink-0">{icon}</span>
+      <span className="hub-o-icon shrink-0" style={iconStyle}>{icon}</span>
       <span className="hub-o-ten font-bold">{title}</span>
       <span className="hub-o-phu">{sub}</span>
     </button>
@@ -120,21 +132,21 @@ function NutCapNhat() {
       type="button"
       onClick={() => void capNhat()}
       disabled={dang}
-      className="tap-target inline-flex items-center font-bold"
+      className="tap-target inline-flex items-center font-bold shadow-xs hover:shadow-sm"
       style={{
         gap: 6,
-        minHeight: 32,
+        minHeight: 34,
         padding: '0 var(--k3)',
         borderRadius: 'var(--bo-tron)',
-        border: '1px solid var(--vien)',
-        background: 'transparent',
-        color: 'var(--nhat)',
+        border: '1px solid var(--gg-xanh)',
+        background: 'var(--gg-xanh-nen)',
+        color: 'var(--gg-xanh)',
         fontFamily: 'var(--sans)',
         fontSize: 'var(--cx-1)',
       }}
     >
       <RefreshCw size={13} className={dang ? 'animate-spin' : undefined} />
-      {dang ? 'Đang lấy…' : 'Lấy bản mới'}
+      {dang ? 'Đang lấy…' : 'Lấy bản mới ngay'}
     </button>
   )
 }
@@ -170,12 +182,36 @@ export default function ExamHubScreen() {
       />
 
       <div className="hub-luoi">
-        <OBam icon={<ClipboardList size={20} />} title="Ca thi" sub="Ai đã nộp, điểm, cho thi lại, xuất bảng điểm" onClick={() => setScreen('lichsuca')} />
-        <OBam icon={<Library size={20} />} title="Ngân hàng câu hỏi" sub="Đề về từ kho · duyệt câu nghi đáp án" onClick={() => setScreen('nganhangde')} />
-        <OBam icon={<Presentation size={20} />} title="Gọi lên bảng" sub="Máy chọn câu đúng chỗ em yếu nhất" onClick={() => setScreen('goilenbang')} />
+        <OBam
+          icon={<ClipboardList size={22} />}
+          iconStyle={{ background: 'var(--gg-luc-nen)', color: 'var(--gg-luc)' }}
+          title="Ca thi"
+          sub="Ai đã nộp, điểm, cho thi lại, xuất bảng điểm"
+          onClick={() => setScreen('lichsuca')}
+        />
+        <OBam
+          icon={<Library size={22} />}
+          iconStyle={{ background: 'var(--gg-xanh-nen)', color: 'var(--gg-xanh)' }}
+          title="Ngân hàng câu hỏi"
+          sub="Đề về từ kho · duyệt câu nghi đáp án"
+          onClick={() => setScreen('nganhangde')}
+        />
+        <OBam
+          icon={<Presentation size={22} />}
+          iconStyle={{ background: 'var(--gg-vang-nen)', color: 'var(--cam)' }}
+          title="Gọi lên bảng"
+          sub="Máy chọn câu đúng chỗ em yếu nhất"
+          onClick={() => setScreen('goilenbang')}
+        />
         {/* HỌC SINH HỎI (thầy chốt 06/09): trước đó câu hỏi nằm lẫn trong Chi
             tiết ca, thầy phải nhớ ca nào mới mở đúng chỗ. Nay một ô ở đây. */}
-        <OBam icon={<MessageCircleQuestion size={20} />} title="Học sinh hỏi" sub="Ca nào có em chờ Thầy chữa" onClick={() => setScreen('cauhoi')} />
+        <OBam
+          icon={<MessageCircleQuestion size={22} />}
+          iconStyle={{ background: 'var(--gg-do-nen)', color: 'var(--gg-do)' }}
+          title="Học sinh hỏi"
+          sub="Ca nào có em chờ Thầy chữa"
+          onClick={() => setScreen('cauhoi')}
+        />
       </div>
       {/* ĐỢT 0 của BAOMATCATHI.md: trang đo, KHÔNG khoá ai. Thầy chụp thử trên
           máy thật để chấm điểm từng kênh; kênh nào đạt chuẩn mới được bật khoá. */}
@@ -193,7 +229,12 @@ export default function ExamHubScreen() {
           bị icon tin nhắn (kéo thả được, hay nằm giữa dưới) đè lên.
           Kèm nút ép cập nhật — xem NutCapNhat bên dưới. */}
       <div className="flex items-center flex-wrap" style={{ gap: 'var(--k3)', marginTop: 'var(--k2)' }}>
-        <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>Bản {PHIEN_BAN_APP}</span>
+        <span
+          className="inline-flex items-center px-3 py-1 font-semibold rounded-full text-xs"
+          style={{ background: 'var(--the)', border: '1px solid var(--vien)', color: 'var(--nhat)' }}
+        >
+          Google Material 3 · Bản {PHIEN_BAN_APP}
+        </span>
         <NutCapNhat />
       </div>
     </div>

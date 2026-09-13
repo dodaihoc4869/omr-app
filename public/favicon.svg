@@ -1,21 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="nen" x1="0.08" y1="0" x2="0.92" y2="1">
-      <stop offset="0" stop-color="#4f46e5"/>
-      <stop offset="0.52" stop-color="#6366f1"/>
-      <stop offset="1" stop-color="#10b981"/>
-    </linearGradient>
-    <linearGradient id="bong" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ffffff" stop-opacity="0.24"/>
-      <stop offset="0.58" stop-color="#ffffff" stop-opacity="0"/>
-    </linearGradient>
+    <filter id="bong" x="-10%" y="-10%" width="125%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="12" stdDeviation="24" flood-color="#1a2332" flood-opacity="0.14" />
+    </filter>
   </defs>
-  <rect width="512" height="512" rx="118" fill="url(#nen)"/>
-  <rect width="512" height="512" rx="118" fill="url(#bong)"/>
-  <g transform="translate(61.0,56.3) scale(0.78)">
-    <polygon points="364,101 405.8,60.3 405.8,451.7 364,421.3" fill="#ffffff"/>
-    <polyline points="405.8,60.3 219.6,240.8 364,305.4" fill="none" stroke="#ffffff" stroke-width="40"
-              stroke-linejoin="round" stroke-linecap="round"/>
-    <line x1="170" y1="292" x2="96" y2="364"
-          stroke="#a7f3d0" stroke-width="40" stroke-linecap="round"/></g>
+  <!-- Nền Squircle trắng tinh khiết Google Surface -->
+  <rect x="24" y="24" width="464" height="464" rx="116" fill="#ffffff" filter="url(#bong)" />
+  <rect x="24" y="24" width="464" height="464" rx="116" fill="none" stroke="#e8eaed" stroke-width="6" />
+
+  <!-- Biểu tượng 4 màu Google: Trang sách tri thức & Bong bóng OMR chuẩn xác -->
+  <g transform="translate(48, 48) scale(0.8125)">
+    <!-- Bong bóng xanh dương (Google Blue): OMR chấm thi -->
+    <circle cx="150" cy="150" r="54" fill="#1a73e8" />
+    <!-- Bong bóng đỏ (Google Red) -->
+    <circle cx="362" cy="150" r="54" fill="#ea4335" />
+    <!-- Bong bóng vàng (Google Amber) -->
+    <circle cx="150" cy="362" r="54" fill="#fbbc04" />
+    <!-- Bong bóng xanh lục (Google Green) -->
+    <circle cx="362" cy="362" r="54" fill="#34a853" />
+
+    <!-- Chữ A Avogadro & Con đường đỗ đại học cách điệu ở tâm -->
+    <path d="M 256 110 L 320 280 L 290 280 L 256 186 L 222 280 L 192 280 Z" fill="#1a2332" />
+    <!-- Thanh ngang liên kết 4 màu Google tạo thành chiếc mũ cử nhân / nhịp tiến bộ -->
+    <rect x="180" y="296" width="152" height="24" rx="12" fill="#1a73e8" />
+    <circle cx="256" cy="370" r="28" fill="#34a853" />
+  </g>
 </svg>

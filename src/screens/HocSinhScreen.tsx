@@ -24,10 +24,11 @@ const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric:
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const O_NHAP: React.CSSProperties = {
   height: 48,
-  borderRadius: 'var(--bo-1)',
-  padding: '0 var(--k4) 0 44px',
-  background: 'var(--the-2)',
-  border: '1.5px solid transparent',
+  borderRadius: 'var(--bo-tron)',
+  padding: '0 var(--k4) 0 46px',
+  background: 'var(--the)',
+  border: '1px solid var(--vien-dam)',
+  boxShadow: 'var(--bong-1)',
   fontFamily: 'var(--sans)',
   fontSize: 'var(--cx-2)',
   color: 'var(--muc)',
@@ -335,8 +336,8 @@ export default function HocSinhScreen() {
             type="button"
             onClick={tai}
             disabled={dangTai}
-            className="tap-target shrink-0 flex items-center justify-center"
-            style={{ width: 48, height: 48, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)' }}
+            className="tap-target shrink-0 flex items-center justify-center shadow-xs transition-all"
+            style={{ width: 48, height: 48, borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien)', background: 'var(--the)', color: 'var(--muc)' }}
             aria-label="Tải lại"
             title="Tải lại"
           >
@@ -352,15 +353,16 @@ export default function HocSinhScreen() {
                 key={k ?? 'tat_ca'}
                 type="button"
                 onClick={() => setKhoiLoc(k)}
-                className="tap-target font-bold"
+                className="tap-target font-bold shadow-xs transition-all"
                 style={{
                   ...SO,
                   fontSize: 'var(--cx-1)',
                   minHeight: 36,
-                  padding: '0 var(--k3)',
+                  padding: '0 var(--k4)',
                   borderRadius: 'var(--bo-tron)',
-                  background: chon ? 'var(--muc)' : 'var(--the-2)',
-                  color: chon ? 'var(--muc-nguoc)' : 'var(--nhat)',
+                  border: chon ? '1px solid var(--gg-xanh)' : '1px solid var(--vien)',
+                  background: chon ? 'var(--gg-xanh)' : 'var(--the)',
+                  color: chon ? 'var(--giay)' : 'var(--nhat)',
                 }}
               >
                 {k === null ? 'Tất cả' : `Khối ${k}`}

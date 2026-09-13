@@ -22,10 +22,10 @@ import { useAppStore } from '../store/appStore'
 
 const O_NHAP: React.CSSProperties = {
   height: 52,
-  borderRadius: 'var(--bo-1)',
+  borderRadius: 'var(--bo-2)',
   padding: '0 var(--k4)',
-  background: 'var(--the-2)',
-  border: '1.5px solid transparent',
+  background: 'var(--the)',
+  border: '1.5px solid var(--vien-dam)',
   fontFamily: 'var(--sans)',
   fontSize: 'var(--cx-2)',
   color: 'var(--muc)',

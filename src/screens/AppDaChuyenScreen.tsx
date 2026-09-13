@@ -6,7 +6,7 @@
 // link đó rơi thẳng vào app QUẢN LÝ của thầy — đúng lỗi thầy đã báo.
 //
 // Màn này là ngõ cụt cố ý: không nút nào dẫn tiếp vào app thầy.
-import LogoDDH from '../components/LogoDDH'
+import LogoApp from '../components/LogoApp'
 
 export default function AppDaChuyenScreen() {
   return (
@@ -14,7 +14,7 @@ export default function AppDaChuyenScreen() {
       className="min-h-screen flex flex-col items-center justify-center text-center"
       style={{ background: 'var(--nen)', color: 'var(--muc)', padding: 'var(--k6) var(--k5)', gap: 'var(--k4)' }}
     >
-      <LogoDDH size={56} />
+      <LogoApp vai="hocsinh" size={56} />
       <h1 className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-5)' }}>
         Link này đã ngừng dùng
       </h1>
