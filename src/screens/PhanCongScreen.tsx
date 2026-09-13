@@ -40,20 +40,38 @@ function gioVN(iso: string): string {
 export default function PhanCongScreen() {
   const [the, setThe] = useState<'btvn' | 'lenbang'>('btvn')
   return (
-    <div style={{ display: 'grid', gap: 'var(--k3)' }}>
-      <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
-        <NutChinh variant={the === 'btvn' ? undefined : 'phu'} onClick={() => setThe('btvn')}>
-          <span className="inline-flex items-center gap-2">
-            <ClipboardList size={18} /> Giao bài tập về nhà
-          </span>
-        </NutChinh>
-        <NutChinh variant={the === 'lenbang' ? undefined : 'phu'} onClick={() => setThe('lenbang')}>
-          <span className="inline-flex items-center gap-2">
-            <Presentation size={18} /> Gọi lên bảng
-          </span>
-        </NutChinh>
+    <div className="w-full max-w-full overflow-x-hidden min-w-0" style={{ fontFamily: 'var(--sans)', color: 'var(--muc)' }}>
+      <div className="px-3 sm:px-4 pt-4">
+        <div className="grid grid-cols-2 gap-2 w-full max-w-full">
+          <NutChinh
+            variant={the === 'btvn' ? undefined : 'phu'}
+            onClick={() => setThe('btvn')}
+            className="!h-11 sm:!h-13"
+          >
+            <span className="inline-flex items-center justify-center gap-1.5 sm:gap-2 truncate text-xs sm:text-sm md:text-base font-bold">
+              <ClipboardList size={16} className="shrink-0" />
+              <span className="truncate">Giao bài tập về nhà</span>
+            </span>
+          </NutChinh>
+          <NutChinh
+            variant={the === 'lenbang' ? undefined : 'phu'}
+            onClick={() => setThe('lenbang')}
+            className="!h-11 sm:!h-13"
+          >
+            <span className="inline-flex items-center justify-center gap-1.5 sm:gap-2 truncate text-xs sm:text-sm md:text-base font-bold">
+              <Presentation size={16} className="shrink-0" />
+              <span className="truncate">Gọi lên bảng</span>
+            </span>
+          </NutChinh>
+        </div>
       </div>
-      {the === 'btvn' ? <TheGiaoBtvn /> : <GoiLenBangScreen />}
+      {the === 'btvn' ? (
+        <div className="min-h-screen pb-28 px-3 sm:px-4 pt-3 flex flex-col w-full max-w-full min-w-0" style={{ gap: 'var(--k3)' }}>
+          <TheGiaoBtvn />
+        </div>
+      ) : (
+        <GoiLenBangScreen />
+      )}
     </div>
   )
 }
@@ -328,9 +346,9 @@ function TheGiaoBtvn() {
   }
 
   return (
-    <div style={{ display: 'grid', gap: 'var(--k3)' }}>
-      <TheNoiDung>
-        <div style={{ display: 'grid', gap: 'var(--k3)' }}>
+    <div className="w-full max-w-full min-w-0 flex flex-col" style={{ gap: 'var(--k3)' }}>
+      <TheNoiDung className="w-full max-w-full overflow-hidden">
+        <div className="w-full max-w-full min-w-0 flex flex-col" style={{ gap: 'var(--k3)' }}>
           {/* LỰA CHỌN HÌNH THỨC GIAO BÀI */}
           <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k1)' }}>
             <span style={{ ...NHAN_NHO, fontWeight: 600, color: 'var(--muc)' }}>Hình thức giao:</span>
@@ -643,25 +661,27 @@ function TheGiaoBtvn() {
             </div>
 
             {/* HÀNG LỌC NHÓM — dùng chung với màn Mở ca, một dòng vuốt ngang. */}
-            <div style={{ marginBottom: 'var(--k2)' }}>
+            <div className="w-full max-w-full min-w-0 overflow-x-auto" style={{ marginBottom: 'var(--k2)' }}>
               <HangNhomDe ds={dsNhom} chon={nhomLoc} onChon={setNhomLoc} />
             </div>
 
             {/* ĐÚNG HỘP CHỌN ĐỀ CỦA MÀN MỞ CA — lồng nguyên, không chép lại. Sửa
                 một chỗ thì ba màn (Mở ca · Gọi lên bảng · Giao bài tập) đổi theo. */}
-            <HopChonDe
-              ds={dsDeTach}
-              daChon={daChon}
-              onChon={(ma) => {
-                const m = new Set(daChon)
-                if (m.has(ma)) m.delete(ma)
-                else m.add(ma)
-                setDaChon(m)
-              }}
-              nhomLoc={nhomLoc}
-              chonNhieu
-              onChonTatCa={(ma) => setDaChon(new Set(ma))}
-            />
+            <div className="w-full max-w-full min-w-0 overflow-hidden">
+              <HopChonDe
+                ds={dsDeTach}
+                daChon={daChon}
+                onChon={(ma) => {
+                  const m = new Set(daChon)
+                  if (m.has(ma)) m.delete(ma)
+                  else m.add(ma)
+                  setDaChon(m)
+                }}
+                nhomLoc={nhomLoc}
+                chonNhieu
+                onChonTatCa={(ma) => setDaChon(new Set(ma))}
+              />
+            </div>
 
             {soChuaChuyen > 0 && (
               <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
