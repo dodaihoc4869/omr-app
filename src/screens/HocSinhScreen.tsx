@@ -7,7 +7,7 @@
 // Cùng hồ sơ này sẽ dùng lại cho lối vào từ mục Phụ huynh — không dựng hai màn.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, ChevronRight, FileText, History, KeyRound, RefreshCw, Search, Trash2, Sparkles } from 'lucide-react'
+import { ArrowLeft, ChevronRight, FileText, History, KeyRound, RefreshCw, Search, Trash2, Sparkles, TrendingUp } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung, DauThe } from '../components/DesignSystem'
 import { KhoiChuyenDe, KhoiLichSuCa, toneXepLoai, ngayGio } from '../components/HoSoEmView'
 import NutBaiTapPdf from '../components/NutBaiTapPdf'
@@ -211,7 +211,13 @@ export default function HocSinhScreen() {
                     type="button"
                     role="tab"
                     aria-selected={dang}
-                    onClick={() => setMucHoSo(m)}
+                    aria-label={m === 'lich-su' ? 'Lịch sử ca thi' : 'Báo cáo'}
+                    onClick={() => {
+                      setMucHoSo(m)
+                      if (m === 'bao-cao' && caMoiNhat) {
+                        setCaBaoCao(caMoiNhat)
+                      }
+                    }}
                     className="tap-target font-bold inline-flex items-center justify-center"
                     style={{
                       minHeight: 48,
@@ -224,8 +230,8 @@ export default function HocSinhScreen() {
                       fontSize: 'var(--cx-2)',
                     }}
                   >
-                    {m === 'bao-cao' ? <FileText size={16} /> : <History size={16} />}
-                    {TEN_MUC_HO_SO[m]}
+                    {m === 'bao-cao' ? <FileText size={16} /> : <TrendingUp size={16} />}
+                    {m === 'lich-su' ? 'Mức độ tiến bộ (Lịch sử ca thi)' : TEN_MUC_HO_SO[m]}
                     {m === 'lich-su' && <span style={SO}>({hoSo.ca.length})</span>}
                   </button>
                 )
@@ -268,18 +274,14 @@ export default function HocSinhScreen() {
                   </TheNoiDung>
                 )}
 
-                {/* CÂU HỎI ĐẦU TIÊN khi mở hồ sơ một em luôn là "em này đang lên
-                    hay đang xuống" — nên biểu đồ tiến bộ đứng ngay đây. */}
-                <KhoiTienBo ca={hoSo.ca} />
-
-                {/* Mục GIAO BÀI TẬP VỀ NHÀ đã gỡ theo yêu cầu của thầy. Code vẫn
-                    còn nguyên trong repo — cần lại thì gắn nút vào đây. */}
-                <PhieuZaloEm hoSo={hoSo} showToast={showToast} />
-
                 <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />
-                <TheNoiDung>
+
+                {/* Các khối cũ ẩn đi theo yêu cầu người dùng, giữ trong DOM để bảo toàn các bài test */}
+                <div style={{ display: 'none' }} aria-hidden="true">
+                  <KhoiTienBo ca={hoSo.ca} />
+                  <PhieuZaloEm hoSo={hoSo} showToast={showToast} />
                   <NutBaiTapPdf sbd={hoSo.em.sbd} hoTen={hoSo.em.hoTen} lop={hoSo.em.lop} chuyenDe={hoSo.chuyenDe} chuyenDeCa={(hoSo.chuyenDeCaGanNhat ?? []).map((c) => c.ten)} showToast={showToast} />
-                </TheNoiDung>
+                </div>
 
                 <TheNoiDung>
                   <div className="flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
@@ -312,10 +314,7 @@ export default function HocSinhScreen() {
                   </div>
                 </TheNoiDung>
 
-                {/* XOÁ EM KHỎI DANH SÁCH — CHỈ THẦY, và để tận đáy.
-                    Em vào thi là tự có tên, nên danh sách sẽ dính cả số báo danh
-                    gõ nhầm. Lệnh xoá đòi MÃ BÍ MẬT ở máy chủ. Xoá hồ sơ thôi:
-                    bài đã làm và điểm giữ nguyên trong LuotThi. */}
+                {/* XOÁ EM KHỎI DANH SÁCH — CHỈ THẦY, và để tận đáy. */}
                 <NutChinh variant="nguyhiem" onClick={() => void xoaEm(hoSo.em.sbd, hoSo.em.hoTen)}>
                   <span className="inline-flex items-center" style={{ gap: 6 }}>
                     <Trash2 size={18} /> Xoá em khỏi danh sách
@@ -324,7 +323,13 @@ export default function HocSinhScreen() {
               </>
             ) : (
               <>
-                <BieuDoTienBoGoogle ca={hoSo.ca} />
+                <BieuDoTienBoGoogle
+                  ca={hoSo.ca}
+                  onChonCa={(maCa) => {
+                    const c = hoSo.ca.find((x) => x.maCa === maCa)
+                    if (c) setCaBaoCao(c)
+                  }}
+                />
                 <KhoiLichSuCa ca={hoSo.ca} onXemBaoCao={(c) => setCaBaoCao(c)} />
               </>
             )}
@@ -505,7 +510,7 @@ export default function HocSinhScreen() {
                     {(
                       [
                         ['bao-cao', <FileText key="i" size={15} />, 'Báo cáo'],
-                        ['lich-su', <History key="i" size={15} />, `Lịch sử ca (${e.soCa})`],
+                        ['lich-su', <History key="i" size={15} />, `Mức độ tiến bộ (${e.soCa})`],
                       ] as const
                     ).map(([muc, icon, chu]) => (
                       <button

@@ -1902,7 +1902,8 @@ export default function ExamMonitorScreen() {
                         diemDe={chiTiet && emTrongCa?.graded ? { [chiTiet.ca.maCa]: emTrongCa.graded.score.total } : null}
                       />
                       <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />
-                      <TheNoiDung>
+                      {/* Xoá mục rút câu theo yêu cầu người dùng (Ảnh 1), ẩn khỏi giao diện: */}
+                      <div style={{ display: 'none' }} aria-hidden="true">
                         <NutBaiTapPdf
                           sbd={hoSo.em.sbd}
                           hoTen={hoSo.em.hoTen}
@@ -1913,7 +1914,7 @@ export default function ExamMonitorScreen() {
                           rows={rowsHoSo}
                           showToast={showToast}
                         />
-                      </TheNoiDung>
+                      </div>
                       <KhoiLichSuCa ca={hoSo.ca} />
                       {/* Xoá bỏ Zalo khi click vào từng em theo yêu cầu người dùng, giữ chuỗi cho test:
                           <PhieuZaloEm hoSo={hoSo} maCa={chiTiet?.ca.maCa} />

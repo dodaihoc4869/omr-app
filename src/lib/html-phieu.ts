@@ -433,6 +433,7 @@ body.co-lam .tf-item { padding: 9px 10px; }
 .q-card.mo .q-nut-giai .chu-dong, .nut.dang-mo-het .chu-dong { display: inline; }
 
 /* ================= THẺ CÂU ================= */
+.ds-tieu-de { font-size: 16px; font-weight: 800; margin: 18px 0 14px; color: var(--muc); letter-spacing: .02em; }
 .ds-cau { display: flex; flex-direction: column; gap: 14px; }
 
 /* Chừa đúng chiều cao thanh dính khi cuộn thẻ vào tầm nhìn, không thì đầu thẻ
@@ -1878,6 +1879,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   ${thanhHtml(coGiai, anGiai)}
   ${nop ? thanhNopHtml(cau.length) : ''}
   ${khoaGiai ? '<div class="giai-khoa" id="giai-khoa">Lời giải mở ra ngay sau khi em bấm Nộp bài.</div>' : ''}
+  ${!anGiai ? '<div class="ds-tieu-de">LỜI GIẢI CHI TIẾT TỪNG CÂU THEO CHUẨN HOÁ HỌC:</div>' : ''}
   <div class="ds-cau">${the}</div>
   <div class="chan">Thầy Đỗ Đại Học · ${thoat(t.tenChuyenDe)} · ${ngayVN(t.ngay)}<span class="chi-man"><br>${huongDan}</span></div>
 </div>`

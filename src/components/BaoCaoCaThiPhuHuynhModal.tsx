@@ -12,14 +12,12 @@ import {
   BarChart3,
   Brain,
   Sparkles,
-  MessageSquare,
   Heart,
   RefreshCw,
-  ExternalLink,
   Layers,
   Zap,
 } from 'lucide-react'
-import { hsCauSaiApi, layPhieu } from '../lib/exam-api'
+import { hsCauSaiApi } from '../lib/exam-api'
 import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
 import ModalKhacPhucCauSai from './ModalKhacPhucCauSai'
 
@@ -59,13 +57,12 @@ export default function BaoCaoCaThiPhuHuynhModal({
   scriptUrl,
   onClose,
   onGiaoBaiChoCon,
-  onNhanTinChoThay,
-  onXemPhieuGoc,
+  onNhanTinChoThay: _onNhanTinChoThay,
+  onXemPhieuGoc: _onXemPhieuGoc,
 }: Props) {
   const [dsCauSai, setDsCauSai] = useState<any[]>([])
   const [dangTaiCauSai, setDangTaiCauSai] = useState(false)
   const [tabPhanTich, setTabPhanTich] = useState<'tong_quan' | 'cau_truc' | 'nhan_thuc' | 'cau_sai'>('tong_quan')
-  const [dangTaiPhieuGoc, setDangTaiPhieuGoc] = useState(false)
   const [hienModalKhacPhuc, setHienModalKhacPhuc] = useState(false)
 
   // Tải danh sách chi tiết các câu con làm sai trong ca này
@@ -205,26 +202,6 @@ export default function BaoCaoCaThiPhuHuynhModal({
       viecCanLam: 'Tạo bài tập 10-15 câu mỗi ngày từ các câu con sai để lấp lỗ hổng kiến thức từng bước một.',
     }
   }, [diem, hoTenCon])
-
-  // Mở phiếu bài làm gốc nếu có
-  const xuLyXemPhieuGoc = async () => {
-    if (!baiThi.maCa || !scriptUrl) return
-    setDangTaiPhieuGoc(true)
-    try {
-      const p = await layPhieu(scriptUrl, `${baiThi.maCa}_${sbd}`)
-      if (p && onXemPhieuGoc) {
-        onClose()
-      } else if (baiThi.linkBaoCao) {
-        window.open(baiThi.linkBaoCao, '_blank')
-      } else {
-        alert('Đang đồng bộ phiếu làm bài chi tiết lên hệ thống...')
-      }
-    } catch {
-      if (baiThi.linkBaoCao) window.open(baiThi.linkBaoCao, '_blank')
-    } finally {
-      setDangTaiPhieuGoc(false)
-    }
-  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/70 backdrop-blur-md overflow-y-auto animate-google-fade">
@@ -729,45 +706,20 @@ export default function BaoCaoCaThiPhuHuynhModal({
         </div>
 
         {/* MODAL FOOTER ACTIONS */}
-        <footer className="p-4 sm:p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/90 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            {/* Nút 1: Nhắn tin cho Thầy về ca này */}
-            <button
-              type="button"
-              onClick={() => {
-                onClose()
-                onNhanTinChoThay(`Kính gửi Thầy Đỗ Đại Học, phụ huynh em ${hoTenCon} (SBD: ${sbd}) vừa xem báo cáo ca thi #${baiThi.maCa} ("${baiThi.tenCa}", đạt ${diem}đ). Nhờ Thầy tư vấn thêm về hướng ôn tập cho con ạ!`)
-              }}
-              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-full border border-slate-300 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer"
-            >
-              <MessageSquare size={15} className="text-blue-600" />
-              <span>Nhắn tin cho Thầy</span>
-            </button>
+        <footer className="p-4 sm:p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/90 flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-5 py-2.5 rounded-full border border-slate-300 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold transition cursor-pointer"
+          >
+            Đóng
+          </button>
 
-            {/* Nút 2: Xem phiếu bài làm gốc */}
-            {(baiThi.linkBaoCao || scriptUrl) && (
-              <button
-                type="button"
-                onClick={xuLyXemPhieuGoc}
-                disabled={dangTaiPhieuGoc}
-                className="px-4 py-2.5 rounded-full border border-slate-300 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer"
-                title="Xem phiếu làm bài HTML"
-              >
-                {dangTaiPhieuGoc ? (
-                  <RefreshCw size={14} className="animate-spin" />
-                ) : (
-                  <ExternalLink size={14} />
-                )}
-                <span>Xem phiếu chi tiết</span>
-              </button>
-            )}
-          </div>
-
-          {/* Nút 3: Tạo ngay bài tập khắc phục cho con */}
+          {/* Nút: Tạo ngay bài tập khắc phục cho con */}
           <button
             type="button"
             onClick={() => setHienModalKhacPhuc(true)}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer"
+            className="px-6 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer"
           >
             <Heart size={16} />
             <span>Tạo bài luyện khắc phục cho con (Hạn 2h)</span>
