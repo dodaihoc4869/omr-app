@@ -336,7 +336,7 @@ export default function HocSinhScreen() {
             type="button"
             onClick={tai}
             disabled={dangTai}
-            className="tap-target shrink-0 flex items-center justify-center shadow-xs transition-all"
+            className="tap-target shrink-0 flex items-center justify-center shadow-xs transition-all active:scale-95 hover:scale-105 cursor-pointer disabled:cursor-not-allowed"
             style={{ width: 48, height: 48, borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien)', background: 'var(--the)', color: 'var(--muc)' }}
             aria-label="Tải lại"
             title="Tải lại"
@@ -353,7 +353,7 @@ export default function HocSinhScreen() {
                 key={k ?? 'tat_ca'}
                 type="button"
                 onClick={() => setKhoiLoc(k)}
-                className="tap-target font-bold shadow-xs transition-all"
+                className="tap-target font-bold shadow-xs transition-all active:scale-95 hover:-translate-y-0.5 cursor-pointer"
                 style={{
                   ...SO,
                   fontSize: 'var(--cx-1)',
@@ -446,7 +446,7 @@ export default function HocSinhScreen() {
                         type="button"
                         onClick={() => moHoSo(e.sbd, muc)}
                         aria-label={`${TEN_MUC_HO_SO[muc]} của ${e.hoTen || `SBD ${e.sbd}`}`}
-                        className="tap-target inline-flex items-center justify-center font-bold"
+                        className="tap-target inline-flex items-center justify-center font-bold active:scale-[0.98] hover:-translate-y-0.5 transition-all shadow-xs cursor-pointer"
                         style={{
                           minHeight: 44,
                           gap: 6,

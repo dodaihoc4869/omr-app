@@ -246,14 +246,12 @@ export function NutChinh({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`tap-target w-full font-bold shadow-xs hover:shadow-sm active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed ${className}`}
+      className={`tap-target w-full font-bold flex items-center justify-center gap-2 select-none active:scale-[0.98] hover:-translate-y-0.5 disabled:hover:translate-y-0 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150 ${className}`}
       style={{
         height: 52,
         borderRadius: 'var(--bo-tron)',
         fontFamily: 'var(--sans)',
         fontSize: 'var(--cx-2)',
-        transitionProperty: 'background-color, opacity, transform, box-shadow',
-        transitionDuration: 'var(--nhanh)',
         ...NUT_CHINH_STYLE[variant],
       }}
     >

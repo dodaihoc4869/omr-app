@@ -723,3 +723,195 @@ html[data-giu-de-an] [data-giu-de-phu] {
     transform: none;
   }
 }
+
+/* ==========================================================================
+   GOOGLE MATERIAL 3 ANIMATIONS & BUTTON UTILITIES
+   ========================================================================== */
+
+/* Keyframes chuyển động mượt mà chuẩn Google */
+@keyframes google-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes google-pop {
+  0% {
+    transform: scale(0.94);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-google-fade {
+  animation: google-fade-in-up 240ms cubic-bezier(0.05, 0.7, 0.1, 1) forwards;
+}
+
+.animate-google-pop {
+  animation: google-pop 200ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Nút bấm chuẩn Google Material 3: Filled / Primary Button */
+.btn-google-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--k2);
+  border-radius: var(--bo-tron);
+  background: var(--gg-xanh);
+  color: var(--giay);
+  font-family: var(--sans);
+  font-weight: 700;
+  border: 1px solid var(--gg-xanh);
+  box-shadow: 0 1px 3px rgba(26, 115, 232, 0.28);
+  transition:
+    transform 160ms cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 160ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 160ms ease,
+    opacity 160ms ease;
+  user-select: none;
+}
+
+.btn-google-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 115, 232, 0.35);
+  filter: brightness(1.03);
+}
+
+.btn-google-primary:active:not(:disabled) {
+  transform: scale(0.975);
+  box-shadow: 0 1px 2px rgba(26, 115, 232, 0.2);
+  filter: brightness(0.97);
+}
+
+/* Nút bấm Tonal / Elevated: Nền pastel Google */
+.btn-google-tonal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--k2);
+  border-radius: var(--bo-tron);
+  background: var(--gg-xanh-nen);
+  color: var(--gg-xanh);
+  font-family: var(--sans);
+  font-weight: 700;
+  border: 1px solid transparent;
+  transition:
+    transform 160ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+  user-select: none;
+}
+
+.btn-google-tonal:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--bong-1);
+  filter: brightness(0.97);
+}
+
+.btn-google-tonal:active:not(:disabled) {
+  transform: scale(0.975);
+}
+
+/* Nút bấm Outlined: Viền mỏng thanh lịch */
+.btn-google-outlined {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--k2);
+  border-radius: var(--bo-tron);
+  background: var(--the);
+  color: var(--muc);
+  font-family: var(--sans);
+  font-weight: 600;
+  border: 1px solid var(--vien-dam);
+  transition:
+    transform 160ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+  user-select: none;
+}
+
+.btn-google-outlined:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: var(--the-2);
+  border-color: var(--nhat);
+  box-shadow: var(--bong-1);
+}
+
+.btn-google-outlined:active:not(:disabled) {
+  transform: scale(0.975);
+}
+
+/* Nút Icon tròn hoàn toàn */
+.btn-google-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--bo-tron);
+  transition:
+    transform 150ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+  user-select: none;
+}
+
+.btn-google-icon:hover:not(:disabled) {
+  transform: scale(1.06);
+  box-shadow: var(--bong-1);
+}
+
+.btn-google-icon:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+/* Chip lọc dạng viên thuốc (Filter Chip) */
+.btn-google-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--bo-tron);
+  font-family: var(--sans);
+  font-weight: 700;
+  transition:
+    transform 150ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+  user-select: none;
+}
+
+.btn-google-chip:hover:not(:disabled) {
+  transform: translateY(-0.5px);
+  box-shadow: var(--bong-1);
+}
+
+.btn-google-chip:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-google-fade,
+  .animate-google-pop,
+  .btn-google-primary,
+  .btn-google-tonal,
+  .btn-google-outlined,
+  .btn-google-icon,
+  .btn-google-chip {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
+}

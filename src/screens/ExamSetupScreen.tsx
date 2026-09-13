@@ -70,7 +70,7 @@ function ChipChon({ chon, onClick, children }: { chon: boolean; onClick: () => v
       role="radio"
       aria-checked={chon}
       onClick={onClick}
-      className="tap-target font-bold"
+      className="tap-target font-bold active:scale-95 hover:-translate-y-0.5 transition-all cursor-pointer shadow-xs"
       style={{
         ...SO,
         fontSize: 'var(--cx-2)',
@@ -78,8 +78,6 @@ function ChipChon({ chon, onClick, children }: { chon: boolean; onClick: () => v
         borderRadius: 'var(--bo-tron)',
         background: chon ? 'var(--muc)' : 'var(--the-2)',
         color: chon ? 'var(--muc-nguoc)' : 'var(--muc)',
-        transitionProperty: 'background-color, color',
-        transitionDuration: 'var(--nhanh)',
       }}
     >
       {children}
@@ -487,7 +485,7 @@ export default function ExamSetupScreen() {
                     key={l}
                     type="button"
                     onClick={() => setLop(l)}
-                    className="tap-target font-bold"
+                    className="tap-target font-bold active:scale-95 hover:-translate-y-0.5 transition-all cursor-pointer shadow-xs"
                     style={{
                       ...SO,
                       fontSize: 'var(--cx-2)',

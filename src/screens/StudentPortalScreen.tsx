@@ -541,14 +541,14 @@ export default function StudentPortalScreen() {
                 <button
                   type="button"
                   onClick={() => setChuaCoMatKhau(false)}
-                  className="w-1/3 py-2.5 px-3 rounded-full border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-semibold transition"
+                  className="w-1/3 py-2.5 px-3 rounded-full btn-google-outlined text-sm font-semibold cursor-pointer"
                 >
                   Quay lại
                 </button>
                 <button
                   type="submit"
                   disabled={dangDatMatKhau}
-                  className="w-2/3 py-2.5 px-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition shadow-sm flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-2/3 py-2.5 px-4 rounded-full btn-google-primary text-sm shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                 >
                   {dangDatMatKhau ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
                   <span>Xác nhận & Đăng nhập</span>
@@ -609,7 +609,7 @@ export default function StudentPortalScreen() {
               <button
                 type="submit"
                 disabled={dangXuLyDangNhap}
-                className="w-full py-3 px-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 mt-3"
+                className="btn-google-primary w-full py-3 px-4 text-sm disabled:opacity-50 mt-3 shadow-sm cursor-pointer"
               >
                 {dangXuLyDangNhap ? <RefreshCw className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
                 <span>Đăng nhập</span>
@@ -638,7 +638,7 @@ export default function StudentPortalScreen() {
 
           {/* Thông tin học sinh dạng Google Account Pill */}
           <div className="flex items-center gap-2.5">
-            <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60">
+            <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 shadow-xs">
               <div className="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
                 {auth.hoTen.charAt(0).toUpperCase()}
               </div>
@@ -655,7 +655,7 @@ export default function StudentPortalScreen() {
             <button
               onClick={dangXuat}
               title="Đăng xuất"
-              className="tap-target inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold transition"
+              className="btn-google-outlined inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden md:inline">Đăng xuất</span>
@@ -669,14 +669,14 @@ export default function StudentPortalScreen() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           <button
             onClick={() => setTab('diem')}
-            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between ${
+            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
               tab === 'diem'
                 ? 'bg-blue-50 text-blue-900 border-blue-200 dark:bg-blue-950/70 dark:text-blue-200 dark:border-blue-800 shadow-xs'
-                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs'
             }`}
           >
             <div className="flex items-center justify-between mb-2">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${tab === 'diem' ? 'bg-blue-600 text-white' : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'}`}>
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform ${tab === 'diem' ? 'bg-blue-600 text-white scale-105' : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'}`}>
                 <Award size={18} strokeWidth={tab === 'diem' ? 2.4 : 2} />
               </div>
               <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'diem' ? 'bg-blue-200/70 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
@@ -693,14 +693,14 @@ export default function StudentPortalScreen() {
 
           <button
             onClick={() => setTab('btvn')}
-            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between ${
+            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
               tab === 'btvn'
                 ? 'bg-emerald-50 text-emerald-900 border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-200 dark:border-emerald-800 shadow-xs'
-                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs'
             }`}
           >
             <div className="flex items-center justify-between mb-2">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${tab === 'btvn' ? 'bg-emerald-600 text-white' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'}`}>
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform ${tab === 'btvn' ? 'bg-emerald-600 text-white scale-105' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'}`}>
                 <BookOpen size={18} strokeWidth={tab === 'btvn' ? 2.4 : 2} />
               </div>
               <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'btvn' ? 'bg-emerald-200/70 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
@@ -717,14 +717,14 @@ export default function StudentPortalScreen() {
 
           <button
             onClick={() => setTab('khacphuc')}
-            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between ${
+            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
               tab === 'khacphuc'
                 ? 'bg-amber-50 text-amber-900 border-amber-200 dark:bg-amber-950/70 dark:text-amber-200 dark:border-amber-800 shadow-xs'
-                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs'
             }`}
           >
             <div className="flex items-center justify-between mb-2">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${tab === 'khacphuc' ? 'bg-amber-500 text-white' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'}`}>
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform ${tab === 'khacphuc' ? 'bg-amber-500 text-white scale-105' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'}`}>
                 <Sparkles size={18} strokeWidth={tab === 'khacphuc' ? 2.4 : 2} />
               </div>
               <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'khacphuc' ? 'bg-amber-200/70 text-amber-800 dark:bg-amber-900 dark:text-amber-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
@@ -741,14 +741,14 @@ export default function StudentPortalScreen() {
 
           <button
             onClick={() => setTab('vaothi')}
-            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between ${
+            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
               tab === 'vaothi'
                 ? 'bg-purple-50 text-purple-900 border-purple-200 dark:bg-purple-950/70 dark:text-purple-200 dark:border-purple-800 shadow-xs'
-                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs'
             }`}
           >
             <div className="flex items-center justify-between mb-2">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${tab === 'vaothi' ? 'bg-purple-600 text-white' : 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400'}`}>
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform ${tab === 'vaothi' ? 'bg-purple-600 text-white scale-105' : 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400'}`}>
                 <LogIn size={18} strokeWidth={tab === 'vaothi' ? 2.4 : 2} />
               </div>
               <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'vaothi' ? 'bg-purple-200/70 text-purple-800 dark:bg-purple-900 dark:text-purple-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
@@ -769,7 +769,7 @@ export default function StudentPortalScreen() {
       <main className="max-w-6xl mx-auto w-full px-4 sm:px-6 py-6 flex-1">
         {/* TAB 1: XEM ĐIỂM */}
         {tab === 'diem' && (
-          <div className="space-y-4">
+          <div className="space-y-4 animate-google-fade">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white">
@@ -865,14 +865,14 @@ export default function StudentPortalScreen() {
                     <div className="flex items-center gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
                       <a
                         href={`/d/${item.maCa}?sbd=${auth.sbd}`}
-                        className="flex-1 py-2 px-4 rounded-full bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-xs font-semibold text-center transition flex items-center justify-center gap-1.5"
+                        className="flex-1 py-2 px-4 rounded-full btn-google-tonal text-xs font-semibold text-center flex items-center justify-center gap-1.5"
                       >
                         <span>Xem báo cáo</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </a>
                       <a
                         href={`/t/${item.maCa}?sbd=${auth.sbd}`}
-                        className="py-2 px-4 rounded-full border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-medium text-center transition"
+                        className="py-2 px-4 rounded-full btn-google-outlined text-xs font-medium text-center"
                       >
                         Mở lại bài thi
                       </a>
@@ -886,7 +886,7 @@ export default function StudentPortalScreen() {
 
         {/* TAB 2: NỘP BÀI TẬP VỀ NHÀ */}
         {tab === 'btvn' && (
-          <div className="space-y-4">
+          <div className="space-y-4 animate-google-fade">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white">
@@ -901,7 +901,7 @@ export default function StudentPortalScreen() {
                 type="button"
                 onClick={() => void napLaiBtvn()}
                 disabled={dangTaiBtvn}
-                className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-800 transition inline-flex items-center gap-1.5 text-slate-700 dark:text-slate-300 cursor-pointer self-start sm:self-auto"
+                className="px-3.5 py-1.5 rounded-full btn-google-outlined text-xs font-medium inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${dangTaiBtvn ? 'animate-spin' : ''}`} />
                 <span>Làm mới</span>
@@ -926,7 +926,7 @@ export default function StudentPortalScreen() {
                   type="button"
                   onClick={() => void napLaiBtvn()}
                   disabled={dangTaiBtvn}
-                  className="mt-4 px-4 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold inline-flex items-center gap-1.5 hover:bg-indigo-100 transition cursor-pointer"
+                  className="mt-4 px-4 py-2 rounded-full btn-google-tonal text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${dangTaiBtvn ? 'animate-spin' : ''}`} />
                   <span>Tải lại danh sách</span>
@@ -945,11 +945,11 @@ export default function StudentPortalScreen() {
                           #{bt.maCa}
                         </span>
                         {bt.daNop ? (
-                          <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+                          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
                             <CheckCircle2 className="w-3 h-3" /> Đã nộp
                           </span>
                         ) : (
-                          <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center gap-1">
+                          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center gap-1">
                             <Clock className="w-3 h-3" /> Chưa nộp
                           </span>
                         )}
@@ -988,7 +988,7 @@ export default function StudentPortalScreen() {
                             type="button"
                             onClick={() => void moBaiTap(bt, false)}
                             disabled={dangMoBai === (bt.maBtvn || bt.maCa)}
-                            className="px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
+                            className="px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-1.5 cursor-pointer btn-google-outlined"
                             title="Xem lại bài làm và lời giải chi tiết"
                           >
                             <Eye className="w-3.5 h-3.5" />
@@ -1000,7 +1000,7 @@ export default function StudentPortalScreen() {
                               type="button"
                               onClick={() => void moBaiTap(bt, true)}
                               disabled={dangMoBai === (bt.maBtvn || bt.maCa)}
-                              className="px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer bg-amber-500 hover:bg-amber-600 text-white shadow-xs"
+                              className="px-4 py-2 rounded-full btn-google-primary !bg-amber-500 hover:!bg-amber-600 !border-amber-500 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"
                               title={`Làm lại bài tập này (còn ${bt.soLanLamLaiConLai ?? 3}/3 lượt)`}
                             >
                               {dangMoBai === (bt.maBtvn || bt.maCa) ? (
@@ -1021,7 +1021,7 @@ export default function StudentPortalScreen() {
                           type="button"
                           onClick={() => void moBaiTap(bt, false)}
                           disabled={dangMoBai === (bt.maBtvn || bt.maCa)}
-                          className="px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                          className="px-4 py-2 rounded-full btn-google-primary !bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"
                         >
                           {dangMoBai === (bt.maBtvn || bt.maCa) ? (
                             <>
@@ -1046,7 +1046,7 @@ export default function StudentPortalScreen() {
 
         {/* TAB 3: KHẮC PHỤC CÂU SAI */}
         {tab === 'khacphuc' && (
-          <div className="space-y-4">
+          <div className="space-y-4 animate-google-fade">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white">
@@ -1060,14 +1060,14 @@ export default function StudentPortalScreen() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={chonTatCaCa}
-                  className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                  className="px-3.5 py-1.5 rounded-full btn-google-outlined text-xs font-medium cursor-pointer"
                 >
                   {cacCaChon.size === dsLichSu.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả ca'}
                 </button>
                 <button
                   onClick={taoDeKhacPhuc}
                   disabled={dangTaoDeKhacPhuc || cacCaChon.size === 0}
-                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold text-xs shadow-md flex items-center gap-1.5 disabled:opacity-50 transition"
+                  className="px-4 py-2 rounded-full btn-google-primary !bg-amber-500 hover:!bg-amber-600 !border-amber-500 text-white font-semibold text-xs shadow-md flex items-center gap-1.5 disabled:opacity-50 transition cursor-pointer"
                 >
                   {dangTaoDeKhacPhuc ? (
                     <RefreshCw className="w-4 h-4 animate-spin" />
@@ -1156,7 +1156,7 @@ export default function StudentPortalScreen() {
 
         {/* TAB 4: VÀO PHÒNG THI */}
         {tab === 'vaothi' && (
-          <div className="max-w-xl mx-auto py-4">
+          <div className="max-w-xl mx-auto py-4 animate-google-fade">
             <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm">
               <div className="text-center mb-6">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-purple-600/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400 mb-3 shadow-inner">
@@ -1213,7 +1213,7 @@ export default function StudentPortalScreen() {
 
                 <button
                   type="submit"
-                  className="w-full py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-sm transition shadow-sm flex items-center justify-center gap-2 mt-2"
+                  className="w-full py-3 px-4 rounded-full btn-google-primary !bg-purple-600 hover:!bg-purple-700 !border-purple-600 text-white font-semibold text-sm shadow-sm flex items-center justify-center gap-2 mt-2 cursor-pointer"
                 >
                   <LogIn className="w-4 h-4" />
                   <span>Vào thi ngay</span>

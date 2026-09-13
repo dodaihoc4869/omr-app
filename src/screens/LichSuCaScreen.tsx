@@ -230,7 +230,7 @@ export default function LichSuCaScreen() {
           <button
             type="button"
             onClick={() => (chonMode ? thoatChon() : setChonMode(true))}
-            className="tap-target shrink-0 flex items-center justify-center transition-all shadow-xs"
+            className="tap-target shrink-0 flex items-center justify-center transition-all shadow-xs active:scale-95 hover:scale-105 cursor-pointer"
             style={{ width: 48, height: 48, borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien)', background: chonMode ? 'var(--gg-xanh)' : 'var(--the)', color: chonMode ? 'var(--giay)' : 'var(--muc)' }}
             aria-label={chonMode ? 'Thoát chế độ chọn' : 'Chọn ca để xoá'}
             aria-pressed={chonMode}
@@ -244,7 +244,7 @@ export default function LichSuCaScreen() {
               thoatChon()
               setXemDaXoa((v) => !v)
             }}
-            className="tap-target shrink-0 flex items-center justify-center transition-all shadow-xs"
+            className="tap-target shrink-0 flex items-center justify-center transition-all shadow-xs active:scale-95 hover:scale-105 cursor-pointer"
             style={{ width: 48, height: 48, borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien)', background: xemDaXoa ? 'var(--gg-xanh)' : 'var(--the)', color: xemDaXoa ? 'var(--giay)' : 'var(--muc)' }}
             aria-label={xemDaXoa ? 'Về danh sách ca đang dùng' : 'Xem ca đã xoá'}
             aria-pressed={xemDaXoa}
@@ -256,7 +256,7 @@ export default function LichSuCaScreen() {
             type="button"
             onClick={tai}
             disabled={dangTai}
-            className="tap-target shrink-0 flex items-center justify-center transition-all shadow-xs"
+            className="tap-target shrink-0 flex items-center justify-center transition-all shadow-xs active:scale-95 hover:scale-105 cursor-pointer disabled:cursor-not-allowed"
             style={{ width: 48, height: 48, borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien)', background: 'var(--the)', color: 'var(--muc)' }}
             aria-label="Tải lại"
             title="Tải lại"
@@ -264,6 +264,7 @@ export default function LichSuCaScreen() {
             <RefreshCw size={18} className={dangTai ? 'animate-spin' : ''} />
           </button>
         </div>
+
         {dsLop.length > 1 && (
           <div className="flex flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k3)' }} role="group" aria-label="Lọc theo lớp">
             {['', ...dsLop].map((l) => {
@@ -273,7 +274,7 @@ export default function LichSuCaScreen() {
                   key={l || '__tat_ca'}
                   type="button"
                   onClick={() => setLopLoc(l)}
-                  className="tap-target font-bold shadow-xs transition-all"
+                  className="tap-target font-bold shadow-xs transition-all active:scale-95 hover:-translate-y-0.5 cursor-pointer"
                   style={{
                     ...SO,
                     fontSize: 'var(--cx-1)',
@@ -297,7 +298,7 @@ export default function LichSuCaScreen() {
             <button
               type="button"
               onClick={() => setDaChon(tichHet ? [] : dsLoc.map((c) => c.maCa))}
-              className="tap-target font-bold inline-flex items-center"
+              className="tap-target font-bold inline-flex items-center active:scale-[0.98] hover:-translate-y-0.5 transition-all cursor-pointer shadow-xs"
               style={{ ...SO, gap: 6, fontSize: 'var(--cx-1)', minHeight: 36, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', color: 'var(--muc)' }}
             >
               {tichHet ? <CheckSquare size={16} /> : <Square size={16} />}
@@ -310,7 +311,7 @@ export default function LichSuCaScreen() {
               type="button"
               onClick={() => setHoiXoa(true)}
               disabled={chonTrongLoc.length === 0}
-              className="tap-target font-bold inline-flex items-center"
+              className="tap-target font-bold inline-flex items-center active:scale-[0.98] hover:-translate-y-0.5 transition-all cursor-pointer shadow-xs disabled:cursor-not-allowed disabled:hover:translate-y-0"
               style={{
                 ...SO,
                 gap: 6,
@@ -332,7 +333,7 @@ export default function LichSuCaScreen() {
             <button
               type="button"
               onClick={() => setDaChon(tichHet ? [] : dsLoc.map((c) => c.maCa))}
-              className="tap-target font-bold inline-flex items-center"
+              className="tap-target font-bold inline-flex items-center active:scale-[0.98] hover:-translate-y-0.5 transition-all cursor-pointer shadow-xs"
               style={{ ...SO, gap: 6, fontSize: 'var(--cx-1)', minHeight: 36, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', color: 'var(--muc)' }}
             >
               {tichHet ? <CheckSquare size={16} /> : <Square size={16} />}
@@ -345,7 +346,7 @@ export default function LichSuCaScreen() {
               type="button"
               onClick={handleKhoiPhucNhieu}
               disabled={chonTrongLoc.length === 0 || dangKhoiPhuc === 'nhieu'}
-              className="tap-target font-bold inline-flex items-center"
+              className="tap-target font-bold inline-flex items-center active:scale-[0.98] hover:-translate-y-0.5 transition-all cursor-pointer shadow-xs disabled:cursor-not-allowed disabled:hover:translate-y-0"
               style={{
                 ...SO,
                 gap: 6,
@@ -363,7 +364,7 @@ export default function LichSuCaScreen() {
               type="button"
               onClick={() => setDsXoaVinhVien(chonTrongLoc.map((c) => c.maCa))}
               disabled={chonTrongLoc.length === 0}
-              className="tap-target font-bold inline-flex items-center"
+              className="tap-target font-bold inline-flex items-center active:scale-[0.98] hover:-translate-y-0.5 transition-all cursor-pointer shadow-xs disabled:cursor-not-allowed disabled:hover:translate-y-0"
               style={{
                 ...SO,
                 gap: 6,
@@ -480,7 +481,7 @@ export default function LichSuCaScreen() {
                             handleKhoiPhuc(c.maCa)
                           }}
                           disabled={dangKhoiPhuc === c.maCa}
-                          className="tap-target font-bold inline-flex items-center"
+                          className="tap-target font-bold inline-flex items-center active:scale-95 hover:scale-105 transition-all cursor-pointer shadow-xs"
                           style={{ ...NHAN_NHO, gap: 4, color: 'var(--muc)', minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien-dam)' }}
                         >
                           <RotateCcw size={14} /> {dangKhoiPhuc === c.maCa ? 'Đang khôi phục…' : 'Khôi phục'}
@@ -492,7 +493,7 @@ export default function LichSuCaScreen() {
                             setDsXoaVinhVien([c.maCa])
                           }}
                           disabled={dangXoaVinhVien}
-                          className="tap-target font-bold inline-flex items-center"
+                          className="tap-target font-bold inline-flex items-center active:scale-95 hover:scale-105 transition-all cursor-pointer shadow-xs"
                           style={{
                             ...NHAN_NHO,
                             gap: 4,
