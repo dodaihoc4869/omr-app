@@ -1616,6 +1616,9 @@ async function btvnCuaEm(env: Env, b: Record<string, unknown>): Promise<Response
   }
   if (!goi) return ra({ ok: false, lyDo: 'mat_goi_de', error: 'Chưa tải được đề bài tập' })
 
+  const soLanLam = Math.max(1, Number(em.so_lan_lam) || 1)
+  const soLanLamLaiConLai = em.nop_luc ? Math.max(0, 4 - soLanLam) : 3
+
   return ra({
     ok: true,
     maBtvn: String(bt.ma_btvn ?? ''),
@@ -1625,6 +1628,9 @@ async function btvnCuaEm(env: Env, b: Record<string, unknown>): Promise<Response
     nopLuc: String(em.nop_luc ?? ''),
     soDung: em.so_dung === null || em.so_dung === undefined ? null : Number(em.so_dung),
     soCau: Number(bt.so_cau) || 0,
+    soLanLam,
+    soLanLamLaiConLai,
+    duocLamLai: soLanLamLaiConLai > 0,
     de: goi,
   })
 }
@@ -1640,20 +1646,40 @@ async function nopBtvn(env: Env, b: Record<string, unknown>): Promise<Response> 
   const hanMs = mocMs(String(bt.han_nop ?? ''))
   if (hanMs > 0 && Date.now() > hanMs) return ra({ ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN' })
 
+  const khoa = `${maBtvn}|${sbd}`
+  const cu = await env.DB.prepare('SELECT nop_luc, COALESCE(so_lan_lam, 1) AS so_lan_lam FROM btvn_em WHERE khoa = ?')
+    .bind(khoa)
+    .first<{ nop_luc: string | null; so_lan_lam: number }>()
+  if (!cu) return ra({ ok: false, lyDo: 'khong_duoc_giao' })
+
   const nay = new Date().toISOString()
+  if (cu.nop_luc) {
+    const daLam = Math.max(1, Number(cu.so_lan_lam) || 1)
+    if (daLam >= 4) {
+      const da = await env.DB.prepare('SELECT nop_luc FROM btvn_em WHERE khoa = ?').bind(khoa).first<{ nop_luc: string }>()
+      if (da?.nop_luc) return ra({ ok: true, daNhan: true, nopLuc: da.nop_luc, hetLuot: true })
+      return ra({ ok: false, lyDo: 'khong_duoc_giao' })
+    }
+    const lanMoi = daLam + 1
+    await env.DB.prepare(
+      `UPDATE btvn_em SET nop_luc = ?, so_dung = ?, so_cau = ?, dap_an_json = ?, so_lan_lam = ? WHERE khoa = ?`,
+    ).bind(nay, Number(b.soDung) || 0, Number(b.soCau) || 0, JSON.stringify(b.dapAn ?? {}), lanMoi, khoa).run()
+    return ra({ ok: true, nopLuc: nay, lanThu: lanMoi, soLanLamLaiConLai: Math.max(0, 4 - lanMoi) })
+  }
+
   // KHOÁ CHỐNG TRÙNG nằm trong WHERE: nộp rồi thì câu này không đổi dòng nào.
   const r = await env.DB.prepare(
-    `UPDATE btvn_em SET nop_luc = ?, so_dung = ?, so_cau = ?, dap_an_json = ?
+    `UPDATE btvn_em SET nop_luc = ?, so_dung = ?, so_cau = ?, dap_an_json = ?, so_lan_lam = 1
       WHERE khoa = ? AND nop_luc IS NULL`,
   )
-    .bind(nay, Number(b.soDung) || 0, Number(b.soCau) || 0, JSON.stringify(b.dapAn ?? {}), `${maBtvn}|${sbd}`)
+    .bind(nay, Number(b.soDung) || 0, Number(b.soCau) || 0, JSON.stringify(b.dapAn ?? {}), khoa)
     .run()
   if (r.meta.changes === 0) {
     const da = await env.DB.prepare('SELECT nop_luc FROM btvn_em WHERE khoa = ?').bind(`${maBtvn}|${sbd}`).first<{ nop_luc: string }>()
     if (da?.nop_luc) return ra({ ok: true, daNhan: true, nopLuc: da.nop_luc })
     return ra({ ok: false, lyDo: 'khong_duoc_giao' })
   }
-  return ra({ ok: true, nopLuc: nay })
+  return ra({ ok: true, nopLuc: nay, lanThu: 1, soLanLamLaiConLai: 3 })
 }
 
 /** THẦY THEO DÕI — đã nộp / chưa nộp, kèm tên em chưa nộp để nhắc. */

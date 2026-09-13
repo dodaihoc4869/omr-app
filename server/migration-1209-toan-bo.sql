@@ -251,7 +251,8 @@ CREATE TABLE IF NOT EXISTS btvn_em (
   nop_luc   TEXT,
   so_dung   INTEGER,
   so_cau    INTEGER,
-  dap_an_json TEXT
+  dap_an_json TEXT,
+  so_lan_lam INTEGER DEFAULT 1
 );
 CREATE INDEX IF NOT EXISTS idx_btvn_em ON btvn_em(sbd);
 CREATE INDEX IF NOT EXISTS idx_btvn_lo ON btvn_em(ma_btvn);

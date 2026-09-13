@@ -38,9 +38,18 @@ export async function layCauHinhChoEmBtvn(): Promise<CauHinhMayChu> {
  * Đáp án KHÔNG nằm trong dữ liệu phiếu cho tới lúc em bấm nộp — máy chủ chấm
  * lại bằng kho, không tin con số máy em gửi. */
 export async function dungPhieuBtvn(
-  r: { hanNop?: string; soCau?: number; de?: unknown; daNop?: boolean; maBtvn?: string },
+  r: {
+    hanNop?: string
+    soCau?: number
+    de?: unknown
+    daNop?: boolean
+    maBtvn?: string
+    soLanLam?: number
+    soLanLamLaiConLai?: number
+  },
   maCa: string,
   sbd: string,
+  tuyChon?: { lamLai?: boolean },
 ): Promise<string> {
   const [{ dungPhieu }, { parseKhoDeJson, buildTeacherSourceFromKhoDe }, { cauLuyenTuNguon }, { layCauHinhChoEmBtvn: layCh }] = await Promise.all([
     import('./html-phieu'),
@@ -63,6 +72,12 @@ export async function dungPhieuBtvn(
   const ch = await layCh()
   const han = String(r.hanNop ?? '')
   const maBtvn = String(r.maBtvn ?? '').trim()
+  const laLamLai = !!tuyChon?.lamLai
+  if (laLamLai) {
+    r = { ...r, daNop: false }
+  }
+  const conLai = typeof r.soLanLamLaiConLai === 'number' ? r.soLanLamLaiConLai : 3
+  const lanLamHienTai = (Number(r.soLanLam) || 1) + (laLamLai ? 1 : 0)
 
   return dungPhieu(
     {
@@ -77,6 +92,7 @@ export async function dungPhieuBtvn(
         { nhan: 'Số báo danh', gia: sbd },
         { nhan: 'Ca', gia: maCa },
         { nhan: 'Hạn nộp', gia: han ? gioVN(han) : '—' },
+        ...(laLamLai ? [{ nhan: 'Lượt làm', gia: `Làm lại lần ${lanLamHienTai - 1} (còn ${conLai} lượt)` }] : []),
       ],
     },
     cau,
@@ -85,7 +101,9 @@ export async function dungPhieuBtvn(
       // không nộp thêm lần nữa.
       nop: r.daNop || !maBtvn ? null : { ma: maBtvn, sbd, url: `${String(ch.URL ?? '').replace(/\/+$/, '')}/goi` },
       loiNhac: r.daNop
-        ? 'Em đã nộp bài này rồi — đây là bản xem lại, bấm vào từng câu để mở lời giải.'
+        ? `Em đã nộp bài này rồi — đây là bản xem lại, bấm vào từng câu để mở lời giải.${conLai > 0 ? ` Thầy cho phép làm lại tối đa 3 lần (còn ${conLai} lượt).` : ' (Đã hết 3 lượt làm lại)'}`
+        : laLamLai
+        ? `Bài tập về nhà (Làm lại lần ${lanLamHienTai - 1} · còn ${conLai} lượt) · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Làm xong bấm Nộp bài ở thanh trên.`
         : `Bài tập về nhà · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Làm xong bấm Nộp bài ở thanh trên.`,
     },
   )

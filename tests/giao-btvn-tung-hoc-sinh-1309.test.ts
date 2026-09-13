@@ -53,4 +53,22 @@ describe('GIAO BTVN CHO TỪNG HỌC SINH', () => {
     expect(PORTAL).toContain('moBaiTap')
     expect(PORTAL).toContain('Tải lại danh sách')
   })
+
+  it('StudentPortalScreen hỗ trợ nút Làm lại bài tập tối đa 3 lần kèm xác nhận', () => {
+    const PORTAL = doc('src/screens/StudentPortalScreen.tsx')
+    expect(PORTAL).toContain('Xem lại bài')
+    expect(PORTAL).toContain('Làm lại (còn')
+    expect(PORTAL).toContain('Hết lượt làm lại (3/3)')
+    expect(PORTAL).toContain('Em đã dùng hết 3 lượt làm lại cho bài tập này')
+    expect(PORTAL).toContain('moBaiTap(bt, true)')
+  })
+
+  it('Server và Client BTVN hỗ trợ nộp lại tối đa 3 lần', () => {
+    const GOI_CU = doc('server/src/goi-cu.ts')
+    expect(GOI_CU).toContain('daLam >= 4')
+    expect(GOI_CU).toContain('Em đã dùng hết 3 lượt làm lại bài tập này')
+    const CHO_EM = doc('src/lib/btvn-cho-em.ts')
+    expect(CHO_EM).toContain('tuyChon?: { lamLai?: boolean }')
+    expect(CHO_EM).toContain('Thầy cho phép làm lại tối đa 3 lần')
+  })
 })

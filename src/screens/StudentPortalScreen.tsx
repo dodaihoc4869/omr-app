@@ -17,6 +17,7 @@ import {
   Square,
   ArrowRight,
   Clock,
+  RotateCcw,
 } from 'lucide-react'
 import {
   hsDangNhapApi,
@@ -132,9 +133,32 @@ export default function StudentPortalScreen() {
     }
   }, [auth])
 
-  const moBaiTap = async (bt: any) => {
+  const moBaiTap = async (bt: any, lamLai = false) => {
     if (!auth) return
     const id = bt.maBtvn || bt.maCa
+
+    if (lamLai) {
+      const con = typeof bt.soLanLamLaiConLai === 'number' ? bt.soLanLamLaiConLai : 3
+      if (con <= 0) {
+        alert('Em đã dùng hết 3 lượt làm lại cho bài tập này!')
+        return
+      }
+      const xacNhan = window.confirm(
+        `Em có chắc muốn làm lại bài tập này không?\n(Được làm lại tối đa 3 lần, hiện còn ${con} lượt. Lần nộp mới sẽ cập nhật điểm số và kết quả mới).`
+      )
+      if (!xacNhan) return
+
+      // Xoá bài làm dở trong localStorage để câu hỏi sạch trơn cho em làm mới
+      try {
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          const k = localStorage.key(i)
+          if (k && (k.startsWith('ddh.lam.' + id) || (bt.maBtvn && k.includes(bt.maBtvn)))) {
+            localStorage.removeItem(k)
+          }
+        }
+      } catch {}
+    }
+
     setDangMoBai(id)
     try {
       const { layCauHinhChoEmBtvn } = await import('../lib/btvn-cho-em')
@@ -146,7 +170,7 @@ export default function StudentPortalScreen() {
         return
       }
       const { dungPhieuBtvn } = await import('../lib/btvn-cho-em')
-      const html = await dungPhieuBtvn(r, bt.maCa || 'Riêng', auth.sbd)
+      const html = await dungPhieuBtvn(r, bt.maCa || 'Riêng', auth.sbd, { lamLai })
       setPhieuHtml(html)
     } catch (e) {
       alert(e instanceof Error ? e.message : 'Không mở được bài tập')
@@ -938,9 +962,9 @@ export default function StudentPortalScreen() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 self-end sm:self-center">
+                    <div className="flex items-center gap-2 sm:gap-3 self-end sm:self-center flex-wrap justify-end">
                       {bt.daNop && bt.diem !== null && (
-                        <div className="text-right">
+                        <div className="text-right mr-1">
                           <div className="text-base font-bold text-emerald-600 dark:text-emerald-400">
                             {bt.diem.toFixed(2)}đ
                           </div>
@@ -949,28 +973,61 @@ export default function StudentPortalScreen() {
                           </div>
                         </div>
                       )}
-                      <button
-                        type="button"
-                        onClick={() => void moBaiTap(bt)}
-                        disabled={dangMoBai === (bt.maBtvn || bt.maCa)}
-                        className={`px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
-                          bt.daNop
-                            ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200'
-                            : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
-                        }`}
-                      >
-                        {dangMoBai === (bt.maBtvn || bt.maCa) ? (
-                          <>
-                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                            <span>Đang mở...</span>
-                          </>
-                        ) : (
-                          <>
-                            <span>{bt.daNop ? 'Xem lại bài' : 'Vào làm bài'}</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </>
-                        )}
-                      </button>
+
+                      {bt.daNop ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => void moBaiTap(bt, false)}
+                            disabled={dangMoBai === (bt.maBtvn || bt.maCa)}
+                            className="px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
+                            title="Xem lại bài làm và lời giải chi tiết"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            <span>Xem lại bài</span>
+                          </button>
+
+                          {(bt.soLanLamLaiConLai ?? 3) > 0 ? (
+                            <button
+                              type="button"
+                              onClick={() => void moBaiTap(bt, true)}
+                              disabled={dangMoBai === (bt.maBtvn || bt.maCa)}
+                              className="px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer bg-amber-500 hover:bg-amber-600 text-white shadow-sm"
+                              title={`Làm lại bài tập này (còn ${bt.soLanLamLaiConLai ?? 3}/3 lượt)`}
+                            >
+                              {dangMoBai === (bt.maBtvn || bt.maCa) ? (
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                              ) : (
+                                <RotateCcw className="w-3.5 h-3.5" />
+                              )}
+                              <span>Làm lại (còn {bt.soLanLamLaiConLai ?? 3}/3 lần)</span>
+                            </button>
+                          ) : (
+                            <span className="text-[11px] text-slate-400 italic px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg">
+                              Hết lượt làm lại (3/3)
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => void moBaiTap(bt, false)}
+                          disabled={dangMoBai === (bt.maBtvn || bt.maCa)}
+                          className="px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+                        >
+                          {dangMoBai === (bt.maBtvn || bt.maCa) ? (
+                            <>
+                              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                              <span>Đang mở...</span>
+                            </>
+                          ) : (
+                            <>
+                              <span>Vào làm bài</span>
+                              <ArrowRight className="w-3.5 h-3.5" />
+                            </>
+                          )}
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}

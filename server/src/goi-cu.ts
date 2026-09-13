@@ -700,21 +700,29 @@ async function nopBtvnQuaPhieu(
 
   const nay = NAY()
   const khoa = `${maBtvn}|${sbd}`
-  const r = await env.DB.prepare(
-    `UPDATE btvn_em SET nop_luc = ?, so_dung = ?, so_cau = ?, dap_an_json = ? WHERE khoa = ? AND nop_luc IS NULL`,
-  )
-    .bind(nay, soDung, soCau, JSON.stringify(lam), khoa)
-    .run()
-  if ((r.meta.changes ?? 0) === 0) {
-    const da = await env.DB.prepare('SELECT nop_luc, so_dung, so_cau FROM btvn_em WHERE khoa = ?').bind(khoa).first<Record<string, unknown>>()
-    // NỘP RỒI THÌ KHÔNG GHI ĐÈ. Trả lại đúng kết quả lần nộp đầu, và nói rõ là
-    // đã nhận — báo lỗi lúc này là em tưởng mất bài rồi bấm nộp lại mãi.
-    if (da?.nop_luc) {
-      return { ok: true, daNhan: true, nopLuc: chuoi(da.nop_luc), soDung: Number(da.so_dung) || 0, soCau: Number(da.so_cau) || 0, qidSai: [], lanThu: 1 }
-    }
+  const cu = await env.DB.prepare('SELECT nop_luc, COALESCE(so_lan_lam, 1) AS so_lan_lam FROM btvn_em WHERE khoa = ?')
+    .bind(khoa)
+    .first<Record<string, unknown>>()
+  if (!cu) {
     return { ok: false, lyDo: 'khong_duoc_giao', error: 'Em không có bài tập của lượt này' }
   }
-  return { ok: true, lanThu: 1, soCau, soDung, qidSai, nopLuc: nay }
+
+  let lanMoi = 1
+  if (cu.nop_luc) {
+    const daLam = Math.max(1, Number(cu.so_lan_lam) || 1)
+    if (daLam >= 4) {
+      return { ok: false, error: 'Em đã dùng hết 3 lượt làm lại bài tập này', daHetLuot: true }
+    }
+    lanMoi = daLam + 1
+  }
+
+  await env.DB.prepare(
+    `UPDATE btvn_em SET nop_luc = ?, so_dung = ?, so_cau = ?, dap_an_json = ?, so_lan_lam = ? WHERE khoa = ?`,
+  )
+    .bind(nay, soDung, soCau, JSON.stringify(lam), lanMoi, khoa)
+    .run()
+
+  return { ok: true, lanThu: lanMoi, soCau, soDung, qidSai, nopLuc: nay, soLanLamLaiConLai: Math.max(0, 4 - lanMoi) }
 }
 
 /** Gỡ hậu tố phần khỏi mã đề — bản dùng trong tệp này (xem `goPhanKhoiMaDe`
@@ -1690,7 +1698,7 @@ export async function hsBtvn(env: Env, b: Record<string, unknown>): Promise<Reco
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
 
   const r = await env.DB.prepare(
-    `SELECT be.ma_btvn, be.sbd, be.nop_luc, be.so_dung, be.so_cau AS em_so_cau,
+    `SELECT be.ma_btvn, be.sbd, be.nop_luc, be.so_dung, be.so_cau AS em_so_cau, COALESCE(be.so_lan_lam, 1) AS so_lan_lam,
             b.ma_ca, b.ma_de, b.han_nop, b.so_cau, b.giao_luc
        FROM btvn_em be
        JOIN btvn b ON b.ma_btvn = be.ma_btvn
@@ -1710,6 +1718,9 @@ export async function hsBtvn(env: Env, b: Record<string, unknown>): Promise<Reco
       const maDe = chuoi(x.ma_de)
       const maCa = chuoi(x.ma_ca)
       const tenBtvn = maDe ? `Bài tập: ${maDe}` : (maCa && maCa !== 'Riêng' ? `Bài tập ca ${maCa}` : 'Bài tập về nhà')
+      const daNop = Boolean(x.nop_luc)
+      const soLanLam = Math.max(1, Number(x.so_lan_lam) || 1)
+      const soLanLamLaiConLai = daNop ? Math.max(0, 4 - soLanLam) : 3
       return {
         maBtvn: chuoi(x.ma_btvn),
         maCa,
@@ -1718,11 +1729,14 @@ export async function hsBtvn(env: Env, b: Record<string, unknown>): Promise<Reco
         hanNop: chuoi(x.han_nop),
         giaoLuc: chuoi(x.giao_luc),
         nopLuc: chuoi(x.nop_luc),
-        daNop: Boolean(x.nop_luc),
+        daNop,
         diem,
         soDung,
         soSai,
         soCau,
+        soLanLam,
+        soLanLamLaiConLai,
+        duocLamLai: soLanLamLaiConLai > 0,
       }
     }),
   }
