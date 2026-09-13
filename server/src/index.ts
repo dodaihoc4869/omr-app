@@ -1447,6 +1447,10 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
   const giaoLuc = nay.toISOString()
   const hanNop = new Date(nay.getTime() + HAN_BTVN_GIO * 3600 * 1000).toISOString()
 
+  const dsSbd = Array.isArray(b.dsSbd)
+    ? (b.dsSbd as unknown[]).map((x) => String(x).trim()).filter(Boolean)
+    : []
+
   const lenh: D1PreparedStatement[] = []
   const emDaCo = new Set<string>()
   const caRong: string[] = []
@@ -1461,9 +1465,31 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
     )
       .bind(ca)
       .all<{ sbd: string; ten: string }>()
-    const dsEm = rEm.results ?? []
-    // Ca chưa em nào vào thi thì BỎ QUA ca ấy và kê tên ra, không làm hỏng cả
-    // lượt giao cho những ca còn lại.
+    let dsEm = rEm.results ?? []
+
+    if (dsSbd.length > 0) {
+      const setSbd = new Set(dsSbd)
+      const dsEmCaNay = dsEm.filter((e) => setSbd.has(String(e.sbd)))
+      if (dsMaCa.length === 1 && dsEmCaNay.length < dsSbd.length) {
+        const daCo = new Set(dsEmCaNay.map((e) => String(e.sbd)))
+        const thieu = dsSbd.filter((s) => !daCo.has(s))
+        if (thieu.length > 0) {
+          const ph = thieu.map(() => '?').join(',')
+          const rThem = await env.DB.prepare(
+            `SELECT d.sbd, COALESCE(d.ho_ten, h.ho_ten, '') AS ten
+               FROM danh_sach d LEFT JOIN hoc_sinh h ON h.sbd = d.sbd
+              WHERE d.sbd IN (${ph})`,
+          ).bind(...thieu).all<{ sbd: string; ten: string }>()
+          const mapTen = new Map((rThem.results ?? []).map((x) => [String(x.sbd), String(x.ten ?? '')]))
+          for (const s of thieu) {
+            dsEmCaNay.push({ sbd: s, ten: mapTen.get(s) || '' })
+          }
+        }
+      }
+      dsEm = dsEmCaNay
+    }
+
+    // Ca chưa em nào vào thi (hoặc không em nào được chọn) thì BỎ QUA ca ấy
     if (dsEm.length === 0) {
       caRong.push(ca)
       continue
@@ -1486,7 +1512,12 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
     soLuotGiao++
   }
 
-  if (soLuotGiao === 0) return ra({ ok: false, error: 'Những ca đã tick chưa có em nào vào thi' })
+  if (soLuotGiao === 0) {
+    return ra({
+      ok: false,
+      error: dsSbd.length > 0 ? 'Không có học sinh nào được chọn trong ca' : 'Những ca đã tick chưa có em nào vào thi',
+    })
+  }
   for (let i = 0; i < lenh.length; i += 150) await env.DB.batch(lenh.slice(i, i + 150))
   return ra({ ok: true, soCa: soLuotGiao, caRong, soEm: emDaCo.size, soCau, soDe: dsMaDe.length, hanNop })
 }

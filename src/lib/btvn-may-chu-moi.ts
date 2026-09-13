@@ -52,11 +52,23 @@ async function goi<T>(ch: CauHinhMayChu, duong: string, than: unknown, mat?: str
   }
 }
 
-/** THẦY GIAO BÀI cho một ca đã thi. Ném lỗi có câu chữ để màn hình hiện thẳng. */
-export async function giaoBtvn(ch: CauHinhMayChu, mat: string, dsMaCa: string[], dsMaDe: string[]): Promise<KetQuaGiaoBtvn> {
+/** THẦY GIAO BÀI cho một ca đã thi (hoặc cho từng học sinh cụ thể). Ném lỗi có câu chữ để màn hình hiện thẳng. */
+export async function giaoBtvn(
+  ch: CauHinhMayChu,
+  mat: string,
+  dsMaCa: string[],
+  dsMaDe: string[],
+  dsSbd?: string[],
+): Promise<KetQuaGiaoBtvn> {
   if (dsMaCa.length === 0) throw new Error('Chưa tick ca nào')
   if (dsMaDe.length === 0) throw new Error('Chưa tick tờ đề nào')
-  const r = await goi<{ ok?: boolean; error?: string } & KetQuaGiaoBtvn>(ch, '/btvn/giao', { dsMaCa, dsMaDe }, mat)
+  if (dsSbd && dsSbd.length === 0) throw new Error('Chưa tick học sinh nào')
+  const r = await goi<{ ok?: boolean; error?: string } & KetQuaGiaoBtvn>(
+    ch,
+    '/btvn/giao',
+    { dsMaCa, dsMaDe, dsSbd: dsSbd && dsSbd.length > 0 ? dsSbd : undefined },
+    mat,
+  )
   if (!r) throw new Error('Máy chủ không trả lời')
   if (!r.ok) throw new Error(r.error || 'Không giao được bài tập')
   return { maBtvn: r.maBtvn, soEm: r.soEm, soCau: r.soCau, hanNop: r.hanNop, soCa: r.soCa, caRong: r.caRong }

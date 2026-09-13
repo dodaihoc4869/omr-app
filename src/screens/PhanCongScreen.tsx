@@ -9,12 +9,13 @@
 // Phần giao bài tập chạy 0% Apps Script: ca và đề đọc từ máy chủ mới, bài giao
 // và bài nộp cũng ở đó.
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { CheckSquare, ClipboardList, Presentation, RefreshCw, Square } from 'lucide-react'
+import { CheckSquare, ClipboardList, Presentation, RefreshCw, Search, Square, UserCheck, Users } from 'lucide-react'
 import { Nhan, NutChinh, OThongBao, TheNoiDung } from '../components/DesignSystem'
 import GoiLenBangScreen from './GoiLenBangScreen'
-import { danhSachCa, type CaTomTat } from '../lib/exam-api'
+import { danhSachCa, danhSachEm, type CaTomTat, type EmTomTat } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { layCauHinhMayChu } from '../lib/may-chu-moi'
+import { luotCuaCaMoi } from '../lib/day-ca-may-chu-moi'
 import { giaoBtvn, theoDoiBtvn, type DongTheoDoiBtvn } from '../lib/btvn-may-chu-moi'
 import HopChonDe from '../components/HopChonDe'
 import HangNhomDe from '../components/HangNhomDe'
@@ -58,6 +59,7 @@ export default function PhanCongScreen() {
 }
 
 function TheGiaoBtvn() {
+  const [cheDo, setCheDo] = useState<'ca' | 'hoc_sinh'>('ca')
   const [dsCa, setDsCa] = useState<CaTomTat[]>([])
   const [dsDe, setDsDe] = useState<DeKho[]>([])
   // TICK NHIỀU CA (thầy chốt 12/09). Một lượt giao ra nhiều lớp, cùng tờ đề,
@@ -66,6 +68,16 @@ function TheGiaoBtvn() {
   // TICK NHIỀU TỜ (thầy chốt 12/09). Giữ theo thứ tự thầy tick: bài em nhận
   // được ghép theo đúng thứ tự ấy, không xáo.
   const [daChon, setDaChon] = useState<Set<string>>(new Set())
+  // TICK TỪNG HỌC SINH (thầy yêu cầu: thêm lựa chọn giao bài tập về nhà cho từng học sinh,
+  // hiển thị ô danh sách học sinh và có ô tick để giao bài tập).
+  const [sbdChon, setSbdChon] = useState<Set<string>>(new Set())
+  const [dsEm, setDsEm] = useState<EmTomTat[]>([])
+  const [luotCacCa, setLuotCacCa] = useState<Record<string, { sbd: string; hoTen: string; diem?: number | null; nopLuc?: string }[]>>({})
+  const [dangTaiLuot, setDangTaiLuot] = useState(false)
+  const [timKiemHs, setTimKiemHs] = useState('')
+  const [nguonHsLoc, setNguonHsLoc] = useState<'ca_da_chon' | 'tat_ca'>('ca_da_chon')
+  const [lopHsLoc, setLopHsLoc] = useState('')
+
   // NGUỒN ĐỀ LẤY Y NHƯ MÀN MỞ CA: kho trên máy thầy, tách theo phần, rồi đưa
   // vào ĐÚNG hộp chọn đề đang chạy ở đó (`HopChonDe`). Thầy chốt 12/09: "phần
   // giao btvn tôi muốn hiển thị đúng như trong mở ca".
@@ -85,8 +97,12 @@ function TheGiaoBtvn() {
       const ch = await layCauHinhMayChu()
       if (!ch.URL) throw new Error('Chưa có địa chỉ máy chủ mới')
 
-      const ca = url && mat ? await danhSachCa(url, mat) : []
+      const [ca, em] = await Promise.all([
+        url && mat ? danhSachCa(url, mat) : Promise.resolve([]),
+        url && mat ? danhSachEm(url, mat).catch(() => []) : Promise.resolve([]),
+      ])
       setDsCa(ca)
+      setDsEm(em)
 
       // KHO ĐỀ đọc từ máy chủ mới. Kho rỗng nghĩa là thầy chưa bấm "Chuyển KHO
       // ĐỀ" trong Cài đặt — nói thẳng câu ấy, đừng để thầy nhìn ô chọn trống mà
@@ -114,6 +130,160 @@ function TheGiaoBtvn() {
     void nap()
   }, [nap])
 
+  const taiLuotCa = useCallback(async (cacMaCa: string[]) => {
+    try {
+      const mat = (await loadTeacherSecret()) ?? ''
+      const ch = await layCauHinhMayChu()
+      if (!ch.URL || !mat) return
+      const canTai = cacMaCa.filter((m) => !luotCacCa[m])
+      if (canTai.length === 0) return
+      setDangTaiLuot(true)
+      const kq: Record<string, { sbd: string; hoTen: string; diem?: number | null; nopLuc?: string }[]> = {}
+      for (const m of canTai) {
+        const ds = await luotCuaCaMoi(ch, mat, m)
+        if (ds) {
+          kq[m] = ds.map((x) => ({
+            sbd: String(x.sbd ?? ''),
+            hoTen: String(x.ho_ten ?? x.hoTen ?? ''),
+            diem: x.diem !== undefined && x.diem !== null ? Number(x.diem) : null,
+            nopLuc: x.nop_luc ? String(x.nop_luc) : undefined,
+          }))
+        }
+      }
+      setLuotCacCa((prev) => ({ ...prev, ...kq }))
+      setSbdChon((prev) => {
+        const tiep = new Set(prev)
+        for (const m of canTai) {
+          for (const e of kq[m] ?? []) {
+            if (e.sbd) tiep.add(e.sbd)
+          }
+        }
+        return tiep
+      })
+    } catch {
+      // bỏ qua lỗi đọc lượt
+    } finally {
+      setDangTaiLuot(false)
+    }
+  }, [luotCacCa])
+
+  const batCa = (maCa: string) => {
+    const m = new Set(caChon)
+    if (m.has(maCa)) {
+      m.delete(maCa)
+    } else {
+      m.add(maCa)
+      void taiLuotCa([maCa])
+    }
+    setCaChon(m)
+  }
+
+  const chonTatCaCa = () => {
+    if (caChon.size === dsCa.length) {
+      setCaChon(new Set())
+    } else {
+      const tatCa = new Set(dsCa.map((c) => c.maCa))
+      setCaChon(tatCa)
+      void taiLuotCa(dsCa.map((c) => c.maCa))
+    }
+  }
+
+  const chuyenSangHocSinh = () => {
+    setCheDo('hoc_sinh')
+    if (caChon.size > 0) {
+      void taiLuotCa(Array.from(caChon))
+    }
+  }
+
+  // Danh sách học sinh của các ca đã tick:
+  const dsHsTrongCa = useMemo(() => {
+    const map = new Map<string, { sbd: string; hoTen: string; lop?: string; diem?: number | null; maCa?: string }>()
+    for (const ma of caChon) {
+      const ca = dsCa.find((c) => c.maCa === ma)
+      const luot = luotCacCa[ma] ?? []
+      for (const l of luot) {
+        if (!map.has(l.sbd)) {
+          map.set(l.sbd, { sbd: l.sbd, hoTen: l.hoTen, lop: ca?.lop || '', diem: l.diem, maCa: ma })
+        }
+      }
+      if (luot.length === 0) {
+        for (const e of dsEm) {
+          if (e.caGanNhat === ma && !map.has(e.sbd)) {
+            map.set(e.sbd, { sbd: e.sbd, hoTen: e.hoTen, lop: e.lop || ca?.lop || '', diem: e.diemGanNhat, maCa: ma })
+          }
+        }
+      }
+    }
+    return Array.from(map.values())
+  }, [caChon, luotCacCa, dsCa, dsEm])
+
+  const dsLopHs = useMemo(() => {
+    const set = new Set<string>()
+    for (const e of dsEm) {
+      if (e.lop?.trim()) set.add(e.lop.trim())
+    }
+    for (const c of dsCa) {
+      if (c.lop?.trim()) set.add(c.lop.trim())
+    }
+    return Array.from(set).sort()
+  }, [dsEm, dsCa])
+
+  const dsHsHienThi = useMemo(() => {
+    let goc: { sbd: string; hoTen: string; lop?: string; diem?: number | null; maCa?: string }[] = []
+    if (nguonHsLoc === 'ca_da_chon' && caChon.size > 0) {
+      goc = dsHsTrongCa
+    } else {
+      goc = dsEm.map((e) => ({
+        sbd: e.sbd,
+        hoTen: e.hoTen,
+        lop: e.lop,
+        diem: e.diemGanNhat,
+        maCa: e.caGanNhat,
+      }))
+    }
+
+    if (lopHsLoc) {
+      goc = goc.filter((e) => (e.lop || '').trim() === lopHsLoc)
+    }
+
+    const q = timKiemHs.trim().toLowerCase()
+    if (q) {
+      goc = goc.filter(
+        (e) =>
+          e.sbd.toLowerCase().includes(q) ||
+          e.hoTen.toLowerCase().includes(q) ||
+          (e.lop || '').toLowerCase().includes(q),
+      )
+    }
+
+    return goc
+  }, [nguonHsLoc, caChon.size, dsHsTrongCa, dsEm, lopHsLoc, timKiemHs])
+
+  const toggleSbd = (sbd: string) => {
+    setSbdChon((prev) => {
+      const m = new Set(prev)
+      if (m.has(sbd)) m.delete(sbd)
+      else m.add(sbd)
+      return m
+    })
+  }
+
+  const chonTatCaHsHienThi = () => {
+    setSbdChon((prev) => {
+      const m = new Set(prev)
+      for (const e of dsHsHienThi) m.add(e.sbd)
+      return m
+    })
+  }
+
+  const boChonHsHienThi = () => {
+    setSbdChon((prev) => {
+      const m = new Set(prev)
+      for (const e of dsHsHienThi) m.delete(e.sbd)
+      return m
+    })
+  }
+
   // CHỈ HIỆN NHỮNG TỜ MÁY CHỦ ĐÃ CÓ. Kho trên máy thầy nhiều hơn kho đã chuyển
   // sang máy chủ; cho tick một tờ máy chủ chưa có thì bấm Giao mới báo lỗi —
   // muộn, và thầy không biết vì sao.
@@ -137,7 +307,8 @@ function TheGiaoBtvn() {
     try {
       const mat = (await loadTeacherSecret()) ?? ''
       const ch = await layCauHinhMayChu()
-      const kq = await giaoBtvn(ch, mat, [...caChon], [...daChon])
+      const dsSbdGui = cheDo === 'hoc_sinh' ? Array.from(sbdChon) : undefined
+      const kq = await giaoBtvn(ch, mat, [...caChon], [...daChon], dsSbdGui)
       const boQua = kq.caRong && kq.caRong.length > 0 ? ` Bỏ qua ${kq.caRong.length} ca chưa em nào vào thi: ${kq.caRong.join(', ')}.` : ''
       setBao({
         ok: true,
@@ -158,14 +329,55 @@ function TheGiaoBtvn() {
     <div style={{ display: 'grid', gap: 'var(--k3)' }}>
       <TheNoiDung>
         <div style={{ display: 'grid', gap: 'var(--k3)' }}>
+          {/* LỰA CHỌN HÌNH THỨC GIAO BÀI */}
+          <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k1)' }}>
+            <span style={{ ...NHAN_NHO, fontWeight: 600, color: 'var(--muc)' }}>Hình thức giao:</span>
+            <button
+              type="button"
+              onClick={() => setCheDo('ca')}
+              className="tap-target font-semibold inline-flex items-center gap-1.5"
+              style={{
+                padding: '6px 14px',
+                borderRadius: 'var(--bo-tron)',
+                fontSize: 'var(--cx-1)',
+                background: cheDo === 'ca' ? 'var(--xanh)' : 'var(--the-2)',
+                color: cheDo === 'ca' ? '#fff' : 'var(--muc)',
+                border: '1px solid ' + (cheDo === 'ca' ? 'var(--xanh)' : 'var(--vien)'),
+                cursor: 'pointer',
+              }}
+            >
+              <Users size={16} /> Theo ca thi (cả lớp)
+            </button>
+            <button
+              type="button"
+              onClick={chuyenSangHocSinh}
+              className="tap-target font-semibold inline-flex items-center gap-1.5"
+              style={{
+                padding: '6px 14px',
+                borderRadius: 'var(--bo-tron)',
+                fontSize: 'var(--cx-1)',
+                background: cheDo === 'hoc_sinh' ? 'var(--xanh)' : 'var(--the-2)',
+                color: cheDo === 'hoc_sinh' ? '#fff' : 'var(--muc)',
+                border: '1px solid ' + (cheDo === 'hoc_sinh' ? 'var(--xanh)' : 'var(--vien)'),
+                cursor: 'pointer',
+              }}
+            >
+              <UserCheck size={16} /> Cho từng học sinh ({sbdChon.size} em)
+            </button>
+          </div>
+
           <div>
             <div className="flex items-center" style={{ justifyContent: 'space-between', gap: 'var(--k2)', marginBottom: 'var(--k2)' }}>
-              <span style={NHAN_NHO}>Ca đã thi — tick nhiều ca, bài giao cho đúng những em có lượt trong các ca ấy</span>
+              <span style={NHAN_NHO}>
+                {cheDo === 'ca'
+                  ? 'Ca đã thi — tick nhiều ca, bài giao cho đúng những em có lượt trong các ca ấy'
+                  : 'Bước 1: Chọn ca thi liên kết (bài tập sẽ xuất hiện trong ca này)'}
+              </span>
               {dsCa.length > 1 && (
                 <button
                   type="button"
                   className="tap-target"
-                  onClick={() => setCaChon(caChon.size === dsCa.length ? new Set() : new Set(dsCa.map((c) => c.maCa)))}
+                  onClick={chonTatCaCa}
                   style={{ ...NHAN_NHO, textDecoration: 'underline', whiteSpace: 'nowrap' }}
                 >
                   {caChon.size === dsCa.length ? 'Bỏ hết' : 'Chọn hết'}
@@ -176,19 +388,14 @@ function TheGiaoBtvn() {
             {dsCa.length === 0 ? (
               <div style={NHAN_NHO}>{dangNap ? 'Đang lấy danh sách ca…' : 'Chưa có ca nào đã thi.'}</div>
             ) : (
-              <div style={{ display: 'grid', gap: 'var(--k2)', maxHeight: 280, overflowY: 'auto' }}>
+              <div style={{ display: 'grid', gap: 'var(--k2)', maxHeight: 240, overflowY: 'auto' }}>
                 {dsCa.map((c) => {
                   const chon = caChon.has(c.maCa)
                   return (
                     <button
                       key={c.maCa}
                       type="button"
-                      onClick={() => {
-                        const m = new Set(caChon)
-                        if (m.has(c.maCa)) m.delete(c.maCa)
-                        else m.add(c.maCa)
-                        setCaChon(m)
-                      }}
+                      onClick={() => batCa(c.maCa)}
                       className="tap-target"
                       style={{
                         display: 'flex',
@@ -223,13 +430,211 @@ function TheGiaoBtvn() {
                 })}
               </div>
             )}
+
             {caChon.size > 0 && (
-              <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
-                Đã tick <b>{caChon.size}</b> ca · <b>{dsCa.filter((c) => caChon.has(c.maCa)).reduce((t, c) => t + c.daVao, 0)}</b> lượt vào thi
-                {' '}(em thi hai ca chỉ nhận một bài).
+              <div className="flex items-center justify-between flex-wrap" style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
+                <span>
+                  Đã tick <b>{caChon.size}</b> ca · <b>{dsCa.filter((c) => caChon.has(c.maCa)).reduce((t, c) => t + c.daVao, 0)}</b> lượt vào thi
+                  {' '}(em thi hai ca chỉ nhận một bài).
+                </span>
+                {cheDo === 'ca' && (
+                  <button
+                    type="button"
+                    onClick={chuyenSangHocSinh}
+                    style={{ color: 'var(--xanh)', textDecoration: 'underline', cursor: 'pointer', background: 'none', border: 'none', padding: 0, font: 'inherit', fontWeight: 600 }}
+                  >
+                    Bấm đây để chọn lọc từng học sinh →
+                  </button>
+                )}
               </div>
             )}
           </div>
+
+          {/* Ô DANH SÁCH HỌC SINH CÓ Ô TICK (KHI CHỌN GIAO CHO TỪNG HỌC SINH) */}
+          {cheDo === 'hoc_sinh' && (
+            <div
+              style={{
+                background: 'var(--the-2)',
+                borderRadius: 'var(--bo-2)',
+                padding: 'var(--k3)',
+                border: '1px solid var(--vien)',
+                display: 'grid',
+                gap: 'var(--k2)',
+              }}
+            >
+              <div className="flex items-center justify-between flex-wrap" style={{ gap: 'var(--k2)' }}>
+                <div>
+                  <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', fontWeight: 700, color: 'var(--muc)' }}>
+                    Bước 2: Danh sách học sinh — tick ô vuông để giao bài tập
+                  </div>
+                  <div style={NHAN_NHO}>
+                    Đã tick chọn: <b style={{ color: 'var(--xanh)', fontVariantNumeric: 'tabular-nums' }}>{sbdChon.size}</b> học sinh nhận bài
+                  </div>
+                </div>
+                <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
+                  <button
+                    type="button"
+                    onClick={chonTatCaHsHienThi}
+                    className="tap-target font-semibold"
+                    style={{ ...NHAN_NHO, textDecoration: 'underline', cursor: 'pointer', background: 'none', border: 'none', padding: '2px 6px' }}
+                  >
+                    Chọn tất cả ({dsHsHienThi.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={boChonHsHienThi}
+                    className="tap-target"
+                    style={{ ...NHAN_NHO, textDecoration: 'underline', cursor: 'pointer', background: 'none', border: 'none', padding: '2px 6px' }}
+                  >
+                    Bỏ chọn
+                  </button>
+                </div>
+              </div>
+
+              {/* THANH TÌM KIẾM & BỘ LỌC */}
+              <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)' }}>
+                <div className="relative flex-1" style={{ minWidth: 200 }}>
+                  <input
+                    type="text"
+                    value={timKiemHs}
+                    onChange={(e) => setTimKiemHs(e.target.value)}
+                    placeholder="Tìm theo số báo danh, họ tên, lớp..."
+                    style={{
+                      width: '100%',
+                      height: 36,
+                      padding: '0 12px 0 32px',
+                      borderRadius: 'var(--bo-tron)',
+                      border: '1px solid var(--vien-dam)',
+                      background: 'var(--the)',
+                      fontSize: 'var(--cx-1)',
+                      color: 'var(--muc)',
+                    }}
+                  />
+                  <Search size={16} style={{ position: 'absolute', left: 10, top: 10, color: 'var(--mo)', pointerEvents: 'none' }} />
+                </div>
+
+                {caChon.size > 0 && (
+                  <div className="flex items-center" style={{ gap: 4 }}>
+                    <button
+                      type="button"
+                      onClick={() => setNguonHsLoc('ca_da_chon')}
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: 'var(--bo-tron)',
+                        fontSize: 'var(--cx-1)',
+                        background: nguonHsLoc === 'ca_da_chon' ? 'var(--xanh)' : 'var(--the)',
+                        color: nguonHsLoc === 'ca_da_chon' ? '#fff' : 'var(--muc)',
+                        border: '1px solid ' + (nguonHsLoc === 'ca_da_chon' ? 'var(--xanh)' : 'var(--vien)'),
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                      }}
+                    >
+                      Trong ca ({dsHsTrongCa.length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNguonHsLoc('tat_ca')}
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: 'var(--bo-tron)',
+                        fontSize: 'var(--cx-1)',
+                        background: nguonHsLoc === 'tat_ca' ? 'var(--xanh)' : 'var(--the)',
+                        color: nguonHsLoc === 'tat_ca' ? '#fff' : 'var(--muc)',
+                        border: '1px solid ' + (nguonHsLoc === 'tat_ca' ? 'var(--xanh)' : 'var(--vien)'),
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                      }}
+                    >
+                      Tất cả ({dsEm.length})
+                    </button>
+                  </div>
+                )}
+
+                {dsLopHs.length > 1 && (
+                  <select
+                    value={lopHsLoc}
+                    onChange={(e) => setLopHsLoc(e.target.value)}
+                    style={{
+                      height: 36,
+                      padding: '0 10px',
+                      borderRadius: 'var(--bo-tron)',
+                      border: '1px solid var(--vien-dam)',
+                      background: 'var(--the)',
+                      fontSize: 'var(--cx-1)',
+                      color: 'var(--muc)',
+                    }}
+                  >
+                    <option value="">Tất cả các lớp</option>
+                    {dsLopHs.map((l) => (
+                      <option key={l} value={l}>
+                        Lớp {l}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              {/* KHUNG CUỘN DANH SÁCH HỌC SINH */}
+              {dangTaiLuot ? (
+                <div style={{ ...NHAN_NHO, padding: 'var(--k3) 0', textAlign: 'center' }}>
+                  Đang tải danh sách học sinh…
+                </div>
+              ) : dsHsHienThi.length === 0 ? (
+                <div style={{ ...NHAN_NHO, padding: 'var(--k3) 0', textAlign: 'center' }}>
+                  {caChon.size === 0
+                    ? 'Hãy tick chọn ít nhất một ca ở Bước 1 bên trên để hiện học sinh.'
+                    : 'Không có học sinh nào phù hợp bộ lọc tìm kiếm.'}
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gap: 6, maxHeight: 280, overflowY: 'auto', paddingRight: 4 }}>
+                  {dsHsHienThi.map((e) => {
+                    const tich = sbdChon.has(e.sbd)
+                    return (
+                      <button
+                        key={e.sbd}
+                        type="button"
+                        onClick={() => toggleSbd(e.sbd)}
+                        className="tap-target"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 'var(--k3)',
+                          textAlign: 'left',
+                          minHeight: 44,
+                          padding: '6px 12px',
+                          borderRadius: 'var(--bo-1)',
+                          background: tich ? 'var(--xanh-nen)' : 'var(--the)',
+                          border: `1.5px solid ${tich ? 'var(--xanh)' : 'transparent'}`,
+                          transition: 'all 0.15s ease',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <span style={{ color: tich ? 'var(--xanh)' : 'var(--mo)', flex: '0 0 auto' }}>
+                          {tich ? <CheckSquare size={18} /> : <Square size={18} />}
+                        </span>
+                        <div className="flex-1 flex items-center justify-between flex-wrap gap-1 min-w-0">
+                          <span className="flex items-center gap-2 truncate">
+                            <span style={{ fontWeight: 600, fontSize: 'var(--cx-1)', color: 'var(--muc)' }}>
+                              {e.hoTen || `Học sinh ${e.sbd}`}
+                            </span>
+                            <span style={{ fontFamily: 'var(--mono)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
+                              SBD: <b>{e.sbd}</b>
+                            </span>
+                          </span>
+                          <span className="flex items-center gap-2 flex-shrink-0">
+                            {e.lop && <Nhan tone="xam">{e.lop}</Nhan>}
+                            {e.diem !== null && e.diem !== undefined && (
+                              <Nhan tone="xanh">{e.diem.toFixed(2)}đ</Nhan>
+                            )}
+                          </span>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )}
 
           <div>
             <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>
@@ -283,9 +688,22 @@ function TheGiaoBtvn() {
           )}
 
           <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
-            <NutChinh onClick={giao} disabled={dangGiao || caChon.size === 0 || daChon.size === 0}>
-              {dangGiao ? 'Đang giao…' : 'Giao bài tập về nhà'}
-            </NutChinh>
+            {cheDo === 'ca' ? (
+              <NutChinh onClick={giao} disabled={dangGiao || caChon.size === 0 || daChon.size === 0}>
+                {dangGiao ? 'Đang giao…' : 'Giao bài tập về nhà'}
+              </NutChinh>
+            ) : (
+              <NutChinh
+                onClick={giao}
+                disabled={dangGiao || caChon.size === 0 || daChon.size === 0 || sbdChon.size === 0}
+              >
+                {dangGiao
+                  ? 'Đang giao…'
+                  : sbdChon.size === 0
+                  ? 'Tick chọn ít nhất 1 học sinh'
+                  : `Giao bài tập về nhà (${sbdChon.size} học sinh)`}
+              </NutChinh>
+            )}
             <NutChinh variant="phu" onClick={() => void nap()} disabled={dangNap}>
               <span className="inline-flex items-center gap-2">
                 <RefreshCw size={16} /> Làm mới
