@@ -2532,64 +2532,68 @@ export default {
     }
     if (req.method !== 'POST') return ra({ ok: false, error: 'Chỉ nhận POST' }, 405)
 
-    let b: Record<string, unknown>
     try {
-      b = (await req.json()) as Record<string, unknown>
-    } catch {
-      return ra({ ok: false, error: 'Thân gói không phải JSON' }, 400)
+      let b: Record<string, unknown>
+      try {
+        b = (await req.json()) as Record<string, unknown>
+      } catch {
+        return ra({ ok: false, error: 'Thân gói không phải JSON' }, 400)
+      }
+
+      // Lệnh của HỌC SINH — không đòi mã bí mật, giống Apps Script hiện nay.
+      if (p === '/vao-thi') return vaoThi(env, b)
+      if (p === '/luu-tam') return luuTam(env, b)
+      if (p === '/nop') return nop(env, b)
+      if (p === '/trang-thai') return dayTrangThai(env, b)
+      if (p === '/phong-cho') return ghiPhongCho(env, b)
+      if (p === '/hs/dang-nhap') return ra(await G.hsDangNhap(env, b))
+      if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))
+      if (p === '/hs/lich-su') return ra(await G.hsLichSuCa(env, b))
+      if (p === '/hs/cau-sai') return ra(await G.hsCauSai(env, b))
+      if (p === '/hs/btvn') return ra(await G.hsBtvn(env, b))
+      // CỔNG TƯƠNG THÍCH — tự phân quyền bên trong, nên đứng TRƯỚC cổng mã bí mật.
+      if (p === '/goi') return goiCu(req, env, b)
+      if (p === '/btvn/cua-em') return btvnCuaEm(env, b)
+      if (p === '/btvn/nop') return nopBtvn(env, b)
+
+      // Lệnh của THẦY — đòi mã bí mật.
+      if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
+      if (p === '/ca/day') return dayCa(env, b)
+      if (p === '/danh-sach/day') return dayDanhSach(env, b)
+      if (p === '/phieu/day') return dayPhieu(env, b)
+      if (p === '/phieu/xoa') return xoaPhieuR2(env, String(b.ma ?? ''))
+      if (p === '/chua-day') return chuaDay(env, String(b.maCa ?? ''))
+      if (p === '/da-day') return danhDauDaDay(env, b)
+      if (p === '/ca/bat-dau') return batDauThi(env, String(b.maCa ?? ''))
+      if (p === '/theo-doi') return xemTheoDoi(env, String(b.maCa ?? ''))
+      if (p === '/ca/luot') return luotCuaCa(env, String(b.maCa ?? ''))
+      if (p === '/ca/nhieu') return dayNhieuCa(env, b)
+      if (p === '/ca/danh-sach') return danhSachCaMoi(env, b.daXoa === true)
+      if (p === '/ca/sua') return suaCa(env, b)
+      if (p === '/ca/xoa-vinh-vien') return ra(await G.xoaVinhVienCa(env, b))
+      if (p === '/ca/chi-tiet') return chiTietCaMoi(env, String(b.maCa ?? ''))
+      if (p === '/diem') return ghiDiemMoi(env, b)
+      if (p === '/em/danh-sach') return danhSachEmMoi(env)
+      if (p === '/ca/nap-day-du') return napDayDuCa(env, b)
+      if (p === '/doi-chieu') return doiChieuSo(env)
+      if (p === '/cham-diem') return chamDiem(env, b)
+      if (p === '/em/tien-do') return tienDoEm(env, String(b.sbd ?? ''))
+      if (p === '/em/cau-sai') return cauSaiCuaEm(env, b)
+      if (p === '/len-bang') return ghiLenBangMoi(env, b)
+      if (p === '/kho/day') return dayDeKho(env, b)
+      if (p === '/kho/danh-sach') return danhSachDeKho(env, b)
+      if (p === '/kho/lay') return layDeKho(env, String(b.maDe ?? ''))
+      if (p === '/kho/xoa') return xoaDeKho(env, b)
+      if (p === '/kho/rut-cau') return rutCau(env, b)
+      if (p === '/kho/chi-muc') return dungChiMucKho(env, b)
+      if (p === '/btvn/giao') return giaoBtvn(env, b)
+      if (p === '/btvn/theo-doi') return theoDoiBtvn(env, b)
+      if (p === '/dong-bo/dau') return ghiDauDongBo(env, b)
+      if (p === '/cho') return xemPhongCho(env, String(b.maCa ?? ''))
+
+      return ra({ ok: false, error: 'Không có đường này' }, 404)
+    } catch (e) {
+      return ra({ ok: false, error: e instanceof Error ? e.message : 'Lỗi máy chủ' }, 500)
     }
-
-    // Lệnh của HỌC SINH — không đòi mã bí mật, giống Apps Script hiện nay.
-    if (p === '/vao-thi') return vaoThi(env, b)
-    if (p === '/luu-tam') return luuTam(env, b)
-    if (p === '/nop') return nop(env, b)
-    if (p === '/trang-thai') return dayTrangThai(env, b)
-    if (p === '/phong-cho') return ghiPhongCho(env, b)
-    if (p === '/hs/dang-nhap') return ra(await G.hsDangNhap(env, b))
-    if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))
-    if (p === '/hs/lich-su') return ra(await G.hsLichSuCa(env, b))
-    if (p === '/hs/cau-sai') return ra(await G.hsCauSai(env, b))
-    if (p === '/hs/btvn') return ra(await G.hsBtvn(env, b))
-    // CỔNG TƯƠNG THÍCH — tự phân quyền bên trong, nên đứng TRƯỚC cổng mã bí mật.
-    if (p === '/goi') return goiCu(req, env, b)
-    if (p === '/btvn/cua-em') return btvnCuaEm(env, b)
-    if (p === '/btvn/nop') return nopBtvn(env, b)
-
-    // Lệnh của THẦY — đòi mã bí mật.
-    if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
-    if (p === '/ca/day') return dayCa(env, b)
-    if (p === '/danh-sach/day') return dayDanhSach(env, b)
-    if (p === '/phieu/day') return dayPhieu(env, b)
-    if (p === '/phieu/xoa') return xoaPhieuR2(env, String(b.ma ?? ''))
-    if (p === '/chua-day') return chuaDay(env, String(b.maCa ?? ''))
-    if (p === '/da-day') return danhDauDaDay(env, b)
-    if (p === '/ca/bat-dau') return batDauThi(env, String(b.maCa ?? ''))
-    if (p === '/theo-doi') return xemTheoDoi(env, String(b.maCa ?? ''))
-    if (p === '/ca/luot') return luotCuaCa(env, String(b.maCa ?? ''))
-    if (p === '/ca/nhieu') return dayNhieuCa(env, b)
-    if (p === '/ca/danh-sach') return danhSachCaMoi(env, b.daXoa === true)
-    if (p === '/ca/sua') return suaCa(env, b)
-    if (p === '/ca/xoa-vinh-vien') return ra(await G.xoaVinhVienCa(env, b))
-    if (p === '/ca/chi-tiet') return chiTietCaMoi(env, String(b.maCa ?? ''))
-    if (p === '/diem') return ghiDiemMoi(env, b)
-    if (p === '/em/danh-sach') return danhSachEmMoi(env)
-    if (p === '/ca/nap-day-du') return napDayDuCa(env, b)
-    if (p === '/doi-chieu') return doiChieuSo(env)
-    if (p === '/cham-diem') return chamDiem(env, b)
-    if (p === '/em/tien-do') return tienDoEm(env, String(b.sbd ?? ''))
-    if (p === '/em/cau-sai') return cauSaiCuaEm(env, b)
-    if (p === '/len-bang') return ghiLenBangMoi(env, b)
-    if (p === '/kho/day') return dayDeKho(env, b)
-    if (p === '/kho/danh-sach') return danhSachDeKho(env, b)
-    if (p === '/kho/lay') return layDeKho(env, String(b.maDe ?? ''))
-    if (p === '/kho/xoa') return xoaDeKho(env, b)
-    if (p === '/kho/rut-cau') return rutCau(env, b)
-    if (p === '/kho/chi-muc') return dungChiMucKho(env, b)
-    if (p === '/btvn/giao') return giaoBtvn(env, b)
-    if (p === '/btvn/theo-doi') return theoDoiBtvn(env, b)
-    if (p === '/dong-bo/dau') return ghiDauDongBo(env, b)
-    if (p === '/cho') return xemPhongCho(env, String(b.maCa ?? ''))
-
-    return ra({ ok: false, error: 'Không có đường này' }, 404)
   },
 }

@@ -964,56 +964,61 @@ export async function khoiPhucCa(env: Env, b: Record<string, unknown>): Promise<
 }
 
 export async function xoaVinhVienCa(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
-  const dsMaCa = Array.isArray(b.dsMaCa)
-    ? (b.dsMaCa as string[]).map(chuoi).map((s) => s.trim()).filter(Boolean)
-    : b.maCa
-    ? [chuoi(b.maCa).trim()].filter(Boolean)
-    : []
-  if (dsMaCa.length === 0) return { ok: false, error: 'Thiếu mã ca cần xoá vĩnh viễn' }
+  try {
+    const dsMaCa = Array.isArray(b.dsMaCa)
+      ? (b.dsMaCa as string[]).map(chuoi).map((s) => s.trim()).filter(Boolean)
+      : b.maCa
+      ? [chuoi(b.maCa).trim()].filter(Boolean)
+      : []
+    if (dsMaCa.length === 0) return { ok: false, error: 'Thiếu mã ca cần xoá vĩnh viễn' }
 
-  const daXoa: string[] = []
-  const bang = [
-    'ca',
-    'luot',
-    'trang_thai',
-    'phong_cho',
-    'chan_vao',
-    'chi_tiet_cau',
-    'ban_do_sai',
-    'tien_do_ca',
-    'cau_hoi_em',
-    'nop_khac_phuc',
-    'btvn',
-    'btvn_em',
-    'phieu',
-    'de_rieng',
-    'kho_ca_them',
-    'yeu_cau_giao_bai',
-    'len_bang',
-  ]
+    const daXoa: string[] = []
+    const bangCoMaCa = [
+      'ca',
+      'luot',
+      'trang_thai',
+      'phong_cho',
+      'chan_vao',
+      'chi_tiet_cau',
+      'ban_do_sai',
+      'tien_do_ca',
+      'cau_hoi_em',
+      'nop_khac_phuc',
+      'btvn',
+      'phieu',
+      'de_rieng',
+      'kho_ca_them',
+      'yeu_cau_giao_bai',
+      'nhan_xet',
+    ]
 
-  for (const maCa of dsMaCa) {
-    if (env.DE) {
-      try {
-        const rP = await env.DB.prepare('SELECT ma FROM phieu WHERE ma_ca = ?').bind(maCa).all<Record<string, unknown>>()
-        for (const row of rP.results ?? []) {
-          const ma = chuoi(row.ma)
-          if (ma) await env.DE.delete(`phieu/${ma}.json`).catch(() => {})
-        }
-        await env.DE.delete(`key/${maCa}.json`).catch(() => {})
-        await env.DE.delete(`de/${maCa}.json`).catch(() => {})
-      } catch {}
+    for (const maCa of dsMaCa) {
+      if (env.DE) {
+        try {
+          const rP = await env.DB.prepare('SELECT ma FROM phieu WHERE ma_ca = ?').bind(maCa).all<Record<string, unknown>>()
+          for (const row of rP.results ?? []) {
+            const ma = chuoi(row.ma)
+            if (ma) await env.DE.delete(`phieu/${ma}.json`).catch(() => {})
+          }
+          await env.DE.delete(`key/${maCa}.json`).catch(() => {})
+          await env.DE.delete(`de/${maCa}.json`).catch(() => {})
+        } catch {}
+      }
+
+      const stmts: D1PreparedStatement[] = [
+        env.DB.prepare('DELETE FROM btvn_em WHERE ma_btvn IN (SELECT ma_btvn FROM btvn WHERE ma_ca = ?)').bind(maCa),
+      ]
+      for (const t of bangCoMaCa) {
+        stmts.push(env.DB.prepare(`DELETE FROM ${t} WHERE ma_ca = ?`).bind(maCa))
+      }
+      await env.DB.batch(stmts)
+      daXoa.push(maCa)
     }
 
-    const stmts: D1PreparedStatement[] = []
-    for (const t of bang) {
-      stmts.push(env.DB.prepare(`DELETE FROM ${t} WHERE ma_ca = ?`).bind(maCa))
-    }
-    await env.DB.batch(stmts)
-    daXoa.push(maCa)
+    return { ok: true, daXoa }
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Lỗi khi xoá vĩnh viễn ca thi' }
   }
-
-  return { ok: true, daXoa }
 }
 
 export async function doiTenCa(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
