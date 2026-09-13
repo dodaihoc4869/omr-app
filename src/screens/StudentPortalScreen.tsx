@@ -48,15 +48,59 @@ export interface BaiMomGiao {
   id: string
   tieuDe: string
   ngayGiao: string
+  taoLuc?: string
   soCau: number
   thoiGianPhut: number
   dsCau: any[]
+  cau?: any[]
   trangThai: 'chua_lam' | 'dang_lam' | 'da_nop'
   batDauLuc?: string
   nopLuc?: string
   diem?: number
   soCauDung?: number
   htmlKetQua?: string
+  htmlBaoCao?: string
+}
+
+export function chuanHoaBaiMom(b: any): BaiMomGiao {
+  const rawCau = Array.isArray(b?.dsCau) ? b.dsCau : (Array.isArray(b?.cau) ? b.cau : [])
+  const dsCau = rawCau.map((c: any, i: number) => ({
+    id: String(c?.id || `cau_${i + 1}`),
+    text: String(c?.text || c?.noiDung || 'Câu hỏi'),
+    choices: Array.isArray(c?.choices)
+      ? c.choices.map(String)
+      : (Array.isArray(c?.luaChon) ? c.luaChon.map(String) : (Array.isArray(c?.ideas) ? c.ideas.map(String) : [])),
+    dapAn: String(c?.dapAn || c?.dapAnDung || 'A'),
+    dapAnDung: String(c?.dapAnDung || c?.dapAn || 'A'),
+    loiGiai: typeof c?.loiGiai === 'object' && c?.loiGiai !== null
+      ? String(c.loiGiai.chot || c.loiGiai.text || c.loiGiai.loiGiai || '')
+      : (String(c?.loiGiai || '') === '[object Object]' ? '' : String(c?.loiGiai || '')),
+    chuyenDe: String(c?.chuyenDe || 'Hoá học'),
+  }))
+
+  const id = String(b?.id || `mom_${Date.now()}`)
+  const tieuDe = String(b?.tieuDe || `Bài của Mom giao (${dsCau.length} câu)`)
+  const ngayGiao = String(b?.ngayGiao || b?.taoLuc || new Date().toISOString())
+  const taoLuc = String(b?.taoLuc || b?.ngayGiao || new Date().toISOString())
+  const soCau = Number(b?.soCau) || dsCau.length
+  const thoiGianPhut = Number(b?.thoiGianPhut) || 120
+  const trangThai = b?.trangThai || 'chua_lam'
+  const htmlKetQua = b?.htmlKetQua || b?.htmlBaoCao || ''
+
+  return {
+    ...b,
+    id,
+    tieuDe,
+    ngayGiao,
+    taoLuc,
+    soCau,
+    thoiGianPhut,
+    dsCau,
+    cau: dsCau,
+    trangThai,
+    htmlKetQua,
+    htmlBaoCao: htmlKetQua,
+  }
 }
 
 interface ThongTinHs {
@@ -150,7 +194,7 @@ export default function StudentPortalScreen() {
       if (raw) {
         const parsed = JSON.parse(raw)
         if (Array.isArray(parsed)) {
-          setDsMomGiao(parsed)
+          setDsMomGiao(parsed.map(chuanHoaBaiMom))
         }
       } else {
         setDsMomGiao([])
@@ -203,9 +247,10 @@ export default function StudentPortalScreen() {
   }
 
   const batDauLamBaiMom = (bai: BaiMomGiao) => {
-    const batDauLuc = bai.batDauLuc || new Date().toISOString()
+    const bChuan = chuanHoaBaiMom(bai)
+    const batDauLuc = bChuan.batDauLuc || new Date().toISOString()
     const capNhat: BaiMomGiao = {
-      ...bai,
+      ...bChuan,
       trangThai: 'dang_lam',
       batDauLuc,
     }
@@ -214,7 +259,7 @@ export default function StudentPortalScreen() {
     setThongBaoNopMom(null)
 
     if (auth) {
-      const danhSach = dsMomGiao.map((b) => (b.id === bai.id ? capNhat : b))
+      const danhSach = dsMomGiao.map((b) => (b.id === bChuan.id ? capNhat : chuanHoaBaiMom(b)))
       localStorage.setItem(`omr_mom_btvn_${auth.sbd}`, JSON.stringify(danhSach))
       setDsMomGiao(danhSach)
     }
@@ -223,12 +268,15 @@ export default function StudentPortalScreen() {
   async function nopBaiCuaMom() {
     if (!dangLamMom || !auth) return
 
+    const dsCau = Array.isArray(dangLamMom.dsCau) && dangLamMom.dsCau.length > 0
+      ? dangLamMom.dsCau
+      : (Array.isArray(dangLamMom.cau) ? dangLamMom.cau : [])
     let soDung = 0
-    const tongSo = dangLamMom.dsCau.length || 1
+    const tongSo = dsCau.length || 1
     const chiTietKq: any[] = []
 
-    for (let i = 0; i < dangLamMom.dsCau.length; i++) {
-      const cau = dangLamMom.dsCau[i]
+    for (let i = 0; i < dsCau.length; i++) {
+      const cau = dsCau[i]
       const dapAnEm = (cauTraLoiMom[cau.id] || '').trim().toUpperCase()
       const dapAnDung = (cau.dapAn || cau.dapAnDung || 'A').trim().toUpperCase()
       const laDung = dapAnEm === dapAnDung
@@ -620,11 +668,60 @@ export default function StudentPortalScreen() {
             text: textCau,
             luaChon,
             dapAn: daDung,
-            chot: String(it.loiGiai || ''),
-            lyDo: null,
-            buoc: null,
+            chot: (() => {
+              const rawLg = (it as any).loiGiai
+              if (!rawLg) return ''
+              if (typeof rawLg === 'object') {
+                const s = String(rawLg.chot || rawLg.text || rawLg.loiGiai || '')
+                return s === '[object Object]' ? '' : s
+              }
+              const str = String(rawLg).trim()
+              if (str === '[object Object]') return ''
+              if (str.startsWith('{') && str.endsWith('}')) {
+                try {
+                  const j = JSON.parse(str)
+                  const s = String(j.chot || j.text || j.loiGiai || '')
+                  return s === '[object Object]' ? '' : s
+                } catch {
+                  return str
+                }
+              }
+              return str
+            })(),
+            lyDo: (() => {
+              const rawLg = (it as any).loiGiai
+              const lg = typeof rawLg === 'string' && rawLg.trim().startsWith('{')
+                ? (() => { try { return JSON.parse(rawLg) } catch { return null } })()
+                : rawLg
+              if (lg && typeof lg === 'object' && lg.tungPa && typeof lg.tungPa === 'object') {
+                return Object.entries(lg.tungPa).map(([k, v]: [string, any]) => ({
+                  khoa: k,
+                  dung: Boolean(v?.dung),
+                  ly: String(v?.viSao || v?.ly || '')
+                }))
+              }
+              return null
+            })(),
+            buoc: (() => {
+              const rawLg = (it as any).loiGiai
+              const lg = typeof rawLg === 'string' && rawLg.trim().startsWith('{')
+                ? (() => { try { return JSON.parse(rawLg) } catch { return null } })()
+                : rawLg
+              if (lg && typeof lg === 'object' && Array.isArray(lg.buoc)) {
+                return lg.buoc.map(String)
+              }
+              return null
+            })(),
             ketQua: daDung,
-            anhThanCau: it.imageDataUrl || it.hinhAnh,
+            anhThanCau: (() => {
+              const a = it.imageDataUrl || it.hinhAnh
+              if (typeof a === 'string' && a.trim().length > 10 && (
+                a.startsWith('data:image/') || a.startsWith('http://') || a.startsWith('https://') || a.startsWith('/')
+              )) {
+                return a.trim()
+              }
+              return undefined
+            })(),
             chuaCho: {
               qid: it.qid,
               soCau: Number(it.soCau) || 1,
@@ -1331,7 +1428,7 @@ export default function StudentPortalScreen() {
                     </div>
 
                     <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                      Đã làm: <strong className="text-slate-800 dark:text-slate-200">{Object.keys(cauTraLoiMom).length}</strong>/{dangLamMom.dsCau.length}
+                      Đã làm: <strong className="text-slate-800 dark:text-slate-200">{Object.keys(cauTraLoiMom).length}</strong>/{(dangLamMom.dsCau || dangLamMom.cau || []).length}
                     </div>
 
                     <button
@@ -1346,7 +1443,7 @@ export default function StudentPortalScreen() {
 
                 {/* Danh sách các câu hỏi của bài */}
                 <div className="space-y-4">
-                  {dangLamMom.dsCau.map((cau: any, idx: number) => {
+                  {(dangLamMom.dsCau || dangLamMom.cau || []).map((cau: any, idx: number) => {
                     const daChon = cauTraLoiMom[cau.id]
                     return (
                       <div
@@ -1519,7 +1616,7 @@ export default function StudentPortalScreen() {
                             </div>
 
                             <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-3">
-                              <span>Số câu: <strong>{bai.soCau || bai.dsCau?.length}</strong> câu</span>
+                              <span>Số câu: <strong>{bai.soCau || (bai.dsCau || bai.cau || []).length}</strong> câu</span>
                               <span>·</span>
                               <span className="flex items-center gap-1 text-rose-600 dark:text-rose-400 font-medium">
                                 <Timer className="w-3.5 h-3.5" />

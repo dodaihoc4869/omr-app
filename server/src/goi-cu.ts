@@ -1809,7 +1809,11 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
       table: fullQ ? fullQ.table : undefined,
       imageDataUrl: fullQ ? fullQ.imageDataUrl : undefined,
       hinhAnh: fullQ ? fullQ.hinhAnh : undefined,
-      loiGiai: fullQ ? chuoi(fullQ.loiGiai || fullQ.explanation || fullQ.giaiThich || '') : '',
+      loiGiai: fullQ
+        ? typeof fullQ.loiGiai === 'object' && fullQ.loiGiai !== null
+          ? JSON.stringify(fullQ.loiGiai)
+          : (chuoi(fullQ.loiGiai || fullQ.explanation || fullQ.giaiThich || '') === '[object Object]' ? '' : chuoi(fullQ.loiGiai || fullQ.explanation || fullQ.giaiThich || ''))
+        : '',
       dang: fullQ
         ? typeof fullQ.dang === 'object' && fullQ.dang !== null
           ? chuoi((fullQ.dang as Record<string, unknown>).ten || (fullQ.dang as Record<string, unknown>).ma || '')

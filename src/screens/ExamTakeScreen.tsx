@@ -57,7 +57,6 @@ import TheCau from '../components/TheCau'
 import MaCaInput from '../components/MaCaInput'
 import LogoHocSinh from '../components/LogoHocSinh'
 import PhongChoGame from '../components/PhongChoGame'
-import BongBongChatHocSinh from '../components/BongBongChatHocSinh'
 import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
 import { TriangleAlert, X, ArrowLeft, LayoutGrid } from 'lucide-react'
 import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
@@ -2518,7 +2517,6 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       <Trang className="flex items-center justify-center px-2 sm:px-4 py-4">
         {/* Đang chờ Thầy bấm bắt đầu */}
         <PhongChoGame cho={cho} loiCho={loiCho} />
-        {sbd && <BongBongChatHocSinh sbd={sbd} hoTen={hoTen} lop={lop} />}
       </Trang>
     )
   }
@@ -3288,9 +3286,6 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           tính `data-giu-de-an` trên <html>. Không state, không render lại danh
           sách câu, không tụt tốc độ cuộn (GIUDEDOC mục 5). */}
       <ManGiuDeDoc />
-
-      {/* Bong bóng chat học sinh */}
-      {sbd && <BongBongChatHocSinh sbd={sbd} hoTen={hoTen} lop={lop} />}
     </Trang>
   )
 }

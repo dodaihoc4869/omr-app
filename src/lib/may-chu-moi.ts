@@ -255,7 +255,8 @@ export async function vaoThiMoi(
       // thầy chốt 07/09). Máy chủ hiện không so tên nữa, nhưng cờ vẫn gửi để
       // nhật ký chặn vào ghi lại được em đã qua bước xác nhận hay chưa.
       xacNhanTen: danhTinh.xacNhanTen === true,
-      matKhau: danhTinh.matKhau ?? '',
+      matKhau: (danhTinh.matKhau ?? '').trim(),
+      matKhauCa: (danhTinh.matKhau ?? '').trim(),
     },
     nhipNong(ch),
   )

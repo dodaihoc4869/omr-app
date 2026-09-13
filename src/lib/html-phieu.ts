@@ -85,9 +85,21 @@ export function thoat(s: unknown): string {
 export function chuHtml(s: unknown): string {
   if (typeof s === 'object' && s !== null) {
     const obj = s as Record<string, unknown>
-    if (typeof obj.text === 'string') return chuHtml(obj.text)
+    const str = obj.chot || obj.text || obj.loiGiai || obj.giaiThich || obj.explanation || obj.noiDung
+    if (typeof str === 'string' && str.trim() !== '[object Object]') return chuHtml(str)
+    return ''
   }
-  return doanHtml(doanCongThuc(goKyTuLa(String(s ?? ''))))
+  let str = String(s ?? '')
+  if (str.trim() === '[object Object]') return ''
+  const trimmed = str.trim()
+  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+    try {
+      const obj = JSON.parse(trimmed) as Record<string, unknown>
+      const inner = obj.chot || obj.text || obj.loiGiai || obj.giaiThich || obj.explanation || obj.noiDung
+      if (typeof inner === 'string' && inner.trim() !== '[object Object]') return chuHtml(inner)
+    } catch {}
+  }
+  return doanHtml(doanCongThuc(goKyTuLa(str)))
 }
 
 /** Hướng thân mũi tên: một chiều sang phải, sang trái, hay hai chiều. */
@@ -998,8 +1010,9 @@ export function oGiaiHtml(c: CauLuyen): string {
   // KIẾN THỨC CỐT LÕI in đậm TRÊN CÙNG (thầy chốt 04-09 khuya: "kiến thức cốt lõi
   // bôi đậm trên cùng để giải câu đó"), rồi mới tới vì sao chọn / không chọn
   // từng phương án.
-  if (c.chot) {
-    khoi.push(`<div class="sol-label">Kiến thức cốt lõi</div><div class="sol-text sol-cot-loi">${chuHtml(c.chot)}</div>`)
+  const chuChot = c.chot && String(c.chot).trim() !== '[object Object]' ? chuHtml(c.chot) : ''
+  if (chuChot && chuChot.trim() !== '[object Object]') {
+    khoi.push(`<div class="sol-label">Kiến thức cốt lõi</div><div class="sol-text sol-cot-loi">${chuChot}</div>`)
     coGiai = true
   }
   if (c.lyDo && c.lyDo.length > 0) {

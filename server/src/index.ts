@@ -190,8 +190,8 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
   // CỔNG MẬT KHẨU CA THI (nếu ca đặt mật khẩu)
   const matKhauCa = String(ca?.mat_khau ?? '').trim()
   if (matKhauCa) {
-    const nhapMatKhau = String(b.matKhauCa ?? '').trim()
-    if (nhapMatKhau !== matKhauCa) {
+    const nhapMatKhau = String(b.matKhauCa ?? b.matKhau ?? '').trim()
+    if (nhapMatKhau !== matKhauCa && nhapMatKhau.toLowerCase() !== matKhauCa.toLowerCase()) {
       return ra({ ok: false, lyDo: 'sai_mat_khau_ca', error: 'Mật khẩu ca thi không chính xác' })
     }
   }

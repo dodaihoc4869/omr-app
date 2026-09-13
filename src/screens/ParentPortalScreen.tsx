@@ -19,11 +19,13 @@ import LogoApp from '../components/LogoApp'
 import BongBongChatPhuHuynh from '../components/BongBongChatPhuHuynh'
 import InfographicHuongDan from '../components/InfographicHuongDan'
 import KhungXemPhieu from '../components/KhungXemPhieu'
+import BaoCaoCaThiPhuHuynhModal from '../components/BaoCaoCaThiPhuHuynhModal'
 import { hsCauSaiApi, hsLichSuCaApi, tenTheoSbd } from '../lib/exam-api'
 import { loadExamSources, loadScriptUrl } from '../lib/exam-db'
 import { rutDeChua } from '../lib/rut-de-chua'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
+import { guiTinNhan } from '../lib/tro-ly/he-thong-chat'
 import type { TeacherExamSource } from '../data/examContent'
 
 interface BaiThiCuaCon {
@@ -31,8 +33,14 @@ interface BaiThiCuaCon {
   tenCa: string
   ngayNop: string
   diem: number
+  diemI?: number | null
+  diemII?: number | null
+  diemIII?: number | null
+  thoiGianPhut?: number
   soCauDung?: number
+  soCauSai?: number
   tongSoCau?: number
+  lanThu?: number
   linkBaoCao?: string
 }
 
@@ -43,11 +51,14 @@ export interface BaiMomGiao {
   soCau: number
   thoiGianPhut: number // 120 phút = 2 tiếng
   taoLuc: string
+  ngayGiao?: string
   trangThai: 'chua_lam' | 'dang_lam' | 'da_nop'
   diem?: number
   nopLuc?: string
   cau?: unknown[]
+  dsCau?: unknown[]
   htmlBaoCao?: string
+  htmlKetQua?: string
 }
 
 const SBD_STORAGE_KEY = 'omr_ph_sbd'
@@ -63,6 +74,7 @@ export default function ParentPortalScreen() {
 
   // Dữ liệu con
   const [dsBaiThi, setDsBaiThi] = useState<BaiThiCuaCon[]>([])
+  const [caDangXem, setCaDangXem] = useState<BaiThiCuaCon | null>(null)
   const [dsMomGiao, setDsMomGiao] = useState<BaiMomGiao[]>([])
 
   // Thanh kéo số câu tạo bài tập cho con (tối đa 99 câu)
@@ -156,8 +168,14 @@ export default function ParentPortalScreen() {
                 tenCa: c.tenCa || `Ca thi #${c.maCa}`,
                 ngayNop: c.nopLuc || '',
                 diem: typeof c.tong === 'number' ? c.tong : 0,
+                diemI: typeof c.diemI === 'number' ? c.diemI : null,
+                diemII: typeof c.diemII === 'number' ? c.diemII : null,
+                diemIII: typeof c.diemIII === 'number' ? c.diemIII : null,
+                thoiGianPhut: Number(c.thoiGianPhut) || 45,
                 soCauDung: c.soCauDung,
+                soCauSai: c.soCauSai,
                 tongSoCau: c.tongCau,
+                lanThu: c.lanThu || 1,
                 linkBaoCao: '',
               })),
             )
@@ -253,8 +271,10 @@ export default function ParentPortalScreen() {
         soCau: soCauThucTe,
         thoiGianPhut: 120, // 2 tiếng
         taoLuc: new Date().toISOString(),
+        ngayGiao: new Date().toISOString(),
         trangThai: 'chua_lam',
         cau: dsCauChon,
+        dsCau: dsCauChon,
       }
 
       // Lưu vào danh sách Mom giao của học sinh
@@ -266,6 +286,62 @@ export default function ParentPortalScreen() {
         loai: 'ok',
         chu: `🎉 Đã tạo thành công "${baiMoi.tieuDe}"! Bài đã gửi sang App Học sinh với thời gian làm bài 2 tiếng tính từ lúc con bắt đầu.`,
       })
+    } catch (e) {
+      setThongBaoMom({
+        loai: 'loi',
+        chu: e instanceof Error ? e.message : 'Có lỗi khi tạo bài tập',
+      })
+    } finally {
+      setDangTaoMom(false)
+    }
+  }
+
+  // TẠO BÀI TẬP KHẮC PHỤC TRỰC TIẾP TỪ CÂU SAI CỦA CA THI
+  const xuLyTaoBaiCuaMomTuCa = async (dsCauSaiCa: any[], maCa?: string) => {
+    if (!sbdHienTai) return
+    setDangTaoMom(true)
+    setThongBaoMom(null)
+    try {
+      let dsCauChon: any[] = []
+      if (Array.isArray(dsCauSaiCa) && dsCauSaiCa.length > 0) {
+        dsCauChon = dsCauSaiCa.map((c, idx) => ({
+          id: c.qid || `cau_${idx + 1}`,
+          phan: c.phan || 'I',
+          text: c.text || 'Câu hỏi cần ôn tập',
+          choices: c.choices || [],
+          dapAn: c.dapAnDung || 'A',
+          dapAnDung: c.dapAnDung || 'A',
+          loiGiai: c.loiGiai || '',
+          chuyenDe: c.chuyenDe || 'Khắc phục lỗi sai',
+        }))
+      } else {
+        await xuLyTaoBaiCuaMom()
+        return
+      }
+
+      const maMom = `mom_${Date.now()}`
+      const baiMoi: BaiMomGiao = {
+        id: maMom,
+        tieuDe: `Bài khắc phục lỗi sai ca #${maCa || ''} (${dsCauChon.length} câu)`,
+        sbd: sbdHienTai,
+        soCau: dsCauChon.length,
+        thoiGianPhut: 120,
+        taoLuc: new Date().toISOString(),
+        ngayGiao: new Date().toISOString(),
+        trangThai: 'chua_lam',
+        cau: dsCauChon,
+        dsCau: dsCauChon,
+      }
+
+      const dsCapNhat = [baiMoi, ...dsMomGiao]
+      localStorage.setItem(`omr_mom_btvn_${sbdHienTai}`, JSON.stringify(dsCapNhat))
+      setDsMomGiao(dsCapNhat)
+
+      setThongBaoMom({
+        loai: 'ok',
+        chu: `🎉 Đã tạo và gửi thành công "${baiMoi.tieuDe}" sang app của con! Con có 2 tiếng làm bài tính từ lúc bắt đầu.`,
+      })
+      alert(`Đã gửi bài tập gồm ${dsCauChon.length} câu sai sang app của con! Con có thể vào làm bài ngay lúc này.`)
     } catch (e) {
       setThongBaoMom({
         loai: 'loi',
@@ -464,24 +540,29 @@ export default function ParentPortalScreen() {
                 dsBaiThi.map((b) => (
                   <div
                     key={b.maCa}
-                    className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-blue-400 transition bg-slate-50/50 dark:bg-slate-800/40 flex items-center justify-between gap-3"
+                    onClick={() => setCaDangXem(b)}
+                    className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-blue-500 hover:shadow-md transition bg-slate-50/50 hover:bg-white dark:bg-slate-800/40 dark:hover:bg-slate-800/80 flex items-center justify-between gap-3 cursor-pointer group"
                   >
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
+                        <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-900">
                           #{b.maCa}
                         </span>
-                        <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200 line-clamp-1">
+                        <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200 line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
                           {b.tenCa}
                         </h3>
                       </div>
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5">
-                        <Calendar size={12} />
-                        <span>{b.ngayNop ? new Date(b.ngayNop).toLocaleDateString('vi-VN') : 'Đã thi'}</span>
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
+                        <span className="flex items-center gap-1">
+                          <Calendar size={12} />
+                          <span>{b.ngayNop ? new Date(b.ngayNop).toLocaleDateString('vi-VN') : 'Đã thi'}</span>
+                        </span>
+                        <span>·</span>
+                        <span className="text-blue-600 dark:text-blue-400 font-medium">Xem báo cáo chi tiết</span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 shrink-0">
                       <div className="text-right">
                         <div className="text-lg font-black text-blue-600 dark:text-blue-400 leading-none">
                           {b.diem.toFixed(2)}
@@ -489,19 +570,17 @@ export default function ParentPortalScreen() {
                         <div className="text-[10px] text-slate-400 mt-0.5">điểm</div>
                       </div>
 
-                      {b.linkBaoCao ? (
-                        <a
-                          href={b.linkBaoCao}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1 shadow-sm transition tap-target"
-                        >
-                          <span>Xem</span>
-                          <ChevronRight size={14} />
-                        </a>
-                      ) : (
-                        <span className="text-[11px] text-slate-400 italic">Đang cập nhật</span>
-                      )}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setCaDangXem(b)
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1 shadow-sm transition tap-target cursor-pointer"
+                      >
+                        <span>Báo cáo</span>
+                        <ChevronRight size={14} />
+                      </button>
                     </div>
                   </div>
                 ))
@@ -655,6 +734,33 @@ export default function ParentPortalScreen() {
           html={xemPhieuHtml}
           ten={`Báo cáo học tập - ${hoTenCon}`}
           dong={() => setXemPhieuHtml(null)}
+        />
+      )}
+
+      {/* MODAL BÁO CÁO CA THI CHI TIẾT CHUẨN GOOGLE MATERIAL 3 */}
+      {caDangXem && (
+        <BaoCaoCaThiPhuHuynhModal
+          baiThi={caDangXem}
+          hoTenCon={hoTenCon}
+          sbd={sbdHienTai || ''}
+          lop={lopCon}
+          scriptUrl={scriptUrl}
+          onClose={() => setCaDangXem(null)}
+          onGiaoBaiChoCon={(ds) => {
+            setCaDangXem(null)
+            void xuLyTaoBaiCuaMomTuCa(ds, caDangXem.maCa)
+          }}
+          onNhanTinChoThay={(noiDung) => {
+            guiTinNhan({
+              nguoiGui: { vai: 'ph', sbd: sbdHienTai || '', hoTen: `Phụ huynh em ${hoTenCon}`, lop: lopCon },
+              nguoiNhan: { vai: 'gv', hoTen: 'Thầy Đỗ Đại Học' },
+              noiDung,
+            })
+            alert('Đã gửi tin nhắn đến Thầy Đỗ Đại Học! Thầy sẽ phản hồi sớm nhất trên hệ thống.')
+          }}
+          onXemPhieuGoc={(html) => {
+            setXemPhieuHtml(html)
+          }}
         />
       )}
     </div>
