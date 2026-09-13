@@ -7,7 +7,6 @@ import {
   ChevronRight,
   Sparkles,
   Heart,
-  Sliders,
   Clock,
   HelpCircle,
   LogOut,
@@ -18,13 +17,12 @@ import LogoApp from '../components/LogoApp'
 import InfographicHuongDan from '../components/InfographicHuongDan'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import BaoCaoCaThiPhuHuynhModal from '../components/BaoCaoCaThiPhuHuynhModal'
+import ModalKhacPhucCauSai from '../components/ModalKhacPhucCauSai'
 import { hsCauSaiApi, hsLichSuCaApi, tenTheoSbd } from '../lib/exam-api'
-import { loadExamSources, loadScriptUrl } from '../lib/exam-db'
-import { rutDeChua } from '../lib/rut-de-chua'
+import { loadScriptUrl } from '../lib/exam-db'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
 import { guiTinNhan } from '../lib/tro-ly/he-thong-chat'
-import type { TeacherExamSource } from '../data/examContent'
 
 interface BaiThiCuaCon {
   maCa: string
@@ -75,10 +73,12 @@ export default function ParentPortalScreen() {
   const [caDangXem, setCaDangXem] = useState<BaiThiCuaCon | null>(null)
   const [dsMomGiao, setDsMomGiao] = useState<BaiMomGiao[]>([])
 
-  // Thanh kéo số câu tạo bài tập cho con (tối đa 99 câu)
-  const [soCauGiao, setSoCauGiao] = useState<number>(20)
   const [dangTaoMom, setDangTaoMom] = useState(false)
   const [thongBaoMom, setThongBaoMom] = useState<{ loai: 'ok' | 'loi'; chu: string } | null>(null)
+
+  // Khắc phục câu sai (Bài của Mom giao - 3 chế độ đồng bộ)
+  const [dsCauSaiModalMom, setDsCauSaiModalMom] = useState<any[] | null>(null)
+  const [tieuDeCaMom, setTieuDeCaMom] = useState<string>('')
 
   // Khung xem báo cáo HTML
   const [xemPhieuHtml, setXemPhieuHtml] = useState<string | null>(null)
@@ -202,14 +202,43 @@ export default function ParentPortalScreen() {
     setSbdInput('')
   }
 
-  // TỰ ĐỘNG TẠO BÀI TẬP KHẮC PHỤC LỖI SAI (BÀI CỦA MOM GIAO)
+  // GIAO BÀI TẬP TRỰC TIẾP CHO CON (HẠN 2 TIẾNG)
+  const xuLyGiaoBaiTrucTiep = (dsCau: any[], tieuDe?: string) => {
+    if (!sbdHienTai || !dsCau || dsCau.length === 0) return
+    const maMom = `mom_${Date.now()}`
+    const tieuDeThucTe = tieuDe || `Bài của Mom giao (${dsCau.length} câu)`
+    const baiMoi: BaiMomGiao = {
+      id: maMom,
+      tieuDe: tieuDeThucTe,
+      sbd: sbdHienTai,
+      soCau: dsCau.length,
+      thoiGianPhut: 120, // 2 tiếng
+      taoLuc: new Date().toISOString(),
+      ngayGiao: new Date().toISOString(),
+      trangThai: 'chua_lam',
+      cau: dsCau,
+      dsCau: dsCau,
+    }
+
+    const dsCapNhat = [baiMoi, ...dsMomGiao]
+    localStorage.setItem(`omr_mom_btvn_${sbdHienTai}`, JSON.stringify(dsCapNhat))
+    setDsMomGiao(dsCapNhat)
+    setDsCauSaiModalMom(null)
+
+    setThongBaoMom({
+      loai: 'ok',
+      chu: `🎉 Đã tạo và gửi thành công "${tieuDeThucTe}" sang app của con! Con có 2 tiếng làm bài tính từ lúc bắt đầu.`,
+    })
+    alert(`Đã gửi bài tập gồm ${dsCau.length} câu sang app của con! Con có thời gian làm bài 2 tiếng tính từ lúc bắt đầu.`)
+  }
+
+  // TỰ ĐỘNG MỞ MODAL KHẮC PHỤC LỖI SAI (BÀI CỦA MOM GIAO - 3 CHẾ ĐỘ CHUẨN)
   const xuLyTaoBaiCuaMom = async () => {
     if (!sbdHienTai) return
     setDangTaoMom(true)
     setThongBaoMom(null)
 
     try {
-      // 1. Quét toàn bộ câu con làm sai trong tất cả các ca thi
       let dsCauSai: any[] = []
       if (scriptUrl) {
         try {
@@ -222,72 +251,21 @@ export default function ParentPortalScreen() {
         }
       }
 
-      // 2. Rút câu nhãn giống nhau từ kho đề
-      let khoDe: TeacherExamSource[] = []
-      try {
-        khoDe = await loadExamSources()
-      } catch {
-        khoDe = []
+      if (dsCauSai.length === 0) {
+        setThongBaoMom({
+          loai: 'loi',
+          chu: 'Con chưa có câu sai nào trong các ca thi đã hoàn thành!',
+        })
+        alert('Con chưa có câu sai nào trong các ca thi đã hoàn thành!')
+        return
       }
 
-      let dsCauChon: any[] = []
-      if (khoDe.length > 0 && dsCauSai.length > 0) {
-        try {
-          const kq = rutDeChua({
-            khoDe,
-            rows: dsCauSai as any,
-            qidTranh: [],
-            soCau: soCauGiao,
-          })
-          dsCauChon = kq.cau
-        } catch {
-          dsCauChon = []
-        }
-      }
-
-      // Nếu kho đề chưa có câu rút tự động, lấy trực tiếp các câu con sai để con làm lại
-      if (dsCauChon.length === 0) {
-        dsCauChon = dsCauSai.slice(0, soCauGiao).map((c) => ({
-          id: c.qid || `cau_${Math.random()}`,
-          phan: c.phan || 'I',
-          text: c.text || 'Câu hỏi cần ôn tập',
-          choices: c.choices || [],
-          dapAn: c.dapAnDung || 'A',
-          loiGiai: c.loiGiai || '',
-          chuyenDe: c.chuyenDe || 'Lỗi sai cần khắc phục',
-        }))
-      }
-
-      const soCauThucTe = Math.min(soCauGiao, dsCauChon.length > 0 ? dsCauChon.length : soCauGiao)
-
-      // 3. Đóng gói bài tập Mom giao (Hạn 2 tiếng)
-      const maMom = `mom_${Date.now()}`
-      const baiMoi: BaiMomGiao = {
-        id: maMom,
-        tieuDe: `Bài của Mom giao (${soCauThucTe} câu)`,
-        sbd: sbdHienTai,
-        soCau: soCauThucTe,
-        thoiGianPhut: 120, // 2 tiếng
-        taoLuc: new Date().toISOString(),
-        ngayGiao: new Date().toISOString(),
-        trangThai: 'chua_lam',
-        cau: dsCauChon,
-        dsCau: dsCauChon,
-      }
-
-      // Lưu vào danh sách Mom giao của học sinh
-      const dsCapNhat = [baiMoi, ...dsMomGiao]
-      localStorage.setItem(`omr_mom_btvn_${sbdHienTai}`, JSON.stringify(dsCapNhat))
-      setDsMomGiao(dsCapNhat)
-
-      setThongBaoMom({
-        loai: 'ok',
-        chu: `🎉 Đã tạo thành công "${baiMoi.tieuDe}"! Bài đã gửi sang App Học sinh với thời gian làm bài 2 tiếng tính từ lúc con bắt đầu.`,
-      })
+      setTieuDeCaMom('Tất cả các ca thi')
+      setDsCauSaiModalMom(dsCauSai)
     } catch (e) {
       setThongBaoMom({
         loai: 'loi',
-        chu: e instanceof Error ? e.message : 'Có lỗi khi tạo bài tập',
+        chu: e instanceof Error ? e.message : 'Có lỗi khi tải danh sách câu sai',
       })
     } finally {
       setDangTaoMom(false)
@@ -295,58 +273,13 @@ export default function ParentPortalScreen() {
   }
 
   // TẠO BÀI TẬP KHẮC PHỤC TRỰC TIẾP TỪ CÂU SAI CỦA CA THI
-  const xuLyTaoBaiCuaMomTuCa = async (dsCauSaiCa: any[], maCa?: string) => {
+  const xuLyTaoBaiCuaMomTuCa = (dsCauSaiCa: any[], maCa?: string) => {
     if (!sbdHienTai) return
-    setDangTaoMom(true)
-    setThongBaoMom(null)
-    try {
-      let dsCauChon: any[] = []
-      if (Array.isArray(dsCauSaiCa) && dsCauSaiCa.length > 0) {
-        dsCauChon = dsCauSaiCa.map((c, idx) => ({
-          id: c.qid || `cau_${idx + 1}`,
-          phan: c.phan || 'I',
-          text: c.text || 'Câu hỏi cần ôn tập',
-          choices: c.choices || [],
-          dapAn: c.dapAnDung || 'A',
-          dapAnDung: c.dapAnDung || 'A',
-          loiGiai: c.loiGiai || '',
-          chuyenDe: c.chuyenDe || 'Khắc phục lỗi sai',
-        }))
-      } else {
-        await xuLyTaoBaiCuaMom()
-        return
-      }
-
-      const maMom = `mom_${Date.now()}`
-      const baiMoi: BaiMomGiao = {
-        id: maMom,
-        tieuDe: `Bài khắc phục lỗi sai ca #${maCa || ''} (${dsCauChon.length} câu)`,
-        sbd: sbdHienTai,
-        soCau: dsCauChon.length,
-        thoiGianPhut: 120,
-        taoLuc: new Date().toISOString(),
-        ngayGiao: new Date().toISOString(),
-        trangThai: 'chua_lam',
-        cau: dsCauChon,
-        dsCau: dsCauChon,
-      }
-
-      const dsCapNhat = [baiMoi, ...dsMomGiao]
-      localStorage.setItem(`omr_mom_btvn_${sbdHienTai}`, JSON.stringify(dsCapNhat))
-      setDsMomGiao(dsCapNhat)
-
-      setThongBaoMom({
-        loai: 'ok',
-        chu: `🎉 Đã tạo và gửi thành công "${baiMoi.tieuDe}" sang app của con! Con có 2 tiếng làm bài tính từ lúc bắt đầu.`,
-      })
-      alert(`Đã gửi bài tập gồm ${dsCauChon.length} câu sai sang app của con! Con có thể vào làm bài ngay lúc này.`)
-    } catch (e) {
-      setThongBaoMom({
-        loai: 'loi',
-        chu: e instanceof Error ? e.message : 'Có lỗi khi tạo bài tập',
-      })
-    } finally {
-      setDangTaoMom(false)
+    if (Array.isArray(dsCauSaiCa) && dsCauSaiCa.length > 0) {
+      setTieuDeCaMom(maCa ? `Ca thi #${maCa}` : 'Ca thi đã chọn')
+      setDsCauSaiModalMom(dsCauSaiCa)
+    } else {
+      void xuLyTaoBaiCuaMom()
     }
   }
 
@@ -609,36 +542,12 @@ export default function ParentPortalScreen() {
               </div>
 
               {/* MÔ TẢ CƠ CHẾ SƯ PHẠM */}
-              <div className="p-4 rounded-2xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/40 mb-5 text-xs text-rose-900 dark:text-rose-200 leading-relaxed">
-                💡 <b>Cơ chế hoạt động</b>: Khi Phụ huynh bấm tạo, máy sẽ tự động quét tất cả các câu con đã làm sai từ các ca thi trước, tìm đúng các câu có cùng dạng và nhãn trong kho đề để tạo thành một đề ôn tập gửi thẳng sang App Học sinh của con.
-              </div>
-
-              {/* THANH TRƯỢT CHỌN SỐ CÂU (TỐI ĐA 99 CÂU) */}
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                    <Sliders size={14} className="text-rose-500" />
-                    <span>Số câu giao cho con (Tối đa 99 câu)</span>
-                  </label>
-                  <span className="text-lg font-black text-rose-600 dark:text-rose-400 px-3 py-0.5 rounded-lg bg-rose-100 dark:bg-rose-900/50 font-mono">
-                    {soCauGiao} câu
-                  </span>
-                </div>
-
-                {/* SLIDER RANGE */}
-                <input
-                  type="range"
-                  min={5}
-                  max={99}
-                  step={1}
-                  value={soCauGiao}
-                  onChange={(e) => setSoCauGiao(Number(e.target.value))}
-                  className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-rose-600"
-                />
-                <div className="flex justify-between text-[11px] text-slate-400 font-mono">
-                  <span>5 câu (ôn nhanh)</span>
-                  <span>50 câu</span>
-                  <span>99 câu (tối đa)</span>
+              <div className="p-4 rounded-2xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/40 mb-5 text-xs text-rose-900 dark:text-rose-200 leading-relaxed space-y-2">
+                <div className="font-bold">💡 3 phương pháp khắc phục câu sai tối ưu cho con:</div>
+                <div className="space-y-1.5 pl-1 text-[11.5px] text-rose-800 dark:text-rose-300">
+                  <div>• <b>1. Làm lại các câu sai</b>: Con làm lại đúng các câu bị mất điểm kèm lời giải chuẩn để ghi nhớ.</div>
+                  <div>• <b>2. Luyện thêm dạng câu sai</b>: Tự động rút câu cùng nhãn dán theo đúng tỷ lệ tối đa (lẻ làm tròn lên).</div>
+                  <div>• <b>3. Lựa chọn luyện câu</b>: Lọc theo mức sao (2 sao, 1 sao, 0 sao) và thể loại (lý thuyết, tính toán), tối đa 100 câu.</div>
                 </div>
               </div>
 
@@ -652,12 +561,12 @@ export default function ParentPortalScreen() {
                 {dangTaoMom ? (
                   <>
                     <RefreshCw size={18} className="animate-spin" />
-                    <span>Đang quét câu sai & rút đề phù hợp…</span>
+                    <span>Đang trích xuất câu sai của con…</span>
                   </>
                 ) : (
                   <>
                     <Heart size={18} />
-                    <span>Tự động tạo & Gửi bài cho con (Hạn 2 tiếng)</span>
+                    <span>Tạo bài luyện khắc phục cho con (3 chế độ)</span>
                   </>
                 )}
               </button>
@@ -739,9 +648,13 @@ export default function ParentPortalScreen() {
           lop={lopCon}
           scriptUrl={scriptUrl}
           onClose={() => setCaDangXem(null)}
-          onGiaoBaiChoCon={(ds) => {
+          onGiaoBaiChoCon={(ds, tieuDe) => {
             setCaDangXem(null)
-            void xuLyTaoBaiCuaMomTuCa(ds, caDangXem.maCa)
+            if (tieuDe) {
+              void xuLyGiaoBaiTrucTiep(ds, tieuDe)
+            } else {
+              void xuLyTaoBaiCuaMomTuCa(ds, caDangXem.maCa)
+            }
           }}
           onNhanTinChoThay={(noiDung) => {
             guiTinNhan({
@@ -752,6 +665,23 @@ export default function ParentPortalScreen() {
             alert('Đã gửi tin nhắn đến Thầy Đỗ Đại Học! Thầy sẽ phản hồi sớm nhất trên hệ thống.')
           }}
           onXemPhieuGoc={(html) => {
+            setXemPhieuHtml(html)
+          }}
+        />
+      )}
+
+      {/* MODAL KHẮC PHỤC CÂU SAI ĐỒNG BỘ 3 LỰA CHỌN CHO PHỤ HUYNH */}
+      {dsCauSaiModalMom && (
+        <ModalKhacPhucCauSai
+          isOpen={Boolean(dsCauSaiModalMom)}
+          onClose={() => setDsCauSaiModalMom(null)}
+          dsCauSai={dsCauSaiModalMom}
+          hoTen={hoTenCon || sbdHienTai || 'Học sinh'}
+          sbd={sbdHienTai || ''}
+          tieuDeCa={tieuDeCaMom}
+          onGiaoBaiChoCon={(dsCau, tieuDe) => xuLyGiaoBaiTrucTiep(dsCau, tieuDe)}
+          onTaoPhieuXong={(html) => {
+            setDsCauSaiModalMom(null)
             setXemPhieuHtml(html)
           }}
         />

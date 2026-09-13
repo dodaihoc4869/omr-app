@@ -55,11 +55,16 @@ export const MOI_LOC_SAO: LocSao[] = ['moi', 'sao_2', 'sao_1']
  * gì — thầy phải chủ động chọn thì mới hẹp lại. */
 export const LOC_SAO_MAC_DINH: LocSao = 'moi'
 
+export type LocSaoMoRong = LocSao | 'sao_0'
+
 /** Câu này có lọt bộ lọc sao đang chọn không. */
-export function hopSao(sao: number | undefined, loc: LocSao): boolean {
+export function hopSao(sao: number | undefined, loc: LocSao | 'sao_0'): boolean {
   if (loc === 'moi') return true
   const s = Number(sao) || 0
-  return loc === 'sao_2' ? s === 2 : s === 1
+  if (loc === 'sao_2') return s === 2
+  if (loc === 'sao_1') return s === 1
+  if (loc === 'sao_0') return s === 0
+  return true
 }
 
 /** Đếm từng mức để màn hình hiện thẳng ba con số, thay vì để thầy bấm rồi mới

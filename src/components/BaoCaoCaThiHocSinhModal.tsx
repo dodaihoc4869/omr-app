@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { hsCauSaiApi } from '../lib/exam-api'
 import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
+import ModalKhacPhucCauSai from './ModalKhacPhucCauSai'
 
 export interface ThongTinBaiThiHocSinh {
   maCa: string
@@ -68,6 +69,7 @@ export default function BaoCaoCaThiHocSinhModal({
   const [dangTaiCauSai, setDangTaiCauSai] = useState(false)
   const [tabHienThi, setTabHienThi] = useState<string>('tong_quan')
   const [cauSaiMoRong, setCauSaiMoRong] = useState<Record<string, boolean>>({})
+  const [hienModalKhacPhuc, setHienModalKhacPhuc] = useState(false)
 
   // Tải danh sách chi tiết các câu làm sai trong ca này
   useEffect(() => {
@@ -285,8 +287,7 @@ export default function BaoCaoCaThiHocSinhModal({
                   <button
                     type="button"
                     onClick={() => {
-                      onClose()
-                      onBatDauKhacPhuc(baiThi.maCa)
+                      setHienModalKhacPhuc(true)
                     }}
                     className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-500 text-white font-bold text-sm shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
@@ -687,8 +688,7 @@ export default function BaoCaoCaThiHocSinhModal({
             <button
               type="button"
               onClick={() => {
-                onClose()
-                onBatDauKhacPhuc(baiThi.maCa)
+                setHienModalKhacPhuc(true)
               }}
               className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs shadow-md shadow-blue-500/20 inline-flex items-center gap-2 cursor-pointer"
             >
@@ -698,6 +698,21 @@ export default function BaoCaoCaThiHocSinhModal({
           )}
         </div>
       </div>
+
+      {/* MODAL LỰA CHỌN KHẮC PHỤC CÂU SAI ĐỒNG BỘ */}
+      {hienModalKhacPhuc && (
+        <ModalKhacPhucCauSai
+          isOpen={hienModalKhacPhuc}
+          onClose={() => setHienModalKhacPhuc(false)}
+          dsCauSai={dsCauSai}
+          hoTen={hoTen}
+          sbd={sbd}
+          tieuDeCa={baiThi.tenCa || baiThi.maCa}
+          onTaoPhieuXong={() => {
+            if (onBatDauKhacPhuc) onBatDauKhacPhuc(baiThi.maCa)
+          }}
+        />
+      )}
     </div>
   )
 }

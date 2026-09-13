@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { hsCauSaiApi, layPhieu } from '../lib/exam-api'
 import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
+import ModalKhacPhucCauSai from './ModalKhacPhucCauSai'
 
 export interface ThongTinBaiThiPhuHuynh {
   maCa: string
@@ -45,7 +46,7 @@ interface Props {
   lop?: string
   scriptUrl: string
   onClose: () => void
-  onGiaoBaiChoCon: (dsCauSai: any[]) => void
+  onGiaoBaiChoCon: (dsCauSai: any[], tieuDe?: string) => void
   onNhanTinChoThay: (noiDung: string) => void
   onXemPhieuGoc?: (html: string) => void
 }
@@ -65,6 +66,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
   const [dangTaiCauSai, setDangTaiCauSai] = useState(false)
   const [tabPhanTich, setTabPhanTich] = useState<'tong_quan' | 'cau_truc' | 'nhan_thuc' | 'cau_sai'>('tong_quan')
   const [dangTaiPhieuGoc, setDangTaiPhieuGoc] = useState(false)
+  const [hienModalKhacPhuc, setHienModalKhacPhuc] = useState(false)
 
   // Tải danh sách chi tiết các câu con làm sai trong ca này
   useEffect(() => {
@@ -633,10 +635,10 @@ export default function BaoCaoCaThiPhuHuynhModal({
                     <span>Tổng số <strong>{dsCauSai.length}</strong> câu con làm sai trong ca thi #{baiThi.maCa}:</span>
                     <button
                       type="button"
-                      onClick={() => onGiaoBaiChoCon(dsCauSai)}
+                      onClick={() => setHienModalKhacPhuc(true)}
                       className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline cursor-pointer flex items-center gap-1"
                     >
-                      <Heart size={14} /> Giao ngay {dsCauSai.length} câu này cho con làm lại
+                      <Heart size={14} /> Khắc phục {dsCauSai.length} câu sai này
                     </button>
                   </div>
 
@@ -764,10 +766,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
           {/* Nút 3: Tạo ngay bài tập khắc phục cho con */}
           <button
             type="button"
-            onClick={() => {
-              onClose()
-              onGiaoBaiChoCon(dsCauSai)
-            }}
+            onClick={() => setHienModalKhacPhuc(true)}
             className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer"
           >
             <Heart size={16} />
@@ -775,6 +774,23 @@ export default function BaoCaoCaThiPhuHuynhModal({
           </button>
         </footer>
       </div>
+
+      {/* MODAL KHẮC PHỤC CÂU SAI ĐỒNG BỘ 3 LỰA CHỌN */}
+      {hienModalKhacPhuc && (
+        <ModalKhacPhucCauSai
+          isOpen={hienModalKhacPhuc}
+          onClose={() => setHienModalKhacPhuc(false)}
+          dsCauSai={dsCauSai}
+          hoTen={hoTenCon}
+          sbd={sbd}
+          tieuDeCa={baiThi.tenCa || `Ca #${baiThi.maCa}`}
+          onGiaoBaiChoCon={(dsCau, tieuDe) => {
+            setHienModalKhacPhuc(false)
+            onClose()
+            onGiaoBaiChoCon(dsCau, tieuDe)
+          }}
+        />
+      )}
     </div>
   )
 }

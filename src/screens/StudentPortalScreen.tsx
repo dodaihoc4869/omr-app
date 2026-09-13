@@ -28,19 +28,16 @@ import {
   hsLichSuCaApi,
   hsBtvnApi,
   hsCauSaiApi,
-  type ChiTietCauRow,
 } from '../lib/exam-api'
-import { loadExamSources, loadScriptUrlHoacMacDinh } from '../lib/exam-db'
-import { rutDeChua } from '../lib/rut-de-chua'
-import type { CauLuyen } from '../lib/bai-tap-pdf'
-import { dangCua } from '../lib/dang-cau'
-import { dungPhieu, type ThongTinPhieu } from '../lib/html-phieu'
+import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
 import LogoHocSinh from '../components/LogoHocSinh'
 import DauTruongGame from '../components/DauTruongGame'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
+import ModalKhacPhucCauSai from '../components/ModalKhacPhucCauSai'
+import type { CauSaiDauVao } from '../lib/thuat-toan-rut-cau-sai'
 import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
 
 const KHOA_LUU_AUTH = 'omr_student_portal_auth'
@@ -175,6 +172,8 @@ export default function StudentPortalScreen() {
   const [dangTaoDeKhacPhuc, setDangTaoDeKhacPhuc] = useState(false)
   const [thongBaoKhacPhuc, setThongBaoKhacPhuc] = useState('')
   const [phieuHtml, setPhieuHtml] = useState('')
+  const [dsCauSaiKhacPhucModal, setDsCauSaiKhacPhucModal] = useState<CauSaiDauVao[] | null>(null)
+  const [tieuDeKhacPhucModal, setTieuDeKhacPhucModal] = useState('')
   const [caXemBaoCaoModal, setCaXemBaoCaoModal] = useState<any | null>(null)
   const [scriptUrl, setScriptUrl] = useState('')
 
@@ -694,130 +693,10 @@ export default function StudentPortalScreen() {
         return
       }
 
-      // Tải kho đề nếu có
-      let khoDe: any[] = []
-      try {
-        khoDe = await loadExamSources()
-      } catch {
-        khoDe = []
-      }
-
-      const rows: ChiTietCauRow[] = res.items.map((it) => ({
-        soCau: it.soCau,
-        phan: it.phan,
-        qid: it.qid,
-        chuyenDe: it.chuyenDe || '',
-        mucDo: it.mucDo || '',
-        dapAnChon: it.dapAnChon || '',
-        dapAnDung: it.dapAnDung || '',
-        dungSai: false,
-        giay: null,
-      }))
-
-      let dsCauLuyen: CauLuyen[] = []
-      if (khoDe && khoDe.length > 0) {
-        try {
-          const kq = rutDeChua({
-            khoDe,
-            rows,
-            qidTranh: [],
-            soCau: Math.max(res.items.length * 2, 10),
-          })
-          dsCauLuyen = kq.cau
-        } catch {
-          dsCauLuyen = []
-        }
-      }
-
-      // Bổ sung các câu làm sai trực tiếp nếu kho đề chưa có câu tương ứng
-      const qidDaCo = new Set(dsCauLuyen.map((c) => c.id))
-      for (const it of res.items) {
-        if (!qidDaCo.has(it.qid)) {
-          const rawDang = typeof it.dang === 'string'
-            ? (it.dang === '[object Object]' ? '' : it.dang)
-            : (it.dang && typeof it.dang === 'object' ? (it.dang as any).ten || (it.dang as any).ma || '' : '')
-          const tenDang = rawDang || it.chuyenDe || 'Lỗi sai cần khắc phục'
-          const maDang = rawDang
-          const rawChoices = it.choices && it.choices.length > 0
-            ? it.choices
-            : (it.ideas && it.ideas.length > 0 ? it.ideas : null)
-          const luaChon = rawChoices ? rawChoices.map((x: unknown) => String(x ?? '')) : null
-          const textCau = String(it.text ?? '')
-          const daDung = String(it.dapAnDung ?? '')
-          const daChon = String(it.dapAnChon ?? '')
-
-          // Sử dụng module chuẩn hoá lời giải đầy đủ cấu trúc: Kiến thức cốt lõi + Vì sao chọn/không chọn
-          const lgChuan = chuanHoaLoiGiaiCau(
-            (it as any).loiGiai,
-            it.phan || 'I',
-            daDung,
-            luaChon,
-            textCau,
-            it.chuyenDe || ''
-          )
-
-          const cl: CauLuyen = {
-            phan: it.phan,
-            id: it.qid,
-            maDe: it.maCa,
-            chuyenDe: it.chuyenDe || 'Hoá học',
-            dang:
-              tenDang ||
-              dangCua({
-                phan: it.phan,
-                text: textCau,
-                luaChon: luaChon ?? [],
-                dapAn: daDung,
-                mucDo: it.mucDo as any,
-              }),
-            sao: 1,
-            mucDo: (it.mucDo as any) || 'hieu',
-            text: textCau,
-            luaChon,
-            dapAn: daDung,
-            chot: lgChuan.chot,
-            lyDo: lgChuan.lyDo,
-            buoc: lgChuan.buoc,
-            ketQua: lgChuan.ketQua || daDung,
-            anhThanCau: (() => {
-              const a = it.imageDataUrl || it.hinhAnh
-              if (typeof a === 'string' && a.trim().length > 10 && (
-                a.startsWith('data:image/') || a.startsWith('http://') || a.startsWith('https://') || a.startsWith('/')
-              )) {
-                return a.trim()
-              }
-              return undefined
-            })(),
-            chuaCho: {
-              qid: it.qid,
-              soCau: Number(it.soCau) || 1,
-              phan: it.phan,
-              maDang: maDang || '',
-              tenDang: tenDang || it.chuyenDe || 'Lỗi sai cần khắc phục',
-              bac: 1,
-              laLamLai: true,
-              daChon,
-              viSaoSai: daChon ? `Em đã chọn ${daChon}, đáp án đúng là ${daDung}` : undefined,
-            },
-          }
-          dsCauLuyen.push(cl)
-        }
-      }
-
-      const tt: ThongTinPhieu = {
-        hoTen: auth.hoTen,
-        sbd: auth.sbd,
-        ngay: new Date(),
-        tenChuyenDe: 'ĐỀ ÔN TẬP KHẮC PHỤC CÂU SAI',
-        ketQua: `Gồm ${res.items.length} câu sai từ ${dsMaCa.length} ca thi`,
-        hienDapAn: false,
-        nhanBia: 'ĐỀ KHẮC PHỤC CÂU SAI',
-      }
-
-      const html = dungPhieu(tt, dsCauLuyen, { anGiai: false })
-      setPhieuHtml(html)
+      setTieuDeKhacPhucModal(dsMaCa.length === 1 ? `Ca thi #${dsMaCa[0]}` : `${dsMaCa.length} ca thi đã chọn`)
+      setDsCauSaiKhacPhucModal(res.items as CauSaiDauVao[])
     } catch (err) {
-      setThongBaoKhacPhuc(err instanceof Error ? err.message : 'Lỗi khi tạo đề khắc phục')
+      setThongBaoKhacPhuc(err instanceof Error ? err.message : 'Lỗi khi tải danh sách câu sai')
     } finally {
       setDangTaoDeKhacPhuc(false)
     }
@@ -1956,6 +1835,22 @@ export default function StudentPortalScreen() {
           }}
           onMoLaiBaiThi={(maCa) => {
             window.location.href = `/t/${maCa}?sbd=${auth.sbd}`
+          }}
+        />
+      )}
+
+      {/* Modal Khắc phục câu sai chuẩn hoá 3 lựa chọn */}
+      {dsCauSaiKhacPhucModal && auth && (
+        <ModalKhacPhucCauSai
+          isOpen={Boolean(dsCauSaiKhacPhucModal)}
+          onClose={() => setDsCauSaiKhacPhucModal(null)}
+          dsCauSai={dsCauSaiKhacPhucModal}
+          hoTen={auth.hoTen}
+          sbd={auth.sbd}
+          tieuDeCa={tieuDeKhacPhucModal}
+          onTaoPhieuXong={(html) => {
+            setDsCauSaiKhacPhucModal(null)
+            setPhieuHtml(html)
           }}
         />
       )}
