@@ -1746,18 +1746,24 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
   const sbd = chuoi(b.sbd).trim()
   const dsMaCa = Array.isArray(b.dsMaCa) ? (b.dsMaCa as string[]).map(chuoi).filter(Boolean) : []
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
-  if (dsMaCa.length === 0) return { ok: true, items: [] }
 
-  const placeholders = dsMaCa.map(() => '?').join(',')
-  const r = await env.DB.prepare(
-    `SELECT c.ma_ca, c.sbd, c.phan, c.so_cau, c.qid, c.chuyen_de, c.muc_do,
+  let query = `SELECT c.ma_ca, c.sbd, c.phan, c.so_cau, c.qid, c.chuyen_de, c.muc_do,
             c.dap_an_chon, c.dap_an_dung, c.dung_sai, ca.ten_ca
        FROM chi_tiet_cau c
        LEFT JOIN ca ON ca.ma_ca = c.ma_ca
-      WHERE c.sbd = ? AND c.dung_sai = 0 AND c.ma_ca IN (${placeholders})
-      ORDER BY c.ma_ca DESC, CASE c.phan WHEN 'I' THEN 1 WHEN 'II' THEN 2 WHEN 'III' THEN 3 ELSE 4 END, c.so_cau ASC`,
-  )
-    .bind(sbd, ...dsMaCa)
+      WHERE c.sbd = ? AND c.dung_sai = 0`
+  const params: unknown[] = [sbd]
+
+  if (dsMaCa.length > 0) {
+    const placeholders = dsMaCa.map(() => '?').join(',')
+    query += ` AND c.ma_ca IN (${placeholders})`
+    params.push(...dsMaCa)
+  }
+
+  query += ` ORDER BY c.ma_ca DESC, CASE c.phan WHEN 'I' THEN 1 WHEN 'II' THEN 2 WHEN 'III' THEN 3 ELSE 4 END, c.so_cau ASC`
+
+  const r = await env.DB.prepare(query)
+    .bind(...params)
     .all<Record<string, unknown>>()
 
   const rows = r.results ?? []
@@ -1767,7 +1773,7 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
   for (const row of rows) {
     const maCa = chuoi(row.ma_ca)
     if (!banksCache.has(maCa) && env.DE) {
-      let bData: Record<string, unknown> | null = null
+      let bData: any = null
       try {
         const oKey = await env.DE.get(`key/${maCa}.json`)
         if (oKey?.body) bData = (await new Response(oKey.body).json()) as Record<string, unknown>
@@ -1780,45 +1786,82 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
       }
       if (bData) {
         banksCache.set(maCa, bData)
-        for (const p of ['phanI', 'phanII', 'phanIII']) {
-          const arr = Array.isArray(bData[p]) ? (bData[p] as Record<string, unknown>[]) : []
-          for (const q of arr) {
-            if (q && q.id) qMap.set(chuoi(q.id), q)
+        const napBank = (bankObj: any) => {
+          if (!bankObj) return
+          if (Array.isArray(bankObj)) {
+            for (const item of bankObj) napBank(item)
+            return
           }
+          for (const p of ['phanI', 'phanII', 'phanIII', 'cau', 'dsCau', 'questions']) {
+            const arr = Array.isArray(bankObj[p]) ? bankObj[p] : []
+            for (const q of arr) {
+              if (q) {
+                if (q.id) qMap.set(chuoi(q.id), q)
+                if (q.qid) qMap.set(chuoi(q.qid), q)
+                if (q.id) qMap.set(`${maCa}_${chuoi(q.id)}`, q)
+                if (q.qid) qMap.set(`${maCa}_${chuoi(q.qid)}`, q)
+                if (q.so) qMap.set(`${maCa}_${chuoi(q.phan || 'I')}_${q.so}`, q)
+              }
+            }
+          }
+          if (bankObj.keyBank) napBank(bankObj.keyBank)
         }
+        napBank(bData)
       }
     }
   }
 
   const items = rows.map((row) => {
     const qid = chuoi(row.qid)
-    const fullQ = qMap.get(qid)
+    const maCa = chuoi(row.ma_ca)
+    const phan = chuoi(row.phan)
+    const soCau = Number(row.so_cau) || 0
+    const fullQ = qMap.get(qid) || qMap.get(`${maCa}_${qid}`) || qMap.get(`${maCa}_${phan}_${soCau}`)
+
+    const rawLg = fullQ ? (fullQ.loiGiai ?? fullQ.loi_giai ?? fullQ.explanation ?? fullQ.giaiThich ?? fullQ.giai_thich) : null
+    let loiGiaiStr = ''
+    if (rawLg) {
+      if (typeof rawLg === 'object' && rawLg !== null) {
+        loiGiaiStr = JSON.stringify(rawLg)
+      } else {
+        const s = chuoi(rawLg)
+        loiGiaiStr = s === '[object Object]' ? '' : s
+      }
+    }
+
+    const rawDang = fullQ ? (fullQ.dang ?? fullQ.tenDang ?? fullQ.chuyenDe ?? fullQ.chuyen_de) : null
+    let dangStr = ''
+    if (rawDang) {
+      if (typeof rawDang === 'object' && rawDang !== null) {
+        dangStr = chuoi((rawDang as any).ten || (rawDang as any).ma || '')
+      } else {
+        const s = chuoi(rawDang)
+        dangStr = s === '[object Object]' ? '' : s
+      }
+    }
+
     return {
-      maCa: chuoi(row.ma_ca),
-      tenCa: chuoi(row.ten_ca) || `Ca ${chuoi(row.ma_ca)}`,
-      phan: chuoi(row.phan),
-      soCau: Number(row.so_cau) || 0,
+      maCa,
+      tenCa: chuoi(row.ten_ca) || `Ca ${maCa}`,
+      phan,
+      soCau,
       qid,
       chuyenDe: chuoi(row.chuyen_de),
       mucDo: chuoi(row.muc_do),
       dapAnChon: chuoi(row.dap_an_chon),
       dapAnDung: chuoi(row.dap_an_dung),
-      text: fullQ ? chuoi(fullQ.text) : '',
-      choices: fullQ && Array.isArray(fullQ.choices) ? fullQ.choices : undefined,
-      ideas: fullQ && Array.isArray(fullQ.ideas) ? fullQ.ideas : undefined,
-      table: fullQ ? fullQ.table : undefined,
-      imageDataUrl: fullQ ? fullQ.imageDataUrl : undefined,
-      hinhAnh: fullQ ? fullQ.hinhAnh : undefined,
-      loiGiai: fullQ
-        ? typeof fullQ.loiGiai === 'object' && fullQ.loiGiai !== null
-          ? JSON.stringify(fullQ.loiGiai)
-          : (chuoi(fullQ.loiGiai || fullQ.explanation || fullQ.giaiThich || '') === '[object Object]' ? '' : chuoi(fullQ.loiGiai || fullQ.explanation || fullQ.giaiThich || ''))
-        : '',
-      dang: fullQ
-        ? typeof fullQ.dang === 'object' && fullQ.dang !== null
-          ? chuoi((fullQ.dang as Record<string, unknown>).ten || (fullQ.dang as Record<string, unknown>).ma || '')
-          : (chuoi(fullQ.dang ?? '') === '[object Object]' ? '' : chuoi(fullQ.dang ?? ''))
-        : '',
+      text: fullQ ? chuoi(fullQ.text || fullQ.de) : '',
+      choices: fullQ && Array.isArray(fullQ.choices)
+        ? fullQ.choices
+        : (fullQ && fullQ.pa ? ['A', 'B', 'C', 'D'].map((k) => fullQ.pa[k] || '') : undefined),
+      ideas: fullQ && Array.isArray(fullQ.ideas)
+        ? fullQ.ideas
+        : (fullQ && fullQ.y ? ['a', 'b', 'c', 'd'].map((k) => fullQ.y[k] || '') : undefined),
+      table: fullQ ? (fullQ.table || fullQ.bang) : undefined,
+      imageDataUrl: fullQ ? (fullQ.imageDataUrl || fullQ.thanCauImg) : undefined,
+      hinhAnh: fullQ ? (fullQ.hinhAnh || fullQ.hinh) : undefined,
+      loiGiai: loiGiaiStr,
+      dang: dangStr,
     }
   })
 

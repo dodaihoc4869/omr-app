@@ -234,7 +234,7 @@ body[data-mau="7"] { --nav: #4c1d95; --nav-2: #6d28d9; --luc: #7c3aed; --luc-2: 
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   background: var(--nen);
   color: var(--muc);
   line-height: 1.5;
@@ -665,9 +665,9 @@ body.co-lam .tf-item { padding: 9px 10px; }
 .sol-text { font-size: 14.5px; line-height: 1.65; color: var(--kem-muc); overflow-wrap: break-word; }
 .sol-text strong { color: #5b2a06; }
 .sol-cot-loi { font-weight: 800; font-size: 15px; line-height: 1.6; color: #3b1d05; }
-.sol-pa { padding: 3px 0; }
+.sol-pa { padding: 4px 0; }
 .sol-pa + .sol-pa { border-top: 1px dashed rgba(91,42,6,.18); }
-.sol-pa.chon { font-weight: 600; }
+.sol-pa.chon { font-weight: 700; color: #14532d; }
 .sol-step { font-size: 14.5px; line-height: 1.65; color: var(--kem-muc); padding-left: 18px; text-indent: -18px; }
 .sol-ket { font-size: 15px; font-weight: 800; color: var(--kem-muc); }
 /* Ảnh lời giải gốc chụp từ đề của tác giả. Nền trắng vì ảnh cắt ra là giấy

@@ -41,6 +41,8 @@ import { datManifestTheoVai } from '../lib/pwa-install'
 import LogoHocSinh from '../components/LogoHocSinh'
 import BongBongChatHocSinh from '../components/BongBongChatHocSinh'
 import DauTruongGame from '../components/DauTruongGame'
+import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
+import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
 
 const KHOA_LUU_AUTH = 'omr_student_portal_auth'
 
@@ -174,6 +176,8 @@ export default function StudentPortalScreen() {
   const [dangTaoDeKhacPhuc, setDangTaoDeKhacPhuc] = useState(false)
   const [thongBaoKhacPhuc, setThongBaoKhacPhuc] = useState('')
   const [phieuHtml, setPhieuHtml] = useState('')
+  const [caXemBaoCaoModal, setCaXemBaoCaoModal] = useState<any | null>(null)
+  const [scriptUrl, setScriptUrl] = useState('')
 
   // Vào thi
   const [maCaVaoThi, setMaCaVaoThi] = useState('')
@@ -282,47 +286,85 @@ export default function StudentPortalScreen() {
       const laDung = dapAnEm === dapAnDung
       if (laDung) soDung++
 
+      const rawChoices = cau.choices && cau.choices.length > 0
+        ? cau.choices
+        : (cau.ideas && cau.ideas.length > 0 ? cau.ideas : [])
+      const luaChon = rawChoices.map((x: unknown) => String(x ?? ''))
+
+      const lgChuan = chuanHoaLoiGiaiCau(
+        cau.loiGiai,
+        cau.phan || 'I',
+        dapAnDung,
+        luaChon,
+        cau.text || '',
+        cau.chuyenDe || ''
+      )
+
       chiTietKq.push({
         stt: i + 1,
         text: cau.text,
-        choices: cau.choices || [],
+        choices: luaChon,
         dapAnEm,
         dapAnDung,
         dungSai: laDung,
-        loiGiai: cau.loiGiai || 'Lời giải chi tiết theo chuẩn hoá học chương trình mới.',
+        chot: lgChuan.chot,
+        lyDo: lgChuan.lyDo,
+        buoc: lgChuan.buoc,
         chuyenDe: cau.chuyenDe || 'Chuyên đề ôn tập',
       })
     }
 
     const diem = Number(((soDung / tongSo) * 10).toFixed(2))
 
-    // Dựng cấu trúc HTML báo cáo kết quả đồng bộ sang app Phụ huynh
-    const htmlKetQua = `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 780px; margin: 0 auto; padding: 24px; color: var(--muc, rgb(30, 41, 59)); background: var(--the, rgb(255, 255, 255));">
-        <div style="text-align: center; border-bottom: 2px solid var(--vien, rgb(226, 232, 240)); padding-bottom: 20px; margin-bottom: 24px;">
-          <div style="font-size: 24px; font-weight: 800; color: var(--gg-do, rgb(225, 29, 72)); margin-bottom: 6px;">💖 KẾT QUẢ BÀI CỦA MOM GIAO</div>
-          <div style="font-size: 14px; color: var(--nhat, rgb(100, 116, 139));">Học sinh: <strong>${auth.hoTen}</strong> (SBD: <strong>${auth.sbd}</strong>) ${auth.lop ? `· Lớp: ${auth.lop}` : ''}</div>
+    const htmlKetQua = `<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo Cáo Bài Của Mom</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: rgb(248, 250, 252);
+      padding: 16px;
+      color: rgb(30, 41, 59);
+    }
+  </style>
+</head>
+<body>
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Google Sans', 'Segoe UI', Roboto, sans-serif; max-width: 820px; margin: 0 auto; padding: 28px; color: var(--muc, rgb(30, 41, 59)); background: var(--the, rgb(255, 255, 255)); border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+        <div style="height: 6px; width: 100%; border-radius: 9999px; overflow: hidden; display: flex; margin-bottom: 24px;">
+          <div style="flex: 1; background: rgb(26, 115, 232);"></div>
+          <div style="flex: 1; background: rgb(234, 67, 53);"></div>
+          <div style="flex: 1; background: rgb(251, 188, 4);"></div>
+          <div style="flex: 1; background: rgb(52, 168, 83);"></div>
+        </div>
+
+        <div style="text-align: center; border-bottom: 2px solid var(--vien, rgb(226, 232, 240)); padding-bottom: 24px; margin-bottom: 28px;">
+          <div style="font-size: 24px; font-weight: 900; color: rgb(234, 67, 53); margin-bottom: 6px; letter-spacing: -0.01em;">💖 KẾT QUẢ BÀI CỦA MOM GIAO</div>
+          <div style="font-size: 14.5px; color: var(--nhat, rgb(100, 116, 139));">Học sinh: <strong>${auth.hoTen}</strong> (SBD: <strong>${auth.sbd}</strong>) ${auth.lop ? `· Lớp: ${auth.lop}` : ''}</div>
           <div style="font-size: 13px; color: var(--chim, rgb(148, 163, 184)); margin-top: 4px;">Thời gian nộp: ${new Date().toLocaleString('vi-VN')}</div>
-          <div style="display: inline-block; margin-top: 16px; padding: 12px 28px; background: rgba(225, 29, 72, 0.08); border: 2px solid rgba(225, 29, 72, 0.2); border-radius: 9999px;">
-            <span style="font-size: 15px; font-weight: 600; color: var(--gg-do, rgb(190, 18, 60));">Điểm số: </span>
-            <span style="font-size: 28px; font-weight: 900; color: var(--gg-do, rgb(225, 29, 72));">${diem}</span>
-            <span style="font-size: 15px; color: var(--gg-do, rgb(136, 19, 55));"> / 10 (${soDung}/${tongSo} câu đúng)</span>
+          <div style="display: inline-block; margin-top: 18px; padding: 12px 32px; background: rgba(234, 67, 53, 0.08); border: 2px solid rgba(234, 67, 53, 0.25); border-radius: 9999px;">
+            <span style="font-size: 16px; font-weight: 700; color: rgb(197, 34, 31);">Điểm số: </span>
+            <span style="font-size: 32px; font-weight: 900; color: rgb(234, 67, 53);">${diem}</span>
+            <span style="font-size: 15px; font-weight: 600; color: rgb(197, 34, 31);"> / 10 (${soDung}/${tongSo} câu đúng)</span>
           </div>
         </div>
 
-        <div style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--muc, rgb(15, 23, 42));">LỜI GIẢI CHI TIẾT TỪNG CÂU:</div>
+        <div style="font-size: 16px; font-weight: 800; margin-bottom: 18px; color: var(--muc, rgb(15, 23, 42)); letter-spacing: 0.02em;">LỜI GIẢI CHI TIẾT TỪNG CÂU THEO CHUẨN HOÁ HỌC:</div>
         ${chiTietKq
           .map(
             (c) => `
-          <div style="margin-bottom: 20px; padding: 16px; border: 1px solid ${c.dungSai ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)'}; border-radius: 16px; background: ${c.dungSai ? 'rgba(34, 197, 94, 0.05)' : 'rgba(239, 68, 68, 0.05)'};">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span style="font-weight: 700; font-size: 14px; color: var(--muc, rgb(30, 41, 59));">Câu ${c.stt}: ${c.chuyenDe}</span>
-              <span style="font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 9999px; background: ${c.dungSai ? 'var(--gg-luc, rgb(34, 197, 94))' : 'var(--gg-do, rgb(239, 68, 68))'}; color: rgb(255, 255, 255);">
+          <div style="margin-bottom: 24px; padding: 20px; border-radius: 20px; border: 1px solid ${c.dungSai ? 'rgba(52, 168, 83, 0.35)' : 'rgba(234, 67, 53, 0.35)'}; background: ${c.dungSai ? 'rgba(52, 168, 83, 0.04)' : 'rgba(234, 67, 53, 0.04)'}; box-shadow: 0 1px 3px rgba(60,64,67,0.06);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span style="font-weight: 800; font-size: 15px; color: var(--muc, rgb(30, 41, 59));">Câu ${c.stt}: ${c.chuyenDe}</span>
+              <span style="font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 9999px; background: ${c.dungSai ? 'rgb(52, 168, 83)' : 'rgb(234, 67, 53)'}; color: rgb(255, 255, 255);">
                 ${c.dungSai ? '✓ ĐÚNG' : '✗ SAI'}
               </span>
             </div>
-            <div style="font-size: 14px; line-height: 1.6; margin-bottom: 12px; color: var(--muc, rgb(51, 65, 85));">${c.text}</div>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 13px; margin-bottom: 12px;">
+            <div style="font-size: 15px; line-height: 1.65; margin-bottom: 14px; color: var(--muc, rgb(51, 65, 85)); font-weight: 500;">${c.text}</div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 13.5px; margin-bottom: 14px;">
               ${c.choices
                 .map(
                   (ch: string, idx: number) => {
@@ -331,22 +373,61 @@ export default function StudentPortalScreen() {
                     const laChon = kyTu === c.dapAnEm
                     let bg = 'var(--the, rgb(255, 255, 255))'
                     let border = 'var(--vien, rgb(226, 232, 240))'
-                    if (laDung) { bg = 'rgba(34, 197, 94, 0.15)'; border = 'var(--gg-luc, rgb(134, 239, 172))'; }
-                    else if (laChon) { bg = 'rgba(239, 68, 68, 0.15)'; border = 'var(--gg-do, rgb(252, 165, 165))'; }
-                    return `<div style="padding: 6px 10px; border-radius: 8px; border: 1px solid ${border}; background: ${bg};">${kyTu}. ${ch}</div>`
+                    let color = 'var(--muc, rgb(30, 41, 59))'
+                    let fw = '500'
+                    if (laDung) { bg = 'rgba(52, 168, 83, 0.12)'; border = 'rgba(52, 168, 83, 0.5)'; color = 'rgb(19, 115, 51)'; fw = '700'; }
+                    else if (laChon) { bg = 'rgba(234, 67, 53, 0.12)'; border = 'rgba(234, 67, 53, 0.5)'; color = 'rgb(197, 34, 31)'; fw = '700'; }
+                    return `<div style="padding: 8px 12px; border-radius: 12px; border: 1px solid ${border}; background: ${bg}; color: ${color}; font-weight: ${fw};"><strong style="margin-right: 4px;">${kyTu}.</strong> ${ch}</div>`
                   }
                 )
                 .join('')}
             </div>
-            <div style="font-size: 13px; line-height: 1.5; padding: 10px; background: var(--the, rgb(255, 255, 255)); border-radius: 8px; border: 1px dashed var(--vien, rgb(203, 213, 225));">
-              <div style="font-weight: 600; color: var(--gg-xanh, rgb(37, 99, 235)); margin-bottom: 4px;">💡 Phương pháp & Lời giải:</div>
-              <div style="color: var(--nhat, rgb(71, 85, 105));">${c.loiGiai}</div>
+
+            <!-- HỘP LỜI GIẢI ĐÚNG CHUẨN ẢNH 4 (MÀU KEM / HỔ PHÁCH) -->
+            <div style="padding: 16px; background: rgb(255, 251, 235); border: 1px solid rgb(253, 230, 138); border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+              <div style="font-size: 14.5px; color: rgb(146, 64, 14); font-weight: 600; margin-bottom: 8px;">
+                Đáp án: <b style="font-size: 16px; font-weight: 900; color: rgb(120, 53, 15); letter-spacing: 0.04em;">${c.dapAnDung}</b>
+              </div>
+              ${c.chot ? `
+                <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: rgb(146, 64, 14); margin-top: 10px; margin-bottom: 4px;">
+                  KIẾN THỨC CỐT LÕI
+                </div>
+                <div style="font-size: 14.5px; font-weight: 800; line-height: 1.6; color: rgb(59, 29, 5); margin-bottom: 12px;">
+                  ${c.chot}
+                </div>
+              ` : ''}
+              ${c.lyDo && c.lyDo.length > 0 ? `
+                <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: rgb(146, 64, 14); margin-top: 10px; margin-bottom: 6px;">
+                  VÌ SAO CHỌN / KHÔNG CHỌN TỪNG PHƯƠNG ÁN
+                </div>
+                <div style="font-size: 14px; line-height: 1.6; color: rgb(120, 53, 15);">
+                  ${c.lyDo.map((l: any) => `
+                    <div style="padding: 4px 0; border-top: 1px dashed rgba(146, 64, 14, 0.2);">
+                      <strong style="color: rgb(91, 42, 6);">${l.khoa}.</strong>
+                      <span style="font-weight: 700; color: ${l.dung ? 'rgb(21, 128, 61)' : 'rgb(185, 28, 28)'}; margin: 0 4px;">
+                        ${l.dung ? '✓' : '✗'}
+                      </span>
+                      <span>${l.ly}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : ''}
+              ${c.buoc && c.buoc.length > 0 ? `
+                <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: rgb(146, 64, 14); margin-top: 12px; margin-bottom: 6px;">
+                  LÀM TỪNG BƯỚC
+                </div>
+                <div style="font-size: 14px; line-height: 1.6; color: rgb(120, 53, 15);">
+                  ${c.buoc.map((b: string, bIdx: number) => `<div style="margin-bottom: 4px;">${bIdx + 1}. ${b}</div>`).join('')}
+                </div>
+              ` : ''}
             </div>
           </div>
         `
           )
           .join('')}
       </div>
+</body>
+</html>
     `
 
     const baiDaNop: BaiMomGiao = {
@@ -368,6 +449,7 @@ export default function StudentPortalScreen() {
   // Ghi nhớ vai hs
   useEffect(() => {
     nhoVaiDaDung('hs')
+    loadScriptUrlHoacMacDinh().then(setScriptUrl).catch(() => {})
   }, [])
 
   const napLaiBtvn = useCallback(async () => {
@@ -580,9 +662,10 @@ export default function StudentPortalScreen() {
   }, [dsLichSu, cacCaChon])
 
   // Rút đề khắc phục câu sai
-  const taoDeKhacPhuc = async () => {
+  const taoDeKhacPhuc = async (danhSachMaCaTuyChon?: string[]) => {
     if (!auth) return
-    if (cacCaChon.size === 0) {
+    const dsMaCa = danhSachMaCaTuyChon && danhSachMaCaTuyChon.length > 0 ? danhSachMaCaTuyChon : Array.from(cacCaChon)
+    if (dsMaCa.length === 0) {
       setThongBaoKhacPhuc('Vui lòng chọn ít nhất một ca thi để khắc phục câu sai')
       return
     }
@@ -590,7 +673,6 @@ export default function StudentPortalScreen() {
     setThongBaoKhacPhuc('')
     try {
       const url = await loadScriptUrlHoacMacDinh().catch(() => '')
-      const dsMaCa = Array.from(cacCaChon)
       const res = await hsCauSaiApi(url, auth.sbd, dsMaCa)
       if (!res.ok || !res.items || res.items.length === 0) {
         setThongBaoKhacPhuc(res.error || 'Các ca đã chọn không có câu sai nào cần khắc phục!')
@@ -649,6 +731,17 @@ export default function StudentPortalScreen() {
           const textCau = String(it.text ?? '')
           const daDung = String(it.dapAnDung ?? '')
           const daChon = String(it.dapAnChon ?? '')
+
+          // Sử dụng module chuẩn hoá lời giải đầy đủ cấu trúc: Kiến thức cốt lõi + Vì sao chọn/không chọn
+          const lgChuan = chuanHoaLoiGiaiCau(
+            (it as any).loiGiai,
+            it.phan || 'I',
+            daDung,
+            luaChon,
+            textCau,
+            it.chuyenDe || ''
+          )
+
           const cl: CauLuyen = {
             phan: it.phan,
             id: it.qid,
@@ -668,51 +761,10 @@ export default function StudentPortalScreen() {
             text: textCau,
             luaChon,
             dapAn: daDung,
-            chot: (() => {
-              const rawLg = (it as any).loiGiai
-              if (!rawLg) return ''
-              if (typeof rawLg === 'object') {
-                const s = String(rawLg.chot || rawLg.text || rawLg.loiGiai || '')
-                return s === '[object Object]' ? '' : s
-              }
-              const str = String(rawLg).trim()
-              if (str === '[object Object]') return ''
-              if (str.startsWith('{') && str.endsWith('}')) {
-                try {
-                  const j = JSON.parse(str)
-                  const s = String(j.chot || j.text || j.loiGiai || '')
-                  return s === '[object Object]' ? '' : s
-                } catch {
-                  return str
-                }
-              }
-              return str
-            })(),
-            lyDo: (() => {
-              const rawLg = (it as any).loiGiai
-              const lg = typeof rawLg === 'string' && rawLg.trim().startsWith('{')
-                ? (() => { try { return JSON.parse(rawLg) } catch { return null } })()
-                : rawLg
-              if (lg && typeof lg === 'object' && lg.tungPa && typeof lg.tungPa === 'object') {
-                return Object.entries(lg.tungPa).map(([k, v]: [string, any]) => ({
-                  khoa: k,
-                  dung: Boolean(v?.dung),
-                  ly: String(v?.viSao || v?.ly || '')
-                }))
-              }
-              return null
-            })(),
-            buoc: (() => {
-              const rawLg = (it as any).loiGiai
-              const lg = typeof rawLg === 'string' && rawLg.trim().startsWith('{')
-                ? (() => { try { return JSON.parse(rawLg) } catch { return null } })()
-                : rawLg
-              if (lg && typeof lg === 'object' && Array.isArray(lg.buoc)) {
-                return lg.buoc.map(String)
-              }
-              return null
-            })(),
-            ketQua: daDung,
+            chot: lgChuan.chot,
+            lyDo: lgChuan.lyDo,
+            buoc: lgChuan.buoc,
+            ketQua: lgChuan.ketQua || daDung,
             anhThanCau: (() => {
               const a = it.imageDataUrl || it.hinhAnh
               if (typeof a === 'string' && a.trim().length > 10 && (
@@ -1211,13 +1263,14 @@ export default function StudentPortalScreen() {
                     </div>
 
                     <div className="flex items-center gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
-                      <a
-                        href={`/d/${item.maCa}?sbd=${auth.sbd}`}
-                        className="flex-1 py-2 px-4 rounded-full btn-google-tonal text-xs font-semibold text-center flex items-center justify-center gap-1.5"
+                      <button
+                        type="button"
+                        onClick={() => setCaXemBaoCaoModal(item)}
+                        className="flex-1 py-2 px-4 rounded-full btn-google-tonal text-xs font-semibold text-center flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         <span>Xem báo cáo</span>
                         <ChevronRight className="w-3.5 h-3.5" />
-                      </a>
+                      </button>
                       <a
                         href={`/t/${item.maCa}?sbd=${auth.sbd}`}
                         className="py-2 px-4 rounded-full btn-google-outlined text-xs font-medium text-center"
@@ -1681,7 +1734,7 @@ export default function StudentPortalScreen() {
                   {cacCaChon.size === dsLichSu.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả ca'}
                 </button>
                 <button
-                  onClick={taoDeKhacPhuc}
+                  onClick={() => void taoDeKhacPhuc()}
                   disabled={dangTaoDeKhacPhuc || cacCaChon.size === 0}
                   className="px-4 py-2 rounded-full btn-google-primary !bg-amber-500 hover:!bg-amber-600 !border-amber-500 text-white font-semibold text-xs shadow-md flex items-center gap-1.5 disabled:opacity-50 transition cursor-pointer"
                 >
@@ -1857,6 +1910,38 @@ export default function StudentPortalScreen() {
           dong={() => {
             setPhieuHtml('')
             void napLaiBtvn()
+          }}
+        />
+      )}
+
+      {/* Modal Báo cáo ca thi chuẩn Google Material 3 - Mở tức thì & Thúc đẩy sửa sai ngay */}
+      {caXemBaoCaoModal && auth && (
+        <BaoCaoCaThiHocSinhModal
+          baiThi={{
+            maCa: caXemBaoCaoModal.maCa,
+            tenCa: caXemBaoCaoModal.tenCa || `Ca thi #${caXemBaoCaoModal.maCa}`,
+            ngayThi: caXemBaoCaoModal.nopLuc ? dinhDangNgayGio(caXemBaoCaoModal.nopLuc) : undefined,
+            diem: caXemBaoCaoModal.tong ?? 0,
+            diemI: caXemBaoCaoModal.diemI,
+            diemII: caXemBaoCaoModal.diemII,
+            diemIII: caXemBaoCaoModal.diemIII,
+            soCauDung: caXemBaoCaoModal.soCauDung,
+            soCauSai: caXemBaoCaoModal.soCauSai,
+            tongCau: caXemBaoCaoModal.tongCau,
+          }}
+          hoTen={auth.hoTen}
+          sbd={auth.sbd}
+          lop={auth.lop}
+          scriptUrl={scriptUrl}
+          onClose={() => setCaXemBaoCaoModal(null)}
+          onBatDauKhacPhuc={(maCa) => {
+            setCaXemBaoCaoModal(null)
+            setTab('khacphuc')
+            setCacCaChon(new Set([maCa]))
+            void taoDeKhacPhuc([maCa])
+          }}
+          onMoLaiBaiThi={(maCa) => {
+            window.location.href = `/t/${maCa}?sbd=${auth.sbd}`
           }}
         />
       )}

@@ -20,6 +20,7 @@ import {
   Zap,
 } from 'lucide-react'
 import { hsCauSaiApi, layPhieu } from '../lib/exam-api'
+import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
 
 export interface ThongTinBaiThiPhuHuynh {
   maCa: string
@@ -674,11 +675,48 @@ export default function BaoCaoCaThiPhuHuynhModal({
                           </div>
                         </div>
 
-                        {c.loiGiai && typeof c.loiGiai === 'string' && c.loiGiai !== '[object Object]' && (
-                          <div className="text-[11px] text-slate-500 dark:text-slate-400 italic pt-1 border-t border-slate-100 dark:border-slate-800">
-                            Lời giải: {c.loiGiai}
-                          </div>
-                        )}
+                        {(() => {
+                          const lg = chuanHoaLoiGiaiCau(
+                            c.loiGiai,
+                            c.phan || 'I',
+                            c.dapAnDung || '',
+                            c.choices || null,
+                            c.text || '',
+                            c.chuyenDe || ''
+                          )
+                          return (
+                            <div className="p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/80 text-amber-950 dark:text-amber-100 space-y-1.5 mt-2">
+                              {lg.chot && (
+                                <div>
+                                  <div className="text-[10px] font-extrabold uppercase text-amber-800 dark:text-amber-400">
+                                    KIẾN THỨC CỐT LÕI
+                                  </div>
+                                  <div className="text-xs font-bold leading-relaxed">
+                                    {lg.chot}
+                                  </div>
+                                </div>
+                              )}
+                              {lg.lyDo && lg.lyDo.length > 0 && (
+                                <div className="pt-1">
+                                  <div className="text-[10px] font-extrabold uppercase text-amber-800 dark:text-amber-400 mb-1">
+                                    VÌ SAO CHỌN / KHÔNG CHỌN TỪNG PHƯƠNG ÁN
+                                  </div>
+                                  <div className="space-y-1 text-[11px] leading-relaxed">
+                                    {lg.lyDo.map((p) => (
+                                      <div key={p.khoa} className="flex items-start gap-1">
+                                        <strong className="text-amber-900 dark:text-amber-200">{p.khoa}.</strong>
+                                        <span className={`font-bold ${p.dung ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>
+                                          {p.dung ? '✓' : '✗'}
+                                        </span>
+                                        <span>{p.ly}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })()}
                       </div>
                     ))}
                   </div>
