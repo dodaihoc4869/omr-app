@@ -6,7 +6,8 @@
 // xám chờ thi lại · tím đang làm · cam rời màn N lần · đỏ bị khoá · xanh đã nộp.
 // Xoá ca = xoá mềm, phải gõ đúng mã ca.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Check, RefreshCw, Trash2, ArrowLeft, ChevronRight, Images, FileSpreadsheet, FileJson, Lock, Unlock, Send, Pencil, LogIn, BarChart3 } from 'lucide-react'
+import { Check, RefreshCw, Trash2, ChevronRight, Images, FileSpreadsheet, FileJson, Lock, Unlock, Send, Pencil, LogIn, BarChart3, Share2, TrendingUp } from 'lucide-react'
+import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
 import { batDauThi, capNhatKeyBank, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
@@ -1067,116 +1068,27 @@ export default function ExamMonitorScreen() {
     }
   }
 
-  // ---------------------------------------------------------- HỒ SƠ MỘT EM
-  // Cùng các khối với tab Học sinh (BA-APP mục 9 cấm dựng hai màn hồ sơ khác
-  // nhau cho cùng một em), thêm khối gửi phụ huynh soạn theo ĐÚNG CA đang xem.
-  if (sbdHoSo) {
-    const emTrongCa = dsEm.find((e) => e.sbd === sbdHoSo)
-    // Bảng chấm từng câu của đúng em này trong đúng ca này — nguồn của phần
-    // "cách làm bài" và phần "từng câu sai" trong báo cáo gửi phụ huynh. Thiếu
-    // ngân hàng đáp án (ca mở ở máy khác, chưa xin được) thì để null: báo cáo
-    // bỏ hẳn hai phần đó chứ không dựng phần rỗng.
-    let rowsHoSo: ChiTietCauRow[] | null = null
-    if (chiTiet && teacherBank && emTrongCa?.moiNhat.dapAn) {
-      try {
-        rowsHoSo = taoChiTietCau(mergeKeepAnswers(teacherBank, soCauCa, boTheoEmDung), chiTiet.ca.maCa, sbdHoSo, emTrongCa.moiNhat.dapAn, emTrongCa.moiNhat.giayCau)
-      } catch {
-        rowsHoSo = null
-      }
+  // ---------------------------------------------------------- HỒ SƠ MỘT EM (MODAL BÁO CÁO CHUẨN GOOGLE MATERIAL 3)
+  // Thay toàn bộ màn chi tiết cũ bằng modal Báo cáo ca thi chuẩn Google Material 3 của học sinh
+  const emTrongCa = useMemo(() => {
+    if (!sbdHoSo) return null
+    return dsEm.find((e) => e.sbd === sbdHoSo) || null
+  }, [sbdHoSo, dsEm])
+
+  const rowsHoSo: ChiTietCauRow[] | null = useMemo(() => {
+    if (!sbdHoSo || !chiTiet || !teacherBank || !emTrongCa?.moiNhat.dapAn) return null
+    try {
+      return taoChiTietCau(
+        mergeKeepAnswers(teacherBank, soCauCa, boTheoEmDung),
+        chiTiet.ca.maCa,
+        sbdHoSo,
+        emTrongCa.moiNhat.dapAn,
+        emTrongCa.moiNhat.giayCau
+      )
+    } catch {
+      return null
     }
-    return (
-      <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-        <button onClick={() => setSbdHoSo('')} className="tap-target self-start inline-flex items-center" style={{ ...NHAN_NHO, gap: 4 }}>
-          <ArrowLeft size={16} /> {chiTiet ? chiTiet.ca.tenCa || `Ca ${chiTiet.ca.maCa}` : 'Chi tiết ca'}
-        </button>
-
-        {loiHoSo && <OThongBao tone="do">{loiHoSo}</OThongBao>}
-        {dangTaiHoSo && !hoSo && <div style={NHAN_NHO}>Đang mở hồ sơ…</div>}
-
-        {hoSo && (
-          <>
-            <TheNoiDung>
-              <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-5)' }}>
-                {hoSo.em.hoTen || `SBD ${hoSo.em.sbd}`}
-              </div>
-              <div style={{ ...NHAN_NHO, marginTop: 4 }}>
-                SBD <span style={SO}>{hoSo.em.sbd}</span>
-                {hoSo.em.lop ? ` · Lớp ${hoSo.em.lop}` : ''}
-                {hoSo.em.namSinh ? ` · sinh ${hoSo.em.namSinh}${khoiTuNamSinh(hoSo.em.namSinh) ? ` (khối ${khoiTuNamSinh(hoSo.em.namSinh)})` : ''}` : ''}
-              </div>
-              <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
-                <span className="font-bold" style={{ ...SO, fontSize: 'var(--cx-6)' }}>
-                  {emTrongCa?.diem === null || emTrongCa?.diem === undefined ? '—' : emTrongCa.diem.toFixed(2).replace('.', ',')}
-                </span>
-                <span style={NHAN_NHO}>điểm ca này</span>
-                <span style={{ ...NHAN_NHO, ...SO }}>· {hoSo.ca.length} ca đã làm</span>
-              </div>
-            </TheNoiDung>
-
-            {/* Biểu đồ tiến bộ đứng đầu hồ sơ: mở ra là biết em đang lên hay
-                đang xuống, trước khi đọc bất cứ số nào khác. */}
-            {/* Điểm ca đang mở lấy số TỰ CHẤM, không lấy ô Sheet — cùng con số
-                đầu màn vừa in. Ca khác giữ ô Sheet vì máy này không có bộ đề
-                của chúng để chấm lại. */}
-            <KhoiTienBo
-              ca={hoSo.ca}
-              diemDe={chiTiet && emTrongCa?.graded ? { [chiTiet.ca.maCa]: emTrongCa.graded.score.total } : null}
-            />
-
-            {/* Phiếu soạn theo ĐÚNG ca đang mở, không phải ca mới nhất của em —
-                thầy đang đứng ở ca này thì tin nhắn phải nói về ca này. */}
-            <PhieuZaloEm
-              hoSo={hoSo}
-              maCa={chiTiet?.ca.maCa}
-              showToast={showToast}
-              rows={rowsHoSo}
-              banks={teacherBank}
-              // ĐIỂM TỰ CHẤM của đúng em này — CÙNG con số đầu màn đang in.
-              // Không chấm lại được thì để `undefined` (không phải `null`) để
-              // khối phiếu tự đi hỏi máy chủ và tự chấm, thay vì rơi về ô Sheet.
-              diemChamLai={
-                emTrongCa?.graded
-                  ? {
-                      tong: emTrongCa.graded.score.total,
-                      I: emTrongCa.graded.score.phanIScore,
-                      II: emTrongCa.graded.score.phanIIScore,
-                      III: emTrongCa.graded.score.phanIIIScore,
-                    }
-                  : undefined
-              }
-              diemLop={dsEm.map((e) => e.diem).filter((d): d is number => typeof d === 'number')}
-              thoiLuongPhut={chiTiet?.ca.thoiGianPhut ?? null}
-              vaoLuc={emTrongCa?.moiNhat.vaoLuc ?? null}
-              // BẰNG CHỨNG RỜI MÀN đi thẳng vào báo cáo: thầy bấm "Báo phụ
-              // huynh" xong, phụ huynh mở link là thấy nút Vi phạm nhấp nháy,
-              // bấm ra đúng mốc giờ máy đã ghi — thầy khỏi gõ tay lại con số.
-              viPham={
-                emTrongCa
-                  ? {
-                      soLan: emTrongCa.moiNhat.soLanRoiMan || 0,
-                      tongGiay: emTrongCa.moiNhat.tongGiayRoiMan || 0,
-                      daKhoa: emTrongCa.moiNhat.trangThai === 'khoa',
-                      lyDoKhoa: emTrongCa.moiNhat.integrity?.lyDoKhoa ?? null,
-                      nguong:
-                        chiTiet?.ca.nguongLan && chiTiet?.ca.nguongGiay
-                          ? { lan: Number(chiTiet.ca.nguongLan), giay: Number(chiTiet.ca.nguongGiay) }
-                          : null,
-                      events: emTrongCa.moiNhat.integrity?.events ?? null,
-                    }
-                  : null
-              }
-            />
-
-            <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />
-            <TheNoiDung>
-              <NutBaiTapPdf sbd={hoSo.em.sbd} hoTen={hoSo.em.hoTen} lop={hoSo.em.lop} chuyenDe={hoSo.chuyenDe} chuyenDeCa={(hoSo.chuyenDeCaGanNhat ?? []).map((c) => c.ten)} maCa={chiTiet?.ca.maCa} rows={rowsHoSo} showToast={showToast} />
-            </TheNoiDung>
-            <KhoiLichSuCa ca={hoSo.ca} />
-          </>
-        )}
-      </div>
-    )
-  }
+  }, [sbdHoSo, chiTiet, teacherBank, emTrongCa, soCauCa, boTheoEmDung])
 
   return (
     <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
@@ -1949,6 +1861,116 @@ export default function ExamMonitorScreen() {
             </div>
           )}
         </>
+      )}
+
+      {/* MODAL BÁO CÁO CA THI HỌC SINH CHUẨN GOOGLE MATERIAL 3 */}
+      {sbdHoSo && (
+        <BaoCaoCaThiHocSinhModal
+          baiThi={{
+            maCa: chiTiet ? chiTiet.ca.maCa : '',
+            tenCa: chiTiet ? (chiTiet.ca.tenCa || `Ca ${chiTiet.ca.maCa}`) : '',
+            ngayThi: emTrongCa?.moiNhat.nopLuc ? ngayGio(emTrongCa.moiNhat.nopLuc) : undefined,
+            diem: emTrongCa?.diem ?? emTrongCa?.graded?.score.total ?? 0,
+            diemI: emTrongCa?.graded?.score.phanIScore ?? null,
+            diemII: emTrongCa?.graded?.score.phanIIScore ?? null,
+            diemIII: emTrongCa?.graded?.score.phanIIIScore ?? null,
+            soCauDung: emTrongCa?.graded?.score
+              ? (emTrongCa.graded.score.total >= 0 ? Math.round((emTrongCa.graded.score.total / 10) * (soCauCa ? soCauCa.I + soCauCa.II + soCauCa.III : (emTrongCa.graded.score.phanI.items.length + emTrongCa.graded.score.phanII.items.length + emTrongCa.graded.score.phanIII.items.length))) : undefined)
+              : undefined,
+            tongCau: soCauCa ? soCauCa.I + soCauCa.II + soCauCa.III : (emTrongCa?.graded?.score ? (emTrongCa.graded.score.phanI.items.length + emTrongCa.graded.score.phanII.items.length + emTrongCa.graded.score.phanIII.items.length) : 40),
+          }}
+          hoTen={emTrongCa?.hoTen || hoSo?.em.hoTen || `SBD ${sbdHoSo}`}
+          sbd={sbdHoSo}
+          lop={emTrongCa?.lop || hoSo?.em.lop}
+          scriptUrl={scriptUrl}
+          onClose={() => setSbdHoSo('')}
+          onBatDauKhacPhuc={() => {
+            setSbdHoSo('')
+          }}
+          extraTabs={[
+            {
+              id: 'zalo',
+              label: 'Báo Phụ Huynh / Zalo',
+              icon: <Share2 className="w-4 h-4 text-emerald-500" />,
+              content: (
+                <div className="space-y-4">
+                  {dangTaiHoSo && !hoSo && <div style={NHAN_NHO}>Đang mở hồ sơ…</div>}
+                  {loiHoSo && <OThongBao tone="do">{loiHoSo}</OThongBao>}
+                  {hoSo && (
+                    <PhieuZaloEm
+                      hoSo={hoSo}
+                      maCa={chiTiet?.ca.maCa}
+                      showToast={showToast}
+                      rows={rowsHoSo}
+                      banks={teacherBank}
+                      diemChamLai={
+                        emTrongCa?.graded
+                          ? {
+                              tong: emTrongCa.graded.score.total,
+                              I: emTrongCa.graded.score.phanIScore,
+                              II: emTrongCa.graded.score.phanIIScore,
+                              III: emTrongCa.graded.score.phanIIIScore,
+                            }
+                          : undefined
+                      }
+                      diemLop={dsEm.map((e) => e.diem).filter((d): d is number => typeof d === 'number')}
+                      thoiLuongPhut={chiTiet?.ca.thoiGianPhut ?? null}
+                      vaoLuc={emTrongCa?.moiNhat.vaoLuc ?? null}
+                      viPham={
+                        emTrongCa
+                          ? {
+                              soLan: emTrongCa.moiNhat.soLanRoiMan || 0,
+                              tongGiay: emTrongCa.moiNhat.tongGiayRoiMan || 0,
+                              daKhoa: emTrongCa.moiNhat.trangThai === 'khoa',
+                              lyDoKhoa: emTrongCa.moiNhat.integrity?.lyDoKhoa ?? null,
+                              nguong:
+                                chiTiet?.ca.nguongLan && chiTiet?.ca.nguongGiay
+                                  ? { lan: Number(chiTiet.ca.nguongLan), giay: Number(chiTiet.ca.nguongGiay) }
+                                  : null,
+                              events: emTrongCa.moiNhat.integrity?.events ?? null,
+                            }
+                          : null
+                      }
+                    />
+                  )}
+                </div>
+              ),
+            },
+            {
+              id: 'ho_so',
+              label: 'Tiến bộ & Lịch sử',
+              icon: <TrendingUp className="w-4 h-4 text-blue-500" />,
+              content: (
+                <div className="space-y-4">
+                  {dangTaiHoSo && !hoSo && <div style={NHAN_NHO}>Đang mở hồ sơ…</div>}
+                  {loiHoSo && <OThongBao tone="do">{loiHoSo}</OThongBao>}
+                  {hoSo && (
+                    <>
+                      <KhoiTienBo
+                        ca={hoSo.ca}
+                        diemDe={chiTiet && emTrongCa?.graded ? { [chiTiet.ca.maCa]: emTrongCa.graded.score.total } : null}
+                      />
+                      <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />
+                      <TheNoiDung>
+                        <NutBaiTapPdf
+                          sbd={hoSo.em.sbd}
+                          hoTen={hoSo.em.hoTen}
+                          lop={hoSo.em.lop}
+                          chuyenDe={hoSo.chuyenDe}
+                          chuyenDeCa={(hoSo.chuyenDeCaGanNhat ?? []).map((c) => c.ten)}
+                          maCa={chiTiet?.ca.maCa}
+                          rows={rowsHoSo}
+                          showToast={showToast}
+                        />
+                      </TheNoiDung>
+                      <KhoiLichSuCa ca={hoSo.ca} />
+                    </>
+                  )}
+                </div>
+              ),
+            },
+          ]}
+        />
       )}
     </div>
   )

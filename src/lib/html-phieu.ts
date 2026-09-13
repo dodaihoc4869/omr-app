@@ -26,6 +26,7 @@ import type { CauLuyen } from './bai-tap-pdf'
 import { cauHinhNop, type CauHinhNopKhacPhuc } from './cau-hinh-nop-khac-phuc'
 import { doanCongThuc, type DoanChu } from './chu-hoa-hoc-pdf'
 import { goKyTuLa } from './chu-la-pdf'
+import { chuanHoaLoiGiaiCau } from './chuan-hoa-loi-giai'
 
 /** Một ô thông tin ngoài bìa: nhãn nhỏ ở trên, giá trị đậm ở dưới. */
 export interface OBia {
@@ -176,59 +177,60 @@ export const CSS_PHIEU = `
 
 :root {
   color-scheme: light;
-  --nav: #0f3057;
-  --nav-2: #00587a;
-  --luc: #008891;
-  --luc-2: #00b4a6;
-  --vang: #ffd700;
-  --nen: #eef2f7;
+  --nav: #1a73e8;
+  --nav-2: #1557b0;
+  --luc: #1a73e8;
+  --luc-2: #34a853;
+  --vang: #fbbc04;
+  --nen: #f8fafc;
   --the-nen: #ffffff;
   --muc: #0f172a;
   --muc-2: #334155;
   --nhat: #64748b;
   --rat-nhat: #94a3b8;
-  --vien: #e4eaf1;
+  --vien: #e2e8f0;
   --vien-dam: #cbd5e1;
-  --dung: #10b981;
-  --dung-nen: #d1fae5;
-  --dung-muc: #065f46;
-  --sai: #ef4444;
+  --dung: #16a34a;
+  --dung-nen: #dcfce7;
+  --dung-muc: #15803d;
+  --sai: #dc2626;
   --sai-nen: #fee2e2;
-  --sai-muc: #991b1b;
+  --sai-muc: #b91c1c;
   --kem-nen: #fffbeb;
   --kem-vien: #fde68a;
   --kem-muc: #78350f;
   --kem-nhan: #92400e;
-  --bo: 16px;
-  --bo-nho: 10px;
-  --bong: 0 1px 2px rgba(15,48,87,.05), 0 10px 28px rgba(15,48,87,.07);
-  --bong-cao: 0 2px 6px rgba(15,48,87,.08), 0 18px 40px rgba(15,48,87,.12);
-  --muot: .32s cubic-bezier(.4, 0, .2, 1);
+  --bo: 24px;
+  --bo-nho: 14px;
+  --bong: 0 2px 10px rgba(0,0,0,.04);
+  --bong-cao: 0 8px 30px rgba(0,0,0,.08);
+  --muot: .25s cubic-bezier(.4, 0, .2, 1);
 }
 
-/* BẢY SẮC CẦU VỒNG, XOAY VÒNG MỖI LẦN MỞ PHIẾU (thầy chốt 08/09: "lấy 7 màu 7
-   sắc cầu vồng để hiển thị lần lượt rồi quay vòng").
+/* DẢI 4 MÀU THƯƠNG HIỆU GOOGLE (CHUẨN MẪU MOM GIAO) */
+.google-bar {
+  height: 6px;
+  width: 100%;
+  border-radius: 9999px;
+  overflow: hidden;
+  display: flex;
+  margin-bottom: 24px;
+}
+.google-bar .g-blue { flex: 1; background: #1a73e8; }
+.google-bar .g-red { flex: 1; background: #ea4335; }
+.google-bar .g-yellow { flex: 1; background: #fbbc04; }
+.google-bar .g-green { flex: 1; background: #34a853; }
 
-   CHỈ ĐỔI MÀU THƯƠNG HIỆU — nav/nav-2 (bìa, tiêu đề), luc/luc-2 (nút chính,
-   nhãn), vang (điểm nhấn). ĐÚNG/SAI giữ nguyên xanh lá và đỏ ở mọi sắc: đây là
-   phiếu chấm bài, đổi màu dấu đúng-sai là đổi nghĩa chứ không phải đổi giao
-   diện. Đánh đổi nói thẳng: đến lượt sắc đỏ và sắc lục thì nền trang cùng hệ
-   màu với dấu sai và dấu đúng, nhưng hai dấu đó vẫn có nền nhạt và viền riêng
-   nên vẫn tách ra được.
-
-   nav phải đủ tối để chữ trắng trên nó còn đọc được (tương phản ≥ 7:1). */
-body[data-mau="1"] { --nav: #7f1d1d; --nav-2: #b91c1c; --luc: #dc2626; --luc-2: #f87171; --vang: #fca5a5; }
-body[data-mau="2"] { --nav: #7c2d12; --nav-2: #c2410c; --luc: #ea580c; --luc-2: #fb923c; --vang: #fdba74; }
-body[data-mau="3"] { --nav: #713f12; --nav-2: #a16207; --luc: #ca8a04; --luc-2: #eab308; --vang: #fde047; }
-body[data-mau="4"] { --nav: #14532d; --nav-2: #15803d; --luc: #16a34a; --luc-2: #4ade80; --vang: #86efac; }
-body[data-mau="5"] { --nav: #0c4a6e; --nav-2: #0369a1; --luc: #0284c7; --luc-2: #38bdf8; --vang: #7dd3fc; }
-body[data-mau="6"] { --nav: #1e1b4b; --nav-2: #3730a3; --luc: #4f46e5; --luc-2: #818cf8; --vang: #a5b4fc; }
-body[data-mau="7"] { --nav: #4c1d95; --nav-2: #6d28d9; --luc: #7c3aed; --luc-2: #a78bfa; --vang: #c4b5fd; }
+/* BẢY SẮC CẦU VỒNG ĐIỂM XUYẾT */
+body[data-mau="1"] { --nav: #dc2626; --nav-2: #b91c1c; --luc: #ef4444; --luc-2: #f87171; --vang: #fca5a5; }
+body[data-mau="2"] { --nav: #ea580c; --nav-2: #c2410c; --luc: #f97316; --luc-2: #fb923c; --vang: #fdba74; }
+body[data-mau="3"] { --nav: #ca8a04; --nav-2: #a16207; --luc: #eab308; --luc-2: #facc15; --vang: #fde047; }
+body[data-mau="4"] { --nav: #16a34a; --nav-2: #15803d; --luc: #22c55e; --luc-2: #4ade80; --vang: #86efac; }
+body[data-mau="5"] { --nav: #0284c7; --nav-2: #0369a1; --luc: #0ea5e9; --luc-2: #38bdf8; --vang: #7dd3fc; }
+body[data-mau="6"] { --nav: #4f46e5; --nav-2: #3730a3; --luc: #6366f1; --luc-2: #818cf8; --vang: #a5b4fc; }
+body[data-mau="7"] { --nav: #7c3aed; --nav-2: #6d28d9; --luc: #8b5cf6; --luc-2: #a78bfa; --vang: #c4b5fd; }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-/* Phải !important: .nut đặt display:inline-flex bằng class nên THẮNG luật
-   [hidden]{display:none} mặc định của trình duyệt, làm nút Bỏ lọc hiện ra
-   ngay cả khi chưa lọc gì. */
 [hidden] { display: none !important; }
 
 html { scroll-behavior: smooth; }
@@ -250,7 +252,7 @@ body {
 sub { font-size: .72em; vertical-align: -.25em; }
 sup { font-size: .72em; vertical-align: .42em; }
 
-.khung { max-width: 900px; margin: 0 auto; padding: 0 16px 72px; }
+.khung { max-width: 900px; margin: 0 auto; padding: 24px 16px 72px; }
 
 /* ================= BÌA ================= */
 .cover {
@@ -261,14 +263,11 @@ sup { font-size: .72em; vertical-align: .42em; }
   justify-content: flex-end;
   padding: 40px 22px 60px;
   color: #ffffff;
-  /* DÙNG BIẾN, KHÔNG GÕ CỨNG (thầy chốt 08/09: "đổi màu cả 2 chỗ này nữa").
-     Ba mã màu gõ thẳng ở đây chính là lý do đổi sắc mà bìa vẫn xanh navy. */
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  margin-bottom: 24px;
   background: linear-gradient(150deg, var(--nav) 0%, var(--nav-2) 52%, var(--luc) 100%);
 }
-/* BÌA KHÔNG CHIẾM TRỌN MÀN NỮA (thầy chốt 06/09: "trực quan, sạch, gọn").
-   Bản cũ cao 100svh, chữ căn giữa, ba phân tử mờ nằm vắt chéo — mở phiếu ra
-   phải cuộn hết một màn mới thấy câu đầu tiên. Nay bìa cao vừa đủ nội dung,
-   chữ căn TRÁI như một tiêu đề tài liệu, và bỏ hẳn hoa văn phân tử. */
 .cover-blob { position: absolute; border-radius: 50%; pointer-events: none; }
 .cover-blob.b1 { top: -170px; right: -130px; width: 360px; height: 360px; background: rgba(255,255,255,.07); }
 .cover-blob.b2 { bottom: -210px; left: -150px; width: 420px; height: 420px; background: rgba(255,255,255,.05); }
@@ -282,9 +281,7 @@ sup { font-size: .72em; vertical-align: .42em; }
 .cover-badge .ct { letter-spacing: 0; text-transform: none; font-size: 13px; opacity: .92; }
 .cover-title { font-size: clamp(28px, 7.4vw, 44px); font-weight: 900; line-height: 1.1; letter-spacing: -.02em; }
 .cover-subtitle { margin-top: 8px; font-size: clamp(13.5px, 3vw, 16px); font-weight: 400; opacity: .82; }
-/* LƯỚI chứ không phải flex-wrap: các ô luôn CÙNG CHIỀU CAO và chia đều hàng.
-   Bản flex trước để ô Kết quả rơi xuống một mình, còn ô tên dài hai dòng thì
-   cao vống hơn hai ô bên cạnh. */
+/* LƯỚI chứ không phải flex-wrap: các ô luôn CÙNG CHIỀU CAO và chia đều hàng. */
 .cover-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: 8px; margin-top: 22px; }
 .cover-info-item {
   padding: 10px 13px; display: flex; flex-direction: column; justify-content: center;
@@ -300,9 +297,6 @@ sup { font-size: .72em; vertical-align: .42em; }
   background: linear-gradient(135deg, var(--nav) 0%, var(--nav-2) 55%, var(--luc) 100%);
   box-shadow: var(--bong-cao);
 }
-/* TIÊU ĐỀ NẰM CÙNG HÀNG với số câu, không chiếm riêng một dòng giữa trang:
-   thẻ này chỉ là bảng tóm tắt, không phải một trang bìa thứ hai (thầy chốt
-   06/09 — "gọn hàng hơn"). */
 .summary-dau { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
 .summary-title { font-size: clamp(15px, 3.6vw, 18px); font-weight: 800; letter-spacing: .01em; }
 .summary-tong { font-size: 13px; opacity: .72; font-variant-numeric: tabular-nums; }
@@ -313,35 +307,26 @@ sup { font-size: .72em; vertical-align: .42em; }
   background: rgba(255,255,255,.11); border: 1px solid rgba(255,255,255,.2); border-radius: 14px;
   transition: background-color var(--muot), border-color var(--muot), transform var(--muot);
 }
-/* Ô bấm được thì phải TRÔNG như bấm được: con trỏ bàn tay, sáng lên khi rê
-   chuột, và khi đang lọc thì nền trắng hẳn để biết đang xem phần nào. */
 button.stat-card, button.topic-item { cursor: pointer; }
 button.stat-card:hover { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.45); }
 button.stat-card:active { transform: scale(.98); }
 button.stat-card.chon { background: #ffffff; border-color: #ffffff; color: var(--nav); }
 button.stat-card.chon .stat-label { opacity: 1; font-weight: 700; }
 button.stat-card:focus-visible, button.topic-item:focus-visible { outline: 3px solid rgba(255,255,255,.7); outline-offset: 2px; }
-/* Nhãn "xem riêng" bỏ hẳn: ô đã có con trỏ bàn tay và sáng lên khi rê chuột,
-   thêm một dòng chữ hoa nữa chỉ làm thẻ cao gấp rưỡi mà không nói thêm gì. */
 .stat-number { font-size: clamp(19px, 4.4vw, 23px); font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
 .stat-label { font-size: 12px; opacity: .82; line-height: 1.3; }
 .topics-list { background: rgba(255,255,255,.09); border-radius: 14px; padding: 11px 14px; }
 .topics-list h3 { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; opacity: .72; margin-bottom: 4px; }
 .topic-item {
   display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
-  padding: 6px 10px; margin: 0 -10px; border: none; border-bottom: 1px solid rgba(255,255,255,.12);
-  border-radius: 8px; background: transparent; color: inherit; font: inherit;
-  font-size: 13px; line-height: 1.45;
+  padding: 6px 10px; margin: 0 -10px; border-radius: 9px;
+  background: transparent; color: inherit; font: inherit;
+  font-size: 13px; line-height: 1.4;
   transition: background-color var(--muot);
 }
 .topic-item:last-child { border-bottom: none; }
-button.topic-item:hover { background: rgba(255,255,255,.14); }
-button.topic-item.chon { background: rgba(255,255,255,.22); font-weight: 600; }
-/* CHẤM TRÒN CÂN VỚI DÒNG CHỮ ĐẦU, KHÔNG PHẢI VỚI CẢ Ô.
-   Căn giữa cả ô (align-items:center) thì dòng nào xuống hai dòng là chấm tụt
-   xuống giữa hai dòng, nhìn như chấm của dòng khác. Nên ô chấm cao đúng MỘT
-   dòng rồi tự căn giữa bên trong: chữ dài bao nhiêu chấm vẫn nằm ngang dòng
-   đầu. Dùng em nên đổi cỡ chữ là chấm tự theo, không phải chỉnh tay. */
+button.topic-item:hover { background: rgba(255,255,255,.12); }
+button.topic-item.chon { background: #ffffff; color: var(--nav); font-weight: 700; }
 .topic-cham { flex-shrink: 0; display: flex; align-items: center; height: 1.5em; }
 .topic-dot { width: 9px; height: 9px; border-radius: 50%; }
 
@@ -461,28 +446,28 @@ body.co-lam .tf-item { padding: 9px 10px; }
 
 .q-card {
   background: var(--the-nen); border: 1px solid var(--vien); border-left: 4px solid var(--vien-dam);
-  border-radius: var(--bo); box-shadow: var(--bong); overflow: hidden;
+  border-radius: 20px; box-shadow: var(--bong); overflow: hidden;
   transition: border-left-color var(--muot), box-shadow var(--muot), transform var(--muot);
   break-inside: avoid;
 }
 .q-card:hover { box-shadow: var(--bong-cao); }
-.q-card.mo { border-left-color: var(--luc); }
+.q-card.mo { border-left-color: #1a73e8; }
 
-.q-header { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px 0; }
+.q-header { display: flex; align-items: flex-start; gap: 12px; padding: 16px 18px 0; }
 .q-num {
-  flex-shrink: 0; width: 34px; height: 34px; border-radius: 11px;
-  background: linear-gradient(135deg, var(--nav), var(--luc)); color: #ffffff;
+  flex-shrink: 0; width: 36px; height: 36px; border-radius: 12px;
+  background: #1a73e8; color: #ffffff;
   display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800;
-  box-shadow: 0 3px 10px rgba(0,88,122,.25);
+  box-shadow: 0 2px 8px rgba(26,115,232,.3);
 }
 .q-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-.q-tag { font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 600; letter-spacing: .01em; white-space: nowrap; }
-.q-tag.type-mc { background: #dbeafe; color: #1e40af; }
+.q-tag { font-size: 11px; padding: 3.5px 10px; border-radius: 999px; font-weight: 700; letter-spacing: .01em; white-space: nowrap; }
+.q-tag.type-mc { background: #eff6ff; color: #1d4ed8; }
 .q-tag.type-tf { background: #fef3c7; color: #92400e; }
-.q-tag.type-sa { background: #e0e7ff; color: #4338ca; }
-.q-tag.level-1 { background: #d1fae5; color: #065f46; }
-.q-tag.level-2 { background: #fce7f3; color: #9d174d; }
-.q-tag.level-3 { background: #fed7aa; color: #9a3412; }
+.q-tag.type-sa { background: #eef2ff; color: #4338ca; }
+.q-tag.level-1 { background: #ecfdf5; color: #047857; }
+.q-tag.level-2 { background: #fdf2f8; color: #be185d; }
+.q-tag.level-3 { background: #fff7ed; color: #c2410c; }
 .q-tag.topic { background: #f1f5f9; color: #475569; }
 /* NHÃN CHỮA — lý do câu này có mặt trên phiếu, nên phải đọc thấy trước ba nhãn
    kia. Thầy chốt 07/09: "gắn màu nào cho nổi bật lên".
@@ -492,7 +477,7 @@ body.co-lam .tf-item { padding: 9px 10px; }
 .q-tag.chua {
   background: #c2410c; color: #ffffff; font-size: 12px; font-weight: 800;
   padding: 4px 12px 4px 9px; letter-spacing: .015em;
-  box-shadow: 0 1px 3px rgba(194, 65, 12, .35);
+  box-shadow: 0 2px 6px rgba(194,65,12,.3);
 }
 .q-tag.chua::before {
   content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%;
@@ -512,17 +497,17 @@ body.co-lam .tf-item { padding: 9px 10px; }
    lớp phủ đều bị che kín. Thầy báo 09/09: bấm "tạo câu khắc phục" ra phiếu
    xám không bấm được, mà không có một chữ nào nói vì sao — đúng là dòng giải
    thích đã được dựng, chỉ là nằm dưới lớp phủ. */
-.nhac-phieu { background: var(--kem-nen); border: 1px solid var(--kem-vien); border-left: 4px solid var(--kem-nhan); border-radius: var(--bo); padding: 12px 16px; margin-bottom: 14px; color: var(--kem-muc); font-size: 14px; line-height: 1.55; }
+.nhac-phieu { background: var(--kem-nen); border: 1px solid var(--kem-vien); border-left: 4px solid var(--kem-nhan); border-radius: 16px; padding: 14px 18px; margin-bottom: 16px; color: var(--kem-muc); font-size: 14px; line-height: 1.55; }
 .nhac-phieu b { color: var(--kem-nhan); }
-.chua-gi { background: #fff7ed; border: 1px solid #fed7aa; border-left: 4px solid #c2410c; border-radius: var(--bo); padding: 14px 16px; margin-bottom: 14px; }
-.chua-gi h3 { margin: 0 0 8px; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: #9a3412; }
+.chua-gi { background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #d97706; border-radius: 20px; padding: 18px 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(217,119,6,0.06); }
+.chua-gi h3 { margin: 0 0 10px; font-size: 13.5px; letter-spacing: .04em; text-transform: uppercase; color: #92400e; font-weight: 800; }
 .chua-gi ul { margin: 0; padding-left: 18px; }
-.chua-gi li { margin: 4px 0; font-size: 14px; line-height: 1.5; }
-.chua-gi li.mo { color: #78716c; }
-.chua-gi .chua-mui { color: #c2410c; font-weight: 700; }
+.chua-gi li { margin: 6px 0; font-size: 14px; line-height: 1.55; color: #78350f; }
+.chua-gi li.mo { color: #a8a29e; }
+.chua-gi .chua-mui { color: #d97706; font-weight: 800; }
 /* Ô phân tích cho câu LÀM LẠI: em phải đọc trước khi làm lại, nên đặt trên đề. */
-.lam-lai { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 14px; line-height: 1.55; color: #7c2d12; }
-.q-card.la-chua.mo { border-left-color: var(--luc); }
+.lam-lai { background: #fffbeb; border: 1px solid #fde68a; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; font-size: 14px; line-height: 1.55; color: #78350f; }
+.q-card.la-chua.mo { border-left-color: #1a73e8; }
 
 /* Vùng bấm: cả thân câu. Con trỏ hình bàn tay để thấy ngay là bấm được. */
 .q-than { padding: 10px 16px 14px; cursor: pointer; }
@@ -646,35 +631,36 @@ body.co-lam .tf-item { padding: 9px 10px; }
 .q-card.mo .sol-wrap { grid-template-rows: 1fr; }
 .sol-inner { overflow: hidden; min-height: 0; }
 .sol-box {
-  margin: 0 16px 16px; padding: 14px 16px;
-  background: var(--kem-nen); border: 1px solid var(--kem-vien); border-radius: var(--bo-nho);
+  margin: 0 16px 16px; padding: 18px 20px;
+  background: var(--kem-nen); border: 1px solid var(--kem-vien); border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(217,119,6,0.04);
   opacity: 0; transform: translateY(-6px);
   transition: opacity var(--muot), transform var(--muot);
 }
 .q-card.mo .sol-box { opacity: 1; transform: none; }
 .sol-label {
-  font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em;
+  font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em;
   color: var(--kem-nhan); margin-bottom: 6px;
 }
-.sol-label + .sol-label, .sol-text + .sol-label, .sol-step + .sol-label, .sol-dap + .sol-label { margin-top: 12px; }
+.sol-label + .sol-label, .sol-text + .sol-label, .sol-step + .sol-label, .sol-dap + .sol-label { margin-top: 14px; }
 /* Đáp án gói gọn MỘT DÒNG. Để nguyên cỡ nhãn lớn như các mục khác thì câu trả
    lời ngắn in số đáp án hai lần sát nhau (ô lớn phía trên và trong ô kem),
    nhìn như lỗi. */
-.sol-dap { font-size: 14.5px; color: var(--kem-nhan); font-weight: 600; margin-bottom: 10px; }
-.sol-dap b { font-size: 16px; font-weight: 800; color: var(--kem-muc); letter-spacing: .04em; }
+.sol-dap { font-size: 15px; color: var(--kem-nhan); font-weight: 700; margin-bottom: 10px; }
+.sol-dap b { font-size: 17px; font-weight: 900; color: var(--kem-muc); letter-spacing: .04em; }
 .sol-text { font-size: 14.5px; line-height: 1.65; color: var(--kem-muc); overflow-wrap: break-word; }
 .sol-text strong { color: #5b2a06; }
 .sol-cot-loi { font-weight: 800; font-size: 15px; line-height: 1.6; color: #3b1d05; }
-.sol-pa { padding: 4px 0; }
-.sol-pa + .sol-pa { border-top: 1px dashed rgba(91,42,6,.18); }
-.sol-pa.chon { font-weight: 700; color: #14532d; }
+.sol-pa { padding: 5px 0; font-size: 14px; line-height: 1.6; color: var(--kem-muc); }
+.sol-pa + .sol-pa { border-top: 1px dashed rgba(146, 64, 14, .2); }
+.sol-pa.chon { font-weight: 700; color: #15803d; }
 .sol-step { font-size: 14.5px; line-height: 1.65; color: var(--kem-muc); padding-left: 18px; text-indent: -18px; }
-.sol-ket { font-size: 15px; font-weight: 800; color: var(--kem-muc); }
+.sol-ket { font-size: 15px; font-weight: 800; color: #451a03; }
 /* Ảnh lời giải gốc chụp từ đề của tác giả. Nền trắng vì ảnh cắt ra là giấy
    trắng mực đen; đặt trên nền kem của ô lời giải sẽ thấy một vệt lệch màu. */
-.sol-anh { margin-top: 6px; }
-.sol-anh img { display: block; width: 100%; height: auto; border-radius: 10px; background: #fff; }
-.sol-step + .sol-label, .sol-text + .sol-anh { margin-top: 10px; }
+.sol-anh { margin-top: 8px; }
+.sol-anh img { display: block; width: 100%; height: auto; border-radius: 12px; background: #fff; border: 1px solid #fde68a; }
+.sol-step + .sol-label, .sol-text + .sol-anh { margin-top: 12px; }
 
 /* ============ TÊN EM HỎI (trang tổng hợp câu hỏi) ============
    HOIBAITHAY.md mục 4D. Nằm ở ĐÂY chứ không ở một bảng kiểu riêng: cả app chỉ
@@ -1008,6 +994,22 @@ export function dapAnChu(c: CauLuyen): string {
  *
  * Không có gì để giải thì trả về chuỗi rỗng, và thẻ câu sẽ KHÔNG có nút mở. */
 export function oGiaiHtml(c: CauLuyen): string {
+  let chot = c.chot
+  let lyDo = c.lyDo
+  let buoc = c.buoc
+  let ketQua = c.ketQua
+
+  if (!chot && (!lyDo || lyDo.length === 0) && (!buoc || buoc.length === 0)) {
+    const rawAny = (c as any).loiGiai || (c as any).giaiThich || (c as any).explanation || (c as any).noiDung || (c as any).viSao
+    if (rawAny) {
+      const ch = chuanHoaLoiGiaiCau(rawAny, c.phan, c.dapAn, c.luaChon, c.text, c.chuyenDe)
+      if (ch.chot) chot = ch.chot
+      if (ch.lyDo && ch.lyDo.length > 0) lyDo = ch.lyDo
+      if (ch.buoc && ch.buoc.length > 0) buoc = ch.buoc
+      if (ch.ketQua && !ketQua) ketQua = ch.ketQua
+    }
+  }
+
   const khoi: string[] = [`<div class="sol-dap">Đáp án: <b>${chuHtml(dapAnChu(c))}</b></div>`]
 
   const dungKhoa = c.phan === 'II' ? CHU_Y.filter((_, i) => ysDung(c.dapAn)[i]) : [(c.dapAn || '').trim().toUpperCase()]
@@ -1015,26 +1017,26 @@ export function oGiaiHtml(c: CauLuyen): string {
   // KIẾN THỨC CỐT LÕI in đậm TRÊN CÙNG (thầy chốt 04-09 khuya: "kiến thức cốt lõi
   // bôi đậm trên cùng để giải câu đó"), rồi mới tới vì sao chọn / không chọn
   // từng phương án.
-  const chuChot = c.chot ? chuHtml(c.chot).trim() : ''
+  const chuChot = chot ? chuHtml(chot).trim() : ''
   if (chuChot && !chuChot.includes('[object Object]')) {
     khoi.push(`<div class="sol-label">Kiến thức cốt lõi</div><div class="sol-text sol-cot-loi">${chuChot}</div>`)
     coGiai = true
   }
-  if (c.lyDo && c.lyDo.length > 0) {
-    const dong = c.lyDo
+  if (lyDo && lyDo.length > 0) {
+    const dong = lyDo
       .map((l) => `<div class="sol-pa${dungKhoa.includes(l.khoa) ? ' chon' : ''}"><strong>${thoat(l.khoa)}.</strong> ${dungKhoa.includes(l.khoa) ? '✓ ' : '✗ '}${chuHtml(l.ly)}</div>`)
       .join('')
     khoi.push(`<div class="sol-label">${c.phan === 'II' ? 'Vì sao từng ý đúng / sai' : 'Vì sao chọn / không chọn từng phương án'}</div><div class="sol-text">${dong}</div>`)
     coGiai = true
   }
-  const buoc = c.buoc ?? []
-  if (buoc.length > 0) {
-    const ds = buoc.map((b, i) => `<div class="sol-step">${i + 1}. ${chuHtml(b)}</div>`).join('')
+  const dsBuoc = buoc ?? []
+  if (dsBuoc.length > 0) {
+    const ds = dsBuoc.map((b, i) => `<div class="sol-step">${i + 1}. ${chuHtml(b)}</div>`).join('')
     khoi.push(`<div class="sol-label">Làm từng bước</div>${ds}`)
     coGiai = true
   }
-  if (c.ketQua) {
-    khoi.push(`<div class="sol-label">Kết quả</div><div class="sol-text sol-ket">${chuHtml(c.ketQua)}</div>`)
+  if (ketQua) {
+    khoi.push(`<div class="sol-label">Kết quả</div><div class="sol-text sol-ket">${chuHtml(ketQua)}</div>`)
     coGiai = true
   }
 
@@ -1105,9 +1107,9 @@ export function congThucBia(tenChuyenDe: string): { chinh: string; troi: [string
 
 export function biaHtml(t: ThongTinPhieu, soCau: number): string {
   const oKetQua = t.ketQua
-    ? `<div class="cover-info-item" style="flex:0 1 auto;background:rgba(239,68,68,.16);border-color:rgba(239,68,68,.34);">
-    <div class="cover-info-label" style="color:#fecaca;">Kết quả</div>
-    <div class="cover-info-value" style="color:#fecaca;">${thoat(t.ketQua)}</div></div>`
+    ? `<div class="cover-info-item" style="flex:0 1 auto;background:#fef2f2;border-color:#fecaca;">
+    <div class="cover-info-label" style="color:#dc2626;">Kết quả</div>
+    <div class="cover-info-value" style="color:#b91c1c;">${thoat(t.ketQua)}</div></div>`
     : ''
   // Tên chuyên đề xuống DÒNG THỨ HAI ở dấu phân cách, đúng như mẫu ("ESTER" /
   // "& LIPID"). Một dòng dài là tràn khỏi bìa với tên như "Hydrocarbon không
@@ -1129,6 +1131,7 @@ export function biaHtml(t: ThongTinPhieu, soCau: number): string {
   // khổng lồ giữa trang, và ba phân tử mờ vắt chéo đã bỏ hẳn — chúng làm bìa
   // rối mà không nói thêm gì (thầy chốt 06/09).
   return `<header class="cover">
+  <div class="google-bar"><div class="g-blue"></div><div class="g-red"></div><div class="g-yellow"></div><div class="g-green"></div></div>
   <div class="cover-blob b1"></div><div class="cover-blob b2"></div>
   <div class="cover-content">
     <div class="cover-badge">${thoat(t.nhanBia || (t.hienDapAn ? 'Lời giải chi tiết' : 'Phiếu bài tập riêng'))}<span class="ct">${ct.chinh}</span></div>

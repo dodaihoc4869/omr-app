@@ -34,6 +34,13 @@ export interface ThongTinBaiThiHocSinh {
   lanThu?: number
 }
 
+export interface ExtraTabItem {
+  id: string
+  label: string
+  icon?: React.ReactNode
+  content: React.ReactNode
+}
+
 interface Props {
   baiThi: ThongTinBaiThiHocSinh
   hoTen: string
@@ -43,6 +50,7 @@ interface Props {
   onClose: () => void
   onBatDauKhacPhuc: (maCa: string) => void
   onMoLaiBaiThi?: (maCa: string) => void
+  extraTabs?: ExtraTabItem[]
 }
 
 export default function BaoCaoCaThiHocSinhModal({
@@ -54,10 +62,11 @@ export default function BaoCaoCaThiHocSinhModal({
   onClose,
   onBatDauKhacPhuc,
   onMoLaiBaiThi,
+  extraTabs,
 }: Props) {
   const [dsCauSai, setDsCauSai] = useState<any[]>([])
   const [dangTaiCauSai, setDangTaiCauSai] = useState(false)
-  const [tabHienThi, setTabHienThi] = useState<'tong_quan' | 'cau_sai' | 'nhan_thuc'>('tong_quan')
+  const [tabHienThi, setTabHienThi] = useState<string>('tong_quan')
   const [cauSaiMoRong, setCauSaiMoRong] = useState<Record<string, boolean>>({})
 
   // Tải danh sách chi tiết các câu làm sai trong ca này
@@ -305,11 +314,11 @@ export default function BaoCaoCaThiHocSinhModal({
           </div>
 
           {/* THANH TAB GOOGLE MATERIAL 3 */}
-          <div className="flex items-center gap-1 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-center gap-1 border-b border-slate-200 dark:border-slate-800 overflow-x-auto pb-px">
             <button
               type="button"
               onClick={() => setTabHienThi('tong_quan')}
-              className={`py-2.5 px-4 text-xs font-bold rounded-t-xl transition-colors border-b-2 flex items-center gap-1.5 cursor-pointer ${
+              className={`py-2.5 px-3.5 text-xs font-bold rounded-t-xl transition-colors border-b-2 flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                 tabHienThi === 'tong_quan'
                   ? 'border-blue-600 text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-950/30'
                   : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
@@ -322,7 +331,7 @@ export default function BaoCaoCaThiHocSinhModal({
             <button
               type="button"
               onClick={() => setTabHienThi('cau_sai')}
-              className={`py-2.5 px-4 text-xs font-bold rounded-t-xl transition-colors border-b-2 flex items-center gap-1.5 cursor-pointer ${
+              className={`py-2.5 px-3.5 text-xs font-bold rounded-t-xl transition-colors border-b-2 flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                 tabHienThi === 'cau_sai'
                   ? 'border-rose-600 text-rose-600 dark:text-rose-400 bg-rose-50/50 dark:bg-rose-950/30'
                   : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
@@ -335,7 +344,7 @@ export default function BaoCaoCaThiHocSinhModal({
             <button
               type="button"
               onClick={() => setTabHienThi('nhan_thuc')}
-              className={`py-2.5 px-4 text-xs font-bold rounded-t-xl transition-colors border-b-2 flex items-center gap-1.5 cursor-pointer ${
+              className={`py-2.5 px-3.5 text-xs font-bold rounded-t-xl transition-colors border-b-2 flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                 tabHienThi === 'nhan_thuc'
                   ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/30'
                   : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
@@ -344,6 +353,22 @@ export default function BaoCaoCaThiHocSinhModal({
               <Layers className="w-4 h-4" />
               <span>Mức độ nhận thức</span>
             </button>
+
+            {extraTabs?.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTabHienThi(t.id)}
+                className={`py-2.5 px-3.5 text-xs font-bold rounded-t-xl transition-colors border-b-2 flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                  tabHienThi === t.id
+                    ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/30'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
+                }`}
+              >
+                {t.icon}
+                <span>{t.label}</span>
+              </button>
+            ))}
           </div>
 
           {/* TAB 1: TỔNG QUAN 3 PHẦN */}
@@ -636,6 +661,15 @@ export default function BaoCaoCaThiHocSinhModal({
                 </div>
               ))}
             </div>
+          )}
+
+          {/* CÁC TAB BỔ SUNG (DÀNH CHO GIÁO VIÊN NẾU CÓ) */}
+          {extraTabs?.map((t) =>
+            tabHienThi === t.id ? (
+              <div key={t.id} className="space-y-4 animate-google-fade">
+                {t.content}
+              </div>
+            ) : null
           )}
         </div>
 
