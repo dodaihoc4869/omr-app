@@ -20,6 +20,7 @@ import {
   Heart,
   Timer,
   Check,
+  Gamepad2,
 } from 'lucide-react'
 import {
   hsDangNhapApi,
@@ -36,8 +37,10 @@ import { dangCua } from '../lib/dang-cau'
 import { dungPhieu, type ThongTinPhieu } from '../lib/html-phieu'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import { nhoVaiDaDung } from '../lib/vai-tro'
+import { datManifestTheoVai } from '../lib/pwa-install'
 import LogoHocSinh from '../components/LogoHocSinh'
 import BongBongChatHocSinh from '../components/BongBongChatHocSinh'
+import DauTruongGame from '../components/DauTruongGame'
 
 const KHOA_LUU_AUTH = 'omr_student_portal_auth'
 
@@ -84,7 +87,7 @@ function mauDiem(diem: number | null): string {
   return 'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/40 dark:border-rose-800'
 }
 
-type TabType = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi'
+type TabType = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'game'
 
 export default function StudentPortalScreen() {
   const [auth, setAuth] = useState<ThongTinHs | null>(() => {
@@ -160,6 +163,18 @@ export default function StudentPortalScreen() {
   useEffect(() => {
     napDsMom()
   }, [napDsMom, tab])
+
+  useEffect(() => {
+    nhoVaiDaDung('hs')
+    try {
+      datManifestTheoVai('hs')
+      document.title = 'ĐĐH Học Sinh'
+      const meta = document.querySelector('meta[name="apple-mobile-web-app-title"]')
+      if (meta) meta.setAttribute('content', 'ĐĐH Học Sinh')
+    } catch {
+      // ignore
+    }
+  }, [])
 
   // Đếm ngược 2 tiếng (7200 giây) kể từ khi bấm vào làm bài
   useEffect(() => {
@@ -854,7 +869,7 @@ export default function StudentPortalScreen() {
 
       {/* Navigation 5 mục theo phong cách Google Material 3 Segmented Pill Tabs */}
       <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-5 pb-1">
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
           <button
             onClick={() => setTab('diem')}
             className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
@@ -971,6 +986,30 @@ export default function StudentPortalScreen() {
               <div className="font-bold text-sm leading-tight">Vào thi</div>
               <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'vaothi' ? 'text-purple-700/80 dark:text-purple-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
                 Nhập mã ca & mật khẩu
+              </div>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setTab('game')}
+            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
+              tab === 'game'
+                ? 'bg-emerald-50 text-emerald-900 border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-200 dark:border-emerald-800 shadow-xs'
+                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform ${tab === 'game' ? 'bg-emerald-600 text-white scale-105' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'}`}>
+                <Gamepad2 size={18} strokeWidth={tab === 'game' ? 2.4 : 2} />
+              </div>
+              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'game' ? 'bg-emerald-200/70 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
+                12 Người
+              </span>
+            </div>
+            <div>
+              <div className="font-bold text-sm leading-tight">Đấu Trường Game 🎮</div>
+              <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'game' ? 'text-emerald-700/80 dark:text-emerald-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
+                Đại chiến sinh tồn
               </div>
             </div>
           </button>
@@ -1701,6 +1740,15 @@ export default function StudentPortalScreen() {
               </form>
             </div>
           </div>
+        )}
+
+        {/* TAB 6: ĐẤU TRƯỜNG GAME NEON SINH TỒN (TỐI ĐA 12 NGƯỜI CHƠI QUA SBD) */}
+        {tab === 'game' && (
+          <DauTruongGame
+            sbdHienTai={auth.sbd}
+            hoTenHienTai={auth.hoTen}
+            onDong={() => setTab('diem')}
+          />
         )}
       </main>
 

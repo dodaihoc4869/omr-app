@@ -1,0 +1,18 @@
+{
+  "id": "/omr-app/phu-huynh",
+  "name": "ĐỖ ĐẠI HỌC - Phụ Huynh",
+  "short_name": "ĐĐH Phụ Huynh",
+  "description": "Cổng thông tin báo cáo học tập và giao bài — Lớp Hoá Thầy Đỗ Đại Học",
+  "lang": "vi",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "./phu-huynh",
+  "scope": "./",
+  "background_color": "#f7f8fa",
+  "theme_color": "#1a2332",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

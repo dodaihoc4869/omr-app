@@ -129,26 +129,26 @@ export function laManThayQuanLy(search: string, duongDan = ''): boolean {
   //
   // Nay `/` trần hỏi máy: máy này lần gần nhất vào bằng vai nào. Máy chưa từng
   // dùng thì GIỮ NGUYÊN hành vi cũ (màn thầy) — không đổi gì cho máy mới.
-  if (vaiDaDung() === 'hs') return false
+  if (vaiDaDung() === 'hs' || vaiDaDung() === 'ph') return false
   return true
 }
 
 const KHOA_VAI_DA_DUNG = 'ddh.vaiDaDung'
 
-/** Máy này lần gần nhất vào bằng vai nào: `'hs'` (vào thi) · `'gv'` (quản lý) ·
- * `null` (chưa từng). Chỉ dùng để quyết `/` trần — mọi đường có vai rõ ràng đều
+/** Máy này lần gần nhất vào bằng vai nào: `'hs'` (học sinh) · `'gv'` (giáo viên) ·
+ * `'ph'` (phụ huynh) · `null` (chưa từng). Chỉ dùng để quyết `/` trần — mọi đường có vai rõ ràng đều
  * thắng cờ này. */
-export function vaiDaDung(): 'hs' | 'gv' | null {
+export function vaiDaDung(): 'hs' | 'gv' | 'ph' | null {
   try {
     const v = localStorage.getItem(KHOA_VAI_DA_DUNG)
-    return v === 'hs' || v === 'gv' ? v : null
+    return v === 'hs' || v === 'gv' || v === 'ph' ? v : null
   } catch {
     return null
   }
 }
 
 /** Ghi lại vai vừa dùng. Gọi khi app khởi động với một đường CÓ vai rõ ràng. */
-export function nhoVaiDaDung(vai: 'hs' | 'gv'): void {
+export function nhoVaiDaDung(vai: 'hs' | 'gv' | 'ph'): void {
   try {
     localStorage.setItem(KHOA_VAI_DA_DUNG, vai)
   } catch {

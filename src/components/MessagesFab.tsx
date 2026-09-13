@@ -9,11 +9,17 @@
 // Hộp thư giữ nguyên vì nó là đường phụ huynh nhắn tới thầy; trợ lý là lối tra
 // cứu, hai việc khác nhau, không gộp.
 import { useEffect, useRef, useState } from 'react'
-import { MessageCircle, X, RefreshCw, Sparkles } from 'lucide-react'
+import { MessageCircle, X, RefreshCw, Sparkles, Send } from 'lucide-react'
 import { demTinMoi, listParentMessages, markMessagesRead, type ParentMessage } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 import KhoiTroLy from './KhoiTroLy'
+import {
+  docTatCaTinNhan,
+  guiTinNhan,
+  dangKyNhanTinNhan,
+  type TinNhanChat,
+} from '../lib/tro-ly/he-thong-chat'
 
 /** Tên thầy đặt cho trợ lý (thầy chốt 06/09). Một chỗ duy nhất — đổi tên thì
  * đổi ở đây, không đi sửa từng chỗ. */
@@ -85,9 +91,26 @@ export default function MessagesFab() {
   const vuaKeoRef = useRef(0)
   const btnRef = useRef<HTMLButtonElement>(null)
 
+  const [tinNoiBo, setTinNoiBo] = useState<TinNhanChat[]>([])
+  const [traLoi, setTraLoi] = useState('')
+  const [mucTieuSbd, setMucTieuSbd] = useState('')
+  const [mucTieuTen, setMucTieuTen] = useState('')
+  const [mucTieuVai, setMucTieuVai] = useState<'hs' | 'ph'>('hs')
+
+  const capNhatTinNoiBo = () => {
+    const tatCa = docTatCaTinNhan()
+    const loc = tatCa.filter((t) => t.nguoiNhan.vai === 'gv' || t.nguoiGui.vai === 'gv')
+    setTinNoiBo(loc)
+  }
+
   useEffect(() => {
     loadScriptUrl().then(setScriptUrl)
     loadTeacherSecret().then(setSecret)
+    capNhatTinNoiBo()
+    const huy = dangKyNhanTinNhan(() => {
+      capNhatTinNoiBo()
+    })
+    return () => huy()
   }, [])
 
   const pollUnread = async (url: string) => {
@@ -354,7 +377,113 @@ export default function MessagesFab() {
                   <div className="text-sm whitespace-pre-wrap">{m.noiDung}</div>
                 </div>
               ))}
+
+              {/* TIN NHẮN ĐỒNG BỘ 3 CHIỀU TỪ HỌC SINH VÀ PHỤ HUYNH */}
+              {tinNoiBo.map((m) => {
+                const laThay = m.nguoiGui.vai === 'gv'
+                return (
+                  <div
+                    key={m.id}
+                    onClick={() => {
+                      if (!laThay && m.nguoiGui.sbd) {
+                        setMucTieuSbd(m.nguoiGui.sbd)
+                        setMucTieuTen(m.nguoiGui.hoTen || `SBD ${m.nguoiGui.sbd}`)
+                        setMucTieuVai(m.nguoiGui.vai === 'ph' ? 'ph' : 'hs')
+                      }
+                    }}
+                    className={`rounded-xl border p-3 space-y-1.5 cursor-pointer transition-colors ${
+                      laThay
+                        ? 'bg-blue-50/60 dark:bg-blue-950/30 border-blue-200 dark:border-blue-900'
+                        : 'bg-slate-50 dark:bg-slate-800/60 border-slate-100 dark:border-slate-800 hover:border-blue-300'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between text-xs text-slate-400 gap-2">
+                      <span className="flex items-center gap-1.5 min-w-0">
+                        <span
+                          className={`shrink-0 px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                            laThay
+                              ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400'
+                              : m.nguoiGui.vai === 'hs'
+                              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400'
+                              : 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-400'
+                          }`}
+                        >
+                          {laThay ? 'Thầy trả lời' : m.nguoiGui.vai === 'hs' ? 'Học sinh' : 'Phụ huynh'}
+                        </span>
+                        <span className="truncate font-medium text-slate-600 dark:text-slate-300">
+                          {m.nguoiGui.hoTen || (laThay ? `Gửi tới: ${m.nguoiNhan.hoTen || m.nguoiNhan.sbd}` : `SBD ${m.nguoiGui.sbd}`)}
+                        </span>
+                      </span>
+                      <span className="shrink-0">{new Date(m.thoiGian).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                    <div className="text-sm whitespace-pre-wrap">{m.noiDung}</div>
+                    {m.html && (
+                      <div className="text-xs mt-1 border-t pt-1" dangerouslySetInnerHTML={{ __html: m.html }} />
+                    )}
+                    {!laThay && m.nguoiGui.sbd && (
+                      <div className="text-[11px] font-bold text-blue-600 dark:text-blue-400 mt-1">
+                        👉 Bấm vào đây để trả lời {m.nguoiGui.hoTen || m.nguoiGui.sbd}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
             </div>
+            )}
+
+            {/* Ô TRẢ LỜI CỦA THẦY KHI CHỌN TIN NHẮN */}
+            {the === 'thu' && mucTieuSbd && (
+              <div className="p-2.5 border-t flex items-center gap-2 bg-slate-50 dark:bg-slate-800">
+                <div className="text-xs truncate max-w-[110px] font-bold text-blue-600 dark:text-blue-400">
+                  Trả lời {mucTieuTen}:
+                </div>
+                <input
+                  type="text"
+                  value={traLoi}
+                  onChange={(e) => setTraLoi(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      const text = traLoi.trim()
+                      if (!text) return
+                      guiTinNhan({
+                        nguoiGui: { vai: 'gv', hoTen: 'Thầy Đỗ Đại Học' },
+                        nguoiNhan: { vai: mucTieuVai, sbd: mucTieuSbd, hoTen: mucTieuTen },
+                        noiDung: text,
+                      })
+                      setTraLoi('')
+                      capNhatTinNoiBo()
+                    }
+                  }}
+                  placeholder="Nhập tin nhắn của Thầy..."
+                  className="flex-1 text-xs px-2.5 py-1.5 rounded-lg border outline-none bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const text = traLoi.trim()
+                    if (!text) return
+                    guiTinNhan({
+                      nguoiGui: { vai: 'gv', hoTen: 'Thầy Đỗ Đại Học' },
+                      nguoiNhan: { vai: mucTieuVai, sbd: mucTieuSbd, hoTen: mucTieuTen },
+                      noiDung: text,
+                    })
+                    setTraLoi('')
+                    capNhatTinNoiBo()
+                  }}
+                  className="p-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                  title="Gửi phản hồi"
+                >
+                  <Send size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMucTieuSbd('')}
+                  className="p-1 text-slate-400 hover:text-slate-600"
+                  title="Huỷ"
+                >
+                  <X size={14} />
+                </button>
+              </div>
             )}
           </div>
         </div>

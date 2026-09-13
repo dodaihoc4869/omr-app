@@ -22,6 +22,8 @@ import KhungXemPhieu from '../components/KhungXemPhieu'
 import { hsCauSaiApi, hsLichSuCaApi, tenTheoSbd } from '../lib/exam-api'
 import { loadExamSources, loadScriptUrl } from '../lib/exam-db'
 import { rutDeChua } from '../lib/rut-de-chua'
+import { nhoVaiDaDung } from '../lib/vai-tro'
+import { datManifestTheoVai } from '../lib/pwa-install'
 import type { TeacherExamSource } from '../data/examContent'
 
 interface BaiThiCuaCon {
@@ -80,6 +82,18 @@ export default function ParentPortalScreen() {
         void dangNhapPhuHuynh(sbdLuu.trim(), u)
       }
     })
+  }, [])
+
+  useEffect(() => {
+    nhoVaiDaDung('ph')
+    try {
+      datManifestTheoVai('ph')
+      document.title = 'ĐĐH Phụ Huynh'
+      const meta = document.querySelector('meta[name="apple-mobile-web-app-title"]')
+      if (meta) meta.setAttribute('content', 'ĐĐH Phụ Huynh')
+    } catch {
+      // ignore
+    }
   }, [])
 
   // Đọc danh sách bài Mom giao đã lưu trong máy

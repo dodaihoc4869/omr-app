@@ -9,7 +9,7 @@ import { datMaBiMatPhien, loadKhoaApp, loadTeacherSecret } from './lib/exam-db'
 import { catPhien, donPhien, khoiPhucPhien } from './lib/khoa-phien'
 import { datDangMoKhoa } from './lib/cap-nhat-app'
 import { phaiHoiLai, type BanGhiKhoa } from './lib/khoa-app'
-import { docDuongVao, laLinkAppCu, laManThayQuanLy } from './lib/vai-tro'
+import { docDuongVao, laLinkAppCu, laManThayQuanLy, vaiDaDung } from './lib/vai-tro'
 import { ganCauNoi, goCauNoi } from './lib/cau-noi-ddh'
 import ExamTakeScreen from './screens/ExamTakeScreen'
 import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
@@ -92,9 +92,20 @@ function App() {
   const [laXemDiem] = useState(() => docDuongVao(location.search, location.pathname).vai === 'diem')
   // CỔNG HỌC SINH (/hoc-sinh, /hs): cổng thông tin riêng của em — đăng nhập,
   // xem điểm, nộp BTVN, khắc phục câu sai, vào thi.
-  const [laHocSinh] = useState(() => docDuongVao(location.search, location.pathname).vai === 'hocsinh')
+  // Khi mở từ màn hình chính iOS (start_url="./" mở "/" trần), nếu máy đã dùng vai 'hs' thì vào thẳng cổng học sinh.
+  const [laHocSinh] = useState(() => {
+    const d = docDuongVao(location.search, location.pathname)
+    if (d.vai === 'hocsinh') return true
+    if (!d.vai && !d.maCa && vaiDaDung() === 'hs') return true
+    return false
+  })
   // CỔNG PHỤ HUYNH (/phu-huynh, /ph): cổng thông tin cho phụ huynh — tra cứu điểm của con bằng SBD, giao bài tập.
-  const [laPhuHuynh] = useState(() => docDuongVao(location.search, location.pathname).vai === 'phuhuynh')
+  const [laPhuHuynh] = useState(() => {
+    const d = docDuongVao(location.search, location.pathname)
+    if (d.vai === 'phuhuynh') return true
+    if (!d.vai && !d.maCa && vaiDaDung() === 'ph') return true
+    return false
+  })
   // MẬT KHẨU MỞ APP (MATKHAUMOAPP.md). CHỈ hỏi ở app quản lý của thầy — vào
   // thi, báo cáo phụ huynh, link riêng cũ đều không bao giờ bị hỏi.
   const [canHoi] = useState(() => laManThayQuanLy(location.search, location.pathname))

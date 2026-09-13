@@ -47,6 +47,8 @@ chuanHoaDuongDan(import.meta.env.BASE_URL)
   const dv = docDuongVao(location.search, location.pathname)
   if (dv.vai === 'gv') nhoVaiDaDung('gv')
   else if (dv.maCa || dv.vai === 'diem') nhoVaiDaDung('hs')
+  else if (dv.vai === 'hocsinh') nhoVaiDaDung('hs')
+  else if (dv.vai === 'phuhuynh') nhoVaiDaDung('ph')
 }
 
 // beforeinstallprompt chỉ bắn MỘT LẦN và bắn trước khi React kịp mount — phải
