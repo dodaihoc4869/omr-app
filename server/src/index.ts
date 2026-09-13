@@ -1618,7 +1618,7 @@ async function btvnCuaEm(env: Env, b: Record<string, unknown>): Promise<Response
 
   return ra({
     ok: true,
-    maBtvn,
+    maBtvn: String(bt.ma_btvn ?? ''),
     hanNop: String(bt.han_nop ?? ''),
     giaoLuc: String(bt.giao_luc ?? ''),
     daNop: !!em.nop_luc,

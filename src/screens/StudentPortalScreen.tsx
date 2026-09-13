@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Award,
   BookOpen,
@@ -100,6 +100,7 @@ export default function StudentPortalScreen() {
   // Dữ liệu BTVN
   const [dsBtvn, setDsBtvn] = useState<any[]>([])
   const [dangTaiBtvn, setDangTaiBtvn] = useState(false)
+  const [dangMoBai, setDangMoBai] = useState<string | null>(null)
 
   // Khắc phục câu sai
   const [cacCaChon, setCacCaChon] = useState<Set<string>>(new Set())
@@ -116,6 +117,43 @@ export default function StudentPortalScreen() {
   useEffect(() => {
     nhoVaiDaDung('hs')
   }, [])
+
+  const napLaiBtvn = useCallback(async () => {
+    if (!auth) return
+    const url = await loadScriptUrlHoacMacDinh().catch(() => '')
+    setDangTaiBtvn(true)
+    try {
+      const resBt = await hsBtvnApi(url, auth.sbd)
+      if (resBt.ok && resBt.items) {
+        setDsBtvn(resBt.items)
+      }
+    } finally {
+      setDangTaiBtvn(false)
+    }
+  }, [auth])
+
+  const moBaiTap = async (bt: any) => {
+    if (!auth) return
+    const id = bt.maBtvn || bt.maCa
+    setDangMoBai(id)
+    try {
+      const { layCauHinhChoEmBtvn } = await import('../lib/btvn-cho-em')
+      const { btvnCuaEm } = await import('../lib/btvn-may-chu-moi')
+      const ch = await layCauHinhChoEmBtvn()
+      const r = await btvnCuaEm(ch, bt.maCa || 'Riêng', auth.sbd)
+      if (!r.ok) {
+        alert(r.error || 'Không mở được bài tập về nhà')
+        return
+      }
+      const { dungPhieuBtvn } = await import('../lib/btvn-cho-em')
+      const html = await dungPhieuBtvn(r, bt.maCa || 'Riêng', auth.sbd)
+      setPhieuHtml(html)
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Không mở được bài tập')
+    } finally {
+      setDangMoBai(null)
+    }
+  }
 
   // Nạp dữ liệu khi đã đăng nhập
   useEffect(() => {
@@ -817,13 +855,25 @@ export default function StudentPortalScreen() {
         {/* TAB 2: NỘP BÀI TẬP VỀ NHÀ */}
         {tab === 'btvn' && (
           <div className="space-y-4">
-            <div>
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                Bài tập về nhà
-              </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Danh sách các bài tập Thầy giao, thời hạn nộp bài và kết quả làm bài
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                  Bài tập về nhà
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Danh sách các bài tập Thầy giao, thời hạn nộp bài và kết quả làm bài
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => void napLaiBtvn()}
+                disabled={dangTaiBtvn}
+                className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-800 transition inline-flex items-center gap-1.5 text-slate-700 dark:text-slate-300 cursor-pointer self-start sm:self-auto"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${dangTaiBtvn ? 'animate-spin' : ''}`} />
+                <span>Làm mới</span>
+              </button>
             </div>
 
             {dangTaiBtvn ? (
@@ -840,6 +890,15 @@ export default function StudentPortalScreen() {
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
                   Hiện tại Thầy chưa giao bài tập mới hoặc các bài tập trước đó đã hoàn tất.
                 </p>
+                <button
+                  type="button"
+                  onClick={() => void napLaiBtvn()}
+                  disabled={dangTaiBtvn}
+                  className="mt-4 px-4 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold inline-flex items-center gap-1.5 hover:bg-indigo-100 transition cursor-pointer"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${dangTaiBtvn ? 'animate-spin' : ''}`} />
+                  <span>Tải lại danh sách</span>
+                </button>
               </div>
             ) : (
               <div className="space-y-3">
@@ -890,17 +949,28 @@ export default function StudentPortalScreen() {
                           </div>
                         </div>
                       )}
-                      <a
-                        href={`/t/${bt.maCa}?sbd=${auth.sbd}`}
-                        className={`px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition ${
+                      <button
+                        type="button"
+                        onClick={() => void moBaiTap(bt)}
+                        disabled={dangMoBai === (bt.maBtvn || bt.maCa)}
+                        className={`px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
                           bt.daNop
                             ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200'
                             : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
                         }`}
                       >
-                        <span>{bt.daNop ? 'Xem lại bài' : 'Vào làm bài'}</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </a>
+                        {dangMoBai === (bt.maBtvn || bt.maCa) ? (
+                          <>
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>Đang mở...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>{bt.daNop ? 'Xem lại bài' : 'Vào làm bài'}</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </>
+                        )}
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -1089,12 +1159,15 @@ export default function StudentPortalScreen() {
         )}
       </main>
 
-      {/* Khung xem đề khắc phục câu sai (chuẩn HTML giống trong báo cáo) */}
+      {/* Khung xem đề bài tập & khắc phục câu sai (chuẩn HTML tương tác) */}
       {phieuHtml && (
         <KhungXemPhieu
           html={phieuHtml}
-          ten="Đề khắc phục câu sai"
-          dong={() => setPhieuHtml('')}
+          ten="Bài tập & Phiếu làm bài"
+          dong={() => {
+            setPhieuHtml('')
+            void napLaiBtvn()
+          }}
         />
       )}
     </div>

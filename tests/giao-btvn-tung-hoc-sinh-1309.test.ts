@@ -39,4 +39,18 @@ describe('GIAO BTVN CHO TỪNG HỌC SINH', () => {
     expect(SERVER).toContain('if (dsMaCa.length === 0 && dsSbd.length > 0)')
     expect(SERVER).toContain('setSbd.has(String(e.sbd))')
   })
+
+  it('hsBtvn truy vấn đúng các cột thực tế của bảng btvn và btvn_em', () => {
+    const GOI_CU = doc('server/src/goi-cu.ts')
+    expect(GOI_CU).toContain('SELECT be.ma_btvn, be.sbd, be.nop_luc, be.so_dung, be.so_cau AS em_so_cau')
+    expect(GOI_CU).toContain('b.ma_ca, b.ma_de, b.han_nop, b.so_cau, b.giao_luc')
+    expect(GOI_CU).not.toContain('be.diem, be.so_dung, be.so_sai')
+  })
+
+  it('StudentPortalScreen có nút làm mới bài tập và nút vào làm bài trực tiếp', () => {
+    const PORTAL = doc('src/screens/StudentPortalScreen.tsx')
+    expect(PORTAL).toContain('napLaiBtvn')
+    expect(PORTAL).toContain('moBaiTap')
+    expect(PORTAL).toContain('Tải lại danh sách')
+  })
 })

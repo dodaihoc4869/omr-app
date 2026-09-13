@@ -26,6 +26,7 @@ export interface R2Object {
 export interface R2Bucket {
   get(key: string): Promise<R2Object | null>
   put(key: string, value: ArrayBuffer | string | ReadableStream): Promise<unknown>
+  delete(keys: string | string[]): Promise<void>
 }
 export interface Env {
   DB: D1Database

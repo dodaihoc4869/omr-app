@@ -13,7 +13,7 @@
 //   2. Gói đề và gói phiếu nằm ở R2, D1 chỉ giữ khoá và phần tra cứu.
 //   3. Lệnh của HỌC SINH không đòi mã bí mật; lệnh của THẦY thì đòi. Bảng
 //      `LENH_CUA_THAY` dưới đây là nơi duy nhất quyết định điều đó.
-import type { Env } from './kieu'
+import type { D1PreparedStatement, Env } from './kieu'
 
 export const NAY = (): string => new Date().toISOString()
 
@@ -22,6 +22,7 @@ export function chuoi(v: unknown): string {
 }
 
 export function soHoacNull(v: unknown): number | null {
+  if (v === null || v === undefined || v === '') return null
   const n = Number(v)
   return Number.isFinite(n) ? n : null
 }
@@ -1689,8 +1690,8 @@ export async function hsBtvn(env: Env, b: Record<string, unknown>): Promise<Reco
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
 
   const r = await env.DB.prepare(
-    `SELECT be.ma_btvn, be.sbd, be.nop_luc, be.diem, be.so_dung, be.so_sai,
-            b.ma_ca, b.ten_btvn, b.han_nop, b.so_cau, b.giao_luc
+    `SELECT be.ma_btvn, be.sbd, be.nop_luc, be.so_dung, be.so_cau AS em_so_cau,
+            b.ma_ca, b.ma_de, b.han_nop, b.so_cau, b.giao_luc
        FROM btvn_em be
        JOIN btvn b ON b.ma_btvn = be.ma_btvn
       WHERE be.sbd = ? AND b.da_xoa = 0
@@ -1701,19 +1702,29 @@ export async function hsBtvn(env: Env, b: Record<string, unknown>): Promise<Reco
 
   return {
     ok: true,
-    items: (r.results ?? []).map((x) => ({
-      maBtvn: chuoi(x.ma_btvn),
-      maCa: chuoi(x.ma_ca),
-      tenBtvn: chuoi(x.ten_btvn) || 'Bài tập về nhà',
-      hanNop: chuoi(x.han_nop),
-      giaoLuc: chuoi(x.giao_luc),
-      nopLuc: chuoi(x.nop_luc),
-      daNop: Boolean(x.nop_luc),
-      diem: soHoacNull(x.diem),
-      soDung: soHoacNull(x.so_dung),
-      soSai: soHoacNull(x.so_sai),
-      soCau: Number(x.so_cau) || 0,
-    })),
+    items: (r.results ?? []).map((x) => {
+      const soDung = soHoacNull(x.so_dung)
+      const soCau = Number(x.so_cau) || Number(x.em_so_cau) || 0
+      const soSai = soDung !== null && soCau >= soDung ? soCau - soDung : null
+      const diem = soDung !== null && soCau > 0 ? Math.round((soDung / soCau) * 1000) / 100 : null
+      const maDe = chuoi(x.ma_de)
+      const maCa = chuoi(x.ma_ca)
+      const tenBtvn = maDe ? `Bài tập: ${maDe}` : (maCa && maCa !== 'Riêng' ? `Bài tập ca ${maCa}` : 'Bài tập về nhà')
+      return {
+        maBtvn: chuoi(x.ma_btvn),
+        maCa,
+        maDe,
+        tenBtvn,
+        hanNop: chuoi(x.han_nop),
+        giaoLuc: chuoi(x.giao_luc),
+        nopLuc: chuoi(x.nop_luc),
+        daNop: Boolean(x.nop_luc),
+        diem,
+        soDung,
+        soSai,
+        soCau,
+      }
+    }),
   }
 }
 
