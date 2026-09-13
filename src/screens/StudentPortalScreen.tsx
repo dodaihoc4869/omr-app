@@ -832,17 +832,17 @@ export default function StudentPortalScreen() {
         <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200/80 dark:border-slate-800 p-8 transition-all">
           <div className="text-center mb-6">
             <div className="flex justify-center mb-3">
-              <LogoHocSinh size={54} />
+              <LogoHocSinh size={54} hienChu={false} />
             </div>
-            <h1
+            <div
               className="text-2xl font-black tracking-tight text-slate-900 dark:text-white"
               style={{ fontFamily: 'var(--sans)' }}
             >
-              Cổng Thông Tin Học Sinh
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5" style={{ fontFamily: 'var(--sans)' }}>
-              Luyện thi Hoá Thầy Đỗ Đại Học · Đăng nhập để học tập
-            </p>
+              ĐỖ ĐẠI HỌC
+            </div>
+            <div className="text-xs font-bold tracking-wider uppercase text-emerald-600 dark:text-emerald-400 mt-1" style={{ fontFamily: 'var(--sans)' }}>
+              Kiên Trì
+            </div>
           </div>
 
           {chuaCoMatKhau ? (

@@ -184,7 +184,7 @@ export default function LogoGiaoVien({
             className="text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5"
             style={{ fontSize: '11px', fontFamily: 'var(--sans)' }}
           >
-            Quản Lý & Chấm Thi OMR
+            Kiên Trì
           </span>
         </div>
       )}

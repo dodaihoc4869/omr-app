@@ -173,7 +173,7 @@ export default function KhoaAppScreen({ pha, banGhi, onMoDuoc }: KhoaAppScreenPr
               ĐỖ ĐẠI HỌC
             </div>
             <div className="text-xs font-bold tracking-wider uppercase text-blue-600 dark:text-blue-400 mt-1" style={{ fontFamily: 'var(--sans)' }}>
-              Giáo Viên · Mở Khoá Thiết Bị
+              Kiên Trì
             </div>
           </div>
 

@@ -2373,7 +2373,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 ĐỖ ĐẠI HỌC
               </div>
               <div className="text-xs font-bold tracking-wider uppercase text-emerald-600 dark:text-emerald-400 mt-1" style={{ fontFamily: 'var(--sans)' }}>
-                Học Sinh · Phòng Thi Trực Tuyến
+                Kiên Trì
               </div>
             </div>
             <div className="flex flex-col" style={{ gap: 'var(--k4)' }}>

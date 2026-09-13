@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import {
-  Users,
   Search,
   BookOpen,
   Award,
@@ -371,15 +370,15 @@ export default function ParentPortalScreen() {
         <main className="flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200 dark:border-slate-800 animate-google-fade">
             <div className="text-center mb-6">
-              <div className="w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400">
-                <Users size={32} />
+              <div className="flex justify-center mb-3">
+                <LogoApp vai="giaovien" size={54} hienChu={false} />
               </div>
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                CỔNG PHỤ HUYNH
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white" style={{ fontFamily: 'var(--sans)' }}>
+                ĐỖ ĐẠI HỌC
               </h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Theo dõi kết quả học tập & Đồng hành cùng con đỗ Đại học
-              </p>
+              <div className="text-xs font-bold tracking-wider uppercase text-blue-600 dark:text-blue-400 mt-1" style={{ fontFamily: 'var(--sans)' }}>
+                Kiên Trì
+              </div>
             </div>
 
             <form
