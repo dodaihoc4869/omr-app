@@ -484,3 +484,19 @@ Script là dựng CÁI THƯỚC, không phải chuyển lệnh.
 4. Cấu hình còn cờ tắt ⇒ một bản ghi cũ đủ hỏng cả ca
 5. Bản đồ đề riêng gửi cả lớp cho từng em; thiếu phần của em thì phát đề sai
 6. Phiếu BTVN mất sạch phương án (đọc sai khoá gói kho)
+
+## 12/09 — "Ca test6 mở nhưng ko gửi được đề"
+- [x] Truy nguyên nhân gốc lỗi "Máy chủ chưa gửi đề" | bằng chứng: D1 ca 455713 `cong_bo='ca_lop_xong'`; `exam-api.ts:526` bảo "đi đường cũ"; Apps Script đã gỡ nên rơi vào `/goi` — cổng ấy trả `deUrl` chứ không trả `bank`
+- [x] Kiểm chứng ca lành, không phải hỏng dữ liệu | bằng chứng: `GET /de/455713` → HTTP 200, 90.170 byte, 24+6+6 câu; `bo_theo_em_json` 835 byte có đủ em 12121212
+- [x] Bỏ sạch `return null` trong `vaoThiQuaMayChuMoi` | bằng chứng: test `vao-thi-may-chu-moi-1109` + `khong-treo-phong-cho-1109` (17 phép)
+- [x] Bỏ chốt `ca_lop_xong` (cổng ấy nay đếm thẳng bảng `luot` trong D1)
+- [x] Bỏ đối chiếu phòng chờ — một nguồn sự thật thì đối chiếu là gọi hai lần cùng một máy chủ
+- [x] Đường nóng thử lại đủ 3 lượt thay vì 1 | bằng chứng: đo thật 3 lượt · báo hỏng sau 11,03s (trước: hỏng hẳn sau 3s)
+- [x] Lượt bị từ chối mang kèm `nopLuc` / `batDau` / `hetHanVao`
+- [x] Gửi kèm `hoTen` / `namSinh` / `xacNhanTen` cho nhật ký chặn vào
+- [x] Lỗi build `GITHUB_PAGES=true npm run build` | bằng chứng: KHÔNG phải lỗi code — `EPERM unlink dist/404.html`, máy ảo không được xoá file trong thư mục gắn. Build ra thư mục khác: xanh.
+- [x] Sáu cổng nghiệm thu | bằng chứng: tsc app + tsc server sạch · 1131+1114+1154 phép kiểm xanh · check:mau đạt · kiem:hien-thi **KẾT LUẬN: ĐẠT 18/18** · build xanh
+- [ ] THẦY BẤM PHÁT HÀNH: commit `bb7ad43` (lùi: `git revert bb7ad43`)
+- [ ] THẦY KHOÁ 5 ca Test còn mở trước 9h: 639777, 825440, 227254, 696447, 455713
+- [ ] `src/lib/doi-chieu-phong-cho.ts` nay không màn nào dùng (đã tree-shake khỏi bản build). Máy ảo không xoá được file — thầy `git rm src/lib/doi-chieu-phong-cho.ts` khi rảnh.
+- [ ] Rác trong thư mục repo chưa xoá được (máy ảo cấm xoá): `_goi-kiem.tgz`, `_cay-tam.tar.gz`, `_day-app.log`, `_chuyen-may-chu.log`, `_patch_cu/`, `spk-loc.patch`, `sua-phep-kiem.patch`, `src/lib/chem-format.tsx.truoc-dong-vi`, `.gitignore.bak-20260905`, `.git/index.lock.bo-di-duoc`

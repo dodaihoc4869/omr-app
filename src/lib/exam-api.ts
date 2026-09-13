@@ -2588,7 +2588,10 @@ export async function ghiPhieuKhacPhuc(
   maCa: string,
   sbd: string,
   idThietBi: string,
-  cau: { id: string; phan: 'I' | 'II' | 'III'; dapAn: string }[],
+  // `chuaCho` PHẢI đi cùng. Link xem báo cáo dựng lại phiếu từ đúng gói này;
+  // gửi thiếu nó là mục đề khắc phục mở ra không nói được nó chữa cho câu nào
+  // (thầy bắt được 12/09, phiếu a3m57s4j ca 195422 lưu vỏn vẹn id + phần + đáp án).
+  cau: { id: string; phan: 'I' | 'II' | 'III'; dapAn: string; chuaCho?: unknown }[],
   tt: { hoTen?: string; tenChuyenDe?: string } = {},
 ): Promise<string> {
   if (cau.length === 0) return ''

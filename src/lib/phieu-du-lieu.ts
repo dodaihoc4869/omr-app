@@ -817,7 +817,11 @@ export function dungPhieuMayEm(n: NguonPhieuMayEm): PhieuDayDu {
     //
     // CÓ kèm bài luyện (thầy chốt 06/09): em tự tạo bộ câu khắc phục lỗi sai
     // ngay sau khi nộp, lúc còn nhớ mình vướng chỗ nào.
-    baiTap: cdEm.cau,
+    // ÁP LẠI NHÃN Ở ĐẦU RA. `chanDoanChoPhieu` gom câu thành cụm theo bệnh và
+    // dựng lại đối tượng, nên nhãn gắn phía trên không sống sót qua nó — đó là
+    // lý do link xem báo cáo vẫn không nói đề khắc phục chữa cho câu nào.
+    // Hàm bỏ qua câu đã có nhãn, nên gọi lại ở đây không đè nhãn theo mã dạng.
+    baiTap: ganNhanTheoChuyenDe(cdEm.cau, n.rows),
     chanDoanCum: cdEm.cum.length > 0 ? cdEm.cum : undefined,
     chanDoanCo: cdEm.co.length > 0 ? cdEm.co : undefined,
     chanDoanCam: cdEm.canhBao.length > 0 ? cdEm.canhBao : undefined,
@@ -963,7 +967,7 @@ export function dungPhieu(n: NguonPhieu): PhieuDayDu {
     dongCauLap: dongCauLap(soCauLap, tk ? tk.tongCau : rows.length || null),
     dai: rows.map((r) => ({ nhan: `Phần ${r.phan} câu ${r.soCau}`, giay: r.giay, dung: Boolean(r.dungSai) })),
     viPham: dungViPham(n.viPham),
-    baiTap: cd.cau,
+    baiTap: ganNhanTheoChuyenDe(cd.cau, rows),
     chanDoanCum: cd.cum.length > 0 ? cd.cum : undefined,
     chanDoanCo: cd.co.length > 0 ? cd.co : undefined,
     chanDoanCam: cd.canhBao.length > 0 ? cd.canhBao : undefined,

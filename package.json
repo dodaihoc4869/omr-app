@@ -14,6 +14,7 @@
     "kiem:hien-thi": "vitest run tests/xuat-dom-hien-thi.test.tsx && vite build && node scripts/kiem-13.mjs"
   },
   "dependencies": {
+    "@rolldown/binding-darwin-arm64": "^1.2.8",
     "@techstark/opencv-js": "^5.0.0-release.1",
     "idb": "^8.0.3",
     "jspdf": "^4.2.1",

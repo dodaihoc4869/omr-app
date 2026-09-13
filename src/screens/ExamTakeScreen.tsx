@@ -815,7 +815,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         a.maCa,
         a.sbd,
         idThietBiCuaLuot(a),
-        (phieuCuaEm.baiTap ?? []).map((c) => ({ id: c.id, phan: c.phan, dapAn: c.dapAn })),
+        (phieuCuaEm.baiTap ?? []).map((c) => ({ id: c.id, phan: c.phan, dapAn: c.dapAn, chuaCho: c.chuaCho })),
         { hoTen: phieuCuaEm.hoTen, tenChuyenDe: phieuCuaEm.chuyenDeCa?.[0]?.ten ?? '' },
       )
       hua.catch(() => {

@@ -112,6 +112,18 @@ describe('phiếu chỉ lấy câu CÙNG MÃ DẠNG với câu em sai', () => {
       expect(c.chuaCho === undefined || c.chuaCho.laLamLai === true || c.chuaCho.theoChuyenDe === true).toBe(true)
     expect(p.thieuChua?.join(' ')).toContain('không phải câu chữa')
   })
+
+  // 12/09: link xem báo cáo hiện đề khắc phục mà KHÔNG nói nó chữa cho câu nào.
+  // `chanDoanChoPhieu` gom câu thành cụm và dựng lại đối tượng, nên nhãn gắn
+  // trước đó không sống sót tới `phieu.baiTap`. Phép kiểm chạy THẬT qua
+  // `dungPhieu` để canh đúng đầu ra người đọc nhìn thấy.
+  it('câu cùng CHUYÊN ĐỀ trong phiếu phải mang nhãn "luyện thêm cho câu N"', () => {
+    const it1 = kho([cau('sai-7', HS, 'Xà phòng hoá, tính khối lượng'), cau('xp-1', XP, 'Thành phần chính của xà phòng là')])
+    const p = dungPhieu({ ...NEN, khoDe: it1, rows: [row(7, 'sai-7', false)] })
+    const co = (p.baiTap ?? []).filter((c) => c.chuaCho)
+    expect(co.length).toBeGreaterThan(0)
+    for (const c of co) expect(c.chuaCho!.soCau).toBe(7)
+  })
 })
 
 describe('phiếu HTML hiện nhãn "Chữa câu N"', () => {

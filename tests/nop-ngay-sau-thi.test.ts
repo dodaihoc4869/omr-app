@@ -81,8 +81,8 @@ describe('màn làm bài gắn link vào báo cáo', () => {
     expect(doc('src/components/KhoiBaiLuyen.tsx')).toContain("const lyDoKhongNop = nop ? '' : !maPhieu ? 'thieu_ma'")
   })
 
-  it('client gửi ĐÚNG ba trường máy chủ cần để chấm', () => {
-    expect(MAN_THI).toContain('.map((c) => ({ id: c.id, phan: c.phan, dapAn: c.dapAn }))')
+  it('client gửi ĐÚNG các trường máy chủ cần để chấm', () => {
+    expect(MAN_THI).toMatch(/\.map\(\(c\) => \(\{ id: c\.id, phan: c\.phan, dapAn: c\.dapAn(?:, chuaCho: c\.chuaCho)? \}\)\)/)
     expect(API).toContain("postJson(scriptUrl, { action: 'ghiPhieuKhacPhuc', maCa, sbd, idThietBi, cau, hoTen: tt.hoTen || '', tenChuyenDe: tt.tenChuyenDe || '' }, 45)")
   })
 })
