@@ -60,13 +60,14 @@ export async function giaoBtvn(
   dsMaDe: string[],
   dsSbd?: string[],
 ): Promise<KetQuaGiaoBtvn> {
-  if (dsMaCa.length === 0) throw new Error('Chưa tick ca nào')
+  const coSbd = Boolean(dsSbd && dsSbd.length > 0)
+  if (dsMaCa.length === 0 && !coSbd) throw new Error('Chưa tick ca nào')
   if (dsMaDe.length === 0) throw new Error('Chưa tick tờ đề nào')
   if (dsSbd && dsSbd.length === 0) throw new Error('Chưa tick học sinh nào')
   const r = await goi<{ ok?: boolean; error?: string } & KetQuaGiaoBtvn>(
     ch,
     '/btvn/giao',
-    { dsMaCa, dsMaDe, dsSbd: dsSbd && dsSbd.length > 0 ? dsSbd : undefined },
+    { dsMaCa: dsMaCa.length > 0 ? dsMaCa : undefined, dsMaDe, dsSbd: coSbd ? dsSbd : undefined },
     mat,
   )
   if (!r) throw new Error('Máy chủ không trả lời')

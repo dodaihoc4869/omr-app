@@ -1382,22 +1382,27 @@ export function goPhanKhoiMaDe(ma: string): { goc: string; phan: 'I' | 'II' | 'I
 async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response> {
   // NHIỀU CA MỘT LƯỢT GIAO (thầy chốt 12/09: "cho tick chọn nhiều ca"). Nhận cả
   // `maCa` một ca của bản trước — bản cũ trên máy thầy vẫn gửi dáng ấy.
+  const dsSbd = Array.isArray(b.dsSbd)
+    ? (b.dsSbd as unknown[]).map((x) => String(x).trim()).filter(Boolean)
+    : []
+
   const dsMaCa = Array.isArray(b.dsMaCa)
     ? (b.dsMaCa as unknown[]).map((x) => String(x).trim()).filter(Boolean)
     : String(b.maCa ?? '').trim()
       ? [String(b.maCa).trim()]
       : []
-  // NHIỀU TỜ ĐỀ MỘT LƯỢT GIAO (thầy chốt 12/09: "cho tick nhiều"). Nhận cả
-  // `maDe` một tờ của bản trước — bản cũ trên máy em vẫn gửi dáng ấy.
-  //
-  // Mã có thể mang HẬU TỐ PHẦN (`-TN` · `-DS` · `-TLN`) vì màn chọn đề của thầy
-  // tick tới từng phần. Giữ nguyên mã đã tách trong sổ; chỗ phát bài gỡ hậu tố
-  // ra để lấy đúng phần.
+
+  // Nếu giao cho từng học sinh mà không chọn ca thi, tự động gán ca là 'Riêng'
+  if (dsMaCa.length === 0 && dsSbd.length > 0) {
+    dsMaCa.push('Riêng')
+  }
+
   const dsMaDe = Array.isArray(b.dsMaDe)
     ? (b.dsMaDe as unknown[]).map((x) => String(x).trim()).filter(Boolean)
     : String(b.maDe ?? '').trim()
       ? [String(b.maDe).trim()]
       : []
+
   if (dsMaCa.length === 0 || dsMaDe.length === 0) return ra({ ok: false, error: 'Thiếu ca hoặc tờ đề' })
   if (dsMaCa.length > 10) return ra({ ok: false, error: `Tối đa 10 ca một lượt giao, thầy đang tick ${dsMaCa.length} ca` })
   // TRẦN 12 TỜ một lượt giao: mỗi tờ tốn một lượt đọc R2 lúc đếm câu, và bài
@@ -1447,9 +1452,6 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
   const giaoLuc = nay.toISOString()
   const hanNop = new Date(nay.getTime() + HAN_BTVN_GIO * 3600 * 1000).toISOString()
 
-  const dsSbd = Array.isArray(b.dsSbd)
-    ? (b.dsSbd as unknown[]).map((x) => String(x).trim()).filter(Boolean)
-    : []
 
   const lenh: D1PreparedStatement[] = []
   const emDaCo = new Set<string>()
@@ -1530,14 +1532,42 @@ async function btvnCuaEm(env: Env, b: Record<string, unknown>): Promise<Response
   const sbd = String(b.sbd ?? '').trim()
   if (!maCa || !sbd) return ra({ ok: false, lyDo: 'thieu' })
 
-  const bt = await env.DB.prepare('SELECT * FROM btvn WHERE ma_ca = ? AND da_xoa = 0 ORDER BY giao_luc DESC LIMIT 1')
-    .bind(maCa)
-    .first<Record<string, unknown>>()
-  if (!bt) return ra({ ok: false, lyDo: 'chua_giao', error: 'Ca này chưa được giao bài tập về nhà' })
+  let bt = maCa
+    ? await env.DB.prepare('SELECT * FROM btvn WHERE ma_ca = ? AND da_xoa = 0 ORDER BY giao_luc DESC LIMIT 1')
+        .bind(maCa)
+        .first<Record<string, unknown>>()
+    : null
 
-  const maBtvn = String(bt.ma_btvn ?? '')
-  const em = await env.DB.prepare('SELECT * FROM btvn_em WHERE khoa = ?').bind(`${maBtvn}|${sbd}`).first<Record<string, unknown>>()
-  if (!em) return ra({ ok: false, lyDo: 'khong_duoc_giao', error: 'Em không có bài tập của ca này' })
+  let em: Record<string, unknown> | null = null
+  if (bt) {
+    em = await env.DB.prepare('SELECT * FROM btvn_em WHERE khoa = ?').bind(`${bt.ma_btvn}|${sbd}`).first<Record<string, unknown>>()
+  }
+
+  if (!bt || !em) {
+    const btEm = await env.DB.prepare(
+      `SELECT b.*, be.nop_luc AS em_nop_luc, be.so_dung AS em_so_dung, be.so_cau AS em_so_cau
+         FROM btvn b JOIN btvn_em be ON be.ma_btvn = b.ma_btvn
+        WHERE be.sbd = ? AND b.da_xoa = 0
+        ORDER BY b.giao_luc DESC LIMIT 1`,
+    )
+      .bind(sbd)
+      .first<Record<string, unknown>>()
+    if (btEm) {
+      bt = btEm
+      em = {
+        khoa: `${btEm.ma_btvn}|${sbd}`,
+        ma_btvn: btEm.ma_btvn,
+        sbd,
+        nop_luc: btEm.em_nop_luc,
+        so_dung: btEm.em_so_dung,
+        so_cau: btEm.em_so_cau,
+      }
+    } else if (!bt) {
+      return ra({ ok: false, lyDo: 'chua_giao', error: 'Ca này chưa được giao bài tập về nhà' })
+    } else {
+      return ra({ ok: false, lyDo: 'khong_duoc_giao', error: 'Em không có bài tập của ca này' })
+    }
+  }
 
   const hanMs = mocMs(String(bt.han_nop ?? ''))
   const quaHan = hanMs > 0 && Date.now() > hanMs

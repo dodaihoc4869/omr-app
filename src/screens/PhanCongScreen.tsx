@@ -9,7 +9,7 @@
 // Phần giao bài tập chạy 0% Apps Script: ca và đề đọc từ máy chủ mới, bài giao
 // và bài nộp cũng ở đó.
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { CheckSquare, ClipboardList, Presentation, RefreshCw, Search, Square, UserCheck, Users } from 'lucide-react'
+import { CheckSquare, ClipboardList, Presentation, RefreshCw, Search, Send, Square, UserCheck, Users } from 'lucide-react'
 import { Nhan, NutChinh, OThongBao, TheNoiDung } from '../components/DesignSystem'
 import GoiLenBangScreen from './GoiLenBangScreen'
 import { danhSachCa, danhSachEm, type CaTomTat, type EmTomTat } from '../lib/exam-api'
@@ -308,11 +308,13 @@ function TheGiaoBtvn() {
       const mat = (await loadTeacherSecret()) ?? ''
       const ch = await layCauHinhMayChu()
       const dsSbdGui = cheDo === 'hoc_sinh' ? Array.from(sbdChon) : undefined
-      const kq = await giaoBtvn(ch, mat, [...caChon], [...daChon], dsSbdGui)
+      const dsCaGui = cheDo === 'hoc_sinh' ? [] : [...caChon]
+      const kq = await giaoBtvn(ch, mat, dsCaGui, [...daChon], dsSbdGui)
       const boQua = kq.caRong && kq.caRong.length > 0 ? ` Bỏ qua ${kq.caRong.length} ca chưa em nào vào thi: ${kq.caRong.join(', ')}.` : ''
+      const noiDungCa = kq.soCa ? ` ở ${kq.soCa} ca` : ''
       setBao({
         ok: true,
-        chu: `Đã giao ${kq.soCau} câu (${daChon.size} tờ đề) cho ${kq.soEm} em ở ${kq.soCa ?? caChon.size} ca. Hạn nộp ${gioVN(kq.hanNop)}.${boQua}`,
+        chu: `Đã giao ${kq.soCau} câu (${daChon.size} tờ đề) cho ${kq.soEm} em${noiDungCa}. Hạn nộp ${gioVN(kq.hanNop)}.${boQua}`,
       })
       // Kho trên MÁY THẦY — cùng nguồn màn Mở ca đọc.
       setNguonKho(await loadExamSources())
@@ -366,78 +368,76 @@ function TheGiaoBtvn() {
             </button>
           </div>
 
-          <div>
-            <div className="flex items-center" style={{ justifyContent: 'space-between', gap: 'var(--k2)', marginBottom: 'var(--k2)' }}>
-              <span style={NHAN_NHO}>
-                {cheDo === 'ca'
-                  ? 'Ca đã thi — tick nhiều ca, bài giao cho đúng những em có lượt trong các ca ấy'
-                  : 'Bước 1: Chọn ca thi liên kết (bài tập sẽ xuất hiện trong ca này)'}
-              </span>
-              {dsCa.length > 1 && (
-                <button
-                  type="button"
-                  className="tap-target"
-                  onClick={chonTatCaCa}
-                  style={{ ...NHAN_NHO, textDecoration: 'underline', whiteSpace: 'nowrap' }}
-                >
-                  {caChon.size === dsCa.length ? 'Bỏ hết' : 'Chọn hết'}
-                </button>
-              )}
-            </div>
-
-            {dsCa.length === 0 ? (
-              <div style={NHAN_NHO}>{dangNap ? 'Đang lấy danh sách ca…' : 'Chưa có ca nào đã thi.'}</div>
-            ) : (
-              <div style={{ display: 'grid', gap: 'var(--k2)', maxHeight: 240, overflowY: 'auto' }}>
-                {dsCa.map((c) => {
-                  const chon = caChon.has(c.maCa)
-                  return (
-                    <button
-                      key={c.maCa}
-                      type="button"
-                      onClick={() => batCa(c.maCa)}
-                      className="tap-target"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 'var(--k3)',
-                        textAlign: 'left',
-                        minHeight: 56,
-                        padding: 'var(--k2) var(--k3)',
-                        borderRadius: 'var(--bo-1)',
-                        background: chon ? 'var(--xanh-nen)' : 'var(--the-2)',
-                        border: `1.5px solid ${chon ? 'var(--xanh)' : 'transparent'}`,
-                        transitionProperty: 'background-color, border-color',
-                        transitionDuration: 'var(--nhanh)',
-                      }}
-                      aria-pressed={chon}
-                    >
-                      <span style={{ color: chon ? 'var(--xanh)' : 'var(--mo)', display: 'flex', flex: '0 0 auto' }}>
-                        {chon ? <CheckSquare size={20} /> : <Square size={20} />}
-                      </span>
-                      <span style={{ display: 'grid', gap: 2, minWidth: 0, flex: 1 }}>
-                        <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--muc)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {c.tenCa || `Ca ${c.maCa}`}
-                        </span>
-                        <span style={NHAN_NHO}>
-                          {c.maCa}
-                          {c.lop ? ` · lớp ${c.lop}` : ''} · <b style={{ fontVariantNumeric: 'tabular-nums' }}>{c.daNop}/{c.daVao}</b> nộp
-                          {c.moLuc ? ` · ${gioVN(c.moLuc)}` : ''}
-                        </span>
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
-            )}
-
-            {caChon.size > 0 && (
-              <div className="flex items-center justify-between flex-wrap" style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
-                <span>
-                  Đã tick <b>{caChon.size}</b> ca · <b>{dsCa.filter((c) => caChon.has(c.maCa)).reduce((t, c) => t + c.daVao, 0)}</b> lượt vào thi
-                  {' '}(em thi hai ca chỉ nhận một bài).
+          {cheDo === 'ca' && (
+            <div>
+              <div className="flex items-center" style={{ justifyContent: 'space-between', gap: 'var(--k2)', marginBottom: 'var(--k2)' }}>
+                <span style={NHAN_NHO}>
+                  Ca đã thi — tick nhiều ca, bài giao cho đúng những em có lượt trong các ca ấy
                 </span>
-                {cheDo === 'ca' && (
+                {dsCa.length > 1 && (
+                  <button
+                    type="button"
+                    className="tap-target"
+                    onClick={chonTatCaCa}
+                    style={{ ...NHAN_NHO, textDecoration: 'underline', whiteSpace: 'nowrap' }}
+                  >
+                    {caChon.size === dsCa.length ? 'Bỏ hết' : 'Chọn hết'}
+                  </button>
+                )}
+              </div>
+
+              {dsCa.length === 0 ? (
+                <div style={NHAN_NHO}>{dangNap ? 'Đang lấy danh sách ca…' : 'Chưa có ca nào đã thi.'}</div>
+              ) : (
+                <div style={{ display: 'grid', gap: 'var(--k2)', maxHeight: 240, overflowY: 'auto' }}>
+                  {dsCa.map((c) => {
+                    const chon = caChon.has(c.maCa)
+                    return (
+                      <button
+                        key={c.maCa}
+                        type="button"
+                        onClick={() => batCa(c.maCa)}
+                        className="tap-target"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 'var(--k3)',
+                          textAlign: 'left',
+                          minHeight: 56,
+                          padding: 'var(--k2) var(--k3)',
+                          borderRadius: 'var(--bo-1)',
+                          background: chon ? 'var(--xanh-nen)' : 'var(--the-2)',
+                          border: `1.5px solid ${chon ? 'var(--xanh)' : 'transparent'}`,
+                          transitionProperty: 'background-color, border-color',
+                          transitionDuration: 'var(--nhanh)',
+                        }}
+                        aria-pressed={chon}
+                      >
+                        <span style={{ color: chon ? 'var(--xanh)' : 'var(--mo)', display: 'flex', flex: '0 0 auto' }}>
+                          {chon ? <CheckSquare size={20} /> : <Square size={20} />}
+                        </span>
+                        <span style={{ display: 'grid', gap: 2, minWidth: 0, flex: 1 }}>
+                          <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--muc)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {c.tenCa || `Ca ${c.maCa}`}
+                          </span>
+                          <span style={NHAN_NHO}>
+                            {c.maCa}
+                            {c.lop ? ` · lớp ${c.lop}` : ''} · <b style={{ fontVariantNumeric: 'tabular-nums' }}>{c.daNop}/{c.daVao}</b> nộp
+                            {c.moLuc ? ` · ${gioVN(c.moLuc)}` : ''}
+                          </span>
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+
+              {caChon.size > 0 && (
+                <div className="flex items-center justify-between flex-wrap" style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
+                  <span>
+                    Đã tick <b>{caChon.size}</b> ca · <b>{dsCa.filter((c) => caChon.has(c.maCa)).reduce((t, c) => t + c.daVao, 0)}</b> lượt vào thi
+                    {' '}(em thi hai ca chỉ nhận một bài).
+                  </span>
                   <button
                     type="button"
                     onClick={chuyenSangHocSinh}
@@ -445,10 +445,10 @@ function TheGiaoBtvn() {
                   >
                     Bấm đây để chọn lọc từng học sinh →
                   </button>
-                )}
-              </div>
-            )}
-          </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Ô DANH SÁCH HỌC SINH CÓ Ô TICK (KHI CHỌN GIAO CHO TỪNG HỌC SINH) */}
           {cheDo === 'hoc_sinh' && (
@@ -465,7 +465,7 @@ function TheGiaoBtvn() {
               <div className="flex items-center justify-between flex-wrap" style={{ gap: 'var(--k2)' }}>
                 <div>
                   <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', fontWeight: 700, color: 'var(--muc)' }}>
-                    Bước 2: Danh sách học sinh — tick ô vuông để giao bài tập
+                    Danh sách học sinh — tick ô vuông để giao bài tập
                   </div>
                   <div style={NHAN_NHO}>
                     Đã tick chọn: <b style={{ color: 'var(--xanh)', fontVariantNumeric: 'tabular-nums' }}>{sbdChon.size}</b> học sinh nhận bài
@@ -687,28 +687,121 @@ function TheGiaoBtvn() {
             </OThongBao>
           )}
 
-          <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
-            {cheDo === 'ca' ? (
-              <NutChinh onClick={giao} disabled={dangGiao || caChon.size === 0 || daChon.size === 0}>
-                {dangGiao ? 'Đang giao…' : 'Giao bài tập về nhà'}
-              </NutChinh>
-            ) : (
-              <NutChinh
-                onClick={giao}
-                disabled={dangGiao || caChon.size === 0 || daChon.size === 0 || sbdChon.size === 0}
-              >
-                {dangGiao
-                  ? 'Đang giao…'
-                  : sbdChon.size === 0
-                  ? 'Tick chọn ít nhất 1 học sinh'
-                  : `Giao bài tập về nhà (${sbdChon.size} học sinh)`}
-              </NutChinh>
-            )}
-            <NutChinh variant="phu" onClick={() => void nap()} disabled={dangNap}>
-              <span className="inline-flex items-center gap-2">
-                <RefreshCw size={16} /> Làm mới
+          {/* KHUNG THAO TÁC GIAO BÀI TẬP — GỌN GÀNG & TRỰC QUAN */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 'var(--k3)',
+              padding: '12px 16px',
+              borderRadius: 'var(--bo-2)',
+              background: 'var(--the-2)',
+              border: '1px solid var(--vien)',
+            }}
+          >
+            <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)' }}>
+              <span style={{ fontSize: 'var(--cx-1)', fontWeight: 600, color: 'var(--muc)' }}>
+                {cheDo === 'ca' ? `Đã chọn: ${caChon.size} ca` : `Đã chọn: ${sbdChon.size} học sinh`}
               </span>
-            </NutChinh>
+              <span style={{ color: 'var(--mo)' }}>•</span>
+              <span style={{ fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
+                {daChon.size > 0 ? `${daChon.size} tờ đề (${tongCauDaChon} câu)` : 'Chưa tick tờ đề'}
+              </span>
+            </div>
+
+            <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)' }}>
+              {cheDo === 'ca' ? (
+                <button
+                  type="button"
+                  onClick={giao}
+                  disabled={dangGiao || caChon.size === 0 || daChon.size === 0}
+                  className="tap-target font-bold"
+                  style={{
+                    height: 44,
+                    padding: '0 20px',
+                    borderRadius: 'var(--bo-1)',
+                    fontFamily: 'var(--sans)',
+                    fontSize: 'var(--cx-1)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    cursor: dangGiao || caChon.size === 0 || daChon.size === 0 ? 'not-allowed' : 'pointer',
+                    background: dangGiao || caChon.size === 0 || daChon.size === 0 ? 'var(--the)' : 'var(--muc)',
+                    color: dangGiao || caChon.size === 0 || daChon.size === 0 ? 'var(--mo)' : 'var(--muc-nguoc)',
+                    border: '1px solid ' + (dangGiao || caChon.size === 0 || daChon.size === 0 ? 'var(--vien-dam)' : 'var(--muc)'),
+                    opacity: dangGiao || caChon.size === 0 || daChon.size === 0 ? 0.6 : 1,
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <Send size={16} />
+                  {dangGiao
+                    ? 'Đang giao…'
+                    : caChon.size === 0
+                    ? 'Chưa chọn ca thi'
+                    : daChon.size === 0
+                    ? 'Chưa chọn tờ đề'
+                    : `Giao bài tập (${caChon.size} ca · ${tongCauDaChon} câu)`}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={giao}
+                  disabled={dangGiao || sbdChon.size === 0 || daChon.size === 0}
+                  className="tap-target font-bold"
+                  style={{
+                    height: 44,
+                    padding: '0 20px',
+                    borderRadius: 'var(--bo-1)',
+                    fontFamily: 'var(--sans)',
+                    fontSize: 'var(--cx-1)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    cursor: dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 'not-allowed' : 'pointer',
+                    background: dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 'var(--the)' : 'var(--muc)',
+                    color: dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 'var(--mo)' : 'var(--muc-nguoc)',
+                    border: '1px solid ' + (dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 'var(--vien-dam)' : 'var(--muc)'),
+                    opacity: dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 0.6 : 1,
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <Send size={16} />
+                  {dangGiao
+                    ? 'Đang giao…'
+                    : sbdChon.size === 0
+                    ? 'Chưa chọn học sinh'
+                    : daChon.size === 0
+                    ? 'Chưa chọn tờ đề'
+                    : `Giao bài tập (${sbdChon.size} học sinh · ${tongCauDaChon} câu)`}
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => void nap()}
+                disabled={dangNap}
+                className="tap-target font-semibold"
+                style={{
+                  height: 44,
+                  padding: '0 16px',
+                  borderRadius: 'var(--bo-1)',
+                  fontFamily: 'var(--sans)',
+                  fontSize: 'var(--cx-1)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: 'var(--the)',
+                  color: 'var(--muc)',
+                  border: '1px solid var(--vien-dam)',
+                  cursor: dangNap ? 'not-allowed' : 'pointer',
+                }}
+              >
+                <RefreshCw size={15} className={dangNap ? 'animate-spin' : ''} />
+                Làm mới
+              </button>
+            </div>
           </div>
 
           {bao && <OThongBao tone={bao.ok ? 'xanh' : 'do'}>{bao.chu}</OThongBao>}
