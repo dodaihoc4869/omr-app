@@ -6,6 +6,7 @@ import { useEffect, useState, useMemo } from 'react'
 import DongDemCau, { DongDemYPhanII, docSoDem } from './DongDemCau'
 import { DongCauSai } from './KhoiCauSai'
 import KhoiBaPhan from './KhoiBaPhan'
+import TheTienBo, { type CaLichSu } from './TheTienBo'
 import { danhGiaBai } from '../lib/danh-gia-bai'
 import { createPortal } from 'react-dom'
 import {
@@ -46,12 +47,9 @@ export interface ThongTinBaiThiHocSinh {
   lanThu?: number
 }
 
-export interface ExtraTabItem {
-  id: string
-  label: string
-  icon?: React.ReactNode
-  content: React.ReactNode
-}
+// BÁO CÁO CHỈ CÓ ĐÚNG BỐN THẺ (thầy chốt 14/09): Tổng quan 3 phần · Câu sai cần
+// chữa · Mức độ nhận thức · Mức tiến bộ. Cơ chế "thẻ bổ sung" đã bỏ hẳn — còn
+// nó là màn nào cũng chèn thêm được một thẻ riêng, và báo cáo lại lệch nhau.
 
 interface Props {
   baiThi: ThongTinBaiThiHocSinh
@@ -62,7 +60,6 @@ interface Props {
   onClose: () => void
   onBatDauKhacPhuc: (maCa: string) => void
   onMoLaiBaiThi?: (maCa: string) => void
-  extraTabs?: ExtraTabItem[]
   tabMacDinh?: string
 }
 
@@ -75,9 +72,9 @@ export default function BaoCaoCaThiHocSinhModal({
   onClose,
   onBatDauKhacPhuc,
   onMoLaiBaiThi,
-  extraTabs,
   tabMacDinh = 'tong_quan',
 }: Props) {
+  const [dsLichSu, setDsLichSu] = useState<CaLichSu[]>([])
   const [dsCauSai, setDsCauSai] = useState<any[]>([])
   const [dangTaiCauSai, setDangTaiCauSai] = useState(false)
   const [tabHienThi, setTabHienThi] = useState<string>(tabMacDinh)
@@ -91,7 +88,7 @@ export default function BaoCaoCaThiHocSinhModal({
       try {
         const res = await hsLichSuCaApi(scriptUrl, sbd)
         if (active && res && res.ok && Array.isArray(res.items)) {
-          void (res.items)
+          setDsLichSu(res.items as CaLichSu[])
         }
       } catch {}
     }
@@ -389,22 +386,20 @@ export default function BaoCaoCaThiHocSinhModal({
               <span>Mức độ nhận thức</span>
             </button>
 
+            <button
+              type="button"
+              onClick={() => setTabHienThi('tien_bo')}
+              className={`py-2.5 px-3.5 text-xs font-bold rounded-t-xl transition-colors border-b-2 flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                tabHienThi === 'tien_bo'
+                  ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/30'
+                  : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
+              }`}
+            >
+              <Layers className="w-4 h-4" />
+              <span>Mức tiến bộ</span>
+            </button>
 
-            {extraTabs?.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setTabHienThi(t.id)}
-                className={`py-2.5 px-3.5 text-xs font-bold rounded-t-xl transition-colors border-b-2 flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                  tabHienThi === t.id
-                    ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/30'
-                    : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
-                }`}
-              >
-                {t.icon}
-                <span>{t.label}</span>
-              </button>
-            ))}
+
           </div>
 
           {/* TAB 1: TỔNG QUAN 3 PHẦN */}
@@ -529,14 +524,9 @@ export default function BaoCaoCaThiHocSinhModal({
 
           {/* TAB 4: MỨC TIẾN BỘ */}
 
-          {/* CÁC TAB BỔ SUNG (DÀNH CHO GIÁO VIÊN NẾU CÓ) */}
-          {extraTabs?.map((t) =>
-            tabHienThi === t.id ? (
-              <div key={t.id} className="space-y-4 animate-google-fade">
-                {t.content}
-              </div>
-            ) : null
-          )}
+          {/* THẺ MỨC TIẾN BỘ — dùng chung `TheTienBo` với cổng phụ huynh. */}
+          {tabHienThi === 'tien_bo' && <TheTienBo lichSu={dsLichSu} dangMo={{ ...baiThi, diem }} />}
+
         </div>
 
         {/* FOOTER MODAL */}

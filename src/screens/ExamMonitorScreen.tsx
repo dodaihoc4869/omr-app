@@ -8,7 +8,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { demKetQua } from '../lib/dem-ket-qua'
 import { goiBaiThi } from '../lib/goi-bao-cao'
-import { Check, RefreshCw, Trash2, ChevronRight, Images, FileSpreadsheet, FileJson, Lock, Unlock, Send, Pencil, LogIn, BarChart3, UserRound } from 'lucide-react'
+import { Check, RefreshCw, Trash2, ChevronRight, Images, FileSpreadsheet, FileJson, Lock, Unlock, Send, Pencil, LogIn, BarChart3 } from 'lucide-react'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
@@ -32,8 +32,6 @@ import { choEmThiLai } from '../lib/thi-lai'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { soanTinRoiMan } from '../lib/phieu-zalo'
-import { KhoiChuyenDe, KhoiLichSuCa } from '../components/HoSoEmView'
-import NutBaiTapPdf from '../components/NutBaiTapPdf'
 import NutTaiDeCa from '../components/NutTaiDeCa'
 import KhoiCauHoiEm from '../components/KhoiCauHoiEm'
 import { hoSoEm, type HoSoEm } from '../lib/exam-api'
@@ -188,8 +186,6 @@ export default function ExamMonitorScreen() {
   // luôn mạnh–yếu và soạn được phiếu gửi phụ huynh — không phải nhớ số báo danh
   // rồi sang tab Học sinh tìm lại.
   const [sbdHoSo, setSbdHoSo] = useState('')
-  const [dangTaiHoSo, setDangTaiHoSo] = useState(false)
-  const [loiHoSo, setLoiHoSo] = useState('')
   const [hoSo, setHoSo] = useState<HoSoEm | null>(null)
   const setScreen = useAppStore((s) => s.setScreen)
   const classList = useAppStore((s) => s.classList)
@@ -269,12 +265,11 @@ export default function ExamMonitorScreen() {
       return
     }
     let huy = false
-    setDangTaiHoSo(true)
-    setLoiHoSo('')
+    // KHÔNG NUỐT LỖI: thẻ hiện lỗi đã bỏ theo lệnh thầy (báo cáo chỉ còn bốn
+    // thẻ), nên báo thẳng bằng toast thay vì cất vào một biến không ai đọc.
     hoSoEm(scriptUrl.trim(), { secret: secret.trim(), sbd: sbdHoSo })
       .then((h) => !huy && setHoSo(h))
-      .catch((e) => !huy && setLoiHoSo(e instanceof Error ? e.message : 'Không mở được hồ sơ'))
-      .finally(() => !huy && setDangTaiHoSo(false))
+      .catch((e) => !huy && showToast(e instanceof Error ? e.message : 'Không mở được hồ sơ', 'error'))
     return () => {
       huy = true
     }
@@ -1876,51 +1871,6 @@ export default function ExamMonitorScreen() {
       {/* MODAL BÁO CÁO CA THI HỌC SINH CHUẨN GOOGLE MATERIAL 3 */}
       {sbdHoSo && (
         <BaoCaoCaThiHocSinhModal
-          extraTabs={[
-            {
-              // THẺ NÀY KHÔNG PHẢI MỘT PHẦN CỦA BÁO CÁO.
-              //
-              // Ba thẻ báo cáo — Tổng quan · Câu sai cần chữa · Mức độ nhận
-              // thức — phải giống hệt nhau ở cả ba app. Thẻ dưới đây là công cụ
-              // RIÊNG của thầy trên màn theo dõi ca (mạnh–yếu cộng dồn, lịch sử
-              // ca), nên đặt tên đúng là "Hồ sơ em".
-              //
-              // Biểu đồ tiến bộ đã bỏ hẳn theo lệnh thầy 14/09: trước đây nó
-              // đứng cạnh thẻ "Mức tiến bộ" của chính báo cáo, thành hai thẻ
-              // gần trùng tên nằm sát nhau.
-              id: 'ho_so',
-              label: 'Hồ sơ em',
-              icon: <UserRound className="w-4 h-4 text-blue-500" />,
-              content: (
-                <div className="space-y-4">
-                  {dangTaiHoSo && !hoSo && <div style={NHAN_NHO}>Đang mở hồ sơ…</div>}
-                  {loiHoSo && <OThongBao tone="do">{loiHoSo}</OThongBao>}
-                  {hoSo && (
-                    <>
-                      <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />
-                      {/* Xoá mục rút câu theo yêu cầu người dùng (Ảnh 1), ẩn khỏi giao diện: */}
-                      <div style={{ display: 'none' }} aria-hidden="true">
-                        <NutBaiTapPdf
-                          sbd={hoSo.em.sbd}
-                          hoTen={hoSo.em.hoTen}
-                          lop={hoSo.em.lop}
-                          chuyenDe={hoSo.chuyenDe}
-                          chuyenDeCa={(hoSo.chuyenDeCaGanNhat ?? []).map((c) => c.ten)}
-                          maCa={chiTiet?.ca.maCa}
-                          rows={rowsHoSo}
-                          showToast={showToast}
-                        />
-                      </div>
-                      <KhoiLichSuCa ca={hoSo.ca} />
-                      {/* Xoá bỏ Zalo khi click vào từng em theo yêu cầu người dùng, giữ chuỗi cho test:
-                          <PhieuZaloEm hoSo={hoSo} maCa={chiTiet?.ca.maCa} />
-                          diemChamLai={emTrongCa?.graded ? { tong: emTrongCa.graded.score.total, I: emTrongCa.graded.score.phanIScore, II: emTrongCa.graded.score.phanIIScore, III: emTrongCa.graded.score.phanIIIScore } : undefined} diemLop={dsEm.map((e) => e.diem).filter((d): d is number => typeof d === 'number')} */}
-                    </>
-                  )}
-                </div>
-              ),
-            },
-          ]}
           baiThi={goiBaiThi(
             {
               maCa: chiTiet ? chiTiet.ca.maCa : '',

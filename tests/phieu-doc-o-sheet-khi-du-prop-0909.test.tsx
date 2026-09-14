@@ -189,26 +189,23 @@ describe('mã nguồn: không còn đường nào lấy thẳng ô Sheet làm đ
     expect(ma).toContain('const diemDung = them?.diemMoi ?? diemChamLai ?? null')
   })
 
-  it('màn Ca thi TRUYỀN điểm tự chấm xuống — cùng nguồn với con số đầu màn', async () => {
+  it('màn Ca thi vẫn lấy điểm TỰ CHẤM làm nguồn, không lấy ô Sheet', async () => {
+    // ĐỔI CHỖ 14/09 — thầy chốt "mỗi báo cáo chỉ có 4 phần ... Còn lại xoá
+    // hết", nên thẻ hồ sơ chèn thêm trên màn Ca thi đã bỏ. Khối `PhieuZaloEm`
+    // trong thẻ ấy vốn ĐÃ BỊ ĐÓNG COMMENT từ trước, tức hai khẳng định cũ chỉ
+    // còn khớp vào một đoạn ghi chú — đọc thì xanh mà thực tế không chạy dòng
+    // nào. Phần LÕI vẫn được khoá: màn Ca thi phải lấy điểm tự chấm làm nguồn.
     const fs = await import('node:fs')
     const path = await import('node:path')
     const ma = fs.readFileSync(path.join(process.cwd(), 'src/screens/ExamMonitorScreen.tsx'), 'utf8')
-    expect(ma).toContain('diemChamLai={')
-    expect(ma).toContain('tong: emTrongCa.graded.score.total')
-    // Không chấm lại được thì để `undefined` (đi hỏi lại), KHÔNG để `null`
-    // (nghĩa là "tôi biết, không có điểm" ⇒ rơi về ô Sheet).
-    const dau = ma.indexOf('diemChamLai={')
-    const khoi = ma.slice(dau, ma.indexOf('diemLop={', dau))
-    expect(khoi).toContain(': undefined')
-    expect(khoi).not.toContain(': null')
+    expect(ma).toContain('diem: graded ? graded.score.total : moiNhat.tong')
   })
 
-  it('đầu màn Hồ sơ và khối phiếu dùng CHUNG một nguồn điểm', async () => {
+  it('phiếu gửi phụ huynh SỐNG THẬT ở màn Hồ sơ học sinh, không phải code chết', async () => {
     const fs = await import('node:fs')
     const path = await import('node:path')
-    const ma = fs.readFileSync(path.join(process.cwd(), 'src/screens/ExamMonitorScreen.tsx'), 'utf8')
-    // Đầu màn in `emTrongCa.diem`, mà `diem` = graded.score.total khi chấm được.
-    expect(ma).toContain('diem: graded ? graded.score.total : moiNhat.tong')
-    expect(ma).toContain('tong: emTrongCa.graded.score.total')
+    const ma = fs.readFileSync(path.join(process.cwd(), 'src/screens/HocSinhScreen.tsx'), 'utf8')
+    expect(ma).toContain('<PhieuZaloEm')
+    expect(ma).toContain('hoSo={hoSo}')
   })
 })

@@ -83,18 +83,40 @@ export function ThanCauSai({ c }: { c: CauSaiHienThi }) {
           src={src}
           alt={`Hình của câu ${c.soCau ?? ''}`}
           loading="lazy"
-          className="w-full max-w-full h-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white"
+          // ĐÚNG CHUẨN `.q-hinh` CỦA PHIẾU HTML (`html-phieu.ts`):
+          //   display:block · max-width:100% · height:auto · margin:12px auto
+          //
+          // Bản trước dùng `w-full`, tức ÉP ảnh rộng bằng cả khung. Ảnh công
+          // thức trong kho đề thường chỉ vài trăm pixel, bị kéo giãn lên thành
+          // khổng lồ, tràn ra ngoài thẻ và đẩy chữ xuống mất hút (thầy chụp
+          // 14/09). `max-w-full` chỉ CHẶN TRÊN, ảnh nhỏ giữ nguyên cỡ thật.
+          //
+          // `max-h` + `object-contain` là ràng buộc riêng của khung xem trong
+          // app: ảnh cao quá thì thu lại vừa màn, KHÔNG cắt xén.
+          className="block mx-auto max-w-full h-auto max-h-[420px] object-contain my-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white"
         />
       ))}
 
+      {/* BẢNG SỐ LIỆU — cùng khuôn `.q-bang` của phiếu HTML: hàng đầu là
+          tiêu đề, nền xám nhạt, chữ đậm; cả bảng cuộn ngang được trên điện
+          thoại thay vì bóp chữ. */}
       {Array.isArray(c.table) && c.table.length > 0 && (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto my-3">
           <table className="w-full text-xs border-collapse">
+            <thead>
+              <tr>
+                {(c.table[0] ?? []).map((o, j) => (
+                  <th key={j} className="border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700 px-3 py-1.5 font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap">
+                    {o}
+                  </th>
+                ))}
+              </tr>
+            </thead>
             <tbody>
-              {c.table.map((hang, i) => (
+              {c.table.slice(1).map((hang, i) => (
                 <tr key={i}>
                   {(hang ?? []).map((o, j) => (
-                    <td key={j} className="border border-slate-200 dark:border-slate-700 px-2 py-1 text-slate-700 dark:text-slate-300">
+                    <td key={j} className="border border-slate-300 dark:border-slate-600 px-3 py-1.5 text-center text-slate-700 dark:text-slate-300 whitespace-nowrap">
                       {o}
                     </td>
                   ))}

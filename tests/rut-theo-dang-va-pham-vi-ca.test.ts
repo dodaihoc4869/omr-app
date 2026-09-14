@@ -198,8 +198,11 @@ describe('ba lựa chọn có mặt trên cả ba màn', () => {
   })
 
   it('11b. NutBaiTapPdf phải còn được dùng thật — kẻo lại sửa nhầm code chết', () => {
-    const dung = ['src/screens/HocSinhScreen.tsx', 'src/screens/ExamMonitorScreen.tsx']
-    for (const f of dung) expect(doc(f)).toContain('<NutBaiTapPdf')
+    // ĐỔI CHỖ 14/09: bản trên màn Chi tiết ca nằm trong thẻ hồ sơ chèn thêm, mà
+    // thẻ ấy đã bỏ theo lệnh thầy ("mỗi báo cáo chỉ có 4 phần"). Bản ấy vốn còn
+    // bị bọc `display:none` — tức đã là code chết sẵn. Bản SỐNG THẬT nằm ở màn
+    // Hồ sơ học sinh, và phép kiểm này khoá đúng bản ấy.
+    expect(doc('src/screens/HocSinhScreen.tsx')).toContain('<NutBaiTapPdf')
   })
 
   it('12. báo cáo phụ huynh và học sinh', () => {

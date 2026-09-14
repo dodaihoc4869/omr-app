@@ -13,6 +13,8 @@ import { soanPhieuZalo, viecCanLamMacDinh, demChu, LOI_NHAN_LUYEN_TAP, type DuLi
 import { tenTepPhieu } from '../src/lib/anh-phieu'
 import maChiTietCa from '../src/screens/ExamMonitorScreen.tsx?raw'
 import maPhieu from '../src/components/PhieuZaloEm.tsx?raw'
+import maHoSoHS from '../src/screens/HocSinhScreen.tsx?raw'
+import maModalBaoCao from '../src/components/BaoCaoCaThiHocSinhModal.tsx?raw'
 
 const DU: DuLieuPhieu = {
   hoTen: 'Nguyễn Thu Hiền',
@@ -148,14 +150,20 @@ describe('Chi tiết ca — chạm tên em', () => {
     expect(maChiTietCa).toContain('onClick={() => setSbdHoSo(e.sbd)}')
   })
 
-  it('hồ sơ trong Chi tiết ca có đủ mạnh–yếu, lịch sử ca và khối gửi phụ huynh', () => {
-    expect(maChiTietCa).toContain('<KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />')
-    expect(maChiTietCa).toContain('<KhoiLichSuCa ca={hoSo.ca} />')
-    expect(maChiTietCa).toContain('<PhieuZaloEm')
-    expect(maChiTietCa).toContain('hoSo={hoSo}')
+  it('hồ sơ có đủ mạnh–yếu, lịch sử ca và khối gửi phụ huynh', () => {
+    // ĐỔI CHỖ 14/09 — thầy chốt: "mỗi báo cáo chỉ có 4 phần ... Còn lại xoá
+    // hết." Thẻ hồ sơ chèn thêm trên màn Chi tiết ca đã bỏ. Ba khối này KHÔNG
+    // mất: chúng vẫn sống ở màn Hồ sơ học sinh, nơi đúng chỗ của chúng và hiện
+    // ra thật (bản cũ trên màn Chi tiết ca còn bọc `display:none`).
+    const hs = maHoSoHS
+    expect(hs).toContain('<KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />')
+    expect(hs).toContain('<KhoiLichSuCa ca={hoSo.ca}')
+    expect(hs).toContain('<PhieuZaloEm')
+    expect(hs).toContain('hoSo={hoSo}')
   })
 
-  it('phiếu soạn theo ĐÚNG ca đang mở, không phải ca mới nhất của em', () => {
-    expect(maChiTietCa).toContain('maCa={chiTiet?.ca.maCa}')
+  it('báo cáo trên màn Chi tiết ca CHỈ còn bốn thẻ, không thẻ phụ nào', () => {
+    expect(maChiTietCa).not.toContain('extraTabs')
+    expect(maModalBaoCao).not.toContain('extraTabs')
   })
 })

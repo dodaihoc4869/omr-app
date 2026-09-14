@@ -6,6 +6,7 @@ import { useEffect, useState, useMemo } from 'react'
 import DongDemCau, { DongDemYPhanII, docSoDem } from './DongDemCau'
 import { DongCauSai } from './KhoiCauSai'
 import KhoiBaPhan from './KhoiBaPhan'
+import TheTienBo, { type CaLichSu } from './TheTienBo'
 import { danhGiaBai } from '../lib/danh-gia-bai'
 import {
   X,
@@ -15,6 +16,7 @@ import {
   AlertCircle,
   BarChart3,
   Brain,
+  TrendingUp,
   Sparkles,
   Heart,
   RefreshCw,
@@ -68,9 +70,10 @@ export default function BaoCaoCaThiPhuHuynhModal({
   onNhanTinChoThay: _onNhanTinChoThay,
   onXemPhieuGoc: _onXemPhieuGoc,
 }: Props) {
+  const [dsLichSu, setDsLichSu] = useState<CaLichSu[]>([])
   const [dsCauSai, setDsCauSai] = useState<any[]>([])
   const [dangTaiCauSai, setDangTaiCauSai] = useState(false)
-  const [tabPhanTich, setTabPhanTich] = useState<'tong_quan' | 'nhan_thuc' | 'cau_sai'>('tong_quan')
+  const [tabPhanTich, setTabPhanTich] = useState<'tong_quan' | 'nhan_thuc' | 'cau_sai' | 'tien_bo'>('tong_quan')
   const [hienModalKhacPhuc, setHienModalKhacPhuc] = useState(false)
 
   // Tải lịch sử ca thi để phụ huynh theo dõi mức tiến bộ của con
@@ -81,7 +84,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
       try {
         const res = await hsLichSuCaApi(scriptUrl, sbd)
         if (active && res && res.ok && Array.isArray(res.items)) {
-          void (res.items)
+          setDsLichSu(res.items as CaLichSu[])
         }
       } catch {}
     }
@@ -332,6 +335,19 @@ export default function BaoCaoCaThiPhuHuynhModal({
             <span>Mức độ nhận thức</span>
           </button>
 
+          <button
+            type="button"
+            onClick={() => setTabPhanTich('tien_bo')}
+            className={`px-4 py-2.5 text-xs font-bold rounded-t-2xl border-b-2 transition whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+              tabPhanTich === 'tien_bo'
+                ? 'border-blue-600 text-blue-600 dark:text-blue-400 bg-white dark:bg-slate-900'
+                : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+            }`}
+          >
+            <TrendingUp size={14} />
+            <span>Mức tiến bộ</span>
+          </button>
+
         </div>
 
         {/* MODAL BODY */}
@@ -543,6 +559,14 @@ export default function BaoCaoCaThiPhuHuynhModal({
                 ))}
               </div>
             </div>
+          )}
+
+          {/* THẺ MỨC TIẾN BỘ — cùng khối với cổng học sinh. */}
+          {tabPhanTich === 'tien_bo' && (
+            <TheTienBo
+              lichSu={dsLichSu}
+              dangMo={{ ...baiThi, diem, tenCa: baiThi.tenCa, ngayThi: baiThi.ngayNop, tongCau }}
+            />
           )}
 
           {/* TAB 4: DANH SÁCH CÂU SAI & LỖI CẦN KHẮC PHỤC */}

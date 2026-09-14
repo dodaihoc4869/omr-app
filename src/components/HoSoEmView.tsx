@@ -29,8 +29,10 @@ export function toneXepLoai(diem: number | null): 'xanh' | 'tim' | 'cam' | 'do' 
 export const NGUONG_YEU = 0.3
 export const SO_CAU_DU_TIN = 4
 
-export function laYeu(cd: Pick<ChuyenDeEm, 'tiLeSai' | 'soCau'>): boolean {
-  return cd.tiLeSai > NGUONG_YEU && cd.soCau >= SO_CAU_DU_TIN
+export function laYeu(cd: Pick<ChuyenDeEm, 'tiLeSai' | 'soCau'> & { soSai?: number }): boolean {
+  // `NaN > NGUONG_YEU` là false, nên gói máy chủ thiếu `tiLeSai` sẽ làm mọi
+  // chuyên đề yếu biến mất khỏi cảnh báo. Tính lại qua `tiLeSaiCua`.
+  return tiLeSaiCua(cd) > NGUONG_YEU && cd.soCau >= SO_CAU_DU_TIN
 }
 
 export const NHAN_BAI_TAP: Record<TrangThaiBaiTap, { ten: string; tone: 'xam' | 'cam' | 'xanh' | 'do' }> = {
@@ -40,8 +42,27 @@ export const NHAN_BAI_TAP: Record<TrangThaiBaiTap, { ten: string; tone: 'xam' | 
   qua_han: { ten: 'quá hạn', tone: 'do' },
 }
 
+/** TỈ LỆ SAI CỦA MỘT CHUYÊN ĐỀ — KHÔNG BAO GIỜ ĐƯỢC RA `NaN`.
+ *
+ * Thầy chụp 14/09: bảng "Điểm mạnh — yếu" in "sai NaN%" và thanh tỉ lệ xanh
+ * đầy, trong khi dòng ngay dưới ghi "3/7 câu sai". Gói máy chủ thiếu (hoặc
+ * hỏng) trường `tiLeSai` là cả ba chỗ đọc nó đều ra `NaN`: chữ ra "NaN%",
+ * `width: NaN%` là CSS vứt đi nên thanh giữ nguyên bề rộng đầy, và phép so
+ * `NaN > 30` là false nên tô xanh — ba lần nói sai cùng lúc.
+ *
+ * Nay tự tính lại từ hai con số LUÔN có thật: số câu sai trên số câu đã làm. */
+export function tiLeSaiCua(cd: { tiLeSai?: number; soSai?: number; soCau?: number }): number {
+  const t = Number(cd?.tiLeSai)
+  if (Number.isFinite(t) && t >= 0) return Math.min(1, t)
+  const sai = Number(cd?.soSai)
+  const cau = Number(cd?.soCau)
+  if (Number.isFinite(sai) && Number.isFinite(cau) && cau > 0) return Math.min(1, Math.max(0, sai / cau))
+  return 0
+}
+
 function phanTram(x: number): string {
-  return `${Math.round(x * 100)}%`
+  const n = Number(x)
+  return `${Math.round((Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : 0) * 100)}%`
 }
 
 export function ngayGio(iso: string): string {
@@ -58,7 +79,8 @@ function MuiTen({ xuHuong }: { xuHuong: XuHuong }) {
 }
 
 function ThanhTiLe({ tiLe }: { tiLe: number }) {
-  const pct = Math.max(0, Math.min(100, Math.round(tiLe * 100)))
+  const raw = Number(tiLe)
+  const pct = Number.isFinite(raw) ? Math.max(0, Math.min(100, Math.round(raw * 100))) : 0
   return (
     <div style={{ height: 6, borderRadius: 999, background: 'var(--the-2)', overflow: 'hidden' }}>
       <div style={{ width: `${pct}%`, height: '100%', background: pct > 30 ? 'var(--do)' : 'var(--xanh)' }} />
@@ -81,7 +103,7 @@ export function KhoiChuyenDe({ chuyenDe }: { chuyenDe: ChuyenDeEm[] }) {
         <>
           {yeu.length > 0 && (
             <OThongBao tone="cam">
-              Yếu nhất: <b>{yeu[0].ten}</b> — sai <b style={SO}>{phanTram(yeu[0].tiLeSai)}</b> trên{' '}
+              Yếu nhất: <b>{yeu[0].ten}</b> — sai <b style={SO}>{phanTram(tiLeSaiCua(yeu[0]))}</b> trên{' '}
               <span style={SO}>{yeu[0].soCau}</span> câu đã làm.
             </OThongBao>
           )}
@@ -96,11 +118,11 @@ export function KhoiChuyenDe({ chuyenDe }: { chuyenDe: ChuyenDeEm[] }) {
                     <MuiTen xuHuong={cd.xuHuong} />
                   </span>
                   <span className="shrink-0 font-bold" style={{ ...SO, fontSize: 'var(--cx-2)' }}>
-                    sai {phanTram(cd.tiLeSai)}
+                    sai {phanTram(tiLeSaiCua(cd))}
                   </span>
                 </div>
                 <div style={{ marginTop: 4 }}>
-                  <ThanhTiLe tiLe={cd.tiLeSai} />
+                  <ThanhTiLe tiLe={tiLeSaiCua(cd)} />
                 </div>
                 <div style={{ ...NHAN_NHO, ...SO, marginTop: 2 }}>
                   {cd.soSai}/{cd.soCau} câu sai

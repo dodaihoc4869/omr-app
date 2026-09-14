@@ -17,6 +17,7 @@ import { docSoDem } from '../src/components/DongDemCau'
 import { demKetQua, type CauDeDem } from '../src/lib/dem-ket-qua'
 import { anhCuaCau } from '../src/components/KhoiCauSai'
 import { danhGiaBai } from '../src/lib/danh-gia-bai'
+import { gomCaChoBieuDo } from '../src/components/TheTienBo'
 
 const doc = (p: string) => readFileSync(resolve(__dirname, '..', p), 'utf8')
 
@@ -146,35 +147,90 @@ describe('ghi rõ tính điểm cho mấy ý', () => {
   })
 })
 
-describe('BỎ HẲN thẻ Mức tiến bộ khỏi mọi báo cáo', () => {
-  // Thầy chốt 14/09: "bỏ thẻ mức tiến bộ trong báo cáo". Trước đó màn theo dõi
-  // ca còn chèn thêm MỘT thẻ "Mức độ tiến bộ" nữa qua `extraTabs`, nên báo cáo
-  // mở từ đó có hai thẻ gần trùng tên — đúng cảnh thầy chụp.
+describe('THẺ MỨC TIẾN BỘ — đúng một thẻ, đúng một biểu đồ, ở mọi báo cáo', () => {
+  // 14/09 thầy bảo bỏ thẻ ấy vì màn Ca thi chèn thêm MỘT thẻ nữa gần trùng tên,
+  // thành hai thẻ "Mức tiến bộ" / "Mức độ tiến bộ" nằm sát nhau. Sau đó thầy
+  // chốt lại: giữ ĐÚNG MỘT thẻ, vẽ biểu đồ điểm các ca và đánh giá mức tiến bộ,
+  // đồng bộ vào mọi báo cáo. Phép kiểm này khoá cả hai vế: có thẻ, và chỉ một.
   const HS = doc('src/components/BaoCaoCaThiHocSinhModal.tsx')
   const PH = doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')
   const MON = doc('src/screens/ExamMonitorScreen.tsx')
 
-  it('không modal nào còn thẻ tiến bộ', () => {
+  it('cả hai cổng đều có thẻ, và vẽ bằng CÙNG một khối', () => {
     for (const [t, ten] of [[HS, 'HS'], [PH, 'PH']] as const) {
-      expect(t, ten).not.toContain("'tien_bo'")
+      expect(t, ten).toContain("'tien_bo'")
+      expect(t, ten).toContain('<span>Mức tiến bộ</span>')
+      expect(t, ten).toContain('<TheTienBo')
+      // Không cổng nào tự vẽ lại biểu đồ hay tự tính tiến bộ.
       expect(t, ten).not.toContain('BieuDoTienBoGoogle')
       expect(t, ten).not.toContain('phanTichTienBo')
     }
   })
 
-  it('màn theo dõi ca không còn thẻ nào tên "tiến bộ" nữa', () => {
-    // Thẻ phụ của thầy được giữ (mạnh–yếu, lịch sử ca) nhưng đổi tên đúng bản
-    // chất là "Hồ sơ em", và biểu đồ tiến bộ trong đó đã bỏ hẳn.
-    expect(MON).toContain("label: 'Hồ sơ em'")
+  it('màn Ca thi KHÔNG chèn thẻ nào nữa — báo cáo đúng BỐN thẻ ở mọi app', () => {
+    // Thầy chốt 14/09: "mỗi báo cáo chỉ có 4 phần ... Còn lại xoá hết."
+    expect(MON).not.toContain('extraTabs')
+    expect(MON).not.toContain("label: 'Hồ sơ em'")
     expect(MON).not.toContain("label: 'Mức độ tiến bộ'")
     expect(MON).not.toContain('BieuDoTienBoGoogle')
+    // Và cơ chế thẻ phụ bị gỡ khỏi chính component báo cáo, nên không app nào
+    // chèn thêm được nữa.
+    expect(HS).not.toContain('extraTabs')
+    expect(HS).not.toContain('ExtraTabItem')
   })
 
-  it('BA THẺ BÁO CÁO giống hệt nhau ở cả hai cổng', () => {
+  it('BỐN THẺ BÁO CÁO giống hệt nhau ở cả hai cổng', () => {
     for (const t of [HS, PH]) {
       expect(t).toContain('Câu sai cần chữa')
       expect(t).toContain('Mức độ nhận thức')
+      expect(t).toContain('Mức tiến bộ')
     }
+  })
+
+  it('ca ĐANG MỞ luôn có mặt trên biểu đồ, kể cả khi lịch sử chưa về', () => {
+    const t = doc('src/components/TheTienBo.tsx')
+    expect(t).toContain('if (!ds.some((c) => c.maCa === dangMo.maCa))')
+    // Và điểm vừa chấm tại chỗ đè lên bản máy chủ.
+    expect(t).toContain('diemDe')
+  })
+
+  it('gom lịch sử: đủ ca, đúng thứ tự dữ liệu, không mất ca đang mở', () => {
+    const ca = gomCaChoBieuDo(
+      [{ maCa: 'A', tenCa: 'Ca A', nopLuc: '2026-09-01T00:00:00Z', tong: 5 }],
+      { maCa: 'B', tenCa: 'Ca B', ngayThi: '2026-09-02T00:00:00Z', diem: 7 },
+    )
+    expect(ca).toHaveLength(2)
+    expect(ca.map((c) => c.maCa)).toEqual(['A', 'B'])
+    expect(ca[1].tong).toBe(7)
+  })
+
+  it('lịch sử đã có ca đang mở thì KHÔNG thêm lần hai', () => {
+    const ca = gomCaChoBieuDo(
+      [{ maCa: 'B', tenCa: 'Ca B', nopLuc: '2026-09-02T00:00:00Z', tong: 7 }],
+      { maCa: 'B', tenCa: 'Ca B', diem: 7 },
+    )
+    expect(ca).toHaveLength(1)
+  })
+})
+
+describe('ẢNH TRONG CÂU SAI vẽ đúng chuẩn của phiếu HTML', () => {
+  const K = doc('src/components/KhoiCauSai.tsx')
+
+  it('KHÔNG ép ảnh rộng bằng cả khung — ảnh nhỏ giữ nguyên cỡ thật', () => {
+    // `.q-hinh` của html-phieu.ts: block · max-width:100% · height:auto · căn giữa.
+    expect(K).toContain('block mx-auto max-w-full h-auto')
+    expect(K).not.toContain('className="w-full max-w-full h-auto rounded-xl')
+  })
+
+  it('ảnh cao quá thì thu lại vừa khung, KHÔNG cắt xén', () => {
+    expect(K).toContain('max-h-[420px]')
+    expect(K).toContain('object-contain')
+  })
+
+  it('bảng số liệu cũng theo chuẩn: hàng đầu là tiêu đề, cuộn ngang được', () => {
+    expect(K).toContain('<thead>')
+    expect(K).toContain('c.table.slice(1)')
+    expect(K).toContain('overflow-x-auto')
   })
 })
 
