@@ -108,7 +108,7 @@ function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number): s
 /** CSS riêng cho máy chiếu. Chồng lên `CSS_PHIEU` nên khối lời giải vẫn y hệt
  * mọi tờ khác; chỉ cỡ chữ và bố cục là của phòng học có máy chiếu. */
 const CSS_MAY_CHIEU = `
-:root { --mc-vien: rgb(226, 232, 240); --mc-nen: rgb(255, 255, 255); --mc-muc: rgb(15, 23, 42); --mc-nhat: rgb(100, 116, 139); --mc-xanh: rgb(26, 115, 232); --mc-xanh-nen: rgb(232, 240, 254); }
+:root { --mc-serif: "Times New Roman", Palatino, Charter, Georgia, serif; --mc-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; --mc-vien: rgb(226, 232, 240); --mc-nen: rgb(255, 255, 255); --mc-muc: rgb(15, 23, 42); --mc-nhat: rgb(100, 116, 139); --mc-xanh: rgb(26, 115, 232); --mc-xanh-nen: rgb(232, 240, 254); }
 @media (prefers-color-scheme: dark) {
   :root:not([data-sang]) { --mc-vien: rgb(51, 65, 85); --mc-nen: rgb(15, 23, 42); --mc-muc: rgb(241, 245, 249); --mc-nhat: rgb(148, 163, 184); --mc-xanh: rgb(138, 180, 248); --mc-xanh-nen: rgb(30, 41, 59); }
 }
@@ -146,9 +146,9 @@ body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); overflow: 
 .mc-phu { display: flex; gap: 14px; margin-top: 3px; color: var(--mc-nhat); font-family: var(--sans, system-ui, sans-serif); font-size: 14px; font-variant-numeric: tabular-nums; }
 .mc-viSao { margin-top: 4px; color: var(--mc-nhat); font-family: var(--sans, system-ui, sans-serif); font-size: 13px; }
 .mc-than { padding-top: 12px; }
-.mc-de { font-family: var(--serif, Georgia, serif); font-size: clamp(17px, 1.5vw, 23px); line-height: 1.55; }
+.mc-de { font-family: var(--mc-serif); font-size: clamp(17px, 1.5vw, 23px); line-height: 1.55; }
 .mc-ds-pa { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
-.mc-pa { display: flex; gap: 10px; align-items: baseline; font-family: var(--serif, Georgia, serif); font-size: clamp(16px, 1.35vw, 21px); line-height: 1.5; }
+.mc-pa { display: flex; gap: 10px; align-items: baseline; font-family: var(--mc-serif); font-size: clamp(16px, 1.35vw, 21px); line-height: 1.5; }
 .mc-ky { flex: none; width: 28px; height: 28px; border-radius: 999px; background: var(--mc-xanh-nen); color: var(--mc-xanh); font-family: var(--sans, system-ui, sans-serif); font-weight: 800; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; }
 .mc-pa-chu { min-width: 0; }
 .mc-ngan { margin-top: 10px; color: var(--mc-nhat); font-family: var(--sans, system-ui, sans-serif); font-size: 14px; }
@@ -276,6 +276,43 @@ const JS_MAY_CHIEU = `
     if ((e.key === 'f' || e.key === 'F') && !e.metaKey && !e.ctrlKey && !e.altKey && toan) { e.preventDefault(); toan.click(); }
   });
   veToan();
+
+  // ───────── TRANG TỰ KIỂM PHÔNG ─────────
+  //
+  // Thầy bắt được 14/09, ảnh chụp tờ chiếu: dấu thanh của các chữ hai dấu
+  // (ế, ề, ồ, ấ, ắ) rơi ra đứng riêng thành một khe hở sau chữ cái.
+  //
+  // Đã truy tới cùng: chữ trong kho SẠCH (6.843 câu, 0 câu lệch NFC), chữ tờ
+  // chiếu sinh ra cũng sạch (ế là đúng một ký tự U+1EBF). Vậy chỗ vỡ nằm ở LÚC
+  // VẼ: phông mà máy chọn không có sẵn glyph gộp cho chữ hai dấu (ế ề ồ ấ ắ),
+  // nên trình duyệt vẽ chữ gốc bằng phông này rồi mượn phông khác vẽ dấu —
+  // ra đúng cái khe hở ấy. Đo trên máy thầy: generic "serif" của macOS vẽ 'ế'
+  // Đo thật trên máy thầy, chuỗi 5 chữ hai dấu so với 5 chữ một dấu ở cỡ 64px:
+  //   generic serif  lệch 25,15px   <- vỡ nặng, đây là thứ trong ảnh
+  //   Georgia        lệch  1,50px   <- vỡ nhẹ, vẫn phải tránh
+  //   Times New Roman / Palatino / Charter / sans hệ thống  lệch 0
+  // Nên thứ tự phông chốt bằng SỐ ĐO, không bằng cảm giác đẹp.
+  //
+  // Không thể biết trước máy nào có phông gì, nên TRANG TỰ ĐO LẤY: chữ hai dấu
+  // phải rộng ĐÚNG BẰNG chữ một dấu. Lệch nghĩa là phông đang vẽ tách — đổi
+  // sang phông sans của hệ (chính phông đang vẽ đúng tên học sinh ngay trên
+  // cùng tờ này) và nói ra, chứ không để thầy chiếu chữ vỡ lên bảng.
+  try {
+    var cv = document.createElement('canvas').getContext('2d');
+    var goc = getComputedStyle(document.documentElement);
+    var phongSerif = (goc.getPropertyValue('--mc-serif') || 'Georgia, serif').trim();
+    var phongSans = (goc.getPropertyValue('--mc-sans') || 'sans-serif').trim();
+    var rong = function (chu, phong) { cv.font = '64px ' + phong; return cv.measureText(chu).width; };
+    var veTach = function (phong) { return Math.abs(rong('ếềồấắ', phong) - rong('êêôââ', phong)) > 0.5; };
+    if (veTach(phongSerif)) {
+      var thay2 = veTach(phongSans) ? 'Arial, Helvetica, sans-serif' : phongSans;
+      document.documentElement.style.setProperty('--mc-serif', thay2);
+      var bao = document.getElementById('mc-dem');
+      if (bao) bao.title = 'Phông serif của máy này không vẽ được chữ hai dấu — đã đổi sang phông hệ thống.';
+    }
+  } catch (e) {
+    console.warn('[may-chieu] không kiểm được phông:', e);
+  }
 
   ve();
 })();

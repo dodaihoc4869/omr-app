@@ -134,6 +134,39 @@ describe('Tờ máy chiếu', () => {
     expect(o).not.toContain('\u0300')
   })
 
+  // Thầy 14/09: "vẫn bị lỗi font, bạn sửa lại triệt để".
+  //
+  // Đã truy: chữ trong kho sạch (6.843 câu, 0 câu lệch NFC), chữ tờ chiếu sinh
+  // ra cũng sạch (ế là đúng một ký tự U+1EBF). Chỗ vỡ nằm ở LÚC VẼ — phông máy
+  // chọn thiếu glyph gộp cho chữ hai dấu. Đo trên máy thầy: generic "serif" vẽ
+  // 'ế' rộng hơn 'ê' 7,3px; Georgia và Times New Roman thì không.
+  it('không mượn --serif của app, chốt phông đủ glyph tiếng Việt', () => {
+    // Thứ tự chốt bằng SỐ ĐO trên máy thầy (cỡ 64px, 5 chữ hai dấu so 5 chữ
+    // một dấu): generic serif lệch 25,15px · Georgia 1,50px · Times New Roman,
+    // Palatino, Charter đều lệch 0. Phông lệch 0 phải đứng trước.
+    expect(html).toContain('--mc-serif: "Times New Roman", Palatino, Charter, Georgia, serif')
+    expect(html).toContain('.mc-de { font-family: var(--mc-serif);')
+    // Generic serif trần là phông vỡ trên máy thầy — không được đứng một mình.
+    expect(html).not.toContain('var(--serif, Georgia, serif)')
+  })
+
+  it('trang TỰ ĐO phông và tự đổi khi phông vẽ tách dấu', () => {
+    expect(html).toContain("rong('ếềồấắ', phong) - rong('êêôââ', phong)")
+    expect(html).toContain("document.documentElement.style.setProperty('--mc-serif'")
+    // Đổi rồi thì nói ra, không lặng lẽ.
+    expect(html).toContain('không vẽ được chữ hai dấu')
+  })
+
+  it('chữ trong tờ chiếu là ký tự GỘP, không phải chữ cái cộng dấu rời', () => {
+    const o = taoHtmlMayChieu([{ ...O(1, 'Em A'), cau: { ...cau(1), text: 'Glucose phổ biến, tồn tại, chủ yếu, lắc đều' } }], {})
+    expect(o).toContain('ph\u1ed5 bi\u1ebfn')
+    expect(o).toContain('t\u1ed3n t\u1ea1i')
+    expect(o).toContain('ch\u1ee7 y\u1ebfu')
+    expect(o).toContain('l\u1eafc \u0111\u1ec1u')
+    // Không một dấu tổ hợp nào lọt ra.
+    expect(/[\u0300-\u036f]/.test(o)).toBe(false)
+  })
+
   it('in ra thì quay ngang A4', () => {
     expect(html).toContain('size: A4 landscape')
   })
