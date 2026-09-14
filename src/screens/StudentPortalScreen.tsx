@@ -20,7 +20,7 @@ import {
   Heart,
   Timer,
   Check,
-  Gamepad2,
+  FlaskConical,
   X,
 } from 'lucide-react'
 import {
@@ -325,14 +325,7 @@ export default function StudentPortalScreen() {
         : (cau.ideas && cau.ideas.length > 0 ? cau.ideas : [])
       const luaChon = rawChoices.map((x: unknown) => String(x ?? ''))
 
-      const lgChuan = chuanHoaLoiGiaiCau(
-        cau.loiGiai,
-        cau.phan || 'I',
-        dapAnDung,
-        luaChon,
-        cau.text || '',
-        cau.chuyenDe || ''
-      )
+      const lgChuan = chuanHoaLoiGiaiCau(cau.loiGiai, cau.phan || 'I', dapAnDung)
 
       chiTietKq.push({
         stt: i + 1,
@@ -1107,16 +1100,16 @@ export default function StudentPortalScreen() {
           >
             <div className="flex items-center justify-between mb-2">
               <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform ${tab === 'game' ? 'bg-emerald-600 text-white scale-105' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'}`}>
-                <Gamepad2 size={18} strokeWidth={tab === 'game' ? 2.4 : 2} />
+                <FlaskConical size={18} strokeWidth={tab === 'game' ? 2.4 : 2} />
               </div>
               <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'game' ? 'bg-emerald-200/70 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
                 12 Người
               </span>
             </div>
             <div>
-              <div className="font-bold text-sm leading-tight">Đấu Trường Game 🎮</div>
+              <div className="font-bold text-sm leading-tight">Đấu Trường Hoá Chất 🧪</div>
               <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'game' ? 'text-emerald-700/80 dark:text-emerald-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
-                Đại chiến sinh tồn
+                Đại chiến mê cung 12 người
               </div>
             </div>
           </button>
@@ -1857,7 +1850,7 @@ export default function StudentPortalScreen() {
           </div>
         )}
 
-        {/* TAB 6: ĐẤU TRƯỜNG GAME NEON SINH TỒN (TỐI ĐA 12 NGƯỜI CHƠI QUA SBD) */}
+        {/* TAB 6: ĐẤU TRƯỜNG HOÁ CHẤT — ĐẠI CHIẾN MÊ CUNG 12 NGƯỜI */}
         {tab === 'game' && (
           <DauTruongGame
             sbdHienTai={auth.sbd}
@@ -1925,10 +1918,16 @@ export default function StudentPortalScreen() {
           lop={auth.lop}
           scriptUrl={scriptUrl}
           onClose={() => setCaXemBaoCaoModal(null)}
-          onBatDauKhacPhuc={(maCa) => {
+          onBatDauKhacPhuc={(maCa, html) => {
             setCaXemBaoCaoModal(null)
             setTab('khacphuc')
             setCacCaChon(new Set([maCa]))
+            // Modal khắc phục đã dựng xong tờ phiếu thì MỞ THẲNG. Gọi lại
+            // `taoDeKhacPhuc` ở đây là mở lại đúng modal em vừa bấm — vòng kín.
+            if (html) {
+              setPhieuHtml(html)
+              return
+            }
             void taoDeKhacPhuc([maCa])
           }}
           onMoLaiBaiThi={(maCa) => void moDeVaLoiGiai(maCa)}

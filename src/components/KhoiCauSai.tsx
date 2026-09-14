@@ -14,7 +14,7 @@
 // Máy chủ vẫn trả đủ cả ba (`hsCauSai` đọc kho đề rồi gắn kèm). Lỗi nằm ở chỗ
 // vẽ, nên sửa ở chỗ vẽ — và sửa MỘT lần cho cả ba app.
 import { useState } from 'react'
-import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
+import { chuanHoaLoiGiaiCau, CHUA_CO_LOI_GIAI } from '../lib/chuan-hoa-loi-giai'
 import { chuDiemTheoY, soYCuaCau, soYDungPhanII } from '../lib/dem-ket-qua'
 
 export interface CauSaiHienThi {
@@ -283,12 +283,15 @@ export function ThanCauSai({ c }: { c: CauSaiHienThi }) {
 
 /** HỘP LỜI GIẢI CHUẨN — cùng một khuôn ở mọi báo cáo. */
 export function LoiGiaiCauSai({ c }: { c: CauSaiHienThi }) {
-  const lg = chuanHoaLoiGiaiCau(c.loiGiai, (c.phan as 'I' | 'II' | 'III') || 'I', c.dapAnDung || '', c.choices || null, c.text || '', c.chuyenDe || '')
+  const lg = chuanHoaLoiGiaiCau(c.loiGiai, (c.phan as 'I' | 'II' | 'III') || 'I', c.dapAnDung || '')
   return (
     <div className="p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 text-amber-950 dark:text-amber-100 shadow-sm space-y-3">
       <div className="text-sm font-semibold text-amber-800 dark:text-amber-300">
         Đáp án: <strong className="text-base font-black text-amber-950 dark:text-amber-100">{lg.ketQua || c.dapAnDung || '—'}</strong>
       </div>
+      {lg.thieu && (
+        <div className="text-xs italic leading-relaxed text-amber-900/80 dark:text-amber-200/80">{CHUA_CO_LOI_GIAI}</div>
+      )}
       {lg.chot && (
         <div>
           <div className="text-[10px] font-extrabold tracking-wider uppercase text-amber-800 dark:text-amber-400 mb-1">KIẾN THỨC CỐT LÕI</div>
@@ -297,7 +300,9 @@ export function LoiGiaiCauSai({ c }: { c: CauSaiHienThi }) {
       )}
       {lg.lyDo && lg.lyDo.length > 0 && (
         <div>
-          <div className="text-[10px] font-extrabold tracking-wider uppercase text-amber-800 dark:text-amber-400 mb-1">VÌ SAO CHỌN / KHÔNG CHỌN TỪNG PHƯƠNG ÁN</div>
+          <div className="text-[10px] font-extrabold tracking-wider uppercase text-amber-800 dark:text-amber-400 mb-1">
+            {String(c.phan) === 'II' ? 'VÌ SAO ĐÚNG / SAI TỪNG Ý' : 'VÌ SAO CHỌN / KHÔNG CHỌN TỪNG PHƯƠNG ÁN'}
+          </div>
           <div className="space-y-1 text-xs leading-relaxed">
             {lg.lyDo.map((p) => (
               <div key={p.khoa} className="flex items-start gap-1.5 py-0.5 border-t border-amber-200/40 dark:border-amber-800/40 first:border-t-0">

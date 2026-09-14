@@ -33,6 +33,10 @@ import {
 } from '../lib/thuat-toan-rut-cau-sai'
 import KhungXemPhieu from './KhungXemPhieu'
 
+/** Máy chưa đồng bộ kho đề của thầy — chỉ luyện lại được đúng các câu sai. */
+export const KHONG_CO_KHO =
+  'Máy này chưa có kho đề của thầy nên chưa rút thêm câu cùng dạng được. Em làm lại đúng các câu sai trước, thầy sẽ giao thêm bài cùng dạng sau.'
+
 export interface ModalKhacPhucCauSaiProps {
   isOpen: boolean
   onClose: () => void
@@ -54,7 +58,21 @@ export default function ModalKhacPhucCauSai({
   onTaoPhieuXong,
   onGiaoBaiChoCon,
 }: ModalKhacPhucCauSaiProps) {
-  const [cheDo, setCheDo] = useState<1 | 2 | 3>(2)
+  // MÁY HỌC SINH KHÔNG BAO GIỜ CÓ KHO ĐỀ.
+  //
+  // Thầy báo 14/09 kèm ảnh màn iPhone: ca Test6, 10 câu sai, mà "Tỷ lệ tối đa:
+  // 0 câu", rút ra "0 / 0 câu", bấm Bắt đầu làm bài thì không có gì chạy.
+  //
+  // Nguyên nhân gốc: chế độ 2 và 3 rút câu luyện thêm từ `loadExamSources()` —
+  // kho đề nằm trong IndexedDB của CHÍNH MÁY ĐANG MỞ. Kho ấy chỉ được nạp bởi
+  // `dongBoNganHang`, mà hàm ấy đòi mã bí mật của thầy (`src/lib/exam-sync.ts`:
+  // "học sinh vẫn chỉ nhận bản không đáp án qua mã ca"). Nên trên máy em kho
+  // LUÔN rỗng, mọi tỷ lệ ra 0, và đề rút ra là đề trắng.
+  //
+  // Nay: kho rỗng thì chỉ còn chế độ 1 — làm lại đúng các câu sai. Chế độ này
+  // không cần kho vì nội dung câu sai đã đi kèm báo cáo. Hai chế độ kia hiện
+  // mờ kèm đúng lý do, thay vì để em bấm vào một đường cụt.
+  const [cheDo, setCheDo] = useState<1 | 2 | 3>(1)
   const [khoDe, setKhoDe] = useState<TeacherExamSource[]>([])
   const [, setDangTaiKho] = useState(false)
   const [dangTao, setDangTao] = useState(false)
@@ -70,6 +88,9 @@ export default function ModalKhacPhucCauSai({
   // HTML phiếu bài tập đã tạo để xem tại chỗ
   const [phieuHtml, setPhieuHtml] = useState<string>('')
 
+  // Vì sao không rút được câu nào — hiện ngay dưới nút, không im lặng.
+  const [loiRut, setLoiRut] = useState<string>('')
+
   // Tải kho đề khi mở modal
   useEffect(() => {
     if (!isOpen) return
@@ -77,7 +98,11 @@ export default function ModalKhacPhucCauSai({
     setDangTaiKho(true)
     loadExamSources()
       .then((sources) => {
-        if (active) setKhoDe(sources)
+        if (!active) return
+        setKhoDe(sources)
+        // Có kho (máy thầy / máy phụ huynh đã đồng bộ) thì giữ nếp cũ: mở sẵn
+        // chế độ 2. Không có kho thì ở nguyên chế độ 1.
+        if (sources.length > 0) setCheDo((hien) => (hien === 1 ? 2 : hien))
       })
       .catch(() => {
         if (active) setKhoDe([])
@@ -89,6 +114,9 @@ export default function ModalKhacPhucCauSai({
       active = false
     }
   }, [isOpen])
+
+  /** Máy này có kho đề của thầy hay không — quyết định bật/tắt chế độ 2 và 3. */
+  const coKhoDe = khoDe.length > 0
 
   // Danh sách các ca thi trích xuất từ câu sai
   const dsCaThi = useMemo(() => {
@@ -186,6 +214,18 @@ export default function ModalKhacPhucCauSai({
         tieuDeBai = `Luyện câu [${tenSao} · ${tenDang}] (${dsCauKetQua.length} câu)`
       }
 
+      // KHÔNG BAO GIỜ MỞ MỘT PHIẾU TRẮNG. Rút ra 0 câu thì nói thẳng là 0 câu,
+      // đừng để em bấm xong nhìn màn hình trống rồi tưởng app hỏng.
+      if (dsCauKetQua.length === 0) {
+        setLoiRut(
+          coKhoDe
+            ? 'Kho đề chưa có câu nào khớp lựa chọn này. Em chọn "Làm lại các câu sai" hoặc nới bộ lọc.'
+            : KHONG_CO_KHO,
+        )
+        return
+      }
+      setLoiRut('')
+
       if (laGiaoBai && onGiaoBaiChoCon) {
         onGiaoBaiChoCon(dsCauKetQua, tieuDeBai)
         onClose()
@@ -282,11 +322,14 @@ export default function ModalKhacPhucCauSai({
 
               {/* THẺ 2: LUYỆN THÊM DẠNG CÂU SAI */}
               <div
-                onClick={() => setCheDo(2)}
-                className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-start gap-4 ${
-                  cheDo === 2
-                    ? 'border-blue-500 bg-blue-50/50 shadow-sm'
-                    : 'border-slate-100 hover:border-slate-200 bg-white'
+                onClick={() => coKhoDe && setCheDo(2)}
+                aria-disabled={!coKhoDe}
+                className={`p-4 rounded-2xl border-2 transition-all flex items-start gap-4 ${
+                  !coKhoDe
+                    ? 'border-slate-100 bg-slate-50 opacity-55 cursor-not-allowed'
+                    : cheDo === 2
+                      ? 'border-blue-500 bg-blue-50/50 shadow-sm cursor-pointer'
+                      : 'border-slate-100 hover:border-slate-200 bg-white cursor-pointer'
                 }`}
               >
                 <div
@@ -309,11 +352,14 @@ export default function ModalKhacPhucCauSai({
 
               {/* THẺ 3: LỰA CHỌN LUYỆN CÂU THEO BỘ LỌC */}
               <div
-                onClick={() => setCheDo(3)}
-                className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-start gap-4 ${
-                  cheDo === 3
-                    ? 'border-blue-500 bg-blue-50/50 shadow-sm'
-                    : 'border-slate-100 hover:border-slate-200 bg-white'
+                onClick={() => coKhoDe && setCheDo(3)}
+                aria-disabled={!coKhoDe}
+                className={`p-4 rounded-2xl border-2 transition-all flex items-start gap-4 ${
+                  !coKhoDe
+                    ? 'border-slate-100 bg-slate-50 opacity-55 cursor-not-allowed'
+                    : cheDo === 3
+                      ? 'border-blue-500 bg-blue-50/50 shadow-sm cursor-pointer'
+                      : 'border-slate-100 hover:border-slate-200 bg-white cursor-pointer'
                 }`}
               >
                 <div
@@ -580,6 +626,16 @@ export default function ModalKhacPhucCauSai({
               </div>
             )}
           </div>
+
+          {/* Vì sao chưa rút được — hiện ngay trên nút, không im lặng nuốt lỗi */}
+          {(loiRut || !coKhoDe) && (
+            <div className="px-6 pb-3 shrink-0">
+              <div className="text-xs text-amber-800 bg-amber-50 p-3 rounded-xl border border-amber-200 flex items-start gap-2">
+                <Info className="w-4 h-4 shrink-0 mt-0.5" />
+                <span className="leading-relaxed">{loiRut || KHONG_CO_KHO}</span>
+              </div>
+            </div>
+          )}
 
           {/* Footer nút hành động */}
           <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 shrink-0">

@@ -1588,6 +1588,10 @@ async function keyBankTuBangCham(env: Env, maCa: string, sbd: string): Promise<u
   const dong = r.results ?? []
   if (dong.length === 0) return null
 
+  // LỜI GIẢI không có trong gói công khai (`mergeAndStrip` lược sạch), nên lấy
+  // từ kho. Thiếu chỗ này thì màn xem lại của em chỉ có đáp án trần.
+  const khoMap = await napCauTuKho(env, dong.map((x) => chuoi(x.qid)))
+
   const phanI: unknown[] = []
   const phanII: unknown[] = []
   const phanIII: unknown[] = []
@@ -1595,6 +1599,8 @@ async function keyBankTuBangCham(env: Env, maCa: string, sbd: string): Promise<u
     const cau = noiDung.get(chuoi(x.qid))
     const d = chuoi(x.dap_an_dung).trim()
     if (!cau || !d) return null
+    const k = khoMap.get(chuoi(x.qid))
+    if (k) Object.assign(cau, { loiGiai: k.loiGiai, dang: k.dang, chuyenDe: k.chuyenDe, mucDo: k.mucDo })
     const phan = chuoi(x.phan)
     if (phan === 'I') {
       const c = d.toUpperCase().slice(0, 1)
@@ -1951,6 +1957,114 @@ export async function resetMatKhauHs(env: Env, b: Record<string, unknown>): Prom
     .run()
 
   return { ok: true, sbd, matKhauMoi: '12121212' }
+}
+
+/** LỜI GIẢI + NHÃN DẠNG THẬT, LẤY TỪ KHO ĐỀ `kho/<maDe>.json`.
+ *
+ * NGUYÊN NHÂN GỐC, thầy bắt được 14/09 qua hai màn khác nhau:
+ *
+ *   · Báo cáo câu sai in "Bản chất kiến thức cốt lõi chuyên đề …: Đáp án đúng
+ *     của câu này là 3. Cần chú ý định luật bảo toàn…" thay cho ba bước tính.
+ *   · Màn Khắc phục câu sai trên điện thoại: 10 câu sai mà "Tỷ lệ tối đa:
+ *     0 câu", rút ra 0/0, kèm dòng "Kho đề hiện tại chưa có câu hỏi tương tự
+ *     cùng nhãn dán".
+ *
+ * Hai triệu chứng, MỘT nguyên nhân: nội dung câu cho báo cáo được dựng lại từ
+ * gói đề CÔNG KHAI `de/<maCa>.json`, mà gói ấy do `mergeAndStrip` tạo ra —
+ * hàm liệt kê từng trường được giữ và KHÔNG giữ `loiGiai`, `dang`, `kienThuc`,
+ * `loiThuongGap`. Đúng về bảo mật (gói ấy gửi cho em TRƯỚC khi làm bài), nhưng
+ * báo cáo thì lại đọc đúng gói ấy, nên vừa mất lời giải vừa mất nhãn dạng.
+ *
+ * Kho đề KHÔNG hề thiếu: đếm 14/09 trên 157 tờ, cả 4.841 câu phần I, 1.293 câu
+ * phần II và 1.800 câu phần III đều có lời giải đủ cấu trúc.
+ *
+ * Nên nay lấy thẳng từ kho — nguồn gốc, có đáp án, KHÔNG BAO GIỜ đi ra đường
+ * công khai. Đường này chỉ chạy cho báo cáo SAU KHI NỘP, nơi đáp án vốn đã
+ * hiện rồi, nên không mở thêm cửa lộ đề nào.
+ *
+ * Không đoán: câu nào kho không có thì để trống, để màn hình nói "chưa có lời
+ * giải" thay vì dựng chữ. */
+const TRAN_TO_DE_MOI_LUOT = 8
+
+export interface CauKho {
+  loiGiai?: unknown
+  dang?: unknown
+  chuyenDe?: string
+  mucDo?: string
+  kienThuc?: unknown
+  loiThuongGap?: unknown
+}
+
+/** `<mã đề>-<phần>-<số>` — cắt ngược ra mã đề khi `cau_hoi` chưa có dòng. */
+function maDeTuQid(qid: string): string {
+  return qid.replace(/-(?:I|II|III)-\d+$/, '')
+}
+
+export async function napCauTuKho(env: Env, qids: string[]): Promise<Map<string, CauKho>> {
+  const ra = new Map<string, CauKho>()
+  if (!env.DE) return ra
+  const ds = [...new Set(qids.map((q) => chuoi(q).trim()).filter(Boolean))].slice(0, 500)
+  if (ds.length === 0) return ra
+
+  // Mã đề lấy từ chỉ mục D1 trước (chuẩn nhất), thiếu thì cắt từ chính qid.
+  const theoQid = new Map<string, string>()
+  for (let i = 0; i < ds.length; i += 100) {
+    const lo = ds.slice(i, i + 100)
+    const r = await env.DB.prepare(`SELECT qid, ma_de FROM cau_hoi WHERE qid IN (${lo.map(() => '?').join(',')})`)
+      .bind(...lo)
+      .all<Record<string, unknown>>()
+    for (const x of r.results ?? []) theoQid.set(chuoi(x.qid), chuoi(x.ma_de))
+  }
+  for (const q of ds) if (!theoQid.get(q)) theoQid.set(q, maDeTuQid(q))
+
+  const dsMaDe = [...new Set([...theoQid.values()].filter(Boolean))].slice(0, TRAN_TO_DE_MOI_LUOT)
+  const can = new Set(ds)
+
+  for (const maDe of dsMaDe) {
+    let goi: any = null
+    try {
+      const o = await env.DE.get(`kho/${maDe}.json`)
+      if (o?.body) goi = await new Response(o.body).json()
+    } catch (e) {
+      console.warn('[kho] không đọc được gói đề', maDe, e)
+    }
+    if (!goi) continue
+    const gom: any[] = Array.isArray(goi.cau) ? goi.cau : []
+    for (const k of ['phanI', 'phanII', 'phanIII']) if (Array.isArray(goi[k])) gom.push(...goi[k])
+    for (const c of gom) {
+      if (!c || typeof c !== 'object') continue
+      const qid = chuoi(c.qid ?? c.id) || `${maDe}-${chuoi(c.phan).toUpperCase()}-${chuoi(c.so)}`
+      if (!can.has(qid) || ra.has(qid)) continue
+      ra.set(qid, {
+        loiGiai: c.loiGiai ?? c.loi_giai ?? c.explanation ?? c.giaiThich ?? c.giai_thich,
+        dang: c.dang,
+        chuyenDe: chuoi(c.chuyenDe ?? c.chuyen_de),
+        mucDo: chuoi(c.mucDo ?? c.muc_do),
+        kienThuc: c.kienThuc ?? c.kien_thuc,
+        loiThuongGap: c.loiThuongGap ?? c.loi_thuong_gap,
+      })
+    }
+  }
+  return ra
+}
+
+/** Lời giải về một chuỗi cho máy em đọc — object thì gói JSON, chữ thì giữ. */
+export function chuoiLoiGiai(raw: unknown): string {
+  if (!raw) return ''
+  if (typeof raw === 'object') return JSON.stringify(raw)
+  const s = chuoi(raw)
+  return s === '[object Object]' ? '' : s
+}
+
+/** Nhãn dạng về một chuỗi tên dạng. */
+export function chuoiDang(raw: unknown): string {
+  if (!raw) return ''
+  if (typeof raw === 'object') {
+    const o = raw as Record<string, unknown>
+    return chuoi(o.ten || o.ma || '')
+  }
+  const s = chuoi(raw)
+  return s === '[object Object]' ? '' : s
 }
 
 async function docBankDe(env: Env, maCa: string): Promise<Record<string, unknown> | null> {
@@ -2418,6 +2532,9 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
     }
   }
 
+  // Một lượt đọc kho cho CẢ báo cáo, không phải mỗi câu một lượt.
+  const khoMap = await napCauTuKho(env, rows.map((r) => chuoi(r.qid)))
+
   const items = rows.map((row) => {
     const qid = chuoi(row.qid)
     const maCa = chuoi(row.ma_ca)
@@ -2430,27 +2547,15 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
       | Record<string, any>
       | undefined
 
-    const rawLg = fullQ ? (fullQ.loiGiai ?? fullQ.loi_giai ?? fullQ.explanation ?? fullQ.giaiThich ?? fullQ.giai_thich) : null
-    let loiGiaiStr = ''
-    if (rawLg) {
-      if (typeof rawLg === 'object' && rawLg !== null) {
-        loiGiaiStr = JSON.stringify(rawLg)
-      } else {
-        const s = chuoi(rawLg)
-        loiGiaiStr = s === '[object Object]' ? '' : s
-      }
-    }
-
-    const rawDang = fullQ ? (fullQ.dang ?? fullQ.tenDang ?? fullQ.chuyenDe ?? fullQ.chuyen_de) : null
-    let dangStr = ''
-    if (rawDang) {
-      if (typeof rawDang === 'object' && rawDang !== null) {
-        dangStr = chuoi((rawDang as any).ten || (rawDang as any).ma || '')
-      } else {
-        const s = chuoi(rawDang)
-        dangStr = s === '[object Object]' ? '' : s
-      }
-    }
+    // Gói đề công khai đã bị lược sạch lời giải và nhãn dạng (xem `napCauTuKho`),
+    // nên hai thứ ấy lấy từ KHO. Gói đề chỉ còn là nguồn dự phòng.
+    const tuKho = khoMap.get(qid)
+    const loiGiaiStr =
+      chuoiLoiGiai(tuKho?.loiGiai) ||
+      chuoiLoiGiai(fullQ ? (fullQ.loiGiai ?? fullQ.loi_giai ?? fullQ.explanation ?? fullQ.giaiThich ?? fullQ.giai_thich) : null)
+    const dangStr =
+      chuoiDang(tuKho?.dang) ||
+      chuoiDang(fullQ ? (fullQ.dang ?? fullQ.tenDang ?? fullQ.chuyenDe ?? fullQ.chuyen_de) : null)
 
     return {
       maCa,
@@ -2458,8 +2563,8 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
       phan,
       soCau,
       qid,
-      chuyenDe: chuoi(row.chuyen_de),
-      mucDo: chuoi(row.muc_do),
+      chuyenDe: chuoi(row.chuyen_de) || chuoi(tuKho?.chuyenDe),
+      mucDo: chuoi(row.muc_do) || chuoi(tuKho?.mucDo),
       dapAnChon: chuoi(row.dap_an_chon),
       dapAnDung: chuoi(row.dap_an_dung),
       text: fullQ ? chuoi(fullQ.text || fullQ.de) : '',

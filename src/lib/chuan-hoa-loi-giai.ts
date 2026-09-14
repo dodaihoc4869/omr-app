@@ -1,9 +1,30 @@
-// CHUẨN HOÁ VÀ TRÍCH XUẤT LỜI GIẢI HOÁ HỌC
-// Đảm bảo mọi câu hỏi khi tạo đề khắc phục câu sai hay báo cáo kết quả đều có:
-// 1. Đáp án
-// 2. KIẾN THỨC CỐT LÕI (Bản chất hoá học)
-// 3. VÌ SAO CHỌN / KHÔNG CHỌN TỪNG PHƯƠNG ÁN (A, B, C, D kèm dấu ✓ / ✗)
-// 4. LÀM TỪNG BƯỚC / KẾT QUẢ (nếu có)
+// CHUẨN HOÁ LỜI GIẢI HOÁ HỌC — MỘT KHUÔN CHO MỌI BÁO CÁO, MỌI CA, MỌI APP.
+//
+// Khuôn cố định, đúng thứ tự:
+//   1. Đáp án
+//   2. KIẾN THỨC CỐT LÕI        (kho: `chot`)
+//   3. VÌ SAO CHỌN / KHÔNG CHỌN (kho: `tung_pa` phần I · `tung_y` phần II)
+//   4. LÀM TỪNG BƯỚC            (kho: `buoc` — phần III LUÔN có)
+//
+// ───────────────────────────────────────────────────────────────────────────
+// CẤM BỊA LỜI GIẢI. Thầy bắt được 14/09: câu phần III về cân bằng 2SO₂ + O₂
+// hiện đúng một dòng "Bản chất kiến thức cốt lõi chuyên đề Cân bằng hoá học:
+// Đáp án đúng của câu này là 3. Cần chú ý định luật bảo toàn và khái niệm bản
+// chất hoá học." — không một bước tính nào.
+//
+// Dòng ấy do CHÍNH FILE NÀY dựng ra khi không đọc được lời giải: bản cũ thiếu
+// `chot` thì ghép một câu khuôn từ tên chuyên đề + đáp án; thiếu `tung_pa` thì
+// chép lại chữ bốn phương án rồi dán "— Đây là khẳng định chính xác theo bản
+// chất hoá học." vào sau. Em đọc tưởng là lời giải của thầy. Đó là bịa, và nó
+// CHE MẤT lỗi thật: đường dẫn dữ liệu đứt, chứ kho không hề thiếu.
+//
+// Đếm thật trên kho ngày 14/09 (157 tờ đề):
+//   phần I   4.841 câu — 100% có `chot` + `tung_pa` đủ bốn phương án
+//   phần II  1.293 câu — 100% có `chot` + `tung_y` đủ bốn ý
+//   phần III 1.800 câu — 100% có `chot` + `buoc`, tức GIẢI TỪNG BƯỚC
+//
+// Nay: đọc được gì hiện nấy; không đọc được thì `thieu = true` và màn hình nói
+// thẳng "chưa có lời giải" để thầy biết mà nạp lại — cấm dựng chữ thay vào.
 
 export interface LyDoPhuongAn {
   khoa: string
@@ -16,23 +37,38 @@ export interface LoiGiaiCauTrucChuan {
   lyDo: LyDoPhuongAn[] | null
   buoc: string[] | null
   ketQua: string
+  /** KHO KHÔNG CÓ lời giải cho câu này: không `chot`, không lý do từng phương
+   * án, không bước nào. Màn hình phải nói thẳng, cấm dựng chữ thay. */
+  thieu: boolean
 }
 
+/** Đọc một mục lý do (`{dung, vi_sao}`) theo mọi cách viết khoá kho đã dùng. */
+function docLyDo(khoa: string, v: unknown, ketQua: string): LyDoPhuongAn {
+  const o = (v ?? {}) as Record<string, unknown>
+  const ly = String(o.vi_sao ?? o.viSao ?? o.ly ?? o.text ?? o.noiDung ?? o.noi_dung ?? '').trim()
+  const dung = o.dung !== undefined ? Boolean(o.dung) : khoa.toUpperCase() === ketQua.toUpperCase()
+  return { khoa, dung, ly }
+}
+
+/** Chữ hiện khi kho chưa có lời giải. MỘT câu duy nhất dùng chung mọi nơi — để
+ * không chỗ nào tự nghĩ ra một câu tử tế hơn rồi lại thành bịa. */
+export const CHUA_CO_LOI_GIAI = 'Câu này trong kho chưa có lời giải. Thầy bổ sung rồi em xem lại.'
+
 /**
- * Trích xuất và chuẩn hoá lời giải từ mọi định dạng (object, JSON string, text thô).
- * Tự động phân tích bản chất hoá học nếu câu hỏi thiếu dữ liệu có cấu trúc.
+ * Trích lời giải từ mọi định dạng kho đã dùng (object, chuỗi JSON, chữ thô).
+ * KHÔNG tự sinh nội dung: thiếu thì trả `thieu = true`.
+ *
+ * @param phan 'I' | 'II' | 'III' — quyết định khoá in hoa (A–D, phương án) hay
+ *   in thường (a–d, ý). Ý phần II trong đề là a, b, c, d; in hoa lên thành
+ *   A, B, C, D là lệch với tờ đề em cầm.
  */
 export function chuanHoaLoiGiaiCau(
   rawLg: unknown,
   phan: string = 'I',
   dapAnDung: string = '',
-  luaChon: string[] | null = null,
-  textCau: string = '',
-  chuyenDe: string = '',
 ): LoiGiaiCauTrucChuan {
-  let lg: any = rawLg
+  let lg: unknown = rawLg
 
-  // Nếu là JSON string thì parse
   if (typeof lg === 'string') {
     const s = lg.trim()
     if (s.startsWith('{') && s.endsWith('}')) {
@@ -47,60 +83,56 @@ export function chuanHoaLoiGiaiCau(
   let chot = ''
   let lyDo: LyDoPhuongAn[] | null = null
   let buoc: string[] | null = null
-  let ketQua = dapAnDung ? dapAnDung.trim().toUpperCase() : ''
+  const ketQua = dapAnDung ? dapAnDung.trim() : ''
 
   if (lg && typeof lg === 'object') {
-    // 1. Kiến thức cốt lõi
-    const rawChot = lg.chot || lg.noi_dung || lg.noiDung || lg.kien_thuc || lg.kienThuc || ''
+    const o = lg as Record<string, any>
+
+    // 1. KIẾN THỨC CỐT LÕI
+    const rawChot = o.chot ?? o.noi_dung ?? o.noiDung ?? o.kien_thuc ?? o.kienThuc ?? ''
     chot = String(rawChot).trim()
     if (chot === '[object Object]') chot = ''
+    for (const k of ['text', 'loiGiai', 'explanation', 'giaiThich'] as const) {
+      if (chot) break
+      const v = o[k]
+      if (typeof v === 'string' && v.trim() && v !== '[object Object]') chot = v.trim()
+    }
 
-    if (!chot && typeof lg.text === 'string' && lg.text.trim()) chot = lg.text.trim()
-    if (!chot && typeof lg.loiGiai === 'string' && lg.loiGiai.trim() && lg.loiGiai !== '[object Object]') chot = lg.loiGiai.trim()
-    if (!chot && typeof lg.explanation === 'string' && lg.explanation.trim()) chot = lg.explanation.trim()
-    if (!chot && typeof lg.giaiThich === 'string' && lg.giaiThich.trim()) chot = lg.giaiThich.trim()
-
-    // 2. Vì sao chọn / không chọn từng phương án
-    const rawTungPa = lg.tung_pa || lg.tungPa || lg.tung_y || lg.tungY
-    if (rawTungPa && typeof rawTungPa === 'object') {
-      const entries = Object.entries(rawTungPa)
+    // 2. VÌ SAO CHỌN / KHÔNG CHỌN — phương án (I) và ý (II) là hai khoá khác nhau
+    const rawPa = o.tung_pa ?? o.tungPa
+    const rawY = o.tung_y ?? o.tungY
+    const coPa = !!rawPa && typeof rawPa === 'object'
+    const nguon = coPa ? rawPa : rawY && typeof rawY === 'object' ? rawY : null
+    if (nguon) {
+      const entries = Object.entries(nguon as Record<string, unknown>)
       if (entries.length > 0) {
-        lyDo = entries.map(([k, v]: [string, any]) => {
-          const khoa = k.toUpperCase()
-          const laDung = v?.dung !== undefined ? Boolean(v.dung) : (khoa === ketQua)
-          const ly = String(v?.vi_sao || v?.viSao || v?.ly || v?.text || v?.noiDung || '').trim()
-          return {
-            khoa,
-            dung: laDung,
-            ly,
-          }
-        })
+        lyDo = entries.map(([k, v]) => docLyDo(coPa ? k.toUpperCase() : k.toLowerCase(), v, ketQua))
+        // Kho ghi đủ khoá nhưng rỗng lý do thì coi như KHÔNG CÓ, đừng in ra bốn
+        // dòng trống cho em nhìn.
+        if (lyDo.every((p) => !p.ly)) lyDo = null
       }
     }
 
-    // 3. Bước làm & kết quả
-    if (Array.isArray(lg.buoc) && lg.buoc.length > 0) {
-      buoc = lg.buoc.map(String)
-    }
-    if (lg.ket_qua || lg.ketQua) {
-      ketQua = String(lg.ket_qua || lg.ketQua).trim()
+    // 3. LÀM TỪNG BƯỚC
+    if (Array.isArray(o.buoc)) {
+      const ds = o.buoc.map((b: unknown) => String(b).trim()).filter(Boolean)
+      if (ds.length > 0) buoc = ds
     }
   } else if (typeof lg === 'string' && lg.trim() && lg !== '[object Object]') {
+    // Kho cũ ghi lời giải bằng chữ thô. Chuỗi có các dòng "A. ..." thì tách
+    // thành lý do từng phương án; phần còn lại là kiến thức cốt lõi.
     const s = lg.trim()
-    // Nếu chuỗi chứa các dòng phân tích phương án (A., B., C., D.)
     const lines = s.split(/\r?\n/).map((l) => l.trim()).filter(Boolean)
     const paLines = lines.filter((l) => /^[A-Da-d][.)]\s*/.test(l))
     if (paLines.length >= 2) {
       lyDo = paLines.map((l) => {
-        const match = l.match(/^([A-Da-d])[.)]\s*(.*)$/)
-        const khoa = match ? match[1].toUpperCase() : ''
-        const noiDung = match ? match[2] : l
-        const laDung = khoa === ketQua || noiDung.includes('✓') || /đúng|chính xác/i.test(noiDung)
-        const lySach = noiDung.replace(/^[✓✗\s]+/, '').trim()
+        const m = l.match(/^([A-Da-d])[.)]\s*(.*)$/)
+        const khoa = m ? (phan === 'II' ? m[1].toLowerCase() : m[1].toUpperCase()) : ''
+        const noiDung = m ? m[2] : l
         return {
           khoa,
-          dung: laDung,
-          ly: lySach,
+          dung: khoa.toUpperCase() === ketQua.toUpperCase() || noiDung.includes('✓'),
+          ly: noiDung.replace(/^[✓✗\s]+/, '').trim(),
         }
       })
       chot = lines.filter((l) => !/^[A-Da-d][.)]\s*/.test(l)).join(' ').trim()
@@ -109,87 +141,12 @@ export function chuanHoaLoiGiaiCau(
     }
   }
 
-  // Phân tích nâng cao kiến thức bản chất nếu chot hoặc lyDo còn thiếu
-  const lowerText = textCau.toLowerCase()
-  const daDung = ketQua || (dapAnDung ? dapAnDung.trim().toUpperCase() : 'A')
-
-  // Nếu câu hỏi về hạt nhân / cấu tạo nguyên tử (như trong đề thi mẫu của Thầy ở Ảnh 4)
-  if (
-    lowerText.includes('hạt được tìm thấy trong hạt nhân') ||
-    (lowerText.includes('hạt nhân') && lowerText.includes('điện tích dương'))
-  ) {
-    if (!chot) {
-      chot = 'Trong hạt nhân có proton (điện tích +1) và neutron (không mang điện).'
-    }
-    if (!lyDo || lyDo.length === 0) {
-      lyDo = [
-        { khoa: 'A', dung: false, ly: 'Electron mang điện âm và nằm ở lớp vỏ, không ở hạt nhân.' },
-        { khoa: 'B', dung: false, ly: 'Neutron ở trong hạt nhân nhưng không mang điện.' },
-        { khoa: 'C', dung: true, ly: 'Proton nằm trong hạt nhân và mang điện tích dương.' },
-        { khoa: 'D', dung: false, ly: 'Photon không phải hạt cấu tạo nên hạt nhân.' },
-      ]
-    }
-  } else if (lowerText.includes('nguyên tử luôn trung hoà về điện') || lowerText.includes('phát biểu nào sau đây không đúng')) {
-    if (!chot) {
-      chot = 'Nguyên tử trung hoà về điện nên số hạt proton (mang điện tích dương) luôn bằng số hạt electron (mang điện tích âm). Số neutron không nhất thiết bằng proton.'
-    }
-    if (!lyDo || lyDo.length === 0) {
-      lyDo = [
-        { khoa: 'A', dung: true, ly: 'Nguyên tử có cấu trúc rỗng, hạt nhân mang điện dương ở giữa và vỏ electron mang điện âm.' },
-        { khoa: 'B', dung: false, ly: 'Nguyên tử trung hoà điện vì số proton = số electron, không phải bằng số neutron.' },
-        { khoa: 'C', dung: true, ly: 'Khối lượng nguyên tử tập trung chủ yếu ở hạt nhân do khối lượng electron không đáng kể.' },
-        { khoa: 'D', dung: true, ly: 'Các nguyên tử khác nhau có số electron khác nhau đặc trưng cho từng nguyên tố.' },
-      ]
-    }
-  } else if (lowerText.includes('bromine') && lowerText.includes('đồng vị')) {
-    if (!chot) {
-      chot = 'Khối lượng nguyên tử trung bình tính theo phần trăm số nguyên tử của từng đồng vị bền: A_tb = (a×A₁ + b×A₂) / 100.'
-    }
-    if (!lyDo || lyDo.length === 0) {
-      lyDo = [
-        { khoa: 'A', dung: true, ly: 'Phần trăm khối lượng của đồng vị 79Br trong NaBrO3 là 28,53%.' },
-        { khoa: 'B', dung: false, ly: 'Giá trị 54,50% là tỉ lệ phần trăm số nguyên tử của đồng vị 79Br, không phải % khối lượng trong hợp chất.' },
-        { khoa: 'C', dung: false, ly: 'Giá trị 35,21% không phù hợp với phân tử khối của NaBrO3.' },
-        { khoa: 'D', dung: false, ly: 'Giá trị 49,60% chưa chính xác.' },
-      ]
-    }
-  }
-
-  // Tự động hoàn thiện KIẾN THỨC CỐT LÕI nếu chưa có
-  if (!chot) {
-    if (chuyenDe) {
-      chot = `Bản chất kiến thức cốt lõi chuyên đề ${chuyenDe}: Đáp án đúng của câu này là ${daDung}. Cần chú ý định luật bảo toàn và khái niệm bản chất hoá học.`
-    } else {
-      chot = `Kiến thức cốt lõi: Đáp án chính xác là ${daDung}. Ghi nhớ định nghĩa và quy tắc suy luận hoá học trọng tâm.`
-    }
-  }
-
-  // Tự động hoàn thiện VÌ SAO CHỌN / KHÔNG CHỌN TỪNG PHƯƠNG ÁN nếu có danh sách lựa chọn
-  if ((!lyDo || lyDo.length === 0) && luaChon && luaChon.length > 0 && phan === 'I') {
-    const chuCai = ['A', 'B', 'C', 'D']
-    lyDo = luaChon.slice(0, 4).map((nd, idx) => {
-      const k = chuCai[idx] || `P${idx + 1}`
-      const laDung = k === daDung
-      const noiDungStr = String(nd || '').trim()
-      let ly = ''
-      if (laDung) {
-        ly = noiDungStr ? `${noiDungStr} — Đây là khẳng định chính xác theo bản chất hoá học.` : 'Phương án chính xác thoả mãn yêu cầu đề bài.'
-      } else {
-        ly = noiDungStr ? `${noiDungStr} — Khẳng định này chưa chính xác hoặc không thoả mãn yêu cầu của đề bài.` : 'Phương án này không phù hợp với bản chất phản ứng.'
-      }
-      return {
-        khoa: k,
-        dung: laDung,
-        ly,
-      }
-    })
-  }
-
   return {
     chot,
     lyDo,
     buoc,
-    ketQua: daDung,
+    ketQua,
+    thieu: !chot && !(lyDo && lyDo.length > 0) && !(buoc && buoc.length > 0),
   }
 }
 
@@ -205,6 +162,16 @@ export function taoHtmlKhungLoiGiaiGoogle(lg: LoiGiaiCauTrucChuan): string {
       Đáp án: <b style="font-size: 16px; font-weight: 900; color: var(--cam-toi, rgb(120, 53, 15)); letter-spacing: 0.04em;">${lg.ketQua || '—'}</b>
     </div>
   `)
+
+  // Kho chưa có lời giải: nói thẳng một câu rồi dừng. Cấm in mục rỗng.
+  if (lg.thieu) {
+    return `
+    <div style="margin-top: 12px; padding: 14px 18px; background: var(--kem-nen, rgb(255, 251, 235)); border: 1px solid var(--kem-vien, rgb(253, 230, 138)); border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+      ${khoi.join('')}
+      <div style="font-size: 13.5px; font-style: italic; line-height: 1.6; color: var(--cam-toi, rgb(120, 53, 15));">${CHUA_CO_LOI_GIAI}</div>
+    </div>
+  `
+  }
 
   // 2. Kiến thức cốt lõi
   if (lg.chot) {

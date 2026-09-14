@@ -62,14 +62,7 @@ export function chuyenCauSaiSangCauLuyen(it: CauSaiDauVao): CauLuyen {
   const daDung = String(it.dapAnDung ?? '')
   const daChon = String(it.dapAnChon ?? '')
 
-  const lgChuan = chuanHoaLoiGiaiCau(
-    it.loiGiai,
-    it.phan || 'I',
-    daDung,
-    luaChon,
-    textCau,
-    it.chuyenDe || ''
-  )
+  const lgChuan = chuanHoaLoiGiaiCau(it.loiGiai, it.phan || 'I', daDung)
 
   const hinhAnhUrl = (() => {
     const a = it.imageDataUrl || it.hinhAnh

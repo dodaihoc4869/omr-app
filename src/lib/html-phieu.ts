@@ -1076,7 +1076,7 @@ export function oGiaiHtml(c: CauLuyen): string {
   if (!chot && (!lyDo || lyDo.length === 0) && (!buoc || buoc.length === 0)) {
     const rawAny = (c as any).loiGiai || (c as any).giaiThich || (c as any).explanation || (c as any).noiDung || (c as any).viSao
     if (rawAny) {
-      const ch = chuanHoaLoiGiaiCau(rawAny, c.phan, c.dapAn, c.luaChon, c.text, c.chuyenDe)
+      const ch = chuanHoaLoiGiaiCau(rawAny, c.phan, c.dapAn)
       if (ch.chot) chot = ch.chot
       if (ch.lyDo && ch.lyDo.length > 0) lyDo = ch.lyDo
       if (ch.buoc && ch.buoc.length > 0) buoc = ch.buoc

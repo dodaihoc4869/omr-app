@@ -58,7 +58,15 @@ interface Props {
   lop?: string
   scriptUrl: string
   onClose: () => void
-  onBatDauKhacPhuc: (maCa: string) => void
+  /** Bấm "Bắt đầu làm bài" trong modal khắc phục.
+   *
+   * `html` là TỜ PHIẾU vừa dựng xong. Bản trước bỏ tham số này, `onTaoPhieuXong`
+   * nhận html rồi vứt đi và chỉ gọi `onBatDauKhacPhuc(maCa)` — mà nhánh ấy bên
+   * `StudentPortalScreen` lại đi tải câu sai rồi MỞ LẠI ĐÚNG modal vừa bấm.
+   * Em bấm "Bắt đầu làm bài" thì quay về chính màn ấy, không bao giờ ra đề.
+   * Đó là lỗi thầy báo 14/09: "khắc phục lỗi sai trên điện thoại app học sinh
+   * không chạy". Nay tờ phiếu đi kèm để chỗ gọi mở thẳng. */
+  onBatDauKhacPhuc: (maCa: string, html?: string) => void
   onMoLaiBaiThi?: (maCa: string) => void
   tabMacDinh?: string
 }
@@ -567,8 +575,9 @@ export default function BaoCaoCaThiHocSinhModal({
           hoTen={hoTen}
           sbd={sbd}
           tieuDeCa={baiThi.tenCa || baiThi.maCa}
-          onTaoPhieuXong={() => {
-            if (onBatDauKhacPhuc) onBatDauKhacPhuc(baiThi.maCa)
+          onTaoPhieuXong={(html) => {
+            setHienModalKhacPhuc(false)
+            if (onBatDauKhacPhuc) onBatDauKhacPhuc(baiThi.maCa, html)
           }}
         />
       )}

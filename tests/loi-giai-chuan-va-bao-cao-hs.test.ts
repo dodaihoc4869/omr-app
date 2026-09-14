@@ -45,44 +45,52 @@ describe('Chuẩn hoá lời giải Hoá học theo chuẩn Ảnh 4', () => {
     expect(res.lyDo?.[0].ly).toBe('Na có cấu hình [Ne]3s1.')
   })
 
-  it('tự động hoàn thiện kiến thức cốt lõi và từng phương án cho câu hạt nhân nếu thiếu cấu trúc', () => {
-    const res = chuanHoaLoiGiaiCau(
-      '',
-      'I',
-      'C',
-      ['Electron.', 'Neutron.', 'Proton.', 'Photon.'],
-      'Loại hạt được tìm thấy trong hạt nhân và mang điện tích dương?',
-      'Cấu tạo nguyên tử'
-    )
-
-    expect(res.chot).toContain('Trong hạt nhân có proton')
-    expect(res.lyDo).toHaveLength(4)
-    expect(res.lyDo?.[2].khoa).toBe('C')
-    expect(res.lyDo?.[2].dung).toBe(true)
-    expect(res.lyDo?.[2].ly).toContain('Proton')
+  // SỬA 14/09 — THẦY ĐỔI LUẬT, KHÔNG PHẢI SỬA TEST CHO XANH.
+  //
+  // Hai ca dưới đây trước kia khoá đúng hành vi BỊA: thiếu lời giải thì tự ghép
+  // một câu "Trong hạt nhân có proton…" theo từ khoá trong đề, hoặc chép chữ
+  // bốn phương án rồi dán một câu khuôn vào sau. Thầy bắt được bản in phần III
+  // ngày 14/09 và chốt: "đáp án trả lời ngắn phải có giải từng bước" — tức lấy
+  // lời giải THẬT trong kho, còn kho chưa có thì nói thẳng là chưa có.
+  //
+  // Nên hai ca này nay khoá đúng điều ngược lại: CẤM BỊA.
+  it('kho không có lời giải thì KHÔNG bịa, chỉ báo thiếu', () => {
+    const res = chuanHoaLoiGiaiCau('', 'I', 'C')
+    expect(res.thieu).toBe(true)
+    expect(res.chot).toBe('')
+    expect(res.lyDo).toBeNull()
+    expect(res.buoc).toBeNull()
+    expect(res.ketQua).toBe('C')
   })
 
-  it('khi nạp vào oGiaiHtml sinh đầy đủ Kiến thức cốt lõi và Vì sao chọn từng phương án theo chuẩn Ảnh 4', () => {
+  it('phần III có bước trong kho thì oGiaiHtml in đủ LÀM TỪNG BƯỚC', () => {
     const lg = chuanHoaLoiGiaiCau(
-      '',
-      'I',
-      'C',
-      ['Electron.', 'Neutron.', 'Proton.', 'Photon.'],
-      'Loại hạt được tìm thấy trong hạt nhân và mang điện tích dương?',
-      'Cấu tạo nguyên tử'
+      {
+        chot: 'Phản ứng toả nhiệt và có 3 mol khí chuyển thành 2 mol khí.',
+        buoc: [
+          'Phản ứng toả nhiệt và có 3 mol khí chuyển thành 2 mol khí.',
+          '(2) tăng áp suất, (3) hạ nhiệt độ và (5) giảm nồng độ SO₃ đều đẩy chiều thuận.',
+          '(1), (6) đẩy chiều nghịch, (4) không làm chuyển dịch. Vậy có 3 biện pháp.',
+        ],
+        ket_qua: '3',
+      },
+      'III',
+      '3',
     )
+    expect(lg.thieu).toBe(false)
+    expect(lg.buoc).toHaveLength(3)
 
     const c: CauLuyen = {
-      phan: 'I',
-      id: 'cau_1',
+      phan: 'III',
+      id: 'cau_11',
       maDe: 'test',
-      chuyenDe: 'Cấu tạo nguyên tử',
-      dang: 'ly_thuyet',
-      sao: 1,
-      mucDo: 'biet',
-      text: 'Loại hạt được tìm thấy trong hạt nhân và mang điện tích dương?',
-      luaChon: ['Electron.', 'Neutron.', 'Proton.', 'Photon.'],
-      dapAn: 'C',
+      chuyenDe: 'Cân bằng hoá học',
+      dang: 'bai_tap',
+      sao: 2,
+      mucDo: 'van_dung',
+      text: 'Có bao nhiêu biện pháp làm cân bằng chuyển dịch theo chiều thuận?',
+      luaChon: null,
+      dapAn: '3',
       chot: lg.chot,
       lyDo: lg.lyDo,
       buoc: lg.buoc,
@@ -90,11 +98,28 @@ describe('Chuẩn hoá lời giải Hoá học theo chuẩn Ảnh 4', () => {
     }
 
     const html = oGiaiHtml(c)
-    expect(html).toContain('Đáp án: <b>C</b>')
+    expect(html).toContain('Đáp án: <b>3</b>')
     expect(html).toContain('Kiến thức cốt lõi')
-    expect(html).toContain('sol-cot-loi')
-    expect(html).toContain('Vì sao chọn / không chọn từng phương án')
-    expect(html).toContain('<strong>A.</strong> ✗')
-    expect(html).toContain('<strong>C.</strong> ✓')
+    expect(html).toContain('(1), (6) đẩy chiều nghịch')
+    expect(html.toLowerCase()).toContain('từng bước')
+    // Câu độn cũ phải biến mất khỏi mọi bản in.
+    expect(html).not.toContain('Cần chú ý định luật bảo toàn')
+  })
+
+  it('phần II đọc tung_y và giữ khoá ý in thường a–d', () => {
+    const res = chuanHoaLoiGiaiCau(
+      {
+        chot: 'Ester no đơn chức mạch hở có công thức chung CnH2nO2.',
+        tung_y: {
+          a: { dung: true, vi_sao: 'Đúng với công thức chung.' },
+          b: { dung: false, vi_sao: 'Sai vì còn một liên kết pi ở nhóm C=O.' },
+        },
+      },
+      'II',
+      'DSDD',
+    )
+    expect(res.lyDo?.map((p) => p.khoa)).toEqual(['a', 'b'])
+    expect(res.lyDo?.[0].dung).toBe(true)
+    expect(res.thieu).toBe(false)
   })
 })
