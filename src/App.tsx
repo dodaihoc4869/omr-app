@@ -9,12 +9,14 @@ import { catPhien, donPhien, khoiPhucPhien } from './lib/khoa-phien'
 import { datDangMoKhoa } from './lib/cap-nhat-app'
 import { phaiHoiLai, type BanGhiKhoa } from './lib/khoa-app'
 import { docDuongVao, laLinkAppCu, laManThayQuanLy, vaiDaDung } from './lib/vai-tro'
+import { canChonApp } from './lib/khoa-vai'
+import ChonAppScreen from './screens/ChonAppScreen'
 import { ganCauNoi, goCauNoi } from './lib/cau-noi-ddh'
 import ExamTakeScreen from './screens/ExamTakeScreen'
 import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
 import PhieuScreen from './screens/PhieuScreen'
 import StudentPortalScreen from './screens/StudentPortalScreen'
-import ParentPortalScreen from './screens/ParentPortalScreen'
+
 
 // TÁM MÀN CHỈ THẦY DÙNG — NẠP MUỘN.
 //
@@ -46,6 +48,10 @@ const LichSuCaScreen = lazy(() => import('./screens/LichSuCaScreen'))
 const HocSinhScreen = lazy(() => import('./screens/HocSinhScreen'))
 const GoiLenBangScreen = lazy(() => import('./screens/PhanCongScreen'))
 const CauHoiScreen = lazy(() => import('./screens/CauHoiScreen'))
+// CỔNG PHỤ HUYNH NẠP MUỘN. Link phụ huynh dùng hằng ngày là `/p#…` (phiếu kết
+// quả) — màn ấy vẫn nạp SỚM. Cổng tra cứu `/ph` thì mở thưa hơn nhiều, mà để
+// nó nhập thẳng là em học sinh nào cũng phải tải kèm.
+const ParentPortalScreen = lazy(() => import('./screens/ParentPortalScreen'))
 import KhoaAppScreen from './screens/KhoaAppScreen'
 import ChanLoi from './components/ChanLoi'
 
@@ -108,7 +114,13 @@ function App() {
   })
   // MẬT KHẨU MỞ APP (MATKHAUMOAPP.md). CHỈ hỏi ở app quản lý của thầy — vào
   // thi, báo cáo phụ huynh, link riêng cũ đều không bao giờ bị hỏi.
-  const [canHoi] = useState(() => laManThayQuanLy(location.search, location.pathname))
+  // `/` TRẦN ⇒ MÀN CHỌN APP, KHÔNG ĐOÁN VAI (thầy chốt 14/09: "đảm bảo 100%
+  // không nhảy lẫn lộn"). Xem `src/lib/khoa-vai.ts` để biết vì sao đoán là còn
+  // sai được. Mọi đường CÓ vai đều đi thẳng như cũ, không qua màn này.
+  const [chuaChonApp] = useState(() => canChonApp(location.search, location.pathname))
+  // Màn chọn app KHÔNG hỏi mật khẩu: chưa vào app nào thì chưa có gì để khoá,
+  // mà hỏi ở đây là em học sinh gõ tên miền tay lại gặp ô mật khẩu của thầy.
+  const [canHoi] = useState(() => !canChonApp(location.search, location.pathname) && laManThayQuanLy(location.search, location.pathname))
   // 'dang_doc' = chưa biết máy này có mật khẩu chưa. KHÔNG dựng app trong lúc
   // đó: mục 5 đòi màn khoá hiện TRƯỚC khi bất kỳ dữ liệu học sinh nào được vẽ.
   const [khoa, setKhoa] = useState<'dang_doc' | 'can_dat' | 'can_mo' | 'da_mo'>(() => (canHoi ? 'dang_doc' : 'da_mo'))
@@ -216,6 +228,15 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [linkCu, laPhieu, laHocSinh, laPhuHuynh])
 
+  // MÀN CHỌN APP đứng TRƯỚC mọi màn khác: `/` trần không thể là phiếu, link
+  // cũ, cổng em hay cổng phụ huynh, nên không cướp đường của ai.
+  if (chuaChonApp) {
+    return (
+      <ChanLoi o="Chọn app">
+        <ChonAppScreen />
+      </ChanLoi>
+    )
+  }
   if (laPhieu) {
     return (
       <ChanLoi o="Phiếu kết quả">
@@ -234,7 +255,9 @@ function App() {
   if (laPhuHuynh) {
     return (
       <ChanLoi o="Cổng phụ huynh">
-        <ParentPortalScreen />
+        <Suspense fallback={<div className="min-h-screen" style={{ background: 'var(--nen)' }} />}>
+          <ParentPortalScreen />
+        </Suspense>
       </ChanLoi>
     )
   }

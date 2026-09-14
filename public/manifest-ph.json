@@ -6,7 +6,7 @@
   "lang": "vi",
   "display": "standalone",
   "orientation": "portrait",
-  "start_url": "./?vai=phuhuynh",
+  "start_url": "./ph",
   "scope": "./",
   "background_color": "#f7f8fa",
   "theme_color": "#1a2332",

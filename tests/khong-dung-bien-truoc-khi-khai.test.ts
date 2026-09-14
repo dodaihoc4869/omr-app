@@ -47,7 +47,7 @@ const DA_RA_SOAT: Record<string, string[]> = {
   //   · `raCauHoiMoi` gọi trong `batDauLeoThap` — hàm gắn vào nút bấm.
   //   · `xuLyTraLoi` gọi trong `setInterval` bên trong `useEffect`.
   // Cùng một dáng với `ExamTakeScreen.tsx` ngay đầu danh sách này.
-  'src/components/ThanThuHoaHocGame.tsx': ['raCauHoiMoi', 'xuLyTraLoi'],
+  'src/components/ThanThuHoaHocGame.tsx': ['raCauHoiMoi', 'setTinTienHoa', 'setViecVuaLam', 'xuLyTraLoiRef'],
 }
 
 interface Nhan {

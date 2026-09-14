@@ -6,7 +6,7 @@
   "lang": "vi",
   "display": "standalone",
   "orientation": "portrait",
-  "start_url": "./?vai=gv",
+  "start_url": "./gv",
   "scope": "./",
   "background_color": "#f7f8fa",
   "theme_color": "#1a2332",

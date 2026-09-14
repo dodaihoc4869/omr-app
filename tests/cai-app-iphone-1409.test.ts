@@ -19,16 +19,24 @@ const doc = (p: string) => readFileSync(resolve(__dirname, '..', p), 'utf8')
 const json = (p: string) => JSON.parse(doc(p)) as Record<string, string>
 
 describe('manifest mang sẵn vai trong start_url', () => {
+  // ĐỔI 14/09 lượt 12: vai chuyển từ THAM SỐ (`./?vai=hocsinh`) sang ĐƯỜNG DẪN
+  // (`./hs`). Ý ĐỊNH của phép kiểm giữ nguyên — không bản nào được để đường
+  // trần — nhưng đường dẫn chắc hơn: phần sau dấu `?` bị Zalo và trình rút gọn
+  // cắt mất là rơi về `/` trần, còn đường dẫn thì không. Xem `src/lib/khoa-vai.ts`.
+  //
+  // `id` GIỮ NGUYÊN dạng cũ: đổi `id` là trình duyệt coi đây là app khác, người
+  // đã cài sẽ thấy biểu tượng thứ hai thay vì được cập nhật.
   const bo = [
-    ['public/manifest.json', 'gv', 'ĐỖ ĐẠI HỌC'],
-    ['public/manifest-hs.json', 'hocsinh', 'ĐĐH Học Sinh'],
-    ['public/manifest-ph.json', 'phuhuynh', 'ĐĐH Phụ Huynh'],
+    ['public/manifest.json', 'gv', './gv', 'ĐỖ ĐẠI HỌC'],
+    ['public/manifest-hs.json', 'hocsinh', './hs', 'ĐĐH Học Sinh'],
+    ['public/manifest-ph.json', 'phuhuynh', './ph', 'ĐĐH Phụ Huynh'],
   ] as const
 
   it('cả ba bản đều ghi rõ vai, không bản nào để đường trần', () => {
-    for (const [f, vai, ten] of bo) {
+    for (const [f, vai, duong, ten] of bo) {
       const m = json(f)
-      expect(m.start_url, f).toBe(`./?vai=${vai}`)
+      expect(m.start_url, f).toBe(duong)
+      expect(m.start_url, f).not.toBe('./')
       expect(m.id, f).toBe(`/?vai=${vai}`)
       expect(m.short_name, f).toBe(ten)
       expect(m.scope, f).toBe('./')

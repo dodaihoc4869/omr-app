@@ -35,8 +35,12 @@ import KhungXemPhieu from '../components/KhungXemPhieu'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
 import LogoHocSinh from '../components/LogoHocSinh'
-import GiaiCuuCongChuaGame from '../components/GiaiCuuCongChuaGame'
-import ThanThuHoaHocGame from '../components/ThanThuHoaHocGame'
+// HAI GAME NẠP MUỘN — đo 14/09: mã game nặng ~234 KB nguồn, mà nhập thẳng
+// vào đây là nó rơi vào MẢNH MÃ CHÍNH (755 KB), thứ MỌI người tải, kể cả phụ
+// huynh chỉ mở một trang báo cáo trên điện thoại. Em nào mở tab game mới tải,
+// và service worker cất lại ngay nên lần sau tức thì.
+const GiaiCuuCongChuaGame = lazy(() => import('../components/GiaiCuuCongChuaGame'))
+const ThanThuHoaHocGame = lazy(() => import('../components/ThanThuHoaHocGame'))
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import DongDemCau, { docSoDem } from '../components/DongDemCau'
 import { goiBaiThi } from '../lib/goi-bao-cao'
@@ -138,6 +142,19 @@ function mauDiem(diem: number | null): string {
 }
 
 type TabType = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'game' | 'thanthu'
+
+/** Chỗ giữ màn trong lúc mảnh mã game đang về. Cao bằng vùng game để không
+ * giật layout, và nói rõ đang chờ chứ không để em nhìn khoảng trắng. */
+function ChoNapGame() {
+  return (
+    <div
+      className="flex items-center justify-center"
+      style={{ minHeight: '60vh', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--nhat)' }}
+    >
+      Đang mở game…
+    </div>
+  )
+}
 
 export default function StudentPortalScreen() {
   const [auth, setAuth] = useState<ThongTinHs | null>(() => {
@@ -1880,14 +1897,16 @@ export default function StudentPortalScreen() {
             KHÔNG truyền SBD và họ tên vào game: điểm game không được dính vào
             hồ sơ học tập, và game không cần biết em là ai. */}
         {tab === 'game' && (
-          <GiaiCuuCongChuaGame onDong={() => setTab('diem')} />
+          <Suspense fallback={<ChoNapGame />}>
+            <GiaiCuuCongChuaGame onDong={() => setTab('diem')} />
+          </Suspense>
         )}
 
         {/* TAB 7: THẦN THÚ HÓA HỌC (ALCHEMON) — Nuôi thú, leo tháp & săn boss câu sai.
             Gắn kết chặt chẽ với nhiệm vụ làm BTVN, sửa câu sai và vào phòng thi. */}
         {tab === 'thanthu' && (
+          <Suspense fallback={<ChoNapGame />}>
           <ThanThuHoaHocGame
-            auth={auth}
             dsLichSu={dsLichSu}
             dsBtvn={dsBtvn}
             onDong={() => setTab('diem')}
@@ -1895,6 +1914,7 @@ export default function StudentPortalScreen() {
             onChuyenSangBtvn={() => setTab('btvn')}
             onChuyenSangVaoThi={() => setTab('vaothi')}
           />
+          </Suspense>
         )}
       </main>
 

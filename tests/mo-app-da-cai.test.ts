@@ -27,7 +27,10 @@ describe('Chỉ còn một app trong repo này', () => {
     // mở ra màn quản lý của thầy (thầy quay video). Nay ba manifest mang sẵn
     // vai trong địa chỉ. Ý ĐỊNH của phép kiểm giữ nguyên: vẫn mở GỐC app, vẫn
     // cùng một phạm vi, không trỏ sang repo nào khác.
-    expect(manifest.start_url).toBe('./?vai=gv')
+    // ĐỔI TIẾP 14/09 lượt 12: vai sang ĐƯỜNG DẪN (`./gv`) thay vì tham số —
+    // tham số bị Zalo và trình rút gọn cắt mất là rơi về `/` trần. Ý ĐỊNH của
+    // phép kiểm vẫn giữ: mở GỐC app, cùng phạm vi, nói rõ là bản của thầy.
+    expect(manifest.start_url).toBe('./gv')
     expect(manifest.scope).toBe('./')
     expect(manifest.start_url.startsWith('./')).toBe(true)
   })

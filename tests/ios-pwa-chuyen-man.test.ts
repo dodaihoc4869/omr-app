@@ -12,13 +12,18 @@ describe('Sửa triệt để lỗi iOS thêm vào màn hình chính bị nhảy
     // ĐỔI 14/09: đường dẫn trần `./hoc-sinh` vẫn bắt app phải TRA localStorage
     // ở vài lối vào; app đã cài trên iOS có kho lưu riêng nên tra ra rỗng. Nay
     // vai nằm thẳng trong địa chỉ, không phụ thuộc kho lưu nào.
-    expect(manifestHs.start_url).toBe('./?vai=hocsinh')
+    //
+    // ĐỔI TIẾP 14/09 lượt 12: vai chuyển từ THAM SỐ sang ĐƯỜNG DẪN (`./hs`).
+    // Ý ĐỊNH của phép kiểm giữ nguyên — biểu tượng phải mở đúng cổng của em,
+    // không bao giờ mở `/` trần — nhưng đường dẫn không bị Zalo hay trình rút
+    // gọn cắt mất như phần sau dấu `?`. Xem `src/lib/khoa-vai.ts`.
+    expect(manifestHs.start_url).toBe('./hs')
     expect(manifestHs.name).toContain('Học Sinh')
     expect(manifestHs.display).toBe('standalone')
   })
 
   it('manifest phụ huynh có start_url trỏ tới cổng phụ huynh', () => {
-    expect(manifestPh.start_url).toBe('./?vai=phuhuynh')
+    expect(manifestPh.start_url).toBe('./ph')
     expect(manifestPh.name).toContain('Phụ Huynh')
     expect(manifestPh.display).toBe('standalone')
   })

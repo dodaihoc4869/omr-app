@@ -24,6 +24,7 @@ import 'katex/dist/katex.min.css'
 import App from './App.tsx'
 
 import { chuanHoaDuongDan, docDuongVao, nhoVaiDaDung } from './lib/vai-tro'
+import { khoaVaiVaoUrl } from './lib/khoa-vai'
 import { donPhienCu } from './lib/don-phien-cu'
 import { batTuHoiBanMoi, daySangBanMoi, tuTaiLaiKhiDoiBan } from './lib/cap-nhat-app'
 import { batSuKienCaiApp } from './lib/pwa-install'
@@ -38,6 +39,18 @@ donPhienCu()
 // làm, nhưng 404.html không chạy trên máy đã cài app (service worker trả thẳng
 // index.html). Sau bước này cả app chỉ thấy MỘT dạng URL.
 chuanHoaDuongDan(import.meta.env.BASE_URL)
+
+// KHOÁ VAI VÀO ĐƯỜNG DẪN — thầy chốt 14/09: "đảm bảo 100% không nhảy lẫn lộn".
+//
+// `chuanHoaDuongDan` ở trên gom mọi thứ về tham số truy vấn. Riêng VAI thì đi
+// ngược lại: đẩy ra ĐƯỜNG DẪN (`/gv`, `/hs`, `/ph`). Tham số bị Zalo hay trình
+// rút gọn cắt mất thì `?vai=gv` thành `/` trần; đường dẫn thì không mất. Sau
+// dòng này thanh địa chỉ luôn nói rõ đang ở app nào, và mọi lượt tải lại —
+// kể cả lượt service worker trả trang — đều giữ nguyên vai.
+//
+// Chạy SAU `chuanHoaDuongDan` để không phải tranh nhau ghi địa chỉ, và TRƯỚC
+// khi React dựng để màn đầu tiên đã thấy đường đúng.
+khoaVaiVaoUrl(import.meta.env.BASE_URL)
 
 // NHỚ VAI MÁY NÀY DÙNG — để lần sau mở `/` trần (biểu tượng trên màn hình chính
 // luôn mở `/` trần vì `start_url` của manifest là `./`) app biết đưa em vào màn

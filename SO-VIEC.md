@@ -143,3 +143,60 @@ lượt activate ấy, rồi ép điều hướng qua chính SW đó vào kho r�
 - [!] Bản Pages vừa đẩy DỰNG TỪ CÂY LÀM VIỆC nên có mang theo mã game đang
   làm dở của phiên kia (`ThanThuHoaHocGame`, `giai-cuu-cong-chua`,
   `public/cai-app*`). Không nằm trong commit `14037b8`.
+
+---
+
+# LƯỢT 12 — RÀ SOÁT 3 APP · KHOÁ VAI · TỐI ƯU (14/09)
+
+- [ ] "rà soát toàn bộ 3 app, tự động sửa nếu phát hiện lỗi"  | bằng chứng: (chưa có)
+- [ ] "Tối ưu mọi thứ từ tốc độ tới sự hoạt động ổn định, mượt mà"  | bằng chứng: (chưa có)
+- [ ] "Link của 3 app bạn hãy bọc hay làm gì đó để đảm bảo 100% không nhảy lẫn lộn"  | bằng chứng: (chưa có)
+
+## Đo được trước khi sửa
+
+Mảnh mã CHÍNH `index-BO6e2eTq.js` nặng **755 KB** — MỌI người tải, kể cả phụ
+huynh chỉ mở một trang báo cáo trên điện thoại. Trong đó có:
+- `GiaiCuuCongChuaGame` 29 KB + `ThanThuHoaHocGame` 37 KB + `src/game/` 168 KB
+  = **~234 KB mã game**, vào mảnh chính vì `StudentPortalScreen` nhập THẲNG,
+  mà `StudentPortalScreen` lại được `App.tsx` nhập thẳng.
+- `ParentPortalScreen` 29 KB — em học sinh không bao giờ cần.
+
+## Lỗ nhảy lẫn vai — chỗ DUY NHẤT còn đoán
+
+Mọi đường có vai rõ ràng đều đúng. Chỗ đoán là `/` TRẦN: `laManThayQuanLy`
+hỏi `localStorage['ddh.vaiDaDung']`. Ba app CHUNG một gốc nên CHUNG một
+localStorage — máy nào mở cả ba thì khoá ấy là của app mở sau cùng.
+
+Thêm: link ba app đang ba kiểu (`/?vai=gv`, `/hs`, `/ph`). Zalo và nhiều trình
+rút gọn có thể cắt phần `?...`, và cắt xong `/?vai=gv` thành `/` trần — rơi
+đúng vào chỗ đoán.
+
+## Đã sửa — lượt 12
+
+### A. KHOÁ VAI — ba lớp bọc
+
+`src/lib/khoa-vai.ts` mới:
+1. **Vai nằm trong ĐƯỜNG DẪN**, không nằm trong tham số. Ba link chuẩn:
+   `/gv` · `/hs` · `/ph`. `khoaVaiVaoUrl()` chạy lúc khởi động viết lại địa chỉ
+   về đúng dạng ấy, nên tải lại trang hay service worker trả trang đều giữ vai.
+   Giữ nguyên phần sau `#` và mọi tham số khác.
+2. **`start_url` cả ba manifest** cũng là đường dẫn ấy (`./gv`, `./hs`, `./ph`).
+   `id` GIỮ NGUYÊN — đổi `id` là người đã cài thấy biểu tượng thứ hai.
+3. **`/` trần HỎI, không đoán** — `ChonAppScreen` ba thẻ, một chạm.
+   `vaiDaDung` từ nay chỉ còn quyền XẾP THỨ TỰ, không quyết định.
+
+Gỡ 4 dòng 302 `/hs → /?vai=hocsinh` trong `_redirects`: chúng tạo thêm một
+vòng mạng rồi bị viết ngược lại, và chỉ đúng với máy CHƯA cài app.
+
+### B. TỐC ĐỘ — mảnh mã chính
+
+| | Trước | Sau |
+|---|---|---|
+| mảnh chính thô | 755 KB | **631 KB** |
+| mảnh chính gzip | — | **183 KB** |
+
+Tách ra thành mảnh riêng, chỉ tải khi mở: `GiaiCuuCongChuaGame` 64 KB ·
+`ThanThuHoaHocGame` · `ParentPortalScreen` 49 KB.
+
+GIỮ NẠP SỚM: `ExamTakeScreen` và `PhieuScreen` — ngày thi không đánh cược vào
+một mảnh mã tải muộn, và phiếu là thứ phụ huynh mở nhiều nhất.

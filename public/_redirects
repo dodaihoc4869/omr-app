@@ -12,6 +12,21 @@
 # GitHub Pages trước đây che lỗi này bằng public/404.html. Pages.dev không có
 # cơ chế ấy, nên phải khai tường minh ở đây.
 #
-# Mã 200 (không phải 301): giữ nguyên đường dẫn trên thanh địa chỉ để app còn
-# đọc được vai và mã ca từ nó.
+# Trang cài đặt app thông minh cho học sinh & phụ huynh
+/cai-app /cai-app/index.html 200
+/cai-dat /cai-app/index.html 200
+/cai-hs /cai-app/index.html?vai=hs 302
+/cai-ph /cai-app/index.html?vai=ph 302
+
+# BA APP, BA ĐƯỜNG — KHÔNG chuyển hướng sang `?vai=`.
+#
+# 14/09 từng có bốn dòng 302 đổi `/hs` thành `/?vai=hocsinh`. Gỡ đi vì nay VAI
+# SỐNG TRONG ĐƯỜNG DẪN (`src/lib/khoa-vai.ts`): app tự viết địa chỉ về `/hs`,
+# nên 302 chỉ tạo thêm một vòng mạng rồi bị viết ngược lại, lại còn nháy màn.
+#
+# Quan trọng hơn: máy đã cài app KHÔNG bao giờ chạm tới tệp này (service worker
+# trả thẳng index.html), nên 302 chỉ đúng với người mở lần đầu — hai đường đi
+# khác nhau cho cùng một link là mầm lỗi. Dòng `/*` ở cuối trả index.html cho
+# `/hs`, `/ph`, `/gv` là đủ và giống nhau cho mọi máy.
+
 /* /index.html 200
