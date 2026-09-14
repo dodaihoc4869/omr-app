@@ -21,10 +21,15 @@ beforeEach(() => {
 })
 
 describe('Chỉ còn một app trong repo này', () => {
-  it('manifest mở thẳng gốc app, không mang tham số vai nào', () => {
-    expect(manifest.start_url).toBe('./')
+  it('manifest mở thẳng gốc app, và NÓI RÕ đây là bản của thầy', () => {
+    // ĐỔI 14/09: `start_url` trần buộc app phải TRA localStorage mới biết vai.
+    // App đã cài trên iOS có kho lưu RIÊNG, trống trơn — nên biểu tượng của em
+    // mở ra màn quản lý của thầy (thầy quay video). Nay ba manifest mang sẵn
+    // vai trong địa chỉ. Ý ĐỊNH của phép kiểm giữ nguyên: vẫn mở GỐC app, vẫn
+    // cùng một phạm vi, không trỏ sang repo nào khác.
+    expect(manifest.start_url).toBe('./?vai=gv')
     expect(manifest.scope).toBe('./')
-    expect(JSON.stringify(manifest)).not.toContain('vai=')
+    expect(manifest.start_url.startsWith('./')).toBe(true)
   })
 
   it('vai học sinh và phụ huynh KHÔNG còn được nhận', () => {

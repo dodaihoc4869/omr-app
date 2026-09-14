@@ -9,13 +9,16 @@ beforeEach(() => {
 
 describe('Sửa triệt để lỗi iOS thêm vào màn hình chính bị nhảy vào app giáo viên', () => {
   it('manifest học sinh có start_url trỏ tới cổng học sinh', () => {
-    expect(manifestHs.start_url).toBe('./hoc-sinh')
+    // ĐỔI 14/09: đường dẫn trần `./hoc-sinh` vẫn bắt app phải TRA localStorage
+    // ở vài lối vào; app đã cài trên iOS có kho lưu riêng nên tra ra rỗng. Nay
+    // vai nằm thẳng trong địa chỉ, không phụ thuộc kho lưu nào.
+    expect(manifestHs.start_url).toBe('./?vai=hocsinh')
     expect(manifestHs.name).toContain('Học Sinh')
     expect(manifestHs.display).toBe('standalone')
   })
 
   it('manifest phụ huynh có start_url trỏ tới cổng phụ huynh', () => {
-    expect(manifestPh.start_url).toBe('./phu-huynh')
+    expect(manifestPh.start_url).toBe('./?vai=phuhuynh')
     expect(manifestPh.name).toContain('Phụ Huynh')
     expect(manifestPh.display).toBe('standalone')
   })

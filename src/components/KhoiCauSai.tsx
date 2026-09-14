@@ -1,0 +1,299 @@
+// MỘT KHỐI CÂU SAI DUY NHẤT — dùng ở MỌI báo cáo của cả ba app.
+//
+// Thầy chốt 14/09: "Tất cả các câu sai phải hiển thị đủ đề và hình ảnh đầy đủ,
+// lời giải theo chuẩn ở trong tất cả các báo cáo."
+//
+// Trước bản này, hai cổng tự vẽ hai kiểu và cùng thiếu ba thứ:
+//   · ẢNH đề bài — câu Hoá rất hay có sơ đồ, bảng biến thiên, hình thí nghiệm.
+//     Không vẽ ảnh thì em đọc "Cho sơ đồ sau" rồi không thấy sơ đồ đâu.
+//   · BỐN Ý a–b–c–d của phần II. Cổng học sinh chỉ vẽ `choices` (A–D) nên câu
+//     phần II ra mỗi dòng dẫn "Mỗi phát biểu sau đây là đúng hay sai?" — thầy
+//     chụp được đúng cảnh ấy.
+//   · BẢNG số liệu (`table`).
+//
+// Máy chủ vẫn trả đủ cả ba (`hsCauSai` đọc kho đề rồi gắn kèm). Lỗi nằm ở chỗ
+// vẽ, nên sửa ở chỗ vẽ — và sửa MỘT lần cho cả ba app.
+import { useState } from 'react'
+import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
+import { chuDiemTheoY, soYCuaCau, soYDungPhanII } from '../lib/dem-ket-qua'
+
+export interface CauSaiHienThi {
+  qid?: string
+  phan?: string
+  soCau?: number
+  chuyenDe?: string
+  mucDo?: string
+  dapAnChon?: string
+  dapAnDung?: string
+  text?: string
+  choices?: string[]
+  ideas?: string[]
+  table?: string[][] | null
+  imageDataUrl?: string
+  hinhAnh?: unknown
+  loiGiai?: string
+}
+
+const CHU_Y = ['a', 'b', 'c', 'd']
+
+/** Gom mọi kiểu ảnh kho đề từng dùng về một danh sách đường dẫn vẽ được. */
+export function anhCuaCau(c: CauSaiHienThi): string[] {
+  const ra: string[] = []
+  const them = (v: unknown) => {
+    const s = typeof v === 'string' ? v.trim() : ''
+    if (s.length > 10 && (s.startsWith('data:image/') || s.startsWith('http://') || s.startsWith('https://') || s.startsWith('/'))) {
+      if (!ra.includes(s)) ra.push(s)
+    }
+  }
+  them(c.imageDataUrl)
+  if (Array.isArray(c.hinhAnh)) for (const h of c.hinhAnh) them(typeof h === 'string' ? h : (h as { src?: string })?.src)
+  else them(c.hinhAnh)
+  return ra
+}
+
+/** Một ký tự Đ/S đã chuẩn hoá; `-` hoặc rỗng = em chưa tô ô đó. */
+function y(v: string | undefined, i: number): string {
+  const s = String(v ?? '').trim().toUpperCase().replace(/Đ/g, 'D')
+  const k = s[i]
+  return k === 'D' || k === 'S' ? k : ''
+}
+
+function ChuY({ k }: { k: string }) {
+  if (!k) return <span className="text-slate-400 font-bold">–</span>
+  return <span className={k === 'D' ? 'text-emerald-600 dark:text-emerald-400 font-black' : 'text-rose-600 dark:text-rose-400 font-black'}>{k === 'D' ? 'Đ' : 'S'}</span>
+}
+
+/** THÂN CÂU: đề bài, ảnh, bảng, rồi phương án theo đúng phần của câu. */
+export function ThanCauSai({ c }: { c: CauSaiHienThi }) {
+  const anh = anhCuaCau(c)
+  const phan = String(c.phan || 'I')
+  return (
+    <>
+      {c.text && (
+        <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-medium leading-relaxed whitespace-pre-wrap">
+          {c.text}
+        </div>
+      )}
+
+      {/* ẢNH ĐỀ BÀI. Câu Hoá hay có sơ đồ và hình thí nghiệm; thiếu ảnh là
+          thiếu nửa đề. */}
+      {anh.map((src, i) => (
+        <img
+          key={i}
+          src={src}
+          alt={`Hình của câu ${c.soCau ?? ''}`}
+          loading="lazy"
+          className="w-full max-w-full h-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white"
+        />
+      ))}
+
+      {Array.isArray(c.table) && c.table.length > 0 && (
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs border-collapse">
+            <tbody>
+              {c.table.map((hang, i) => (
+                <tr key={i}>
+                  {(hang ?? []).map((o, j) => (
+                    <td key={j} className="border border-slate-200 dark:border-slate-700 px-2 py-1 text-slate-700 dark:text-slate-300">
+                      {o}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* PHẦN I — bốn phương án A–D. */}
+      {phan === 'I' && Array.isArray(c.choices) && c.choices.length > 0 && (
+        <div className="space-y-1.5">
+          {c.choices.map((ch, i) => {
+            const k = String.fromCharCode(65 + i)
+            const laDung = k === String(c.dapAnDung || '').trim().toUpperCase()
+            const laChon = k === String(c.dapAnChon || '').trim().toUpperCase()
+            return (
+              <div
+                key={k}
+                className={`p-2.5 rounded-xl border flex items-start gap-2 text-xs ${
+                  laDung
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-200 font-semibold'
+                    : laChon
+                      ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200'
+                      : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
+                }`}
+              >
+                <span className="w-5 h-5 rounded-full bg-slate-200/80 dark:bg-slate-700 flex items-center justify-center font-bold text-[11px] shrink-0">{k}</span>
+                <span className="min-w-0 whitespace-pre-wrap">{ch}</span>
+                {laChon && <span className="ml-auto shrink-0 text-[10px] font-bold">em chọn</span>}
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* PHẦN II — BỐN Ý a–b–c–d, mỗi ý một dòng, so Đ/S em tô với đáp án.
+          Đây là chỗ bản cũ bỏ trắng: em nhìn thấy mỗi câu dẫn. */}
+      {phan === 'II' && Array.isArray(c.ideas) && c.ideas.length > 0 && (
+        <div className="space-y-1.5">
+          {c.ideas.map((noiDung, i) => {
+            const chon = y(c.dapAnChon, i)
+            const dung = y(c.dapAnDung, i)
+            const khop = Boolean(chon) && chon === dung
+            return (
+              <div
+                key={i}
+                className={`p-2.5 rounded-xl border text-xs ${
+                  khop
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700'
+                    : 'bg-rose-50 dark:bg-rose-950/60 border-rose-300 dark:border-rose-700'
+                }`}
+              >
+                <div className="flex items-start gap-2">
+                  <span className="w-5 h-5 rounded-full bg-slate-200/80 dark:bg-slate-700 flex items-center justify-center font-bold text-[11px] shrink-0">
+                    {CHU_Y[i] ?? i + 1}
+                  </span>
+                  <span className="min-w-0 whitespace-pre-wrap text-slate-800 dark:text-slate-200">{noiDung}</span>
+                </div>
+                <div className="mt-1.5 pl-7 flex items-center gap-3 text-[11px] text-slate-600 dark:text-slate-400">
+                  <span>Em chọn: <ChuY k={chon} /></span>
+                  <span>Đáp án: <ChuY k={dung} /></span>
+                  <span className={`ml-auto font-bold ${khop ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                    {khop ? '✓ đúng ý này' : '✗ sai ý này'}
+                  </span>
+                </div>
+              </div>
+            )
+          })}
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 pl-1">
+            Em đúng <strong>{soYDungPhanII(c.dapAnChon, c.dapAnDung)}</strong>/{c.ideas.length} ý của câu này.
+          </div>
+        </div>
+      )}
+
+      {/* PHẦN III — trả lời ngắn: đặt hai con số cạnh nhau cho dễ so. */}
+      {phan === 'III' && (
+        <div className="flex flex-wrap gap-2 text-xs">
+          <span className="px-2.5 py-1 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200">
+            Em điền: <strong>{c.dapAnChon || 'bỏ trống'}</strong>
+          </span>
+          <span className="px-2.5 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-200">
+            Đáp án: <strong>{c.dapAnDung || '—'}</strong>
+          </span>
+        </div>
+      )}
+    </>
+  )
+}
+
+/** HỘP LỜI GIẢI CHUẨN — cùng một khuôn ở mọi báo cáo. */
+export function LoiGiaiCauSai({ c }: { c: CauSaiHienThi }) {
+  const lg = chuanHoaLoiGiaiCau(c.loiGiai, (c.phan as 'I' | 'II' | 'III') || 'I', c.dapAnDung || '', c.choices || null, c.text || '', c.chuyenDe || '')
+  return (
+    <div className="p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 text-amber-950 dark:text-amber-100 shadow-sm space-y-3">
+      <div className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+        Đáp án: <strong className="text-base font-black text-amber-950 dark:text-amber-100">{lg.ketQua || c.dapAnDung || '—'}</strong>
+      </div>
+      {lg.chot && (
+        <div>
+          <div className="text-[10px] font-extrabold tracking-wider uppercase text-amber-800 dark:text-amber-400 mb-1">KIẾN THỨC CỐT LÕI</div>
+          <div className="text-xs sm:text-sm font-bold leading-relaxed text-amber-950 dark:text-amber-100">{lg.chot}</div>
+        </div>
+      )}
+      {lg.lyDo && lg.lyDo.length > 0 && (
+        <div>
+          <div className="text-[10px] font-extrabold tracking-wider uppercase text-amber-800 dark:text-amber-400 mb-1">VÌ SAO CHỌN / KHÔNG CHỌN TỪNG PHƯƠNG ÁN</div>
+          <div className="space-y-1 text-xs leading-relaxed">
+            {lg.lyDo.map((p) => (
+              <div key={p.khoa} className="flex items-start gap-1.5 py-0.5 border-t border-amber-200/40 dark:border-amber-800/40 first:border-t-0">
+                <strong className="text-amber-900 dark:text-amber-200">{p.khoa}.</strong>
+                <span className={`font-bold ${p.dung ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>{p.dung ? '✓' : '✗'}</span>
+                <span className="text-amber-900 dark:text-amber-200">{p.ly}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {lg.buoc && lg.buoc.length > 0 && (
+        <div>
+          <div className="text-[10px] font-extrabold tracking-wider uppercase text-amber-800 dark:text-amber-400 mb-1">LÀM TỪNG BƯỚC</div>
+          <div className="space-y-1 text-xs">
+            {lg.buoc.map((b, i) => (
+              <div key={i}>{i + 1}. {b}</div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/** Cả câu: thân + lời giải. Đây là thứ mọi báo cáo phải dùng. */
+export default function KhoiCauSai({ c }: { c: CauSaiHienThi }) {
+  return (
+    <div className="space-y-3">
+      <ThanCauSai c={c} />
+      <LoiGiaiCauSai c={c} />
+    </div>
+  )
+}
+
+/** MỘT DÒNG CÂU SAI TRỌN VẸN — đầu dòng bấm mở, thân dòng là `KhoiCauSai`.
+ *
+ * Cả hai cổng dùng ĐÚNG component này, nên bố cục, nhãn và màu giống nhau 100%.
+ * Trước đây mỗi cổng tự dựng một kiểu đầu dòng, và chỉ cổng học sinh có nhãn
+ * biểu điểm theo ý. */
+export function DongCauSai({ c, stt }: { c: CauSaiHienThi; stt: number }) {
+  const [mo, setMo] = useState(false)
+  const phan = String(c.phan || 'I')
+  const yDung = phan === 'II' ? soYDungPhanII(c.dapAnChon, c.dapAnDung) : null
+  const daTo = String(c.dapAnChon ?? '').replace(/-/g, '').trim()
+  return (
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 overflow-hidden shadow-sm transition-all">
+      <button
+        type="button"
+        onClick={() => setMo((v) => !v)}
+        className="w-full p-3.5 text-left flex items-center justify-between gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors cursor-pointer"
+      >
+        <div className="flex items-center gap-2.5 min-w-0">
+          <span className="w-6 h-6 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center justify-center shrink-0">
+            {stt}
+          </span>
+          <div className="truncate">
+            <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+              Câu {stt} (Phần {phan}):
+            </span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 ml-1.5">{c.chuyenDe || 'Hoá học'}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+          {yDung !== null && yDung > 0 && (
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+              {chuDiemTheoY(yDung, soYCuaCau(c.dapAnDung))}
+            </span>
+          )}
+          {!daTo && (
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+              Bỏ trống
+            </span>
+          )}
+          {/* Ô "em chọn" ĐỎ RÕ: đây là chỗ phải nhìn thấy đầu tiên. */}
+          <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-rose-600 text-white border border-rose-700">
+            Em chọn: {c.dapAnChon || '—'}
+          </span>
+          <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+            Đúng: {c.dapAnDung || '—'}
+          </span>
+          <span className="text-xs text-slate-400">{mo ? '\u25b2' : '\u25bc'}</span>
+        </div>
+      </button>
+
+      {mo && (
+        <div className="p-4 pt-2 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 text-xs animate-google-fade">
+          <KhoiCauSai c={c} />
+        </div>
+      )}
+    </div>
+  )
+}

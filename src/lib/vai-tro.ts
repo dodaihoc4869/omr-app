@@ -117,7 +117,21 @@ export function docDuongVao(search: string, duongDan = ''): DuongVao {
  *   `/phu-huynh` · `/ph`          → cổng phụ huynh
  *
  * Còn lại (`/` trần và `/gv`) là app của thầy. */
-export function laManThayQuanLy(search: string, duongDan = ''): boolean {
+/** App đang chạy TỪ BIỂU TƯỢNG trên màn hình chính (đã cài), không phải trong
+ * tab trình duyệt. iOS dùng `navigator.standalone`, còn lại dùng display-mode. */
+export function dangChayTuManHinhChinh(): boolean {
+  try {
+    if (typeof window === 'undefined') return false
+    const nav = navigator as Navigator & { standalone?: boolean }
+    if (nav.standalone === true) return true
+    if (typeof window.matchMedia !== 'function') return false
+    return window.matchMedia('(display-mode: standalone)').matches || window.matchMedia('(display-mode: fullscreen)').matches
+  } catch {
+    return false
+  }
+}
+
+export function laManThayQuanLy(search: string, duongDan = '', daCai = dangChayTuManHinhChinh): boolean {
   if (laLinkAppCu(search, duongDan)) return false
   const d = docDuongVao(search, duongDan)
   if (d.vai === 'phieu' || d.vai === 'diem' || d.vai === 'hocsinh' || d.vai === 'phuhuynh') return false
@@ -138,6 +152,19 @@ export function laManThayQuanLy(search: string, duongDan = ''): boolean {
   // Nay `/` trần hỏi máy: máy này lần gần nhất vào bằng vai nào. Máy chưa từng
   // dùng thì GIỮ NGUYÊN hành vi cũ (màn thầy) — không đổi gì cho máy mới.
   if (vaiDaDung() === 'hs' || vaiDaDung() === 'ph') return false
+  // APP ĐÃ CÀI, MỞ `/` TRẦN, MÁY CHƯA NHỚ VAI NÀO ⇒ KHÔNG vào màn thầy.
+  //
+  // Thầy quay video 14/09: lưu app ra màn hình chính iPhone rồi mở lên thì nhảy
+  // thẳng vào app giáo viên. App đã cài trên iOS có kho lưu RIÊNG, trống trơn —
+  // nên `vaiDaDung()` trả `null` dù trong Safari máy ấy đã dùng cổng học sinh
+  // cả buổi.
+  //
+  // Từ bản này `start_url` của cả ba manifest đều mang sẵn `?vai=`, nên biểu
+  // tượng cài MỚI không bao giờ rơi vào đây. Nhánh này là lưới hứng cho biểu
+  // tượng cài từ BẢN CŨ: thà mở cổng học sinh — nơi em gõ số báo danh — còn hơn
+  // đổ em vào màn quản lý của thầy. Thầy vào màn của mình bằng `?vai=gv`, và
+  // máy thầy thì `vaiDaDung()` đã là `'gv'` từ lâu nên không chạm nhánh này.
+  if (vaiDaDung() === null && daCai()) return false
   return true
 }
 

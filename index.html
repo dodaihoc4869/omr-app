@@ -4,14 +4,48 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- App GIÁO VIÊN — một manifest duy nhất. Manifest riêng cho học sinh và
-      phụ huynh đã gỡ khỏi repo này: hai app đó tách sang repo riêng
-      (TACHAPPHSPH.md). -->
-    <link rel="manifest" href="/manifest.json" />
+    <!-- CHỌN MANIFEST NGAY LÚC PHÂN TÍCH HTML, TRƯỚC KHI REACT CHẠY.
+      ~
+      Thầy quay video 14/09: em lưu app ra màn hình chính iPhone, mở lên thì
+      nhảy thẳng vào app GIÁO VIÊN.
+      ~
+      Hai nguyên nhân chồng nhau:
+        1. Thẻ manifest trong HTML luôn trỏ `manifest.json` (bản của thầy).
+           Mã JS đổi thẻ sau đó là ĐÃ MUỘN — Safari đọc manifest ngay lúc phân
+           tích HTML, và người dùng bấm "Thêm vào Màn hình chính" thì nó dùng
+           bản đã đọc.
+        2. `start_url` của cả ba bản đều là `./` hoặc một đường dẫn trần. App
+           mở `/` trần thì phải TRA localStorage mới biết vai — mà app đã cài
+           trên iOS có kho lưu RIÊNG, trống trơn. Không biết vai ⇒ rơi về màn
+           quản lý của thầy.
+      ~
+      Sửa cả hai: `start_url` nay mang sẵn `?vai=`, và thẻ manifest được chọn
+      bằng đoạn mã đồng bộ ngay dưới đây, đọc vai từ chính đường dẫn đang mở.
+      Không có JS thì vẫn còn thẻ `<link>` dự phòng ở sau. -->
+    <script>
+      (function () {
+        try {
+          var d = (location.pathname || '') + (location.search || '')
+          var vai = /[?&]vai=hocsinh|(^|\/)(hoc-sinh|hocsinh|hs)\/?($|\?)/.test(d)
+            ? 'hs'
+            : /[?&]vai=phuhuynh|(^|\/)(phu-huynh|phuhuynh|ph)\/?($|\?)/.test(d)
+              ? 'ph'
+              : /[?&]vai=gv|(^|\/)gv\/?($|\?)/.test(d)
+                ? 'gv'
+                : localStorage.getItem('ddh.vaiDaDung') || ''
+          var ten = vai === 'hs' ? 'manifest-hs.json' : vai === 'ph' ? 'manifest-ph.json' : 'manifest.json'
+          var ten2 = vai === 'hs' ? 'ĐĐH Học Sinh' : vai === 'ph' ? 'ĐĐH Phụ Huynh' : 'ĐỖ ĐẠI HỌC'
+          document.write('<link rel="manifest" href="/' + ten + '">')
+          document.write('<meta name="apple-mobile-web-app-title" content="' + ten2 + '">')
+        } catch (e) {
+          document.write('<link rel="manifest" href="/manifest.json">')
+        }
+      })()
+    </script>
+    <noscript><link rel="manifest" href="/manifest.json" /></noscript>
     <!-- iOS tự bo góc biểu tượng, nên file này phải là hình VUÔNG phủ kín,
       không bo sẵn: trỏ vào icon-192 (đã bo góc) là bị bo hai lần, ra viền xấu. -->
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-title" content="ĐỖ ĐẠI HỌC" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <!-- Màu thanh trạng thái/địa chỉ = --muc của hệ thiết kế (tokens.css); manifest.json do vite-plugin-pwa sinh từ vite.config.ts -->

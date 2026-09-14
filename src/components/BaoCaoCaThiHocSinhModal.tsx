@@ -4,9 +4,9 @@
 
 import { useEffect, useState, useMemo } from 'react'
 import DongDemCau, { DongDemYPhanII, docSoDem } from './DongDemCau'
-import { chuDiemTheoY, soYCuaCau, soYDungPhanII } from '../lib/dem-ket-qua'
-import BieuDoTienBoGoogle from './BieuDoTienBoGoogle'
-import type { HoSoEm } from '../lib/exam-api'
+import { DongCauSai } from './KhoiCauSai'
+import KhoiBaPhan from './KhoiBaPhan'
+import { danhGiaBai } from '../lib/danh-gia-bai'
 import { createPortal } from 'react-dom'
 import {
   X,
@@ -20,11 +20,9 @@ import {
   Layers,
   ArrowRight,
   Flame,
-  TrendingUp,
   FileQuestion,
 } from 'lucide-react'
 import { hsCauSaiApi, hsLichSuCaApi } from '../lib/exam-api'
-import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
 import ModalKhacPhucCauSai from './ModalKhacPhucCauSai'
 
 export interface ThongTinBaiThiHocSinh {
@@ -83,9 +81,7 @@ export default function BaoCaoCaThiHocSinhModal({
   const [dsCauSai, setDsCauSai] = useState<any[]>([])
   const [dangTaiCauSai, setDangTaiCauSai] = useState(false)
   const [tabHienThi, setTabHienThi] = useState<string>(tabMacDinh)
-  const [cauSaiMoRong, setCauSaiMoRong] = useState<Record<string, boolean>>({})
   const [hienModalKhacPhuc, setHienModalKhacPhuc] = useState(false)
-  const [dsLichSu, setDsLichSu] = useState<any[]>([])
 
   // Tải lịch sử ca thi để phân tích mức tiến bộ
   useEffect(() => {
@@ -95,7 +91,7 @@ export default function BaoCaoCaThiHocSinhModal({
       try {
         const res = await hsLichSuCaApi(scriptUrl, sbd)
         if (active && res && res.ok && Array.isArray(res.items)) {
-          setDsLichSu(res.items)
+          void (res.items)
         }
       } catch {}
     }
@@ -115,10 +111,6 @@ export default function BaoCaoCaThiHocSinhModal({
         const res = await hsCauSaiApi(scriptUrl, sbd, [baiThi.maCa])
         if (active && res && res.ok && Array.isArray(res.items)) {
           setDsCauSai(res.items)
-          // Tự động mở câu sai đầu tiên
-          if (res.items.length > 0) {
-            setCauSaiMoRong({ [res.items[0].qid || '0']: true })
-          }
         }
       } catch {
         if (active) setDsCauSai([])
@@ -176,102 +168,15 @@ export default function BaoCaoCaThiHocSinhModal({
   const tyLeChinhXac = coDemCau && tongCau !== null ? Math.min(100, Math.max(0, Math.round(((soDung ?? 0) / tongCau) * 100))) : null
 
   // Phân tích mức độ tiến bộ qua các ca thi
-  // MỘT NGUỒN CHO BIỂU ĐỒ TIẾN BỘ — đúng dạng `chuoiTienBo` cần.
+
+
+  // NHẬN XÉT PHẢI ĐÚNG VỚI CON SỐ CỦA CHÍNH BÀI NÀY.
   //
-  // Ca đang mở LUÔN có mặt, kể cả khi lịch sử máy chủ chưa kịp về: thầy mở báo
-  // cáo ngay sau khi em nộp thì `dsLichSu` còn rỗng, và một biểu đồ trống ở
-  // đúng lúc ấy trông như hỏng.
-  const caChoBieuDo = useMemo(() => {
-    const ds = (dsLichSu ?? [])
-      .filter((c: any) => c && c.maCa)
-      .map((c: any) => ({
-        maCa: String(c.maCa),
-        tenCa: String(c.tenCa ?? ''),
-        lop: '',
-        lanThu: Number(c.lanThu) || 1,
-        nopLuc: String(c.nopLuc ?? c.ngay ?? c.ngayNop ?? ''),
-        trangThai: 'da_nop',
-        diemI: c.diemI ?? null,
-        diemII: c.diemII ?? null,
-        diemIII: c.diemIII ?? null,
-        tong: typeof c.tong === 'number' ? c.tong : null,
-        tongCau: c.tongCau ?? null,
-        soCauDung: c.soCauDung ?? null,
-        soCauSai: c.soCauSai ?? null,
-        hang: null,
-        siSo: null,
-        soLanRoiMan: 0,
-      }))
-    if (!ds.some((c) => c.maCa === baiThi.maCa)) {
-      ds.push({
-        maCa: baiThi.maCa,
-        tenCa: baiThi.tenCa,
-        lop: '',
-        lanThu: baiThi.lanThu ?? 1,
-        nopLuc: baiThi.ngayThi || new Date().toISOString(),
-        trangThai: 'da_nop',
-        diemI: baiThi.diemI ?? null,
-        diemII: baiThi.diemII ?? null,
-        diemIII: baiThi.diemIII ?? null,
-        tong: diem,
-        tongCau: baiThi.tongCau ?? null,
-        soCauDung: baiThi.soCauDung ?? null,
-        soCauSai: baiThi.soCauSai ?? null,
-        hang: null,
-        siSo: null,
-        soLanRoiMan: 0,
-      })
-    }
-    return ds as unknown as HoSoEm['ca']
-  }, [dsLichSu, baiThi, diem])
-
-
-  // Đánh giá sư phạm và thông điệp thôi thúc sửa sai
-  const danhGia = useMemo(() => {
-    if (diem >= 9.0) {
-      return {
-        xepLoai: 'Xuất sắc',
-        mau: 'text-emerald-600 dark:text-emerald-400',
-        nen: 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800',
-        thongDiep: 'Phong độ đỉnh cao! Em chỉ còn thiếu một chút nữa là đạt điểm 10 tuyệt đối. Hãy khắc phục ngay các câu sai này để hoàn thiện 100% kiến thức!',
-        mucDoCanThiet: 'can_thien',
-      }
-    }
-    if (diem >= 8.0) {
-      return {
-        xepLoai: 'Rất tốt (Mục tiêu 9+)',
-        mau: 'text-blue-600 dark:text-blue-400',
-        nen: 'bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800',
-        thongDiep: 'Kiến thức của em rất vững! Những câu sai này phần lớn rơi vào bẫy đề thi hoặc tính toán cẩn thận. Khắc phục ngay để vững vàng tiến tới mốc 9+!',
-        mucDoCanThiet: 'can_thien',
-      }
-    }
-    if (diem >= 6.5) {
-      return {
-        xepLoai: 'Khá (Cần bứt phá)',
-        mau: 'text-indigo-600 dark:text-indigo-400',
-        nen: 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800',
-        thongDiep: 'Em đang ở ngưỡng bứt phá quan trọng! Có một số lỗ hổng lý thuyết và dạng bài then chốt cần lấp ngay hôm nay trước khi chuyển sang đề thi mới.',
-        mucDoCanThiet: 'cap_thiet',
-      }
-    }
-    if (diem >= 5.0) {
-      return {
-        xepLoai: 'Trung bình (Cần sửa ngay)',
-        mau: 'text-amber-600 dark:text-amber-400',
-        nen: 'bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800',
-        thongDiep: 'Báo động kiến thức trọng tâm! Em đang bị mất điểm ở nhiều câu nhận biết và thông hiểu. Nếu không làm lại ngay các câu này, em sẽ rất dễ lặp lại lỗi sai trong phòng thi thật!',
-        mucDoCanThiet: 'khan_cap',
-      }
-    }
-    return {
-      xepLoai: 'Cần khắc phục khẩn cấp',
-      mau: 'text-rose-600 dark:text-rose-400',
-      nen: 'bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-800',
-      thongDiep: 'Đừng nản lòng em nhé! Thầy đã chuẩn bị sẵn lời giải chi tiết từng bước cho em. Hãy dành 15 phút ngay bây giờ để xem lại và làm lại các câu sai để lấy lại tự tin!',
-      mucDoCanThiet: 'khan_cap',
-    }
-  }, [diem])
+  // Bản cũ chỉ nhìn điểm, nên bài 10/10 vẫn được khen "chỉ còn thiếu một chút
+  // nữa là đạt điểm 10" kèm lời hối thúc khắc phục một danh sách rỗng (thầy bắt
+  // được 14/09). Nay dùng chung `danhGiaBai` với cổng phụ huynh: cùng một xếp
+  // loại, cùng một câu chữ, và câu nào cũng nhắc đúng số câu còn phải chữa.
+  const danhGia = useMemo(() => danhGiaBai(diem, soKhacPhuc, tongCau), [diem, soKhacPhuc, tongCau])
 
   // (Điểm từng phần đã khai báo một lần ở trên — bản trùng ở đây đã bỏ.)
 
@@ -484,18 +389,6 @@ export default function BaoCaoCaThiHocSinhModal({
               <span>Mức độ nhận thức</span>
             </button>
 
-            <button
-              type="button"
-              onClick={() => setTabHienThi('tien_bo')}
-              className={`py-2.5 px-3.5 text-xs font-bold rounded-t-xl transition-colors border-b-2 flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                tabHienThi === 'tien_bo'
-                  ? 'border-purple-600 text-purple-600 dark:text-purple-400 bg-purple-50/50 dark:bg-purple-950/30'
-                  : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
-              }`}
-            >
-              <TrendingUp className="w-4 h-4" />
-              <span>Mức tiến bộ</span>
-            </button>
 
             {extraTabs?.map((t) => (
               <button
@@ -517,66 +410,13 @@ export default function BaoCaoCaThiHocSinhModal({
           {/* TAB 1: TỔNG QUAN 3 PHẦN */}
           {tabHienThi === 'tong_quan' && (
             <div className="space-y-4 animate-google-fade">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {/* Phần I */}
-                <div className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                  <div className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
-                    PHẦN I: TRẮC NGHIỆM
-                  </div>
-                  <div className="text-2xl font-black text-slate-900 dark:text-white">
-                    {diemI.toFixed(2)}
-                    <span className="text-xs font-normal text-slate-400 ml-1">/ 4.50 điểm</span>
-                  </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                    Nhiều lựa chọn (A, B, C, D)
-                  </div>
-                </div>
+              <KhoiBaPhan diemI={diemI} diemII={diemII} diemIII={diemIII} />
 
-                {/* Phần II */}
-                <div className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                  <div className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
-                    PHẦN II: ĐÚNG / SAI
-                  </div>
-                  <div className="text-2xl font-black text-slate-900 dark:text-white">
-                    {diemII.toFixed(2)}
-                    <span className="text-xs font-normal text-slate-400 ml-1">/ 4.00 điểm</span>
-                  </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                    Câu hỏi Đúng / Sai (mỗi câu gồm 4 ý a, b, c, d)
-                  </div>
-                </div>
-
-                {/* Phần III */}
-                <div className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                  <div className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
-                    PHẦN III: TRẢ LỜI NGẮN
-                  </div>
-                  <div className="text-2xl font-black text-slate-900 dark:text-white">
-                    {diemIII.toFixed(2)}
-                    <span className="text-xs font-normal text-slate-400 ml-1">/ 1.50 điểm</span>
-                  </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                    Câu hỏi trả lời ngắn tính toán và biện luận
-                  </div>
-                </div>
-              </div>
-
-              {/* Hướng dẫn khắc phục */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
-                    <CheckCircle2 className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-slate-900 dark:text-white">
-                      Mở lại đề thi gốc để xem lại bài làm
-                    </div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Xem lại đề bài đầy đủ, các đáp án đã chọn và thời gian làm từng câu
-                    </div>
-                  </div>
-                </div>
-
+              {/* CHỈ CÒN CÁI NÚT.
+                  Hai dòng chữ giải thích ở đây bị ép vào một cột hẹp trên điện
+                  thoại nên rơi thành mỗi dòng một chữ, cao gần hết màn hình
+                  (thầy chụp 14/09). Nút đã tự nói nó làm gì. */}
+              <div className="flex justify-center">
                 {onMoLaiBaiThi && (
                   <button
                     type="button"
@@ -642,174 +482,9 @@ export default function BaoCaoCaThiHocSinhModal({
                     <span>Bấm vào câu để mở lời giải chi tiết chuẩn Hoá học</span>
                   </div>
 
-                  {dsCauSai.map((c, idx) => {
-                    const qidKey = c.qid || String(idx)
-                    const moRong = Boolean(cauSaiMoRong[qidKey])
-                    // PHẦN II CHẤM THEO Ý — ghi rõ mấy ý đúng và mấy phần trăm
-                    // điểm câu (thầy chốt 14/09: "ghi rõ tính điểm cho mấy ý").
-                    // Không có dòng này thì em nhìn câu 3/4 ý nằm chung bảng
-                    // với câu sai sạch, tưởng mình mất trắng cả câu.
-                    const yDung = c.phan === 'II' ? soYDungPhanII(c.dapAnChon, c.dapAnDung) : null
-                    const laBoTrong = c.dungSai === null || c.dungSai === undefined
-                      ? !String(c.dapAnChon ?? '').replace(/-/g, '').trim()
-                      : false
-                    const lg = chuanHoaLoiGiaiCau(
-                      c.loiGiai,
-                      c.phan || 'I',
-                      c.dapAnDung || '',
-                      c.choices || null,
-                      c.text || '',
-                      c.chuyenDe || '',
-                    )
-
-                    return (
-                      <div
-                        key={qidKey}
-                        className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 overflow-hidden shadow-sm transition-all"
-                      >
-                        {/* Header câu sai */}
-                        <button
-                          type="button"
-                          onClick={() => setCauSaiMoRong((prev) => ({ ...prev, [qidKey]: !prev[qidKey] }))}
-                          className="w-full p-3.5 text-left flex items-center justify-between gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors cursor-pointer"
-                        >
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <span className="w-6 h-6 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center justify-center shrink-0">
-                              {c.soCau || idx + 1}
-                            </span>
-                            <div className="truncate">
-                              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                                Câu {c.soCau || idx + 1} (Phần {c.phan || 'I'}):
-                              </span>
-                              <span className="text-xs text-slate-500 dark:text-slate-400 ml-1.5">
-                                {c.chuyenDe || 'Hoá học'}
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-2 shrink-0">
-                            {/* Ô "em chọn" phải ĐỎ RÕ, không phải hồng nhạt:
-                                đây là chỗ em phải nhìn thấy đầu tiên trong cả
-                                bảng câu sai. Nền đỏ chữ trắng, cùng một kiểu ở
-                                cả ba cổng. */}
-                            {yDung !== null && yDung > 0 && (
-                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
-                                {chuDiemTheoY(yDung, soYCuaCau(c.dapAnDung))}
-                              </span>
-                            )}
-                            {laBoTrong && (
-                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
-                                Bỏ trống
-                              </span>
-                            )}
-                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-rose-600 text-white border border-rose-700">
-                              Em chọn: {c.dapAnChon || '—'}
-                            </span>
-                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                              Đúng: {c.dapAnDung || '—'}
-                            </span>
-                            <span className="text-xs text-slate-400">
-                              {moRong ? '▲' : '▼'}
-                            </span>
-                          </div>
-                        </button>
-
-                        {/* Chi tiết câu sai và Lời giải đúng chuẩn Ảnh 4 */}
-                        {moRong && (
-                          <div className="p-4 pt-2 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 text-xs space-y-3 animate-google-fade">
-                            {/* Nội dung câu hỏi */}
-                            {c.text && (
-                              <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-medium leading-relaxed">
-                                {c.text}
-                              </div>
-                            )}
-
-                            {/* Lựa chọn A, B, C, D */}
-                            {Array.isArray(c.choices) && c.choices.length > 0 && (
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                {c.choices.map((ch: string, cIdx: number) => {
-                                  const k = String.fromCharCode(65 + cIdx)
-                                  const laDung = k === c.dapAnDung
-                                  const laChon = k === c.dapAnChon
-                                  return (
-                                    <div
-                                      key={k}
-                                      className={`p-2.5 rounded-xl border flex items-center gap-2 ${
-                                        laDung
-                                          ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-200 font-semibold'
-                                          : laChon
-                                          ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200'
-                                          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
-                                      }`}
-                                    >
-                                      <span className="w-5 h-5 rounded-full bg-slate-200/80 dark:bg-slate-700 flex items-center justify-center font-bold text-[11px] shrink-0">
-                                        {k}
-                                      </span>
-                                      <span className="truncate">{ch}</span>
-                                    </div>
-                                  )
-                                })}
-                              </div>
-                            )}
-
-                            {/* HỘP LỜI GIẢI ĐÚNG CHUẨN ẢNH 4 (MÀU KEM / HỔ PHÁCH) */}
-                            <div className="p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 text-amber-950 dark:text-amber-100 shadow-sm space-y-3">
-                              {/* Đáp án */}
-                              <div className="text-sm font-semibold text-amber-800 dark:text-amber-300">
-                                Đáp án: <strong className="text-base font-black text-amber-950 dark:text-amber-100">{lg.ketQua || c.dapAnDung || '—'}</strong>
-                              </div>
-
-                              {/* Kiến thức cốt lõi */}
-                              {lg.chot && (
-                                <div>
-                                  <div className="text-[10px] font-extrabold tracking-wider uppercase text-amber-800 dark:text-amber-400 mb-1">
-                                    KIẾN THỨC CỐT LÕI
-                                  </div>
-                                  <div className="text-xs sm:text-sm font-bold leading-relaxed text-amber-950 dark:text-amber-100">
-                                    {lg.chot}
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Vì sao chọn / không chọn từng phương án */}
-                              {lg.lyDo && lg.lyDo.length > 0 && (
-                                <div>
-                                  <div className="text-[10px] font-extrabold tracking-wider uppercase text-amber-800 dark:text-amber-400 mb-1">
-                                    VÌ SAO CHỌN / KHÔNG CHỌN TỪNG PHƯƠNG ÁN
-                                  </div>
-                                  <div className="space-y-1 text-xs leading-relaxed">
-                                    {lg.lyDo.map((p) => (
-                                      <div key={p.khoa} className="flex items-start gap-1.5 py-0.5 border-t border-amber-200/40 dark:border-amber-800/40 first:border-t-0">
-                                        <strong className="text-amber-900 dark:text-amber-200">{p.khoa}.</strong>
-                                        <span className={`font-bold ${p.dung ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>
-                                          {p.dung ? '✓' : '✗'}
-                                        </span>
-                                        <span className="text-amber-900 dark:text-amber-200">{p.ly}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Làm từng bước (nếu có) */}
-                              {lg.buoc && lg.buoc.length > 0 && (
-                                <div>
-                                  <div className="text-[10px] font-extrabold tracking-wider uppercase text-amber-800 dark:text-amber-400 mb-1">
-                                    LÀM TỪNG BƯỚC
-                                  </div>
-                                  <div className="space-y-1 text-xs">
-                                    {lg.buoc.map((b, bIdx) => (
-                                      <div key={bIdx}>{bIdx + 1}. {b}</div>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
+                  {dsCauSai.map((c, idx) => (
+                    <DongCauSai key={c.qid || idx} c={c} stt={c.soCau || idx + 1} />
+                  ))}
                 </div>
               )}
             </div>
@@ -853,15 +528,6 @@ export default function BaoCaoCaThiHocSinhModal({
           )}
 
           {/* TAB 4: MỨC TIẾN BỘ */}
-          {tabHienThi === 'tien_bo' && (
-            // MỘT BIỂU ĐỒ TIẾN BỘ DUY NHẤT CHO MỌI BÁO CÁO.
-            // Thầy chốt 14/09: "Mục mức độ tiến bộ đồng bộ đúng theo ảnh ở tất
-            // cả các báo cáo." Trước đây mỗi màn tự vẽ một kiểu — cùng một em,
-            // cùng bốn ca, ra ba hình khác nhau.
-            <div className="animate-google-fade">
-              <BieuDoTienBoGoogle ca={caChoBieuDo} />
-            </div>
-          )}
 
           {/* CÁC TAB BỔ SUNG (DÀNH CHO GIÁO VIÊN NẾU CÓ) */}
           {extraTabs?.map((t) =>

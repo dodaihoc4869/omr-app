@@ -15,6 +15,8 @@ import { resolve } from 'node:path'
 import { goiBaiThi } from '../src/lib/goi-bao-cao'
 import { docSoDem } from '../src/components/DongDemCau'
 import { demKetQua, type CauDeDem } from '../src/lib/dem-ket-qua'
+import { anhCuaCau } from '../src/components/KhoiCauSai'
+import { danhGiaBai } from '../src/lib/danh-gia-bai'
 
 const doc = (p: string) => readFileSync(resolve(__dirname, '..', p), 'utf8')
 
@@ -133,27 +135,119 @@ describe('khắc phục gộp cả bỏ trống lẫn phần II chưa trọn ý'
 })
 
 describe('ghi rõ tính điểm cho mấy ý', () => {
-  it('cả hai cổng đều in biểu điểm theo ý cho câu phần II', () => {
+  it('biểu điểm theo ý nằm trong khối dùng chung, nên hai cổng đều có', () => {
+    const k = doc('src/components/KhoiCauSai.tsx')
+    expect(k).toContain('chuDiemTheoY(')
+    expect(k).toContain('soYDungPhanII(')
+    // Và cả hai cổng vẽ danh sách câu sai bằng đúng khối ấy.
     for (const f of ['src/components/BaoCaoCaThiHocSinhModal.tsx', 'src/components/BaoCaoCaThiPhuHuynhModal.tsx']) {
-      expect(doc(f), f).toContain('chuDiemTheoY(')
-      expect(doc(f), f).toContain('soYDungPhanII(')
+      expect(doc(f), f).toContain('<DongCauSai key=')
     }
   })
 })
 
-describe('mức độ tiến bộ — một biểu đồ duy nhất', () => {
-  it('cả hai cổng vẽ bằng BieuDoTienBoGoogle, không màn nào tự vẽ nữa', () => {
-    for (const f of ['src/components/BaoCaoCaThiHocSinhModal.tsx', 'src/components/BaoCaoCaThiPhuHuynhModal.tsx']) {
-      const t = doc(f)
-      expect(t, f).toContain('<BieuDoTienBoGoogle ca={caChoBieuDo} />')
-      // Khối tự vẽ cũ đã bỏ hẳn.
-      expect(t, f).not.toContain('phanTichTienBo')
+describe('BỎ HẲN thẻ Mức tiến bộ khỏi mọi báo cáo', () => {
+  // Thầy chốt 14/09: "bỏ thẻ mức tiến bộ trong báo cáo". Trước đó màn theo dõi
+  // ca còn chèn thêm MỘT thẻ "Mức độ tiến bộ" nữa qua `extraTabs`, nên báo cáo
+  // mở từ đó có hai thẻ gần trùng tên — đúng cảnh thầy chụp.
+  const HS = doc('src/components/BaoCaoCaThiHocSinhModal.tsx')
+  const PH = doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')
+  const MON = doc('src/screens/ExamMonitorScreen.tsx')
+
+  it('không modal nào còn thẻ tiến bộ', () => {
+    for (const [t, ten] of [[HS, 'HS'], [PH, 'PH']] as const) {
+      expect(t, ten).not.toContain("'tien_bo'")
+      expect(t, ten).not.toContain('BieuDoTienBoGoogle')
+      expect(t, ten).not.toContain('phanTichTienBo')
     }
   })
 
-  it('ca đang mở luôn có mặt trên biểu đồ, kể cả khi lịch sử chưa về', () => {
+  it('màn theo dõi ca không còn thẻ nào tên "tiến bộ" nữa', () => {
+    // Thẻ phụ của thầy được giữ (mạnh–yếu, lịch sử ca) nhưng đổi tên đúng bản
+    // chất là "Hồ sơ em", và biểu đồ tiến bộ trong đó đã bỏ hẳn.
+    expect(MON).toContain("label: 'Hồ sơ em'")
+    expect(MON).not.toContain("label: 'Mức độ tiến bộ'")
+    expect(MON).not.toContain('BieuDoTienBoGoogle')
+  })
+
+  it('BA THẺ BÁO CÁO giống hệt nhau ở cả hai cổng', () => {
+    for (const t of [HS, PH]) {
+      expect(t).toContain('Câu sai cần chữa')
+      expect(t).toContain('Mức độ nhận thức')
+    }
+  })
+})
+
+describe('câu sai hiện đủ đề, ảnh, bốn ý phần II và lời giải chuẩn', () => {
+  const HS = doc('src/components/BaoCaoCaThiHocSinhModal.tsx')
+  const PH = doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')
+  const KHOI = doc('src/components/KhoiCauSai.tsx')
+
+  it('cả hai cổng vẽ câu sai bằng CÙNG một khối, cả đầu dòng lẫn thân dòng', () => {
+    expect(HS).toContain('<DongCauSai key={c.qid || idx} c={c} stt={c.soCau || idx + 1} />')
+    expect(PH).toContain('<DongCauSai key={c.qid || i} c={c} stt={c.soCau || i + 1} />')
+    // Không cổng nào còn tự dựng đầu dòng hay lời giải nữa.
+    expect(HS).not.toContain('chuanHoaLoiGiaiCau')
+    expect(PH).not.toContain('chuanHoaLoiGiaiCau')
+    expect(HS).not.toContain('cauSaiMoRong')
+  })
+
+  it('KHÔNG còn khối chữ dài ngoằng cạnh nút mở đề', () => {
+    // Trên điện thoại nó rơi thành mỗi dòng một chữ, cao gần hết màn hình.
+    expect(HS).not.toContain('Mở lại đề thi gốc để xem lại bài làm')
+    expect(HS).not.toContain('các đáp án đã chọn và thời gian làm từng câu')
+    expect(HS).toContain('Xem đề và lời giải kèm lỗi sai')
+  })
+
+  it('khối ấy vẽ đủ ảnh, bảng, bốn ý phần II và trả lời ngắn', () => {
+    expect(KHOI).toContain('anhCuaCau')
+    expect(KHOI).toContain('<img')
+    expect(KHOI).toContain('c.table')
+    expect(KHOI).toContain('c.ideas')
+    expect(KHOI).toContain("phan === 'III'")
+    expect(KHOI).toContain('LoiGiaiCauSai')
+  })
+
+  it('nhận ảnh ở mọi kiểu kho đề từng dùng', () => {
+    expect(anhCuaCau({ imageDataUrl: 'data:image/png;base64,AAAAAAAAAAAA' })).toHaveLength(1)
+    expect(anhCuaCau({ hinhAnh: ['https://vi.du/a.png'] })).toHaveLength(1)
+    expect(anhCuaCau({ hinhAnh: 'https://vi.du/b.png' })).toHaveLength(1)
+    // Rác thì bỏ, không vẽ thẻ ảnh vỡ.
+    expect(anhCuaCau({ hinhAnh: 'x', imageDataUrl: '' })).toHaveLength(0)
+    expect(anhCuaCau({})).toHaveLength(0)
+  })
+})
+
+describe('nhận xét phải đúng với con số của chính bài đó', () => {
+  it('bài 10 điểm KHÔNG còn bị khen "thiếu một chút nữa là 10"', () => {
+    const d = danhGiaBai(10, 0, 12)
+    expect(d.xepLoai).toBe('Trọn điểm')
+    expect(d.thongDiep).toContain('làm đúng hết trên 12 câu')
+    expect(d.thongDiep).not.toContain('thiếu một chút')
+    expect(d.thongDiep).not.toContain('khắc phục')
+  })
+
+  it('còn câu phải chữa thì nhận xét nhắc ĐÚNG số câu ấy', () => {
+    expect(danhGiaBai(9.5, 2, 12).thongDiep).toContain('2 câu cần chữa')
+    expect(danhGiaBai(2, 12, 12).thongDiep).toContain('12 câu cần chữa')
+  })
+
+  it('không câu nào dùng dấu chấm than hay lời khen suông', () => {
+    for (const [d, c] of [[10, 0], [9.5, 1], [8.2, 3], [7, 5], [5.5, 8], [2, 12]] as const) {
+      const t = danhGiaBai(d, c, 12).thongDiep
+      expect(t, `${d}/${c}`).not.toContain('!')
+      expect(t, `${d}/${c}`).not.toContain('Đừng nản lòng')
+      expect(t, `${d}/${c}`).not.toContain('Phong độ đỉnh cao')
+    }
+  })
+
+  it('chưa biết tổng số câu thì KHÔNG bịa ra', () => {
+    expect(danhGiaBai(7, 3, null).thongDiep).not.toContain('trên')
+  })
+
+  it('hai cổng dùng chung một hàm xếp loại', () => {
     for (const f of ['src/components/BaoCaoCaThiHocSinhModal.tsx', 'src/components/BaoCaoCaThiPhuHuynhModal.tsx']) {
-      expect(doc(f), f).toContain("if (!ds.some((c) => c.maCa === baiThi.maCa))")
+      expect(doc(f), f).toContain('danhGiaBai(diem, soKhacPhuc, tongCau)')
     }
   })
 })

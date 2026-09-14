@@ -115,11 +115,27 @@ describe('KhoiTienBo dựng thật — chữ hiện ra phải khớp đầu màn
   })
 })
 
-describe('màn Ca thi đưa đúng bản đè xuống biểu đồ', () => {
-  it('lấy mã ca ĐANG MỞ và điểm tự chấm của đúng em đang xem', async () => {
+describe('màn Ca thi KHÔNG còn biểu đồ tiến bộ', () => {
+  // ĐỔI LUẬT 14/09 — thầy chốt: "bỏ thẻ mức tiến bộ trong báo cáo". Thẻ ấy nằm
+  // trên màn Ca thi, ngay cạnh thẻ "Mức tiến bộ" của chính báo cáo, thành hai
+  // thẻ gần trùng tên nằm sát nhau (thầy chụp màn hình).
+  //
+  // Phép kiểm cũ khoá việc màn Ca thi truyền `diemDe` xuống biểu đồ. Biểu đồ đã
+  // bỏ khỏi màn ấy nên khẳng định cũ không còn đối tượng. Phần LÕI vẫn được
+  // khoá nguyên vẹn ở các phép kiểm bên trên: `KhoiTienBo` phải đè đúng điểm tự
+  // chấm lên đúng mã ca.
+  it('không còn biểu đồ tiến bộ trên màn Ca thi', async () => {
     const fs = await import('node:fs')
     const path = await import('node:path')
     const ma = fs.readFileSync(path.join(process.cwd(), 'src/screens/ExamMonitorScreen.tsx'), 'utf8')
-    expect(ma).toContain('diemDe={chiTiet && emTrongCa?.graded ? { [chiTiet.ca.maCa]: emTrongCa.graded.score.total } : null}')
+    expect(ma).not.toContain('BieuDoTienBoGoogle')
+    expect(ma).not.toContain("label: 'Mức độ tiến bộ'")
+  })
+
+  it('màn Hồ sơ học sinh vẫn giữ biểu đồ và vẫn đè đúng điểm tự chấm', async () => {
+    const fs = await import('node:fs')
+    const path = await import('node:path')
+    const hs = fs.readFileSync(path.join(process.cwd(), 'src/screens/HocSinhScreen.tsx'), 'utf8')
+    expect(hs).toContain('BieuDoTienBoGoogle')
   })
 })

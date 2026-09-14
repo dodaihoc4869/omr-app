@@ -106,19 +106,14 @@ describe('BA APP — không màn nào tự dựng số câu', () => {
 // trôi lẫn vào nền.
 // ===========================================================================
 describe('Đáp án EM CHỌN tô đỏ ở cả ba cổng', () => {
-  it('cổng học sinh: nền đỏ, chữ trắng', () => {
-    expect(HS_MODAL).toContain('bg-rose-600 text-white border border-rose-700')
-    const i = HS_MODAL.indexOf('Em chọn: {c.dapAnChon')
+  it('ô "Em chọn" nền đỏ chữ trắng — nay nằm trong khối dùng chung nên cả ba cổng giống nhau', () => {
+    const K = doc('src/components/KhoiCauSai.tsx')
+    expect(K).toContain('bg-rose-600 text-white border border-rose-700')
+    const i = K.indexOf('Em chọn: {c.dapAnChon')
     expect(i).toBeGreaterThan(0)
-    expect(HS_MODAL.slice(Math.max(0, i - 260), i)).toContain('bg-rose-600')
+    expect(K.slice(Math.max(0, i - 260), i)).toContain('bg-rose-600')
     // KHÔNG còn kiểu hồng nhạt cũ.
-    expect(HS_MODAL).not.toContain('bg-rose-50 dark:bg-rose-950 text-rose-600')
-  })
-
-  it('cổng phụ huynh: cùng một kiểu', () => {
-    const i = PH_MODAL.indexOf('Con đã chọn:')
-    expect(i).toBeGreaterThan(0)
-    expect(PH_MODAL.slice(i, i + 300)).toContain('bg-rose-600 text-white border border-rose-700')
+    expect(K).not.toContain('bg-rose-50 dark:bg-rose-950 text-rose-600')
   })
 
   it('app của Thầy: phần em chọn tô đỏ, đáp án đúng giữ màu thường', () => {
