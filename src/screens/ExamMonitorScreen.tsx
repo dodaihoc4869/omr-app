@@ -1478,7 +1478,10 @@ export default function ExamMonitorScreen() {
                               </b>
                               {c.chuyenDe ? ` · ${c.chuyenDe}` : ''} · <span style={{ color: 'var(--do)' }}>{c.soLanSai > 0 ? `sai lần thứ ${c.soLanSai}` : 'lại sai'}</span>
                               <span style={{ ...SO, display: 'block', color: 'var(--nhat)' }}>
-                                đúng: {c.dapAnDung || '—'} · em chọn: {c.dapAnChon || 'bỏ trống'}
+                                {/* Cùng luật với hai cổng kia: phần EM CHỌN tô đỏ,
+                                    phần đáp án đúng giữ màu chữ thường. */}
+                                đúng: {c.dapAnDung || '—'} · em chọn:{' '}
+                                <b style={{ color: 'var(--do)' }}>{c.dapAnChon || 'bỏ trống'}</b>
                               </span>
                             </div>
                           ))}

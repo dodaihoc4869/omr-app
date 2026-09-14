@@ -565,7 +565,7 @@ export default function BaoCaoCaThiHocSinhModal({
                     }}
                     className="px-3.5 py-2 rounded-xl btn-google-outlined text-xs font-semibold shrink-0 cursor-pointer"
                   >
-                    Mở lại bài thi
+                    Xem đề và lời giải kèm lỗi sai
                   </button>
                 )}
               </div>
@@ -635,7 +635,11 @@ export default function BaoCaoCaThiHocSinhModal({
                           </div>
 
                           <div className="flex items-center gap-2 shrink-0">
-                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800">
+                            {/* Ô "em chọn" phải ĐỎ RÕ, không phải hồng nhạt:
+                                đây là chỗ em phải nhìn thấy đầu tiên trong cả
+                                bảng câu sai. Nền đỏ chữ trắng, cùng một kiểu ở
+                                cả ba cổng. */}
+                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-rose-600 text-white border border-rose-700">
                               Em chọn: {c.dapAnChon || '—'}
                             </span>
                             <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">

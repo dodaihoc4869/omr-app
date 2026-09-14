@@ -94,3 +94,51 @@ describe('BA APP — không màn nào tự dựng số câu', () => {
     }
   })
 })
+
+// ===========================================================================
+// "EM CHỌN" PHẢI ĐỎ RÕ — thầy chốt 14/09, đồng bộ cả ba cổng.
+// Đây là chỗ em phải nhìn thấy đầu tiên trong bảng câu sai; hồng nhạt thì
+// trôi lẫn vào nền.
+// ===========================================================================
+describe('Đáp án EM CHỌN tô đỏ ở cả ba cổng', () => {
+  it('cổng học sinh: nền đỏ, chữ trắng', () => {
+    expect(HS_MODAL).toContain('bg-rose-600 text-white border border-rose-700')
+    const i = HS_MODAL.indexOf('Em chọn: {c.dapAnChon')
+    expect(i).toBeGreaterThan(0)
+    expect(HS_MODAL.slice(Math.max(0, i - 260), i)).toContain('bg-rose-600')
+    // KHÔNG còn kiểu hồng nhạt cũ.
+    expect(HS_MODAL).not.toContain('bg-rose-50 dark:bg-rose-950 text-rose-600')
+  })
+
+  it('cổng phụ huynh: cùng một kiểu', () => {
+    const i = PH_MODAL.indexOf('Con đã chọn:')
+    expect(i).toBeGreaterThan(0)
+    expect(PH_MODAL.slice(i, i + 300)).toContain('bg-rose-600 text-white border border-rose-700')
+  })
+
+  it('app của Thầy: phần em chọn tô đỏ, đáp án đúng giữ màu thường', () => {
+    const M = doc('src/screens/ExamMonitorScreen.tsx')
+    const i = M.indexOf("· em chọn:")
+    expect(i).toBeGreaterThan(0)
+    const than = M.slice(i, i + 200)
+    expect(than).toContain("<b style={{ color: 'var(--do)' }}>{c.dapAnChon")
+  })
+
+  it('màu lấy từ token, không gõ mã màu vào mã nguồn', () => {
+    const M = doc('src/screens/ExamMonitorScreen.tsx')
+    const i = M.indexOf("· em chọn:")
+    expect(M.slice(i, i + 200)).toContain('var(--do)')
+  })
+})
+
+describe('Nút mở bài đã nộp nói đúng việc nó làm', () => {
+  // "Mở lại bài thi" khiến em tưởng được thi lại. Nó chỉ mở bài ĐÃ NỘP ở chế
+  // độ xem: đề, lời giải và chỗ em sai.
+  it('cả hai chỗ đều đổi tên', () => {
+    const SP = doc('src/screens/StudentPortalScreen.tsx')
+    expect(SP).toContain('Xem đề và lời giải kèm lỗi sai')
+    expect(SP).not.toContain('Mở lại bài thi')
+    expect(HS_MODAL).toContain('Xem đề và lời giải kèm lỗi sai')
+    expect(HS_MODAL).not.toContain('Mở lại bài thi')
+  })
+})

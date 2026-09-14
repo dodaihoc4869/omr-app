@@ -766,7 +766,10 @@ export default function BaoCaoCaThiPhuHuynhModal({
 
                         <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 flex items-center justify-between text-[11px]">
                           <div>
-                            Con đã chọn: <strong className="text-rose-600 font-bold">{c.dapAnChon || 'Bỏ trống'}</strong>
+                            Con đã chọn:{' '}
+                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-rose-600 text-white border border-rose-700">
+                              {c.dapAnChon || 'Bỏ trống'}
+                            </span>
                           </div>
                           <div>
                             Đáp án đúng của đề: <strong className="text-emerald-600 font-bold">{c.dapAnDung || 'A'}</strong>

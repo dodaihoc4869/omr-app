@@ -1180,7 +1180,7 @@ export default function StudentPortalScreen() {
                         href={`/t/${item.maCa}?sbd=${auth.sbd}`}
                         className="py-2 px-4 rounded-full btn-google-outlined text-xs font-medium text-center"
                       >
-                        Mở lại bài thi
+                        Xem đề và lời giải kèm lỗi sai
                       </a>
                     </div>
                   </div>
