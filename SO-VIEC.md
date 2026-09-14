@@ -1,9 +1,9 @@
-# SỔ VIỆC — 14/09 lượt 9
+# SỔ VIỆC — 14/09 lượt 9 + 10
 
 - [x] "đáp án trả lời ngắn phải có giải từng bước. Sửa lại và đồng bộ hết mọi báo cáo, mọi ca thi, mọi app"  | bằng chứng: `vitest run tests/loi-giai-tung-buoc-1409.test.ts` 6/6 · `tests/loi-giai-chuan-va-bao-cao-hs.test.ts` 5/5
 - [x] "Khắc phục lỗi sai trên điện thoại app học sinh không chạy."  | bằng chứng: `vitest run tests/khac-phuc-tren-dien-thoai-1409.test.ts` 9/9
-- [ ] "Gộp 2 nút này làm một, thiết kế lại cho tinh tế hiện đại đẹp và phù hợp chuẩn google"  | bằng chứng: (chưa có)
-- [ ] "Tạo cho tôi một nút máy chiếu ... file html quay ngang chia 2 phần, mỗi trang in tên 2 học sinh vào 2 nửa và đề bài đi kèm, đề bài có nút hiện lời giải, phần dưới trắng để học sinh lên bảng làm, xong 1 đợt thì kéo xuống hoặc bấm tiếp để hiện 2 đề và 2 học sinh tiếp theo"  | bằng chứng: (chưa có)
+- [x] "Gộp 2 nút này làm một, thiết kế lại cho tinh tế hiện đại đẹp và phù hợp chuẩn google"  | bằng chứng: `vitest run tests/may-chieu-len-bang-1409.test.ts` 11/11 · `tests/man-goi-len-bang-hien-ra-1009.test.tsx` 7/7
+- [x] "Tạo cho tôi một nút máy chiếu ... file html quay ngang chia 2 phần, mỗi trang in tên 2 học sinh vào 2 nửa và đề bài đi kèm, đề bài có nút hiện lời giải, phần dưới trắng để học sinh lên bảng làm, xong 1 đợt thì kéo xuống hoặc bấm tiếp để hiện 2 đề và 2 học sinh tiếp theo"  | bằng chứng: `vitest run tests/may-chieu-len-bang-1409.test.ts` 11/11
 - [!] Phát hành  | KẸT: phiên Claude KHÁC đang sửa cùng kho (DauTruongGame.tsx sửa lúc 10:01, sw.ts, vite.config.ts, package.json, public/_headers) — đẩy bản live bây giờ là kéo theo việc dở của phiên ấy
 
 ## 7 CỬA — đo lúc 10:19–10:22 ngày 14/09
@@ -61,3 +61,25 @@ Sửa: tờ phiếu đi kèm lên chỗ gọi và mở thẳng; modal mặc đ�
 vi BỊA ("tự động hoàn thiện kiến thức cốt lõi … cho câu hạt nhân nếu thiếu cấu
 trúc"). Thầy đổi luật ngày 14/09, nên hai ca ấy nay khoá điều ngược lại: cấm bịa.
 Không phải sửa test cho xanh — đã ghi chú ngày và lý do ngay trong tệp.
+
+
+## LƯỢT 10 — PHÂN CÔNG LÊN BẢNG
+
+Gộp hai nút xanh giống hệt nhau ("Xếp giờ" và "Phân công lên bảng") thành MỘT
+nút chạy cả hai đúng thứ tự. Thêm nút viền "Chiếu lên bảng" (chỉ hiện khi đã có
+bảng phân công) dựng `src/lib/html-may-chieu.ts`: quay ngang, chia đôi màn, mỗi
+đợt hai em — tên em trên, đề bài giữa, nút hiện lời giải riêng từng nửa, nửa
+dưới để trắng cho em viết bảng. Kéo xuống, bấm "Đợt tiếp", hoặc phím ← → đều
+sang hai em tiếp theo. In ra là A4 quay ngang, mỗi đợt một trang.
+
+Lẻ một em thì nửa kia để trắng và nói rõ — không độn thêm em cho đủ cặp.
+
+### Đã sửa test cũ — khai rõ
+`tests/man-goi-len-bang-hien-ra-1009.test.tsx` có hai ca khoá bố cục HAI nút cũ
+("khối Giáo án đứng TRƯỚC nút Phân công cũ", "nút Phân công cũ bấm được"). Thầy
+chốt gộp nút ngày 14/09 nên hai ca ấy nay khoá bố cục MỘT nút, và khoá thêm:
+nút máy chiếu chưa hiện khi chưa chạy phân công. Đã ghi ngày và lý do trong tệp.
+
+### 7 cửa — đo lại lúc 10:40–10:45
+tsc 0/0 · server tsc 0/0 · 3.667 phép (84+84+83 tệp) · check:mau sạch ·
+kiem-13 18/18 · kiem-sw 6/6 · vite build rc=0

@@ -137,7 +137,16 @@ describe('KHỐI GIÁO ÁN 80 PHÚT PHẢI DỰNG RA ĐƯỢC', () => {
     expect(t).toContain('ngân sách chữa')
   }, 30000)
 
-  it('khối Giáo án đứng TRƯỚC nút Phân công cũ — thầy đọc từ trên xuống là gặp', async () => {
+  // SỬA 14/09 — THẦY GỘP HAI NÚT, KHÔNG PHẢI SỬA TEST CHO XANH.
+  //
+  // Ca này trước kia khoá thứ tự "khối Giáo án đứng TRƯỚC nút Phân công cũ".
+  // Thầy chốt ngày 14/09: "Gộp 2 nút này làm một" — hai nút xanh y hệt nhau
+  // nằm cách nhau một thẻ là chỗ dễ bấm nhầm nhất. Nay chỉ còn MỘT nút chạy cả
+  // xếp giờ lẫn phân công, nên thứ tự cũ không còn thứ để so.
+  //
+  // Điều đáng khoá bây giờ: khối Giáo án phải dựng ra, và nút gộp phải nằm
+  // TRONG khối ấy chứ không trôi xuống cuối màn.
+  it('khối Giáo án dựng ra và nút gộp nằm ngay trong khối', async () => {
     dsCaTra = [ca('111111', false)]
     const r = render(<GoiLenBangScreen />)
     await waitFor(() => expect(r.getByText('Ca 111111')).toBeTruthy(), CHO)
@@ -145,16 +154,16 @@ describe('KHỐI GIÁO ÁN 80 PHÚT PHẢI DỰNG RA ĐƯỢC', () => {
     await waitFor(() => expect(r.container.textContent).toContain('Giáo án 80 phút'), CHO)
     const t = r.container.textContent ?? ''
     const viTriGiaoAn = t.indexOf('Giáo án 80 phút')
-    // Dò NÚT chứ không dò cụm chữ: dòng giải thích ở mục 1 cũng nhắc tên chế độ
-    // "Phân công lên bảng", nên `indexOf` trần bắt nhầm nó ở vị trí 180.
-    const viTriPhanCong = t.indexOf('Phân công lên bảng (')
+    const viTriNut = t.indexOf('Xếp giờ & phân công lên bảng')
     expect(viTriGiaoAn).toBeGreaterThan(-1)
-    expect(viTriPhanCong).toBeGreaterThan(-1)
-    expect(viTriGiaoAn).toBeLessThan(viTriPhanCong)
+    expect(viTriNut).toBeGreaterThan(-1)
+    expect(viTriGiaoAn).toBeLessThan(viTriNut)
+    // Nút cũ đã đi hẳn, không còn hai nút xanh cạnh nhau.
+    expect(t).not.toContain('Phân công lên bảng (')
   }, 30000)
 
 
-  it('mở ca xong là nút Xếp giờ BẤM ĐƯỢC NGAY — không bắt thầy đi tích đề trước', async () => {
+  it('mở ca xong là nút gộp BẤM ĐƯỢC NGAY — không bắt thầy đi tích đề trước', async () => {
     // Ca thường (không có bộ rút sẵn) rơi vào nhánh `tu_chon`. Nếu nhánh ấy để
     // `dsCau` rỗng thì nút Xếp giờ mờ, và thầy lại "chưa thấy thay đổi gì" một
     // lần nữa — chỉ khác là lần này vì nút bấm không ăn.
@@ -170,8 +179,11 @@ describe('KHỐI GIÁO ÁN 80 PHÚT PHẢI DỰNG RA ĐƯỢC', () => {
     // Cùng điều kiện mờ với nút Phân công cũ: mở ca + có em có mặt là bấm được.
     // Chưa tích đề thì bấm ra LỜI NHẮC, chứ không phải một nút chết lặng.
     expect((nut as HTMLButtonElement).disabled).toBe(false)
+    // 14/09: nút cũ "Phân công lên bảng (N em)" đã gộp vào chính nút trên.
     const nutCu = [...r.container.querySelectorAll('button')].find((b) => (b.textContent ?? '').includes('Phân công lên bảng ('))
-    expect((nutCu as HTMLButtonElement).disabled).toBe(false)
+    expect(nutCu).toBeUndefined()
+    // Nút máy chiếu CHƯA hiện khi chưa chạy phân công — chưa có gì để chiếu.
+    expect(r.container.textContent ?? '').not.toContain('Chiếu lên bảng')
   }, 30000)
 
   it('CHƯA mở ca thì KHÔNG dựng khối Giáo án — không hiện khối rỗng', async () => {

@@ -12,7 +12,7 @@
 //   · phần còn lại mới chia cho em, ưu tiên em SAI CHÍNH CÂU ĐÓ.
 // Thuật toán ở lib/phan-cong.ts, phần đọc dữ liệu ca ở lib/du-lieu-len-bang.ts.
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Shuffle } from 'lucide-react'
+import { ArrowLeft, ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Shuffle, MonitorPlay } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, lichSuLenBang, type CaTomTat, type LichSuLenBangEm } from '../lib/exam-api'
 import { docKhoChuaCa, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
@@ -27,6 +27,8 @@ import { LOC_SAO_MAC_DINH, MOI_LOC_SAO, TEN_LOC_SAO, type LocSao } from '../lib/
 import { LOC_DANG_MAC_DINH, MOI_LOC_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
 import { SO_CAU_MAC_DINH } from '../lib/cau-hinh-chua'
 import ThanhSoCauChua from '../components/ThanhSoCauChua'
+import KhungXemPhieu from '../components/KhungXemPhieu'
+import type { OBang as OBangMayChieu } from '../lib/html-may-chieu'
 import { bangChu, chuCau, chuChum, MAC_DINH, phanCong, TEN_MUC_NHAM, type CauChua, type DongPhanCong, type KetQuaPhanCong } from '../lib/phan-cong'
 import { baiLamCoGiayTuCa } from '../lib/du-lieu-len-bang'
 import { CAU_HINH_LEN_BANG_MAC_DINH, TEN_LANE, dongHo, nganSachGiay } from '../lib/len-bang-cau-hinh'
@@ -140,6 +142,9 @@ export default function GoiLenBangScreen() {
   const [kho, setKho] = useState<KhoDoKhoLuu>(KHO_DO_KHO_RONG)
   const [dangDungKho, setDangDungKho] = useState('')
   const [kqXep, setKqXep] = useState<KetQuaXep | null>(null)
+
+  /** HTML tờ máy chiếu đang mở. Rỗng là chưa dựng. */
+  const [htmlMayChieu, setHtmlMayChieu] = useState('')
   const [boBatBuoc, setBoBatBuoc] = useState<string[]>([])
   const [tranEm, setTranEm] = useState(CAU_HINH_LEN_BANG_MAC_DINH.SO_EM_LEN_BANG_TOI_DA)
   const [giayMoiEm, setGiayMoiEm] = useState(CAU_HINH_LEN_BANG_MAC_DINH.GIAY_LANE.L3)
@@ -550,6 +555,59 @@ export default function GoiLenBangScreen() {
     setSoLuot(luot)
     setKq(r)
     setXemCau('')
+  }
+
+  /** MỘT NÚT CHẠY CẢ HAI, đúng thứ tự: xếp giờ trước để biết em nào lên bảng,
+   * phân công sau để biết em ấy chữa câu nào. */
+  const chayCaHai = () => {
+    chayGiaoAn()
+    chay(1)
+  }
+
+  /** TỜ MÁY CHIẾU — hai em một đợt, chiếu lên bảng để gọi lên chữa.
+   *
+   * Nguồn là ĐÚNG bảng phân công vừa chạy, không rút lại bộ khác: tờ chiếu lên
+   * bảng mà khác bảng phân công thầy đang cầm thì gọi nhầm em ngay. */
+  const moMayChieu = async () => {
+    const dsPc = kq?.phanCong ?? []
+    if (dsPc.length === 0) {
+      return showToast('Chưa có bảng phân công — bấm "Xếp giờ & phân công lên bảng" trước', 'warn')
+    }
+
+    const [{ cauLuyenTuBoCau }, { taoHtmlMayChieu }] = await Promise.all([
+      import('../lib/bai-tap-pdf'),
+      import('../lib/html-may-chieu'),
+    ])
+
+    const dsO: OBangMayChieu[] = []
+    const thieu: string[] = []
+    for (const p of dsPc) {
+      const day = traCau.get(p.cau.id)
+      if (!day) {
+        thieu.push(`${p.hoTen || p.sbd} — câu ${p.cau.so} phần ${p.cau.phan}`)
+        continue
+      }
+      const [cl] = cauLuyenTuBoCau([{ phan: day.phan, q: day.q } as Parameters<typeof cauLuyenTuBoCau>[0][number]])
+      if (!cl) {
+        thieu.push(`${p.hoTen || p.sbd} — câu ${p.cau.so} phần ${p.cau.phan}`)
+        continue
+      }
+      dsO.push({ sbd: p.sbd, hoTen: p.hoTen, soCau: p.cau.so, cau: cl, viSao: p.viSao })
+    }
+
+    // CẤM CHIẾU MỘT TỜ THIẾU CÂU MÀ KHÔNG NÓI. Câu nào không tra được nội dung
+    // thì nói thẳng tên em ấy, để thầy biết mà gọi tay.
+    if (thieu.length > 0) {
+      showToast(`${thieu.length} em chưa tra được đề: ${thieu.slice(0, 3).join(' · ')}`, 'warn')
+    }
+    if (dsO.length === 0) return
+
+    setHtmlMayChieu(
+      taoHtmlMayChieu(dsO, {
+        tenBuoi: du ? `Chữa bài ca ${du.maCa}` : 'Gọi lên bảng',
+        ngay: new Date(),
+      }),
+    )
   }
 
   const doiVang = (sbd: string) =>
@@ -1032,18 +1090,30 @@ export default function GoiLenBangScreen() {
             </span>
           </div>
 
+          {/* MỘT NÚT, MỘT VIỆC (thầy chốt 14/09: "gộp 2 nút này làm một").
+              Trước đây "Xếp giờ" và "Phân công lên bảng" là hai nút xanh y hệt
+              nhau, nằm cách nhau một thẻ — thầy phải nhớ bấm cái nào trước, và
+              bấm mỗi cái một lần mới đủ. Hai nút cùng màu cùng cỡ cạnh nhau là
+              chỗ dễ bấm nhầm nhất. Nay một nút chạy cả hai: xếp giờ trước, phân
+              công sau, đúng thứ tự vốn phải làm.
+
+              ĐIỀU KIỆN MỜ giữ nguyên `!du || soCoMat === 0`. Bản cũ từng mờ theo
+              `!dsCau.length`, mà `chayGiaoAn` đã có sẵn lời nhắc cho đúng ca ấy
+              — nút mờ chặn trước nên lời nhắc không bao giờ hiện. Nút chết lặng
+              là đúng thứ đặc tả cấm: không lặng lẽ sai. */}
           <div style={{ marginTop: 'var(--k4)' }}>
-            {/* CÙNG ĐIỀU KIỆN MỜ VỚI NÚT PHÂN CÔNG CŨ (`!du || soCoMat === 0`).
-                Bản trước mờ theo `!dsCau.length`, mà `chayGiaoAn` đã có sẵn lời
-                nhắc cho đúng ca ấy — nút mờ chặn trước nên lời nhắc không bao giờ
-                hiện. Thầy mở ca xong thấy "Xếp giờ (0 câu · 10 em)" nằm im, không
-                câu nào nói vì sao, trong khi nút cũ ngay dưới vẫn bấm được. Nút
-                chết lặng là đúng thứ đặc tả cấm: không lặng lẽ sai. */}
-            <NutChinh onClick={chayGiaoAn} disabled={!du || soCoMat === 0}>
-              <span className="inline-flex items-center" style={{ gap: 6 }}>
-                <Wand2 size={18} /> Xếp giờ ({dsCau.length} câu · {soCoMat} em)
+            <NutChinh onClick={chayCaHai} disabled={!du || soCoMat === 0}>
+              <span className="inline-flex items-center" style={{ gap: 8 }}>
+                <Wand2 size={18} />
+                <span>Xếp giờ &amp; phân công lên bảng</span>
+                <span style={{ ...SO, opacity: 0.82, fontWeight: 600 }}>
+                  {dsCau.length} câu · {soCoMat} em
+                </span>
               </span>
             </NutChinh>
+            <div style={{ ...NHAN_NHO, marginTop: 6, textAlign: 'center' }}>
+              Một lượt bấm ra cả giáo án theo phút và bảng phân công từng em.
+            </div>
           </div>
 
           {/* 5 — CẢNH BÁO THỪA GIỜ: hiện đúng con số và ba lựa chọn, CHỜ THẦY CHẠM */}
@@ -1150,12 +1220,34 @@ export default function GoiLenBangScreen() {
         </TheNoiDung>
       )}
 
-      {/* 4 — PHÂN CÔNG */}
-      <NutChinh onClick={() => chay(1)} disabled={!du || soCoMat === 0}>
-        <span className="inline-flex items-center" style={{ gap: 6 }}>
-          <Wand2 size={18} /> Phân công lên bảng ({soCoMat} em)
-        </span>
-      </NutChinh>
+      {/* 4 — PHÂN CÔNG: nút cũ đã gộp lên trên. Ở đây chỉ còn TỜ MÁY CHIẾU.
+
+          Nút phụ, không phải nút chính: việc chính là xếp giờ và phân công;
+          chiếu lên bảng là bước sau, và chỉ có nghĩa khi đã có bảng phân công.
+          Nên nó mang dáng nút viền (Material 3 outlined), không tranh chỗ với
+          nút xanh ở trên. */}
+      {kq && kq.phanCong.length > 0 && (
+        <button
+          type="button"
+          onClick={() => void moMayChieu()}
+          className="tap-target w-full font-bold flex items-center justify-center gap-2 select-none active:scale-[0.98] hover:-translate-y-0.5 transition-all duration-150"
+          style={{
+            height: 52,
+            marginTop: 'var(--k3)',
+            borderRadius: 'var(--bo-tron)',
+            background: 'var(--the)',
+            color: 'var(--xanh)',
+            border: '1px solid var(--vien)',
+            fontFamily: 'var(--sans)',
+            fontSize: 'var(--cx-2)',
+          }}
+        >
+          <MonitorPlay size={18} /> Chiếu lên bảng
+          <span style={{ ...SO, opacity: 0.75, fontWeight: 600 }}>
+            {Math.ceil(kq.phanCong.length / 2)} đợt · 2 em mỗi đợt
+          </span>
+        </button>
+      )}
 
       {kq && (
         <TheNoiDung>
@@ -1334,6 +1426,11 @@ export default function GoiLenBangScreen() {
             )}
           </div>
         </TheNoiDung>
+      )}
+
+      {/* TỜ MÁY CHIẾU — mở đúng trong khung xem chung với mọi phiếu khác. */}
+      {htmlMayChieu && (
+        <KhungXemPhieu html={htmlMayChieu} ten="Tờ máy chiếu — gọi lên bảng" dong={() => setHtmlMayChieu('')} />
       )}
     </div>
   )
