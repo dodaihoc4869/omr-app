@@ -32,6 +32,8 @@ import {
   type BoLocCauLuyen,
 } from '../lib/thuat-toan-rut-cau-sai'
 import KhungXemPhieu from './KhungXemPhieu'
+import { napKhoChoMayEm } from '../lib/kho-cho-may-em'
+import { loadScriptUrl } from '../lib/exam-db'
 
 /** Máy chưa đồng bộ kho đề của thầy — chỉ luyện lại được đúng các câu sai. */
 export const KHONG_CO_KHO =
@@ -74,7 +76,7 @@ export default function ModalKhacPhucCauSai({
   // mờ kèm đúng lý do, thay vì để em bấm vào một đường cụt.
   const [cheDo, setCheDo] = useState<1 | 2 | 3>(1)
   const [khoDe, setKhoDe] = useState<TeacherExamSource[]>([])
-  const [, setDangTaiKho] = useState(false)
+  const [dangTaiKho, setDangTaiKho] = useState(false)
   const [dangTao, setDangTao] = useState(false)
 
   // Tuỳ chọn Chế độ 2: Luyện thêm dạng câu sai
@@ -91,29 +93,48 @@ export default function ModalKhacPhucCauSai({
   // Vì sao không rút được câu nào — hiện ngay dưới nút, không im lặng.
   const [loiRut, setLoiRut] = useState<string>('')
 
-  // Tải kho đề khi mở modal
+  /** Khoá nội dung của danh sách câu sai — dùng làm deps thay cho chính mảng. */
+  const khoaCauSai = useMemo(() => dsCauSai.map((c) => `${c.maCa ?? ''}:${c.qid ?? ''}:${c.chuyenDe ?? ''}`).join('|'), [dsCauSai])
+
+  // TẢI KHO KHI MỞ MODAL — máy thầy lấy tại chỗ, máy em xin máy chủ.
+  //
+  // Thầy chốt 14/09: "Bạn phải đồng bộ sang máy học sinh." Kho trong IndexedDB
+  // chỉ có trên máy thầy (đồng bộ đòi mã bí mật), nên máy em rỗng và chế độ 2/3
+  // ra 0 câu. Nay hết kho máy thì XIN MÁY CHỦ rút hộ đúng chuyên đề em vừa sai
+  // — xem `src/lib/kho-cho-may-em.ts`.
   useEffect(() => {
     if (!isOpen) return
     let active = true
     setDangTaiKho(true)
-    loadExamSources()
-      .then((sources) => {
+    setLoiRut('')
+    void (async () => {
+      let sources: TeacherExamSource[] = []
+      try {
+        sources = await loadExamSources()
+      } catch {
+        sources = []
+      }
+      if (!active) return
+
+      if (sources.length === 0 && dsCauSai.length > 0) {
+        const url = await loadScriptUrl().catch(() => '')
+        const kq = await napKhoChoMayEm(url || '', sbd, dsCauSai)
         if (!active) return
-        setKhoDe(sources)
-        // Có kho (máy thầy / máy phụ huynh đã đồng bộ) thì giữ nếp cũ: mở sẵn
-        // chế độ 2. Không có kho thì ở nguyên chế độ 1.
-        if (sources.length > 0) setCheDo((hien) => (hien === 1 ? 2 : hien))
-      })
-      .catch(() => {
-        if (active) setKhoDe([])
-      })
-      .finally(() => {
-        if (active) setDangTaiKho(false)
-      })
+        sources = kq.nguon
+        if (kq.nguon.length === 0) setLoiRut(kq.loi || KHONG_CO_KHO)
+      }
+
+      if (!active) return
+      setKhoDe(sources)
+      if (sources.length > 0) setCheDo((hien) => (hien === 1 ? 2 : hien))
+      setDangTaiKho(false)
+    })()
     return () => {
       active = false
     }
-  }, [isOpen])
+    // `dsCauSai` là prop MẢNG: mỗi lượt vẽ lại là một tham chiếu mới. Để nó
+    // thẳng trong deps là xin máy chủ vô hạn lần. Khoá theo NỘI DUNG.
+  }, [isOpen, sbd, khoaCauSai])
 
   /** Máy này có kho đề của thầy hay không — quyết định bật/tắt chế độ 2 và 3. */
   const coKhoDe = khoDe.length > 0
@@ -627,8 +648,18 @@ export default function ModalKhacPhucCauSai({
             )}
           </div>
 
+          {/* Đang xin kho của máy chủ — nói ra, đừng để em nhìn "0 câu" rồi tưởng hỏng */}
+          {dangTaiKho && (
+            <div className="px-6 pb-3 shrink-0">
+              <div className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center gap-2">
+                <RefreshCw className="w-4 h-4 shrink-0 animate-spin" />
+                Đang lấy câu cùng dạng từ máy chủ…
+              </div>
+            </div>
+          )}
+
           {/* Vì sao chưa rút được — hiện ngay trên nút, không im lặng nuốt lỗi */}
-          {(loiRut || !coKhoDe) && (
+          {!dangTaiKho && (loiRut || !coKhoDe) && (
             <div className="px-6 pb-3 shrink-0">
               <div className="text-xs text-amber-800 bg-amber-50 p-3 rounded-xl border border-amber-200 flex items-start gap-2">
                 <Info className="w-4 h-4 shrink-0 mt-0.5" />

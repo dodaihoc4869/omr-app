@@ -71,6 +71,18 @@ describe('Tờ máy chiếu', () => {
     expect(html).not.toContain('Cần chú ý định luật bảo toàn')
   })
 
+  // Thầy 14/09 (lượt 11): "Lời giải hiện trong mục chiếu lên bảng bị lỗi".
+  // `oGiaiHtml` trả `<div class="sol-box">`, mà CSS_PHIEU để khối ấy opacity 0
+  // và chỉ mở lại bằng `.q-card.mo .sol-box`. Tờ chiếu không có `.q-card` nào
+  // nên lời giải nằm đó mà không nhìn thấy.
+  it('lời giải trong tờ chiếu KHÔNG bị ẩn bằng opacity', () => {
+    expect(html).toContain('.mc-giai .sol-box { opacity: 1 !important; transform: none !important; margin: 0; }')
+    // Luật gốc vẫn còn trong CSS_PHIEU — nên luật gỡ phải đứng SAU nó.
+    expect(html.indexOf('.sol-box {')).toBeLessThan(html.indexOf('.mc-giai .sol-box'))
+    // Và nội dung lời giải thật sự nằm trong khối.
+    expect(html).toContain('<div class="sol-box">')
+  })
+
   it('chừa phần dưới trắng cho em viết bảng', () => {
     expect(html.match(/class="mc-trang"/g)).toHaveLength(4)
     expect(html).toContain('.mc-trang { flex: 1 1 auto; min-height: 34vh; }')

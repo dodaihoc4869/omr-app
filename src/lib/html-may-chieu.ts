@@ -143,6 +143,15 @@ body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); }
 .mc-nut-giai { min-height: 40px; padding: 0 16px; border: 1px solid var(--mc-vien); border-radius: 999px; background: transparent; color: var(--mc-muc); font-family: var(--sans, system-ui, sans-serif); font-weight: 700; font-size: 14px; cursor: pointer; }
 .mc-nut-giai[aria-expanded="true"] { background: var(--mc-xanh-nen); color: var(--mc-xanh); border-color: var(--mc-xanh-nen); }
 .mc-giai { margin-top: 10px; }
+/* LỜI GIẢI PHẢI HIỆN RA. Thầy bắt được 14/09: bấm "Hiện lời giải" trên tờ
+   chiếu thì khối mở ra nhưng TRẮNG TRƠN. Nguyên nhân gốc: oGiaiHtml trả về
+   một div class="sol-box", mà trong CSS_PHIEU khối ấy để opacity 0 và
+   transform translateY(-6px), chỉ được trả lại bằng luật ".q-card.mo
+   .sol-box". Tờ chiếu dựng nửa bảng chứ không dựng thẻ câu nên không có tổ
+   tiên .q-card.mo nào — chữ vẫn nằm đó mà mắt không thấy. Trả lại đúng hai
+   thuộc tính ấy, và bỏ lề của phiếu vì ở đây khối nằm trong nửa bảng. */
+.mc-giai .sol-box { opacity: 1 !important; transform: none !important; margin: 0; }
+.mc-giai .sol-wrap { grid-template-rows: 1fr; }
 /* PHẦN TRẮNG — chỗ em viết trên bảng thật. Nó phải trắng, và phải còn lại. */
 .mc-trang { flex: 1 1 auto; min-height: 34vh; }
 @media print {
