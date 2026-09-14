@@ -56,6 +56,7 @@ export default defineConfig({
         // Thiếu hai đuôi này thì mất mạng là dấu tiếng Việt và chỉ số công thức
         // rơi về phông dự phòng — đúng lỗi "bă`ng" đã gặp.
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,woff,woff2,ttf}'],
+        globIgnores: ['**/404.html'],
         // ĐƯỜNG LUI CHO MỌI LƯỢT ĐIỀU HƯỚNG — khai TƯỜNG MINH.
         //
         // App đọc vai và mã ca từ đường dẫn (/hs, /ph, /t/<mã ca>, /d/<mã ca>).
