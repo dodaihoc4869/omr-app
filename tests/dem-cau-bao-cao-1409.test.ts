@@ -142,3 +142,54 @@ describe('Nút mở bài đã nộp nói đúng việc nó làm', () => {
     expect(HS_MODAL).not.toContain('Mở lại bài thi')
   })
 })
+
+// ===========================================================================
+// TỰ TẢI LẠI KHI BẢN MỚI CHIẾM QUYỀN — thầy kẹt 14/09.
+// Máy hiện "Bản 2cf33fe · 23:31" trong khi máy chủ đã phục vụ `daca60a`.
+// Dây chuyền chạy đúng tới bước áp chót rồi dừng: service worker mới đã nắm
+// quyền, nhưng trang đang mở vẫn giữ mã JS cũ vì không ai gọi tải lại.
+// ===========================================================================
+describe('App tự nhận bản mới, không bắt Thầy xoá dữ liệu trang', () => {
+  it('có nghe `controllerchange` và tải lại', async () => {
+    const { tuTaiLaiKhiDoiBan } = await import('../src/lib/cap-nhat-app')
+    let banBat: (() => void) | null = null
+    let daTaiLai = 0
+    tuTaiLaiKhiDoiBan({
+      addEventListener: (t, f) => {
+        if (t === 'controllerchange') banBat = f
+      },
+      taiLai: () => {
+        daTaiLai += 1
+      },
+      dangLamBai: () => false,
+    })
+    expect(banBat).not.toBeNull()
+    banBat!()
+    expect(daTaiLai).toBe(1)
+  })
+
+  it('ĐANG THI thì KHÔNG tải lại — mất bài giữa giờ còn tệ hơn chạy bản cũ', async () => {
+    // Module giữ cờ "đã hẹn tải lại" nên phải nạp lại sạch cho phép kiểm này.
+    const { tuTaiLaiKhiDoiBan } = await import('../src/lib/cap-nhat-app?moi=1')
+    let banBat: (() => void) | null = null
+    let daTaiLai = 0
+    tuTaiLaiKhiDoiBan({
+      addEventListener: (t, f) => {
+        if (t === 'controllerchange') banBat = f
+      },
+      taiLai: () => {
+        daTaiLai += 1
+      },
+      dangLamBai: () => true,
+    })
+    banBat!()
+    expect(daTaiLai).toBe(0)
+  })
+
+  it('main.tsx bật cơ chế ấy ngay khi app khởi động', () => {
+    const M = doc('src/main.tsx')
+    expect(M).toContain('tuTaiLaiKhiDoiBan()')
+    // Phải đứng TRƯỚC registerSW để không bỏ lỡ lần đổi bản đầu tiên.
+    expect(M.indexOf('tuTaiLaiKhiDoiBan()')).toBeLessThan(M.indexOf('registerSW({'))
+  })
+})

@@ -25,7 +25,7 @@ import App from './App.tsx'
 
 import { chuanHoaDuongDan, docDuongVao, nhoVaiDaDung } from './lib/vai-tro'
 import { donPhienCu } from './lib/don-phien-cu'
-import { batTuHoiBanMoi, batTuTaiLaiKhiDoiBan, daySangBanMoi } from './lib/cap-nhat-app'
+import { batTuHoiBanMoi, batTuTaiLaiKhiDoiBan, daySangBanMoi, tuTaiLaiKhiDoiBan } from './lib/cap-nhat-app'
 import { batSuKienCaiApp } from './lib/pwa-install'
 import { batLoiThieuManh } from './lib/nap-manh'
 import { napDiaChiMayChuMoiChoEm } from './lib/may-chu-moi'
@@ -80,6 +80,11 @@ void napDiaChiMayChuMoiChoEm()
 // về và cho nó chiếm quyền; trang đang mở vẫn chạy mã cũ tới khi tải lại — đó
 // là lý do thầy sửa xong mở app vẫn thấy y lỗi cũ. Xem cap-nhat-app.ts.
 batTuTaiLaiKhiDoiBan()
+
+// Bản mới chiếm quyền thì TỰ TẢI LẠI trang — nếu không, máy đã cầm bản mới mà
+// màn hình vẫn chạy mã cũ. Đăng ký trước `registerSW` để không bỏ lỡ lần đổi
+// bản đầu tiên.
+tuTaiLaiKhiDoiBan()
 
 registerSW({
   immediate: true,

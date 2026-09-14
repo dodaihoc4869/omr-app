@@ -83,6 +83,49 @@ export function dangLamBaiKhong(): boolean {
  * tắt màn hình liên tục. */
 export const GIAN_CACH_TOI_THIEU_MS = 60 * 1000
 
+/** TỰ TẢI LẠI KHI BẢN MỚI CHIẾM QUYỀN — mảnh còn thiếu của cả dây chuyền.
+ *
+ * Trước bản này, dây chuyền chạy đúng tới bước áp chót rồi dừng: `update()`
+ * tải service worker mới về, `skipWaiting` cho nó chiếm quyền ngay — nhưng
+ * TRANG ĐANG MỞ vẫn giữ nguyên mã JS đã tải từ đầu phiên. Không có ai gọi tải
+ * lại, nên màn hình vẫn là bản cũ dù máy đã cầm bản mới trong tay.
+ *
+ * Đó đúng là thứ thầy gặp 14/09: máy hiện "Bản 2cf33fe · 23:31" trong khi máy
+ * chủ đã phục vụ `daca60a` và Actions báo success.
+ *
+ * `controllerchange` bắn đúng lúc bản mới nắm quyền điều khiển trang. Tải lại
+ * ở đó là chỗ sớm nhất mà an toàn.
+ *
+ * HAI CHỐT AN TOÀN:
+ *   · KHÔNG tải lại khi em đang làm bài — mất bài giữa giờ thi còn tệ hơn chạy
+ *     bản cũ thêm một lúc. Tải lại ngay sau khi em nộp xong (`khiXongBai`).
+ *   · Chỉ tải lại MỘT lần cho mỗi lần đổi bản, tránh vòng lặp tải lại vô hạn
+ *     nếu service worker vì lý do nào đó cứ chiếm quyền liên tục. */
+let daHenTaiLai = false
+
+export function tuTaiLaiKhiDoiBan(
+  moiTruong: {
+    addEventListener: (t: string, f: () => void) => void
+    taiLai: () => void
+    dangLamBai?: () => boolean
+  } = {
+    addEventListener: (t, f) => navigator.serviceWorker?.addEventListener(t, f),
+    taiLai: () => location.reload(),
+  },
+): void {
+  const dangLam = moiTruong.dangLamBai || dangLamBaiKhong
+  moiTruong.addEventListener('controllerchange', () => {
+    if (daHenTaiLai) return
+    daHenTaiLai = true
+    if (dangLam()) {
+      // Đang thi: xếp hàng, nộp xong mới tải lại.
+      khiXongBai.push(() => moiTruong.taiLai())
+      return
+    }
+    moiTruong.taiLai()
+  })
+}
+
 export interface DangKySW {
   update: () => Promise<unknown>
   /** Bản mới đã tải xong nhưng còn nằm chờ (chưa chiếm quyền). */
