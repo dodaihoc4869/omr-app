@@ -26,12 +26,15 @@
 //   3. Bất kỳ bản `index.html` nào còn trong CacheStorage, kể cả của bản cũ.
 // Hết cả ba mới chịu trả lỗi.
 //
-// KILL SWITCH (thêm 14/09 — khắc phục triệt để SW cũ kẹt trên máy người dùng):
-//   Khi SW activate, fetch `sw-version.json` (no-store trên server).
-//   Nếu server có timestamp mới hơn bản SW này biết → xóa hết cache cũ +
-//   unregister → trình duyệt tải lại bản SW mới từ đầu, sạch bộ nhớ.
-//   Cơ chế này đảm bảo SW cũ không thể "kẹt" trên máy người dùng quá 1 lần
-//   mở trang sau khi có bản mới.
+// BẢN MỚI TRÊN MÁY CHỦ (viết lại 14/09 lượt 11):
+//   Lúc activate, đọc `sw-version.json` (máy chủ trả `no-store`). Máy chủ mới
+//   hơn thì gọi `registration.update()` để trình duyệt tải bản SW mới về, rồi
+//   nhắn cho các tab đang mở biết. CHỈ CÓ THẾ.
+//
+//   Bản trước ở đây xoá sạch cache, tự gỡ đăng ký và ép tab điều hướng lại —
+//   và đó chính là thứ làm "app học sinh và phụ huynh lại không truy cập
+//   được". Đọc khối ở cuối tệp để biết vì sao nó hỏng mỗi lần phát hành.
+//   `scripts/kiem-sw.mjs` nay chặn cả ba việc ấy quay lại.
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
 import { clientsClaim } from 'workbox-core'
@@ -42,8 +45,8 @@ declare const self: ServiceWorkerGlobalScope
 precacheAndRoute(self.__WB_MANIFEST)
 cleanupOutdatedCaches()
 
-/** Đường của chính Cloudflare Pages và đường ép tải bản mới — không đụng vào. */
-const KHONG_DUNG: RegExp[] = [/^\/cdn-cgi\//, /[?&]_moi=/]
+/** Đường của chính Cloudflare Pages, trang cài đặt app và tệp cấu hình — không đụng vào. */
+const KHONG_DUNG: RegExp[] = [/^\/cdn-cgi\//, /[?&]_moi=/, /^\/cai-/, /\.mobileconfig$/]
 
 const TU_PRECACHE = createHandlerBoundToURL('index.html')
 
@@ -55,6 +58,10 @@ async function traTrangApp(tuyChon: Parameters<typeof TU_PRECACHE>[0]): Promise<
   } catch (e) {
     // Ghi ra để còn lần được, KHÔNG nuốt im.
     console.warn('[sw] precache không trả được index.html, đi ra mạng:', e)
+    // Precache hỏng là dấu hiệu bản SW này đã lệch với máy chủ. Gọi bản mới
+    // về NGAY, không chờ lượt activate sau — nhưng vẫn trả trang cho em bằng
+    // hai tầng dưới, không bắt em chờ.
+    void self.registration.update().catch(() => undefined)
   }
   try {
     const r = await fetch(tuyChon.request)
@@ -77,18 +84,42 @@ registerRoute(new NavigationRoute(traTrangApp, { denylist: KHONG_DUNG }))
 self.skipWaiting()
 clientsClaim()
 
-// ─── KILL SWITCH: XÓA CACHE CŨ KHI PHÁT HIỆN BẢN MỚI TRÊN SERVER ───
+// ─── BẢN MỚI TRÊN MÁY CHỦ: GỌI BẢN MỚI VỀ, TUYỆT ĐỐI KHÔNG TỰ HUỶ ────────
 //
-// `sw-version.json` có `Cache-Control: no-store` trên Cloudflare Pages,
-// nên fetch này luôn lấy bản mới nhất từ server, không bị cache bởi SW hay
-// trình duyệt.
+// 14/09 thầy báo LẠI: "app học sinh và phụ huynh lại không truy cập được".
+// Lần này nguyên nhân gốc nằm ngay trong đoạn từng đặt ở đây — một "kill
+// switch" xoá sạch cache rồi tự gỡ đăng ký. Đo được trên bản đang chạy thật
+// (`sw.js` trên máy chủ có `registration.unregister()`).
 //
-// Timestamp được vite-plugin-pwa chèn vào lúc build qua `__SW_BUILT_AT__`.
-// Nếu server có timestamp lớn hơn → SW này đã lỗi thời → xóa hết cache và
-// unregister để lần mở trang tiếp theo cài SW mới từ đầu.
+// VÌ SAO NÓ HỎNG, VÀ VÌ SAO NÓ HỎNG MỖI LẦN PHÁT HÀNH:
+//
+//   Điều kiện `serverTs > SW_BUILT_AT` KHÔNG phải ca hiếm. Máy em đang giữ
+//   bản SW cũ, máy chủ vừa có bản mới — nghĩa là ĐÚNG mọi em quay lại sau mỗi
+//   lần thầy đẩy bản. Nhánh ấy chạy cho TẤT CẢ, mỗi lần, và nó:
+//     1. `caches.delete` toàn bộ — xoá luôn kho precache mà workbox vừa nạp
+//        xong trong chính lượt activate này, và xoá luôn phần chạy offline.
+//     2. `registration.unregister()` — nhưng SW này VẪN đang điều khiển các
+//        tab đang mở; gỡ đăng ký chỉ chặn lần sau.
+//     3. ép mọi tab điều hướng lại — lượt ấy vẫn đi qua CHÍNH SW này,
+//        rơi vào `traTrangApp`, tầng precache vừa bị xoá rỗng, mạng chớp một
+//        nhịp là rơi nốt tầng ba (cũng rỗng) ⇒ `Response.error()` ⇒ ERR_FAILED.
+//   Đúng cái màn hình lỗi thầy thấy, và đúng lý do nó LẶP LẠI.
+//
+// CÁCH ĐÚNG: thấy máy chủ có bản mới thì BẢO TRÌNH DUYỆT ĐI LẤY, rồi để
+// workbox làm việc của nó (`skipWaiting` + `clientsClaim` + `cleanupOutdated
+// Caches` đã thay bản cũ bằng bản mới ở mọi lượt mở trang). Không xoá kho,
+// không tự gỡ, không ép điều hướng. Kho cũ thừa đã có `cleanupOutdatedCaches`
+// dọn đúng phần của nó.
 declare const __SW_BUILT_AT__: number
 
 const SW_BUILT_AT: number = typeof __SW_BUILT_AT__ !== 'undefined' ? __SW_BUILT_AT__ : 0
+
+/** Báo cho mọi tab đang mở biết có bản mới, để app tự chọn lúc nạp lại.
+ * CHỈ BÁO — không ép điều hướng, vì ép là dẫm đúng vào lỗi 14/09. */
+async function baoCoBanMoi(banMayChu: number): Promise<void> {
+  const ds = await self.clients.matchAll({ type: 'window' })
+  for (const c of ds) c.postMessage({ kieu: 'ddh:co-ban-moi', banMayChu, banDangChay: SW_BUILT_AT })
+}
 
 self.addEventListener('activate', (event: ExtendableEvent) => {
   event.waitUntil(
@@ -96,26 +127,18 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
       try {
         const res = await fetch('/sw-version.json', { cache: 'no-store' })
         if (!res.ok) return
-        const data = await res.json() as { builtAt?: number }
-        const serverTs = Number(data.builtAt || 0)
-        // Nếu server có timestamp lớn hơn ≥ 2 giây (tránh race condition khi deploy chậm)
-        if (serverTs > SW_BUILT_AT + 2) {
-          console.info(`[sw] Bản mới (server=${serverTs}) > bản này (${SW_BUILT_AT}). Xóa cache và unregister.`)
-          // Xóa TẤT CẢ cache cũ
-          const keys = await caches.keys()
-          await Promise.all(keys.map(k => caches.delete(k)))
-          // Unregister SW này → browser sẽ tải SW mới lần mở trang tiếp
-          await self.registration.unregister()
-          // Thông báo tất cả tab đang mở để tải lại
-          const clients = await self.clients.matchAll({ type: 'window' })
-          for (const client of clients) {
-            client.navigate(client.url)
-          }
-        }
+        const data = (await res.json()) as { builtAt?: number }
+        const banMayChu = Number(data.builtAt || 0)
+        if (!(banMayChu > SW_BUILT_AT + 2)) return
+        console.info(`[sw] máy chủ có bản ${banMayChu}, bản đang chạy ${SW_BUILT_AT} — gọi bản mới về`)
+        // Bảo trình duyệt tải lại `/sw.js`. Máy chủ trả `must-revalidate` nên
+        // lượt này lấy được bản mới; workbox cài và chiếm quyền như thường lệ.
+        await self.registration.update()
+        await baoCoBanMoi(banMayChu)
       } catch {
-        // Mất mạng hoặc lỗi fetch → giữ nguyên SW hiện tại, không làm gì
+        // Mất mạng thì giữ nguyên bản đang chạy — app vẫn chạy offline.
       }
-    })()
+    })(),
   )
 })
 

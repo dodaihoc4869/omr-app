@@ -43,6 +43,11 @@ const DA_RA_SOAT: Record<string, string[]> = {
   // `boDo` đã có giá trị. Máy soi tĩnh không biết luật cẩu riêng của vitest nên
   // vẫn kêu; đã đọc tay và xác nhận an toàn.
   'tests/cau-noi-ddh.test.ts': ['boDo'],
+  // Đã đọc tay 14/09, cả hai chỗ đều chạy SAU khi dựng xong, không phải lúc dựng:
+  //   · `raCauHoiMoi` gọi trong `batDauLeoThap` — hàm gắn vào nút bấm.
+  //   · `xuLyTraLoi` gọi trong `setInterval` bên trong `useEffect`.
+  // Cùng một dáng với `ExamTakeScreen.tsx` ngay đầu danh sách này.
+  'src/components/ThanThuHoaHocGame.tsx': ['raCauHoiMoi', 'xuLyTraLoi'],
 }
 
 interface Nhan {

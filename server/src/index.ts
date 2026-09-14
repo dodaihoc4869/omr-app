@@ -2419,6 +2419,8 @@ const LENH_CUA_THAY = new Set([
   'linkDanhSachLop', 'luuLinkDanhSachLop', 'deleteStudent', 'danhSachDe', 'layDe', 'luuDe',
   'xoaDe', 'luuPhieu', 'luuNhieuPhieu', 'xoaPhieu', 'phieuTheoCa', 'nopKhacPhucTheoCa',
   'dungChiMuc', 'danhSachCauHoi', 'xoaCauHoi', 'danhDauDaChua', 'ghiLenBang', 'lichSuLenBang',
+  // Hồ sơ CẢ LỚP là dữ liệu của nhiều em — lệnh của THẦY, không mở cho máy em.
+  'hoSoLopLenBang',
   'sendTeacherMessage', 'listMessages', 'demTinMoi', 'listStudents', 'markMessagesRead',
   'resetMatKhauHs',
 ])
@@ -2575,6 +2577,7 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
     case 'markMessagesRead': return ra(await G.danhDauDaDoc(env, b))
     case 'ghiLenBang': return ghiLenBangMoi(env, b)
     case 'lichSuLenBang': return ra(await G.lichSuLenBang(env, b))
+    case 'hoSoLopLenBang': return ra(await G.hoSoLopLenBang(env, b))
 
     default:
       return ra({ ok: false, error: `Máy chủ mới chưa dựng lệnh "${act}"` }, 400)

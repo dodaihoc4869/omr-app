@@ -41,6 +41,19 @@ export interface CauHinhLenBang {
   GIAY_LANE: Record<Lane, number>
   /** TRẦN số em lên bảng. Là trần thầy đặt, KHÔNG phải biến để thuật toán tối ưu. */
   SO_EM_LEN_BANG_TOI_DA: number
+  /** SÀN số em lên bảng — thầy chốt 14/09: "trong 90 phút danh sách lớp phải
+   * có ít nhất 20 em được lên bảng".
+   *
+   * Đây là ĐÍCH, không phải lời hứa. Buổi không đủ câu để gọi bấy nhiêu em thì
+   * thuật toán phải NÓI THIẾU BAO NHIÊU, cấm bịa thêm em. */
+  SO_EM_LEN_BANG_TOI_THIEU: number
+  /** GIÂY LÊN BẢNG THEO SAO — thay cho một giá cố định.
+   *
+   * Vì sao phải tách: 20 em × 420 giây = 8.400 giây, gấp đôi ngân sách 90 phút.
+   * Không có cách nào đạt 20 em nếu mọi em lên bảng đều tốn bằng nhau. Câu 2
+   * sao đáng 5 phút vì phải chốt bẫy; câu 0 sao gọi nhanh 2 phút là đủ. Đan xen
+   * khó–dễ chính là chỗ này. */
+  GIAY_LEN_BANG_THEO_SAO: Record<0 | 1 | 2, number>
 
   /** N1 — lớp vừa rồi sai từ tỉ lệ này trở lên thì câu vào danh sách bắt buộc. */
   N1_TI_LE_SAI_BAT_BUOC: number
@@ -87,11 +100,18 @@ export interface CauHinhLenBang {
 }
 
 export const CAU_HINH_LEN_BANG_MAC_DINH: CauHinhLenBang = {
-  NGAN_SACH_PHUT: 80,
+  // 90 phút (thầy chốt 14/09), trừ 480 giây hao phí còn 4.920 giây chữa.
+  NGAN_SACH_PHUT: 90,
   HAO_PHI_MO_DAU_GIAY: 180,
   HAO_PHI_CHOT_CUOI_GIAY: 300,
   GIAY_LANE: { L0: 5, L1: 20, L2: 150, L3: 420 },
-  SO_EM_LEN_BANG_TOI_DA: 8,
+  // Trần nới theo sàn mới: sàn 20 thì trần không thể còn 8.
+  SO_EM_LEN_BANG_TOI_DA: 30,
+  SO_EM_LEN_BANG_TOI_THIEU: 20,
+  // Phép tính đối chứng cho sàn 20 trong 4.920 giây:
+  //   6 câu 2 sao × 300 + 8 câu 1 sao × 180 + 6 câu 0 sao × 120 = 3.960 giây,
+  //   còn 960 giây đọc đáp án cho phần còn lại (L0 5 giây, L1 20 giây mỗi câu).
+  GIAY_LEN_BANG_THEO_SAO: { 2: 300, 1: 180, 0: 120 },
 
   N1_TI_LE_SAI_BAT_BUOC: 0.4,
   N1_CO_MAU_TOI_THIEU: 8,
@@ -112,6 +132,12 @@ export const CAU_HINH_LEN_BANG_MAC_DINH: CauHinhLenBang = {
 /** Hao phí cả buổi — mở đầu cộng chốt cuối. Giây. */
 export function haoPhiGiay(ch: CauHinhLenBang): number {
   return ch.HAO_PHI_MO_DAU_GIAY + ch.HAO_PHI_CHOT_CUOI_GIAY
+}
+
+/** Giây một em lên bảng chữa câu này — theo SAO của câu, không phải một giá
+ * chung. Câu chưa gắn sao tính như 0 sao. */
+export function giayLenBang(ch: CauHinhLenBang, sao: 0 | 1 | 2 | undefined): number {
+  return ch.GIAY_LEN_BANG_THEO_SAO[sao ?? 0] ?? ch.GIAY_LEN_BANG_THEO_SAO[0]
 }
 
 /** Ngân sách thật cho phần chữa, sau khi trừ hao phí. Giây. */

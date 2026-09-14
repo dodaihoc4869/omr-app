@@ -42,7 +42,7 @@ describe('MÁY CHỦ — số câu chỉ đến từ bảng chấm', () => {
     expect(hsLichSu).toContain('...goiDemCau(demCua)')
     expect(SRV).toContain('tongCau: d ? d.tong : null')
     expect(SRV).toContain('soCauDung: d ? d.dung : null')
-    expect(SRV).toContain('soCauSai: d ? d.sai : null')
+    expect(SRV).toContain('soCauSai: d ? Math.max(0, d.tong - d.dung) : null')
   })
 
   it('`lichSuEm` nay trả đủ hợp đồng ba cổng đang đọc', () => {

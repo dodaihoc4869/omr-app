@@ -167,6 +167,30 @@ describe('Tờ máy chiếu', () => {
     expect(/[\u0300-\u036f]/.test(o)).toBe(false)
   })
 
+  // Thầy 14/09: "số câu còn lại chưa được chữa được chiếu đáp án lên bảng qua
+  // mục máy chiếu".
+  it('câu chỉ đọc đáp án thành TRANG ĐÁP ÁN nối sau các đợt', () => {
+    const dsDapAn = Array.from({ length: 26 }, (_, i) => ({ ...cau(i + 50), dapAn: 'C' }))
+    const o = taoHtmlMayChieu([O(1, 'Em A'), O(2, 'Em B')], { dsDapAn })
+    // 1 đợt gọi em + 3 trang đáp án (12 + 12 + 2)
+    expect(o.match(/class="mc-dot"/g)).toHaveLength(1)
+    expect(o.match(/class="mc-dot mc-dot-da"/g)).toHaveLength(3)
+    expect(o).toContain('Đáp án các câu còn lại')
+    expect(o).toContain('1–12 trong 26 câu')
+    expect(o).toContain('25–26 trong 26 câu')
+    expect(o).toContain('26 câu chỉ đọc đáp án')
+    // Trang đáp án chiếm trọn bề ngang, không chia đôi bảng.
+    expect(o).toContain('.mc-dot-da { grid-template-columns: 1fr; }')
+  })
+
+  it('không có câu đọc đáp án thì không sinh trang thừa', () => {
+    const o = taoHtmlMayChieu([O(1, 'Em A')], {})
+    // Luật CSS vẫn nằm trong bảng kiểu; thứ KHÔNG được có là TRANG.
+    expect(o).not.toContain('class="mc-dot mc-dot-da"')
+    expect(o).not.toContain('Đáp án các câu còn lại')
+    expect(o).not.toContain('chỉ đọc đáp án')
+  })
+
   it('in ra thì quay ngang A4', () => {
     expect(html).toContain('size: A4 landscape')
   })
@@ -208,7 +232,13 @@ describe('Màn Gọi lên bảng', () => {
   })
 
   it('tờ chiếu lấy đúng bảng phân công vừa chạy, câu không tra được thì báo', () => {
-    expect(than).toContain('const dsPc = kq?.phanCong ?? []')
+    // Sửa 14/09: nguồn ưu tiên là BUỔI CHỮA mới (`kqBuoi`); chưa xếp thì mới
+    // lùi về bảng phân công cũ. Tờ chiếu không bao giờ tự rút bộ câu khác.
+    // 14/09 lượt 10: `dsPc` mang thêm dữ liệu bài tập về nhà nên phải khai
+    // kiểu tường minh, không viết gọn một dòng được nữa. Ý ĐỊNH giữ nguyên:
+    // nguồn ưu tiên vẫn là `kqBuoi`, và vẫn lùi về `kq.phanCong` khi chưa xếp.
+    expect(than).toMatch(/const dsPc:[\s\S]{0,400}\}\[\] = kqBuoi/)
+    expect(than).toContain('(kq?.phanCong ?? [])')
     expect(than).toContain('chưa tra được đề')
   })
 })

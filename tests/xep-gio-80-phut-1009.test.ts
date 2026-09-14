@@ -30,7 +30,14 @@ import { dungGiaoAn, moiPhanTramCoCoMau } from '../src/lib/giao-an-len-bang'
 import { mucGhep, type CauChua, type BaiLam } from '../src/lib/phan-cong'
 import { gopCaVaoKho, KHO_DO_KHO_RONG, thongKeKho } from '../src/lib/kho-do-kho'
 
-const CH = CAU_HINH_LEN_BANG_MAC_DINH
+// GHIM CẤU HÌNH 80 PHÚT (sửa 14/09) — KHÔNG PHẢI SỬA TEST CHO XANH.
+//
+// Bộ kiểm này đo RÀNG BUỘC CỨNG của bộ xếp giờ 80 phút trên 100 ca cỡ lớp.
+// Ngày 14/09 thầy chốt buổi chữa 90 phút và sàn 20 em, nên mặc định đổi:
+// 80 → 90 phút, trần em 8 → 30. Luật bị soi ở đây không đổi một chữ; chỉ ghim
+// đầu vào để nó không trôi theo mặc định. Ngân sách 90 phút có bộ kiểm riêng:
+// `tests/xep-buoi-chua-1409.test.ts`.
+const CH = { ...CAU_HINH_LEN_BANG_MAC_DINH, NGAN_SACH_PHUT: 80, SO_EM_LEN_BANG_TOI_DA: 8 }
 
 // ------------------------------------------------------------------- tiện ích
 
@@ -301,7 +308,7 @@ describe('8.4 — LAGRANGE SO VÉT CẠN, khoảng cách đối ngẫu ≤ 5%', 
       const soCau = 3 + ((s + seed0) % (nCauToiDa - 2))
       const ca = caGiaLap(s + seed0 * 7919, soCau, soEm)
       const { theoEm } = vapCuaLop(ca.cau, ca.baiLam, CH)
-      const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, {})
+      const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, { cauHinh: CH })
       const toiUu = vetCan(ca, CH, CH.SO_EM_LEN_BANG_TOI_DA)
       expect(kq.tongGiay).toBeLessThanOrEqual(nganSachGiay(CH))
       const kc = toiUu > 0 ? (toiUu - kq.tongGiaTri) / toiUu : 0
@@ -324,7 +331,7 @@ describe('8.4 — LAGRANGE SO VÉT CẠN, khoảng cách đối ngẫu ≤ 5%', 
     for (let s = 0; s < 20; s++) {
       const ca = caGiaLap(50000 + s, 8, 4)
       const { theoEm } = vapCuaLop(ca.cau, ca.baiLam, CH)
-      const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, {})
+      const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, { cauHinh: CH })
       const toiUu = vetCan(ca, CH, CH.SO_EM_LEN_BANG_TOI_DA)
       const kc = toiUu > 0 ? (toiUu - kq.tongGiaTri) / toiUu : 0
       if (kc > xauNhat) xauNhat = kc
@@ -338,7 +345,7 @@ describe('8.4 — LAGRANGE SO VÉT CẠN, khoảng cách đối ngẫu ≤ 5%', 
     for (let s = 0; s < 40; s++) {
       const ca = caGiaLap(90000 + s, 6, 4)
       const { theoEm } = vapCuaLop(ca.cau, ca.baiLam, CH)
-      const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, {})
+      const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, { cauHinh: CH })
       const toiUu = vetCan(ca, CH, CH.SO_EM_LEN_BANG_TOI_DA)
       expect(kq.canTrenNoi).toBeGreaterThanOrEqual(toiUu - 1e-9)
     }
@@ -361,7 +368,7 @@ describe('DÂY BÁO HỒI QUY — khoảng cách tới cận trên nới trên c
     for (let s = 0; s < 100; s++) {
       const ca = caGiaLap(seed0 + s, 28, 30, dang)
       const { theoEm } = vapCuaLop(ca.cau, ca.baiLam, CH)
-      const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, {})
+      const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, { cauHinh: CH })
       if (kq.khoangCachDoiNgau > xau) xau = kq.khoangCachDoiNgau
       if (kq.khoangCachDoiNgau > CH.KHOANG_CACH_DOI_NGAU_TOI_DA) tren5++
       tongL3 += kq.soEmLenBang
@@ -394,7 +401,7 @@ describe('DÂY BÁO HỒI QUY — khoảng cách tới cận trên nới trên c
   it('ca cực khó PHẢI kèm lý do, không để thầy tự đoán vì sao chênh', () => {
     const ca = caGiaLap(700017, 28, 30, 'kho')
     const { theoEm } = vapCuaLop(ca.cau, ca.baiLam, CH)
-    const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, {})
+    const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, { cauHinh: CH })
     expect(kq.thuaGio).not.toBeNull()
     const chu = kq.canhBao.join(' ')
     expect(chu).toContain('cận trên nới')
@@ -409,7 +416,7 @@ describe('8.5 · 8.6 · 8.8 — RÀNG BUỘC CỨNG trên 100 ca thật cỡ l�
     let dat = 0
     for (const ca of cas) {
       const { theoEm } = vapCuaLop(ca.cau, ca.baiLam, CH)
-      const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, {})
+      const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, { cauHinh: CH })
       if (kq.thuaGio && kq.dong.length === 0) continue
       const xau = kq.dong.filter((d) => d.batBuoc && d.lane !== 'L2' && d.lane !== 'L3')
       if (!xau.length) dat++
@@ -440,7 +447,7 @@ describe('8.5 · 8.6 · 8.8 — RÀNG BUỘC CỨNG trên 100 ca thật cỡ l�
     let hetNuoc = 0
     for (const ca of cas) {
       const { theoEm } = vapCuaLop(ca.cau, ca.baiLam, CH)
-      const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, {})
+      const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, { cauHinh: CH })
       if (kq.thuaGio && kq.dong.length === 0) continue
       expect(kq.tongGiay).toBeLessThanOrEqual(B)
       if (kq.tongGiay >= B * 0.95) dat++
@@ -465,7 +472,7 @@ describe('8.5 · 8.6 · 8.8 — RÀNG BUỘC CỨNG trên 100 ca thật cỡ l�
     expect(CH.GIAY_LANE.L3 - CH.GIAY_LANE.L2).toBe(270) // 270 > 250
 
     // Sau khi chốt: 250 giây ấy đổ vào chính câu sao 0 ⇒ 4 200 giây, còn 120.
-    const kq = xepGioLenBang(doKho, Array.from({ length: 30 }, (_, j) => ({ sbd: `S${j}`, hoTen: `E${j}`, coMat: true, soLanLenBang: 0 })), bl, new Map(), {})
+    const kq = xepGioLenBang(doKho, Array.from({ length: 30 }, (_, j) => ({ sbd: `S${j}`, hoTen: `E${j}`, coMat: true, soLanLenBang: 0 })), bl, new Map(), { cauHinh: CH })
     expect(kq.soCauNoiTran).toBe(1)
     expect(kq.tongGiay).toBe(28 * CH.GIAY_LANE.L2)
     expect(kq.tongGiay).toBeGreaterThanOrEqual(nganSachGiay(CH) * 0.95)
@@ -486,7 +493,7 @@ describe('8.5 · 8.6 · 8.8 — RÀNG BUỘC CỨNG trên 100 ca thật cỡ l�
     const em = Array.from({ length: 30 }, (_, j) => ({ sbd: `S${String(j).padStart(2, '0')}`, hoTen: `Em ${j}`, coMat: true, soLanLenBang: 0 }))
     // Mỗi em có một chỗ vấp cùng chuyên đề ⇒ ai cũng đủ tư cách lên bảng.
     const vap = new Map(em.map((e) => [e.sbd, [{ sbd: e.sbd, idCau: 'NGOAI', chuyenDe: 'Ester – lipid', mucDo: 'van_dung' as const, nguyenNhan: 'hieu_nham' as const, chon: 'C', cungChon: 9, soEmLam: 30 }]]))
-    const kq = xepGioLenBang(doKho, em, [], vap, {})
+    const kq = xepGioLenBang(doKho, em, [], vap, { cauHinh: CH })
     expect(nganSachGiay(CH) - 12 * CH.GIAY_LANE.L2).toBe(2520)
     expect(Math.floor(2520 / (CH.GIAY_LANE.L3 - CH.GIAY_LANE.L2))).toBe(9) // mua được 9
     expect(kq.soEmLenBang).toBe(CH.SO_EM_LEN_BANG_TOI_DA) // nhưng trần là 8
@@ -499,8 +506,8 @@ describe('8.5 · 8.6 · 8.8 — RÀNG BUỘC CỨNG trên 100 ca thật cỡ l�
     const doKho = dungDoKho(cau, [], {}, CH)
     const em = Array.from({ length: 30 }, (_, j) => ({ sbd: `S${String(j).padStart(2, '0')}`, hoTen: `Em ${j}`, coMat: true, soLanLenBang: 0 }))
     const vap = new Map(em.map((e) => [e.sbd, [{ sbd: e.sbd, idCau: 'NGOAI', chuyenDe: 'Ester – lipid', mucDo: 'van_dung' as const, nguyenNhan: 'hieu_nham' as const, chon: 'C', cungChon: 9, soEmLam: 30 }]]))
-    expect(xepGioLenBang(doKho, em, [], vap, { tranEm: 3 }).soEmLenBang).toBe(3)
-    expect(xepGioLenBang(doKho, em, [], vap, { tranEm: 0 }).soEmLenBang).toBe(0)
+    expect(xepGioLenBang(doKho, em, [], vap, { cauHinh: CH, tranEm: 3 }).soEmLenBang).toBe(3)
+    expect(xepGioLenBang(doKho, em, [], vap, { cauHinh: CH, tranEm: 0 }).soEmLenBang).toBe(0)
   })
 
   // PHÁ MÃ TÌM RA CHỖ NÀY. Bỏ hẳn lệnh sắp câu theo `id` mà 50 phép kiểm vẫn
@@ -511,8 +518,8 @@ describe('8.5 · 8.6 · 8.8 — RÀNG BUỘC CỨNG trên 100 ca thật cỡ l�
   it('ĐẢO THỨ TỰ ĐẦU VÀO vẫn ra đúng giáo án ấy', () => {
     const ca = caGiaLap(700003, 28, 30)
     const { theoEm } = vapCuaLop(ca.cau, ca.baiLam, CH)
-    const xuoi = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, {})
-    const nguoc = xepGioLenBang([...ca.doKho].reverse(), [...ca.em].reverse(), ca.baiLam, theoEm, {})
+    const xuoi = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, { cauHinh: CH })
+    const nguoc = xepGioLenBang([...ca.doKho].reverse(), [...ca.em].reverse(), ca.baiLam, theoEm, { cauHinh: CH })
     const chu = (k: typeof xuoi) =>
       [...k.dong].sort((a, b) => (a.cau.id < b.cau.id ? -1 : 1)).map((d) => `${d.cau.id}:${d.lane}:${d.em?.sbd ?? '-'}`)
     expect(chu(nguoc)).toEqual(chu(xuoi))
@@ -524,8 +531,8 @@ describe('8.5 · 8.6 · 8.8 — RÀNG BUỘC CỨNG trên 100 ca thật cỡ l�
     for (const s of [0, 17, 55]) {
       const ca = caGiaLap(700000 + s, 28, 30)
       const { theoEm } = vapCuaLop(ca.cau, ca.baiLam, CH)
-      const a = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, {})
-      const b = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, {})
+      const a = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, { cauHinh: CH })
+      const b = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, { cauHinh: CH })
       expect(b.dong.map((d) => `${d.cau.id}:${d.lane}:${d.em?.sbd ?? '-'}`)).toEqual(
         a.dong.map((d) => `${d.cau.id}:${d.lane}:${d.em?.sbd ?? '-'}`),
       )
@@ -546,7 +553,7 @@ describe('8.7 — PHẢI HƠN THUẬT TOÁN BỐN MỨC CŨ, in hai số cạnh 
     for (let s = 0; s < 100; s++) {
       const ca = caGiaLap(310000 + s, 28, 30)
       const { theoEm } = vapCuaLop(ca.cau, ca.baiLam, CH)
-      const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, {})
+      const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, { cauHinh: CH })
       const soSuat = kq.dong.filter((d) => d.lane === 'L3').length
       moiTong += kq.tongGiaTri
 
@@ -596,8 +603,8 @@ describe('8.7 — PHẢI HƠN THUẬT TOÁN BỐN MỨC CŨ, in hai số cạnh 
 describe('8.9 — MỌI PHẦN TRĂM PHẢI KÈM CỠ MẪU', () => {
   const ca = caGiaLap(4242, 28, 30)
   const { theoEm } = vapCuaLop(ca.cau, ca.baiLam, CH)
-  const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, {})
-  const chu = dungGiaoAn(kq, { ngay: '10/09', maCa: '447479', soEmNop: 30, tenDe: '12-BD7-07', duong: 'A', soCauKhop: 28, soCauTong: 28 }, CH)
+  const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, { cauHinh: CH })
+  const chu = dungGiaoAn(kq, { cauHinh: CH, ngay: '10/09', maCa: '447479', soEmNop: 30, tenDe: '12-BD7-07', duong: 'A', soCauKhop: 28, soCauTong: 28 }, CH)
 
   it('giáo án thật không có dòng nào mang % trần', () => {
     expect(moiPhanTramCoCoMau(chu)).toEqual([])
@@ -643,7 +650,7 @@ describe('8.10 — CA THIẾU GIÂY: tắt hai luật đọc thời gian, và N�
   it('giáo án in đúng câu cảnh báo, không im lặng', () => {
     const ca = caGiaLap(881, 10, 12)
     const { theoEm } = vapCuaLop(ca.cau, ca.baiLam, CH)
-    const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, { thieuGiay: true })
+    const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, { cauHinh: CH, thieuGiay: true })
     const chu = dungGiaoAn(kq, { ngay: '10/09', maCa: 'X', soEmNop: 12, tenDe: 'D', duong: 'A', soCauKhop: 10, soCauTong: 10 }, CH)
     expect(chu).toContain('Ca này thiếu dữ liệu thời gian')
   })
@@ -653,7 +660,7 @@ describe('8.11 — CHƯA CÓ LỊCH SỬ LÊN BẢNG thì nói thẳng, cấm in
   it('cảnh báo có mặt, và giáo án không chứa dòng "lần lên bảng gần nhất"', () => {
     const ca = caGiaLap(991, 12, 10)
     const { theoEm } = vapCuaLop(ca.cau, ca.baiLam, CH)
-    const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, { chuaCoLichSuLenBang: true })
+    const kq = xepGioLenBang(ca.doKho, ca.em, ca.baiLam, theoEm, { cauHinh: CH, chuaCoLichSuLenBang: true })
     const chu = dungGiaoAn(kq, { ngay: '10/09', maCa: 'X', soEmNop: 10, tenDe: 'D', duong: 'A', soCauKhop: 12, soCauTong: 12 }, CH)
     expect(chu).toContain('Chưa có lịch sử lên bảng')
     expect(chu).not.toContain('Lần lên bảng gần nhất')
@@ -672,7 +679,7 @@ describe('4.3 — THỪA GIỜ: hiện số và ba lựa chọn, CẤM tự cắ
     // 40 câu sao 2 ⇒ tất cả bắt buộc ⇒ tối thiểu 40 × 150 s = 6 000 s > ngân sách.
     const cau = Array.from({ length: 40 }, (_, i) => cauMau(i + 1, 2))
     const doKho = dungDoKho(cau, [], {}, CH)
-    const kq = xepGioLenBang(doKho, [{ sbd: 'A', hoTen: 'A', coMat: true, soLanLenBang: 0 }], [], new Map(), {})
+    const kq = xepGioLenBang(doKho, [{ sbd: 'A', hoTen: 'A', coMat: true, soLanLenBang: 0 }], [], new Map(), { cauHinh: CH })
     expect(kq.thuaGio).not.toBeNull()
     expect(kq.dong).toEqual([])
     expect(kq.thuaGio?.luaChon.length).toBeGreaterThanOrEqual(1)
@@ -683,7 +690,7 @@ describe('4.3 — THỪA GIỜ: hiện số và ba lựa chọn, CẤM tự cắ
     const cau = Array.from({ length: 40 }, (_, i) => cauMau(i + 1, 2))
     const doKho = dungDoKho(cau, [], {}, CH)
     const bo = doKho.slice(20).map((d) => d.cau.id)
-    const kq = xepGioLenBang(doKho, [{ sbd: 'A', hoTen: 'A', coMat: true, soLanLenBang: 0 }], [], new Map(), { boBatBuoc: bo })
+    const kq = xepGioLenBang(doKho, [{ sbd: 'A', hoTen: 'A', coMat: true, soLanLenBang: 0 }], [], new Map(), { cauHinh: CH, boBatBuoc: bo })
     expect(kq.dong.length).toBe(40)
     expect(kq.tongGiay).toBeLessThanOrEqual(nganSachGiay(CH))
     expect(kq.dong.filter((d) => d.batBuoc).length).toBe(20)

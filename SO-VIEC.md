@@ -1,44 +1,85 @@
-# SỔ VIỆC — 14/09 lượt 11 · ĐỒNG BỘ KHO + TỜ MÁY CHIẾU
+# SỔ VIỆC — 14/09 lượt 12 · VIẾT LẠI THUẬT TOÁN PHÂN CÔNG LÊN BẢNG
 
-- [x] "Bạn phải đồng bộ sang máy học sinh"  | bằng chứng: đã lên live `4498d442`; đo thật ca Test6: 8 tờ · 187 KB · 164 ứng viên · 5/9 dạng (trước là 1 tờ · 396 KB · 6 ứng viên · 1/9 dạng)
-- [x] "Lời giải hiện trong mục chiếu lên bảng bị lỗi"  | bằng chứng: `vitest run tests/may-chieu-len-bang-1409.test.ts` 15/15
-- [x] "nội dung đề bị lỗi chữ, sửa lại đúng chuẩn"  | bằng chứng: `vitest run tests/gop-dau-nfc-1409.test.ts` 8/8 · commit `f2dc080`
-- [x] "cho tôi một nút toàn màn hình ở mục chiếu lên bảng"  | bằng chứng: 15/15 như trên · commit `f2dc080`
-- [x] "1 đợt là 1 trang chia đôi bảng, bấm đợt tiếp thì chuyển ngang"  | bằng chứng: 15/15 như trên · commit `f2dc080`
-- [x] Chọn tờ đề chia đều theo chuyên đề (để đủ 9/9 dạng)  | bằng chứng: 7 cửa xanh, CHƯA phát hành
-- [!] Phát hành  | KẸT: phiên Claude khác đang sửa đường phát hành ngay lúc này
+- [ ] "viết lại thuật toán phân công bên bảng"  | bằng chứng: (chưa có)
+- [ ] "box chọn bài bạn cho hiển thị đầy đủ số câu trong kho đề"  | bằng chứng: (chưa có)
+- [ ] "Khi tick chọn học sinh ưu tiên phân công câu 2 sao trước rồi đến 1 sao"  | bằng chứng: (chưa có)
+- [ ] "lấy tất cả mọi dữ liệu của học sinh, từ bài thi, bài tập về nhà, khắc phục câu sai đóng gói lại để phân bổ câu gọi lên bảng cho hợp lý"  | bằng chứng: (chưa có)
+- [ ] "trong 90 phút danh sách lớp phải có ít nhất 20 em được lên bảng, tính toán chữa câu khó và câu dễ đan xen gọi học sinh phù hợp"  | bằng chứng: (chưa có)
+- [ ] "số câu khó và quan trọng nhất phải được chữa hết, số câu còn lại chỉ cần đọc đáp án"  | bằng chứng: (chưa có)
+- [ ] "số câu còn lại chưa được chữa được chiếu đáp án lên bảng qua mục máy chiếu"  | bằng chứng: (chưa có)
+- [ ] Nghiệm thu 7 cửa + phát hành  | bằng chứng: (chưa có)
 
-## 7 CỬA — đo lúc 13:00–13:10 ngày 14/09, trên đúng cây đang có
+## Vì sao bản cũ không đạt 20 em
 
-| Cửa | Kết quả |
-|---|---|
-| `npx tsc -b` | 0 lỗi |
-| `npx tsc -p server/tsconfig.json --noEmit` | 0 lỗi |
-| `npx vitest run --shard=1..3/3` | 253 tệp · 3.697 phép · 0 trượt |
-| `npm run check:mau` | sạch |
-| `node scripts/kiem-13.mjs` | ĐẠT 18/18 |
-| `node scripts/kiem-sw.mjs` | ĐẠT 6/6 |
-| `npx vite build` | rc=0 |
+Cấu hình cũ: 80 phút, hao phí 480 giây, còn 4.320 giây để chữa.
+Lane L3 (em lên bảng) giá CỐ ĐỊNH 420 giây, trần 8 em.
 
-## KẸT: phiên khác đang sửa đường phát hành
+20 em × 420 giây = 8.400 giây — gấp đôi ngân sách. Không có cách nào đạt
+nếu mỗi em lên bảng đều tốn bằng nhau. Đó là lý do trần đặt 8.
 
-Lúc 12:55 phiên ấy để `server/src/goi-cu.ts` ở trạng thái VỠ: viết lại
-`danhGiaLuot` theo `layCauPhan` nhưng bỏ mất ba dòng dựng `pI`/`pII`/`pIII`,
-18 lỗi biên dịch. `wrangler` bó bằng esbuild nên KHÔNG chặn — đẩy lên là mỗi
-lượt chấm ném ReferenceError và mọi báo cáo câu sai chết. Tôi khôi phục đúng ba
-dòng ấy lúc 12:59, không đổi một chữ nào trong thiết kế của nó.
+## Phép tính mới — 90 phút, giá lên bảng theo ĐỘ KHÓ
 
-Sau đó, từ 13:02 đến 13:09 phiên ấy sửa tiếp:
-`DAY-TAT-CA.command` · `public/_headers` · `public/_redirects` · `src/sw.ts` ·
-`src/screens/ExamTakeScreen.tsx` · `PhieuScreen.tsx` · `PhieuV3.tsx` ·
-`tests/dem-cau-bao-cao-1409.test.ts` — đang dựng trang `/cai-app`.
+5.400 − 480 = 4.920 giây chữa.
 
-Đáng chú ý: `_redirects` đổi `/hs` và `/ph` từ phục vụ thẳng (mã 200, giữ
-nguyên đường dẫn) sang chuyển hướng 302. Chú thích cũ ghi rõ vì sao phải là
-200. Đổi này chạm đúng phần cài app lên màn hình iPhone đã sửa sáng nay.
+| Loại câu | Giây lên bảng | Vì sao |
+|---|---|---|
+| 2 sao (khó, quan trọng) | 300 | em làm + thầy chốt bẫy |
+| 1 sao | 180 | em làm, thầy chốt một câu |
+| 0 sao | 120 | gọi nhanh, chữa gọn |
 
-`DAY-TAT-CA.command` dựng từ CÂY LÀM VIỆC, nên bấm phát hành bây giờ là đẩy
-luôn trang `/cai-app` còn dở và luật chuyển hướng mới. Đã dừng, chờ thầy.
+Ví dụ 6 câu 2 sao + 8 câu 1 sao + 6 câu 0 sao = 20 em:
+6×300 + 8×180 + 6×120 = 3.960 giây. Còn 960 giây đọc đáp án cho phần còn lại
+(L0 5 giây, L1 20 giây mỗi câu) — thừa sức cho vài chục câu.
 
-Lệnh khi thầy cho phép: `~/Documents/DAY-OMR-APP.command`
-Lùi phần của tôi: `git revert f2dc080`
+⇒ 20 em ĐẠT ĐƯỢC, với điều kiện có đủ câu. Thiếu câu thì nói thẳng thiếu bao
+nhiêu và cần tích thêm bao nhiêu bài, KHÔNG bịa ra số em.
+
+## Việc phải làm
+
+A. Máy chủ: lệnh gói hồ sơ cả lớp trong MỘT lượt gọi — bản đồ câu sai
+   (`ban_do_sai`), câu đã làm (`qid_da_lam`, gồm cả BTVN và khắc phục),
+   bảng mạnh–yếu (`tien_do_hs`), lịch sử lên bảng (`len_bang`).
+B. Máy thầy: gộp thành một hồ sơ đầy đủ cho mỗi em.
+C. Thuật toán mới: xếp buổi chữa theo hai tầng — câu khó chữa hết, câu còn lại
+   đọc đáp án; bảo đảm số em lên bảng tối thiểu.
+D. Hộp chọn bài: hiện đủ số câu trong kho (bỏ khử trùng ở tầng HIỂN THỊ, chỉ
+   khử trùng khi DỰNG danh sách chữa).
+E. Tờ máy chiếu: thêm trang ĐÁP ÁN cho những câu chỉ đọc, không chữa.
+
+---
+
+# LƯỢT 10 — BÀI TẬP VỀ NHÀ LÀM CĂN CỨ GỌI LÊN BẢNG (14/09)
+
+- [x] "khi phân công học sinh chiếu lên bảng, bạn sử dụng dữ liệu nộp bài tập về nhà, vì tôi lấy đúng file giao về nhà cho học sinh để gọi lên bảng"  | bằng chứng: `hoSoLopLenBang` đọc `btvn_em.dap_an_json` đối chiếu kho; `TRONG_SO.BTVN_CHINH_CAU = 0,34` là trọng số NẶNG NHẤT trong `diemHopCau`; `npx vitest run tests/btvn-len-bang-1409.test.ts` → 25/25
+- [x] "phải hiển thị được học sinh đó làm bao nhiêu câu về nhà/tổng số câu, bao nhiêu câu làm đúng, bao nhiêu câu làm sai, bao nhiêu câu chưa làm"  | bằng chứng: cùng tệp test, mục "bốn con số thầy hỏi ra ĐÚNG bảng tính tay"; hiện ở 3 nơi — dòng phân công, dòng tổng cả lớp, tờ máy chiếu
+- [x] "câu bạn đó được phân lên bảng thì đã làm ở nhà là đúng hay sai hay chưa làm"  | bằng chứng: thẻ `<TheBtvn>` trên màn, `mc-btvn-*` trên tờ chiếu, `[về nhà làm SAI]` trong bảng copy
+- [ ] Nghiệm thu 7 cửa + phát hành  | bằng chứng: (chưa có)
+
+## NGUYÊN NHÂN GỐC — vì sao không thể đọc thẳng con số có sẵn
+
+`btvn_em` chỉ ghi TỔNG `so_dung` và `so_cau`. Suy ngược ra "sai mấy câu, chưa
+làm mấy câu" từ hai số ấy là BỊA, vì lúc chấm (`nopBtvnQuaPhieu`) `qidSai`
+GỘP câu bỏ trống vào câu sai — đúng thứ thầy cần tách ra.
+
+Đường đúng duy nhất: `dap_an_json` giữ nguyên bài làm của em. Đối chiếu với
+đáp án trong kho, TỪNG CÂU MỘT, là ra ba trạng thái rời nhau.
+
+## Đã làm
+
+1. `dapAnTheoMaDe(env, maDeCsv, boNho)` — MỘT hàm đọc đáp án, dùng chung cho
+   CHẤM bài và cho HỒ SƠ lên bảng. Trước đây khối đọc ấy nằm trong
+   `nopBtvnQuaPhieu`; tách ra để hai nơi không bao giờ lệch nhau một câu.
+2. `hoSoLopLenBang` thêm truy vấn thứ 5 (`btvn_em` JOIN `btvn`), lấy 4 lượt
+   giao gần nhất, LƯỢT MỚI ĐÈ LƯỢT CŨ, trả `HoSoBtvnEm`.
+3. `diemHopCau` xếp lại trọng số: bài tập về nhà của CHÍNH câu ấy nặng nhất
+   (0,34) vì thầy lấy đúng tờ đề giao về nhà làm đề gọi lên bảng.
+   sai 1,0 · chưa làm 0,8 · đúng 0 (gọi lại em đã làm đúng là đốt giờ bảng).
+4. `DongChua.em` giữ nguyên hồ sơ em thay vì cắt còn tên + số báo danh.
+5. Hiện ở ba nơi: dòng phân công, dòng tổng cả lớp, và tờ máy chiếu.
+
+## Giả định đã dùng
+
+- Chỉ tính 4 lượt giao gần nhất (`TRAN_LUOT_BTVN`). Bài tháng trước không nói
+  gì về buổi chữa hôm nay, mà mỗi lượt là thêm một lần chạm R2.
+- Câu KHÔNG nằm trong bài giao về nhà thì KHÔNG hiện nhãn, và cộng 0 điểm —
+  khác hẳn "chưa làm". Hiện nhãn "chưa làm" cho câu chưa từng giao là bịa.

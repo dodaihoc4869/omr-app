@@ -29,11 +29,14 @@ import { SO_CAU_MAC_DINH } from '../lib/cau-hinh-chua'
 import ThanhSoCauChua from '../components/ThanhSoCauChua'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import type { OBang as OBangMayChieu } from '../lib/html-may-chieu'
+import type { CauLuyen } from '../lib/bai-tap-pdf'
 import { bangChu, chuCau, chuChum, MAC_DINH, phanCong, TEN_MUC_NHAM, type CauChua, type DongPhanCong, type KetQuaPhanCong } from '../lib/phan-cong'
 import { baiLamCoGiayTuCa } from '../lib/du-lieu-len-bang'
 import { CAU_HINH_LEN_BANG_MAC_DINH, TEN_LANE, dongHo, nganSachGiay } from '../lib/len-bang-cau-hinh'
 import { dungDoKho, vapCuaLop } from '../lib/do-kho-cau'
 import { doiEmChoDong, xepGioLenBang, type KetQuaXep } from '../lib/xep-gio-len-bang'
+import { xepBuoiChua, bangChuBuoiChua, type CauVaoXep, type KetQuaBuoiChua } from '../lib/xep-buoi-chua'
+import { btvnCuaCau, napHoSoLop, type HoSoEmDayDu, type KetQuaBtvn } from '../lib/ho-so-lop'
 import { dungGiaoAn } from '../lib/giao-an-len-bang'
 import { KHO_DO_KHO_RONG, gopCaVaoKho, thongKeKho, type KhoDoKhoLuu } from '../lib/kho-do-kho'
 import { docKhoDoKho, luuKhoDoKho } from '../lib/exam-db'
@@ -43,6 +46,46 @@ import { useAppStore } from '../store/appStore'
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const TIEU_DE_MUC: React.CSSProperties = { fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)', fontWeight: 700, color: 'var(--muc)' }
+
+/** THẺ BÀI TẬP VỀ NHÀ của ĐÚNG câu em được phân lên bảng (thầy chốt 14/09).
+ *
+ * Ba màu, đọc lướt là ra: đỏ = ở nhà làm SAI (chữa đúng chỗ em hiểu lệch),
+ * cam = CHƯA LÀM (em chưa qua được câu này), xanh = làm ĐÚNG rồi.
+ * `null` nghĩa là câu ấy KHÔNG nằm trong bài giao về nhà — khác "chưa làm",
+ * nên không hiện thẻ, tránh đọc nhầm. */
+const MAU_BTVN: Record<KetQuaBtvn, { nen: string; vien: string; nhan: string }> = {
+  sai: { nen: 'var(--gg-do-nen)', vien: 'var(--gg-do)', nhan: 'Nhà: SAI' },
+  chuaLam: { nen: 'var(--cam-nen)', vien: 'var(--cam)', nhan: 'Nhà: CHƯA LÀM' },
+  dung: { nen: 'var(--gg-luc-nen)', vien: 'var(--gg-luc)', nhan: 'Nhà: ĐÚNG' },
+}
+
+function TheBtvn({ kq }: { kq: KetQuaBtvn | null }) {
+  if (!kq) return null
+  const m = MAU_BTVN[kq]
+  return (
+    <span
+      className="font-bold"
+      style={{
+        fontFamily: 'var(--sans)',
+        fontSize: '12px',
+        letterSpacing: '0.02em',
+        padding: '1px 9px',
+        borderRadius: 'var(--bo-tron)',
+        background: m.nen,
+        // CHỮ LẤY MÀU MỰC CHÍNH, không lấy màu trạng thái: chữ cam trên nền
+        // cam nhạt chỉ đạt ~2:1, thầy nhìn màn hình giữa lớp là mất chữ. Màu
+        // trạng thái chuyển sang VIỀN + NỀN, còn chữ thì luôn đọc được — mà
+        // trạng thái vẫn không phụ thuộc màu, vì nó viết hẳn ra chữ.
+        color: 'var(--muc)',
+        border: `1.5px solid ${m.vien}`,
+        whiteSpace: 'nowrap',
+      }}
+      data-btvn={kq}
+    >
+      {m.nhan}
+    </span>
+  )
+}
 const O_NHAP: React.CSSProperties = {
   height: 48,
   borderRadius: 'var(--bo-1)',
@@ -145,6 +188,12 @@ export default function GoiLenBangScreen() {
 
   /** HTML tờ máy chiếu đang mở. Rỗng là chưa dựng. */
   const [htmlMayChieu, setHtmlMayChieu] = useState('')
+
+  /** Hồ sơ ĐẦY ĐỦ cả lớp — bài thi + bài tập về nhà + khắc phục câu sai. */
+  const [hoSoLop, setHoSoLop] = useState<HoSoEmDayDu[]>([])
+  const [loiHoSo, setLoiHoSo] = useState('')
+  /** Kết quả xếp buổi chữa theo thuật toán mới. */
+  const [kqBuoi, setKqBuoi] = useState<KetQuaBuoiChua | null>(null)
   const [boBatBuoc, setBoBatBuoc] = useState<string[]>([])
   const [tranEm, setTranEm] = useState(CAU_HINH_LEN_BANG_MAC_DINH.SO_EM_LEN_BANG_TOI_DA)
   const [giayMoiEm, setGiayMoiEm] = useState(CAU_HINH_LEN_BANG_MAC_DINH.GIAY_LANE.L3)
@@ -161,7 +210,15 @@ export default function GoiLenBangScreen() {
       const [url, mat, kho] = await Promise.all([loadScriptUrl(), loadTeacherSecret(), loadExamSources()])
       // Mỗi mã đề tách làm ba dạng (trắc nghiệm · đúng sai · trả lời ngắn), y
       // hệt màn Mở ca — tích một dòng là lấy đúng dạng đó.
-      setDeDaLuu(khuTrungNguon(tachNhieuTheoPhan(kho)).nguon)
+      // HỘP CHỌN BÀI HIỆN ĐỦ SỐ CÂU TRONG KHO (thầy chốt 14/09).
+      //
+      // Bản trước khử trùng câu NGAY TẠI ĐÂY rồi mới đưa vào hộp, nên số câu
+      // mỗi bài hiện ra ít hơn số câu thật, và bài nào trùng sạch thì BIẾN MẤT
+      // khỏi cây — thầy tìm không ra bài mình vừa nạp.
+      //
+      // Khử trùng là việc của lúc DỰNG DANH SÁCH CHỮA, không phải của lúc HIỆN
+      // CÂY. Nay hộp nhận kho đầy đủ; `bankTichTay` mới là chỗ khử trùng.
+      setDeDaLuu(tachNhieuTheoPhan(kho))
       if (!url.trim() || !mat.trim()) {
         setLoi('Chưa cấu hình địa chỉ máy chủ hoặc mã bí mật — vào Ngân hàng câu hỏi → Cấu hình')
         setDsCa([])
@@ -295,7 +352,17 @@ export default function GoiLenBangScreen() {
   }, [kqChua, khoDe])
 
   /** Bản đề của các mã thầy tích thêm, gộp lại thành một kho. */
-  const bankTichTay: BanDeCa = useMemo(() => mergeKeepAnswers(deDaLuu.filter((d) => maDeChon.has(d.maDe))), [deDaLuu, maDeChon])
+  // KHỬ TRÙNG Ở ĐÂY, sau khi thầy đã tích — hộp chọn vẫn hiện đủ kho, còn danh
+  // sách chữa thì không có hai câu y hệt nhau.
+  const bankTichTay: BanDeCa = useMemo(
+    () => mergeKeepAnswers(khuTrungNguon(deDaLuu.filter((d) => maDeChon.has(d.maDe))).nguon),
+    [deDaLuu, maDeChon],
+  )
+  /** Số câu bị bỏ vì trùng — nói ra để thầy khỏi thắc mắc sao tích 40 ra 36. */
+  const soCauTrung = useMemo(() => {
+    const bo = khuTrungNguon(deDaLuu.filter((d) => maDeChon.has(d.maDe))).boQua
+    return bo.I + bo.II + bo.III
+  }, [deDaLuu, maDeChon])
 
   /** Câu chữa THÊM = kho chữa tự nạp của ca + đề thầy tích tay. Cả hai đều là
    * câu không em nào làm, nên không bao giờ bị xếp "giảng cả lớp". */
@@ -559,9 +626,63 @@ export default function GoiLenBangScreen() {
 
   /** MỘT NÚT CHẠY CẢ HAI, đúng thứ tự: xếp giờ trước để biết em nào lên bảng,
    * phân công sau để biết em ấy chữa câu nào. */
+  /** CÂU ĐƯA VÀO THUẬT TOÁN MỚI — gộp độ khó đo được với sao trong kho. */
+  const cauVaoXep = useMemo<CauVaoXep[]>(
+    () =>
+      doKhoCau.map((d) => ({
+        cau: d.cau,
+        tiLeDung: d.n1 && d.n1.n > 0 ? (d.n1.n - d.n1.sai) / d.n1.n : null,
+        soEmLam: d.n1?.n ?? 0,
+        batBuoc: d.batBuoc && !boBatBuoc.includes(d.cau.id),
+      })),
+    [doKhoCau, boBatBuoc],
+  )
+
+  /** BÀI TẬP VỀ NHÀ CẢ LỚP — cộng dồn từ hồ sơ, KHÔNG ước lượng. Không em nào
+   * có bài giao thì trả `null` để màn hình nói thẳng là chưa có dữ liệu. */
+  const tomBtvnLop = useMemo(() => {
+    const co = hoSoLop.filter((e) => e.btvn.soCauGiao > 0)
+    if (co.length === 0) return null
+    return {
+      soEmCoBai: co.length,
+      giao: co.reduce((t, e) => t + e.btvn.soCauGiao, 0),
+      daLam: co.reduce((t, e) => t + e.btvn.soDaLam, 0),
+      dung: co.reduce((t, e) => t + e.btvn.soDung, 0),
+      sai: co.reduce((t, e) => t + e.btvn.soSai, 0),
+      chua: co.reduce((t, e) => t + e.btvn.soChuaLam, 0),
+    }
+  }, [hoSoLop])
+
+  /** XẾP BUỔI CHỮA 90 PHÚT — thuật toán viết lại 14/09.
+   *
+   * Trước khi xếp phải có HỒ SƠ ĐẦY ĐỦ của lớp: chỉ nhìn ca vừa thi thì gọi
+   * nhầm hai kiểu em — em đã chữa câu ấy rồi, và em ca này không làm câu ấy
+   * nhưng sai đúng dạng ấy trong bài tập về nhà. */
+  const chayBuoiChua = async () => {
+    if (!du) return
+    const coMat = dsEmCa.filter((e) => e.coMat).map((e) => ({ sbd: e.sbd, hoTen: e.hoTen, coMat: true }))
+    if (coMat.length === 0) return showToast('Không em nào có mặt', 'warn')
+
+    let hoSo = hoSoLop
+    if (hoSo.length !== coMat.length) {
+      const r = await napHoSoLop(cauHinh?.url ?? '', cauHinh?.mat ?? '', coMat)
+      hoSo = r.hoSo
+      setHoSoLop(r.hoSo)
+      setLoiHoSo(r.loi)
+      // KHÔNG DỪNG khi mất mạng: vẫn xếp được bằng dữ liệu ca hiện tại, chỉ là
+      // ghép em kém chính xác hơn — và màn hình nói rõ điều đó.
+      if (r.loi) showToast(`Chưa lấy được hồ sơ lớp (${r.loi}) — xếp bằng dữ liệu ca này`, 'warn')
+    }
+
+    const kq = xepBuoiChua(cauVaoXep, hoSo)
+    setKqBuoi(kq)
+    if (!kq.datSan && kq.thieu) showToast(`Mới ${kq.soEmLenBang}/${kq.soEmToiThieu} em lên bảng — ${kq.thieu.viSao}`, 'warn')
+  }
+
   const chayCaHai = () => {
     chayGiaoAn()
     chay(1)
+    void chayBuoiChua()
   }
 
   /** TỜ MÁY CHIẾU — hai em một đợt, chiếu lên bảng để gọi lên chữa.
@@ -569,7 +690,38 @@ export default function GoiLenBangScreen() {
    * Nguồn là ĐÚNG bảng phân công vừa chạy, không rút lại bộ khác: tờ chiếu lên
    * bảng mà khác bảng phân công thầy đang cầm thì gọi nhầm em ngay. */
   const moMayChieu = async () => {
-    const dsPc = kq?.phanCong ?? []
+    // NGUỒN LÀ BUỔI CHỮA MỚI khi đã xếp; chưa xếp thì lùi về bảng phân công cũ.
+    // BÀI TẬP VỀ NHÀ đi kèm từng ô: câu ấy em ở nhà làm ra sao, và cả lượt em
+    // làm được bao nhiêu. Đường phân công CŨ (chưa xếp buổi chữa) không có hồ
+    // sơ em, nên để trống — tờ chiếu sẽ không in dòng ấy, chứ không đoán.
+    const dsPc: {
+      sbd: string
+      hoTen: string
+      cau: CauChua
+      viSao: string
+      btvnCau?: KetQuaBtvn
+      btvnTom?: OBangMayChieu['btvnTom']
+    }[] = kqBuoi
+      ? kqBuoi.dong
+          .filter((d) => d.tang === 'len_bang' && d.em)
+          .map((d) => ({
+            sbd: d.em!.sbd,
+            hoTen: d.em!.hoTen,
+            cau: d.cau,
+            viSao: d.viSao,
+            btvnCau: btvnCuaCau(d.em!, d.cau.id) ?? undefined,
+            btvnTom:
+              d.em!.btvn.soCauGiao > 0
+                ? {
+                    soCauGiao: d.em!.btvn.soCauGiao,
+                    soDaLam: d.em!.btvn.soDaLam,
+                    soDung: d.em!.btvn.soDung,
+                    soSai: d.em!.btvn.soSai,
+                    soChuaLam: d.em!.btvn.soChuaLam,
+                  }
+                : undefined,
+          }))
+      : (kq?.phanCong ?? []).map((p) => ({ sbd: p.sbd, hoTen: p.hoTen, cau: p.cau, viSao: p.viSao }))
     if (dsPc.length === 0) {
       return showToast('Chưa có bảng phân công — bấm "Xếp giờ & phân công lên bảng" trước', 'warn')
     }
@@ -592,7 +744,7 @@ export default function GoiLenBangScreen() {
         thieu.push(`${p.hoTen || p.sbd} — câu ${p.cau.so} phần ${p.cau.phan}`)
         continue
       }
-      dsO.push({ sbd: p.sbd, hoTen: p.hoTen, soCau: p.cau.so, cau: cl, viSao: p.viSao })
+      dsO.push({ sbd: p.sbd, hoTen: p.hoTen, soCau: p.cau.so, cau: cl, viSao: p.viSao, btvnCau: p.btvnCau, btvnTom: p.btvnTom })
     }
 
     // CẤM CHIẾU MỘT TỜ THIẾU CÂU MÀ KHÔNG NÓI. Câu nào không tra được nội dung
@@ -602,10 +754,20 @@ export default function GoiLenBangScreen() {
     }
     if (dsO.length === 0) return
 
+    // CÂU CHỈ ĐỌC ĐÁP ÁN đi thành trang đáp án nối sau các đợt (thầy chốt 14/09).
+    const dsDapAn: CauLuyen[] = []
+    for (const c of kqBuoi?.cauDocDapAn ?? []) {
+      const day = traCau.get(c.id)
+      if (!day) continue
+      const [cl] = cauLuyenTuBoCau([{ phan: day.phan, q: day.q } as Parameters<typeof cauLuyenTuBoCau>[0][number]])
+      if (cl) dsDapAn.push(cl)
+    }
+
     setHtmlMayChieu(
       taoHtmlMayChieu(dsO, {
         tenBuoi: du ? `Chữa bài ca ${du.maCa}` : 'Gọi lên bảng',
         ngay: new Date(),
+        dsDapAn,
       }),
     )
   }
@@ -971,6 +1133,13 @@ export default function GoiLenBangScreen() {
             cao={264}
           />
           ))}
+        {/* Hộp trên hiện ĐỦ SỐ CÂU TRONG KHO. Câu trùng chỉ bị bỏ khi dựng danh
+            sách chữa — nói ra con số ấy để thầy khỏi thắc mắc tích 40 ra 36. */}
+        {soCauTrung > 0 && (
+          <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
+            Đã bỏ <span style={SO}>{soCauTrung}</span> câu trùng giữa các bài đã tích — danh sách chữa lấy mỗi câu một lần.
+          </div>
+        )}
       </TheNoiDung>
 
       {/* 3 — EM CÓ MẶT */}
@@ -1115,6 +1284,71 @@ export default function GoiLenBangScreen() {
               Một lượt bấm ra cả giáo án theo phút và bảng phân công từng em.
             </div>
           </div>
+
+          {/* BUỔI CHỮA 90 PHÚT — thuật toán viết lại 14/09. Hai con số thầy cần
+              nhìn đầu tiên: bao nhiêu em lên bảng, và hết bao nhiêu phút. */}
+          {kqBuoi && (
+            <div style={{ marginTop: 'var(--k4)', padding: 'var(--k3)', borderRadius: 'var(--bo-2)', background: kqBuoi.datSan ? 'var(--gg-luc-nen)' : 'var(--cam-nen)' }} data-khoi="buoi-chua">
+              <div className="flex items-center flex-wrap" style={{ gap: 'var(--k3)' }}>
+                <span className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: kqBuoi.datSan ? 'var(--gg-luc)' : 'var(--cam)' }}>
+                  <span style={SO}>{kqBuoi.soEmLenBang}</span>/<span style={SO}>{kqBuoi.soEmToiThieu}</span> em lên bảng
+                </span>
+                <span style={{ ...NHAN_NHO, ...SO }}>
+                  {Math.round(kqBuoi.tongGiay / 60)}/{Math.round(kqBuoi.nganSach / 60)} phút
+                </span>
+                <span style={{ ...NHAN_NHO, ...SO }}>{kqBuoi.cauDocDapAn.length} câu chỉ đọc đáp án</span>
+              </div>
+              {tomBtvnLop && (
+                <div style={{ ...NHAN_NHO, ...SO, marginTop: 6 }}>
+                  Bài tập về nhà cả lớp: làm {tomBtvnLop.daLam}/{tomBtvnLop.giao} câu · đúng {tomBtvnLop.dung} · sai{' '}
+                  {tomBtvnLop.sai} · chưa làm {tomBtvnLop.chua} · {tomBtvnLop.soEmCoBai} em có bài giao
+                </div>
+              )}
+              {!tomBtvnLop && !loiHoSo && (
+                <div style={{ ...NHAN_NHO, marginTop: 6 }}>
+                  Chưa có dữ liệu bài tập về nhà cho lớp này — đang ghép em bằng bài thi và phiếu khắc phục.
+                </div>
+              )}
+              {kqBuoi.thieu && (
+                <div style={{ ...NHAN_NHO, marginTop: 6 }}>Chưa đủ sàn: {kqBuoi.thieu.viSao}</div>
+              )}
+              {loiHoSo && (
+                <div style={{ ...NHAN_NHO, marginTop: 6 }}>
+                  Hồ sơ lớp chưa lấy được ({loiHoSo}) — đang ghép em bằng dữ liệu ca này, kém chính xác hơn.
+                </div>
+              )}
+              <div className="flex flex-col" style={{ gap: 'var(--k1)', marginTop: 'var(--k3)', maxHeight: 260, overflowY: 'auto' }}>
+                {kqBuoi.dong
+                  .filter((d) => d.tang === 'len_bang')
+                  .map((d, i) => (
+                    <div key={d.cau.id} className="flex items-center" style={{ gap: 'var(--k2)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}>
+                      <span style={{ ...SO, color: 'var(--nhat)', minWidth: 22 }}>{i + 1}.</span>
+                      <span className="font-bold">{d.em?.hoTen || d.em?.sbd}</span>
+                      <span style={{ ...NHAN_NHO, ...SO }}>{chuCau(d.cau)}</span>
+                      {/* BÀI TẬP VỀ NHÀ — hai thứ, đúng như thầy chốt 14/09:
+                          câu ĐANG PHÂN em ở nhà làm ra sao, và cả lượt em làm
+                          được bao nhiêu trên tổng số câu được giao. */}
+                      <TheBtvn kq={d.em ? btvnCuaCau(d.em, d.cau.id) : null} />
+                      {d.em && d.em.btvn.soCauGiao > 0 && (
+                        <span style={{ ...NHAN_NHO, ...SO }}>
+                          {d.em.btvn.soDaLam}/{d.em.btvn.soCauGiao} · Đ {d.em.btvn.soDung} · S {d.em.btvn.soSai} · ? {d.em.btvn.soChuaLam}
+                        </span>
+                      )}
+                      <span style={{ ...NHAN_NHO, ...SO, marginLeft: 'auto' }}>{Math.round(d.giay / 60)}′</span>
+                      <span className="truncate" style={{ ...NHAN_NHO, flex: '0 1 auto' }}>{d.viSao}</span>
+                    </div>
+                  ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => void navigator.clipboard.writeText(bangChuBuoiChua(kqBuoi, du ? `Ca ${du.maCa}` : 'Buổi chữa')).then(() => showToast('Đã copy bảng buổi chữa', 'success'))}
+                className="tap-target inline-flex items-center font-bold"
+                style={{ gap: 6, minHeight: 40, marginTop: 'var(--k3)', padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--the)', color: 'var(--muc)', border: '1px solid var(--vien)', fontSize: 'var(--cx-1)' }}
+              >
+                <ClipboardCopy size={16} /> Copy bảng buổi chữa
+              </button>
+            </div>
+          )}
 
           {/* 5 — CẢNH BÁO THỪA GIỜ: hiện đúng con số và ba lựa chọn, CHỜ THẦY CHẠM */}
           {kqXep?.thuaGio && (

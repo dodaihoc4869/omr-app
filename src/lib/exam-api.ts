@@ -1493,6 +1493,49 @@ export interface QuyenHoSo {
   tokenPH?: string
 }
 
+/** HỒ SƠ CẢ LỚP CHO BUỔI CHỮA — một lượt gọi cho tối đa 60 em.
+ *
+ * Gộp bốn nguồn: mạnh–yếu theo chuyên đề, bản đồ câu sai từng câu, câu đã làm
+ * (gồm bài tập về nhà và phiếu khắc phục), và lịch sử lên bảng. Xem
+ * `hoSoLopLenBang` bên máy chủ. */
+export interface HoSoLopMayChu {
+  em: Record<
+    string,
+    {
+      chuyenDe: { ten: string; soCau: number; soSai: number }[]
+      qidSai: { qid: string; chuyenDe: string; mucDo: string; soLanSai: number; daChua: boolean; maCa: string }[]
+      qidDaLam: { qid: string; soLan: number }[]
+      lenBang: { soLan: number; lanCuoi: string; qids: string[] }
+      /** Bài tập về nhà đã quy về TỪNG CÂU. Máy chủ đối chiếu `dap_an_json`
+       * của em với đáp án trong kho, nên ba mảng qid rời nhau và cộng lại
+       * đúng bằng `soCauGiao`. Máy chủ đời cũ chưa trả trường này. */
+      btvn?: HoSoBtvnMayChu
+    }
+  >
+}
+
+/** BÀI TẬP VỀ NHÀ CỦA MỘT EM — bản máy chủ trả về. Giữ đúng tên trường với
+ * `HoSoBtvnEm` bên `server/src/goi-cu.ts`; đổi một bên là lệch cả hai. */
+export interface HoSoBtvnMayChu {
+  soCauGiao: number
+  soDaLam: number
+  soDung: number
+  soSai: number
+  soChuaLam: number
+  soLuot: number
+  soLuotDaNop: number
+  qidDung: string[]
+  qidSai: string[]
+  qidChuaLam: string[]
+  luot: { maBtvn: string; giaoLuc: string; daNop: boolean; soCau: number; soDung: number; soSai: number; soChuaLam: number }[]
+}
+
+export async function goiHoSoLopLenBang(scriptUrl: string, secret: string, dsSbd: string[], soNgay = 60): Promise<HoSoLopMayChu> {
+  const r = await postJson(scriptUrl, { action: 'hoSoLopLenBang', secret, dsSbd, soNgay }, 45)
+  if (!r.ok) throw new Error(r.error || 'Không lấy được hồ sơ lớp')
+  return { em: (r.em ?? {}) as HoSoLopMayChu['em'] }
+}
+
 export async function hoSoEm(scriptUrl: string, quyen: QuyenHoSo): Promise<HoSoEm> {
   const r = await postJson(scriptUrl, { action: 'hoSoEm', ...quyen })
   if (!r.ok) throw new Error(r.error || 'Không lấy được hồ sơ')

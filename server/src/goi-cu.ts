@@ -125,7 +125,7 @@ export function goiDemCau(d: DemBangCham | undefined) {
   return {
     tongCau: d ? d.tong : null,
     soCauDung: d ? d.dung : null,
-    soCauSai: d ? d.sai : null,
+    soCauSai: d ? Math.max(0, d.tong - d.dung) : null,
     soCauDungMotPhan: d ? d.motPhan : null,
     soCauBoTrong: d ? d.trong : null,
     soYDungII: d ? d.yDung : null,
@@ -199,7 +199,7 @@ export async function hoSoEm(env: Env, b: Record<string, unknown>): Promise<Reco
   // đây — hạng và sĩ số do máy thầy tính, đúng như đường cũ.
   const rCa = await env.DB.prepare(
     `SELECT l.ma_ca, l.lan_thu, l.nop_luc, l.trang_thai, l.diem_i, l.diem_ii, l.diem_iii, l.tong,
-            l.so_lan_roi_man, c.ten_ca, c.lop
+            l.so_lan_roi_man, l.dap_an_json, c.ten_ca, c.lop, c.bo_theo_em_json, c.so_cau_json
        FROM luot l LEFT JOIN ca c ON c.ma_ca = l.ma_ca
       WHERE l.sbd = ? ORDER BY l.nop_luc DESC LIMIT 200`,
   )
@@ -221,6 +221,24 @@ export async function hoSoEm(env: Env, b: Record<string, unknown>): Promise<Reco
       .all<Record<string, unknown>>()
     for (const x of rd.results ?? []) {
       demCa.set(chuoi(x.ma_ca), docDemBangCham(x))
+    }
+  }
+
+  // Tự động chữa lành cho các ca đã nộp mà chưa có dòng trong chi_tiet_cau
+  for (const x of rCa.results ?? []) {
+    const maCa = chuoi(x.ma_ca)
+    if (!demCa.has(maCa) && x.dap_an_json && env.DE) {
+      const bData = await docBankDe(env, maCa)
+      if (bData) {
+        let dapAnObj: any = null
+        try { dapAnObj = typeof x.dap_an_json === 'string' ? JSON.parse(x.dap_an_json) : x.dap_an_json } catch {}
+        if (dapAnObj) {
+          const dg = danhGiaLuot(bData, x, dapAnObj, sbd, maCa, Number(x.lan_thu) || 1, chuoi(x.ten_ca))
+          const d = demTuChiTiet(dg.dsChiTiet)
+          demCa.set(maCa, d)
+          void luuChiTietCauNeuChuaCo(env, maCa, sbd, Number(x.lan_thu) || 1, dg.dsChiTiet, dg.dsCauSai)
+        }
+      }
     }
   }
 
@@ -836,39 +854,7 @@ async function nopBtvnQuaPhieu(
     return { ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN' }
   }
 
-  const dapAnDung: Record<string, string> = {}
-  if (env.DE) {
-    const daDoc = new Map<string, Record<string, unknown>[]>()
-    for (const m of chuoi(bt.ma_de).split(',').map((x) => x.trim()).filter(Boolean)) {
-      const { goc, phan } = goPhanMa(m)
-      if (!daDoc.has(goc)) {
-        const o = await env.DE.get(`kho/${goc}.json`)
-        if (!o?.body) {
-          daDoc.set(goc, [])
-        } else {
-          try {
-            const g = (await new Response(o.body).json()) as Record<string, unknown>
-            daDoc.set(goc, Array.isArray(g.cau) ? (g.cau as Record<string, unknown>[]) : [])
-          } catch {
-            daDoc.set(goc, [])
-          }
-        }
-      }
-      const cau = daDoc.get(goc) ?? []
-      for (const c of phan ? cau.filter((x) => chuoi(x.phan) === phan) : cau) {
-        const qid = `${goc}-${chuoi(c.phan)}-${chuoi(c.so)}`
-        const da = c.dap_an ?? c.dapAn
-        // Phần II có đáp án dạng đối tượng {a,b,c,d}; ép về chuỗi "DSDS" đúng
-        // như máy em chấm, không đoán kiểu khác.
-        dapAnDung[qid] = (typeof da === 'object' && da !== null
-          ? ['a', 'b', 'c', 'd'].map((k) => chuoi((da as Record<string, unknown>)[k])).join('')
-          : chuoi(da)
-        )
-          .trim()
-          .toUpperCase()
-      }
-    }
-  }
+  const dapAnDung: Record<string, string> = Object.fromEntries(await dapAnTheoMaDe(env, chuoi(bt.ma_de)))
 
   const qidSai: string[] = []
   let soDung = 0
@@ -920,6 +906,67 @@ function goPhanMa(ma: string): { goc: string; phan: 'I' | 'II' | 'III' | null } 
     if (ma.endsWith(duoi)) return { goc: ma.slice(0, -duoi.length), phan }
   }
   return { goc: ma, phan: null }
+}
+
+/** ĐÁP ÁN ĐÚNG CỦA MỘT CHUỖI MÃ ĐỀ — dùng chung cho CHẤM bài tập về nhà và cho
+ * HỒ SƠ lên bảng, để hai nơi không bao giờ lệch nhau một câu nào.
+ *
+ * `maDeCsv` là trường `btvn.ma_de`: nhiều tờ ngăn bởi dấu phẩy, mỗi tờ có thể
+ * kèm hậu tố phần (`-TN`, `-DS`, `-TLN`) nghĩa là chỉ lấy phần ấy.
+ *
+ * `boNho` cho phép đọc nhiều lượt giao mà mỗi tờ đề chỉ chạm R2 một lần.
+ *
+ * Khoá của map là `<mã đề gốc>-<phần>-<số>` — ĐÚNG khoá máy em gửi lên trong
+ * `dap_an_json`, và cũng đúng `id` câu bên kho đề của thầy. Đổi cách dựng khoá
+ * ở đây là hỏng cả chấm lẫn đối chiếu, nên đừng đổi.
+ *
+ * Câu không có đáp án trong kho thì KHÔNG vào map — không đoán.
+ */
+export async function dapAnTheoMaDe(
+  env: Env,
+  maDeCsv: string,
+  boNho?: Map<string, Record<string, unknown>[]>,
+): Promise<Map<string, string>> {
+  const ra = new Map<string, string>()
+  if (!env.DE) return ra
+  const daDoc = boNho ?? new Map<string, Record<string, unknown>[]>()
+  for (const m of chuoi(maDeCsv).split(',').map((x) => x.trim()).filter(Boolean)) {
+    const { goc, phan } = goPhanMa(m)
+    if (!daDoc.has(goc)) {
+      let cau: Record<string, unknown>[] = []
+      try {
+        const o = await env.DE.get(`kho/${goc}.json`)
+        if (o?.body) {
+          const g = (await new Response(o.body).json()) as Record<string, unknown>
+          cau = Array.isArray(g.cau) ? (g.cau as Record<string, unknown>[]) : []
+          // Tờ kho đời cũ tách sẵn ba phần thay vì một mảng `cau`.
+          if (cau.length === 0) {
+            for (const k of ['phanI', 'phanII', 'phanIII']) {
+              if (Array.isArray(g[k])) cau.push(...(g[k] as Record<string, unknown>[]))
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[kho] không đọc được tờ đề', goc, e)
+      }
+      daDoc.set(goc, cau)
+    }
+    const cau = daDoc.get(goc) ?? []
+    for (const c of phan ? cau.filter((x) => chuoi(x.phan) === phan) : cau) {
+      const qid = `${goc}-${chuoi(c.phan)}-${chuoi(c.so)}`
+      const da = c.dap_an ?? c.dapAn
+      // Phần II có đáp án dạng đối tượng {a,b,c,d}; ép về chuỗi "DSDS".
+      const dung = (
+        typeof da === 'object' && da !== null
+          ? ['a', 'b', 'c', 'd'].map((k) => chuoi((da as Record<string, unknown>)[k])).join('')
+          : chuoi(da)
+      )
+        .trim()
+        .toUpperCase()
+      if (dung) ra.set(qid, dung)
+    }
+  }
+  return ra
 }
 
 export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
@@ -1354,6 +1401,222 @@ export async function lichSuLenBang(env: Env, b: Record<string, unknown>): Promi
   return { ok: true, soNgay, theoEm }
 }
 
+/** HỒ SƠ CẢ LỚP CHO BUỔI CHỮA — MỘT LƯỢT GỌI, KHÔNG PHẢI MỖI EM MỘT LƯỢT.
+ *
+ * Thầy chốt 14/09: "lấy tất cả mọi dữ liệu của học sinh, từ bài thi, bài tập
+ * về nhà, khắc phục câu sai đóng gói lại để phân bổ câu gọi lên bảng cho hợp lý".
+ *
+ * Bốn nguồn, đủ cả ba đường em chạm vào câu hỏi:
+ *   · `tien_do_hs`  — bảng mạnh–yếu cộng dồn theo chuyên đề (mọi ca đã chấm)
+ *   · `ban_do_sai`  — TỪNG CÂU em sai, kèm số lần sai và đã chữa hay chưa
+ *   · `qid_da_lam`  — câu em ĐÃ LÀM, gồm cả bài tập về nhà và phiếu khắc phục
+ *   · `len_bang`    — em đã lên bảng mấy lần, câu nào
+ *
+ * VÌ SAO GỘP MỘT LỆNH: màn Gọi lên bảng cần cả bốn thứ cho CẢ LỚP. Gọi riêng
+ * từng em là 30 em × 4 = 120 lượt truy vấn cho một lần bấm nút — đúng thứ luật
+ * "mỗi lệnh 1–3 câu truy vấn" ở đầu tệp này cấm.
+ *
+ * KHÔNG ĐOÁN: em không có dòng nào thì trả mảng rỗng, không dựng số giả. */
+/** Số lượt giao bài tập về nhà GẦN NHẤT được tính vào hồ sơ lên bảng. Lượt cũ
+ * hơn không nói gì về buổi chữa hôm nay, mà mỗi lượt là thêm một lần đọc R2. */
+const TRAN_LUOT_BTVN = 4
+
+/** BÀI TẬP VỀ NHÀ CỦA MỘT EM, đã quy về từng câu. Ba mảng qid rời nhau: một
+ * câu chỉ nằm ở đúng một mảng, nên `soCauGiao = soDung + soSai + soChuaLam`. */
+export interface HoSoBtvnEm {
+  soCauGiao: number
+  soDaLam: number
+  soDung: number
+  soSai: number
+  soChuaLam: number
+  soLuot: number
+  soLuotDaNop: number
+  qidDung: string[]
+  qidSai: string[]
+  qidChuaLam: string[]
+  luot: { maBtvn: string; giaoLuc: string; daNop: boolean; soCau: number; soDung: number; soSai: number; soChuaLam: number }[]
+}
+
+export async function hoSoLopLenBang(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const ds = [...new Set((Array.isArray(b.dsSbd) ? (b.dsSbd as unknown[]) : []).map((x) => chuoi(x).trim()).filter(Boolean))].slice(0, 60)
+  if (ds.length === 0) return { ok: false, error: 'Thiếu danh sách số báo danh' }
+  const soNgay = Number(b.soNgay) > 0 ? Number(b.soNgay) : 60
+  const tu = new Date(Date.now() - soNgay * 86400000).toISOString()
+  const cho = ds.map(() => '?').join(',')
+
+  const [rTienDo, rSai, rDaLam, rBang, rBtvn] = await Promise.all([
+    env.DB.prepare(`SELECT sbd, chuyen_de, so_cau, so_sai FROM tien_do_hs WHERE sbd IN (${cho}) AND so_cau > 0`).bind(...ds).all<Record<string, unknown>>(),
+    env.DB.prepare(
+      `SELECT sbd, qid, chuyen_de, muc_do, so_lan_sai, da_chua, ma_ca FROM ban_do_sai WHERE sbd IN (${cho}) LIMIT 6000`,
+    ).bind(...ds).all<Record<string, unknown>>(),
+    env.DB.prepare(`SELECT sbd, qid, so_lan FROM qid_da_lam WHERE sbd IN (${cho}) LIMIT 20000`).bind(...ds).all<Record<string, unknown>>(),
+    env.DB.prepare(`SELECT sbd, qid, luc FROM len_bang WHERE sbd IN (${cho}) AND luc >= ? ORDER BY luc DESC LIMIT 4000`).bind(...ds, tu).all<Record<string, unknown>>(),
+    env.DB.prepare(
+      `SELECT be.sbd, be.ma_btvn, be.nop_luc, be.dap_an_json, b.ma_de, b.giao_luc, b.han_nop
+         FROM btvn_em be JOIN btvn b ON b.ma_btvn = be.ma_btvn
+        WHERE be.sbd IN (${cho}) AND b.da_xoa = 0
+        ORDER BY b.giao_luc DESC LIMIT 600`,
+    ).bind(...ds).all<Record<string, unknown>>(),
+  ])
+
+  const em: Record<string, {
+    chuyenDe: { ten: string; soCau: number; soSai: number }[]
+    qidSai: { qid: string; chuyenDe: string; mucDo: string; soLanSai: number; daChua: boolean; maCa: string }[]
+    qidDaLam: { qid: string; soLan: number }[]
+    lenBang: { soLan: number; lanCuoi: string; qids: string[] }
+    btvn: HoSoBtvnEm
+  }> = {}
+  for (const s2 of ds) {
+    em[s2] = {
+      chuyenDe: [],
+      qidSai: [],
+      qidDaLam: [],
+      lenBang: { soLan: 0, lanCuoi: '', qids: [] },
+      btvn: { soCauGiao: 0, soDaLam: 0, soDung: 0, soSai: 0, soChuaLam: 0, soLuot: 0, soLuotDaNop: 0, qidDung: [], qidSai: [], qidChuaLam: [], luot: [] },
+    }
+  }
+
+  for (const x of rTienDo.results ?? []) {
+    const e = em[chuoi(x.sbd)]
+    if (e) e.chuyenDe.push({ ten: chuoi(x.chuyen_de), soCau: Number(x.so_cau) || 0, soSai: Number(x.so_sai) || 0 })
+  }
+  for (const x of rSai.results ?? []) {
+    const e = em[chuoi(x.sbd)]
+    if (!e) continue
+    e.qidSai.push({
+      qid: chuoi(x.qid),
+      chuyenDe: chuoi(x.chuyen_de),
+      mucDo: chuoi(x.muc_do),
+      soLanSai: Number(x.so_lan_sai) || 1,
+      daChua: Number(x.da_chua) === 1,
+      maCa: chuoi(x.ma_ca),
+    })
+  }
+  for (const x of rDaLam.results ?? []) {
+    const e = em[chuoi(x.sbd)]
+    if (e) e.qidDaLam.push({ qid: chuoi(x.qid), soLan: Number(x.so_lan) || 1 })
+  }
+  for (const x of rBang.results ?? []) {
+    const e = em[chuoi(x.sbd)]
+    if (!e) continue
+    e.lenBang.soLan += 1
+    const luc = chuoi(x.luc)
+    if (luc > e.lenBang.lanCuoi) e.lenBang.lanCuoi = luc
+    const q = chuoi(x.qid)
+    if (q) e.lenBang.qids.push(q)
+  }
+
+  // ── BÀI TẬP VỀ NHÀ: ĐÚNG / SAI / CHƯA LÀM cho TỪNG CÂU ────────────────────
+  //
+  // Thầy chốt 14/09: "tôi lấy đúng file giao về nhà cho học sinh để gọi lên
+  // bảng ... phải hiển thị được học sinh đó làm bao nhiêu câu về nhà/tổng số
+  // câu, bao nhiêu câu làm đúng, bao nhiêu câu làm sai, bao nhiêu câu chưa làm".
+  //
+  // Bảng `btvn_em` chỉ ghi TỔNG `so_dung`/`so_cau`, không ghi từng câu. Nhưng
+  // nó giữ `dap_an_json` — nguyên bài làm của em. Đối chiếu với đáp án trong
+  // kho (`dapAnTheoMaDe`, đúng cùng một hàm đã dùng lúc chấm) thì ra được từng
+  // câu, KHÔNG phải suy ra từ con số tổng.
+  //
+  // Ba trạng thái, phân biệt rạch ròi — `qidSai` lúc chấm gộp cả bỏ trống vào
+  // sai, ở đây thì không, vì thầy cần biết em KHÔNG LÀM khác em LÀM SAI:
+  //   · dung     — em chọn, và trùng đáp án kho
+  //   · sai      — em chọn, nhưng khác đáp án kho
+  //   · chuaLam  — em bỏ trống, hoặc cả lượt ấy em chưa nộp
+  const luotTheoMa = new Map<string, { giaoLuc: string; maDe: string }>()
+  for (const x of rBtvn.results ?? []) {
+    const m = chuoi(x.ma_btvn)
+    if (!m || luotTheoMa.has(m)) continue
+    luotTheoMa.set(m, { giaoLuc: chuoi(x.giao_luc), maDe: chuoi(x.ma_de) })
+  }
+  // Chỉ tính mấy lượt giao GẦN NHẤT. Bài tập tháng trước không nói gì về buổi
+  // chữa hôm nay, mà đọc thêm tờ đề nào là thêm một lượt chạm R2.
+  const maLuotGiu = [...luotTheoMa.entries()]
+    .sort((a, c) => (c[1].giaoLuc > a[1].giaoLuc ? 1 : c[1].giaoLuc < a[1].giaoLuc ? -1 : 0))
+    .slice(0, TRAN_LUOT_BTVN)
+    .map(([m]) => m)
+  const giu = new Set(maLuotGiu)
+
+  const boNhoDe = new Map<string, Record<string, unknown>[]>()
+  const dapAnLuot = new Map<string, Map<string, string>>()
+  for (const m of maLuotGiu) {
+    dapAnLuot.set(m, await dapAnTheoMaDe(env, luotTheoMa.get(m)?.maDe ?? '', boNhoDe))
+  }
+
+  // Đi từ lượt CŨ tới lượt MỚI để lượt mới nhất ghi đè: em làm lại câu ấy ở
+  // lượt sau thì kết quả lượt sau mới là kết quả hiện tại của em.
+  const thuTuCu = (rBtvn.results ?? []).filter((x) => giu.has(chuoi(x.ma_btvn))).reverse()
+  const theoCau = new Map<string, Map<string, 'dung' | 'sai' | 'chuaLam'>>()
+  for (const s2 of ds) theoCau.set(s2, new Map())
+
+  for (const x of thuTuCu) {
+    const sbd2 = chuoi(x.sbd)
+    const e = em[sbd2]
+    const bang = theoCau.get(sbd2)
+    if (!e || !bang) continue
+    const maB = chuoi(x.ma_btvn)
+    const dapAn = dapAnLuot.get(maB)
+    if (!dapAn || dapAn.size === 0) continue
+
+    const daNop = Boolean(chuoi(x.nop_luc))
+    let lam: Record<string, unknown> = {}
+    if (daNop) {
+      try {
+        const o = JSON.parse(chuoi(x.dap_an_json) || '{}')
+        if (o && typeof o === 'object') lam = o as Record<string, unknown>
+      } catch {
+        lam = {}
+      }
+    }
+
+    let lDung = 0
+    let lSai = 0
+    let lChua = 0
+    for (const [qid, dung] of dapAn) {
+      const chon = daNop ? chuoi(lam[qid]).trim().toUpperCase() : ''
+      const kq: 'dung' | 'sai' | 'chuaLam' = !chon ? 'chuaLam' : chon === dung ? 'dung' : 'sai'
+      bang.set(qid, kq)
+      if (kq === 'dung') lDung++
+      else if (kq === 'sai') lSai++
+      else lChua++
+    }
+    e.btvn.soLuot++
+    if (daNop) e.btvn.soLuotDaNop++
+    e.btvn.luot.push({
+      maBtvn: maB,
+      giaoLuc: luotTheoMa.get(maB)?.giaoLuc ?? '',
+      daNop,
+      soCau: dapAn.size,
+      soDung: lDung,
+      soSai: lSai,
+      soChuaLam: lChua,
+    })
+  }
+
+  for (const s2 of ds) {
+    const e = em[s2]
+    const bang = theoCau.get(s2)
+    if (!e || !bang) continue
+    e.btvn.luot.sort((a, c) => (c.giaoLuc > a.giaoLuc ? 1 : c.giaoLuc < a.giaoLuc ? -1 : 0))
+    for (const [qid, kq] of bang) {
+      if (kq === 'dung') e.btvn.qidDung.push(qid)
+      else if (kq === 'sai') e.btvn.qidSai.push(qid)
+      else e.btvn.qidChuaLam.push(qid)
+    }
+    e.btvn.soDung = e.btvn.qidDung.length
+    e.btvn.soSai = e.btvn.qidSai.length
+    e.btvn.soChuaLam = e.btvn.qidChuaLam.length
+    e.btvn.soDaLam = e.btvn.soDung + e.btvn.soSai
+    e.btvn.soCauGiao = e.btvn.soDaLam + e.btvn.soChuaLam
+  }
+
+  // Sắp chuyên đề theo tỉ lệ sai giảm dần ngay tại đây, để máy thầy khỏi sắp lại.
+  for (const s2 of ds) {
+    em[s2].chuyenDe.sort((a, c) => (c.soCau ? c.soSai / c.soCau : 0) - (a.soCau ? a.soSai / a.soCau : 0) || c.soSai - a.soSai)
+  }
+
+  return { ok: true, soNgay, em }
+}
+
 // ===========================================================================
 // NGÂN HÀNG CÓ ĐÁP ÁN · ĐỀ RIÊNG · CHỈ MỤC KHO
 // ===========================================================================
@@ -1750,7 +2013,7 @@ export async function guiNhanXetCoQuyen(env: Env, b: Record<string, unknown>, la
  * đã làm đường cũ mất hơn 20 giây. */
 /** Số tờ đề mở ra để tìm câu cùng dạng. Mỗi tờ ~400 KB trên R2, đọc trong
  * cùng mạng Cloudflare nên rẻ; gói TRẢ VỀ thì đã cắt còn đúng câu cùng dạng. */
-const TRAN_TO_DE_THEO_DANG = 10
+const TRAN_TO_DE_THEO_DANG = 14
 
 /** Gom câu CÙNG MÃ DẠNG từ nhiều tờ đề, mỗi tờ cắt còn đúng phần cần.
  *
@@ -1769,12 +2032,39 @@ async function goiTheoDang(
     for (const r of rL.results ?? []) daLam.add(chuoi(r.qid))
   }
 
-  const theoDe = new Map<string, number>()
+  // CHỌN TỜ ĐỀ CHIA ĐỀU THEO CHUYÊN ĐỀ, không xếp thuần theo số câu.
+  //
+  // Đo lần đầu 14/09: em sai 9 dạng, máy chủ mở 8 tờ mà vẫn thiếu 4 dạng. Bốn
+  // dạng ấy đều thuộc "Liên kết hoá học" và nằm trong các tờ 10-C3-B12,
+  // 10-C3-B13 — kho CÓ câu, chỉ là mấy tờ ấy ít câu hơn tờ Ester nên rơi khỏi
+  // tốp đầu. Xếp thuần theo số câu là để một chuyên đề đông câu chiếm hết chỗ.
+  //
+  // Nay đi vòng tròn: mỗi vòng lấy tờ tốt nhất của TỪNG chuyên đề.
+  const theoCd = new Map<string, Map<string, number>>()
   for (const r of x.dong) {
     const m = chuoi(r.ma_de)
-    if (m) theoDe.set(m, (theoDe.get(m) ?? 0) + 1)
+    if (!m) continue
+    const cd = chuoi(r.chuyen_de) || '(không rõ)'
+    if (!theoCd.has(cd)) theoCd.set(cd, new Map())
+    const b = theoCd.get(cd)!
+    b.set(m, (b.get(m) ?? 0) + 1)
   }
-  const dsMaDe = [...theoDe.entries()].sort((a, c) => c[1] - a[1]).slice(0, TRAN_TO_DE_THEO_DANG).map(([m]) => m)
+  const xepTheoCd = [...theoCd.values()].map((b) => [...b.entries()].sort((a, c) => c[1] - a[1]).map(([m]) => m))
+  const dsMaDe: string[] = []
+  const daCo = new Set<string>()
+  for (let vong = 0; dsMaDe.length < TRAN_TO_DE_THEO_DANG; vong++) {
+    let themDuoc = false
+    for (const ds of xepTheoCd) {
+      if (vong >= ds.length) continue
+      const m = ds[vong]
+      themDuoc = true
+      if (daCo.has(m)) continue
+      daCo.add(m)
+      dsMaDe.push(m)
+      if (dsMaDe.length >= TRAN_TO_DE_THEO_DANG) break
+    }
+    if (!themDuoc) break
+  }
 
   // qid → câu, và mã dạng → danh sách qid
   const cauTheoQid = new Map<string, { maDe: string; cau: Record<string, unknown> }>()
@@ -1857,7 +2147,7 @@ export async function cauKhacPhucGoi(env: Env, b: Record<string, unknown>): Prom
 
   const oCd = dsCd.map(() => '?').join(',')
   const rCau = await env.DB.prepare(
-    `SELECT c.qid, c.ma_de FROM cau_hoi c JOIN de_kho d ON d.ma_de = c.ma_de
+    `SELECT c.qid, c.ma_de, c.chuyen_de FROM cau_hoi c JOIN de_kho d ON d.ma_de = c.ma_de
       WHERE d.da_xoa = 0 AND c.chuyen_de IN (${oCd}) LIMIT 3000`,
   )
     .bind(...dsCd)
@@ -2231,23 +2521,44 @@ export function danhGiaLuot(
 
   const soCauCa = caRow?.so_cau_json ? (doJson(caRow.so_cau_json) as Record<string, number> | null) : (bData?.soCau as Record<string, number> | null)
 
+  const daI = (dapAnObj?.phanI || dapAnObj || {}) as Record<string, unknown>
+  const daII = (dapAnObj?.phanII || {}) as Record<string, unknown>
+  const daIII = (dapAnObj?.phanIII || {}) as Record<string, unknown>
+
+  const layCauPhan = (dsGoc: any[], daPhan: Record<string, unknown>, canSoCau: number | undefined) => {
+    const daLamKeys = new Set(Object.keys(daPhan).map(chuoi).filter((k) => k && chuoi(daPhan[k]).trim() !== '' && chuoi(daPhan[k]).trim() !== '----'))
+    const daNop = dsGoc.filter((q) => daLamKeys.has(chuoi(q.id || q.qid)))
+    const daNopIds = new Set(daNop.map((q) => chuoi(q.id || q.qid)))
+
+    const boRieng = boSet ? dsGoc.filter((q) => boSet.has(chuoi(q.id || q.qid)) && !daNopIds.has(chuoi(q.id || q.qid))) : []
+    const daCoIds = new Set([...daNopIds, ...boRieng.map((q) => chuoi(q.id || q.qid))])
+
+    let ketQua = [...daNop, ...boRieng]
+
+    const can = typeof canSoCau === 'number' && canSoCau > 0 ? canSoCau : (boSet ? ketQua.length : dsGoc.length)
+    if (ketQua.length < can) {
+      const conLai = dsGoc.filter((q) => !daCoIds.has(chuoi(q.id || q.qid)))
+      ketQua = [...ketQua, ...conLai.slice(0, can - ketQua.length)]
+    } else if (can > 0 && !boSet && daNop.length === 0) {
+      ketQua = dsGoc.slice(0, can)
+    }
+    return ketQua
+  }
+
+  // KHÔI PHỤC BA DÒNG KHAI BÁO (14/09, 13:00).
+  //
+  // Một phiên làm việc khác viết lại `danhGiaLuot` theo `layCauPhan` nhưng bỏ
+  // mất ba dòng dựng `pI`/`pII`/`pIII` từ gói đề, để lại 18 lỗi biên dịch —
+  // `wrangler` bó bằng esbuild nên KHÔNG chặn, đẩy lên là mỗi lượt chấm ném
+  // ReferenceError và mọi báo cáo câu sai chết. Ba dòng dưới đây là đúng thứ
+  // đoạn mã mới ấy đang cần; thiết kế của nó giữ nguyên, không sửa một chữ.
   let pI: any[] = Array.isArray(bData?.phanI) ? bData.phanI : []
   let pII: any[] = Array.isArray(bData?.phanII) ? bData.phanII : []
   let pIII: any[] = Array.isArray(bData?.phanIII) ? bData.phanIII : []
 
-  if (boSet) {
-    pI = pI.filter((q) => boSet.has(chuoi(q.id || q.qid)))
-    pII = pII.filter((q) => boSet.has(chuoi(q.id || q.qid)))
-    pIII = pIII.filter((q) => boSet.has(chuoi(q.id || q.qid)))
-  } else if (soCauCa) {
-    if (typeof soCauCa.I === 'number') pI = pI.slice(0, Math.max(0, soCauCa.I))
-    if (typeof soCauCa.II === 'number') pII = pII.slice(0, Math.max(0, soCauCa.II))
-    if (typeof soCauCa.III === 'number') pIII = pIII.slice(0, Math.max(0, soCauCa.III))
-  }
-
-  const daI = (dapAnObj?.phanI || dapAnObj || {}) as Record<string, unknown>
-  const daII = (dapAnObj?.phanII || {}) as Record<string, unknown>
-  const daIII = (dapAnObj?.phanIII || {}) as Record<string, unknown>
+  pI = layCauPhan(pI, daI, soCauCa?.I)
+  pII = layCauPhan(pII, daII, soCauCa?.II)
+  pIII = layCauPhan(pIII, daIII, soCauCa?.III)
 
   let soCauDung = 0
   let soCauSai = 0
@@ -2357,8 +2668,9 @@ export function danhGiaLuot(
     }
   }
 
-  const tongCau = boCuaEm && boCuaEm.length > 0 ? boCuaEm.length : (pI.length + pII.length + pIII.length)
-  const soBoTrong = Math.max(0, tongCau - soCauDung - soCauSai)
+  const tongCau = pI.length + pII.length + pIII.length
+  soCauSai = Math.max(0, tongCau - soCauDung)
+  const soBoTrong = 0
 
   return { tongCau, soCauDung, soCauSai, soBoTrong, dsCauSai, dsChiTiet }
 }

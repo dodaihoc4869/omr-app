@@ -13,6 +13,7 @@
 // Đây đúng bài học của đợt 19b lật ngược: hôm đó phép kiểm soi VỎ mà quên RUỘT;
 // lần này tôi soi RUỘT mà quên VỎ.
 import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { CAU_HINH_LEN_BANG_MAC_DINH } from '../src/lib/len-bang-cau-hinh'
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
 import type { CaTomTat } from '../src/lib/exam-api'
 import type { TeacherExamSource } from '../src/data/examContent'
@@ -85,6 +86,11 @@ vi.mock('../src/store/appStore', () => ({
 
 const { default: GoiLenBangScreen } = await import('../src/screens/GoiLenBangScreen')
 
+// SỬA 14/09 — THẦY ĐỔI NGÂN SÁCH, KHÔNG PHẢI SỬA TEST CHO XANH.
+// Tiêu đề khối lấy thẳng từ `NGAN_SACH_PHUT`, nên bộ kiểm cũng lấy từ đó: đổi
+// ngân sách lần sau (80 → 90 → …) không phải sửa lại tệp này nữa.
+const TIEU_DE_GIAO_AN = `Giáo án ${CAU_HINH_LEN_BANG_MAC_DINH.NGAN_SACH_PHUT} phút`
+
 const CHO = { timeout: 20000 }
 
 beforeEach(() => {
@@ -128,7 +134,7 @@ describe('KHỐI GIÁO ÁN 80 PHÚT PHẢI DỰNG RA ĐƯỢC', () => {
     await waitFor(() => expect(r.getByText('Ca 111111')).toBeTruthy(), CHO)
     fireEvent.click(r.getByText('Ca 111111'))
     // Mở ca là đường bất đồng bộ (chiTietCa → hoSoEm từng em) nên phải chờ.
-    await waitFor(() => expect(r.container.textContent).toContain('Giáo án 80 phút'), CHO)
+    await waitFor(() => expect(r.container.textContent).toContain(TIEU_DE_GIAO_AN), CHO)
     const t = r.container.textContent ?? ''
     expect(t).toContain('2. Câu để chữa lấy ở đâu')
     expect(t).toContain('3. Em có mặt hôm nay')
@@ -151,9 +157,9 @@ describe('KHỐI GIÁO ÁN 80 PHÚT PHẢI DỰNG RA ĐƯỢC', () => {
     const r = render(<GoiLenBangScreen />)
     await waitFor(() => expect(r.getByText('Ca 111111')).toBeTruthy(), CHO)
     fireEvent.click(r.getByText('Ca 111111'))
-    await waitFor(() => expect(r.container.textContent).toContain('Giáo án 80 phút'), CHO)
+    await waitFor(() => expect(r.container.textContent).toContain(TIEU_DE_GIAO_AN), CHO)
     const t = r.container.textContent ?? ''
-    const viTriGiaoAn = t.indexOf('Giáo án 80 phút')
+    const viTriGiaoAn = t.indexOf(TIEU_DE_GIAO_AN)
     const viTriNut = t.indexOf('Xếp giờ & phân công lên bảng')
     expect(viTriGiaoAn).toBeGreaterThan(-1)
     expect(viTriNut).toBeGreaterThan(-1)
@@ -171,7 +177,7 @@ describe('KHỐI GIÁO ÁN 80 PHÚT PHẢI DỰNG RA ĐƯỢC', () => {
     const r = render(<GoiLenBangScreen />)
     await waitFor(() => expect(r.getByText('Ca 111111')).toBeTruthy(), CHO)
     fireEvent.click(r.getByText('Ca 111111'))
-    await waitFor(() => expect(r.container.textContent).toContain('Giáo án 80 phút'), CHO)
+    await waitFor(() => expect(r.container.textContent).toContain(TIEU_DE_GIAO_AN), CHO)
     const nut = [...r.container.querySelectorAll('button')].find((b) => (b.textContent ?? '').includes('Xếp giờ'))
     expect(nut).toBeTruthy()
     // eslint-disable-next-line no-console
@@ -190,6 +196,6 @@ describe('KHỐI GIÁO ÁN 80 PHÚT PHẢI DỰNG RA ĐƯỢC', () => {
     dsCaTra = [ca('111111', false)]
     const r = render(<GoiLenBangScreen />)
     await waitFor(() => expect(r.getByText('Ca 111111')).toBeTruthy(), CHO)
-    expect(r.container.textContent).not.toContain('Giáo án 80 phút')
+    expect(r.container.textContent).not.toContain(TIEU_DE_GIAO_AN)
   }, 30000)
 })

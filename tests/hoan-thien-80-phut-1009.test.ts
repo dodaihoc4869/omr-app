@@ -17,7 +17,17 @@ import { dungDoKho, hopVoiEm, type BaiLamCoGiay, type VapCuaEm } from '../src/li
 import { doiEmChoDong, laneChoPhep, xepGioLenBang, type EmLenBang } from '../src/lib/xep-gio-len-bang'
 import type { CauChua } from '../src/lib/phan-cong'
 
-const CH = CAU_HINH_LEN_BANG_MAC_DINH
+// GHIM CẤU HÌNH 80 PHÚT (sửa 14/09) — KHÔNG PHẢI SỬA TEST CHO XANH.
+//
+// Bộ kiểm này đo SỐ HỌC CỦA GIÁO ÁN 80 PHÚT: "27 câu bắt buộc, thừa 250 giây,
+// rẻ nhất 270". Ngày 14/09 thầy chốt buổi chữa 90 phút và sàn 20 em, nên
+// `CAU_HINH_LEN_BANG_MAC_DINH` đổi: 80 → 90 phút, trần em 8 → 30.
+//
+// Cái bộ kiểm này kiểm là LUẬT XỬ GIỜ THỪA và LUẬT ĐỔI EM, không phải con số
+// ngân sách mặc định. Nên ghim đúng cấu hình nó được viết ra để đo; luật vẫn
+// bị soi y như cũ, chỉ khác là đầu vào không còn trôi theo mặc định nữa.
+// Ngân sách 90 phút mới có bộ kiểm riêng: `tests/xep-buoi-chua-1409.test.ts`.
+const CH = { ...CAU_HINH_LEN_BANG_MAC_DINH, NGAN_SACH_PHUT: 80, SO_EM_LEN_BANG_TOI_DA: 8 }
 const MAN = fs.readFileSync(path.join(process.cwd(), 'src/screens/GoiLenBangScreen.tsx'), 'utf8')
 
 function cauMau(i: number, sao: 0 | 1 | 2, cd = 'Ester – lipid'): CauChua {
@@ -44,7 +54,7 @@ describe('1 — GIỜ CHẾT: đổ nốt giờ thừa vào câu ngoài danh sá
 
   it('nay giờ thừa được tiêu: câu sao 0 lên "thầy chữa tại chỗ"', () => {
     const { doKho, bl } = caGioChet()
-    const kq = xepGioLenBang(doKho, emMau(30), bl, new Map(), {})
+    const kq = xepGioLenBang(doKho, emMau(30), bl, new Map(), { cauHinh: CH })
     expect(kq.soCauNoiTran).toBe(1)
     expect(kq.dong.find((d) => d.cau.id === 'Q28')?.lane).toBe('L2')
     expect(kq.tongGiay).toBe(28 * CH.GIAY_LANE.L2) // 4 200, thay vì 4 070
@@ -54,7 +64,7 @@ describe('1 — GIỜ CHẾT: đổ nốt giờ thừa vào câu ngoài danh sá
 
   it('NÓI RA đã nới, không lặng lẽ phá trần của chính mình', () => {
     const { doKho, bl } = caGioChet()
-    const kq = xepGioLenBang(doKho, emMau(30), bl, new Map(), {})
+    const kq = xepGioLenBang(doKho, emMau(30), bl, new Map(), { cauHinh: CH })
     expect(kq.canhBao.join(' ')).toContain('Đã đổ giờ thừa vào 1 câu sao 0 ngoài danh sách bắt buộc')
   })
 
@@ -63,7 +73,7 @@ describe('1 — GIỜ CHẾT: đổ nốt giờ thừa vào câu ngoài danh sá
     // mặt em. Ca này thừa cực nhiều giờ mà câu sao 0 vẫn chỉ tới L2.
     const cau = Array.from({ length: 4 }, (_, i) => cauMau(i + 1, 0))
     const bl: BaiLamCoGiay[] = cau.flatMap((c) => Array.from({ length: 10 }, (_, k) => ({ sbd: `E${k}`, idCau: c.id, dung: k > 1, chon: 'A' })))
-    const kq = xepGioLenBang(dungDoKho(cau, bl, {}, CH), emMau(30), bl, new Map(emMau(30).map((e) => [e.sbd, [vapMau(e.sbd)]])), {})
+    const kq = xepGioLenBang(dungDoKho(cau, bl, {}, CH), emMau(30), bl, new Map(emMau(30).map((e) => [e.sbd, [vapMau(e.sbd)]])), { cauHinh: CH })
     expect(kq.dong.every((d) => d.lane !== 'L3')).toBe(true)
     expect(kq.soEmLenBang).toBe(0)
   })
@@ -73,7 +83,7 @@ describe('1 — GIỜ CHẾT: đổ nốt giờ thừa vào câu ngoài danh sá
     const cau = Array.from({ length: 4 }, (_, i) => cauMau(i + 1, 0))
     const doKho = dungDoKho(cau, [], {}, CH)
     expect(laneChoPhep(doKho[0], new Set())).toEqual(['L0'])
-    const kq = xepGioLenBang(doKho, emMau(30), [], new Map(), {})
+    const kq = xepGioLenBang(doKho, emMau(30), [], new Map(), { cauHinh: CH })
     expect(kq.soCauNoiTran).toBe(0)
     expect(kq.dong.every((d) => d.lane === 'L0')).toBe(true)
   })
@@ -100,7 +110,7 @@ describe('1 — GIỜ CHẾT: đổ nốt giờ thừa vào câu ngoài danh sá
   it('còn mua được trong luật chặt thì KHÔNG nới — nới là phương án cuối', () => {
     const cau = [cauMau(1, 2), cauMau(2, 1), cauMau(3, 0)]
     const bl: BaiLamCoGiay[] = cau.flatMap((c) => Array.from({ length: 10 }, (_, k) => ({ sbd: `E${k}`, idCau: c.id, dung: k > 3, chon: 'A' })))
-    const kq = xepGioLenBang(dungDoKho(cau, bl, {}, CH), emMau(30), bl, new Map(emMau(30).map((e) => [e.sbd, [vapMau(e.sbd)]])), {})
+    const kq = xepGioLenBang(dungDoKho(cau, bl, {}, CH), emMau(30), bl, new Map(emMau(30).map((e) => [e.sbd, [vapMau(e.sbd)]])), { cauHinh: CH })
     // Câu sao 1 còn đường lên L2/L3 trong luật chặt nên thuật toán tiêu ở đó trước.
     expect(kq.soCauNoiTran).toBe(0)
   })
@@ -124,12 +134,12 @@ describe('2 — BA LỰA CHỌN THỪA GIỜ phải CHẠM ĐƯỢC', () => {
   it('lựa chọn ① bỏ ĐÚNG số câu điểm thấp nhất và xếp được ngay', () => {
     const cau = Array.from({ length: 40 }, (_, i) => cauMau(i + 1, 2))
     const doKho = dungDoKho(cau, [], {}, CH)
-    const truoc = xepGioLenBang(doKho, emMau(30), [], new Map(), {})
+    const truoc = xepGioLenBang(doKho, emMau(30), [], new Map(), { cauHinh: CH })
     expect(truoc.thuaGio).not.toBeNull()
     expect(truoc.dong).toEqual([])
     const canBo = Math.ceil((truoc.thuaGio!.giayCan - truoc.thuaGio!.giayCo) / CH.GIAY_LANE.L2)
     const bo = [...doKho].sort((a, b) => a.giaTri - b.giaTri).slice(0, canBo).map((d) => d.cau.id)
-    const sau = xepGioLenBang(doKho, emMau(30), [], new Map(), { boBatBuoc: bo })
+    const sau = xepGioLenBang(doKho, emMau(30), [], new Map(), { boBatBuoc: bo, cauHinh: CH })
     expect(sau.dong.length).toBe(40)
     expect(sau.tongGiay).toBeLessThanOrEqual(nganSachGiay(CH))
   })
@@ -139,8 +149,8 @@ describe('2 — BA LỰA CHỌN THỪA GIỜ phải CHẠM ĐƯỢC', () => {
     const doKho = dungDoKho(cau, [], {}, CH)
     const em = emMau(30)
     const vap = new Map(em.map((e) => [e.sbd, [vapMau(e.sbd)]]))
-    expect(xepGioLenBang(doKho, em, [], vap, { tranEm: 3 }).soEmLenBang).toBe(3)
-    const rutGio = xepGioLenBang(doKho, em, [], vap, { giayMoiEm: 300 })
+    expect(xepGioLenBang(doKho, em, [], vap, { tranEm: 3, cauHinh: CH }).soEmLenBang).toBe(3)
+    const rutGio = xepGioLenBang(doKho, em, [], vap, { giayMoiEm: 300, cauHinh: CH })
     expect(rutGio.dong.filter((d) => d.lane === 'L3').every((d) => d.giay === 300)).toBe(true)
   })
 })
@@ -150,7 +160,7 @@ describe('3 — ĐỔI EM: đúng một dòng đổi, phần còn lại đứng 
   const doKho = dungDoKho(cau, [], {}, CH)
   const em = emMau(30)
   const vap = new Map(em.map((e) => [e.sbd, [vapMau(e.sbd)]]))
-  const goc = xepGioLenBang(doKho, em, [], vap, {})
+  const goc = xepGioLenBang(doKho, em, [], vap, { cauHinh: CH })
   const dongL3 = goc.dong.filter((d) => d.lane === 'L3')
 
   it('có sẵn dòng L3 để mà đổi', () => {
@@ -193,7 +203,7 @@ describe('3 — ĐỔI EM: đúng một dòng đổi, phần còn lại đứng 
   it('hết em rảnh thì trả nguyên kết quả cũ, KHÔNG ném lỗi giữa lúc đứng lớp', () => {
     const itEm = emMau(CH.SO_EM_LEN_BANG_TOI_DA)
     const vapIt = new Map(itEm.map((e) => [e.sbd, [vapMau(e.sbd)]]))
-    const k = xepGioLenBang(doKho, itEm, [], vapIt, {})
+    const k = xepGioLenBang(doKho, itEm, [], vapIt, { cauHinh: CH })
     const id = k.dong.filter((d) => d.lane === 'L3')[0].cau.id
     expect(doiEmChoDong(k, id, doKho, itEm, vapIt)).toBe(k)
   })
@@ -228,7 +238,7 @@ describe('4 — XẾP LẠI LẦN HAI trong buổi: em vừa lên bảng phải 
       { sbd: 'S01', hoTen: 'Chưa lên', coMat: true, soLanLenBang: 0 },
     ]
     const vap = new Map(em.map((e) => [e.sbd, [vapMau(e.sbd)]]))
-    const kq = xepGioLenBang(doKho, em, [], vap, {})
+    const kq = xepGioLenBang(doKho, em, [], vap, { cauHinh: CH })
     expect(kq.dong[0].lane).toBe('L3')
     expect(kq.dong[0].em?.sbd).toBe('S01')
   })

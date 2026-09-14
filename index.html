@@ -66,5 +66,89 @@
   <body>
     <main id="root"></main>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- CHỐT CHẶN CUỐI: APP TRẮNG MÀN THÌ TỰ SỬA, KHÔNG ĐỢI THẦY.
+      ~
+      Thầy chốt 14/09: "app học sinh và phụ huynh lại không truy cập được. Bạn
+      phải tìm cách để hiện tượng này không lặp lại nữa."
+      ~
+      Nguyên nhân LẦN NÀY đã sửa trong `src/sw.ts`. Nhưng "không lặp lại nữa"
+      thì không thể chỉ vá đúng nguyên nhân vừa bắt được: lần sau sẽ là nguyên
+      nhân khác. Đoạn dưới không cần biết vì sao app trắng màn — nó chỉ đo MỘT
+      điều đo được: sau 9 giây mà `#root` vẫn rỗng thì app KHÔNG chạy. Lúc ấy
+      nó gỡ service worker, xoá kho tạm, nạp lại thẳng từ mạng.
+      ~
+      BA RÀNG BUỘC ĐỂ THỨ NÀY KHÔNG TỰ THÀNH LỖI MỚI:
+        1. CHỈ MỘT LẦN mỗi tab (`sessionStorage`), nên không có vòng lặp nạp
+           lại — đó mới là thứ đáng sợ hơn cả màn hình trắng.
+        2. Chỉ chạy khi `#root` RỖNG. App đã vẽ ra dù chỉ một phần thì không
+           đụng tới, kể cả khi mạng chậm.
+        3. Nạp lại kèm `_moi=` — đường này nằm trong danh sách service worker
+           KHÔNG đụng vào, nên lượt nạp ấy chắc chắn đi thẳng ra mạng.
+      ~
+      Mất mạng thật thì `location.replace` không đi được đâu cả, trình duyệt
+      hiện trang lỗi của chính nó — vẫn hơn màn trắng không lời giải thích. -->
+    <script>
+      (function () {
+        var GIAY_CHO = 9000
+        var KHOA = 'ddh.daTuSua'
+        function daThu() {
+          try {
+            return sessionStorage.getItem(KHOA) === '1'
+          } catch (e) {
+            return true
+          }
+        }
+        function ghiDaThu() {
+          try {
+            sessionStorage.setItem(KHOA, '1')
+          } catch (e) {
+            /* riêng tư/hết chỗ: coi như đã thử, thà không sửa còn hơn lặp vô hạn */
+          }
+        }
+        setTimeout(function () {
+          var goc = document.getElementById('root')
+          if (goc && goc.childElementCount > 0) return
+          if (daThu()) return
+          ghiDaThu()
+          console.error('[tu-sua] app chưa vẽ ra gì sau ' + GIAY_CHO + 'ms — gỡ service worker và nạp lại từ mạng')
+          var xong = function () {
+            var d = location.pathname + (location.search ? location.search + '&' : '?') + '_moi=' + Date.now()
+            location.replace(d)
+          }
+          var viec = []
+          try {
+            if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+              viec.push(
+                navigator.serviceWorker.getRegistrations().then(function (ds) {
+                  return Promise.all(
+                    ds.map(function (r) {
+                      return r.unregister()
+                    }),
+                  )
+                }),
+              )
+            }
+            if (window.caches && caches.keys) {
+              viec.push(
+                caches.keys().then(function (ks) {
+                  return Promise.all(
+                    ks.map(function (k) {
+                      return caches.delete(k)
+                    }),
+                  )
+                }),
+              )
+            }
+          } catch (e) {
+            /* trình duyệt không cho thì thôi, vẫn nạp lại */
+          }
+          if (viec.length === 0) return xong()
+          Promise.all(viec).then(xong, xong)
+          // Dọn dẹp treo quá 3 giây thì nạp lại luôn, không chờ nữa.
+          setTimeout(xong, 3000)
+        }, GIAY_CHO)
+      })()
+    </script>
   </body>
 </html>

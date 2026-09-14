@@ -20,6 +20,41 @@ if (!existsSync(SW)) {
 }
 const s = readFileSync(SW, 'utf8')
 
+// CHỐT TỰ SỬA nằm trong `index.html`, không nằm trong `sw.js` — phải đọc riêng.
+// Đây là đường lui CUỐI: sửa đúng nguyên nhân hôm nay không bảo đảm được
+// "không lặp lại nữa", vì lần sau sẽ là nguyên nhân khác. Chốt ấy không cần
+// biết nguyên nhân — nó chỉ đo `#root` còn rỗng sau 9 giây hay không.
+const TRANG = resolve(dirname(SW), 'index.html')
+const t = existsSync(TRANG) ? readFileSync(TRANG, 'utf8') : ''
+const coChotTuSua =
+  t.includes('ddh.daTuSua') && t.includes('childElementCount') && t.includes('_moi=') && t.includes('unregister')
+
+/** CÓ CHỖ NÀO XOÁ SẠCH CACHESTORAGE KHÔNG.
+ *
+ * Không cấm được `caches.keys()` — `cleanupOutdatedCaches()` của workbox dùng
+ * nó, và đó là việc ĐÚNG: nó `.filter(...)` theo tiền tố kho của chính mình
+ * rồi mới xoá. Thứ phải cấm là lấy HẾT khoá rồi xoá thẳng, không lọc — đó là
+ * đoạn 14/09 đã làm app trắng màn.
+ *
+ * Phép đo: sau mỗi `caches.keys()`, trong 200 ký tự kế tiếp phải gặp `.filter(`
+ * TRƯỚC khi gặp `.map(` hay `.delete(`. */
+function xoaSachKho(ma) {
+  const re = /caches\s*\.\s*keys\s*\(\s*\)/g
+  let m
+  while ((m = re.exec(ma)) !== null) {
+    const sau = ma.slice(m.index + m[0].length, m.index + m[0].length + 200)
+    const viLoc = sau.indexOf('.filter(')
+    const viXoa = Math.min(
+      ...['.map(', '.delete(', 'caches.delete'].map((k) => {
+        const i = sau.indexOf(k)
+        return i === -1 ? Number.POSITIVE_INFINITY : i
+      }),
+    )
+    if (viLoc === -1 || viLoc > viXoa) return true
+  }
+  return false
+}
+
 const phep = [
   [
     'danh sách tệp đã được chèn',
@@ -50,6 +85,37 @@ const phep = [
     'chiếm quyền ngay',
     s.includes('skipWaiting'),
     'bản mới nằm chờ vô hạn trên app đã cài vào màn hình chính',
+  ],
+  // ── BA PHÉP DƯỚI ĐÂY THÊM 14/09 LƯỢT 11 ─────────────────────────────────
+  //
+  // Thầy báo "app học sinh và phụ huynh LẠI không truy cập được". Truy ra:
+  // trong `dist/sw.js` đang chạy thật có một đoạn tự huỷ — thấy máy chủ có
+  // bản mới thì xoá sạch cache, tự gỡ đăng ký, rồi ép mọi tab điều hướng lại
+  // QUA CHÍNH NÓ khi kho precache vừa bị xoá rỗng. Điều kiện kích hoạt là
+  // "máy chủ mới hơn máy em" — tức MỌI em, MỖI lần thầy phát hành.
+  //
+  // Ba phép này chặn đúng ba việc ấy quay lại. Chúng đọc `dist/sw.js` — bản
+  // THẬT sẽ chạy trên máy em — nên không lách được bằng cách đổi cách viết
+  // trong `src/sw.ts`.
+  [
+    'KHÔNG tự gỡ đăng ký service worker',
+    !/registration\s*\.\s*unregister\s*\(/.test(s),
+    'SW tự gỡ nhưng vẫn đang điều khiển tab đang mở ⇒ lượt điều hướng kế tiếp rơi vào kho rỗng ⇒ ERR_FAILED',
+  ],
+  [
+    'KHÔNG xoá sạch CacheStorage',
+    !xoaSachKho(s),
+    'xoá toàn bộ kho là xoá luôn precache vừa nạp và mất sạch phần chạy offline — dọn kho cũ đã có cleanupOutdatedCaches lo',
+  ],
+  [
+    'KHÔNG ép tab đang mở điều hướng lại',
+    !/\.\s*navigate\s*\(/.test(s),
+    'ép điều hướng từ trong SW thì lượt ấy đi qua chính SW đó, gặp kho chưa sẵn sàng là ra trang lỗi',
+  ],
+  [
+    'có chốt tự sửa khi app trắng màn',
+    coChotTuSua,
+    'thiếu chốt trong index.html: app trắng màn là kẹt vĩnh viễn, phải chờ thầy bảo em xoá dữ liệu trang',
   ],
 ]
 

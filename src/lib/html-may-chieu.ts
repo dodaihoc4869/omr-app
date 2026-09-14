@@ -18,7 +18,7 @@
 // ký tự hoá học hiện y như mọi tờ khác. Lời giải dùng lại `oGiaiHtml` — cùng
 // một khuôn với báo cáo và phiếu, không dựng khuôn thứ hai.
 import type { CauLuyen } from './bai-tap-pdf'
-import { CSS_PHIEU, anhHtml, bangHtml, chuHtml, hinhTaiViTri, oGiaiHtml, thoat } from './html-phieu'
+import { CSS_PHIEU, anhHtml, bangHtml, chuHtml, dapAnChu, hinhTaiViTri, oGiaiHtml, thoat } from './html-phieu'
 
 /** Một ô bảng: một em, một câu. */
 export interface OBang {
@@ -29,12 +29,36 @@ export interface OBang {
   cau: CauLuyen
   /** Vì sao gọi đúng em này lên câu này — in nhỏ dưới tên. */
   viSao?: string
+  /** BÀI TẬP VỀ NHÀ CỦA ĐÚNG CÂU NÀY: em ở nhà làm đúng, sai, hay chưa làm.
+   * Bỏ trống nghĩa là câu này không nằm trong bài giao về nhà — KHÁC "chưa
+   * làm", nên tờ chiếu không hiện gì thay vì hiện nhầm. */
+  btvnCau?: 'dung' | 'sai' | 'chuaLam'
+  /** Cả lượt bài tập về nhà của em: làm bao nhiêu trên tổng, đúng, sai, chưa
+   * làm. Bỏ trống nghĩa là em chưa được giao bài nào. */
+  btvnTom?: { soCauGiao: number; soDaLam: number; soDung: number; soSai: number; soChuaLam: number }
+}
+
+/** Chữ và màu cho từng trạng thái bài tập về nhà trên tờ chiếu. */
+const NHAN_BTVN: Record<'dung' | 'sai' | 'chuaLam', string> = {
+  sai: 'Ở NHÀ LÀM SAI',
+  chuaLam: 'Ở NHÀ CHƯA LÀM',
+  dung: 'Ở NHÀ LÀM ĐÚNG',
 }
 
 export interface TuyChonMayChieu {
   tenBuoi?: string
   ngay?: Date
+  /** CÂU CHỈ ĐỌC ĐÁP ÁN — thầy chốt 14/09: "số câu còn lại chưa được chữa được
+   * chiếu đáp án lên bảng qua mục máy chiếu".
+   *
+   * Những câu này không gọi em nào lên bảng, nên chúng đi thành mấy TRANG ĐÁP
+   * ÁN nối sau các đợt: thầy lật tiếp là chiếu đáp án cho cả lớp dò. */
+  dsDapAn?: CauLuyen[]
 }
+
+/** Số câu mỗi trang đáp án. Chiếu lên tường thì 12 dòng là vừa mắt từ cuối lớp;
+ * nhồi hơn là em ngồi xa không đọc nổi. */
+export const SO_DAP_AN_MOI_TRANG = 12
 
 const CHU_PA = ['A', 'B', 'C', 'D']
 const CHU_Y = ['a', 'b', 'c', 'd']
@@ -83,6 +107,21 @@ function thanCauHtml(c: CauLuyen): string {
 
 /** Một nửa bảng. `oB` rỗng nghĩa là đợt cuối lẻ một em — nửa kia để trắng hẳn,
  * không bịa thêm một em nào cho đủ cặp. */
+/** DÒNG BÀI TẬP VỀ NHÀ dưới tên em (thầy chốt 14/09).
+ *
+ * Hai thứ, đúng thứ tự thầy hỏi: câu ĐANG GỌI em ở nhà làm ra sao, rồi cả lượt
+ * em làm được bao nhiêu trên tổng số câu được giao. Không có dữ liệu thì không
+ * in dòng nào — cấm dựng số. */
+function btvnHtml(o: OBang): string {
+  const o1 = o.btvnCau ? `<span class="mc-btvn-the mc-btvn-${o.btvnCau}">${NHAN_BTVN[o.btvnCau]}</span>` : ''
+  const t = o.btvnTom
+  const o2 =
+    t && t.soCauGiao > 0
+      ? `<span class="mc-btvn-so">Về nhà: làm ${t.soDaLam}/${t.soCauGiao} câu · đúng ${t.soDung} · sai ${t.soSai} · chưa làm ${t.soChuaLam}</span>`
+      : ''
+  return o1 || o2 ? `<div class="mc-btvn">${o1}${o2}</div>` : ''
+}
+
 function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number): string {
   if (!o) {
     return `<section class="mc-nua mc-${viTri} mc-trong" aria-hidden="true"><div class="mc-trong-chu">Đợt này chỉ gọi một em</div></section>`
@@ -92,6 +131,7 @@ function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number): s
   <header class="mc-em">
     <div class="mc-ten">${thoat(o.hoTen || o.sbd)}</div>
     <div class="mc-phu"><span class="mc-sbd">${thoat(o.sbd)}</span><span class="mc-cau-so">Câu ${o.soCau} · Phần ${o.cau.phan}</span></div>
+    ${btvnHtml(o)}
     ${o.viSao ? `<div class="mc-viSao">${thoat(o.viSao)}</div>` : ''}
   </header>
   <div class="mc-than">${thanCauHtml(o.cau)}</div>
@@ -105,12 +145,34 @@ function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number): s
 </section>`
 }
 
+/** Một trang ĐÁP ÁN — lưới câu và đáp án, chiếu cho cả lớp dò. */
+function trangDapAnHtml(ds: CauLuyen[], tu: number, tong: number): string {
+  const o = ds
+    .map(
+      (c) => `<div class="mc-da-o">
+      <span class="mc-da-so">${thoat(c.phan)}.${c.chuaCho ? thoat(String(c.chuaCho.soCau)) : ''}${c.chuaCho ? '' : ''}</span>
+      <span class="mc-da-dap">${chuHtml(dapAnChu(c))}</span>
+      ${c.chot ? `<span class="mc-da-chot">${chuHtml(c.chot)}</span>` : ''}
+    </div>`,
+    )
+    .join('')
+  return `<div class="mc-dot mc-dot-da" data-dap-an="1">
+  <section class="mc-nua mc-da-trang">
+    <header class="mc-em">
+      <div class="mc-ten">Đáp án các câu còn lại</div>
+      <div class="mc-phu"><span>Cả lớp tự dò · không gọi lên bảng</span><span class="mc-cau-so">${tu + 1}–${tu + ds.length} trong ${tong} câu</span></div>
+    </header>
+    <div class="mc-da-luoi">${o}</div>
+  </section>
+</div>`
+}
+
 /** CSS riêng cho máy chiếu. Chồng lên `CSS_PHIEU` nên khối lời giải vẫn y hệt
  * mọi tờ khác; chỉ cỡ chữ và bố cục là của phòng học có máy chiếu. */
 const CSS_MAY_CHIEU = `
-:root { --mc-serif: "Times New Roman", Palatino, Charter, Georgia, serif; --mc-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; --mc-vien: rgb(226, 232, 240); --mc-nen: rgb(255, 255, 255); --mc-muc: rgb(15, 23, 42); --mc-nhat: rgb(100, 116, 139); --mc-xanh: rgb(26, 115, 232); --mc-xanh-nen: rgb(232, 240, 254); }
+:root { --mc-serif: "Times New Roman", Palatino, Charter, Georgia, serif; --mc-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; --mc-vien: rgb(226, 232, 240); --mc-nen: rgb(255, 255, 255); --mc-muc: rgb(15, 23, 42); --mc-nhat: rgb(100, 116, 139); --mc-xanh: rgb(26, 115, 232); --mc-xanh-nen: rgb(232, 240, 254); --mc-do: rgb(197, 34, 31); --mc-do-nen: rgb(252, 232, 230); --mc-cam: rgb(169, 94, 0); --mc-cam-nen: rgb(254, 239, 195); --mc-luc: rgb(20, 108, 67); --mc-luc-nen: rgb(230, 244, 234); }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-sang]) { --mc-vien: rgb(51, 65, 85); --mc-nen: rgb(15, 23, 42); --mc-muc: rgb(241, 245, 249); --mc-nhat: rgb(148, 163, 184); --mc-xanh: rgb(138, 180, 248); --mc-xanh-nen: rgb(30, 41, 59); }
+  :root:not([data-sang]) { --mc-vien: rgb(51, 65, 85); --mc-nen: rgb(15, 23, 42); --mc-muc: rgb(241, 245, 249); --mc-nhat: rgb(148, 163, 184); --mc-xanh: rgb(138, 180, 248); --mc-xanh-nen: rgb(30, 41, 59); --mc-do: rgb(242, 139, 130); --mc-do-nen: rgb(66, 27, 26); --mc-cam: rgb(253, 214, 99); --mc-cam-nen: rgb(65, 48, 12); --mc-luc: rgb(129, 201, 149); --mc-luc-nen: rgb(24, 52, 37); }
 }
 body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); overflow: hidden; }
 .mc-thanh { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 12px; padding: 10px 20px; background: var(--mc-nen); border-bottom: 1px solid var(--mc-vien); font-family: var(--sans, system-ui, sans-serif); }
@@ -145,6 +207,12 @@ body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); overflow: 
 .mc-ten { font-family: var(--sans, system-ui, sans-serif); font-weight: 900; font-size: clamp(22px, 2.4vw, 34px); line-height: 1.2; }
 .mc-phu { display: flex; gap: 14px; margin-top: 3px; color: var(--mc-nhat); font-family: var(--sans, system-ui, sans-serif); font-size: 14px; font-variant-numeric: tabular-nums; }
 .mc-viSao { margin-top: 4px; color: var(--mc-nhat); font-family: var(--sans, system-ui, sans-serif); font-size: 13px; }
+.mc-btvn { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 6px; font-family: var(--sans, system-ui, sans-serif); }
+.mc-btvn-the { padding: 3px 12px; border-radius: 999px; font-weight: 900; font-size: 13px; letter-spacing: 0.03em; white-space: nowrap; }
+.mc-btvn-sai { background: var(--mc-do-nen); color: var(--mc-do); }
+.mc-btvn-chuaLam { background: var(--mc-cam-nen); color: var(--mc-cam); }
+.mc-btvn-dung { background: var(--mc-luc-nen); color: var(--mc-luc); }
+.mc-btvn-so { color: var(--mc-nhat); font-size: 13px; font-variant-numeric: tabular-nums; }
 .mc-than { padding-top: 12px; }
 .mc-de { font-family: var(--mc-serif); font-size: clamp(17px, 1.5vw, 23px); line-height: 1.55; }
 .mc-ds-pa { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
@@ -153,6 +221,14 @@ body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); overflow: 
 .mc-pa-chu { min-width: 0; }
 .mc-ngan { margin-top: 10px; color: var(--mc-nhat); font-family: var(--sans, system-ui, sans-serif); font-size: 14px; }
 .mc-anh, .mc-anh-pa { display: block; max-width: 100%; height: auto; }
+/* TRANG ĐÁP ÁN — chiếm trọn bề ngang, không chia đôi bảng. */
+.mc-dot-da { grid-template-columns: 1fr; }
+.mc-da-trang { overflow-y: auto; }
+.mc-da-luoi { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px 22px; margin-top: 16px; }
+.mc-da-o { display: flex; align-items: baseline; gap: 10px; padding: 8px 12px; border-radius: 12px; background: var(--mc-xanh-nen); font-family: var(--mc-serif); font-size: clamp(16px, 1.3vw, 21px); }
+.mc-da-so { font-family: var(--mc-sans); font-weight: 800; font-size: 14px; color: var(--mc-nhat); flex: none; }
+.mc-da-dap { font-weight: 900; color: var(--mc-xanh); }
+.mc-da-chot { min-width: 0; font-size: 0.82em; color: var(--mc-nhat); }
 .mc-anh { max-height: 30vh; object-fit: contain; margin: 8px 0; }
 .mc-anh-pa { max-height: 12vh; object-fit: contain; }
 .mc-giai-vung { margin-top: 12px; }
@@ -331,12 +407,17 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChon: TuyChonMayChieu = {}): st
     const so = k / 2 + 1
     dot.push(`<div class="mc-dot" data-dot="${so}">${nuaHtml(dsO[k], 'trai', so)}${nuaHtml(dsO[k + 1], 'phai', so)}</div>`)
   }
+  // TRANG ĐÁP ÁN nối ngay sau các đợt — lật tiếp là tới, không phải mở tờ khác.
+  const dsDa = tuyChon.dsDapAn ?? []
+  for (let k = 0; k < dsDa.length; k += SO_DAP_AN_MOI_TRANG) {
+    dot.push(trangDapAnHtml(dsDa.slice(k, k + SO_DAP_AN_MOI_TRANG), k, dsDa.length))
+  }
   const soDot = dot.length
 
   const than = `<div class="mc-thanh">
   <div>
     <div class="mc-thanh-ten">${thoat(tuyChon.tenBuoi || 'Gọi lên bảng')}</div>
-    <div class="mc-thanh-phu">${ngayVn(ngay)} · ${dsO.length} em · ${soDot} đợt</div>
+    <div class="mc-thanh-phu">${ngayVn(ngay)} · ${dsO.length} em · ${soDot} trang${dsDa.length > 0 ? ` · ${dsDa.length} câu chỉ đọc đáp án` : ''}</div>
   </div>
   <div class="mc-dem" id="mc-dem">Đợt 1/${soDot}</div>
   <div class="mc-dieu">
