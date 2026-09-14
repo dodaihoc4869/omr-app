@@ -328,20 +328,45 @@ button.stat-card.chon .stat-label { color: var(--nav); font-weight: 700; }
 button.stat-card:focus-visible, button.topic-item:focus-visible { outline: 3px solid var(--nav); outline-offset: 2px; }
 .stat-number { font-size: clamp(19px, 4.4vw, 23px); font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
 .stat-label { font-size: 12px; color: var(--nhat); line-height: 1.3; }
-.topics-list { background: var(--nen); border: 1px solid var(--vien); border-radius: 16px; padding: 11px 14px; }
-.topics-list h3 { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--nhat); margin-bottom: 4px; }
-.topic-item {
-  display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
-  padding: 6px 10px; margin: 0 -10px; border-radius: 9px;
-  background: transparent; color: inherit; font: inherit;
-  font-size: 13px; line-height: 1.4;
-  transition: background-color var(--muot);
+/* PHÂN LOẠI MỨC ĐỘ.
+   Bản cũ dồn tất cả vào MỘT dòng chữ 13px: tên mức, dãy số câu, số câu, tên
+   chuyên đề nối đuôi nhau. Đọc trên điện thoại là một dải chữ dài không có
+   chỗ nghỉ mắt. Nặng hơn: mỗi dòng mang lề âm -10px trong khung chỉ đệm 14px,
+   nên nền và viền dòng tràn sát mép khung, nhìn như bị cắt cụt.
+   Nay tách hai tầng — tầng trên là TÊN MỨC (đọc trước) kèm chuyên đề mờ,
+   tầng dưới là dãy số câu chữ nhỏ — và dòng nằm gọn hẳn trong khung. */
+.topics-list { background: var(--nen); border: 1px solid var(--vien); border-radius: 20px; padding: 12px 8px 8px; }
+.topics-list h3 {
+  font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--nhat); margin: 0 0 6px; padding: 0 10px;
 }
-.topic-item:last-child { border-bottom: none; }
+.topic-item {
+  display: grid; grid-template-columns: 4px minmax(0, 1fr); align-items: start;
+  gap: 3px 11px; width: 100%; margin: 0; text-align: left;
+  padding: 9px 11px; border: 0; border-radius: 14px;
+  background: transparent; color: inherit; font: inherit;
+  transition: background-color var(--muot), box-shadow var(--muot);
+}
+.topic-item + .topic-item { margin-top: 2px; }
+/* Thanh màu dọc thay cho chấm tròn: dòng cao hai tầng thì chấm tròn lửng lơ,
+   còn thanh chạy hết chiều cao nên neo được cả khối chữ. */
+.topic-cham { grid-row: 1 / span 2; align-self: stretch; display: block; min-height: 26px; }
+.topic-dot { display: block; width: 4px; height: 100%; min-height: 26px; border-radius: 999px; }
+.topic-ten {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px;
+  font-size: 14px; line-height: 1.35; letter-spacing: -.01em;
+}
+.topic-ten strong { font-weight: 700; }
+.topic-cd { font-size: 12px; font-weight: 500; color: var(--nhat); }
+.topic-cau {
+  grid-column: 2; font-size: 12px; line-height: 1.55; color: var(--nhat);
+  font-variant-numeric: tabular-nums;
+}
 button.topic-item:hover { background: var(--the-nen); }
-button.topic-item.chon { background: var(--the-nen); color: var(--nav); font-weight: 700; box-shadow: inset 0 0 0 1px var(--nav); }
-.topic-cham { flex-shrink: 0; display: flex; align-items: center; height: 1.5em; }
-.topic-dot { width: 9px; height: 9px; border-radius: 50%; }
+button.topic-item:active { background: var(--the-nen); }
+button.topic-item.chon { background: var(--the-nen); box-shadow: inset 0 0 0 1.5px var(--nav); }
+button.topic-item.chon .topic-ten { color: var(--nav); }
+button.topic-item.chon .topic-cau, button.topic-item.chon .topic-cd { color: var(--nav); opacity: .78; }
 
 /* ================= Ô LÀM BÀI (phiếu nộp được) =================
    CHỌN NGAY TRÊN PHƯƠNG ÁN, không có hàng "EM CHỌN" riêng nữa (thầy chốt
@@ -1180,10 +1205,15 @@ function oThongKe(so: number, nhan: string, loc: string): string {
 
 export function tongQuanHtml(cau: CauLuyen[]): string {
   const dem = (p: string) => cau.filter((c) => c.phan === p).length
+  // Mức độ là thang THỨ BẬC dễ → khó, nên màu cũng phải đi theo bậc: xanh lá →
+  // cam → đỏ, đúng lối Material của Google. Bản cũ để hồng cho "Thông hiểu" —
+  // hồng không nằm trên thang nào cả, người đọc phải tra chú thích mới hiểu.
+  // Ba mã dưới đều đủ tương phản trên nền sáng của phiếu, và tên mức luôn in
+  // đậm ngay cạnh nên người mù màu vẫn phân biệt được, không phụ thuộc màu.
   const muc: [string, string, string][] = [
-    ['biet', '#34d399', 'Nhận biết'],
-    ['hieu', '#f472b6', 'Thông hiểu'],
-    ['van_dung', '#fb923c', 'Vận dụng'],
+    ['biet', '#1e8e3e', 'Nhận biết'],
+    ['hieu', '#e37400', 'Thông hiểu'],
+    ['van_dung', '#c5221f', 'Vận dụng'],
   ]
   const dong = muc
     .map(([k, mau, ten]) => {
@@ -1195,7 +1225,7 @@ export function tongQuanHtml(cau: CauLuyen[]): string {
       const lien = so[so.length - 1] - so[0] + 1 === so.length
       const nhan = so.length === 1 ? `Câu ${so[0]}` : lien ? `Câu ${so[0]}–${so[so.length - 1]}` : `Câu ${so.join(', ')}`
       const cd = [...new Set(ds.map((x) => x.c.chuyenDe).filter(Boolean))].join(', ')
-      return `<button type="button" class="topic-item" data-loc="muc:${k}" aria-pressed="false"><span class="topic-cham"><span class="topic-dot" style="background:${mau};"></span></span><span><strong>${ten}:</strong> ${nhan} · ${ds.length} câu${cd ? ` — ${thoat(cd)}` : ''}</span></button>`
+      return `<button type="button" class="topic-item" data-loc="muc:${k}" aria-pressed="false"><span class="topic-cham"><span class="topic-dot" style="background:${mau};"></span></span><span class="topic-ten"><strong>${ten}</strong>${cd ? `<span class="topic-cd">${thoat(cd)}</span>` : ''}</span><span class="topic-cau">${nhan} · ${ds.length} câu</span></button>`
     })
     .join('')
   // KHÔNG EMOJI: quy tắc viết của thầy cấm emoji trong mọi thứ gửi phụ huynh và

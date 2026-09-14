@@ -93,7 +93,7 @@ export async function hoSoEm(env: Env, b: Record<string, unknown>): Promise<Reco
     const rd = await env.DB.prepare(
       `SELECT ma_ca, COUNT(*) AS n,
               SUM(CASE WHEN dung_sai = 1 THEN 1 ELSE 0 END) AS dung,
-              SUM(CASE WHEN dung_sai = 0 THEN 1 ELSE 0 END) AS sai
+              SUM(CASE WHEN dung_sai = 0 AND dap_an_chon <> '' AND dap_an_chon <> '----' THEN 1 ELSE 0 END) AS sai
          FROM chi_tiet_cau WHERE sbd = ? AND ma_ca IN (${o}) GROUP BY ma_ca`,
     )
       .bind(sbd, ...maDs)
@@ -642,7 +642,7 @@ export async function lichSuEm(env: Env, b: Record<string, unknown>): Promise<Re
     const rc = await env.DB.prepare(
       `SELECT ma_ca, COUNT(*) AS n,
               SUM(CASE WHEN dung_sai = 1 THEN 1 ELSE 0 END) AS dung,
-              SUM(CASE WHEN dung_sai = 0 THEN 1 ELSE 0 END) AS sai
+              SUM(CASE WHEN dung_sai = 0 AND dap_an_chon <> '' AND dap_an_chon <> '----' THEN 1 ELSE 0 END) AS sai
          FROM chi_tiet_cau WHERE sbd = ? AND ma_ca IN (${o}) GROUP BY ma_ca`,
     )
       .bind(sbd, ...dong.map((x) => chuoi(x.ma_ca)))
@@ -1727,14 +1727,221 @@ export async function resetMatKhauHs(env: Env, b: Record<string, unknown>): Prom
   return { ok: true, sbd, matKhauMoi: '12121212' }
 }
 
+async function docBankDe(env: Env, maCa: string): Promise<Record<string, unknown> | null> {
+  if (!env.DE) return null
+  try {
+    const oKey = await env.DE.get(`key/${maCa}.json`)
+    if (oKey?.body) return (await new Response(oKey.body).json()) as Record<string, unknown>
+  } catch {}
+  try {
+    const oDe = await env.DE.get(`de/${maCa}.json`)
+    if (oDe?.body) return (await new Response(oDe.body).json()) as Record<string, unknown>
+  } catch {}
+  return null
+}
+
+export interface DanhGiaLuotOutput {
+  tongCau: number
+  soCauDung: number
+  soCauSai: number
+  soBoTrong: number
+  dsCauSai: Array<Record<string, unknown>>
+  dsChiTiet: Array<Record<string, unknown>>
+}
+
+export function danhGiaLuot(
+  bData: any,
+  caRow: Record<string, unknown> | null,
+  dapAnObj: any,
+  sbd: string,
+  maCa: string,
+  lanThu: number = 1,
+  tenCa: string = '',
+): DanhGiaLuotOutput {
+  const rawBoGoc = caRow?.bo_theo_em_json ? doJson(caRow.bo_theo_em_json) : (bData?.boTheoEm ? bData.boTheoEm : null)
+  const goiGoc = rawBoGoc && typeof rawBoGoc === 'object' ? (rawBoGoc as Record<string, unknown>) : null
+  const goiRieng = locGoiDeRiengChoEm(goiGoc, sbd)
+  const boCuaEm = trichBoCauCuaEm(goiRieng ?? goiGoc, sbd)
+  const boSet = boCuaEm && boCuaEm.length > 0 ? new Set(boCuaEm.map(chuoi)) : null
+
+  const soCauCa = caRow?.so_cau_json ? (doJson(caRow.so_cau_json) as Record<string, number> | null) : (bData?.soCau as Record<string, number> | null)
+
+  let pI: any[] = Array.isArray(bData?.phanI) ? bData.phanI : []
+  let pII: any[] = Array.isArray(bData?.phanII) ? bData.phanII : []
+  let pIII: any[] = Array.isArray(bData?.phanIII) ? bData.phanIII : []
+
+  if (boSet) {
+    pI = pI.filter((q) => boSet.has(chuoi(q.id || q.qid)))
+    pII = pII.filter((q) => boSet.has(chuoi(q.id || q.qid)))
+    pIII = pIII.filter((q) => boSet.has(chuoi(q.id || q.qid)))
+  } else if (soCauCa) {
+    if (typeof soCauCa.I === 'number') pI = pI.slice(0, Math.max(0, soCauCa.I))
+    if (typeof soCauCa.II === 'number') pII = pII.slice(0, Math.max(0, soCauCa.II))
+    if (typeof soCauCa.III === 'number') pIII = pIII.slice(0, Math.max(0, soCauCa.III))
+  }
+
+  const daI = (dapAnObj?.phanI || dapAnObj || {}) as Record<string, unknown>
+  const daII = (dapAnObj?.phanII || {}) as Record<string, unknown>
+  const daIII = (dapAnObj?.phanIII || {}) as Record<string, unknown>
+
+  let soCauDung = 0
+  let soCauSai = 0
+  const dsCauSai: Array<Record<string, unknown>> = []
+  const dsChiTiet: Array<Record<string, unknown>> = []
+  const qidDaXet = new Set<string>()
+
+  pI.forEach((q, idx) => {
+    const qid = chuoi(q.id || q.qid) || `I_${idx + 1}`
+    qidDaXet.add(qid)
+    const chon = chuoi(daI[qid] ?? '').trim().toUpperCase()
+    const dung = chuoi(q.correct ?? '').trim().toUpperCase()
+    if (!chon) {
+      dsChiTiet.push({ ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'I', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: '', dap_an_dung: dung, dung_sai: null, ten_ca: tenCa })
+    } else if (chon === dung) {
+      soCauDung++
+      dsChiTiet.push({ ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'I', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: chon, dap_an_dung: dung, dung_sai: 1, ten_ca: tenCa })
+    } else {
+      soCauSai++
+      const item = { ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'I', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: chon, dap_an_dung: dung, dung_sai: 0, ten_ca: tenCa }
+      dsChiTiet.push(item)
+      dsCauSai.push(item)
+    }
+  })
+
+  pII.forEach((q, idx) => {
+    const qid = chuoi(q.id || q.qid) || `II_${idx + 1}`
+    qidDaXet.add(qid)
+    const row = daII[qid]
+    const dung = Array.isArray(q.correct) ? q.correct.join('') : chuoi(q.correct ?? '')
+    let chon = ''
+    let coChon = false
+    if (Array.isArray(row)) {
+      coChon = row.some((v) => v !== null && v !== undefined && chuoi(v).trim() !== '' && chuoi(v).trim() !== '-')
+      chon = row.map((v) => (v !== null && v !== undefined && chuoi(v).trim() !== '' ? chuoi(v).trim() : '-')).join('')
+    } else if (typeof row === 'string') {
+      chon = row.trim()
+      coChon = chon !== '' && chon !== '----'
+    }
+    if (!coChon) {
+      dsChiTiet.push({ ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'II', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: chon || '----', dap_an_dung: dung, dung_sai: null, ten_ca: tenCa })
+    } else if (chon === dung) {
+      soCauDung++
+      dsChiTiet.push({ ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'II', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: chon, dap_an_dung: dung, dung_sai: 1, ten_ca: tenCa })
+    } else {
+      soCauSai++
+      const item = { ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'II', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: chon, dap_an_dung: dung, dung_sai: 0, ten_ca: tenCa }
+      dsChiTiet.push(item)
+      dsCauSai.push(item)
+    }
+  })
+
+  pIII.forEach((q, idx) => {
+    const qid = chuoi(q.id || q.qid) || `III_${idx + 1}`
+    qidDaXet.add(qid)
+    const chon = chuoi(daIII[qid] ?? '').trim()
+    const dung = chuoi(q.correct ?? '').trim()
+    const normChon = chon.toLowerCase().replace(',', '.')
+    const normDung = dung.toLowerCase().replace(',', '.')
+    if (!chon) {
+      dsChiTiet.push({ ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'III', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: '', dap_an_dung: dung, dung_sai: null, ten_ca: tenCa })
+    } else if (normChon === normDung) {
+      soCauDung++
+      dsChiTiet.push({ ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'III', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: chon, dap_an_dung: dung, dung_sai: 1, ten_ca: tenCa })
+    } else {
+      soCauSai++
+      const item = { ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'III', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: chon, dap_an_dung: dung, dung_sai: 0, ten_ca: tenCa }
+      dsChiTiet.push(item)
+      dsCauSai.push(item)
+    }
+  })
+
+  if (boCuaEm && boCuaEm.length > 0) {
+    let extraIdx = dsChiTiet.length + 1
+    for (const qid of boCuaEm) {
+      const sq = chuoi(qid)
+      if (!sq || qidDaXet.has(sq)) continue
+      qidDaXet.add(sq)
+      const phan = sq.includes('-II-') ? 'II' : sq.includes('-III-') ? 'III' : 'I'
+      dsChiTiet.push({
+        ma_ca: maCa,
+        sbd,
+        lan_thu: lanThu,
+        phan,
+        so_cau: extraIdx++,
+        qid: sq,
+        chuyen_de: '',
+        muc_do: '',
+        dap_an_chon: '',
+        dap_an_dung: '',
+        dung_sai: null,
+        ten_ca: tenCa,
+      })
+    }
+  }
+
+  const tongCau = boCuaEm && boCuaEm.length > 0 ? boCuaEm.length : (pI.length + pII.length + pIII.length)
+  const soBoTrong = Math.max(0, tongCau - soCauDung - soCauSai)
+
+  return { tongCau, soCauDung, soCauSai, soBoTrong, dsCauSai, dsChiTiet }
+}
+
+async function luuChiTietCauNeuChuaCo(
+  env: Env,
+  maCa: string,
+  sbd: string,
+  lanThu: number,
+  dsChiTiet: Array<Record<string, unknown>>,
+  dsCauSai: Array<Record<string, unknown>>,
+) {
+  if (!env.DB || dsChiTiet.length === 0) return
+  const nay = NAY()
+  const stmts: D1PreparedStatement[] = []
+  for (const c of dsChiTiet) {
+    stmts.push(
+      env.DB.prepare(
+        `INSERT INTO chi_tiet_cau (khoa, ma_ca, sbd, lan_thu, phan, so_cau, qid, chuyen_de, muc_do, dap_an_chon, dap_an_dung, dung_sai, giay, cap_nhat_luc)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+         ON CONFLICT(khoa) DO UPDATE SET
+           dap_an_chon=excluded.dap_an_chon, dap_an_dung=excluded.dap_an_dung,
+           dung_sai=excluded.dung_sai, cap_nhat_luc=excluded.cap_nhat_luc`,
+      ).bind(
+        `${maCa}|${sbd}|${lanThu}|${chuoi(c.phan)}|${Number(c.so_cau) || 1}`,
+        maCa, sbd, lanThu, chuoi(c.phan), Number(c.so_cau) || 1, chuoi(c.qid),
+        chuoi(c.chuyen_de), chuoi(c.muc_do), chuoi(c.dap_an_chon), chuoi(c.dap_an_dung),
+        c.dung_sai === null ? null : Number(c.dung_sai), null, nay,
+      ),
+    )
+  }
+  for (const c of dsCauSai) {
+    const qid = chuoi(c.qid).trim()
+    if (!qid) continue
+    stmts.push(
+      env.DB.prepare(
+        `INSERT INTO ban_do_sai (khoa, ma_ca, sbd, qid, chuyen_de, muc_do, so_lan_sai, da_chua, cap_nhat_luc)
+         VALUES (?,?,?,?,?,?,1,0,?)
+         ON CONFLICT(khoa) DO UPDATE SET
+           chuyen_de=excluded.chuyen_de, muc_do=excluded.muc_do, cap_nhat_luc=excluded.cap_nhat_luc`,
+      ).bind(`${maCa}|${sbd}|${qid}`, maCa, sbd, qid, chuoi(c.chuyen_de), chuoi(c.muc_do), nay),
+    )
+  }
+  try {
+    for (let i = 0; i < stmts.length; i += 200) {
+      await env.DB.batch(stmts.slice(i, i + 200))
+    }
+  } catch (e) {
+    console.error('Lỗi tự động ghi chi_tiet_cau:', e)
+  }
+}
+
 export async function hsLichSuCa(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const sbd = chuoi(b.sbd).trim()
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
 
   const r = await env.DB.prepare(
-    `SELECT l.ma_ca, l.lan_thu, l.nop_luc, l.vao_luc, l.diem_i, l.diem_ii, l.diem_iii, l.tong,
+    `SELECT l.ma_ca, l.lan_thu, l.nop_luc, l.vao_luc, l.diem_i, l.diem_ii, l.diem_iii, l.tong, l.dap_an_json,
             COALESCE(c.ten_ca, '') AS ten_ca, COALESCE(c.lop, '') AS lop, c.thoi_gian_phut, c.cong_bo,
-            (SELECT COUNT(*) FROM chi_tiet_cau WHERE ma_ca = l.ma_ca AND sbd = l.sbd AND lan_thu = l.lan_thu AND dung_sai = 0) AS so_cau_sai,
+            c.bo_theo_em_json, c.so_cau_json,
+            (SELECT COUNT(*) FROM chi_tiet_cau WHERE ma_ca = l.ma_ca AND sbd = l.sbd AND lan_thu = l.lan_thu AND dung_sai = 0 AND dap_an_chon <> '' AND dap_an_chon <> '----') AS so_cau_sai,
             (SELECT COUNT(*) FROM chi_tiet_cau WHERE ma_ca = l.ma_ca AND sbd = l.sbd AND lan_thu = l.lan_thu AND dung_sai = 1) AS so_cau_dung,
             (SELECT COUNT(*) FROM chi_tiet_cau WHERE ma_ca = l.ma_ca AND sbd = l.sbd AND lan_thu = l.lan_thu) AS tong_cau
        FROM luot l
@@ -1745,47 +1952,64 @@ export async function hsLichSuCa(env: Env, b: Record<string, unknown>): Promise<
     .bind(sbd)
     .all<Record<string, unknown>>()
 
+  const bankCache = new Map<string, Record<string, unknown> | null>()
+
+  const items: Array<Record<string, unknown>> = []
+  for (const x of r.results ?? []) {
+    let rawTongCau = Number(x.tong_cau) || 0
+    let rawSoDung = Number(x.so_cau_dung) || 0
+    let rawSoSai = Number(x.so_cau_sai) || 0
+    const tongDiem = soHoacNull(x.tong)
+    const dI = soHoacNull(x.diem_i)
+    const dII = soHoacNull(x.diem_ii)
+    const dIII = soHoacNull(x.diem_iii)
+    const maCa = chuoi(x.ma_ca)
+
+    // Nếu chưa có chi_tiet_cau nhưng có đáp án đã nộp: tự động chấm từ ngân hàng đề
+    if (rawTongCau === 0 && x.dap_an_json && env.DE) {
+      if (!bankCache.has(maCa)) {
+        bankCache.set(maCa, await docBankDe(env, maCa))
+      }
+      const bData = bankCache.get(maCa)
+      if (bData) {
+        let dapAnObj: any = null
+        try {
+          dapAnObj = typeof x.dap_an_json === 'string' ? JSON.parse(x.dap_an_json) : x.dap_an_json
+        } catch {}
+        if (dapAnObj) {
+          const dg = danhGiaLuot(bData, x, dapAnObj, sbd, maCa, Number(x.lan_thu) || 1, chuoi(x.ten_ca))
+          rawTongCau = dg.tongCau
+          rawSoDung = dg.soCauDung
+          rawSoSai = dg.soCauSai
+          void luuChiTietCauNeuChuaCo(env, maCa, sbd, Number(x.lan_thu) || 1, dg.dsChiTiet, dg.dsCauSai)
+        }
+      }
+    }
+
+    const coCham = rawTongCau > 0
+    const tongCau = coCham ? rawTongCau : null
+    const soCauDung = coCham ? rawSoDung : null
+    const soCauSai = coCham ? rawSoSai : null
+
+    items.push({
+      maCa,
+      tenCa: chuoi(x.ten_ca) || `Ca ${maCa}`,
+      lanThu: Number(x.lan_thu) || 1,
+      nopLuc: chuoi(x.nop_luc),
+      tong: tongDiem,
+      diemI: dI,
+      diemII: dII,
+      diemIII: dIII,
+      thoiGianPhut: Number(x.thoi_gian_phut) || 0,
+      soCauSai,
+      soCauDung,
+      tongCau,
+    })
+  }
+
   return {
     ok: true,
-    items: (r.results ?? []).map((x) => {
-      const rawTongCau = Number(x.tong_cau) || 0
-      const rawSoDung = Number(x.so_cau_dung) || 0
-      const rawSoSai = Number(x.so_cau_sai) || 0
-      const tongDiem = soHoacNull(x.tong)
-      const dI = soHoacNull(x.diem_i)
-      const dII = soHoacNull(x.diem_ii)
-      const dIII = soHoacNull(x.diem_iii)
-
-      // CHƯA CÓ BẢNG CHẤM ⇒ `null`, TUYỆT ĐỐI KHÔNG SUY TỪ ĐIỂM.
-      //
-      // Bản trước, khi `chi_tiet_cau` rỗng, tự đặt tổng câu bằng 28 rồi suy số câu
-      // đúng bằng các trần cứng 18/4/6, hoặc bằng `(diem / 10) * 28`. Ca Test2
-      // (561169) là ca ĐỀ RIÊNG phát ĐÚNG 12 câu mỗi em (`soCau` I:8 II:2 III:2)
-      // và chưa chấm, nên bài 1,56 điểm hiện ra "Đúng 4/28 câu · sai 24 câu" —
-      // không một con số nào có thật.
-      //
-      // Số câu chỉ có một nguồn hợp lệ: bảng chấm của chính em. Không có thì
-      // trả `null` và để màn hình giấu dòng đếm đi.
-      const coCham = rawTongCau > 0
-      const tongCau = coCham ? rawTongCau : null
-      const soCauDung = coCham ? rawSoDung : null
-      const soCauSai = coCham ? rawSoSai : null
-
-      return {
-        maCa: chuoi(x.ma_ca),
-        tenCa: chuoi(x.ten_ca) || `Ca ${chuoi(x.ma_ca)}`,
-        lanThu: Number(x.lan_thu) || 1,
-        nopLuc: chuoi(x.nop_luc),
-        tong: tongDiem,
-        diemI: dI,
-        diemII: dII,
-        diemIII: dIII,
-        thoiGianPhut: Number(x.thoi_gian_phut) || 0,
-        soCauSai,
-        soCauDung,
-        tongCau,
-      }
-    }),
+    items,
   }
 }
 
@@ -1847,7 +2071,7 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
             c.dap_an_chon, c.dap_an_dung, c.dung_sai, ca.ten_ca
        FROM chi_tiet_cau c
        LEFT JOIN ca ON ca.ma_ca = c.ma_ca
-      WHERE c.sbd = ? AND c.dung_sai = 0`
+      WHERE c.sbd = ? AND c.dung_sai = 0 AND c.dap_an_chon <> '' AND c.dap_an_chon <> '----'`
   const params: unknown[] = [sbd]
 
   if (dsMaCa.length > 0) {
@@ -1865,9 +2089,10 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
   let rows = r.results ?? []
 
   // Nếu chi_tiet_cau chưa có dữ liệu cho em này (vd học sinh thi nộp trực tiếp chưa qua chấm lại),
-  // tự động phân tích bài làm từ luot và keyBank để trích xuất đầy đủ câu sai.
+  // tự động phân tích bài làm từ luot và keyBank để trích xuất đầy đủ câu sai chuẩn xác theo bộ câu của em.
   if (rows.length === 0) {
-    let luotQuery = `SELECT l.ma_ca, l.sbd, l.lan_thu, l.dap_an_json, COALESCE(ca.ten_ca, '') AS ten_ca
+    let luotQuery = `SELECT l.ma_ca, l.sbd, l.lan_thu, l.dap_an_json, COALESCE(ca.ten_ca, '') AS ten_ca,
+                            ca.bo_theo_em_json, ca.so_cau_json
        FROM luot l
        LEFT JOIN ca ON ca.ma_ca = l.ma_ca
       WHERE l.sbd = ? AND (l.trang_thai = 'da_nop' OR l.trang_thai = 'khoa' OR l.nop_luc IS NOT NULL) AND l.dap_an_json IS NOT NULL`
@@ -1888,86 +2113,12 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
       } catch {}
       if (!dapAnObj || !env.DE) continue
 
-      let bData: any = null
-      try {
-        const oKey = await env.DE.get(`key/${maCa}.json`)
-        if (oKey?.body) bData = await new Response(oKey.body).json()
-      } catch {}
-      if (!bData) {
-        try {
-          const oDe = await env.DE.get(`de/${maCa}.json`)
-          if (oDe?.body) bData = await new Response(oDe.body).json()
-        } catch {}
-      }
+      const bData = await docBankDe(env, maCa)
       if (!bData) continue
 
-      const pI: any[] = bData.phanI || []
-      const pII: any[] = bData.phanII || []
-      const pIII: any[] = bData.phanIII || []
-
-      const daI = dapAnObj.phanI || dapAnObj
-      pI.forEach((q, idx) => {
-        const chon = daI[q.id || q.qid] ?? ''
-        const dung = q.correct ?? ''
-        if (chon && dung && String(chon).trim().toUpperCase() !== String(dung).trim().toUpperCase()) {
-          rows.push({
-            ma_ca: maCa,
-            sbd,
-            phan: 'I',
-            so_cau: idx + 1,
-            qid: q.id || q.qid || `I_${idx + 1}`,
-            chuyen_de: q.chuyenDe || '',
-            muc_do: q.mucDo || '',
-            dap_an_chon: String(chon),
-            dap_an_dung: String(dung),
-            dung_sai: 0,
-            ten_ca: tenCa,
-          })
-        }
-      })
-
-      const daII = dapAnObj.phanII || {}
-      pII.forEach((q, idx) => {
-        const chonArr = daII[q.id || q.qid] ?? [null, null, null, null]
-        const chon = Array.isArray(chonArr) ? chonArr.map((v: any) => v ?? '-').join('') : String(chonArr)
-        const dung = Array.isArray(q.correct) ? q.correct.join('') : String(q.correct ?? '')
-        if (chon && dung && chon !== dung) {
-          rows.push({
-            ma_ca: maCa,
-            sbd,
-            phan: 'II',
-            so_cau: idx + 1,
-            qid: q.id || q.qid || `II_${idx + 1}`,
-            chuyen_de: q.chuyenDe || '',
-            muc_do: q.mucDo || '',
-            dap_an_chon: chon,
-            dap_an_dung: dung,
-            dung_sai: 0,
-            ten_ca: tenCa,
-          })
-        }
-      })
-
-      const daIII = dapAnObj.phanIII || {}
-      pIII.forEach((q, idx) => {
-        const chon = String(daIII[q.id || q.qid] ?? '').trim()
-        const dung = String(q.correct ?? '').trim()
-        if (chon && dung && chon.toLowerCase().replace(',', '.') !== dung.toLowerCase().replace(',', '.')) {
-          rows.push({
-            ma_ca: maCa,
-            sbd,
-            phan: 'III',
-            so_cau: idx + 1,
-            qid: q.id || q.qid || `III_${idx + 1}`,
-            chuyen_de: q.chuyenDe || '',
-            muc_do: q.mucDo || '',
-            dap_an_chon: chon,
-            dap_an_dung: dung,
-            dung_sai: 0,
-            ten_ca: tenCa,
-          })
-        }
-      })
+      const dg = danhGiaLuot(bData, lItem, dapAnObj, sbd, maCa, Number(lItem.lan_thu) || 1, tenCa)
+      rows.push(...dg.dsCauSai)
+      void luuChiTietCauNeuChuaCo(env, maCa, sbd, Number(lItem.lan_thu) || 1, dg.dsChiTiet, dg.dsCauSai)
     }
   }
   const banksCache = new Map<string, Record<string, unknown>>()

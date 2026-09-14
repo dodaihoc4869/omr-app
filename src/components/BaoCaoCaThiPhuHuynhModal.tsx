@@ -119,9 +119,11 @@ export default function BaoCaoCaThiPhuHuynhModal({
   // Đây là báo cáo phụ huynh đọc, nên càng không được có con số suy ra từ điểm.
   const tongCau = baiThi.tongSoCau && baiThi.tongSoCau > 0 ? baiThi.tongSoCau : null
   const soDung = typeof baiThi.soCauDung === 'number' ? baiThi.soCauDung : null
-  const soSai = typeof baiThi.soCauSai === 'number' ? baiThi.soCauSai : dsCauSai.length > 0 ? dsCauSai.length : null
+  const soSaiRaw = typeof baiThi.soCauSai === 'number' ? baiThi.soCauSai : dsCauSai.length > 0 ? dsCauSai.length : null
+  const soSai = soSaiRaw !== null && tongCau !== null ? Math.min(soSaiRaw, Math.max(0, tongCau - (soDung ?? 0))) : soSaiRaw
   const coDemCau = tongCau !== null && soDung !== null
-  const tyLeChinhXac = coDemCau ? Math.min(100, Math.max(0, Math.round((soDung / tongCau) * 100))) : null
+  const soBoTrong = coDemCau && tongCau !== null ? Math.max(0, tongCau - (soDung ?? 0) - (soSai ?? 0)) : null
+  const tyLeChinhXac = coDemCau && tongCau !== null ? Math.min(100, Math.max(0, Math.round(((soDung ?? 0) / tongCau) * 100))) : null
 
   // Phân tích mức độ tiến bộ của con dành riêng cho Phụ huynh
   const phanTichTienBo = useMemo(() => {
@@ -516,7 +518,11 @@ export default function BaoCaoCaThiPhuHuynhModal({
                       {soSai ?? '—'} <span className="text-xs font-medium text-slate-400">câu</span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                      {coDemCau ? `Chiếm ${100 - (tyLeChinhXac ?? 0)}% cần luyện lại` : 'Chưa có bảng chấm'}
+                      {coDemCau
+                        ? (soBoTrong ?? 0) > 0
+                          ? `Sai ${soSai} câu · Bỏ trống ${soBoTrong} câu`
+                          : `Sai ${soSai} câu cần luyện lại`
+                        : 'Chưa có bảng chấm'}
                     </p>
                   </div>
                 </div>

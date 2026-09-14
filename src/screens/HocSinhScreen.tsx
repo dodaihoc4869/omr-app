@@ -63,6 +63,8 @@ export default function HocSinhScreen() {
     moHoSoEm(sbd)
   }
 
+
+
   const [cauHinh, setCauHinh] = useState<{ url: string; mat: string } | null>(null)
   const [ds, setDs] = useState<EmTomTat[] | null>(null)
   const [dangTai, setDangTai] = useState(false)
@@ -163,6 +165,8 @@ export default function HocSinhScreen() {
     if (!hoSo?.ca || hoSo.ca.length === 0) return null
     return hoSo.ca.find((c) => c.tong !== null) ?? hoSo.ca[0]
   }, [hoSo?.ca])
+
+
 
   // ------------------------------------------------------------------ HỒ SƠ
   if (sbdDangXem) {

@@ -17,6 +17,10 @@ echo "=== 1/3 · Dựng bản mới (địa chỉ gốc /, đúng cho pages.dev)
 unset GITHUB_PAGES
 npm run build || { echo ">>> DỰNG HỎNG — đọc lỗi ở trên."; exit 1; }
 
+# Cloudflare Pages: KHÔNG được để 404.html trong dist. Có 404.html thì Cloudflare
+# tắt cơ chế SPA fallback và mọi link /hs, /ph, /t/... đều bị trả lỗi 404!
+rm -f dist/404.html
+
 echo
 echo "=== 2/3 · Đẩy lên Pages ==="
 npx -y wrangler@latest pages deploy dist --project-name=omr-app --branch=main

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Award,
   BookOpen,
@@ -38,6 +38,9 @@ import DauTruongGame from '../components/DauTruongGame'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import ModalKhacPhucCauSai from '../components/ModalKhacPhucCauSai'
 import type { CauSaiDauVao } from '../lib/thuat-toan-rut-cau-sai'
+
+// Màn làm bài nạp trễ: cổng học sinh không phải kéo theo bộ chấm khi chỉ xem điểm.
+const ManLamBai = lazy(() => import('./ExamTakeScreen'))
 import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
 
 const KHOA_LUU_AUTH = 'omr_student_portal_auth'
@@ -179,6 +182,8 @@ export default function StudentPortalScreen() {
    * Cloudflare Pages trả 404, máy đã cài service worker thiếu đường lui thì ra
    * thẳng trang lỗi. Em bấm nút là thấy "không vào được". */
   const [xemDeHtml, setXemDeHtml] = useState('')
+  /** Màn làm bài mở ngay trong cổng học sinh, không rời trang. */
+  const [manThi, setManThi] = useState(false)
   const [dangMoDe, setDangMoDe] = useState(false)
 
   const moDeVaLoiGiai = async (maCa: string) => {
@@ -740,11 +745,25 @@ export default function StudentPortalScreen() {
       return
     }
     setLoiVaoThi('')
-    let url = `/t/${ma}?sbd=${auth?.sbd || ''}`
-    if (matKhauCaVaoThi.trim()) {
-      url += `&matKhau=${encodeURIComponent(matKhauCaVaoThi.trim())}`
+    // VÀO THI NGAY TRONG APP, KHÔNG RỜI CỔNG HỌC SINH.
+    //
+    // Bản trước nhảy sang `/t/<mã ca>` bằng `window.location.href`. Hai cái hại:
+    // em bị đá ra khỏi cổng đang đứng, và đường dẫn ấy chính là chỗ vỡ khi máy
+    // chủ không có đường lui (Cloudflare Pages trả 404).
+    //
+    // `ExamTakeScreen` không nhận tham số — nó tự đọc mã ca từ địa chỉ. Nên đặt
+    // tham số vào địa chỉ TRƯỚC, rồi mới dựng màn thi trong lớp phủ: màn xác
+    // nhận "Có đúng em không?" hiện ngay tại chỗ.
+    try {
+      const u = new URL(location.href)
+      u.searchParams.set('examCode', ma)
+      if (auth?.sbd) u.searchParams.set('sbd', auth.sbd)
+      if (matKhauCaVaoThi.trim()) u.searchParams.set('matKhau', matKhauCaVaoThi.trim())
+      history.replaceState(null, '', u.toString())
+    } catch {
+      // Địa chỉ lạ thì thôi, `ExamTakeScreen` vẫn hỏi mã ca ở màn đầu.
     }
-    window.location.href = url
+    setManThi(true)
   }
 
   // NẾU CHƯA ĐĂNG NHẬP
@@ -1839,6 +1858,15 @@ export default function StudentPortalScreen() {
           cổng học sinh: em mất chỗ đang đứng, và trên app đã cài vào màn hình
           chính thì đó là một cửa sổ khác hẳn. Nay mở trong lớp phủ, đóng lại là
           về đúng chỗ cũ. */}
+      {/* MÀN LÀM BÀI — phủ toàn màn, ngay trong cổng học sinh. */}
+      {manThi && (
+        <div className="fixed inset-0 z-[60] overflow-auto bg-white dark:bg-slate-950">
+          <Suspense fallback={<div className="p-6 text-sm text-slate-500">Đang mở phòng thi…</div>}>
+            <ManLamBai />
+          </Suspense>
+        </div>
+      )}
+
       {xemDeHtml && (
         <KhungXemPhieu
           html={xemDeHtml}

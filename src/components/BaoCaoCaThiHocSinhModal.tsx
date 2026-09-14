@@ -137,13 +137,14 @@ export default function BaoCaoCaThiHocSinhModal({
   const tongCau = baiThi.tongCau && baiThi.tongCau > 0 ? baiThi.tongCau : null
   const soDung = typeof baiThi.soCauDung === 'number' ? baiThi.soCauDung : null
   // Danh sách câu sai THẬT (lấy từ bảng chấm) vẫn là nguồn hợp lệ cho số sai.
-  const soSai = typeof baiThi.soCauSai === 'number' ? baiThi.soCauSai : dsCauSai.length > 0 ? dsCauSai.length : null
+  const soSaiRaw = typeof baiThi.soCauSai === 'number' ? baiThi.soCauSai : dsCauSai.length > 0 ? dsCauSai.length : null
+  const soSai = soSaiRaw !== null && tongCau !== null ? Math.min(soSaiRaw, Math.max(0, tongCau - (soDung ?? 0))) : soSaiRaw
   const coDemCau = tongCau !== null && soDung !== null
   // BỎ TRỐNG = phần chênh giữa tổng câu với (đúng + sai). KHÔNG gộp vào "sai":
   // em Đỗ Đại Học làm 6 câu trên đề 12 câu ca Test2, gọi 6 câu còn lại là sai
   // thì vừa sai bản chất vừa oan cho em.
-  const soBoTrong = coDemCau ? Math.max(0, tongCau - soDung - (soSai ?? 0)) : null
-  const tyLeChinhXac = coDemCau ? Math.min(100, Math.max(0, Math.round((soDung / tongCau) * 100))) : null
+  const soBoTrong = coDemCau && tongCau !== null ? Math.max(0, tongCau - (soDung ?? 0) - (soSai ?? 0)) : null
+  const tyLeChinhXac = coDemCau && tongCau !== null ? Math.min(100, Math.max(0, Math.round(((soDung ?? 0) / tongCau) * 100))) : null
 
   // Phân tích mức độ tiến bộ qua các ca thi
   const phanTichTienBo = useMemo(() => {
@@ -379,19 +380,25 @@ export default function BaoCaoCaThiHocSinhModal({
                     <Award className="w-3.5 h-3.5" />
                     <span>{danhGia.xepLoai}</span>
                   </div>
-                  <div className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                    Đúng <strong className="text-emerald-600 dark:text-emerald-400">{soDung}</strong>/{tongCau} câu
-                    {(soSai ?? 0) > 0 && (
-                      <span className="text-rose-500 dark:text-rose-400 font-bold ml-1.5">
-                        (sai {soSai} câu)
-                      </span>
-                    )}
-                    {(soBoTrong ?? 0) > 0 && (
-                      <span className="text-slate-400 dark:text-slate-500 font-semibold ml-1.5">
-                        · bỏ trống {soBoTrong} câu
-                      </span>
-                    )}
-                  </div>
+                  {coDemCau ? (
+                    <div className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                      Đúng <strong className="text-emerald-600 dark:text-emerald-400">{soDung}</strong>/{tongCau} câu
+                      {(soSai ?? 0) > 0 && (
+                        <span className="text-rose-500 dark:text-rose-400 font-bold ml-1.5">
+                          (sai {soSai} câu)
+                        </span>
+                      )}
+                      {(soBoTrong ?? 0) > 0 && (
+                        <span className="text-slate-400 dark:text-slate-500 font-semibold ml-1.5">
+                          · bỏ trống {soBoTrong} câu
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-sm font-semibold text-slate-600 dark:text-slate-300">
+                      {(soSai ?? 0) > 0 ? `Sai ${soSai} câu` : 'Bài thi đã hoàn thành'}
+                    </div>
+                  )}
                   <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     Độ chính xác: <strong>{coDemCau ? `${tyLeChinhXac}%` : '—'}</strong>
                   </div>
@@ -516,7 +523,7 @@ export default function BaoCaoCaThiHocSinhModal({
                     <span className="text-xs font-normal text-slate-400 ml-1">/ 4.50 điểm</span>
                   </div>
                   <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                    Nhiều lựa chọn (A, B, C, D) · 18 câu trọng tâm
+                    Nhiều lựa chọn (A, B, C, D)
                   </div>
                 </div>
 
@@ -530,7 +537,7 @@ export default function BaoCaoCaThiHocSinhModal({
                     <span className="text-xs font-normal text-slate-400 ml-1">/ 4.00 điểm</span>
                   </div>
                   <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                    4 câu hỏi chùm (mỗi câu gồm 4 ý a, b, c, d)
+                    Câu hỏi Đúng / Sai (mỗi câu gồm 4 ý a, b, c, d)
                   </div>
                 </div>
 
@@ -544,7 +551,7 @@ export default function BaoCaoCaThiHocSinhModal({
                     <span className="text-xs font-normal text-slate-400 ml-1">/ 1.50 điểm</span>
                   </div>
                   <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                    6 câu toán tính toán và biện luận chuyên sâu
+                    Câu hỏi trả lời ngắn tính toán và biện luận
                   </div>
                 </div>
               </div>
