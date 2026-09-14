@@ -25,6 +25,13 @@
 //      đường dẫn, nên tầng này luôn đúng khi còn mạng.
 //   3. Bất kỳ bản `index.html` nào còn trong CacheStorage, kể cả của bản cũ.
 // Hết cả ba mới chịu trả lỗi.
+//
+// KILL SWITCH (thêm 14/09 — khắc phục triệt để SW cũ kẹt trên máy người dùng):
+//   Khi SW activate, fetch `sw-version.json` (no-store trên server).
+//   Nếu server có timestamp mới hơn bản SW này biết → xóa hết cache cũ +
+//   unregister → trình duyệt tải lại bản SW mới từ đầu, sạch bộ nhớ.
+//   Cơ chế này đảm bảo SW cũ không thể "kẹt" trên máy người dùng quá 1 lần
+//   mở trang sau khi có bản mới.
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
 import { clientsClaim } from 'workbox-core'
@@ -69,5 +76,47 @@ registerRoute(new NavigationRoute(traTrangApp, { denylist: KHONG_DUNG }))
 // vào màn hình chính gần như không bao giờ nhận được bản sửa.
 self.skipWaiting()
 clientsClaim()
+
+// ─── KILL SWITCH: XÓA CACHE CŨ KHI PHÁT HIỆN BẢN MỚI TRÊN SERVER ───
+//
+// `sw-version.json` có `Cache-Control: no-store` trên Cloudflare Pages,
+// nên fetch này luôn lấy bản mới nhất từ server, không bị cache bởi SW hay
+// trình duyệt.
+//
+// Timestamp được vite-plugin-pwa chèn vào lúc build qua `__SW_BUILT_AT__`.
+// Nếu server có timestamp lớn hơn → SW này đã lỗi thời → xóa hết cache và
+// unregister để lần mở trang tiếp theo cài SW mới từ đầu.
+declare const __SW_BUILT_AT__: number
+
+const SW_BUILT_AT: number = typeof __SW_BUILT_AT__ !== 'undefined' ? __SW_BUILT_AT__ : 0
+
+self.addEventListener('activate', (event: ExtendableEvent) => {
+  event.waitUntil(
+    (async () => {
+      try {
+        const res = await fetch('/sw-version.json', { cache: 'no-store' })
+        if (!res.ok) return
+        const data = await res.json() as { builtAt?: number }
+        const serverTs = Number(data.builtAt || 0)
+        // Nếu server có timestamp lớn hơn ≥ 2 giây (tránh race condition khi deploy chậm)
+        if (serverTs > SW_BUILT_AT + 2) {
+          console.info(`[sw] Bản mới (server=${serverTs}) > bản này (${SW_BUILT_AT}). Xóa cache và unregister.`)
+          // Xóa TẤT CẢ cache cũ
+          const keys = await caches.keys()
+          await Promise.all(keys.map(k => caches.delete(k)))
+          // Unregister SW này → browser sẽ tải SW mới lần mở trang tiếp
+          await self.registration.unregister()
+          // Thông báo tất cả tab đang mở để tải lại
+          const clients = await self.clients.matchAll({ type: 'window' })
+          for (const client of clients) {
+            client.navigate(client.url)
+          }
+        }
+      } catch {
+        // Mất mạng hoặc lỗi fetch → giữ nguyên SW hiện tại, không làm gì
+      }
+    })()
+  )
+})
 
 export {}

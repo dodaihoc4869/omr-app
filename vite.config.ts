@@ -1,4 +1,6 @@
 import { execSync } from 'node:child_process'
+import { writeFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -23,11 +25,28 @@ function dauPhienBan(): string {
   return `${sha ? sha.slice(0, 7) : 'dev'} · ${ngay}`
 }
 
+const SW_BUILT_AT = Math.floor(Date.now() / 1000)
+
+// Ghi sw-version.json với timestamp mới nhất lúc build (cùng giá trị với __SW_BUILT_AT__)
+// để kill switch trong service worker so sánh được.
+
+function ghiSwVersion() {
+  try {
+    const p = resolve('public/sw-version.json')
+    writeFileSync(p, JSON.stringify({ builtAt: SW_BUILT_AT }))
+  } catch (e) {
+    console.warn('[vite] Không ghi được sw-version.json:', e)
+  }
+}
+ghiSwVersion()
+
 export default defineConfig({
   base: process.env.GITHUB_PAGES === 'true' ? REPO_BASE : '/',
   define: {
     __PHIEN_BAN__: JSON.stringify(dauPhienBan()),
+    __SW_BUILT_AT__: SW_BUILT_AT,
   },
+
   plugins: [
     react(),
     VitePWA({

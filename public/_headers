@@ -1,12 +1,23 @@
 # CLOUDFLARE PAGES — QUY TẮC CACHE CHO CÁC TỆP CỦA APP
+#
+# TẤT CẢ CÁC ĐƯỜNG HTML (/, /hs, /ph, /gv, /t/*, /d/*, /p)
+# PHẢI KHÔNG CÓ CACHE để Service Worker cũ không giữ bản cũ.
+# Cloudflare Pages đã áp dụng `/* /index.html 200` từ _redirects,
+# nên mọi đường HTML đều phục vụ index.html cùng quy tắc cache này.
+/*
+  Cache-Control: public, max-age=0, must-revalidate
+
 /sw.js
   Cache-Control: public, max-age=0, must-revalidate
 
-/index.html
-  Cache-Control: public, max-age=0, must-revalidate
+/sw-version.json
+  Cache-Control: no-store, no-cache
 
 /cau-hinh.json
   Cache-Control: public, max-age=0, must-revalidate
 
 /manifest*.json
   Cache-Control: public, max-age=0, must-revalidate
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
