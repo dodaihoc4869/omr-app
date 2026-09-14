@@ -56,6 +56,19 @@ export default defineConfig({
         // Thiếu hai đuôi này thì mất mạng là dấu tiếng Việt và chỉ số công thức
         // rơi về phông dự phòng — đúng lỗi "bă`ng" đã gặp.
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,woff,woff2,ttf}'],
+        // ĐƯỜNG LUI CHO MỌI LƯỢT ĐIỀU HƯỚNG — khai TƯỜNG MINH.
+        //
+        // App đọc vai và mã ca từ đường dẫn (/hs, /ph, /t/<mã ca>, /d/<mã ca>).
+        // Không có dòng này thì service worker không biết trả gì cho những
+        // đường ấy: máy đã cài service worker mở /ph ra TRANG LỖI của trình
+        // duyệt, không phải 404 — đúng thứ thầy gặp 14/09, và nó không hiện ở
+        // máy chưa cài nên rất dễ tưởng là lỗi mạng.
+        //
+        // `_redirects` lo phía máy chủ cho máy CHƯA cài; dòng này lo phía máy
+        // em ĐÃ cài. Phải có cả hai.
+        navigateFallback: 'index.html',
+        // Trừ các đường của chính Cloudflare Pages và tệp có đuôi thật.
+        navigateFallbackDenylist: [/^\/cdn-cgi\//],
         maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
         // KHÔNG chặn /t/, /hs/, /ph/ nữa: service worker cứ trả index.html cho
         // mọi đường điều hướng, và app tự đọc vai + mã ca từ ĐƯỜNG DẪN

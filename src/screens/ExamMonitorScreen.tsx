@@ -1876,8 +1876,30 @@ export default function ExamMonitorScreen() {
             diemI: emTrongCa?.graded?.score.phanIScore ?? null,
             diemII: emTrongCa?.graded?.score.phanIIScore ?? null,
             diemIII: emTrongCa?.graded?.score.phanIIIScore ?? null,
+            // ĐẾM THẬT TỪNG CÂU, KHÔNG SUY TỪ ĐIỂM.
+            //
+            // Bản trước: `Math.round((diem / 10) * tongCau)`. Em Đỗ Đại Học ca
+            // Test2 được 3,13 điểm trên đề 12 câu ⇒ ra "Đúng 4", trong khi bảng
+            // chấm chỉ có 1 câu đúng và 5 câu sai (em bỏ trống 6 câu). Hai con
+            // số trên cùng một dòng lấy từ hai nguồn khác nhau nên cộng lại
+            // không ra tổng: "Đúng 4/12 câu (sai 5 câu)".
             soCauDung: emTrongCa?.graded?.score
-              ? (emTrongCa.graded.score.total >= 0 ? Math.round((emTrongCa.graded.score.total / 10) * (soCauCa ? soCauCa.I + soCauCa.II + soCauCa.III : (emTrongCa.graded.score.phanI.items.length + emTrongCa.graded.score.phanII.items.length + emTrongCa.graded.score.phanIII.items.length))) : undefined)
+              ? [
+                  ...emTrongCa.graded.score.phanI.items,
+                  ...emTrongCa.graded.score.phanII.items,
+                  ...emTrongCa.graded.score.phanIII.items,
+                ].filter((x) => x.correct).length
+              : undefined,
+            // SỐ SAI cũng từ đúng bảng ấy, nhưng CÂU BỎ TRỐNG KHÔNG TÍNH LÀ
+            // SAI. Em Đỗ Đại Học làm 6 câu trên đề 12 câu; gộp 6 câu bỏ trống
+            // vào "sai" là nói em sai 11 câu, sai bản chất và oan cho em.
+            // `flag === 'EMPTY'` là câu không có dấu nào.
+            soCauSai: emTrongCa?.graded?.score
+              ? [
+                  ...emTrongCa.graded.score.phanI.items,
+                  ...emTrongCa.graded.score.phanII.items,
+                  ...emTrongCa.graded.score.phanIII.items,
+                ].filter((x) => !x.correct && x.flag !== 'EMPTY').length
               : undefined,
             // KHÔNG CÒN SỐ 40 BỊA RA. Ca đề riêng phát 12 câu, ca khác 28 —
             // in 40 lên báo cáo là sai với mọi ca. Không biết thì trả `null`.

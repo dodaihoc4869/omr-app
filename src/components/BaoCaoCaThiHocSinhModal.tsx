@@ -139,6 +139,10 @@ export default function BaoCaoCaThiHocSinhModal({
   // Danh sách câu sai THẬT (lấy từ bảng chấm) vẫn là nguồn hợp lệ cho số sai.
   const soSai = typeof baiThi.soCauSai === 'number' ? baiThi.soCauSai : dsCauSai.length > 0 ? dsCauSai.length : null
   const coDemCau = tongCau !== null && soDung !== null
+  // BỎ TRỐNG = phần chênh giữa tổng câu với (đúng + sai). KHÔNG gộp vào "sai":
+  // em Đỗ Đại Học làm 6 câu trên đề 12 câu ca Test2, gọi 6 câu còn lại là sai
+  // thì vừa sai bản chất vừa oan cho em.
+  const soBoTrong = coDemCau ? Math.max(0, tongCau - soDung - (soSai ?? 0)) : null
   const tyLeChinhXac = coDemCau ? Math.min(100, Math.max(0, Math.round((soDung / tongCau) * 100))) : null
 
   // Phân tích mức độ tiến bộ qua các ca thi
@@ -380,6 +384,11 @@ export default function BaoCaoCaThiHocSinhModal({
                     {(soSai ?? 0) > 0 && (
                       <span className="text-rose-500 dark:text-rose-400 font-bold ml-1.5">
                         (sai {soSai} câu)
+                      </span>
+                    )}
+                    {(soBoTrong ?? 0) > 0 && (
+                      <span className="text-slate-400 dark:text-slate-500 font-semibold ml-1.5">
+                        · bỏ trống {soBoTrong} câu
                       </span>
                     )}
                   </div>
