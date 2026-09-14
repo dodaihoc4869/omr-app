@@ -206,14 +206,17 @@ describe('Xem đề và lời giải mở tại chỗ', () => {
   })
 
   it('mở trong lớp phủ ngay trong app', () => {
-    expect(SP).toContain("const [xemDeCa, setXemDeCa] = useState('')")
-    expect(SP).toContain('onClick={() => setXemDeCa(item.maCa)}')
-    expect(SP).toContain('onMoLaiBaiThi={(maCa) => setXemDeCa(maCa)}')
+    expect(SP).toContain("const [xemDeHtml, setXemDeHtml] = useState('')")
+    expect(SP).toContain('onClick={() => void moDeVaLoiGiai(item.maCa)}')
+    expect(SP).toContain('onMoLaiBaiThi={(maCa) => void moDeVaLoiGiai(maCa)}')
     expect(SP).toContain('ten="Đề và lời giải kèm lỗi sai"')
   })
 
-  it('đường dẫn bám BASE_URL, không gõ cứng — pages.dev dùng gốc "/"', () => {
-    expect(SP).toContain('${import.meta.env.BASE_URL}t/${xemDeCa}')
+  it('KHÔNG còn phụ thuộc đường dẫn nào cả — dựng HTML tại máy', () => {
+    // Bản trước dùng `${'${'}import.meta.env.BASE_URL}t/...` trong lớp phủ; chính
+    // chỗ đó vỡ khi Pages trả 404 hoặc service worker thiếu đường lui.
+    expect(SP).not.toContain('BASE_URL}t/')
+    expect(SP).toContain('html={xemDeHtml}')
   })
 })
 
@@ -340,5 +343,49 @@ describe('Bìa và tổng quan phiếu: phẳng, sáng, dùng token màu', () =>
   it('ô đang chọn nổi bằng viền màu nhấn, không đảo sang nền trắng', () => {
     expect(HP).toContain('button.stat-card.chon { background: var(--the-nen); border-color: var(--nav)')
     expect(HP).not.toContain('button.stat-card.chon { background: #ffffff')
+  })
+})
+
+// ===========================================================================
+// XEM ĐỀ VÀ LỜI GIẢI: DỰNG HTML TẠI MÁY, KHÔNG MỞ ĐƯỜNG DẪN — 14/09.
+//
+// Bản trước mở `/t/<mã ca>` trong lớp phủ. Cách ấy phụ thuộc việc máy chủ (hoặc
+// service worker) trả đúng index.html cho một đường dẫn không có tệp thật — và
+// đó chính là chỗ vỡ: Cloudflare Pages trả 404, máy đã cài service worker
+// thiếu đường lui thì ra thẳng trang lỗi trình duyệt.
+// ===========================================================================
+describe('Đề và lời giải dựng tại máy, đúng khuôn phiếu đã thiết kế', () => {
+  const SP = doc('src/screens/StudentPortalScreen.tsx')
+  const LIB = doc('src/lib/de-loi-giai-cua-em.ts')
+
+  it('lớp phủ nhận HTML dựng sẵn, KHÔNG nhận đường dẫn', () => {
+    expect(SP).toContain('html={xemDeHtml}')
+    expect(SP).not.toContain('}t/${xemDeCa}?sbd=')
+  })
+
+  it('dựng bằng đúng khuôn phiếu chung `dungPhieu`', () => {
+    expect(LIB).toContain("from './html-phieu'")
+    expect(LIB).toContain('return dungPhieu(tt, cau, { anGiai: false })')
+  })
+
+  it('đi theo BẢNG CHẤM của chính em, không theo cả gói đề', () => {
+    // Ca đề riêng: gói đề chứa cả kho của lớp, bảng chấm mới là tờ đề của em.
+    expect(LIB).toContain('for (const r of rows)')
+    expect(LIB).toContain('theoId.get(r.qid)')
+  })
+
+  it('câu SAI mang nhãn kèm đáp án em đã chọn', () => {
+    expect(LIB).toContain('r.dungSai === false')
+    expect(LIB).toContain('daChon: r.dapAnChon')
+  })
+
+  it('thiếu đáp án thì nói rõ, không mở phiếu rỗng', () => {
+    expect(LIB).toContain("if (!b?.bank) return { html: '', loi: 'Ca này chưa có đáp án trên máy chủ")
+    expect(LIB).toContain("if (!html) return { html: '', loi: 'Không dựng được đề của em")
+  })
+
+  it('cả hai lối vào đều đi qua cùng một hàm', () => {
+    expect(SP).toContain('onClick={() => void moDeVaLoiGiai(item.maCa)}')
+    expect(SP).toContain('onMoLaiBaiThi={(maCa) => void moDeVaLoiGiai(maCa)}')
   })
 })

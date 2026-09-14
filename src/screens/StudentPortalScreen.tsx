@@ -172,8 +172,31 @@ export default function StudentPortalScreen() {
   const [dangTaoDeKhacPhuc, setDangTaoDeKhacPhuc] = useState(false)
   const [thongBaoKhacPhuc, setThongBaoKhacPhuc] = useState('')
   const [phieuHtml, setPhieuHtml] = useState('')
-  /** Mã ca đang mở ở lớp phủ "Xem đề và lời giải kèm lỗi sai". Rỗng = không mở. */
-  const [xemDeCa, setXemDeCa] = useState('')
+  /** HTML đề + lời giải của em, dựng TẠI MÁY. Rỗng = không mở lớp phủ.
+   *
+   * Bản trước mở `/t/<mã ca>` trong khung. Cách ấy phụ thuộc việc máy chủ trả
+   * đúng index.html cho một đường dẫn không có tệp thật — và đó là chỗ vỡ:
+   * Cloudflare Pages trả 404, máy đã cài service worker thiếu đường lui thì ra
+   * thẳng trang lỗi. Em bấm nút là thấy "không vào được". */
+  const [xemDeHtml, setXemDeHtml] = useState('')
+  const [dangMoDe, setDangMoDe] = useState(false)
+
+  const moDeVaLoiGiai = async (maCa: string) => {
+    if (!auth) return
+    setDangMoDe(true)
+    try {
+      const { deVaLoiGiaiCuaEm } = await import('../lib/de-loi-giai-cua-em')
+      const { loadScriptUrlHoacMacDinh } = await import('../lib/exam-db')
+      const url = await loadScriptUrlHoacMacDinh().catch(() => '')
+      const kq = await deVaLoiGiaiCuaEm(url, maCa, auth.sbd, auth.hoTen || '')
+      if (kq.html) setXemDeHtml(kq.html)
+      else setThongBaoKhacPhuc(kq.loi || 'Không mở được đề của em')
+    } catch (e) {
+      setThongBaoKhacPhuc(e instanceof Error ? e.message : 'Không mở được đề của em')
+    } finally {
+      setDangMoDe(false)
+    }
+  }
   const [dsCauSaiKhacPhucModal, setDsCauSaiKhacPhucModal] = useState<CauSaiDauVao[] | null>(null)
   const [tieuDeKhacPhucModal, setTieuDeKhacPhucModal] = useState('')
   const [caXemBaoCaoModal, setCaXemBaoCaoModal] = useState<any | null>(null)
@@ -1180,7 +1203,8 @@ export default function StudentPortalScreen() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => setXemDeCa(item.maCa)}
+                        onClick={() => void moDeVaLoiGiai(item.maCa)}
+                        disabled={dangMoDe}
                         className="py-2 px-4 rounded-full btn-google-outlined text-xs font-medium text-center cursor-pointer"
                       >
                         Xem đề và lời giải kèm lỗi sai
@@ -1815,11 +1839,11 @@ export default function StudentPortalScreen() {
           cổng học sinh: em mất chỗ đang đứng, và trên app đã cài vào màn hình
           chính thì đó là một cửa sổ khác hẳn. Nay mở trong lớp phủ, đóng lại là
           về đúng chỗ cũ. */}
-      {xemDeCa && (
+      {xemDeHtml && (
         <KhungXemPhieu
-          src={`${import.meta.env.BASE_URL}t/${xemDeCa}?sbd=${encodeURIComponent(auth?.sbd ?? '')}`}
+          html={xemDeHtml}
           ten="Đề và lời giải kèm lỗi sai"
-          dong={() => setXemDeCa('')}
+          dong={() => setXemDeHtml('')}
         />
       )}
 
@@ -1861,7 +1885,7 @@ export default function StudentPortalScreen() {
             setCacCaChon(new Set([maCa]))
             void taoDeKhacPhuc([maCa])
           }}
-          onMoLaiBaiThi={(maCa) => setXemDeCa(maCa)}
+          onMoLaiBaiThi={(maCa) => void moDeVaLoiGiai(maCa)}
         />
       )}
 
