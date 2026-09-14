@@ -29,8 +29,16 @@ export interface DuongVao {
 
 const RE_GV_TREN_DUONG = /(?:^|\/)(?:gv|giaovien)\/?$/
 const RE_PHIEU_TREN_DUONG = /(?:^|\/)p\/?$/
-const RE_HOCSINH_TREN_DUONG = /(?:^|\/)(?:hoc-sinh|hocsinh)\/?$/
-const RE_PHUHUYNH_TREN_DUONG = /(?:^|\/)(?:phu-huynh|phuhuynh)\/?$/
+// `hs` và `ph` TRẦN cũng là cổng học sinh / phụ huynh.
+//
+// Trước 14/09 chỉ nhận `hoc-sinh` và `phu-huynh`, nên mở `/hs` rơi thẳng vào
+// màn quản lý của Thầy và hiện ô "Đặt mật khẩu mở app" — đúng thứ bắt được khi
+// chuyển sang pages.dev.
+//
+// KHÔNG đụng link riêng CŨ `/hs/<token>`: mẫu dưới đòi HẾT đường dẫn ngay sau
+// `hs`, còn link cũ còn một đoạn token phía sau nên `laLinkAppCu` vẫn bắt đúng.
+const RE_HOCSINH_TREN_DUONG = /(?:^|\/)(?:hoc-sinh|hocsinh|hs)\/?$/
+const RE_PHUHUYNH_TREN_DUONG = /(?:^|\/)(?:phu-huynh|phuhuynh|ph)\/?$/
 const RE_CA_TREN_DUONG = /(?:^|\/)t\/(\d{4,8})\/?$/
 const RE_DIEM_TREN_DUONG = /(?:^|\/)d\/(\d{4,8})\/?$/
 const RE_APP_CU = /(?:^|\/)(?:hs|ph)\/[0-9a-zA-Z]{8,}\/?$/

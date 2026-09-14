@@ -238,3 +238,35 @@ describe('Chỉ MỘT nơi phát hành: Cloudflare Pages', () => {
     expect(iKiem).toBeLessThan(iDay)
   })
 })
+
+// ===========================================================================
+// CỔNG NGẮN /hs VÀ /ph — thầy bắt được 14/09 khi chuyển sang pages.dev:
+// mở https://omr-app-b3u.pages.dev/hs thì rơi vào màn quản lý của Thầy và hiện
+// ô "Đặt mật khẩu mở app", vì mẫu đường dẫn chỉ nhận `hoc-sinh`/`phu-huynh`.
+// ===========================================================================
+describe('Đường dẫn ngắn /hs và /ph vào đúng cổng', () => {
+  it('nhận cả dạng ngắn lẫn dạng dài', async () => {
+    const { docVaiTuDuongDan } = await import('../src/lib/vai-tro')
+    for (const d of ['/hs', '/hs/', '/hoc-sinh', '/hocsinh', '/omr-app/hs']) {
+      expect(docVaiTuDuongDan(d).vai, d).toBe('hocsinh')
+    }
+    for (const d of ['/ph', '/ph/', '/phu-huynh', '/phuhuynh', '/omr-app/ph']) {
+      expect(docVaiTuDuongDan(d).vai, d).toBe('phuhuynh')
+    }
+  })
+
+  it('KHÔNG cướp link riêng cũ /hs/<token> — nó còn đoạn token phía sau', async () => {
+    const { docVaiTuDuongDan, laLinkAppCu } = await import('../src/lib/vai-tro')
+    const cu = '/hs/abc12345xyz'
+    expect(docVaiTuDuongDan(cu).vai).toBeNull()
+    expect(laLinkAppCu('', cu)).toBe(true)
+  })
+
+  it('các cổng khác không đổi', async () => {
+    const { docVaiTuDuongDan } = await import('../src/lib/vai-tro')
+    expect(docVaiTuDuongDan('/gv').vai).toBe('gv')
+    expect(docVaiTuDuongDan('/t/561169').maCa).toBe('561169')
+    expect(docVaiTuDuongDan('/d/561169').vai).toBe('diem')
+    expect(docVaiTuDuongDan('/').vai).toBeNull()
+  })
+})
