@@ -270,3 +270,30 @@ describe('Đường dẫn ngắn /hs và /ph vào đúng cổng', () => {
     expect(docVaiTuDuongDan('/').vai).toBeNull()
   })
 })
+
+// ===========================================================================
+// CLOUDFLARE PAGES PHẢI TRẢ index.html CHO MỌI ĐƯỜNG DẪN — 14/09.
+//
+// App đọc vai và mã ca TỪ ĐƯỜNG DẪN. Máy đã cài service worker thì chính nó trả
+// index.html nên không ai thấy vấn đề; máy CHƯA cài (hoặc vừa xoá bộ đệm) thì
+// Pages đi tìm một tệp có thật tên `/hs` và không thấy — ERR_FAILED / 404.
+// Đó là lý do link học sinh mở trên máy khác không vào được, và khung "Xem đề
+// và lời giải" mở ra trang lỗi vì /t/<mã ca> trả 404.
+// ===========================================================================
+describe('Pages trả index.html cho mọi đường dẫn của app', () => {
+  const R = doc('public/_redirects')
+
+  it('có luật bắt tất, trả mã 200 chứ không chuyển hướng', () => {
+    const dong = R.split('\n').filter((d) => d.trim() && !d.trim().startsWith('#'))
+    expect(dong.length).toBeGreaterThan(0)
+    const cuoi = dong[dong.length - 1].split(/\s+/)
+    expect(cuoi[0]).toBe('/*')
+    expect(cuoi[1]).toBe('/index.html')
+    // 200 giữ nguyên đường dẫn trên thanh địa chỉ để app còn đọc được vai.
+    expect(cuoi[2]).toBe('200')
+  })
+
+  it('nằm trong public/ nên được chép thẳng vào bản dựng', () => {
+    expect(fs.existsSync(path.join(process.cwd(), 'public/_redirects'))).toBe(true)
+  })
+})

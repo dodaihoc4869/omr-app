@@ -1,1 +1,17 @@
-/* /index.html 200
+# CLOUDFLARE PAGES — TRẢ index.html CHO MỌI ĐƯỜNG DẪN CỦA APP.
+#
+# App đọc vai và mã ca TỪ ĐƯỜNG DẪN (/hs, /ph, /t/<mã ca>, /d/<mã ca>,
+# /phieu/<mã>). Trên máy đã cài service worker thì chính service worker trả
+# index.html cho mọi đường điều hướng nên không ai thấy vấn đề — nhưng máy CHƯA
+# cài, hoặc vừa xoá bộ đệm, thì Pages đi tìm một tệp có thật tên `/hs` và không
+# thấy: ERR_FAILED / 404.
+#
+# Đúng lỗi thầy gặp 14/09: mở link học sinh trên máy khác thì không vào được,
+# và khung "Xem đề và lời giải" mở ra trang lỗi vì /t/<mã ca> trả 404.
+#
+# GitHub Pages trước đây che lỗi này bằng public/404.html. Pages.dev không có
+# cơ chế ấy, nên phải khai tường minh ở đây.
+#
+# Mã 200 (không phải 301): giữ nguyên đường dẫn trên thanh địa chỉ để app còn
+# đọc được vai và mã ca từ nó.
+/*    /index.html   200
