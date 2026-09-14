@@ -13,9 +13,9 @@ import { sinhDao, sanDuoi, boSinh, type Dao } from './man-choi'
 import { xuLyDam, type ThanhPhan } from './xu-ly-dam'
 import { taoRong, buocRong, dinhDauRong, rongMatMau, type Rong } from './rong'
 import { taoNao, nghiBot, type NaoBot } from './bot'
-import { MUOI_HAI_NGUOI } from './nhan-vat'
+import { MUOI_HAI_NGUOI } from './bo-nguoi'
 import { KhoHieuUng } from './hieu-ung'
-import type { NguoiChoi, PhaVan, BangTin } from './types'
+import { LOI_CANH_MO_DAU, type NguoiChoi, type PhaVan, type BangTin } from './types'
 import { layDoKho, type DoKho, type MaDoKho } from './do-kho'
 import {
   sinhQuai, sinhHoa, buocQuai, chongNhau, damTrungQuai,
@@ -37,6 +37,9 @@ export class VanChoi {
   pha: PhaVan = 'chay'
   ket: KetVan = { thang: null, duong: null, botChamCongChua: false }
   bang: BangTin | null = null
+  /** Cảnh mở đầu trận rồng: giây bắt đầu, null khi không chiếu. */
+  canhMoDau: number | null = null
+  readonly loiCanhMoDau = LOI_CANH_MO_DAU
   hieuUng: KhoHieuUng | null
   /** id của người thật. -1 nghĩa là ván toàn bot (dùng cho phép kiểm). */
   idNguoiThat: number
@@ -380,6 +383,20 @@ export class VanChoi {
     if (this.pha === 'xong') return
     this.giay += dt
 
+    if (this.pha === 'canhMoDau') {
+      if (this.canhMoDau !== null && this.giay - this.canhMoDau >= CAU_HINH.GIAY_CANH_MO_DAU) {
+        this.pha = 'chay'
+      } else {
+        for (const n of this.conSong()) {
+          n.phim.trai = false; n.phim.phai = false; n.phim.nhayLuc = -999
+          n.batTuDen = Math.max(n.batTuDen, this.giay + 0.5)
+          n.vx = 0
+        }
+        this.hieuUng?.buoc(dt)
+        return
+      }
+    }
+
     for (const n of this.conSong()) {
       if (n.laBot) {
         const nao = this.nao.get(n.id)
@@ -391,15 +408,56 @@ export class VanChoi {
     this.vaChamQuaiVaHoa()
 
     const song = this.conSong()
-    const nguoiVaoHang = song.some((n) => n.x > this.dao.xHang - 40)
+
+    // ——— CỬA HANG CHỈ MỞ CHO NGƯỜI SỐNG SÓT CUỐI CÙNG
+    //
+    // Thầy chốt 14-09. Bản trước mở hang ngay khi CÓ NGƯỜI chạm cửa, nên hai
+    // ba người cùng đánh rồng — và ai tới trước thì thắng bằng chân chạy, không
+    // phải bằng chuyện sống sót. Nay: còn hơn một người thì cửa đóng, ai chạm
+    // cửa cũng bị đẩy lại. Muốn gặp rồng thì phải là người cuối cùng.
+    const chiMotNguoi = song.length <= 1
+
+    // ——— CẢNH MỞ ĐẦU: vừa còn một người thì màn tối lại, chữ hiện dần.
+    // Chiếu TRƯỚC khi mở hang, và máy chủ giữ mốc thời gian để 12 máy thấy
+    // cùng lúc — máy khách tự đếm giờ là mỗi máy một kiểu.
+    if (CAU_HINH.CHI_NGUOI_CUOI_CUNG_GAP_RONG && this.pha === 'chay'
+        && chiMotNguoi && this.canhMoDau === null && song.length === 1) {
+      this.canhMoDau = this.giay
+      this.pha = 'canhMoDau'
+    }
+    if (this.pha === 'canhMoDau') {
+      if (this.canhMoDau !== null && this.giay - this.canhMoDau >= CAU_HINH.GIAY_CANH_MO_DAU) {
+        this.pha = 'chay'
+      } else {
+        // đứng yên, bất tử, không quái không lửa: đây là phút lấy hơi
+        for (const n of song) {
+          n.phim.trai = false; n.phim.phai = false; n.phim.nhayLuc = -999
+          n.batTuDen = Math.max(n.batTuDen, this.giay + 0.5)
+        }
+        this.hieuUng?.buoc(dt)
+        return
+      }
+    }
+
+    const moDuocHang = CAU_HINH.CHI_NGUOI_CUOI_CUNG_GAP_RONG ? chiMotNguoi : true
+    if (!moDuocHang) {
+      for (const n of song) {
+        if (n.x > this.dao.xHang - 40) {
+          n.x = this.dao.xHang - 40
+          if (n.vx > 0) n.vx = 0
+          if (n.id === this.idNguoiThat && this.bang === null) {
+            this.bang = {
+              pt: '', tieuChi: 'phải là người sống sót cuối cùng',
+              nhan: 'CỬA HANG CÒN ĐÓNG · còn ' + song.length + ' người',
+              mau: '#8894B4', den: this.giay + CAU_HINH.GIAY_HIEN_PHUONG_TRINH,
+            }
+          }
+        }
+      }
+    }
+    const nguoiVaoHang = moDuocHang && song.some((n) => n.x > this.dao.xHang - 40)
     if (this.pha === 'chay' && nguoiVaoHang) this.pha = 'trum'
     if (this.pha === 'trum') this.buocTrum(dt)
-
-    if (song.length === 1 && this.rong.pha !== 'nga') {
-      // sống sót cuối cùng vẫn phải hạ rồng — không thắng chay
-      this.ket.thang = song[0]!.id
-      this.ket.duong = 'sotCuoi'
-    }
     if (song.length === 0) { this.pha = 'xong'; this.ket = { thang: null, duong: null, botChamCongChua: this.ket.botChamCongChua } }
 
     if (this.bang && this.bang.den < this.giay) this.bang = null

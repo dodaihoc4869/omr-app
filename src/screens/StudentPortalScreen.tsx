@@ -35,7 +35,8 @@ import KhungXemPhieu from '../components/KhungXemPhieu'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
 import LogoHocSinh from '../components/LogoHocSinh'
-import DauTruongGame from '../components/DauTruongGame'
+import GiaiCuuCongChuaGame from '../components/GiaiCuuCongChuaGame'
+import ThanThuHoaHocGame from '../components/ThanThuHoaHocGame'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import DongDemCau, { docSoDem } from '../components/DongDemCau'
 import { goiBaiThi } from '../lib/goi-bao-cao'
@@ -136,7 +137,7 @@ function mauDiem(diem: number | null): string {
   return 'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/40 dark:border-rose-800'
 }
 
-type TabType = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'game'
+type TabType = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'game' | 'thanthu'
 
 export default function StudentPortalScreen() {
   const [auth, setAuth] = useState<ThongTinHs | null>(() => {
@@ -967,9 +968,9 @@ export default function StudentPortalScreen() {
         </div>
       </header>
 
-      {/* Navigation 5 mục theo phong cách Google Material 3 Segmented Pill Tabs */}
+      {/* Navigation mục theo phong cách Google Material 3 Segmented Pill Tabs */}
       <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-5 pb-1">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2.5">
           <button
             onClick={() => setTab('diem')}
             className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
@@ -1107,9 +1108,34 @@ export default function StudentPortalScreen() {
               </span>
             </div>
             <div>
-              <div className="font-bold text-sm leading-tight">Đấu Trường Hoá Chất 🧪</div>
+              <div className="font-bold text-sm leading-tight">Giải Cứu NY Cũ 👑</div>
               <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'game' ? 'text-emerald-700/80 dark:text-emerald-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
-                Đại chiến mê cung 12 người
+                Dẫm đầu nhau
+              </div>
+            </div>
+          </button>
+
+          {/* TAB 7: THẦN THÚ HÓA HỌC (ALCHEMON) */}
+          <button
+            onClick={() => setTab('thanthu')}
+            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
+              tab === 'thanthu'
+                ? 'bg-amber-50 text-amber-900 border-amber-300 dark:bg-amber-950/70 dark:text-amber-200 dark:border-amber-700 shadow-xs'
+                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform ${tab === 'thanthu' ? 'bg-amber-500 text-white scale-105 shadow-sm' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'}`}>
+                <Sparkles size={18} strokeWidth={tab === 'thanthu' ? 2.4 : 2} />
+              </div>
+              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'thanthu' ? 'bg-amber-200/80 text-amber-900 dark:bg-amber-900 dark:text-amber-200' : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-900/60 animate-pulse'}`}>
+                Mới
+              </span>
+            </div>
+            <div>
+              <div className="font-bold text-sm leading-tight text-amber-900 dark:text-amber-300">Thần Thú Hóa Học</div>
+              <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'thanthu' ? 'text-amber-700/90 dark:text-amber-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
+                Nuôi thú & Leo tháp
               </div>
             </div>
           </button>
@@ -1850,12 +1876,24 @@ export default function StudentPortalScreen() {
           </div>
         )}
 
-        {/* TAB 6: ĐẤU TRƯỜNG HOÁ CHẤT — ĐẠI CHIẾN MÊ CUNG 12 NGƯỜI */}
+        {/* TAB 6: GIẢI CỨU CÔNG CHÚA — 12 người, dẫm đầu nhau bằng hoá chất.
+            KHÔNG truyền SBD và họ tên vào game: điểm game không được dính vào
+            hồ sơ học tập, và game không cần biết em là ai. */}
         {tab === 'game' && (
-          <DauTruongGame
-            sbdHienTai={auth.sbd}
-            hoTenHienTai={auth.hoTen}
+          <GiaiCuuCongChuaGame onDong={() => setTab('diem')} />
+        )}
+
+        {/* TAB 7: THẦN THÚ HÓA HỌC (ALCHEMON) — Nuôi thú, leo tháp & săn boss câu sai.
+            Gắn kết chặt chẽ với nhiệm vụ làm BTVN, sửa câu sai và vào phòng thi. */}
+        {tab === 'thanthu' && (
+          <ThanThuHoaHocGame
+            auth={auth}
+            dsLichSu={dsLichSu}
+            dsBtvn={dsBtvn}
             onDong={() => setTab('diem')}
+            onChuyenSangKhacPhuc={() => setTab('khacphuc')}
+            onChuyenSangBtvn={() => setTab('btvn')}
+            onChuyenSangVaoThi={() => setTab('vaothi')}
           />
         )}
       </main>

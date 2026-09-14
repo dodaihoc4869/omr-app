@@ -1,0 +1,24 @@
+# MÁY CHỦ GAME — Worker RIÊNG, KHÔNG dùng chung với máy chủ thi `omr`.
+#
+# Lệnh dựng một lần:
+#   cd server-game && npx wrangler deploy
+#
+# KHÔNG có d1_databases, KHÔNG có r2_buckets, KHÔNG có secret.
+# Máy chủ này không chạm được vào dữ liệu học sinh, kể cả khi bị chiếm.
+
+name = "omr-game"
+main = "src/index.ts"
+compatibility_date = "2026-09-11"
+workers_dev = true
+preview_urls = false
+
+[[durable_objects.bindings]]
+name = "PHONG"
+class_name = "PhongChoi"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["PhongChoi"]
+
+[observability]
+enabled = true

@@ -171,3 +171,73 @@ kèm `git checkout 079875d -- src/components/DauTruongGame.tsx`.
 
 **`tsc -b` còn 2 lỗi, KHÔNG phải của game:** `src/lib/ho-so-lop.ts(166)` thiếu trường
 `btvn` — tệp đó là việc đang sửa dở của phiên kia, tôi không đụng vào.
+
+
+---
+
+## 14-09-2026 — Đợt 2: nhiều người thật qua Durable Object
+
+### Thêm
+
+| Tệp | Việc |
+|---|---|
+| `server-game/wrangler.toml` | Worker **`omr-game`** riêng — 0 D1, 0 R2, 0 secret |
+| `server-game/src/index.ts` | định tuyến `/moi`, `/phong/<MÃ>`, `/khoe` |
+| `server-game/src/phong.ts` | Durable Object: phòng chờ, nhịp 20 Hz, trọng tài |
+| `src/game/…/giao-thuc.ts` | gói lên/xuống; máy khách CHỈ gửi phím |
+| `src/game/…/may-chu.ts` | máy khách WebSocket, nội suy giữa hai ảnh |
+| `src/game/…/bo-nguoi.ts` | tách dữ liệu 12 người khỏi mã vẽ |
+| `src/game/…/dia-chi-may-chu.ts` | địa chỉ Worker (công khai, không phải bí mật) |
+| `tests/…-giao-thuc.test.ts` | 14 phép kiểm giao thức và tầng đỏ |
+| `server-game/kiem/*.mjs` | hai phép kiểm ĐẦU-CUỐI trên máy chủ chạy thật |
+
+### Ba việc thầy thêm giữa chừng, đã làm
+
+1. **Chỉ người sống sót cuối cùng được gặp rồng.** Còn hơn một người thì cửa hang đóng.
+   Điều này **sửa một chỗ bản đợt 1 làm lệch** so với câu đầu tiên thầy nói.
+2. **Cảnh mở đầu 6,5 giây**: màn tối, hai đốm mắt rồng, năm dòng chữ, kết bằng
+   **DŨNG CẢM LÊN**. Âm rùng rợn: nốt trầm 55 Hz chồng 58 Hz (lệch 3 Hz nên tai nghe
+   gờn gợn), thêm quãng tritone, rồi bốn tiếng gõ chậm dần như tim đập.
+3. **Đổi tên hiển thị** thành *Giải Cứu Người Yêu Cũ*.
+
+### Nghiệm thu đợt 2
+
+| # | Tiêu chí | Kết quả | Đạt |
+|---|---|---|---|
+| 23 | máy khách không gửi được toạ độ | `GoiPhim` chỉ có loai·trai·phai·nhay·stt | ✅ |
+| 24 | máy chủ chỉ đọc đúng 5 trường đó | quét `phong.ts` | ✅ |
+| 25 | máy chủ game không chạm dữ liệu học sinh | 0 D1, 0 R2, 0 secret | ✅ |
+| 26 | máy chủ dùng đúng bộ luật máy khách | import `van-choi.ts` | ✅ |
+| 27a | hai người vào một phòng | ✓ | ✅ |
+| 27b | cấm trùng chất trên máy chủ thật | B bị từ chối HCl | ✅ |
+| 27c | chỉ chủ phòng đổi mức độ | ✓ | ✅ |
+| 27d | ván mở sau 30 giây, đủ 12 người | ✓ | ✅ |
+| 27e | nhịp ảnh ≈20/giây | **đo 20,4** | ✅ |
+| 27f | gửi phím phải thì máy chủ dời mình | ✓ | ✅ |
+| 27g | **gói giả tự dời 5 000 đơn vị bị bỏ qua** | ✓ | ✅ |
+| 28 | `tsc -b` · `vitest` · `build` | 0 lỗi · **69/69** · build sạch | ✅ |
+
+Lệnh chạy lại phần đầu-cuối: `bash server-game/kiem/chay.sh`
+
+### CHƯA PHÁT HÀNH — cần thầy làm một việc
+
+`npx wrangler whoami` trả về **"You are not authenticated"**. Máy chủ game chưa dựng
+được, nên chế độ nhiều người **chưa dùng được thật**. Chơi một mình thì chạy bình thường.
+
+Thầy chạy hai lệnh này, tôi làm nốt phần còn lại:
+
+```
+npx wrangler login                 # mở trình duyệt, thầy bấm cho phép
+cd server-game && npx wrangler deploy
+```
+
+Tôi **không** tự đăng nhập thay thầy — đó là tài khoản Cloudflare giữ cả máy chủ thi.
+
+Sau khi dựng xong, địa chỉ mặc định trong `dia-chi-may-chu.ts` là
+`https://omr-game.ttadodaihoc.workers.dev`. Khác thì sửa một dòng ở tệp đó.
+
+### Chưa làm
+
+- Bảng xếp hạng chung: chưa.
+- Dự đoán tại máy khách: **cố ý chưa làm**, lý do ở mục 3D đặc tả.
+- fps trên máy thật: chưa đo.

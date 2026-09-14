@@ -16,10 +16,14 @@ import { HOA_CHAT } from '../game/giai-cuu-cong-chua/hoa-chat'
 import { demDoiThu } from '../game/giai-cuu-cong-chua/bang-khac-che'
 import { BA_DO_KHO, type MaDoKho } from '../game/giai-cuu-cong-chua/do-kho'
 import { VanChoi } from '../game/giai-cuu-cong-chua/van-choi'
+import { NoiMayChu, type TayCam, type TrangThaiNoi } from '../game/giai-cuu-cong-chua/may-chu'
+import { diaChiMayChu } from '../game/giai-cuu-cong-chua/dia-chi-may-chu'
+import type { GoiPhongCho } from '../game/giai-cuu-cong-chua/giao-thuc'
 import { veVan } from '../game/giai-cuu-cong-chua/ve-van'
 import { AmThanh } from '../game/giai-cuu-cong-chua/am-thanh'
 
-type Man = 'chon' | 'choi' | 'ket'
+type Man = 'che' | 'chon' | 'phong' | 'choi' | 'ket'
+type Che = 'motMinh' | 'nhieuNguoi'
 
 interface Props { onDong: () => void }
 
@@ -44,7 +48,15 @@ const TIN_RONG: Tin = {
 }
 
 export default function GiaiCuuCongChuaGame({ onDong }: Props) {
-  const [man, setMan] = useState<Man>('chon')
+  const [man, setMan] = useState<Man>('che')
+  const [che, setChe] = useState<Che>('motMinh')
+  const [bietDanh, setBietDanh] = useState('')
+  const [maPhong, setMaPhong] = useState('')
+  const [phong, setPhong] = useState<GoiPhongCho | null>(null)
+  const [noiTT, setNoiTT] = useState<TrangThaiNoi>('chuaNoi')
+  const [loiNoi, setLoiNoi] = useState('')
+  const oNoi = useRef<NoiMayChu | null>(null)
+  const oTay = useRef<TayCam>({ trai: false, phai: false, nhay: false })
   const [chat, setChat] = useState<string>(HOA_CHAT[0]!.ct)
   const [doKho, setDoKho] = useState<MaDoKho>('do')
   const [tin, setTin] = useState<Tin>(TIN_RONG)
@@ -75,10 +87,33 @@ export default function GiaiCuuCongChuaGame({ onDong }: Props) {
 
     let truoc = performance.now()
     let tinCu = ''
+    let guiCuoi = 0
+    let daBanCanh = false
+    let daBanDungCam = false
     const chay = (t: number) => {
       const dt = Math.min(0.05, (t - truoc) / 1000)
       truoc = t
-      van.buoc(dt)
+      if (che === 'nhieuNguoi' && oNoi.current) {
+        // MÁY CHỦ LÀ TRỌNG TÀI: máy khách không tự tính một bước nào, chỉ đắp
+        // ảnh chụp vào rồi vẽ. Phím gửi lên 20 lần mỗi giây, đúng nhịp máy chủ.
+        oNoi.current.dapVaoVan(van)
+        if (t - guiCuoi >= 50) {
+          guiCuoi = t
+          oNoi.current.guiPhim(oTay.current)
+          oTay.current.nhay = false
+        }
+      } else {
+        van.buoc(dt)
+      }
+
+      // cảnh mở đầu trận rồng: âm rùng rợn một lần, tiếng vang một lần
+      if (van.pha === 'canhMoDau' && van.canhMoDau !== null) {
+        if (!daBanCanh) { daBanCanh = true; oAm.current?.rungRon() }
+        const u = van.giay - van.canhMoDau
+        if (!daBanDungCam && u >= 0.7 + (van.loiCanhMoDau.length - 1) * 0.85) {
+          daBanDungCam = true; oAm.current?.dungCamLen()
+        }
+      }
 
       const dpr = Math.min(window.devicePixelRatio || 1, 2)
       const w = cv.clientWidth, h = cv.clientHeight
@@ -116,10 +151,52 @@ export default function GiaiCuuCongChuaGame({ onDong }: Props) {
   }, [man])
 
   useEffect(() => { if (tin.xong && man === 'choi') setMan('ket') }, [tin.xong, man])
+
+  const noiPhong = useCallback((ma: string) => {
+    oAm.current ??= new AmThanh()
+    oAm.current.moKhoa()
+    setLoiNoi('')
+    const n = new NoiMayChu(diaChiMayChu(), {
+      doiTrangThai: setNoiTT,
+      phongCho: (g) => { setPhong(g); setMaPhong(g.maPhong) },
+      loi: (g) => setLoiNoi(g.loi),
+      vaoVan: (g) => {
+        // dựng ván CỤC BỘ đúng hạt giống và mức độ máy chủ gửi, chỉ để VẼ
+        const v = new VanChoi(g.hat, null, true, g.idCuaBan, g.doKho)
+        g.nguoi.forEach((x) => {
+          const k = v.nguoi.find((y) => y.id === x.id)
+          if (k) { k.hoaChat = x.hoaChat; k.laBot = x.laBot }
+        })
+        oVan.current = v
+        setTin({ ...TIN_RONG, hoaChat: g.nguoi.find((x) => x.id === g.idCuaBan)?.hoaChat ?? '' })
+        setMan('choi')
+      },
+      ketVan: () => setMan('ket'),
+    })
+    oNoi.current = n
+    n.noi(ma, bietDanh)
+    setMan('phong')
+  }, [bietDanh])
+
+  const taoPhong = useCallback(async () => {
+    setLoiNoi('')
+    try {
+      const r = await fetch(diaChiMayChu() + '/moi')
+      const j = (await r.json()) as { ma: string }
+      noiPhong(j.ma)
+    } catch {
+      setLoiNoi('Không gọi được máy chủ game. Kiểm tra mạng, hoặc chơi một mình.')
+    }
+  }, [noiPhong])
+
+  useEffect(() => () => { oNoi.current?.dong() }, [])
   useEffect(() => { oAm.current?.datBat(tieng) }, [tieng])
 
   // ——— điều khiển: bàn phím và cảm ứng đổ vào cùng một chỗ
   const dat = useCallback((phim: 'trai' | 'phai' | 'nhay', bat: boolean) => {
+    // nhiều người: ghi vào tay cầm, vòng lặp gửi lên máy chủ
+    if (phim === 'nhay') { if (bat) oTay.current.nhay = true } else oTay.current[phim] = bat
+    // một mình: ghi thẳng vào ván
     const van = oVan.current, toi = van?.nguoiThat
     if (!van || !toi) return
     if (phim === 'nhay') { if (bat) toi.phim.nhayLuc = van.giay; return }
@@ -142,7 +219,146 @@ export default function GiaiCuuCongChuaGame({ onDong }: Props) {
     return () => { window.removeEventListener('keydown', xuong); window.removeEventListener('keyup', len) }
   }, [man, dat])
 
-  // ═══════════ MÀN CHỌN HOÁ CHẤT ═══════════
+  // ═══════════ MÀN CHỌN CHẾ ĐỘ ═══════════
+  if (man === 'che') {
+    return (
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6">
+        <div className="flex items-start justify-between gap-3 mb-4">
+          <div>
+            <h2 className="font-bold text-lg">Giải Cứu Người Yêu Cũ</h2>
+            <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5 max-w-prose">
+              Mười hai người, mười hai hoá chất. Dẫm lên đầu nhau — nhưng dẫm trúng người
+              <b> khắc chế mình</b> thì <b>chính mình</b> mất một mạng. Ai sống sót cuối cùng
+              mới được vào hang gặp rồng.
+            </p>
+          </div>
+          <button type="button" onClick={onDong} aria-label="Đóng"
+            className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer shrink-0">
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button type="button" onClick={() => { setChe('motMinh'); setMan('chon') }}
+            className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 text-left hover:border-emerald-300 hover:-translate-y-0.5 transition-all cursor-pointer">
+            <div className="font-bold text-[15px] mb-1">Chơi một mình</div>
+            <p className="text-[12px] text-slate-500 dark:text-slate-400 m-0">
+              11 máy lấp chỗ. Chơi ngay, không cần mạng ổn định.
+            </p>
+          </button>
+          <button type="button" onClick={() => setChe('nhieuNguoi')}
+            className={`rounded-2xl border p-4 text-left hover:-translate-y-0.5 transition-all cursor-pointer ${
+              che === 'nhieuNguoi' ? 'border-emerald-400 bg-emerald-50/60 dark:bg-emerald-950/40' : 'border-slate-200 dark:border-slate-800 hover:border-emerald-300'
+            }`}>
+            <div className="font-bold text-[15px] mb-1">Chơi với bạn · tới 12 người</div>
+            <p className="text-[12px] text-slate-500 dark:text-slate-400 m-0">
+              Một người tạo phòng, đọc mã 4 chữ cho cả nhóm cùng vào.
+            </p>
+          </button>
+        </div>
+
+        {che === 'nhieuNguoi' && (
+          <div className="mt-4 rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+              Biệt danh hiện cho cả phòng
+            </label>
+            <input
+              value={bietDanh} onChange={(e) => setBietDanh(e.target.value)}
+              maxLength={16} placeholder="VD: Bảo, Minh Anh…"
+              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-emerald-400"
+            />
+            <p className="text-[11px] text-slate-400 mt-1.5">
+              Chỉ biệt danh. Game không biết em là ai, không gửi gì ra khỏi máy ngoài phím bấm.
+            </p>
+
+            <div className="flex flex-wrap gap-2 mt-3">
+              <button type="button" onClick={taoPhong}
+                className="px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm cursor-pointer">
+                Tạo phòng mới
+              </button>
+              <div className="flex gap-2 items-center">
+                <input
+                  value={maPhong} onChange={(e) => setMaPhong(e.target.value.toUpperCase().slice(0, 4))}
+                  placeholder="MÃ" maxLength={4}
+                  className="w-24 rounded-full border border-slate-200 dark:border-slate-700 bg-transparent px-4 py-2.5 text-sm font-bold tracking-widest text-center outline-none focus:border-emerald-400"
+                />
+                <button type="button" disabled={maPhong.length !== 4}
+                  onClick={() => noiPhong(maPhong)}
+                  className="px-5 py-2.5 rounded-full border border-slate-300 dark:border-slate-700 font-semibold text-sm disabled:opacity-40 cursor-pointer">
+                  Vào phòng
+                </button>
+              </div>
+            </div>
+            {loiNoi !== '' && <p className="text-[12px] text-rose-600 dark:text-rose-400 mt-2 mb-0">{loiNoi}</p>}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // ═══════════ PHÒNG CHỜ (nhiều người) ═══════════
+  if (man === 'phong') {
+    return (
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6">
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <div>
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Mã phòng</div>
+            <div className="font-bold text-3xl tracking-[0.3em] tabular-nums">{phong?.maPhong ?? maPhong}</div>
+            <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-1 mb-0">
+              Đọc mã này cho cả nhóm. {noiTT === 'daNoi' ? 'Đã nối máy chủ.' : noiTT === 'dangNoi' ? 'Đang nối…' : 'Mất kết nối.'}
+            </p>
+          </div>
+          <button type="button" onClick={() => { oNoi.current?.dong(); setMan('che') }}
+            className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer shrink-0">
+            <X size={18} />
+          </button>
+        </div>
+
+        {phong && (
+          <>
+            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 px-4 py-3 mb-3 flex items-center justify-between">
+              <span className="text-[13px] font-semibold">{phong.nguoi.length}/12 người</span>
+              <span className="text-[13px] tabular-nums font-bold text-emerald-600 dark:text-emerald-400">
+                Bắt đầu sau {phong.giayConLai}s
+              </span>
+            </div>
+
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {phong.nguoi.map((n) => (
+                <span key={n.maMay}
+                  className="px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[12px] font-semibold">
+                  {n.bietDanh}{n.laChuPhong && ' 👑'}{n.hoaChat && ' · ' + n.hoaChat}
+                </span>
+              ))}
+            </div>
+
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+              Chọn hoá chất — không ai trùng ai
+            </div>
+            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+              {HOA_CHAT.map((h) => {
+                const daLay = phong.chatDaLay.includes(h.ct)
+                const cuaToi = phong.nguoi.some((n) => n.hoaChat === h.ct && n.bietDanh === bietDanh)
+                return (
+                  <button key={h.ct} type="button" disabled={daLay && !cuaToi}
+                    onClick={() => oNoi.current?.chonChat(h.ct)}
+                    className={`rounded-xl border p-2 text-left transition-all cursor-pointer disabled:opacity-35 disabled:cursor-not-allowed ${
+                      cuaToi ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/60' : 'border-slate-200 dark:border-slate-800'
+                    }`}>
+                    <span className="inline-block w-3 h-3 rounded-full mr-1.5 align-middle" style={{ background: h.mau }} />
+                    <span className="font-bold text-[13px]">{h.ct}</span>
+                  </button>
+                )
+              })}
+            </div>
+            {loiNoi !== '' && <p className="text-[12px] text-rose-600 dark:text-rose-400 mt-2 mb-0">{loiNoi}</p>}
+          </>
+        )}
+      </div>
+    )
+  }
+
+  // ═══════════ MÀN CHỌN HOÁ CHẤT (chơi một mình) ═══════════
   if (man === 'chon') {
     return (
       <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6">
@@ -244,7 +460,7 @@ export default function GiaiCuuCongChuaGame({ onDong }: Props) {
             : 'Lần sau nhìn công thức trên đầu đối thủ trước khi nhảy — viền đỏ nghĩa là nhảy lên thì chính mình mất mạng.'}
         </p>
         <div className="flex gap-2 justify-center">
-          <button type="button" onClick={() => setMan('chon')}
+          <button type="button" onClick={() => setMan(che === 'nhieuNguoi' ? 'phong' : 'chon')}
             className="px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm cursor-pointer">
             Chơi ván mới
           </button>

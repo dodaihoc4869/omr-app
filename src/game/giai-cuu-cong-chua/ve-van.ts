@@ -5,6 +5,7 @@
  * Trục y của ván hướng LÊN. Canvas hướng XUỐNG. Đổi trục đúng một chỗ: `mh()`.
  */
 import { CAU_HINH } from './cau-hinh'
+import { LOI_CANH_MO_DAU } from './types'
 import { veHocTro, veCongChua, veRong, veMang, veQuai, veHoa } from './nhan-vat'
 import { canhBaoDam } from './bang-khac-che'
 import { HOA_CHAT } from './hoa-chat'
@@ -143,6 +144,63 @@ let _giay = 0
 export function datGiay(g: number): void { _giay = g }
 function van_giay(_t: number): number { return _giay }
 
+/**
+ * CẢNH MỞ ĐẦU TRẬN RỒNG.
+ *
+ * Màn tối dần, hai đốm mắt rồng sáng lên trong bóng tối, rồi chữ hiện từng dòng
+ * một. Dòng cuối "DŨNG CẢM LÊN" to và sáng hơn hẳn — đó là câu duy nhất em còn
+ * nhớ khi màn sáng lại.
+ *
+ * Mốc thời gian lấy từ VÁN, không phải từ đồng hồ máy: 12 máy phải thấy cùng lúc.
+ */
+function veCanhMoDau(ctx: CanvasRenderingContext2D, W: number, H: number, u: number): void {
+  const vao = Math.min(1, u / 0.8)
+  const ra = Math.min(1, Math.max(0, (CAU_HINH.GIAY_CANH_MO_DAU - u) / 0.7))
+  const dam = Math.min(vao, ra)
+
+  ctx.save()
+  ctx.fillStyle = 'rgba(6,4,12,' + (0.93 * dam).toFixed(3) + ')'
+  ctx.fillRect(0, 0, W, H)
+
+  // hai đốm mắt rồng trong bóng tối
+  const nhay = 0.55 + Math.sin(u * 3.1) * 0.25
+  for (const sx of [-1, 1]) {
+    const x = W / 2 + sx * Math.min(120, W * 0.11)
+    const y = H * 0.30
+    const g = ctx.createRadialGradient(x, y, 1, x, y, 46)
+    g.addColorStop(0, 'rgba(255,90,60,' + (nhay * dam).toFixed(3) + ')')
+    g.addColorStop(1, 'rgba(255,90,60,0)')
+    ctx.fillStyle = g
+    ctx.beginPath(); ctx.arc(x, y, 46, 0, Math.PI * 2); ctx.fill()
+    ctx.beginPath(); ctx.ellipse(x, y, 11, 15, 0, 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(255,196,120,' + (nhay * dam).toFixed(3) + ')'
+    ctx.fill()
+  }
+
+  ctx.textAlign = 'center'
+  const n = LOI_CANH_MO_DAU.length
+  for (let i = 0; i < n; i++) {
+    const hien = Math.min(1, Math.max(0, (u - 0.7 - i * 0.85) / 0.45))
+    if (hien <= 0) continue
+    const cuoi = i === n - 1
+    const co = cuoi ? Math.min(46, W / 17) : Math.min(28, W / 28)
+    ctx.globalAlpha = hien * dam
+    ctx.font = (cuoi ? '900 ' : '700 ') + co + 'px "Baloo 2","Be Vietnam Pro",system-ui,sans-serif'
+    const y = H * 0.50 + i * (co * (cuoi ? 1.15 : 1.5))
+    if (cuoi) {
+      ctx.shadowColor = 'rgba(255,120,60,.85)'; ctx.shadowBlur = 26
+      ctx.fillStyle = '#FFD27A'
+    } else {
+      ctx.shadowBlur = 0
+      ctx.fillStyle = 'rgba(240,238,250,.94)'
+    }
+    ctx.fillText(LOI_CANH_MO_DAU[i]!, W / 2, y)
+    ctx.shadowBlur = 0
+  }
+  ctx.globalAlpha = 1
+  ctx.restore()
+}
+
 export function veVan(ctx: CanvasRenderingContext2D, van: VanChoi, W: number, H: number, t: number): void {
   const toi = van.nguoiThat
   const camX = toi ? toi.x : van.dao.dai / 2
@@ -216,6 +274,10 @@ export function veVan(ctx: CanvasRenderingContext2D, van: VanChoi, W: number, H:
     ctx.save(); ctx.translate(qx, qy); ctx.scale(k.ti, k.ti); veQuai(ctx, q.kieu, q.huong, t); ctx.restore()
   }
   for (const n of van.nguoi) if (n.song) veNguoi(ctx, k, n, t, toi, van.khongLo(n))
+
+  if (van.pha === 'canhMoDau' && van.canhMoDau !== null) {
+    veCanhMoDau(ctx, W, H, van.giay - van.canhMoDau)
+  }
 
   // ——— hạt và chữ bay
   const hu = van.hieuUng

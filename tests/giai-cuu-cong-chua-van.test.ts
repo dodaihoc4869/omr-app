@@ -185,3 +185,107 @@ describe('cảnh báo khắc chế', () => {
     expect(sai).toBe(0)
   })
 })
+
+describe('cửa hang chỉ mở cho người sống sót cuối cùng', () => {
+  it('còn hơn một người thì KHÔNG ai vào được hang', () => {
+    const v = new VanChoi(4242, 'Zn', false, 0)
+    v.giay = 5
+    // đẩy hai người tới sát cửa hang, những người khác vẫn sống
+    const a = v.nguoiThat!, b = v.nguoi[1]!
+    a.x = v.dao.xHang + 300; b.x = v.dao.xHang + 300
+    v.buoc(1 / 60)
+    expect(v.pha).toBe('chay')
+    expect(a.x).toBeLessThanOrEqual(v.dao.xHang - 40)
+    expect(b.x).toBeLessThanOrEqual(v.dao.xHang - 40)
+  })
+
+  it('còn ĐÚNG một người thì chiếu cảnh mở đầu RỒI mới mở hang', () => {
+    const v = new VanChoi(4242, 'Zn', false, 0)
+    v.giay = 5
+    for (const n of v.nguoi) if (n.id !== v.idNguoiThat) n.song = false
+    const a = v.nguoiThat!
+    a.x = v.dao.xHang + 10
+    v.buoc(1 / 60)
+    expect(v.conSong().length).toBe(1)
+    expect(v.pha).toBe('canhMoDau')          // cảnh trước, hang sau
+    for (let i = 0; i < Math.ceil(CAU_HINH.GIAY_CANH_MO_DAU * 60) + 5; i++) v.buoc(1 / 60)
+    a.x = v.dao.xHang + 10
+    v.buoc(1 / 60)
+    expect(v.pha).toBe('trum')
+  })
+
+  it('người cuối cùng vẫn PHẢI hạ rồng — không thắng chay', () => {
+    const v = new VanChoi(4242, 'Zn', false, 0)
+    v.giay = 5
+    for (const n of v.nguoi) if (n.id !== v.idNguoiThat) n.song = false
+    const a = v.nguoiThat!
+    a.x = v.xCongChua                 // đứng ngay cạnh người yêu cũ
+    v.buoc(1 / 60)
+    expect(v.rong.pha).not.toBe('nga')
+    expect(v.ket.thang).toBeNull()    // rồng chưa ngã thì chưa ai thắng
+  })
+
+  it('hạ rồng rồi chạm tay mới thắng', () => {
+    const v = new VanChoi(4242, 'Zn', false, 0)
+    v.giay = 5
+    for (const n of v.nguoi) if (n.id !== v.idNguoiThat) n.song = false
+    const a = v.nguoiThat!
+    v.buoc(1 / 60)
+    for (let i = 0; i < Math.ceil(CAU_HINH.GIAY_CANH_MO_DAU * 60) + 5; i++) v.buoc(1 / 60)
+    a.x = v.dao.xHang + 10
+    v.buoc(1 / 60)
+    v.rong.pha = 'nga'; v.rong.mau = 0
+    a.x = v.xCongChua
+    v.buoc(1 / 60)
+    expect(v.ket.thang).toBe(v.idNguoiThat)
+    expect(v.ket.duong).toBe('rong')
+    expect(v.pha).toBe('xong')
+  })
+})
+
+describe('cảnh mở đầu trận rồng', () => {
+  it('vừa còn MỘT người thì cảnh chạy, và chạy đúng một lần', () => {
+    const v = new VanChoi(4242, 'Zn', false, 0)
+    v.giay = 5
+    for (const n of v.nguoi) if (n.id !== v.idNguoiThat) n.song = false
+    expect(v.canhMoDau).toBeNull()
+    v.buoc(1 / 60)
+    expect(v.pha).toBe('canhMoDau')
+    const moc = v.canhMoDau
+    expect(moc).not.toBeNull()
+    v.buoc(1 / 60)
+    expect(v.canhMoDau).toBe(moc)        // không đặt lại mốc mỗi khung hình
+  })
+
+  it('trong cảnh thì người chơi ĐỨNG YÊN và BẤT TỬ', () => {
+    const v = new VanChoi(4242, 'Zn', false, 0)
+    v.giay = 5
+    for (const n of v.nguoi) if (n.id !== v.idNguoiThat) n.song = false
+    const a = v.nguoiThat!
+    v.buoc(1 / 60)
+    a.phim.phai = true
+    const x = a.x
+    for (let i = 0; i < 60; i++) v.buoc(1 / 60)
+    expect(a.x).toBe(x)
+    expect(a.batTuDen).toBeGreaterThan(v.giay)
+    expect(v.pha).toBe('canhMoDau')
+  })
+
+  it('hết GIAY_CANH_MO_DAU thì trả lại quyền điều khiển', () => {
+    const v = new VanChoi(4242, 'Zn', false, 0)
+    v.giay = 5
+    for (const n of v.nguoi) if (n.id !== v.idNguoiThat) n.song = false
+    v.buoc(1 / 60)
+    for (let i = 0; i < Math.ceil(CAU_HINH.GIAY_CANH_MO_DAU * 60) + 5; i++) v.buoc(1 / 60)
+    expect(v.pha).not.toBe('canhMoDau')
+  })
+
+  it('có đủ năm dòng chữ, dòng cuối là DŨNG CẢM LÊN', () => {
+    const v = new VanChoi(1, 'Zn', false, 0)
+    expect(v.loiCanhMoDau.length).toBe(5)
+    expect(v.loiCanhMoDau[0]).toContain('Người yêu cũ')
+    expect(v.loiCanhMoDau[1]).toContain('rồng giam giữ')
+    expect(v.loiCanhMoDau[3]).toContain('quay lại với người yêu cũ')
+    expect(v.loiCanhMoDau[4]).toBe('DŨNG CẢM LÊN')
+  })
+})

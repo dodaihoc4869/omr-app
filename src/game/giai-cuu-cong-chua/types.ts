@@ -1,6 +1,25 @@
-import type { HocTro, TuThe } from './nhan-vat'
+import type { HocTro, TuThe } from './bo-nguoi'
 
-export type PhaVan = 'chay' | 'trum' | 'xong'
+export type PhaVan = 'chay' | 'canhMoDau' | 'trum' | 'xong'
+
+/**
+ * Cảnh mở đầu trận rồng. Màn tối lại, chữ hiện từng dòng.
+ * Máy chủ quyết cảnh này chứ không phải máy khách — 12 máy phải thấy cùng lúc.
+ */
+export interface CanhMoDau {
+  /** Giây trong ván lúc cảnh bắt đầu. */
+  batDau: number
+  /** Các dòng chữ, hiện dần. */
+  dong: string[]
+}
+
+export const LOI_CANH_MO_DAU: readonly string[] = [
+  'Người yêu cũ của bạn',
+  'đang bị con rồng giam giữ.',
+  'Chiến thắng con rồng,',
+  'bạn sẽ được quay lại với người yêu cũ…',
+  'DŨNG CẢM LÊN',
+]
 export type PhaRong = 'do' | 'phun' | 'dap' | 'ho' | 'nga'
 
 export interface PhimBam {

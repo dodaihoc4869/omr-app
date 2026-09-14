@@ -28,6 +28,10 @@ export interface CauHinhDao {
   GIAY_HIEN_PHUONG_TRINH: number
   HIEN_CANH_BAO_KHAC_CHE: boolean
 
+  /** Cảnh mở đầu trận rồng kéo bao lâu. */
+  GIAY_CANH_MO_DAU: number
+  /** Chỉ người SỐNG SÓT CUỐI CÙNG mới được vào hang gặp rồng. */
+  CHI_NGUOI_CUOI_CUNG_GAP_RONG: boolean
   MAU_RONG: number
   GIAY_PHUN_LUA: number
   GIAY_HO_SAU_DAP: number
@@ -67,6 +71,8 @@ export const CAU_HINH: Readonly<CauHinhDao> = {
   GIAY_HIEN_PHUONG_TRINH: 1.6,
   HIEN_CANH_BAO_KHAC_CHE: true,
 
+  GIAY_CANH_MO_DAU: 6.5,
+  CHI_NGUOI_CUOI_CUNG_GAP_RONG: true,   // thầy chốt 14-09
   MAU_RONG: 3,
   GIAY_PHUN_LUA: 1.2,
   GIAY_HO_SAU_DAP: 1.5,

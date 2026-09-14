@@ -1,4 +1,7 @@
 import { HOA_CHAT } from './hoa-chat'
+export { MUOI_HAI_NGUOI } from './bo-nguoi'
+export type { HocTro, KieuDau, BoMau } from './bo-nguoi'
+import type { HocTro, KieuDau, BoMau } from './bo-nguoi'
 
 // ============================================================================
 // ĐẢO CÔNG CHÚA — BỘ VẼ NHÂN VẬT
@@ -18,34 +21,19 @@ import { HOA_CHAT } from './hoa-chat'
 // Chỗ gọi tự co giãn và đặt vị trí.
 // ============================================================================
 
-export type TuThe = 'dung' | 'chay' | 'nhay' | 'dam' | 'thang'
+export type { TuThe } from './bo-nguoi'
+import type { TuThe } from './bo-nguoi'
 
-export interface BoMau {
-  /** Màu áo — thứ phân biệt 12 người chơi với nhau. */
-  chinh: string
-  /** Màu quần hoặc váy. */
-  phu: string
-  /** Màu da. */
-  da: string
-  /** Màu tóc. */
-  toc: string
-}
 
-export type KieuDau = 'toc' | 'muLuoiTrai' | 'muLen' | 'nonLa' | 'bangDo' | 'toc2'
+
+
 
 /** Hoá chất em cầm vào trận. Quyết định dẫm ai thì thắng, dẫm ai thì tự mất mạng. */
 /** Kiểu bình hoá chất — lấy nguyên từ nguồn sự thật `hoa-chat.ts`,
  *  KHÔNG khai lại ở đây. Hai bảng hoá chất là hai bảng sẽ lệch nhau. */
 export type HoaChat = { ct: string; mau: string }
 
-export interface HocTro {
-  mau: BoMau
-  dau: KieuDau
-  /** Tên hiển thị, tối đa 12 ký tự. */
-  ten: string
-  /** Hoá chất đang cầm. Không có thì không vẽ bình. */
-  hoaChat?: HoaChat
-}
+
 
 // ────────────────────────────────────────────────────────── màu
 
@@ -862,28 +850,7 @@ export function veRong(ctx: CanvasRenderingContext2D, t: number, phunLua: number
  */
 export const MUOI_HAI_HOA_CHAT: readonly HoaChat[] = HOA_CHAT
 
-/**
- * Bộ 12 người chơi.
- *
- * MỘT NGƯỜI MỘT HOÁ CHẤT, KHÔNG TRÙNG — và tên hiển thị chính là công thức.
- * Nhờ vậy nhìn một cái là biết CẢ hai thứ cần biết trước khi quyết định dẫm:
- * đó là ai, và người đó cầm chất gì. Hai màu riêng cho hai thứ là bắt mắt đọc
- * hai lần trong nửa giây — không kịp.
- */
-export const MUOI_HAI_NGUOI: HocTro[] = [
-  { ten: 'HCl',      dau: 'muLuoiTrai',  hoaChat: MUOI_HAI_HOA_CHAT[0 ], mau: { chinh: '#FF5A4E', phu: '#2E4A8A', da: '#FFD9B8', toc: '#3A2A22' } },
-  { ten: 'H₂SO₄',    dau: 'toc',         hoaChat: MUOI_HAI_HOA_CHAT[1 ], mau: { chinh: '#FFC13D', phu: '#8A5A1E', da: '#FFE0C4', toc: '#2B2118' } },
-  { ten: 'NaOH',     dau: 'muLen',       hoaChat: MUOI_HAI_HOA_CHAT[2 ], mau: { chinh: '#2F8BFF', phu: '#23406E', da: '#F6CBA0', toc: '#463024' } },
-  { ten: 'Ca(OH)₂',  dau: 'nonLa',       hoaChat: MUOI_HAI_HOA_CHAT[3 ], mau: { chinh: '#E8EDF5', phu: '#8E9CB4', da: '#FFD9B8', toc: '#3A2A22' } },
-  { ten: 'Ba(OH)₂',  dau: 'toc2',        hoaChat: MUOI_HAI_HOA_CHAT[4 ], mau: { chinh: '#7E8FE8', phu: '#3A4694', da: '#FFE0C4', toc: '#2B1F30' } },
-  { ten: 'Na₂CO₃',   dau: 'bangDo',      hoaChat: MUOI_HAI_HOA_CHAT[5 ], mau: { chinh: '#25B86B', phu: '#1B5E4A', da: '#FFE6D0', toc: '#4A2A30' } },
-  { ten: 'CuSO₄',    dau: 'muLuoiTrai',  hoaChat: MUOI_HAI_HOA_CHAT[6 ], mau: { chinh: '#1E7FD4', phu: '#10406E', da: '#F6CBA0', toc: '#3A2A22' } },
-  { ten: 'AgNO₃',    dau: 'toc',         hoaChat: MUOI_HAI_HOA_CHAT[7 ], mau: { chinh: '#9B5DE5', phu: '#4A2E7A', da: '#FFD9B8', toc: '#2B2118' } },
-  { ten: 'Al',       dau: 'muLen',       hoaChat: MUOI_HAI_HOA_CHAT[8 ], mau: { chinh: '#B0B8C4', phu: '#5E6674', da: '#F0C098', toc: '#332418' } },
-  { ten: 'Zn',       dau: 'toc2',        hoaChat: MUOI_HAI_HOA_CHAT[9 ], mau: { chinh: '#20C4C0', phu: '#166E6C', da: '#FFE0C4', toc: '#3A222A' } },
-  { ten: 'FeCl₃',    dau: 'bangDo',      hoaChat: MUOI_HAI_HOA_CHAT[10], mau: { chinh: '#FF8A3D', phu: '#7A3A12', da: '#F6CBA0', toc: '#463024' } },
-  { ten: 'Cl₂',      dau: 'nonLa',       hoaChat: MUOI_HAI_HOA_CHAT[11], mau: { chinh: '#8FBF3F', phu: '#4A6E1E', da: '#FFD9B8', toc: '#2B2118' } },
-]
+
 
 /** Ba mạng — vẽ thành ba trái tim nhỏ trên đầu bình. */
 export function veMang(ctx: CanvasRenderingContext2D, con: number, y: number): void {
