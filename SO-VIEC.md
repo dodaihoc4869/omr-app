@@ -4,7 +4,7 @@
 - [x] "Khắc phục lỗi sai trên điện thoại app học sinh không chạy."  | bằng chứng: `vitest run tests/khac-phuc-tren-dien-thoai-1409.test.ts` 9/9
 - [x] "Gộp 2 nút này làm một, thiết kế lại cho tinh tế hiện đại đẹp và phù hợp chuẩn google"  | bằng chứng: `vitest run tests/may-chieu-len-bang-1409.test.ts` 11/11 · `tests/man-goi-len-bang-hien-ra-1009.test.tsx` 7/7
 - [x] "Tạo cho tôi một nút máy chiếu ... file html quay ngang chia 2 phần, mỗi trang in tên 2 học sinh vào 2 nửa và đề bài đi kèm, đề bài có nút hiện lời giải, phần dưới trắng để học sinh lên bảng làm, xong 1 đợt thì kéo xuống hoặc bấm tiếp để hiện 2 đề và 2 học sinh tiếp theo"  | bằng chứng: `vitest run tests/may-chieu-len-bang-1409.test.ts` 11/11
-- [!] Phát hành  | KẸT: phiên Claude KHÁC đang sửa cùng kho (DauTruongGame.tsx sửa lúc 10:01, sw.ts, vite.config.ts, package.json, public/_headers) — đẩy bản live bây giờ là kéo theo việc dở của phiên ấy
+- [x] Phát hành  | bằng chứng: Worker `eef6a348-7b92-4c41-8933-dd59cab32d2b` · Pages `24d57f2c` · đo trên bản live: 22/22 câu sai trả về lời giải thật (trước là 0/22), phần III ra 2–8 bước
 
 ## 7 CỬA — đo lúc 10:19–10:22 ngày 14/09
 
@@ -83,3 +83,39 @@ nút máy chiếu chưa hiện khi chưa chạy phân công. Đã ghi ngày và 
 ### 7 cửa — đo lại lúc 10:40–10:45
 tsc 0/0 · server tsc 0/0 · 3.667 phép (84+84+83 tệp) · check:mau sạch ·
 kiem-13 18/18 · kiem-sw 6/6 · vite build rc=0
+
+
+## PHÁT HÀNH 14/09 lúc 11:00
+
+Thầy xác nhận phiên Claude kia đã dừng. Gom việc dở của phiên ấy thành commit
+riêng `079875d` trước (để bản live có đường lùi), rồi chạy `DAY-OMR-APP.command`.
+
+- Máy chủ (Worker): `eef6a348-7b92-4c41-8933-dd59cab32d2b`
+- App (Pages): `24d57f2c` → https://omr-app-b3u.pages.dev
+- Commit khi phát hành: `079875d` (trên `ea26e8a`, `29782b8`)
+
+### Kiểm trước khi đẩy — không có ca thi nào đang chạy
+D1 lúc 10:52: `SELECT ... FROM luot WHERE nop_luc IS NULL OR nop_luc=''` → **0 dòng**.
+Lượt vào cuối 09:06, nộp cuối 09:09. Năm ca `trang_thai='mo'` đều là ca test
+Test2–Test6, mỗi ca 1 vào / 1 nộp.
+
+### Đo trên BẢN LIVE (gọi từ tab khác gốc, không phải tab app — tránh đọc bản
+service worker cache cũ)
+
+`POST omr.ttadodaihoc.workers.dev/hs/cau-sai` sbd 12121212, ca 614232 + 814335:
+- 22/22 câu có lời giải thật (trước phát hành: 0/22, toàn chữ độn)
+- phần III ra 2 · 3 · 8 · 5 bước — đúng "giải từng bước"
+- `dang` nay có tên dạng thật ("Cấu tạo — đếm nguyên tử"…), trước để rỗng —
+  đây cũng chính là thứ làm màn khắc phục báo "Tỷ lệ tối đa: 0 câu"
+- không còn chuỗi "Cần chú ý định luật bảo toàn" trong dữ liệu lẫn trong bundle
+
+Gói tĩnh đang phục vụ:
+- `assets/index-Cq6df59y.js` — có "LÀM TỪNG BƯỚC", "Máy này chưa có kho đề của thầy",
+  "Kho đề chưa có câu nào khớp lựa chọn này"
+- `assets/PhanCongScreen-JSfTCuXQ.js` — có "Chiếu lên bảng" và nút gộp
+- `assets/html-may-chieu-UQcBhDqO.js` — tờ máy chiếu
+- `sw.js` 26.661 byte
+
+### Lùi bản phát hành
+`git revert 079875d ea26e8a 29782b8` rồi chạy lại `DAY-OMR-APP.command`.
+Chỉ lùi phần lời giải + khắc phục: `git revert 29782b8`.
