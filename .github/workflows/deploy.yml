@@ -1,17 +1,15 @@
-# CỔNG KIỂM TỰ ĐỘNG + CHUYỂN HƯỚNG TRANG CŨ.
+# PHÁT HÀNH APP LÊN CLOUDFLARE PAGES — https://omr-app-b3u.pages.dev/
 #
-# Thầy chuyển app sang https://omr-app-b3u.pages.dev/ ngày 14/09. Từ đó GitHub
-# Pages KHÔNG còn phát hành app nữa — nếu vẫn phát hành, mỗi lần đẩy mã lại sinh
-# thêm một bản app song song, và em nào giữ link cũ sẽ làm bài trên bản khác với
-# bản Thầy đang chấm. Đúng loại hỏng không ai thấy cho tới lúc điểm lệch.
+# Thầy chốt 14/09: chỉ còn MỘT nơi phát hành. GitHub Pages bị bỏ hẳn, không còn
+# job nào đẩy lên đó nữa — để hai nơi cùng sống thì mỗi lần đẩy mã lại sinh một
+# bản app song song, và em nào giữ link cũ sẽ làm bài trên bản khác với bản Thầy
+# đang chấm.
 #
-# NHƯNG KHÔNG XOÁ HẲN, vì hai lẽ:
-#   1. Tắt phát hành mà để nguyên trang cũ thì trang cũ vẫn phục vụ bản chốt
-#      cuối cùng — em cầm link cũ kẹt ở bản cũ VĨNH VIỄN, tệ hơn hiện tại. Nên
-#      trang cũ nay chỉ còn MỘT việc: đưa người mở nó sang địa chỉ mới.
-#   2. Các cổng kiểm (check:mau, toàn bộ phép kiểm, dựng thử) vẫn chạy mỗi lần
-#      đẩy mã. Mất chúng là mất lưới an toàn tự động duy nhất của repo.
-name: Kiểm tự động · chuyển hướng trang cũ sang pages.dev
+# CẦN ĐẶT MỘT LẦN, trong repo → Settings → Secrets and variables → Actions:
+#   CLOUDFLARE_API_TOKEN   (quyền: Cloudflare Pages — Edit)
+#   CLOUDFLARE_ACCOUNT_ID  (mã tài khoản Cloudflare)
+# Đặt xong thì mọi lần đẩy mã lên main đều tự phát hành, không ai phải bấm gì.
+name: Phát hành lên Cloudflare Pages
 
 on:
   push:
@@ -20,18 +18,13 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: phat-hanh
   cancel-in-progress: true
 
-env:
-  DIA_CHI_MOI: https://omr-app-b3u.pages.dev/
-
 jobs:
-  kiem:
+  phat-hanh:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,58 +33,19 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+
+      # CỔNG KIỂM CHẠY TRƯỚC, và hỏng là DỪNG — không phát hành bản lỗi.
       - run: npm run check:mau
       - run: npm test -- --run
-      # Vẫn DỰNG THỬ để bắt lỗi dựng sớm, nhưng KHÔNG phát hành bản dựng ấy.
+
+      # KHÔNG đặt GITHUB_PAGES: cờ đó đổi địa chỉ gốc thành /omr-app/, chỉ đúng
+      # cho GitHub Pages. Đặt nhầm thì pages.dev tải tài nguyên sai đường và mở
+      # ra trang trắng.
       - run: npm run build
 
-      # Trang cũ chỉ còn một tệp: chuyển hướng sang địa chỉ mới, giữ nguyên
-      # phần đuôi đường dẫn để link riêng (/d/<mã ca>, /phieu/<mã>, /hs, /ph)
-      # vẫn tới đúng chỗ.
-      - name: Dựng trang chuyển hướng
-        run: |
-          rm -rf _chuyen-huong && mkdir -p _chuyen-huong
-          cat > _chuyen-huong/index.html <<'HTML'
-          <!doctype html>
-          <html lang="vi">
-          <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1">
-          <title>Địa chỉ mới — Thầy Đỗ Đại Học</title>
-          <script>
-            // Giữ nguyên phần sau /omr-app/ rồi ghép vào địa chỉ mới.
-            (function () {
-              var duoi = location.pathname.replace(/^\/omr-app\/?/, '')
-              location.replace('https://omr-app-b3u.pages.dev/' + duoi + location.search + location.hash)
-            })()
-          </script>
-          <style>
-            body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;margin:0;
-                 min-height:100vh;display:flex;align-items:center;justify-content:center;
-                 background:#f7f8fa;color:#1f2430;padding:24px;text-align:center}
-            a{color:#2563eb;font-weight:700}
-          </style>
-          </head>
-          <body>
-          <div>
-            <p><b>Địa chỉ này đã chuyển.</b></p>
-            <p>Đang đưa em sang trang mới…</p>
-            <p><a href="https://omr-app-b3u.pages.dev/">Bấm vào đây nếu máy không tự chuyển</a></p>
-          </div>
-          </body>
-          </html>
-          HTML
-          cp _chuyen-huong/index.html _chuyen-huong/404.html
-      - uses: actions/upload-pages-artifact@v3
+      - name: Đẩy lên Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
         with:
-          path: _chuyen-huong
-
-  chuyen-huong:
-    needs: kiem
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=omr-app --branch=main

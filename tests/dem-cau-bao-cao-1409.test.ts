@@ -193,3 +193,48 @@ describe('App tự nhận bản mới, không bắt Thầy xoá dữ liệu tran
     expect(M.indexOf('tuTaiLaiKhiDoiBan()')).toBeLessThan(M.indexOf('registerSW({'))
   })
 })
+
+// ===========================================================================
+// XEM ĐỀ VÀ LỜI GIẢI NGAY TRONG APP, và CHỈ MỘT NƠI PHÁT HÀNH — 14/09.
+// ===========================================================================
+describe('Xem đề và lời giải mở tại chỗ', () => {
+  const SP = doc('src/screens/StudentPortalScreen.tsx')
+
+  it('KHÔNG còn điều hướng sang trang khác', () => {
+    expect(SP).not.toContain('window.location.href = `/t/${maCa}?sbd=')
+    expect(SP).not.toContain('href={`/t/${item.maCa}?sbd=${auth.sbd}`}')
+  })
+
+  it('mở trong lớp phủ ngay trong app', () => {
+    expect(SP).toContain("const [xemDeCa, setXemDeCa] = useState('')")
+    expect(SP).toContain('onClick={() => setXemDeCa(item.maCa)}')
+    expect(SP).toContain('onMoLaiBaiThi={(maCa) => setXemDeCa(maCa)}')
+    expect(SP).toContain('ten="Đề và lời giải kèm lỗi sai"')
+  })
+
+  it('đường dẫn bám BASE_URL, không gõ cứng — pages.dev dùng gốc "/"', () => {
+    expect(SP).toContain('${import.meta.env.BASE_URL}t/${xemDeCa}')
+  })
+})
+
+describe('Chỉ MỘT nơi phát hành: Cloudflare Pages', () => {
+  const WF = doc('.github/workflows/deploy.yml')
+
+  it('không còn job nào đẩy lên GitHub Pages', () => {
+    expect(WF).not.toContain('upload-pages-artifact')
+    expect(WF).not.toContain('deploy-pages')
+    expect(WF).not.toContain("GITHUB_PAGES: 'true'")
+  })
+
+  it('đẩy thẳng lên project omr-app trên Cloudflare Pages', () => {
+    expect(WF).toContain('cloudflare/wrangler-action')
+    expect(WF).toContain('pages deploy dist --project-name=omr-app')
+  })
+
+  it('cổng kiểm chạy TRƯỚC khi phát hành — hỏng là dừng, không đẩy bản lỗi', () => {
+    const iKiem = WF.indexOf('npm test -- --run')
+    const iDay = WF.indexOf('pages deploy dist')
+    expect(iKiem).toBeGreaterThan(0)
+    expect(iKiem).toBeLessThan(iDay)
+  })
+})

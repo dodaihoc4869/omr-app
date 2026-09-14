@@ -172,6 +172,8 @@ export default function StudentPortalScreen() {
   const [dangTaoDeKhacPhuc, setDangTaoDeKhacPhuc] = useState(false)
   const [thongBaoKhacPhuc, setThongBaoKhacPhuc] = useState('')
   const [phieuHtml, setPhieuHtml] = useState('')
+  /** Mã ca đang mở ở lớp phủ "Xem đề và lời giải kèm lỗi sai". Rỗng = không mở. */
+  const [xemDeCa, setXemDeCa] = useState('')
   const [dsCauSaiKhacPhucModal, setDsCauSaiKhacPhucModal] = useState<CauSaiDauVao[] | null>(null)
   const [tieuDeKhacPhucModal, setTieuDeKhacPhucModal] = useState('')
   const [caXemBaoCaoModal, setCaXemBaoCaoModal] = useState<any | null>(null)
@@ -1176,12 +1178,13 @@ export default function StudentPortalScreen() {
                         <span>Xem báo cáo</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </button>
-                      <a
-                        href={`/t/${item.maCa}?sbd=${auth.sbd}`}
-                        className="py-2 px-4 rounded-full btn-google-outlined text-xs font-medium text-center"
+                      <button
+                        type="button"
+                        onClick={() => setXemDeCa(item.maCa)}
+                        className="py-2 px-4 rounded-full btn-google-outlined text-xs font-medium text-center cursor-pointer"
                       >
                         Xem đề và lời giải kèm lỗi sai
-                      </a>
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -1807,6 +1810,19 @@ export default function StudentPortalScreen() {
         )}
       </main>
 
+      {/* XEM ĐỀ VÀ LỜI GIẢI NGAY TRONG APP.
+          Trước đây bấm là điều hướng thẳng sang /t/<mã ca>, tức nhảy hẳn khỏi
+          cổng học sinh: em mất chỗ đang đứng, và trên app đã cài vào màn hình
+          chính thì đó là một cửa sổ khác hẳn. Nay mở trong lớp phủ, đóng lại là
+          về đúng chỗ cũ. */}
+      {xemDeCa && (
+        <KhungXemPhieu
+          src={`${import.meta.env.BASE_URL}t/${xemDeCa}?sbd=${encodeURIComponent(auth?.sbd ?? '')}`}
+          ten="Đề và lời giải kèm lỗi sai"
+          dong={() => setXemDeCa('')}
+        />
+      )}
+
       {/* Khung xem đề bài tập & khắc phục câu sai (chuẩn HTML tương tác) */}
       {phieuHtml && (
         <KhungXemPhieu
@@ -1845,9 +1861,7 @@ export default function StudentPortalScreen() {
             setCacCaChon(new Set([maCa]))
             void taoDeKhacPhuc([maCa])
           }}
-          onMoLaiBaiThi={(maCa) => {
-            window.location.href = `/t/${maCa}?sbd=${auth.sbd}`
-          }}
+          onMoLaiBaiThi={(maCa) => setXemDeCa(maCa)}
         />
       )}
 
