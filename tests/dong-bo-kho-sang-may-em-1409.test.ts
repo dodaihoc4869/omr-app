@@ -207,6 +207,15 @@ describe('Máy chủ lọc theo mã dạng', () => {
     expect(than).toContain('if (vong >= ds.length) continue')
   })
 
+  it('chọn tờ đề chia đều theo chuyên đề, không để một chuyên đề chiếm hết', () => {
+    // Đo 14/09: xếp thuần theo số câu thì 4 dạng "Liên kết hoá học" không có
+    // ứng viên nào, dù kho CÓ câu — mấy tờ ấy ít câu hơn tờ Ester nên rơi khỏi
+    // tốp đầu.
+    expect(than).toContain('const theoCd = new Map<string, Map<string, number>>()')
+    expect(than).toContain('c.chuyen_de FROM cau_hoi c')
+    expect(than).toContain('for (let vong = 0; dsMaDe.length < TRAN_TO_DE_THEO_DANG; vong++)')
+  })
+
   it('cắt mỗi tờ đề còn đúng câu đã chọn, không trả trọn tờ', () => {
     expect(than).toContain('const items = [...theoDeRa.entries()].map(([ma_de, cau]) => ({ ma_de, cau }))')
   })

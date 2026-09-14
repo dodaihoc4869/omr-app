@@ -112,7 +112,7 @@ const CSS_MAY_CHIEU = `
 @media (prefers-color-scheme: dark) {
   :root:not([data-sang]) { --mc-vien: rgb(51, 65, 85); --mc-nen: rgb(15, 23, 42); --mc-muc: rgb(241, 245, 249); --mc-nhat: rgb(148, 163, 184); --mc-xanh: rgb(138, 180, 248); --mc-xanh-nen: rgb(30, 41, 59); }
 }
-body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); }
+body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); overflow: hidden; }
 .mc-thanh { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 12px; padding: 10px 20px; background: var(--mc-nen); border-bottom: 1px solid var(--mc-vien); font-family: var(--sans, system-ui, sans-serif); }
 .mc-thanh-ten { font-weight: 800; font-size: 15px; }
 .mc-thanh-phu { color: var(--mc-nhat); font-size: 13px; }
@@ -120,9 +120,25 @@ body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); }
 .mc-dieu { display: flex; gap: 8px; }
 .mc-dieu button { min-height: 40px; padding: 0 18px; border: none; border-radius: 999px; background: var(--mc-xanh); color: rgb(255,255,255); font-weight: 800; font-size: 14px; cursor: pointer; font-family: inherit; }
 .mc-dieu button[disabled] { opacity: .38; cursor: default; }
-.mc-dot { display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: calc(100vh - 61px); scroll-snap-align: start; border-bottom: 4px solid var(--mc-vien); }
-.mc-nua { display: flex; flex-direction: column; padding: 18px 22px 0; min-width: 0; }
+.mc-dieu button.mc-vien { background: transparent; color: var(--mc-xanh); border: 1px solid var(--mc-vien); }
+/* TOÀN MÀN HÌNH: giấu luôn thanh điều khiển đi cho bảng sạch, chỉ chừa nút
+   thoát ở góc. Chiếu lên tường thì mọi thứ không phải đề bài đều là nhiễu. */
+:fullscreen .mc-thanh, :-webkit-full-screen .mc-thanh { position: fixed; top: 0; left: 0; right: 0; opacity: 0; transition: opacity .2s; }
+:fullscreen .mc-thanh:hover, :-webkit-full-screen .mc-thanh:hover { opacity: 1; }
+:fullscreen .mc-dot, :-webkit-full-screen .mc-dot { min-height: 100vh; }
+/* MỘT ĐỢT LÀ MỘT TRANG, LẬT NGANG.
+   Thầy chốt 14/09: "1 đợt là 1 trang chia đôi bảng chứ không cuộn xuống, khi
+   bấm đợt tiếp thì chuyển sang trang tiếp theo theo chiều ngang".
+   Bản trước xếp các đợt chồng dọc rồi cuộn xuống — chiếu lên tường thì thầy
+   phải cuộn giữa giờ, và hai nửa của hai đợt khác nhau lọt chung một khung. */
+.mc-ray { display: flex; height: calc(100vh - 61px); overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; }
+.mc-ray::-webkit-scrollbar { display: none; }
+.mc-dot { flex: 0 0 100%; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 0; scroll-snap-align: start; scroll-snap-stop: always; }
+/* Nửa bảng tự cuộn khi câu quá dài — TRANG thì không bao giờ cuộn. */
+.mc-nua { display: flex; flex-direction: column; padding: 18px 22px 0; min-width: 0; min-height: 0; overflow-y: auto; }
 .mc-trai { border-right: 2px dashed var(--mc-vien); }
+/* Vạch giữa hai đợt: nhìn là biết đã sang trang, không lẫn với vạch chia bảng. */
+.mc-dot + .mc-dot .mc-trai { border-left: 4px solid var(--mc-vien); }
 .mc-trong { align-items: center; justify-content: center; }
 .mc-trong-chu { color: var(--mc-nhat); font-family: var(--sans, system-ui, sans-serif); font-size: 15px; }
 .mc-em { padding-bottom: 10px; border-bottom: 2px solid var(--mc-xanh); }
@@ -153,22 +169,29 @@ body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); }
 .mc-giai .sol-box { opacity: 1 !important; transform: none !important; margin: 0; }
 .mc-giai .sol-wrap { grid-template-rows: 1fr; }
 /* PHẦN TRẮNG — chỗ em viết trên bảng thật. Nó phải trắng, và phải còn lại. */
-.mc-trang { flex: 1 1 auto; min-height: 34vh; }
+/* PHẦN TRẮNG co lại được: trang không cuộn nên chỗ trống là phần còn thừa. */
+.mc-trang { flex: 1 1 auto; min-height: 12vh; }
 @media print {
   @page { size: A4 landscape; margin: 10mm; }
   .mc-thanh { display: none; }
-  .mc-dot { min-height: 0; page-break-after: always; border-bottom: none; }
+  .mc-ray { display: block; height: auto; overflow: visible; }
+  .mc-dot { display: grid; height: auto; page-break-after: always; }
+  .mc-nua { overflow: visible; }
+  .mc-trang { min-height: 30vh; }
   .mc-giai { display: block !important; }
 }
 @media (max-width: 900px) {
-  .mc-dot { grid-template-columns: 1fr; }
+  /* Màn hẹp: hai nửa xếp trên dưới, NHƯNG vẫn lật trang theo chiều ngang. */
+  .mc-dot { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
   .mc-trai { border-right: none; border-bottom: 2px dashed var(--mc-vien); }
-  .mc-trang { min-height: 22vh; }
+  .mc-dot + .mc-dot .mc-trai { border-left: none; }
+  .mc-trang { min-height: 8vh; }
 }
 `
 
 const JS_MAY_CHIEU = `
 (function () {
+  var ray = document.getElementById('mc-ray');
   var dots = Array.prototype.slice.call(document.querySelectorAll('.mc-dot'));
   var dem = document.getElementById('mc-dem');
   var truoc = document.getElementById('mc-truoc');
@@ -181,9 +204,10 @@ const JS_MAY_CHIEU = `
     if (sau) sau.disabled = i >= dots.length - 1;
   }
   function den(k) {
-    if (!dots.length) return;
+    if (!dots.length || !ray) return;
     i = Math.max(0, Math.min(dots.length - 1, k));
-    dots[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // LẬT NGANG: kéo ray theo trục X. Kéo theo trục Y là đúng thứ vừa bỏ.
+    ray.scrollTo({ left: i * ray.clientWidth, behavior: 'smooth' });
     ve();
   }
   if (truoc) truoc.addEventListener('click', function () { den(i - 1); });
@@ -194,15 +218,17 @@ const JS_MAY_CHIEU = `
   });
 
   // Kéo tay cũng phải cập nhật số đợt, nếu không đếm một đằng chiếu một nẻo.
-  if ('IntersectionObserver' in window) {
-    var ob = new IntersectionObserver(function (mucs) {
-      mucs.forEach(function (m) {
-        if (!m.isIntersecting) return;
-        var k = dots.indexOf(m.target);
-        if (k >= 0) { i = k; ve(); }
-      });
-    }, { threshold: 0.5 });
-    dots.forEach(function (d) { ob.observe(d); });
+  if (ray) {
+    var hen = null;
+    ray.addEventListener('scroll', function () {
+      if (hen) clearTimeout(hen);
+      hen = setTimeout(function () {
+        var k = Math.round(ray.scrollLeft / Math.max(1, ray.clientWidth));
+        if (k !== i && k >= 0 && k < dots.length) { i = k; ve(); }
+      }, 80);
+    });
+    // Đổi cỡ cửa sổ (cắm máy chiếu, xoay màn) thì giữ nguyên đợt đang chiếu.
+    window.addEventListener('resize', function () { ray.scrollLeft = i * ray.clientWidth; });
   }
 
   document.addEventListener('click', function (e) {
@@ -216,6 +242,40 @@ const JS_MAY_CHIEU = `
     var chu = nut.querySelector('.mc-nut-chu');
     if (chu) chu.textContent = mo ? 'Hiện lời giải' : 'Ẩn lời giải';
   });
+
+  // TOÀN MÀN HÌNH. Trình duyệt CHỈ cho bật từ một cú chạm thật của người dùng,
+  // nên nó phải nằm trong chính lượt xử lý sự kiện, không hẹn sau.
+  var toan = document.getElementById('mc-toan');
+  function dangToan() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+  function veToan() {
+    if (!toan) return;
+    toan.textContent = dangToan() ? '⛶ Thoát toàn màn hình' : '⛶ Toàn màn hình';
+  }
+  if (toan) {
+    toan.addEventListener('click', function () {
+      try {
+        if (dangToan()) {
+          if (document.exitFullscreen) document.exitFullscreen();
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          return;
+        }
+        var g = document.documentElement;
+        if (g.requestFullscreen) g.requestFullscreen();
+        else if (g.webkitRequestFullscreen) g.webkitRequestFullscreen();
+        else toan.textContent = 'Trình duyệt này không cho toàn màn hình';
+      } catch (e) {
+        // Nói thẳng trên chính cái nút, đừng im lặng để thầy bấm mãi.
+        toan.textContent = 'Không bật được toàn màn hình';
+      }
+    });
+  }
+  document.addEventListener('fullscreenchange', veToan);
+  document.addEventListener('webkitfullscreenchange', veToan);
+  // Phím F: bật nhanh khi đang đứng trước lớp, khỏi phải dò chuột.
+  document.addEventListener('keydown', function (e) {
+    if ((e.key === 'f' || e.key === 'F') && !e.metaKey && !e.ctrlKey && !e.altKey && toan) { e.preventDefault(); toan.click(); }
+  });
+  veToan();
 
   ve();
 })();
@@ -243,11 +303,12 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChon: TuyChonMayChieu = {}): st
   </div>
   <div class="mc-dem" id="mc-dem">Đợt 1/${soDot}</div>
   <div class="mc-dieu">
+    <button type="button" id="mc-toan" class="mc-vien">⛶ Toàn màn hình</button>
     <button type="button" id="mc-truoc">◂ Đợt trước</button>
     <button type="button" id="mc-sau">Đợt tiếp ▸</button>
   </div>
 </div>
-${dot.join('')}`
+<div class="mc-ray" id="mc-ray">${dot.join('')}</div>`
 
   return `<!DOCTYPE html>
 <html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">

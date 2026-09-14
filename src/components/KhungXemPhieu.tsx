@@ -130,6 +130,11 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
       <iframe
         title={ten || 'Phiếu bài tập'}
         {...(html ? { srcDoc: html } : { src })}
+        // TỜ CHIẾU LÊN BẢNG CÓ NÚT TOÀN MÀN HÌNH. Trang trong iframe chỉ gọi
+        // được `requestFullscreen` khi khung cha CHO PHÉP; thiếu dòng này thì
+        // nút bấm không ăn mà cũng không báo lỗi gì.
+        allow="fullscreen"
+        allowFullScreen
         style={{ display: 'block', width: '100%', height: '100%', border: 0, background: 'var(--p-giay)' }}
       />
       {/* Nút thoát NHỎ, nổi góc trên phải. Không phải một dải chiếm hết bề

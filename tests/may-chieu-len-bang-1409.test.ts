@@ -49,6 +49,26 @@ describe('Tờ máy chiếu', () => {
     expect(html).toContain('Đợt 1/2')
   })
 
+  // Thầy 14/09: "1 đợt là 1 trang chia đôi bảng chứ không cuộn xuống, khi bấm
+  // đợt tiếp thì chuyển sang trang tiếp theo theo chiều ngang chứ không theo
+  // chiều dọc". Bản trước xếp các đợt chồng dọc rồi cuộn.
+  it('lật trang NGANG, mỗi đợt trọn một màn, trang không cuộn dọc', () => {
+    expect(html).toContain('<div class="mc-ray" id="mc-ray">')
+    expect(html).toContain('.mc-ray { display: flex;')
+    expect(html).toContain('scroll-snap-type: x mandatory')
+    expect(html).toContain('.mc-dot { flex: 0 0 100%;')
+    expect(html).toContain('height: calc(100vh - 61px)')
+    // Trang không được cuộn dọc; nửa bảng quá dài thì TỰ nó cuộn.
+    expect(html).toContain('body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); overflow: hidden; }')
+    expect(html).toContain('overflow-y: auto;')
+    // Bấm "Đợt tiếp" phải đi ngang, không kéo trang xuống.
+    expect(html).toContain("ray.scrollTo({ left: i * ray.clientWidth, behavior: 'smooth' })")
+    // Hàm `den` của tờ chiếu KHÔNG được kéo dọc nữa. (`scrollIntoView` vẫn còn
+    // trong JS dùng chung của phiếu, nên chỉ soi đúng hàm này.)
+    const den = html.slice(html.indexOf('function den(k)'), html.indexOf('function den(k)') + 400)
+    expect(den).not.toContain('scrollIntoView')
+  })
+
   it('mỗi đợt chia đôi màn: nửa trái và nửa phải', () => {
     expect(html.match(/class="mc-nua mc-trai"/g)).toHaveLength(2)
     expect(html.match(/class="mc-nua mc-phai"/g)).toHaveLength(2)
@@ -85,7 +105,33 @@ describe('Tờ máy chiếu', () => {
 
   it('chừa phần dưới trắng cho em viết bảng', () => {
     expect(html.match(/class="mc-trang"/g)).toHaveLength(4)
-    expect(html).toContain('.mc-trang { flex: 1 1 auto; min-height: 34vh; }')
+    expect(html).toContain('.mc-trang { flex: 1 1 auto; min-height: 12vh; }')
+  })
+
+  // Thầy 14/09: "cho tôi một nút toàn màn hình ở mục chiếu lên bảng nhé".
+  it('có nút toàn màn hình, bật bằng nút hoặc phím F', () => {
+    expect(html).toContain('id="mc-toan"')
+    expect(html).toContain('Toàn màn hình')
+    expect(html).toContain('requestFullscreen')
+    expect(html).toContain('webkitRequestFullscreen')
+    expect(html).toContain("e.key === 'f' || e.key === 'F'")
+    // Đang toàn màn hình thì đổi nhãn, không để thầy đoán đang ở chế độ nào.
+    expect(html).toContain('Thoát toàn màn hình')
+    // Chiếu lên tường thì thanh điều khiển phải lùi đi.
+    expect(html).toContain(':fullscreen .mc-thanh')
+  })
+
+  // Thầy 14/09: "nội dung đề bị lỗi chữ" — "Hợp châ ́t", "tiê ́t", "vê ̀ mô ́i".
+  // Đề rút từ PDF ra chữ dạng NFD: 'ấ' ghi thành 'â' + U+0301, phông nào không
+  // gộp dấu thì vẽ thành hai ký tự rời.
+  it('gộp dấu NFD về một ký tự, không để dấu rơi ra đứng riêng', () => {
+    const nfd = 'Hợp châ\u0301t 2-methylbutyl ethanoate tiê\u0301t ra vê\u0300 mô\u0301i nguy hiểm'
+    const o = taoHtmlMayChieu([{ ...O(1, 'Em A'), cau: { ...cau(1), text: nfd } }], {})
+    expect(o).toContain('Hợp chất')
+    expect(o).toContain('tiết ra về mối')
+    // Không còn ký tự dấu đứng rời nào trong phần đề.
+    expect(o).not.toContain('\u0301')
+    expect(o).not.toContain('\u0300')
   })
 
   it('in ra thì quay ngang A4', () => {
@@ -95,7 +141,9 @@ describe('Tờ máy chiếu', () => {
   it('có nút sang đợt tiếp và kéo tay cũng đếm đúng', () => {
     expect(html).toContain('id="mc-sau"')
     expect(html).toContain('id="mc-truoc"')
-    expect(html).toContain('IntersectionObserver')
+    // Kéo tay trên ray ngang cũng phải cập nhật số đợt.
+    expect(html).toContain("ray.addEventListener('scroll'")
+    expect(html).toContain('Math.round(ray.scrollLeft / Math.max(1, ray.clientWidth))')
     expect(html).toContain("e.key === 'ArrowRight'")
   })
 

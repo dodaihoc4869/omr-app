@@ -23,7 +23,18 @@ const CON_LA = /[\uE000-\uF8FF]/
 export function goKyTuLa(s: unknown): string {
   const str = String(s ?? '')
   if (!str) return ''
-  return str.replace(DAI_SYMBOL, (c) => String.fromCharCode(c.charCodeAt(0) - 0xf000))
+  // GỘP DẤU VỀ MỘT KÝ TỰ (NFC) TRƯỚC KHI LÀM GÌ KHÁC.
+  //
+  // Thầy bắt được 14/09 trên tờ máy chiếu: "Hợp châ ́t", "tiê ́t", "vê ̀ mô ́i",
+  // "câ ́u tạo" — dấu sắc, dấu huyền rơi ra đứng riêng sau chữ cái. Đề rút từ
+  // PDF hay ra chữ ở dạng NFD: 'ấ' được ghi thành 'â' + U+0301. Cùng một chuỗi,
+  // cùng một nghĩa, nhưng phông chữ nào không có bảng gộp dấu thì vẽ thành hai
+  // ký tự rời — cỡ chữ càng lớn càng lộ, nên tờ chiếu lên bảng thấy trước.
+  //
+  // Chuẩn hoá NGAY TẠI TẦNG HIỂN THỊ (hàm này nằm trên đường của `chuHtml`),
+  // nên mọi ca cũ, mọi link phiếu đã gửi đi đều tự đúng, không phải nạp lại đề.
+  // Cửa nạp đề cũng đi qua đây nên đề mới vào kho là đã gộp sẵn.
+  return str.normalize('NFC').replace(DAI_SYMBOL, (c) => String.fromCharCode(c.charCodeAt(0) - 0xf000))
 }
 
 /** Còn ký tự vùng dùng riêng nào KHÔNG gỡ được không — chỗ này phải cờ hoá. */

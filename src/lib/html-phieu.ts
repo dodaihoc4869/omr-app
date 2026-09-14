@@ -73,7 +73,13 @@ export function thoat(s: unknown): string {
     if (typeof obj.ma === 'string') return thoat(obj.ma)
     if (typeof obj.text === 'string') return thoat(obj.text)
   }
-  return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+  // Gộp dấu về một ký tự như `chuHtml` — tên em và tiêu đề cũng từ PDF ra.
+  return String(s ?? '')
+    .normalize('NFC')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
 }
 
 /** Chuỗi có công thức Hoá → HTML có <sub>/<sup>, mũi tên là ký tự thật.
