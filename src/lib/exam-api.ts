@@ -1451,6 +1451,11 @@ export interface CaCuaEm {
    * phiếu cũ, chỗ hiển thị hiểu là 10. Máy chủ không lưu, máy thầy tính lại từ
    * số câu của ca rồi gắn vào lúc dựng phiếu. */
   tranPhan?: { I: number; II: number; III: number } | null
+  /** Số câu THẬT của ca, đếm từ bảng chấm. `null` = ca chưa chấm xong — chỗ
+   * hiển thị phải GIẤU dòng đếm, cấm suy ra từ điểm. */
+  tongCau?: number | null
+  soCauDung?: number | null
+  soCauSai?: number | null
   hang: number | null
   siSo: number | null
   soLanRoiMan: number
@@ -3047,9 +3052,11 @@ export async function hsLichSuCaApi(scriptUrl: string, sbd: string): Promise<{
     diemII: number | null
     diemIII: number | null
     thoiGianPhut: number
-    soCauSai: number
-    soCauDung: number
-    tongCau: number
+    /** Số câu THẬT từ bảng chấm. `null` = ca chưa chấm — chỗ hiển thị phải
+     * giấu dòng đếm, cấm suy ra từ điểm. */
+    soCauSai: number | null
+    soCauDung: number | null
+    tongCau: number | null
   }>
   error?: string
 }> {

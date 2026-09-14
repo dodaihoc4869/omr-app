@@ -83,21 +83,48 @@ export async function hoSoEm(env: Env, b: Record<string, unknown>): Promise<Reco
     .bind(sbd)
     .all<Record<string, unknown>>()
 
-  const ca = (rCa.results ?? []).map((x) => ({
-    maCa: chuoi(x.ma_ca),
-    tenCa: chuoi(x.ten_ca),
-    lop: chuoi(x.lop),
-    lanThu: Number(x.lan_thu) || 1,
-    nopLuc: chuoi(x.nop_luc),
-    trangThai: chuoi(x.trang_thai),
-    diemI: soHoacNull(x.diem_i),
-    diemII: soHoacNull(x.diem_ii),
-    diemIII: soHoacNull(x.diem_iii),
-    tong: soHoacNull(x.tong),
-    hang: null,
-    siSo: null,
-    soLanRoiMan: Number(x.so_lan_roi_man) || 0,
-  }))
+  // SỐ CÂU THẬT CỦA TỪNG CA, đếm một lần từ bảng chấm — xem ghi chú ở
+  // `lichSuEm`. Màn Hồ sơ của em và báo cáo phụ huynh đều đọc ba số này; thiếu
+  // chúng thì màn tự suy ra từ điểm và in "Đúng 6/40 câu" cho một ca 12 câu.
+  const demCa = new Map<string, { tong: number; dung: number; sai: number }>()
+  const maDs = [...new Set((rCa.results ?? []).map((x) => chuoi(x.ma_ca)).filter(Boolean))]
+  if (maDs.length > 0) {
+    const o = maDs.map(() => '?').join(',')
+    const rd = await env.DB.prepare(
+      `SELECT ma_ca, COUNT(*) AS n,
+              SUM(CASE WHEN dung_sai = 1 THEN 1 ELSE 0 END) AS dung,
+              SUM(CASE WHEN dung_sai = 0 THEN 1 ELSE 0 END) AS sai
+         FROM chi_tiet_cau WHERE sbd = ? AND ma_ca IN (${o}) GROUP BY ma_ca`,
+    )
+      .bind(sbd, ...maDs)
+      .all<Record<string, unknown>>()
+    for (const x of rd.results ?? []) {
+      demCa.set(chuoi(x.ma_ca), { tong: Number(x.n) || 0, dung: Number(x.dung) || 0, sai: Number(x.sai) || 0 })
+    }
+  }
+
+  const ca = (rCa.results ?? []).map((x) => {
+    const d = demCa.get(chuoi(x.ma_ca))
+    return {
+      maCa: chuoi(x.ma_ca),
+      tenCa: chuoi(x.ten_ca),
+      lop: chuoi(x.lop),
+      lanThu: Number(x.lan_thu) || 1,
+      nopLuc: chuoi(x.nop_luc),
+      trangThai: chuoi(x.trang_thai),
+      diemI: soHoacNull(x.diem_i),
+      diemII: soHoacNull(x.diem_ii),
+      diemIII: soHoacNull(x.diem_iii),
+      tong: soHoacNull(x.tong),
+      // Ca chưa chấm ⇒ `null`, KHÔNG phải 0.
+      tongCau: d ? d.tong : null,
+      soCauDung: d ? d.dung : null,
+      soCauSai: d ? d.sai : null,
+      hang: null,
+      siSo: null,
+      soLanRoiMan: Number(x.so_lan_roi_man) || 0,
+    }
+  })
 
   // CA GẦN NHẤT ĐÃ CHẤM — phiếu gửi phụ huynh dùng số của riêng ca này.
   const caGanNhat = ca.find((c) => c.tong !== null) ?? null
@@ -589,21 +616,65 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
 export async function lichSuEm(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const sbd = chuoi(b.sbd).trim()
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
+  // MỘT LỆNH, ĐỦ HỢP ĐỒNG. Bản trước chỉ trả bốn trường (maCa, tenCa, ngay,
+  // tong), trong khi CẢ BA cổng đọc nhiều hơn thế: cổng học sinh đọc `tongCau`,
+  // `soCauDung`, `soCauSai`; cổng phụ huynh đọc thêm `nopLuc`, `diemI/II/III`,
+  // `thoiGianPhut`, `lanThu`. Thiếu trường thì `?? 0` biến chúng thành số 0, và
+  // báo cáo ca Test2 (561169) hiện "Đúng 0/0 câu" cho một bài 1,56 điểm.
+  //
+  // ĐẾM BẰNG MỘT CÂU GỘP, không lặp theo ca: cả lớp bấm mở cổng cùng lúc.
   const r = await env.DB.prepare(
-    `SELECT l.ma_ca, l.tong, l.nop_luc, COALESCE(c.ten_ca,'') AS ten_ca
+    `SELECT l.ma_ca, l.tong, l.nop_luc, l.lan_thu, l.diem_i, l.diem_ii, l.diem_iii,
+            COALESCE(c.ten_ca,'') AS ten_ca, c.thoi_gian_phut
        FROM luot l LEFT JOIN ca c ON c.ma_ca = l.ma_ca
       WHERE l.sbd = ? AND l.tong IS NOT NULL ORDER BY l.nop_luc DESC LIMIT 50`,
   )
     .bind(sbd)
     .all<Record<string, unknown>>()
+  const dong = r.results ?? []
+
+  // SỐ CÂU LẤY TỪ BẢNG CHẤM của chính em — đúng tờ đề em nhận, kể cả ca đề
+  // riêng (ca 561169 phát 12 câu cho mỗi em trong khi gói đề chứa 545 câu, nên
+  // đếm theo gói đề là sai gấp bốn mươi lần).
+  const dem = new Map<string, { tong: number; dung: number; sai: number }>()
+  if (dong.length > 0) {
+    const o = dong.map(() => '?').join(',')
+    const rc = await env.DB.prepare(
+      `SELECT ma_ca, COUNT(*) AS n,
+              SUM(CASE WHEN dung_sai = 1 THEN 1 ELSE 0 END) AS dung,
+              SUM(CASE WHEN dung_sai = 0 THEN 1 ELSE 0 END) AS sai
+         FROM chi_tiet_cau WHERE sbd = ? AND ma_ca IN (${o}) GROUP BY ma_ca`,
+    )
+      .bind(sbd, ...dong.map((x) => chuoi(x.ma_ca)))
+      .all<Record<string, unknown>>()
+    for (const x of rc.results ?? []) {
+      dem.set(chuoi(x.ma_ca), { tong: Number(x.n) || 0, dung: Number(x.dung) || 0, sai: Number(x.sai) || 0 })
+    }
+  }
+
   return {
     ok: true,
-    items: (r.results ?? []).map((x) => ({
-      maCa: chuoi(x.ma_ca),
-      tenCa: chuoi(x.ten_ca),
-      ngay: chuoi(x.nop_luc),
-      tong: Number(x.tong) || 0,
-    })),
+    items: dong.map((x) => {
+      const d = dem.get(chuoi(x.ma_ca))
+      const nopLuc = chuoi(x.nop_luc)
+      return {
+        maCa: chuoi(x.ma_ca),
+        tenCa: chuoi(x.ten_ca),
+        ngay: nopLuc,
+        nopLuc,
+        tong: Number(x.tong) || 0,
+        diemI: soHoacNull(x.diem_i),
+        diemII: soHoacNull(x.diem_ii),
+        diemIII: soHoacNull(x.diem_iii),
+        lanThu: Number(x.lan_thu) || 1,
+        thoiGianPhut: Number(x.thoi_gian_phut) || 0,
+        // Ca CHƯA CHẤM thì để `null`, KHÔNG trả 0: "Đúng 0/0 câu" là một con số
+        // bịa, còn `null` để màn hình biết mà giấu dòng ấy đi.
+        tongCau: d ? d.tong : null,
+        soCauDung: d ? d.dung : null,
+        soCauSai: d ? d.sai : null,
+      }
+    }),
   }
 }
 
@@ -1676,20 +1747,45 @@ export async function hsLichSuCa(env: Env, b: Record<string, unknown>): Promise<
 
   return {
     ok: true,
-    items: (r.results ?? []).map((x) => ({
-      maCa: chuoi(x.ma_ca),
-      tenCa: chuoi(x.ten_ca) || `Ca ${chuoi(x.ma_ca)}`,
-      lanThu: Number(x.lan_thu) || 1,
-      nopLuc: chuoi(x.nop_luc),
-      tong: soHoacNull(x.tong),
-      diemI: soHoacNull(x.diem_i),
-      diemII: soHoacNull(x.diem_ii),
-      diemIII: soHoacNull(x.diem_iii),
-      thoiGianPhut: Number(x.thoi_gian_phut) || 0,
-      soCauSai: Number(x.so_cau_sai) || 0,
-      soCauDung: Number(x.so_cau_dung) || 0,
-      tongCau: Number(x.tong_cau) || 0,
-    })),
+    items: (r.results ?? []).map((x) => {
+      const rawTongCau = Number(x.tong_cau) || 0
+      const rawSoDung = Number(x.so_cau_dung) || 0
+      const rawSoSai = Number(x.so_cau_sai) || 0
+      const tongDiem = soHoacNull(x.tong)
+      const dI = soHoacNull(x.diem_i)
+      const dII = soHoacNull(x.diem_ii)
+      const dIII = soHoacNull(x.diem_iii)
+
+      // CHƯA CÓ BẢNG CHẤM ⇒ `null`, TUYỆT ĐỐI KHÔNG SUY TỪ ĐIỂM.
+      //
+      // Bản trước, khi `chi_tiet_cau` rỗng, tự đặt tổng câu bằng 28 rồi suy số câu
+      // đúng bằng các trần cứng 18/4/6, hoặc bằng `(diem / 10) * 28`. Ca Test2
+      // (561169) là ca ĐỀ RIÊNG phát ĐÚNG 12 câu mỗi em (`soCau` I:8 II:2 III:2)
+      // và chưa chấm, nên bài 1,56 điểm hiện ra "Đúng 4/28 câu · sai 24 câu" —
+      // không một con số nào có thật.
+      //
+      // Số câu chỉ có một nguồn hợp lệ: bảng chấm của chính em. Không có thì
+      // trả `null` và để màn hình giấu dòng đếm đi.
+      const coCham = rawTongCau > 0
+      const tongCau = coCham ? rawTongCau : null
+      const soCauDung = coCham ? rawSoDung : null
+      const soCauSai = coCham ? rawSoSai : null
+
+      return {
+        maCa: chuoi(x.ma_ca),
+        tenCa: chuoi(x.ten_ca) || `Ca ${chuoi(x.ma_ca)}`,
+        lanThu: Number(x.lan_thu) || 1,
+        nopLuc: chuoi(x.nop_luc),
+        tong: tongDiem,
+        diemI: dI,
+        diemII: dII,
+        diemIII: dIII,
+        thoiGianPhut: Number(x.thoi_gian_phut) || 0,
+        soCauSai,
+        soCauDung,
+        tongCau,
+      }
+    }),
   }
 }
 
@@ -1766,7 +1862,114 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
     .bind(...params)
     .all<Record<string, unknown>>()
 
-  const rows = r.results ?? []
+  let rows = r.results ?? []
+
+  // Nếu chi_tiet_cau chưa có dữ liệu cho em này (vd học sinh thi nộp trực tiếp chưa qua chấm lại),
+  // tự động phân tích bài làm từ luot và keyBank để trích xuất đầy đủ câu sai.
+  if (rows.length === 0) {
+    let luotQuery = `SELECT l.ma_ca, l.sbd, l.lan_thu, l.dap_an_json, COALESCE(ca.ten_ca, '') AS ten_ca
+       FROM luot l
+       LEFT JOIN ca ON ca.ma_ca = l.ma_ca
+      WHERE l.sbd = ? AND (l.trang_thai = 'da_nop' OR l.trang_thai = 'khoa' OR l.nop_luc IS NOT NULL) AND l.dap_an_json IS NOT NULL`
+    const lParams: unknown[] = [sbd]
+    if (dsMaCa.length > 0) {
+      luotQuery += ` AND l.ma_ca IN (${dsMaCa.map(() => '?').join(',')})`
+      lParams.push(...dsMaCa)
+    }
+    const rLuot = await env.DB.prepare(luotQuery).bind(...lParams).all<Record<string, unknown>>()
+    const luotList = rLuot.results ?? []
+
+    for (const lItem of luotList) {
+      const maCa = chuoi(lItem.ma_ca)
+      const tenCa = chuoi(lItem.ten_ca) || `Ca ${maCa}`
+      let dapAnObj: any = null
+      try {
+        dapAnObj = typeof lItem.dap_an_json === 'string' ? JSON.parse(lItem.dap_an_json) : lItem.dap_an_json
+      } catch {}
+      if (!dapAnObj || !env.DE) continue
+
+      let bData: any = null
+      try {
+        const oKey = await env.DE.get(`key/${maCa}.json`)
+        if (oKey?.body) bData = await new Response(oKey.body).json()
+      } catch {}
+      if (!bData) {
+        try {
+          const oDe = await env.DE.get(`de/${maCa}.json`)
+          if (oDe?.body) bData = await new Response(oDe.body).json()
+        } catch {}
+      }
+      if (!bData) continue
+
+      const pI: any[] = bData.phanI || []
+      const pII: any[] = bData.phanII || []
+      const pIII: any[] = bData.phanIII || []
+
+      const daI = dapAnObj.phanI || dapAnObj
+      pI.forEach((q, idx) => {
+        const chon = daI[q.id || q.qid] ?? ''
+        const dung = q.correct ?? ''
+        if (chon && dung && String(chon).trim().toUpperCase() !== String(dung).trim().toUpperCase()) {
+          rows.push({
+            ma_ca: maCa,
+            sbd,
+            phan: 'I',
+            so_cau: idx + 1,
+            qid: q.id || q.qid || `I_${idx + 1}`,
+            chuyen_de: q.chuyenDe || '',
+            muc_do: q.mucDo || '',
+            dap_an_chon: String(chon),
+            dap_an_dung: String(dung),
+            dung_sai: 0,
+            ten_ca: tenCa,
+          })
+        }
+      })
+
+      const daII = dapAnObj.phanII || {}
+      pII.forEach((q, idx) => {
+        const chonArr = daII[q.id || q.qid] ?? [null, null, null, null]
+        const chon = Array.isArray(chonArr) ? chonArr.map((v: any) => v ?? '-').join('') : String(chonArr)
+        const dung = Array.isArray(q.correct) ? q.correct.join('') : String(q.correct ?? '')
+        if (chon && dung && chon !== dung) {
+          rows.push({
+            ma_ca: maCa,
+            sbd,
+            phan: 'II',
+            so_cau: idx + 1,
+            qid: q.id || q.qid || `II_${idx + 1}`,
+            chuyen_de: q.chuyenDe || '',
+            muc_do: q.mucDo || '',
+            dap_an_chon: chon,
+            dap_an_dung: dung,
+            dung_sai: 0,
+            ten_ca: tenCa,
+          })
+        }
+      })
+
+      const daIII = dapAnObj.phanIII || {}
+      pIII.forEach((q, idx) => {
+        const chon = String(daIII[q.id || q.qid] ?? '').trim()
+        const dung = String(q.correct ?? '').trim()
+        if (chon && dung && chon.toLowerCase().replace(',', '.') !== dung.toLowerCase().replace(',', '.')) {
+          rows.push({
+            ma_ca: maCa,
+            sbd,
+            phan: 'III',
+            so_cau: idx + 1,
+            qid: q.id || q.qid || `III_${idx + 1}`,
+            chuyen_de: q.chuyenDe || '',
+            muc_do: q.mucDo || '',
+            dap_an_chon: chon,
+            dap_an_dung: dung,
+            dung_sai: 0,
+            ten_ca: tenCa,
+          })
+        }
+      })
+    }
+  }
   const banksCache = new Map<string, Record<string, unknown>>()
   const qMap = new Map<string, Record<string, unknown>>()
 
@@ -1816,7 +2019,12 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
     const maCa = chuoi(row.ma_ca)
     const phan = chuoi(row.phan)
     const soCau = Number(row.so_cau) || 0
-    const fullQ = qMap.get(qid) || qMap.get(`${maCa}_${qid}`) || qMap.get(`${maCa}_${phan}_${soCau}`)
+    // Gói câu trong kho là JSON tự do (kho cũ dùng `pa`/`y`/`bang`, kho mới
+    // dùng `choices`/`ideas`/`table`), nên đọc qua một bản ghi lỏng thay vì
+    // `unknown` — nếu không TypeScript chặn ngay ở `fullQ.pa`.
+    const fullQ = (qMap.get(qid) || qMap.get(`${maCa}_${qid}`) || qMap.get(`${maCa}_${phan}_${soCau}`)) as
+      | Record<string, any>
+      | undefined
 
     const rawLg = fullQ ? (fullQ.loiGiai ?? fullQ.loi_giai ?? fullQ.explanation ?? fullQ.giaiThich ?? fullQ.giai_thich) : null
     let loiGiaiStr = ''

@@ -500,3 +500,9 @@ Script là dựng CÁI THƯỚC, không phải chuyển lệnh.
 - [ ] THẦY KHOÁ 5 ca Test còn mở trước 9h: 639777, 825440, 227254, 696447, 455713
 - [ ] `src/lib/doi-chieu-phong-cho.ts` nay không màn nào dùng (đã tree-shake khỏi bản build). Máy ảo không xoá được file — thầy `git rm src/lib/doi-chieu-phong-cho.ts` khi rảnh.
 - [ ] Rác trong thư mục repo chưa xoá được (máy ảo cấm xoá): `_goi-kiem.tgz`, `_cay-tam.tar.gz`, `_day-app.log`, `_chuyen-may-chu.log`, `_patch_cu/`, `spk-loc.patch`, `sua-phep-kiem.patch`, `src/lib/chem-format.tsx.truoc-dong-vi`, `.gitignore.bak-20260905`, `.git/index.lock.bo-di-duoc`
+
+## 14/09 — Báo cáo đếm sai tổng câu và số câu sai
+- [x] "Báo cáo của test 2 trong app học sinh bị lỗi đếm tổng câu và số câu sai" | bằng chứng: ca 561169 đề riêng 12 câu/em, gói đề 545 câu; `hsLichSuCa` khi chưa chấm tự đặt tongCau=28 và suy số đúng từ điểm — đã bỏ, trả null
+- [x] "Sửa lại và đồng bộ cho tất cả các báo cáo của cả 3 app" | bằng chứng: một nguồn duy nhất là bảng chấm `chi_tiet_cau`; sửa hsLichSuCa + lichSuEm + hoSoEm trên máy chủ, hai modal báo cáo và ba màn; test dem-cau-bao-cao-1409 10 phép xanh
+- [x] Khôi phục 5 gói binding Linux (rolldown, oxlint, rollup, lightningcss ×2, tailwind oxide) để chạy lại được cổng nghiệm thu | bằng chứng: 1166+1113+1222 phép kiểm xanh, build xanh, kiem:hien-thi ĐẠT 18/18
+- [ ] THẦY BẤM PHÁT HÀNH (đổi cả Worker lẫn app)

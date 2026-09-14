@@ -1876,7 +1876,13 @@ export default function ExamMonitorScreen() {
             soCauDung: emTrongCa?.graded?.score
               ? (emTrongCa.graded.score.total >= 0 ? Math.round((emTrongCa.graded.score.total / 10) * (soCauCa ? soCauCa.I + soCauCa.II + soCauCa.III : (emTrongCa.graded.score.phanI.items.length + emTrongCa.graded.score.phanII.items.length + emTrongCa.graded.score.phanIII.items.length))) : undefined)
               : undefined,
-            tongCau: soCauCa ? soCauCa.I + soCauCa.II + soCauCa.III : (emTrongCa?.graded?.score ? (emTrongCa.graded.score.phanI.items.length + emTrongCa.graded.score.phanII.items.length + emTrongCa.graded.score.phanIII.items.length) : 40),
+            // KHÔNG CÒN SỐ 40 BỊA RA. Ca đề riêng phát 12 câu, ca khác 28 —
+            // in 40 lên báo cáo là sai với mọi ca. Không biết thì trả `null`.
+            tongCau: soCauCa
+              ? soCauCa.I + soCauCa.II + soCauCa.III
+              : emTrongCa?.graded?.score
+                ? emTrongCa.graded.score.phanI.items.length + emTrongCa.graded.score.phanII.items.length + emTrongCa.graded.score.phanIII.items.length
+                : undefined,
           }}
           hoTen={emTrongCa?.hoTen || hoSo?.em.hoTen || `SBD ${sbdHoSo}`}
           sbd={sbdHoSo}

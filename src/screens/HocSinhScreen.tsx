@@ -347,7 +347,13 @@ export default function HocSinhScreen() {
               diemI: caBaoCao.diemI ?? null,
               diemII: caBaoCao.diemII ?? null,
               diemIII: caBaoCao.diemIII ?? null,
-              tongCau: 40,
+              // SỐ THẬT TỪ BẢNG CHẤM (`lichSuEm` trả `tongCau`/`soCauDung`/
+              // `soCauSai`). Số 40 gõ cứng ở đây là nguồn của "Đúng 6/40 câu"
+              // trên ca Test2 — ca đề riêng chỉ phát 12 câu mỗi em.
+              tongCau: caBaoCao.tongCau ?? undefined,
+              soCauDung: caBaoCao.soCauDung ?? undefined,
+              soCauSai: caBaoCao.soCauSai ?? undefined,
+              lanThu: caBaoCao.lanThu,
             }}
             hoTen={hoSo.em.hoTen || `SBD ${hoSo.em.sbd}`}
             sbd={hoSo.em.sbd}

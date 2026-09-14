@@ -1125,15 +1125,23 @@ export default function StudentPortalScreen() {
                           <Clock className="w-3.5 h-3.5" />
                           {dinhDangNgayGio(item.nopLuc)}
                         </span>
-                        <span>•</span>
-                        <span>
-                          Đúng <strong>{item.soCauDung ?? 0}</strong>/{item.tongCau ?? 0} câu
-                          {(item.soCauSai ?? 0) > 0 && (
-                            <span className="text-rose-500 font-medium ml-1">
-                              (sai {item.soCauSai} câu)
+                        {/* CHƯA CHẤM THÌ KHÔNG HIỆN. Máy chủ trả `null` khi ca
+                            chưa có bảng chấm; `?? 0` biến nó thành "Đúng 0/0
+                            câu" — một con số bịa, và đó đúng là thứ ca Test2
+                            (561169) hiện ra cho bài 1,56 điểm. */}
+                        {typeof item.tongCau === 'number' && item.tongCau > 0 && (
+                          <>
+                            <span>•</span>
+                            <span>
+                              Đúng <strong>{item.soCauDung ?? 0}</strong>/{item.tongCau} câu
+                              {(item.soCauSai ?? 0) > 0 && (
+                                <span className="text-rose-500 font-medium ml-1">
+                                  (sai {item.soCauSai} câu)
+                                </span>
+                              )}
                             </span>
-                          )}
-                        </span>
+                          </>
+                        )}
                       </div>
 
                       {/* Điểm từng phần */}

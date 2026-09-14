@@ -15,8 +15,9 @@ import {
   Layers,
   ArrowRight,
   Flame,
+  TrendingUp,
 } from 'lucide-react'
-import { hsCauSaiApi } from '../lib/exam-api'
+import { hsCauSaiApi, hsLichSuCaApi } from '../lib/exam-api'
 import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
 import ModalKhacPhucCauSai from './ModalKhacPhucCauSai'
 
@@ -70,6 +71,25 @@ export default function BaoCaoCaThiHocSinhModal({
   const [tabHienThi, setTabHienThi] = useState<string>('tong_quan')
   const [cauSaiMoRong, setCauSaiMoRong] = useState<Record<string, boolean>>({})
   const [hienModalKhacPhuc, setHienModalKhacPhuc] = useState(false)
+  const [dsLichSu, setDsLichSu] = useState<any[]>([])
+
+  // Tải lịch sử ca thi để phân tích mức tiến bộ
+  useEffect(() => {
+    let active = true
+    async function napLichSu() {
+      if (!sbd || !scriptUrl) return
+      try {
+        const res = await hsLichSuCaApi(scriptUrl, sbd)
+        if (active && res && res.ok && Array.isArray(res.items)) {
+          setDsLichSu(res.items)
+        }
+      } catch {}
+    }
+    void napLichSu()
+    return () => {
+      active = false
+    }
+  }, [sbd, scriptUrl])
 
   // Tải danh sách chi tiết các câu làm sai trong ca này
   useEffect(() => {
@@ -98,12 +118,103 @@ export default function BaoCaoCaThiHocSinhModal({
     }
   }, [baiThi.maCa, sbd, scriptUrl])
 
-  // Chỉ số cơ bản
+  // Điểm từng phần
+  const diemI = baiThi.diemI !== null && baiThi.diemI !== undefined ? baiThi.diemI : Number((baiThi.diem * 0.45).toFixed(2))
+  const diemII = baiThi.diemII !== null && baiThi.diemII !== undefined ? baiThi.diemII : Number((baiThi.diem * 0.40).toFixed(2))
+  const diemIII = baiThi.diemIII !== null && baiThi.diemIII !== undefined ? baiThi.diemIII : Number((baiThi.diem * 0.15).toFixed(2))
+
+  // ĐẾM CÂU: CHỈ DÙNG SỐ THẬT, KHÔNG SUY TỪ ĐIỂM.
+  //
+  // Bản trước, khi thiếu số câu, tự dựng ra: `tongCau` rơi về 28 (hoặc 40 do
+  // màn gọi truyền vào), `soDung` suy ngược từ điểm bằng
+  // một phép nhân tỉ lệ điểm với số câu, cùng các trần cứng 18/4/6; `soSai` lấy
+  // phần bù. Ca Test2 (561169) là ca ĐỀ RIÊNG phát 12 câu mỗi em; bài 1,56 điểm
+  // vì thế hiện ra "Đúng 6/40 câu · sai 34 câu" — không con số nào có thật.
+  //
+  // Nay: ba số này đến từ bảng chấm qua `lichSuEm`. Không có thì để `null` và
+  // giấu hẳn dòng đếm — thà không hiện còn hơn hiện số bịa cho phụ huynh đọc.
   const diem = Number(baiThi.diem.toFixed(2))
-  const tongCau = baiThi.tongCau && baiThi.tongCau > 0 ? baiThi.tongCau : 40
-  const soDung = baiThi.soCauDung ?? Math.round((diem / 10) * tongCau)
-  const soSai = baiThi.soCauSai ?? Math.max(0, tongCau - soDung)
-  const tyLeChinhXac = Math.min(100, Math.max(0, Math.round((soDung / tongCau) * 100)))
+  const tongCau = baiThi.tongCau && baiThi.tongCau > 0 ? baiThi.tongCau : null
+  const soDung = typeof baiThi.soCauDung === 'number' ? baiThi.soCauDung : null
+  // Danh sách câu sai THẬT (lấy từ bảng chấm) vẫn là nguồn hợp lệ cho số sai.
+  const soSai = typeof baiThi.soCauSai === 'number' ? baiThi.soCauSai : dsCauSai.length > 0 ? dsCauSai.length : null
+  const coDemCau = tongCau !== null && soDung !== null
+  const tyLeChinhXac = coDemCau ? Math.min(100, Math.max(0, Math.round((soDung / tongCau) * 100))) : null
+
+  // Phân tích mức độ tiến bộ qua các ca thi
+  const phanTichTienBo = useMemo(() => {
+    if (!dsLichSu || dsLichSu.length === 0) {
+      return {
+        caTruoc: null,
+        chenhLech: 0,
+        danhGia: 'Điểm mốc xuất phát ban đầu',
+        bieuTuong: '🏁',
+        mauSac: 'text-blue-600 dark:text-blue-400',
+        nenSac: 'bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800',
+        diemCaoNhat: diem,
+        diemTrungBinh: diem,
+        tongSoCa: 1,
+        dsLichSuSapXep: [{ maCa: baiThi.maCa, tenCa: baiThi.tenCa, tong: diem, nopLuc: baiThi.ngayThi }],
+      }
+    }
+
+    // Lọc các ca có điểm và sắp xếp theo thời gian tăng dần
+    const cacCaCoDiem = dsLichSu
+      .filter((c) => c.tong !== null && c.tong !== undefined)
+      .sort((a, b) => new Date(a.nopLuc || 0).getTime() - new Date(b.nopLuc || 0).getTime())
+
+    const viTriHienTai = cacCaCoDiem.findIndex((c) => c.maCa === baiThi.maCa)
+    const caTruoc = viTriHienTai > 0 ? cacCaCoDiem[viTriHienTai - 1] : (cacCaCoDiem.length > 1 ? cacCaCoDiem[cacCaCoDiem.length - 2] : null)
+
+    const diemCaTruoc = caTruoc && caTruoc.tong !== null ? Number(Number(caTruoc.tong).toFixed(2)) : null
+    const chenhLech = diemCaTruoc !== null ? Number((diem - diemCaTruoc).toFixed(2)) : 0
+
+    let danhGia = 'Điểm mốc xuất phát ban đầu'
+    let bieuTuong = '🏁'
+    let mauSac = 'text-blue-600 dark:text-blue-400'
+    let nenSac = 'bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800'
+
+    if (diemCaTruoc !== null) {
+      if (chenhLech >= 1.5) {
+        danhGia = 'Tiến bộ vượt bậc'
+        bieuTuong = '🚀'
+        mauSac = 'text-emerald-600 dark:text-emerald-400'
+        nenSac = 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800'
+      } else if (chenhLech >= 0.5) {
+        danhGia = 'Tiến bộ rõ rệt'
+        bieuTuong = '📈'
+        mauSac = 'text-teal-600 dark:text-teal-400'
+        nenSac = 'bg-teal-50 dark:bg-teal-950/50 border-teal-200 dark:border-teal-800'
+      } else if (chenhLech >= -0.5) {
+        danhGia = 'Giữ vững phong độ'
+        bieuTuong = '🎯'
+        mauSac = 'text-indigo-600 dark:text-indigo-400'
+        nenSac = 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-200 dark:border-indigo-800'
+      } else {
+        danhGia = 'Cần bứt phá & nỗ lực hơn'
+        bieuTuong = '💡'
+        mauSac = 'text-amber-600 dark:text-amber-400'
+        nenSac = 'bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800'
+      }
+    }
+
+    const tatCaDiem = cacCaCoDiem.map((c) => Number(c.tong) || 0)
+    const diemCaoNhat = tatCaDiem.length > 0 ? Math.max(...tatCaDiem, diem) : diem
+    const diemTrungBinh = tatCaDiem.length > 0 ? Number((tatCaDiem.reduce((a, b) => a + b, 0) / tatCaDiem.length).toFixed(2)) : diem
+
+    return {
+      caTruoc,
+      chenhLech,
+      danhGia,
+      bieuTuong,
+      mauSac,
+      nenSac,
+      diemCaoNhat,
+      diemTrungBinh,
+      tongSoCa: cacCaCoDiem.length,
+      dsLichSuSapXep: cacCaCoDiem,
+    }
+  }, [dsLichSu, baiThi.maCa, baiThi.tenCa, baiThi.ngayThi, diem])
 
   // Đánh giá sư phạm và thông điệp thôi thúc sửa sai
   const danhGia = useMemo(() => {
@@ -152,10 +263,7 @@ export default function BaoCaoCaThiHocSinhModal({
     }
   }, [diem])
 
-  // Điểm từng phần
-  const diemI = baiThi.diemI !== null && baiThi.diemI !== undefined ? baiThi.diemI : Number((diem * 0.45).toFixed(2))
-  const diemII = baiThi.diemII !== null && baiThi.diemII !== undefined ? baiThi.diemII : Number((diem * 0.4).toFixed(2))
-  const diemIII = baiThi.diemIII !== null && baiThi.diemIII !== undefined ? baiThi.diemIII : Number((diem * 0.15).toFixed(2))
+  // (Điểm từng phần đã khai báo một lần ở trên — bản trùng ở đây đã bỏ.)
 
   // Mức độ nhận thức
   const mucDoStats = useMemo(() => {
@@ -269,20 +377,20 @@ export default function BaoCaoCaThiHocSinhModal({
                   </div>
                   <div className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                     Đúng <strong className="text-emerald-600 dark:text-emerald-400">{soDung}</strong>/{tongCau} câu
-                    {soSai > 0 && (
+                    {(soSai ?? 0) > 0 && (
                       <span className="text-rose-500 dark:text-rose-400 font-bold ml-1.5">
                         (sai {soSai} câu)
                       </span>
                     )}
                   </div>
                   <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Độ chính xác: <strong>{tyLeChinhXac}%</strong>
+                    Độ chính xác: <strong>{coDemCau ? `${tyLeChinhXac}%` : '—'}</strong>
                   </div>
                 </div>
               </div>
 
               {/* Nút hành động 1 chạm sửa lỗi sai ngay */}
-              {soSai > 0 && (
+              {(soSai ?? 0) > 0 && (
                 <div className="flex flex-col sm:items-end gap-2">
                   <button
                     type="button"
@@ -353,6 +461,19 @@ export default function BaoCaoCaThiHocSinhModal({
             >
               <Layers className="w-4 h-4" />
               <span>Mức độ nhận thức</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setTabHienThi('tien_bo')}
+              className={`py-2.5 px-3.5 text-xs font-bold rounded-t-xl transition-colors border-b-2 flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                tabHienThi === 'tien_bo'
+                  ? 'border-purple-600 text-purple-600 dark:text-purple-400 bg-purple-50/50 dark:bg-purple-950/30'
+                  : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
+              }`}
+            >
+              <TrendingUp className="w-4 h-4" />
+              <span>Mức tiến bộ</span>
             </button>
 
             {extraTabs?.map((t) => (
@@ -664,6 +785,120 @@ export default function BaoCaoCaThiHocSinhModal({
             </div>
           )}
 
+          {/* TAB 4: MỨC TIẾN BỘ */}
+          {tabHienThi === 'tien_bo' && (
+            <div className="space-y-4 animate-google-fade">
+              {/* Thẻ chỉ số tổng quan tiến bộ */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-700">
+                  <div>
+                    <span className="text-xs text-slate-400 uppercase tracking-wider font-bold">
+                      Đánh giá mức tiến bộ
+                    </span>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-2xl">{phanTichTienBo.bieuTuong}</span>
+                      <h4 className="text-lg font-black text-slate-900 dark:text-white">
+                        {phanTichTienBo.danhGia}
+                      </h4>
+                    </div>
+                  </div>
+
+                  <div className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 self-start sm:self-auto ${phanTichTienBo.nenSac} ${phanTichTienBo.mauSac}`}>
+                    <TrendingUp className="w-4 h-4" />
+                    <span>
+                      {phanTichTienBo.chenhLech > 0
+                        ? `Tăng +${phanTichTienBo.chenhLech.toFixed(2)} điểm`
+                        : phanTichTienBo.chenhLech < 0
+                        ? `Giảm ${phanTichTienBo.chenhLech.toFixed(2)} điểm`
+                        : 'Không đổi so với ca trước'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 3 Thẻ chỉ số tiến bộ */}
+                <div className="grid grid-cols-3 gap-2.5 pt-1 text-center">
+                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+                    <div className="text-[11px] text-slate-400">Điểm ca này</div>
+                    <div className="text-lg sm:text-xl font-black text-blue-600 dark:text-blue-400 mt-0.5">
+                      {diem.toFixed(2)}
+                    </div>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+                    <div className="text-[11px] text-slate-400">Ca trước đó</div>
+                    <div className="text-lg sm:text-xl font-black text-slate-700 dark:text-slate-300 mt-0.5">
+                      {phanTichTienBo.caTruoc && phanTichTienBo.caTruoc.tong !== null
+                        ? Number(phanTichTienBo.caTruoc.tong).toFixed(2)
+                        : '—'}
+                    </div>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+                    <div className="text-[11px] text-slate-400">Điểm cao nhất</div>
+                    <div className="text-lg sm:text-xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
+                      {phanTichTienBo.diemCaoNhat.toFixed(2)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Lịch sử điểm các ca thi gần đây */}
+              {phanTichTienBo.dsLichSuSapXep.length > 0 && (
+                <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                      Tiến trình qua các ca thi ({phanTichTienBo.tongSoCa} ca)
+                    </span>
+                    <span className="text-xs text-slate-400">
+                      Trung bình: <strong>{phanTichTienBo.diemTrungBinh.toFixed(2)}</strong>/10
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    {phanTichTienBo.dsLichSuSapXep.slice(-6).map((caItem: any, idx: number) => {
+                      const d = Number(caItem.tong) || 0
+                      const laCaHienTai = caItem.maCa === baiThi.maCa
+                      return (
+                        <div
+                          key={caItem.maCa || idx}
+                          className={`p-3 rounded-xl border flex items-center justify-between gap-3 text-xs transition-colors ${
+                            laCaHienTai
+                              ? 'bg-blue-50/70 dark:bg-blue-950/40 border-blue-300 dark:border-blue-700'
+                              : 'bg-slate-50 dark:bg-slate-900/40 border-slate-100 dark:border-slate-800'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className="font-mono font-bold text-slate-500">#{caItem.maCa}</span>
+                            <div>
+                              <div className="font-semibold text-slate-800 dark:text-slate-200">
+                                {caItem.tenCa || `Ca ${caItem.maCa}`}
+                                {laCaHienTai && (
+                                  <span className="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white">
+                                    Ca này
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            <div className="w-24 sm:w-32 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden hidden sm:block">
+                              <div
+                                className="h-full bg-blue-600 rounded-full"
+                                style={{ width: `${Math.min(100, Math.max(5, d * 10))}%` }}
+                              />
+                            </div>
+                            <span className="font-black text-sm text-slate-900 dark:text-white w-12 text-right">
+                              {d.toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* CÁC TAB BỔ SUNG (DÀNH CHO GIÁO VIÊN NẾU CÓ) */}
           {extraTabs?.map((t) =>
             tabHienThi === t.id ? (
@@ -684,7 +919,7 @@ export default function BaoCaoCaThiHocSinhModal({
             Đóng
           </button>
 
-          {soSai > 0 && (
+          {(soSai ?? 0) > 0 && (
             <button
               type="button"
               onClick={() => {
