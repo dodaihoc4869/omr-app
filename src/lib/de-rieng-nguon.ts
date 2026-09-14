@@ -425,9 +425,14 @@ export async function dungDeRiengChoCa(
 
   const uv = dungUngVien(bankDung)
   let uvCuoi = uv
-  const thieuI = Math.max(0, sc.I - uv.I.length)
-  const thieuII = Math.max(0, sc.II - uv.II.length)
-  const thieuIII = Math.max(0, sc.III - uv.III.length)
+  const qidHoiLai = new Set(cauNoiThem.qids)
+  const soMoiCoI = uv.I.filter((q) => !qidHoiLai.has(q.id)).length
+  const soMoiCoII = uv.II.filter((q) => !qidHoiLai.has(q.id)).length
+  const soMoiCoIII = uv.III.filter((q) => !qidHoiLai.has(q.id)).length
+
+  const thieuI = Math.max(0, sc.I - soMoiCoI)
+  const thieuII = Math.max(0, sc.II - soMoiCoII)
+  const thieuIII = Math.max(0, sc.III - soMoiCoIII)
   if (thieuI > 0 || thieuII > 0 || thieuIII > 0) {
     const khoToanBo = await loadExamSources().catch(() => [] as TeacherExamSource[])
     const daCo = new Set([...bankDung.flatMap((s) => [...s.phanI, ...s.phanII, ...s.phanIII].map((q) => q.id))])

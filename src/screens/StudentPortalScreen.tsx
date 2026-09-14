@@ -677,9 +677,13 @@ export default function StudentPortalScreen() {
   // Rút đề khắc phục câu sai
   const taoDeKhacPhuc = async (danhSachMaCaTuyChon?: string[]) => {
     if (!auth) return
-    const dsMaCa = danhSachMaCaTuyChon && danhSachMaCaTuyChon.length > 0 ? danhSachMaCaTuyChon : Array.from(cacCaChon)
+    let dsMaCa = danhSachMaCaTuyChon && danhSachMaCaTuyChon.length > 0 ? danhSachMaCaTuyChon : Array.from(cacCaChon)
     if (dsMaCa.length === 0) {
-      setThongBaoKhacPhuc('Vui lòng chọn ít nhất một ca thi để khắc phục câu sai')
+      const caCoSai = dsLichSu.filter((c) => (c.soCauSai ?? 0) > 0).map((c) => c.maCa)
+      dsMaCa = caCoSai.length > 0 ? caCoSai : dsLichSu.map((c) => c.maCa)
+    }
+    if (dsMaCa.length === 0) {
+      setThongBaoKhacPhuc('Chưa có dữ liệu ca thi để khắc phục câu sai')
       return
     }
     setDangTaoDeKhacPhuc(true)
@@ -1628,7 +1632,7 @@ export default function StudentPortalScreen() {
                 </button>
                 <button
                   onClick={() => void taoDeKhacPhuc()}
-                  disabled={dangTaoDeKhacPhuc || cacCaChon.size === 0}
+                  disabled={dangTaoDeKhacPhuc || (cacCaChon.size === 0 && dsLichSu.length === 0)}
                   className="px-4 py-2 rounded-full btn-google-primary !bg-amber-500 hover:!bg-amber-600 !border-amber-500 text-white font-semibold text-xs shadow-md flex items-center gap-1.5 disabled:opacity-50 transition cursor-pointer"
                 >
                   {dangTaoDeKhacPhuc ? (
@@ -1636,7 +1640,7 @@ export default function StudentPortalScreen() {
                   ) : (
                     <Sparkles className="w-4 h-4" />
                   )}
-                  <span>Tạo đề khắc phục ({cacCaChon.size} ca - {tongSoCauSaiDaChon} câu sai)</span>
+                  <span>Tạo câu khắc phục 3 chế độ</span>
                 </button>
               </div>
             </div>

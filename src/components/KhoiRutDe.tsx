@@ -228,7 +228,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
 
   // Báo bộ câu lên màn Mở ca. Không rút thì báo null = giữ nguyên đường cũ.
   useEffect(() => {
-    if (cheDo === 'tron' || !kq) {
+    if ((cheDo === 'tron' && !deRieng) || !kq) {
       onDoi(null)
       return
     }

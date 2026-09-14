@@ -90,17 +90,48 @@ export default function ModalKhacPhucCauSai({
     }
   }, [isOpen])
 
-  // Phân tích tỷ lệ cho Chế độ 2
+  // Danh sách các ca thi trích xuất từ câu sai
+  const dsCaThi = useMemo(() => {
+    const map = new Map<string, { maCa: string; tenCa: string; soCauSai: number }>()
+    for (const c of dsCauSai) {
+      const ma = c.maCa || 'mac_dinh'
+      const ten = c.tenCa || (c.maCa ? `Ca thi #${c.maCa}` : 'Bài kiểm tra')
+      const hien = map.get(ma)
+      if (hien) {
+        hien.soCauSai += 1
+      } else {
+        map.set(ma, { maCa: ma, tenCa: ten, soCauSai: 1 })
+      }
+    }
+    return Array.from(map.values())
+  }, [dsCauSai])
+
+  // Set các ca thi được tick chọn trong Chế độ 2 (mặc định chọn tất cả ca)
+  const [caChonCheDo2, setCaChonCheDo2] = useState<Set<string>>(() => new Set(dsCauSai.map((c) => c.maCa || 'mac_dinh')))
+
+  // Đồng bộ khi dsCauSai thay đổi
+  useEffect(() => {
+    setCaChonCheDo2(new Set(dsCauSai.map((c) => c.maCa || 'mac_dinh')))
+  }, [dsCauSai])
+
+  // Danh sách câu sai được lọc theo các ca thi đã tick ở Chế độ 2
+  const dsCauSaiCheDo2 = useMemo(() => {
+    return dsCauSai.filter((c) => caChonCheDo2.has(c.maCa || 'mac_dinh'))
+  }, [dsCauSai, caChonCheDo2])
+
+  // Phân tích tỷ lệ cho Chế độ 2 theo danh sách câu sai của các ca đã tick
   const { thongKe: thongKeCheDo2, tongToiDa: tongToiDaCheDo2, tinhSoCauMoiDang: tinhCheDo2 } = useMemo(() => {
-    return phanTichTyLeDang(dsCauSai, khoDe)
-  }, [dsCauSai, khoDe])
+    return phanTichTyLeDang(dsCauSaiCheDo2, khoDe)
+  }, [dsCauSaiCheDo2, khoDe])
 
   // Cập nhật số câu mặc định cho Chế độ 2 khi phân tích xong
   useEffect(() => {
     if (tongToiDaCheDo2 > 0) {
-      setSoCauCheDo2(Math.min(tongToiDaCheDo2, Math.max(10, dsCauSai.length * 2)))
+      setSoCauCheDo2((prev) => Math.min(tongToiDaCheDo2, Math.max(1, prev > 0 ? prev : Math.min(tongToiDaCheDo2, dsCauSaiCheDo2.length * 2))))
+    } else {
+      setSoCauCheDo2(0)
     }
-  }, [tongToiDaCheDo2, dsCauSai.length])
+  }, [tongToiDaCheDo2, dsCauSaiCheDo2.length])
 
   // Phân bổ hiện tại của Chế độ 2
   const phanBoCheDo2 = useMemo(() => {
@@ -140,8 +171,8 @@ export default function ModalKhacPhucCauSai({
         dsCauKetQua = res.dsCau
         tieuDeBai = `Làm lại ${dsCauKetQua.length} câu sai`
       } else if (cheDo === 2) {
-        // Chế độ 2: Luyện thêm dạng câu sai
-        const res = rutLuyenThemDangCauSai(dsCauSai, khoDe, soCauCheDo2, options)
+        // Chế độ 2: Luyện thêm dạng câu sai theo các ca đã chọn
+        const res = rutLuyenThemDangCauSai(dsCauSaiCheDo2, khoDe, soCauCheDo2, options)
         ketQuaHtml = res.html
         dsCauKetQua = res.dsCau
         tieuDeBai = `Luyện thêm dạng câu sai (${dsCauKetQua.length} câu)`
@@ -307,6 +338,80 @@ export default function ModalKhacPhucCauSai({
             {/* PHẦN ĐIỀU KHIỂN CHI TIẾT THEO TỪNG CHẾ ĐỘ */}
             {cheDo === 2 && (
               <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-4 animate-in fade-in duration-150">
+                {/* Hộp chọn ca thi của học sinh trong box có ô tick */}
+                {dsCaThi.length > 0 && (
+                  <div className="p-4 rounded-2xl bg-white border border-slate-200/80 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                        <Layers className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Ca thi của học sinh ({caChonCheDo2.size}/{dsCaThi.length} ca · {dsCauSaiCheDo2.length} câu sai)</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setCaChonCheDo2(new Set(dsCaThi.map((c) => c.maCa)))}
+                          className="px-2.5 py-1 rounded-lg text-xs font-semibold text-blue-600 hover:bg-blue-50 transition cursor-pointer"
+                        >
+                          Chọn tất cả
+                        </button>
+                        <span className="text-slate-300">|</span>
+                        <button
+                          type="button"
+                          onClick={() => setCaChonCheDo2(new Set())}
+                          className="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100 transition cursor-pointer"
+                        >
+                          Bỏ chọn
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="max-h-40 overflow-y-auto space-y-1.5 pr-1">
+                      {dsCaThi.map((ca) => {
+                        const daTick = caChonCheDo2.has(ca.maCa)
+                        return (
+                          <div
+                            key={ca.maCa}
+                            onClick={() => {
+                              setCaChonCheDo2((prev) => {
+                                const moi = new Set(prev)
+                                if (moi.has(ca.maCa)) moi.delete(ca.maCa)
+                                else moi.add(ca.maCa)
+                                return moi
+                              })
+                            }}
+                            className={`flex items-center justify-between p-2.5 rounded-xl border transition cursor-pointer ${
+                              daTick
+                                ? 'bg-blue-50/40 border-blue-200 text-slate-800'
+                                : 'bg-slate-50/50 border-slate-200/60 text-slate-400 hover:bg-slate-50'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <input
+                                type="checkbox"
+                                checked={daTick}
+                                onChange={() => {}}
+                                className="w-4 h-4 rounded text-blue-600 accent-blue-600 cursor-pointer pointer-events-none"
+                              />
+                              <span className="text-xs font-semibold truncate">
+                                {ca.tenCa}
+                              </span>
+                            </div>
+                            <span
+                              className={`shrink-0 text-xs font-bold px-2 py-0.5 rounded-full border ${
+                                daTick
+                                  ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                  : 'bg-slate-100 text-slate-400 border-slate-200'
+                              }`}
+                            >
+                              {ca.soCauSai} câu sai
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-bold text-slate-700 flex items-center gap-2">
                     <Layers className="w-4 h-4 text-emerald-600" />
@@ -317,7 +422,12 @@ export default function ModalKhacPhucCauSai({
                   </span>
                 </div>
 
-                {tongToiDaCheDo2 > 0 ? (
+                {dsCauSaiCheDo2.length === 0 ? (
+                  <div className="text-xs text-slate-500 bg-slate-100 p-3 rounded-xl border border-slate-200 flex items-center gap-2">
+                    <Info className="w-4 h-4 shrink-0" />
+                    Vui lòng tick chọn ít nhất một ca thi ở danh sách trên để tính câu khắc phục.
+                  </div>
+                ) : tongToiDaCheDo2 > 0 ? (
                   <div className="space-y-2">
                     <input
                       type="range"

@@ -133,7 +133,7 @@ export default function ThanhBenTrai() {
           type="button"
           onClick={() => setScreen('examhub')}
           className="tap-target text-left w-full rounded-2xl hover:bg-slate-100/70 dark:hover:bg-slate-800/60 transition p-2 -m-2 flex items-center"
-          title="Trang chủ kiểm tra tại lớp"
+          title="Trang chủ Kiên trì"
         >
           <LogoGiaoVien size={38} hienChu={true} />
         </button>

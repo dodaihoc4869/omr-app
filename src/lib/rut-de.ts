@@ -270,6 +270,17 @@ export function rutDeCoBatBuoc(uv: Record<PhanDe, CauUngVien[]>, yc: YeuCauRut, 
     // `chonDan` đã tự loại câu trùng với `daCo` khỏi tập lấy tiếp, nên không
     // phải lọc trước — truyền thẳng `hop` vào.
     const c = chonDan(hop, can, tranh, hashSeed(`${yc.seed}:${p}`), bat, new Set())
+    // Nếu các câu theo bộ lọc hop không đủ, bù tiếp từ kho uv[p] để luôn đủ 100% số câu cấu hình
+    if (c.length < can) {
+      const daCoId = new Set(c.map((x) => x.id))
+      for (const item of uv[p]) {
+        if (c.length >= can) break
+        if (!daCoId.has(item.id)) {
+          c.push(item)
+          daCoId.add(item.id)
+        }
+      }
+    }
     chon[p] = c
     thieu[p] = Math.max(0, can - c.length)
     conLai[p] = Math.max(0, hop.length - c.filter((x) => hop.some((h) => h.id === x.id)).length)

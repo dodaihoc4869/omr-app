@@ -480,7 +480,7 @@ export default function TheCau(props: TheCauProps) {
           những câu được đánh dấu, nên kết quả không còn nói được em đã chắc
           chưa. Sau khi nộp thì dải lại có ích — lúc ấy nó là chỉ dẫn sửa sai,
           không còn ảnh hưởng bài làm. */}
-      {xemLai && props.cauHoiLai && <DaiHoiLai soLanSai={props.cauHoiLai.soLanSai} />}
+      {props.cauHoiLai && <DaiHoiLai soLanSai={props.cauHoiLai.soLanSai} />}
       <div className="flex flex-col" style={{ padding: 'var(--k5)', gap: 'var(--k3)' }}>
         {thanCauImg ? (
           <button type="button" onClick={() => onZoom?.(thanCauImg)} className="block w-full" title="Bấm để phóng to">

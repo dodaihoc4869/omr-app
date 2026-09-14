@@ -1262,7 +1262,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       // chưa nhận) → về màn Đã nộp và gửi tiếp, không cho làm lại.
       if (kq.cach === 'khoi_phuc' && existing?.submitted) return moLaiDaNop(existing)
 
-      const bankGoc = cached?.bank ?? kq.bank
+      const bankGoc = kq.bank ?? cached?.bank
       if (!bankGoc) throw new Error('Máy chủ chưa gửi đề — bấm Vào thi lại.')
       // ĐỀ RIÊNG TỪNG EM: GHÉP BẢN ĐỒ VÀO KHO TRƯỚC KHI CẮT ĐỀ.
       //

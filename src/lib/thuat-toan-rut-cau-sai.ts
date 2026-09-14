@@ -124,7 +124,7 @@ export function chuyenCauSaiSangCauLuyen(it: CauSaiDauVao): CauLuyen {
 export function layNhanDanCauSai(c: CauSaiDauVao, banDo?: Map<string, DangCauKho>): { ma: string; ten: string } {
   if (banDo && banDo.has(c.qid)) {
     const d = banDo.get(c.qid)!
-    return { ma: d.ma, ten: d.ten }
+    if (d.ma) return { ma: d.ma, ten: d.ten || d.ma }
   }
   if (c.dang) {
     if (typeof c.dang === 'string' && c.dang !== '[object Object]' && c.dang.trim()) {
@@ -136,8 +136,20 @@ export function layNhanDanCauSai(c: CauSaiDauVao, banDo?: Map<string, DangCauKho
       if (ma) return { ma, ten }
     }
   }
-  const chuyenDe = String(c.chuyenDe || '').trim()
-  return { ma: chuyenDe, ten: chuyenDe || 'Chuyên đề chung' }
+  try {
+    const dAuto = dangCua({
+      phan: c.phan,
+      text: c.text,
+      luaChon: c.choices ?? c.ideas ?? [],
+      dapAn: c.dapAnDung,
+      mucDo: c.mucDo as any,
+    })
+    if (dAuto && dAuto !== 'chua_ro') {
+      return { ma: dAuto, ten: dAuto === 'ly_thuyet' ? 'Lý thuyết' : 'Bài tập' }
+    }
+  } catch {}
+
+  return { ma: '', ten: c.chuyenDe || 'Chưa gắn dạng' }
 }
 
 /** LỰA CHỌN 1: Làm lại toàn bộ câu sai */
@@ -171,8 +183,9 @@ export function phanTichTyLeDang(
   const banDo = banDoDang(khoDe)
   const tatCaUngVien = cauLuyenTuNguon(khoDe)
   const qidSaiSet = new Set(dsCauSai.map((c) => c.qid))
+  const tapUngVienPhanBiet = new Set<string>()
 
-  // Chuẩn bị danh sách ứng viên cho từng câu sai
+  // Chuẩn bị danh sách ứng viên cho từng câu sai theo đúng nhãn dán
   const thongKe: ThongKeDangCauSai[] = dsCauSai.map((cs) => {
     const nhan = layNhanDanCauSai(cs, banDo)
     // Tìm các câu trong kho có cùng nhãn dán và khác câu sai
@@ -182,11 +195,15 @@ export function phanTichTyLeDang(
       if (candDang && nhan.ma) {
         if (candDang.ma === nhan.ma) return true
       }
-      if (cand.chuyenDe && cs.chuyenDe && cand.chuyenDe.trim().toLowerCase() === cs.chuyenDe.trim().toLowerCase()) {
+      if (candDang && nhan.ten && nhan.ten !== 'Chưa gắn dạng' && candDang.ten === nhan.ten) {
         return true
       }
       return false
     })
+
+    for (const u of ungVienCungNhan) {
+      tapUngVienPhanBiet.add(u.id)
+    }
 
     return {
       qid: cs.qid,
@@ -199,9 +216,9 @@ export function phanTichTyLeDang(
     }
   })
 
-  // Tổng số câu tối đa = tổng số câu có cùng nhãn dán của từng câu
-  // Ví dụ 10 câu sai, mỗi câu 10 câu giống nhãn dán => tổng tối đa 100 câu
-  const tongToiDa = thongKe.reduce((acc, cur) => acc + cur.soUngVienToiDa, 0)
+  // Tổng số câu tối đa = tổng số câu có cùng nhãn dán của từng câu, giới hạn bằng tập câu ứng viên phân biệt trong kho
+  const tongCong = thongKe.reduce((acc, cur) => acc + cur.soUngVienToiDa, 0)
+  const tongToiDa = Math.min(tongCong, tapUngVienPhanBiet.size)
 
   // Hàm tính số câu rút cho mỗi câu sai theo tỷ lệ tối đa, nếu lẻ thì làm tròn lên
   const tinhSoCauMoiDang = (tongSoCauRut: number): Map<string, number> => {
@@ -306,18 +323,19 @@ export function phanTichBoLocCau(
   const banDo = banDoDang(khoDe)
   const tatCaUngVien = cauLuyenTuNguon(khoDe)
   const qidSaiSet = new Set(dsCauSai.map((c) => c.qid))
+  const tapUngVienPhanBiet = new Set<string>()
 
   const thongKe: ThongKeDangCauSai[] = dsCauSai.map((cs) => {
     const nhan = layNhanDanCauSai(cs, banDo)
     const ungVienLoc = tatCaUngVien.filter((cand) => {
       if (qidSaiSet.has(cand.id) || cand.id === cs.qid) return false
 
-      // 1. Phải khớp nhãn dán
+      // 1. Phải khớp nhãn dán chặt chẽ
       const candDang = banDo.get(cand.id)
       let khopNhan = false
       if (candDang && nhan.ma && candDang.ma === nhan.ma) {
         khopNhan = true
-      } else if (cand.chuyenDe && cs.chuyenDe && cand.chuyenDe.trim().toLowerCase() === cs.chuyenDe.trim().toLowerCase()) {
+      } else if (candDang && nhan.ten && nhan.ten !== 'Chưa gắn dạng' && candDang.ten === nhan.ten) {
         khopNhan = true
       }
       if (!khopNhan) return false
@@ -332,6 +350,10 @@ export function phanTichBoLocCau(
       return true
     })
 
+    for (const u of ungVienLoc) {
+      tapUngVienPhanBiet.add(u.id)
+    }
+
     return {
       qid: cs.qid,
       soCau: cs.soCau,
@@ -345,7 +367,7 @@ export function phanTichBoLocCau(
 
   // Tổng số câu khớp bộ lọc (tối đa 100 câu trên thanh trượt theo yêu cầu)
   const tongCo = thongKe.reduce((acc, cur) => acc + cur.soUngVienToiDa, 0)
-  const tongToiDa = Math.min(100, tongCo)
+  const tongToiDa = Math.min(100, Math.min(tongCo, tapUngVienPhanBiet.size))
 
   const tinhSoCauMoiDang = (tongSoCauRut: number): Map<string, number> => {
     const ketQua = new Map<string, number>()

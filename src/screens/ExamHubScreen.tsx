@@ -168,7 +168,7 @@ export default function ExamHubScreen() {
             </span>
           </div>
           <h1 className="font-bold text-2xl tracking-tight text-slate-900 dark:text-white" style={{ fontFamily: 'var(--sans)' }}>
-            Kiểm tra tại lớp
+            Kiên trì
           </h1>
         </div>
       </header>

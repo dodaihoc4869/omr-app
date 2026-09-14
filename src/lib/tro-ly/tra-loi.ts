@@ -63,7 +63,7 @@ const HDAN: Record<string, { chu: string; dong: string[] }> = {
   },
   mo_ca: {
     chu: 'Mở ca kiểm tra:',
-    dong: ['Màn Kiểm tra tại lớp → ô tím "Mở ca kiểm tra" trên cùng.', 'Chọn đề, đặt lớp và thời gian, máy phát mã ca cho em nhập.'],
+    dong: ['Màn Kiên trì → ô tím "Mở ca kiểm tra" trên cùng.', 'Chọn đề, đặt lớp và thời gian, máy phát mã ca cho em nhập.'],
   },
   nap_de: {
     chu: 'Nạp đề mới:',
@@ -71,7 +71,7 @@ const HDAN: Record<string, { chu: string; dong: string[] }> = {
   },
   len_bang: {
     chu: 'Gọi lên bảng:',
-    dong: ['Màn Kiểm tra tại lớp → ô "Gọi lên bảng".', 'Máy chọn câu đúng chỗ em yếu nhất, chấm Đạt / Không đạt xong là cộng vào bảng mạnh yếu của em.'],
+    dong: ['Màn Kiên trì → ô "Gọi lên bảng".', 'Máy chọn câu đúng chỗ em yếu nhất, chấm Đạt / Không đạt xong là cộng vào bảng mạnh yếu của em.'],
   },
   gui_phieu: {
     chu: 'Gửi báo cáo cho phụ huynh:',

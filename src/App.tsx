@@ -59,7 +59,7 @@ import ChanLoi from './components/ChanLoi'
 /** Tên màn để câu báo lỗi nói đúng chỗ ("Màn Mở ca kiểm tra gặp lỗi"). */
 const TEN_MAN: Record<string, string> = {
   classlist: 'Danh sách lớp',
-  examhub: 'Kiểm tra tại lớp',
+  examhub: 'Kiên trì',
   examsetup: 'Mở ca kiểm tra',
   nganhangde: 'Ngân hàng câu hỏi',
   examtake: 'Làm bài',
