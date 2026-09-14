@@ -68,8 +68,8 @@ export default defineConfig({
         // `_redirects` lo phía máy chủ cho máy CHƯA cài; dòng này lo phía máy
         // em ĐÃ cài. Phải có cả hai.
         navigateFallback: 'index.html',
-        // Trừ các đường của chính Cloudflare Pages và tệp có đuôi thật.
-        navigateFallbackDenylist: [/^\/cdn-cgi\//],
+        // Trừ các đường của chính Cloudflare Pages và đường ép tải bản mới (_moi).
+        navigateFallbackDenylist: [/^\/cdn-cgi\//, /[?&]_moi=/],
         maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
         // KHÔNG chặn /t/, /hs/, /ph/ nữa: service worker cứ trả index.html cho
         // mọi đường điều hướng, và app tự đọc vai + mã ca từ ĐƯỜNG DẪN

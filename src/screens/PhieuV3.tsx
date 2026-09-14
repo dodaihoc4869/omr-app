@@ -142,8 +142,19 @@ export default function PhieuV3({ du, laCuaEm = false, xinLink }: { du: PhieuDay
   const hienHang = duocHienHang(ch, du.deRieng)
   const [moHet, setMoHet] = useState(false)
 
-  const boTrong = du.cauSai.filter((c) => !String(c.dapAnChon ?? '').trim())
-  const soDung = du.thongKe ? Math.max(0, du.thongKe.tongCau - du.thongKe.soSai - du.thongKe.soBoTrong) : (du.tongSoCau !== null ? Math.max(0, du.tongSoCau - du.soCauSai - boTrong.length) : null)
+  const laBoTrong = (c: { dapAnChon?: string | null; phan?: string }) => {
+    const s = String(c.dapAnChon ?? '').trim()
+    if (!s) return true
+    if (c.phan === 'II') return /^-{1,4}$/.test(s)
+    return false
+  }
+  const boTrong = du.cauSai.filter(laBoTrong)
+  const cauSaiThat = du.cauSai.filter((c) => !laBoTrong(c))
+  const soSaiThat = du.thongKe ? du.thongKe.soSai : (du.cauSai ? cauSaiThat.length : du.soCauSai)
+  const soBoTrongThat = du.thongKe ? du.thongKe.soBoTrong : boTrong.length
+  const soDung = du.thongKe
+    ? Math.max(0, du.thongKe.tongCau - soSaiThat - soBoTrongThat)
+    : (du.tongSoCau !== null ? Math.max(0, du.tongSoCau - soSaiThat - soBoTrongThat) : null)
   const chac = du.chuyenDeCa.filter((c) => c.soCau > 0 && c.soSai === 0)
   const roi = du.chuyenDeCa.filter((c) => c.soSai > 0).sort((a, b) => b.soSai / b.soCau - a.soSai / a.soCau)
   const xung = laCuaEm ? 'em' : 'con'
@@ -175,13 +186,13 @@ export default function PhieuV3({ du, laCuaEm = false, xinLink }: { du: PhieuDay
             {soDung !== null && du.tongSoCau !== null ? (
               <>
                 {`Đúng ${soDung}/${du.tongSoCau} câu`}
-                {du.soCauSai > 0 ? ` · sai ${du.soCauSai} câu` : ''}
-                {boTrong.length > 0 ? ` · chưa làm ${boTrong.length} câu` : ''}
+                {soSaiThat > 0 ? ` · Sai ${soSaiThat} câu` : ''}
+                {soBoTrongThat > 0 ? ` · Chưa làm ${soBoTrongThat} câu` : ''}
               </>
             ) : (
               <>
-                {`Sai ${du.soCauSai} câu`}
-                {boTrong.length > 0 ? ` · chưa làm ${boTrong.length} câu` : ''}
+                {soSaiThat > 0 ? `Sai ${soSaiThat} câu` : 'Bài thi đã hoàn thành'}
+                {soBoTrongThat > 0 ? ` · Chưa làm ${soBoTrongThat} câu` : ''}
               </>
             )}
           </div>

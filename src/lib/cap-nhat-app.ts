@@ -114,7 +114,10 @@ export function tuTaiLaiKhiDoiBan(
   },
 ): void {
   const dangLam = moiTruong.dangLamBai || dangLamBaiKhong
+  const sw = typeof navigator !== 'undefined' ? navigator.serviceWorker : undefined
+  const laLanDau = Boolean(sw && !sw.controller)
   moiTruong.addEventListener('controllerchange', () => {
+    if (laLanDau) return
     if (daHenTaiLai) return
     daHenTaiLai = true
     if (dangLam()) {
@@ -122,6 +125,7 @@ export function tuTaiLaiKhiDoiBan(
       khiXongBai.push(() => moiTruong.taiLai())
       return
     }
+    if (phaiHoanBanMoi(false, dangMoKhoaKhong(), coGoiPhien())) return
     moiTruong.taiLai()
   })
 }
