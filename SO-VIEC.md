@@ -83,3 +83,63 @@ GỘP câu bỏ trống vào câu sai — đúng thứ thầy cần tách ra.
   gì về buổi chữa hôm nay, mà mỗi lượt là thêm một lần chạm R2.
 - Câu KHÔNG nằm trong bài giao về nhà thì KHÔNG hiện nhãn, và cộng 0 điểm —
   khác hẳn "chưa làm". Hiện nhãn "chưa làm" cho câu chưa từng giao là bịa.
+
+---
+
+# LƯỢT 11 — APP HỌC SINH & PHỤ HUYNH KHÔNG TRUY CẬP ĐƯỢC (14/09)
+
+- [x] "app học sinh và phụ huynh lại không truy cập được. Bạn phải tìm cách để hiện tượng này không lặp lại nữa."  | bằng chứng: `sw.js` trên máy chủ nay KHÔNG còn `registration.unregister()`, không xoá sạch kho, không ép điều hướng (đo từ tab khác gốc); chốt tự sửa đã lên; `kiem-sw.mjs` ĐẠT 10/10; bản phát hành Pages `75136d05`, commit `14037b8`
+
+## NGUYÊN NHÂN GỐC — đo được, không đoán
+
+Bản `sw.js` ĐANG CHẠY THẬT chứa đoạn tự huỷ:
+
+```
+if (serverTs > SW_BUILT_AT + 2) {
+  const keys = await caches.keys()
+  await Promise.all(keys.map(k => caches.delete(k)))   // xoá CẢ precache vừa nạp
+  await self.registration.unregister()                  // gỡ, nhưng VẪN đang điều khiển tab
+  for (const client of clients) client.navigate(client.url)  // ép đi qua chính nó
+}
+```
+
+Điều kiện `serverTs > SW_BUILT_AT` KHÔNG hiếm — nó đúng với MỌI em quay lại
+sau MỖI lần phát hành. Nhánh ấy xoá kho precache workbox vừa nạp trong chính
+lượt activate ấy, rồi ép điều hướng qua chính SW đó vào kho rỗng ⇒
+`Response.error()` ⇒ ERR_FAILED. Đó là lý do lỗi LẶP LẠI sau mỗi bản.
+
+Đo lúc truy: Pages trả 200, Worker trả 200 (71 ms), `/hs/dang-nhap` trả đúng
+— nghĩa là máy chủ không hỏng. Hỏng nằm ở service worker trên máy em.
+
+## Đã sửa — ba lớp
+
+1. `src/sw.ts`: thấy máy chủ có bản mới thì `registration.update()` + nhắn
+   cho tab. Không xoá kho, không tự gỡ, không ép điều hướng. Thêm: tầng
+   precache trượt thì gọi bản mới về ngay, nhưng vẫn trả trang cho em.
+2. `index.html`: sau 9 giây mà `#root` còn rỗng thì gỡ SW, xoá kho, nạp lại
+   kèm `_moi=`. CHỈ MỘT LẦN mỗi tab. Chốt này KHÔNG cần biết nguyên nhân,
+   nên nó chặn cả nguyên nhân lần sau — đây mới là phần "không lặp lại nữa".
+3. `scripts/kiem-sw.mjs`: 4 phép mới đọc `dist/sw.js` bản THẬT. Trượt là
+   `DAY-TAT-CA.command` dừng, không đẩy.
+
+## Nghiệm thu sau phát hành (đo từ tab Cloudflare, KHÁC gốc app)
+
+| Việc | Kết quả |
+|---|---|
+| `registration.unregister()` trong sw.js | KHÔNG còn |
+| xoá sạch CacheStorage | KHÔNG còn |
+| ép tab điều hướng | KHÔNG còn |
+| `registration.update()` + báo tab | CÓ |
+| chốt tự sửa trong index.html | CÓ |
+| 142 mục precache | 0 mục hỏng |
+| tài nguyên index.html trỏ tới | 0 mục hỏng |
+| máy đã có SW CŨ mở lại app | `#root` có nội dung, kho precache CÒN NGUYÊN, chốt tự sửa KHÔNG phải chạy |
+
+## CÒN TREO — KHÔNG PHẢI VIỆC CỦA LƯỢT NÀY
+
+- [!] `npm run check:mau`: 90 mã màu ngoài tokens.css, TẤT CẢ nằm trong 6 tệp
+  `src/game/giai-cuu-cong-chua/*` của phiên Claude khác, chưa theo dõi git.
+  Không đụng vào, không đưa vào commit này.
+- [!] Bản Pages vừa đẩy DỰNG TỪ CÂY LÀM VIỆC nên có mang theo mã game đang
+  làm dở của phiên kia (`ThanThuHoaHocGame`, `giai-cuu-cong-chua`,
+  `public/cai-app*`). Không nằm trong commit `14037b8`.
