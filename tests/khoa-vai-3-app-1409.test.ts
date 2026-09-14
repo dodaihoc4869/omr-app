@@ -210,11 +210,12 @@ describe('Tốc độ — mảnh mã chính không cõng thứ người khác kh
   const MAN_EM = doc('src/screens/StudentPortalScreen.tsx')
   const APP = doc('src/App.tsx')
 
-  it('hai game NẠP MUỘN — đo 14/09: ~234 KB nguồn game từng nằm trong mảnh chính', () => {
-    expect(MAN_EM).toContain("lazy(() => import('../components/GiaiCuuCongChuaGame'))")
+  it('game NẠP MUỘN — đo 14/09: ~234 KB nguồn game từng nằm trong mảnh chính', () => {
+    // 14/09 chiều: thầy chốt bỏ hẳn Giải Cứu Người Yêu Cũ, chỉ còn Thần Thú.
     expect(MAN_EM).toContain("lazy(() => import('../components/ThanThuHoaHocGame'))")
-    expect(MAN_EM).not.toMatch(/^import GiaiCuuCongChuaGame from/m)
     expect(MAN_EM).not.toMatch(/^import ThanThuHoaHocGame from/m)
+    // và không còn dấu vết game đã bỏ
+    expect(MAN_EM).not.toContain('GiaiCuuCongChua')
   })
 
   it('game nạp muộn có chỗ giữ màn, không để em nhìn khoảng trắng', () => {

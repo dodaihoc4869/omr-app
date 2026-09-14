@@ -20,7 +20,6 @@ import {
   Heart,
   Timer,
   Check,
-  FlaskConical,
   X,
 } from 'lucide-react'
 import {
@@ -39,7 +38,6 @@ import LogoHocSinh from '../components/LogoHocSinh'
 // vào đây là nó rơi vào MẢNH MÃ CHÍNH (755 KB), thứ MỌI người tải, kể cả phụ
 // huynh chỉ mở một trang báo cáo trên điện thoại. Em nào mở tab game mới tải,
 // và service worker cất lại ngay nên lần sau tức thì.
-const GiaiCuuCongChuaGame = lazy(() => import('../components/GiaiCuuCongChuaGame'))
 const ThanThuHoaHocGame = lazy(() => import('../components/ThanThuHoaHocGame'))
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import DongDemCau, { docSoDem } from '../components/DongDemCau'
@@ -141,7 +139,7 @@ function mauDiem(diem: number | null): string {
   return 'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/40 dark:border-rose-800'
 }
 
-type TabType = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'game' | 'thanthu'
+type TabType = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu'
 
 /** Chỗ giữ màn trong lúc mảnh mã game đang về. Cao bằng vùng game để không
  * giật layout, và nói rõ đang chờ chứ không để em nhìn khoảng trắng. */
@@ -987,7 +985,7 @@ export default function StudentPortalScreen() {
 
       {/* Navigation mục theo phong cách Google Material 3 Segmented Pill Tabs */}
       <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-5 pb-1">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2.5">
           <button
             onClick={() => setTab('diem')}
             className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
@@ -1104,30 +1102,6 @@ export default function StudentPortalScreen() {
               <div className="font-bold text-sm leading-tight">Vào thi</div>
               <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'vaothi' ? 'text-purple-700/80 dark:text-purple-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
                 Nhập mã ca & mật khẩu
-              </div>
-            </div>
-          </button>
-
-          <button
-            onClick={() => setTab('game')}
-            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
-              tab === 'game'
-                ? 'bg-emerald-50 text-emerald-900 border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-200 dark:border-emerald-800 shadow-xs'
-                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform ${tab === 'game' ? 'bg-emerald-600 text-white scale-105' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'}`}>
-                <FlaskConical size={18} strokeWidth={tab === 'game' ? 2.4 : 2} />
-              </div>
-              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'game' ? 'bg-emerald-200/70 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
-                12 Người
-              </span>
-            </div>
-            <div>
-              <div className="font-bold text-sm leading-tight">Giải Cứu NY Cũ 👑</div>
-              <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'game' ? 'text-emerald-700/80 dark:text-emerald-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
-                Dẫm đầu nhau
               </div>
             </div>
           </button>
@@ -1891,15 +1865,6 @@ export default function StudentPortalScreen() {
               </form>
             </div>
           </div>
-        )}
-
-        {/* TAB 6: GIẢI CỨU CÔNG CHÚA — 12 người, dẫm đầu nhau bằng hoá chất.
-            KHÔNG truyền SBD và họ tên vào game: điểm game không được dính vào
-            hồ sơ học tập, và game không cần biết em là ai. */}
-        {tab === 'game' && (
-          <Suspense fallback={<ChoNapGame />}>
-            <GiaiCuuCongChuaGame onDong={() => setTab('diem')} />
-          </Suspense>
         )}
 
         {/* TAB 7: THẦN THÚ HÓA HỌC (ALCHEMON) — Nuôi thú, leo tháp & săn boss câu sai.

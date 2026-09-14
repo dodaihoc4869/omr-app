@@ -43,8 +43,8 @@ import { AmThanhPet } from '../game/than-thu-hoa-hoc/am-thanh-pet'
 
 interface Props {
   /**
-   * KHÔNG NHẬN `auth`. Game không cần biết em là ai — đúng lệ đã đặt cho
-   * GiaiCuuCongChuaGame: điểm game không dính vào hồ sơ học tập.
+   * KHÔNG NHẬN `auth`. Game không cần biết em là ai: điểm game không được
+   * dính vào hồ sơ học tập, và game không cần danh tính để chạy.
    * Chỉ nhận hai danh sách để TÍNH buff và quy đổi EXP; không hiện tên, không
    * hiện số báo danh, không ghi số báo danh vào localStorage.
    */
