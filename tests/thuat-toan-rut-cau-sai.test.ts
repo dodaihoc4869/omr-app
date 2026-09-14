@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { join as joinPath } from 'node:path'
 import {
   chuyenCauSaiSangCauLuyen,
   phanTichTyLeDang,
@@ -187,5 +189,130 @@ describe('Thuật toán rút câu sai & khắc phục lỗi sai', () => {
       expect(res.dsCau[0].id).toBe('c1')
       expect(res.html).toContain('BỘ LỌC CÂU LUYỆN')
     })
+  })
+})
+
+// ===========================================================================
+// TỐI ĐA CHẾ ĐỘ 2 — thầy bắt được 14/09: "Tỷ lệ tối đa: 8800 câu".
+//
+// 11 câu sai, mỗi câu tìm được chừng 800 câu cùng nhãn trong kho. Bản trước
+// CỘNG DỒN 11 con số ấy rồi mới chặn, nên ra 8800 — trong khi phần lớn là
+// CÙNG MỘT câu được đếm đi đếm lại cho từng câu sai. Thanh kéo chạy tới một
+// con số không bao giờ rút nổi.
+// ===========================================================================
+describe('Chế độ 2 — tối đa là số câu PHÂN BIỆT, không cộng dồn', () => {
+  const cauSai = (qid: string, soCau: number): CauSaiDauVao => ({
+    qid,
+    soCau,
+    phan: 'I',
+    dapAnDung: 'A',
+    text: `Câu sai ${qid}`,
+    choices: ['A', 'B', 'C', 'D'],
+  })
+
+  // Ba câu sai CÙNG một nhãn ⇒ cùng chia nhau đúng một tập ứng viên.
+  const KHO = khoMock([
+    cauKho('s1', A), cauKho('s2', A), cauKho('s3', A),
+    cauKho('u1', A), cauKho('u2', A), cauKho('u3', A), cauKho('u4', A),
+  ])
+  const SAI = [cauSai('s1', 1), cauSai('s2', 2), cauSai('s3', 3)]
+
+  it('KHÔNG đếm một câu nhiều lần: 3 câu sai × 4 ứng viên chung ⇒ tối đa 4, không phải 12', () => {
+    const { tongToiDa, thongKe } = phanTichTyLeDang(SAI, KHO)
+    // Mỗi câu sai nhìn thấy đủ 4 ứng viên...
+    for (const t of thongKe) expect(t.soUngVienToiDa).toBe(4)
+    // ...nhưng cả ba dùng chung đúng 4 câu ấy.
+    expect(tongToiDa).toBe(4)
+    expect(tongToiDa).toBeLessThan(thongKe.reduce((a, c) => a + c.soUngVienToiDa, 0))
+  })
+
+  it('tối đa không bao giờ vượt số câu thật có trong kho', () => {
+    const { tongToiDa } = phanTichTyLeDang(SAI, KHO)
+    const soCauTrongKho = KHO[0].phanI.length
+    expect(tongToiDa).toBeLessThanOrEqual(soCauTrongKho)
+  })
+
+  it('kéo hết thanh thì rút đủ số tối đa, và rút được thật', () => {
+    const { tongToiDa } = phanTichTyLeDang(SAI, KHO)
+    const { dsCau } = rutLuyenThemDangCauSai(SAI, KHO, tongToiDa, { hoTen: 'Em A', sbd: '10001' })
+    expect(dsCau.length).toBeGreaterThan(0)
+    expect(dsCau.length).toBeLessThanOrEqual(tongToiDa)
+    // Không câu nào lặp lại.
+    expect(new Set(dsCau.map((c) => c.id)).size).toBe(dsCau.length)
+  })
+
+  it('chia theo tỷ lệ, lẻ thì LÀM TRÒN LÊN — không câu sai nào bị bỏ trắng', () => {
+    const { tinhSoCauMoiDang } = phanTichTyLeDang(SAI, KHO)
+    // Kéo 3 câu cho 3 câu sai ngang nhau: mỗi câu 1, không ai bằng 0.
+    const pb = tinhSoCauMoiDang(3)
+    for (const q of ['s1', 's2', 's3']) expect(pb.get(q)).toBeGreaterThanOrEqual(1)
+    // Kéo 1 câu: làm tròn LÊN nên vẫn mỗi câu tối thiểu 1, không ai mất suất.
+    const pb1 = tinhSoCauMoiDang(1)
+    for (const q of ['s1', 's2', 's3']) expect(pb1.get(q)).toBeGreaterThanOrEqual(1)
+  })
+
+  it('TỔNG phân bổ bám sát số kéo, không phình lên gấp nhiều lần', () => {
+    // ĐÂY LÀ LỖI THẬT. Bản trước lấy tỷ lệ = ứng viên của câu / `tongToiDa`.
+    // Ba câu sai dùng chung 4 ứng viên ⇒ mỗi câu ra tỷ lệ 4/4 = 1, nên kéo 4
+    // câu thì MỖI câu được phân 4 — tổng 12, gấp ba lần thứ thầy kéo.
+    // Mẫu số đúng là TỔNG ứng viên (12), khi ấy các tỷ lệ cộng lại bằng 1.
+    const { tinhSoCauMoiDang, tongToiDa } = phanTichTyLeDang(SAI, KHO)
+    const pb = tinhSoCauMoiDang(tongToiDa)
+    const tong = [...pb.values()].reduce((a, b) => a + b, 0)
+    // Làm tròn LÊN nên được phép nhỉnh hơn, nhưng không quá một suất mỗi câu sai.
+    expect(tong).toBeLessThanOrEqual(tongToiDa + SAI.length)
+    // Bản cũ ra 12 với tongToiDa = 4 ⇒ phép kiểm này bắt đúng chỗ đó.
+    expect(tong).toBeLessThan(12)
+  })
+
+  it('câu sai có nhiều ứng viên hơn thì được chia phần nhiều hơn', () => {
+    const kho2 = khoMock([
+      cauKho('x1', A), cauKho('x2', B),
+      cauKho('a1', A), cauKho('a2', A), cauKho('a3', A), cauKho('a4', A),
+      cauKho('b1', B),
+    ])
+    const sai2 = [cauSai('x1', 1), cauSai('x2', 2)]
+    const { thongKe, tinhSoCauMoiDang } = phanTichTyLeDang(sai2, kho2)
+    const uv = new Map(thongKe.map((t) => [t.qid, t.soUngVienToiDa]))
+    expect(uv.get('x1')!).toBeGreaterThan(uv.get('x2')!)
+    const pb = tinhSoCauMoiDang(5)
+    expect(pb.get('x1')!).toBeGreaterThanOrEqual(pb.get('x2')!)
+  })
+
+  it('không có ứng viên nào ⇒ tối đa 0, không nổ', () => {
+    const khoRong = khoMock([cauKho('z1', A)])
+    const { tongToiDa, tinhSoCauMoiDang } = phanTichTyLeDang([cauSai('z1', 1)], khoRong)
+    expect(tongToiDa).toBe(0)
+    expect(tinhSoCauMoiDang(10).get('z1')).toBe(0)
+  })
+})
+
+// ===========================================================================
+// NÚT "LẤY BẢN MỚI NGAY" phải dọn sạch, không chỉ gọi update().
+// Thầy bắt được 14/09: máy hiện "Bản 2cf33fe · 23:31" trong khi GitHub Pages
+// đã phục vụ bản mới từ 01:06 và Actions báo success.
+// ===========================================================================
+describe('Nút lấy bản mới', () => {
+  const HUB = readFileSync(joinPath(process.cwd(), 'src/screens/ExamHubScreen.tsx'), 'utf8')
+  const than = HUB.slice(HUB.indexOf('const capNhat = async ()'), HUB.indexOf('const capNhat = async ()') + 2600)
+
+  it('xoá sạch mọi bộ đệm', () => {
+    expect(than).toContain('caches.keys()')
+    expect(than).toContain('caches.delete(t)')
+  })
+
+  it('huỷ đăng ký service worker để lần tải sau buộc đi ra mạng', () => {
+    expect(than).toContain('getRegistrations()')
+    expect(than).toContain('d.unregister()')
+  })
+
+  it('tải lại kèm tem thời gian, qua nốt bộ đệm HTTP của trang', () => {
+    expect(than).toContain("u.searchParams.set('_moi', String(Date.now()))")
+    expect(than).toContain('location.replace(')
+  })
+
+  it('vẫn giữ ba bước cũ, không thay bằng dọn sạch', () => {
+    expect(than).toContain('dk.update()')
+    expect(than).toContain('daySangBanMoi(')
   })
 })

@@ -216,9 +216,17 @@ export function phanTichTyLeDang(
     }
   })
 
-  // Tổng số câu tối đa = tổng số câu có cùng nhãn dán của từng câu, giới hạn bằng tập câu ứng viên phân biệt trong kho
-  const tongCong = thongKe.reduce((acc, cur) => acc + cur.soUngVienToiDa, 0)
-  const tongToiDa = Math.min(tongCong, tapUngVienPhanBiet.size)
+  // TỐI ĐA = SỐ CÂU PHÂN BIỆT RÚT ĐƯỢC, không phải tổng cộng dồn.
+  //
+  // Bản trước cộng `soUngVienToiDa` của từng câu sai rồi mới chặn bằng số câu
+  // phân biệt. Một câu trong kho thường là ứng viên cho NHIỀU câu sai cùng
+  // nhãn, nên phép cộng ấy đếm nó nhiều lần — 11 câu sai ra "tối đa 8800 câu"
+  // trong khi cả kho chỉ có mấy nghìn câu. Thanh kéo vì thế chạy tới một con số
+  // không bao giờ rút nổi.
+  //
+  // Rút nhiều nhất được bao nhiêu thì đúng bằng số câu PHÂN BIỆT trong tập ứng
+  // viên: rút quá số ấy là bắt đầu lặp lại chính những câu đã có.
+  const tongToiDa = tapUngVienPhanBiet.size
 
   // Hàm tính số câu rút cho mỗi câu sai theo tỷ lệ tối đa, nếu lẻ thì làm tròn lên
   const tinhSoCauMoiDang = (tongSoCauRut: number): Map<string, number> => {
@@ -229,14 +237,24 @@ export function phanTichTyLeDang(
     }
 
     const K = Math.min(tongSoCauRut, tongToiDa)
+    const tongUngVien = thongKe.reduce((a, c) => a + c.soUngVienToiDa, 0)
+    if (tongUngVien <= 0) {
+      for (const t of thongKe) ketQua.set(t.qid, 0)
+      return ketQua
+    }
     for (const t of thongKe) {
       if (t.soUngVienToiDa <= 0) {
         ketQua.set(t.qid, 0)
         continue
       }
-      // Tỷ lệ của câu này trong tổng tối đa
-      const tyLe = t.soUngVienToiDa / tongToiDa
-      // Số câu phân bổ = K * tỷ lệ, nếu lẻ thì làm tròn lên (Math.ceil)
+      // TỶ LỆ TÍNH TRÊN TỔNG ỨNG VIÊN, không trên `tongToiDa`.
+      //
+      // `tongToiDa` là số câu PHÂN BIỆT, nhỏ hơn hẳn tổng ứng viên khi nhiều
+      // câu sai dùng chung một kho nhãn. Chia cho nó thì các tỷ lệ cộng lại
+      // vượt 100% và câu nào cũng ăn gần hết hạn mức. Mẫu số đúng là tổng ứng
+      // viên của mọi câu sai — khi ấy tổng các tỷ lệ đúng bằng 1.
+      const tyLe = t.soUngVienToiDa / tongUngVien
+      // Lẻ thì LÀM TRÒN LÊN, đúng luật thầy chốt.
       const phanBo = Math.ceil(K * tyLe)
       // Không được vượt quá số ứng viên tối đa của chính câu đó
       const soCauChon = Math.min(t.soUngVienToiDa, Math.max(1, phanBo))
