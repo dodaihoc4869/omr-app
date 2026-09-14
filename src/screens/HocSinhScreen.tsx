@@ -75,6 +75,7 @@ export default function HocSinhScreen() {
   const [hoSo, setHoSo] = useState<HoSoEm | null>(null)
   const [dangTaiHoSo, setDangTaiHoSo] = useState(false)
   const [caBaoCao, setCaBaoCao] = useState<HoSoEm['ca'][number] | null>(null)
+  const [tabBaoCaoMo, setTabBaoCaoMo] = useState<string>('tong_quan')
   const showToast = useAppStore((s) => s.showToast)
 
   const tai = async () => {
@@ -112,6 +113,18 @@ export default function HocSinhScreen() {
       .catch((e) => setLoi(e instanceof Error ? e.message : 'Không mở được hồ sơ'))
       .finally(() => setDangTaiHoSo(false))
   }, [sbdDangXem, cauHinh])
+
+  // Tự động bật luôn báo cáo mới chuẩn Google Material 3 khi chạm "Báo cáo"
+  useEffect(() => {
+    if (hoSo && mucHoSo === 'bao-cao') {
+      const ca = hoSo.ca.find((c) => c.tong !== null) ?? hoSo.ca[0]
+      if (ca) {
+        setCaBaoCao(ca)
+      } else {
+        showToast(`Em ${hoSo.em.hoTen || hoSo.em.sbd} chưa tham gia ca thi nào`, 'warn')
+      }
+    }
+  }, [hoSo, mucHoSo, showToast])
 
   /** XOÁ EM KHỎI DANH SÁCH — chỉ thầy (máy chủ đòi mã bí mật).
    *
@@ -351,20 +364,26 @@ export default function HocSinhScreen() {
               diemI: caBaoCao.diemI ?? null,
               diemII: caBaoCao.diemII ?? null,
               diemIII: caBaoCao.diemIII ?? null,
-              // SỐ THẬT TỪ BẢNG CHẤM (`lichSuEm` trả `tongCau`/`soCauDung`/
-              // `soCauSai`). Số 40 gõ cứng ở đây là nguồn của "Đúng 6/40 câu"
-              // trên ca Test2 — ca đề riêng chỉ phát 12 câu mỗi em.
               tongCau: caBaoCao.tongCau ?? undefined,
               soCauDung: caBaoCao.soCauDung ?? undefined,
-              soCauSai: caBaoCao.soCauSai ?? undefined,
+              soCauSai: (caBaoCao.tongCau !== null && caBaoCao.tongCau !== undefined && caBaoCao.soCauDung !== null && caBaoCao.soCauDung !== undefined)
+                ? Math.max(0, caBaoCao.tongCau - caBaoCao.soCauDung)
+                : (caBaoCao.soCauSai ?? undefined),
               lanThu: caBaoCao.lanThu,
             }}
             hoTen={hoSo.em.hoTen || `SBD ${hoSo.em.sbd}`}
             sbd={hoSo.em.sbd}
             lop={hoSo.em.lop}
             scriptUrl={cauHinh?.url || ''}
-            onClose={() => setCaBaoCao(null)}
-            onBatDauKhacPhuc={() => setCaBaoCao(null)}
+            tabMacDinh={tabBaoCaoMo}
+            onClose={() => {
+              setCaBaoCao(null)
+              moHoSoEm('')
+            }}
+            onBatDauKhacPhuc={() => {
+              setCaBaoCao(null)
+              moHoSoEm('')
+            }}
           />
         )}
       </div>
@@ -475,7 +494,10 @@ export default function HocSinhScreen() {
                     <span className="flex-1 min-w-0">
                       <button
                         type="button"
-                        onClick={() => moHoSo(e.sbd)}
+                        onClick={() => {
+                          setTabBaoCaoMo('tong_quan')
+                          moHoSo(e.sbd, 'bao-cao')
+                        }}
                         className="tap-target font-bold inline-flex items-center text-left"
                         style={{
                           fontFamily: 'var(--serif)',
@@ -526,7 +548,10 @@ export default function HocSinhScreen() {
                       <button
                         key={muc}
                         type="button"
-                        onClick={() => moHoSo(e.sbd, muc)}
+                        onClick={() => {
+                          setTabBaoCaoMo(muc === 'bao-cao' ? 'tong_quan' : 'tien_bo')
+                          moHoSo(e.sbd, muc)
+                        }}
                         aria-label={`${TEN_MUC_HO_SO[muc]} của ${e.hoTen || `SBD ${e.sbd}`}`}
                         className="tap-target inline-flex items-center justify-center font-bold active:scale-[0.98] hover:-translate-y-0.5 transition-all shadow-xs cursor-pointer"
                         style={{

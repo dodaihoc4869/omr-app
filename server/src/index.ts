@@ -2067,7 +2067,7 @@ async function chamDiem(env: Env, b: Record<string, unknown>): Promise<Response>
       env.DB.prepare(
         `INSERT INTO tien_do_ca (khoa, ma_ca, sbd, chuyen_de, so_cau, so_sai, nop_luc, cap_nhat_luc)
          SELECT ? || '|' || chuyen_de, ?, ?, chuyen_de,
-                COUNT(*), SUM(CASE WHEN dung_sai = 0 AND dap_an_chon <> '' AND dap_an_chon <> '----' THEN 1 ELSE 0 END),
+                COUNT(*), SUM(CASE WHEN COALESCE(dung_sai, 0) = 0 THEN 1 ELSE 0 END),
                 (SELECT nop_luc FROM luot WHERE ma_ca = ? AND sbd = ? AND lan_thu = ?), ?
            FROM chi_tiet_cau
           WHERE ma_ca = ? AND sbd = ? AND lan_thu = ? AND chuyen_de <> ''

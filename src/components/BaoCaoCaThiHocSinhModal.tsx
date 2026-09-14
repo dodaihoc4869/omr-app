@@ -3,6 +3,7 @@
 // Tuân thủ nghiêm ngặt: Không dùng mã màu hex trong file .tsx.
 
 import { useEffect, useState, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import {
   X,
   Award,
@@ -54,6 +55,7 @@ interface Props {
   onBatDauKhacPhuc: (maCa: string) => void
   onMoLaiBaiThi?: (maCa: string) => void
   extraTabs?: ExtraTabItem[]
+  tabMacDinh?: string
 }
 
 export default function BaoCaoCaThiHocSinhModal({
@@ -66,10 +68,11 @@ export default function BaoCaoCaThiHocSinhModal({
   onBatDauKhacPhuc,
   onMoLaiBaiThi,
   extraTabs,
+  tabMacDinh = 'tong_quan',
 }: Props) {
   const [dsCauSai, setDsCauSai] = useState<any[]>([])
   const [dangTaiCauSai, setDangTaiCauSai] = useState(false)
-  const [tabHienThi, setTabHienThi] = useState<string>('tong_quan')
+  const [tabHienThi, setTabHienThi] = useState<string>(tabMacDinh)
   const [cauSaiMoRong, setCauSaiMoRong] = useState<Record<string, boolean>>({})
   const [hienModalKhacPhuc, setHienModalKhacPhuc] = useState(false)
   const [dsLichSu, setDsLichSu] = useState<any[]>([])
@@ -137,14 +140,11 @@ export default function BaoCaoCaThiHocSinhModal({
   const diem = Number(baiThi.diem.toFixed(2))
   const tongCau = baiThi.tongCau && baiThi.tongCau > 0 ? baiThi.tongCau : null
   const soDung = typeof baiThi.soCauDung === 'number' ? baiThi.soCauDung : null
-  // Danh sách câu sai THẬT (lấy từ bảng chấm) vẫn là nguồn hợp lệ cho số sai.
+  // Danh sách câu sai (bao gồm cả câu chưa làm / bỏ trống)
   const soSaiRaw = typeof baiThi.soCauSai === 'number' ? baiThi.soCauSai : dsCauSai.length > 0 ? dsCauSai.length : null
-  const soSai = soSaiRaw !== null && tongCau !== null ? Math.min(soSaiRaw, Math.max(0, tongCau - (soDung ?? 0))) : soSaiRaw
+  const soSai = tongCau !== null && soDung !== null ? Math.max(0, tongCau - soDung) : soSaiRaw
   const coDemCau = tongCau !== null && soDung !== null
-  // BỎ TRỐNG = phần chênh giữa tổng câu với (đúng + sai). KHÔNG gộp vào "sai":
-  // em Đỗ Đại Học làm 6 câu trên đề 12 câu ca Test2, gọi 6 câu còn lại là sai
-  // thì vừa sai bản chất vừa oan cho em.
-  const soBoTrong = coDemCau && tongCau !== null ? Math.max(0, tongCau - (soDung ?? 0) - (soSai ?? 0)) : null
+  const soBoTrong = 0
   const tyLeChinhXac = coDemCau && tongCau !== null ? Math.min(100, Math.max(0, Math.round(((soDung ?? 0) / tongCau) * 100))) : null
 
   // Phân tích mức độ tiến bộ qua các ca thi
@@ -324,7 +324,8 @@ export default function BaoCaoCaThiHocSinhModal({
     ]
   }, [dsCauSai])
 
-  return (
+  if (typeof document === 'undefined') return null
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto animate-google-fade">
       <div className="relative w-full max-w-3xl my-auto bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden flex flex-col max-h-[92vh]">
         {/* Dải 4 màu thương hiệu Google */}
@@ -389,16 +390,10 @@ export default function BaoCaoCaThiHocSinhModal({
                           · Sai {soSai} câu
                         </span>
                       )}
-                      {(soBoTrong ?? 0) > 0 && (
-                        <span className="text-slate-400 dark:text-slate-500 font-semibold ml-1.5">
-                          · Chưa làm {soBoTrong} câu
-                        </span>
-                      )}
                     </div>
                   ) : (
                     <div className="text-sm font-semibold text-slate-600 dark:text-slate-300">
                       {(soSai ?? 0) > 0 ? `Sai ${soSai} câu` : 'Bài thi đã hoàn thành'}
-                      {(soBoTrong ?? 0) > 0 && ` · Chưa làm ${soBoTrong} câu`}
                     </div>
                   )}
                   <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -408,7 +403,7 @@ export default function BaoCaoCaThiHocSinhModal({
               </div>
 
               {/* Nút hành động 1 chạm sửa lỗi sai ngay */}
-              {((soSai ?? 0) > 0 || (soBoTrong ?? 0) > 0) && (
+              {(soSai ?? 0) > 0 && (
                 <div className="flex flex-col sm:items-end gap-2">
                   <button
                     type="button"
@@ -419,9 +414,7 @@ export default function BaoCaoCaThiHocSinhModal({
                   >
                     <Flame className="w-4 h-4 text-amber-200 animate-pulse" />
                     <span>
-                      {(soSai ?? 0) > 0
-                        ? `KHẮC PHỤC NGAY ${soSai} CÂU SAI`
-                        : `LUYỆN TẬP NGAY ${soBoTrong} CÂU CHƯA LÀM`}
+                      {`KHẮC PHỤC NGAY ${soSai} CÂU SAI`}
                     </span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
@@ -1002,6 +995,7 @@ export default function BaoCaoCaThiHocSinhModal({
           }}
         />
       )}
-    </div>
+    </div>,
+    document.body,
   )
 }

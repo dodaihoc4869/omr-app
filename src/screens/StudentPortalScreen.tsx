@@ -1178,14 +1178,9 @@ export default function StudentPortalScreen() {
                             <span>•</span>
                             <span>
                               Đúng <strong>{item.soCauDung ?? 0}</strong>/{item.tongCau} câu
-                              {(item.soCauSai ?? 0) > 0 && (
+                              {Math.max(0, item.tongCau - (item.soCauDung ?? 0)) > 0 && (
                                 <span className="text-rose-500 font-medium ml-1">
-                                  · Sai {item.soCauSai} câu
-                                </span>
-                              )}
-                              {(item.tongCau - (item.soCauDung ?? 0) - (item.soCauSai ?? 0)) > 0 && (
-                                <span className="text-slate-400 font-medium ml-1">
-                                  · Chưa làm {item.tongCau - (item.soCauDung ?? 0) - (item.soCauSai ?? 0)} câu
+                                  · Sai {Math.max(0, item.tongCau - (item.soCauDung ?? 0))} câu
                                 </span>
                               )}
                             </span>

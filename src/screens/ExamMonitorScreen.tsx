@@ -1890,16 +1890,13 @@ export default function ExamMonitorScreen() {
                   ...emTrongCa.graded.score.phanIII.items,
                 ].filter((x) => x.correct).length
               : undefined,
-            // SỐ SAI cũng từ đúng bảng ấy, nhưng CÂU BỎ TRỐNG KHÔNG TÍNH LÀ
-            // SAI. Em Đỗ Đại Học làm 6 câu trên đề 12 câu; gộp 6 câu bỏ trống
-            // vào "sai" là nói em sai 11 câu, sai bản chất và oan cho em.
-            // `flag === 'EMPTY'` là câu không có dấu nào.
+            // SỐ SAI: câu không đúng (kể cả câu chưa làm / bỏ trống) đều tính là sai.
             soCauSai: emTrongCa?.graded?.score
               ? [
                   ...emTrongCa.graded.score.phanI.items,
                   ...emTrongCa.graded.score.phanII.items,
                   ...emTrongCa.graded.score.phanIII.items,
-                ].filter((x) => !x.correct && x.flag !== 'EMPTY').length
+                ].filter((x) => !x.correct).length
               : undefined,
             // KHÔNG CÒN SỐ 40 BỊA RA. Ca đề riêng phát 12 câu, ca khác 28 —
             // in 40 lên báo cáo là sai với mọi ca. Không biết thì trả `null`.

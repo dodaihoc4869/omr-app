@@ -491,7 +491,7 @@ export default function ParentPortalScreen() {
                         {typeof b.tongSoCau === 'number' && b.tongSoCau > 0 && typeof b.soCauDung === 'number' && (
                           <>
                             <span>·</span>
-                            <span>Đúng <strong>{b.soCauDung}</strong>/{b.tongSoCau} câu{(b.soCauSai ?? 0) > 0 ? ` · Sai ${b.soCauSai} câu` : ''}{(b.tongSoCau - b.soCauDung - (b.soCauSai ?? 0)) > 0 ? ` · Chưa làm ${b.tongSoCau - b.soCauDung - (b.soCauSai ?? 0)} câu` : ''}</span>
+                            <span>Đúng <strong>{b.soCauDung}</strong>/{b.tongSoCau} câu{Math.max(0, b.tongSoCau - b.soCauDung) > 0 ? ` · Sai ${Math.max(0, b.tongSoCau - b.soCauDung)} câu` : ''}</span>
                           </>
                         )}
                         <span>·</span>

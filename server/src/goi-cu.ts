@@ -93,7 +93,7 @@ export async function hoSoEm(env: Env, b: Record<string, unknown>): Promise<Reco
     const rd = await env.DB.prepare(
       `SELECT ma_ca, COUNT(*) AS n,
               SUM(CASE WHEN dung_sai = 1 THEN 1 ELSE 0 END) AS dung,
-              SUM(CASE WHEN dung_sai = 0 AND dap_an_chon <> '' AND dap_an_chon <> '----' THEN 1 ELSE 0 END) AS sai
+              SUM(CASE WHEN COALESCE(dung_sai, 0) = 0 THEN 1 ELSE 0 END) AS sai
          FROM chi_tiet_cau WHERE sbd = ? AND ma_ca IN (${o}) GROUP BY ma_ca`,
     )
       .bind(sbd, ...maDs)
@@ -642,7 +642,7 @@ export async function lichSuEm(env: Env, b: Record<string, unknown>): Promise<Re
     const rc = await env.DB.prepare(
       `SELECT ma_ca, COUNT(*) AS n,
               SUM(CASE WHEN dung_sai = 1 THEN 1 ELSE 0 END) AS dung,
-              SUM(CASE WHEN dung_sai = 0 AND dap_an_chon <> '' AND dap_an_chon <> '----' THEN 1 ELSE 0 END) AS sai
+              SUM(CASE WHEN COALESCE(dung_sai, 0) = 0 THEN 1 ELSE 0 END) AS sai
          FROM chi_tiet_cau WHERE sbd = ? AND ma_ca IN (${o}) GROUP BY ma_ca`,
     )
       .bind(sbd, ...dong.map((x) => chuoi(x.ma_ca)))
@@ -1910,7 +1910,10 @@ export function danhGiaLuot(
     const chon = chuoi(daI[qid] ?? '').trim().toUpperCase()
     const dung = chuoi(q.correct ?? '').trim().toUpperCase()
     if (!chon) {
-      dsChiTiet.push({ ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'I', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: '', dap_an_dung: dung, dung_sai: null, ten_ca: tenCa })
+      soCauSai++
+      const item = { ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'I', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: '', dap_an_dung: dung, dung_sai: 0, ten_ca: tenCa, chua_lam: 1 }
+      dsChiTiet.push(item)
+      dsCauSai.push(item)
     } else if (chon === dung) {
       soCauDung++
       dsChiTiet.push({ ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'I', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: chon, dap_an_dung: dung, dung_sai: 1, ten_ca: tenCa })
@@ -1937,7 +1940,10 @@ export function danhGiaLuot(
       coChon = chon !== '' && chon !== '----'
     }
     if (!coChon) {
-      dsChiTiet.push({ ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'II', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: chon || '----', dap_an_dung: dung, dung_sai: null, ten_ca: tenCa })
+      soCauSai++
+      const item = { ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'II', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: chon || '----', dap_an_dung: dung, dung_sai: 0, ten_ca: tenCa, chua_lam: 1 }
+      dsChiTiet.push(item)
+      dsCauSai.push(item)
     } else if (chon === dung) {
       soCauDung++
       dsChiTiet.push({ ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'II', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: chon, dap_an_dung: dung, dung_sai: 1, ten_ca: tenCa })
@@ -1957,7 +1963,10 @@ export function danhGiaLuot(
     const normChon = chon.toLowerCase().replace(',', '.')
     const normDung = dung.toLowerCase().replace(',', '.')
     if (!chon) {
-      dsChiTiet.push({ ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'III', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: '', dap_an_dung: dung, dung_sai: null, ten_ca: tenCa })
+      soCauSai++
+      const item = { ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'III', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: '', dap_an_dung: dung, dung_sai: 0, ten_ca: tenCa, chua_lam: 1 }
+      dsChiTiet.push(item)
+      dsCauSai.push(item)
     } else if (normChon === normDung) {
       soCauDung++
       dsChiTiet.push({ ma_ca: maCa, sbd, lan_thu: lanThu, phan: 'III', so_cau: idx + 1, qid, chuyen_de: chuoi(q.chuyenDe), muc_do: chuoi(q.mucDo), dap_an_chon: chon, dap_an_dung: dung, dung_sai: 1, ten_ca: tenCa })
@@ -1976,7 +1985,8 @@ export function danhGiaLuot(
       if (!sq || qidDaXet.has(sq)) continue
       qidDaXet.add(sq)
       const phan = sq.includes('-II-') ? 'II' : sq.includes('-III-') ? 'III' : 'I'
-      dsChiTiet.push({
+      soCauSai++
+      const item = {
         ma_ca: maCa,
         sbd,
         lan_thu: lanThu,
@@ -1987,9 +1997,12 @@ export function danhGiaLuot(
         muc_do: '',
         dap_an_chon: '',
         dap_an_dung: '',
-        dung_sai: null,
+        dung_sai: 0,
         ten_ca: tenCa,
-      })
+        chua_lam: 1,
+      }
+      dsChiTiet.push(item)
+      dsCauSai.push(item)
     }
   }
 
@@ -2055,7 +2068,7 @@ export async function hsLichSuCa(env: Env, b: Record<string, unknown>): Promise<
     `SELECT l.ma_ca, l.lan_thu, l.nop_luc, l.vao_luc, l.diem_i, l.diem_ii, l.diem_iii, l.tong, l.dap_an_json,
             COALESCE(c.ten_ca, '') AS ten_ca, COALESCE(c.lop, '') AS lop, c.thoi_gian_phut, c.cong_bo,
             c.bo_theo_em_json, c.so_cau_json,
-            (SELECT COUNT(*) FROM chi_tiet_cau WHERE ma_ca = l.ma_ca AND sbd = l.sbd AND lan_thu = l.lan_thu AND dung_sai = 0 AND dap_an_chon <> '' AND dap_an_chon <> '----') AS so_cau_sai,
+            (SELECT COUNT(*) FROM chi_tiet_cau WHERE ma_ca = l.ma_ca AND sbd = l.sbd AND lan_thu = l.lan_thu AND COALESCE(dung_sai, 0) = 0) AS so_cau_sai,
             (SELECT COUNT(*) FROM chi_tiet_cau WHERE ma_ca = l.ma_ca AND sbd = l.sbd AND lan_thu = l.lan_thu AND dung_sai = 1) AS so_cau_dung,
             (SELECT COUNT(*) FROM chi_tiet_cau WHERE ma_ca = l.ma_ca AND sbd = l.sbd AND lan_thu = l.lan_thu) AS tong_cau
        FROM luot l
@@ -2185,7 +2198,7 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
             c.dap_an_chon, c.dap_an_dung, c.dung_sai, ca.ten_ca
        FROM chi_tiet_cau c
        LEFT JOIN ca ON ca.ma_ca = c.ma_ca
-      WHERE c.sbd = ? AND c.dung_sai = 0 AND c.dap_an_chon <> '' AND c.dap_an_chon <> '----'`
+      WHERE c.sbd = ? AND COALESCE(c.dung_sai, 0) = 0`
   const params: unknown[] = [sbd]
 
   if (dsMaCa.length > 0) {

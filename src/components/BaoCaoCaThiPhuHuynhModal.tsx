@@ -120,9 +120,8 @@ export default function BaoCaoCaThiPhuHuynhModal({
   const tongCau = baiThi.tongSoCau && baiThi.tongSoCau > 0 ? baiThi.tongSoCau : null
   const soDung = typeof baiThi.soCauDung === 'number' ? baiThi.soCauDung : null
   const soSaiRaw = typeof baiThi.soCauSai === 'number' ? baiThi.soCauSai : dsCauSai.length > 0 ? dsCauSai.length : null
-  const soSai = soSaiRaw !== null && tongCau !== null ? Math.min(soSaiRaw, Math.max(0, tongCau - (soDung ?? 0))) : soSaiRaw
+  const soSai = tongCau !== null && soDung !== null ? Math.max(0, tongCau - soDung) : soSaiRaw
   const coDemCau = tongCau !== null && soDung !== null
-  const soBoTrong = coDemCau && tongCau !== null ? Math.max(0, tongCau - (soDung ?? 0) - (soSai ?? 0)) : null
   const tyLeChinhXac = coDemCau && tongCau !== null ? Math.min(100, Math.max(0, Math.round(((soDung ?? 0) / tongCau) * 100))) : null
 
   // Phân tích mức độ tiến bộ của con dành riêng cho Phụ huynh
@@ -519,9 +518,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                       {coDemCau
-                        ? (soBoTrong ?? 0) > 0
-                          ? `Sai ${soSai} câu · Chưa làm ${soBoTrong} câu`
-                          : `Sai ${soSai} câu cần luyện lại`
+                        ? `Sai ${soSai} câu cần luyện lại`
                         : 'Chưa có bảng chấm'}
                     </p>
                   </div>
