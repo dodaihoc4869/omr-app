@@ -28,6 +28,9 @@ export interface CauSaiDauVao {
   hinhAnh?: string
   loiGiai?: string
   dang?: string | { ma?: string; ten?: string }
+  /** MÃ dạng do máy chủ trả kèm (`hsCauSai`). Khớp theo MÃ là khớp chắc; khớp
+   * theo tên thì hai tờ đề viết lệch một dấu là trượt. */
+  dangMa?: string
   maCa?: string
   tenCa?: string
 }
@@ -118,6 +121,13 @@ export function layNhanDanCauSai(c: CauSaiDauVao, banDo?: Map<string, DangCauKho
   if (banDo && banDo.has(c.qid)) {
     const d = banDo.get(c.qid)!
     if (d.ma) return { ma: d.ma, ten: d.ten || d.ma }
+  }
+  // MÃ do máy chủ trả kèm đứng trước tên: máy em không có kho nên không dựng
+  // được `banDo`, mà `dang` trả về chỉ là TÊN dạng — khớp tên là khớp hớ.
+  if (c.dangMa && String(c.dangMa).trim()) {
+    const ma = String(c.dangMa).trim()
+    const ten = typeof c.dang === 'string' && c.dang.trim() ? c.dang.trim() : ma
+    return { ma, ten }
   }
   if (c.dang) {
     if (typeof c.dang === 'string' && c.dang !== '[object Object]' && c.dang.trim()) {

@@ -30,6 +30,9 @@ export interface CauSaiXinKho {
   qid?: string
   chuyenDe?: string
   maCa?: string
+  /** MÃ dạng của câu sai. Có thì máy chủ lọc thẳng theo dạng — em sai tám dạng
+   * thì có câu cho cả tám, chứ không phải sáu mươi câu của một dạng. */
+  dangMa?: string
 }
 
 export interface KetQuaNapKho {
@@ -64,9 +67,10 @@ export async function napKhoChoMayEm(
 
   const maCa = String(dsCauSai.find((c) => c.maCa)?.maCa ?? '')
   const loaiTru = dsCauSai.map((c) => String(c.qid ?? '')).filter(Boolean)
+  const dsDang = [...new Set(dsCauSai.map((c) => String(c.dangMa ?? '').trim()).filter(Boolean))]
 
   try {
-    const kq = await cauKhacPhuc(scriptUrl, maCa, sbd.trim(), layIdThietBi(), chuyenDe, loaiTru, soCau)
+    const kq = await cauKhacPhuc(scriptUrl, maCa, sbd.trim(), layIdThietBi(), chuyenDe, loaiTru, soCau, dsDang)
     const nguon: TeacherExamSource[] = []
     for (const m of kq.nguon) {
       const doc = parseKhoDeJson(m.json)

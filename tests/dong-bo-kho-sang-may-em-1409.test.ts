@@ -61,8 +61,8 @@ const GOI_KHO = {
 }
 
 const CAU_SAI = [
-  { qid: 'T6-I-1', chuyenDe: 'Cân bằng hoá học', maCa: '614232' },
-  { qid: 'T6-I-2', chuyenDe: 'Cân bằng hoá học', maCa: '614232' },
+  { qid: 'T6-I-1', chuyenDe: 'Cân bằng hoá học', maCa: '614232', dangMa: 'CAN_BANG.CAN_BANG.XAC_DINH_CHIEU' },
+  { qid: 'T6-I-2', chuyenDe: 'Cân bằng hoá học', maCa: '614232', dangMa: 'ESTER.CAU_TAO.DEM_NGUYEN_TU' },
 ]
 
 beforeEach(() => goiCauKhacPhuc.mockReset())
@@ -73,13 +73,16 @@ describe('Máy em xin kho của máy chủ', () => {
     const kq = await napKhoChoMayEm('https://may-chu', '12109', CAU_SAI)
 
     expect(goiCauKhacPhuc).toHaveBeenCalledTimes(1)
-    const [, maCa, sbd, idTb, chuyenDe, loaiTru, soCau] = goiCauKhacPhuc.mock.calls[0]
+    const [, maCa, sbd, idTb, chuyenDe, loaiTru, soCau, dsDang] = goiCauKhacPhuc.mock.calls[0]
     expect(maCa).toBe('614232')
     expect(sbd).toBe('12109')
     expect(idTb).toBe('may-cua-em')
     expect(chuyenDe).toEqual(['Cân bằng hoá học'])
     expect(loaiTru).toEqual(['T6-I-1', 'T6-I-2'])
     expect(soCau).toBe(SO_CAU_XIN_KHO)
+    // MÃ DẠNG phải lên máy chủ, nếu không máy chủ lại gom theo chuyên đề và em
+    // sai tám dạng chỉ có câu cho một dạng — đúng lỗi thầy bắt 14/09.
+    expect(dsDang).toEqual(['CAN_BANG.CAN_BANG.XAC_DINH_CHIEU', 'ESTER.CAU_TAO.DEM_NGUYEN_TU'])
     expect(kq.loi).toBe('')
   })
 
@@ -149,5 +152,74 @@ describe('Modal khắc phục nối đúng đường', () => {
     expect(than).toContain('const [dangTaiKho, setDangTaiKho] = useState(false)')
     expect(than).toContain('Đang lấy câu cùng dạng từ máy chủ')
     expect(than).toContain('{!dangTaiKho && (loiRut || !coKhoDe) && (')
+  })
+})
+
+describe('Nhãn dạng của câu sai trên máy không có kho', () => {
+  it('ưu tiên MÃ dạng máy chủ trả kèm, không khớp mò theo tên', async () => {
+    const { layNhanDanCauSai } = await import('../src/lib/thuat-toan-rut-cau-sai')
+    const nhan = layNhanDanCauSai({
+      qid: 'T6-I-1',
+      soCau: 1,
+      phan: 'I',
+      dapAnDung: 'C',
+      text: 'Câu hỏi',
+      dang: 'Chuyển dịch cân bằng — xác định chiều',
+      dangMa: 'CAN_BANG.CAN_BANG.XAC_DINH_CHIEU',
+    })
+    expect(nhan.ma).toBe('CAN_BANG.CAN_BANG.XAC_DINH_CHIEU')
+    expect(nhan.ten).toBe('Chuyển dịch cân bằng — xác định chiều')
+  })
+
+  it('không có mã thì vẫn lùi về tên như cũ', async () => {
+    const { layNhanDanCauSai } = await import('../src/lib/thuat-toan-rut-cau-sai')
+    const nhan = layNhanDanCauSai({
+      qid: 'T6-I-2',
+      soCau: 2,
+      phan: 'I',
+      dapAnDung: 'A',
+      text: 'Câu hỏi',
+      dang: 'Chuyển dịch cân bằng — xác định chiều',
+    })
+    expect(nhan.ma).toBe('Chuyển dịch cân bằng — xác định chiều')
+  })
+})
+
+describe('Máy chủ lọc theo mã dạng', () => {
+  const srv = readFileSync(join(process.cwd(), 'server/src/goi-cu.ts'), 'utf8')
+  const than = srv.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')
+
+  it('hsCauSai trả MÃ dạng riêng, không chỉ tên', () => {
+    expect(than).toContain('export function maDang(')
+    expect(than).toContain('const dangMa = maDang(tuKho?.dang) || maDang(fullQ?.dang)')
+    expect(than).toContain('dangMa,')
+  })
+
+  it('cauKhacPhuc có đường riêng khi nhận dsDang', () => {
+    expect(than).toContain('const dsDang = new Set(')
+    expect(than).toContain('if (dsDang.size > 0 && env.DE)')
+    expect(than).toContain('return await goiTheoDang(env, {')
+  })
+
+  it('chia đều theo dạng, không để một dạng nuốt hết chỗ', () => {
+    // Vòng tròn qua từng mã dạng: mỗi vòng lấy một câu của mỗi dạng.
+    expect(than).toContain('for (let vong = 0; thuTu.length < x.soCau; vong++)')
+    expect(than).toContain('if (vong >= ds.length) continue')
+  })
+
+  it('cắt mỗi tờ đề còn đúng câu đã chọn, không trả trọn tờ', () => {
+    expect(than).toContain('const items = [...theoDeRa.entries()].map(([ma_de, cau]) => ({ ma_de, cau }))')
+  })
+
+  it('dạng nào không có câu nào thì nói ra, không im lặng', () => {
+    expect(than).toContain('dangThieu:')
+  })
+
+  it('vẫn loại câu em đã làm và câu vừa sai', () => {
+    expect(than).toContain('if (!qid || x.loaiTru.has(qid) || daLam.has(qid) || cauTheoQid.has(qid)) continue')
+  })
+
+  it('đường cũ (không có dsDang) KHÔNG đổi — màn làm bài vẫn dùng nó', () => {
+    expect(than).toContain('const xepDe = [...theoDe.entries()].sort((a, c) => c[1].length - a[1].length).slice(0, 8)')
   })
 })

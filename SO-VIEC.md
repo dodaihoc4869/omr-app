@@ -50,3 +50,20 @@ có tổ tiên `.q-card.mo` nào — lời giải nằm đó mà mắt không th
 
 Sửa: `CSS_MAY_CHIEU` thêm `.mc-giai .sol-box { opacity: 1 !important;
 transform: none !important; margin: 0 }`.
+
+### 3. Lọc theo MÃ DẠNG ngay trên máy chủ (đợt sửa thứ hai)
+
+Đo bản live sau đợt một: em sai 9 dạng mà chỉ 1 dạng có câu luyện (6 ứng viên).
+Nguyên nhân: `cauKhacPhucGoi` gom câu theo CHUYÊN ĐỀ rồi xếp tờ đề theo số câu
+dùng được và lấy đủ `soCau` từ tờ ĐẦU — tối ưu "ít byte nhất cho N câu", đúng
+với việc nó sinh ra (dựng phiếu bài tập), nhưng màn khắc phục cần vùng chọn
+rộng theo DẠNG, mà dạng rải khắp các tờ.
+
+Sửa:
+- `hsCauSai` trả thêm `dangMa` (mã dạng riêng, không chỉ tên).
+- `cauKhacPhucGoi` nhận `dsDang`: mở tới 10 tờ đề, mỗi tờ CẮT còn đúng câu cùng
+  mã dạng, chia đều theo vòng tròn qua từng dạng. Gói trả về vì thế NHỎ hơn
+  đường cũ dù đọc nhiều tờ hơn. Dạng nào không có câu thì trả trong `dangThieu`.
+- Đường cũ (không gửi `dsDang`) GIỮ NGUYÊN — màn làm bài vẫn dùng nó.
+- `layNhanDanCauSai` ưu tiên MÃ dạng máy chủ trả kèm; máy em không có kho nên
+  không dựng được `banDo`, khớp theo tên là khớp hớ.

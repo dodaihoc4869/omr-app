@@ -1748,6 +1748,97 @@ export async function guiNhanXetCoQuyen(env: Env, b: Record<string, unknown>, la
  *
  * TRẦN 8 GÓI ĐỀ một lượt: mỗi gói vài trăm KB, tải cả kho về máy em là đúng cái
  * đã làm đường cũ mất hơn 20 giây. */
+/** Số tờ đề mở ra để tìm câu cùng dạng. Mỗi tờ ~400 KB trên R2, đọc trong
+ * cùng mạng Cloudflare nên rẻ; gói TRẢ VỀ thì đã cắt còn đúng câu cùng dạng. */
+const TRAN_TO_DE_THEO_DANG = 10
+
+/** Gom câu CÙNG MÃ DẠNG từ nhiều tờ đề, mỗi tờ cắt còn đúng phần cần.
+ *
+ * CHIA ĐỀU THEO DẠNG, không để một dạng nuốt hết chỗ: đi vòng tròn qua các mã
+ * dạng, mỗi vòng lấy một câu. Em sai tám dạng thì phải có câu cho cả tám, chứ
+ * không phải sáu mươi câu của một dạng.
+ *
+ * CẤM BỊA: tờ nào đọc không được thì bỏ tờ ấy, không dựng câu thay. */
+async function goiTheoDang(
+  env: Env,
+  x: { dsDang: Set<string>; dong: Record<string, unknown>[]; loaiTru: Set<string>; sbd: string; soCau: number },
+): Promise<Record<string, unknown>> {
+  const daLam = new Set<string>()
+  if (x.sbd) {
+    const rL = await env.DB.prepare('SELECT qid FROM qid_da_lam WHERE sbd = ?').bind(x.sbd).all<Record<string, unknown>>()
+    for (const r of rL.results ?? []) daLam.add(chuoi(r.qid))
+  }
+
+  const theoDe = new Map<string, number>()
+  for (const r of x.dong) {
+    const m = chuoi(r.ma_de)
+    if (m) theoDe.set(m, (theoDe.get(m) ?? 0) + 1)
+  }
+  const dsMaDe = [...theoDe.entries()].sort((a, c) => c[1] - a[1]).slice(0, TRAN_TO_DE_THEO_DANG).map(([m]) => m)
+
+  // qid → câu, và mã dạng → danh sách qid
+  const cauTheoQid = new Map<string, { maDe: string; cau: Record<string, unknown> }>()
+  const qidTheoDang = new Map<string, string[]>()
+  for (const maDe of dsMaDe) {
+    let goi: any = null
+    try {
+      const o = await env.DE!.get(`kho/${maDe}.json`)
+      if (o?.body) goi = await new Response(o.body).json()
+    } catch (e) {
+      console.warn('[kho] không đọc được gói đề', maDe, e)
+    }
+    if (!goi) continue
+    const gom: any[] = Array.isArray(goi.cau) ? goi.cau : []
+    for (const k of ['phanI', 'phanII', 'phanIII']) if (Array.isArray(goi[k])) gom.push(...goi[k])
+    for (const c of gom) {
+      if (!c || typeof c !== 'object') continue
+      const ma = maDang(c.dang)
+      if (!ma || !x.dsDang.has(ma)) continue
+      const qid = chuoi(c.qid ?? c.id) || `${maDe}-${chuoi(c.phan).toUpperCase()}-${chuoi(c.so)}`
+      if (!qid || x.loaiTru.has(qid) || daLam.has(qid) || cauTheoQid.has(qid)) continue
+      cauTheoQid.set(qid, { maDe, cau: c })
+      if (!qidTheoDang.has(ma)) qidTheoDang.set(ma, [])
+      qidTheoDang.get(ma)!.push(qid)
+    }
+  }
+
+  // Vòng tròn qua từng dạng cho tới khi đủ số câu hoặc hết ứng viên.
+  const thuTu: string[] = []
+  const dsDangCo = [...qidTheoDang.keys()]
+  for (let vong = 0; thuTu.length < x.soCau; vong++) {
+    let themDuoc = false
+    for (const ma of dsDangCo) {
+      const ds = qidTheoDang.get(ma)!
+      if (vong >= ds.length) continue
+      thuTu.push(ds[vong])
+      themDuoc = true
+      if (thuTu.length >= x.soCau) break
+    }
+    if (!themDuoc) break
+  }
+
+  // Cắt gói: mỗi tờ chỉ còn đúng câu đã chọn.
+  const chon = new Set(thuTu)
+  const theoDeRa = new Map<string, unknown[]>()
+  for (const qid of thuTu) {
+    const v = cauTheoQid.get(qid)!
+    if (!theoDeRa.has(v.maDe)) theoDeRa.set(v.maDe, [])
+    theoDeRa.get(v.maDe)!.push(v.cau)
+  }
+  const items = [...theoDeRa.entries()].map(([ma_de, cau]) => ({ ma_de, cau }))
+
+  return {
+    ok: true,
+    items,
+    soCau: thuTu.length,
+    soChon: cauTheoQid.size,
+    thuTu,
+    catBotViNang: cauTheoQid.size > chon.size,
+    // Nói rõ dạng nào không tìm được câu nào — để màn hình khỏi im lặng.
+    dangThieu: [...x.dsDang].filter((m) => !qidTheoDang.has(m)),
+  }
+}
+
 export async function cauKhacPhucGoi(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const sbd = chuoi(b.sbd).trim()
   const soCau = Math.max(1, Math.min(60, Number(b.soCau) || 20))
@@ -1771,6 +1862,34 @@ export async function cauKhacPhucGoi(env: Env, b: Record<string, unknown>): Prom
   )
     .bind(...dsCd)
     .all<Record<string, unknown>>()
+
+  // ĐƯỜNG RIÊNG CHO MÀN KHẮC PHỤC: LỌC THEO MÃ DẠNG.
+  //
+  // Thầy bắt được 14/09: trên máy em, 9 dạng sai mà chỉ 1 dạng có câu luyện.
+  // Đường cũ gom câu theo CHUYÊN ĐỀ rồi xếp tờ đề theo số câu dùng được và lấy
+  // câu từ tờ đầu cho đủ `soCau` — tối ưu cho "ít byte nhất cho N câu", đúng
+  // với việc nó sinh ra (dựng một phiếu bài tập). Nhưng màn khắc phục cần VÙNG
+  // CHỌN rộng theo DẠNG, mà dạng thì rải khắp các tờ; lấy trọn tờ đầu là tám
+  // dạng còn lại không có lấy một ứng viên.
+  //
+  // Nên khi có `dsDang`, đi đường khác hẳn: mở nhiều tờ hơn, và mỗi tờ chỉ giữ
+  // lại đúng những câu CÙNG MÃ DẠNG. Gói trả về vì thế nhỏ hơn đường cũ dù đọc
+  // nhiều tờ hơn.
+  //
+  // `cau_hoi` chưa có cột mã dạng nên không lọc được bằng SQL; mã dạng nằm
+  // trong gói kho. Vẫn rẻ: chỉ đọc R2, không đọc thêm D1.
+  const dsDang = new Set(
+    (Array.isArray(b.dsDang) ? (b.dsDang as unknown[]) : []).map((x) => chuoi(x).trim()).filter(Boolean),
+  )
+  if (dsDang.size > 0 && env.DE) {
+    return await goiTheoDang(env, {
+      dsDang,
+      dong: rCau.results ?? [],
+      loaiTru,
+      sbd,
+      soCau,
+    })
+  }
 
   const daLam = new Set<string>()
   if (sbd) {
@@ -2054,6 +2173,12 @@ export function chuoiLoiGiai(raw: unknown): string {
   if (typeof raw === 'object') return JSON.stringify(raw)
   const s = chuoi(raw)
   return s === '[object Object]' ? '' : s
+}
+
+/** MÃ dạng (chuỗi `ma` trong bảng đóng `kho-de/DANG-BAI.md`), rỗng khi chưa gắn. */
+export function maDang(raw: unknown): string {
+  if (!raw || typeof raw !== 'object') return ''
+  return chuoi((raw as Record<string, unknown>).ma || '')
 }
 
 /** Nhãn dạng về một chuỗi tên dạng. */
@@ -2556,6 +2681,9 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
     const dangStr =
       chuoiDang(tuKho?.dang) ||
       chuoiDang(fullQ ? (fullQ.dang ?? fullQ.tenDang ?? fullQ.chuyenDe ?? fullQ.chuyen_de) : null)
+    // MÃ DẠNG đi RIÊNG với tên dạng. Máy em gửi mã này lên để xin câu cùng dạng;
+    // gửi tên thì hai tờ đề viết tên khác nhau một dấu là trượt.
+    const dangMa = maDang(tuKho?.dang) || maDang(fullQ?.dang)
 
     return {
       maCa,
@@ -2593,6 +2721,7 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
       hinhAnh: fullQ ? (fullQ.hinhAnh || fullQ.hinh) : undefined,
       loiGiai: loiGiaiStr,
       dang: dangStr,
+      dangMa,
     }
   })
 
