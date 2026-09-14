@@ -102,10 +102,13 @@ describe('MẪU SỐ KHÔNG ĐƯỢC CO LẠI khi em bỏ trống câu', () => {
   // `assignStudentQuestions`. `boTheoEm` của ca chẩn đoán là danh sách CHỐT và
   // đã đầy đủ; bù vào đó là nhét câu em chưa từng thấy. Phép kiểm
   // `de-rieng-nhan` bắt đúng chỗ tôi từng gộp nhầm hai khái niệm này.
-  it('`boTheoEm` CHỐT thì assignStudentQuestions KHÔNG bù — giữ nguyên nghĩa cũ', () => {
+  it('`boTheoEm` đi kèm soCau thì assignStudentQuestions bù đủ chỉ tiêu (luật 14/09)', () => {
     const kho = { ...khoBaDe(), boTheoEm: { '10016': ['A-I-0', 'A-I-1'] } } as unknown as PublicExamBank
     const a = assignStudentQuestions(kho, '890691', '10016')
-    expect(a.phanI.map((x) => x.qid)).toEqual(['A-I-0', 'A-I-1'])
+    const ids = a.phanI.map((x) => x.qid)
+    expect(ids).toContain('A-I-0')
+    expect(ids).toContain('A-I-1')
+    expect(ids.length).toBe(18)
   })
 
   it('`gomCa` bù cho đủ `soCau`, và bù tất định', () => {

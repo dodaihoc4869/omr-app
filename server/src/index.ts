@@ -480,9 +480,9 @@ async function layDe(env: Env, maCa: string): Promise<Response> {
   if (!env.DE) return ra({ ok: false, lyDo: 'chua_noi_r2' }, 500)
   const o = await env.DE.get(ca.bank_r2)
   if (!o) return ra({ ok: false, lyDo: 'mat_goi_de' }, 404)
-  // Gói đề của một ca không đổi sau khi phát ⇒ cho bộ đệm biên giữ lâu.
+  // Gói đề có thể được nối thêm câu khi mở ca đề riêng ⇒ revalidate với etag
   return new Response(o.body, {
-    headers: { ...JSON_HEADERS, 'cache-control': 'public, max-age=86400', etag: o.httpEtag },
+    headers: { ...JSON_HEADERS, 'cache-control': 'no-cache, must-revalidate', etag: o.httpEtag },
   })
 }
 

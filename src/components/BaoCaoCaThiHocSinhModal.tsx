@@ -16,6 +16,7 @@ import {
   ArrowRight,
   Flame,
   TrendingUp,
+  FileQuestion,
 } from 'lucide-react'
 import { hsCauSaiApi, hsLichSuCaApi } from '../lib/exam-api'
 import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
@@ -385,18 +386,19 @@ export default function BaoCaoCaThiHocSinhModal({
                       Đúng <strong className="text-emerald-600 dark:text-emerald-400">{soDung}</strong>/{tongCau} câu
                       {(soSai ?? 0) > 0 && (
                         <span className="text-rose-500 dark:text-rose-400 font-bold ml-1.5">
-                          (sai {soSai} câu)
+                          · Sai {soSai} câu
                         </span>
                       )}
                       {(soBoTrong ?? 0) > 0 && (
                         <span className="text-slate-400 dark:text-slate-500 font-semibold ml-1.5">
-                          · bỏ trống {soBoTrong} câu
+                          · Chưa làm {soBoTrong} câu
                         </span>
                       )}
                     </div>
                   ) : (
                     <div className="text-sm font-semibold text-slate-600 dark:text-slate-300">
                       {(soSai ?? 0) > 0 ? `Sai ${soSai} câu` : 'Bài thi đã hoàn thành'}
+                      {(soBoTrong ?? 0) > 0 && ` · Chưa làm ${soBoTrong} câu`}
                     </div>
                   )}
                   <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -406,7 +408,7 @@ export default function BaoCaoCaThiHocSinhModal({
               </div>
 
               {/* Nút hành động 1 chạm sửa lỗi sai ngay */}
-              {(soSai ?? 0) > 0 && (
+              {((soSai ?? 0) > 0 || (soBoTrong ?? 0) > 0) && (
                 <div className="flex flex-col sm:items-end gap-2">
                   <button
                     type="button"
@@ -416,7 +418,11 @@ export default function BaoCaoCaThiHocSinhModal({
                     className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-500 text-white font-bold text-sm shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <Flame className="w-4 h-4 text-amber-200 animate-pulse" />
-                    <span>KHẮC PHỤC NGAY {soSai} CÂU SAI</span>
+                    <span>
+                      {(soSai ?? 0) > 0
+                        ? `KHẮC PHỤC NGAY ${soSai} CÂU SAI`
+                        : `LUYỆN TẬP NGAY ${soBoTrong} CÂU CHƯA LÀM`}
+                    </span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                   <span className="text-[11px] text-slate-400 dark:text-slate-500 text-center sm:text-right">
@@ -597,14 +603,38 @@ export default function BaoCaoCaThiHocSinhModal({
                   <span className="text-xs">Đang phân tích lời giải chi tiết từng câu sai...</span>
                 </div>
               ) : dsCauSai.length === 0 ? (
-                <div className="py-10 text-center rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 p-6">
-                  <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
-                  <div className="text-base font-bold text-emerald-800 dark:text-emerald-200">
-                    Không có câu sai nào trong ca thi này!
-                  </div>
-                  <div className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
-                    Chúc mừng em đã làm đúng tất cả các câu đã nộp trong ca thi này.
-                  </div>
+                <div className="py-10 text-center rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6">
+                  {soDung === tongCau && (tongCau ?? 0) > 0 ? (
+                    <>
+                      <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
+                      <div className="text-base font-bold text-emerald-800 dark:text-emerald-200">
+                        Tuyệt đối xuất sắc: Đúng tất cả {tongCau} câu!
+                      </div>
+                      <div className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+                        Chúc mừng em đã hoàn thành trọn vẹn và chính xác tất cả các câu trong ca thi này.
+                      </div>
+                    </>
+                  ) : (soBoTrong ?? 0) > 0 ? (
+                    <>
+                      <FileQuestion className="w-10 h-10 text-amber-500 mx-auto mb-2" />
+                      <div className="text-base font-bold text-slate-800 dark:text-slate-200">
+                        Không có câu làm sai, nhưng còn {soBoTrong} câu chưa làm
+                      </div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                        Em hãy ôn luyện lại kiến thức và dành thời gian làm hết các câu trong lần thi tiếp theo nhé.
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
+                      <div className="text-base font-bold text-emerald-800 dark:text-emerald-200">
+                        Không có câu sai nào trong ca thi này!
+                      </div>
+                      <div className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+                        Chúc mừng em đã làm đúng tất cả các câu đã nộp trong ca thi này.
+                      </div>
+                    </>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -939,7 +969,7 @@ export default function BaoCaoCaThiHocSinhModal({
             Đóng
           </button>
 
-          {(soSai ?? 0) > 0 && (
+          {((soSai ?? 0) > 0 || (soBoTrong ?? 0) > 0) && (
             <button
               type="button"
               onClick={() => {
@@ -948,7 +978,11 @@ export default function BaoCaoCaThiHocSinhModal({
               className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs shadow-md shadow-blue-500/20 inline-flex items-center gap-2 cursor-pointer"
             >
               <Flame className="w-4 h-4 text-amber-300" />
-              <span>Khắc phục ngay câu sai của ca này</span>
+              <span>
+                {(soSai ?? 0) > 0
+                  ? `Khắc phục ngay ${soSai} câu sai của ca này`
+                  : `Luyện tập ngay ${soBoTrong} câu chưa làm`}
+              </span>
             </button>
           )}
         </div>

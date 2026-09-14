@@ -483,11 +483,17 @@ export default function ParentPortalScreen() {
                           {b.tenCa}
                         </h3>
                       </div>
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex flex-wrap items-center gap-2">
                         <span className="flex items-center gap-1">
                           <Calendar size={12} />
                           <span>{b.ngayNop ? new Date(b.ngayNop).toLocaleDateString('vi-VN') : 'Đã thi'}</span>
                         </span>
+                        {typeof b.tongSoCau === 'number' && b.tongSoCau > 0 && typeof b.soCauDung === 'number' && (
+                          <>
+                            <span>·</span>
+                            <span>Đúng <strong>{b.soCauDung}</strong>/{b.tongSoCau} câu{(b.soCauSai ?? 0) > 0 ? ` · Sai ${b.soCauSai} câu` : ''}{(b.tongSoCau - b.soCauDung - (b.soCauSai ?? 0)) > 0 ? ` · Chưa làm ${b.tongSoCau - b.soCauDung - (b.soCauSai ?? 0)} câu` : ''}</span>
+                          </>
+                        )}
                         <span>·</span>
                         <span className="text-blue-600 dark:text-blue-400 font-medium">Xem báo cáo chi tiết</span>
                       </div>

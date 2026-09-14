@@ -176,17 +176,12 @@ describe('MẪU SỐ KHÔNG ĐƯỢC CO LẠI khi em bỏ trống câu', () => {
     expect(gradeFromKeyBank(khoCa(), MA_CA, '12125', BAI_12125, boCua('12125', BAI_12125)).score.total).toBeCloseTo(7.56, 2)
   })
 
-  // CHỐT CHẶN CHO NGƯỜI SỬA SAU. Truyền THẲNG danh sách qid trong bài (không
-  // qua `boCauTuBaiLam`) trông có vẻ gọn hơn, và với em trả lời đủ thì đúng —
-  // nhưng em bỏ trống một câu là mẫu số co lại và điểm bị THỔI LÊN. 12125 trả
-  // lời 7/8 câu Phần I: bù đúng ra 2,81, không bù thành 3,21.
-  it('KHÔNG được truyền thẳng qid trong bài — mẫu số co lại, điểm thổi lên', () => {
-    const khongBu = gradeFromKeyBank(khoCa(), MA_CA, '12125', BAI_12125, qidCua(BAI_12125)).score.phanIScore
-    const coBu = gradeFromKeyBank(khoCa(), MA_CA, '12125', BAI_12125, boCua('12125', BAI_12125)).score.phanIScore
-    // eslint-disable-next-line no-console
-    console.log(`[mẫu số] Phần I — không bù ${khongBu} (chia 7) · có bù ${coBu} (chia 8)`)
-    expect(khongBu).toBeGreaterThan(coBu)
-    expect(coBu).toBeCloseTo(2.81, 2)
+  // Luật 14/09: assignStudentQuestions tự động bảo toàn mẫu số 8 theo chỉ tiêu soCau.
+  it('mẫu số luôn bảo toàn đúng soCau — không co lại khi em bỏ trống', () => {
+    const khongQuaBo = gradeFromKeyBank(khoCa(), MA_CA, '12125', BAI_12125, qidCua(BAI_12125)).score.phanIScore
+    const coBo = gradeFromKeyBank(khoCa(), MA_CA, '12125', BAI_12125, boCua('12125', BAI_12125)).score.phanIScore
+    expect(khongQuaBo).toBeCloseTo(2.81, 2)
+    expect(coBo).toBeCloseTo(2.81, 2)
   })
 
   it('`giayCau` cũng là dấu vết: câu em XEM rồi bỏ trống vẫn vào bộ', () => {

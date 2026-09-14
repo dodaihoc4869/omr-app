@@ -520,7 +520,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                       {coDemCau
                         ? (soBoTrong ?? 0) > 0
-                          ? `Sai ${soSai} câu · Bỏ trống ${soBoTrong} câu`
+                          ? `Sai ${soSai} câu · Chưa làm ${soBoTrong} câu`
                           : `Sai ${soSai} câu cần luyện lại`
                         : 'Chưa có bảng chấm'}
                     </p>
@@ -774,7 +774,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
                           <div>
                             Con đã chọn:{' '}
                             <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-rose-600 text-white border border-rose-700">
-                              {c.dapAnChon || 'Bỏ trống'}
+                              {c.dapAnChon || 'Chưa làm'}
                             </span>
                           </div>
                           <div>

@@ -1259,18 +1259,132 @@ export async function capNhatKeyBank(env: Env, b: Record<string, unknown>): Prom
 export async function noiKhoCa(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const maCa = chuoi(b.maCa).trim()
   if (!maCa) return { ok: false, error: 'Thiếu mã ca' }
-  const bank = Array.isArray(b.bank) ? (b.bank as Record<string, unknown>[]) : []
-  const key = (b.keyBank ?? {}) as Record<string, unknown>
+
+  const bankObj = b.bank as Record<string, unknown> | undefined
+  let pI: any[] = []
+  let pII: any[] = []
+  let pIII: any[] = []
+  if (Array.isArray(b.bank)) {
+    for (const c of b.bank) {
+      const qid = chuoi(c?.id || c?.qid)
+      if (qid.includes('-II-') || chuoi(c?.phan) === 'II') pII.push(c)
+      else if (qid.includes('-III-') || chuoi(c?.phan) === 'III') pIII.push(c)
+      else pI.push(c)
+    }
+  } else if (bankObj && typeof bankObj === 'object') {
+    if (Array.isArray(bankObj.phanI)) pI = bankObj.phanI
+    if (Array.isArray(bankObj.phanII)) pII = bankObj.phanII
+    if (Array.isArray(bankObj.phanIII)) pIII = bankObj.phanIII
+  }
+
+  const dapAnMap = new Map<string, string>()
+  const keyObj = b.keyBank as Record<string, unknown> | undefined
+  if (keyObj && typeof keyObj === 'object') {
+    if (Array.isArray(keyObj.phanI) || Array.isArray(keyObj.phanII) || Array.isArray(keyObj.phanIII)) {
+      if (Array.isArray(keyObj.phanI)) {
+        for (const q of keyObj.phanI) {
+          const qid = chuoi(q?.id || q?.qid)
+          if (qid) dapAnMap.set(qid, chuoi(q?.correct ?? q?.answer ?? ''))
+        }
+      }
+      if (Array.isArray(keyObj.phanII)) {
+        for (const q of keyObj.phanII) {
+          const qid = chuoi(q?.id || q?.qid)
+          if (qid) {
+            let da = ''
+            if (Array.isArray(q?.correct)) da = q.correct.map((x: any) => x === true || x === 'D' ? 'D' : 'S').join('')
+            else if (Array.isArray(q?.ideas)) da = q.ideas.map((i: any) => i?.correct === true || i?.correct === 'D' ? 'D' : 'S').join('')
+            else da = chuoi(q?.correct ?? q?.answer ?? '')
+            dapAnMap.set(qid, da)
+          }
+        }
+      }
+      if (Array.isArray(keyObj.phanIII)) {
+        for (const q of keyObj.phanIII) {
+          const qid = chuoi(q?.id || q?.qid)
+          if (qid) dapAnMap.set(qid, chuoi(q?.correct ?? q?.answer ?? ''))
+        }
+      }
+    } else {
+      for (const [k, v] of Object.entries(keyObj)) {
+        dapAnMap.set(k, chuoi(v))
+      }
+    }
+  }
+
   const nay = NAY()
-  const lenh = bank.slice(0, 400).map((c) => {
-    const qid = chuoi(c.id) || chuoi(c.qid)
+  const tatCaCau = [...pI, ...pII, ...pIII]
+  const lenh = tatCaCau.slice(0, 400).map((c) => {
+    const qid = chuoi(c.id || c.qid)
+    const da = dapAnMap.get(qid) || ''
     return env.DB.prepare(
       `INSERT INTO kho_ca_them (khoa, ma_ca, qid, cau_json, dap_an, luc) VALUES (?, ?, ?, ?, ?, ?)
        ON CONFLICT(khoa) DO UPDATE SET cau_json = excluded.cau_json, dap_an = excluded.dap_an, luc = excluded.luc`,
-    ).bind(`${maCa}|${qid}`, maCa, qid, JSON.stringify(c), chuoi(key[qid]), nay)
+    ).bind(`${maCa}|${qid}`, maCa, qid, JSON.stringify(c), da, nay)
   })
   for (let i = 0; i < lenh.length; i += 100) await env.DB.batch(lenh.slice(i, i + 100))
-  return { ok: true, themBank: lenh.length, themKey: Object.keys(key).length }
+
+  if (env.DE && tatCaCau.length > 0) {
+    // 1. Cập nhật de/${maCa}.json trong R2
+    try {
+      const oDe = await env.DE.get(`de/${maCa}.json`)
+      let deHienTai: any = null
+      if (oDe?.body) {
+        try { deHienTai = await new Response(oDe.body).json() } catch {}
+      }
+      if (deHienTai && typeof deHienTai === 'object') {
+        const daCoI = new Set((deHienTai.phanI || []).map((x: any) => chuoi(x?.id || x?.qid)))
+        const daCoII = new Set((deHienTai.phanII || []).map((x: any) => chuoi(x?.id || x?.qid)))
+        const daCoIII = new Set((deHienTai.phanIII || []).map((x: any) => chuoi(x?.id || x?.qid)))
+
+        const themI = pI.filter((q) => { const id = chuoi(q?.id || q?.qid); return id && !daCoI.has(id) })
+        const themII = pII.filter((q) => { const id = chuoi(q?.id || q?.qid); return id && !daCoII.has(id) })
+        const themIII = pIII.filter((q) => { const id = chuoi(q?.id || q?.qid); return id && !daCoIII.has(id) })
+
+        if (themI.length > 0 || themII.length > 0 || themIII.length > 0) {
+          deHienTai.phanI = [...(deHienTai.phanI || []), ...themI]
+          deHienTai.phanII = [...(deHienTai.phanII || []), ...themII]
+          deHienTai.phanIII = [...(deHienTai.phanIII || []), ...themIII]
+          await env.DE.put(`de/${maCa}.json`, JSON.stringify(deHienTai))
+        }
+      }
+    } catch {}
+
+    // 2. Cập nhật key/${maCa}.json trong R2
+    try {
+      const oKey = await env.DE.get(`key/${maCa}.json`)
+      let keyHienTai: any = null
+      if (oKey?.body) {
+        try { keyHienTai = await new Response(oKey.body).json() } catch {}
+      }
+      if (keyHienTai && typeof keyHienTai === 'object') {
+        if (Array.isArray(keyHienTai.phanI) || Array.isArray(keyHienTai.phanII) || Array.isArray(keyHienTai.phanIII)) {
+          const kI = Array.isArray(keyObj?.phanI) ? keyObj.phanI : []
+          const kII = Array.isArray(keyObj?.phanII) ? keyObj.phanII : []
+          const kIII = Array.isArray(keyObj?.phanIII) ? keyObj.phanIII : []
+
+          const daCoKI = new Set((keyHienTai.phanI || []).map((x: any) => chuoi(x?.id || x?.qid)))
+          const daCoKII = new Set((keyHienTai.phanII || []).map((x: any) => chuoi(x?.id || x?.qid)))
+          const daCoKIII = new Set((keyHienTai.phanIII || []).map((x: any) => chuoi(x?.id || x?.qid)))
+
+          const themKI = kI.filter((q: any) => { const id = chuoi(q?.id || q?.qid); return id && !daCoKI.has(id) })
+          const themKII = kII.filter((q: any) => { const id = chuoi(q?.id || q?.qid); return id && !daCoKII.has(id) })
+          const themKIII = kIII.filter((q: any) => { const id = chuoi(q?.id || q?.qid); return id && !daCoKIII.has(id) })
+
+          if (themKI.length > 0 || themKII.length > 0 || themKIII.length > 0) {
+            keyHienTai.phanI = [...(keyHienTai.phanI || []), ...themKI]
+            keyHienTai.phanII = [...(keyHienTai.phanII || []), ...themKII]
+            keyHienTai.phanIII = [...(keyHienTai.phanIII || []), ...themKIII]
+            await env.DE.put(`key/${maCa}.json`, JSON.stringify(keyHienTai))
+          }
+        }
+      }
+    } catch {}
+  }
+
+  await env.DB.prepare('UPDATE ca SET cap_nhat_luc = ? WHERE ma_ca = ?').bind(nay, maCa).run().catch(() => {})
+
+  return { ok: true, themBank: lenh.length, themKey: dapAnMap.size }
 }
 
 

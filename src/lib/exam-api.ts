@@ -579,6 +579,9 @@ async function vaoThiQuaMayChuMoi(
       throw new Error('Gói đề tải về bị hỏng — báo Thầy đẩy lại đề cho ca này.')
     }
     if (!bank) throw new Error('Gói đề rỗng — báo Thầy đẩy lại đề cho ca này.')
+    if (r.soCau && (!bank.soCau || !bank.soCau.I)) {
+      bank.soCau = r.soCau as any
+    }
   }
 
   return {

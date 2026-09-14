@@ -377,7 +377,7 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duC
   if (Number(du.v) >= 3) return <PhieuV3 du={du} laCuaEm={laCuaEm} xinLink={xinLink} />
 
   const tk = du.thongKe
-  const dung = du.tongSoCau !== null ? du.tongSoCau - du.soCauSai : null
+  const dung = du.thongKe ? Math.max(0, du.thongKe.tongCau - du.thongKe.soSai - du.thongKe.soBoTrong) : (du.tongSoCau !== null ? Math.max(0, du.tongSoCau - du.soCauSai) : null)
   const chuyenDeCa = [...du.chuyenDeCa].sort((a, b) => b.soSai / Math.max(1, b.soCau) - a.soSai / Math.max(1, a.soCau))
   // Chỉ CA NÀY được biết chắc là ca đề riêng: `hoSoEm` của máy chủ không chở cờ
   // đó cho từng ca cũ, mà bịa ra thì sai. Mỗi báo cáo dựng ở thời điểm ca của
@@ -539,7 +539,7 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duC
             <div className="bc-o3">
               <OSo so={tk.giayCauDungTB !== null ? `${tk.giayCauDungTB}s` : null} ten="giây trung bình một câu ĐÚNG" />
               <OSo so={tk.giayCauSaiTB !== null ? `${tk.giayCauSaiTB}s` : null} ten="giây trung bình một câu SAI" />
-              <OSo so={tk.soBoTrong} ten="câu bỏ trống" />
+              <OSo so={tk.soBoTrong} ten="câu chưa làm" />
             </div>
             <DaiThoiGian cau={du.dai ?? []} tat={tat} />
             {tk.theoMucDo.length > 0 && (

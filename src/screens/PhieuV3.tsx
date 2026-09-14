@@ -142,8 +142,8 @@ export default function PhieuV3({ du, laCuaEm = false, xinLink }: { du: PhieuDay
   const hienHang = duocHienHang(ch, du.deRieng)
   const [moHet, setMoHet] = useState(false)
 
-  const soDung = du.tongSoCau !== null ? du.tongSoCau - du.soCauSai : null
   const boTrong = du.cauSai.filter((c) => !String(c.dapAnChon ?? '').trim())
+  const soDung = du.thongKe ? Math.max(0, du.thongKe.tongCau - du.thongKe.soSai - du.thongKe.soBoTrong) : (du.tongSoCau !== null ? Math.max(0, du.tongSoCau - du.soCauSai - boTrong.length) : null)
   const chac = du.chuyenDeCa.filter((c) => c.soCau > 0 && c.soSai === 0)
   const roi = du.chuyenDeCa.filter((c) => c.soSai > 0).sort((a, b) => b.soSai / b.soCau - a.soSai / a.soCau)
   const xung = laCuaEm ? 'em' : 'con'
@@ -172,9 +172,18 @@ export default function PhieuV3({ du, laCuaEm = false, xinLink }: { du: PhieuDay
             <span className="v3-loai">{classify(du.diem)}</span>
           </div>
           <div className="v3-dem">
-            {soDung !== null && du.tongSoCau !== null ? `Đúng ${soDung}/${du.tongSoCau} câu` : `Sai ${du.soCauSai} câu`}
-            {du.soCauSai > 0 ? ` · sai ${du.soCauSai} câu` : ''}
-            {boTrong.length > 0 ? ` · bỏ trống ${boTrong.length} câu` : ''}
+            {soDung !== null && du.tongSoCau !== null ? (
+              <>
+                {`Đúng ${soDung}/${du.tongSoCau} câu`}
+                {du.soCauSai > 0 ? ` · sai ${du.soCauSai} câu` : ''}
+                {boTrong.length > 0 ? ` · chưa làm ${boTrong.length} câu` : ''}
+              </>
+            ) : (
+              <>
+                {`Sai ${du.soCauSai} câu`}
+                {boTrong.length > 0 ? ` · chưa làm ${boTrong.length} câu` : ''}
+              </>
+            )}
           </div>
           {du.dongCauLap ? <div className="v3-dem">{du.dongCauLap}</div> : null}
           <Spark ds={du.lichSu.map((c) => ({ ngay: c.ngay, tong: c.tong, maCa: c.maCa }))} maCaRieng={caRieng} />
