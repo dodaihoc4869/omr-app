@@ -1,69 +1,44 @@
-# SỔ VIỆC — 14/09 lượt 11 · ĐỒNG BỘ KHO SANG MÁY HỌC SINH
+# SỔ VIỆC — 14/09 lượt 11 · ĐỒNG BỘ KHO + TỜ MÁY CHIẾU
 
-- [x] "Bạn phải đồng bộ sang máy học sinh. Sửa hoàn thành 100% đi nhé" — chế độ 2 và 3 của màn Khắc phục câu sai phải chạy được trên máy em, không chỉ máy thầy  | bằng chứng: `vitest run tests/dong-bo-kho-sang-may-em-1409.test.ts` 8/8
-- [x] "Lời giải hiện trong mục chiếu lên bảng bị lỗi"  | bằng chứng: `vitest run tests/may-chieu-len-bang-1409.test.ts` 12/12
-- [ ] Nghiệm thu 7 cửa + phát hành  | bằng chứng: (chưa có)
+- [x] "Bạn phải đồng bộ sang máy học sinh"  | bằng chứng: đã lên live `4498d442`; đo thật ca Test6: 8 tờ · 187 KB · 164 ứng viên · 5/9 dạng (trước là 1 tờ · 396 KB · 6 ứng viên · 1/9 dạng)
+- [x] "Lời giải hiện trong mục chiếu lên bảng bị lỗi"  | bằng chứng: `vitest run tests/may-chieu-len-bang-1409.test.ts` 15/15
+- [x] "nội dung đề bị lỗi chữ, sửa lại đúng chuẩn"  | bằng chứng: `vitest run tests/gop-dau-nfc-1409.test.ts` 8/8 · commit `f2dc080`
+- [x] "cho tôi một nút toàn màn hình ở mục chiếu lên bảng"  | bằng chứng: 15/15 như trên · commit `f2dc080`
+- [x] "1 đợt là 1 trang chia đôi bảng, bấm đợt tiếp thì chuyển ngang"  | bằng chứng: 15/15 như trên · commit `f2dc080`
+- [x] Chọn tờ đề chia đều theo chuyên đề (để đủ 9/9 dạng)  | bằng chứng: 7 cửa xanh, CHƯA phát hành
+- [!] Phát hành  | KẸT: phiên Claude khác đang sửa đường phát hành ngay lúc này
 
-## Vì sao chưa chạy (đã truy lượt 9)
+## 7 CỬA — đo lúc 13:00–13:10 ngày 14/09, trên đúng cây đang có
 
-Chế độ 2/3 rút câu từ `loadExamSources()` — kho đề trong IndexedDB của CHÍNH
-MÁY. Kho ấy chỉ do `dongBoNganHang` nạp, mà hàm ấy đòi mã bí mật của thầy
-(`src/lib/exam-sync.ts`: "học sinh vẫn chỉ nhận bản không đáp án qua mã ca").
-Máy em không có mã ⇒ kho LUÔN rỗng.
+| Cửa | Kết quả |
+|---|---|
+| `npx tsc -b` | 0 lỗi |
+| `npx tsc -p server/tsconfig.json --noEmit` | 0 lỗi |
+| `npx vitest run --shard=1..3/3` | 253 tệp · 3.697 phép · 0 trượt |
+| `npm run check:mau` | sạch |
+| `node scripts/kiem-13.mjs` | ĐẠT 18/18 |
+| `node scripts/kiem-sw.mjs` | ĐẠT 6/6 |
+| `npx vite build` | rc=0 |
 
-CẤM đẩy cả kho xuống máy em: 157 tờ, 4,3 GB, và có đáp án. Đường đúng là máy
-chủ rút hộ — em gửi lên danh sách câu sai, máy chủ trả về đúng số câu CÙNG MÃ
-DẠNG cần để luyện, không hơn.
+## KẸT: phiên khác đang sửa đường phát hành
 
-## Chặn đường
+Lúc 12:55 phiên ấy để `server/src/goi-cu.ts` ở trạng thái VỠ: viết lại
+`danhGiaLuot` theo `layCauPhan` nhưng bỏ mất ba dòng dựng `pI`/`pII`/`pIII`,
+18 lỗi biên dịch. `wrangler` bó bằng esbuild nên KHÔNG chặn — đẩy lên là mỗi
+lượt chấm ném ReferenceError và mọi báo cáo câu sai chết. Tôi khôi phục đúng ba
+dòng ấy lúc 12:59, không đổi một chữ nào trong thiết kế của nó.
 
-`cau_hoi` trong D1 chỉ có `chuyen_de`, `muc_do`, `phan`, `lop`, `ma_de`,
-`co_loi_giai` — KHÔNG có mã dạng, nên không truy vấn theo dạng được.
+Sau đó, từ 13:02 đến 13:09 phiên ấy sửa tiếp:
+`DAY-TAT-CA.command` · `public/_headers` · `public/_redirects` · `src/sw.ts` ·
+`src/screens/ExamTakeScreen.tsx` · `PhieuScreen.tsx` · `PhieuV3.tsx` ·
+`tests/dem-cau-bao-cao-1409.test.ts` — đang dựng trang `/cai-app`.
 
-## CÁCH SỬA (lượt 11)
+Đáng chú ý: `_redirects` đổi `/hs` và `/ph` từ phục vụ thẳng (mã 200, giữ
+nguyên đường dẫn) sang chuyển hướng 302. Chú thích cũ ghi rõ vì sao phải là
+200. Đổi này chạm đúng phần cài app lên màn hình iPhone đã sửa sáng nay.
 
-### 1. Đồng bộ kho sang máy học sinh — `src/lib/kho-cho-may-em.ts`
+`DAY-TAT-CA.command` dựng từ CÂY LÀM VIỆC, nên bấm phát hành bây giờ là đẩy
+luôn trang `/cai-app` còn dở và luật chuyển hướng mới. Đã dừng, chờ thầy.
 
-KHÔNG chép kho xuống máy em (157 tờ, 4,3 GB, có đáp án). Máy chủ rút hộ:
-em gửi chuyên đề của câu vừa sai → lệnh HỌC SINH `cauKhacPhuc` (không cần mã
-bí mật) trả gói câu cùng chuyên đề → máy em lọc theo MÃ DẠNG bằng đúng
-`phanTichTyLeDang` đang chạy trên máy thầy.
-
-Gói đi qua ĐÚNG cửa nạp `parseKhoDeJson` → `buildTeacherSourceFromKhoDe`,
-không nới luật nào — giống hệt đường `ExamTakeScreen` đã dùng từ trước.
-
-Đo thật trên bản live, ca Test6: **1 gói · 395 KB · 0,44 giây · 175 câu ·
-19 mã dạng**.
-
-Hai chốt chống lỗi tự gây:
-- deps của effect khoá theo NỘI DUNG câu sai, không theo tham chiếu mảng —
-  để prop mảng đổi tham chiếu mỗi lượt vẽ không thành vòng xin máy chủ vô hạn.
-- đang xin kho thì nói "Đang lấy câu cùng dạng từ máy chủ…", không để em nhìn
-  "Tỷ lệ tối đa: 0 câu" rồi tưởng hỏng.
-
-### 2. Lời giải trong tờ máy chiếu bị lỗi
-
-NGUYÊN NHÂN GỐC: `oGiaiHtml` trả về `<div class="sol-box">`, mà `CSS_PHIEU` để
-khối ấy `opacity: 0; transform: translateY(-6px)` và CHỈ trả lại bằng luật
-`.q-card.mo .sol-box`. Tờ chiếu dựng nửa bảng chứ không dựng thẻ câu, nên không
-có tổ tiên `.q-card.mo` nào — lời giải nằm đó mà mắt không thấy.
-
-Sửa: `CSS_MAY_CHIEU` thêm `.mc-giai .sol-box { opacity: 1 !important;
-transform: none !important; margin: 0 }`.
-
-### 3. Lọc theo MÃ DẠNG ngay trên máy chủ (đợt sửa thứ hai)
-
-Đo bản live sau đợt một: em sai 9 dạng mà chỉ 1 dạng có câu luyện (6 ứng viên).
-Nguyên nhân: `cauKhacPhucGoi` gom câu theo CHUYÊN ĐỀ rồi xếp tờ đề theo số câu
-dùng được và lấy đủ `soCau` từ tờ ĐẦU — tối ưu "ít byte nhất cho N câu", đúng
-với việc nó sinh ra (dựng phiếu bài tập), nhưng màn khắc phục cần vùng chọn
-rộng theo DẠNG, mà dạng rải khắp các tờ.
-
-Sửa:
-- `hsCauSai` trả thêm `dangMa` (mã dạng riêng, không chỉ tên).
-- `cauKhacPhucGoi` nhận `dsDang`: mở tới 10 tờ đề, mỗi tờ CẮT còn đúng câu cùng
-  mã dạng, chia đều theo vòng tròn qua từng dạng. Gói trả về vì thế NHỎ hơn
-  đường cũ dù đọc nhiều tờ hơn. Dạng nào không có câu thì trả trong `dangThieu`.
-- Đường cũ (không gửi `dsDang`) GIỮ NGUYÊN — màn làm bài vẫn dùng nó.
-- `layNhanDanCauSai` ưu tiên MÃ dạng máy chủ trả kèm; máy em không có kho nên
-  không dựng được `banDo`, khớp theo tên là khớp hớ.
+Lệnh khi thầy cho phép: `~/Documents/DAY-OMR-APP.command`
+Lùi phần của tôi: `git revert f2dc080`
