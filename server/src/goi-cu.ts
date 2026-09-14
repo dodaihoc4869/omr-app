@@ -130,6 +130,11 @@ export function goiDemCau(d: DemBangCham | undefined) {
     soCauBoTrong: d ? d.trong : null,
     soYDungII: d ? d.yDung : null,
     soYTongII: d ? d.yTong : null,
+    // SỐ CÂU CẦN KHẮC PHỤC = mọi câu KHÔNG đúng trọn vẹn (thầy chốt 14/09:
+    // "Câu bỏ trống cũng được tính vào khắc phục câu sai, câu đúng sai mà
+    // không đúng hết thì cũng tính vào khắc phục câu sai"). Đúng bằng số dòng
+    // `hsCauSai` trả về, vì lệnh ấy lọc `COALESCE(dung_sai,0) = 0`.
+    soCanKhacPhuc: d ? Math.max(0, d.tong - d.dung) : null,
   }
 }
 

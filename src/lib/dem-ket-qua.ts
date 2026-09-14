@@ -24,6 +24,8 @@
 //
 // Và đếm thêm theo Ý cho riêng phần II, vì đó mới là đơn vị máy chấm điểm.
 
+import { PHAN_NGHIN_THEO_Y_DUNG } from '../engine/score'
+
 export type PhanBai = 'I' | 'II' | 'III'
 
 export interface CauDeDem {
@@ -42,6 +44,15 @@ export interface KetQuaDem {
   soBoTrong: number
   /** Riêng phần II, đếm theo Ý — đơn vị máy chấm điểm. */
   yPhanII: { tong: number; dung: number }
+  /** SỐ CÂU CẦN KHẮC PHỤC = mọi câu KHÔNG đúng trọn vẹn.
+   *
+   * Thầy chốt 14/09: "Câu bỏ trống cũng được tính vào khắc phục câu sai, câu
+   * đúng sai mà không đúng hết thì cũng tính vào khắc phục câu sai."
+   *
+   * Nên đúng bằng `tongCau - soDung`, và cũng đúng bằng số dòng máy chủ trả về
+   * ở danh sách câu sai (`hsCauSai` lọc `COALESCE(dung_sai,0) = 0`, tức gộp cả
+   * câu bỏ trống lẫn câu phần II chưa trọn ý). Một con số, một luật, ba app. */
+  soCanKhacPhuc: number
 }
 
 const KY_TU_HOP_LE = new Set(['D', 'S', 'Đ'])
@@ -81,7 +92,7 @@ export function soYCuaCau(dapAnDung: unknown): number {
 }
 
 export function demKetQua(rows: CauDeDem[]): KetQuaDem {
-  const ra: KetQuaDem = { tongCau: 0, soDung: 0, soDungMotPhan: 0, soSai: 0, soBoTrong: 0, yPhanII: { tong: 0, dung: 0 } }
+  const ra: KetQuaDem = { tongCau: 0, soDung: 0, soDungMotPhan: 0, soSai: 0, soBoTrong: 0, yPhanII: { tong: 0, dung: 0 }, soCanKhacPhuc: 0 }
   for (const r of rows) {
     ra.tongCau++
     if (r.phan === 'II') {
@@ -98,12 +109,29 @@ export function demKetQua(rows: CauDeDem[]): KetQuaDem {
     else if (r.dungSai === null) ra.soBoTrong++
     else ra.soSai++
   }
+  ra.soCanKhacPhuc = Math.max(0, ra.tongCau - ra.soDung)
   return ra
 }
 
 /** Một dòng chữ tóm tắt, dùng y hệt ở cả ba app.
  *
  * Không bịa: thiếu số thì bỏ hẳn vế đó chứ không in số 0 cho đủ câu. */
+/** BIỂU ĐIỂM PHẦN II — ghi rõ mấy ý đúng thì được bao nhiêu điểm.
+ *
+ * Thầy chốt 14/09: "ghi rõ tính điểm cho mấy ý". Thang này là thang của chương
+ * trình 2018, tính theo PHẦN NGHÌN của trần một câu: 1 ý 10%, 2 ý 25%, 3 ý 50%,
+ * 4 ý 100%.
+ *
+ * ĐỌC THẲNG BẢNG CỦA BỘ CHẤM, không gõ lại: gõ lại là màn hình nói một đằng,
+ * máy cộng điểm một nẻo — và không ai phát hiện ra cho tới khi phụ huynh hỏi. */
+export const PHAN_TRAM_THEO_Y_DUNG: readonly number[] = PHAN_NGHIN_THEO_Y_DUNG.map((p) => p / 10)
+
+/** "đúng 3/4 ý · được 50% điểm câu". Dòng này hiện ngay cạnh câu phần II. */
+export function chuDiemTheoY(soYDung: number, soY = 4): string {
+  const y = Math.max(0, Math.min(4, Math.floor(soYDung)))
+  return `đúng ${y}/${soY} ý · được ${PHAN_TRAM_THEO_Y_DUNG[y] ?? 0}% điểm câu`
+}
+
 export function chuTomTat(k: KetQuaDem): string {
   const ve: string[] = [`Đúng ${k.soDung}/${k.tongCau} câu`]
   if (k.soDungMotPhan > 0) ve.push(`${k.soDungMotPhan} câu đúng một phần`)

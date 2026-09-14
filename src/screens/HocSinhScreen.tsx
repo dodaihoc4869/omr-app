@@ -7,6 +7,7 @@
 // Cùng hồ sơ này sẽ dùng lại cho lối vào từ mục Phụ huynh — không dựng hai màn.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
 import { useEffect, useMemo, useState } from 'react'
+import { goiBaiThi } from '../lib/goi-bao-cao'
 import { ArrowLeft, ChevronRight, FileText, History, KeyRound, RefreshCw, Search, Trash2, Sparkles, TrendingUp } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung, DauThe } from '../components/DesignSystem'
 import { KhoiChuyenDe, KhoiLichSuCa, toneXepLoai, ngayGio } from '../components/HoSoEmView'
@@ -356,21 +357,7 @@ export default function HocSinhScreen() {
         {/* MODAL BÁO CÁO CA THI HỌC SINH CHUẨN GOOGLE MATERIAL 3 */}
         {caBaoCao && hoSo && (
           <BaoCaoCaThiHocSinhModal
-            baiThi={{
-              maCa: caBaoCao.maCa,
-              tenCa: caBaoCao.tenCa || `Ca ${caBaoCao.maCa}`,
-              ngayThi: caBaoCao.nopLuc ? ngayGio(caBaoCao.nopLuc) : undefined,
-              diem: caBaoCao.tong ?? 0,
-              diemI: caBaoCao.diemI ?? null,
-              diemII: caBaoCao.diemII ?? null,
-              diemIII: caBaoCao.diemIII ?? null,
-              tongCau: caBaoCao.tongCau ?? undefined,
-              soCauDung: caBaoCao.soCauDung ?? undefined,
-              soCauSai: (caBaoCao.tongCau !== null && caBaoCao.tongCau !== undefined && caBaoCao.soCauDung !== null && caBaoCao.soCauDung !== undefined)
-                ? Math.max(0, caBaoCao.tongCau - caBaoCao.soCauDung)
-                : (caBaoCao.soCauSai ?? undefined),
-              lanThu: caBaoCao.lanThu,
-            }}
+            baiThi={goiBaiThi(caBaoCao, caBaoCao.nopLuc ? ngayGio(caBaoCao.nopLuc) : undefined)}
             hoTen={hoSo.em.hoTen || `SBD ${hoSo.em.sbd}`}
             sbd={hoSo.em.sbd}
             lop={hoSo.em.lop}

@@ -38,6 +38,7 @@ import LogoHocSinh from '../components/LogoHocSinh'
 import DauTruongGame from '../components/DauTruongGame'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import DongDemCau, { docSoDem } from '../components/DongDemCau'
+import { goiBaiThi } from '../lib/goi-bao-cao'
 import ModalKhacPhucCauSai from '../components/ModalKhacPhucCauSai'
 import type { CauSaiDauVao } from '../lib/thuat-toan-rut-cau-sai'
 import type { TuCongHocSinh } from './ExamTakeScreen'
@@ -576,7 +577,9 @@ export default function StudentPortalScreen() {
           // Mặc định chọn các ca có câu sai
           const coSai = new Set<string>()
           for (const it of resLs.items) {
-            if ((it.soCauSai ?? 0) > 0) coSai.add(it.maCa)
+            // CẦN KHẮC PHỤC, không phải chỉ "sai hẳn": câu bỏ trống và câu
+            // phần II chưa trọn ý cũng phải vào đề khắc phục.
+            if ((docSoDem(it)?.soCanKhacPhuc ?? 0) > 0) coSai.add(it.maCa)
           }
           setCacCaChon(coSai)
         }
@@ -1732,7 +1735,7 @@ export default function StudentPortalScreen() {
                 <div className="divide-y divide-slate-100 dark:divide-slate-800">
                   {dsLichSu.map((item) => {
                     const isSelected = cacCaChon.has(item.maCa)
-                    const coSai = (item.soCauSai ?? 0) > 0
+                    const coSai = (docSoDem(item)?.soCanKhacPhuc ?? 0) > 0
                     return (
                       <div
                         key={item.maCa}
@@ -1768,7 +1771,7 @@ export default function StudentPortalScreen() {
                         <div>
                           {coSai ? (
                             <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
-                              Sai {docSoDem(item)?.soSai ?? item.soCauSai} câu
+                              {docSoDem(item)?.soCanKhacPhuc ?? 0} câu cần khắc phục
                             </span>
                           ) : (
                             <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
@@ -1913,18 +1916,10 @@ export default function StudentPortalScreen() {
       {/* Modal Báo cáo ca thi chuẩn Google Material 3 - Mở tức thì & Thúc đẩy sửa sai ngay */}
       {caXemBaoCaoModal && auth && (
         <BaoCaoCaThiHocSinhModal
-          baiThi={{
-            maCa: caXemBaoCaoModal.maCa,
-            tenCa: caXemBaoCaoModal.tenCa || `Ca thi #${caXemBaoCaoModal.maCa}`,
-            ngayThi: caXemBaoCaoModal.nopLuc ? dinhDangNgayGio(caXemBaoCaoModal.nopLuc) : undefined,
-            diem: caXemBaoCaoModal.tong ?? 0,
-            diemI: caXemBaoCaoModal.diemI,
-            diemII: caXemBaoCaoModal.diemII,
-            diemIII: caXemBaoCaoModal.diemIII,
-            soCauDung: caXemBaoCaoModal.soCauDung,
-            soCauSai: caXemBaoCaoModal.soCauSai,
-            tongCau: caXemBaoCaoModal.tongCau,
-          }}
+          baiThi={goiBaiThi(
+            caXemBaoCaoModal,
+            caXemBaoCaoModal.nopLuc ? dinhDangNgayGio(caXemBaoCaoModal.nopLuc) : undefined,
+          )}
           hoTen={auth.hoTen}
           sbd={auth.sbd}
           lop={auth.lop}

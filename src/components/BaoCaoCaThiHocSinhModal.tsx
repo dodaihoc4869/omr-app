@@ -4,6 +4,9 @@
 
 import { useEffect, useState, useMemo } from 'react'
 import DongDemCau, { DongDemYPhanII, docSoDem } from './DongDemCau'
+import { chuDiemTheoY, soYCuaCau, soYDungPhanII } from '../lib/dem-ket-qua'
+import BieuDoTienBoGoogle from './BieuDoTienBoGoogle'
+import type { HoSoEm } from '../lib/exam-api'
 import { createPortal } from 'react-dom'
 import {
   X,
@@ -155,6 +158,15 @@ export default function BaoCaoCaThiHocSinhModal({
   // II vẫn bị in là "Sai 12 câu" — con số chọi thẳng vào cột điểm ngay cạnh nó.
   // Nay đọc đúng bốn con số máy chủ trả, qua một khuôn chung cho cả ba app.
   const dem = docSoDem(baiThi)
+  // SỐ CÂU CẦN KHẮC PHỤC — mọi câu KHÔNG đúng trọn vẹn.
+  //
+  // Thầy chốt 14/09: "Câu bỏ trống cũng được tính vào khắc phục câu sai, câu
+  // đúng sai mà không đúng hết thì cũng tính vào khắc phục câu sai."
+  //
+  // Con số này phải khớp ĐÚNG số dòng máy chủ trả về ở danh sách câu sai
+  // (`hsCauSai` lọc `COALESCE(dung_sai,0) = 0`). Bản trước dùng `soSai` — chỉ
+  // đếm câu sai hẳn — nên nút ghi "10 CÂU SAI" trong khi danh sách có 12 dòng.
+  const soKhacPhuc = dem ? dem.soCanKhacPhuc : dsCauSai.length
   const soSaiRaw = typeof baiThi.soCauSai === 'number' ? baiThi.soCauSai : dsCauSai.length > 0 ? dsCauSai.length : null
   const soSai = dem ? dem.soSai : soSaiRaw
   const soMotPhan = dem ? dem.soDungMotPhan : 0
@@ -164,79 +176,55 @@ export default function BaoCaoCaThiHocSinhModal({
   const tyLeChinhXac = coDemCau && tongCau !== null ? Math.min(100, Math.max(0, Math.round(((soDung ?? 0) / tongCau) * 100))) : null
 
   // Phân tích mức độ tiến bộ qua các ca thi
-  const phanTichTienBo = useMemo(() => {
-    if (!dsLichSu || dsLichSu.length === 0) {
-      return {
-        caTruoc: null,
-        chenhLech: 0,
-        danhGia: 'Điểm mốc xuất phát ban đầu',
-        bieuTuong: '🏁',
-        mauSac: 'text-blue-600 dark:text-blue-400',
-        nenSac: 'bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800',
-        diemCaoNhat: diem,
-        diemTrungBinh: diem,
-        tongSoCa: 1,
-        dsLichSuSapXep: [{ maCa: baiThi.maCa, tenCa: baiThi.tenCa, tong: diem, nopLuc: baiThi.ngayThi }],
-      }
+  // MỘT NGUỒN CHO BIỂU ĐỒ TIẾN BỘ — đúng dạng `chuoiTienBo` cần.
+  //
+  // Ca đang mở LUÔN có mặt, kể cả khi lịch sử máy chủ chưa kịp về: thầy mở báo
+  // cáo ngay sau khi em nộp thì `dsLichSu` còn rỗng, và một biểu đồ trống ở
+  // đúng lúc ấy trông như hỏng.
+  const caChoBieuDo = useMemo(() => {
+    const ds = (dsLichSu ?? [])
+      .filter((c: any) => c && c.maCa)
+      .map((c: any) => ({
+        maCa: String(c.maCa),
+        tenCa: String(c.tenCa ?? ''),
+        lop: '',
+        lanThu: Number(c.lanThu) || 1,
+        nopLuc: String(c.nopLuc ?? c.ngay ?? c.ngayNop ?? ''),
+        trangThai: 'da_nop',
+        diemI: c.diemI ?? null,
+        diemII: c.diemII ?? null,
+        diemIII: c.diemIII ?? null,
+        tong: typeof c.tong === 'number' ? c.tong : null,
+        tongCau: c.tongCau ?? null,
+        soCauDung: c.soCauDung ?? null,
+        soCauSai: c.soCauSai ?? null,
+        hang: null,
+        siSo: null,
+        soLanRoiMan: 0,
+      }))
+    if (!ds.some((c) => c.maCa === baiThi.maCa)) {
+      ds.push({
+        maCa: baiThi.maCa,
+        tenCa: baiThi.tenCa,
+        lop: '',
+        lanThu: baiThi.lanThu ?? 1,
+        nopLuc: baiThi.ngayThi || new Date().toISOString(),
+        trangThai: 'da_nop',
+        diemI: baiThi.diemI ?? null,
+        diemII: baiThi.diemII ?? null,
+        diemIII: baiThi.diemIII ?? null,
+        tong: diem,
+        tongCau: baiThi.tongCau ?? null,
+        soCauDung: baiThi.soCauDung ?? null,
+        soCauSai: baiThi.soCauSai ?? null,
+        hang: null,
+        siSo: null,
+        soLanRoiMan: 0,
+      })
     }
+    return ds as unknown as HoSoEm['ca']
+  }, [dsLichSu, baiThi, diem])
 
-    // Lọc các ca có điểm và sắp xếp theo thời gian tăng dần
-    const cacCaCoDiem = dsLichSu
-      .filter((c) => c.tong !== null && c.tong !== undefined)
-      .sort((a, b) => new Date(a.nopLuc || 0).getTime() - new Date(b.nopLuc || 0).getTime())
-
-    const viTriHienTai = cacCaCoDiem.findIndex((c) => c.maCa === baiThi.maCa)
-    const caTruoc = viTriHienTai > 0 ? cacCaCoDiem[viTriHienTai - 1] : (cacCaCoDiem.length > 1 ? cacCaCoDiem[cacCaCoDiem.length - 2] : null)
-
-    const diemCaTruoc = caTruoc && caTruoc.tong !== null ? Number(Number(caTruoc.tong).toFixed(2)) : null
-    const chenhLech = diemCaTruoc !== null ? Number((diem - diemCaTruoc).toFixed(2)) : 0
-
-    let danhGia = 'Điểm mốc xuất phát ban đầu'
-    let bieuTuong = '🏁'
-    let mauSac = 'text-blue-600 dark:text-blue-400'
-    let nenSac = 'bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800'
-
-    if (diemCaTruoc !== null) {
-      if (chenhLech >= 1.5) {
-        danhGia = 'Tiến bộ vượt bậc'
-        bieuTuong = '🚀'
-        mauSac = 'text-emerald-600 dark:text-emerald-400'
-        nenSac = 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800'
-      } else if (chenhLech >= 0.5) {
-        danhGia = 'Tiến bộ rõ rệt'
-        bieuTuong = '📈'
-        mauSac = 'text-teal-600 dark:text-teal-400'
-        nenSac = 'bg-teal-50 dark:bg-teal-950/50 border-teal-200 dark:border-teal-800'
-      } else if (chenhLech >= -0.5) {
-        danhGia = 'Giữ vững phong độ'
-        bieuTuong = '🎯'
-        mauSac = 'text-indigo-600 dark:text-indigo-400'
-        nenSac = 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-200 dark:border-indigo-800'
-      } else {
-        danhGia = 'Cần bứt phá & nỗ lực hơn'
-        bieuTuong = '💡'
-        mauSac = 'text-amber-600 dark:text-amber-400'
-        nenSac = 'bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800'
-      }
-    }
-
-    const tatCaDiem = cacCaCoDiem.map((c) => Number(c.tong) || 0)
-    const diemCaoNhat = tatCaDiem.length > 0 ? Math.max(...tatCaDiem, diem) : diem
-    const diemTrungBinh = tatCaDiem.length > 0 ? Number((tatCaDiem.reduce((a, b) => a + b, 0) / tatCaDiem.length).toFixed(2)) : diem
-
-    return {
-      caTruoc,
-      chenhLech,
-      danhGia,
-      bieuTuong,
-      mauSac,
-      nenSac,
-      diemCaoNhat,
-      diemTrungBinh,
-      tongSoCa: cacCaCoDiem.length,
-      dsLichSuSapXep: cacCaCoDiem,
-    }
-  }, [dsLichSu, baiThi.maCa, baiThi.tenCa, baiThi.ngayThi, diem])
 
   // Đánh giá sư phạm và thông điệp thôi thúc sửa sai
   const danhGia = useMemo(() => {
@@ -432,7 +420,7 @@ export default function BaoCaoCaThiHocSinhModal({
                   >
                     <Flame className="w-4 h-4 text-amber-200 animate-pulse" />
                     <span>
-                      {`KHẮC PHỤC NGAY ${soSai} CÂU SAI`}
+                      {`KHẮC PHỤC NGAY ${soKhacPhuc} CÂU SAI`}
                     </span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
@@ -480,7 +468,7 @@ export default function BaoCaoCaThiHocSinhModal({
               }`}
             >
               <AlertCircle className="w-4 h-4" />
-              <span>Câu sai cần chữa ({soSai})</span>
+              <span>Câu sai cần chữa ({soKhacPhuc})</span>
             </button>
 
             <button
@@ -657,6 +645,14 @@ export default function BaoCaoCaThiHocSinhModal({
                   {dsCauSai.map((c, idx) => {
                     const qidKey = c.qid || String(idx)
                     const moRong = Boolean(cauSaiMoRong[qidKey])
+                    // PHẦN II CHẤM THEO Ý — ghi rõ mấy ý đúng và mấy phần trăm
+                    // điểm câu (thầy chốt 14/09: "ghi rõ tính điểm cho mấy ý").
+                    // Không có dòng này thì em nhìn câu 3/4 ý nằm chung bảng
+                    // với câu sai sạch, tưởng mình mất trắng cả câu.
+                    const yDung = c.phan === 'II' ? soYDungPhanII(c.dapAnChon, c.dapAnDung) : null
+                    const laBoTrong = c.dungSai === null || c.dungSai === undefined
+                      ? !String(c.dapAnChon ?? '').replace(/-/g, '').trim()
+                      : false
                     const lg = chuanHoaLoiGiaiCau(
                       c.loiGiai,
                       c.phan || 'I',
@@ -696,6 +692,16 @@ export default function BaoCaoCaThiHocSinhModal({
                                 đây là chỗ em phải nhìn thấy đầu tiên trong cả
                                 bảng câu sai. Nền đỏ chữ trắng, cùng một kiểu ở
                                 cả ba cổng. */}
+                            {yDung !== null && yDung > 0 && (
+                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                                {chuDiemTheoY(yDung, soYCuaCau(c.dapAnDung))}
+                              </span>
+                            )}
+                            {laBoTrong && (
+                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                                Bỏ trống
+                              </span>
+                            )}
                             <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-rose-600 text-white border border-rose-700">
                               Em chọn: {c.dapAnChon || '—'}
                             </span>
@@ -848,115 +854,12 @@ export default function BaoCaoCaThiHocSinhModal({
 
           {/* TAB 4: MỨC TIẾN BỘ */}
           {tabHienThi === 'tien_bo' && (
-            <div className="space-y-4 animate-google-fade">
-              {/* Thẻ chỉ số tổng quan tiến bộ */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-700">
-                  <div>
-                    <span className="text-xs text-slate-400 uppercase tracking-wider font-bold">
-                      Đánh giá mức tiến bộ
-                    </span>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-2xl">{phanTichTienBo.bieuTuong}</span>
-                      <h4 className="text-lg font-black text-slate-900 dark:text-white">
-                        {phanTichTienBo.danhGia}
-                      </h4>
-                    </div>
-                  </div>
-
-                  <div className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 self-start sm:self-auto ${phanTichTienBo.nenSac} ${phanTichTienBo.mauSac}`}>
-                    <TrendingUp className="w-4 h-4" />
-                    <span>
-                      {phanTichTienBo.chenhLech > 0
-                        ? `Tăng +${phanTichTienBo.chenhLech.toFixed(2)} điểm`
-                        : phanTichTienBo.chenhLech < 0
-                        ? `Giảm ${phanTichTienBo.chenhLech.toFixed(2)} điểm`
-                        : 'Không đổi so với ca trước'}
-                    </span>
-                  </div>
-                </div>
-
-                {/* 3 Thẻ chỉ số tiến bộ */}
-                <div className="grid grid-cols-3 gap-2.5 pt-1 text-center">
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
-                    <div className="text-[11px] text-slate-400">Điểm ca này</div>
-                    <div className="text-lg sm:text-xl font-black text-blue-600 dark:text-blue-400 mt-0.5">
-                      {diem.toFixed(2)}
-                    </div>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
-                    <div className="text-[11px] text-slate-400">Ca trước đó</div>
-                    <div className="text-lg sm:text-xl font-black text-slate-700 dark:text-slate-300 mt-0.5">
-                      {phanTichTienBo.caTruoc && phanTichTienBo.caTruoc.tong !== null
-                        ? Number(phanTichTienBo.caTruoc.tong).toFixed(2)
-                        : '—'}
-                    </div>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
-                    <div className="text-[11px] text-slate-400">Điểm cao nhất</div>
-                    <div className="text-lg sm:text-xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
-                      {phanTichTienBo.diemCaoNhat.toFixed(2)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Lịch sử điểm các ca thi gần đây */}
-              {phanTichTienBo.dsLichSuSapXep.length > 0 && (
-                <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                      Tiến trình qua các ca thi ({phanTichTienBo.tongSoCa} ca)
-                    </span>
-                    <span className="text-xs text-slate-400">
-                      Trung bình: <strong>{phanTichTienBo.diemTrungBinh.toFixed(2)}</strong>/10
-                    </span>
-                  </div>
-
-                  <div className="space-y-2">
-                    {phanTichTienBo.dsLichSuSapXep.slice(-6).map((caItem: any, idx: number) => {
-                      const d = Number(caItem.tong) || 0
-                      const laCaHienTai = caItem.maCa === baiThi.maCa
-                      return (
-                        <div
-                          key={caItem.maCa || idx}
-                          className={`p-3 rounded-xl border flex items-center justify-between gap-3 text-xs transition-colors ${
-                            laCaHienTai
-                              ? 'bg-blue-50/70 dark:bg-blue-950/40 border-blue-300 dark:border-blue-700'
-                              : 'bg-slate-50 dark:bg-slate-900/40 border-slate-100 dark:border-slate-800'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2.5">
-                            <span className="font-mono font-bold text-slate-500">#{caItem.maCa}</span>
-                            <div>
-                              <div className="font-semibold text-slate-800 dark:text-slate-200">
-                                {caItem.tenCa || `Ca ${caItem.maCa}`}
-                                {laCaHienTai && (
-                                  <span className="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white">
-                                    Ca này
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-3">
-                            <div className="w-24 sm:w-32 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden hidden sm:block">
-                              <div
-                                className="h-full bg-blue-600 rounded-full"
-                                style={{ width: `${Math.min(100, Math.max(5, d * 10))}%` }}
-                              />
-                            </div>
-                            <span className="font-black text-sm text-slate-900 dark:text-white w-12 text-right">
-                              {d.toFixed(2)}
-                            </span>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
+            // MỘT BIỂU ĐỒ TIẾN BỘ DUY NHẤT CHO MỌI BÁO CÁO.
+            // Thầy chốt 14/09: "Mục mức độ tiến bộ đồng bộ đúng theo ảnh ở tất
+            // cả các báo cáo." Trước đây mỗi màn tự vẽ một kiểu — cùng một em,
+            // cùng bốn ca, ra ba hình khác nhau.
+            <div className="animate-google-fade">
+              <BieuDoTienBoGoogle ca={caChoBieuDo} />
             </div>
           )}
 
@@ -991,7 +894,7 @@ export default function BaoCaoCaThiHocSinhModal({
               <Flame className="w-4 h-4 text-amber-300" />
               <span>
                 {(soSai ?? 0) > 0
-                  ? `Khắc phục ngay ${soSai} câu sai của ca này`
+                  ? `Khắc phục ngay ${soKhacPhuc} câu sai của ca này`
                   : `Luyện tập ngay ${soBoTrong} câu chưa làm`}
               </span>
             </button>

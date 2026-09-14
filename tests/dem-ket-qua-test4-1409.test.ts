@@ -3,7 +3,7 @@
 // Thầy bắt được: em được 2,00 điểm phần II mà báo cáo in "Đúng 0/12 câu · Sai
 // 12 câu". Phép kiểm này dựng lại đúng 12 dòng ấy.
 import { describe, expect, it } from 'vitest'
-import { demKetQua, chuTomTat, soYDungPhanII, soYCuaCau, type CauDeDem } from '../src/lib/dem-ket-qua'
+import { demKetQua, chuTomTat, chuDiemTheoY, soYDungPhanII, soYCuaCau, type CauDeDem } from '../src/lib/dem-ket-qua'
 
 // Nguyên văn bảng chấm ca 814335, SBD 12121212.
 const TEST4: CauDeDem[] = [
@@ -100,6 +100,32 @@ describe('luật đếm', () => {
   })
 
   it('bảng chấm rỗng thì trả số không, không nổ', () => {
-    expect(demKetQua([])).toEqual({ tongCau: 0, soDung: 0, soDungMotPhan: 0, soSai: 0, soBoTrong: 0, yPhanII: { tong: 0, dung: 0 } })
+    expect(demKetQua([])).toEqual({ tongCau: 0, soDung: 0, soDungMotPhan: 0, soSai: 0, soBoTrong: 0, yPhanII: { tong: 0, dung: 0 }, soCanKhacPhuc: 0 })
+  })
+
+  it('SỐ CÂU CẦN KHẮC PHỤC gộp cả bỏ trống lẫn phần II chưa trọn ý', () => {
+    // Thầy chốt 14/09: "Câu bỏ trống cũng được tính vào khắc phục câu sai, câu
+    // đúng sai mà không đúng hết thì cũng tính vào khắc phục câu sai."
+    const k = demKetQua([
+      { phan: 'I', dapAnChon: 'A', dapAnDung: 'A', dungSai: true },
+      { phan: 'I', dapAnChon: 'A', dapAnDung: 'B', dungSai: false },
+      { phan: 'I', dapAnChon: '', dapAnDung: 'B', dungSai: null },
+      { phan: 'II', dapAnChon: 'DDDS', dapAnDung: 'DDDD', dungSai: false },
+    ])
+    expect(k.soCanKhacPhuc).toBe(3)
+    expect(k.soCanKhacPhuc).toBe(k.tongCau - k.soDung)
+    expect(k.soCanKhacPhuc).toBe(k.soSai + k.soDungMotPhan + k.soBoTrong)
+  })
+
+  it('ca Test4: cần khắc phục đủ 12 câu, không phải 10', () => {
+    expect(demKetQua(TEST4).soCanKhacPhuc).toBe(12)
+  })
+
+  it('ghi rõ tính điểm cho mấy ý, đúng thang của bộ chấm', () => {
+    expect(chuDiemTheoY(0)).toBe('đúng 0/4 ý · được 0% điểm câu')
+    expect(chuDiemTheoY(1)).toBe('đúng 1/4 ý · được 10% điểm câu')
+    expect(chuDiemTheoY(2)).toBe('đúng 2/4 ý · được 25% điểm câu')
+    expect(chuDiemTheoY(3)).toBe('đúng 3/4 ý · được 50% điểm câu')
+    expect(chuDiemTheoY(4)).toBe('đúng 4/4 ý · được 100% điểm câu')
   })
 })

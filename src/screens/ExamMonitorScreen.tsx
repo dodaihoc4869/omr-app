@@ -7,6 +7,7 @@
 // Xoá ca = xoá mềm, phải gõ đúng mã ca.
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { demKetQua } from '../lib/dem-ket-qua'
+import { goiBaiThi } from '../lib/goi-bao-cao'
 import { Check, RefreshCw, Trash2, ChevronRight, Images, FileSpreadsheet, FileJson, Lock, Unlock, Send, Pencil, LogIn, BarChart3, TrendingUp } from 'lucide-react'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
@@ -1876,42 +1877,27 @@ export default function ExamMonitorScreen() {
       {/* MODAL BÁO CÁO CA THI HỌC SINH CHUẨN GOOGLE MATERIAL 3 */}
       {sbdHoSo && (
         <BaoCaoCaThiHocSinhModal
-          baiThi={{
-            maCa: chiTiet ? chiTiet.ca.maCa : '',
-            tenCa: chiTiet ? (chiTiet.ca.tenCa || `Ca ${chiTiet.ca.maCa}`) : '',
-            ngayThi: emTrongCa?.moiNhat.nopLuc ? ngayGio(emTrongCa.moiNhat.nopLuc) : undefined,
-            diem: emTrongCa?.diem ?? emTrongCa?.graded?.score.total ?? 0,
-            diemI: emTrongCa?.graded?.score.phanIScore ?? null,
-            diemII: emTrongCa?.graded?.score.phanIIScore ?? null,
-            diemIII: emTrongCa?.graded?.score.phanIIIScore ?? null,
-            // ĐẾM THẬT TỪNG CÂU, KHÔNG SUY TỪ ĐIỂM.
-            //
-            // Bản trước: `Math.round((diem / 10) * tongCau)`. Em Đỗ Đại Học ca
-            // Test2 được 3,13 điểm trên đề 12 câu ⇒ ra "Đúng 4", trong khi bảng
-            // chấm chỉ có 1 câu đúng và 5 câu sai (em bỏ trống 6 câu). Hai con
-            // số trên cùng một dòng lấy từ hai nguồn khác nhau nên cộng lại
-            // không ra tổng: "Đúng 4/12 câu (sai 5 câu)".
-            soCauDung: demBangCham?.soDung,
-            // BỐN NHÓM RỜI NHAU. Bản trước gộp "chưa làm / bỏ trống" và câu
-            // phần II đúng một phần vào SAI, nên số sai luôn lớn hơn sự thật.
-            soCauSai: demBangCham?.soSai,
-            soCauDungMotPhan: demBangCham?.soDungMotPhan,
-            soCauBoTrong: demBangCham?.soBoTrong,
-            soYDungII: demBangCham?.yPhanII.dung,
-            soYTongII: demBangCham?.yPhanII.tong,
-            // KHÔNG CÒN SỐ 40 BỊA RA. Ca đề riêng phát 12 câu, ca khác 28 —
-            // in 40 lên báo cáo là sai với mọi ca. Không biết thì trả `null`.
-            // Ưu tiên SỐ DÒNG BẢNG CHẤM THẬT của chính em: ca đề riêng có thể
-            // phát cho em ít hơn chỉ tiêu ca nếu kho thiếu, và lúc ấy chỉ tiêu
-            // ca là con số của ca chứ không phải của em.
-            tongCau: demBangCham
-              ? demBangCham.tongCau
-              : soCauCa
-              ? soCauCa.I + soCauCa.II + soCauCa.III
-              : emTrongCa?.graded?.score
-                ? emTrongCa.graded.score.phanI.items.length + emTrongCa.graded.score.phanII.items.length + emTrongCa.graded.score.phanIII.items.length
-                : undefined,
-          }}
+          baiThi={goiBaiThi(
+            {
+              maCa: chiTiet ? chiTiet.ca.maCa : '',
+              tenCa: chiTiet ? chiTiet.ca.tenCa : '',
+              tong: emTrongCa?.diem ?? emTrongCa?.graded?.score.total ?? 0,
+              diemI: emTrongCa?.graded?.score.phanIScore,
+              diemII: emTrongCa?.graded?.score.phanIIScore,
+              diemIII: emTrongCa?.graded?.score.phanIIIScore,
+              // ĐẾM THẬT TỪNG CÂU TỪ BẢNG CHẤM, không suy từ điểm và không
+              // nhặt tay từng trường — `goiBaiThi` là cửa duy nhất, để màn này
+              // và cổng học sinh không bao giờ ra hai con số khác nhau nữa.
+              tongCau: demBangCham?.tongCau,
+              soCauDung: demBangCham?.soDung,
+              soCauSai: demBangCham?.soSai,
+              soCauDungMotPhan: demBangCham?.soDungMotPhan,
+              soCauBoTrong: demBangCham?.soBoTrong,
+              soYDungII: demBangCham?.yPhanII.dung,
+              soYTongII: demBangCham?.yPhanII.tong,
+            },
+            emTrongCa?.moiNhat.nopLuc ? ngayGio(emTrongCa.moiNhat.nopLuc) : undefined,
+          )}
           hoTen={emTrongCa?.hoTen || hoSo?.em.hoTen || `SBD ${sbdHoSo}`}
           sbd={sbdHoSo}
           lop={emTrongCa?.lop || hoSo?.em.lop}

@@ -1467,6 +1467,7 @@ export interface CaCuaEm {
   soCauBoTrong?: number | null
   soYDungII?: number | null
   soYTongII?: number | null
+  soCanKhacPhuc?: number | null
   hang: number | null
   siSo: number | null
   soLanRoiMan: number

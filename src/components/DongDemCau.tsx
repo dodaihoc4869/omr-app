@@ -17,6 +17,7 @@ export interface SoDemCau {
   soCauBoTrong?: number | null
   soYDungII?: number | null
   soYTongII?: number | null
+  soCanKhacPhuc?: number | null
 }
 
 const so = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) ? v : null)
@@ -40,6 +41,10 @@ export function docSoDem(x: SoDemCau | null | undefined): KetQuaDem | null {
     soSai: sai,
     soBoTrong: Math.max(0, tong - dung - motPhan - sai),
     yPhanII: { tong: so(x?.soYTongII) ?? 0, dung: so(x?.soYDungII) ?? 0 },
+    // MỌI CÂU KHÔNG ĐÚNG TRỌN VẸN đều phải khắc phục — thầy chốt 14/09. Tính
+    // tại đây chứ không tin con số máy chủ gửi kèm: nó phải luôn khớp với số
+    // dòng trong danh sách câu sai, và `tongCau - soDung` là định nghĩa ấy.
+    soCanKhacPhuc: Math.max(0, tong - dung),
   }
 }
 
