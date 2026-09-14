@@ -17,6 +17,124 @@ import type { D1PreparedStatement, Env } from './kieu'
 
 export const NAY = (): string => new Date().toISOString()
 
+// ĐẾM BẢNG CHẤM — CÙNG MỘT LUẬT VỚI `src/lib/dem-ket-qua.ts`.
+//
+// Thầy bắt được 14/09, ca 814335 "Test4": em được 2,00 điểm phần II mà báo cáo
+// in "Đúng 0/12 câu · Sai 12 câu". Hai lỗi đếm nằm ngay trong câu SQL cũ:
+//
+//   1. `COALESCE(dung_sai, 0) = 0` gộp CÂU BỎ TRỐNG vào câu sai. Em hết giờ bỏ
+//      trống 5 câu bị báo là làm sai 5 câu.
+//   2. Phần II chỉ tính "đúng" khi trúng CẢ BỐN Ý, nên câu đúng 3/4 ý — có
+//      điểm hẳn hoi — bị đếm là sai trọn. Ca Test4 có đúng hai câu như thế: em
+//      chọn SDDS/DDDS trong khi đáp án là DDDS/DDDD, tức sáu ý đúng trên tám.
+//
+// Nay tách bốn nhóm RỜI NHAU: đúng · đúng một phần (chỉ phần II) · sai · bỏ
+// trống, cộng lại đúng bằng tổng. Trả thêm số Ý phần II, vì ý mới là đơn vị máy
+// chấm điểm.
+//
+// Số ý mỗi câu phần II luôn là 4: phần II của hệ này dựng từ đúng 4 `ideas` và
+// xáo bằng `seededPermutation(4, …)`. Đó là cấu trúc, không phải con số đoán.
+const CHON_CHUAN = "replace(replace(upper(COALESCE(dap_an_chon,'')),'Đ','D'),'đ','D')"
+const DUNG_CHUAN = "replace(replace(upper(COALESCE(dap_an_dung,'')),'Đ','D'),'đ','D')"
+/** Số Ý ĐÚNG của một dòng phần II. Ô chưa tô (`-`) không bao giờ tính là đúng. */
+const Y_DUNG = [1, 2, 3, 4]
+  .map(
+    (i) =>
+      `(CASE WHEN substr(${CHON_CHUAN},${i},1) IN ('D','S')` +
+      ` AND substr(${CHON_CHUAN},${i},1) = substr(${DUNG_CHUAN},${i},1) THEN 1 ELSE 0 END)`,
+  )
+  .join(' + ')
+export const CHON_DEM_BANG_CHAM = `COUNT(*) AS n,
+       SUM(CASE WHEN dung_sai = 1 THEN 1 ELSE 0 END) AS dung,
+       SUM(CASE WHEN dung_sai IS NULL THEN 1 ELSE 0 END) AS trong,
+       SUM(CASE WHEN dung_sai = 0 AND phan = 'II' AND (${Y_DUNG}) > 0 THEN 1 ELSE 0 END) AS mot_phan,
+       SUM(CASE WHEN dung_sai = 0 AND NOT (phan = 'II' AND (${Y_DUNG}) > 0) THEN 1 ELSE 0 END) AS sai,
+       SUM(CASE WHEN phan = 'II' THEN (${Y_DUNG}) ELSE 0 END) AS y_dung,
+       SUM(CASE WHEN phan = 'II' THEN 4 ELSE 0 END) AS y_tong`
+
+export interface DemBangCham {
+  tong: number
+  dung: number
+  motPhan: number
+  sai: number
+  trong: number
+  yDung: number
+  yTong: number
+}
+
+export function docDemBangCham(x: Record<string, unknown>): DemBangCham {
+  return {
+    tong: Number(x.n) || 0,
+    dung: Number(x.dung) || 0,
+    motPhan: Number(x.mot_phan) || 0,
+    sai: Number(x.sai) || 0,
+    trong: Number(x.trong) || 0,
+    yDung: Number(x.y_dung) || 0,
+    yTong: Number(x.y_tong) || 0,
+  }
+}
+
+/** Bốn con số đếm câu + hai con số đếm ý, gắn y hệt nhau vào mọi gói trả về cho
+ * cả ba cổng. Ca chưa chấm ⇒ `null` hết, để màn hình giấu dòng đi chứ không in
+ * "Đúng 0/0 câu". */
+/** Cùng luật đếm, nhưng viết dưới dạng CÂU CON theo từng lượt thi — `hsLichSuCa`
+ * cần đếm theo bộ ba (ma_ca, sbd, lan_thu) chứ không gộp theo ca. */
+export function cauConDem(ten: string, dieuKien: string): string {
+  return `(SELECT COUNT(*) FROM chi_tiet_cau t WHERE t.ma_ca = l.ma_ca AND t.sbd = l.sbd AND t.lan_thu = l.lan_thu AND ${dieuKien}) AS ${ten}`
+}
+export function cauConTong(ten: string, bieuThuc: string): string {
+  return `(SELECT COALESCE(SUM(${bieuThuc}), 0) FROM chi_tiet_cau t WHERE t.ma_ca = l.ma_ca AND t.sbd = l.sbd AND t.lan_thu = l.lan_thu AND t.phan = 'II') AS ${ten}`
+}
+/** Cùng biểu thức `Y_DUNG` nhưng gọi cột qua bí danh `t` của câu con. */
+export const Y_DUNG_T = Y_DUNG.replace(/dap_an_chon/g, 't.dap_an_chon').replace(/dap_an_dung/g, 't.dap_an_dung')
+
+/** CÙNG LUẬT ĐẾM, CHẠY TRÊN MẢNG DÒNG BẢNG CHẤM trong bộ nhớ.
+ *
+ * Dùng khi ca chưa có `chi_tiet_cau` và máy chủ vừa tự chấm lại từ bài đã nộp:
+ * lúc ấy chưa có gì trong bảng để SQL đếm, nhưng kết quả phải ra ĐÚNG con số mà
+ * câu SQL kia sẽ cho ở lần đọc sau. */
+export function demTuChiTiet(ds: Array<Record<string, unknown>>): DemBangCham {
+  const ra: DemBangCham = { tong: 0, dung: 0, motPhan: 0, sai: 0, trong: 0, yDung: 0, yTong: 0 }
+  const chuan = (v: unknown) => chuoi(v).trim().toUpperCase().replace(/Đ/g, 'D')
+  for (const c of ds) {
+    ra.tong++
+    const ds1 = c.dung_sai === null || c.dung_sai === undefined ? null : Number(c.dung_sai) === 1
+    if (chuoi(c.phan) === 'II') {
+      const chon = chuan(c.dap_an_chon)
+      const dung = chuan(c.dap_an_dung)
+      let y = 0
+      for (let i = 0; i < Math.min(chon.length, dung.length, 4); i++) {
+        if ((chon[i] === 'D' || chon[i] === 'S') && chon[i] === dung[i]) y++
+      }
+      ra.yTong += 4
+      ra.yDung += y
+      if (ds1 === true) ra.dung++
+      else if (ds1 === null) ra.trong++
+      else if (y > 0) ra.motPhan++
+      else ra.sai++
+      continue
+    }
+    if (ds1 === true) ra.dung++
+    else if (ds1 === null) ra.trong++
+    else ra.sai++
+  }
+  return ra
+}
+
+export function goiDemCau(d: DemBangCham | undefined) {
+  return {
+    tongCau: d ? d.tong : null,
+    soCauDung: d ? d.dung : null,
+    soCauSai: d ? d.sai : null,
+    soCauDungMotPhan: d ? d.motPhan : null,
+    soCauBoTrong: d ? d.trong : null,
+    soYDungII: d ? d.yDung : null,
+    soYTongII: d ? d.yTong : null,
+  }
+}
+
+
+
 export function chuoi(v: unknown): string {
   return v === null || v === undefined ? '' : String(v)
 }
@@ -86,20 +204,18 @@ export async function hoSoEm(env: Env, b: Record<string, unknown>): Promise<Reco
   // SỐ CÂU THẬT CỦA TỪNG CA, đếm một lần từ bảng chấm — xem ghi chú ở
   // `lichSuEm`. Màn Hồ sơ của em và báo cáo phụ huynh đều đọc ba số này; thiếu
   // chúng thì màn tự suy ra từ điểm và in "Đúng 6/40 câu" cho một ca 12 câu.
-  const demCa = new Map<string, { tong: number; dung: number; sai: number }>()
+  const demCa = new Map<string, DemBangCham>()
   const maDs = [...new Set((rCa.results ?? []).map((x) => chuoi(x.ma_ca)).filter(Boolean))]
   if (maDs.length > 0) {
     const o = maDs.map(() => '?').join(',')
     const rd = await env.DB.prepare(
-      `SELECT ma_ca, COUNT(*) AS n,
-              SUM(CASE WHEN dung_sai = 1 THEN 1 ELSE 0 END) AS dung,
-              SUM(CASE WHEN COALESCE(dung_sai, 0) = 0 THEN 1 ELSE 0 END) AS sai
+      `SELECT ma_ca, ${CHON_DEM_BANG_CHAM}
          FROM chi_tiet_cau WHERE sbd = ? AND ma_ca IN (${o}) GROUP BY ma_ca`,
     )
       .bind(sbd, ...maDs)
       .all<Record<string, unknown>>()
     for (const x of rd.results ?? []) {
-      demCa.set(chuoi(x.ma_ca), { tong: Number(x.n) || 0, dung: Number(x.dung) || 0, sai: Number(x.sai) || 0 })
+      demCa.set(chuoi(x.ma_ca), docDemBangCham(x))
     }
   }
 
@@ -116,10 +232,7 @@ export async function hoSoEm(env: Env, b: Record<string, unknown>): Promise<Reco
       diemII: soHoacNull(x.diem_ii),
       diemIII: soHoacNull(x.diem_iii),
       tong: soHoacNull(x.tong),
-      // Ca chưa chấm ⇒ `null`, KHÔNG phải 0.
-      tongCau: d ? d.tong : null,
-      soCauDung: d ? d.dung : null,
-      soCauSai: d ? d.sai : null,
+      ...goiDemCau(d),
       hang: null,
       siSo: null,
       soLanRoiMan: Number(x.so_lan_roi_man) || 0,
@@ -636,19 +749,17 @@ export async function lichSuEm(env: Env, b: Record<string, unknown>): Promise<Re
   // SỐ CÂU LẤY TỪ BẢNG CHẤM của chính em — đúng tờ đề em nhận, kể cả ca đề
   // riêng (ca 561169 phát 12 câu cho mỗi em trong khi gói đề chứa 545 câu, nên
   // đếm theo gói đề là sai gấp bốn mươi lần).
-  const dem = new Map<string, { tong: number; dung: number; sai: number }>()
+  const dem = new Map<string, DemBangCham>()
   if (dong.length > 0) {
     const o = dong.map(() => '?').join(',')
     const rc = await env.DB.prepare(
-      `SELECT ma_ca, COUNT(*) AS n,
-              SUM(CASE WHEN dung_sai = 1 THEN 1 ELSE 0 END) AS dung,
-              SUM(CASE WHEN COALESCE(dung_sai, 0) = 0 THEN 1 ELSE 0 END) AS sai
+      `SELECT ma_ca, ${CHON_DEM_BANG_CHAM}
          FROM chi_tiet_cau WHERE sbd = ? AND ma_ca IN (${o}) GROUP BY ma_ca`,
     )
       .bind(sbd, ...dong.map((x) => chuoi(x.ma_ca)))
       .all<Record<string, unknown>>()
     for (const x of rc.results ?? []) {
-      dem.set(chuoi(x.ma_ca), { tong: Number(x.n) || 0, dung: Number(x.dung) || 0, sai: Number(x.sai) || 0 })
+      dem.set(chuoi(x.ma_ca), docDemBangCham(x))
     }
   }
 
@@ -668,11 +779,7 @@ export async function lichSuEm(env: Env, b: Record<string, unknown>): Promise<Re
         diemIII: soHoacNull(x.diem_iii),
         lanThu: Number(x.lan_thu) || 1,
         thoiGianPhut: Number(x.thoi_gian_phut) || 0,
-        // Ca CHƯA CHẤM thì để `null`, KHÔNG trả 0: "Đúng 0/0 câu" là một con số
-        // bịa, còn `null` để màn hình biết mà giấu dòng ấy đi.
-        tongCau: d ? d.tong : null,
-        soCauDung: d ? d.dung : null,
-        soCauSai: d ? d.sai : null,
+        ...goiDemCau(d),
       }
     }),
   }
@@ -2068,9 +2175,13 @@ export async function hsLichSuCa(env: Env, b: Record<string, unknown>): Promise<
     `SELECT l.ma_ca, l.lan_thu, l.nop_luc, l.vao_luc, l.diem_i, l.diem_ii, l.diem_iii, l.tong, l.dap_an_json,
             COALESCE(c.ten_ca, '') AS ten_ca, COALESCE(c.lop, '') AS lop, c.thoi_gian_phut, c.cong_bo,
             c.bo_theo_em_json, c.so_cau_json,
-            (SELECT COUNT(*) FROM chi_tiet_cau WHERE ma_ca = l.ma_ca AND sbd = l.sbd AND lan_thu = l.lan_thu AND COALESCE(dung_sai, 0) = 0) AS so_cau_sai,
-            (SELECT COUNT(*) FROM chi_tiet_cau WHERE ma_ca = l.ma_ca AND sbd = l.sbd AND lan_thu = l.lan_thu AND dung_sai = 1) AS so_cau_dung,
-            (SELECT COUNT(*) FROM chi_tiet_cau WHERE ma_ca = l.ma_ca AND sbd = l.sbd AND lan_thu = l.lan_thu) AS tong_cau
+            ${cauConDem('so_cau_sai', `t.dung_sai = 0 AND NOT (t.phan = 'II' AND (${Y_DUNG_T}) > 0)`)},
+            ${cauConDem('so_cau_dung', 't.dung_sai = 1')},
+            ${cauConDem('so_cau_mot_phan', `t.dung_sai = 0 AND t.phan = 'II' AND (${Y_DUNG_T}) > 0`)},
+            ${cauConDem('so_cau_trong', 't.dung_sai IS NULL')},
+            ${cauConTong('so_y_dung', `(${Y_DUNG_T})`)},
+            ${cauConTong('so_y_tong', '4')},
+            ${cauConDem('tong_cau', '1 = 1')}
        FROM luot l
        LEFT JOIN ca c ON c.ma_ca = l.ma_ca
       WHERE l.sbd = ? AND (l.trang_thai = 'da_nop' OR l.trang_thai = 'khoa' OR l.nop_luc IS NOT NULL)
@@ -2086,6 +2197,10 @@ export async function hsLichSuCa(env: Env, b: Record<string, unknown>): Promise<
     let rawTongCau = Number(x.tong_cau) || 0
     let rawSoDung = Number(x.so_cau_dung) || 0
     let rawSoSai = Number(x.so_cau_sai) || 0
+    let rawMotPhan = Number(x.so_cau_mot_phan) || 0
+    let rawTrong = Number(x.so_cau_trong) || 0
+    let rawYDung = Number(x.so_y_dung) || 0
+    let rawYTong = Number(x.so_y_tong) || 0
     const tongDiem = soHoacNull(x.tong)
     const dI = soHoacNull(x.diem_i)
     const dII = soHoacNull(x.diem_ii)
@@ -2105,18 +2220,26 @@ export async function hsLichSuCa(env: Env, b: Record<string, unknown>): Promise<
         } catch {}
         if (dapAnObj) {
           const dg = danhGiaLuot(bData, x, dapAnObj, sbd, maCa, Number(x.lan_thu) || 1, chuoi(x.ten_ca))
+          // ĐẾM LẠI TỪ CHÍNH BẢNG CHẤM VỪA DỰNG, cùng một luật với câu SQL ở
+          // trên — không dùng `dg.soCauSai` vì con số đó gộp cả câu bỏ trống
+          // lẫn câu phần II đúng một phần.
+          const d = demTuChiTiet(dg.dsChiTiet)
           rawTongCau = dg.tongCau
-          rawSoDung = dg.soCauDung
-          rawSoSai = dg.soCauSai
+          rawSoDung = d.dung
+          rawSoSai = d.sai
+          rawMotPhan = d.motPhan
+          rawTrong = d.trong
+          rawYDung = d.yDung
+          rawYTong = d.yTong
           void luuChiTietCauNeuChuaCo(env, maCa, sbd, Number(x.lan_thu) || 1, dg.dsChiTiet, dg.dsCauSai)
         }
       }
     }
 
     const coCham = rawTongCau > 0
-    const tongCau = coCham ? rawTongCau : null
-    const soCauDung = coCham ? rawSoDung : null
-    const soCauSai = coCham ? rawSoSai : null
+    const demCua: DemBangCham | undefined = coCham
+      ? { tong: rawTongCau, dung: rawSoDung, sai: rawSoSai, motPhan: rawMotPhan, trong: rawTrong, yDung: rawYDung, yTong: rawYTong }
+      : undefined
 
     items.push({
       maCa,
@@ -2128,9 +2251,7 @@ export async function hsLichSuCa(env: Env, b: Record<string, unknown>): Promise<
       diemII: dII,
       diemIII: dIII,
       thoiGianPhut: Number(x.thoi_gian_phut) || 0,
-      soCauSai,
-      soCauDung,
-      tongCau,
+      ...goiDemCau(demCua),
     })
   }
 

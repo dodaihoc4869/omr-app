@@ -6,6 +6,7 @@
 // xám chờ thi lại · tím đang làm · cam rời màn N lần · đỏ bị khoá · xanh đã nộp.
 // Xoá ca = xoá mềm, phải gõ đúng mã ca.
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { demKetQua } from '../lib/dem-ket-qua'
 import { Check, RefreshCw, Trash2, ChevronRight, Images, FileSpreadsheet, FileJson, Lock, Unlock, Send, Pencil, LogIn, BarChart3, TrendingUp } from 'lucide-react'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
@@ -1089,6 +1090,13 @@ export default function ExamMonitorScreen() {
     }
   }, [sbdHoSo, chiTiet, teacherBank, emTrongCa, soCauCa, boTheoEmDung])
 
+  // ĐẾM BẢNG CHẤM BẰNG ĐÚNG LUẬT DÙNG CHUNG CHO CẢ BA APP.
+  //
+  // Đếm từ `rowsHoSo` — chính bảng chấm đang bày trên màn — chứ không đếm lại
+  // từ `graded.score.items`: hai nguồn là hai con số, và đó là cách bản trước
+  // in "Đúng 4/12 câu (sai 5 câu)" trên cùng một dòng.
+  const demBangCham = useMemo(() => (rowsHoSo ? demKetQua(rowsHoSo) : null), [rowsHoSo])
+
   return (
     <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
       <div className="flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
@@ -1883,24 +1891,22 @@ export default function ExamMonitorScreen() {
             // chấm chỉ có 1 câu đúng và 5 câu sai (em bỏ trống 6 câu). Hai con
             // số trên cùng một dòng lấy từ hai nguồn khác nhau nên cộng lại
             // không ra tổng: "Đúng 4/12 câu (sai 5 câu)".
-            soCauDung: emTrongCa?.graded?.score
-              ? [
-                  ...emTrongCa.graded.score.phanI.items,
-                  ...emTrongCa.graded.score.phanII.items,
-                  ...emTrongCa.graded.score.phanIII.items,
-                ].filter((x) => x.correct).length
-              : undefined,
-            // SỐ SAI: câu không đúng (kể cả câu chưa làm / bỏ trống) đều tính là sai.
-            soCauSai: emTrongCa?.graded?.score
-              ? [
-                  ...emTrongCa.graded.score.phanI.items,
-                  ...emTrongCa.graded.score.phanII.items,
-                  ...emTrongCa.graded.score.phanIII.items,
-                ].filter((x) => !x.correct).length
-              : undefined,
+            soCauDung: demBangCham?.soDung,
+            // BỐN NHÓM RỜI NHAU. Bản trước gộp "chưa làm / bỏ trống" và câu
+            // phần II đúng một phần vào SAI, nên số sai luôn lớn hơn sự thật.
+            soCauSai: demBangCham?.soSai,
+            soCauDungMotPhan: demBangCham?.soDungMotPhan,
+            soCauBoTrong: demBangCham?.soBoTrong,
+            soYDungII: demBangCham?.yPhanII.dung,
+            soYTongII: demBangCham?.yPhanII.tong,
             // KHÔNG CÒN SỐ 40 BỊA RA. Ca đề riêng phát 12 câu, ca khác 28 —
             // in 40 lên báo cáo là sai với mọi ca. Không biết thì trả `null`.
-            tongCau: soCauCa
+            // Ưu tiên SỐ DÒNG BẢNG CHẤM THẬT của chính em: ca đề riêng có thể
+            // phát cho em ít hơn chỉ tiêu ca nếu kho thiếu, và lúc ấy chỉ tiêu
+            // ca là con số của ca chứ không phải của em.
+            tongCau: demBangCham
+              ? demBangCham.tongCau
+              : soCauCa
               ? soCauCa.I + soCauCa.II + soCauCa.III
               : emTrongCa?.graded?.score
                 ? emTrongCa.graded.score.phanI.items.length + emTrongCa.graded.score.phanII.items.length + emTrongCa.graded.score.phanIII.items.length

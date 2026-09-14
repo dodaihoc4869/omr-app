@@ -67,7 +67,9 @@ export interface CauLuyen {
    * Chỉ có khi câu được rút qua cổng `rutDeChua()`. Câu in lại đề em vừa làm
    * và câu rút tự do không có nhãn, và `html-phieu.ts` / `ve-bai-tap-pdf.ts`
    * vẫn chạy nguyên như cũ với câu không nhãn. */
-  chuaCho?: { qid: string; soCau: number; phan: 'I' | 'II' | 'III'; maDang: string; tenDang?: string; bac: 1 | 2; laLamLai?: true; theoChuyenDe?: true; daChon?: string; viSaoSai?: string }
+  /** `laDeCuaEm` — đây là CHÍNH TỜ ĐỀ em vừa làm, không phải phiếu khắc phục.
+   * Nhãn phải nói "em làm sai câu này", tuyệt đối không nói "khắc phục lỗi sai". */
+  chuaCho?: { qid: string; soCau: number; phan: 'I' | 'II' | 'III'; maDang: string; tenDang?: string; bac: 1 | 2; laLamLai?: true; theoChuyenDe?: true; daChon?: string; viSaoSai?: string; laDeCuaEm?: true; dapAnDung?: string }
 }
 
 /** CÂU NÀY CÓ ẢNH KHÔNG — một chỗ trả lời cho cả app.

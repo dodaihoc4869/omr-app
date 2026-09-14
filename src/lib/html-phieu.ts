@@ -526,6 +526,19 @@ body.co-lam .tf-item { padding: 9px 10px; }
    phân biệt được từ xa mà không phải đọc chữ. */
 .q-tag.chua-2 { background: #ffedd5; color: #9a3412; box-shadow: none; }
 .q-tag.chua-2::before { background: #c2410c; }
+/* NHÃN "EM LÀM SAI CÂU NÀY" — tờ ĐỀ CỦA EM, không phải phiếu khắc phục.
+   Màu đỏ chứ không cam: cam là màu của việc phải làm tiếp (khắc phục, luyện
+   thêm), đỏ là màu của chỗ đã sai. Nhìn một cái phải phân biệt được hai loại
+   tờ, vì thầy mở cả hai trong cùng một buổi. */
+.q-tag.sai-cua-em {
+  background: #c5221f; color: #ffffff; font-size: 12px; font-weight: 800;
+  padding: 4px 12px 4px 9px; letter-spacing: .015em;
+  box-shadow: 0 2px 6px rgba(197,34,31,.28);
+}
+.q-tag.sai-cua-em::before {
+  content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: #ffffff; margin-right: 7px; vertical-align: 1px;
+}
 /* Cả thẻ câu cũng đổi vạch trái: nhìn lướt là thấy câu nào là câu chữa. */
 .q-card.la-chua { border-left-color: #c2410c; }
 /* Khối "Phiếu này chữa gì" — đọc trước khi làm bài, nên đặt màu nhạt cùng họ
@@ -932,9 +945,17 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
     // Ba mức, nói đúng mức của mình — nhãn "khắc phục" chỉ dành cho câu CÙNG
     // MÃ DẠNG. Câu chỉ cùng chuyên đề thì nói là luyện thêm, không được đội lốt
     // câu chữa: thầy nhìn phiếu phải biết ngay câu nào chữa đúng bệnh.
+    // BỐN MỨC, mỗi mức nói đúng việc của mình.
+    //
+    // Mức `laDeCuaEm` thêm 14/09: thầy bấm "Xem đề và lời giải kèm lỗi sai" mà
+    // ra một tờ trông y hệt phiếu khắc phục, vì MỌI câu em làm sai đều bị dán
+    // nhãn "Khắc phục lỗi sai câu N phần P". Tờ này là CHÍNH ĐỀ em vừa làm —
+    // nhãn của nó phải nói em sai câu nào, không được nói đang chữa câu nào.
     n
-      ? `<span class="q-tag chua">${
-          n.laLamLai
+      ? `<span class="q-tag ${n.laDeCuaEm ? 'sai-cua-em' : 'chua'}">${
+          n.laDeCuaEm
+            ? `Em làm sai câu ${n.soCau} phần ${n.phan}`
+            : n.laLamLai
             ? `Làm lại câu ${n.soCau} phần ${n.phan}`
             : n.theoChuyenDe
               ? `Luyện thêm cho câu ${n.soCau} phần ${n.phan}`
@@ -943,7 +964,7 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
       : '',
     n && n.laLamLai ? '<span class="q-tag chua-2">kho chưa có câu cùng dạng</span>' : '',
     n && n.theoChuyenDe ? '<span class="q-tag chua-2">cùng chuyên đề, chưa chắc cùng dạng</span>' : '',
-    n && !n.laLamLai && !n.theoChuyenDe && n.bac === 2 ? '<span class="q-tag chua-2">cùng cơ chế, khác việc</span>' : '',
+    n && !n.laDeCuaEm && !n.laLamLai && !n.theoChuyenDe && n.bac === 2 ? '<span class="q-tag chua-2">cùng cơ chế, khác việc</span>' : '',
     `<span class="q-tag ${LOP_LOAI[c.phan]}">${TEN_LOAI[c.phan]}</span>`,
     c.mucDo ? `<span class="q-tag ${LOP_MUC[c.mucDo]}">${TEN_MUC[c.mucDo]}</span>` : '',
     c.chuyenDe ? `<span class="q-tag topic">${thoat(c.chuyenDe)}</span>` : '',
@@ -1012,7 +1033,11 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
     : ''
 
   const oLamLai =
-    n && n.laLamLai
+    n && n.laDeCuaEm
+      ? `<div class="lam-lai"><b>Em chọn ${n.daChon ? thoat(n.daChon) : 'chưa trả lời'}${
+          n.dapAnDung || c.dapAn ? ` · đáp án đúng ${thoat(n.dapAnDung || c.dapAn)}` : ''
+        }.</b> Đọc lời giải bên dưới rồi tự làm lại câu này.</div>`
+      : n && n.laLamLai
       ? `<div class="lam-lai"><b>Lần thi vừa rồi em chọn ${n.daChon ? thoat(n.daChon) : 'sai câu này'}.</b>${
           n.viSaoSai ? ` ${thoat(n.viSaoSai)}` : ' Em xem lại lời giải bên dưới rồi tự làm lại từ đầu.'
         }</div>`
@@ -1264,7 +1289,9 @@ export function khoiChuaGiHtml(cau: CauLuyen[], thieu: { soCau: number; phan?: '
     const n = c.chuaCho
     // Câu chỉ cùng chuyên đề KHÔNG được đếm vào bảng "chữa câu nào" — bảng ấy
     // là lời hứa đã chữa đúng bệnh.
-    if (!n || n.theoChuyenDe) continue
+    // Tờ ĐỀ CỦA EM không có bảng "khắc phục lỗi nào" — nó không khắc phục gì
+    // cả, nó là chính bài em vừa làm.
+    if (!n || n.theoChuyenDe || n.laDeCuaEm) continue
     const k = KHOA(n.phan, n.soCau)
     const cu = gom.get(k) ?? { phan: n.phan, soCau: n.soCau, ten: n.tenDang || '', so: 0 }
     cu.so += 1

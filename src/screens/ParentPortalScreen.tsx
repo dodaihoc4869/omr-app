@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import DongDemCau from '../components/DongDemCau'
 import {
   Search,
   BookOpen,
@@ -36,6 +37,11 @@ interface BaiThiCuaCon {
   soCauDung?: number
   soCauSai?: number
   tongSoCau?: number
+  /** Bốn nhóm rời nhau, thêm 14/09 — xem `src/lib/dem-ket-qua.ts`. */
+  soCauDungMotPhan?: number | null
+  soCauBoTrong?: number | null
+  soYDungII?: number | null
+  soYTongII?: number | null
   lanThu?: number
   linkBaoCao?: string
 }
@@ -173,6 +179,10 @@ export default function ParentPortalScreen() {
                 soCauDung: c.soCauDung,
                 soCauSai: c.soCauSai,
                 tongSoCau: c.tongCau,
+                soCauDungMotPhan: c.soCauDungMotPhan,
+                soCauBoTrong: c.soCauBoTrong,
+                soYDungII: c.soYDungII,
+                soYTongII: c.soYTongII,
                 lanThu: c.lanThu || 1,
                 linkBaoCao: '',
               })),
@@ -491,7 +501,9 @@ export default function ParentPortalScreen() {
                         {typeof b.tongSoCau === 'number' && b.tongSoCau > 0 && typeof b.soCauDung === 'number' && (
                           <>
                             <span>·</span>
-                            <span>Đúng <strong>{b.soCauDung}</strong>/{b.tongSoCau} câu{Math.max(0, b.tongSoCau - b.soCauDung) > 0 ? ` · Sai ${Math.max(0, b.tongSoCau - b.soCauDung)} câu` : ''}</span>
+                            {/* Cùng khuôn với cổng học sinh và báo cáo — cấm
+                                trừ ngược `tongSoCau - soCauDung`. */}
+                            <DongDemCau so={{ ...b, tongCau: b.tongSoCau }} />
                           </>
                         )}
                         <span>·</span>

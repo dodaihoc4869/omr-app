@@ -86,6 +86,14 @@ export interface QuestionResult {
   /** Điểm câu này (cents), ĐÃ LÀM TRÒN ĐỂ HIỂN THỊ. Xem ghi chú đầu file. */
   cents: number
   flag: ItemFlag
+  /** CHỈ PHẦN II: số Ý em trả lời đúng (0..4).
+   *
+   * Có nó thì báo cáo mới phân biệt được câu SAI HẲN với câu ĐÚNG MỘT PHẦN. Bản
+   * trước chỉ có `correct` (đúng cả bốn ý), nên câu đúng 3/4 ý — có điểm hẳn
+   * hoi — bị đếm chung với câu sai sạch, và ca Test4 ra "Sai 12 câu" cho bài
+   * được 2,00 điểm (thầy bắt 14/09). Không dùng `cents > 0` thay được: trần
+   * điểm nhỏ thì một ý đúng vẫn làm tròn về 0 cent. */
+  yDung?: number
 }
 
 export interface ScoreResult {
@@ -276,6 +284,7 @@ export function scorePhanII(
       correct: correctIdeas === SO_Y_PHAN_II && !hasDoubleMark,
       cents: chiaLamTron(tranCau * phanNghin, 1000),
       flag,
+      yDung: hasDoubleMark ? 0 : correctIdeas,
     }
   })
   return { items, cents: chiaLamTron(quota * tongPhanNghin, n * 1000) }

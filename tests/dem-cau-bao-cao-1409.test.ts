@@ -32,27 +32,32 @@ describe('MÁY CHỦ — số câu chỉ đến từ bảng chấm', () => {
     expect(hsLichSu).not.toContain('tongCau = 28')
   })
 
-  it('`hsLichSuCa` chưa chấm ⇒ trả null cho cả ba số', () => {
+  it('`hsLichSuCa` chưa chấm ⇒ trả null cho MỌI số đếm', () => {
+    // 14/09 lượt 2: ba dòng `coCham ? … : null` gom lại thành một khuôn chung
+    // `goiDemCau` để thêm được "đúng một phần" và số Ý phần II mà không phải
+    // sửa ba chỗ. Ý ĐỊNH của phép kiểm giữ nguyên: chưa chấm là `null`, không
+    // phải 0.
     expect(hsLichSu).toContain('const coCham = rawTongCau > 0')
-    expect(hsLichSu).toContain('const tongCau = coCham ? rawTongCau : null')
-    expect(hsLichSu).toContain('const soCauDung = coCham ? rawSoDung : null')
-    expect(hsLichSu).toContain('const soCauSai = coCham ? rawSoSai : null')
+    expect(hsLichSu).toContain('const demCua: DemBangCham | undefined = coCham')
+    expect(hsLichSu).toContain('...goiDemCau(demCua)')
+    expect(SRV).toContain('tongCau: d ? d.tong : null')
+    expect(SRV).toContain('soCauDung: d ? d.dung : null')
+    expect(SRV).toContain('soCauSai: d ? d.sai : null')
   })
 
   it('`lichSuEm` nay trả đủ hợp đồng ba cổng đang đọc', () => {
     const ham = SRV.slice(SRV.indexOf('export async function lichSuEm'), SRV.indexOf('export async function lichSuEm') + 3600)
-    for (const k of ['tongCau:', 'soCauDung:', 'soCauSai:', 'diemI:', 'diemII:', 'diemIII:', 'lanThu:', 'thoiGianPhut:', 'nopLuc,']) {
+    for (const k of ['diemI:', 'diemII:', 'diemIII:', 'lanThu:', 'thoiGianPhut:', 'nopLuc,']) {
       expect(ham, k).toContain(k)
     }
     expect(ham).toContain('FROM chi_tiet_cau WHERE sbd = ? AND ma_ca IN')
-    expect(ham).toContain('tongCau: d ? d.tong : null')
+    expect(ham).toContain('...goiDemCau(d)')
   })
 
   it('`hoSoEm` cũng đếm từ bảng chấm, một câu gộp chứ không lặp theo ca', () => {
     const ham = SRV.slice(SRV.indexOf('export async function hoSoEm'), SRV.indexOf('export async function hoSoEm') + 4200)
     expect(ham).toContain('FROM chi_tiet_cau WHERE sbd = ? AND ma_ca IN')
-    expect(ham).toContain('tongCau: d ? d.tong : null')
-    expect(ham).toContain('soCauSai: d ? d.sai : null')
+    expect(ham).toContain('...goiDemCau(d)')
   })
 
   it('đếm gộp một câu cho cả danh sách ca — cả lớp mở cổng cùng lúc', () => {
@@ -85,7 +90,7 @@ describe('BA APP — không màn nào tự dựng số câu', () => {
   it('chưa chấm thì GIẤU dòng đếm, không hiện "Đúng 0/0 câu"', () => {
     const SP = doc('src/screens/StudentPortalScreen.tsx')
     expect(SP).toContain("{typeof item.tongCau === 'number' && item.tongCau > 0 && (")
-    expect(PH_MODAL).toContain("{coDemCau ? `Đúng ${soDung}/${tongCau} câu` : 'Ca chưa chấm xong'}")
+    expect(PH_MODAL).toContain("{coDemCau ? <DongDemCau so={demPH} /> : 'Ca chưa chấm xong'}")
   })
 
   it('danh sách câu sai THẬT vẫn được dùng khi máy chủ chưa trả số', () => {

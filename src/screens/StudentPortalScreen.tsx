@@ -21,6 +21,7 @@ import {
   Timer,
   Check,
   Gamepad2,
+  X,
 } from 'lucide-react'
 import {
   hsDangNhapApi,
@@ -36,8 +37,10 @@ import { datManifestTheoVai } from '../lib/pwa-install'
 import LogoHocSinh from '../components/LogoHocSinh'
 import DauTruongGame from '../components/DauTruongGame'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
+import DongDemCau, { docSoDem } from '../components/DongDemCau'
 import ModalKhacPhucCauSai from '../components/ModalKhacPhucCauSai'
 import type { CauSaiDauVao } from '../lib/thuat-toan-rut-cau-sai'
+import type { TuCongHocSinh } from './ExamTakeScreen'
 
 // Màn làm bài nạp trễ: cổng học sinh không phải kéo theo bộ chấm khi chỉ xem điểm.
 const ManLamBai = lazy(() => import('./ExamTakeScreen'))
@@ -184,6 +187,8 @@ export default function StudentPortalScreen() {
   const [xemDeHtml, setXemDeHtml] = useState('')
   /** Màn làm bài mở ngay trong cổng học sinh, không rời trang. */
   const [manThi, setManThi] = useState(false)
+  /** Danh tính đã xác thực + mã ca, trao thẳng cho màn làm bài. */
+  const [boVaoThi, setBoVaoThi] = useState<TuCongHocSinh | null>(null)
   const [dangMoDe, setDangMoDe] = useState(false)
 
   const moDeVaLoiGiai = async (maCa: string) => {
@@ -745,24 +750,33 @@ export default function StudentPortalScreen() {
       return
     }
     setLoiVaoThi('')
-    // VÀO THI NGAY TRONG APP, KHÔNG RỜI CỔNG HỌC SINH.
-    //
-    // Bản trước nhảy sang `/t/<mã ca>` bằng `window.location.href`. Hai cái hại:
-    // em bị đá ra khỏi cổng đang đứng, và đường dẫn ấy chính là chỗ vỡ khi máy
-    // chủ không có đường lui (Cloudflare Pages trả 404).
-    //
-    // `ExamTakeScreen` không nhận tham số — nó tự đọc mã ca từ địa chỉ. Nên đặt
-    // tham số vào địa chỉ TRƯỚC, rồi mới dựng màn thi trong lớp phủ: màn xác
-    // nhận "Có đúng em không?" hiện ngay tại chỗ.
-    try {
-      const u = new URL(location.href)
-      u.searchParams.set('examCode', ma)
-      if (auth?.sbd) u.searchParams.set('sbd', auth.sbd)
-      if (matKhauCaVaoThi.trim()) u.searchParams.set('matKhau', matKhauCaVaoThi.trim())
-      history.replaceState(null, '', u.toString())
-    } catch {
-      // Địa chỉ lạ thì thôi, `ExamTakeScreen` vẫn hỏi mã ca ở màn đầu.
+    if (!auth) {
+      setLoiVaoThi('Em cần đăng nhập trước khi vào thi.')
+      return
     }
+    // VÀO THẲNG PHÒNG CHỜ, KHÔNG HỎI LẠI TÊN (thầy chốt 14/09: "sau khi nhập mã
+    // ca và mật khẩu thì phải chuyển vào màn hình chờ hoặc chuyển vào làm bài
+    // luôn").
+    //
+    // Hai bản trước đều bắt em đi qua một cửa thừa. Bản đầu nhảy sang đường dẫn
+    // `/t/<mã ca>`: em bị đá khỏi cổng, và đó đúng là chỗ vỡ khi máy chủ không
+    // trả `index.html` cho đường dẫn không có tệp thật. Bản sau dựng màn thi
+    // trong lớp phủ nhưng nhét mã ca vào ĐỊA CHỈ rồi để màn thi tự đọc — nên em
+    // vẫn phải bấm qua màn "Có đúng em không?", trong khi chính em vừa đăng
+    // nhập bằng mật khẩu riêng cách đó ba giây.
+    //
+    // Nay trao tay thẳng bằng THAM SỐ, không qua địa chỉ: tên và năm sinh của
+    // em là dữ liệu cá nhân, không được nằm trên thanh địa chỉ để người ngồi
+    // cạnh đọc được. Màn thi nhận đủ danh tính đã xác thực nên bỏ hẳn bước hỏi
+    // lại, gọi máy chủ ngay và rơi đúng vào phòng chờ hoặc vào bài.
+    setBoVaoThi({
+      maCa: ma,
+      sbd: auth.sbd,
+      hoTen: auth.hoTen || '',
+      namSinh: auth.namSinh || '',
+      lop: auth.lop || '',
+      matKhau: matKhauCaVaoThi.trim(),
+    })
     setManThi(true)
   }
 
@@ -1176,14 +1190,11 @@ export default function StudentPortalScreen() {
                         {typeof item.tongCau === 'number' && item.tongCau > 0 && (
                           <>
                             <span>•</span>
-                            <span>
-                              Đúng <strong>{item.soCauDung ?? 0}</strong>/{item.tongCau} câu
-                              {Math.max(0, item.tongCau - (item.soCauDung ?? 0)) > 0 && (
-                                <span className="text-rose-500 font-medium ml-1">
-                                  · Sai {Math.max(0, item.tongCau - (item.soCauDung ?? 0))} câu
-                                </span>
-                              )}
-                            </span>
+                            {/* KHÔNG tự trừ `tongCau - soCauDung` nữa: phép trừ
+                                ấy dồn cả câu bỏ trống lẫn câu phần II đúng một
+                                phần vào "sai", nên ca Test4 (thầy bắt 14/09)
+                                in "Sai 12 câu" cho bài được 2,00 điểm. */}
+                            <DongDemCau so={item} />
                           </>
                         )}
                       </div>
@@ -1757,7 +1768,7 @@ export default function StudentPortalScreen() {
                         <div>
                           {coSai ? (
                             <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
-                              Sai {item.soCauSai} câu
+                              Sai {docSoDem(item)?.soSai ?? item.soCauSai} câu
                             </span>
                           ) : (
                             <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
@@ -1861,8 +1872,20 @@ export default function StudentPortalScreen() {
       {/* MÀN LÀM BÀI — phủ toàn màn, ngay trong cổng học sinh. */}
       {manThi && (
         <div className="fixed inset-0 z-[60] overflow-auto bg-white dark:bg-slate-950">
+          <button
+            type="button"
+            onClick={() => {
+              setManThi(false)
+              setBoVaoThi(null)
+            }}
+            className="fixed top-3 right-3 z-[61] w-10 h-10 rounded-full bg-white/95 dark:bg-slate-800/95 border border-slate-200 dark:border-slate-700 shadow-lg flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white"
+            aria-label="Đóng phòng thi, về cổng học sinh"
+            title="Về cổng học sinh"
+          >
+            <X className="w-5 h-5" />
+          </button>
           <Suspense fallback={<div className="p-6 text-sm text-slate-500">Đang mở phòng thi…</div>}>
-            <ManLamBai />
+            <ManLamBai tuCong={boVaoThi ?? undefined} />
           </Suspense>
         </div>
       )}

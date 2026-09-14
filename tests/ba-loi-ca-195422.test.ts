@@ -218,6 +218,6 @@ describe('LỖI 5 — đề khắc phục không nói nó chữa cho câu nào',
 
   it('bảng "Phiếu này khắc phục lỗi nào" KHÔNG đếm câu chỉ cùng chuyên đề', () => {
     const HP = doc('src/lib/html-phieu.ts')
-    expect(HP).toContain('if (!n || n.theoChuyenDe) continue')
+    expect(HP).toContain('if (!n || n.theoChuyenDe || n.laDeCuaEm) continue')
   })
 })

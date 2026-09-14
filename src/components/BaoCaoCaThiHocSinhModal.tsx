@@ -3,6 +3,7 @@
 // Tuân thủ nghiêm ngặt: Không dùng mã màu hex trong file .tsx.
 
 import { useEffect, useState, useMemo } from 'react'
+import DongDemCau, { DongDemYPhanII, docSoDem } from './DongDemCau'
 import { createPortal } from 'react-dom'
 import {
   X,
@@ -35,6 +36,12 @@ export interface ThongTinBaiThiHocSinh {
   soCauDung?: number
   soCauSai?: number
   tongCau?: number
+  /** Bốn nhóm rời nhau + đếm theo Ý phần II (thêm 14/09, ca Test4).
+   * Xem `src/lib/dem-ket-qua.ts` — một luật cho cả ba app. */
+  soCauDungMotPhan?: number | null
+  soCauBoTrong?: number | null
+  soYDungII?: number | null
+  soYTongII?: number | null
   lanThu?: number
 }
 
@@ -141,8 +148,17 @@ export default function BaoCaoCaThiHocSinhModal({
   const tongCau = baiThi.tongCau && baiThi.tongCau > 0 ? baiThi.tongCau : null
   const soDung = typeof baiThi.soCauDung === 'number' ? baiThi.soCauDung : null
   // Danh sách câu sai (bao gồm cả câu chưa làm / bỏ trống)
+  // BỐN NHÓM RỜI NHAU, KHÔNG TRỪ NGƯỢC (thầy bắt 14/09, ca Test4).
+  //
+  // Bản cũ lấy `soSai = tongCau - soDung`. Phép trừ ấy dồn cả câu BỎ TRỐNG lẫn
+  // câu phần II ĐÚNG MỘT PHẦN vào "sai", nên bài được 2,00 điểm nhờ 6/8 ý phần
+  // II vẫn bị in là "Sai 12 câu" — con số chọi thẳng vào cột điểm ngay cạnh nó.
+  // Nay đọc đúng bốn con số máy chủ trả, qua một khuôn chung cho cả ba app.
+  const dem = docSoDem(baiThi)
   const soSaiRaw = typeof baiThi.soCauSai === 'number' ? baiThi.soCauSai : dsCauSai.length > 0 ? dsCauSai.length : null
-  const soSai = tongCau !== null && soDung !== null ? Math.max(0, tongCau - soDung) : soSaiRaw
+  const soSai = dem ? dem.soSai : soSaiRaw
+  const soMotPhan = dem ? dem.soDungMotPhan : 0
+  const soBoTrongDem = dem ? dem.soBoTrong : 0
   const coDemCau = tongCau !== null && soDung !== null
   const soBoTrong = 0
   const tyLeChinhXac = coDemCau && tongCau !== null ? Math.min(100, Math.max(0, Math.round(((soDung ?? 0) / tongCau) * 100))) : null
@@ -384,16 +400,18 @@ export default function BaoCaoCaThiHocSinhModal({
                   </div>
                   {coDemCau ? (
                     <div className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                      Đúng <strong className="text-emerald-600 dark:text-emerald-400">{soDung}</strong>/{tongCau} câu
-                      {(soSai ?? 0) > 0 && (
-                        <span className="text-rose-500 dark:text-rose-400 font-bold ml-1.5">
-                          · Sai {soSai} câu
-                        </span>
-                      )}
+                      <DongDemCau so={baiThi} />
                     </div>
                   ) : (
                     <div className="text-sm font-semibold text-slate-600 dark:text-slate-300">
                       {(soSai ?? 0) > 0 ? `Sai ${soSai} câu` : 'Bài thi đã hoàn thành'}
+                    </div>
+                  )}
+                  {/* VÌ SAO EM CÓ ĐIỂM MÀ KHÔNG CÂU NÀO ĐÚNG TRỌN — phần II
+                      chấm theo Ý, nên dòng này là câu trả lời bằng số. */}
+                  {(soMotPhan > 0 || soBoTrongDem > 0) && (
+                    <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      <DongDemYPhanII so={baiThi} />
                     </div>
                   )}
                   <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">

@@ -3,6 +3,7 @@
 // Tuân thủ nghiêm ngặt: Không dùng mã màu hex trong file .tsx.
 
 import { useEffect, useState, useMemo } from 'react'
+import DongDemCau, { DongDemYPhanII, docSoDem } from './DongDemCau'
 import {
   X,
   Award,
@@ -34,6 +35,12 @@ export interface ThongTinBaiThiPhuHuynh {
   soCauDung?: number
   soCauSai?: number
   tongSoCau?: number
+  /** Bốn nhóm rời nhau + đếm theo Ý phần II (thêm 14/09, ca Test4).
+   * Xem `src/lib/dem-ket-qua.ts` — một luật cho cả ba app. */
+  soCauDungMotPhan?: number | null
+  soCauBoTrong?: number | null
+  soYDungII?: number | null
+  soYTongII?: number | null
   lanThu?: number
   linkBaoCao?: string
 }
@@ -119,8 +126,18 @@ export default function BaoCaoCaThiPhuHuynhModal({
   // Đây là báo cáo phụ huynh đọc, nên càng không được có con số suy ra từ điểm.
   const tongCau = baiThi.tongSoCau && baiThi.tongSoCau > 0 ? baiThi.tongSoCau : null
   const soDung = typeof baiThi.soCauDung === 'number' ? baiThi.soCauDung : null
+  // BỐN NHÓM RỜI NHAU, KHÔNG TRỪ NGƯỢC (thầy bắt 14/09, ca Test4).
+  //
+  // Bản cũ lấy `soSai = tongCau - soDung`. Phép trừ ấy dồn cả câu BỎ TRỐNG lẫn
+  // câu phần II ĐÚNG MỘT PHẦN vào "sai", nên bài được 2,00 điểm nhờ 6/8 ý phần
+  // II vẫn bị in là "Sai 12 câu" — con số chọi thẳng vào cột điểm ngay cạnh nó.
+  // Nay đọc đúng bốn con số máy chủ trả, qua một khuôn chung cho cả ba app.
+  const demPH = { ...baiThi, tongCau }
+  const dem = docSoDem(demPH)
   const soSaiRaw = typeof baiThi.soCauSai === 'number' ? baiThi.soCauSai : dsCauSai.length > 0 ? dsCauSai.length : null
-  const soSai = tongCau !== null && soDung !== null ? Math.max(0, tongCau - soDung) : soSaiRaw
+  const soSai = dem ? dem.soSai : soSaiRaw
+  const soMotPhan = dem ? dem.soDungMotPhan : 0
+  const soBoTrongDem = dem ? dem.soBoTrong : 0
   const coDemCau = tongCau !== null && soDung !== null
   const tyLeChinhXac = coDemCau && tongCau !== null ? Math.min(100, Math.max(0, Math.round(((soDung ?? 0) / tongCau) * 100))) : null
 
@@ -475,6 +492,11 @@ export default function BaoCaoCaThiPhuHuynhModal({
                   </div>
 
                   <div className="space-y-1.5 text-left">
+                    {(soMotPhan > 0 || soBoTrongDem > 0) && (
+                      <div className="text-xs text-slate-500 dark:text-slate-400">
+                        <DongDemYPhanII so={demPH} />
+                      </div>
+                    )}
                     <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold border shadow-xs ${xepLoai.nen} ${xepLoai.mau}`}>
                       Xếp loại: {xepLoai.ten}
                     </div>
@@ -482,7 +504,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
                       Độ chính xác: <strong className="text-slate-800 dark:text-slate-200">{coDemCau ? `${tyLeChinhXac}%` : '—'}</strong>
                     </div>
                     <div className="text-[11px] text-slate-400">
-                      {coDemCau ? `Đúng ${soDung}/${tongCau} câu` : 'Ca chưa chấm xong'}
+                      {coDemCau ? <DongDemCau so={demPH} /> : 'Ca chưa chấm xong'}
                     </div>
                   </div>
                 </div>
@@ -518,7 +540,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                       {coDemCau
-                        ? `Sai ${soSai} câu cần luyện lại`
+                        ? `Sai ${soSai} câu cần luyện lại${soMotPhan > 0 ? ` · ${soMotPhan} câu đúng một phần` : ''}${soBoTrongDem > 0 ? ` · bỏ trống ${soBoTrongDem} câu` : ''}`
                         : 'Chưa có bảng chấm'}
                     </p>
                   </div>

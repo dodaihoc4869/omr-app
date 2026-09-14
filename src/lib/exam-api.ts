@@ -1459,6 +1459,14 @@ export interface CaCuaEm {
   tongCau?: number | null
   soCauDung?: number | null
   soCauSai?: number | null
+  /** ĐẾM THEO BỐN NHÓM RỜI NHAU (thêm 14/09 sau ca Test4).
+   * `soCauSai` từ bản này KHÔNG còn gộp câu bỏ trống và câu phần II đúng một
+   * phần. Bốn nhóm cộng lại đúng bằng `tongCau`. `soYDungII/soYTongII` đếm theo
+   * Ý — đơn vị máy chấm điểm phần II. `null` = ca chưa chấm. */
+  soCauDungMotPhan?: number | null
+  soCauBoTrong?: number | null
+  soYDungII?: number | null
+  soYTongII?: number | null
   hang: number | null
   siSo: number | null
   soLanRoiMan: number
@@ -3060,6 +3068,10 @@ export async function hsLichSuCaApi(scriptUrl: string, sbd: string): Promise<{
     soCauSai: number | null
     soCauDung: number | null
     tongCau: number | null
+    soCauDungMotPhan?: number | null
+    soCauBoTrong?: number | null
+    soYDungII?: number | null
+    soYTongII?: number | null
   }>
   error?: string
 }> {

@@ -212,7 +212,24 @@ const KHOA_HO_TEN = 'ddh.em.hoTen'
 const KHOA_NAM_SINH = 'ddh.em.namSinh'
 
 
-export default function ExamTakeScreen() {
+/** DANH TÍNH ĐÃ XÁC THỰC, trao thẳng từ cổng học sinh sang màn làm bài.
+ *
+ * Em đăng nhập cổng bằng mật khẩu riêng rồi mới gõ mã ca, nên bắt em xác nhận
+ * lại tên một lần nữa là một cửa thừa — thầy chốt 14/09: "nhập mã ca và mật
+ * khẩu thì phải chuyển vào màn hình chờ hoặc chuyển vào làm bài luôn".
+ *
+ * Trao bằng THAM SỐ chứ không qua thanh địa chỉ: tên và năm sinh là dữ liệu cá
+ * nhân, không được phơi trên URL. */
+export interface TuCongHocSinh {
+  maCa: string
+  sbd: string
+  hoTen: string
+  namSinh: string
+  lop?: string
+  matKhau?: string
+}
+
+export default function ExamTakeScreen({ tuCong }: { tuCong?: TuCongHocSinh } = {}) {
   const showToast = useAppStore((s) => s.showToast)
 
   const [phase, setPhase] = useState<'join' | 'loading' | 'cho' | 'exam' | 'submitted' | 'error'>('join')
@@ -263,7 +280,7 @@ export default function ExamTakeScreen() {
   })
   // Năm sinh chỉ còn để GỬI KÈM cho ca lọc theo khối; không còn ô nhập nào từ
   // 07/09, giá trị lấy từ lần trước em đã gõ trên chính máy này.
-  const [namSinh] = useState(() => {
+  const [namSinh, setNamSinh] = useState(() => {
     try { return localStorage.getItem(KHOA_NAM_SINH) ?? '' } catch { return '' }
   })
   const [scriptUrl, setScriptUrl] = useState('')
@@ -473,8 +490,24 @@ export default function ExamTakeScreen() {
 
   const totalCountRef = useRef(0)
 
+  // TỪ CỔNG HỌC SINH TRAO SANG — điền sẵn mọi ô và coi như đã xác nhận tên.
+  useEffect(() => {
+    if (!tuCong) return
+    setMaCa(tuCong.maCa)
+    setSbd(tuCong.sbd)
+    if (tuCong.hoTen) setHoTen(tuCong.hoTen)
+    if (tuCong.namSinh) setNamSinh(tuCong.namSinh)
+    setMatKhauCa(tuCong.matKhau || '')
+    // Cổng đã xác thực em bằng mật khẩu riêng — mạnh hơn hẳn màn gõ tên. Danh
+    // sách lớp vẫn được máy chủ đối chiếu trong `vaoThi`, nên bỏ bước hỏi lại ở
+    // đây không nới lỏng một chốt nào.
+    setXacNhan({ sbd: tuCong.sbd, hoTen: tuCong.hoTen, lop: tuCong.lop || '' })
+    loadScriptUrlHoacMacDinh().then(setScriptUrl)
+  }, [tuCong])
+
   // Đọc link mời (?examCode=...&api=...) — học sinh mở link chỉ cần gõ SBD.
   useEffect(() => {
+    if (tuCong) return
     const params = new URLSearchParams(location.search)
     const codeFromUrl = params.get('examCode')
     const apiFromUrl = params.get('api')
@@ -489,7 +522,7 @@ export default function ExamTakeScreen() {
     } else {
       loadScriptUrlHoacMacDinh().then(setScriptUrl)
     }
-  }, [])
+  }, [tuCong])
 
   const assignment: StudentAssignment | null = useMemo(() => {
     if (!bank || !maCa || !sbd) return null
@@ -1331,6 +1364,24 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       setPhase('error')
     }
   }
+
+  // TỰ BẤM "VÀO THI" KHI CỔNG HỌC SINH TRAO SANG.
+  //
+  // Chờ đủ ba thứ rồi mới gọi: địa chỉ máy chủ đã nạp, mã ca và SBD đã vào
+  // state, và danh tính đã đặt. Thiếu một thứ mà gọi sớm là `handleJoin` đọc
+  // phải state rỗng rồi quay về màn nhập — đúng cái cửa thừa đang muốn bỏ.
+  const daTuVaoRef = useRef(false)
+  useEffect(() => {
+    if (!tuCong || daTuVaoRef.current) return
+    if (!scriptUrl.trim()) return
+    if (maCa.trim() !== tuCong.maCa.trim() || sbd.trim() !== tuCong.sbd.trim()) return
+    if (!xacNhan) return
+    daTuVaoRef.current = true
+    void handleJoin()
+    // `handleJoin` đọc state qua closure; chỉ chạy MỘT LẦN nên không cần nó
+    // trong danh sách phụ thuộc, và thêm vào là tự gọi lại mỗi lần render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tuCong, scriptUrl, maCa, sbd, xacNhan])
 
   // Đồng hồ đếm ngược: mốc hết giờ do MÁY CHỦ đặt (hetGioLuc), thời gian hiện
   // tại lấy từ gioMayChu() (đã hiệu chỉnh theo máy chủ, chống chỉnh giờ máy) —

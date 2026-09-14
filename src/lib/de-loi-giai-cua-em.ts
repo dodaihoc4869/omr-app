@@ -50,6 +50,12 @@ export function dungHtmlDeVaLoiGiai(
               tenDang: r.chuyenDe || '',
               bac: 1 as const,
               daChon: r.dapAnChon || '',
+              // ĐÂY LÀ TỜ ĐỀ CỦA EM, KHÔNG PHẢI PHIẾU KHẮC PHỤC (thầy bắt
+              // 14/09: bấm "Xem đề và lời giải" ra một tờ dán đầy nhãn "Khắc
+              // phục lỗi sai"). Cờ này đổi nhãn sang "Em làm sai câu N phần P"
+              // và bỏ hẳn bảng "phiếu này khắc phục lỗi nào".
+              laDeCuaEm: true as const,
+              dapAnDung: r.dapAnDung || '',
             },
           }
         : c,
