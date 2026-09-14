@@ -15,7 +15,7 @@ import { resolve } from 'node:path'
 import { goiBaiThi } from '../src/lib/goi-bao-cao'
 import { docSoDem } from '../src/components/DongDemCau'
 import { demKetQua, type CauDeDem } from '../src/lib/dem-ket-qua'
-import { anhCuaCau } from '../src/components/KhoiCauSai'
+import { anhCuaCau, anhPhuongAn } from '../src/components/KhoiCauSai'
 import { danhGiaBai } from '../src/lib/danh-gia-bai'
 import { gomCaChoBieuDo } from '../src/components/TheTienBo'
 
@@ -305,5 +305,62 @@ describe('nhận xét phải đúng với con số của chính bài đó', () =
     for (const f of ['src/components/BaoCaoCaThiHocSinhModal.tsx', 'src/components/BaoCaoCaThiPhuHuynhModal.tsx']) {
       expect(doc(f), f).toContain('danhGiaBai(diem, soKhacPhuc, tongCau)')
     }
+  })
+})
+
+describe('ảnh của PHƯƠNG ÁN phải nằm ở phương án, không dồn lên đầu câu', () => {
+  // Thầy bắt được 14/09: câu có bốn phương án bằng ảnh thì báo cáo dồn cả bốn
+  // ảnh lên đầu câu, còn bốn dòng phương án chỉ còn chữ "(xem hình phương án
+  // A)". Em không biết ảnh nào là của phương án nào.
+  const A = 'data:image/png;base64,AAAAAAAAAAAAAA'
+  const B = 'data:image/png;base64,BBBBBBBBBBBBBB'
+  const THAN = 'data:image/png;base64,TTTTTTTTTTTTTT'
+
+  it('`choiceImgs` là ảnh THAY CHỮ của đúng phương án đó', () => {
+    const c = { phan: 'I', choiceImgs: [A, B, undefined, undefined] }
+    expect(anhPhuongAn(c, 'I', 0)).toBe(A)
+    expect(anhPhuongAn(c, 'I', 1)).toBe(B)
+    expect(anhPhuongAn(c, 'I', 2)).toBe('')
+  })
+
+  it('ảnh đặt SAU một phương án cũng về đúng phương án ấy', () => {
+    const c = { phan: 'I', hinhAnh: [{ src: A, viTri: 'sau_pa_A' }, { src: B, viTri: 'sau_pa_C' }] }
+    expect(anhPhuongAn(c, 'I', 0)).toBe(A)
+    expect(anhPhuongAn(c, 'I', 2)).toBe(B)
+    expect(anhPhuongAn(c, 'I', 1)).toBe('')
+  })
+
+  it('ý a–d của phần II cũng vậy', () => {
+    expect(anhPhuongAn({ phan: 'II', ideaImgs: [undefined, A] }, 'II', 1)).toBe(A)
+    expect(anhPhuongAn({ phan: 'II', hinhAnh: [{ src: B, viTri: 'sau_y_c' }] }, 'II', 2)).toBe(B)
+  })
+
+  it('THÂN CÂU chỉ lấy ảnh của thân câu — ảnh phương án KHÔNG trôi lên đầu', () => {
+    const c = {
+      phan: 'I',
+      thanCauImg: THAN,
+      choiceImgs: [A, B, undefined, undefined],
+      hinhAnh: [{ src: A, viTri: 'sau_pa_A' }, { src: THAN, viTri: 'sau_de' }],
+    }
+    const than = anhCuaCau(c)
+    expect(than).toEqual([THAN])
+    expect(than).not.toContain(A)
+    expect(than).not.toContain(B)
+  })
+
+  it('máy chủ trả riêng ba trường ảnh, không gộp làm một', () => {
+    const srv = doc('server/src/goi-cu.ts')
+    expect(srv).toContain('thanCauImg: fullQ ? fullQ.thanCauImg : undefined')
+    expect(srv).toContain('choiceImgs: fullQ && Array.isArray(fullQ.choiceImgs)')
+    expect(srv).toContain('ideaImgs: fullQ && Array.isArray(fullQ.ideaImgs)')
+    // Không còn gộp ảnh thân câu vào `imageDataUrl`.
+    expect(srv).not.toContain('fullQ.imageDataUrl || fullQ.thanCauImg')
+  })
+
+  it('màn hình vẽ ảnh phương án thay cho chữ "(xem hình…)"', () => {
+    const K = doc('src/components/KhoiCauSai.tsx')
+    expect(K).toContain("anhPhuongAn(c, 'I', i)")
+    expect(K).toContain("anhPhuongAn(c, 'II', i)")
+    expect(K).toContain('alt={`Phương án ${k}`}')
   })
 })

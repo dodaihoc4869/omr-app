@@ -30,25 +30,77 @@ export interface CauSaiHienThi {
   ideas?: string[]
   table?: string[][] | null
   imageDataUrl?: string
+  /** Ảnh của THÂN CÂU (đề bài), khác hẳn ảnh của từng phương án. */
+  thanCauImg?: string
+  /** Ảnh THAY CHỮ cho từng phương án A–D của phần I. */
+  choiceImgs?: (string | undefined)[]
+  /** Ảnh THAY CHỮ cho từng ý a–d của phần II. */
+  ideaImgs?: (string | undefined)[]
+  /** Ảnh có VỊ TRÍ: `sau_de` · `cuoi_cau` · `sau_pa_A` · `sau_y_a` … */
   hinhAnh?: unknown
   loiGiai?: string
 }
 
 const CHU_Y = ['a', 'b', 'c', 'd']
 
-/** Gom mọi kiểu ảnh kho đề từng dùng về một danh sách đường dẫn vẽ được. */
+interface AnhCoViTri {
+  src: string
+  viTri: string
+  alt?: string
+}
+
+
+/** Một đường dẫn ảnh vẽ được, hay chuỗi rỗng. */
+function duongAnh(v: unknown): string {
+  const s = typeof v === 'string' ? v.trim() : ''
+  if (s.length > 10 && (s.startsWith('data:image/') || s.startsWith('http://') || s.startsWith('https://') || s.startsWith('/'))) return s
+  return ''
+}
+
+/** Mảng ảnh CÓ VỊ TRÍ của một câu, đã chuẩn hoá. */
+function anhCoViTri(c: CauSaiHienThi): AnhCoViTri[] {
+  const ra: AnhCoViTri[] = []
+  const ds = Array.isArray(c.hinhAnh) ? c.hinhAnh : c.hinhAnh ? [c.hinhAnh] : []
+  for (const h of ds) {
+    if (typeof h === 'string') {
+      const src = duongAnh(h)
+      if (src) ra.push({ src, viTri: 'sau_de' })
+      continue
+    }
+    const o = h as { src?: unknown; viTri?: unknown; alt?: unknown }
+    const src = duongAnh(o?.src)
+    if (src) ra.push({ src, viTri: String(o?.viTri ?? 'sau_de'), alt: typeof o?.alt === 'string' ? o.alt : undefined })
+  }
+  return ra
+}
+
+/** ẢNH CỦA THÂN CÂU — và CHỈ của thân câu.
+ *
+ * Thầy bắt được 14/09: câu có bốn phương án bằng ảnh thì cả bốn ảnh bị dồn lên
+ * đầu câu, còn bốn dòng phương án chỉ còn chữ "(xem hình phương án A)". Ảnh đặt
+ * sau phương án A phải nằm SAU PHƯƠNG ÁN A. */
 export function anhCuaCau(c: CauSaiHienThi): string[] {
   const ra: string[] = []
-  const them = (v: unknown) => {
-    const s = typeof v === 'string' ? v.trim() : ''
-    if (s.length > 10 && (s.startsWith('data:image/') || s.startsWith('http://') || s.startsWith('https://') || s.startsWith('/'))) {
-      if (!ra.includes(s)) ra.push(s)
-    }
+  const them = (v: string) => {
+    if (v && !ra.includes(v)) ra.push(v)
   }
-  them(c.imageDataUrl)
-  if (Array.isArray(c.hinhAnh)) for (const h of c.hinhAnh) them(typeof h === 'string' ? h : (h as { src?: string })?.src)
-  else them(c.hinhAnh)
+  them(duongAnh(c.thanCauImg))
+  them(duongAnh(c.imageDataUrl))
+  for (const h of anhCoViTri(c)) {
+    // Chỉ lấy ảnh của thân câu. `sau_pa_*` và `sau_y_*` thuộc về phương án.
+    if (h.viTri.startsWith('sau_pa_') || h.viTri.startsWith('sau_y_')) continue
+    them(h.src)
+  }
   return ra
+}
+
+/** Ảnh của MỘT phương án: ưu tiên ảnh thay chữ, rồi tới ảnh đặt sau nó. */
+export function anhPhuongAn(c: CauSaiHienThi, phan: string, i: number): string {
+  const thayChu = phan === 'II' ? c.ideaImgs?.[i] : c.choiceImgs?.[i]
+  const t = duongAnh(thayChu)
+  if (t) return t
+  const khoa = phan === 'II' ? `sau_y_${CHU_Y[i] ?? ''}` : `sau_pa_${'ABCD'[i] ?? ''}`
+  return anhCoViTri(c).find((h) => h.viTri === khoa)?.src ?? ''
 }
 
 /** Một ký tự Đ/S đã chuẩn hoá; `-` hoặc rỗng = em chưa tô ô đó. */
@@ -146,7 +198,19 @@ export function ThanCauSai({ c }: { c: CauSaiHienThi }) {
                 }`}
               >
                 <span className="w-5 h-5 rounded-full bg-slate-200/80 dark:bg-slate-700 flex items-center justify-center font-bold text-[11px] shrink-0">{k}</span>
-                <span className="min-w-0 whitespace-pre-wrap">{ch}</span>
+                {/* ẢNH CỦA PHƯƠNG ÁN NẰM Ở PHƯƠNG ÁN — không dồn lên đầu câu.
+                    Kho đề ghi chữ "(xem hình phương án A)" ở những câu này, nên
+                    in chữ ấy ra là em nhìn bốn dòng trống rỗng. */}
+                {anhPhuongAn(c, 'I', i) ? (
+                  <img
+                    src={anhPhuongAn(c, 'I', i)}
+                    alt={`Phương án ${k}`}
+                    loading="lazy"
+                    className="block max-w-full h-auto max-h-32 object-contain"
+                  />
+                ) : (
+                  <span className="min-w-0 whitespace-pre-wrap">{ch}</span>
+                )}
                 {laChon && <span className="ml-auto shrink-0 text-[10px] font-bold">em chọn</span>}
               </div>
             )
@@ -175,7 +239,16 @@ export function ThanCauSai({ c }: { c: CauSaiHienThi }) {
                   <span className="w-5 h-5 rounded-full bg-slate-200/80 dark:bg-slate-700 flex items-center justify-center font-bold text-[11px] shrink-0">
                     {CHU_Y[i] ?? i + 1}
                   </span>
-                  <span className="min-w-0 whitespace-pre-wrap text-slate-800 dark:text-slate-200">{noiDung}</span>
+                  {anhPhuongAn(c, 'II', i) ? (
+                    <img
+                      src={anhPhuongAn(c, 'II', i)}
+                      alt={`Ý ${CHU_Y[i] ?? i + 1}`}
+                      loading="lazy"
+                      className="block max-w-full h-auto max-h-32 object-contain"
+                    />
+                  ) : (
+                    <span className="min-w-0 whitespace-pre-wrap text-slate-800 dark:text-slate-200">{noiDung}</span>
+                  )}
                 </div>
                 <div className="mt-1.5 pl-7 flex items-center gap-3 text-[11px] text-slate-600 dark:text-slate-400">
                   <span>Em chọn: <ChuY k={chon} /></span>

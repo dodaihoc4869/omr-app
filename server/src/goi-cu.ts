@@ -2470,7 +2470,21 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
         ? fullQ.ideas
         : (fullQ && fullQ.y ? ['a', 'b', 'c', 'd'].map((k) => fullQ.y[k] || '') : undefined),
       table: fullQ ? (fullQ.table || fullQ.bang) : undefined,
-      imageDataUrl: fullQ ? (fullQ.imageDataUrl || fullQ.thanCauImg) : undefined,
+      imageDataUrl: fullQ ? fullQ.imageDataUrl : undefined,
+      // ẢNH THÂN CÂU và ẢNH TỪNG PHƯƠNG ÁN là HAI THỨ KHÁC NHAU.
+      //
+      // Thầy bắt được 14/09: câu có bốn phương án bằng ảnh thì báo cáo dồn cả
+      // bốn ảnh lên đầu câu, còn bốn dòng phương án chỉ còn chữ "(xem hình
+      // phương án A)" — em không biết ảnh nào là của phương án nào.
+      //
+      // Bản trước gộp `thanCauImg` vào `imageDataUrl` và bỏ hẳn `choiceImgs` /
+      // `ideaImgs`, nên màn hình không còn cách nào gắn ảnh về đúng phương án.
+      // Nay trả riêng ba trường, đúng như kho đề và như màn làm bài đang dùng.
+      thanCauImg: fullQ ? fullQ.thanCauImg : undefined,
+      choiceImgs: fullQ && Array.isArray(fullQ.choiceImgs) ? fullQ.choiceImgs : undefined,
+      ideaImgs: fullQ && Array.isArray(fullQ.ideaImgs) ? fullQ.ideaImgs : undefined,
+      // Giữ NGUYÊN mảng có `viTri`: ảnh đặt sau phương án A phải nằm sau
+      // phương án A, không phải trôi lên đầu câu.
       hinhAnh: fullQ ? (fullQ.hinhAnh || fullQ.hinh) : undefined,
       loiGiai: loiGiaiStr,
       dang: dangStr,
