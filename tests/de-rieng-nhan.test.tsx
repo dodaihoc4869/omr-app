@@ -185,8 +185,21 @@ describe('bảng nghiệm thu mục 8 — phần nhãn', () => {
     // Bản đồ của ca KHÁC không được rò sang: gọi lại y hệt phải ra y hệt.
     expect(assignStudentQuestions(bank, 'ca1', '12000').phanI.map((a) => a.qid)).toEqual(cu)
     // Có bản đồ thì đi theo bản đồ, KHÔNG cắt lại theo seed.
+    //
+    // ĐỔI LUẬT 14/09 — thầy chốt: "rút 30% câu sai ra, nếu chưa đủ tổng 12 câu
+    // thì rút tiếp các câu hỏi mới ở trong bài đã tick". Trước đây khẳng định
+    // này là `toEqual(['q7','q9'])`, tức bản đồ có 2 câu thì em nhận đúng 2 câu
+    // dù thầy đặt 5 — chính là lỗi thầy bắt được (màn làm bài hiện "PHẦN I —
+    // Trắc nghiệm (4 câu)" trong khi thầy đặt 8). Ý ĐỊNH của phép kiểm giữ
+    // nguyên: câu trong bản đồ KHÔNG được seed cắt đi. Chỉ vế "và không bù thêm
+    // câu nào" là luật cũ đã bị thầy thay.
     const rieng = assignStudentQuestions({ ...bank, boTheoEm: { '12000': ['q7', 'q9'] } }, 'ca1', '12000')
-    expect(rieng.phanI.map((a) => a.qid)).toEqual(['q7', 'q9'])
+    const idRieng = rieng.phanI.map((a) => a.qid)
+    expect(idRieng).toContain('q7')
+    expect(idRieng).toContain('q9')
+    // Bù cho đủ chỉ tiêu thầy đặt, lấy ngay trong kho của ca.
+    expect(idRieng.length).toBe(5)
+    expect(new Set(idRieng).size).toBe(5)
   })
 
   it('BẢN ĐỒ ĐỀ RIÊNG ĐI CÙNG Ở MỌI CHỖ DỰNG BẢNG CHẤM', () => {
