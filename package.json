@@ -11,7 +11,8 @@
     "lint": "oxlint",
     "check:mau": "node scripts/check-mau.mjs",
     "preview": "vite preview",
-    "kiem:hien-thi": "vitest run tests/xuat-dom-hien-thi.test.tsx && vite build && node scripts/kiem-13.mjs"
+    "kiem:hien-thi": "vitest run tests/xuat-dom-hien-thi.test.tsx && vite build && node scripts/kiem-13.mjs",
+    "kiem:sw": "node scripts/kiem-sw.mjs"
   },
   "dependencies": {
     "@techstark/opencv-js": "^5.0.0-release.1",

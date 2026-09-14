@@ -31,6 +31,15 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      // SERVICE WORKER VIẾT TAY (`src/sw.ts`), KHÔNG dùng bản tự sinh nữa.
+      //
+      // Bản tự sinh không cho bọc đường lui quanh `NavigationRoute`, nên một
+      // lượt điều hướng rơi vào lúc bản mới vừa chiếm quyền là ra thẳng
+      // ERR_FAILED — đúng lỗi "app học sinh / phụ huynh không vào được" thầy
+      // báo 14/09. Đọc `src/sw.ts` để biết ba tầng đường lui.
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       registerType: 'autoUpdate',
       // Tự đăng ký service worker trong main.tsx (registerSW từ
       // 'virtual:pwa-register', immediate:true) để có bản mới TỰ TẢI LẠI
@@ -44,14 +53,20 @@ export default defineConfig({
       // manifest.json / manifest-hs.json / manifest-ph.json nay nằm thẳng trong
       // public/, và index.html tự chọn đúng file ngay lúc phân tích HTML.
       manifest: false,
-      workbox: {
+      injectManifest: {
+        // DẠNG IIFE, KHÔNG PHẢI ES MODULE.
+        //
+        // Mặc định của plugin là `es`, và service worker dạng ES module thì
+        // Safari trên iPhone KHÔNG đăng ký được — nghĩa là mọi máy iPhone của
+        // học sinh mất sạch phần chạy offline. Máy thầy dùng Chrome nên lỗi này
+        // không bao giờ lộ ra khi thử ở nhà.
+        rollupFormat: 'iife',
         // BẢN MỚI PHẢI CHIẾM QUYỀN NGAY. Mặc định, service worker mới chỉ nằm
         // chờ ("waiting") tới khi người dùng đóng HẾT tab/app — mà app đã cài
         // vào màn hình chính thì gần như không bao giờ bị đóng hẳn, nên bản mới
         // nằm chờ vô hạn: thầy sửa lỗi, đẩy lên, mở app vẫn thấy bản cũ. Đã dính
         // đúng lỗi này (bản 0eddc42 nằm chờ trong khi máy chủ đã có bản mới).
-        skipWaiting: true,
-        clientsClaim: true,
+        // `skipWaiting` và `clientsClaim` nay gọi thẳng trong `src/sw.ts`.
         // woff2/woff: phông có dấu tiếng Việt và phông công thức của KaTeX.
         // Thiếu hai đuôi này thì mất mạng là dấu tiếng Việt và chỉ số công thức
         // rơi về phông dự phòng — đúng lỗi "bă`ng" đã gặp.
@@ -67,9 +82,8 @@ export default defineConfig({
         //
         // `_redirects` lo phía máy chủ cho máy CHƯA cài; dòng này lo phía máy
         // em ĐÃ cài. Phải có cả hai.
-        navigateFallback: 'index.html',
-        // Trừ các đường của chính Cloudflare Pages và đường ép tải bản mới (_moi).
-        navigateFallbackDenylist: [/^\/cdn-cgi\//, /[?&]_moi=/],
+        // `navigateFallback` và danh sách trừ nay nằm trong `src/sw.ts` — ở đó
+        // mới bọc được đường lui ra mạng.
         maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
         // KHÔNG chặn /t/, /hs/, /ph/ nữa: service worker cứ trả index.html cho
         // mọi đường điều hướng, và app tự đọc vai + mã ca từ ĐƯỜNG DẪN

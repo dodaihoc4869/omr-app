@@ -21,6 +21,12 @@ npm run build || { echo ">>> DỰNG HỎNG — đọc lỗi ở trên."; exit 1;
 rm -f dist/404.html
 
 echo
+echo "=== 2b/4 · Kiểm service worker TRƯỚC khi đẩy ==="
+# Lỗi 14/09 "app không vào được" nằm trong dist/sw.js — tệp chỉ sinh ra lúc
+# dựng nên không phép kiểm nào trong kho đụng tới. Từ nay chặn ngay tại đây.
+node scripts/kiem-sw.mjs || { echo ">>> SERVICE WORKER HỎNG — KHÔNG ĐẨY. Đọc dòng ✗ ở trên."; exit 1; }
+
+echo
 echo "=== 3/4 · Đẩy APP lên Pages ==="
 npx -y wrangler@latest pages deploy dist --project-name=omr-app --branch=main
 MA=$?
