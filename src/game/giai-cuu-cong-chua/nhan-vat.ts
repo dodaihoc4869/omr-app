@@ -155,22 +155,22 @@ export function mat(
     ctx.quadraticCurveTo(x, y + r * 0.55, x + r * 0.9, y)
     ctx.lineWidth = r * 0.34
     ctx.lineCap = 'round'
-    ctx.strokeStyle = '#3A2A22'
+    ctx.strokeStyle = 'rgb(58, 42, 34)'
     ctx.stroke()
     return
   }
   bau(ctx, x, y, r * 0.82, r)
-  to(ctx, { mau: '#FFFFFF', vien: r * 0.22 })
-  ctx.strokeStyle = '#3A2A22'
+  to(ctx, { mau: 'rgb(255, 255, 255)', vien: r * 0.22 })
+  ctx.strokeStyle = 'rgb(58, 42, 34)'
   ctx.lineWidth = r * 0.22
   ctx.stroke()
 
   const px = x + nhin * r * 0.26
   bau(ctx, px, y + r * 0.08, r * 0.46, r * 0.56)
-  to(ctx, { mau: '#2E2118' })
+  to(ctx, { mau: 'rgb(46, 33, 24)' })
 
   bau(ctx, px - r * 0.16, y - r * 0.26, r * 0.19, r * 0.22)
-  to(ctx, { mau: '#FFFFFF' })
+  to(ctx, { mau: 'rgb(255, 255, 255)' })
   bau(ctx, px + r * 0.16, y + r * 0.2, r * 0.1, r * 0.11)
   to(ctx, { mau: 'rgba(255,255,255,.75)' })
 }
@@ -193,7 +193,7 @@ export function cuoi(ctx: CanvasRenderingContext2D, x: number, y: number, r: num
   ctx.quadraticCurveTo(x, y + r * (0.85 + ha), x + r, y)
   ctx.lineWidth = r * 0.30
   ctx.lineCap = 'round'
-  ctx.strokeStyle = '#8A4038'
+  ctx.strokeStyle = 'rgb(138, 64, 56)'
   ctx.stroke()
   if (ha > 0.5) {
     // miệng há: tô trong
@@ -201,7 +201,7 @@ export function cuoi(ctx: CanvasRenderingContext2D, x: number, y: number, r: num
     ctx.moveTo(x - r, y)
     ctx.quadraticCurveTo(x, y + r * (0.85 + ha), x + r, y)
     ctx.quadraticCurveTo(x, y + r * 0.2, x - r, y)
-    ctx.fillStyle = '#C4585A'
+    ctx.fillStyle = 'rgb(196, 88, 90)'
     ctx.fill()
   }
 }
@@ -306,7 +306,7 @@ function veKieuDau(ctx: CanvasRenderingContext2D, kieu: KieuDau, mau: BoMau, R: 
       to(ctx, { mau: sangHon(mau.phu, 0.35), vien: 3.2 })
       ctx.beginPath()
       ctx.arc(0, dinh - R * 0.98, R * 0.24, 0, Math.PI * 2)
-      to(ctx, { mau: '#FFFFFF', vien: 3 })
+      to(ctx, { mau: 'rgb(255, 255, 255)', vien: 3 })
       break
     case 'nonLa':
       // NÓN LÁ — nét riêng của trung tâm, không mượn của ai.
@@ -315,7 +315,7 @@ function veKieuDau(ctx: CanvasRenderingContext2D, kieu: KieuDau, mau: BoMau, R: 
       ctx.quadraticCurveTo(0, dinh - R * 1.5, R * 1.5, dinh + R * 0.22)
       ctx.quadraticCurveTo(0, dinh + R * 0.52, -R * 1.5, dinh + R * 0.22)
       ctx.closePath()
-      to(ctx, { mau: '#F2D9A0', vien: 3.4, khoi: true, tren: dinh - R * 1.2, duoi: dinh + R * 0.4 })
+      to(ctx, { mau: 'rgb(242, 217, 160)', vien: 3.4, khoi: true, tren: dinh - R * 1.2, duoi: dinh + R * 0.4 })
       for (let i = -2; i <= 2; i++) {
         ctx.beginPath()
         ctx.moveTo(0, dinh - R * 1.18)
@@ -401,7 +401,7 @@ export function veBinhHoaChat(
   ctx.lineTo(7.5, 6)
   ctx.quadraticCurveTo(0, 8.6, -7.5, 6)
   ctx.closePath()
-  to(ctx, { mau: '#EAF2FA', vien: 2.2 })
+  to(ctx, { mau: 'rgb(234, 242, 250)', vien: 2.2 })
 
   // dung dịch bên trong
   ctx.beginPath()
@@ -414,7 +414,7 @@ export function veBinhHoaChat(
 
   ctx.beginPath()
   ctx.rect(-2.6, -7.6, 5.2, 3.8)
-  to(ctx, { mau: '#D6E2EE', vien: 2 })
+  to(ctx, { mau: 'rgb(214, 226, 238)', vien: 2 })
   ctx.restore()
 }
 
@@ -456,7 +456,7 @@ export function veHocTro(
     // dẫm: bàn chân xoay ngang thành mũi nhọn chúc xuống
     if (tu === 'dam') ctx.ellipse(0, 2, 6.6, 7.4, 0, 0, Math.PI * 2)
     else ctx.ellipse(2, 0, 9.5, 5.6, 0, 0, Math.PI * 2)
-    to(ctx, { mau: '#4A3B52', vien: 3 })
+    to(ctx, { mau: 'rgb(74, 59, 82)', vien: 3 })
     ctx.restore()
   }
 
@@ -550,7 +550,7 @@ export function veCongChua(ctx: CanvasRenderingContext2D, t: number): void {
     ctx.quadraticCurveTo(s * 22 + Math.sin(n * 2 + s) * 3, yThan + 30, s * 15, yThan + 46)
     ctx.quadraticCurveTo(s * 6, yThan + 44, s * 5, yThan + 20)
     ctx.closePath()
-    to(ctx, { mau: '#FFE3F1', vien: 3.2, khoi: true, tren: yThan, duoi: yThan + 46 })
+    to(ctx, { mau: 'rgb(255, 227, 241)', vien: 3.2, khoi: true, tren: yThan, duoi: yThan + 46 })
   }
 
   // quần lụa
@@ -560,7 +560,7 @@ export function veCongChua(ctx: CanvasRenderingContext2D, t: number): void {
   ctx.lineTo(9, yThan + 44)
   ctx.quadraticCurveTo(14, yThan + 34, 11, yThan + 12)
   ctx.closePath()
-  to(ctx, { mau: '#F7F3FF', vien: 3.2 })
+  to(ctx, { mau: 'rgb(247, 243, 255)', vien: 3.2 })
 
   // thân áo dài
   ctx.beginPath()
@@ -570,7 +570,7 @@ export function veCongChua(ctx: CanvasRenderingContext2D, t: number): void {
   ctx.quadraticCurveTo(15, yThan - 6, 13, yThan + 14)
   ctx.quadraticCurveTo(0, yThan + 18, -13, yThan + 14)
   ctx.closePath()
-  to(ctx, { mau: '#FF8FC0', vien: 3.6, khoi: true, tren: yThan - 23, duoi: yThan + 18 })
+  to(ctx, { mau: 'rgb(255, 143, 192)', vien: 3.6, khoi: true, tren: yThan - 23, duoi: yThan + 18 })
 
   // hoa thêu trên áo
   for (const [hx, hy] of [[-5, yThan - 4], [6, yThan + 4], [-2, yThan + 10]] as [number, number][]) {
@@ -583,8 +583,8 @@ export function veCongChua(ctx: CanvasRenderingContext2D, t: number): void {
   }
 
   // tay
-  chi(ctx, -13, yThan - 9, 21, 9.5, 0.3 + Math.sin(n * 1.6) * 0.1, '#FF8FC0')
-  chi(ctx, 13, yThan - 9, 21, 9.5, -0.3 - Math.sin(n * 1.6) * 0.1, '#FF8FC0')
+  chi(ctx, -13, yThan - 9, 21, 9.5, 0.3 + Math.sin(n * 1.6) * 0.1, 'rgb(255, 143, 192)')
+  chi(ctx, 13, yThan - 9, 21, 9.5, -0.3 - Math.sin(n * 1.6) * 0.1, 'rgb(255, 143, 192)')
 
   // tóc dài phía sau
   ctx.beginPath()
@@ -593,20 +593,20 @@ export function veCongChua(ctx: CanvasRenderingContext2D, t: number): void {
   ctx.lineTo(R * 0.7, yDau + 52)
   ctx.quadraticCurveTo(R * 1.5, yDau + 34, R * 0.95, yDau)
   ctx.closePath()
-  to(ctx, { mau: '#3B2A24', vien: 3.4, khoi: true, tren: yDau, duoi: yDau + 52 })
+  to(ctx, { mau: 'rgb(59, 42, 36)', vien: 3.4, khoi: true, tren: yDau, duoi: yDau + 52 })
 
   // đầu
   ctx.save()
   ctx.translate(0, yDau)
   ctx.beginPath()
   ctx.ellipse(0, 0, R * 1.02, R * 0.97, 0, 0, Math.PI * 2)
-  to(ctx, { mau: '#FFE0C4', vien: 3.6, khoi: true, tren: -R, duoi: R })
+  to(ctx, { mau: 'rgb(255, 224, 196)', vien: 3.6, khoi: true, tren: -R, duoi: R })
 
   // tóc mái
   ctx.beginPath()
   ctx.arc(0, -R * 0.4, R * 1.03, Math.PI * 1.0, Math.PI * 2.0)
   ctx.closePath()
-  to(ctx, { mau: '#3B2A24', vien: 3.2, khoi: true, tren: -R * 1.4, duoi: -R * 0.4 })
+  to(ctx, { mau: 'rgb(59, 42, 36)', vien: 3.2, khoi: true, tren: -R * 1.4, duoi: -R * 0.4 })
 
   // VƯƠNG MIỆN HOA SEN — năm cánh, vàng
   for (let i = -2; i <= 2; i++) {
@@ -615,12 +615,12 @@ export function veCongChua(ctx: CanvasRenderingContext2D, t: number): void {
     ctx.rotate(a)
     ctx.beginPath()
     ctx.ellipse(0, -R * 1.28, 4.6 - Math.abs(i) * 0.7, 9 - Math.abs(i) * 1.6, 0, 0, Math.PI * 2)
-    to(ctx, { mau: '#FFD166', vien: 2.8 })
+    to(ctx, { mau: 'rgb(255, 209, 102)', vien: 2.8 })
     ctx.restore()
   }
   ctx.beginPath()
   ctx.arc(0, -R * 1.12, 3.4, 0, Math.PI * 2)
-  to(ctx, { mau: '#FF6FA5', vien: 2.4 })
+  to(ctx, { mau: 'rgb(255, 111, 165)', vien: 2.4 })
 
   const nhay = (t % 5200) < 130 ? 1 : 0
   mat(ctx, -9, 2, 7.6, Math.sin(n * 0.6) * 0.3, nhay)
@@ -630,7 +630,7 @@ export function veCongChua(ctx: CanvasRenderingContext2D, t: number): void {
   cuoi(ctx, 0, 13, 5.6, 0.2)
   ctx.beginPath()
   ctx.arc(0, 7.5, 1.8, 0, Math.PI * 2)
-  to(ctx, { mau: '#E5B896' })
+  to(ctx, { mau: 'rgb(229, 184, 150)' })
   ctx.restore()
 }
 
@@ -651,9 +651,9 @@ export function veRong(ctx: CanvasRenderingContext2D, t: number, phunLua: number
   // ngần ấy thì bàn chân mới CHẠM nền thay vì lún xuống dưới nền.
   ctx.save()
   ctx.translate(0, -23)
-  const THAN = '#4FBF6A'
-  const BUNG = '#F6E08A'
-  const SUNG = '#E8C070'
+  const THAN = 'rgb(79, 191, 106)'
+  const BUNG = 'rgb(246, 224, 138)'
+  const SUNG = 'rgb(232, 192, 112)'
 
   bongDo(ctx, 6, 42, 0.22)
 
@@ -717,7 +717,7 @@ export function veRong(ctx: CanvasRenderingContext2D, t: number, phunLua: number
     ctx.quadraticCurveTo(-20 - Math.abs(i) * 2, -6 + i * 7, -30 - Math.abs(i), i * 11 + Math.sin(n * 3 + i) * 2)
     ctx.lineWidth = 5.5
     ctx.lineCap = 'round'
-    ctx.strokeStyle = '#E07A3C'
+    ctx.strokeStyle = 'rgb(224, 122, 60)'
     ctx.stroke()
   }
 
@@ -761,16 +761,16 @@ export function veRong(ctx: CanvasRenderingContext2D, t: number, phunLua: number
     ctx.moveTo(tx - 2.4, ty - 2)
     ctx.quadraticCurveTo(tx, ty + 5.5, tx + 2.4, ty - 2)
     ctx.closePath()
-    to(ctx, { mau: '#FFFFFF', vien: 2 })
+    to(ctx, { mau: 'rgb(255, 255, 255)', vien: 2 })
   }
 
   // mắt — to, tròn, hơi hung nhưng vẫn dễ thương
   bau(ctx, 4, -5, 8.4, 9.2)
-  to(ctx, { mau: '#FFF6D8', vien: 3 })
+  to(ctx, { mau: 'rgb(255, 246, 216)', vien: 3 })
   bau(ctx, 5.4, -4, 4.2, 5.6)
-  to(ctx, { mau: '#C0392B' })
+  to(ctx, { mau: 'rgb(192, 57, 43)' })
   bau(ctx, 4.2, -6.6, 1.9, 2.1)
-  to(ctx, { mau: '#FFFFFF' })
+  to(ctx, { mau: 'rgb(255, 255, 255)' })
   // chân mày gồ, cho ra vẻ trùm
   ctx.beginPath()
   ctx.moveTo(-3, -15)
@@ -791,7 +791,7 @@ export function veRong(ctx: CanvasRenderingContext2D, t: number, phunLua: number
     )
     ctx.lineWidth = 3.2
     ctx.lineCap = 'round'
-    ctx.strokeStyle = '#E07A3C'
+    ctx.strokeStyle = 'rgb(224, 122, 60)'
     ctx.stroke()
   }
 
@@ -808,8 +808,8 @@ export function veRong(ctx: CanvasRenderingContext2D, t: number, phunLua: number
       const r = (5 + u * 17) * (0.55 + rn * 0.6) * L
       const g = ctx.createRadialGradient(x, y, 0, x, y, r)
       const nong = u < 0.35
-      g.addColorStop(0, nong ? '#FFF9D0' : '#FFD25A')
-      g.addColorStop(0.5, nong ? '#FFC93C' : '#FF8A2B')
+      g.addColorStop(0, nong ? 'rgb(255, 249, 208)' : 'rgb(255, 210, 90)')
+      g.addColorStop(0.5, nong ? 'rgb(255, 201, 60)' : 'rgb(255, 138, 43)')
       g.addColorStop(1, 'rgba(255,92,20,0)')
       ctx.beginPath()
       ctx.arc(x, y, r, 0, Math.PI * 2)
@@ -833,7 +833,7 @@ export function veRong(ctx: CanvasRenderingContext2D, t: number, phunLua: number
       ctx.quadraticCurveTo(i * 5, 21, i * 4.5, 23)
       ctx.lineWidth = 2.6
       ctx.lineCap = 'round'
-      ctx.strokeStyle = '#FFF3D0'
+      ctx.strokeStyle = 'rgb(255, 243, 208)'
       ctx.stroke()
     }
     ctx.restore()
@@ -863,14 +863,14 @@ export function veMang(ctx: CanvasRenderingContext2D, con: number, y: number): v
     ctx.bezierCurveTo(-5.4, -1.4, -3.2, -6.2, 0, -3.2)
     ctx.bezierCurveTo(3.2, -6.2, 5.4, -1.4, 0, 3.4)
     ctx.closePath()
-    to(ctx, { mau: i < con ? '#FF5A7A' : 'rgba(255,255,255,.28)', vien: 1.8 })
+    to(ctx, { mau: i < con ? 'rgb(255, 90, 122)' : 'rgba(255,255,255,.28)', vien: 1.8 })
     ctx.restore()
   }
 }
 
 /* ═══════════════════ QUÁI VÀ HOA ═══════════════════ */
 
-const MAU_QUAI = ['#8A5AC8', '#E8674C', '#2FA8A0'] as const
+const MAU_QUAI = ['rgb(138, 90, 200)', 'rgb(232, 103, 76)', 'rgb(47, 168, 160)'] as const
 
 /**
  * Quái đi tuần. Ba kiểu, phân biệt bằng SỪNG và CHÂN chứ không bằng chi tiết nhỏ —
@@ -918,7 +918,7 @@ export function veQuai(ctx: CanvasRenderingContext2D, kieu: number, huong: 1 | -
       ctx.lineTo(sx * 1.35, -72 + nhun)
       ctx.lineTo(sx * 0.55, -56 + nhun)
       ctx.closePath()
-      to(ctx, { mau: '#F6E08A', vien: 2.4 })
+      to(ctx, { mau: 'rgb(246, 224, 138)', vien: 2.4 })
     }
   }
 
@@ -933,7 +933,7 @@ export function veQuai(ctx: CanvasRenderingContext2D, kieu: number, huong: 1 | -
     ctx.lineTo(-11 + (i + 1) * 7.3, -22 + nhun)
   }
   ctx.closePath()
-  to(ctx, { mau: '#FFF6E8', vien: 2 })
+  to(ctx, { mau: 'rgb(255, 246, 232)', vien: 2 })
   ctx.restore()
 }
 
@@ -953,11 +953,11 @@ export function veHoa(ctx: CanvasRenderingContext2D, t: number): void {
     ctx.rotate((i / 6) * Math.PI * 2 + n * 0.6)
     ctx.beginPath()
     ctx.ellipse(0, -17, 9, 15, 0, 0, Math.PI * 2)
-    to(ctx, { mau: i % 2 ? '#FF7AB0' : '#FF5A9E', vien: 2.4 })
+    to(ctx, { mau: i % 2 ? 'rgb(255, 122, 176)' : 'rgb(255, 90, 158)', vien: 2.4 })
     ctx.restore()
   }
   // nhuỵ
   ctx.beginPath(); ctx.arc(0, 0, 9, 0, Math.PI * 2)
-  to(ctx, { mau: '#FFC13D', vien: 2.4 })
+  to(ctx, { mau: 'rgb(255, 193, 61)', vien: 2.4 })
   ctx.restore()
 }

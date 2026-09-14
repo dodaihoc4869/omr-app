@@ -26,18 +26,18 @@ export interface HoaChat {
 }
 
 export const HOA_CHAT: readonly HoaChat[] = [
-  { ct: 'HCl',      mau: '#12B5CB', vai: 'axit',    cation: 'H',   anion: 'Cl'  },
-  { ct: 'H₂SO₄',    mau: '#C79A2E', vai: 'axit',    cation: 'H',   anion: 'SO4' },
-  { ct: 'NaOH',     mau: '#4F6BED', vai: 'kiem',    cation: 'Na',  anion: 'OH'  },
-  { ct: 'Ca(OH)₂',  mau: '#EDF2F8', vai: 'kiem',    cation: 'Ca',  anion: 'OH'  },
-  { ct: 'Ba(OH)₂',  mau: '#A9BEF2', vai: 'kiem',    cation: 'Ba',  anion: 'OH'  },
-  { ct: 'Na₂CO₃',   mau: '#5FD0B6', vai: 'muoi',    cation: 'Na',  anion: 'CO3' },
-  { ct: 'CuSO₄',    mau: '#1E7FD4', vai: 'muoi',    cation: 'Cu',  anion: 'SO4' }, // xanh lam — màu thật
-  { ct: 'AgNO₃',    mau: '#CFC7DE', vai: 'muoi',    cation: 'Ag',  anion: 'NO3' },
-  { ct: 'Al',       mau: '#BFC7D0', vai: 'kimLoai', cation: null,  anion: null  },
-  { ct: 'Zn',       mau: '#7E93A8', vai: 'kimLoai', cation: null,  anion: null  },
-  { ct: 'FeCl₃',    mau: '#C86A2E', vai: 'muoi',    cation: 'Fe3', anion: 'Cl'  }, // vàng nâu — màu thật
-  { ct: 'Cl₂',      mau: '#B8D62B', vai: 'oxh',     cation: null,  anion: null  }, // vàng lục — màu thật
+  { ct: 'HCl',      mau: 'rgb(18, 181, 203)', vai: 'axit',    cation: 'H',   anion: 'Cl'  },
+  { ct: 'H₂SO₄',    mau: 'rgb(199, 154, 46)', vai: 'axit',    cation: 'H',   anion: 'SO4' },
+  { ct: 'NaOH',     mau: 'rgb(79, 107, 237)', vai: 'kiem',    cation: 'Na',  anion: 'OH'  },
+  { ct: 'Ca(OH)₂',  mau: 'rgb(237, 242, 248)', vai: 'kiem',    cation: 'Ca',  anion: 'OH'  },
+  { ct: 'Ba(OH)₂',  mau: 'rgb(169, 190, 242)', vai: 'kiem',    cation: 'Ba',  anion: 'OH'  },
+  { ct: 'Na₂CO₃',   mau: 'rgb(95, 208, 182)', vai: 'muoi',    cation: 'Na',  anion: 'CO3' },
+  { ct: 'CuSO₄',    mau: 'rgb(30, 127, 212)', vai: 'muoi',    cation: 'Cu',  anion: 'SO4' }, // xanh lam — màu thật
+  { ct: 'AgNO₃',    mau: 'rgb(207, 199, 222)', vai: 'muoi',    cation: 'Ag',  anion: 'NO3' },
+  { ct: 'Al',       mau: 'rgb(191, 199, 208)', vai: 'kimLoai', cation: null,  anion: null  },
+  { ct: 'Zn',       mau: 'rgb(126, 147, 168)', vai: 'kimLoai', cation: null,  anion: null  },
+  { ct: 'FeCl₃',    mau: 'rgb(200, 106, 46)', vai: 'muoi',    cation: 'Fe3', anion: 'Cl'  }, // vàng nâu — màu thật
+  { ct: 'Cl₂',      mau: 'rgb(184, 214, 43)', vai: 'oxh',     cation: null,  anion: null  }, // vàng lục — màu thật
 ] as const
 
 export const SO_HOA_CHAT = HOA_CHAT.length

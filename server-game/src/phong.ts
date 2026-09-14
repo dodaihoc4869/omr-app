@@ -191,6 +191,14 @@ export class PhongChoi {
       return
     }
     this.van.buoc(NHIP_MS / 1000)
+    // Sự kiện (phương trình, ăn hoa, khổng lồ hất) phải xuống cả phòng — máy chủ
+    // không có "người thật" nào nên ván không tự hiện băng cho ai được.
+    for (const sk of this.van.rutNhatKy()) {
+      this.phat({
+        loai: "suKien", giay: sk.giay, nhan: sk.nhan, pt: sk.pt,
+        tieuChi: sk.tieuChi, mau: sk.mau, idA: sk.idA, idB: sk.idB,
+      })
+    }
     this.banAnh()
     if (this.van.pha === 'xong') this.ketVan()
   }

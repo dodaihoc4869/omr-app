@@ -32,7 +32,7 @@ function mh(k: KhungNhin, x: number, y: number): [number, number] {
 
 function troiVaDoi(ctx: CanvasRenderingContext2D, k: KhungNhin, t: number): void {
   const g = ctx.createLinearGradient(0, 0, 0, k.H)
-  g.addColorStop(0, '#C9ECFB'); g.addColorStop(1, '#8FD4F5')
+  g.addColorStop(0, 'rgb(201, 236, 251)'); g.addColorStop(1, 'rgb(143, 212, 245)')
   ctx.fillStyle = g; ctx.fillRect(0, 0, k.W, k.H)
 
   for (let i = 0; i < 6; i++) {
@@ -52,7 +52,7 @@ function troiVaDoi(ctx: CanvasRenderingContext2D, k: KhungNhin, t: number): void
     ctx.lineTo(x, yNen - 52 - Math.sin(u) * 34 - Math.sin(u * 2.3) * 16)
   }
   ctx.lineTo(k.W, k.H); ctx.lineTo(0, k.H); ctx.closePath()
-  ctx.fillStyle = '#9FDE8C'; ctx.fill()   // nhạt hơn cỏ thật, để không nhầm là chỗ đứng
+  ctx.fillStyle = 'rgb(159, 222, 140)'; ctx.fill()   // nhạt hơn cỏ thật, để không nhầm là chỗ đứng
 }
 
 function nenVaBac(ctx: CanvasRenderingContext2D, k: KhungNhin, van: VanChoi): void {
@@ -65,8 +65,8 @@ function nenVaBac(ctx: CanvasRenderingContext2D, k: KhungNhin, van: VanChoi): vo
     const [x1] = mh(k, moc[i]!, 0)
     const [x2] = mh(k, moc[i + 1]!, 0)
     if (x2 < -40 || x1 > k.W + 40) continue
-    ctx.fillStyle = '#5CC24A'; ctx.fillRect(x1, yNen, x2 - x1, 15)
-    ctx.fillStyle = '#B9793F'; ctx.fillRect(x1, yNen + 15, x2 - x1, k.H - yNen - 15)
+    ctx.fillStyle = 'rgb(92, 194, 74)'; ctx.fillRect(x1, yNen, x2 - x1, 15)
+    ctx.fillStyle = 'rgb(185, 121, 63)'; ctx.fillRect(x1, yNen + 15, x2 - x1, k.H - yNen - 15)
   }
   for (const b of van.dao.bac) {
     const [x, y] = mh(k, b.x, b.y)
@@ -75,8 +75,8 @@ function nenVaBac(ctx: CanvasRenderingContext2D, k: KhungNhin, van: VanChoi): vo
     ctx.beginPath()
     const h = 22 * k.ti
     if (ctx.roundRect) ctx.roundRect(x, y, w, h, 8 * k.ti); else ctx.rect(x, y, w, h)
-    ctx.fillStyle = '#B9793F'; ctx.fill()
-    ctx.fillStyle = '#5CC24A'; ctx.fillRect(x, y, w, 6 * k.ti)
+    ctx.fillStyle = 'rgb(185, 121, 63)'; ctx.fill()
+    ctx.fillStyle = 'rgb(92, 194, 74)'; ctx.fillRect(x, y, w, 6 * k.ti)
   }
 }
 
@@ -122,7 +122,7 @@ function veNguoi(
   ctx.globalAlpha = laToi ? 1 : 0.88
   ctx.strokeStyle = 'rgba(255,255,255,.92)'
   ctx.strokeText(n.hoaChat, 0, -128)
-  ctx.fillStyle = chatCua(n.hoaChat).mau === '#EDF2F8' ? '#8E9CB4' : chatCua(n.hoaChat).mau
+  ctx.fillStyle = chatCua(n.hoaChat).mau === 'rgb(237, 242, 248)' ? 'rgb(142, 156, 180)' : chatCua(n.hoaChat).mau
   ctx.fillText(n.hoaChat, 0, -128)
   ctx.restore()
   ctx.globalAlpha = 1
@@ -136,7 +136,7 @@ function veNguoi(
 
 function chatCua(ct: string): { ct: string; mau: string } {
   const h = HOA_CHAT.find((c) => c.ct === ct)
-  return { ct, mau: h?.mau ?? '#999' }
+  return { ct, mau: h?.mau ?? 'rgb(153, 153, 153)' }
 }
 
 /** nhan-vat dùng mốc thời gian mili-giây; ván dùng giây. Đổi ở đúng một chỗ. */
@@ -189,7 +189,7 @@ function veCanhMoDau(ctx: CanvasRenderingContext2D, W: number, H: number, u: num
     const y = H * 0.50 + i * (co * (cuoi ? 1.15 : 1.5))
     if (cuoi) {
       ctx.shadowColor = 'rgba(255,120,60,.85)'; ctx.shadowBlur = 26
-      ctx.fillStyle = '#FFD27A'
+      ctx.fillStyle = 'rgb(255, 210, 122)'
     } else {
       ctx.shadowBlur = 0
       ctx.fillStyle = 'rgba(240,238,250,.94)'
@@ -217,11 +217,11 @@ export function veVan(ctx: CanvasRenderingContext2D, van: VanChoi, W: number, H:
     ctx.beginPath()
     ctx.moveTo(xh - 90 * k.ti, yh)
     ctx.quadraticCurveTo(xh + 260 * k.ti, yh - 560 * k.ti, xh + 610 * k.ti, yh)
-    ctx.closePath(); ctx.fillStyle = '#7A6A86'; ctx.fill()
+    ctx.closePath(); ctx.fillStyle = 'rgb(122, 106, 134)'; ctx.fill()
     ctx.beginPath()
     ctx.moveTo(xh + 120 * k.ti, yh)
     ctx.quadraticCurveTo(xh + 260 * k.ti, yh - 330 * k.ti, xh + 400 * k.ti, yh)
-    ctx.closePath(); ctx.fillStyle = '#2A1F33'; ctx.fill()
+    ctx.closePath(); ctx.fillStyle = 'rgb(42, 31, 51)'; ctx.fill()
   }
 
   // ——— rồng
@@ -246,7 +246,7 @@ export function veVan(ctx: CanvasRenderingContext2D, van: VanChoi, W: number, H:
     ctx.restore()
     // cột đá để nấp
     const [cx, cy] = mh(k, van.rong.x - 290, 0)
-    ctx.fillStyle = van.rong.cotConLai > 0 ? '#6C5B7B' : '#8A7A6A'
+    ctx.fillStyle = van.rong.cotConLai > 0 ? 'rgb(108, 91, 123)' : 'rgb(138, 122, 106)'
     ctx.fillRect(cx - 16 * k.ti, cy - 210 * k.ti, 32 * k.ti, 210 * k.ti)
   }
 

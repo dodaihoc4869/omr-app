@@ -1,11 +1,15 @@
 /**
  * DỮ LIỆU THẦN THÚ HOÁ HỌC (ALCHEMON)
- * 4 Hệ nguyên tố: Hỏa/Nhiệt Nhôm, Axit/Ăn Mòn, Kiềm/Tinh Thể, Khí/Halogen
+ * 4 hệ: Hoả/nhiệt nhôm · Acid/ăn mòn · Base/kết tủa · Khí/halogen.
+ * Danh pháp 2018 cho mọi chữ HIỆN RA cho học sinh (acid, base, sodium…).
  * Tuân thủ tuyệt đối quy tắc check:mau (chỉ dùng rgb / rgba, không dùng hex code).
  */
 
+import { CAP_TOI_DA, type CapTienHoa } from './hinh-thai'
+import { EXP_BAN_DAU, thanhExp } from './kinh-nghiem'
+
 export type HeNguyenTo = 'hoa' | 'axit' | 'kiem' | 'khi'
-export type CapTienHoa = 1 | 2 | 3
+export type { CapTienHoa }
 
 export interface ThanThuInfo {
   id: string
@@ -37,26 +41,26 @@ export const DANH_SACH_THAN_THU: Record<string, ThanThuInfo> = {
   },
   thuy_quai: {
     id: 'thuy_quai',
-    ten: 'Hải Quái Axit Aqua',
+    ten: 'Hải Quái Acid Aqua',
     danhHieu: 'Chúa Tể Ăn Mòn Kim Loại',
     he: 'axit',
     mauChinh: 'rgb(168, 85, 247)',
     mauPhu: 'rgb(99, 102, 241)',
     mauHaoQuang: 'rgba(168, 85, 247, 0.45)',
-    moTa: 'Tích tụ từ dòng dung dịch cường toan HNO₃ và HCl đặc. Rút cạn sinh lực và ăn mòn mọi lớp giáp kiềm kim.',
-    kyNangThuong: 'Bắn Gai Axit H⁺',
+    moTa: 'Tích tụ từ nước cường toan — HNO₃ đặc trộn HCl đặc theo tỉ lệ 1 : 3. Rút cạn sinh lực và ăn mòn mọi lớp giáp kiềm kim.',
+    kyNangThuong: 'Bắn Gai Acid H⁺',
     kyNangNo: 'Đại Hồng Thủy Cường Toan',
-    nguyenToGoc: 'HNO₃ + HCl',
+    nguyenToGoc: 'HNO₃ + 3HCl',
   },
   thiet_giap: {
     id: 'thiet_giap',
-    ten: 'Bảo Thần Kiềm Tinh Thể',
+    ten: 'Bảo Thần Base Tinh Thể',
     danhHieu: 'Kim Thân Bất Hoại BaSO₄',
     he: 'kiem',
     mauChinh: 'rgb(14, 165, 233)',
     mauPhu: 'rgb(234, 179, 8)',
     mauHaoQuang: 'rgba(14, 165, 233, 0.45)',
-    moTa: 'Kết tinh từ mạng lưới tinh thể bazơ bền vững và kết tủa BaSO₄. Tạo màn chắn trung hòa mọi loại axit.',
+    moTa: 'Kết tinh từ mạng lưới tinh thể base bền vững và kết tủa BaSO₄. Tạo màn chắn trung hoà mọi loại acid.',
     kyNangThuong: 'Khiên Kết Tủa BaSO₄',
     kyNangNo: 'Lồng Tinh Thể Trung Hòa',
     nguyenToGoc: 'Ba(OH)₂ + Na₂SO₄',
@@ -69,19 +73,19 @@ export const DANH_SACH_THAN_THU: Record<string, ThanThuInfo> = {
     mauChinh: 'rgb(34, 197, 94)',
     mauPhu: 'rgb(16, 185, 129)',
     mauHaoQuang: 'rgba(34, 197, 94, 0.45)',
-    moTa: 'Hấp thụ khí Flo và Clo đậm đặc, có độ âm điện mạnh nhất bảng tuần hoàn, giật điện và làm tê liệt đối thủ.',
+    moTa: 'Hấp thụ khí fluorine và chlorine. Fluorine có độ âm điện lớn nhất bảng tuần hoàn.',
     kyNangThuong: 'Lốc Xoáy Khí Clo Cl₂',
     kyNangNo: 'Cuồng Phong Oxi Hóa Flo F₂',
-    nguyenToGoc: 'F₂ + Cl₂',
+    nguyenToGoc: 'F₂, Cl₂',
   },
 }
 
 /**
  * Tương khắc nguyên tố:
- * Hỏa (Nhiệt nhôm) > Khí (Halogen)
- * Khí (Halogen) > Kiềm (Hấp thụ kiềm)
- * Kiềm (Bazơ) > Axit (Trung hòa axit)
- * Axit (Ăn mòn) > Hỏa (Dập tắt oxit / nhiệt)
+ * Hoả (nhiệt nhôm) > Khí (halogen)
+ * Khí (halogen) > Base (kiềm hấp thụ khí halogen)
+ * Base > Acid (trung hoà acid)
+ * Acid (ăn mòn) > Hoả (ăn mòn kim loại, dập phản ứng nhiệt)
  */
 export function tinhHeSoTuongKhac(heCong: HeNguyenTo, heThu: HeNguyenTo): { heSo: number; thongDiep: string } {
   if (
@@ -112,22 +116,57 @@ export interface HoSoThanThuLuu {
   expToiDa: number
   capTienHoa: CapTienHoa
   tangThapCaoNhat: number
-  soLanThangPvp: number
+  /** Số câu sai đã thanh tẩy — nguồn EXP thật, có hiện ra màn. */
+  soCauDaThanhTay: number
   danhHieuHienTai: string
   ngayNhanTrung: string
 }
 
 export const KHOA_LUU_THAN_THU = 'omr_than_thu_hoa_hoc_data'
 
+/**
+ * Trộn hồ sơ đọc từ máy với hồ sơ mặc định.
+ *
+ * Hồ sơ cũ hoặc hỏng thiếu `expToiDa` thì `exp / expToiDa` ra NaN, và thanh
+ * EXP nhận `width: NaN%` — vỡ âm thầm, không ai thấy lỗi ở đâu.
+ */
+export function vaHoSo(tho: unknown, idChon = 'hoa_long'): HoSoThanThuLuu {
+  const md = layHoSoThanThuMacDinh(idChon)
+  if (typeof tho !== 'object' || tho === null) return md
+  const o = tho as Record<string, unknown>
+  const so = (k: string, mac: number): number => {
+    const v = o[k]
+    return typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : mac
+  }
+  const chuoi = (k: string, mac: string): string => {
+    const v = o[k]
+    return typeof v === 'string' && v !== '' ? v : mac
+  }
+  const capDo = Math.max(1, Math.min(CAP_TOI_DA, Math.round(so('capDo', 1))))
+  return {
+    idThanhThuChon: DANH_SACH_THAN_THU[chuoi('idThanhThuChon', md.idThanhThuChon)]
+      ? chuoi('idThanhThuChon', md.idThanhThuChon) : md.idThanhThuChon,
+    capDo,
+    exp: so('exp', 0),
+    // luôn tính lại theo cấp, không tin số cũ trong máy
+    expToiDa: thanhExp(capDo),
+    capTienHoa: capDo as CapTienHoa,
+    tangThapCaoNhat: Math.max(1, Math.round(so('tangThapCaoNhat', 1))),
+    soCauDaThanhTay: Math.max(0, Math.round(so('soCauDaThanhTay', 0))),
+    danhHieuHienTai: chuoi('danhHieuHienTai', md.danhHieuHienTai),
+    ngayNhanTrung: chuoi('ngayNhanTrung', md.ngayNhanTrung),
+  }
+}
+
 export function layHoSoThanThuMacDinh(idChon = 'hoa_long'): HoSoThanThuLuu {
   return {
     idThanhThuChon: idChon,
     capDo: 1,
     exp: 0,
-    expToiDa: 100,
+    expToiDa: EXP_BAN_DAU,
     capTienHoa: 1,
     tangThapCaoNhat: 1,
-    soLanThangPvp: 0,
+    soCauDaThanhTay: 0,
     danhHieuHienTai: 'Tập Sự Nguyên Tố',
     ngayNhanTrung: new Date().toISOString(),
   }
@@ -143,9 +182,12 @@ export function tinhLucChienPet(params: {
   tyLeBtvn: number // 0 .. 1
 }): { cp: number; mau: number; cong: number; giap: number } {
   const { capDo, capTienHoa, diemTrungBinh, tyLeBtvn } = params
-  const diemHocTap = diemTrungBinh !== null && Number.isFinite(diemTrungBinh) ? diemTrungBinh : 7.0
-  const heSoHoc = 1 + (diemHocTap / 10) * 0.4 + tyLeBtvn * 0.3
-  const heSoTienHoa = capTienHoa === 3 ? 2.2 : capTienHoa === 2 ? 1.5 : 1.0
+  // CHƯA THI CA NÀO THÌ KHÔNG CÓ BUFF TỪ ĐIỂM — không bịa 7.0 như bản trước.
+  // Bịa ở đây nghĩa là màn hình in "Điểm trung bình: 7.00đ" cho em chưa thi lần nào.
+  const coDiem = diemTrungBinh !== null && Number.isFinite(diemTrungBinh)
+  const heSoHoc = 1 + (coDiem ? (diemTrungBinh! / 10) * 0.4 : 0) + tyLeBtvn * 0.3
+  // 12 hình thái: hệ số dàn đều thay vì ba nấc 1.0 / 1.5 / 2.2
+  const heSoTienHoa = 1 + (Math.min(CAP_TOI_DA, Math.max(1, capTienHoa)) - 1) * 0.25
 
   const mau = Math.round((200 + capDo * 35) * heSoHoc * heSoTienHoa)
   const cong = Math.round((35 + capDo * 8) * heSoHoc * heSoTienHoa)

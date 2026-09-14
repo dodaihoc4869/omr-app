@@ -30,6 +30,7 @@ export interface BoNghe {
   vaoVan?: (g: Extract<GoiXuong, { loai: 'vaoVan' }>) => void
   ketVan?: (g: Extract<GoiXuong, { loai: 'ketVan' }>) => void
   loi?: (g: Extract<GoiXuong, { loai: 'loi' }>) => void
+  suKien?: (g: Extract<GoiXuong, { loai: 'suKien' }>) => void
   doiTrangThai?: (t: TrangThaiNoi) => void
 }
 
@@ -104,6 +105,7 @@ export class NoiMayChu {
       case 'phongCho': this.nghe.phongCho?.(g); break
       case 'ketVan': this.nghe.ketVan?.(g); break
       case 'loi': this.nghe.loi?.(g); break
+      case 'suKien': this.nghe.suKien?.(g); break
       default: break
     }
   }

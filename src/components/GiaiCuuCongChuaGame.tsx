@@ -55,6 +55,8 @@ export default function GiaiCuuCongChuaGame({ onDong }: Props) {
   const [phong, setPhong] = useState<GoiPhongCho | null>(null)
   const [noiTT, setNoiTT] = useState<TrangThaiNoi>('chuaNoi')
   const [loiNoi, setLoiNoi] = useState('')
+  const [bangKet, setBangKet] = useState<{ id: number; bietDanh: string; mang: number; hoaChatCuoi: string }[] | null>(null)
+  const [thangLa, setThangLa] = useState<number | null>(null)
   const oNoi = useRef<NoiMayChu | null>(null)
   const oTay = useRef<TayCam>({ trai: false, phai: false, nhay: false })
   const [chat, setChat] = useState<string>(HOA_CHAT[0]!.ct)
@@ -160,6 +162,26 @@ export default function GiaiCuuCongChuaGame({ onDong }: Props) {
       doiTrangThai: setNoiTT,
       phongCho: (g) => { setPhong(g); setMaPhong(g.maPhong) },
       loi: (g) => setLoiNoi(g.loi),
+      suKien: (g) => {
+        // Máy chủ quyết sự kiện; máy khách chỉ vẽ lại. Chỉ hiện băng khi
+        // sự kiện dính tới CHÍNH MÌNH — 12 người mà hiện hết thì loạn màn.
+        const v = oVan.current
+        if (!v) return
+        const toi = v.idNguoiThat
+        if (g.idA !== toi && g.idB !== toi) return
+        // "KHẮC CHẾ" nhìn từ phía người dẫm; nếu mình là người BỊ dẫm thì đảo lại
+        let nhan = g.nhan
+        if (g.idB === toi && g.idA !== toi) {
+          if (nhan === 'KHẮC CHẾ') nhan = 'BỊ KHẮC CHẾ'
+          else if (nhan === 'BỊ KHẮC CHẾ') nhan = 'KHẮC CHẾ'
+          else if (nhan === 'KHỔNG LỒ HẤT VĂNG') nhan = 'BỊ KHỔNG LỒ HẤT'
+        }
+        v.bang = {
+          pt: g.pt, tieuChi: g.tieuChi, nhan,
+          mau: nhan.startsWith('BỊ') ? 'rgb(255, 90, 78)' : g.mau,
+          den: v.giay + 1.6,
+        }
+      },
       vaoVan: (g) => {
         // dựng ván CỤC BỘ đúng hạt giống và mức độ máy chủ gửi, chỉ để VẼ
         const v = new VanChoi(g.hat, null, true, g.idCuaBan, g.doKho)
@@ -171,7 +193,7 @@ export default function GiaiCuuCongChuaGame({ onDong }: Props) {
         setTin({ ...TIN_RONG, hoaChat: g.nguoi.find((x) => x.id === g.idCuaBan)?.hoaChat ?? '' })
         setMan('choi')
       },
-      ketVan: () => setMan('ket'),
+      ketVan: (g) => { setBangKet(g.bang); setThangLa(g.thang); setMan('ket') },
     })
     oNoi.current = n
     n.noi(ma, bietDanh)
@@ -453,12 +475,36 @@ export default function GiaiCuuCongChuaGame({ onDong }: Props) {
   if (man === 'ket') {
     return (
       <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 text-center">
-        <h2 className="font-bold text-2xl mb-1">{tin.thang ? 'Cứu được người yêu cũ!' : 'Hết ba mạng'}</h2>
+        <h2 className="font-bold text-2xl mb-1">
+          {che === 'nhieuNguoi'
+            ? (thangLa !== null && thangLa === oNoi.current?.idCuaBan
+                ? 'Cứu được người yêu cũ!'
+                : thangLa !== null ? 'Người khác cứu được trước' : 'Hết ba mạng')
+            : (tin.thang ? 'Cứu được người yêu cũ!' : 'Hết ba mạng')}
+        </h2>
         <p className="text-[13px] text-slate-500 dark:text-slate-400 mb-5">
           {tin.thang
             ? 'Sống sót tới hang, hạ rồng, chạm tay người yêu cũ.'
             : 'Lần sau nhìn công thức trên đầu đối thủ trước khi nhảy — viền đỏ nghĩa là nhảy lên thì chính mình mất mạng.'}
         </p>
+        {bangKet && (
+          <div className="mx-auto max-w-md text-left mb-5">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Cả phòng</div>
+            <div className="rounded-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
+              {[...bangKet].sort((a, b) => b.mang - a.mang).map((r) => (
+                <div key={r.id} className="flex items-center justify-between px-3 py-2 text-[13px]">
+                  <span className="font-semibold">
+                    {r.id === thangLa && '👑 '}{r.bietDanh}
+                  </span>
+                  <span className="text-slate-500 dark:text-slate-400 tabular-nums">
+                    {r.hoaChatCuoi} · {'♥'.repeat(Math.max(0, r.mang))}{r.mang <= 0 && 'hết mạng'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="flex gap-2 justify-center">
           <button type="button" onClick={() => setMan(che === 'nhieuNguoi' ? 'phong' : 'chon')}
             className="px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm cursor-pointer">
@@ -522,6 +568,8 @@ export default function GiaiCuuCongChuaGame({ onDong }: Props) {
               {HOA_CHAT.map((h) => (
                 <button key={h.ct} type="button"
                   onClick={() => {
+                    // nhiều người: máy chủ quyết, máy khách chỉ xin
+                    if (che === 'nhieuNguoi') { oNoi.current?.chonChat(h.ct); return }
                     const van = oVan.current, toi = van?.nguoiThat
                     if (van && toi) van.doiChat(toi, h.ct)
                   }}

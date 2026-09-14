@@ -15,7 +15,7 @@ import { taoRong, buocRong, dinhDauRong, rongMatMau, type Rong } from './rong'
 import { taoNao, nghiBot, type NaoBot } from './bot'
 import { MUOI_HAI_NGUOI } from './bo-nguoi'
 import { KhoHieuUng } from './hieu-ung'
-import { LOI_CANH_MO_DAU, type NguoiChoi, type PhaVan, type BangTin } from './types'
+import { LOI_CANH_MO_DAU, type NguoiChoi, type PhaVan, type BangTin, type SuKien } from './types'
 import { layDoKho, type DoKho, type MaDoKho } from './do-kho'
 import {
   sinhQuai, sinhHoa, buocQuai, chongNhau, damTrungQuai,
@@ -37,6 +37,8 @@ export class VanChoi {
   pha: PhaVan = 'chay'
   ket: KetVan = { thang: null, duong: null, botChamCongChua: false }
   bang: BangTin | null = null
+  /** Nhật ký sự kiện chưa ai đọc. Máy chủ rút ra mỗi nhịp rồi bắn xuống. */
+  nhatKy: SuKien[] = []
   /** Cảnh mở đầu trận rồng: giây bắt đầu, null khi không chiếu. */
   canhMoDau: number | null = null
   readonly loiCanhMoDau = LOI_CANH_MO_DAU
@@ -102,6 +104,25 @@ export class VanChoi {
   /** Ăn hoa thì khổng lồ 10 giây: chạm ai người đó mất mạng, chạm quái quái chết. */
   khongLo(n: NguoiChoi): boolean { return n.khongLoDen > this.giay }
 
+  /** Ghi một sự kiện, và nếu nó dính tới người thật thì hiện băng luôn. */
+  private ghi(sk: SuKien): void {
+    this.nhatKy.push(sk)
+    if (this.nhatKy.length > 64) this.nhatKy.shift()
+    if (sk.idA === this.idNguoiThat || sk.idB === this.idNguoiThat) {
+      this.bang = {
+        pt: sk.pt, tieuChi: sk.tieuChi, nhan: sk.nhan, mau: sk.mau,
+        den: this.giay + CAU_HINH.GIAY_HIEN_PHUONG_TRINH,
+      }
+    }
+  }
+
+  /** Máy chủ rút nhật ký ra để bắn xuống. Rút xong là xoá. */
+  rutNhatKy(): SuKien[] {
+    const ds = this.nhatKy
+    this.nhatKy = []
+    return ds
+  }
+
   get nguoiThat(): NguoiChoi | undefined {
     return this.nguoi.find((n) => n.id === this.idNguoiThat)
   }
@@ -121,7 +142,7 @@ export class VanChoi {
     if (n.batTuDen > this.giay || !n.song) return
     n.mang -= 1
     n.batTuDen = this.giay + CAU_HINH.GIAY_BAT_TU_SAU_MAT_MANG
-    this.hieuUng?.chuNoi(n.x, n.y + CAU_HINH.CAO_NHAN_VAT + 30, '−1', '#FF3B30')
+    this.hieuUng?.chuNoi(n.x, n.y + CAU_HINH.CAO_NHAN_VAT + 30, '−1', 'rgb(255, 59, 48)')
     if (n.mang <= 0) { n.song = false; return }
     if (CAU_HINH.DOI_CHAT_KHI_MAT_MANG) {
       n.soLanDuocChon += 1
@@ -242,18 +263,16 @@ export class VanChoi {
         a.y = b.y + CAU_HINH.CAO_NHAN_VAT + 2
         for (const ai of kq.matMang) this.matMang(ai === 'nguoiDam' ? a : b)
         const mau = kq.hoa.loai === 'khacChe'
-          ? (kq.hoa.thang === a.hoaChat ? '#1EA05A' : '#FF5A4E')
-          : kq.hoa.loai === 'trungHoa' ? '#FF8A3D' : '#8894B4'
+          ? (kq.hoa.thang === a.hoaChat ? 'rgb(30, 160, 90)' : 'rgb(255, 90, 78)')
+          : kq.hoa.loai === 'trungHoa' ? 'rgb(255, 138, 61)' : 'rgb(136, 148, 180)'
         const nhan = kq.hoa.loai === 'khacChe'
           ? (kq.hoa.thang === a.hoaChat ? 'KHẮC CHẾ' : 'BỊ KHẮC CHẾ')
           : kq.hoa.loai === 'trungHoa' ? 'TRUNG HOÀ' : 'KHÔNG PHẢN ỨNG'
-        if (a.id === this.idNguoiThat || b.id === this.idNguoiThat) {
-          this.bang = {
-            pt: kq.hoa.pt, tieuChi: kq.hoa.tieuChi, nhan, mau,
-            den: this.giay + CAU_HINH.GIAY_HIEN_PHUONG_TRINH,
-          }
-        }
-        this.hieuUng?.no(b.x, b.y + CAU_HINH.CAO_NHAN_VAT, mau, '#FFF0A8')
+        this.ghi({
+          giay: this.giay, pt: kq.hoa.pt, tieuChi: kq.hoa.tieuChi, nhan, mau,
+          idA: a.id, idB: b.id,
+        })
+        this.hieuUng?.no(b.x, b.y + CAU_HINH.CAO_NHAN_VAT, mau, 'rgb(255, 240, 168)')
       }
     }
   }
@@ -281,15 +300,13 @@ export class VanChoi {
         if (chongNhau(n.x, n.y, rongN, caoN, h.x, h.y - BAN_KINH_HOA, BAN_KINH_HOA * 2, BAN_KINH_HOA * 2)) {
           h.conDo = false
           n.khongLoDen = this.giay + CAU_HINH.GIAY_KHONG_LO
-          this.hieuUng?.no(h.x, h.y, '#FF5A9E', '#FFC13D', 22)
-          if (n.id === this.idNguoiThat) {
-            this.bang = {
-              pt: 'KHỔNG LỒ ' + CAU_HINH.GIAY_KHONG_LO + ' giây',
-              tieuChi: 'chạm ai người đó mất mạng — không cần dẫm',
-              nhan: 'ĂN HOA', mau: '#FF5A9E',
-              den: this.giay + CAU_HINH.GIAY_HIEN_PHUONG_TRINH,
-            }
-          }
+          this.hieuUng?.no(h.x, h.y, 'rgb(255, 90, 158)', 'rgb(255, 193, 61)', 22)
+          this.ghi({
+            giay: this.giay,
+            pt: 'KHỔNG LỒ ' + CAU_HINH.GIAY_KHONG_LO + ' giây',
+            tieuChi: 'chạm ai người đó mất mạng — không cần dẫm',
+            nhan: 'ĂN HOA', mau: 'rgb(255, 90, 158)', idA: n.id, idB: -1,
+          })
         }
       }
 
@@ -299,13 +316,13 @@ export class VanChoi {
         if (!chongNhau(n.x, n.y, rongN, caoN, q.x, q.y, RONG_QUAI, CAO_QUAI)) continue
         if (this.khongLo(n)) {
           q.song = false
-          this.hieuUng?.no(q.x, q.y + CAO_QUAI / 2, '#8A5AC8', '#FFF0A8', 16)
+          this.hieuUng?.no(q.x, q.y + CAO_QUAI / 2, 'rgb(138, 90, 200)', 'rgb(255, 240, 168)', 16)
           continue
         }
         if (damTrungQuai(n.x, n.y, n.vy, CAU_HINH.RONG_NHAN_VAT, q)) {
           q.song = false
           n.vy = CAU_HINH.NAY_SAU_DAM
-          this.hieuUng?.no(q.x, q.y + CAO_QUAI / 2, '#8A5AC8', '#FFF0A8', 16)
+          this.hieuUng?.no(q.x, q.y + CAO_QUAI / 2, 'rgb(138, 90, 200)', 'rgb(255, 240, 168)', 16)
           continue
         }
         this.matMang(n)
@@ -317,13 +334,11 @@ export class VanChoi {
           if (k === n || this.khongLo(k)) continue
           if (chongNhau(n.x, n.y, rongN, caoN, k.x, k.y, CAU_HINH.RONG_NHAN_VAT, CAU_HINH.CAO_NHAN_VAT)) {
             this.matMang(k)
-            if (k.id === this.idNguoiThat || n.id === this.idNguoiThat) {
-              this.bang = {
-                pt: '', tieuChi: 'khổng lồ chạm là mất mạng, không tra hoá chất',
-                nhan: n.id === this.idNguoiThat ? 'KHỔNG LỒ HẤT VĂNG' : 'BỊ KHỔNG LỒ HẤT',
-                mau: '#FF5A9E', den: this.giay + CAU_HINH.GIAY_HIEN_PHUONG_TRINH,
-              }
-            }
+            this.ghi({
+              giay: this.giay, pt: '',
+              tieuChi: 'khổng lồ chạm là mất mạng, không tra hoá chất',
+              nhan: 'KHỔNG LỒ HẤT VĂNG', mau: 'rgb(255, 90, 158)', idA: n.id, idB: k.id,
+            })
           }
         }
       }
@@ -350,16 +365,14 @@ export class VanChoi {
         // RỒNG CŨNG CẦM HOÁ CHẤT: dẫm bằng chất bị rồng khắc chế thì mình mất mạng
         if (biKhacChe(n.hoaChat, this.rong.hoaChat)) {
           this.matMang(n)
-          if (n.id === this.idNguoiThat) {
-            const kq = xuLyHoaChat(n.hoaChat, this.rong.hoaChat)
-            this.bang = {
-              pt: kq.pt, tieuChi: kq.tieuChi, nhan: 'BỊ KHẮC CHẾ', mau: '#FF5A4E',
-              den: this.giay + CAU_HINH.GIAY_HIEN_PHUONG_TRINH,
-            }
-          }
+          const kq = xuLyHoaChat(n.hoaChat, this.rong.hoaChat)
+          this.ghi({
+            giay: this.giay, pt: kq.pt, tieuChi: kq.tieuChi,
+            nhan: 'RỒNG KHẮC CHẾ', mau: 'rgb(255, 90, 78)', idA: n.id, idB: -1,
+          })
         } else {
           rongMatMau(this.rong, () => Math.floor(this.rChat() * HOA_CHAT.length))
-          this.hieuUng?.no(dinh.x, dinh.y, '#FFC13D', '#FF5A4E', 26)
+          this.hieuUng?.no(dinh.x, dinh.y, 'rgb(255, 193, 61)', 'rgb(255, 90, 78)', 26)
         }
       }
     }
@@ -449,7 +462,7 @@ export class VanChoi {
             this.bang = {
               pt: '', tieuChi: 'phải là người sống sót cuối cùng',
               nhan: 'CỬA HANG CÒN ĐÓNG · còn ' + song.length + ' người',
-              mau: '#8894B4', den: this.giay + CAU_HINH.GIAY_HIEN_PHUONG_TRINH,
+              mau: 'rgb(136, 148, 180)', den: this.giay + CAU_HINH.GIAY_HIEN_PHUONG_TRINH,
             }
           }
         }

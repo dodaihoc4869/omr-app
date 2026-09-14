@@ -30,16 +30,16 @@ export const MUOI_HAI_HOA_CHAT: readonly { ct: string; mau: string }[] = HOA_CHA
  * hai lần trong nửa giây — không kịp.
  */
 export const MUOI_HAI_NGUOI: HocTro[] = [
-  { ten: 'HCl',      dau: 'muLuoiTrai',  hoaChat: MUOI_HAI_HOA_CHAT[0 ], mau: { chinh: '#FF5A4E', phu: '#2E4A8A', da: '#FFD9B8', toc: '#3A2A22' } },
-  { ten: 'H₂SO₄',    dau: 'toc',         hoaChat: MUOI_HAI_HOA_CHAT[1 ], mau: { chinh: '#FFC13D', phu: '#8A5A1E', da: '#FFE0C4', toc: '#2B2118' } },
-  { ten: 'NaOH',     dau: 'muLen',       hoaChat: MUOI_HAI_HOA_CHAT[2 ], mau: { chinh: '#2F8BFF', phu: '#23406E', da: '#F6CBA0', toc: '#463024' } },
-  { ten: 'Ca(OH)₂',  dau: 'nonLa',       hoaChat: MUOI_HAI_HOA_CHAT[3 ], mau: { chinh: '#E8EDF5', phu: '#8E9CB4', da: '#FFD9B8', toc: '#3A2A22' } },
-  { ten: 'Ba(OH)₂',  dau: 'toc2',        hoaChat: MUOI_HAI_HOA_CHAT[4 ], mau: { chinh: '#7E8FE8', phu: '#3A4694', da: '#FFE0C4', toc: '#2B1F30' } },
-  { ten: 'Na₂CO₃',   dau: 'bangDo',      hoaChat: MUOI_HAI_HOA_CHAT[5 ], mau: { chinh: '#25B86B', phu: '#1B5E4A', da: '#FFE6D0', toc: '#4A2A30' } },
-  { ten: 'CuSO₄',    dau: 'muLuoiTrai',  hoaChat: MUOI_HAI_HOA_CHAT[6 ], mau: { chinh: '#1E7FD4', phu: '#10406E', da: '#F6CBA0', toc: '#3A2A22' } },
-  { ten: 'AgNO₃',    dau: 'toc',         hoaChat: MUOI_HAI_HOA_CHAT[7 ], mau: { chinh: '#9B5DE5', phu: '#4A2E7A', da: '#FFD9B8', toc: '#2B2118' } },
-  { ten: 'Al',       dau: 'muLen',       hoaChat: MUOI_HAI_HOA_CHAT[8 ], mau: { chinh: '#B0B8C4', phu: '#5E6674', da: '#F0C098', toc: '#332418' } },
-  { ten: 'Zn',       dau: 'toc2',        hoaChat: MUOI_HAI_HOA_CHAT[9 ], mau: { chinh: '#20C4C0', phu: '#166E6C', da: '#FFE0C4', toc: '#3A222A' } },
-  { ten: 'FeCl₃',    dau: 'bangDo',      hoaChat: MUOI_HAI_HOA_CHAT[10], mau: { chinh: '#FF8A3D', phu: '#7A3A12', da: '#F6CBA0', toc: '#463024' } },
-  { ten: 'Cl₂',      dau: 'nonLa',       hoaChat: MUOI_HAI_HOA_CHAT[11], mau: { chinh: '#8FBF3F', phu: '#4A6E1E', da: '#FFD9B8', toc: '#2B2118' } },
+  { ten: 'HCl',      dau: 'muLuoiTrai',  hoaChat: MUOI_HAI_HOA_CHAT[0 ], mau: { chinh: 'rgb(255, 90, 78)', phu: 'rgb(46, 74, 138)', da: 'rgb(255, 217, 184)', toc: 'rgb(58, 42, 34)' } },
+  { ten: 'H₂SO₄',    dau: 'toc',         hoaChat: MUOI_HAI_HOA_CHAT[1 ], mau: { chinh: 'rgb(255, 193, 61)', phu: 'rgb(138, 90, 30)', da: 'rgb(255, 224, 196)', toc: 'rgb(43, 33, 24)' } },
+  { ten: 'NaOH',     dau: 'muLen',       hoaChat: MUOI_HAI_HOA_CHAT[2 ], mau: { chinh: 'rgb(47, 139, 255)', phu: 'rgb(35, 64, 110)', da: 'rgb(246, 203, 160)', toc: 'rgb(70, 48, 36)' } },
+  { ten: 'Ca(OH)₂',  dau: 'nonLa',       hoaChat: MUOI_HAI_HOA_CHAT[3 ], mau: { chinh: 'rgb(232, 237, 245)', phu: 'rgb(142, 156, 180)', da: 'rgb(255, 217, 184)', toc: 'rgb(58, 42, 34)' } },
+  { ten: 'Ba(OH)₂',  dau: 'toc2',        hoaChat: MUOI_HAI_HOA_CHAT[4 ], mau: { chinh: 'rgb(126, 143, 232)', phu: 'rgb(58, 70, 148)', da: 'rgb(255, 224, 196)', toc: 'rgb(43, 31, 48)' } },
+  { ten: 'Na₂CO₃',   dau: 'bangDo',      hoaChat: MUOI_HAI_HOA_CHAT[5 ], mau: { chinh: 'rgb(37, 184, 107)', phu: 'rgb(27, 94, 74)', da: 'rgb(255, 230, 208)', toc: 'rgb(74, 42, 48)' } },
+  { ten: 'CuSO₄',    dau: 'muLuoiTrai',  hoaChat: MUOI_HAI_HOA_CHAT[6 ], mau: { chinh: 'rgb(30, 127, 212)', phu: 'rgb(16, 64, 110)', da: 'rgb(246, 203, 160)', toc: 'rgb(58, 42, 34)' } },
+  { ten: 'AgNO₃',    dau: 'toc',         hoaChat: MUOI_HAI_HOA_CHAT[7 ], mau: { chinh: 'rgb(155, 93, 229)', phu: 'rgb(74, 46, 122)', da: 'rgb(255, 217, 184)', toc: 'rgb(43, 33, 24)' } },
+  { ten: 'Al',       dau: 'muLen',       hoaChat: MUOI_HAI_HOA_CHAT[8 ], mau: { chinh: 'rgb(176, 184, 196)', phu: 'rgb(94, 102, 116)', da: 'rgb(240, 192, 152)', toc: 'rgb(51, 36, 24)' } },
+  { ten: 'Zn',       dau: 'toc2',        hoaChat: MUOI_HAI_HOA_CHAT[9 ], mau: { chinh: 'rgb(32, 196, 192)', phu: 'rgb(22, 110, 108)', da: 'rgb(255, 224, 196)', toc: 'rgb(58, 34, 42)' } },
+  { ten: 'FeCl₃',    dau: 'bangDo',      hoaChat: MUOI_HAI_HOA_CHAT[10], mau: { chinh: 'rgb(255, 138, 61)', phu: 'rgb(122, 58, 18)', da: 'rgb(246, 203, 160)', toc: 'rgb(70, 48, 36)' } },
+  { ten: 'Cl₂',      dau: 'nonLa',       hoaChat: MUOI_HAI_HOA_CHAT[11], mau: { chinh: 'rgb(143, 191, 63)', phu: 'rgb(74, 110, 30)', da: 'rgb(255, 217, 184)', toc: 'rgb(43, 33, 24)' } },
 ]

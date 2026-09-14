@@ -1,0 +1,244 @@
+/**
+ * CỔNG THẦN THÚ HOÁ HỌC.
+ *
+ * Phép kiểm quan trọng nhất: **cấp sau NGẦU HƠN cấp trước**. "Ngầu" được dịch
+ * thành hai con số đo được — số tính năng bật, và số điểm ảnh thực sự vẽ ra —
+ * nên không ai lỡ tay làm cấp sau nghèo hơn cấp trước mà không bị bắt.
+ */
+import { describe, it, expect } from 'vitest'
+import {
+  MUOI_HAI_HINH_THAI, CAP_TOI_DA, layHinhThai, demTinhNang,
+} from '../src/game/than-thu-hoa-hoc/hinh-thai'
+import {
+  EXP_BAN_DAU, thanhExp, nhanExp, tongExpToiDinh, NGUON_EXP, BANG_NGUON_EXP,
+} from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import {
+  DANH_SACH_THAN_THU, tinhLucChienPet, tinhHeSoTuongKhac, vaHoSo,
+  layHoSoThanThuMacDinh,
+} from '../src/game/than-thu-hoa-hoc/he-thong-pet'
+
+/**
+ * Đọc MÃ, bỏ chú thích.
+ *
+ * Cổng phải soi mã chứ không soi lời văn: chính dòng chú thích giải thích
+ * "đã bỏ chuỗi bịa X" lại chứa chuỗi X, và làm cổng đỏ oan.
+ */
+function chiMa(duong: string): string {
+  return readFileSync(resolve(__dirname, duong), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .split('\n').filter((d) => !d.trim().startsWith('//')).join('\n')
+}
+const MA_COMPONENT = () => chiMa('../src/components/ThanThuHoaHocGame.tsx')
+
+describe('mười hai hình thái', () => {
+  it('đúng 12 cấp, tên không trùng', () => {
+    expect(MUOI_HAI_HINH_THAI.length).toBe(12)
+    expect(CAP_TOI_DA).toBe(12)
+    expect(new Set(MUOI_HAI_HINH_THAI.map((h) => h.ten)).size).toBe(12)
+  })
+
+  it('NGẦU DẦN — số tính năng tăng nghiêm ngặt từ cấp 2 lên 12', () => {
+    for (let c = 3; c <= 12; c++) {
+      const truoc = demTinhNang(layHinhThai(c - 1))
+      const nay = demTinhNang(layHinhThai(c))
+      expect(nay, `cấp ${c} phải nhiều tính năng hơn cấp ${c - 1}`).toBeGreaterThan(truoc)
+    }
+  })
+
+  it('CỘNG DỒN — bật rồi thì không bao giờ tắt', () => {
+    const co = ['than', 'sung', 'duoi', 'canhNho', 'haoQuang', 'vay',
+      'canhLon', 'quyDao', 'vuongMien', 'vongRune', 'toiThuong'] as const
+    for (const k of co) {
+      let daBat = false
+      for (let c = 1; c <= 12; c++) {
+        const bat = layHinhThai(c)[k]
+        if (daBat) expect(bat, `${k} tắt lại ở cấp ${c}`).toBe(true)
+        if (bat) daBat = true
+      }
+    }
+  })
+
+  it('cỡ, hào quang và số hạt đều không giảm', () => {
+    for (let c = 2; c <= 12; c++) {
+      const a = layHinhThai(c - 1), b = layHinhThai(c)
+      expect(b.coCon).toBeGreaterThan(a.coCon)
+      expect(b.damHaoQuang).toBeGreaterThanOrEqual(a.damHaoQuang)
+      expect(b.soHat).toBeGreaterThanOrEqual(a.soHat)
+    }
+  })
+
+  it('chỉ cấp 1 còn vỏ trứng', () => {
+    expect(layHinhThai(1).vo).toBe(true)
+    expect(layHinhThai(1).than).toBe(false)
+    for (let c = 2; c <= 12; c++) {
+      expect(layHinhThai(c).vo, `cấp ${c} không được còn vỏ`).toBe(false)
+      expect(layHinhThai(c).than).toBe(true)
+    }
+  })
+
+  it('cấp ngoài khoảng bị kẹp lại, không vỡ', () => {
+    expect(layHinhThai(0).cap).toBe(1)
+    expect(layHinhThai(-5).cap).toBe(1)
+    expect(layHinhThai(99).cap).toBe(12)
+  })
+})
+
+describe('kinh nghiệm', () => {
+  it('THANH ĐẦU TIÊN LÀ 2000 — thầy chốt', () => {
+    expect(EXP_BAN_DAU).toBe(2000)
+    expect(thanhExp(1)).toBe(2000)
+  })
+
+  it('thanh dài dần, và cấp 12 là hết đường lên', () => {
+    for (let c = 2; c <= 11; c++) {
+      expect(thanhExp(c)).toBeGreaterThan(thanhExp(c - 1))
+    }
+    expect(thanhExp(12)).toBe(0)
+    expect(thanhExp(13)).toBe(0)
+  })
+
+  it('cộng EXP thì lên cấp THẬT — kể cả nhảy nhiều cấp một lúc', () => {
+    const a = nhanExp({ capDo: 1, exp: 0 }, 1999)
+    expect(a.capDo).toBe(1)
+    expect(a.exp).toBe(1999)
+
+    const b = nhanExp({ capDo: 1, exp: 0 }, 2000)
+    expect(b.capDo).toBe(2)
+    expect(b.exp).toBe(0)
+    expect(b.soCapLen).toBe(1)
+
+    const c = nhanExp({ capDo: 1, exp: 0 }, 2000 + 2360 + 5)
+    expect(c.capDo).toBe(3)
+    expect(c.soCapLen).toBe(2)
+  })
+
+  it('không vượt quá cấp 12, và tới đỉnh thì EXP về 0', () => {
+    const k = nhanExp({ capDo: 1, exp: 0 }, 10_000_000)
+    expect(k.capDo).toBe(12)
+    expect(k.exp).toBe(0)
+    expect(k.daToiDinh).toBe(true)
+    expect(k.expToiDa).toBe(0)
+  })
+
+  it('EXP âm hoặc rác không làm tụt cấp', () => {
+    const k = nhanExp({ capDo: 5, exp: 100 }, -999)
+    expect(k.capDo).toBe(5)
+    expect(k.exp).toBe(100)
+  })
+
+  it('tổng đường lên đỉnh là một con số hữu hạn, đo được', () => {
+    const t = tongExpToiDinh()
+    expect(t).toBeGreaterThan(40_000)
+    expect(t).toBeLessThan(80_000)
+    // eslint-disable-next-line no-console
+    console.log(`  tổng EXP từ cấp 1 lên cấp 12: ${t.toLocaleString()}`)
+  })
+
+  it('BẢNG NGUỒN EXP phải khớp đúng con số trong mã — không hứa suông', () => {
+    expect(BANG_NGUON_EXP.length).toBe(4)
+    expect(NGUON_EXP.suaCauSai()).toBe(100)
+    expect(BANG_NGUON_EXP.find((n) => n.viec.includes('câu sai'))?.thuong).toBe('100 EXP')
+    expect(NGUON_EXP.nopBtvn()).toBe(200)
+    expect(BANG_NGUON_EXP.find((n) => n.viec.includes('bài tập'))?.thuong).toBe('200 EXP')
+    expect(NGUON_EXP.caThi(10)).toBe(600)
+    expect(NGUON_EXP.leoThap(1)).toBe(150)
+    expect(NGUON_EXP.leoThap(10)).toBe(420)
+  })
+
+  it('tầng càng cao EXP càng nhiều', () => {
+    for (let t = 2; t <= 20; t++) {
+      expect(NGUON_EXP.leoThap(t)).toBeGreaterThan(NGUON_EXP.leoThap(t - 1))
+    }
+  })
+})
+
+describe('không bịa dữ liệu', () => {
+  it('CHƯA THI CA NÀO thì KHÔNG có buff từ điểm — không lấy 7.0', () => {
+    const khong = tinhLucChienPet({ capDo: 1, capTienHoa: 1, diemTrungBinh: null, tyLeBtvn: 0 })
+    const bay = tinhLucChienPet({ capDo: 1, capTienHoa: 1, diemTrungBinh: 7.0, tyLeBtvn: 0 })
+    expect(khong.cp).toBeLessThan(bay.cp)
+  })
+
+  it('điểm cao hơn thì lực chiến cao hơn', () => {
+    const a = tinhLucChienPet({ capDo: 5, capTienHoa: 5, diemTrungBinh: 5, tyLeBtvn: 0.5 })
+    const b = tinhLucChienPet({ capDo: 5, capTienHoa: 5, diemTrungBinh: 9, tyLeBtvn: 0.5 })
+    expect(b.cp).toBeGreaterThan(a.cp)
+  })
+
+  it('cấp tiến hoá cao hơn thì mạnh hơn, suốt cả 12 cấp', () => {
+    let truoc = 0
+    for (let c = 1; c <= 12; c++) {
+      const k = tinhLucChienPet({ capDo: c, capTienHoa: c as 1, diemTrungBinh: 8, tyLeBtvn: 1 })
+      expect(k.cp, `cấp ${c}`).toBeGreaterThan(truoc)
+      truoc = k.cp
+    }
+  })
+
+  it('mã nguồn KHÔNG còn bảng xếp hạng bịa', () => {
+    const s = MA_COMPONENT()
+    for (const bia of ['Chiến Binh Nhiệt Nhôm', 'Thần Đồng Halogen', 'cp * 0.88', 'cp * 0.76',
+      'Bảng Xếp Hạng Thần Thú Cả Lớp', 'Bậc Thầy Hóa Học']) {
+      expect(s.includes(bia), `còn chuỗi bịa "${bia}"`).toBe(false)
+    }
+  })
+
+  it('game KHÔNG nhận số báo danh và họ tên nữa', () => {
+    const ma = MA_COMPONENT()
+    expect(/\bauth\./.test(ma), 'còn đọc auth').toBe(false)
+    expect(/\bsbd\b/i.test(ma), 'còn nhắc sbd').toBe(false)
+    expect(/\bhoTen\b/.test(ma), 'còn nhắc hoTen').toBe(false)
+  })
+
+  it('KHÔNG còn nút cho EXP miễn phí', () => {
+    const s = MA_COMPONENT()
+    expect(s.includes('Nạp Tinh Thể Não Lực')).toBe(false)
+    expect(s.includes('+35 EXP')).toBe(false)
+  })
+})
+
+describe('hồ sơ lưu', () => {
+  it('hồ sơ rác hoặc thiếu trường thì trộn về mặc định, không ra NaN', () => {
+    for (const rac of [null, undefined, 42, 'hỏng', {}, { capDo: -9 }, { exp: 'x' }]) {
+      const h = vaHoSo(rac)
+      expect(Number.isFinite(h.exp)).toBe(true)
+      expect(Number.isFinite(h.expToiDa)).toBe(true)
+      expect(h.capDo).toBeGreaterThanOrEqual(1)
+      expect(h.capDo).toBeLessThanOrEqual(12)
+      expect(DANH_SACH_THAN_THU[h.idThanhThuChon]).toBeDefined()
+    }
+  })
+
+  it('expToiDa luôn tính lại theo cấp, không tin số cũ trong máy', () => {
+    const h = vaHoSo({ capDo: 4, exp: 10, expToiDa: 999999 })
+    expect(h.expToiDa).toBe(thanhExp(4))
+  })
+
+  it('hồ sơ mặc định bắt đầu bằng thanh 2000', () => {
+    expect(layHoSoThanThuMacDinh().expToiDa).toBe(2000)
+    expect(layHoSoThanThuMacDinh().capDo).toBe(1)
+  })
+})
+
+describe('tương khắc nguyên tố — không còn là mã chết', () => {
+  it('vòng khắc chế khép kín', () => {
+    expect(tinhHeSoTuongKhac('hoa', 'khi').heSo).toBe(1.5)
+    expect(tinhHeSoTuongKhac('khi', 'kiem').heSo).toBe(1.5)
+    expect(tinhHeSoTuongKhac('kiem', 'axit').heSo).toBe(1.5)
+    expect(tinhHeSoTuongKhac('axit', 'hoa').heSo).toBe(1.5)
+  })
+
+  it('bị khắc thì yếu đi, cùng hệ thì hoà', () => {
+    expect(tinhHeSoTuongKhac('khi', 'hoa').heSo).toBe(0.7)
+    expect(tinhHeSoTuongKhac('hoa', 'hoa').heSo).toBe(1.0)
+  })
+
+  it('component có THỰC SỰ gọi tương khắc', () => {
+    const s = MA_COMPONENT()
+    expect(s.includes('tinhHeSoTuongKhac(')).toBe(true)
+    // và sát thương không còn cắm cứng
+    expect(s.includes('const satThuong = 45')).toBe(false)
+    expect(s.includes('const satThuongBoss = 30')).toBe(false)
+  })
+})

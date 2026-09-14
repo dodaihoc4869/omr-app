@@ -28,17 +28,17 @@ export interface DoKho {
 export const BA_DO_KHO: readonly DoKho[] = [
   {
     ma: 'truot', ten: 'Trượt đại học', moTa: 'Ít quái, chậm, nhiều hoa. Học cách chơi.',
-    mau: '#2FA8E8', soQuai: 8, tocDoQuai: 70, soHoa: 10,
+    mau: 'rgb(47, 168, 232)', soQuai: 8, tocDoQuai: 70, soHoa: 10,
     botDoChinhXac: 0.42, mauRong: 2, giayHoRong: 2.0,
   },
   {
     ma: 'do', ten: 'Đỗ đại học', moTa: 'Vừa sức. Quái đi tuần, hoa đủ dùng.',
-    mau: '#1EA05A', soQuai: 16, tocDoQuai: 110, soHoa: 6,
+    mau: 'rgb(30, 160, 90)', soQuai: 16, tocDoQuai: 110, soHoa: 6,
     botDoChinhXac: 0.62, mauRong: 3, giayHoRong: 1.5,
   },
   {
     ma: 'thuKhoa', ten: 'Thủ khoa toàn quốc', moTa: 'Quái dày và nhanh, hoa hiếm, bot thuộc bài.',
-    mau: '#FF5A4E', soQuai: 26, tocDoQuai: 160, soHoa: 3,
+    mau: 'rgb(255, 90, 78)', soQuai: 26, tocDoQuai: 160, soHoa: 3,
     botDoChinhXac: 0.82, mauRong: 4, giayHoRong: 1.1,
   },
 ] as const

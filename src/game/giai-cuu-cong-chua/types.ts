@@ -60,6 +60,25 @@ export interface NguoiChoi {
   khongLoDen: number
 }
 
+/**
+ * Một sự kiện đáng hiện chữ. Ván GHI vào nhật ký; ai đọc là việc của người đọc:
+ * chơi một mình thì vỏ React đọc, chơi nhiều người thì máy chủ đọc rồi bắn xuống.
+ *
+ * Trước đây ván chỉ đặt `bang` cho riêng idNguoiThat — nên ở chế độ nhiều người
+ * (máy chủ không có "người thật" nào) KHÔNG AI thấy phương trình. Mất đúng phần
+ * đáng giá nhất của game.
+ */
+export interface SuKien {
+  giay: number
+  nhan: string
+  pt: string
+  tieuChi: string
+  mau: string
+  /** id người gây ra và người chịu. -1 nghĩa là không có ai cụ thể. */
+  idA: number
+  idB: number
+}
+
 export interface BangTin {
   /** Phương trình hiện sau cú dẫm. */
   pt: string
