@@ -297,3 +297,48 @@ describe('Pages trả index.html cho mọi đường dẫn của app', () => {
     expect(fs.existsSync(path.join(process.cwd(), 'public/_redirects'))).toBe(true)
   })
 })
+
+// ===========================================================================
+// BÌA PHIẾU PHẲNG VÀ SÁNG (Material 3) — thầy chốt 14/09, áp cho MỌI phiếu của
+// cả ba app, vì cả ba đều dựng từ `html-phieu.ts`.
+//
+// Bản trước: nền chuyển sắc đậm + chữ trắng + hai vệt tròn mờ + bóng đổ. Chữ
+// trắng trên nền vàng gần như không đọc nổi ngoài nắng — mà em mở phiếu này
+// trên điện thoại.
+// ===========================================================================
+describe('Bìa và tổng quan phiếu: phẳng, sáng, dùng token màu', () => {
+  const HP = doc('src/lib/html-phieu.ts')
+  const bia = HP.slice(HP.indexOf('.cover {'), HP.indexOf('.cover-blob'))
+  const tq = HP.slice(HP.indexOf('.summary-page {'), HP.indexOf('.summary-page {') + 420)
+
+  it('bìa KHÔNG còn nền chuyển sắc, KHÔNG còn bóng đổ', () => {
+    expect(bia).not.toContain('linear-gradient')
+    expect(bia).not.toContain('box-shadow')
+  })
+
+  it('bìa dùng nền sáng, chữ tối, viền mảnh', () => {
+    expect(bia).toContain('background: var(--the-nen)')
+    expect(bia).toContain('color: var(--muc)')
+    expect(bia).toContain('border: 1px solid var(--vien)')
+  })
+
+  it('tổng quan cùng lối, và thôi chồng đè lên bìa', () => {
+    expect(tq).not.toContain('linear-gradient')
+    expect(tq).toContain('background: var(--the-nen)')
+    expect(tq).toContain('margin: 0 auto 20px')
+  })
+
+  it('hai vệt tròn mờ bị tắt — chúng chỉ có nghĩa trên nền đậm', () => {
+    expect(HP).toContain('.cover-blob { display: none; }')
+  })
+
+  it('không còn tô bằng màu trắng mờ chồng lớp ở khối đầu phiếu', () => {
+    const dau = HP.slice(HP.indexOf('.cover {'), HP.indexOf('/* ================= Ô LÀM BÀI'))
+    expect(dau).not.toContain('rgba(255,255,255')
+  })
+
+  it('ô đang chọn nổi bằng viền màu nhấn, không đảo sang nền trắng', () => {
+    expect(HP).toContain('button.stat-card.chon { background: var(--the-nen); border-color: var(--nav)')
+    expect(HP).not.toContain('button.stat-card.chon { background: #ffffff')
+  })
+})

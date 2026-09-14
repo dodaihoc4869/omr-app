@@ -255,68 +255,81 @@ sup { font-size: .72em; vertical-align: .42em; }
 .khung { max-width: 900px; margin: 0 auto; padding: 24px 16px 72px; }
 
 /* ================= BÌA ================= */
+/* ================= BÌA — PHẲNG VÀ SÁNG (Material 3) =================
+   Bản trước: nền chuyển sắc đậm, chữ trắng, hai vệt tròn mờ và bóng đổ. Ba
+   thứ ấy cộng lại làm cả đầu phiếu tối và chói, chữ trắng trên nền vàng thì
+   gần như không đọc nổi ngoài nắng — mà em mở phiếu này trên điện thoại.
+   Nay: nền sáng, chữ tối, MÀU chỉ còn làm điểm nhấn nhỏ. Đúng lối Material 3 —
+   phân tầng bằng nền và viền mảnh chứ không bằng bóng đổ. */
 .cover {
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 40px 22px 60px;
-  color: #ffffff;
-  border-radius: 24px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  margin-bottom: 24px;
-  background: linear-gradient(150deg, var(--nav) 0%, var(--nav-2) 52%, var(--luc) 100%);
+  padding: 32px 22px 28px;
+  color: var(--muc);
+  border-radius: 28px;
+  border: 1px solid var(--vien);
+  margin-bottom: 16px;
+  background: var(--the-nen);
 }
-.cover-blob { position: absolute; border-radius: 50%; pointer-events: none; }
-.cover-blob.b1 { top: -170px; right: -130px; width: 360px; height: 360px; background: rgba(255,255,255,.07); }
-.cover-blob.b2 { bottom: -210px; left: -150px; width: 420px; height: 420px; background: rgba(255,255,255,.05); }
+/* Hai vệt tròn mờ chỉ có nghĩa trên nền đậm. Nền sáng thì chúng thành hai
+   mảng xám bẩn, nên tắt hẳn — giữ thẻ trong HTML để không phải sửa mọi chỗ
+   dựng bìa. */
+.cover-blob { display: none; }
 .cover-content { position: relative; z-index: 2; width: 100%; max-width: 700px; margin: 0 auto; }
 .cover-badge {
-  display: inline-flex; align-items: center; gap: 8px; margin-bottom: 18px; padding: 7px 16px;
-  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.3); border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; padding: 6px 14px;
+  background: var(--nen); border: 1px solid var(--vien); border-radius: 999px;
+  color: var(--nav);
   font-size: 11.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
 }
 /* Công thức đứng CẠNH nhãn, không chiếm một dòng khổng lồ giữa trang. */
-.cover-badge .ct { letter-spacing: 0; text-transform: none; font-size: 13px; opacity: .92; }
+.cover-badge .ct { letter-spacing: 0; text-transform: none; font-size: 13px; color: var(--muc-2); }
 .cover-title { font-size: clamp(28px, 7.4vw, 44px); font-weight: 900; line-height: 1.1; letter-spacing: -.02em; }
-.cover-subtitle { margin-top: 8px; font-size: clamp(13.5px, 3vw, 16px); font-weight: 400; opacity: .82; }
+.cover-subtitle { margin-top: 8px; font-size: clamp(13.5px, 3vw, 16px); font-weight: 400; color: var(--nhat); }
 /* LƯỚI chứ không phải flex-wrap: các ô luôn CÙNG CHIỀU CAO và chia đều hàng. */
 .cover-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: 8px; margin-top: 22px; }
 .cover-info-item {
-  padding: 10px 13px; display: flex; flex-direction: column; justify-content: center;
-  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); border-radius: 13px;
+  padding: 11px 13px; display: flex; flex-direction: column; justify-content: center;
+  background: var(--nen); border: 1px solid var(--vien); border-radius: 14px;
 }
-.cover-info-label { font-size: 10px; text-transform: uppercase; letter-spacing: .12em; opacity: .72; margin-bottom: 3px; }
+.cover-info-label { font-size: 10px; text-transform: uppercase; letter-spacing: .12em; color: var(--nhat); margin-bottom: 3px; }
 .cover-info-value { font-size: clamp(13.5px, 3.2vw, 15.5px); font-weight: 700; overflow-wrap: anywhere; line-height: 1.35; }
 
 /* ================= TỔNG QUAN ================= */
+/* TỔNG QUAN — cùng lối phẳng sáng với bìa.
+   Bỏ luôn lề trên âm: khối này chồng đè lên bìa chỉ có nghĩa khi hai khối
+   khác màu nhau. Cùng nền sáng thì chồng lên nhau thành một mảng rối, nên nay
+   xếp cách đều. */
 .summary-page {
-  margin: -28px auto 26px; max-width: 900px; position: relative; z-index: 3;
-  border-radius: 24px; padding: 18px 18px 20px; color: #ffffff;
-  background: linear-gradient(135deg, var(--nav) 0%, var(--nav-2) 55%, var(--luc) 100%);
-  box-shadow: var(--bong-cao);
+  margin: 0 auto 20px; max-width: 900px; position: relative; z-index: 3;
+  border-radius: 28px; padding: 18px 18px 20px; color: var(--muc);
+  background: var(--the-nen); border: 1px solid var(--vien);
 }
 .summary-dau { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
 .summary-title { font-size: clamp(15px, 3.6vw, 18px); font-weight: 800; letter-spacing: .01em; }
-.summary-tong { font-size: 13px; opacity: .72; font-variant-numeric: tabular-nums; }
+.summary-tong { font-size: 13px; color: var(--nhat); font-variant-numeric: tabular-nums; }
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; margin-bottom: 12px; }
 .stat-card {
   display: flex; align-items: baseline; gap: 8px; width: 100%; text-align: left;
-  padding: 11px 13px; color: inherit; font: inherit;
-  background: rgba(255,255,255,.11); border: 1px solid rgba(255,255,255,.2); border-radius: 14px;
+  padding: 12px 13px; color: inherit; font: inherit;
+  background: var(--nen); border: 1px solid var(--vien); border-radius: 16px;
   transition: background-color var(--muot), border-color var(--muot), transform var(--muot);
 }
 button.stat-card, button.topic-item { cursor: pointer; }
-button.stat-card:hover { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.45); }
+button.stat-card:hover { background: var(--the-nen); border-color: var(--vien-dam); }
 button.stat-card:active { transform: scale(.98); }
-button.stat-card.chon { background: #ffffff; border-color: #ffffff; color: var(--nav); }
-button.stat-card.chon .stat-label { opacity: 1; font-weight: 700; }
-button.stat-card:focus-visible, button.topic-item:focus-visible { outline: 3px solid rgba(255,255,255,.7); outline-offset: 2px; }
+/* Ô ĐANG CHỌN: tô bằng chính màu nhấn ở mức rất nhạt + viền đậm, thay cho
+   cách cũ là đảo sang nền trắng — trên nền sáng thì trắng không còn nổi. */
+button.stat-card.chon { background: var(--the-nen); border-color: var(--nav); color: var(--nav); box-shadow: inset 0 0 0 1px var(--nav); }
+button.stat-card.chon .stat-label { color: var(--nav); font-weight: 700; }
+button.stat-card:focus-visible, button.topic-item:focus-visible { outline: 3px solid var(--nav); outline-offset: 2px; }
 .stat-number { font-size: clamp(19px, 4.4vw, 23px); font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
-.stat-label { font-size: 12px; opacity: .82; line-height: 1.3; }
-.topics-list { background: rgba(255,255,255,.09); border-radius: 14px; padding: 11px 14px; }
-.topics-list h3 { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; opacity: .72; margin-bottom: 4px; }
+.stat-label { font-size: 12px; color: var(--nhat); line-height: 1.3; }
+.topics-list { background: var(--nen); border: 1px solid var(--vien); border-radius: 16px; padding: 11px 14px; }
+.topics-list h3 { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--nhat); margin-bottom: 4px; }
 .topic-item {
   display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
   padding: 6px 10px; margin: 0 -10px; border-radius: 9px;
@@ -325,8 +338,8 @@ button.stat-card:focus-visible, button.topic-item:focus-visible { outline: 3px s
   transition: background-color var(--muot);
 }
 .topic-item:last-child { border-bottom: none; }
-button.topic-item:hover { background: rgba(255,255,255,.12); }
-button.topic-item.chon { background: #ffffff; color: var(--nav); font-weight: 700; }
+button.topic-item:hover { background: var(--the-nen); }
+button.topic-item.chon { background: var(--the-nen); color: var(--nav); font-weight: 700; box-shadow: inset 0 0 0 1px var(--nav); }
 .topic-cham { flex-shrink: 0; display: flex; align-items: center; height: 1.5em; }
 .topic-dot { width: 9px; height: 9px; border-radius: 50%; }
 

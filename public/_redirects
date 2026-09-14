@@ -14,4 +14,4 @@
 #
 # Mã 200 (không phải 301): giữ nguyên đường dẫn trên thanh địa chỉ để app còn
 # đọc được vai và mã ca từ nó.
-/*    /index.html   200
+/* /index.html 200

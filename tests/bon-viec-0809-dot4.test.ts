@@ -198,14 +198,22 @@ describe('Ô Đ/S BẤM ĐƯỢC BẰNG NGÓN TAY', () => {
 describe('BÌA VÀ KHỐI TỔNG QUAN CŨNG ĐỔI MÀU', () => {
   const html = dungPhieu(TT, CAU, { nop: NOP })
 
-  it('hai dải màu dùng BIẾN, không gõ cứng mã màu navy', () => {
-    expect(html).toContain('background: linear-gradient(150deg, var(--nav) 0%, var(--nav-2) 52%, var(--luc) 100%);')
-    expect(html).toContain('background: linear-gradient(135deg, var(--nav) 0%, var(--nav-2) 55%, var(--luc) 100%);')
+  // 14/09: bìa và khối tổng quan chuyển sang PHẲNG VÀ SÁNG (Material 3) —
+  // nền sáng, chữ tối, viền mảnh, không còn dải chuyển sắc. Luật đang đo KHÔNG
+  // đổi: màu phải lấy từ BIẾN, cấm gõ cứng mã màu; chỉ đích của nó đổi từ
+  // "hai dải chuyển sắc" sang "nền và viền".
+  it('bìa và khối tổng quan lấy màu từ BIẾN, không gõ cứng', () => {
+    expect(html).toContain('background: var(--the-nen)')
+    expect(html).toContain('border: 1px solid var(--vien)')
+    expect(html).toContain('color: var(--muc)')
   })
 
-  it('KHÔNG còn mã màu navy gõ cứng trong hai dải đó', () => {
+  it('KHÔNG còn dải chuyển sắc ở bìa lẫn khối tổng quan', () => {
+    const bia = html.slice(html.indexOf('.cover {'), html.indexOf('.cover-blob'))
+    const tq = html.slice(html.indexOf('.summary-page {'), html.indexOf('.summary-page {') + 420)
+    expect(bia).not.toContain('linear-gradient')
+    expect(tq).not.toContain('linear-gradient')
     expect(html).not.toContain('linear-gradient(150deg, #0f3057')
-    expect(html).not.toContain('linear-gradient(135deg, #0f3057 0%, #00587a 55%')
   })
 
   it('bảy sắc vẫn còn nguyên và vẫn đổi đủ ba biến mà hai dải màu cần', () => {
