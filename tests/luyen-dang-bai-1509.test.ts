@@ -91,6 +91,25 @@ describe('Mục 4 — hai lệnh mới của máy chủ', () => {
     expect(dsThay).not.toContain('deTheoDangBai')
   })
 
+  it('menu đọc cột CÓ THẬT của bảng de_kho', () => {
+    // 15/09 bản đầu đọc cột `nhom` — `de_kho` KHÔNG có cột ấy (chỉ ma_de,
+    // ten_de, lop, chuyen_de, so_cau, r2_khoa, da_xoa, cap_nhat_luc), nên D1
+    // ném lỗi và máy chủ trả HTTP 500 cho MỌI lượt mở mục 4.
+    expect(mayChu).toContain('SELECT ma_de, ten_de, so_cau FROM de_kho')
+    expect(mayChu).not.toContain('SELECT ma_de, nhom, so_cau FROM de_kho')
+    expect(mayChu).toContain("chuoi(x.ten_de).split(' · ')")
+    const cot = /CREATE TABLE IF NOT EXISTS de_kho \(([^;]*?)\)/.exec(
+      readFileSync(resolve(GOC, 'server/migration-1209-toan-bo.sql'), 'utf8'),
+    )
+    expect(cot).not.toBeNull()
+    expect(cot![1]).toContain('ten_de')
+    expect(cot![1]).not.toContain('nhom')
+  })
+
+  it('kho có tờ mà menu rỗng thì BÁO, không trả menu rỗng im lặng', () => {
+    expect(mayChu).toContain('if (soTo > 0 && tongDang === 0)')
+  })
+
   it('chỉ mở đúng tờ dạng bài, không thành đường tải tờ đề bất kỳ', () => {
     expect(mayChu).toContain("export const TIEN_TO_DANG_BAI = 'DB-'")
     expect(mayChu).toContain('if (!ma.startsWith(TIEN_TO_DANG_BAI))')

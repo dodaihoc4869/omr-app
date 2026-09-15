@@ -3206,10 +3206,17 @@ export async function thanThuGhi(env: Env, b: Record<string, unknown>): Promise<
 export const TIEN_TO_DANG_BAI = 'DB-'
 
 /** MENU LUYỆN DẠNG BÀI: lớp → bài → dạng, dựng từ chính bảng `de_kho`.
- * Nhãn `nhom` của tờ có dáng "Dạng bài · <lớp> · <Bài N. Tên bài> · <tên dạng>". */
+ *
+ * Nhãn nằm ở cột `ten_de`, dáng "Dạng bài · <lớp> · <Bài N. Tên bài> · <tên dạng>"
+ * — `nap-de-may-chu-moi.py` gửi thẳng trường `nhom` của gói vào đó cho tờ `DB-`.
+ *
+ * BẢN ĐẦU 15/09 ĐỌC `nhom` VÀ LÀM MÁY CHỦ TRẢ HTTP 500: `de_kho` chỉ có
+ * ma_de · ten_de · lop · chuyen_de · so_cau · r2_khoa · da_xoa · cap_nhat_luc.
+ * Nhãn nhóm sống trong GÓI trên R2, D1 không giữ. Đọc cột không có là D1 ném
+ * lỗi, và màn hình chỉ thấy "Không lấy được danh mục dạng bài". */
 export async function danhMucDangBai(env: Env): Promise<Record<string, unknown>> {
   const r = await env.DB.prepare(
-    `SELECT ma_de, nhom, so_cau FROM de_kho
+    `SELECT ma_de, ten_de, so_cau FROM de_kho
       WHERE da_xoa = 0 AND ma_de LIKE '${TIEN_TO_DANG_BAI}%' ORDER BY ma_de`,
   ).all<Record<string, unknown>>()
 
@@ -3219,7 +3226,7 @@ export async function danhMucDangBai(env: Env): Promise<Record<string, unknown>>
 
   for (const x of r.results ?? []) {
     const ma = chuoi(x.ma_de)
-    const phan = chuoi(x.nhom).split(' · ')
+    const phan = chuoi(x.ten_de).split(' · ')
     // Dáng sai thì BỎ tờ ấy và không đoán — menu thiếu một dạng còn hơn menu
     // có một mục trỏ vào hư không.
     if (phan.length !== 4 || phan[0] !== 'Dạng bài') continue
@@ -3238,7 +3245,18 @@ export async function danhMucDangBai(env: Env): Promise<Record<string, unknown>>
     }))
 
   const tongDang = lops.reduce((n, l) => n + l.bais.reduce((m, b) => m + b.dangs.length, 0), 0)
-  return { ok: true, lops, tongDang }
+
+  // KHO CÓ TỜ MÀ MENU RỖNG NGHĨA LÀ NHÃN SAI DÁNG — nói thẳng, đừng trả menu
+  // rỗng rồi để màn hình đoán là "kho chưa có dạng bài nào".
+  const soTo = (r.results ?? []).length
+  if (soTo > 0 && tongDang === 0) {
+    return {
+      ok: false,
+      error: `Kho có ${soTo} tờ dạng bài nhưng nhãn không đúng dáng `
+        + `"Dạng bài · <lớp> · <bài> · <tên dạng>". Thầy đẩy lại kho đề.`,
+    }
+  }
+  return { ok: true, lops, tongDang, soTo }
 }
 
 /** "Bài 12. Tên bài" → 12. Không đọc được số thì đẩy xuống cuối, không vứt đi. */
