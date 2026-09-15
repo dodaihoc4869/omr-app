@@ -305,3 +305,20 @@ thì mời TẢI LẠI CHÍNH LINK ẤY.
 
 `ddh.vaiDaDung` là khoá localStorage CHUNG GỐC của cả ba app — chính nó là cửa
 để hai cổng nhảy sang nhau. Nay nó không còn quyền quyết định gì.
+
+## NGHIỆM THU TRÊN BẢN LIVE (15/09, sau phát hành)
+
+Mở thử từ một trình duyệt CHƯA từng có mã bí mật — đúng hoàn cảnh máy của em:
+
+| Mở | Địa chỉ thành | Màn hiện ra | Số link ra ngoài |
+|---|---|---|---|
+| `/gv` | `/gv` | **KHOÁ — đòi mã bí mật** | 0 |
+| `/?vai=gv` | **`/gv`** | **KHOÁ — đòi mã bí mật** | 0 |
+| `/hs` | `/hs` | cổng học sinh | — |
+| `/ph` | `/ph` | cổng phụ huynh | — |
+| `/` | `/` | **ngõ cụt** | **0** |
+| `/linh-tinh` | `/linh-tinh` | **ngõ cụt** | **0** |
+| `/t/999999` | `/?examCode=999999` | màn vào thi, KHÔNG vỏ app thầy | 0 |
+
+Hai màn ngõ cụt và màn khoá đều có **0 thẻ `<a>`** — không có đường nào lang
+thang sang app khác.
