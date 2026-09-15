@@ -86,9 +86,11 @@ describe('mười hai hình thái', () => {
 })
 
 describe('kinh nghiệm', () => {
-  it('THANH ĐẦU TIÊN LÀ 240 — thầy chốt 15-09 (hạ từ 2000)', () => {
-    expect(EXP_BAN_DAU).toBe(240)
-    expect(thanhExp(1)).toBe(240)
+  it('THANH ĐẦU TIÊN LÀ 300 — tính theo nhịp kiếm EXP thật', () => {
+    expect(EXP_BAN_DAU).toBe(300)
+    expect(thanhExp(1)).toBe(300)
+    // 300 = đúng một ca thi 5 điểm. Em học xong buổi đầu là thấy thanh nhảy.
+    expect(NGUON_EXP.caThi(5)).toBe(300)
   })
 
   it('thanh dài dần, và cấp 12 là hết đường lên', () => {
@@ -100,17 +102,17 @@ describe('kinh nghiệm', () => {
   })
 
   it('cộng EXP thì lên cấp THẬT — kể cả nhảy nhiều cấp một lúc', () => {
-    const a = nhanExp({ capDo: 1, exp: 0 }, 239)
+    const a = nhanExp({ capDo: 1, exp: 0 }, 299)
     expect(a.capDo).toBe(1)
-    expect(a.exp).toBe(239)
+    expect(a.exp).toBe(299)
 
-    const b = nhanExp({ capDo: 1, exp: 0 }, 240)
+    const b = nhanExp({ capDo: 1, exp: 0 }, 300)
     expect(b.capDo).toBe(2)
     expect(b.exp).toBe(0)
     expect(b.soCapLen).toBe(1)
 
-    // 240 (thanh cấp 1) + 280 (thanh cấp 2) + 5 dư
-    const c = nhanExp({ capDo: 1, exp: 0 }, 240 + 280 + 5)
+    // 300 (thanh cấp 1) + 380 (thanh cấp 2) + 5 dư
+    const c = nhanExp({ capDo: 1, exp: 0 }, 300 + 380 + 5)
     expect(c.capDo).toBe(3)
     expect(c.exp).toBe(5)
     expect(c.soCapLen).toBe(2)
@@ -134,9 +136,14 @@ describe('kinh nghiệm', () => {
     const t = tongExpToiDinh()
     // Con số CHỐT, không phải khoảng ước lượng: đổi nhịp game thì phải sửa ở đây,
     // để không ai lỡ tay đổi `EXP_BAN_DAU` mà không thấy hệ quả.
-    expect(t).toBe(6_890)
-    expect(thanhExp(1)).toBe(240)
-    expect(thanhExp(11)).toBe(1_260)
+    expect(t).toBe(15_120)
+    expect(thanhExp(1)).toBe(300)
+    expect(thanhExp(11)).toBe(3_540)
+    // VÀO NHANH VỀ CHẬM: năm cấp đầu ≤ 20% cả đường, ba cấp cuối ≥ 50%.
+    const namCapDau = thanhExp(1) + thanhExp(2) + thanhExp(3) + thanhExp(4) + thanhExp(5)
+    const baCapCuoi = thanhExp(9) + thanhExp(10) + thanhExp(11)
+    expect(namCapDau / t).toBeLessThan(0.20)
+    expect(baCapCuoi / t).toBeGreaterThan(0.50)
     // eslint-disable-next-line no-console
     console.log(`  tổng EXP từ cấp 1 lên cấp 12: ${t.toLocaleString()}`)
   })
@@ -148,8 +155,30 @@ describe('kinh nghiệm', () => {
     expect(NGUON_EXP.nopBtvn()).toBe(200)
     expect(BANG_NGUON_EXP.find((n) => n.viec.includes('bài tập'))?.thuong).toBe('200 EXP')
     expect(NGUON_EXP.caThi(10)).toBe(600)
-    expect(NGUON_EXP.leoThap(1)).toBe(150)
-    expect(NGUON_EXP.leoThap(10)).toBe(420)
+    expect(NGUON_EXP.leoThap(1)).toBe(36)
+    expect(NGUON_EXP.leoThap(10)).toBe(90)
+    expect(BANG_NGUON_EXP.find((n) => n.viec.includes('tầng tháp'))?.thuong)
+      .toBe('30 + 6 × số tầng')
+  })
+
+  it('THÁP KHÔNG ĐƯỢC NUỐT CẢ GAME — leo tới tầng 40 vẫn dưới nửa đường lên đỉnh', () => {
+    // Công thức cũ `120 + 30 × tầng` cho 29 400 EXP ở tầng 40, gần GẤP ĐÔI cả
+    // đường lên cấp 12: ngồi leo một buổi tối là tối đa hình thái, khỏi cần thi.
+    const congDon = (n: number) => {
+      let t = 0
+      for (let i = 1; i <= n; i++) t += NGUON_EXP.leoThap(i)
+      return t
+    }
+    const duong = tongExpToiDinh()
+    expect(congDon(20) / duong).toBeLessThan(0.20)
+    expect(congDon(40) / duong).toBeLessThan(0.50)
+  })
+
+  it('một tầng tháp đáng ít hơn một câu sai sửa xong — có chủ ý', () => {
+    // Tầng tháp là một câu bất kỳ; câu sai là LỖI CỦA CHÍNH EM được sửa.
+    for (let t = 1; t <= 10; t++) {
+      expect(NGUON_EXP.leoThap(t)).toBeLessThan(NGUON_EXP.suaCauSai())
+    }
   })
 
   it('tầng càng cao EXP càng nhiều', () => {
@@ -220,8 +249,8 @@ describe('hồ sơ lưu', () => {
     expect(h.expToiDa).toBe(thanhExp(4))
   })
 
-  it('hồ sơ mặc định bắt đầu bằng thanh 240', () => {
-    expect(layHoSoThanThuMacDinh().expToiDa).toBe(240)
+  it('hồ sơ mặc định bắt đầu bằng thanh 300', () => {
+    expect(layHoSoThanThuMacDinh().expToiDa).toBe(300)
     expect(layHoSoThanThuMacDinh().capDo).toBe(1)
   })
 })

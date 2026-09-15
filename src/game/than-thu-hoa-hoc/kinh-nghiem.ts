@@ -2,7 +2,23 @@
  * KINH NGHIỆM — MỘT NGUỒN SỰ THẬT.
  *
  * Thầy chốt 14-09: **hết thanh thì phải đi kiếm theo hệ thống game**, không có
- * nút bấm phát ra EXP. Thanh đầu tiên chốt 2000, hạ xuống **240** ngày 15-09.
+ * nút bấm phát ra EXP.
+ *
+ * NHỊP GAME — tính từ nhịp thật của trung tâm, không ước chừng.
+ * Một học kỳ 18 tuần, 1 ca thi và 2 bài tập mỗi tuần, 40 câu một ca, sai 30%,
+ * trong đó ~60% là câu phần I đưa được vào game và em chăm sửa được ~60% số đó:
+ *
+ *   18 ca thi 7 điểm      7 560 EXP
+ *   36 bài tập về nhà     7 200 EXP
+ *   78 câu sai sửa xong   7 776 EXP
+ *   ───────────────────────────────
+ *   một học kỳ           22 536 EXP
+ *
+ * Chốt cả đường cấp 1 → 12 ở **15 120 EXP**, tức **67% một học kỳ** — khoảng
+ * 12 tuần học đều. Đủ xa để cấp 12 là phần thưởng, đủ gần để thấy được đích.
+ *
+ * Lịch sử hai lần chỉnh: 2000 (14-09) cho 57 520 EXP — hai học kỳ rưỡi, quá xa;
+ * 240 (15-09) cho 6 890 EXP — một tháng rưỡi là hết hình thái, quá gần.
  *
  * Nghĩa là mọi điểm kinh nghiệm phải đổi bằng một VIỆC HỌC THẬT: leo tháp,
  * sửa câu sai, nộp bài, thi. Nút "nạp năng lượng" cho không EXP đã bị bỏ —
@@ -11,16 +27,23 @@
 import { CAP_TOI_DA, type CapTienHoa } from './hinh-thai'
 
 /**
- * Thanh EXP của cấp 1. Thầy chốt: 2000 (14-09) → **240** (15-09).
+ * Thanh EXP của cấp 1 — **300**.
  *
- * Đây là NÚM VẶN NHỊP GAME. Với 240, cả đường từ cấp 1 lên cấp 12 tốn
- * **6 890 EXP** — bằng khoảng 18 tầng tháp, hoặc 14 ca thi 8 điểm, hoặc 68 câu
- * sai sửa xong. Đổi số này là đổi cả nhịp; `HE_SO_DAI_THEM` là núm thứ hai.
+ * Chọn 300 vì đó là mốc lên cấp 2 bằng **một ca thi 5 điểm**, hoặc hai bài tập,
+ * hoặc ba câu sai sửa xong. Em làm xong buổi học đầu tiên là thấy thanh nhảy —
+ * đó là cái móc giữ em quay lại.
  */
-export const EXP_BAN_DAU = 240
+export const EXP_BAN_DAU = 300
 
-/** Mỗi cấp thanh dài thêm 18%. Đổi một số này là đổi cả nhịp game. */
-export const HE_SO_DAI_THEM = 1.18
+/**
+ * Mỗi cấp thanh dài thêm **28%**.
+ *
+ * Trước là 18% — thanh gần như phẳng, cấp 11 chỉ đắt gấp 5 lần cấp 1, nên đoạn
+ * cuối không có sức nặng. Với 28%: cấp 1 tốn 300, cấp 11 tốn 3 540 (gấp gần 12
+ * lần). Năm cấp đầu chỉ chiếm 17% cả đường, còn ba cấp cuối chiếm 56% — vào
+ * nhanh, về chậm, đúng nhịp một game nuôi thú.
+ */
+export const HE_SO_DAI_THEM = 1.28
 
 /**
  * Thanh EXP của một cấp. Cấp 12 là tối đa nên trả 0 — hết đường lên.
@@ -41,8 +64,19 @@ export function tongExpToiDinh(): number {
 /* ─────────── BỐN NGUỒN KIẾM EXP, đều là việc học thật ─────────── */
 
 export const NGUON_EXP = {
-  /** Hạ trùm một tầng tháp. Tầng càng cao càng nhiều. */
-  leoThap: (tang: number) => 120 + Math.max(0, Math.round(tang)) * 30,
+  /**
+   * Hạ trùm một tầng tháp. Tầng càng cao càng nhiều.
+   *
+   * HẠ TỪ `120 + 30 × tầng` XUỐNG `30 + 6 × tầng`. Công thức cũ làm tháp NUỐT
+   * cả game: leo tới tầng 40 cho 29 400 EXP, gần gấp đôi cả đường lên cấp 12 —
+   * tức là ngồi leo tháp một buổi tối là đủ tối đa hình thái, khỏi cần thi,
+   * khỏi cần nộp bài. Nay tới tầng 20 cho 1 860 EXP (12% cả đường), tới tầng 40
+   * cho 6 120 EXP (40%): tháp là THƯỞNG THÊM, ba nguồn kia mới là đường chính.
+   *
+   * Và một tầng tháp đáng ít hơn một câu sai sửa xong là có chủ ý: tầng tháp là
+   * một câu bất kỳ, câu sai là LỖI CỦA CHÍNH EM được sửa.
+   */
+  leoThap: (tang: number) => 30 + Math.max(0, Math.round(tang)) * 6,
   /** Thanh tẩy MỘT câu sai — sửa xong một câu mình từng làm sai. */
   suaCauSai: () => 100,
   /** Nộp đủ một bài tập về nhà. */
@@ -53,7 +87,7 @@ export const NGUON_EXP = {
 
 /** Nhãn hiện cho học sinh — phải khớp đúng con số ở trên, không hứa suông. */
 export const BANG_NGUON_EXP: readonly { viec: string; thuong: string }[] = [
-  { viec: 'Hạ trùm một tầng tháp', thuong: '120 + 30 × số tầng' },
+  { viec: 'Hạ trùm một tầng tháp', thuong: '30 + 6 × số tầng' },
   { viec: 'Thanh tẩy một câu sai', thuong: '100 EXP' },
   { viec: 'Nộp đủ một bài tập về nhà', thuong: '200 EXP' },
   { viec: 'Thi xong một ca', thuong: '60 EXP mỗi điểm' },
