@@ -2473,6 +2473,11 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
     case 'hsBtvn': return ra(await G.hsBtvn(env, b))
     case 'hsCauSai': return ra(await G.hsCauSai(env, b))
 
+    // ---- THẦN THÚ HOÁ HỌC — đồng bộ đa thiết bị (15-09) ------------------
+    // Chỉ tiến trình game. Không tên, không điểm, không ảnh bài.
+    case 'thanThuDoc': return ra(await G.thanThuDoc(env, b))
+    case 'thanThuGhi': return ra(await G.thanThuGhi(env, b))
+
     // ---- CA THI ----------------------------------------------------------
     case 'publish': return dayCa(env, b)
     case 'batDauThi': return batDauThi(env, String(b.maCa ?? ''))
@@ -2643,6 +2648,8 @@ export default {
       if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))
       if (p === '/hs/lich-su') return ra(await G.hsLichSuCa(env, b))
       if (p === '/hs/cau-sai') return ra(await G.hsCauSai(env, b))
+      if (p === '/hs/than-thu') return ra(await G.thanThuDoc(env, b))
+      if (p === '/hs/than-thu-ghi') return ra(await G.thanThuGhi(env, b))
       if (p === '/hs/btvn') return ra(await G.hsBtvn(env, b))
       // CỔNG TƯƠNG THÍCH — tự phân quyền bên trong, nên đứng TRƯỚC cổng mã bí mật.
       if (p === '/goi') return goiCu(req, env, b)

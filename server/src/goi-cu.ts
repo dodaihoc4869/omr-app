@@ -3056,3 +3056,129 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
   return { ok: true, items }
 }
 
+
+// ===========================================================================
+// THẦN THÚ HOÁ HỌC — ĐỒNG BỘ ĐA THIẾT BỊ (15-09-2026)
+//
+// Thầy bắt được: "trên điện thoại vẫn là trứng, trên web thì là có sừng". Hồ sơ
+// game trước nay chỉ nằm trong localStorage từng máy.
+//
+// TẦNG ĐỎ — hai luật không được phá:
+//  1. Bảng `than_thu` KHÔNG chứa tên, số điện thoại, điểm thi, ảnh bài. Chỉ
+//     tiến trình game. Máy chủ LỌC TỪNG TRƯỜNG, không tin máy em gửi gì cũng lưu
+//     — máy em là chỗ dễ sửa nhất trong cả hệ.
+//  2. Hồ sơ game không bao giờ chảy ngược vào bảng điểm.
+// ===========================================================================
+
+/** Đúng những trường game được phép lưu. Trường lạ bị vứt, không hỏi. */
+interface HoSoThanThuMayChu {
+  idThanhThuChon: string
+  capDo: number
+  exp: number
+  expToiDa: number
+  capTienHoa: number
+  khoExp: number
+  soExp: Record<string, number>
+  tangThapCaoNhat: number
+  soCauDaThanhTay: number
+  danhHieuHienTai: string
+  ngayNhanTrung: string
+  ngayChonThu: string
+}
+
+const NGUON_EXP_HOP_LE = ['caThi', 'btvn', 'mom', 'leoThap', 'sanBoss'] as const
+/** Trần cứng để một máy em bị sửa không ghi được cấp 999 hay EXP tỉ tỉ. */
+const TRAN_CAP = 12
+const TRAN_EXP = 100_000_000
+
+function soNguyenTrongKhoang(v: unknown, thap: number, cao: number, mac = 0): number {
+  const n = Number(v)
+  if (!Number.isFinite(n)) return mac
+  return Math.max(thap, Math.min(cao, Math.round(n)))
+}
+
+/** Lọc hồ sơ máy em gửi lên về đúng khuôn được phép lưu. */
+function locHoSoThanThu(tho: unknown): { hoSo: HoSoThanThuMayChu; tongExp: number } {
+  const o = (tho ?? {}) as Record<string, unknown>
+  const soExp: Record<string, number> = {}
+  const thoSo = (o.soExp ?? {}) as Record<string, unknown>
+  let tongExp = 0
+  for (const k of NGUON_EXP_HOP_LE) {
+    const v = soNguyenTrongKhoang(thoSo[k], 0, TRAN_EXP, 0)
+    soExp[k] = v
+    tongExp += v
+  }
+  const capDo = soNguyenTrongKhoang(o.capDo, 1, TRAN_CAP, 1)
+  return {
+    tongExp,
+    hoSo: {
+      idThanhThuChon: chuoi(o.idThanhThuChon).slice(0, 40),
+      capDo,
+      exp: soNguyenTrongKhoang(o.exp, 0, TRAN_EXP, 0),
+      expToiDa: soNguyenTrongKhoang(o.expToiDa, 0, TRAN_EXP, 0),
+      capTienHoa: soNguyenTrongKhoang(o.capTienHoa, 1, TRAN_CAP, capDo),
+      khoExp: soNguyenTrongKhoang(o.khoExp, 0, TRAN_EXP, 0),
+      soExp,
+      tangThapCaoNhat: soNguyenTrongKhoang(o.tangThapCaoNhat, 1, 100_000, 1),
+      soCauDaThanhTay: soNguyenTrongKhoang(o.soCauDaThanhTay, 0, 100_000, 0),
+      danhHieuHienTai: chuoi(o.danhHieuHienTai).slice(0, 80),
+      ngayNhanTrung: chuoi(o.ngayNhanTrung).slice(0, 40),
+      ngayChonThu: chuoi(o.ngayChonThu).slice(0, 40),
+    },
+  }
+}
+
+/** ĐỌC hồ sơ thần thú của một em. Chưa có thì trả `hoSo: null`, không dựng sẵn. */
+export async function thanThuDoc(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const sbd = chuoi(b.sbd).trim()
+  if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
+  const r = await env.DB.prepare(
+    'SELECT du_lieu_json, tong_exp, cap_nhat_luc FROM than_thu WHERE sbd = ?',
+  ).bind(sbd).first<Record<string, unknown>>()
+  if (!r) return { ok: true, hoSo: null, tongExp: 0, capNhatLuc: '' }
+  let hoSo: unknown = null
+  try { hoSo = JSON.parse(chuoi(r.du_lieu_json)) } catch { hoSo = null }
+  return {
+    ok: true,
+    hoSo,
+    tongExp: Number(r.tong_exp) || 0,
+    capNhatLuc: chuoi(r.cap_nhat_luc),
+  }
+}
+
+/**
+ * GHI hồ sơ thần thú.
+ *
+ * HOÀ GIẢI THEO TỔNG EXP, KHÔNG THEO ĐỒNG HỒ. Tổng EXP em đã kiếm chỉ có tăng,
+ * nên bản nào tổng lớn hơn là bản mới hơn — chắc chắn. So theo `cap_nhat_luc`
+ * thì một máy đặt sai giờ sẽ đè chết tiến trình của máy kia.
+ *
+ * Bản gửi lên THẤP HƠN bản đang có thì KHÔNG ghi, và trả về bản trên máy chủ để
+ * máy em nuốt vào — đó là lúc điện thoại vừa mở lại sau nhiều ngày.
+ */
+export async function thanThuGhi(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const sbd = chuoi(b.sbd).trim()
+  if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
+
+  const { hoSo, tongExp } = locHoSoThanThu(b.hoSo)
+  const cu = await env.DB.prepare('SELECT du_lieu_json, tong_exp FROM than_thu WHERE sbd = ?')
+    .bind(sbd).first<Record<string, unknown>>()
+  const tongCu = cu ? Number(cu.tong_exp) || 0 : -1
+
+  if (cu && tongExp < tongCu) {
+    let hoSoCu: unknown = null
+    try { hoSoCu = JSON.parse(chuoi(cu.du_lieu_json)) } catch { hoSoCu = null }
+    return { ok: true, daGhi: false, lyDo: 'may_chu_moi_hon', hoSo: hoSoCu, tongExp: tongCu }
+  }
+
+  const luc = NAY()
+  await env.DB.prepare(
+    `INSERT INTO than_thu (sbd, du_lieu_json, tong_exp, cap_nhat_luc) VALUES (?,?,?,?)
+     ON CONFLICT(sbd) DO UPDATE SET
+       du_lieu_json = excluded.du_lieu_json,
+       tong_exp     = excluded.tong_exp,
+       cap_nhat_luc = excluded.cap_nhat_luc`,
+  ).bind(sbd, JSON.stringify(hoSo), tongExp, luc).run()
+
+  return { ok: true, daGhi: true, tongExp, capNhatLuc: luc }
+}

@@ -54,6 +54,7 @@ import {
   type CauHoiCuaEm, type CauSaiTho, type KetQuaDoiCau,
 } from '../game/than-thu-hoa-hoc/cau-hoi-cua-em'
 import { veThanThuCanvas, khungVeThanThu } from '../game/than-thu-hoa-hoc/ve-than-thu'
+import { hoaGiaiHoSo } from '../game/than-thu-hoa-hoc/dong-bo'
 import KhungLoiGiaiGame from './KhungLoiGiaiGame'
 import OngNghiemExp from './OngNghiemExp'
 import PopupThuongExp, { type TinThuongExp } from './PopupThuongExp'
@@ -83,6 +84,13 @@ interface Props {
    * cổng học sinh gọi máy chủ rồi đưa kết quả xuống.
    */
   layCauSaiCuaEm?: () => Promise<CauSaiTho[]>
+  /**
+   * ĐỒNG BỘ THẦN THÚ ĐA THIẾT BỊ. Cổng học sinh cung cấp hai hàm gọi lại; game
+   * vẫn không biết số báo danh — cổng biết em là ai và tự gọi máy chủ.
+   * Thiếu hai hàm này thì game chạy y như cũ, chỉ lưu trong máy.
+   */
+  docThanThuMayChu?: () => Promise<unknown>
+  ghiThanThuMayChu?: (hoSo: unknown) => Promise<unknown>
   onDong: () => void
   onChuyenSangKhacPhuc: () => void
   onChuyenSangBtvn: () => void
@@ -159,6 +167,8 @@ export default function ThanThuHoaHocGame({
   dsBtvn,
   dsMom = [],
   layCauSaiCuaEm,
+  docThanThuMayChu,
+  ghiThanThuMayChu,
   onDong,
   onChuyenSangKhacPhuc,
   onChuyenSangBtvn,
@@ -415,6 +425,56 @@ export default function ThanThuHoaHocGame({
         setTinhTrangKho('loi')
       })
   }, [tabGame, layCauSaiCuaEm])
+
+  /**
+   * ĐỒNG BỘ VỚI MÁY CHỦ.
+   *
+   * Thầy bắt được 15-09: "trên điện thoại vẫn là trứng, trên web thì là có sừng".
+   *
+   * Mở game: đọc bản máy chủ, hoà giải với bản trong máy (theo TỔNG EXP, không
+   * theo đồng hồ — xem `dong-bo.ts`), lấy bản trộn làm chuẩn.
+   * Sau đó: mỗi lần hồ sơ đổi thì đẩy lên, có chờ 2,5 giây gộp lại — em bấm
+   * liên tục lúc leo tháp, đẩy từng nhịp là phá 3G của em.
+   */
+  const [tinhTrangDongBo, setTinhTrangDongBo] = useState<'chua' | 'dangTai' | 'xong' | 'loi' | 'khongCo'>('chua')
+  const daNuotRef = useRef(false)
+
+  useEffect(() => {
+    if (daNuotRef.current) return
+    daNuotRef.current = true
+    if (!docThanThuMayChu) { setTinhTrangDongBo('khongCo'); return }
+    setTinhTrangDongBo('dangTai')
+    docThanThuMayChu()
+      .then((tho) => {
+        if (!conGanRef.current) return
+        setHoSo((prev) => hoaGiaiHoSo(prev, tho).hoSo)
+        setTinhTrangDongBo('xong')
+      })
+      .catch(() => { if (conGanRef.current) setTinhTrangDongBo('loi') })
+  }, [docThanThuMayChu])
+
+  const henGhiRef = useRef<number | null>(null)
+  useEffect(() => {
+    // Chưa nuốt xong bản máy chủ thì CHƯA ĐƯỢC ĐẨY — đẩy lúc này là lấy bản
+    // trong máy đè lên bản máy chủ, đúng cái lỗi đang đi sửa.
+    if (!ghiThanThuMayChu || tinhTrangDongBo === 'chua' || tinhTrangDongBo === 'dangTai') return
+    if (henGhiRef.current !== null) clearTimeout(henGhiRef.current)
+    henGhiRef.current = window.setTimeout(() => {
+      henGhiRef.current = null
+      void ghiThanThuMayChu(hoSo)
+        .then((tra) => {
+          // Máy chủ có bản nhỉnh hơn (em vừa chơi trên máy khác) thì nuốt lại.
+          const o = tra as { daGhi?: boolean; hoSo?: unknown } | null
+          if (o !== null && o.daGhi === false && o.hoSo !== undefined && conGanRef.current) {
+            setHoSo((prev) => hoaGiaiHoSo(prev, o.hoSo).hoSo)
+          }
+        })
+        .catch(() => { /* mất mạng thì thôi, lần sau đẩy tiếp */ })
+    }, 2500)
+    return () => {
+      if (henGhiRef.current !== null) { clearTimeout(henGhiRef.current); henGhiRef.current = null }
+    }
+  }, [hoSo, ghiThanThuMayChu, tinhTrangDongBo])
 
   /** Câu của em đang dùng được hay đang phải mượn kho chung. */
   const dungKhoCuaEm = dsCauCuaEm.length > 0

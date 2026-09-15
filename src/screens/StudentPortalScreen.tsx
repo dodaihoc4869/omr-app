@@ -28,6 +28,8 @@ import {
   hsLichSuCaApi,
   hsBtvnApi,
   hsCauSaiApi,
+  thanThuDocApi,
+  thanThuGhiApi,
 } from '../lib/exam-api'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import KhungXemPhieu from '../components/KhungXemPhieu'
@@ -735,6 +737,28 @@ export default function StudentPortalScreen() {
     const res = await hsCauSaiApi(url, auth.sbd, [])
     if (!res.ok || !res.items) throw new Error(res.error || 'Máy chủ không trả được câu sai')
     return res.items
+  }, [auth])
+
+  /**
+   * ĐỒNG BỘ THẦN THÚ ĐA THIẾT BỊ.
+   *
+   * Thầy bắt được 15-09: điện thoại thấy trứng, web thấy có sừng. Game không
+   * biết số báo danh (và không cần biết) — cổng này biết, nên cổng gọi máy chủ
+   * rồi trao kết quả xuống. Chỉ tiến trình game đi qua đây: cấp thú, EXP, tầng
+   * tháp. Không tên, không điểm, không ảnh bài.
+   */
+  const docThanThuChoGame = useCallback(async () => {
+    if (!auth) return null
+    const url = await loadScriptUrlHoacMacDinh().catch(() => '')
+    const res = await thanThuDocApi(url, auth.sbd)
+    if (!res.ok) throw new Error(res.error || 'Máy chủ không trả được hồ sơ thần thú')
+    return res.hoSo ?? null
+  }, [auth])
+
+  const ghiThanThuChoGame = useCallback(async (hoSo: unknown) => {
+    if (!auth) return null
+    const url = await loadScriptUrlHoacMacDinh().catch(() => '')
+    return await thanThuGhiApi(url, auth.sbd, hoSo)
   }, [auth])
 
   const taoDeKhacPhuc = async (danhSachMaCaTuyChon?: string[]) => {
@@ -1891,6 +1915,8 @@ export default function StudentPortalScreen() {
             dsBtvn={dsBtvn}
             dsMom={dsMomGiao}
             layCauSaiCuaEm={layCauSaiChoGame}
+            docThanThuMayChu={docThanThuChoGame}
+            ghiThanThuMayChu={ghiThanThuChoGame}
             onDong={() => setTab('diem')}
             onChuyenSangKhacPhuc={() => setTab('khacphuc')}
             onChuyenSangBtvn={() => setTab('btvn')}

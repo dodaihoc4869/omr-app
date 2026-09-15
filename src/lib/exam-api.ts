@@ -3211,3 +3211,52 @@ export async function hsCauSaiApi(scriptUrl: string, sbd: string, dsMaCa: string
   }
 }
 
+
+// ===========================================================================
+// THẦN THÚ HOÁ HỌC — ĐỒNG BỘ ĐA THIẾT BỊ (15-09-2026)
+// Chỉ tiến trình game. Không tên, không điểm, không ảnh bài.
+// ===========================================================================
+
+export async function thanThuDocApi(scriptUrl: string, sbd: string): Promise<{
+  ok: boolean
+  hoSo?: unknown
+  tongExp?: number
+  capNhatLuc?: string
+  error?: string
+}> {
+  const ch = await layCauHinhMayChu()
+  const base = ch.BAT && ch.URL ? ch.URL : (scriptUrl ? scriptUrl.replace(/\/$/, '') : '')
+  try {
+    const res = await fetch(`${base}/hs/than-thu`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ sbd: sbd.trim() }),
+    })
+    return (await res.json()) as { ok: boolean; hoSo?: unknown; tongExp?: number; capNhatLuc?: string }
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
+  }
+}
+
+export async function thanThuGhiApi(scriptUrl: string, sbd: string, hoSo: unknown): Promise<{
+  ok: boolean
+  daGhi?: boolean
+  lyDo?: string
+  /** Máy chủ trả về bản của nó khi bản gửi lên cũ hơn — máy em phải nuốt vào. */
+  hoSo?: unknown
+  tongExp?: number
+  error?: string
+}> {
+  const ch = await layCauHinhMayChu()
+  const base = ch.BAT && ch.URL ? ch.URL : (scriptUrl ? scriptUrl.replace(/\/$/, '') : '')
+  try {
+    const res = await fetch(`${base}/hs/than-thu-ghi`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ sbd: sbd.trim(), hoSo }),
+    })
+    return (await res.json()) as { ok: boolean; daGhi?: boolean; lyDo?: string; hoSo?: unknown; tongExp?: number }
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
+  }
+}
