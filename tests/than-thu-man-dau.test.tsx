@@ -54,6 +54,9 @@ function gan(layCauSai?: () => Promise<CauSaiTho[]>) {
 
 beforeEach(() => {
   localStorage.clear()
+  // Từ 15-09 em phải chọn thần thú ở màn đầu mới vào được các tab. Các phép kiểm
+  // dưới đây kiểm việc khác, nên nạp sẵn một hồ sơ đã chọn rồi.
+  localStorage.setItem('omr_than_thu_hoa_hoc_data', JSON.stringify({ idThanhThuChon: 'hoa_long' }))
   // jsdom không dựng được ngữ cảnh 2D; hook vẽ đã tự thoát khi không có ctx,
   // nên chỉ cần chặn cảnh báo "not implemented".
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null)

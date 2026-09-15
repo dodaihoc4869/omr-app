@@ -32,6 +32,10 @@ import {
   vaHoSo,
   tinhLucChienPet,
   tinhHeSoTuongKhac,
+  TEN_HE_DAY_DU,
+  TEN_HE_NGAN,
+  heKhacDuoc,
+  heBiKhacBoi,
   type HoSoThanThuLuu,
   type CapTienHoa,
   type HeNguyenTo,
@@ -78,12 +82,8 @@ type TabGame = 'dao_thu' | 'leo_thap' | 'san_cau_sai' | 'xep_hang'
 /** Sổ ghi câu sai đã làm đúng lại — để mỗi câu chỉ trả EXP một lần trong đời. */
 const KHOA_QID_THANH_TAY = 'omr_than_thu_qid_thanh_tay'
 
-const TEN_HE: Record<HeNguyenTo, string> = {
-  hoa: 'Hoả · nhiệt nhôm',
-  axit: 'Acid · ăn mòn',
-  kiem: 'Base · kết tủa',
-  khi: 'Khí · halogen',
-}
+// Tên hệ dùng chung với bảng tương khắc — một nguồn sự thật, sáu hệ.
+const TEN_HE = TEN_HE_DAY_DU
 
 /** Trạng thái thú trong trận: đứng yên · ra đòn · trúng đòn · tung chiêu nộ. */
 type HieuUngCombat = 'yen' | 'danh' | 'biDanh' | 'no'
@@ -207,15 +207,18 @@ export default function ThanThuHoaHocGame({
     return { diemTb, tyLeBtvn, btvnDaNop, tongBtvn: dsBtvn.length, soCa: dsLichSu.length }
   }, [dsLichSu, dsBtvn])
 
-  const infoPet = DANH_SACH_THAN_THU[hoSo.idThanhThuChon] || DANH_SACH_THAN_THU['hoa_long']!
+  /** Em đã chốt thần thú chưa. Chưa thì game hiện màn chọn, khoá mọi tab. */
+  const daChonThu = hoSo.idThanhThuChon !== '' && DANH_SACH_THAN_THU[hoSo.idThanhThuChon] !== undefined
+  const infoPet = DANH_SACH_THAN_THU[hoSo.idThanhThuChon] ?? DANH_SACH_THAN_THU['hoa_long']!
   const chiSoPet = useMemo(() => {
     return tinhLucChienPet({
       capDo: hoSo.capDo,
       capTienHoa: hoSo.capDo as CapTienHoa,
       diemTrungBinh: chiSoHocTap.diemTb,
       tyLeBtvn: chiSoHocTap.tyLeBtvn,
+      he: infoPet.he,
     })
-  }, [hoSo.capDo, hoSo.capTienHoa, chiSoHocTap])
+  }, [hoSo.capDo, hoSo.capTienHoa, chiSoHocTap, infoPet.he])
 
   // Hiệu ứng thú trong trận. Ghi vào ref chứ không vào state: state thì mỗi đòn
   // đánh lại dựng lại vòng lặp vẽ và đồng hồ hoạt hình giật về 0.
@@ -430,12 +433,22 @@ export default function ThanThuHoaHocGame({
     congExp(tong, 'Quy đổi ' + viec.join(' + '))
   }, [dsLichSu, dsBtvn, congExp])
 
-  // Đổi linh thú khác
-  const doiThanhThu = (idMoi: string) => {
+  /**
+   * CHỐT THẦN THÚ — MỘT LẦN, KHÔNG ĐỔI.
+   *
+   * Thầy chốt 15-09. Trước đây là nút đổi tự do, nên vòng tương khắc thành vô
+   * nghĩa: gặp trùm hệ nào thì đổi sang hệ khắc hệ ấy rồi đánh. Nay chọn xong
+   * là gắn bó — em phải học cách đánh bằng đúng con mình chọn, kể cả khi bị khắc.
+   */
+  const chonThanThu = useCallback((id: string) => {
+    if (DANH_SACH_THAN_THU[id] === undefined) return
+    setHoSo((prev) => {
+      if (prev.idThanhThuChon !== '') return prev   // đã chốt thì thôi
+      return { ...prev, idThanhThuChon: id, ngayChonThu: new Date().toISOString() }
+    })
     amThanhRef.current?.moKhoa()
     amThanhRef.current?.tanCong()
-    setHoSo((prev) => ({ ...prev, idThanhThuChon: idMoi }))
-  }
+  }, [])
 
   // State cho mini-game LEO THÁP TRI THỨC
   const [dangLeoThap, setDangLeoThap] = useState(false)
@@ -736,8 +749,8 @@ export default function ThanThuHoaHocGame({
           </div>
         </div>
 
-        {/* 4 Tabs Chế Độ Game */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-5">
+        {/* 4 Tabs Chế Độ Game — ẩn cho tới khi em chốt thần thú. */}
+        <div className={`grid grid-cols-2 sm:grid-cols-4 gap-2 mt-5 ${daChonThu ? '' : 'hidden'}`}>
           <button
             onClick={() => { setTabGame('dao_thu'); setDangLeoThap(false); }}
             className={`py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
@@ -788,8 +801,55 @@ export default function ThanThuHoaHocGame({
         </div>
       </div>
 
+      {/* MÀN CHỌN LẦN ĐẦU — chưa chọn thì không vào được tab nào. */}
+      {!daChonThu && (
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 sm:p-7 shadow-sm space-y-5">
+          <div className="text-center space-y-1.5">
+            <h2 className="text-xl font-black text-slate-900 dark:text-white">
+              Chọn thần thú đồng hành của em
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-lg mx-auto leading-relaxed">
+              Sáu hệ, mỗi hệ một lối đánh. <b>Chọn một lần duy nhất và không đổi được</b>,
+              nên đọc kỹ hệ nào khắc hệ nào trước khi bấm.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {Object.values(DANH_SACH_THAN_THU).map((pet) => (
+              <button
+                key={pet.id}
+                type="button"
+                onClick={() => chonThanThu(pet.id)}
+                className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30 text-left space-y-2 cursor-pointer transition-all active:scale-95"
+              >
+                <div>
+                  <div className="text-sm font-black text-slate-900 dark:text-white">{pet.ten}</div>
+                  <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                    {TEN_HE[pet.he]}
+                  </div>
+                </div>
+                <p className="text-[11.5px] leading-relaxed text-slate-600 dark:text-slate-300 line-clamp-3">
+                  {pet.moTa}
+                </p>
+                <div className="space-y-0.5 text-[11px]">
+                  <div className="text-emerald-700 dark:text-emerald-400">
+                    <b>Khắc được:</b>{' '}
+                    {heKhacDuoc(pet.he).map((c) => TEN_HE_NGAN[c.thu]).join(', ') || '—'}
+                  </div>
+                  <div className="text-rose-700 dark:text-rose-400">
+                    <b>Bị khắc bởi:</b>{' '}
+                    {heBiKhacBoi(pet.he).map((c) => TEN_HE_NGAN[c.cong]).join(', ') || '—'}
+                  </div>
+                  <div className="text-slate-500 font-mono">Gốc: {pet.nguyenToGoc}</div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* NỘI DUNG TAB 1: ĐẢO THẦN THÚ */}
-      {tabGame === 'dao_thu' && (
+      {daChonThu && tabGame === 'dao_thu' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           {/* Cột trái: Khung hiển thị thần thú tương tác Canvas */}
           <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col items-center justify-between text-center relative overflow-hidden">
@@ -946,30 +1006,45 @@ export default function ThanThuHoaHocGame({
               </div>
             </div>
 
-            {/* Chọn đổi linh thú 4 hệ */}
+            {/* SÁU HỆ — CHỈ ĐỌC. Em đã chốt một con, không đổi được nữa. */}
             <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-3">
               <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-                Chọn Thần Thú Đồng Hành
+                Sáu Hệ Thần Thú
               </h3>
               <div className="grid grid-cols-2 gap-2">
                 {Object.values(DANH_SACH_THAN_THU).map((pet) => {
-                  const isSelect = hoSo.idThanhThuChon === pet.id
+                  const laCuaEm = hoSo.idThanhThuChon === pet.id
+                  const tk = tinhHeSoTuongKhac(infoPet.he, pet.he)
                   return (
-                    <button
+                    <div
                       key={pet.id}
-                      onClick={() => doiThanhThu(pet.id)}
-                      className={`p-2.5 rounded-2xl border text-left transition-all cursor-pointer ${
-                        isSelect
-                          ? 'border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/40 font-bold'
-                          : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/40'
+                      className={`p-2.5 rounded-2xl border text-left ${
+                        laCuaEm
+                          ? 'border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/40'
+                          : 'border-slate-200 dark:border-slate-800'
                       }`}
                     >
                       <div className="text-xs font-bold line-clamp-1">{pet.ten}</div>
                       <div className="text-[10px] text-slate-500">{TEN_HE[pet.he]}</div>
-                    </button>
+                      <div className="text-[10px] mt-0.5 font-bold">
+                        {laCuaEm ? (
+                          <span className="text-emerald-600 dark:text-emerald-400">Thần thú của em</span>
+                        ) : tk.loai === 'khac' ? (
+                          <span className="text-emerald-600 dark:text-emerald-400">Em khắc hệ này +50%</span>
+                        ) : tk.loai === 'biKhac' ? (
+                          <span className="text-rose-600 dark:text-rose-400">Hệ này khắc em −30%</span>
+                        ) : (
+                          <span className="text-slate-400">Không tương khắc</span>
+                        )}
+                      </div>
+                    </div>
                   )
                 })}
               </div>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                Thần thú chọn một lần là gắn bó cả chặng — không đổi được. Gặp hệ khắc
+                mình thì phải trả lời chắc hơn, chứ không đổi thú để né.
+              </p>
             </div>
 
             {/* HỒ SƠ NGUYÊN TỐ — phần "học" của game.
@@ -1019,7 +1094,7 @@ export default function ThanThuHoaHocGame({
       )}
 
       {/* NỘI DUNG TAB 2: LEO THÁP TRI THỨC */}
-      {tabGame === 'leo_thap' && (
+      {daChonThu && tabGame === 'leo_thap' && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 sm:p-7 shadow-sm">
           {!dangLeoThap ? (
             <div className="text-center py-8 max-w-md mx-auto space-y-4">
@@ -1187,7 +1262,7 @@ export default function ThanThuHoaHocGame({
       )}
 
       {/* NỘI DUNG TAB 3: SĂN BOSS CÂU SAI (Đột kích lò phản ứng) */}
-      {tabGame === 'san_cau_sai' && (
+      {daChonThu && tabGame === 'san_cau_sai' && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 sm:p-7 shadow-sm space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
             <div>
@@ -1388,7 +1463,7 @@ export default function ThanThuHoaHocGame({
           với học sinh rằng đây là xếp hạng cả lớp là bịa — nên bỏ hẳn, thay
           bằng kỷ lục thật của chính em. Muốn có bảng chung toàn trung tâm thì
           phải có máy chủ, làm sau. */}
-      {tabGame === 'xep_hang' && (
+      {daChonThu && tabGame === 'xep_hang' && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 sm:p-7 shadow-sm space-y-5">
           <div className="border-b border-slate-100 dark:border-slate-800 pb-4">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">

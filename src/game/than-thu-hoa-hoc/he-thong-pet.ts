@@ -7,8 +7,13 @@
 
 import { CAP_TOI_DA, type CapTienHoa } from './hinh-thai'
 import { EXP_BAN_DAU, thanhExp } from './kinh-nghiem'
+import { type HeNguyenTo } from './tuong-khac'
 
-export type HeNguyenTo = 'hoa' | 'axit' | 'kiem' | 'khi'
+// Vòng tương khắc SÁU HỆ sống ở `tuong-khac.ts` — một nguồn sự thật. Ở đây chỉ
+// xuất lại để mọi chỗ đang nhập từ tệp này không phải sửa.
+export { tinhHeSoTuongKhac, TEN_HE_NGAN, TEN_HE_DAY_DU, DS_HE, BANG_KHAC_CHE,
+  heKhacDuoc, heBiKhacBoi, type KetQuaTuongKhac, type CapKhacChe } from './tuong-khac'
+export type { HeNguyenTo }
 export type { CapTienHoa }
 
 export interface ThanThuInfo {
@@ -78,38 +83,67 @@ export const DANH_SACH_THAN_THU: Record<string, ThanThuInfo> = {
     kyNangNo: 'Cuồng Phong Oxi Hóa Flo F₂',
     nguyenToGoc: 'F₂, Cl₂',
   },
+  // ─── HAI HỆ MỚI, thầy chốt 15-09 ───
+  loi_kim: {
+    id: 'loi_kim',
+    ten: 'Lôi Kim Thú Điện Cực',
+    danhHieu: 'Chúa Tể Dãy Điện Hoá',
+    he: 'dien',
+    mauChinh: 'rgb(100, 116, 139)',
+    mauPhu: 'rgb(56, 189, 248)',
+    mauHaoQuang: 'rgba(56, 189, 248, 0.45)',
+    moTa: 'Sinh ra trong pin Zn–Cu, nơi electron chạy từ cực âm sang cực dương. Càng đứng trước trong dãy điện hoá, tính khử càng mạnh.',
+    kyNangThuong: 'Dòng Electron Anode',
+    kyNangNo: 'Điện Phân Nóng Chảy Toàn Cực',
+    nguyenToGoc: 'Zn | Cu²⁺',
+  },
+  moc_tinh: {
+    id: 'moc_tinh',
+    ten: 'Mộc Tinh Ester Polymer',
+    danhHieu: 'Linh Hồn Chuỗi Carbon',
+    he: 'huuco',
+    mauChinh: 'rgb(132, 204, 22)',
+    mauPhu: 'rgb(180, 83, 9)',
+    mauHaoQuang: 'rgba(132, 204, 22, 0.45)',
+    moTa: 'Kết tinh từ chuỗi ester và polymer nối dài vô tận. Bộ giáp carbon bền hoá học, không acid nào ăn nổi.',
+    kyNangThuong: 'Xích Chuỗi Polymer',
+    kyNangNo: 'Than Hoạt Tính Hấp Phụ Toàn Diện',
+    nguyenToGoc: '(RCOO)₃C₃H₅',
+  },
 }
 
 /**
- * Tương khắc nguyên tố:
- * Hoả (nhiệt nhôm) > Khí (halogen)
- * Khí (halogen) > Base (kiềm hấp thụ khí halogen)
- * Base > Acid (trung hoà acid)
- * Acid (ăn mòn) > Hoả (ăn mòn kim loại, dập phản ứng nhiệt)
+ * HỆ SỐ BÙ CÂN BẰNG THEO HỆ.
+ *
+ * Bảng khắc chế sáu hệ KHÔNG đối xứng — ép cho đối xứng là bịa phản ứng không
+ * có (xem đầu `tuong-khac.ts`). Nên cân bằng ở đây: đo lợi thế khắc chế của
+ * từng hệ khi đấu đủ năm hệ còn lại, rồi nhân ngược vào chỉ số gốc.
+ *
+ * Số đo trước khi bù — lợi thế (hệ số công trung bình ÷ hệ số thủ trung bình):
+ *   Base 1,558 · Hoả 1,348 · Khí 1,000 · Hữu cơ 0,864 · Acid 0,860 · Điện hoá 0,642
+ *   chênh lệch cao/thấp = 2,428 lần
+ * Sau khi nhân các hệ số dưới đây: chênh lệch còn **1,011 lần**.
+ *
+ * Đổi bảng khắc chế thì phải ĐO LẠI bộ số này — phép kiểm sẽ bắt.
  */
-export function tinhHeSoTuongKhac(heCong: HeNguyenTo, heThu: HeNguyenTo): { heSo: number; thongDiep: string } {
-  if (
-    (heCong === 'hoa' && heThu === 'khi') ||
-    (heCong === 'khi' && heThu === 'kiem') ||
-    (heCong === 'kiem' && heThu === 'axit') ||
-    (heCong === 'axit' && heThu === 'hoa')
-  ) {
-    return { heSo: 1.5, thongDiep: 'Khắc chế Nguyên Tố! Sát thương +50%' }
-  }
-
-  if (
-    (heThu === 'hoa' && heCong === 'khi') ||
-    (heThu === 'khi' && heCong === 'kiem') ||
-    (heThu === 'kiem' && heCong === 'axit') ||
-    (heThu === 'axit' && heCong === 'hoa')
-  ) {
-    return { heSo: 0.7, thongDiep: 'Bị khắc chế! Sát thương -30%' }
-  }
-
-  return { heSo: 1.0, thongDiep: 'Khắc chế tương đương' }
+export const BU_CAN_BANG_HE: Record<HeNguyenTo, number> = {
+  hoa: 0.86,
+  khi: 1.00,
+  kiem: 0.80,
+  axit: 1.08,
+  dien: 1.25,
+  huuco: 1.08,
 }
 
 export interface HoSoThanThuLuu {
+  /**
+   * Thần thú em chọn. **Rỗng nghĩa là CHƯA CHỌN** — game hiện màn chọn trước.
+   *
+   * Thầy chốt 15-09: mỗi em chỉ chọn một con ngay từ đầu theo sở thích. Trước
+   * đây mặc định sẵn Hoả Long và cho bấm đổi tuỳ ý, nên "chọn theo sở thích"
+   * chẳng có nghĩa gì, mà hệ tương khắc cũng vô nghĩa nốt: gặp trùm hệ nào thì
+   * đổi sang hệ khắc hệ ấy.
+   */
   idThanhThuChon: string
   capDo: number
   exp: number
@@ -120,6 +154,8 @@ export interface HoSoThanThuLuu {
   soCauDaThanhTay: number
   danhHieuHienTai: string
   ngayNhanTrung: string
+  /** Thời điểm em chốt thần thú. Rỗng khi chưa chọn. */
+  ngayChonThu: string
 }
 
 export const KHOA_LUU_THAN_THU = 'omr_than_thu_hoa_hoc_data'
@@ -130,7 +166,7 @@ export const KHOA_LUU_THAN_THU = 'omr_than_thu_hoa_hoc_data'
  * Hồ sơ cũ hoặc hỏng thiếu `expToiDa` thì `exp / expToiDa` ra NaN, và thanh
  * EXP nhận `width: NaN%` — vỡ âm thầm, không ai thấy lỗi ở đâu.
  */
-export function vaHoSo(tho: unknown, idChon = 'hoa_long'): HoSoThanThuLuu {
+export function vaHoSo(tho: unknown, idChon = ''): HoSoThanThuLuu {
   const md = layHoSoThanThuMacDinh(idChon)
   if (typeof tho !== 'object' || tho === null) return md
   const o = tho as Record<string, unknown>
@@ -144,8 +180,10 @@ export function vaHoSo(tho: unknown, idChon = 'hoa_long'): HoSoThanThuLuu {
   }
   const capDo = Math.max(1, Math.min(CAP_TOI_DA, Math.round(so('capDo', 1))))
   return {
-    idThanhThuChon: DANH_SACH_THAN_THU[chuoi('idThanhThuChon', md.idThanhThuChon)]
-      ? chuoi('idThanhThuChon', md.idThanhThuChon) : md.idThanhThuChon,
+    // Hồ sơ cũ (trước 15-09) đã có sẵn một thần thú — coi như em đã chọn rồi,
+    // không bắt chọn lại. Id lạ hoặc rỗng thì về rỗng = chưa chọn.
+    idThanhThuChon: DANH_SACH_THAN_THU[chuoi('idThanhThuChon', '')] !== undefined
+      ? chuoi('idThanhThuChon', '') : md.idThanhThuChon,
     capDo,
     exp: so('exp', 0),
     // luôn tính lại theo cấp, không tin số cũ trong máy
@@ -155,10 +193,11 @@ export function vaHoSo(tho: unknown, idChon = 'hoa_long'): HoSoThanThuLuu {
     soCauDaThanhTay: Math.max(0, Math.round(so('soCauDaThanhTay', 0))),
     danhHieuHienTai: chuoi('danhHieuHienTai', md.danhHieuHienTai),
     ngayNhanTrung: chuoi('ngayNhanTrung', md.ngayNhanTrung),
+    ngayChonThu: chuoi('ngayChonThu', md.ngayChonThu),
   }
 }
 
-export function layHoSoThanThuMacDinh(idChon = 'hoa_long'): HoSoThanThuLuu {
+export function layHoSoThanThuMacDinh(idChon = ''): HoSoThanThuLuu {
   return {
     idThanhThuChon: idChon,
     capDo: 1,
@@ -168,6 +207,8 @@ export function layHoSoThanThuMacDinh(idChon = 'hoa_long'): HoSoThanThuLuu {
     tangThapCaoNhat: 1,
     soCauDaThanhTay: 0,
     danhHieuHienTai: 'Tập Sự Nguyên Tố',
+    // Mốc chọn thú, để biết em chọn lúc nào. Rỗng = chưa chọn.
+    ngayChonThu: '',
     ngayNhanTrung: new Date().toISOString(),
   }
 }
@@ -180,8 +221,12 @@ export function tinhLucChienPet(params: {
   capTienHoa: CapTienHoa
   diemTrungBinh: number | null
   tyLeBtvn: number // 0 .. 1
+  /** Hệ của thần thú — quyết định hệ số bù cân bằng. Thiếu thì coi như 1,0. */
+  he?: HeNguyenTo
 }): { cp: number; mau: number; cong: number; giap: number } {
-  const { capDo, capTienHoa, diemTrungBinh, tyLeBtvn } = params
+  const { capDo, capTienHoa, diemTrungBinh, tyLeBtvn, he } = params
+  // Bù lợi thế khắc chế: hệ nào khắc được nhiều hệ khác thì chỉ số gốc thấp hơn.
+  const bu = he !== undefined ? (BU_CAN_BANG_HE[he] ?? 1) : 1
   // CHƯA THI CA NÀO THÌ KHÔNG CÓ BUFF TỪ ĐIỂM — không bịa 7.0 như bản trước.
   // Bịa ở đây nghĩa là màn hình in "Điểm trung bình: 7.00đ" cho em chưa thi lần nào.
   const coDiem = diemTrungBinh !== null && Number.isFinite(diemTrungBinh)
@@ -189,9 +234,9 @@ export function tinhLucChienPet(params: {
   // 12 hình thái: hệ số dàn đều thay vì ba nấc 1.0 / 1.5 / 2.2
   const heSoTienHoa = 1 + (Math.min(CAP_TOI_DA, Math.max(1, capTienHoa)) - 1) * 0.25
 
-  const mau = Math.round((200 + capDo * 35) * heSoHoc * heSoTienHoa)
-  const cong = Math.round((35 + capDo * 8) * heSoHoc * heSoTienHoa)
-  const giap = Math.round((15 + capDo * 4) * heSoHoc * heSoTienHoa)
+  const mau = Math.round((200 + capDo * 35) * heSoHoc * heSoTienHoa * bu)
+  const cong = Math.round((35 + capDo * 8) * heSoHoc * heSoTienHoa * bu)
+  const giap = Math.round((15 + capDo * 4) * heSoHoc * heSoTienHoa * bu)
   const cp = Math.round((mau / 10 + cong * 2 + giap * 1.5) * 10)
 
   return { cp, mau, cong, giap }

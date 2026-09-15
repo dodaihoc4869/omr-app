@@ -240,7 +240,9 @@ describe('hồ sơ lưu', () => {
       expect(Number.isFinite(h.expToiDa)).toBe(true)
       expect(h.capDo).toBeGreaterThanOrEqual(1)
       expect(h.capDo).toBeLessThanOrEqual(12)
-      expect(DANH_SACH_THAN_THU[h.idThanhThuChon]).toBeDefined()
+      // Rỗng = CHƯA CHỌN, hợp lệ từ 15-09 (mỗi em chọn thú một lần ở màn đầu).
+      // Khác rỗng thì bắt buộc phải là một thần thú có thật.
+      if (h.idThanhThuChon !== '') expect(DANH_SACH_THAN_THU[h.idThanhThuChon]).toBeDefined()
     }
   })
 
@@ -256,16 +258,34 @@ describe('hồ sơ lưu', () => {
 })
 
 describe('tương khắc nguyên tố — không còn là mã chết', () => {
-  it('vòng khắc chế khép kín', () => {
-    expect(tinhHeSoTuongKhac('hoa', 'khi').heSo).toBe(1.5)
-    expect(tinhHeSoTuongKhac('khi', 'kiem').heSo).toBe(1.5)
+  /**
+   * BẢN 4 HỆ CŨ CÓ HAI CHIỀU SAI HOÁ HỌC, sửa khi mở lên sáu hệ 15-09:
+   *   · cũ ghi `hoa > khi` mà không có phản ứng nào đỡ. Thật ra ngược: CO₂ dập
+   *     tắt đám cháy, nên `khi > hoa`.
+   *   · cũ ghi `khi > kiem` với ghi chú "kiềm hấp thụ khí halogen" — chính câu
+   *     ghi chú ấy nói ngược lại điều nó khẳng định. Cl₂ + 2NaOH → NaCl +
+   *     NaClO + H₂O là BASE ăn khí, nên `kiem > khi`.
+   *   · cũ ghi `axit > hoa` ("ăn mòn kim loại, dập phản ứng nhiệt") — mơ hồ,
+   *     không có phương trình. Bỏ, để hai hệ này trung tính.
+   * Bảng đầy đủ sáu hệ và bằng chứng từng cặp: `tests/than-thu-sau-he.test.ts`.
+   */
+  it('cặp khắc chế phải có phản ứng thật đỡ lưng', () => {
+    // Trung hoà — cặp duy nhất của bản cũ đúng chiều, giữ nguyên.
     expect(tinhHeSoTuongKhac('kiem', 'axit').heSo).toBe(1.5)
-    expect(tinhHeSoTuongKhac('axit', 'hoa').heSo).toBe(1.5)
+    // Hai chiều đã sửa cho đúng hoá học.
+    expect(tinhHeSoTuongKhac('khi', 'hoa').heSo).toBe(1.5)
+    expect(tinhHeSoTuongKhac('kiem', 'khi').heSo).toBe(1.5)
+    // Mỗi cặp khắc chế đều phải nêu được phản ứng.
+    expect(tinhHeSoTuongKhac('kiem', 'axit').banChung).toContain('→')
+    expect(tinhHeSoTuongKhac('khi', 'hoa').banChung.length).toBeGreaterThan(20)
   })
 
-  it('bị khắc thì yếu đi, cùng hệ thì hoà', () => {
-    expect(tinhHeSoTuongKhac('khi', 'hoa').heSo).toBe(0.7)
+  it('bị khắc thì yếu đi, cùng hệ thì hoà, không quan hệ thì trung tính', () => {
+    expect(tinhHeSoTuongKhac('hoa', 'khi').heSo).toBe(0.7)
     expect(tinhHeSoTuongKhac('hoa', 'hoa').heSo).toBe(1.0)
+    // Acid và hoả không còn khắc nhau — trung tính, và nói thẳng là không có.
+    expect(tinhHeSoTuongKhac('axit', 'hoa').heSo).toBe(1.0)
+    expect(tinhHeSoTuongKhac('axit', 'hoa').banChung).toBe('')
   })
 
   it('component có THỰC SỰ gọi tương khắc', () => {
