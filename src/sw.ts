@@ -51,10 +51,51 @@ const KHONG_DUNG: RegExp[] = [/^\/cdn-cgi\//, /[?&]_moi=/, /^\/cai-/, /\.mobilec
 const TU_PRECACHE = createHandlerBoundToURL('index.html')
 
 /** Thử lần lượt ba tầng, tầng nào ra trang là dùng tầng đó. */
+/**
+ * GỠ DẤU "ĐÃ QUA CHUYỂN HƯỚNG" KHỎI TRANG TRƯỚC KHI TRẢ CHO EM.
+ *
+ * Thầy báo 15/09: em làm xong bài, bấm Nộp, Safari văng ra
+ *   "Đã xảy ra lỗi: Response served by service worker has redirections".
+ * (Bài VẪN NỘP ĐƯỢC — ca 457868 lưu đủ điểm và đáp án; chỉ màn hình văng.)
+ *
+ * NGUYÊN NHÂN GỐC, đo được trên bản live:
+ *
+ *     fetch('/index.html?__WB_REVISION__=…')  →  redirected: true
+ *                                                url: '/?__WB_REVISION__=…'
+ *
+ * Cloudflare Pages CẮT `index.html` khỏi đường dẫn bằng một lượt chuyển
+ * hướng. Mà `/index.html?__WB_REVISION__=<mã>` chính là khoá workbox dùng cho
+ * kho precache — và khi khoá ấy TRƯỢT trong kho (đúng lúc vừa phát hành bản
+ * mới, kho đang thay), workbox đi ra mạng lấy chính khoá ấy. Response thu về
+ * mang `redirected = true`.
+ *
+ * Chuẩn Fetch CẤM service worker trả một response như thế cho lượt ĐIỀU HƯỚNG.
+ * Chrome bỏ qua, Safari chặn thẳng và hiện đúng câu lỗi trên. Nên lỗi chỉ nổ
+ * trên iPhone, và chỉ trong mấy phút đầu sau mỗi lần phát hành — đúng lúc em
+ * bấm Nộp rồi app tải lại để nhận bản mới.
+ *
+ * Cách sửa: dựng lại response từ chính thân của nó. Nội dung y nguyên, chỉ
+ * mất cái dấu chuyển hướng mà Safari soi. KHÔNG phải bọc lỗi cho im — trang
+ * vẫn là trang ấy, chỉ khác là Safari chịu nhận.
+ *
+ * `opaqueredirect` thì GIỮ NGUYÊN: chuẩn cho phép trả nó cho điều hướng, và
+ * thân của nó vốn không đọc được nên cũng không dựng lại được.
+ */
+async function goDauChuyenHuong(r: Response): Promise<Response> {
+  if (!r.redirected) return r
+  try {
+    const than = await r.clone().arrayBuffer()
+    return new Response(than, { status: r.status, statusText: r.statusText, headers: r.headers })
+  } catch (e) {
+    console.warn('[sw] không dựng lại được trang sau chuyển hướng:', e)
+    return r
+  }
+}
+
 async function traTrangApp(tuyChon: Parameters<typeof TU_PRECACHE>[0]): Promise<Response> {
   try {
     const r = await TU_PRECACHE(tuyChon)
-    if (r) return r
+    if (r) return goDauChuyenHuong(r)
   } catch (e) {
     // Ghi ra để còn lần được, KHÔNG nuốt im.
     console.warn('[sw] precache không trả được index.html, đi ra mạng:', e)
@@ -65,14 +106,15 @@ async function traTrangApp(tuyChon: Parameters<typeof TU_PRECACHE>[0]): Promise<
   }
   try {
     const r = await fetch(tuyChon.request)
-    if (r && (r.ok || r.type === 'opaqueredirect')) return r
+    if (r && r.type === 'opaqueredirect') return r
+    if (r && r.ok) return goDauChuyenHuong(r)
   } catch (e) {
     console.warn('[sw] mạng cũng không trả được trang:', e)
   }
   // Mất mạng VÀ precache hỏng: quét mọi kho xem còn bản index.html nào không.
   for (const khoa of ['index.html', '/index.html', self.registration.scope]) {
     const c = await caches.match(khoa, { ignoreSearch: true })
-    if (c) return c
+    if (c) return goDauChuyenHuong(c)
   }
   return Response.error()
 }

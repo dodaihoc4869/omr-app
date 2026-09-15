@@ -377,3 +377,47 @@ Mở từ trình duyệt CHƯA từng có mã bí mật — đúng hoàn cảnh 
 | `/linh-tinh` | `/linh-tinh` | THẦY — khoá |
 
 Không lượt nào hiện màn đệm. Không lượt nào mở được app quản lý.
+
+---
+
+# LƯỢT 16 — NỘP BÀI XONG VĂNG TRÊN iPHONE (15/09)
+
+- [x] "Làm bài ktra xong trên app học sinh bấm nộp bài bị văng"  | bằng chứng: `tests/sw-khong-tra-trang-chuyen-huong-1509` 9/9 · `kiem-sw` 10/10
+
+## BÀI VẪN NỘP ĐƯỢC — kiểm trước tiên
+
+D1: ca `457868` · sbd `12121212` · `nop_luc 2026-09-15T03:24:56` ·
+`trang_thai='da_nop'` · tổng **3,88** · `dap_an_json` 330 ký tự.
+Hỏng ở MÀN HÌNH sau khi nộp, KHÔNG hỏng ở dữ liệu.
+
+## NGUYÊN NHÂN GỐC — đo được trên bản live
+
+```
+fetch('/index.html?__WB_REVISION__=…')  →  redirected: true
+                                           url: '/?__WB_REVISION__=…'
+```
+
+Cloudflare Pages cắt `index.html` khỏi đường dẫn bằng một lượt CHUYỂN HƯỚNG.
+Mà `/index.html?__WB_REVISION__=<mã>` chính là khoá workbox dùng cho kho
+precache. Khi khoá ấy TRƯỢT trong kho — đúng lúc vừa phát hành bản mới, kho
+đang thay — workbox đi ra mạng lấy chính khoá ấy, response thu về mang
+`redirected = true`.
+
+Chuẩn Fetch CẤM service worker trả response như thế cho lượt ĐIỀU HƯỚNG.
+Chrome bỏ qua, Safari chặn thẳng:
+"Response served by service worker has redirections".
+
+⇒ Chỉ nổ trên iPhone, và chỉ mấy phút đầu sau mỗi lần phát hành — đúng lúc em
+bấm Nộp rồi app tải lại để nhận bản mới.
+
+## Đã sửa
+
+`goDauChuyenHuong()` dựng lại response từ chính thân của nó: nội dung y nguyên,
+chỉ mất cái dấu chuyển hướng Safari soi. Áp cho CẢ BA tầng đường lui.
+`opaqueredirect` giữ nguyên (chuẩn cho phép, thân không đọc được).
+
+## Việc phát sinh
+
+`xlsx` bị gỡ khỏi `package.json` ở commit `079875d` của phiên khác, nhưng
+`ExamMonitorScreen` và `ResultsScreen` vẫn nhập nó. Chỉ lộ ra khi phiên ấy chạy
+`npm i three` làm npm dọn mất `node_modules/xlsx`. Đã cài lại `xlsx@0.18.5`.
