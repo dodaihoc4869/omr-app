@@ -569,7 +569,7 @@ export default function ThanThuHoaHocGame({
    *  ở Đảo Thần Thú, nên máy còn kẹt ở màn chọn thì không thấy gì và cũng
    *  không có nút nào để thử lại. */
   const thanhDongBo = (
-    <div className="w-full z-10 mt-3 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 px-3 py-2 text-left">
+    <div className="relative w-full z-10 mt-3 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-800/70 px-3 py-2 text-left backdrop-blur-sm">
       <span
         className={`h-2 w-2 shrink-0 rounded-full ${
           tinhTrangDongBo === 'xong' ? 'bg-emerald-500'
@@ -1276,65 +1276,104 @@ export default function ThanThuHoaHocGame({
 
       {/* NỘI DUNG TAB 1: ĐẢO THẦN THÚ */}
       {daChonThu && tabGame === 'dao_thu' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-3 items-start gap-5">
           {/* Cột trái: Khung hiển thị thần thú tương tác Canvas */}
-          <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col items-center justify-between text-center relative overflow-hidden">
+          <div className="lg:col-span-2 border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-3xl shadow-sm overflow-hidden flex flex-col text-center">
+            {/* ═══ SÂN KHẤU ═══ Thầy chốt 15-09: *"nền xung quanh của thần thú
+                tràn ra tất cả ô mà thần thú đó đứng"* và *"để nền và thú trọn
+                vẹn không dính chữ gì"*. Ô đó là SÂN KHẤU này — cảnh 3D tràn
+                sát bốn mép, trên nó chỉ có tên thú ở đỉnh và hai nút chiêu nép
+                hai bên. Mọi thanh số liệu đẩy hết xuống bảng điều khiển bên
+                dưới, nền đục, để chữ đọc được mà thân thú không dính chữ nào.
+                Trước đây cảnh trải kín CẢ thẻ: khung ảnh cao gấp ba lần rộng
+                nên con thú bị kéo phình, còn bảng EXP thì nằm đè lên bụng nó. */}
+            <div className={`relative w-full ${dung3D ? 'bg-slate-950 text-white' : ''}`}>
+            {dung3D && (
+              <Suspense fallback={null}>
+                <ThanThu3D
+                  info={infoPet}
+                  cap={hoSo.capTienHoa}
+                  lenhChieu={lenhChieu}
+                  onCham={chamThu3D}
+                  onKhongDungDuoc={bo3D}
+                  lapDay
+                />
+              </Suspense>
+            )}
+            {/* Hai dải tối trên–dưới: chữ đè lên cảnh phải đọc được ở mọi hệ,
+                kể cả hệ Base nền sáng băng. */}
+            {dung3D && (
+              <div
+                className="pointer-events-none absolute inset-0 z-[5]"
+                style={{
+                  background:
+                    'linear-gradient(to bottom, rgba(2,6,23,0.82) 0%, rgba(2,6,23,0.28) 22%, rgba(2,6,23,0) 42%, rgba(2,6,23,0.35) 68%, rgba(2,6,23,0.9) 100%)',
+                }}
+              />
+            )}
+            <div className="relative z-10 flex flex-col p-5 sm:p-6">
             {/* Header thú cưng */}
-            <div className="w-full flex items-center justify-between z-10">
-              <div className="text-left">
-                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono">
-                  Hình thái {hoSo.capDo}/{CAP_TOI_DA} · {layHinhThai(hoSo.capDo).ten}
+            <div className="relative w-full flex items-start justify-between gap-3 z-10">
+              <div className="text-left min-w-0">
+                <span
+                  className={`inline-block max-w-full whitespace-nowrap text-[11px] font-bold px-2.5 py-0.5 rounded-full font-mono ${
+                    dung3D
+                      ? 'bg-white/12 border border-white/20 text-slate-100 backdrop-blur-sm'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                  }`}
+                >
+                  Hình thái {hoSo.capDo}/{CAP_TOI_DA}
+                  <span className="hidden sm:inline"> · {layHinhThai(hoSo.capDo).ten}</span>
                 </span>
-                <h2 className="text-lg font-black text-slate-900 dark:text-white mt-1">
+                <h2
+                  className={`text-lg font-black mt-1 ${
+                    dung3D ? 'text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]' : 'text-slate-900 dark:text-white'
+                  }`}
+                >
                   {infoPet.ten}
                 </h2>
-                <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                <div
+                  className={`text-xs font-semibold ${
+                    dung3D ? 'text-slate-200/90' : 'text-slate-500 dark:text-slate-400'
+                  }`}
+                >
                   {infoPet.danhHieu}
                 </div>
               </div>
 
-              <div className="text-right">
-                <div className="text-xl font-black text-amber-500 font-mono">
+              <div className="text-right shrink-0">
+                <div className="text-xl font-black text-amber-500 font-mono whitespace-nowrap">
                   CP: {chiSoPet.cp.toLocaleString()}
                 </div>
-                <div className="text-[11px] text-slate-400">Lực chiến tổng</div>
+                <div className={`text-[11px] ${dung3D ? 'text-slate-300/85' : 'text-slate-400'}`}>
+                  Lực chiến tổng
+                </div>
               </div>
             </div>
 
-            {thanhDongBo}
-
-            {/* CANVAS TƯƠNG TÁC — vuốt ngang để xoay 360°, chạm để nghe tiếng kêu,
-                hai nút bên cạnh để tung chiêu. */}
-            <div className="my-2 relative flex items-center justify-center gap-2 sm:gap-3">
+            {/* HAI NÚT CHƯỞNG nổi hai bên. Bản 3D thì con thú đã nằm ở lớp
+                nền phía sau, khoảng giữa để trống cho thấy cảnh; bản phẳng thì
+                canvas 2D vẫn đứng giữa như cũ. */}
+            <div
+              className={`my-2 relative z-10 flex items-center justify-between w-full gap-2 sm:gap-3 ${
+                dung3D ? 'min-h-[300px]' : 'justify-center'
+              }`}
+            >
               <button
                 type="button"
                 onClick={() => tungChieu(false)}
                 title={infoPet.kyNangThuong}
-                className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shadow-sm hover:bg-emerald-100 dark:hover:bg-emerald-900/50 cursor-pointer transition-transform active:scale-90"
+                aria-label={infoPet.kyNangThuong}
+                className={`shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shadow-lg cursor-pointer transition-transform active:scale-90 ${
+                  dung3D
+                    ? 'bg-emerald-500/20 border border-emerald-400/60 text-emerald-200 backdrop-blur-sm hover:bg-emerald-500/35'
+                    : 'bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50'
+                }`}
               >
-                <Swords className="w-5 h-5" />
+                <Swords className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
 
-              {dung3D ? (
-                <div className="flex-1 min-w-0 max-w-[340px]">
-                  <Suspense
-                    fallback={
-                      <div className="h-[300px] flex items-center justify-center text-xs text-slate-400">
-                        Đang dựng thần thú 3D…
-                      </div>
-                    }
-                  >
-                    <ThanThu3D
-                      info={infoPet}
-                      cap={hoSo.capTienHoa}
-                      lenhChieu={lenhChieu}
-                      onCham={chamThu3D}
-                      onKhongDungDuoc={bo3D}
-                      cao={300}
-                    />
-                  </Suspense>
-                </div>
-              ) : (
+              {!dung3D && (
                 <canvas
                   ref={canvasRef}
                   width={280}
@@ -1355,37 +1394,59 @@ export default function ThanThuHoaHocGame({
                 type="button"
                 onClick={() => tungChieu(true)}
                 title={infoPet.kyNangNo}
-                className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-800 text-amber-700 dark:text-amber-300 flex items-center justify-center shadow-sm hover:bg-amber-100 dark:hover:bg-amber-900/50 cursor-pointer transition-transform active:scale-90"
+                aria-label={infoPet.kyNangNo}
+                className={`shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shadow-lg cursor-pointer transition-transform active:scale-90 ${
+                  dung3D
+                    ? 'bg-amber-500/25 border border-amber-400/70 text-amber-100 backdrop-blur-sm hover:bg-amber-500/45'
+                    : 'bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-800 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50'
+                }`}
               >
-                <Zap className="w-5 h-5" />
+                <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             </div>
+            </div>
+            </div>
+            {/* ═══ HẾT SÂN KHẤU ═══ */}
 
-            <div className="grid grid-cols-2 gap-2 w-full text-[11px] -mt-1">
-              <button
-                type="button"
-                onClick={() => tungChieu(false)}
-                className="px-2 py-1.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-bold leading-tight cursor-pointer hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition"
-              >
-                {infoPet.kyNangThuong}
-              </button>
-              <button
-                type="button"
-                onClick={() => tungChieu(true)}
-                className="px-2 py-1.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 font-bold leading-tight cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50 transition"
-              >
-                {infoPet.kyNangNo}
-              </button>
-            </div>
+            {/* ═══ BẢNG ĐIỀU KHIỂN ═══ nền đục, tách hẳn khỏi cảnh. */}
+            <div className="p-5 sm:p-6 pt-4 flex flex-col items-center gap-3">
+            {thanhDongBo}
 
-            <div className="text-[11px] text-slate-400 dark:text-slate-500 text-center -mt-1">
-              Vuốt ngang để xoay thần thú · chạm vào nó để nghe tiếng kêu
-              {dung3D ? ' · đang hiện bản 3D' : ' · máy này không dựng được 3D nên đang hiện bản phẳng'}
-            </div>
+            {/* Thầy chốt 15-09: *"để nền và thú trọn vẹn không dính chữ gì"*.
+                Ở bản 3D, sân khấu là cả thẻ nên hai nút chữ tên chiêu và dòng
+                hướng dẫn nằm ngay ngực–mặt con thú. Bỏ hẳn: hai nút biểu tượng
+                hai bên đã tung đúng hai chiêu đó, tên chiêu vẫn hiện đầy đủ ở
+                dòng thông báo khi đánh trùm. Bản phẳng không có sân khấu nên
+                giữ nguyên như cũ. */}
+            {!dung3D && (
+              <>
+                <div className="relative z-10 grid grid-cols-2 gap-2 w-full text-[11px] -mt-1">
+                  <button
+                    type="button"
+                    onClick={() => tungChieu(false)}
+                    className="px-2 py-1.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-bold leading-tight cursor-pointer hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition"
+                  >
+                    {infoPet.kyNangThuong}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => tungChieu(true)}
+                    className="px-2 py-1.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 font-bold leading-tight cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50 transition"
+                  >
+                    {infoPet.kyNangNo}
+                  </button>
+                </div>
+
+                <div className="relative z-10 text-[11px] text-slate-400 dark:text-slate-500 text-center -mt-1">
+                  Vuốt ngang để xoay thần thú · chạm vào nó để nghe tiếng kêu ·
+                  máy này không dựng được 3D nên đang hiện bản phẳng
+                </div>
+              </>
+            )}
 
             {/* HAI BỂ: ỐNG NGHIỆM (EXP đã kiếm) và THANH CẤP ĐỘ (EXP đã nạp).
                 Nút nạp chỉ CHUYỂN giữa hai bể, không sinh thêm EXP. */}
-            <div className="w-full space-y-3 z-10">
+            <div className="relative w-full space-y-3 z-10">
               <div className="flex items-stretch gap-4">
                 {/* Bể 1 — ống nghiệm */}
                 <div className="flex flex-col items-center gap-1 shrink-0">
@@ -1481,6 +1542,8 @@ export default function ThanThuHoaHocGame({
                 </div>
               </div>
             </div>
+            </div>
+            {/* ═══ HẾT BẢNG ĐIỀU KHIỂN ═══ */}
           </div>
 
           {/* Cột phải: Chỉ số sức mạnh & Khung tăng lực chiến từ học tập */}

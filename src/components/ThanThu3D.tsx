@@ -43,6 +43,7 @@ export default function ThanThu3D({
   onCham,
   onKhongDungDuoc,
   cao = 300,
+  lapDay = false,
 }: {
   info: ThanThuInfo
   cap: number
@@ -52,6 +53,13 @@ export default function ThanThu3D({
   /** Máy không dựng được WebGL. */
   onKhongDungDuoc?: () => void
   cao?: number
+  /**
+   * LẤP ĐẦY Ô CHỨA. Thầy chốt 15-09: *"nền xung quanh của thần thú nó tràn ra
+   * tất cả ô mà thần thú đó đứng"*. Bật cờ này thì màn 3D bám sát bốn cạnh của
+   * thẻ cha thay vì là một ô vuông nhỏ giữa thẻ; chữ và nút của thẻ nổi lên
+   * trên nó.
+   */
+  lapDay?: boolean
 }) {
   const boc = useRef<HTMLDivElement | null>(null)
   const nhan = useRef<HTMLSpanElement | null>(null)
@@ -79,7 +87,8 @@ export default function ThanThu3D({
     }
 
     const rong = Math.max(200, oBoc.clientWidth || 320)
-    renderer.setSize(rong, cao)
+    const caoThat = lapDay ? Math.max(200, oBoc.clientHeight || cao) : cao
+    renderer.setSize(rong, caoThat)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = THREE.PCFSoftShadowMap
@@ -89,15 +98,15 @@ export default function ThanThu3D({
     renderer.domElement.style.touchAction = 'none'
     renderer.domElement.style.cursor = 'grab'
     renderer.domElement.style.width = '100%'
-    renderer.domElement.style.height = 'auto'
+    renderer.domElement.style.height = lapDay ? '100%' : 'auto'
     renderer.domElement.style.display = 'block'
 
     // MỘT NGUỒN DỰNG CẢNH. Màn này và ảnh chụp cho tờ chiếu lên bảng gọi
     // CHUNG `dungCanh3D` — cùng hình khối, cùng bộ lông, cùng khung cảnh, cùng
     // ba ngọn đèn, cùng phép khớp khung. Thầy chốt 15-09: thú lên bảng phải
     // giống y hệt thú trong mục Thần Thú, nên hai nơi không được có hai bộ vẽ.
-    const kc = dungCanh3D(info, cap, rong / cao)
-    const { canh, may, nen, tam, xaThat, yMay } = kc
+    const kc = dungCanh3D(info, cap, rong / caoThat)
+    const { canh, may, nen, tam } = kc
     let bo: BoThanThu3D = kc.bo
     if (nhan.current !== null) nhan.current.textContent = nen.ten
 
@@ -165,11 +174,15 @@ export default function ThanThu3D({
       const lenh = lenhRef.current
       if (lenh.lan !== lanCuoi) {
         lanCuoi = lenh.lan
-        chieu.ban(bo.mieng)
-        if (lenh.no) bo.goc.scale.setScalar(1.1)
+        // Cờ cuồng nộ đi THẲNG vào chiêu thức: chưởng nộ có kịch bản riêng
+        // (quầng nộ, chớp loá, sóng loang đất), không phải chưởng thường phóng to.
+        // Truyền cao độ bàn chân: vũng acid và sóng loang phải bám mặt sàn.
+        chieu.ban(bo.mieng, lenh.no, bo.chanY - bo.mieng.y)
+        if (lenh.no) bo.goc.scale.setScalar(1.16)
       }
       chieu.capNhat(dt)
-      if (chieu.vuaNo) rungConLai = 0.22
+      // Rung theo sức của chiêu — cuồng nộ rung hơn gấp đôi.
+      if (chieu.vuaNo) rungConLai = 0.22 * chieu.manhNo
 
       // Quán tính xoay: thả tay ra thì thú quay trôi rồi tự dừng.
       if (!keo) {
@@ -225,32 +238,49 @@ export default function ThanThu3D({
 
       nen.capNhat(t, dt)
 
+      // MÁY QUAY TRÔI NHẸ. Nền lấp đầy cả thẻ mà đứng chết một khung thì nhìn
+      // như ảnh dán; trôi chậm thế này là cảnh có chiều sâu, hạt và đạo cụ phía
+      // sau chạy lệch tầng với con thú.
+      const troiX = Math.sin(t * 0.13) * 0.55
+      const troiY = Math.sin(t * 0.09 + 1.2) * 0.2
+
       // Rung máy quay một nhịp khi chiêu nổ.
       dich.set(0, 0, 0)
       if (rungConLai > 0) {
         rungConLai = Math.max(0, rungConLai - dt)
         dich.set((Math.random() - 0.5) * rungConLai * 0.8, (Math.random() - 0.5) * rungConLai * 0.8, 0)
       }
-      may.position.set(dich.x, yMay + dich.y, xaThat)
+      // Đọc thẳng kc.* chứ không hứng ra biến: khopKhung() đổi khoảng lùi khi
+      // thẻ co giãn, hứng ra biến thì máy quay đứng nguyên chỗ cũ.
+      may.position.set(troiX + dich.x, kc.yMay + troiY + dich.y, kc.xaThat)
       may.lookAt(0, tam.y, 0)
 
       renderer.render(canh, may)
     }
-    may.position.set(0, yMay, xaThat)
+    may.position.set(0, kc.yMay, kc.xaThat)
     may.lookAt(0, tam.y, 0)
     id = requestAnimationFrame(ve)
 
     const doiCo = () => {
       const w = Math.max(200, oBoc.clientWidth || 320)
-      may.aspect = w / cao
+      const h = lapDay ? Math.max(200, oBoc.clientHeight || cao) : cao
+      may.aspect = w / h
       may.updateProjectionMatrix()
-      renderer.setSize(w, cao)
+      // Tính lại khoảng lùi theo tỷ lệ khung MỚI. Ở chế độ lấp đầy, thẻ nở ra
+      // sau khi gắn, khoảng lùi đo lúc gắn làm con thú phình to và cụt chân.
+      kc.khopKhung()
+      renderer.setSize(w, h)
     }
     window.addEventListener('resize', doiCo)
+    // Ô cha co giãn theo thẻ chứ không theo cửa sổ, nên riêng lượt resize của
+    // cửa sổ là không đủ.
+    const theoCo = typeof ResizeObserver === 'function' ? new ResizeObserver(doiCo) : null
+    theoCo?.observe(oBoc)
 
     return () => {
       cancelAnimationFrame(id)
       window.removeEventListener('resize', doiCo)
+      theoCo?.disconnect()
       document.removeEventListener('visibilitychange', doiTab)
       theoDoi.disconnect()
       el.removeEventListener('pointerdown', xuong)
@@ -262,8 +292,18 @@ export default function ThanThu3D({
       renderer.dispose()
       if (el.parentNode !== null) el.parentNode.removeChild(el)
     }
-  }, [info, cap, cao, onKhongDungDuoc])
+  }, [info, cap, cao, lapDay, onKhongDungDuoc])
 
+  if (lapDay) {
+    return (
+      <div className="absolute inset-0 overflow-hidden">
+        <div ref={boc} className="w-full h-full" />
+        {/* Nhãn tên khung cảnh vẫn được gắn để giữ ref, nhưng ẩn đi: ở chế độ
+            lấp đầy, sân khấu phải sạch chữ — thầy chốt 15-09. */}
+        <span ref={nhan} className="hidden" />
+      </div>
+    )
+  }
   return (
     <div className="relative w-full overflow-hidden rounded-2xl" style={{ minHeight: cao }}>
       <div ref={boc} className="w-full flex items-center justify-center" style={{ minHeight: cao }} />

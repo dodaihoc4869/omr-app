@@ -33,9 +33,19 @@ export interface BoCanh3D {
   nen: BoCanhNen
   /** Tâm hộp bao — máy quay nhìn vào đây. */
   tam: THREE.Vector3
+  /** Cỡ hộp bao. Giữ lại để tính LẠI khung khi ô chứa đổi tỉ lệ. */
+  co: THREE.Vector3
   /** Khoảng lùi của máy quay, đã tính cả sàn tối thiểu. */
   xaThat: number
   yMay: number
+  /**
+   * Tính lại khoảng lùi theo tỉ lệ khung HIỆN TẠI của máy quay.
+   *
+   * Bắt buộc gọi khi ô chứa đổi cỡ. Bản trước tính đúng một lần lúc gắn: màn
+   * 3D lấp đầy thẻ thì thẻ cao lên theo nội dung SAU khi gắn, tỉ lệ khung đổi
+   * mà khoảng lùi giữ nguyên — thú phình to và bị cắt mất chân.
+   */
+  khopKhung(): void
   don(): void
 }
 
@@ -64,16 +74,18 @@ export function dungCanh3D(
   // Mặt sàn đặt theo BÀN CHÂN thú, không theo đáy hộp bao: vòng lửa cấp 12
   // và vòng rune nằm thấp hơn bàn chân, lấy đáy hộp bao thì thú lơ lửng.
   const dayNen = bo.chanY
-  const fovY = (may.fov * Math.PI) / 180
-  const fovX = 2 * Math.atan(Math.tan(fovY / 2) * may.aspect)
   // Thú xoay quanh trục đứng nên bề ngang lúc quay là cạnh dài nhất của X và Z.
   const ngang = Math.max(co.x, co.z)
-  const xa = Math.max(co.y / 2 / Math.tan(fovY / 2), ngang / 2 / Math.tan(fovX / 2)) * 1.2
-    + ngang / 2
-  // Sàn tối thiểu: quả trứng cấp 1 bé nên phép khớp khung kéo máy quay sát tận
-  // nơi, trứng chiếm trọn khung và mất hết khung cảnh. Lùi tối thiểu 4,6.
-  const xaThat = Math.max(xa, 4.6)
-  const yMay = tam.y + co.y * 0.08
+  const tinhXa = (tyLeKhung: number): number => {
+    const fovY = (may.fov * Math.PI) / 180
+    const fovX = 2 * Math.atan(Math.tan(fovY / 2) * tyLeKhung)
+    const xa = Math.max(co.y / 2 / Math.tan(fovY / 2), ngang / 2 / Math.tan(fovX / 2)) * 1.2
+      + ngang / 2
+    // Sàn tối thiểu: quả trứng cấp 1 bé nên phép khớp khung kéo máy quay sát
+    // tận nơi, trứng chiếm trọn khung và mất hết khung cảnh. Lùi tối thiểu 4,6.
+    return Math.max(xa, 4.6)
+  }
+  const khung = { xa: tinhXa(tyLe), y: tam.y + co.y * 0.08 }
 
   // ── KHUNG CẢNH riêng của hệ: trời, sương mù, sàn, hạt, đạo cụ ──
   const nen = dungCanhNen(info.he, dayNen - 0.02)
@@ -101,7 +113,10 @@ export function dungCanh3D(
   canh.add(vien)
 
   return {
-    canh, may, bo, nen, tam, xaThat, yMay,
+    canh, may, bo, nen, tam, co,
+    get xaThat() { return khung.xa },
+    get yMay() { return khung.y },
+    khopKhung() { khung.xa = tinhXa(may.aspect) },
     don() {
       donBoThanThu3D(bo)
       donCanhNen(nen)
