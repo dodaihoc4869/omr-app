@@ -94,8 +94,12 @@ describe('LỖI 2 — máy học sinh không có kho đề', () => {
   const modal = boChuThich(doc('src/components/ModalKhacPhucCauSai.tsx'))
 
   it('modal mặc định vào chế độ 1, chỉ nâng lên 2 khi kho thật sự có đề', () => {
-    expect(modal).toContain('useState<1 | 2 | 3>(1)')
-    expect(modal).not.toContain('useState<1 | 2 | 3>(2)')
+    // 15/09 thêm chế độ 4 (Luyện dạng bài) nên kiểu nới thành 1|2|3|4. Điều
+    // phép kiểm này giữ KHÔNG ĐỔI: mặc định vẫn phải là chế độ 1.
+    expect(modal).toContain('useState<1 | 2 | 3 | 4>(1)')
+    expect(modal).not.toContain('useState<1 | 2 | 3 | 4>(2)')
+    expect(modal).not.toContain('useState<1 | 2 | 3 | 4>(3)')
+    expect(modal).not.toContain('useState<1 | 2 | 3 | 4>(4)')
     expect(modal).toContain('if (sources.length > 0) setCheDo(')
   })
 

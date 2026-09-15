@@ -160,7 +160,10 @@ describe('Modal khắc phục nối đúng đường', () => {
   it('đang xin kho thì nói ra, không hiện 0 câu rồi nhảy số', () => {
     expect(than).toContain('const [dangTaiKho, setDangTaiKho] = useState(false)')
     expect(than).toContain('Đang lấy câu cùng dạng từ máy chủ')
-    expect(than).toContain('{!dangTaiKho && (loiRut || !coKhoDe) && (')
+    // 15/09: chế độ 4 (Luyện dạng bài) KHÔNG lấy gì từ kho câu-sai, nên kho
+    // rỗng không phải lý do để nó hiện lời cảnh báo ấy. Điều phép kiểm giữ
+    // nguyên với ba chế độ cũ.
+    expect(than).toContain('{!dangTaiKho && (loiRut || (!coKhoDe && cheDo !== 4)) && (')
   })
 })
 
