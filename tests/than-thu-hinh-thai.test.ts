@@ -86,9 +86,9 @@ describe('mười hai hình thái', () => {
 })
 
 describe('kinh nghiệm', () => {
-  it('THANH ĐẦU TIÊN LÀ 2000 — thầy chốt', () => {
-    expect(EXP_BAN_DAU).toBe(2000)
-    expect(thanhExp(1)).toBe(2000)
+  it('THANH ĐẦU TIÊN LÀ 240 — thầy chốt 15-09 (hạ từ 2000)', () => {
+    expect(EXP_BAN_DAU).toBe(240)
+    expect(thanhExp(1)).toBe(240)
   })
 
   it('thanh dài dần, và cấp 12 là hết đường lên', () => {
@@ -100,17 +100,19 @@ describe('kinh nghiệm', () => {
   })
 
   it('cộng EXP thì lên cấp THẬT — kể cả nhảy nhiều cấp một lúc', () => {
-    const a = nhanExp({ capDo: 1, exp: 0 }, 1999)
+    const a = nhanExp({ capDo: 1, exp: 0 }, 239)
     expect(a.capDo).toBe(1)
-    expect(a.exp).toBe(1999)
+    expect(a.exp).toBe(239)
 
-    const b = nhanExp({ capDo: 1, exp: 0 }, 2000)
+    const b = nhanExp({ capDo: 1, exp: 0 }, 240)
     expect(b.capDo).toBe(2)
     expect(b.exp).toBe(0)
     expect(b.soCapLen).toBe(1)
 
-    const c = nhanExp({ capDo: 1, exp: 0 }, 2000 + 2360 + 5)
+    // 240 (thanh cấp 1) + 280 (thanh cấp 2) + 5 dư
+    const c = nhanExp({ capDo: 1, exp: 0 }, 240 + 280 + 5)
     expect(c.capDo).toBe(3)
+    expect(c.exp).toBe(5)
     expect(c.soCapLen).toBe(2)
   })
 
@@ -130,8 +132,11 @@ describe('kinh nghiệm', () => {
 
   it('tổng đường lên đỉnh là một con số hữu hạn, đo được', () => {
     const t = tongExpToiDinh()
-    expect(t).toBeGreaterThan(40_000)
-    expect(t).toBeLessThan(80_000)
+    // Con số CHỐT, không phải khoảng ước lượng: đổi nhịp game thì phải sửa ở đây,
+    // để không ai lỡ tay đổi `EXP_BAN_DAU` mà không thấy hệ quả.
+    expect(t).toBe(6_890)
+    expect(thanhExp(1)).toBe(240)
+    expect(thanhExp(11)).toBe(1_260)
     // eslint-disable-next-line no-console
     console.log(`  tổng EXP từ cấp 1 lên cấp 12: ${t.toLocaleString()}`)
   })
@@ -215,8 +220,8 @@ describe('hồ sơ lưu', () => {
     expect(h.expToiDa).toBe(thanhExp(4))
   })
 
-  it('hồ sơ mặc định bắt đầu bằng thanh 2000', () => {
-    expect(layHoSoThanThuMacDinh().expToiDa).toBe(2000)
+  it('hồ sơ mặc định bắt đầu bằng thanh 240', () => {
+    expect(layHoSoThanThuMacDinh().expToiDa).toBe(240)
     expect(layHoSoThanThuMacDinh().capDo).toBe(1)
   })
 })

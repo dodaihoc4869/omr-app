@@ -1,8 +1,8 @@
 /**
  * KINH NGHIỆM — MỘT NGUỒN SỰ THẬT.
  *
- * Thầy chốt 14-09: **thanh EXP đầu tiên là 2000**, và **hết thì phải đi kiếm
- * theo hệ thống game**, không có nút bấm phát ra EXP.
+ * Thầy chốt 14-09: **hết thanh thì phải đi kiếm theo hệ thống game**, không có
+ * nút bấm phát ra EXP. Thanh đầu tiên chốt 2000, hạ xuống **240** ngày 15-09.
  *
  * Nghĩa là mọi điểm kinh nghiệm phải đổi bằng một VIỆC HỌC THẬT: leo tháp,
  * sửa câu sai, nộp bài, thi. Nút "nạp năng lượng" cho không EXP đã bị bỏ —
@@ -10,8 +10,14 @@
  */
 import { CAP_TOI_DA, type CapTienHoa } from './hinh-thai'
 
-/** Thanh EXP của cấp 1. Thầy chốt. */
-export const EXP_BAN_DAU = 2000
+/**
+ * Thanh EXP của cấp 1. Thầy chốt: 2000 (14-09) → **240** (15-09).
+ *
+ * Đây là NÚM VẶN NHỊP GAME. Với 240, cả đường từ cấp 1 lên cấp 12 tốn
+ * **6 890 EXP** — bằng khoảng 18 tầng tháp, hoặc 14 ca thi 8 điểm, hoặc 68 câu
+ * sai sửa xong. Đổi số này là đổi cả nhịp; `HE_SO_DAI_THEM` là núm thứ hai.
+ */
+export const EXP_BAN_DAU = 240
 
 /** Mỗi cấp thanh dài thêm 18%. Đổi một số này là đổi cả nhịp game. */
 export const HE_SO_DAI_THEM = 1.18
