@@ -1762,6 +1762,15 @@ async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
   if (de) await env.DE.put(khoa, JSON.stringify(de))
 
   const cauDs = Array.isArray(b.cau) ? (b.cau as Record<string, unknown>[]) : []
+
+  // SỐ CÂU PHẢI ĐẾM TRÊN GÓI, KHÔNG PHẢI TRÊN CHỈ MỤC.
+  //
+  // Bản cũ ghi `so_cau = cauDs.length`. Đúng khi hai thứ ấy bằng nhau, nhưng tờ
+  // DẠNG BÀI (`DB-…`) cố tình gửi chỉ mục RỖNG để câu khỏi bị đếm hai lần —
+  // ghi theo chỉ mục là cả 55 tờ hiện "0 câu" trên menu và phép nghiệm thu
+  // "số câu từng tờ" báo lệch 55 tờ, dù gói trên R2 không thiếu câu nào.
+  const soCauThat = cauDs.length > 0 ? cauDs.length : de ? docCauTuGoiDe(de as Record<string, unknown>).length : 0
+
   const nay = new Date().toISOString()
   const lenh: D1PreparedStatement[] = [
     env.DB.prepare(
@@ -1773,7 +1782,7 @@ async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
          chuyen_de=COALESCE(NULLIF(excluded.chuyen_de,''), de_kho.chuyen_de),
          so_cau=excluded.so_cau, r2_khoa=excluded.r2_khoa, da_xoa=0,
          cap_nhat_luc=excluded.cap_nhat_luc`,
-    ).bind(maDe, String(b.tenDe ?? ''), String(b.lop ?? ''), String(b.chuyenDe ?? ''), cauDs.length, de ? khoa : null, nay),
+    ).bind(maDe, String(b.tenDe ?? ''), String(b.lop ?? ''), String(b.chuyenDe ?? ''), soCauThat, de ? khoa : null, nay),
   ]
   // Chỉ mục câu: đẩy lại một đề thì chỉ mục cũ của ĐÚNG đề ấy phải đi, kẻo câu
   // đã xoá khỏi đề vẫn còn được rút ra cho em.
@@ -1796,7 +1805,7 @@ async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
     )
   }
   for (let i = 0; i < lenh.length; i += 150) await env.DB.batch(lenh.slice(i, i + 150))
-  return ra({ ok: true, maDe, soCau: cauDs.length, coGoi: !!de })
+  return ra({ ok: true, maDe, soCau: soCauThat, soDongChiMuc: cauDs.length, coGoi: !!de })
 }
 
 /** DANH SÁCH ĐỀ TRONG KHO — chỉ mục, không kéo gói. */
@@ -1858,8 +1867,11 @@ async function dungChiMucKho(env: Env, b: Record<string, unknown>): Promise<Resp
   const rChon = dsVao.length
     ? { results: dsVao.map((m) => ({ ma_de: m })) }
     : await env.DB.prepare(
+        // `DB-%` là tờ DẠNG BÀI — dẫn xuất từ tờ gốc, CỐ Ý không có chỉ mục
+        // (xem `TIEN_TO_DANG_BAI`). Dựng chỉ mục cho chúng là đếm câu hai lần.
         `SELECT d.ma_de FROM de_kho d
           WHERE d.da_xoa = 0 AND d.r2_khoa IS NOT NULL
+            AND d.ma_de NOT LIKE 'DB-%'
             AND NOT EXISTS (SELECT 1 FROM cau_hoi c WHERE c.ma_de = d.ma_de)
           ORDER BY d.ma_de LIMIT ?`,
       )
@@ -1916,6 +1928,7 @@ async function dungChiMucKho(env: Env, b: Record<string, unknown>): Promise<Resp
   const rCon = await env.DB.prepare(
     `SELECT COUNT(*) AS n FROM de_kho d
       WHERE d.da_xoa = 0 AND d.r2_khoa IS NOT NULL
+        AND d.ma_de NOT LIKE 'DB-%'
         AND NOT EXISTS (SELECT 1 FROM cau_hoi c WHERE c.ma_de = d.ma_de)`,
   ).first<{ n: number }>()
   const tong = await env.DB.prepare('SELECT COUNT(*) AS n FROM cau_hoi').first<{ n: number }>()
@@ -2472,6 +2485,12 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
     case 'hsLichSuCa': return ra(await G.hsLichSuCa(env, b))
     case 'hsBtvn': return ra(await G.hsBtvn(env, b))
     case 'hsCauSai': return ra(await G.hsCauSai(env, b))
+
+    // ---- LUYỆN DẠNG BÀI (15-09) ------------------------------------------
+    // Menu và tờ đề theo dạng bài. Lệnh của MÁY EM: không có đáp án nào rò ra
+    // ngoài phạm vi kho đề mà em vẫn luyện bằng `cauKhacPhuc`.
+    case 'danhMucDangBai': return ra(await G.danhMucDangBai(env))
+    case 'deTheoDangBai': return ra(await G.deTheoDangBai(env, b))
 
     // ---- THẦN THÚ HOÁ HỌC — đồng bộ đa thiết bị (15-09) ------------------
     // Chỉ tiến trình game. Không tên, không điểm, không ảnh bài.

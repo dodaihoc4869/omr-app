@@ -2,6 +2,7 @@
 // 1. Làm lại các câu sai: hiển thị lại toàn bộ câu sai và lời giải chuẩn để học sinh tự làm lại.
 // 2. Luyện thêm dạng câu sai: thanh rút tối đa số câu có cùng nhãn dán chia theo tỷ lệ tối đa, nếu lẻ thì làm tròn lên.
 // 3. Lựa chọn luyện câu: 2 sao, 1 sao, 0 sao, lý thuyết, bài tập tính toán. Rút đúng nhãn dán, thanh trượt tối đa 100 câu.
+// 4. Luyện dạng bài: chọn lớp → tên bài sách giáo khoa → dạng toán trọng tâm, gom TẤT CẢ câu trong kho thuộc dạng ấy.
 // Tất cả câu rút hiển thị theo mẫu mới của HTML: chuẩn đề, chuẩn lời giải.
 
 import type { TeacherExamSource } from '../data/examContent'
@@ -464,6 +465,56 @@ export function rutLuyenTheoBoLoc(
     ketQua: `Gồm ${dsCauRut.length} câu (rút từ tối đa ${tongToiDa} câu)`,
     hienDapAn: false,
     nhanBia: 'BỘ LỌC CÂU LUYỆN',
+  }
+  const html = dungPhieu(tt, dsCauRut, { anGiai: false })
+  return { html, dsCau: dsCauRut }
+}
+
+// ============================================================================
+// CHẾ ĐỘ 4 — LUYỆN DẠNG BÀI (15/09)
+//
+// Khác hẳn ba chế độ trên: ba chế độ kia đi từ CÂU EM SAI, chế độ này đi từ
+// DANH MỤC DẠNG TOÁN TRỌNG TÂM của sách. Em chọn lớp → tên bài → dạng, máy chủ
+// trả TRỌN tờ đề của dạng ấy (`xong/Dạng bài/<lớp>/<bài>/<mã>.json` trong kho),
+// ở đây chỉ còn việc trộn và cắt theo thanh trượt.
+//
+// KHÔNG lọc lại theo nhãn sao hay thể loại: dạng bài đã là ranh giới rồi, lọc
+// thêm là em kéo thanh trượt lên 100 mà chỉ nhận về 7 câu.
+
+/** Trộn tại chỗ, Fisher–Yates. Mỗi lượt rút một thứ tự khác nhau — em luyện
+ * dạng ấy lần thứ ba không gặp lại đúng 20 câu đầu. */
+function tronMang<T>(ds: T[]): T[] {
+  const a = ds.slice()
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
+/** Số câu dùng được của một dạng bài — đếm SAU khi qua cửa nạp, vì cửa nạp bỏ
+ * câu thiếu phương án hoặc thiếu đáp án. Con số trên thanh trượt phải là con số
+ * THẬT sẽ rút được, không phải `so_cau` ghi trong gói. */
+export function demCauDangBai(khoDangBai: TeacherExamSource[]): number {
+  return cauLuyenTuNguon(khoDangBai).length
+}
+
+export function rutLuyenDangBai(
+  khoDangBai: TeacherExamSource[],
+  soCauRut: number,
+  thongTin: { hoTen: string; sbd: string; tenDang: string; tenBai: string; lop: string },
+): { html: string; dsCau: CauLuyen[] } {
+  const tatCa = cauLuyenTuNguon(khoDangBai)
+  const dsCauRut = tronMang(tatCa).slice(0, Math.max(0, soCauRut))
+
+  const tt: ThongTinPhieu = {
+    hoTen: thongTin.hoTen,
+    sbd: thongTin.sbd,
+    ngay: new Date(),
+    tenChuyenDe: `${thongTin.tenDang} — Lớp ${thongTin.lop} · ${thongTin.tenBai}`,
+    ketQua: `Gồm ${dsCauRut.length} câu (kho có ${tatCa.length} câu thuộc dạng này)`,
+    hienDapAn: false,
+    nhanBia: 'LUYỆN DẠNG BÀI',
   }
   const html = dungPhieu(tt, dsCauRut, { anGiai: false })
   return { html, dsCau: dsCauRut }

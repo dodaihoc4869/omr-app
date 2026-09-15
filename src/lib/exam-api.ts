@@ -3269,3 +3269,61 @@ export async function thanThuGhiApi(scriptUrl: string, sbd: string, hoSo: unknow
     return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
   }
 }
+
+// ============================================================================
+// LUYỆN DẠNG BÀI (15/09) — mục 4 của khối rút đề.
+// Hai lệnh của MÁY EM: menu (lớp → bài → dạng) và tờ đề của một dạng.
+
+export interface DangBaiMuc {
+  ma: string
+  ten: string
+  soCau: number
+}
+export interface BaiDangBai {
+  tenBai: string
+  dangs: DangBaiMuc[]
+}
+export interface LopDangBai {
+  lop: string
+  bais: BaiDangBai[]
+}
+
+/** MENU luyện dạng bài. Lỗi mạng KHÔNG ném ra — màn hình chỉ cần biết
+ * "có menu hay không" và "vì sao không". */
+export async function danhMucDangBai(
+  scriptUrl: string,
+): Promise<{ lops: LopDangBai[]; tongDang: number; loi: string }> {
+  try {
+    const r = await postJson(scriptUrl, { action: 'danhMucDangBai' }, 30)
+    if (!r.ok) return { lops: [], tongDang: 0, loi: String(r.error || 'Không lấy được danh mục dạng bài') }
+    const lops: LopDangBai[] = (Array.isArray(r.lops) ? r.lops : []).map((l: any) => ({
+      lop: String(l?.lop ?? ''),
+      bais: (Array.isArray(l?.bais) ? l.bais : []).map((b: any) => ({
+        tenBai: String(b?.tenBai ?? ''),
+        dangs: (Array.isArray(b?.dangs) ? b.dangs : []).map((d: any) => ({
+          ma: String(d?.ma ?? ''),
+          ten: String(d?.ten ?? ''),
+          soCau: Number(d?.soCau) || 0,
+        })),
+      })),
+    }))
+    return { lops, tongDang: Number(r.tongDang) || 0, loi: '' }
+  } catch (e) {
+    return { lops: [], tongDang: 0, loi: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
+  }
+}
+
+/** Tờ đề gom TRỌN câu của một dạng bài. Gói có thể tới vài MB (câu có ảnh) nên
+ * để hạn 60 giây như `cauKhacPhuc`, không phải 25 mặc định. */
+export async function deTheoDangBai(
+  scriptUrl: string,
+  ma: string,
+): Promise<{ de: unknown | null; loi: string }> {
+  try {
+    const r = await postJson(scriptUrl, { action: 'deTheoDangBai', ma }, 60)
+    if (!r.ok) return { de: null, loi: String(r.error || 'Không lấy được đề của dạng bài này') }
+    return { de: r.de ?? null, loi: '' }
+  } catch (e) {
+    return { de: null, loi: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
+  }
+}

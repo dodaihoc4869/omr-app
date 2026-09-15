@@ -559,11 +559,12 @@ export default function ParentPortalScreen() {
 
               {/* MÔ TẢ CƠ CHẾ SƯ PHẠM */}
               <div className="p-4 rounded-2xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/40 mb-5 text-xs text-rose-900 dark:text-rose-200 leading-relaxed space-y-2">
-                <div className="font-bold">💡 3 phương pháp khắc phục câu sai tối ưu cho con:</div>
+                <div className="font-bold">💡 4 phương pháp khắc phục câu sai tối ưu cho con:</div>
                 <div className="space-y-1.5 pl-1 text-[11.5px] text-rose-800 dark:text-rose-300">
                   <div>• <b>1. Làm lại các câu sai</b>: Con làm lại đúng các câu bị mất điểm kèm lời giải chuẩn để ghi nhớ.</div>
                   <div>• <b>2. Luyện thêm dạng câu sai</b>: Tự động rút câu cùng nhãn dán theo đúng tỷ lệ tối đa (lẻ làm tròn lên).</div>
                   <div>• <b>3. Lựa chọn luyện câu</b>: Lọc theo mức sao (2 sao, 1 sao, 0 sao) và thể loại (lý thuyết, tính toán), tối đa 100 câu.</div>
+                  <div>• <b>4. Luyện dạng bài</b>: Chọn lớp 10/11/12 → tên bài theo sách giáo khoa → dạng toán trọng tâm, gom tất cả câu trong kho thuộc dạng ấy.</div>
                 </div>
               </div>
 

@@ -3179,3 +3179,90 @@ export async function thanThuGhi(env: Env, b: Record<string, unknown>): Promise<
   // một vòng — không phải đợi lần mở game sau.
   return { ok: true, daGhi: true, hoSo, daTron, tongExp, capNhatLuc: luc }
 }
+
+// ============================================================================
+// LUYỆN DẠNG BÀI (15/09) — mục 4 của khối rút đề.
+//
+// Thầy chốt: "tạo thêm một mục 4 chỗ này là Luyện dạng bài… bấm vào dạng bài
+// cho hiện các thư mục con LỚP 10, 11, 12, trong đó có tên bài theo sách giáo
+// khoa, bấm vào mỗi tên bài thì hiển thị từng dạng bài của bài đó (trong từng
+// dạng bài sẽ gom TẤT CẢ các câu trong kho đề thuộc dạng bài đó)".
+//
+// VÌ SAO KHÔNG DÙNG `cauKhacPhuc`. Lệnh ấy lọc theo CHUYÊN ĐỀ rồi cắt theo mã
+// dạng ba tầng, và có trần 200 câu — đúng cho "luyện thêm dạng câu sai", sai
+// cho "gom tất cả". Một dạng bài như "Thiết lập công thức phân tử amine" có
+// 426 câu nằm rải khắp kho; đi đường ấy là em chỉ thấy một phần.
+//
+// ĐƯỜNG ĐI: kho đã dựng sẵn cây `xong/Dạng bài/` — mỗi dạng MỘT TỜ gom trọn
+// câu của dạng ấy, mã tờ là mã dạng (`DB-12-B8-D1`). Tờ nằm trong R2 như mọi
+// tờ khác, nên ở đây chỉ cần hai việc: liệt kê menu, và trả đúng một tờ.
+//
+// KHÔNG có chỉ mục `cau_hoi` cho tờ `DB-%` (bộ nạp cố tình bỏ), nên chúng
+// KHÔNG bao giờ lọt vào lượt rút ngẫu nhiên của `cauKhacPhuc` — câu không bị
+// đếm hai lần.
+
+/** Tiền tố mã tờ dạng bài. MỘT NGUỒN SỰ THẬT — `nap-de-may-chu-moi.py` bỏ chỉ
+ * mục theo đúng tiền tố này, và hai lệnh dưới đây chỉ nhận mã bắt đầu bằng nó. */
+export const TIEN_TO_DANG_BAI = 'DB-'
+
+/** MENU LUYỆN DẠNG BÀI: lớp → bài → dạng, dựng từ chính bảng `de_kho`.
+ * Nhãn `nhom` của tờ có dáng "Dạng bài · <lớp> · <Bài N. Tên bài> · <tên dạng>". */
+export async function danhMucDangBai(env: Env): Promise<Record<string, unknown>> {
+  const r = await env.DB.prepare(
+    `SELECT ma_de, nhom, so_cau FROM de_kho
+      WHERE da_xoa = 0 AND ma_de LIKE '${TIEN_TO_DANG_BAI}%' ORDER BY ma_de`,
+  ).all<Record<string, unknown>>()
+
+  type Dang = { ma: string; ten: string; soCau: number }
+  type Bai = { tenBai: string; dangs: Dang[] }
+  const theoLop = new Map<string, Map<string, Bai>>()
+
+  for (const x of r.results ?? []) {
+    const ma = chuoi(x.ma_de)
+    const phan = chuoi(x.nhom).split(' · ')
+    // Dáng sai thì BỎ tờ ấy và không đoán — menu thiếu một dạng còn hơn menu
+    // có một mục trỏ vào hư không.
+    if (phan.length !== 4 || phan[0] !== 'Dạng bài') continue
+    const [, lop, tenBai, tenDang] = phan
+    if (!theoLop.has(lop)) theoLop.set(lop, new Map())
+    const bai = theoLop.get(lop)!
+    if (!bai.has(tenBai)) bai.set(tenBai, { tenBai, dangs: [] })
+    bai.get(tenBai)!.dangs.push({ ma, ten: tenDang, soCau: Number(x.so_cau) || 0 })
+  }
+
+  const lops = [...theoLop.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0], 'vi'))
+    .map(([lop, bai]) => ({
+      lop,
+      bais: [...bai.values()].sort((a, b) => soBaiCua(a.tenBai) - soBaiCua(b.tenBai)),
+    }))
+
+  const tongDang = lops.reduce((n, l) => n + l.bais.reduce((m, b) => m + b.dangs.length, 0), 0)
+  return { ok: true, lops, tongDang }
+}
+
+/** "Bài 12. Tên bài" → 12. Không đọc được số thì đẩy xuống cuối, không vứt đi. */
+function soBaiCua(ten: string): number {
+  const m = /^Bài\s+(\d+)/.exec(ten)
+  return m ? Number(m[1]) : 9999
+}
+
+/** TRẢ TRỌN MỘT TỜ DẠNG BÀI. Chỉ nhận mã `DB-…` — không mở đường cho máy em
+ * tải tờ đề bất kỳ bằng lệnh không cần mã bí mật. */
+export async function deTheoDangBai(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const ma = chuoi(b.ma).trim()
+  if (!ma.startsWith(TIEN_TO_DANG_BAI)) return { ok: false, error: 'Mã dạng bài không hợp lệ' }
+  if (!/^[A-Za-z0-9-]+$/.test(ma)) return { ok: false, error: 'Mã dạng bài không hợp lệ' }
+  if (!env.DE) return { ok: false, error: 'Máy chủ chưa gắn kho đề' }
+
+  const co = await env.DB.prepare('SELECT ma_de FROM de_kho WHERE ma_de = ? AND da_xoa = 0').bind(ma).first()
+  if (!co) return { ok: false, error: 'Kho chưa có dạng bài này. Thầy cần đẩy lại kho đề.' }
+
+  const o = await env.DE.get(`kho/${ma}.json`)
+  if (!o?.body) return { ok: false, error: 'Gói đề của dạng bài này không còn trên máy chủ.' }
+  try {
+    return { ok: true, de: await new Response(o.body).json() }
+  } catch {
+    return { ok: false, error: 'Gói đề của dạng bài này hỏng, không đọc được.' }
+  }
+}
