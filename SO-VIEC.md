@@ -532,7 +532,7 @@ có thật của bất kỳ ca nào. Với `dsCauSai` rỗng thì vòng nạp kh
   sinh, trên chrome máy tính vẫn bấm được. Sửa lại triệt để và đồng bộ hết mọi
   báo cáo, mọi app, mọi chỗ"  | bằng chứng: `npx vitest run tests/dia-chi-may-chu-mot-nguon-1509.test.ts` → 20/20 đạt
 - [x] Nghiệm thu 7 cửa  | bằng chứng: bảng cuối mục này
-- [ ] Phát hành  | bằng chứng: (chưa có)
+- [x] Phát hành  | bằng chứng: xem mục Phát hành cuối
 
 ## Đo thật TRƯỚC khi sửa
 
@@ -590,3 +590,27 @@ Cùng họ với vụ 60-vs-579 ngày 14/09: màn phụ thuộc một giá trị
 | Hiển thị 360px | `node scripts/kiem-13.mjs` | ĐẠT 18/18 | Đạt |
 | Service worker | `node scripts/kiem-sw.mjs` | ĐẠT 10/10 | Đạt |
 | Dựng bản | `npx vite build` | 170 mục precache · mảnh chính 486 KB | Đạt |
+
+## Phát hành
+
+- [x] Kiểm không có ca nào đang thi  | bằng chứng: D1 `SELECT ma_ca, COUNT(*) FROM luot WHERE nop_luc IS NULL GROUP BY ma_ca` → rỗng (08:08 UTC)
+- [x] Đợi phiên Claude kia đẩy xong rồi mới đẩy  | bằng chứng: hai cửa sổ Terminal của `DAY-APP-THAN-THU-1509` và `DAY-MAY-CHU-THAN-THU-1509` đều đã về dòng "Bấm Enter để đóng"; bản của họ dựng 169 mục precache, KHÔNG có bản sửa này — nên phải đẩy sau
+- [x] `DAY-OMR-APP.command` → "XONG CẢ HAI"
+
+Đối chứng bản live, trình duyệt khác gốc, quét cả 68 mảnh js:
+
+| Kiểm | Kết quả |
+|---|---|
+| `sw-version.json` | `{"builtAt":1789460147}` |
+| `Chưa lấy được địa chỉ máy chủ` | có, trong `assets/exam-api-DIoZqsfj.js` |
+| màn rỗng khắc phục | có, trong `assets/ModalKhacPhucCauSai-CDKpwxKP.js` |
+| `Máy này chưa có kho đề của thầy` | không còn mảnh nào |
+| `cau-hinh.json` có khoá `scriptUrl` | không |
+
+**Thử thật trên MÁY SẠCH** (trình duyệt riêng, xoá sạch IndexedDB + localStorage
+rồi tải lại — đúng cảnh điện thoại em mở app lần đầu): đăng nhập bằng SBD giả
+`000000` → máy chủ trả lời **"Số báo danh không tồn tại trong hệ thống"**. Câu
+trả lời ấy chỉ có thể đến từ máy chủ, tức máy sạch KHÔNG còn `scriptUrl` vẫn ra
+được địa chỉ. Đúng chỗ bản cũ chết câm.
+
+Mã commit: `b91b0f2`. Lùi bản phát hành: `git revert b91b0f2`.
