@@ -137,9 +137,18 @@ describe('Modal khắc phục nối đúng đường', () => {
     .replace(/^\s*\/\/.*$/gm, '')
     .replace(/\/\*[\s\S]*?\*\//g, '')
 
-  it('hết kho máy thì xin máy chủ, không bỏ cuộc', () => {
+  it('LUÔN xin máy chủ, không đọc kho của máy đang mở', () => {
+    // ĐỔI 14/09 chiều: bản trước chỉ xin máy chủ KHI máy rỗng
+    // (`if (sources.length === 0 && …)`). Thầy bắt được hậu quả: cùng một em,
+    // cùng ca Test6, điện thoại hiện tối đa 60 câu còn máy tính hiện 579 — vì
+    // máy tính có kho của thầy trong IndexedDB nên đọc luôn kho ấy.
+    //
+    // Ý ĐỊNH của phép kiểm giữ nguyên và còn chặt hơn: máy em phải lấy được
+    // kho. Nay thêm: mọi máy lấy từ CÙNG MỘT nguồn.
+    // Chi tiết: `tests/khac-phuc-mot-nguon-1409.test.ts`.
     expect(than).toContain('napKhoChoMayEm')
-    expect(than).toContain('if (sources.length === 0 && dsCauSai.length > 0)')
+    expect(than).toContain('if (dsCauSai.length > 0)')
+    expect(than).not.toContain('loadExamSources')
   })
 
   it('khoá deps theo NỘI DUNG câu sai, không theo tham chiếu mảng', () => {

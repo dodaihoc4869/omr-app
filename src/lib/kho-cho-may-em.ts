@@ -43,9 +43,16 @@ export interface KetQuaNapKho {
   loi: string
 }
 
-/** Số câu xin máy chủ. Máy chủ chặn trần 60 và gom tối đa 8 tờ đề; xin cao là
- * để VÙNG CHỌN rộng, còn rút bao nhiêu thì màn hình quyết sau. */
-export const SO_CAU_XIN_KHO = 60
+/** Số câu xin máy chủ — ĐÂY LÀ VÙNG CHỌN, không phải số câu em sẽ làm; rút
+ * bao nhiêu thì thanh trượt trên màn quyết sau.
+ *
+ * PHẢI BẰNG `TRAN_CAU_KHAC_PHUC` bên `server/src/goi-cu.ts` (200). Xin nhiều
+ * hơn trần máy chủ thì màn hình hiện một con số mà máy chủ không bao giờ trả
+ * đủ — đúng kiểu lệch thầy bắt được 14/09.
+ *
+ * Nâng 60 → 200 ngày 14/09: từ nay MỌI máy của em lấy vùng chọn từ máy chủ
+ * (xem `ModalKhacPhucCauSai`), nên 60 là quá hẹp cho em luyện. */
+export const SO_CAU_XIN_KHO = 200
 
 /**
  * Xin máy chủ gói câu cùng chuyên đề với các câu em vừa sai.

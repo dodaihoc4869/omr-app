@@ -200,3 +200,48 @@ Tách ra thành mảnh riêng, chỉ tải khi mở: `GiaiCuuCongChuaGame` 64 KB
 
 GIỮ NẠP SỚM: `ExamTakeScreen` và `PhieuScreen` — ngày thi không đánh cược vào
 một mảnh mã tải muộn, và phiếu là thứ phụ huynh mở nhiều nhất.
+
+---
+
+# LƯỢT 13 — KHẮC PHỤC CÂU SAI LỆCH GIỮA ĐIỆN THOẠI VÀ MÁY TÍNH (14/09)
+
+- [x] "Tạo câu khắc phục trên điện thoại của học sinh và máy tính đang lệch nhau. Kiểm tra kĩ xem đúng sai ở đâu sửa và đồng bộ chính xác."  | bằng chứng: `tests/khac-phuc-mot-nguon-1409.test.ts` 7/7 · `dong-bo-kho-sang-may-em-1409` 18/18
+
+## ĐO THẬT (ảnh thầy chụp) — CÙNG em, CÙNG ca Test6, CÙNG 10 câu sai
+
+|  | điện thoại | máy tính |
+|---|---|---|
+| Số câu rút luyện tập | 31 / **60** | 20 / **579** |
+| Câu 1 (I) | tối đa 2 | tối đa 3 |
+| Câu 2 (I) | tối đa 2 | tối đa 3 |
+| Câu 3 (I) | tối đa 0 | tối đa 0 |
+| Câu 4 (I) | tối đa **14** | tối đa **75** |
+
+## NGUYÊN NHÂN GỐC — không con số nào tính sai, HAI NGUỒN KHÁC NHAU
+
+`ModalKhacPhucCauSai` đọc `loadExamSources()` TRƯỚC, chỉ khi máy rỗng mới xin
+máy chủ. Mà `loadExamSources()` là kho trong IndexedDB CỦA CHÍNH MÁY ĐANG MỞ:
+
+- **Điện thoại em**: rỗng (đồng bộ kho đòi mã bí mật) ⇒ xin máy chủ ⇒ trần 60.
+- **Máy tính thầy**: có KHO ĐẦY ĐỦ CỦA THẦY. Cổng học sinh mở trên chính máy
+  ấy dùng CHUNG GỐC nên đọc luôn kho ấy ⇒ 579.
+
+Nguồn thứ hai còn sai RANH GIỚI DỮ LIỆU: màn của EM không được đọc kho của
+THẦY chỉ vì tình cờ mở trên máy thầy.
+
+⇒ Con số ĐÚNG phải là con số MÁY CHỦ trả, vì chỉ nó giống nhau trên mọi máy.
+
+## Đã sửa
+
+1. Modal **LUÔN** xin máy chủ, bỏ hẳn `loadExamSources()`. Một nguồn duy nhất.
+2. Nới vùng chọn, vì nay đây là vùng chọn của MỌI máy:
+   - `TRAN_TO_DE_THEO_DANG` 14 → **40** tờ đề
+   - `TRAN_CAU_KHAC_PHUC` 60 → **200** câu (hằng có tên, máy chủ khai một chỗ)
+   - `SO_CAU_XIN_KHO` 60 → **200**, và phép kiểm bắt hai số này phải BẰNG NHAU
+3. Giữ trần: bỏ trần là gói to, máy em tải cả phút.
+
+## Còn treo
+
+- [!] Trần 200 chưa phải toàn kho (157 tờ). Muốn đúng bằng số ứng viên thật thì
+  phải thêm cột `dang_ma` vào `cau_hoi` rồi đánh lại chỉ mục cả kho — việc
+  riêng, chưa làm trong lượt này.

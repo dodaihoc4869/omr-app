@@ -2013,7 +2013,16 @@ export async function guiNhanXetCoQuyen(env: Env, b: Record<string, unknown>, la
  * đã làm đường cũ mất hơn 20 giây. */
 /** Số tờ đề mở ra để tìm câu cùng dạng. Mỗi tờ ~400 KB trên R2, đọc trong
  * cùng mạng Cloudflare nên rẻ; gói TRẢ VỀ thì đã cắt còn đúng câu cùng dạng. */
-const TRAN_TO_DE_THEO_DANG = 14
+// Số TỜ ĐỀ máy chủ mở ra để tìm câu cùng dạng.
+//
+// 14/09 nâng 14 → 40. Lý do: từ nay MỌI máy của em đều lấy vùng chọn từ đây
+// (trước đó máy nào tình cờ có kho của thầy trong IndexedDB thì đọc kho ấy,
+// nên hai máy ra hai con số — thầy bắt được). Vùng chọn hẹp là em mất chỗ
+// luyện, nên phải nới; nhưng vẫn phải chặn, vì mỗi tờ là một lượt đọc R2 và
+// gói trả về càng to thì máy em tải càng lâu.
+//
+// Đo thật 14/09 với ca Test6: 14 tờ ⇒ 175 câu · 395 KB · 0,44 giây.
+const TRAN_TO_DE_THEO_DANG = 40
 
 /** Gom câu CÙNG MÃ DẠNG từ nhiều tờ đề, mỗi tờ cắt còn đúng phần cần.
  *
@@ -2129,9 +2138,16 @@ async function goiTheoDang(
   }
 }
 
+/** Trần số câu một lượt xin kho khắc phục. Máy em và máy thầy CÙNG dùng số
+ * này, nên đổi ở đây là đổi cho cả hai — không có chỗ thứ hai để lệch. */
+export const TRAN_CAU_KHAC_PHUC = 200
+
 export async function cauKhacPhucGoi(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const sbd = chuoi(b.sbd).trim()
-  const soCau = Math.max(1, Math.min(60, Number(b.soCau) || 20))
+  // TRẦN SỐ CÂU TRẢ VỀ. Nâng 60 → 200 ngày 14/09 cùng lý do với
+  // `TRAN_TO_DE_THEO_DANG`: đây nay là vùng chọn DUY NHẤT của mọi máy học
+  // sinh, nên 60 là quá hẹp. Trần phải giữ — gói to là máy em tải lâu.
+  const soCau = Math.max(1, Math.min(TRAN_CAU_KHAC_PHUC, Number(b.soCau) || 20))
   const loaiTru = new Set((Array.isArray(b.loaiTru) ? (b.loaiTru as unknown[]) : []).map((x) => chuoi(x)))
   let dsCd = (Array.isArray(b.chuyenDe) ? (b.chuyenDe as unknown[]) : []).map((x) => chuoi(x)).filter(Boolean)
 

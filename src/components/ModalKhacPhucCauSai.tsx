@@ -21,7 +21,6 @@ import {
   Heart,
 } from 'lucide-react'
 import type { TeacherExamSource } from '../data/examContent'
-import { loadExamSources } from '../lib/exam-db'
 import {
   taoDeLamLaiCauSai,
   rutLuyenThemDangCauSai,
@@ -96,12 +95,26 @@ export default function ModalKhacPhucCauSai({
   /** Khoá nội dung của danh sách câu sai — dùng làm deps thay cho chính mảng. */
   const khoaCauSai = useMemo(() => dsCauSai.map((c) => `${c.maCa ?? ''}:${c.qid ?? ''}:${c.chuyenDe ?? ''}`).join('|'), [dsCauSai])
 
-  // TẢI KHO KHI MỞ MODAL — máy thầy lấy tại chỗ, máy em xin máy chủ.
+  // TẢI KHO KHI MỞ MODAL — LUÔN XIN MÁY CHỦ, không đọc kho của máy đang mở.
   //
-  // Thầy chốt 14/09: "Bạn phải đồng bộ sang máy học sinh." Kho trong IndexedDB
-  // chỉ có trên máy thầy (đồng bộ đòi mã bí mật), nên máy em rỗng và chế độ 2/3
-  // ra 0 câu. Nay hết kho máy thì XIN MÁY CHỦ rút hộ đúng chuyên đề em vừa sai
-  // — xem `src/lib/kho-cho-may-em.ts`.
+  // Thầy báo 14/09: "Tạo câu khắc phục trên điện thoại của học sinh và máy tính
+  // đang lệch nhau." Đo thật, cùng một em, cùng ca Test6, 10 câu sai:
+  //   · điện thoại  : tối đa  60 câu · câu 4 tối đa 14
+  //   · máy tính    : tối đa 579 câu · câu 4 tối đa 75
+  //
+  // NGUYÊN NHÂN GỐC: bản trước đọc `loadExamSources()` TRƯỚC, chỉ khi máy rỗng
+  // mới xin máy chủ. Mà `loadExamSources()` là kho trong IndexedDB CỦA CHÍNH
+  // MÁY ĐANG MỞ:
+  //   · Điện thoại em: rỗng (đồng bộ kho đòi mã bí mật) ⇒ xin máy chủ ⇒ 60.
+  //   · Máy tính thầy: có KHO ĐẦY ĐỦ CỦA THẦY. Cổng học sinh mở trên chính máy
+  //     ấy dùng chung gốc nên đọc luôn kho ấy ⇒ 579.
+  //
+  // Hai con số không phải một phép tính sai — là HAI NGUỒN KHÁC NHAU. Và nguồn
+  // thứ hai còn sai về ranh giới dữ liệu: màn của EM không được đọc kho của
+  // THẦY chỉ vì tình cờ mở trên máy thầy.
+  //
+  // Nay MỘT NGUỒN DUY NHẤT: máy chủ rút hộ (`src/lib/kho-cho-may-em.ts`). Cùng
+  // một em thì mọi máy ra cùng một con số, không phụ thuộc máy nào đang mở.
   useEffect(() => {
     if (!isOpen) return
     let active = true
@@ -109,14 +122,7 @@ export default function ModalKhacPhucCauSai({
     setLoiRut('')
     void (async () => {
       let sources: TeacherExamSource[] = []
-      try {
-        sources = await loadExamSources()
-      } catch {
-        sources = []
-      }
-      if (!active) return
-
-      if (sources.length === 0 && dsCauSai.length > 0) {
+      if (dsCauSai.length > 0) {
         const url = await loadScriptUrl().catch(() => '')
         const kq = await napKhoChoMayEm(url || '', sbd, dsCauSai)
         if (!active) return
