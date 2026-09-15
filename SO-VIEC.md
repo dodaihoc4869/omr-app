@@ -467,7 +467,10 @@ còn 6 nơi dùng.
   "1. Làm lại các câu sai (0 câu)" + nút "Bắt đầu làm bài" + dòng "Máy này chưa
   có kho đề của thầy")  | bằng chứng: `npx vitest run tests/khac-phuc-khong-co-cau-sai-1509.test.tsx` → 10/10 đạt
 - [x] Nghiệm thu 7 cửa  | bằng chứng: bảng cuối mục này
-- [ ] Phát hành  | bằng chứng: (chưa có)
+- [x] Phát hành  | bằng chứng: `DAY-OMR-APP.command` → "XONG CẢ HAI"; `sw-version.json` live = `{"builtAt":1789458153}`; quét 67 mảnh js live: câu chữ mới có trong `ModalKhacPhucCauSai-B4rZx-NJ.js`, câu chữ cũ "Máy này chưa có kho đề của thầy" KHÔNG còn mảnh nào
+- [x] Kiểm không có ca nào đang thi trước khi đẩy  | bằng chứng: D1 `SELECT ... FROM luot WHERE nop_luc IS NULL GROUP BY ma_ca` → rỗng; lượt gần nhất nộp 03:24 UTC (10:24 giờ VN), trước lúc đẩy hơn 4 tiếng
+
+Mã commit trước khi phát hành: `3cbfd7b`. Lùi bản phát hành: `git revert 3cbfd7b`.
 
 ## Hai nguyên nhân gốc, rời nhau
 
