@@ -86,10 +86,21 @@ describe('CỬA KHOÁ — máy chủ chấm mã, không phải máy này', () =>
 })
 
 describe('VAI CHỈ ĐẾN TỪ ĐƯỜNG LINK — không đoán, không nhớ', () => {
-  it('`/` trần KHÔNG bao giờ là app của thầy, dù máy nhớ vai gì', () => {
+  it('cờ trong máy KHÔNG đổi được kết quả của bất kỳ đường nào', () => {
+    // Đây là phép kiểm quan trọng nhất của cả tệp: cùng một đường, mọi trạng
+    // thái bộ nhớ máy phải cho CÙNG một kết quả. Còn lệch một ca là còn cửa
+    // cho hai máy ra hai app.
+    const duong: [string, string][] = [
+      ['', '/'], ['', '/gv'], ['', '/hs'], ['', '/ph'],
+      ['?vai=gv', '/'], ['?vai=hocsinh', '/'], ['?vai=phuhuynh', '/'],
+      ['', '/hoc-sinh'], ['', '/phu-huynh'], ['', '/t/123456'], ['', '/d/123456'],
+    ]
+    const chuaNho: boolean[] = duong.map(([s2, d]) => laManThayQuanLy(s2, d))
     for (const v of ['gv', 'hs', 'ph'] as const) {
       nhoVaiDaDung(v)
-      expect(laManThayQuanLy('', '/'), v).toBe(false)
+      duong.forEach(([s2, d], i) => {
+        expect(laManThayQuanLy(s2, d), `${d}${s2} với cờ ${v}`).toBe(chuaNho[i])
+      })
     }
   })
 
@@ -188,6 +199,111 @@ describe('HỌC SINH VÀ PHỤ HUYNH TÁCH HẲN', () => {
       const t = boChuThich(doc(f))
       expect(t, f).not.toContain('vai=gv')
       expect(t, f).not.toMatch(/['"`]\/gv['"`]/)
+    }
+  })
+})
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BA LINK RIÊNG BIỆT — PHÉP KIỂM THẦY YÊU CẦU 15/09
+//
+// "chỉ cần 3 link không nhảy vào nhau 100% là được ... CHỉ cần kiểm tra kĩ 3
+// link riêng biệt."
+//
+// Ba link, và CHỈ ba link này, là thứ thầy gửi đi:
+//     Thầy      /gv
+//     Học sinh  /hs
+//     Phụ huynh /ph
+//
+// Khối dưới quét CHÉO: với mỗi link, kiểm nó ra đúng một vai và KHÔNG ra hai
+// vai kia — ở mọi dáng viết, mọi trạng thái bộ nhớ máy, và sau khi đã đi qua
+// hai link kia.
+// ═══════════════════════════════════════════════════════════════════════════
+
+import { chuanHoaUrlTheoVai, DUONG_APP, vaiCuaDuong } from '../src/lib/khoa-vai'
+
+describe('BA LINK RIÊNG BIỆT — quét chéo', () => {
+  /** Mọi dáng viết dẫn về cùng một app. Thầy chỉ gửi dáng đầu; các dáng sau là
+   * link cũ còn trong tin nhắn Zalo và trong biểu tượng đã cài. */
+  const BO: Record<'gv' | 'hs' | 'ph', string[]> = {
+    gv: ['/gv', '/giaovien', '/?vai=gv'],
+    hs: ['/hs', '/hoc-sinh', '/hocsinh', '/?vai=hocsinh'],
+    ph: ['/ph', '/phu-huynh', '/phuhuynh', '/?vai=phuhuynh'],
+  }
+  const tach = (d: string) => {
+    const i = d.indexOf('?')
+    return i === -1 ? { p: d, s: '' } : { p: d.slice(0, i), s: d.slice(i) }
+  }
+  const CAP: ('gv' | 'hs' | 'ph')[] = ['gv', 'hs', 'ph']
+
+  it('mỗi dáng viết ra ĐÚNG MỘT vai, và KHÔNG ra hai vai kia', () => {
+    for (const vai of CAP) {
+      for (const d of BO[vai]) {
+        const { p, s } = tach(d)
+        expect(vaiCuaDuong(s, p), d).toBe(vai)
+        for (const khac of CAP) {
+          if (khac !== vai) expect(vaiCuaDuong(s, p), `${d} KHÔNG được ra ${khac}`).not.toBe(khac)
+        }
+      }
+    }
+  })
+
+  it('mọi dáng viết QUY VỀ đúng link chuẩn của app ấy', () => {
+    for (const vai of CAP) {
+      for (const d of BO[vai]) {
+        const { p, s } = tach(d)
+        const moi = chuanHoaUrlTheoVai('/', p, s, '')
+        // Rỗng nghĩa là đã đúng đường chuẩn rồi.
+        expect(moi === '' ? p : moi, d).toBe(DUONG_APP[vai])
+      }
+    }
+  })
+
+  it('CHỈ link của thầy mới dẫn tới app thầy — hai link kia thì không, mọi dáng', () => {
+    for (const d of BO.gv) {
+      const { p, s } = tach(d)
+      expect(laManThayQuanLy(s, p), d).toBe(true)
+    }
+    for (const d of [...BO.hs, ...BO.ph]) {
+      const { p, s } = tach(d)
+      expect(laManThayQuanLy(s, p), d).toBe(false)
+    }
+  })
+
+  it('ĐI QUA CẢ BA LINK rồi quay lại — link nào vẫn ra app nấy', () => {
+    // Đây là ca thầy lo nhất: em mở cổng học sinh, rồi mở cổng phụ huynh, rồi
+    // quay lại cổng học sinh. Mỗi lần "mở" ghi lại cờ đúng như `main.tsx` làm.
+    const thuTu: ('hs' | 'ph' | 'gv' | 'hs' | 'ph')[] = ['hs', 'ph', 'gv', 'hs', 'ph']
+    for (const vaiMo of thuTu) {
+      nhoVaiDaDung(vaiMo) // giả lập lượt mở trước đó
+      for (const vai of CAP) {
+        for (const d of BO[vai]) {
+          const { p, s } = tach(d)
+          expect(vaiCuaDuong(s, p), `${d} sau khi vừa mở ${vaiMo}`).toBe(vai)
+        }
+      }
+    }
+  })
+
+  it('ba link chuẩn KHÁC NHAU từng đôi một, và đều là đường dẫn trần', () => {
+    const ds = CAP.map((v) => DUONG_APP[v])
+    expect(new Set(ds).size).toBe(3)
+    for (const d of ds) {
+      expect(d).toMatch(/^\/[a-z]+$/)
+      expect(d).not.toContain('?')
+    }
+  })
+
+  it('`start_url` ba manifest KHỚP ĐÚNG ba link chuẩn', () => {
+    const j = (f: string) => JSON.parse(doc(f)) as Record<string, string>
+    expect(j('public/manifest.json').start_url).toBe('.' + DUONG_APP.gv)
+    expect(j('public/manifest-hs.json').start_url).toBe('.' + DUONG_APP.hs)
+    expect(j('public/manifest-ph.json').start_url).toBe('.' + DUONG_APP.ph)
+  })
+
+  it('không link nào của em hay phụ huynh trùng tiền tố với link của thầy', () => {
+    // `/gvx` hay `/hsa` mà lọt vào đúng app là mầm lỗi gõ nhầm.
+    for (const lac of ['/gvx', '/hsa', '/phb', '/g', '/h', '/p']) {
+      expect(vaiCuaDuong('', lac), lac).toBe(null)
     }
   })
 })

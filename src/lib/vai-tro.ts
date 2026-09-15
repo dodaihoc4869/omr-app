@@ -142,17 +142,17 @@ export function laManThayQuanLy(search: string, duongDan = '', _daCai = dangChay
   // trên máy thầy từng mở link thi thử thì gõ `?vai=gv` cũng không vào được màn
   // quản lý — phép kiểm bắt ngay.
   if (d.vai === 'gv') return true
-  // ĐƯỜNG KHÔNG NÓI `gv` THÌ KHÔNG PHẢI APP CỦA THẦY. Hết.
+  // CÒN LẠI (`/` trần và đường lạ) LÀ APP CỦA THẦY — VÀ APP ẤY ĐÃ KHOÁ CỨNG.
   //
-  // 15/09 gỡ hai nhánh đoán từng đứng ở đây: `/` trần hỏi `vaiDaDung()`, rồi
-  // hỏi tiếp "app đã cài mà chưa nhớ vai nào". Hai nhánh ấy sinh ra đúng thứ
-  // thầy bắt được — cùng một địa chỉ, hai máy ra hai app.
+  // 15/09 gỡ hai nhánh ĐOÁN từng đứng ở đây: `/` trần hỏi `vaiDaDung()`, rồi
+  // hỏi tiếp "app đã cài mà chưa nhớ vai nào". Hai nhánh ấy đọc một khoá
+  // localStorage CHUNG GỐC của cả ba app — chính là cửa để cổng em và cổng phụ
+  // huynh nhảy sang nhau, vì máy mở hai cổng thì khoá ấy là của cổng mở sau.
   //
-  // Nay `/` trần không tới được đây nữa: `App.tsx` chặn trước bằng màn ngõ cụt
-  // (`DungLinkScreen`). Giữ `return false` ở đây là lớp thứ hai — lỡ có đường
-  // nào lọt qua thì nó rơi vào "không phải app thầy", chứ không rơi vào app
-  // thầy. Sai về phía an toàn.
-  return false
+  // Bỏ đoán rồi thì `/` trần về lại app của thầy như đời đầu. KHÔNG còn là lỗ
+  // hổng nữa: từ 15/09 app của thầy đòi mã bí mật ngay ở cửa
+  // (`KhoaMayThayScreen`), nên em gõ tên miền trần chỉ gặp ổ khoá.
+  return true
 }
 
 const KHOA_VAI_DA_DUNG = 'ddh.vaiDaDung'

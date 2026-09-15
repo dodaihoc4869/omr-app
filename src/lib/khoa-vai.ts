@@ -29,10 +29,18 @@
 //      Biểu tượng trên màn hình chính mở thẳng `/hs`, `/ph`, `/gv` — không
 //      bao giờ mở `/` trần nữa.
 //
-//   3. `/` TRẦN KHÔNG ĐOÁN NỮA — HỎI.
-//      Còn đoán là còn xác suất sai, mà thầy đòi 100%. Nên `/` trần hiện màn
-//      CHỌN APP: ba thẻ, một chạm. `vaiDaDung` chỉ còn dùng để XẾP THỨ TỰ
-//      cho app quen tay lên đầu, KHÔNG còn quyền quyết định.
+//   3. BỎ HẲN MỌI CHỖ ĐOÁN VAI.
+//      `laManThayQuanLy` không còn hỏi `ddh.vaiDaDung` — khoá localStorage ấy
+//      dùng CHUNG GỐC cho cả ba app, nên máy mở hai cổng thì nó là của cổng mở
+//      sau: đúng cái cửa để hai cổng nhảy sang nhau. Nay vai CHỈ đến từ đường
+//      link, không từ bộ nhớ máy.
+//
+//      `/` trần và đường lạ về app của thầy như đời đầu — không còn là lỗ hổng,
+//      vì app ấy đã khoá cứng sau mã bí mật (`src/screens/KhoaMayThayScreen.tsx`).
+//
+//   (15/09 thầy bỏ màn chọn app từng đứng ở bước 3 này: "có thể học sinh dùng
+//   2 máy chọn 2 app khác nhau" — và bắt người dùng chọn thì giảm trải nghiệm.
+//   Ba link riêng biệt là đủ.)
 import { docDuongVao, laLinkAppCu } from './vai-tro'
 
 export type VaiApp = 'gv' | 'hs' | 'ph'
@@ -60,18 +68,6 @@ export function vaiCuaDuong(search: string, duongDan: string): VaiApp | null {
   if (d.vai === 'hocsinh') return 'hs'
   if (d.vai === 'phuhuynh') return 'ph'
   return null
-}
-
-/**
- * ĐƯỜNG NÀY CÓ PHẢI `/` TRẦN KHÔNG — tức chưa nói vai, cũng không phải link
- * thi, link điểm, link phiếu hay link riêng cũ.
- *
- * Đúng chỗ này, và CHỈ chỗ này, mới hiện màn chọn app.
- */
-export function canChonApp(search: string, duongDan: string): boolean {
-  if (laLinkAppCu(search, duongDan)) return false
-  const d = docDuongVao(search, duongDan)
-  return !d.vai && !d.maCa
 }
 
 /**

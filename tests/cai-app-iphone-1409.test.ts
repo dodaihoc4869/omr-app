@@ -81,28 +81,28 @@ describe('app đã cài mở `/` trần thì KHÔNG đổ vào màn thầy', () 
     try { localStorage.clear() } catch { /* trống */ }
   })
 
-  it('máy chưa nhớ vai + đang chạy từ biểu tượng ⇒ vào cổng học sinh', () => {
-    expect(laManThayQuanLy('', '/', () => true)).toBe(false)
+  it('biểu tượng của em mở THẲNG `/hs`, không còn phải đoán', () => {
+    // ĐỔI 15/09: `start_url` của manifest học sinh là `./hs`, nên biểu tượng
+    // không bao giờ mở `/` trần nữa — không còn chỗ nào phải đoán.
+    expect(laManThayQuanLy('', '/hs', () => true)).toBe(false)
   })
 
-  it('mở trong TAB trình duyệt cũng KHÔNG ra màn thầy nữa', () => {
-    // ĐỔI 15/09: `/` trần không còn là màn thầy trong bất cứ hoàn cảnh nào —
-    // không phân biệt biểu tượng hay tab, không hỏi cờ nào. Thầy chốt "app
-    // giáo viên khoá cứng lại không thể chạm vào được bằng cách nào", mà `/`
-    // trần là địa chỉ ai gõ tay cũng ra.
-    expect(laManThayQuanLy('', '/', () => false)).toBe(false)
+  it('`/` trần cho CÙNG một kết quả dù mở từ biểu tượng hay tab', () => {
+    // ĐỔI 15/09: bỏ hẳn nhánh hỏi "đang chạy từ biểu tượng hay không" — đoán
+    // là còn sai được. `/` trần về app thầy, và app thầy đã khoá cứng.
+    expect(laManThayQuanLy('', '/', () => false)).toBe(true)
+    expect(laManThayQuanLy('', '/', () => true)).toBe(true)
   })
 
   it('`?vai=gv` luôn thắng, kể cả khi đang chạy từ biểu tượng', () => {
     expect(laManThayQuanLy('?vai=gv', '/', () => true)).toBe(true)
   })
 
-  it('máy đã dùng vai thầy thì biểu tượng CŨNG KHÔNG mở màn thầy', () => {
-    // ĐỔI 15/09: cờ trong localStorage không còn quyền quyết định gì — nó là
-    // khoá CHUNG GỐC của cả ba app. Thầy vào app của mình bằng link `/gv`, và
-    // biểu tượng của thầy có `start_url` là `./gv`.
+  it('cờ `vaiDaDung` không còn quyền quyết định gì', () => {
     nhoVaiDaDung('gv')
-    expect(laManThayQuanLy('', '/', () => true)).toBe(false)
+    expect(laManThayQuanLy('', '/', () => true)).toBe(true)
+    nhoVaiDaDung('hs')
+    expect(laManThayQuanLy('', '/', () => true)).toBe(true)
   })
 
   it('đường có vai rõ ràng thì không phụ thuộc cờ đã cài', () => {

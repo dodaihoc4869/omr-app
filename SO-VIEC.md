@@ -322,3 +322,29 @@ Mở thử từ một trình duyệt CHƯA từng có mã bí mật — đúng h
 
 Hai màn ngõ cụt và màn khoá đều có **0 thẻ `<a>`** — không có đường nào lang
 thang sang app khác.
+
+---
+
+# LƯỢT 15 — BỎ MÀN NGÕ CỤT, CHỈ CÒN BA LINK (15/09)
+
+- [x] "bạn bỏ luôn mở app bằng đúng link thầy gửi đi ... làm thế này giảm trải nghiệm người dùng. CHỉ cần kiểm tra kĩ 3 link riêng biệt"  | bằng chứng: `tests/khoa-cung-app-thay-1509` 25/25 (có khối QUÉT CHÉO ba link)
+
+Bỏ `DungLinkScreen` và `canChonApp`. Bấm link là vào thẳng app, không màn đệm.
+
+`/` trần và đường lạ về lại app của thầy như đời đầu — KHÔNG còn là lỗ hổng,
+vì app của thầy đã khoá cứng sau mã bí mật từ lượt 14. Em gõ tên miền trần chỉ
+gặp ổ khoá, không gặp app quản lý.
+
+## Vẫn giữ nguyên (lượt 14)
+
+- App thầy đòi mã bí mật ở cửa, máy chủ chấm mã.
+- Link vào thi không dựng vỏ app thầy.
+- `laManThayQuanLy` KHÔNG còn nhánh đoán `vaiDaDung()` / `daCai()`.
+
+## Quét chéo ba link — phép kiểm thầy yêu cầu
+
+Với MỖI dáng viết của mỗi link: ra đúng một vai, KHÔNG ra hai vai kia; quy về
+đúng link chuẩn; giữ nguyên kết quả sau khi đã đi qua cả ba link theo mọi thứ
+tự; và mọi trạng thái cờ trong máy cho CÙNG một kết quả.
+
+Gõ nhầm (`/gvx`, `/hsa`, `/phb`, `/g`, `/h`, `/p`) ⇒ không rơi vào app nào.

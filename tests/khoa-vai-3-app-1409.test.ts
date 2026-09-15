@@ -21,7 +21,7 @@
 import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
-import { canChonApp, chuanHoaUrlTheoVai, DUONG_APP, vaiCuaDuong } from '../src/lib/khoa-vai'
+import { chuanHoaUrlTheoVai, DUONG_APP, vaiCuaDuong } from '../src/lib/khoa-vai'
 
 const GOC = process.cwd()
 const doc = (p: string) => fs.readFileSync(path.join(GOC, p), 'utf8')
@@ -144,31 +144,6 @@ describe('Viết lại địa chỉ về đường chuẩn', () => {
   })
 })
 
-describe('`/` trần HỎI, không đoán', () => {
-  it('chỉ đúng `/` trần mới hiện màn chọn app', () => {
-    expect(canChonApp('', '/')).toBe(true)
-    expect(canChonApp('', '')).toBe(true)
-  })
-
-  it('mọi đường có vai, có mã ca, hoặc là link cũ đều KHÔNG hiện màn chọn', () => {
-    for (const [s, d] of [
-      ['', '/gv'],
-      ['', '/hs'],
-      ['', '/ph'],
-      ['?vai=gv', '/'],
-      ['?vai=hocsinh', '/'],
-      ['?vai=phuhuynh', '/'],
-      ['', '/t/123456'],
-      ['', '/d/123456'],
-      ['?examCode=123456', '/'],
-      ['', '/hs/abcd1234efgh'],
-      ['?vai=hs', '/'],
-    ] as [string, string][]) {
-      expect(canChonApp(s, d), `${d}${s}`).toBe(false)
-    }
-  })
-})
-
 describe('Nối vào app', () => {
   const MAIN = doc('src/main.tsx')
   const APP = doc('src/App.tsx')
@@ -181,24 +156,14 @@ describe('Nối vào app', () => {
     )
   })
 
-  it('`/` trần là NGÕ CỤT, đứng TRƯỚC mọi màn khác', () => {
-    // ĐỔI 15/09: thầy bỏ màn chọn app — "có thể học sinh dùng 2 máy chọn 2 app
-    // khác nhau". Chọn app không phải việc của em; vai do LINK quyết.
-    expect(APP).toContain('if (khongCoVai) {')
-    expect(APP).toContain('<DungLinkScreen />')
-    expect(APP.indexOf('if (khongCoVai) {')).toBeLessThan(APP.indexOf('if (laPhieu) {'))
-  })
-
-  it('KHÔNG còn màn chọn app, và ngõ cụt không có link sang app nào', () => {
-    const man = doc('src/screens/DungLinkScreen.tsx')
-    expect(man).not.toContain('DUONG_APP')
-    expect(man).not.toMatch(/<a\b/)
-    expect(man).not.toContain('href')
+  it('KHÔNG có màn chọn app, KHÔNG có màn chặn — thầy chỉ gửi ba link', () => {
+    // 15/09 thầy chốt: "bỏ màn chọn app ... làm thế này giảm trải nghiệm người
+    // dùng. Chỉ cần kiểm tra kĩ 3 link riêng biệt." Bấm link là vào thẳng app,
+    // không màn đệm nào.
     expect(fs.existsSync(path.join(GOC, 'src/screens/ChonAppScreen.tsx'))).toBe(false)
-  })
-
-  it('ngõ cụt KHÔNG hỏi mật khẩu của thầy', () => {
-    expect(APP).toContain('!canChonApp(location.search, location.pathname) && laManThayQuanLy(')
+    expect(fs.existsSync(path.join(GOC, 'src/screens/DungLinkScreen.tsx'))).toBe(false)
+    expect(APP).not.toContain('khongCoVai')
+    expect(APP).not.toContain('canChonApp')
   })
 
   it('`_redirects` KHÔNG còn 302 đổi `/hs` thành `?vai=`', () => {

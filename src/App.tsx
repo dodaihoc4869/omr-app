@@ -9,8 +9,6 @@ import { catPhien, donPhien, khoiPhucPhien } from './lib/khoa-phien'
 import { datDangMoKhoa } from './lib/cap-nhat-app'
 import { phaiHoiLai, type BanGhiKhoa } from './lib/khoa-app'
 import { docDuongVao, laLinkAppCu, laManThayQuanLy } from './lib/vai-tro'
-import { canChonApp } from './lib/khoa-vai'
-import DungLinkScreen from './screens/DungLinkScreen'
 import KhoaMayThayScreen from './screens/KhoaMayThayScreen'
 import { ganCauNoi, goCauNoi } from './lib/cau-noi-ddh'
 import ExamTakeScreen from './screens/ExamTakeScreen'
@@ -109,13 +107,7 @@ function App() {
   const [laPhuHuynh] = useState(() => docDuongVao(location.search, location.pathname).vai === 'phuhuynh')
   // MẬT KHẨU MỞ APP (MATKHAUMOAPP.md). CHỈ hỏi ở app quản lý của thầy — vào
   // thi, báo cáo phụ huynh, link riêng cũ đều không bao giờ bị hỏi.
-  // `/` TRẦN ⇒ MÀN CHỌN APP, KHÔNG ĐOÁN VAI (thầy chốt 14/09: "đảm bảo 100%
-  // không nhảy lẫn lộn"). Xem `src/lib/khoa-vai.ts` để biết vì sao đoán là còn
-  // sai được. Mọi đường CÓ vai đều đi thẳng như cũ, không qua màn này.
-  const [khongCoVai] = useState(() => canChonApp(location.search, location.pathname))
-  // Màn chọn app KHÔNG hỏi mật khẩu: chưa vào app nào thì chưa có gì để khoá,
-  // mà hỏi ở đây là em học sinh gõ tên miền tay lại gặp ô mật khẩu của thầy.
-  const [canHoi] = useState(() => !canChonApp(location.search, location.pathname) && laManThayQuanLy(location.search, location.pathname))
+  const [canHoi] = useState(() => laManThayQuanLy(location.search, location.pathname))
   // 'dang_doc' = chưa biết máy này có mật khẩu chưa. KHÔNG dựng app trong lúc
   // đó: mục 5 đòi màn khoá hiện TRƯỚC khi bất kỳ dữ liệu học sinh nào được vẽ.
   const [khoa, setKhoa] = useState<'dang_doc' | 'chua_cap_quyen' | 'can_dat' | 'can_mo' | 'da_mo'>(() => (canHoi ? 'dang_doc' : 'da_mo'))
@@ -229,15 +221,6 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [linkCu, laPhieu, laHocSinh, laPhuHuynh])
 
-  // `/` TRẦN LÀ NGÕ CỤT, đứng TRƯỚC mọi màn khác. Không thể là phiếu, link cũ,
-  // cổng em hay cổng phụ huynh, nên không cướp đường của ai.
-  if (khongCoVai) {
-    return (
-      <ChanLoi o="Mở app">
-        <DungLinkScreen />
-      </ChanLoi>
-    )
-  }
   if (laPhieu) {
     return (
       <ChanLoi o="Phiếu kết quả">

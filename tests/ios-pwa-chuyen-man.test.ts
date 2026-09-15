@@ -33,18 +33,38 @@ describe('Sửa triệt để lỗi iOS thêm vào màn hình chính bị nhảy
     expect(docDuongVao('', '/phu-huynh').vai).toBe('phuhuynh')
   })
 
-  it('khi máy đã ghi nhận vai học sinh (hs), mở / trần không coi là màn thầy', () => {
+  // ĐỔI 15/09 — lỗi tệp này canh nay chặn ở CHỖ KHÁC, chắc hơn.
+  //
+  // Hai phép cũ đòi: máy đã nhớ vai 'hs'/'ph' thì `/` trần không phải màn thầy.
+  // Cách ấy dựa vào một khoá localStorage CHUNG GỐC cho cả ba app — máy mở hai
+  // cổng thì nó là của cổng mở sau, nên chính nó là cửa để hai cổng nhảy sang
+  // nhau (thầy bắt được 15/09).
+  //
+  // Nay: biểu tượng của em mở THẲNG `/hs` (`start_url: './hs'`) nên không còn
+  // rơi vào `/` trần; và `/` trần về app thầy thì cũng vô hại, vì app ấy đã
+  // khoá cứng sau mã bí mật. Ý ĐỊNH giữ nguyên — em không vào được app thầy —
+  // nhưng không còn phải đoán để đạt được điều đó.
+  it('biểu tượng của em mở thẳng cổng của em, không qua `/` trần', () => {
     nhoVaiDaDung('hs')
-    expect(vaiDaDung()).toBe('hs')
-    expect(laManThayQuanLy('', '/omr-app/')).toBe(false)
-    expect(laManThayQuanLy('', '/')).toBe(false)
+    expect(manifestHs.start_url).toBe('./hs')
+    expect(laManThayQuanLy('', '/hs')).toBe(false)
+    expect(laManThayQuanLy('', '/omr-app/hs')).toBe(false)
   })
 
-  it('khi máy đã ghi nhận vai phụ huynh (ph), mở / trần không coi là màn thầy', () => {
+  it('biểu tượng của phụ huynh cũng vậy', () => {
     nhoVaiDaDung('ph')
-    expect(vaiDaDung()).toBe('ph')
-    expect(laManThayQuanLy('', '/omr-app/')).toBe(false)
-    expect(laManThayQuanLy('', '/')).toBe(false)
+    expect(manifestPh.start_url).toBe('./ph')
+    expect(laManThayQuanLy('', '/ph')).toBe(false)
+    expect(laManThayQuanLy('', '/omr-app/ph')).toBe(false)
+  })
+
+  it('cờ `vaiDaDung` KHÔNG còn quyền đổi kết quả của `/` trần', () => {
+    nhoVaiDaDung('hs')
+    const a = laManThayQuanLy('', '/')
+    nhoVaiDaDung('ph')
+    expect(laManThayQuanLy('', '/')).toBe(a)
+    nhoVaiDaDung('gv')
+    expect(laManThayQuanLy('', '/')).toBe(a)
   })
 
   it('mở có tham số ?vai=gv vẫn luôn thắng cờ', () => {
