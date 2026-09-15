@@ -11,6 +11,7 @@ import { dongBoGioMayChu } from './gio-may-chu'
 import { chuanTenCa } from './ten-ca'
 import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
 import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi, xongNapDiaChi } from './may-chu-moi'
+import { layDiaChiMayChu } from './dia-chi-may-chu'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
 import { chamDiemMoi, chiTietCaMoi, danhSachEmMoi, dayCaMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, ghiLenBangMoi, luotCuaCaMoi, napDayDuCaMoi, suaCaMoi, tienDoEmMoi, type OSuaCa } from './day-ca-may-chu-moi'
 import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu } from './man-ca-may-chu-moi'
@@ -3050,8 +3051,9 @@ export async function hsDangNhapApi(scriptUrl: string, sbd: string, matKhau?: st
   namSinh?: string
   error?: string
 }> {
-  const ch = await layCauHinhMayChu()
-  const base = ch.BAT && ch.URL ? ch.URL : (scriptUrl ? scriptUrl.replace(/\/$/, '') : '')
+  // MỘT NGUỒN ĐỊA CHỈ. Chỗ gọi truyền rỗng cũng phải chạy: xem `dia-chi-may-chu.ts`.
+  const base = await layDiaChiMayChu(scriptUrl)
+  if (!base) return { ok: false, error: 'Chưa lấy được địa chỉ máy chủ. Em tải lại trang rồi thử lại.' } as any
   try {
     const res = await fetch(`${base}/hs/dang-nhap`, {
       method: 'POST',
@@ -3069,8 +3071,9 @@ export async function hsDatMatKhauApi(scriptUrl: string, sbd: string, matKhauMoi
   message?: string
   error?: string
 }> {
-  const ch = await layCauHinhMayChu()
-  const base = ch.BAT && ch.URL ? ch.URL : (scriptUrl ? scriptUrl.replace(/\/$/, '') : '')
+  // MỘT NGUỒN ĐỊA CHỈ. Chỗ gọi truyền rỗng cũng phải chạy: xem `dia-chi-may-chu.ts`.
+  const base = await layDiaChiMayChu(scriptUrl)
+  if (!base) return { ok: false, error: 'Chưa lấy được địa chỉ máy chủ. Em tải lại trang rồi thử lại.' } as any
   try {
     const res = await fetch(`${base}/hs/dat-mat-khau`, {
       method: 'POST',
@@ -3089,8 +3092,9 @@ export async function resetMatKhauHsApi(scriptUrl: string, secret: string, sbd: 
   matKhauMoi?: string
   error?: string
 }> {
-  const ch = await layCauHinhMayChu()
-  const base = ch.BAT && ch.URL ? ch.URL : (scriptUrl ? scriptUrl.replace(/\/$/, '') : '')
+  // MỘT NGUỒN ĐỊA CHỈ. Chỗ gọi truyền rỗng cũng phải chạy: xem `dia-chi-may-chu.ts`.
+  const base = await layDiaChiMayChu(scriptUrl)
+  if (!base) return { ok: false, error: 'Chưa lấy được địa chỉ máy chủ. Em tải lại trang rồi thử lại.' } as any
   try {
     const res = await fetch(`${base}/goi`, {
       method: 'POST',
@@ -3127,8 +3131,9 @@ export async function hsLichSuCaApi(scriptUrl: string, sbd: string): Promise<{
   }>
   error?: string
 }> {
-  const ch = await layCauHinhMayChu()
-  const base = ch.BAT && ch.URL ? ch.URL : (scriptUrl ? scriptUrl.replace(/\/$/, '') : '')
+  // MỘT NGUỒN ĐỊA CHỈ. Chỗ gọi truyền rỗng cũng phải chạy: xem `dia-chi-may-chu.ts`.
+  const base = await layDiaChiMayChu(scriptUrl)
+  if (!base) return { ok: false, error: 'Chưa lấy được địa chỉ máy chủ. Em tải lại trang rồi thử lại.' } as any
   try {
     const res = await fetch(`${base}/hs/lich-su`, {
       method: 'POST',
@@ -3158,8 +3163,9 @@ export async function hsBtvnApi(scriptUrl: string, sbd: string): Promise<{
   }>
   error?: string
 }> {
-  const ch = await layCauHinhMayChu()
-  const base = ch.BAT && ch.URL ? ch.URL : (scriptUrl ? scriptUrl.replace(/\/$/, '') : '')
+  // MỘT NGUỒN ĐỊA CHỈ. Chỗ gọi truyền rỗng cũng phải chạy: xem `dia-chi-may-chu.ts`.
+  const base = await layDiaChiMayChu(scriptUrl)
+  if (!base) return { ok: false, error: 'Chưa lấy được địa chỉ máy chủ. Em tải lại trang rồi thử lại.' } as any
   try {
     const res = await fetch(`${base}/hs/btvn`, {
       method: 'POST',
@@ -3197,8 +3203,9 @@ export async function hsCauSaiApi(scriptUrl: string, sbd: string, dsMaCa: string
   }>
   error?: string
 }> {
-  const ch = await layCauHinhMayChu()
-  const base = ch.BAT && ch.URL ? ch.URL : (scriptUrl ? scriptUrl.replace(/\/$/, '') : '')
+  // MỘT NGUỒN ĐỊA CHỈ. Chỗ gọi truyền rỗng cũng phải chạy: xem `dia-chi-may-chu.ts`.
+  const base = await layDiaChiMayChu(scriptUrl)
+  if (!base) return { ok: false, error: 'Chưa lấy được địa chỉ máy chủ. Em tải lại trang rồi thử lại.' } as any
   try {
     const res = await fetch(`${base}/hs/cau-sai`, {
       method: 'POST',
@@ -3224,8 +3231,9 @@ export async function thanThuDocApi(scriptUrl: string, sbd: string): Promise<{
   capNhatLuc?: string
   error?: string
 }> {
-  const ch = await layCauHinhMayChu()
-  const base = ch.BAT && ch.URL ? ch.URL : (scriptUrl ? scriptUrl.replace(/\/$/, '') : '')
+  // MỘT NGUỒN ĐỊA CHỈ. Chỗ gọi truyền rỗng cũng phải chạy: xem `dia-chi-may-chu.ts`.
+  const base = await layDiaChiMayChu(scriptUrl)
+  if (!base) return { ok: false, error: 'Chưa lấy được địa chỉ máy chủ. Em tải lại trang rồi thử lại.' } as any
   try {
     const res = await fetch(`${base}/hs/than-thu`, {
       method: 'POST',
@@ -3247,8 +3255,9 @@ export async function thanThuGhiApi(scriptUrl: string, sbd: string, hoSo: unknow
   tongExp?: number
   error?: string
 }> {
-  const ch = await layCauHinhMayChu()
-  const base = ch.BAT && ch.URL ? ch.URL : (scriptUrl ? scriptUrl.replace(/\/$/, '') : '')
+  // MỘT NGUỒN ĐỊA CHỈ. Chỗ gọi truyền rỗng cũng phải chạy: xem `dia-chi-may-chu.ts`.
+  const base = await layDiaChiMayChu(scriptUrl)
+  if (!base) return { ok: false, error: 'Chưa lấy được địa chỉ máy chủ. Em tải lại trang rồi thử lại.' } as any
   try {
     const res = await fetch(`${base}/hs/than-thu-ghi`, {
       method: 'POST',

@@ -523,3 +523,70 @@ có thật của bất kỳ ca nào. Với `dsCauSai` rỗng thì vòng nạp kh
 - [!] Ca thử Test2–Test7 còn `trang_thai='mo'`.
 - [!] `TRAN_CAU_KHAC_PHUC = 200` chưa phải trần thật của kho (157 tờ) — cần cột
   `dang_ma` trên `cau_hoi` và một lần đánh chỉ mục lại.
+
+---
+
+# SỔ VIỆC — 15/09 lượt 14 · ĐỊA CHỈ MÁY CHỦ MỘT NGUỒN
+
+- [x] "Nút khắc phục ngay 9 câu sai bấm ko phải hồi trên điện thoại của học
+  sinh, trên chrome máy tính vẫn bấm được. Sửa lại triệt để và đồng bộ hết mọi
+  báo cáo, mọi app, mọi chỗ"  | bằng chứng: `npx vitest run tests/dia-chi-may-chu-mot-nguon-1509.test.ts` → 20/20 đạt
+- [x] Nghiệm thu 7 cửa  | bằng chứng: bảng cuối mục này
+- [ ] Phát hành  | bằng chứng: (chưa có)
+
+## Đo thật TRƯỚC khi sửa
+
+Gọi thẳng máy chủ, đúng em ấy, đúng ca ấy:
+
+```
+POST https://omr.ttadodaihoc.workers.dev/hs/cau-sai
+     {"sbd":"12121212","dsMaCa":["457868"]}
+→ 200 · ok:true · 9 câu · 16.649 byte · 1.257 ms
+```
+
+Máy chủ không hỏng, gói nhỏ, không có gì để chậm. Lỗi nằm ở MÁY EM.
+
+Mở app bằng một trình duyệt SẠCH (chưa từng vào app). IndexedDB
+`omr-exam/settings` có ĐÚNG MỘT khoá: `mayChuMoi`. **Không có `scriptUrl`.**
+
+## Nguyên nhân gốc
+
+`scriptUrl` là một giá trị CHẾT mà vẫn canh cửa.
+
+- 12/09 cắt hẳn Google ⇒ khoá `scriptUrl` bị gỡ khỏi `public/cau-hinh.json`,
+  `postJson` chặn cứng mọi địa chỉ Google.
+- `loadScriptUrlHoacMacDinh()` chạy MỘT LẦN lúc màn mở. Thua cuộc đua với lượt
+  nạp địa chỉ ở `main.tsx` thì nó đi tìm khoá `scriptUrl` trong `cau-hinh.json`
+  — khoá đã gỡ ⇒ rỗng. **Và không ai thử lại cả phiên.**
+- Máy tính thầy còn khoá cũ trong IndexedDB từ trước 12/09 ⇒ luôn khác rỗng ⇒
+  mọi cổng canh đều lọt. Điện thoại em sạch, lại chậm hơn nên hay thua cuộc đua.
+- Hai màn báo cáo canh đúng giá trị chết ấy:
+  `if (!baiThi.maCa || !scriptUrl) return` ⇒ trên máy em lượt gọi `hsCauSai`
+  KHÔNG BAO GIỜ được bắn đi. Không phải nút hỏng — nút không có gì để mở.
+
+Cùng họ với vụ 60-vs-579 ngày 14/09: màn phụ thuộc một giá trị cất trong máy
+đang mở. Chữa bằng cách bỏ hẳn sự phụ thuộc, không phải đoán giá trị giỏi hơn.
+
+## Đã sửa
+
+| Tệp | Sửa gì |
+|---|---|
+| `src/lib/dia-chi-may-chu.ts` (mới) | `layDiaChiMayChu()` — bốn đường về một địa chỉ: cấu hình máy → gợi ý → chờ lượt nạp khởi động → tải thẳng `cau-hinh.json`. Cấm ném lỗi, cấm nhớ cái rỗng, cấm trả địa chỉ Google |
+| `src/lib/exam-api.ts` | cả 8 hàm của học sinh/phụ huynh dùng chung nguồn ấy; không lấy được địa chỉ thì trả lỗi có chữ, không im lặng |
+| `src/lib/exam-db.ts` | `loadScriptUrl` hết ném lỗi khi IndexedDB hỏng; `loadScriptUrlHoacMacDinh` hết đi tìm khoá đã chết |
+| `src/components/BaoCaoCaThiHocSinhModal.tsx` | bỏ hai cổng `!scriptUrl`; giữ và hiện lý do khi gọi hỏng |
+| `src/components/BaoCaoCaThiPhuHuynhModal.tsx` | như trên |
+| `src/screens/ParentPortalScreen.tsx` | bỏ cổng `if (scriptUrl)`; phân biệt "không sai câu nào" với "gọi hỏng" |
+| `tests/dia-chi-may-chu-mot-nguon-1509.test.ts` | 20 phép: 10 phép chạy thật bốn đường + ba điều cấm, 10 phép soi mã chạy cả 3 app |
+
+## Bảy cửa — 15/09 08:07
+
+| Cửa | Lệnh | Kết quả | Đạt/Trượt |
+|---|---|---|---|
+| Kiểu app | `npx tsc -b` | mã thoát 0 | Đạt |
+| Kiểu máy chủ | `npx tsc -p server/tsconfig.json --noEmit` | mã thoát 0 | Đạt |
+| Phép kiểm | `npx vitest run --shard=N/8` | 276 tệp · 4.103 phép đạt | Đạt |
+| Mã màu | `npm run check:mau` | không có # ngoài tokens.css | Đạt |
+| Hiển thị 360px | `node scripts/kiem-13.mjs` | ĐẠT 18/18 | Đạt |
+| Service worker | `node scripts/kiem-sw.mjs` | ĐẠT 10/10 | Đạt |
+| Dựng bản | `npx vite build` | 170 mục precache · mảnh chính 486 KB | Đạt |

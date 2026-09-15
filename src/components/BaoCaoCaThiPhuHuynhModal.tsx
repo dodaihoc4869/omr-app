@@ -73,6 +73,8 @@ export default function BaoCaoCaThiPhuHuynhModal({
   const [dsLichSu, setDsLichSu] = useState<CaLichSu[]>([])
   const [dsCauSai, setDsCauSai] = useState<any[]>([])
   const [dangTaiCauSai, setDangTaiCauSai] = useState(false)
+  /** Vì sao chưa lấy được danh sách — hiện ra, cấm nuốt lỗi im lặng. */
+  const [loiCauSai, setLoiCauSai] = useState('')
   const [tabPhanTich, setTabPhanTich] = useState<'tong_quan' | 'nhan_thuc' | 'cau_sai' | 'tien_bo'>('tong_quan')
   const [hienModalKhacPhuc, setHienModalKhacPhuc] = useState(false)
 
@@ -80,7 +82,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
   useEffect(() => {
     let active = true
     async function napLichSu() {
-      if (!sbd || !scriptUrl) return
+      if (!sbd) return
       try {
         const res = await hsLichSuCaApi(scriptUrl, sbd)
         if (active && res && res.ok && Array.isArray(res.items)) {
@@ -97,16 +99,33 @@ export default function BaoCaoCaThiPhuHuynhModal({
   // Tải danh sách chi tiết các câu con làm sai trong ca này
   useEffect(() => {
     let active = true
+  // CẤM CANH CỬA BẰNG `scriptUrl`.
+  //
+  // Thầy báo 15/09: nút "KHẮC PHỤC NGAY 9 CÂU SAI" bấm không phản hồi trên điện
+  // thoại em, Chrome máy tính thì được. Đo thật: máy chủ trả đủ 9 câu, 16.649
+  // byte, 1.257 ms — không hỏng gì. Chết ở ĐÂY: `scriptUrl` rỗng trên máy em
+  // (khoá ấy bị gỡ khỏi `cau-hinh.json` từ 12/09) nên lượt gọi không bao giờ
+  // được bắn đi; máy thầy còn giữ khoá cũ trong IndexedDB nên luôn lọt.
+  // Nay địa chỉ do `layDiaChiMayChu()` lo (xem `src/lib/dia-chi-may-chu.ts`),
+  // màn không cần biết địa chỉ nữa.
     async function napCauSai() {
-      if (!baiThi.maCa || !scriptUrl) return
+      if (!baiThi.maCa) return
       setDangTaiCauSai(true)
+      setLoiCauSai('')
       try {
         const res = await hsCauSaiApi(scriptUrl, sbd, [baiThi.maCa])
-        if (active && res && res.ok && Array.isArray(res.items)) {
+        if (!active) return
+        if (res && res.ok && Array.isArray(res.items)) {
           setDsCauSai(res.items)
+        } else {
+          setDsCauSai([])
+          setLoiCauSai(res?.error || 'Máy chủ không trả về danh sách câu sai')
         }
-      } catch {
-        if (active) setDsCauSai([])
+      } catch (e) {
+        if (active) {
+          setDsCauSai([])
+          setLoiCauSai(e instanceof Error ? e.message : 'Không kết nối được máy chủ')
+        }
       } finally {
         if (active) setDangTaiCauSai(false)
       }
@@ -637,7 +656,9 @@ export default function BaoCaoCaThiPhuHuynhModal({
             </button>
           ) : (
             <span className="text-xs text-slate-500 dark:text-slate-400 text-right">
-              {dangTaiCauSai ? 'Đang tải danh sách câu sai…' : 'Ca này con không có câu nào cần khắc phục'}
+              {dangTaiCauSai
+                ? 'Đang tải danh sách câu sai…'
+                : loiCauSai || 'Ca này con không có câu nào cần khắc phục'}
             </span>
           )}
         </footer>

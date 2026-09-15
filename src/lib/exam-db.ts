@@ -323,13 +323,19 @@ export async function saveCauHinhMayChu(c: Partial<CauHinhMayChu>): Promise<CauH
  * hình. Nên khi ô cũ trống mà máy chủ mới ĐÃ có địa chỉ, trả địa chỉ ấy: cổng
  * chặn giữ nguyên ý nghĩa, và thầy không phải nhập lại một cái link đã bỏ. */
 export async function loadScriptUrl(): Promise<string> {
-  const db = await getDb()
-  const cu = (await db.get(STORE_SETTINGS, 'scriptUrl')) || ''
-  if (cu) return cu
+  // `getDb()` nằm NGOÀI try ở bản cũ: IndexedDB hỏng (máy em ở chế độ riêng tư,
+  // hết chỗ) là hàm này ném lỗi, chỗ gọi `.catch(() => '')` nuốt mất, và màn
+  // ngồi với một địa chỉ rỗng suốt phiên.
   try {
-    const { layCauHinhMayChu } = await import('./may-chu-moi')
-    const ch = await layCauHinhMayChu()
-    return String(ch.URL ?? '').trim()
+    const db = await getDb()
+    const cu = (await db.get(STORE_SETTINGS, 'scriptUrl')) || ''
+    if (cu) return cu
+  } catch {
+    // còn đường địa chỉ chung bên dưới
+  }
+  try {
+    const { layDiaChiMayChu } = await import('./dia-chi-may-chu')
+    return await layDiaChiMayChu()
   } catch {
     return ''
   }
@@ -373,16 +379,21 @@ export async function loadDiaChiMayChuMoiChoEm(): Promise<string> {
   }
 }
 
+/**
+ * MỘT NGUỒN ĐỊA CHỈ — xem `src/lib/dia-chi-may-chu.ts`.
+ *
+ * Bản cũ tải `cau-hinh.json` rồi tìm khoá `scriptUrl`. Khoá ấy BỊ GỠ từ 12/09
+ * lúc cắt hẳn Google, nên hàm này luôn trả về rỗng trên mọi máy chưa từng lưu
+ * khoá — tức mọi điện thoại học sinh. Máy thầy còn khoá cũ trong IndexedDB nên
+ * không ai thấy. Đó là nguyên nhân gốc vụ 15/09 "nút khắc phục không phản hồi
+ * trên điện thoại, máy tính vẫn được".
+ */
 export async function loadScriptUrlHoacMacDinh(): Promise<string> {
   const daLuu = await loadScriptUrl()
   if (daLuu) return daLuu
   try {
-    const res = await fetch(`${import.meta.env.BASE_URL}cau-hinh.json`, { cache: 'no-cache' })
-    if (!res.ok) return ''
-    const cfg = (await res.json()) as { scriptUrl?: string }
-    const url = (cfg.scriptUrl || '').trim()
-    if (url) await saveScriptUrl(url)
-    return url
+    const { layDiaChiMayChu } = await import('./dia-chi-may-chu')
+    return await layDiaChiMayChu()
   } catch {
     return ''
   }

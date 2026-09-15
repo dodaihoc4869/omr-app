@@ -249,24 +249,22 @@ export default function ParentPortalScreen() {
     setThongBaoMom(null)
 
     try {
+      // CẤM CANH CỬA BẰNG `scriptUrl` — xem `src/lib/dia-chi-may-chu.ts`.
+      // Máy phụ huynh chưa từng lưu khoá ấy, canh theo nó là không bao giờ gọi.
       let dsCauSai: any[] = []
-      if (scriptUrl) {
-        try {
-          const res = await hsCauSaiApi(scriptUrl, sbdHienTai, [])
-          if (res && res.ok && Array.isArray(res.items)) {
-            dsCauSai = res.items
-          }
-        } catch {
-          dsCauSai = []
-        }
+      let loiGoi = ''
+      try {
+        const res = await hsCauSaiApi(scriptUrl, sbdHienTai, [])
+        if (res && res.ok && Array.isArray(res.items)) dsCauSai = res.items
+        else loiGoi = res?.error || 'Máy chủ không trả về danh sách câu sai'
+      } catch (e) {
+        loiGoi = e instanceof Error ? e.message : 'Không kết nối được máy chủ'
       }
 
       if (dsCauSai.length === 0) {
-        setThongBaoMom({
-          loai: 'loi',
-          chu: 'Con chưa có câu sai nào trong các ca thi đã hoàn thành!',
-        })
-        alert('Con chưa có câu sai nào trong các ca thi đã hoàn thành!')
+        // Rỗng vì KHÔNG SAI CÂU NÀO và rỗng vì GỌI HỎNG là hai chuyện khác nhau.
+        const chu = loiGoi || 'Con chưa có câu sai nào trong các ca thi đã hoàn thành!'
+        setThongBaoMom({ loai: 'loi', chu })
         return
       }
 
