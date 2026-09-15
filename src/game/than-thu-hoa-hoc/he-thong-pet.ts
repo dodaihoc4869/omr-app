@@ -6,6 +6,8 @@
  */
 
 import { CAP_TOI_DA, type CapTienHoa } from './hinh-thai'
+import { heSoTienHoa } from './can-bang-thap'
+import { vaLichSu, type DongLichSuThap } from './rut-cau-thap'
 import {
   EXP_BAN_DAU, thanhExp, SUC_CHUA_ONG,
   soExpRong, vaSoExp, type SoExpTheoNguon,
@@ -160,6 +162,14 @@ export interface HoSoThanThuLuu {
   /** Sổ cộng dồn EXP theo năm nguồn — để dựng bảng tóm tắt cho em xem. */
   soExp: SoExpTheoNguon
   tangThapCaoNhat: number
+  /**
+   * SỔ CÂU ĐÃ HỎI Ở THÁP — sống qua mọi lượt leo và mọi máy.
+   *
+   * Thầy báo 15-09: *"số câu chơi ở các tầng lặp lại nhiều"*. Bản cũ chỉ nhớ
+   * trong MỘT lượt leo, đóng ra mở lại là quên hết. Nay nằm trong hồ sơ nên đi
+   * theo em sang điện thoại.
+   */
+  lichSuThap: DongLichSuThap[]
   /** Số câu sai đã thanh tẩy — nguồn EXP thật, có hiện ra màn. */
   soCauDaThanhTay: number
   danhHieuHienTai: string
@@ -202,6 +212,7 @@ export function vaHoSo(tho: unknown, idChon = ''): HoSoThanThuLuu {
     expToiDa: thanhExp(capDo),
     capTienHoa: capDo as CapTienHoa,
     tangThapCaoNhat: Math.max(1, Math.round(so('tangThapCaoNhat', 1))),
+    lichSuThap: vaLichSu((tho as Record<string, unknown> | null)?.lichSuThap),
     soCauDaThanhTay: Math.max(0, Math.round(so('soCauDaThanhTay', 0))),
     danhHieuHienTai: chuoi('danhHieuHienTai', md.danhHieuHienTai),
     ngayNhanTrung: chuoi('ngayNhanTrung', md.ngayNhanTrung),
@@ -219,6 +230,7 @@ export function layHoSoThanThuMacDinh(idChon = ''): HoSoThanThuLuu {
     expToiDa: EXP_BAN_DAU,
     capTienHoa: 1,
     tangThapCaoNhat: 1,
+    lichSuThap: [],
     soCauDaThanhTay: 0,
     danhHieuHienTai: 'Tập Sự Nguyên Tố',
     // Mốc chọn thú, để biết em chọn lúc nào. Rỗng = chưa chọn.
@@ -245,12 +257,19 @@ export function tinhLucChienPet(params: {
   // Bịa ở đây nghĩa là màn hình in "Điểm trung bình: 7.00đ" cho em chưa thi lần nào.
   const coDiem = diemTrungBinh !== null && Number.isFinite(diemTrungBinh)
   const heSoHoc = 1 + (coDiem ? (diemTrungBinh! / 10) * 0.4 : 0) + tyLeBtvn * 0.3
-  // 12 hình thái: hệ số dàn đều thay vì ba nấc 1.0 / 1.5 / 2.2
-  const heSoTienHoa = 1 + (Math.min(CAP_TOI_DA, Math.max(1, capTienHoa)) - 1) * 0.25
+  /**
+   * ĐƯỜNG 120 CẤP bắt buộc đổi hệ số này.
+   *
+   * Cũ `1 + (cap − 1) × 0,25` đúng với 12 cấp (ra ×3,75) nhưng với 120 cấp ra
+   * ×30,75 — thú một phát giết mọi trùm, tháp mất sạch sức nặng. Công thức mới
+   * nằm trong `can-bang-thap.ts` để máu trùm và chỉ số thú dùng CHUNG một chỗ,
+   * không phải hai công thức cạnh nhau rồi lệch nhau.
+   */
+  const heSoTH = heSoTienHoa(capTienHoa)
 
-  const mau = Math.round((200 + capDo * 35) * heSoHoc * heSoTienHoa * bu)
-  const cong = Math.round((35 + capDo * 8) * heSoHoc * heSoTienHoa * bu)
-  const giap = Math.round((15 + capDo * 4) * heSoHoc * heSoTienHoa * bu)
+  const mau = Math.round((160 + capDo * 22) * heSoHoc * heSoTH * bu)
+  const cong = Math.round((30 + capDo * 6) * heSoHoc * heSoTH * bu)
+  const giap = Math.round((12 + capDo * 3) * heSoHoc * heSoTH * bu)
   const cp = Math.round((mau / 10 + cong * 2 + giap * 1.5) * 10)
 
   return { cp, mau, cong, giap }

@@ -27,31 +27,43 @@
 import { CAP_TOI_DA, type CapTienHoa } from './hinh-thai'
 
 /**
- * Thanh EXP của cấp 1 — **300**.
+ * ĐƯỜNG EXP 120 CẤP — BA ĐOẠN, khớp đúng hai mốc thầy chốt 15-09:
+ * *"độ khó phải rõ ràng từ cấp số 10, từ số 13 trở đi là phải lâu mới lên
+ * được cấp rồi"*.
  *
- * Chọn 300 vì đó là mốc lên cấp 2 bằng **một ca thi 5 điểm**, hoặc hai bài tập,
- * hoặc ba câu sai sửa xong. Em làm xong buổi học đầu tiên là thấy thanh nhảy —
- * đó là cái móc giữ em quay lại.
+ *   cấp 1–9    120 × 1,10^(c−1)        khởi động nhanh: 120 → 260
+ *   cấp 10–12  … × 1,55^(c−9)          DỐC HẲN: 400 → 620 → 960
+ *   cấp 13–119 … × 1,037^(c−12)        LÂU DẦN: 990 → … → 46 740
+ *
+ * Tổng tới cấp 120 = 1 286 590 EXP (đường 12 cấp cũ chỉ 15 120).
+ *
+ * MỘT CHỦ Ý PHẢI GIỮ: em nào đang tối đa cấp 12 hôm nay, sau lượt reset leo
+ * lại tới cấp 12 chỉ tốn 3 610 EXP — NHANH HƠN bây giờ (15 120). Reset không
+ * được làm em nản ngay tuần đầu; đường dài nằm ở phía sau cấp 13.
  */
-export const EXP_BAN_DAU = 300
+export const EXP_BAN_DAU = 120
+
+/** Hệ số ba đoạn. Đổi ba số này là đổi cả nhịp game — đọc kỹ bảng trên trước. */
+export const HE_SO_DOAN_DAU = 1.10
+export const HE_SO_DOAN_DOC = 1.55
+export const HE_SO_DOAN_DAI = 1.037
+/** Cấp bắt đầu đoạn dốc, và cấp bắt đầu đoạn dài. */
+export const CAP_DOC = 10
+export const CAP_DAI = 13
 
 /**
- * Mỗi cấp thanh dài thêm **28%**.
- *
- * Trước là 18% — thanh gần như phẳng, cấp 11 chỉ đắt gấp 5 lần cấp 1, nên đoạn
- * cuối không có sức nặng. Với 28%: cấp 1 tốn 300, cấp 11 tốn 3 540 (gấp gần 12
- * lần). Năm cấp đầu chỉ chiếm 17% cả đường, còn ba cấp cuối chiếm 56% — vào
- * nhanh, về chậm, đúng nhịp một game nuôi thú.
- */
-export const HE_SO_DAI_THEM = 1.28
-
-/**
- * Thanh EXP của một cấp. Cấp 12 là tối đa nên trả 0 — hết đường lên.
+ * Thanh EXP của một cấp. Cấp 120 là tối đa nên trả 0 — hết đường lên.
  */
 export function thanhExp(cap: number): number {
   if (cap >= CAP_TOI_DA) return 0
   const c = Math.max(1, Math.round(cap))
-  return Math.round((EXP_BAN_DAU * Math.pow(HE_SO_DAI_THEM, c - 1)) / 10) * 10
+  const nenDau = EXP_BAN_DAU * Math.pow(HE_SO_DOAN_DAU, CAP_DOC - 2)
+  const nenDoc = nenDau * Math.pow(HE_SO_DOAN_DOC, CAP_DAI - CAP_DOC)
+  let v: number
+  if (c < CAP_DOC) v = EXP_BAN_DAU * Math.pow(HE_SO_DOAN_DAU, c - 1)
+  else if (c < CAP_DAI) v = nenDau * Math.pow(HE_SO_DOAN_DOC, c - CAP_DOC + 1)
+  else v = nenDoc * Math.pow(HE_SO_DOAN_DAI, c - CAP_DAI + 1)
+  return Math.round(v / 10) * 10
 }
 
 /**
@@ -62,14 +74,13 @@ export function thanhExp(cap: number): number {
  *   · ỐNG NGHIỆM  — EXP đã kiếm, chưa dùng. Chỉ đầy bằng việc học thật.
  *   · THANH CẤP ĐỘ — EXP đã nạp vào thú. Chỉ đầy bằng cách rót từ ống sang.
  *
- * Nút nạp KHÔNG sinh ra EXP, nó chỉ chuyển chỗ. Đây là điểm phải giữ: bể thứ
- * hai không được mở thêm một đường vào nào ngoài cái ống.
+ * Nút nạp KHÔNG sinh ra EXP, nó chỉ chuyển chỗ.
  *
- * Trần 2 000 chọn để ống luôn rót đủ ít nhất một cấp ở mọi mức (cấp đắt nhất là
- * 3 540, rót hai lần là qua). Ống đầy thì CHẶN quy đổi thêm và báo cho em nạp
- * trước — không bao giờ làm mất EXP em đã kiếm.
+ * Trần nâng 2 000 → 50 000 cùng đường 120 cấp: cấp đắt nhất là 46 740, ống
+ * phải rót nổi ít nhất một cấp ở MỌI mức, nếu không thì tới cuối đường em rót
+ * ba lần mới lên nổi một cấp và thanh trông như đứng yên.
  */
-export const SUC_CHUA_ONG = 2000
+export const SUC_CHUA_ONG = 50000
 
 /** Tổng EXP phải kiếm để đi từ cấp 1 tới cấp 12. */
 export function tongExpToiDinh(): number {
@@ -133,7 +144,18 @@ export const NGUON_EXP = {
    * Và một tầng tháp đáng ít hơn một câu sai sửa xong là có chủ ý: tầng tháp là
    * một câu bất kỳ, câu sai là LỖI CỦA CHÍNH EM được sửa.
    */
-  leoThap: (tang: number) => 30 + Math.max(0, Math.round(tang)) * 6,
+  leoThap: (tang: number) => Math.round((25 + Math.max(0, Math.round(tang)) * 0.9) / 5) * 5,
+  /**
+   * Leo LẠI một tầng đã hạ — chỉ 12%.
+   *
+   * Vì sao phải có: 999 tầng với công thức cũ `30 + 6×tầng` in ra 3 026 970
+   * EXP, gấp 200 lần cả đường 12 cấp. Tháp thành máy in, khỏi cần thi khỏi cần
+   * nộp bài. Nay lần đầu hạ một tầng mới trả đủ, cày lại tầng cũ gần như không
+   * được gì — muốn thêm EXP thì phải leo CAO HƠN, tức phải trả lời đúng câu
+   * khó hơn.
+   */
+  leoThapLai: (tang: number) =>
+    Math.max(1, Math.floor((Math.round((25 + Math.max(0, Math.round(tang)) * 0.9) / 5) * 5) * 0.12)),
   /** Thanh tẩy MỘT câu sai — sửa xong một câu mình từng làm sai. */
   suaCauSai: () => 100,
   /** Nộp đủ một bài tập về nhà. */
@@ -149,7 +171,8 @@ export const NGUON_EXP = {
 
 /** Nhãn hiện cho học sinh — phải khớp đúng con số ở trên, không hứa suông. */
 export const BANG_NGUON_EXP: readonly { viec: string; thuong: string }[] = [
-  { viec: 'Hạ trùm một tầng tháp', thuong: '30 + 6 × số tầng' },
+  { viec: 'Hạ trùm một tầng tháp MỚI', thuong: '25 + 0,9 × số tầng' },
+  { viec: 'Leo lại tầng đã hạ', thuong: 'chỉ 12%' },
   { viec: 'Thanh tẩy một câu sai', thuong: '100 EXP' },
   { viec: 'Nộp đủ một bài tập về nhà', thuong: '200 EXP' },
   { viec: 'Thi xong một ca', thuong: '60 EXP mỗi điểm' },
@@ -163,7 +186,7 @@ export interface KetQuaNhanExp {
   expToiDa: number
   /** Lên được mấy cấp trong lần nhận này. */
   soCapLen: number
-  /** Đã chạm trần cấp 12 chưa. */
+  /** Đã chạm trần cấp 120 chưa. */
   daToiDinh: boolean
 }
 

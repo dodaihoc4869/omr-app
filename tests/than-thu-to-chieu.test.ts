@@ -11,6 +11,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { thanThuChoToChieu, veThanThuRaAnh, veThanThu3DRaAnh } from '../src/lib/anh-than-thu'
 import { taoHtmlMayChieu, type OBang } from '../src/lib/html-may-chieu'
+import { layHinhThai } from '../src/game/than-thu-hoa-hoc/hinh-thai'
 import { DANH_SACH_THAN_THU } from '../src/game/than-thu-hoa-hoc/he-thong-pet'
 
 const HO_SO_THAT = {
@@ -72,7 +73,9 @@ describe('Đọc hồ sơ cho tờ chiếu', () => {
     expect(t).not.toBeNull()
     expect(t!.ten).toBe(DANH_SACH_THAN_THU['loi_kim']!.ten)
     expect(t!.capDo).toBe(6)
-    expect(t!.hinhThai).toBe('Thức Tỉnh Hào Quang')
+    // Thang 120 cấp dịch mốc: cấp 6 nay là bậc "Sinh Đuôi" (mốc cấp 5),
+    // "Thức Tỉnh Hào Quang" lùi về mốc cấp 11.
+    expect(t!.hinhThai).toBe(layHinhThai(6).ten)
     expect(t!.tangThapCaoNhat).toBe(14)
     expect(t!.soCauDaThanhTay).toBe(27)
     expect(t!.he).not.toBe('')

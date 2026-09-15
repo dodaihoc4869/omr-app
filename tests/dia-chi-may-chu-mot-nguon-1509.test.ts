@@ -136,10 +136,15 @@ const CONG_PH = boChuThich(doc('src/screens/ParentPortalScreen.tsx'))
 const DB = boChuThich(doc('src/lib/exam-db.ts'))
 
 describe('Mọi lượt gọi của học sinh và phụ huynh dùng chung một nguồn địa chỉ', () => {
-  it('8 hàm API không còn tự suy địa chỉ từ `scriptUrl`', () => {
+  it('MỌI hàm API đều đi qua một nguồn địa chỉ, không hàm nào tự suy', () => {
     expect(API).not.toContain('ch.BAT && ch.URL')
+    // Đếm THEO SỐ HÀM ĐANG CÓ, không cắm cứng 8: thêm một lệnh mới (15-09 thêm
+    // `hsCauDaThiApi` cho tháp) là con số cũ sai ngay, mà cái phải giữ là
+    // "không hàm nào tự suy địa chỉ", không phải "đúng tám hàm".
     const dung = API.split('await layDiaChiMayChu(scriptUrl)').length - 1
-    expect(dung).toBe(8)
+    expect(dung).toBeGreaterThanOrEqual(8)
+    // Không còn chỗ nào dựng địa chỉ bằng tay từ `scriptUrl`.
+    expect(API).not.toMatch(/scriptUrl\.replace\(/)
   })
 
   it('không lấy được địa chỉ thì NÓI RA, không trả rỗng im lặng', () => {

@@ -33,9 +33,31 @@ export interface HoSoThanThuMayChu {
   danhHieuHienTai: string
   ngayNhanTrung: string
   ngayChonThu: string
+  /**
+   * SỔ CÂU ĐÃ HỎI Ở THÁP. Chỉ `qid` + hai con số — KHÔNG có nội dung câu,
+   * không tên, không điểm. Tầng đỏ dữ liệu vẫn nguyên.
+   */
+  lichSuThap: { qid: string; lanCuoi: number; soLanHoi: number }[]
 }
 
 export const NGUON_EXP_HOP_LE = ['caThi', 'btvn', 'mom', 'leoThap', 'sanBoss'] as const
+
+/** Trộn hai sổ tháp — lấy `max` cả hai trường, giữ 300 dòng mới nhất. */
+export function tronSoThap(
+  a: readonly { qid: string; lanCuoi: number; soLanHoi: number }[] = [],
+  b: readonly { qid: string; lanCuoi: number; soLanHoi: number }[] = [],
+): { qid: string; lanCuoi: number; soLanHoi: number }[] {
+  const m = new Map<string, { qid: string; lanCuoi: number; soLanHoi: number }>()
+  for (const d of [...(a ?? []), ...(b ?? [])]) {
+    const cu = m.get(d.qid)
+    m.set(d.qid, cu === undefined ? { ...d } : {
+      qid: d.qid,
+      lanCuoi: Math.max(cu.lanCuoi, d.lanCuoi),
+      soLanHoi: Math.max(cu.soLanHoi, d.soLanHoi),
+    })
+  }
+  return [...m.values()].sort((x, y) => y.lanCuoi - x.lanCuoi).slice(0, 300)
+}
 
 export function tongExpCuaThu(h: HoSoThanThuMayChu): number {
   let t = 0
@@ -86,6 +108,9 @@ export function tronHoSoThu(
     // khống. Ngoại lệ: cùng cấp thì chưa bên nào nạp, lấy ống đầy hơn.
     khoExp: nen.capDo === kia.capDo ? Math.max(nen.khoExp, kia.khoExp) : nen.khoExp,
     tangThapCaoNhat: Math.max(nen.tangThapCaoNhat, kia.tangThapCaoNhat),
+    // Cộng hiểu biết hai máy: hỏi nhiều hơn thì giữ số lớn, hỏi gần đây hơn
+    // thì giữ mốc mới. Không bên nào đè bên nào.
+    lichSuThap: tronSoThap(nen.lichSuThap, kia.lichSuThap),
     soCauDaThanhTay: Math.max(nen.soCauDaThanhTay, kia.soCauDaThanhTay),
     // CHỌN MỘT LẦN, KHÔNG ĐỔI: bên nào đã chốt thần thú thì giữ. Bên rỗng là
     // bên chưa kịp đồng bộ, KHÔNG phải bên vừa bỏ thú — đây đúng là chỗ hồ sơ

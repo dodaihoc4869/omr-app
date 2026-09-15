@@ -28,6 +28,7 @@ import {
   hsLichSuCaApi,
   hsBtvnApi,
   hsCauSaiApi,
+  hsCauDaThiApi,
   thanThuDocApi,
   thanThuGhiApi,
 } from '../lib/exam-api'
@@ -734,8 +735,12 @@ export default function StudentPortalScreen() {
   const layCauSaiChoGame = useCallback(async () => {
     if (!auth) return []
     const url = await loadScriptUrlHoacMacDinh().catch(() => '')
+    // THÁP LẤY MỌI CÂU EM ĐÃ THI, không riêng câu sai — thầy chốt 15-09.
+    // Máy chủ chưa đẩy bản mới thì lùi về kho câu sai, em vẫn leo được.
+    const moi = await hsCauDaThiApi(url, auth.sbd, [])
+    if (moi.ok && moi.items) return moi.items as NonNullable<Awaited<ReturnType<typeof hsCauSaiApi>>['items']>
     const res = await hsCauSaiApi(url, auth.sbd, [])
-    if (!res.ok || !res.items) throw new Error(res.error || 'Máy chủ không trả được câu sai')
+    if (!res.ok || !res.items) throw new Error(res.error || 'Máy chủ không trả được câu hỏi của em')
     return res.items
   }, [auth])
 

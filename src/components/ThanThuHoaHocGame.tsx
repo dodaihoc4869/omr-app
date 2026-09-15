@@ -38,19 +38,24 @@ import {
   heBiKhacBoi,
   type HoSoThanThuLuu,
   type CapTienHoa,
-  type HeNguyenTo,
   type ThanThuInfo,
 } from '../game/than-thu-hoa-hoc/he-thong-pet'
 import { layHinhThai, CAP_TOI_DA } from '../game/than-thu-hoa-hoc/hinh-thai'
 import {
+  TANG_TOI_DA, heTrumTang as heTrumTangMoi, mauTrumTang as mauTrumTangMoi,
+  satThuongTrum, tenTrumTang, saoMucTieuTheoTang, laTangCanh,
+} from '../game/than-thu-hoa-hoc/can-bang-thap'
+import {
+  rutCauChoTang, ghiLichSu, CHU_LY_DO_NOI,
+  type CauUngVien, type LyDoNoi,
+} from '../game/than-thu-hoa-hoc/rut-cau-thap'
+import {
   nhanExp, NGUON_EXP, BANG_NGUON_EXP, SUC_CHUA_ONG,
   DS_NGUON_EXP, TEN_NGUON_EXP, tongSoExp, type NguonKiemExp,
 } from '../game/than-thu-hoa-hoc/kinh-nghiem'
+import { KHO_CAU_HOI, type CauHoi } from '../game/than-thu-hoa-hoc/kho-cau-hoi'
 import {
-  KHO_CAU_HOI, bacTheoTang, chiSoTheoBac, type CauHoi,
-} from '../game/than-thu-hoa-hoc/kho-cau-hoi'
-import {
-  doiCauSaiThanhCauChoi, locTheoBac, TEN_LY_DO,
+  doiCauSaiThanhCauChoi, TEN_LY_DO,
   type CauHoiCuaEm, type CauSaiTho, type KetQuaDoiCau,
 } from '../game/than-thu-hoa-hoc/cau-hoi-cua-em'
 import { veThanThuCanvas, khungVeThanThu } from '../game/than-thu-hoa-hoc/ve-than-thu'
@@ -920,15 +925,19 @@ export default function ThanThuHoaHocGame({
   const [cauHoiHienTai, setCauHoiHienTai] = useState<CauHoi | null>(null)
   const [thoiGianConLaiCau, setThoiGianConLaiCau] = useState(15)
 
-  // Danh sách câu hỏi hóa học mẫu phong phú cho leo tháp
-  /** Hệ của trùm tầng N — xoay vòng 4 hệ để mỗi tầng là một bài tương khắc khác. */
-  const heTrumTang = useCallback((tang: number): HeNguyenTo => {
-    const ds: HeNguyenTo[] = ['khi', 'kiem', 'axit', 'hoa']
-    return ds[Math.max(0, Math.round(tang) - 1) % 4]!
-  }, [])
+  /**
+   * HỆ TRÙM và MÁU TRÙM nay nằm trong `can-bang-thap.ts`.
+   *
+   * Hai hàm cũ ở đây có hai lỗi: hệ trùm chỉ chạy BỐN hệ nên trùm Điện hoá và
+   * Hữu cơ chưa từng xuất hiện lần nào; và máu trùm là đường thẳng
+   * `100 + 18×tầng`, kéo lên 999 tầng thì từ tầng ~25 trở đi một câu đúng là
+   * hạ trùm. Xem phần đo trong `can-bang-thap.ts`.
+   */
+  const heTrumTang = heTrumTangMoi
+  const mauTrumTang = mauTrumTangMoi
 
-  /** Máu trùm tầng N. Càng lên cao càng dày — trước đây tầng nào cũng 100. */
-  const mauTrumTang = useCallback((tang: number) => 100 + Math.max(0, Math.round(tang) - 1) * 18, [])
+  /** Vì sao lượt rút câu vừa rồi phải nới lỏng — hiện thẳng lên màn cho em biết. */
+  const [lyDoNoiCau, setLyDoNoiCau] = useState<LyDoNoi[]>([])
 
   const batDauLeoThap = () => {
     amThanhRef.current?.moKhoa()
@@ -941,29 +950,60 @@ export default function ThanThuHoaHocGame({
     setMauPetCombat(chiSoPet.mau)
     setDaHoiCau([])
     const tkMo = tinhHeSoTuongKhac(infoPet.he, heTrumTang(tang))
-    setThongBaoChienDau(`Tầng ${tang} — trùm hệ ${TEN_HE[heTrumTang(tang)]}. ${tkMo.thongDiep}`)
+    setThongBaoChienDau(`Tầng ${tang} — ${tenTrumTang(tang)}. ${tkMo.thongDiep}`)
     raCauHoiMoi([], tang)
   }
 
   /**
-   * Rút câu CHƯA HỎI trong lượt leo này. Trước đây rút thuần ngẫu nhiên nên
-   * tầng 2 lặp lại y hệt câu tầng 1.
+   * RÚT CÂU CHO TẦNG N — theo SAO, có sổ chống lặp sống qua mọi lượt.
+   *
+   * Thầy chốt 15-09: *"khó là những câu 2 sao... 2 sao khó nhất, xong đến 1
+   * sao, rồi 0 sao"*, và *"số câu chơi ở các tầng lặp lại nhiều"*.
+   *
+   * Công thức chọn nằm hết trong `rut-cau-thap.ts` (tệp thuần, kiểm được).
+   * Chỗ này chỉ nối dữ liệu vào và ghi sổ.
    */
   const raCauHoiMoi = useCallback((daHoi: string[], tang: number) => {
-    const bac = bacTheoTang(tang)
-    // ƯU TIÊN CÂU CỦA CHÍNH EM. Chỉ khi em chưa có câu sai nào đọc được mới
-    // mượn kho chung — và màn hình nói rõ đang mượn, không giả vờ là câu của em.
-    const nguon: { cau: CauHoi; khoa: string }[] = dsCauCuaEm.length > 0
-      ? locTheoBac(dsCauCuaEm, bac).map((c) => ({ cau: c as CauHoi, khoa: c.qid }))
-      : chiSoTheoBac(bac).map((i) => ({ cau: KHO_CAU_HOI[i]!, khoa: 'kho_' + i }))
-    if (nguon.length === 0) return
-    // Tránh hỏi lại câu đã hỏi trong lượt leo này; hết câu mới thì cho lặp.
-    const conLai = nguon.filter((x) => !daHoi.includes(x.khoa))
-    const chon = conLai.length > 0 ? conLai : nguon
-    const x = chon[Math.floor(Math.random() * chon.length)]!
-    setKhoaCauHienTai(x.khoa)
-    setCauHoiHienTai(x.cau)
+    // ƯU TIÊN CÂU CỦA CHÍNH EM. Chỉ khi em chưa có câu nào đọc được mới mượn
+    // kho chung — và màn hình NÓI RÕ đang mượn, không giả vờ là câu của em.
+    if (dsCauCuaEm.length === 0) {
+      const ds = KHO_CAU_HOI.map((c, i) => ({ cau: c, khoa: 'kho_' + i }))
+      const conLai = ds.filter((x) => !daHoi.includes(x.khoa))
+      const chon = conLai.length > 0 ? conLai : ds
+      const x = chon[Math.floor(Math.random() * chon.length)]!
+      setKhoaCauHienTai(x.khoa)
+      setCauHoiHienTai(x.cau)
+      setLyDoNoiCau(['muonKhoChung'])
+      setThoiGianConLaiCau(15)
+      return
+    }
+
+    const chuyenDeDaGap = new Set(
+      daHoi.map((q) => dsCauCuaEm.find((c) => c.qid === q)?.chuyenDe ?? '').filter((x) => x !== ''),
+    )
+    const kho: CauUngVien[] = dsCauCuaEm.map((c) => ({
+      qid: c.qid, sao: c.sao, chuyenDe: c.chuyenDe, tungSai: c.tungSai,
+    }))
+    const kq = rutCauChoTang({
+      kho,
+      tang,
+      saoMucTieu: saoMucTieuTheoTang(tang),
+      lichSu: hoSoRef.current.lichSuThap,
+      daHoiLuotNay: daHoi,
+      chuyenDeDaGap,
+      ngauNhien: Math.random,
+    })
+    if (kq.cau === null) return
+    const day = dsCauCuaEm.find((c) => c.qid === kq.cau!.qid)
+    if (day === undefined) return
+    setKhoaCauHienTai(day.qid)
+    setCauHoiHienTai(day as CauHoi)
+    setLyDoNoiCau(kq.daNoi)
     setThoiGianConLaiCau(15)
+    // GHI SỔ ngay lúc hỏi, không đợi trả lời: em thoát giữa chừng thì câu ấy
+    // vẫn coi như đã gặp, nếu không là mở lại gặp đúng nó.
+    const bayGio = Date.now()
+    setHoSo((prev) => ({ ...prev, lichSuThap: ghiLichSu(prev.lichSuThap, day.qid, bayGio) }))
   }, [dsCauCuaEm])
 
   /**
@@ -1013,13 +1053,22 @@ export default function ThanThuHoaHocGame({
 
       if (mauBossMoi <= 0) {
         amThanhRef.current?.thangTran()
-        const thuong = NGUON_EXP.leoThap(tangHienTai)
-        setThongBaoChienDau(`${infoPet.kyNangNo}! Hạ trùm tầng ${tangHienTai} — +${thuong} EXP`)
+        // TẦNG MỚI trả đủ, LEO LẠI tầng cũ chỉ 12%. Không có luật này thì 999
+        // tầng in ra 3 triệu EXP — cày tháp một buổi là khỏi cần thi.
+        const tangMoi = tangHienTai >= hoSoRef.current.tangThapCaoNhat
+        const thuong = tangMoi
+          ? NGUON_EXP.leoThap(tangHienTai)
+          : NGUON_EXP.leoThapLai(tangHienTai)
+        const nhan = laTangCanh(tangHienTai) ? thuong * 2 : thuong
+        setThongBaoChienDau(
+          `${infoPet.kyNangNo}! Hạ ${tenTrumTang(tangHienTai)} — +${nhan} EXP`
+          + (tangMoi ? '' : ' (tầng đã hạ, chỉ 12%)'),
+        )
         setHoSo((prev) => ({
           ...prev,
-          tangThapCaoNhat: Math.max(prev.tangThapCaoNhat, tangHienTai + 1),
+          tangThapCaoNhat: Math.min(TANG_TOI_DA, Math.max(prev.tangThapCaoNhat, tangHienTai + 1)),
         }))
-        themVaoKho(thuong, 'leoThap', `Hạ trùm tầng ${tangHienTai}`)
+        themVaoKho(nhan, 'leoThap', `Hạ trùm tầng ${tangHienTai}`)
       }
       setKetQuaCauVua({
         dung: true,
@@ -1034,9 +1083,12 @@ export default function ThanThuHoaHocGame({
       amThanhRef.current?.trungDon()
       // Giáp thật sự đỡ đòn.
       const tk = tinhHeSoTuongKhac(heTrumTang(tangHienTai), infoPet.he)
+      // Cũ `28 + tầng × 3`: tầng 999 ra 3 025 sát thương một đòn, thú cấp 120
+      // chỉ ~4 800 máu ⇒ sai hai câu là chết. Nay bám theo máu tối đa của thú:
+      // mỗi đòn ~18% máu, tức sai 5 câu là kiệt sức, ở MỌI tầng.
       const satThuongBoss = Math.max(
         1,
-        Math.round((28 + tangHienTai * 3) * tk.heSo - chiSoPet.giap * 0.25),
+        Math.round(satThuongTrum(tangHienTai, chiSoPet.mau) * tk.heSo - chiSoPet.giap * 0.25),
       )
       const mauPetMoi = Math.max(0, mauPetCombat - satThuongBoss)
       setMauPetCombat(mauPetMoi)
@@ -1840,7 +1892,12 @@ export default function ThanThuHoaHocGame({
                 {/* Boss tầng */}
                 <div className="p-4 bg-rose-50/60 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 rounded-2xl text-right">
                   <div className="text-xs font-bold text-rose-800 dark:text-rose-300">
-                    Trùm Tầng {tangHienTai}: Quái Hóa Hắc Ám
+                    Tầng {tangHienTai}/{TANG_TOI_DA}: {tenTrumTang(tangHienTai)}
+                  </div>
+                  {/* ĐỘ KHÓ HIỆN THÀNH SỐ. "Tầng cao hơn thì khó hơn" phải là
+                      thứ em nhìn thấy, không phải lời hứa suông. */}
+                  <div className="text-[10px] text-rose-700/80 dark:text-rose-400/80 font-mono">
+                    độ khó ★{saoMucTieuTheoTang(tangHienTai).toFixed(1)}/2,0
                   </div>
                   <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mt-1.5">
                     <div
@@ -1851,6 +1908,12 @@ export default function ThanThuHoaHocGame({
                   <div className="text-[10px] text-slate-500 mt-1 font-mono tabular-nums">{mauBoss} / {mauBossToiDa} HP</div>
                 </div>
               </div>
+
+              {lyDoNoiCau.length > 0 && (
+                <div className="mt-2 rounded-xl border border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 px-3 py-2 text-[11px] leading-relaxed text-amber-900 dark:text-amber-200">
+                  {CHU_LY_DO_NOI[lyDoNoiCau[lyDoNoiCau.length - 1]!]}
+                </div>
+              )}
 
               {/* THẦN THÚ TRÊN SÀN ĐẤU.
                   Trước đây màn đấu chỉ có hai thanh máu — con thú em nuôi không

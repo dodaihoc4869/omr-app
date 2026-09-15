@@ -2418,6 +2418,23 @@ export interface CauKho {
   mucDo?: string
   kienThuc?: unknown
   loiThuongGap?: unknown
+  /**
+   * SỐ SAO của câu — 0, 1 hoặc 2. Thầy gắn trong kho đề ở `can_chua.sao`.
+   *
+   * Thầy chốt 15-09: *"khó là những câu 2 sao, bạn dựa vào đó để phân"*. Bản
+   * trước hàm này ĐỌC câu từ kho rồi VỨT trường ấy đi, nên game không có cách
+   * nào biết câu nào khó — phải đoán qua nhãn `mucDo`, mà nhãn ấy phần lớn
+   * chưa gắn.
+   */
+  sao?: 0 | 1 | 2
+}
+
+/** Số sao của một câu thô trong kho, đọc mọi cách viết đã từng dùng. */
+export function saoCuaCau(c: Record<string, unknown>): 0 | 1 | 2 {
+  const cc = (c.can_chua ?? c.canChua) as Record<string, unknown> | undefined
+  const v = cc !== undefined && cc !== null ? cc.sao : (c.sao ?? c.so_sao)
+  const n = Math.round(Number(v))
+  return n === 1 || n === 2 ? n : 0
 }
 
 /** `<mã đề>-<phần>-<số>` — cắt ngược ra mã đề khi `cau_hoi` chưa có dòng. */
@@ -2467,6 +2484,7 @@ export async function napCauTuKho(env: Env, qids: string[]): Promise<Map<string,
         mucDo: chuoi(c.mucDo ?? c.muc_do),
         kienThuc: c.kienThuc ?? c.kien_thuc,
         loiThuongGap: c.loiThuongGap ?? c.loi_thuong_gap,
+        sao: saoCuaCau(c as Record<string, unknown>),
       })
     }
   }
@@ -2887,11 +2905,20 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
   const dsMaCa = Array.isArray(b.dsMaCa) ? (b.dsMaCa as string[]).map(chuoi).filter(Boolean) : []
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
 
+  /**
+   * `chiSai === false` ⇒ trả về MỌI CÂU EM ĐÃ THI, không chỉ câu sai.
+   *
+   * Thầy chốt 15-09: *"không cần phân câu sai, chỉ cần phân câu kiến thức em
+   * đã thi của các ca thi trước đó"*. Tháp lấy từ đây. Mặc định vẫn là `true`
+   * để mục Khắc Phục Câu Sai và mọi chỗ gọi cũ không đổi hành vi một li nào.
+   */
+  const chiSai = b.chiSai !== false
+
   let query = `SELECT c.ma_ca, c.sbd, c.phan, c.so_cau, c.qid, c.chuyen_de, c.muc_do,
             c.dap_an_chon, c.dap_an_dung, c.dung_sai, ca.ten_ca
        FROM chi_tiet_cau c
        LEFT JOIN ca ON ca.ma_ca = c.ma_ca
-      WHERE c.sbd = ? AND COALESCE(c.dung_sai, 0) = 0`
+      WHERE c.sbd = ?${chiSai ? ' AND COALESCE(c.dung_sai, 0) = 0' : ''}`
   const params: unknown[] = [sbd]
 
   if (dsMaCa.length > 0) {
@@ -3021,6 +3048,8 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
       qid,
       chuyenDe: chuoi(row.chuyen_de) || chuoi(tuKho?.chuyenDe),
       mucDo: chuoi(row.muc_do) || chuoi(tuKho?.mucDo),
+      sao: tuKho?.sao ?? 0,
+      dungSai: Number(row.dung_sai ?? 0) === 1,
       dapAnChon: chuoi(row.dap_an_chon),
       dapAnDung: chuoi(row.dap_an_dung),
       text: fullQ ? chuoi(fullQ.text || fullQ.de) : '',
@@ -3057,6 +3086,17 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
 }
 
 
+/**
+ * MỌI CÂU EM ĐÃ THI — nguồn câu của Tháp Tri Thức.
+ *
+ * Mỏng có chủ ý: dùng lại nguyên thân `hsCauSai` để không có hai đường đọc kho
+ * đề song song rồi lệch nhau. Khác đúng một cờ.
+ */
+export async function hsCauDaThi(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+  return hsCauSai(env, { ...b, chiSai: false })
+}
+
+
 // ===========================================================================
 // THẦN THÚ HOÁ HỌC — ĐỒNG BỘ ĐA THIẾT BỊ (15-09-2026)
 //
@@ -3075,8 +3115,14 @@ import {
   tronHoSoThu, tongExpCuaThu, NGUON_EXP_HOP_LE, type HoSoThanThuMayChu,
 } from './tron-than-thu'
 
-/** Trần cứng để một máy em bị sửa không ghi được cấp 999 hay EXP tỉ tỉ. */
-const TRAN_CAP = 12
+/**
+ * Trần cứng để một máy em bị sửa không ghi được cấp vô hạn hay EXP tỉ tỉ.
+ *
+ * NÂNG 12 → 120 ngày 15-09 cùng đường 120 cấp. Số này phải LUÔN bằng
+ * `CAP_TOI_DA` bên app — để lệch là em lên cấp 13 xong máy chủ cắt về 12, và
+ * mỗi lần đồng bộ lại tụt cấp một lần mà không ai hiểu vì sao.
+ */
+const TRAN_CAP = 120
 const TRAN_EXP = 100_000_000
 
 function soNguyenTrongKhoang(v: unknown, thap: number, cao: number, mac = 0): number {
@@ -3112,6 +3158,19 @@ function locHoSoThanThu(tho: unknown): { hoSo: HoSoThanThuMayChu; tongExp: numbe
       danhHieuHienTai: chuoi(o.danhHieuHienTai).slice(0, 80),
       ngayNhanTrung: chuoi(o.ngayNhanTrung).slice(0, 40),
       ngayChonThu: chuoi(o.ngayChonThu).slice(0, 40),
+      // SỔ THÁP — lọc từng trường, không tin máy em gửi gì cũng lưu.
+      // Chỉ `qid` và hai con số; cắt 300 dòng để một em không phình bảng.
+      lichSuThap: (Array.isArray(o.lichSuThap) ? o.lichSuThap : [])
+        .slice(0, 300)
+        .map((x: unknown) => {
+          const d = (x ?? {}) as Record<string, unknown>
+          return {
+            qid: chuoi(d.qid).slice(0, 80),
+            lanCuoi: soNguyenTrongKhoang(d.lanCuoi, 0, 4_102_444_800_000, 0),
+            soLanHoi: soNguyenTrongKhoang(d.soLanHoi, 1, 100_000, 1),
+          }
+        })
+        .filter((d: { qid: string }) => d.qid !== ''),
     },
   }
 }

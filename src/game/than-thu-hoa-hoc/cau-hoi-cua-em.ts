@@ -38,6 +38,10 @@ export interface CauSaiTho {
   dangMa?: string
   imageDataUrl?: string
   hinhAnh?: unknown
+  /** SỐ SAO thầy gắn trong kho đề (`can_chua.sao`): 0 · 1 · 2. */
+  sao?: number
+  /** Em làm ĐÚNG câu này hay không. Chỉ có ở lệnh `hsCauDaThi`. */
+  dungSai?: boolean
 }
 
 /** Một câu sai đã đổi sang khung câu hỏi của game. */
@@ -60,6 +64,16 @@ export interface CauHoiCuaEm extends CauHoi {
   /** Tên dạng thầy gắn; rỗng khi câu chưa gắn dạng. */
   tenDang: string
   maDang: string
+  /**
+   * SỐ SAO — thang khó DUY NHẤT của tháp từ 15-09.
+   *
+   * Thầy chốt: *"khó là những câu 2 sao... 2 sao khó nhất, xong đến 1 sao, rồi
+   * 0 sao"*. Câu chưa gắn sao thì là 0 — và đó là SỰ THẬT (chưa gắn), không
+   * phải mặc định bịa như `bacTheoMucDo` từng làm với mức độ.
+   */
+  sao: 0 | 1 | 2
+  /** Em từng làm SAI câu này chưa. Câu từng sai đáng ôn hơn câu làm đúng. */
+  tungSai: boolean
 }
 
 export type LyDoBo =
@@ -193,6 +207,9 @@ export function doiCauSaiThanhCauChoi(tho: readonly CauSaiTho[]): KetQuaDoiCau {
             : `Đáp án đúng là ${dap}.`),
       chuyenDe,
       bac: bacTheoMucDo(c.mucDo),
+      sao: (() => { const n = Math.round(Number(c.sao)); return n === 1 || n === 2 ? n : 0 })(),
+      // Lệnh cũ `hsCauSai` chỉ trả câu SAI nên thiếu trường này ⇒ coi là đã sai.
+      tungSai: c.dungSai === undefined ? true : c.dungSai !== true,
     })
   }
 

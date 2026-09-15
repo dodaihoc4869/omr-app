@@ -16,7 +16,7 @@ import * as THREE from 'three'
 import { dungThanThu3D, donBoThanThu3D, mauTuChuoi } from '../src/game/than-thu-hoa-hoc/dung-than-thu-3d'
 import { ChieuThuc3D } from '../src/game/than-thu-hoa-hoc/chieu-thuc-3d'
 import { DANH_SACH_THAN_THU } from '../src/game/than-thu-hoa-hoc/he-thong-pet'
-import { CAP_TOI_DA } from '../src/game/than-thu-hoa-hoc/hinh-thai'
+import { CAP_TOI_DA, laCapMoc, layHinhThai } from '../src/game/than-thu-hoa-hoc/hinh-thai'
 
 const HOA = DANH_SACH_THAN_THU['hoa_long']!
 
@@ -57,14 +57,36 @@ describe('Mô hình 3D theo 12 hình thái', () => {
     }
   })
 
-  it('CẤP SAU NGẦU HƠN CẤP TRƯỚC — số khối tăng nghiêm ngặt từ cấp 2 lên 12', () => {
+  /**
+   * ĐƯỜNG 120 CẤP đổi luật này, và phải nói thẳng vì sao.
+   *
+   * Với 12 cấp thì mỗi cấp một tính năng mới, nên "số khối tăng nghiêm ngặt
+   * mỗi cấp" là luật đúng. Với 120 cấp mà vẫn đòi thế thì phải dựng 120 tính
+   * năng cấu trúc — vô lý, và máy em không tải nổi.
+   *
+   * Luật mới, vẫn đếm được và vẫn bắt được lỗi "cấp sau nghèo hơn cấp trước":
+   *  · số khối KHÔNG BAO GIỜ GIẢM trên cả 120 cấp;
+   *  · tại MỖI CẤP MỐC, số khối TĂNG THẬT so với cấp liền trước;
+   *  · `coCon` tăng nghiêm ngặt mỗi cấp, nên không hai cấp nào nhìn y hệt.
+   */
+  it('CẤP SAU NGẦU HƠN CẤP TRƯỚC — không cấp nào nghèo đi, mốc nào cũng giàu thêm', () => {
     let truoc = -1
     for (let c = 2; c <= CAP_TOI_DA; c++) {
       const bo = dungThanThu3D(HOA, c)
       const n = demKhoi(bo.goc)
-      expect(n, `cấp ${c} phải nhiều khối hơn cấp ${c - 1}`).toBeGreaterThan(truoc)
+      if (laCapMoc(c)) {
+        expect(n, `cấp mốc ${c} phải NHIỀU khối hơn cấp ${c - 1}`).toBeGreaterThan(truoc)
+      } else {
+        expect(n, `cấp ${c} không được nghèo hơn cấp ${c - 1}`).toBeGreaterThanOrEqual(truoc)
+      }
       truoc = n
       donBoThanThu3D(bo)
+    }
+  })
+
+  it('không hai cấp nào nhìn y hệt nhau — cỡ thú tăng nghiêm ngặt', () => {
+    for (let c = 2; c <= CAP_TOI_DA; c++) {
+      expect(layHinhThai(c).coCon, `cấp ${c}`).toBeGreaterThan(layHinhThai(c - 1).coCon)
     }
   })
 
@@ -77,22 +99,23 @@ describe('Mô hình 3D theo 12 hình thái', () => {
     donBoThanThu3D(bo)
   })
 
-  it('đuôi mọc từ cấp 4, cánh từ cấp 5, vòng xoay từ cấp 9', () => {
+  it('đuôi mọc từ cấp 5, cánh từ cấp 8, vòng xoay từ cấp 26 (thang 120 cấp)', () => {
     const co = (c: number) => {
       const b = dungThanThu3D(HOA, c)
       const r = { duoi: b.duoi !== null, canh: b.canhTrai !== null, vong: b.vongXoay.length > 0 }
       donBoThanThu3D(b)
       return r
     }
-    expect(co(3).duoi).toBe(false)
-    expect(co(4).duoi).toBe(true)
-    expect(co(4).canh).toBe(false)
-    expect(co(5).canh).toBe(true)
-    expect(co(8).vong).toBe(false)
-    expect(co(9).vong).toBe(true)
-    // Cộng dồn: có rồi thì không bao giờ mất.
-    expect(co(12).duoi).toBe(true)
-    expect(co(12).canh).toBe(true)
+    expect(co(4).duoi).toBe(false)
+    expect(co(5).duoi).toBe(true)
+    expect(co(7).canh).toBe(false)
+    expect(co(8).canh).toBe(true)
+    expect(co(25).vong).toBe(false)
+    expect(co(26).vong).toBe(true)
+    // Cộng dồn: có rồi thì không bao giờ mất, tới tận cấp 120.
+    expect(co(120).duoi).toBe(true)
+    expect(co(120).canh).toBe(true)
+    expect(co(120).vong).toBe(true)
   })
 
   it('miệng nằm phía trước thú — chiêu bắn ra đằng trước, không bắn vào mặt em', () => {

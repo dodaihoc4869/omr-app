@@ -26,8 +26,15 @@ beforeEach(() => {
 })
 afterEach(() => { cleanup(); vi.restoreAllMocks() })
 
-/** 8 ca thi 10 điểm = 8 × 600 = 4 800 EXP, vượt xa trần ống 2 000. */
-const NHIEU_CA = Array.from({ length: 8 }, (_, i) => ({ tong: 10, maCa: 'ca' + i }))
+/**
+ * Đủ ca để CHẮC CHẮN tràn ống, tính theo trần thật thay vì cắm cứng 8 ca.
+ *
+ * Trần ống nâng 2 000 → 50 000 ngày 15-09 cùng đường 120 cấp (cấp đắt nhất là
+ * 46 740, ống phải rót nổi một cấp ở mọi mức). Cắm cứng 8 ca thì từ hôm nay
+ * phép kiểm này không còn kiểm cái nó định kiểm nữa.
+ */
+const SO_CA_TRAN = Math.ceil(SUC_CHUA_ONG / NGUON_EXP.caThi(10)) + 3
+const NHIEU_CA = Array.from({ length: SO_CA_TRAN }, (_, i) => ({ tong: 10, maCa: 'ca' + i }))
 
 function gan(props: { khoExp?: number; capDo?: number; dsLichSu?: unknown[] } = {}) {
   localStorage.setItem(KHOA_LUU_THAN_THU, hoSoCo(props.khoExp ?? 0, props.capDo ?? 1))
@@ -106,11 +113,16 @@ describe('Việc học chỉ đổ vào ỐNG', () => {
 
 describe('Nạp tinh lực: chuyển chỗ, không sinh EXP', () => {
   it('bấm nạp thì ống về 0 và thần thú lên cấp', async () => {
-    gan({ khoExp: 700 })   // thanh cấp 1 là 300, cấp 2 là 380 -> lên cấp 3, dư 20
-    fireEvent.click(screen.getByText(/Nạp 700 tinh lực/))
+    // Tính mốc theo đường EXP THẬT, không cắm cứng số — đổi nhịp game là phép
+    // kiểm này tự đúng theo, không phải sửa tay rồi quên.
+    const NAP = 700
+    let capCho = 1, conLai = NAP
+    while (thanhExp(capCho) > 0 && conLai >= thanhExp(capCho)) { conLai -= thanhExp(capCho); capCho++ }
+    gan({ khoExp: NAP })
+    fireEvent.click(screen.getByText(new RegExp(`Nạp ${NAP} tinh lực`)))
     await waitFor(() => expect(doc().khoExp).toBe(0))
-    expect(doc().capDo).toBe(3)
-    expect(doc().exp).toBe(700 - thanhExp(1) - thanhExp(2))
+    expect(doc().capDo).toBe(capCho)
+    expect(doc().exp).toBe(conLai)
   })
 
   it('TỔNG EXP BẢO TOÀN — nạp không làm sinh ra hay mất đi điểm nào', async () => {
@@ -145,7 +157,7 @@ describe('Nạp tinh lực: chuyển chỗ, không sinh EXP', () => {
 
 describe('Ống đầy: KHÔNG BAO GIỜ mất EXP đã kiếm', () => {
   it('rót nhiều hơn trần thì chỉ nhận vừa đủ, phần còn lại GIỮ cho lần sau', async () => {
-    gan({ dsLichSu: NHIEU_CA })   // 4 800 EXP, trần 2 000
+    gan({ dsLichSu: NHIEU_CA })
     fireEvent.click(screen.getByText('Rót việc học vào ống'))
     await waitFor(() => expect(doc().khoExp).toBeGreaterThan(0))
     expect(doc().khoExp).toBeLessThanOrEqual(SUC_CHUA_ONG)
@@ -159,7 +171,7 @@ describe('Ống đầy: KHÔNG BAO GIỜ mất EXP đã kiếm', () => {
 
   it('nạp xong rót tiếp thì lấy được đúng phần còn lại — tổng không hụt', async () => {
     gan({ dsLichSu: NHIEU_CA })
-    const TONG = NHIEU_CA.length * NGUON_EXP.caThi(10)   // 4 800
+    const TONG = NHIEU_CA.length * NGUON_EXP.caThi(10)
 
     let daVao = 0
     for (let vong = 0; vong < 6; vong++) {

@@ -2485,6 +2485,7 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
     case 'hsLichSuCa': return ra(await G.hsLichSuCa(env, b))
     case 'hsBtvn': return ra(await G.hsBtvn(env, b))
     case 'hsCauSai': return ra(await G.hsCauSai(env, b))
+    case 'hsCauDaThi': return ra(await G.hsCauDaThi(env, b))
 
     // ---- LUYỆN DẠNG BÀI (15-09) ------------------------------------------
     // Menu và tờ đề theo dạng bài. Lệnh của MÁY EM: không có đáp án nào rò ra
@@ -2667,6 +2668,7 @@ export default {
       if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))
       if (p === '/hs/lich-su') return ra(await G.hsLichSuCa(env, b))
       if (p === '/hs/cau-sai') return ra(await G.hsCauSai(env, b))
+      if (p === '/hs/cau-da-thi') return ra(await G.hsCauDaThi(env, b))
       if (p === '/hs/than-thu') return ra(await G.thanThuDoc(env, b))
       if (p === '/hs/than-thu-ghi') return ra(await G.thanThuGhi(env, b))
       if (p === '/hs/btvn') return ra(await G.hsBtvn(env, b))

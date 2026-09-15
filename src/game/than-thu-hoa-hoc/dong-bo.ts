@@ -21,6 +21,7 @@
  */
 
 import { vaHoSo, type CapTienHoa, type HoSoThanThuLuu } from './he-thong-pet'
+import { tronLichSu } from './rut-cau-thap'
 import { DS_NGUON_EXP, thanhExp, tongSoExp } from './kinh-nghiem'
 
 export type BenThang = 'may' | 'mayChu' | 'nhuNhau'
@@ -124,6 +125,9 @@ export function hoaGiaiHoSo(may: HoSoThanThuLuu, mayChuTho: unknown): KetQuaHoaG
     capTienHoa: nen.capDo as CapTienHoa,
     expToiDa: thanhExp(nen.capDo),
     tangThapCaoNhat: Math.max(nen.tangThapCaoNhat, kia.tangThapCaoNhat),
+    // SỔ THÁP: cộng hiểu biết hai máy, không bên nào đè bên nào. Leo trên máy
+    // tính rồi mở điện thoại thì không gặp lại câu vừa hỏi.
+    lichSuThap: tronLichSu(nen.lichSuThap, kia.lichSuThap),
     soCauDaThanhTay: Math.max(nen.soCauDaThanhTay, kia.soCauDaThanhTay),
     // Thần thú đã chọn: bên nào đã chốt thì giữ. Chọn một lần, không đổi —
     // nên nếu một bên còn rỗng thì đó là bên chưa kịp đồng bộ, không phải bên

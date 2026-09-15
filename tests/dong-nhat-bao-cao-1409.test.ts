@@ -131,7 +131,13 @@ describe('khắc phục gộp cả bỏ trống lẫn phần II chưa trọn ý'
   it('danh sách câu sai của máy chủ GỘP cả câu bỏ trống', () => {
     // `COALESCE(dung_sai, 0) = 0` gộp NULL (bỏ trống) và 0 (sai, kể cả phần II
     // đúng một phần). Đúng luật thầy chốt — ở ĐÂY thì giữ nguyên.
-    expect(doc('server/src/goi-cu.ts')).toContain('WHERE c.sbd = ? AND COALESCE(c.dung_sai, 0) = 0')
+    //
+    // 15-09 thêm cờ `chiSai` cho Tháp Tri Thức (tháp lấy MỌI câu em đã thi).
+    // Mệnh đề lọc câu sai nay nằm trong nhánh `chiSai ? … : ''` — vẫn còn
+    // nguyên, chỉ là có thể tắt cho đúng một lệnh. Phép kiểm đổi theo, nhưng
+    // vẫn khoá đúng cái phải khoá: mặc định là LỌC CÂU SAI.
+    expect(doc('server/src/goi-cu.ts')).toContain("chiSai ? ' AND COALESCE(c.dung_sai, 0) = 0' : ''")
+    expect(doc('server/src/goi-cu.ts')).toContain('const chiSai = b.chiSai !== false')
   })
 })
 

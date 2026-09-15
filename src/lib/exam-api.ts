@@ -3219,6 +3219,38 @@ export async function hsCauSaiApi(scriptUrl: string, sbd: string, dsMaCa: string
 }
 
 
+/**
+ * MỌI CÂU EM ĐÃ THI — nguồn câu của Tháp Tri Thức.
+ *
+ * Thầy chốt 15-09: *"không cần phân câu sai, chỉ cần phân câu kiến thức em đã
+ * thi của các ca thi trước đó"*. `dsMaCa` rỗng nghĩa là lấy của MỌI ca.
+ *
+ * Máy chủ bản cũ chưa có đường này: bắt lỗi rồi lùi về `hsCauSaiApi`, để em
+ * vẫn leo tháp được bằng kho câu sai trong lúc chờ đẩy máy chủ.
+ */
+export async function hsCauDaThiApi(scriptUrl: string, sbd: string, dsMaCa: string[]): Promise<{
+  ok: boolean
+  items?: unknown[]
+  error?: string
+}> {
+  const base = await layDiaChiMayChu(scriptUrl)
+  if (!base) return { ok: false, error: 'Chưa lấy được địa chỉ máy chủ. Em tải lại trang rồi thử lại.' }
+  try {
+    const res = await fetch(`${base}/hs/cau-da-thi`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ sbd: sbd.trim(), dsMaCa }),
+    })
+    if (res.status === 404) return { ok: false, error: 'MAY_CHU_CHUA_CO_LENH' }
+    const j = (await res.json()) as { ok?: boolean; items?: unknown[]; error?: string }
+    if (j.ok !== true) return { ok: false, error: j.error || 'MAY_CHU_CHUA_CO_LENH' }
+    return { ok: true, items: j.items ?? [] }
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
+  }
+}
+
+
 // ===========================================================================
 // THẦN THÚ HOÁ HỌC — ĐỒNG BỘ ĐA THIẾT BỊ (15-09-2026)
 // Chỉ tiến trình game. Không tên, không điểm, không ảnh bài.
