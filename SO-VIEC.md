@@ -421,3 +421,40 @@ chỉ mất cái dấu chuyển hướng Safari soi. Áp cho CẢ BA tầng đư
 `xlsx` bị gỡ khỏi `package.json` ở commit `079875d` của phiên khác, nhưng
 `ExamMonitorScreen` và `ResultsScreen` vẫn nhập nó. Chỉ lộ ra khi phiên ấy chạy
 `npm i three` làm npm dọn mất `node_modules/xlsx`. Đã cài lại `xlsx@0.18.5`.
+
+---
+
+# LƯỢT 17 — GỠ HAI THẺ TRÊN MÀN CHI TIẾT CA (15/09)
+
+- [x] "Xóa luôn phần này trên app gv. Chuyển nút xóa lên phần còn lại" — thầy chốt tiếp: "Bỏ hết phần tôi chụp"  | bằng chứng: 8 mảnh · 4.014 phép · 0 trượt
+
+## Đã gỡ
+
+Thẻ **"Xuất kết quả"** (Phiếu zip · Bảng điểm xlsx · Dữ liệu json · Tạo &
+copy link phiếu gửi Zalo) và thẻ **"Tải đề & lời giải"** (đề riêng từng em,
+cả kho của ca, copy link).
+
+Nút **"Xoá ca này"** chuyển lên cuối THẺ THÔNG TIN CA — cùng một thẻ với Bắt
+đầu thi và Khoá ca, tức mọi việc tác động lên chính ca nằm chung một nơi.
+
+## VIỆC SUÝT MẤT — đã dọn ra chỗ khác
+
+Trong `handleTaiPhieuHangLoat` của thẻ vừa gỡ có một việc **không dính gì tới
+xuất phiếu**: vá ngược khoá `key/<maCa>.json` cho ca cũ. Thiếu khoá ấy thì LINK
+XEM ĐIỂM của cả ca báo "Máy chủ chưa gửi đề của ca này" (ca 195422, 12/09).
+
+Gỡ thẻ mà không dọn là ca cũ mất đường tự lành TRONG IM LẶNG. Nay nó thành một
+`useEffect` riêng, chạy MỘT LẦN mỗi ca khi thầy mở màn.
+
+## Luồng gửi Zalo KHÔNG mất
+
+Nó đi qua cầu nối `window.__ddh` (`src/lib/cau-noi-ddh.ts`) gọi thẳng
+`phieuTheoCa`, không qua màn hình. Lõi dựng phiếu `phieu-ca-ca.ts` vẫn còn và
+còn 6 nơi dùng.
+
+## Lợi ích kèm theo — nhẹ hẳn
+
+| | Trước | Sau |
+|---|---|---|
+| mảnh mã chính | 630 KB (183 gzip) | **473 KB (138 gzip)** |
+| mảnh màn Theo dõi | 350 KB | **62 KB** |

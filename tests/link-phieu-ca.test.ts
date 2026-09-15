@@ -116,12 +116,22 @@ describe('lệnh máy chủ và nút trên màn Theo dõi', () => {
     expect(pz).toContain("loai: 'ketqua'")
   })
 
-  it('màn Theo dõi có nút copy link phiếu cho cả ca', async () => {
+  // ĐỔI 15/09: thầy chốt gỡ hẳn thẻ "Xuất kết quả" khỏi màn Chi tiết ca, nên
+  // nút "Tạo & copy link phiếu gửi Zalo" KHÔNG còn ở đó nữa.
+  //
+  // Luồng gửi Zalo của thầy KHÔNG mất: nó đi qua cầu nối `window.__ddh`
+  // (`src/lib/cau-noi-ddh.ts`), vốn gọi thẳng `phieuTheoCa` chứ không qua màn
+  // hình. Phép kiểm chuyển sang ghim ĐÚNG chỗ ấy.
+  it('cầu nối Zalo vẫn gọi được danh sách phiếu của cả ca', async () => {
+    const { readFileSync } = await import('node:fs')
+    const { resolve } = await import('node:path')
+    const cauNoi = readFileSync(resolve(__dirname, '../src/lib/cau-noi-ddh.ts'), 'utf8')
+    expect(cauNoi).toContain('phieuTheoCa')
+    expect(cauNoi).toContain('return phieuTheoCa(url, mat, String(maCa || \'\').trim())')
+  })
+
+  it('màn Chi tiết ca KHÔNG còn nút tạo link phiếu — đã gỡ theo lệnh thầy', async () => {
     const ma = (await import('../src/screens/ExamMonitorScreen.tsx?raw')).default
-    // Nhãn đổi 06/09: nút không còn chỉ "copy" mà DỰNG NỐT phiếu còn thiếu rồi
-    // mới copy, nên chữ trên nút phải nói đúng việc nó làm.
-    expect(ma).toContain('Tạo & copy link phiếu gửi Zalo')
-    expect(ma).toContain('phieuTheoCa(url, mat, chiTiet.ca.maCa)')
-    expect(ma).toContain('vanBanLinkPhieu(g)')
+    expect(ma).not.toContain('Tạo & copy link phiếu gửi Zalo')
   })
 })

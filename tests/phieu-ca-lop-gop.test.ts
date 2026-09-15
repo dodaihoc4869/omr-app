@@ -271,9 +271,12 @@ describe('Màn Chi tiết ca dựng nốt phiếu còn thiếu', () => {
     const { readFileSync } = await import('node:fs')
     const { resolve } = await import('node:path')
     const man = readFileSync(resolve(__dirname, '../src/screens/ExamMonitorScreen.tsx'), 'utf8')
-    expect(man).toContain('taoPhieuChoEm(')
-    // 06/09: lõi dựng phiếu chuyển sang `phieu-ca-ca.ts` để dùng chung với cầu
-    // nối `window.__ddh`. Hai lệnh gộp vẫn phải là hai lệnh gộp — chỉ đổi nhà.
+    // ĐỔI 15/09: thẻ "Xuất kết quả" đã gỡ khỏi màn Chi tiết ca theo lệnh thầy,
+    // nên màn ấy không còn dựng phiếu. Ý ĐỊNH của phép kiểm giữ nguyên và
+    // chuyển về ĐÚNG nhà của lõi: hai lệnh gộp vẫn phải là hai lệnh gộp, và
+    // không được gọi hồ sơ từng em trong vòng dựng phiếu cả ca.
+    // 06/09: lõi dựng phiếu nằm ở `phieu-ca-ca.ts`, dùng chung với cầu nối
+    // `window.__ddh`.
     const loi = readFileSync(resolve(__dirname, '../src/lib/phieu-ca-ca.ts'), 'utf8')
     expect(loi).toContain('hoSoNhieuEm(url, mat, dsSbd)')
     expect(loi).toContain('luuNhieuPhieu(url, mat, canLuu)')
@@ -290,15 +293,15 @@ describe('Màn Chi tiết ca dựng nốt phiếu còn thiếu', () => {
   })
 
   it('KHÔNG hỏi lại máy chủ danh sách phiếu sau khi vừa tạo', async () => {
+    // ĐỔI 15/09: nút ấy đã gỡ khỏi màn Chi tiết ca. Chỗ còn dựng phiếu cả ca
+    // là lõi chung `dungPhieuChoEm`; ghim ở đó mới đúng nhà.
     const { readFileSync } = await import('node:fs')
     const { resolve } = await import('node:path')
-    const man = readFileSync(resolve(__dirname, '../src/screens/ExamMonitorScreen.tsx'), 'utf8')
-    const dau = man.indexOf('const handleCopyLinkPhieu')
-    const cuoi = man.indexOf('const handleExportJson')
-    expect(dau).toBeGreaterThan(0)
-    expect(cuoi).toBeGreaterThan(dau)
-    const ham = man.slice(dau, cuoi)
-    // Đúng MỘT lượt `phieuTheoCa` cho cả nút.
-    expect(ham.split('phieuTheoCa(').length - 1).toBe(1)
+    const loi = readFileSync(resolve(__dirname, '../src/lib/phieu-ca-ca.ts'), 'utf8')
+    const dau = loi.indexOf('export async function dungPhieuChoEm')
+    const cuoi = loi.indexOf('export async function gomCa')
+    const ham = loi.slice(dau, cuoi)
+    // Lõi dựng phiếu KHÔNG được tự đi hỏi lại danh sách phiếu.
+    expect(ham).not.toContain('phieuTheoCa(')
   })
 })

@@ -8,21 +8,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { demKetQua } from '../lib/dem-ket-qua'
 import { goiBaiThi } from '../lib/goi-bao-cao'
-import { Check, RefreshCw, Trash2, ChevronRight, Images, FileSpreadsheet, FileJson, Lock, Unlock, Send, Pencil, LogIn, BarChart3 } from 'lucide-react'
+import { Check, RefreshCw, Trash2, ChevronRight, Lock, Unlock, Pencil, LogIn, BarChart3 } from 'lucide-react'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
-import { classify, type AnswerKey, type ScoreResult, type StudentAnswers } from '../engine/score'
+import { classify } from '../engine/score'
 import { batDauThi, capNhatKeyBank, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
 import { chuanTenCa, tenHienCua, TEN_CA_TOI_DA } from '../lib/ten-ca'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { emLechDiem, loiBaoLechDiem } from '../lib/lech-diem'
 import { dongSoCauHoiLai } from '../lib/dem-cau-hoi-lai'
 import { maCaLay, vaBienBanCu } from '../lib/va-bien-ban-cu'
-import { goiPhieuCaZip, tenTepZipCa, chuyenDeTuChiTiet, type EmTrongCaDeXuatPhieu } from '../lib/phieu-hang-loat'
-import { viecCanLamMacDinh } from '../lib/phieu-zalo'
-import { gomLinkPhieu, tomTatLinkPhieu, vanBanLinkPhieu, type DongLinkPhieu } from '../lib/link-phieu-ca'
-import { dungPhieuChoEm, type CoChanDoanEm } from '../lib/phieu-ca-ca'
-import { phieuTheoCa } from '../lib/exam-api'
 import { sinhBoTheoEm, TEN_MUC_PHAN_TANG } from '../lib/de-rieng-blueprint'
 import { docCheDoDeRieng, docDeRiengCa, docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuDeRiengCa, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret, type BienBanDeRieng, type DeRiengCaLuu } from '../lib/exam-db'
 import { CHU_LY_DO_THIEU } from '../lib/de-rieng'
@@ -32,11 +27,8 @@ import { choEmThiLai } from '../lib/thi-lai'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { soanTinRoiMan } from '../lib/phieu-zalo'
-import NutTaiDeCa from '../components/NutTaiDeCa'
 import KhoiCauHoiEm from '../components/KhoiCauHoiEm'
 import { hoSoEm, type HoSoEm } from '../lib/exam-api'
-import { buildStudentEntry, downloadDuLieuJson } from '../lib/json-export'
-import { downloadBangDiem, type StudentRow } from '../lib/xlsx-export'
 import { mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
 import { chuTatDe } from '../lib/giu-de-doc'
 import { useAppStore } from '../store/appStore'
@@ -242,20 +234,10 @@ export default function ExamMonitorScreen() {
   // tới khi thầy bấm Bắt đầu thi ngay tại đây.
   const [dangBatDau, setDangBatDau] = useState(false)
   const [hoiHuy, setHoiHuy] = useState(false)
-  // Tải phiếu cả ca: dựng ảnh cho từng em rồi gói .zip, chạy hoàn toàn tại máy
-  // thầy nên không phụ thuộc mạng.
-  const [dangGoiPhieu, setDangGoiPhieu] = useState('')
-  // Gom link phiếu của cả ca để dán một lượt vào Zalo (thầy chốt 05/09 chiều).
-  const [dangGomLink, setDangGomLink] = useState(false)
-  /** CỜ CHẨN ĐOÁN của lượt dựng phiếu gần nhất — em nào bị bỏ câu chữa vì
-   * nghi hết giờ, và câu nào đáng gán nhãn mức phương án. Chỉ thầy thấy. */
-  const [coChanDoan, setCoChanDoan] = useState<CoChanDoanEm[]>([])
-  /** "3/12" khi đang dựng nốt phiếu còn thiếu — nút phải nói nó đang làm gì,
-   * không thì thầy tưởng máy treo. */
-  const [tienTaoPhieu, setTienTaoPhieu] = useState('')
-  const [tomTatLink, setTomTatLink] = useState('')
   // Đã ghi điểm lên Sheet cho lượt nào (khoá `${sbd}:${lanThu}:${nopLuc}`) — không ghi lặp mỗi lần tải lại.
   const daGhiRef = useRef<Set<string>>(new Set())
+  /** Ca nào đã vá khoá `key/<maCa>.json` rồi — vá một lần là đủ. */
+  const daVaKeyRef = useRef<Set<string>>(new Set())
 
   // Nạp hồ sơ khi thầy chạm tên một em. Chỉ nạp khi thật sự mở — hồ sơ tốn
   // 2–4 giây một lượt gọi máy chủ, nạp sẵn cho cả lớp là phí.
@@ -440,6 +422,30 @@ export default function ExamMonitorScreen() {
     out.sort((a, b) => thuTu(a.moiNhat) - thuTu(b.moiNhat) || (a.hoTen || a.sbd).localeCompare(b.hoTen || b.sbd, 'vi'))
     return out
   }, [chiTiet, teacherBank, soCauCa, classList, deRiengCa, lapDungLai])
+
+  // VÁ NGƯỢC KHOÁ `key/<maCa>.json` CHO CA CŨ — TỰ LÀNH KHI THẦY MỞ MÀN.
+  //
+  // Trước 12/09, ngân hàng CÓ đáp án chỉ được đẩy lên máy chủ khi ca công bố
+  // NGAY. Ca 195422 sáng 12/09 đặt `ca_lop_xong`, nên máy chủ không có khoá ấy
+  // và LINK XEM ĐIỂM của cả ca báo "Máy chủ chưa gửi đề của ca này".
+  //
+  // 15/09: việc này TỪNG nằm trong `handleTaiPhieuHangLoat` của thẻ "Xuất kết
+  // quả". Thầy chốt gỡ thẻ ấy, nên nó phải dọn ra đây — nó KHÔNG dính gì tới
+  // việc xuất phiếu, chỉ tình cờ ở nhờ trong đó. Gỡ mà không dọn là ca cũ mất
+  // đường tự lành trong im lặng.
+  //
+  // Chạy MỘT LẦN mỗi ca: `daVaKeyRef` chặn lặp mỗi lần màn vẽ lại. Lệnh
+  // `capNhatKeyBank` chỉ ghi MỘT đối tượng R2, không đụng dòng ca. Hỏng thì im
+  // lặng — đây là việc vá nền, không được chặn màn của thầy.
+  useEffect(() => {
+    if (!chiTiet || !teacherBank || teacherBank.length === 0) return
+    const ma = chiTiet.ca.maCa
+    if (daVaKeyRef.current.has(ma)) return
+    daVaKeyRef.current.add(ma)
+    const keyBank = mergeKeepAnswers(teacherBank, soCauCa, boTheoEmDung)
+    void capNhatKeyBank(scriptUrl, secret, chiTiet.ca.maCa, keyBank).catch(() => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chiTiet, teacherBank, soCauCa])
 
   // Tự ghi điểm + chi tiết từng câu (mục 5) cho lượt vừa chấm được mà chưa ghi.
   useEffect(() => {
@@ -814,202 +820,9 @@ export default function ExamMonitorScreen() {
     }
   }
 
-  const daCham = dsEm.filter((e) => e.graded)
-  const handleExportXlsx = () => {
-    const rows: StudentRow[] = daCham.map((e, i) => ({ stt: i + 1, sbd: e.sbd, hoTen: e.hoTen, lop: e.lop || chiTiet?.ca.lop || '', madeThi: chiTiet?.ca.maCa ?? '', sdtPhuHuynh: e.sdt, score: e.graded!.score as ScoreResult }))
-    downloadBangDiem(rows, `BangDiem_kiemtra_${chiTiet?.ca.maCa}.xlsx`)
-  }
-  /** TẢI PHIẾU HÀNG LOẠT — mỗi em đã chấm một ảnh, gói chung một .zip.
-   *
-   * Hạng lớp tính TẠI ĐÂY từ chính bảng điểm của ca (xếp giảm dần, đồng điểm
-   * đồng hạng) chứ không gọi máy chủ — cùng một con số mà lấy hai nguồn thì sớm
-   * muộn cũng lệch. Dòng "việc cần làm" dùng bản mặc định theo chuyên đề em sai
-   * nhiều nhất; em nào cần lời riêng thì thầy mở hồ sơ em đó sửa rồi tải lại. */
-  const handleTaiPhieuHangLoat = async () => {
-    if (!chiTiet || daCham.length === 0) return
-    const bank = teacherBank
-    if (!bank || bank.length === 0) return showToast('Máy này chưa có bản đề CÓ đáp án của ca — không dựng được phiếu', 'error')
-    setDangGoiPhieu('0/' + daCham.length)
-    try {
-      // `boTheoEm` PHẢI đi cùng ở MỌI chỗ dựng bảng chấm: thiếu ở một chỗ là
-      // chỗ đó cắt câu theo luật hash và dựng bảng của người khác.
-      const keyBank = mergeKeepAnswers(bank, soCauCa, boTheoEmDung)
 
-      // VÁ NGƯỢC KHOÁ `key/<maCa>.json` CHO CA CŨ.
-      //
-      // Trước 12/09, ngân hàng CÓ đáp án chỉ được đẩy lên máy chủ khi ca công
-      // bố NGAY. Ca 195422 sáng 12/09 đặt `ca_lop_xong`, nên máy chủ không có
-      // khoá ấy và LINK XEM ĐIỂM của cả ca báo "Máy chủ chưa gửi đề của ca này".
-      // Ca mở từ nay đã luôn đẩy; còn ca CŨ thì tự lành ở đây — Thầy mở màn
-      // chấm là đẩy lên, vì đúng lúc này máy Thầy vừa dựng xong `keyBank`.
-      //
-      // Lệnh `capNhatKeyBank` chỉ ghi MỘT đối tượng R2, không đụng dòng ca.
-      // Hỏng thì im lặng: việc chính ở đây là dựng phiếu, không được chặn.
-      void capNhatKeyBank(scriptUrl, secret, chiTiet.ca.maCa, keyBank).catch(() => {})
 
-      const xep = [...daCham].sort((a, b) => (b.diem ?? 0) - (a.diem ?? 0))
-      const hangCua = new Map<string, number>()
-      xep.forEach((e, i) => {
-        const truoc = i > 0 ? xep[i - 1] : null
-        hangCua.set(e.sbd, truoc && truoc.diem === e.diem ? hangCua.get(truoc.sbd)! : i + 1)
-      })
 
-      const ds: EmTrongCaDeXuatPhieu[] = daCham.map((e) => {
-        const rows = taoChiTietCau(keyBank, chiTiet.ca.maCa, e.sbd, e.moiNhat.dapAn!, e.moiNhat.giayCau)
-        const sc = e.graded!.score
-        const cd = chuyenDeTuChiTiet(rows).filter((c) => c.soSai > 0)
-        return {
-          sbd: e.sbd,
-          hoTen: e.hoTen,
-          lop: e.lop || chiTiet.ca.lop || '',
-          diem: sc.total,
-          xepLoai: classify(sc.total),
-          diemPhan: { I: sc.phanIScore, II: sc.phanIIScore, III: sc.phanIIIScore },
-          toiDaPhan: { I: keyBank.phanI.length * 0.25, II: keyBank.phanII.length, III: keyBank.phanIII.length * 0.25 },
-          chiTietCau: rows,
-          hang: hangCua.get(e.sbd) ?? null,
-          siSo: daCham.length,
-          nopLuc: e.moiNhat.nopLuc || new Date().toISOString(),
-          vieCanLam: viecCanLamMacDinh({
-            hoTen: e.hoTen,
-            ngay: e.moiNhat.nopLuc,
-            diem: sc.total,
-            xepLoai: classify(sc.total),
-            soCauSai: rows.filter((r) => r.dungSai === false).length,
-            chuyenDeSai: cd[0] ? { ten: cd[0].ten, soSai: cd[0].soSai } : null,
-            baiTapDaGiao: null,
-          }),
-        }
-      })
-
-      const zip = await goiPhieuCaZip(ds, chiTiet.ca.tenCa || `Ca ${chiTiet.ca.maCa}`, (da, tong) => setDangGoiPhieu(`${da}/${tong}`))
-      const ten = tenTepZipCa(chiTiet.ca.tenCa, chiTiet.ca.maCa)
-      const u = URL.createObjectURL(zip)
-      const a = document.createElement('a')
-      a.href = u
-      a.download = ten
-      a.click()
-      setTimeout(() => URL.revokeObjectURL(u), 6000)
-      showToast(`Đã tải ${ten} — ${ds.length} phiếu`, 'success')
-    } catch (e) {
-      showToast(e instanceof Error ? e.message : 'Không tạo được phiếu hàng loạt', 'error')
-    } finally {
-      setDangGoiPhieu('')
-    }
-  }
-
-  /** DỰNG VÀ CẤT PHIẾU cho những em chưa có, trả về dòng link của các em đó.
-   *
-   * Hai chỗ gộp để đỡ tải máy chủ: hồ sơ lấy MỘT lệnh cho cả danh sách
-   * (`hoSoNhieuEm`), phiếu cất theo GÓI (`luuNhieuPhieu`) chứ không từng em. */
-  const taoPhieuChoEm = async (
-    url: string,
-    mat: string,
-    dsSbd: string[],
-    goc: string,
-    tien: (da: number, tong: number) => void,
-  ): Promise<DongLinkPhieu[]> => {
-    if (!chiTiet || dsSbd.length === 0) return []
-    const bank = teacherBank
-    if (!bank || bank.length === 0) return []
-    // Lõi dựng phiếu nằm ở `phieu-ca-ca.ts`, dùng chung với cầu nối
-    // `window.__ddh`. Màn hình chỉ đưa dữ liệu nó đã có sẵn trong bộ nhớ.
-    const { dong, loi, co } = await dungPhieuChoEm(
-      url,
-      mat,
-      {
-        maCa: chiTiet.ca.maCa,
-        tenCa: chiTiet.ca.tenCa || '',
-        lop: chiTiet.ca.lop || '',
-        thoiGianPhut: chiTiet.ca.thoiGianPhut ?? null,
-        nguongLan: chiTiet.ca.nguongLan ?? null,
-        nguongGiay: chiTiet.ca.nguongGiay ?? null,
-        // CA ĐỀ RIÊNG TỪNG EM: cờ tắt hạng lớp, và bản đồ số lần sai để báo
-        // cáo gắn đúng nhãn. Thiếu ở đây là phiếu dựng từ màn Theo dõi khác
-        // phiếu dựng từ cầu nối — hai bản cho cùng một em.
-        deRieng: Boolean(deRiengCa),
-        lapCua: deRiengCa?.lapCua,
-      },
-      mergeKeepAnswers(bank, soCauCa, boTheoEmDung),
-      daCham.filter((e): e is typeof e & { graded: NonNullable<typeof e.graded> } => !!e.graded),
-      dsSbd,
-      goc,
-      tien,
-    )
-    if (loi.length > 0) showToast(`${loi.length} em chưa cất được phiếu: ${loi[0].vi_sao}`, 'warn')
-    // CỜ CHẨN ĐOÁN cho thầy (RUT-CAU-CHUA-THEO-NGUYEN-NHAN mục "màn hình").
-    // Em bị chẩn là hết giờ thì phiếu KHÔNG kê câu kiến thức — thầy phải thấy
-    // chuyện đó, bằng không việc bỏ câu diễn ra trong im lặng.
-    setCoChanDoan(co)
-    return dong
-  }
-
-  /** COPY HẾT LINK PHIẾU CỦA CA. Máy chủ đã giữ mã phiếu theo mã ca, nên chỉ
-   * cần một lệnh thay vì mở phiếu từng em.
-   *
-   * Em CHƯA CÓ PHIẾU vẫn được kê tên ở cuối văn bản: im lặng bỏ qua là thầy gửi
-   * thiếu một phụ huynh mà không biết. */
-  const handleCopyLinkPhieu = async () => {
-    if (!chiTiet) return
-    const url = scriptUrl.trim()
-    const mat = secret.trim()
-    if (!url || !mat) return showToast('Chưa cấu hình địa chỉ máy chủ hoặc mã bí mật', 'error')
-    setDangGomLink(true)
-    try {
-      const goc = `${location.origin}${import.meta.env.BASE_URL}`
-      const ds = await phieuTheoCa(url, mat, chiTiet.ca.maCa)
-      let g = gomLinkPhieu(
-        daCham.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen })),
-        ds,
-        goc,
-      )
-
-      // TỰ TẠO PHIẾU CHO EM CÒN THIẾU (thầy chốt 06/09).
-      //
-      // Trước đây phiếu chỉ được cất khi thầy MỞ hồ sơ từng em — ca ba chục em
-      // là ba chục lần mở chỉ để có link gửi Zalo. Nay bấm một nút: máy dựng
-      // nốt phiếu còn thiếu rồi copy đủ cả ca.
-      if (g.chuaCoPhieu.length > 0) {
-        setDangGomLink(true)
-        const them = await taoPhieuChoEm(
-          url,
-          mat,
-          g.chuaCoPhieu.map((x) => x.sbd),
-          goc,
-          (da, tong) => setTienTaoPhieu(`${da}/${tong}`),
-        )
-        if (them.length > 0) {
-          // Ghép tại chỗ, KHÔNG gọi lại `phieuTheoCa`: mã vừa tạo đã nằm trong
-          // tay, hỏi lại máy chủ là một lượt gọi thừa.
-          const conThieu = g.chuaCoPhieu.filter((x) => !them.some((t) => t.sbd === x.sbd))
-          g = { dong: [...g.dong, ...them], chuaCoPhieu: conThieu }
-        }
-      }
-
-      if (g.dong.length === 0) {
-        setTomTatLink('')
-        return showToast('Chưa dựng được phiếu nào — máy này cần bản đề CÓ đáp án của ca', 'warn')
-      }
-      const t = vanBanLinkPhieu(g)
-      setTomTatLink(tomTatLinkPhieu(g))
-      try {
-        await navigator.clipboard.writeText(t)
-        showToast(`Đã copy ${g.dong.length} link phiếu${g.chuaCoPhieu.length ? ` · ${g.chuaCoPhieu.length} em chưa dựng được` : ''}`, 'success')
-      } catch {
-        showToast(t, 'success')
-      }
-    } catch (e) {
-      showToast(e instanceof Error ? e.message : 'Không lấy được danh sách phiếu', 'error')
-    } finally {
-      setDangGomLink(false)
-      setTienTaoPhieu('')
-    }
-  }
-
-  const handleExportJson = () => {
-    const entries = daCham.map((e) => buildStudentEntry(e.hoTen, e.lop || chiTiet?.ca.lop || '', e.sdt, e.graded!.studentAnswers as StudentAnswers, e.graded!.key as AnswerKey))
-    downloadDuLieuJson(entries, `dulieu_kiemtra_${chiTiet?.ca.maCa}.json`)
-  }
 
   const now = gioMayChu()
   const tk = chiTiet
@@ -1559,6 +1372,16 @@ export default function ExamMonitorScreen() {
                 bài. Gửi được sau khi đã dựng phiếu cho ca.
               </div>
             </div>
+
+            {/* XOÁ CA — chuyển lên đây 15/09 theo lệnh thầy, sau khi gỡ hai thẻ
+                "Xuất kết quả" và "Tải đề & lời giải". Đặt cuối thẻ thông tin ca
+                là đúng chỗ: mọi việc tác động lên CHÍNH CA này (Bắt đầu thi,
+                Khoá ca, Xoá ca) nằm chung một thẻ. */}
+            <div className="flex justify-end" style={{ marginTop: 'var(--k4)', paddingTop: 'var(--k3)', borderTop: '1px solid var(--vien)' }}>
+              <button type="button" onClick={() => setHoiXoa(true)} className="tap-target inline-flex items-center gap-1" style={{ ...NHAN_NHO, color: 'var(--do)' }}>
+                <Trash2 size={14} /> Xoá ca này
+              </button>
+            </div>
           </TheNoiDung>
 
           {/* HỘP XÁC NHẬN KHOÁ — nêu ĐÚNG SỐ ĐẾM THẬT, không nói chung chung.
@@ -1727,69 +1550,10 @@ export default function ExamMonitorScreen() {
             )}
           </TheNoiDung>
 
-          {/* XUẤT — ba việc cùng hạng, nên cùng cỡ và xếp một hàng. Bản trước
-              một nút đen to đè hai nút viền, nhìn như ba việc khác hạng nhau
-              trong khi thầy dùng cả ba ngang nhau. Nhãn còn hai chữ, đuôi tệp
-              xuống dòng nhỏ bên dưới. */}
-          {daCham.length > 0 && (
-            <TheNoiDung>
-              <div className="flex items-baseline justify-between" style={{ gap: 'var(--k3)', marginBottom: 'var(--k3)' }}>
-                <div style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)', fontWeight: 700 }}>Xuất kết quả</div>
-                <div style={NHAN_NHO}>{daCham.length} em đã chấm</div>
-              </div>
-              <div className="grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--k2)' }}>
-                <NutXuat icon={<Images size={20} />} ten={dangGoiPhieu ? 'Đang dựng…' : 'Phiếu'} phu={dangGoiPhieu || `${daCham.length} ảnh · zip`} onClick={() => void handleTaiPhieuHangLoat()} tat={!!dangGoiPhieu} />
-                <NutXuat icon={<FileSpreadsheet size={20} />} ten="Bảng điểm" phu="xlsx" onClick={handleExportXlsx} />
-                <NutXuat icon={<FileJson size={20} />} ten="Dữ liệu" phu="json" onClick={handleExportJson} />
-              </div>
-              {/* LINK PHIẾU GỬI ZALO — một lệnh cho cả ca, thay vì mở phiếu
-                  từng em rồi copy từng link. */}
-              <button
-                type="button"
-                onClick={() => void handleCopyLinkPhieu()}
-                disabled={dangGomLink}
-                className="tap-target w-full inline-flex items-center justify-center font-bold"
-                style={{ gap: 8, minHeight: 48, marginTop: 'var(--k2)', borderRadius: 'var(--bo-1)', background: 'var(--the-2)', border: 'none', color: 'var(--muc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}
-              >
-                {dangGomLink ? <RefreshCw size={18} className="animate-spin" /> : <Send size={18} />}
-                {dangGomLink ? (tienTaoPhieu ? `Đang dựng phiếu ${tienTaoPhieu}…` : 'Đang lấy mã phiếu…') : 'Tạo & copy link phiếu gửi Zalo'}
-              </button>
-              {tomTatLink && <div style={{ ...NHAN_NHO, marginTop: 4, textAlign: 'center' }}>{tomTatLink}</div>}
-              {/* CỜ CHẨN ĐOÁN — em nào bị bỏ câu chữa vì nghi hết giờ, và câu
-                  nào đáng gán nhãn mức phương án. Chỉ hiện cho thầy, không
-                  vào phiếu phụ huynh. */}
-              {coChanDoan.length > 0 && (
-                <div style={{ marginTop: 'var(--k2)', padding: 'var(--k2)', borderRadius: 'var(--bo-1)', background: 'var(--the-2)' }}>
-                  <div style={{ fontWeight: 700, fontSize: 'var(--cx-1)', marginBottom: 4 }}>Chẩn đoán nguyên nhân sai ({coChanDoan.length})</div>
-                  <ul style={{ ...NHAN_NHO, margin: 0, paddingLeft: 18, lineHeight: 1.6 }}>
-                    {coChanDoan.map((c, i) => (
-                      <li key={`${c.sbd}-${i}`}>
-                        <b>{c.hoTen}</b> ({c.sbd}): {c.chu}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </TheNoiDung>
-          )}
-
-          {/* ĐỀ + LỜI GIẢI CỦA CA. Cần ngân hàng CÓ đáp án; ca mở ở máy khác mà
-              chưa xin được thì không hiện nút chứ không hiện nút bấm vào lỗi. */}
-          {teacherBank && teacherBank.length > 0 && chiTiet && (
-            <TheNoiDung>
-              <div style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)', fontWeight: 700, marginBottom: 'var(--k3)' }}>Tải đề & lời giải</div>
-              <NutTaiDeCa
-                banks={teacherBank}
-                maCa={chiTiet.ca.maCa}
-                tenCa={chiTiet.ca.tenCa || `Ca ${chiTiet.ca.maCa}`}
-                ghiChu={chiTiet.ca.lop ? `Lớp ${chiTiet.ca.lop}` : ''}
-                soCauCa={soCauCa ?? null}
-                dsEm={dsEm.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen }))}
-                showToast={showToast}
-              />
-            </TheNoiDung>
-          )}
-
+          {/* HAI THẺ "XUẤT KẾT QUẢ" VÀ "TẢI ĐỀ & LỜI GIẢI" ĐÃ GỠ — thầy chốt
+              15/09: "Xóa luôn phần này trên app gv. Chuyển nút xóa lên phần
+              còn lại." Nút "Xoá ca này" nay nằm cuối thẻ thông tin ca, cùng
+              chỗ với Bắt đầu thi và Khoá ca. */}
           {/* CÂU HỎI CỦA EM (HOIBAITHAY.md mục 4C). Không gọi máy chủ cho tới
               khi thầy bấm — Chi tiết ca đã đủ nặng, thêm một lệnh nữa mỗi lần
               mở màn là đi ngược việc giảm tải vừa làm. */}
@@ -1833,10 +1597,6 @@ export default function ExamMonitorScreen() {
             </div>
           )}
 
-          {/* XOÁ CA */}
-          <button type="button" onClick={() => setHoiXoa(true)} className="tap-target self-end inline-flex items-center gap-1" style={{ ...NHAN_NHO, color: 'var(--do)' }}>
-            <Trash2 size={14} /> Xoá ca này
-          </button>
           {hoiXoa && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'var(--phu)' }}>
               <div className="w-full flex flex-col" style={{ maxWidth: 400, background: 'var(--the)', borderRadius: 'var(--bo-3)', padding: 'var(--k5)', gap: 'var(--k3)', boxShadow: 'var(--bong-2)' }}>
@@ -1947,33 +1707,3 @@ function NutLinkCa({ icon, ten, phu, mau, nen, daCopy, onClick }: { icon: React.
   )
 }
 
-function NutXuat({ icon, ten, phu, onClick, tat }: { icon: React.ReactNode; ten: string; phu: string; onClick: () => void; tat?: boolean }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={tat}
-      className="tap-target flex flex-col items-center justify-center"
-      style={{
-        gap: 4,
-        minHeight: 84,
-        padding: 'var(--k3) var(--k2)',
-        borderRadius: 'var(--bo-2)',
-        background: 'var(--the-2)',
-        border: '1.5px solid transparent',
-        color: tat ? 'var(--mo)' : 'var(--muc)',
-        opacity: tat ? 0.7 : 1,
-        transitionProperty: 'background-color, border-color',
-        transitionDuration: 'var(--nhanh)',
-      }}
-    >
-      <span style={{ color: tat ? 'var(--mo)' : 'var(--phu-dam)' }}>{icon}</span>
-      <span className="font-bold text-center" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', lineHeight: 1.2 }}>
-        {ten}
-      </span>
-      <span className="text-center" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', fontVariantNumeric: 'tabular-nums', lineHeight: 1.2 }}>
-        {phu}
-      </span>
-    </button>
-  )
-}

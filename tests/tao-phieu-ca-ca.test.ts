@@ -251,9 +251,15 @@ describe('Màn Chi tiết ca dùng CHUNG lõi này, không chép lại', () => {
     // `type CoChanDoanEm` (cờ chẩn đoán cho thầy) và phép kiểm đỏ dù màn hình
     // vẫn dùng đúng lõi chung. Ghim nguyên văn là mỗi lần thêm một kiểu lại
     // phải sửa phép kiểm — sửa riết thành phản xạ sửa test cho xanh.
-    expect(man).toMatch(/import \{[^}]*\bdungPhieuChoEm\b[^}]*\} from '\.\.\/lib\/phieu-ca-ca'/)
-    expect(man).toContain('dungPhieuChoEm(')
-    // Không còn bản chép: màn hình không được tự gọi `dungPhieu`/`luuNhieuPhieu`.
+    // ĐỔI 15/09: thầy chốt gỡ hẳn thẻ "Xuất kết quả" khỏi màn Chi tiết ca, nên
+    // màn ấy KHÔNG còn dựng phiếu nữa. Ý ĐỊNH của phép kiểm giữ nguyên và
+    // viết lại cho đúng: CÒN dựng phiếu thì phải dùng lõi chung; và tuyệt đối
+    // không được có bản chép.
+    const coDungPhieu = man.includes('dungPhieuChoEm(')
+    if (coDungPhieu) {
+      expect(man).toMatch(/import \{[^}]*\bdungPhieuChoEm\b[^}]*\} from '\.\.\/lib\/phieu-ca-ca'/)
+    }
+    // Không có bản chép, dù có dựng phiếu hay không.
     expect(man).not.toContain('luuNhieuPhieu(')
     expect(man).not.toContain('sinhMaPhieu()')
   })
