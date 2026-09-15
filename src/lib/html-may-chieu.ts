@@ -36,6 +36,18 @@ export interface OBang {
   /** Cả lượt bài tập về nhà của em: làm bao nhiêu trên tổng, đúng, sai, chưa
    * làm. Bỏ trống nghĩa là em chưa được giao bài nào. */
   btvnTom?: { soCauGiao: number; soDaLam: number; soDung: number; soSai: number; soChuaLam: number }
+  /** THẦN THÚ CỦA EM — góc phải tờ chiếu. Bỏ trống khi em chưa chọn thần thú
+   * hoặc máy chủ không trả kịp; tờ chiếu khi ấy in như cũ, không chừa ô rỗng. */
+  thanThu?: {
+    anh: string
+    ten: string
+    danhHieu: string
+    he: string
+    capDo: number
+    hinhThai: string
+    tangThapCaoNhat: number
+    soCauDaThanhTay: number
+  }
 }
 
 /** Chữ và màu cho từng trạng thái bài tập về nhà trên tờ chiếu. */
@@ -122,6 +134,23 @@ function btvnHtml(o: OBang): string {
   return o1 || o2 ? `<div class="mc-btvn">${o1}${o2}</div>` : ''
 }
 
+/** Góc thần thú — thầy chốt 15-09: mỗi em lên bảng thì thú của em hiện ra. */
+function thuHtml(o: OBang): string {
+  const t = o.thanThu
+  if (!t) return ''
+  const anh = t.anh !== ''
+    ? `<img class="mc-thu-anh" src="${t.anh}" alt="" />`
+    : '<div class="mc-thu-anh mc-thu-trong" aria-hidden="true"></div>'
+  return `<aside class="mc-thu">
+      ${anh}
+      <div class="mc-thu-chu">
+        <div class="mc-thu-ten">${thoat(t.ten)}</div>
+        <div class="mc-thu-cap"><b>Hình thái ${t.capDo}/12</b> · ${thoat(t.hinhThai)}</div>
+        <div class="mc-thu-so">Tháp tầng ${t.tangThapCaoNhat} · thanh tẩy ${t.soCauDaThanhTay} câu</div>
+      </div>
+    </aside>`
+}
+
 function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number): string {
   if (!o) {
     return `<section class="mc-nua mc-${viTri} mc-trong" aria-hidden="true"><div class="mc-trong-chu">Đợt này chỉ gọi một em</div></section>`
@@ -129,10 +158,13 @@ function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number): s
   const ma = `giai-${maDot}-${viTri}`
   return `<section class="mc-nua mc-${viTri}">
   <header class="mc-em">
-    <div class="mc-ten">${thoat(o.hoTen || o.sbd)}</div>
-    <div class="mc-phu"><span class="mc-sbd">${thoat(o.sbd)}</span><span class="mc-cau-so">Câu ${o.soCau} · Phần ${o.cau.phan}</span></div>
-    ${btvnHtml(o)}
-    ${o.viSao ? `<div class="mc-viSao">${thoat(o.viSao)}</div>` : ''}
+    <div class="mc-em-trai">
+      <div class="mc-ten">${thoat(o.hoTen || o.sbd)}</div>
+      <div class="mc-phu"><span class="mc-sbd">${thoat(o.sbd)}</span><span class="mc-cau-so">Câu ${o.soCau} · Phần ${o.cau.phan}</span></div>
+      ${btvnHtml(o)}
+      ${o.viSao ? `<div class="mc-viSao">${thoat(o.viSao)}</div>` : ''}
+    </div>
+    ${thuHtml(o)}
   </header>
   <div class="mc-than">${thanCauHtml(o.cau)}</div>
   <div class="mc-giai-vung">
@@ -203,7 +235,19 @@ body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); overflow: 
 .mc-dot + .mc-dot .mc-trai { border-left: 4px solid var(--mc-vien); }
 .mc-trong { align-items: center; justify-content: center; }
 .mc-trong-chu { color: var(--mc-nhat); font-family: var(--sans, system-ui, sans-serif); font-size: 15px; }
-.mc-em { padding-bottom: 10px; border-bottom: 2px solid var(--mc-xanh); }
+.mc-em { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding-bottom: 10px; border-bottom: 2px solid var(--mc-xanh); }
+.mc-em-trai { min-width: 0; flex: 1 1 auto; }
+/* Góc thần thú. Chiếu lên tường từ cuối lớp nên ảnh phải to hơn một biểu tượng
+   thường: 108px là ngưỡng còn nhận ra hình thái mà không lấn chỗ đề bài. */
+.mc-thu { flex: 0 0 auto; display: flex; align-items: center; gap: 12px; width: 344px; max-width: 50%; padding: 6px 12px 6px 6px; border: 1px solid var(--mc-vien); border-radius: 16px; font-family: var(--sans, system-ui, sans-serif); }
+.mc-thu-anh { width: 100px; height: 100px; object-fit: contain; display: block; flex: 0 0 auto; }
+.mc-thu-trong { border-radius: 12px; background: var(--mc-vien); }
+.mc-thu-chu { min-width: 0; line-height: 1.32; }
+.mc-thu-ten { font-weight: 900; font-size: 14px; line-height: 1.25; }
+.mc-thu-cap { margin-top: 3px; color: var(--mc-nhat); font-size: 13px; }
+.mc-thu-cap b { color: inherit; font-weight: 800; }
+.mc-thu-so { margin-top: 2px; color: var(--mc-nhat); font-size: 12px; font-variant-numeric: tabular-nums; }
+@media (max-width: 1280px) { .mc-thu { width: 228px; } .mc-thu-anh { width: 80px; height: 80px; } .mc-thu-ten { font-size: 13px; } .mc-thu-cap, .mc-thu-so { font-size: 11px; } }
 .mc-ten { font-family: var(--sans, system-ui, sans-serif); font-weight: 900; font-size: clamp(22px, 2.4vw, 34px); line-height: 1.2; }
 .mc-phu { display: flex; gap: 14px; margin-top: 3px; color: var(--mc-nhat); font-family: var(--sans, system-ui, sans-serif); font-size: 14px; font-variant-numeric: tabular-nums; }
 .mc-viSao { margin-top: 4px; color: var(--mc-nhat); font-family: var(--sans, system-ui, sans-serif); font-size: 13px; }

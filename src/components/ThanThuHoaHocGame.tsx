@@ -403,7 +403,14 @@ export default function ThanThuHoaHocGame({
    */
   const daNapKhoRef = useRef(false)
   const conGanRef = useRef(true)
-  useEffect(() => () => { conGanRef.current = false }, [])
+  // Phải bật lại khi GẮN, không chỉ tắt khi rời. StrictMode dựng → dọn → dựng
+  // lại trên CÙNG một thể hiện, nên ref sống qua lượt dọn: bản cũ chỉ tắt mà
+  // không bật lại, thế là từ lượt gắn thứ hai trở đi MỌI kết quả mạng về đều bị
+  // vứt lặng lẽ, màn hình treo ở "đang tải" mà không ai thấy lỗi.
+  useEffect(() => {
+    conGanRef.current = true
+    return () => { conGanRef.current = false }
+  }, [])
 
   useEffect(() => {
     if (tabGame !== 'leo_thap' && tabGame !== 'san_cau_sai') return
@@ -437,7 +444,15 @@ export default function ThanThuHoaHocGame({
    * liên tục lúc leo tháp, đẩy từng nhịp là phá 3G của em.
    */
   const [tinhTrangDongBo, setTinhTrangDongBo] = useState<'chua' | 'dangTai' | 'xong' | 'loi' | 'khongCo'>('chua')
+  /** Lý do hỏng, NGUYÊN VĂN từ tầng gọi mạng. Nuốt lý do là tự bịt mắt mình. */
+  const [lyDoDongBo, setLyDoDongBo] = useState('')
+  const [lucDongBo, setLucDongBo] = useState('')
+  const [dangDongBoTay, setDangDongBoTay] = useState(false)
   const daNuotRef = useRef(false)
+  /** Gương của `hoSo` để hàm đồng bộ tay đọc được bản mới nhất mà không phụ
+   *  thuộc vào lượt dựng lại của React. */
+  const hoSoRef = useRef(hoSo)
+  useEffect(() => { hoSoRef.current = hoSo }, [hoSo])
 
   useEffect(() => {
     if (daNuotRef.current) return
@@ -449,9 +464,56 @@ export default function ThanThuHoaHocGame({
         if (!conGanRef.current) return
         setHoSo((prev) => hoaGiaiHoSo(prev, tho).hoSo)
         setTinhTrangDongBo('xong')
+        setLucDongBo(new Date().toLocaleTimeString('vi-VN'))
       })
-      .catch(() => { if (conGanRef.current) setTinhTrangDongBo('loi') })
+      .catch((e) => {
+        if (!conGanRef.current) return
+        setTinhTrangDongBo('loi')
+        setLyDoDongBo(e instanceof Error ? e.message : 'Không rõ lý do')
+      })
   }, [docThanThuMayChu])
+
+  /**
+   * ĐỒNG BỘ NGAY. Đường tự động chỉ chạy lúc mở game rồi đẩy sau 2,5 giây; em
+   * mở tab rồi tắt nhanh là chưa kịp đẩy gì. Nút này kéo bản máy chủ về, trộn,
+   * đẩy ngược lên — trọn một vòng, và NÓI RA kết quả.
+   */
+  const dongBoNgay = useCallback(async () => {
+    if (!docThanThuMayChu || !ghiThanThuMayChu) {
+      setTinhTrangDongBo('khongCo')
+      setLyDoDongBo('Màn này chưa nối máy chủ')
+      return
+    }
+    setDangDongBoTay(true)
+    setTinhTrangDongBo('dangTai')
+    setLyDoDongBo('')
+    try {
+      const tho = await docThanThuMayChu()
+      const kq = hoaGiaiHoSo(hoSoRef.current, tho)
+      hoSoRef.current = kq.hoSo
+      if (conGanRef.current) setHoSo(kq.hoSo)
+      const tra = (await ghiThanThuMayChu(kq.hoSo)) as
+        { ok?: boolean; daGhi?: boolean; hoSo?: unknown; error?: string } | null
+      if (tra !== null && tra.ok === false) throw new Error(tra.error || 'Máy chủ từ chối ghi')
+      // Máy chủ nhỉnh hơn thì nuốt lại lần nữa cho hai bên bằng nhau.
+      if (tra !== null && tra.daGhi === false && tra.hoSo !== undefined) {
+        const k2 = hoaGiaiHoSo(kq.hoSo, tra.hoSo)
+        hoSoRef.current = k2.hoSo
+        if (conGanRef.current) setHoSo(k2.hoSo)
+      }
+      if (conGanRef.current) {
+        setTinhTrangDongBo('xong')
+        setLucDongBo(new Date().toLocaleTimeString('vi-VN'))
+      }
+    } catch (e) {
+      if (conGanRef.current) {
+        setTinhTrangDongBo('loi')
+        setLyDoDongBo(e instanceof Error ? e.message : 'Không rõ lý do')
+      }
+    } finally {
+      if (conGanRef.current) setDangDongBoTay(false)
+    }
+  }, [docThanThuMayChu, ghiThanThuMayChu])
 
   const henGhiRef = useRef<number | null>(null)
   useEffect(() => {
@@ -469,7 +531,16 @@ export default function ThanThuHoaHocGame({
             setHoSo((prev) => hoaGiaiHoSo(prev, o.hoSo).hoSo)
           }
         })
-        .catch(() => { /* mất mạng thì thôi, lần sau đẩy tiếp */ })
+        .then(() => {
+          if (conGanRef.current) setLucDongBo(new Date().toLocaleTimeString('vi-VN'))
+        })
+        .catch((e) => {
+          // Mất mạng thì lần sau đẩy tiếp — nhưng PHẢI hiện ra, đừng nuốt.
+          if (conGanRef.current) {
+            setTinhTrangDongBo('loi')
+            setLyDoDongBo(e instanceof Error ? e.message : 'Không đẩy được lên máy chủ')
+          }
+        })
     }, 2500)
     return () => {
       if (henGhiRef.current !== null) { clearTimeout(henGhiRef.current); henGhiRef.current = null }
@@ -1129,6 +1200,43 @@ export default function ThanThuHoaHocGame({
                 </div>
                 <div className="text-[11px] text-slate-400">Lực chiến tổng</div>
               </div>
+            </div>
+
+            {/* THANH ĐỒNG BỘ — trước đây `tinhTrangDongBo` được tính rồi BỎ ĐÓ,
+                không hiện ra màn nào. Thú hai máy lệch nhau mà không ai biết
+                hỏng ở khâu nào, phải mò bằng cách soi cơ sở dữ liệu. Nay nói
+                thẳng: đang ở trạng thái gì, lần đồng bộ gần nhất lúc mấy giờ,
+                hỏng thì hỏng vì lý do gì — nguyên văn từ tầng gọi mạng. */}
+            <div className="w-full z-10 mt-3 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 px-3 py-2 text-left">
+              <span
+                className={`h-2 w-2 shrink-0 rounded-full ${
+                  tinhTrangDongBo === 'xong' ? 'bg-emerald-500'
+                    : tinhTrangDongBo === 'dangTai' ? 'bg-amber-400 animate-pulse'
+                    : tinhTrangDongBo === 'loi' ? 'bg-rose-500'
+                    : 'bg-slate-400'
+                }`}
+              />
+              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                {tinhTrangDongBo === 'xong' ? 'Đã đồng bộ với máy chủ'
+                  : tinhTrangDongBo === 'dangTai' ? 'Đang đồng bộ…'
+                  : tinhTrangDongBo === 'loi' ? 'Chưa đồng bộ được'
+                  : tinhTrangDongBo === 'khongCo' ? 'Màn này chạy một mình, không nối máy chủ'
+                  : 'Chưa đồng bộ lần nào'}
+                {lucDongBo !== '' && tinhTrangDongBo === 'xong' ? ` · ${lucDongBo}` : ''}
+              </span>
+              {lyDoDongBo !== '' && (
+                <span className="text-[11px] text-rose-600 dark:text-rose-400 basis-full sm:basis-auto">
+                  {lyDoDongBo}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => { void dongBoNgay() }}
+                disabled={dangDongBoTay}
+                className="ml-auto rounded-full bg-slate-900 dark:bg-white px-3 py-1 text-[11px] font-bold text-white dark:text-slate-900 disabled:opacity-40"
+              >
+                {dangDongBoTay ? 'Đang đồng bộ…' : 'Đồng bộ ngay'}
+              </button>
             </div>
 
             {/* CANVAS TƯƠNG TÁC — vuốt ngang để xoay 360°, chạm để nghe tiếng kêu,

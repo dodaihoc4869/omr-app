@@ -14,7 +14,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Shuffle, MonitorPlay } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
-import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, lichSuLenBang, type CaTomTat, type LichSuLenBangEm } from '../lib/exam-api'
+import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, lichSuLenBang, thanThuDocApi, type CaTomTat, type LichSuLenBangEm } from '../lib/exam-api'
 import { docKhoChuaCa, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { mergeKeepAnswers } from '../data/examContent'
 import { khuTrungNguon } from '../lib/khu-trung-cau'
@@ -753,6 +753,28 @@ export default function GoiLenBangScreen() {
       showToast(`${thieu.length} em chưa tra được đề: ${thieu.slice(0, 3).join(' · ')}`, 'warn')
     }
     if (dsO.length === 0) return
+
+    // THẦN THÚ CỦA TỪNG EM — góc phải tờ chiếu (thầy chốt 15-09).
+    //
+    // Gọi song song và CÓ HẠN CHỜ. Máy chủ chậm, mất mạng, hay em chưa chọn
+    // thần thú thì tờ chiếu vẫn mở đúng như cũ, chỉ thiếu con thú — việc gọi em
+    // lên bảng KHÔNG được phụ thuộc vào một thứ trang trí.
+    //
+    // Nhập kiểu động: bộ vẽ thần thú chỉ cần đúng lúc bấm máy chiếu, không việc
+    // gì phải nằm trong gói khởi động của màn thầy.
+    try {
+      const { thanThuChoToChieu } = await import('../lib/anh-than-thu')
+      const docThu = (sbd: string): Promise<unknown> =>
+        thanThuDocApi('', sbd).then((r) => (r.ok ? (r.hoSo ?? null) : null))
+      const dsThu = await Promise.all(
+        dsO.map((o) => thanThuChoToChieu(docThu, o.sbd).catch(() => null)),
+      )
+      for (const [i, t] of dsThu.entries()) {
+        if (t !== null) dsO[i]!.thanThu = t
+      }
+    } catch {
+      /* không lấy được thú thì thôi — tờ chiếu vẫn phải mở */
+    }
 
     // CÂU CHỈ ĐỌC ĐÁP ÁN đi thành trang đáp án nối sau các đợt (thầy chốt 14/09).
     const dsDapAn: CauLuyen[] = []
