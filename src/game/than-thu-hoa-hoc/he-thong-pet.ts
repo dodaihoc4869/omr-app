@@ -6,7 +6,10 @@
  */
 
 import { CAP_TOI_DA, type CapTienHoa } from './hinh-thai'
-import { EXP_BAN_DAU, thanhExp } from './kinh-nghiem'
+import {
+  EXP_BAN_DAU, thanhExp, SUC_CHUA_ONG,
+  soExpRong, vaSoExp, type SoExpTheoNguon,
+} from './kinh-nghiem'
 import { type HeNguyenTo } from './tuong-khac'
 
 // Vòng tương khắc SÁU HỆ sống ở `tuong-khac.ts` — một nguồn sự thật. Ở đây chỉ
@@ -149,6 +152,13 @@ export interface HoSoThanThuLuu {
   exp: number
   expToiDa: number
   capTienHoa: CapTienHoa
+  /**
+   * ỐNG NGHIỆM — EXP đã kiếm mà chưa nạp cho thần thú. Trần `SUC_CHUA_ONG`.
+   * Đây là bể THỨ NHẤT; `exp` ở trên là bể thứ hai (đã nạp vào thú).
+   */
+  khoExp: number
+  /** Sổ cộng dồn EXP theo năm nguồn — để dựng bảng tóm tắt cho em xem. */
+  soExp: SoExpTheoNguon
   tangThapCaoNhat: number
   /** Số câu sai đã thanh tẩy — nguồn EXP thật, có hiện ra màn. */
   soCauDaThanhTay: number
@@ -186,6 +196,8 @@ export function vaHoSo(tho: unknown, idChon = ''): HoSoThanThuLuu {
       ? chuoi('idThanhThuChon', '') : md.idThanhThuChon,
     capDo,
     exp: so('exp', 0),
+    khoExp: Math.min(SUC_CHUA_ONG, so('khoExp', 0)),
+    soExp: vaSoExp(o.soExp),
     // luôn tính lại theo cấp, không tin số cũ trong máy
     expToiDa: thanhExp(capDo),
     capTienHoa: capDo as CapTienHoa,
@@ -202,6 +214,8 @@ export function layHoSoThanThuMacDinh(idChon = ''): HoSoThanThuLuu {
     idThanhThuChon: idChon,
     capDo: 1,
     exp: 0,
+    khoExp: 0,
+    soExp: soExpRong(),
     expToiDa: EXP_BAN_DAU,
     capTienHoa: 1,
     tangThapCaoNhat: 1,

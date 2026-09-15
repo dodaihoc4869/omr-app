@@ -149,7 +149,11 @@ describe('kinh nghiệm', () => {
   })
 
   it('BẢNG NGUỒN EXP phải khớp đúng con số trong mã — không hứa suông', () => {
-    expect(BANG_NGUON_EXP.length).toBe(4)
+    // Năm nguồn từ 15-09: thêm "nộp bài cho MOM".
+    expect(BANG_NGUON_EXP.length).toBe(5)
+    expect(NGUON_EXP.nopMom(0)).toBe(150)
+    expect(NGUON_EXP.nopMom(10)).toBe(400)
+    expect(BANG_NGUON_EXP.find((n) => n.viec.includes('MOM'))?.thuong).toBe('150 + 25 × điểm')
     expect(NGUON_EXP.suaCauSai()).toBe(100)
     expect(BANG_NGUON_EXP.find((n) => n.viec.includes('câu sai'))?.thuong).toBe('100 EXP')
     expect(NGUON_EXP.nopBtvn()).toBe(200)

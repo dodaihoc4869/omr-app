@@ -15,6 +15,15 @@ export interface ThongSoHieuUng {
   dangDanh: boolean
   dangBiDanh: boolean
   dangTungNo: boolean
+  /**
+   * Góc xoay quanh trục đứng, radian. Em vuốt ngang trên canvas thì thú quay.
+   *
+   * Canvas 2D không có không gian ba chiều, nên xoay được giả bằng cách NÉN
+   * ngang theo `cos(góc)`: nhìn thẳng thì cos = 1, nghiêng 90° thì cos = 0 và
+   * thú mỏng như tờ giấy, qua 90° thì cos âm và hình tự lật — đúng cảm giác
+   * quay tròn 360°. Không truyền thì coi như nhìn thẳng.
+   */
+  gocXoay?: number
 }
 
 function nhat(mau: string, doMo: number): string {
@@ -355,6 +364,16 @@ export function veThanThuCanvas(
 
   ctx.save()
   ctx.translate(cx, cy)
+
+  // XOAY 360° quanh trục đứng. Giữ |cos| tối thiểu 0,15: ảnh chụp thử ở 0,06
+  // cho ra một vệt mảnh như sợi chỉ ở đúng 90° và 270°, em tưởng thú biến mất.
+  const goc = fx.gocXoay ?? 0
+  if (goc !== 0) {
+    const c = Math.cos(goc)
+    const ti = Math.sign(c || 1) * Math.max(0.15, Math.abs(c))
+    ctx.scale(ti, 1)
+  }
+
   if (fx.dangBiDanh) {
     ctx.translate(Math.sin(t * 40) * banKinh * 0.06, 0)
     ctx.globalAlpha = 0.72

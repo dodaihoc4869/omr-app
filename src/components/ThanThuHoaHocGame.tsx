@@ -11,7 +11,7 @@
  * Và một luật của kho: chỉ dùng rgb / rgba / token Tailwind, không hex.
  */
 
-import { useEffect, useRef, useState, useMemo, useCallback } from 'react'
+import { Fragment, useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import {
   Sparkles,
   Trophy,
@@ -42,7 +42,10 @@ import {
   type ThanThuInfo,
 } from '../game/than-thu-hoa-hoc/he-thong-pet'
 import { layHinhThai, CAP_TOI_DA } from '../game/than-thu-hoa-hoc/hinh-thai'
-import { nhanExp, NGUON_EXP, BANG_NGUON_EXP } from '../game/than-thu-hoa-hoc/kinh-nghiem'
+import {
+  nhanExp, NGUON_EXP, BANG_NGUON_EXP, SUC_CHUA_ONG,
+  DS_NGUON_EXP, TEN_NGUON_EXP, tongSoExp, type NguonKiemExp,
+} from '../game/than-thu-hoa-hoc/kinh-nghiem'
 import {
   KHO_CAU_HOI, bacTheoTang, chiSoTheoBac, type CauHoi,
 } from '../game/than-thu-hoa-hoc/kho-cau-hoi'
@@ -52,6 +55,8 @@ import {
 } from '../game/than-thu-hoa-hoc/cau-hoi-cua-em'
 import { veThanThuCanvas, khungVeThanThu } from '../game/than-thu-hoa-hoc/ve-than-thu'
 import KhungLoiGiaiGame from './KhungLoiGiaiGame'
+import OngNghiemExp from './OngNghiemExp'
+import PopupThuongExp, { type TinThuongExp } from './PopupThuongExp'
 import { AmThanhPet } from '../game/than-thu-hoa-hoc/am-thanh-pet'
 
 interface Props {
@@ -63,6 +68,8 @@ interface Props {
    */
   dsLichSu: { tong?: number; soCauSai?: number; maCa?: string; id?: string }[]
   dsBtvn: { daNop?: boolean; id?: string }[]
+  /** Bài phụ huynh (MOM) đã giao — chỉ đọc `id`, `trangThai`, `diem`. */
+  dsMom?: { id?: string; trangThai?: string; diem?: number }[]
   /**
    * Lấy danh sách câu em đã làm SAI, kèm nhãn `chuyenDe` / `mucDo` / `dang`
    * thầy gắn trong kho đề — đúng nguồn mục Khắc Phục Câu Sai đang dùng.
@@ -101,6 +108,8 @@ function useVeThanThu(
   cap: number,
   hieuUngRef: { current: HieuUngCombat },
   dangHien: boolean,
+  /** Góc xoay em vuốt được; đọc từ ref nên xoay không dựng lại vòng lặp. */
+  gocRef?: { current: number },
 ) {
   useEffect(() => {
     if (!dangHien) return
@@ -130,18 +139,20 @@ function useVeThanThu(
           dangDanh: hu === 'danh',
           dangBiDanh: hu === 'biDanh',
           dangTungNo: hu === 'no',
+          gocXoay: gocRef?.current ?? 0,
         },
       )
       animId = requestAnimationFrame(ve)
     }
     animId = requestAnimationFrame(ve)
     return () => cancelAnimationFrame(animId)
-  }, [canvasRef, info, cap, hieuUngRef, dangHien])
+  }, [canvasRef, info, cap, hieuUngRef, dangHien, gocRef])
 }
 
 export default function ThanThuHoaHocGame({
   dsLichSu,
   dsBtvn,
+  dsMom = [],
   layCauSaiCuaEm,
   onDong,
   onChuyenSangKhacPhuc,
@@ -164,6 +175,11 @@ export default function ThanThuHoaHocGame({
   const amThanhRef = useRef<AmThanhPet | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const canvasCombatRef = useRef<HTMLCanvasElement | null>(null)
+  /** Góc xoay của thú ở Đảo Thần Thú — em vuốt ngang để quay 360°. */
+  const gocXoayRef = useRef(0)
+  const keoRef = useRef<{ dangKeo: boolean; xTruoc: number; daKeo: number }>({
+    dangKeo: false, xTruoc: 0, daKeo: 0,
+  })
 
   // Khởi tạo audio context
   // Tạo MỘT lần. Trước đây phụ thuộc [batAm] nên mỗi lần bật/tắt loa lại dựng
@@ -241,31 +257,83 @@ export default function ThanThuHoaHocGame({
   }, [])
 
   /**
-   * CỘNG EXP — ĐƯỜNG DUY NHẤT. Mọi nguồn đều đi qua đây.
+   * RÓT EXP VÀO ỐNG NGHIỆM — ĐƯỜNG DUY NHẤT vào bể thứ nhất.
    *
-   * Trước đây mỗi chỗ tự viết nhánh lên cấp riêng, và chỗ thắng tháp quên viết:
-   * leo hai mươi tầng vẫn Lv.1, thanh EXP tràn rồi bị Math.min(100,…) che đi.
+   * Mọi việc học đều đổ vào đây, KHÔNG đổ thẳng vào thần thú. Muốn thú lên cấp
+   * thì em phải tự bấm nạp — đó là lúc ống vơi đi (thầy chốt 15-09).
+   *
+   * Ống đầy thì CHẶN và báo, không bao giờ vứt EXP em đã kiếm được.
    */
-  const congExp = useCallback((them: number, viec: string) => {
+  const [ongDayKhongNhan, setOngDayKhongNhan] = useState(0)
+  const [tinThuong, setTinThuong] = useState<TinThuongExp | null>(null)
+  const demLanThuong = useRef(0)
+
+  const themVaoKho = useCallback((them: number, nguon: NguonKiemExp, viec: string) => {
     if (them <= 0) return
     amThanhRef.current?.moKhoa()
+    let daNhan = 0
     setHoSo((prev) => {
-      const kq = nhanExp({ capDo: prev.capDo, exp: prev.exp }, them)
+      const conCho = Math.max(0, SUC_CHUA_ONG - prev.khoExp)
+      const nhan = Math.min(them, conCho)
+      if (nhan < them) setOngDayKhongNhan(them - nhan)
+      if (nhan <= 0) return prev
+      daNhan = nhan
+      // Sổ ghi ĐÚNG phần rót được, không ghi phần ống không chứa nổi —
+      // nếu không tổng sổ sẽ vênh với tổng EXP thật.
+      return {
+        ...prev,
+        khoExp: prev.khoExp + nhan,
+        soExp: { ...prev.soExp, [nguon]: (prev.soExp[nguon] ?? 0) + nhan },
+      }
+    })
+    if (daNhan > 0) {
+      demLanThuong.current += 1
+      setTinThuong({ exp: daNhan, nguon, viec, lan: demLanThuong.current })
+      amThanhRef.current?.thangTran()
+    }
+    setViecVuaLam(viec + ' · +' + them + ' EXP vào ống')
+  }, [])
+
+  /**
+   * NẠP TINH LỰC — rót từ ống sang thần thú. Ống vơi đúng bằng phần đã rót.
+   *
+   * Hàm này KHÔNG sinh EXP. Nó là chỗ duy nhất đổ vào bể thứ hai, và nó chỉ
+   * lấy từ bể thứ nhất ra.
+   */
+  const [dangNap, setDangNap] = useState(false)
+  const napVaoThu = useCallback(() => {
+    amThanhRef.current?.moKhoa()
+    setHoSo((prev) => {
+      const rot = prev.khoExp
+      if (rot <= 0) return prev
+      const kq = nhanExp({ capDo: prev.capDo, exp: prev.exp }, rot)
       if (kq.soCapLen > 0) {
         amThanhRef.current?.tienHoa()
         setTinTienHoa({ cap: kq.capDo, ten: layHinhThai(kq.capDo).ten })
+      } else {
+        amThanhRef.current?.kichNo()
       }
+      setViecVuaLam(`Đã nạp ${rot} EXP từ ống vào thần thú`)
       return {
         ...prev,
         capDo: kq.capDo,
         capTienHoa: kq.capTienHoa,
         exp: kq.exp,
         expToiDa: kq.expToiDa,
+        khoExp: 0,
         danhHieuHienTai: `${layHinhThai(kq.capDo).ten} · Lv.${kq.capDo}`,
       }
     })
-    setViecVuaLam(viec + ' · +' + them + ' EXP')
+    // Hoạt ảnh ống vơi: chỉ là cờ cho CSS, không đụng gì tới số liệu.
+    setDangNap(true)
+    window.setTimeout(() => setDangNap(false), 850)
   }, [])
+
+  useEffect(() => {
+    if (ongDayKhongNhan <= 0) return
+    const h = setTimeout(() => setOngDayKhongNhan(0), 6000)
+    return () => clearTimeout(h)
+  }, [ongDayKhongNhan])
 
   const [tinTienHoa, setTinTienHoa] = useState<{ cap: number; ten: string } | null>(null)
   const [viecVuaLam, setViecVuaLam] = useState('')
@@ -383,7 +451,7 @@ export default function ThanThuHoaHocGame({
         if (truoc.includes(q.qid)) return truoc
         const sau = [...truoc, q.qid]
         setHoSo((h) => ({ ...h, soCauDaThanhTay: sau.length }))
-        congExp(NGUON_EXP.suaCauSai(), `Hạ quái câu sai: ${q.tenDang || q.chuyenDe}`)
+        themVaoKho(NGUON_EXP.suaCauSai(), 'sanBoss', `Hạ quái câu sai: ${q.tenDang || q.chuyenDe}`)
         return sau
       })
     } else {
@@ -391,7 +459,7 @@ export default function ThanThuHoaHocGame({
       amThanhRef.current?.trungDon()
       setKetQuaSan({ dung: false, daChon: idx })
     }
-  }, [cauSanHienTai, ketQuaSan, congExp])
+  }, [cauSanHienTai, ketQuaSan, themVaoKho])
 
   /**
    * EXP TỪ VIỆC HỌC ĐÃ CÓ SẴN — nhận một lần, không nhận lại.
@@ -407,31 +475,129 @@ export default function ThanThuHoaHocGame({
       if (raw) daNhan = JSON.parse(raw) as Record<string, boolean>
     } catch { /* hỏng thì coi như chưa nhận gì */ }
 
-    let tong = 0
-    const viec: string[] = []
-    for (const ca of dsLichSu) {
-      const khoa = 'ca_' + String((ca as { maCa?: string; id?: string }).maCa ?? (ca as { id?: string }).id ?? '')
-      if (khoa === 'ca_' || daNhan[khoa]) continue
-      if (typeof ca.tong !== 'number' || Number.isNaN(ca.tong)) continue
-      daNhan[khoa] = true
-      tong += NGUON_EXP.caThi(ca.tong)
-      viec.push('ca thi')
+    // CHỖ TRỐNG TRONG ỐNG QUYẾT ĐỊNH RÓT ĐƯỢC BAO NHIÊU.
+    //
+    // Bản đầu đánh dấu "đã nhận" cho MỌI ca rồi mới rót; ống đầy thì phần dư
+    // bay mất vĩnh viễn vì ca đã bị đánh dấu. Nay duyệt tới đâu đánh dấu tới
+    // đó, hết chỗ thì DỪNG và giữ nguyên các ca chưa rót cho lần sau.
+    const conCho = Math.max(0, SUC_CHUA_ONG - hoSo.khoExp)
+    if (conCho <= 0) {
+      setViecVuaLam('Ống đã đầy — nạp cho thần thú trước rồi rót tiếp')
+      return
     }
-    let btvn = 0
+
+    // Duyệt theo TỪNG NGUỒN để sổ nhật ký ghi đúng chỗ. Ba nguồn quy đổi được
+    // từ dữ liệu có sẵn: ca thi, bài tập về nhà, bài MOM.
+    let tong = 0
+    let conCho2 = conCho
+    let conViec = 0
+    const ghi: Record<string, boolean> = {}
+    const gom: { nguon: NguonKiemExp; exp: number; so: number }[] = [
+      { nguon: 'caThi', exp: 0, so: 0 },
+      { nguon: 'btvn', exp: 0, so: 0 },
+      { nguon: 'mom', exp: 0, so: 0 },
+    ]
+    const cong = (i: number, khoa: string, them: number) => {
+      if (daNhan[khoa] || ghi[khoa]) return
+      if (them > conCho2) { conViec++; return }
+      ghi[khoa] = true
+      conCho2 -= them
+      tong += them
+      gom[i]!.exp += them
+      gom[i]!.so += 1
+    }
+
+    for (const ca of dsLichSu) {
+      const ma = String((ca as { maCa?: string; id?: string }).maCa ?? (ca as { id?: string }).id ?? '')
+      if (ma === '') continue
+      if (typeof ca.tong !== 'number' || Number.isNaN(ca.tong)) continue
+      cong(0, 'ca_' + ma, NGUON_EXP.caThi(ca.tong))
+    }
     for (const bt of dsBtvn) {
       if (!bt.daNop) continue
-      const khoa = 'bt_' + String((bt as { id?: string }).id ?? '')
-      if (khoa === 'bt_' || daNhan[khoa]) continue
-      daNhan[khoa] = true
-      tong += NGUON_EXP.nopBtvn()
-      btvn++
+      const ma = String((bt as { id?: string }).id ?? '')
+      if (ma === '') continue
+      cong(1, 'bt_' + ma, NGUON_EXP.nopBtvn())
     }
-    if (btvn > 0) viec.push(btvn + ' bài tập')
+    for (const m of dsMom) {
+      if (m.trangThai !== 'da_nop') continue
+      const ma = String(m.id ?? '')
+      if (ma === '') continue
+      const d = typeof m.diem === 'number' && Number.isFinite(m.diem) ? m.diem : 0
+      cong(2, 'mom_' + ma, NGUON_EXP.nopMom(d))
+    }
+
+    if (tong <= 0) {
+      setViecVuaLam(
+        conViec > 0
+          ? 'Ống không còn chỗ cho việc học tiếp theo — nạp cho thần thú trước'
+          : 'Chưa có việc học nào mới để quy đổi',
+      )
+      return
+    }
+
+    // Chỉ ghi "đã nhận" cho đúng những thứ VỪA rót được.
+    for (const k of Object.keys(ghi)) daNhan[k] = true
     try { localStorage.setItem(KHOA_DA_NHAN, JSON.stringify(daNhan)) } catch { /* bỏ qua */ }
 
-    if (tong <= 0) { setViecVuaLam('Chưa có việc học nào mới để quy đổi'); return }
-    congExp(tong, 'Quy đổi ' + viec.join(' + '))
-  }, [dsLichSu, dsBtvn, congExp])
+    setOngDayKhongNhan(0)
+    const TEN_VIEC: Record<NguonKiemExp, string> = {
+      caThi: 'ca thi', btvn: 'bài tập', mom: 'bài MOM', leoThap: 'tầng tháp', sanBoss: 'quái câu sai',
+    }
+    for (const g of gom) {
+      if (g.exp > 0) themVaoKho(g.exp, g.nguon, `${g.so} ${TEN_VIEC[g.nguon]}`)
+    }
+    if (conViec > 0) {
+      setViecVuaLam(`Đã rót ${tong} EXP. Còn ${conViec} việc học chờ ống có chỗ — chưa mất đâu.`)
+    }
+  }, [dsLichSu, dsBtvn, dsMom, themVaoKho, hoSo.khoExp])
+
+  /**
+   * VUỐT NGANG ĐỂ XOAY 360°, CHẠM ĐỂ NGHE TIẾNG KÊU.
+   *
+   * Góc ghi vào ref chứ không vào state: vẽ lại 60 lần mỗi giây mà đi qua state
+   * thì React dựng lại cây giao diện 60 lần — giật ngay trên điện thoại.
+   *
+   * Phân biệt chạm và kéo bằng quãng đường: dưới 6 điểm ảnh coi là chạm.
+   */
+  const batDauKeo = useCallback((x: number) => {
+    keoRef.current = { dangKeo: true, xTruoc: x, daKeo: 0 }
+  }, [])
+
+  const dangKeoToi = useCallback((x: number) => {
+    const k = keoRef.current
+    if (!k.dangKeo) return
+    const dx = x - k.xTruoc
+    k.xTruoc = x
+    k.daKeo += Math.abs(dx)
+    // 220 điểm ảnh ngang ≈ một vòng tròn đầy.
+    gocXoayRef.current = (gocXoayRef.current + (dx / 220) * Math.PI * 2) % (Math.PI * 2)
+  }, [])
+
+  const ketThucKeo = useCallback(() => {
+    const k = keoRef.current
+    k.dangKeo = false
+    if (k.daKeo < 6) {
+      // Chạm, không phải kéo: thú kêu.
+      amThanhRef.current?.moKhoa()
+      amThanhRef.current?.keu(infoPet.he)
+      batHieuUng('danh', 420)
+    }
+    k.daKeo = 0
+  }, [infoPet.he, batHieuUng])
+
+  /** Bấm nút chiêu: thú tung chiêu thật, kèm âm. */
+  const tungChieu = useCallback((no: boolean) => {
+    amThanhRef.current?.moKhoa()
+    if (no) {
+      amThanhRef.current?.kichNo()
+      amThanhRef.current?.keu(infoPet.he)
+      batHieuUng('no', 1200)
+    } else {
+      amThanhRef.current?.tanCong()
+      batHieuUng('danh', 600)
+    }
+  }, [infoPet.he, batHieuUng])
 
   /**
    * CHỐT THẦN THÚ — MỘT LẦN, KHÔNG ĐỔI.
@@ -582,7 +748,7 @@ export default function ThanThuHoaHocGame({
           ...prev,
           tangThapCaoNhat: Math.max(prev.tangThapCaoNhat, tangHienTai + 1),
         }))
-        congExp(thuong, `Hạ trùm tầng ${tangHienTai}`)
+        themVaoKho(thuong, 'leoThap', `Hạ trùm tầng ${tangHienTai}`)
       }
       setKetQuaCauVua({
         dung: true,
@@ -644,7 +810,7 @@ export default function ThanThuHoaHocGame({
   useEffect(() => { xuLyTraLoiRef.current = xuLyTraLoi })
 
   // Hai canvas, một con thú. Canvas nào không hiện thì không quay vòng lặp.
-  useVeThanThu(canvasRef, infoPet, hoSo.capTienHoa, hieuUngYenRef, tabGame === 'dao_thu')
+  useVeThanThu(canvasRef, infoPet, hoSo.capTienHoa, hieuUngYenRef, tabGame === 'dao_thu', gocXoayRef)
   useVeThanThu(
     canvasCombatRef, infoPet, hoSo.capTienHoa, hieuUngRef,
     tabGame === 'leo_thap' && dangLeoThap,
@@ -709,6 +875,8 @@ export default function ThanThuHoaHocGame({
 
   return (
     <div className="space-y-5 animate-google-fade pb-10">
+      {/* Popup lấp lánh mỗi lần nhận EXP — thầy chốt 15-09. */}
+      <PopupThuongExp tin={tinThuong} onDong={() => setTinThuong(null)} />
       {/* Thanh tiêu đề Game */}
       <div className="bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-blue-500/10 dark:from-amber-950/30 dark:via-purple-950/30 dark:to-blue-950/30 border border-amber-200/80 dark:border-amber-800/60 rounded-3xl p-5 sm:p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -875,55 +1043,141 @@ export default function ThanThuHoaHocGame({
               </div>
             </div>
 
-            {/* Canvas động vẽ thần thú */}
-            <div className="my-2 relative flex items-center justify-center">
+            {/* CANVAS TƯƠNG TÁC — vuốt ngang để xoay 360°, chạm để nghe tiếng kêu,
+                hai nút bên cạnh để tung chiêu. */}
+            <div className="my-2 relative flex items-center justify-center gap-2 sm:gap-3">
+              <button
+                type="button"
+                onClick={() => tungChieu(false)}
+                title={infoPet.kyNangThuong}
+                className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shadow-sm hover:bg-emerald-100 dark:hover:bg-emerald-900/50 cursor-pointer transition-transform active:scale-90"
+              >
+                <Swords className="w-5 h-5" />
+              </button>
+
               <canvas
                 ref={canvasRef}
                 width={280}
                 height={260}
-                className="max-w-full drop-shadow-lg"
+                aria-label={`${infoPet.ten} — vuốt ngang để xoay, chạm để nghe tiếng kêu`}
+                className="max-w-full drop-shadow-lg cursor-grab active:cursor-grabbing touch-none select-none"
+                onPointerDown={(e) => {
+                  e.currentTarget.setPointerCapture(e.pointerId)
+                  batDauKeo(e.clientX)
+                }}
+                onPointerMove={(e) => dangKeoToi(e.clientX)}
+                onPointerUp={ketThucKeo}
+                onPointerCancel={ketThucKeo}
               />
+
+              <button
+                type="button"
+                onClick={() => tungChieu(true)}
+                title={infoPet.kyNangNo}
+                className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-800 text-amber-700 dark:text-amber-300 flex items-center justify-center shadow-sm hover:bg-amber-100 dark:hover:bg-amber-900/50 cursor-pointer transition-transform active:scale-90"
+              >
+                <Zap className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* Thanh kinh nghiệm EXP & Nút Nạp Năng Lượng */}
+            <div className="grid grid-cols-2 gap-2 w-full text-[11px] -mt-1">
+              <button
+                type="button"
+                onClick={() => tungChieu(false)}
+                className="px-2 py-1.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-bold leading-tight cursor-pointer hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition"
+              >
+                {infoPet.kyNangThuong}
+              </button>
+              <button
+                type="button"
+                onClick={() => tungChieu(true)}
+                className="px-2 py-1.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 font-bold leading-tight cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50 transition"
+              >
+                {infoPet.kyNangNo}
+              </button>
+            </div>
+
+            <div className="text-[11px] text-slate-400 dark:text-slate-500 text-center -mt-1">
+              Vuốt ngang để xoay thần thú · chạm vào nó để nghe tiếng kêu
+            </div>
+
+            {/* HAI BỂ: ỐNG NGHIỆM (EXP đã kiếm) và THANH CẤP ĐỘ (EXP đã nạp).
+                Nút nạp chỉ CHUYỂN giữa hai bể, không sinh thêm EXP. */}
             <div className="w-full space-y-3 z-10">
-              <div className="flex items-center justify-between text-xs font-bold">
-                <span className="text-slate-700 dark:text-slate-300">
-                  Cấp độ: <strong className="text-emerald-600 text-sm">Lv.{hoSo.capDo}</strong>
-                </span>
-                <span className="font-mono text-slate-500 tabular-nums">
-                  {hoSo.capDo >= CAP_TOI_DA
-                    ? 'ĐÃ TỚI ĐỈNH'
-                    : `EXP: ${hoSo.exp} / ${hoSo.expToiDa}`}
-                </span>
-              </div>
+              <div className="flex items-stretch gap-4">
+                {/* Bể 1 — ống nghiệm */}
+                <div className="flex flex-col items-center gap-1 shrink-0">
+                  <OngNghiemExp dangCo={hoSo.khoExp} sucChua={SUC_CHUA_ONG} dangRot={dangNap} />
+                  <div className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">
+                    {dangNap ? 0 : hoSo.khoExp}
+                  </div>
+                  <div className="text-[10px] text-slate-400 leading-none">/ {SUC_CHUA_ONG}</div>
+                </div>
 
-              <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-200/60 dark:border-slate-700">
-                <div
-                  className="h-full bg-gradient-to-r from-emerald-500 to-amber-500 rounded-full transition-all duration-300"
-                  style={{
-                    width: `${hoSo.capDo >= CAP_TOI_DA
-                      ? 100
-                      : Math.max(0, Math.min(100, (hoSo.exp / Math.max(1, hoSo.expToiDa)) * 100))}%`,
-                  }}
-                />
-              </div>
+                {/* Bể 2 — thanh cấp độ */}
+                <div className="flex-1 flex flex-col justify-center gap-2 min-w-0">
+                  <div className="flex items-center justify-between text-xs font-bold gap-2">
+                    <span className="text-slate-700 dark:text-slate-300">
+                      Cấp độ: <strong className="text-emerald-600 text-sm">Lv.{hoSo.capDo}</strong>
+                    </span>
+                    <span className="font-mono text-slate-500 tabular-nums">
+                      {hoSo.capDo >= CAP_TOI_DA
+                        ? 'ĐÃ TỚI ĐỈNH'
+                        : `${hoSo.exp} / ${hoSo.expToiDa}`}
+                    </span>
+                  </div>
 
-              <div className="text-center text-[11px] text-slate-500 dark:text-slate-400">
-                {hoSo.capDo >= CAP_TOI_DA
-                  ? 'Hình thái tối thượng — không còn cấp nào cao hơn'
-                  : `Còn ${Math.max(0, hoSo.expToiDa - hoSo.exp)} EXP nữa lên ${layHinhThai(hoSo.capDo + 1).ten}`}
+                  <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-200/60 dark:border-slate-700">
+                    <div
+                      className="h-full bg-gradient-to-r from-emerald-500 to-amber-500 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${hoSo.capDo >= CAP_TOI_DA
+                          ? 100
+                          : Math.max(0, Math.min(100, (hoSo.exp / Math.max(1, hoSo.expToiDa)) * 100))}%`,
+                      }}
+                    />
+                  </div>
+
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    {hoSo.capDo >= CAP_TOI_DA
+                      ? 'Hình thái tối thượng — không còn cấp nào cao hơn'
+                      : `Còn ${Math.max(0, hoSo.expToiDa - hoSo.exp)} EXP nữa lên ${layHinhThai(hoSo.capDo + 1).ten}`}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={napVaoThu}
+                    disabled={hoSo.khoExp <= 0 || hoSo.capDo >= CAP_TOI_DA}
+                    className="w-full py-2.5 px-4 rounded-full bg-gradient-to-r from-emerald-500 to-sky-500 hover:from-emerald-600 hover:to-sky-600 disabled:from-slate-300 disabled:to-slate-300 dark:disabled:from-slate-700 dark:disabled:to-slate-700 disabled:cursor-not-allowed text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-95"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>
+                      {hoSo.capDo >= CAP_TOI_DA
+                        ? 'Thần thú đã tới đỉnh'
+                        : hoSo.khoExp > 0
+                          ? `Nạp ${hoSo.khoExp} tinh lực vào thần thú`
+                          : 'Ống rỗng — đi học để đầy ống'}
+                    </span>
+                  </button>
+                </div>
               </div>
 
               <div className="flex items-center justify-center gap-3 pt-1">
                 <button
                   onClick={nhanExpTuHocTap}
-                  className="py-2.5 px-5 rounded-full bg-gradient-to-r from-emerald-500 to-sky-500 hover:from-emerald-600 hover:to-sky-600 text-white font-bold text-xs shadow-md flex items-center gap-2 cursor-pointer transition-transform active:scale-95"
+                  className="py-2.5 px-5 rounded-full border border-emerald-500 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 font-bold text-xs flex items-center gap-2 cursor-pointer transition-transform active:scale-95"
                 >
                   <Sparkles className="w-4 h-4" />
-                  <span>Quy đổi việc học thành EXP</span>
+                  <span>Rót việc học vào ống</span>
                 </button>
               </div>
+
+              {ongDayKhongNhan > 0 && (
+                <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-[12px] text-amber-900 dark:text-amber-200 text-center">
+                  Ống đã đầy nên còn <b>{ongDayKhongNhan} EXP</b> chưa rót được.
+                  Nạp cho thần thú rồi rót tiếp — không mất đâu.
+                </div>
+              )}
               {viecVuaLam !== '' && (
                 <div className="text-center text-[12px] font-bold text-emerald-600 dark:text-emerald-400">
                   {viecVuaLam}
@@ -1002,6 +1256,40 @@ export default function ThanThuHoaHocGame({
                       ? 'chưa giao bài nào'
                       : Math.round(chiSoHocTap.tyLeBtvn * 100) + '% (' + chiSoHocTap.btvnDaNop + '/' + chiSoHocTap.tongBtvn + ' bài)'}
                   </strong>
+                </div>
+              </div>
+
+              {/* TÓM TẮT EXP TỪNG NHIỆM VỤ — thầy chốt 15-09, đặt ngay trong thẻ
+                  buff này để em thấy việc học nào đẻ ra bao nhiêu sức mạnh. */}
+              <div className="rounded-2xl bg-slate-50 dark:bg-slate-800/60 p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    EXP đã kiếm theo nhiệm vụ
+                  </div>
+                  <div className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">
+                    {tongSoExp(hoSo.soExp).toLocaleString()}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-[1fr_auto_auto] gap-x-3 gap-y-1 text-[12px] items-baseline">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Nhiệm vụ</div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-right">Cộng</div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-right">Trừ</div>
+                  {DS_NGUON_EXP.map((k) => (
+                    <Fragment key={k}>
+                      <span className="text-slate-600 dark:text-slate-300">{TEN_NGUON_EXP[k]}</span>
+                      <span className="text-right font-mono tabular-nums font-bold text-emerald-600 dark:text-emerald-400">
+                        {(hoSo.soExp[k] ?? 0) > 0 ? '+' + (hoSo.soExp[k] ?? 0).toLocaleString() : '—'}
+                      </span>
+                      <span className="text-right font-mono tabular-nums text-slate-400">0</span>
+                    </Fragment>
+                  ))}
+                </div>
+
+                <div className="text-[10.5px] text-slate-400 leading-snug pt-1 border-t border-slate-200 dark:border-slate-700">
+                  Cột trừ luôn bằng 0: <b>chưa có nhiệm vụ nào lấy EXP của em đi</b>.
+                  Làm sai chỉ là không được cộng, không bị phạt.
+                  Toàn bộ EXP trên đây đã cộng dồn vào ống nghiệm.
                 </div>
               </div>
             </div>

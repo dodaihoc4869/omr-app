@@ -1889,6 +1889,7 @@ export default function StudentPortalScreen() {
           <ThanThuHoaHocGame
             dsLichSu={dsLichSu}
             dsBtvn={dsBtvn}
+            dsMom={dsMomGiao}
             layCauSaiCuaEm={layCauSaiChoGame}
             onDong={() => setTab('diem')}
             onChuyenSangKhacPhuc={() => setTab('khacphuc')}

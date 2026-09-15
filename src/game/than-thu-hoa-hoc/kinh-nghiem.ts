@@ -54,6 +54,23 @@ export function thanhExp(cap: number): number {
   return Math.round((EXP_BAN_DAU * Math.pow(HE_SO_DAI_THEM, c - 1)) / 10) * 10
 }
 
+/**
+ * SỨC CHỨA ỐNG NGHIỆM — kho EXP em kiếm được mà chưa nạp cho thần thú.
+ *
+ * Thầy chốt 15-09: EXP hiện ra kiểu ống nghiệm đựng chất lỏng xanh lá; bấm nạp
+ * thì ống vơi, kiếm được thì đầy lên. Tức là **hai bể**, không phải một:
+ *   · ỐNG NGHIỆM  — EXP đã kiếm, chưa dùng. Chỉ đầy bằng việc học thật.
+ *   · THANH CẤP ĐỘ — EXP đã nạp vào thú. Chỉ đầy bằng cách rót từ ống sang.
+ *
+ * Nút nạp KHÔNG sinh ra EXP, nó chỉ chuyển chỗ. Đây là điểm phải giữ: bể thứ
+ * hai không được mở thêm một đường vào nào ngoài cái ống.
+ *
+ * Trần 2 000 chọn để ống luôn rót đủ ít nhất một cấp ở mọi mức (cấp đắt nhất là
+ * 3 540, rót hai lần là qua). Ống đầy thì CHẶN quy đổi thêm và báo cho em nạp
+ * trước — không bao giờ làm mất EXP em đã kiếm.
+ */
+export const SUC_CHUA_ONG = 2000
+
 /** Tổng EXP phải kiếm để đi từ cấp 1 tới cấp 12. */
 export function tongExpToiDinh(): number {
   let t = 0
@@ -61,7 +78,47 @@ export function tongExpToiDinh(): number {
   return t
 }
 
-/* ─────────── BỐN NGUỒN KIẾM EXP, đều là việc học thật ─────────── */
+/* ─────────── NĂM NGUỒN KIẾM EXP, đều là việc học thật ─────────── */
+
+/**
+ * Khoá nguồn EXP — dùng làm khoá sổ nhật ký, nên KHÔNG đổi chữ tuỳ tiện:
+ * đổi là mất sổ cũ trong máy học sinh.
+ */
+export type NguonKiemExp = 'leoThap' | 'sanBoss' | 'btvn' | 'caThi' | 'mom'
+
+export const DS_NGUON_EXP: readonly NguonKiemExp[] =
+  ['caThi', 'btvn', 'mom', 'leoThap', 'sanBoss'] as const
+
+export const TEN_NGUON_EXP: Record<NguonKiemExp, string> = {
+  caThi: 'Thi kiểm tra',
+  btvn: 'Bài tập về nhà',
+  mom: 'Nộp bài cho MOM',
+  leoThap: 'Leo tháp tri thức',
+  sanBoss: 'Săn boss câu sai',
+}
+
+/** Sổ cộng dồn EXP theo từng nguồn. Chỉ cộng — chưa có mục nào trừ EXP. */
+export type SoExpTheoNguon = Record<NguonKiemExp, number>
+
+export function soExpRong(): SoExpTheoNguon {
+  return { caThi: 0, btvn: 0, mom: 0, leoThap: 0, sanBoss: 0 }
+}
+
+/** Đọc sổ từ máy, bỏ khoá lạ, ép số âm hoặc rác về 0. */
+export function vaSoExp(tho: unknown): SoExpTheoNguon {
+  const ra = soExpRong()
+  if (typeof tho !== 'object' || tho === null) return ra
+  const o = tho as Record<string, unknown>
+  for (const k of DS_NGUON_EXP) {
+    const v = o[k]
+    if (typeof v === 'number' && Number.isFinite(v) && v > 0) ra[k] = Math.round(v)
+  }
+  return ra
+}
+
+export function tongSoExp(so: SoExpTheoNguon): number {
+  return DS_NGUON_EXP.reduce((t, k) => t + (so[k] ?? 0), 0)
+}
 
 export const NGUON_EXP = {
   /**
@@ -83,6 +140,11 @@ export const NGUON_EXP = {
   nopBtvn: () => 200,
   /** Một ca thi, theo điểm đạt được (thang 10). */
   caThi: (diem: number) => Math.max(0, Math.round(diem * 60)),
+  /**
+   * Nộp một bài MOM — bài phụ huynh giao, làm trong hai tiếng có người nhà
+   * ngồi cạnh. Nặng hơn bài tập về nhà thường vì dài hơn và có giám sát.
+   */
+  nopMom: (diem: number) => 150 + Math.max(0, Math.round(diem * 25)),
 } as const
 
 /** Nhãn hiện cho học sinh — phải khớp đúng con số ở trên, không hứa suông. */
@@ -91,6 +153,7 @@ export const BANG_NGUON_EXP: readonly { viec: string; thuong: string }[] = [
   { viec: 'Thanh tẩy một câu sai', thuong: '100 EXP' },
   { viec: 'Nộp đủ một bài tập về nhà', thuong: '200 EXP' },
   { viec: 'Thi xong một ca', thuong: '60 EXP mỗi điểm' },
+  { viec: 'Nộp một bài cho MOM', thuong: '150 + 25 × điểm' },
 ]
 
 export interface KetQuaNhanExp {
