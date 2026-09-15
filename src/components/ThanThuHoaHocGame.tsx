@@ -40,7 +40,9 @@ import {
   type CapTienHoa,
   type ThanThuInfo,
 } from '../game/than-thu-hoa-hoc/he-thong-pet'
-import { layHinhThai, CAP_TOI_DA } from '../game/than-thu-hoa-hoc/hinh-thai'
+import {
+  CAP_TOI_DA, tenBacThu, bacTienHoa, capBacKeTiep, CAP_BAC,
+} from '../game/than-thu-hoa-hoc/hinh-thai'
 import {
   TANG_TOI_DA, heTrumTang as heTrumTangMoi, mauTrumTang as mauTrumTangMoi,
   satThuongTrum, tenTrumTang, saoMucTieuTheoTang, laTangCanh,
@@ -344,7 +346,7 @@ export default function ThanThuHoaHocGame({
       const kq = nhanExp({ capDo: prev.capDo, exp: prev.exp }, rot)
       if (kq.soCapLen > 0) {
         amThanhRef.current?.tienHoa()
-        setTinTienHoa({ cap: kq.capDo, ten: layHinhThai(kq.capDo).ten })
+        setTinTienHoa({ cap: kq.capDo, ten: tenBacThu(infoPet.id, kq.capDo) })
       } else {
         amThanhRef.current?.kichNo()
       }
@@ -356,7 +358,7 @@ export default function ThanThuHoaHocGame({
         exp: kq.exp,
         expToiDa: kq.expToiDa,
         khoExp: 0,
-        danhHieuHienTai: `${layHinhThai(kq.capDo).ten} · Lv.${kq.capDo}`,
+        danhHieuHienTai: `${tenBacThu(infoPet.id, kq.capDo)} · Lv.${kq.capDo}`,
       }
     })
     // Hoạt ảnh ống vơi: chỉ là cờ cho CSS, không đụng gì tới số liệu.
@@ -867,7 +869,9 @@ export default function ThanThuHoaHocGame({
     setLenhChieu((t) => ({ lan: t.lan + 1, no }))
     if (no) {
       amThanhRef.current?.kichNo()
-      amThanhRef.current?.keu(infoPet.he)
+      // Tiếng RIÊNG của sáu chưởng tối thượng — `kichNo` lo sức nặng chung,
+      // hàm này lo chất riêng (tia laze, dàn pháo, nộ hống băng, xoáy nước…).
+      amThanhRef.current?.chuongToiThuong(infoPet.he)
       batHieuUng('no', 1200)
     } else {
       amThanhRef.current?.tanCong()
@@ -1440,7 +1444,7 @@ export default function ThanThuHoaHocGame({
                   }`}
                 >
                   Hình thái {hoSo.capDo}/{CAP_TOI_DA}
-                  <span className="hidden sm:inline"> · {layHinhThai(hoSo.capDo).ten}</span>
+                  <span className="hidden sm:inline"> · {tenBacThu(infoPet.id, hoSo.capDo)}</span>
                 </span>
                 <h2
                   className={`text-lg font-black mt-1 ${
@@ -1601,7 +1605,10 @@ export default function ThanThuHoaHocGame({
                   <div className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
                     {hoSo.capDo >= CAP_TOI_DA
                       ? 'Hình thái tối thượng — không còn cấp nào cao hơn'
-                      : `Còn ${Math.max(0, hoSo.expToiDa - hoSo.exp)} EXP nữa lên ${layHinhThai(hoSo.capDo + 1).ten}`}
+                      : `Còn ${Math.max(0, hoSo.expToiDa - hoSo.exp)} EXP nữa lên Lv.${hoSo.capDo + 1}`
+                        + (capBacKeTiep(hoSo.capDo) > 0
+                          ? ` · bậc ${tenBacThu(infoPet.id, capBacKeTiep(hoSo.capDo))} ở Lv.${capBacKeTiep(hoSo.capDo)}`
+                          : '')}
                   </div>
 
                   <button
@@ -1929,7 +1936,7 @@ export default function ThanThuHoaHocGame({
                   className="max-w-full drop-shadow-lg"
                 />
                 <div className="text-[11px] text-slate-500 dark:text-slate-400 text-center">
-                  <b className="text-slate-700 dark:text-slate-200">{layHinhThai(hoSo.capDo).ten}</b>
+                  <b className="text-slate-700 dark:text-slate-200">{tenBacThu(infoPet.id, hoSo.capDo)}</b>
                   {' · '}Hệ {TEN_HE[infoPet.he]}
                   {' · '}Gốc <span className="font-mono">{infoPet.nguyenToGoc}</span>
                 </div>
@@ -2078,7 +2085,7 @@ export default function ThanThuHoaHocGame({
                 {chiSoPet.cp.toLocaleString()}
               </div>
               <p className="text-[11px] text-slate-600 dark:text-slate-400">
-                {layHinhThai(hoSo.capDo).ten} · Lv.{hoSo.capDo}/{CAP_TOI_DA}
+                {tenBacThu(infoPet.id, hoSo.capDo)} · Lv.{hoSo.capDo}/{CAP_TOI_DA}
               </p>
             </div>
           </div>
@@ -2239,7 +2246,7 @@ export default function ThanThuHoaHocGame({
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { nhan: 'Hình thái', so: layHinhThai(hoSo.capDo).ten, phu: `${hoSo.capDo}/${CAP_TOI_DA}` },
+              { nhan: 'Bậc tiến hoá', so: tenBacThu(infoPet.id, hoSo.capDo), phu: `bậc ${bacTienHoa(hoSo.capDo)}/6 · Lv.${hoSo.capDo}` },
               { nhan: 'Lực chiến', so: chiSoPet.cp.toLocaleString(), phu: 'CP' },
               { nhan: 'Tầng tháp cao nhất', so: String(hoSo.tangThapCaoNhat), phu: 'tầng' },
               { nhan: 'Câu sai đã thanh tẩy', so: String(hoSo.soCauDaThanhTay), phu: 'câu' },
@@ -2257,16 +2264,18 @@ export default function ThanThuHoaHocGame({
               Đường lên hình thái tối thượng
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {Array.from({ length: CAP_TOI_DA }, (_, i) => i + 1).map((c) => {
-                const qua = c <= hoSo.capDo
+              {/* SÁU BẬC, không phải 120 viên. Bày 120 viên ra thì em chẳng
+                  đọc được gì, mà cái em cần biết là "bậc kế tiếp ở cấp mấy". */}
+              {CAP_BAC.map((capBac, i) => {
+                const qua = hoSo.capDo >= capBac
                 return (
-                  <span key={c}
+                  <span key={capBac}
                     className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
                       qua
                         ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
                         : 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500'
                     }`}>
-                    {c}. {layHinhThai(c).ten}
+                    Bậc {i + 1} · Lv.{capBac} — {tenBacThu(infoPet.id, capBac)}
                   </span>
                 )
               })}

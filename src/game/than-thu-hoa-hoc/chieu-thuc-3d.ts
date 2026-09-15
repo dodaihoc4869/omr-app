@@ -64,6 +64,29 @@ const TRUC_Y = new THREE.Vector3(0, 1, 0)
 
 type KieuNo = 'lua' | 'vung' | 'tinhThe' | 'loc' | 'dien' | 'luoi'
 
+/**
+ * SÁU CHƯỞNG TỐI THƯỢNG — đúng sáu tấm ảnh thầy gửi 15-09.
+ *
+ *   tiaNgocBich  Thanh Long   ULTIMATE JADE BLAST — chùm tia bích ngọc bảy sắc
+ *   tiaNganHa    Kỳ Lân       GALAXY CROWN LASER — tia từ sừng, xoáy thiên hà
+ *   danPhao      Huyền Quy    CHRONO-CORE CANON ARRAY — dàn pháo trên mai
+ *   bungNoMatTroi Xích Phượng SOLAR FLARE ERUPTION — bùng nổ hào quang
+ *   hongBang     Lôi Lân      CHILLING FROST ROAR — nộ hống băng sương
+ *   xoayQuangSinh Bích Long   BIOLUMINESCENT VORTEX BLAST — xoáy quang sinh học
+ */
+export type KieuToiThuong =
+  | 'tiaNgocBich' | 'tiaNganHa' | 'danPhao'
+  | 'bungNoMatTroi' | 'hongBang' | 'xoayQuangSinh'
+
+const TOI_THUONG: Record<string, KieuToiThuong> = {
+  khi: 'tiaNgocBich',
+  axit: 'tiaNganHa',
+  kiem: 'danPhao',
+  hoa: 'bungNoMatTroi',
+  dien: 'hongBang',
+  huuco: 'xoayQuangSinh',
+}
+
 interface NetChieu {
   dan: () => THREE.BufferGeometry
   /** Số đốm vệt bám sau đạn. 0 là không có vệt. */
@@ -115,9 +138,15 @@ export class ChieuThuc3D {
 
   /** `erasableSyntaxOnly` của kho cấm tham số-thuộc-tính, nên khai riêng. */
   private net: NetChieu
+  /** Kiểu chưởng tối thượng của hệ này. */
+  private kieuTT: KieuToiThuong
+  /** Bộ phận riêng của chưởng tối thượng — chỉ hiện khi bấm chưởng nộ. */
+  private tt: THREE.Object3D[] = []
+  private ttVatLieu: THREE.Material[] = []
 
   constructor(info: ThanThuInfo) {
     this.net = NET[info.he] ?? NET['hoa']!
+    this.kieuTT = TOI_THUONG[info.he] ?? 'bungNoMatTroi'
     const mau = mauTuChuoi(info.mauPhu)
     const mauChinh = mauTuChuoi(info.mauChinh)
     const ghi = <T extends THREE.BufferGeometry | THREE.Material>(x: T): T => {
@@ -245,6 +274,119 @@ export class ChieuThuc3D {
     this.chop.visible = false
     this.nhom.add(this.chop)
 
+    // ═══════════════════════════════════════════════════════════════════
+    // CHƯỞNG TỐI THƯỢNG — sáu bộ, mỗi hệ một bộ, dựng sẵn rồi ẩn đi.
+    // Dựng sẵn vì em bấm liên tục: dựng mới mỗi lần bấm là rò bộ nhớ GPU.
+    // ═══════════════════════════════════════════════════════════════════
+    const themTT = (o: THREE.Object3D, ...vl: THREE.Material[]) => {
+      o.visible = false
+      this.nhom.add(o)
+      this.tt.push(o)
+      for (const v of vl) this.ttVatLieu.push(v)
+    }
+    const trang = new THREE.Color(1, 1, 1)
+
+    if (this.kieuTT === 'tiaNgocBich' || this.kieuTT === 'tiaNganHa') {
+      // CHÙM TIA — bảy lõi lồng nhau, lõi trong trắng loá, ngoài ngả màu hệ.
+      // Bích ngọc thì bảy sắc; ngân hà thì tím hồng dần ra.
+      for (let i = 0; i < 7; i++) {
+        const u = i / 6
+        const mauTia = this.kieuTT === 'tiaNgocBich'
+          ? new THREE.Color().setHSL((0.33 + u * 0.55) % 1, 0.85, 0.6)
+          : mau.clone().lerp(new THREE.Color(1, 0.45, 0.95), u)
+        const g = ghi(new THREE.CylinderGeometry(0.06 + u * 0.19, 0.03 + u * 0.1, XA * 2.4, 16, 1, true))
+        const m = ghi(new THREE.MeshBasicMaterial({
+          color: i === 0 ? trang : mauTia, transparent: true,
+          opacity: 0.9 - u * 0.62, depthWrite: false, side: THREE.DoubleSide,
+          blending: THREE.AdditiveBlending,
+        }))
+        const t = new THREE.Mesh(g, m)
+        t.rotation.x = Math.PI / 2
+        t.position.z = XA * 1.2
+        themTT(t, m)
+      }
+    } else if (this.kieuTT === 'danPhao') {
+      // DÀN PHÁO — sáu nòng trên mai bắn sáu tia vàng chéo nhau.
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2
+        const g = ghi(new THREE.CylinderGeometry(0.07, 0.11, XA * 2.2, 10, 1, true))
+        const m = ghi(new THREE.MeshBasicMaterial({
+          color: new THREE.Color(1, 0.86, 0.42), transparent: true, opacity: 0.85,
+          depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
+        }))
+        const t = new THREE.Mesh(g, m)
+        t.position.set(Math.cos(a) * 0.5, Math.sin(a) * 0.4 + 0.3, XA * 1.1)
+        t.rotation.set(Math.PI / 2, 0, 0)
+        t.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.cos(a) * 0.2)
+        t.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), Math.sin(a) * 0.16)
+        themTT(t, m)
+      }
+    } else if (this.kieuTT === 'bungNoMatTroi') {
+      // BÙNG NỔ HÀO QUANG — vành lửa khổng lồ cộng tám lưỡi lửa toả ra.
+      const gVanh = ghi(new THREE.TorusGeometry(1.5, 0.22, 14, 56))
+      const mVanh = ghi(new THREE.MeshBasicMaterial({
+        color: new THREE.Color(1, 0.55, 0.12), transparent: true, opacity: 0.9,
+        depthWrite: false, blending: THREE.AdditiveBlending,
+      }))
+      const vanh = new THREE.Mesh(gVanh, mVanh)
+      vanh.position.z = XA * 0.5
+      themTT(vanh, mVanh)
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2
+        const g = ghi(new THREE.ConeGeometry(0.3, 2.4, 6, 1, true))
+        const m = ghi(new THREE.MeshBasicMaterial({
+          color: new THREE.Color(1, 0.78, 0.22), transparent: true, opacity: 0.7,
+          depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
+        }))
+        const t = new THREE.Mesh(g, m)
+        t.position.set(Math.cos(a) * 1.3, Math.sin(a) * 1.3, XA * 0.5)
+        t.rotation.z = a - Math.PI / 2
+        themTT(t, m)
+      }
+    } else if (this.kieuTT === 'hongBang') {
+      // NỘ HỐNG BĂNG SƯƠNG — nón hơi lạnh cộng mười hai phiến băng bay tới.
+      const gNon = ghi(new THREE.ConeGeometry(1.5, XA * 2.2, 26, 1, true))
+      const mNon = ghi(new THREE.MeshBasicMaterial({
+        color: new THREE.Color(0.68, 0.92, 1), transparent: true, opacity: 0.4,
+        depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
+      }))
+      const non = new THREE.Mesh(gNon, mNon)
+      non.rotation.x = Math.PI / 2
+      non.position.z = XA * 1.1
+      themTT(non, mNon)
+      for (let i = 0; i < 12; i++) {
+        const g = ghi(new THREE.OctahedronGeometry(0.16, 0))
+        const m = ghi(new THREE.MeshBasicMaterial({
+          color: trang, transparent: true, opacity: 0.85, depthWrite: false,
+          blending: THREE.AdditiveBlending,
+        }))
+        const t = new THREE.Mesh(g, m)
+        t.userData.pha = i / 12
+        themTT(t, m)
+      }
+    } else {
+      // XOÁY QUANG SINH HỌC — bốn vòng xoáy lồng nhau chạy tới, phát sáng lạnh.
+      for (let i = 0; i < 4; i++) {
+        const g = ghi(new THREE.TorusGeometry(0.5 + i * 0.32, 0.075, 12, 44))
+        const m = ghi(new THREE.MeshBasicMaterial({
+          color: new THREE.Color(0.25, 0.95, 0.95).lerp(mau, i / 6), transparent: true,
+          opacity: 0.8 - i * 0.12, depthWrite: false, blending: THREE.AdditiveBlending,
+        }))
+        const t = new THREE.Mesh(g, m)
+        t.userData.pha = i / 4
+        themTT(t, m)
+      }
+      const gLoi = ghi(new THREE.CylinderGeometry(0.14, 0.3, XA * 2, 16, 1, true))
+      const mLoi = ghi(new THREE.MeshBasicMaterial({
+        color: new THREE.Color(0.6, 1, 1), transparent: true, opacity: 0.7,
+        depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
+      }))
+      const loi = new THREE.Mesh(gLoi, mLoi)
+      loi.rotation.x = Math.PI / 2
+      loi.position.z = XA
+      themTT(loi, mLoi)
+    }
+
     // ĐÈN LOÉ — đặt đúng điểm nổ, tắt hẳn lúc thường. Ánh sáng thật hắt lên
     // lông thú và mặt sàn là thứ tách "nổ" khỏi "dán thêm một hình sáng".
     this.denNo = new THREE.PointLight(mau, 0, 11, 2)
@@ -297,6 +439,7 @@ export class ChieuThuc3D {
     this.quangNo.visible = cuongNo
     if (this.tia !== null) this.tia.visible = false
     for (const m of this.thanTia) m.visible = false
+    for (const o of this.tt) o.visible = false
     this.denNo.intensity = 0
     for (const m of this.manh) m.visible = false
     for (const m of this.duoi) m.visible = false
@@ -323,6 +466,8 @@ export class ChieuThuc3D {
     if (t < MOC_BAY) this.phaDonLuc(t, dt, co, mDan)
     else if (t < MOC_NO) this.phaBay(t, dt, co, mDan)
     else this.phaCham(t, truoc, dt, co)
+    // CHƯỞNG TỐI THƯỢNG chỉ chạy ở chưởng cuồng nộ, và chỉ từ lúc phóng.
+    if (this.cuongNo && t >= MOC_BAY) this.phaToiThuong(t, dt)
   }
 
   private phaDonLuc(t: number, dt: number, co: number, mDan: THREE.MeshBasicMaterial): void {
@@ -469,6 +614,87 @@ export class ChieuThuc3D {
       this.chop.visible = c > 0
       this.chop.scale.setScalar(0.45 + (1 - c) * 1.5)
       ;(this.chop.material as THREE.MeshBasicMaterial).opacity = c * 0.6
+    }
+  }
+
+  /**
+   * SÁU CHƯỞNG TỐI THƯỢNG.
+   *
+   * Dựng theo đúng sáu tấm ảnh thầy gửi 15-09. Điểm chung: bắt đầu từ lúc
+   * phóng (`MOC_BAY`), mạnh nhất ở khoảng giữa, tắt dần về cuối — nên nó ôm
+   * trọn cú chưởng chứ không phải một chớp loé rời rạc.
+   */
+  private phaToiThuong(t: number, dt: number): void {
+    const u = (t - MOC_BAY) / (1 - MOC_BAY)          // 0…1 suốt cú chưởng
+    const manh = Math.sin(Math.min(1, u * 1.15) * Math.PI)   // lên rồi xuống
+    const k = this.kieuTT
+
+    if (k === 'tiaNgocBich' || k === 'tiaNganHa') {
+      for (const [i, o] of this.tt.entries()) {
+        o.visible = true
+        const p = i / Math.max(1, this.tt.length - 1)
+        o.scale.set(manh * (1 + p * 0.5), 1, manh * (1 + p * 0.5))
+        o.rotation.y += dt * (k === 'tiaNganHa' ? 2.2 + i * 0.5 : 0.8 + i * 0.3)
+        const m = (o as THREE.Mesh).material as THREE.MeshBasicMaterial
+        m.opacity = (0.92 - p * 0.6) * manh
+      }
+    } else if (k === 'danPhao') {
+      for (const [i, o] of this.tt.entries()) {
+        // Sáu nòng bắn LỆCH NHỊP nhau — cả dàn nổ cùng lúc thì mất chất "dàn pháo".
+        const tre = (i / this.tt.length) * 0.35
+        const uu = Math.max(0, Math.min(1, (u - tre) * 1.9))
+        o.visible = uu > 0
+        o.scale.set(uu, 1, uu)
+        ;((o as THREE.Mesh).material as THREE.MeshBasicMaterial).opacity = 0.9 * Math.sin(uu * Math.PI)
+      }
+    } else if (k === 'bungNoMatTroi') {
+      for (const [i, o] of this.tt.entries()) {
+        o.visible = true
+        if (i === 0) {
+          o.scale.setScalar(0.2 + u * 2.3)
+          o.rotation.z += dt * 1.1
+        } else {
+          const a = ((i - 1) / 8) * Math.PI * 2
+          o.scale.setScalar(manh * (0.8 + u * 1.4))
+          o.position.set(Math.cos(a) * (1.1 + u * 1.9), Math.sin(a) * (1.1 + u * 1.9), XA * 0.5)
+        }
+        ;((o as THREE.Mesh).material as THREE.MeshBasicMaterial).opacity = manh * 0.85
+      }
+    } else if (k === 'hongBang') {
+      for (const [i, o] of this.tt.entries()) {
+        o.visible = true
+        const m = (o as THREE.Mesh).material as THREE.MeshBasicMaterial
+        if (i === 0) {
+          o.scale.set(0.3 + u * 1.1, 1, 0.3 + u * 1.1)
+          m.opacity = manh * 0.45
+        } else {
+          // Phiến băng bay tới theo nhịp riêng, xoay tít.
+          const pha = (o.userData.pha as number) ?? 0
+          const w = (u * 1.6 + pha) % 1
+          o.position.set((pha - 0.5) * 2.2, Math.sin(pha * 9) * 0.7, w * XA * 2)
+          o.rotation.x += dt * 7
+          o.rotation.y += dt * 5
+          o.scale.setScalar(0.7 + w * 0.9)
+          m.opacity = manh * 0.9 * (1 - w * 0.5)
+        }
+      }
+    } else {
+      for (const [i, o] of this.tt.entries()) {
+        o.visible = true
+        const m = (o as THREE.Mesh).material as THREE.MeshBasicMaterial
+        if (i < 4) {
+          const pha = (o.userData.pha as number) ?? 0
+          const w = (u * 1.4 + pha) % 1
+          o.position.z = w * XA * 2
+          o.rotation.z += dt * (3 + i * 1.6)
+          o.scale.setScalar(0.6 + w * 1.5)
+          m.opacity = manh * 0.85 * (1 - w * 0.55)
+        } else {
+          o.scale.set(manh, 1, manh)
+          o.rotation.y += dt * 4
+          m.opacity = manh * 0.75
+        }
+      }
     }
   }
 

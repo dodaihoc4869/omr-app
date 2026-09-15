@@ -64,7 +64,7 @@ describe('Màn chọn lần đầu', () => {
 
   it('bấm chọn thì vào game, và hồ sơ ghi lại mốc chọn', async () => {
     gan()
-    fireEvent.click(screen.getByText('Mộc Tinh Ester Polymer'))
+    fireEvent.click(screen.getByText(DANH_SACH_THAN_THU.moc_tinh.ten))
     await waitFor(() => expect(screen.getByText('Chỉ Số Chiến Đấu')).toBeTruthy())
     expect(screen.queryByText('Chọn thần thú đồng hành của em')).toBeNull()
 
@@ -77,7 +77,7 @@ describe('Màn chọn lần đầu', () => {
 describe('Chọn rồi thì KHÔNG đổi được', () => {
   it('không còn nút đổi thần thú nào trên màn', async () => {
     gan()
-    fireEvent.click(screen.getByText('Lôi Kim Thú Điện Cực'))
+    fireEvent.click(screen.getByText(DANH_SACH_THAN_THU.loi_kim.ten))
     await waitFor(() => expect(screen.getByText('Sáu Hệ Thần Thú')).toBeTruthy())
 
     // Tiêu đề cũ "Chọn Thần Thú Đồng Hành" là cái thẻ cho đổi tự do — phải biến mất.
@@ -94,7 +94,7 @@ describe('Chọn rồi thì KHÔNG đổi được', () => {
   it('màn hình nói rõ hệ nào khắc em, hệ nào em khắc', async () => {
     gan()
     // Base khắc 4 hệ, bị Hoả khắc — nhiều quan hệ nhất, dễ thấy cả ba nhãn.
-    fireEvent.click(screen.getByText('Bảo Thần Base Tinh Thể'))
+    fireEvent.click(screen.getByText(DANH_SACH_THAN_THU.thiet_giap.ten))
     await waitFor(() => expect(screen.getByText('Sáu Hệ Thần Thú')).toBeTruthy())
     expect(screen.getByText('Thần thú của em')).toBeTruthy()
     expect(screen.getAllByText('Em khắc hệ này +50%').length).toBeGreaterThanOrEqual(1)

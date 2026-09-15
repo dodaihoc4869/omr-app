@@ -377,7 +377,9 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duC
   if (Number(du.v) >= 3) return <PhieuV3 du={du} laCuaEm={laCuaEm} xinLink={xinLink} />
 
   const tk = du.thongKe
-  const dung = du.thongKe ? Math.max(0, du.thongKe.tongCau - du.thongKe.soSai - du.thongKe.soBoTrong) : (du.tongSoCau !== null ? Math.max(0, du.tongSoCau - du.soCauSai) : null)
+  const dung = du.dai && du.dai.length > 0
+    ? du.dai.filter((x) => x.dung).length
+    : (du.thongKe ? Math.max(0, du.thongKe.tongCau - du.thongKe.soSai) : (du.tongSoCau !== null ? Math.max(0, du.tongSoCau - du.soCauSai) : null))
   const chuyenDeCa = [...du.chuyenDeCa].sort((a, b) => b.soSai / Math.max(1, b.soCau) - a.soSai / Math.max(1, a.soCau))
   // Chỉ CA NÀY được biết chắc là ca đề riêng: `hoSoEm` của máy chủ không chở cờ
   // đó cho từng ca cũ, mà bịa ra thì sai. Mỗi báo cáo dựng ở thời điểm ca của

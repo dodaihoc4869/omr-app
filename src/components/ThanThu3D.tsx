@@ -25,8 +25,10 @@
 
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import { type BoThanThu3D } from '../game/than-thu-hoa-hoc/dung-than-thu-3d'
+import { mauTuChuoi, type BoThanThu3D } from '../game/than-thu-hoa-hoc/dung-than-thu-3d'
 import { dungCanh3D } from '../game/than-thu-hoa-hoc/canh-3d-chung'
+import { dungTanHuVo } from '../game/than-thu-hoa-hoc/tan-hu-vo-3d'
+import { CAP_TOI_DA } from '../game/than-thu-hoa-hoc/hinh-thai'
 import { ChieuThuc3D } from '../game/than-thu-hoa-hoc/chieu-thuc-3d'
 import type { ThanThuInfo } from '../game/than-thu-hoa-hoc/he-thong-pet'
 
@@ -113,6 +115,30 @@ export default function ThanThu3D({
     const chieu = new ChieuThuc3D(info)
     bo.goc.add(chieu.doiTuong)
 
+    /**
+     * CẤP 120 — TAN THÀNH HƯ VÔ, NHẬP VỚI ĐẠI THỂ.
+     *
+     * Thầy chốt 15-09. Chỉ dựng khi đúng cấp tối đa: đây là cảnh cuối cùng của
+     * cả hành trình, không phải hiệu ứng trang trí bật ở mọi cấp.
+     */
+    const tanHuVo = cap >= CAP_TOI_DA
+      ? dungTanHuVo(Math.max(0.8, kc.co.y * 0.55), mauTuChuoi(info.mauChinh), mauTuChuoi(info.mauPhu))
+      : null
+    if (tanHuVo !== null) {
+      tanHuVo.nhom.position.y = kc.tam.y
+      canh.add(tanHuVo.nhom)
+    }
+    let tTan = 0
+    /**
+     * Vật liệu của thân thú, gom MỘT LẦN lúc bắt đầu tan.
+     *
+     * Đổi `transparent` trên vật liệu three là phải bật `needsUpdate` cho nó
+     * dịch lại shader — không bật thì `opacity` bị bỏ qua hoàn toàn và thân thú
+     * đứng nguyên đó trong suốt cảnh tan. Và chỉ bật ĐÚNG MỘT LẦN: mỗi lần bật
+     * là một lượt dịch shader, bật mỗi khung hình thì màn đứng hình.
+     */
+    let vlThan: THREE.Material[] | null = null
+
     // ── Xoay bằng ngón tay ──
     let gocY = 0.35
     let daQuan = 0
@@ -181,6 +207,29 @@ export default function ThanThu3D({
         if (lenh.no) bo.goc.scale.setScalar(1.16)
       }
       chieu.capNhat(dt)
+
+      // ── TAN HƯ VÔ: thân mờ dần, hạt hiện lên, rồi thành thiên hà nhỏ ──
+      if (tanHuVo !== null) {
+        tTan += dt
+        tanHuVo.capNhat(tTan, dt)
+        const mo = tanHuVo.doMoThan(tTan)
+        if (vlThan === null) {
+          const gom = new Set<THREE.Material>()
+          bo.goc.traverse((o) => {
+            const m = (o as THREE.Mesh).material as THREE.Material | THREE.Material[] | undefined
+            if (m === undefined) return
+            for (const v of Array.isArray(m) ? m : [m]) gom.add(v)
+          })
+          vlThan = [...gom]
+          for (const v of vlThan) {
+            v.transparent = true
+            v.depthWrite = false
+            v.needsUpdate = true
+          }
+        }
+        for (const v of vlThan) v.opacity = mo
+        bo.goc.visible = mo > 0.004
+      }
       // Rung theo sức của chiêu — cuồng nộ rung hơn gấp đôi.
       if (chieu.vuaNo) rungConLai = 0.22 * chieu.manhNo
 
@@ -288,6 +337,7 @@ export default function ThanThu3D({
       el.removeEventListener('pointerup', len)
       el.removeEventListener('pointercancel', len)
       chieu.dispose()
+      tanHuVo?.don()
       kc.don()
       renderer.dispose()
       if (el.parentNode !== null) el.parentNode.removeChild(el)

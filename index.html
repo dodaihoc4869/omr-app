@@ -62,8 +62,83 @@
       body { margin: 0; background: #f7f8fa; }
       @media (prefers-color-scheme: dark) { body { background: #0f1419; } }
     </style>
-  </head>
-  <body>
+    <!-- TƯƠNG THÍCH MÁY IOS CŨ (< iOS 18) & CHỐNG TRẮNG MÀN HÌNH -->
+    <script>
+      (function () {
+        try {
+          if (!Array.prototype.at) {
+            Array.prototype.at = function (n) {
+              n = Math.trunc(n) || 0
+              if (n < 0) n += this.length
+              if (n < 0 || n >= this.length) return undefined
+              return this[n]
+            }
+          }
+          if (!String.prototype.at) {
+            String.prototype.at = function (n) {
+              n = Math.trunc(n) || 0
+              if (n < 0) n += this.length
+              if (n < 0 || n >= this.length) return undefined
+              return this[n]
+            }
+          }
+          if (!Object.hasOwn) {
+            Object.hasOwn = function (obj, prop) {
+              return Object.prototype.hasOwnProperty.call(obj, prop)
+            }
+          }
+          if (typeof crypto !== 'undefined' && !crypto.randomUUID) {
+            crypto.randomUUID = function () {
+              return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, function (c) {
+                return (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16)
+              })
+            }
+          }
+          if (!Promise.withResolvers) {
+            Promise.withResolvers = function () {
+              var a, b
+              var c = new Promise(function (res, rej) { a = res; b = rej })
+              return { promise: c, resolve: a, reject: b }
+            }
+          }
+          if (typeof window !== 'undefined') {
+            if (!window.requestIdleCallback) {
+              window.requestIdleCallback = function (cb) {
+                var start = Date.now()
+                return setTimeout(function () {
+                  cb({
+                    didTimeout: false,
+                    timeRemaining: function () { return Math.max(0, 50 - (Date.now() - start)) },
+                  })
+                }, 1)
+              }
+            }
+            if (!window.cancelIdleCallback) {
+              window.cancelIdleCallback = function (id) { clearTimeout(id) }
+            }
+          }
+        } catch (e) {}
+
+        // Bắt lỗi toàn cục — không bao giờ để máy trắng màn hình
+        window.addEventListener('error', function () {
+          setTimeout(function () {
+            var goc = document.getElementById('root')
+            if (goc && goc.childElementCount === 0) {
+              goc.innerHTML =
+                '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f7f8fa;color:#1a2332">' +
+                '<div style="font-size:44px;margin-bottom:12px">🎓</div>' +
+                '<div style="font-size:18px;font-weight:700;margin-bottom:6px">ĐỖ ĐẠI HỌC</div>' +
+                '<div style="font-size:13px;color:#5b6270;margin-bottom:20px;max-width:300px;line-height:1.4">' +
+                'Trang web gặp sự cố hiển thị trên thiết bị. Bấm nút dưới để nạp lại trực tiếp:' +
+                '</div>' +
+                '<button onclick="location.reload()" style="background:#16a34a;color:#fff;border:none;padding:12px 24px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:12px;box-shadow:0 2px 8px rgba(22,163,74,0.3)">Tải lại trang</button>' +
+                '<div style="font-size:12px;color:#9aa4b2">Nếu vẫn lỗi, hãy bấm dấu ... chọn Mở bằng Safari</div>' +
+                '</div>'
+            }
+          }, 500)
+        })
+      })()
+    </script>
     <main id="root"></main>
     <script type="module" src="/src/main.tsx"></script>
 

@@ -38,6 +38,7 @@ if [ $MA -eq 0 ]; then
   echo "    Giáo viên : https://omr-app-b3u.pages.dev/?vai=gv"
   echo "    Học sinh  : https://omr-app-b3u.pages.dev/hs"
   echo "    Phụ huynh : https://omr-app-b3u.pages.dev/ph"
+  echo "    Cài đặt App HS & PH : https://omr-app-b3u.pages.dev/cai-app"
 else
   echo ">>> APP CHƯA ĐẨY ĐƯỢC (mã thoát $MA) — đọc lỗi ở trên. Máy chủ thì đã lên."
 fi

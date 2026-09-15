@@ -13,12 +13,12 @@
  * BẢN NÀY cho mỗi con một BỘ SỐ DÁNG riêng, và một NÉT KÝ riêng không con nào
  * có. Vẫn một bộ mã dựng, nhưng đọc số từ bảng dưới nên sáu bóng đổ khác hẳn:
  *
- *   Hoả Long   LONG   — thân rắn uốn khúc, cổ dài, râu rồng, bờm gáy
- *   Hải Quái   QUY    — mai vòm trên lưng, bốn chân ngắn, vây lưng
- *   Bảo Thần   LY     — kỳ lân bốn chân, một sừng, gai tinh thể trên vai
- *   Phong Lôi  PHƯỢNG — chim, mỏ, mào dựng, đuôi lông dài xoè
- *   Lôi Kim    HỔ       — hổ vằn bốn chân, vai u, nanh dài, vuốt sấm
- *   Mộc Tinh   ĐẠI BÀNG — cánh xoè lớn, mỏ quặp, chùm lông gáy, móng vuốt
+ *   Hoả      Xích Phượng Nhiệt Nhôm    → PHƯỢNG
+ *   Acid     Tử Giác Kỳ Lân Cường Toan → KỲ LÂN
+ *   Base     Huyền Quy Kết Tủa BaSO₄   → QUY
+ *   Khí      Thanh Long Halogen        → LONG
+ *   Điện hoá Lôi Lân Điện Cực          → LÂN
+ *   Hữu cơ   Bích Long Ester Polymer   → THUỶ LONG
  *
  * "Lông lá nhiều hơn" làm bằng hai núm: `dayLong` (bề dày bộ lông) và số lớp vỏ
  * — nâng chung cho cả sáu, rồi mỗi con lệch thêm một chút theo tính cách.
@@ -34,14 +34,14 @@
  * cùng một khuôn. Sáu khung dưới đây khác nhau ở CẤU TRÚC: số chân, thân nằm
  * ngang hay đứng, có mai hay không, có cổ hay không.
  *
- *   long   rồng      thân rắn uốn khúc dựng đứng, cổ dài, râu, sừng nai
- *   quy    rùa       mai vòm to trên lưng, thân thấp bè, bốn chân ngắn
- *   ly     kỳ lân    bốn chân, thân nằm ngang, cổ vươn, một sừng giữa trán
- *   phuong phượng    chim: thân trứng đứng, mỏ, mào, đuôi lông dài xoè
- *   ho     hổ        bốn chân vằn, vai u, nanh dài, vuốt thép, đuôi dày
- *   daiBang đại bàng  cánh xoè lớn, mỏ quặp, chùm lông gáy, móng vuốt
+ *   long     Thanh Long Halogen        thân rắn uốn khúc, sừng nai, râu, cánh dơi
+ *   quy      Huyền Quy Kết Tủa          mai vòm vảy lục giác, bốn chân ngắn, sừng nhỏ
+ *   kyLan    Tử Giác Kỳ Lân Cường Toan  ngựa bốn chân, HAI sừng xoắn, bờm và đuôi bay
+ *   phuong   Xích Phượng Nhiệt Nhôm     chim lửa, cánh xoè lớn, mào ngọn lửa, đuôi lửa
+ *   lan      Lôi Lân Điện Cực           sư tử bờm dày, sừng, bốn chân, đuôi chùm
+ *   thuyLong Bích Long Ester Polymer    rồng nước, mào lá dọc lưng, vây, cánh dơi
  */
-export type KhungXuong = 'long' | 'quy' | 'ly' | 'phuong' | 'ho' | 'daiBang'
+export type KhungXuong = 'long' | 'quy' | 'kyLan' | 'phuong' | 'lan' | 'thuyLong'
 
 /** Kiểu tai — quyết định bóng đổ của đầu, thứ mắt nhận ra đầu tiên. */
 export type KieuTai = 'tron' | 'nhon' | 'vay' | 'dai' | 'chop' | 'la'
@@ -71,7 +71,7 @@ export interface DangThu {
 }
 
 const MAC_DINH: DangThu = {
-  khung: 'ho',
+  khung: 'lan',
   coDau: [1.02, 0.96, 0.98],
   coThan: [0.74, 0.66, 0.7],
   yThan: -0.74,
@@ -86,43 +86,43 @@ const MAC_DINH: DangThu = {
 export const DANG_THU: Record<string, DangThu> = {
   // HOẢ — vạm vỡ, tai nhọn vểnh, bờm gáy dựng. Dáng hổ báo.
   hoa_long: {
-    khung: 'long',
-    coDau: [0.7, 0.72, 1.08], coThan: [0.62, 0.6, 0.66], yThan: -0.62,
+    khung: 'phuong',
+    coDau: [0.66, 0.68, 0.74], coThan: [0.6, 0.84, 0.62], yThan: -0.72,
     kieuTai: 'nhon', coMom: 1.12, dayLong: 0.27, themLop: 3,
     netKy: 'bomGay', soDotDuoi: 4,
   },
   // ACID — đầu tròn to, thân thấp bè, tai vây cá, lông mượt sát. Dáng quái nước.
   thuy_quai: {
-    khung: 'quy',
-    coDau: [0.66, 0.6, 0.7], coThan: [1.02, 0.5, 0.94], yThan: -0.92,
+    khung: 'kyLan',
+    coDau: [0.72, 0.76, 0.96], coThan: [0.6, 0.56, 0.96], yThan: -0.78,
     kieuTai: 'vay', coMom: 0.92, dayLong: 0.2, themLop: 1,
     netKy: 'vayLung', soDotDuoi: 3,
   },
   // BASE — vuông vức, thân dày nhất, tai ngắn, gai tinh thể trên vai. Dáng giáp sĩ.
   thiet_giap: {
-    khung: 'ly',
-    coDau: [0.8, 0.8, 1.0], coThan: [0.66, 0.6, 0.98], yThan: -0.74,
+    khung: 'quy',
+    coDau: [0.66, 0.6, 0.72], coThan: [1.02, 0.5, 0.94], yThan: -0.92,
     kieuTai: 'tron', coMom: 0.88, dayLong: 0.23, themLop: 2,
     netKy: 'gaiVai', soDotDuoi: 2,
   },
   // KHÍ — đầu nhỏ, thân thon cao, tai dài thỏ, lông xù bay. Dáng nhanh nhẹn.
   loi_dieu: {
-    khung: 'phuong',
-    coDau: [0.68, 0.7, 0.72], coThan: [0.6, 0.86, 0.6], yThan: -0.72,
+    khung: 'long',
+    coDau: [0.7, 0.72, 1.06], coThan: [0.62, 0.6, 0.66], yThan: -0.62,
     kieuTai: 'dai', coMom: 0.95, dayLong: 0.31, themLop: 4,
     netKy: 'longXu', soDotDuoi: 5,
   },
   // ĐIỆN HOÁ — đầu vừa, thân gọn, tai chóp nhọn, chỏm tóc dựng đứng. Tinh nghịch.
   loi_kim: {
-    khung: 'ho',
-    coDau: [0.86, 0.82, 0.96], coThan: [0.74, 0.64, 1.02], yThan: -0.78,
+    khung: 'lan',
+    coDau: [0.88, 0.84, 0.92], coThan: [0.72, 0.62, 1.0], yThan: -0.78,
     kieuTai: 'chop', coMom: 1.0, dayLong: 0.26, themLop: 3,
     netKy: 'chomToc', soDotDuoi: 4,
   },
   // HỮU CƠ — tròn ũm, tai lá bè, lông dày nhất. Dáng hiền lành.
   moc_tinh: {
-    khung: 'daiBang',
-    coDau: [0.68, 0.7, 0.78], coThan: [0.66, 0.9, 0.66], yThan: -0.72,
+    khung: 'thuyLong',
+    coDau: [0.72, 0.74, 1.02], coThan: [0.62, 0.6, 0.68], yThan: -0.64,
     kieuTai: 'la', coMom: 0.94, dayLong: 0.34, themLop: 4,
     netKy: 'laVai', soDotDuoi: 3,
   },

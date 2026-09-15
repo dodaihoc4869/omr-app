@@ -114,6 +114,10 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    target: ['es2020', 'safari14', 'ios14'],
+    cssTarget: ['safari14', 'ios14'],
+  },
   worker: {
     format: 'es',
   },

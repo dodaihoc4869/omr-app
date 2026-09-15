@@ -256,9 +256,9 @@ export default function ExamTakeScreen({ tuCong }: { tuCong?: TuCongHocSinh } = 
   // bài Thầy — dựng màn thứ hai là hai nơi rồi lệch nhau.
   const [laXemDiem] = useState(() => docDuongVao(location.search, location.pathname).vai === 'diem')
 
-  const [maCa, setMaCa] = useState('')
-  const [sbd, setSbd] = useState('')
-  const [matKhauCa, setMatKhauCa] = useState('')
+  const [maCa, setMaCa] = useState(() => tuCong?.maCa ?? '')
+  const [sbd, setSbd] = useState(() => tuCong?.sbd ?? '')
+  const [matKhauCa, setMatKhauCa] = useState(() => tuCong?.matKhau ?? '')
   // MÀN XÁC NHẬN TÊN (thầy chốt 07/09). Em gõ MỖI số báo danh; bấm Vào thi thì
   // máy tra tên của chính số đó và hiện lên cho em nhìn, rồi em bấm Bắt đầu hay
   // Nhập lại.
@@ -267,7 +267,9 @@ export default function ExamTakeScreen({ tuCong }: { tuCong?: TuCongHocSinh } = 
   // với danh sách. Gõ lệch bất cứ ô nào cũng chỉ nhận đúng một câu "thông tin
   // không đúng" — 07/09 hai em bị chặn giữa buổi mà không ai biết sai ở đâu.
   // Nhìn thấy TÊN MÌNH thì gõ nhầm một số là phát hiện ngay.
-  const [xacNhan, setXacNhan] = useState<{ sbd: string; hoTen: string; lop: string } | null>(null)
+  const [xacNhan, setXacNhan] = useState<{ sbd: string; hoTen: string; lop: string } | null>(() =>
+    tuCong ? { sbd: tuCong.sbd, hoTen: tuCong.hoTen, lop: tuCong.lop || '' } : null,
+  )
   const [dangTraTen, setDangTraTen] = useState(false)
   // PHÒNG CHỜ (thầy chốt 07/09): em đã qua cổng nhưng thầy chưa bấm bắt đầu.
   const [cho, setCho] = useState<{ tenCa: string; thoiGianPhut: number } | null>(null)
@@ -2087,7 +2089,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           scriptUrlRef.current.trim(),
           '',
           done.maCa,
-          [taoBaiGhiDiem(kb, done.maCa, done.sbd, done.lanThu ?? 1, done.answers, g, done.giayCau, done.idThietBi ?? layIdThietBi())],
+          [taoBaiGhiDiem(kb, done.maCa, done.sbd, done.lanThu ?? 1, done.answers, g, done.giayCau, done.idThietBi ?? layIdThietBi(), boEm)],
           soCauEmDaChia,
         ).catch(() => {
           // máy thầy chấm lại sẽ ghi đè — không chặn luồng
@@ -2411,7 +2413,23 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     )
   }
 
-  if (phase === 'join') {
+  if (phase === 'join' && tuCong) {
+    return (
+      <Trang className="flex items-center justify-center px-4">
+        <div className="w-full text-center flex flex-col items-center justify-center py-16" style={{ maxWidth: 400 }}>
+          <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)', fontWeight: 600 }}>
+            Đang vào ca thi #{tuCong.maCa}…
+          </div>
+          <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginTop: 8 }}>
+            Hệ thống đang kiểm tra và kết nối phòng thi
+          </div>
+        </div>
+      </Trang>
+    )
+  }
+
+  if (phase === 'join' && !tuCong) {
     return (
       <Trang className="flex items-center justify-center px-4 py-8">
         <div className="w-full" style={{ maxWidth: 400 }}>

@@ -56,7 +56,7 @@ export default function ScanScreen() {
     }
 
     const newSheet: ScannedSheet = {
-      id: crypto.randomUUID(),
+      id: typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
       scannedAt: new Date().toISOString(),
       answers,
       score,

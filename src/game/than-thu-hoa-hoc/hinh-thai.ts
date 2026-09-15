@@ -77,23 +77,102 @@ interface Moc { cap: number; co: TenCo | null; ten: string }
 const MOC: readonly Moc[] = [
   { cap: 1, co: null, ten: 'Trứng Nguyên Tố' },
   { cap: 2, co: 'than', ten: 'Sơ Sinh' },
-  { cap: 3, co: 'sung', ten: 'Mọc Sừng' },
-  { cap: 5, co: 'duoi', ten: 'Sinh Đuôi' },
-  { cap: 8, co: 'canhNho', ten: 'Chớm Cánh' },
-  { cap: 11, co: 'haoQuang', ten: 'Thức Tỉnh Hào Quang' },
-  { cap: 15, co: 'vay', ten: 'Vảy Nguyên Tố' },
-  { cap: 20, co: 'canhLon', ten: 'Song Dực' },
-  { cap: 26, co: 'quyDao', ten: 'Quỹ Đạo Năng Lượng' },
-  { cap: 33, co: 'vuongMien', ten: 'Vương Miện' },
-  { cap: 41, co: 'vongRune', ten: 'Vòng Rune Nguyên Tố' },
-  { cap: 50, co: 'toiThuong', ten: 'Hình Thái Tối Thượng' },
-  { cap: 60, co: 'gaiLung', ten: 'Gai Sống Lưng' },
-  { cap: 70, co: 'duoiLua', ten: 'Đuôi Lửa Nguyên Tố' },
-  { cap: 81, co: 'haoQuangKep', ten: 'Hào Quang Song Tầng' },
-  { cap: 92, co: 'matThuBa', ten: 'Mắt Thứ Ba' },
-  { cap: 104, co: 'giapNguc', ten: 'Giáp Ngực Nguyên Tố' },
-  { cap: 116, co: 'runeKep', ten: 'Rune Nghịch Chuyển' },
+  { cap: 4, co: 'sung', ten: 'Mọc Sừng' },
+  { cap: 7, co: 'duoi', ten: 'Sinh Đuôi' },
+  // ── BẬC 2 ── cấp 10
+  { cap: 10, co: 'canhNho', ten: 'Chớm Cánh' },
+  { cap: 16, co: 'haoQuang', ten: 'Thức Tỉnh Hào Quang' },
+  { cap: 23, co: 'vay', ten: 'Vảy Nguyên Tố' },
+  // ── BẬC 3 ── cấp 30
+  { cap: 30, co: 'canhLon', ten: 'Song Dực' },
+  { cap: 38, co: 'quyDao', ten: 'Quỹ Đạo Năng Lượng' },
+  { cap: 44, co: 'gaiLung', ten: 'Gai Sống Lưng' },
+  // ── BẬC 4 ── cấp 50
+  { cap: 50, co: 'vuongMien', ten: 'Vương Miện' },
+  { cap: 58, co: 'duoiLua', ten: 'Đuôi Lửa Nguyên Tố' },
+  { cap: 64, co: 'vongRune', ten: 'Vòng Rune Nguyên Tố' },
+  // ── BẬC 5 ── cấp 70
+  { cap: 70, co: 'toiThuong', ten: 'Hình Thái Tối Thượng' },
+  { cap: 80, co: 'haoQuangKep', ten: 'Hào Quang Song Tầng' },
+  { cap: 90, co: 'matThuBa', ten: 'Mắt Thứ Ba' },
+  // ── BẬC 6 ── cấp 100
+  { cap: 100, co: 'giapNguc', ten: 'Giáp Ngực Nguyên Tố' },
+  { cap: 112, co: 'runeKep', ten: 'Rune Nghịch Chuyển' },
 ] as const
+
+/**
+ * SÁU BẬC TIẾN HOÁ — đúng mốc trong ảnh thầy gửi 15-09: 10 · 30 · 50 · 70 · 100.
+ *
+ * Mỗi con MỘT BỘ TÊN RIÊNG. Trước nay sáu con dùng chung một thang tên
+ * ("Mọc Sừng", "Song Dực"…) — đúng kiểu đặt cho một con thú chung chung, mà
+ * thầy đã vẽ ra sáu dòng giống khác hẳn nhau, mỗi dòng một tông danh xưng.
+ */
+export const CAP_BAC: readonly number[] = [1, 10, 30, 50, 70, 100]
+
+export const TEN_BAC_THEO_THU: Record<string, readonly string[]> = {
+  // Xích Phượng Nhiệt Nhôm — hệ Hoả
+  hoa_long: [
+    'Trứng Hoả Tinh', 'Xích Phượng Sơ Sinh', 'Xích Phượng Trưởng Thành',
+    'Hoả Phượng Hoàn Cầu', 'Đại Phượng Triều Dương',
+    'TỐI THƯỢNG XÍCH PHƯỢNG LONG THẦN',
+  ],
+  // Tử Giác Kỳ Lân Cường Toan — hệ Acid
+  thuy_quai: [
+    'Trứng Cường Toan', 'Kỳ Lân Nhỏ', 'Kỳ Lân Trưởng Thành',
+    'Thần Thú Kỳ Lân', 'Đại Kỳ Lân Thần Thú',
+    'CÕI THƯỢNG TỬ GIÁC KỲ LÂN',
+  ],
+  // Huyền Quy Kết Tủa BaSO₄ — hệ Base
+  thiet_giap: [
+    'Trứng Kết Tủa', 'Quy Vạn Niên Nhỏ', 'Sở Quy Trưởng Thành',
+    'Thần Quy Vạn Niên', 'Sở Quy Thần Quy',
+    'TỐI THƯỢNG HUYỀN QUY THẦN GIÁP',
+  ],
+  // Thanh Long Halogen — hệ Khí
+  loi_dieu: [
+    'Trứng Halogen', 'Rồng Cung Đình Nhỏ', 'Thần Long Hoàn Thiện',
+    'Thanh Long Halogen', 'Cung Đình Đại Thần Long',
+    'TỐI THƯỢNG CUNG ĐÌNH LONG THẦN',
+  ],
+  // Lôi Lân Điện Cực — hệ Điện hoá
+  loi_kim: [
+    'Trứng Điện Cực', 'Đại Lân Nhỏ', 'Đại Lân Trưởng Thành',
+    'Sơn Lâm Đại Lân', 'Thần Sơn Lâm Đại Lân',
+    'TỐI THƯỢNG SƠN LÂM LÔI LÂN',
+  ],
+  // Bích Long Ester Polymer — hệ Hữu cơ
+  moc_tinh: [
+    'Trứng Polymer', 'Thuỷ Phù Long Thần Nhỏ', 'Thuỷ Phù Long Thần Trưởng Thành',
+    'Thuỷ Phù Long Thần Đa Dạng', 'Đại Thuỷ Phù Long Thần',
+    'TỐI THƯỢNG THUỶ PHÙ LONG THẦN',
+  ],
+}
+
+/** Bậc tiến hoá (1…6) của một cấp. */
+export function bacTienHoa(cap: number): number {
+  const c = Math.max(1, Math.min(CAP_TOI_DA, Math.round(cap)))
+  let b = 1
+  for (const [i, m] of CAP_BAC.entries()) if (c >= m) b = i + 1
+  return b
+}
+
+/**
+ * Tên bậc của một con ở một cấp.
+ *
+ * Đây là tên EM ĐỌC THẤY. Tên kỹ thuật trong `HinhThai.ten` (Mọc Sừng, Song
+ * Dực…) giữ nguyên cho phép kiểm và cho mã cũ, nhưng không hiện ra nữa.
+ */
+export function tenBacThu(idThu: string, cap: number): string {
+  const ds = TEN_BAC_THEO_THU[idThu] ?? TEN_BAC_THEO_THU['hoa_long']!
+  return ds[bacTienHoa(cap) - 1] ?? ds[ds.length - 1]!
+}
+
+/** Cấp tới hạn của bậc kế tiếp; đã ở bậc cuối thì trả 0. */
+export function capBacKeTiep(cap: number): number {
+  const c = Math.max(1, Math.min(CAP_TOI_DA, Math.round(cap)))
+  for (const m of CAP_BAC) if (m > c) return m
+  return 0
+}
 
 const SO_LA_MA = [
   '', ' II', ' III', ' IV', ' V', ' VI', ' VII', ' VIII', ' IX', ' X',

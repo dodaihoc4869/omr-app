@@ -82,13 +82,14 @@ describe('doiCauSaiThanhCauChoi', () => {
     expect(kq.lyDoBoQua.dapAnKhongHopLe).toBe(3)
   })
 
-  it('bỏ câu có hình ảnh — màn đấu chỉ hiện chữ', () => {
+  it('giữ câu có hình ảnh — gom ảnh đúng cấu trúc', () => {
     const kq = doiCauSaiThanhCauChoi([
       { ...CAU_TOT, qid: 'a', imageDataUrl: 'data:image/png;base64,iVBOR' },
-      { ...CAU_TOT, qid: 'b', hinhAnh: [{ viTri: 'thanCau' }] },
+      { ...CAU_TOT, qid: 'b', hinhAnh: [{ url: 'data:image/png;base64,iVBOR', viTri: 1 }] },
     ])
-    expect(kq.dsCau).toHaveLength(0)
-    expect(kq.lyDoBoQua.coAnh).toBe(2)
+    expect(kq.dsCau).toHaveLength(2)
+    expect(kq.dsCau[0]!.anhThanCau).toBe('data:image/png;base64,iVBOR')
+    expect(kq.dsCau[1]!.anhXen).toHaveLength(1)
   })
 
   it('bỏ câu trùng qid, giữ bản đầu', () => {

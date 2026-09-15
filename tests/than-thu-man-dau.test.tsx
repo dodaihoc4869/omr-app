@@ -11,6 +11,7 @@
  */
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { DANH_SACH_THAN_THU } from '../src/game/than-thu-hoa-hoc/he-thong-pet'
 import ThanThuHoaHocGame from '../src/components/ThanThuHoaHocGame'
 import type { CauSaiTho } from '../src/game/than-thu-hoa-hoc/cau-hoi-cua-em'
 
@@ -91,9 +92,12 @@ describe('Canvas thần thú trong màn đấu', () => {
     fireEvent.click(screen.getByText('Leo Tháp Tri Thức'))
     await waitFor(() => expect(screen.getByText(/Khiêu Chiến Tầng/)).toBeTruthy())
     fireEvent.click(screen.getByText(/Khiêu Chiến Tầng/))
+    // Đọc tên chiêu TỪ BẢNG THẦN THÚ, không cắm cứng chuỗi: 15-09 đổi cả sáu
+    // tên chiêu theo ảnh thầy gửi, cắm cứng là phép kiểm đỏ mà chẳng vì lỗi gì.
+    const pet = DANH_SACH_THAN_THU['hoa_long']!
     await waitFor(() => {
-      expect(screen.getByText('Phun Lửa Nhiệt Nhôm')).toBeTruthy()
-      expect(screen.getByText('Thiêu Đốt Phân Tử Cấp Độ 4')).toBeTruthy()
+      expect(screen.getAllByText(pet.kyNangThuong).length).toBeGreaterThan(0)
+      expect(screen.getAllByText(pet.kyNangNo).length).toBeGreaterThan(0)
     })
   })
 })

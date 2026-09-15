@@ -99,19 +99,19 @@ describe('Mô hình 3D theo 12 hình thái', () => {
     donBoThanThu3D(bo)
   })
 
-  it('đuôi mọc từ cấp 5, cánh từ cấp 8, vòng xoay từ cấp 26 (thang 120 cấp)', () => {
+  it('mốc xuất hiện đuôi, cánh, vòng xoay theo bậc tiến hoá', () => {
     const co = (c: number) => {
       const b = dungThanThu3D(HOA, c)
       const r = { duoi: b.duoi !== null, canh: b.canhTrai !== null, vong: b.vongXoay.length > 0 }
       donBoThanThu3D(b)
       return r
     }
-    expect(co(4).duoi).toBe(false)
-    expect(co(5).duoi).toBe(true)
-    expect(co(7).canh).toBe(false)
-    expect(co(8).canh).toBe(true)
-    expect(co(25).vong).toBe(false)
-    expect(co(26).vong).toBe(true)
+    expect(co(6).duoi).toBe(false)
+    expect(co(7).duoi).toBe(true)
+    expect(co(9).canh).toBe(false)
+    expect(co(10).canh).toBe(true)
+    expect(co(37).vong).toBe(false)
+    expect(co(38).vong).toBe(true)
     // Cộng dồn: có rồi thì không bao giờ mất, tới tận cấp 120.
     expect(co(120).duoi).toBe(true)
     expect(co(120).canh).toBe(true)

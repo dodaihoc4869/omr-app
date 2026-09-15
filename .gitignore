@@ -19,3 +19,12 @@ _to_delete/
 
 # Bộ chấm 13 phép kiểm hiển thị dựng DOM tạm ở đây (scripts/kiem-13.mjs)
 .kiem-hien-thi/
+
+# Wrangler & logs & temporary archives
+.wrangler/
+*.log
+_*.tgz
+_*.tar.gz
+*.patch
+_patch_cu/
+.gitignore.bak*

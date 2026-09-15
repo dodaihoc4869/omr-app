@@ -309,6 +309,94 @@ export class AmThanhPet {
    *   0,45–0,95s  CÚ GIÁNG: hạ âm tụt sâu + vỡ dải rộng + chuông kim loại
    *   0,95–1,7s   ĐUÔI VANG rút dần
    */
+  /**
+   * SÁU TIẾNG CHƯỞNG TỐI THƯỢNG — mỗi hệ một tiếng, đúng sáu chiêu thầy chốt.
+   *
+   * Gọi kèm `kichNo()`: `kichNo` lo phần SỨC NẶNG chung (rít dâng, cú giáng hạ
+   * âm, đuôi vang), còn hàm này lo phần CHẤT RIÊNG của từng chiêu. Tách hai
+   * tầng vì nếu nhét hết vào một hàm thì sáu tiếng lại ra sáu biến thể của
+   * cùng một tiếng nổ — đúng lỗi bản âm thanh đầu tiên.
+   */
+  chuongToiThuong(he: string): void {
+    this.moKhoa()
+    if (!this.bat) return
+    const T = 0.45
+    switch (he) {
+      case 'khi':
+        // ULTIMATE JADE BLAST — chùm tia bích ngọc: tiếng nạp rồi RÍT DÀI,
+        // cao độ trượt lên như tia laze xuyên qua không khí.
+        this.giong({ tre: T, dang: 'sawtooth', f0: 220, fGiua: 1650, f1: 1180, to: 0.3,
+          len: 0.04, giu: 0.5, tat: 0.5, rung: 0.02, nhipRung: 30,
+          loc: 'bandpass', fLoc: 1400, fLoc1: 3200, qLoc: 6, lech: 9, vang: 0.4 })
+        this.on({ tre: T, to: 0.16, len: 0.05, giu: 0.42, tat: 0.4,
+          loc: 'highpass', f0: 2000, f1: 8000, q: 0.8, vang: 0.5 })
+        break
+      case 'axit':
+        // GALAXY CROWN LASER — tia từ sừng: một nốt cao TINH KHIẾT, gần như
+        // sạch hẳn nhiễu, cộng hào quang ngân dài. Chất "ngân hà" nằm ở đuôi vang.
+        this.giong({ tre: T, dang: 'sine', f0: 1320, f1: 1760, to: 0.26, len: 0.03,
+          giu: 0.46, tat: 0.7, loc: 'bandpass', fLoc: 2400, qLoc: 9, lech: 5, vang: 0.75 })
+        this.giong({ tre: T + 0.04, dang: 'sine', f0: 2640, to: 0.11, len: 0.02,
+          giu: 0.3, tat: 0.62, vang: 0.8 })
+        break
+      case 'kiem':
+        // CHRONO-CORE CANON ARRAY — SÁU phát pháo lệch nhịp, mỗi phát một cú
+        // thụi trầm cộng tiếng kim loại. Đây là chỗ "dàn pháo" phải nghe ra.
+        for (let i = 0; i < 6; i++) {
+          const tre = T + i * 0.075
+          this.giong({ tre, dang: 'sine', f0: 190 - i * 8, f1: 46, to: 0.34,
+            len: 0.004, giu: 0.03, tat: 0.24 })
+          this.on({ tre, to: 0.2, len: 0.003, giu: 0.015, tat: 0.2,
+            loc: 'lowpass', f0: 5200, f1: 400, q: 0.9, vang: 0.4 })
+          this.giong({ tre: tre + 0.01, dang: 'square', f0: 520 + i * 40, f1: 300, to: 0.07,
+            giu: 0.02, tat: 0.2, loc: 'bandpass', fLoc: 2400, qLoc: 8, vang: 0.5 })
+        }
+        break
+      case 'hoa':
+        // SOLAR FLARE ERUPTION — bùng nổ hào quang: gầm trầm dày cộng lửa réo
+        // dải rộng, không có cao độ rõ — đúng chất "một mảng lửa khổng lồ".
+        this.giong({ tre: T, dang: 'sawtooth', f0: 88, fGiua: 140, f1: 62, to: 0.42,
+          len: 0.05, giu: 0.5, tat: 0.6, rung: 0.06, nhipRung: 11,
+          loc: 'lowpass', fLoc: 900, fLoc1: 260, qLoc: 3, lech: 16, vang: 0.45 })
+        this.on({ tre: T, to: 0.34, len: 0.06, giu: 0.44, tat: 0.66,
+          loc: 'bandpass', f0: 1500, f1: 400, q: 0.7, vang: 0.55 })
+        for (let i = 0; i < 9; i++) {
+          this.on({ tre: T + 0.05 + i * 0.07 + Math.random() * 0.03, to: 0.12,
+            giu: 0.004, tat: 0.09, loc: 'bandpass', f0: 900 + Math.random() * 3200, q: 4, vang: 0.4 })
+        }
+        break
+      case 'dien':
+        // CHILLING FROST ROAR — TIẾNG GẦM trước, băng vỡ sau. Gầm dựng bằng
+        // răng cưa trầm có rung mạnh; băng là chuỗi tiếng lách tách cao và khô.
+        this.giong({ tre: T, dang: 'sawtooth', f0: 104, fGiua: 168, f1: 96, to: 0.44,
+          len: 0.06, giu: 0.42, tat: 0.55, rung: 0.09, nhipRung: 17,
+          loc: 'lowpass', fLoc: 780, fLoc1: 380, qLoc: 4, lech: 14, vang: 0.4 })
+        this.giong({ tre: T + 0.02, dang: 'triangle', f0: 320, fGiua: 480, f1: 300, to: 0.16,
+          len: 0.05, giu: 0.36, tat: 0.4, rung: 0.05, nhipRung: 9,
+          loc: 'bandpass', fLoc: 1100, qLoc: 3, vang: 0.42 })
+        for (let i = 0; i < 14; i++) {
+          this.on({ tre: T + 0.12 + i * 0.045 + Math.random() * 0.02, to: 0.14,
+            len: 0.001, giu: 0.001, tat: 0.05,
+            loc: 'highpass', f0: 4200 + Math.random() * 5000, q: 2, vang: 0.5 })
+        }
+        break
+      default:
+        // BIOLUMINESCENT VORTEX BLAST — xoáy nước phát quang: tiếng ù trầm
+        // quay tròn cộng ba lớp sủi. Rung nhịp chậm là cái tạo cảm giác XOÁY.
+        this.giong({ tre: T, dang: 'sine', f0: 132, fGiua: 96, f1: 150, to: 0.4,
+          len: 0.08, giu: 0.5, tat: 0.6, rung: 0.16, nhipRung: 5.5,
+          loc: 'lowpass', fLoc: 620, qLoc: 2.4, lech: 12, vang: 0.5 })
+        this.on({ tre: T, to: 0.24, len: 0.1, giu: 0.42, tat: 0.6,
+          loc: 'bandpass', f0: 700, f1: 2600, q: 1.6, vang: 0.6 })
+        for (let i = 0; i < 6; i++) {
+          this.giong({ tre: T + 0.06 + i * 0.09, dang: 'sine', f0: 300 + i * 90,
+            f1: (300 + i * 90) * 2.2, to: 0.14, len: 0.006, giu: 0.02, tat: 0.14,
+            loc: 'bandpass', fLoc: 900 + i * 220, qLoc: 8, vang: 0.5 })
+        }
+        break
+    }
+  }
+
   kichNo(): void {
     this.moKhoa()
     const T = 0.45

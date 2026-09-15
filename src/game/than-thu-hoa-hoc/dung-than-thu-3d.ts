@@ -436,7 +436,7 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
     }
     dotThan(new THREE.Vector3(0, d.yThan + 0.32, 0.5), new THREE.Vector3(0.3, 0.28, 0.34), mThanPhu)
     vtDau = new THREE.Vector3(0, 0.12, 0.78)
-  } else if (d.khung === 'ly') {
+  } else if (d.khung === 'kyLan') {
     // LY — kỳ lân bốn chân, thân NẰM NGANG, cổ vươn chéo lên.
     dotThan(new THREE.Vector3(0, d.yThan, -0.28), new THREE.Vector3(0.66, 0.6, 0.98))
     for (let i = 0; i < 3; i++) {
@@ -446,7 +446,7 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
         new THREE.Vector3(r, r, r), mThanPhu, d.dayLong * 0.85)
     }
     vtDau = new THREE.Vector3(0, 0.66, 0.74)
-  } else if (d.khung === 'phuong' || d.khung === 'daiBang') {
+  } else if (d.khung === 'phuong') {
     // PHƯỢNG — thân trứng ĐỨNG, ngực ưỡn, cổ mảnh, không có tay.
     dotThan(new THREE.Vector3(0, d.yThan + 0.02, 0.04), new THREE.Vector3(0.6, 0.86, 0.6))
     for (let i = 0; i < 3; i++) {
@@ -456,18 +456,30 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
         new THREE.Vector3(r, r, r), mThanPhu, d.dayLong * 0.7)
     }
     vtDau = new THREE.Vector3(0, 0.82, 0.06)
-  } else if (d.khung === 'ho') {
-    // HỔ — bốn chân, thân NẰM NGANG, VAI U gồ cao hơn hông, ngực nở.
+  } else if (d.khung === 'lan') {
+    // LÂN — sư tử bốn chân, thân NẰM NGANG, vai u gồ cao, ngực nở.
     dotThan(new THREE.Vector3(0, d.yThan, -0.26), new THREE.Vector3(0.7, 0.62, 1.0))
-    // U vai: cái bướu cơ trên vai là thứ làm dáng hổ ra hổ.
     dotThan(new THREE.Vector3(0, d.yThan + 0.36, 0.24), new THREE.Vector3(0.62, 0.42, 0.56), mThanPhu)
     dotThan(new THREE.Vector3(0, d.yThan + 0.12, 0.62), new THREE.Vector3(0.5, 0.46, 0.44), mThanPhu)
     vtDau = new THREE.Vector3(0, 0.62, 0.86)
   } else {
-    // ĐẠI BÀNG — thân chim nghiêng tới trước, ngực nở, cổ ngắn khoẻ.
-    dotThan(new THREE.Vector3(0, d.yThan, 0.0), new THREE.Vector3(0.62, 0.9, 0.7))
-    dotThan(new THREE.Vector3(0, d.yThan + 0.62, 0.2), new THREE.Vector3(0.44, 0.4, 0.44), mThanPhu)
-    vtDau = new THREE.Vector3(0, 0.74, 0.34)
+    // THUỶ LONG — rồng nước: thân rắn sáu đốt cuộn NGANG rồi vươn lên, ngắn và
+    // mập hơn Thanh Long, không có chân sau.
+    for (let i = 0; i < 6; i++) {
+      const u = i / 5
+      const r = 0.58 - u * 0.24
+      dotThan(
+        new THREE.Vector3(Math.sin(u * 4.2) * 0.34, d.yThan - u * 0.3, -0.1 - u * 0.36),
+        new THREE.Vector3(r, r * 0.88, r),
+      )
+    }
+    for (let i = 0; i < 2; i++) {
+      const u = i
+      const r = 0.36 - u * 0.05
+      dotThan(new THREE.Vector3(0, d.yThan + 0.34 + u * 0.34, 0.14 + u * 0.14),
+        new THREE.Vector3(r, r, r), mThanPhu, d.dayLong * 0.8)
+    }
+    vtDau = new THREE.Vector3(0, 0.66, 0.34)
   }
 
   // ─── ĐẦU ───
@@ -573,7 +585,7 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
   const mom = new THREE.Mesh(gCau, mMom)
   mom.position.set(0, -0.24, 1.0)
   // Rồng và kỳ lân có MÕM DÀI thật, không phải cục tròn dán trước mặt.
-  const momDai = d.khung === 'long' || d.khung === 'ly'
+  const momDai = d.khung === 'long' || d.khung === 'kyLan'
   mom.scale.set(0.33 * d.coMom, 0.24 * d.coMom, (momDai ? 0.62 : 0.26) * d.coMom)
   if (momDai) mom.position.set(0, -0.24, 1.2)
   matKhung.add(mom)
@@ -610,7 +622,7 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
     c.castShadow = true
     than.add(c)
   }
-  if (d.khung === 'ly' || d.khung === 'ho' || d.khung === 'quy') {
+  if (d.khung === 'kyLan' || d.khung === 'lan' || d.khung === 'quy') {
     // BỐN CHÂN — hai trước hai sau, thân nằm ngang bên trên.
     const dai = d.khung === 'quy' ? 0.72 : 1
     for (const ben of [-1, 1] as const) {
@@ -632,7 +644,7 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
       ban.scale.set(0.5, 0.45, 0.8)
       than.add(ban)
     }
-  } else if (d.khung === 'long') {
+  } else if (d.khung === 'long' || d.khung === 'thuyLong') {
     // LONG — hai chân trước nhỏ như vuốt rồng, không có chân sau: thân là đuôi.
     for (const ben of [-1, 1] as const) {
       datChi(ben * 0.62, -0.58, 0.28, 0.72, ben * 0.4)
@@ -642,10 +654,10 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
   }
 
   // ─── VUỐT — hổ, long, đại bàng, phượng đều có vuốt thật, ba ngón ───
-  if (d.khung === 'ho' || d.khung === 'long' || d.khung === 'daiBang' || d.khung === 'phuong') {
+  if (d.khung === 'lan' || d.khung === 'long' || d.khung === 'thuyLong' || d.khung === 'phuong') {
     const gVuot = ghi(new THREE.ConeGeometry(0.045, 0.2, 5))
     const mVuot = ghi(vatLieu(new THREE.Color(0.96, 0.94, 0.88), { bong: 0.6, nham: 0.25 }))
-    const chanTruoc: [number, number, number][] = d.khung === 'ho'
+    const chanTruoc: [number, number, number][] = d.khung === 'lan'
       ? [[-0.46, -1.42, 0.56], [0.46, -1.42, 0.56]]
       : d.khung === 'long'
         ? [[-0.62, -0.74, 0.42], [0.62, -0.74, 0.42]]
@@ -683,7 +695,7 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
   }
 
   // ─── SỪNG ĐỘC KỲ LÂN — chỉ khung `ly` ───
-  if (d.khung === 'ly') {
+  if (d.khung === 'kyLan') {
     const gSungLy = ghi(new THREE.ConeGeometry(0.1, 0.72, 7))
     const mSungLy = ghi(vatLieu(cPhu, { bong: 0.55, nham: 0.3, phat: 0.3 }))
     const sl = new THREE.Mesh(gSungLy, mSungLy)
@@ -750,7 +762,28 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
         nn.rotation.x = Math.PI
         matKhung.add(nn)
       }
-    } else if (d.khung === 'ly') {
+    } else if (d.khung === 'kyLan') {
+      // KỲ LÂN — HAI SỪNG XOẮN, bờm bay, đuôi bay. Đúng ảnh thầy gửi.
+      const gXoan = ghi(new THREE.TorusKnotGeometry(0.075, 0.03, 40, 6, 2, 3))
+      for (const ben of [-1, 1] as const) {
+        for (let i = 0; i < 3; i++) {
+          const x = new THREE.Mesh(gXoan, mVang)
+          x.position.set(ben * 0.22, 0.82 + i * 0.2, -0.04 - i * 0.03)
+          x.rotation.set(0.3, 0, ben * 0.22)
+          x.scale.setScalar((1.05 - i * 0.14) * k)
+          dau.add(x)
+        }
+      }
+      // BỜM BAY — dải lông mảnh phất sau gáy.
+      const gDai = ghi(new THREE.CircleGeometry(0.3, 3))
+      for (let i = 0; i < 5; i++) {
+        const u = i / 4
+        const b = new THREE.Mesh(gDai, mRuc)
+        b.position.set((u - 0.5) * 0.4, 0.5 - u * 0.5, -0.4 - u * 0.3)
+        b.rotation.set(-0.5 - u * 0.5, 0, (u - 0.5) * 1.6)
+        b.scale.set((1.5 - u * 0.3) * k, (2.2 - u * 0.4) * k, 1)
+        goc.add(b)
+      }
       // LY — BỜM DÀI xoã hai bên cổ, GIÁP VAI, MÓNG GUỐC.
       const gBom = ghi(new THREE.ConeGeometry(0.14, 0.56, 5))
       for (let i = 0; i < 8; i++) {
@@ -803,7 +836,17 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
         t.scale.set((1.4 - i * 0.1) * k, (3.4 - i * 0.5) * k, 1)
         goc.add(t)
       }
-    } else if (d.khung === 'ho') {
+    } else if (d.khung === 'lan') {
+      // LÂN — BỜM DÀY vòng kín quanh đầu, đây là thứ làm sư tử ra sư tử.
+      const gBom = ghi(new THREE.ConeGeometry(0.17, 0.56, 4))
+      for (let i = 0; i < 14; i++) {
+        const a = (i / 14) * Math.PI * 2
+        const b = new THREE.Mesh(gBom, mRuc)
+        b.position.set(Math.cos(a) * 0.72, Math.sin(a) * 0.7, -0.16)
+        b.rotation.set(0.35, 0, a - Math.PI / 2)
+        b.scale.setScalar((1 + Math.cos(a) * 0.12) * k)
+        dau.add(b)
+      }
       // HỔ — VẰN thân, NANH DÀI, BỜM MÁ hai bên, TAI vểnh.
       const gVan = ghi(new THREE.TorusGeometry(0.52, 0.045, 6, 18, Math.PI * 1.1))
       const mVan = ghi(vatLieu(new THREE.Color(0.08, 0.07, 0.1), { nham: 0.85 }))
@@ -831,6 +874,34 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
           m.scale.setScalar((1 - i * 0.12) * k)
           matKhung.add(m)
         }
+      }
+    } else if (d.khung === 'thuyLong') {
+      // THUỶ LONG — MÀO LÁ dọc sống lưng, VÂY MÁ hai bên, SỪNG NAI nhỏ.
+      const gLa = ghi(new THREE.ConeGeometry(0.16, 0.42, 4))
+      for (let i = 0; i < 10; i++) {
+        const u = i / 9
+        const l = new THREE.Mesh(gLa, mRuc)
+        l.position.set(Math.sin(u * 4.2) * 0.3, 0.62 - u * 1.5, 0.0 - u * 0.4)
+        l.rotation.set(-0.4 - u * 0.3, 0, Math.sin(u * 4.2) * 0.5)
+        l.scale.setScalar((1.3 - u * 0.55) * k)
+        goc.add(l)
+      }
+      const gVayMa = ghi(new THREE.CircleGeometry(0.3, 3))
+      for (const ben of [-1, 1] as const) {
+        for (let i = 0; i < 2; i++) {
+          const v = new THREE.Mesh(gVayMa, mRuc)
+          v.position.set(ben * 0.68, -0.1 - i * 0.24, 0.1 - i * 0.14)
+          v.rotation.set(0, ben * 1.1, ben * (0.8 + i * 0.3))
+          v.scale.setScalar((1.2 - i * 0.25) * k)
+          matKhung.add(v)
+        }
+      }
+      const gNhanh = ghi(new THREE.CapsuleGeometry(0.04, 0.3, 4, 8))
+      for (const ben of [-1, 1] as const) {
+        const n = new THREE.Mesh(gNhanh, mVang)
+        n.position.set(ben * 0.3, 0.8, -0.14)
+        n.rotation.set(-0.3, 0, ben * 0.6)
+        dau.add(n)
       }
     } else {
       // ĐẠI BÀNG — MỎ QUẶP, CHÙM LÔNG GÁY, LÔNG CÁNH nhiều tầng, MÓNG THÉP.
@@ -998,7 +1069,7 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
     if (d.khung === 'phuong') {
       duoi.position.set(0, -0.5, -0.86)
       duoi.scale.set(1.5, 1.5, 1.5)
-    } else if (d.khung === 'ly' || d.khung === 'ho' || d.khung === 'quy') {
+    } else if (d.khung === 'kyLan' || d.khung === 'lan' || d.khung === 'quy') {
       duoi.position.set(0, -1.0, -1.0)
     } else if (d.khung === 'long') {
       duoi.position.set(0.1, -1.6, -1.05)
