@@ -25,8 +25,8 @@
 
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import { dungThanThu3D, donBoThanThu3D, type BoThanThu3D } from '../game/than-thu-hoa-hoc/dung-than-thu-3d'
-import { dungCanhNen, donCanhNen, type BoCanhNen } from '../game/than-thu-hoa-hoc/canh-nen-3d'
+import { type BoThanThu3D } from '../game/than-thu-hoa-hoc/dung-than-thu-3d'
+import { dungCanh3D } from '../game/than-thu-hoa-hoc/canh-3d-chung'
 import { ChieuThuc3D } from '../game/than-thu-hoa-hoc/chieu-thuc-3d'
 import type { ThanThuInfo } from '../game/than-thu-hoa-hoc/he-thong-pet'
 
@@ -92,55 +92,14 @@ export default function ThanThu3D({
     renderer.domElement.style.height = 'auto'
     renderer.domElement.style.display = 'block'
 
-    const canh = new THREE.Scene()
-    const may = new THREE.PerspectiveCamera(42, rong / cao, 0.1, 100)
-
-    let bo: BoThanThu3D = dungThanThu3D(info, cap)
-    canh.add(bo.goc)
-
-    // ── Đo hộp bao để đặt sàn và lùi máy quay cho vừa khung ──
-    const hop = new THREE.Box3().setFromObject(bo.goc)
-    const co = hop.getSize(new THREE.Vector3())
-    const tam = hop.getCenter(new THREE.Vector3())
-    // Mặt sàn đặt theo BÀN CHÂN thú, không theo đáy hộp bao: vòng lửa cấp 12
-    // và vòng rune nằm thấp hơn bàn chân, lấy đáy hộp bao thì thú lơ lửng.
-    const dayNen = bo.chanY
-    const fovY = (may.fov * Math.PI) / 180
-    const fovX = 2 * Math.atan(Math.tan(fovY / 2) * may.aspect)
-    // Thú xoay quanh trục đứng nên bề ngang lúc quay là cạnh dài nhất của X và Z.
-    const ngang = Math.max(co.x, co.z)
-    const xa = Math.max(co.y / 2 / Math.tan(fovY / 2), ngang / 2 / Math.tan(fovX / 2)) * 1.2
-      + ngang / 2
-    // Sàn tối thiểu: quả trứng cấp 1 bé nên phép khớp khung kéo máy quay sát
-    // tận nơi, trứng chiếm trọn khung và mất hết khung cảnh. Lùi tối thiểu 4,6.
-    const xaThat = Math.max(xa, 4.6)
-    const yMay = tam.y + co.y * 0.08
-
-    // ── KHUNG CẢNH riêng của hệ: trời, sương mù, sàn, hạt, đạo cụ ──
-    const nen: BoCanhNen = dungCanhNen(info.he, dayNen - 0.02)
-    canh.background = nen.troi
-    canh.fog = nen.suongMu
-    canh.add(nen.nhom)
+    // MỘT NGUỒN DỰNG CẢNH. Màn này và ảnh chụp cho tờ chiếu lên bảng gọi
+    // CHUNG `dungCanh3D` — cùng hình khối, cùng bộ lông, cùng khung cảnh, cùng
+    // ba ngọn đèn, cùng phép khớp khung. Thầy chốt 15-09: thú lên bảng phải
+    // giống y hệt thú trong mục Thần Thú, nên hai nơi không được có hai bộ vẽ.
+    const kc = dungCanh3D(info, cap, rong / cao)
+    const { canh, may, nen, tam, xaThat, yMay } = kc
+    let bo: BoThanThu3D = kc.bo
     if (nhan.current !== null) nhan.current.textContent = nen.ten
-
-    // ÁNH SÁNG — ba nguồn ăn màu theo cảnh: đèn chính tạo khối, đèn phụ vớt
-    // bóng, đèn viền tách bộ lông khỏi nền tối.
-    canh.add(new THREE.AmbientLight(nen.denChinh, nen.moiTruong))
-    const chinh = new THREE.DirectionalLight(nen.denChinh, 1.85)
-    chinh.position.set(3.2, 5.4, 4.6)
-    chinh.castShadow = true
-    chinh.shadow.mapSize.set(1024, 1024)
-    chinh.shadow.camera.near = 0.5
-    chinh.shadow.camera.far = 24
-    canh.add(chinh)
-    const phu = new THREE.DirectionalLight(nen.denPhu, 0.72)
-    phu.position.set(-4.2, 1.4, 2.2)
-    canh.add(phu)
-    // Đèn viền đặt SAU thú: viền sáng chạy dọc mép lông là thứ làm lông trông
-    // tơi và mềm; thiếu nó thì bộ lông chỉ là mảng màu tối.
-    const vien = new THREE.PointLight(nen.denVien, 34, 16)
-    vien.position.set(-1.8, tam.y + 2.2, -3.8)
-    canh.add(vien)
 
     const chieu = new ChieuThuc3D(info)
     bo.goc.add(chieu.doiTuong)
@@ -299,8 +258,7 @@ export default function ThanThu3D({
       el.removeEventListener('pointerup', len)
       el.removeEventListener('pointercancel', len)
       chieu.dispose()
-      donBoThanThu3D(bo)
-      donCanhNen(nen)
+      kc.don()
       renderer.dispose()
       if (el.parentNode !== null) el.parentNode.removeChild(el)
     }

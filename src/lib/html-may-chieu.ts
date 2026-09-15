@@ -240,14 +240,14 @@ body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); overflow: 
 /* Góc thần thú. Chiếu lên tường từ cuối lớp nên ảnh phải to hơn một biểu tượng
    thường: 108px là ngưỡng còn nhận ra hình thái mà không lấn chỗ đề bài. */
 .mc-thu { flex: 0 0 auto; display: flex; align-items: center; gap: 12px; width: 344px; max-width: 50%; padding: 6px 12px 6px 6px; border: 1px solid var(--mc-vien); border-radius: 16px; font-family: var(--sans, system-ui, sans-serif); }
-.mc-thu-anh { width: 100px; height: 100px; object-fit: contain; display: block; flex: 0 0 auto; }
+.mc-thu-anh { width: 104px; height: 104px; object-fit: cover; display: block; flex: 0 0 auto; border-radius: 13px; }
 .mc-thu-trong { border-radius: 12px; background: var(--mc-vien); }
 .mc-thu-chu { min-width: 0; line-height: 1.32; }
 .mc-thu-ten { font-weight: 900; font-size: 14px; line-height: 1.25; }
 .mc-thu-cap { margin-top: 3px; color: var(--mc-nhat); font-size: 13px; }
 .mc-thu-cap b { color: inherit; font-weight: 800; }
 .mc-thu-so { margin-top: 2px; color: var(--mc-nhat); font-size: 12px; font-variant-numeric: tabular-nums; }
-@media (max-width: 1280px) { .mc-thu { width: 228px; } .mc-thu-anh { width: 80px; height: 80px; } .mc-thu-ten { font-size: 13px; } .mc-thu-cap, .mc-thu-so { font-size: 11px; } }
+@media (max-width: 1280px) { .mc-thu { width: 232px; } .mc-thu-anh { width: 82px; height: 82px; } .mc-thu-ten { font-size: 13px; } .mc-thu-cap, .mc-thu-so { font-size: 11px; } }
 .mc-ten { font-family: var(--sans, system-ui, sans-serif); font-weight: 900; font-size: clamp(22px, 2.4vw, 34px); line-height: 1.2; }
 .mc-phu { display: flex; gap: 14px; margin-top: 3px; color: var(--mc-nhat); font-family: var(--sans, system-ui, sans-serif); font-size: 14px; font-variant-numeric: tabular-nums; }
 .mc-viSao { margin-top: 4px; color: var(--mc-nhat); font-family: var(--sans, system-ui, sans-serif); font-size: 13px; }

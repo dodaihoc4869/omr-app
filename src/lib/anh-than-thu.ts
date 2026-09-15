@@ -18,9 +18,11 @@
  * con số màn này không có; tính bằng giá trị rỗng là in ra một con số sai.
  */
 
+import * as THREE from 'three'
 import { vaHoSo, DANH_SACH_THAN_THU, TEN_HE_DAY_DU } from '../game/than-thu-hoa-hoc/he-thong-pet'
 import { layHinhThai } from '../game/than-thu-hoa-hoc/hinh-thai'
 import { veThanThuCanvas, khungVeThanThu } from '../game/than-thu-hoa-hoc/ve-than-thu'
+import { dungCanh3D, datDangDungYen } from '../game/than-thu-hoa-hoc/canh-3d-chung'
 
 export interface ThanThuChieu {
   /** PNG dạng `data:` — nhúng thẳng vào `<img src>`. */
@@ -35,7 +37,55 @@ export interface ThanThuChieu {
 }
 
 /**
- * Vẽ con thú ra PNG vuông. Máy không dựng được canvas thì trả chuỗi rỗng.
+ * ẢNH 3D — ĐÚNG CON THÚ EM NHÌN THẤY TRONG MỤC THẦN THÚ.
+ *
+ * Thầy chốt 15-09: *"Thần thú hiện lên bảng phải giống y hệt với trong mục thần
+ * thú nhé."* Nên ảnh này dựng bằng CHÍNH `dungCanh3D` mà màn game dùng — cùng
+ * hình khối, cùng bộ lông, cùng khung cảnh của hệ, cùng ba ngọn đèn, cùng góc
+ * quay mở màn. Không phải vẽ lại cho giống; là cùng một nguồn.
+ *
+ * Vẽ ngoài màn hình đúng MỘT khung hình rồi đọc ra PNG. `preserveDrawingBuffer`
+ * bắt buộc: thiếu nó thì trình duyệt xoá bộ đệm ngay sau lượt vẽ và `toDataURL`
+ * trả về một tấm trong suốt.
+ *
+ * Trả chuỗi rỗng khi máy không dựng được WebGL — chỗ gọi lùi về bản canvas 2D.
+ */
+export function veThanThu3DRaAnh(idThu: string, capDo: number, co = 460): string {
+  const info = DANH_SACH_THAN_THU[idThu]
+  if (info === undefined) return ''
+  let may: THREE.WebGLRenderer | null = null
+  let kc: ReturnType<typeof dungCanh3D> | null = null
+  try {
+    const cv = document.createElement('canvas')
+    cv.width = co
+    cv.height = co
+    may = new THREE.WebGLRenderer({
+      canvas: cv, antialias: true, alpha: true, preserveDrawingBuffer: true,
+    })
+    if (may.getContext() === null) return ''
+    may.setPixelRatio(1)
+    may.setSize(co, co, false)
+    may.shadowMap.enabled = true
+    may.shadowMap.type = THREE.PCFSoftShadowMap
+    may.toneMapping = THREE.ACESFilmicToneMapping
+    may.toneMappingExposure = 1.06
+
+    kc = dungCanh3D(info, capDo, 1)
+    datDangDungYen(kc)
+    may.render(kc.canh, kc.may)
+    const ra = cv.toDataURL('image/png')
+    return ra.startsWith('data:image/png') ? ra : ''
+  } catch {
+    return ''
+  } finally {
+    if (kc !== null) kc.don()
+    if (may !== null) may.dispose()
+  }
+}
+
+/**
+ * Vẽ con thú ra PNG vuông bằng bộ canvas 2D — ĐƯỜNG LUI khi máy không dựng
+ * được WebGL. Hình này khác hình trong game, nên chỉ dùng khi không còn cách.
  *
  * `co` là cỡ ẢNH, cố ý gấp đôi cỡ hiển thị trên tờ chiếu (108px): máy chiếu
  * thường 1080p trở lên, vẽ đúng cỡ hiển thị thì viền thú răng cưa thấy rõ.
@@ -90,8 +140,13 @@ export async function thanThuChoToChieu(
   const info = DANH_SACH_THAN_THU[h.idThanhThuChon]
   if (info === undefined) return null
 
+  // Ưu tiên ảnh 3D — giống y hệt mục Thần Thú. Máy thầy không dựng được WebGL
+  // thì mới lùi về canvas 2D, còn hơn là ô trống.
+  const anh = veThanThu3DRaAnh(h.idThanhThuChon, h.capDo)
+    || veThanThuRaAnh(h.idThanhThuChon, h.capDo)
+
   return {
-    anh: veThanThuRaAnh(h.idThanhThuChon, h.capDo),
+    anh,
     ten: info.ten,
     danhHieu: info.danhHieu,
     he: TEN_HE_DAY_DU[info.he] ?? '',

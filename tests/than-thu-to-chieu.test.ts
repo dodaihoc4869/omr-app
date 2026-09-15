@@ -9,7 +9,7 @@
  * tờ chiếu vẫn phải mở, chỉ thiếu con thú.
  */
 import { describe, it, expect, vi } from 'vitest'
-import { thanThuChoToChieu, veThanThuRaAnh } from '../src/lib/anh-than-thu'
+import { thanThuChoToChieu, veThanThuRaAnh, veThanThu3DRaAnh } from '../src/lib/anh-than-thu'
 import { taoHtmlMayChieu, type OBang } from '../src/lib/html-may-chieu'
 import { DANH_SACH_THAN_THU } from '../src/game/than-thu-hoa-hoc/he-thong-pet'
 
@@ -42,6 +42,27 @@ describe('Vẽ thú ra ảnh', () => {
   it('máy không dựng được canvas thì trả rỗng, không ném lỗi', () => {
     // jsdom không có ngữ cảnh 2D thật — đúng cảnh máy cũ tắt tăng tốc phần cứng.
     expect(() => veThanThuRaAnh('hoa_long', 3)).not.toThrow()
+  })
+})
+
+describe('Ảnh 3D — cùng một nguồn với mục Thần Thú', () => {
+  it('id lạ thì trả rỗng, không ném lỗi', () => {
+    expect(() => veThanThu3DRaAnh('khong-co-con-nay', 5)).not.toThrow()
+    expect(veThanThu3DRaAnh('khong-co-con-nay', 5)).toBe('')
+  })
+
+  it('máy KHÔNG dựng được WebGL thì trả rỗng để chỗ gọi lùi về canvas 2D', () => {
+    // jsdom không có WebGL — đúng cảnh máy cũ hoặc trình duyệt tắt tăng tốc.
+    expect(() => veThanThu3DRaAnh('hoa_long', 6)).not.toThrow()
+    expect(veThanThu3DRaAnh('hoa_long', 6)).toBe('')
+  })
+
+  it('dựng ảnh cho cả sáu thần thú, mọi cấp, đều không ném lỗi', () => {
+    for (const id of Object.keys(DANH_SACH_THAN_THU)) {
+      for (const c of [1, 6, 12]) {
+        expect(() => veThanThu3DRaAnh(id, c), `${id} cấp ${c}`).not.toThrow()
+      }
+    }
   })
 })
 
