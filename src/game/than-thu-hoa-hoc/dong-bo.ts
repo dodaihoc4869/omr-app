@@ -20,8 +20,8 @@
  * Bộ hàm này THUẦN — không đọc mạng, không đọc localStorage — để còn kiểm được.
  */
 
-import { vaHoSo, type HoSoThanThuLuu } from './he-thong-pet'
-import { DS_NGUON_EXP, tongSoExp } from './kinh-nghiem'
+import { vaHoSo, type CapTienHoa, type HoSoThanThuLuu } from './he-thong-pet'
+import { DS_NGUON_EXP, thanhExp, tongSoExp } from './kinh-nghiem'
 
 export type BenThang = 'may' | 'mayChu' | 'nhuNhau'
 
@@ -34,9 +34,45 @@ export interface KetQuaHoaGiai {
   tongExpMayChu: number
 }
 
-/** Tổng EXP đã kiếm — mốc hoà giải. */
+/** Tổng EXP đã kiếm — một trong các mốc hoà giải. */
 export function tongExpCuaHoSo(h: HoSoThanThuLuu): number {
   return tongSoExp(h.soExp)
+}
+
+/**
+ * THƯỚC ĐO TIẾN TRÌNH — so theo thứ tự từ điển, mục trước quan trọng hơn.
+ *
+ * ───────────────────────────────────────────────────────────────────────────
+ * VÌ SAO KHÔNG SO BẰNG MỖI TỔNG EXP (lỗi bản 15-09, thầy bắt được ngay chiều
+ * hôm ấy: "điện thoại và máy tính chưa hiện thần thú giống nhau"):
+ *
+ * Sổ `soExp` chỉ mới có từ 15-09. Mọi hồ sơ nuôi từ trước có sổ RỖNG — tổng 0.
+ * Hai máy cùng tổng 0 thì hoà, mà hoà thì luật cũ giữ bản của máy này. Nên máy
+ * nào cũng giữ bản của mình, mãi mãi: điện thoại giữ quả trứng, web giữ con đã
+ * mọc sừng, đồng bộ chạy mà chẳng đổi gì. **Cấp thú không hề nằm trong phép so.**
+ *
+ * CẤP THÚ ĐỨNG ĐẦU, vì cấp chỉ tăng không bao giờ giảm. Để tổng EXP đứng đầu
+ * thì gặp ca "máy A cấp 3 đã nạp hết ống, máy B cấp 1 còn đầy ống" là máy A bị
+ * TỤT CẤP — lỗi nhìn thấy ngay và đáng sợ hơn hẳn.
+ */
+export function mocTienTrinh(h: HoSoThanThuLuu): readonly number[] {
+  return [
+    h.capDo,
+    tongSoExp(h.soExp),
+    h.tangThapCaoNhat,
+    h.soCauDaThanhTay,
+    h.khoExp + h.exp,
+  ]
+}
+
+/** So hai thước đo theo thứ tự từ điển: >0 là a hơn, <0 là b hơn, 0 là ngang. */
+export function soMoc(a: readonly number[], b: readonly number[]): number {
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    const x = a[i] ?? 0
+    const y = b[i] ?? 0
+    if (x !== y) return x > y ? 1 : -1
+  }
+  return 0
 }
 
 /**
@@ -53,7 +89,8 @@ export function hoaGiaiHoSo(may: HoSoThanThuLuu, mayChuTho: unknown): KetQuaHoaG
 
   const mayChu = vaHoSo(mayChuTho)
   const tChu = tongExpCuaHoSo(mayChu)
-  const ben: BenThang = tMay > tChu ? 'may' : tChu > tMay ? 'mayChu' : 'nhuNhau'
+  const d = soMoc(mocTienTrinh(may), mocTienTrinh(mayChu))
+  const ben: BenThang = d > 0 ? 'may' : d < 0 ? 'mayChu' : 'nhuNhau'
   // Bằng nhau thì giữ bản máy này — tránh nháy giao diện vô cớ.
   const nen = ben === 'mayChu' ? mayChu : may
   const kia = ben === 'mayChu' ? may : mayChu
@@ -64,9 +101,28 @@ export function hoaGiaiHoSo(may: HoSoThanThuLuu, mayChuTho: unknown): KetQuaHoaG
     soExp[k] = Math.max(nen.soExp[k] ?? 0, kia.soExp[k] ?? 0)
   }
 
+  // KHỐI CẤP ĐỘ LẤY TRỌN MỘT BÊN, không trộn từng trường.
+  // `capDo`, `exp` (đã nạp vào thú) và `khoExp` (còn trong ống) là ba con số ăn
+  // khớp nhau: nạp ống vào thú là ống vơi đi, cấp lên, `exp` đổi. Lấy cấp của
+  // bên này mà ống của bên kia là CỘNG KHỐNG — chỗ EXP ấy đã hoá thành cấp rồi.
+  //
+  // NGOẠI LỆ DUY NHẤT: hai bên cùng cấp thì chưa bên nào nạp thêm, lấy ống đầy
+  // hơn không cộng khống gì cả — và đó là ca thường gặp nhất (hai máy cùng cấp,
+  // một máy vừa làm bài kiếm thêm).
+  const khoExp = nen.capDo === kia.capDo
+    ? Math.max(nen.khoExp, kia.khoExp)
+    : nen.khoExp
+
   const hoSo: HoSoThanThuLuu = {
     ...nen,
     soExp,
+    khoExp,
+    // Cấp là con số CHỈ TĂNG — hoà giải xong không bao giờ được thấp hơn cả hai
+    // bên. `expToiDa` và `capTienHoa` phải tính lại theo cấp ấy, nếu không hồ sơ
+    // ra cấp 5 mà thanh EXP vẫn dài bằng cấp 1.
+    capDo: nen.capDo,
+    capTienHoa: nen.capDo as CapTienHoa,
+    expToiDa: thanhExp(nen.capDo),
     tangThapCaoNhat: Math.max(nen.tangThapCaoNhat, kia.tangThapCaoNhat),
     soCauDaThanhTay: Math.max(nen.soCauDaThanhTay, kia.soCauDaThanhTay),
     // Thần thú đã chọn: bên nào đã chốt thì giữ. Chọn một lần, không đổi —
