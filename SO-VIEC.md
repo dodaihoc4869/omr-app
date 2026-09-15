@@ -245,3 +245,18 @@ THẦY chỉ vì tình cờ mở trên máy thầy.
 - [!] Trần 200 chưa phải toàn kho (157 tờ). Muốn đúng bằng số ứng viên thật thì
   phải thêm cột `dang_ma` vào `cau_hoi` rồi đánh lại chỉ mục cả kho — việc
   riêng, chưa làm trong lượt này.
+
+## NGHIỆM THU TRÊN BẢN LIVE (sau phát hành)
+
+| Mở | Địa chỉ thành | App hiện ra |
+|---|---|---|
+| `/gv` | `/gv` | GIÁO VIÊN |
+| `/ph` | `/ph` | PHỤ HUYNH |
+| `/?vai=gv` | **`/gv`** | GIÁO VIÊN |
+| `/?vai=hocsinh` | **`/hs`** | HỌC SINH |
+| `/hoc-sinh` | **`/hs`** | HỌC SINH |
+| `/` | `/` | **Màn chọn app** (không đoán) |
+
+- `start_url` manifest học sinh trên máy chủ: `./hs`
+- Mảnh mã chính trên bản live: **616 KB** (trước 755 KB) · mở trang **1,07 giây**
+- Chốt tự sửa khi app trắng màn: CÓ trong `index.html` bản live
