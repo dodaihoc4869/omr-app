@@ -7,7 +7,10 @@
  *
  * Ba thứ tệp này khoá:
  *  1. Trạng thái đồng bộ HIỆN RA, và lý do hỏng in NGUYÊN VĂN.
- *  2. Có nút đồng bộ tay — không phải chờ đủ 2,5 giây rồi cầu may.
+ *  2. MÁY TỰ ĐỒNG BỘ — không còn nút bấm nào. Thầy chốt 15-09: *"bỏ nút đồng
+ *     bộ để tự đồng bộ"*. Nút cũ bắt em tự nhớ bấm, mà chính em lại là người
+ *     không biết hai máy đang lệch. Nay ba mồi: quay lại tab · có mạng lại ·
+ *     nhịp 45 giây; cộng một lượt đẩy nốt lúc rời tab.
  *  3. Dựng → dọn → dựng lại (StrictMode) vẫn nuốt được bản máy chủ. Bản cũ tắt
  *     `conGanRef` lúc dọn mà không bật lại lúc gắn, nên từ lượt gắn thứ hai mọi
  *     kết quả mạng về đều bị vứt lặng lẽ.
@@ -75,19 +78,54 @@ describe('Thanh đồng bộ hiện ra màn', () => {
   })
 })
 
-describe('Nút Đồng bộ ngay', () => {
-  it('bấm là kéo bản máy chủ về và đẩy ngược lên, không chờ 2,5 giây', async () => {
+/** Giả lập em rời tab rồi quay lại — mồi quan trọng nhất của tự đồng bộ. */
+function datHien(hien: boolean): void {
+  Object.defineProperty(document, 'visibilityState', {
+    configurable: true,
+    get: () => (hien ? 'visible' : 'hidden'),
+  })
+  fireEvent(document, new Event('visibilitychange'))
+}
+
+describe('Máy tự đồng bộ, không còn nút bấm', () => {
+  it('không bày nút Đồng bộ ngay nào nữa', async () => {
+    gan({
+      trongMay: CO_THU,
+      docThu: () => Promise.resolve({ idThanhThuChon: 'hoa_long', capDo: 9 }),
+      ghi: () => Promise.resolve({ ok: true, daGhi: true }),
+    })
+    await waitFor(() => expect(screen.getByText(/Đã đồng bộ với máy chủ/)).toBeTruthy())
+    expect(screen.queryByRole('button', { name: 'Đồng bộ ngay' })).toBeNull()
+    expect(screen.getByText('Máy tự đồng bộ')).toBeTruthy()
+  })
+
+  it('quay lại tab là kéo bản máy chủ về và đẩy ngược lên', async () => {
     const daGhi: unknown[] = []
     gan({
       trongMay: CO_THU,
       docThu: () => Promise.resolve({ idThanhThuChon: 'hoa_long', capDo: 9 }),
       ghi: (h) => { daGhi.push(h); return Promise.resolve({ ok: true, daGhi: true }) },
     })
-    const nut = await screen.findByRole('button', { name: 'Đồng bộ ngay' })
-    fireEvent.click(nut)
+    await waitFor(() => expect(screen.getByText(/Đã đồng bộ với máy chủ/)).toBeTruthy())
+    daGhi.length = 0
+    datHien(true)
     await waitFor(() => expect(daGhi.length).toBeGreaterThan(0))
     await waitFor(() => expect(doc().capDo).toBe(9))
     expect((daGhi[daGhi.length - 1] as { capDo: number }).capDo).toBe(9)
+  })
+
+  it('rời tab thì đẩy nốt NGAY, không chờ hết 2,5 giây', async () => {
+    const daGhi: unknown[] = []
+    gan({
+      trongMay: CO_THU,
+      docThu: () => Promise.resolve(null),
+      ghi: (h) => { daGhi.push(h); return Promise.resolve({ ok: true, daGhi: true }) },
+    })
+    await waitFor(() => expect(screen.getByText(/Đã đồng bộ với máy chủ/)).toBeTruthy())
+    daGhi.length = 0
+    datHien(false)
+    await waitFor(() => expect(daGhi.length).toBeGreaterThan(0))
+    datHien(true)
   })
 
   it('máy chủ nhỉnh hơn thì nuốt lại lần nữa cho hai bên bằng nhau', async () => {
@@ -99,19 +137,27 @@ describe('Nút Đồng bộ ngay', () => {
         hoSo: { idThanhThuChon: 'hoa_long', capDo: 11 },
       }),
     })
-    fireEvent.click(await screen.findByRole('button', { name: 'Đồng bộ ngay' }))
+    await waitFor(() => expect(screen.getByText(/Đã đồng bộ với máy chủ/)).toBeTruthy())
+    datHien(true)
     await waitFor(() => expect(doc().capDo).toBe(11))
   })
 
-  it('bấm mà hỏng thì hiện lý do, không treo ở "đang đồng bộ"', async () => {
+  it('vòng tự động hỏng thì hiện lý do, không treo ở "đang đồng bộ"', async () => {
+    let lan = 0
     gan({
       trongMay: CO_THU,
-      docThu: () => Promise.reject(new Error('máy chủ bận')),
+      docThu: () => {
+        lan++
+        return lan === 1
+          ? Promise.resolve({ idThanhThuChon: 'hoa_long', capDo: 3 })
+          : Promise.reject(new Error('máy chủ bận'))
+      },
       ghi: () => Promise.resolve({ ok: true, daGhi: true }),
     })
-    fireEvent.click(await screen.findByRole('button', { name: 'Đồng bộ ngay' }))
+    await waitFor(() => expect(screen.getByText(/Đã đồng bộ với máy chủ/)).toBeTruthy())
+    datHien(true)
     await waitFor(() => expect(screen.getByText('máy chủ bận')).toBeTruthy())
-    expect(screen.getByRole('button', { name: 'Đồng bộ ngay' })).toBeTruthy()
+    expect(screen.getByText('Chưa đồng bộ được')).toBeTruthy()
   })
 })
 
@@ -176,14 +222,16 @@ describe('Chưa chọn thú: KHÔNG bày nút chọn khi chưa hỏi xong máy c
     expect(screen.getByText('mất mạng')).toBeTruthy()
   })
 
-  it('màn chọn cũng có nút Đồng bộ ngay để thử lại', async () => {
+  it('hỏi hỏng thì bảo em CHỜ, không giục em bấm nút nào', async () => {
     gan({
       trongMay: CHUA_CHON,
       docThu: () => Promise.reject(new Error('máy chủ bận')),
       ghi: () => Promise.resolve({ ok: true, daGhi: true }),
     })
-    const nut = await screen.findByRole('button', { name: 'Đồng bộ ngay' })
-    expect(nut).toBeTruthy()
+    // Nút cũ đã bỏ; lời khuyên phải đổi theo, nếu không là chỉ em bấm cái
+    // không tồn tại.
+    await waitFor(() => expect(screen.getByText(/chờ có mạng rồi hãy chọn/)).toBeTruthy())
+    expect(screen.queryByRole('button', { name: 'Đồng bộ ngay' })).toBeNull()
   })
 
   it('màn KHÔNG nối máy chủ thì bày nút chọn ngay, không bắt chờ', () => {

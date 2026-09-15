@@ -14,6 +14,8 @@
  *  4. Chưởng cuồng nộ chỉ khác chưởng thường ở chỗ phóng to. Nay phải khác ở
  *     BỐN thứ đo được: chớp loá, sóng loang đất, đèn loé, số mảnh vỡ.
  */
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { describe, it, expect, vi, beforeAll } from 'vitest'
 import * as THREE from 'three'
 import { ChieuThuc3D } from '../src/game/than-thu-hoa-hoc/chieu-thuc-3d'
@@ -125,5 +127,31 @@ describe('Vũng acid và sóng loang bám mặt sàn', () => {
     // Mõm ở y = 0,2 nên sàn ở y ≈ −1,46. Phải có thứ nằm sát sàn.
     expect(thap).toBeLessThan(-1.2)
     c.dispose()
+  })
+})
+
+
+/**
+ * CHẠM PHẢI XUYÊN QUA LỚP CHỮ MÀ TỚI ĐƯỢC CẢNH 3D.
+ *
+ * Thầy báo 15-09: *"xoay thú 360 độ bản mới không xoay được"*. Nguyên nhân:
+ * lớp nội dung `z-10` chính là thứ quyết định chiều cao sân khấu, nên nó phủ
+ * KÍN sân khấu và nuốt sạch cú chạm–kéo trước khi tới lớp canvas bên dưới.
+ *
+ * Đây là phép kiểm ĐỌC MÃ, yếu hơn phép kiểm hành vi — jsdom không tính bố cục
+ * CSS nên không dựng lại được cảnh này. Hành vi thật đã đo bằng trình duyệt
+ * (Chromium, 15-09): `document.elementFromPoint` ở giữa sân khấu trả về
+ * `CANVAS`, và một cú kéo ngang 224 px làm ảnh dựng đổi — tức xoay được.
+ */
+describe('Lớp chữ không được nuốt cú chạm của sân khấu', () => {
+  const ma = readFileSync(resolve(process.cwd(), 'src/components/ThanThuHoaHocGame.tsx'), 'utf8')
+
+  it('lớp nội dung sân khấu cho chạm xuyên qua khi đang dựng 3D', () => {
+    expect(ma).toContain("dung3D ? 'pointer-events-none' : ''")
+  })
+
+  it('hai nút chiêu bật lại nhận chạm, nếu không thì bấm chiêu cũng chết theo', () => {
+    const so = ma.split('pointer-events-auto shrink-0 w-12 h-12').length - 1
+    expect(so).toBe(2)
   })
 })

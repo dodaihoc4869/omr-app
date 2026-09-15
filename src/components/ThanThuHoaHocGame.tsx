@@ -447,7 +447,13 @@ export default function ThanThuHoaHocGame({
   /** Lý do hỏng, NGUYÊN VĂN từ tầng gọi mạng. Nuốt lý do là tự bịt mắt mình. */
   const [lyDoDongBo, setLyDoDongBo] = useState('')
   const [lucDongBo, setLucDongBo] = useState('')
-  const [dangDongBoTay, setDangDongBoTay] = useState(false)
+  /** Đã hỏi xong máy chủ LẦN ĐẦU chưa. Tách hẳn khỏi `tinhTrangDongBo`: từ
+   *  15-09 máy tự đồng bộ lại nhiều lần, mỗi lần lại kéo trạng thái về
+   *  'dangTai'; nếu màn chọn thú vẫn nhìn vào đó thì cứ vài chục giây nó lại
+   *  chớp về màn chờ. */
+  const [daHoiLanDau, setDaHoiLanDau] = useState(false)
+  /** Chặn hai vòng đồng bộ chồng lên nhau — ba mồi tự động có thể nổ cùng lúc. */
+  const dangDongBoRef = useRef(false)
   const daNuotRef = useRef(false)
   /** Gương của `hoSo` để hàm đồng bộ tay đọc được bản mới nhất mà không phụ
    *  thuộc vào lượt dựng lại của React. */
@@ -457,7 +463,7 @@ export default function ThanThuHoaHocGame({
   useEffect(() => {
     if (daNuotRef.current) return
     daNuotRef.current = true
-    if (!docThanThuMayChu) { setTinhTrangDongBo('khongCo'); return }
+    if (!docThanThuMayChu) { setTinhTrangDongBo('khongCo'); setDaHoiLanDau(true); return }
     setTinhTrangDongBo('dangTai')
     docThanThuMayChu()
       .then((tho) => {
@@ -471,12 +477,20 @@ export default function ThanThuHoaHocGame({
         setTinhTrangDongBo('loi')
         setLyDoDongBo(e instanceof Error ? e.message : 'Không rõ lý do')
       })
+      .finally(() => {
+        if (conGanRef.current) setDaHoiLanDau(true)
+      })
   }, [docThanThuMayChu])
 
   /**
-   * ĐỒNG BỘ NGAY. Đường tự động chỉ chạy lúc mở game rồi đẩy sau 2,5 giây; em
-   * mở tab rồi tắt nhanh là chưa kịp đẩy gì. Nút này kéo bản máy chủ về, trộn,
-   * đẩy ngược lên — trọn một vòng, và NÓI RA kết quả.
+   * MỘT VÒNG ĐỒNG BỘ TRỌN VẸN: kéo bản máy chủ về → trộn → đẩy ngược lên →
+   * nuốt lại bản máy chủ trả về.
+   *
+   * Thầy chốt 15-09: *"bỏ nút đồng bộ để tự đồng bộ"*. Trước đây vòng này chỉ
+   * chạy khi em BẤM NÚT, còn đường tự động thì mỏng: đọc một lần lúc mở game
+   * rồi chỉ đẩy lên sau mỗi lần hồ sơ đổi. Hệ quả là em mở app trên máy này
+   * trong khi máy kia vừa ăn EXP thì máy này KHÔNG BAO GIỜ biết, trừ khi tự
+   * bấm. Nay không còn nút — vòng này do máy tự gọi, xem ba mồi ở dưới.
    */
   const dongBoNgay = useCallback(async () => {
     if (!docThanThuMayChu || !ghiThanThuMayChu) {
@@ -484,7 +498,10 @@ export default function ThanThuHoaHocGame({
       setLyDoDongBo('Màn này chưa nối máy chủ')
       return
     }
-    setDangDongBoTay(true)
+    // Ba mồi có thể nổ sát nhau (hiện tab + đúng nhịp hẹn giờ). Chạy chồng thì
+    // hai vòng cùng đọc–ghi một hồ sơ, bản sau đè bản trước.
+    if (dangDongBoRef.current) return
+    dangDongBoRef.current = true
     setTinhTrangDongBo('dangTai')
     setLyDoDongBo('')
     try {
@@ -512,11 +529,52 @@ export default function ThanThuHoaHocGame({
         setLyDoDongBo(e instanceof Error ? e.message : 'Không rõ lý do')
       }
     } finally {
-      if (conGanRef.current) setDangDongBoTay(false)
+      dangDongBoRef.current = false
     }
   }, [docThanThuMayChu, ghiThanThuMayChu])
 
+  /**
+   * BA MỒI TỰ ĐỒNG BỘ — thay cho cái nút vừa bỏ.
+   *
+   *  1. QUAY LẠI TAB. Đây là mồi quan trọng nhất: em học trên máy tính rồi
+   *     cầm điện thoại lên, vừa mở ra là kéo bản mới nhất về ngay.
+   *  2. CÓ MẠNG LẠI. Mất sóng giữa chừng thì lần có sóng đầu tiên chạy bù.
+   *  3. NHỊP 45 GIÂY khi tab đang hiện. Hai máy mở song song vẫn đuổi kịp
+   *     nhau; tab ẩn thì không chạy, không phá 3G của em.
+   */
   const henGhiRef = useRef<number | null>(null)
+  const dongBoNgayRef = useRef(dongBoNgay)
+  useEffect(() => { dongBoNgayRef.current = dongBoNgay }, [dongBoNgay])
+
+  useEffect(() => {
+    if (!docThanThuMayChu || !ghiThanThuMayChu) return
+    const chay = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return
+      void dongBoNgayRef.current()
+    }
+    const doiTab = () => {
+      if (document.visibilityState === 'visible') { chay(); return }
+      // RỜI TAB: đẩy nốt phần đang chờ. Lượt đẩy thường hẹn 2,5 giây cho đỡ
+      // phá 3G; em ăn EXP xong tắt máy ngay trong 2,5 giây ấy là mất trắng
+      // lượt đẩy — đúng cảnh "máy tính có, điện thoại không".
+      if (henGhiRef.current !== null) {
+        window.clearTimeout(henGhiRef.current)
+        henGhiRef.current = null
+      }
+      void ghiThanThuMayChu(hoSoRef.current).catch(() => { /* lát nữa đẩy bù */ })
+    }
+    const nhip = window.setInterval(chay, 45_000)
+    document.addEventListener('visibilitychange', doiTab)
+    window.addEventListener('pagehide', doiTab)
+    window.addEventListener('online', chay)
+    return () => {
+      window.clearInterval(nhip)
+      document.removeEventListener('visibilitychange', doiTab)
+      window.removeEventListener('pagehide', doiTab)
+      window.removeEventListener('online', chay)
+    }
+  }, [docThanThuMayChu, ghiThanThuMayChu])
+
   useEffect(() => {
     // Chưa nuốt xong bản máy chủ thì CHƯA ĐƯỢC ĐẨY — đẩy lúc này là lấy bản
     // trong máy đè lên bản máy chủ, đúng cái lỗi đang đi sửa.
@@ -562,12 +620,16 @@ export default function ThanThuHoaHocGame({
    * bày — hỏng thì bày kèm lời cảnh báo, chứ không khoá em lại vĩnh viễn khi
    * mất mạng.
    */
-  const dangHoiMayChu = docThanThuMayChu !== undefined
-    && (tinhTrangDongBo === 'chua' || tinhTrangDongBo === 'dangTai')
+  const dangHoiMayChu = docThanThuMayChu !== undefined && !daHoiLanDau
 
-  /** Thanh đồng bộ — dùng ở CẢ màn chọn thú lẫn Đảo Thần Thú. Trước đây chỉ có
-   *  ở Đảo Thần Thú, nên máy còn kẹt ở màn chọn thì không thấy gì và cũng
-   *  không có nút nào để thử lại. */
+  /**
+   * THANH ĐỒNG BỘ — chỉ còn là một dòng TRẠNG THÁI, không còn nút.
+   *
+   * Thầy chốt 15-09: *"bỏ nút đồng bộ để tự đồng bộ"*. Nút cũ là dấu hiệu máy
+   * chưa làm tròn việc: bắt em tự nhớ bấm thì kiểu gì cũng có em quên, mà
+   * chính em lại là người không biết hai máy đang lệch nhau. Nay máy tự chạy
+   * (ba mồi ở trên), thanh này chỉ nói ra nó đang ở đâu.
+   */
   const thanhDongBo = (
     <div className="relative w-full z-10 mt-3 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-800/70 px-3 py-2 text-left backdrop-blur-sm">
       <span
@@ -591,14 +653,9 @@ export default function ThanThuHoaHocGame({
           {lyDoDongBo}
         </span>
       )}
-      <button
-        type="button"
-        onClick={() => { void dongBoNgay() }}
-        disabled={dangDongBoTay}
-        className="ml-auto rounded-full bg-slate-900 dark:bg-white px-3 py-1 text-[11px] font-bold text-white dark:text-slate-900 disabled:opacity-40"
-      >
-        {dangDongBoTay ? 'Đang đồng bộ…' : 'Đồng bộ ngay'}
-      </button>
+      <span className="ml-auto text-[10px] text-slate-400 dark:text-slate-500">
+        {tinhTrangDongBo === 'khongCo' ? '' : 'Máy tự đồng bộ'}
+      </span>
     </div>
   )
 
@@ -1217,8 +1274,7 @@ export default function ThanThuHoaHocGame({
             <div className="rounded-2xl border border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 px-4 py-3 text-xs leading-relaxed text-amber-900 dark:text-amber-200">
               <b>Chưa hỏi được máy chủ.</b> Nếu em đã nuôi thần thú ở máy khác thì máy
               này chưa thấy con ấy — bấm chọn bây giờ là chốt nhầm một con thứ hai.
-              Bấm <b>Đồng bộ ngay</b> ở dưới thử lại; vẫn không được thì để lát nữa
-              hãy chọn.
+              Máy đang tự thử lại; <b>chờ có mạng rồi hãy chọn</b>, đừng chọn lúc này.
             </div>
           )}
 
@@ -1311,7 +1367,13 @@ export default function ThanThuHoaHocGame({
                 }}
               />
             )}
-            <div className="relative z-10 flex flex-col p-5 sm:p-6">
+            {/* Thầy bắt 15-09: *"bản mới không xoay được"*. Lớp nội dung này
+                nằm ĐÈ KÍN sân khấu (nó chính là thứ quyết định chiều cao sân
+                khấu), nên mọi cú chạm–kéo rơi vào nó chứ không tới được lớp
+                canvas 3D phía dưới. Ở bản 3D phải cho chạm XUYÊN QUA lớp này;
+                riêng hai nút chiêu bật lại nhận chạm. Bản phẳng thì canvas 2D
+                nằm TRONG lớp này nên giữ nguyên. */}
+            <div className={`relative z-10 flex flex-col p-5 sm:p-6 ${dung3D ? 'pointer-events-none' : ''}`}>
             {/* Header thú cưng */}
             <div className="relative w-full flex items-start justify-between gap-3 z-10">
               <div className="text-left min-w-0">
@@ -1364,7 +1426,7 @@ export default function ThanThuHoaHocGame({
                 onClick={() => tungChieu(false)}
                 title={infoPet.kyNangThuong}
                 aria-label={infoPet.kyNangThuong}
-                className={`shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shadow-lg cursor-pointer transition-transform active:scale-90 ${
+                className={`pointer-events-auto shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shadow-lg cursor-pointer transition-transform active:scale-90 ${
                   dung3D
                     ? 'bg-emerald-500/20 border border-emerald-400/60 text-emerald-200 backdrop-blur-sm hover:bg-emerald-500/35'
                     : 'bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50'
@@ -1395,7 +1457,7 @@ export default function ThanThuHoaHocGame({
                 onClick={() => tungChieu(true)}
                 title={infoPet.kyNangNo}
                 aria-label={infoPet.kyNangNo}
-                className={`shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shadow-lg cursor-pointer transition-transform active:scale-90 ${
+                className={`pointer-events-auto shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shadow-lg cursor-pointer transition-transform active:scale-90 ${
                   dung3D
                     ? 'bg-amber-500/25 border border-amber-400/70 text-amber-100 backdrop-blur-sm hover:bg-amber-500/45'
                     : 'bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-800 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50'
