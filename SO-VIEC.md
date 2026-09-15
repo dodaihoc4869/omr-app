@@ -623,7 +623,7 @@ Mã commit: `b91b0f2`. Lùi bản phát hành: `git revert b91b0f2`.
   vì khác màu, sửa triệt để và đồng bộ tất cả mọi chỗ, tất cả các app"
   | bằng chứng: `node scripts/kiem-lo-dap-an.mjs` → ĐẠT 9/9 (Chromium thật, so getComputedStyle)
 - [x] Nghiệm thu 8 cửa  | bằng chứng: bảng cuối mục này
-- [ ] Phát hành  | bằng chứng: (chưa có)
+- [x] Phát hành  | bằng chứng: xem mục Phát hành cuối
 
 ## Nguyên nhân gốc
 
@@ -674,3 +674,20 @@ Bốn tệp phép kiểm cũ chốt luật cũ, đã sửa kèm ghi chú ngày: 
 | **Lộ đáp án** | `node scripts/kiem-lo-dap-an.mjs` | **ĐẠT 9/9** | Đạt |
 | Service worker | `node scripts/kiem-sw.mjs` | ĐẠT 10/10 | Đạt |
 | Dựng bản | `npx vite build` | 173 mục precache · mảnh chính 490 KB | Đạt |
+
+## Phát hành
+
+- [x] Kiểm không có ca nào đang thi  | bằng chứng: D1 `SELECT ... FROM luot WHERE nop_luc IS NULL` → rỗng (16:44 UTC)
+- [x] Đợi phiên Claude kia nhả máy  | ghi chú: máy bị phiên kia giữ 18 phút, thử lại tới khi nhả rồi mới đẩy
+- [x] `DAY-TAT-CA.command` → "XONG CẢ HAI"
+
+Đối chứng bản live, trình duyệt khác gốc, quét cả 71 mảnh js:
+
+| Kiểm | Kết quả |
+|---|---|
+| `sw-version.json` | `{"builtAt":1789492267}` |
+| `dongBoLoDapAn` | có, trong `assets/html-phieu-D26pfaZA.js` |
+| luật cũ `body.chi-de .q-opt.dung { background: #f8fafc` | KHÔNG còn mảnh nào |
+| luật giấu `.lo-dap` | có |
+
+Mã commit: `2d68f00`. Lùi bản phát hành: `git revert 2d68f00`.
