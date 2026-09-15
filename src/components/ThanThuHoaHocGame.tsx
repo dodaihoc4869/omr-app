@@ -550,6 +550,58 @@ export default function ThanThuHoaHocGame({
     }
   }, [hoSo, ghiThanThuMayChu, tinhTrangDongBo])
 
+  /**
+   * ĐANG HỎI MÁY CHỦ XEM EM ĐÃ CHỌN THẦN THÚ CHƯA.
+   *
+   * Thầy bắt được 15-09 qua ảnh chụp máy em: màn "Chọn thần thú đồng hành"
+   * hiện ra NGAY, trước khi máy chủ kịp trả lời. Mà màn ấy ghi rõ "chọn một
+   * lần duy nhất và không đổi được" — em bấm trong một hai giây chờ ấy là chốt
+   * nhầm một con thứ hai, trong khi con thật đang nằm ở máy kia.
+   *
+   * Nên: còn đang hỏi thì KHÔNG bày nút chọn ra. Hỏi xong (hoặc hỏi hỏng) mới
+   * bày — hỏng thì bày kèm lời cảnh báo, chứ không khoá em lại vĩnh viễn khi
+   * mất mạng.
+   */
+  const dangHoiMayChu = docThanThuMayChu !== undefined
+    && (tinhTrangDongBo === 'chua' || tinhTrangDongBo === 'dangTai')
+
+  /** Thanh đồng bộ — dùng ở CẢ màn chọn thú lẫn Đảo Thần Thú. Trước đây chỉ có
+   *  ở Đảo Thần Thú, nên máy còn kẹt ở màn chọn thì không thấy gì và cũng
+   *  không có nút nào để thử lại. */
+  const thanhDongBo = (
+    <div className="w-full z-10 mt-3 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 px-3 py-2 text-left">
+      <span
+        className={`h-2 w-2 shrink-0 rounded-full ${
+          tinhTrangDongBo === 'xong' ? 'bg-emerald-500'
+            : tinhTrangDongBo === 'dangTai' ? 'bg-amber-400 animate-pulse'
+            : tinhTrangDongBo === 'loi' ? 'bg-rose-500'
+            : 'bg-slate-400'
+        }`}
+      />
+      <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+        {tinhTrangDongBo === 'xong' ? 'Đã đồng bộ với máy chủ'
+          : tinhTrangDongBo === 'dangTai' ? 'Đang đồng bộ…'
+          : tinhTrangDongBo === 'loi' ? 'Chưa đồng bộ được'
+          : tinhTrangDongBo === 'khongCo' ? 'Màn này chạy một mình, không nối máy chủ'
+          : 'Chưa đồng bộ lần nào'}
+        {lucDongBo !== '' && tinhTrangDongBo === 'xong' ? ` · ${lucDongBo}` : ''}
+      </span>
+      {lyDoDongBo !== '' && (
+        <span className="text-[11px] text-rose-600 dark:text-rose-400 basis-full sm:basis-auto">
+          {lyDoDongBo}
+        </span>
+      )}
+      <button
+        type="button"
+        onClick={() => { void dongBoNgay() }}
+        disabled={dangDongBoTay}
+        className="ml-auto rounded-full bg-slate-900 dark:bg-white px-3 py-1 text-[11px] font-bold text-white dark:text-slate-900 disabled:opacity-40"
+      >
+        {dangDongBoTay ? 'Đang đồng bộ…' : 'Đồng bộ ngay'}
+      </button>
+    </div>
+  )
+
   /** Câu của em đang dùng được hay đang phải mượn kho chung. */
   const dungKhoCuaEm = dsCauCuaEm.length > 0
 
@@ -1131,8 +1183,22 @@ export default function ThanThuHoaHocGame({
         </div>
       </div>
 
+      {/* CÒN ĐANG HỎI MÁY CHỦ — chưa được bày nút chọn ra. Xem `dangHoiMayChu`. */}
+      {!daChonThu && dangHoiMayChu && (
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm text-center space-y-3">
+          <div className="mx-auto h-9 w-9 rounded-full border-2 border-slate-200 dark:border-slate-700 border-t-emerald-500 animate-spin" />
+          <h2 className="text-lg font-black text-slate-900 dark:text-white">
+            Đang hỏi máy chủ xem em đã chọn thần thú chưa
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
+            Nếu em đã nuôi thú ở máy khác, con thú ấy sẽ hiện ra ngay — em không
+            phải chọn lại. Chờ một nhịp.
+          </p>
+        </div>
+      )}
+
       {/* MÀN CHỌN LẦN ĐẦU — chưa chọn thì không vào được tab nào. */}
-      {!daChonThu && (
+      {!daChonThu && !dangHoiMayChu && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 sm:p-7 shadow-sm space-y-5">
           <div className="text-center space-y-1.5">
             <h2 className="text-xl font-black text-slate-900 dark:text-white">
@@ -1143,6 +1209,20 @@ export default function ThanThuHoaHocGame({
               nên đọc kỹ hệ nào khắc hệ nào trước khi bấm.
             </p>
           </div>
+
+          {/* HỎI MÁY CHỦ KHÔNG ĐƯỢC thì phải nói ra TRƯỚC KHI em bấm chọn.
+              Em có thể đang có thú ở máy khác mà máy này không biết — bấm chọn
+              lúc này là chốt nhầm một con thứ hai. */}
+          {tinhTrangDongBo === 'loi' && (
+            <div className="rounded-2xl border border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 px-4 py-3 text-xs leading-relaxed text-amber-900 dark:text-amber-200">
+              <b>Chưa hỏi được máy chủ.</b> Nếu em đã nuôi thần thú ở máy khác thì máy
+              này chưa thấy con ấy — bấm chọn bây giờ là chốt nhầm một con thứ hai.
+              Bấm <b>Đồng bộ ngay</b> ở dưới thử lại; vẫn không được thì để lát nữa
+              hãy chọn.
+            </div>
+          )}
+
+          {thanhDongBo}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {Object.values(DANH_SACH_THAN_THU).map((pet) => (
@@ -1205,42 +1285,7 @@ export default function ThanThuHoaHocGame({
               </div>
             </div>
 
-            {/* THANH ĐỒNG BỘ — trước đây `tinhTrangDongBo` được tính rồi BỎ ĐÓ,
-                không hiện ra màn nào. Thú hai máy lệch nhau mà không ai biết
-                hỏng ở khâu nào, phải mò bằng cách soi cơ sở dữ liệu. Nay nói
-                thẳng: đang ở trạng thái gì, lần đồng bộ gần nhất lúc mấy giờ,
-                hỏng thì hỏng vì lý do gì — nguyên văn từ tầng gọi mạng. */}
-            <div className="w-full z-10 mt-3 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 px-3 py-2 text-left">
-              <span
-                className={`h-2 w-2 shrink-0 rounded-full ${
-                  tinhTrangDongBo === 'xong' ? 'bg-emerald-500'
-                    : tinhTrangDongBo === 'dangTai' ? 'bg-amber-400 animate-pulse'
-                    : tinhTrangDongBo === 'loi' ? 'bg-rose-500'
-                    : 'bg-slate-400'
-                }`}
-              />
-              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
-                {tinhTrangDongBo === 'xong' ? 'Đã đồng bộ với máy chủ'
-                  : tinhTrangDongBo === 'dangTai' ? 'Đang đồng bộ…'
-                  : tinhTrangDongBo === 'loi' ? 'Chưa đồng bộ được'
-                  : tinhTrangDongBo === 'khongCo' ? 'Màn này chạy một mình, không nối máy chủ'
-                  : 'Chưa đồng bộ lần nào'}
-                {lucDongBo !== '' && tinhTrangDongBo === 'xong' ? ` · ${lucDongBo}` : ''}
-              </span>
-              {lyDoDongBo !== '' && (
-                <span className="text-[11px] text-rose-600 dark:text-rose-400 basis-full sm:basis-auto">
-                  {lyDoDongBo}
-                </span>
-              )}
-              <button
-                type="button"
-                onClick={() => { void dongBoNgay() }}
-                disabled={dangDongBoTay}
-                className="ml-auto rounded-full bg-slate-900 dark:bg-white px-3 py-1 text-[11px] font-bold text-white dark:text-slate-900 disabled:opacity-40"
-              >
-                {dangDongBoTay ? 'Đang đồng bộ…' : 'Đồng bộ ngay'}
-              </button>
-            </div>
+            {thanhDongBo}
 
             {/* CANVAS TƯƠNG TÁC — vuốt ngang để xoay 360°, chạm để nghe tiếng kêu,
                 hai nút bên cạnh để tung chiêu. */}

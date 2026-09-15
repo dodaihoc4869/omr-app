@@ -129,3 +129,65 @@ describe('Dựng lại vẫn đồng bộ được (StrictMode)', () => {
     expect(screen.getAllByText(/Đã đồng bộ với máy chủ/).length).toBeGreaterThan(0)
   })
 })
+
+describe('Chưa chọn thú: KHÔNG bày nút chọn khi chưa hỏi xong máy chủ', () => {
+  /**
+   * Thầy bắt được qua ảnh chụp máy em 15-09: màn "Chọn thần thú đồng hành" hiện
+   * ra NGAY, trước khi máy chủ kịp trả lời. Màn ấy ghi rõ "chọn một lần duy nhất
+   * và không đổi được" — em bấm trong một hai giây chờ ấy là chốt nhầm con thứ
+   * hai, trong khi con thật đang nằm ở máy kia.
+   */
+  const CHUA_CHON = { idThanhThuChon: '', capDo: 1, soExp: { caThi: 0 } }
+
+  it('đang hỏi máy chủ thì hiện màn chờ, KHÔNG hiện nút chọn', async () => {
+    let traLoi: (v: unknown) => void = () => {}
+    gan({
+      trongMay: CHUA_CHON,
+      docThu: () => new Promise((r) => { traLoi = r }),
+      ghi: () => Promise.resolve({ ok: true, daGhi: true }),
+    })
+    expect(screen.getByText(/Đang hỏi máy chủ xem em đã chọn thần thú chưa/)).toBeTruthy()
+    expect(screen.queryByText('Chọn thần thú đồng hành của em')).toBeNull()
+
+    // Máy chủ trả về con thú em đã nuôi ở máy khác ⇒ khỏi phải chọn lại.
+    traLoi({ idThanhThuChon: 'moc_tinh', capDo: 5 })
+    await waitFor(() => expect(doc().idThanhThuChon).toBe('moc_tinh'))
+    expect(screen.queryByText('Chọn thần thú đồng hành của em')).toBeNull()
+  })
+
+  it('máy chủ trả về RỖNG thì mới bày nút chọn', async () => {
+    gan({
+      trongMay: CHUA_CHON,
+      docThu: () => Promise.resolve(null),
+      ghi: () => Promise.resolve({ ok: true, daGhi: true }),
+    })
+    await waitFor(() =>
+      expect(screen.getByText('Chọn thần thú đồng hành của em')).toBeTruthy())
+  })
+
+  it('hỏi HỎNG thì vẫn bày nút chọn (không khoá em khi mất mạng) NHƯNG có cảnh báo', async () => {
+    gan({
+      trongMay: CHUA_CHON,
+      docThu: () => Promise.reject(new Error('mất mạng')),
+    })
+    await waitFor(() =>
+      expect(screen.getByText('Chọn thần thú đồng hành của em')).toBeTruthy())
+    expect(screen.getByText(/Chưa hỏi được máy chủ/)).toBeTruthy()
+    expect(screen.getByText('mất mạng')).toBeTruthy()
+  })
+
+  it('màn chọn cũng có nút Đồng bộ ngay để thử lại', async () => {
+    gan({
+      trongMay: CHUA_CHON,
+      docThu: () => Promise.reject(new Error('máy chủ bận')),
+      ghi: () => Promise.resolve({ ok: true, daGhi: true }),
+    })
+    const nut = await screen.findByRole('button', { name: 'Đồng bộ ngay' })
+    expect(nut).toBeTruthy()
+  })
+
+  it('màn KHÔNG nối máy chủ thì bày nút chọn ngay, không bắt chờ', () => {
+    gan({ trongMay: CHUA_CHON })
+    expect(screen.getByText('Chọn thần thú đồng hành của em')).toBeTruthy()
+  })
+})
