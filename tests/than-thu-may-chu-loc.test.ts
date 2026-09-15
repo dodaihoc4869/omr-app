@@ -16,7 +16,10 @@ import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 
 const MA = readFileSync('server/src/goi-cu.ts', 'utf8')
-const KHOI = MA.slice(MA.indexOf('THẦN THÚ HOÁ HỌC — ĐỒNG BỘ ĐA THIẾT BỊ'))
+// Phép trộn đã tách sang tệp thuần để phép kiểm CHẠY được nó (xem
+// `than-thu-may-chu-tron.test.ts`); mấy phép đọc mã ở đây soi cả hai tệp.
+const TRON = readFileSync('server/src/tron-than-thu.ts', 'utf8')
+const KHOI = MA.slice(MA.indexOf('THẦN THÚ HOÁ HỌC — ĐỒNG BỘ ĐA THIẾT BỊ')) + '\n' + TRON
 const SQL = readFileSync('server/migration-1509-than-thu.sql', 'utf8')
 const INDEX = readFileSync('server/src/index.ts', 'utf8')
 
@@ -64,17 +67,16 @@ describe('Bộ lọc trường của máy chủ', () => {
     expect(KHOI).toMatch(/TRAN_CAP\s*=\s*12/)
   })
 
-  it('hoà giải theo TỔNG EXP, không theo đồng hồ', () => {
+  it('hoà giải KHÔNG theo đồng hồ — máy em đặt sai giờ không đè được máy kia', () => {
     const ghi = KHOI.slice(KHOI.indexOf('export async function thanThuGhi'))
-    expect(ghi).toContain('tongExp < tongCu')
-    // Không được so mốc thời gian để quyết bên nào thắng.
     expect(ghi).not.toMatch(/cap_nhat_luc\s*[<>]/)
   })
 
-  it('bản gửi lên cũ hơn thì KHÔNG ghi đè, và trả bản máy chủ về', () => {
+  it('máy chủ TRỘN hai bản rồi trả bản trộn về, không ghi đè mù', () => {
     const ghi = KHOI.slice(KHOI.indexOf('export async function thanThuGhi'))
-    expect(ghi).toContain('daGhi: false')
-    expect(ghi).toContain('may_chu_moi_hon')
+    expect(ghi).toContain('tronHoSoThu')
+    // Bản trộn phải quay về máy em, để hai bên bằng nhau ngay trong một vòng.
+    expect(ghi).toContain('hoSo,')
   })
 
   it('thiếu số báo danh thì từ chối, cả đọc lẫn ghi', () => {

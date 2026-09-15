@@ -3071,22 +3071,10 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
 // ===========================================================================
 
 /** Đúng những trường game được phép lưu. Trường lạ bị vứt, không hỏi. */
-interface HoSoThanThuMayChu {
-  idThanhThuChon: string
-  capDo: number
-  exp: number
-  expToiDa: number
-  capTienHoa: number
-  khoExp: number
-  soExp: Record<string, number>
-  tangThapCaoNhat: number
-  soCauDaThanhTay: number
-  danhHieuHienTai: string
-  ngayNhanTrung: string
-  ngayChonThu: string
-}
+import {
+  tronHoSoThu, tongExpCuaThu, NGUON_EXP_HOP_LE, type HoSoThanThuMayChu,
+} from './tron-than-thu'
 
-const NGUON_EXP_HOP_LE = ['caThi', 'btvn', 'mom', 'leoThap', 'sanBoss'] as const
 /** Trần cứng để một máy em bị sửa không ghi được cấp 999 hay EXP tỉ tỉ. */
 const TRAN_CAP = 12
 const TRAN_EXP = 100_000_000
@@ -3160,16 +3148,23 @@ export async function thanThuGhi(env: Env, b: Record<string, unknown>): Promise<
   const sbd = chuoi(b.sbd).trim()
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
 
-  const { hoSo, tongExp } = locHoSoThanThu(b.hoSo)
+  const { hoSo: hoSoMoi } = locHoSoThanThu(b.hoSo)
   const cu = await env.DB.prepare('SELECT du_lieu_json, tong_exp FROM than_thu WHERE sbd = ?')
     .bind(sbd).first<Record<string, unknown>>()
-  const tongCu = cu ? Number(cu.tong_exp) || 0 : -1
 
-  if (cu && tongExp < tongCu) {
-    let hoSoCu: unknown = null
-    try { hoSoCu = JSON.parse(chuoi(cu.du_lieu_json)) } catch { hoSoCu = null }
-    return { ok: true, daGhi: false, lyDo: 'may_chu_moi_hon', hoSo: hoSoCu, tongExp: tongCu }
+  // TRỘN, không chọn một bên rồi vứt bên kia. Xem `tronHoSoThu`.
+  let hoSo = hoSoMoi
+  let daTron = false
+  if (cu) {
+    let thoCu: unknown = null
+    try { thoCu = JSON.parse(chuoi(cu.du_lieu_json)) } catch { thoCu = null }
+    if (thoCu !== null) {
+      const { hoSo: hoSoCu } = locHoSoThanThu(thoCu)
+      hoSo = tronHoSoThu(hoSoMoi, hoSoCu)
+      daTron = true
+    }
   }
+  const tongExp = tongExpCuaThu(hoSo)
 
   const luc = NAY()
   await env.DB.prepare(
@@ -3180,5 +3175,7 @@ export async function thanThuGhi(env: Env, b: Record<string, unknown>): Promise<
        cap_nhat_luc = excluded.cap_nhat_luc`,
   ).bind(sbd, JSON.stringify(hoSo), tongExp, luc).run()
 
-  return { ok: true, daGhi: true, tongExp, capNhatLuc: luc }
+  // Trả BẢN ĐÃ TRỘN về cho máy em nuốt lại, để hai bên bằng nhau ngay trong
+  // một vòng — không phải đợi lần mở game sau.
+  return { ok: true, daGhi: true, hoSo, daTron, tongExp, capNhatLuc: luc }
 }

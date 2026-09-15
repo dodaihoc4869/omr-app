@@ -495,8 +495,9 @@ export default function ThanThuHoaHocGame({
       const tra = (await ghiThanThuMayChu(kq.hoSo)) as
         { ok?: boolean; daGhi?: boolean; hoSo?: unknown; error?: string } | null
       if (tra !== null && tra.ok === false) throw new Error(tra.error || 'Máy chủ từ chối ghi')
-      // Máy chủ nhỉnh hơn thì nuốt lại lần nữa cho hai bên bằng nhau.
-      if (tra !== null && tra.daGhi === false && tra.hoSo !== undefined) {
+      // Máy chủ trả bản đã trộn (ghi được hay bị từ chối đều có) — nuốt lại
+      // cho hai bên bằng nhau ngay.
+      if (tra !== null && tra.hoSo !== undefined && tra.hoSo !== null) {
         const k2 = hoaGiaiHoSo(kq.hoSo, tra.hoSo)
         hoSoRef.current = k2.hoSo
         if (conGanRef.current) setHoSo(k2.hoSo)
@@ -525,9 +526,11 @@ export default function ThanThuHoaHocGame({
       henGhiRef.current = null
       void ghiThanThuMayChu(hoSo)
         .then((tra) => {
-          // Máy chủ có bản nhỉnh hơn (em vừa chơi trên máy khác) thì nuốt lại.
-          const o = tra as { daGhi?: boolean; hoSo?: unknown } | null
-          if (o !== null && o.daGhi === false && o.hoSo !== undefined && conGanRef.current) {
+          // Máy chủ TRỘN hai bản rồi trả bản trộn về — kể cả khi ghi thành
+          // công. Nuốt lại là hai bên bằng nhau ngay trong một vòng, không
+          // phải đợi lần mở game sau.
+          const o = tra as { hoSo?: unknown } | null
+          if (o !== null && o.hoSo !== undefined && o.hoSo !== null && conGanRef.current) {
             setHoSo((prev) => hoaGiaiHoSo(prev, o.hoSo).hoSo)
           }
         })
