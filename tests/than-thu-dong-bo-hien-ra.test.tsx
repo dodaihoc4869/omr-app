@@ -191,3 +191,32 @@ describe('Chưa chọn thú: KHÔNG bày nút chọn khi chưa hỏi xong máy c
     expect(screen.getByText('Chọn thần thú đồng hành của em')).toBeTruthy()
   })
 })
+
+describe('Hỏi xong mà máy chủ không có thú thì phải NÓI RA', () => {
+  /**
+   * Thầy bắt được 15-09: thanh đồng bộ báo "Đã đồng bộ với máy chủ · 21:28:12"
+   * chấm xanh, mà màn vẫn bày nút chọn — nhìn như bấm đồng bộ không ăn thua.
+   * Thật ra đồng bộ chạy đúng; máy chủ chỉ không có gì để trả về. Câu "đã đồng
+   * bộ" một mình KHÔNG trả lời được câu em đang hỏi: "thế con thú của tôi đâu?"
+   */
+  it('máy chủ trả về rỗng thì nói thẳng là chưa có thú nào của em', async () => {
+    gan({
+      trongMay: { idThanhThuChon: '', capDo: 1, soExp: { caThi: 0 } },
+      docThu: () => Promise.resolve(null),
+      ghi: () => Promise.resolve({ ok: true, daGhi: true }),
+    })
+    await waitFor(() =>
+      expect(screen.getByText(/chưa có thần thú nào mang số báo danh của em/)).toBeTruthy())
+    expect(screen.getByText(/mở game ở đúng máy ấy một lượt/)).toBeTruthy()
+  })
+
+  it('máy chủ CÓ thú thì không hiện câu ấy — vì màn chọn biến mất luôn', async () => {
+    gan({
+      trongMay: { idThanhThuChon: '', capDo: 1, soExp: { caThi: 0 } },
+      docThu: () => Promise.resolve({ idThanhThuChon: 'thiet_giap', capDo: 4 }),
+      ghi: () => Promise.resolve({ ok: true, daGhi: true }),
+    })
+    await waitFor(() => expect(doc().idThanhThuChon).toBe('thiet_giap'))
+    expect(screen.queryByText(/chưa có thần thú nào mang số báo danh của em/)).toBeNull()
+  })
+})

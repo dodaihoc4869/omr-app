@@ -1222,6 +1222,22 @@ export default function ThanThuHoaHocGame({
             </div>
           )}
 
+          {/* HỎI XONG, MÁY CHỦ KHÔNG CÓ THÚ NÀO. Phải nói thẳng ra.
+              Thầy bắt được 15-09: thanh đồng bộ báo "Đã đồng bộ với máy chủ ·
+              21:28:12" chấm xanh, mà màn vẫn bày nút chọn — nhìn như bấm đồng
+              bộ không ăn thua gì. Thật ra đồng bộ chạy đúng, chỉ là máy chủ
+              không có gì để trả về. Câu "đã đồng bộ" một mình KHÔNG trả lời
+              được câu hỏi em đang hỏi: "thế con thú của tôi đâu?" */}
+          {tinhTrangDongBo === 'xong' && (
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-4 py-3 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+              Đã hỏi máy chủ xong: <b>chưa có thần thú nào mang số báo danh của em</b>.
+              Con em chọn ở đây sẽ là con đầu tiên, và từ đó hiện ở mọi máy em đăng nhập.
+              <br />
+              Nếu em nhớ là đã nuôi thú ở máy khác thì <b>mở game ở đúng máy ấy một lượt</b> trước
+              đã — con thú sẽ tự lên máy chủ rồi về đây, khỏi phải chọn lại.
+            </div>
+          )}
+
           {thanhDongBo}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
