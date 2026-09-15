@@ -11,7 +11,7 @@
  * Và một luật của kho: chỉ dùng rgb / rgba / token Tailwind, không hex.
  */
 
-import { Fragment, useEffect, useRef, useState, useMemo, useCallback } from 'react'
+import { Fragment, Suspense, lazy, useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import {
   Sparkles,
   Trophy,
@@ -57,6 +57,11 @@ import { veThanThuCanvas, khungVeThanThu } from '../game/than-thu-hoa-hoc/ve-tha
 import KhungLoiGiaiGame from './KhungLoiGiaiGame'
 import OngNghiemExp from './OngNghiemExp'
 import PopupThuongExp, { type TinThuongExp } from './PopupThuongExp'
+/**
+ * Màn 3D nặng khoảng 600 KB (three.js), nên nhập kiểu `lazy`: chỉ tải khi em
+ * thật sự mở Đảo Thần Thú, không nằm trong gói khởi động của cổng học sinh.
+ */
+const ThanThu3D = lazy(() => import('./ThanThu3D'))
 import { AmThanhPet } from '../game/than-thu-hoa-hoc/am-thanh-pet'
 
 interface Props {
@@ -175,6 +180,21 @@ export default function ThanThuHoaHocGame({
   const amThanhRef = useRef<AmThanhPet | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const canvasCombatRef = useRef<HTMLCanvasElement | null>(null)
+  /**
+   * 3D bật sẵn; máy nào không dựng được WebGL thì tự rơi về canvas 2D.
+   * Nhớ luôn vào máy để lần sau khỏi thử lại và khỏi chớp một nhịp.
+   */
+  const KHOA_HONG_3D = 'omr_than_thu_khong_3d'
+  const [dung3D, setDung3D] = useState(() => {
+    try { return localStorage.getItem(KHOA_HONG_3D) !== '1' } catch { return true }
+  })
+  const bo3D = useCallback(() => {
+    try { localStorage.setItem(KHOA_HONG_3D, '1') } catch { /* bỏ qua */ }
+    setDung3D(false)
+  }, [])
+  /** Đổi `lan` là màn 3D bắn chiêu. */
+  const [lenhChieu, setLenhChieu] = useState({ lan: 0, no: false })
+
   /** Góc xoay của thú ở Đảo Thần Thú — em vuốt ngang để quay 360°. */
   const gocXoayRef = useRef(0)
   const keoRef = useRef<{ dangKeo: boolean; xTruoc: number; daKeo: number }>({
@@ -574,6 +594,13 @@ export default function ThanThuHoaHocGame({
     gocXoayRef.current = (gocXoayRef.current + (dx / 220) * Math.PI * 2) % (Math.PI * 2)
   }, [])
 
+  /** Chạm vào thú trên màn 3D — dùng lại đúng đường của bản 2D. */
+  const chamThu3D = useCallback(() => {
+    amThanhRef.current?.moKhoa()
+    amThanhRef.current?.keu(infoPet.he)
+    batHieuUng('danh', 420)
+  }, [infoPet.he, batHieuUng])
+
   const ketThucKeo = useCallback(() => {
     const k = keoRef.current
     k.dangKeo = false
@@ -589,6 +616,7 @@ export default function ThanThuHoaHocGame({
   /** Bấm nút chiêu: thú tung chiêu thật, kèm âm. */
   const tungChieu = useCallback((no: boolean) => {
     amThanhRef.current?.moKhoa()
+    setLenhChieu((t) => ({ lan: t.lan + 1, no }))
     if (no) {
       amThanhRef.current?.kichNo()
       amThanhRef.current?.keu(infoPet.he)
@@ -810,7 +838,7 @@ export default function ThanThuHoaHocGame({
   useEffect(() => { xuLyTraLoiRef.current = xuLyTraLoi })
 
   // Hai canvas, một con thú. Canvas nào không hiện thì không quay vòng lặp.
-  useVeThanThu(canvasRef, infoPet, hoSo.capTienHoa, hieuUngYenRef, tabGame === 'dao_thu', gocXoayRef)
+  useVeThanThu(canvasRef, infoPet, hoSo.capTienHoa, hieuUngYenRef, tabGame === 'dao_thu' && !dung3D, gocXoayRef)
   useVeThanThu(
     canvasCombatRef, infoPet, hoSo.capTienHoa, hieuUngRef,
     tabGame === 'leo_thap' && dangLeoThap,
@@ -1055,20 +1083,41 @@ export default function ThanThuHoaHocGame({
                 <Swords className="w-5 h-5" />
               </button>
 
-              <canvas
-                ref={canvasRef}
-                width={280}
-                height={260}
-                aria-label={`${infoPet.ten} — vuốt ngang để xoay, chạm để nghe tiếng kêu`}
-                className="max-w-full drop-shadow-lg cursor-grab active:cursor-grabbing touch-none select-none"
-                onPointerDown={(e) => {
-                  e.currentTarget.setPointerCapture(e.pointerId)
-                  batDauKeo(e.clientX)
-                }}
-                onPointerMove={(e) => dangKeoToi(e.clientX)}
-                onPointerUp={ketThucKeo}
-                onPointerCancel={ketThucKeo}
-              />
+              {dung3D ? (
+                <div className="flex-1 min-w-0 max-w-[340px]">
+                  <Suspense
+                    fallback={
+                      <div className="h-[300px] flex items-center justify-center text-xs text-slate-400">
+                        Đang dựng thần thú 3D…
+                      </div>
+                    }
+                  >
+                    <ThanThu3D
+                      info={infoPet}
+                      cap={hoSo.capTienHoa}
+                      lenhChieu={lenhChieu}
+                      onCham={chamThu3D}
+                      onKhongDungDuoc={bo3D}
+                      cao={300}
+                    />
+                  </Suspense>
+                </div>
+              ) : (
+                <canvas
+                  ref={canvasRef}
+                  width={280}
+                  height={260}
+                  aria-label={`${infoPet.ten} — vuốt ngang để xoay, chạm để nghe tiếng kêu`}
+                  className="max-w-full drop-shadow-lg cursor-grab active:cursor-grabbing touch-none select-none"
+                  onPointerDown={(e) => {
+                    e.currentTarget.setPointerCapture(e.pointerId)
+                    batDauKeo(e.clientX)
+                  }}
+                  onPointerMove={(e) => dangKeoToi(e.clientX)}
+                  onPointerUp={ketThucKeo}
+                  onPointerCancel={ketThucKeo}
+                />
+              )}
 
               <button
                 type="button"
@@ -1099,6 +1148,7 @@ export default function ThanThuHoaHocGame({
 
             <div className="text-[11px] text-slate-400 dark:text-slate-500 text-center -mt-1">
               Vuốt ngang để xoay thần thú · chạm vào nó để nghe tiếng kêu
+              {dung3D ? ' · đang hiện bản 3D' : ' · máy này không dựng được 3D nên đang hiện bản phẳng'}
             </div>
 
             {/* HAI BỂ: ỐNG NGHIỆM (EXP đã kiếm) và THANH CẤP ĐỘ (EXP đã nạp).

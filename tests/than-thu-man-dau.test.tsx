@@ -57,6 +57,9 @@ beforeEach(() => {
   // Từ 15-09 em phải chọn thần thú ở màn đầu mới vào được các tab. Các phép kiểm
   // dưới đây kiểm việc khác, nên nạp sẵn một hồ sơ đã chọn rồi.
   localStorage.setItem('omr_than_thu_hoa_hoc_data', JSON.stringify({ idThanhThuChon: 'hoa_long' }))
+  // jsdom không dựng được WebGL. Màn 3D tự rơi về canvas 2D khi gặp máy như vậy;
+  // ở đây bật thẳng cờ đó để phép kiểm khỏi phải chờ lazy-load three.js.
+  localStorage.setItem('omr_than_thu_khong_3d', '1')
   // jsdom không dựng được ngữ cảnh 2D; hook vẽ đã tự thoát khi không có ctx,
   // nên chỉ cần chặn cảnh báo "not implemented".
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null)
