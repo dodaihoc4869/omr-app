@@ -42,6 +42,17 @@ export interface CauSaiTho {
 
 /** Một câu sai đã đổi sang khung câu hỏi của game. */
 export interface CauHoiCuaEm extends CauHoi {
+  /**
+   * LỜI GIẢI NGUYÊN BẢN TỪ KHO — chưa đụng vào.
+   *
+   * Kho ghi lời giải bằng JSON có cấu trúc (`chot`, `tung_pa`, `buoc`…), và bản
+   * trước ép thẳng chuỗi ấy vào `giaiThich` rồi in ra màn. Học sinh nhận nguyên
+   * một đống `{"chot":"…","tung_pa":{"A":{"dung":false,"vi_sao":"…"}}}`. Nay để
+   * nguyên ở đây cho `chuanHoaLoiGiaiCau` đọc và màn hình dựng lại cho tử tế.
+   */
+  loiGiaiTho: unknown
+  /** Em đã chọn gì trong ca thi — để tô đúng phương án em từng sa vào. */
+  daChonTruoc: string
   /** Khoá câu trong kho đề — dùng để chỉ thưởng EXP một lần cho mỗi câu. */
   qid: string
   tenCa: string
@@ -155,8 +166,12 @@ export function doiCauSaiThanhCauChoi(tho: readonly CauSaiTho[]): KetQuaDoiCau {
     if (String(c.chuyenDe ?? '').trim() !== '') chuyenDeSet.add(String(c.chuyenDe).trim())
     if (dang.ten !== '') dangSet.add(dang.ten)
 
-    const giai = String(c.loiGiai ?? '').trim()
     const daChon = String(c.dapAnChon ?? '').trim().toUpperCase()
+    // KHÔNG ép lời giải thành chuỗi ở đây. `c.loiGiai` có thể là object hoặc
+    // chuỗi JSON; ép sang String là cách sinh ra đống ngoặc nhọn trên màn hình.
+    const giaiTho: unknown = c.loiGiai
+    const giaiChu = typeof giaiTho === 'string' ? giaiTho.trim() : ''
+    const laJson = giaiChu.startsWith('{') && giaiChu.endsWith('}')
 
     dsCau.push({
       qid: khoa,
@@ -167,8 +182,12 @@ export function doiCauSaiThanhCauChoi(tho: readonly CauSaiTho[]): KetQuaDoiCau {
       cau: de,
       phuongAn: [pa[0]!, pa[1]!, pa[2]!, pa[3]!],
       dung: iDung as 0 | 1 | 2 | 3,
-      giaiThich: giai !== ''
-        ? giai
+      loiGiaiTho: giaiTho,
+      daChonTruoc: daChon,
+      // `giaiThich` chỉ còn là DÒNG DỰ PHÒNG một câu, dùng khi kho không có lời
+      // giải. Chuỗi JSON không bao giờ được rơi vào đây.
+      giaiThich: (giaiChu !== '' && !laJson)
+        ? giaiChu
         : (daChon !== '' && daChon !== dap
             ? `Lần thi trước em chọn ${daChon}, đáp án đúng là ${dap}.`
             : `Đáp án đúng là ${dap}.`),

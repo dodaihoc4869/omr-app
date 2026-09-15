@@ -153,7 +153,7 @@ describe('Săn Boss Câu Sai — không có nút tự khai EXP nữa', () => {
     const nut = screen.getByText(laEster ? 'Methyl acetate' : 'Na')
     fireEvent.click(nut)
 
-    await waitFor(() => expect(screen.getByText(/Vẫn sai\. Không có EXP câu này\./)).toBeTruthy())
+    await waitFor(() => expect(screen.getByText(/Vẫn sai\. Không có EXP câu này/)).toBeTruthy())
     expect(screen.getByText('2 câu')).toBeTruthy()
   })
 

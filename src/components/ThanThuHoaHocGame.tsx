@@ -47,6 +47,7 @@ import {
   type CauHoiCuaEm, type CauSaiTho, type KetQuaDoiCau,
 } from '../game/than-thu-hoa-hoc/cau-hoi-cua-em'
 import { veThanThuCanvas, khungVeThanThu } from '../game/than-thu-hoa-hoc/ve-than-thu'
+import KhungLoiGiaiGame from './KhungLoiGiaiGame'
 import { AmThanhPet } from '../game/than-thu-hoa-hoc/am-thanh-pet'
 
 interface Props {
@@ -345,7 +346,8 @@ export default function ThanThuHoaHocGame({
     } catch { return [] }
   })
   const [cauSanHienTai, setCauSanHienTai] = useState<CauHoiCuaEm | null>(null)
-  const [ketQuaSan, setKetQuaSan] = useState<{ dung: boolean; giai: string } | null>(null)
+  /** Đã trả lời chưa, và chọn ý nào — lời giải dựng từ `cauSanHienTai`, không nhét chuỗi vào đây. */
+  const [ketQuaSan, setKetQuaSan] = useState<{ dung: boolean; daChon: number } | null>(null)
 
   useEffect(() => {
     try { localStorage.setItem(KHOA_QID_THANH_TAY, JSON.stringify(qidDaThanhTay)) }
@@ -372,7 +374,7 @@ export default function ThanThuHoaHocGame({
     if (idx === q.dung) {
       amThanhRef.current?.dungCauHoi()
       amThanhRef.current?.thangTran()
-      setKetQuaSan({ dung: true, giai: q.giaiThich })
+      setKetQuaSan({ dung: true, daChon: idx })
       // Chốt EXP theo qid: đã trả rồi thì thôi, dù em bấm lại bao nhiêu lần.
       setQidDaThanhTay((truoc) => {
         if (truoc.includes(q.qid)) return truoc
@@ -384,7 +386,7 @@ export default function ThanThuHoaHocGame({
     } else {
       amThanhRef.current?.saiCauHoi()
       amThanhRef.current?.trungDon()
-      setKetQuaSan({ dung: false, giai: q.giaiThich })
+      setKetQuaSan({ dung: false, daChon: idx })
     }
   }, [cauSanHienTai, ketQuaSan, congExp])
 
@@ -444,8 +446,26 @@ export default function ThanThuHoaHocGame({
   /** Khoá câu đang hỏi: `qid` thật khi là câu của em, `kho_<i>` khi mượn kho chung. */
   const [khoaCauHienTai, setKhoaCauHienTai] = useState('')
   const [daHoiCau, setDaHoiCau] = useState<string[]>([])
-  /** Đang chờ 1,2–1,8 giây sang câu/tầng kế: khoá đồng hồ và khoá bấm. */
-  const [dangChoSangTang, setDangChoSangTang] = useState(false)
+  /**
+   * KẾT QUẢ CÂU VỪA LÀM — màn hình dừng ở đây cho em ĐỌC LỜI GIẢI.
+   *
+   * Bản trước tự nhảy sang câu kế sau 1,2–1,8 giây. Thầy chốt 15-09: mỗi câu
+   * phải có nút bấm để em dừng lại đọc. Một giây tám không đủ đọc hết một dòng,
+   * nói gì tới lý do bốn phương án — tức là phần học bị nuốt mất.
+   *
+   * `null` = đang làm bài, đồng hồ chạy. Khác `null` = đang đọc lời giải, đồng
+   * hồ dừng, chờ em bấm.
+   */
+  const [ketQuaCauVua, setKetQuaCauVua] = useState<{
+    dung: boolean
+    daChon: number
+    cau: CauHoi
+    /** Trùm vừa gục: nút sẽ là "Lên tầng N". */
+    haTrum: boolean
+    tangKeTiep: number
+    /** Thú hết máu: hết lượt leo. */
+    thua: boolean
+  } | null>(null)
   const [thongBaoChienDau, setThongBaoChienDau] = useState('')
   const [cauHoiHienTai, setCauHoiHienTai] = useState<CauHoi | null>(null)
   const [thoiGianConLaiCau, setThoiGianConLaiCau] = useState(15)
@@ -508,7 +528,7 @@ export default function ThanThuHoaHocGame({
    * Nay: đếm bằng một ô nhớ riêng, hết giờ thì DỪNG hẳn rồi mới xử.
    */
   useEffect(() => {
-    if (!dangLeoThap || !cauHoiHienTai || dangChoSangTang) return
+    if (!dangLeoThap || !cauHoiHienTai || ketQuaCauVua !== null) return
     let con = 15
     setThoiGianConLaiCau(con)
     const timer = setInterval(() => {
@@ -521,10 +541,10 @@ export default function ThanThuHoaHocGame({
     }, 1000)
     return () => clearInterval(timer)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dangLeoThap, cauHoiHienTai, dangChoSangTang])
+  }, [dangLeoThap, cauHoiHienTai, ketQuaCauVua])
 
   const xuLyTraLoi = (idxChon: number) => {
-    if (!cauHoiHienTai || dangChoSangTang) return
+    if (!cauHoiHienTai || ketQuaCauVua !== null) return
     const daHoi = [...daHoiCau, khoaCauHienTai]
     setDaHoiCau(daHoi)
 
@@ -543,7 +563,6 @@ export default function ThanThuHoaHocGame({
 
       if (mauBossMoi <= 0) {
         amThanhRef.current?.thangTran()
-        setDangChoSangTang(true)
         const thuong = NGUON_EXP.leoThap(tangHienTai)
         setThongBaoChienDau(`${infoPet.kyNangNo}! Hạ trùm tầng ${tangHienTai} — +${thuong} EXP`)
         setHoSo((prev) => ({
@@ -551,18 +570,15 @@ export default function ThanThuHoaHocGame({
           tangThapCaoNhat: Math.max(prev.tangThapCaoNhat, tangHienTai + 1),
         }))
         congExp(thuong, `Hạ trùm tầng ${tangHienTai}`)
-        setTimeout(() => {
-          const tangMoi = tangHienTai + 1
-          setTangHienTai(tangMoi)
-          setMauBoss(mauTrumTang(tangMoi))
-          setMauBossToiDa(mauTrumTang(tangMoi))
-          setDangChoSangTang(false)
-          raCauHoiMoi(daHoi, tangMoi)
-        }, 1800)
-      } else {
-        setDangChoSangTang(true)
-        setTimeout(() => { setDangChoSangTang(false); raCauHoiMoi(daHoi, tangHienTai) }, 1200)
       }
+      setKetQuaCauVua({
+        dung: true,
+        daChon: idxChon,
+        cau: cauHoiHienTai,
+        haTrum: mauBossMoi <= 0,
+        tangKeTiep: mauBossMoi <= 0 ? tangHienTai + 1 : tangHienTai,
+        thua: false,
+      })
     } else {
       amThanhRef.current?.saiCauHoi()
       amThanhRef.current?.trungDon()
@@ -576,17 +592,39 @@ export default function ThanThuHoaHocGame({
       setMauPetCombat(mauPetMoi)
       batHieuUng('biDanh', 700)
       const loi = idxChon === -1 ? 'Hết giờ!' : 'Sai rồi!'
-      setThongBaoChienDau(`${loi} Mất ${satThuongBoss} máu. ${cauHoiHienTai.giaiThich}`)
-
+      // Lời giải KHÔNG nhét vào dòng thông báo nữa — nó có khung riêng ở dưới.
+      setThongBaoChienDau(`${loi} Mất ${satThuongBoss} máu.`)
       if (mauPetMoi <= 0) {
-        setThongBaoChienDau('Thần thú kiệt sức. Đi sửa câu sai và nộp bài để lấy EXP rồi quay lại.')
-        setCauHoiHienTai(null)
-      } else {
-        setDangChoSangTang(true)
-        setTimeout(() => { setDangChoSangTang(false); raCauHoiMoi(daHoi, tangHienTai) }, 1500)
+        setThongBaoChienDau('Thần thú kiệt sức. Đọc kỹ lời giải rồi quay lại leo tiếp.')
       }
+      setKetQuaCauVua({
+        dung: false,
+        daChon: idxChon,
+        cau: cauHoiHienTai,
+        haTrum: false,
+        tangKeTiep: tangHienTai,
+        thua: mauPetMoi <= 0,
+      })
     }
   }
+
+  /** Bấm "Câu tiếp theo" / "Lên tầng". Đây là chỗ DUY NHẤT đi tiếp. */
+  const diTiep = useCallback(() => {
+    const kq = ketQuaCauVua
+    if (kq === null) return
+    setKetQuaCauVua(null)
+    if (kq.thua) { setDangLeoThap(false); setCauHoiHienTai(null); return }
+    if (kq.haTrum) {
+      const tangMoi = kq.tangKeTiep
+      setTangHienTai(tangMoi)
+      setMauBoss(mauTrumTang(tangMoi))
+      setMauBossToiDa(mauTrumTang(tangMoi))
+      setThongBaoChienDau(`Tầng ${tangMoi} — trùm hệ ${TEN_HE[heTrumTang(tangMoi)]}`)
+      raCauHoiMoi(daHoiCau, tangMoi)
+    } else {
+      raCauHoiMoi(daHoiCau, kq.tangKeTiep)
+    }
+  }, [ketQuaCauVua, daHoiCau, mauTrumTang, heTrumTang, raCauHoiMoi])
 
   // Đồng hồ gọi xuLyTraLoi qua ref: hàm này dựng lại mỗi lần vẽ, giữ bản mới nhất.
   const xuLyTraLoiRef = useRef(xuLyTraLoi)
@@ -1072,8 +1110,39 @@ export default function ThanThuHoaHocGame({
                 </div>
               )}
 
+              {/* SAU KHI TRẢ LỜI: dừng lại đọc lời giải, chờ em bấm đi tiếp.
+                  Bản trước tự nhảy sau 1,2–1,8 giây — không đủ đọc một dòng. */}
+              {ketQuaCauVua !== null && (
+                <div className="space-y-3">
+                  <KhungLoiGiaiGame
+                    loiGiaiTho={
+                      'loiGiaiTho' in ketQuaCauVua.cau
+                        ? (ketQuaCauVua.cau as { loiGiaiTho?: unknown }).loiGiaiTho
+                        : undefined
+                    }
+                    dapAnDung={ketQuaCauVua.cau.dung}
+                    daChon={ketQuaCauVua.daChon}
+                    phuongAn={ketQuaCauVua.cau.phuongAn}
+                    duPhong={ketQuaCauVua.cau.giaiThich}
+                  />
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={diTiep}
+                      className="py-3 px-6 rounded-full bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm shadow-md cursor-pointer transition-transform active:scale-95"
+                    >
+                      {ketQuaCauVua.thua
+                        ? 'Về Đảo Thần Thú'
+                        : ketQuaCauVua.haTrum
+                          ? `Lên tầng ${ketQuaCauVua.tangKeTiep} →`
+                          : 'Câu tiếp theo →'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Khung câu hỏi Q&A chiến đấu */}
-              {cauHoiHienTai && mauPetCombat > 0 && mauBoss > 0 && (
+              {ketQuaCauVua === null && cauHoiHienTai && mauPetCombat > 0 && mauBoss > 0 && (
                 <div className="p-5 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4">
                   <div className="flex items-center justify-between text-xs font-bold">
                     <span className="text-purple-600 dark:text-purple-400">
@@ -1245,15 +1314,25 @@ export default function ThanThuHoaHocGame({
               </div>
 
               {ketQuaSan !== null && (
-                <div
-                  className={`p-3 rounded-xl text-xs leading-relaxed ${
-                    ketQuaSan.dung
-                      ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-                      : 'bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
-                  }`}
-                >
-                  <b>{ketQuaSan.dung ? `Hạ quái! +${NGUON_EXP.suaCauSai()} EXP.` : 'Vẫn sai. Không có EXP câu này.'}</b>
-                  {ketQuaSan.giai !== '' && <> {ketQuaSan.giai}</>}
+                <div className="space-y-2.5">
+                  <div
+                    className={`p-2.5 rounded-xl text-xs font-bold ${
+                      ketQuaSan.dung
+                        ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                        : 'bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                    }`}
+                  >
+                    {ketQuaSan.dung
+                      ? `Hạ quái! +${NGUON_EXP.suaCauSai()} EXP.`
+                      : 'Vẫn sai. Không có EXP câu này — đọc kỹ rồi làm lại sau.'}
+                  </div>
+                  <KhungLoiGiaiGame
+                    loiGiaiTho={cauSanHienTai.loiGiaiTho}
+                    dapAnDung={cauSanHienTai.dung}
+                    daChon={ketQuaSan.daChon}
+                    phuongAn={cauSanHienTai.phuongAn}
+                    duPhong={cauSanHienTai.giaiThich}
+                  />
                 </div>
               )}
 
