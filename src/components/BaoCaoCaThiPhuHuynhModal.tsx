@@ -623,15 +623,23 @@ export default function BaoCaoCaThiPhuHuynhModal({
             Đóng
           </button>
 
-          {/* Nút: Tạo ngay bài tập khắc phục cho con */}
-          <button
-            type="button"
-            onClick={() => setHienModalKhacPhuc(true)}
-            className="px-6 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer"
-          >
-            <Heart size={16} />
-            <span>Tạo bài luyện khắc phục cho con (Hạn 2h)</span>
-          </button>
+          {/* Nút: Tạo ngay bài tập khắc phục cho con.
+              Chỉ sống khi DANH SÁCH THẬT có câu — bản cũ hiện vô điều kiện nên
+              ca con làm đúng hết vẫn mở ra một modal không tạo được gì. */}
+          {dsCauSai.length > 0 ? (
+            <button
+              type="button"
+              onClick={() => setHienModalKhacPhuc(true)}
+              className="px-6 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer"
+            >
+              <Heart size={16} />
+              <span>Tạo bài luyện khắc phục cho con (Hạn 2h)</span>
+            </button>
+          ) : (
+            <span className="text-xs text-slate-500 dark:text-slate-400 text-right">
+              {dangTaiCauSai ? 'Đang tải danh sách câu sai…' : 'Ca này con không có câu nào cần khắc phục'}
+            </span>
+          )}
         </footer>
       </div>
 

@@ -458,3 +458,65 @@ còn 6 nơi dùng.
 |---|---|---|
 | mảnh mã chính | 630 KB (183 gzip) | **473 KB (138 gzip)** |
 | mảnh màn Theo dõi | 350 KB | **62 KB** |
+
+---
+
+# SỔ VIỆC — 15/09 lượt 13 · CA KHÔNG SAI CÂU NÀO
+
+- [x] "Sửa lại chỗ này nhé" (ảnh ca Test7: "0 câu làm sai" mà modal vẫn mời
+  "1. Làm lại các câu sai (0 câu)" + nút "Bắt đầu làm bài" + dòng "Máy này chưa
+  có kho đề của thầy")  | bằng chứng: `npx vitest run tests/khac-phuc-khong-co-cau-sai-1509.test.tsx` → 10/10 đạt
+- [x] Nghiệm thu 7 cửa  | bằng chứng: bảng cuối mục này
+- [ ] Phát hành  | bằng chứng: (chưa có)
+
+## Hai nguyên nhân gốc, rời nhau
+
+**1. Cổng mở nút và ruột modal đọc hai nguồn khác nhau.**
+Nút "KHẮC PHỤC NGAY N CÂU SAI" trong `BaoCaoCaThiHocSinhModal` mở theo `soSai`
+lấy từ `docSoDem(baiThi)` — đếm từ bảng chấm. Modal thì chạy trên `dsCauSai` —
+danh sách `hsCauSai` trả về. Hai nguồn lệch một nhịp (đang tải, hoặc máy chủ
+trả rỗng) là ra đúng màn thầy chụp. Cùng họ với vụ 60-vs-579 ngày 14/09.
+
+Nút cuối trang phụ huynh còn tệ hơn: hiện VÔ ĐIỀU KIỆN.
+
+**2. Cổng chặn nút chỉ phủ chế độ 2.**
+Điều kiện cũ `cheDo === 2 && tongToiDaCheDo2 === 0 && dsCauSai.length === 0`
+bỏ trống chế độ 1, nên 0 câu sai vẫn bấm được và mở ra một phiếu trắng.
+
+**Dòng cảnh báo thì sai lý do.** Từ 15/09 modal luôn xin máy chủ, không đọc kho
+của máy đang mở nữa — nên "Máy này chưa có kho đề của thầy" không còn là lý do
+có thật của bất kỳ ca nào. Với `dsCauSai` rỗng thì vòng nạp kho còn không chạy,
+`coKhoDe` hoá false, và dòng ấy hiện ra thay cho sự thật là "em không sai câu nào".
+
+## Đã sửa
+
+| Tệp | Sửa gì |
+|---|---|
+| `ModalKhacPhucCauSai.tsx` | `dsCauSai.length === 0` ⇒ màn rỗng trung thực, chỉ còn nút Đóng |
+| `ModalKhacPhucCauSai.tsx` | `soCauSeRut` chặn cả 3 chế độ, thay cổng chỉ phủ chế độ 2 |
+| `ModalKhacPhucCauSai.tsx` | `KHONG_CO_KHO` viết lại: lỗi là máy chủ không rút được, không đổ cho máy em |
+| `BaoCaoCaThiHocSinhModal.tsx` | hai nút khắc phục đi theo `dsCauSai` thật; lệch nguồn thì nói ra |
+| `BaoCaoCaThiPhuHuynhModal.tsx` | nút "Tạo bài luyện khắc phục" hết hiện vô điều kiện |
+| `tests/khac-phuc-khong-co-cau-sai-1509.test.tsx` | 10 phép chốt cả hai nguyên nhân |
+
+## Bảy cửa — 15/09 05:20
+
+| Cửa | Lệnh | Kết quả | Đạt/Trượt |
+|---|---|---|---|
+| Kiểu app | `npx tsc -b` | mã thoát 0 | Đạt |
+| Kiểu máy chủ | `npx tsc -p server/tsconfig.json --noEmit` | mã thoát 0 | Đạt |
+| Phép kiểm | `npx vitest run --shard=N/8` | 275 tệp · 4.064 phép đạt | Đạt |
+| Mã màu | `npm run check:mau` | không có # ngoài tokens.css | Đạt |
+| Hiển thị 360px | `node scripts/kiem-13.mjs` | ĐẠT 18/18 | Đạt |
+| Service worker | `node scripts/kiem-sw.mjs` | ĐẠT 10/10 | Đạt |
+| Dựng bản | `npx vite build` | 169 mục precache · mảnh chính 486 KB | Đạt |
+
+## Còn nợ (mang từ lượt trước)
+
+- [!] `MA_BI_MAT` lộ 10/09 chưa đổi — khoá cứng app thầy chỉ chắc bằng mã ấy.
+- [!] `nopKhacPhucTheoCa` trả `qidSai` rỗng.
+- [!] `qid_da_lam.so_lan` phồng lên mỗi lần chấm lại.
+- [!] Thầy chưa thêm `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` vào GitHub secrets.
+- [!] Ca thử Test2–Test7 còn `trang_thai='mo'`.
+- [!] `TRAN_CAU_KHAC_PHUC = 200` chưa phải trần thật của kho (157 tờ) — cần cột
+  `dang_ma` trên `cau_hoi` và một lần đánh chỉ mục lại.

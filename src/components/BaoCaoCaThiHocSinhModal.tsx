@@ -319,14 +319,21 @@ export default function BaoCaoCaThiHocSinhModal({
               </div>
 
               {/* Nút hành động 1 chạm sửa lỗi sai ngay */}
-              {(soSai ?? 0) > 0 && (
+              {/* CỔNG MỞ NÚT VÀ RUỘT CỦA MODAL PHẢI CÙNG MỘT NGUỒN.
+                  Thầy bắt 15/09, ca Test7: nút mở theo `soSai` (đếm từ bảng
+                  chấm) nhưng modal chạy trên `dsCauSai` (danh sách `hsCauSai`
+                  trả về). Hai nguồn lệch nhau một nhịp là ra đúng màn thầy
+                  chụp: "0 câu làm sai" mà vẫn có nút bấm. Nay nút chỉ sống
+                  khi DANH SÁCH THẬT có câu, còn lệch thì nói rõ lệch. */}
+              {soKhacPhuc > 0 && (
                 <div className="flex flex-col sm:items-end gap-2">
                   <button
                     type="button"
+                    disabled={dsCauSai.length === 0}
                     onClick={() => {
                       setHienModalKhacPhuc(true)
                     }}
-                    className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-500 text-white font-bold text-sm shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-500 text-white font-bold text-sm shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
                     <Flame className="w-4 h-4 text-amber-200 animate-pulse" />
                     <span>
@@ -335,7 +342,11 @@ export default function BaoCaoCaThiHocSinhModal({
                     <ArrowRight className="w-4 h-4" />
                   </button>
                   <span className="text-[11px] text-slate-400 dark:text-slate-500 text-center sm:text-right">
-                    Tạo đề ôn tập riêng chỉ với 1 chạm
+                    {dsCauSai.length > 0
+                      ? 'Tạo đề ôn tập riêng chỉ với 1 chạm'
+                      : dangTaiCauSai
+                        ? 'Đang tải danh sách câu sai…'
+                        : 'Chưa lấy được danh sách câu sai của ca này'}
                   </span>
                 </div>
               )}
@@ -547,7 +558,7 @@ export default function BaoCaoCaThiHocSinhModal({
             Đóng
           </button>
 
-          {((soSai ?? 0) > 0 || (soBoTrong ?? 0) > 0) && (
+          {soKhacPhuc > 0 && dsCauSai.length > 0 && (
             <button
               type="button"
               onClick={() => {
@@ -556,11 +567,7 @@ export default function BaoCaoCaThiHocSinhModal({
               className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs shadow-md shadow-blue-500/20 inline-flex items-center gap-2 cursor-pointer"
             >
               <Flame className="w-4 h-4 text-amber-300" />
-              <span>
-                {(soSai ?? 0) > 0
-                  ? `Khắc phục ngay ${soKhacPhuc} câu sai của ca này`
-                  : `Luyện tập ngay ${soBoTrong} câu chưa làm`}
-              </span>
+              <span>{`Khắc phục ngay ${soKhacPhuc} câu sai của ca này`}</span>
             </button>
           )}
         </div>

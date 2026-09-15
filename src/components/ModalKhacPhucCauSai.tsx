@@ -34,9 +34,15 @@ import KhungXemPhieu from './KhungXemPhieu'
 import { napKhoChoMayEm } from '../lib/kho-cho-may-em'
 import { loadScriptUrl } from '../lib/exam-db'
 
-/** Máy chưa đồng bộ kho đề của thầy — chỉ luyện lại được đúng các câu sai. */
+/**
+ * Máy chủ không rút được câu nào cùng dạng với các câu em sai.
+ *
+ * Từ 15/09 modal LUÔN xin máy chủ (`napKhoChoMayEm`) và không còn đọc kho đề
+ * trong máy đang mở nữa, nên lý do cũ — "máy này chưa có kho đề của thầy" —
+ * đã không còn đúng với bất kỳ ca nào. Nói sai lý do còn tệ hơn không nói.
+ */
 export const KHONG_CO_KHO =
-  'Máy này chưa có kho đề của thầy nên chưa rút thêm câu cùng dạng được. Em làm lại đúng các câu sai trước, thầy sẽ giao thêm bài cùng dạng sau.'
+  'Máy chủ chưa rút được câu nào cùng dạng với các câu em sai. Em làm lại đúng các câu sai trước, thầy sẽ giao thêm bài cùng dạng sau.'
 
 export interface ModalKhacPhucCauSaiProps {
   isOpen: boolean
@@ -209,7 +215,84 @@ export default function ModalKhacPhucCauSai({
     }
   }, [tongToiDaCheDo3])
 
+  /**
+   * Số câu chế độ đang chọn sẽ rút ra. Bằng 0 thì cấm bấm — không mở phiếu trắng.
+   *
+   * Bản cũ chỉ chặn đúng chế độ 2, nên chế độ 1 với 0 câu sai vẫn bật nút.
+   */
+  const soCauSeRut =
+    cheDo === 1
+      ? dsCauSai.length
+      : cheDo === 2
+        ? Math.min(soCauCheDo2, tongToiDaCheDo2)
+        : Math.min(soCauCheDo3, tongToiDaCheDo3)
+
   if (!isOpen) return null
+
+  // KHÔNG SAI CÂU NÀO THÌ KHÔNG CÓ GÌ ĐỂ KHẮC PHỤC.
+  //
+  // Thầy báo 15/09 kèm ảnh ca Test7: tiêu đề ghi "0 câu làm sai", mà modal vẫn
+  // mời "1. Làm lại các câu sai (0 câu)" và bật nút "Bắt đầu làm bài" — bấm vào
+  // là một phiếu trắng. Dưới nút còn hiện "Máy này chưa có kho đề của thầy":
+  // lý do sai hẳn, vì danh sách rỗng thì vòng nạp kho còn không chạy lần nào,
+  // `khoDe` cứ rỗng nên `coKhoDe` hoá false.
+  //
+  // Nay: rỗng thì nói thẳng là rỗng, và không để lại nút nào bấm nhầm được.
+  if (dsCauSai.length === 0) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+        <div
+          className="relative w-full max-w-md rounded-3xl overflow-hidden shadow-2xl border border-slate-200"
+          style={{ background: 'var(--the, rgb(255, 255, 255))', color: 'var(--muc, rgb(15, 23, 42))' }}
+          data-man="khac-phuc-khong-co-cau-sai"
+        >
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+            <div className="flex items-center gap-3">
+              <div
+                className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-xs"
+                style={{ background: 'rgba(52, 168, 83, 0.12)', color: 'var(--gg-xanh-la, rgb(52, 168, 83))' }}
+              >
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold leading-tight" style={{ fontFamily: 'var(--serif)' }}>
+                  Không có câu nào cần khắc phục
+                </h2>
+                <div className="text-xs text-slate-500 font-medium">{tieuDeCa || 'Ca thi này'}</div>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="tap-target w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+              aria-label="Đóng"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="h-1 w-full" style={{ background: 'var(--gg-xanh-la, rgb(52, 168, 83))' }} />
+
+          <div className="px-6 py-6">
+            <p className="text-sm leading-relaxed text-slate-600">
+              Ca này không có câu nào sai, bỏ trống hay đúng một phần nên chưa tạo được đề khắc phục. Em chọn ca khác
+              trong lịch sử làm bài để luyện tiếp.
+            </p>
+          </div>
+
+          <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              className="tap-target px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-md active:scale-95 transition-all cursor-pointer"
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // Xử lý tạo đề
   const handleTaoDe = (laGiaoBai: boolean = false) => {
@@ -689,7 +772,7 @@ export default function ModalKhacPhucCauSai({
                 <button
                   type="button"
                   onClick={() => handleTaoDe(false)}
-                  disabled={dangTao || (cheDo === 2 && tongToiDaCheDo2 === 0 && dsCauSai.length === 0)}
+                  disabled={dangTao || soCauSeRut <= 0}
                   className="tap-target px-4 py-2.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 text-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                   title="Xem trước đề dạng HTML"
                 >
@@ -701,7 +784,7 @@ export default function ModalKhacPhucCauSai({
               <button
                 type="button"
                 onClick={() => handleTaoDe(Boolean(onGiaoBaiChoCon))}
-                disabled={dangTao || (cheDo === 2 && tongToiDaCheDo2 === 0 && dsCauSai.length === 0)}
+                disabled={dangTao || soCauSeRut <= 0}
                 className={`tap-target px-6 py-2.5 rounded-xl text-white text-sm font-bold shadow-md active:scale-95 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
                   onGiaoBaiChoCon
                     ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-500/20'
