@@ -308,6 +308,40 @@ function veLuaVien(ctx: CanvasRenderingContext2D, r: number, info: ThanThuInfo, 
 
 /* ─────────── vẽ một thần thú ─────────── */
 
+/**
+ * HỘP BAO LỚN NHẤT CỦA HÌNH VẼ, tính theo đơn vị `banKinh`.
+ *
+ * ĐO THẬT, không ước lượng: dựng 4 thần thú × 12 cấp × 4 cờ hiệu ứng × 12 mốc
+ * thời gian trên Chromium, quét điểm ảnh đặc (alpha > 190) rồi lấy biên xa nhất.
+ * Ca xấu nhất luôn là cấp 12 `dangTungNo` — vòng lửa viền của hình thái tối
+ * thượng là thứ vươn xa nhất.
+ *
+ * Trước khi có mấy số này, canvas lấy tâm ở giữa khung và bán kính
+ * `min(w,h) * 0,32`: ĐUÔI bị cắt cụt ở mép trái từ cấp 4 trở lên, còn cấp 8
+ * lúc tung chiêu thì CÁNH bị cắt ở mép trên. Chỉ nhìn ảnh chụp mới thấy.
+ *
+ * Sửa hình vẽ thì phải ĐO LẠI bộ số này.
+ */
+export const HOP_BAO_THAN_THU = { trai: 2.43, phai: 2.04, tren: 2.11, duoi: 1.97 } as const
+
+/**
+ * Chọn tâm và bán kính để cả hình nằm gọn trong khung, chừa `le` điểm ảnh mép.
+ * Bán kính KHÔNG đổi theo cấp — cấp thấp vẽ nhỏ hơn trong khung là đúng ý đồ:
+ * cấp sau phải trông ngầu hơn cấp trước.
+ */
+export function khungVeThanThu(w: number, h: number, le = 4): { cx: number; cy: number; banKinh: number } {
+  const B = HOP_BAO_THAN_THU
+  const r = Math.max(
+    1,
+    Math.min((w - le * 2) / (B.trai + B.phai), (h - le * 2) / (B.tren + B.duoi)),
+  )
+  return {
+    cx: (w - (B.trai + B.phai) * r) / 2 + B.trai * r,
+    cy: (h - (B.tren + B.duoi) * r) / 2 + B.tren * r,
+    banKinh: r,
+  }
+}
+
 export function veThanThuCanvas(
   ctx: CanvasRenderingContext2D,
   cx: number, cy: number, banKinh: number,

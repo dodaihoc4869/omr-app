@@ -722,6 +722,21 @@ export default function StudentPortalScreen() {
   }, [dsLichSu, cacCaChon])
 
   // Rút đề khắc phục câu sai
+  /**
+   * LẤY CÂU SAI CỦA EM CHO GAME THẦN THÚ.
+   *
+   * Truyền xuống dưới dạng HÀM GỌI LẠI, không truyền số báo danh: game không
+   * cần biết em là ai, nó chỉ cần nội dung câu và nhãn dạng thầy đã gắn.
+   * Danh sách mã ca để RỖNG nghĩa là lấy câu sai của mọi ca em đã thi.
+   */
+  const layCauSaiChoGame = useCallback(async () => {
+    if (!auth) return []
+    const url = await loadScriptUrlHoacMacDinh().catch(() => '')
+    const res = await hsCauSaiApi(url, auth.sbd, [])
+    if (!res.ok || !res.items) throw new Error(res.error || 'Máy chủ không trả được câu sai')
+    return res.items
+  }, [auth])
+
   const taoDeKhacPhuc = async (danhSachMaCaTuyChon?: string[]) => {
     if (!auth) return
     let dsMaCa = danhSachMaCaTuyChon && danhSachMaCaTuyChon.length > 0 ? danhSachMaCaTuyChon : Array.from(cacCaChon)
@@ -1874,6 +1889,7 @@ export default function StudentPortalScreen() {
           <ThanThuHoaHocGame
             dsLichSu={dsLichSu}
             dsBtvn={dsBtvn}
+            layCauSaiCuaEm={layCauSaiChoGame}
             onDong={() => setTab('diem')}
             onChuyenSangKhacPhuc={() => setTab('khacphuc')}
             onChuyenSangBtvn={() => setTab('btvn')}

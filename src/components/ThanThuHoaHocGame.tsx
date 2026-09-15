@@ -35,10 +35,18 @@ import {
   type HoSoThanThuLuu,
   type CapTienHoa,
   type HeNguyenTo,
+  type ThanThuInfo,
 } from '../game/than-thu-hoa-hoc/he-thong-pet'
 import { layHinhThai, CAP_TOI_DA } from '../game/than-thu-hoa-hoc/hinh-thai'
 import { nhanExp, NGUON_EXP, BANG_NGUON_EXP } from '../game/than-thu-hoa-hoc/kinh-nghiem'
-import { veThanThuCanvas } from '../game/than-thu-hoa-hoc/ve-than-thu'
+import {
+  KHO_CAU_HOI, bacTheoTang, chiSoTheoBac, type CauHoi,
+} from '../game/than-thu-hoa-hoc/kho-cau-hoi'
+import {
+  doiCauSaiThanhCauChoi, locTheoBac, TEN_LY_DO,
+  type CauHoiCuaEm, type CauSaiTho, type KetQuaDoiCau,
+} from '../game/than-thu-hoa-hoc/cau-hoi-cua-em'
+import { veThanThuCanvas, khungVeThanThu } from '../game/than-thu-hoa-hoc/ve-than-thu'
 import { AmThanhPet } from '../game/than-thu-hoa-hoc/am-thanh-pet'
 
 interface Props {
@@ -50,6 +58,14 @@ interface Props {
    */
   dsLichSu: { tong?: number; soCauSai?: number; maCa?: string; id?: string }[]
   dsBtvn: { daNop?: boolean; id?: string }[]
+  /**
+   * Lấy danh sách câu em đã làm SAI, kèm nhãn `chuyenDe` / `mucDo` / `dang`
+   * thầy gắn trong kho đề — đúng nguồn mục Khắc Phục Câu Sai đang dùng.
+   *
+   * Là HÀM GỌI LẠI chứ không phải số báo danh: game vẫn không biết em là ai,
+   * cổng học sinh gọi máy chủ rồi đưa kết quả xuống.
+   */
+  layCauSaiCuaEm?: () => Promise<CauSaiTho[]>
   onDong: () => void
   onChuyenSangKhacPhuc: () => void
   onChuyenSangBtvn: () => void
@@ -58,6 +74,9 @@ interface Props {
 
 type TabGame = 'dao_thu' | 'leo_thap' | 'san_cau_sai' | 'xep_hang'
 
+/** Sổ ghi câu sai đã làm đúng lại — để mỗi câu chỉ trả EXP một lần trong đời. */
+const KHOA_QID_THANH_TAY = 'omr_than_thu_qid_thanh_tay'
+
 const TEN_HE: Record<HeNguyenTo, string> = {
   hoa: 'Hoả · nhiệt nhôm',
   axit: 'Acid · ăn mòn',
@@ -65,9 +84,64 @@ const TEN_HE: Record<HeNguyenTo, string> = {
   khi: 'Khí · halogen',
 }
 
+/** Trạng thái thú trong trận: đứng yên · ra đòn · trúng đòn · tung chiêu nộ. */
+type HieuUngCombat = 'yen' | 'danh' | 'biDanh' | 'no'
+
+/**
+ * Vòng lặp vẽ thần thú — dùng chung cho canvas Đảo Thần Thú và canvas màn đấu.
+ *
+ * Trước đây chỉ Đảo Thần Thú có canvas, và ba cờ `dangDanh` / `dangBiDanh` /
+ * `dangTungNo` luôn truyền `false`: mã vẽ hiệu ứng có sẵn nhưng không ai bật.
+ * Cờ đọc từ ref chứ không từ state, để mỗi đòn đánh không dựng lại vòng lặp vẽ.
+ */
+function useVeThanThu(
+  canvasRef: { current: HTMLCanvasElement | null },
+  info: ThanThuInfo,
+  cap: number,
+  hieuUngRef: { current: HieuUngCombat },
+  dangHien: boolean,
+) {
+  useEffect(() => {
+    if (!dangHien) return
+    const cvs = canvasRef.current
+    if (!cvs) return
+    const ctx = cvs.getContext('2d')
+    if (!ctx) return
+
+    let animId = 0
+    const moc = performance.now()
+    // Tâm và bán kính tính từ hộp bao ĐO THẬT của hình, không phải
+    // `min(w,h) * 0,32` như bản trước — bản ấy cắt cụt đuôi và cánh.
+    const k = khungVeThanThu(cvs.width, cvs.height)
+    const ve = (now: number) => {
+      const t = (now - moc) / 1000
+      ctx.clearRect(0, 0, cvs.width, cvs.height)
+      const hu = hieuUngRef.current
+      veThanThuCanvas(
+        ctx,
+        k.cx,
+        k.cy,
+        k.banKinh,
+        info,
+        cap,
+        {
+          thoiGian: t,
+          dangDanh: hu === 'danh',
+          dangBiDanh: hu === 'biDanh',
+          dangTungNo: hu === 'no',
+        },
+      )
+      animId = requestAnimationFrame(ve)
+    }
+    animId = requestAnimationFrame(ve)
+    return () => cancelAnimationFrame(animId)
+  }, [canvasRef, info, cap, hieuUngRef, dangHien])
+}
+
 export default function ThanThuHoaHocGame({
   dsLichSu,
   dsBtvn,
+  layCauSaiCuaEm,
   onDong,
   onChuyenSangKhacPhuc,
   onChuyenSangBtvn,
@@ -88,6 +162,7 @@ export default function ThanThuHoaHocGame({
   const [batAm, setBatAm] = useState(true)
   const amThanhRef = useRef<AmThanhPet | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const canvasCombatRef = useRef<HTMLCanvasElement | null>(null)
 
   // Khởi tạo audio context
   // Tạo MỘT lần. Trước đây phụ thuộc [batAm] nên mỗi lần bật/tắt loa lại dựng
@@ -141,35 +216,25 @@ export default function ThanThuHoaHocGame({
     })
   }, [hoSo.capDo, hoSo.capTienHoa, chiSoHocTap])
 
-  // Vòng lặp vẽ thú bằng Canvas
-  useEffect(() => {
-    const cvs = canvasRef.current
-    if (!cvs) return
-    const ctx = cvs.getContext('2d')
-    if (!ctx) return
+  // Hiệu ứng thú trong trận. Ghi vào ref chứ không vào state: state thì mỗi đòn
+  // đánh lại dựng lại vòng lặp vẽ và đồng hồ hoạt hình giật về 0.
+  const hieuUngRef = useRef<HieuUngCombat>('yen')
+  const henHieuUngRef = useRef<number | null>(null)
+  /** Canvas Đảo Thần Thú không đánh nhau — luôn đứng yên khoe hình thái. */
+  const hieuUngYenRef = useRef<HieuUngCombat>('yen')
 
-    let animId: number
-    let startTime = performance.now()
+  const batHieuUng = useCallback((hu: HieuUngCombat, ms: number) => {
+    hieuUngRef.current = hu
+    if (henHieuUngRef.current !== null) clearTimeout(henHieuUngRef.current)
+    henHieuUngRef.current = window.setTimeout(() => {
+      hieuUngRef.current = 'yen'
+      henHieuUngRef.current = null
+    }, ms)
+  }, [])
 
-    const render = (now: number) => {
-      const t = (now - startTime) / 1000
-      const w = cvs.width
-      const h = cvs.height
-      ctx.clearRect(0, 0, w, h)
-
-      veThanThuCanvas(ctx, w / 2, h / 2 + 10, Math.min(w, h) * 0.32, infoPet, hoSo.capTienHoa, {
-        thoiGian: t,
-        dangDanh: false,
-        dangBiDanh: false,
-        dangTungNo: false,
-      })
-
-      animId = requestAnimationFrame(render)
-    }
-
-    animId = requestAnimationFrame(render)
-    return () => cancelAnimationFrame(animId)
-  }, [infoPet, hoSo.capTienHoa])
+  useEffect(() => () => {
+    if (henHieuUngRef.current !== null) clearTimeout(henHieuUngRef.current)
+  }, [])
 
   /**
    * CỘNG EXP — ĐƯỜNG DUY NHẤT. Mọi nguồn đều đi qua đây.
@@ -211,25 +276,117 @@ export default function ThanThuHoaHocGame({
     return () => clearTimeout(h)
   }, [tinTienHoa])
 
-  /** Tổng số câu sai đang có trong lịch sử ca thi. */
-  const soCauSaiConLai = useMemo(
-    () => dsLichSu.reduce((t: number, ca: { soCauSai?: number }) => t + (ca.soCauSai ?? 0), 0),
-    [dsLichSu],
-  )
+  /**
+   * KHO CÂU CỦA CHÍNH EM.
+   *
+   * Thầy chốt 15-09: câu hỏi trong game phải nằm trong phần em đã học. Máy chủ
+   * không có trường "chuyên đề đã học", nhưng TỪNG CÂU em làm sai thì có nhãn
+   * `chuyenDe` / `mucDo` / `dang` thầy gắn sẵn trong kho đề. Nên game hỏi
+   * thẳng bằng chính những câu ấy — sát hơn mọi cách suy đoán chuyên đề.
+   *
+   * Nạp một lần, khi em bước vào phần cần dùng, không nạp lúc mở game.
+   */
+  const [dsCauCuaEm, setDsCauCuaEm] = useState<CauHoiCuaEm[]>([])
+  const [tinhTrangKho, setTinhTrangKho] = useState<'chua' | 'dangTai' | 'xong' | 'loi'>('chua')
+  const [tomTatKho, setTomTatKho] = useState<KetQuaDoiCau | null>(null)
+  const [loiKho, setLoiKho] = useState('')
 
   /**
-   * Quy đổi câu sai ĐÃ SỬA thành EXP.
+   * CHỐT "ĐÃ NẠP" BẰNG REF, KHÔNG BẰNG STATE.
    *
-   * Bản trước in "+100 EXP / Câu" lên thẻ mà KHÔNG có một dòng mã nào cộng EXP —
-   * hứa suông với học sinh. Nay cộng thật, và chỉ cộng cho phần CHÊNH so với
-   * số đã thanh tẩy lần trước, nên bấm mấy lần cũng không ăn gian được.
+   * Bản đầu để `tinhTrangKho` trong danh sách phụ thuộc: `setTinhTrangKho('dangTai')`
+   * làm effect chạy lại, React dọn lượt cũ, `huy = true` — và lời hứa vừa gửi
+   * đi bị vứt kết quả ngay khi nó về. Màn hình đứng mãi ở "đang tải", không ai
+   * thấy lỗi ở đâu. Phép kiểm `than-thu-man-dau` bắt đúng chỗ này.
    */
-  const nhanExpCauSai = useCallback(() => {
-    const moi = soCauSaiConLai - hoSo.soCauDaThanhTay
-    if (moi <= 0) { setViecVuaLam('Chưa có câu nào mới để quy đổi'); return }
-    setHoSo((prev) => ({ ...prev, soCauDaThanhTay: soCauSaiConLai }))
-    congExp(moi * NGUON_EXP.suaCauSai(), `Thanh tẩy ${moi} câu sai`)
-  }, [soCauSaiConLai, hoSo.soCauDaThanhTay, congExp])
+  const daNapKhoRef = useRef(false)
+  const conGanRef = useRef(true)
+  useEffect(() => () => { conGanRef.current = false }, [])
+
+  useEffect(() => {
+    if (tabGame !== 'leo_thap' && tabGame !== 'san_cau_sai') return
+    if (daNapKhoRef.current) return
+    daNapKhoRef.current = true
+    if (!layCauSaiCuaEm) { setTinhTrangKho('xong'); return }
+    setTinhTrangKho('dangTai')
+    layCauSaiCuaEm()
+      .then((tho) => {
+        if (!conGanRef.current) return
+        const kq = doiCauSaiThanhCauChoi(tho)
+        setDsCauCuaEm(kq.dsCau)
+        setTomTatKho(kq)
+        setTinhTrangKho('xong')
+      })
+      .catch((e: unknown) => {
+        if (!conGanRef.current) return
+        setLoiKho(e instanceof Error ? e.message : 'Không tải được câu sai của em')
+        setTinhTrangKho('loi')
+      })
+  }, [tabGame, layCauSaiCuaEm])
+
+  /** Câu của em đang dùng được hay đang phải mượn kho chung. */
+  const dungKhoCuaEm = dsCauCuaEm.length > 0
+
+  /**
+   * SĂN CÂU SAI — PHẢI LÀM ĐÚNG MỚI CÓ EXP.
+   *
+   * Bản trước là một nút tự khai: bấm "Quy đổi câu đã sửa" là ăn 100 EXP mỗi
+   * câu, không ai kiểm em có sửa thật hay không. Thầy bắt đúng chỗ ấy 15-09.
+   *
+   * Nay muốn lấy EXP của một câu thì phải TRẢ LỜI ĐÚNG chính câu đó, và mỗi
+   * `qid` chỉ trả một lần trong đời — ghi vào máy để bấm lại không ăn thêm.
+   * Trả lời sai thì hiện lời giải và không cộng gì; câu vẫn nằm đó chờ làm lại.
+   */
+  const [qidDaThanhTay, setQidDaThanhTay] = useState<string[]>(() => {
+    try {
+      const raw = localStorage.getItem(KHOA_QID_THANH_TAY)
+      const v: unknown = raw === null ? null : JSON.parse(raw)
+      return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []
+    } catch { return [] }
+  })
+  const [cauSanHienTai, setCauSanHienTai] = useState<CauHoiCuaEm | null>(null)
+  const [ketQuaSan, setKetQuaSan] = useState<{ dung: boolean; giai: string } | null>(null)
+
+  useEffect(() => {
+    try { localStorage.setItem(KHOA_QID_THANH_TAY, JSON.stringify(qidDaThanhTay)) }
+    catch { /* chế độ ẩn danh: không lưu được thì thôi */ }
+  }, [qidDaThanhTay])
+
+  /** Quái chưa hạ = câu em làm sai mà chưa trả lời đúng lại lần nào. */
+  const dsQuaiConLai = useMemo(
+    () => dsCauCuaEm.filter((c) => !qidDaThanhTay.includes(c.qid)),
+    [dsCauCuaEm, qidDaThanhTay],
+  )
+
+  const goiQuaiTiepTheo = useCallback(() => {
+    amThanhRef.current?.moKhoa()
+    setKetQuaSan(null)
+    const q = dsQuaiConLai[Math.floor(Math.random() * dsQuaiConLai.length)] ?? null
+    if (q) amThanhRef.current?.tanCong()
+    setCauSanHienTai(q)
+  }, [dsQuaiConLai])
+
+  const traLoiQuai = useCallback((idx: number) => {
+    const q = cauSanHienTai
+    if (!q || ketQuaSan !== null) return
+    if (idx === q.dung) {
+      amThanhRef.current?.dungCauHoi()
+      amThanhRef.current?.thangTran()
+      setKetQuaSan({ dung: true, giai: q.giaiThich })
+      // Chốt EXP theo qid: đã trả rồi thì thôi, dù em bấm lại bao nhiêu lần.
+      setQidDaThanhTay((truoc) => {
+        if (truoc.includes(q.qid)) return truoc
+        const sau = [...truoc, q.qid]
+        setHoSo((h) => ({ ...h, soCauDaThanhTay: sau.length }))
+        congExp(NGUON_EXP.suaCauSai(), `Hạ quái câu sai: ${q.tenDang || q.chuyenDe}`)
+        return sau
+      })
+    } else {
+      amThanhRef.current?.saiCauHoi()
+      amThanhRef.current?.trungDon()
+      setKetQuaSan({ dung: false, giai: q.giaiThich })
+    }
+  }, [cauSanHienTai, ketQuaSan, congExp])
 
   /**
    * EXP TỪ VIỆC HỌC ĐÃ CÓ SẴN — nhận một lần, không nhận lại.
@@ -284,56 +441,16 @@ export default function ThanThuHoaHocGame({
   const [mauBoss, setMauBoss] = useState(100)
   const [mauPetCombat, setMauPetCombat] = useState(100)
   const [mauBossToiDa, setMauBossToiDa] = useState(100)
-  const [chiSoCauHienTai, setChiSoCauHienTai] = useState(0)
-  const [daHoiCau, setDaHoiCau] = useState<number[]>([])
+  /** Khoá câu đang hỏi: `qid` thật khi là câu của em, `kho_<i>` khi mượn kho chung. */
+  const [khoaCauHienTai, setKhoaCauHienTai] = useState('')
+  const [daHoiCau, setDaHoiCau] = useState<string[]>([])
   /** Đang chờ 1,2–1,8 giây sang câu/tầng kế: khoá đồng hồ và khoá bấm. */
   const [dangChoSangTang, setDangChoSangTang] = useState(false)
   const [thongBaoChienDau, setThongBaoChienDau] = useState('')
-  const [cauHoiHienTai, setCauHoiHienTai] = useState<{
-    cau: string
-    phuongAn: string[]
-    dung: number
-    giaiThich: string
-  } | null>(null)
+  const [cauHoiHienTai, setCauHoiHienTai] = useState<CauHoi | null>(null)
   const [thoiGianConLaiCau, setThoiGianConLaiCau] = useState(15)
 
   // Danh sách câu hỏi hóa học mẫu phong phú cho leo tháp
-  const KHO_CAU_THAP = useMemo(
-    () => [
-      {
-        cau: 'Kim loại nào sau đây có thể phản ứng với nước ở nhiệt độ thường tạo dung dịch kiềm?',
-        phuongAn: ['Fe (iron)', 'Cu (copper)', 'Na (sodium)', 'Al (aluminium)'],
-        dung: 2,
-        giaiThich: '2Na + 2H₂O → 2NaOH + H₂↑ (Phản ứng mãnh liệt tỏa nhiệt lớn).',
-      },
-      {
-        cau: 'Khí nào sau đây có màu vàng lục, mùi hắc và có tính oxi hóa rất mạnh?',
-        phuongAn: ['O₂ (oxygen)', 'Cl₂ (chlorine)', 'N₂ (nitrogen)', 'CO₂ (carbon dioxide)'],
-        dung: 1,
-        giaiThich: 'Khí Clo Cl₂ có màu vàng lục, nặng hơn không khí và oxi hóa mạnh.',
-      },
-      {
-        cau: 'Chất nào tạo kết tủa trắng không tan trong acid mạnh khi tác dụng với Ba(OH)₂?',
-        phuongAn: ['NaCl', 'KNO₃', 'H₂SO₄', 'HCl'],
-        dung: 2,
-        giaiThich: 'Ba(OH)₂ + H₂SO₄ → BaSO₄↓ + 2H₂O (BaSO₄ kết tủa trắng bền vững).',
-      },
-      {
-        cau: 'Phản ứng nhiệt nhôm là phản ứng khử oxit kim loại bằng kim loại nào?',
-        phuongAn: ['Fe (iron)', 'Mg (magnesium)', 'Al (aluminium)', 'Cu (copper)'],
-        dung: 2,
-        giaiThich: 'Aluminium (Al) dùng để khử Fe₂O₃ hoặc Cr₂O₃ tạo kim loại tự do ở nhiệt độ cao.',
-      },
-      {
-        cau: 'Dung dịch làm quỳ tím hóa đỏ (pH < 7) là dung dịch của chất nào?',
-        phuongAn: ['NaOH', 'HCl', 'Ba(OH)₂', 'NaCl'],
-        dung: 1,
-        giaiThich: 'Dung dịch hydrochloric acid HCl làm quỳ tím chuyển sang màu đỏ.',
-      },
-    ],
-    []
-  )
-
   /** Hệ của trùm tầng N — xoay vòng 4 hệ để mỗi tầng là một bài tương khắc khác. */
   const heTrumTang = useCallback((tang: number): HeNguyenTo => {
     const ds: HeNguyenTo[] = ['khi', 'kiem', 'axit', 'hoa']
@@ -353,22 +470,31 @@ export default function ThanThuHoaHocGame({
     setMauBossToiDa(mauTrumTang(tang))
     setMauPetCombat(chiSoPet.mau)
     setDaHoiCau([])
-    setThongBaoChienDau(`Tầng ${tang} — trùm hệ ${TEN_HE[heTrumTang(tang)]}`)
-    raCauHoiMoi([])
+    const tkMo = tinhHeSoTuongKhac(infoPet.he, heTrumTang(tang))
+    setThongBaoChienDau(`Tầng ${tang} — trùm hệ ${TEN_HE[heTrumTang(tang)]}. ${tkMo.thongDiep}`)
+    raCauHoiMoi([], tang)
   }
 
   /**
    * Rút câu CHƯA HỎI trong lượt leo này. Trước đây rút thuần ngẫu nhiên nên
    * tầng 2 lặp lại y hệt câu tầng 1.
    */
-  const raCauHoiMoi = useCallback((daHoi: number[]) => {
-    const conLai = KHO_CAU_THAP.map((_, i) => i).filter((i) => !daHoi.includes(i))
-    const nguon = conLai.length > 0 ? conLai : KHO_CAU_THAP.map((_, i) => i)
-    const i = nguon[Math.floor(Math.random() * nguon.length)]!
-    setChiSoCauHienTai(i)
-    setCauHoiHienTai(KHO_CAU_THAP[i]!)
+  const raCauHoiMoi = useCallback((daHoi: string[], tang: number) => {
+    const bac = bacTheoTang(tang)
+    // ƯU TIÊN CÂU CỦA CHÍNH EM. Chỉ khi em chưa có câu sai nào đọc được mới
+    // mượn kho chung — và màn hình nói rõ đang mượn, không giả vờ là câu của em.
+    const nguon: { cau: CauHoi; khoa: string }[] = dsCauCuaEm.length > 0
+      ? locTheoBac(dsCauCuaEm, bac).map((c) => ({ cau: c as CauHoi, khoa: c.qid }))
+      : chiSoTheoBac(bac).map((i) => ({ cau: KHO_CAU_HOI[i]!, khoa: 'kho_' + i }))
+    if (nguon.length === 0) return
+    // Tránh hỏi lại câu đã hỏi trong lượt leo này; hết câu mới thì cho lặp.
+    const conLai = nguon.filter((x) => !daHoi.includes(x.khoa))
+    const chon = conLai.length > 0 ? conLai : nguon
+    const x = chon[Math.floor(Math.random() * chon.length)]!
+    setKhoaCauHienTai(x.khoa)
+    setCauHoiHienTai(x.cau)
     setThoiGianConLaiCau(15)
-  }, [KHO_CAU_THAP])
+  }, [dsCauCuaEm])
 
   /**
    * Đồng hồ câu hỏi.
@@ -399,7 +525,7 @@ export default function ThanThuHoaHocGame({
 
   const xuLyTraLoi = (idxChon: number) => {
     if (!cauHoiHienTai || dangChoSangTang) return
-    const daHoi = [...daHoiCau, chiSoCauHienTai]
+    const daHoi = [...daHoiCau, khoaCauHienTai]
     setDaHoiCau(daHoi)
 
     if (idxChon === cauHoiHienTai.dung) {
@@ -411,13 +537,15 @@ export default function ThanThuHoaHocGame({
       const satThuong = Math.max(1, Math.round(chiSoPet.cong * tk.heSo))
       const mauBossMoi = Math.max(0, mauBoss - satThuong)
       setMauBoss(mauBossMoi)
-      setThongBaoChienDau(`Đúng! Gây ${satThuong} sát thương — ${tk.thongDiep}`)
+      // Bật cờ hiệu ứng cho canvas màn đấu: hạ trùm thì tung chiêu nộ, còn lại là đòn thường.
+      batHieuUng(mauBossMoi <= 0 ? 'no' : 'danh', mauBossMoi <= 0 ? 1200 : 550)
+      setThongBaoChienDau(`Đúng! ${infoPet.kyNangThuong} gây ${satThuong} sát thương — ${tk.thongDiep}`)
 
       if (mauBossMoi <= 0) {
         amThanhRef.current?.thangTran()
         setDangChoSangTang(true)
         const thuong = NGUON_EXP.leoThap(tangHienTai)
-        setThongBaoChienDau(`Hạ trùm tầng ${tangHienTai}! +${thuong} EXP`)
+        setThongBaoChienDau(`${infoPet.kyNangNo}! Hạ trùm tầng ${tangHienTai} — +${thuong} EXP`)
         setHoSo((prev) => ({
           ...prev,
           tangThapCaoNhat: Math.max(prev.tangThapCaoNhat, tangHienTai + 1),
@@ -429,11 +557,11 @@ export default function ThanThuHoaHocGame({
           setMauBoss(mauTrumTang(tangMoi))
           setMauBossToiDa(mauTrumTang(tangMoi))
           setDangChoSangTang(false)
-          raCauHoiMoi(daHoi)
+          raCauHoiMoi(daHoi, tangMoi)
         }, 1800)
       } else {
         setDangChoSangTang(true)
-        setTimeout(() => { setDangChoSangTang(false); raCauHoiMoi(daHoi) }, 1200)
+        setTimeout(() => { setDangChoSangTang(false); raCauHoiMoi(daHoi, tangHienTai) }, 1200)
       }
     } else {
       amThanhRef.current?.saiCauHoi()
@@ -446,6 +574,7 @@ export default function ThanThuHoaHocGame({
       )
       const mauPetMoi = Math.max(0, mauPetCombat - satThuongBoss)
       setMauPetCombat(mauPetMoi)
+      batHieuUng('biDanh', 700)
       const loi = idxChon === -1 ? 'Hết giờ!' : 'Sai rồi!'
       setThongBaoChienDau(`${loi} Mất ${satThuongBoss} máu. ${cauHoiHienTai.giaiThich}`)
 
@@ -454,7 +583,7 @@ export default function ThanThuHoaHocGame({
         setCauHoiHienTai(null)
       } else {
         setDangChoSangTang(true)
-        setTimeout(() => { setDangChoSangTang(false); raCauHoiMoi(daHoi) }, 1500)
+        setTimeout(() => { setDangChoSangTang(false); raCauHoiMoi(daHoi, tangHienTai) }, 1500)
       }
     }
   }
@@ -462,6 +591,70 @@ export default function ThanThuHoaHocGame({
   // Đồng hồ gọi xuLyTraLoi qua ref: hàm này dựng lại mỗi lần vẽ, giữ bản mới nhất.
   const xuLyTraLoiRef = useRef(xuLyTraLoi)
   useEffect(() => { xuLyTraLoiRef.current = xuLyTraLoi })
+
+  // Hai canvas, một con thú. Canvas nào không hiện thì không quay vòng lặp.
+  useVeThanThu(canvasRef, infoPet, hoSo.capTienHoa, hieuUngYenRef, tabGame === 'dao_thu')
+  useVeThanThu(
+    canvasCombatRef, infoPet, hoSo.capTienHoa, hieuUngRef,
+    tabGame === 'leo_thap' && dangLeoThap,
+  )
+
+  /**
+   * DẢI NÓI RÕ CÂU HỎI LẤY TỪ ĐÂU.
+   * Không được để em tưởng đang làm câu của mình trong khi game mượn kho chung.
+   */
+  const daiNguonCau = (
+    <>
+      {tinhTrangKho === 'dangTai' && (
+        <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-[12px] text-slate-600 dark:text-slate-300 text-center">
+          Đang lấy các câu em từng làm sai…
+        </div>
+      )}
+
+      {tinhTrangKho === 'loi' && (
+        <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-[12px] text-amber-800 dark:text-amber-300">
+          Không lấy được câu sai của em ({loiKho}). Đang dùng kho câu chung {KHO_CAU_HOI.length} câu.
+        </div>
+      )}
+
+      {tinhTrangKho === 'xong' && dungKhoCuaEm && (
+        <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-[12px] text-emerald-900 dark:text-emerald-200 space-y-1">
+          <div>
+            Câu hỏi lấy từ <b>{dsCauCuaEm.length} câu chính em từng làm sai</b> — không phải câu chung.
+          </div>
+          {tomTatKho !== null && tomTatKho.dsChuyenDe.length > 0 && (
+            <div className="text-[11px] opacity-80">
+              Chuyên đề: {tomTatKho.dsChuyenDe.join(' · ')}
+            </div>
+          )}
+          {tomTatKho !== null && tomTatKho.soBoQua > 0 && (
+            <div className="text-[11px] opacity-80">
+              Đã bỏ {tomTatKho.soBoQua} câu không đưa vào game được:{' '}
+              {Object.entries(tomTatKho.lyDoBoQua)
+                .map(([ly, so]) => `${so} câu ${TEN_LY_DO[ly as keyof typeof TEN_LY_DO]}`)
+                .join(', ')}.
+            </div>
+          )}
+        </div>
+      )}
+
+      {tinhTrangKho === 'xong' && !dungKhoCuaEm && (
+        <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-[12px] text-slate-600 dark:text-slate-300 space-y-1">
+          <div>
+            Chưa lấy được câu sai nào của em, nên đang dùng <b>kho câu chung {KHO_CAU_HOI.length} câu</b>.
+          </div>
+          {tomTatKho !== null && tomTatKho.soBoQua > 0 && (
+            <div className="text-[11px] opacity-80">
+              Có {tomTatKho.soBoQua} câu sai nhưng không đưa vào game được:{' '}
+              {Object.entries(tomTatKho.lyDoBoQua)
+                .map(([ly, so]) => `${so} câu ${TEN_LY_DO[ly as keyof typeof TEN_LY_DO]}`)
+                .join(', ')}.
+            </div>
+          )}
+        </div>
+      )}
+    </>
+  )
 
   return (
     <div className="space-y-5 animate-google-fade pb-10">
@@ -566,7 +759,7 @@ export default function ThanThuHoaHocGame({
             <div className="w-full flex items-center justify-between z-10">
               <div className="text-left">
                 <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono">
-                  Giai đoạn: Cấp {hoSo.capTienHoa} ({hoSo.capTienHoa === 3 ? 'Tối Thượng' : hoSo.capTienHoa === 2 ? 'Thiếu Niên' : 'Sơ Sinh'})
+                  Hình thái {hoSo.capDo}/{CAP_TOI_DA} · {layHinhThai(hoSo.capDo).ten}
                 </span>
                 <h2 className="text-lg font-black text-slate-900 dark:text-white mt-1">
                   {infoPet.ten}
@@ -619,8 +812,9 @@ export default function ThanThuHoaHocGame({
               </div>
 
               <div className="text-center text-[11px] text-slate-500 dark:text-slate-400">
-                Hình thái <b className="text-slate-700 dark:text-slate-200">{layHinhThai(hoSo.capDo).ten}</b>
-                {' '}· {hoSo.capDo}/{CAP_TOI_DA}
+                {hoSo.capDo >= CAP_TOI_DA
+                  ? 'Hình thái tối thượng — không còn cấp nào cao hơn'
+                  : `Còn ${Math.max(0, hoSo.expToiDa - hoSo.exp)} EXP nữa lên ${layHinhThai(hoSo.capDo + 1).ten}`}
               </div>
 
               <div className="flex items-center justify-center gap-3 pt-1">
@@ -733,10 +927,53 @@ export default function ThanThuHoaHocGame({
                       }`}
                     >
                       <div className="text-xs font-bold line-clamp-1">{pet.ten}</div>
-                      <div className="text-[10px] text-slate-500 uppercase">{pet.he}</div>
+                      <div className="text-[10px] text-slate-500">{TEN_HE[pet.he]}</div>
                     </button>
                   )
                 })}
+              </div>
+            </div>
+
+            {/* HỒ SƠ NGUYÊN TỐ — phần "học" của game.
+                Bốn thần thú đều dựng từ phản ứng có thật; trước đây `moTa`,
+                `kyNangThuong`, `kyNangNo`, `nguyenToGoc` nằm trong dữ liệu mà
+                không màn nào hiện ra, tức là viết xong rồi bỏ đó. */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-3">
+              <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                <Zap className="w-4 h-4 text-amber-500" />
+                <span>Hồ Sơ Nguyên Tố</span>
+              </h3>
+
+              <div className="flex items-start justify-between gap-2">
+                <div className="text-xs font-bold text-slate-800 dark:text-slate-100">{infoPet.danhHieu}</div>
+                <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                  {TEN_HE[infoPet.he]}
+                </span>
+              </div>
+
+              <p className="text-[12px] leading-relaxed text-slate-600 dark:text-slate-300">
+                {infoPet.moTa}
+              </p>
+
+              <div className="rounded-2xl bg-slate-50 dark:bg-slate-800/60 p-3 space-y-1.5 text-[12px]">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-slate-500 shrink-0">Nguyên tố gốc</span>
+                  <span className="font-mono font-bold text-slate-800 dark:text-slate-100 text-right">{infoPet.nguyenToGoc}</span>
+                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-slate-500 shrink-0">Chiêu thường</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400 text-right">{infoPet.kyNangThuong}</span>
+                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-slate-500 shrink-0">Chiêu nộ</span>
+                  <span className="font-bold text-amber-600 dark:text-amber-400 text-right">{infoPet.kyNangNo}</span>
+                </div>
+              </div>
+
+              <div className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+                Vòng khắc chế: Hoả ▸ Khí ▸ Base ▸ Acid ▸ Hoả. Đánh vào hệ mình khắc
+                được <b className="text-emerald-600 dark:text-emerald-400">+50%</b> sát thương;
+                đánh vào hệ khắc mình thì <b className="text-rose-600 dark:text-rose-400">−30%</b>.
               </div>
             </div>
           </div>
@@ -759,6 +996,8 @@ export default function ThanThuHoaHocGame({
                   Mỗi tầng canh giữ bởi Quái Vật Hóa Học. Trả lời đúng trong 15s để kích hoạt chiêu nộ hạ gục Boss!
                 </p>
               </div>
+
+              {daiNguonCau}
 
               <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/70 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300">
                 Kỷ lục tầng hiện tại của em: <strong className="text-purple-600 text-sm">Tầng {hoSo.tangThapCaoNhat}</strong>
@@ -802,6 +1041,27 @@ export default function ThanThuHoaHocGame({
                     />
                   </div>
                   <div className="text-[10px] text-slate-500 mt-1 font-mono tabular-nums">{mauBoss} / {mauBossToiDa} HP</div>
+                </div>
+              </div>
+
+              {/* THẦN THÚ TRÊN SÀN ĐẤU.
+                  Trước đây màn đấu chỉ có hai thanh máu — con thú em nuôi không
+                  xuất hiện lúc nó đánh nhau, và ba cờ hiệu ứng nằm chết trong mã. */}
+              <div className="flex flex-col items-center gap-1">
+                <canvas
+                  ref={canvasCombatRef}
+                  width={260}
+                  height={200}
+                  className="max-w-full drop-shadow-lg"
+                />
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 text-center">
+                  <b className="text-slate-700 dark:text-slate-200">{layHinhThai(hoSo.capDo).ten}</b>
+                  {' · '}Hệ {TEN_HE[infoPet.he]}
+                  {' · '}Gốc <span className="font-mono">{infoPet.nguyenToGoc}</span>
+                </div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 text-center">
+                  Đúng thì tung <b className="text-emerald-600 dark:text-emerald-400">{infoPet.kyNangThuong}</b>
+                  {' · '}Hạ trùm thì nổ <b className="text-amber-600 dark:text-amber-400">{infoPet.kyNangNo}</b>
                 </div>
               </div>
 
@@ -867,7 +1127,7 @@ export default function ThanThuHoaHocGame({
                 <span>Đột Kích Lò Phản Ứng: Săn Boss Câu Sai</span>
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Các câu làm sai trong ca thi được hóa thân thành Quái Dị Hóa giam giữ Đá Tiến Hóa. Hãy thanh tẩy chúng!
+                Mỗi câu em từng làm sai là một con quái. Trả lời đúng lại chính câu đó mới hạ được và mới có EXP.
               </p>
             </div>
 
@@ -880,46 +1140,143 @@ export default function ThanThuHoaHocGame({
             </button>
           </div>
 
+          {daiNguonCau}
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/60 space-y-2">
-              <div className="text-xs font-bold text-rose-800 dark:text-rose-300">Quái Thể Câu Sai Hiện Tại</div>
-              <div className="text-2xl font-black text-rose-700 dark:text-rose-400 font-mono">
-                {dsLichSu.reduce((acc, cur) => acc + (cur.soCauSai || 0), 0)} Câu
+              <div className="text-xs font-bold text-rose-800 dark:text-rose-300">Quái chưa hạ</div>
+              <div className="text-2xl font-black text-rose-700 dark:text-rose-400 font-mono tabular-nums">
+                {dsQuaiConLai.length} câu
               </div>
               <p className="text-[11px] text-slate-600 dark:text-slate-400">
-                Thanh tẩy toàn bộ để nhận danh hiệu <strong>Thợ Săn Dị Hóa Cấp S</strong>.
+                {/* SỐ NÀY ĐẾM TỪ CHÍNH CÂU SAI CỦA EM, không phải tổng soCauSai
+                    trong bảng điểm — hai con số lệch nhau là chuyện thường vì
+                    câu phần II, phần III và câu có hình không đưa vào game được. */}
+                Mỗi quái là một câu em từng làm sai. Hạ được là trả lời đúng lại chính câu đó.
               </p>
             </div>
 
             <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60 space-y-2">
-              <div className="text-xs font-bold text-amber-800 dark:text-amber-300">Phần Thưởng Thanh Tẩy</div>
+              <div className="text-xs font-bold text-amber-800 dark:text-amber-300">Thưởng mỗi quái hạ được</div>
               <div className="text-2xl font-black text-amber-700 dark:text-amber-400 font-mono tabular-nums">
-                +{NGUON_EXP.suaCauSai()} EXP / Câu
+                +{NGUON_EXP.suaCauSai()} EXP
               </div>
               <p className="text-[11px] text-slate-600 dark:text-slate-400">
-                Sửa xong câu nào thì <b>bấm nút dưới</b> để quy đổi. Đã thanh tẩy:{' '}
-                <b className="tabular-nums">{hoSo.soCauDaThanhTay}</b> câu.
+                Đã hạ <b className="tabular-nums">{qidDaThanhTay.length}</b> câu.
+                Mỗi câu chỉ thưởng <b>một lần</b>; làm sai thì không có EXP, câu vẫn nằm đó.
               </p>
-              <button
-                type="button"
-                onClick={nhanExpCauSai}
-                disabled={soCauSaiConLai <= hoSo.soCauDaThanhTay}
-                className="w-full py-2 rounded-full bg-amber-500 hover:bg-amber-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-[12px] cursor-pointer"
-              >
-                Quy đổi câu đã sửa
-              </button>
             </div>
 
             <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/60 space-y-2">
-              <div className="text-xs font-bold text-emerald-800 dark:text-emerald-300">Trạng Thái Thần Thú</div>
-              <div className="text-2xl font-black text-emerald-700 dark:text-emerald-400 font-mono">
-                Sẵn Sàng Chiến
+              <div className="text-xs font-bold text-emerald-800 dark:text-emerald-300">Lực chiến thần thú</div>
+              <div className="text-2xl font-black text-emerald-700 dark:text-emerald-400 font-mono tabular-nums">
+                {chiSoPet.cp.toLocaleString()}
               </div>
               <p className="text-[11px] text-slate-600 dark:text-slate-400">
-                Lực chiến CP hiện tại: <strong>{chiSoPet.cp.toLocaleString()}</strong>
+                {layHinhThai(hoSo.capDo).ten} · Lv.{hoSo.capDo}/{CAP_TOI_DA}
               </p>
             </div>
           </div>
+
+          {/* SÀN SĂN QUÁI — phải làm đúng mới có EXP, không còn nút tự khai. */}
+          {cauSanHienTai === null ? (
+            <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-center space-y-3">
+              {dsQuaiConLai.length > 0 ? (
+                <>
+                  <div className="text-xs text-slate-600 dark:text-slate-300">
+                    Còn <b className="text-rose-600 dark:text-rose-400">{dsQuaiConLai.length}</b> quái đang giam Đá Tiến Hóa.
+                  </div>
+                  <button
+                    type="button"
+                    onClick={goiQuaiTiepTheo}
+                    className="py-3 px-6 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm shadow-md inline-flex items-center gap-2 cursor-pointer transition-transform active:scale-95"
+                  >
+                    <Swords className="w-5 h-5" />
+                    <span>Khiêu chiến quái tiếp theo</span>
+                  </button>
+                </>
+              ) : dungKhoCuaEm ? (
+                <div className="text-xs text-emerald-700 dark:text-emerald-300 font-bold">
+                  Em đã làm đúng lại toàn bộ {dsCauCuaEm.length} câu từng sai. Không còn quái nào.
+                </div>
+              ) : (
+                <div className="text-xs text-slate-600 dark:text-slate-300">
+                  Chưa có câu sai nào của em đưa vào game được, nên chưa có quái để săn.
+                  Phần này chỉ dùng câu thật của em — không lấy câu kho chung ra cho EXP.
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="p-5 rounded-2xl border border-rose-200 dark:border-rose-800 bg-rose-50/50 dark:bg-rose-950/20 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold">
+                <span className="text-rose-600 dark:text-rose-400">QUÁI CÂU SAI</span>
+                <span className="text-slate-500 dark:text-slate-400 font-normal">
+                  {cauSanHienTai.tenCa !== '' && <>Ca: {cauSanHienTai.tenCa} · </>}
+                  Câu {cauSanHienTai.soCau}
+                  {cauSanHienTai.tenDang !== '' && <> · Dạng: {cauSanHienTai.tenDang}</>}
+                </span>
+              </div>
+
+              <div className="text-sm font-semibold text-slate-900 dark:text-white leading-relaxed whitespace-pre-line">
+                {cauSanHienTai.cau}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {cauSanHienTai.phuongAn.map((pa, idx) => {
+                  const daXong = ketQuaSan !== null
+                  const laDapAn = idx === cauSanHienTai.dung
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      disabled={daXong}
+                      onClick={() => traLoiQuai(idx)}
+                      className={`p-3 rounded-xl border text-left text-xs font-medium transition cursor-pointer disabled:cursor-default ${
+                        daXong && laDapAn
+                          ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/50'
+                          : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40'
+                      }`}
+                    >
+                      <strong className="text-rose-600 mr-2">{String.fromCharCode(65 + idx)}.</strong>
+                      <span>{pa}</span>
+                    </button>
+                  )
+                })}
+              </div>
+
+              {ketQuaSan !== null && (
+                <div
+                  className={`p-3 rounded-xl text-xs leading-relaxed ${
+                    ketQuaSan.dung
+                      ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                      : 'bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                  }`}
+                >
+                  <b>{ketQuaSan.dung ? `Hạ quái! +${NGUON_EXP.suaCauSai()} EXP.` : 'Vẫn sai. Không có EXP câu này.'}</b>
+                  {ketQuaSan.giai !== '' && <> {ketQuaSan.giai}</>}
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setCauSanHienTai(null); setKetQuaSan(null) }}
+                  className="btn-google-outlined text-xs py-2 px-4 rounded-full cursor-pointer"
+                >
+                  Rời sàn
+                </button>
+                {ketQuaSan !== null && dsQuaiConLai.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={goiQuaiTiepTheo}
+                    className="py-2 px-4 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs cursor-pointer"
+                  >
+                    Quái tiếp theo →
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
 
           <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="text-xs text-slate-600 dark:text-slate-300 text-center sm:text-left">
