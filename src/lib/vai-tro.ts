@@ -131,7 +131,9 @@ export function dangChayTuManHinhChinh(): boolean {
   }
 }
 
-export function laManThayQuanLy(search: string, duongDan = '', daCai = dangChayTuManHinhChinh): boolean {
+/** Tham số thứ ba giữ lại cho các phép kiểm cũ gọi tới; từ 15/09 hàm này
+ * KHÔNG còn hỏi "app đã cài hay chưa" nữa, vì vai chỉ đến từ đường link. */
+export function laManThayQuanLy(search: string, duongDan = '', _daCai = dangChayTuManHinhChinh): boolean {
   if (laLinkAppCu(search, duongDan)) return false
   const d = docDuongVao(search, duongDan)
   if (d.vai === 'phieu' || d.vai === 'diem' || d.vai === 'hocsinh' || d.vai === 'phuhuynh') return false
@@ -140,32 +142,17 @@ export function laManThayQuanLy(search: string, duongDan = '', daCai = dangChayT
   // trên máy thầy từng mở link thi thử thì gõ `?vai=gv` cũng không vào được màn
   // quản lý — phép kiểm bắt ngay.
   if (d.vai === 'gv') return true
-  // `/` TRẦN: theo VAI MÁY NÀY ĐÃ DÙNG, không mặc định là màn thầy.
+  // ĐƯỜNG KHÔNG NÓI `gv` THÌ KHÔNG PHẢI APP CỦA THẦY. Hết.
   //
-  // Thầy báo 09/09 17:45, giữa ca thi: em làm đúng hướng dẫn "Thêm vào Màn hình
-  // chính" rồi mở từ biểu tượng thì ra APP GIÁO VIÊN, không vào thi được.
-  // Nguyên nhân: `start_url` của manifest là `./`, nên biểu tượng luôn mở
-  // `/omr-app/` TRẦN — mất sạch `/t/<mã ca>` mà em thêm từ đó. Mà `/` trần thì
-  // hàm này vẫn trả `true` ⇒ màn quản lý. Hướng dẫn của chính app dẫn em vào
-  // ngõ cụt.
+  // 15/09 gỡ hai nhánh đoán từng đứng ở đây: `/` trần hỏi `vaiDaDung()`, rồi
+  // hỏi tiếp "app đã cài mà chưa nhớ vai nào". Hai nhánh ấy sinh ra đúng thứ
+  // thầy bắt được — cùng một địa chỉ, hai máy ra hai app.
   //
-  // Nay `/` trần hỏi máy: máy này lần gần nhất vào bằng vai nào. Máy chưa từng
-  // dùng thì GIỮ NGUYÊN hành vi cũ (màn thầy) — không đổi gì cho máy mới.
-  if (vaiDaDung() === 'hs' || vaiDaDung() === 'ph') return false
-  // APP ĐÃ CÀI, MỞ `/` TRẦN, MÁY CHƯA NHỚ VAI NÀO ⇒ KHÔNG vào màn thầy.
-  //
-  // Thầy quay video 14/09: lưu app ra màn hình chính iPhone rồi mở lên thì nhảy
-  // thẳng vào app giáo viên. App đã cài trên iOS có kho lưu RIÊNG, trống trơn —
-  // nên `vaiDaDung()` trả `null` dù trong Safari máy ấy đã dùng cổng học sinh
-  // cả buổi.
-  //
-  // Từ bản này `start_url` của cả ba manifest đều mang sẵn `?vai=`, nên biểu
-  // tượng cài MỚI không bao giờ rơi vào đây. Nhánh này là lưới hứng cho biểu
-  // tượng cài từ BẢN CŨ: thà mở cổng học sinh — nơi em gõ số báo danh — còn hơn
-  // đổ em vào màn quản lý của thầy. Thầy vào màn của mình bằng `?vai=gv`, và
-  // máy thầy thì `vaiDaDung()` đã là `'gv'` từ lâu nên không chạm nhánh này.
-  if (vaiDaDung() === null && daCai()) return false
-  return true
+  // Nay `/` trần không tới được đây nữa: `App.tsx` chặn trước bằng màn ngõ cụt
+  // (`DungLinkScreen`). Giữ `return false` ở đây là lớp thứ hai — lỡ có đường
+  // nào lọt qua thì nó rơi vào "không phải app thầy", chứ không rơi vào app
+  // thầy. Sai về phía an toàn.
+  return false
 }
 
 const KHOA_VAI_DA_DUNG = 'ddh.vaiDaDung'

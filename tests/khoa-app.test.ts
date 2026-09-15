@@ -208,7 +208,12 @@ describe('9. VAI KHÔNG PHẢI GIÁO VIÊN THÌ KHÔNG BAO GIỜ HỎI MẬT KH�
   })
 
   it('CHỈ app quản lý của thầy mới hỏi', () => {
-    expect(laManThayQuanLy('', '/omr-app/')).toBe(true)
+    // ĐỔI 15/09: `/` TRẦN không còn là app của thầy. Thầy chốt "app giáo viên
+    // khoá cứng lại không thể chạm vào được bằng cách nào" — mà `/` trần là
+    // địa chỉ ai gõ tay cũng ra, nên nó phải KHÔNG dẫn tới app thầy.
+    // Nay `/` trần là ngõ cụt (`DungLinkScreen`); chỉ đường nói rõ `gv` mới là
+    // app của thầy.
+    expect(laManThayQuanLy('', '/omr-app/')).toBe(false)
     expect(laManThayQuanLy('', '/omr-app/gv')).toBe(true)
     expect(laManThayQuanLy('?vai=gv', '/omr-app/')).toBe(true)
   })

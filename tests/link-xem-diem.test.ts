@@ -44,7 +44,10 @@ describe('đường /d/<mã ca>', () => {
     expect(laManThayQuanLy('', '/omr-app/d/248567')).toBe(false)
     expect(laManThayQuanLy('?vai=diem&examCode=248567', '/')).toBe(false)
     // Đối chứng: đường của thầy vẫn phải hỏi.
-    expect(laManThayQuanLy('', '/omr-app/')).toBe(true)
+    // ĐỔI 15/09: đường của thầy nay là `/gv`, KHÔNG phải `/` trần — `/` trần
+    // là ngõ cụt cho mọi người. Xem `tests/khoa-cung-app-thay-1509.test.ts`.
+    expect(laManThayQuanLy('', '/omr-app/gv')).toBe(true)
+    expect(laManThayQuanLy('', '/omr-app/')).toBe(false)
   })
 })
 

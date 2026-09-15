@@ -260,3 +260,48 @@ THẦY chỉ vì tình cờ mở trên máy thầy.
 - `start_url` manifest học sinh trên máy chủ: `./hs`
 - Mảnh mã chính trên bản live: **616 KB** (trước 755 KB) · mở trang **1,07 giây**
 - Chốt tự sửa khi app trắng màn: CÓ trong `index.html` bản live
+
+---
+
+# LƯỢT 14 — BỎ MÀN CHỌN APP · KHOÁ CỨNG APP THẦY (15/09)
+
+- [x] "bỏ màn chọn app đi nhé, vì có thể học sinh dùng 2 máy chọn 2 app khác nhau"  | bằng chứng: `DungLinkScreen` thay `ChonAppScreen`; `tests/khoa-vai-3-app-1409` 38/38
+- [x] "app giáo viên khoá cứng lại không thể chạm vào được bằng cách nào"  | bằng chứng: `tests/khoa-cung-app-thay-1509` 18/18
+- [x] "app học sinh và phụ huynh cũng phải tách biệt hoàn toàn không được nhảy lẫn lộn nhau"  | bằng chứng: cùng tệp trên, mục HỌC SINH VÀ PHỤ HUYNH TÁCH HẲN
+
+## HAI LỖ THẬT ĐÃ BỊT
+
+### 1. Máy trắng VÀO THẲNG app quản lý
+
+`App.tsx` từng quyết: `setKhoa(ma ? 'can_dat' : 'da_mo')` — máy chưa có mã bí
+mật thì `da_mo`. Nghĩa là **em gõ `/gv` trên điện thoại của chính em là app
+quản lý mở ra, không hỏi một câu nào.** Lý lẽ cũ "chưa có gì để khoá" đúng về
+dữ liệu, sai về quyền — và mã bí mật đã từng lộ 10/09.
+
+Nay: không có mã bí mật trên máy ⇒ `chua_cap_quyen` ⇒ chỉ hiện đúng một cửa
+nhập mã, **máy chủ chấm** (`lichSuLenBang`), không phải máy tự chấm. IndexedDB
+hỏng cũng KHOÁ chứ không mở.
+
+Thầy KHÔNG bị khoá: máy thầy đã có bản ghi mật khẩu ⇒ nhánh `can_mo` chạy
+trước, không chạm cửa mới.
+
+### 2. Link vào thi dựng VỎ APP CỦA THẦY
+
+`/t/<mã ca>` và `/d/<mã ca>` không có vai `gv` nên `canHoi=false`, `khoa='da_mo'`,
+rồi **chính vỏ app quản lý được dựng**, chỉ ẩn thanh bên khi `screen==='examtake'`.
+Em chỉ cách app thầy đúng MỘT lần đổi `screen`: màn thi ném lỗi là `ChanLoi`
+mời "về màn chính" → `setScreen('examhub')` → em ngồi giữa app quản lý, đủ
+thanh bên, trên chính điện thoại của em.
+
+Nay hai đường ấy trả về ĐÚNG một màn làm bài, không vỏ, không thanh nào; lỗi
+thì mời TẢI LẠI CHÍNH LINK ẤY.
+
+## Bỏ hết đường ĐOÁN vai
+
+- `App.tsx`: `laHocSinh`/`laPhuHuynh` không còn hỏi `vaiDaDung()`.
+- `vai-tro.ts`: `laManThayQuanLy` không còn nhánh `vaiDaDung()` và `daCai()`.
+  Đường không nói `gv` thì không phải app thầy. Hết.
+- `/` trần và mọi đường lạ ⇒ ngõ cụt, không dẫn đi đâu.
+
+`ddh.vaiDaDung` là khoá localStorage CHUNG GỐC của cả ba app — chính nó là cửa
+để hai cổng nhảy sang nhau. Nay nó không còn quyền quyết định gì.

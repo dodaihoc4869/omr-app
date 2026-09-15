@@ -17,8 +17,12 @@ import { laManThayQuanLy, vaiDaDung, nhoVaiDaDung } from '../src/lib/vai-tro'
 beforeEach(() => localStorage.clear())
 
 describe('`/` trần đi theo vai máy này đã dùng', () => {
-  it('MÁY CHƯA TỪNG DÙNG: giữ nguyên hành vi cũ — `/` trần là màn thầy', () => {
-    expect(laManThayQuanLy('', '/omr-app/')).toBe(true)
+  it('MÁY CHƯA TỪNG DÙNG: `/` trần KHÔNG phải màn thầy', () => {
+    // ĐỔI 15/09. Lỗi gốc tệp này canh (biểu tượng của em mở ra app giáo viên)
+    // nay được chặn mạnh hơn hẳn: `/` trần KHÔNG dẫn tới app thầy cho BẤT KỲ
+    // AI, không cần biết máy đã dùng vai nào. Thầy chốt: "app giáo viên khoá
+    // cứng lại không thể chạm vào được bằng cách nào."
+    expect(laManThayQuanLy('', '/omr-app/')).toBe(false)
   })
 
   it('TÁI HIỆN LỖI: máy em đã vào thi ⇒ biểu tượng KHÔNG còn mở màn thầy', () => {
@@ -26,9 +30,12 @@ describe('`/` trần đi theo vai máy này đã dùng', () => {
     expect(laManThayQuanLy('', '/omr-app/')).toBe(false)
   })
 
-  it('máy thầy đã vào bằng ?vai=gv ⇒ `/` trần vẫn là màn thầy', () => {
+  it('kể cả máy THẦY đã vào bằng ?vai=gv, `/` trần vẫn KHÔNG là màn thầy', () => {
+    // ĐỔI 15/09: cờ trong localStorage không còn quyền quyết định gì. Nó là
+    // khoá CHUNG GỐC của cả ba app — chính nó là cửa để hai cổng nhảy sang
+    // nhau. Thầy vào app của mình bằng link `/gv`.
     nhoVaiDaDung('gv')
-    expect(laManThayQuanLy('', '/omr-app/')).toBe(true)
+    expect(laManThayQuanLy('', '/omr-app/')).toBe(false)
   })
 
   it('cờ chỉ quyết `/` TRẦN — đường có vai rõ ràng luôn thắng', () => {
@@ -63,7 +70,9 @@ describe('vaiDaDung / nhoVaiDaDung', () => {
   it('giá trị rác trong máy thì coi như chưa từng dùng, không vỡ', () => {
     localStorage.setItem('ddh.vaiDaDung', 'linh tinh')
     expect(vaiDaDung()).toBe(null)
-    expect(laManThayQuanLy('', '/omr-app/')).toBe(true)
+    // ĐỔI 15/09: rác hay sạch đều không đổi gì — `/` trần không bao giờ là
+    // màn thầy nữa.
+    expect(laManThayQuanLy('', '/omr-app/')).toBe(false)
   })
 })
 

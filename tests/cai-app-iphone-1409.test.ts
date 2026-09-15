@@ -85,17 +85,24 @@ describe('app đã cài mở `/` trần thì KHÔNG đổ vào màn thầy', () 
     expect(laManThayQuanLy('', '/', () => true)).toBe(false)
   })
 
-  it('cùng trường hợp ấy nhưng mở trong TAB trình duyệt ⇒ giữ nguyên màn thầy', () => {
-    expect(laManThayQuanLy('', '/', () => false)).toBe(true)
+  it('mở trong TAB trình duyệt cũng KHÔNG ra màn thầy nữa', () => {
+    // ĐỔI 15/09: `/` trần không còn là màn thầy trong bất cứ hoàn cảnh nào —
+    // không phân biệt biểu tượng hay tab, không hỏi cờ nào. Thầy chốt "app
+    // giáo viên khoá cứng lại không thể chạm vào được bằng cách nào", mà `/`
+    // trần là địa chỉ ai gõ tay cũng ra.
+    expect(laManThayQuanLy('', '/', () => false)).toBe(false)
   })
 
   it('`?vai=gv` luôn thắng, kể cả khi đang chạy từ biểu tượng', () => {
     expect(laManThayQuanLy('?vai=gv', '/', () => true)).toBe(true)
   })
 
-  it('máy đã dùng vai thầy thì biểu tượng vẫn mở màn thầy', () => {
+  it('máy đã dùng vai thầy thì biểu tượng CŨNG KHÔNG mở màn thầy', () => {
+    // ĐỔI 15/09: cờ trong localStorage không còn quyền quyết định gì — nó là
+    // khoá CHUNG GỐC của cả ba app. Thầy vào app của mình bằng link `/gv`, và
+    // biểu tượng của thầy có `start_url` là `./gv`.
     nhoVaiDaDung('gv')
-    expect(laManThayQuanLy('', '/', () => true)).toBe(true)
+    expect(laManThayQuanLy('', '/', () => true)).toBe(false)
   })
 
   it('đường có vai rõ ràng thì không phụ thuộc cờ đã cài', () => {

@@ -8,9 +8,10 @@ import { datMaBiMatPhien, loadKhoaApp, loadTeacherSecret } from './lib/exam-db'
 import { catPhien, donPhien, khoiPhucPhien } from './lib/khoa-phien'
 import { datDangMoKhoa } from './lib/cap-nhat-app'
 import { phaiHoiLai, type BanGhiKhoa } from './lib/khoa-app'
-import { docDuongVao, laLinkAppCu, laManThayQuanLy, vaiDaDung } from './lib/vai-tro'
+import { docDuongVao, laLinkAppCu, laManThayQuanLy } from './lib/vai-tro'
 import { canChonApp } from './lib/khoa-vai'
-import ChonAppScreen from './screens/ChonAppScreen'
+import DungLinkScreen from './screens/DungLinkScreen'
+import KhoaMayThayScreen from './screens/KhoaMayThayScreen'
 import { ganCauNoi, goCauNoi } from './lib/cau-noi-ddh'
 import ExamTakeScreen from './screens/ExamTakeScreen'
 import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
@@ -97,33 +98,27 @@ function App() {
   // CỔNG HỌC SINH (/hoc-sinh, /hs, ?vai=hocsinh): cổng thông tin riêng của em — đăng nhập,
   // xem điểm, nộp BTVN, khắc phục câu sai, vào thi.
   // Khi mở từ màn hình chính iOS (start_url="./" mở "/" trần), nếu máy đã dùng vai 'hs' thì vào thẳng cổng học sinh.
-  const [laHocSinh] = useState(() => {
-    const d = docDuongVao(location.search, location.pathname)
-    if (d.vai === 'hocsinh') return true
-    if (d.vai === 'phuhuynh' || d.vai === 'gv') return false
-    if (!d.vai && !d.maCa && vaiDaDung() === 'hs') return true
-    return false
-  })
+  // VAI CHỈ ĐẾN TỪ ĐƯỜNG LINK. Không hỏi `vaiDaDung()` nữa (thầy chốt 15/09:
+  // "app học sinh và phụ huynh cũng phải tách biệt hoàn toàn không được nhảy
+  // lẫn lộn nhau"). Khoá `ddh.vaiDaDung` nằm trong localStorage CHUNG GỐC của
+  // cả ba app, nên máy nào mở hai app thì khoá ấy là của app mở sau — đó đúng
+  // là cái cửa để hai cổng nhảy sang nhau. Nay `/` trần là ngõ cụt, không suy
+  // ra vai nào cả.
+  const [laHocSinh] = useState(() => docDuongVao(location.search, location.pathname).vai === 'hocsinh')
   // CỔNG PHỤ HUYNH (/phu-huynh, /ph, ?vai=phuhuynh): cổng thông tin cho phụ huynh — tra cứu điểm của con bằng SBD, giao bài tập.
-  const [laPhuHuynh] = useState(() => {
-    const d = docDuongVao(location.search, location.pathname)
-    if (d.vai === 'phuhuynh') return true
-    if (d.vai === 'hocsinh' || d.vai === 'gv') return false
-    if (!d.vai && !d.maCa && vaiDaDung() === 'ph') return true
-    return false
-  })
+  const [laPhuHuynh] = useState(() => docDuongVao(location.search, location.pathname).vai === 'phuhuynh')
   // MẬT KHẨU MỞ APP (MATKHAUMOAPP.md). CHỈ hỏi ở app quản lý của thầy — vào
   // thi, báo cáo phụ huynh, link riêng cũ đều không bao giờ bị hỏi.
   // `/` TRẦN ⇒ MÀN CHỌN APP, KHÔNG ĐOÁN VAI (thầy chốt 14/09: "đảm bảo 100%
   // không nhảy lẫn lộn"). Xem `src/lib/khoa-vai.ts` để biết vì sao đoán là còn
   // sai được. Mọi đường CÓ vai đều đi thẳng như cũ, không qua màn này.
-  const [chuaChonApp] = useState(() => canChonApp(location.search, location.pathname))
+  const [khongCoVai] = useState(() => canChonApp(location.search, location.pathname))
   // Màn chọn app KHÔNG hỏi mật khẩu: chưa vào app nào thì chưa có gì để khoá,
   // mà hỏi ở đây là em học sinh gõ tên miền tay lại gặp ô mật khẩu của thầy.
   const [canHoi] = useState(() => !canChonApp(location.search, location.pathname) && laManThayQuanLy(location.search, location.pathname))
   // 'dang_doc' = chưa biết máy này có mật khẩu chưa. KHÔNG dựng app trong lúc
   // đó: mục 5 đòi màn khoá hiện TRƯỚC khi bất kỳ dữ liệu học sinh nào được vẽ.
-  const [khoa, setKhoa] = useState<'dang_doc' | 'can_dat' | 'can_mo' | 'da_mo'>(() => (canHoi ? 'dang_doc' : 'da_mo'))
+  const [khoa, setKhoa] = useState<'dang_doc' | 'chua_cap_quyen' | 'can_dat' | 'can_mo' | 'da_mo'>(() => (canHoi ? 'dang_doc' : 'da_mo'))
   const [banGhiKhoa, setBanGhiKhoa] = useState<BanGhiKhoa | null>(null)
   // Bản ghi vân tay của MÁY NÀY. Đọc cùng lúc với `khoaApp` để màn khoá gọi
   // được vân tay ngay khi dựng, không phải chờ thêm một vòng đọc IndexedDB.
@@ -156,14 +151,20 @@ function App() {
           setKhoa('can_mo')
           return
         }
-        // Chưa có mật khẩu. Máy đã có mã bí mật ⇒ mời thầy đặt (mục 4A). Máy
-        // trắng chưa nhập mã bí mật bao giờ ⇒ vào thẳng, vì chưa có gì để khoá.
+        // MÁY CHƯA CÓ MÃ BÍ MẬT ⇒ KHÔNG PHẢI MÁY CỦA THẦY ⇒ KHÔNG CÓ APP.
+        //
+        // Bản trước ở đây là `setKhoa(ma ? 'can_dat' : 'da_mo')` — máy trắng
+        // VÀO THẲNG, lấy lý do "chưa có gì để khoá". Hậu quả: em gõ `/gv` trên
+        // điện thoại của em là mở ra app quản lý, không hỏi câu nào. Thầy chốt
+        // 15/09: "app giáo viên khoá cứng lại không thể chạm vào được bằng
+        // cách nào." Xem `src/screens/KhoaMayThayScreen.tsx`.
         const ma = await loadTeacherSecret()
         if (!con) return
-        setKhoa(ma ? 'can_dat' : 'da_mo')
+        setKhoa(ma ? 'can_dat' : 'chua_cap_quyen')
       } catch {
-        // IndexedDB hỏng thì thà cho vào còn hơn khoá cứng app của thầy.
-        if (con) setKhoa('da_mo')
+        // IndexedDB hỏng thì KHOÁ, không mở. Thà thầy phải nhập lại mã trên
+        // máy của mình còn hơn mở toang app quản lý cho mọi máy hỏng kho.
+        if (con) setKhoa('chua_cap_quyen')
       }
     })()
     return () => {
@@ -228,12 +229,12 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [linkCu, laPhieu, laHocSinh, laPhuHuynh])
 
-  // MÀN CHỌN APP đứng TRƯỚC mọi màn khác: `/` trần không thể là phiếu, link
-  // cũ, cổng em hay cổng phụ huynh, nên không cướp đường của ai.
-  if (chuaChonApp) {
+  // `/` TRẦN LÀ NGÕ CỤT, đứng TRƯỚC mọi màn khác. Không thể là phiếu, link cũ,
+  // cổng em hay cổng phụ huynh, nên không cướp đường của ai.
+  if (khongCoVai) {
     return (
-      <ChanLoi o="Chọn app">
-        <ChonAppScreen />
+      <ChanLoi o="Mở app">
+        <DungLinkScreen />
       </ChanLoi>
     )
   }
@@ -266,6 +267,14 @@ function App() {
   // chục mili giây, nhưng đây là chỗ mục 5 đòi — không được thấy loáng thoáng
   // danh sách lớp rồi mới bị che.
   if (khoa === 'dang_doc') return <div className="min-h-screen" style={{ background: 'var(--nen)' }} />
+  // MÁY CHƯA ĐƯỢC CẤP QUYỀN: chỉ có đúng cửa nhập mã bí mật, không gì khác.
+  if (khoa === 'chua_cap_quyen') {
+    return (
+      <ChanLoi o="Mở app">
+        <KhoaMayThayScreen onMoDuoc={() => setKhoa('can_dat')} />
+      </ChanLoi>
+    )
+  }
   if (khoa === 'can_dat' || khoa === 'can_mo') {
     return (
       <ChanLoi o="Mở app">
@@ -287,6 +296,28 @@ function App() {
             })()
           }}
         />
+      </ChanLoi>
+    )
+  }
+
+  // LINK VÀO THI `/t/<mã ca>` VÀ LINK XEM ĐIỂM `/d/<mã ca>` LÀ MÁY CỦA EM —
+  // TRẢ ĐÚNG MÀN LÀM BÀI, KHÔNG DỰNG VỎ APP CỦA THẦY.
+  //
+  // Thầy chốt 15/09: "không được phép nhảy app kiểu học sinh nhảy sang app
+  // giáo viên."
+  //
+  // LỖ ĐÃ BỊT: hai đường này không có vai `gv` nên `canHoi` là `false`, `khoa`
+  // thành `'da_mo'`, rồi CHÍNH VỎ APP QUẢN LÝ được dựng — chỉ ẩn thanh bên khi
+  // `screen === 'examtake'`. Em chỉ cách app của thầy đúng MỘT lần đổi `screen`:
+  // màn thi ném lỗi là `ChanLoi` mời "về màn chính" → `setScreen('examhub')` →
+  // em ngồi giữa app quản lý, đủ thanh bên, trên chính điện thoại của em.
+  //
+  // Nay hai đường ấy trả về ĐÚNG một màn, không vỏ, không thanh nào, và không
+  // có đường nào đi tiếp. Lỗi thì mời TẢI LẠI CHÍNH LINK ẤY.
+  if (docDuongVao(location.search, location.pathname).maCa || laXemDiem) {
+    return (
+      <ChanLoi o="Làm bài" veManChinh={() => location.reload()}>
+        <ExamTakeScreen />
       </ChanLoi>
     )
   }

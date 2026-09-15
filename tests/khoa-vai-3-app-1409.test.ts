@@ -181,12 +181,23 @@ describe('Nối vào app', () => {
     )
   })
 
-  it('màn chọn app đứng TRƯỚC mọi màn khác', () => {
-    expect(APP).toContain('if (chuaChonApp) {')
-    expect(APP.indexOf('if (chuaChonApp) {')).toBeLessThan(APP.indexOf('if (laPhieu) {'))
+  it('`/` trần là NGÕ CỤT, đứng TRƯỚC mọi màn khác', () => {
+    // ĐỔI 15/09: thầy bỏ màn chọn app — "có thể học sinh dùng 2 máy chọn 2 app
+    // khác nhau". Chọn app không phải việc của em; vai do LINK quyết.
+    expect(APP).toContain('if (khongCoVai) {')
+    expect(APP).toContain('<DungLinkScreen />')
+    expect(APP.indexOf('if (khongCoVai) {')).toBeLessThan(APP.indexOf('if (laPhieu) {'))
   })
 
-  it('màn chọn app KHÔNG hỏi mật khẩu của thầy', () => {
+  it('KHÔNG còn màn chọn app, và ngõ cụt không có link sang app nào', () => {
+    const man = doc('src/screens/DungLinkScreen.tsx')
+    expect(man).not.toContain('DUONG_APP')
+    expect(man).not.toMatch(/<a\b/)
+    expect(man).not.toContain('href')
+    expect(fs.existsSync(path.join(GOC, 'src/screens/ChonAppScreen.tsx'))).toBe(false)
+  })
+
+  it('ngõ cụt KHÔNG hỏi mật khẩu của thầy', () => {
     expect(APP).toContain('!canChonApp(location.search, location.pathname) && laManThayQuanLy(')
   })
 

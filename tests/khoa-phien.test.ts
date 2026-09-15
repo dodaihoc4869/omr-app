@@ -176,7 +176,7 @@ describe('Phép 9 — vai KHÔNG phải giáo viên thì không đụng gì', ()
     expect(hieuUng).toContain('khoiPhucPhien()')
     // Và màn mở khoá — nơi gọi `catPhien` — chỉ dựng khi `canHoi` đúng, vì
     // `khoa` khởi tạo là 'da_mo' cho mọi vai khác.
-    expect(app).toContain("useState<'dang_doc' | 'can_dat' | 'can_mo' | 'da_mo'>(() => (canHoi ? 'dang_doc' : 'da_mo'))")
+    expect(app).toContain("useState<'dang_doc' | 'chua_cap_quyen' | 'can_dat' | 'can_mo' | 'da_mo'>(() => (canHoi ? 'dang_doc' : 'da_mo'))")
   })
 
   it('module phiên KHÔNG tự chạy gì lúc nạp — phải gọi mới làm', async () => {
