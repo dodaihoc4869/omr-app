@@ -348,3 +348,32 @@ Với MỖI dáng viết của mỗi link: ra đúng một vai, KHÔNG ra hai va
 tự; và mọi trạng thái cờ trong máy cho CÙNG một kết quả.
 
 Gõ nhầm (`/gvx`, `/hsa`, `/phb`, `/g`, `/h`, `/p`) ⇒ không rơi vào app nào.
+
+## NGHIỆM THU BA LINK TRÊN BẢN LIVE (15/09)
+
+Mở từ trình duyệt CHƯA từng có mã bí mật — đúng hoàn cảnh máy của em.
+
+**Mở lần lượt ba link, HAI VÒNG, trong cùng một trình duyệt** (ca thầy lo nhất):
+
+| Lượt | Mở | Địa chỉ thành | App |
+|---|---|---|---|
+| 1 | `/hs` | `/hs` | HỌC SINH |
+| 2 | `/ph` | `/ph` | PHỤ HUYNH |
+| 3 | `/gv` | `/gv` | THẦY — khoá, đòi mã |
+| 4 | `/hs` | `/hs` | HỌC SINH |
+| 5 | `/ph` | `/ph` | PHỤ HUYNH |
+| 6 | `/gv` | `/gv` | THẦY — khoá, đòi mã |
+
+**Dáng link cũ và đường lạ:**
+
+| Mở | Địa chỉ thành | App |
+|---|---|---|
+| `/?vai=hocsinh` | `/hs` | HỌC SINH |
+| `/hoc-sinh` | `/hs` | HỌC SINH |
+| `/?vai=phuhuynh` | `/ph` | PHỤ HUYNH |
+| `/phu-huynh` | `/ph` | PHỤ HUYNH |
+| `/?vai=gv` | `/gv` | THẦY — khoá |
+| `/` | `/` | THẦY — khoá |
+| `/linh-tinh` | `/linh-tinh` | THẦY — khoá |
+
+Không lượt nào hiện màn đệm. Không lượt nào mở được app quản lý.
