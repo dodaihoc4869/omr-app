@@ -17,8 +17,8 @@
  *   Hải Quái   QUY    — mai vòm trên lưng, bốn chân ngắn, vây lưng
  *   Bảo Thần   LY     — kỳ lân bốn chân, một sừng, gai tinh thể trên vai
  *   Phong Lôi  PHƯỢNG — chim, mỏ, mào dựng, đuôi lông dài xoè
- *   Lôi Kim    MIÊU   — linh miêu hai chân, chân dài, chỏm tóc dựng
- *   Mộc Tinh   GẤU    — gấu bốn chân mập, lá vai, lông dày nhất
+ *   Lôi Kim    HỔ       — hổ vằn bốn chân, vai u, nanh dài, vuốt sấm
+ *   Mộc Tinh   ĐẠI BÀNG — cánh xoè lớn, mỏ quặp, chùm lông gáy, móng vuốt
  *
  * "Lông lá nhiều hơn" làm bằng hai núm: `dayLong` (bề dày bộ lông) và số lớp vỏ
  * — nâng chung cho cả sáu, rồi mỗi con lệch thêm một chút theo tính cách.
@@ -38,10 +38,10 @@
  *   quy    rùa       mai vòm to trên lưng, thân thấp bè, bốn chân ngắn
  *   ly     kỳ lân    bốn chân, thân nằm ngang, cổ vươn, một sừng giữa trán
  *   phuong phượng    chim: thân trứng đứng, mỏ, mào, đuôi lông dài xoè
- *   mieu   linh miêu hai chân, thân thon cao, chân dài, dáng chồm tới
- *   gau    gấu       bốn chân mập, thân tròn thấp, đầu gục xuống
+ *   ho     hổ        bốn chân vằn, vai u, nanh dài, vuốt thép, đuôi dày
+ *   daiBang đại bàng  cánh xoè lớn, mỏ quặp, chùm lông gáy, móng vuốt
  */
-export type KhungXuong = 'long' | 'quy' | 'ly' | 'phuong' | 'mieu' | 'gau'
+export type KhungXuong = 'long' | 'quy' | 'ly' | 'phuong' | 'ho' | 'daiBang'
 
 /** Kiểu tai — quyết định bóng đổ của đầu, thứ mắt nhận ra đầu tiên. */
 export type KieuTai = 'tron' | 'nhon' | 'vay' | 'dai' | 'chop' | 'la'
@@ -71,7 +71,7 @@ export interface DangThu {
 }
 
 const MAC_DINH: DangThu = {
-  khung: 'gau',
+  khung: 'ho',
   coDau: [1.02, 0.96, 0.98],
   coThan: [0.74, 0.66, 0.7],
   yThan: -0.74,
@@ -114,15 +114,15 @@ export const DANG_THU: Record<string, DangThu> = {
   },
   // ĐIỆN HOÁ — đầu vừa, thân gọn, tai chóp nhọn, chỏm tóc dựng đứng. Tinh nghịch.
   loi_kim: {
-    khung: 'mieu',
-    coDau: [0.98, 0.9, 0.92], coThan: [0.6, 0.82, 0.58], yThan: -0.66,
+    khung: 'ho',
+    coDau: [0.86, 0.82, 0.96], coThan: [0.74, 0.64, 1.02], yThan: -0.78,
     kieuTai: 'chop', coMom: 1.0, dayLong: 0.26, themLop: 3,
     netKy: 'chomToc', soDotDuoi: 4,
   },
   // HỮU CƠ — tròn ũm, tai lá bè, lông dày nhất. Dáng hiền lành.
   moc_tinh: {
-    khung: 'gau',
-    coDau: [1.16, 1.06, 1.04], coThan: [0.94, 0.7, 0.92], yThan: -0.84,
+    khung: 'daiBang',
+    coDau: [0.68, 0.7, 0.78], coThan: [0.66, 0.9, 0.66], yThan: -0.72,
     kieuTai: 'la', coMom: 0.94, dayLong: 0.34, themLop: 4,
     netKy: 'laVai', soDotDuoi: 3,
   },

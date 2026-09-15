@@ -982,12 +982,15 @@ export default function ThanThuHoaHocGame({
       daHoi.map((q) => dsCauCuaEm.find((c) => c.qid === q)?.chuyenDe ?? '').filter((x) => x !== ''),
     )
     const kho: CauUngVien[] = dsCauCuaEm.map((c) => ({
-      qid: c.qid, sao: c.sao, chuyenDe: c.chuyenDe, tungSai: c.tungSai,
+      qid: c.qid, sao: c.sao, chuyenDe: c.chuyenDe, tungSai: c.tungSai, doDai: c.doDai,
     }))
     const kq = rutCauChoTang({
       kho,
       tang,
       saoMucTieu: saoMucTieuTheoTang(tang),
+      // Thầy chốt 15-09: *"càng tầng cao câu càng khó càng dài"*. Tầng 1 nhắm
+      // câu ngắn nhất kho của em, tầng 999 nhắm câu dài nhất.
+      daiMucTieu: saoMucTieuTheoTang(tang) / 2,
       lichSu: hoSoRef.current.lichSuThap,
       daHoiLuotNay: daHoi,
       chuyenDeDaGap,

@@ -38,6 +38,12 @@ export interface CauSaiTho {
   dangMa?: string
   imageDataUrl?: string
   hinhAnh?: unknown
+  /** Ảnh THÂN CÂU — khác hẳn ảnh từng phương án. */
+  thanCauImg?: unknown
+  /** Ảnh của từng phương án A B C D, đúng thứ tự. */
+  choiceImgs?: unknown[]
+  /** Bảng biểu: mảng hàng, mỗi hàng là mảng ô. */
+  table?: unknown[]
   /** SỐ SAO thầy gắn trong kho đề (`can_chua.sao`): 0 · 1 · 2. */
   sao?: number
   /** Em làm ĐÚNG câu này hay không. Chỉ có ở lệnh `hsCauDaThi`. */
@@ -74,6 +80,22 @@ export interface CauHoiCuaEm extends CauHoi {
   sao: 0 | 1 | 2
   /** Em từng làm SAI câu này chưa. Câu từng sai đáng ôn hơn câu làm đúng. */
   tungSai: boolean
+  /** Ảnh thân câu — rỗng nghĩa là câu không có ảnh. */
+  anhThanCau: string
+  /** Ảnh của từng phương án; phần tử rỗng nghĩa là phương án ấy không có ảnh. */
+  anhPhuongAn: string[]
+  /** Ảnh chèn giữa bài, giữ nguyên `viTri` thầy đặt. */
+  anhXen: AnhXen[]
+  /** Bảng biểu của câu; rỗng nghĩa là câu không có bảng. */
+  bang: string[][]
+  /** Tổng số ký tự đề + bốn phương án — dùng cho luật "tầng cao câu dài hơn". */
+  doDai: number
+}
+
+/** Một ảnh chèn giữa bài. `viTri` < 0 nghĩa là không rõ chỗ, xếp cuối thân câu. */
+export interface AnhXen {
+  url: string
+  viTri: number
 }
 
 export type LyDoBo =
@@ -135,11 +157,48 @@ export function tenDangCua(c: CauSaiTho): { ma: string; ten: string } {
   return { ma: maPhu, ten: ten || maPhu }
 }
 
-function coAnh(c: CauSaiTho): boolean {
-  if (typeof c.imageDataUrl === 'string' && c.imageDataUrl !== '') return true
-  if (Array.isArray(c.hinhAnh)) return c.hinhAnh.length > 0
-  if (typeof c.hinhAnh === 'string') return c.hinhAnh !== ''
-  return false
+/**
+ * Gom ẢNH của một câu về đúng ba chỗ nó thuộc về.
+ *
+ * Thầy chốt 15-09: *"tất cả các câu có hình ảnh, bảng biểu đều mang vào game
+ * được, hiển thị đúng chuẩn cấu trúc"*. Bản trước VỨT THẲNG mọi câu có ảnh —
+ * mà ảnh là chỗ nhiều câu hay nhất nằm (đồ thị, sơ đồ phản ứng, bảng số liệu).
+ *
+ * BA CHỖ KHÁC NHAU, không được gộp — thầy đã bắt đúng lỗi này ngày 14-09 ở màn
+ * báo cáo: ảnh thân câu, ảnh từng phương án, và ảnh chèn giữa bài theo `viTri`.
+ */
+function gomAnh(c: CauSaiTho): { thanCau: string; theoPa: string[]; xen: AnhXen[] } {
+  const chuoiAnh = (x: unknown): string => (typeof x === 'string' && x.startsWith('data:') ? x : '')
+  const thanCau = chuoiAnh(c.thanCauImg) || chuoiAnh(c.imageDataUrl)
+  const theoPa = Array.isArray(c.choiceImgs)
+    ? c.choiceImgs.map((x) => chuoiAnh(x))
+    : []
+  const xen: AnhXen[] = []
+  if (Array.isArray(c.hinhAnh)) {
+    for (const h of c.hinhAnh) {
+      if (typeof h === 'string') { const u = chuoiAnh(h); if (u !== '') xen.push({ url: u, viTri: -1 }) }
+      else if (h !== null && typeof h === 'object') {
+        const o = h as Record<string, unknown>
+        const u = chuoiAnh(o.url ?? o.data ?? o.src ?? o.imageDataUrl)
+        if (u !== '') xen.push({ url: u, viTri: Number(o.viTri ?? o.vi_tri ?? -1) })
+      }
+    }
+  } else if (typeof c.hinhAnh === 'string') {
+    const u = chuoiAnh(c.hinhAnh)
+    if (u !== '') xen.push({ url: u, viTri: -1 })
+  }
+  return { thanCau, theoPa, xen }
+}
+
+/** Bảng biểu về đúng mảng hai chiều; ô rỗng giữ nguyên, không tự điền. */
+function gomBang(c: CauSaiTho): string[][] {
+  if (!Array.isArray(c.table)) return []
+  const ra: string[][] = []
+  for (const hang of c.table) {
+    if (!Array.isArray(hang)) continue
+    ra.push(hang.map((o) => String(o ?? '')))
+  }
+  return ra.length > 0 && ra.some((h) => h.length > 0) ? ra : []
 }
 
 /**
@@ -164,11 +223,11 @@ export function doiCauSaiThanhCauChoi(tho: readonly CauSaiTho[]): KetQuaDoiCau {
     const pa = Array.isArray(c.choices) ? c.choices.map((x) => String(x ?? '').trim()) : []
     if (pa.length !== 4 || pa.some((x) => x === '')) { bo('thieuPhuongAn'); continue }
 
+    const anh = gomAnh(c)
     const dap = String(c.dapAnDung ?? '').trim().toUpperCase()
     const iDung = CHU_CAI.indexOf(dap as 'A' | 'B' | 'C' | 'D')
     if (iDung < 0) { bo('dapAnKhongHopLe'); continue }
 
-    if (coAnh(c)) { bo('coAnh'); continue }
 
     const qid = String(c.qid ?? '').trim()
     const khoa = qid !== '' ? qid : `${String(c.maCa ?? '')}_${String(c.soCau ?? '')}`
@@ -208,6 +267,11 @@ export function doiCauSaiThanhCauChoi(tho: readonly CauSaiTho[]): KetQuaDoiCau {
       chuyenDe,
       bac: bacTheoMucDo(c.mucDo),
       sao: (() => { const n = Math.round(Number(c.sao)); return n === 1 || n === 2 ? n : 0 })(),
+      anhThanCau: anh.thanCau,
+      anhPhuongAn: anh.theoPa,
+      anhXen: anh.xen,
+      bang: gomBang(c),
+      doDai: de.length + pa.reduce((t, x) => t + x.length, 0),
       // Lệnh cũ `hsCauSai` chỉ trả câu SAI nên thiếu trường này ⇒ coi là đã sai.
       tungSai: c.dungSai === undefined ? true : c.dungSai !== true,
     })

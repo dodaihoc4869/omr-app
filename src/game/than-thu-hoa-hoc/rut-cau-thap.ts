@@ -38,6 +38,14 @@ export interface CauUngVien {
   chuyenDe: string
   /** Em từng làm SAI câu này chưa. Câu từng sai đáng ôn hơn câu làm đúng. */
   tungSai: boolean
+  /**
+   * Tổng ký tự đề + bốn phương án.
+   *
+   * Thầy chốt 15-09: *"càng tầng cao câu càng khó càng dài"*. Độ dài là một
+   * thang ĐỘC LẬP với sao: câu 2 sao vẫn có câu ngắn, câu 0 sao vẫn có câu dài
+   * lê thê. Muốn tầng cao vừa khó vừa dài thì phải cân cả hai.
+   */
+  doDai: number
 }
 
 /** Một dòng sổ câu đã hỏi ở tháp. Sống trong hồ sơ thần thú, đồng bộ đa máy. */
@@ -59,6 +67,14 @@ export const CAU_HINH_RUT = {
   UU_TIEN_CHUYEN_DE_MOI: 1.6,
   /** Sao lệch mục tiêu 1 đơn vị thì còn lại bấy nhiêu phần trọng số. */
   PHAT_LECH_SAO: 0.35,
+  /**
+   * Trọng số của độ dài so với sao.
+   *
+   * Sao vẫn là thang chính (thầy chốt "khó là những câu 2 sao"); độ dài chỉ
+   * nghiêng cán cân trong số câu cùng sao. 0,45 nghĩa là lệch hết cỡ về độ dài
+   * cũng chỉ bằng nửa một bậc sao — không để câu dài mà dễ chen lên tầng cao.
+   */
+  TRONG_SO_DAI: 0.45,
 } as const
 
 /** Vì sao lượt rút này phải nới lỏng — màn hình PHẢI nói ra, cấm nới lặng lẽ. */
@@ -94,6 +110,10 @@ export function diemUuTien(
   saoMucTieu: number,
   soLanHoi: number,
   chuyenDeDaGap: ReadonlySet<string>,
+  /** Độ dài mục tiêu quy về thang 0…1; bỏ trống thì không cân độ dài. */
+  daiMucTieu?: number,
+  /** Độ dài của câu này quy về thang 0…1 trong chính kho của em. */
+  daiCuaCau?: number,
 ): number {
   // Gần mục tiêu sao thì nặng ký. Lệch 2 sao còn 0,35² ≈ 0,12 — vẫn có cửa,
   // không loại hẳn, nên kho lệch cỡ nào cũng rút được.
@@ -103,7 +123,28 @@ export function diemUuTien(
   d /= 1 + soLanHoi * 1.5
   if (c.tungSai) d *= CAU_HINH_RUT.UU_TIEN_TUNG_SAI
   if (!chuyenDeDaGap.has(c.chuyenDe)) d *= CAU_HINH_RUT.UU_TIEN_CHUYEN_DE_MOI
+  // Độ dài: cùng cách chấm như sao, nhưng nhẹ ký hơn.
+  if (daiMucTieu !== undefined && daiCuaCau !== undefined) {
+    const lechDai = Math.abs(daiCuaCau - daiMucTieu)
+    d *= Math.pow(CAU_HINH_RUT.PHAT_LECH_SAO, lechDai * 2 * CAU_HINH_RUT.TRONG_SO_DAI)
+  }
   return d
+}
+
+/**
+ * Xếp hạng độ dài của từng câu trong kho, quy về 0…1.
+ *
+ * Dùng THỨ HẠNG chứ không dùng số ký tự chia cho hằng số: kho của em này toàn
+ * câu ngắn, kho em kia toàn câu dài — chia cho hằng số thì một trong hai em
+ * không bao giờ chạm được đầu thang.
+ */
+export function thangDoDai(kho: readonly CauUngVien[]): Map<string, number> {
+  const sap = [...kho].sort((a, b) => a.doDai - b.doDai)
+  const m = new Map<string, number>()
+  for (const [i, c] of sap.entries()) {
+    m.set(c.qid, sap.length <= 1 ? 0.5 : i / (sap.length - 1))
+  }
+  return m
 }
 
 /** Bốc một phần tử theo trọng số. `ngauNhien` trả về 0…1. */
@@ -130,6 +171,8 @@ export function rutCauChoTang(p: {
   daHoiLuotNay: readonly string[]
   /** Chuyên đề đã gặp trong lượt leo này. */
   chuyenDeDaGap: ReadonlySet<string>
+  /** Độ dài mục tiêu 0…1 theo tầng. Tầng 1 nhắm câu ngắn, tầng 999 nhắm câu dài. */
+  daiMucTieu?: number
   ngauNhien: () => number
 }): KetQuaRut {
   const { kho, saoMucTieu, lichSu, daHoiLuotNay, chuyenDeDaGap, ngauNhien } = p
@@ -144,8 +187,13 @@ export function rutCauChoTang(p: {
   )
   const trongLuot = new Set(daHoiLuotNay)
 
+  const thangDai = thangDoDai(kho)
   const chamDiem = (ds: readonly CauUngVien[]) =>
-    ds.map((x) => ({ x, w: diemUuTien(x, saoMucTieu, soLan(x.qid), chuyenDeDaGap) }))
+    ds.map((x) => ({
+      x,
+      w: diemUuTien(x, saoMucTieu, soLan(x.qid), chuyenDeDaGap,
+        p.daiMucTieu, thangDai.get(x.qid)),
+    }))
 
   // Lớp 1 — câu chưa hỏi trong lượt này VÀ không nằm trong 40 câu gần nhất.
   const lop1 = kho.filter((c) => !trongLuot.has(c.qid) && !ganDay.has(c.qid))
