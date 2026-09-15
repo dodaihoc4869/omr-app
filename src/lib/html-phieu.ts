@@ -867,11 +867,27 @@ body.chua-nop #mo-het, body.chua-nop #chi-de, body.chua-nop #pdf-giai, body.chua
    mang lớp dung, rồi luật "đang chọn" mang !important đặt ngay sau và thắng.
    Ô nào em chọn cũng ra CÙNG MỘT MÀU, đúng hay sai chưa nói gì.
    (Cấm dấu huyền ngược trong khối này: cả khối nằm trong một chuỗi mẫu.) */
-body.chua-nop .q-opt.dung { background: #f8fafc !important; border-color: var(--vien) !important; color: var(--muc-2) !important; font-weight: 400 !important; }
-body.chua-nop .q-opt.dung .q-opt-letter { background: var(--vien-dam) !important; }
-body.chua-nop .tf-badge.dung { background: #f1f5f9 !important; color: var(--rat-nhat) !important; border-color: var(--vien) !important; }
+/* 15/09 - BO HAN LOI "TO LAI CHO TRUNG HOA".
+   Ba luat cu o day ve lai o dap an bang mot bo mau KHAC bo mau cua o thuong:
+   nen #f8fafc trong khi o thuong la #ffffff, chu var(--muc-2) trong khi o
+   thuong la var(--muc), va chu cai nen var(--vien-dam) trong khi o thuong la
+   #f1f5f9. Bon cho lech mau la bon cho lo dap an - thay chup duoc 15/09: bam
+   "Hien de" ma o B va o D van khac hen ba o con lai.
+   Khong the va lai cho giong bang tay: them mot thuoc tinh moi vao .q-opt.dung
+   la lo lai. Nay LOP "dung" KHONG CON TRONG THE khi dang giau (ham
+   dongBoLoDapAn o phan mã lệnh go han lop ra khoi DOM), nen khong con luat nao
+   de ve. Cam them luat body.chua-nop .q-opt.dung / body.chi-de .q-opt.dung.
+   (Cam dau huyen nguoc trong khoi nay: ca khoi nam trong mot chuoi mau.) */
 body.chua-nop .sa-answer { display: none !important; }
 body.chua-nop .sa-blank { display: block !important; }
+/* DAP AN VIET THANG RA CHU cung phai giau, khong chi rieng o to mau:
+   - .lo-dap la menh de "dap an dung X" trong hop nhac cua phieu de-cua-em;
+   - .lam-ket la chu "Dung"/"Sai" gan vao tung the sau khi nop, noi gian tiep
+     o em chon la dung hay sai.
+   Hai cho nay nam NGOAI khoi loi giai nen luat giau loi giai khong voi toi.
+   (Cam dau huyen nguoc trong khoi nay: ca khoi nam trong mot chuoi mau.) */
+body.chua-nop .lo-dap, body.chi-de .lo-dap { display: none !important; }
+body.chi-de .lam-ket { display: none !important; }
 .giai-khoa {
   margin: 0 0 10px; padding: 10px 14px; border-radius: 12px; background: #fdf6e7;
   color: #8a6d1f; font-size: 12.5px; font-weight: 600; line-height: 1.5;
@@ -879,9 +895,8 @@ body.chua-nop .sa-blank { display: block !important; }
 body:not(.chua-nop) .giai-khoa { display: none; }
 /* Chế độ "Hiện đề" cũng giấu đáp án — và cũng phải chừa ô em đang chọn, cùng
    một lý do như khối chua-nop bên trên. */
-body.chi-de .q-opt.dung { background: #f8fafc !important; border-color: var(--vien) !important; color: var(--muc-2) !important; font-weight: 400 !important; }
-body.chi-de .q-opt.dung .q-opt-letter { background: var(--vien-dam) !important; }
-body.chi-de .tf-badge.dung { background: #f1f5f9 !important; color: var(--rat-nhat) !important; border-color: var(--vien) !important; }
+/* Xem ghi chu 15/09 o khoi chua-nop ben tren: lop "dung" bi go khoi DOM chu
+   khong to lai mau. (Cam dau huyen nguoc trong khoi nay.) */
 body.chi-de .q-card { border-left-color: var(--vien-dam) !important; }
 body.chi-de .sa-answer { display: none !important; }
 body.chi-de .sa-blank { display: block !important; }
@@ -986,7 +1001,14 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
       .map((pa, i) => {
         const dung = CHU_PA[i] === (c.dapAn || '').trim().toUpperCase()
         const laDaChonSai = Boolean(n && n.daChon && n.daChon.trim().toUpperCase() === CHU_PA[i] && !dung)
-        const lop = `q-opt${dung ? ' dung' : ''}${laDaChonSai ? ' sai' : ''}`
+        // LỚP `dung`/`sai` KHÔNG NẰM SẴN TRONG THẺ — xem `dongBoLoDapAn` dưới
+        // phần mã lệnh. Thẻ chỉ mang DẤU (`data-dung` / `data-sai`); khi nào
+        // được phép hiện đáp án thì mã lệnh mới gắn lớp vào. Nhờ vậy lúc giấu
+        // thì thẻ đúng và thẻ sai giống nhau TỪNG THUỘC TÍNH, không phải giống
+        // nhau nhờ một bộ mau to lai bang tay (thầy bắt 15/09: bấm "Hiện đề"
+        // mà ô đáp án vẫn khác màu).
+        const dau = `${dung ? ' data-dung="1"' : ''}${laDaChonSai ? ' data-sai="1"' : ''}`
+        const lop = 'q-opt'
         const anh = c.anhLuaChon?.[i]
         const noi = anh ? anhHtml(anh, 'pa', `Phương án ${CHU_PA[i]}`) : chuHtml(pa)
         // THẺ NÚT THẬT, không phải div gắn sự kiện (thầy chốt 08/09 sau bốn
@@ -997,8 +1019,8 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
         // vào là HTML sai chuẩn và trình duyệt tự cắt cấu trúc — đo được: cả
         // phương án phần I mất hẳn cú bấm.
         const trong = `<span class="q-opt-letter"><span class="ky">${CHU_PA[i]}</span></span><span class="q-opt-text">${noi}${hinhTaiViTri(c, `sau_pa_${CHU_PA[i]}`)}</span>`
-        if (!choLam) return `<div class="${lop}"><div class="q-opt-letter"><span class="ky">${CHU_PA[i]}</span></div><div class="q-opt-text">${noi}${hinhTaiViTri(c, `sau_pa_${CHU_PA[i]}`)}</div></div>`
-        return `<button type="button" class="${lop} lam-o" data-chon="${CHU_PA[i]}" role="radio" aria-checked="false">${trong}</button>`
+        if (!choLam) return `<div class="${lop}"${dau}><div class="q-opt-letter"><span class="ky">${CHU_PA[i]}</span></div><div class="q-opt-text">${noi}${hinhTaiViTri(c, `sau_pa_${CHU_PA[i]}`)}</div></div>`
+        return `<button type="button" class="${lop} lam-o"${dau} data-chon="${CHU_PA[i]}" role="radio" aria-checked="false">${trong}</button>`
       })
       .join('')
     than = `<div class="q-options${dai ? ' single-col' : ''}">${o}</div>`
@@ -1010,8 +1032,8 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
         const noi = anh ? anhHtml(anh, 'pa', `Ý ${CHU_Y[i]}`) : chuHtml(y)
         const oDS = (ds: 'd' | 's', ky: string, laDung: boolean) =>
           choLam
-            ? `<button type="button" class="tf-badge ${ds}${laDung ? ' dung' : ''} lam-o" data-chon="${ds === 'd' ? 'D' : 'S'}" role="radio" aria-checked="false" aria-label="${ky === 'Đ' ? 'Đúng' : 'Sai'} — ý ${CHU_Y[i]}"><span class="ky">${ky}</span></button>`
-            : `<div class="tf-badge ${ds}${laDung ? ' dung' : ''}"><span class="ky">${ky}</span></div>`
+            ? `<button type="button" class="tf-badge ${ds} lam-o"${laDung ? ' data-dung="1"' : ''} data-chon="${ds === 'd' ? 'D' : 'S'}" role="radio" aria-checked="false" aria-label="${ky === 'Đ' ? 'Đúng' : 'Sai'} — ý ${CHU_Y[i]}"><span class="ky">${ky}</span></button>`
+            : `<div class="tf-badge ${ds}"${laDung ? ' data-dung="1"' : ''}><span class="ky">${ky}</span></div>`
         return `<div class="tf-item"${choLam ? ` data-y="${CHU_Y[i]}"` : ''}><div class="tf-statement">${CHU_Y[i]}. ${noi}${hinhTaiViTri(c, `sau_y_${CHU_Y[i]}`)}</div><div class="tf-o">${oDS('d', 'Đ', dung[i])}${oDS('s', 'S', !dung[i])}</div></div>`
       })
       .join('')
@@ -1040,9 +1062,12 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
 
   const oLamLai =
     n && n.laDeCuaEm
-      ? `<div class="lam-lai"><b>Em chọn ${n.daChon ? thoat(n.daChon) : 'chưa trả lời'}${
+      ? // Mệnh đề "đáp án đúng X" là ĐÁP ÁN VIẾT THẲNG RA CHỮ, nằm ngoài khối
+        // lời giải nên chế độ "Hiện đề" không giấu được. Tách vào một span
+        // riêng để giấu cùng lúc với mọi thứ khác (thầy bắt 15/09).
+        `<div class="lam-lai"><b>Em chọn ${n.daChon ? thoat(n.daChon) : 'chưa trả lời'}<span class="lo-dap">${
           n.dapAnDung || c.dapAn ? ` · đáp án đúng ${thoat(n.dapAnDung || c.dapAn)}` : ''
-        }.</b> Đọc lời giải bên dưới rồi tự làm lại câu này.</div>`
+        }</span>.</b> Đọc lời giải bên dưới rồi tự làm lại câu này.</div>`
       : n && n.laLamLai
       ? `<div class="lam-lai"><b>Lần thi vừa rồi em chọn ${n.daChon ? thoat(n.daChon) : 'sai câu này'}.</b>${
           n.viSaoSai ? ` ${thoat(n.viSaoSai)}` : ' Em xem lại lời giải bên dưới rồi tự làm lại từ đầu.'
@@ -1490,8 +1515,35 @@ export const JS_PHIEU = `
    * Một lớp "chi-de" dùng cho CẢ màn hình lẫn bản in, nên đang xem kiểu nào
    * thì lưu ra PDF đúng kiểu đó. Trước đây chỉ có bản in giấu được, còn trên
    * màn hình em mở phiếu ra là thấy sẵn đáp án. */
+  /** GO LOP DAP AN RA KHOI DOM KHI DANG GIAU.
+   *
+   * Thay bat 15/09: "trong de khac phuc loi sai khi bam nut chi hien de thi
+   * dap an van bi lo vi khac mau". Dung: ban cu giau bang cach TO LAI o dap an
+   * cho "trung hoa", ma bo mau to lai khong trung khop bo mau cua o thuong -
+   * nen #f8fafc so voi #ffffff, chu var(--muc-2) so voi var(--muc), chu cai
+   * nen var(--vien-dam) so voi #f1f5f9. Nhin la thay ngay o nao la dap an.
+   *
+   * Khong to lai nua. The mang DAU data-dung / data-sai; lop "dung"/"sai" chi
+   * duoc gan khi duoc phep hien. Dang giau thi lop khong ton tai, nen khong
+   * luat CSS nao - hom nay hay mai sau - ve khac duoc o do.
+   * (Cam dau huyen nguoc trong khoi nay: ca khoi nam trong mot chuoi mau.)
+   *
+   * Goi ham nay o MOI cho doi trang thai giau/hien: bat tat "Hien de", nop bai
+   * xong, va truoc khi in. */
+  function dongBoLoDapAn() {
+    var an = document.body.classList.contains('chi-de') || document.body.classList.contains('chua-nop');
+    var ds = document.querySelectorAll('[data-dung],[data-sai]');
+    for (var i = 0; i < ds.length; i++) {
+      var e = ds[i];
+      if (e.getAttribute('data-dung') === '1') e.classList.toggle('dung', !an);
+      if (e.getAttribute('data-sai') === '1') e.classList.toggle('sai', !an);
+    }
+  }
+  window.addEventListener('beforeprint', dongBoLoDapAn);
+
   function datChiDe(bat_) {
     document.body.classList.toggle('chi-de', !!bat_);
+    dongBoLoDapAn();
     if (nutChiDe) nutChiDe.setAttribute('aria-pressed', bat_ ? 'true' : 'false');
     if (nutChiDe) nutChiDe.classList.toggle('dang-mo-het', !!bat_);
     // ĐÓNG HẾT thẻ đang mở: thẻ đang mở mang lớp "mo", mà luật của lớp đó
@@ -1523,6 +1575,8 @@ export const JS_PHIEU = `
     } else {
       document.body.classList.remove('chi-de');
     }
+    // Ban in cung phai theo dung trang thai giau/hien nhu tren man hinh.
+    dongBoLoDapAn();
     window.print();
     // Trả màn hình về đúng như trước khi bấm. Chrome trả quyền ngay sau
     // print(), Safari chậm hơn — chờ một nhịp cho chắc.
@@ -1559,6 +1613,9 @@ export const JS_PHIEU = `
   });
   // Phiếu CHỈ CÓ ĐỀ: bật sẵn chế độ chỉ đề, khỏi phải bấm.
   if (!nutChiDe && !document.getElementById('mo-het')) document.body.classList.add('chi-de');
+  // Gan lop dap an theo dung trang thai luc mo trang. Ban dung HTML KHONG gan
+  // san lop nao, nen thieu loi goi nay la phieu da nop cung khong hien dap an.
+  dongBoLoDapAn();
 
   demLai();
 
@@ -1856,6 +1913,7 @@ export const JS_PHIEU = `
           // chỗ đang bị CSS giấu. (Cấm dấu huyền ngược trong khối này: cả
           // khối nằm trong một chuỗi mẫu.)
           document.body.classList.remove('chua-nop');
+          dongBoLoDapAn();
           for (var i = 0; i < tatCa.length; i++) bat(tatCa[i], true);
           demLai();
         }

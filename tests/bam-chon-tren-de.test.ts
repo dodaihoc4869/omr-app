@@ -117,13 +117,25 @@ describe('Ô ĐÁP ÁN ĐÚNG: chọn xong phải ĐỔI MÀU, nhưng chưa ch�
   // Hợp đồng mới MẠNH HƠN, không phải nhẹ hơn: giấu áp cho MỌI ô dung, và màu
   // ô-đang-chọn không được phụ thuộc lớp dung. Xem khối "BẤM KHÔNG ĐƯỢC LỘ ĐÁP
   // ÁN" ở cuối tệp.
-  it('luật giấu đáp án áp cho MỌI ô đáp án đúng, ở CẢ hai chế độ giấu', () => {
+  // HỢP ĐỒNG MẠNH HƠN NỮA TỪ 15/09 — xem `tests/lo-dap-an-chi-de-1509.test.ts`.
+  //
+  // Bản 08/09 giấu bằng luật CSS TÔ LẠI ô `dung` cho trung hoà. Thầy chụp ảnh
+  // 15/09: bấm "Hiện đề" rồi mà ô đáp án vẫn khác ba ô kia — vì bộ màu tô lại
+  // lệch bộ màu ô thường ở bốn thuộc tính (nền, chữ, nền chữ cái, độ đậm).
+  // Không vá được bằng cách chép màu cho khớp: thêm một thuộc tính mới vào
+  // `.q-opt.dung` là lộ lại.
+  //
+  // Nay lớp `dung` KHÔNG nằm trong DOM lúc đang giấu. Thẻ chỉ mang dấu
+  // `data-dung`, và `dongBoLoDapAn` gắn/gỡ lớp theo trạng thái. Không còn luật
+  // nào để lệch, và luật viết sau này cũng không bám vào đâu được.
+  it('không còn luật nào tô ô đáp án khi đang giấu — lớp bị gỡ khỏi DOM', () => {
     const h = dungPhieu(tt, [cau('q1', 'I'), cau('q2', 'II')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x' } })
+    expect(h).toContain('function dongBoLoDapAn()')
+    expect(h).toContain("classList.toggle('dung', !an)")
     for (const lop of ['chua-nop', 'chi-de']) {
-      expect(h).toContain(`body.${lop} .q-opt.dung { background`)
-      expect(h).toContain(`body.${lop} .q-opt.dung .q-opt-letter { background`)
-      expect(h).toContain(`body.${lop} .tf-badge.dung { background`)
-      // Bộ chọn :not(...) chính là thứ đã làm lộ đáp án — cấm quay lại.
+      expect(h).not.toContain(`body.${lop} .q-opt.dung { background`)
+      expect(h).not.toContain(`body.${lop} .tf-badge.dung { background`)
+      // Bộ chọn :not(...) chính là thứ đã làm lộ đáp án 08/09 — cấm quay lại.
       expect(h).not.toContain(`body.${lop} .q-opt.dung:not([aria-checked="true"])`)
       expect(h).not.toContain(`body.${lop} .tf-badge.dung:not([aria-checked="true"])`)
     }
@@ -131,9 +143,12 @@ describe('Ô ĐÁP ÁN ĐÚNG: chọn xong phải ĐỔI MÀU, nhưng chưa ch�
 
   it('BẤM THẬT vào đúng ô đáp án đúng: aria bật, đếm lên, lưu đúng', () => {
     moPhieu(dungPhieu(tt, [cau('q1', 'I')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x' } }))
-    // Câu mẫu có đáp án 'A', nên ô A mang lớp `dung` — đúng ca thầy gặp.
+    // Câu mẫu có đáp án 'A'. Phiếu nộp được mở ở trạng thái `chua-nop`, nên
+    // từ 15/09 ô A mang DẤU `data-dung` mà KHÔNG mang lớp `dung` — lớp chỉ
+    // quay lại sau khi nộp.
     const oA = document.querySelector<HTMLElement>('.q-card[data-qid="q1"] .q-opt.lam-o[data-chon="A"]')!
-    expect(oA.className).toContain('dung')
+    expect(oA.getAttribute('data-dung')).toBe('1')
+    expect(oA.className).not.toContain('dung')
     oA.click()
     expect(oA.getAttribute('aria-checked')).toBe('true')
     expect(document.getElementById('nop-dem')?.textContent).toBe('1')
@@ -231,12 +246,13 @@ describe('MỘT CÚ CHẠM = MỘT LẦN CHỌN, trên mọi máy', () => {
 // đặt SAU và thắng. Hai yêu cầu (bấm phải đổi màu; không lộ đáp án) chỉ cùng
 // thoả khi màu ô-đang-chọn KHÔNG phụ thuộc lớp dung.
 describe('BẤM KHÔNG ĐƯỢC LỘ ĐÁP ÁN', () => {
-  it('luật giấu áp cho MỌI ô dung, KHÔNG chừa ô đang chọn', () => {
+  // 15/09: giấu không còn bằng luật CSS mà bằng cách GỠ LỚP khỏi DOM.
+  it('đang giấu thì lớp dung không tồn tại, nên không ô nào tô được', () => {
     const h = dungPhieu(tt, [cau('q1', 'I'), cau('q2', 'II')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x' } })
+    expect(h).toContain("querySelectorAll('[data-dung],[data-sai]')")
     for (const lop of ['chua-nop', 'chi-de']) {
-      expect(h).toContain(`body.${lop} .q-opt.dung {`)
-      expect(h).toContain(`body.${lop} .tf-badge.dung {`)
-      // Bộ chọn :not(...) là đúng thứ đã làm lộ đáp án — cấm quay lại.
+      expect(h).not.toContain(`body.${lop} .q-opt.dung {`)
+      expect(h).not.toContain(`body.${lop} .tf-badge.dung {`)
       expect(h).not.toContain(`body.${lop} .q-opt.dung:not([aria-checked="true"])`)
       expect(h).not.toContain(`body.${lop} .tf-badge.dung:not([aria-checked="true"])`)
     }
@@ -253,9 +269,10 @@ describe('BẤM KHÔNG ĐƯỢC LỘ ĐÁP ÁN', () => {
       /body\.chua-nop \.tf-badge\.lam-o\[aria-checked="true"\],\s*\n\s*body\.chi-de \.tf-badge\.lam-o\[aria-checked="true"\] \{[^}]*!important[^}]*\}/,
     ]
     for (const re of khoi) expect(h, `thiếu khối: ${re}`).toMatch(re)
-    // Phải đứng SAU khối giấu thì mới thắng.
-    expect(h.search(khoi[0])).toBeGreaterThan(h.indexOf('body.chua-nop .q-opt.dung {'))
-    expect(h.search(khoi[0])).toBeGreaterThan(h.indexOf('body.chi-de .q-opt.dung {'))
+    // Phải đứng SAU khối giấu `.sa-answer`/`.lo-dap` thì mới thắng mọi luật
+    // giấu còn lại (luật tô lại ô `dung` đã bỏ hẳn 15/09).
+    expect(h.search(khoi[0])).toBeGreaterThan(h.indexOf('body.chua-nop .sa-answer'))
+    expect(h.search(khoi[0])).toBeGreaterThan(h.indexOf('body.chi-de .sa-answer'))
     // Và màu ô-đang-chọn KHÔNG được nhắc tới lớp dung — nhắc là lại phụ thuộc
     // đúng/sai, tức lại lộ đáp án.
     for (const re of khoi) expect(h.match(re)![0]).not.toContain('dung')
@@ -265,8 +282,13 @@ describe('BẤM KHÔNG ĐƯỢC LỘ ĐÁP ÁN', () => {
     moPhieu(dungPhieu(tt, [cau('q1', 'I')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x' } }))
     const oA = document.querySelector<HTMLElement>('.q-card[data-qid="q1"] .q-opt.lam-o[data-chon="A"]')!
     const oB = document.querySelector<HTMLElement>('.q-card[data-qid="q1"] .q-opt.lam-o[data-chon="B"]')!
-    expect(oA.className).toContain('dung')
+    // 15/09: lúc chưa nộp, ô đúng và ô sai KHÔNG khác nhau lớp nào cả — khác
+    // nhau đúng một thuộc tính `data-dung` mà CSS không bám vào.
+    expect(oA.getAttribute('data-dung')).toBe('1')
+    expect(oB.getAttribute('data-dung')).toBeNull()
+    expect(oA.className).not.toContain('dung')
     expect(oB.className).not.toContain('dung')
+    expect(oA.className).toBe(oB.className)
     oA.click()
     expect(oA.getAttribute('aria-checked')).toBe('true')
     oB.click()

@@ -11,6 +11,7 @@
     "lint": "oxlint",
     "check:mau": "node scripts/check-mau.mjs",
     "preview": "vite preview",
+    "kiem:lo-dap-an": "vitest run tests/lo-dap-an-chi-de-1509.test.ts && node scripts/kiem-lo-dap-an.mjs",
     "kiem:hien-thi": "vitest run tests/xuat-dom-hien-thi.test.tsx && vite build && node scripts/kiem-13.mjs",
     "kiem:sw": "node scripts/kiem-sw.mjs"
   },

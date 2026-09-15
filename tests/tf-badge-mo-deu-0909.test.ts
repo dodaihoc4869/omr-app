@@ -109,11 +109,23 @@ describe('LƯỚI CHẮN: sửa kiểu chữ KHÔNG được để lộ đáp á
     expect(new Set(d.map(chuan)).size).toBe(1)
   })
 
-  it('trước khi nộp: luật giấu đè lên MỌI ô mang đáp án, không chừa ô nào', () => {
+  // ĐỔI CÁCH GIẤU 15/09 — xem `tests/lo-dap-an-chi-de-1509.test.ts`.
+  //
+  // Bản cũ giấu bằng luật CSS TÔ LẠI ô đáp án cho trung hoà. Bộ màu tô lại
+  // không trùng bộ màu ô thường, nên bấm "Hiện đề" rồi vẫn nhìn ra đáp án —
+  // thầy chụp ảnh bắt được 15/09. Cách ấy còn không vá được: thêm một thuộc
+  // tính mới vào `.tf-badge.dung` là lộ lại.
+  //
+  // Nay lớp `dung` KHÔNG nằm trong DOM lúc đang giấu, nên không luật CSS nào
+  // vẽ khác được — kể cả luật viết sau này.
+  it('trước khi nộp: lớp đáp án bị GỠ KHỎI DOM chứ không phải tô lại', () => {
     const h = phieu({ anGiai: true })
-    // Ba luật giấu của thân "chi-de" phải còn đủ, kèm !important.
-    expect(h).toMatch(/body\.chi-de \.tf-badge\.dung \{[^}]*color: var\(--rat-nhat\) !important/)
-    expect(h).toMatch(/body\.chua-nop \.tf-badge\.dung \{[^}]*color: var\(--rat-nhat\) !important/)
+    expect(h).toContain('function dongBoLoDapAn()')
+    expect(h).toContain("classList.toggle('dung', !an)")
+    expect(h).toMatch(/var an = document\.body\.classList\.contains\('chi-de'\) \|\| document\.body\.classList\.contains\('chua-nop'\)/)
+    // Không còn luật tô lại nào — đó mới là thứ từng làm lộ.
+    expect(h).not.toMatch(/body\.chi-de \.tf-badge\.dung \{/)
+    expect(h).not.toMatch(/body\.chua-nop \.tf-badge\.dung \{/)
   })
 
   it('màu xanh/đỏ của đáp án chỉ sống trong thẻ ĐÃ MỞ hoặc bản in', () => {

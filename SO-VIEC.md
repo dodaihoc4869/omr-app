@@ -614,3 +614,63 @@ trả lời ấy chỉ có thể đến từ máy chủ, tức máy sạch KHÔN
 được địa chỉ. Đúng chỗ bản cũ chết câm.
 
 Mã commit: `b91b0f2`. Lùi bản phát hành: `git revert b91b0f2`.
+
+---
+
+# SỔ VIỆC — 15/09 lượt 15 · HIỆN ĐỀ KHÔNG ĐƯỢC LỘ ĐÁP ÁN
+
+- [x] "trong đề khắc phục lỗi sai khi bấm nút chỉ hiện đề thì đáp án vẫn bị lộ
+  vì khác màu, sửa triệt để và đồng bộ tất cả mọi chỗ, tất cả các app"
+  | bằng chứng: `node scripts/kiem-lo-dap-an.mjs` → ĐẠT 9/9 (Chromium thật, so getComputedStyle)
+- [x] Nghiệm thu 8 cửa  | bằng chứng: bảng cuối mục này
+- [ ] Phát hành  | bằng chứng: (chưa có)
+
+## Nguyên nhân gốc
+
+Bản cũ giấu đáp án bằng cách **TÔ LẠI** ô đáp án cho "trung hoà". Bộ màu tô lại
+không trùng bộ màu ô thường:
+
+| thuộc tính | ô thường | ô đáp án lúc "Hiện đề" |
+|---|---|---|
+| nền | `#ffffff` | `#f8fafc` |
+| chữ | `var(--muc)` | `var(--muc-2)` |
+| nền chữ cái | `#f1f5f9` | `var(--vien-dam)` |
+| độ đậm | 500 | 400 |
+
+Bốn chỗ lệch là bốn chỗ lộ. Và cách ấy **không vá được**: thêm một thuộc tính
+mới vào `.q-opt.dung` là lộ lại. Đây là lý do phải đổi cơ chế chứ không chép
+màu cho khớp.
+
+Hai chỗ nữa viết thẳng đáp án ra CHỮ, nằm NGOÀI khối lời giải nên luật giấu lời
+giải không với tới: `· đáp án đúng C` trong hộp nhắc của phiếu đề-của-em, và
+nhãn `Đúng`/`Sai` gắn vào từng thẻ sau khi nộp.
+
+## Đã sửa — một chỗ duy nhất, ba app dùng chung
+
+Mọi phiếu của cả ba app đều do `src/lib/html-phieu.ts` dựng, nên sửa một chỗ là
+đồng bộ tất cả.
+
+| Sửa gì |
+|---|
+| Thẻ chỉ mang DẤU `data-dung` / `data-sai`; lớp `dung`/`sai` KHÔNG nằm sẵn trong mã nguồn |
+| Hàm `dongBoLoDapAn()` gắn lớp khi được phép hiện, GỠ RA khi đang giấu — gọi ở 5 chỗ: bật/tắt "Hiện đề", lưu PDF, lúc mở trang, nộp bài xong, và `beforeprint` |
+| Bỏ hẳn 6 luật CSS "tô lại cho trung hoà" — không còn luật nào để lệch |
+| `· đáp án đúng X` vào `<span class="lo-dap">`, giấu cùng lúc với mọi thứ khác |
+| Nhãn `Đúng`/`Sai` sau khi nộp cũng giấu trong chế độ "Hiện đề" |
+| `scripts/kiem-lo-dap-an.mjs` + `npm run kiem:lo-dap-an` — phép kiểm chấm bằng số, không bằng mắt |
+
+Bốn tệp phép kiểm cũ chốt luật cũ, đã sửa kèm ghi chú ngày: `html-phieu`,
+`tf-badge-mo-deu-0909`, `nop-phieu-khac-phuc`, `bam-chon-tren-de`.
+
+## Tám cửa — 15/09 16:44
+
+| Cửa | Lệnh | Kết quả | Đạt/Trượt |
+|---|---|---|---|
+| Kiểu app | `npx tsc -b` | mã thoát 0 | Đạt |
+| Kiểu máy chủ | `npx tsc -p server/tsconfig.json --noEmit` | mã thoát 0 | Đạt |
+| Phép kiểm | `npx vitest run --shard=N/8` | 284 tệp · 4.212 phép đạt | Đạt |
+| Mã màu | `npm run check:mau` | không có # ngoài tokens.css | Đạt |
+| Hiển thị 360px | `node scripts/kiem-13.mjs` | ĐẠT 18/18 | Đạt |
+| **Lộ đáp án** | `node scripts/kiem-lo-dap-an.mjs` | **ĐẠT 9/9** | Đạt |
+| Service worker | `node scripts/kiem-sw.mjs` | ĐẠT 10/10 | Đạt |
+| Dựng bản | `npx vite build` | 173 mục precache · mảnh chính 490 KB | Đạt |

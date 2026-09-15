@@ -71,7 +71,9 @@ describe('trang phiếu', () => {
     // Phần I: bốn phương án A–D chính là bốn ô bấm.
     const oI = h.slice(h.indexOf('data-qid="q1"'), h.indexOf('data-qid="q2"'))
     for (const k of ['A', 'B', 'C', 'D']) expect(oI).toContain(`data-chon="${k}"`)
-    expect((oI.match(/class="q-opt[^"]* lam-o" data-chon="/g) || []).length).toBe(4)
+    // 15/09: giữa lớp và `data-chon` nay có thể chen `data-dung`/`data-sai`
+    // (dấu đáp án, xem `lo-dap-an-chi-de-1509`), nên đừng đòi chúng dính nhau.
+    expect((oI.match(/class="q-opt lam-o"[^>]*data-chon="/g) || []).length).toBe(4)
     expect((oI.match(/aria-checked="false"/g) || []).length).toBe(4)
     // Phần II: bốn ý, mỗi ý một cặp Đ/S ngay trên huy hiệu sẵn có.
     const oII = h.slice(h.indexOf('data-qid="q2"'), h.indexOf('data-qid="q3"'))
@@ -310,10 +312,16 @@ describe('CHƯA NỘP: bịt ĐỦ BỐN đường tới đáp án (thầy bắt
     expect(html).toContain('body.chua-nop #pdf-giai')
   })
 
-  it('TÔ ĐÁP ÁN ĐÚNG trên thân câu cũng tắt — phòng khi một thẻ lọt vào trạng thái mở', () => {
-    expect(html).toContain('body.chua-nop .q-opt.dung { background: #f8fafc !important;')
-    expect(html).toContain('body.chua-nop .tf-badge.dung {')
+  // ĐỔI CÁCH GIẤU 15/09 — xem `tests/lo-dap-an-chi-de-1509.test.ts`. Bản cũ
+  // tắt màu bằng cách TÔ LẠI ô đáp án; bộ màu tô lại lệch bộ màu ô thường ở
+  // bốn thuộc tính nên vẫn lộ. Nay lớp `dung` bị gỡ khỏi DOM khi đang giấu.
+  it('TÔ ĐÁP ÁN ĐÚNG trên thân câu cũng tắt — nay bằng cách GỠ LỚP khỏi DOM', () => {
+    expect(html).toContain('function dongBoLoDapAn()')
+    expect(html).toContain("classList.toggle('dung', !an)")
+    expect(html).toContain("document.body.classList.contains('chua-nop')")
+    expect(html).not.toContain('body.chua-nop .q-opt.dung { background: #f8fafc !important;')
     expect(html).toContain('body.chua-nop .sa-answer { display: none !important; }')
+    expect(html).toContain('body.chua-nop .lo-dap, body.chi-de .lo-dap { display: none !important; }')
   })
 
   it('PHIẾU THƯỜNG không mất nút nào — thầy vẫn mở tất cả như cũ', () => {

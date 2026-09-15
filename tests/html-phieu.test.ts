@@ -53,10 +53,22 @@ describe('theCauHtml — Phần I', () => {
     expect(h).not.toContain('q-card mo')
   })
 
-  it('đánh dấu phương án đúng bằng lớp `dung` để CSS tô khi mở', () => {
+  // ĐỔI LUẬT 15/09 — xem `tests/lo-dap-an-chi-de-1509.test.ts`.
+  //
+  // Trước: phương án đúng mang sẵn lớp `dung` trong mã nguồn thẻ, và chế độ
+  // "Hiện đề" giấu nó bằng cách TÔ LẠI cho trung hoà. Bộ màu tô lại không
+  // trùng bộ màu ô thường (nền #f8fafc so với #ffffff, chữ var(--muc-2) so
+  // với var(--muc), nền chữ cái var(--vien-dam) so với #f1f5f9) nên bấm
+  // "Hiện đề" rồi vẫn nhìn ra đáp án — thầy chụp ảnh bắt được 15/09.
+  //
+  // Nay thẻ chỉ mang DẤU `data-dung`; lớp `dung` do `dongBoLoDapAn` trong
+  // phiếu gắn vào khi được phép hiện và gỡ ra khi đang giấu.
+  it('đánh dấu phương án đúng bằng DẤU `data-dung`, không phải lớp có sẵn', () => {
     const h = theCauHtml(MCQ, 1)
-    expect(h).toContain('<div class="q-opt dung"><div class="q-opt-letter"><span class="ky">C</span></div>')
-    expect((h.match(/q-opt dung/g) || []).length).toBe(1)
+    expect(h).toContain('<div class="q-opt" data-dung="1"><div class="q-opt-letter"><span class="ky">C</span></div>')
+    expect((h.match(/data-dung="1"/g) || []).length).toBe(1)
+    // Lớp KHÔNG được nằm sẵn trong mã nguồn — đó chính là lỗ hổng cũ.
+    expect(h).not.toContain('q-opt dung')
   })
 
   it('lời giải nằm NGAY TRONG thẻ, gập trong sol-wrap', () => {
@@ -95,19 +107,22 @@ describe('theCauHtml — Phần I', () => {
 describe('theCauHtml — Phần II', () => {
   const tf = C({ phan: 'II', luaChon: ['ya', 'yb', 'yc', 'yd'], dapAn: 'DSSD', chot: 'c.' })
 
-  it('mỗi ý đánh dấu `dung` vào đúng một trong hai ô Đ/S', () => {
+  // ĐỔI LUẬT 15/09 — cùng lý do như phần I bên trên: dấu chứ không phải lớp.
+  it('mỗi ý đánh dấu `data-dung` vào đúng một trong hai ô Đ/S', () => {
     const h = theCauHtml(tf, 1)
     const hang = h.split('<div class="tf-statement">').slice(1)
     expect(hang).toHaveLength(4)
-    expect(hang[0]).toContain('tf-badge d dung')
-    expect(hang[1]).toContain('tf-badge s dung')
-    expect(hang[2]).toContain('tf-badge s dung')
-    expect(hang[3]).toContain('tf-badge d dung')
+    expect(hang[0]).toContain('class="tf-badge d" data-dung="1"')
+    expect(hang[1]).toContain('class="tf-badge s" data-dung="1"')
+    expect(hang[2]).toContain('class="tf-badge s" data-dung="1"')
+    expect(hang[3]).toContain('class="tf-badge d" data-dung="1"')
+    expect(h).not.toContain('tf-badge d dung')
+    expect(h).not.toContain('tf-badge s dung')
   })
 
   it('mỗi ý chỉ một ô được đánh dấu, không đánh cả hai', () => {
     const h = theCauHtml(tf, 1)
-    expect((h.match(/tf-badge [ds] dung/g) || []).length).toBe(4)
+    expect((h.match(/class="tf-badge [ds]" data-dung="1"/g) || []).length).toBe(4)
   })
 
   it('đánh số ý bằng a b c d', () => {
@@ -338,7 +353,10 @@ describe('hai lựa chọn in', () => {
     const h = taiLieuHtml('', 'x')
     expect(h).toContain("classList.contains('mo')")
     expect(h).toContain('daMo.push')
-    expect(h).toContain('body.chi-de .q-opt.dung { background: #f8fafc !important;')
+    // ĐỔI LUẬT 15/09: không còn luật tô lại ô đáp án. Thay vào đó lớp `dung`
+    // bị GỠ KHỎI DOM khi đang giấu, nên không luật CSS nào vẽ khác được.
+    expect(h).not.toContain('body.chi-de .q-opt.dung { background: #f8fafc !important;')
+    expect(h).toContain('function dongBoLoDapAn()')
   })
 
   it('chế độ chỉ đề giấu SẠCH lời giải và đáp án đã tô, ở CẢ màn hình lẫn bản in', () => {
@@ -346,10 +364,13 @@ describe('hai lựa chọn in', () => {
     expect(h).toContain('body.chi-de .sol-wrap { display: none !important; }')
     expect(h).toContain('body.chi-de .sa-answer { display: none !important; }')
     expect(h).toContain('body.chi-de .sa-blank { display: block !important; }')
-    // Ô đáp án đúng phải trở lại màu thường, không thì em nhìn màn hình vẫn
-    // thấy ô nào được tô xanh.
-    expect(h).toContain('body.chi-de .q-opt.dung')
-    expect(h).toContain('body.chi-de .tf-badge.dung')
+    // Ô đáp án đúng phải giống HỆT ô thường. ĐỔI LUẬT 15/09: đạt bằng cách gỡ
+    // lớp `dung` khỏi thẻ, KHÔNG phải bằng cách tô lại cho trung hoà — tô lại
+    // là bản cũ, và bốn thuộc tính tô lệch chính là bốn chỗ lộ đáp án.
+    // Đo bằng Chromium thật: `node scripts/kiem-lo-dap-an.mjs`.
+    expect(h).toContain("classList.toggle('dung', !an)")
+    expect(h).toContain("classList.toggle('sai', !an)")
+    expect(h).toContain('body.chua-nop .lo-dap, body.chi-de .lo-dap { display: none !important; }')
     // Luật nằm NGOÀI mọi khối @media thì mới ăn trên màn hình. Đây là cả điểm
     // của lần sửa này: bản cũ chỉ giấu được lúc in. Kiểm bằng cách CẮT SẠCH
     // các khối @media rồi xem luật còn không.
