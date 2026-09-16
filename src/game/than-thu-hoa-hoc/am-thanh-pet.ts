@@ -325,19 +325,32 @@ export class AmThanhPet {
       case 'khi':
         // ULTIMATE JADE BLAST — chùm tia bích ngọc: tiếng nạp rồi RÍT DÀI,
         // cao độ trượt lên như tia laze xuyên qua không khí.
-        this.giong({ tre: T, dang: 'sawtooth', f0: 220, fGiua: 1650, f1: 1180, to: 0.3,
+        this.giong({ tre: T, dang: 'sawtooth', f0: 220, fGiua: 1650, f1: 1180, to: 0.46,
           len: 0.04, giu: 0.5, tat: 0.5, rung: 0.02, nhipRung: 30,
           loc: 'bandpass', fLoc: 1400, fLoc1: 3200, qLoc: 6, lech: 9, vang: 0.4 })
-        this.on({ tre: T, to: 0.16, len: 0.05, giu: 0.42, tat: 0.4,
+        this.on({ tre: T, to: 0.26, len: 0.05, giu: 0.42, tat: 0.4,
           loc: 'highpass', f0: 2000, f1: 8000, q: 0.8, vang: 0.5 })
+        // NỀN TRẦM. Đo 16-09: tia bích ngọc chỉ có dải cao nên đỉnh sóng 0,45
+        // — nghe mỏng hơn cả đòn thường. Một lớp hạ âm đi cùng là ra "khẩu
+        // pháo", không phải "cái còi".
+        this.giong({ tre: T, dang: 'sine', f0: 76, f1: 58, to: 0.34,
+          len: 0.03, giu: 0.5, tat: 0.55, loc: 'lowpass', fLoc: 260, qLoc: 1.2, vang: 0.35 })
         break
       case 'axit':
         // GALAXY CROWN LASER — tia từ sừng: một nốt cao TINH KHIẾT, gần như
         // sạch hẳn nhiễu, cộng hào quang ngân dài. Chất "ngân hà" nằm ở đuôi vang.
-        this.giong({ tre: T, dang: 'sine', f0: 1320, f1: 1760, to: 0.26, len: 0.03,
+        // Đo 16-09: bản trước đỉnh sóng 0,20 — YẾU HƠN cả đòn thường (0,26).
+        // Một chiêu tối thượng mà nhỏ tiếng hơn đòn phổ thông là sai hẳn ý
+        // "âm thanh của chưởng phải mãnh liệt". Nâng ba lớp, thêm nền trầm và
+        // một lớp hơi rít, vẫn giữ chất TINH KHIẾT của tia laze.
+        this.giong({ tre: T, dang: 'sine', f0: 1320, f1: 1760, to: 0.5, len: 0.03,
           giu: 0.46, tat: 0.7, loc: 'bandpass', fLoc: 2400, qLoc: 9, lech: 5, vang: 0.75 })
-        this.giong({ tre: T + 0.04, dang: 'sine', f0: 2640, to: 0.11, len: 0.02,
+        this.giong({ tre: T + 0.04, dang: 'sine', f0: 2640, to: 0.24, len: 0.02,
           giu: 0.3, tat: 0.62, vang: 0.8 })
+        this.giong({ tre: T, dang: 'sine', f0: 82, f1: 64, to: 0.34, len: 0.03,
+          giu: 0.46, tat: 0.6, loc: 'lowpass', fLoc: 240, qLoc: 1.2, vang: 0.4 })
+        this.on({ tre: T, to: 0.16, len: 0.04, giu: 0.4, tat: 0.55,
+          loc: 'bandpass', f0: 3200, f1: 6400, q: 2.2, vang: 0.7 })
         break
       case 'kiem':
         // CHRONO-CORE CANON ARRAY — SÁU phát pháo lệch nhịp, mỗi phát một cú

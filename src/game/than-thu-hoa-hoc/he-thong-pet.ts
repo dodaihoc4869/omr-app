@@ -38,8 +38,8 @@ export interface ThanThuInfo {
 export const DANH_SACH_THAN_THU: Record<string, ThanThuInfo> = {
   hoa_long: {
     id: 'hoa_long',
-    ten: 'Xích Diệm Nhiệt Nhôm Phượng',
-    danhHieu: 'Triều Dương Thiêu Thiết Đế Quân',
+    ten: 'Nhiệt Nhôm Triều Dương Phượng',
+    danhHieu: '2Al + Fe₂O₃ — Hoàn Cầu Thiêu Thiết Hoả Đế',
     he: 'hoa',
     mauChinh: 'rgb(239, 68, 68)',
     mauPhu: 'rgb(249, 115, 22)',
@@ -51,8 +51,8 @@ export const DANH_SACH_THAN_THU: Record<string, ThanThuInfo> = {
   },
   thuy_quai: {
     id: 'thuy_quai',
-    ten: 'Vương Thuỷ Tử Giác Kỳ Lân',
-    danhHieu: 'Hoá Kim Nhất Giác Chi Vương',
+    ten: 'Cường Toan Ngân Hà Kỳ Lân',
+    danhHieu: 'HNO₃ : HCl = 1 : 3 — Hoá Kim Nhất Giác Vương',
     he: 'axit',
     mauChinh: 'rgb(168, 85, 247)',
     mauPhu: 'rgb(99, 102, 241)',
@@ -64,8 +64,8 @@ export const DANH_SACH_THAN_THU: Record<string, ThanThuInfo> = {
   },
   thiet_giap: {
     id: 'thiet_giap',
-    ten: 'Huyền Vũ Trầm Tủa Thần Quy',
-    danhHieu: 'Vạn Niên Bất Tan Thần Giáp',
+    ten: 'Trầm Tủa Vạn Niên Thần Quy',
+    danhHieu: 'Ba²⁺ + SO₄²⁻ — Lõi Thời Không Bất Tan Đế',
     he: 'kiem',
     mauChinh: 'rgb(14, 165, 233)',
     mauPhu: 'rgb(234, 179, 8)',
@@ -77,8 +77,8 @@ export const DANH_SACH_THAN_THU: Record<string, ThanThuInfo> = {
   },
   loi_dieu: {
     id: 'loi_dieu',
-    ten: 'Thanh Long Cuồng Phong Halogen',
-    danhHieu: 'Cửu Trùng Phệ Kim Long Đế',
+    ten: 'Halogen Cung Đình Thần Long',
+    danhHieu: 'F₂ · Cl₂ — Bích Ngọc Cửu Trùng Phệ Kim Long Đế',
     he: 'khi',
     mauChinh: 'rgb(34, 197, 94)',
     mauPhu: 'rgb(16, 185, 129)',
@@ -91,8 +91,8 @@ export const DANH_SACH_THAN_THU: Record<string, ThanThuInfo> = {
   // ─── HAI HỆ MỚI, thầy chốt 15-09 ───
   loi_kim: {
     id: 'loi_kim',
-    ten: 'Lôi Đình Kim Lân Điện Cực',
-    danhHieu: 'Zn‖Cu²⁺ Dẫn Lôi Chi Chủ',
+    ten: 'Điện Cực Sơn Lâm Kim Lân',
+    danhHieu: 'Zn‖Cu²⁺ — Băng Sương Lôi Đình Chi Chủ',
     he: 'dien',
     mauChinh: 'rgb(100, 116, 139)',
     mauPhu: 'rgb(56, 189, 248)',
@@ -104,8 +104,8 @@ export const DANH_SACH_THAN_THU: Record<string, ThanThuInfo> = {
   },
   moc_tinh: {
     id: 'moc_tinh',
-    ten: 'Bích Lân Trùng Hợp Thuỷ Long',
-    danhHieu: 'Vạn Xích Carbon Bất Đoạn Thần',
+    ten: 'Trùng Hợp Thuỷ Phù Long Thần',
+    danhHieu: '(–CH₂–CH₂–)ₙ — Quang Sinh Vạn Xích Bất Đoạn',
     he: 'huuco',
     mauChinh: 'rgb(132, 204, 22)',
     mauPhu: 'rgb(180, 83, 9)',

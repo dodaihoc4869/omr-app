@@ -110,41 +110,41 @@ const MOC: readonly Moc[] = [
 export const CAP_BAC: readonly number[] = [1, 10, 30, 50, 70, 100]
 
 export const TEN_BAC_THEO_THU: Record<string, readonly string[]> = {
-  // Xích Diệm Nhiệt Nhôm Phượng — hệ Hoả
+  // Nhiệt Nhôm Triều Dương Phượng — hệ Hoả
   hoa_long: [
-    'Trứng Hoả Tinh', 'Xích Diệm Sơ Phượng', 'Xích Diệm Phượng Hoàng',
-    'Nhiệt Nhôm Hoả Phượng', 'Đại Phượng Triều Dương',
-    'TỐI THƯỢNG XÍCH DIỆM THIÊU THIẾT ĐẾ',
+    'Trứng Nhiệt Nhôm', 'Hoả Vũ Sơ Phượng', 'Xích Diệm Phượng Hoàng',
+    'Thiêu Thiết Hoả Phượng', 'Hoàn Cầu Triều Dương Phượng',
+    'TỐI THƯỢNG THIÊU THIẾT HOẢ ĐẾ',
   ],
-  // Vương Thuỷ Tử Giác Kỳ Lân — hệ Acid
+  // Cường Toan Ngân Hà Kỳ Lân — hệ Acid
   thuy_quai: [
-    'Trứng Cường Toan', 'Tử Giác Lân Nhỏ', 'Tử Giác Lân Trưởng Thành',
-    'Vương Thuỷ Thần Lân', 'Đại Vương Thuỷ Kỳ Lân',
-    'CÕI THƯỢNG VƯƠNG THUỶ HOÁ KIM VƯƠNG',
+    'Trứng Cường Toan', 'Tử Giác Lân Nhỏ', 'Nhất Giác Kỳ Lân',
+    'Hoá Kim Thần Lân', 'Ngân Hà Cường Toan Kỳ Lân',
+    'TỐI THƯỢNG HOÁ KIM NHẤT GIÁC VƯƠNG',
   ],
-  // Huyền Vũ Trầm Tủa Thần Quy — hệ Base
+  // Trầm Tủa Vạn Niên Thần Quy — hệ Base
   thiet_giap: [
-    'Trứng Kết Tủa', 'Huyền Vũ Quy Nhỏ', 'Huyền Vũ Quy Trưởng Thành',
-    'Trầm Tủa Thần Quy', 'Đại Huyền Vũ Thần Quy',
-    'TỐI THƯỢNG HUYỀN VŨ BẤT TAN THẦN GIÁP',
+    'Trứng Kết Tủa', 'Huyền Vũ Quy Nhỏ', 'Trầm Tủa Huyền Quy',
+    'Vạn Niên Thần Quy', 'Lõi Thời Không Thần Quy',
+    'TỐI THƯỢNG HUYỀN VŨ BẤT TAN ĐẾ',
   ],
-  // Thanh Long Cuồng Phong Halogen — hệ Khí
+  // Halogen Cung Đình Thần Long — hệ Khí
   loi_dieu: [
-    'Trứng Halogen', 'Thanh Long Nhỏ', 'Thanh Long Trưởng Thành',
-    'Cuồng Phong Halogen Long', 'Cửu Trùng Đại Thanh Long',
-    'TỐI THƯỢNG THANH LONG PHỆ KIM ĐẾ',
+    'Trứng Halogen', 'Thanh Long Nhỏ', 'Bích Ngọc Thanh Long',
+    'Phệ Kim Halogen Long', 'Cung Đình Cửu Trùng Thần Long',
+    'TỐI THƯỢNG BÍCH NGỌC PHỆ KIM LONG ĐẾ',
   ],
-  // Lôi Đình Kim Lân Điện Cực — hệ Điện hoá
+  // Điện Cực Sơn Lâm Kim Lân — hệ Điện hoá
   loi_kim: [
-    'Trứng Điện Cực', 'Kim Lân Nhỏ', 'Kim Lân Trưởng Thành',
-    'Lôi Đình Kim Lân', 'Đại Lôi Đình Thần Lân',
-    'TỐI THƯỢNG LÔI ĐÌNH DẪN LÔI CHI CHỦ',
+    'Trứng Điện Cực', 'Kim Lân Nhỏ', 'Lôi Đình Kim Lân',
+    'Băng Sương Kim Lân', 'Sơn Lâm Đại Kim Lân',
+    'TỐI THƯỢNG BĂNG SƯƠNG LÔI ĐÌNH CHI CHỦ',
   ],
-  // Bích Lân Trùng Hợp Thuỷ Long — hệ Hữu cơ
+  // Trùng Hợp Thuỷ Phù Long Thần — hệ Hữu cơ
   moc_tinh: [
-    'Trứng Trùng Hợp', 'Bích Lân Long Nhỏ', 'Bích Lân Long Trưởng Thành',
-    'Trùng Hợp Thuỷ Long', 'Đại Bích Lân Thuỷ Long',
-    'TỐI THƯỢNG BÍCH LÂN BẤT ĐOẠN THẦN',
+    'Trứng Trùng Hợp', 'Bích Lân Long Nhỏ', 'Quang Sinh Bích Lân Long',
+    'Trùng Hợp Thuỷ Long', 'Thuỷ Phù Vạn Xích Long Thần',
+    'TỐI THƯỢNG QUANG SINH BẤT ĐOẠN THẦN',
   ],
 }
 

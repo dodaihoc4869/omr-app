@@ -1073,7 +1073,6 @@ export default function ThanThuHoaHocGame({
 
     if (idxChon === cauHoiHienTai.dung) {
       amThanhRef.current?.dungCauHoi()
-      amThanhRef.current?.kichNo()
       // SÁT THƯƠNG THẬT: lấy từ chỉ số thú, nhân hệ số tương khắc nguyên tố.
       // Bản trước cắm cứng 45 — nên mọi buff từ điểm học tập chỉ là chữ trang trí.
       const tk = tinhHeSoTuongKhac(infoPet.he, heTrumTang(tangHienTai))
@@ -1082,6 +1081,15 @@ export default function ThanThuHoaHocGame({
       setMauBoss(mauBossMoi)
       // Bật cờ hiệu ứng cho canvas màn đấu: hạ trùm thì tung chiêu nộ, còn lại là đòn thường.
       batHieuUng(mauBossMoi <= 0 ? 'no' : 'danh', mauBossMoi <= 0 ? 1200 : 550)
+      // ÂM PHẢI KHỚP HÌNH. Bản trước phát tiếng nổ tối thượng cho MỌI câu đúng,
+      // kể cả khi trùm còn nguyên máu và hình chỉ là một đòn thường — nghe một
+      // buổi là em nhờn tai, tới lúc hạ trùm thật thì chẳng còn gì đặc biệt.
+      if (mauBossMoi <= 0) {
+        amThanhRef.current?.kichNo()
+        amThanhRef.current?.chuongToiThuong(infoPet.he)
+      } else {
+        amThanhRef.current?.tanCong()
+      }
       setThongBaoChienDau(`Đúng! ${infoPet.kyNangThuong} gây ${satThuong} sát thương — ${tk.thongDiep}`)
 
       if (mauBossMoi <= 0) {
