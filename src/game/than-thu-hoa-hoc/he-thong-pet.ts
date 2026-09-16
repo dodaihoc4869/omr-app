@@ -38,8 +38,8 @@ export interface ThanThuInfo {
 export const DANH_SACH_THAN_THU: Record<string, ThanThuInfo> = {
   hoa_long: {
     id: 'hoa_long',
-    ten: 'Xích Phượng Nhiệt Nhôm',
-    danhHieu: 'Triều Dương Thiêu Kim Bá Chủ',
+    ten: 'Xích Diệm Nhiệt Nhôm Phượng',
+    danhHieu: 'Triều Dương Thiêu Thiết Đế Quân',
     he: 'hoa',
     mauChinh: 'rgb(239, 68, 68)',
     mauPhu: 'rgb(249, 115, 22)',
@@ -51,8 +51,8 @@ export const DANH_SACH_THAN_THU: Record<string, ThanThuInfo> = {
   },
   thuy_quai: {
     id: 'thuy_quai',
-    ten: 'Tử Giác Kỳ Lân Cường Toan',
-    danhHieu: 'Độc Giác Ăn Mòn Vạn Kim',
+    ten: 'Vương Thuỷ Tử Giác Kỳ Lân',
+    danhHieu: 'Hoá Kim Nhất Giác Chi Vương',
     he: 'axit',
     mauChinh: 'rgb(168, 85, 247)',
     mauPhu: 'rgb(99, 102, 241)',
@@ -64,8 +64,8 @@ export const DANH_SACH_THAN_THU: Record<string, ThanThuInfo> = {
   },
   thiet_giap: {
     id: 'thiet_giap',
-    ten: 'Huyền Quy Kết Tủa BaSO₄',
-    danhHieu: 'Vạn Niên Thần Giáp Bất Hoại',
+    ten: 'Huyền Vũ Trầm Tủa Thần Quy',
+    danhHieu: 'Vạn Niên Bất Tan Thần Giáp',
     he: 'kiem',
     mauChinh: 'rgb(14, 165, 233)',
     mauPhu: 'rgb(234, 179, 8)',
@@ -77,8 +77,8 @@ export const DANH_SACH_THAN_THU: Record<string, ThanThuInfo> = {
   },
   loi_dieu: {
     id: 'loi_dieu',
-    ten: 'Thanh Long Halogen',
-    danhHieu: 'Cung Đình Phong Lôi Long Thần',
+    ten: 'Thanh Long Cuồng Phong Halogen',
+    danhHieu: 'Cửu Trùng Phệ Kim Long Đế',
     he: 'khi',
     mauChinh: 'rgb(34, 197, 94)',
     mauPhu: 'rgb(16, 185, 129)',
@@ -91,8 +91,8 @@ export const DANH_SACH_THAN_THU: Record<string, ThanThuInfo> = {
   // ─── HAI HỆ MỚI, thầy chốt 15-09 ───
   loi_kim: {
     id: 'loi_kim',
-    ten: 'Lôi Lân Điện Cực',
-    danhHieu: 'Sơn Lâm Chúa Tể Dãy Điện Hoá',
+    ten: 'Lôi Đình Kim Lân Điện Cực',
+    danhHieu: 'Zn‖Cu²⁺ Dẫn Lôi Chi Chủ',
     he: 'dien',
     mauChinh: 'rgb(100, 116, 139)',
     mauPhu: 'rgb(56, 189, 248)',
@@ -104,8 +104,8 @@ export const DANH_SACH_THAN_THU: Record<string, ThanThuInfo> = {
   },
   moc_tinh: {
     id: 'moc_tinh',
-    ten: 'Bích Long Ester Polymer',
-    danhHieu: 'Thuỷ Phù Chuỗi Carbon Bất Hoại',
+    ten: 'Bích Lân Trùng Hợp Thuỷ Long',
+    danhHieu: 'Vạn Xích Carbon Bất Đoạn Thần',
     he: 'huuco',
     mauChinh: 'rgb(132, 204, 22)',
     mauPhu: 'rgb(180, 83, 9)',
