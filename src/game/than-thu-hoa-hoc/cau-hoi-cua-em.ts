@@ -92,17 +92,10 @@ export interface CauHoiCuaEm extends CauHoi {
   doDai: number
 }
 
-/**
- * Một ảnh chèn giữa bài, GIỮ NGUYÊN chỗ thầy đặt.
- *
- * `viTri` là CHUỖI đúng theo `ViTriHinh` của kho (`sau_de`, `sau_pa_A`,
- * `cuoi_cau`…). Bản 15-09 ép nó qua `Number()` — mọi ảnh thành `NaN`, tức là
- * mất sạch vị trí, ảnh phương án bị dồn lên đầu câu. Đúng cái lỗi thầy đã bắt
- * ở màn báo cáo ngày 14-09.
- */
+/** Một ảnh chèn giữa bài. `viTri` < 0 nghĩa là không rõ chỗ, xếp cuối thân câu. */
 export interface AnhXen {
   url: string
-  viTri: string
+  viTri: number
 }
 
 export type LyDoBo =
@@ -176,36 +169,24 @@ export function tenDangCua(c: CauSaiTho): { ma: string; ten: string } {
  */
 function gomAnh(c: CauSaiTho): { thanCau: string; theoPa: string[]; xen: AnhXen[] } {
   const chuoiAnh = (x: unknown): string => (typeof x === 'string' && x.startsWith('data:') ? x : '')
-  // Mọi ảnh CÓ VỊ TRÍ của câu, chuẩn hoá về { url, viTri } — cùng luật với
-  // `anhCoViTri` trong `KhoiCauSai.tsx`, chỗ thầy đã chốt ngày 14-09.
-  const coViTri: AnhXen[] = []
-  const nap = (h: unknown) => {
-    if (typeof h === 'string') {
-      const u = chuoiAnh(h)
-      if (u !== '') coViTri.push({ url: u, viTri: 'sau_de' })
-      return
-    }
-    if (h === null || typeof h !== 'object') return
-    const o = h as Record<string, unknown>
-    const u = chuoiAnh(o.src ?? o.url ?? o.data ?? o.imageDataUrl)
-    if (u === '') return
-    coViTri.push({ url: u, viTri: String(o.viTri ?? o.vi_tri ?? 'sau_de') })
-  }
-  if (Array.isArray(c.hinhAnh)) for (const h of c.hinhAnh) nap(h)
-  else if (c.hinhAnh !== undefined) nap(c.hinhAnh)
-
   const thanCau = chuoiAnh(c.thanCauImg) || chuoiAnh(c.imageDataUrl)
-  // ẢNH PHƯƠNG ÁN — ưu tiên ảnh thay chữ, rồi tới ảnh đặt SAU phương án ấy.
-  const theoPa = CHU_CAI.map((chu, i) => {
-    const thayChu = Array.isArray(c.choiceImgs) ? chuoiAnh(c.choiceImgs[i]) : ''
-    if (thayChu !== '') return thayChu
-    return coViTri.find((h) => h.viTri === `sau_pa_${chu}`)?.url ?? ''
-  })
-  // ẢNH CHÈN — mọi ảnh còn lại. Ảnh của phương án (`sau_pa_*`) và của ý phần
-  // II (`sau_y_*`) KHÔNG được dồn lên thân câu.
-  const xen = coViTri.filter(
-    (h) => !h.viTri.startsWith('sau_pa_') && !h.viTri.startsWith('sau_y_') && h.url !== thanCau,
-  )
+  const theoPa = Array.isArray(c.choiceImgs)
+    ? c.choiceImgs.map((x) => chuoiAnh(x))
+    : []
+  const xen: AnhXen[] = []
+  if (Array.isArray(c.hinhAnh)) {
+    for (const h of c.hinhAnh) {
+      if (typeof h === 'string') { const u = chuoiAnh(h); if (u !== '') xen.push({ url: u, viTri: -1 }) }
+      else if (h !== null && typeof h === 'object') {
+        const o = h as Record<string, unknown>
+        const u = chuoiAnh(o.url ?? o.data ?? o.src ?? o.imageDataUrl)
+        if (u !== '') xen.push({ url: u, viTri: Number(o.viTri ?? o.vi_tri ?? -1) })
+      }
+    }
+  } else if (typeof c.hinhAnh === 'string') {
+    const u = chuoiAnh(c.hinhAnh)
+    if (u !== '') xen.push({ url: u, viTri: -1 })
+  }
   return { thanCau, theoPa, xen }
 }
 
@@ -240,12 +221,9 @@ export function doiCauSaiThanhCauChoi(tho: readonly CauSaiTho[]): KetQuaDoiCau {
     if (de === '') { bo('thieuDeBai'); continue }
 
     const pa = Array.isArray(c.choices) ? c.choices.map((x) => String(x ?? '').trim()) : []
+    if (pa.length !== 4 || pa.some((x) => x === '')) { bo('thieuPhuongAn'); continue }
+
     const anh = gomAnh(c)
-    // Phương án CHỈ CÓ ẢNH là hợp lệ: nhiều câu Hoá cho bốn công thức cấu tạo
-    // bằng ảnh, chữ rỗng. Bản trước vứt cả câu — mất đúng nhóm câu hay nhất.
-    if (pa.length !== 4 || pa.some((x, i) => x === '' && anh.theoPa[i] === '')) {
-      bo('thieuPhuongAn'); continue
-    }
     const dap = String(c.dapAnDung ?? '').trim().toUpperCase()
     const iDung = CHU_CAI.indexOf(dap as 'A' | 'B' | 'C' | 'D')
     if (iDung < 0) { bo('dapAnKhongHopLe'); continue }
