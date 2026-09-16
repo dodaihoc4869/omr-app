@@ -31,6 +31,8 @@ import {
   hsCauDaThiApi,
   thanThuDocApi,
   thanThuGhiApi,
+  voDaiTaoApi, voDaiMoiApi, voDaiLoiMoiApi, voDaiVaoApi,
+  voDaiBatDauApi, voDaiXemApi, voDaiNopApi, voDaiDongApi,
 } from '../lib/exam-api'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import KhungXemPhieu from '../components/KhungXemPhieu'
@@ -764,6 +766,29 @@ export default function StudentPortalScreen() {
     if (!auth) return null
     const url = await loadScriptUrlHoacMacDinh().catch(() => '')
     return await thanThuGhiApi(url, auth.sbd, hoSo)
+  }, [auth])
+
+  /**
+   * CỔNG ĐẤU TRƯỜNG CHÂN LÝ.
+   *
+   * Tám hàm dưới đây đóng sẵn số báo danh vào, nên màn game vẫn KHÔNG nhận số
+   * báo danh — đúng luật đã đặt cho cả game từ đầu. Số báo danh của BẠN mà em
+   * gõ vào ô mời thì đi thẳng lên máy chủ, không cất ở đâu trong máy.
+   */
+  const congVoDai = useMemo(() => {
+    if (!auth) return undefined
+    const url = () => loadScriptUrlHoacMacDinh().catch(() => '')
+    return {
+      taoPhong: async (biDanh: string, he: string) => voDaiTaoApi(await url(), auth.sbd, biDanh, he),
+      moi: async (ma: string, dsSbd: string[]) => voDaiMoiApi(await url(), auth.sbd, ma, dsSbd),
+      loiMoi: async () => voDaiLoiMoiApi(await url(), auth.sbd),
+      vao: async (ma: string, biDanh: string, he: string) => voDaiVaoApi(await url(), auth.sbd, ma, biDanh, he),
+      batDau: async (ma: string) => voDaiBatDauApi(await url(), auth.sbd, ma),
+      xem: async (ma: string) => voDaiXemApi(await url(), auth.sbd, ma),
+      nop: async (ma: string, vong: number, nop: Record<string, unknown>) =>
+        voDaiNopApi(await url(), auth.sbd, ma, vong, nop),
+      dong: async (ma: string) => voDaiDongApi(await url(), auth.sbd, ma),
+    }
   }, [auth])
 
   const taoDeKhacPhuc = async (danhSachMaCaTuyChon?: string[]) => {
@@ -1922,6 +1947,7 @@ export default function StudentPortalScreen() {
             layCauSaiCuaEm={layCauSaiChoGame}
             docThanThuMayChu={docThanThuChoGame}
             ghiThanThuMayChu={ghiThanThuChoGame}
+            congVoDai={congVoDai}
             onDong={() => setTab('diem')}
             onChuyenSangKhacPhuc={() => setTab('khacphuc')}
             onChuyenSangBtvn={() => setTab('btvn')}

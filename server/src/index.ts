@@ -10,6 +10,7 @@
 import { CA_DO_TAI, TRANG_DO_TAI } from './do-tai'
 import { chuanHoaDanhSach } from './danh-sach'
 import * as G from './goi-cu'
+import * as VD from './vo-dai'
 import type { D1PreparedStatement, DongCa, DongLuot, Env } from './kieu'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 
@@ -2672,6 +2673,16 @@ export default {
       if (p === '/hs/than-thu') return ra(await G.thanThuDoc(env, b))
       if (p === '/hs/than-thu-ghi') return ra(await G.thanThuGhi(env, b))
       if (p === '/hs/btvn') return ra(await G.hsBtvn(env, b))
+      // ĐẤU TRƯỜNG CHÂN LÝ — phòng sáu người. Máy chủ chỉ cất đội hình đã nộp;
+      // trận đánh do máy em tính, và nó tất định. Xem `server/src/vo-dai.ts`.
+      if (p === '/vo-dai/tao') return ra(await VD.voDaiTao(env, b))
+      if (p === '/vo-dai/moi') return ra(await VD.voDaiMoi(env, b))
+      if (p === '/vo-dai/loi-moi') return ra(await VD.voDaiLoiMoi(env, b))
+      if (p === '/vo-dai/vao') return ra(await VD.voDaiVao(env, b))
+      if (p === '/vo-dai/bat-dau') return ra(await VD.voDaiBatDau(env, b))
+      if (p === '/vo-dai/xem') return ra(await VD.voDaiXem(env, b))
+      if (p === '/vo-dai/nop') return ra(await VD.voDaiNop(env, b))
+      if (p === '/vo-dai/dong') return ra(await VD.voDaiDong(env, b))
       // CỔNG TƯƠNG THÍCH — tự phân quyền bên trong, nên đứng TRƯỚC cổng mã bí mật.
       if (p === '/goi') return goiCu(req, env, b)
       if (p === '/btvn/cua-em') return btvnCuaEm(env, b)

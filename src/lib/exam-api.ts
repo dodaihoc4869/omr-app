@@ -3359,3 +3359,91 @@ export async function deTheoDangBai(
     return { de: null, loi: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
   }
 }
+
+// ════════════════════════════════════════════════════════════════════════════
+// ĐẤU TRƯỜNG CHÂN LÝ — TÁM LỆNH PHÒNG ĐẤU.
+//
+// Thầy chốt 15-09: *"chọn cửa mời số báo danh tối đa được 6 người chơi cùng
+// lúc"*. Số báo danh chỉ đi LÊN máy chủ ở lệnh mời; máy chủ KHÔNG trả số báo
+// danh của bạn cùng phòng xuống — xem `voDaiXem` bên `server/src/vo-dai.ts`.
+//
+// Máy chủ bản cũ chưa có tám đường này. Mọi lệnh đều trả `ok: false` kèm lời
+// nhắn đọc được thay vì ném lỗi, để màn hình nói thẳng "máy chủ chưa có Đấu
+// Trường" chứ không quay vòng tròn.
+// ════════════════════════════════════════════════════════════════════════════
+
+/** Một người trong phòng, như máy chủ trả về (KHÔNG có số báo danh). */
+export interface GheTrongPhong {
+  khoa: string
+  biDanh: string
+  he: string
+  laMinh: boolean
+  nop: Record<string, {
+    doiHinh: { idQuan: string; sao: number }[]
+    mau: number
+    vang: number
+    kinhNghiem: number
+    chuoi: number
+  }>
+}
+
+export interface PhongTuMayChu {
+  ma: string
+  trangThai: 'cho' | 'dang_choi' | 'xong'
+  vong: number
+  laChu: boolean
+  nguoi: GheTrongPhong[]
+}
+
+async function goiVoDai(
+  scriptUrl: string, duong: string, than: Record<string, unknown>,
+): Promise<Record<string, unknown>> {
+  const base = await layDiaChiMayChu(scriptUrl)
+  if (!base) return { ok: false, error: 'Chưa lấy được địa chỉ máy chủ. Em tải lại trang rồi thử lại.' }
+  try {
+    const res = await fetch(`${base}/vo-dai/${duong}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(than),
+    })
+    if (res.status === 404) {
+      return { ok: false, error: 'Máy chủ chưa có Đấu Trường Chân Lý — thầy cần đẩy bản mới lên.' }
+    }
+    return (await res.json()) as Record<string, unknown>
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
+  }
+}
+
+export async function voDaiTaoApi(scriptUrl: string, sbd: string, biDanh: string, he: string) {
+  return goiVoDai(scriptUrl, 'tao', { sbd, biDanh, he }) as Promise<{ ok: boolean; ma?: string; error?: string }>
+}
+export async function voDaiMoiApi(scriptUrl: string, sbd: string, ma: string, dsSbd: string[]) {
+  return goiVoDai(scriptUrl, 'moi', { sbd, ma, dsSbd }) as Promise<{ ok: boolean; daMoi?: number; error?: string }>
+}
+export async function voDaiLoiMoiApi(scriptUrl: string, sbd: string) {
+  return goiVoDai(scriptUrl, 'loi-moi', { sbd }) as Promise<{
+    ok: boolean
+    ds?: { ma: string; soNguoi: number; chuBiDanh: string; moiLuc: string }[]
+    error?: string
+  }>
+}
+export async function voDaiVaoApi(scriptUrl: string, sbd: string, ma: string, biDanh: string, he: string) {
+  return goiVoDai(scriptUrl, 'vao', { sbd, ma, biDanh, he }) as Promise<{ ok: boolean; ma?: string; error?: string }>
+}
+export async function voDaiBatDauApi(scriptUrl: string, sbd: string, ma: string) {
+  return goiVoDai(scriptUrl, 'bat-dau', { sbd, ma }) as Promise<{ ok: boolean; vong?: number; error?: string }>
+}
+export async function voDaiXemApi(scriptUrl: string, sbd: string, ma: string) {
+  return goiVoDai(scriptUrl, 'xem', { sbd, ma }) as Promise<{ ok: boolean; phong?: PhongTuMayChu; error?: string }>
+}
+export async function voDaiNopApi(
+  scriptUrl: string, sbd: string, ma: string, vong: number, nop: Record<string, unknown>,
+) {
+  return goiVoDai(scriptUrl, 'nop', { sbd, ma, vong, nop }) as Promise<{
+    ok: boolean; daNop?: number; tongNguoi?: number; error?: string
+  }>
+}
+export async function voDaiDongApi(scriptUrl: string, sbd: string, ma: string) {
+  return goiVoDai(scriptUrl, 'dong', { sbd, ma }) as Promise<{ ok: boolean; error?: string }>
+}

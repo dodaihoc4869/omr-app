@@ -63,6 +63,10 @@ import {
 import { veThanThuCanvas, khungVeThanThu } from '../game/than-thu-hoa-hoc/ve-than-thu'
 import { hoaGiaiHoSo } from '../game/than-thu-hoa-hoc/dong-bo'
 import KhungLoiGiaiGame from './KhungLoiGiaiGame'
+import {
+  ThanCauGame, NoiDungPhuongAn, cauCoMedia, type CauCoAnh,
+} from './CauHoiTrongGame'
+import DauTruongChanLy, { type CongVoDai, type CauKiemVang } from './DauTruongChanLy'
 import OngNghiemExp from './OngNghiemExp'
 import PopupThuongExp, { type TinThuongExp } from './PopupThuongExp'
 /**
@@ -98,6 +102,12 @@ interface Props {
    */
   docThanThuMayChu?: () => Promise<unknown>
   ghiThanThuMayChu?: (hoSo: unknown) => Promise<unknown>
+  /**
+   * ĐẤU TRƯỜNG CHÂN LÝ — tám hàm gọi lại, cổng học sinh đã đóng sẵn số báo
+   * danh vào từng hàm. Game vẫn KHÔNG biết em là ai. Thiếu cổng này thì tab
+   * Võ Đài nói thẳng "cần cổng học sinh", không giả vờ chơi được.
+   */
+  congVoDai?: CongVoDai
   onDong: () => void
   onChuyenSangKhacPhuc: () => void
   onChuyenSangBtvn: () => void
@@ -176,6 +186,7 @@ export default function ThanThuHoaHocGame({
   layCauSaiCuaEm,
   docThanThuMayChu,
   ghiThanThuMayChu,
+  congVoDai,
   onDong,
   onChuyenSangKhacPhuc,
   onChuyenSangBtvn,
@@ -1011,6 +1022,21 @@ export default function ThanThuHoaHocGame({
     // vẫn coi như đã gặp, nếu không là mở lại gặp đúng nó.
     const bayGio = Date.now()
     setHoSo((prev) => ({ ...prev, lichSuThap: ghiLichSu(prev.lichSuThap, day.qid, bayGio) }))
+  }, [dsCauCuaEm])
+
+  /**
+   * RÚT CÂU CHO ĐẤU TRƯỜNG — đúng một việc: đổi câu đúng lấy vàng.
+   *
+   * Không ghi vào sổ tháp, không cộng EXP, không tính vào "câu đã thanh tẩy":
+   * đây là sân đấu, không phải giờ ôn. Ưu tiên câu của chính em; hết thì mượn
+   * kho chung, y như tháp.
+   */
+  const raCauHoiKiemVang = useCallback((): CauKiemVang | null => {
+    const nguon: CauKiemVang[] = dsCauCuaEm.length > 0
+      ? (dsCauCuaEm as unknown as CauKiemVang[])
+      : (KHO_CAU_HOI as unknown as CauKiemVang[])
+    if (nguon.length === 0) return null
+    return nguon[Math.floor(Math.random() * nguon.length)] ?? null
   }, [dsCauCuaEm])
 
   /**
@@ -1997,19 +2023,25 @@ export default function ThanThuHoaHocGame({
                     </span>
                   </div>
 
-                  <div className="text-sm font-semibold text-slate-900 dark:text-white leading-relaxed">
-                    {cauHoiHienTai.cau}
-                  </div>
+                  {/* Ảnh đề, bảng số liệu, ảnh từng phương án — đúng chỗ của
+                      nó. Thiếu ảnh thì câu "dựa vào đồ thị" thành câu đoán mò. */}
+                  <ThanCauGame c={cauHoiHienTai as CauCoAnh} />
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
-                    {cauHoiHienTai.phuongAn.map((pa, idx) => (
+                  <div
+                    className={`grid gap-2.5 pt-2 ${
+                      cauCoMedia(cauHoiHienTai as CauCoAnh)
+                        ? 'grid-cols-1'
+                        : 'grid-cols-1 sm:grid-cols-2'
+                    }`}
+                  >
+                    {cauHoiHienTai.phuongAn.map((_pa, idx) => (
                       <button
                         key={idx}
                         onClick={() => xuLyTraLoi(idx)}
-                        className="p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-purple-950/40 text-left text-xs font-medium transition cursor-pointer"
+                        className="p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-purple-950/40 text-left text-xs font-medium transition cursor-pointer flex gap-2"
                       >
-                        <strong className="text-purple-600 mr-2">{String.fromCharCode(65 + idx)}.</strong>
-                        <span>{pa}</span>
+                        <strong className="text-purple-600 shrink-0">{String.fromCharCode(65 + idx)}.</strong>
+                        <NoiDungPhuongAn c={cauHoiHienTai as CauCoAnh} i={idx} />
                       </button>
                     ))}
                   </div>
@@ -2129,12 +2161,14 @@ export default function ThanThuHoaHocGame({
                 </span>
               </div>
 
-              <div className="text-sm font-semibold text-slate-900 dark:text-white leading-relaxed whitespace-pre-line">
-                {cauSanHienTai.cau}
-              </div>
+              <ThanCauGame c={cauSanHienTai as CauCoAnh} />
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {cauSanHienTai.phuongAn.map((pa, idx) => {
+              <div
+                className={`grid gap-2.5 ${
+                  cauCoMedia(cauSanHienTai as CauCoAnh) ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
+                }`}
+              >
+                {cauSanHienTai.phuongAn.map((_pa, idx) => {
                   const daXong = ketQuaSan !== null
                   const laDapAn = idx === cauSanHienTai.dung
                   return (
@@ -2143,14 +2177,14 @@ export default function ThanThuHoaHocGame({
                       type="button"
                       disabled={daXong}
                       onClick={() => traLoiQuai(idx)}
-                      className={`p-3 rounded-xl border text-left text-xs font-medium transition cursor-pointer disabled:cursor-default ${
+                      className={`p-3 rounded-xl border text-left text-xs font-medium transition cursor-pointer disabled:cursor-default flex gap-2 ${
                         daXong && laDapAn
                           ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/50'
                           : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40'
                       }`}
                     >
-                      <strong className="text-rose-600 mr-2">{String.fromCharCode(65 + idx)}.</strong>
-                      <span>{pa}</span>
+                      <strong className="text-rose-600 shrink-0">{String.fromCharCode(65 + idx)}.</strong>
+                      <NoiDungPhuongAn c={cauSanHienTai as CauCoAnh} i={idx} />
                     </button>
                   )
                 })}
@@ -2231,6 +2265,20 @@ export default function ThanThuHoaHocGame({
           với học sinh rằng đây là xếp hạng cả lớp là bịa — nên bỏ hẳn, thay
           bằng kỷ lục thật của chính em. Muốn có bảng chung toàn trung tâm thì
           phải có máy chủ, làm sau. */}
+      {/* ĐẤU TRƯỜNG CHÂN LÝ — thầy chốt 15-09: bấm Võ Đài là phải ra đấu
+          trường ngay, không phải một trang thống kê. Kỷ lục cá nhân lùi
+          xuống dưới, vẫn còn đủ, chỉ không còn chiếm chỗ đầu màn. */}
+      {daChonThu && tabGame === 'xep_hang' && (
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 sm:p-7 shadow-sm">
+          <DauTruongChanLy
+            cong={congVoDai}
+            biDanh={`${tenBacThu(infoPet.id, hoSo.capDo)} Lv.${hoSo.capDo}`}
+            he={infoPet.he}
+            raCauHoi={raCauHoiKiemVang}
+          />
+        </div>
+      )}
+
       {daChonThu && tabGame === 'xep_hang' && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 sm:p-7 shadow-sm space-y-5">
           <div className="border-b border-slate-100 dark:border-slate-800 pb-4">
