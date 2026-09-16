@@ -434,8 +434,15 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
       o.rotation.set(Math.cos(a) * 0.5, 0, -Math.sin(a) * 0.5)
       than.add(o)
     }
-    dotThan(new THREE.Vector3(0, d.yThan + 0.32, 0.5), new THREE.Vector3(0.3, 0.28, 0.34), mThanPhu)
-    vtDau = new THREE.Vector3(0, 0.12, 0.78)
+    // CỔ — ba đốt nối mai lên đầu. Bản 16-09 chỉ có một đốt ở y −0,60 trong
+    // khi đầu ở y 0,12: đầu rùa bay lơ lửng trên mai, thấy rõ trên ảnh chụp.
+    for (let i = 0; i < 3; i++) {
+      const u = i / 2
+      const r = 0.34 - u * 0.05
+      dotThan(new THREE.Vector3(0, d.yThan + 0.3 + u * 0.36, 0.46 + u * 0.14),
+        new THREE.Vector3(r, r, r), mThanPhu, d.dayLong * 0.8)
+    }
+    vtDau = new THREE.Vector3(0, 0.1, 0.72)
   } else if (d.khung === 'kyLan') {
     // LY — kỳ lân bốn chân, thân NẰM NGANG, cổ vươn chéo lên.
     dotThan(new THREE.Vector3(0, d.yThan, -0.28), new THREE.Vector3(0.66, 0.6, 0.98))
@@ -504,12 +511,65 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
    * trên một quả cầu bán kính 1 — đầu nhỏ đi là mắt và mõm lơ lửng ngoài đầu.
    * Nhét hết vào một khung co theo `CO_DAU` thì mặt luôn bám đúng da.
    */
+  // Hệ số MẶT LÔNG: `bocLong` phình lớp ngoài cùng ra `1 + dayLong` lần bán
+  // kính khối. Toạ độ mặt trong tệp này viết cho quả cầu bán kính 1, nên phải
+  // nhân đúng hệ số ấy, nếu không mắt–mõm–tai nằm chìm dưới lông.
+  const VIEN_LONG = 1 + d.dayLong * 0.92
   const matKhung = new THREE.Group()
-  matKhung.scale.copy(CO_DAU)
+  matKhung.scale.copy(CO_DAU).multiplyScalar(VIEN_LONG)
   dau.add(matKhung)
 
-  // ─── TAI — SÁU KIỂU, mỗi con một kiểu. Bóng đổ của đầu là thứ mắt nhận ra
-  // đầu tiên, nên tai chính là chỗ tách sáu con ra khỏi nhau rõ nhất. ───
+  /**
+   * KHUNG PHỤ KIỆN ĐẦU — sừng, mào, bờm, vương miện, mắt thứ ba.
+   *
+   * Cùng cỡ với `matKhung` nên toạ độ viết theo "quả cầu bán kính 1" vẫn đúng,
+   * và cũng đã nhân sẵn hệ số lông nên phụ kiện NẰM NGOÀI bộ lông. Bản 15-09
+   * gắn thẳng vào `dau` (chưa co theo cỡ đầu, chưa cộng lông): bờm sư tử bán
+   * kính 0,72 mà mặt lông đầu tới 1,04 — bờm chui hẳn vào trong đầu.
+   */
+  const dauNgoai = new THREE.Group()
+  dauNgoai.scale.copy(matKhung.scale)
+  dau.add(dauNgoai)
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // MẶT — SÁU KIỂU, KHÔNG KIỂU NÀO GIỐNG KIỂU NÀO.
+  //
+  // Thầy chốt 15-09: *"Mỗi thần thú phải khác nhau hoàn toàn về hình dáng.
+  // Không con nào được giống con nào."*
+  //
+  // Bản 15-09 đã tách được SÁU THÂN nhưng vẫn để chung MỘT CÁI MẶT: mắt tròn
+  // to, mũi hồng, miệng cười, má hồng — nhìn vào mặt thì sáu con là một con.
+  // Bảng dưới đây tách nốt phần ấy: cỡ và khoảng cách mắt, hình đồng tử, có gờ
+  // mày hay không, mõm hay mỏ, có má hồng hay không.
+  // ═══════════════════════════════════════════════════════════════════════
+  interface NetMat {
+    /** Khoảng cách mắt (nửa) và cao độ. */
+    x: number; y: number
+    /** Cỡ nhãn cầu. */
+    co: number
+    /** Bóp dọc đồng tử: 1 = tròn, 0,3 = khe dọc bò sát. */
+    docTrong: number
+    /** Gờ mày — làm mặt dữ. Số 0 là không có. */
+    may: number
+    /** Má hồng: chỉ thú và hươu mới có. */
+    maHong: boolean
+    /** Mõm: `bau` cục tròn · `dai` mõm dài · `mo` mỏ · `hamBe` hàm bè. */
+    mom: 'bau' | 'dai' | 'mo' | 'hamBe'
+    /** Nanh chìa ra. */
+    nanh: boolean
+  }
+  const NET_MAT: Record<string, NetMat> = {
+    thu: { x: 0.31, y: 0.1, co: 0.88, docTrong: 1, may: 0, maHong: true, mom: 'bau', nanh: true },
+    rong: { x: 0.3, y: 0.18, co: 0.7, docTrong: 0.3, may: 0.5, maHong: false, mom: 'dai', nanh: true },
+    chim: { x: 0.31, y: 0.14, co: 0.78, docTrong: 1, may: 0.3, maHong: false, mom: 'mo', nanh: false },
+    huou: { x: 0.33, y: 0.14, co: 0.8, docTrong: 0.78, may: 0, maHong: true, mom: 'dai', nanh: false },
+    quy: { x: 0.3, y: 0.08, co: 0.64, docTrong: 0.9, may: 0.62, maHong: false, mom: 'hamBe', nanh: false },
+    thuy: { x: 0.3, y: 0.14, co: 0.76, docTrong: 0.42, may: 0.34, maHong: false, mom: 'bau', nanh: true },
+  }
+  const nm = NET_MAT[d.kieuMat] ?? NET_MAT['thu']!
+
+  // ─── TAI — SÁU KIỂU. Chim và rùa KHÔNG có tai ngoài; đắp tai tròn lên mặt
+  // chim là hỏng ngay cái bóng đổ, thứ mắt nhận ra đầu tiên. ───
   const mTrongTai = ghi(vatLieu(new THREE.Color(1, 0.68, 0.72), { nham: 0.8 }))
   const SO_TAI: Record<string, { co: [number, number, number]; x: number; y: number; ngA: number }> = {
     tron: { co: [0.3, 0.42, 0.22], x: 0.6, y: 0.76, ngA: 0.3 },
@@ -519,24 +579,40 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
     chop: { co: [0.24, 0.5, 0.18], x: 0.58, y: 0.82, ngA: 0.6 },
     la: { co: [0.44, 0.36, 0.1], x: 0.64, y: 0.72, ngA: 0.72 },
   }
-  const kt = SO_TAI[d.kieuTai] ?? SO_TAI['tron']!
-  for (const ben of [-1, 1] as const) {
-    const vtTai = new THREE.Vector3(ben * kt.x, kt.y, -0.04)
-    const coTai = new THREE.Vector3(kt.co[0], kt.co[1], kt.co[2])
-    const xoayTai = new THREE.Euler(0, 0, ben * kt.ngA)
-    const mTai = ghi(vatLieu(cChinh, { nham: 0.9 }))
-    const tai = new THREE.Mesh(gCau, mTai)
-    tai.position.copy(vtTai)
-    tai.scale.copy(coTai)
-    tai.rotation.copy(xoayTai)
-    matKhung.add(tai)
-    nhan(bocLong(matKhung, gCau, { vt: vtTai, co: coTai, xoay: xoayTai }, cChinh, cPhu,
-      { soLop: nLopNho, tex: texLong, dayLong: 0.22, lapVan: 4 }))
-    const trong = new THREE.Mesh(gCau, mTrongTai)
-    trong.position.set(ben * (kt.x - 0.02), kt.y, 0.2)
-    trong.scale.set(kt.co[0] * 0.53, kt.co[1] * 0.6, 0.09)
-    trong.rotation.z = ben * kt.ngA
-    matKhung.add(trong)
+  const coTaiNgoai = d.kieuMat !== 'chim' && d.kieuMat !== 'quy' && d.kieuMat !== 'rong'
+  if (coTaiNgoai) {
+    const kt = SO_TAI[d.kieuTai] ?? SO_TAI['tron']!
+    for (const ben of [-1, 1] as const) {
+      const vtTai = new THREE.Vector3(ben * kt.x, kt.y, -0.04)
+      const coTai = new THREE.Vector3(kt.co[0], kt.co[1], kt.co[2])
+      const xoayTai = new THREE.Euler(0, 0, ben * kt.ngA)
+      const mTai = ghi(vatLieu(cChinh, { nham: 0.9 }))
+      const tai = new THREE.Mesh(gCau, mTai)
+      tai.position.copy(vtTai)
+      tai.scale.copy(coTai)
+      tai.rotation.copy(xoayTai)
+      matKhung.add(tai)
+      nhan(bocLong(matKhung, gCau, { vt: vtTai, co: coTai, xoay: xoayTai }, cChinh, cPhu,
+        { soLop: nLopNho, tex: texLong, dayLong: 0.22, lapVan: 4 }))
+      const trong = new THREE.Mesh(gCau, mTrongTai)
+      trong.position.set(ben * (kt.x - 0.02), kt.y, 0.2)
+      trong.scale.set(kt.co[0] * 0.53, kt.co[1] * 0.6, 0.09)
+      trong.rotation.z = ben * kt.ngA
+      matKhung.add(trong)
+    }
+  } else {
+    // CHIM và RÙA — thay tai bằng PHIẾN MANG/LÔNG TAI ốp sát đầu, vuốt ra sau.
+    const gPhien = ghi(new THREE.ConeGeometry(0.2, 0.5, 4))
+    const mPhien = ghi(vatLieu(cPhu, { bong: 0.3, nham: 0.45 }))
+    for (const ben of [-1, 1] as const) {
+      for (let i = 0; i < 2; i++) {
+        const ph = new THREE.Mesh(gPhien, mPhien)
+        ph.position.set(ben * 0.74, 0.42 - i * 0.3, -0.3 - i * 0.12)
+        ph.rotation.set(1.2, 0, ben * (1.5 - i * 0.2))
+        ph.scale.setScalar(1 - i * 0.2)
+        matKhung.add(ph)
+      }
+    }
   }
 
   // ─── MẮT: tròng to, vành mống màu hệ, HAI đốm sáng lệch nhau ───
@@ -553,6 +629,8 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
   const gLoeTo = ghi(new THREE.SphereGeometry(0.072, 16, 14))
   const gLoeNho = ghi(new THREE.SphereGeometry(0.036, 12, 10))
   const mLoe = ghi(vatLieu(new THREE.Color(1, 1, 1), { phat: 0.95 }))
+  const gMay = ghi(new THREE.SphereGeometry(0.3, 18, 8, 0, Math.PI * 2, 0, Math.PI / 2))
+  const mMay = ghi(vatLieu(cChinh.clone().multiplyScalar(0.7), { nham: 0.9 }))
   const mat: THREE.Group[] = []
   for (const ben of [-1, 1] as const) {
     const g = new THREE.Group()
@@ -561,7 +639,9 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
     g.add(t)
     const tr = new THREE.Mesh(gTrong, mTrong)
     tr.position.z = 0.12
-    tr.scale.set(1, 1.06, 0.72)
+    // Đồng tử: tròn cho thú và chim, KHE DỌC cho rồng — đây là nét làm mặt bò
+    // sát ra bò sát. Cùng một khối cầu, chỉ khác phép bóp.
+    tr.scale.set(nm.docTrong, 1.06, 0.72)
     g.add(tr)
     const mo = new THREE.Mesh(gMong, mMong)
     mo.position.z = 0.15
@@ -572,45 +652,116 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
     const l2 = new THREE.Mesh(gLoeNho, mLoe)
     l2.position.set(-ben * 0.08, -0.09, 0.23)
     g.add(l2)
-    // z = 1,02: nhô hẳn qua mặt lông (≈ 1,07 trừ bán kính cầu mắt) nên không
-    // có sợi nào cắt ngang tròng. Bản đầu để 0,84 — mắt chìm trong lông.
-    g.position.set(ben * 0.38, 0.08, 1.02)
+    g.scale.setScalar(nm.co)
+    // z = 0,84: khung này đã nhân `VIEN_LONG`, nên mặt lông nằm ở 1,0. Nhãn
+    // cầu bán kính 0,31 (bóp còn 0,64 theo trục z) nhô thêm ≈ 0,2 — đặt 0,84
+    // là tròng vừa qua khỏi lông, không lồi ra thành hai quả bóng dán ngoài.
+    g.position.set(ben * nm.x, nm.y, 0.84)
     g.rotation.y = ben * 0.12
     matKhung.add(g)
     mat.push(g)
+    // GỜ MÀY — mái vòm che nửa trên mắt. Đây là thứ biến "dễ thương" thành
+    // "dữ": rùa già và rồng có, thú và hươu không.
+    if (nm.may > 0) {
+      const my = new THREE.Mesh(gMay, mMay)
+      my.position.set(ben * nm.x, nm.y + 0.2 * nm.co, 0.8)
+      my.scale.set(nm.co * 1.3, nm.may * 0.7, nm.co * 0.55)
+      my.rotation.set(1.15, 0, ben * 0.3)
+      matKhung.add(my)
+    }
   }
 
-  // ─── MÕM, MŨI, MIỆNG CƯỜI ───
+  // ─── MÕM / MỎ / HÀM — bốn kiểu, theo `NET_MAT` ───
   const mMom = ghi(vatLieu(cSang, { nham: 0.88 }))
-  const mom = new THREE.Mesh(gCau, mMom)
-  mom.position.set(0, -0.24, 1.0)
-  // Rồng và kỳ lân có MÕM DÀI thật, không phải cục tròn dán trước mặt.
-  const momDai = d.khung === 'long' || d.khung === 'kyLan'
-  mom.scale.set(0.33 * d.coMom, 0.24 * d.coMom, (momDai ? 0.62 : 0.26) * d.coMom)
-  if (momDai) mom.position.set(0, -0.24, 1.2)
-  matKhung.add(mom)
-  const gMui = ghi(new THREE.SphereGeometry(0.09, 16, 14))
   const mMui = ghi(vatLieu(new THREE.Color(0.22, 0.13, 0.17), { nham: 0.3 }))
-  const mui = new THREE.Mesh(gMui, mMui)
-  mui.position.set(0, -0.17, 1.2)
-  mui.scale.set(1.15, 0.8, 0.8)
-  matKhung.add(mui)
-  const gCuoi = ghi(new THREE.TorusGeometry(0.1, 0.021, 8, 18, Math.PI))
-  const cuoi = new THREE.Mesh(gCuoi, mMui)
-  cuoi.position.set(0, -0.3, 1.18)
-  cuoi.rotation.z = Math.PI
-  matKhung.add(cuoi)
-
-  // ─── MÁ HỒNG ───
-  const gMa = ghi(new THREE.SphereGeometry(0.19, 20, 16))
-  const mMa = ghi(vatLieu(new THREE.Color(1, 0.6, 0.62), { nham: 0.85, trong: 0.66 }))
-  for (const x of [-0.62, 0.62]) {
-    const ma = new THREE.Mesh(gMa, mMa)
-    ma.position.set(x, -0.2, 0.9)
-    ma.scale.set(1, 0.68, 0.42)
-    matKhung.add(ma)
+  if (nm.mom === 'mo') {
+    // MỎ — thay hẳn mõm. Hai mảnh: mảnh trên quặp xuống, mảnh dưới ngắn.
+    const mMoVang = ghi(vatLieu(new THREE.Color(1, 0.78, 0.3), { bong: 0.55, nham: 0.3 }))
+    const gMoTren = ghi(new THREE.ConeGeometry(0.24, 0.94, 6))
+    const moT = new THREE.Mesh(gMoTren, mMoVang)
+    moT.position.set(0, -0.14, 1.06)
+    moT.rotation.set(Math.PI / 2 + 0.3, 0, 0)
+    moT.scale.set(1, 1, 0.78)
+    matKhung.add(moT)
+    const gMoDuoi = ghi(new THREE.ConeGeometry(0.17, 0.44, 6))
+    const moD = new THREE.Mesh(gMoDuoi, mMoVang)
+    moD.position.set(0, -0.36, 0.94)
+    moD.rotation.set(Math.PI / 2 - 0.45, 0, 0)
+    matKhung.add(moD)
+    const gLoMui = ghi(new THREE.SphereGeometry(0.035, 10, 8))
+    for (const ben of [-1, 1] as const) {
+      const lm = new THREE.Mesh(gLoMui, mMui)
+      lm.position.set(ben * 0.07, 0.0, 1.1)
+      matKhung.add(lm)
+    }
+  } else if (nm.mom === 'hamBe') {
+    // HÀM BÈ — rùa: một khối hộp bè ngang, mép sừng nhô ra, không mũi hồng.
+    const mSung = ghi(vatLieu(new THREE.Color(0.94, 0.9, 0.78), { bong: 0.4, nham: 0.4 }))
+    const gHam = ghi(new THREE.SphereGeometry(1, 22, 16))
+    const ham = new THREE.Mesh(gHam, mMom)
+    ham.position.set(0, -0.3, 0.74)
+    ham.scale.set(0.54 * d.coMom, 0.24 * d.coMom, 0.36 * d.coMom)
+    matKhung.add(ham)
+    const gMep = ghi(new THREE.ConeGeometry(0.26, 0.42, 4))
+    const mepT = new THREE.Mesh(gMep, mSung)
+    mepT.position.set(0, -0.18, 0.94)
+    mepT.rotation.set(Math.PI / 2 + 0.3, Math.PI / 4, 0)
+    matKhung.add(mepT)
+    const mepD = new THREE.Mesh(gMep, mSung)
+    mepD.position.set(0, -0.4, 0.86)
+    mepD.rotation.set(Math.PI / 2 - 0.45, Math.PI / 4, 0)
+    mepD.scale.set(0.8, 0.6, 0.8)
+    matKhung.add(mepD)
+    const gLoMui = ghi(new THREE.SphereGeometry(0.042, 10, 8))
+    for (const ben of [-1, 1] as const) {
+      const lm = new THREE.Mesh(gLoMui, mMui)
+      lm.position.set(ben * 0.08, -0.06, 1.04)
+      matKhung.add(lm)
+    }
+  } else {
+    // MÕM — `dai` cho rồng và hươu, `bau` cho thú.
+    const dai = nm.mom === 'dai'
+    const mom = new THREE.Mesh(gCau, mMom)
+    mom.scale.set((dai ? 0.28 : 0.34) * d.coMom, (dai ? 0.22 : 0.25) * d.coMom,
+      (dai ? 0.46 : 0.3) * d.coMom)
+    mom.position.set(0, -0.26, dai ? 0.92 : 0.9)
+    matKhung.add(mom)
+    const gMui = ghi(new THREE.SphereGeometry(0.09, 16, 14))
+    const mui = new THREE.Mesh(gMui, mMui)
+    mui.position.set(0, -0.18, dai ? 0.92 + 0.44 * d.coMom : 1.14)
+    mui.scale.set(1.15, 0.8, 0.8)
+    matKhung.add(mui)
+    const gCuoi = ghi(new THREE.TorusGeometry(0.1, 0.021, 8, 18, Math.PI))
+    const cuoi = new THREE.Mesh(gCuoi, mMui)
+    cuoi.position.set(0, -0.33, dai ? 0.92 + 0.36 * d.coMom : 1.1)
+    cuoi.rotation.z = Math.PI
+    matKhung.add(cuoi)
+  }
+  // NANH — chìa ra khỏi mép trên, chỉ con nào `NET_MAT` cho phép.
+  if (nm.nanh) {
+    const mNga = ghi(vatLieu(new THREE.Color(0.98, 0.96, 0.9), { bong: 0.55, nham: 0.25 }))
+    const gNanhMat = ghi(new THREE.ConeGeometry(0.05, 0.22, 5))
+    const zN = nm.mom === 'dai' ? 0.92 + 0.34 * d.coMom : 1.0
+    for (const ben of [-1, 1] as const) {
+      const n = new THREE.Mesh(gNanhMat, mNga)
+      n.position.set(ben * 0.15, -0.38, zN)
+      n.rotation.set(Math.PI - 0.2, 0, 0)
+      matKhung.add(n)
+    }
   }
 
+  // ─── MÁ HỒNG — chỉ mặt thú và mặt hươu. Đắp má hồng lên mặt rồng hay mặt
+  // rùa già là mất sạch chất dữ, đó là lỗi của bản trước. ───
+  if (nm.maHong) {
+    const gMa = ghi(new THREE.SphereGeometry(0.19, 20, 16))
+    const mMa = ghi(vatLieu(new THREE.Color(1, 0.6, 0.62), { nham: 0.85, trong: 0.66 }))
+    for (const x of [-0.62, 0.62]) {
+      const ma = new THREE.Mesh(gMa, mMa)
+      ma.position.set(x, -0.2, 0.9)
+      ma.scale.set(1, 0.68, 0.42)
+      matKhung.add(ma)
+    }
+  }
   // ─── CHI — BỐN CHÂN, HAI CHÂN, hay CHÂN CHIM, theo khung xương ───
   const gChi = ghi(new THREE.CapsuleGeometry(0.19, 0.12, 6, 16))
   const mChi = ghi(vatLieu(cChinh.clone().multiplyScalar(0.92), { nham: 0.9 }))
@@ -684,14 +835,18 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
     }
   }
 
-  // ─── MỎ PHƯỢNG — thay mõm, chỉ khung `phuong` ───
+  // ─── YẾM LÔNG CỔ PHƯỢNG — vòng lông vũ xoè quanh cổ.
+  // (Mỏ nay do `NET_MAT.mom === 'mo'` dựng, không dựng hai lần.) ───
   if (d.khung === 'phuong') {
-    const gMo = ghi(new THREE.ConeGeometry(0.16, 0.44, 8))
-    const mMo = ghi(vatLieu(cPhu, { bong: 0.4, nham: 0.35 }))
-    const mo = new THREE.Mesh(gMo, mMo)
-    mo.position.set(0, -0.14, 0.96)
-    mo.rotation.x = Math.PI / 2
-    matKhung.add(mo)
+    const gVu = ghi(new THREE.ConeGeometry(0.16, 0.44, 4))
+    const mVu = ghi(vatLieu(cPhu, { bong: 0.25, nham: 0.45, phat: h.haoQuang ? 0.3 : 0.1 }))
+    for (let i = 0; i < 11; i++) {
+      const a2 = (i / 11) * Math.PI * 2
+      const v = new THREE.Mesh(gVu, mVu)
+      v.position.set(Math.cos(a2) * 0.58, -0.62 + Math.sin(a2) * 0.2, Math.sin(a2) * 0.34 + 0.1)
+      v.rotation.set(0.9, 0, a2)
+      matKhung.add(v)
+    }
   }
 
   // ─── SỪNG ĐỘC KỲ LÂN — chỉ khung `ly` ───
@@ -748,10 +903,10 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
       for (const ben of [-1, 1] as const) {
         for (const [i, ng] of [0.0, 0.5, -0.4].entries()) {
           const n = new THREE.Mesh(gNhanh, mVang)
-          n.position.set(ben * (0.3 + i * 0.1), 0.8 + i * 0.22, -0.16 - i * 0.08)
+          n.position.set(ben * (0.42 + i * 0.17), 1.02 + i * 0.3, -0.2 - i * 0.12)
           n.rotation.set(-0.3 + ng * 0.4, 0, ben * (0.5 + ng))
-          n.scale.setScalar(1 - i * 0.2)
-          dau.add(n)
+          n.scale.setScalar((1.3 - i * 0.24) * k)
+          dauNgoai.add(n)
         }
       }
       // Nanh dưới mõm.
@@ -768,10 +923,10 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
       for (const ben of [-1, 1] as const) {
         for (let i = 0; i < 3; i++) {
           const x = new THREE.Mesh(gXoan, mVang)
-          x.position.set(ben * 0.22, 0.82 + i * 0.2, -0.04 - i * 0.03)
+          x.position.set(ben * 0.28, 1.04 + i * 0.28, -0.06 - i * 0.04)
           x.rotation.set(0.3, 0, ben * 0.22)
-          x.scale.setScalar((1.05 - i * 0.14) * k)
-          dau.add(x)
+          x.scale.setScalar((1.45 - i * 0.2) * k)
+          dauNgoai.add(x)
         }
       }
       // BỜM BAY — dải lông mảnh phất sau gáy.
@@ -821,12 +976,16 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
     } else if (d.khung === 'phuong') {
       // PHƯỢNG — MÀO BA LÔNG dựng, LÔNG CỔ xoè, ĐUÔI BA PHIẾN dài rực.
       const gLong = ghi(new THREE.CircleGeometry(0.3, 3))
-      for (const [i, ng] of [-0.5, 0, 0.5].entries()) {
-        const m = new THREE.Mesh(gLong, mVang)
-        m.position.set(ng * 0.2, 0.92 + (i === 1 ? 0.22 : 0.06), -0.1)
-        m.rotation.set(-0.25, 0, ng)
-        m.scale.set((i === 1 ? 1.5 : 1.1) * k, (i === 1 ? 2.1 : 1.5) * k, 1)
-        dau.add(m)
+      const mMaoP = ghi(vatLieu(cPhu.clone().lerp(new THREE.Color(1, 0.86, 0.3), 0.5),
+        { bong: 0.3, nham: 0.4, phat: 0.55 }))
+      mMaoP.side = THREE.DoubleSide
+      for (const [i, ng] of [-0.86, -0.44, 0, 0.44, 0.86].entries()) {
+        const cao = 1 - Math.abs(ng) * 0.45
+        const m = new THREE.Mesh(gLong, i % 2 === 0 ? mMaoP : mVang)
+        m.position.set(ng * 0.3, 1.1 + cao * 0.42, -0.14 - Math.abs(ng) * 0.1)
+        m.rotation.set(-0.3, 0, ng * 0.9)
+        m.scale.set(1.5 * cao * k, (2.0 + cao * 2.2) * k, 1)
+        dauNgoai.add(m)
       }
       const gPhien = ghi(new THREE.CircleGeometry(0.42, 3))
       for (const [i, ng] of [-0.45, 0, 0.45].entries()) {
@@ -838,14 +997,22 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
       }
     } else if (d.khung === 'lan') {
       // LÂN — BỜM DÀY vòng kín quanh đầu, đây là thứ làm sư tử ra sư tử.
-      const gBom = ghi(new THREE.ConeGeometry(0.17, 0.56, 4))
-      for (let i = 0; i < 14; i++) {
-        const a = (i / 14) * Math.PI * 2
-        const b = new THREE.Mesh(gBom, mRuc)
-        b.position.set(Math.cos(a) * 0.72, Math.sin(a) * 0.7, -0.16)
-        b.rotation.set(0.35, 0, a - Math.PI / 2)
-        b.scale.setScalar((1 + Math.cos(a) * 0.12) * k)
-        dau.add(b)
+      // Hai vòng bờm lệch pha: vòng trong dày ôm mặt, vòng ngoài dài xoã ra.
+      // Nón BÈ (đáy 0,3 · cao 0,5) và ngả về sau — nón thon chĩa thẳng ra
+      // ngoài cho ra con nhím, đúng lỗi của ảnh chụp 16-09.
+      // Bờm KHÔNG dùng `mRuc`: `mRuc` là màu phụ có phát sáng, ảnh 16-09 cho
+      // ra bó gai băng chứ không ra bờm. Bờm là lông — sẫm hơn da, không sáng.
+      const mBomSu = ghi(vatLieu(cChinh.clone().multiplyScalar(0.72).lerp(cPhu, 0.22), { nham: 0.95 }))
+      const gBom = ghi(new THREE.ConeGeometry(0.34, 0.44, 5))
+      for (const [vong, sl, bk, co, lui] of [[0, 15, 0.86, 1.0, -0.1], [1, 13, 1.06, 1.24, -0.4]] as const) {
+        for (let i = 0; i < sl; i++) {
+          const a = (i / sl) * Math.PI * 2 + vong * 0.22
+          const b = new THREE.Mesh(gBom, mBomSu)
+          b.position.set(Math.cos(a) * bk, Math.sin(a) * bk * 0.94, lui)
+          b.rotation.set(1.15, 0, a - Math.PI / 2)
+          b.scale.set(co * k * 1.15, co * k, co * k * 0.45)
+          dauNgoai.add(b)
+        }
       }
       // HỔ — VẰN thân, NANH DÀI, BỜM MÁ hai bên, TAI vểnh.
       const gVan = ghi(new THREE.TorusGeometry(0.52, 0.045, 6, 18, Math.PI * 1.1))
@@ -899,9 +1066,10 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
       const gNhanh = ghi(new THREE.CapsuleGeometry(0.04, 0.3, 4, 8))
       for (const ben of [-1, 1] as const) {
         const n = new THREE.Mesh(gNhanh, mVang)
-        n.position.set(ben * 0.3, 0.8, -0.14)
+        n.position.set(ben * 0.42, 1.06, -0.18)
         n.rotation.set(-0.3, 0, ben * 0.6)
-        dau.add(n)
+        n.scale.setScalar(1.3 * k)
+        dauNgoai.add(n)
       }
     } else {
       // ĐẠI BÀNG — MỎ QUẶP, CHÙM LÔNG GÁY, LÔNG CÁNH nhiều tầng, MÓNG THÉP.
@@ -922,7 +1090,7 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
         g.position.set(Math.cos(a) * 0.62, -0.42, Math.sin(a) * 0.5)
         g.rotation.set(0.8, 0, a)
         g.scale.setScalar(k)
-        dau.add(g)
+        dauNgoai.add(g)
       }
     }
   }
@@ -993,11 +1161,11 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
       const gToc = ghi(new THREE.ConeGeometry(0.11, 0.46, 6))
       for (const [i, x] of [-0.22, 0.02, 0.24].entries()) {
         const t = new THREE.Mesh(gToc, mToc)
-        t.position.set(x, 1.04 + (i === 1 ? 0.16 : 0), -0.02)
+        t.position.set(x * 1.3, 1.16 + (i === 1 ? 0.2 : 0), -0.04)
         t.rotation.z = (i - 1) * 0.42
         t.rotation.x = -0.18
         t.scale.setScalar((i === 1 ? 1.5 : 1.15) * k)
-        dau.add(t)
+        dauNgoai.add(t)
       }
     } else {
       // HỮU CƠ — lá vai: bốn phiến lá bè xoè hai bên, mềm và hiền.
@@ -1026,11 +1194,11 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
     }))
     for (const ben of [-1, 1] as const) {
       const s = new THREE.Mesh(gSung, mSung)
-      s.position.set(ben * 0.28, 1.0, 0.2)
+      s.position.set(ben * 0.36, 1.12, 0.22)
       s.rotation.z = -ben * 0.36
       s.rotation.x = -0.24
       s.castShadow = true
-      dau.add(s)
+      dauNgoai.add(s)
     }
   }
 
@@ -1225,8 +1393,8 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
       c.position.set(Math.cos(a) * 0.42, 0.15, Math.sin(a) * 0.42)
       mien.add(c)
     }
-    mien.position.set(0, 1.2, 0)
-    dau.add(mien)
+    mien.position.set(0, 1.34, 0)
+    dauNgoai.add(mien)
   }
 
   // ─── CẤP 11: VÒNG RUNE ký hiệu hoá học, chạy quanh chân ───
@@ -1337,13 +1505,13 @@ export function dungThanThu3D(info: ThanThuInfo, cap: number, soLop?: number): B
     const gM3 = ghi(new THREE.SphereGeometry(0.15, 20, 16))
     const mM3 = ghi(vatLieu(cPhu, { phat: 1.6, nham: 0.15 }))
     const m3 = new THREE.Mesh(gM3, mM3)
-    m3.position.set(0, 0.52, 0.94)
+    m3.position.set(0, 0.56, 0.86)
     m3.scale.set(1, 1.3, 0.7)
-    dau.add(m3)
+    dauNgoai.add(m3)
     const gVanh = ghi(new THREE.TorusGeometry(0.19, 0.028, 10, 22))
     const vanh = new THREE.Mesh(gVanh, mM3)
-    vanh.position.set(0, 0.52, 0.96)
-    dau.add(vanh)
+    vanh.position.set(0, 0.56, 0.88)
+    dauNgoai.add(vanh)
   }
 
   // ─── CẤP 104: GIÁP NGỰC ───
