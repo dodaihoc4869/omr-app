@@ -63,6 +63,9 @@ import {
 import { veThanThuCanvas, khungVeThanThu } from '../game/than-thu-hoa-hoc/ve-than-thu'
 import { hoaGiaiHoSo } from '../game/than-thu-hoa-hoc/dong-bo'
 import KhungLoiGiaiGame from './KhungLoiGiaiGame'
+import {
+  ThanCauGame, NoiDungPhuongAn, cauCoMedia, type CauCoAnh,
+} from './CauHoiTrongGame'
 import OngNghiemExp from './OngNghiemExp'
 import PopupThuongExp, { type TinThuongExp } from './PopupThuongExp'
 /**
@@ -1997,19 +2000,25 @@ export default function ThanThuHoaHocGame({
                     </span>
                   </div>
 
-                  <div className="text-sm font-semibold text-slate-900 dark:text-white leading-relaxed">
-                    {cauHoiHienTai.cau}
-                  </div>
+                  {/* Ảnh đề, bảng số liệu, ảnh từng phương án — đúng chỗ của
+                      nó. Thiếu ảnh thì câu "dựa vào đồ thị" thành câu đoán mò. */}
+                  <ThanCauGame c={cauHoiHienTai as CauCoAnh} />
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
-                    {cauHoiHienTai.phuongAn.map((pa, idx) => (
+                  <div
+                    className={`grid gap-2.5 pt-2 ${
+                      cauCoMedia(cauHoiHienTai as CauCoAnh)
+                        ? 'grid-cols-1'
+                        : 'grid-cols-1 sm:grid-cols-2'
+                    }`}
+                  >
+                    {cauHoiHienTai.phuongAn.map((_pa, idx) => (
                       <button
                         key={idx}
                         onClick={() => xuLyTraLoi(idx)}
-                        className="p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-purple-950/40 text-left text-xs font-medium transition cursor-pointer"
+                        className="p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-purple-950/40 text-left text-xs font-medium transition cursor-pointer flex gap-2"
                       >
-                        <strong className="text-purple-600 mr-2">{String.fromCharCode(65 + idx)}.</strong>
-                        <span>{pa}</span>
+                        <strong className="text-purple-600 shrink-0">{String.fromCharCode(65 + idx)}.</strong>
+                        <NoiDungPhuongAn c={cauHoiHienTai as CauCoAnh} i={idx} />
                       </button>
                     ))}
                   </div>
@@ -2129,12 +2138,14 @@ export default function ThanThuHoaHocGame({
                 </span>
               </div>
 
-              <div className="text-sm font-semibold text-slate-900 dark:text-white leading-relaxed whitespace-pre-line">
-                {cauSanHienTai.cau}
-              </div>
+              <ThanCauGame c={cauSanHienTai as CauCoAnh} />
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {cauSanHienTai.phuongAn.map((pa, idx) => {
+              <div
+                className={`grid gap-2.5 ${
+                  cauCoMedia(cauSanHienTai as CauCoAnh) ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
+                }`}
+              >
+                {cauSanHienTai.phuongAn.map((_pa, idx) => {
                   const daXong = ketQuaSan !== null
                   const laDapAn = idx === cauSanHienTai.dung
                   return (
@@ -2143,14 +2154,14 @@ export default function ThanThuHoaHocGame({
                       type="button"
                       disabled={daXong}
                       onClick={() => traLoiQuai(idx)}
-                      className={`p-3 rounded-xl border text-left text-xs font-medium transition cursor-pointer disabled:cursor-default ${
+                      className={`p-3 rounded-xl border text-left text-xs font-medium transition cursor-pointer disabled:cursor-default flex gap-2 ${
                         daXong && laDapAn
                           ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/50'
                           : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40'
                       }`}
                     >
-                      <strong className="text-rose-600 mr-2">{String.fromCharCode(65 + idx)}.</strong>
-                      <span>{pa}</span>
+                      <strong className="text-rose-600 shrink-0">{String.fromCharCode(65 + idx)}.</strong>
+                      <NoiDungPhuongAn c={cauSanHienTai as CauCoAnh} i={idx} />
                     </button>
                   )
                 })}
