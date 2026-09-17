@@ -10,6 +10,7 @@ import {
 import { loadClassListMeta, saveClassList } from '../lib/classlist-db'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { napDanhSachLop } from '../lib/exam-api'
+import { GraduationCap, RefreshCw, FileSpreadsheet, Sparkles, CheckCircle2 } from 'lucide-react'
 
 const FIELD_LABEL: Record<keyof ColumnMapping, string> = {
   sbd: 'Số báo danh',
@@ -106,84 +107,150 @@ export default function ClassListScreen() {
   const header = rows?.[0] ?? []
 
   return (
-    <div className="gv-page min-h-screen pb-24 px-4 pt-4 space-y-4 bg-slate-50 dark:bg-slate-950">
-      <h1 className="text-xl font-bold">Kết nối danh sách lớp</h1>
+    <div className="gv-page min-h-screen pb-24 px-3 sm:px-4 pt-4 space-y-4">
+      {/* HEADER GOOGLE STYLE */}
+      <header className="flex flex-wrap items-center justify-between gap-3 pb-1 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/70 text-[#1a73e8] border border-blue-200 dark:border-blue-800 shadow-2xs">
+            <GraduationCap size={20} />
+          </div>
+          <div>
+            <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">
+              Kết nối danh sách lớp
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Đồng bộ danh sách học sinh theo lớp từ Google Sheet hoặc tệp bảng tính
+            </p>
+          </div>
+        </div>
 
-      <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">
-        Link Google Sheet ở chế độ "ai có link đều xem" là công khai (dù không ai đoán được đường link) — chỉ dùng
-        khi thầy chấp nhận điều đó. Nếu cần kín hoàn toàn, dùng "Dán tay TSV" ở dưới, không cần bật chia sẻ.
+        <div className="text-xs font-bold px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/70 text-[#1a73e8] dark:text-blue-300 border border-blue-200/80 dark:border-blue-800 shadow-2xs">
+          Đang lưu: {classList.length} học sinh
+        </div>
+      </header>
+
+      {/* THÔNG BÁO / HƯỚNG DẪN KIỂU GOOGLE AMBER */}
+      <div className="rounded-2xl border-2 border-amber-200/90 dark:border-amber-800/70 bg-gradient-to-br from-amber-50/50 via-white to-orange-50/20 dark:from-slate-900 dark:via-slate-900 dark:to-amber-950/30 p-3.5 sm:p-4 text-xs sm:text-sm text-amber-900 dark:text-amber-200 shadow-sm leading-relaxed space-y-1">
+        <div className="font-bold flex items-center gap-1.5 text-amber-800 dark:text-amber-300">
+          <Sparkles size={16} className="text-[#fbbc04]" />
+          <span>Lưu ý kết nối Google Sheet</span>
+        </div>
+        <p>
+          Link Google Sheet ở chế độ "ai có link đều xem" là công khai (dù không ai đoán được đường link) — chỉ dùng khi thầy chấp nhận điều đó. Nếu cần kín hoàn toàn, dùng "Dán tay TSV" ở dưới, không cần bật chia sẻ.
+        </p>
       </div>
 
+      {/* CHUYỂN CHẾ ĐỘ GOOGLE PILLS */}
       <div className="flex gap-2">
         <button
           onClick={() => setMode('gviz')}
-          className={`tap-target flex-1 rounded-lg font-semibold ${mode === 'gviz' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600'}`}
+          className={`tap-target flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 shadow-2xs ${
+            mode === 'gviz'
+              ? 'bg-[#1a73e8] text-white shadow-xs'
+              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-blue-300'
+          }`}
         >
-          Link Google Sheet
+          <FileSpreadsheet size={16} />
+          <span>Link Google Sheet</span>
         </button>
         <button
           onClick={() => setMode('tsv')}
-          className={`tap-target flex-1 rounded-lg font-semibold ${mode === 'tsv' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600'}`}
+          className={`tap-target flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 shadow-2xs ${
+            mode === 'tsv'
+              ? 'bg-[#1a73e8] text-white shadow-xs'
+              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-blue-300'
+          }`}
         >
-          Dán tay TSV
+          <span>Dán tay TSV</span>
         </button>
       </div>
 
-      {mode === 'gviz' ? (
-        <div className="space-y-2">
-          <input
-            className="tap-target w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3"
-            placeholder="Dán link Google Sheet…"
-            value={sheetUrl}
-            onChange={(e) => setSheetUrl(e.target.value)}
-          />
-          <button onClick={handleFetch} disabled={loading || !sheetUrl} className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold disabled:opacity-50">
-            {loading ? 'Đang tải…' : 'Đồng bộ'}
-          </button>
-        </div>
-      ) : (
-        <div className="space-y-2">
-          <textarea
-            className="w-full h-32 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 p-3 text-sm font-mono"
-            placeholder="Dán vùng dữ liệu copy trực tiếp từ Google Sheet (kèm hàng tiêu đề)"
-            value={tsvText}
-            onChange={(e) => setTsvText(e.target.value)}
-          />
-          <button onClick={handleParseTsv} className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold">
-            Đọc dữ liệu đã dán
-          </button>
+      {/* KHUNG NHẬP DỮ LIỆU */}
+      <div className="rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-4 shadow-xs space-y-3">
+        {mode === 'gviz' ? (
+          <div className="space-y-3">
+            <input
+              className="tap-target w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
+              placeholder="Dán link Google Sheet…"
+              value={sheetUrl}
+              onChange={(e) => setSheetUrl(e.target.value)}
+            />
+            <button
+              onClick={handleFetch}
+              disabled={loading || !sheetUrl}
+              className="tap-target w-full min-h-[46px] rounded-xl bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold text-sm shadow-xs transition disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+            >
+              <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+              <span>{loading ? 'Đang tải…' : 'Đồng bộ'}</span>
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <textarea
+              className="w-full h-32 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 text-sm font-mono text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
+              placeholder="Dán vùng dữ liệu copy trực tiếp từ Google Sheet (kèm hàng tiêu đề)"
+              value={tsvText}
+              onChange={(e) => setTsvText(e.target.value)}
+            />
+            <button
+              onClick={handleParseTsv}
+              className="tap-target w-full min-h-[46px] rounded-xl bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold text-sm shadow-xs transition cursor-pointer"
+            >
+              Đọc dữ liệu đã dán
+            </button>
+          </div>
+        )}
+      </div>
+
+      {error && (
+        <div className="rounded-xl bg-rose-50 border border-rose-200 dark:bg-rose-950/60 dark:border-rose-800 p-3 text-xs sm:text-sm font-semibold text-rose-700 dark:text-rose-200 shadow-2xs">
+          {error}
         </div>
       )}
 
-      {error && <div className="rounded-xl bg-rose-50 border border-rose-200 p-3 text-sm text-rose-700">{error}</div>}
-
+      {/* ÁNH XẠ CỘT */}
       {rows && (
-        <div className="space-y-3">
-          <h2 className="font-semibold text-sm">Ánh xạ cột ({rows.length - 1} dòng dữ liệu)</h2>
-          {(Object.keys(FIELD_LABEL) as (keyof ColumnMapping)[]).map((field) => (
-            <div key={field} className="flex items-center justify-between gap-2">
-              <span className="text-sm">{FIELD_LABEL[field]}</span>
-              <select
-                className="tap-target border border-slate-300 dark:border-slate-600 rounded-lg px-2 bg-white dark:bg-slate-900"
-                value={mapping[field] ?? ''}
-                onChange={(e) => setMapping({ ...mapping, [field]: e.target.value || null })}
+        <div className="rounded-2xl border-2 border-blue-200/90 dark:border-blue-800/70 bg-gradient-to-br from-blue-50/40 via-white to-slate-50/20 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/30 p-4 sm:p-5 shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-blue-100 dark:border-blue-900/60">
+            <h2 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
+              <CheckCircle2 size={16} className="text-[#1a73e8]" />
+              <span>Ánh xạ cột ({rows.length - 1} dòng dữ liệu)</span>
+            </h2>
+          </div>
+
+          <div className="space-y-2.5">
+            {(Object.keys(FIELD_LABEL) as (keyof ColumnMapping)[]).map((field) => (
+              <div
+                key={field}
+                className="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-white/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs"
               >
-                <option value="">— không có —</option>
-                {header.map((h) => (
-                  <option key={h} value={h}>
-                    {h}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ))}
-          <button onClick={handleConfirmSave} className="tap-target w-full rounded-xl bg-indigo-600 text-white font-semibold">
+                <span className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200">
+                  {FIELD_LABEL[field]}
+                </span>
+                <select
+                  className="tap-target border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 text-xs sm:text-sm bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={mapping[field] ?? ''}
+                  onChange={(e) => setMapping({ ...mapping, [field]: e.target.value || null })}
+                >
+                  <option value="">— không có —</option>
+                  {header.map((h) => (
+                    <option key={h} value={h}>
+                      {h}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={handleConfirmSave}
+            className="tap-target w-full min-h-[48px] rounded-xl bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold text-sm shadow-sm transition active:scale-[0.99] cursor-pointer"
+          >
             Lưu danh sách lớp
           </button>
         </div>
       )}
-
-      <div className="text-sm text-slate-500">Đang lưu: {classList.length} học sinh (cache ngoại tuyến).</div>
     </div>
   )
 }

@@ -110,7 +110,26 @@ export function dinhDangDeCayThuMuc(maDeStr: string): string {
 }
 
 export default function PhanCongScreen() {
- return <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-3 flex flex-col w-full max-w-full min-w-0" style={{gap:'var(--k3)'}}><header className="gv-page-header"><div><h1>Giao bài tập về nhà</h1><p>Chọn người nhận, chọn đề và theo dõi bài đã nộp.</p></div></header><TheGiaoBtvn/></div>
+  return (
+    <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col w-full max-w-full min-w-0" style={{ gap: 'var(--k3)' }}>
+      <header className="gv-page-header flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-emerald-50 dark:bg-emerald-950/70 text-[#1e8e3e] border border-emerald-200 dark:border-emerald-800 shadow-2xs shrink-0">
+            <ClipboardList size={22} />
+          </div>
+          <div>
+            <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">
+              Giao bài tập về nhà
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Chọn người nhận theo lớp/ca, chọn bộ câu và quản lý tiến độ nộp bài
+            </p>
+          </div>
+        </div>
+      </header>
+      <TheGiaoBtvn />
+    </div>
+  )
 }
 
 function TheGiaoBtvn() {
@@ -381,37 +400,27 @@ function TheGiaoBtvn() {
         <div className="w-full max-w-full min-w-0 flex flex-col" style={{ gap: 'var(--k3)' }}>
           <div className="gv-homework-grid"><section className="gv-work-step"><h2>1. Người nhận</h2>
           {/* LỰA CHỌN HÌNH THỨC GIAO BÀI */}
-          <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k1)' }}>
-            <span style={{ ...NHAN_NHO, fontWeight: 600, color: 'var(--muc)' }}>Hình thức giao:</span>
+          <div className="flex items-center flex-wrap gap-2 mb-2">
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Hình thức giao:</span>
             <button
               type="button"
               onClick={() => setCheDo('ca')}
-              className="tap-target font-semibold inline-flex items-center gap-1.5"
-              style={{
-                padding: '6px 14px',
-                borderRadius: 'var(--bo-tron)',
-                fontSize: 'var(--cx-1)',
-                background: cheDo === 'ca' ? 'var(--xanh)' : 'var(--the-2)',
-                color: cheDo === 'ca' ? 'var(--muc-nguoc)' : 'var(--muc)',
-                border: '1px solid ' + (cheDo === 'ca' ? 'var(--xanh)' : 'var(--vien)'),
-                cursor: 'pointer',
-              }}
+              className={`tap-target text-xs sm:text-sm font-bold inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
+                cheDo === 'ca'
+                  ? 'bg-[#1a73e8] text-white ring-2 ring-blue-400/30 shadow-xs'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
+              }`}
             >
               <Users size={16} /> Theo ca thi
             </button>
             <button
               type="button"
               onClick={chuyenSangHocSinh}
-              className="tap-target font-semibold inline-flex items-center gap-1.5"
-              style={{
-                padding: '6px 14px',
-                borderRadius: 'var(--bo-tron)',
-                fontSize: 'var(--cx-1)',
-                background: cheDo === 'hoc_sinh' ? 'var(--xanh)' : 'var(--the-2)',
-                color: cheDo === 'hoc_sinh' ? 'var(--muc-nguoc)' : 'var(--muc)',
-                border: '1px solid ' + (cheDo === 'hoc_sinh' ? 'var(--xanh)' : 'var(--vien)'),
-                cursor: 'pointer',
-              }}
+              className={`tap-target text-xs sm:text-sm font-bold inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
+                cheDo === 'hoc_sinh'
+                  ? 'bg-[#1a73e8] text-white ring-2 ring-blue-400/30 shadow-xs'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
+              }`}
             >
               <UserCheck size={16} /> Gửi từng lớp
             </button>
@@ -500,7 +509,30 @@ function TheGiaoBtvn() {
           )}
 
           {/* Ô DANH SÁCH HỌC SINH CÓ Ô TICK (KHI CHỌN GIAO CHO TỪNG HỌC SINH) */}
-          {cheDo === 'hoc_sinh' && <section style={{padding:18,border:'1px solid var(--vien)',borderRadius:16}}><label>Lớp theo năm sinh <select aria-label="Chọn lớp theo năm sinh" value={khoiGui} onChange={e=>setKhoiGui(e.target.value)} style={{marginLeft:12,padding:10,background:'var(--the)',color:'var(--muc)'}}>{[10,11,12].map(k=><option key={k} value={k}>Lớp {k}</option>)}</select></label><p>{dsTheoLop.length} học sinh nhận bài. Tính theo năm sinh và năm học hiện tại; hồ sơ thiếu năm sinh không tự ghép lớp.</p></section>}
+          {cheDo === 'hoc_sinh' && (
+            <section className="p-4 rounded-2xl border border-blue-200/90 dark:border-blue-800/80 bg-blue-50/40 dark:bg-blue-950/30 space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                  Lớp theo năm sinh
+                  <select
+                    aria-label="Chọn lớp theo năm sinh"
+                    value={khoiGui}
+                    onChange={(e) => setKhoiGui(e.target.value)}
+                    className="ml-2 px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs font-bold focus:ring-2 focus:ring-blue-500 shadow-2xs"
+                  >
+                    {[10, 11, 12].map((k) => (
+                      <option key={k} value={k}>
+                        Lớp {k}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                <b className="text-[#1a73e8]">{dsTheoLop.length}</b> học sinh nhận bài. Tính theo năm sinh và năm học hiện tại; hồ sơ thiếu năm sinh không tự ghép lớp.
+              </p>
+            </section>
+          )}
           {cheDo === 'ca' && <label style={{display:'flex',gap:10,alignItems:'center'}}><input type="checkbox" checked={chonRieng} onChange={e=>setChonRieng(e.target.checked)}/>Chọn thêm học sinh</label>}
           {cheDo === 'ca' && chonRieng && (
             <div
@@ -543,7 +575,26 @@ function TheGiaoBtvn() {
               </div>
 
               {/* THANH TÌM KIẾM & BỘ LỌC */}
-              <div className="flex flex-wrap gap-2" aria-label="Lọc khối học sinh">{['', '10', '11', '12'].map(k=><button key={k} type="button" aria-pressed={khoiThem===k} onClick={()=>setKhoiThem(k)} style={{padding:'8px 16px',borderRadius:20,background:khoiThem===k?'var(--xanh)':'var(--the)',color:khoiThem===k?'var(--muc-nguoc)':'var(--muc)',border:'1px solid var(--vien)'}}>{k?`Khối ${k}`:'Tất cả'}</button>)}</div>
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2" aria-label="Lọc khối học sinh">
+                {['', '10', '11', '12'].map((k) => {
+                  const chon = khoiThem === k
+                  return (
+                    <button
+                      key={k}
+                      type="button"
+                      aria-pressed={chon}
+                      onClick={() => setKhoiThem(k)}
+                      className={`text-xs font-bold px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
+                        chon
+                          ? 'bg-[#1a73e8] text-white ring-2 ring-blue-400/30 shadow-xs'
+                          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      {k ? `Khối ${k}` : 'Tất cả'}
+                    </button>
+                  )
+                })}
+              </div>
               <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)' }}>
                 <div className="relative flex-1" style={{ minWidth: 200 }}>
                   <input

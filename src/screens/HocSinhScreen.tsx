@@ -8,8 +8,8 @@
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
 import { useEffect, useMemo, useState } from 'react'
 import { goiBaiThi } from '../lib/goi-bao-cao'
-import { ArrowLeft, ChevronRight, FileText, History, KeyRound, RefreshCw, Search, Trash2, Sparkles, TrendingUp } from 'lucide-react'
-import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung, DauThe } from '../components/DesignSystem'
+import { ArrowLeft, ChevronRight, FileText, History, KeyRound, RefreshCw, Search, Trash2, Sparkles, TrendingUp, Users } from 'lucide-react'
+import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { KhoiChuyenDe, KhoiLichSuCa, toneXepLoai, ngayGio } from '../components/HoSoEmView'
 import NutBaiTapPdf from '../components/NutBaiTapPdf'
 import KhoiTienBo from '../components/KhoiTienBo'
@@ -72,6 +72,7 @@ export default function HocSinhScreen() {
   const [loi, setLoi] = useState('')
   const [timKiem, setTimKiem] = useState('')
   const [khoiLoc, setKhoiLoc] = useState<number | null>(null)
+  const [lopLoc, setLopLoc] = useState('')
 
   const [hoSo, setHoSo] = useState<HoSoEm | null>(null)
   const [dangTaiHoSo, setDangTaiHoSo] = useState(false)
@@ -167,27 +168,33 @@ export default function HocSinhScreen() {
     }
   }
 
+  const dsLop = useMemo(() => {
+    return Array.from(new Set((ds ?? []).map((e) => e.lop?.trim()).filter(Boolean) as string[])).sort()
+  }, [ds])
+
   const dsLoc = useMemo(() => {
     const q = timKiem.trim().toLowerCase()
     return (ds ?? []).filter((e) => {
       const khoi = khoiTuNamSinh(e.namSinh)
-      return (khoiLoc === null || khoi === khoiLoc) && (!q || e.sbd.includes(q) || e.hoTen.toLowerCase().includes(q) || e.lop.toLowerCase().includes(q))
+      return (
+        (khoiLoc === null || khoi === khoiLoc) &&
+        (!lopLoc || e.lop?.trim() === lopLoc) &&
+        (!q || e.sbd.includes(q) || e.hoTen.toLowerCase().includes(q) || e.lop.toLowerCase().includes(q))
+      )
     })
-  }, [ds, timKiem, khoiLoc])
+  }, [ds, timKiem, khoiLoc, lopLoc])
 
   const caMoiNhat = useMemo(() => {
     if (!hoSo?.ca || hoSo.ca.length === 0) return null
     return hoSo.ca.find((c) => c.tong !== null) ?? hoSo.ca[0]
   }, [hoSo?.ca])
 
-
-
   // ------------------------------------------------------------------ HỒ SƠ
   if (sbdDangXem) {
     const diemGanNhat = hoSo?.ca.find((c) => c.tong !== null)?.tong ?? null
     return (
       <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-        <button onClick={() => moHoSoEm('')} className="tap-target self-start inline-flex items-center" style={{ ...NHAN_NHO, gap: 4 }}>
+        <button onClick={() => moHoSoEm('')} className="tap-target self-start inline-flex items-center text-xs font-bold text-[#1a73e8] hover:underline" style={{ gap: 4 }}>
           <ArrowLeft size={16} /> Danh sách học sinh
         </button>
 
@@ -196,31 +203,58 @@ export default function HocSinhScreen() {
 
         {hoSo && (
           <>
-            <TheNoiDung noPadding>
-              <DauThe index={0} badge={(hoSo.em.hoTen || '?').trim().slice(0, 1).toUpperCase()} title={hoSo.em.hoTen || `SBD ${hoSo.em.sbd}`} />
-              <div style={{ padding: 'var(--k5)' }}>
-                <div style={NHAN_NHO}>
-                  SBD <span style={SO}>{hoSo.em.sbd}</span>
-                  {hoSo.em.lop ? ` · Lớp ${hoSo.em.lop}` : ''}
-                  {hoSo.em.namSinh ? ` · sinh ${hoSo.em.namSinh}${khoiTuNamSinh(hoSo.em.namSinh) ? ` (khối ${khoiTuNamSinh(hoSo.em.namSinh)})` : ''}` : ''}
+            {/* THẺ HỒ SƠ EM CHUẨN GOOGLE WORKSPACE */}
+            <div className="rounded-2xl border-2 border-blue-200/90 dark:border-blue-800/70 bg-gradient-to-br from-blue-50/70 via-white to-indigo-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40 p-4 sm:p-5 shadow-sm space-y-4">
+              <div className="flex items-start justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[#1a73e8] text-white font-bold text-lg shadow-xs">
+                    {(hoSo.em.hoTen || '?').trim().slice(0, 1).toUpperCase()}
+                  </div>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">
+                      {hoSo.em.hoTen || `SBD ${hoSo.em.sbd}`}
+                    </h2>
+                    <div className="flex items-center gap-1.5 flex-wrap text-xs text-slate-500 dark:text-slate-400 mt-1">
+                      <span className="font-mono font-bold px-1.5 py-0.2 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-200">
+                        #{hoSo.em.sbd}
+                      </span>
+                      {hoSo.em.lop && (
+                        <span className="font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200">
+                          Lớp {hoSo.em.lop}
+                        </span>
+                      )}
+                      {hoSo.em.namSinh && (
+                        <span>
+                          sinh {hoSo.em.namSinh}
+                          {khoiTuNamSinh(hoSo.em.namSinh) ? ` (khối ${khoiTuNamSinh(hoSo.em.namSinh)})` : ''}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
-                  <span className="font-bold" style={{ ...SO, fontSize: 'var(--cx-6)' }}>
-                    {diemGanNhat === null ? '—' : diemGanNhat.toFixed(2).replace('.', ',')}
-                  </span>
-                  <Nhan tone={toneXepLoai(diemGanNhat)}>{diemGanNhat === null ? 'chưa có điểm' : classify(diemGanNhat)}</Nhan>
-                  <span style={{ ...NHAN_NHO, ...SO }}>
-                    {hoSo.ca.length} ca đã làm
-                  </span>
+
+                <div className="flex items-center gap-2">
+                  <div className="text-right">
+                    <div className="text-2xl sm:text-3xl font-black text-[#1a73e8] dark:text-[#8ab4f8] tabular-nums leading-none">
+                      {diemGanNhat === null ? '—' : diemGanNhat.toFixed(2).replace('.', ',')}
+                    </div>
+                    <div className="text-[10px] text-slate-400 font-bold uppercase mt-1">
+                      Điểm gần nhất
+                    </div>
+                  </div>
+                  <Nhan tone={toneXepLoai(diemGanNhat)}>
+                    {diemGanNhat === null ? 'chưa có điểm' : classify(diemGanNhat)}
+                  </Nhan>
                 </div>
               </div>
-            </TheNoiDung>
 
-            {/* HAI MỤC, KHÔNG PHẢI MỘT TRANG DÀI. Trước đây hồ sơ đổ hết mọi
-                khối xuống một cột: muốn xem lịch sử ca của em phải cuộn qua
-                biểu đồ tiến bộ, phiếu Zalo và bảng chuyên đề. Nay tách hai mục,
-                và nút trong danh sách đi thẳng vào đúng mục. */}
-            <div className="gv-student-actions grid grid-cols-1 sm:grid-cols-3" style={{ gap: 'var(--k2)' }} role="tablist" aria-label="Mục hồ sơ">
+              <div className="pt-2 border-t border-blue-100 dark:border-blue-900/60 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                Đã tham gia <b>{hoSo.ca.length}</b> ca kiểm tra
+              </div>
+            </div>
+
+            {/* HAI MỤC TAB GOOGLE PILLS */}
+            <div className="gv-student-actions grid grid-cols-1 sm:grid-cols-2 gap-2" role="tablist" aria-label="Mục hồ sơ">
               {(['bao-cao', 'lich-su'] as const).map((m) => {
                 const dang = mucHoSo === m
                 return (
@@ -236,21 +270,17 @@ export default function HocSinhScreen() {
                         setCaBaoCao(caMoiNhat)
                       }
                     }}
-                    className="tap-target font-bold inline-flex items-center justify-center"
-                    style={{
-                      minHeight: 48,
-                      gap: 6,
-                      borderRadius: 'var(--bo-1)',
-                      background: dang ? 'var(--tim-nen)' : 'var(--the)',
-                      border: `1.5px solid ${dang ? 'var(--tim)' : 'var(--vien)'}`,
-                      color: dang ? 'var(--tim)' : 'var(--nhat)',
-                      fontFamily: 'var(--sans)',
-                      fontSize: 'var(--cx-2)',
-                    }}
+                    className={`tap-target min-h-[48px] py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 shadow-2xs ${
+                      dang
+                        ? m === 'bao-cao'
+                          ? 'bg-[#1a73e8] text-white shadow-xs'
+                          : 'bg-[#1e8e3e] text-white shadow-xs'
+                        : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-blue-300'
+                    }`}
                   >
                     {m === 'bao-cao' ? <FileText size={16} /> : <TrendingUp size={16} />}
-                    {m === 'lich-su' ? 'Mức độ tiến bộ (Lịch sử ca thi)' : TEN_MUC_HO_SO[m]}
-                    {m === 'lich-su' && <span style={SO}>({hoSo.ca.length})</span>}
+                    <span>{m === 'lich-su' ? 'Mức độ tiến bộ (Lịch sử ca thi)' : TEN_MUC_HO_SO[m]}</span>
+                    {m === 'lich-su' && <span className="text-xs font-bold tabular-nums">({hoSo.ca.length})</span>}
                   </button>
                 )
               })}
@@ -380,22 +410,32 @@ export default function HocSinhScreen() {
   // ------------------------------------------------------------- DANH SÁCH EM
   return (
     <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-      <div className="gv-page-header flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
-        <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
-          Học sinh
-        </h1>
+      {/* HEADER GOOGLE STYLE */}
+      <div className="gv-page-header flex items-center justify-between gap-3 pb-1 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/70 text-[#1a73e8] border border-blue-200 dark:border-blue-800 shadow-2xs">
+            <Users size={20} />
+          </div>
+          <div>
+            <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--sans)' }}>
+              Học sinh
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Quản lý học sinh theo lớp, xem báo cáo và mức độ tiến bộ
+            </p>
+          </div>
+        </div>
+
         {/* CÙNG MỘT NÚT VỚI KHO ĐỀ: bấm là chọn file danh sách rồi đẩy lên máy
             chủ. Danh sách này là CỔNG VÀO THI — nạp xong, số báo danh ngoài
             danh sách không thi được nữa. */}
-        <div className="gv-header-actions flex flex-col items-end" style={{ gap: 'var(--k2)' }}>
+        <div className="gv-header-actions flex flex-col sm:flex-row items-end sm:items-center" style={{ gap: 'var(--k2)' }}>
           <NutDongBoDanhSach
             onXong={(soEm, tomTat) => {
               showToast(`Đã nạp ${soEm} em lên máy chủ${tomTat ? ` — ${tomTat}` : ''}. Từ giờ chỉ những em này vào thi được.`, 'success')
               void tai()
             }}
           />
-          {/* THÊM MỘT EM (thầy chốt 07/09). Ghi thẳng vào Google Sheet gốc của
-              khối, không chỉ vào bản sao — bản sao bị lượt Đồng bộ sau ghi đè. */}
           <NutThemHocSinh
             onXong={(_soEm, tomTat) => {
               showToast(tomTat, 'success')
@@ -405,58 +445,95 @@ export default function HocSinhScreen() {
         </div>
       </div>
 
-      {/* Nói thẳng chạm vào đâu để giao bài — nút Giao bài tập nằm trong hồ sơ
-          từng em (phải biết em yếu chuyên đề nào mới rút được câu), nên nhìn
-          danh sách không đoán ra. */}
-      <details className="gv-help"><summary>Hướng dẫn quản lý học sinh</summary>      <div style={NHAN_NHO}>
-        Mỗi em có các nút: <b style={{ color: 'var(--muc)' }}>Báo cáo</b> (tiến bộ, phiếu gửi phụ huynh, chuyên đề mạnh–yếu) và{' '}
-        <b style={{ color: 'var(--muc)' }}>Lịch sử ca</b> (mọi ca đã làm, điểm và hạng lớp), cùng nút <b style={{ color: 'var(--muc)' }}>Reset mật khẩu</b>. Em chỉ vào thi được khi nhập đúng cả ba: số báo danh, họ tên, năm sinh — khớp
-        file danh sách đã đồng bộ.
-      </div></details>
+      {/* Hướng dẫn quản lý */}
+      <details className="gv-help rounded-2xl border border-blue-200/60 dark:border-slate-800 bg-blue-50/30 dark:bg-slate-900/50 p-3 sm:p-4 shadow-2xs">
+        <summary className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200 cursor-pointer flex items-center gap-2">
+          <Sparkles size={16} className="text-[#1a73e8]" />
+          <span>Hướng dẫn quản lý học sinh theo lớp</span>
+        </summary>
+        <div style={NHAN_NHO} className="mt-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+          Mỗi em có các nút: <b style={{ color: 'var(--muc)' }}>Báo cáo</b> (tiến bộ, chuyên đề mạnh–yếu) và{' '}
+          <b style={{ color: 'var(--muc)' }}>Lịch sử ca</b> (mọi ca đã làm, điểm và hạng lớp), cùng nút{' '}
+          <b style={{ color: 'var(--muc)' }}>Reset mật khẩu</b>. Em chỉ vào thi được khi nhập đúng cả ba: số báo danh, họ tên, năm sinh — khớp file danh sách đã đồng bộ.
+        </div>
+      </details>
 
       <TheNoiDung className="gv-directory">
         <div className="gv-filterbar flex items-center" style={{ gap: 'var(--k3)', marginBottom: 'var(--k3)' }}>
           <div className="relative flex-1">
             <Search size={18} className="absolute" style={{ left: 14, top: 15, color: 'var(--mo)' }} />
-            <input style={O_NHAP} placeholder="Tìm tên hoặc số báo danh…" value={timKiem} onChange={(e) => setTimKiem(e.target.value)} inputMode="search" aria-label="Tìm học sinh" />
+            <input
+              style={O_NHAP}
+              className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-2xs focus:ring-2 focus:ring-blue-500"
+              placeholder="Tìm tên, số báo danh hoặc lớp…"
+              value={timKiem}
+              onChange={(e) => setTimKiem(e.target.value)}
+              inputMode="search"
+              aria-label="Tìm học sinh"
+            />
           </div>
           <button
             type="button"
             onClick={tai}
             disabled={dangTai}
-            className="tap-target shrink-0 flex items-center justify-center shadow-xs transition-all active:scale-95 hover:scale-105 cursor-pointer disabled:cursor-not-allowed"
-            style={{ width: 48, height: 48, borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien)', background: 'var(--the)', color: 'var(--muc)' }}
+            className="tap-target shrink-0 flex items-center justify-center shadow-2xs transition-all active:scale-95 hover:scale-105 cursor-pointer disabled:cursor-not-allowed rounded-xl"
+            style={{ width: 48, height: 48, border: '1px solid var(--vien)', background: 'var(--the)', color: 'var(--muc)' }}
             aria-label="Tải lại"
             title="Tải lại"
           >
-            <RefreshCw size={18} className={dangTai ? 'animate-spin' : ''} />
+            <RefreshCw size={18} className={dangTai ? 'animate-spin text-[#1a73e8]' : ''} />
           </button>
         </div>
 
-        <div className="flex flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k3)' }} role="group" aria-label="Lọc theo khối">
-          {[null, 10, 11, 12].map((k) => {
-            const chon = khoiLoc === k
-            return (
-              <button
-                key={k ?? 'tat_ca'}
-                type="button"
-                onClick={() => setKhoiLoc(k)}
-                className="tap-target font-bold shadow-xs transition-all active:scale-95 hover:-translate-y-0.5 cursor-pointer"
-                style={{
-                  ...SO,
-                  fontSize: 'var(--cx-1)',
-                  minHeight: 36,
-                  padding: '0 var(--k4)',
-                  borderRadius: 'var(--bo-tron)',
-                  border: chon ? '1px solid var(--gg-xanh)' : '1px solid var(--vien)',
-                  background: chon ? 'var(--gg-xanh)' : 'var(--the)',
-                  color: chon ? 'var(--giay)' : 'var(--nhat)',
-                }}
-              >
-                {k === null ? 'Tất cả' : `Khối ${k}`}
-              </button>
-            )
-          })}
+        {/* BỘ LỌC KHỐI & TẤT CẢ CÁC LỚP */}
+        <div className="space-y-2.5" style={{ marginBottom: 'var(--k3)' }}>
+          {/* Lọc theo khối */}
+          <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Lọc theo khối">
+            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mr-1 uppercase">Khối:</span>
+            {[null, 10, 11, 12].map((k) => {
+              const chon = khoiLoc === k
+              return (
+                <button
+                  key={k ?? 'tat_ca'}
+                  type="button"
+                  onClick={() => setKhoiLoc(k)}
+                  className={`tap-target font-bold text-xs py-1.5 px-3 rounded-full transition-all cursor-pointer shadow-2xs ${
+                    chon
+                      ? 'bg-[#1a73e8] text-white border border-[#1a73e8]'
+                      : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-blue-300'
+                  }`}
+                  style={{ ...SO }}
+                >
+                  {k === null ? 'Tất cả khối' : `Khối ${k}`}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Lọc theo lớp (đồng bộ tất cả các lớp) */}
+          {dsLop.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Lọc theo lớp">
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mr-1 uppercase">Lớp:</span>
+              {['', ...dsLop].map((l) => {
+                const chon = lopLoc === l
+                return (
+                  <button
+                    key={l || '__tat_ca_lop'}
+                    type="button"
+                    onClick={() => setLopLoc(l)}
+                    className={`tap-target font-bold text-xs py-1.5 px-3 rounded-full transition-all cursor-pointer shadow-2xs ${
+                      chon
+                        ? 'bg-[#1e8e3e] text-white border border-[#1e8e3e]'
+                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-emerald-300'
+                    }`}
+                    style={{ ...SO }}
+                  >
+                    {l ? `Lớp ${l}` : 'Tất cả các lớp'}
+                  </button>
+                )
+              })}
+            </div>
+          )}
         </div>
 
         {loi && <OThongBao tone="do">{loi}</OThongBao>}
@@ -473,9 +550,6 @@ export default function HocSinhScreen() {
             {dsLoc.map((e) => {
               const khoi = khoiTuNamSinh(e.namSinh)
               return (
-                // KHÔNG để cả hàng là một nút nữa: hàng nay chứa ba nút con
-                // (tên · Báo cáo · Lịch sử ca) mà nút lồng trong nút là HTML sai
-                // và trình đọc màn hình đọc lẫn.
                 <Hang key={e.sbd} className="flex-col" style={{ alignItems: 'stretch' }} data-sbd={e.sbd}>
                   <span className="flex items-start justify-between" style={{ gap: 'var(--k3)' }}>
                     <span className="flex-1 min-w-0">
@@ -487,10 +561,10 @@ export default function HocSinhScreen() {
                         }}
                         className="tap-target font-bold inline-flex items-center text-left"
                         style={{
-                          fontFamily: 'var(--serif)',
+                          fontFamily: 'var(--sans)',
                           fontSize: 'var(--cx-2)',
                           color: 'var(--muc)',
-                          gap: 2,
+                          gap: 4,
                           background: 'none',
                           border: 'none',
                           padding: 0,
@@ -503,10 +577,21 @@ export default function HocSinhScreen() {
                         {e.hoTen || `SBD ${e.sbd}`}
                         <ChevronRight size={14} style={{ color: 'var(--mo)', flexShrink: 0 }} />
                       </button>
-                      <div style={NHAN_NHO}>
-                        <span style={SO}>{e.sbd}</span>
-                        {e.lop ? ` · Lớp ${e.lop}` : ''}
-                        {khoi ? ` · khối ${khoi}` : ''} · <span style={SO}>{e.soCa}</span> ca
+                      <div className="flex items-center gap-1.5 flex-wrap mt-1 text-xs text-slate-500 dark:text-slate-400">
+                        <span className="font-mono font-bold px-1.5 py-0.2 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-200">
+                          #{e.sbd}
+                        </span>
+                        {e.lop && (
+                          <span className="font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200">
+                            Lớp {e.lop}
+                          </span>
+                        )}
+                        {khoi && (
+                          <span className="font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-200">
+                            Khối {khoi}
+                          </span>
+                        )}
+                        <span>· <span style={SO}>{e.soCa}</span> ca</span>
                       </div>
                     </span>
                     <span className="shrink-0 font-bold" style={{ ...SO, fontSize: 'var(--cx-3)' }}>
@@ -515,16 +600,12 @@ export default function HocSinhScreen() {
                   </span>
                   <span className="flex items-center flex-wrap" style={{ gap: 4, marginTop: 6 }}>
                     <Nhan tone={toneXepLoai(e.diemGanNhat)}>{e.diemGanNhat === null ? 'chưa có điểm' : classify(e.diemGanNhat)}</Nhan>
-                    {/* Danh sách lấy từ file thầy nạp. Em nào chỉ có số báo danh,
-                        hoặc có hồ sơ cũ mà không nằm trong file mới, đều cờ hoá —
-                        em ngoài danh sách KHÔNG vào thi được. */}
                     {!e.hoTen && <Nhan tone="cam">chưa có tên</Nhan>}
                     {e.trangThai === 'ngoai_danh_sach' && <Nhan tone="do">ngoài danh sách</Nhan>}
                     {e.soCa === 0 && <Nhan tone="xam">chưa thi ca nào</Nhan>}
                   </span>
-                  {/* HAI NÚT MỖI EM (thầy chốt 05/09) — vào thẳng đúng mục, không
-                      phải mở hồ sơ rồi cuộn tìm. Nhãn trợ năng kèm TÊN em, vì
-                      danh sách 300 em thì "Báo cáo" trơ trọi không nói lên ai. */}
+
+                  {/* BA NÚT MỖI EM */}
                   <span className="gv-student-actions grid grid-cols-1 sm:grid-cols-3" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
                     {(
                       [
@@ -540,14 +621,14 @@ export default function HocSinhScreen() {
                           moHoSo(e.sbd, muc)
                         }}
                         aria-label={`${TEN_MUC_HO_SO[muc]} của ${e.hoTen || `SBD ${e.sbd}`}`}
-                        className="tap-target inline-flex items-center justify-center font-bold active:scale-[0.98] hover:-translate-y-0.5 transition-all shadow-xs cursor-pointer"
+                        className={`tap-target inline-flex items-center justify-center font-bold active:scale-[0.98] hover:-translate-y-0.5 transition-all shadow-xs cursor-pointer rounded-xl ${
+                          muc === 'bao-cao'
+                            ? 'bg-blue-50 dark:bg-blue-950/60 text-[#1a73e8] dark:text-[#8ab4f8] border border-blue-200 dark:border-blue-800'
+                            : 'bg-emerald-50 dark:bg-emerald-950/60 text-[#1e8e3e] dark:text-[#81c995] border border-emerald-200 dark:border-emerald-800'
+                        }`}
                         style={{
                           minHeight: 44,
                           gap: 6,
-                          borderRadius: 'var(--bo-1)',
-                          background: 'var(--the)',
-                          border: '1.5px solid var(--vien)',
-                          color: 'var(--muc)',
                           fontFamily: 'var(--sans)',
                           fontSize: 'var(--cx-1)',
                         }}
@@ -561,8 +642,8 @@ export default function HocSinhScreen() {
                       disabled={dangResetMk}
                       onClick={() => void resetMatKhau(e.sbd, e.hoTen)}
                       aria-label={`Reset mật khẩu của ${e.hoTen || `SBD ${e.sbd}`}`}
-                      className="tap-target inline-flex items-center justify-center gap-2 font-bold shadow-xs disabled:opacity-50"
-                      style={{ minHeight: 44, borderRadius: 'var(--bo-1)', background: 'var(--the)', border: '1.5px solid var(--vien)', color: 'var(--muc)', fontSize: 'var(--cx-1)' }}
+                      className="tap-target inline-flex items-center justify-center gap-2 font-bold shadow-xs disabled:opacity-50 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-amber-400 cursor-pointer"
+                      style={{ minHeight: 44, fontSize: 'var(--cx-1)' }}
                     >
                       <KeyRound size={15} /> {dangResetMk ? 'Đang reset…' : 'Reset mật khẩu'}
                     </button>

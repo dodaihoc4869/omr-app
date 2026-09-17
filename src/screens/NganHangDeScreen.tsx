@@ -9,7 +9,7 @@ import GameReports from '../game/than-thu-v2/Reports'
 // lại các ca đã dùng câu đó không (cập nhật ngân hàng CÓ đáp án của từng ca;
 // màn Theo dõi mở lại là chấm theo đáp án mới).
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { RefreshCw, Trash2, ChevronDown, ChevronUp, Upload, CheckCheck } from 'lucide-react'
+import { RefreshCw, Trash2, ChevronDown, ChevronUp, Upload, CheckCheck, Library } from 'lucide-react'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { TheNoiDung, Hang, Nhan, OThongBao, NutChinh } from '../components/DesignSystem'
 import KhoiMatKhauApp from '../components/KhoiMatKhauApp'
@@ -356,11 +356,21 @@ export default function NganHangDeScreen() {
   return (
     <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k5)', fontFamily: 'var(--sans)' }}>
 
-      <div className="gv-page-header flex items-center justify-between">
-        <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
-          Ngân hàng câu hỏi
-        </h1>
-        <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target">
+      <div className="gv-page-header flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/70 text-[#1a73e8] border border-blue-200 dark:border-blue-800 shadow-2xs shrink-0">
+            <Library size={22} />
+          </div>
+          <div>
+            <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">
+              Ngân hàng câu hỏi
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Kho đề kiểm tra, thẩm định đáp án và đồng bộ tự động
+            </p>
+          </div>
+        </div>
+        <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target hover:text-[#1a73e8] transition-colors cursor-pointer">
           ← Kiểm tra
         </button>
       </div>

@@ -193,29 +193,52 @@ export default function CauHoiScreen() {
 
   return (
     <div className="gv-page min-h-screen pb-24 px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)' }}>
-      <header className="gv-page-header" style={{ paddingTop: 'var(--k2)' }}>
-        <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--mo)', letterSpacing: '.16em', textTransform: 'uppercase' }}>Đỗ Đại Học</div>
-        <h1 className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-5)', lineHeight: 1.15, marginTop: 2 }}>
-          {laRac ? 'Thùng rác' : 'Học sinh hỏi'}
-        </h1>
-        {tong && (
-          <div style={{ ...NHAN, marginTop: 4 }}>
-            {laRac
-              ? `${tong.soCa} ca đã bỏ · chọn ca cần lấy lại`
-              : `${tong.soCa} ca có câu hỏi${tong.chuaChua > 0 ? ` · ${tong.chuaChua} em chờ Thầy chữa` : ' · đã chữa hết'}`}
+      <header className="gv-page-header flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-rose-50 dark:bg-rose-950/70 text-[#ea4335] border border-rose-200 dark:border-rose-800 shadow-2xs shrink-0">
+            <MessageCircleQuestion size={22} />
           </div>
-        )}
+          <div>
+            <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">
+              {laRac ? 'Thùng rác câu hỏi' : 'Học sinh hỏi'}
+            </h1>
+            {tong && (
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                {laRac
+                  ? `${tong.soCa} ca đã bỏ · chọn ca cần lấy lại`
+                  : `${tong.soCa} ca có câu hỏi${tong.chuaChua > 0 ? ` · ${tong.chuaChua} em chờ Thầy chữa` : ' · đã chữa hết'}`}
+              </p>
+            )}
+          </div>
+        </div>
       </header>
 
-      {/* HAI LỐI NHÌN, không trộn: màn chính chỉ ca đang hiện, thùng rác chỉ ca
-          đã bỏ. Trộn rồi để màn tự lọc là mỗi lần mở lại kéo về cả đống dòng cũ. */}
-      <div className="flex" style={{ gap: 'var(--k2)' }}>
-        <NutChinh variant={laRac ? 'phu' : 'chinh'} onClick={() => void doiChe('chinh')} disabled={dang}>
+      {/* HAI LỐI NHÌN: Google Blue & Red pills */}
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => void doiChe('chinh')}
+          disabled={dang}
+          className={`tap-target text-xs sm:text-sm font-bold px-4 py-2 rounded-full transition-all cursor-pointer ${
+            !laRac
+              ? 'bg-[#1a73e8] text-white ring-2 ring-blue-400/30 shadow-xs'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200/80 dark:border-slate-700'
+          }`}
+        >
           Đang hiện
-        </NutChinh>
-        <NutChinh variant={laRac ? 'chinh' : 'phu'} onClick={() => void doiChe('rac')} disabled={dang}>
+        </button>
+        <button
+          type="button"
+          onClick={() => void doiChe('rac')}
+          disabled={dang}
+          className={`tap-target text-xs sm:text-sm font-bold px-4 py-2 rounded-full transition-all cursor-pointer ${
+            laRac
+              ? 'bg-[#ea4335] text-white ring-2 ring-rose-400/30 shadow-xs'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200/80 dark:border-slate-700'
+          }`}
+        >
           Thùng rác
-        </NutChinh>
+        </button>
       </div>
 
       {loi && <OThongBao tone="cam">{loi}</OThongBao>}

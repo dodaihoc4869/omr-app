@@ -5,7 +5,7 @@ import { laBoDe12, rutDeChuan2026, SO_CAU_CHUAN_2026, GHI_CHU_MA_TRAN } from '..
 // này CHỈ còn 3 việc: chọn đề · lớp & thời gian · cách công bố điểm → Mở ca.
 // Không còn mục dán link, không xoá đề ở đây (xoá ở Ngân hàng câu hỏi).
 import { useEffect, useMemo, useState } from 'react'
-import { CheckSquare, Square, Library, Copy, Check } from 'lucide-react'
+import { CheckSquare, Square, Library, Copy, Check, PlusCircle } from 'lucide-react'
 import { mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
 import KhoiRutDe from '../components/KhoiRutDe'
 import HopChonDe from '../components/HopChonDe'
@@ -72,15 +72,12 @@ function ChipChon({ chon, onClick, children }: { chon: boolean; onClick: () => v
       role="radio"
       aria-checked={chon}
       onClick={onClick}
-      className="tap-target font-bold active:scale-95 hover:-translate-y-0.5 transition-all cursor-pointer shadow-xs"
-      style={{
-        ...SO,
-        fontSize: 'var(--cx-2)',
-        padding: '0 var(--k4)',
-        borderRadius: 'var(--bo-tron)',
-        background: chon ? 'var(--muc)' : 'var(--the-2)',
-        color: chon ? 'var(--muc-nguoc)' : 'var(--muc)',
-      }}
+      className={`tap-target text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full transition-all cursor-pointer active:scale-95 shadow-2xs ${
+        chon
+          ? 'bg-[#1a73e8] text-white ring-2 ring-blue-400/30 shadow-xs'
+          : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
+      }`}
+      style={SO}
     >
       {children}
     </button>
@@ -412,11 +409,21 @@ export default function ExamSetupScreen() {
   // ------------------------------------------------------------ SOẠN CA
   return (
     <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-      <div className="gv-page-header flex items-center justify-between">
-        <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
-          Mở ca kiểm tra
-        </h1>
-        <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target">
+      <div className="gv-page-header flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/70 text-[#1a73e8] border border-blue-200 dark:border-blue-800 shadow-2xs shrink-0">
+            <PlusCircle size={22} />
+          </div>
+          <div>
+            <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">
+              Mở ca kiểm tra
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Thiết lập đề thi, chọn lớp và cài đặt chế độ làm bài
+            </p>
+          </div>
+        </div>
+        <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target hover:text-[#1a73e8] transition-colors cursor-pointer">
           ← Kiểm tra
         </button>
       </div>
@@ -481,7 +488,7 @@ export default function ExamSetupScreen() {
         <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
           <input style={O_NHAP} placeholder="Tên ca (tuỳ chọn, vd Kiểm tra 15 phút — Este)" value={tenCa} onChange={(e) => setTenCa(e.target.value)} aria-label="Tên ca" />
           {dsLop.length > 0 && (
-            <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }}>
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2" role="group" aria-label="Chọn nhanh lớp">
               {dsLop.map((l) => {
                 const chon = lop.trim() === l
                 return (
@@ -489,15 +496,12 @@ export default function ExamSetupScreen() {
                     key={l}
                     type="button"
                     onClick={() => setLop(l)}
-                    className="tap-target font-bold active:scale-95 hover:-translate-y-0.5 transition-all cursor-pointer shadow-xs"
-                    style={{
-                      ...SO,
-                      fontSize: 'var(--cx-2)',
-                      padding: '0 var(--k4)',
-                      borderRadius: 'var(--bo-tron)',
-                      background: chon ? 'var(--muc)' : 'var(--the-2)',
-                      color: chon ? 'var(--muc-nguoc)' : 'var(--muc)',
-                    }}
+                    className={`tap-target text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full transition-all cursor-pointer active:scale-95 shadow-2xs ${
+                      chon
+                        ? 'bg-[#1a73e8] text-white ring-2 ring-blue-400/30 shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
+                    }`}
+                    style={SO}
                   >
                     {l}
                   </button>

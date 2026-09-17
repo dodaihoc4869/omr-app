@@ -14,7 +14,7 @@ import { phanCongDayHoc } from '../lib/phan-cong-day-hoc'
 //   · phần còn lại mới chia cho em, ưu tiên em SAI CHÍNH CÂU ĐÓ.
 // Thuật toán ở lib/phan-cong.ts, phần đọc dữ liệu ca ở lib/du-lieu-len-bang.ts.
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Shuffle, MonitorPlay } from 'lucide-react'
+import { ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Shuffle, MonitorPlay, UserCheck } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, lichSuLenBang, thanThuLopDocApi, type CaTomTat, type LichSuLenBangEm } from '../lib/exam-api'
 import { docKhoChuaCa, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
@@ -949,12 +949,24 @@ export default function GoiLenBangScreen() {
 
   return (
     <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-      <button onClick={() => setScreen('examhub')} className="tap-target self-start inline-flex items-center" style={{ ...NHAN_NHO, gap: 4 }}>
-        <ArrowLeft size={16} /> Kiểm tra
-      </button>
-      <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
-        Gọi học sinh lên bảng
-      </h1>
+      <div className="gv-page-header flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-emerald-50 dark:bg-emerald-950/70 text-[#1e8e3e] border border-emerald-200 dark:border-emerald-800 shadow-2xs shrink-0">
+            <UserCheck size={22} />
+          </div>
+          <div>
+            <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">
+              Gọi học sinh lên bảng
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Phân công chữa bài tập, dạy học và theo dõi lượt lên bảng
+            </p>
+          </div>
+        </div>
+        <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target hover:text-[#1a73e8] transition-colors cursor-pointer">
+          ← Kiểm tra
+        </button>
+      </div>
 
       <TheNoiDung>
         <button type="button" role="switch" aria-label="Dạy học" aria-checked={dayHoc}

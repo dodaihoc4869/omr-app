@@ -4,7 +4,7 @@
 // Bật "Chọn" → mỗi hàng thành ô tích, xoá được nhiều ca ngay tại màn này.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
 import { useEffect, useMemo, useState } from 'react'
-import { CheckSquare, RefreshCw, RotateCcw, Search, Square, Trash2, ChevronDown, ChevronRight} from 'lucide-react'
+import { CheckSquare, RefreshCw, RotateCcw, Search, Square, Trash2, ChevronDown, ChevronRight, ClipboardList } from 'lucide-react'
 import { Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { THU_MUC_KHAC, gomCaTheoNamSinh } from '../lib/nam-sinh-ca'
 import { danhSachCa, khoiPhucCa, xoaNhieuCa, xoaVinhVienCa, type CaTomTat } from '../lib/exam-api'
@@ -14,19 +14,6 @@ import { useAppStore } from '../store/appStore'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
-const O_NHAP: React.CSSProperties = {
-  height: 48,
-  borderRadius: 'var(--bo-tron)',
-  padding: '0 var(--k4) 0 46px',
-  background: 'var(--the)',
-  border: '1px solid var(--vien-dam)',
-  boxShadow: 'var(--bong-1)',
-  fontFamily: 'var(--sans)',
-  fontSize: 'var(--cx-2)',
-  color: 'var(--muc)',
-  outline: 'none',
-  width: '100%',
-}
 /** Trạng thái hiển thị của ca theo mốc thời gian máy chủ + số đã nộp. */
 export function trangThaiCa(ca: Pick<CaTomTat, 'trangThai' | 'batDau' | 'hetHanVao' | 'daVao' | 'daNop'>, nowMs: number): { ten: string; tone: 'xanh' | 'cam' | 'do' | 'tim' | 'xam' } {
   if (ca.trangThai === 'dong') return { ten: 'Đã đóng', tone: 'xam' }
@@ -198,26 +185,46 @@ export default function LichSuCaScreen() {
 
   return (
     <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-      <div className="gv-page-header flex items-center justify-between">
-        <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
-          {xemDaXoa ? 'Ca đã xoá' : 'Ca thi'}
-        </h1>
-        <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target">
+      <div className="gv-page-header flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-amber-50 dark:bg-amber-950/70 text-[#f29900] border border-amber-200 dark:border-amber-800 shadow-2xs shrink-0">
+            <ClipboardList size={22} />
+          </div>
+          <div>
+            <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">
+              {xemDaXoa ? 'Ca đã xoá' : 'Ca thi'}
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              {xemDaXoa ? 'Thùng rác và phục hồi dữ liệu ca' : 'Quản lý, tìm kiếm và chi tiết các ca kiểm tra'}
+            </p>
+          </div>
+        </div>
+        <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target hover:text-[#1a73e8] transition-colors cursor-pointer">
           ← Kiểm tra
         </button>
       </div>
 
       <TheNoiDung className="gv-directory">
-        <div className="gv-filterbar flex items-center" style={{ gap: 'var(--k3)', marginBottom: 'var(--k3)' }}>
+        <div className="gv-filterbar flex items-center gap-2 sm:gap-2.5 mb-3">
           <div className="relative flex-1">
-            <Search size={18} className="absolute" style={{ left: 14, top: 15, color: 'var(--mo)' }} />
-            <input style={O_NHAP} placeholder="Tìm mã ca, tên ca, lớp…" value={timKiem} onChange={(e) => setTimKiem(e.target.value)} inputMode="search" aria-label="Tìm ca" />
+            <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              className="w-full h-11 pl-10 pr-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
+              placeholder="Tìm mã ca, tên ca, lớp…"
+              value={timKiem}
+              onChange={(e) => setTimKiem(e.target.value)}
+              inputMode="search"
+              aria-label="Tìm ca"
+            />
           </div>
           <button
             type="button"
             onClick={() => (chonMode ? thoatChon() : setChonMode(true))}
-            className="tap-target shrink-0 flex items-center justify-center transition-all shadow-xs active:scale-95 hover:scale-105 cursor-pointer"
-            style={{ width: 48, height: 48, borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien)', background: chonMode ? 'var(--gg-xanh)' : 'var(--the)', color: chonMode ? 'var(--giay)' : 'var(--muc)' }}
+            className={`tap-target shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all shadow-2xs active:scale-95 cursor-pointer border ${
+              chonMode
+                ? 'bg-[#1a73e8] text-white border-blue-600'
+                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
+            }`}
             aria-label={chonMode ? 'Thoát chế độ chọn' : 'Chọn ca để xoá'}
             aria-pressed={chonMode}
             title={chonMode ? 'Xong' : 'Chọn ca để xoá'}
@@ -230,8 +237,11 @@ export default function LichSuCaScreen() {
               thoatChon()
               setXemDaXoa((v) => !v)
             }}
-            className="tap-target shrink-0 flex items-center justify-center transition-all shadow-xs active:scale-95 hover:scale-105 cursor-pointer"
-            style={{ width: 48, height: 48, borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien)', background: xemDaXoa ? 'var(--gg-xanh)' : 'var(--the)', color: xemDaXoa ? 'var(--giay)' : 'var(--muc)' }}
+            className={`tap-target shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all shadow-2xs active:scale-95 cursor-pointer border ${
+              xemDaXoa
+                ? 'bg-[#ea4335] text-white border-rose-600'
+                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
+            }`}
             aria-label={xemDaXoa ? 'Về danh sách ca đang dùng' : 'Xem ca đã xoá'}
             aria-pressed={xemDaXoa}
             title={xemDaXoa ? 'Về danh sách ca đang dùng' : 'Ca đã xoá'}
@@ -242,8 +252,7 @@ export default function LichSuCaScreen() {
             type="button"
             onClick={tai}
             disabled={dangTai}
-            className="tap-target shrink-0 flex items-center justify-center transition-all shadow-xs active:scale-95 hover:scale-105 cursor-pointer disabled:cursor-not-allowed"
-            style={{ width: 48, height: 48, borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien)', background: 'var(--the)', color: 'var(--muc)' }}
+            className="tap-target shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all shadow-2xs active:scale-95 cursor-pointer disabled:cursor-not-allowed bg-blue-50 dark:bg-blue-950/60 text-[#1a73e8] border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/60"
             aria-label="Tải lại"
             title="Tải lại"
           >
@@ -252,7 +261,7 @@ export default function LichSuCaScreen() {
         </div>
 
         {dsLop.length > 1 && (
-          <div className="flex flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k3)' }} role="group" aria-label="Lọc theo lớp">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-3" role="group" aria-label="Lọc theo lớp">
             {['', ...dsLop].map((l) => {
               const chon = lopLoc === l
               return (
@@ -260,17 +269,12 @@ export default function LichSuCaScreen() {
                   key={l || '__tat_ca'}
                   type="button"
                   onClick={() => setLopLoc(l)}
-                  className="tap-target font-bold shadow-xs transition-all active:scale-95 hover:-translate-y-0.5 cursor-pointer"
-                  style={{
-                    ...SO,
-                    fontSize: 'var(--cx-1)',
-                    minHeight: 36,
-                    padding: '0 var(--k4)',
-                    borderRadius: 'var(--bo-tron)',
-                    border: chon ? '1px solid var(--gg-xanh)' : '1px solid var(--vien)',
-                    background: chon ? 'var(--gg-xanh)' : 'var(--the)',
-                    color: chon ? 'var(--giay)' : 'var(--nhat)',
-                  }}
+                  className={`tap-target text-xs font-bold px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
+                    chon
+                      ? 'bg-[#1a73e8] text-white shadow-sm ring-2 ring-blue-400/30'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
+                  }`}
+                  style={SO}
                 >
                   {l || 'Tất cả'}
                 </button>
@@ -411,18 +415,19 @@ export default function LichSuCaScreen() {
                 {/* THƯ MỤC NĂM SINH. Bấm để gấp lại cho đỡ dài. */}
                 <button
                   type="button"
-                  onClick={() => setGapNam((cu) => ({ ...cu, [tm.nam]: !(cu[tm.nam] ?? true) }))}
-                  aria-expanded={!(gapNam[tm.nam] ?? true)}
-                  className="tap-target flex items-center font-bold w-full text-left transition-colors hover:bg-slate-100/60 dark:hover:bg-slate-800/60 cursor-pointer"
-                  style={{ gap: 10, minHeight: 52, padding: '10px 14px', background: 'var(--xanh-nen)', border: 'none', color: 'var(--muc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}
+                  onClick={() => setGapNam((cu) => ({ ...cu, [tm.nam]: !cu[tm.nam] }))}
+                  aria-expanded={!gapNam[tm.nam]}
+                  className="tap-target flex items-center justify-between font-bold w-full text-left transition-colors bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-slate-50/60 dark:from-slate-800 dark:via-slate-800 dark:to-slate-800/90 border-b border-slate-200 dark:border-slate-700/80 hover:brightness-95 cursor-pointer px-3.5 py-3"
                 >
-                  {(gapNam[tm.nam] ?? true) ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
-                  <span>{tm.nam === THU_MUC_KHAC ? THU_MUC_KHAC : `Năm sinh ${tm.nam}`}</span>
-                  <span style={{ ...NHAN_NHO, ...SO, marginLeft: 'auto', padding: '3px 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)', border: '1px solid var(--vien)' }}>
+                  <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 text-sm">
+                    {gapNam[tm.nam] ? <ChevronRight size={17} className="text-slate-400" /> : <ChevronDown size={17} className="text-[#1a73e8]" />}
+                    <span>{tm.nam === THU_MUC_KHAC ? THU_MUC_KHAC : `Năm sinh ${tm.nam}`}</span>
+                  </div>
+                  <span className="text-xs font-bold text-[#1a73e8] bg-blue-100/70 dark:bg-blue-950/80 px-2.5 py-0.5 rounded-full border border-blue-200/80 dark:border-blue-800 tabular-nums">
                     {tm.ca.length} ca
                   </span>
                 </button>
-                {!(gapNam[tm.nam] ?? true) && (
+                {!gapNam[tm.nam] && (
                   <div role="region" aria-label={`Lịch sử ca ${tm.nam === THU_MUC_KHAC ? THU_MUC_KHAC : `Năm sinh ${tm.nam}`}`} tabIndex={0} className="flex flex-col overflow-y-auto overscroll-contain space-y-2.5 p-3" style={{ maxHeight: 'min(65vh, 560px)' }}>
                     {tm.ca.map((c) => {
               const tt = trangThaiCa(c, now)
@@ -434,8 +439,8 @@ export default function LichSuCaScreen() {
                   data-trang-thai={tt.ten}
                   className={`p-3 sm:p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-2 ${
                     chonMode && tich
-                      ? 'border-blue-500 bg-blue-50/80 dark:bg-blue-950/60 shadow-xs'
-                      : 'border-slate-200/90 dark:border-slate-800 bg-slate-50/40 hover:bg-white dark:bg-slate-800/30 dark:hover:bg-slate-800/80 hover:border-blue-400 hover:shadow-xs'
+                      ? 'border-blue-500 bg-blue-50/90 dark:bg-blue-950/70 shadow-xs ring-1 ring-blue-400'
+                      : 'border-slate-200/90 dark:border-slate-800 bg-slate-50/40 hover:bg-white dark:bg-slate-800/40 dark:hover:bg-slate-800/90 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-xs'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2.5 w-full">
@@ -446,7 +451,7 @@ export default function LichSuCaScreen() {
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-900 shrink-0">
+                        <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950 text-[#1a73e8] border border-blue-200 dark:border-blue-900 shrink-0">
                           #{c.maCa}
                         </span>
                         <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">
@@ -455,7 +460,7 @@ export default function LichSuCaScreen() {
                       </div>
                       <div className="flex items-center gap-2 flex-wrap text-xs text-slate-500 dark:text-slate-400 mt-1.5">
                         {c.lop && (
-                          <span className="font-semibold text-slate-700 dark:text-slate-300">
+                          <span className="font-bold text-xs px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950 text-[#1e8e3e] border border-emerald-200 dark:border-emerald-800">
                             Lớp {c.lop}
                           </span>
                         )}
