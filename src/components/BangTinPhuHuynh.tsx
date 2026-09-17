@@ -568,56 +568,50 @@ export default function BangTinPhuHuynh({
                  {tabStats?.diemCount ?? 0} ca thi
                </span>
              </div>
-             <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800/80 text-[11px] font-semibold w-full">
-               <span className="text-slate-400 dark:text-slate-500">
-                 {activeTab === 'diem' ? 'Đang mở chi tiết ở bên dưới' : 'Bấm ô để xem danh sách ca thi & điểm số'}
-               </span>
-               <span className={`font-bold flex items-center gap-1 ${activeTab === 'diem' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 group-hover:text-blue-600'}`}>
-                 {activeTab === 'diem' ? 'Đang mở ▼ (Thu gọn)' : 'Mở xem ▼'}
-               </span>
-             </div>
-           </button>
+              <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800/80 text-[11px] font-semibold w-full">
+                <span className="text-slate-400 dark:text-slate-500">
+                  Chi tiết hiển thị ở cột bên dưới
+                </span>
+                <span className="font-bold flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                  Cột 1 · Báo cáo ▼
+                </span>
+              </div>
+            </button>
 
-           {/* PHỤ HUYNH THẺ 2: 4 Chế Độ Giao Bài Cho Con */}
-           <button
-             type="button"
-             onClick={() => onSelectTab?.('giaobai')}
-             className={`p-4 sm:p-5 rounded-3xl border-2 text-left transition-all duration-200 cursor-pointer flex flex-col justify-between gap-3 relative overflow-hidden group active:scale-[0.99] ${
-               activeTab === 'giaobai'
-                 ? 'border-amber-500 bg-amber-50/90 dark:bg-amber-950/80 shadow-md ring-4 ring-amber-400/20'
-                 : 'border-amber-300/90 dark:border-amber-700/80 bg-white dark:bg-slate-900 hover:border-amber-500 hover:shadow-sm'
-             }`}
-           >
-             <div className="flex items-start justify-between gap-3 w-full">
-               <div className="flex items-center gap-3">
-                 <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${
-                   activeTab === 'giaobai' ? 'bg-amber-500 text-white shadow-sm' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'
-                 }`}>
-                   <Sparkles size={24} />
-                 </div>
-                 <div>
-                   <h4 className="font-black text-base sm:text-lg text-amber-700 dark:text-amber-400 uppercase tracking-wide leading-tight flex items-center gap-1.5">
-                     <Sparkles size={16} className="text-amber-500 shrink-0" />
-                     <span>4 CHẾ ĐỘ GIAO BÀI CHO CON</span>
-                   </h4>
-                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                     Hệ thống tự động phân tích và tạo bài luyện khắc phục theo nhu cầu của con
-                   </p>
-                 </div>
-               </div>
-               <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900 shrink-0">
-                 Hạn 2 tiếng
-               </span>
-             </div>
-             <div className="flex items-center justify-between pt-2.5 border-t border-amber-100 dark:border-amber-900/40 text-[11px] font-semibold w-full">
-               <span className="text-slate-400 dark:text-slate-500">
-                 {activeTab === 'giaobai' ? 'Đang mở chi tiết ở bên dưới' : 'Bấm ô để mở 4 chế độ giao bài cho con'}
-               </span>
-               <span className={`font-bold flex items-center gap-1 ${activeTab === 'giaobai' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500 group-hover:text-amber-600'}`}>
-                 {activeTab === 'giaobai' ? 'Đang mở ▼ (Thu gọn)' : 'Mở giao bài ▼'}
-               </span>
-             </div>
-           </button>
+            {/* PHỤ HUYNH THẺ 2: 4 Chế Độ Giao Bài Cho Con */}
+            <button
+              type="button"
+              onClick={() => onSelectTab?.('giaobai')}
+              className="p-4 sm:p-5 rounded-3xl border-2 border-amber-300/90 dark:border-amber-700/80 bg-white dark:bg-slate-900 hover:border-amber-500 hover:shadow-xs text-left transition-all duration-200 cursor-pointer flex flex-col justify-between gap-3 relative overflow-hidden group active:scale-[0.99]"
+            >
+              <div className="flex items-start justify-between gap-3 w-full">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
+                    <Sparkles size={24} />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-base sm:text-lg text-amber-700 dark:text-amber-400 uppercase tracking-wide leading-tight flex items-center gap-1.5">
+                      <Sparkles size={16} className="text-amber-500 shrink-0" />
+                      <span>4 CHẾ ĐỘ GIAO BÀI CHO CON</span>
+                    </h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                      Hệ thống tự động phân tích và tạo bài luyện khắc phục theo nhu cầu của con
+                    </p>
+                  </div>
+                </div>
+                <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900 shrink-0">
+                  Hạn 2 tiếng
+                </span>
+              </div>
+              <div className="flex items-center justify-between pt-2.5 border-t border-amber-100 dark:border-amber-900/40 text-[11px] font-semibold w-full">
+                <span className="text-slate-400 dark:text-slate-500">
+                  Chi tiết hiển thị ở cột bên dưới
+                </span>
+                <span className="font-bold flex items-center gap-1 text-amber-600 dark:text-amber-400">
+                  Cột 2 · Giao bài ▼
+                </span>
+              </div>
+            </button>
          </>
        )}
      </div>

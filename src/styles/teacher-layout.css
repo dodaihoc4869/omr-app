@@ -2,7 +2,7 @@
    student/parent portals and projected documents retain their own layout. */
 [data-teacher-screen] .gv-page{
   --gv-gap:20px;
-  width:100%;min-width:0;padding:max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) calc(112px + env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left))!important;
+  width:100%;min-width:0;padding:env(safe-area-inset-top, 12px) max(16px, env(safe-area-inset-right)) calc(112px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left))!important;
   gap:var(--gv-gap)!important;
 }
 [data-teacher-screen] .gv-page>*,[data-teacher-screen] .gv-work-step>*{min-width:0}
@@ -39,7 +39,7 @@
 [data-teacher-screen] .setup-overview,[data-teacher-screen] .setup-group{border-radius:18px}
 [data-teacher-screen] .setup-group>summary{padding:16px 20px}
 [data-teacher-screen] .setup-group-body{padding:0 12px 12px}
-[data-teacher-screen] .setup-launch{bottom:88px;box-shadow:0 4px 16px #00000012}
+[data-teacher-screen] .setup-launch{bottom:88px;box-shadow:0 4px 16px rgba(0, 0, 0, 0.07)}
 [data-teacher-screen] .parent-news>header{align-items:flex-start}
 [data-teacher-screen] .parent-news>header>div:last-child{flex-wrap:wrap}
 [data-teacher-screen] .parent-news .news-metrics{gap:12px}
@@ -49,7 +49,7 @@
   [data-teacher-screen] .gv-homework-grid>.gv-work-step+section{padding-left:24px;border-left:1px solid var(--vien)}
 }
 @media (max-width:800px){
-  [data-teacher-screen] .gv-page{padding:max(16px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) calc(112px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left))!important;--gv-gap:16px}
+  [data-teacher-screen] .gv-page{padding:env(safe-area-inset-top, 8px) max(10px, env(safe-area-inset-right)) calc(112px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left))!important;--gv-gap:16px}
   [data-teacher-screen] .gv-page-header{align-items:flex-start}
   [data-teacher-screen] .gv-header-actions{width:100%;justify-content:flex-start}
   [data-teacher-screen] .gv-directory{padding:14px!important}

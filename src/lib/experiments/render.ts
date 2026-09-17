@@ -3,7 +3,7 @@ import {EXPERIMENTS} from './verified'
 import {EXPANDED} from './expanded'
 import {SCENES} from './catalog'
 import {renderScene} from './scene'
-export function experimentKey(text:string):string{let a=2166136261,b=5381;for(const c of text.normalize('NFC').replace(/\s+/g,' ').trim()){a=Math.imul(a^c.charCodeAt(0),16777619);b=Math.imul(b,33)^c.charCodeAt(0)}return `${a>>>0}-${b>>>0}`}
+export function experimentKey(text?:string):string{let a=2166136261,b=5381;for(const c of (text||'').normalize('NFC').replace(/\s+/g,' ').trim()){a=Math.imul(a^c.charCodeAt(0),16777619);b=Math.imul(b,33)^c.charCodeAt(0)}return `${a>>>0}-${b>>>0}`}
 export function experimentHtml(text:string):string{
  const scenes=EXPANDED[experimentKey(text)];if(scenes)return scenes.map(id=>SCENES[id]?renderScene(SCENES[id]):'').join('')
  const kind=EXPERIMENTS[experimentKey(text)];if(!kind)return ''

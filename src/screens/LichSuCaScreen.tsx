@@ -5,7 +5,7 @@
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
 import { useEffect, useMemo, useState } from 'react'
 import { CheckSquare, RefreshCw, RotateCcw, Search, Square, Trash2, ChevronDown, ChevronRight} from 'lucide-react'
-import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
+import { Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { THU_MUC_KHAC, gomCaTheoNamSinh } from '../lib/nam-sinh-ca'
 import { danhSachCa, khoiPhucCa, xoaNhieuCa, xoaVinhVienCa, type CaTomTat } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
@@ -405,79 +405,100 @@ export default function LichSuCaScreen() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 items-start" style={{ gap: 'var(--k3)' }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 items-start" style={{ gap: 'var(--k3)' }}>
             {gomCaTheoNamSinh(dsLoc, (c) => c.tenCa).map((tm) => (
-              <div key={tm.nam} className="flex flex-col overflow-hidden" style={{ border: '1px solid var(--vien)', borderRadius: 'var(--bo-2)', background: 'var(--the)', boxShadow: 'var(--bong-1)' }}>
-                {/* THƯ MỤC NĂM SINH. Tên ca thầy luôn để năm ở đầu, nên cây này
-                    dựng từ dữ liệu sẵn có — ca cũ vào đúng chỗ ngay, không phải
-                    sửa tay ca nào. Bấm để gấp lại cho đỡ dài. */}
+              <div key={tm.nam} className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+                {/* THƯ MỤC NĂM SINH. Bấm để gấp lại cho đỡ dài. */}
                 <button
                   type="button"
                   onClick={() => setGapNam((cu) => ({ ...cu, [tm.nam]: !(cu[tm.nam] ?? true) }))}
                   aria-expanded={!(gapNam[tm.nam] ?? true)}
-                  className="tap-target flex items-center font-bold w-full text-left"
-                  style={{ gap: 10, minHeight: 56, padding: 'var(--k3) var(--k4)', background: 'var(--xanh-nen)', border: 'none', color: 'var(--muc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}
+                  className="tap-target flex items-center font-bold w-full text-left transition-colors hover:bg-slate-100/60 dark:hover:bg-slate-800/60 cursor-pointer"
+                  style={{ gap: 10, minHeight: 52, padding: '10px 14px', background: 'var(--xanh-nen)', border: 'none', color: 'var(--muc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}
                 >
                   {(gapNam[tm.nam] ?? true) ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
-                  {tm.nam === THU_MUC_KHAC ? THU_MUC_KHAC : `Năm sinh ${tm.nam}`}
-                  <span style={{ ...NHAN_NHO, ...SO, marginLeft: 'auto', padding: '4px 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)' }}>{tm.ca.length} ca</span>
+                  <span>{tm.nam === THU_MUC_KHAC ? THU_MUC_KHAC : `Năm sinh ${tm.nam}`}</span>
+                  <span style={{ ...NHAN_NHO, ...SO, marginLeft: 'auto', padding: '3px 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)', border: '1px solid var(--vien)' }}>
+                    {tm.ca.length} ca
+                  </span>
                 </button>
                 {!(gapNam[tm.nam] ?? true) && (
-                  <div role="region" aria-label={`Lịch sử ca ${tm.nam === THU_MUC_KHAC ? THU_MUC_KHAC : `Năm sinh ${tm.nam}`}`} tabIndex={0} className="grid grid-cols-1 sm:grid-cols-2 overflow-y-auto overscroll-contain" style={{ maxHeight: 'min(60vh, 520px)', gap: 'var(--k2)', padding: 'var(--k3)' }}>
+                  <div role="region" aria-label={`Lịch sử ca ${tm.nam === THU_MUC_KHAC ? THU_MUC_KHAC : `Năm sinh ${tm.nam}`}`} tabIndex={0} className="flex flex-col overflow-y-auto overscroll-contain space-y-2.5 p-3" style={{ maxHeight: 'min(65vh, 560px)' }}>
                     {tm.ca.map((c) => {
               const tt = trangThaiCa(c, now)
               const tich = daChon.includes(c.maCa)
               return (
-                <Hang
+                <div
                   key={c.maCa}
                   onClick={chonMode ? () => bat(c.maCa) : (!xemDaXoa ? () => moChiTietCa(c.maCa) : undefined)}
-                  selected={chonMode && tich}
                   data-trang-thai={tt.ten}
-                  className="flex-col shrink-0"
-                  style={{ alignItems: 'stretch' }}
+                  className={`p-3 sm:p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-2 ${
+                    chonMode && tich
+                      ? 'border-blue-500 bg-blue-50/80 dark:bg-blue-950/60 shadow-xs'
+                      : 'border-slate-200/90 dark:border-slate-800 bg-slate-50/40 hover:bg-white dark:bg-slate-800/30 dark:hover:bg-slate-800/80 hover:border-blue-400 hover:shadow-xs'
+                  }`}
                 >
-                  <span className="flex items-start justify-between" style={{ gap: 'var(--k3)' }}>
+                  <div className="flex items-start justify-between gap-2.5 w-full">
                     {chonMode && (
-                      <span className="shrink-0" style={{ color: tich ? 'var(--xanh)' : 'var(--mo)', marginTop: 2 }} aria-hidden="true">
-                        {tich ? <CheckSquare size={20} /> : <Square size={20} />}
+                      <span className="shrink-0 pt-0.5" style={{ color: tich ? 'var(--xanh)' : 'var(--mo)' }} aria-hidden="true">
+                        {tich ? <CheckSquare size={18} /> : <Square size={18} />}
                       </span>
                     )}
-                    <span className="flex-1 min-w-0">
-                      <div className="font-bold truncate" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
-                        {c.tenCa || `Ca ${c.maCa}`}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-900 shrink-0">
+                          #{c.maCa}
+                        </span>
+                        <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                          {c.tenCa || `Ca ${c.maCa}`}
+                        </h4>
                       </div>
-                      <div style={NHAN_NHO}>
-                        <span style={SO}>{c.maCa}</span>
-                        {c.lop ? ` · Lớp ${c.lop}` : ''} · <span style={SO}>{ngayGio(c.batDau || c.moLuc)}</span> · {c.thoiGianPhut} phút
+                      <div className="flex items-center gap-2 flex-wrap text-xs text-slate-500 dark:text-slate-400 mt-1.5">
+                        {c.lop && (
+                          <span className="font-semibold text-slate-700 dark:text-slate-300">
+                            Lớp {c.lop}
+                          </span>
+                        )}
+                        <span>·</span>
+                        <span>{ngayGio(c.batDau || c.moLuc)}</span>
+                        <span>·</span>
+                        <span>{c.thoiGianPhut} phút</span>
                       </div>
-                    </span>
-                    <span className="shrink-0 font-bold" style={{ ...SO, fontSize: 'var(--cx-2)' }}>
-                      {c.daNop}/{c.daVao} nộp
-                    </span>
-                  </span>
-                  <span className="flex items-center flex-wrap" style={{ gap: 6, marginTop: 6 }}>
-                    <Nhan tone={xemDaXoa ? 'xam' : tt.tone}>{xemDaXoa ? 'đã xoá' : tt.ten}</Nhan>
-                    {c.canhBao > 0 && <Nhan tone="cam">{c.canhBao} cảnh báo</Nhan>}
-                    {xemDaXoa && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleKhoiPhuc(c.maCa)
-                          }}
-                          disabled={dangKhoiPhuc === c.maCa}
-                          className="tap-target font-bold inline-flex items-center active:scale-95 hover:scale-105 transition-all cursor-pointer shadow-xs"
-                          style={{ ...NHAN_NHO, gap: 4, color: 'var(--muc)', minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien-dam)' }}
-                        >
-                          <RotateCcw size={14} /> {dangKhoiPhuc === c.maCa ? 'Đang khôi phục…' : 'Khôi phục'}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setDsXoaVinhVien([c.maCa])
-                          }}
+                    </div>
+
+                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                      <span className="font-bold text-xs px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 tabular-nums">
+                        {c.daNop}/{c.daVao} nộp
+                      </span>
+                      <Nhan tone={xemDaXoa ? 'xam' : tt.tone}>{xemDaXoa ? 'đã xoá' : tt.ten}</Nhan>
+                    </div>
+                  </div>
+
+                  {c.canhBao > 0 && (
+                    <div className="pt-1.5 border-t border-slate-100 dark:border-slate-800/80">
+                      <Nhan tone="cam">{c.canhBao} cảnh báo rời màn</Nhan>
+                    </div>
+                  )}
+
+                  {xemDaXoa && (
+                    <div className="flex items-center gap-2 pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleKhoiPhuc(c.maCa)
+                        }}
+                        disabled={dangKhoiPhuc === c.maCa}
+                        className="tap-target font-bold inline-flex items-center text-xs px-2.5 py-1 rounded-lg border border-slate-300 hover:bg-slate-100 cursor-pointer"
+                      >
+                        <RotateCcw size={13} className="mr-1" /> {dangKhoiPhuc === c.maCa ? 'Đang khôi phục…' : 'Khôi phục'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setDsXoaVinhVien([c.maCa])
+                        }}
                           disabled={dangXoaVinhVien}
                           className="tap-target font-bold inline-flex items-center active:scale-95 hover:scale-105 transition-all cursor-pointer shadow-xs"
                           style={{
@@ -493,10 +514,9 @@ export default function LichSuCaScreen() {
                         >
                           <Trash2 size={14} /> Xoá vĩnh viễn
                         </button>
-                      </>
+                      </div>
                     )}
-                  </span>
-                </Hang>
+                </div>
               )
             })}
                   </div>

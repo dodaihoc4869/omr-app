@@ -28,6 +28,7 @@ import {
   Timer,
   Check,
   X,
+  ArrowLeft,
 } from 'lucide-react'
 import {
   hsDangNhapApi,
@@ -1032,7 +1033,7 @@ export default function StudentPortalScreen() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
       {/* Header Google Workspace style */}
-      <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200/80 dark:border-slate-800 px-4 pb-2.5 sm:px-6" style={{ paddingTop: 'max(10px, env(safe-area-inset-top))' }}>
+      <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200/80 dark:border-slate-800 px-4 pb-2 sm:px-6" style={{ paddingTop: 'env(safe-area-inset-top, 6px)' }}>
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
           {/* Logo Học sinh phong cách Google */}
           <LogoHocSinh size={38} hienChu={true} />
@@ -1106,31 +1107,44 @@ export default function StudentPortalScreen() {
         </div>
       )}
 
-      {/* Main Content Area: Chỉ mở ra khi học sinh bấm vào thẻ chức năng */}
+      {/* FULLSCREEN CHỨC NĂNG: BẤM VÀO MỞ FULL MÀN HÌNH */}
       {tab !== null && (
-        <main className="max-w-6xl mx-auto w-full px-4 sm:px-6 py-6 flex-1 animate-google-fade">
-          {/* Thanh tiêu đề chức năng đang mở & Nút thu gọn */}
-          <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 mb-5">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#1a73e8]" />
-              <span className="font-bold text-sm text-slate-800 dark:text-slate-200">
-                {tab === 'diem' && 'Chi tiết: Xem Điểm & Lịch Sử Ca Thi'}
-                {tab === 'btvn' && 'Chi tiết: Bài Tập Về Nhà'}
-                {tab === 'mom' && 'Chi tiết: Bài Của Mom Giao (Hạn 2 tiếng)'}
-                {tab === 'khacphuc' && 'Chi tiết: Khắc Phục Lỗi Sai & Luyện Đề'}
-                {tab === 'vaothi' && 'Chi tiết: Vào Phòng Thi Trực Tuyến'}
-                {tab === 'thanthu' && 'Chi tiết: Thần Thú Hóa Học (Alchemon)'}
-              </span>
-            </div>
+        <div className="fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto flex flex-col animate-google-fade">
+          {/* Header Toàn Màn Hình */}
+          <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-3 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 shadow-xs">
             <button
               type="button"
               onClick={() => setTab(null)}
-              className="px-3 py-1 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-rose-100 hover:text-rose-700 dark:hover:bg-rose-950 dark:hover:text-rose-300 text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs sm:text-sm font-bold transition cursor-pointer active:scale-95"
             >
-              <X size={14} />
-              <span>Thu gọn ✕</span>
+              <ArrowLeft size={16} />
+              <span>Quay lại Bảng tin</span>
             </button>
-          </div>
+
+            <div className="flex items-center gap-2 min-w-0 max-w-[200px] sm:max-w-md">
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />
+              <h2 className="font-bold text-xs sm:text-base text-slate-900 dark:text-white truncate">
+                {tab === 'diem' && 'Xem Điểm & Lịch Sử Ca Thi'}
+                {tab === 'btvn' && 'Bài Tập Về Nhà'}
+                {tab === 'mom' && 'Bài Của Mom Giao (Hạn 2 tiếng)'}
+                {tab === 'khacphuc' && 'Khắc Phục Lỗi Sai & Luyện Đề'}
+                {tab === 'vaothi' && 'Vào Phòng Thi Trực Tuyến'}
+                {tab === 'thanthu' && 'Thần Thú Hóa Học (Alchemon)'}
+              </h2>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setTab(null)}
+              className="p-1.5 sm:px-3 sm:py-1.5 rounded-full bg-slate-100 hover:bg-rose-50 hover:text-rose-600 dark:bg-slate-800 dark:hover:bg-rose-950/60 dark:hover:text-rose-300 text-slate-600 dark:text-slate-300 text-xs sm:text-sm font-bold transition flex items-center gap-1 cursor-pointer active:scale-95"
+              title="Đóng toàn màn hình"
+            >
+              <X size={16} />
+              <span className="hidden sm:inline">Đóng</span>
+            </button>
+          </header>
+
+          <main className="max-w-6xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-6 flex-1">
 
           {/* TAB 1: XEM ĐIỂM */}
           {tab === 'diem' && (
@@ -1797,7 +1811,8 @@ export default function StudentPortalScreen() {
           </Suspense>
           </KhungThanThuToanManHinh>
         )}
-      </main>
+          </main>
+        </div>
       )}
 
       {/* XEM ĐỀ VÀ LỜI GIẢI NGAY TRONG APP.

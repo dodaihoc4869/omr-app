@@ -8,7 +8,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { demKetQua } from '../lib/dem-ket-qua'
 import { goiBaiThi } from '../lib/goi-bao-cao'
-import { Check, RefreshCw, Trash2, ChevronRight, Lock, Unlock, Pencil, LogIn, BarChart3 } from 'lucide-react'
+import { Check, RefreshCw, Trash2, ChevronRight, Lock, Unlock, Pencil, LogIn, BarChart3, ArrowLeft } from 'lucide-react'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify } from '../engine/score'
@@ -966,8 +966,14 @@ export default function ExamMonitorScreen() {
               </h1>
               {chiTiet && <Pencil size={16} className="shrink-0" style={{ color: 'var(--nhat)' }} />}
             </button>
-            <button onClick={() => setScreen('lichsuca')} style={NHAN_NHO} className="tap-target shrink-0">
-              ← Lịch sử
+            <button
+              type="button"
+              onClick={() => setScreen('lichsuca')}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60 text-slate-700 dark:text-slate-200 shadow-2xs font-semibold text-xs transition cursor-pointer active:scale-95 shrink-0"
+              aria-label="Quay lại Lịch sử ca"
+            >
+              <ArrowLeft size={15} className="text-slate-600 dark:text-slate-300" />
+              <span>Lịch sử ca</span>
             </button>
           </>
         )}
@@ -994,28 +1000,58 @@ export default function ExamMonitorScreen() {
         <>
           {/* THÔNG TIN CA */}
           <TheNoiDung className="gv-monitor-overview">
-            <div className="gv-page-header flex items-start justify-between" style={{ gap: 'var(--k3)' }}>
-              <div className="min-w-0">
-                <div className="font-bold" style={{ ...SO, fontSize: 'var(--cx-5)', letterSpacing: '.12em' }}>
-                  {chiTiet.ca.maCa}
+            <div className="gv-page-header flex items-start justify-between flex-wrap" style={{ gap: 'var(--k3)' }}>
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-mono font-black text-xl sm:text-2xl text-blue-600 dark:text-blue-400 tracking-wider">
+                    #{chiTiet.ca.maCa}
+                  </span>
+                  {chiTiet.ca.lop && (
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-700">
+                      Lớp {chiTiet.ca.lop}
+                    </span>
+                  )}
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-bold border border-emerald-200 dark:border-emerald-800">
+                    {chiTiet.ca.thoiGianPhut} phút
+                  </span>
                 </div>
-                <div style={NHAN_NHO}>
-                  {chiTiet.ca.lop ? `Lớp ${chiTiet.ca.lop} · ` : ''}
-                  {chiTiet.ca.thoiGianPhut} phút · bắt đầu <span style={SO}>{ngayGio(chiTiet.ca.batDau || chiTiet.ca.moLuc)}</span> · vào phòng đến <span style={SO}>{chiTiet.ca.hetHanVao ? gio(chiTiet.ca.hetHanVao) : 'không giới hạn'}</span>
+
+                <div className="flex items-center gap-2 flex-wrap text-xs text-slate-600 dark:text-slate-300">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80">
+                    <span className="text-slate-400">Bắt đầu:</span>
+                    <span style={SO} className="font-semibold">{ngayGio(chiTiet.ca.batDau || chiTiet.ca.moLuc)}</span>
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80">
+                    <span className="text-slate-400">Vào phòng đến:</span>
+                    <span style={SO} className="font-semibold">{chiTiet.ca.hetHanVao ? gio(chiTiet.ca.hetHanVao) : 'không giới hạn'}</span>
+                  </span>
                 </div>
-                <div style={NHAN_NHO}>
-                  Khoá khi rời màn {chiTiet.ca.nguongLan ?? 3} lần / quá {chiTiet.ca.nguongGiay ?? 30} giây
-                </div>
-                <div style={NHAN_NHO}>
-                  {TEN_CONG_BO[chiTiet.ca.congBo]} · {TEN_PHAM_VI[chiTiet.ca.phamVi]}
-                  {chiTiet.ca.phamVi === 'khoi' ? ` (sinh ${chiTiet.ca.danhSachMoi} → khối ${khoiTuNamSinh(String(chiTiet.ca.danhSachMoi)) ?? '?'})` : ''}
-                  {chiTiet.ca.phamVi === 'chon' && Array.isArray(chiTiet.ca.danhSachMoi) ? ` (${chiTiet.ca.danhSachMoi.length} em)` : ''}
+
+                <div className="flex items-center gap-2 flex-wrap text-xs">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800/80 font-medium">
+                    Khoá rời màn: {chiTiet.ca.nguongLan ?? 3} lần / {chiTiet.ca.nguongGiay ?? 30}s
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-800/80 font-medium">
+                    {TEN_CONG_BO[chiTiet.ca.congBo]} · {TEN_PHAM_VI[chiTiet.ca.phamVi]}
+                    {chiTiet.ca.phamVi === 'khoi' ? ` (sinh ${chiTiet.ca.danhSachMoi} → K${khoiTuNamSinh(String(chiTiet.ca.danhSachMoi)) ?? '?'})` : ''}
+                    {chiTiet.ca.phamVi === 'chon' && Array.isArray(chiTiet.ca.danhSachMoi) ? ` (${chiTiet.ca.danhSachMoi.length} em)` : ''}
+                  </span>
                 </div>
               </div>
-              <div className="shrink-0 flex flex-col items-end" style={{ gap: 'var(--k2)' }}>
+
+              {/* Nhãn trạng thái và Nút làm mới cùng một cụm cân xứng */}
+              <div className="shrink-0 flex items-center gap-2">
                 <Nhan tone={tt.tone}>{tt.ten}</Nhan>
-                <button type="button" onClick={() => tai(chiTiet.ca.maCa)} disabled={dangTai} className="tap-target flex items-center justify-center" style={{ width: 40, height: 40, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)' }} aria-label="Tải lại" title="Tải lại">
-                  <RefreshCw size={16} className={dangTai ? 'animate-spin' : ''} />
+                <button
+                  type="button"
+                  onClick={() => tai(chiTiet.ca.maCa)}
+                  disabled={dangTai}
+                  className="tap-target inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/80 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition shadow-2xs text-xs font-bold cursor-pointer active:scale-95 disabled:opacity-50"
+                  aria-label="Làm mới ca thi"
+                  title="Làm mới dữ liệu ca thi"
+                >
+                  <RefreshCw size={13} className={dangTai ? 'animate-spin' : ''} />
+                  <span>Làm mới</span>
                 </button>
               </div>
             </div>

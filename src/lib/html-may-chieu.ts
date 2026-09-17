@@ -91,9 +91,50 @@ function ngayVn(d: Date): string {
  * tới khi thầy bấm — nếu không thì chiếu lên là cả lớp đọc được đáp án trước
  * khi em kịp cầm phấn. */
 /** Preserve explicit author line breaks without interpreting arbitrary HTML. */
-export function chuDeChieu(s:string):string {
+export function chuDeChieu(s?: string): string {
+  if (!s) return ''
   return s.replace(/\r\n?/g,'\n').replace(/<br\s*\/?\s*>/gi,'\n').split('\n').map(line=>chuHtml(line)).join('<br>')
 }
+
+/**
+ * Tính toán câu dài / ngắn cho máy chiếu:
+ * - Nếu cả 2 câu đủ ngắn hiển thị đủ ở 2 nửa bảng thì chia đôi bảng.
+ * - Nếu câu dài không hiển thị đủ nửa bảng thì chiếu 1 câu đó lên 2/3 bảng, 1/3 để trống để học sinh lên làm bên đó.
+ */
+export function laCauDai(c: CauLuyen | undefined): boolean {
+  if (!c) return false
+  const text = c.text || ''
+  const hasImage = Boolean(c.anhThanCau || (c.anhLuaChon && c.anhLuaChon.some(Boolean)) || /<img\b/i.test(text))
+  const hasTable = Boolean(c.bang) || /<table\b/i.test(text)
+
+  // Nếu có ảnh hoặc bảng số liệu, chiếm dụng chiều dọc rất lớn -> câu dài
+  if (hasImage || hasTable) {
+    if (text.length > 90) return true
+    if (c.phan === 'I' && c.luaChon && c.luaChon.some((p) => (p || '').length > 30)) return true
+    if (c.phan === 'II') return true
+  }
+
+  // Đoạn văn đề bài dài hơn 280 ký tự hoặc từ 4 dòng trở lên
+  if (text.length > 280) return true
+  const soDong = text.split(/\r\n|\r|\n|<br\s*\/?>/i).length
+  if (soDong >= 4) return true
+
+  // Theo từng phần
+  if (c.phan === 'II' && c.luaChon && c.luaChon.length > 0) {
+    const tongDoDaiY = c.luaChon.reduce((acc, y) => acc + (y || '').length, 0)
+    if (text.length + tongDoDaiY > 320) return true
+    if (c.luaChon.some((y) => (y || '').length > 80)) return true
+  } else if (c.phan === 'I' && c.luaChon && c.luaChon.length > 0) {
+    const tongDoDaiPa = c.luaChon.reduce((acc, p) => acc + (p || '').length, 0)
+    if (text.length + tongDoDaiPa > 360) return true
+    if (c.luaChon.some((p) => (p || '').length > 65)) return true
+  } else if (c.phan === 'III') {
+    if (text.length > 250) return true
+  }
+
+  return false
+}
+
 function thanCauHtml(c: CauLuyen): string {
   const khoi: string[] = []
 
@@ -102,8 +143,12 @@ function thanCauHtml(c: CauLuyen): string {
   } else {
     khoi.push(`<div class="mc-de">${chuDeChieu(c.text)}</div>`)
   }
-  khoi.push(experimentHtml(c.text))
-  khoi.push(experimentOriginal(c.text,hinhTaiViTri(c, 'sau_de')))
+  if (c.text) {
+    khoi.push(experimentHtml(c.text))
+    khoi.push(experimentOriginal(c.text, hinhTaiViTri(c, 'sau_de')))
+  } else {
+    khoi.push(hinhTaiViTri(c, 'sau_de'))
+  }
   khoi.push(bangHtml(c.bang))
 
   if (c.phan === 'I' && c.luaChon && c.luaChon.length > 0) {
@@ -162,6 +207,24 @@ function thuHtml(o: OBang): string {
     </aside>`
 }
 
+/** Header học sinh: nổi hẳn lên trên (sticky), gọn gàng chuẩn Google */
+function headerEmHtml(o: OBang, ma: string): string {
+  return `<header class="mc-em" id="em-${ma}" hidden>
+    <div class="mc-em-trai">
+      <div class="mc-em-hang1">
+        <span class="mc-ten">${thoat(o.hoTen || o.sbd)}</span>
+        <div class="mc-phu">
+          <span class="mc-sbd">${thoat(o.sbd)}</span>
+          <span class="mc-cau-so">Câu ${o.soCau} · Phần ${o.cau.phan}</span>
+        </div>
+        ${btvnHtml(o)}
+      </div>
+      ${o.viSao ? `<div class="mc-viSao">${thoat(o.viSao)}</div>` : ''}
+    </div>
+    ${thuHtml(o)}
+  </header>`
+}
+
 /** Ước lượng đọc và giải; làm tròn 15 giây, giới hạn 1–3 phút. */
 export function thoiGianDayHoc(o: OBang): number {
   const html = thanCauHtml(o.cau)
@@ -178,15 +241,7 @@ function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number): s
   const ma = `giai-${maDot}-${viTri}`
   return `<section class="mc-nua mc-${viTri}">
   <button type="button" class="mc-nut-hien-em mc-nut-giai" aria-expanded="false" aria-controls="em-${ma}">Hiện học sinh và thần thú →</button>
-  <header class="mc-em" id="em-${ma}" hidden>
-    <div class="mc-em-trai">
-      <div class="mc-ten">${thoat(o.hoTen || o.sbd)}</div>
-      <div class="mc-phu"><span class="mc-sbd">${thoat(o.sbd)}</span><span class="mc-cau-so">Câu ${o.soCau} · Phần ${o.cau.phan}</span></div>
-      ${btvnHtml(o)}
-      ${o.viSao ? `<div class="mc-viSao">${thoat(o.viSao)}</div>` : ''}
-    </div>
-    ${thuHtml(o)}
-  </header>
+  ${headerEmHtml(o, ma)}
   <div class="mc-than">${thanCauHtml(o.cau)}</div>
   <div class="mc-giai-vung">
     <button type="button" class="mc-nut-giai" aria-expanded="false" aria-controls="${ma}">
@@ -196,6 +251,40 @@ function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number): s
   </div>
   <div class="mc-trang" aria-hidden="true"></div>
 </section>`
+}
+
+/** Đợt chiếu hai em chia đôi bảng 50% - 50% khi cả 2 câu đủ ngắn */
+function dotHaiEmHtml(o1: OBang, o2: OBang | undefined, soDot: number, tuyChon: TuyChonMayChieu): string {
+  const secondsAttr = tuyChon.dayHoc ? `data-seconds="${Math.max(thoiGianDayHoc(o1), o2 ? thoiGianDayHoc(o2) : 0)}"` : ''
+  return `<div class="mc-dot" data-dot="${soDot}" ${secondsAttr}>${nuaHtml(o1, 'trai', soDot)}${nuaHtml(o2, 'phai', soDot)}</div>`
+}
+
+/** Đợt chiếu một em khi câu dài: 2/3 bảng chiếu câu hỏi, 1/3 bảng để trống cho học sinh lên làm */
+function dotMotEmHtml(o: OBang, soDot: number, tuyChon: TuyChonMayChieu): string {
+  const secondsAttr = tuyChon.dayHoc ? `data-seconds="${thoiGianDayHoc(o)}"` : ''
+  const ma = `giai-${soDot}-don`
+  return `<div class="mc-dot mc-dot-don" data-dot="${soDot}" ${secondsAttr}>
+  <section class="mc-nua mc-don">
+    <button type="button" class="mc-nut-hien-em mc-nut-giai" aria-expanded="false" aria-controls="em-${ma}">Hiện học sinh và thần thú →</button>
+    ${headerEmHtml(o, ma)}
+    <div class="mc-than">${thanCauHtml(o.cau)}</div>
+    <div class="mc-giai-vung">
+      <button type="button" class="mc-nut-giai" aria-expanded="false" aria-controls="${ma}">
+        <span class="mc-nut-chu">Hiện lời giải</span>
+      </button>
+      <div class="mc-giai" id="${ma}" hidden>${oGiaiHtml(o.cau)}</div>
+    </div>
+    <div class="mc-trang" aria-hidden="true"></div>
+  </section>
+  <section class="mc-cot-lam-bai" aria-label="Bảng để học sinh lên làm">
+    <div class="mc-bang-trong">
+      <div class="mc-bang-trong-khung">
+        <div class="mc-bang-trong-nhan">Bảng học sinh lên làm</div>
+        <div class="mc-bang-trong-phu">${thoat(o.hoTen || o.sbd)} · Câu ${o.soCau}</div>
+      </div>
+    </div>
+  </section>
+</div>`
 }
 
 /** Một trang ĐÁP ÁN — lưới câu và đáp án, chiếu cho cả lớp dò. */
@@ -274,39 +363,50 @@ body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); overflow: 
 .mc-ray { display: flex; height: calc(100vh - 61px); overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; }
 .mc-ray::-webkit-scrollbar { display: none; }
 .mc-dot { flex: 0 0 100%; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 0; scroll-snap-align: start; scroll-snap-stop: always; }
+.mc-dot-don { grid-template-columns: 2fr 1fr; }
+.mc-cot-lam-bai { display: flex; flex-direction: column; padding: 18px 22px; border-left: 2px dashed var(--mc-vien); background: var(--mc-nen); min-height: 0; overflow: hidden; box-sizing: border-box; }
+.mc-bang-trong { flex: 1; border: 2px dashed color-mix(in srgb, var(--mc-vien) 80%, transparent); border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 32px 16px; background: color-mix(in srgb, var(--mc-nen) 96%, var(--mc-xanh)); box-sizing: border-box; text-align: center; }
+.mc-bang-trong-nhan { font-family: var(--mc-sans); font-weight: 850; font-size: clamp(15px, 1.4vw, 20px); color: var(--mc-xanh); letter-spacing: 0.04em; text-transform: uppercase; }
+.mc-bang-trong-phu { margin-top: 8px; font-family: var(--mc-sans); font-size: clamp(13px, 1.1vw, 16px); color: var(--mc-nhat); }
 /* Nửa bảng tự cuộn khi câu quá dài — TRANG thì không bao giờ cuộn. */
-.mc-nua { display: flex; flex-direction: column; padding: 18px 22px 0; min-width: 0; min-height: 0; overflow-y: auto; }
+.mc-nua { display: flex; flex-direction: column; padding: 18px 22px 0; min-width: 0; min-height: 0; overflow-y: auto; position: relative; }
 .mc-trai { border-right: 2px dashed var(--mc-vien); }
 /* Vạch giữa hai đợt: nhìn là biết đã sang trang, không lẫn với vạch chia bảng. */
-.mc-dot + .mc-dot .mc-trai { border-left: 4px solid var(--mc-vien); }
+.mc-dot + .mc-dot .mc-trai, .mc-dot + .mc-dot-don .mc-nua { border-left: 4px solid var(--mc-vien); }
 .mc-trong { align-items: center; justify-content: center; }
 .mc-trong-chu { color: var(--mc-nhat); font-family: var(--sans, system-ui, sans-serif); font-size: 15px; }
-.mc-em { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding-bottom: 10px; border-bottom: 2px solid var(--mc-xanh); }
+
+/* THẺ TÊN HỌC SINH NỔI BẬT TRÊN ĐẦU (STICKY) — CUỘN BÀI GIẢNG KHÔNG BỊ MẤT THÔNG TIN HỌC SINH */
+.mc-em { position: sticky; top: 0; z-index: 15; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 14px; margin: -18px -22px 12px; background: var(--mc-nen); border-bottom: 2px solid var(--mc-xanh); box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05); }
 .mc-em-trai { min-width: 0; flex: 1 1 auto; }
-/* Góc thần thú. Chiếu lên tường từ cuối lớp nên ảnh phải to hơn một biểu tượng
-   thường: 108px là ngưỡng còn nhận ra hình thái mà không lấn chỗ đề bài. */
-.mc-thu { flex: 0 0 auto; display: flex; align-items: center; gap: 12px; width: 344px; max-width: 50%; padding: 6px 12px 6px 6px; border: 1px solid var(--mc-vien); border-radius: 16px; font-family: var(--sans, system-ui, sans-serif); }
-.mc-thu-anh { width: 104px; height: 104px; object-fit: contain; display: block; flex: 0 0 auto; border-radius: 13px; background:radial-gradient(ellipse at center,rgba(63,147,148,.3),rgb(20,31,50)); animation:mc-thu-tho 4s ease-in-out infinite; }
+.mc-em-hang1 { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+
+/* Góc thần thú gọn gàng, tinh tế */
+.mc-thu { flex: 0 0 auto; display: flex; align-items: center; gap: 10px; width: auto; max-width: 48%; padding: 4px 10px 4px 6px; border: 1px solid var(--mc-vien); border-radius: 14px; font-family: var(--sans, system-ui, sans-serif); background: var(--mc-nen); }
+.mc-thu-anh { width: 52px; height: 52px; object-fit: contain; display: block; flex: 0 0 auto; border-radius: 10px; background:radial-gradient(ellipse at center,rgba(63,147,148,.3),rgb(20,31,50)); animation:mc-thu-tho 4s ease-in-out infinite; }
 @keyframes mc-thu-tho { 50% { transform:translateY(-3px); } }
 @media(prefers-reduced-motion:reduce) { .mc-thu-anh { animation:none; } }
 @media print { .mc-thu-anh { animation:none; } }
-.mc-thu-trong { border-radius: 12px; background: var(--mc-vien); }
-.mc-thu-chu { min-width: 0; line-height: 1.32; }
-.mc-thu-ten { font-weight: 900; font-size: 14px; line-height: 1.25; }
-.mc-thu-cap { margin-top: 3px; color: var(--mc-nhat); font-size: 13px; }
+.mc-thu-trong { border-radius: 10px; background: var(--mc-vien); }
+.mc-thu-chu { min-width: 0; line-height: 1.25; }
+.mc-thu-ten { font-weight: 900; font-size: 13px; line-height: 1.2; }
+.mc-thu-cap { margin-top: 2px; color: var(--mc-nhat); font-size: 11px; }
 .mc-thu-cap b { color: inherit; font-weight: 800; }
-.mc-thu-so { margin-top: 2px; color: var(--mc-nhat); font-size: 12px; font-variant-numeric: tabular-nums; }
-@media (max-width: 1280px) { .mc-thu { width: 232px; } .mc-thu-anh { width: 82px; height: 82px; } .mc-thu-ten { font-size: 13px; } .mc-thu-cap, .mc-thu-so { font-size: 11px; } }
-.mc-ten { font-family: var(--sans, system-ui, sans-serif); font-weight: 900; font-size: clamp(22px, 2.4vw, 34px); line-height: 1.2; }
-.mc-phu { display: flex; gap: 14px; margin-top: 3px; color: var(--mc-nhat); font-family: var(--sans, system-ui, sans-serif); font-size: 14px; font-variant-numeric: tabular-nums; }
-.mc-viSao { margin-top: 4px; color: var(--mc-nhat); font-family: var(--sans, system-ui, sans-serif); font-size: 13px; }
-.mc-btvn { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 6px; font-family: var(--sans, system-ui, sans-serif); }
-.mc-btvn-the { padding: 3px 12px; border-radius: 999px; font-weight: 900; font-size: 13px; letter-spacing: 0.03em; white-space: nowrap; }
+.mc-thu-so { margin-top: 1px; color: var(--mc-nhat); font-size: 11px; font-variant-numeric: tabular-nums; }
+@media (max-width: 1280px) { .mc-thu { max-width: 45%; } .mc-thu-anh { width: 44px; height: 44px; } .mc-thu-ten { font-size: 12px; } .mc-thu-cap, .mc-thu-so { font-size: 10px; } }
+
+.mc-ten { font-family: var(--sans, system-ui, sans-serif); font-weight: 900; font-size: clamp(19px, 1.8vw, 28px); line-height: 1.2; }
+.mc-phu { display: inline-flex; align-items: center; gap: 8px; color: var(--mc-nhat); font-family: var(--sans, system-ui, sans-serif); font-size: 13px; font-variant-numeric: tabular-nums; }
+.mc-sbd { font-weight: 700; color: var(--mc-xanh); background: var(--mc-xanh-nen); padding: 2px 8px; border-radius: 6px; }
+.mc-cau-so { font-weight: 700; color: var(--mc-muc); background: color-mix(in srgb, var(--mc-nen) 85%, var(--mc-muc)); padding: 2px 8px; border-radius: 6px; }
+.mc-viSao { margin-top: 3px; color: var(--mc-nhat); font-family: var(--sans, system-ui, sans-serif); font-size: 12px; }
+.mc-btvn { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; font-family: var(--sans, system-ui, sans-serif); }
+.mc-btvn-the { padding: 2px 10px; border-radius: 999px; font-weight: 900; font-size: 12px; letter-spacing: 0.03em; white-space: nowrap; }
 .mc-btvn-sai { background: var(--mc-do-nen); color: var(--mc-do); }
 .mc-btvn-chuaLam { background: var(--mc-cam-nen); color: var(--mc-cam); }
 .mc-btvn-dung { background: var(--mc-luc-nen); color: var(--mc-luc); }
-.mc-btvn-so { color: var(--mc-nhat); font-size: 13px; font-variant-numeric: tabular-nums; }
-.mc-than { padding-top: 12px; }
+.mc-btvn-so { color: var(--mc-nhat); font-size: 12px; font-variant-numeric: tabular-nums; }
+.mc-than { padding-top: 6px; }
 .mc-de { font-family: var(--mc-serif); font-size: clamp(17px, 1.5vw, 23px); line-height: 1.55; }
 .mc-ds-pa { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
 .mc-pa { display: flex; gap: 10px; align-items: baseline; font-family: var(--mc-serif); font-size: clamp(16px, 1.35vw, 21px); line-height: 1.5; }
@@ -354,9 +454,12 @@ body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); overflow: 
 @media (max-width: 900px) {
   /* Màn hẹp: hai nửa xếp trên dưới, NHƯNG vẫn lật trang theo chiều ngang. */
   .mc-dot { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+  .mc-dot-don { grid-template-columns: 1fr; grid-template-rows: auto auto; }
+  .mc-cot-lam-bai { border-left: none; border-top: 2px dashed var(--mc-vien); min-height: 180px; }
   .mc-trai { border-right: none; border-bottom: 2px dashed var(--mc-vien); }
   .mc-dot + .mc-dot .mc-trai { border-left: none; }
   .mc-trang { min-height: 8vh; }
+  .mc-em { margin: -18px -22px 10px; padding: 8px 12px; }
 }
 
 
@@ -399,9 +502,24 @@ const JS_MAY_CHIEU = `
   });}
   window.addEventListener('resize',fitOptions);
   if(document.fonts)document.fonts.ready.then(fitOptions);
-  requestAnimationFrame(fitOptions);
+  if (typeof requestAnimationFrame !== 'undefined') {
+    requestAnimationFrame(fitOptions);
+  } else {
+    fitOptions();
+  }
   var palette=document.getElementById('mc-palette'),scale=document.getElementById('mc-size');
-  function projectionSettings(){document.documentElement.dataset.projector=palette.value;document.documentElement.style.setProperty('--mc-scale',scale.value);try{localStorage.setItem('mc-projector-palette',palette.value);localStorage.setItem('mc-projector-scale',scale.value)}catch(e){} requestAnimationFrame(function(){fitOptions();var bar=document.querySelector('.mc-thanh'),r=document.getElementById('mc-ray');if(bar&&r)r.style.height='calc(100vh - '+(document.fullscreenElement?0:bar.offsetHeight)+'px)'})}
+  function projectionSettings(){
+    document.documentElement.dataset.projector=palette.value;
+    document.documentElement.style.setProperty('--mc-scale',scale.value);
+    try{localStorage.setItem('mc-projector-palette',palette.value);localStorage.setItem('mc-projector-scale',scale.value)}catch(e){}
+    var capNhatRay = function(){
+      fitOptions();
+      var bar=document.querySelector('.mc-thanh'),r=document.getElementById('mc-ray');
+      if(bar&&r)r.style.height='calc(100vh - '+(document.fullscreenElement?0:bar.offsetHeight)+'px)';
+    };
+    if (typeof requestAnimationFrame !== 'undefined') requestAnimationFrame(capNhatRay);
+    else capNhatRay();
+  }
   if(palette&&scale){try{var p=localStorage.getItem('mc-projector-palette'),z=localStorage.getItem('mc-projector-scale');if(['soft','dark','matte-light','matte-dark'].indexOf(p)>=0)palette.value=p;if(['0.85','1','1.2','1.4'].indexOf(z)>=0)scale.value=z}catch(e){}palette.onchange=scale.onchange=projectionSettings;projectionSettings();window.addEventListener('resize',projectionSettings);document.addEventListener('fullscreenchange',projectionSettings)}
 
   var ray = document.getElementById('mc-ray');
@@ -609,9 +727,28 @@ const JS_MAY_CHIEU = `
 export function taoHtmlMayChieu(dsO: OBang[], tuyChon: TuyChonMayChieu = {}): string {
   const ngay = tuyChon.ngay ?? new Date()
   const dot: string[] = []
-  for (let k = 0; k < dsO.length; k += 2) {
-    const so = k / 2 + 1
-    dot.push(`<div class="mc-dot" data-dot="${so}" ${tuyChon.dayHoc ? `data-seconds="${Math.max(thoiGianDayHoc(dsO[k]), dsO[k+1] ? thoiGianDayHoc(dsO[k+1]) : 0)}"` : ''}>${nuaHtml(dsO[k], 'trai', so)}${nuaHtml(dsO[k + 1], 'phai', so)}</div>`)
+  let k = 0
+  let demDot = 0
+  while (k < dsO.length) {
+    demDot++
+    const o1 = dsO[k]
+    const cau1Dai = laCauDai(o1.cau)
+    if (cau1Dai) {
+      // Câu dài không vừa nửa bảng: chiếu 1 câu lên 2/3 bảng, 1/3 để trống cho học sinh lên làm
+      dot.push(dotMotEmHtml(o1, demDot, tuyChon))
+      k += 1
+    } else {
+      const o2 = dsO[k + 1]
+      if (o2 && !laCauDai(o2.cau)) {
+        // Cả 2 câu đủ ngắn: chia đôi bảng 50% - 50%
+        dot.push(dotHaiEmHtml(o1, o2, demDot, tuyChon))
+        k += 2
+      } else {
+        // Câu 1 ngắn nhưng không có bạn ghép đôi cùng ngắn: để trắng nửa còn lại
+        dot.push(dotHaiEmHtml(o1, undefined, demDot, tuyChon))
+        k += 1
+      }
+    }
   }
   // TRANG ĐÁP ÁN nối ngay sau các đợt — lật tiếp là tới, không phải mở tờ khác.
   const dsDa = tuyChon.dsDapAn ?? []

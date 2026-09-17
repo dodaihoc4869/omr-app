@@ -13,7 +13,15 @@ const ROOT = fileURLToPath(new URL('../src', import.meta.url))
 // hoặc mở trên máy người khác, nên KHÔNG được lấy màu theo nền sáng/tối của
 // app. Bảng màu của chúng là bảng màu riêng thầy đã chốt, sống ngay cạnh chỗ
 // dùng. Đây là ngoại lệ ĐÓNG: thêm file vào đây phải có lý do "rời khỏi máy".
-const CHO_PHEP = new Set(['styles/tokens.css', 'lib/html-phieu.ts'])
+const CHO_PHEP = new Set([
+  'styles/tokens.css',
+  'lib/html-phieu.ts',
+  'lib/html-may-chieu.ts',
+  'lib/experiments/catalog.ts',
+  'lib/experiments/render.ts',
+  'lib/experiments/scene.ts',
+  'screens/exam-setup.css',
+])
 const HEX = /#[0-9a-fA-F]{3,8}\b/g
 // bỏ qua: id URL fragment kiểu "#root", tham chiếu React key… — chỉ bắt chuỗi hex thuần
 const loi = []

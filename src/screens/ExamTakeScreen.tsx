@@ -58,7 +58,9 @@ import MaCaInput from '../components/MaCaInput'
 import LogoHocSinh from '../components/LogoHocSinh'
 import PhongChoGame from '../components/PhongChoGame'
 import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
-import { TriangleAlert, X, ArrowLeft, LayoutGrid } from 'lucide-react'
+import { TriangleAlert, X, ArrowLeft, LayoutGrid, Clock, Sparkles } from 'lucide-react'
+import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
+import { goiBaiThi } from '../lib/goi-bao-cao'
 import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
 import { docDuongVao } from '../lib/vai-tro'
 import { gradeFromKeyBank, type GradedSubmission } from '../lib/exam-grade'
@@ -352,6 +354,7 @@ export default function ExamTakeScreen({ tuCong }: { tuCong?: TuCongHocSinh } = 
   // điểm" mở lại popup bất cứ lúc nào; popup chỉ là cờ hiện/ẩn.
   const [graded, setGraded] = useState<GradedSubmission | null>(null)
   const [gradedPopup, setGradedPopup] = useState(false)
+  const [xemBaoCaoModal, setXemBaoCaoModal] = useState(false)
   // Chế độ công bố của ca (server trả về sau khi nộp / khi hỏi lại) + số em
   // đã nộp / đã vào thi để hiện "đang chờ cả lớp x/y".
   const [congBo, setCongBo] = useState<CongBoDiem | null>(null)
@@ -2076,7 +2079,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       const boEm = boCauCuaEm ?? boCauTuBaiLam(kb, done.maCa, done.sbd, done.answers, done.giayCau, kb.soCau)
       const g = gradeFromKeyBank(kb, done.maCa, done.sbd, done.answers, boEm)
       setGraded(g)
-      if (!done.integrity.blocked) setGradedPopup(true)
+      // Không tự bật popup cũ đè màn hình — nút xem điểm sẽ sáng lên cho em bấm mở báo cáo full màn hình
       // MẪU SỐ máy em vừa chia. `gradeFromKeyBank` cắt đề theo `kb.soCau`, thiếu
       // thì rơi về mặc định 18/4/6 — đúng chỗ đã làm điểm ca 447479 lệch (xem
       // ghi chú dài ở `ghiDiem`). Khai đúng con số ĐÃ DÙNG, không khai con số
@@ -2148,7 +2151,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       }
     }
     void hoi()
-    const id = setInterval(() => void hoi(), chuKyLechPhaMs(20000))
+    const nhipCho = congBo === 'ca_lop_xong' ? 4000 : 15000
+    const id = setInterval(() => void hoi(), chuKyLechPhaMs(nhipCho))
     const onVis = () => {
       if (!document.hidden) hoi()
     }
@@ -2892,11 +2896,35 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
             </div>
           </TheNoiDung>
 
+          {/* NÚT XEM ĐIỂM CHI TIẾT:
+              - Nếu cho xem điểm luôn (graded sẵn sàng) hoặc khi học sinh cuối cùng nộp bài:
+                Nút sáng lên, bấm vào bung luôn ra báo cáo đã đồng bộ full màn hình.
+              - Nếu đang chờ cả lớp nộp xong:
+                Hiện nút nhưng disabled và báo rõ số em đã nộp / đã vào, khi đủ thì tự sáng lên. */}
           {graded && (!attempt?.integrity.blocked || xemLai) && (
-            <NutChinh onClick={() => setGradedPopup(true)}>
-              Xem điểm chi tiết
+            <NutChinh
+              onClick={() => setXemBaoCaoModal(true)}
+              className="animate-google-fade"
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Sparkles size={17} />
+                <span>Xem điểm chi tiết</span>
+              </div>
             </NutChinh>
           )}
+
+          {!graded && choCaLop && (!attempt?.integrity.blocked || xemLai) && (
+            <button
+              type="button"
+              disabled
+              className="w-full py-3 px-4 rounded-2xl font-bold text-sm bg-slate-200/90 dark:bg-slate-800/90 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-2 opacity-80"
+              title="Điểm sẽ tự động hiện và nút xem điểm sẽ sáng lên khi cả lớp nộp xong"
+            >
+              <Clock size={16} className="animate-spin text-amber-500" />
+              <span>Xem điểm (Chờ cả lớp nộp xong: {choCaLop.daNop}/{choCaLop.daVao})</span>
+            </button>
+          )}
+
           {phieuCuaEm && (
             <NutChinh variant="phu" onClick={() => setXemBaoCao(true)}>
               Xem báo cáo học tập
@@ -3007,6 +3035,34 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               </div>
             </div>
           </div>
+        )}
+
+        {/* MODAL BÁO CÁO CA THI ĐỒNG BỘ FULL MÀN HÌNH */}
+        {xemBaoCaoModal && graded && attempt && (
+          <BaoCaoCaThiHocSinhModal
+            baiThi={goiBaiThi({
+              maCa: attempt.maCa,
+              tenCa: attempt.tenCa || `Ca ${attempt.maCa}`,
+              nopLuc: attempt.submittedAt,
+              tong: graded.score.total,
+              diemI: graded.score.phanIScore,
+              diemII: graded.score.phanIIScore,
+              diemIII: graded.score.phanIIIScore,
+              tongCau: flat.length,
+              soCauSai: graded.wrongPhanI.length + graded.wrongPhanII.length + graded.wrongPhanIII.length,
+              soCauDung: flat.length - (graded.wrongPhanI.length + graded.wrongPhanII.length + graded.wrongPhanIII.length),
+              lanThu: attempt.lanThu,
+            })}
+            hoTen={(xacNhan?.hoTen || hoTen).trim() || `SBD ${attempt.sbd}`}
+            sbd={attempt.sbd}
+            lop={xacNhan?.lop}
+            scriptUrl={scriptUrlRef.current}
+            onClose={() => setXemBaoCaoModal(false)}
+            onBatDauKhacPhuc={(_maCa, html) => {
+              setXemBaoCaoModal(false)
+              if (html) setHtmlDe(html)
+            }}
+          />
         )}
       </Trang>
     )

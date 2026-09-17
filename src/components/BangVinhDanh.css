@@ -386,499 +386,189 @@
   z-index: 5;
 }
 
-/* Gộp 3 ô tôn vinh vào bảng vinh danh chia làm 2 cột - Luôn chia đôi 1 hàng 2 cột trên mọi thiết bị kể cả điện thoại */
-.honors-split-2col {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr) !important;
-  gap: 6px;
-  align-items: stretch;
-}
-
-.honors-split-2col .honors-col-left {
-  border-right: 1px solid var(--vien);
-  padding-right: 6px;
-  min-width: 0;
-}
-
-.honors-col-quotes {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 4px;
-  min-width: 0;
-}
-
-.honors-quote-card {
-  min-width: 0;
-}
-
 /* ==========================================================================
-   1. ĐIỆN THOẠI DI ĐỘNG (<= 480px): Thu nhỏ cực nét, 1 hàng 2 cột cân xứng
+   THU NHỎ GỌN GÀNG TINH TẾ — ĐỒNG BỘ MỌI MÀN HÌNH
    ========================================================================== */
+.honors {
+  padding: 10px 14px 12px;
+  border-radius: 18px;
+  margin-bottom: 14px;
+}
+
+.honors-heading h2 {
+  font-size: 15px;
+}
+
+.honors-podium {
+  gap: 8px;
+  margin: 8px 0 2px;
+}
+
+.honors-card {
+  padding: 7px 6px 9px;
+  border-radius: 13px;
+}
+
+.honors-rank-1 {
+  padding-top: 10px;
+}
+
+.honors-spirit {
+  height: 52px;
+  margin: 3px 0 1px;
+}
+
+.honors-rank-1 .honors-spirit {
+  height: 68px;
+  margin: 4px 0 2px;
+}
+
+.honors-top1-radiance {
+  width: 100px;
+  height: 100px;
+}
+
+.honors-card .honors-name {
+  font-size: 12px;
+  min-height: 30px;
+  margin: 4px 0 3px;
+  padding: 3px 4px;
+  border-radius: 8px;
+}
+
+.honors-rank-1 .honors-name {
+  font-size: 12.5px;
+}
+
+.honors-score {
+  font-size: 18px;
+}
+
+.honors-rank-1 .honors-score {
+  font-size: 21px;
+}
+
+.honors-praise {
+  font-size: 9px;
+  margin-top: 2px;
+}
+
+.honors-pet {
+  font-size: 8.5px;
+  margin-top: 1px;
+}
+
+.honors-foot {
+  margin-top: 6px;
+  padding-top: 4px;
+  font-size: 8.5px;
+}
+
+/* Trên điện thoại: Nhỏ nhắn, sắc nét, không chiếm màn hình */
 @media (max-width: 480px) {
   .honors {
-    padding: 7px 6px 8px;
+    padding: 8px 8px 10px;
     border-radius: 14px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
-
-  /* Cột 1: Heading */
-  .honors-split-2col .honors-heading {
-    align-items: flex-start;
-    gap: 3px;
+  .honors-heading h2 {
+    font-size: 13px;
   }
-  .honors-split-2col .honors-eyebrow {
-    font-size: 7.5px;
-    gap: 2.5px;
-    letter-spacing: 0.04em;
-  }
-  .honors-split-2col .honors-eyebrow svg {
-    width: 9px;
-    height: 9px;
-  }
-  .honors-split-2col .honors-heading h2 {
-    font-size: 11px;
-    font-weight: 800;
-    margin: 0.5px 0;
-    line-height: 1.15;
-  }
-  .honors-split-2col .honors-heading p {
-    font-size: 7px;
-    line-height: 1.1;
+  .honors-heading p {
+    font-size: 8.5px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .honors-split-2col .honors-crown {
-    width: 14px;
-    height: 14px;
-    flex-shrink: 0;
+  .honors-eyebrow {
+    font-size: 8.5px;
   }
-
-  /* Cột 1: Podium Top 1-2-3 */
-  .honors-split-2col .honors-podium {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 2px;
-    margin: 4px 0 0;
-    align-items: end;
+  .honors-crown {
+    width: 16px;
+    height: 16px;
   }
-  .honors-split-2col .honors-card {
-    padding: 3px 2px 3.5px;
-    border-radius: 7px;
+  .honors-podium {
+    gap: 4px;
+    margin: 6px 0 0;
   }
-  .honors-split-2col .honors-rank-1 {
-    padding-top: 5px;
-    border-width: 1.5px;
+  .honors-card {
+    padding: 5px 3px 6px;
+    border-radius: 9px;
   }
-  .honors-split-2col .honors-rank {
-    font-size: 6.5px;
-    gap: 1.5px;
-    letter-spacing: 0.02em;
-    margin-bottom: 1px;
+  .honors-rank-1 {
+    padding-top: 6px;
   }
-  .honors-split-2col .honors-rank svg {
-    width: 8.5px;
-    height: 8.5px;
+  .honors-rank {
+    font-size: 8px;
   }
-  .honors-split-2col .honors-card .honors-name {
-    font-size: 7.5px;
-    font-weight: 750;
-    line-height: 1.15;
-    min-height: 20px;
-    max-height: 22px;
-    padding: 1px 2px;
-    margin: 1.5px 0 1.5px;
-    border-radius: 4px;
+  .honors-card .honors-name {
+    font-size: 9.5px;
+    min-height: 24px;
+    max-height: 26px;
+    padding: 1px 3px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     word-break: break-word;
-    text-align: center;
   }
-  .honors-split-2col .honors-rank-1 .honors-name {
-    font-size: 8px;
+  .honors-rank-1 .honors-name {
+    font-size: 10px;
   }
-
-  .honors-split-2col .honors-spirit {
-    height: 23px;
-    margin: 1.5px 0 1px;
-  }
-  .honors-split-2col .honors-rank-1 .honors-spirit {
-    height: 31px;
+  .honors-spirit {
+    height: 38px;
     margin: 2px 0 1px;
   }
-  .honors-split-2col .honors-spirit-shadow {
-    width: 18px;
-    height: 2.5px;
-    margin-top: -1px;
+  .honors-rank-1 .honors-spirit {
+    height: 50px;
+    margin: 2px 0 1px;
   }
-  .honors-split-2col .honors-top1-radiance {
-    width: 42px;
-    height: 42px;
-    top: 8%;
+  .honors-spirit-shadow {
+    width: 26px;
+    height: 3.5px;
   }
-  .honors-split-2col .honors-sparkle {
-    font-size: 6.5px;
+  .honors-top1-radiance {
+    width: 70px;
+    height: 70px;
   }
-  .honors-split-2col .honors-sparkle-1 { top: 2px; left: 2px; }
-  .honors-split-2col .honors-sparkle-2 { top: 2px; right: 2px; }
-  .honors-split-2col .honors-sparkle-3 { bottom: 22%; left: 1.5px; }
-  .honors-split-2col .honors-sparkle-4 { bottom: 24%; right: 1.5px; }
-
-  .honors-split-2col .honors-score {
-    font-size: 10px;
-    margin-top: 1px;
-    line-height: 1;
+  .honors-sparkle {
+    font-size: 9px;
   }
-  .honors-split-2col .honors-rank-1 .honors-score {
-    font-size: 11px;
-  }
-  .honors-split-2col .honors-score span {
-    font-size: 5.8px;
-    margin-left: 0.5px;
-  }
-  .honors-split-2col .honors-praise {
-    font-size: 5.8px;
-    line-height: 1.1;
-    margin-top: 1px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .honors-split-2col .honors-pet {
-    font-size: 5.5px;
-    line-height: 1.1;
-    margin-top: 0.5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .honors-split-2col .honors-foot {
-    font-size: 5.5px;
-    line-height: 1.1;
-    margin-top: 1.5px;
-    padding-top: 1.5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .honors-split-2col .honors-foot span {
-    display: block !important;
-    font-size: 5px;
-    margin-top: 0.5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* Cột 2: 3 Ô Tôn Vinh Google */
-  .honors-col-quotes {
-    gap: 3px;
-    justify-content: space-between;
-  }
-  .honors-col-quotes .honors-quote-card {
-    padding: 3px 4.5px !important;
-    border-radius: 7px !important;
-    border-width: 1px !important;
-  }
-  .honors-quote-badge {
-    font-size: 6.8px !important;
-    padding: 0.5px 3px !important;
-    gap: 2px !important;
-  }
-  .honors-quote-badge svg {
-    width: 8px !important;
-    height: 8px !important;
-  }
-  .honors-quote-subtag {
-    font-size: 6.2px !important;
-    gap: 2px !important;
-  }
-  .honors-quote-subtag .google-pulse-dot {
-    width: 3.5px !important;
-    height: 3.5px !important;
-  }
-  .honors-quote-body {
-    font-size: 7.2px !important;
-    line-height: 1.2 !important;
-    margin-top: 1px !important;
-    display: -webkit-box !important;
-    -webkit-line-clamp: 2 !important;
-    -webkit-box-orient: vertical !important;
-    overflow: hidden !important;
-  }
-  .honors-parent-title {
-    font-size: 7.8px !important;
-    line-height: 1.15 !important;
-  }
-  .honors-parent-sub {
-    font-size: 6.5px !important;
-    line-height: 1.1 !important;
-    margin-top: 0.5px !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-  .honors-quote-foot {
-    font-size: 6.2px !important;
-    margin-top: 1px !important;
-    padding-top: 1px !important;
-  }
-  .honors-quote-foot .honors-ca-pill {
-    font-size: 6.5px !important;
-    padding: 0 3px !important;
-  }
-}
-
-/* ==========================================================================
-   2. MÀN HÌNH ĐIỆN THOẠI LỚN / PHABLET (481px -> 640px)
-   ========================================================================== */
-@media (min-width: 481px) and (max-width: 640px) {
-  .honors {
-    padding: 9px 8px 10px;
-    border-radius: 16px;
-    margin-bottom: 14px;
-  }
-  .honors-split-2col {
-    gap: 8px;
-  }
-  .honors-split-2col .honors-col-left {
-    padding-right: 8px;
-  }
-
-  .honors-split-2col .honors-eyebrow {
-    font-size: 8.5px;
-  }
-  .honors-split-2col .honors-heading h2 {
-    font-size: 13px;
-  }
-  .honors-split-2col .honors-heading p {
-    font-size: 8.5px;
-  }
-  .honors-split-2col .honors-crown {
-    width: 17px;
-    height: 17px;
-  }
-
-  .honors-split-2col .honors-podium {
-    gap: 4px;
-    margin: 6px 0 0;
-  }
-  .honors-split-2col .honors-card {
-    padding: 5px 3px 6px;
-    border-radius: 9px;
-  }
-  .honors-split-2col .honors-rank {
-    font-size: 7.5px;
-  }
-  .honors-split-2col .honors-rank svg {
-    width: 10px;
-    height: 10px;
-  }
-  .honors-split-2col .honors-card .honors-name {
-    font-size: 8.5px;
-    min-height: 23px;
-    max-height: 25px;
-    padding: 2px 3px;
-  }
-  .honors-split-2col .honors-rank-1 .honors-name {
-    font-size: 9.5px;
-  }
-  .honors-split-2col .honors-spirit {
-    height: 32px;
-  }
-  .honors-split-2col .honors-rank-1 .honors-spirit {
-    height: 42px;
-  }
-  .honors-split-2col .honors-score {
-    font-size: 12.5px;
-  }
-  .honors-split-2col .honors-rank-1 .honors-score {
+  .honors-score {
     font-size: 14px;
   }
-  .honors-split-2col .honors-score span {
-    font-size: 7px;
-  }
-  .honors-split-2col .honors-praise {
-    font-size: 7px;
-  }
-  .honors-split-2col .honors-pet {
-    font-size: 6.8px;
-  }
-  .honors-split-2col .honors-foot {
-    font-size: 6.8px;
-  }
-  .honors-split-2col .honors-foot span {
-    display: block !important;
-    font-size: 6.2px;
-  }
-
-  .honors-col-quotes {
-    gap: 4.5px;
-  }
-  .honors-col-quotes .honors-quote-card {
-    padding: 4.5px 6px !important;
-    border-radius: 9px !important;
-    border-width: 1.5px !important;
-  }
-  .honors-quote-badge {
-    font-size: 8px !important;
-    padding: 1px 4px !important;
-  }
-  .honors-quote-subtag {
-    font-size: 7.5px !important;
-  }
-  .honors-quote-body {
-    font-size: 8.5px !important;
-    line-height: 1.25 !important;
-  }
-  .honors-parent-title {
-    font-size: 9px !important;
-  }
-  .honors-parent-sub {
-    font-size: 7.5px !important;
-  }
-  .honors-quote-foot {
-    font-size: 7.5px !important;
-  }
-}
-
-/* ==========================================================================
-   3. TABLET / LAPTOP NHỎ (641px -> 959px)
-   ========================================================================== */
-@media (min-width: 641px) and (max-width: 959px) {
-  .honors {
-    padding: 10px 12px 14px;
-    border-radius: 18px;
-  }
-  .honors-split-2col {
-    gap: 12px;
-  }
-  .honors-split-2col .honors-col-left {
-    padding-right: 12px;
-  }
-  .honors-split-2col .honors-heading h2 {
-    font-size: 15px;
-  }
-  .honors-split-2col .honors-heading p {
-    font-size: 9.5px;
-  }
-  .honors-split-2col .honors-card {
-    padding: 7px 5px 9px;
-    border-radius: 12px;
-  }
-  .honors-split-2col .honors-card .honors-name {
-    font-size: 10.5px;
-    min-height: 28px;
-    padding: 2px 4px;
-  }
-  .honors-split-2col .honors-rank-1 .honors-name {
-    font-size: 11.5px;
-  }
-  .honors-split-2col .honors-spirit {
-    height: 44px;
-  }
-  .honors-split-2col .honors-rank-1 .honors-spirit {
-    height: 58px;
-  }
-  .honors-split-2col .honors-score {
+  .honors-rank-1 .honors-score {
     font-size: 16px;
   }
-  .honors-split-2col .honors-rank-1 .honors-score {
-    font-size: 19px;
+  .honors-score span {
+    font-size: 7.5px;
   }
-  .honors-split-2col .honors-score span {
-    font-size: 8.5px;
+  .honors-praise {
+    font-size: 7.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .honors-split-2col .honors-praise,
-  .honors-split-2col .honors-pet,
-  .honors-split-2col .honors-foot {
-    font-size: 8.5px;
+  .honors-pet {
+    font-size: 7px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .honors-col-quotes {
-    gap: 6px;
+  .honors-foot {
+    font-size: 7px;
+    margin-top: 3px;
+    padding-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .honors-col-quotes .honors-quote-card {
-    padding: 6px 8px !important;
-  }
-  .honors-quote-badge {
-    font-size: 9px !important;
-  }
-  .honors-quote-subtag {
-    font-size: 8.5px !important;
-  }
-  .honors-quote-body {
-    font-size: 10px !important;
-  }
-  .honors-parent-title {
-    font-size: 10.5px !important;
-  }
-  .honors-parent-sub {
-    font-size: 9px !important;
-  }
-  .honors-quote-foot {
-    font-size: 8.5px !important;
-  }
-}
-
-/* ==========================================================================
-   4. DESKTOP (>= 960px): Đẹp thoáng như ảnh thiết kế chuẩn Google
-   ========================================================================== */
-@media (min-width: 960px) {
-  .honors-split-2col {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-    gap: 16px;
-  }
-  .honors-split-2col .honors-col-left {
-    border-right: 1px solid var(--vien);
-    padding-right: 16px;
-  }
-  .honors-col-quotes {
-    gap: 8px;
-  }
-}
-
-/* ==========================================================================
-   5. BẢNG VINH DANH ĐỘC LẬP (KHI KHÔNG CÓ CỘT TÔN VINH, VD: BẢNG TIN THẦY)
-   ========================================================================== */
-@media (max-width: 600px) {
-  .honors:not(:has(.honors-split-2col)) {
-    padding: 10px 10px 14px;
-    border-radius: 18px;
-  }
-  .honors:not(:has(.honors-split-2col)) .honors-heading h2 {
-    font-size: 15px;
-  }
-  .honors:not(:has(.honors-split-2col)) .honors-podium {
-    gap: 6px;
-  }
-  .honors:not(:has(.honors-split-2col)) .honors-card {
-    padding: 8px 4px 10px;
-    border-radius: 14px;
-  }
-  .honors:not(:has(.honors-split-2col)) .honors-card .honors-name {
-    font-size: 11px;
-    min-height: 32px;
-    padding: 3px 4px;
-  }
-  .honors:not(:has(.honors-split-2col)) .honors-rank-1 .honors-name {
-    font-size: 12px;
-  }
-  .honors:not(:has(.honors-split-2col)) .honors-spirit {
-    height: 52px;
-  }
-  .honors:not(:has(.honors-split-2col)) .honors-rank-1 .honors-spirit {
-    height: 68px;
-  }
-  .honors:not(:has(.honors-split-2col)) .honors-score {
-    font-size: 18px;
-  }
-  .honors:not(:has(.honors-split-2col)) .honors-rank-1 .honors-score {
-    font-size: 21px;
-  }
-  .honors:not(:has(.honors-split-2col)) .honors-foot span {
-    display: none;
+  .honors-foot span {
+    display: block;
+    font-size: 6.5px;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
