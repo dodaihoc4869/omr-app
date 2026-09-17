@@ -388,8 +388,8 @@
 
 /* Gộp 3 ô tôn vinh vào bảng vinh danh chia làm 2 cột - Luôn chia đôi 1 hàng 2 cột trên mọi thiết bị kể cả điện thoại */
 .honors-split-2col {
-  display: grid;
-  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr) !important;
   gap: 6px;
   align-items: stretch;
 }

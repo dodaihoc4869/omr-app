@@ -1,0 +1,396 @@
+[
+  {
+    "results": [
+      {
+        "sbd": "12121212",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":4,\"exp\":618,\"expToiDa\":160,\"capTienHoa\":4,\"khoExp\":0,\"soExp\":{\"caThi\":1788,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Sinh Đuôi · Lv.4\",\"ngayNhanTrung\":\"2026-09-15T14:28:00.929Z\",\"ngayChonThu\":\"2026-09-15T15:52:56.008Z\",\"lichSuThap\":[{\"qid\":\"12-C1-B1-D2-I-27\",\"lanCuoi\":1789495339257,\"soLanHoi\":1},{\"qid\":\"12-C1-B1-D3-I-77\",\"lanCuoi\":1789495329673,\"soLanHoi\":1},{\"qid\":\"10-C3-B13-I-6\",\"lanCuoi\":1789495324240,\"soLanHoi\":1}]}",
+        "tong_exp": 1788,
+        "cap_nhat_luc": "2026-09-15T18:03:23.944Z"
+      },
+      {
+        "sbd": "11052",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":51,\"exp\":680,\"expToiDa\":3950,\"capTienHoa\":51,\"khoExp\":0,\"soExp\":{\"caThi\":555,\"btvn\":0,\"mom\":0,\"leoThap\":55544,\"sanBoss\":200},\"tangThapCaoNhat\":298,\"soCauDaThanhTay\":2,\"danhHieuHienTai\":\"Hình Thái Tối Thượng II · Lv.51\",\"ngayNhanTrung\":\"2026-09-15T15:58:03.166Z\",\"ngayChonThu\":\"2026-09-15T15:59:00.491Z\",\"lichSuThap\":[{\"qid\":\"11-C1-B1-I-2\",\"lanCuoi\":1789496398129,\"soLanHoi\":57},{\"qid\":\"DH-11-C1-B1-I-9\",\"lanCuoi\":1789496395709,\"soLanHoi\":58},{\"qid\":\"11-C1-B1-I-44\",\"lanCuoi\":1789496394198,\"soLanHoi\":56},{\"qid\":\"DH-11-C1-B1-I-44\",\"lanCuoi\":1789496392817,\"soLanHoi\":50},{\"qid\":\"DH-11-C1-B1-I-11\",\"lanCuoi\":1789496390958,\"soLanHoi\":54},{\"qid\":\"DH-11-C1-B2-I-24\",\"lanCuoi\":1789496389454,\"soLanHoi\":60},{\"qid\":\"DH-11-C1-B2-I-105\",\"lanCuoi\":1789496387640,\"soLanHoi\":59},{\"qid\":\"DH-11-C1-B1-I-37\",\"lanCuoi\":1789496381413,\"soLanHoi\":58},{\"qid\":\"11-C1-B1-I-30\",\"lanCuoi\":1789496373787,\"soLanHoi\":37},{\"qid\":\"DH-11-C1-B3-D1-I-11\",\"lanCuoi\":1789496371518,\"soLanHoi\":57},{\"qid\":\"DH-11-C1-B2-I-19\",\"lanCuoi\":1789496368988,\"soLanHoi\":65},{\"qid\":\"11-C1-B2-D2-I-11\",\"lanCuoi\":1789496367467,\"soLanHoi\":54},{\"qid\":\"11-C1-B1-I-6\",\"lanCuoi\":1789496358708,\"soLanHoi\":54},{\"qid\":\"DH-11-C1-B1-I-28\",\"lanCuoi\":1789496357211,\"soLanHoi\":62},{\"qid\":\"11-C1-B2-D1-I-87\",\"lanCuoi\":1789496353879,\"soLanHoi\":55},{\"qid\":\"DH-11-C1-B3-D2-I-5\",\"lanCuoi\":1789496348358,\"soLanHoi\":61}]}",
+        "tong_exp": 56299,
+        "cap_nhat_luc": "2026-09-15T18:20:48.987Z"
+      },
+      {
+        "sbd": "12120",
+        "du_lieu_json": "{\"idThanhThuChon\":\"thuy_quai\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":456,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":456,\"sanBoss\":0},\"tangThapCaoNhat\":9,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T15:58:07.844Z\",\"ngayChonThu\":\"2026-09-15T16:00:16.777Z\"}",
+        "tong_exp": 456,
+        "cap_nhat_luc": "2026-09-15T16:21:41.987Z"
+      },
+      {
+        "sbd": "11084",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T15:58:34.167Z\",\"ngayChonThu\":\"2026-09-15T15:59:34.041Z\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:38:58.401Z"
+      },
+      {
+        "sbd": "11034",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T23:56:52.962Z\",\"ngayChonThu\":\"2026-09-15T23:56:58.485Z\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-16T00:00:20.123Z"
+      },
+      {
+        "sbd": "12090",
+        "du_lieu_json": "{\"idThanhThuChon\":\"thiet_giap\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T15:59:16.978Z\",\"ngayChonThu\":\"2026-09-15T16:12:57.675Z\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:31:59.191Z"
+      },
+      {
+        "sbd": "11076",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":2,\"exp\":180,\"expToiDa\":380,\"capTienHoa\":2,\"khoExp\":0,\"soExp\":{\"caThi\":480,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Sơ Sinh · Lv.2\",\"ngayNhanTrung\":\"2026-09-15T16:07:37.040Z\",\"ngayChonThu\":\"2026-09-15T16:07:42.330Z\"}",
+        "tong_exp": 480,
+        "cap_nhat_luc": "2026-09-15T16:45:45.575Z"
+      },
+      {
+        "sbd": "11057",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:03:26.308Z\",\"ngayChonThu\":\"\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:34:18.739Z"
+      },
+      {
+        "sbd": "12042",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:02:02.269Z\",\"ngayChonThu\":\"\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:25:04.330Z"
+      },
+      {
+        "sbd": "12088",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:02:12.509Z\",\"ngayChonThu\":\"\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:05:41.867Z"
+      },
+      {
+        "sbd": "12035",
+        "du_lieu_json": "{\"idThanhThuChon\":\"thiet_giap\",\"capDo\":4,\"exp\":24,\"expToiDa\":630,\"capTienHoa\":4,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":726,\"sanBoss\":0},\"tangThapCaoNhat\":12,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Sinh Đuôi · Lv.4\",\"ngayNhanTrung\":\"2026-09-15T16:13:46.852Z\",\"ngayChonThu\":\"2026-09-15T16:04:19.514Z\"}",
+        "tong_exp": 726,
+        "cap_nhat_luc": "2026-09-15T16:34:59.770Z"
+      },
+      {
+        "sbd": "10003",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T23:54:48.266Z\",\"ngayChonThu\":\"\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T23:55:20.262Z"
+      },
+      {
+        "sbd": "12043",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:03:50.297Z\",\"ngayChonThu\":\"2026-09-15T16:04:01.864Z\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:04:22.223Z"
+      },
+      {
+        "sbd": "12047",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:04:13.601Z\",\"ngayChonThu\":\"\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:08:38.623Z"
+      },
+      {
+        "sbd": "10039",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:04:36.598Z\",\"ngayChonThu\":\"\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:07:08.554Z"
+      },
+      {
+        "sbd": "12010",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:05:25.079Z\",\"ngayChonThu\":\"\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:06:08.430Z"
+      },
+      {
+        "sbd": "12011",
+        "du_lieu_json": "{\"idThanhThuChon\":\"thiet_giap\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:05:32.602Z\",\"ngayChonThu\":\"2026-09-15T16:11:41.799Z\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:32:15.173Z"
+      },
+      {
+        "sbd": "12058",
+        "du_lieu_json": "{\"idThanhThuChon\":\"loi_kim\",\"capDo\":13,\"exp\":47,\"expToiDa\":990,\"capTienHoa\":13,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":8415,\"sanBoss\":0},\"tangThapCaoNhat\":100,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Thức Tỉnh Hào Quang III · Lv.13\",\"ngayNhanTrung\":\"2026-09-15T16:06:14.598Z\",\"ngayChonThu\":\"2026-09-15T16:08:29.778Z\",\"lichSuThap\":[]}",
+        "tong_exp": 8415,
+        "cap_nhat_luc": "2026-09-15T17:27:15.948Z"
+      },
+      {
+        "sbd": "11009",
+        "du_lieu_json": "{\"idThanhThuChon\":\"loi_kim\",\"capDo\":7,\"exp\":748,\"expToiDa\":1320,\"capTienHoa\":7,\"khoExp\":0,\"soExp\":{\"caThi\":246,\"btvn\":0,\"mom\":0,\"leoThap\":3860,\"sanBoss\":0},\"tangThapCaoNhat\":42,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Vảy Nguyên Tố · Lv.7\",\"ngayNhanTrung\":\"2026-09-15T16:06:46.075Z\",\"ngayChonThu\":\"2026-09-15T16:11:28.728Z\",\"lichSuThap\":[]}",
+        "tong_exp": 4106,
+        "cap_nhat_luc": "2026-09-15T17:12:31.072Z"
+      },
+      {
+        "sbd": "12125",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":12,\"exp\":72,\"expToiDa\":960,\"capTienHoa\":12,\"khoExp\":110,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":3095,\"sanBoss\":0},\"tangThapCaoNhat\":36,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Thức Tỉnh Hào Quang II · Lv.12\",\"ngayNhanTrung\":\"2026-09-15T16:19:31.748Z\",\"ngayChonThu\":\"2026-09-15T16:12:49.628Z\",\"lichSuThap\":[]}",
+        "tong_exp": 3095,
+        "cap_nhat_luc": "2026-09-15T17:52:35.777Z"
+      },
+      {
+        "sbd": "12079",
+        "du_lieu_json": "{\"idThanhThuChon\":\"thuy_quai\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:07:11.698Z\",\"ngayChonThu\":\"2026-09-15T16:07:35.110Z\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:08:18.356Z"
+      },
+      {
+        "sbd": "11025",
+        "du_lieu_json": "{\"idThanhThuChon\":\"thuy_quai\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":396,\"soExp\":{\"caThi\":396,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:07:13.721Z\",\"ngayChonThu\":\"2026-09-15T16:08:00.993Z\"}",
+        "tong_exp": 396,
+        "cap_nhat_luc": "2026-09-15T16:09:11.502Z"
+      },
+      {
+        "sbd": "12082",
+        "du_lieu_json": "{\"idThanhThuChon\":\"moc_tinh\",\"capDo\":4,\"exp\":20,\"expToiDa\":160,\"capTienHoa\":4,\"khoExp\":0,\"soExp\":{\"caThi\":360,\"btvn\":0,\"mom\":0,\"leoThap\":240,\"sanBoss\":0},\"tangThapCaoNhat\":6,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Trứng Polymer · Lv.4\",\"ngayNhanTrung\":\"2026-09-15T16:07:26.874Z\",\"ngayChonThu\":\"2026-09-15T16:08:44.256Z\",\"lichSuThap\":[]}",
+        "tong_exp": 600,
+        "cap_nhat_luc": "2026-09-15T23:33:47.910Z"
+      },
+      {
+        "sbd": "11022",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:09:31.960Z\",\"ngayChonThu\":\"\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:10:49.388Z"
+      },
+      {
+        "sbd": "12024",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:10:23.622Z\",\"ngayChonThu\":\"2026-09-15T16:10:58.669Z\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:11:19.562Z"
+      },
+      {
+        "sbd": "11063",
+        "du_lieu_json": "{\"idThanhThuChon\":\"moc_tinh\",\"capDo\":2,\"exp\":165,\"expToiDa\":380,\"capTienHoa\":2,\"khoExp\":36,\"soExp\":{\"caThi\":465,\"btvn\":0,\"mom\":0,\"leoThap\":36,\"sanBoss\":0},\"tangThapCaoNhat\":2,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Sơ Sinh · Lv.2\",\"ngayNhanTrung\":\"2026-09-15T16:14:02.190Z\",\"ngayChonThu\":\"2026-09-15T16:15:10.400Z\"}",
+        "tong_exp": 501,
+        "cap_nhat_luc": "2026-09-15T16:20:36.301Z"
+      },
+      {
+        "sbd": "12084",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":4,\"exp\":0,\"expToiDa\":630,\"capTienHoa\":4,\"khoExp\":0,\"soExp\":{\"caThi\":222,\"btvn\":0,\"mom\":0,\"leoThap\":726,\"sanBoss\":0},\"tangThapCaoNhat\":12,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Sinh Đuôi · Lv.4\",\"ngayNhanTrung\":\"2026-09-15T16:31:24.625Z\",\"ngayChonThu\":\"2026-09-15T16:32:24.174Z\"}",
+        "tong_exp": 948,
+        "cap_nhat_luc": "2026-09-15T16:38:46.684Z"
+      },
+      {
+        "sbd": "11007",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:12:42.992Z\",\"ngayChonThu\":\"\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:14:54.566Z"
+      },
+      {
+        "sbd": "12022",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":476,\"soExp\":{\"caThi\":476,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:12:52.867Z\",\"ngayChonThu\":\"2026-09-15T16:14:45.041Z\"}",
+        "tong_exp": 476,
+        "cap_nhat_luc": "2026-09-15T16:16:10.799Z"
+      },
+      {
+        "sbd": "11090",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:13:53.156Z\",\"ngayChonThu\":\"2026-09-15T16:15:15.039Z\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:19:33.146Z"
+      },
+      {
+        "sbd": "12026",
+        "du_lieu_json": "{\"idThanhThuChon\":\"thiet_giap\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:18:45.588Z\",\"ngayChonThu\":\"2026-09-15T16:19:38.493Z\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:20:46.367Z"
+      },
+      {
+        "sbd": "10002",
+        "du_lieu_json": "{\"idThanhThuChon\":\"thiet_giap\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:19:37.663Z\",\"ngayChonThu\":\"2026-09-15T16:21:38.109Z\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:37:35.291Z"
+      },
+      {
+        "sbd": "12049",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:19:55.996Z\",\"ngayChonThu\":\"\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:20:07.413Z"
+      },
+      {
+        "sbd": "12033",
+        "du_lieu_json": "{\"idThanhThuChon\":\"moc_tinh\",\"capDo\":12,\"exp\":0,\"expToiDa\":0,\"capTienHoa\":12,\"khoExp\":0,\"soExp\":{\"caThi\":461,\"btvn\":0,\"mom\":0,\"leoThap\":10000,\"sanBoss\":100},\"tangThapCaoNhat\":135,\"soCauDaThanhTay\":1,\"danhHieuHienTai\":\"Hình Thái Tối Thượng · Lv.12\",\"ngayNhanTrung\":\"2026-09-15T16:20:21.351Z\",\"ngayChonThu\":\"2026-09-15T16:20:46.899Z\"}",
+        "tong_exp": 10561,
+        "cap_nhat_luc": "2026-09-15T16:47:30.329Z"
+      },
+      {
+        "sbd": "12080",
+        "du_lieu_json": "{\"idThanhThuChon\":\"thiet_giap\",\"capDo\":14,\"exp\":50,\"expToiDa\":1030,\"capTienHoa\":14,\"khoExp\":0,\"soExp\":{\"caThi\":443,\"btvn\":0,\"mom\":0,\"leoThap\":12641,\"sanBoss\":200},\"tangThapCaoNhat\":114,\"soCauDaThanhTay\":2,\"danhHieuHienTai\":\"Thức Tỉnh Hào Quang IV · Lv.14\",\"ngayNhanTrung\":\"2026-09-15T16:20:30.026Z\",\"ngayChonThu\":\"2026-09-15T16:26:23.759Z\",\"lichSuThap\":[{\"qid\":\"DH-12-C1-B2-I-44\",\"lanCuoi\":1789494065734,\"soLanHoi\":5},{\"qid\":\"DH-12-C2-B4-I-10\",\"lanCuoi\":1789494055446,\"soLanHoi\":5},{\"qid\":\"DH-12-C1-B3-D2-I-5\",\"lanCuoi\":1789494052765,\"soLanHoi\":4},{\"qid\":\"DH-12-C2-B4-I-32\",\"lanCuoi\":1789494049713,\"soLanHoi\":5},{\"qid\":\"DH-12-C1-B3-D2-I-8\",\"lanCuoi\":1789494045115,\"soLanHoi\":4},{\"qid\":\"DH-12-C2-B4-I-8\",\"lanCuoi\":1789493103143,\"soLanHoi\":5},{\"qid\":\"DH-12-C1-B3-D2-I-16\",\"lanCuoi\":1789493101568,\"soLanHoi\":4}]}",
+        "tong_exp": 13284,
+        "cap_nhat_luc": "2026-09-15T17:39:49.513Z"
+      },
+      {
+        "sbd": "12030",
+        "du_lieu_json": "{\"idThanhThuChon\":\"moc_tinh\",\"capDo\":2,\"exp\":132,\"expToiDa\":380,\"capTienHoa\":2,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":306,\"sanBoss\":0},\"tangThapCaoNhat\":7,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Sơ Sinh · Lv.2\",\"ngayNhanTrung\":\"2026-09-15T16:35:44.779Z\",\"ngayChonThu\":\"2026-09-15T16:32:05.664Z\"}",
+        "tong_exp": 306,
+        "cap_nhat_luc": "2026-09-15T16:42:55.215Z"
+      },
+      {
+        "sbd": "11029",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":4,\"exp\":0,\"expToiDa\":160,\"capTienHoa\":4,\"khoExp\":0,\"soExp\":{\"caThi\":342,\"btvn\":0,\"mom\":0,\"leoThap\":828,\"sanBoss\":0},\"tangThapCaoNhat\":13,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Sinh Đuôi · Lv.4\",\"ngayNhanTrung\":\"2026-09-15T16:31:49.748Z\",\"ngayChonThu\":\"2026-09-15T16:32:05.414Z\",\"lichSuThap\":[]}",
+        "tong_exp": 1170,
+        "cap_nhat_luc": "2026-09-15T23:23:48.731Z"
+      },
+      {
+        "sbd": "11068",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:35:03.054Z\",\"ngayChonThu\":\"\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:35:40.311Z"
+      },
+      {
+        "sbd": "11065",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":300,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T16:36:46.451Z\",\"ngayChonThu\":\"\"}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T16:37:41.645Z"
+      },
+      {
+        "sbd": "12066",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":25,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":25,\"sanBoss\":0},\"tangThapCaoNhat\":2,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T23:04:05.769Z\",\"ngayChonThu\":\"2026-09-15T23:04:21.313Z\",\"lichSuThap\":[{\"qid\":\"DH-12-C2-B4-I-23\",\"lanCuoi\":1789513601298,\"soLanHoi\":1},{\"qid\":\"DH-12-C2-B5-I-4\",\"lanCuoi\":1789513596099,\"soLanHoi\":1},{\"qid\":\"DH-12-C2-B4-I-32\",\"lanCuoi\":1789513585238,\"soLanHoi\":1},{\"qid\":\"DH-12-C1-B1-P1-I-37\",\"lanCuoi\":1789513578852,\"soLanHoi\":1},{\"qid\":\"DH-12-C1-B2-I-16\",\"lanCuoi\":1789513567950,\"soLanHoi\":1},{\"qid\":\"DH-12-C2-B4-I-47\",\"lanCuoi\":1789513550920,\"soLanHoi\":1}]}",
+        "tong_exp": 25,
+        "cap_nhat_luc": "2026-09-15T23:09:42.031Z"
+      },
+      {
+        "sbd": "11038",
+        "du_lieu_json": "{\"idThanhThuChon\":\"thiet_giap\",\"capDo\":4,\"exp\":35,\"expToiDa\":160,\"capTienHoa\":4,\"khoExp\":0,\"soExp\":{\"caThi\":435,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Mọc Sừng II · Lv.4\",\"ngayNhanTrung\":\"2026-09-15T17:14:39.236Z\",\"ngayChonThu\":\"2026-09-15T17:15:41.611Z\",\"lichSuThap\":[]}",
+        "tong_exp": 435,
+        "cap_nhat_luc": "2026-09-15T17:16:46.645Z"
+      },
+      {
+        "sbd": "12094",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T17:33:03.841Z\",\"ngayChonThu\":\"2026-09-15T17:33:43.682Z\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T17:34:05.374Z"
+      },
+      {
+        "sbd": "12124",
+        "du_lieu_json": "{\"idThanhThuChon\":\"thiet_giap\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T17:40:02.860Z\",\"ngayChonThu\":\"2026-09-15T17:40:12.721Z\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T17:41:58.587Z"
+      },
+      {
+        "sbd": "11078",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T17:54:13.719Z\",\"ngayChonThu\":\"\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T17:54:33.407Z"
+      },
+      {
+        "sbd": "12071",
+        "du_lieu_json": "{\"idThanhThuChon\":\"loi_kim\",\"capDo\":10,\"exp\":381,\"expToiDa\":400,\"capTienHoa\":10,\"khoExp\":0,\"soExp\":{\"caThi\":566,\"btvn\":0,\"mom\":0,\"leoThap\":1445,\"sanBoss\":0},\"tangThapCaoNhat\":36,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Đại Lân Nhỏ · Lv.10\",\"ngayNhanTrung\":\"2026-09-15T22:31:43.939Z\",\"ngayChonThu\":\"2026-09-15T22:32:34.796Z\",\"lichSuThap\":[{\"qid\":\"DH-12-C2-B4-I-23\",\"lanCuoi\":1789512965942,\"soLanHoi\":19},{\"qid\":\"DH-12-C1-B2-I-16\",\"lanCuoi\":1789512961656,\"soLanHoi\":22},{\"qid\":\"DH-12-C1-B1-P1-I-37\",\"lanCuoi\":1789512957743,\"soLanHoi\":16},{\"qid\":\"DH-12-C2-B4-I-10\",\"lanCuoi\":1789512950593,\"soLanHoi\":21},{\"qid\":\"DH-12-C2-B4-I-48\",\"lanCuoi\":1789512944793,\"soLanHoi\":15},{\"qid\":\"DH-12-C1-B1-P1-I-85\",\"lanCuoi\":1789512942042,\"soLanHoi\":9},{\"qid\":\"DH-12-C1-B3-D2-I-16\",\"lanCuoi\":1789512939213,\"soLanHoi\":8},{\"qid\":\"DH-12-C2-B5-I-10\",\"lanCuoi\":1789512930758,\"soLanHoi\":14}]}",
+        "tong_exp": 2011,
+        "cap_nhat_luc": "2026-09-15T22:57:19.776Z"
+      },
+      {
+        "sbd": "11079",
+        "du_lieu_json": "{\"idThanhThuChon\":\"loi_dieu\",\"capDo\":1,\"exp\":50,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":25,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":25,\"sanBoss\":0},\"tangThapCaoNhat\":2,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Trứng Halogen · Lv.1\",\"ngayNhanTrung\":\"2026-09-15T22:42:30.088Z\",\"ngayChonThu\":\"2026-09-15T22:37:41.611Z\",\"lichSuThap\":[{\"qid\":\"11-C1-B1-I-5\",\"lanCuoi\":1789512196066,\"soLanHoi\":1},{\"qid\":\"DH-11-C1-B1-I-43\",\"lanCuoi\":1789512182573,\"soLanHoi\":1},{\"qid\":\"11-C1-B2-D2-I-16\",\"lanCuoi\":1789512176054,\"soLanHoi\":1},{\"qid\":\"11-C1-B2-D1-I-60\",\"lanCuoi\":1789512167280,\"soLanHoi\":1},{\"qid\":\"11-C1-B2-D1-I-87\",\"lanCuoi\":1789512155924,\"soLanHoi\":1}]}",
+        "tong_exp": 25,
+        "cap_nhat_luc": "2026-09-15T22:43:52.196Z"
+      },
+      {
+        "sbd": "12056",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T22:47:19.039Z\",\"ngayChonThu\":\"\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T22:50:27.682Z"
+      },
+      {
+        "sbd": "11039",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T22:58:19.888Z\",\"ngayChonThu\":\"2026-09-15T22:58:25.816Z\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T22:58:34.195Z"
+      },
+      {
+        "sbd": "12103",
+        "du_lieu_json": "{\"idThanhThuChon\":\"loi_dieu\",\"capDo\":4,\"exp\":140,\"expToiDa\":160,\"capTienHoa\":4,\"khoExp\":170,\"soExp\":{\"caThi\":540,\"btvn\":0,\"mom\":0,\"leoThap\":170,\"sanBoss\":0},\"tangThapCaoNhat\":7,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Trứng Hoả Tinh · Lv.4\",\"ngayNhanTrung\":\"2026-09-15T22:59:48.297Z\",\"ngayChonThu\":\"2026-09-15T23:00:00.043Z\",\"lichSuThap\":[{\"qid\":\"DH-12-C2-B4-I-46\",\"lanCuoi\":1789513404580,\"soLanHoi\":4},{\"qid\":\"DH-12-C1-B2-I-49\",\"lanCuoi\":1789513403022,\"soLanHoi\":4},{\"qid\":\"DH-12-C1-B2-I-43\",\"lanCuoi\":1789513399847,\"soLanHoi\":2},{\"qid\":\"DH-12-C1-B3-D2-I-16\",\"lanCuoi\":1789513397745,\"soLanHoi\":2},{\"qid\":\"DH-12-C1-B2-I-46\",\"lanCuoi\":1789513396264,\"soLanHoi\":4},{\"qid\":\"DH-12-C1-B3-D2-I-5\",\"lanCuoi\":1789513384547,\"soLanHoi\":5},{\"qid\":\"DH-12-C1-B1-P2-I-7\",\"lanCuoi\":1789513381497,\"soLanHoi\":3},{\"qid\":\"DH-12-C2-B5-I-46\",\"lanCuoi\":1789513370290,\"soLanHoi\":2}]}",
+        "tong_exp": 710,
+        "cap_nhat_luc": "2026-09-15T23:04:00.570Z"
+      },
+      {
+        "sbd": "12015",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T23:05:01.186Z\",\"ngayChonThu\":\"\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T23:05:20.407Z"
+      },
+      {
+        "sbd": "11073",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T23:08:18.621Z\",\"ngayChonThu\":\"2026-09-15T23:08:42.664Z\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T23:09:25.629Z"
+      },
+      {
+        "sbd": "11040",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T23:16:37.126Z\",\"ngayChonThu\":\"\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T23:18:12.675Z"
+      },
+      {
+        "sbd": "12055",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T23:17:57.391Z\",\"ngayChonThu\":\"2026-09-15T23:18:21.974Z\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T23:25:00.934Z"
+      },
+      {
+        "sbd": "12077",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T23:19:30.142Z\",\"ngayChonThu\":\"2026-09-15T23:19:44.971Z\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T23:20:30.294Z"
+      },
+      {
+        "sbd": "12001",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":2,\"exp\":5,\"expToiDa\":130,\"capTienHoa\":2,\"khoExp\":115,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":140,\"sanBoss\":0},\"tangThapCaoNhat\":6,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Trứng Hoả Tinh · Lv.2\",\"ngayNhanTrung\":\"2026-09-15T23:19:58.151Z\",\"ngayChonThu\":\"2026-09-15T23:20:56.584Z\",\"lichSuThap\":[]}",
+        "tong_exp": 140,
+        "cap_nhat_luc": "2026-09-16T00:01:42.095Z"
+      },
+      {
+        "sbd": "12004",
+        "du_lieu_json": "{\"idThanhThuChon\":\"loi_kim\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T23:20:01.898Z\",\"ngayChonThu\":\"2026-09-15T23:20:55.468Z\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T23:22:49.786Z"
+      },
+      {
+        "sbd": "11010",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T23:20:37.144Z\",\"ngayChonThu\":\"\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T23:28:59.792Z"
+      },
+      {
+        "sbd": "12045",
+        "du_lieu_json": "{\"idThanhThuChon\":\"thuy_quai\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T23:26:24.161Z\",\"ngayChonThu\":\"2026-09-15T23:27:37.199Z\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T23:38:24.390Z"
+      },
+      {
+        "sbd": "10014",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T23:40:59.988Z\",\"ngayChonThu\":\"\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T23:41:06.257Z"
+      },
+      {
+        "sbd": "10033",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T23:49:37.280Z\",\"ngayChonThu\":\"2026-09-15T23:51:04.421Z\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-15T23:57:06.413Z"
+      },
+      {
+        "sbd": "11043",
+        "du_lieu_json": "{\"idThanhThuChon\":\"hoa_long\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T23:59:30.589Z\",\"ngayChonThu\":\"2026-09-15T23:59:58.643Z\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-16T00:00:25.174Z"
+      },
+      {
+        "sbd": "11011",
+        "du_lieu_json": "{\"idThanhThuChon\":\"\",\"capDo\":1,\"exp\":0,\"expToiDa\":120,\"capTienHoa\":1,\"khoExp\":0,\"soExp\":{\"caThi\":0,\"btvn\":0,\"mom\":0,\"leoThap\":0,\"sanBoss\":0},\"tangThapCaoNhat\":1,\"soCauDaThanhTay\":0,\"danhHieuHienTai\":\"Tập Sự Nguyên Tố\",\"ngayNhanTrung\":\"2026-09-15T23:59:54.111Z\",\"ngayChonThu\":\"\",\"lichSuThap\":[]}",
+        "tong_exp": 0,
+        "cap_nhat_luc": "2026-09-16T00:00:22.330Z"
+      }
+    ],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "APAC",
+      "served_by_colo": "HKG",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.7121
+      },
+      "duration": 0.7121,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 4816896,
+      "rows_read": 62,
+      "rows_written": 0,
+      "total_attempts": 1
+    }
+  }
+]
