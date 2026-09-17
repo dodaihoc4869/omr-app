@@ -1661,7 +1661,15 @@ export const JS_PHIEU = `
       var oLoiNop = document.getElementById('nop-loi');
       var daNop = false;
       var lam = {};
-      try { lam = JSON.parse(localStorage.getItem(KHOA_LUU) || '{}') || {}; } catch (e4) { lam = {}; }
+      if (du.banNhap && typeof du.banNhap === 'object') {
+        try { Object.assign(lam, du.banNhap); } catch (eBn) {}
+      }
+      try {
+        var tuLocal = JSON.parse(localStorage.getItem(KHOA_LUU) || '{}') || {};
+        if (tuLocal && typeof tuLocal === 'object') {
+          Object.assign(lam, tuLocal);
+        }
+      } catch (e4) {}
       // Chuyển bản nháp BTVN mã ghép cũ; không xóa bản gốc.
       try {
         if (!Object.keys(lam).length && du.legacyIds && du.legacyIds.length === du.cau.length && new Set(du.legacyIds).size === du.legacyIds.length) {
@@ -1698,6 +1706,11 @@ export const JS_PHIEU = `
 
       function luuLam() {
         try { localStorage.setItem(KHOA_LUU, JSON.stringify(lam)); } catch (e5) {}
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ type: 'ddh-btvn-draft', ma: du.ma, sbd: du.sbd, lam: lam }, '*');
+          }
+        } catch (ePost) {}
       }
       function soDaLam() {
         var n = 0;
@@ -1943,6 +1956,11 @@ export const JS_PHIEU = `
         if (oKet) { oKet.hidden = false; oKet.textContent = ' · Đúng ' + kq.dung + '/' + du.cau.length; }
         gui(true)
           .then(function (j) {
+            try {
+              if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'ddh-btvn-submitted', ma: du.ma, sbd: du.sbd }, '*');
+              }
+            } catch (eSub) {}
             if(Array.isArray(j.qidSai))toKetQua({sai:j.qidSai});
             nutNop.textContent = du.ch && du.ch.CHO_NOP_LAI === false ? 'Đã nộp' : 'Làm lại';
             nutNop.disabled = false;
@@ -2003,6 +2021,7 @@ export interface TuyChonPhieu {
     /** Link Apps Script. Đây là link CÔNG KHAI, không kèm mã bí mật. */
     url: string
     cauHinh?: Partial<CauHinhNopKhacPhuc> | null
+    banNhap?: Record<string, string> | null
   } | null
   /** MỘT DÒNG NÓI VÌ SAO phiếu mở ra ở dạng này — dựng ngay đầu phiếu.
    *
@@ -2052,6 +2071,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
         sbd: nop.sbd,
         url: nop.url,
         ch: chNop,
+        banNhap: nop.banNhap,
         cau: cau.map((c) => ({ id: c.id, phan: c.phan, dapAn: c.dapAn })),
       }).replace(/</g, '\\u003c')}<\/script>`
     : ''

@@ -405,7 +405,7 @@ export default function LichSuCaScreen() {
             )}
           </div>
         ) : (
-          <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 items-start" style={{ gap: 'var(--k3)' }}>
             {gomCaTheoNamSinh(dsLoc, (c) => c.tenCa).map((tm) => (
               <div key={tm.nam} className="flex flex-col overflow-hidden" style={{ border: '1px solid var(--vien)', borderRadius: 'var(--bo-2)', background: 'var(--the)', boxShadow: 'var(--bong-1)' }}>
                 {/* THƯ MỤC NĂM SINH. Tên ca thầy luôn để năm ở đầu, nên cây này

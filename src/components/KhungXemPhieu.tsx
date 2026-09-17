@@ -99,8 +99,22 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
     const phim = (e: KeyboardEvent) => {
       if (e.key === 'Escape') dongRef.current()
     }
+    const tinNhan = (e: MessageEvent) => {
+      if (e.data?.type === 'ddh-btvn-draft' && e.data.ma) {
+        try {
+          const k = `ddh.btvn.draft.${e.data.ma}.${e.data.sbd || ''}`
+          localStorage.setItem(k, JSON.stringify(e.data.lam))
+        } catch {}
+      } else if (e.data?.type === 'ddh-btvn-submitted' && e.data.ma) {
+        try {
+          const k = `ddh.btvn.draft.${e.data.ma}.${e.data.sbd || ''}`
+          localStorage.removeItem(k)
+        } catch {}
+      }
+    }
     window.addEventListener('popstate', quayLai)
     window.addEventListener('keydown', phim)
+    window.addEventListener('message', tinNhan)
 
     // Khoá cuộn trang nền — không thì cuộn trong phiếu tới cuối là trang phía
     // sau cuộn theo, nhìn như phiếu bị trôi.
@@ -110,6 +124,7 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
     return () => {
       window.removeEventListener('popstate', quayLai)
       window.removeEventListener('keydown', phim)
+      window.removeEventListener('message', tinNhan)
       document.body.style.overflow = cuonCu
       // Đóng bằng Esc hoặc nút X thì mục lịch sử vẫn còn — gỡ ra, không thì
       // lần sau bấm back thành một nhịp thừa không làm gì.

@@ -1,4 +1,5 @@
 import {layDiaChiMayChu} from './dia-chi-may-chu'
+import {chuanHoaLoiGiaiCau, taoHtmlKhungLoiGiaiGoogle} from './chuan-hoa-loi-giai'
 const saves = new Map<string, Promise<any>>()
 export function momApi(action:string,body:Record<string,unknown>):Promise<any>{
   if (action !== 'save' && action !== 'submit') return requestMom(action,body)
@@ -42,6 +43,42 @@ export async function migrateMom(sbd:string){
 /** Báo cáo dựng từ nội dung và điểm đã lưu trên máy chủ, không nhận HTML tùy ý. */
 export function momReviewHtml(b:any):string {
   const escape=(s:unknown)=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
-  const plain=(s:unknown)=>{const doc=new DOMParser().parseFromString(String(s??''),'text/html');return doc.body.textContent||''}
-  return `<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kết quả bài của Mom</title><style>body{font:16px/1.7 system-ui;background:#f8fafc;color:#172033;max-width:900px;margin:auto;padding:24px}article{background:white;padding:24px;border:1px solid #e2e8f0;border-radius:20px;margin:16px 0}p{white-space:pre-wrap}.score{font-size:32px;color:#059669}</style><h1>${escape(b.tieuDe)}</h1><div class="score">${escape(b.diem)}/10</div><p>Đúng ${escape(b.soCauDung)}/${escape(b.soCau)} câu</p>${(b.dsCau||[]).map((c:any,i:number)=>`<article><h2>Câu ${i+1}</h2><p>${escape(plain(c.text||c.noiDung))}</p>${(c.choices||c.luaChon||[]).map((v:unknown,k:number)=>`<p>${String.fromCharCode(65+k)}. ${escape(plain(v))}</p>`).join('')}<p>Em trả lời: <b>${escape(b.dapAnDaNop?.[c.id]||'Chưa trả lời')}</b><br>Đáp án: <b>${escape(c.dapAn||c.dapAnDung)}</b></p><p>${escape(plain(c.loiGiai))}</p></article>`).join('')}</html>`
+  const plain=(s:unknown)=>{
+    try {
+      const doc=new DOMParser().parseFromString(String(s??''),'text/html')
+      return doc.body.textContent||''
+    } catch {
+      return String(s??'')
+    }
+  }
+  return `<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kết quả bài của Mom</title><style>
+body{font:16px/1.7 system-ui,-apple-system,BlinkMacSystemFont,sans-serif;background:#f8fafc;color:#172033;max-width:900px;margin:auto;padding:24px}
+article{background:white;padding:24px;border:1px solid #e2e8f0;border-radius:20px;margin:20px 0;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+p{white-space:pre-wrap;margin:10px 0}
+h1{font-size:24px;margin-bottom:8px}
+h2{font-size:18px;margin-top:0;color:#1e293b}
+.score{font-size:36px;font-weight:900;color:#059669;margin:8px 0}
+.summary{color:#64748b;font-size:15px;margin-bottom:24px}
+.ans-box{background:#f1f5f9;padding:12px 16px;border-radius:12px;margin:12px 0}
+</style>
+<h1>${escape(b.tieuDe)}</h1>
+<div class="score">${escape(b.diem ?? 0)}/10</div>
+<div class="summary">Đúng ${escape(b.soCauDung ?? 0)}/${escape(b.soCau ?? 0)} câu</div>
+${(b.dsCau||[]).map((c:any,i:number)=>{
+  const lgChuan = chuanHoaLoiGiaiCau(c.loiGiai, c.phan || 'I', c.dapAn || c.dapAnDung)
+  const khungLg = taoHtmlKhungLoiGiaiGoogle(lgChuan)
+  const daChon = b.dapAnDaNop?.[c.id] || 'Chưa trả lời'
+  const dung = c.dapAn || c.dapAnDung || ''
+  return `<article>
+    <h2>Câu ${i+1}</h2>
+    <p>${escape(plain(c.text||c.noiDung))}</p>
+    ${(c.choices||c.luaChon||[]).map((v:unknown,k:number)=>`<p><b>${String.fromCharCode(65+k)}.</b> ${escape(plain(v))}</p>`).join('')}
+    <div class="ans-box">
+      Em trả lời: <b>${escape(daChon)}</b><br>
+      Đáp án đúng: <b>${escape(dung)}</b>
+    </div>
+    ${khungLg}
+  </article>`
+}).join('')}
+</html>`
 }

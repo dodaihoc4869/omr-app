@@ -39,6 +39,76 @@ function gioVN(iso: string): string {
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
 }
 
+/** Đổi mã đề dạng DH-12-C2-B6-DS,DH-12-C2-B6-TLN thành cây thư mục Dạy học / Lớp 12 / Ch.2 / Bài 6 / Đúng sai · Trả lời ngắn */
+export function dinhDangDeCayThuMuc(maDeStr: string): string {
+  if (!maDeStr) return ''
+  const codes = maDeStr.split(',').map((s) => s.trim()).filter(Boolean)
+  if (codes.length === 0) return maDeStr
+
+  const MAP_TIEN_TO: Record<string, string> = {
+    DH: 'Dạy học',
+    DB: 'Dạng bài',
+    GK: 'Giữa kì',
+    CK: 'Cuối kì',
+  }
+
+  const MAP_DUOI: Record<string, string> = {
+    DS: 'Đúng sai',
+    TLN: 'Trả lời ngắn',
+    TN: 'Trắc nghiệm',
+    VD: 'Ví dụ',
+    DT: 'Dạng toán',
+  }
+
+  const parsed = codes.map((code) => {
+    const m = /^(?:([A-Za-z0-9]+)-)?(10|11|12)-C(\d+)-B(\d+)(?:-([A-Za-z0-9_-]+))?$/i.exec(code)
+    if (!m) {
+      const m2 = /^(?:([A-Za-z0-9]+)-)?(10|11|12)(?:-C(\d+))?(?:-B(\d+))?(?:-([A-Za-z0-9_-]+))?$/i.exec(code)
+      if (m2 && (m2[3] || m2[4])) {
+        return {
+          goc: code,
+          tienTo: m2[1] ? (MAP_TIEN_TO[m2[1].toUpperCase()] || m2[1]) : '',
+          lop: m2[2] ? `Lớp ${m2[2]}` : '',
+          chuong: m2[3] ? `Ch.${m2[3]}` : '',
+          bai: m2[4] ? `Bài ${m2[4]}` : '',
+          duoi: m2[5] ? (MAP_DUOI[m2[5].toUpperCase()] || m2[5]) : '',
+        }
+      }
+      return null
+    }
+    return {
+      goc: code,
+      tienTo: m[1] ? (MAP_TIEN_TO[m[1].toUpperCase()] || m[1]) : '',
+      lop: `Lớp ${m[2]}`,
+      chuong: `Ch.${m[3]}`,
+      bai: `Bài ${m[4]}`,
+      duoi: m[5] ? (MAP_DUOI[m[5].toUpperCase()] || m[5]) : '',
+    }
+  })
+
+  if (parsed.some((p) => p === null)) return maDeStr
+
+  const valid = parsed as NonNullable<(typeof parsed)[0]>[]
+  const first = valid[0]
+  const cungTienTo = valid.every((v) => v.tienTo === first.tienTo)
+  const cungLop = valid.every((v) => v.lop === first.lop)
+  const cungChuong = valid.every((v) => v.chuong === first.chuong)
+  const cungBai = valid.every((v) => v.bai === first.bai)
+
+  if (cungTienTo && cungLop && cungChuong && cungBai) {
+    const duongDan = [first.tienTo, first.lop, first.chuong, first.bai].filter(Boolean).join(' / ')
+    const dsDuoi = valid.map((v) => v.duoi).filter(Boolean)
+    if (dsDuoi.length > 0) {
+      return `${duongDan} / ${dsDuoi.join(' · ')}`
+    }
+    return duongDan || maDeStr
+  }
+
+  return valid
+    .map((v) => [v.tienTo, v.lop, v.chuong, v.bai, v.duoi].filter(Boolean).join(' / ') || v.goc)
+    .join(', ')
+}
+
 export default function PhanCongScreen() {
  return <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-3 flex flex-col w-full max-w-full min-w-0" style={{gap:'var(--k3)'}}><header className="gv-page-header"><div><h1>Giao bài tập về nhà</h1><p>Chọn người nhận, chọn đề và theo dõi bài đã nộp.</p></div></header><TheGiaoBtvn/></div>
 }
@@ -740,7 +810,7 @@ function TheGiaoBtvn() {
               <details key={t.maBtvn} style={{ background: 'var(--the-2)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)' }}>
                 <summary className="flex items-center" style={{ cursor:'pointer',justifyContent: 'space-between', gap: 'var(--k2)' }}>
                   <span style={{ minWidth:0,overflowWrap:'anywhere',fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}>
-                    Ca {t.maCa} · đề {t.maDe} · {t.soCau} câu
+                    Ca {t.maCa} · {dinhDangDeCayThuMuc(t.maDe)} · {t.soCau} câu
                   </span>
                   <Nhan tone={t.daNop === t.tong ? 'xanh' : t.quaHan ? 'do' : 'cam'}>
                     {t.daNop}/{t.tong} nộp

@@ -23,11 +23,11 @@ const s = readFileSync(SW, 'utf8')
 // CHỐT TỰ SỬA nằm trong `index.html`, không nằm trong `sw.js` — phải đọc riêng.
 // Đây là đường lui CUỐI: sửa đúng nguyên nhân hôm nay không bảo đảm được
 // "không lặp lại nữa", vì lần sau sẽ là nguyên nhân khác. Chốt ấy không cần
-// biết nguyên nhân — nó chỉ đo `#root` còn rỗng sau 9 giây hay không.
+// biết nguyên nhân — nó giữ dữ liệu và cho nạp bản mới khi #root chưa dựng được.
 const TRANG = resolve(dirname(SW), 'index.html')
 const t = existsSync(TRANG) ? readFileSync(TRANG, 'utf8') : ''
 const coChotTuSua =
-  t.includes('ddh.daTuSua') && t.includes('childElementCount') && t.includes('_moi=') && t.includes('unregister')
+  t.includes('startup-retry') && t.includes('childElementCount') && t.includes('_moi') && t.includes('u.hash') && !t.includes('caches.delete(') && !t.includes('.unregister(')
 
 /** CÓ CHỖ NÀO XOÁ SẠCH CACHESTORAGE KHÔNG.
  *

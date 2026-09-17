@@ -1,0 +1,3169 @@
+[
+  {
+    "fingerprint": "4025436874-2050056144",
+    "qid": "DB-12-B4-D3-II-117",
+    "scenes": [
+      "glucose-cold"
+    ]
+  },
+  {
+    "fingerprint": "4025436874-2050056144",
+    "qid": "DB-12-B4-D3-II-51",
+    "scenes": [
+      "glucose-cold"
+    ]
+  },
+  {
+    "fingerprint": "1648758203-1461236279",
+    "qid": "DH-12-C2-B4-VD-II-6",
+    "scenes": [
+      "glucose-cold"
+    ]
+  },
+  {
+    "fingerprint": "4025436874-2050056144",
+    "qid": "DH-12-C2-B4-II-18",
+    "scenes": [
+      "glucose-cold"
+    ]
+  },
+  {
+    "fingerprint": "1261094848-1530453704",
+    "qid": "DH-12-C2-B4-I-31",
+    "scenes": [
+      "glucose-hot"
+    ]
+  },
+  {
+    "fingerprint": "1261094848-1530453704",
+    "qid": "DB-12-B4-D1-I-27",
+    "scenes": [
+      "glucose-hot"
+    ]
+  },
+  {
+    "fingerprint": "1862632560-386292088",
+    "qid": "DB-12-B4-D1-I-106",
+    "scenes": [
+      "glucose-hot"
+    ]
+  },
+  {
+    "fingerprint": "3017036785-4246209931",
+    "qid": "DH-12-C2-B4-II-19",
+    "scenes": [
+      "glucose-compare"
+    ]
+  },
+  {
+    "fingerprint": "2653207313-2202589643",
+    "qid": "DB-12-B4-D1-II-105",
+    "scenes": [
+      "glucose-compare"
+    ]
+  },
+  {
+    "fingerprint": "2693767092-2071026738",
+    "qid": "DH-12-C2-B4-I-30",
+    "scenes": [
+      "tollens-glucose"
+    ]
+  },
+  {
+    "fingerprint": "580298545-2329645405",
+    "qid": "DH-12-C2-B4-I-75",
+    "scenes": [
+      "tollens-glucose"
+    ]
+  },
+  {
+    "fingerprint": "677257221-1722469067",
+    "qid": "DH-12-C2-B4-I-77",
+    "scenes": [
+      "tollens-glucose"
+    ]
+  },
+  {
+    "fingerprint": "2503434332-2696771342",
+    "qid": "DH-12-C2-B7-D1-I-12",
+    "scenes": [
+      "tollens-glucose"
+    ]
+  },
+  {
+    "fingerprint": "1242123707-403908125",
+    "qid": "DB-12-B4-D1-I-28",
+    "scenes": [
+      "tollens-glucose"
+    ]
+  },
+  {
+    "fingerprint": "2092503526-941862052",
+    "qid": "DB-12-B4-D1-I-29",
+    "scenes": [
+      "tollens-glucose"
+    ]
+  },
+  {
+    "fingerprint": "318716067-2373469163",
+    "qid": "DB-12-B4-D1-II-103",
+    "scenes": [
+      "tollens-glucose"
+    ]
+  },
+  {
+    "fingerprint": "318716067-2373469163",
+    "qid": "DH-12-C2-B4-II-21",
+    "scenes": [
+      "tollens-glucose"
+    ]
+  },
+  {
+    "fingerprint": "1200933658-2610206530",
+    "qid": "DH-12-C2-B4-VD-II-4",
+    "scenes": [
+      "tollens-glucose"
+    ]
+  },
+  {
+    "fingerprint": "1293461987-2876337819",
+    "qid": "DH-12-C2-B4-DT-III-1",
+    "scenes": [
+      "tollens-glucose"
+    ]
+  },
+  {
+    "fingerprint": "2478204231-166060493",
+    "qid": "DH-12-C2-B4-DT-III-2",
+    "scenes": [
+      "tollens-glucose"
+    ]
+  },
+  {
+    "fingerprint": "1067420057-1442041293",
+    "qid": "DH-12-C2-B4-DT-III-3",
+    "scenes": [
+      "tollens-glucose"
+    ]
+  },
+  {
+    "fingerprint": "2534025258-3472092794",
+    "qid": "DB-12-B4-D1-III-123",
+    "scenes": [
+      "tollens-glucose"
+    ]
+  },
+  {
+    "fingerprint": "1545797873-2576164669",
+    "qid": "11-C6-B23-III-5",
+    "scenes": [
+      "tollens-aldehyde"
+    ]
+  },
+  {
+    "fingerprint": "1953302502-1164709928",
+    "qid": "11-C6-B23-I-12",
+    "scenes": [
+      "aldehyde-copper"
+    ]
+  },
+  {
+    "fingerprint": "1504576940-1964813178",
+    "qid": "DH-12-C2-B7-D2-I-2",
+    "scenes": [
+      "starch-iodine"
+    ]
+  },
+  {
+    "fingerprint": "1716808003-1856932731",
+    "qid": "DH-12-C2-B6-I-54",
+    "scenes": [
+      "starch-iodine"
+    ]
+  },
+  {
+    "fingerprint": "1504576940-1964813178",
+    "qid": "DB-12-B5-D2-I-140",
+    "scenes": [
+      "starch-iodine"
+    ]
+  },
+  {
+    "fingerprint": "3289760010-2828342300",
+    "qid": "DH-12-C2-B6-II-12",
+    "scenes": [
+      "starch-iodine"
+    ]
+  },
+  {
+    "fingerprint": "2360021756-158494450",
+    "qid": "DB-12-B5-D2-I-176",
+    "scenes": [
+      "starch-iodine"
+    ]
+  },
+  {
+    "fingerprint": "2360021756-158494450",
+    "qid": "DB-12-B5-D2-I-203",
+    "scenes": [
+      "starch-iodine"
+    ]
+  },
+  {
+    "fingerprint": "779956484-4037535284",
+    "qid": "DH-12-C2-B6-I-66",
+    "scenes": [
+      "starch-thermal"
+    ]
+  },
+  {
+    "fingerprint": "1227740303-2191185529",
+    "qid": "12-KT-C123-D2-I-9",
+    "scenes": [
+      "starch-thermal"
+    ]
+  },
+  {
+    "fingerprint": "2841905823-1126500709",
+    "qid": "DB-12-B9-P2-D1-II-103",
+    "scenes": [
+      "biuret"
+    ]
+  },
+  {
+    "fingerprint": "3284501708-2656135560",
+    "qid": "DH-12-C3-B9-P2-II-5",
+    "scenes": [
+      "biuret"
+    ]
+  },
+  {
+    "fingerprint": "1896742406-1719128832",
+    "qid": "DH-12-C3-B9-P2-II-7",
+    "scenes": [
+      "biuret"
+    ]
+  },
+  {
+    "fingerprint": "3683809404-1040094820",
+    "qid": "DH-12-C3-B9-P2-VD-II-2",
+    "scenes": [
+      "biuret"
+    ]
+  },
+  {
+    "fingerprint": "3620211257-366660825",
+    "qid": "DH-12-C3-B10-II-16",
+    "scenes": [
+      "protein-heat"
+    ]
+  },
+  {
+    "fingerprint": "3822149589-1664443655",
+    "qid": "DH-12-C3-B10-II-15",
+    "scenes": [
+      "protein-acid"
+    ]
+  },
+  {
+    "fingerprint": "1446133976-3283185720",
+    "qid": "12-KT-C34-D2-I-17",
+    "scenes": [
+      "protein-acid"
+    ]
+  },
+  {
+    "fingerprint": "2350510776-1898269144",
+    "qid": "12-C3-B10-D1-II-2",
+    "scenes": [
+      "protein-nitric"
+    ]
+  },
+  {
+    "fingerprint": "3975465696-459574294",
+    "qid": "DH-12-C3-B10-II-17",
+    "scenes": [
+      "protein-nitric"
+    ]
+  },
+  {
+    "fingerprint": "3616614917-540557361",
+    "qid": "DH-12-C3-B10-II-18",
+    "scenes": [
+      "protein-two"
+    ]
+  },
+  {
+    "fingerprint": "1781181093-3765719099",
+    "qid": "DH-12-C3-B10-VD-II-1",
+    "scenes": [
+      "protein-two"
+    ]
+  },
+  {
+    "fingerprint": "70189845-4274031807",
+    "qid": "12-C3-B10-D1-II-3",
+    "scenes": [
+      "protein-three"
+    ]
+  },
+  {
+    "fingerprint": "3400636602-3338077490",
+    "qid": "12-C3-B10-D2-II-34",
+    "scenes": [
+      "protein-three"
+    ]
+  },
+  {
+    "fingerprint": "3400636602-3338077490",
+    "qid": "12-KT-C3-D3-II-3",
+    "scenes": [
+      "protein-three"
+    ]
+  },
+  {
+    "fingerprint": "2256435622-2631484368",
+    "qid": "DB-12-B8-D1-I-208",
+    "scenes": [
+      "aniline-bromine"
+    ]
+  },
+  {
+    "fingerprint": "2256435622-2631484368",
+    "qid": "DB-12-B8-D1-I-216",
+    "scenes": [
+      "aniline-bromine"
+    ]
+  },
+  {
+    "fingerprint": "674024683-909965913",
+    "qid": "DH-12-C3-B8-I-63",
+    "scenes": [
+      "aniline-bromine"
+    ]
+  },
+  {
+    "fingerprint": "4206335289-2280101489",
+    "qid": "DH-12-C3-B8-I-81",
+    "scenes": [
+      "aniline-bromine"
+    ]
+  },
+  {
+    "fingerprint": "674024683-909965913",
+    "qid": "DB-12-B8-D1-I-170",
+    "scenes": [
+      "aniline-bromine"
+    ]
+  },
+  {
+    "fingerprint": "4140468177-1297340847",
+    "qid": "DB-12-B8-D1-II-119",
+    "scenes": [
+      "aniline-bromine"
+    ]
+  },
+  {
+    "fingerprint": "4259449054-4006899598",
+    "qid": "DB-12-B8-D1-III-271",
+    "scenes": [
+      "aniline-bromine"
+    ]
+  },
+  {
+    "fingerprint": "2429995789-261371239",
+    "qid": "DH-12-C3-B8-II-18",
+    "scenes": [
+      "aniline-solubility"
+    ]
+  },
+  {
+    "fingerprint": "3399017453-1898664527",
+    "qid": "DB-12-B8-D1-II-211",
+    "scenes": [
+      "methylamine-copper"
+    ]
+  },
+  {
+    "fingerprint": "2018318892-133719462",
+    "qid": "DB-12-B8-D1-I-218",
+    "scenes": [
+      "amine-nitrous"
+    ]
+  },
+  {
+    "fingerprint": "1386433698-4087184810",
+    "qid": "DB-12-B8-D1-I-169",
+    "scenes": [
+      "amine-nitrous"
+    ]
+  },
+  {
+    "fingerprint": "2174786359-287548939",
+    "qid": "DH-12-C3-B8-II-12",
+    "scenes": [
+      "amine-two-metals"
+    ]
+  },
+  {
+    "fingerprint": "2174786359-287548939",
+    "qid": "DB-12-B8-D1-II-254",
+    "scenes": [
+      "amine-two-metals"
+    ]
+  },
+  {
+    "fingerprint": "2666621132-3064340042",
+    "qid": "DH-12-C3-B8-II-11",
+    "scenes": [
+      "amine-acid"
+    ]
+  },
+  {
+    "fingerprint": "4141459265-2849682625",
+    "qid": "DH-12-C3-B8-II-20",
+    "scenes": [
+      "amine-nitrous",
+      "methylamine-copper"
+    ]
+  },
+  {
+    "fingerprint": "4231803849-646447745",
+    "qid": "DB-12-B8-D1-II-282",
+    "scenes": [
+      "amine-nitrous",
+      "methylamine-copper"
+    ]
+  },
+  {
+    "fingerprint": "213915821-66818029",
+    "qid": "DH-11-C1-B2-I-41",
+    "scenes": [
+      "base-indicator"
+    ]
+  },
+  {
+    "fingerprint": "297179022-1771622772",
+    "qid": "DH-12-C3-B8-I-25",
+    "scenes": [
+      "base-indicator"
+    ]
+  },
+  {
+    "fingerprint": "964028027-440336591",
+    "qid": "DH-11-C1-B2-I-90",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "1288241101-3630794773",
+    "qid": "11-C1-B2-D2-II-17",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "2116205067-3337372481",
+    "qid": "DB-11-B2-D5-II-15",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "4050327828-3694226696",
+    "qid": "11-C1-B2-D2-II-22",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "2080232759-2095424545",
+    "qid": "DB-11-B2-D5-II-43",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "4145686592-1434385694",
+    "qid": "DH-11-C1-B2-II-30",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "144932074-3730137474",
+    "qid": "DH-11-C1-B2-VD-II-1",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "1679949518-2706355064",
+    "qid": "DH-11-C1-B3-D1-II-2",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "1148029226-795655456",
+    "qid": "11-C1-B2-D2-III-54",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "3659045836-2187744586",
+    "qid": "DH-11-C1-B2-DT-III-11",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "2080232759-2095424545",
+    "qid": "DH-11-C1-B2-II-28",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "2116205067-3337372481",
+    "qid": "11-C1-B2-D2-II-20",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "1704300225-2209674303",
+    "qid": "11-C1-B2-D2-II-18",
+    "scenes": [
+      "titrate-acid"
+    ]
+  },
+  {
+    "fingerprint": "445268825-3320092559",
+    "qid": "11-C1-B2-D2-II-25",
+    "scenes": [
+      "titrate-acid"
+    ]
+  },
+  {
+    "fingerprint": "3317123104-2191925032",
+    "qid": "12-C8-B26-II-2",
+    "scenes": [
+      "permanganate"
+    ]
+  },
+  {
+    "fingerprint": "2192868545-648048237",
+    "qid": "12-C8-B26-II-9",
+    "scenes": [
+      "permanganate"
+    ]
+  },
+  {
+    "fingerprint": "2889997562-131123342",
+    "qid": "DB-12-B1-P2-D1-II-52",
+    "scenes": [
+      "soap"
+    ]
+  },
+  {
+    "fingerprint": "3547360036-28247130",
+    "qid": "12-BD7-18-II-1",
+    "scenes": [
+      "soap"
+    ]
+  },
+  {
+    "fingerprint": "3547360036-28247130",
+    "qid": "12-C1-B1-D1-II-7",
+    "scenes": [
+      "soap"
+    ]
+  },
+  {
+    "fingerprint": "3686286206-1417277636",
+    "qid": "DH-12-C1-B2-II-14",
+    "scenes": [
+      "soap"
+    ]
+  },
+  {
+    "fingerprint": "1815281173-392403997",
+    "qid": "DH-12-C1-B2-II-17",
+    "scenes": [
+      "soap"
+    ]
+  },
+  {
+    "fingerprint": "3320817099-463981365",
+    "qid": "DH-12-C1-B2-II-18",
+    "scenes": [
+      "soap"
+    ]
+  },
+  {
+    "fingerprint": "2955667921-195363713",
+    "qid": "DB-12-B1-P2-D1-II-57",
+    "scenes": [
+      "soap"
+    ]
+  },
+  {
+    "fingerprint": "3517534345-3876129369",
+    "qid": "12-KT-C1-D1-II-2",
+    "scenes": [
+      "soap"
+    ]
+  },
+  {
+    "fingerprint": "1642754586-2556923994",
+    "qid": "DB-12-B1-P2-D1-I-67",
+    "scenes": [
+      "soap"
+    ]
+  },
+  {
+    "fingerprint": "3496574098-3327219020",
+    "qid": "DB-12-B1-P1-D1-II-185",
+    "scenes": [
+      "soap"
+    ]
+  },
+  {
+    "fingerprint": "3547360036-28247130",
+    "qid": "DB-12-B1-P2-D1-II-4",
+    "scenes": [
+      "soap"
+    ]
+  },
+  {
+    "fingerprint": "3547360036-28247130",
+    "qid": "DB-12-B1-P2-D1-II-55",
+    "scenes": [
+      "soap"
+    ]
+  },
+  {
+    "fingerprint": "3517534345-3876129369",
+    "qid": "DB-12-B1-P2-D1-II-62",
+    "scenes": [
+      "soap"
+    ]
+  },
+  {
+    "fingerprint": "1815281173-392403997",
+    "qid": "DH-12-C1-B3-D1-II-2",
+    "scenes": [
+      "soap"
+    ]
+  },
+  {
+    "fingerprint": "3496574098-3327219020",
+    "qid": "DH-12-C1-B2-II-21",
+    "scenes": [
+      "soap"
+    ]
+  },
+  {
+    "fingerprint": "3496574098-3327219020",
+    "qid": "DH-12-C1-B2-VD-II-1",
+    "scenes": [
+      "soap"
+    ]
+  },
+  {
+    "fingerprint": "2101835244-525457016",
+    "qid": "DB-12-B1-P1-D2-I-13",
+    "scenes": [
+      "ester-ethyl"
+    ]
+  },
+  {
+    "fingerprint": "3126910678-1836419536",
+    "qid": "DB-12-B1-P1-D2-II-19",
+    "scenes": [
+      "ester-ethyl"
+    ]
+  },
+  {
+    "fingerprint": "3067773334-330845528",
+    "qid": "DH-12-C1-B1-P1-I-86",
+    "scenes": [
+      "ester-ethyl"
+    ]
+  },
+  {
+    "fingerprint": "971596032-2932397008",
+    "qid": "DH-12-C1-B1-P1-II-8",
+    "scenes": [
+      "ester-ethyl"
+    ]
+  },
+  {
+    "fingerprint": "4134319902-1651178286",
+    "qid": "DB-12-B1-P1-D2-II-56",
+    "scenes": [
+      "ester-isoamyl"
+    ]
+  },
+  {
+    "fingerprint": "235106530-3073895054",
+    "qid": "DB-12-B1-P1-D2-II-20",
+    "scenes": [
+      "ester-isoamyl"
+    ]
+  },
+  {
+    "fingerprint": "596432874-4122931374",
+    "qid": "DH-12-C1-B1-P1-II-9",
+    "scenes": [
+      "ester-isoamyl"
+    ]
+  },
+  {
+    "fingerprint": "3699660609-2811480375",
+    "qid": "12-C1-B1-D2-II-4",
+    "scenes": [
+      "ester-separate"
+    ]
+  },
+  {
+    "fingerprint": "3699660609-2811480375",
+    "qid": "DB-12-B1-P1-D2-II-24",
+    "scenes": [
+      "ester-separate"
+    ]
+  },
+  {
+    "fingerprint": "3699660609-2811480375",
+    "qid": "DB-12-B1-P1-D2-II-52",
+    "scenes": [
+      "ester-separate"
+    ]
+  },
+  {
+    "fingerprint": "3699660609-2811480375",
+    "qid": "DB-12-B1-P1-D2-II-94",
+    "scenes": [
+      "ester-separate"
+    ]
+  },
+  {
+    "fingerprint": "3699660609-2811480375",
+    "qid": "DH-12-C1-B1-P1-II-17",
+    "scenes": [
+      "ester-separate"
+    ]
+  },
+  {
+    "fingerprint": "3699660609-2811480375",
+    "qid": "12-C1-B1-D3-II-12",
+    "scenes": [
+      "ester-separate"
+    ]
+  },
+  {
+    "fingerprint": "3088349246-3404643912",
+    "qid": "DB-12-B1-P1-D2-II-51",
+    "scenes": [
+      "ester-isoamyl",
+      "ester-separate"
+    ]
+  },
+  {
+    "fingerprint": "4129937771-332054825",
+    "qid": "DB-12-B1-P1-D2-II-100",
+    "scenes": [
+      "ester-isoamyl",
+      "ester-separate"
+    ]
+  },
+  {
+    "fingerprint": "3404517284-1965019774",
+    "qid": "DH-12-C1-B1-P1-II-28",
+    "scenes": [
+      "ester-isoamyl",
+      "ester-separate"
+    ]
+  },
+  {
+    "fingerprint": "4129937771-332054825",
+    "qid": "DH-12-C1-B1-P1-II-33",
+    "scenes": [
+      "ester-isoamyl",
+      "ester-separate"
+    ]
+  },
+  {
+    "fingerprint": "3088349246-3404643912",
+    "qid": "12-C1-B1-D3-II-11",
+    "scenes": [
+      "ester-isoamyl",
+      "ester-separate"
+    ]
+  },
+  {
+    "fingerprint": "4129937771-332054825",
+    "qid": "DH-12-C1-B1-P1-VD-II-5",
+    "scenes": [
+      "ester-isoamyl",
+      "ester-separate"
+    ]
+  },
+  {
+    "fingerprint": "2716149289-1964474977",
+    "qid": "DH-12-C1-B1-P1-I-49",
+    "scenes": [
+      "ester-two"
+    ]
+  },
+  {
+    "fingerprint": "1783490501-239805333",
+    "qid": "DB-12-B1-P1-D1-II-39",
+    "scenes": [
+      "ester-two"
+    ]
+  },
+  {
+    "fingerprint": "2618363490-3188687184",
+    "qid": "12-C1-B1-D3-II-10",
+    "scenes": [
+      "ester-two"
+    ]
+  },
+  {
+    "fingerprint": "2745304549-3622477045",
+    "qid": "DH-12-C1-B1-P1-II-15",
+    "scenes": [
+      "ester-two"
+    ]
+  },
+  {
+    "fingerprint": "218436118-2593858070",
+    "qid": "DH-12-C1-B1-P1-II-27",
+    "scenes": [
+      "ester-two"
+    ]
+  },
+  {
+    "fingerprint": "2602899195-2612096245",
+    "qid": "DH-12-C1-B1-P1-VD-II-4",
+    "scenes": [
+      "ester-two"
+    ]
+  },
+  {
+    "fingerprint": "3628609885-2147344657",
+    "qid": "DH-12-C1-B1-P1-I-70",
+    "scenes": [
+      "ester-three"
+    ]
+  },
+  {
+    "fingerprint": "4073850663-3547122871",
+    "qid": "12-C1-B1-D3-III-4",
+    "scenes": [
+      "ester-three"
+    ]
+  },
+  {
+    "fingerprint": "3628609885-2147344657",
+    "qid": "12-C1-B1-D3-I-52",
+    "scenes": [
+      "ester-three"
+    ]
+  },
+  {
+    "fingerprint": "2736153295-2922301641",
+    "qid": "DH-12-C1-B3-D1-III-4",
+    "scenes": [
+      "ester-three"
+    ]
+  },
+  {
+    "fingerprint": "2206803579-507037375",
+    "qid": "11-C3-B11-II-1",
+    "scenes": [
+      "distill-ethanol"
+    ]
+  },
+  {
+    "fingerprint": "1078673169-474004301",
+    "qid": "DB-11-B5-D2-I-3",
+    "scenes": [
+      "fountain"
+    ]
+  },
+  {
+    "fingerprint": "1541241079-1978446229",
+    "qid": "DB-11-B5-D2-I-33",
+    "scenes": [
+      "fountain"
+    ]
+  },
+  {
+    "fingerprint": "3194617088-3479303864",
+    "qid": "DB-11-B5-D2-I-94",
+    "scenes": [
+      "fountain"
+    ]
+  },
+  {
+    "fingerprint": "1088726728-2592150072",
+    "qid": "DB-11-B5-D2-II-66",
+    "scenes": [
+      "fountain"
+    ]
+  },
+  {
+    "fingerprint": "1541241079-1978446229",
+    "qid": "DH-11-C2-B5-I-32",
+    "scenes": [
+      "fountain"
+    ]
+  },
+  {
+    "fingerprint": "1088726728-2592150072",
+    "qid": "DH-11-C2-B5-II-14",
+    "scenes": [
+      "fountain"
+    ]
+  },
+  {
+    "fingerprint": "3194617088-3479303864",
+    "qid": "DH-11-C2-B9-D1-I-4",
+    "scenes": [
+      "fountain"
+    ]
+  },
+  {
+    "fingerprint": "3916551000-3999608810",
+    "qid": "DB-11-B5-D3-I-1",
+    "scenes": [
+      "ammonium-base"
+    ]
+  },
+  {
+    "fingerprint": "2997293760-2190464024",
+    "qid": "DH-11-C2-B5-I-51",
+    "scenes": [
+      "ammonium-base"
+    ]
+  },
+  {
+    "fingerprint": "1621802600-3608041150",
+    "qid": "DH-11-C2-B5-I-62",
+    "scenes": [
+      "ammonium-base"
+    ]
+  },
+  {
+    "fingerprint": "3986975800-3661335244",
+    "qid": "DH-11-C2-B5-III-16",
+    "scenes": [
+      "ammonium-base"
+    ]
+  },
+  {
+    "fingerprint": "1093171084-2124273836",
+    "qid": "DH-11-C2-B5-II-15",
+    "scenes": [
+      "fertilizer"
+    ]
+  },
+  {
+    "fingerprint": "2380760633-2201695989",
+    "qid": "11-C5-B19-I-11",
+    "scenes": [
+      "silver-chloride"
+    ]
+  },
+  {
+    "fingerprint": "3467548684-147387742",
+    "qid": "DH-11-C2-B8-I-71",
+    "scenes": [
+      "barium-sulfate"
+    ]
+  },
+  {
+    "fingerprint": "3507853257-2359771667",
+    "qid": "DH-11-C2-B8-DT-I-9",
+    "scenes": [
+      "barium-sulfate"
+    ]
+  },
+  {
+    "fingerprint": "2526365181-3623540821",
+    "qid": "12-C7-B24-I-10",
+    "scenes": [
+      "sulfate-compare"
+    ]
+  },
+  {
+    "fingerprint": "3393517398-513308602",
+    "qid": "12-C7-B24-II-10",
+    "scenes": [
+      "sulfate-compare"
+    ]
+  },
+  {
+    "fingerprint": "3206170669-4073606487",
+    "qid": "12-C7-B24-II-14",
+    "scenes": [
+      "sulfate-compare"
+    ]
+  },
+  {
+    "fingerprint": "261274667-579732089",
+    "qid": "12-C8-B26-I-31",
+    "scenes": [
+      "iron-hydroxide"
+    ]
+  },
+  {
+    "fingerprint": "1270284437-2341790241",
+    "qid": "DH-11-C2-B5-III-34",
+    "scenes": [
+      "iron-hydroxide"
+    ]
+  },
+  {
+    "fingerprint": "2465696220-2460742460",
+    "qid": "DH-11-C2-B5-I-75",
+    "scenes": [
+      "iron-hydroxide"
+    ]
+  },
+  {
+    "fingerprint": "3546702080-1331361708",
+    "qid": "12-C8-B26-I-32",
+    "scenes": [
+      "copper-hydroxide"
+    ]
+  },
+  {
+    "fingerprint": "648492875-2299493913",
+    "qid": "12-C8-B27-I-45",
+    "scenes": [
+      "copper-hydroxide"
+    ]
+  },
+  {
+    "fingerprint": "2085032079-1381118473",
+    "qid": "12-C6-B19-I-40",
+    "scenes": [
+      "iron-copper"
+    ]
+  },
+  {
+    "fingerprint": "980080168-1430948104",
+    "qid": "12-KT-C6-D5-I-17",
+    "scenes": [
+      "iron-copper"
+    ]
+  },
+  {
+    "fingerprint": "401898327-1703305841",
+    "qid": "12-KT-C5-D1-II-2",
+    "scenes": [
+      "copper-silver"
+    ]
+  },
+  {
+    "fingerprint": "4234007627-2801052321",
+    "qid": "12-KT-C56-D2-II-1",
+    "scenes": [
+      "copper-silver"
+    ]
+  },
+  {
+    "fingerprint": "151898934-1504346514",
+    "qid": "100-II-3",
+    "scenes": [
+      "copper-electrolysis"
+    ]
+  },
+  {
+    "fingerprint": "151898934-1504346514",
+    "qid": "12-C5-B16-II-20",
+    "scenes": [
+      "copper-electrolysis"
+    ]
+  },
+  {
+    "fingerprint": "3360136281-4257618213",
+    "qid": "12-KT-C5-D5-II-3",
+    "scenes": [
+      "copper-electrolysis"
+    ]
+  },
+  {
+    "fingerprint": "2787130388-1663361172",
+    "qid": "12-C5-B16-I-5",
+    "scenes": [
+      "copper-refining"
+    ]
+  },
+  {
+    "fingerprint": "952365514-1942842324",
+    "qid": "12-C5-B16-I-7",
+    "scenes": [
+      "copper-refining"
+    ]
+  },
+  {
+    "fingerprint": "2608819790-3936761584",
+    "qid": "12-C5-B16-II-25",
+    "scenes": [
+      "copper-refining"
+    ]
+  },
+  {
+    "fingerprint": "251719720-1276144414",
+    "qid": "12-C5-B16-II-26",
+    "scenes": [
+      "copper-refining"
+    ]
+  },
+  {
+    "fingerprint": "66277742-994804318",
+    "qid": "12-KT-C5-D3-II-4",
+    "scenes": [
+      "copper-refining"
+    ]
+  },
+  {
+    "fingerprint": "1064004075-2601010569",
+    "qid": "12-C6-B19-I-54",
+    "scenes": [
+      "zinc-acid-copper"
+    ]
+  },
+  {
+    "fingerprint": "2846414980-2499200356",
+    "qid": "12-KT-C56-D2-I-10",
+    "scenes": [
+      "zinc-acid-copper"
+    ]
+  },
+  {
+    "fingerprint": "703207600-2887562450",
+    "qid": "12-C6-B19-II-6",
+    "scenes": [
+      "acid-metals"
+    ]
+  },
+  {
+    "fingerprint": "1021674051-649309123",
+    "qid": "12-KT-C6-D2-II-4",
+    "scenes": [
+      "acid-metals"
+    ]
+  },
+  {
+    "fingerprint": "140496057-1439723883",
+    "qid": "DH-11-C2-B8-I-19",
+    "scenes": [
+      "copper-sulfuric"
+    ]
+  },
+  {
+    "fingerprint": "130921380-1777247036",
+    "qid": "DH-11-C2-B8-VD-III-2",
+    "scenes": [
+      "copper-sulfuric"
+    ]
+  },
+  {
+    "fingerprint": "1893249660-828223922",
+    "qid": "DH-11-C2-B8-II-10",
+    "scenes": [
+      "copper-sulfuric-compare"
+    ]
+  },
+  {
+    "fingerprint": "3955612815-3721008511",
+    "qid": "DH-11-C2-B6-I-42",
+    "scenes": [
+      "copper-nitric"
+    ]
+  },
+  {
+    "fingerprint": "4265478716-571274896",
+    "qid": "DB-11-B1-D1-I-43",
+    "scenes": [
+      "thiocyanate"
+    ]
+  },
+  {
+    "fingerprint": "3280790644-3725837246",
+    "qid": "DH-11-C1-B1-I-43",
+    "scenes": [
+      "thiocyanate"
+    ]
+  },
+  {
+    "fingerprint": "2288220033-4160284849",
+    "qid": "12-C7-B23-III-7",
+    "scenes": [
+      "sodium-water"
+    ]
+  },
+  {
+    "fingerprint": "1135724134-2790984692",
+    "qid": "12-C7-B24-I-2",
+    "scenes": [
+      "calcium-water"
+    ]
+  },
+  {
+    "fingerprint": "2650354000-3383436716",
+    "qid": "11-C6-B23-I-16",
+    "scenes": [
+      "iodoform"
+    ]
+  },
+  {
+    "fingerprint": "2228866330-3477780448",
+    "qid": "12-C3-B9-D1-I-83",
+    "scenes": [
+      "electrophoresis"
+    ]
+  },
+  {
+    "fingerprint": "2676293625-1080685841",
+    "qid": "12-C3-B9-D1-I-86",
+    "scenes": [
+      "electrophoresis"
+    ]
+  },
+  {
+    "fingerprint": "2040033216-1326956056",
+    "qid": "DB-12-B9-P1-D2-II-28",
+    "scenes": [
+      "electrophoresis"
+    ]
+  },
+  {
+    "fingerprint": "2676293625-1080685841",
+    "qid": "12-C3-B9-D3-I-20",
+    "scenes": [
+      "electrophoresis"
+    ]
+  },
+  {
+    "fingerprint": "926463707-1146056509",
+    "qid": "DB-12-B9-P1-D2-I-59",
+    "scenes": [
+      "electrophoresis"
+    ]
+  },
+  {
+    "fingerprint": "1932314061-2391969101",
+    "qid": "12-KT-C3-D4-I-18",
+    "scenes": [
+      "electrophoresis"
+    ]
+  },
+  {
+    "fingerprint": "2676293625-1080685841",
+    "qid": "DB-12-B9-P1-D1-I-56",
+    "scenes": [
+      "electrophoresis"
+    ]
+  },
+  {
+    "fingerprint": "2676293625-1080685841",
+    "qid": "DB-12-B9-P1-D1-I-109",
+    "scenes": [
+      "electrophoresis"
+    ]
+  },
+  {
+    "fingerprint": "1577680851-763482513",
+    "qid": "DB-12-B9-P1-D1-I-217",
+    "scenes": [
+      "electrophoresis"
+    ]
+  },
+  {
+    "fingerprint": "2228866330-3477780448",
+    "qid": "DB-12-B9-P1-D2-I-19",
+    "scenes": [
+      "electrophoresis"
+    ]
+  },
+  {
+    "fingerprint": "1932314061-2391969101",
+    "qid": "DB-12-B9-P1-D2-I-77",
+    "scenes": [
+      "electrophoresis"
+    ]
+  },
+  {
+    "fingerprint": "701537605-1941754379",
+    "qid": "DB-12-B9-P1-D2-II-108",
+    "scenes": [
+      "electrophoresis"
+    ]
+  },
+  {
+    "fingerprint": "1577680851-763482513",
+    "qid": "DH-12-C3-B9-P1-I-68",
+    "scenes": [
+      "electrophoresis"
+    ]
+  },
+  {
+    "fingerprint": "701537605-1941754379",
+    "qid": "DH-12-C3-B9-P1-II-16",
+    "scenes": [
+      "electrophoresis"
+    ]
+  },
+  {
+    "fingerprint": "1920018027-3742511055",
+    "qid": "11-C1-B1-I-52",
+    "scenes": [
+      "no2-cold"
+    ]
+  },
+  {
+    "fingerprint": "2432875570-358509730",
+    "qid": "DB-11-B1-D1-I-61",
+    "scenes": [
+      "no2-cold"
+    ]
+  },
+  {
+    "fingerprint": "1920018027-3742511055",
+    "qid": "DB-11-B1-D1-I-50",
+    "scenes": [
+      "no2-cold"
+    ]
+  },
+  {
+    "fingerprint": "469971743-1096210151",
+    "qid": "DB-11-B1-D1-I-215",
+    "scenes": [
+      "no2-cold"
+    ]
+  },
+  {
+    "fingerprint": "469971743-1096210151",
+    "qid": "DH-11-C1-B3-D1-I-10",
+    "scenes": [
+      "no2-cold"
+    ]
+  },
+  {
+    "fingerprint": "2846592290-3162221782",
+    "qid": "10-C7-B22-III-1",
+    "scenes": [
+      "silver-halides"
+    ]
+  },
+  {
+    "fingerprint": "2796998153-1633382503",
+    "qid": "10-C7-B21-I-5",
+    "scenes": [
+      "chlorine-iodide"
+    ]
+  },
+  {
+    "fingerprint": "2749341232-1861928470",
+    "qid": "11-C4-B16-I-11",
+    "scenes": [
+      "acetylene-silver"
+    ]
+  },
+  {
+    "fingerprint": "4278148458-1177847632",
+    "qid": "11-C4-B16-I-15",
+    "scenes": [
+      "alkynes-alkenes"
+    ]
+  },
+  {
+    "fingerprint": "2721446853-2690602609",
+    "qid": "DH-12-C2-B4-VD-I-4",
+    "scenes": [
+      "glucose-bromine"
+    ]
+  },
+  {
+    "fingerprint": "2530861880-284467890",
+    "qid": "12-C8-B27-II-1",
+    "scenes": [
+      "nickel-ammonia"
+    ]
+  },
+  {
+    "fingerprint": "2842319637-2170088543",
+    "qid": "11-C5-B20-II-6",
+    "scenes": [
+      "copper-ethanol",
+      "tollens-aldehyde",
+      "iodoform"
+    ]
+  },
+  {
+    "fingerprint": "1873001353-2624319825",
+    "qid": "11-C6-B23-I-23",
+    "scenes": [
+      "carbonate-acid"
+    ]
+  },
+  {
+    "fingerprint": "600288276-1633263288",
+    "qid": "12-BD7-13-I-16",
+    "scenes": [
+      "carbonate-rate"
+    ]
+  },
+  {
+    "fingerprint": "3130955009-3016617447",
+    "qid": "DH-12-C1-B2-II-16",
+    "scenes": [
+      "soap-detergent"
+    ]
+  },
+  {
+    "fingerprint": "3158700540-1888682712",
+    "qid": "DB-12-B2-D1-II-117",
+    "scenes": [
+      "soap-detergent"
+    ]
+  },
+  {
+    "fingerprint": "3240436293-30848431",
+    "qid": "DH-12-C1-B2-VD-II-2",
+    "scenes": [
+      "soap-hardwater"
+    ]
+  },
+  {
+    "fingerprint": "657653598-4264644490",
+    "qid": "DH-12-C2-B5-II-14",
+    "scenes": [
+      "sucrose-hydrolysis-silver"
+    ]
+  },
+  {
+    "fingerprint": "1588949703-3033714229",
+    "qid": "DB-12-B4-D1-II-120",
+    "scenes": [
+      "sucrose-hydrolysis-silver"
+    ]
+  },
+  {
+    "fingerprint": "1883573178-3688488324",
+    "qid": "DB-12-B4-D1-II-75",
+    "scenes": [
+      "cellulose-hydrolysis-silver"
+    ]
+  },
+  {
+    "fingerprint": "1883573178-3688488324",
+    "qid": "DB-12-B4-D1-II-83",
+    "scenes": [
+      "cellulose-hydrolysis-silver"
+    ]
+  },
+  {
+    "fingerprint": "1894396962-3579324484",
+    "qid": "DB-12-B4-D1-II-116",
+    "scenes": [
+      "cellulose-hydrolysis-silver"
+    ]
+  },
+  {
+    "fingerprint": "1883573178-3688488324",
+    "qid": "DH-12-C2-B6-II-24",
+    "scenes": [
+      "cellulose-hydrolysis-silver"
+    ]
+  },
+  {
+    "fingerprint": "1195614827-2163536003",
+    "qid": "DH-12-C2-B6-II-21",
+    "scenes": [
+      "cellulose-hydrolysis-copper"
+    ]
+  },
+  {
+    "fingerprint": "4183794767-1848315875",
+    "qid": "DH-12-C2-B6-III-25",
+    "scenes": [
+      "cellulose-hydrolysis-copper"
+    ]
+  },
+  {
+    "fingerprint": "1651290919-2717037555",
+    "qid": "DH-12-C2-B6-VD-II-6",
+    "scenes": [
+      "cellulose-hydrolysis-copper"
+    ]
+  },
+  {
+    "fingerprint": "3084350313-2181682125",
+    "qid": "DB-12-B4-D3-II-127",
+    "scenes": [
+      "starch-hydrolysis-copper"
+    ]
+  },
+  {
+    "fingerprint": "1870793842-2460619756",
+    "qid": "DH-12-C2-B6-VD-II-5",
+    "scenes": [
+      "starch-hydrolysis-copper"
+    ]
+  },
+  {
+    "fingerprint": "3786787670-953143474",
+    "qid": "DH-12-C2-B7-D1-II-3",
+    "scenes": [
+      "starch-hydrolysis-copper"
+    ]
+  },
+  {
+    "fingerprint": "4216375615-1268770845",
+    "qid": "DH-12-C2-B5-VD-II-1",
+    "scenes": [
+      "sucrose-cold"
+    ]
+  },
+  {
+    "fingerprint": "830114920-4104805586",
+    "qid": "12-KT-C123-D1-II-4",
+    "scenes": [
+      "three-foods"
+    ]
+  },
+  {
+    "fingerprint": "381841154-2646209312",
+    "qid": "12-C8-B27-II-18",
+    "scenes": [
+      "ammonia-al-zinc"
+    ]
+  },
+  {
+    "fingerprint": "2990637368-3716543774",
+    "qid": "12-C8-B27-I-42",
+    "scenes": [
+      "al-hydroxide"
+    ]
+  },
+  {
+    "fingerprint": "1469795487-645683675",
+    "qid": "12-C8-B27-I-44",
+    "scenes": [
+      "copper-chloride"
+    ]
+  },
+  {
+    "fingerprint": "2520223617-4029304959",
+    "qid": "12-C8-B27-II-21",
+    "scenes": [
+      "copper-chloride-compare"
+    ]
+  },
+  {
+    "fingerprint": "3567475853-2190504105",
+    "qid": "12-C8-B27-II-22",
+    "scenes": [
+      "iron-hydrolysis"
+    ]
+  },
+  {
+    "fingerprint": "2717979780-3774432054",
+    "qid": "12-C8-B26-II-13",
+    "scenes": [
+      "water-iron"
+    ]
+  },
+  {
+    "fingerprint": "1671381542-2961090926",
+    "qid": "DB-12-B1-P1-D1-II-105",
+    "scenes": [
+      "ester-acid"
+    ]
+  },
+  {
+    "fingerprint": "18944239-1941011773",
+    "qid": "DB-12-B1-P1-D2-II-74",
+    "scenes": [
+      "ester-acid"
+    ]
+  },
+  {
+    "fingerprint": "1542618135-2828490937",
+    "qid": "12-C7-B24-II-11",
+    "scenes": [
+      "sulfate-three"
+    ]
+  },
+  {
+    "fingerprint": "2979067753-1635122611",
+    "qid": "12-BD7-21-II-3",
+    "scenes": [
+      "zinc-copper-acid"
+    ]
+  },
+  {
+    "fingerprint": "4020189617-2219104845",
+    "qid": "12-C6-B19-I-50",
+    "scenes": [
+      "zinc-copper-acid"
+    ]
+  },
+  {
+    "fingerprint": "2979067753-1635122611",
+    "qid": "12-C6-B19-II-2",
+    "scenes": [
+      "zinc-copper-acid"
+    ]
+  },
+  {
+    "fingerprint": "2384195919-483636451",
+    "qid": "12-C6-B19-II-13",
+    "scenes": [
+      "aluminium-copper-acid"
+    ]
+  },
+  {
+    "fingerprint": "3808054922-3535645508",
+    "qid": "12-KT-C6-D3-II-4",
+    "scenes": [
+      "aluminium-copper-acid"
+    ]
+  },
+  {
+    "fingerprint": "1474410684-3550633012",
+    "qid": "12-KT-C6-D1-II-4",
+    "scenes": [
+      "iron-acid-copper"
+    ]
+  },
+  {
+    "fingerprint": "2910540129-1802317907",
+    "qid": "12-C6-B19-II-12",
+    "scenes": [
+      "rust-four"
+    ]
+  },
+  {
+    "fingerprint": "3973554479-661594261",
+    "qid": "12-KT-C6-D2-I-17",
+    "scenes": [
+      "rust-four"
+    ]
+  },
+  {
+    "fingerprint": "2560157349-2042193583",
+    "qid": "12-KT-C56-D2-I-8",
+    "scenes": [
+      "rust-two"
+    ]
+  },
+  {
+    "fingerprint": "3803429619-3564221475",
+    "qid": "12-C5-B16-I-48",
+    "scenes": [
+      "sulfate-electrolysis"
+    ]
+  },
+  {
+    "fingerprint": "3574213925-3876496951",
+    "qid": "12-C5-B16-II-19",
+    "scenes": [
+      "javel"
+    ]
+  },
+  {
+    "fingerprint": "4013966826-3362877488",
+    "qid": "12-KT-C5-D4-I-4",
+    "scenes": [
+      "javel"
+    ]
+  },
+  {
+    "fingerprint": "2563245530-4190793366",
+    "qid": "DH-10-C2-B6-VD-III-1",
+    "scenes": [
+      "sodium-magnesium"
+    ]
+  },
+  {
+    "fingerprint": "1967990576-4025397270",
+    "qid": "12-C7-B24-II-8",
+    "scenes": [
+      "calcium-barium"
+    ]
+  },
+  {
+    "fingerprint": "1938673996-2372442018",
+    "qid": "12-C2-B4-D2-II-9",
+    "scenes": [
+      "fermentation"
+    ]
+  },
+  {
+    "fingerprint": "93733916-3474243724",
+    "qid": "12-C2-B4-D2-II-15",
+    "scenes": [
+      "fermentation"
+    ]
+  },
+  {
+    "fingerprint": "91677117-3360310709",
+    "qid": "12-KT-C2-D5-II-3",
+    "scenes": [
+      "fermentation"
+    ]
+  },
+  {
+    "fingerprint": "1938673996-2372442018",
+    "qid": "DB-12-B4-D2-II-10",
+    "scenes": [
+      "fermentation"
+    ]
+  },
+  {
+    "fingerprint": "93733916-3474243724",
+    "qid": "DB-12-B4-D2-II-27",
+    "scenes": [
+      "fermentation"
+    ]
+  },
+  {
+    "fingerprint": "91677117-3360310709",
+    "qid": "DB-12-B4-D2-II-97",
+    "scenes": [
+      "fermentation"
+    ]
+  },
+  {
+    "fingerprint": "1938673996-2372442018",
+    "qid": "DB-12-B4-D2-II-107",
+    "scenes": [
+      "fermentation"
+    ]
+  },
+  {
+    "fingerprint": "1938673996-2372442018",
+    "qid": "DH-12-C2-B4-II-25",
+    "scenes": [
+      "fermentation"
+    ]
+  },
+  {
+    "fingerprint": "1826693917-3161446223",
+    "qid": "100-II-2",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "1826693917-3161446223",
+    "qid": "12-C1-B1-D1-II-1",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "3875918548-4181922288",
+    "qid": "12-C1-B1-D2-II-3",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "1420965837-1966344553",
+    "qid": "DB-12-B1-P1-D2-II-25",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "3218779591-2271648677",
+    "qid": "DB-12-B1-P1-D2-II-27",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "1319725677-3955083775",
+    "qid": "DH-12-C1-B1-P1-II-22",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "857638099-2403301721",
+    "qid": "12-C1-B1-D3-II-4",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "3070611503-2336501585",
+    "qid": "12-KT-C1-D2-II-4",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "3420441703-1342358291",
+    "qid": "12-KT-C1-D4-II-4",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "3571889449-1066829393",
+    "qid": "12-KT-C1-D5-II-2",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "2074744172-3938888862",
+    "qid": "DB-12-B1-P1-D2-II-72",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "3267402101-1290081953",
+    "qid": "DB-12-B1-P1-D2-II-76",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "2404576894-2919475814",
+    "qid": "DH-12-C1-B3-D2-II-4",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "1826693917-3161446223",
+    "qid": "DB-12-B1-P1-D2-II-14",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "1826693917-3161446223",
+    "qid": "DB-12-B1-P1-D2-II-55",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "3070611503-2336501585",
+    "qid": "DB-12-B1-P1-D2-II-65",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "3420441703-1342358291",
+    "qid": "DB-12-B1-P1-D2-II-69",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "540494170-2895944232",
+    "qid": "DH-12-C1-B1-P1-II-18",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "2192988503-3710082403",
+    "qid": "DH-12-C1-B1-P1-II-16",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "3444067564-1361060124",
+    "qid": "12-C1-B1-D3-II-8",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "1249865681-2452642937",
+    "qid": "12-C8-B27-II-10",
+    "scenes": [
+      "ammonia-copper"
+    ]
+  },
+  {
+    "fingerprint": "3307870533-2067428155",
+    "qid": "11-C6-B24-III-6",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "416127455-3385742077",
+    "qid": "12-C3-B10-D2-II-11",
+    "scenes": [
+      "pepsin"
+    ]
+  },
+  {
+    "fingerprint": "434421685-1967615253",
+    "qid": "12-C3-B10-D2-II-16",
+    "scenes": [
+      "pepsin"
+    ]
+  },
+  {
+    "fingerprint": "3273801247-3747208129",
+    "qid": "12-C3-B10-D2-II-35",
+    "scenes": [
+      "pepsin"
+    ]
+  },
+  {
+    "fingerprint": "434421685-1967615253",
+    "qid": "12-C3-B11-D2-II-1",
+    "scenes": [
+      "pepsin"
+    ]
+  },
+  {
+    "fingerprint": "1767124665-3330350213",
+    "qid": "DH-12-C3-B10-II-20",
+    "scenes": [
+      "pepsin"
+    ]
+  },
+  {
+    "fingerprint": "2687300811-2407557829",
+    "qid": "DH-12-C3-B11-D2-II-1",
+    "scenes": [
+      "pepsin"
+    ]
+  },
+  {
+    "fingerprint": "1400563396-1241624206",
+    "qid": "12-C3-B10-D2-II-12",
+    "scenes": [
+      "amylase"
+    ]
+  },
+  {
+    "fingerprint": "678726543-3303084419",
+    "qid": "12-KT-C123-D1-II-3",
+    "scenes": [
+      "amylase"
+    ]
+  },
+  {
+    "fingerprint": "112712168-494305080",
+    "qid": "DH-12-C3-B10-II-21",
+    "scenes": [
+      "amylase"
+    ]
+  },
+  {
+    "fingerprint": "129564929-2530917451",
+    "qid": "12-C3-B10-D1-I-65",
+    "scenes": [
+      "protease"
+    ]
+  },
+  {
+    "fingerprint": "129564929-2530917451",
+    "qid": "DB-12-B9-P2-D1-I-5",
+    "scenes": [
+      "protease"
+    ]
+  },
+  {
+    "fingerprint": "1817789381-2425484807",
+    "qid": "DB-12-B9-P2-D1-I-140",
+    "scenes": [
+      "protease"
+    ]
+  },
+  {
+    "fingerprint": "1817789381-2425484807",
+    "qid": "DH-12-C3-B10-I-62",
+    "scenes": [
+      "protease"
+    ]
+  },
+  {
+    "fingerprint": "1598017869-4169866283",
+    "qid": "DB-12-B6-D1-II-29",
+    "scenes": [
+      "cellulase"
+    ]
+  },
+  {
+    "fingerprint": "2315558052-2100597776",
+    "qid": "DH-12-C2-B6-II-30",
+    "scenes": [
+      "cellulase"
+    ]
+  },
+  {
+    "fingerprint": "298633106-951559864",
+    "qid": "DB-12-B4-D2-II-26",
+    "scenes": [
+      "lactic"
+    ]
+  },
+  {
+    "fingerprint": "1258011099-2125087525",
+    "qid": "11-C2-B8-II-1",
+    "scenes": [
+      "acid-dilution"
+    ]
+  },
+  {
+    "fingerprint": "1258011099-2125087525",
+    "qid": "DB-11-B8-D1-II-11",
+    "scenes": [
+      "acid-dilution"
+    ]
+  },
+  {
+    "fingerprint": "3725023358-2885304900",
+    "qid": "DB-11-B8-D1-II-90",
+    "scenes": [
+      "acid-dilution"
+    ]
+  },
+  {
+    "fingerprint": "3725023358-2885304900",
+    "qid": "DH-11-C2-B8-II-14",
+    "scenes": [
+      "acid-dilution"
+    ]
+  },
+  {
+    "fingerprint": "2146169907-224061017",
+    "qid": "DH-11-C2-B8-I-24",
+    "scenes": [
+      "sugar-carbon"
+    ]
+  },
+  {
+    "fingerprint": "3968779309-1357882995",
+    "qid": "DH-11-C2-B8-I-54",
+    "scenes": [
+      "sugar-carbon"
+    ]
+  },
+  {
+    "fingerprint": "2112768927-496315747",
+    "qid": "DH-11-C2-B8-II-11",
+    "scenes": [
+      "sugar-carbon"
+    ]
+  },
+  {
+    "fingerprint": "592067824-1617099092",
+    "qid": "DH-11-C2-B7-I-16",
+    "scenes": [
+      "iron-sulfur"
+    ]
+  },
+  {
+    "fingerprint": "3374786351-2637613011",
+    "qid": "DH-11-C2-B7-II-16",
+    "scenes": [
+      "iron-sulfur"
+    ]
+  },
+  {
+    "fingerprint": "298402852-737386076",
+    "qid": "DH-11-C2-B7-VD-III-2",
+    "scenes": [
+      "iron-sulfur"
+    ]
+  },
+  {
+    "fingerprint": "3430740733-4138353539",
+    "qid": "DH-11-C2-B5-II-17",
+    "scenes": [
+      "ammonia-four"
+    ]
+  },
+  {
+    "fingerprint": "1486779334-3732941404",
+    "qid": "DH-12-C3-B8-II-14",
+    "scenes": [
+      "amine-bromine-compare"
+    ]
+  },
+  {
+    "fingerprint": "430525598-285393462",
+    "qid": "12-C6-B19-II-10",
+    "scenes": [
+      "copper-ferric"
+    ]
+  },
+  {
+    "fingerprint": "867584631-3462230675",
+    "qid": "12-KT-C6-D4-I-17",
+    "scenes": [
+      "zinc-copper-salt"
+    ]
+  },
+  {
+    "fingerprint": "266445259-986977139",
+    "qid": "12-KT-C6-D4-I-18",
+    "scenes": [
+      "zinc-copper-salt"
+    ]
+  },
+  {
+    "fingerprint": "33373841-3903494787",
+    "qid": "12-KT-C5-D5-I-3",
+    "scenes": [
+      "silver-plating"
+    ]
+  },
+  {
+    "fingerprint": "2781841033-2493096747",
+    "qid": "12-KT-C56-D1-II-3",
+    "scenes": [
+      "silver-plating"
+    ]
+  },
+  {
+    "fingerprint": "2940553460-107965580",
+    "qid": "12-KT-C5-D4-II-1",
+    "scenes": [
+      "galvanic-zinc-copper"
+    ]
+  },
+  {
+    "fingerprint": "12312841-1454598981",
+    "qid": "12-C5-B16-II-11",
+    "scenes": [
+      "galvanic-al-lead"
+    ]
+  },
+  {
+    "fingerprint": "900985311-3808909439",
+    "qid": "DB-12-B9-P2-D1-I-107",
+    "scenes": [
+      "biuret-unknown"
+    ]
+  },
+  {
+    "fingerprint": "1965547606-279646856",
+    "qid": "DH-12-C3-B8-III-18",
+    "scenes": [
+      "amine-litmus"
+    ]
+  },
+  {
+    "fingerprint": "3866140514-1805899730",
+    "qid": "12-C1-B1-D1-I-81",
+    "scenes": [
+      "ester-methyl-propionate"
+    ]
+  },
+  {
+    "fingerprint": "3866140514-1805899730",
+    "qid": "DH-12-C1-B1-P1-I-63",
+    "scenes": [
+      "ester-methyl-propionate"
+    ]
+  },
+  {
+    "fingerprint": "3835444854-4008490008",
+    "qid": "12-C8-B26-II-14",
+    "scenes": [
+      "hydrate-heating"
+    ]
+  },
+  {
+    "fingerprint": "3839478006-3548436164",
+    "qid": "DH-11-C2-B7-I-29",
+    "scenes": [
+      "sulfur-hydrogen-sulfide"
+    ]
+  },
+  {
+    "fingerprint": "3790863789-830600007",
+    "qid": "12-C3-B8-D2-II-23",
+    "scenes": [
+      "amine-ph"
+    ]
+  },
+  {
+    "fingerprint": "3892451074-3756265446",
+    "qid": "DB-12-B8-D2-II-62",
+    "scenes": [
+      "amine-ph"
+    ]
+  },
+  {
+    "fingerprint": "3790863789-830600007",
+    "qid": "DB-12-B8-D2-II-27",
+    "scenes": [
+      "amine-ph"
+    ]
+  },
+  {
+    "fingerprint": "1166633060-1298032086",
+    "qid": "DB-12-B8-D2-II-89",
+    "scenes": [
+      "amine-ph"
+    ]
+  },
+  {
+    "fingerprint": "1166633060-1298032086",
+    "qid": "DH-12-C3-B8-II-25",
+    "scenes": [
+      "amine-ph"
+    ]
+  },
+  {
+    "fingerprint": "3655238431-3647558003",
+    "qid": "12-C1-B1-D2-II-7",
+    "scenes": [
+      "aspirin-hydrolysis"
+    ]
+  },
+  {
+    "fingerprint": "3655238431-3647558003",
+    "qid": "DB-12-B1-P1-D1-II-40",
+    "scenes": [
+      "aspirin-hydrolysis"
+    ]
+  },
+  {
+    "fingerprint": "1724534005-2152271509",
+    "qid": "DB-12-B1-P1-D1-II-153",
+    "scenes": [
+      "aspirin-hydrolysis"
+    ]
+  },
+  {
+    "fingerprint": "1724534005-2152271509",
+    "qid": "DH-12-C1-B1-P1-II-20",
+    "scenes": [
+      "aspirin-hydrolysis"
+    ]
+  },
+  {
+    "fingerprint": "1568030299-921384751",
+    "qid": "DB-12-B1-P2-D1-II-74",
+    "scenes": [
+      "soap"
+    ]
+  },
+  {
+    "fingerprint": "1405471987-1950028997",
+    "qid": "DH-12-C1-B1-P1-II-21",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "2824202518-2735449388",
+    "qid": "DB-12-B1-P1-D2-I-44",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "4218823544-1294162420",
+    "qid": "DB-12-B1-P1-D2-I-45",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "2824202518-2735449388",
+    "qid": "12-C1-B1-D3-I-58",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "4218823544-1294162420",
+    "qid": "12-C1-B1-D3-I-59",
+    "scenes": [
+      "ester-reflux"
+    ]
+  },
+  {
+    "fingerprint": "3404517284-1965019774",
+    "qid": "DB-12-B1-P1-D2-II-99",
+    "scenes": [
+      "ester-isoamyl",
+      "ester-separate"
+    ]
+  },
+  {
+    "fingerprint": "513750129-3063975845",
+    "qid": "DB-12-B1-P2-D2-III-6",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "527687467-483273957",
+    "qid": "12-C1-B1-D3-III-28",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "4055462277-2379181573",
+    "qid": "DH-12-C1-B2-III-17",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "686470847-1766014905",
+    "qid": "DH-12-C3-B11-D1-I-5",
+    "scenes": [
+      "methylamine-copper",
+      "aniline-bromine",
+      "amine-nitrous",
+      "amine-litmus"
+    ]
+  },
+  {
+    "fingerprint": "2967386276-3651092722",
+    "qid": "11-C5-B21-II-2",
+    "scenes": [
+      "phenol-base-co2"
+    ]
+  },
+  {
+    "fingerprint": "729764002-1973578884",
+    "qid": "DB-11-B8-D1-III-1",
+    "scenes": [
+      "ammonia-five"
+    ]
+  },
+  {
+    "fingerprint": "533472333-3883170245",
+    "qid": "DB-11-B8-D1-III-14",
+    "scenes": [
+      "acid-four"
+    ]
+  },
+  {
+    "fingerprint": "3506301016-2825167906",
+    "qid": "10-C7-B21-II-2",
+    "scenes": [
+      "chlorine-bromide"
+    ]
+  },
+  {
+    "fingerprint": "2731913862-1158440126",
+    "qid": "10-C7-B21-III-1",
+    "scenes": [
+      "chlorine-four"
+    ]
+  },
+  {
+    "fingerprint": "3117468146-3620393268",
+    "qid": "11-C4-B16-III-6",
+    "scenes": [
+      "carbide-water"
+    ]
+  },
+  {
+    "fingerprint": "1784173390-2018995496",
+    "qid": "11-C4-B16-III-5",
+    "scenes": [
+      "phenol-alkyne"
+    ]
+  },
+  {
+    "fingerprint": "152424428-2157630418",
+    "qid": "DH-12-C2-B6-II-25",
+    "scenes": [
+      "cellulose-cold"
+    ]
+  },
+  {
+    "fingerprint": "2968065735-3551945615",
+    "qid": "DH-12-C3-B11-D2-I-18",
+    "scenes": [
+      "milk-acid"
+    ]
+  },
+  {
+    "fingerprint": "3935088252-3908273684",
+    "qid": "12-KT-C5-D4-I-10",
+    "scenes": [
+      "metal-three"
+    ]
+  },
+  {
+    "fingerprint": "1106439375-3701838283",
+    "qid": "12-KT-C5-D1-I-15",
+    "scenes": [
+      "metal-three"
+    ]
+  },
+  {
+    "fingerprint": "525243855-24110459",
+    "qid": "12-C6-B21-III-14",
+    "scenes": [
+      "iodometry-copper"
+    ]
+  },
+  {
+    "fingerprint": "2305246248-3407186552",
+    "qid": "12-C7-B23-II-5",
+    "scenes": [
+      "alkali-water"
+    ]
+  },
+  {
+    "fingerprint": "1818826941-3500538111",
+    "qid": "12-C7-B24-I-48",
+    "scenes": [
+      "iia-water"
+    ]
+  },
+  {
+    "fingerprint": "1878932187-3388137585",
+    "qid": "12-C7-B24-II-7",
+    "scenes": [
+      "iia-water"
+    ]
+  },
+  {
+    "fingerprint": "2661722501-2783355877",
+    "qid": "12-C7-B24-I-65",
+    "scenes": [
+      "hardwater-heat"
+    ]
+  },
+  {
+    "fingerprint": "3779731837-2549555889",
+    "qid": "DH-11-C1-B3-D2-I-12",
+    "scenes": [
+      "alum-water"
+    ]
+  },
+  {
+    "fingerprint": "2888366016-874480378",
+    "qid": "DH-11-C2-B5-III-31",
+    "scenes": [
+      "ammonia-smoke"
+    ]
+  },
+  {
+    "fingerprint": "4200532830-3578344512",
+    "qid": "DH-11-C2-B5-I-69",
+    "scenes": [
+      "ammonia-salts"
+    ]
+  },
+  {
+    "fingerprint": "1881013809-983296753",
+    "qid": "DH-11-C2-B7-DT-I-4",
+    "scenes": [
+      "sulfur-burn"
+    ]
+  },
+  {
+    "fingerprint": "438583294-2880527548",
+    "qid": "12-KT-C6-D1-III-2",
+    "scenes": [
+      "zinc-four"
+    ]
+  },
+  {
+    "fingerprint": "1792516729-1155731959",
+    "qid": "DH-12-C1-B2-II-11",
+    "scenes": [
+      "saponin"
+    ]
+  },
+  {
+    "fingerprint": "1409988500-2892662938",
+    "qid": "12-C8-B26-I-39",
+    "scenes": [
+      "permanganate-two"
+    ]
+  },
+  {
+    "fingerprint": "72935906-4248932914",
+    "qid": "10-C4-B15-I-22",
+    "scenes": [
+      "oxalate-permanganate"
+    ]
+  },
+  {
+    "fingerprint": "3059248001-3376995397",
+    "qid": "12-C8-B26-III-11",
+    "scenes": [
+      "oxalate-permanganate"
+    ]
+  },
+  {
+    "fingerprint": "4018161270-1125579952",
+    "qid": "DH-12-C2-B4-III-22",
+    "scenes": [
+      "fermentation-lime"
+    ]
+  },
+  {
+    "fingerprint": "233155361-3498401809",
+    "qid": "DH-12-C2-B4-DT-III-4",
+    "scenes": [
+      "fermentation-lime"
+    ]
+  },
+  {
+    "fingerprint": "2305529685-2496944843",
+    "qid": "DH-12-C2-B6-DT-III-2",
+    "scenes": [
+      "fermentation-lime"
+    ]
+  },
+  {
+    "fingerprint": "560713630-105674106",
+    "qid": "12-KT-C3-D2-I-15",
+    "scenes": [
+      "protein-four"
+    ]
+  },
+  {
+    "fingerprint": "3992566898-2840568098",
+    "qid": "12-C8-B26-III-14",
+    "scenes": [
+      "chromate-dichromate"
+    ]
+  },
+  {
+    "fingerprint": "450031153-4534619",
+    "qid": "12-C8-B27-I-49",
+    "scenes": [
+      "methylamine-copper"
+    ]
+  },
+  {
+    "fingerprint": "4042358015-2355141597",
+    "qid": "DB-12-B4-D3-I-133",
+    "scenes": [
+      "glucose-hot",
+      "biuret"
+    ]
+  },
+  {
+    "fingerprint": "702745255-3810436375",
+    "qid": "12-KT-C3-D5-III-4",
+    "scenes": [
+      "glucose-hot",
+      "aniline-bromine",
+      "methylamine-copper",
+      "protein-nitric"
+    ]
+  },
+  {
+    "fingerprint": "1958076649-3397355577",
+    "qid": "12-C7-B24-II-4",
+    "scenes": [
+      "flame-alkali"
+    ]
+  },
+  {
+    "fingerprint": "2834104073-521407209",
+    "qid": "12-C7-B23-II-13",
+    "scenes": [
+      "flame-unknown"
+    ]
+  },
+  {
+    "fingerprint": "62597777-2762561503",
+    "qid": "DH-12-C1-B2-I-37",
+    "scenes": [
+      "soap-before-salt"
+    ]
+  },
+  {
+    "fingerprint": "62597777-2762561503",
+    "qid": "DB-12-B1-P2-D1-I-76",
+    "scenes": [
+      "soap-before-salt"
+    ]
+  },
+  {
+    "fingerprint": "68863063-2905992479",
+    "qid": "12-C1-B1-D2-II-6",
+    "scenes": [
+      "ester-extract-ether"
+    ]
+  },
+  {
+    "fingerprint": "68863063-2905992479",
+    "qid": "DB-12-B1-P1-D2-II-26",
+    "scenes": [
+      "ester-extract-ether"
+    ]
+  },
+  {
+    "fingerprint": "3877355133-426062721",
+    "qid": "DB-12-B1-P1-D2-II-96",
+    "scenes": [
+      "ester-extract-ether"
+    ]
+  },
+  {
+    "fingerprint": "3877355133-426062721",
+    "qid": "DH-12-C1-B1-P1-II-19",
+    "scenes": [
+      "ester-extract-ether"
+    ]
+  },
+  {
+    "fingerprint": "1198144701-3124646651",
+    "qid": "DB-12-B4-D3-III-115",
+    "scenes": [
+      "starch-follow"
+    ]
+  },
+  {
+    "fingerprint": "53427504-3906810636",
+    "qid": "DB-12-B4-D3-III-163",
+    "scenes": [
+      "starch-follow"
+    ]
+  },
+  {
+    "fingerprint": "1804888251-1605638059",
+    "qid": "DH-12-C2-B5-I-34",
+    "scenes": [
+      "copper-unknown-cold"
+    ]
+  },
+  {
+    "fingerprint": "3538649173-1021690347",
+    "qid": "DB-12-B8-D2-II-40",
+    "scenes": [
+      "amine-water-gas"
+    ]
+  },
+  {
+    "fingerprint": "1299125063-3272609483",
+    "qid": "DB-12-B8-D2-II-64",
+    "scenes": [
+      "amine-water-gas"
+    ]
+  },
+  {
+    "fingerprint": "602235331-1710552027",
+    "qid": "11-C1-B2-D2-III-16",
+    "scenes": [
+      "phenolphthalein-four"
+    ]
+  },
+  {
+    "fingerprint": "4218889336-2162816372",
+    "qid": "11-C1-B2-D2-II-26",
+    "scenes": [
+      "soil-ph"
+    ]
+  },
+  {
+    "fingerprint": "4004383955-3769164057",
+    "qid": "DH-11-C1-B2-VD-III-3",
+    "scenes": [
+      "soil-ph"
+    ]
+  },
+  {
+    "fingerprint": "722315200-495441836",
+    "qid": "11-C1-B2-D2-III-57",
+    "scenes": [
+      "egg-back-titration"
+    ]
+  },
+  {
+    "fingerprint": "3605019843-1679654237",
+    "qid": "DH-11-C1-B2-III-55",
+    "scenes": [
+      "egg-back-titration"
+    ]
+  },
+  {
+    "fingerprint": "292229193-550744413",
+    "qid": "DH-11-C1-B2-DT-III-12",
+    "scenes": [
+      "egg-back-titration"
+    ]
+  },
+  {
+    "fingerprint": "2315423138-3435469856",
+    "qid": "11-C1-B2-D2-III-40",
+    "scenes": [
+      "ammonia-back-titration"
+    ]
+  },
+  {
+    "fingerprint": "4139987543-1807717791",
+    "qid": "12-C7-B23-I-46",
+    "scenes": [
+      "kcl-crystallise"
+    ]
+  },
+  {
+    "fingerprint": "3038259621-2750635845",
+    "qid": "12-C1-B1-D3-I-65",
+    "scenes": [
+      "oil-hydrogenation"
+    ]
+  },
+  {
+    "fingerprint": "2585772886-357137654",
+    "qid": "DH-11-C2-B8-I-12",
+    "scenes": [
+      "acid-litmus"
+    ]
+  },
+  {
+    "fingerprint": "3238460336-469892236",
+    "qid": "DH-11-C2-B6-I-40",
+    "scenes": [
+      "nitric-yellow"
+    ]
+  },
+  {
+    "fingerprint": "1936617358-2457138930",
+    "qid": "12-C6-B20-I-31",
+    "scenes": [
+      "copper-oxide-co"
+    ]
+  },
+  {
+    "fingerprint": "3626623073-2712723231",
+    "qid": "12-C6-B19-I-56",
+    "scenes": [
+      "iron-two-salts"
+    ]
+  },
+  {
+    "fingerprint": "1885301773-4080116511",
+    "qid": "12-KT-C6-D2-I-11",
+    "scenes": [
+      "iron-two-salts"
+    ]
+  },
+  {
+    "fingerprint": "541297180-1867052540",
+    "qid": "DH-11-C2-B8-III-10",
+    "scenes": [
+      "sulfate-acid-five"
+    ]
+  },
+  {
+    "fingerprint": "1292045719-3855212753",
+    "qid": "12-C8-B27-I-37",
+    "scenes": [
+      "silver-cyanide"
+    ]
+  },
+  {
+    "fingerprint": "2188619205-220733533",
+    "qid": "DB-12-B4-D1-III-86",
+    "scenes": [
+      "tollens-glucose",
+      "glucose-bromine",
+      "glucose-hot",
+      "sucrose-cold"
+    ]
+  },
+  {
+    "fingerprint": "2631205537-2084603081",
+    "qid": "DB-12-B4-D1-III-122",
+    "scenes": [
+      "tollens-glucose",
+      "glucose-bromine",
+      "glucose-hot",
+      "sucrose-cold"
+    ]
+  },
+  {
+    "fingerprint": "2709294403-719366501",
+    "qid": "DH-10-C1-B1-I-1",
+    "scenes": [
+      "thomson"
+    ]
+  },
+  {
+    "fingerprint": "2706494567-1265404935",
+    "qid": "DH-10-C1-B1-I-25",
+    "scenes": [
+      "thomson"
+    ]
+  },
+  {
+    "fingerprint": "1251557141-2376024281",
+    "qid": "11-C1-B2-D2-II-15",
+    "scenes": [
+      "burette-bubble"
+    ]
+  },
+  {
+    "fingerprint": "2173831004-810587116",
+    "qid": "10-C1-B1-II-3",
+    "scenes": [
+      "thomson"
+    ]
+  },
+  {
+    "fingerprint": "2173831004-810587116",
+    "qid": "DB-10-B1-D1-II-56",
+    "scenes": [
+      "thomson"
+    ]
+  },
+  {
+    "fingerprint": "2173831004-810587116",
+    "qid": "DB-10-B1-D1-II-142",
+    "scenes": [
+      "thomson"
+    ]
+  },
+  {
+    "fingerprint": "2173831004-810587116",
+    "qid": "DH-10-C1-B1-II-3",
+    "scenes": [
+      "thomson"
+    ]
+  },
+  {
+    "fingerprint": "153665038-4118973386",
+    "qid": "12-BD7-19-II-4",
+    "scenes": [
+      "permanganate"
+    ]
+  },
+  {
+    "fingerprint": "2216637334-1560030976",
+    "qid": "12-C8-B26-I-33",
+    "scenes": [
+      "permanganate"
+    ]
+  },
+  {
+    "fingerprint": "3964306063-203303173",
+    "qid": "12-C8-B26-I-34",
+    "scenes": [
+      "permanganate"
+    ]
+  },
+  {
+    "fingerprint": "3190575136-2806503722",
+    "qid": "12-C8-B26-I-37",
+    "scenes": [
+      "permanganate"
+    ]
+  },
+  {
+    "fingerprint": "1538492289-2327719475",
+    "qid": "12-C8-B26-II-10",
+    "scenes": [
+      "permanganate"
+    ]
+  },
+  {
+    "fingerprint": "604043709-3140000981",
+    "qid": "12-C8-B26-II-12",
+    "scenes": [
+      "permanganate"
+    ]
+  },
+  {
+    "fingerprint": "1507234159-4137040495",
+    "qid": "12-C8-B26-III-7",
+    "scenes": [
+      "permanganate"
+    ]
+  },
+  {
+    "fingerprint": "2224547150-3257748276",
+    "qid": "10-C4-B15-III-8",
+    "scenes": [
+      "sulfur-dioxide-permanganate"
+    ]
+  },
+  {
+    "fingerprint": "3893159900-2053727864",
+    "qid": "DH-11-C1-B2-I-47",
+    "scenes": [
+      "titration-neutral"
+    ]
+  },
+  {
+    "fingerprint": "1101364338-1477360686",
+    "qid": "DH-11-C1-B2-I-48",
+    "scenes": [
+      "titration-neutral"
+    ]
+  },
+  {
+    "fingerprint": "2722948440-632587186",
+    "qid": "DB-11-B2-D5-I-3",
+    "scenes": [
+      "titration-neutral"
+    ]
+  },
+  {
+    "fingerprint": "2513853257-745581305",
+    "qid": "DH-11-C1-B2-I-50",
+    "scenes": [
+      "titration-neutral"
+    ]
+  },
+  {
+    "fingerprint": "2257292728-1769487290",
+    "qid": "DH-11-C1-B2-I-89",
+    "scenes": [
+      "titration-neutral"
+    ]
+  },
+  {
+    "fingerprint": "2139404218-1674921966",
+    "qid": "DH-11-C1-B2-I-100",
+    "scenes": [
+      "titration-neutral"
+    ]
+  },
+  {
+    "fingerprint": "3746257671-1252966467",
+    "qid": "DH-11-C2-B8-III-24",
+    "scenes": [
+      "titration-neutral"
+    ]
+  },
+  {
+    "fingerprint": "1088378006-1699383182",
+    "qid": "11-C1-B2-D2-I-35",
+    "scenes": [
+      "titration-neutral"
+    ]
+  },
+  {
+    "fingerprint": "1449928720-359496402",
+    "qid": "DH-11-C1-B2-I-49",
+    "scenes": [
+      "titration-neutral"
+    ]
+  },
+  {
+    "fingerprint": "1922653873-3756686597",
+    "qid": "11-C1-B2-D2-II-19",
+    "scenes": [
+      "titration-neutral"
+    ]
+  },
+  {
+    "fingerprint": "927825880-2370783934",
+    "qid": "11-C1-B2-D2-III-25",
+    "scenes": [
+      "titration-neutral"
+    ]
+  },
+  {
+    "fingerprint": "3152982844-1222386684",
+    "qid": "11-C1-B2-D2-III-26",
+    "scenes": [
+      "titration-neutral"
+    ]
+  },
+  {
+    "fingerprint": "3253406482-3602437002",
+    "qid": "11-C1-B2-D2-III-33",
+    "scenes": [
+      "titration-neutral"
+    ]
+  },
+  {
+    "fingerprint": "1767499298-1614609904",
+    "qid": "11-C1-B2-D2-III-36",
+    "scenes": [
+      "titration-neutral"
+    ]
+  },
+  {
+    "fingerprint": "3120581738-1866779892",
+    "qid": "DH-11-C1-B2-DT-III-10",
+    "scenes": [
+      "titration-neutral"
+    ]
+  },
+  {
+    "fingerprint": "3226884458-408390710",
+    "qid": "DH-11-C1-B2-III-64",
+    "scenes": [
+      "titration-neutral"
+    ]
+  },
+  {
+    "fingerprint": "2813457683-1730289891",
+    "qid": "DB-11-B2-D5-I-8",
+    "scenes": [
+      "burette-bubble"
+    ]
+  },
+  {
+    "fingerprint": "64865955-3044861331",
+    "qid": "DH-11-C1-B2-I-102",
+    "scenes": [
+      "burette-bubble"
+    ]
+  },
+  {
+    "fingerprint": "4189154681-1632350829",
+    "qid": "12-BD7-20-I-17",
+    "scenes": [
+      "phenol-bromine"
+    ]
+  },
+  {
+    "fingerprint": "3580479823-2598839131",
+    "qid": "11-C6-B24-II-8",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "1613709931-361416479",
+    "qid": "11-C1-B2-D2-II-23",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "1504273779-3727581165",
+    "qid": "DH-11-C1-B3-D2-II-1",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "2590974985-2639224445",
+    "qid": "DH-11-C1-B2-III-54",
+    "scenes": [
+      "titrate-base"
+    ]
+  },
+  {
+    "fingerprint": "1919298901-2326642485",
+    "qid": "12-C5-B16-I-10",
+    "scenes": [
+      "galvanic-zinc-copper"
+    ]
+  },
+  {
+    "fingerprint": "3233187277-3678563737",
+    "qid": "12-C5-B15-III-11",
+    "scenes": [
+      "galvanic-zinc-copper"
+    ]
+  },
+  {
+    "fingerprint": "3647693410-484793118",
+    "qid": "12-KT-C5-D4-III-3",
+    "scenes": [
+      "galvanic-zinc-copper"
+    ]
+  },
+  {
+    "fingerprint": "258665806-3363621824",
+    "qid": "12-C6-B19-I-10",
+    "scenes": [
+      "zinc-copper-acid"
+    ]
+  },
+  {
+    "fingerprint": "4197853097-3778394205",
+    "qid": "12-C6-B19-II-14",
+    "scenes": [
+      "zinc-copper-acid"
+    ]
+  },
+  {
+    "fingerprint": "4038718943-4225216743",
+    "qid": "DH-12-C1-B2-I-36",
+    "scenes": [
+      "oil-soap"
+    ]
+  },
+  {
+    "fingerprint": "1950955941-3395565141",
+    "qid": "DH-12-C3-B8-I-36",
+    "scenes": [
+      "aniline-bromine"
+    ]
+  },
+  {
+    "fingerprint": "1950955941-3395565141",
+    "qid": "DB-12-B8-D1-I-252",
+    "scenes": [
+      "aniline-bromine"
+    ]
+  },
+  {
+    "fingerprint": "3901381836-143000226",
+    "qid": "12-C5-B15-I-43",
+    "scenes": [
+      "aluminium-copper-acid"
+    ]
+  },
+  {
+    "fingerprint": "81239645-813308869",
+    "qid": "12-C6-B19-I-35",
+    "scenes": [
+      "iron-copper"
+    ]
+  },
+  {
+    "fingerprint": "2902748400-303241190",
+    "qid": "12-KT-C1-D1-I-18",
+    "scenes": [
+      "oil-water"
+    ]
+  },
+  {
+    "fingerprint": "2894674301-1923856181",
+    "qid": "12-KT-C12-D2-I-10",
+    "scenes": [
+      "isoamyl-water"
+    ]
+  },
+  {
+    "fingerprint": "3174485926-609779226",
+    "qid": "11-C1-B2-D2-II-21",
+    "scenes": [
+      "egg-back-titration"
+    ]
+  },
+  {
+    "fingerprint": "2888232694-3988626706",
+    "qid": "DH-11-C1-B2-II-29",
+    "scenes": [
+      "egg-back-titration"
+    ]
+  }
+]

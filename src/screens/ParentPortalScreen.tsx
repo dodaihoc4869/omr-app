@@ -598,7 +598,7 @@ export default function ParentPortalScreen() {
                 ) : (
                   <>
                     <Heart size={18} />
-                    <span>Tạo bài luyện khắc phục cho con (3 chế độ)</span>
+                    <span>Tạo bài luyện khắc phục cho con (4 chế độ)</span>
                   </>
                 )}
               </button>

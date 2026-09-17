@@ -95,9 +95,7 @@ export function chuanHoaBaiMom(b: any): BaiMomGiao {
       : (Array.isArray(c?.luaChon) ? c.luaChon.map(String) : (Array.isArray(c?.ideas) ? c.ideas.map(String) : [])),
     dapAn: String(c?.dapAn || c?.dapAnDung || 'A'),
     dapAnDung: String(c?.dapAnDung || c?.dapAn || 'A'),
-    loiGiai: typeof c?.loiGiai === 'object' && c?.loiGiai !== null
-      ? String(c.loiGiai.chot || c.loiGiai.text || c.loiGiai.loiGiai || '')
-      : (String(c?.loiGiai || '') === '[object Object]' ? '' : String(c?.loiGiai || '')),
+    loiGiai: c?.loiGiai != null && String(c.loiGiai) !== '[object Object]' ? c.loiGiai : '',
     chuyenDe: String(c?.chuyenDe || 'Hoá học'),
   }))
 
@@ -344,7 +342,14 @@ export default function StudentPortalScreen() {
       let answers = data.item.dapAnDaNop || {}
       try { const raw = localStorage.getItem(`omr_mom_draft_${auth.sbd}_${bai.id}`); if (raw) answers = {...answers, ...JSON.parse(raw)} } catch {}
       setCauTraLoiMom(answers)
-      if (capNhat.trangThai === 'da_nop') { await napDsMom(); return }
+      if (capNhat.trangThai === 'da_nop') {
+        await napDsMom()
+        try {
+          const rev = await momApi('review', { token: auth.token, id: bai.id })
+          if (rev?.item) setPhieuHtml(momReviewHtml(chuanHoaBaiMom(rev.item)))
+        } catch {}
+        return
+      }
       setDangLamMom(capNhat)
       setThongBaoNopMom(null)
       setLoiMom('')
@@ -585,7 +590,7 @@ export default function StudentPortalScreen() {
       try {
         for (let i = localStorage.length - 1; i >= 0; i--) {
           const k = localStorage.key(i)
-          if (k && (k.startsWith('ddh.lam.' + id) || (bt.maBtvn && k.includes(bt.maBtvn)))) {
+          if (k && (k.startsWith('ddh.lam.' + id) || (bt.maBtvn && k.includes(bt.maBtvn)) || k.startsWith('ddh.btvn.draft.' + id))) {
             localStorage.removeItem(k)
           }
         }
@@ -1048,7 +1053,23 @@ export default function StudentPortalScreen() {
               </div>
             </div>
 
-            {auth.token&&<ThongBaoHocSinh token={auth.token} onOpen={t=>{setTab(t);void napDsMom()}}/>}
+            {auth.token && (
+              <ThongBaoHocSinh
+                token={auth.token}
+                onOpen={(t, noticeId) => {
+                  setTab(t)
+                  if (t === 'mom') {
+                    void napDsMom()
+                    if (noticeId) {
+                      const momId = noticeId.startsWith('mom:') ? noticeId.split(':')[2] : noticeId
+                      if (momId) void batDauLamBaiMom({ id: momId } as BaiMomGiao)
+                    }
+                  } else if (t === 'btvn') {
+                    void napLaiBtvn()
+                  }
+                }}
+              />
+            )}
             <button
               onClick={dangXuat}
               title="Đăng xuất"

@@ -79,6 +79,14 @@ export async function dungPhieuBtvn(
   const conLai = typeof r.soLanLamLaiConLai === 'number' ? r.soLanLamLaiConLai : 3
   const lanLamHienTai = (Number(r.soLanLam) || 1) + (laLamLai ? 1 : 0)
 
+  let banNhap: Record<string, string> | undefined
+  if (!laLamLai && !r.daNop && maBtvn) {
+    try {
+      const raw = localStorage.getItem(`ddh.btvn.draft.${maBtvn}.${sbd}`) || localStorage.getItem(`ddh.lam.${maBtvn}`)
+      if (raw) banNhap = JSON.parse(raw)
+    } catch {}
+  }
+
   return dungPhieu(
     {
       hoTen: '',
@@ -99,7 +107,7 @@ export async function dungPhieuBtvn(
     {
       // Đã nộp rồi thì mở thành phiếu CHỈ ĐỌC kèm lời giải — em xem lại bài,
       // không nộp thêm lần nữa.
-      nop: r.daNop || !maBtvn ? null : { ma: maBtvn, sbd, legacyIds:cau.map(c=>doc.json!.ma_de+(c.id.match(/-(III|II|I)-\d+$/)?.[0]||'')), url: `${String(ch.URL ?? '').replace(/\/+$/, '')}/goi` },
+      nop: r.daNop || !maBtvn ? null : { ma: maBtvn, sbd, banNhap, legacyIds:cau.map(c=>doc.json!.ma_de+(c.id.match(/-(III|II|I)-\d+$/)?.[0]||'')), url: `${String(ch.URL ?? '').replace(/\/+$/, '')}/goi` },
       loiNhac: r.daNop
         ? `Em đã nộp bài này rồi — đây là bản xem lại, bấm vào từng câu để mở lời giải.${conLai > 0 ? ` Thầy cho phép làm lại tối đa 3 lần (còn ${conLai} lượt).` : ' (Đã hết 3 lượt làm lại)'}`
         : laLamLai

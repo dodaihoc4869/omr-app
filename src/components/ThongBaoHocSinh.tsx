@@ -66,7 +66,7 @@ export default function ThongBaoHocSinh({
   onOpen,
 }: {
   token: string
-  onOpen: (tab: 'btvn' | 'mom') => void
+  onOpen: (tab: 'btvn' | 'mom', noticeId?: string) => void
 }) {
   const [loaded, setLoaded] = useState(false)
   const [loadError, setLoadError] = useState('')
@@ -352,7 +352,7 @@ export default function ThongBaoHocSinh({
                         )
                       )
                       .catch(() => {})
-                    onOpen(n.target)
+                    onOpen(n.target, n.id)
                     setOpen(false)
                   }}
                   className={`w-full text-left p-3.5 rounded-2xl transition-all duration-150 flex items-start gap-3 cursor-pointer group ${
