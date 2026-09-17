@@ -109,7 +109,7 @@ export default function BangTinPhuHuynh({
       </div>
     </div>
    )}
-   <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+   <div className="grid grid-cols-2 gap-2 sm:gap-5 items-stretch">
     {/* CỘT 1: TỔNG QUAN HỌC TẬP (Metrics, Bài thi, Kiến thức cần củng cố) */}
     <div className="space-y-4 flex flex-col justify-between">
       {/* 3 THẺ CHỈ SỐ THEO PHONG CÁCH GOOGLE */}
@@ -347,7 +347,7 @@ export default function BangTinPhuHuynh({
        </span>
      </div>
 
-     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-3.5">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3.5">
        {studentToken ? (
          <>
            {/* 1. Xem điểm */}
