@@ -12,7 +12,7 @@ import HocSinhNhanBai from '../components/HocSinhNhanBai'
 // Phần giao bài tập chạy 0% Apps Script: ca và đề đọc từ máy chủ mới, bài giao
 // và bài nộp cũng ở đó.
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { CheckSquare, ClipboardList, RefreshCw, Search, Square, UserCheck, Users, Send, ClipboardCheck, Clock } from 'lucide-react'
+import { CheckSquare, ClipboardList, RefreshCw, Search, Square, UserCheck, Users, Send, ClipboardCheck, Clock, GraduationCap } from 'lucide-react'
 import { OThongBao } from '../components/DesignSystem'
 import { danhSachCa, danhSachEm, khoiTuNamSinh, type CaTomTat, type EmTomTat } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret, loadExamSources } from '../lib/exam-db'
@@ -20,7 +20,6 @@ import { layCauHinhMayChu } from '../lib/may-chu-moi'
 import { luotCuaCaMoi } from '../lib/day-ca-may-chu-moi'
 import { giaoBtvn, theoDoiBtvn, suaGiaoBtvn, type DongTheoDoiBtvn } from '../lib/btvn-may-chu-moi'
 import HopChonDe from '../components/HopChonDe'
-import HangNhomDe from '../components/HangNhomDe'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import type { TeacherExamSource } from '../data/examContent'
 
@@ -131,7 +130,7 @@ export default function PhanCongScreen() {
 
 function TheGiaoBtvn() {
   const [tabBtvn, setTabBtvn] = useState<'giao' | 'theodoi'>('giao')
-  const [cheDo, setCheDo] = useState<'ca' | 'hoc_sinh'>('ca')
+  const [cheDo, setCheDo] = useState<'ca' | 'hoc_sinh' | 'theo_em'>('ca')
   const [dsCa, setDsCa] = useState<CaTomTat[]>([])
   const [dsDe, setDsDe] = useState<DeKho[]>([])
   // TICK NHIỀU CA (thầy chốt 12/09). Một lượt giao ra nhiều lớp, cùng tờ đề,
@@ -143,6 +142,9 @@ function TheGiaoBtvn() {
   // TICK TỪNG HỌC SINH (thầy yêu cầu: thêm lựa chọn giao bài tập về nhà cho từng học sinh,
   // hiển thị ô danh sách học sinh và có ô tick để giao bài tập).
   const [sbdChon, setSbdChon] = useState<Set<string>>(new Set())
+  const [sbdChonTheoEm, setSbdChonTheoEm] = useState<Set<string>>(new Set())
+  const [khoiTheoEm, setKhoiTheoEm] = useState('')
+  const [timKiemTheoEm, setTimKiemTheoEm] = useState('')
   const [dsEm, setDsEm] = useState<EmTomTat[]>([])
   const [luotCacCa, setLuotCacCa] = useState<Record<string, { sbd: string; hoTen: string; diem?: number | null; nopLuc?: string }[]>>({})
   const [dangTaiLuot, setDangTaiLuot] = useState(false)
@@ -156,7 +158,6 @@ function TheGiaoBtvn() {
   // vào ĐÚNG hộp chọn đề đang chạy ở đó (`HopChonDe`). Thầy chốt 12/09: "phần
   // giao btvn tôi muốn hiển thị đúng như trong mở ca".
   const [nguonKho, setNguonKho] = useState<TeacherExamSource[]>([])
-  const [nhomLoc, setNhomLoc] = useState('')
   const [dangNap, setDangNap] = useState(true)
   const [dangGiao, setDangGiao] = useState(false)
   const [bao, setBao] = useState<{ ok: boolean; chu: string } | null>(null)
@@ -320,6 +321,42 @@ function TheGiaoBtvn() {
     })
   }
 
+  const dsHsTheoEmHienThi = useMemo(() => {
+    const norm = (v: string) => v.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').toLowerCase()
+    const q = norm(timKiemTheoEm.trim())
+    return dsEm.filter((e) => {
+      const khoi = khoiTuNamSinh(e.namSinh)
+      const khopKhoi = !khoiTheoEm || khoi === Number(khoiTheoEm) || (e.lop && e.lop.startsWith(khoiTheoEm))
+      const khopTim = !q || norm(`${e.hoTen} ${e.sbd} ${e.lop || ''}`).includes(q)
+      return khopKhoi && khopTim
+    })
+  }, [dsEm, khoiTheoEm, timKiemTheoEm])
+
+  const toggleSbdTheoEm = (sbd: string) => {
+    setSbdChonTheoEm((prev) => {
+      const m = new Set(prev)
+      if (m.has(sbd)) m.delete(sbd)
+      else m.add(sbd)
+      return m
+    })
+  }
+
+  const chonTatCaTheoEm = () => {
+    setSbdChonTheoEm((prev) => {
+      const m = new Set(prev)
+      for (const e of dsHsTheoEmHienThi) m.add(e.sbd)
+      return m
+    })
+  }
+
+  const boChonTheoEm = () => {
+    setSbdChonTheoEm((prev) => {
+      const m = new Set(prev)
+      for (const e of dsHsTheoEmHienThi) m.delete(e.sbd)
+      return m
+    })
+  }
+
   // CHỈ HIỆN NHỮNG TỜ MÁY CHỦ ĐÃ CÓ. Kho trên máy thầy nhiều hơn kho đã chuyển
   // sang máy chủ; cho tick một tờ máy chủ chưa có thì bấm Giao mới báo lỗi —
   // muộn, và thầy không biết vì sao.
@@ -327,10 +364,6 @@ function TheGiaoBtvn() {
   const nguonGiaoDuoc = useMemo(() => nguonKho.filter((s) => maTrenMayChu.has(s.maDe)), [nguonKho, maTrenMayChu])
   const soChuaChuyen = nguonKho.length - nguonGiaoDuoc.length
   const dsDeTach = useMemo(() => tachNhieuTheoPhan(nguonGiaoDuoc), [nguonGiaoDuoc])
-  const dsNhom = useMemo(
-    () => Array.from(new Set(nguonGiaoDuoc.map((c) => (c.nhom || '').trim()).filter(Boolean))).sort(),
-    [nguonGiaoDuoc],
-  )
   // Số câu của đúng những mã đã tick — mã đã tách thì chỉ đếm phần của nó.
   const tongCauDaChon = useMemo(
     () => dsDeTach.filter((d) => daChon.has(d.maDe)).reduce((t, d) => t + d.phanI.length + d.phanII.length + d.phanIII.length, 0),
@@ -361,9 +394,13 @@ function TheGiaoBtvn() {
     try {
       const mat = (await loadTeacherSecret()) ?? ''
       const ch = await layCauHinhMayChu()
-      const dsSbdGui = cheDo === 'hoc_sinh' ? dsTheoLop.map(e=>e.sbd) : undefined
-      if(dsSbdGui&&dsSbdGui.length===0)throw new Error('Chưa có học sinh được chọn.')
-      const dsCaGui = cheDo === 'hoc_sinh' ? [] : [...caChon]
+      const dsSbdGui = cheDo === 'hoc_sinh'
+        ? dsTheoLop.map(e => e.sbd)
+        : cheDo === 'theo_em'
+        ? Array.from(sbdChonTheoEm)
+        : undefined
+      if (dsSbdGui && dsSbdGui.length === 0) throw new Error('Chưa có học sinh được chọn.')
+      const dsCaGui = cheDo === 'hoc_sinh' || cheDo === 'theo_em' ? [] : [...caChon]
       const kq = await giaoBtvn(ch, mat, dsCaGui, [...daChon], dsSbdGui, hanMoi ? new Date(hanMoi).toISOString() : undefined, cheDo === 'ca' && chonRieng ? [...sbdChon] : undefined)
       const boQua = kq.caRong && kq.caRong.length > 0 ? ` Bỏ qua ${kq.caRong.length} ca chưa em nào vào thi: ${kq.caRong.join(', ')}.` : ''
       const noiDungCa = kq.soCa ? ` ở ${kq.soCa} ca` : ''
@@ -460,6 +497,17 @@ function TheGiaoBtvn() {
                   }`}
                 >
                   <UserCheck size={15} /> Gửi theo khối lớp
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCheDo('theo_em')}
+                  className={`text-xs font-bold inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                    cheDo === 'theo_em'
+                      ? 'bg-white dark:bg-slate-700 text-[#1a73e8] dark:text-blue-400 shadow-xs ring-1 ring-black/5'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                  }`}
+                >
+                  <GraduationCap size={15} /> Theo em
                 </button>
               </div>
             </div>
@@ -673,6 +721,113 @@ function TheGiaoBtvn() {
                 </p>
               </div>
             )}
+
+            {/* KHI CHỌN GIAO THEO EM */}
+            {cheDo === 'theo_em' && (
+              <div className="p-3 sm:p-4 rounded-xl border border-blue-200/80 dark:border-blue-800/80 bg-blue-50/30 dark:bg-blue-950/20 space-y-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                      Chọn học sinh nhận bài tập
+                    </div>
+                    <div className="text-[11px] text-slate-500">
+                      Đã chọn: <b className="text-[#1a73e8] dark:text-blue-400 font-bold">{sbdChonTheoEm.size}</b> / {dsEm.length} em
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <button
+                      type="button"
+                      onClick={chonTatCaTheoEm}
+                      className="font-bold text-[#1a73e8] hover:underline cursor-pointer"
+                    >
+                      Chọn tất cả ({dsHsTheoEmHienThi.length})
+                    </button>
+                    <span className="text-slate-300 dark:text-slate-600">|</span>
+                    <button
+                      type="button"
+                      onClick={boChonTheoEm}
+                      className="font-bold text-slate-500 hover:underline cursor-pointer"
+                    >
+                      Bỏ chọn
+                    </button>
+                  </div>
+                </div>
+
+                {/* BỘ LỌC KHỐI LỚP VÀ Ô TÌM KIẾM */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-1" aria-label="Lọc khối lớp">
+                    {['', '10', '11', '12'].map((k) => {
+                      const chon = khoiTheoEm === k
+                      return (
+                        <button
+                          key={k}
+                          type="button"
+                          onClick={() => setKhoiTheoEm(k)}
+                          className={`text-xs font-bold px-3 py-1 rounded-full transition-all cursor-pointer ${
+                            chon
+                              ? 'bg-[#1a73e8] text-white shadow-2xs'
+                              : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
+                          }`}
+                        >
+                          {k ? `Lớp ${k}` : 'Tất cả'}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  <div className="relative flex-1 min-w-[180px]">
+                    <input
+                      type="text"
+                      value={timKiemTheoEm}
+                      onChange={(e) => setTimKiemTheoEm(e.target.value)}
+                      placeholder="Tìm tên hoặc số báo danh…"
+                      className="w-full h-8 pl-8 pr-3 text-xs rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                    <Search size={14} className="absolute left-2.5 top-2 text-slate-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* DANH SÁCH CUỘN HỌC SINH */}
+                {dsHsTheoEmHienThi.length === 0 ? (
+                  <div className="text-xs text-slate-400 py-3 text-center">
+                    {dsEm.length === 0 ? 'Chưa có dữ liệu học sinh.' : 'Không tìm thấy học sinh phù hợp.'}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-56 overflow-y-auto pr-1">
+                    {dsHsTheoEmHienThi.map((e) => {
+                      const tich = sbdChonTheoEm.has(e.sbd)
+                      const khoi = khoiTuNamSinh(e.namSinh)
+                      return (
+                        <button
+                          key={e.sbd}
+                          type="button"
+                          role="checkbox"
+                          aria-checked={tich}
+                          onClick={() => toggleSbdTheoEm(e.sbd)}
+                          className={`p-2 rounded-lg border text-left flex items-center gap-2.5 transition-all text-xs cursor-pointer ${
+                            tich
+                              ? 'bg-blue-50/80 dark:bg-blue-950/40 border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100 font-medium shadow-2xs'
+                              : 'bg-white dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-800'
+                          }`}
+                        >
+                          <span className={tich ? 'text-[#1a73e8] dark:text-blue-400' : 'text-slate-400'}>
+                            {tich ? <CheckSquare size={16} /> : <Square size={16} />}
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="font-bold text-slate-800 dark:text-slate-200 truncate block">
+                              {e.hoTen || `SBD ${e.sbd}`}
+                            </span>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400 block">
+                              #{e.sbd}
+                              {e.lop ? ` · Lớp ${e.lop}` : khoi ? ` · Khối ${khoi}` : ''}
+                            </span>
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* BƯỚC 2: NỘI DUNG BÀI TẬP */}
@@ -695,11 +850,6 @@ function TheGiaoBtvn() {
               )}
             </div>
 
-            {/* DẢI LỌC NHÓM ĐỀ */}
-            <div className="w-full overflow-x-auto pb-1">
-              <HangNhomDe ds={dsNhom} chon={nhomLoc} onChon={setNhomLoc} />
-            </div>
-
             {/* HỘP CHỌN ĐỀ */}
             <div className="w-full overflow-hidden">
               <HopChonDe
@@ -711,7 +861,6 @@ function TheGiaoBtvn() {
                   else m.add(ma)
                   setDaChon(m)
                 }}
-                nhomLoc={nhomLoc}
                 chonNhieu
                 onChonTatCa={(ma) => setDaChon(new Set(ma))}
               />
@@ -755,6 +904,8 @@ function TheGiaoBtvn() {
               <span className="font-bold text-slate-800 dark:text-slate-200">
                 {cheDo === 'ca'
                   ? `Người nhận: ${caChon.size} ca thi ${chonRieng && sbdThem.length > 0 ? `+ ${sbdThem.length} em chọn thêm` : ''}`
+                  : cheDo === 'theo_em'
+                  ? `Người nhận: ${sbdChonTheoEm.size} học sinh đã chọn`
                   : `Người nhận: Lớp ${khoiGui} (${dsTheoLop.length} học sinh)`}
               </span>
               <span className="font-bold text-[#1a73e8] dark:text-blue-400">
@@ -777,6 +928,7 @@ function TheGiaoBtvn() {
                   dangGiao ||
                   (cheDo === 'ca' && caChon.size === 0 && !(chonRieng && sbdChon.size > 0)) ||
                   (cheDo === 'hoc_sinh' && dsTheoLop.length === 0) ||
+                  (cheDo === 'theo_em' && sbdChonTheoEm.size === 0) ||
                   daChon.size === 0
                 }
                 className="flex-1 sm:flex-initial min-h-[46px] px-6 rounded-xl bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold text-sm inline-flex items-center justify-center gap-2 transition-all shadow-xs active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
@@ -788,6 +940,8 @@ function TheGiaoBtvn() {
                   ? 'Tick chọn ít nhất 1 ca'
                   : cheDo === 'hoc_sinh' && dsTheoLop.length === 0
                   ? 'Không có học sinh trong lớp'
+                  : cheDo === 'theo_em' && sbdChonTheoEm.size === 0
+                  ? 'Chọn ít nhất 1 học sinh'
                   : daChon.size === 0
                   ? 'Tick chọn ít nhất 1 tờ đề'
                   : `Giao bài tập về nhà (${tongCauDaChon} câu)`}

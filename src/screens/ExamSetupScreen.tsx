@@ -318,7 +318,7 @@ export default function ExamSetupScreen() {
         // Phạm vi lấy câu sai đi CÙNG cờ chế độ, để máy nào bấm Bắt đầu cũng
         // rút đúng thứ thầy đã chọn lúc mở ca.
         phamViHoiLai: boRut?.phamViHoiLai ?? 'gan_nhat',
-        anHanGiay,
+        anHanGiay: giuDeDoc ? (anHanGiay || 3) : 0,
         matKhau: matKhauCa.trim() || undefined,
         chiNop3PhutCuoi,
       })
@@ -657,7 +657,15 @@ export default function ExamSetupScreen() {
 
             <button
               type="button"
-              onClick={() => setGiuDeDoc((v) => !v)}
+              onClick={() => {
+                setGiuDeDoc((v) => {
+                  const moi = !v
+                  if (moi) {
+                    setAnHanGiay(3)
+                  }
+                  return moi
+                })
+              }}
               className={`tap-target p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-2 active:scale-98 ${
                 giuDeDoc
                   ? 'bg-blue-50/70 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200 shadow-2xs'
@@ -669,7 +677,7 @@ export default function ExamSetupScreen() {
                   <span>👆 Giữ để đọc đề</span>
                 </div>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                  Chống chụp ảnh đề & chia sẻ
+                  Chống chụp ảnh đề & chia sẻ · Mặc định 3s
                 </div>
               </div>
               <span
@@ -679,7 +687,7 @@ export default function ExamSetupScreen() {
                     : 'bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
                 }`}
               >
-                {giuDeDoc ? 'BẬT' : 'TẮT'}
+                {giuDeDoc ? 'BẬT (3s)' : 'TẮT'}
               </span>
             </button>
           </div>

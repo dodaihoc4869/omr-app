@@ -237,63 +237,54 @@ export default function BangTinPhuHuynh({
           }`}
         >
         {/* Header của ô */}
-        <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800/80">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center shrink-0 bg-amber-50 dark:bg-amber-950/60 text-[#d97706] dark:text-[#fdd663] border border-amber-200/60 dark:border-amber-900 shadow-xs">
-              <Target size={22} />
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
-                  Khắc phục luyện đề
-                </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 shrink-0">
-                  4 lựa chọn
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Bấm trực tiếp vào 1 trong 4 lựa chọn để bắt đầu luyện tập:
-              </p>
-            </div>
+        <div className="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-800/80">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center shrink-0 bg-amber-50 dark:bg-amber-950/60 text-[#d97706] dark:text-[#fdd663] border border-amber-200/60 dark:border-amber-900 shadow-xs">
+            <Target size={22} />
           </div>
-
-          <button
-            type="button"
-            onClick={() => onSelectTab?.('khacphuc', 1)}
-            className="hidden sm:flex items-center gap-1 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition shrink-0 cursor-pointer"
-          >
-            <span>Mở giao diện luyện</span>
-            <ChevronRight size={14} />
-          </button>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
+                Khắc phục luyện đề
+              </span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 shrink-0">
+                4 lựa chọn
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Bấm trực tiếp vào 1 trong 4 lựa chọn để bắt đầu luyện tập:
+            </p>
+          </div>
         </div>
 
-        {/* 4 LỰA CHỌN HIỂN THỊ TRỰC TIẾP TRONG Ô */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 pt-3">
+        {/* 4 LỰA CHỌN: 2 Ở TRÊN, 2 Ở DƯỚI — RỘNG RÃI, DỄ CHỌN */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-3.5">
           {/* Card 1: Sửa câu sai */}
           <button
             type="button"
             onClick={() => onSelectTab?.('khacphuc', 1)}
-            className="group/opt text-left p-3 rounded-xl border border-rose-200/80 dark:border-rose-900/50 bg-rose-50/40 dark:bg-rose-950/20 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-xs transition cursor-pointer active:scale-[0.98] flex flex-col justify-between"
+            className="group/opt text-left p-4 sm:p-4.5 rounded-2xl border border-rose-200/90 dark:border-rose-900/60 bg-rose-50/40 dark:bg-rose-950/20 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:border-rose-300 dark:hover:border-rose-600 hover:shadow-sm transition-all cursor-pointer active:scale-[0.98] flex flex-col justify-between"
           >
-            <div className="flex items-start justify-between gap-2">
-              <div className="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-900/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
-                <RotateCcw size={16} />
+            <div>
+              <div className="flex items-start justify-between gap-2">
+                <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-900/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                  <RotateCcw size={18} />
+                </div>
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/70 text-rose-700 dark:text-rose-300">
+                  Trọng tâm
+                </span>
               </div>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300">
-                Trọng tâm
-              </span>
+              <div className="mt-3">
+                <div className="font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover/opt:text-rose-600 dark:group-hover/opt:text-rose-400 transition">
+                  1. Sửa câu sai
+                </div>
+                <div className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                  Rút câu từng làm sai từ các ca thi
+                </div>
+              </div>
             </div>
-            <div className="mt-2.5">
-              <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white group-hover/opt:text-rose-600 dark:group-hover/opt:text-rose-400 transition">
-                1. Sửa câu sai
-              </div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
-                Rút câu từng làm sai từ các ca thi
-              </div>
-            </div>
-            <div className="mt-2.5 pt-2 border-t border-rose-100 dark:border-rose-900/40 flex items-center justify-between text-[11px] font-semibold text-rose-600 dark:text-rose-400">
+            <div className="mt-3.5 pt-2.5 border-t border-rose-100 dark:border-rose-900/50 flex items-center justify-between text-xs sm:text-sm font-semibold text-rose-600 dark:text-rose-400">
               <span>Luyện ngay</span>
-              <ChevronRight size={13} className="group-hover/opt:translate-x-0.5 transition-transform" />
+              <ChevronRight size={15} className="group-hover/opt:translate-x-0.5 transition-transform" />
             </div>
           </button>
 
@@ -301,27 +292,29 @@ export default function BangTinPhuHuynh({
           <button
             type="button"
             onClick={() => onSelectTab?.('khacphuc', 2)}
-            className="group/opt text-left p-3 rounded-xl border border-amber-200/80 dark:border-amber-900/50 bg-amber-50/40 dark:bg-amber-950/20 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:border-amber-300 dark:hover:border-amber-700 hover:shadow-xs transition cursor-pointer active:scale-[0.98] flex flex-col justify-between"
+            className="group/opt text-left p-4 sm:p-4.5 rounded-2xl border border-amber-200/90 dark:border-amber-900/60 bg-amber-50/40 dark:bg-amber-950/20 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:border-amber-300 dark:hover:border-amber-600 hover:shadow-sm transition-all cursor-pointer active:scale-[0.98] flex flex-col justify-between"
           >
-            <div className="flex items-start justify-between gap-2">
-              <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-                <TrendingUp size={16} />
+            <div>
+              <div className="flex items-start justify-between gap-2">
+                <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                  <TrendingUp size={18} />
+                </div>
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/70 text-amber-700 dark:text-amber-300">
+                  Khắc phục
+                </span>
               </div>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300">
-                Khắc phục
-              </span>
+              <div className="mt-3">
+                <div className="font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover/opt:text-amber-600 dark:group-hover/opt:text-amber-400 transition">
+                  2. Dạng câu sai
+                </div>
+                <div className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                  Luyện câu tương tự dạng mất điểm
+                </div>
+              </div>
             </div>
-            <div className="mt-2.5">
-              <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white group-hover/opt:text-amber-600 dark:group-hover/opt:text-amber-400 transition">
-                2. Dạng câu sai
-              </div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
-                Luyện câu tương tự dạng mất điểm
-              </div>
-            </div>
-            <div className="mt-2.5 pt-2 border-t border-amber-100 dark:border-amber-900/40 flex items-center justify-between text-[11px] font-semibold text-amber-600 dark:text-amber-400">
+            <div className="mt-3.5 pt-2.5 border-t border-amber-100 dark:border-amber-900/50 flex items-center justify-between text-xs sm:text-sm font-semibold text-amber-600 dark:text-amber-400">
               <span>Luyện ngay</span>
-              <ChevronRight size={13} className="group-hover/opt:translate-x-0.5 transition-transform" />
+              <ChevronRight size={15} className="group-hover/opt:translate-x-0.5 transition-transform" />
             </div>
           </button>
 
@@ -329,27 +322,29 @@ export default function BangTinPhuHuynh({
           <button
             type="button"
             onClick={() => onSelectTab?.('khacphuc', 3)}
-            className="group/opt text-left p-3 rounded-xl border border-blue-200/80 dark:border-blue-900/50 bg-blue-50/40 dark:bg-blue-950/20 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-xs transition cursor-pointer active:scale-[0.98] flex flex-col justify-between"
+            className="group/opt text-left p-4 sm:p-4.5 rounded-2xl border border-blue-200/90 dark:border-blue-900/60 bg-blue-50/40 dark:bg-blue-950/20 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-sm transition-all cursor-pointer active:scale-[0.98] flex flex-col justify-between"
           >
-            <div className="flex items-start justify-between gap-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-                <BookOpen size={16} />
+            <div>
+              <div className="flex items-start justify-between gap-2">
+                <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                  <BookOpen size={18} />
+                </div>
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/70 text-blue-700 dark:text-blue-300">
+                  Hệ thống
+                </span>
               </div>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300">
-                Hệ thống
-              </span>
+              <div className="mt-3">
+                <div className="font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover/opt:text-blue-600 dark:group-hover/opt:text-blue-400 transition">
+                  3. Dạng bài
+                </div>
+                <div className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                  Chuyên đề theo lớp 10, 11, 12
+                </div>
+              </div>
             </div>
-            <div className="mt-2.5">
-              <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white group-hover/opt:text-blue-600 dark:group-hover/opt:text-blue-400 transition">
-                3. Dạng bài
-              </div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
-                Chuyên đề theo lớp 10, 11, 12
-              </div>
-            </div>
-            <div className="mt-2.5 pt-2 border-t border-blue-100 dark:border-blue-900/40 flex items-center justify-between text-[11px] font-semibold text-blue-600 dark:text-blue-400">
+            <div className="mt-3.5 pt-2.5 border-t border-blue-100 dark:border-blue-900/50 flex items-center justify-between text-xs sm:text-sm font-semibold text-blue-600 dark:text-blue-400">
               <span>Luyện ngay</span>
-              <ChevronRight size={13} className="group-hover/opt:translate-x-0.5 transition-transform" />
+              <ChevronRight size={15} className="group-hover/opt:translate-x-0.5 transition-transform" />
             </div>
           </button>
 
@@ -357,27 +352,29 @@ export default function BangTinPhuHuynh({
           <button
             type="button"
             onClick={() => onSelectTab?.('khacphuc', 4)}
-            className="group/opt text-left p-3 rounded-xl border border-purple-200/80 dark:border-purple-900/50 bg-purple-50/40 dark:bg-purple-950/20 hover:bg-purple-50 dark:hover:bg-purple-950/40 hover:border-purple-300 dark:hover:border-purple-700 hover:shadow-xs transition cursor-pointer active:scale-[0.98] flex flex-col justify-between"
+            className="group/opt text-left p-4 sm:p-4.5 rounded-2xl border border-purple-200/90 dark:border-purple-900/60 bg-purple-50/40 dark:bg-purple-950/20 hover:bg-purple-50 dark:hover:bg-purple-950/40 hover:border-purple-300 dark:hover:border-purple-600 hover:shadow-sm transition-all cursor-pointer active:scale-[0.98] flex flex-col justify-between"
           >
-            <div className="flex items-start justify-between gap-2">
-              <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
-                <Sparkles size={16} />
+            <div>
+              <div className="flex items-start justify-between gap-2">
+                <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                  <Sparkles size={18} />
+                </div>
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/70 text-purple-700 dark:text-purple-300">
+                  Tùy biến
+                </span>
               </div>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300">
-                Tùy biến
-              </span>
+              <div className="mt-3">
+                <div className="font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover/opt:text-purple-600 dark:group-hover/opt:text-purple-400 transition">
+                  4. Tự do
+                </div>
+                <div className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                  Tùy chọn số câu, độ khó & đề mẫu
+                </div>
+              </div>
             </div>
-            <div className="mt-2.5">
-              <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white group-hover/opt:text-purple-600 dark:group-hover/opt:text-purple-400 transition">
-                4. Tự do
-              </div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
-                Tùy chọn số câu, độ khó & đề mẫu
-              </div>
-            </div>
-            <div className="mt-2.5 pt-2 border-t border-purple-100 dark:border-purple-900/40 flex items-center justify-between text-[11px] font-semibold text-purple-600 dark:text-purple-400">
+            <div className="mt-3.5 pt-2.5 border-t border-purple-100 dark:border-purple-900/50 flex items-center justify-between text-xs sm:text-sm font-semibold text-purple-600 dark:text-purple-400">
               <span>Luyện ngay</span>
-              <ChevronRight size={13} className="group-hover/opt:translate-x-0.5 transition-transform" />
+              <ChevronRight size={15} className="group-hover/opt:translate-x-0.5 transition-transform" />
             </div>
           </button>
         </div>
