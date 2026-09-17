@@ -12,7 +12,7 @@ import { Check, RefreshCw, Trash2, ChevronRight, Lock, Unlock, Pencil, LogIn, Ba
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify } from '../engine/score'
-import { danhSachEm, batDauThi, capNhatKeyBank, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
+import { danhSachCa, type CaTomTat, danhSachEm, batDauThi, capNhatKeyBank, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
 import { chuanTenCa, tenHienCua, TEN_CA_TOI_DA } from '../lib/ten-ca'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { emLechDiem, loiBaoLechDiem } from '../lib/lech-diem'
@@ -257,10 +257,30 @@ export default function ExamMonitorScreen() {
     }
   }, [sbdHoSo, scriptUrl, secret])
 
+  const [dsCaGoiY, setDsCaGoiY] = useState<CaTomTat[]>([])
+
   useEffect(() => {
     loadScriptUrl().then(setScriptUrl)
     loadTeacherSecret().then(setSecret)
   }, [])
+
+  useEffect(() => {
+    if (!chiTiet) {
+      Promise.all([loadScriptUrl(), loadTeacherSecret()])
+        .then(([u, m]) => {
+          if (u.trim() && m.trim()) {
+            return danhSachCa(u.trim(), m.trim(), false)
+          }
+          return []
+        })
+        .then((list) => {
+          if (list && list.length > 0) {
+            setDsCaGoiY(list.slice(0, 8))
+          }
+        })
+        .catch(() => {})
+    }
+  }, [chiTiet, scriptUrl, secret])
 
   const tai = async (ma: string, imLang = false) => {
     const url = (scriptUrl || (await loadScriptUrl())).trim()
@@ -302,7 +322,12 @@ export default function ExamMonitorScreen() {
       const drMayChu = (ct.ca as { deRieng?: boolean }).deRieng === true
       setCaCanDeRieng(drMayChu || (await docCheDoDeRieng(ma.trim()).catch(() => false)))
     } catch (e) {
-      setLoi(`Không tải được ca: ${e instanceof Error ? e.message : 'lỗi không rõ'}`)
+      const msg = e instanceof Error ? e.message : 'lỗi không rõ'
+      if (msg.includes('Không tìm thấy ca kiểm tra')) {
+        setLoi(`Không tìm thấy ca kiểm tra #${ma.trim()}. Bạn hãy kiểm tra lại mã ca hoặc chọn từ danh sách ca thi bên dưới.`)
+      } else {
+        setLoi(`Không tải được ca: ${msg}`)
+      }
     } finally {
       setDangTai(false)
     }
@@ -984,13 +1009,62 @@ export default function ExamMonitorScreen() {
           <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Nhập mã ca</div>
           <div className="flex items-center" style={{ gap: 'var(--k3)' }}>
             <input style={{ ...O_NHAP, ...SO }} placeholder="Mã ca (6 số)" value={maCa} onChange={(e) => setMaCa(e.target.value)} inputMode="numeric" onKeyDown={(e) => e.key === 'Enter' && tai(maCa)} />
-            <button type="button" onClick={() => tai(maCa)} disabled={dangTai} className="tap-target shrink-0 font-bold" style={{ height: 52, padding: '0 var(--k5)', borderRadius: 'var(--bo-1)', background: 'var(--muc)', color: 'var(--muc-nguoc)' }}>
+            <button type="button" onClick={() => tai(maCa)} disabled={dangTai} className="tap-target shrink-0 font-bold active:scale-95 transition cursor-pointer" style={{ height: 52, padding: '0 var(--k5)', borderRadius: 'var(--bo-1)', background: 'var(--muc)', color: 'var(--muc-nguoc)' }}>
               {dangTai ? '…' : 'Tải'}
             </button>
           </div>
           {loi && (
             <div style={{ marginTop: 'var(--k3)' }}>
               <OThongBao tone="do">{loi}</OThongBao>
+            </div>
+          )}
+
+          {dsCaGoiY.length > 0 && (
+            <div className="mt-5 pt-4 border-t border-dashed border-slate-200 dark:border-slate-700">
+              <div className="flex items-center justify-between mb-3">
+                <span style={NHAN_NHO} className="font-semibold text-slate-700 dark:text-slate-300">
+                  Hoặc chọn nhanh ca gần đây:
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setScreen('lichsuca')}
+                  className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                >
+                  Xem tất cả ca thi <ChevronRight size={14} />
+                </button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {dsCaGoiY.map((c) => (
+                  <button
+                    key={c.maCa}
+                    type="button"
+                    onClick={() => {
+                      setMaCa(c.maCa)
+                      tai(c.maCa)
+                    }}
+                    className="tap-target flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 text-left transition cursor-pointer active:scale-98"
+                  >
+                    <div className="min-w-0 flex-1 mr-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-sm text-blue-600 dark:text-blue-400">
+                          #{c.maCa}
+                        </span>
+                        {c.lop && (
+                          <span className="px-1.5 py-0.5 rounded text-[11px] font-semibold bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                            {c.lop}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs font-medium text-slate-700 dark:text-slate-200 truncate mt-1">
+                        {c.tenCa || 'Ca kiểm tra'}
+                      </div>
+                    </div>
+                    <Nhan tone={c.trangThai === 'mo' ? 'tim' : 'xam'}>
+                      {c.trangThai === 'mo' ? 'Đang mở' : 'Đã đóng'}
+                    </Nhan>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </TheNoiDung>
