@@ -27,6 +27,8 @@ export default function BangTinPhuHuynh({
   activeTab,
   onSelectTab,
   tabStats,
+  hoTen,
+  lop,
 }:{
   sbd:string;
   onSent:(id?:string)=>void;
@@ -34,6 +36,8 @@ export default function BangTinPhuHuynh({
   activeTab?:string|null;
   onSelectTab?:(tab:string)=>void;
   tabStats?:{diemCount?:number;btvnCount?:number;momCount?:number;wrongCount?:number};
+  hoTen?:string;
+  lop?:string;
 }){
  const [daily,setDaily]=useState<{id:string;submitted_at:string|null}|null>(null)
  const api=useCallback((action:'list'|'assign')=>studentToken?studentNewsApi(action,studentToken):parentNewsApi(action,sbd),[sbd,studentToken])
@@ -49,10 +53,25 @@ export default function BangTinPhuHuynh({
    ? (btvnChuaNop + momChuaNop + deXuatChuaNop)
    : (report?.pending || 0)
 
- return <><BangVinhDanh/><section className="parent-news space-y-5">
+ return <>
+  <BangVinhDanh
+    vaiTro={studentToken ? 'hocsinh' : 'phuhuynh'}
+    hoTen={hoTen}
+    sbd={sbd}
+    lop={lop}
+    tongSoCa={tabStats?.diemCount ?? 0}
+  />
+  <section className="parent-news space-y-5">
   <div className="flex items-start justify-between gap-3"><div><h2 className="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white"><Calendar className="news-accent" size={22}/>{studentToken?'Bảng tin học tập của em':'Bảng tin học tập của con'}</h2><p className="mt-1 text-xs news-muted">Bản tin mới lúc 00:01 mỗi ngày · Giờ Việt Nam</p></div><button type="button" aria-label="Cập nhật bảng tin" onClick={()=>void refresh()} className="news-refresh"><RefreshCw size={18}/></button></div>
   {error&&<p role="alert" className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{error}</p>}
-  {!report?<p className="text-sm news-muted">Đang tổng hợp dữ liệu của con…</p>:<>
+  {!report?(
+    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 p-5 text-center shadow-xs">
+      <div className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400">
+        <RefreshCw size={16} className="animate-spin text-blue-600 dark:text-blue-400" />
+        <span>Đang tổng hợp dữ liệu học tập của con…</span>
+      </div>
+    </div>
+  ):(<>
    <div className="flex flex-wrap justify-between gap-2 text-xs news-muted"><span>Ngày {report.day.split('-').reverse().join('/')}</span><span>Cập nhật {new Date(report.updatedAt).toLocaleTimeString('vi-VN')}</span></div>
    {tongChuaNop > 0 && (
     <div className="news-alert-red" role="alert">
@@ -310,20 +329,21 @@ export default function BangTinPhuHuynh({
             : 'Mỗi ngày gửi một bài theo đề xuất; phụ huynh vẫn có thể tự tạo bài bên dưới.'}
         </p>
       </div>
+     </div>
     </div>
-   </div>
+   </>)}
 
    {/* DANH MỤC CÁC CHỨC NĂNG CHIA 2 CỘT NỔI KHỐI (GOOGLE STYLE) */}
    <div className="pt-4 border-t border-slate-200/80 dark:border-slate-800 space-y-3">
      <div className="flex flex-wrap items-center justify-between gap-2">
        <div className="flex items-center gap-2">
          <div className="w-2.5 h-2.5 rounded-full bg-[#4285f4]" />
-         <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-           {studentToken ? 'Chức năng học tập & Luyện thi' : 'Chức năng đồng hành cùng con'}
+         <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+           {studentToken ? 'Chức năng học tập & Luyện thi' : 'Chức năng đồng hành cùng con (2 ô chọn nhanh)'}
          </h3>
        </div>
-       <span className="text-[11px] font-semibold text-slate-400">
-         Bấm thẻ để mở / đóng chức năng bên dưới
+       <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+         Bấm ô để mở / đóng chi tiết chức năng ở bên dưới
        </span>
      </div>
 
@@ -522,34 +542,39 @@ export default function BangTinPhuHuynh({
            <button
              type="button"
              onClick={() => onSelectTab?.('diem')}
-             className={`p-4 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 ${
+             className={`p-4 sm:p-5 rounded-3xl border-2 text-left transition-all duration-200 cursor-pointer flex flex-col justify-between gap-3 relative overflow-hidden group active:scale-[0.99] ${
                activeTab === 'diem'
-                 ? 'border-2 border-[#1a73e8] bg-blue-50/90 dark:bg-blue-950/80 shadow-md ring-2 ring-blue-400/30'
-                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-blue-300 hover:shadow-xs'
+                 ? 'border-blue-600 bg-blue-50/90 dark:bg-blue-950/80 shadow-md ring-4 ring-blue-400/20'
+                 : 'border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-blue-400 hover:shadow-sm'
              }`}
            >
-             <div className="flex items-center gap-3">
-               <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
-                 activeTab === 'diem' ? 'bg-[#1a73e8] text-white' : 'bg-blue-50 dark:bg-blue-950/60 text-[#1a73e8]'
-               }`}>
-                 <Award size={22} />
-               </div>
-               <div>
-                 <div className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-tight">
-                   Báo Cáo Điểm Các Ca Thi
+             <div className="flex items-start justify-between gap-3 w-full">
+               <div className="flex items-center gap-3">
+                 <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${
+                   activeTab === 'diem' ? 'bg-blue-600 text-white shadow-sm' : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'
+                 }`}>
+                   <Award size={24} />
                  </div>
-                 <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                   Kết quả và chi tiết bài làm con đã nộp
+                 <div>
+                   <h4 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white leading-tight">
+                     Báo Cáo Điểm Các Ca Thi
+                   </h4>
+                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                     Kết quả và chi tiết bài làm con đã nộp
+                   </p>
                  </div>
                </div>
-             </div>
-             <div className="flex flex-col items-end gap-1 shrink-0">
-               <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+               <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900 shrink-0">
                  {tabStats?.diemCount ?? 0} ca thi
                </span>
-               {activeTab === 'diem' && (
-                 <span className="text-[11px] font-bold text-[#1a73e8]">Đang mở ▼</span>
-               )}
+             </div>
+             <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800/80 text-[11px] font-semibold w-full">
+               <span className="text-slate-400 dark:text-slate-500">
+                 {activeTab === 'diem' ? 'Đang mở chi tiết ở bên dưới' : 'Bấm ô để xem danh sách ca thi & điểm số'}
+               </span>
+               <span className={`font-bold flex items-center gap-1 ${activeTab === 'diem' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 group-hover:text-blue-600'}`}>
+                 {activeTab === 'diem' ? 'Đang mở ▼ (Thu gọn)' : 'Mở xem ▼'}
+               </span>
              </div>
            </button>
 
@@ -557,40 +582,46 @@ export default function BangTinPhuHuynh({
            <button
              type="button"
              onClick={() => onSelectTab?.('giaobai')}
-             className={`p-4 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 ${
+             className={`p-4 sm:p-5 rounded-3xl border-2 text-left transition-all duration-200 cursor-pointer flex flex-col justify-between gap-3 relative overflow-hidden group active:scale-[0.99] ${
                activeTab === 'giaobai'
-                 ? 'border-2 border-[#f29900] bg-amber-50/90 dark:bg-amber-950/80 shadow-md ring-2 ring-amber-400/30'
-                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-amber-300 hover:shadow-xs'
+                 ? 'border-amber-500 bg-amber-50/90 dark:bg-amber-950/80 shadow-md ring-4 ring-amber-400/20'
+                 : 'border-amber-300/90 dark:border-amber-700/80 bg-white dark:bg-slate-900 hover:border-amber-500 hover:shadow-sm'
              }`}
            >
-             <div className="flex items-center gap-3">
-               <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
-                 activeTab === 'giaobai' ? 'bg-[#f29900] text-white' : 'bg-amber-50 dark:bg-amber-950/60 text-[#f29900]'
-               }`}>
-                 <Sparkles size={22} />
-               </div>
-               <div>
-                 <div className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-tight">
-                   4 Chế Độ Giao Bài Cho Con
+             <div className="flex items-start justify-between gap-3 w-full">
+               <div className="flex items-center gap-3">
+                 <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${
+                   activeTab === 'giaobai' ? 'bg-amber-500 text-white shadow-sm' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'
+                 }`}>
+                   <Sparkles size={24} />
                  </div>
-                 <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                   Tự chọn, câu sai, chuyên đề, tự do
+                 <div>
+                   <h4 className="font-black text-base sm:text-lg text-amber-700 dark:text-amber-400 uppercase tracking-wide leading-tight flex items-center gap-1.5">
+                     <Sparkles size={16} className="text-amber-500 shrink-0" />
+                     <span>4 CHẾ ĐỘ GIAO BÀI CHO CON</span>
+                   </h4>
+                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                     Hệ thống tự động phân tích và tạo bài luyện khắc phục theo nhu cầu của con
+                   </p>
                  </div>
                </div>
-             </div>
-             <div className="flex flex-col items-end gap-1 shrink-0">
-               <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200">
+               <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900 shrink-0">
                  Hạn 2 tiếng
                </span>
-               {activeTab === 'giaobai' && (
-                 <span className="text-[11px] font-bold text-[#d97706]">Đang mở ▼</span>
-               )}
+             </div>
+             <div className="flex items-center justify-between pt-2.5 border-t border-amber-100 dark:border-amber-900/40 text-[11px] font-semibold w-full">
+               <span className="text-slate-400 dark:text-slate-500">
+                 {activeTab === 'giaobai' ? 'Đang mở chi tiết ở bên dưới' : 'Bấm ô để mở 4 chế độ giao bài cho con'}
+               </span>
+               <span className={`font-bold flex items-center gap-1 ${activeTab === 'giaobai' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500 group-hover:text-amber-600'}`}>
+                 {activeTab === 'giaobai' ? 'Đang mở ▼ (Thu gọn)' : 'Mở giao bài ▼'}
+               </span>
              </div>
            </button>
          </>
        )}
      </div>
    </div>
-  </>}
- </section></>
+ </section>
+ </>
 }

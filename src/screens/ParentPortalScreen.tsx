@@ -9,13 +9,10 @@ import {
   Award,
   Calendar,
   ChevronRight,
-  Sparkles,
   HelpCircle,
   LogOut,
   RefreshCw,
   AlertCircle,
-  Heart,
-  Clock,
   X,
 } from 'lucide-react'
 import LogoApp from '../components/LogoApp'
@@ -70,51 +67,7 @@ export interface BaiMomGiao {
 
 const SBD_STORAGE_KEY = 'omr_ph_sbd'
 
-// Danh sách câu nói tôn vinh cha mẹ - cập nhật khác nhau mỗi ngày lúc 00:01
-const CAU_NOI_TRI_AN_CHA_ME = [
-  { cau: 'Đi khắp thế gian không ai tốt bằng Mẹ, gánh nặng cuộc đời không ai khổ bằng Cha.', tacGia: 'Ca dao Việt Nam' },
-  { cau: 'Tình thương của cha mẹ là ngọn hải đăng soi sáng từng bước chân con trên đường đời.', tacGia: 'Danh ngôn giáo dục' },
-  { cau: 'Bàn tay cha mẹ nâng bước con đi, tình yêu cha mẹ chắp cánh mọi ước mơ thành sự thật.', tacGia: 'Tri ân phụ mẫu' },
-  { cau: 'Không có kỳ quan nào vĩ đại hơn trái tim người mẹ, không có điểm tựa nào vững chãi hơn bờ vai người cha.', tacGia: 'Ngạn ngữ phương Đông' },
-  { cau: 'Mỗi bước con trưởng thành là gom góp bao giọt mồ hôi và tình thương lặng thầm của cha mẹ.', tacGia: 'Tâm tình cha mẹ' },
-  { cau: 'Cơm cha áo mẹ chữ thầy, nghĩ sao cho bõ những ngày ước ao.', tacGia: 'Ca dao Việt Nam' },
-  { cau: 'Tình cha ấm áp như vầng thái dương, lòng mẹ dịu êm như dòng suối mát lành.', tacGia: 'Lời tri ân' },
-  { cau: 'Cha mẹ là bến đỗ bình yên nhất, nơi con luôn tìm thấy sự chở che sau mọi giông bão.', tacGia: 'Danh ngôn cuộc sống' },
-  { cau: 'Những hy sinh thầm lặng của cha mẹ hôm nay chính là nền móng tương lai rạng rỡ của con ngày mai.', tacGia: 'Tri ân gia đình' },
-  { cau: 'Tấm lòng cha mẹ rộng lớn hơn biển cả, sâu thẳm hơn ngàn con suối mát đầu nguồn.', tacGia: 'Ca dao phụ mẫu' },
-  { cau: 'Con dù lớn vẫn là con của mẹ, đi hết đời lòng mẹ vẫn theo con.', tacGia: 'Nhà thơ Chế Lan Viên' },
-  { cau: 'Ơn cha nặng lắm ai ơi, nghĩa mẹ bằng trời chín tháng cưu mang.', tacGia: 'Ca dao Việt Nam' },
-  { cau: 'Phía sau sự nỗ lực của con luôn là ánh mắt dõi theo đầy tin yêu và hy vọng của cha mẹ.', tacGia: 'Tâm tình cha mẹ' },
-  { cau: 'Hạnh phúc lớn nhất của đời người là có cha mẹ dõi theo và đồng hành trên từng chặng đường.', tacGia: 'Danh ngôn phụ mẫu' },
-]
-
-const CAU_NOI_DONG_HANH = [
-  { cau: 'Sự kiên nhẫn và đồng hành của cha mẹ là món quà vô giá, là bệ phóng vững chắc nhất cho con trẻ.', tacGia: 'Tâm lý giáo dục' },
-  { cau: 'Khi cha mẹ trao niềm tin và sự thấu hiểu, con cái sẽ có thêm muôn phần dũng khí chinh phục tri thức.', tacGia: 'Đồng hành cùng con' },
-  { cau: 'Dạy con bằng sự bao dung, động viên con bằng niềm tin - tương lai tươi sáng bắt đầu từ mái ấm.', tacGia: 'Danh ngôn giáo dục' },
-  { cau: 'Không gì tiếp thêm sức mạnh cho con bằng ánh mắt khích lệ và bờ vai ấm áp của cha mẹ.', tacGia: 'Học cách yêu thương' },
-  { cau: 'Cha mẹ là người thầy đầu tiên, vĩ đại nhất và cũng là chỗ dựa bình yên suốt cuộc đời con.', tacGia: 'Ngạn ngữ thế giới' },
-  { cau: 'Mỗi lời động viên kịp thời của cha mẹ là một hạt mầm tự tin nở hoa trong tâm hồn con.', tacGia: 'Nghệ thuật làm cha mẹ' },
-  { cau: 'Đồng hành cùng con không chỉ là chỉ đường, mà là cùng con vượt qua những thử thách đầu đời.', tacGia: 'Đồng hành cùng con' },
-  { cau: 'Thành công của con không chỉ đo bằng điểm số, mà bằng cả hành trình kiên trì cha mẹ đã kề bên.', tacGia: 'Tâm sự phụ huynh' },
-  { cau: 'Một đứa trẻ được cha mẹ lắng nghe và tin tưởng sẽ luôn biết đứng dậy sau mỗi lần vấp ngã.', tacGia: 'Tâm lý học' },
-  { cau: 'Hãy dành cho con tình yêu vô điều kiện và niềm tin trọn vẹn, con sẽ tự tin bay cao bay xa.', tacGia: 'Chắp cánh ước mơ' },
-  { cau: 'Tình yêu thương và sự kiên trì của cha mẹ sẽ cảm hóa và biến mọi khó khăn thành động lực.', tacGia: 'Danh ngôn nuôi dạy con' },
-  { cau: 'Cha mẹ đồng hành là ngọn đuốc thắp sáng con đường tìm kiếm tri thức và tương lai của con.', tacGia: 'Tri ân phụ mẫu' },
-]
-
-function layCauNoiTheoNgay() {
-  const now = new Date()
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000
-  const vn = new Date(utc + 3600000 * 7)
-  const dayNumber = Math.floor(vn.getTime() / (1000 * 60 * 60 * 24))
-  const triAn = CAU_NOI_TRI_AN_CHA_ME[dayNumber % CAU_NOI_TRI_AN_CHA_ME.length]
-  const dongHanh = CAU_NOI_DONG_HANH[(dayNumber + 3) % CAU_NOI_DONG_HANH.length]
-  return { triAn, dongHanh }
-}
-
 export default function ParentPortalScreen() {
-  const { triAn: cauNoiTriAn, dongHanh: cauNoiDongHanh } = layCauNoiTheoNgay()
   const [tabPh, setTabPh] = useState<'diem' | 'giaobai' | null>(null)
   const [sbdInput, setSbdInput] = useState('')
   const [sbdHienTai, setSbdHienTai] = useState<string | null>(null)
@@ -487,99 +440,11 @@ export default function ParentPortalScreen() {
 
       {/* BODY CHÍNH GỒM 2 Ô TRỌNG TÂM */}
       <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6 pb-24">
-        {/* BANNER TÔN VINH CHA MẸ & THÔNG TIN ĐỒNG HÀNH (GOOGLE STYLE 3 PHẦN RIÊNG BIỆT) */}
-        <div className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 shadow-sm relative overflow-hidden p-4 sm:p-5">
-          {/* Vạch 4 màu Google chuẩn */}
-          <div className="h-1 absolute top-0 left-0 right-0 bg-gradient-to-r from-blue-500 via-rose-500 via-amber-400 to-emerald-500" />
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5 sm:gap-4 mt-1">
-            {/* PHẦN 1: THÔNG TIN ĐỒNG HÀNH CÙNG CON (Google Blue) */}
-            <div className="rounded-2xl border-2 border-blue-200/80 dark:border-blue-800/60 bg-gradient-to-br from-blue-50/70 via-white to-indigo-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40 p-4 flex flex-col justify-between shadow-2xs">
-              <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-[11px] font-bold">
-                  <Sparkles size={13} className="text-blue-600 dark:text-blue-400" />
-                  <span>Cổng Đồng Hành Cùng Con</span>
-                </div>
-                <h1 className="text-base sm:text-lg font-black text-slate-900 dark:text-white mt-2.5 leading-snug">
-                  Chào Quý Phụ huynh<br />
-                  <span className="text-blue-600 dark:text-blue-400">của em {hoTenCon || 'học sinh'}!</span>
-                </h1>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
-                  Nơi Phụ huynh xem toàn bộ kết quả ca thi của con và chủ động tạo đề luyện khắc phục lỗi sai dành riêng cho con.
-                </p>
-              </div>
-
-              <div className="mt-3 pt-3 border-t border-blue-100 dark:border-blue-900/60 flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-200">
-                <span className="text-slate-500 dark:text-slate-400 font-medium">Tổng số ca thi:</span>
-                <span className="px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 font-black">
-                  {dsBaiThi.length} ca
-                </span>
-              </div>
-            </div>
-
-            {/* PHẦN 2: TÔN VINH CHA MẸ - TÌNH THƯƠNG BAO LA (Google Red / Rose) */}
-            <div className="rounded-2xl border-2 border-rose-200/80 dark:border-rose-800/60 bg-gradient-to-br from-rose-50/60 via-white to-pink-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-rose-950/40 p-4 flex flex-col justify-between shadow-2xs">
-              <div>
-                <div className="flex items-center justify-between">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 text-[11px] font-bold">
-                    <Heart size={13} className="text-rose-600 dark:text-rose-400" fill="currentColor" />
-                    <span>Lời Tri Ân Cha Mẹ</span>
-                  </div>
-                  <span className="text-[10px] font-semibold text-rose-500 dark:text-rose-400">
-                    00:01 mỗi ngày
-                  </span>
-                </div>
-
-                <div className="mt-2.5 space-y-2">
-                  <p className="text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 italic leading-relaxed">
-                    "{cauNoiTriAn.cau}"
-                  </p>
-                  <p className="text-[11px] font-bold text-rose-600 dark:text-rose-400 text-right">
-                    — {cauNoiTriAn.tacGia}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-3 pt-2.5 border-t border-rose-100 dark:border-rose-900/60 flex items-center gap-1.5 text-[11px] text-rose-700 dark:text-rose-300">
-                <Clock size={12} className="shrink-0" />
-                <span>Cập nhật câu mới mỗi ngày lúc 00:01</span>
-              </div>
-            </div>
-
-            {/* PHẦN 3: TÔN VINH CHA MẸ - ĐỒNG HÀNH & NIỀM TIN (Google Amber / Green) */}
-            <div className="rounded-2xl border-2 border-amber-200/80 dark:border-amber-800/60 bg-gradient-to-br from-amber-50/60 via-white to-yellow-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-amber-950/40 p-4 flex flex-col justify-between shadow-2xs">
-              <div>
-                <div className="flex items-center justify-between">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-200 text-[11px] font-bold">
-                    <Sparkles size={13} className="text-amber-600 dark:text-amber-400" />
-                    <span>Đồng Hành Cùng Con</span>
-                  </div>
-                  <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
-                    Bệ phóng tương lai
-                  </span>
-                </div>
-
-                <div className="mt-2.5 space-y-2">
-                  <p className="text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 italic leading-relaxed">
-                    "{cauNoiDongHanh.cau}"
-                  </p>
-                  <p className="text-[11px] font-bold text-amber-600 dark:text-amber-400 text-right">
-                    — {cauNoiDongHanh.tacGia}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-3 pt-2.5 border-t border-amber-100 dark:border-amber-900/60 flex items-center gap-1.5 text-[11px] text-amber-700 dark:text-amber-300">
-                <Calendar size={12} className="shrink-0" />
-                <span>Tri ân tình thương phụ mẫu · Giờ Việt Nam</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div className="mb-6">
           <BangTinPhuHuynh
             sbd={sbdHienTai}
+            hoTen={hoTenCon}
+            lop={lopCon}
             onSent={() => void napDanhSachMomGiao(sbdHienTai)}
             activeTab={tabPh}
             onSelectTab={(tab) => setTabPh((prev) => (prev === tab ? null : (tab as any)))}

@@ -410,3 +410,43 @@
     display: none;
   }
 }
+
+/* Google 4-color top stripe */
+.honors:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #4285f4 0 25%, #ea4335 25% 50%, #fbbc04 50% 75%, #34a853 75%);
+  border-radius: 4px 4px 0 0;
+  z-index: 5;
+}
+
+/* Gộp 3 ô tôn vinh vào bảng vinh danh chia làm 2 cột */
+.honors-split-2col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+
+@media (min-width: 960px) {
+  .honors-split-2col {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 16px;
+  }
+  .honors-split-2col .honors-col-left {
+    border-right: 1px solid var(--vien);
+    padding-right: 16px;
+  }
+}
+
+.honors-col-quotes {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
