@@ -735,7 +735,7 @@ function TheGiaoBtvn() {
             <div style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)' }}>Bài đã giao</div>
             {bao&&<div role="status"><OThongBao tone={bao.ok?'xanh':'do'}>{bao.chu}</OThongBao></div>}
             {dangSua&&<p role="status">Đang cập nhật bài tập…</p>}
-            <div style={{maxHeight:'75vh',overflowY:'auto',overscrollBehavior:'contain',display:'grid',gap:16,padding:2}}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 items-start" style={{maxHeight:'75vh',overflowY:'auto',overscrollBehavior:'contain',padding:2}}>
             {nhomBtvn(theoDoi).map((t) => (
               <details key={t.maBtvn} style={{ background: 'var(--the-2)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)' }}>
                 <summary className="flex items-center" style={{ cursor:'pointer',justifyContent: 'space-between', gap: 'var(--k2)' }}>

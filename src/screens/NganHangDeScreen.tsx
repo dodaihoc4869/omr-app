@@ -444,7 +444,7 @@ export default function NganHangDeScreen() {
 
       <section className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
         <div className="flex items-center justify-between gap-3 p-4 bg-slate-50 dark:bg-slate-800"><h2 className="font-bold">Danh sách đề</h2><span className="text-sm text-slate-500">{sources.length} đề</span></div>
-        <div role="region" aria-label="Danh sách đề trong ngân hàng" tabIndex={0} className="max-h-[65vh] overflow-y-auto overscroll-contain p-3 space-y-3">
+        <div role="region" aria-label="Danh sách đề trong ngân hàng" tabIndex={0} className="max-h-[65vh] overflow-y-auto overscroll-contain p-3 grid grid-cols-1 md:grid-cols-2 gap-3 items-start">
       {sources.map((s, i) => {
         const nghi = cauNghiCua(s)
         const mo = moDe.has(s.maDe)
