@@ -82,43 +82,7 @@ export default function BangTinPhuHuynh({
       </div>
     </div>
   ):(<>
-   <div className="flex flex-wrap justify-between gap-2 text-xs news-muted"><span>Ngày {report.day.split('-').reverse().join('/')}</span><span>Cập nhật {new Date(report.updatedAt).toLocaleTimeString('vi-VN')}</span></div>
-   {tongChuaNop > 0 && (
-    <div className="news-alert-red" role="alert">
-      <div className="flex items-center gap-2">
-        <AlertTriangle className="news-pending-triangle" size={20} />
-        <span className="font-bold text-sm text-red-600 dark:text-red-400">
-          Cảnh báo: {studentToken ? 'Em còn bài tập chưa hoàn thành' : 'Con còn bài tập chưa hoàn thành'} ({tongChuaNop} câu)
-        </span>
-      </div>
-      <div className="news-alert-lines mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs sm:text-sm font-semibold text-red-800 dark:text-red-200">
-        {btvnChuaNop > 0 && (
-          <span className="inline-flex items-center gap-1.5">
-            <span className="news-alert-dot" />
-            <span>Bài tập về nhà: <b>chưa nộp {btvnChuaNop} câu</b></span>
-          </span>
-        )}
-        {momChuaNop > 0 && (
-          <span className="inline-flex items-center gap-1.5">
-            <span className="news-alert-dot" />
-            <span>Bài tập mom giao: <b>chưa nộp {momChuaNop} câu</b></span>
-          </span>
-        )}
-        {deXuatChuaNop > 0 && (
-          <span className="inline-flex items-center gap-1.5">
-            <span className="news-alert-dot" />
-            <span>Bài tập đề xuất: <b>chưa nộp {deXuatChuaNop} câu</b></span>
-          </span>
-        )}
-        {btvnChuaNop === 0 && momChuaNop === 0 && deXuatChuaNop === 0 && tongChuaNop > 0 && (
-          <span className="inline-flex items-center gap-1.5">
-            <span className="news-alert-dot" />
-            <span>Chưa nộp: <b>{tongChuaNop} câu</b></span>
-          </span>
-        )}
-      </div>
-    </div>
-   )}
+    <div className="flex flex-wrap justify-between gap-2 text-xs news-muted"><span>Ngày {report.day.split('-').reverse().join('/')}</span><span>Cập nhật {new Date(report.updatedAt).toLocaleTimeString('vi-VN')}</span></div>
    {/* BẢNG TIN TỔNG QUAN & GỢI Ý: Trên điện thoại 1 cột rộng rãi, trên máy tính/tablet 2 cột */}
    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 items-stretch">
     {/* CỘT 1: TỔNG QUAN HỌC TẬP (Metrics, Bài thi, Kiến thức cần củng cố) */}
@@ -211,31 +175,313 @@ export default function BangTinPhuHuynh({
         </div>
       )}
 
-      {/* KIẾN THỨC CẦN CỦNG CỐ */}
-      {report.weak.length > 0 && (
-        <div className="rounded-2xl border border-amber-200/70 dark:border-amber-900/40 bg-white dark:bg-slate-900/80 p-3.5 space-y-2 shadow-xs">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900 dark:text-amber-300">
-            <Target size={15} className="text-[#fbbc04]" />
-            <span>Kiến thức cần củng cố ({report.weak.length} chuyên đề)</span>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {report.weak.map((t) => (
-              <span
-                key={t.name}
-                className="inline-flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 border-l-4 border-l-[#fbbc04] rounded-xl px-2.5 py-1 text-xs font-semibold bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-2xs"
-              >
-                <span className="truncate max-w-[180px]">{t.name}</span>
-                <span className="shrink-0 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200">
-                  {t.count} câu
-                </span>
+      {/* HỌC SINH: 6 NÚT CHỨC NĂNG RÚT GỌN (2 HÀNG x 3 CỘT) */}
+      {studentToken && (
+        <div className="space-y-2 pt-1">
+          <div className="flex items-center justify-between gap-2 px-1">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-[#1a73e8]" />
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                Chức năng học tập
               </span>
-            ))}
+            </div>
+            <span className="text-[10px] font-medium text-slate-400">
+              Mở toàn màn hình
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
+            {/* 1. Xem điểm */}
+            <button
+              type="button"
+              onClick={() => onSelectTab?.('diem')}
+              className={`p-2.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
+                activeTab === 'diem'
+                  ? 'border-2 border-[#1a73e8] bg-blue-50 dark:bg-blue-950/80 shadow-sm ring-2 ring-blue-400/30'
+                  : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-blue-300 hover:shadow-xs'
+              }`}
+            >
+              <div className="flex items-center justify-between w-full">
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                  activeTab === 'diem' ? 'bg-[#1a73e8] text-white' : 'bg-blue-50 dark:bg-blue-950/60 text-[#1a73e8]'
+                }`}>
+                  <Award size={17} />
+                </div>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/80 text-blue-800 dark:text-blue-200 tabular-nums">
+                  {tabStats?.diemCount ?? 0} ca
+                </span>
+              </div>
+              <div>
+                <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight truncate group-hover:text-[#1a73e8] transition">
+                  Xem điểm
+                </div>
+                <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                  Lịch sử ca thi
+                </div>
+              </div>
+            </button>
+
+            {/* 2. BTVN */}
+            <button
+              type="button"
+              onClick={() => onSelectTab?.('btvn')}
+              className={`p-2.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
+                activeTab === 'btvn'
+                  ? 'border-2 border-[#1e8e3e] bg-emerald-50 dark:bg-emerald-950/80 shadow-sm ring-2 ring-emerald-400/30'
+                  : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-300 hover:shadow-xs'
+              }`}
+            >
+              <div className="flex items-center justify-between w-full">
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                  activeTab === 'btvn' ? 'bg-[#1e8e3e] text-white' : 'bg-emerald-50 dark:bg-emerald-950/60 text-[#1e8e3e]'
+                }`}>
+                  <BookOpen size={17} />
+                </div>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200 tabular-nums">
+                  {tabStats?.btvnCount ?? 0} bài
+                </span>
+              </div>
+              <div>
+                <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight truncate group-hover:text-[#1e8e3e] transition">
+                  BTVN
+                </div>
+                <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                  Thầy giáo giao
+                </div>
+              </div>
+            </button>
+
+            {/* 3. Bài Mom */}
+            <button
+              type="button"
+              onClick={() => onSelectTab?.('mom')}
+              className={`p-2.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
+                activeTab === 'mom'
+                  ? 'border-2 border-[#d93025] bg-rose-50 dark:bg-rose-950/80 shadow-sm ring-2 ring-rose-400/30'
+                  : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-rose-300 hover:shadow-xs'
+              }`}
+            >
+              <div className="flex items-center justify-between w-full">
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                  activeTab === 'mom' ? 'bg-[#d93025] text-white' : 'bg-rose-50 dark:bg-rose-950/60 text-[#d93025]'
+                }`}>
+                  <Heart size={17} fill="currentColor" />
+                </div>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/80 text-rose-800 dark:text-rose-200 tabular-nums">
+                  {tabStats?.momCount ?? 0} bài
+                </span>
+              </div>
+              <div>
+                <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight truncate group-hover:text-[#d93025] transition">
+                  Bài Mom
+                </div>
+                <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                  Phụ huynh giao
+                </div>
+              </div>
+            </button>
+
+            {/* 4. Luyện đề */}
+            <button
+              type="button"
+              onClick={() => onSelectTab?.('khacphuc')}
+              className={`p-2.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
+                activeTab === 'khacphuc'
+                  ? 'border-2 border-[#f29900] bg-amber-50 dark:bg-amber-950/80 shadow-sm ring-2 ring-amber-400/30'
+                  : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-amber-300 hover:shadow-xs'
+              }`}
+            >
+              <div className="flex items-center justify-between w-full">
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                  activeTab === 'khacphuc' ? 'bg-[#f29900] text-white' : 'bg-amber-50 dark:bg-amber-950/60 text-[#f29900]'
+                }`}>
+                  <Target size={17} />
+                </div>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/80 text-amber-800 dark:text-amber-200 tabular-nums">
+                  {tabStats?.wrongCount ?? 0} câu
+                </span>
+              </div>
+              <div>
+                <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight truncate group-hover:text-[#f29900] transition">
+                  Luyện đề
+                </div>
+                <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                  4 chế độ luyện
+                </div>
+              </div>
+            </button>
+
+            {/* 5. Vào thi */}
+            <button
+              type="button"
+              onClick={() => onSelectTab?.('vaothi')}
+              className={`p-2.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
+                activeTab === 'vaothi'
+                  ? 'border-2 border-[#9334e6] bg-purple-50 dark:bg-purple-950/80 shadow-sm ring-2 ring-purple-400/30'
+                  : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-purple-300 hover:shadow-xs'
+              }`}
+            >
+              <div className="flex items-center justify-between w-full">
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                  activeTab === 'vaothi' ? 'bg-[#9334e6] text-white' : 'bg-purple-50 dark:bg-purple-950/60 text-[#9334e6]'
+                }`}>
+                  <LogIn size={17} />
+                </div>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/80 text-purple-800 dark:text-purple-200">
+                  Online
+                </span>
+              </div>
+              <div>
+                <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight truncate group-hover:text-[#9334e6] transition">
+                  Vào thi
+                </div>
+                <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                  Phòng trực tuyến
+                </div>
+              </div>
+            </button>
+
+            {/* 6. Thần thú */}
+            <button
+              type="button"
+              onClick={() => onSelectTab?.('thanthu')}
+              className={`p-2.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
+                activeTab === 'thanthu'
+                  ? 'border-2 border-[#ea580c] bg-orange-50 dark:bg-orange-950/80 shadow-sm ring-2 ring-orange-400/30'
+                  : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-orange-300 hover:shadow-xs'
+              }`}
+            >
+              <div className="flex items-center justify-between w-full">
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                  activeTab === 'thanthu' ? 'bg-[#ea580c] text-white' : 'bg-orange-50 dark:bg-orange-950/60 text-[#ea580c]'
+                }`}>
+                  <Sparkles size={17} />
+                </div>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/80 text-orange-800 dark:text-orange-200">
+                  8 hệ
+                </span>
+              </div>
+              <div>
+                <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight truncate group-hover:text-[#ea580c] transition">
+                  Thần thú
+                </div>
+                <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                  Leo tháp 8 hệ
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* PHỤ HUYNH: 2 THẺ CHỨC NĂNG HOẠT ĐỘNG CỦA CON CHUYỂN LÊN ĐÂY */}
+      {!studentToken && (
+        <div className="space-y-2 pt-1">
+          <div className="flex items-center justify-between gap-2 px-1">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-[#1a73e8]" />
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                Hoạt động học tập của con
+              </span>
+            </div>
+            <span className="text-[10px] font-medium text-slate-400">
+              Mở toàn màn hình
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+            {/* 1. Ô NHỎ HIỂN THỊ ĐIỂM CỦA CA THI GẦN NHẤT */}
+            <button
+              type="button"
+              onClick={() => onSelectTab?.('diem')}
+              className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 active:scale-[0.98] group shadow-2xs ${
+                activeTab === 'diem'
+                  ? 'border-2 border-[#1a73e8] bg-blue-50/90 dark:bg-blue-950/80 shadow-md ring-2 ring-blue-400/30'
+                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-400 hover:shadow-xs'
+              }`}
+            >
+              <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-blue-50 dark:bg-blue-950/60 text-[#1a73e8] dark:text-[#8ab4f8] border border-blue-200/60 dark:border-blue-900">
+                  <Award size={20} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                      Ca gần nhất
+                    </span>
+                    {latestCa?.maCa ? (
+                      <span className="font-mono text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-200">
+                        #{latestCa.maCa}
+                      </span>
+                    ) : null}
+                  </div>
+                  <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white truncate mt-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
+                    {latestCa?.tenCa || (tabStats?.diemCount ? 'Đã có ca thi' : 'Chưa có ca thi')}
+                  </div>
+                  <div className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold mt-0.5 flex items-center gap-0.5">
+                    <span>Xem điểm tất cả ({tabStats?.diemCount ?? 0})</span>
+                    <ChevronRight size={13} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="shrink-0 text-right pl-2 border-l border-slate-100 dark:border-slate-800">
+                <div className="text-xl sm:text-2xl font-black text-[#1a73e8] dark:text-[#8ab4f8] tabular-nums leading-none">
+                  {latestCa && typeof latestCa.diem === 'number'
+                    ? latestCa.diem.toFixed(2)
+                    : '--'}
+                </div>
+                <div className="text-[9px] font-bold text-slate-400 dark:text-slate-500 mt-1 uppercase">
+                  Điểm số
+                </div>
+              </div>
+            </button>
+
+            {/* 2. NÚT KHẮC PHỤC LUYỆN ĐỀ (4 LỰA CHỌN) */}
+            <button
+              type="button"
+              onClick={() => onSelectTab?.('khacphuc')}
+              className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 active:scale-[0.98] group shadow-2xs ${
+                activeTab === 'khacphuc'
+                  ? 'border-2 border-[#f29900] bg-amber-50/90 dark:bg-amber-950/80 shadow-md ring-2 ring-amber-400/30'
+                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-amber-400 hover:shadow-xs'
+              }`}
+            >
+              <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-amber-50 dark:bg-amber-950/60 text-[#d97706] dark:text-[#fdd663] border border-amber-200/60 dark:border-amber-900">
+                  <Target size={20} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">
+                      Khắc phục luyện đề
+                    </span>
+                    <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200">
+                      4 mục
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                    Rút câu sai · Dạng bài · Tự do
+                  </div>
+                  <div className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold mt-0.5 flex items-center gap-0.5">
+                    <span>Mở 4 lựa chọn</span>
+                    <ChevronRight size={13} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="shrink-0 pl-1">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center shadow-xs transition group-hover:scale-105">
+                  <ChevronRight size={16} />
+                </div>
+              </div>
+            </button>
           </div>
         </div>
       )}
     </div>
 
-    {/* CỘT 2: GỢI Ý HÔM NAY & HÀNH ĐỘNG */}
+    {/* CỘT 2: GỢI Ý HÔM NAY (BAO GỒM CẢNH BÁO VÀ KIẾN THỨC CẦN CỦNG CỐ) */}
     <div className="rounded-2xl border-2 border-blue-200/90 dark:border-blue-800/70 bg-gradient-to-br from-blue-50/70 via-white to-indigo-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/30 p-4 sm:p-5 shadow-sm flex flex-col justify-between h-full space-y-4">
       <div className="space-y-3">
         {/* Header gợi ý */}
@@ -253,35 +499,66 @@ export default function BangTinPhuHuynh({
           </span>
         </div>
 
+        {/* CẢNH BÁO BÀI CHỜ LÀM (NẾU CÓ) */}
+        {tongChuaNop > 0 && (
+          <div className="rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50/90 dark:bg-rose-950/40 p-3 space-y-2 shadow-2xs">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-xs font-bold text-rose-800 dark:text-rose-200">
+                <AlertTriangle size={16} className="text-[#ea4335] shrink-0" />
+                <span>Cảnh báo: {tongChuaNop} bài đang chờ làm</span>
+              </div>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-200/80 dark:bg-rose-900/80 text-rose-900 dark:text-rose-100">
+                Chưa nộp
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-1.5 text-[11px]">
+              {btvnChuaNop > 0 && (
+                <span className="px-2 py-0.5 rounded-lg font-semibold bg-white/80 dark:bg-slate-800/80 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-900/40">
+                  BTVN: <strong>{btvnChuaNop}</strong>
+                </span>
+              )}
+              {momChuaNop > 0 && (
+                <span className="px-2 py-0.5 rounded-lg font-semibold bg-white/80 dark:bg-slate-800/80 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-900/40">
+                  Bài Mom: <strong>{momChuaNop}</strong>
+                </span>
+              )}
+              {deXuatChuaNop > 0 && (
+                <span className="px-2 py-0.5 rounded-lg font-semibold bg-white/80 dark:bg-slate-800/80 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-900/40">
+                  Đề xuất: <strong>{deXuatChuaNop}</strong>
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Trạng thái đề xuất */}
         {daily?.submitted_at ? (
-          <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 flex items-center gap-2 text-sm sm:text-base font-bold shadow-2xs">
+          <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 flex items-center gap-2 text-xs sm:text-sm font-bold shadow-2xs">
             <CheckCircle2 size={18} className="text-[#34a853] shrink-0" />
             <span>Đã hoàn thành bài luyện hôm nay</span>
           </div>
         ) : (
           <div className="space-y-2">
-            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200 flex items-center gap-2 text-sm sm:text-base font-bold shadow-2xs">
-              <AlertCircle size={18} className="text-[#ea4335] shrink-0" />
-              <span>
-                {studentToken
-                  ? 'Chưa hoàn thành bài luyện hôm nay'
-                  : 'Con chưa hoàn thành bài luyện hôm nay'}
-              </span>
+            <div className="p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 text-blue-900 dark:text-blue-100 flex items-center justify-between gap-2 shadow-2xs">
+              <div className="flex items-center gap-2 text-xs sm:text-sm font-bold">
+                <AlertCircle size={16} className="text-[#1a73e8] shrink-0" />
+                <span>
+                  {studentToken
+                    ? 'Chưa hoàn thành bài luyện hôm nay'
+                    : 'Con chưa hoàn thành bài luyện hôm nay'}
+                </span>
+              </div>
+              {report.assignmentCount > 0 && (
+                <span className="shrink-0 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#1a73e8] text-white">
+                  {report.mode}
+                </span>
+              )}
             </div>
-            <div className="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-200">
+            <div className="text-xs font-semibold text-slate-600 dark:text-slate-300 px-1">
               {report.assignmentCount
-                ? `1 bài · tối đa ${report.questionCount} câu · khoảng ${report.minutes} phút`
+                ? `Đề xuất: 1 bài · tối đa ${report.questionCount} câu · khoảng ${report.minutes} phút`
                 : 'Chưa cần giao thêm bài'}
             </div>
-          </div>
-        )}
-
-        {/* Chế độ */}
-        {report.assignmentCount > 0 && !daily?.submitted_at && (
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 dark:bg-blue-950 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-800">
-            <span>Chế độ:</span>
-            <strong className="font-bold">{report.mode}</strong>
           </div>
         )}
 
@@ -291,6 +568,31 @@ export default function BangTinPhuHuynh({
             ? report.reason.replace(/Con/g, 'Em').replace(/con/g, 'em')
             : report.reason}
         </div>
+
+        {/* KIẾN THỨC CẦN CỦNG CỐ CHUYỂN SANG ĐÂY */}
+        {report.weak.length > 0 && (
+          <div className="rounded-xl border border-amber-200/80 dark:border-amber-900/40 bg-amber-50/40 dark:bg-amber-950/20 p-3 space-y-2 shadow-2xs">
+            <div className="flex items-center justify-between text-xs font-bold text-amber-900 dark:text-amber-300">
+              <span className="flex items-center gap-1.5">
+                <Target size={15} className="text-[#fbbc04]" />
+                Kiến thức cần củng cố ({report.weak.length} chuyên đề)
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1">
+              {report.weak.map((t) => (
+                <span
+                  key={t.name}
+                  className="inline-flex items-center gap-1.5 border border-amber-200 dark:border-amber-800/60 rounded-lg px-2 py-0.5 text-xs font-medium bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-2xs"
+                >
+                  <span className="truncate max-w-[150px] sm:max-w-[200px]">{t.name}</span>
+                  <span className="shrink-0 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200">
+                    {t.count} câu
+                  </span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Nút hành động và thông tin */}
@@ -303,7 +605,7 @@ export default function BangTinPhuHuynh({
             !!daily?.submitted_at ||
             (studentToken ? !daily && !report.assignmentCount : !report.assignmentCount)
           }
-          className={`w-full min-h-[48px] py-3 px-4 rounded-xl font-bold text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+          className={`w-full min-h-[44px] sm:min-h-[48px] py-2.5 sm:py-3 px-4 rounded-xl font-bold text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99] ${
             daily?.submitted_at
               ? 'bg-[#34a853] text-white hover:bg-[#2e944b]'
               : 'bg-[#ea4335] text-white hover:bg-[#d93025]'
@@ -340,312 +642,9 @@ export default function BangTinPhuHuynh({
             : 'Mỗi ngày gửi một bài theo đề xuất; phụ huynh vẫn có thể tự tạo bài bên dưới.'}
         </p>
       </div>
-     </div>
     </div>
-   </>)}
-
-   {/* DANH MỤC CHỨC NĂNG HỌC SINH (BẤM VÀO MỞ TOÀN MÀN HÌNH) — PHỤ HUYNH ĐÃ CÓ 2 CỘT HIỆN SẴN Ở DƯỚI */}
-   {studentToken && (
-   <div className="pt-4 border-t border-slate-200/80 dark:border-slate-800 space-y-3">
-     <div className="flex flex-wrap items-center justify-between gap-2">
-       <div className="flex items-center gap-2">
-         <div className="w-2.5 h-2.5 rounded-full bg-[#4285f4]" />
-         <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-           Chức năng học tập & Luyện thi
-         </h3>
-       </div>
-       <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-         Bấm ô để mở toàn màn hình
-       </span>
-     </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
-           {/* 1. Xem điểm */}
-           <button
-             type="button"
-             onClick={() => onSelectTab?.('diem')}
-             className={`p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 ${
-               activeTab === 'diem'
-                 ? 'border-2 border-[#1a73e8] bg-blue-50/90 dark:bg-blue-950/80 shadow-md ring-2 ring-blue-400/30'
-                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-blue-300 hover:shadow-xs'
-             }`}
-           >
-             <div className="flex items-center gap-3">
-               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                 activeTab === 'diem' ? 'bg-[#1a73e8] text-white' : 'bg-blue-50 dark:bg-blue-950/60 text-[#1a73e8]'
-               }`}>
-                 <Award size={20} />
-               </div>
-               <div>
-                 <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">Xem điểm</div>
-                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Báo cáo các ca thi đã nộp</div>
-               </div>
-             </div>
-             <div className="flex flex-col items-end gap-1 shrink-0">
-               <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                 {tabStats?.diemCount ?? 0} ca
-               </span>
-               {activeTab === 'diem' && (
-                 <span className="text-[10px] font-bold text-[#1a73e8]">Đang mở ▼</span>
-               )}
-             </div>
-           </button>
-
-           {/* 2. Bài tập về nhà */}
-           <button
-             type="button"
-             onClick={() => onSelectTab?.('btvn')}
-             className={`p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 ${
-               activeTab === 'btvn'
-                 ? 'border-2 border-[#1e8e3e] bg-emerald-50/90 dark:bg-emerald-950/80 shadow-md ring-2 ring-emerald-400/30'
-                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-300 hover:shadow-xs'
-             }`}
-           >
-             <div className="flex items-center gap-3">
-               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                 activeTab === 'btvn' ? 'bg-[#1e8e3e] text-white' : 'bg-emerald-50 dark:bg-emerald-950/60 text-[#1e8e3e]'
-               }`}>
-                 <BookOpen size={20} />
-               </div>
-               <div>
-                 <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">Bài tập về nhà</div>
-                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Bài tập thầy giáo giao</div>
-               </div>
-             </div>
-             <div className="flex flex-col items-end gap-1 shrink-0">
-               <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200">
-                 {tabStats?.btvnCount ?? 0} bài
-               </span>
-               {activeTab === 'btvn' && (
-                 <span className="text-[10px] font-bold text-[#1e8e3e]">Đang mở ▼</span>
-               )}
-             </div>
-           </button>
-
-           {/* 3. Bài của Mom giao */}
-           <button
-             type="button"
-             onClick={() => onSelectTab?.('mom')}
-             className={`p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 ${
-               activeTab === 'mom'
-                 ? 'border-2 border-[#d93025] bg-rose-50/90 dark:bg-rose-950/80 shadow-md ring-2 ring-rose-400/30'
-                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-rose-300 hover:shadow-xs'
-             }`}
-           >
-             <div className="flex items-center gap-3">
-               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                 activeTab === 'mom' ? 'bg-[#d93025] text-white' : 'bg-rose-50 dark:bg-rose-950/60 text-[#d93025]'
-               }`}>
-                 <Heart size={20} fill="currentColor" />
-               </div>
-               <div>
-                 <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">Bài của Mom giao</div>
-                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Bài luyện phụ huynh giao</div>
-               </div>
-             </div>
-             <div className="flex flex-col items-end gap-1 shrink-0">
-               <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900 text-rose-800 dark:text-rose-200">
-                 {tabStats?.momCount ?? 0} bài
-               </span>
-               {activeTab === 'mom' && (
-                 <span className="text-[10px] font-bold text-[#d93025]">Đang mở ▼</span>
-               )}
-             </div>
-           </button>
-
-           {/* 4. Khắc phục và Luyện đề */}
-           <button
-             type="button"
-             onClick={() => onSelectTab?.('khacphuc')}
-             className={`p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 ${
-               activeTab === 'khacphuc'
-                 ? 'border-2 border-[#f29900] bg-amber-50/90 dark:bg-amber-950/80 shadow-md ring-2 ring-amber-400/30'
-                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-amber-300 hover:shadow-xs'
-             }`}
-           >
-             <div className="flex items-center gap-3">
-               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                 activeTab === 'khacphuc' ? 'bg-[#f29900] text-white' : 'bg-amber-50 dark:bg-amber-950/60 text-[#f29900]'
-               }`}>
-                 <Sparkles size={20} />
-               </div>
-               <div>
-                 <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">Khắc phục & Luyện đề</div>
-                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Sửa câu sai & 4 chế độ luyện</div>
-               </div>
-             </div>
-             <div className="flex flex-col items-end gap-1 shrink-0">
-               <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200">
-                 {tabStats?.wrongCount ?? 0} câu sai
-               </span>
-               {activeTab === 'khacphuc' && (
-                 <span className="text-[10px] font-bold text-[#d97706]">Đang mở ▼</span>
-               )}
-             </div>
-           </button>
-
-           {/* 5. Vào thi */}
-           <button
-             type="button"
-             onClick={() => onSelectTab?.('vaothi')}
-             className={`p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 ${
-               activeTab === 'vaothi'
-                 ? 'border-2 border-[#9334e6] bg-purple-50/90 dark:bg-purple-950/80 shadow-md ring-2 ring-purple-400/30'
-                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-purple-300 hover:shadow-xs'
-             }`}
-           >
-             <div className="flex items-center gap-3">
-               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                 activeTab === 'vaothi' ? 'bg-[#9334e6] text-white' : 'bg-purple-50 dark:bg-purple-950/60 text-[#9334e6]'
-               }`}>
-                 <LogIn size={20} />
-               </div>
-               <div>
-                 <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">Vào thi</div>
-                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Nhập mã phòng & ca trực tuyến</div>
-               </div>
-             </div>
-             <div className="flex flex-col items-end gap-1 shrink-0">
-               <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200">
-                 Trực tuyến
-               </span>
-               {activeTab === 'vaothi' && (
-                 <span className="text-[10px] font-bold text-[#9334e6]">Đang mở ▼</span>
-               )}
-             </div>
-           </button>
-
-           {/* 6. Thần Thú Hóa Học */}
-           <button
-             type="button"
-             onClick={() => onSelectTab?.('thanthu')}
-             className={`p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 ${
-               activeTab === 'thanthu'
-                 ? 'border-2 border-[#ea580c] bg-orange-50/90 dark:bg-orange-950/80 shadow-md ring-2 ring-orange-400/30'
-                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-orange-300 hover:shadow-xs'
-             }`}
-           >
-             <div className="flex items-center gap-3">
-               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                 activeTab === 'thanthu' ? 'bg-[#ea580c] text-white' : 'bg-orange-50 dark:bg-orange-950/60 text-[#ea580c]'
-               }`}>
-                 <Sparkles size={20} />
-               </div>
-               <div>
-                 <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">Thần Thú Hóa Học</div>
-                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Nuôi thú & Leo tháp 8 hệ</div>
-               </div>
-             </div>
-             <div className="flex flex-col items-end gap-1 shrink-0">
-               <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200">
-                 Mới
-               </span>
-               {activeTab === 'thanthu' && (
-                 <span className="text-[10px] font-bold text-[#ea580c]">Đang mở ▼</span>
-               )}
-             </div>
-            </button>
-      </div>
-    </div>
-   )}
-
-   {/* DANH MỤC CHỨC NĂNG PHỤ HUYNH — HIỂN THỊ Ô ĐIỂM GẦN NHẤT & NÚT KHẮC PHỤC LUYỆN ĐỀ (BẤM VÀO BUNG RA FULL MÀN HÌNH) */}
-   {!studentToken && (
-   <div className="pt-4 border-t border-slate-200/80 dark:border-slate-800 space-y-3">
-     <div className="flex flex-wrap items-center justify-between gap-2">
-       <div className="flex items-center gap-2">
-         <div className="w-2.5 h-2.5 rounded-full bg-[#1a73e8]" />
-         <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-           Chức năng học tập của con
-         </h3>
-       </div>
-       <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-         Bấm ô để mở toàn màn hình
-       </span>
-     </div>
-
-     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-       {/* 1. Ô NHỎ HIỂN THỊ ĐIỂM CỦA CA THI GẦN NHẤT */}
-       <button
-         type="button"
-         onClick={() => onSelectTab?.('diem')}
-         className="p-3.5 sm:p-4 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-400 hover:shadow-sm active:scale-[0.99] group shadow-2xs"
-       >
-         <div className="flex items-center gap-3 min-w-0 flex-1">
-           <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 bg-blue-50 dark:bg-blue-950/60 text-[#1a73e8] dark:text-[#8ab4f8] border border-blue-200/60 dark:border-blue-900">
-             <Award size={22} />
-           </div>
-           <div className="min-w-0 flex-1">
-             <div className="flex items-center gap-1.5 flex-wrap">
-               <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                 Ca thi gần nhất
-               </span>
-               {latestCa?.maCa ? (
-                 <span className="font-mono text-[11px] font-bold px-1.5 py-0.2 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-200">
-                   #{latestCa.maCa}
-                 </span>
-               ) : null}
-             </div>
-             <div className="font-bold text-sm text-slate-900 dark:text-white truncate mt-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
-               {latestCa?.tenCa || (tabStats?.diemCount ? 'Đã có ca thi' : 'Chưa có ca thi')}
-             </div>
-             <div className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold mt-0.5 flex items-center gap-1">
-               <span>Bấm xem điểm tất cả ca thi ({tabStats?.diemCount ?? 0})</span>
-               <ChevronRight size={13} />
-             </div>
-           </div>
-         </div>
-
-         <div className="shrink-0 text-right pl-2 border-l border-slate-100 dark:border-slate-800">
-           <div className="text-2xl sm:text-3xl font-black text-[#1a73e8] dark:text-[#8ab4f8] tabular-nums leading-none">
-             {latestCa && typeof latestCa.diem === 'number'
-               ? latestCa.diem.toFixed(2)
-               : '--'}
-           </div>
-           <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mt-1 uppercase">
-             Điểm số
-           </div>
-         </div>
-       </button>
-
-       {/* 2. NÚT KHẮC PHỤC LUYỆN ĐỀ (4 LỰA CHỌN) */}
-       <button
-         type="button"
-         onClick={() => onSelectTab?.('khacphuc')}
-         className="p-3.5 sm:p-4 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-amber-400 hover:shadow-sm active:scale-[0.99] group shadow-2xs"
-       >
-         <div className="flex items-center gap-3 min-w-0 flex-1">
-           <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 bg-amber-50 dark:bg-amber-950/60 text-[#d97706] dark:text-[#fdd663] border border-amber-200/60 dark:border-amber-900">
-             <Target size={22} />
-           </div>
-           <div className="min-w-0 flex-1">
-             <div className="flex items-center gap-1.5">
-               <span className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">
-                 Khắc phục luyện đề
-               </span>
-               <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200">
-                 4 lựa chọn
-               </span>
-             </div>
-             <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-               Rút câu sai · Dạng câu sai · Dạng bài · Tự do
-             </div>
-             <div className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold mt-0.5 flex items-center gap-1">
-               <span>Bấm mở toàn màn hình</span>
-               <ChevronRight size={13} />
-             </div>
-           </div>
-         </div>
-
-         <div className="shrink-0 pl-2">
-           <div className="w-8 h-8 rounded-xl bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center shadow-xs transition group-hover:scale-105">
-             <ChevronRight size={18} />
-           </div>
-         </div>
-       </button>
-     </div>
    </div>
-   )}
+  </>)}
   </section>
   </>
 }
