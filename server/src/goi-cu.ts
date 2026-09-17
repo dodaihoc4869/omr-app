@@ -1,4 +1,5 @@
 import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect} from './btvn-grading'
+import { hopLe3DangChuan } from './loc-cau-chuan'
 // CỔNG TƯƠNG THÍCH `/goi` — CẮT HẲN GOOGLE.
 //
 // Thầy chốt 12/09 rạng sáng: "gỡ sạch google, toàn bộ app phải được chạy trên
@@ -3082,7 +3083,19 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
     }
   })
 
-  return { ok: true, items }
+  // KHÓA VĨNH VIỄN CÂU TỰ LUẬN — CHỈ RÚT 3 DẠNG CHUẨN (I, II, III)
+  const itemsHopLe = items.filter((q) =>
+    hopLe3DangChuan({
+      phan: q.phan,
+      text: q.text,
+      dapAnDung: q.dapAnDung,
+      choices: q.choices,
+      ideas: q.ideas,
+      maDe: q.maCa,
+    })
+  )
+
+  return { ok: true, items: itemsHopLe }
 }
 
 

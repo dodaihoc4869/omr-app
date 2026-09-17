@@ -67,3 +67,30 @@ it('phân tách chi tiết số câu chưa nộp cho BTVN, Mom giao và Đề xu
   expect(r.pending).toBe(15)
   expect(r.pendingDetails).toEqual({btvn:5,mom:4,daily:6})
 })
+
+it('tự động tăng số câu đề xuất lên tối đa 36 câu khi học sinh chăm chỉ / đam mê luyện tập',()=>{
+  // 1 ca hôm nay -> 18 câu
+  const exam1 = [{nop_luc:'2026-09-16T08:00:00Z',tong:8.0}]
+  const r1 = analyzeParent('x',exam1,details,0,now)
+  expect(r1.questionCount).toBe(18)
+
+  // 2 ca hôm nay -> 24 câu
+  const exam2 = [
+    {nop_luc:'2026-09-16T10:00:00Z',tong:8.5},
+    {nop_luc:'2026-09-16T08:00:00Z',tong:7.5}
+  ]
+  const r2 = analyzeParent('x',exam2,details,0,now)
+  expect(r2.questionCount).toBe(24)
+
+  // 4 ca hôm nay -> 36 câu (tối đa)
+  const exam4 = [
+    {nop_luc:'2026-09-16T11:00:00Z',tong:9.0},
+    {nop_luc:'2026-09-16T10:00:00Z',tong:8.5},
+    {nop_luc:'2026-09-16T09:00:00Z',tong:8.0},
+    {nop_luc:'2026-09-16T08:00:00Z',tong:7.5}
+  ]
+  const r4 = analyzeParent('x',exam4,details,0,now)
+  expect(r4.questionCount).toBe(36)
+  expect(r4.reason).toContain('36 câu')
+})
+

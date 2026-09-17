@@ -40,6 +40,7 @@ import { napKhoChoMayEm } from '../lib/kho-cho-may-em'
 import { loadScriptUrl } from '../lib/exam-db'
 import { danhMucDangBai, deTheoDangBai, type LopDangBai, type DangBaiMuc } from '../lib/exam-api'
 import { parseKhoDeJson, buildTeacherSourceFromKhoDe } from '../lib/exam-kho-de-import'
+import { hopLeDeRut } from '../lib/loc-cau-rut'
 
 /**
  * Máy chủ không rút được câu nào cùng dạng với các câu em sai.
@@ -67,7 +68,7 @@ export interface ModalKhacPhucCauSaiProps {
 export default function ModalKhacPhucCauSai({
   isOpen,
   onClose,
-  dsCauSai,
+  dsCauSai: rawDsCauSai,
   hoTen,
   sbd,
   tieuDeCa,
@@ -76,6 +77,18 @@ export default function ModalKhacPhucCauSai({
   onBatDauLamBaiLuyen,
   cheDoMacDinh,
 }: ModalKhacPhucCauSaiProps) {
+  const dsCauSai = useMemo(() => {
+    return (rawDsCauSai || []).filter((c) =>
+      hopLeDeRut({
+        phan: c.phan,
+        maDe: c.maCa,
+        dapAnDung: c.dapAnDung,
+        text: c.text,
+        choices: c.choices || c.ideas,
+      })
+    )
+  }, [rawDsCauSai])
+
   const [cheDo, setCheDo] = useState<1 | 2 | 3 | 4>(cheDoMacDinh ?? (dsCauSai.length ? 1 : 3))
 
   useEffect(() => {

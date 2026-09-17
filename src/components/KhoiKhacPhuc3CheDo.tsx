@@ -36,6 +36,7 @@ import {
 } from '../lib/thuat-toan-rut-cau-sai'
 import { cauLuyenTuNguon, type CauLuyen } from '../lib/bai-tap-pdf'
 import { hopSao } from '../lib/loc-sao'
+import { hopLeDeRut } from '../lib/loc-cau-rut'
 import { normalizeNumericAnswer } from '../engine/score'
 import { loadScriptUrlHoacMacDinh, loadExamSources } from '../lib/exam-db'
 import { layDiaChiMayChu } from '../lib/dia-chi-may-chu'
@@ -247,7 +248,15 @@ export default function KhoiKhacPhuc3CheDo({
           setDsCauSai2([])
           return
         }
-        const dsCauSai = res.items as CauSaiDauVao[]
+        const dsCauSai = (res.items as CauSaiDauVao[]).filter((c) =>
+          hopLeDeRut({
+            phan: c.phan,
+            maDe: c.maCa,
+            dapAnDung: c.dapAnDung,
+            text: c.text,
+            choices: c.choices || c.ideas,
+          })
+        )
         setDsCauSai2(dsCauSai)
         // Bước 2: xin máy chủ gói câu cùng nhãn với các câu sai
         // Thử xin máy chủ trước; nếu không được thì dùng kho local

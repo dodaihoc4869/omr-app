@@ -12,6 +12,7 @@ import { dangCua } from './dang-cau'
 import { hopSao, type LocSaoMoRong } from './loc-sao'
 import { banDoDang, type DangCauKho } from './rut-de-chua'
 import { dungPhieu, type ThongTinPhieu } from './html-phieu'
+import { hopLeDeRut } from './loc-cau-rut'
 
 export interface CauSaiDauVao {
   qid: string
@@ -166,7 +167,16 @@ export function taoDeLamLaiCauSai(
   dsCauSai: CauSaiDauVao[],
   thongTin: { hoTen: string; sbd: string; tenDe?: string }
 ): { html: string; dsCau: CauLuyen[] } {
-  const dsCau = dsCauSai.map(chuyenCauSaiSangCauLuyen)
+  const dsCauHopLe = dsCauSai.filter((c) =>
+    hopLeDeRut({
+      phan: c.phan,
+      maDe: c.maCa,
+      dapAnDung: c.dapAnDung,
+      text: c.text,
+      choices: c.choices || c.ideas,
+    })
+  )
+  const dsCau = dsCauHopLe.map(chuyenCauSaiSangCauLuyen)
   const tt: ThongTinPhieu = {
     hoTen: thongTin.hoTen,
     sbd: thongTin.sbd,
@@ -189,13 +199,22 @@ export function phanTichTyLeDang(
   tongToiDa: number
   tinhSoCauMoiDang: (tongSoCauRut: number) => Map<string, number>
 } {
+  const dsCauSaiHopLe = dsCauSai.filter((c) =>
+    hopLeDeRut({
+      phan: c.phan,
+      maDe: c.maCa,
+      dapAnDung: c.dapAnDung,
+      text: c.text,
+      choices: c.choices || c.ideas,
+    })
+  )
   const banDo = banDoDang(khoDe)
   const tatCaUngVien = cauLuyenTuNguon(khoDe)
-  const qidSaiSet = new Set(dsCauSai.map((c) => c.qid))
+  const qidSaiSet = new Set(dsCauSaiHopLe.map((c) => c.qid))
   const tapUngVienPhanBiet = new Set<string>()
 
   // Chuẩn bị danh sách ứng viên cho từng câu sai theo đúng nhãn dán
-  const thongKe: ThongKeDangCauSai[] = dsCauSai.map((cs) => {
+  const thongKe: ThongKeDangCauSai[] = dsCauSaiHopLe.map((cs) => {
     const nhan = layNhanDanCauSai(cs, banDo)
     // Tìm các câu trong kho có cùng nhãn dán và khác câu sai
     const ungVienCungNhan = tatCaUngVien.filter((cand) => {
@@ -347,12 +366,21 @@ export function phanTichBoLocCau(
   tongToiDa: number
   tinhSoCauMoiDang: (tongSoCauRut: number) => Map<string, number>
 } {
+  const dsCauSaiHopLe = dsCauSai.filter((c) =>
+    hopLeDeRut({
+      phan: c.phan,
+      maDe: c.maCa,
+      dapAnDung: c.dapAnDung,
+      text: c.text,
+      choices: c.choices || c.ideas,
+    })
+  )
   const banDo = banDoDang(khoDe)
   const tatCaUngVien = cauLuyenTuNguon(khoDe)
-  const qidSaiSet = new Set(dsCauSai.map((c) => c.qid))
+  const qidSaiSet = new Set(dsCauSaiHopLe.map((c) => c.qid))
   const tapUngVienPhanBiet = new Set<string>()
 
-  const thongKe: ThongKeDangCauSai[] = dsCauSai.map((cs) => {
+  const thongKe: ThongKeDangCauSai[] = dsCauSaiHopLe.map((cs) => {
     const nhan = layNhanDanCauSai(cs, banDo)
     const ungVienLoc = tatCaUngVien.filter((cand) => {
       if (qidSaiSet.has(cand.id) || cand.id === cs.qid) return false

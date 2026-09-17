@@ -341,9 +341,9 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
       if (luot?.het_gio_luc) {
         const hetGio = new Date(luot.het_gio_luc).getTime()
         const conLaiGiay = Math.round((hetGio - Date.now()) / 1000)
-        // Chỉ nộp trong 3 phút cuối (180 giây), cộng 10 giây độ trễ mạng
-        if (conLaiGiay > 190) {
-          return ra({ ok: false, lyDo: 'chua_den_3_phut_cuoi', error: 'Chỉ được nộp bài trong 3 phút cuối của ca thi' }, 400)
+        // Chỉ nộp trong 1 phút cuối (60 giây), cộng 10 giây độ trễ mạng
+        if (conLaiGiay > 70) {
+          return ra({ ok: false, lyDo: 'chua_den_1_phut_cuoi', error: 'Chỉ được nộp bài trong 1 phút cuối của ca thi' }, 400)
         }
       }
     }

@@ -921,11 +921,11 @@ export default function ExamSetupScreen() {
                 </div>
               </div>
 
-              {/* Chỉ nộp 3 phút cuối */}
+              {/* Chỉ nộp 1 phút cuối */}
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                 <div>
                   <div className="font-bold text-slate-800 dark:text-slate-200">
-                    Chỉ nộp trong 3 phút cuối
+                    Chỉ nộp trong 1 phút cuối
                   </div>
                   <div className="text-[11px] text-slate-400">Tránh học sinh nộp bài vội</div>
                 </div>

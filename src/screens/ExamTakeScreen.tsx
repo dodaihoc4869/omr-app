@@ -2033,8 +2033,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   }
 
   const doSubmit = async (a: ExamAttempt, tuDongNop = false) => {
-    if (!tuDongNop && a.chiNop3PhutCuoi && typeof remaining === 'number' && remaining > 180) {
-      showToast(`Chỉ được nộp bài trong 3 phút cuối của ca thi (còn ${Math.ceil((remaining - 180) / 60)} phút)`, 'warn')
+    if (!tuDongNop && a.chiNop3PhutCuoi && typeof remaining === 'number' && remaining > 60) {
+      showToast(`Chỉ được nộp bài trong 1 phút cuối của ca thi (còn ${Math.ceil((remaining - 60) / 60)} phút)`, 'warn')
       return
     }
     // GIỮ ĐỂ ĐỌC: gộp hai con số đúng lúc này, không rắc dọc đường. Chúng KHÔNG
@@ -3174,8 +3174,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     )
   }
 
-  const camNopSom = Boolean(attempt.chiNop3PhutCuoi && typeof remaining === 'number' && remaining > 180)
-  const giayChoPhepNop = camNopSom ? Math.max(0, Math.floor((remaining ?? 0) - 180)) : 0
+  const camNopSom = Boolean(attempt.chiNop3PhutCuoi && typeof remaining === 'number' && remaining > 60)
+  const giayChoPhepNop = camNopSom ? Math.max(0, Math.floor((remaining ?? 0) - 60)) : 0
   const phutChoPhepNop = Math.floor(giayChoPhepNop / 60)
   const leGiayChoPhepNop = giayChoPhepNop % 60
   const nhanNutNop = camNopSom
@@ -3259,7 +3259,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
             <div style={{ marginTop: 'var(--k4)' }}>
               {camNopSom && (
                 <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--cam)', marginBottom: 'var(--k2)', textAlign: 'center' }}>
-                  Chỉ nộp bài trong 3 phút cuối
+                  Chỉ nộp bài trong 1 phút cuối
                 </div>
               )}
               <NutChinh disabled={camNopSom} onClick={() => { if (!camNopSom) setShowConfirm(true) }}>{nhanNutNop}</NutChinh>
@@ -3275,7 +3275,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           <div style={{ paddingTop: 'var(--k3)' }}>
             {camNopSom && (
               <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--cam)', marginBottom: 'var(--k2)', textAlign: 'center' }}>
-                Chỉ nộp bài trong 3 phút cuối
+                Chỉ nộp bài trong 1 phút cuối
               </div>
             )}
             <NutChinh disabled={camNopSom} onClick={() => { if (!camNopSom) setShowConfirm(true) }}>{nhanNutNop}</NutChinh>
@@ -3322,7 +3322,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
             </div>
             {camNopSom && (
               <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--cam)', marginBottom: 'var(--k2)', textAlign: 'center' }}>
-                Chỉ nộp bài trong 3 phút cuối
+                Chỉ nộp bài trong 1 phút cuối
               </div>
             )}
             <NutChinh

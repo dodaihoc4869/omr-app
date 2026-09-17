@@ -1,6 +1,7 @@
 import type {Env} from './kieu'
 import {hsCauSai} from './goi-cu'
 import {mom} from './mom'
+import {hopLe3DangChuan} from './loc-cau-chuan'
 
 type Row = Record<string, any>
 
@@ -119,17 +120,41 @@ export function analyzeParent(
 
   const duDoanDiem = tinhDuDoanDiem(exams, details, now)
 
-  // THIẾT KẾ KẾ HOẠCH BÀI LUYỆN: Luôn tối thiểu 12 câu để kích thích luyện tập hàng ngày
+  // THIẾT KẾ KẾ HOẠCH BÀI LUYỆN: TỰ ĐỘNG TĂNG CÂU HỎI KHI HỌC SINH ĐAM MÊ LUYỆN TẬP
+  // Mức nền tảng tối thiểu: 12 câu / ngày. Tối đa: 36 câu / ngày.
+  let targetCount = 12
+
+  // Đo mức độ đam mê / chăm chỉ luyện tập của học sinh:
+  if (today.length >= 4) {
+    targetCount = 36
+  } else if (today.length === 3) {
+    targetCount = 30
+  } else if (today.length === 2) {
+    targetCount = 24
+  } else if (today.length === 1) {
+    targetCount = 18
+  } else if (exams.length >= 6 && pending <= 3) {
+    // Học sinh chăm chỉ nộp đều các ngày gần đây và không để tồn đọng bài
+    targetCount = 18
+  }
+
+  // Tăng tối đa 36 câu nếu vừa thi nhiều ca hôm nay vừa có thói quen làm bài tích cực
+  if (today.length >= 2 && exams.length >= 8 && pending === 0) {
+    targetCount = 36
+  }
+
+  // Giới hạn tuyệt đối trong khoảng [12, 36]
+  targetCount = Math.min(36, Math.max(12, targetCount))
+
   // Nếu học sinh còn quá nhiều bài dồn ứ (> 36 câu), tạm hoãn để giải toả tồn đọng.
   const quaTai = pending >= 36
-  const targetCount = 12
 
-  // Phân chia cấu trúc 12 câu theo phương pháp Spaced Repetition & Scaffolding:
-  // 1. Sửa lỗi trọng tâm (khoảng 50-60% target, hoặc toàn bộ câu sai nếu ít)
-  const soCauSuaLoi = Math.min(relevantWrong.length, Math.min(8, Math.round(targetCount * 0.6)))
+  // Phân chia cấu trúc câu theo 3 trụ cột Spaced Repetition & Cognitive Scaffolding:
+  // 1. Sửa lỗi trọng tâm (khoảng 45-50% target, ưu tiên câu cơ bản 1 sao trước để nâng đỡ)
+  const soCauSuaLoi = Math.min(relevantWrong.length, Math.round(targetCount * 0.5))
   const conLai = targetCount - soCauSuaLoi
   // 2. Ôn bài cũ chống quên (Spaced Repetition từ các câu đã làm đúng từ trước)
-  const soCauOnBaiCu = Math.min(relevantCorrect.length, Math.round(conLai * 0.6))
+  const soCauOnBaiCu = Math.min(relevantCorrect.length, Math.round(conLai * 0.5))
   // 3. Tiến bộ dạng mới vừa sức (câu mới thuộc phạm vi của học sinh)
   const soCauTienBo = Math.max(0, conLai - soCauOnBaiCu)
 
@@ -147,8 +172,8 @@ export function analyzeParent(
 
   const mode =
     relevantWrong.length > 0
-      ? 'Khắc phục lỗi sai & Nâng đỡ (12 câu)'
-      : 'Rèn phản xạ & Tiến bộ dạng mới (12 câu)'
+      ? `Khắc phục lỗi sai & Nâng đỡ (${count} câu)`
+      : `Rèn phản xạ & Tiến bộ dạng mới (${count} câu)`
 
   const weak = [...topics]
     .sort((a, b) => b[1] - a[1])
@@ -159,9 +184,11 @@ export function analyzeParent(
   if (quaTai) {
     reason = `Con đang còn ${pending} câu chưa nộp; ưu tiên hoàn thành bài đang chờ để không bị quá tải.`
   } else if (relevantWrong.length > 0) {
-    reason = `Kế hoạch 12 câu hôm nay: ${soCauSuaLoi} câu trọng tâm sửa lỗi chuyên đề (${weak.map((w) => w.name).slice(0, 2).join(', ')}), ${soCauOnBaiCu} câu lặp lại ngắt quãng chống quên, và ${soCauTienBo} câu tiến bộ dạng mới vừa sức.`
+    const damMeNote = targetCount > 12 ? ` (Tự động tăng lên ${targetCount} câu vì con rất chăm chỉ luyện tập)` : ''
+    reason = `Kế hoạch ${targetCount} câu hôm nay${damMeNote}: ${soCauSuaLoi} câu trọng tâm sửa lỗi chuyên đề (${weak.map((w) => w.name).slice(0, 2).join(', ')}), ${soCauOnBaiCu} câu lặp lại ngắt quãng chống quên, và ${soCauTienBo} câu tiến bộ dạng mới vừa sức.`
   } else {
-    reason = `Con đã hoàn thành rất tốt các bài thi! Kế hoạch 12 câu hôm nay áp dụng phương pháp lặp lại ngắt quãng để củng cố phản xạ bài cũ và mở rộng câu mới vừa sức mỗi ngày.`
+    const damMeNote = targetCount > 12 ? ` (Tự động tăng lên ${targetCount} câu vì tinh thần học tập tích cực)` : ''
+    reason = `Con đã hoàn thành rất tốt các bài thi! Kế hoạch ${targetCount} câu hôm nay${damMeNote} áp dụng phương pháp lặp lại ngắt quãng để củng cố phản xạ bài cũ và mở rộng câu mới vừa sức mỗi ngày.`
   }
 
   return {
@@ -273,6 +300,18 @@ async function layCauTuKhoDe(env: Env, slCan = 12): Promise<Row[]> {
         for (const k of ['phanI', 'phanII', 'phanIII']) if (Array.isArray(goi[k])) gom.push(...goi[k])
         for (const c of gom) {
           if (!c || !c.text || !c.dapAnDung) continue
+          if (
+            !hopLe3DangChuan({
+              phan: c.phan || 'I',
+              text: c.text,
+              dapAnDung: c.dapAnDung,
+              choices: c.choices,
+              ideas: c.ideas,
+              maDe: d.ma_de,
+            })
+          ) {
+            continue
+          }
           ra.push({
             id: c.id || c.qid || `${d.ma_de}_${ra.length + 1}`,
             qid: c.id || c.qid || `${d.ma_de}_${ra.length + 1}`,
@@ -298,7 +337,7 @@ export async function parentNews(env: Env, action: string, b: Record<string, unk
   if (!sbd || !(await env.DB.prepare('SELECT sbd FROM hoc_sinh WHERE sbd=?').bind(sbd).first())) {
     throw new Error('Không tìm thấy số báo danh của con.')
   }
-  const { reports, details } = await refreshDailyNews(env, sbd)
+  const { reports } = await refreshDailyNews(env, sbd)
   const report = reports[0]
 
   if (action === 'list') {
@@ -307,7 +346,7 @@ export async function parentNews(env: Env, action: string, b: Record<string, unk
       .all<{ body: string }>()
     const daily = await env.DB.prepare('SELECT id,submitted_at FROM mom_bai WHERE sbd=? AND id=?')
       .bind(sbd, `daily_${report.day}`)
-      .first()
+      .first<{ id: string; submitted_at: string | null }>()
     if (!daily?.submitted_at && report.questionCount > 0 && !report.pendingDetails?.daily) {
       report.pendingDetails = { ...report.pendingDetails, daily: report.questionCount }
       report.pending =
@@ -326,8 +365,20 @@ export async function parentNews(env: Env, action: string, b: Record<string, unk
   const result = await hsCauSai(env, { sbd, chiSai: false, dsMaCa: [] })
   const allExamItems = (result.items || []) as Row[]
 
-  const wrongPool = allExamItems.filter((q) => !q.dungSai && q.text && q.dapAnDung)
-  const correctPool = allExamItems.filter((q) => q.dungSai && q.text && q.dapAnDung)
+  // Lọc sạch 100%, KHÓA VĨNH VIỄN MỌI CÂU TỰ LUẬN, CHỈ GIỮ LẠI 3 DẠNG CHUẨN
+  const allValidItems = allExamItems.filter((q) =>
+    hopLe3DangChuan({
+      phan: q.phan,
+      text: q.text,
+      dapAnDung: q.dapAnDung,
+      choices: q.choices,
+      ideas: q.ideas,
+      maDe: q.maCa,
+    })
+  )
+
+  const wrongPool = allValidItems.filter((q) => !q.dungSai && q.text && q.dapAnDung)
+  const correctPool = allValidItems.filter((q) => q.dungSai && q.text && q.dapAnDung)
 
   // Sắp xếp câu sai theo chuyên đề yếu, ưu tiên câu cơ bản 1 sao trước (nâng đỡ)
   let sortedWrong = spreadTopics(wrongPool, report.weak.map((t) => t.name))
