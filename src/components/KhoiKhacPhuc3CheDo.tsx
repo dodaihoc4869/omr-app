@@ -40,7 +40,7 @@ import type { TeacherExamSource } from '../data/examContent'
 export interface BaiLuyenKhacPhuc {
   id: string
   tieuDe: string
-  cheDo: 1 | 2 | 3
+  cheDo: 1 | 2 | 3 | 4
   createdAt: number
   status: 'active' | 'submitted'
   dsCau: CauLuyen[]
@@ -119,7 +119,7 @@ export default function KhoiKhacPhuc3CheDo({
   dsLichSu,
   scriptUrl: scriptUrlProp,
 }: KhoiKhacPhuc3CheDoProps) {
-  const [cheDo, setCheDo] = useState<1 | 2 | 3>(1)
+  const [cheDo, setCheDo] = useState<1 | 2 | 3 | 4>(1)
   const [dangXuLy, setDangXuLy] = useState(false)
   const [loi, setLoi] = useState('')
 
@@ -133,7 +133,7 @@ export default function KhoiKhacPhuc3CheDo({
     return s
   })
 
-  // Chế độ 3: Theo SGK 10, 11, 12
+  // Chế độ 3: Dạng bài, Chế độ 4: Tự do
   const [dmDangBai, setDmDangBai] = useState<LopDangBai[]>([])
   const [dangTaiDm, setDangTaiDm] = useState(false)
   const [lopChon, setLopChon] = useState('12')
@@ -141,6 +141,7 @@ export default function KhoiKhacPhuc3CheDo({
   const [dangChon, setDangChon] = useState<DangBaiMuc | null>(null)
   const [mucDo, setMucDo] = useState<'ngau_nhien' | 'sao_2' | 'sao_1' | 'ly_thuyet' | 'bai_tap'>('ngau_nhien')
   const [soCauCheDo3, setSoCauCheDo3] = useState<number>(20)
+  const [soCauCheDo4, setSoCauCheDo4] = useState<number>(20)
   const [khoDangBai, setKhoDangBai] = useState<TeacherExamSource[]>([])
   const [dangTaiDang, setDangTaiDang] = useState(false)
 
@@ -262,8 +263,8 @@ export default function KhoiKhacPhuc3CheDo({
     }
   }, [dangChon, scriptUrlProp])
 
-  // Đếm số câu tối đa của dạng đang chọn
-  const boLocCheDo3: BoLocCauLuyen = useMemo(() => {
+  // Chế độ 4: Lọc theo mức độ & thể loại tự do
+  const boLocCheDo4: BoLocCauLuyen = useMemo(() => {
     if (mucDo === 'sao_2') return { sao: 'sao_2', dang: 'tat_ca' }
     if (mucDo === 'sao_1') return { sao: 'sao_1', dang: 'tat_ca' }
     if (mucDo === 'ly_thuyet') return { sao: 'moi', dang: 'ly_thuyet' }
@@ -271,13 +272,22 @@ export default function KhoiKhacPhuc3CheDo({
     return { sao: 'moi', dang: 'tat_ca' }
   }, [mucDo])
 
-  const tongToiDaCheDo3 = useMemo(() => demCauDangBai(khoDangBai, boLocCheDo3), [khoDangBai, boLocCheDo3])
+  // Chế độ 3 (Dạng bài): tính toàn bộ số câu của dạng bài (không lọc)
+  const tongToiDaCheDo3 = useMemo(() => demCauDangBai(khoDangBai), [khoDangBai])
+  // Chế độ 4 (Tự do): tính số câu theo bộ lọc mức độ
+  const tongToiDaCheDo4 = useMemo(() => demCauDangBai(khoDangBai, boLocCheDo4), [khoDangBai, boLocCheDo4])
 
   useEffect(() => {
     if (tongToiDaCheDo3 > 0) {
       setSoCauCheDo3((prev) => Math.min(tongToiDaCheDo3, Math.max(5, Math.min(prev, 50))))
     }
   }, [tongToiDaCheDo3])
+
+  useEffect(() => {
+    if (tongToiDaCheDo4 > 0) {
+      setSoCauCheDo4((prev) => Math.min(tongToiDaCheDo4, Math.max(1, Math.min(prev, 50))))
+    }
+  }, [tongToiDaCheDo4])
 
   // Đồng hồ đếm thời gian cho bài luyện đang làm
   useEffect(() => {
@@ -374,7 +384,7 @@ export default function KhoiKhacPhuc3CheDo({
         setCurrentTest(baiMoi)
         setSeconds(0)
       } else if (cheDo === 3) {
-        // Chế độ 3: Theo SGK 10, 11, 12
+        // Chế độ 3: Dạng bài
         if (!dangChon) {
           setLoi('Vui lòng chọn bài học và dạng bài trước khi bắt đầu.')
           return
@@ -392,18 +402,71 @@ export default function KhoiKhacPhuc3CheDo({
             tenDang: dangChon.ten,
             tenBai: baiChon,
             lop: lopChon,
-          },
-          boLocCheDo3
+          }
         )
         if (dsCau.length === 0) {
-          setLoi('Không tìm thấy câu hỏi phù hợp với bộ lọc đã chọn.')
+          setLoi('Không tìm thấy câu hỏi nào thuộc dạng bài này.')
           return
         }
-        const tieuDe = `Luyện SGK ${lopChon}: ${baiChon} - ${dangChon.ten} (${dsCau.length} câu)`
+        const tieuDe = `Dạng bài: ${dangChon.ten} — Lớp ${lopChon} (${dsCau.length} câu)`
         const baiMoi: BaiLuyenKhacPhuc = {
           id: `kp_${Date.now()}`,
           tieuDe,
           cheDo: 3,
+          createdAt: Date.now(),
+          status: 'active',
+          dsCau,
+          answers: {},
+          score: null,
+          soCauDung: 0,
+          tongSoCau: dsCau.length,
+          submittedAt: null,
+          durationSeconds: 0,
+        }
+        luuHistory([baiMoi, ...history])
+        setCurrentTest(baiMoi)
+        setSeconds(0)
+      } else if (cheDo === 4) {
+        // Chế độ 4: Tự do theo mức độ
+        if (!dangChon) {
+          setLoi('Vui lòng chọn bài học và dạng bài trước khi bắt đầu.')
+          return
+        }
+        if (khoDangBai.length === 0) {
+          setLoi('Dạng bài này chưa có đề trong kho hoặc đang tải. Em thử lại sau giây lát.')
+          return
+        }
+        const { dsCau } = rutLuyenDangBai(
+          khoDangBai,
+          soCauCheDo4,
+          {
+            hoTen,
+            sbd,
+            tenDang: dangChon.ten,
+            tenBai: baiChon,
+            lop: lopChon,
+          },
+          boLocCheDo4
+        )
+        if (dsCau.length === 0) {
+          setLoi('Không tìm thấy câu hỏi phù hợp với mức độ đã chọn.')
+          return
+        }
+        const nhanMuc =
+          mucDo === 'sao_2'
+            ? '2 sao'
+            : mucDo === 'sao_1'
+            ? '1 sao'
+            : mucDo === 'ly_thuyet'
+            ? 'Lý thuyết'
+            : mucDo === 'bai_tap'
+            ? 'Bài tập'
+            : 'Ngẫu nhiên'
+        const tieuDe = `Tự do (${nhanMuc}): ${dangChon.ten} (${dsCau.length} câu)`
+        const baiMoi: BaiLuyenKhacPhuc = {
+          id: `kp_${Date.now()}`,
+          tieuDe,
+          cheDo: 4,
           createdAt: Date.now(),
           status: 'active',
           dsCau,
@@ -621,15 +684,15 @@ export default function KhoiKhacPhuc3CheDo({
       <div>
         <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-lg">
           <Sparkles size={20} />
-          <h2>3 CHẾ ĐỘ KHẮC PHỤC CÂU SAI</h2>
+          <h2>4 CHẾ ĐỘ KHẮC PHỤC CÂU SAI</h2>
         </div>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
           Hệ thống tự động phân tích và tạo bài luyện khắc phục theo nhu cầu của em
         </p>
       </div>
 
-      {/* 3 Nút chọn chế độ */}
-      <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+      {/* 4 Nút chọn chế độ */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
         <button
           onClick={() => {
             setCheDo(1)
@@ -667,7 +730,20 @@ export default function KhoiKhacPhuc3CheDo({
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          3. Theo SGK
+          3. Dạng bài
+        </button>
+        <button
+          onClick={() => {
+            setCheDo(4)
+            setLoi('')
+          }}
+          className={`py-2 px-1 text-center rounded-lg text-xs font-semibold transition cursor-pointer ${
+            cheDo === 4
+              ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          4. Tự do
         </button>
       </div>
 
@@ -799,13 +875,13 @@ export default function KhoiKhacPhuc3CheDo({
         </div>
       )}
 
-      {/* NỘI DUNG CHẾ ĐỘ 3: THEO SGK 10, 11, 12 */}
+      {/* NỘI DUNG CHẾ ĐỘ 3: DẠNG BÀI */}
       {cheDo === 3 && (
         <div className="space-y-3.5">
           {dangTaiDm ? (
             <div className="py-6 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
               <RefreshCw size={16} className="animate-spin text-amber-500" />
-              Đang tải danh mục SGK...
+              Đang tải danh mục dạng bài...
             </div>
           ) : (
             <>
@@ -875,36 +951,7 @@ export default function KhoiKhacPhuc3CheDo({
                 </div>
               )}
 
-              {/* Chọn Mức độ */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  4. Chọn Mức độ:
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs">
-                  {[
-                    { id: 'ngau_nhien', label: 'Ngẫu nhiên' },
-                    { id: 'sao_2', label: '2 sao (Vận dụng)' },
-                    { id: 'sao_1', label: '1 sao (Thông hiểu)' },
-                    { id: 'ly_thuyet', label: 'Lý thuyết' },
-                    { id: 'bai_tap', label: 'Bài tập' },
-                  ].map((m) => (
-                    <button
-                      key={m.id}
-                      type="button"
-                      onClick={() => setMucDo(m.id as any)}
-                      className={`p-2 rounded-xl border text-center font-medium transition cursor-pointer text-[11px] ${
-                        mucDo === m.id
-                          ? 'border-amber-500 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-bold'
-                          : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
-                      }`}
-                    >
-                      {m.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Chọn số câu */}
+              {/* Chọn số câu muốn luyện (Không lọc mức độ) */}
               {tongToiDaCheDo3 > 0 && (
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
@@ -934,7 +981,151 @@ export default function KhoiKhacPhuc3CheDo({
                 ) : (
                   <Play size={16} fill="currentColor" />
                 )}
-                <span>Bắt đầu bài luyện SGK</span>
+                <span>Bắt đầu bài luyện dạng bài</span>
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* NỘI DUNG CHẾ ĐỘ 4: TỰ DO (Tách từ mục 4 của SGK cũ) */}
+      {cheDo === 4 && (
+        <div className="space-y-3.5">
+          {dangTaiDm ? (
+            <div className="py-6 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
+              <RefreshCw size={16} className="animate-spin text-amber-500" />
+              Đang tải dữ liệu...
+            </div>
+          ) : (
+            <>
+              {/* Chọn Lớp 10 / 11 / 12 */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  1. Chọn Lớp:
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {['10', '11', '12'].map((lop) => (
+                    <button
+                      key={lop}
+                      type="button"
+                      onClick={() => handleChonLop(lop)}
+                      className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer ${
+                        lopChon === lop
+                          ? 'border-amber-500 bg-amber-500 text-white'
+                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:border-amber-300'
+                      }`}
+                    >
+                      Lớp {lop}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Chọn Bài SGK */}
+              {baisCuaLop.length > 0 && (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    2. Chọn Bài học SGK:
+                  </label>
+                  <select
+                    value={baiChon}
+                    onChange={(e) => handleChonBai(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  >
+                    {baisCuaLop.map((b) => (
+                      <option key={b.tenBai} value={b.tenBai}>
+                        {b.tenBai} ({b.dangs.length} dạng)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Chọn Dạng bài trọng tâm */}
+              {dangsCuaBai.length > 0 && (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    3. Chọn Dạng toán trọng tâm:
+                  </label>
+                  <select
+                    value={dangChon?.ma || ''}
+                    onChange={(e) => {
+                      const d = dangsCuaBai.find((x) => x.ma === e.target.value) || null
+                      setDangChon(d)
+                    }}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  >
+                    {dangsCuaBai.map((d) => (
+                      <option key={d.ma} value={d.ma}>
+                        {d.ten} ({d.soCau} câu)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* 4. Chọn Mức độ: Tách từ mục 4 cũ */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  4. Chọn Mức độ luyện tập:
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs">
+                  {[
+                    { id: 'ngau_nhien', label: 'Ngẫu nhiên' },
+                    { id: 'sao_2', label: '2 sao (Vận dụng)' },
+                    { id: 'sao_1', label: '1 sao (Thông hiểu)' },
+                    { id: 'ly_thuyet', label: 'Lý thuyết' },
+                    { id: 'bai_tap', label: 'Bài tập' },
+                  ].map((m) => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => setMucDo(m.id as any)}
+                      className={`p-2 rounded-xl border text-center font-medium transition cursor-pointer text-[11px] ${
+                        mucDo === m.id
+                          ? 'border-amber-500 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-bold'
+                          : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
+                      }`}
+                    >
+                      {m.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Chọn số câu */}
+              {tongToiDaCheDo4 > 0 ? (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
+                    <span>Số câu muốn luyện:</span>
+                    <strong className="text-amber-600 dark:text-amber-400 text-sm">
+                      {soCauCheDo4} / {tongToiDaCheDo4} câu
+                    </strong>
+                  </div>
+                  <input
+                    type="range"
+                    min={Math.min(1, tongToiDaCheDo4)}
+                    max={tongToiDaCheDo4}
+                    value={soCauCheDo4}
+                    onChange={(e) => setSoCauCheDo4(Number(e.target.value))}
+                    className="w-full accent-amber-500 cursor-pointer"
+                  />
+                </div>
+              ) : (
+                <p className="text-xs text-slate-400 italic">Dạng này chưa có câu phù hợp với mức độ đã chọn.</p>
+              )}
+
+              <button
+                disabled={dangXuLy || dangTaiDang || !dangChon || tongToiDaCheDo4 === 0}
+                onClick={batDauLamBai}
+                className="w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 transition cursor-pointer"
+              >
+                {dangXuLy || dangTaiDang ? (
+                  <RefreshCw size={16} className="animate-spin" />
+                ) : (
+                  <Play size={16} fill="currentColor" />
+                )}
+                <span>Bắt đầu bài luyện tự do</span>
               </button>
             </>
           )}
