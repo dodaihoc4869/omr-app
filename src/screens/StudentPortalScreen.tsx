@@ -201,7 +201,7 @@ export default function StudentPortalScreen() {
   const [loiDatMatKhau, setLoiDatMatKhau] = useState('')
 
   // Tab
-  const [tab, setTab] = useState<TabType>('diem')
+  const [tab, setTab] = useState<TabType | null>(null)
 
   // Dữ liệu ca thi & điểm
   const [dsLichSu, setDsLichSu] = useState<any[]>([])
@@ -1082,161 +1082,56 @@ export default function StudentPortalScreen() {
         </div>
       </header>
 
-      {auth.token && !dangLamMom && !manThi && tab !== 'thanthu' && <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-5"><BangTinPhuHuynh sbd={auth.sbd} studentToken={auth.token} onSent={(id)=>{void napDsMom();setTab('mom');if(id)void batDauLamBaiMom({id} as BaiMomGiao)}}/></div>}
-      {/* Navigation mục theo phong cách Google Material 3 Segmented Pill Tabs */}
-      <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-5 pb-1">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2.5">
-          <button
-            onClick={() => setTab('diem')}
-            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
-              tab === 'diem'
-                ? 'bg-blue-50 text-blue-900 border-blue-200 dark:bg-blue-950/70 dark:text-blue-200 dark:border-blue-800 shadow-xs'
-                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform ${tab === 'diem' ? 'bg-blue-600 text-white scale-105' : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'}`}>
-                <Award size={18} strokeWidth={tab === 'diem' ? 2.4 : 2} />
-              </div>
-              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'diem' ? 'bg-blue-200/70 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
-                {dsLichSu.length} ca
-              </span>
-            </div>
-            <div>
-              <div className="font-bold text-sm leading-tight">Xem điểm</div>
-              <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'diem' ? 'text-blue-700/80 dark:text-blue-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
-                Báo cáo các ca thi
-              </div>
-            </div>
-          </button>
-
-          <button
-            onClick={() => setTab('btvn')}
-            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
-              tab === 'btvn'
-                ? 'bg-emerald-50 text-emerald-900 border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-200 dark:border-emerald-800 shadow-xs'
-                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform ${tab === 'btvn' ? 'bg-emerald-600 text-white scale-105' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'}`}>
-                <BookOpen size={18} strokeWidth={tab === 'btvn' ? 2.4 : 2} />
-              </div>
-              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'btvn' ? 'bg-emerald-200/70 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
-                {dsBtvn.length} bài
-              </span>
-            </div>
-            <div>
-              <div className="font-bold text-sm leading-tight">Bài tập về nhà</div>
-              <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'btvn' ? 'text-emerald-700/80 dark:text-emerald-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
-                Giao & nộp bài
-              </div>
-            </div>
-          </button>
-
-          <button
-            onClick={() => { setTab('mom'); setDangLamMom(null); }}
-            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
-              tab === 'mom'
-                ? 'bg-rose-50 text-rose-900 border-rose-200 dark:bg-rose-950/70 dark:text-rose-200 dark:border-rose-800 shadow-xs'
-                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform ${tab === 'mom' ? 'bg-rose-600 text-white scale-105' : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'}`}>
-                <Heart size={18} strokeWidth={tab === 'mom' ? 2.4 : 2} />
-              </div>
-              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'mom' ? 'bg-rose-200/70 text-rose-800 dark:bg-rose-900 dark:text-rose-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
-                {dsMomGiao.length} bài
-              </span>
-            </div>
-            <div>
-              <div className="font-bold text-sm leading-tight">Bài của Mom giao</div>
-              <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'mom' ? 'text-rose-700/80 dark:text-rose-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
-                Hạn 2 tiếng (Mom giao)
-              </div>
-            </div>
-          </button>
-
-          <button
-            onClick={() => setTab('khacphuc')}
-            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
-              tab === 'khacphuc'
-                ? 'bg-amber-50 text-amber-900 border-amber-200 dark:bg-amber-950/70 dark:text-amber-200 dark:border-amber-800 shadow-xs'
-                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform ${tab === 'khacphuc' ? 'bg-amber-500 text-white scale-105' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'}`}>
-                <Sparkles size={18} strokeWidth={tab === 'khacphuc' ? 2.4 : 2} />
-              </div>
-              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'khacphuc' ? 'bg-amber-200/70 text-amber-800 dark:bg-amber-900 dark:text-amber-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
-                {tongSoCauSaiDaChon} câu sai
-              </span>
-            </div>
-            <div>
-              <div className="font-bold text-sm leading-tight">Khắc phục và Luyện đề</div>
-              <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'khacphuc' ? 'text-amber-700/80 dark:text-amber-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
-                Tự tạo đề ôn tập
-              </div>
-            </div>
-          </button>
-
-          <button
-            onClick={() => setTab('vaothi')}
-            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
-              tab === 'vaothi'
-                ? 'bg-purple-50 text-purple-900 border-purple-200 dark:bg-purple-950/70 dark:text-purple-200 dark:border-purple-800 shadow-xs'
-                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform ${tab === 'vaothi' ? 'bg-purple-600 text-white scale-105' : 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400'}`}>
-                <LogIn size={18} strokeWidth={tab === 'vaothi' ? 2.4 : 2} />
-              </div>
-              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'vaothi' ? 'bg-purple-200/70 text-purple-800 dark:bg-purple-900 dark:text-purple-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
-                Trực tuyến
-              </span>
-            </div>
-            <div>
-              <div className="font-bold text-sm leading-tight">Vào thi</div>
-              <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'vaothi' ? 'text-purple-700/80 dark:text-purple-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
-                Nhập mã ca & mật khẩu
-              </div>
-            </div>
-          </button>
-
-          {/* TAB 7: THẦN THÚ HÓA HỌC (ALCHEMON) */}
-          <button
-            onClick={() => setTab('thanthu')}
-            className={`p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer ${
-              tab === 'thanthu'
-                ? 'bg-amber-50 text-amber-900 border-amber-300 dark:bg-amber-950/70 dark:text-amber-200 dark:border-amber-700 shadow-xs'
-                : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform ${tab === 'thanthu' ? 'bg-amber-500 text-white scale-105 shadow-sm' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'}`}>
-                <Sparkles size={18} strokeWidth={tab === 'thanthu' ? 2.4 : 2} />
-              </div>
-              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tab === 'thanthu' ? 'bg-amber-200/80 text-amber-900 dark:bg-amber-900 dark:text-amber-200' : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-900/60 animate-pulse'}`}>
-                Mới
-              </span>
-            </div>
-            <div>
-              <div className="font-bold text-sm leading-tight text-amber-900 dark:text-amber-300">Thần Thú Hóa Học</div>
-              <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'thanthu' ? 'text-amber-700/90 dark:text-amber-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
-                Nuôi thú & Leo tháp
-              </div>
-            </div>
-          </button>
+      {auth.token && !dangLamMom && !manThi && (
+        <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-5">
+          <BangTinPhuHuynh
+            sbd={auth.sbd}
+            studentToken={auth.token}
+            onSent={(id) => {
+              void napDsMom()
+              setTab('mom')
+              if (id) void batDauLamBaiMom({ id } as BaiMomGiao)
+            }}
+            activeTab={tab}
+            onSelectTab={(k) => setTab((prev) => (prev === k ? null : (k as TabType)))}
+            tabStats={{
+              diemCount: dsLichSu.length,
+              btvnCount: dsBtvn.length,
+              momCount: dsMomGiao.length,
+              wrongCount: tongSoCauSaiDaChon,
+            }}
+          />
         </div>
-      </div>
+      )}
 
-      {/* Main Content Area */}
-      <main className="max-w-6xl mx-auto w-full px-4 sm:px-6 py-6 flex-1">
-        {/* TAB 1: XEM ĐIỂM */}
-        {tab === 'diem' && (
+      {/* Main Content Area: Chỉ mở ra khi học sinh bấm vào thẻ chức năng */}
+      {tab !== null && (
+        <main className="max-w-6xl mx-auto w-full px-4 sm:px-6 py-6 flex-1 animate-google-fade">
+          {/* Thanh tiêu đề chức năng đang mở & Nút thu gọn */}
+          <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 mb-5">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#1a73e8]" />
+              <span className="font-bold text-sm text-slate-800 dark:text-slate-200">
+                {tab === 'diem' && 'Chi tiết: Xem Điểm & Lịch Sử Ca Thi'}
+                {tab === 'btvn' && 'Chi tiết: Bài Tập Về Nhà'}
+                {tab === 'mom' && 'Chi tiết: Bài Của Mom Giao (Hạn 2 tiếng)'}
+                {tab === 'khacphuc' && 'Chi tiết: Khắc Phục Lỗi Sai & Luyện Đề'}
+                {tab === 'vaothi' && 'Chi tiết: Vào Phòng Thi Trực Tuyến'}
+                {tab === 'thanthu' && 'Chi tiết: Thần Thú Hóa Học (Alchemon)'}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setTab(null)}
+              className="px-3 py-1 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-rose-100 hover:text-rose-700 dark:hover:bg-rose-950 dark:hover:text-rose-300 text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+            >
+              <X size={14} />
+              <span>Thu gọn ✕</span>
+            </button>
+          </div>
+
+          {/* TAB 1: XEM ĐIỂM */}
+          {tab === 'diem' && (
           <div className="space-y-4 animate-google-fade">
             <div className="flex items-center justify-between">
               <div>
@@ -1901,6 +1796,7 @@ export default function StudentPortalScreen() {
           </KhungThanThuToanManHinh>
         )}
       </main>
+      )}
 
       {/* XEM ĐỀ VÀ LỜI GIẢI NGAY TRONG APP.
           Trước đây bấm là điều hướng thẳng sang /t/<mã ca>, tức nhảy hẳn khỏi

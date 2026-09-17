@@ -13,13 +13,32 @@ import {
   CheckCircle2,
   Target,
   Info,
+  Award,
+  BookOpen,
+  Heart,
+  LogIn,
+  AlertCircle,
 } from 'lucide-react'
 type Report={day:string;updatedAt:string;today:{tenCa:string;diem:number|null;nopLuc:string}[];weak:{name:string;count:number}[];wrong:number;pending:number;pendingDetails?:{btvn:number;mom:number;daily:number};questionCount:number;assignmentCount:number;minutes:number;mode:string;reason:string}
-export default function BangTinPhuHuynh({sbd,onSent,studentToken}:{sbd:string;onSent:(id?:string)=>void;studentToken?:string}){
+export default function BangTinPhuHuynh({
+  sbd,
+  onSent,
+  studentToken,
+  activeTab,
+  onSelectTab,
+  tabStats,
+}:{
+  sbd:string;
+  onSent:(id?:string)=>void;
+  studentToken?:string;
+  activeTab?:string|null;
+  onSelectTab?:(tab:string)=>void;
+  tabStats?:{diemCount?:number;btvnCount?:number;momCount?:number;wrongCount?:number};
+}){
  const [daily,setDaily]=useState<{id:string;submitted_at:string|null}|null>(null)
  const api=useCallback((action:'list'|'assign')=>studentToken?studentNewsApi(action,studentToken):parentNewsApi(action,sbd),[sbd,studentToken])
- const [report,setReport]=useState<Report|null>(null),[history,setHistory]=useState<Report[]>([]),[error,setError]=useState(''),[sending,setSending]=useState(false),[sent,setSent]=useState('')
- const refresh=useCallback(async()=>{try{const r=await api('list');setReport(r.report);setDaily(r.daily||null);setHistory(r.history);setError('')}catch(e){setError(e instanceof Error?e.message:'Chưa cập nhật được dữ liệu.')}},[api])
+ const [report,setReport]=useState<Report|null>(null),[error,setError]=useState(''),[sending,setSending]=useState(false),[sent,setSent]=useState('')
+ const refresh=useCallback(async()=>{try{const r=await api('list');setReport(r.report);setDaily(r.daily||null);setError('')}catch(e){setError(e instanceof Error?e.message:'Chưa cập nhật được dữ liệu.')}},[api])
  useEffect(()=>{setReport(null);setSent('');void refresh();const poll=()=>{if(!document.hidden)void refresh()};const t=setInterval(poll,15000);window.addEventListener('focus',poll);window.addEventListener('online',poll);return()=>{clearInterval(t);window.removeEventListener('focus',poll);window.removeEventListener('online',poll)}},[refresh])
  async function assign(){setSending(true);setError('');try{const r=await api('assign');setSent(r.alreadySent?'Bài theo đề xuất hôm nay đã được gửi. Không tạo thêm bài trùng.':`Đã gửi 1 bài gồm ${r.questionCount} câu sang app của con.`);onSent(r.id);await refresh()}catch(e){setError(e instanceof Error?e.message:'Chưa gửi được bài.')}finally{setSending(false)}}
 
@@ -206,15 +225,25 @@ export default function BangTinPhuHuynh({sbd,onSent,studentToken}:{sbd:string;on
 
         {/* Trạng thái đề xuất */}
         {daily?.submitted_at ? (
-          <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 flex items-center gap-2 text-sm sm:text-base font-bold">
+          <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 flex items-center gap-2 text-sm sm:text-base font-bold shadow-2xs">
             <CheckCircle2 size={18} className="text-[#34a853] shrink-0" />
             <span>Đã hoàn thành bài luyện hôm nay</span>
           </div>
         ) : (
-          <div className="text-base sm:text-lg font-black text-slate-900 dark:text-white leading-snug">
-            {report.assignmentCount
-              ? `1 bài · tối đa ${report.questionCount} câu · khoảng ${report.minutes} phút`
-              : 'Chưa cần giao thêm bài'}
+          <div className="space-y-2">
+            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200 flex items-center gap-2 text-sm sm:text-base font-bold shadow-2xs">
+              <AlertCircle size={18} className="text-[#ea4335] shrink-0" />
+              <span>
+                {studentToken
+                  ? 'Chưa hoàn thành bài luyện hôm nay'
+                  : 'Con chưa hoàn thành bài luyện hôm nay'}
+              </span>
+            </div>
+            <div className="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-200">
+              {report.assignmentCount
+                ? `1 bài · tối đa ${report.questionCount} câu · khoảng ${report.minutes} phút`
+                : 'Chưa cần giao thêm bài'}
+            </div>
           </div>
         )}
 
@@ -247,7 +276,7 @@ export default function BangTinPhuHuynh({sbd,onSent,studentToken}:{sbd:string;on
           className={`w-full min-h-[48px] py-3 px-4 rounded-xl font-bold text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
             daily?.submitted_at
               ? 'bg-[#34a853] text-white hover:bg-[#2e944b]'
-              : 'bg-[#1a73e8] text-white hover:bg-[#1557b0]'
+              : 'bg-[#ea4335] text-white hover:bg-[#d93025]'
           }`}
         >
           {daily?.submitted_at ? (
@@ -258,14 +287,12 @@ export default function BangTinPhuHuynh({sbd,onSent,studentToken}:{sbd:string;on
           <span>
             {sending
               ? 'Đang tạo và gửi bài…'
-              : studentToken
-              ? daily?.submitted_at
-                ? 'Đã hoàn thành bài hôm nay'
-                : daily
-                ? 'Tiếp tục bài hôm nay'
-                : 'Bắt đầu bài luyện hôm nay'
               : daily?.submitted_at
               ? 'Đã hoàn thành bài hôm nay'
+              : studentToken
+              ? daily
+                ? 'Tiếp tục bài hôm nay'
+                : 'Bắt đầu bài luyện hôm nay'
               : 'Giao bài theo đề xuất'}
           </span>
         </button>
@@ -285,7 +312,285 @@ export default function BangTinPhuHuynh({sbd,onSent,studentToken}:{sbd:string;on
       </div>
     </div>
    </div>
+
+   {/* DANH MỤC CÁC CHỨC NĂNG CHIA 2 CỘT NỔI KHỐI (GOOGLE STYLE) */}
+   <div className="pt-4 border-t border-slate-200/80 dark:border-slate-800 space-y-3">
+     <div className="flex flex-wrap items-center justify-between gap-2">
+       <div className="flex items-center gap-2">
+         <div className="w-2.5 h-2.5 rounded-full bg-[#4285f4]" />
+         <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+           {studentToken ? 'Chức năng học tập & Luyện thi' : 'Chức năng đồng hành cùng con'}
+         </h3>
+       </div>
+       <span className="text-[11px] font-semibold text-slate-400">
+         Bấm thẻ để mở / đóng chức năng bên dưới
+       </span>
+     </div>
+
+     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-3.5">
+       {studentToken ? (
+         <>
+           {/* 1. Xem điểm */}
+           <button
+             type="button"
+             onClick={() => onSelectTab?.('diem')}
+             className={`p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 ${
+               activeTab === 'diem'
+                 ? 'border-2 border-[#1a73e8] bg-blue-50/90 dark:bg-blue-950/80 shadow-md ring-2 ring-blue-400/30'
+                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-blue-300 hover:shadow-xs'
+             }`}
+           >
+             <div className="flex items-center gap-3">
+               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                 activeTab === 'diem' ? 'bg-[#1a73e8] text-white' : 'bg-blue-50 dark:bg-blue-950/60 text-[#1a73e8]'
+               }`}>
+                 <Award size={20} />
+               </div>
+               <div>
+                 <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">Xem điểm</div>
+                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Báo cáo các ca thi đã nộp</div>
+               </div>
+             </div>
+             <div className="flex flex-col items-end gap-1 shrink-0">
+               <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                 {tabStats?.diemCount ?? 0} ca
+               </span>
+               {activeTab === 'diem' && (
+                 <span className="text-[10px] font-bold text-[#1a73e8]">Đang mở ▼</span>
+               )}
+             </div>
+           </button>
+
+           {/* 2. Bài tập về nhà */}
+           <button
+             type="button"
+             onClick={() => onSelectTab?.('btvn')}
+             className={`p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 ${
+               activeTab === 'btvn'
+                 ? 'border-2 border-[#1e8e3e] bg-emerald-50/90 dark:bg-emerald-950/80 shadow-md ring-2 ring-emerald-400/30'
+                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-300 hover:shadow-xs'
+             }`}
+           >
+             <div className="flex items-center gap-3">
+               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                 activeTab === 'btvn' ? 'bg-[#1e8e3e] text-white' : 'bg-emerald-50 dark:bg-emerald-950/60 text-[#1e8e3e]'
+               }`}>
+                 <BookOpen size={20} />
+               </div>
+               <div>
+                 <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">Bài tập về nhà</div>
+                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Bài tập thầy giáo giao</div>
+               </div>
+             </div>
+             <div className="flex flex-col items-end gap-1 shrink-0">
+               <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200">
+                 {tabStats?.btvnCount ?? 0} bài
+               </span>
+               {activeTab === 'btvn' && (
+                 <span className="text-[10px] font-bold text-[#1e8e3e]">Đang mở ▼</span>
+               )}
+             </div>
+           </button>
+
+           {/* 3. Bài của Mom giao */}
+           <button
+             type="button"
+             onClick={() => onSelectTab?.('mom')}
+             className={`p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 ${
+               activeTab === 'mom'
+                 ? 'border-2 border-[#d93025] bg-rose-50/90 dark:bg-rose-950/80 shadow-md ring-2 ring-rose-400/30'
+                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-rose-300 hover:shadow-xs'
+             }`}
+           >
+             <div className="flex items-center gap-3">
+               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                 activeTab === 'mom' ? 'bg-[#d93025] text-white' : 'bg-rose-50 dark:bg-rose-950/60 text-[#d93025]'
+               }`}>
+                 <Heart size={20} fill="currentColor" />
+               </div>
+               <div>
+                 <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">Bài của Mom giao</div>
+                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Bài luyện phụ huynh giao</div>
+               </div>
+             </div>
+             <div className="flex flex-col items-end gap-1 shrink-0">
+               <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900 text-rose-800 dark:text-rose-200">
+                 {tabStats?.momCount ?? 0} bài
+               </span>
+               {activeTab === 'mom' && (
+                 <span className="text-[10px] font-bold text-[#d93025]">Đang mở ▼</span>
+               )}
+             </div>
+           </button>
+
+           {/* 4. Khắc phục và Luyện đề */}
+           <button
+             type="button"
+             onClick={() => onSelectTab?.('khacphuc')}
+             className={`p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 ${
+               activeTab === 'khacphuc'
+                 ? 'border-2 border-[#f29900] bg-amber-50/90 dark:bg-amber-950/80 shadow-md ring-2 ring-amber-400/30'
+                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-amber-300 hover:shadow-xs'
+             }`}
+           >
+             <div className="flex items-center gap-3">
+               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                 activeTab === 'khacphuc' ? 'bg-[#f29900] text-white' : 'bg-amber-50 dark:bg-amber-950/60 text-[#f29900]'
+               }`}>
+                 <Sparkles size={20} />
+               </div>
+               <div>
+                 <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">Khắc phục & Luyện đề</div>
+                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Sửa câu sai & 4 chế độ luyện</div>
+               </div>
+             </div>
+             <div className="flex flex-col items-end gap-1 shrink-0">
+               <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200">
+                 {tabStats?.wrongCount ?? 0} câu sai
+               </span>
+               {activeTab === 'khacphuc' && (
+                 <span className="text-[10px] font-bold text-[#d97706]">Đang mở ▼</span>
+               )}
+             </div>
+           </button>
+
+           {/* 5. Vào thi */}
+           <button
+             type="button"
+             onClick={() => onSelectTab?.('vaothi')}
+             className={`p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 ${
+               activeTab === 'vaothi'
+                 ? 'border-2 border-[#9334e6] bg-purple-50/90 dark:bg-purple-950/80 shadow-md ring-2 ring-purple-400/30'
+                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-purple-300 hover:shadow-xs'
+             }`}
+           >
+             <div className="flex items-center gap-3">
+               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                 activeTab === 'vaothi' ? 'bg-[#9334e6] text-white' : 'bg-purple-50 dark:bg-purple-950/60 text-[#9334e6]'
+               }`}>
+                 <LogIn size={20} />
+               </div>
+               <div>
+                 <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">Vào thi</div>
+                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Nhập mã phòng & ca trực tuyến</div>
+               </div>
+             </div>
+             <div className="flex flex-col items-end gap-1 shrink-0">
+               <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200">
+                 Trực tuyến
+               </span>
+               {activeTab === 'vaothi' && (
+                 <span className="text-[10px] font-bold text-[#9334e6]">Đang mở ▼</span>
+               )}
+             </div>
+           </button>
+
+           {/* 6. Thần Thú Hóa Học */}
+           <button
+             type="button"
+             onClick={() => onSelectTab?.('thanthu')}
+             className={`p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 ${
+               activeTab === 'thanthu'
+                 ? 'border-2 border-[#ea580c] bg-orange-50/90 dark:bg-orange-950/80 shadow-md ring-2 ring-orange-400/30'
+                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-orange-300 hover:shadow-xs'
+             }`}
+           >
+             <div className="flex items-center gap-3">
+               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                 activeTab === 'thanthu' ? 'bg-[#ea580c] text-white' : 'bg-orange-50 dark:bg-orange-950/60 text-[#ea580c]'
+               }`}>
+                 <Sparkles size={20} />
+               </div>
+               <div>
+                 <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">Thần Thú Hóa Học</div>
+                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Nuôi thú & Leo tháp 8 hệ</div>
+               </div>
+             </div>
+             <div className="flex flex-col items-end gap-1 shrink-0">
+               <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200">
+                 Mới
+               </span>
+               {activeTab === 'thanthu' && (
+                 <span className="text-[10px] font-bold text-[#ea580c]">Đang mở ▼</span>
+               )}
+             </div>
+           </button>
+         </>
+       ) : (
+         <>
+           {/* PHỤ HUYNH THẺ 1: Báo Cáo Điểm Các Ca Thi */}
+           <button
+             type="button"
+             onClick={() => onSelectTab?.('diem')}
+             className={`p-4 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 ${
+               activeTab === 'diem'
+                 ? 'border-2 border-[#1a73e8] bg-blue-50/90 dark:bg-blue-950/80 shadow-md ring-2 ring-blue-400/30'
+                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-blue-300 hover:shadow-xs'
+             }`}
+           >
+             <div className="flex items-center gap-3">
+               <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
+                 activeTab === 'diem' ? 'bg-[#1a73e8] text-white' : 'bg-blue-50 dark:bg-blue-950/60 text-[#1a73e8]'
+               }`}>
+                 <Award size={22} />
+               </div>
+               <div>
+                 <div className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-tight">
+                   Báo Cáo Điểm Các Ca Thi
+                 </div>
+                 <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                   Kết quả và chi tiết bài làm con đã nộp
+                 </div>
+               </div>
+             </div>
+             <div className="flex flex-col items-end gap-1 shrink-0">
+               <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                 {tabStats?.diemCount ?? 0} ca thi
+               </span>
+               {activeTab === 'diem' && (
+                 <span className="text-[11px] font-bold text-[#1a73e8]">Đang mở ▼</span>
+               )}
+             </div>
+           </button>
+
+           {/* PHỤ HUYNH THẺ 2: 4 Chế Độ Giao Bài Cho Con */}
+           <button
+             type="button"
+             onClick={() => onSelectTab?.('giaobai')}
+             className={`p-4 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 ${
+               activeTab === 'giaobai'
+                 ? 'border-2 border-[#f29900] bg-amber-50/90 dark:bg-amber-950/80 shadow-md ring-2 ring-amber-400/30'
+                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-amber-300 hover:shadow-xs'
+             }`}
+           >
+             <div className="flex items-center gap-3">
+               <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
+                 activeTab === 'giaobai' ? 'bg-[#f29900] text-white' : 'bg-amber-50 dark:bg-amber-950/60 text-[#f29900]'
+               }`}>
+                 <Sparkles size={22} />
+               </div>
+               <div>
+                 <div className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-tight">
+                   4 Chế Độ Giao Bài Cho Con
+                 </div>
+                 <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                   Tự chọn, câu sai, chuyên đề, tự do
+                 </div>
+               </div>
+             </div>
+             <div className="flex flex-col items-end gap-1 shrink-0">
+               <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200">
+                 Hạn 2 tiếng
+               </span>
+               {activeTab === 'giaobai' && (
+                 <span className="text-[11px] font-bold text-[#d97706]">Đang mở ▼</span>
+               )}
+             </div>
+           </button>
+         </>
+       )}
+     </div>
+   </div>
   </>}
-  {history.length>1&&<details className="border-t border-slate-100 pt-3"><summary className="cursor-pointer text-sm font-semibold">Bản tin các ngày trước</summary><div className="max-h-64 overflow-y-auto space-y-2 mt-3">{history.slice(1).map(r=><div key={r.day} className="rounded-xl bg-slate-50 p-3 text-sm"><strong>{r.day.split('-').reverse().join('/')}</strong><p>{r.assignmentCount?`${r.questionCount} câu · ${r.mode}`:'Chưa cần giao thêm bài'}</p><p className="text-xs news-muted">{r.reason}</p></div>)}</div></details>}
  </section></>
 }
