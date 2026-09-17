@@ -69,6 +69,7 @@ const SBD_STORAGE_KEY = 'omr_ph_sbd'
 
 export default function ParentPortalScreen() {
   const [tabPh, setTabPh] = useState<'diem' | 'khacphuc' | null>(null)
+  const [cheDoKhacPhuc, setCheDoKhacPhuc] = useState<1 | 2 | 3 | 4>(1)
   const [sbdInput, setSbdInput] = useState('')
   const [sbdHienTai, setSbdHienTai] = useState<string | null>(null)
   const [hoTenCon, setHoTenCon] = useState('')
@@ -464,7 +465,10 @@ export default function ParentPortalScreen() {
             lop={lopCon}
             onSent={() => void napDanhSachMomGiao(sbdHienTai)}
             activeTab={tabPh}
-            onSelectTab={(tab) => setTabPh((prev) => (prev === tab ? null : (tab as any)))}
+            onSelectTab={(tab, cd) => {
+              if (cd) setCheDoKhacPhuc(cd)
+              setTabPh((prev) => (prev === tab && !cd ? null : (tab as any)))
+            }}
             tabStats={{ diemCount: dsBaiThi.length }}
             caGanNhat={caGanNhat}
           />
@@ -588,6 +592,7 @@ export default function ParentPortalScreen() {
                   dsLichSu={dsBaiThi}
                   scriptUrl={scriptUrl}
                   vaiTro="ph"
+                  initialCheDo={cheDoKhacPhuc}
                   dsMomGiao={dsMomGiao}
                   thongBaoMom={thongBaoMom}
                   onGiaoBaiChoCon={xuLyGiaoBaiTrucTiep}

@@ -205,6 +205,7 @@ export default function StudentPortalScreen() {
 
   // Tab
   const [tab, setTab] = useState<TabType | null>(null)
+  const [cheDoKhacPhuc, setCheDoKhacPhuc] = useState<1 | 2 | 3 | 4>(1)
 
   // Dữ liệu ca thi & điểm
   const [dsLichSu, setDsLichSu] = useState<any[]>([])
@@ -1114,7 +1115,10 @@ export default function StudentPortalScreen() {
               if (id) void batDauLamBaiMom({ id } as BaiMomGiao)
             }}
             activeTab={tab}
-            onSelectTab={(k) => setTab((prev) => (prev === k ? null : (k as TabType)))}
+            onSelectTab={(k, cd) => {
+              if (cd) setCheDoKhacPhuc(cd)
+              setTab((prev) => (prev === k && !cd ? null : (k as TabType)))
+            }}
             tabStats={{
               diemCount: dsLichSu.length,
               btvnCount: dsBtvn.length,
@@ -1741,6 +1745,7 @@ export default function StudentPortalScreen() {
                 hoTen={auth.hoTen}
                 dsLichSu={dsLichSu}
                 scriptUrl={scriptUrl}
+                initialCheDo={cheDoKhacPhuc}
               />
             </div>
           </div>

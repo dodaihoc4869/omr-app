@@ -32,7 +32,30 @@ export interface DongTheoDoiBtvn {
   quaHan: boolean
   tong: number
   daNop: number
-  hocSinh?: {sbd:string;hoTen:string;nopLuc:string|null;soDung:number|null;soCau:number|null;thuHoi:boolean}[]
+  hocSinh?: {
+    sbd: string
+    hoTen: string
+    nopLuc: string | null
+    soDung: number | null
+    soCau: number | null
+    thuHoi: boolean
+    gianLan?: boolean
+    xacSuatGianLan?: number
+    lyDoGianLan?: string
+    diemThiDoiChieu?: number | null
+    chiTietDoiChieu?: {
+      diemThiTB?: number | null
+      diemThiMax?: number | null
+      soCaThi?: number
+      diemBtvnQuyDoi?: number | null
+      doLechNangLuc?: number | null
+      trungLapVoi?: string | null
+      tiLeTrungLap?: number | null
+      trungLoiSai?: number | null
+      khoangCachPhut?: number | null
+      soLanRoiManThi?: number
+    }
+  }[]
   chuaNop: { sbd: string; hoTen: string }[]
 }
 

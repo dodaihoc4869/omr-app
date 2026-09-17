@@ -71,6 +71,7 @@ export interface KhoiKhacPhuc3CheDoProps {
   thongBaoMom?: { loai: 'ok' | 'loi'; chu: string } | null
   onGiaoBaiChoCon?: (dsCau: any[], tieuDe: string) => Promise<void> | void
   onXemKetQuaMom?: (bai: any) => void
+  initialCheDo?: 1 | 2 | 3 | 4
 }
 
 function chamBai(
@@ -137,10 +138,18 @@ export default function KhoiKhacPhuc3CheDo({
   thongBaoMom,
   onGiaoBaiChoCon,
   onXemKetQuaMom,
+  initialCheDo,
 }: KhoiKhacPhuc3CheDoProps) {
-  const [cheDo, setCheDo] = useState<1 | 2 | 3 | 4>(1)
+  const [cheDo, setCheDo] = useState<1 | 2 | 3 | 4>(initialCheDo || 1)
   const [dangXuLy, setDangXuLy] = useState(false)
   const [loi, setLoi] = useState('')
+
+  useEffect(() => {
+    if (initialCheDo) {
+      setCheDo(initialCheDo)
+      setLoi('')
+    }
+  }, [initialCheDo])
 
   const layUrl = async () =>
     scriptUrlProp || (await layDiaChiMayChu()) || (await loadScriptUrlHoacMacDinh().catch(() => ''))

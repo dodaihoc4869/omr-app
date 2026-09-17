@@ -8,6 +8,7 @@ import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
 import { gameV2 } from './game-v2'
 import { gameToken, gameIdentity } from './game-v2-auth'
+import { phanTichGianLanBtvn, type ThiThatBaseline, type ThongTinHocSinhBtvn } from './gian-lan-btvn'
 // MÁY CHỦ MỚI — bốn lệnh nóng lúc thi (MAY-CHU-MOI.md).
 //
 // BA LUẬT KHÔNG ĐƯỢC PHÁ:
@@ -1641,20 +1642,76 @@ async function suaBtvn(env:Env,b:Record<string,unknown>):Promise<Response> {
  return ra({ok:true})
 }
 
-/** THẦY THEO DÕI — đã nộp / chưa nộp, kèm tên em chưa nộp để nhắc. */
+/** THẦY THEO DÕI — đã nộp / chưa nộp, kèm tên em chưa nộp để nhắc và thuật toán phát hiện gian lận đối chiếu ca thi. */
 async function theoDoiBtvn(env: Env, b: Record<string, unknown>): Promise<Response> {
   const maCa = String(b.maCa ?? '').trim()
   const r = maCa
     ? await env.DB.prepare('SELECT * FROM btvn WHERE ma_ca = ? AND da_xoa = 0 ORDER BY giao_luc DESC').bind(maCa).all<Record<string, unknown>>()
     : await env.DB.prepare('SELECT * FROM btvn WHERE da_xoa = 0 ORDER BY giao_luc DESC LIMIT 50').all<Record<string, unknown>>()
 
-  const ds = []
+  // 1. Đọc dữ liệu học sinh của từng bài BTVN
+  const dsBtvnData: { bt: Record<string, unknown>; dsEm: Record<string, unknown>[] }[] = []
+  const allSubmittedSbd = new Set<string>()
+
   for (const bt of r.results ?? []) {
     const maBtvn = String(bt.ma_btvn ?? '')
-    const em = await env.DB.prepare('SELECT sbd, ho_ten, nop_luc, so_dung, so_cau, thu_hoi FROM btvn_em WHERE ma_btvn = ? ORDER BY sbd')
+    const em = await env.DB.prepare('SELECT sbd, ho_ten, nop_luc, so_dung, so_cau, thu_hoi, dap_an_json FROM btvn_em WHERE ma_btvn = ? ORDER BY sbd')
       .bind(maBtvn)
       .all<Record<string, unknown>>()
     const dsEm = em.results ?? []
+    dsBtvnData.push({ bt, dsEm })
+    for (const x of dsEm) {
+      if (x.nop_luc && !x.thu_hoi) {
+        allSubmittedSbd.add(String(x.sbd))
+      }
+    }
+  }
+
+  // 2. Tải dữ liệu ca thi có giám sát (Ground Truth Baseline) cho tất cả SBD đã nộp bài
+  const mapThiThat = new Map<string, ThiThatBaseline>()
+  const dsSbdArray = Array.from(allSubmittedSbd)
+  if (dsSbdArray.length > 0) {
+    for (let i = 0; i < dsSbdArray.length; i += 80) {
+      const chunk = dsSbdArray.slice(i, i + 80)
+      const ph = chunk.map(() => '?').join(',')
+      try {
+        const rs = await env.DB.prepare(
+          `SELECT sbd, AVG(tong) as diem_tb, MAX(tong) as diem_max, COUNT(*) as so_ca, SUM(so_lan_roi_man) as tong_roi
+           FROM luot
+           WHERE nop_luc IS NOT NULL AND ma_ca NOT LIKE 'BTVN%' AND sbd IN (${ph})
+           GROUP BY sbd`
+        ).bind(...chunk).all<Record<string, unknown>>()
+        for (const row of rs.results ?? []) {
+          mapThiThat.set(String(row.sbd), {
+            sbd: String(row.sbd),
+            diemTB: Number(row.diem_tb) || 0,
+            diemMax: Number(row.diem_max) || 0,
+            soCa: Number(row.so_ca) || 0,
+            tongRoiMan: Number(row.tong_roi) || 0,
+          })
+        }
+      } catch (err) {
+        console.error('Lỗi truy vấn baseline thi thật:', err)
+      }
+    }
+  }
+
+  // 3. Phân tích gian lận cho từng bài BTVN
+  const ds = []
+  for (const { bt, dsEm } of dsBtvnData) {
+    const maBtvn = String(bt.ma_btvn ?? '')
+    const emInput: ThongTinHocSinhBtvn[] = dsEm.map((x) => ({
+      sbd: String(x.sbd),
+      hoTen: String(x.ho_ten || ''),
+      nopLuc: x.nop_luc ? String(x.nop_luc) : null,
+      soDung: x.so_dung !== null && x.so_dung !== undefined ? Number(x.so_dung) : null,
+      soCau: x.so_cau !== null && x.so_cau !== undefined ? Number(x.so_cau) : null,
+      thuHoi: !!x.thu_hoi,
+      dap_an_json: typeof x.dap_an_json === 'string' ? x.dap_an_json : null,
+    }))
+
+    const kqMap = phanTichGianLanBtvn(emInput, mapThiThat)
+
     ds.push({
       maBtvn,
       maCa: String(bt.ma_ca ?? ''),
@@ -1663,13 +1720,29 @@ async function theoDoiBtvn(env: Env, b: Record<string, unknown>): Promise<Respon
       giaoLuc: String(bt.giao_luc ?? ''),
       hanNop: String(bt.han_nop ?? ''),
       quaHan: mocMs(String(bt.han_nop ?? '')) > 0 && Date.now() > mocMs(String(bt.han_nop ?? '')),
-      hocSinh: dsEm.map(x=>({sbd:String(x.sbd),hoTen:String(x.ho_ten||''),nopLuc:x.nop_luc,soDung:x.so_dung,soCau:x.so_cau,thuHoi:!!x.thu_hoi})),
-      tong: dsEm.filter(x=>!x.thu_hoi).length,
-      daNop: dsEm.filter((x) => x.nop_luc&&!x.thu_hoi).length,
-      // Tên em CHƯA nộp, để thầy nhắc đúng người.
-      chuaNop: dsEm.filter((x) => !x.nop_luc&&!x.thu_hoi).map((x) => ({ sbd: String(x.sbd ?? ''), hoTen: String(x.ho_ten ?? '') })),
+      hocSinh: dsEm.map((x) => {
+        const sbd = String(x.sbd)
+        const gl = kqMap.get(sbd)
+        return {
+          sbd,
+          hoTen: String(x.ho_ten || ''),
+          nopLuc: x.nop_luc,
+          soDung: x.so_dung,
+          soCau: x.so_cau,
+          thuHoi: !!x.thu_hoi,
+          gianLan: gl ? gl.gianLan : false,
+          xacSuatGianLan: gl ? gl.xacSuatGianLan : 0,
+          lyDoGianLan: gl ? gl.lyDoGianLan : '',
+          diemThiDoiChieu: gl ? gl.diemThiDoiChieu : null,
+          chiTietDoiChieu: gl ? gl.chiTietDoiChieu : undefined,
+        }
+      }),
+      tong: dsEm.filter((x) => !x.thu_hoi).length,
+      daNop: dsEm.filter((x) => x.nop_luc && !x.thu_hoi).length,
+      chuaNop: dsEm.filter((x) => !x.nop_luc && !x.thu_hoi).map((x) => ({ sbd: String(x.sbd ?? ''), hoTen: String(x.ho_ten ?? '') })),
     })
   }
+
   return ra({ ok: true, ds })
 }
 
