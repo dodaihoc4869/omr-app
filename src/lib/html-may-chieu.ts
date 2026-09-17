@@ -276,9 +276,7 @@ function dotMotEmHtml(o: OBang, soDot: number, tuyChon: TuyChonMayChieu): string
     </div>
     <div class="mc-trang" aria-hidden="true"></div>
   </section>
-  <section class="mc-cot-lam-bai" aria-label="Bảng để học sinh lên làm">
-    <div class="mc-bang-trong"></div>
-  </section>
+  <section class="mc-cot-lam-bai" aria-label="Bảng để học sinh lên làm"></section>
 </div>`
 }
 
@@ -360,9 +358,6 @@ body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); overflow: 
 .mc-dot { flex: 0 0 100%; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 0; scroll-snap-align: start; scroll-snap-stop: always; }
 .mc-dot-don { grid-template-columns: 2fr 1fr; }
 .mc-cot-lam-bai { display: flex; flex-direction: column; padding: 18px 22px; border-left: 2px dashed var(--mc-vien); background: var(--mc-nen); min-height: 0; overflow: hidden; box-sizing: border-box; }
-.mc-bang-trong { flex: 1; border: 2px dashed color-mix(in srgb, var(--mc-vien) 80%, transparent); border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 32px 16px; background: color-mix(in srgb, var(--mc-nen) 96%, var(--mc-xanh)); box-sizing: border-box; text-align: center; }
-.mc-bang-trong-nhan { font-family: var(--mc-sans); font-weight: 850; font-size: clamp(15px, 1.4vw, 20px); color: var(--mc-xanh); letter-spacing: 0.04em; text-transform: uppercase; }
-.mc-bang-trong-phu { margin-top: 8px; font-family: var(--mc-sans); font-size: clamp(13px, 1.1vw, 16px); color: var(--mc-nhat); }
 /* Nửa bảng tự cuộn khi câu quá dài — TRANG thì không bao giờ cuộn. */
 .mc-nua { display: flex; flex-direction: column; padding: 18px 22px 0; min-width: 0; min-height: 0; overflow-y: auto; position: relative; }
 .mc-trai { border-right: 2px dashed var(--mc-vien); }

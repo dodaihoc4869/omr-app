@@ -41,6 +41,15 @@ donPhienCu()
 // index.html). Sau bước này cả app chỉ thấy MỘT dạng URL.
 chuanHoaDuongDan(import.meta.env.BASE_URL)
 
+// Xoá tham số _moi nếu có (dùng để ép nạp bản mới vượt Service Worker cache)
+if (typeof window !== 'undefined' && location.search.includes('_moi')) {
+  try {
+    const u = new URL(location.href)
+    u.searchParams.delete('_moi')
+    history.replaceState(null, '', u.pathname + (u.search ? u.search : '') + u.hash)
+  } catch {}
+}
+
 // KHOÁ VAI VÀO ĐƯỜNG DẪN — thầy chốt 14/09: "đảm bảo 100% không nhảy lẫn lộn".
 //
 // `chuanHoaDuongDan` ở trên gom mọi thứ về tham số truy vấn. Riêng VAI thì đi
