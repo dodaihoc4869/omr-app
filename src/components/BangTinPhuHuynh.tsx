@@ -109,7 +109,8 @@ export default function BangTinPhuHuynh({
       </div>
     </div>
    )}
-   <div className="grid grid-cols-2 gap-2 sm:gap-5 items-stretch">
+   {/* BẢNG TIN TỔNG QUAN & GỢI Ý: Trên điện thoại 1 cột rộng rãi, trên máy tính/tablet 2 cột */}
+   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 items-stretch">
     {/* CỘT 1: TỔNG QUAN HỌC TẬP (Metrics, Bài thi, Kiến thức cần củng cố) */}
     <div className="space-y-4 flex flex-col justify-between">
       {/* 3 THẺ CHỈ SỐ THEO PHONG CÁCH GOOGLE */}
@@ -333,23 +334,22 @@ export default function BangTinPhuHuynh({
     </div>
    </>)}
 
-   {/* DANH MỤC CÁC CHỨC NĂNG CHIA 2 CỘT NỔI KHỐI (GOOGLE STYLE) */}
+   {/* DANH MỤC CHỨC NĂNG HỌC SINH (BẤM VÀO MỞ TOÀN MÀN HÌNH) — PHỤ HUYNH ĐÃ CÓ 2 CỘT HIỆN SẴN Ở DƯỚI */}
+   {studentToken && (
    <div className="pt-4 border-t border-slate-200/80 dark:border-slate-800 space-y-3">
      <div className="flex flex-wrap items-center justify-between gap-2">
        <div className="flex items-center gap-2">
          <div className="w-2.5 h-2.5 rounded-full bg-[#4285f4]" />
          <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-           {studentToken ? 'Chức năng học tập & Luyện thi' : 'Chức năng đồng hành cùng con (2 ô chọn nhanh)'}
+           Chức năng học tập & Luyện thi
          </h3>
        </div>
        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-         Bấm ô để mở / đóng chi tiết chức năng ở bên dưới
+         Bấm ô để mở toàn màn hình
        </span>
      </div>
 
-      <div className="grid grid-cols-2 gap-2 sm:gap-3.5">
-       {studentToken ? (
-         <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
            {/* 1. Xem điểm */}
            <button
              type="button"
@@ -534,88 +534,10 @@ export default function BangTinPhuHuynh({
                  <span className="text-[10px] font-bold text-[#ea580c]">Đang mở ▼</span>
                )}
              </div>
-           </button>
-         </>
-       ) : (
-         <>
-           {/* PHỤ HUYNH THẺ 1: Báo Cáo Điểm Các Ca Thi */}
-           <button
-             type="button"
-             onClick={() => onSelectTab?.('diem')}
-             className={`p-4 sm:p-5 rounded-3xl border-2 text-left transition-all duration-200 cursor-pointer flex flex-col justify-between gap-3 relative overflow-hidden group active:scale-[0.99] ${
-               activeTab === 'diem'
-                 ? 'border-blue-600 bg-blue-50/90 dark:bg-blue-950/80 shadow-md ring-4 ring-blue-400/20'
-                 : 'border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-blue-400 hover:shadow-sm'
-             }`}
-           >
-             <div className="flex items-start justify-between gap-3 w-full">
-               <div className="flex items-center gap-3">
-                 <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${
-                   activeTab === 'diem' ? 'bg-blue-600 text-white shadow-sm' : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'
-                 }`}>
-                   <Award size={24} />
-                 </div>
-                 <div>
-                   <h4 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white leading-tight">
-                     Báo Cáo Điểm Các Ca Thi
-                   </h4>
-                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                     Kết quả và chi tiết bài làm con đã nộp
-                   </p>
-                 </div>
-               </div>
-               <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900 shrink-0">
-                 {tabStats?.diemCount ?? 0} ca thi
-               </span>
-             </div>
-              <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800/80 text-[11px] font-semibold w-full">
-                <span className="text-slate-400 dark:text-slate-500">
-                  Chi tiết hiển thị ở cột bên dưới
-                </span>
-                <span className="font-bold flex items-center gap-1 text-blue-600 dark:text-blue-400">
-                  Cột 1 · Báo cáo ▼
-                </span>
-              </div>
             </button>
-
-            {/* PHỤ HUYNH THẺ 2: 4 Chế Độ Giao Bài Cho Con */}
-            <button
-              type="button"
-              onClick={() => onSelectTab?.('giaobai')}
-              className="p-4 sm:p-5 rounded-3xl border-2 border-amber-300/90 dark:border-amber-700/80 bg-white dark:bg-slate-900 hover:border-amber-500 hover:shadow-xs text-left transition-all duration-200 cursor-pointer flex flex-col justify-between gap-3 relative overflow-hidden group active:scale-[0.99]"
-            >
-              <div className="flex items-start justify-between gap-3 w-full">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
-                    <Sparkles size={24} />
-                  </div>
-                  <div>
-                    <h4 className="font-black text-base sm:text-lg text-amber-700 dark:text-amber-400 uppercase tracking-wide leading-tight flex items-center gap-1.5">
-                      <Sparkles size={16} className="text-amber-500 shrink-0" />
-                      <span>4 CHẾ ĐỘ GIAO BÀI CHO CON</span>
-                    </h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                      Hệ thống tự động phân tích và tạo bài luyện khắc phục theo nhu cầu của con
-                    </p>
-                  </div>
-                </div>
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900 shrink-0">
-                  Hạn 2 tiếng
-                </span>
-              </div>
-              <div className="flex items-center justify-between pt-2.5 border-t border-amber-100 dark:border-amber-900/40 text-[11px] font-semibold w-full">
-                <span className="text-slate-400 dark:text-slate-500">
-                  Chi tiết hiển thị ở cột bên dưới
-                </span>
-                <span className="font-bold flex items-center gap-1 text-amber-600 dark:text-amber-400">
-                  Cột 2 · Giao bài ▼
-                </span>
-              </div>
-            </button>
-         </>
-       )}
-     </div>
-   </div>
+      </div>
+    </div>
+   )}
  </section>
  </>
 }
