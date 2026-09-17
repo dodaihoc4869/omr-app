@@ -90,7 +90,7 @@ it('classroom reads only chosen current-season V2 spirit without importing legac
  expect(sql.prepare('SELECT * FROM game_v2_profile').get()).toEqual(before)
 })
 
-describe('Khiên miễn tử',()=>{
+describe('Khiên chống đuổi',()=>{
  it('thưởng theo mốc, tiêu một lần, chặn dùng trùng và giữ qua thiết bị',async()=>{
   const {env,sql}=fixture(),token=await gameToken(env,'1');await loadProfile(env,'1')
   const put=(cap:number,extra={})=>sql.prepare('UPDATE game_v2_profile SET json=? WHERE sbd=?').run(JSON.stringify({pet:'dat_quy',choice:false,cap,exp:0,wallet:0,earned:0,tower:1,mastery:[],arena:null,cutover:'now',...extra}),'1')

@@ -65,7 +65,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
   if(action==='shield-use'){
     const id=String(b.useId??'');if(!/^[a-zA-Z0-9-]{16,80}$/.test(id))throw new Error('Lượt dùng khiên không hợp lệ.')
     if(p.shields?.lastUse===id||Number(p.shields?.activeUntil)>Date.now())return {ok:true,profile:visible(p),revision}
-    if(p.choice||shieldRemaining(p.cap,p.shields)<1)throw new Error('Em chưa có Khiên miễn tử. Tiến hoá thần thú để nhận khiên.')
+    if(p.choice||shieldRemaining(p.cap,p.shields)<1)throw new Error('Em chưa có Khiên chống đuổi. Tiến hoá thần thú để nhận khiên.')
     p.shields={used:(p.shields?.used??0)+1,activeUntil:Date.now()+10000,lastUse:id}
     return {ok:true,profile:visible(p),revision:await save(env,sbd,p,revision)}
   }

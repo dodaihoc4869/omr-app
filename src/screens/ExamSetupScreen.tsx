@@ -410,286 +410,366 @@ export default function ExamSetupScreen() {
       </div>
 
       {/* THẺ 1: ĐỀ KIỂM TRA */}
-      <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/70 text-[#1a73e8] border border-blue-200 dark:border-blue-800 flex items-center justify-center shrink-0">
-              <Library size={16} />
+      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs">
+        <div className="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/70 text-[#1a73e8] border border-blue-200/80 dark:border-blue-800 flex items-center justify-center shrink-0 shadow-2xs">
+              <Library size={18} />
             </div>
             <div className="min-w-0">
-              <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white truncate">
+              <div className="font-bold text-sm text-slate-900 dark:text-white truncate">
                 {selectedSources.length > 0
-                  ? `${selectedSources.length} đề · ${tongCauDaChon} câu ra đề${soCauTrung > 0 ? ` (lọc trùng ${soCauTrung})` : ''}`
-                  : 'Chưa chọn đề nào'}
+                  ? `${selectedSources.length} đề đã chọn · ${tongCauDaChon} câu${soCauTrung > 0 ? ` (lọc trùng ${soCauTrung})` : ''}`
+                  : 'Chưa chọn đề kiểm tra'}
               </div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                {chuan2026 ? 'Bộ đề 12 · Chuẩn 2026 (50p)' : soCauRaDe ? `Rút: ${soCauRaDe.I} I · ${soCauRaDe.II} II · ${soCauRaDe.III} III` : 'Lấy trọn kho đã chọn'}
+              <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                {chuan2026 ? 'Bộ đề 12 · Chuẩn cấu trúc 2026 (50 phút)' : soCauRaDe ? `Chế độ rút: ${soCauRaDe.I} câu I · ${soCauRaDe.II} câu II · ${soCauRaDe.III} câu III` : 'Lấy nguyên vẹn toàn bộ câu trong đề'}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 ml-auto">
             {!chuan2026 && selectedSources.length > 0 && (
               <button
                 type="button"
                 onClick={() => setHienRutDe(true)}
-                className="tap-target px-2.5 py-1.5 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 cursor-pointer transition active:scale-95"
+                className="tap-target px-3.5 py-2 rounded-xl text-xs font-semibold bg-amber-50/70 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/80 hover:bg-amber-100/70 cursor-pointer transition active:scale-95 shadow-2xs"
               >
-                {boRut ? `Rút ${tongCauDaChon}c` : 'Rút câu'}
+                {boRut ? `Rút ${tongCauDaChon} câu` : 'Rút câu'}
               </button>
             )}
             <button
               type="button"
               onClick={() => setHienChonDe(true)}
-              className="tap-target px-3 py-1.5 rounded-full text-xs font-bold bg-blue-50 dark:bg-blue-950/70 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 cursor-pointer transition active:scale-95"
+              className="tap-target px-4 py-2 rounded-xl text-xs font-bold bg-blue-50 dark:bg-blue-950/70 text-[#1a73e8] dark:text-blue-300 border border-blue-200/90 dark:border-blue-800 hover:bg-blue-100/70 cursor-pointer transition active:scale-95 shadow-2xs"
             >
-              {selectedSources.length > 0 ? 'Đổi đề' : 'Chọn đề'}
+              {selectedSources.length > 0 ? 'Đổi đề khác' : 'Chọn đề kiểm tra'}
             </button>
           </div>
         </div>
       </div>
 
-      {/* THẺ 2: LỚP & THỜI GIAN */}
-      <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-2.5">
-        {/* Hàng chọn lớp nhanh */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-          {dsLop.map((l) => {
-            const chon = lop.trim() === l
-            return (
-              <button
-                key={l}
-                type="button"
-                onClick={() => setLop(l)}
-                className={`tap-target text-xs font-bold px-3 py-1 rounded-full shrink-0 transition-all cursor-pointer active:scale-95 ${
-                  chon
-                    ? 'bg-[#1a73e8] text-white shadow-2xs'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700'
-                }`}
-              >
-                {l}
-              </button>
-            )
-          })}
-          <input
-            placeholder="Lớp…"
-            value={lop}
-            onChange={(e) => setLop(e.target.value)}
-            className="h-7 w-20 px-2.5 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white shrink-0 outline-none focus:ring-1 focus:ring-blue-500"
-          />
-          <input
-            placeholder="Tên ca (tùy chọn)"
-            value={tenCa}
-            onChange={(e) => setTenCa(e.target.value)}
-            className="h-7 flex-1 min-w-[100px] px-2.5 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-blue-500 truncate"
-          />
-        </div>
+      {/* THẺ 2: LỚP HỌC & THỜI GIAN LÀM BÀI */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-4">
+        {/* Hàng 1: Chọn lớp học */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+              Lớp kiểm tra:
+            </span>
+            <span className="text-[11px] text-slate-400">Chọn nhanh hoặc nhập tên lớp</span>
+          </div>
 
-        {/* Thời gian làm & Bắt đầu */}
-        <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
-          <div className="flex items-center gap-1">
-            <span className="text-[11px] font-bold uppercase text-slate-400 shrink-0 mr-0.5">Giờ làm:</span>
-            {[15, 45, 50, 90].map((ph) => {
-              const chon = (chuan2026 ? 50 : thoiGianPhut) === ph
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+            {dsLop.map((l) => {
+              const chon = lop.trim() === l
               return (
                 <button
-                  key={ph}
+                  key={l}
                   type="button"
-                  disabled={chuan2026}
-                  onClick={() => setThoiGianPhut(ph)}
-                  className={`tap-target text-xs font-bold px-2.5 py-1 rounded-full transition-all cursor-pointer active:scale-95 ${
+                  onClick={() => setLop(l)}
+                  className={`tap-target text-xs font-semibold px-3.5 py-1.5 rounded-xl shrink-0 transition-all cursor-pointer active:scale-95 ${
                     chon
-                      ? 'bg-emerald-600 text-white shadow-2xs'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700'
+                      ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
+                      : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
                   }`}
                 >
-                  {ph}'
+                  {l}
                 </button>
               )
             })}
-            {!chuan2026 && (
-              <input
-                type="number"
-                min={1}
-                value={thoiGianPhut}
-                onChange={(e) => setThoiGianPhut(Number(e.target.value))}
-                className="h-7 w-12 px-1 text-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white outline-none"
-              />
-            )}
+            <input
+              placeholder="Nhập lớp…"
+              value={lop}
+              onChange={(e) => setLop(e.target.value)}
+              className="h-8 w-28 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-900 dark:text-white shrink-0 outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+            />
+            <input
+              placeholder="Tên ca (tùy chọn, ví dụ: 15 Phút Số 1)"
+              value={tenCa}
+              onChange={(e) => setTenCa(e.target.value)}
+              className="h-8 flex-1 min-w-[140px] px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 truncate"
+            />
+          </div>
+        </div>
+
+        {/* Hàng 2: Thời gian làm bài & Bắt đầu */}
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+          {/* Thời lượng làm bài */}
+          <div className="space-y-1.5">
+            <div className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+              Thời gian làm bài:
+            </div>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {[15, 45, 50, 90].map((ph) => {
+                const chon = (chuan2026 ? 50 : thoiGianPhut) === ph
+                return (
+                  <button
+                    key={ph}
+                    type="button"
+                    disabled={chuan2026}
+                    onClick={() => setThoiGianPhut(ph)}
+                    className={`tap-target text-xs font-semibold px-3 py-1.5 rounded-xl transition-all cursor-pointer active:scale-95 ${
+                      chon
+                        ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
+                        : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    {ph} phút
+                  </button>
+                )
+              })}
+              {!chuan2026 && (
+                <div className="flex items-center gap-1 text-xs text-slate-500">
+                  <input
+                    type="number"
+                    min={1}
+                    value={thoiGianPhut}
+                    onChange={(e) => setThoiGianPhut(Number(e.target.value))}
+                    className="h-8 w-14 px-1.5 text-center rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                  <span>phút</span>
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="flex items-center gap-1 shrink-0 ml-auto">
-            <button
-              type="button"
-              onClick={() => setBatDauCach('ngay')}
-              className={`tap-target text-xs font-bold px-3 py-1 rounded-full transition-all cursor-pointer active:scale-95 ${
-                batDauCach === 'ngay'
-                  ? 'bg-[#1a73e8] text-white'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700'
-              }`}
-            >
-              ⚡ Ngay
-            </button>
-            <button
-              type="button"
-              onClick={() => setBatDauCach('hen')}
-              className={`tap-target text-xs font-bold px-3 py-1 rounded-full transition-all cursor-pointer active:scale-95 ${
-                batDauCach === 'hen'
-                  ? 'bg-[#1a73e8] text-white'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700'
-              }`}
-            >
-              ⏰ Hẹn
-            </button>
+          {/* Lựa chọn bắt đầu ngay / hẹn giờ */}
+          <div className="space-y-1.5">
+            <div className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+              Thời điểm bắt đầu:
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setBatDauCach('ngay')}
+                className={`tap-target flex-1 text-xs font-semibold py-1.5 px-3 rounded-xl transition-all cursor-pointer active:scale-95 text-center ${
+                  batDauCach === 'ngay'
+                    ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
+                    : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                ⚡ Bắt đầu ngay
+              </button>
+              <button
+                type="button"
+                onClick={() => setBatDauCach('hen')}
+                className={`tap-target flex-1 text-xs font-semibold py-1.5 px-3 rounded-xl transition-all cursor-pointer active:scale-95 text-center ${
+                  batDauCach === 'hen'
+                    ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
+                    : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                ⏰ Hẹn giờ mở
+              </button>
+            </div>
           </div>
         </div>
 
         {batDauCach === 'hen' && (
-          <div className="pt-0.5">
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80">
+            <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">
+              Chọn thời điểm tự động mở ca:
+            </label>
             <input
               type="datetime-local"
               value={batDauLocal}
               onChange={(e) => setBatDauLocal(e.target.value)}
               style={{ colorScheme: 'light dark' }}
-              className="w-full h-8 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-medium text-slate-900 dark:text-white"
+              className="w-full h-9 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-900 dark:text-white shadow-2xs focus:ring-2 focus:ring-blue-500/30"
             />
           </div>
         )}
       </div>
 
-      {/* THẺ 3: HỌC SINH & CHẾ ĐỘ THI */}
-      <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-2">
-        {/* Phạm vi */}
-        <div className="flex items-center gap-1.5">
-          {[
-            { id: 'tu_do', label: '🌐 Tự do' },
-            { id: 'sbd', label: '👥 SBD cả lớp' },
-            { id: 'chon', label: `🎯 Chọn em${chonSbd.size > 0 ? ` (${chonSbd.size})` : ''}` },
-          ].map((p) => {
-            const chon = phamVi === p.id
-            return (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => {
-                  setPhamVi(p.id as PhamViCa)
-                  if (p.id === 'chon') setHienChonEm(true)
-                }}
-                className={`tap-target flex-1 text-xs font-bold py-1.5 px-2 rounded-full transition-all text-center cursor-pointer truncate active:scale-95 ${
-                  chon
-                    ? 'bg-[#1a73e8] text-white shadow-2xs'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700'
-                }`}
-              >
-                {p.label}
-              </button>
-            )
-          })}
-        </div>
+      {/* THẺ 3: QUY CHẾ THI & BẢO MẬT */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-4">
+        {/* Phạm vi tham gia */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+              Phạm vi học sinh tham gia:
+            </span>
+            <span className="text-[11px] text-slate-400">Quy định quyền truy cập</span>
+          </div>
 
-        {/* 2 Chế độ thi: Phòng chờ & Giữ để đọc */}
-        <div className="flex items-center justify-between gap-2 pt-0.5">
-          <button
-            type="button"
-            onClick={() => !deRiengBat && setPhongCho((v) => !v)}
-            className={`tap-target flex-1 text-xs font-bold py-1.5 px-2.5 rounded-full transition-all text-center cursor-pointer border active:scale-95 ${
-              phongCho || deRiengBat
-                ? 'bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200/80 dark:border-slate-700'
-            }`}
-          >
-            🚪 Phòng chờ: {phongCho || deRiengBat ? 'BẬT' : 'TẮT'}
-          </button>
-          <button
-            type="button"
-            onClick={() => setGiuDeDoc((v) => !v)}
-            className={`tap-target flex-1 text-xs font-bold py-1.5 px-2.5 rounded-full transition-all text-center cursor-pointer border active:scale-95 ${
-              giuDeDoc
-                ? 'bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-700'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200/80 dark:border-slate-700'
-            }`}
-          >
-            👆 Giữ để đọc: {giuDeDoc ? 'BẬT' : 'TẮT'}
-          </button>
-        </div>
-      </div>
-
-      {/* THẺ 4: CÔNG BỐ ĐIỂM & NÂNG CAO */}
-      <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-2">
-        <div className="flex items-center gap-1.5">
-          <span className="text-[11px] font-bold uppercase text-slate-400 shrink-0 mr-0.5">Điểm:</span>
-          {[
-            { id: 'khong', label: '🔒 Không hiện' },
-            { id: 'ngay', label: '⚡ Khi nộp' },
-            { id: 'ca_lop_xong', label: '👥 Cả lớp xong' },
-          ].map((c) => {
-            const chon = congBoDiem === c.id
-            return (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => setCongBoDiem(c.id as CongBoDiem)}
-                className={`tap-target flex-1 text-xs font-bold py-1 px-1 rounded-full transition-all text-center cursor-pointer truncate active:scale-95 ${
-                  chon
-                    ? 'bg-[#1a73e8] text-white shadow-2xs'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700'
-                }`}
-              >
-                {c.label}
-              </button>
-            )
-          })}
-        </div>
-
-        <div className="flex items-center justify-between text-xs pt-0.5">
-          <button
-            type="button"
-            onClick={() => setHienNangCao(true)}
-            className="inline-flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 font-semibold cursor-pointer tap-target"
-          >
-            <Settings2 size={14} className="text-blue-600" />
-            <span>Nâng cao: {nguongLan}l rời · {matKhauCa ? 'có mật khẩu' : 'không MK'}</span>
-          </button>
-          <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium">
-            <span>Hạn vào:</span>
-            {HAN_VAO_CHON.map((h) => {
-              const chon = hanVaoPhut === h.phut
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { id: 'tu_do', label: '🌐 Tự do' },
+              { id: 'sbd', label: '👥 SBD cả lớp' },
+              { id: 'chon', label: `🎯 Chọn em${chonSbd.size > 0 ? ` (${chonSbd.size})` : ''}` },
+            ].map((p) => {
+              const chon = phamVi === p.id
               return (
                 <button
-                  key={h.phut}
+                  key={p.id}
                   type="button"
-                  onClick={() => setHanVaoPhut(h.phut)}
-                  className={`px-1.5 py-0.5 rounded font-bold cursor-pointer ${
+                  onClick={() => {
+                    setPhamVi(p.id as PhamViCa)
+                    if (p.id === 'chon') setHienChonEm(true)
+                  }}
+                  className={`tap-target text-xs font-semibold py-2 px-2.5 rounded-xl transition-all text-center cursor-pointer truncate active:scale-95 ${
                     chon
-                      ? 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300'
-                      : 'text-slate-400 hover:text-slate-600'
+                      ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
+                      : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
                   }`}
                 >
-                  {h.phut ? `${h.phut}'` : '∞'}
+                  {p.label}
                 </button>
               )
             })}
           </div>
         </div>
+
+        {/* 2 Chế độ kiểm soát phòng thi */}
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-1.5">
+          <div className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+            Kiểm soát phòng thi:
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <button
+              type="button"
+              onClick={() => !deRiengBat && setPhongCho((v) => !v)}
+              className={`tap-target p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-2 active:scale-98 ${
+                phongCho || deRiengBat
+                  ? 'bg-blue-50/70 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200 shadow-2xs'
+                  : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
+              }`}
+            >
+              <div className="min-w-0">
+                <div className="text-xs font-bold flex items-center gap-1.5">
+                  <span>🚪 Phòng chờ phát đề</span>
+                </div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  Chờ Thầy bấm Bắt đầu mới đếm ngược
+                </div>
+              </div>
+              <span
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+                  phongCho || deRiengBat
+                    ? 'bg-blue-200/80 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
+                    : 'bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                }`}
+              >
+                {phongCho || deRiengBat ? 'BẬT' : 'TẮT'}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setGiuDeDoc((v) => !v)}
+              className={`tap-target p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-2 active:scale-98 ${
+                giuDeDoc
+                  ? 'bg-blue-50/70 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200 shadow-2xs'
+                  : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
+              }`}
+            >
+              <div className="min-w-0">
+                <div className="text-xs font-bold flex items-center gap-1.5">
+                  <span>👆 Giữ để đọc đề</span>
+                </div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  Chống chụp ảnh đề & chia sẻ
+                </div>
+              </div>
+              <span
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+                  giuDeDoc
+                    ? 'bg-blue-200/80 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
+                    : 'bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                }`}
+              >
+                {giuDeDoc ? 'BẬT' : 'TẮT'}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* Công bố điểm & Hạn vào phòng */}
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-2">
+          <div className="space-y-1.5">
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+              Công bố kết quả điểm:
+            </span>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { id: 'khong', label: '🔒 Không hiện' },
+                { id: 'ngay', label: '⚡ Khi nộp bài' },
+                { id: 'ca_lop_xong', label: '👥 Cả lớp xong' },
+              ].map((c) => {
+                const chon = congBoDiem === c.id
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setCongBoDiem(c.id as CongBoDiem)}
+                    className={`tap-target text-xs font-semibold py-1.5 px-2 rounded-xl transition-all text-center cursor-pointer truncate active:scale-95 ${
+                      chon
+                        ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
+                        : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    {c.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-3 pt-1 text-xs flex-wrap">
+            <button
+              type="button"
+              onClick={() => setHienNangCao(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer tap-target transition shadow-2xs"
+            >
+              <Settings2 size={15} className="text-[#1a73e8]" />
+              <span>Nâng cao: {nguongLan}l rời · {matKhauCa ? 'có mật khẩu' : 'không MK'}</span>
+            </button>
+
+            <div className="flex items-center gap-1.5 text-xs text-slate-500">
+              <span className="font-semibold text-slate-600 dark:text-slate-400">Hạn vào phòng:</span>
+              <div className="flex items-center gap-1">
+                {HAN_VAO_CHON.map((h) => {
+                  const chon = hanVaoPhut === h.phut
+                  return (
+                    <button
+                      key={h.phut}
+                      type="button"
+                      onClick={() => setHanVaoPhut(h.phut)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition ${
+                        chon
+                          ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
+                          : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      {h.phut ? `${h.phut}'` : '∞'}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* NÚT MỞ CA TO — NỔI BẬT CHUẨN GOOGLE */}
-      <div className="pt-1">
+      {/* NÚT MỞ CA KIỂM TRA — NỔI BẬT, TRANG NHÃ CHUẨN GOOGLE */}
+      <div className="pt-2">
         <button
           type="button"
           disabled={opening || selectedSources.length === 0}
           onClick={handleOpenSession}
-          className="w-full py-3.5 px-4 rounded-full bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold text-sm shadow-md transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+          className="w-full py-4 px-6 rounded-2xl bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold text-sm sm:text-base shadow-md hover:shadow-lg transition-all active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2.5"
         >
           {opening ? (
             <>
-              <RefreshCw size={18} className="animate-spin" />
-              <span>Đang mở ca…</span>
+              <RefreshCw size={19} className="animate-spin" />
+              <span>Đang khởi tạo ca kiểm tra…</span>
             </>
           ) : (
             <>
-              <span>🚀 Mở ca kiểm tra</span>
-              <span className="text-xs font-medium opacity-90">
-                ({lop.trim() || 'Chưa chọn lớp'} · {tongCauDaChon} câu · {chuan2026 ? 50 : thoiGianPhut}')
+              <span>🚀 Mở ca kiểm tra ngay</span>
+              <span className="text-xs sm:text-sm font-normal opacity-90 pl-1 border-l border-white/30">
+                {lop.trim() || 'Chưa chọn lớp'} · {tongCauDaChon} câu · {chuan2026 ? 50 : thoiGianPhut} phút
               </span>
             </>
           )}
