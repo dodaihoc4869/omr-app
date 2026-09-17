@@ -1,0 +1,45 @@
+# CỬA DỰ PHÒNG TRÊN GITHUB PAGES — 17-09-2026.
+#
+# Thầy báo 17-09: iPhone (iOS cũ) mở link học sinh, Safari nói "không thể tìm
+# thấy máy chủ" — hỏng ngay ở bước tra tên miền omr-app-b3u.pages.dev, chưa
+# tới được mã app. Muốn chữa được thì phải có MỘT trang không nằm trên
+# Cloudflare để máy ấy còn mở được: đó là github.io.
+#
+# KHÔNG PHẢI PHÁT HÀNH APP LẦN HAI. Quyết định 14/09 "chỉ còn một nơi phát
+# hành" vẫn giữ nguyên: job này chỉ đẩy đúng thư mục public/cua-du-phong/ —
+# một trang tĩnh gõ cửa máy chủ rồi đưa em sang link thật. Không có mã app,
+# không có bản app song song nào để lệch phiên bản.
+#
+# Đồng thời nó THAY THẾ bản app cũ đang còn sống ở dodaihoc4869.github.io/omr-app
+# (bản trước 14/09, vẫn mở được tới 17-09) — bản cũ ấy mới là thứ đáng lo.
+name: Cửa dự phòng (GitHub Pages)
+
+on:
+  push:
+    branches: [main]
+    paths: ['public/cua-du-phong/**', '.github/workflows/cua-du-phong.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: cua-du-phong
+  cancel-in-progress: true
+
+jobs:
+  day:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public/cua-du-phong
+      - id: deploy
+        uses: actions/deploy-pages@v4

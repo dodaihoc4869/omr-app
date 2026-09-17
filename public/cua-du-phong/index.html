@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>ĐỖ ĐẠI HỌC — Cửa dự phòng</title>
+  <!--
+    CỬA DỰ PHÒNG — 17-09-2026.
+
+    Thầy báo 17-09 kèm ảnh: iPhone (iOS cũ) mở link học sinh, Safari nói
+    "không thể mở trang vì không thể tìm thấy máy chủ" — tức là ngay bước tra
+    tên miền omr-app-b3u.pages.dev đã hỏng, chưa tới được một dòng mã nào của
+    app. Vì thế trang này KHÔNG nằm trên Cloudflare: nó ở GitHub Pages, tên
+    miền github.io, không có bản ghi HTTPS/ECH, để máy nào cũng mở được.
+
+    Trang làm đúng ba việc, không hơn:
+      1. Thử gõ cửa từng máy chủ từ CHÍNH máy em (không đoán, đo tại chỗ).
+      2. Vào được app thì tự đưa em sang link thật — em không phải làm gì.
+      3. Không vào được thì nói rõ hỏng ở đâu, chỉ hai cách chữa tại chỗ, và in
+         một MÃ ngắn để em chụp gửi Thầy — mã ấy là bằng chứng, không phải lời kể.
+
+    Không có gì của học sinh đi qua trang này: không tên, không số báo danh,
+    không điểm. Chỉ có mấy lượt gõ cửa rỗng.
+
+    Viết bằng JavaScript đời cũ (không ?. không ??) để chạy cả trên iOS 12.
+  -->
+  <style>
+    :root { color-scheme: light dark; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+           background: #f7f8fa; color: #1a2332; line-height: 1.5; }
+    @media (prefers-color-scheme: dark) { body { background: #0f1419; color: #e8eaed; } .the { background: #161c24 !important; border-color: #2a3340 !important; } }
+    main { max-width: 520px; margin: 0 auto; padding: 28px 18px 48px; }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    .phu { font-size: 13px; opacity: .7; margin: 0 0 18px; }
+    .the { background: #fff; border: 1px solid #e3e7ee; border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    td { padding: 7px 0; border-top: 1px solid rgba(128,128,128,.18); vertical-align: top; }
+    tr:first-child td { border-top: 0; }
+    td.kq { text-align: right; white-space: nowrap; font-weight: 700; width: 38%; }
+    .cho { color: #8a94a6; }
+    .ok { color: #16a34a; }
+    .hong { color: #dc2626; }
+    .ma { font-family: ui-monospace, Menlo, monospace; font-size: 15px; letter-spacing: .04em;
+          background: rgba(128,128,128,.12); padding: 10px 12px; border-radius: 10px; word-break: break-all; }
+    .nut { display: block; width: 100%; box-sizing: border-box; text-align: center; padding: 14px; border-radius: 999px;
+           background: #2563eb; color: #fff; font-weight: 700; font-size: 16px; text-decoration: none; border: 0; }
+    .nut.xam { background: #64748b; }
+    ol { padding-left: 20px; margin: 8px 0 0; } li { margin-bottom: 6px; font-size: 14px; }
+    .an { display: none; }
+    .nho { font-size: 12px; opacity: .65; margin-top: 10px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>ĐỖ ĐẠI HỌC</h1>
+  <p class="phu">Cửa dự phòng — đang kiểm tra đường vào app từ máy của em…</p>
+
+  <div class="the">
+    <table id="bang">
+      <tr><td>Máy chủ app <span class="nho">(omr-app-b3u.pages.dev)</span></td><td class="kq cho" id="kq-P">đang thử…</td></tr>
+      <tr><td>Máy chủ dữ liệu <span class="nho">(workers.dev)</span></td><td class="kq cho" id="kq-W">đang thử…</td></tr>
+      <tr><td>Cloudflare theo địa chỉ số <span class="nho">(1.1.1.1)</span></td><td class="kq cho" id="kq-I">đang thử…</td></tr>
+      <tr><td>Cloudflare tên khác <span class="nho">(claude.ai)</span></td><td class="kq cho" id="kq-C">đang thử…</td></tr>
+      <tr><td>Google DNS có thấy app không</td><td class="kq cho" id="kq-G">đang thử…</td></tr>
+    </table>
+  </div>
+
+  <div class="the">
+    <div class="nho" style="margin:0 0 6px">Mã kiểm tra — chụp màn hình này gửi Thầy nếu không vào được</div>
+    <div class="ma" id="ma">…</div>
+  </div>
+
+  <div id="vao" class="an">
+    <a class="nut" id="nut-vao" href="#">Vào app ngay →</a>
+    <p class="nho" id="dem">Tự chuyển sau 3 giây…</p>
+  </div>
+
+  <div id="hong" class="the an">
+    <b>Máy em đang không tới được máy chủ app.</b>
+    <p style="margin:8px 0 0;font-size:14px">Không phải lỗi của em, cũng không phải app hỏng — là đường mạng từ máy em tới máy chủ đang bị chặn hoặc tra sai địa chỉ. Chữa tại chỗ, thử lần lượt:</p>
+    <ol>
+      <li><b>Tắt Wi-Fi, dùng 4G/5G</b> rồi mở lại link. Vào được là do Wi-Fi nhà/lớp chặn.</li>
+      <li>Nếu bắt buộc dùng Wi-Fi: <b>Cài đặt → Wi-Fi → bấm (i) cạnh tên mạng → Định cấu hình DNS → Thủ công → Thêm máy chủ</b> <span class="ma" style="padding:2px 6px;font-size:13px">8.8.8.8</span> và <span class="ma" style="padding:2px 6px;font-size:13px">1.1.1.1</span> → Lưu, rồi mở lại link.</li>
+      <li>Vẫn không được: chụp màn hình này (có mã ở trên) gửi Thầy.</li>
+    </ol>
+    <a class="nut xam" href="#" id="nut-thu-lai" style="margin-top:12px">Thử lại</a>
+  </div>
+
+  <p class="nho" id="ua"></p>
+</main>
+
+<script>
+(function () {
+  var DICH = 'https://omr-app-b3u.pages.dev'
+  var DEN = '/hs'
+  try {
+    var q = location.search.replace(/^\?/, '').split('&')
+    for (var i = 0; i < q.length; i++) {
+      var c = q[i].split('=')
+      if (c[0] === 'den' && c[1]) DEN = decodeURIComponent(c[1])
+    }
+    if (DEN.charAt(0) !== '/') DEN = '/' + DEN
+  } catch (e) {}
+
+  function $(id) { return document.getElementById(id) }
+  function ghi(id, ok, chu) {
+    var o = $('kq-' + id)
+    o.className = 'kq ' + (ok ? 'ok' : 'hong')
+    o.textContent = chu
+  }
+
+  // Gõ cửa một địa chỉ. Không cần đọc nội dung: `no-cors` mà TRẢ VỀ được là
+  // tên miền tra ra và bắt tay TLS xong; bị từ chối (TypeError) là hỏng ở một
+  // trong hai bước ấy. Có hạn 8 giây để không treo.
+  function go(url) {
+    return new Promise(function (res) {
+      var xong = false
+      var t = setTimeout(function () { if (!xong) { xong = true; res({ ok: false, ly: 'quá 8 giây' }) } }, 8000)
+      var bd = Date.now()
+      var opt = { mode: 'no-cors', cache: 'no-store', credentials: 'omit' }
+      try {
+        fetch(url, opt).then(function () {
+          if (xong) return; xong = true; clearTimeout(t)
+          res({ ok: true, ms: Date.now() - bd })
+        }, function (e) {
+          if (xong) return; xong = true; clearTimeout(t)
+          res({ ok: false, ly: String(e && e.message || e).slice(0, 40) })
+        })
+      } catch (e) { xong = true; clearTimeout(t); res({ ok: false, ly: 'không gọi được' }) }
+    })
+  }
+
+  function googleThay() {
+    return new Promise(function (res) {
+      var t = setTimeout(function () { res({ ok: false, chu: 'không hỏi được' }) }, 8000)
+      fetch('https://dns.google/resolve?name=omr-app-b3u.pages.dev&type=A', { cache: 'no-store' })
+        .then(function (r) { return r.json() })
+        .then(function (d) {
+          clearTimeout(t)
+          var ds = (d && d.Answer) || []
+          var ip = []
+          for (var i = 0; i < ds.length; i++) if (ds[i].type === 1) ip.push(ds[i].data)
+          res(ip.length ? { ok: true, chu: 'có · ' + ip[0] } : { ok: false, chu: 'không có địa chỉ' })
+        }, function () { clearTimeout(t); res({ ok: false, chu: 'không hỏi được' }) })
+    })
+  }
+
+  function iosPhienBan() {
+    var m = navigator.userAgent.match(/OS (\d+)[_.](\d+)/)
+    return m ? 'iOS ' + m[1] + '.' + m[2] : (/Android/.test(navigator.userAgent) ? 'Android' : 'máy khác')
+  }
+
+  function chay() {
+    $('vao').className = 'an'; $('hong').className = 'the an'
+    var ids = ['P', 'W', 'I', 'C', 'G']
+    for (var i = 0; i < ids.length; i++) { $('kq-' + ids[i]).className = 'kq cho'; $('kq-' + ids[i]).textContent = 'đang thử…' }
+    $('ma').textContent = '…'
+    $('ua').textContent = iosPhienBan() + ' · ' + (navigator.userAgent.slice(0, 90))
+
+    Promise.all([
+      go(DICH + '/sw-version.json?_=' + Date.now()),
+      go('https://omr.ttadodaihoc.workers.dev/?_=' + Date.now()),
+      go('https://1.1.1.1/?_=' + Date.now()),
+      go('https://claude.ai/?_=' + Date.now()),
+      googleThay()
+    ]).then(function (r) {
+      ghi('P', r[0].ok, r[0].ok ? 'vào được · ' + r[0].ms + ' ms' : 'KHÔNG · ' + r[0].ly)
+      ghi('W', r[1].ok, r[1].ok ? 'vào được · ' + r[1].ms + ' ms' : 'KHÔNG · ' + r[1].ly)
+      ghi('I', r[2].ok, r[2].ok ? 'vào được' : 'KHÔNG')
+      ghi('C', r[3].ok, r[3].ok ? 'vào được' : 'KHÔNG')
+      ghi('G', r[4].ok, r[4].chu)
+      var ma = 'P' + (r[0].ok ? 1 : 0) + ' W' + (r[1].ok ? 1 : 0) + ' I' + (r[2].ok ? 1 : 0)
+             + ' C' + (r[3].ok ? 1 : 0) + ' G' + (r[4].ok ? 1 : 0) + ' · ' + iosPhienBan()
+             + ' · ' + new Date().toISOString().slice(0, 16).replace('T', ' ')
+      $('ma').textContent = ma
+
+      if (r[0].ok) {
+        var link = DICH + DEN
+        $('nut-vao').setAttribute('href', link)
+        $('vao').className = ''
+        var n = 3
+        var dem = setInterval(function () {
+          n -= 1
+          $('dem').textContent = n > 0 ? 'Tự chuyển sau ' + n + ' giây…' : 'Đang chuyển…'
+          if (n <= 0) { clearInterval(dem); location.replace(link) }
+        }, 1000)
+      } else {
+        $('hong').className = 'the'
+      }
+    })
+  }
+
+  $('nut-thu-lai').addEventListener('click', function (e) { e.preventDefault(); chay() })
+  chay()
+})()
+</script>
+</body>
+</html>
