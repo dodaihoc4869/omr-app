@@ -186,7 +186,7 @@ export default function HocSinhScreen() {
   if (sbdDangXem) {
     const diemGanNhat = hoSo?.ca.find((c) => c.tong !== null)?.tong ?? null
     return (
-      <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
+      <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
         <button onClick={() => moHoSoEm('')} className="tap-target self-start inline-flex items-center" style={{ ...NHAN_NHO, gap: 4 }}>
           <ArrowLeft size={16} /> Danh sách học sinh
         </button>
@@ -220,7 +220,7 @@ export default function HocSinhScreen() {
                 khối xuống một cột: muốn xem lịch sử ca của em phải cuộn qua
                 biểu đồ tiến bộ, phiếu Zalo và bảng chuyên đề. Nay tách hai mục,
                 và nút trong danh sách đi thẳng vào đúng mục. */}
-            <div className="grid grid-cols-2" style={{ gap: 'var(--k2)' }} role="tablist" aria-label="Mục hồ sơ">
+            <div className="gv-student-actions grid grid-cols-1 sm:grid-cols-3" style={{ gap: 'var(--k2)' }} role="tablist" aria-label="Mục hồ sơ">
               {(['bao-cao', 'lich-su'] as const).map((m) => {
                 const dang = mucHoSo === m
                 return (
@@ -379,15 +379,15 @@ export default function HocSinhScreen() {
 
   // ------------------------------------------------------------- DANH SÁCH EM
   return (
-    <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-      <div className="flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
+    <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
+      <div className="gv-page-header flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
         <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
           Học sinh
         </h1>
         {/* CÙNG MỘT NÚT VỚI KHO ĐỀ: bấm là chọn file danh sách rồi đẩy lên máy
             chủ. Danh sách này là CỔNG VÀO THI — nạp xong, số báo danh ngoài
             danh sách không thi được nữa. */}
-        <div className="flex flex-col items-end" style={{ gap: 'var(--k2)' }}>
+        <div className="gv-header-actions flex flex-col items-end" style={{ gap: 'var(--k2)' }}>
           <NutDongBoDanhSach
             onXong={(soEm, tomTat) => {
               showToast(`Đã nạp ${soEm} em lên máy chủ${tomTat ? ` — ${tomTat}` : ''}. Từ giờ chỉ những em này vào thi được.`, 'success')
@@ -408,14 +408,14 @@ export default function HocSinhScreen() {
       {/* Nói thẳng chạm vào đâu để giao bài — nút Giao bài tập nằm trong hồ sơ
           từng em (phải biết em yếu chuyên đề nào mới rút được câu), nên nhìn
           danh sách không đoán ra. */}
-      <div style={NHAN_NHO}>
-        Mỗi em có hai nút: <b style={{ color: 'var(--muc)' }}>Báo cáo</b> (tiến bộ, phiếu gửi phụ huynh, chuyên đề mạnh–yếu) và{' '}
-        <b style={{ color: 'var(--muc)' }}>Lịch sử ca</b> (mọi ca đã làm, điểm và hạng lớp). Em chỉ vào thi được khi nhập đúng cả ba: số báo danh, họ tên, năm sinh — khớp
+      <details className="gv-help"><summary>Hướng dẫn quản lý học sinh</summary>      <div style={NHAN_NHO}>
+        Mỗi em có các nút: <b style={{ color: 'var(--muc)' }}>Báo cáo</b> (tiến bộ, phiếu gửi phụ huynh, chuyên đề mạnh–yếu) và{' '}
+        <b style={{ color: 'var(--muc)' }}>Lịch sử ca</b> (mọi ca đã làm, điểm và hạng lớp), cùng nút <b style={{ color: 'var(--muc)' }}>Reset mật khẩu</b>. Em chỉ vào thi được khi nhập đúng cả ba: số báo danh, họ tên, năm sinh — khớp
         file danh sách đã đồng bộ.
-      </div>
+      </div></details>
 
-      <TheNoiDung>
-        <div className="flex items-center" style={{ gap: 'var(--k3)', marginBottom: 'var(--k3)' }}>
+      <TheNoiDung className="gv-directory">
+        <div className="gv-filterbar flex items-center" style={{ gap: 'var(--k3)', marginBottom: 'var(--k3)' }}>
           <div className="relative flex-1">
             <Search size={18} className="absolute" style={{ left: 14, top: 15, color: 'var(--mo)' }} />
             <input style={O_NHAP} placeholder="Tìm tên hoặc số báo danh…" value={timKiem} onChange={(e) => setTimKiem(e.target.value)} inputMode="search" aria-label="Tìm học sinh" />
@@ -469,7 +469,7 @@ export default function HocSinhScreen() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+          <div className="gv-student-list" style={{ gap: 'var(--k2)' }}>
             {dsLoc.map((e) => {
               const khoi = khoiTuNamSinh(e.namSinh)
               return (
@@ -525,7 +525,7 @@ export default function HocSinhScreen() {
                   {/* HAI NÚT MỖI EM (thầy chốt 05/09) — vào thẳng đúng mục, không
                       phải mở hồ sơ rồi cuộn tìm. Nhãn trợ năng kèm TÊN em, vì
                       danh sách 300 em thì "Báo cáo" trơ trọi không nói lên ai. */}
-                  <span className="grid grid-cols-2" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
+                  <span className="gv-student-actions grid grid-cols-1 sm:grid-cols-3" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
                     {(
                       [
                         ['bao-cao', <FileText key="i" size={15} />, 'Báo cáo'],
@@ -556,6 +556,16 @@ export default function HocSinhScreen() {
                         {chu}
                       </button>
                     ))}
+                    <button
+                      type="button"
+                      disabled={dangResetMk}
+                      onClick={() => void resetMatKhau(e.sbd, e.hoTen)}
+                      aria-label={`Reset mật khẩu của ${e.hoTen || `SBD ${e.sbd}`}`}
+                      className="tap-target inline-flex items-center justify-center gap-2 font-bold shadow-xs disabled:opacity-50"
+                      style={{ minHeight: 44, borderRadius: 'var(--bo-1)', background: 'var(--the)', border: '1.5px solid var(--vien)', color: 'var(--muc)', fontSize: 'var(--cx-1)' }}
+                    >
+                      <KeyRound size={15} /> {dangResetMk ? 'Đang reset…' : 'Reset mật khẩu'}
+                    </button>
                   </span>
                 </Hang>
               )

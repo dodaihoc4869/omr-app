@@ -24,6 +24,7 @@ import {
   RotateCcw,
   Clock,
   LogIn,
+  HelpCircle,
 } from 'lucide-react'
 import {
   DANH_SACH_THAN_THU,
@@ -205,6 +206,7 @@ export default function ThanThuHoaHocGame({
     }
   })
   const [batAm, setBatAm] = useState(true)
+  const [hienHuongDan, setHienHuongDan] = useState(false)
   const amThanhRef = useRef<AmThanhPet | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const canvasCombatRef = useRef<HTMLCanvasElement | null>(null)
@@ -1265,15 +1267,24 @@ export default function ThanThuHoaHocGame({
 
           <div className="flex items-center gap-2 self-end sm:self-auto">
             <button
+              type="button"
+              onClick={() => setHienHuongDan(true)}
+              title="Hướng dẫn chơi"
+              className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 cursor-pointer flex items-center gap-1.5 tap-target"
+            >
+              <HelpCircle className="w-4 h-4 text-amber-500" />
+              <span className="text-xs font-bold hidden sm:inline">Hướng dẫn</span>
+            </button>
+            <button
               onClick={() => setBatAm(!batAm)}
               title={batAm ? 'Tắt âm thanh' : 'Bật âm thanh'}
-              className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 cursor-pointer"
+              className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 cursor-pointer tap-target"
             >
               {batAm ? <Volume2 className="w-4 h-4 text-emerald-600" /> : <VolumeX className="w-4 h-4 text-slate-400" />}
             </button>
             <button
               onClick={onDong}
-              className="btn-google-outlined text-xs py-2 px-3 rounded-xl flex items-center gap-1 cursor-pointer"
+              className="btn-google-outlined text-xs py-2 px-3 rounded-xl flex items-center gap-1 cursor-pointer tap-target"
             >
               <X className="w-4 h-4" />
               <span>Thoát Game</span>
@@ -1355,7 +1366,7 @@ export default function ThanThuHoaHocGame({
               Chọn thần thú đồng hành của em
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 max-w-lg mx-auto leading-relaxed">
-              Sáu hệ, mỗi hệ một lối đánh. <b>Chọn một lần duy nhất và không đổi được</b>,
+              Bát Đại Thần Thú gồm <b>Tứ Đại Tự Nhiên</b> & <b>Tứ Trụ Tâm Thức</b>. <b>Chọn một lần duy nhất và không đổi được</b>,
               nên đọc kỹ hệ nào khắc hệ nào trước khi bấm.
             </p>
           </div>
@@ -1371,12 +1382,7 @@ export default function ThanThuHoaHocGame({
             </div>
           )}
 
-          {/* HỎI XONG, MÁY CHỦ KHÔNG CÓ THÚ NÀO. Phải nói thẳng ra.
-              Thầy bắt được 15-09: thanh đồng bộ báo "Đã đồng bộ với máy chủ ·
-              21:28:12" chấm xanh, mà màn vẫn bày nút chọn — nhìn như bấm đồng
-              bộ không ăn thua gì. Thật ra đồng bộ chạy đúng, chỉ là máy chủ
-              không có gì để trả về. Câu "đã đồng bộ" một mình KHÔNG trả lời
-              được câu hỏi em đang hỏi: "thế con thú của tôi đâu?" */}
+          {/* HỎI XONG, MÁY CHỦ KHÔNG CÓ THÚ NÀO. Phải nói thẳng ra. */}
           {tinhTrangDongBo === 'xong' && (
             <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-4 py-3 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
               Đã hỏi máy chủ xong: <b>chưa có thần thú nào mang số báo danh của em</b>.
@@ -1389,36 +1395,86 @@ export default function ThanThuHoaHocGame({
 
           {thanhDongBo}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {Object.values(DANH_SACH_THAN_THU).map((pet) => (
-              <button
-                key={pet.id}
-                type="button"
-                onClick={() => chonThanThu(pet.id)}
-                className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30 text-left space-y-2 cursor-pointer transition-all active:scale-95"
-              >
-                <div>
-                  <div className="text-sm font-black text-slate-900 dark:text-white">{pet.ten}</div>
-                  <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                    {TEN_HE[pet.he]}
-                  </div>
-                </div>
-                <p className="text-[11.5px] leading-relaxed text-slate-600 dark:text-slate-300 line-clamp-3">
-                  {pet.moTa}
-                </p>
-                <div className="space-y-0.5 text-[11px]">
-                  <div className="text-emerald-700 dark:text-emerald-400">
-                    <b>Khắc được:</b>{' '}
-                    {heKhacDuoc(pet.he).map((c) => TEN_HE_NGAN[c.thu]).join(', ') || '—'}
-                  </div>
-                  <div className="text-rose-700 dark:text-rose-400">
-                    <b>Bị khắc bởi:</b>{' '}
-                    {heBiKhacBoi(pet.he).map((c) => TEN_HE_NGAN[c.cong]).join(', ') || '—'}
-                  </div>
-                  <div className="text-slate-500 font-mono">Gốc: {pet.nguyenToGoc}</div>
-                </div>
-              </button>
-            ))}
+          <div className="space-y-4">
+            <div>
+              <div className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-2 flex items-center gap-1.5">
+                <span>🌿 Tứ Đại Tự Nhiên (Vật chất & Trạng thái tồn tại)</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {(['dat_quy', 'nuoc_long', 'lua_phuong', 'khi_bang'] as const).map((id) => {
+                  const pet = DANH_SACH_THAN_THU[id]!
+                  return (
+                    <button
+                      key={pet.id}
+                      type="button"
+                      onClick={() => chonThanThu(pet.id)}
+                      className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30 text-left space-y-2 cursor-pointer transition-all active:scale-95"
+                    >
+                      <div>
+                        <div className="text-sm font-black text-slate-900 dark:text-white">{pet.ten}</div>
+                        <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                          {TEN_HE[pet.he]}
+                        </div>
+                      </div>
+                      <p className="text-[11.5px] leading-relaxed text-slate-600 dark:text-slate-300 line-clamp-3">
+                        {pet.moTa}
+                      </p>
+                      <div className="space-y-0.5 text-[11px]">
+                        <div className="text-emerald-700 dark:text-emerald-400">
+                          <b>Khắc được:</b>{' '}
+                          {heKhacDuoc(pet.he).map((c) => TEN_HE_NGAN[c.thu]).join(', ') || '—'}
+                        </div>
+                        <div className="text-rose-700 dark:text-rose-400">
+                          <b>Bị khắc bởi:</b>{' '}
+                          {heBiKhacBoi(pet.he).map((c) => TEN_HE_NGAN[c.cong]).join(', ') || '—'}
+                        </div>
+                        <div className="text-slate-500 font-mono text-[10px]">Gốc: {pet.nguyenToGoc}</div>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div>
+              <div className="text-xs font-black uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-2 flex items-center gap-1.5">
+                <span>✨ Tứ Trụ Tâm Thức (Ý chí, Đạo đức & Khai sáng)</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {(['ductin_su', 'tinhyeu_ho', 'bieton_huou', 'sangy_ma'] as const).map((id) => {
+                  const pet = DANH_SACH_THAN_THU[id]!
+                  return (
+                    <button
+                      key={pet.id}
+                      type="button"
+                      onClick={() => chonThanThu(pet.id)}
+                      className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-purple-400 hover:bg-purple-50/50 dark:hover:bg-purple-950/30 text-left space-y-2 cursor-pointer transition-all active:scale-95"
+                    >
+                      <div>
+                        <div className="text-sm font-black text-slate-900 dark:text-white">{pet.ten}</div>
+                        <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                          {TEN_HE[pet.he]}
+                        </div>
+                      </div>
+                      <p className="text-[11.5px] leading-relaxed text-slate-600 dark:text-slate-300 line-clamp-3">
+                        {pet.moTa}
+                      </p>
+                      <div className="space-y-0.5 text-[11px]">
+                        <div className="text-emerald-700 dark:text-emerald-400">
+                          <b>Khắc được:</b>{' '}
+                          {heKhacDuoc(pet.he).map((c) => TEN_HE_NGAN[c.thu]).join(', ') || '—'}
+                        </div>
+                        <div className="text-rose-700 dark:text-rose-400">
+                          <b>Bị khắc bởi:</b>{' '}
+                          {heBiKhacBoi(pet.he).map((c) => TEN_HE_NGAN[c.cong]).join(', ') || '—'}
+                        </div>
+                        <div className="text-slate-500 font-mono text-[10px]">Gốc: {pet.nguyenToGoc}</div>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -1875,8 +1931,8 @@ export default function ThanThuHoaHocGame({
               </div>
 
               <div className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
-                Vòng khắc chế: Hoả ▸ Khí ▸ Base ▸ Acid ▸ Hoả. Đánh vào hệ mình khắc
-                được <b className="text-emerald-600 dark:text-emerald-400">+50%</b> sát thương;
+                Bát Đại Tương Khắc: Đất ▸ Nước ▸ Lửa ▸ Khí ▸ Đất & Đức Tin ▸ Tình Yêu ▸ Lòng Biết Ơn ▸ Sáng Ý ▸ Đức Tin.
+                Đánh vào hệ mình khắc được <b className="text-emerald-600 dark:text-emerald-400">+50%</b> sát thương;
                 đánh vào hệ khắc mình thì <b className="text-rose-600 dark:text-rose-400">−30%</b>.
               </div>
             </div>
@@ -1894,7 +1950,7 @@ export default function ThanThuHoaHocGame({
               </div>
               <div>
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                  Tháp Tri Thức 100 Tầng
+                  Tháp Tri Thức 999 Tầng
                 </h2>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Mỗi tầng canh giữ bởi Quái Vật Hóa Học. Trả lời đúng trong 15s để kích hoạt chiêu nộ hạ gục Boss!
@@ -1922,7 +1978,7 @@ export default function ThanThuHoaHocGame({
                 {/* Pet của em */}
                 <div className="p-4 bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-2xl text-left">
                   <div className="text-xs font-bold text-emerald-800 dark:text-emerald-300">
-                    {infoPet.ten} (Lv.{hoSo.capDo})
+                    {infoPet.ten} (Lv.{hoSo.capDo}) · {TEN_HE_NGAN[infoPet.he]}
                   </div>
                   <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mt-1.5">
                     <div
@@ -1938,8 +1994,6 @@ export default function ThanThuHoaHocGame({
                   <div className="text-xs font-bold text-rose-800 dark:text-rose-300">
                     Tầng {tangHienTai}/{TANG_TOI_DA}: {tenTrumTang(tangHienTai)}
                   </div>
-                  {/* ĐỘ KHÓ HIỆN THÀNH SỐ. "Tầng cao hơn thì khó hơn" phải là
-                      thứ em nhìn thấy, không phải lời hứa suông. */}
                   <div className="text-[10px] text-rose-700/80 dark:text-rose-400/80 font-mono">
                     độ khó ★{saoMucTieuTheoTang(tangHienTai).toFixed(1)}/2,0
                   </div>
@@ -1951,6 +2005,24 @@ export default function ThanThuHoaHocGame({
                   </div>
                   <div className="text-[10px] text-slate-500 mt-1 font-mono tabular-nums">{mauBoss} / {mauBossToiDa} HP</div>
                 </div>
+
+                {/* Huy hiệu tương khắc giữa Pet và Boss */}
+                {(() => {
+                  const tk = tinhHeSoTuongKhac(infoPet.he, heTrumTang(tangHienTai))
+                  return (
+                    <div className="col-span-2 text-center py-1">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold ${
+                        tk.loai === 'khac'
+                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700'
+                          : tk.loai === 'biKhac'
+                            ? 'bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300 border border-rose-300 dark:border-rose-700'
+                            : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
+                      }`}>
+                        <span>{tk.thongDiep}</span>
+                      </span>
+                    </div>
+                  )
+                })()}
               </div>
 
               {lyDoNoiCau.length > 0 && (
@@ -2336,6 +2408,63 @@ export default function ThanThuHoaHocGame({
                 )
               })}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL HƯỚNG DẪN CHƠI THẦN THÚ */}
+      {hienHuongDan && (
+        <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto animate-google-fade">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
+                  <Sparkles size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white leading-tight">Hướng Dẫn Chơi Thần Thú</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Nuôi thú, thức tỉnh nguyên tố & leo tháp tri thức</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setHienHuongDan(false)}
+                className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer tap-target"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs leading-relaxed text-slate-700 dark:text-slate-300">
+              <div className="p-3.5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/40 space-y-1">
+                <div className="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                  <span>🥚</span> Nuôi Thần Thú & Nhận EXP
+                </div>
+                <p>Mỗi câu Hoá học làm đúng trong ca thi, BTVN và bài luyện khắc phục tự động cộng <b>2 EXP</b> cho Thần thú. Tích đủ EXP để tăng cấp độ và tiến hoá lên các bậc cao hơn.</p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-purple-50/80 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-900/40 space-y-1">
+                <div className="font-bold text-purple-900 dark:text-purple-300 flex items-center gap-1.5">
+                  <span>⚡</span> Thức Tỉnh Nguyên Tố & Chiêu Thức
+                </div>
+                <p>Mỗi Thần thú mang một nguyên tố Hoá học cốt lõi (Kim, Mộc, Thuỷ, Hoả, Thổ, Khí...). Khi đạt các mốc cấp độ, thú mở khoá các kỹ năng thường và kỹ năng nộ uy lực.</p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-900/40 space-y-1">
+                <div className="font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
+                  <span>🗼</span> Leo Tháp Tri Thức & Săn Boss
+                </div>
+                <p>Mỗi tầng tháp là một thử thách câu hỏi Hoá học. Trả lời đúng để ra đòn tiêu diệt quái và boss tầng, nhận thêm lượng lớn EXP và vật phẩm quý giá.</p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setHienHuongDan(false)}
+              className="w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs cursor-pointer shadow-md transition tap-target"
+            >
+              Đã hiểu, sẵn sàng chiến đấu!
+            </button>
           </div>
         </div>
       )}

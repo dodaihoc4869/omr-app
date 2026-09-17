@@ -1,3 +1,5 @@
+import NhomCaThuGon from '../components/NhomCaThuGon'
+import { phanCongDayHoc } from '../lib/phan-cong-day-hoc'
 // GỌI HỌC SINH LÊN BẢNG — MỘT MÀN, MỘT LUỒNG (thầy chốt 05/09 chiều).
 //
 // Nguồn duy nhất là CA thầy vừa cho lớp làm. Từ một ca ấy ra cả hai việc:
@@ -14,7 +16,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Shuffle, MonitorPlay } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
-import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, lichSuLenBang, thanThuDocApi, type CaTomTat, type LichSuLenBangEm } from '../lib/exam-api'
+import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, lichSuLenBang, thanThuLopDocApi, type CaTomTat, type LichSuLenBangEm } from '../lib/exam-api'
 import { docKhoChuaCa, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { mergeKeepAnswers } from '../data/examContent'
 import { khuTrungNguon } from '../lib/khu-trung-cau'
@@ -139,6 +141,7 @@ export default function GoiLenBangScreen() {
 
   const [cauHinh, setCauHinh] = useState<{ url: string; mat: string } | null>(null)
   const [loi, setLoi] = useState('')
+  const [dayHoc, setDayHoc] = useState(false)
 
   const [dsCa, setDsCa] = useState<CaTomTat[] | null>(null)
   const [timCa, setTimCa] = useState('')
@@ -313,7 +316,7 @@ export default function GoiLenBangScreen() {
       setDu({ maCa: ca.maCa, ten: ca.tenCa || `mã ${ca.maCa}`, bank, khoChua, luot, hoSo })
       // Ca thường (mở bằng Rút bộ câu / Lấy trọn kho) không có bộ rút sẵn — đưa
       // thẳng thầy sang nhánh tự chọn, khỏi phải bấm thêm một chạm.
-      setCachLayCau(khoChua ? 'san' : 'tu_chon')
+      setCachLayCau(!dayHoc && khoChua ? 'san' : 'tu_chon')
       showToast(`Ca ${ca.tenCa || ca.maCa}: ${coBai.length} em có bài`, 'success')
     } catch (e) {
       setDu(null)
@@ -355,8 +358,8 @@ export default function GoiLenBangScreen() {
   // KHỬ TRÙNG Ở ĐÂY, sau khi thầy đã tích — hộp chọn vẫn hiện đủ kho, còn danh
   // sách chữa thì không có hai câu y hệt nhau.
   const bankTichTay: BanDeCa = useMemo(
-    () => mergeKeepAnswers(khuTrungNguon(deDaLuu.filter((d) => maDeChon.has(d.maDe))).nguon),
-    [deDaLuu, maDeChon],
+    () => mergeKeepAnswers(dayHoc ? deDaLuu.filter(d => maDeChon.has(d.maDe)) : khuTrungNguon(deDaLuu.filter((d) => maDeChon.has(d.maDe))).nguon),
+    [deDaLuu, maDeChon, dayHoc],
   )
   /** Số câu bị bỏ vì trùng — nói ra để thầy khỏi thắc mắc sao tích 40 ra 36. */
   const soCauTrung = useMemo(() => {
@@ -402,6 +405,7 @@ export default function GoiLenBangScreen() {
     const q = timEm.trim().toLowerCase()
     return q ? dsEmCa.filter((e) => e.sbd.includes(q) || e.hoTen.toLowerCase().includes(q)) : dsEmCa
   }, [dsEmCa, timEm])
+  useEffect(() => { if(dayHoc) { setKq(null); setKqBuoi(null); setKqXep(null); setHtmlMayChieu('') } }, [dayHoc, maDeChon, vang, du?.maCa])
   const soCoMat = dsEmCa.filter((e) => e.coMat).length
 
   /** Tra câu ĐẦY ĐỦ theo id — gộp nhiều đề thì `viTri` của hai đề trùng nhau,
@@ -680,6 +684,14 @@ export default function GoiLenBangScreen() {
   }
 
   const chayCaHai = () => {
+    if (dayHoc) {
+      if (!lichSu) return showToast('Chưa tải được lịch sử lên bảng. Thầy tải lại lịch sử trước khi phân công.', 'warn')
+      try {
+        const result = phanCongDayHoc(dsCau, dsEmCa.map(e => ({...e, soLanLenBang: lichSu.theoEm[e.sbd]?.soLan ?? 0})))
+        setKqXep(null); setKqBuoi(null); setKq(result); setXemCau('')
+      } catch (e) { showToast(e instanceof Error ? e.message : 'Chưa phân công được', 'warn') }
+      return
+    }
     chayGiaoAn()
     chay(1)
     void chayBuoiChua()
@@ -744,7 +756,7 @@ export default function GoiLenBangScreen() {
         thieu.push(`${p.hoTen || p.sbd} — câu ${p.cau.so} phần ${p.cau.phan}`)
         continue
       }
-      dsO.push({ sbd: p.sbd, hoTen: p.hoTen, soCau: p.cau.so, cau: cl, viSao: p.viSao, btvnCau: p.btvnCau, btvnTom: p.btvnTom })
+      dsO.push({ sbd: p.sbd, hoTen: p.hoTen, soCau: p.cau.so, sao: p.cau.sao, mucDo: p.cau.mucDo, cau: cl, viSao: p.viSao, btvnCau: p.btvnCau, btvnTom: p.btvnTom })
     }
 
     // CẤM CHIẾU MỘT TỜ THIẾU CÂU MÀ KHÔNG NÓI. Câu nào không tra được nội dung
@@ -763,11 +775,10 @@ export default function GoiLenBangScreen() {
     // Nhập kiểu động: bộ vẽ thần thú chỉ cần đúng lúc bấm máy chiếu, không việc
     // gì phải nằm trong gói khởi động của màn thầy.
     try {
-      const { thanThuChoToChieu } = await import('../lib/anh-than-thu')
-      const docThu = (sbd: string): Promise<unknown> =>
-        thanThuDocApi('', sbd).then((r) => (r.ok ? (r.hoSo ?? null) : null))
+      const { thanThuV2ChoToChieu } = await import('../lib/anh-than-thu-v2')
+      const docThu = thanThuLopDocApi
       const dsThu = await Promise.all(
-        dsO.map((o) => thanThuChoToChieu(docThu, o.sbd).catch(() => null)),
+        dsO.map((o) => thanThuV2ChoToChieu(docThu, o.sbd).catch(() => null)),
       )
       for (const [i, t] of dsThu.entries()) {
         if (t !== null) dsO[i]!.thanThu = t
@@ -787,7 +798,8 @@ export default function GoiLenBangScreen() {
 
     setHtmlMayChieu(
       taoHtmlMayChieu(dsO, {
-        tenBuoi: du ? `Chữa bài ca ${du.maCa}` : 'Gọi lên bảng',
+        dayHoc,
+        tenBuoi: dayHoc ? 'Dạy học · Gọi lên bảng' : du ? `Chữa bài ca ${du.maCa}` : 'Gọi lên bảng',
         ngay: new Date(),
         dsDapAn,
       }),
@@ -936,7 +948,7 @@ export default function GoiLenBangScreen() {
   }
 
   return (
-    <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
+    <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
       <button onClick={() => setScreen('examhub')} className="tap-target self-start inline-flex items-center" style={{ ...NHAN_NHO, gap: 4 }}>
         <ArrowLeft size={16} /> Kiểm tra
       </button>
@@ -944,10 +956,20 @@ export default function GoiLenBangScreen() {
         Gọi học sinh lên bảng
       </h1>
 
+      <TheNoiDung>
+        <button type="button" role="switch" aria-label="Dạy học" aria-checked={dayHoc}
+          onClick={() => { setDayHoc(!dayHoc); setCachLayCau('tu_chon'); setKq(null); setKqXep(null); setKqBuoi(null); setHtmlMayChieu('') }}
+          className="flex w-full items-center justify-between gap-3 text-left font-bold">
+          <span>{dayHoc ? 'Dạy học' : 'Chữa bài tập về nhà'}</span>
+          <span className={`rounded-full px-4 py-2 ${dayHoc ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'}`}>{dayHoc ? 'Dạy học: Bật' : 'Dạy học: Tắt'}</span>
+        </button>
+        {dayHoc && <p className="mt-3 text-sm text-slate-500">Lấy toàn bộ câu trong đề đã chọn. Mỗi đợt 2 em khác nhau; ưu tiên ít lên bảng, bốc ngẫu nhiên khi bằng lượt. Nếu số câu lẻ, đợt cuối có 1 em. Chọn ca bên dưới để lấy danh sách học sinh.</p>}
+      </TheNoiDung>
       {loi && <OThongBao tone="do">{loi}</OThongBao>}
 
-      {/* 1 — CA LẤY BÀI LÀM */}
-      <TheNoiDung>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+        {/* 1 — CA LẤY BÀI LÀM */}
+        <TheNoiDung className="h-full">
         <div className="flex items-center justify-between" style={{ gap: 'var(--k2)' }}>
           <div style={TIEU_DE_MUC}>1. Ca lớp vừa làm</div>
           {du && (
@@ -986,7 +1008,7 @@ export default function GoiLenBangScreen() {
           <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>Chưa có ca nào khớp.</div>
         ) : (
           <div className="flex flex-col" style={{ gap: 'var(--k1)', marginTop: 'var(--k3)', maxHeight: 300, overflowY: 'auto' }} data-hop-ca>
-            {dsCaLoc.map((c) => {
+            <NhomCaThuGon ds={dsCaLoc} selected={c=>du?.maCa===c.maCa} render={(c) => {
               const chon = du?.maCa === c.maCa
               return (
                 <button
@@ -1011,21 +1033,21 @@ export default function GoiLenBangScreen() {
                   {dangTaiCa === c.maCa ? <RefreshCw size={16} className="animate-spin shrink-0" /> : chon ? <Check size={16} className="shrink-0" style={{ color: 'var(--xanh)' }} /> : null}
                 </button>
               )
-            })}
+            }}/>
           </div>
         )}
         {dangTaiCa && tienDo && <div style={{ ...NHAN_NHO, ...SO, marginTop: 'var(--k2)' }}>Đang lấy hồ sơ chuyên đề từng em… {tienDo}</div>}
       </TheNoiDung>
 
       {/* 2 — THÊM CÂU NGOÀI CA */}
-      <TheNoiDung>
+      <TheNoiDung className="h-full">
         <div style={TIEU_DE_MUC}>2. Câu để chữa lấy ở đâu</div>
         <div style={{ ...NHAN_NHO, marginTop: 4, marginBottom: 'var(--k3)' }}>
           Bài làm của em ở mục 1 luôn được dùng để tính câu nào cả lớp cùng sai. Mục này chỉ quyết định LẤY CÂU NÀO RA CHỮA.
         </div>
 
         <div className="flex flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k3)' }} role="radiogroup" aria-label="Cách lấy câu để chữa">
-          {(['theo_dang', 'san', 'tu_chon'] as const).map((c) => {
+          {(!dayHoc ? ['theo_dang', 'san', 'tu_chon'] as const : []).map((c) => {
             const chon = cachLayCau === c
             const tat = (c === 'san' && !du?.khoChua) || (c === 'theo_dang' && (demChua?.tongUngVien ?? 0) === 0)
             return (
@@ -1055,7 +1077,7 @@ export default function GoiLenBangScreen() {
           })}
         </div>
 
-        {cachLayCau === 'theo_dang' ? (
+        {dayHoc ? <p className="text-sm text-slate-500">Chọn đề dạy học bên dưới. Toàn bộ câu sẽ được phân công theo thứ tự đề.</p> : cachLayCau === 'theo_dang' ? (
           <div data-theo-dang>
             <div style={{ ...NHAN_NHO, marginBottom: 'var(--k3)' }}>
               Rút từ <b>cả kho</b>, chỉ lấy câu cùng mã dạng với những câu cả lớp làm sai. Không lấy câu chuyên đề khác, không bó trong đề của ca.
@@ -1157,12 +1179,13 @@ export default function GoiLenBangScreen() {
           ))}
         {/* Hộp trên hiện ĐỦ SỐ CÂU TRONG KHO. Câu trùng chỉ bị bỏ khi dựng danh
             sách chữa — nói ra con số ấy để thầy khỏi thắc mắc tích 40 ra 36. */}
-        {soCauTrung > 0 && (
+        {!dayHoc && soCauTrung > 0 && (
           <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
             Đã bỏ <span style={SO}>{soCauTrung}</span> câu trùng giữa các bài đã tích — danh sách chữa lấy mỗi câu một lần.
           </div>
         )}
       </TheNoiDung>
+      </div>
 
       {/* 3 — EM CÓ MẶT */}
       {du && (
@@ -1200,7 +1223,7 @@ export default function GoiLenBangScreen() {
       {du && (
         <TheNoiDung>
           <div className="flex items-center justify-between flex-wrap" style={{ gap: 'var(--k2)' }}>
-            <div style={TIEU_DE_MUC}>Giáo án {CAU_HINH_LEN_BANG_MAC_DINH.NGAN_SACH_PHUT} phút</div>
+            <div style={TIEU_DE_MUC}>{dayHoc ? 'Phân công dạy học' : `Giáo án ${CAU_HINH_LEN_BANG_MAC_DINH.NGAN_SACH_PHUT} phút`}</div>
             <button
               type="button"
               onClick={() => void dungKho()}
@@ -1224,7 +1247,7 @@ export default function GoiLenBangScreen() {
           </div>
 
           {/* 4 — DANH SÁCH BẮT BUỘC CHỮA, hiện TRƯỚC khi xếp giờ */}
-          {doKhoCau.length > 0 && (
+          {!dayHoc && doKhoCau.length > 0 && (
             <div style={{ marginTop: 'var(--k4)', padding: 'var(--k3)', borderRadius: 'var(--bo-2)', background: 'var(--cam-nen)' }} data-khoi="bat-buoc-chua">
               <div className="flex items-center font-bold" style={{ gap: 6, color: 'var(--cam)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
                 <BookOpenCheck size={16} /> BẮT BUỘC CHỮA — <span style={SO}>{soBatBuoc}</span>/<span style={SO}>{doKhoCau.length}</span> câu
@@ -1251,6 +1274,7 @@ export default function GoiLenBangScreen() {
             </div>
           )}
 
+          {!dayHoc && <>
           {/* 6 — CÀI ĐẶT: một nguồn sự thật, thầy chỉnh được đúng hai thứ mà ba
               lựa chọn thừa giờ nhắc tới. */}
           <div className="flex items-center flex-wrap" style={{ gap: 'var(--k3)', marginTop: 'var(--k4)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
@@ -1281,6 +1305,7 @@ export default function GoiLenBangScreen() {
             </span>
           </div>
 
+          </>}
           {/* MỘT NÚT, MỘT VIỆC (thầy chốt 14/09: "gộp 2 nút này làm một").
               Trước đây "Xếp giờ" và "Phân công lên bảng" là hai nút xanh y hệt
               nhau, nằm cách nhau một thẻ — thầy phải nhớ bấm cái nào trước, và
@@ -1296,14 +1321,14 @@ export default function GoiLenBangScreen() {
             <NutChinh onClick={chayCaHai} disabled={!du || soCoMat === 0}>
               <span className="inline-flex items-center" style={{ gap: 8 }}>
                 <Wand2 size={18} />
-                <span>Xếp giờ &amp; phân công lên bảng</span>
+                <span>{dayHoc ? 'Phân công toàn bộ câu dạy học' : 'Xếp giờ & phân công lên bảng'}</span>
                 <span style={{ ...SO, opacity: 0.82, fontWeight: 600 }}>
                   {dsCau.length} câu · {soCoMat} em
                 </span>
               </span>
             </NutChinh>
             <div style={{ ...NHAN_NHO, marginTop: 6, textAlign: 'center' }}>
-              Một lượt bấm ra cả giáo án theo phút và bảng phân công từng em.
+              {dayHoc ? 'Mỗi câu được phân cho một em; số lượt trong buổi được tính để chia đều.' : 'Một lượt bấm ra cả giáo án theo phút và bảng phân công từng em.'}
             </div>
           </div>
 
@@ -1564,7 +1589,7 @@ export default function GoiLenBangScreen() {
               <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', letterSpacing: '.04em' }}>
                 LƯỢT {luot}
               </div>
-              <div className="flex flex-col" style={{ gap: 'var(--k3)', marginTop: 'var(--k2)' }}>
+              <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--k3)', marginTop: 'var(--k2)' }}>
                 {ds.map((p) => {
                   const ma = p.sbd + p.cau.id
                   return (

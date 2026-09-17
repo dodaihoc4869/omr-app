@@ -5,12 +5,14 @@
  * package.json: "check:mau"). */
 :root {
   /* nền và bề mặt */
-  --nen: #f7f8fa;
-  --the: #ffffff;
-  --the-2: #f3f4f6; /* nền chìm: hàng phương án, ô nhập */
+  --nen: #f5f4ef;
+  --the: #fffefb;
+  --the-2: #eeeee8; /* nền chìm: hàng phương án, ô nhập */
   --the-mo: rgba(255, 255, 255, 0.85); /* thanh trên mờ (backdrop-filter) của màn làm bài */
   --giay: #ffffff; /* "tờ giấy": nền ảnh cắt từ đề + phiếu in — CỐ ĐỊNH trắng ở cả 2 nền */
 
+  --vang-diu: #91691e;
+  --vang-diu-nen: #f7efd9;
   /* chữ */
   --muc: #1a2332;
   /* HAI BẬC CHỮ MỜ PHẢI ĐỌC ĐƯỢC, không chỉ phải nhạt.
@@ -20,8 +22,8 @@
    * trang trí chứ không phải để đọc.
    * Nay cả hai bậc đều ≥ 4,5 trên CẢ BA nền sáng (--the, --nen, --the-2), và
    * vẫn cách nhau đủ để phân bậc. Khoá lại bằng `tuong-phan-mau-1009.test.ts`. */
-  --nhat: #5b6270;
-  --mo: #667085;
+  --nhat: #505b69;
+  --mo: #626c7b;
   --muc-nguoc: #ffffff; /* chữ đặt TRÊN nền --muc/--do/--tim đặc (nút chính, cảnh báo) */
 
   /* lớp phủ sau hộp thoại / ảnh phóng to */
@@ -150,15 +152,17 @@
  * chữ/khoảng cách/bo góc không đổi theo nền. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --nen: #0f1419;
-    --the: #1a2029;
-    --the-2: #242b36;
+    --vang-diu: #e4c47e;
+    --vang-diu-nen: #343126;
+    --nen: #171c23;
+    --the: #202730;
+    --the-2: #29323d;
     --the-mo: rgba(26, 32, 41, 0.85);
 
     --muc: #e8eaed;
-    --nhat: #9aa4b2;
+    --nhat: #c2c8cf;
     /* Nền tối cũng vậy: #6b7482 cũ chỉ đạt 3,02 trên --the-2. */
-    --mo: #8d97a5;
+    --mo: #a6b0bc;
     --muc-nguoc: #0f1419;
 
     --phu: rgba(0, 0, 0, 0.6);

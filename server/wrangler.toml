@@ -43,3 +43,7 @@ enabled = true
 
 [observability.logs]
 enabled = true
+
+# Bảng tin phụ huynh: 00:01 giờ Việt Nam hằng ngày.
+[triggers]
+crons = ["1 17 * * *", "* * * * *"]

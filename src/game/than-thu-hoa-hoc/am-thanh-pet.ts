@@ -330,19 +330,12 @@ export class AmThanhPet {
           loc: 'bandpass', fLoc: 1400, fLoc1: 3200, qLoc: 6, lech: 9, vang: 0.4 })
         this.on({ tre: T, to: 0.26, len: 0.05, giu: 0.42, tat: 0.4,
           loc: 'highpass', f0: 2000, f1: 8000, q: 0.8, vang: 0.5 })
-        // NỀN TRẦM. Đo 16-09: tia bích ngọc chỉ có dải cao nên đỉnh sóng 0,45
-        // — nghe mỏng hơn cả đòn thường. Một lớp hạ âm đi cùng là ra "khẩu
-        // pháo", không phải "cái còi".
         this.giong({ tre: T, dang: 'sine', f0: 76, f1: 58, to: 0.34,
           len: 0.03, giu: 0.5, tat: 0.55, loc: 'lowpass', fLoc: 260, qLoc: 1.2, vang: 0.35 })
         break
+      case 'nuoc':
       case 'axit':
-        // GALAXY CROWN LASER — tia từ sừng: một nốt cao TINH KHIẾT, gần như
-        // sạch hẳn nhiễu, cộng hào quang ngân dài. Chất "ngân hà" nằm ở đuôi vang.
-        // Đo 16-09: bản trước đỉnh sóng 0,20 — YẾU HƠN cả đòn thường (0,26).
-        // Một chiêu tối thượng mà nhỏ tiếng hơn đòn phổ thông là sai hẳn ý
-        // "âm thanh của chưởng phải mãnh liệt". Nâng ba lớp, thêm nền trầm và
-        // một lớp hơi rít, vẫn giữ chất TINH KHIẾT của tia laze.
+        // HYDROGEN VORTEX TSUNAMI — tia vương miện ngân hà / hải triều liên kết hydro:
         this.giong({ tre: T, dang: 'sine', f0: 1320, f1: 1760, to: 0.5, len: 0.03,
           giu: 0.46, tat: 0.7, loc: 'bandpass', fLoc: 2400, qLoc: 9, lech: 5, vang: 0.75 })
         this.giong({ tre: T + 0.04, dang: 'sine', f0: 2640, to: 0.24, len: 0.02,
@@ -352,9 +345,9 @@ export class AmThanhPet {
         this.on({ tre: T, to: 0.16, len: 0.04, giu: 0.4, tat: 0.55,
           loc: 'bandpass', f0: 3200, f1: 6400, q: 2.2, vang: 0.7 })
         break
+      case 'dat':
       case 'kiem':
-        // CHRONO-CORE CANON ARRAY — SÁU phát pháo lệch nhịp, mỗi phát một cú
-        // thụi trầm cộng tiếng kim loại. Đây là chỗ "dàn pháo" phải nghe ra.
+        // CONTINENTAL CRUST IMPACT — Dàn Pháo Thạch Nham & Lõi Thời Không:
         for (let i = 0; i < 6; i++) {
           const tre = T + i * 0.075
           this.giong({ tre, dang: 'sine', f0: 190 - i * 8, f1: 46, to: 0.34,
@@ -365,9 +358,9 @@ export class AmThanhPet {
             giu: 0.02, tat: 0.2, loc: 'bandpass', fLoc: 2400, qLoc: 8, vang: 0.5 })
         }
         break
+      case 'lua':
       case 'hoa':
-        // SOLAR FLARE ERUPTION — bùng nổ hào quang: gầm trầm dày cộng lửa réo
-        // dải rộng, không có cao độ rõ — đúng chất "một mảng lửa khổng lồ".
+        // SOLAR FLARE ERUPTION — bùng nổ hào quang nhiệt nhôm:
         this.giong({ tre: T, dang: 'sawtooth', f0: 88, fGiua: 140, f1: 62, to: 0.42,
           len: 0.05, giu: 0.5, tat: 0.6, rung: 0.06, nhipRung: 11,
           loc: 'lowpass', fLoc: 900, fLoc1: 260, qLoc: 3, lech: 16, vang: 0.45 })
@@ -378,9 +371,9 @@ export class AmThanhPet {
             giu: 0.004, tat: 0.09, loc: 'bandpass', f0: 900 + Math.random() * 3200, q: 4, vang: 0.4 })
         }
         break
+      case 'ductin':
       case 'dien':
-        // CHILLING FROST ROAR — TIẾNG GẦM trước, băng vỡ sau. Gầm dựng bằng
-        // răng cưa trầm có rung mạnh; băng là chuỗi tiếng lách tách cao và khô.
+        // LAW OF CONSERVATION REALM — Kim Cương Giới Bất Hoại:
         this.giong({ tre: T, dang: 'sawtooth', f0: 104, fGiua: 168, f1: 96, to: 0.44,
           len: 0.06, giu: 0.42, tat: 0.55, rung: 0.09, nhipRung: 17,
           loc: 'lowpass', fLoc: 780, fLoc1: 380, qLoc: 4, lech: 14, vang: 0.4 })
@@ -393,9 +386,24 @@ export class AmThanhPet {
             loc: 'highpass', f0: 4200 + Math.random() * 5000, q: 2, vang: 0.5 })
         }
         break
+      case 'sangy':
+        // COSMIC CONSCIOUSNESS ILLUMINATION — Vô Cực Diệu Giác:
+        this.giong({ tre: T, dang: 'sine', f0: 880, fGiua: 2640, f1: 1760, to: 0.5,
+          len: 0.04, giu: 0.55, tat: 0.7, rung: 0.04, nhipRung: 12,
+          loc: 'bandpass', fLoc: 2200, qLoc: 6, lech: 7, vang: 0.8 })
+        this.on({ tre: T, to: 0.22, len: 0.02, giu: 0.45, tat: 0.6,
+          loc: 'highpass', f0: 3500, f1: 9500, q: 1.2, vang: 0.75 })
+        break
+      case 'bieton':
+        // LE CHATELIER EQUILIBRIUM FLOURISH — Vạn Cổ Cân Bằng Hoa Trận:
+        this.giong({ tre: T, dang: 'triangle', f0: 440, fGiua: 554, f1: 659, to: 0.45,
+          len: 0.06, giu: 0.6, tat: 0.7, rung: 0.02, nhipRung: 6,
+          loc: 'lowpass', fLoc: 1200, qLoc: 1.8, lech: 5, vang: 0.7 })
+        this.on({ tre: T + 0.1, to: 0.15, len: 0.05, giu: 0.4, tat: 0.6,
+          loc: 'bandpass', f0: 1200, f1: 3000, q: 2, vang: 0.65 })
+        break
       default:
-        // BIOLUMINESCENT VORTEX BLAST — xoáy nước phát quang: tiếng ù trầm
-        // quay tròn cộng ba lớp sủi. Rung nhịp chậm là cái tạo cảm giác XOÁY.
+        // COVALENT SOUL HARMONY — Hồng Tinh Đồng Tâm:
         this.giong({ tre: T, dang: 'sine', f0: 132, fGiua: 96, f1: 150, to: 0.4,
           len: 0.08, giu: 0.5, tat: 0.6, rung: 0.16, nhipRung: 5.5,
           loc: 'lowpass', fLoc: 620, qLoc: 2.4, lech: 12, vang: 0.5 })
@@ -485,12 +493,19 @@ export class AmThanhPet {
     this.moKhoa()
     if (!this.bat) return
     switch (he) {
-      case 'hoa': return this.keuHoa()
-      case 'axit': return this.keuAcid()
+      case 'dat':
       case 'kiem': return this.keuBase()
+      case 'nuoc':
+      case 'axit': return this.keuAcid()
+      case 'lua':
+      case 'hoa': return this.keuHoa()
       case 'khi': return this.keuKhi()
+      case 'ductin':
       case 'dien': return this.keuDien()
+      case 'tinhyeu':
       case 'huuco': return this.keuHuuCo()
+      case 'bieton': return this.keuBietOn()
+      case 'sangy': return this.keuSangY()
       default: return this.keuHuuCo()
     }
   }
@@ -557,7 +572,7 @@ export class AmThanhPet {
     this.giong({ tre: 0.22, dang: 'triangle', f0: 1180, f1: 700, to: 0.22, len: 0.01, giu: 0.07, tat: 0.3,
       rung: 0.05, nhipRung: 22, loc: 'bandpass', fLoc: 1900, qLoc: 4, vang: 0.34 })
     // Thân giọng trầm: thiếu lớp này thì tiếng điện chỉ còn lạo xạo, không ra
-    // tiếng CON gì cả — đo được rms 0,008, mỏng hơn năm hệ kia ba bốn lần.
+    // tiếng CON gì cả.
     this.giong({ tre: 0.14, dang: 'triangle', f0: 330, fGiua: 470, f1: 380, to: 0.085, len: 0.02, giu: 0.07, tat: 0.24,
       rung: 0.025, nhipRung: 7, loc: 'lowpass', fLoc: 1300, qLoc: 2, lech: 10, vang: 0.24 })
   }
@@ -572,5 +587,24 @@ export class AmThanhPet {
     // Cái nảy cuối: cao độ vồng lên rồi rơi, nghe như lò xo bật.
     this.giong({ tre: 0.25, dang: 'sine', f0: 698.5, fGiua: 1050, f1: 620, to: 0.1, len: 0.02, giu: 0.05, tat: 0.3,
       rung: 0.03, nhipRung: 6.5, loc: 'bandpass', fLoc: 1200, qLoc: 3, vang: 0.4 })
+  }
+
+  /** LÒNG BIẾT ƠN — tiếng chuông thiền định ngọc bích an hoà, ngân vang chữa lành. */
+  private keuBietOn(): void {
+    const n = [528, 660, 792] // Tần số năng lượng Solfeggio 528Hz chữa lành
+    n.forEach((f, i) => {
+      this.giong({ tre: i * 0.1, dang: 'sine', f0: f, to: 0.18, len: 0.02, giu: 0.08, tat: 0.6,
+        loc: 'bandpass', fLoc: f * 1.5, qLoc: 2.5, lech: 4, vang: 0.5 })
+    })
+  }
+
+  /** SỰ SÁNG Ý THỨC — chùm âm photon vút cao lấp lánh, tiếng ngân quang lượng tử. */
+  private keuSangY(): void {
+    const n = [880, 1174.66, 1479.98, 1760]
+    n.forEach((f, i) => {
+      this.giong({ tre: i * 0.045, dang: 'sine', f0: f * 0.8, f1: f * 1.2, to: 0.14, len: 0.01, giu: 0.04, tat: 0.45,
+        loc: 'bandpass', fLoc: f * 2, qLoc: 5, lech: 6, vang: 0.6 })
+    })
+    this.on({ tre: 0.15, to: 0.08, len: 0.02, giu: 0.05, tat: 0.35, loc: 'highpass', f0: 4500, f1: 9000, q: 1.5, vang: 0.65 })
   }
 }

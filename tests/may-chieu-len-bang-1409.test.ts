@@ -84,7 +84,7 @@ describe('Tờ máy chiếu', () => {
 
   it('mỗi nửa có nút hiện lời giải riêng, đóng sẵn', () => {
     expect(html.match(/class="mc-nut-giai"/g)).toHaveLength(4)
-    expect(html.match(/aria-expanded="false"/g)).toHaveLength(4)
+    expect(html.match(/class="mc-nut-giai" aria-expanded="false"/g)).toHaveLength(4)
     expect(html.match(/class="mc-giai" id="giai-\d+-(trai|phai)" hidden/g)).toHaveLength(4)
     // Lời giải phải là lời giải THẬT của câu, không phải chữ độn.
     expect(html).toContain('Bước một của lời giải')
@@ -217,7 +217,7 @@ describe('Màn Gọi lên bảng', () => {
   const than = src.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')
 
   it('chỉ còn MỘT nút chính, chạy cả xếp giờ lẫn phân công', () => {
-    expect(than).toContain('Xếp giờ &amp; phân công lên bảng')
+    expect(than).toContain('Xếp giờ & phân công lên bảng')
     expect(than).toContain('onClick={chayCaHai}')
     expect(than).toContain('const chayCaHai = () => {')
     // Hai nút cũ đã đi.

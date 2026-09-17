@@ -106,7 +106,7 @@ export default function ClassListScreen() {
   const header = rows?.[0] ?? []
 
   return (
-    <div className="min-h-screen pb-24 px-4 pt-4 space-y-4 bg-slate-50 dark:bg-slate-950">
+    <div className="gv-page min-h-screen pb-24 px-4 pt-4 space-y-4 bg-slate-50 dark:bg-slate-950">
       <h1 className="text-xl font-bold">Kết nối danh sách lớp</h1>
 
       <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">

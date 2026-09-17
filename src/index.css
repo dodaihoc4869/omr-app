@@ -931,3 +931,134 @@ html[data-giu-de-an] [data-giu-de-phu] {
     transform: none;
   }
 }
+
+/* Neutral surfaces shared by all three portals; semantic status colors stay distinct. */
+@theme {
+  --color-slate-50: #f5f4ef;
+  --color-slate-100: #eeeee8;
+  --color-slate-200: #dedfd9;
+  --color-slate-300: #c3c8ca;
+  --color-slate-400: #a6b0bc;
+  --color-slate-500: #657180;
+  --color-slate-600: #515e6b;
+  --color-slate-700: #394652;
+  --color-slate-800: #29323d;
+  --color-slate-900: #202730;
+  --color-slate-950: #171c23;
+}
+body { background:var(--nen);color:var(--muc) }
+.bg-white { background-color:var(--the) }
+@media (prefers-color-scheme:light) {
+  .text-slate-400 { color:var(--mo) }
+}
+@media (prefers-color-scheme:dark) {
+  .text-slate-500 { color:var(--mo) }
+}
+::selection { background:var(--vang-diu-nen);color:var(--muc) }
+
+/* Native date fields must use matching foreground/background in both themes. */
+input:is([type="date"], [type="datetime-local"], [type="time"]) {
+  color: var(--muc);
+  -webkit-text-fill-color: var(--muc);
+  background-color: var(--the);
+  border-color: var(--vien-dam);
+  color-scheme: light;
+  min-height: 44px;
+  max-width: 100%;
+}
+input:is([type="date"], [type="datetime-local"], [type="time"])::-webkit-datetime-edit {
+  color: var(--muc);
+  -webkit-text-fill-color: var(--muc);
+}
+input:is([type="date"], [type="datetime-local"], [type="time"])::-webkit-calendar-picker-indicator {
+  opacity: .9;
+  cursor: pointer;
+}
+@media (prefers-color-scheme: dark) {
+  input:is([type="date"], [type="datetime-local"], [type="time"]) { color-scheme: dark; }
+}
+/* Explicit contrast protects solution text from mixed light/dark utility overrides. */
+.readable-solution{background:#fff8e9!important;color:#322c22!important;border-color:#dbc58e!important}.readable-solution [class*="text-amber"]{color:#493a20!important}.readable-solution [class*="uppercase"]{color:#815512!important}.dark .readable-solution,[data-theme="dark"] .readable-solution{background:#292f35!important;color:#f2eee3!important;border-color:#786645!important}.dark .readable-solution [class*="text-amber"],[data-theme="dark"] .readable-solution [class*="text-amber"]{color:#f2eee3!important}.dark .readable-solution [class*="uppercase"],[data-theme="dark"] .readable-solution [class*="uppercase"]{color:#e8c477!important}
+.khac-phuc-modal{border-color:var(--vien-dam)!important;background:var(--the)!important;color:var(--muc)!important}
+.khac-phuc-modal [class*="bg-white"],.khac-phuc-modal [class*="bg-slate-50"],.khac-phuc-modal [class*="bg-slate-100"]{background:var(--the-2)!important}
+.khac-phuc-modal [class*="bg-blue-50"]{background:var(--xanh-nen)!important}
+.khac-phuc-modal [class*="text-slate-"]{color:var(--muc)!important}
+.khac-phuc-modal [class*="text-slate-400"],.khac-phuc-modal [class*="text-slate-500"]{color:var(--nhat)!important}
+.khac-phuc-modal [class*="text-blue-"]{color:var(--xanh)!important}
+.khac-phuc-modal [class*="border-slate-"]{border-color:var(--vien-dam)!important}
+.khac-phuc-modal .bg-blue-600{background:var(--xanh)!important;color:var(--muc-nguoc)!important}
+.khac-phuc-modal [class*="bg-amber-50"]{background:var(--the-2)!important;color:var(--muc)!important}
+.khac-phuc-modal button:disabled{opacity:.55}
+.dark .khac-phuc-modal .bg-white,.dark .khac-phuc-modal .bg-slate-50{background:var(--the-2)!important}
+.dark .khac-phuc-modal .bg-blue-50\/50{background:color-mix(in srgb,var(--xanh) 18%,var(--the-2))!important}
+.dark .khac-phuc-modal .text-slate-800,.dark .khac-phuc-modal .text-slate-700,.dark .khac-phuc-modal .text-slate-600{color:var(--muc)!important}
+.dark .khac-phuc-modal .text-slate-500,.dark .khac-phuc-modal .text-slate-400{color:var(--nhat)!important}
+.dark .khac-phuc-modal .border-slate-100,.dark .khac-phuc-modal .border-slate-200,.dark .khac-phuc-modal .border-slate-300{border-color:var(--vien-dam)!important}
+.dark .khac-phuc-modal button:disabled{color:var(--nhat)!important;opacity:.58}
+.dark .khac-phuc-modal button:not(:disabled){opacity:1}
+
+/* MŨI TÊN PHẢN ỨNG HOÁ HỌC — nhãn TRÊN và DƯỚI thân, đúng chuẩn SGK */
+.mt {
+  display: inline-grid;
+  justify-items: center;
+  align-items: center;
+  vertical-align: middle;
+  margin: 0 4px;
+  line-height: 1.15;
+  text-align: center;
+}
+.mt-tren, .mt-duoi {
+  font-size: .74em;
+  white-space: nowrap;
+  padding: 0 4px;
+  color: var(--nhat);
+}
+.mt-than {
+  position: relative;
+  width: 100%;
+  min-width: 28px;
+  height: 0;
+  border-top: 1.4px solid currentColor;
+  margin: 3px 0;
+}
+.mt-than::after, .mt-than::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  width: 0;
+  height: 0;
+  border: 4px solid transparent;
+}
+.mt-phai::after {
+  right: -1px;
+  border-right: 0;
+  border-left-color: currentColor;
+}
+.mt-trai::before {
+  left: -1px;
+  border-left: 0;
+  border-right-color: currentColor;
+}
+.mt-hai {
+  height: 5px;
+  border-bottom: 1.4px solid currentColor;
+}
+.mt-hai::after {
+  top: -4px;
+  right: -1px;
+  border-right: 0;
+  border-left-color: currentColor;
+}
+.mt-hai::before {
+  top: 1px;
+  left: -1px;
+  border-left: 0;
+  border-right-color: currentColor;
+}
+.mt-tran {
+  margin: 0 5px;
+}
+.mt-tran .mt-than {
+  min-width: 20px;
+}
+

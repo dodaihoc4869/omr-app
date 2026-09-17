@@ -1,3 +1,4 @@
+import ExperimentDemo from './ExperimentDemo'
 // MỘT KHỐI CÂU SAI DUY NHẤT — dùng ở MỌI báo cáo của cả ba app.
 //
 // Thầy chốt 14/09: "Tất cả các câu sai phải hiển thị đủ đề và hình ảnh đầy đủ,
@@ -14,6 +15,7 @@
 // Máy chủ vẫn trả đủ cả ba (`hsCauSai` đọc kho đề rồi gắn kèm). Lỗi nằm ở chỗ
 // vẽ, nên sửa ở chỗ vẽ — và sửa MỘT lần cho cả ba app.
 import { useState } from 'react'
+import { ChemText } from '../lib/chem-format'
 import { chuanHoaLoiGiaiCau, CHUA_CO_LOI_GIAI } from '../lib/chuan-hoa-loi-giai'
 import { chuDiemTheoY, soYCuaCau, soYDungPhanII } from '../lib/dem-ket-qua'
 
@@ -127,6 +129,7 @@ export function ThanCauSai({ c }: { c: CauSaiHienThi }) {
         </div>
       )}
 
+      <ExperimentDemo text={c.text}/>
       {/* ẢNH ĐỀ BÀI. Câu Hoá hay có sơ đồ và hình thí nghiệm; thiếu ảnh là
           thiếu nửa đề. */}
       {anh.map((src, i) => (
@@ -282,10 +285,10 @@ export function ThanCauSai({ c }: { c: CauSaiHienThi }) {
 }
 
 /** HỘP LỜI GIẢI CHUẨN — cùng một khuôn ở mọi báo cáo. */
-export function LoiGiaiCauSai({ c }: { c: CauSaiHienThi }) {
+export function LoiGiaiCauSai({ c, hoaHoc = false }: { c: Omit<CauSaiHienThi, 'loiGiai'> & {loiGiai?: unknown}; hoaHoc?: boolean }) {
   const lg = chuanHoaLoiGiaiCau(c.loiGiai, (c.phan as 'I' | 'II' | 'III') || 'I', c.dapAnDung || '')
   return (
-    <div className="p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 text-amber-950 dark:text-amber-100 shadow-sm space-y-3">
+    <div className="readable-solution p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 text-amber-950 dark:text-amber-100 shadow-sm space-y-3">
       <div className="text-sm font-semibold text-amber-800 dark:text-amber-300">
         Đáp án: <strong className="text-base font-black text-amber-950 dark:text-amber-100">{lg.ketQua || c.dapAnDung || '—'}</strong>
       </div>
@@ -295,7 +298,7 @@ export function LoiGiaiCauSai({ c }: { c: CauSaiHienThi }) {
       {lg.chot && (
         <div>
           <div className="text-[10px] font-extrabold tracking-wider uppercase text-amber-800 dark:text-amber-400 mb-1">KIẾN THỨC CỐT LÕI</div>
-          <div className="text-xs sm:text-sm font-bold leading-relaxed text-amber-950 dark:text-amber-100">{lg.chot}</div>
+          <div className="text-xs sm:text-sm font-bold leading-relaxed text-amber-950 dark:text-amber-100">{hoaHoc ? <ChemText text={lg.chot}/> : lg.chot}</div>
         </div>
       )}
       {lg.lyDo && lg.lyDo.length > 0 && (
@@ -307,8 +310,8 @@ export function LoiGiaiCauSai({ c }: { c: CauSaiHienThi }) {
             {lg.lyDo.map((p) => (
               <div key={p.khoa} className="flex items-start gap-1.5 py-0.5 border-t border-amber-200/40 dark:border-amber-800/40 first:border-t-0">
                 <strong className="text-amber-900 dark:text-amber-200">{p.khoa}.</strong>
-                <span className={`font-bold ${p.dung ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>{p.dung ? '✓' : '✗'}</span>
-                <span className="text-amber-900 dark:text-amber-200">{p.ly}</span>
+                <span className={`font-bold ${(hoaHoc && c.phan === 'II' && /^[DS]{4}$/.test(c.dapAnDung || '') ? c.dapAnDung?.['abcd'.indexOf(p.khoa.toLowerCase())] === 'D' : p.dung) ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>{(hoaHoc && c.phan === 'II' && /^[DS]{4}$/.test(c.dapAnDung || '') ? c.dapAnDung?.['abcd'.indexOf(p.khoa.toLowerCase())] === 'D' : p.dung) ? '✓' : '✗'}</span>
+                <span className="text-amber-900 dark:text-amber-200">{hoaHoc ? <ChemText text={p.ly}/> : p.ly}</span>
               </div>
             ))}
           </div>
@@ -319,7 +322,7 @@ export function LoiGiaiCauSai({ c }: { c: CauSaiHienThi }) {
           <div className="text-[10px] font-extrabold tracking-wider uppercase text-amber-800 dark:text-amber-400 mb-1">LÀM TỪNG BƯỚC</div>
           <div className="space-y-1 text-xs">
             {lg.buoc.map((b, i) => (
-              <div key={i}>{i + 1}. {b}</div>
+              <div key={i}>{i + 1}. {hoaHoc ? <ChemText text={b}/> : b}</div>
             ))}
           </div>
         </div>

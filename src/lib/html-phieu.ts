@@ -1,3 +1,4 @@
+import {experimentHtml,experimentOriginal} from './experiments/render'
 // DỰNG PHIẾU THÀNH MỘT TRANG WEB ĐỌC ĐƯỢC, BẤM VÀO CÂU LÀ HIỆN LỜI GIẢI.
 //
 // VÌ SAO ĐỔI KHỎI BẢN "GIẤY A4"
@@ -1053,7 +1054,7 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
 
   // Ảnh cắt cả thân câu LÀ đề bài — có nó thì không in `text` nữa, đúng như màn
   // làm bài của học sinh (lớp chữ trong PDF gốc hay vỡ công thức ÂM THẦM).
-  const deBai = c.anhThanCau ? anhHtml(c.anhThanCau, 'than', 'Đề bài') : `<div class="q-text">${chuHtml(c.text)}</div>`
+  const deBai = (c.anhThanCau ? anhHtml(c.anhThanCau, 'than', 'Đề bài') : `<div class="q-text">${chuHtml(c.text)}</div>`) + experimentHtml(c.text)
   const giai = anGiai ? '' : oGiaiHtml(c)
   const nut = giai
     ? `<button class="q-nut-giai" type="button" aria-expanded="${moSan ? 'true' : 'false'}" aria-controls="giai-${stt}">${MUI_TEN}<span class="chu-mo">Xem lời giải</span><span class="chu-dong">Ẩn lời giải</span></button>
@@ -1079,7 +1080,7 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
     ${oLamLai}
     ${deBai}
     ${bangHtml(c.bang)}
-    ${hinhTaiViTri(c, 'sau_de')}
+    ${experimentOriginal(c.text,hinhTaiViTri(c, 'sau_de'))}
     ${than}
     ${hinhTaiViTri(c, 'cuoi_cau')}
   </div>
@@ -1645,9 +1646,9 @@ export const JS_PHIEU = `
        * Nay khoá mang thêm VÂN TAY của bộ câu. Cùng bộ mở lại thì vẫn khôi phục
        * đúng như trước; bộ khác thì tờ giấy trắng.
        */
-      function vanTayBo() {
+      function vanTayBo(ids) {
         var t = '';
-        for (var i = 0; i < du.cau.length; i++) t += du.cau[i].id + '|';
+        for (var i = 0; i < du.cau.length; i++) t += (ids ? ids[i] : du.cau[i].id) + '|';
         var h = 5381;
         for (var j = 0; j < t.length; j++) { h = ((h * 33) ^ t.charCodeAt(j)) >>> 0; }
         return h.toString(36);
@@ -1661,6 +1662,16 @@ export const JS_PHIEU = `
       var daNop = false;
       var lam = {};
       try { lam = JSON.parse(localStorage.getItem(KHOA_LUU) || '{}') || {}; } catch (e4) { lam = {}; }
+      // Chuyển bản nháp BTVN mã ghép cũ; không xóa bản gốc.
+      try {
+        if (!Object.keys(lam).length && du.legacyIds && du.legacyIds.length === du.cau.length && new Set(du.legacyIds).size === du.legacyIds.length) {
+          var oldKey=KHOA_CU+'.'+vanTayBo(du.legacyIds);
+          var oldDraft=JSON.parse(localStorage.getItem(oldKey)||'{}');
+          for(var li=0;li<du.cau.length;li++)if(Object.prototype.hasOwnProperty.call(oldDraft,du.legacyIds[li]))lam[du.cau[li].id]=oldDraft[du.legacyIds[li]];
+          if(Object.keys(lam).length)localStorage.setItem(KHOA_LUU,JSON.stringify(lam));
+          if(localStorage.getItem(oldKey+'.cho')==='1')localStorage.setItem(KHOA_LUU+'.cho','1');
+        }
+      }catch(legacyError){}
       /* CHUYỂN BÀI CŨ SANG KHOÁ MỚI, chỉ khi CHẮC CHẮN là cùng bộ câu.
        * Em đang làm dở bằng bản app cũ thì mở bản mới không được mất bài. Điều
        * kiện chặt: mọi qid đã lưu đều nằm trong bộ đang mở. Lệch một câu là bỏ
@@ -1832,14 +1843,12 @@ export const JS_PHIEU = `
       /** CHẤM TẠI CHỖ để hiện ngay. Máy chủ vẫn chấm LẠI và con số ghi vào
        * Sheet là con số của máy chủ — máy em sửa được. */
       function chamTaiCho() {
-        // CHUAN HOA SO PHAN III — chep DUNG luat cua normalizeNumericAnswer
-        // (src/engine/score.ts). Phieu la tep HTML roi, khong import duoc, nen
-        // day la ban sao BAT BUOC; phep kiem dau-tru-phan-ba-1009 khoa hai ben
-        // khong duoc lech nhau. De soan tren Word ra dau tru en dash con em go
-        // dau tru ban phim. Chu thich tep nay khong dau va khong backtick: ca
-        // khoi nam trong mot template literal.
         var chuanIII = function (v) {
-          return String(v == null ? '' : v).replace(/[‐‑‒–—―−－]/g, '-').replace(/[\\s ]+/g, '').replace(',', '.');
+          var s = String(v == null ? '' : v).replace(/[‐‑‒–—―−－]/g, '-').replace(/[\s ]+/g, '').replace(',', '.').replace(/^[+]/, '');
+          return s.replace(/(gam|lit|lít|mol|cm3|dm3|kcal|kj|cal|amu|giay|phut|kg|ml|g|l|m|%|j|h|s)$/i, '').trim();
+        };
+        var normII = function (v) {
+          return String(v == null ? '' : v).toUpperCase().replace(/Đ/g, 'D').replace(/[^DS]/g, '');
         };
         var dung = 0;
         var sai = [];
@@ -1849,8 +1858,19 @@ export const JS_PHIEU = `
           var dapAn = String(c.dapAn == null ? '' : c.dapAn).trim();
           var khop = false;
           if (!chon) khop = false;
-          else if (c.phan === 'III') khop = chuanIII(chon) === chuanIII(dapAn);
-          else khop = chon.toUpperCase() === dapAn.toUpperCase();
+          else if (c.phan === 'III') {
+            var cChon = chuanIII(chon), cDap = chuanIII(dapAn);
+            if (cChon === cDap) khop = true;
+            else {
+              var nC = Number(cChon), nD = Number(cDap);
+              khop = !isNaN(nC) && !isNaN(nD) && Math.abs(nC - nD) < 1e-4;
+            }
+          } else if (c.phan === 'II') {
+            var nChon = normII(chon), nDap = normII(dapAn);
+            khop = nChon.length === 4 && nDap.length === 4 && nChon === nDap;
+          } else {
+            khop = chon.toUpperCase().replace(/Đ/g, 'D') === dapAn.toUpperCase().replace(/Đ/g, 'D');
+          }
           if (khop) dung++; else sai.push(c.id);
         }
         return { dung: dung, sai: sai };
@@ -1864,6 +1884,9 @@ export const JS_PHIEU = `
           var the = vung[j];
           var qidT = the.getAttribute('data-qid');
           var laSai = !!saiCua[qidT];
+          the.classList.remove('cau-sai','cau-dung');
+          var ketCu=the.querySelectorAll('.lam-ket');
+          for(var kc=0;kc<ketCu.length;kc++)ketCu[kc].remove();
           the.classList.add('da-cham');
           the.classList.add(laSai ? 'cau-sai' : 'cau-dung');
           var d = document.createElement('div');
@@ -1920,6 +1943,7 @@ export const JS_PHIEU = `
         if (oKet) { oKet.hidden = false; oKet.textContent = ' · Đúng ' + kq.dung + '/' + du.cau.length; }
         gui(true)
           .then(function (j) {
+            if(Array.isArray(j.qidSai))toKetQua({sai:j.qidSai});
             nutNop.textContent = du.ch && du.ch.CHO_NOP_LAI === false ? 'Đã nộp' : 'Làm lại';
             nutNop.disabled = false;
             if (oKet) oKet.textContent = ' · Đúng ' + j.soDung + '/' + j.soCau + ' (lần ' + j.lanThu + ')';
@@ -1973,6 +1997,7 @@ export interface TuyChonPhieu {
   nop?: {
     /** Mã phiếu, để máy chủ biết bài này của phiếu nào. */
     ma: string
+    legacyIds?: string[]
     /** SBD của em — máy chủ đối chiếu, không cho nộp hộ. */
     sbd: string
     /** Link Apps Script. Đây là link CÔNG KHAI, không kèm mã bí mật. */
@@ -2023,6 +2048,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   const goiNop = nop
     ? `<script type="application/json" id="du-nop">${JSON.stringify({
         ma: nop.ma,
+        legacyIds: nop.legacyIds,
         sbd: nop.sbd,
         url: nop.url,
         ch: chNop,

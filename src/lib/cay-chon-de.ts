@@ -25,6 +25,7 @@ export interface Nut {
   con: Nut[]
   /** Chỉ tầng "dang" (lá) mới có. */
   maDe?: string
+  anMa?: boolean
   soCau: SoCau
   /** Mọi mã đề nằm dưới nút này, kể cả chính nó nếu là lá. */
   laMa: string[]
@@ -79,8 +80,16 @@ export function chuongCuaDe(c: Pick<TeacherExamSource, 'nhom'>): string {
 /** Tên bài hiện cho thầy đọc: ưu tiên `nguon` (vd "Bài 4. Glucose và
  * fructose"), thiếu thì lấy mã gốc. Cắt phần chú thích dài sau dấu " — ". */
 export function tenBai(c: Pick<TeacherExamSource, 'maDe' | 'nguon'>): string {
-  const n = (c.nguon || '').split(' — ')[0].trim()
+  const n = (c.nguon || '').normalize('NFC').split(' — ')[0].trim().replace(/\s*·\s*(?:VÍ DỤ MINH HOẠ|VÍ DỤ MINH HỌA|CÁC DẠNG TOÁN TRỌNG TÂM)\s*$/i, '')
   return n || goMaDeTachRa(c.maDe).goc
+}
+
+function tenMucDayHoc(c: TeacherExamSource): string | null {
+  if (thuMucCuaDe(c).normalize('NFC').toUpperCase() !== 'DẠY HỌC') return null
+  const ma = goMaDeTachRa(c.maDe).goc
+  if (/-VD$/.test(ma)) return 'Ví dụ minh hoạ'
+  if (/-DT$/.test(ma)) return 'Các dạng toán trọng tâm'
+  return null
 }
 
 const soCauCua = (s: TeacherExamSource): SoCau => ({ I: s.phanI.length, II: s.phanII.length, III: s.phanIII.length })
@@ -133,21 +142,27 @@ export function dungCay(ds: TeacherExamSource[]): Nut[] {
       const bai = gom(dsC, (c) => tenBai(c)).map(({ khoa: b, ds: dsB }) => {
         // Bài có nhiều mã gốc thì lá phải nói rõ mã nào, không thì thầy thấy
         // hai dòng "Trắc nghiệm" y hệt nhau mà không biết khác gì.
-        const nhieuMa = new Set(dsB.map((c) => goMaDeTachRa(c.maDe).goc)).size > 1
+        const nhieuMa = new Set(dsB.filter(c => !tenMucDayHoc(c)).map((c) => goMaDeTachRa(c.maDe).goc)).size > 1
         const dang: Nut[] = dsB.map((c) => {
           const { goc, phan } = goMaDeTachRa(c.maDe)
           const sc = soCauCua(c)
           const tuCau: PhanDe | null = phan ?? (sc.I > 0 ? 'I' : sc.II > 0 ? 'II' : sc.III > 0 ? 'III' : null)
+          const muc = tenMucDayHoc(c)
           const ten = tuCau ? TEN_PHAN_TACH[tuCau] : c.maDe
           return {
             khoa: `${tienTo}/${ch}/${b}/${c.maDe}`,
-            nhan: nhieuMa ? `${ten} · ${duoiPhanBiet(goc)}` : ten,
+            nhan: muc || (nhieuMa ? `${ten} · ${duoiPhanBiet(goc)}` : ten),
+            anMa: !!muc,
             tang: 'dang' as const,
             con: [],
             maDe: c.maDe,
             soCau: sc,
             laMa: [c.maDe],
           }
+        })
+        dang.sort((a,b) => {
+          const rank = (n: Nut) => n.nhan === 'Ví dụ minh hoạ' ? 0 : n.nhan === 'Các dạng toán trọng tâm' ? 1 : 2
+          return rank(a)-rank(b)
         })
         return nutCha(`${tienTo}/${ch}/${b}`, b, 'bai', dang)
       })

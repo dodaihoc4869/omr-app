@@ -1,3 +1,4 @@
+import GameReports from '../game/than-thu-v2/Reports'
 // NGÂN HÀNG CÂU HỎI — app CHỈ ĐỌC đề đã có sẵn (NAPDETUDONG.md): không thả
 // file, không đọc PDF/DOCX, không duyệt câu. Thầy thả file vào kho-de/moi/,
 // pipeline "Nạp đề mới" đẩy lên kho đề Apps Script, màn này tự đồng bộ về
@@ -353,8 +354,9 @@ export default function NganHangDeScreen() {
   const tongNghi = useMemo(() => sources.reduce((n, s) => n + cauNghiCua(s).length, 0), [sources])
 
   return (
-    <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k5)', fontFamily: 'var(--sans)' }}>
-      <div className="flex items-center justify-between">
+    <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k5)', fontFamily: 'var(--sans)' }}>
+
+      <div className="gv-page-header flex items-center justify-between">
         <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
           Ngân hàng câu hỏi
         </h1>
@@ -363,8 +365,8 @@ export default function NganHangDeScreen() {
         </button>
       </div>
 
-      <TheNoiDung>
-        <div className="flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
+      <TheNoiDung className="gv-bank-overview">
+        <div className="gv-page-header flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
           <div>
             <div className="font-bold" style={{ fontSize: 'var(--cx-4)', fontFamily: 'var(--serif)', fontVariantNumeric: 'tabular-nums' }}>
               {sources.length} đề · {tongCau} câu
@@ -429,12 +431,20 @@ export default function NganHangDeScreen() {
         )}
       </TheNoiDung>
 
+      <details className="gv-help"><summary>Phản hồi câu hỏi từ Thần thú</summary><GameReports teacher/></details>
+
       {/* KHỐI MÃ DẠNG — đặc tả v3 mục 4.3. Đặt NGAY SAU khối đồng bộ, trước
           danh sách đề: thầy vừa kéo đề về là thấy ngay kho đang hổng chỗ nào. */}
       {sources.length > 0 && (
+        <details className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 bg-white dark:bg-slate-900">
+          <summary className="cursor-pointer font-bold">Mã dạng · Thống kê và kiểm tra</summary>
         <KhoiMaDang sources={sources} soSua={soSua} onSua={luuSoSua} dangDongBo={dangDongBo} onTaiLaiHet={() => dongBo(scriptUrl, secret, false, true)} />
+        </details>
       )}
 
+      <section className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+        <div className="flex items-center justify-between gap-3 p-4 bg-slate-50 dark:bg-slate-800"><h2 className="font-bold">Danh sách đề</h2><span className="text-sm text-slate-500">{sources.length} đề</span></div>
+        <div role="region" aria-label="Danh sách đề trong ngân hàng" tabIndex={0} className="max-h-[65vh] overflow-y-auto overscroll-contain p-3 space-y-3">
       {sources.map((s, i) => {
         const nghi = cauNghiCua(s)
         const mo = moDe.has(s.maDe)
@@ -447,7 +457,7 @@ export default function NganHangDeScreen() {
                 phần hiện thành ba Ô ĐẾM đều nhau, không phải ba viên thuốc dài
                 ngắn khác nhau xếp lệch hàng. */}
             <div style={{ borderLeft: `4px solid ${nghi.length ? 'var(--cam)' : 'var(--xanh)'}`, borderTopLeftRadius: 'var(--bo-3)', borderBottomLeftRadius: 'var(--bo-3)' }}>
-              <div className="flex flex-col" style={{ padding: 'var(--k4) var(--k5)', gap: 'var(--k3)' }}>
+              <div className="flex flex-col" style={{ padding: 'var(--k3)', gap: 'var(--k2)' }}>
                 <div className="flex items-start justify-between" style={{ gap: 'var(--k3)' }}>
                   <div className="flex items-start min-w-0" style={{ gap: 'var(--k3)' }}>
                     <div
@@ -457,11 +467,11 @@ export default function NganHangDeScreen() {
                       {i + 1}
                     </div>
                     <div className="min-w-0">
-                      <div className="font-bold truncate" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', lineHeight: 1.2 }}>
-                        {s.maDe}
+                      <div className="font-bold truncate" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)', lineHeight: 1.4 }}>
+                        {s.nguon?.split(' — ')[0] || s.maDe}
                       </div>
                       <div className="truncate" style={{ ...NHAN_NHO, marginTop: 3 }}>
-                        {s.nguon || 'Không rõ nguồn'}
+                        {s.maDe}
                         {s.ngayNap ? ` · nạp ${new Date(s.ngayNap).toLocaleDateString('vi-VN')}` : ''}
                       </div>
                     </div>
@@ -477,6 +487,10 @@ export default function NganHangDeScreen() {
                 {/* BA MÃ CON — Màn Mở ca liệt kê đúng ba mã này thành ba dòng
                     tích riêng. Kho vẫn giữ MỘT bản đề: id từng câu không đổi,
                     chấm bài và lịch sử ca cũ không đụng gì. */}
+                <div className="flex flex-wrap gap-2 text-xs text-slate-600 dark:text-slate-300">
+                  <span>{s.phanI.length + s.phanII.length + s.phanIII.length} câu</span><span>· TN {s.phanI.length}</span><span>· Đ/S {s.phanII.length}</span><span>· TLN {s.phanIII.length}</span>
+                </div>
+                <details><summary className="cursor-pointer text-xs font-semibold text-blue-600">Chi tiết đề</summary>
                 <div className="grid" style={{ gap: 'var(--k2)', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
                   {PHAN_DE_TACH.map((phan) => {
                     const n = phan === 'I' ? s.phanI.length : phan === 'II' ? s.phanII.length : s.phanIII.length
@@ -512,6 +526,7 @@ export default function NganHangDeScreen() {
                   </div>
                 )}
 
+                </details>
               {nghi.length > 0 && (
                 <>
                   <button
@@ -554,6 +569,8 @@ export default function NganHangDeScreen() {
           </TheNoiDung>
         )
       })}
+        </div>
+      </section>
 
       {sources.length === 0 && !dangDongBo && (
         <OThongBao>Chưa có đề nào. Thả file .pdf vào <code>kho-de/moi/</code> trên máy rồi gõ "Nạp đề mới" trong Cowork (hoặc đợi 22:00), sau đó bấm Đồng bộ ngay.</OThongBao>

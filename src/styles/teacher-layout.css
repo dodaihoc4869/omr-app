@@ -1,0 +1,62 @@
+/* Layout only. Scoped to the authenticated teacher shell; examination,
+   student/parent portals and projected documents retain their own layout. */
+[data-teacher-screen] .gv-page{
+  --gv-gap:20px;
+  width:100%;min-width:0;padding:max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) calc(112px + env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left))!important;
+  gap:var(--gv-gap)!important;
+}
+[data-teacher-screen] .gv-page>*,[data-teacher-screen] .gv-work-step>*{min-width:0}
+[data-teacher-screen] .gv-page-header{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  gap:12px 24px!important;min-width:0;padding-block:4px 8px;
+}
+[data-teacher-screen] .gv-page-header h1,[data-teacher-screen] .gv-page>h1{
+  font-family:var(--sans)!important;font-size:clamp(24px,2.5vw,32px)!important;
+  line-height:1.3;font-weight:750;letter-spacing:-.025em;margin:0;
+}
+[data-teacher-screen] .gv-page-header p{margin:6px 0 0;color:var(--nhat);font-size:14px;line-height:1.6}
+[data-teacher-screen] .gv-header-actions{flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px!important}
+[data-teacher-screen] .gv-page>[data-ui-card],
+[data-teacher-screen] .gv-page>div>[data-ui-card]{border-radius:18px!important;box-shadow:none!important}
+[data-teacher-screen] .gv-filterbar{display:flex;flex-wrap:wrap;gap:8px!important;align-items:center}
+[data-teacher-screen] .gv-filterbar>.relative{flex:1 1 250px;min-width:150px}
+[data-teacher-screen] .gv-filterbar button{flex-shrink:0}
+[data-teacher-screen] .gv-directory{padding:20px!important}
+[data-teacher-screen] .gv-help{border:1px solid var(--vien);background:var(--the);border-radius:14px;padding:0 16px}
+[data-teacher-screen] .gv-help>summary{cursor:pointer;padding:14px 0;font-size:14px;font-weight:650;color:var(--nhat);line-height:1.5}
+[data-teacher-screen] .gv-help[open]>summary{color:var(--muc);border-bottom:1px solid var(--vien);margin-bottom:12px}
+[data-teacher-screen] .gv-help>div{padding-bottom:14px;line-height:1.7}
+[data-teacher-screen] .gv-student-list{display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch}
+[data-teacher-screen] .gv-student-list>[data-sbd]{padding:16px!important;border-radius:14px!important}
+[data-teacher-screen] .gv-student-actions{display:flex;flex-wrap:wrap;gap:8px!important}
+[data-teacher-screen] .gv-student-actions>button{flex:1 1 120px;padding:8px 12px;line-height:1.4;white-space:normal}
+[data-teacher-screen] .gv-homework-grid{display:grid;gap:24px;grid-template-columns:minmax(0,1fr);align-items:start}
+[data-teacher-screen] .gv-work-step{display:flex;flex-direction:column;gap:16px;min-width:0}
+[data-teacher-screen] .gv-work-step>h2{font-size:17px;font-weight:750;margin:0;padding-bottom:12px;border-bottom:1px solid var(--vien)}
+[data-teacher-screen] .gv-work-step button{max-width:100%}
+[data-teacher-screen] .gv-actionbar{padding-top:16px;border-top:1px solid var(--vien);gap:12px!important}
+[data-teacher-screen] .gv-actionbar>button{min-height:44px;white-space:normal;line-height:1.5}
+[data-teacher-screen] .setup-overview,[data-teacher-screen] .setup-group{border-radius:18px}
+[data-teacher-screen] .setup-group>summary{padding:16px 20px}
+[data-teacher-screen] .setup-group-body{padding:0 12px 12px}
+[data-teacher-screen] .setup-launch{bottom:88px;box-shadow:0 4px 16px #00000012}
+[data-teacher-screen] .parent-news>header{align-items:flex-start}
+[data-teacher-screen] .parent-news>header>div:last-child{flex-wrap:wrap}
+[data-teacher-screen] .parent-news .news-metrics{gap:12px}
+@media (min-width:1400px){
+  [data-teacher-screen] .gv-student-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px!important}
+  [data-teacher-screen] .gv-homework-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  [data-teacher-screen] .gv-homework-grid>.gv-work-step+section{padding-left:24px;border-left:1px solid var(--vien)}
+}
+@media (max-width:800px){
+  [data-teacher-screen] .gv-page{padding:max(16px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) calc(112px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left))!important;--gv-gap:16px}
+  [data-teacher-screen] .gv-page-header{align-items:flex-start}
+  [data-teacher-screen] .gv-header-actions{width:100%;justify-content:flex-start}
+  [data-teacher-screen] .gv-directory{padding:14px!important}
+  [data-teacher-screen] .gv-filterbar>.relative{flex-basis:100%}
+  [data-teacher-screen] .gv-actionbar>button{flex:1 1 100%}
+  [data-teacher-screen] .gv-work-step>div{max-width:100%;min-width:0}
+}
+@media(min-width:1024px){[data-teacher-screen] .setup-launch{bottom:16px}}
+[data-teacher-screen] .gv-help summary:focus-visible{outline:2px solid var(--gg-xanh);outline-offset:3px}
+@media print{[data-teacher-screen] .gv-page{padding:0!important}}

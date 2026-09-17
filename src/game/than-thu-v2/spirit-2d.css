@@ -1,0 +1,24 @@
+.spirit-2d{position:relative;isolation:isolate;width:100%;height:340px;--spirit-tint:255,200,75;contain:layout style;pointer-events:none}
+.spirit-2d-compact{height:180px}
+.spirit-2d-body{position:absolute;inset:4% 7% 7%;z-index:2;transform-origin:50% 90%;will-change:transform;filter:drop-shadow(0 4px 6px rgba(8,11,35,.33)) drop-shadow(0 0 9px rgba(var(--spirit-tint),.45))}
+.spirit-2d-image{display:block;width:100%;height:100%;overflow:hidden}
+.spirit-2d-idle{animation:spirit-breathe 4s ease-in-out infinite}
+.spirit-2d[data-pet="3"] .spirit-2d-idle,.spirit-2d[data-pet="7"] .spirit-2d-idle{animation:spirit-hover 3.8s ease-in-out infinite}
+.spirit-2d-halo{position:absolute;inset:12% 13% 8%;border-radius:50%;background:radial-gradient(ellipse,rgba(var(--spirit-tint),.3),rgba(var(--spirit-tint),.08) 48%,transparent 70%);animation:spirit-glow 4s ease-in-out infinite}
+.spirit-2d-orbit{position:absolute;inset:14% 17%;border:1px solid rgba(var(--spirit-tint),.28);border-radius:50%;box-shadow:0 0 18px rgba(var(--spirit-tint),.12);transform:rotate(-20deg) scaleX(.86)}
+.spirit-2d-ground{position:absolute;left:18%;right:18%;bottom:7%;height:10%;border-radius:50%;border:1px solid rgba(var(--spirit-tint),.5);background:radial-gradient(ellipse,rgba(var(--spirit-tint),.22),transparent 70%);box-shadow:0 0 16px rgba(var(--spirit-tint),.18)}
+.spirit-2d-motes{position:absolute;inset:5%;z-index:3;overflow:hidden}
+.spirit-2d-motes i{position:absolute;font-style:normal;font-size:10px;color:rgb(var(--spirit-tint));text-shadow:0 0 9px currentColor;animation:spirit-mote 3.6s ease-in-out infinite;animation-delay:calc(var(--mote)*-.43s)}
+.spirit-2d-cast{animation:spirit-cast 1.8s both;filter:drop-shadow(0 0 12px rgba(var(--spirit-tint),.9))}
+.spirit-2d-hurt{animation:spirit-recoil 1.4s both}
+.spirit-2d-victory{animation:spirit-celebrate 1.5s ease-in-out infinite}
+.spirit-2d-battle .spirit-2d-orbit{opacity:.45}
+@keyframes spirit-breathe{0%,100%{transform:translateY(0) rotate(-.8deg) scale(1)}50%{transform:translateY(-4px) rotate(.8deg) scale(1.018,1.025)}}
+@keyframes spirit-hover{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-10px) rotate(1deg)}}
+@keyframes spirit-glow{0%,100%{opacity:.55;transform:scale(.95)}50%{opacity:1;transform:scale(1.06)}}
+@keyframes spirit-mote{0%,100%{opacity:.15;transform:translateY(6px) scale(.6)}50%{opacity:.9;transform:translateY(-10px) scale(1)}}
+@keyframes spirit-cast{0%{transform:translate(0,0)}12%{transform:translate(-3%,3%) scale(1.08,.88) rotate(-5deg)}28%{transform:translate(4%,-22%) scale(.96,1.06) rotate(-8deg)}42%{transform:translate(9%,-25%) scale(1.06,.98) rotate(7deg)}62%{transform:translate(5%,-15%) rotate(5deg)}78%{transform:translate(0,3%) scale(1.08,.91)}90%{transform:translate(0,-2%) scale(.98,1.03)}100%{transform:none}}
+@keyframes spirit-recoil{0%{transform:none}18%{transform:translate(-9%,1%) rotate(-9deg);filter:brightness(1.5) saturate(.65) drop-shadow(0 0 12px rgb(238,153,153))}30%{transform:translate(-6%,0) rotate(3deg)}45%{transform:translate(-3%,0) rotate(-3deg)}100%{transform:none}}
+@keyframes spirit-celebrate{0%,100%{transform:none}40%{transform:translateY(-10px) rotate(-3deg)}65%{transform:translateY(-5px) rotate(3deg)}}
+.spirit-2d-quiet *{animation:none!important;will-change:auto}.spirit-2d-quiet .spirit-2d-motes{display:none}
+@media(prefers-reduced-motion:reduce){.spirit-2d *{animation:none!important;will-change:auto}}

@@ -1,0 +1,33 @@
+import BangVinhDanh from './BangVinhDanh'
+import {useCallback,useEffect,useState} from 'react'
+import {CalendarDays,RefreshCw,Activity,ClipboardList,GraduationCap} from 'lucide-react'
+import {layCauHinhMayChu} from '../lib/may-chu-moi'
+import {loadTeacherSecret} from '../lib/exam-db'
+import {useAppStore} from '../store/appStore'
+import './BangTinPhuHuynh.css'
+type Report={day:string;updatedAt:string;exams:any[];homework:any[];examSubmitted:number;homeworkSubmitted:number;board:{n:number;hoc_sinh:number};changes:{hanh_dong:string;n:number}[];visits?:{role:string;visits:number;online:number}[]}
+export default function BangTinGiaoVien(){
+ const [day,setDay]=useState(''),[report,setReport]=useState<Report|null>(null),[error,setError]=useState(''),[loading,setLoading]=useState(false)
+ const navigate=useAppStore(s=>s.setScreen)
+ const refresh=useCallback(async()=>{setLoading(true);try{const [ch,secret]=await Promise.all([layCauHinhMayChu(),loadTeacherSecret()]);const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),20000);const r=await fetch(`${ch.URL}/teacher-news`,{method:'POST',headers:{'content-type':'application/json','x-ma-bi-mat':secret||''},body:JSON.stringify({day:day||undefined}),signal:controller.signal});clearTimeout(timeout);const data=await r.json();if(!r.ok||!data.ok)throw new Error(data.error||'Chưa tải được bảng tin.');setReport(data);setError('')}catch(e){setError(e instanceof Error?e.message:'Mất kết nối máy chủ.')}finally{setLoading(false)}},[day])
+ useEffect(()=>{void refresh();const poll=()=>{if(!document.hidden)void refresh()};const t=setInterval(poll,15000);window.addEventListener('focus',poll);window.addEventListener('online',poll);return()=>{clearInterval(t);window.removeEventListener('focus',poll);window.removeEventListener('online',poll)}},[refresh])
+ return <><section className="parent-news space-y-5">
+  <header className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-xl font-bold flex items-center gap-2"><CalendarDays className="news-accent" size={23}/>Bảng tin của thầy</h2><p className="news-muted text-xs mt-2">Ngày mới từ 00:01 · Giờ Việt Nam</p></div><div className="flex gap-2 items-center"><input aria-label="Ngày xem bảng tin" type="date" value={day||report?.day||''} onChange={e=>setDay(e.target.value)} style={{background:'var(--the-2)',color:'var(--muc)',border:'1px solid var(--vien)',borderRadius:12,padding:10}}/><button className="news-refresh" disabled={loading} aria-label="Cập nhật bảng tin giáo viên" onClick={()=>void refresh()}><RefreshCw size={18}/></button>{day&&<button onClick={()=>setDay('')} className="text-sm news-accent">Hôm nay</button>}</div></header>
+  {error&&<p role="alert" style={{color:'var(--do)'}}>{error}</p>}
+  {!report?<p className="news-muted">Đang tổng hợp hoạt động…</p>:<>
+   <div className="news-metrics"><Metric value={report.homework.length} label="Đợt giao bài"/><Metric value={report.exams.length} label="Ca bắt đầu / mở"/><Metric value={Number(report.board?.n||0)} label="Lượt chữa trên bảng đã ghi"/></div>
+   <div className="news-recommendation"><h3 className="font-bold mb-2">Thầy đã làm gì trong ngày?</h3><p>Đã giao {report.homework.length} đợt bài cho {report.homework.reduce((n,b)=>n+Number(b.tong),0)} lượt học sinh. Có {report.examSubmitted} lượt nộp bài thi và {report.homeworkSubmitted} bài tập về nhà được nộp trong ngày.</p>{report.changes.map(c=><p key={c.hanh_dong} className="mt-2 text-sm">{c.hanh_dong==='reset'?'Cho làm lại':'Thu hồi riêng'}: {c.n} lượt học sinh.</p>)}</div>
+   <div className="grid md:grid-cols-2 gap-4">
+    <details open style={box}><summary className="font-bold cursor-pointer flex gap-2 items-center"><ClipboardList size={18}/>Bài đã giao · {report.homework.length}</summary><div style={scroll}>{report.homework.map(b=><article key={b.ma_btvn} style={row}><strong style={{overflowWrap:'anywhere'}}>{b.ma_de}</strong><p className="news-muted text-xs mt-1">{time(b.giao_luc)} · {b.so_cau} câu · {b.tong} lượt nhận</p><p className="text-sm mt-2">{b.da_xoa?'Đã thu hồi cả đợt':`${b.da_nop||0}/${b.tong} đã nộp${b.thu_hoi?` · ${b.thu_hoi} đã thu hồi riêng`:''}`}</p><p className="news-muted text-xs mt-1">Hạn {new Date(b.han_nop).toLocaleString('vi-VN')}</p></article>)}{!report.homework.length&&<p className="news-muted">Chưa giao bài trong ngày này.</p>}</div><button className="text-sm news-accent mt-3" onClick={()=>navigate('giaobtvn')}>Quản lý bài tập →</button></details>
+    <details open style={box}><summary className="font-bold cursor-pointer flex gap-2 items-center"><GraduationCap size={18}/>Ca kiểm tra · {report.exams.length}</summary><div style={scroll}>{report.exams.map(c=><article key={c.ma_ca} style={row}><strong>{c.ten_ca||c.ma_ca}</strong><p className="news-muted text-xs mt-1">{time(c.luc)} · Mã {c.ma_ca}</p><p className="text-sm mt-2">{c.da_nop}/{c.luot} lượt đã nộp · {c.trang_thai==='dong'?'Đã đóng':c.trang_thai==='da_xoa'?'Đã xóa':'Đang mở'}</p></article>)}{!report.exams.length&&<p className="news-muted">Chưa có ca bắt đầu hoặc mở trong ngày này.</p>}</div><button className="text-sm news-accent mt-3" onClick={()=>navigate('lichsuca')}>Xem ca thi →</button></details>
+   </div>
+   <div style={box}><h3 className="font-bold flex gap-2 items-center"><Activity size={18} className="news-accent"/>Truy cập</h3><div className="news-metrics mt-3">{['gv','hs','ph'].map(role=>{const v=report.visits?.find(v=>v.role===role);return <div key={role}><strong>{v?.online||0} đang mở</strong><p className="news-muted text-xs mt-1">{role==='gv'?'Giáo viên':role==='hs'?'Học sinh':'Phụ huynh'} · {v?.visits||0} phiên trong ngày</p></div>})}</div><p className="news-muted text-xs mt-3">Đang mở: có tín hiệu trong 90 giây gần nhất. Đếm phiên trình duyệt, không phải số người. Bắt đầu ghi từ khi cập nhật này được mở.</p></div>
+   <p className="news-muted text-xs">Cập nhật {time(report.updatedAt)} · Làm mới khoảng 15 giây khi mở app. Trạng thái bài giao được lấy ở thời điểm xem.</p>
+  </>}
+ </section><BangVinhDanh/></>
+}
+const box={padding:16,border:'1px solid var(--vien)',borderRadius:18,background:'var(--the)'}
+const row={padding:'12px 0',borderBottom:'1px solid var(--vien)'}
+const scroll={maxHeight:280,overflowY:'auto' as const,marginTop:12}
+const time=(s:string)=>new Date(s).toLocaleTimeString('vi-VN',{timeZone:'Asia/Ho_Chi_Minh',hour:'2-digit',minute:'2-digit'})
+function Metric({value,label}:{value:number;label:string}){return <div className="news-metric"><strong className="news-number">{value}</strong><p className="news-muted text-xs mt-2">{label}</p></div>}

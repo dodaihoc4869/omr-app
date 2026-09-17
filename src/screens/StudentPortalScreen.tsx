@@ -1,4 +1,13 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
+import ThongBaoHocSinh,{noticeApi} from '../components/ThongBaoHocSinh'
+import BangTinPhuHuynh from '../components/BangTinPhuHuynh'
+import {MomQuestionStem,MomOption} from '../components/MomQuestionMedia'
+import {momApi, momReviewHtml} from '../lib/mom-api'
+import PhongVaoThi from '../components/PhongVaoThi'
+import KhungThanThuToanManHinh from '../components/KhungThanThuToanManHinh'
+import LuyenDeChuan from '../components/LuyenDeChuan'
+import KhoiKhacPhuc3CheDo from '../components/KhoiKhacPhuc3CheDo'
+import {syncStudentExp} from '../game/than-thu-v2/academic-sync'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import {
   Award,
   BookOpen,
@@ -12,8 +21,6 @@ import {
   RefreshCw,
   Sparkles,
   AlertCircle,
-  CheckSquare,
-  Square,
   ArrowRight,
   Clock,
   RotateCcw,
@@ -43,7 +50,7 @@ import LogoHocSinh from '../components/LogoHocSinh'
 // vào đây là nó rơi vào MẢNH MÃ CHÍNH (755 KB), thứ MỌI người tải, kể cả phụ
 // huynh chỉ mở một trang báo cáo trên điện thoại. Em nào mở tab game mới tải,
 // và service worker cất lại ngay nên lần sau tức thì.
-const ThanThuHoaHocGame = lazy(() => import('../components/ThanThuHoaHocGame'))
+const ThanThuHoaHocGame = lazy(() => import('../game/than-thu-v2/Game'))
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import DongDemCau, { docSoDem } from '../components/DongDemCau'
 import { goiBaiThi } from '../lib/goi-bao-cao'
@@ -71,6 +78,7 @@ export interface BaiMomGiao {
   nopLuc?: string
   diem?: number
   soCauDung?: number
+  dapAnDaNop?: Record<string,string>
   htmlKetQua?: string
   htmlBaoCao?: string
 }
@@ -78,6 +86,8 @@ export interface BaiMomGiao {
 export function chuanHoaBaiMom(b: any): BaiMomGiao {
   const rawCau = Array.isArray(b?.dsCau) ? b.dsCau : (Array.isArray(b?.cau) ? b.cau : [])
   const dsCau = rawCau.map((c: any, i: number) => ({
+    ...c,
+    phan: c?.phan || (/^[DS]{4}$/i.test(String(c?.dapAn || c?.dapAnDung)) ? 'II' : undefined),
     id: String(c?.id || `cau_${i + 1}`),
     text: String(c?.text || c?.noiDung || 'Câu hỏi'),
     choices: Array.isArray(c?.choices)
@@ -101,6 +111,7 @@ export function chuanHoaBaiMom(b: any): BaiMomGiao {
   const htmlKetQua = b?.htmlKetQua || b?.htmlBaoCao || ''
 
   return {
+    dapAnDaNop: b?.dapAnDaNop,
     ...b,
     id,
     tieuDe,
@@ -169,6 +180,14 @@ export default function StudentPortalScreen() {
     }
   })
 
+  useEffect(()=>{
+    if(!auth?.sbd||!auth.token)return
+    const sync=()=>{if(document.visibilityState==='visible')void syncStudentExp(auth.sbd,auth.token!)}
+    sync();const timer=setInterval(sync,30000)
+    window.addEventListener('focus',sync);document.addEventListener('visibilitychange',sync)
+    return()=>{clearInterval(timer);window.removeEventListener('focus',sync);document.removeEventListener('visibilitychange',sync)}
+  },[auth?.sbd,auth?.token])
+
   // Đăng nhập state
   const [sbdInput, setSbdInput] = useState('')
   const [matKhauInput, setMatKhauInput] = useState('')
@@ -196,9 +215,6 @@ export default function StudentPortalScreen() {
   const [dangMoBai, setDangMoBai] = useState<string | null>(null)
 
   // Khắc phục câu sai
-  const [cacCaChon, setCacCaChon] = useState<Set<string>>(new Set())
-  const [dangTaoDeKhacPhuc, setDangTaoDeKhacPhuc] = useState(false)
-  const [thongBaoKhacPhuc, setThongBaoKhacPhuc] = useState('')
   const [phieuHtml, setPhieuHtml] = useState('')
   /** HTML đề + lời giải của em, dựng TẠI MÁY. Rỗng = không mở lớp phủ.
    *
@@ -222,15 +238,16 @@ export default function StudentPortalScreen() {
       const url = await loadScriptUrlHoacMacDinh().catch(() => '')
       const kq = await deVaLoiGiaiCuaEm(url, maCa, auth.sbd, auth.hoTen || '')
       if (kq.html) setXemDeHtml(kq.html)
-      else setThongBaoKhacPhuc(kq.loi || 'Không mở được đề của em')
+      else alert(kq.loi || 'Không mở được đề của em')
     } catch (e) {
-      setThongBaoKhacPhuc(e instanceof Error ? e.message : 'Không mở được đề của em')
+      alert(e instanceof Error ? e.message : 'Không mở được đề của em')
     } finally {
       setDangMoDe(false)
     }
   }
   const [dsCauSaiKhacPhucModal, setDsCauSaiKhacPhucModal] = useState<CauSaiDauVao[] | null>(null)
   const [tieuDeKhacPhucModal, setTieuDeKhacPhucModal] = useState('')
+  const [cheDoKhacPhucMacDinh, setCheDoKhacPhucMacDinh] = useState<1 | 4>(1)
   const [caXemBaoCaoModal, setCaXemBaoCaoModal] = useState<any | null>(null)
   const [scriptUrl, setScriptUrl] = useState('')
 
@@ -246,26 +263,40 @@ export default function StudentPortalScreen() {
   const [cauTraLoiMom, setCauTraLoiMom] = useState<Record<string, string>>({})
   const [thongBaoNopMom, setThongBaoNopMom] = useState<string | null>(null)
 
-  const napDsMom = useCallback(() => {
+  const answersMomRef = useRef(cauTraLoiMom)
+  answersMomRef.current = cauTraLoiMom
+  const submittingMom = useRef(false)
+  const retryMomAt = useRef(0)
+  const [loiMom, setLoiMom] = useState('')
+  const [daTaiMom, setDaTaiMom] = useState(false)
+  const napDsMom = useCallback(async () => {
     if (!auth) return
     try {
-      const raw = localStorage.getItem(`omr_mom_btvn_${auth.sbd}`)
-      if (raw) {
-        const parsed = JSON.parse(raw)
-        if (Array.isArray(parsed)) {
-          setDsMomGiao(parsed.map(chuanHoaBaiMom))
-        }
-      } else {
-        setDsMomGiao([])
-      }
-    } catch {
-      setDsMomGiao([])
-    }
+      const data = await momApi('list', {token:auth.token})
+      let legacy: BaiMomGiao[] = []
+      try { legacy = JSON.parse(localStorage.getItem(`omr_mom_btvn_${auth.sbd}`) || '[]').filter((b: BaiMomGiao) => b.trangThai === 'da_nop' && !data.items.some((n: BaiMomGiao) => n.id === b.id)) } catch {}
+      setDsMomGiao([...data.items, ...legacy].map(chuanHoaBaiMom))
+      setDaTaiMom(true)
+      setLoiMom('')
+    } catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được bài. Em thử lại.') }
   }, [auth])
 
   useEffect(() => {
-    napDsMom()
+    void napDsMom()
+    const refresh = () => { if (!document.hidden) void napDsMom() }
+    const timer = setInterval(refresh, 15000)
+    window.addEventListener('focus', refresh)
+    window.addEventListener('online', refresh)
+    return () => { clearInterval(timer); window.removeEventListener('focus', refresh); window.removeEventListener('online', refresh) }
   }, [napDsMom, tab])
+  useEffect(() => {
+    if (!dangLamMom || !auth) return
+    try { localStorage.setItem(`omr_mom_draft_${auth.sbd}_${dangLamMom.id}`, JSON.stringify(cauTraLoiMom)) } catch {}
+    const timer = setTimeout(() => {
+      void momApi('save', {token:auth.token,id:dangLamMom.id,answers:cauTraLoiMom}).catch(e => setLoiMom(`Chưa lưu được đáp án lên máy chủ: ${e.message}`))
+    }, 600)
+    return () => clearTimeout(timer)
+  }, [cauTraLoiMom, dangLamMom, auth])
 
   useEffect(() => {
     nhoVaiDaDung('hs')
@@ -288,7 +319,7 @@ export default function StudentPortalScreen() {
       const daTroiQua = Math.floor((Date.now() - new Date(dangLamMom.batDauLuc).getTime()) / 1000)
       const conLai = Math.max(0, 7200 - daTroiQua)
       setGiayConLaiMom(conLai)
-      if (conLai === 0) {
+      if (conLai === 0 && Date.now() >= retryMomAt.current) {
         void nopBaiCuaMom()
       }
     }
@@ -305,28 +336,27 @@ export default function StudentPortalScreen() {
     return `${String(gio).padStart(2, '0')}:${String(phut).padStart(2, '0')}:${String(giay).padStart(2, '0')}`
   }
 
-  const batDauLamBaiMom = (bai: BaiMomGiao) => {
-    const bChuan = chuanHoaBaiMom(bai)
-    const batDauLuc = bChuan.batDauLuc || new Date().toISOString()
-    const capNhat: BaiMomGiao = {
-      ...bChuan,
-      trangThai: 'dang_lam',
-      batDauLuc,
-    }
-    setDangLamMom(capNhat)
-    setCauTraLoiMom({})
-    setThongBaoNopMom(null)
-
-    if (auth) {
-      const danhSach = dsMomGiao.map((b) => (b.id === bChuan.id ? capNhat : chuanHoaBaiMom(b)))
-      localStorage.setItem(`omr_mom_btvn_${auth.sbd}`, JSON.stringify(danhSach))
-      setDsMomGiao(danhSach)
-    }
+  const batDauLamBaiMom = async (bai: BaiMomGiao) => {
+    if (!auth) return
+    try {
+      const data = await momApi('start', {token:auth.token,id:bai.id})
+      const capNhat = chuanHoaBaiMom(data.item)
+      let answers = data.item.dapAnDaNop || {}
+      try { const raw = localStorage.getItem(`omr_mom_draft_${auth.sbd}_${bai.id}`); if (raw) answers = {...answers, ...JSON.parse(raw)} } catch {}
+      setCauTraLoiMom(answers)
+      if (capNhat.trangThai === 'da_nop') { await napDsMom(); return }
+      setDangLamMom(capNhat)
+      setThongBaoNopMom(null)
+      setLoiMom('')
+    } catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa mở được bài. Em thử lại.') }
   }
 
   async function nopBaiCuaMom() {
-    if (!dangLamMom || !auth) return
-
+    if (!dangLamMom || !auth || submittingMom.current) return
+    submittingMom.current = true
+    retryMomAt.current = Date.now() + 15000
+    const cauTraLoiMom = answersMomRef.current
+    try {
     const dsCau = Array.isArray(dangLamMom.dsCau) && dangLamMom.dsCau.length > 0
       ? dangLamMom.dsCau
       : (Array.isArray(dangLamMom.cau) ? dangLamMom.cau : [])
@@ -499,14 +529,21 @@ export default function StudentPortalScreen() {
       nopLuc: new Date().toISOString(),
       diem,
       soCauDung: soDung,
+      dapAnDaNop: {...cauTraLoiMom},
       htmlKetQua,
     }
 
-    const danhSachMoi = dsMomGiao.map((b) => (b.id === dangLamMom.id ? baiDaNop : b))
-    localStorage.setItem(`omr_mom_btvn_${auth.sbd}`, JSON.stringify(danhSachMoi))
+    const saved = await momApi('submit', {token:auth.token,id:dangLamMom.id,answers:cauTraLoiMom})
+    const confirmed = {...baiDaNop, ...saved.item, htmlKetQua}
+    const danhSachMoi = dsMomGiao.map((b) => (b.id === dangLamMom.id ? confirmed : b))
+    try { localStorage.setItem(`omr_mom_btvn_${auth.sbd}`, JSON.stringify(danhSachMoi)) } catch {}
     setDsMomGiao(danhSachMoi)
+    if(auth.token)void syncStudentExp(auth.sbd,auth.token)
     setDangLamMom(null)
-    setThongBaoNopMom(`🎉 Chúc mừng em đã hoàn thành bài của Mom! Điểm: ${diem}/10. Kết quả đã tự động gửi về App của Mom.`)
+    setThongBaoNopMom(`Đã nộp bài thành công. Điểm: ${saved.item.diem}/10. Mom đã có thể xem kết quả trên app.`)
+    setLoiMom('')
+    } catch (e) { setLoiMom(`Chưa nộp được bài. Đáp án vẫn được giữ trên máy, em bấm nộp lại khi có mạng. ${e instanceof Error ? e.message : ''}`) }
+    finally { submittingMom.current = false }
   }
 
   // Ghi nhớ vai hs
@@ -560,7 +597,7 @@ export default function StudentPortalScreen() {
       const { layCauHinhChoEmBtvn } = await import('../lib/btvn-cho-em')
       const { btvnCuaEm } = await import('../lib/btvn-may-chu-moi')
       const ch = await layCauHinhChoEmBtvn()
-      const r = await btvnCuaEm(ch, bt.maCa || 'Riêng', auth.sbd)
+      const r = await btvnCuaEm(ch, bt.maCa || 'Riêng', auth.sbd, bt.maBtvn)
       if (!r.ok) {
         alert(r.error || 'Không mở được bài tập về nhà')
         return
@@ -588,14 +625,6 @@ export default function StudentPortalScreen() {
         setDangTaiLichSu(false)
         if (resLs.ok && resLs.items) {
           setDsLichSu(resLs.items)
-          // Mặc định chọn các ca có câu sai
-          const coSai = new Set<string>()
-          for (const it of resLs.items) {
-            // CẦN KHẮC PHỤC, không phải chỉ "sai hẳn": câu bỏ trống và câu
-            // phần II chưa trọn ý cũng phải vào đề khắc phục.
-            if ((docSoDem(it)?.soCanKhacPhuc ?? 0) > 0) coSai.add(it.maCa)
-          }
-          setCacCaChon(coSai)
         }
       }
 
@@ -640,6 +669,7 @@ export default function StudentPortalScreen() {
         hoTen: res.hoTen || `Học sinh ${sbd}`,
         lop: res.lop || '',
         namSinh: res.namSinh || '',
+        token: res.token,
       }
       localStorage.setItem(KHOA_LUU_AUTH, JSON.stringify(thongTin))
       setAuth(thongTin)
@@ -678,6 +708,7 @@ export default function StudentPortalScreen() {
           hoTen: resDn.hoTen || `Học sinh ${sbdInput.trim()}`,
           lop: resDn.lop || '',
           namSinh: resDn.namSinh || '',
+          token: resDn.token,
         }
         localStorage.setItem(KHOA_LUU_AUTH, JSON.stringify(thongTin))
         setAuth(thongTin)
@@ -693,38 +724,21 @@ export default function StudentPortalScreen() {
     }
   }
 
-  const dangXuat = () => {
+  const dangXuat = async () => {
+    try{const r=await navigator.serviceWorker?.getRegistration();const sub=await r?.pushManager?.getSubscription();if(sub&&auth?.token){await noticeApi(auth.token,'unsubscribe',{endpoint:sub.endpoint});await sub.unsubscribe()}}catch{/* Generic push contains no personal data. */}
     localStorage.removeItem(KHOA_LUU_AUTH)
     setAuth(null)
     setMatKhauInput('')
     setSbdInput('')
   }
 
-  // Khắc phục câu sai: toggle chọn ca
-  const toggleChonCa = (maCa: string) => {
-    const s = new Set(cacCaChon)
-    if (s.has(maCa)) s.delete(maCa)
-    else s.add(maCa)
-    setCacCaChon(s)
-  }
-
-  const chonTatCaCa = () => {
-    if (cacCaChon.size === dsLichSu.length) {
-      setCacCaChon(new Set())
-    } else {
-      setCacCaChon(new Set(dsLichSu.map((c) => c.maCa)))
-    }
-  }
-
   const tongSoCauSaiDaChon = useMemo(() => {
     let t = 0
     for (const c of dsLichSu) {
-      if (cacCaChon.has(c.maCa)) {
-        t += c.soCauSai ?? 0
-      }
+      t += (docSoDem(c)?.soCanKhacPhuc ?? c.soCauSai ?? 0)
     }
     return t
-  }, [dsLichSu, cacCaChon])
+  }, [dsLichSu])
 
   // Rút đề khắc phục câu sai
   /**
@@ -793,33 +807,27 @@ export default function StudentPortalScreen() {
 
   const taoDeKhacPhuc = async (danhSachMaCaTuyChon?: string[]) => {
     if (!auth) return
-    let dsMaCa = danhSachMaCaTuyChon && danhSachMaCaTuyChon.length > 0 ? danhSachMaCaTuyChon : Array.from(cacCaChon)
+    let dsMaCa = danhSachMaCaTuyChon && danhSachMaCaTuyChon.length > 0 ? danhSachMaCaTuyChon : []
     if (dsMaCa.length === 0) {
       const caCoSai = dsLichSu.filter((c) => (c.soCauSai ?? 0) > 0).map((c) => c.maCa)
       dsMaCa = caCoSai.length > 0 ? caCoSai : dsLichSu.map((c) => c.maCa)
     }
     if (dsMaCa.length === 0) {
-      setThongBaoKhacPhuc('Chưa có dữ liệu ca thi để khắc phục câu sai')
+      setTieuDeKhacPhucModal('Lựa chọn luyện tập')
+      setDsCauSaiKhacPhucModal([])
       return
     }
-    setDangTaoDeKhacPhuc(true)
-    setThongBaoKhacPhuc('')
+    setCheDoKhacPhucMacDinh(1)
     try {
       const url = await loadScriptUrlHoacMacDinh().catch(() => '')
       const res = await hsCauSaiApi(url, auth.sbd, dsMaCa)
-      if (!res.ok || !res.items || res.items.length === 0) {
-        setThongBaoKhacPhuc(res.error || 'Các ca đã chọn không có câu sai nào cần khắc phục!')
-        setDangTaoDeKhacPhuc(false)
+      if (!res.ok || !res.items) {
         return
       }
 
       setTieuDeKhacPhucModal(dsMaCa.length === 1 ? `Ca thi #${dsMaCa[0]}` : `${dsMaCa.length} ca thi đã chọn`)
       setDsCauSaiKhacPhucModal(res.items as CauSaiDauVao[])
-    } catch (err) {
-      setThongBaoKhacPhuc(err instanceof Error ? err.message : 'Lỗi khi tải danh sách câu sai')
-    } finally {
-      setDangTaoDeKhacPhuc(false)
-    }
+    } catch {}
   }
 
   // Vào thi
@@ -1019,7 +1027,7 @@ export default function StudentPortalScreen() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
       {/* Header Google Workspace style */}
-      <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200/80 dark:border-slate-800 px-4 py-2.5 sm:px-6">
+      <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200/80 dark:border-slate-800 px-4 pb-2.5 sm:px-6" style={{ paddingTop: 'max(10px, env(safe-area-inset-top))' }}>
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
           {/* Logo Học sinh phong cách Google */}
           <LogoHocSinh size={38} hienChu={true} />
@@ -1040,6 +1048,7 @@ export default function StudentPortalScreen() {
               </div>
             </div>
 
+            {auth.token&&<ThongBaoHocSinh token={auth.token} onOpen={t=>{setTab(t);void napDsMom()}}/>}
             <button
               onClick={dangXuat}
               title="Đăng xuất"
@@ -1052,6 +1061,7 @@ export default function StudentPortalScreen() {
         </div>
       </header>
 
+      {auth.token && !dangLamMom && !manThi && tab !== 'thanthu' && <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-5"><BangTinPhuHuynh sbd={auth.sbd} studentToken={auth.token} onSent={(id)=>{void napDsMom();setTab('mom');if(id)void batDauLamBaiMom({id} as BaiMomGiao)}}/></div>}
       {/* Navigation mục theo phong cách Google Material 3 Segmented Pill Tabs */}
       <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-5 pb-1">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2.5">
@@ -1144,7 +1154,7 @@ export default function StudentPortalScreen() {
               </span>
             </div>
             <div>
-              <div className="font-bold text-sm leading-tight">Khắc phục câu sai</div>
+              <div className="font-bold text-sm leading-tight">Khắc phục và Luyện đề</div>
               <div className={`text-[11px] mt-0.5 line-clamp-1 ${tab === 'khacphuc' ? 'text-amber-700/80 dark:text-amber-300/80' : 'text-slate-400 dark:text-slate-500'}`}>
                 Tự tạo đề ôn tập
               </div>
@@ -1234,7 +1244,7 @@ export default function StudentPortalScreen() {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div role="region" aria-label="Lịch sử thi và báo cáo" tabIndex={0} className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[65vh] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-3 sm:p-4">
                 {dsLichSu.map((item) => (
                   <div
                     key={item.maCa}
@@ -1378,7 +1388,7 @@ export default function StudentPortalScreen() {
                 </button>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div role="region" aria-label="Bài tập về nhà" tabIndex={0} className="space-y-3 max-h-[65vh] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-3 sm:p-4">
                 {dsBtvn.map((bt) => (
                   <div
                     key={bt.maBtvn || bt.maCa}
@@ -1559,10 +1569,10 @@ export default function StudentPortalScreen() {
                         </div>
 
                         <div className="text-sm text-slate-800 dark:text-slate-200 leading-relaxed">
-                          {cau.text}
+                          <MomQuestionStem q={cau} />
                         </div>
 
-                        {Array.isArray(cau?.choices) && cau.choices.length > 0 ? (
+                        {cau.phan === 'II' ? <div className="space-y-3">{(cau.ideas || cau.luaChon || cau.choices || []).map((idea:string,i:number)=><div key={i} className="rounded-xl border border-slate-200 p-3"><MomOption q={cau} index={i} text={`${String.fromCharCode(97+i)}) ${idea}`} tf /><div className="mt-2 flex gap-2">{['D','S'].map(v=><button key={v} onClick={()=>setCauTraLoiMom(prev=>{const a=(prev[cau.id]||'----').split('');a[i]=v;return {...prev,[cau.id]:a.join('')}})} className={`rounded-full px-4 py-2 text-sm font-semibold ${daChon?.[i]===v?'bg-rose-600 text-white':'bg-slate-100 text-slate-700'}`}>{v==='D'?'Đúng':'Sai'}</button>)}</div></div>)}</div> : Array.isArray(cau?.choices) && cau.choices.length > 0 ? (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                             {cau.choices.map((choice: string, cIdx: number) => {
                               const kyTu = String.fromCharCode(65 + cIdx)
@@ -1589,7 +1599,7 @@ export default function StudentPortalScreen() {
                                   >
                                     {kyTu}
                                   </span>
-                                  <span className="leading-snug">{choice}</span>
+                                  <MomOption q={cau} index={cIdx} text={choice} />
                                 </button>
                               )
                             })}
@@ -1615,6 +1625,7 @@ export default function StudentPortalScreen() {
                   })}
                 </div>
 
+                {loiMom && <div role="alert" className="p-4 rounded-2xl bg-amber-50 text-amber-900">{loiMom}</div>}
                 {/* Nút nộp bài dưới cùng */}
                 <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-900/60 text-center space-y-3">
                   <div className="text-sm font-bold text-slate-900 dark:text-white">
@@ -1654,6 +1665,7 @@ export default function StudentPortalScreen() {
                   </button>
                 </div>
 
+                {loiMom && <div role="alert" className="p-4 rounded-2xl bg-amber-50 text-amber-900">{loiMom}</div>}
                 {thongBaoNopMom && (
                   <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center justify-between">
                     <span>{thongBaoNopMom}</span>
@@ -1672,14 +1684,14 @@ export default function StudentPortalScreen() {
                       <Heart className="w-6 h-6" />
                     </div>
                     <div className="font-bold text-sm text-slate-900 dark:text-white">
-                      Chưa có bài tập nào do Mom giao
+                      {daTaiMom ? 'Chưa có bài tập nào do Mom giao' : loiMom ? 'Chưa tải được danh sách bài' : 'Đang nhận bài từ Mom…'}
                     </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
                       Mom có thể vào <strong>Cổng Phụ Huynh (/phu-huynh)</strong> chỉ bằng Số báo danh của con, kéo thanh chọn câu (tối đa 99 câu) để tự động tạo và gửi bài cho con làm bất kỳ lúc nào.
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  <div role="region" aria-label="Bài của Mom giao" tabIndex={0} className="grid grid-cols-1 md:grid-cols-2 gap-3.5 max-h-[65vh] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-3 sm:p-4">
                     {dsMomGiao.map((bai) => {
                       const daNop = bai.trangThai === 'da_nop'
                       const dangLam = bai.trangThai === 'dang_lam'
@@ -1725,12 +1737,10 @@ export default function StudentPortalScreen() {
                           <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
                             {daNop ? (
                               <button
-                                onClick={() => {
-                                  if (bai.htmlKetQua) {
-                                    setPhieuHtml(bai.htmlKetQua)
-                                  } else {
-                                    alert(`Điểm của em: ${bai.diem}/10 (${bai.soCauDung}/${bai.soCau} câu đúng)`)
-                                  }
+                                onClick={async () => {
+                                  if (bai.htmlKetQua) { setPhieuHtml(bai.htmlKetQua); return }
+                                  try { const data = await momApi('review', {token:auth?.token,id:bai.id}); setPhieuHtml(momReviewHtml(chuanHoaBaiMom(data.item))) }
+                                  catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được kết quả.') }
                                 }}
                                 className="btn-google-outlined text-xs py-2 px-3.5 rounded-full font-semibold flex items-center gap-1.5 cursor-pointer"
                               >
@@ -1757,118 +1767,27 @@ export default function StudentPortalScreen() {
           </div>
         )}
 
-        {/* TAB 3: KHẮC PHỤC CÂU SAI */}
+        {/* TAB 3: KHẮC PHỤC CÂU SAI - CHIA 2 NỬA */}
         {tab === 'khacphuc' && (
-          <div className="space-y-4 animate-google-fade">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                  Khắc phục câu sai các ca thi
-                </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Chọn các ca thi để hệ thống tự động trích xuất các câu làm sai và rút các câu chữa phù hợp
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={chonTatCaCa}
-                  className="px-3.5 py-1.5 rounded-full btn-google-outlined text-xs font-medium cursor-pointer"
-                >
-                  {cacCaChon.size === dsLichSu.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả ca'}
-                </button>
-                <button
-                  onClick={() => void taoDeKhacPhuc()}
-                  disabled={dangTaoDeKhacPhuc || (cacCaChon.size === 0 && dsLichSu.length === 0)}
-                  className="px-4 py-2 rounded-full btn-google-primary !bg-amber-500 hover:!bg-amber-600 !border-amber-500 text-white font-semibold text-xs shadow-md flex items-center gap-1.5 disabled:opacity-50 transition cursor-pointer"
-                >
-                  {dangTaoDeKhacPhuc ? (
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Sparkles className="w-4 h-4" />
-                  )}
-                  <span>Tạo câu khắc phục 3 chế độ</span>
-                </button>
-              </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start animate-google-fade">
+            <div>
+              <LuyenDeChuan sbd={auth.sbd} token={auth.token} />
             </div>
-
-            {thongBaoKhacPhuc && (
-              <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl text-amber-800 dark:text-amber-300 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <span>{thongBaoKhacPhuc}</span>
-              </div>
-            )}
-
-            {dsLichSu.length === 0 ? (
-              <div className="p-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-center">
-                <Sparkles className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-                <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-sm">
-                  Chưa có dữ liệu câu sai
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
-                  Sau khi tham gia các ca thi, các câu làm sai sẽ được hiển thị ở đây để tạo đề ôn tập.
-                </p>
-              </div>
-            ) : (
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
-                <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {dsLichSu.map((item) => {
-                    const isSelected = cacCaChon.has(item.maCa)
-                    const coSai = (docSoDem(item)?.soCanKhacPhuc ?? 0) > 0
-                    return (
-                      <div
-                        key={item.maCa}
-                        onClick={() => toggleChonCa(item.maCa)}
-                        className={`p-4 flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition ${
-                          isSelected ? 'bg-indigo-50/40 dark:bg-indigo-950/20' : ''
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="text-indigo-600 dark:text-indigo-400">
-                            {isSelected ? (
-                              <CheckSquare className="w-5 h-5" />
-                            ) : (
-                              <Square className="w-5 h-5 text-slate-300 dark:text-slate-600" />
-                            )}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                                #{item.maCa}
-                              </span>
-                              <h4 className="font-bold text-slate-900 dark:text-white text-sm">
-                                {item.tenCa || `Ca ${item.maCa}`}
-                              </h4>
-                            </div>
-                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                              Nộp: {dinhDangNgayGio(item.nopLuc)} • Điểm:{' '}
-                              <strong>{item.tong !== null ? item.tong.toFixed(2) : '--'}</strong>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div>
-                          {coSai ? (
-                            <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
-                              {docSoDem(item)?.soCanKhacPhuc ?? 0} câu cần khắc phục
-                            </span>
-                          ) : (
-                            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
-                              Đúng 100%
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
+            <div>
+              <KhoiKhacPhuc3CheDo
+                sbd={auth.sbd}
+                token={auth.token}
+                hoTen={auth.hoTen}
+                dsLichSu={dsLichSu}
+                scriptUrl={scriptUrl}
+              />
+            </div>
           </div>
         )}
 
         {/* TAB 4: VÀO PHÒNG THI */}
-        {tab === 'vaothi' && (
+        {tab === 'vaothi' && !manThi && (
+          <PhongVaoThi onClose={() => setTab('diem')}>
           <div className="max-w-xl mx-auto py-4 animate-google-fade">
             <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm">
               <div className="text-center mb-6">
@@ -1934,13 +1853,17 @@ export default function StudentPortalScreen() {
               </form>
             </div>
           </div>
+          </PhongVaoThi>
         )}
 
         {/* TAB 7: THẦN THÚ HÓA HỌC (ALCHEMON) — Nuôi thú, leo tháp & săn boss câu sai.
             Gắn kết chặt chẽ với nhiệm vụ làm BTVN, sửa câu sai và vào phòng thi. */}
         {tab === 'thanthu' && (
+          <KhungThanThuToanManHinh>
           <Suspense fallback={<ChoNapGame />}>
           <ThanThuHoaHocGame
+            sbd={auth.sbd}
+            token={auth.token}
             dsLichSu={dsLichSu}
             dsBtvn={dsBtvn}
             dsMom={dsMomGiao}
@@ -1954,6 +1877,7 @@ export default function StudentPortalScreen() {
             onChuyenSangVaoThi={() => setTab('vaothi')}
           />
           </Suspense>
+          </KhungThanThuToanManHinh>
         )}
       </main>
 
@@ -2018,7 +1942,6 @@ export default function StudentPortalScreen() {
           onBatDauKhacPhuc={(maCa, html) => {
             setCaXemBaoCaoModal(null)
             setTab('khacphuc')
-            setCacCaChon(new Set([maCa]))
             // Modal khắc phục đã dựng xong tờ phiếu thì MỞ THẲNG. Gọi lại
             // `taoDeKhacPhuc` ở đây là mở lại đúng modal em vừa bấm — vòng kín.
             if (html) {
@@ -2040,6 +1963,7 @@ export default function StudentPortalScreen() {
           hoTen={auth.hoTen}
           sbd={auth.sbd}
           tieuDeCa={tieuDeKhacPhucModal}
+          cheDoMacDinh={cheDoKhacPhucMacDinh}
           onTaoPhieuXong={(html) => {
             setDsCauSaiKhacPhucModal(null)
             setPhieuHtml(html)

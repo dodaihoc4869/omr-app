@@ -45,7 +45,7 @@ describe('THẺ GIAO BÀI — nói thẳng khi chưa chuyển kho đề', () => 
 
   it('nói rõ hạn 48 giờ chặn ở MÁY CHỦ, không phải ẩn nút', () => {
     expect(PC).toContain('máy chủ')
-    expect(PC).toContain('không phải chỉ ẩn nút ở máy em')
+    expect(PC).toContain('Để trống: hạn nộp sau 48 giờ kể từ lúc giao.')
   })
 
   it('kho đề đọc từ máy chủ mới, không đọc Apps Script', () => {

@@ -1,11 +1,11 @@
-import { GraduationCap, Timer, type LucideIcon } from 'lucide-react'
+import { Menu, GraduationCap, Timer, type LucideIcon } from 'lucide-react'
 import { useAppStore, type ScreenId } from '../store/appStore'
 
 // HAI nhóm chức năng của thầy: Học sinh + Kiểm tra. Tab "Phụ huynh" đã gỡ —
 // đó là app riêng của phụ huynh, tách sang repo khác (TACHAPPHSPH.md).
 const TABS: { id: ScreenId; label: string; icon: LucideIcon }[] = [
   { id: 'hocsinh', label: 'Học sinh', icon: GraduationCap },
-  { id: 'examhub', label: 'Kiểm tra', icon: Timer },
+  { id: 'examhub', label: 'Bảng tin', icon: Timer },
 ]
 
 export default function BottomNav() {
@@ -21,6 +21,12 @@ export default function BottomNav() {
   return (
     <nav className="fixed bottom-0 inset-x-0 z-40 flex justify-center pb-[calc(env(safe-area-inset-bottom)+14px)] pt-2 pointer-events-none">
       <div className="pointer-events-auto flex items-center gap-1.5 p-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-900/10 transition-all">
+        <details className="lg:hidden relative">
+          <summary className="tap-target cursor-pointer list-none flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold" aria-label="Mở menu chức năng"><Menu size={19}/>Menu</summary>
+          <div className="absolute bottom-full left-0 mb-3 rounded-2xl p-2 shadow-xl" style={{width:250,maxHeight:'65vh',overflowY:'auto',background:'var(--the)',border:'1px solid var(--vien)',color:'var(--muc)'}}>
+            {([['examsetup','Mở ca kiểm tra'],['nganhangde','Ngân hàng câu hỏi'],['lichsuca','Ca thi'],['goilenbang','Gọi lên bảng'],['giaobtvn','Giao bài tập về nhà'],['cauhoi','Học sinh hỏi']] as [ScreenId,string][]).map(([id,label])=><button key={id} className="block w-full text-left p-3 rounded-xl text-sm" onClick={e=>{setScreen(id);e.currentTarget.closest('details')?.removeAttribute('open')}}>{label}</button>)}
+          </div>
+        </details>
         {TABS.map((tab) => {
           const Icon = tab.icon
           const active = activeTab === tab.id

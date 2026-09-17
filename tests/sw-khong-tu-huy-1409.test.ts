@@ -69,32 +69,21 @@ describe('src/sw.ts — ba việc tự huỷ không được quay lại', () => 
   })
 })
 
-describe('index.html — chốt tự sửa khi app trắng màn', () => {
-  it('chỉ chạy khi #root RỖNG, không đụng app đã vẽ ra', () => {
-    expect(TRANG).toContain('if (goc && goc.childElementCount > 0) return')
+describe('index.html — phục hồi không hủy dữ liệu trên máy yếu', () => {
+  it('không thay màn đã mở thành công', () => {
+    expect(TRANG).toContain("root.childElementCount && !root.querySelector('[data-startup-status]')")
   })
-
-  it('CHỈ MỘT LẦN mỗi tab — không có vòng lặp nạp lại', () => {
-    expect(TRANG).toContain("var KHOA = 'ddh.daTuSua'")
-    expect(TRANG).toContain('if (daThu()) return')
-    expect(TRANG).toContain('ghiDaThu()')
-    // Ghi cờ TRƯỚC khi làm bất cứ việc gì khác: hỏng giữa chừng cũng không lặp.
-    expect(TRANG.indexOf('ghiDaThu()')).toBeLessThan(TRANG.indexOf('unregister()'))
+  it('không xóa cache hay gỡ service worker vì tải chậm', () => {
+    expect(TRANG).not.toContain('caches.delete(')
+    expect(TRANG).not.toContain('.unregister(')
   })
-
-  it('sessionStorage chặn thì coi như ĐÃ THỬ — thà không sửa còn hơn lặp vô hạn', () => {
-    expect(TRANG).toMatch(/function daThu\(\)[\s\S]{0,200}catch \(e\) \{\s*return true/)
+  it('nạp lại do người dùng bấm, giữ vai và dữ liệu trong hash', () => {
+    expect(TRANG).toContain("document.getElementById('startup-retry').onclick")
+    expect(TRANG).toContain('u.pathname + u.search + u.hash')
   })
-
-  it('gỡ service worker, xoá kho, rồi nạp lại thẳng từ mạng', () => {
-    expect(TRANG).toContain('navigator.serviceWorker.getRegistrations()')
-    expect(TRANG).toContain('caches.delete(k)')
-    expect(TRANG).toContain("'_moi=' + Date.now()")
-    expect(TRANG).toContain('location.replace(d)')
-  })
-
-  it('dọn dẹp treo quá 3 giây thì vẫn nạp lại, không kẹt', () => {
-    expect(TRANG).toContain('setTimeout(xong, 3000)')
+  it('có chẩn đoán lỗi đồng bộ và bất đồng bộ', () => {
+    expect(TRANG).toContain("window.addEventListener('error'")
+    expect(TRANG).toContain("window.addEventListener('unhandledrejection'")
   })
 })
 
@@ -121,7 +110,7 @@ describe('scripts/kiem-sw.mjs — cửa này PHẢI bắt được bản hỏng'
     try { await f() } catch (e) { console.warn("[sw] đi ra mạng", e) }
     caches.match(x); Response.error();
   })()`
-  const TRANG_LANH = `<script>var KHOA='ddh.daTuSua'; goc.childElementCount; '_moi='; r.unregister()</script>`
+  const TRANG_LANH = `<script>'startup-retry'; root.childElementCount; '_moi'; u.hash</script>`
 
   it('bản lành thì ĐẠT — cửa không kêu oan', () => {
     expect(chay(LANH, TRANG_LANH)).toBe(0)

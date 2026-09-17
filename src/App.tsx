@@ -1,3 +1,4 @@
+import './styles/teacher-layout.css'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import BottomNav from './components/BottomNav'
 import ThanhBenTrai from './components/ThanhBenTrai'
@@ -45,7 +46,8 @@ const NganHangDeScreen = lazy(() => import('./screens/NganHangDeScreen'))
 const ExamMonitorScreen = lazy(() => import('./screens/ExamMonitorScreen'))
 const LichSuCaScreen = lazy(() => import('./screens/LichSuCaScreen'))
 const HocSinhScreen = lazy(() => import('./screens/HocSinhScreen'))
-const GoiLenBangScreen = lazy(() => import('./screens/PhanCongScreen'))
+const GoiLenBangScreen = lazy(() => import('./screens/GoiLenBangScreen'))
+const GiaoBtvnScreen = lazy(() => import('./screens/PhanCongScreen'))
 const CauHoiScreen = lazy(() => import('./screens/CauHoiScreen'))
 // CỔNG PHỤ HUYNH NẠP MUỘN. Link phụ huynh dùng hằng ngày là `/p#…` (phiếu kết
 // quả) — màn ấy vẫn nạp SỚM. Cổng tra cứu `/ph` thì mở thưa hơn nhiều, mà để
@@ -71,7 +73,8 @@ const TEN_MAN: Record<string, string> = {
   exammonitor: 'Theo dõi ca',
   lichsuca: 'Ca thi',
   hocsinh: 'Học sinh',
-  goilenbang: 'Phân công',
+  goilenbang: 'Gọi lên bảng',
+  giaobtvn: 'Giao bài tập về nhà',
   cauhoi: 'Học sinh hỏi',
 }
 
@@ -314,7 +317,7 @@ function App() {
       <Toast />
       {!laManThi && <ThanhBenTrai />}
       <div className="khung-noi-dung">
-        <div className="giua-noi-dung">
+        <div className="giua-noi-dung" data-teacher-screen={laManThi ? undefined : screen}>
       {/* Một màn ném lỗi thì chỉ màn đó hiện báo lỗi, app KHÔNG trắng. key theo
           `screen` để lỗi cũ không dính lại khi thầy sang màn khác. */}
       <ChanLoi key={screen} o={TEN_MAN[screen]} veManChinh={() => setScreen('examhub')}>
@@ -327,6 +330,7 @@ function App() {
         {screen === 'exammonitor' && <ExamMonitorScreen />}
         {screen === 'lichsuca' && <LichSuCaScreen />}
         {screen === 'hocsinh' && <HocSinhScreen />}
+        {screen === 'giaobtvn' && <GiaoBtvnScreen />}
         {screen === 'goilenbang' && <GoiLenBangScreen />}
         {screen === 'cauhoi' && <CauHoiScreen />}
         </Suspense>

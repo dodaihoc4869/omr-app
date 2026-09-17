@@ -1,3 +1,6 @@
+import {nhomBtvn, type NhomBtvn} from '../lib/nhom-btvn'
+import NhomCaThuGon from '../components/NhomCaThuGon'
+import HocSinhNhanBai from '../components/HocSinhNhanBai'
 // PHÂN CÔNG — hai việc sau một ca thi, chung một chỗ.
 //
 // Thầy chốt 11/09: đổi mục "Phân công lên bảng" thành **Phân công**, trong đó
@@ -9,14 +12,13 @@
 // Phần giao bài tập chạy 0% Apps Script: ca và đề đọc từ máy chủ mới, bài giao
 // và bài nộp cũng ở đó.
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { CheckSquare, ClipboardList, Presentation, RefreshCw, Search, Square, UserCheck, Users } from 'lucide-react'
-import { Nhan, NutChinh, OThongBao, TheNoiDung } from '../components/DesignSystem'
-import GoiLenBangScreen from './GoiLenBangScreen'
-import { danhSachCa, danhSachEm, type CaTomTat, type EmTomTat } from '../lib/exam-api'
+import { CheckSquare, ClipboardList, RefreshCw, Search, Square, UserCheck, Users } from 'lucide-react'
+import { Nhan, OThongBao, TheNoiDung } from '../components/DesignSystem'
+import { danhSachCa, danhSachEm, khoiTuNamSinh, type CaTomTat, type EmTomTat } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { layCauHinhMayChu } from '../lib/may-chu-moi'
 import { luotCuaCaMoi } from '../lib/day-ca-may-chu-moi'
-import { giaoBtvn, theoDoiBtvn, type DongTheoDoiBtvn } from '../lib/btvn-may-chu-moi'
+import { giaoBtvn, theoDoiBtvn, suaGiaoBtvn, type DongTheoDoiBtvn } from '../lib/btvn-may-chu-moi'
 import HopChonDe from '../components/HopChonDe'
 import HangNhomDe from '../components/HangNhomDe'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
@@ -38,42 +40,7 @@ function gioVN(iso: string): string {
 }
 
 export default function PhanCongScreen() {
-  const [the, setThe] = useState<'btvn' | 'lenbang'>('btvn')
-  return (
-    <div className="w-full max-w-full overflow-x-hidden min-w-0" style={{ fontFamily: 'var(--sans)', color: 'var(--muc)' }}>
-      <div className="px-3 sm:px-4 pt-4">
-        <div className="grid grid-cols-2 gap-2 w-full max-w-full">
-          <NutChinh
-            variant={the === 'btvn' ? undefined : 'phu'}
-            onClick={() => setThe('btvn')}
-            className="!h-11 sm:!h-13"
-          >
-            <span className="inline-flex items-center justify-center gap-1.5 sm:gap-2 truncate text-xs sm:text-sm md:text-base font-bold">
-              <ClipboardList size={16} className="shrink-0" />
-              <span className="truncate">Giao bài tập về nhà</span>
-            </span>
-          </NutChinh>
-          <NutChinh
-            variant={the === 'lenbang' ? undefined : 'phu'}
-            onClick={() => setThe('lenbang')}
-            className="!h-11 sm:!h-13"
-          >
-            <span className="inline-flex items-center justify-center gap-1.5 sm:gap-2 truncate text-xs sm:text-sm md:text-base font-bold">
-              <Presentation size={16} className="shrink-0" />
-              <span className="truncate">Gọi lên bảng</span>
-            </span>
-          </NutChinh>
-        </div>
-      </div>
-      {the === 'btvn' ? (
-        <div className="min-h-screen pb-28 px-3 sm:px-4 pt-3 flex flex-col w-full max-w-full min-w-0" style={{ gap: 'var(--k3)' }}>
-          <TheGiaoBtvn />
-        </div>
-      ) : (
-        <GoiLenBangScreen />
-      )}
-    </div>
-  )
+ return <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-3 flex flex-col w-full max-w-full min-w-0" style={{gap:'var(--k3)'}}><header className="gv-page-header"><div><h1>Giao bài tập về nhà</h1><p>Chọn người nhận, chọn đề và theo dõi bài đã nộp.</p></div></header><TheGiaoBtvn/></div>
 }
 
 function TheGiaoBtvn() {
@@ -93,8 +60,10 @@ function TheGiaoBtvn() {
   const [luotCacCa, setLuotCacCa] = useState<Record<string, { sbd: string; hoTen: string; diem?: number | null; nopLuc?: string }[]>>({})
   const [dangTaiLuot, setDangTaiLuot] = useState(false)
   const [timKiemHs, setTimKiemHs] = useState('')
-  const [nguonHsLoc, setNguonHsLoc] = useState<'ca_da_chon' | 'tat_ca'>('ca_da_chon')
-  const [lopHsLoc, setLopHsLoc] = useState('')
+  const [chonRieng,setChonRieng]=useState(false)
+  const [khoiThem,setKhoiThem]=useState('')
+  const [khoiGui,setKhoiGui]=useState('10')
+
 
   // NGUỒN ĐỀ LẤY Y NHƯ MÀN MỞ CA: kho trên máy thầy, tách theo phần, rồi đưa
   // vào ĐÚNG hộp chọn đề đang chạy ở đó (`HopChonDe`). Thầy chốt 12/09: "phần
@@ -104,6 +73,10 @@ function TheGiaoBtvn() {
   const [dangNap, setDangNap] = useState(true)
   const [dangGiao, setDangGiao] = useState(false)
   const [bao, setBao] = useState<{ ok: boolean; chu: string } | null>(null)
+  const [hanMoi, setHanMoi] = useState('')
+  const [suaHan, setSuaHan] = useState<Record<string,string>>({})
+  const [dangSua, setDangSua] = useState('')
+  const [xacNhan,setXacNhan]=useState<{text:string;run:()=>Promise<void>}|null>(null)
   const [theoDoi, setTheoDoi] = useState<DongTheoDoiBtvn[]>([])
 
   const nap = useCallback(async () => {
@@ -169,15 +142,7 @@ function TheGiaoBtvn() {
         }
       }
       setLuotCacCa((prev) => ({ ...prev, ...kq }))
-      setSbdChon((prev) => {
-        const tiep = new Set(prev)
-        for (const m of canTai) {
-          for (const e of kq[m] ?? []) {
-            if (e.sbd) tiep.add(e.sbd)
-          }
-        }
-        return tiep
-      })
+
     } catch {
       // bỏ qua lỗi đọc lượt
     } finally {
@@ -235,47 +200,13 @@ function TheGiaoBtvn() {
     return Array.from(map.values())
   }, [caChon, luotCacCa, dsCa, dsEm])
 
-  const dsLopHs = useMemo(() => {
-    const set = new Set<string>()
-    for (const e of dsEm) {
-      if (e.lop?.trim()) set.add(e.lop.trim())
-    }
-    for (const c of dsCa) {
-      if (c.lop?.trim()) set.add(c.lop.trim())
-    }
-    return Array.from(set).sort()
-  }, [dsEm, dsCa])
-
-  const dsHsHienThi = useMemo(() => {
-    let goc: { sbd: string; hoTen: string; lop?: string; diem?: number | null; maCa?: string }[] = []
-    if (nguonHsLoc === 'ca_da_chon' && caChon.size > 0) {
-      goc = dsHsTrongCa
-    } else {
-      goc = dsEm.map((e) => ({
-        sbd: e.sbd,
-        hoTen: e.hoTen,
-        lop: e.lop,
-        diem: e.diemGanNhat,
-        maCa: e.caGanNhat,
-      }))
-    }
-
-    if (lopHsLoc) {
-      goc = goc.filter((e) => (e.lop || '').trim() === lopHsLoc)
-    }
-
-    const q = timKiemHs.trim().toLowerCase()
-    if (q) {
-      goc = goc.filter(
-        (e) =>
-          e.sbd.toLowerCase().includes(q) ||
-          e.hoTen.toLowerCase().includes(q) ||
-          (e.lop || '').toLowerCase().includes(q),
-      )
-    }
-
-    return goc
-  }, [nguonHsLoc, caChon.size, dsHsTrongCa, dsEm, lopHsLoc, timKiemHs])
+  const dsTheoLop=useMemo(()=>dsEm.filter(e=>khoiTuNamSinh(e.namSinh)===Number(khoiGui)),[dsEm,khoiGui])
+  const dsHsHienThi=useMemo(()=>{
+    const norm=(v:string)=>v.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').toLowerCase()
+    const q=norm(timKiemHs.trim())
+    return dsEm.filter(e=>(!khoiThem || khoiTuNamSinh(e.namSinh)===Number(khoiThem)) && norm(`${e.hoTen} ${e.sbd}`).includes(q))
+  },[dsEm,khoiThem,timKiemHs])
+  const sbdThem=Array.from(sbdChon).filter(sbd=>!dsHsTrongCa.some(e=>e.sbd===sbd))
 
   const toggleSbd = (sbd: string) => {
     setSbdChon((prev) => {
@@ -319,15 +250,34 @@ function TheGiaoBtvn() {
     [dsDeTach, daChon],
   )
 
+  async function capNhatHocSinh(t:DongTheoDoiBtvn,sbd:string,hanhDong:'reset'|'thu-hoi') {
+    setDangSua(t.maBtvn)
+    try{const ch=await layCauHinhMayChu(),mat=(await loadTeacherSecret())||'';await suaGiaoBtvn(ch,mat,(t as NhomBtvn).maTheoSbd?.[sbd]||t.maBtvn,{sbd,hanhDong});setTheoDoi(await theoDoiBtvn(ch,mat));setBao({ok:true,chu:hanhDong==='reset'?'Đã mở lại bài cho học sinh.':'Đã thu hồi bài của học sinh.'})}
+    catch(e){setBao({ok:false,chu:e instanceof Error?e.message:'Chưa cập nhật được.'})}finally{setDangSua('')}
+  }
+
+  async function capNhatBai(t:DongTheoDoiBtvn,thuHoi=false) {
+    setDangSua(t.maBtvn)
+    try {
+      const ch=await layCauHinhMayChu(), mat=(await loadTeacherSecret())||''
+      if(!thuHoi && !suaHan[t.maBtvn])throw new Error('Thầy chọn ngày giờ hạn nộp trước.')
+      for (const original of (t as NhomBtvn).baiGoc||[t]) await suaGiaoBtvn(ch,mat,original.maBtvn,thuHoi?{thuHoi:true}:{hanNop:new Date(suaHan[t.maBtvn]).toISOString()})
+      setTheoDoi(await theoDoiBtvn(ch,mat))
+      setBao({ok:true,chu:thuHoi?'Đã thu hồi bài. Kết quả đã nộp được giữ nguyên.':'Đã cập nhật hạn nộp cho học sinh.'})
+    } catch(e){setBao({ok:false,chu:e instanceof Error?e.message:'Chưa cập nhật được.'})}
+    finally{setDangSua('')}
+  }
+
   async function giao() {
     setDangGiao(true)
     setBao(null)
     try {
       const mat = (await loadTeacherSecret()) ?? ''
       const ch = await layCauHinhMayChu()
-      const dsSbdGui = cheDo === 'hoc_sinh' ? Array.from(sbdChon) : undefined
+      const dsSbdGui = cheDo === 'hoc_sinh' ? dsTheoLop.map(e=>e.sbd) : undefined
+      if(dsSbdGui&&dsSbdGui.length===0)throw new Error('Chưa có học sinh được chọn.')
       const dsCaGui = cheDo === 'hoc_sinh' ? [] : [...caChon]
-      const kq = await giaoBtvn(ch, mat, dsCaGui, [...daChon], dsSbdGui)
+      const kq = await giaoBtvn(ch, mat, dsCaGui, [...daChon], dsSbdGui, hanMoi ? new Date(hanMoi).toISOString() : undefined, cheDo === 'ca' && chonRieng ? [...sbdChon] : undefined)
       const boQua = kq.caRong && kq.caRong.length > 0 ? ` Bỏ qua ${kq.caRong.length} ca chưa em nào vào thi: ${kq.caRong.join(', ')}.` : ''
       const noiDungCa = kq.soCa ? ` ở ${kq.soCa} ca` : ''
       setBao({
@@ -347,8 +297,19 @@ function TheGiaoBtvn() {
 
   return (
     <div className="w-full max-w-full min-w-0 flex flex-col" style={{ gap: 'var(--k3)' }}>
+      {xacNhan&&<div style={{position:'fixed',inset:0,zIndex:10000,background:'var(--phu)',display:'grid',placeItems:'center',padding:20}}>
+        <div role="dialog" aria-modal="true" aria-labelledby="confirm-homework" style={{width:'100%',maxWidth:440,padding:24,borderRadius:22,background:'var(--the)',color:'var(--muc)',boxShadow:'var(--bong-2)'}}>
+          <h2 id="confirm-homework" style={{fontSize:20,fontWeight:700}}>Xác nhận thay đổi bài tập</h2>
+          <p style={{margin:'16px 0',lineHeight:1.7}}>{xacNhan.text}</p>
+          <div style={{display:'flex',gap:12,justifyContent:'flex-end'}}>
+            <button autoFocus className="btn-google-outlined" onClick={()=>setXacNhan(null)}>Hủy</button>
+            <button style={{padding:'10px 18px',borderRadius:12,background:'var(--gg-xanh)',color:'var(--muc-nguoc)',fontWeight:700}} onClick={()=>{const action=xacNhan.run;setXacNhan(null);void action()}}>Xác nhận</button>
+          </div>
+        </div>
+      </div>}
       <TheNoiDung className="w-full max-w-full overflow-hidden">
         <div className="w-full max-w-full min-w-0 flex flex-col" style={{ gap: 'var(--k3)' }}>
+          <div className="gv-homework-grid"><section className="gv-work-step"><h2>1. Người nhận</h2>
           {/* LỰA CHỌN HÌNH THỨC GIAO BÀI */}
           <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k1)' }}>
             <span style={{ ...NHAN_NHO, fontWeight: 600, color: 'var(--muc)' }}>Hình thức giao:</span>
@@ -366,7 +327,7 @@ function TheGiaoBtvn() {
                 cursor: 'pointer',
               }}
             >
-              <Users size={16} /> Theo ca thi (cả lớp)
+              <Users size={16} /> Theo ca thi
             </button>
             <button
               type="button"
@@ -382,7 +343,7 @@ function TheGiaoBtvn() {
                 cursor: 'pointer',
               }}
             >
-              <UserCheck size={16} /> Cho từng học sinh ({sbdChon.size} em)
+              <UserCheck size={16} /> Gửi từng lớp
             </button>
           </div>
 
@@ -408,7 +369,7 @@ function TheGiaoBtvn() {
                 <div style={NHAN_NHO}>{dangNap ? 'Đang lấy danh sách ca…' : 'Chưa có ca nào đã thi.'}</div>
               ) : (
                 <div style={{ display: 'grid', gap: 'var(--k2)', maxHeight: 240, overflowY: 'auto' }}>
-                  {dsCa.map((c) => {
+                  <NhomCaThuGon ds={dsCa} selected={c=>caChon.has(c.maCa)} render={(c) => {
                     const chon = caChon.has(c.maCa)
                     return (
                       <button
@@ -446,7 +407,7 @@ function TheGiaoBtvn() {
                         </span>
                       </button>
                     )
-                  })}
+                  }}/>
                 </div>
               )}
 
@@ -458,10 +419,10 @@ function TheGiaoBtvn() {
                   </span>
                   <button
                     type="button"
-                    onClick={chuyenSangHocSinh}
+                    onClick={()=>setChonRieng(true)}
                     style={{ color: 'var(--xanh)', textDecoration: 'underline', cursor: 'pointer', background: 'none', border: 'none', padding: 0, font: 'inherit', fontWeight: 600 }}
                   >
-                    Bấm đây để chọn lọc từng học sinh →
+                    Chọn thêm học sinh →
                   </button>
                 </div>
               )}
@@ -469,7 +430,9 @@ function TheGiaoBtvn() {
           )}
 
           {/* Ô DANH SÁCH HỌC SINH CÓ Ô TICK (KHI CHỌN GIAO CHO TỪNG HỌC SINH) */}
-          {cheDo === 'hoc_sinh' && (
+          {cheDo === 'hoc_sinh' && <section style={{padding:18,border:'1px solid var(--vien)',borderRadius:16}}><label>Lớp theo năm sinh <select aria-label="Chọn lớp theo năm sinh" value={khoiGui} onChange={e=>setKhoiGui(e.target.value)} style={{marginLeft:12,padding:10,background:'var(--the)',color:'var(--muc)'}}>{[10,11,12].map(k=><option key={k} value={k}>Lớp {k}</option>)}</select></label><p>{dsTheoLop.length} học sinh nhận bài. Tính theo năm sinh và năm học hiện tại; hồ sơ thiếu năm sinh không tự ghép lớp.</p></section>}
+          {cheDo === 'ca' && <label style={{display:'flex',gap:10,alignItems:'center'}}><input type="checkbox" checked={chonRieng} onChange={e=>setChonRieng(e.target.checked)}/>Chọn thêm học sinh</label>}
+          {cheDo === 'ca' && chonRieng && (
             <div
               style={{
                 background: 'var(--the-2)',
@@ -483,10 +446,10 @@ function TheGiaoBtvn() {
               <div className="flex items-center justify-between flex-wrap" style={{ gap: 'var(--k2)' }}>
                 <div>
                   <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', fontWeight: 700, color: 'var(--muc)' }}>
-                    Danh sách học sinh — tick ô vuông để giao bài tập
+                    Tất cả học sinh — chọn thêm ngoài các ca đã tick
                   </div>
                   <div style={NHAN_NHO}>
-                    Đã tick chọn: <b style={{ color: 'var(--xanh)', fontVariantNumeric: 'tabular-nums' }}>{sbdChon.size}</b> học sinh nhận bài
+                    Chọn thêm: <b style={{ color: 'var(--xanh)', fontVariantNumeric: 'tabular-nums' }}>{sbdThem.length}</b> học sinh · Các ca đã chọn vẫn nhận đủ bài
                   </div>
                 </div>
                 <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
@@ -510,13 +473,14 @@ function TheGiaoBtvn() {
               </div>
 
               {/* THANH TÌM KIẾM & BỘ LỌC */}
+              <div className="flex flex-wrap gap-2" aria-label="Lọc khối học sinh">{['', '10', '11', '12'].map(k=><button key={k} type="button" aria-pressed={khoiThem===k} onClick={()=>setKhoiThem(k)} style={{padding:'8px 16px',borderRadius:20,background:khoiThem===k?'var(--xanh)':'var(--the)',color:khoiThem===k?'var(--muc-nguoc)':'var(--muc)',border:'1px solid var(--vien)'}}>{k?`Khối ${k}`:'Tất cả'}</button>)}</div>
               <div className="flex items-center flex-wrap" style={{ gap: 'var(--k2)' }}>
                 <div className="relative flex-1" style={{ minWidth: 200 }}>
                   <input
                     type="text"
                     value={timKiemHs}
                     onChange={(e) => setTimKiemHs(e.target.value)}
-                    placeholder="Tìm theo số báo danh, họ tên, lớp..."
+                    placeholder="Tìm tên hoặc số báo danh…"
                     style={{
                       width: '100%',
                       height: 36,
@@ -531,65 +495,7 @@ function TheGiaoBtvn() {
                   <Search size={16} style={{ position: 'absolute', left: 10, top: 10, color: 'var(--mo)', pointerEvents: 'none' }} />
                 </div>
 
-                {caChon.size > 0 && (
-                  <div className="flex items-center" style={{ gap: 4 }}>
-                    <button
-                      type="button"
-                      onClick={() => setNguonHsLoc('ca_da_chon')}
-                      style={{
-                        padding: '4px 10px',
-                        borderRadius: 'var(--bo-tron)',
-                        fontSize: 'var(--cx-1)',
-                        background: nguonHsLoc === 'ca_da_chon' ? 'var(--xanh)' : 'var(--the)',
-                        color: nguonHsLoc === 'ca_da_chon' ? 'var(--muc-nguoc)' : 'var(--muc)',
-                        border: '1px solid ' + (nguonHsLoc === 'ca_da_chon' ? 'var(--xanh)' : 'var(--vien)'),
-                        cursor: 'pointer',
-                        fontWeight: 600,
-                      }}
-                    >
-                      Trong ca ({dsHsTrongCa.length})
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setNguonHsLoc('tat_ca')}
-                      style={{
-                        padding: '4px 10px',
-                        borderRadius: 'var(--bo-tron)',
-                        fontSize: 'var(--cx-1)',
-                        background: nguonHsLoc === 'tat_ca' ? 'var(--xanh)' : 'var(--the)',
-                        color: nguonHsLoc === 'tat_ca' ? 'var(--muc-nguoc)' : 'var(--muc)',
-                        border: '1px solid ' + (nguonHsLoc === 'tat_ca' ? 'var(--xanh)' : 'var(--vien)'),
-                        cursor: 'pointer',
-                        fontWeight: 600,
-                      }}
-                    >
-                      Tất cả ({dsEm.length})
-                    </button>
-                  </div>
-                )}
 
-                {dsLopHs.length > 1 && (
-                  <select
-                    value={lopHsLoc}
-                    onChange={(e) => setLopHsLoc(e.target.value)}
-                    style={{
-                      height: 36,
-                      padding: '0 10px',
-                      borderRadius: 'var(--bo-tron)',
-                      border: '1px solid var(--vien-dam)',
-                      background: 'var(--the)',
-                      fontSize: 'var(--cx-1)',
-                      color: 'var(--muc)',
-                    }}
-                  >
-                    <option value="">Tất cả các lớp</option>
-                    {dsLopHs.map((l) => (
-                      <option key={l} value={l}>
-                        Lớp {l}
-                      </option>
-                    ))}
-                  </select>
-                )}
               </div>
 
               {/* KHUNG CUỘN DANH SÁCH HỌC SINH */}
@@ -599,18 +505,18 @@ function TheGiaoBtvn() {
                 </div>
               ) : dsHsHienThi.length === 0 ? (
                 <div style={{ ...NHAN_NHO, padding: 'var(--k3) 0', textAlign: 'center' }}>
-                  {caChon.size === 0
-                    ? 'Hãy tick chọn ít nhất một ca ở Bước 1 bên trên để hiện học sinh.'
-                    : 'Không có học sinh nào phù hợp bộ lọc tìm kiếm.'}
+                  Không có học sinh nào phù hợp bộ lọc tìm kiếm.
                 </div>
               ) : (
                 <div style={{ display: 'grid', gap: 6, maxHeight: 280, overflowY: 'auto', paddingRight: 4 }}>
                   {dsHsHienThi.map((e) => {
-                    const tich = sbdChon.has(e.sbd)
+                    const trongCa = dsHsTrongCa.some(h=>h.sbd===e.sbd)
+                    const tich = trongCa || sbdChon.has(e.sbd)
                     return (
                       <button
                         key={e.sbd}
                         type="button"
+                        role="checkbox" aria-checked={tich} disabled={trongCa}
                         onClick={() => toggleSbd(e.sbd)}
                         className="tap-target"
                         style={{
@@ -641,9 +547,7 @@ function TheGiaoBtvn() {
                           </span>
                           <span className="flex items-center gap-2 flex-shrink-0">
                             {e.lop && <Nhan tone="xam">{e.lop}</Nhan>}
-                            {e.diem !== null && e.diem !== undefined && (
-                              <Nhan tone="xanh">{e.diem.toFixed(2)}đ</Nhan>
-                            )}
+                            {trongCa && <Nhan tone="xanh">Đã có trong ca</Nhan>}
                           </span>
                         </div>
                       </button>
@@ -654,6 +558,7 @@ function TheGiaoBtvn() {
             </div>
           )}
 
+</section><section className="gv-work-step"><h2>2. Nội dung bài tập</h2>
           <div>
             <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>
               Tờ đề — tick được nhiều tờ, tới từng phần. Em nhận TẤT CẢ câu của những phần
@@ -701,6 +606,7 @@ function TheGiaoBtvn() {
             )}
           </div>
 
+</section></div>
           {!dangNap && dsDe.length === 0 && (
             <OThongBao tone="cam">
               Kho đề trên máy chủ mới đang rỗng. Vào Cài đặt → Máy chủ mới, bấm “Chuyển KHO ĐỀ sang máy chủ mới” trước.
@@ -722,7 +628,7 @@ function TheGiaoBtvn() {
             }}
           >
             <span style={{ fontSize: 'var(--cx-1)', fontWeight: 600, color: 'var(--muc)' }}>
-              {cheDo === 'ca' ? `Đã chọn: ${caChon.size} ca` : `Đã chọn: ${sbdChon.size} học sinh`}
+              {cheDo === 'ca' ? `Đã chọn: ${caChon.size} ca` : `Lớp ${khoiGui}: ${dsTheoLop.length} học sinh`}
             </span>
             <span style={{ fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
               {daChon.size > 0 ? `${daChon.size} tờ đề (${tongCauDaChon} câu)` : 'Chưa tick tờ đề nào'}
@@ -730,12 +636,12 @@ function TheGiaoBtvn() {
           </div>
 
           {/* HÀNG NÚT BẤM GIAO BÀI TẬP VỀ NHÀ — TO RÕ, NỔI BẬT & TRỰC QUAN */}
-          <div className="flex items-center gap-3 flex-wrap" style={{ marginTop: 'var(--k1)' }}>
+          <div className="gv-actionbar flex items-center gap-3 flex-wrap" style={{ marginTop: 'var(--k1)' }}>
             {cheDo === 'ca' ? (
               <button
                 type="button"
                 onClick={giao}
-                disabled={dangGiao || caChon.size === 0 || daChon.size === 0}
+                disabled={dangGiao || (caChon.size === 0 && !(chonRieng && sbdChon.size > 0)) || daChon.size === 0}
                 className="tap-target font-bold inline-flex items-center justify-center gap-2 flex-1 sm:flex-initial"
                 style={{
                   minHeight: 48,
@@ -743,11 +649,11 @@ function TheGiaoBtvn() {
                   borderRadius: 'var(--bo-1)',
                   fontFamily: 'var(--sans)',
                   fontSize: 'var(--cx-2)',
-                  cursor: dangGiao || caChon.size === 0 || daChon.size === 0 ? 'not-allowed' : 'pointer',
-                  background: dangGiao || caChon.size === 0 || daChon.size === 0 ? 'var(--the-2)' : 'var(--muc)',
-                  color: dangGiao || caChon.size === 0 || daChon.size === 0 ? 'var(--mo)' : 'var(--muc-nguoc)',
-                  border: '1.5px solid ' + (dangGiao || caChon.size === 0 || daChon.size === 0 ? 'var(--vien)' : 'var(--muc)'),
-                  opacity: dangGiao || caChon.size === 0 || daChon.size === 0 ? 0.65 : 1,
+                  cursor: dangGiao || (caChon.size === 0 && !(chonRieng && sbdChon.size > 0)) || daChon.size === 0 ? 'not-allowed' : 'pointer',
+                  background: dangGiao || (caChon.size === 0 && !(chonRieng && sbdChon.size > 0)) || daChon.size === 0 ? 'var(--the-2)' : 'var(--muc)',
+                  color: dangGiao || (caChon.size === 0 && !(chonRieng && sbdChon.size > 0)) || daChon.size === 0 ? 'var(--mo)' : 'var(--muc-nguoc)',
+                  border: '1.5px solid ' + (dangGiao || (caChon.size === 0 && !(chonRieng && sbdChon.size > 0)) || daChon.size === 0 ? 'var(--vien)' : 'var(--muc)'),
+                  opacity: dangGiao || (caChon.size === 0 && !(chonRieng && sbdChon.size > 0)) || daChon.size === 0 ? 0.65 : 1,
                   transition: 'all 0.15s ease',
                 }}
               >
@@ -764,7 +670,7 @@ function TheGiaoBtvn() {
               <button
                 type="button"
                 onClick={giao}
-                disabled={dangGiao || sbdChon.size === 0 || daChon.size === 0}
+                disabled={dangGiao || dsTheoLop.length === 0 || daChon.size === 0}
                 className="tap-target font-bold inline-flex items-center justify-center gap-2 flex-1 sm:flex-initial"
                 style={{
                   minHeight: 48,
@@ -772,22 +678,22 @@ function TheGiaoBtvn() {
                   borderRadius: 'var(--bo-1)',
                   fontFamily: 'var(--sans)',
                   fontSize: 'var(--cx-2)',
-                  cursor: dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 'not-allowed' : 'pointer',
-                  background: dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 'var(--the-2)' : 'var(--xanh)',
-                  color: dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 'var(--mo)' : 'var(--muc-nguoc)',
-                  border: '1.5px solid ' + (dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 'var(--vien)' : 'var(--xanh)'),
-                  opacity: dangGiao || sbdChon.size === 0 || daChon.size === 0 ? 0.65 : 1,
+                  cursor: dangGiao || dsTheoLop.length === 0 || daChon.size === 0 ? 'not-allowed' : 'pointer',
+                  background: dangGiao || dsTheoLop.length === 0 || daChon.size === 0 ? 'var(--the-2)' : 'var(--xanh)',
+                  color: dangGiao || dsTheoLop.length === 0 || daChon.size === 0 ? 'var(--mo)' : 'var(--muc-nguoc)',
+                  border: '1.5px solid ' + (dangGiao || dsTheoLop.length === 0 || daChon.size === 0 ? 'var(--vien)' : 'var(--xanh)'),
+                  opacity: dangGiao || dsTheoLop.length === 0 || daChon.size === 0 ? 0.65 : 1,
                   transition: 'all 0.15s ease',
                 }}
               >
                 <ClipboardList size={20} />
                 {dangGiao
                   ? 'Đang giao…'
-                  : sbdChon.size === 0
+                  : dsTheoLop.length === 0
                   ? 'Tick chọn ít nhất 1 học sinh'
                   : daChon.size === 0
                   ? 'Tick chọn ít nhất 1 tờ đề'
-                  : `Giao bài tập về nhà cho ${sbdChon.size} học sinh (${tongCauDaChon} câu)`}
+                  : `Giao bài tập về nhà cho ${dsTheoLop.length} học sinh (${tongCauDaChon} câu)`}
               </button>
             )}
 
@@ -815,8 +721,10 @@ function TheGiaoBtvn() {
           {bao && <OThongBao tone={bao.ok ? 'xanh' : 'do'}>{bao.chu}</OThongBao>}
 
           <div style={NHAN_NHO}>
-            Hạn nộp 48 giờ, tính từ lúc bấm Giao, chung cho cả lớp. Quá hạn thì máy chủ
-            {' '}từ chối — không phải chỉ ẩn nút ở máy em.
+            <label className="flex flex-wrap items-center gap-3">Hạn nộp bài
+              <input aria-label="Hạn nộp bài mới" type="datetime-local" value={hanMoi} onChange={e=>setHanMoi(e.target.value)} className="rounded-xl border border-slate-200 bg-white p-2 text-slate-800" />
+            </label>
+            {hanMoi ? 'Áp dụng hạn đã chọn cho học sinh được giao.' : 'Để trống: hạn nộp sau 48 giờ kể từ lúc giao.'}
           </div>
         </div>
       </TheNoiDung>
@@ -825,27 +733,32 @@ function TheGiaoBtvn() {
         <TheNoiDung>
           <div style={{ display: 'grid', gap: 'var(--k3)' }}>
             <div style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)' }}>Bài đã giao</div>
-            {theoDoi.map((t) => (
-              <div key={t.maBtvn} style={{ background: 'var(--the-2)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)' }}>
-                <div className="flex items-center" style={{ justifyContent: 'space-between', gap: 'var(--k2)' }}>
-                  <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}>
+            {bao&&<div role="status"><OThongBao tone={bao.ok?'xanh':'do'}>{bao.chu}</OThongBao></div>}
+            {dangSua&&<p role="status">Đang cập nhật bài tập…</p>}
+            <div style={{maxHeight:'75vh',overflowY:'auto',overscrollBehavior:'contain',display:'grid',gap:16,padding:2}}>
+            {nhomBtvn(theoDoi).map((t) => (
+              <details key={t.maBtvn} style={{ background: 'var(--the-2)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)' }}>
+                <summary className="flex items-center" style={{ cursor:'pointer',justifyContent: 'space-between', gap: 'var(--k2)' }}>
+                  <span style={{ minWidth:0,overflowWrap:'anywhere',fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}>
                     Ca {t.maCa} · đề {t.maDe} · {t.soCau} câu
                   </span>
                   <Nhan tone={t.daNop === t.tong ? 'xanh' : t.quaHan ? 'do' : 'cam'}>
                     {t.daNop}/{t.tong} nộp
                   </Nhan>
-                </div>
+                </summary>
                 <div style={{ ...NHAN_NHO, marginTop: 4 }}>
                   Giao {gioVN(t.giaoLuc)} · hạn {gioVN(t.hanNop)}
                   {t.quaHan ? ' · đã quá hạn' : ''}
                 </div>
-                {t.chuaNop.length > 0 && (
-                  <div style={{ ...NHAN_NHO, marginTop: 4 }}>
-                    Chưa nộp: {t.chuaNop.map((e) => `${e.hoTen || e.sbd}`).join(', ')}
-                  </div>
-                )}
-              </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <input aria-label={`Hạn nộp ${t.maBtvn}`} type="datetime-local" value={suaHan[t.maBtvn] ?? new Date(Date.parse(t.hanNop)-new Date(t.hanNop).getTimezoneOffset()*60000).toISOString().slice(0,16)} onChange={e=>setSuaHan(v=>({...v,[t.maBtvn]:e.target.value}))} className="rounded-xl border border-slate-200 bg-white p-2 text-sm text-slate-800" />
+                  <button disabled={dangSua===t.maBtvn} onClick={()=>capNhatBai(t)} className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">Đặt hạn nộp</button>
+                  <button disabled={dangSua===t.maBtvn} onClick={()=>setXacNhan({text:`Thu hồi bài này của ${t.tong} học sinh? Kết quả đã nộp vẫn được giữ lại.`,run:()=>capNhatBai(t,true)})} className="rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 disabled:opacity-50">Thu hồi bài</button>
+                </div>
+                <HocSinhNhanBai maTheoSbd={t.maTheoSbd} bai={t} busy={dangSua===t.maBtvn} onAction={(sbd,action)=>setXacNhan({text:`${action==='reset'?'Cho làm lại':'Thu hồi bài của'} học sinh ${sbd}? Kết quả cũ được lưu lại.`,run:()=>capNhatHocSinh(t,sbd,action)})}/>
+              </details>
             ))}
+            </div>
           </div>
         </TheNoiDung>
       )}

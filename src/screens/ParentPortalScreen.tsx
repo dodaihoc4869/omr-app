@@ -1,3 +1,5 @@
+import BangTinPhuHuynh from '../components/BangTinPhuHuynh'
+import {momApi, migrateMom} from '../lib/mom-api'
 import { useEffect, useState } from 'react'
 import DongDemCau from '../components/DongDemCau'
 import {
@@ -112,22 +114,28 @@ export default function ParentPortalScreen() {
     }
   }, [])
 
-  // Đọc danh sách bài Mom giao đã lưu trong máy
-  const napDanhSachMomGiao = (sbd: string) => {
+  const napDanhSachMomGiao = async (sbd: string) => {
     try {
-      const raw = localStorage.getItem(`omr_mom_btvn_${sbd}`)
-      if (raw) {
-        const parsed = JSON.parse(raw)
-        if (Array.isArray(parsed)) {
-          setDsMomGiao(parsed)
-        }
-      } else {
-        setDsMomGiao([])
-      }
-    } catch {
-      setDsMomGiao([])
+      let migrationError = ''
+      try { await migrateMom(sbd) } catch (e) { migrationError = e instanceof Error ? e.message : 'Chưa gửi hết bài cũ.' }
+      const data = await momApi('parent-list', {sbd})
+      let legacy: BaiMomGiao[] = []
+      try { legacy = JSON.parse(localStorage.getItem(`omr_mom_btvn_${sbd}`) || '[]').filter((b: BaiMomGiao) => b.trangThai === 'da_nop' && !data.items.some((n: BaiMomGiao) => n.id === b.id)) } catch {}
+      setDsMomGiao([...data.items, ...legacy])
+      if (migrationError) setThongBaoMom({loai:'loi',chu:`Còn bài cũ chưa gửi được: ${migrationError}. App sẽ tự thử lại khi có mạng.`})
+      else setThongBaoMom(previous => previous?.loai === 'loi' ? null : previous)
+    } catch (e) {
+      setThongBaoMom({loai:'loi',chu:`Chưa đồng bộ được bài: ${e instanceof Error ? e.message : 'Vui lòng thử lại.'}`})
     }
   }
+  useEffect(() => {
+    if (!sbdHienTai) return
+    const refresh = () => { if (!document.hidden) void napDanhSachMomGiao(sbdHienTai) }
+    const timer = setInterval(refresh, 15000)
+    window.addEventListener('focus', refresh)
+    window.addEventListener('online', refresh)
+    return () => { clearInterval(timer); window.removeEventListener('focus', refresh); window.removeEventListener('online', refresh) }
+  }, [sbdHienTai])
 
   async function dangNhapPhuHuynh(sbd: string, urlParam?: string) {
     const sbdSach = sbd.trim()
@@ -213,7 +221,7 @@ export default function ParentPortalScreen() {
   }
 
   // GIAO BÀI TẬP TRỰC TIẾP CHO CON (HẠN 2 TIẾNG)
-  const xuLyGiaoBaiTrucTiep = (dsCau: any[], tieuDe?: string) => {
+  const xuLyGiaoBaiTrucTiep = async (dsCau: any[], tieuDe?: string) => {
     if (!sbdHienTai || !dsCau || dsCau.length === 0) return
     const maMom = `mom_${Date.now()}`
     const tieuDeThucTe = tieuDe || `Bài của Mom giao (${dsCau.length} câu)`
@@ -230,16 +238,22 @@ export default function ParentPortalScreen() {
       dsCau: dsCau,
     }
 
-    const dsCapNhat = [baiMoi, ...dsMomGiao]
-    localStorage.setItem(`omr_mom_btvn_${sbdHienTai}`, JSON.stringify(dsCapNhat))
-    setDsMomGiao(dsCapNhat)
-    setDsCauSaiModalMom(null)
-
-    setThongBaoMom({
-      loai: 'ok',
-      chu: `🎉 Đã tạo và gửi thành công "${tieuDeThucTe}" sang app của con! Con có 2 tiếng làm bài tính từ lúc bắt đầu.`,
-    })
-    alert(`Đã gửi bài tập gồm ${dsCau.length} câu sang app của con! Con có thời gian làm bài 2 tiếng tính từ lúc bắt đầu.`)
+    setDangTaoMom(true)
+    setThongBaoMom(null)
+    try {
+      // Lưu hàng chờ trước; chỉ báo thành công sau khi máy chủ xác nhận.
+      try {
+        const old = JSON.parse(localStorage.getItem(`omr_mom_btvn_${sbdHienTai}`) || '[]')
+        localStorage.setItem(`omr_mom_btvn_${sbdHienTai}`, JSON.stringify([baiMoi, ...old]))
+      } catch { /* Hết dung lượng máy vẫn gửi trực tiếp được. */ }
+      await momApi('create', {sbd:sbdHienTai,id:maMom,tieuDe:tieuDeThucTe,dsCau})
+      try { localStorage.setItem(`omr_mom_sent_${sbdHienTai}_${maMom}`, '1') } catch {}
+      setDsCauSaiModalMom(null)
+      await napDanhSachMomGiao(sbdHienTai)
+      setThongBaoMom({loai:'ok',chu:`Đã gửi “${tieuDeThucTe}”. Con mở mục Bài của Mom giao để nhận bài. Thời gian 2 tiếng tính từ lúc con bắt đầu.`})
+    } catch (e) {
+      setThongBaoMom({loai:'loi',chu:`Chưa gửi được bài. Vui lòng giữ app và kết nối lại để gửi tiếp. ${e instanceof Error ? e.message : ''}`})
+    } finally { setDangTaoMom(false) }
   }
 
   // TỰ ĐỘNG MỞ MODAL KHẮC PHỤC LỖI SAI (BÀI CỦA MOM GIAO - 3 CHẾ ĐỘ CHUẨN)
@@ -295,8 +309,8 @@ export default function ParentPortalScreen() {
   if (!sbdHienTai) {
     return (
       <div className="min-h-screen flex flex-col justify-between bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
-        <header className="p-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-          <LogoApp vai="giaovien" size={38} hienChu={true} phuDe="PHỤ HUYNH" />
+        <header className="px-4 pb-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900" style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}>
+          <LogoApp vai="phuhuynh" size={38} hienChu={true} phuDe="PHỤ HUYNH" />
           <button
             type="button"
             onClick={() => setHienHuongDan(true)}
@@ -311,7 +325,7 @@ export default function ParentPortalScreen() {
           <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200 dark:border-slate-800 animate-google-fade">
             <div className="text-center mb-6">
               <div className="flex justify-center mb-3">
-                <LogoApp vai="giaovien" size={54} hienChu={false} />
+                <LogoApp vai="phuhuynh" size={54} hienChu={false} />
               </div>
               <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white" style={{ fontFamily: 'var(--sans)' }}>
                 ĐỖ ĐẠI HỌC
@@ -386,9 +400,9 @@ export default function ParentPortalScreen() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
       {/* HEADER */}
-      <header className="p-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-30 flex items-center justify-between">
+      <header className="px-4 pb-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-30 flex items-center justify-between" style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}>
         <div className="flex items-center gap-3">
-          <LogoApp vai="giaovien" size={36} hienChu={true} phuDe="PHỤ HUYNH" />
+          <LogoApp vai="phuhuynh" size={36} hienChu={true} phuDe="PHỤ HUYNH" />
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
@@ -445,6 +459,7 @@ export default function ParentPortalScreen() {
           </div>
         </div>
 
+        <div className="mb-6"><BangTinPhuHuynh sbd={sbdHienTai} onSent={() => void napDanhSachMomGiao(sbdHienTai)} /></div>
         {/* LƯỚI 2 Ô: Ô 1 (BÁO CÁO CON) & Ô 2 (TẠO BÀI CỦA MOM GIAO) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Ô 1: XEM BÁO CÁO CỦA CON */}
@@ -625,11 +640,11 @@ export default function ParentPortalScreen() {
                       <div>
                         {m.trangThai === 'da_nop' ? (
                           <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300">
-                            Đã nộp: {m.diem?.toFixed(1) ?? '10'} điểm
+                            Đã nộp: {m.diem?.toFixed(1) ?? '—'} điểm
                           </span>
                         ) : (
                           <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300">
-                            Con đang làm
+                            {m.trangThai === 'dang_lam' ? 'Con đang làm' : 'Đã giao · Con chưa bắt đầu'}
                           </span>
                         )}
                       </div>

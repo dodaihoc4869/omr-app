@@ -1,3 +1,5 @@
+import './exam-setup.css'
+import { laBoDe12, rutDeChuan2026, SO_CAU_CHUAN_2026, GHI_CHU_MA_TRAN } from '../lib/ma-tran-hoa-2026'
 // MỞ CA KIỂM TRA — tối giản theo yêu cầu thầy (2026-09-02): đề đã tự về từ
 // kho, link Apps Script đã cấu hình 1 lần ở màn Ngân hàng câu hỏi, nên màn
 // này CHỈ còn 3 việc: chọn đề · lớp & thời gian · cách công bố điểm → Mở ca.
@@ -263,6 +265,7 @@ export default function ExamSetupScreen() {
   // Luật: trùng thì giữ bản trong nhánh "Bộ đề" (thầy chốt 09/09).
   const kqKhuTrung = useMemo(() => khuTrungNguon(dsDeTach.filter((c) => selectedMaDe.has(c.maDe))), [dsDeTach, selectedMaDe])
   const selectedSources = kqKhuTrung.nguon
+  const chuan2026 = selectedSources.some(laBoDe12)
   const soCauTrung = tongBoQua(kqKhuTrung.boQua)
 
   /** Bộ đề THẬT SỰ gửi lên máy chủ: đã cắt xuống còn những câu thầy chốt. */
@@ -273,12 +276,12 @@ export default function ExamSetupScreen() {
   //
   // Phiếu gửi phụ huynh và cộng dồn mạnh/yếu KHÔNG dính gì tới cờ này: mọi ca,
   // mọi lựa chọn đều ghi điểm và chi tiết từng câu như nhau.
-  const lenBang = boRut?.lenBang === true
+  const lenBang = !chuan2026 && boRut?.lenBang === true
   /** Ca mở ở chế độ ĐỀ RIÊNG TỪNG EM — kéo theo phòng chờ, bắt buộc. */
-  const deRiengBat = boRut?.deRieng === true
+  const deRiengBat = !chuan2026 && boRut?.deRieng === true
 
-  const nguonRaDe = useMemo(() => (boRut && !deRiengBat ? locNguonTheoId(selectedSources, boRut.ids) : selectedSources), [selectedSources, boRut, deRiengBat])
-  const soCauRaDe = boRut ? boRut.soCau : undefined
+  const nguonRaDe = useMemo(() => (chuan2026 ? selectedSources.filter(laBoDe12) : boRut && !deRiengBat ? locNguonTheoId(selectedSources, boRut.ids) : selectedSources), [selectedSources, boRut, deRiengBat, chuan2026])
+  const soCauRaDe = chuan2026 ? SO_CAU_CHUAN_2026 : boRut ? boRut.soCau : undefined
 
   const dsNhom = useMemo(() => Array.from(new Set(savedSources.map((c) => (c.nhom || '').trim()).filter(Boolean))).sort(), [savedSources])
 
@@ -304,8 +307,8 @@ export default function ExamSetupScreen() {
     setOpening(true)
     try {
       const maCa = randomSessionCode()
-      const nguonCuoi = nguonRaDe
-      const soCauCuoi = soCauRaDe
+      const nguonCuoi = chuan2026 ? rutDeChuan2026(selectedSources, maCa) : nguonRaDe
+      const soCauCuoi = chuan2026 ? SO_CAU_CHUAN_2026 : soCauRaDe
       if (nguonCuoi.length === 0) return showToast('Bộ câu ra đề đang rỗng — chỉnh lại phần Bộ câu ra đề', 'error')
       // ĐỀ RIÊNG TỪNG EM: KHÔNG gắn bản đồ ở đây. Lúc mở ca chưa biết em nào
       // tới, nên bộ câu của từng em rút lúc thầy bấm Bắt đầu, từ đúng danh
@@ -313,7 +316,7 @@ export default function ExamSetupScreen() {
       // RỘNG để lúc đó còn câu mà rút.
       const publicBank = mergeAndStrip(nguonCuoi, soCauCuoi)
       const keyBank = congBoDiem === 'khong' ? undefined : mergeKeepAnswers(nguonCuoi, soCauCuoi)
-      const moc = await publishSession(scriptUrl.trim(), maCa, lop.trim(), thoiGianPhut, publicBank, congBoDiem, keyBank, {
+      const moc = await publishSession(scriptUrl.trim(), maCa, lop.trim(), chuan2026 ? 50 : thoiGianPhut, publicBank, congBoDiem, keyBank, {
         batDau: batDauIso,
         hanVaoPhut,
         tenCa: tenCa.trim(),
@@ -343,7 +346,7 @@ export default function ExamSetupScreen() {
       // KHO CHỮA: chỉ ở chế độ "Phân công lên bảng". Rộng hơn đề em làm để màn
       // Gọi lên bảng đủ câu chia bốn lượt. Lưu ở máy thầy, không đẩy lên máy
       // chủ — em không được thấy câu chưa làm.
-      if (boRut?.lenBang && boRut.idsChua) await luuKhoChuaCa(maCa, locNguonTheoId(selectedSources, boRut.idsChua))
+      if (!chuan2026 && boRut?.lenBang && boRut.idsChua) await luuKhoChuaCa(maCa, locNguonTheoId(selectedSources, boRut.idsChua))
       if (soCauCuoi) await luuSoCauCa(maCa, soCauCuoi)
       // Đánh dấu ca này mở ở chế độ đề riêng. Bộ câu rút lúc bấm Bắt đầu.
       if (deRiengBat) await luuCheDoDeRieng(maCa, true)
@@ -368,7 +371,7 @@ export default function ExamSetupScreen() {
   // ------------------------------------------------------------ CA ĐÃ MỞ
   if (opened) {
     return (
-      <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
+      <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
         <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
           Ca kiểm tra đã mở
         </h1>
@@ -408,8 +411,8 @@ export default function ExamSetupScreen() {
 
   // ------------------------------------------------------------ SOẠN CA
   return (
-    <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-      <div className="flex items-center justify-between">
+    <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
+      <div className="gv-page-header flex items-center justify-between">
         <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
           Mở ca kiểm tra
         </h1>
@@ -418,7 +421,7 @@ export default function ExamSetupScreen() {
         </button>
       </div>
 
-      {/* 1. ĐỀ */}
+<div className="setup-overview"><p>Chọn đề, xác định học sinh và kiểm tra thiết lập trước khi mở ca.</p><nav aria-label="Các bước mở ca" onClick={event => { const link = (event.target as HTMLElement).closest('a'); const target = link?.getAttribute('href'); if (target) { const group = document.querySelector<HTMLDetailsElement>(target); if (group) group.open = true } }}><a href="#setup-source">1 · Chọn đề</a><a href="#setup-info">2 · Lớp & thời gian</a><a href="#setup-people">3 · Học sinh</a><a href="#setup-wait">4 · Vào thi</a></nav></div><div className="setup-steps-grid"><details id="setup-source" className="setup-group" open><summary><span>1 · Chọn đề kiểm tra</span><small>{selectedSources.length ? `${selectedSources.length} nguồn · ${tongCauDaChon} câu` : 'Chọn từ cây thư mục ngân hàng'}</small></summary><div className="setup-group-body">      {/* 1. ĐỀ */}
       <TheNoiDung>
         <div className="flex items-center justify-between" style={{ gap: 'var(--k3)', marginBottom: 'var(--k3)' }}>
           <div className="min-w-0">
@@ -468,10 +471,11 @@ export default function ExamSetupScreen() {
             />
           </div>
         )}
-        {selectedSources.length > 0 && <KhoiRutDe nguon={selectedSources} qidCaTruoc={qidCaTruoc} phutLamBai={thoiGianPhut} onDoi={setBoRut} onDoiPhutLamBai={setThoiGianPhut} />}
+        {chuan2026 && <div className="p-4 rounded-xl bg-blue-50 text-slate-800 space-y-2"><b>BỘ ĐỀ lớp 12 · Tự động rút chuẩn cấu trúc · 50 phút</b><p>18 câu chọn đáp án · 4 câu đúng/sai · 6 câu trả lời ngắn. Chỉ lấy các nguồn BỘ ĐỀ lớp 12 đã tích; thiếu mức độ sẽ không mở ca.</p><p className="text-xs">{GHI_CHU_MA_TRAN}</p></div>}
+        {!chuan2026 && selectedSources.length > 0 && <KhoiRutDe nguon={selectedSources} qidCaTruoc={qidCaTruoc} phutLamBai={thoiGianPhut} onDoi={setBoRut} onDoiPhutLamBai={setThoiGianPhut} />}
       </TheNoiDung>
 
-      {/* 2. LỚP & THỜI GIAN */}
+</div></details><details id="setup-info" className="setup-group" open><summary><span>2 · Lớp và thời gian</span><small>{`${lop || 'Chưa chọn lớp'} · ${chuan2026 ? 50 : thoiGianPhut} phút · ${batDauCach==='hen'?'Hẹn giờ':'Ngay bây giờ'}`}</small></summary><div className="setup-group-body">      {/* 2. LỚP & THỜI GIAN */}
       <TheNoiDung>
         <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Lớp & thời gian</div>
         <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
@@ -501,17 +505,19 @@ export default function ExamSetupScreen() {
               })}
             </div>
           )}
-          <input style={O_NHAP} placeholder="Lớp (vd 12A1)" value={lop} onChange={(e) => setLop(e.target.value)} />
+          <input style={O_NHAP} aria-label="Lớp" placeholder="Lớp (vd 12A1)" value={lop} onChange={(e) => setLop(e.target.value)} />
           <div className="flex items-center" style={{ gap: 'var(--k3)' }}>
             <input
               type="number"
               inputMode="numeric"
+              aria-label="Số phút làm bài"
               min={1}
               style={{ ...O_NHAP, width: 110, ...SO }}
-              value={thoiGianPhut}
+              value={chuan2026 ? 50 : thoiGianPhut}
+              disabled={chuan2026}
               onChange={(e) => setThoiGianPhut(Number(e.target.value))}
             />
-            <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--nhat)' }}>phút làm bài — tính từ lúc từng em vào</span>
+            <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--nhat)' }}>phút làm bài — {phongCho||deRiengBat?'bắt đầu khi thầy mở thi':'tính từ lúc từng em vào'}</span>
           </div>
 
           {/* BẮT ĐẦU: ngay / hẹn giờ */}
@@ -567,7 +573,7 @@ export default function ExamSetupScreen() {
         </div>
       </TheNoiDung>
 
-      {/* 3. PHẠM VI GỬI CA */}
+</div></details><details id="setup-people" className="setup-group"><summary><span>3 · Học sinh được vào ca</span><small>{phamVi==='chon'?`Đã chọn ${chonSbd.size} học sinh`:PHAM_VI_CHON.find(p=>p.id===phamVi)?.ten}</small></summary><div className="setup-group-body">      {/* 3. PHẠM VI GỬI CA */}
       <TheNoiDung>
         <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Ai được vào ca này</div>
         <div className="flex flex-col" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Phạm vi gửi ca">
@@ -644,42 +650,7 @@ export default function ExamSetupScreen() {
         )}
       </TheNoiDung>
 
-      {/* 4. CHỐNG GIAN LẬN */}
-      <TheNoiDung>
-        <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k1)' }}>Rời màn hình khi làm bài</div>
-        <div style={{ ...NHAN_NHO, marginBottom: 'var(--k3)' }}>
-          Lần 1 cảnh báo, lần 2 cảnh báo đậm + rung. Đến ngưỡng thì khoá bài, nộp phần đã làm, báo thầy và phụ huynh. Thầy mở khoá được ở Chi tiết ca.
-        </div>
-        <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
-          <div>
-            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Khoá khi rời màn lần thứ</div>
-            <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Số lần rời màn thì khoá">
-              {[2, 3, 5].map((n) => (
-                <ChipChon key={n} chon={nguongLan === n} onClick={() => setNguongLan(n)}>
-                  {n} lần
-                </ChipChon>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Khoá ngay nếu một lần rời quá</div>
-            <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Số giây rời màn thì khoá ngay">
-              {[2, 5, 10, 30].map((g) => (
-                <ChipChon key={g} chon={nguongGiay === g} onClick={() => setNguongGiay(g)}>
-                  {g} giây
-                </ChipChon>
-              ))}
-            </div>
-            {nguongGiay <= 5 && (
-              <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)', color: 'var(--cam)' }}>
-                {nguongGiay} giây rất gắt: một cuộc gọi đến hay thông báo Zalo cũng đủ khoá bài. Ca này thầy nên ngồi cạnh màn Chi tiết ca để mở khoá ngay.
-              </div>
-            )}
-          </div>
-        </div>
-      </TheNoiDung>
-
-      {/* 4b. GIỮ ĐỂ ĐỌC. Màn này chỉ mở CA THI; bài tập về nhà đi đường
+</div></details><details id="setup-wait" className="setup-group" open><summary><span>4 · Cách vào thi và nhận kết quả</span><small>{`${phongCho || deRiengBat ? 'Phòng chờ bật' : 'Vào làm bài trực tiếp'} · ${CACH_CONG_BO.find(c=>c.id===congBoDiem)?.ten ?? ''}`}</small></summary><div className="setup-group-body">      {/* 4b. GIỮ ĐỂ ĐỌC. Màn này chỉ mở CA THI; bài tập về nhà đi đường
         GiaoBaiTap và không bật cơ chế này. */}
       <TheNoiDung>
         {/* PHÒNG CHỜ (thầy chốt 07/09). Cùng khuôn nút gạt với Giữ để đọc. */}
@@ -722,6 +693,68 @@ export default function ExamSetupScreen() {
             : phongCho
               ? 'Em vào ca thì đứng ở màn chờ, chưa nhận đề và đồng hồ chưa chạy. Thầy bấm "Bắt đầu thi" ở màn Theo dõi ca thì cả lớp hiện đề cùng một lúc. Em vào sớm không đọc trước được câu nào.'
               : 'Em vào ca là nhận đề ngay, đồng hồ chạy từ lúc từng em vào.'}
+        </div>
+      </TheNoiDung>
+
+      {/* 5. CÔNG BỐ ĐIỂM */}
+      <TheNoiDung>
+        <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Công bố điểm cho học sinh</div>
+        <div className="flex flex-col" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Cách công bố điểm">
+          {CACH_CONG_BO.map((c) => {
+            const chon = congBoDiem === c.id
+            return (
+              <Hang key={c.id} selected={chon} onClick={() => setCongBoDiem(c.id)} data-trang-thai={chon ? 'chon' : undefined}>
+                <span
+                  className="shrink-0 flex items-center justify-center"
+                  aria-hidden
+                  style={{ width: 20, height: 20, borderRadius: 'var(--bo-tron)', border: `2px solid ${chon ? 'var(--xanh)' : 'var(--vien-dam)'}` }}
+                >
+                  {chon && <span style={{ width: 10, height: 10, borderRadius: 'var(--bo-tron)', background: 'var(--xanh)' }} />}
+                </span>
+                <span className="flex-1 min-w-0">
+                  <div className="font-bold" style={{ fontSize: 'var(--cx-2)' }}>
+                    {c.ten}
+                  </div>
+                  <div style={NHAN_NHO}>{c.mota}</div>
+                </span>
+              </Hang>
+            )
+          })}
+        </div>
+      </TheNoiDung>
+
+</div></details></div><details id="setup-advanced" className="setup-group setup-monitor-group"><summary><span>Tuỳ chọn giám sát và nộp bài</span><small>{`Rời màn: ${nguongLan} lần / ${nguongGiay} giây · Giữ để đọc: ${giuDeDoc?'bật':'tắt'} · Nộp 3 phút cuối: ${chiNop3PhutCuoi?'bật':'tắt'}`}</small></summary><div className="setup-group-body">      {/* 4. CHỐNG GIAN LẬN */}
+      <TheNoiDung>
+        <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k1)' }}>Rời màn hình khi làm bài</div>
+        <div style={{ ...NHAN_NHO, marginBottom: 'var(--k3)' }}>
+          Lần 1 cảnh báo, lần 2 cảnh báo đậm + rung. Đến ngưỡng thì khoá bài, nộp phần đã làm, báo thầy và phụ huynh. Thầy mở khoá được ở Chi tiết ca.
+        </div>
+        <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
+          <div>
+            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Khoá khi rời màn lần thứ</div>
+            <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Số lần rời màn thì khoá">
+              {[2, 3, 5].map((n) => (
+                <ChipChon key={n} chon={nguongLan === n} onClick={() => setNguongLan(n)}>
+                  {n} lần
+                </ChipChon>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Khoá ngay nếu một lần rời quá</div>
+            <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Số giây rời màn thì khoá ngay">
+              {[2, 5, 10, 30].map((g) => (
+                <ChipChon key={g} chon={nguongGiay === g} onClick={() => setNguongGiay(g)}>
+                  {g} giây
+                </ChipChon>
+              ))}
+            </div>
+            {nguongGiay <= 5 && (
+              <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)', color: 'var(--cam)' }}>
+                {nguongGiay} giây rất gắt: một cuộc gọi đến hay thông báo Zalo cũng đủ khoá bài. Ca này thầy nên ngồi cạnh màn Chi tiết ca để mở khoá ngay.
+              </div>
+            )}
+          </div>
         </div>
       </TheNoiDung>
 
@@ -819,37 +852,9 @@ export default function ExamSetupScreen() {
         </div>
       </TheNoiDung>
 
-      {/* 5. CÔNG BỐ ĐIỂM */}
-      <TheNoiDung>
-        <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Công bố điểm cho học sinh</div>
-        <div className="flex flex-col" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Cách công bố điểm">
-          {CACH_CONG_BO.map((c) => {
-            const chon = congBoDiem === c.id
-            return (
-              <Hang key={c.id} selected={chon} onClick={() => setCongBoDiem(c.id)} data-trang-thai={chon ? 'chon' : undefined}>
-                <span
-                  className="shrink-0 flex items-center justify-center"
-                  aria-hidden
-                  style={{ width: 20, height: 20, borderRadius: 'var(--bo-tron)', border: `2px solid ${chon ? 'var(--xanh)' : 'var(--vien-dam)'}` }}
-                >
-                  {chon && <span style={{ width: 10, height: 10, borderRadius: 'var(--bo-tron)', background: 'var(--xanh)' }} />}
-                </span>
-                <span className="flex-1 min-w-0">
-                  <div className="font-bold" style={{ fontSize: 'var(--cx-2)' }}>
-                    {c.ten}
-                  </div>
-                  <div style={NHAN_NHO}>{c.mota}</div>
-                </span>
-              </Hang>
-            )
-          })}
-        </div>
-      </TheNoiDung>
-
-      <NutChinh onClick={handleOpenSession} disabled={opening}>
+</div></details>      <div className="setup-launch"><div><strong>{tenCa.trim()||'Ca kiểm tra mới'}</strong><small>{lop||'Chưa chọn lớp'} · {tongCauDaChon} câu · {chuan2026?50:thoiGianPhut} phút · {phongCho||deRiengBat?'Có phòng chờ':'Vào làm bài trực tiếp'}</small></div><NutChinh onClick={handleOpenSession} disabled={opening}>
         {opening ? 'Đang mở ca…' : 'Mở ca kiểm tra'}
-      </NutChinh>
+      </NutChinh></div>
     </div>
   )
 }
-

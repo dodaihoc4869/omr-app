@@ -28,6 +28,7 @@ export function TheNoiDung({
   return (
     <div
       id={id}
+      data-ui-card="content"
       className={className}
       style={{
         background: 'var(--the)',

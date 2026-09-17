@@ -1,3 +1,4 @@
+import { tachNhieuTheoPhan } from '../src/lib/tach-phan-de'
 // Ô TÍCH CẢ CHƯƠNG — đặc tả CA-THI-VA-GOI-LEN-BANG mục 4.3, phép kiểm 10–13.
 //
 // Luật gom nhóm và ba trạng thái ô tích kiểm bằng test thuần; phần vẽ kiểm qua
@@ -151,6 +152,7 @@ describe('HopChonDe — vẽ cây', () => {
   it('PHÉP KIỂM 10 — bấm ô tích chương chọn hết 5 mã trong chương', () => {
     const goi = vi.fn()
     const { getByRole } = render(<HopChonDe ds={KHO} daChon={new Set()} onChon={vi.fn()} chonNhieu onChonTatCa={goi} />)
+    fireEvent.click(getByRole('button', { name: 'Mở Khối 12' }))
     fireEvent.click(getByRole('checkbox', { name: /C1 - Ester lipid/ }))
     expect([...goi.mock.calls[0][0]].sort()).toEqual(['12-C1-B1-DS', '12-C1-B1-TLN', '12-C1-B1-TN', '12-C1-B2-DS', '12-C1-B2-TN'])
   })
@@ -226,4 +228,31 @@ describe('tầng thư mục', () => {
     expect(thuMucCuaDe({ nhom: '12 · C1 - Ester lipid' })).toBe('')
     expect(thuMucCuaDe({ nhom: '' })).toBe('')
   })
+})
+
+it('gom ví dụ và dạng toán vào cùng bài, giữ mã và tổng câu khi chọn cả bài', () => {
+  const nhom = '10 · DẠY HỌC/C1 - Nguyên Tử'
+  const bai = 'Bài 1. Thành phần nguyên tử (vip)'
+  const ds = [
+    de('DH-10-C1-B1-TN', nhom, bai, [10,0,0]),
+    de('DH-10-C1-B1-DS', nhom, bai, [0,4,0]),
+    de('DH-10-C1-B1-TLN', nhom, bai, [0,0,5]),
+    de('DH-10-C1-B1-VD', nhom, bai+' · VÍ DỤ MINH HOẠ — Chuyên đề bài tập dạy thêm', [0,0,6]),
+    de('DH-10-C1-B1-DT', nhom, bai+' · CÁC DẠNG TOÁN TRỌNG TÂM', [0,0,9]),
+  ]
+  const tree=dungCay(ds), lessons=tree[0].con[0].con[0].con
+  expect(lessons).toHaveLength(1)
+  expect(lessons[0].con.map(n=>n.nhan)).toEqual(['Ví dụ minh hoạ','Các dạng toán trọng tâm','Trắc nghiệm','Đúng sai','Trả lời ngắn'])
+  expect(new Set(lessons[0].laMa)).toEqual(new Set(ds.map(d=>d.maDe)))
+  expect(tongCau(tongDaChon(tree,bamTich(lessons[0],new Set())))).toBe(34)
+  expect(lessons[0].con.slice(0,2).every(n=>n.anMa)).toBe(true)
+})
+
+it('giữ ví dụ nhiều loại câu thành một mục chọn đầy đủ', () => {
+  const source=de('DH-12-C1-B1-VD','12 · DẠY HỌC/C1 - Ester lipid','Bài 1. Ester · VÍ DỤ MINH HOẠ',[2,3,4])
+  const split=tachNhieuTheoPhan([source])
+  expect(split).toEqual([source])
+  const tree=dungCay(split)
+  expect(tree[0].con[0].con[0].con[0].con).toHaveLength(1)
+  expect(tongCau(tongDaChon(tree,bamTich(tree[0],new Set())))).toBe(9)
 })

@@ -15,6 +15,19 @@ import { taoChiTietCau } from './chi-tiet-cau'
 import { dungPhieu, type ThongTinPhieu } from './html-phieu'
 import { phieuCuaEm, type ChiTietCauRow, type KeyBank } from './exam-api'
 
+/** Chọn đúng dấu vết đề đã làm; chỉ tái dựng cho dữ liệu ca cũ chưa có bảng chấm. */
+export function chiTietDeDaLam(
+  bank: KeyBank,
+  maCa: string,
+  sbd: string,
+  rowsMayChu: ChiTietCauRow[] | null | undefined,
+  dapAn: Parameters<typeof taoChiTietCau>[3],
+  giayCau: Parameters<typeof taoChiTietCau>[4],
+  boCuaEm?: string[] | null,
+): ChiTietCauRow[] {
+  return rowsMayChu?.length ? rowsMayChu : taoChiTietCau(bank, maCa, sbd, dapAn, giayCau, boCuaEm)
+}
+
 /** Ghép bộ câu của chính em với lời giải, đánh dấu đúng chỗ em sai. */
 export function dungHtmlDeVaLoiGiai(
   bank: KeyBank,
@@ -91,7 +104,11 @@ export async function deVaLoiGiaiCuaEm(
   }
   if (!b?.bank) return { html: '', loi: 'Ca này chưa có đáp án trên máy chủ — báo Thầy.' }
   const dapAn = b.luot?.dapAn ?? { phanI: {}, phanII: {}, phanIII: {} }
-  const rows = taoChiTietCau(b.bank, maCa, sbd, dapAn, b.luot?.giayCau)
+  // Bảng chấm trên máy chủ là bản ghi chính xác của đề em đã nhận: đúng qid,
+  // đúng số câu và đúng thứ tự tại thời điểm làm bài. Không dựng lại từ kho
+  // hiện tại vì ca đề riêng có thể rút một bộ khác khi quy tắc/kho đã đổi.
+  // Ca cũ chưa có bảng chấm mới dùng đường lui từ dấu vết bài làm.
+  const rows = chiTietDeDaLam(b.bank, maCa, sbd, b.chiTietCau, dapAn, b.luot?.giayCau, b.boCuaEm)
   const html = dungHtmlDeVaLoiGiai(b.bank, maCa, sbd, b.hoTen || hoTenDuPhong, b.tenCa || '', rows)
   if (!html) return { html: '', loi: 'Không dựng được đề của em — báo Thầy.' }
   return { html, loi: '' }

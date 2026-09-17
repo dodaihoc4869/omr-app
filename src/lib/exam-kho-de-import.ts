@@ -71,6 +71,7 @@ export interface KhoDeHinh {
 }
 
 export interface KhoDeCau {
+  qid?: string // Mã gốc giữ riêng từng câu khi ghép nhiều tờ đề.
   phan: 'I' | 'II' | 'III'
   so: number
   de: string // công thức bọc $\ce{...}$ (hoặc \ce{...} trần) — KHÔNG dùng $$...$$
@@ -328,6 +329,7 @@ export function parseKhoDeJson(data: unknown): KhoDeParseResult {
       return
     }
     cau.push({
+      qid: typeof c.qid === 'string' ? c.qid : undefined,
       phan: c.phan,
       so: c.so,
       de: c.de,
@@ -438,7 +440,7 @@ export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherE
         errors.push(`${nhan}: "dap_an" phải là 1 trong A/B/C/D`)
         continue
       }
-      phanI.push({ id: `${json.ma_de}-I-${c.so}`, ...chung, choices, correct })
+      phanI.push({ id: c.qid || `${json.ma_de}-I-${c.so}`, ...chung, choices, correct })
     } else if (c.phan === 'II') {
       const y = c.y ?? {}
       const ideas: [string, string, string, string] = [y.a ?? '', y.b ?? '', y.c ?? '', y.d ?? '']
@@ -457,14 +459,14 @@ export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherE
         errors.push(`${nhan}: "dap_an" phải là chuỗi 4 ký tự D/S (vd "DSDS") hoặc object {a,b,c,d}`)
         continue
       }
-      phanII.push({ id: `${json.ma_de}-II-${c.so}`, ...chung, ideas, correct })
+      phanII.push({ id: c.qid || `${json.ma_de}-II-${c.so}`, ...chung, ideas, correct })
     } else {
       const correct = typeof c.dap_an === 'string' ? c.dap_an.trim() : ''
       if (!correct) {
         errors.push(`${nhan}: thiếu "dap_an"`)
         continue
       }
-      phanIII.push({ id: `${json.ma_de}-III-${c.so}`, ...chung, correct })
+      phanIII.push({ id: c.qid || `${json.ma_de}-III-${c.so}`, ...chung, correct })
     }
   }
 

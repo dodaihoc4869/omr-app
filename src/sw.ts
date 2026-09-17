@@ -185,3 +185,13 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
 })
 
 export {}
+
+// Push shows a generic message; the authenticated inbox holds assignment details.
+self.addEventListener('push',event=>{
+ let data:{title?:string;body?:string}={};try{data=event.data?.json()||{}}catch{}
+ event.waitUntil(self.registration.showNotification(data.title||'Đỗ Đại Học',{body:data.body||'Em có cập nhật bài tập.',icon:'/logo-hs-192-v2.png',badge:'/logo-hs-64-v2.png',tag:'student-homework',data:{url:'/hs?thongbao=1'}}))
+})
+self.addEventListener('notificationclick',event=>{
+ event.notification.close()
+ event.waitUntil(self.clients.openWindow('/hs?thongbao=1'))
+})

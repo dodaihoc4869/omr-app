@@ -117,7 +117,7 @@ describe('Sáu khung cảnh', () => {
       expect(bo.ten).toBe(TEN_CANH[he])
       donCanhNen(bo)
     }
-    expect(ten.size).toBe(6)
+    expect(ten.size).toBe(DS_HE.length)
   })
 
   it('KHÔNG có nền trắng: mỗi hệ một màu trời và một màu sương mù riêng', () => {
@@ -132,8 +132,8 @@ describe('Sáu khung cảnh', () => {
       for (const nac of c.troi) expect(nac).not.toContain('255, 255, 255')
       donCanhNen(bo)
     }
-    expect(troi.size).toBe(6)
-    expect(mu.size).toBe(6)
+    expect(troi.size).toBe(DS_HE.length)
+    expect(mu.size).toBe(DS_HE.length)
   })
 
   it('KHÔNG đạo cụ nào đứng chắn trước mặt thú', () => {

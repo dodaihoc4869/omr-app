@@ -1,3 +1,4 @@
+import NhomCaThuGon from './NhomCaThuGon'
 // MODAL KHẮC PHỤC CÂU SAI — CHUẨN HOÁ CHO CẢ 3 APP
 // 1. Làm lại các câu sai
 // 2. Luyện thêm dạng câu sai (chia theo tỷ lệ tối đa của từng câu sai, lẻ làm tròn lên)
@@ -11,13 +12,10 @@ import {
   X,
   RefreshCw,
   Layers,
-  SlidersHorizontal,
   Sparkles,
   ArrowRight,
   CheckCircle2,
   BookOpen,
-  Calculator,
-  Star,
   Info,
   Eye,
   Heart,
@@ -61,7 +59,9 @@ export interface ModalKhacPhucCauSaiProps {
   sbd: string
   tieuDeCa?: string
   onTaoPhieuXong?: (html: string) => void
-  onGiaoBaiChoCon?: (dsCau: any[], tieuDe: string) => void
+  onGiaoBaiChoCon?: (dsCau: any[], tieuDe: string) => void | Promise<void>
+  onBatDauLamBaiLuyen?: (dsCau: any[], tieuDe: string) => void
+  cheDoMacDinh?: 1 | 2 | 3 | 4
 }
 
 export default function ModalKhacPhucCauSai({
@@ -73,22 +73,14 @@ export default function ModalKhacPhucCauSai({
   tieuDeCa,
   onTaoPhieuXong,
   onGiaoBaiChoCon,
+  onBatDauLamBaiLuyen,
+  cheDoMacDinh,
 }: ModalKhacPhucCauSaiProps) {
-  // MÁY HỌC SINH KHÔNG BAO GIỜ CÓ KHO ĐỀ.
-  //
-  // Thầy báo 14/09 kèm ảnh màn iPhone: ca Test6, 10 câu sai, mà "Tỷ lệ tối đa:
-  // 0 câu", rút ra "0 / 0 câu", bấm Bắt đầu làm bài thì không có gì chạy.
-  //
-  // Nguyên nhân gốc: chế độ 2 và 3 rút câu luyện thêm từ `loadExamSources()` —
-  // kho đề nằm trong IndexedDB của CHÍNH MÁY ĐANG MỞ. Kho ấy chỉ được nạp bởi
-  // `dongBoNganHang`, mà hàm ấy đòi mã bí mật của thầy (`src/lib/exam-sync.ts`:
-  // "học sinh vẫn chỉ nhận bản không đáp án qua mã ca"). Nên trên máy em kho
-  // LUÔN rỗng, mọi tỷ lệ ra 0, và đề rút ra là đề trắng.
-  //
-  // Nay: kho rỗng thì chỉ còn chế độ 1 — làm lại đúng các câu sai. Chế độ này
-  // không cần kho vì nội dung câu sai đã đi kèm báo cáo. Hai chế độ kia hiện
-  // mờ kèm đúng lý do, thay vì để em bấm vào một đường cụt.
-  const [cheDo, setCheDo] = useState<1 | 2 | 3 | 4>(1)
+  const [cheDo, setCheDo] = useState<1 | 2 | 3 | 4>(cheDoMacDinh ?? (dsCauSai.length ? 1 : 3))
+
+  useEffect(() => {
+    if (cheDoMacDinh) setCheDo(cheDoMacDinh)
+  }, [cheDoMacDinh])
   const [khoDe, setKhoDe] = useState<TeacherExamSource[]>([])
   const [dangTaiKho, setDangTaiKho] = useState(false)
   const [dangTao, setDangTao] = useState(false)
@@ -97,8 +89,8 @@ export default function ModalKhacPhucCauSai({
   const [soCauCheDo2, setSoCauCheDo2] = useState<number>(20)
 
   // Tuỳ chọn Chế độ 3: Luyện câu theo bộ lọc
-  const [boLocSao, setBoLocSao] = useState<BoLocCauLuyen['sao']>('moi')
-  const [boLocDang, setBoLocDang] = useState<BoLocCauLuyen['dang']>('tat_ca')
+  const [boLocSao] = useState<BoLocCauLuyen['sao']>('moi')
+  const [boLocDang] = useState<BoLocCauLuyen['dang']>('tat_ca')
   const [soCauCheDo3, setSoCauCheDo3] = useState<number>(20)
 
   // ─── Chế độ 4: Luyện dạng bài ────────────────────────────────────────────
@@ -108,6 +100,7 @@ export default function ModalKhacPhucCauSai({
   const [dmDangBai, setDmDangBai] = useState<LopDangBai[]>([])
   const [dangTaiDm, setDangTaiDm] = useState(false)
   const [loiDm, setLoiDm] = useState('')
+  const [lanTaiDm, setLanTaiDm] = useState(0)
   const [lopChon, setLopChon] = useState<string>('')
   const [baiChon, setBaiChon] = useState<string>('')
   const [dangChon, setDangChon] = useState<DangBaiMuc | null>(null)
@@ -115,9 +108,10 @@ export default function ModalKhacPhucCauSai({
   const [dangTaiDang, setDangTaiDang] = useState(false)
   const [loiDang, setLoiDang] = useState('')
   const [soCauCheDo4, setSoCauCheDo4] = useState<number>(20)
+  const [saoTuDo, setSaoTuDo] = useState<BoLocCauLuyen['sao']>('moi')
+  const [dangTuDo, setDangTuDo] = useState<BoLocCauLuyen['dang']>('tat_ca')
   /** Em không sai câu nào vẫn luyện dạng bài được — chế độ 4 không lệ thuộc
    * câu sai. Bật cờ này để đi qua màn "không có câu nào cần khắc phục". */
-  const [moThangDangBai, setMoThangDangBai] = useState(false)
 
   // HTML phiếu bài tập đã tạo để xem tại chỗ
   const [phieuHtml, setPhieuHtml] = useState<string>('')
@@ -240,6 +234,8 @@ export default function ModalKhacPhucCauSai({
         if (huy) return
         setDmDangBai(kq.lops)
         setLoiDm(kq.lops.length === 0 ? kq.loi || 'Kho trên máy chủ chưa có dạng bài nào.' : '')
+      } catch (e) {
+        if (!huy) setLoiDm(e instanceof Error ? e.message : 'Không tải được danh mục dạng bài.')
       } finally {
         if (!huy) setDangTaiDm(false)
       }
@@ -247,7 +243,7 @@ export default function ModalKhacPhucCauSai({
     return () => {
       huy = true
     }
-  }, [isOpen])
+  }, [isOpen, lanTaiDm])
 
   // TẢI TỜ ĐỀ CỦA MỘT DẠNG khi em bấm vào dạng ấy. Gói đi qua ĐÚNG cửa nạp của
   // kho đề — không nới một luật nào, y như `napKhoChoMayEm`.
@@ -270,7 +266,8 @@ export default function ModalKhacPhucCauSai({
           setLoiDang(kq.loi || 'Không lấy được đề của dạng bài này.')
           return
         }
-        const doc = parseKhoDeJson(JSON.stringify(kq.de))
+        // parseKhoDeJson(JSON.stringify(kq.de))
+        const doc = parseKhoDeJson(kq.de)
         if (!doc.ok || !doc.json) {
           setLoiDang('Gói đề của dạng bài này không đọc được.')
           return
@@ -294,20 +291,37 @@ export default function ModalKhacPhucCauSai({
 
   /** Số câu THẬT rút được của dạng đang chọn — đếm sau cửa nạp, không lấy
    * `so_cau` ghi trong gói (cửa nạp bỏ câu thiếu phương án / thiếu đáp án). */
-  const tongToiDaCheDo4 = useMemo(() => demCauDangBai(khoDangBai), [khoDangBai])
+  const boLocTuDo = useMemo(() => ({ sao: saoTuDo, dang: dangTuDo }), [saoTuDo, dangTuDo])
+  const tongToiDaCheDo4 = useMemo(() => demCauDangBai(khoDangBai, boLocTuDo), [khoDangBai, boLocTuDo])
 
   useEffect(() => {
     if (tongToiDaCheDo4 > 0) setSoCauCheDo4(Math.min(tongToiDaCheDo4, 20))
   }, [tongToiDaCheDo4])
 
-  const baisCuaLop = useMemo(
-    () => dmDangBai.find((l) => l.lop === lopChon)?.bais ?? [],
-    [dmDangBai, lopChon],
-  )
-  const dangsCuaBai = useMemo(
-    () => baisCuaLop.find((b) => b.tenBai === baiChon)?.dangs ?? [],
-    [baisCuaLop, baiChon],
-  )
+  const lopHienTai = useMemo(() => dmDangBai.find((l) => l.lop === lopChon), [dmDangBai, lopChon])
+  const baisCuaLop = useMemo(() => lopHienTai?.bais ?? [], [lopHienTai])
+  const baiHienTai = useMemo(() => baisCuaLop.find((b) => b.tenBai === baiChon), [baisCuaLop, baiChon])
+  const dangsCuaBai = useMemo(() => baiHienTai?.dangs ?? [], [baiHienTai])
+
+  // Tự động chọn mặc định Lớp 12 -> Bài 1 -> Dạng 1 để học sinh luôn thấy đầy đủ box bài & bộ lọc mức độ
+  useEffect(() => {
+    if (dmDangBai.length > 0 && !lopChon) {
+      const l12 = dmDangBai.find((l) => l.lop === '12') || dmDangBai[dmDangBai.length - 1]
+      if (l12) setLopChon(l12.lop)
+    }
+  }, [dmDangBai, lopChon])
+
+  useEffect(() => {
+    if (lopChon && baisCuaLop.length > 0 && !baiChon) {
+      setBaiChon(baisCuaLop[0].tenBai)
+    }
+  }, [lopChon, baisCuaLop, baiChon])
+
+  useEffect(() => {
+    if (baiChon && dangsCuaBai.length > 0 && !dangChon) {
+      setDangChon(dangsCuaBai[0])
+    }
+  }, [baiChon, dangsCuaBai, dangChon])
 
   // Phân tích cho Chế độ 3
   const boLocHienTai: BoLocCauLuyen = useMemo(
@@ -336,7 +350,7 @@ export default function ModalKhacPhucCauSai({
       : cheDo === 2
         ? Math.min(soCauCheDo2, tongToiDaCheDo2)
         : cheDo === 3
-          ? Math.min(soCauCheDo3, tongToiDaCheDo3)
+          ? Math.min(soCauCheDo4, tongToiDaCheDo4)
           : Math.min(soCauCheDo4, tongToiDaCheDo4)
 
   if (!isOpen) return null
@@ -350,75 +364,8 @@ export default function ModalKhacPhucCauSai({
   // `khoDe` cứ rỗng nên `coKhoDe` hoá false.
   //
   // Nay: rỗng thì nói thẳng là rỗng, và không để lại nút nào bấm nhầm được.
-  if (dsCauSai.length === 0 && !moThangDangBai) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-        <div
-          className="relative w-full max-w-md rounded-3xl overflow-hidden shadow-2xl border border-slate-200"
-          style={{ background: 'var(--the, rgb(255, 255, 255))', color: 'var(--muc, rgb(15, 23, 42))' }}
-          data-man="khac-phuc-khong-co-cau-sai"
-        >
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-            <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-xs"
-                style={{ background: 'rgba(52, 168, 83, 0.12)', color: 'var(--gg-xanh-la, rgb(52, 168, 83))' }}
-              >
-                <CheckCircle2 className="w-5 h-5" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold leading-tight" style={{ fontFamily: 'var(--serif)' }}>
-                  Không có câu nào cần khắc phục
-                </h2>
-                <div className="text-xs text-slate-500 font-medium">{tieuDeCa || 'Ca thi này'}</div>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="tap-target w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
-              aria-label="Đóng"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="h-1 w-full" style={{ background: 'var(--gg-xanh-la, rgb(52, 168, 83))' }} />
-
-          <div className="px-6 py-6">
-            <p className="text-sm leading-relaxed text-slate-600">
-              Ca này không có câu nào sai, bỏ trống hay đúng một phần nên chưa tạo được đề khắc phục. Em chọn ca khác
-              trong lịch sử làm bài để luyện tiếp, hoặc luyện theo dạng bài dưới đây.
-            </p>
-          </div>
-
-          <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-between gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                setMoThangDangBai(true)
-                setCheDo(4)
-              }}
-              className="tap-target px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold shadow-md active:scale-95 transition-all cursor-pointer flex items-center gap-2"
-            >
-              <GraduationCap className="w-4 h-4" />
-              Luyện dạng bài
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="tap-target px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-md active:scale-95 transition-all cursor-pointer"
-            >
-              Đóng
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   // Xử lý tạo đề
-  const handleTaoDe = (laGiaoBai: boolean = false) => {
+  const handleTaoDe = async (laGiaoBai: boolean = false) => {
     setDangTao(true)
     try {
       let ketQuaHtml = ''
@@ -437,7 +384,7 @@ export default function ModalKhacPhucCauSai({
         ketQuaHtml = res.html
         dsCauKetQua = res.dsCau
         tieuDeBai = `Luyện thêm dạng câu sai (${dsCauKetQua.length} câu)`
-      } else if (cheDo === 4) {
+      } else if (cheDo === 3) {
         // Chế độ 4: Luyện dạng bài — gom trọn câu của một dạng toán trọng tâm
         if (!dangChon) {
           setLoiRut('Em chọn lớp, tên bài rồi chọn một dạng bài trước.')
@@ -449,10 +396,10 @@ export default function ModalKhacPhucCauSai({
           tenDang: dangChon.ten,
           tenBai: baiChon,
           lop: lopChon,
-        })
+        }, boLocTuDo)
         ketQuaHtml = res.html
         dsCauKetQua = res.dsCau
-        tieuDeBai = `Luyện dạng bài: ${dangChon.ten} (${dsCauKetQua.length} câu)`
+        tieuDeBai = `Luyện câu: ${dangChon.ten} (${dsCauKetQua.length} câu)`
       } else {
         // Chế độ 3: Luyện câu theo bộ lọc
         const res = rutLuyenTheoBoLoc(dsCauSai, khoDe, boLocHienTai, soCauCheDo3, options)
@@ -467,7 +414,7 @@ export default function ModalKhacPhucCauSai({
       // đừng để em bấm xong nhìn màn hình trống rồi tưởng app hỏng.
       if (dsCauKetQua.length === 0) {
         setLoiRut(
-          cheDo === 4
+          cheDo === 3
             ? 'Dạng bài này chưa có câu nào dùng được trong kho. Em chọn dạng khác.'
             : coKhoDe
               ? 'Kho đề chưa có câu nào khớp lựa chọn này. Em chọn "Làm lại các câu sai" hoặc nới bộ lọc.'
@@ -478,7 +425,13 @@ export default function ModalKhacPhucCauSai({
       setLoiRut('')
 
       if (laGiaoBai && onGiaoBaiChoCon) {
-        onGiaoBaiChoCon(dsCauKetQua, tieuDeBai)
+        await onGiaoBaiChoCon(dsCauKetQua, tieuDeBai)
+        onClose()
+        return
+      }
+
+      if (onBatDauLamBaiLuyen) {
+        onBatDauLamBaiLuyen(dsCauKetQua, tieuDeBai)
         onClose()
         return
       }
@@ -497,7 +450,7 @@ export default function ModalKhacPhucCauSai({
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
         <div
-          className="relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-3xl overflow-hidden shadow-2xl border border-slate-200"
+          className="khac-phuc-modal relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-3xl overflow-hidden shadow-2xl border border-slate-200"
           style={{ background: 'var(--the, rgb(255, 255, 255))', color: 'var(--muc, rgb(15, 23, 42))' }}
         >
           {/* Header phong cách Google Material 3 */}
@@ -544,6 +497,7 @@ export default function ModalKhacPhucCauSai({
                 Chọn hình thức luyện tập
               </label>
 
+              {dsCauSai.length > 0 && <>
               {/* THẺ 1: LÀM LẠI CÁC CÂU SAI */}
               <div
                 onClick={() => setCheDo(1)}
@@ -601,14 +555,19 @@ export default function ModalKhacPhucCauSai({
                 </div>
               </div>
 
-              {/* THẺ 3: LỰA CHỌN LUYỆN CÂU THEO BỘ LỌC */}
+              </>}
+              {/* THẺ 4: LUYỆN DẠNG BÀI
+                  KHÔNG khoá theo `coKhoDe`: chế độ này lấy đề từ danh mục dạng
+                  bài trên máy chủ, không dính gì tới kho câu-sai của ba chế độ
+                  trên. Khoá nó theo `coKhoDe` là em không sai câu nào cũng
+                  không luyện được dạng bài — đúng thứ vô lý phải tránh. */}
               <div
-                onClick={() => coKhoDe && setCheDo(3)}
-                aria-disabled={!coKhoDe}
+                onClick={() => setCheDo(3)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCheDo(3) } }}
                 className={`p-4 rounded-2xl border-2 transition-all flex items-start gap-4 ${
-                  !coKhoDe
-                    ? 'border-slate-100 bg-slate-50 opacity-55 cursor-not-allowed'
-                    : cheDo === 3
+                  cheDo === 3
                       ? 'border-blue-500 bg-blue-50/50 shadow-sm cursor-pointer'
                       : 'border-slate-100 hover:border-slate-200 bg-white cursor-pointer'
                 }`}
@@ -622,47 +581,12 @@ export default function ModalKhacPhucCauSai({
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-bold text-sm text-slate-800 flex items-center gap-2">
-                    <SlidersHorizontal className="w-4 h-4 text-purple-600" />
-                    3. Lựa chọn luyện câu (2 sao, 1 sao, 0 sao, lý thuyết, tính toán)
-                  </div>
-                  <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                    Rút đúng nhãn dán kết hợp bộ lọc độ khó và thể loại câu hỏi, thanh trượt tối đa 100 câu.
-                  </p>
-                </div>
-              </div>
-
-              {/* THẺ 4: LUYỆN DẠNG BÀI
-                  KHÔNG khoá theo `coKhoDe`: chế độ này lấy đề từ danh mục dạng
-                  bài trên máy chủ, không dính gì tới kho câu-sai của ba chế độ
-                  trên. Khoá nó theo `coKhoDe` là em không sai câu nào cũng
-                  không luyện được dạng bài — đúng thứ vô lý phải tránh. */}
-              <div
-                onClick={() => dmDangBai.length > 0 && setCheDo(4)}
-                aria-disabled={dmDangBai.length === 0}
-                className={`p-4 rounded-2xl border-2 transition-all flex items-start gap-4 ${
-                  dmDangBai.length === 0
-                    ? 'border-slate-100 bg-slate-50 opacity-55 cursor-not-allowed'
-                    : cheDo === 4
-                      ? 'border-blue-500 bg-blue-50/50 shadow-sm cursor-pointer'
-                      : 'border-slate-100 hover:border-slate-200 bg-white cursor-pointer'
-                }`}
-              >
-                <div
-                  className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
-                    cheDo === 4 ? 'bg-blue-600 text-white' : 'border-2 border-slate-300'
-                  }`}
-                >
-                  {cheDo === 4 ? <CheckCircle2 className="w-4 h-4" /> : null}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-bold text-sm text-slate-800 flex items-center gap-2">
                     <GraduationCap className="w-4 h-4 text-rose-600" />
-                    4. Luyện dạng bài
+                    3. Lựa chọn luyện câu
                     {dangTaiDm ? ' (đang tải danh mục…)' : ''}
                   </div>
                   <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                    Chọn lớp 10 / 11 / 12 → tên bài theo sách giáo khoa → dạng toán trọng tâm. Mỗi dạng gom TẤT CẢ
-                    câu trong kho đề thuộc dạng ấy.
+                    Chọn box kiến thức, mức 1–2 sao hoặc ngẫu nhiên, rồi chọn lý thuyết hay bài tập.
                   </p>
                 </div>
               </div>
@@ -699,7 +623,7 @@ export default function ModalKhacPhucCauSai({
                     </div>
 
                     <div className="max-h-40 overflow-y-auto space-y-1.5 pr-1">
-                      {dsCaThi.map((ca) => {
+                      <NhomCaThuGon ds={dsCaThi} selected={ca=>caChonCheDo2.has(ca.maCa)} render={(ca) => {
                         const daTick = caChonCheDo2.has(ca.maCa)
                         return (
                           <div
@@ -740,7 +664,7 @@ export default function ModalKhacPhucCauSai({
                             </span>
                           </div>
                         )
-                      })}
+                      }}/>
                     </div>
                   </div>
                 )}
@@ -812,114 +736,14 @@ export default function ModalKhacPhucCauSai({
               </div>
             )}
 
-            {cheDo === 3 && (
-              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-4 animate-in fade-in duration-150">
-                {/* Bộ lọc mức sao */}
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
-                    <Star className="w-3.5 h-3.5 text-amber-500" />
-                    Lọc theo mức độ câu (Sao):
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    {(
-                      [
-                        ['moi', 'Mọi mức sao'],
-                        ['sao_2', '2 sao (Khó)'],
-                        ['sao_1', '1 sao (Bản chất)'],
-                        ['sao_0', '0 sao (Cơ bản)'],
-                      ] as const
-                    ).map(([s, label]) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => setBoLocSao(s)}
-                        className={`py-2 px-3 rounded-xl text-xs font-bold transition-all border ${
-                          boLocSao === s
-                            ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                            : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Bộ lọc thể loại */}
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
-                    <BookOpen className="w-3.5 h-3.5 text-blue-500" />
-                    Lọc theo thể loại:
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(
-                      [
-                        ['tat_ca', 'Mọi thể loại', <Layers key="a" className="w-3.5 h-3.5" />],
-                        ['ly_thuyet', 'Lý thuyết', <BookOpen key="b" className="w-3.5 h-3.5" />],
-                        ['bai_tap', 'Bài tập tính toán', <Calculator key="c" className="w-3.5 h-3.5" />],
-                      ] as const
-                    ).map(([d, label, icon]) => (
-                      <button
-                        key={d}
-                        type="button"
-                        onClick={() => setBoLocDang(d)}
-                        className={`py-2 px-2.5 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-1.5 ${
-                          boLocDang === d
-                            ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                            : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
-                        }`}
-                      >
-                        {icon}
-                        <span className="truncate">{label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Thanh trượt số câu cho Chế độ 3 (tối đa 100 câu) */}
-                <div className="space-y-2 pt-2 border-t border-slate-200/60">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-bold text-slate-700">
-                      Số câu rút (tối đa 100 câu):
-                    </span>
-                    <span className="text-base font-extrabold text-blue-600 bg-blue-50 px-3 py-1 rounded-xl border border-blue-200">
-                      {soCauCheDo3} / {tongToiDaCheDo3} câu
-                    </span>
-                  </div>
-
-                  {tongToiDaCheDo3 > 0 ? (
-                    <div className="space-y-2">
-                      <input
-                        type="range"
-                        min={1}
-                        max={tongToiDaCheDo3}
-                        value={soCauCheDo3}
-                        onChange={(e) => setSoCauCheDo3(Number(e.target.value))}
-                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                      />
-                      <div className="flex justify-between text-xs font-semibold text-slate-400">
-                        <span>1 câu</span>
-                        <span>{Math.round(tongToiDaCheDo3 / 2)} câu</span>
-                        <span>Tối đa {tongToiDaCheDo3} câu</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-xs text-amber-600 bg-amber-50 p-3 rounded-xl border border-amber-200 flex items-center gap-2">
-                      <Info className="w-4 h-4 shrink-0" />
-                      Không tìm thấy câu nào trong kho khớp bộ lọc này cùng nhãn dán.
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
             {/* ─── CHẾ ĐỘ 4: CÂY DẠNG BÀI — LỚP → TÊN BÀI → DẠNG ─────────── */}
-            {cheDo === 4 && (
+            {cheDo === 3 && (
               <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-4 animate-in fade-in duration-150">
                 {loiDm ? (
                   <div className="text-xs text-amber-800 bg-amber-50 p-3 rounded-xl border border-amber-200 flex items-start gap-2">
                     <Info className="w-4 h-4 shrink-0 mt-0.5" />
                     <span className="leading-relaxed">{loiDm}</span>
+                    <button type="button" disabled={dangTaiDm} onClick={() => setLanTaiDm(n => n + 1)} className="font-bold underline shrink-0">{dangTaiDm ? 'Đang tải…' : 'Thử lại'}</button>
                   </div>
                 ) : null}
 
@@ -1020,6 +844,24 @@ export default function ModalKhacPhucCauSai({
 
                 {dangChon ? (
                   <div className="space-y-2 pt-2 border-t border-slate-200/60">
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs font-bold text-slate-600">Mức độ</label>
+                        <div className="grid grid-cols-3 gap-1.5 mt-1">
+                          {([['moi','Ngẫu nhiên'],['sao_1','1 sao'],['sao_2','2 sao']] as const).map(([v,ten]) => (
+                            <button key={v} type="button" onClick={() => setSaoTuDo(v)} className={`py-2 rounded-xl text-xs font-bold border ${saoTuDo===v?'bg-blue-600 text-white border-blue-600':'bg-white text-slate-600 border-slate-200'}`}>{ten}</button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-slate-600">Loại câu</label>
+                        <div className="grid grid-cols-3 gap-1.5 mt-1">
+                          {([['tat_ca','Tất cả'],['ly_thuyet','Lý thuyết'],['bai_tap','Bài tập']] as const).map(([v,ten]) => (
+                            <button key={v} type="button" onClick={() => setDangTuDo(v)} className={`py-2 rounded-xl text-xs font-bold border ${dangTuDo===v?'bg-blue-600 text-white border-blue-600':'bg-white text-slate-600 border-slate-200'}`}>{ten}</button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                     {dangTaiDang ? (
                       <div className="text-xs text-slate-600 bg-white p-3 rounded-xl border border-slate-200 flex items-center gap-2">
                         <RefreshCw className="w-4 h-4 shrink-0 animate-spin" />
@@ -1079,7 +921,7 @@ export default function ModalKhacPhucCauSai({
           )}
 
           {/* Vì sao chưa rút được — hiện ngay trên nút, không im lặng nuốt lỗi */}
-          {!dangTaiKho && (loiRut || (!coKhoDe && cheDo !== 4)) && (
+          {!dangTaiKho && (loiRut || (!coKhoDe && cheDo === 2)) && (
             <div className="px-6 pb-3 shrink-0">
               <div className="text-xs text-amber-800 bg-amber-50 p-3 rounded-xl border border-amber-200 flex items-start gap-2">
                 <Info className="w-4 h-4 shrink-0 mt-0.5" />

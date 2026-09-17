@@ -11,8 +11,6 @@ import { danhSachCa, khoiPhucCa, xoaNhieuCa, xoaVinhVienCa, type CaTomTat } from
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { useAppStore } from '../store/appStore'
-import KhoiLuyenKhacPhuc from '../components/KhoiLuyenKhacPhuc'
-import NutDongBoMoiCa from '../components/NutDongBoMoiCa'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -82,9 +80,6 @@ export default function LichSuCaScreen() {
   const [dangKhoiPhuc, setDangKhoiPhuc] = useState('')
   const [dsXoaVinhVien, setDsXoaVinhVien] = useState<string[]>([])
   const [dangXoaVinhVien, setDangXoaVinhVien] = useState(false)
-  // Giữ lại link + mã để khối "Luyện câu khắc phục" hỏi thẳng máy chủ khi thầy
-  // bấm, không phải đọc IndexedDB lại một lượt nữa.
-  const [nguon, setNguon] = useState({ url: '', mat: '' })
 
   const tai = async () => {
     setDangTai(true)
@@ -93,7 +88,6 @@ export default function LichSuCaScreen() {
       const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
       if (!url.trim()) throw new Error('Chưa cấu hình địa chỉ máy chủ — vào Ngân hàng câu hỏi → Cấu hình')
       if (!mat.trim()) throw new Error('Chưa nhập mã bí mật — vào Ngân hàng câu hỏi → Cấu hình')
-      setNguon({ url: url.trim(), mat: mat.trim() })
       setDsCa(await danhSachCa(url.trim(), mat.trim(), xemDaXoa))
     } catch (e) {
       setLoi(e instanceof Error ? e.message : 'Lỗi không rõ')
@@ -108,7 +102,7 @@ export default function LichSuCaScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [xemDaXoa])
 
-  /** Thư mục năm sinh đang gấp lại. Mặc định mở hết — thầy mở màn là thấy ca ngay. */
+  /** Thư mục năm sinh đang gấp lại. Mặc định thu gọn; chỉ mở thư mục thầy chọn. */
   const [gapNam, setGapNam] = useState<Record<string, boolean>>({})
   const dsLop = useMemo(() => Array.from(new Set((dsCa ?? []).map((c) => c.lop.trim()).filter(Boolean))).sort(), [dsCa])
   const dsLoc = useMemo(() => {
@@ -203,8 +197,8 @@ export default function LichSuCaScreen() {
   const now = gioMayChu()
 
   return (
-    <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-      <div className="flex items-center justify-between">
+    <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
+      <div className="gv-page-header flex items-center justify-between">
         <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
           {xemDaXoa ? 'Ca đã xoá' : 'Ca thi'}
         </h1>
@@ -213,16 +207,8 @@ export default function LichSuCaScreen() {
         </button>
       </div>
 
-      {/* LUYỆN CÂU KHẮC PHỤC — thầy chốt 08/09: để ngay ngoài màn Ca thi, không
-          phải mở vào từng ca. Gập sẵn nên không chiếm chỗ của danh sách ca. */}
-      {!xemDaXoa && !chonMode && nguon.url && <KhoiLuyenKhacPhuc scriptUrl={nguon.url} maBiMat={nguon.mat} />}
-      {/* ĐỒNG BỘ LẠI PHIẾU MỌI CA — nút, không phải lệnh gõ tay ở một máy
-          (thầy chốt 08/09: "cho máy nào cũng được và đồng bộ cho tất cả các
-          máy bấm"). Đặt ở màn Lịch sử ca vì đây là chỗ nhìn thấy mọi ca. */}
-      {!xemDaXoa && !chonMode && nguon.url && <NutDongBoMoiCa />}
-
-      <TheNoiDung>
-        <div className="flex items-center" style={{ gap: 'var(--k3)', marginBottom: 'var(--k3)' }}>
+      <TheNoiDung className="gv-directory">
+        <div className="gv-filterbar flex items-center" style={{ gap: 'var(--k3)', marginBottom: 'var(--k3)' }}>
           <div className="relative flex-1">
             <Search size={18} className="absolute" style={{ left: 14, top: 15, color: 'var(--mo)' }} />
             <input style={O_NHAP} placeholder="Tìm mã ca, tên ca, lớp…" value={timKiem} onChange={(e) => setTimKiem(e.target.value)} inputMode="search" aria-label="Tìm ca" />
@@ -421,23 +407,23 @@ export default function LichSuCaScreen() {
         ) : (
           <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
             {gomCaTheoNamSinh(dsLoc, (c) => c.tenCa).map((tm) => (
-              <div key={tm.nam} className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+              <div key={tm.nam} className="flex flex-col overflow-hidden" style={{ border: '1px solid var(--vien)', borderRadius: 'var(--bo-2)', background: 'var(--the)', boxShadow: 'var(--bong-1)' }}>
                 {/* THƯ MỤC NĂM SINH. Tên ca thầy luôn để năm ở đầu, nên cây này
                     dựng từ dữ liệu sẵn có — ca cũ vào đúng chỗ ngay, không phải
                     sửa tay ca nào. Bấm để gấp lại cho đỡ dài. */}
                 <button
                   type="button"
-                  onClick={() => setGapNam((cu) => ({ ...cu, [tm.nam]: !cu[tm.nam] }))}
-                  aria-expanded={!gapNam[tm.nam]}
-                  className="tap-target flex items-center font-bold self-start"
-                  style={{ gap: 6, minHeight: 36, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', border: 'none', color: 'var(--muc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}
+                  onClick={() => setGapNam((cu) => ({ ...cu, [tm.nam]: !(cu[tm.nam] ?? true) }))}
+                  aria-expanded={!(gapNam[tm.nam] ?? true)}
+                  className="tap-target flex items-center font-bold w-full text-left"
+                  style={{ gap: 10, minHeight: 56, padding: 'var(--k3) var(--k4)', background: 'var(--xanh-nen)', border: 'none', color: 'var(--muc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}
                 >
-                  {gapNam[tm.nam] ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
-                  {tm.nam === THU_MUC_KHAC ? THU_MUC_KHAC : `Khối ${tm.nam}`}
-                  <span style={{ ...NHAN_NHO, ...SO }}>({tm.ca.length})</span>
+                  {(gapNam[tm.nam] ?? true) ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
+                  {tm.nam === THU_MUC_KHAC ? THU_MUC_KHAC : `Năm sinh ${tm.nam}`}
+                  <span style={{ ...NHAN_NHO, ...SO, marginLeft: 'auto', padding: '4px 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)' }}>{tm.ca.length} ca</span>
                 </button>
-                {!gapNam[tm.nam] && (
-                  <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+                {!(gapNam[tm.nam] ?? true) && (
+                  <div role="region" aria-label={`Lịch sử ca ${tm.nam === THU_MUC_KHAC ? THU_MUC_KHAC : `Năm sinh ${tm.nam}`}`} tabIndex={0} className="grid grid-cols-1 sm:grid-cols-2 overflow-y-auto overscroll-contain" style={{ maxHeight: 'min(60vh, 520px)', gap: 'var(--k2)', padding: 'var(--k3)' }}>
                     {tm.ca.map((c) => {
               const tt = trangThaiCa(c, now)
               const tich = daChon.includes(c.maCa)
@@ -447,7 +433,7 @@ export default function LichSuCaScreen() {
                   onClick={chonMode ? () => bat(c.maCa) : (!xemDaXoa ? () => moChiTietCa(c.maCa) : undefined)}
                   selected={chonMode && tich}
                   data-trang-thai={tt.ten}
-                  className="flex-col"
+                  className="flex-col shrink-0"
                   style={{ alignItems: 'stretch' }}
                 >
                   <span className="flex items-start justify-between" style={{ gap: 'var(--k3)' }}>

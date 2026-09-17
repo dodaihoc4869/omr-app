@@ -57,7 +57,7 @@ interface Props {
   raCauHoi: () => CauKiemVang | null
 }
 
-const MAU_HE: Record<HeNguyenTo, string> = {
+const MAU_HE: Partial<Record<HeNguyenTo, string>> = {
   hoa: 'rgb(249, 115, 22)', khi: 'rgb(16, 185, 129)', kiem: 'rgb(56, 189, 248)',
   axit: 'rgb(168, 85, 247)', dien: 'rgb(59, 130, 246)', huuco: 'rgb(132, 204, 22)',
 }

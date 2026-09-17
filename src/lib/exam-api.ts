@@ -3043,6 +3043,7 @@ export async function napToanBoCaLenMayChuMoi(
 // ---------------------------------------------------------------------------
 
 export async function hsDangNhapApi(scriptUrl: string, sbd: string, matKhau?: string): Promise<{
+  token?: string
   ok: boolean
   chuaCoMatKhau?: boolean
   sbd?: string
@@ -3446,4 +3447,11 @@ export async function voDaiNopApi(
 }
 export async function voDaiDongApi(scriptUrl: string, sbd: string, ma: string) {
   return goiVoDai(scriptUrl, 'dong', { sbd, ma }) as Promise<{ ok: boolean; error?: string }>
+}
+
+/** Teacher-only, current-season spirit for classroom projection. No legacy progress. */
+export async function thanThuLopDocApi(sbd:string):Promise<unknown>{
+ const [base,secret]=await Promise.all([layDiaChiMayChu(''),loadTeacherSecret()])
+ if(!base||!secret)return null
+ try{const response=await fetch(`${base}/game-v2-admin`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'spirit',sbd:sbd.trim(),secret,maBiMat:secret})});const data=await response.json();return data.ok?data.spirit??null:null}catch{return null}
 }

@@ -27,7 +27,11 @@ import katex from 'katex'
 import 'katex/contrib/mhchem'
 import { goKyTuLa } from './chu-la-pdf'
 
-type ChemPart = { t: 'text'; v: string } | { t: 'sub'; v: string } | { t: 'sup'; v: string }
+export type ChemPart =
+  | { t: 'text'; v: string }
+  | { t: 'sub'; v: string }
+  | { t: 'sup'; v: string }
+  | { t: 'mui'; mui: '→' | '←' | '⇌'; tren: string; duoi: string }
 
 function isAtomBoundaryChar(ch: string | undefined): boolean {
   if (!ch) return false
@@ -142,20 +146,45 @@ function thoatNgoacVuong(nhan: string): string {
   return nhan.replace(/\[/g, '{[}').replace(/\]/g, '{]}')
 }
 
+export function chuanHoaNhanTrenMuiTen(raw: string): string {
+  let s = String(raw ?? '').trim()
+  if (!s) return ''
+  s = s.replace(/\bt\^o\b/gi, 't°').replace(/\bt\\circ\b/gi, 't°')
+  if (/^\d+$/.test(s) || /^[IVXLCDM]+$/i.test(s)) return `(${s})`
+  return s
+}
+
+function timNgoacDongChar(s: string, mo: number, loai: '[' | '(' = '['): number {
+  const moChar = loai
+  const dongChar = loai === '[' ? ']' : ')'
+  let sau = 0
+  for (let j = mo; j < s.length; j++) {
+    if (s[j] === moChar) sau++
+    else if (s[j] === dongChar) {
+      sau--
+      if (sau === 0) return j
+    }
+  }
+  return -1
+}
+
 /** Một khúc của chuỗi: chữ thường, hoặc MỘT mũi tên kèm nhãn trên/nhãn dưới. */
 export type KhucMuiTen = { t: 'chu'; v: string } | { t: 'mui'; mui: '→' | '←' | '⇌'; tren: string; duoi: string }
 
-const KY_HIEU_MUI: Record<string, '→' | '←' | '⇌'> = { '->': '→', '<-': '←', '<=>': '⇌', '<->': '⇌' }
-// `<=>` và `<->` phải đứng TRƯỚC `->` và `<-`, nếu không `<->` bị đọc thành
-// `<` rồi `->` và mũi tên hai chiều biến thành mũi tên một chiều.
-const RE_MUI = /(<=>|<->|->|<-)/g
+const KY_HIEU_MUI: Record<string, '→' | '←' | '⇌'> = {
+  '->': '→',
+  '<-': '←',
+  '<=>': '⇌',
+  '<->': '⇌',
+  '→': '→',
+  '←': '←',
+  '⇌': '⇌',
+}
+// `<=>` và `<->` phải đứng TRƯỚC `->` và `<-`
+const RE_MUI = /(<=>|<->|->|<-|→|←|⇌)/g
 
-/** Tách chuỗi thành chữ và MŨI TÊN KÈM NHÃN, để bên vẽ dựng nhãn nằm TRÊN và
- * DƯỚI thân mũi tên đúng như sách viết.
- *
- * Bản cũ nhét điều kiện vào ngoặc ngay sau mũi tên (`→ (+H2 dư, Ni, t°)`) vì
- * bộ vẽ PDF không xếp chồng chữ được. Phiếu nay là HTML nên xếp chồng được, và
- * sơ đồ chuyển hoá đọc đúng như trong sách giáo khoa. */
+/** Tách chuỗi thành chữ và MŨI TÊN KÈM NHÃN (nhận cả ngoặc vuông [...] và ngoặc tròn (...)).
+ * Nhãn nằm TRÊN và DƯỚI thân mũi tên đúng như sách giáo khoa. */
 export function tachMuiTen(raw: string): KhucMuiTen[] {
   const s = String(raw ?? '')
   const ra: KhucMuiTen[] = []
@@ -167,14 +196,15 @@ export function tachMuiTen(raw: string): KhucMuiTen[] {
     if (m.index > i) ra.push({ t: 'chu', v: s.slice(i, m.index) })
     let j = m.index + m[0].length
     const nhan: string[] = []
-    // Tối đa hai nhãn `[trên][dưới]`, cho phép một dấu cách trước mỗi nhãn.
+    // Tối đa hai nhãn: [trên][dưới] hoặc (trên)(dưới) hoặc hỗn hợp
     for (let lan = 0; lan < 2; lan++) {
-      const sau = /^\s*\[/.exec(s.slice(j))
+      const sau = /^\s*([\[\(])/.exec(s.slice(j))
       if (!sau) break
+      const moChar = sau[1] as '[' | '('
       const mo = j + sau[0].length - 1
-      const dong = timNgoacDong(s, mo)
+      const dong = timNgoacDongChar(s, mo, moChar)
       if (dong < 0) break
-      nhan.push(s.slice(mo + 1, dong))
+      nhan.push(chuanHoaNhanTrenMuiTen(s.slice(mo + 1, dong)))
       j = dong + 1
     }
     ra.push({ t: 'mui', mui: KY_HIEU_MUI[m[0]], tren: nhan[0] ?? '', duoi: nhan[1] ?? '' })
@@ -360,9 +390,11 @@ const ION_QUEN_THUOC: Record<string, string> = {
   'CH3COO-': 'CH_{3}COO^{-}', 'HCOO-': 'HCOO^{-}',
 }
 
+// Không dùng lookbehind: Safari trước 16.4 ném lỗi ngay khi nạp module.
+// Giữ ký tự ranh giới bằng nhóm bắt và trả lại nguyên vẹn khi thay ion.
 /** Dai nhat truoc, de `SO42-` duoc thu truoc `SO4`; `HCO3-` truoc `CO3`. */
 const RE_ION_QUEN_THUOC = new RegExp(
-  '(?<![A-Za-z0-9])(' +
+  '(^|[^A-Za-z0-9])(' +
     Object.keys(ION_QUEN_THUOC)
       .sort((a, b) => b.length - a.length)
       .map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
@@ -378,7 +410,7 @@ const RE_ION_QUEN_THUOC = new RegExp(
 export function chuanHoaIonQuenThuoc(raw: string): string {
   const s = String(raw ?? '')
   if (!/\d[+-]/.test(s)) return s
-  return s.replace(RE_ION_QUEN_THUOC, (m) => ION_QUEN_THUOC[m] ?? m)
+  return s.replace(RE_ION_QUEN_THUOC, (_match, prefix: string, ion: string) => prefix + (ION_QUEN_THUOC[ion] ?? ion))
 }
 
 // ---------------------------------------------------------------------------
@@ -426,8 +458,7 @@ export function taRaChuNoiBiDinh(raw: string): string {
   return String(raw ?? '').replace(RE_CHU_NOI_DINH, '$1 $2 ')
 }
 
-export function parseChemText(raw: string): ChemPart[] {
-  const text = chuanHoaCongThucTongQuat(chuanHoaIonQuenThuoc(taRaChuNoiBiDinh(gomKyHieuDongViBiXen(raw)))).replace(/<=>/g, '⇌').replace(/->/g, '→').replace(/<-/g, '←')
+function parseChemTextDon(text: string): ChemPart[] {
   const parts: ChemPart[] = []
   const pushText = (ch: string) => {
     const last = parts[parts.length - 1]
@@ -464,9 +495,6 @@ export function parseChemText(raw: string): ChemPart[] {
       }
     }
     if (ch === '^') {
-      // Dấu trừ Unicode (−, –, —) cũng tính: kho đề cũ ghi `10^−17` bằng dấu
-      // trừ toán học U+2212, bản cũ chỉ nhận dấu `-` ASCII nên cả cụm rơi ra
-      // chữ thường và em nhìn thấy nguyên chữ `10^−17`.
       const m = /^[0-9+\-\u2212\u2013\u2014]+/.exec(text.slice(i + 1))
       if (m) {
         parts.push({ t: 'sup', v: m[0] })
@@ -475,9 +503,7 @@ export function parseChemText(raw: string): ChemPart[] {
       }
     }
 
-    // CẤU HÌNH ELECTRON — xét TRƯỚC luật chỉ số dưới tự động, vì luật kia sẽ
-    // vơ cả dãy số và cắt sai chỗ. Dãy phải đứng riêng: hai đầu không dính chữ
-    // hay số nào khác.
+    // CẤU HÌNH ELECTRON
     if (/[1-7]/.test(ch) && !chanCauHinh(text[i - 1])) {
       let cuoi = i
       while (cuoi < text.length && KY_TU_CAU_HINH.test(text[cuoi])) cuoi++
@@ -501,11 +527,6 @@ export function parseChemText(raw: string): ChemPart[] {
       if (isAtomBoundaryChar(prevChar)) {
         const m = /^[0-9]+/.exec(text.slice(i))!
         const after = text[i + m[0].length]
-        // Số đi liền dấu +/- — có thể là chỉ số NGUYÊN TỬ hay ĐIỆN TÍCH tuỳ
-        // ion cụ thể, không thể suy đoán chắc chắn → giữ nguyên chữ thường.
-        //
-        // TRỪ khi dấu đó là LIÊN KẾT trong công thức cấu tạo: `[CH2]4-CH(...)`
-        // thì `4` là chỉ số nhóm, không dính dáng gì tới điện tích.
         const dauLaLienKet = after === '-' && laCongThucCauTao(text, i + m[0].length)
         if ((after === '+' || after === '-') && !dauLaLienKet) {
           pushText(m[0])
@@ -518,13 +539,12 @@ export function parseChemText(raw: string): ChemPart[] {
       }
     }
 
-    // Tự động: dấu +/- đứng một mình ngay sau chữ/dấu đóng ngoặc (không có số kèm)
+    // Tự động: dấu +/- đứng một mình ngay sau chữ/dấu đóng ngoặc
     if ((ch === '+' || ch === '-') && i > 0) {
       const prevChar = text[i - 1]
       const nextChar = text[i + 1]
       const boundaryBefore = isAtomBoundaryChar(prevChar)
       const boundaryAfter = !nextChar || !/[0-9+-]/.test(nextChar)
-      // Dấu `-` trong một công thức cấu tạo là LIÊN KẾT, không phải điện tích.
       const laLienKet = ch === '-' && laCongThucCauTao(text, i)
       if (boundaryBefore && boundaryAfter && !laLienKet) {
         parts.push({ t: 'sup', v: ch })
@@ -535,6 +555,38 @@ export function parseChemText(raw: string): ChemPart[] {
 
     pushText(ch)
     i += 1
+  }
+  return parts
+}
+
+export function parseChemText(raw: string): ChemPart[] {
+  const daChuan = chuanHoaCongThucTongQuat(chuanHoaIonQuenThuoc(taRaChuNoiBiDinh(gomKyHieuDongViBiXen(raw))))
+  const khucs = tachMuiTen(daChuan)
+  const parts: ChemPart[] = []
+  for (const k of khucs) {
+    if (k.t === 'mui') {
+      if (!k.tren && !k.duoi) {
+        // Mũi tên trần: giữ nguyên text để tương thích các bộ kiểm thử cũ
+        const last = parts[parts.length - 1]
+        if (last && last.t === 'text') last.v += k.mui
+        else parts.push({ t: 'text', v: k.mui })
+      } else {
+        parts.push({ t: 'mui', mui: k.mui, tren: k.tren, duoi: k.duoi })
+      }
+      continue
+    }
+    const donParts = parseChemTextDon(k.v)
+    if (donParts.length > 0) {
+      const last = parts[parts.length - 1]
+      let startIdx = 0
+      if (last && last.t === 'text' && donParts[0].t === 'text') {
+        last.v += donParts[0].v
+        startIdx = 1
+      }
+      for (let j = startIdx; j < donParts.length; j++) {
+        parts.push(donParts[j])
+      }
+    }
   }
   return parts
 }
@@ -693,22 +745,38 @@ const KATEX_OPTS = { throwOnError: true, strict: false, displayMode: false } as 
  * Đo bằng `beRongUocTinh`, KHÔNG bằng `latex.length` — xem ghi chú ở hàm đó. */
 const DAI_PHAI_CUON = 26
 
+function chuanHoaMuiTenMhchem(raw: string): string {
+  let s = String(raw ?? '')
+  s = s.replace(/(<=>>|<<=>|<=>|<->|->|<-|→|←|⇌|\\to|\\rightarrow)\s*\(([^)]+)\)/g, (_m, mui, nhan) => {
+    const chuanMui = mui === '→' || mui === '\\to' || mui === '\\rightarrow' ? '->' : mui === '←' ? '<-' : mui === '⇌' ? '<=>' : mui
+    return `${chuanMui}[${nhan}]`
+  })
+  s = s.replace(/\[([^\]]*)\]/g, (_m, nhan: string) => {
+    const dk = nhan.replace(/\bt\^o\b/gi, 't^\\circ').replace(/t°/g, 't^\\circ')
+    return `[${dk}]`
+  })
+  return s
+}
+
+function ChemTextNoMui({ text }: { text: string }): JSX.Element {
+  const parts = parseChemTextDon(text)
+  return (
+    <>
+      {parts.map((p, idx) => {
+        if (p.t === 'sub') return <sub key={idx}>{p.v}</sub>
+        if (p.t === 'sup') return <sup key={idx}>{p.v}</sup>
+        if (p.t === 'text') return <span key={idx}>{p.v}</span>
+        return null
+      })}
+    </>
+  )
+}
+
 function ChemFormula({ t, latex: latexGoc }: { t: 'ce' | 'math'; latex: string }): JSX.Element {
-  // Chuẩn hoá TRƯỚC khi đưa cho mhchem, nếu không `CnH2n+3N` ra sai (xem ghi
-  // chú ở `chuanHoaCongThucTongQuat`), và nhãn mũi tên có ngoặc vuông lồng thì
-  // vỡ (xem `chuanHoaNhanMuiTen`). Thoát ngoặc TRƯỚC: sau bước đó nhãn có thêm
-  // `{[}` nên luật công thức tổng quát khỏi phải đoán giữa đống ngoặc.
-  const latex = chuanHoaCongThucTongQuat(chuanHoaNhanMuiTen(kyHieuToanVeLatex(latexGoc)))
+  // Chuẩn hoá TRƯỚC khi đưa cho mhchem
+  const latex = chuanHoaCongThucTongQuat(chuanHoaNhanMuiTen(kyHieuToanVeLatex(t === 'ce' ? chuanHoaMuiTenMhchem(latexGoc) : latexGoc)))
   try {
     const html = katex.renderToString(t === 'ce' ? `\\ce{${latex}}` : latex, KATEX_OPTS)
-    // Công thức NGẮN: KHÔNG bọc thêm inline-block/overflow/vertical-align —
-    // từng làm lệch đường chân chữ và CẮT mất chỉ số dưới (overflow-x:auto kéo
-    // theo overflow-y:auto).
-    //
-    // Công thức DÀI: KaTeX không xuống dòng giữa phương trình được, nên để
-    // nguyên là chữ tràn khỏi màn hình và em MẤT HẲN vế phải mà không biết —
-    // đúng lỗi thầy chụp ngày 04-09. Tách thành khối riêng cuộn ngang được, có
-    // đệm trên dưới để chỉ số dưới không bị cắt.
     if (beRongUocTinh(latex) > DAI_PHAI_CUON) {
       return (
         <span
@@ -749,6 +817,31 @@ export function ChemText({ text }: { text: string }): JSX.Element {
             {parts.map((p, i) => {
               if (p.t === 'sub') return <sub key={i}>{p.v}</sub>
               if (p.t === 'sup') return <sup key={i}>{p.v}</sup>
+              if (p.t === 'mui') {
+                const huong = p.mui === '→' ? 'mt-phai' : p.mui === '←' ? 'mt-trai' : 'mt-hai'
+                if (!p.tren && !p.duoi) {
+                  return (
+                    <span key={i} className="mt mt-tran">
+                      <span className={`mt-than ${huong}`} />
+                    </span>
+                  )
+                }
+                return (
+                  <span key={i} className="mt">
+                    {p.tren && (
+                      <span className="mt-tren">
+                        <ChemTextNoMui text={p.tren} />
+                      </span>
+                    )}
+                    <span className={`mt-than ${huong}`} />
+                    {p.duoi && (
+                      <span className="mt-duoi">
+                        <ChemTextNoMui text={p.duoi} />
+                      </span>
+                    )}
+                  </span>
+                )
+              }
               return <span key={i}>{p.v}</span>
             })}
           </span>

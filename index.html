@@ -2,7 +2,7 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
 
     <!-- CHỌN MANIFEST NGAY LÚC PHÂN TÍCH HTML, TRƯỚC KHI REACT CHẠY.
       ~
@@ -33,6 +33,9 @@
               : /[?&]vai=gv|(^|\/)gv\/?($|\?)/.test(d)
                 ? 'gv'
                 : localStorage.getItem('ddh.vaiDaDung') || ''
+          var logoVai = vai === 'hs' ? 'hs' : vai === 'ph' ? 'ph' : 'gv'
+          document.write('<link rel="icon" type="image/png" href="/logo-' + logoVai + '-64-v2.png">')
+          document.write('<link rel="apple-touch-icon" href="/logo-' + logoVai + '-180-v2.png">')
           var ten = vai === 'hs' ? 'manifest-hs.json' : vai === 'ph' ? 'manifest-ph.json' : 'manifest.json'
           var ten2 = vai === 'hs' ? 'ĐĐH Học Sinh' : vai === 'ph' ? 'ĐĐH Phụ Huynh' : 'ĐỖ ĐẠI HỌC'
           document.write('<link rel="manifest" href="/' + ten + '">')
@@ -45,11 +48,13 @@
     <noscript><link rel="manifest" href="/manifest.json" /></noscript>
     <!-- iOS tự bo góc biểu tượng, nên file này phải là hình VUÔNG phủ kín,
       không bo sẵn: trỏ vào icon-192 (đã bo góc) là bị bo hai lần, ra viền xấu. -->
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <!-- Màu thanh trạng thái/địa chỉ = --muc của hệ thiết kế (tokens.css); manifest.json do vite-plugin-pwa sinh từ vite.config.ts -->
-    <meta name="theme-color" content="#1a2332" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <!-- Màu thanh trạng thái Android / iOS: đổi thành #ffffff (hoặc #0f172a chế độ tối) để full viền tràn màn hình, không bị dải đen -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a" />
+    <meta name="theme-color" content="#ffffff" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -119,111 +124,34 @@
           }
         } catch (e) {}
 
-        // Bắt lỗi toàn cục — không bao giờ để máy trắng màn hình
-        window.addEventListener('error', function () {
-          setTimeout(function () {
-            var goc = document.getElementById('root')
-            if (goc && goc.childElementCount === 0) {
-              goc.innerHTML =
-                '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f7f8fa;color:#1a2332">' +
-                '<div style="font-size:44px;margin-bottom:12px">🎓</div>' +
-                '<div style="font-size:18px;font-weight:700;margin-bottom:6px">ĐỖ ĐẠI HỌC</div>' +
-                '<div style="font-size:13px;color:#5b6270;margin-bottom:20px;max-width:300px;line-height:1.4">' +
-                'Trang web gặp sự cố hiển thị trên thiết bị. Bấm nút dưới để nạp lại trực tiếp:' +
-                '</div>' +
-                '<button onclick="location.reload()" style="background:#16a34a;color:#fff;border:none;padding:12px 24px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:12px;box-shadow:0 2px 8px rgba(22,163,74,0.3)">Tải lại trang</button>' +
-                '<div style="font-size:12px;color:#9aa4b2">Nếu vẫn lỗi, hãy bấm dấu ... chọn Mở bằng Safari</div>' +
-                '</div>'
-            }
-          }, 500)
+        // Giữ chẩn đoán khởi động, không xoá cache/bài làm khi máy chỉ tải chậm.
+        function hienLoiKhoiDong(message) {
+          var root = document.getElementById('root')
+          if (!root || (root.childElementCount && !root.querySelector('[data-startup-status]'))) return
+          root.innerHTML = '<section data-startup-status="1" style="max-width:480px;margin:12vh auto;padding:24px;font-family:system-ui,sans-serif;line-height:1.6;color:#1a2332;background:#f7f8fa">' +
+            '<h1 style="font-size:24px">ĐỖ ĐẠI HỌC</h1><p>App chưa mở xong. Em có thể chờ thêm nếu mạng chậm hoặc thử nạp bản mới.</p>' +
+            '<p>Thao tác này không xóa bài làm đã lưu.</p><button id="startup-retry" style="padding:14px 22px;border:0;border-radius:12px;background:#15803d;color:white;font-size:16px">Thử nạp bản mới</button>' +
+            '<details style="margin-top:20px"><summary>Thông tin lỗi để gửi Thầy</summary><pre id="startup-detail" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre></details></section>'
+          document.getElementById('startup-detail').textContent = String(message || 'Chưa nhận được màn hình từ app.').slice(0, 400)
+          document.getElementById('startup-retry').onclick = function () {
+            var u = new URL(location.href)
+            u.searchParams.set('_moi', String(Date.now()))
+            location.replace(u.pathname + u.search + u.hash)
+          }
+        }
+        window.addEventListener('error', function (event) {
+          var detail = event.message || 'Không nạp được mã khởi động.'
+          setTimeout(function () { hienLoiKhoiDong(detail) }, 500)
         })
+        window.addEventListener('unhandledrejection', function (event) {
+          var reason = event.reason
+          setTimeout(function () { hienLoiKhoiDong(reason && reason.message ? reason.message : 'Không hoàn tất được bước khởi động.') }, 500)
+        })
+        setTimeout(function () { hienLoiKhoiDong('App chưa mở xong sau 30 giây. Kiểm tra kết nối rồi thử nạp bản mới nếu cần.') }, 30000)
       })()
     </script>
     <main id="root"></main>
     <script type="module" src="/src/main.tsx"></script>
 
-    <!-- CHỐT CHẶN CUỐI: APP TRẮNG MÀN THÌ TỰ SỬA, KHÔNG ĐỢI THẦY.
-      ~
-      Thầy chốt 14/09: "app học sinh và phụ huynh lại không truy cập được. Bạn
-      phải tìm cách để hiện tượng này không lặp lại nữa."
-      ~
-      Nguyên nhân LẦN NÀY đã sửa trong `src/sw.ts`. Nhưng "không lặp lại nữa"
-      thì không thể chỉ vá đúng nguyên nhân vừa bắt được: lần sau sẽ là nguyên
-      nhân khác. Đoạn dưới không cần biết vì sao app trắng màn — nó chỉ đo MỘT
-      điều đo được: sau 9 giây mà `#root` vẫn rỗng thì app KHÔNG chạy. Lúc ấy
-      nó gỡ service worker, xoá kho tạm, nạp lại thẳng từ mạng.
-      ~
-      BA RÀNG BUỘC ĐỂ THỨ NÀY KHÔNG TỰ THÀNH LỖI MỚI:
-        1. CHỈ MỘT LẦN mỗi tab (`sessionStorage`), nên không có vòng lặp nạp
-           lại — đó mới là thứ đáng sợ hơn cả màn hình trắng.
-        2. Chỉ chạy khi `#root` RỖNG. App đã vẽ ra dù chỉ một phần thì không
-           đụng tới, kể cả khi mạng chậm.
-        3. Nạp lại kèm `_moi=` — đường này nằm trong danh sách service worker
-           KHÔNG đụng vào, nên lượt nạp ấy chắc chắn đi thẳng ra mạng.
-      ~
-      Mất mạng thật thì `location.replace` không đi được đâu cả, trình duyệt
-      hiện trang lỗi của chính nó — vẫn hơn màn trắng không lời giải thích. -->
-    <script>
-      (function () {
-        var GIAY_CHO = 9000
-        var KHOA = 'ddh.daTuSua'
-        function daThu() {
-          try {
-            return sessionStorage.getItem(KHOA) === '1'
-          } catch (e) {
-            return true
-          }
-        }
-        function ghiDaThu() {
-          try {
-            sessionStorage.setItem(KHOA, '1')
-          } catch (e) {
-            /* riêng tư/hết chỗ: coi như đã thử, thà không sửa còn hơn lặp vô hạn */
-          }
-        }
-        setTimeout(function () {
-          var goc = document.getElementById('root')
-          if (goc && goc.childElementCount > 0) return
-          if (daThu()) return
-          ghiDaThu()
-          console.error('[tu-sua] app chưa vẽ ra gì sau ' + GIAY_CHO + 'ms — gỡ service worker và nạp lại từ mạng')
-          var xong = function () {
-            var d = location.pathname + (location.search ? location.search + '&' : '?') + '_moi=' + Date.now()
-            location.replace(d)
-          }
-          var viec = []
-          try {
-            if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
-              viec.push(
-                navigator.serviceWorker.getRegistrations().then(function (ds) {
-                  return Promise.all(
-                    ds.map(function (r) {
-                      return r.unregister()
-                    }),
-                  )
-                }),
-              )
-            }
-            if (window.caches && caches.keys) {
-              viec.push(
-                caches.keys().then(function (ks) {
-                  return Promise.all(
-                    ks.map(function (k) {
-                      return caches.delete(k)
-                    }),
-                  )
-                }),
-              )
-            }
-          } catch (e) {
-            /* trình duyệt không cho thì thôi, vẫn nạp lại */
-          }
-          if (viec.length === 0) return xong()
-          Promise.all(viec).then(xong, xong)
-          // Dọn dẹp treo quá 3 giây thì nạp lại luôn, không chờ nữa.
-          setTimeout(xong, 3000)
-        }, GIAY_CHO)
-      })()
-    </script>
   </body>
 </html>

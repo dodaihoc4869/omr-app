@@ -92,8 +92,14 @@ function doanThuong(raw: string): DoanChu[] {
   if (!s.trim()) return []
   const ra: DoanChu[] = []
   for (const p of parseChemText(donKyHieu(s))) {
-    if (p.t !== 'text') {
+    if (p.t === 'sub' || p.t === 'sup') {
       ra.push({ t: p.t, v: p.v })
+      continue
+    }
+    if (p.t === 'mui') {
+      const tren = doanThuong(p.tren)
+      const duoi = doanThuong(p.duoi)
+      ra.push({ t: 'mui', v: p.mui, ...(tren.length ? { tren } : {}), ...(duoi.length ? { duoi } : {}) })
       continue
     }
     // Mũi tên TRẦN còn sót (chuỗi cũ đã có sẵn ký tự →) vẫn cắt riêng để bên

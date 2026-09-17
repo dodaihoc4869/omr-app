@@ -99,7 +99,7 @@ export async function dungPhieuBtvn(
     {
       // Đã nộp rồi thì mở thành phiếu CHỈ ĐỌC kèm lời giải — em xem lại bài,
       // không nộp thêm lần nữa.
-      nop: r.daNop || !maBtvn ? null : { ma: maBtvn, sbd, url: `${String(ch.URL ?? '').replace(/\/+$/, '')}/goi` },
+      nop: r.daNop || !maBtvn ? null : { ma: maBtvn, sbd, legacyIds:cau.map(c=>doc.json!.ma_de+(c.id.match(/-(III|II|I)-\d+$/)?.[0]||'')), url: `${String(ch.URL ?? '').replace(/\/+$/, '')}/goi` },
       loiNhac: r.daNop
         ? `Em đã nộp bài này rồi — đây là bản xem lại, bấm vào từng câu để mở lời giải.${conLai > 0 ? ` Thầy cho phép làm lại tối đa 3 lần (còn ${conLai} lượt).` : ' (Đã hết 3 lượt làm lại)'}`
         : laLamLai

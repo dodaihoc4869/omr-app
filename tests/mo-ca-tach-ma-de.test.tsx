@@ -71,11 +71,12 @@ describe('danh sách đề khi mở ca', () => {
     expect(parseInt(hop.style.maxHeight, 10)).toBeGreaterThan(0)
   })
 
-  it('mặc định GẬP HẾT: chỉ thấy khối và chương, chưa thấy mã đề', async () => {
+  it('mặc định GẬP HẾT: chỉ thấy khối, chưa thấy chương và mã đề', async () => {
     const { container } = moCaKiemTra()
     await waitFor(() => expect(container.textContent).toContain('Khối 12'))
     const cay = (container.querySelector('[role="tree"]') as HTMLElement).textContent ?? ''
-    expect(cay).toContain('CI - Ester lipid')
+    expect(cay).toContain('Khối 12')
+    expect(cay).not.toContain('CI - Ester lipid')
     expect(cay).not.toContain('12-C1-B2-TN')
   })
 

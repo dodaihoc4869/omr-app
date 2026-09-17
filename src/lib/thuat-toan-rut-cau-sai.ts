@@ -26,7 +26,10 @@ export interface CauSaiDauVao {
   ideas?: string[]
   table?: string[][]
   imageDataUrl?: string
-  hinhAnh?: string
+  hinhAnh?: string | {src:string;viTri:string;alt?:string}[]
+  thanCauImg?: string
+  choiceImgs?: string[]
+  ideaImgs?: string[]
   loiGiai?: string
   dang?: string | { ma?: string; ten?: string }
   /** MÃ dạng do máy chủ trả kèm (`hsCauSai`). Khớp theo MÃ là khớp chắc; khớp
@@ -101,7 +104,9 @@ export function chuyenCauSaiSangCauLuyen(it: CauSaiDauVao): CauLuyen {
     lyDo: lgChuan.lyDo,
     buoc: lgChuan.buoc,
     ketQua: lgChuan.ketQua || daDung,
-    anhThanCau: hinhAnhUrl,
+    anhThanCau: it.thanCauImg,
+    anhLuaChon: it.phan === 'II' ? it.ideaImgs : it.choiceImgs,
+    hinh: [...(Array.isArray(it.hinhAnh) ? it.hinhAnh : []), ...(hinhAnhUrl ? [{src:hinhAnhUrl,viTri:'sau_de'}] : [])],
     bang: it.table ?? null,
     chuaCho: {
       qid: it.qid,
@@ -495,16 +500,26 @@ function tronMang<T>(ds: T[]): T[] {
 /** Số câu dùng được của một dạng bài — đếm SAU khi qua cửa nạp, vì cửa nạp bỏ
  * câu thiếu phương án hoặc thiếu đáp án. Con số trên thanh trượt phải là con số
  * THẬT sẽ rút được, không phải `so_cau` ghi trong gói. */
-export function demCauDangBai(khoDangBai: TeacherExamSource[]): number {
-  return cauLuyenTuNguon(khoDangBai).length
+export function demCauDangBai(khoDangBai: TeacherExamSource[], boLoc?: BoLocCauLuyen): number {
+  // return cauLuyenTuNguon(khoDangBai).length
+  return locCauTuDo(khoDangBai, boLoc).length
+}
+
+function locCauTuDo(kho: TeacherExamSource[], boLoc?: BoLocCauLuyen): CauLuyen[] {
+  return cauLuyenTuNguon(kho).filter((c) => {
+    if (!boLoc) return true
+    if (!hopSao(c.sao, boLoc.sao)) return false
+    return boLoc.dang === 'tat_ca' || c.dang === boLoc.dang
+  })
 }
 
 export function rutLuyenDangBai(
   khoDangBai: TeacherExamSource[],
   soCauRut: number,
   thongTin: { hoTen: string; sbd: string; tenDang: string; tenBai: string; lop: string },
+  boLoc?: BoLocCauLuyen,
 ): { html: string; dsCau: CauLuyen[] } {
-  const tatCa = cauLuyenTuNguon(khoDangBai)
+  const tatCa = locCauTuDo(khoDangBai, boLoc)
   const dsCauRut = tronMang(tatCa).slice(0, Math.max(0, soCauRut))
 
   const tt: ThongTinPhieu = {
@@ -514,7 +529,7 @@ export function rutLuyenDangBai(
     tenChuyenDe: `${thongTin.tenDang} — Lớp ${thongTin.lop} · ${thongTin.tenBai}`,
     ketQua: `Gồm ${dsCauRut.length} câu (kho có ${tatCa.length} câu thuộc dạng này)`,
     hienDapAn: false,
-    nhanBia: 'LUYỆN DẠNG BÀI',
+    nhanBia: 'LUYỆN ĐỀ TỰ DO',
   }
   const html = dungPhieu(tt, dsCauRut, { anGiai: false })
   return { html, dsCau: dsCauRut }

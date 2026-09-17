@@ -1,0 +1,37 @@
+.parent-news{color:var(--muc);background:var(--the);border:1px solid var(--vien);border-radius:28px;padding:clamp(20px,3vw,32px);box-shadow:0 6px 24px rgba(20,28,38,.04);position:relative;overflow:hidden}
+.parent-news:before{content:"";position:absolute;inset:0 28px auto;height:3px;background:var(--vang-diu);opacity:.55;border-radius:4px}
+.news-muted{color:var(--nhat)}.news-accent{color:var(--vang-diu)}
+.news-refresh{display:grid;place-items:center;width:44px;height:44px;flex-shrink:0;border:1px solid var(--vien);border-radius:14px;background:var(--the-2);color:var(--muc)}
+.news-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.news-metric{padding:18px 12px;border:1px solid var(--vien);border-radius:18px;background:var(--the-2)}
+.news-number{font-size:clamp(26px,3vw,36px);line-height:1.2;letter-spacing:-.04em;color:var(--muc);font-variant-numeric:tabular-nums}
+.news-metric:nth-child(2){background:var(--vang-diu-nen)}.news-metric:nth-child(2) .news-number{color:var(--vang-diu)}
+.news-topic{display:inline-flex;border:1px solid var(--vien);border-radius:12px;padding:8px 12px;font-size:13px;background:var(--the-2);color:var(--muc)}
+.news-recommendation{padding:22px;border:1px solid var(--vien);border-left:4px solid var(--vang-diu);border-radius:18px;background:var(--vang-diu-nen);color:var(--muc);line-height:1.65}
+.news-send{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:52px;padding:12px 18px;border-radius:16px;background:var(--muc);color:var(--the);font-weight:700;transition:opacity .15s}
+.news-send:disabled{opacity:.45;cursor:not-allowed}.news-send:not(:disabled):hover{opacity:.88}
+.parent-news button:focus-visible,.parent-news summary:focus-visible{outline:3px solid var(--vang-diu);outline-offset:3px}
+@media(max-width:480px){.news-metrics{gap:6px}.news-metric{padding:14px 9px}.news-recommendation{padding:16px}.parent-news{border-radius:22px}}
+/* Shared Google-inspired section accents across teacher, student and parent news. */
+.parent-news:before{background:linear-gradient(90deg,var(--gg-xanh) 0 25%,var(--gg-do) 25% 50%,var(--gg-vang) 50% 75%,var(--gg-luc) 75%);opacity:.9;height:4px}
+.parent-news h2>svg{background:var(--gg-xanh-nen);color:var(--gg-xanh);border-radius:12px;padding:7px;width:38px;height:38px;flex-shrink:0}
+.news-metric{border-top:3px solid var(--gg-xanh);background:var(--gg-xanh-nen)}
+.news-metric .news-number{color:var(--gg-xanh)}
+.news-metric:nth-child(2){border-top-color:var(--vang-diu);background:var(--vang-diu-nen)}
+.news-metric:nth-child(3){border-top-color:var(--gg-luc);background:var(--gg-luc-nen)}
+.news-metric:nth-child(3) .news-number{color:var(--gg-luc)}
+.news-recommendation{border-left-color:var(--tim);background:var(--tim-nen)}
+.news-recommendation h3{color:var(--muc)}
+.news-recommendation h3 svg{color:var(--tim)}
+.news-refresh{color:var(--gg-xanh);background:var(--gg-xanh-nen);border-color:transparent}
+.news-send{background:var(--gg-xanh);color:var(--muc-nguoc)}
+.news-topic{border-left:3px solid var(--vang-diu)}
+.parent-news details>summary svg{color:var(--gg-xanh)}
+.parent-news details:nth-child(2)>summary svg{color:var(--gg-luc)}
+.news-alert-red{display:flex;flex-direction:column;gap:6px;padding:14px 18px;border-radius:20px;border:1.5px solid var(--gg-do);background:var(--gg-do-nen);color:var(--muc);box-shadow:0 4px 16px rgba(234,67,53,.12)}
+.news-alert-lines{display:flex;flex-wrap:wrap;align-items:center;gap:12px;font-size:12.5px;color:var(--muc)}
+.news-alert-dot{width:6px;height:6px;border-radius:50%;background:var(--gg-do);animation:pending-triangle-pulse 1.3s ease-in-out infinite;flex-shrink:0}
+.news-pending-triangle{color:var(--gg-do);animation:pending-triangle-pulse 1.3s ease-in-out infinite;flex-shrink:0}
+@keyframes pending-triangle-pulse{0%,100%{transform:scale(1);opacity:1;filter:drop-shadow(0 0 0 rgba(234,67,53,0))}50%{transform:scale(1.18);opacity:.8;filter:drop-shadow(0 0 6px rgba(234,67,53,.55))}}
+@media(prefers-reduced-motion:reduce){.news-alert-dot,.news-pending-triangle{animation:none}}
+

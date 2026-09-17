@@ -1,3 +1,4 @@
+import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect} from './btvn-grading'
 // CỔNG TƯƠNG THÍCH `/goi` — CẮT HẲN GOOGLE.
 //
 // Thầy chốt 12/09 rạng sáng: "gỡ sạch google, toàn bộ app phải được chạy trên
@@ -841,7 +842,7 @@ export async function baiTapCuaEm(env: Env, b: Record<string, unknown>): Promise
  * đáp án. Đọc đúng những tờ đề của lượt giao ấy, lọc đúng phần thầy đã tick.
  *
  * QUÁ HẠN THÌ TỪ CHỐI Ở ĐÂY, không chỉ ẩn nút bên máy em: giờ máy em chỉnh được. */
-async function nopBtvnQuaPhieu(
+export async function nopBtvnQuaPhieu(
   env: Env,
   bt: Record<string, unknown>,
   sbd: string,
@@ -854,28 +855,22 @@ async function nopBtvnQuaPhieu(
     return { ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN' }
   }
 
-  const dapAnDung: Record<string, string> = Object.fromEntries(await dapAnTheoMaDe(env, chuoi(bt.ma_de)))
-
-  const qidSai: string[] = []
-  let soDung = 0
-  let soCau = 0
-  for (const [qid, dung] of Object.entries(dapAnDung)) {
-    if (!dung) continue
-    soCau++
-    const chon = chuoi(lam[qid]).trim().toUpperCase()
-    if (chon && chon === dung) soDung++
-    else qidSai.push(qid)
-  }
+  let graded
+  try { graded=gradeHomework(homeworkKeys(await homeworkQuestions(env,chuoi(bt.ma_de))),lam,chuoi(bt.ma_de)) }
+  catch(e){return {ok:false,error:e instanceof Error?e.message:'Không chấm được bài.'}}
+  const {soDung,soCau,qidSai}=graded
+  lam=graded.answers
 
   const nay = NAY()
   const khoa = `${maBtvn}|${sbd}`
-  const cu = await env.DB.prepare('SELECT nop_luc, COALESCE(so_lan_lam, 1) AS so_lan_lam FROM btvn_em WHERE khoa = ?')
+  const cu = await env.DB.prepare('SELECT dap_an_json, nop_luc, COALESCE(so_lan_lam, 1) AS so_lan_lam FROM btvn_em WHERE khoa = ? AND thu_hoi=0')
     .bind(khoa)
     .first<Record<string, unknown>>()
   if (!cu) {
     return { ok: false, lyDo: 'khong_duoc_giao', error: 'Em không có bài tập của lượt này' }
   }
 
+  if(cu.nop_luc&&String(cu.dap_an_json)===JSON.stringify(lam))return {ok:true,lanThu:Number(cu.so_lan_lam),soCau,soDung,qidSai,nopLuc:cu.nop_luc,daNhan:true}
   let lanMoi = 1
   if (cu.nop_luc) {
     const daLam = Math.max(1, Number(cu.so_lan_lam) || 1)
@@ -885,12 +880,13 @@ async function nopBtvnQuaPhieu(
     lanMoi = daLam + 1
   }
 
-  await env.DB.prepare(
-    `UPDATE btvn_em SET nop_luc = ?, so_dung = ?, so_cau = ?, dap_an_json = ?, so_lan_lam = ? WHERE khoa = ?`,
+  const saved=await env.DB.prepare(
+    `UPDATE btvn_em SET nop_luc = ?, so_dung = ?, so_cau = ?, dap_an_json = ?, so_lan_lam = ? WHERE khoa = ? AND thu_hoi=0`,
   )
     .bind(nay, soDung, soCau, JSON.stringify(lam), lanMoi, khoa)
     .run()
 
+  if(!saved.meta.changes)return {ok:false,error:'Bài vừa được cập nhật từ một lần nộp khác. Em tải lại để xem kết quả.'}
   return { ok: true, lanThu: lanMoi, soCau, soDung, qidSai, nopLuc: nay, soLanLamLaiConLai: Math.max(0, 4 - lanMoi) }
 }
 
@@ -985,6 +981,8 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
     .bind(ma)
     .first<Record<string, unknown>>()
   if (bt) return nopBtvnQuaPhieu(env, bt, sbd, lam)
+  const recalled = await env.DB.prepare('SELECT ma_btvn FROM btvn WHERE ma_btvn = ? AND da_xoa <> 0').bind(ma).first()
+  if (recalled) return {ok:false,error:'Bài tập đã được thầy thu hồi.'}
 
   // ĐÁP ÁN LẤY TỪ GÓI PHIẾU trên R2 — không lấy từ gói máy em gửi lên.
   let dapAnDung: Record<string, string> = {}
@@ -1014,7 +1012,9 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
     if (!dung) continue
     soCau++
     const chon = chuoi(lam[qid]).trim().toUpperCase()
-    if (chon && chon === dung) soDung++
+    const phanMatch = qid.match(/-(III|II|I)-\d+$/)
+    const phan = phanMatch ? phanMatch[1] : (qid.includes('-III-') ? 'III' : qid.includes('-II-') ? 'II' : 'I')
+    if (chon && isAnswerCorrect(chon, dung, phan)) soDung++
     else qidSai.push(qid)
   }
 
@@ -2860,7 +2860,7 @@ export async function hsBtvn(env: Env, b: Record<string, unknown>): Promise<Reco
             b.ma_ca, b.ma_de, b.han_nop, b.so_cau, b.giao_luc
        FROM btvn_em be
        JOIN btvn b ON b.ma_btvn = be.ma_btvn
-      WHERE be.sbd = ? AND b.da_xoa = 0
+      WHERE be.sbd = ? AND be.thu_hoi=0 AND b.da_xoa = 0
       ORDER BY b.giao_luc DESC LIMIT 100`,
   )
     .bind(sbd)
@@ -3207,6 +3207,9 @@ export async function thanThuGhi(env: Env, b: Record<string, unknown>): Promise<
   const sbd = chuoi(b.sbd).trim()
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
 
+  const upgraded = await env.DB.prepare('SELECT sbd FROM game_v2_profile WHERE sbd = ?').bind(sbd).first()
+  if (upgraded) return { ok: false, error: 'Game đã nâng cấp. Em tải lại app để tiếp tục; hồ sơ cũ vẫn được giữ.' }
+
   const { hoSo: hoSoMoi } = locHoSoThanThu(b.hoSo)
   const cu = await env.DB.prepare('SELECT du_lieu_json, tong_exp FROM than_thu WHERE sbd = ?')
     .bind(sbd).first<Record<string, unknown>>()
@@ -3283,9 +3286,28 @@ export async function danhMucDangBai(env: Env): Promise<Record<string, unknown>>
   type Bai = { tenBai: string; dangs: Dang[] }
   const theoLop = new Map<string, Map<string, Bai>>()
 
-  for (const x of r.results ?? []) {
+  // Kho cũ lưu lớp/bài trong nhom, tên dạng trong nguon của gói R2.
+  // Chỉ đọc bù nhãn thiếu; không sửa câu hỏi hay luật rút câu.
+  const rows = r.results ?? []
+  const nhan = new Map<string, string[]>()
+  for (let i = 0; i < rows.length; i += 6) {
+    await Promise.all(rows.slice(i, i + 6).map(async x => {
+      const phan = chuoi(x.ten_de).split(' · ')
+      if (phan.length === 4 && phan[0] === 'Dạng bài') return
+      if (!env.DE) return
+      const ma = chuoi(x.ma_de)
+      const o = await env.DE.get(`kho/${ma}.json`)
+      if (!o) return
+      const de = await new Response(o.body).json() as Record<string, unknown>
+      const nhom = chuoi(de.nhom)
+      const cu = /^(10|11|12) · DẠNG BÀI\/(.+)$/.exec(nhom)
+      const ten = chuoi(de.nguon).trim()
+      if (cu && ten) nhan.set(ma, ['Dạng bài', cu[1], cu[2], ten])
+    }))
+  }
+  for (const x of rows) {
     const ma = chuoi(x.ma_de)
-    const phan = chuoi(x.ten_de).split(' · ')
+    const phan = nhan.get(ma) ?? chuoi(x.ten_de).split(' · ')
     // Dáng sai thì BỎ tờ ấy và không đoán — menu thiếu một dạng còn hơn menu
     // có một mục trỏ vào hư không.
     if (phan.length !== 4 || phan[0] !== 'Dạng bài') continue

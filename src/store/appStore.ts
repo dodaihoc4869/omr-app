@@ -16,6 +16,7 @@ export type ScreenId =
   | 'exammonitor'
   | 'lichsuca'
   | 'hocsinh'
+  | 'giaobtvn'
   | 'goilenbang'
   | 'cauhoi'
 

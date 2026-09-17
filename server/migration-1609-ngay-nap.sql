@@ -1,0 +1,12 @@
+-- 16/09 · CỘT `ngay_nap` CHO BẢNG `de_kho`.
+--
+-- Vì sao: app so `ngayNap` để biết tờ nào phải tải lại (exam-sync.ts ·
+-- chonDeCanTai). `danhSachDe` chưa bao giờ trả trường ấy vì D1 không có cột
+-- nào giữ nó — app nhận '' cho cả kho, so với ngày thật trong gói đang giữ,
+-- kết luận TỜ NÀO CŨNG ĐỔI, rồi mỗi lượt Đồng bộ tải lại toàn bộ 225 tờ và
+-- đẩy lại ngân hàng của mọi ca đã mở. Chạy mãi không xong ⇒ nhìn từ phía thầy
+-- là "bấm Đồng bộ mà không vào".
+--
+-- Cột thêm, KHÔNG đụng dữ liệu cũ. Bản máy chủ cũ không biết cột này vẫn chạy
+-- bình thường, nên chạy migration TRƯỚC khi đẩy Worker là an toàn.
+ALTER TABLE de_kho ADD COLUMN ngay_nap TEXT NOT NULL DEFAULT '';

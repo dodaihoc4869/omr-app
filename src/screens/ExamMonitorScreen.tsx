@@ -12,7 +12,7 @@ import { Check, RefreshCw, Trash2, ChevronRight, Lock, Unlock, Pencil, LogIn, Ba
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify } from '../engine/score'
-import { batDauThi, capNhatKeyBank, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
+import { danhSachEm, batDauThi, capNhatKeyBank, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
 import { chuanTenCa, tenHienCua, TEN_CA_TOI_DA } from '../lib/ten-ca'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { emLechDiem, loiBaoLechDiem } from '../lib/lech-diem'
@@ -712,7 +712,12 @@ export default function ExamMonitorScreen() {
       let bienBan: BienBanDeRieng | undefined
       let demSai: Record<string, Record<string, number>> | undefined
       if (caCanDeRieng) {
-        const dsCho = (chiTiet.dsCho ?? []).map((x) => x.sbd).filter(Boolean)
+        // Chuẩn bị cả học sinh cùng lớp chưa kịp vào phòng chờ; không đổi cổng quyền vào ca.
+        const registered = await danhSachEm(scriptUrl.trim(), secret.trim())
+        const dsCho = [...new Set([
+          ...(chiTiet.dsCho ?? []).map(x => x.sbd),
+          ...registered.filter(e => !chiTiet.ca.lop || String(e.lop).trim() === String(chiTiet.ca.lop).trim()).map(e => e.sbd),
+        ].filter(Boolean))]
         if (dsCho.length === 0) {
           showToast('Chưa em nào vào phòng chờ — chưa rút được đề riêng.', 'error')
           setDangBatDau(false)
@@ -906,8 +911,8 @@ export default function ExamMonitorScreen() {
   const demBangCham = useMemo(() => (rowsHoSo ? demKetQua(rowsHoSo) : null), [rowsHoSo])
 
   return (
-    <div className="min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-      <div className="flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
+    <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
+      <div className="gv-page-header flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
         {/* TÊN CA SỬA ĐƯỢC TẠI CHỖ (thầy báo 07/09).
             Chạm vào tên là mở ô nhập ngay tại chỗ nó đang đứng, không nhảy sang
             màn khác: thầy sửa tên giữa lúc coi thi, mất bảng lượt thi một nhịp
@@ -988,8 +993,8 @@ export default function ExamMonitorScreen() {
       {chiTiet && tk && tt && (
         <>
           {/* THÔNG TIN CA */}
-          <TheNoiDung>
-            <div className="flex items-start justify-between" style={{ gap: 'var(--k3)' }}>
+          <TheNoiDung className="gv-monitor-overview">
+            <div className="gv-page-header flex items-start justify-between" style={{ gap: 'var(--k3)' }}>
               <div className="min-w-0">
                 <div className="font-bold" style={{ ...SO, fontSize: 'var(--cx-5)', letterSpacing: '.12em' }}>
                   {chiTiet.ca.maCa}
@@ -1420,7 +1425,7 @@ export default function ExamMonitorScreen() {
               chưa chữa bài — chữa bài là việc sau khi ca xong. */}
 
           {/* DANH SÁCH EM */}
-          <TheNoiDung>
+          <TheNoiDung className="gv-monitor-students">
             <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Học sinh trong ca ({dsEm.length})</div>
             {/* EM CHƯA CÓ TÊN (thầy báo 07/09). Em vào thi chỉ gõ số báo danh
                 nên cột tên của lượt bỏ trống, và phiếu gửi phụ huynh in

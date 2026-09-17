@@ -110,37 +110,76 @@ const MOC: readonly Moc[] = [
 export const CAP_BAC: readonly number[] = [1, 10, 30, 50, 70, 100]
 
 export const TEN_BAC_THEO_THU: Record<string, readonly string[]> = {
-  // Nhiệt Nhôm Triều Dương Phượng — hệ Hoả
+  // ─── TỨ ĐẠI TỰ NHIÊN ───
+  dat_quy: [
+    'Trứng Khoáng Thạch', 'Cương Nham Ấu Quy', 'Hổ Phách Cự Quy',
+    'Kim Cương Nham Thần Quy', 'Thái Sơn Trấn Địa Quy',
+    'TỐI THƯỢNG HOÀNG GIÁP CƯƠNG NHAM THẦN ĐẾ',
+  ],
+  nuoc_long: [
+    'Trứng Lam Thuỷ', 'Thuỷ Tinh Sơ Giao', 'Lam Uyên Hải Thần Giao',
+    'Triều Tịch Cửu Uyên Long', 'Vương Thuỷ Bích Hải Long',
+    'TỐI THƯỢNG CỬU UYÊN TRIỀU TỊCH HẢI HOÀNG ĐẾ',
+  ],
+  lua_phuong: [
+    'Trứng Hoả Tinh', 'Xích Diệm Sơ Phượng', 'Xích Diệm Hoả Phượng',
+    'Nhiệt Nhôm Liệt Phượng', 'Đại Phượng Triều Dương',
+    'TỐI THƯỢNG XÍCH DIỆM THIÊU THIẾT ĐẾ',
+  ],
+  khi_bang: [
+    'Trứng Thiên Phong', 'Thanh Điêu Sơ Sinh', 'Cuồng Phong Thiết Dực Bằng',
+    'Halogen Phong Thần Bằng', 'Cửu Thiên Bão Tố Bằng',
+    'TỐI THƯỢNG CỬU TRÙNG CUỒNG PHONG BẰNG HOÀNG',
+  ],
+
+  // ─── TỨ TRỤ TÂM THỨC ───
+  ductin_su: [
+    'Trứng Bạch Kim', 'Bạch Tinh Ấu Sư', 'Kim Cương Chiến Sư',
+    'Bất Hoại Thánh Quang Sư', 'Định Luật Bảo Toàn Vương',
+    'TỐI THƯỢNG KIM CƯƠNG BẤT HOẠI QUANG SƯ ĐẾ',
+  ],
+  tinhyeu_ho: [
+    'Trứng Hồng Ngọc', 'Tam Vĩ Sơ Hồ', 'Lục Vĩ Cộng Hóa Linh Hồ',
+    'Cửu Vĩ Ái Tâm Tiên Hồ', 'Hồng Tinh Vạn Hữu Hồ Thần',
+    'TỐI THƯỢNG HỒNG TINH CỘNG HÓA CỬU VĨ THẦN HOÀNG',
+  ],
+  bieton_huou: [
+    'Trứng Tố Linh', 'Thanh Giác Ấu Hươu', 'Liên Hoa Đệm Thần Hươu',
+    'Tri Ân Dưỡng Dục Hươu', 'Vạn Cổ Cân Bằng Linh Hươu',
+    'TỐI THƯỢNG TỐ LINH ĐỆM THẦN HƯƠU ĐẾ',
+  ],
+  sangy_ma: [
+    'Trứng Diệu Quang', 'Lục Sắc Ấu Mã', 'Quang Phổ Dực Thiên Mã',
+    'Lượng Tử Khai Trí Mã', 'Vô Cực Diệu Giác Thiên Mã',
+    'TỐI THƯỢNG THẦN QUANG VÔ CỰC THIÊN MÃ HOÀNG',
+  ],
+
+  // ─── ALIAS TƯƠNG THÍCH NGƯỢC ───
   hoa_long: [
     'Trứng Nhiệt Nhôm', 'Hoả Vũ Sơ Phượng', 'Xích Diệm Phượng Hoàng',
     'Thiêu Thiết Hoả Phượng', 'Hoàn Cầu Triều Dương Phượng',
     'TỐI THƯỢNG THIÊU THIẾT HOẢ ĐẾ',
   ],
-  // Cường Toan Ngân Hà Kỳ Lân — hệ Acid
   thuy_quai: [
     'Trứng Cường Toan', 'Tử Giác Lân Nhỏ', 'Nhất Giác Kỳ Lân',
     'Hoá Kim Thần Lân', 'Ngân Hà Cường Toan Kỳ Lân',
     'TỐI THƯỢNG HOÁ KIM NHẤT GIÁC VƯƠNG',
   ],
-  // Trầm Tủa Vạn Niên Thần Quy — hệ Base
   thiet_giap: [
     'Trứng Kết Tủa', 'Huyền Vũ Quy Nhỏ', 'Trầm Tủa Huyền Quy',
     'Vạn Niên Thần Quy', 'Lõi Thời Không Thần Quy',
     'TỐI THƯỢNG HUYỀN VŨ BẤT TAN ĐẾ',
   ],
-  // Halogen Cung Đình Thần Long — hệ Khí
   loi_dieu: [
     'Trứng Halogen', 'Thanh Long Nhỏ', 'Bích Ngọc Thanh Long',
     'Phệ Kim Halogen Long', 'Cung Đình Cửu Trùng Thần Long',
     'TỐI THƯỢNG BÍCH NGỌC PHỆ KIM LONG ĐẾ',
   ],
-  // Điện Cực Sơn Lâm Kim Lân — hệ Điện hoá
   loi_kim: [
     'Trứng Điện Cực', 'Kim Lân Nhỏ', 'Lôi Đình Kim Lân',
     'Băng Sương Kim Lân', 'Sơn Lâm Đại Kim Lân',
     'TỐI THƯỢNG BĂNG SƯƠNG LÔI ĐÌNH CHI CHỦ',
   ],
-  // Trùng Hợp Thuỷ Phù Long Thần — hệ Hữu cơ
   moc_tinh: [
     'Trứng Trùng Hợp', 'Bích Lân Long Nhỏ', 'Quang Sinh Bích Lân Long',
     'Trùng Hợp Thuỷ Long', 'Thuỷ Phù Vạn Xích Long Thần',

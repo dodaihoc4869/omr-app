@@ -1,0 +1,37 @@
+.honors{border:1px solid var(--vien);border-radius:28px;background:var(--the);padding:clamp(20px,3vw,32px);color:var(--muc);overflow:hidden;margin-bottom:24px;position:relative}.honors-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}.honors-heading h2{font-size:26px;font-weight:700;letter-spacing:-.04em;margin:6px 0}.honors-heading p,.honors-rules{font-size:12px;color:var(--nhat)}.honors-eyebrow{display:flex;align-items:center;gap:6px;color:var(--vang-diu);font-size:10px;font-weight:700;letter-spacing:.16em}.honors-crown{color:var(--vang-diu)}.honors-podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:end;margin:30px 0 20px}.honors-card{text-align:center;border-radius:22px;padding:20px 12px;background:var(--the-2);border:1px solid var(--vien);position:relative;min-width:0}.honors-rank-1{grid-column:2;grid-row:1;background:var(--vang-diu-nen);border-color:var(--vang-diu);padding-top:32px;box-shadow:0 12px 32px rgba(178,137,47,.12)}.honors-rank-2{grid-column:1;grid-row:1}.honors-rank-3{grid-column:3;grid-row:1}.honors-rank{display:inline-flex;gap:6px;align-items:center;color:var(--vang-diu);font-size:11px;font-weight:700;letter-spacing:.1em}.honors-spirit{height:150px;display:grid;place-items:center;position:relative;color:var(--vang-diu);isolation:isolate}.honors-spirit:before{content:'';position:absolute;inset:20px;border-radius:50%;background:radial-gradient(ellipse,rgba(231,190,85,.35),transparent 68%);z-index:-1}.honors-spirit img{height:100%;max-width:100%;object-fit:contain;filter:drop-shadow(0 8px 12px rgba(195,156,61,.25))}.honors-rank-1 .honors-spirit{height:190px}.honors-card h3{font-size:17px;font-weight:700;overflow-wrap:anywhere}.honors-score{font-size:40px;font-weight:700;letter-spacing:-.05em;color:var(--vang-diu);margin-top:8px}.honors-score span{font-size:14px;letter-spacing:0;color:var(--nhat);margin-left:4px}.honors-praise{font-size:12px;margin-top:8px}.honors-pet{font-size:11px;color:var(--nhat);margin-top:8px}.honors-foot{border-top:1px solid var(--vien);margin-top:16px;padding-top:12px;font-size:11px;color:var(--nhat)}.honors-foot span{display:block;margin-top:5px;overflow-wrap:anywhere}.honors-rules summary{cursor:pointer}.honors-rules p{margin-top:8px;line-height:1.7}.honors-empty{padding:28px 0;color:var(--nhat);font-size:14px}@media(max-width:600px){.honors-podium{grid-template-columns:1fr;gap:12px;margin-top:20px}.honors-card{grid-column:auto;grid-row:auto}.honors-rank-1{order:-1}.honors-spirit,.honors-rank-1 .honors-spirit{height:160px}.honors-heading h2{font-size:23px}}
+/* Give the student's name its own layer above the bounded spirit artwork. */
+.honors-card .honors-name{position:relative;z-index:2;isolation:isolate;line-height:1.45;margin:14px 0 8px;padding:12px 8px;border-radius:14px;color:var(--muc);background:var(--the);font-size:clamp(17px,1.8vw,23px);overflow-wrap:anywhere}
+.honors-name:before{content:'';position:absolute;inset:-5px;border-radius:inherit;z-index:-1;pointer-events:none;border:1px solid rgba(227,180,62,.35);box-shadow:0 0 var(--name-glow,8px) rgba(227,180,62,var(--name-power,.15));animation:honors-name-glow 3.6s ease-in-out infinite alternate}
+.honors-rank-1{--name-glow:28px;--name-power:.65}.honors-rank-2{--name-glow:16px;--name-power:.35}.honors-rank-3{--name-glow:8px;--name-power:.18}
+.honors-rank-1 .honors-name{border:1px solid var(--vang-diu);font-weight:800}
+.honors-spirit{overflow:hidden;min-height:0;z-index:0}
+.honors-spirit img{display:block;width:100%;height:100%;min-height:0;max-height:100%;object-fit:contain}
+@keyframes honors-name-glow{from{opacity:.6}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.honors-name:before{animation:none}}
+/* A single, compact podium on phones as well as desktop. */
+@media(max-width:600px){
+ .honors{padding:16px 10px;border-radius:22px}
+ .honors-heading{padding:0 4px;gap:8px}
+ .honors-heading h2{font-size:21px}
+ .honors-heading p{font-size:10px;line-height:1.5}
+ .honors-eyebrow{font-size:9px;letter-spacing:.08em}
+ .honors-crown{width:27px;flex-shrink:0}
+ .honors-podium{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:22px 0 0;align-items:end}
+ .honors-card{padding:12px 5px;border-radius:15px;min-width:0}
+ .honors-rank-1{grid-column:2;grid-row:1;order:0;padding-top:22px}
+ .honors-rank-2{grid-column:1;grid-row:1}
+ .honors-rank-3{grid-column:3;grid-row:1}
+ .honors-rank{font-size:9px;gap:3px;letter-spacing:0}
+ .honors-rank svg{width:13px;height:13px}
+ .honors-card .honors-name{font-size:12px;line-height:1.45;margin:10px 0 6px;padding:7px 3px;border-radius:9px;min-height:66px;display:flex;align-items:center;justify-content:center;overflow-wrap:break-word}
+ .honors-rank-1 .honors-name{font-size:13px}
+ .honors-spirit{height:88px}
+ .honors-rank-1 .honors-spirit{height:112px}
+ .honors-score{font-size:27px;margin-top:4px}
+ .honors-score span{font-size:10px;margin-left:2px}
+ .honors-praise{font-size:10px;line-height:1.5;margin-top:5px}
+ .honors-pet{font-size:9px;line-height:1.5;margin-top:6px}
+ .honors-foot{font-size:9px;line-height:1.5;margin-top:10px;padding-top:8px}
+ .honors-foot span{display:none}
+ .honors-name:before{inset:-2px}
+}

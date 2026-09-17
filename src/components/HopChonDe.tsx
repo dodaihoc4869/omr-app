@@ -102,7 +102,7 @@ function Hang({
           </span>
           {/* Mã đề vẫn phải hiện ở lá: thầy đối chiếu với file trên máy và với
               lịch sử ca cũ bằng mã, không bằng tên bài. */}
-          {la && (
+          {la && !n.anMa && (
             <span className="truncate" style={{ ...NHAN_NHO, ...SO, flex: '0 1 auto' }}>
               {n.maDe}
             </span>
@@ -150,10 +150,10 @@ export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308,
   // đặt mặc định thì lần vẽ đầu cây gập sạch rồi mới bung ra — nhìn thấy giật,
   // và test cũng bắt được đúng cái nháy đó.
   //
-  //   · không gõ tìm  → mở tầng khối, gập từ chương xuống (đúng đặc tả 4.3)
+  //   · không gõ tìm  → thu gọn toàn bộ thư mục
   //   · đang gõ tìm   → mở đúng nhánh có kết quả
   //   · thầy tự bấm   → theo tay thầy, cho đến khi đổi chữ trong ô tìm
-  const macDinh = useMemo(() => new Set(tim.trim() ? moKhoa : cayGoc.map((n) => n.khoa)), [tim, moKhoa, cayGoc])
+  const macDinh = useMemo(() => new Set<string>(tim.trim() ? moKhoa : []), [tim, moKhoa, cayGoc])
   const moRong = moTay && moTay.tim === tim ? moTay.set : macDinh
 
   const gap = (khoa: string) => {

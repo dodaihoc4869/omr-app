@@ -1,3 +1,4 @@
+import ExperimentDemo,{ExperimentOriginal} from './ExperimentDemo'
 // THẺ CÂU HỎI — một component, hai trạng thái (GIAO-DIEN-LAM-BAI.md):
 //   cheDo "thi"     : KHÔNG tô đáp án đúng, KHÔNG ô giải thích, xanh = ĐANG CHỌN.
 //                     Props `correct`/`explanation` không bao giờ được truyền
@@ -491,9 +492,10 @@ export default function TheCau(props: TheCauProps) {
             <ChemText text={text} />
           </div>
         )}
+        <ExperimentDemo text={text}/>
         <BangSoLieu table={table} />
-        {imageDataUrl && <CauHinh src={imageDataUrl} alt={`Hình ${nhan}`} onZoom={onZoom} />}
-        <HinhTaiViTri hinhAnh={hinhAnh} viTri="sau_de" onZoom={onZoom} nhan={nhan} />
+        <ExperimentOriginal text={text} hasImages={Boolean(imageDataUrl || hinhAnh?.some(h=>h.viTri==='sau_de'))}>        {imageDataUrl && <CauHinh src={imageDataUrl} alt={`Hình ${nhan}`} onZoom={onZoom} />}
+        <HinhTaiViTri hinhAnh={hinhAnh} viTri="sau_de" onZoom={onZoom} nhan={nhan} /></ExperimentOriginal>
         {body}
         <HinhTaiViTri hinhAnh={hinhAnh} viTri="cuoi_cau" onZoom={onZoom} nhan={nhan} />
         {xemLai && <LoiGiai props={props} nhan={props.nhanLoiGiai} />}

@@ -1,3 +1,4 @@
+import ExperimentDemo,{ExperimentOriginal} from './ExperimentDemo'
 // MỘT THẺ CÂU GẬP MỞ — đề, phương án, đáp án đúng, lời giải.
 //
 // TÁCH RA TỪ `PhieuScreen` (thầy chốt 06/09: "chỗ mục học sinh chọn câu hỏi bài
@@ -172,7 +173,8 @@ export default function TheCauChiTiet({ c, stt, mauSo, anLoiGiai = false, tick, 
                 {/* Ảnh cắt cả thân câu LÀ đề bài — có nó thì không in `de` nữa,
                     đúng như màn làm bài của học sinh. */}
                 {c.anhThanCau ? <Hinh src={c.anhThanCau} lop="than" alt="Đề bài" /> : <ChemText text={c.de} />}
-                <HinhTaiViTri c={c} viTri="sau_de" />
+                <ExperimentDemo text={c.de}/>
+                <ExperimentOriginal text={c.de} hasImages={Boolean(c.hinh?.some(h=>h.viTri==='sau_de'))}><HinhTaiViTri c={c} viTri="sau_de" /></ExperimentOriginal>
                 {/* Dòng này CHỈ còn khi câu có hình mà gói phiếu đã phải bỏ ảnh
                     ra vì quá cỡ (`giamGoiPhieu`). Còn ảnh thì nói "không kèm
                     hình" là nói sai chuyện đang xảy ra. */}
@@ -276,6 +278,7 @@ export default function TheCauChiTiet({ c, stt, mauSo, anLoiGiai = false, tick, 
                       <ChemText text={b} />
                     </div>
                   ))}
+
                   {c.ketQua && (
                     <div className="bc-giai-y" style={{ fontWeight: 700 }}>
                       Kết quả: <ChemText text={c.ketQua} />

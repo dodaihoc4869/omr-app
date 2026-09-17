@@ -188,7 +188,7 @@ describe('Tốc độ — mảnh mã chính không cõng thứ người khác kh
 
   it('game NẠP MUỘN — đo 14/09: ~234 KB nguồn game từng nằm trong mảnh chính', () => {
     // 14/09 chiều: thầy chốt bỏ hẳn Giải Cứu Người Yêu Cũ, chỉ còn Thần Thú.
-    expect(MAN_EM).toContain("lazy(() => import('../components/ThanThuHoaHocGame'))")
+    expect(MAN_EM).toContain("lazy(() => import('../game/than-thu-v2/Game'))")
     expect(MAN_EM).not.toMatch(/^import ThanThuHoaHocGame from/m)
     // và không còn dấu vết game đã bỏ
     expect(MAN_EM).not.toContain('GiaiCuuCongChua')

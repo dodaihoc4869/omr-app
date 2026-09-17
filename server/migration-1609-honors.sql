@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS daily_honors(day TEXT PRIMARY KEY,created_at TEXT NOT NULL,body TEXT NOT NULL);

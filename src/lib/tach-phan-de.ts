@@ -53,6 +53,8 @@ function chiPhan(s: TeacherExamSource, phan: PhanDe): TeacherExamSource {
 /** Ba mã con của một đề. Phần rỗng thì KHÔNG sinh mã — thầy không phải nhìn
  * "12-C1-B2-TLN · 0 câu" rồi chọn nhầm. */
 export function tachTheoPhan(s: TeacherExamSource): TeacherExamSource[] {
+  // Mục dạy học là một đơn vị chọn, kể cả khi chứa nhiều loại câu.
+  if (/·\s*DẠY HỌC\//i.test((s.nhom || '').normalize('NFC')) && /-(VD|DT)$/.test(s.maDe)) return [s]
   const co = PHAN_DE_TACH.filter((p) => (p === 'I' ? s.phanI.length : p === 'II' ? s.phanII.length : s.phanIII.length) > 0)
   // Đề vốn chỉ có MỘT phần (đề đã tách sẵn trong kho, hoặc đề chỉ có trắc
   // nghiệm) thì trả nguyên, không gắn thêm hậu tố — kẻo ra "12-C1-B2-TN-TN".

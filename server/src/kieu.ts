@@ -29,6 +29,8 @@ export interface R2Bucket {
   delete(keys: string | string[]): Promise<void>
 }
 export interface Env {
+  PUSH_PUBLIC_KEY?: string
+  PUSH_PRIVATE_KEY?: string
   DB: D1Database
   DE: R2Bucket
   /** Mã bí mật của thầy — đặt bằng `wrangler secret put MA_BI_MAT`, KHÔNG vào git. */

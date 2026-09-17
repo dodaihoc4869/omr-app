@@ -1,10 +1,11 @@
+import LogoPhuHuynh from './LogoPhuHuynh'
 import LogoGiaoVien from './LogoGiaoVien'
 import LogoHocSinh from './LogoHocSinh'
 
 export { LogoGiaoVien, LogoHocSinh }
 
 interface LogoAppProps {
-  vai?: 'giaovien' | 'hocsinh'
+  vai?: 'giaovien' | 'hocsinh' | 'phuhuynh'
   size?: number
   hienChu?: boolean
   className?: string
@@ -22,6 +23,7 @@ export default function LogoApp({
   className = '',
   phuDe,
 }: LogoAppProps) {
+  if (vai === 'phuhuynh') return <LogoPhuHuynh size={size} hienChu={hienChu} className={className} phuDe={phuDe} />
   if (vai === 'hocsinh') {
     return <LogoHocSinh size={size} hienChu={hienChu} className={className} phuDe={phuDe} />
   }

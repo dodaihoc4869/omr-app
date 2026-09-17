@@ -1,3 +1,13 @@
+import {homeworkQuestions,homeworkKeys,gradeHomework} from './btvn-grading'
+import {notifications,deliverNotices} from './notifications'
+import {dailyHonors} from './honors'
+import {teacherNews,recordPresence} from './teacher-news'
+import {parentNews,refreshDailyNews} from './parent-news'
+import { mom } from './mom'
+import { luyenDe } from './luyen-de'
+import {adminGame,parentGame} from './game-v2-reports'
+import { gameV2 } from './game-v2'
+import { gameToken, gameIdentity } from './game-v2-auth'
 // MÁY CHỦ MỚI — bốn lệnh nóng lúc thi (MAY-CHU-MOI.md).
 //
 // BA LUẬT KHÔNG ĐƯỢC PHÁ:
@@ -1383,6 +1393,7 @@ export function goPhanKhoiMaDe(ma: string): { goc: string; phan: 'I' | 'II' | 'I
 async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response> {
   // NHIỀU CA MỘT LƯỢT GIAO (thầy chốt 12/09: "cho tick chọn nhiều ca"). Nhận cả
   // `maCa` một ca của bản trước — bản cũ trên máy thầy vẫn gửi dáng ấy.
+  const dsSbdThem = [...new Set((Array.isArray(b.dsSbdThem) ? b.dsSbdThem : []).map(x=>String(x).trim()).filter(Boolean))]
   const dsSbd = Array.isArray(b.dsSbd)
     ? (b.dsSbd as unknown[]).map((x) => String(x).trim()).filter(Boolean)
     : []
@@ -1398,6 +1409,8 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
     dsMaCa.push('Riêng')
   }
 
+  if (dsSbdThem.length && !dsMaCa.includes('Riêng')) dsMaCa.push('Riêng')
+
   const dsMaDe = Array.isArray(b.dsMaDe)
     ? (b.dsMaDe as unknown[]).map((x) => String(x).trim()).filter(Boolean)
     : String(b.maDe ?? '').trim()
@@ -1405,7 +1418,7 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
       : []
 
   if (dsMaCa.length === 0 || dsMaDe.length === 0) return ra({ ok: false, error: 'Thiếu ca hoặc tờ đề' })
-  if (dsMaCa.length > 10) return ra({ ok: false, error: `Tối đa 10 ca một lượt giao, thầy đang tick ${dsMaCa.length} ca` })
+  if (dsMaCa.filter(c=>c!=='Riêng').length > 10) return ra({ ok: false, error: `Tối đa 10 ca một lượt giao, thầy đang tick ${dsMaCa.length} ca` })
   // TRẦN 12 TỜ một lượt giao: mỗi tờ tốn một lượt đọc R2 lúc đếm câu, và bài
   // của em cũng không nên là một trăm câu.
   if (dsMaDe.length > 12) return ra({ ok: false, error: `Tối đa 12 tờ một lượt giao, thầy đang tick ${dsMaDe.length} tờ` })
@@ -1451,7 +1464,9 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
   // cùng hạn nộp — hạn chốt MỘT lần ở đây để cả ba lớp cùng mốc.
   const nay = new Date()
   const giaoLuc = nay.toISOString()
-  const hanNop = new Date(nay.getTime() + HAN_BTVN_GIO * 3600 * 1000).toISOString()
+  const hanMsMoi = b.hanNop ? Date.parse(String(b.hanNop)) : nay.getTime() + HAN_BTVN_GIO * 3600 * 1000
+  if (!Number.isFinite(hanMsMoi) || hanMsMoi <= nay.getTime()) return ra({ok:false,error:'Hạn nộp phải là thời điểm trong tương lai.'})
+  const hanNop = new Date(hanMsMoi).toISOString()
 
 
   const lenh: D1PreparedStatement[] = []
@@ -1470,12 +1485,13 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
       .all<{ sbd: string; ten: string }>()
     let dsEm = rEm.results ?? []
 
-    if (dsSbd.length > 0) {
-      const setSbd = new Set(dsSbd)
+    const recipients = ca === 'Riêng' && dsSbdThem.length ? dsSbdThem : dsSbd
+    if (recipients.length > 0) {
+      const setSbd = new Set(recipients)
       const dsEmCaNay = dsEm.filter((e) => setSbd.has(String(e.sbd)))
-      if (dsMaCa.length === 1 && dsEmCaNay.length < dsSbd.length) {
+      if (ca === 'Riêng' && dsEmCaNay.length < recipients.length) {
         const daCo = new Set(dsEmCaNay.map((e) => String(e.sbd)))
-        const thieu = dsSbd.filter((s) => !daCo.has(s))
+        const thieu = recipients.filter((s) => !daCo.has(s))
         if (thieu.length > 0) {
           const ph = thieu.map(() => '?').join(',')
           const rThem = await env.DB.prepare(
@@ -1497,6 +1513,8 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
       caRong.push(ca)
       continue
     }
+    dsEm = dsEm.filter(e=>!emDaCo.has(String(e.sbd)))
+    if (!dsEm.length) continue
     const maBtvn = `${ca}-${nay.getTime().toString(36)}`
     lenh.push(
       env.DB.prepare(
@@ -1533,42 +1551,15 @@ async function btvnCuaEm(env: Env, b: Record<string, unknown>): Promise<Response
   const sbd = String(b.sbd ?? '').trim()
   if (!maCa || !sbd) return ra({ ok: false, lyDo: 'thieu' })
 
-  let bt = maCa
-    ? await env.DB.prepare('SELECT * FROM btvn WHERE ma_ca = ? AND da_xoa = 0 ORDER BY giao_luc DESC LIMIT 1')
-        .bind(maCa)
-        .first<Record<string, unknown>>()
-    : null
-
-  let em: Record<string, unknown> | null = null
-  if (bt) {
-    em = await env.DB.prepare('SELECT * FROM btvn_em WHERE khoa = ?').bind(`${bt.ma_btvn}|${sbd}`).first<Record<string, unknown>>()
-  }
-
-  if (!bt || !em) {
-    const btEm = await env.DB.prepare(
-      `SELECT b.*, be.nop_luc AS em_nop_luc, be.so_dung AS em_so_dung, be.so_cau AS em_so_cau
-         FROM btvn b JOIN btvn_em be ON be.ma_btvn = b.ma_btvn
-        WHERE be.sbd = ? AND b.da_xoa = 0
-        ORDER BY b.giao_luc DESC LIMIT 1`,
-    )
-      .bind(sbd)
-      .first<Record<string, unknown>>()
-    if (btEm) {
-      bt = btEm
-      em = {
-        khoa: `${btEm.ma_btvn}|${sbd}`,
-        ma_btvn: btEm.ma_btvn,
-        sbd,
-        nop_luc: btEm.em_nop_luc,
-        so_dung: btEm.em_so_dung,
-        so_cau: btEm.em_so_cau,
-      }
-    } else if (!bt) {
-      return ra({ ok: false, lyDo: 'chua_giao', error: 'Ca này chưa được giao bài tập về nhà' })
-    } else {
-      return ra({ ok: false, lyDo: 'khong_duoc_giao', error: 'Em không có bài tập của ca này' })
-    }
-  }
+  const maBtvn = String(b.maBtvn ?? '').trim()
+  // Mở đúng lượt giao đã bấm; tuyệt đối không thay bằng bài mới nhất của em.
+  const bt = await env.DB.prepare(maBtvn
+    ? 'SELECT b.* FROM btvn b JOIN btvn_em e ON e.ma_btvn=b.ma_btvn WHERE b.ma_btvn=? AND e.sbd=? AND e.thu_hoi=0 AND b.da_xoa=0'
+    : 'SELECT b.* FROM btvn b JOIN btvn_em e ON e.ma_btvn=b.ma_btvn WHERE b.ma_ca=? AND e.sbd=? AND e.thu_hoi=0 AND b.da_xoa=0 ORDER BY b.giao_luc DESC LIMIT 1')
+    .bind(maBtvn || maCa,sbd).first<Record<string,unknown>>()
+  if (!bt) return ra({ok:false,lyDo:'khong_duoc_giao',error:'Bài này đã được thu hồi hoặc chưa được giao cho em.'})
+  const em = await env.DB.prepare('SELECT * FROM btvn_em WHERE khoa=?').bind(`${bt.ma_btvn}|${sbd}`).first<Record<string,unknown>>()
+  if (!em || em.thu_hoi) return ra({ok:false,lyDo:'khong_duoc_giao',error:'Em không có bài tập này.'})
 
   const hanMs = mocMs(String(bt.han_nop ?? ''))
   const quaHan = hanMs > 0 && Date.now() > hanMs
@@ -1576,46 +1567,9 @@ async function btvnCuaEm(env: Env, b: Record<string, unknown>): Promise<Response
     return ra({ ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN', hanNop: String(bt.han_nop ?? '') })
   }
 
-  // Gói đề đầy đủ nằm ở R2 `kho/`. TRẢ NGUYÊN GÓI, đúng thứ tự kho.
-  //
-  // Từ 12/09 một lượt giao có thể gồm NHIỀU tờ đề (`ma_de` là danh sách nối
-  // bằng dấu phẩy). Gộp theo ĐÚNG THỨ TỰ THẦY TÍCH, và giữ nguyên thứ tự câu
-  // trong từng tờ — cấm xáo, cấm lọc, đúng luật của phiếu bài tập.
-  const dsMaDe = String(bt.ma_de ?? '')
-    .split(',')
-    .map((x) => x.trim())
-    .filter(Boolean)
-  let goi: unknown = null
-  if (env.DE && dsMaDe.length > 0) {
-    const gom: unknown[] = []
-    // Một tờ có thể xuất hiện nhiều lần (thầy tick cả ba phần của nó), nên đọc
-    // R2 MỘT lần rồi dùng lại — không tải cùng một gói ba lượt.
-    const daDoc = new Map<string, Record<string, unknown>[]>()
-    for (const m of dsMaDe) {
-      const { goc, phan } = goPhanKhoiMaDe(m)
-      if (!daDoc.has(goc)) {
-        const o = await env.DE.get(`kho/${goc}.json`)
-        if (!o?.body) {
-          daDoc.set(goc, [])
-        } else {
-          try {
-            daDoc.set(goc, docCauTuGoiDe((await new Response(o.body).json()) as Record<string, unknown>))
-          } catch {
-            // Một tờ hỏng thì BỎ TỜ ẤY, không làm chết cả phiếu của em.
-            daDoc.set(goc, [])
-          }
-        }
-      }
-      const cau = daDoc.get(goc) ?? []
-      for (const c of phan ? cau.filter((x) => String(x.phan ?? '') === phan) : cau) gom.push(c)
-    }
-    // DÁNG GÓI PHẢI LÀ KHUÔN KHO (`ma_de` + `cau`): máy em nạp nó qua ĐÚNG cửa
-    // `parseKhoDeJson` đang dùng cho phiếu khắc phục, nên câu thiếu phương án
-    // hay thiếu đáp án bị loại ngay tại cửa thay vì hiện ra một ô trống cho em
-    // ngồi đoán.
-    if (gom.length > 0) goi = { ma_de: dsMaDe.join(','), cau: gom }
-  }
-  if (!goi) return ra({ ok: false, lyDo: 'mat_goi_de', error: 'Chưa tải được đề bài tập' })
+  let goi
+  try {goi={ma_de:String(bt.ma_de),cau:await homeworkQuestions(env,String(bt.ma_de))}}
+  catch {return ra({ok:false,error:'Chưa tải đủ đề bài tập. Em thử lại.'})}
 
   const soLanLam = Math.max(1, Number(em.so_lan_lam) || 1)
   const soLanLamLaiConLai = em.nop_luc ? Math.max(0, 4 - soLanLam) : 3
@@ -1642,45 +1596,49 @@ async function nopBtvn(env: Env, b: Record<string, unknown>): Promise<Response> 
   const sbd = String(b.sbd ?? '').trim()
   if (!maBtvn || !sbd) return ra({ ok: false, lyDo: 'thieu' })
 
-  const bt = await env.DB.prepare('SELECT han_nop FROM btvn WHERE ma_btvn = ? AND da_xoa = 0').bind(maBtvn).first<{ han_nop: string }>()
-  if (!bt) return ra({ ok: false, lyDo: 'khong_co' })
-  const hanMs = mocMs(String(bt.han_nop ?? ''))
-  if (hanMs > 0 && Date.now() > hanMs) return ra({ ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN' })
+  const bt=await env.DB.prepare('SELECT * FROM btvn WHERE ma_btvn=? AND da_xoa=0').bind(maBtvn).first<Record<string,unknown>>()
+  if(!bt)return ra({ok:false,error:'Không có bài tập.'})
+  return ra(await G.nopBtvnQuaPhieu(env,bt,sbd,(b.dapAn||{}) as Record<string,unknown>))
+}
 
-  const khoa = `${maBtvn}|${sbd}`
-  const cu = await env.DB.prepare('SELECT nop_luc, COALESCE(so_lan_lam, 1) AS so_lan_lam FROM btvn_em WHERE khoa = ?')
-    .bind(khoa)
-    .first<{ nop_luc: string | null; so_lan_lam: number }>()
-  if (!cu) return ra({ ok: false, lyDo: 'khong_duoc_giao' })
+async function xemBaiBtvn(env:Env,b:Record<string,unknown>):Promise<Response>{
+ const em=await env.DB.prepare('SELECT e.*,b.ma_de FROM btvn_em e JOIN btvn b ON b.ma_btvn=e.ma_btvn WHERE e.ma_btvn=? AND e.sbd=?').bind(String(b.maBtvn||''),String(b.sbd||'')).first<Record<string,unknown>>()
+ if(!em?.nop_luc)return ra({ok:false,error:'Học sinh chưa có bài nộp.'})
+ try{
+  const cau=await homeworkQuestions(env,String(em.ma_de))
+  const graded=gradeHomework(homeworkKeys(cau),JSON.parse(String(em.dap_an_json||'{}')),String(em.ma_de))
+  return ra({ok:true,hoTen:em.ho_ten,sbd:em.sbd,nopLuc:em.nop_luc,...graded,de:{ma_de:em.ma_de,cau}})
+ }catch(e){return ra({ok:false,error:e instanceof Error?e.message:'Chưa mở được bài.'})}
+}
 
-  const nay = new Date().toISOString()
-  if (cu.nop_luc) {
-    const daLam = Math.max(1, Number(cu.so_lan_lam) || 1)
-    if (daLam >= 4) {
-      const da = await env.DB.prepare('SELECT nop_luc FROM btvn_em WHERE khoa = ?').bind(khoa).first<{ nop_luc: string }>()
-      if (da?.nop_luc) return ra({ ok: true, daNhan: true, nopLuc: da.nop_luc, hetLuot: true })
-      return ra({ ok: false, lyDo: 'khong_duoc_giao' })
-    }
-    const lanMoi = daLam + 1
-    await env.DB.prepare(
-      `UPDATE btvn_em SET nop_luc = ?, so_dung = ?, so_cau = ?, dap_an_json = ?, so_lan_lam = ? WHERE khoa = ?`,
-    ).bind(nay, Number(b.soDung) || 0, Number(b.soCau) || 0, JSON.stringify(b.dapAn ?? {}), lanMoi, khoa).run()
-    return ra({ ok: true, nopLuc: nay, lanThu: lanMoi, soLanLamLaiConLai: Math.max(0, 4 - lanMoi) })
-  }
-
-  // KHOÁ CHỐNG TRÙNG nằm trong WHERE: nộp rồi thì câu này không đổi dòng nào.
-  const r = await env.DB.prepare(
-    `UPDATE btvn_em SET nop_luc = ?, so_dung = ?, so_cau = ?, dap_an_json = ?, so_lan_lam = 1
-      WHERE khoa = ? AND nop_luc IS NULL`,
-  )
-    .bind(nay, Number(b.soDung) || 0, Number(b.soCau) || 0, JSON.stringify(b.dapAn ?? {}), khoa)
-    .run()
-  if (r.meta.changes === 0) {
-    const da = await env.DB.prepare('SELECT nop_luc FROM btvn_em WHERE khoa = ?').bind(`${maBtvn}|${sbd}`).first<{ nop_luc: string }>()
-    if (da?.nop_luc) return ra({ ok: true, daNhan: true, nopLuc: da.nop_luc })
-    return ra({ ok: false, lyDo: 'khong_duoc_giao' })
-  }
-  return ra({ ok: true, nopLuc: nay, lanThu: 1, soLanLamLaiConLai: 3 })
+async function suaBtvn(env:Env,b:Record<string,unknown>):Promise<Response> {
+ const id=String(b.maBtvn??'').trim()
+ if(!id)return ra({ok:false,error:'Thiếu mã bài.'})
+ const bt=await env.DB.prepare('SELECT ma_btvn FROM btvn WHERE ma_btvn=? AND da_xoa=0').bind(id).first()
+ if(!bt)return ra({ok:false,error:'Bài không còn được giao.'})
+ if(b.sbd){
+   const khoa=`${id}|${String(b.sbd).trim()}`
+   const em=await env.DB.prepare('SELECT * FROM btvn_em WHERE khoa=?').bind(khoa).first<Record<string,unknown>>()
+   if(!em)return ra({ok:false,error:'Học sinh không có trong lượt giao này.'})
+   if(b.hanhDong!=='reset'&&b.hanhDong!=='thu-hoi')return ra({ok:false,error:'Thao tác không hợp lệ.'})
+   if(b.hanhDong==='reset'){
+     const han=await env.DB.prepare('SELECT han_nop FROM btvn WHERE ma_btvn=?').bind(id).first<{han_nop:string}>()
+     if(!han||Date.parse(han.han_nop)<=Date.now())return ra({ok:false,error:'Thầy gia hạn nộp trước khi cho học sinh làm lại.'})
+   }
+   await env.DB.batch([
+     env.DB.prepare('INSERT INTO btvn_em_lich_su(id,khoa,luu_luc,hanh_dong,du_lieu) VALUES(?,?,?,?,?)').bind(crypto.randomUUID(),khoa,new Date().toISOString(),String(b.hanhDong),JSON.stringify(em)),
+     b.hanhDong==='thu-hoi'?env.DB.prepare('UPDATE btvn_em SET thu_hoi=1 WHERE khoa=?').bind(khoa):env.DB.prepare('UPDATE btvn_em SET thu_hoi=0,nop_luc=NULL,so_dung=NULL,so_cau=NULL,dap_an_json=NULL,so_lan_lam=1 WHERE khoa=?').bind(khoa)
+   ])
+   return ra({ok:true})
+ }
+ if(b.thuHoi===true){
+   await env.DB.prepare('UPDATE btvn SET da_xoa=1,cap_nhat_luc=? WHERE ma_btvn=?').bind(new Date().toISOString(),id).run()
+ }else{
+   const ms=Date.parse(String(b.hanNop??''))
+   if(!Number.isFinite(ms)||ms<=Date.now())return ra({ok:false,error:'Hạn nộp phải là thời điểm trong tương lai.'})
+   await env.DB.prepare('UPDATE btvn SET han_nop=?,cap_nhat_luc=? WHERE ma_btvn=? AND da_xoa=0').bind(new Date(ms).toISOString(),new Date().toISOString(),id).run()
+ }
+ return ra({ok:true})
 }
 
 /** THẦY THEO DÕI — đã nộp / chưa nộp, kèm tên em chưa nộp để nhắc. */
@@ -1693,7 +1651,7 @@ async function theoDoiBtvn(env: Env, b: Record<string, unknown>): Promise<Respon
   const ds = []
   for (const bt of r.results ?? []) {
     const maBtvn = String(bt.ma_btvn ?? '')
-    const em = await env.DB.prepare('SELECT sbd, ho_ten, nop_luc, so_dung, so_cau FROM btvn_em WHERE ma_btvn = ? ORDER BY sbd')
+    const em = await env.DB.prepare('SELECT sbd, ho_ten, nop_luc, so_dung, so_cau, thu_hoi FROM btvn_em WHERE ma_btvn = ? ORDER BY sbd')
       .bind(maBtvn)
       .all<Record<string, unknown>>()
     const dsEm = em.results ?? []
@@ -1705,10 +1663,11 @@ async function theoDoiBtvn(env: Env, b: Record<string, unknown>): Promise<Respon
       giaoLuc: String(bt.giao_luc ?? ''),
       hanNop: String(bt.han_nop ?? ''),
       quaHan: mocMs(String(bt.han_nop ?? '')) > 0 && Date.now() > mocMs(String(bt.han_nop ?? '')),
-      tong: dsEm.length,
-      daNop: dsEm.filter((x) => x.nop_luc).length,
+      hocSinh: dsEm.map(x=>({sbd:String(x.sbd),hoTen:String(x.ho_ten||''),nopLuc:x.nop_luc,soDung:x.so_dung,soCau:x.so_cau,thuHoi:!!x.thu_hoi})),
+      tong: dsEm.filter(x=>!x.thu_hoi).length,
+      daNop: dsEm.filter((x) => x.nop_luc&&!x.thu_hoi).length,
       // Tên em CHƯA nộp, để thầy nhắc đúng người.
-      chuaNop: dsEm.filter((x) => !x.nop_luc).map((x) => ({ sbd: String(x.sbd ?? ''), hoTen: String(x.ho_ten ?? '') })),
+      chuaNop: dsEm.filter((x) => !x.nop_luc&&!x.thu_hoi).map((x) => ({ sbd: String(x.sbd ?? ''), hoTen: String(x.ho_ten ?? '') })),
     })
   }
   return ra({ ok: true, ds })
@@ -1772,18 +1731,28 @@ async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
   // "số câu từng tờ" báo lệch 55 tờ, dù gói trên R2 không thiếu câu nào.
   const soCauThat = cauDs.length > 0 ? cauDs.length : de ? docCauTuGoiDe(de as Record<string, unknown>).length : 0
 
+  // NGÀY NẠP nằm TRONG GÓI (`ngay_nap`), không nằm ở chỗ gọi: kho sửa lời giải
+  // hay nạp thêm câu là đổi dấu này, app so dấu là biết phải tải lại tờ ấy.
+  // Chép xuống D1 để `danhSachDe` trả được mà khỏi phải mở 225 gói trên R2.
+  const goi = de && typeof de === 'object' ? (de as Record<string, unknown>) : null
+  const ngayNap = String(goi?.ngay_nap ?? b.ngayNap ?? '')
+  const nhomDang = /^((?:10|11|12)) · DẠNG BÀI\/(.+)$/.exec(String(goi?.nhom ?? ''))
+  const tenDeLuu = maDe.startsWith('DB-') && nhomDang && String(goi?.nguon ?? '').trim()
+    ? ['Dạng bài', nhomDang[1], nhomDang[2], String(goi?.nguon).trim()].join(' · ')
+    : String(b.tenDe ?? '')
   const nay = new Date().toISOString()
   const lenh: D1PreparedStatement[] = [
     env.DB.prepare(
-      `INSERT INTO de_kho (ma_de, ten_de, lop, chuyen_de, so_cau, r2_khoa, da_xoa, cap_nhat_luc)
-       VALUES (?,?,?,?,?,?,0,?)
+      `INSERT INTO de_kho (ma_de, ten_de, lop, chuyen_de, so_cau, r2_khoa, da_xoa, cap_nhat_luc, ngay_nap)
+       VALUES (?,?,?,?,?,?,0,?,?)
        ON CONFLICT(ma_de) DO UPDATE SET
          ten_de=COALESCE(NULLIF(excluded.ten_de,''), de_kho.ten_de),
          lop=COALESCE(NULLIF(excluded.lop,''), de_kho.lop),
          chuyen_de=COALESCE(NULLIF(excluded.chuyen_de,''), de_kho.chuyen_de),
          so_cau=excluded.so_cau, r2_khoa=excluded.r2_khoa, da_xoa=0,
-         cap_nhat_luc=excluded.cap_nhat_luc`,
-    ).bind(maDe, String(b.tenDe ?? ''), String(b.lop ?? ''), String(b.chuyenDe ?? ''), soCauThat, de ? khoa : null, nay),
+         cap_nhat_luc=excluded.cap_nhat_luc,
+         ngay_nap=COALESCE(NULLIF(excluded.ngay_nap,''), de_kho.ngay_nap)`,
+    ).bind(maDe, tenDeLuu, String(b.lop ?? ''), String(b.chuyenDe ?? ''), soCauThat, de ? khoa : null, nay, ngayNap),
   ]
   // Chỉ mục câu: đẩy lại một đề thì chỉ mục cũ của ĐÚNG đề ấy phải đi, kẻo câu
   // đã xoá khỏi đề vẫn còn được rút ra cho em.
@@ -1824,6 +1793,13 @@ async function danhSachDeKho(env: Env, b: Record<string, unknown>): Promise<Resp
       soCau: Number(x.so_cau) || 0,
       daXoa: Number(x.da_xoa) === 1,
       capNhatLuc: String(x.cap_nhat_luc ?? ''),
+      // NGÀY NẠP — app so trường này để biết tờ nào phải tải lại
+      // (`exam-sync.ts · chonDeCanTai`). Bản cũ KHÔNG trả nó: app nhận '' cho
+      // cả 225 tờ, so với ngày thật trong gói đang giữ ⇒ tờ NÀO CŨNG "đã đổi"
+      // ⇒ mỗi lượt Đồng bộ tải lại cả kho và đẩy lại ngân hàng của mọi ca đã
+      // mở, chạy mãi không xong. Nhìn từ phía thầy y hệt "bấm đồng bộ mà không
+      // vào". Đó là lỗi 16/09.
+      ngayNap: String(x.ngay_nap ?? ''),
     })),
   })
 }
@@ -2611,6 +2587,7 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
 }
 
 export default {
+  async scheduled(event:{cron:string}, env:Env) { if(event.cron==='1 17 * * *')await Promise.all([refreshDailyNews(env),dailyHonors(env,false)]);else await deliverNotices(env) },
   async fetch(req: Request, env: Env): Promise<Response> {
     const url = new URL(req.url)
     const p = url.pathname
@@ -2665,7 +2642,25 @@ export default {
       if (p === '/nop') return nop(env, b)
       if (p === '/trang-thai') return dayTrangThai(env, b)
       if (p === '/phong-cho') return ghiPhongCho(env, b)
-      if (p === '/hs/dang-nhap') return ra(await G.hsDangNhap(env, b))
+      if (p === '/hs/dang-nhap') {
+        const result = await G.hsDangNhap(env, b)
+        if (result.ok && !result.chuaCoMatKhau) {
+          try { result.token = await gameToken(env, String(result.sbd)) } catch { /* Game must not block academic login. */ }
+        }
+        return ra(result)
+      }
+      if(p.startsWith('/notifications/'))return ra(await notifications(env,p.slice('/notifications/'.length),b))
+      if (p === '/daily-honors') return ra(await dailyHonors(env))
+      if (p === '/presence') return ra(await recordPresence(env,b))
+      if (p.startsWith('/student-news/')) {
+        const sbd = await gameIdentity(env,b)
+        return ra(await parentNews(env,p.slice('/student-news/'.length),{sbd}))
+      }
+      if (p.startsWith('/parent-news/')) return ra(await parentNews(env,p.slice('/parent-news/'.length),b))
+      if (p.startsWith('/mom/')) return ra(await mom(env,p.slice('/mom/'.length),b))
+      if (p === '/game-v2-parent') return ra(await parentGame(env,b))
+      if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
+      if (p.startsWith('/game-v2/')) return ra(await gameV2(env, p.slice('/game-v2/'.length), b))
       if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))
       if (p === '/hs/lich-su') return ra(await G.hsLichSuCa(env, b))
       if (p === '/hs/cau-sai') return ra(await G.hsCauSai(env, b))
@@ -2690,6 +2685,8 @@ export default {
 
       // Lệnh của THẦY — đòi mã bí mật.
       if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
+      if (p === '/teacher-news') return ra(await teacherNews(env,b))
+      if (p === '/game-v2-admin') return ra(await adminGame(env,b))
       if (p === '/ca/day') return dayCa(env, b)
       if (p === '/danh-sach/day') return dayDanhSach(env, b)
       if (p === '/phieu/day') return dayPhieu(env, b)
@@ -2718,7 +2715,9 @@ export default {
       if (p === '/kho/xoa') return xoaDeKho(env, b)
       if (p === '/kho/rut-cau') return rutCau(env, b)
       if (p === '/kho/chi-muc') return dungChiMucKho(env, b)
+      if (p === '/btvn/sua') return suaBtvn(env,b)
       if (p === '/btvn/giao') return giaoBtvn(env, b)
+      if (p === '/btvn/bai-lam') return xemBaiBtvn(env,b)
       if (p === '/btvn/theo-doi') return theoDoiBtvn(env, b)
       if (p === '/dong-bo/dau') return ghiDauDongBo(env, b)
       if (p === '/cho') return xemPhongCho(env, String(b.maCa ?? ''))

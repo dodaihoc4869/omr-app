@@ -29,7 +29,7 @@ function oMau(them: Partial<OBang> = {}): OBang {
     sbd: '12121212',
     hoTen: 'Nguyễn Văn A',
     soCau: 7,
-    cau: { phan: 'I', de: 'Cho phản ứng nhiệt nhôm', luaChon: [], dapAn: 'A', loiGiai: '' } as unknown as OBang['cau'],
+    cau: { phan: 'I', text: 'Cho phản ứng nhiệt nhôm', luaChon: [], dapAn: 'A', loiGiai: '' } as unknown as OBang['cau'],
     ...them,
   }
 }
@@ -129,7 +129,7 @@ describe('Tờ chiếu in ra góc thần thú', () => {
     const html = taoHtmlMayChieu([oMau({ thanThu: thu })])
     expect(html).toContain('<aside class="mc-thu">')
     expect(html).toContain('Lôi Kim Thú Điện Cực')
-    expect(html).toContain('Hình thái 6/12')
+    expect(html).toContain('Cấp 6/120')
     expect(html).toContain('Thức Tỉnh Hào Quang')
     expect(html).toContain('Tháp tầng 14')
     expect(html).toContain('thanh tẩy 27 câu')

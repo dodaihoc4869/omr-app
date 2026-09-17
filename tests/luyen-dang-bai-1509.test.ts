@@ -135,8 +135,8 @@ describe('Mục 4 — tờ dạng bài không được đếm hai lần', () => 
   it('so_cau đếm TRÊN GÓI, không trên chỉ mục', () => {
     // Chốt số 2. Đếm trên chỉ mục là cả 55 dạng hiện "0 câu" trên menu.
     expect(congChu).toContain('const soCauThat = cauDs.length > 0 ? cauDs.length : de ? docCauTuGoiDe(de as Record<string, unknown>).length : 0')
-    expect(congChu).toContain("String(b.chuyenDe ?? ''), soCauThat, de ? khoa : null, nay)")
-    expect(congChu).not.toContain("String(b.chuyenDe ?? ''), cauDs.length, de ? khoa : null, nay)")
+    expect(congChu).toContain("String(b.chuyenDe ?? ''), soCauThat, de ? khoa : null, nay")
+    expect(congChu).not.toContain("String(b.chuyenDe ?? ''), cauDs.length, de ? khoa : null, nay")
   })
 })
 

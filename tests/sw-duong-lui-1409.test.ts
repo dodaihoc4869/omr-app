@@ -60,7 +60,8 @@ describe('service worker viết tay', () => {
 
   it('vẫn precache đủ tệp, vẫn bỏ 404.html', () => {
     expect(SW).toContain('precacheAndRoute(self.__WB_MANIFEST)')
-    expect(VITE).toContain("globIgnores: ['**/404.html']")
+    expect(VITE).toMatch(/globIgnores:\s*\[[^\]]*'\*\*\/404\.html'/)
+    expect(VITE).toContain("'**/than-thu-v2/**'")
     expect(VITE).toContain("globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,woff,woff2,ttf}']")
   })
 })

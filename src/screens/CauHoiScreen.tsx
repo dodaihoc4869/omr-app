@@ -1,3 +1,4 @@
+import NhomCaThuGon from '../components/NhomCaThuGon'
 // HỌC SINH HỎI — màn riêng, vào từ ô ngoài màn chính (thầy chốt 06/09).
 //
 // Trước đó câu hỏi của em nằm lẫn trong Chi tiết ca: thầy phải nhớ ca nào rồi
@@ -165,7 +166,7 @@ export default function CauHoiScreen() {
 
   if (mo) {
     return (
-      <div className="min-h-screen pb-24 px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)' }}>
+      <div className="gv-page min-h-screen pb-24 px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)' }}>
         <button
           type="button"
           onClick={() => setMo(null)}
@@ -191,8 +192,8 @@ export default function CauHoiScreen() {
   const daChonHet = Boolean(ds && ds.length > 0 && chon.size === ds.length)
 
   return (
-    <div className="min-h-screen pb-24 px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)' }}>
-      <header style={{ paddingTop: 'var(--k2)' }}>
+    <div className="gv-page min-h-screen pb-24 px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)' }}>
+      <header className="gv-page-header" style={{ paddingTop: 'var(--k2)' }}>
         <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--mo)', letterSpacing: '.16em', textTransform: 'uppercase' }}>Đỗ Đại Học</div>
         <h1 className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-5)', lineHeight: 1.15, marginTop: 2 }}>
           {laRac ? 'Thùng rác' : 'Học sinh hỏi'}
@@ -247,7 +248,7 @@ export default function CauHoiScreen() {
         </div>
       )}
 
-      {ds?.map((c) => {
+      <NhomCaThuGon ds={ds||[]} selected={c=>chon.has(c.maCa)} render={(c) => {
         const daChon = chon.has(c.maCa)
         return (
           <div
@@ -280,7 +281,7 @@ export default function CauHoiScreen() {
             </button>
           </div>
         )
-      })}
+      }}/>
 
       {ds && ds.length > 0 && (
         <div style={NHAN}>

@@ -36,108 +36,153 @@ export interface ThanThuInfo {
 }
 
 export const DANH_SACH_THAN_THU: Record<string, ThanThuInfo> = {
-  hoa_long: {
-    id: 'hoa_long',
-    ten: 'Nhiệt Nhôm Triều Dương Phượng',
-    danhHieu: '2Al + Fe₂O₃ — Hoàn Cầu Thiêu Thiết Hoả Đế',
-    he: 'hoa',
+  // ─── TỨ ĐẠI TỰ NHIÊN ───
+  dat_quy: {
+    id: 'dat_quy',
+    ten: 'Hoàng Giáp Cương Nham Thần Quy',
+    danhHieu: 'SiO₂ + CaCO₃ — Thái Sơn Thạch Giáp Trấn Địa Quân',
+    he: 'dat',
+    mauChinh: 'rgb(180, 83, 9)',
+    mauPhu: 'rgb(217, 119, 6)',
+    mauHaoQuang: 'rgba(217, 119, 6, 0.45)',
+    moTa: 'Tích tụ từ mạng lưới tinh thể Silicate (SiO₂) và lớp kết tủa CaCO₃, BaSO₄ ngàn năm không tan. Sở hữu lớp mai tinh thể cứng như kim cương.',
+    kyNangThuong: 'Thạch Nham Trấn Giáp',
+    kyNangNo: 'CONTINENTAL CRUST IMPACT — Đại Địa Băng Liệt Kích',
+    nguyenToGoc: 'SiO₂ + CaCO₃',
+  },
+  nuoc_long: {
+    id: 'nuoc_long',
+    ten: 'Vương Thuỷ Lam Giao Thần Long',
+    danhHieu: 'H₂O + H⁺ — Cửu Uyên Triều Tịch Hải Hoàng Long',
+    he: 'nuoc',
+    mauChinh: 'rgb(14, 165, 233)',
+    mauPhu: 'rgb(2, 132, 199)',
+    mauHaoQuang: 'rgba(56, 189, 248, 0.45)',
+    moTa: 'Ngưng tụ từ hàng tỷ liên kết hydro bền vững trong H₂O tinh khiết, dung môi vạn năng có khả năng hoà tan và phân ly mọi hợp chất ion.',
+    kyNangThuong: 'Lam Triều Thuỷ Trảm',
+    kyNangNo: 'HYDROGEN VORTEX TSUNAMI — Hải Triều Cực Hạn Luân Hồi',
+    nguyenToGoc: 'H₂O + H⁺',
+  },
+  lua_phuong: {
+    id: 'lua_phuong',
+    ten: 'Xích Diệm Nhiệt Nhôm Phượng',
+    danhHieu: '2Al + Fe₂O₃ — Triều Dương Thiêu Thiết Đế Quân',
+    he: 'lua',
     mauChinh: 'rgb(239, 68, 68)',
     mauPhu: 'rgb(249, 115, 22)',
     mauHaoQuang: 'rgba(239, 68, 68, 0.45)',
-    moTa: 'Sinh ra từ phản ứng nhiệt nhôm bộc phát giữa Al và Fe₂O₃ ở 2000°C. Mang sức mạnh bộc phá cực hạn.',
+    moTa: 'Sinh ra từ phản ứng nhiệt nhôm bộc phát giữa Al và Fe₂O₃ ở 2000°C làm tan chảy sắt thép, toả nhiệt lượng khổng lồ.',
     kyNangThuong: 'Hoả Vũ Nhiệt Nhôm',
     kyNangNo: 'SOLAR FLARE ERUPTION — Bùng Nổ Hào Quang Mặt Trời',
     nguyenToGoc: 'Al + Fe₂O₃',
   },
-  thuy_quai: {
-    id: 'thuy_quai',
-    ten: 'Cường Toan Ngân Hà Kỳ Lân',
-    danhHieu: 'HNO₃ : HCl = 1 : 3 — Hoá Kim Nhất Giác Vương',
-    he: 'axit',
-    mauChinh: 'rgb(168, 85, 247)',
-    mauPhu: 'rgb(99, 102, 241)',
-    mauHaoQuang: 'rgba(168, 85, 247, 0.45)',
-    moTa: 'Tích tụ từ nước cường toan — HNO₃ đặc trộn HCl đặc theo tỉ lệ 1 : 3. Rút cạn sinh lực và ăn mòn mọi lớp giáp kiềm kim.',
-    kyNangThuong: 'Giác Xung Cường Toan',
-    kyNangNo: 'GALAXY CROWN LASER — Tia Vương Miện Ngân Hà',
-    nguyenToGoc: 'HNO₃ + 3HCl',
-  },
-  thiet_giap: {
-    id: 'thiet_giap',
-    ten: 'Trầm Tủa Vạn Niên Thần Quy',
-    danhHieu: 'Ba²⁺ + SO₄²⁻ — Lõi Thời Không Bất Tan Đế',
-    he: 'kiem',
-    mauChinh: 'rgb(14, 165, 233)',
-    mauPhu: 'rgb(234, 179, 8)',
-    mauHaoQuang: 'rgba(14, 165, 233, 0.45)',
-    moTa: 'Kết tinh từ mạng lưới tinh thể base bền vững và kết tủa BaSO₄. Tạo màn chắn trung hoà mọi loại acid.',
-    kyNangThuong: 'Kết Tủa Trấn Giáp',
-    kyNangNo: 'CHRONO-CORE CANON ARRAY — Dàn Pháo Lõi Thời Không',
-    nguyenToGoc: 'Ba(OH)₂ + Na₂SO₄',
-  },
-  loi_dieu: {
-    id: 'loi_dieu',
-    ten: 'Halogen Cung Đình Thần Long',
-    danhHieu: 'F₂ · Cl₂ — Bích Ngọc Cửu Trùng Phệ Kim Long Đế',
+  khi_bang: {
+    id: 'khi_bang',
+    ten: 'Thanh Phong Bão Tố Thiên Bằng',
+    danhHieu: 'F₂ · Cl₂ — Cửu Trùng Cuồng Phong Halogen Đế',
     he: 'khi',
-    mauChinh: 'rgb(34, 197, 94)',
-    mauPhu: 'rgb(16, 185, 129)',
-    mauHaoQuang: 'rgba(34, 197, 94, 0.45)',
-    moTa: 'Hấp thụ khí fluorine và chlorine. Fluorine có độ âm điện lớn nhất bảng tuần hoàn.',
-    kyNangThuong: 'Long Tức Halogen',
-    kyNangNo: 'ULTIMATE JADE BLAST — Bích Ngọc Huỷ Diệt Quang',
-    nguyenToGoc: 'F₂, Cl₂',
+    mauChinh: 'rgb(16, 185, 129)',
+    mauPhu: 'rgb(52, 211, 153)',
+    mauHaoQuang: 'rgba(16, 185, 129, 0.45)',
+    moTa: 'Hấp thụ khí Halogen F₂, Cl₂ có tính oxi hoá mãnh liệt và động học phân tử chất khí khuếch tán với tốc độ cực đại.',
+    kyNangThuong: 'Phong Nhẫn Halogen',
+    kyNangNo: 'HURRICANE PRESSURE ZERO — Bão Tố Chân Không Tuyệt Diệt',
+    nguyenToGoc: 'F₂ + Cl₂',
   },
-  // ─── HAI HỆ MỚI, thầy chốt 15-09 ───
-  loi_kim: {
-    id: 'loi_kim',
-    ten: 'Điện Cực Sơn Lâm Kim Lân',
-    danhHieu: 'Zn‖Cu²⁺ — Băng Sương Lôi Đình Chi Chủ',
-    he: 'dien',
-    mauChinh: 'rgb(100, 116, 139)',
-    mauPhu: 'rgb(56, 189, 248)',
-    mauHaoQuang: 'rgba(56, 189, 248, 0.45)',
-    moTa: 'Sinh ra trong pin Zn–Cu, nơi electron chạy từ cực âm sang cực dương. Càng đứng trước trong dãy điện hoá, tính khử càng mạnh.',
-    kyNangThuong: 'Lôi Trảo Điện Cực',
-    kyNangNo: 'CHILLING FROST ROAR — Băng Sương Nộ Hống',
-    nguyenToGoc: 'Zn | Cu²⁺',
+
+  // ─── TỨ TRỤ TÂM THỨC ───
+  ductin_su: {
+    id: 'ductin_su',
+    ten: 'Kim Cương Bất Hoại Quang Sư',
+    danhHieu: 'C(sp³) — Vạn Kiếp Bất Biến Định Luật Vương',
+    he: 'ductin',
+    mauChinh: 'rgb(226, 232, 240)',
+    mauPhu: 'rgb(168, 85, 247)',
+    mauHaoQuang: 'rgba(168, 85, 247, 0.45)',
+    moTa: 'Kết tinh từ Định luật bảo toàn khối lượng và cấu trúc kim cương sp³ bất biến. Thể hiện đức tin sắt đá không lay chuyển trước mọi khó khăn.',
+    kyNangThuong: 'Quang Sư Trảo Kích',
+    kyNangNo: 'LAW OF CONSERVATION REALM — Vạn Kiếp Bảo Toàn Kim Cương Giới',
+    nguyenToGoc: 'C(sp³) + Bảo Toàn',
   },
-  moc_tinh: {
-    id: 'moc_tinh',
-    ten: 'Trùng Hợp Thuỷ Phù Long Thần',
-    danhHieu: '(–CH₂–CH₂–)ₙ — Quang Sinh Vạn Xích Bất Đoạn',
-    he: 'huuco',
-    mauChinh: 'rgb(132, 204, 22)',
-    mauPhu: 'rgb(180, 83, 9)',
-    mauHaoQuang: 'rgba(132, 204, 22, 0.45)',
-    moTa: 'Kết tinh từ chuỗi ester và polymer nối dài vô tận. Bộ giáp carbon bền hoá học, không acid nào ăn nổi.',
-    kyNangThuong: 'Xích Chuỗi Polymer',
-    kyNangNo: 'BIOLUMINESCENT VORTEX BLAST — Xoáy Quang Sinh Học',
-    nguyenToGoc: '(RCOO)₃C₃H₅',
+  tinhyeu_ho: {
+    id: 'tinhyeu_ho',
+    ten: 'Hồng Tinh Cộng Hóa Cửu Vĩ Hồ',
+    danhHieu: 'C–C, C–H — Vạn Hữu Liên Kết Ái Tâm Thần',
+    he: 'tinhyeu',
+    mauChinh: 'rgb(244, 63, 94)',
+    mauPhu: 'rgb(251, 113, 133)',
+    mauHaoQuang: 'rgba(244, 63, 94, 0.45)',
+    moTa: 'Sinh ra từ liên kết cộng hoá trị sẻ chia đôi electron và liên kết hydro sự sống trong chuỗi xoắn kép DNA. Kết nối trái tim với tình yêu thương tri thức.',
+    kyNangThuong: 'Cộng Hóa Hồ Hoả',
+    kyNangNo: 'COVALENT SOUL HARMONY — Đồng Tâm Cộng Hoá Vạn Vật Linh',
+    nguyenToGoc: 'C–C, DNA',
+  },
+  bieton_huou: {
+    id: 'bieton_huou',
+    ten: 'Tố Linh Đệm Thần Hươu',
+    danhHieu: 'HCO₃⁻ / H₂CO₃ — Tri Ân Cân Bằng Dưỡng Dục Quân',
+    he: 'bieton',
+    mauChinh: 'rgb(20, 184, 166)',
+    mauPhu: 'rgb(45, 212, 191)',
+    mauHaoQuang: 'rgba(20, 184, 166, 0.45)',
+    moTa: 'Mang sức mạnh của hệ đệm sinh học HCO₃⁻/H₂CO₃ và nguyên lý chuyển dịch cân bằng Le Chatelier. Đại diện cho lòng biết ơn công ơn cha mẹ và thầy cô.',
+    kyNangThuong: 'Đệm Tố Cam Lộ',
+    kyNangNo: 'LE CHATELIER EQUILIBRIUM FLOURISH — Vạn Cổ Cân Bằng Khai Hoa Trận',
+    nguyenToGoc: 'HCO₃⁻/H₂CO₃',
+  },
+  sangy_ma: {
+    id: 'sangy_ma',
+    ten: 'Thần Quang Vô Cực Thiên Mã',
+    danhHieu: 'E = hν — Lượng Tử Diệu Giác Khai Trí Quân',
+    he: 'sangy',
+    mauChinh: 'rgb(234, 179, 8)',
+    mauPhu: 'rgb(250, 204, 21)',
+    mauHaoQuang: 'rgba(250, 204, 21, 0.55)',
+    moTa: 'Hội tụ từ năng lượng photon ánh sáng E = hν và electron nhảy mức lượng tử quang hoá. Biểu trưng cho tia sáng ý thức và trí tuệ khai mở.',
+    kyNangThuong: 'Lượng Tử Quang Tiễn',
+    kyNangNo: 'COSMIC CONSCIOUSNESS ILLUMINATION — Vô Cực Diệu Giác Phổ Độ Quang',
+    nguyenToGoc: 'E = hν',
   },
 }
 
+/** Ánh xạ an toàn từ 6 thần thú cũ sang 8 thần thú mới để học sinh cũ không bị mất thú. */
+export const ANH_XA_ID_CU: Record<string, string> = {
+  hoa_long: 'lua_phuong',
+  thuy_quai: 'nuoc_long',
+  thiet_giap: 'dat_quy',
+  loi_dieu: 'khi_bang',
+  loi_kim: 'ductin_su',
+  moc_tinh: 'tinhyeu_ho',
+}
+
+// Giữ alias tương thích ngược trong DANH_SACH_THAN_THU
+DANH_SACH_THAN_THU['hoa_long'] = DANH_SACH_THAN_THU['lua_phuong']!
+DANH_SACH_THAN_THU['thuy_quai'] = DANH_SACH_THAN_THU['nuoc_long']!
+DANH_SACH_THAN_THU['thiet_giap'] = DANH_SACH_THAN_THU['dat_quy']!
+DANH_SACH_THAN_THU['loi_dieu'] = DANH_SACH_THAN_THU['khi_bang']!
+DANH_SACH_THAN_THU['loi_kim'] = DANH_SACH_THAN_THU['ductin_su']!
+DANH_SACH_THAN_THU['moc_tinh'] = DANH_SACH_THAN_THU['tinhyeu_ho']!
+
 /**
  * HỆ SỐ BÙ CÂN BẰNG THEO HỆ.
- *
- * Bảng khắc chế sáu hệ KHÔNG đối xứng — ép cho đối xứng là bịa phản ứng không
- * có (xem đầu `tuong-khac.ts`). Nên cân bằng ở đây: đo lợi thế khắc chế của
- * từng hệ khi đấu đủ năm hệ còn lại, rồi nhân ngược vào chỉ số gốc.
- *
- * Số đo trước khi bù — lợi thế (hệ số công trung bình ÷ hệ số thủ trung bình):
- *   Base 1,558 · Hoả 1,348 · Khí 1,000 · Hữu cơ 0,864 · Acid 0,860 · Điện hoá 0,642
- *   chênh lệch cao/thấp = 2,428 lần
- * Sau khi nhân các hệ số dưới đây: chênh lệch còn **1,011 lần**.
- *
- * Đổi bảng khắc chế thì phải ĐO LẠI bộ số này — phép kiểm sẽ bắt.
+ * Bảng khắc chế 8 hệ mới cân bằng đối xứng 1:1 (mỗi hệ 2 thắng 2 thua),
+ * nên hệ số bù chuẩn cho mọi hệ là 1.00.
  */
 export const BU_CAN_BANG_HE: Record<HeNguyenTo, number> = {
-  hoa: 0.86,
-  khi: 1.00,
-  kiem: 0.80,
-  axit: 1.08,
-  dien: 1.25,
-  huuco: 1.08,
+  dat: 1.0,
+  nuoc: 1.0,
+  lua: 1.0,
+  khi: 1.0,
+  ductin: 1.0,
+  tinhyeu: 1.0,
+  bieton: 1.0,
+  sangy: 1.0,
+  // Alias hệ cũ
+  hoa: 1.0,
+  axit: 1.0,
+  kiem: 1.0,
+  dien: 1.0,
+  huuco: 1.0,
 }
 
 export interface HoSoThanThuLuu {
@@ -200,10 +245,13 @@ export function vaHoSo(tho: unknown, idChon = ''): HoSoThanThuLuu {
   }
   const capDo = Math.max(1, Math.min(CAP_TOI_DA, Math.round(so('capDo', 1))))
   return {
-    // Hồ sơ cũ (trước 15-09) đã có sẵn một thần thú — coi như em đã chọn rồi,
-    // không bắt chọn lại. Id lạ hoặc rỗng thì về rỗng = chưa chọn.
-    idThanhThuChon: DANH_SACH_THAN_THU[chuoi('idThanhThuChon', '')] !== undefined
-      ? chuoi('idThanhThuChon', '') : md.idThanhThuChon,
+    // Hồ sơ cũ được chuyển đổi tự động sang id mới thông qua ANH_XA_ID_CU.
+    // Id lạ hoặc rỗng thì về rỗng = chưa chọn.
+    idThanhThuChon: (() => {
+      const raw = chuoi('idThanhThuChon', '')
+      const mapped = ANH_XA_ID_CU[raw] ?? raw
+      return DANH_SACH_THAN_THU[mapped] !== undefined ? mapped : md.idThanhThuChon
+    })(),
     capDo,
     exp: so('exp', 0),
     khoExp: Math.min(SUC_CHUA_ONG, so('khoExp', 0)),

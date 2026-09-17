@@ -113,42 +113,97 @@ const MAC_DINH: DangThu = {
 }
 
 export const DANG_THU: Record<string, DangThu> = {
-  // HOẢ — vạm vỡ, tai nhọn vểnh, bờm gáy dựng. Dáng hổ báo.
+  // ─── TỨ ĐẠI TỰ NHIÊN ───
+  // ĐẤT — Rùa mai tinh thể thạch nham, vững chãi, mỏ sừng, bốn chân ngắn.
+  dat_quy: {
+    khung: 'quy',
+    coDau: [0.66, 0.6, 0.72], coThan: [1.02, 0.5, 0.94], yThan: -0.92,
+    kieuTai: 'tron', kieuMat: 'quy', coMom: 0.88, dayLong: 0.13, themLop: 3,
+    netKy: 'gaiVai', soDotDuoi: 2,
+  },
+  // NƯỚC — Rồng nước uốn lượn, vây cá, mào dọc lưng, uyển chuyển.
+  nuoc_long: {
+    khung: 'thuyLong',
+    coDau: [0.72, 0.74, 1.02], coThan: [0.62, 0.6, 0.68], yThan: -0.64,
+    kieuTai: 'vay', kieuMat: 'thuy', coMom: 0.94, dayLong: 0.18, themLop: 5,
+    netKy: 'vayLung', soDotDuoi: 4,
+  },
+  // LỬA — Phượng hoàng lửa, sải cánh rộng, mào lửa, mỏ quặp, đuôi lửa.
+  lua_phuong: {
+    khung: 'phuong',
+    coDau: [0.66, 0.68, 0.74], coThan: [0.6, 0.84, 0.62], yThan: -0.72,
+    kieuTai: 'nhon', kieuMat: 'chim', coMom: 1.12, dayLong: 0.15, themLop: 4,
+    netKy: 'bomGay', soDotDuoi: 4,
+  },
+  // KHÍ — Đại bàng bão tố, lông xù bay, sải cánh lốc xoáy.
+  khi_bang: {
+    khung: 'phuong',
+    coDau: [0.68, 0.7, 0.8], coThan: [0.62, 0.78, 0.64], yThan: -0.7,
+    kieuTai: 'nhon', kieuMat: 'chim', coMom: 1.05, dayLong: 0.16, themLop: 4,
+    netKy: 'longXu', soDotDuoi: 5,
+  },
+
+  // ─── TỨ TRỤ TÂM THỨC ───
+  // ĐỨC TIN — Sư tử bạch kim bờm kim cương dày, oai vệ, kiên định.
+  ductin_su: {
+    khung: 'lan',
+    coDau: [0.88, 0.84, 0.92], coThan: [0.72, 0.62, 1.0], yThan: -0.78,
+    kieuTai: 'chop', kieuMat: 'thu', coMom: 1.0, dayLong: 0.14, themLop: 4,
+    netKy: 'chomToc', soDotDuoi: 4,
+  },
+  // TÌNH YÊU — Cửu vĩ hồ hồng ngọc, tai mềm, đuôi bồng bềnh, gắn kết.
+  tinhyeu_ho: {
+    khung: 'lan',
+    coDau: [0.82, 0.8, 0.9], coThan: [0.68, 0.58, 0.92], yThan: -0.76,
+    kieuTai: 'nhon', kieuMat: 'huou', coMom: 0.95, dayLong: 0.16, themLop: 5,
+    netKy: 'bomGay', soDotDuoi: 5,
+  },
+  // LÒNG BIẾT ƠN — Hươu thần ngọc bích sừng hoa sen, tai lá, thanh thoát điềm tĩnh.
+  bieton_huou: {
+    khung: 'kyLan',
+    coDau: [0.72, 0.76, 0.96], coThan: [0.6, 0.56, 0.96], yThan: -0.78,
+    kieuTai: 'la', kieuMat: 'huou', coMom: 0.92, dayLong: 0.13, themLop: 3,
+    netKy: 'laVai', soDotDuoi: 3,
+  },
+  // SỰ SÁNG Ý THỨC — Thiên mã quang phổ, cánh lông vũ lượng tử, rực sáng.
+  sangy_ma: {
+    khung: 'kyLan',
+    coDau: [0.74, 0.76, 1.0], coThan: [0.62, 0.58, 0.98], yThan: -0.76,
+    kieuTai: 'chop', kieuMat: 'huou', coMom: 0.96, dayLong: 0.14, themLop: 4,
+    netKy: 'chomToc', soDotDuoi: 4,
+  },
+
+  // ─── ALIAS HỆ CŨ ───
   hoa_long: {
     khung: 'phuong',
     coDau: [0.66, 0.68, 0.74], coThan: [0.6, 0.84, 0.62], yThan: -0.72,
     kieuTai: 'nhon', kieuMat: 'chim', coMom: 1.12, dayLong: 0.15, themLop: 4,
     netKy: 'bomGay', soDotDuoi: 4,
   },
-  // ACID — đầu tròn to, thân thấp bè, tai vây cá, lông mượt sát. Dáng quái nước.
   thuy_quai: {
     khung: 'kyLan',
     coDau: [0.72, 0.76, 0.96], coThan: [0.6, 0.56, 0.96], yThan: -0.78,
     kieuTai: 'vay', kieuMat: 'huou', coMom: 0.92, dayLong: 0.11, themLop: 2,
     netKy: 'vayLung', soDotDuoi: 3,
   },
-  // BASE — vuông vức, thân dày nhất, tai ngắn, gai tinh thể trên vai. Dáng giáp sĩ.
   thiet_giap: {
     khung: 'quy',
     coDau: [0.66, 0.6, 0.72], coThan: [1.02, 0.5, 0.94], yThan: -0.92,
     kieuTai: 'tron', kieuMat: 'quy', coMom: 0.88, dayLong: 0.13, themLop: 3,
     netKy: 'gaiVai', soDotDuoi: 2,
   },
-  // KHÍ — đầu nhỏ, thân thon cao, tai dài thỏ, lông xù bay. Dáng nhanh nhẹn.
   loi_dieu: {
     khung: 'long',
     coDau: [0.7, 0.72, 1.06], coThan: [0.62, 0.6, 0.66], yThan: -0.62,
     kieuTai: 'dai', kieuMat: 'rong', coMom: 0.95, dayLong: 0.17, themLop: 5,
     netKy: 'longXu', soDotDuoi: 5,
   },
-  // ĐIỆN HOÁ — đầu vừa, thân gọn, tai chóp nhọn, chỏm tóc dựng đứng. Tinh nghịch.
   loi_kim: {
     khung: 'lan',
     coDau: [0.88, 0.84, 0.92], coThan: [0.72, 0.62, 1.0], yThan: -0.78,
     kieuTai: 'chop', kieuMat: 'thu', coMom: 1.0, dayLong: 0.14, themLop: 4,
     netKy: 'chomToc', soDotDuoi: 4,
   },
-  // HỮU CƠ — tròn ũm, tai lá bè, lông dày nhất. Dáng hiền lành.
   moc_tinh: {
     khung: 'thuyLong',
     coDau: [0.72, 0.74, 1.02], coThan: [0.62, 0.6, 0.68], yThan: -0.64,

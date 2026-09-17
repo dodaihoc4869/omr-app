@@ -32,6 +32,7 @@ export interface DongTheoDoiBtvn {
   quaHan: boolean
   tong: number
   daNop: number
+  hocSinh?: {sbd:string;hoTen:string;nopLuc:string|null;soDung:number|null;soCau:number|null;thuHoi:boolean}[]
   chuaNop: { sbd: string; hoTen: string }[]
 }
 
@@ -43,7 +44,7 @@ async function goi<T>(ch: CauHinhMayChu, duong: string, than: unknown, mat?: str
     const dau: Record<string, string> = { 'content-type': 'application/json' }
     if (mat) dau['x-ma-bi-mat'] = mat
     const res = await fetch(`${ch.URL}${duong}`, { method: 'POST', headers: dau, body: JSON.stringify(than), signal: bo.signal })
-    if (!res.ok) return null
+    // Preserve server errors (including expired teacher credentials) for visible feedback.
     return (await res.json()) as T
   } catch {
     return null
@@ -59,15 +60,17 @@ export async function giaoBtvn(
   dsMaCa: string[],
   dsMaDe: string[],
   dsSbd?: string[],
+  hanNop?: string,
+  dsSbdThem?: string[],
 ): Promise<KetQuaGiaoBtvn> {
   const coSbd = Boolean(dsSbd && dsSbd.length > 0)
-  if (dsMaCa.length === 0 && !coSbd) throw new Error('Chưa tick ca nào')
+  if (dsMaCa.length === 0 && !coSbd && !dsSbdThem?.length) throw new Error('Chưa tick ca nào')
   if (dsMaDe.length === 0) throw new Error('Chưa tick tờ đề nào')
   if (dsSbd && dsSbd.length === 0) throw new Error('Chưa tick học sinh nào')
   const r = await goi<{ ok?: boolean; error?: string } & KetQuaGiaoBtvn>(
     ch,
     '/btvn/giao',
-    { dsMaCa: dsMaCa.length > 0 ? dsMaCa : undefined, dsMaDe, dsSbd: coSbd ? dsSbd : undefined },
+    { dsMaCa: dsMaCa.length > 0 ? dsMaCa : undefined, dsMaDe, dsSbd: coSbd ? dsSbd : undefined, dsSbdThem, hanNop },
     mat,
   )
   if (!r) throw new Error('Máy chủ không trả lời')
@@ -89,11 +92,12 @@ export async function btvnCuaEm(
   ch: CauHinhMayChu,
   maCa: string,
   sbd: string,
+  maBtvn?: string,
 ): Promise<{ ok: boolean; lyDo?: string; error?: string; maBtvn?: string; hanNop?: string; daNop?: boolean; soCau?: number; de?: unknown }> {
   const r = await goi<{ ok?: boolean; lyDo?: string; error?: string; maBtvn?: string; hanNop?: string; daNop?: boolean; soCau?: number; de?: unknown }>(
     ch,
     '/btvn/cua-em',
-    { maCa, sbd },
+    { maCa, sbd, maBtvn },
   )
   if (!r) return { ok: false, lyDo: 'mang', error: 'Không nối được máy chủ' }
   return { ...r, ok: r.ok === true }
@@ -107,4 +111,9 @@ export async function nopBtvn(
   const r = await goi<{ ok?: boolean; lyDo?: string; error?: string; nopLuc?: string; daNhan?: boolean }>(ch, '/btvn/nop', d)
   if (!r) return { ok: false, lyDo: 'mang', error: 'Không nối được máy chủ' }
   return { ...r, ok: r.ok === true }
+}
+
+export async function suaGiaoBtvn(ch:CauHinhMayChu,mat:string,maBtvn:string,options:{thuHoi?:boolean;hanNop?:string;sbd?:string;hanhDong?:'reset'|'thu-hoi'}) {
+ const r=await goi<{ok:boolean;error?:string}>(ch,'/btvn/sua',{maBtvn,...options},mat)
+ if(!r?.ok)throw new Error(r?.error||'Chưa cập nhật được bài tập. Thầy thử lại.')
 }

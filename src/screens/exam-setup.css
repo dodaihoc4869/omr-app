@@ -1,0 +1,26 @@
+.setup-overview{padding:18px 22px;border-radius:22px;background:var(--the);border:1px solid var(--vien-dam)}.setup-overview p{margin:0 0 14px;color:var(--nhat)}.setup-overview nav{display:flex;flex-wrap:wrap;gap:8px}.setup-overview a{padding:9px 14px;border-radius:20px;background:var(--the-2);color:var(--muc);font-size:13px;font-weight:700;text-decoration:none}.setup-group{border:1px solid var(--vien-dam);border-radius:22px;background:var(--the);scroll-margin-top:90px;overflow:hidden}.setup-group>summary{cursor:pointer;padding:20px 24px;list-style:none;display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;border-left:4px solid #6f9ee5}.setup-group>summary::-webkit-details-marker{display:none}.setup-group>summary:after{content:'＋';margin-left:auto;font-size:20px;color:var(--nhat)}.setup-group[open]>summary:after{content:'−'}.setup-group>summary>span{font-size:19px;font-weight:750}.setup-group>summary>small{font-size:13px;color:var(--nhat);line-height:1.5}.setup-group-body{padding:0 16px 16px;display:grid;gap:12px}.setup-group-body>section,.setup-group-body>div{box-shadow:none!important}.setup-group:nth-of-type(2)>summary{border-left-color:#79bfa0}.setup-group:nth-of-type(3)>summary{border-left-color:#e0b65e}.setup-launch{position:sticky;bottom:12px;z-index:15;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px;border-radius:22px;background:var(--the);border:1px solid var(--vien-dam);box-shadow:0 6px 30px #0002}.setup-launch>div{min-width:0}.setup-launch strong,.setup-launch small{display:block;overflow-wrap:anywhere}.setup-launch small{margin-top:5px;color:var(--nhat);font-size:13px}.setup-launch>button{width:auto;min-width:200px}.setup-group input{max-width:100%;box-sizing:border-box}@media(max-width:650px){.setup-group>summary{padding:16px}.setup-group>summary>small{width:85%;order:2}.setup-group-body{padding:0 8px 8px}.setup-launch{flex-direction:column;align-items:stretch;padding:12px;bottom:8px}.setup-launch>button{width:100%}.setup-launch strong{font-size:14px}.setup-overview{padding:15px}.setup-overview a{font-size:12px;padding:8px 10px}}
+
+/* Bốn bước chính: hai bước mỗi hàng trên màn hình đủ rộng, một cột trên điện thoại. */
+.setup-steps-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:start}
+.setup-steps-grid>.setup-group{min-width:0;width:100%}
+#setup-source>summary{border-left-color:#6f9ee5}
+#setup-info>summary{border-left-color:#79bfa0}
+#setup-people>summary{border-left-color:#e0b65e}
+#setup-wait>summary{border-left-color:#b38bd4}
+
+/* Ba nhóm này là ba thẻ độc lập để đọc và thao tác nhanh. */
+.setup-monitor-group>.setup-group-body{grid-template-columns:minmax(0,1fr);align-items:stretch}
+.setup-monitor-group>.setup-group-body>[data-ui-card]{height:100%;min-width:0;border:1px solid var(--vien);border-radius:16px!important;padding:16px!important;background:var(--the-2)}
+
+@media(min-width:900px){
+  .setup-steps-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+  .setup-monitor-group>.setup-group-body{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+}
+
+@media(max-width:650px){
+  .setup-steps-grid{gap:12px}
+  .setup-monitor-group>.setup-group-body>[data-ui-card]{padding:14px!important}
+  .setup-launch{align-items:flex-end!important;padding:0!important;bottom:76px!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;pointer-events:none}
+  .setup-launch>div{display:none}
+  .setup-launch>button{pointer-events:auto;width:auto!important;min-width:0!important;min-height:42px!important;padding:0 16px!important;border-radius:999px!important;background:var(--xanh)!important;color:#fff!important;box-shadow:0 4px 14px color-mix(in srgb,var(--xanh) 28%,transparent)!important;font-size:13px!important}
+}
