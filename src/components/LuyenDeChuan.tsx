@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import TheCau from './TheCau'
 import { createPortal } from 'react-dom'
-import { ArrowUpRight, Clock3, FileText, ChevronLeft, Award } from 'lucide-react'
+import { ArrowUpRight, Clock3, FileText, ChevronLeft, Award, ChevronDown } from 'lucide-react'
 import { layCauHinhMayChu, xongNapDiaChi } from '../lib/may-chu-moi'
 import type { PublicExamBank, TeacherExamSource } from '../data/examContent'
 import ModalXacNhanNop from './ModalXacNhanNop'
@@ -29,6 +29,7 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
   const [seconds, setSeconds] = useState(0)
   const [saved, setSaved] = useState('')
   const [hienXacNhanNop, setHienXacNhanNop] = useState(false)
+  const [moDanhSach, setMoDanhSach] = useState(false)
 
   const saveQueue = useRef(Promise.resolve())
   const answerRef = useRef(answers)
@@ -64,7 +65,13 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
   async function refresh() {
     try {
       const r = await api('history')
-      if (alive.current) setHistory(r.items)
+      if (alive.current) {
+        const items = (r.items || []) as History[]
+        setHistory(items)
+        if (items.some((h) => h.status === 'active')) {
+          setMoDanhSach(true)
+        }
+      }
     } catch (e) {
       if (alive.current) setError(e instanceof Error ? e.message : 'Không tải được lịch sử.')
     }
@@ -188,60 +195,74 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
         )}
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs">
-          <div className="flex items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800 px-4 py-3 border-b border-slate-100 dark:border-slate-800">
-            <h3 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2">
-              <FileText size={16} className="text-blue-600 dark:text-blue-400" />
-              Bài luyện của em
-            </h3>
-            <span className="text-xs text-slate-500 dark:text-slate-400">{history.length} bài</span>
-          </div>
-          <div
-            role="region"
-            aria-label="Bài luyện của em"
-            tabIndex={0}
-            className="max-h-60 overflow-y-auto overscroll-contain divide-y divide-slate-100 dark:divide-slate-800"
+          <button
+            type="button"
+            onClick={() => setMoDanhSach(!moDanhSach)}
+            className="w-full flex items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800 px-4 py-3 hover:bg-slate-100/80 dark:hover:bg-slate-750 transition-colors text-left cursor-pointer"
           >
-            {history.length === 0 ? (
-              <p className="p-4 text-xs text-slate-500">Chưa có bài luyện.</p>
-            ) : (
-              history.map((h) => (
-                <button
-                  key={h.id}
-                  disabled={busy}
-                  className="flex w-full items-center gap-3 p-3.5 text-left hover:bg-blue-50/60 dark:hover:bg-slate-800/60 transition-colors disabled:opacity-50 cursor-pointer"
-                  onClick={() => void open(h.id)}
-                >
-                  <span className="rounded-xl bg-blue-50 dark:bg-blue-950 p-2 text-blue-600 shrink-0">
-                    <FileText size={18} />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">
-                      {h.status === 'active' ? 'Tiếp tục bài luyện' : 'Xem lại bài luyện'}
-                    </span>
-                    <span className="block mt-0.5 text-[11px] text-slate-400">
-                      {new Date(h.createdAt).toLocaleString('vi-VN', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                      })}
-                    </span>
-                  </span>
-                  <span
-                    className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-                      h.status === 'active'
-                        ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
-                        : 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
-                    }`}
+            <div className="flex items-center gap-2">
+              <FileText size={16} className="text-blue-600 dark:text-blue-400" />
+              <h3 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-100">
+                Bài luyện của em
+              </h3>
+              <span className="text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 px-2 py-0.5 rounded-full">
+                {history.length} bài
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+              <span className="text-[11px] hidden sm:inline">{moDanhSach ? 'Thu gọn' : 'Xem danh sách'}</span>
+              <ChevronDown size={15} className={`transition-transform duration-200 ${moDanhSach ? 'rotate-180' : ''}`} />
+            </div>
+          </button>
+          {moDanhSach && (
+            <div
+              role="region"
+              aria-label="Bài luyện của em"
+              tabIndex={0}
+              className="max-h-48 sm:max-h-52 overflow-y-auto overscroll-contain divide-y divide-slate-100 dark:divide-slate-800 border-t border-slate-100 dark:border-slate-800"
+            >
+              {history.length === 0 ? (
+                <p className="p-4 text-xs text-slate-500 text-center">Chưa có bài luyện nào.</p>
+              ) : (
+                history.map((h) => (
+                  <button
+                    key={h.id}
+                    disabled={busy}
+                    className="flex w-full items-center gap-3 p-3 text-left hover:bg-blue-50/60 dark:hover:bg-slate-800/60 transition-colors disabled:opacity-50 cursor-pointer"
+                    onClick={() => void open(h.id)}
                   >
-                    {h.status === 'active' ? 'Đang làm' : h.score == null ? 'Đã nộp' : `${h.score.toFixed(2)} điểm`}
-                  </span>
-                  <ArrowUpRight size={14} className="shrink-0 text-slate-400" />
-                </button>
-              ))
-            )}
-          </div>
+                    <span className="rounded-xl bg-blue-50 dark:bg-blue-950 p-2 text-blue-600 shrink-0">
+                      <FileText size={16} />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">
+                        {h.status === 'active' ? 'Tiếp tục bài luyện' : 'Xem lại bài luyện'}
+                      </span>
+                      <span className="block mt-0.5 text-[11px] text-slate-400">
+                        {new Date(h.createdAt).toLocaleString('vi-VN', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                        })}
+                      </span>
+                    </span>
+                    <span
+                      className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
+                        h.status === 'active'
+                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
+                          : 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
+                      }`}
+                    >
+                      {h.status === 'active' ? 'Đang làm' : h.score == null ? 'Đã nộp' : `${h.score.toFixed(2)} điểm`}
+                    </span>
+                    <ArrowUpRight size={14} className="shrink-0 text-slate-400" />
+                  </button>
+                ))
+              )}
+            </div>
+          )}
         </div>
       </section>
     )

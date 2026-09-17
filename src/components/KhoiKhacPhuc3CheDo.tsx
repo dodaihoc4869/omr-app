@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
   Sparkles,
@@ -15,6 +15,7 @@ import {
   Award,
   Layers,
   Info,
+  ChevronDown,
 } from 'lucide-react'
 import TheCau from './TheCau'
 import { docSoDem } from './DongDemCau'
@@ -31,9 +32,6 @@ import {
   phanTichTyLeDang,
   rutLuyenDangBai,
   demCauDangBai,
-  phanTichBoLocCau,
-  rutLuyenTheoBoLoc,
-  type BoLocCauLuyen,
   type CauSaiDauVao,
 } from '../lib/thuat-toan-rut-cau-sai'
 import { cauLuyenTuNguon, type CauLuyen } from '../lib/bai-tap-pdf'
@@ -169,7 +167,26 @@ export default function KhoiKhacPhuc3CheDo({
   const [baiChon, setBaiChon] = useState('')
   const [cacDangChon, setCacDangChon] = useState<Set<string>>(new Set())
   const cacheDeRef = useRef<Map<string, TeacherExamSource>>(new Map())
-  const [mucDo, setMucDo] = useState<'ngau_nhien' | 'sao_2' | 'sao_1' | 'ly_thuyet' | 'bai_tap'>('ngau_nhien')
+  // Chế độ 4: Cho phép chọn nhiều lựa chọn mức độ
+  const [cacMucDoChon, setCacMucDoChon] = useState<Set<string>>(() => new Set(['ngau_nhien']))
+  const toggleMucDo = (id: string) => {
+    setCacMucDoChon((prev) => {
+      if (id === 'ngau_nhien') {
+        return new Set(['ngau_nhien'])
+      }
+      const s = new Set(prev)
+      s.delete('ngau_nhien')
+      if (s.has(id)) {
+        s.delete(id)
+      } else {
+        s.add(id)
+      }
+      if (s.size === 0) {
+        s.add('ngau_nhien')
+      }
+      return s
+    })
+  }
   const [soCauCheDo3, setSoCauCheDo3] = useState<number>(20)
   const [soCauCheDo4, setSoCauCheDo4] = useState<number>(20)
   const [khoDangBai, setKhoDangBai] = useState<TeacherExamSource[]>([])
@@ -188,6 +205,18 @@ export default function KhoiKhacPhuc3CheDo({
   const [currentTest, setCurrentTest] = useState<BaiLuyenKhacPhuc | null>(null)
   const [seconds, setSeconds] = useState<number>(0)
   const [hienXacNhanNop, setHienXacNhanNop] = useState(false)
+  const [moDanhSach, setMoDanhSach] = useState(() => {
+    if (vaiTro === 'ph') {
+      return Boolean(dsMomGiao && dsMomGiao.some((m) => m.trangThai === 'dang_lam'))
+    }
+    try {
+      const raw = localStorage.getItem(`ddh.khacphuc.history.${sbd}`)
+      const items: BaiLuyenKhacPhuc[] = raw ? JSON.parse(raw) : []
+      return items.some((h) => h.status !== 'submitted')
+    } catch {
+      return false
+    }
+  })
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // Lưu lịch sử vào localStorage
@@ -403,34 +432,50 @@ export default function KhoiKhacPhuc3CheDo({
     }
   }, [cacDangChon, scriptUrlProp])
 
-  // Chế độ 4: Lọc theo mức độ & thể loại tự do
-  const boLocCheDo4: BoLocCauLuyen = useMemo(() => {
-    if (mucDo === 'sao_2') return { sao: 'sao_2', dang: 'tat_ca' }
-    if (mucDo === 'sao_1') return { sao: 'sao_1', dang: 'tat_ca' }
-    if (mucDo === 'ly_thuyet') return { sao: 'moi', dang: 'ly_thuyet' }
-    if (mucDo === 'bai_tap') return { sao: 'moi', dang: 'bai_tap' }
-    return { sao: 'moi', dang: 'tat_ca' }
-  }, [mucDo])
+  // Chế độ 4: Lọc theo nhiều mức độ & thể loại tự do
+  const isNgauNhien = cacMucDoChon.has('ngau_nhien') || cacMucDoChon.size === 0
+  const chonSao2 = cacMucDoChon.has('sao_2')
+  const chonSao1 = cacMucDoChon.has('sao_1')
+  const chonLyThuyet = cacMucDoChon.has('ly_thuyet')
+  const chonBaiTap = cacMucDoChon.has('bai_tap')
+
+  const khopBoLocCheDo4 = useCallback(
+    (cand: { sao?: any; dang?: any; kieu?: any }) => {
+      if (isNgauNhien) return true
+
+      // 1. Kiểm tra sao nếu có chọn sao
+      if (chonSao2 && chonSao1) {
+        if (!hopSao(cand.sao, 'sao_2') && !hopSao(cand.sao, 'sao_1')) return false
+      } else if (chonSao2) {
+        if (!hopSao(cand.sao, 'sao_2')) return false
+      } else if (chonSao1) {
+        if (!hopSao(cand.sao, 'sao_1')) return false
+      }
+
+      // 2. Kiểm tra thể loại nếu có chọn thể loại
+      const dangCand = cand.dang || cand.kieu
+      if (chonLyThuyet && chonBaiTap) {
+        if (dangCand !== 'ly_thuyet' && dangCand !== 'bai_tap') return false
+      } else if (chonLyThuyet) {
+        if (dangCand !== 'ly_thuyet') return false
+      } else if (chonBaiTap) {
+        if (dangCand !== 'bai_tap') return false
+      }
+
+      return true
+    },
+    [isNgauNhien, chonSao2, chonSao1, chonLyThuyet, chonBaiTap]
+  )
 
   // Chế độ 3 (Dạng bài): tính toàn bộ số câu của dạng bài (không lọc)
   const tongToiDaCheDo3 = useMemo(() => demCauDangBai(khoDangBai), [khoDangBai])
 
-  // Chế độ 4 (Tự do): rút từ kho câu theo bộ lọc mức độ
+  // Chế độ 4 (Tự do): rút từ kho câu theo bộ lọc đa mức độ
   const { dsUngVienCheDo4, tongToiDaCheDo4 } = useMemo(() => {
-    if (dsCauSai2.length > 0 && khoDe2.length > 0) {
-      const pt = phanTichBoLocCau(dsCauSai2, khoDe2, boLocCheDo4)
-      if (pt.tongToiDa > 0) {
-        return { dsUngVienCheDo4: [], tongToiDaCheDo4: pt.tongToiDa }
-      }
-    }
-    const tatCa = cauLuyenTuNguon(khoDe2).filter((cand) => {
-      if (!hopSao(cand.sao, boLocCheDo4.sao)) return false
-      if (boLocCheDo4.dang === 'ly_thuyet' && cand.dang !== 'ly_thuyet') return false
-      if (boLocCheDo4.dang === 'bai_tap' && cand.dang !== 'bai_tap') return false
-      return true
-    })
-    return { dsUngVienCheDo4: tatCa, tongToiDaCheDo4: tatCa.length }
-  }, [dsCauSai2, khoDe2, boLocCheDo4])
+    const tatCa = cauLuyenTuNguon(khoDe2)
+    const ds = tatCa.filter(khopBoLocCheDo4)
+    return { dsUngVienCheDo4: ds, tongToiDaCheDo4: ds.length }
+  }, [khoDe2, khopBoLocCheDo4])
 
   useEffect(() => {
     if (tongToiDaCheDo3 > 0) {
@@ -603,37 +648,30 @@ export default function KhoiKhacPhuc3CheDo({
         setCurrentTest(baiMoi)
         setSeconds(0)
       } else if (cheDo === 4) {
-        // Chế độ 4: Tự do theo mức độ (không ràng buộc chọn dạng bài)
+        // Chế độ 4: Tự do theo nhiều mức độ đã chọn
         if (khoDe2.length === 0) {
           setLoi('Chưa có câu hỏi trong kho hoặc đang tải dữ liệu. Vui lòng thử lại sau giây lát.')
           return
         }
         let dsCau: CauLuyen[] = []
-        if (dsCauSai2.length > 0) {
-          const res = rutLuyenTheoBoLoc(dsCauSai2, khoDe2, boLocCheDo4, soCauCheDo4, {
-            hoTen,
-            sbd,
-          })
-          dsCau = res.dsCau
-        }
-        if (dsCau.length === 0 && dsUngVienCheDo4.length > 0) {
+        if (dsUngVienCheDo4.length > 0) {
           const tron = [...dsUngVienCheDo4].sort(() => Math.random() - 0.5)
           dsCau = tron.slice(0, Math.min(soCauCheDo4, dsUngVienCheDo4.length))
         }
         if (dsCau.length === 0) {
-          setLoi('Không tìm thấy câu hỏi phù hợp với mức độ đã chọn.')
+          setLoi('Không tìm thấy câu hỏi phù hợp với các mức độ đã chọn.')
           return
         }
-        const nhanMuc =
-          mucDo === 'sao_2'
-            ? '2 sao (Vận dụng)'
-            : mucDo === 'sao_1'
-            ? '1 sao (Thông hiểu)'
-            : mucDo === 'ly_thuyet'
-            ? 'Lý thuyết'
-            : mucDo === 'bai_tap'
-            ? 'Bài tập'
-            : 'Ngẫu nhiên'
+        const nhanList: string[] = []
+        if (isNgauNhien) {
+          nhanList.push('Ngẫu nhiên')
+        } else {
+          if (chonSao2) nhanList.push('2 sao')
+          if (chonSao1) nhanList.push('1 sao')
+          if (chonLyThuyet) nhanList.push('Lý thuyết')
+          if (chonBaiTap) nhanList.push('Bài tập')
+        }
+        const nhanMuc = nhanList.join(' + ') || 'Tự do'
         const tieuDe = `Tự do (${nhanMuc}): ${dsCau.length} câu`
         if (onGiaoBaiChoCon) {
           await onGiaoBaiChoCon(dsCau, tieuDe)
@@ -1437,11 +1475,22 @@ export default function KhoiKhacPhuc3CheDo({
             </div>
           ) : (
             <>
-              {/* Chọn Mức độ luyện tập */}
+              {/* Chọn Mức độ luyện tập (Cho phép chọn nhiều lựa chọn) */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Chọn Mức độ luyện tập:
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    Chọn Mức độ luyện tập (chọn được nhiều):
+                  </label>
+                  {!isNgauNhien && (
+                    <button
+                      type="button"
+                      onClick={() => setCacMucDoChon(new Set(['ngau_nhien']))}
+                      className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
+                    >
+                      Đặt lại ngẫu nhiên
+                    </button>
+                  )}
+                </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs">
                   {[
                     { id: 'ngau_nhien', label: 'Ngẫu nhiên' },
@@ -1449,20 +1498,26 @@ export default function KhoiKhacPhuc3CheDo({
                     { id: 'sao_1', label: '1 sao (Thông hiểu)' },
                     { id: 'ly_thuyet', label: 'Lý thuyết' },
                     { id: 'bai_tap', label: 'Bài tập' },
-                  ].map((m) => (
-                    <button
-                      key={m.id}
-                      type="button"
-                      onClick={() => setMucDo(m.id as any)}
-                      className={`p-2 rounded-xl border text-center font-medium transition cursor-pointer text-[11px] ${
-                        mucDo === m.id
-                          ? 'border-amber-500 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-bold'
-                          : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
-                      }`}
-                    >
-                      {m.label}
-                    </button>
-                  ))}
+                  ].map((m) => {
+                    const isSelected = isNgauNhien ? m.id === 'ngau_nhien' : cacMucDoChon.has(m.id)
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => toggleMucDo(m.id)}
+                        className={`p-2.5 rounded-xl border text-center font-semibold transition cursor-pointer text-xs flex items-center justify-center gap-1.5 ${
+                          isSelected
+                            ? 'border-amber-500 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 font-bold ring-2 ring-amber-400/40 shadow-xs'
+                            : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
+                        }`}
+                      >
+                        {isSelected && m.id !== 'ngau_nhien' && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                        )}
+                        <span>{m.label}</span>
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
 
@@ -1511,150 +1566,162 @@ export default function KhoiKhacPhuc3CheDo({
 
       {/* DANH SÁCH BÀI LUYỆN CỦA EM HOẶC BÀI MOM ĐÃ GIAO */}
       <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs">
-        <div className="flex items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800 px-4 py-3 border-b border-slate-100 dark:border-slate-800">
-          <h3 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setMoDanhSach(!moDanhSach)}
+          className="w-full flex items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800 px-4 py-3 hover:bg-slate-100/80 dark:hover:bg-slate-750 transition-colors text-left cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
             <FileText size={16} className="text-amber-500" />
-            {vaiTro === 'ph' ? 'Các bài Mom đã giao' : 'Bài luyện của em'}
-          </h3>
-          <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-            {vaiTro === 'ph' ? (dsMomGiao ? dsMomGiao.length : 0) : history.length} bài
-          </span>
-        </div>
+            <h3 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-100">
+              {vaiTro === 'ph' ? 'Các bài Mom đã giao' : 'Bài luyện của em'}
+            </h3>
+            <span className="text-[11px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 px-2 py-0.5 rounded-full">
+              {vaiTro === 'ph' ? (dsMomGiao ? dsMomGiao.length : 0) : history.length} bài
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+            <span className="text-[11px] hidden sm:inline">{moDanhSach ? 'Thu gọn' : 'Xem danh sách'}</span>
+            <ChevronDown size={15} className={`transition-transform duration-200 ${moDanhSach ? 'rotate-180' : ''}`} />
+          </div>
+        </button>
 
-        {vaiTro === 'ph' ? (
-          !dsMomGiao || dsMomGiao.length === 0 ? (
-            <p className="p-4 text-xs text-slate-400 text-center bg-white dark:bg-slate-900">
-              Chưa có bài tập nào được giao. Phụ huynh hãy chọn một trong 4 chế độ phía trên để giao bài cho con!
-            </p>
-          ) : (
-            <div
-              role="region"
-              aria-label="Danh sách bài Mom đã giao"
-              tabIndex={0}
-              className="max-h-60 overflow-y-auto overscroll-contain p-2 space-y-2"
-            >
-              {dsMomGiao.map((m) => {
-                const daNop = m.trangThai === 'da_nop'
-                return (
-                  <div
-                    key={m.id}
-                    onClick={() => {
-                      if (daNop && onXemKetQuaMom) {
-                        onXemKetQuaMom(m)
-                      }
-                    }}
-                    className={`p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/70 transition flex items-center justify-between gap-3 ${
-                      daNop ? 'hover:border-amber-300 dark:hover:border-amber-700 cursor-pointer' : ''
-                    }`}
-                  >
-                    <div className="min-w-0 flex-1">
-                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate block">
-                        {m.tieuDe}
-                      </span>
-                      <span className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
-                        <Clock3 size={12} />
-                        {new Date(m.taoLuc).toLocaleString('vi-VN', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                        })}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span
-                        className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
-                          daNop
-                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                            : m.trangThai === 'dang_lam'
-                            ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
-                            : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
-                        }`}
-                      >
-                        {daNop
-                          ? `Đã nộp: ${m.diem?.toFixed(2) ?? '—'} điểm`
-                          : m.trangThai === 'dang_lam'
-                          ? 'Con đang làm'
-                          : 'Đã giao · Con chưa làm'}
-                      </span>
-                      {daNop && onXemKetQuaMom && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            onXemKetQuaMom(m)
-                          }}
-                          className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] flex items-center gap-1 transition cursor-pointer shadow-xs"
-                          title="Xem kết quả bài nộp"
+        {moDanhSach && (
+          vaiTro === 'ph' ? (
+            !dsMomGiao || dsMomGiao.length === 0 ? (
+              <p className="p-4 text-xs text-slate-400 text-center bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+                Chưa có bài tập nào được giao. Phụ huynh hãy chọn một trong 4 chế độ phía trên để giao bài cho con!
+              </p>
+            ) : (
+              <div
+                role="region"
+                aria-label="Danh sách bài Mom đã giao"
+                tabIndex={0}
+                className="max-h-48 sm:max-h-52 overflow-y-auto overscroll-contain p-2 space-y-1.5 border-t border-slate-100 dark:border-slate-800"
+              >
+                {dsMomGiao.map((m) => {
+                  const daNop = m.trangThai === 'da_nop'
+                  return (
+                    <div
+                      key={m.id}
+                      onClick={() => {
+                        if (daNop && onXemKetQuaMom) {
+                          onXemKetQuaMom(m)
+                        }
+                      }}
+                      className={`p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/70 transition flex items-center justify-between gap-3 ${
+                        daNop ? 'hover:border-amber-300 dark:hover:border-amber-700 cursor-pointer' : ''
+                      }`}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate block">
+                          {m.tieuDe}
+                        </span>
+                        <span className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
+                          <Clock3 size={12} />
+                          {new Date(m.taoLuc).toLocaleString('vi-VN', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                            daNop
+                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                              : m.trangThai === 'dang_lam'
+                              ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
+                              : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
+                          }`}
                         >
-                          <span>Xem kết quả</span>
-                          <ArrowUpRight size={13} />
-                        </button>
-                      )}
+                          {daNop
+                            ? `Đã nộp: ${m.diem?.toFixed(2) ?? '—'} điểm`
+                            : m.trangThai === 'dang_lam'
+                            ? 'Con đang làm'
+                            : 'Đã giao · Con chưa làm'}
+                        </span>
+                        {daNop && onXemKetQuaMom && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              onXemKetQuaMom(m)
+                            }}
+                            className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] flex items-center gap-1 transition cursor-pointer shadow-xs"
+                            title="Xem kết quả bài nộp"
+                          >
+                            <span>Xem kết quả</span>
+                            <ArrowUpRight size={13} />
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )
-              })}
-            </div>
-          )
-        ) : (
-          history.length === 0 ? (
-            <p className="p-4 text-xs text-slate-400 text-center bg-white dark:bg-slate-900">
-              Chưa có bài luyện nào. Em hãy chọn chế độ phía trên để bắt đầu làm bài!
-            </p>
+                  )
+                })}
+              </div>
+            )
           ) : (
-            <div
-              role="region"
-              aria-label="Danh sách bài luyện của em"
-              tabIndex={0}
-              className="max-h-60 overflow-y-auto overscroll-contain p-2 space-y-2"
-            >
-              {history.map((h) => {
-                const daNop = h.status === 'submitted'
-                return (
-                  <div
-                    key={h.id}
-                    onClick={() => setCurrentTest(h)}
-                    className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/70 hover:border-amber-300 dark:hover:border-amber-700 transition flex items-center justify-between gap-3 cursor-pointer"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate block">
-                        {h.tieuDe}
-                      </span>
-                      <span className="text-[11px] text-slate-400 mt-0.5 block">
-                        {new Date(h.createdAt).toLocaleString('vi-VN', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                        })}
-                      </span>
+            history.length === 0 ? (
+              <p className="p-4 text-xs text-slate-400 text-center bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+                Chưa có bài luyện nào. Em hãy chọn chế độ phía trên để bắt đầu làm bài!
+              </p>
+            ) : (
+              <div
+                role="region"
+                aria-label="Danh sách bài luyện của em"
+                tabIndex={0}
+                className="max-h-48 sm:max-h-52 overflow-y-auto overscroll-contain p-2 space-y-1.5 border-t border-slate-100 dark:border-slate-800"
+              >
+                {history.map((h) => {
+                  const daNop = h.status === 'submitted'
+                  return (
+                    <div
+                      key={h.id}
+                      onClick={() => setCurrentTest(h)}
+                      className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/70 hover:border-amber-300 dark:hover:border-amber-700 transition flex items-center justify-between gap-3 cursor-pointer"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate block">
+                          {h.tieuDe}
+                        </span>
+                        <span className="text-[11px] text-slate-400 mt-0.5 block">
+                          {new Date(h.createdAt).toLocaleString('vi-VN', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                            daNop
+                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                              : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
+                          }`}
+                        >
+                          {daNop ? `${typeof h.score === 'number' ? h.score.toFixed(2) : '--'} điểm` : 'Đang làm'}
+                        </span>
+                        <button
+                          onClick={(e) => xoaBai(h.id, e)}
+                          title="Xoá bài luyện này"
+                          className="text-slate-300 hover:text-rose-500 p-1 rounded transition cursor-pointer"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                        <ArrowUpRight size={14} className="text-slate-400" />
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span
-                        className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
-                          daNop
-                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                            : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
-                        }`}
-                      >
-                        {daNop ? `${typeof h.score === 'number' ? h.score.toFixed(2) : '--'} điểm` : 'Đang làm'}
-                      </span>
-                      <button
-                        onClick={(e) => xoaBai(h.id, e)}
-                        title="Xoá bài luyện này"
-                        className="text-slate-300 hover:text-rose-500 p-1 rounded transition cursor-pointer"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                      <ArrowUpRight size={14} className="text-slate-400" />
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+                  )
+                })}
+              </div>
+            )
           )
         )}
       </div>

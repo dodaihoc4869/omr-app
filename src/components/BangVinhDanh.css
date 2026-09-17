@@ -1,37 +1,412 @@
-.honors{border:1px solid var(--vien);border-radius:28px;background:var(--the);padding:clamp(20px,3vw,32px);color:var(--muc);overflow:hidden;margin-bottom:24px;position:relative}.honors-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}.honors-heading h2{font-size:26px;font-weight:700;letter-spacing:-.04em;margin:6px 0}.honors-heading p,.honors-rules{font-size:12px;color:var(--nhat)}.honors-eyebrow{display:flex;align-items:center;gap:6px;color:var(--vang-diu);font-size:10px;font-weight:700;letter-spacing:.16em}.honors-crown{color:var(--vang-diu)}.honors-podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:end;margin:30px 0 20px}.honors-card{text-align:center;border-radius:22px;padding:20px 12px;background:var(--the-2);border:1px solid var(--vien);position:relative;min-width:0}.honors-rank-1{grid-column:2;grid-row:1;background:var(--vang-diu-nen);border-color:var(--vang-diu);padding-top:32px;box-shadow:0 12px 32px rgba(178,137,47,.12)}.honors-rank-2{grid-column:1;grid-row:1}.honors-rank-3{grid-column:3;grid-row:1}.honors-rank{display:inline-flex;gap:6px;align-items:center;color:var(--vang-diu);font-size:11px;font-weight:700;letter-spacing:.1em}.honors-spirit{height:150px;display:grid;place-items:center;position:relative;color:var(--vang-diu);isolation:isolate}.honors-spirit:before{content:'';position:absolute;inset:20px;border-radius:50%;background:radial-gradient(ellipse,rgba(231,190,85,.35),transparent 68%);z-index:-1}.honors-spirit img{height:100%;max-width:100%;object-fit:contain;filter:drop-shadow(0 8px 12px rgba(195,156,61,.25))}.honors-rank-1 .honors-spirit{height:190px}.honors-card h3{font-size:17px;font-weight:700;overflow-wrap:anywhere}.honors-score{font-size:40px;font-weight:700;letter-spacing:-.05em;color:var(--vang-diu);margin-top:8px}.honors-score span{font-size:14px;letter-spacing:0;color:var(--nhat);margin-left:4px}.honors-praise{font-size:12px;margin-top:8px}.honors-pet{font-size:11px;color:var(--nhat);margin-top:8px}.honors-foot{border-top:1px solid var(--vien);margin-top:16px;padding-top:12px;font-size:11px;color:var(--nhat)}.honors-foot span{display:block;margin-top:5px;overflow-wrap:anywhere}.honors-rules summary{cursor:pointer}.honors-rules p{margin-top:8px;line-height:1.7}.honors-empty{padding:28px 0;color:var(--nhat);font-size:14px}@media(max-width:600px){.honors-podium{grid-template-columns:1fr;gap:12px;margin-top:20px}.honors-card{grid-column:auto;grid-row:auto}.honors-rank-1{order:-1}.honors-spirit,.honors-rank-1 .honors-spirit{height:160px}.honors-heading h2{font-size:23px}}
-/* Give the student's name its own layer above the bounded spirit artwork. */
-.honors-card .honors-name{position:relative;z-index:2;isolation:isolate;line-height:1.45;margin:14px 0 8px;padding:12px 8px;border-radius:14px;color:var(--muc);background:var(--the);font-size:clamp(17px,1.8vw,23px);overflow-wrap:anywhere}
-.honors-name:before{content:'';position:absolute;inset:-5px;border-radius:inherit;z-index:-1;pointer-events:none;border:1px solid rgba(227,180,62,.35);box-shadow:0 0 var(--name-glow,8px) rgba(227,180,62,var(--name-power,.15));animation:honors-name-glow 3.6s ease-in-out infinite alternate}
-.honors-rank-1{--name-glow:28px;--name-power:.65}.honors-rank-2{--name-glow:16px;--name-power:.35}.honors-rank-3{--name-glow:8px;--name-power:.18}
-.honors-rank-1 .honors-name{border:1px solid var(--vang-diu);font-weight:800}
-.honors-spirit{overflow:hidden;min-height:0;z-index:0}
-.honors-spirit img{display:block;width:100%;height:100%;min-height:0;max-height:100%;object-fit:contain}
-@keyframes honors-name-glow{from{opacity:.6}to{opacity:1}}
-@media(prefers-reduced-motion:reduce){.honors-name:before{animation:none}}
-/* A single, compact podium on phones as well as desktop. */
-@media(max-width:600px){
- .honors{padding:16px 10px;border-radius:22px}
- .honors-heading{padding:0 4px;gap:8px}
- .honors-heading h2{font-size:21px}
- .honors-heading p{font-size:10px;line-height:1.5}
- .honors-eyebrow{font-size:9px;letter-spacing:.08em}
- .honors-crown{width:27px;flex-shrink:0}
- .honors-podium{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:22px 0 0;align-items:end}
- .honors-card{padding:12px 5px;border-radius:15px;min-width:0}
- .honors-rank-1{grid-column:2;grid-row:1;order:0;padding-top:22px}
- .honors-rank-2{grid-column:1;grid-row:1}
- .honors-rank-3{grid-column:3;grid-row:1}
- .honors-rank{font-size:9px;gap:3px;letter-spacing:0}
- .honors-rank svg{width:13px;height:13px}
- .honors-card .honors-name{font-size:12px;line-height:1.45;margin:10px 0 6px;padding:7px 3px;border-radius:9px;min-height:66px;display:flex;align-items:center;justify-content:center;overflow-wrap:break-word}
- .honors-rank-1 .honors-name{font-size:13px}
- .honors-spirit{height:88px}
- .honors-rank-1 .honors-spirit{height:112px}
- .honors-score{font-size:27px;margin-top:4px}
- .honors-score span{font-size:10px;margin-left:2px}
- .honors-praise{font-size:10px;line-height:1.5;margin-top:5px}
- .honors-pet{font-size:9px;line-height:1.5;margin-top:6px}
- .honors-foot{font-size:9px;line-height:1.5;margin-top:10px;padding-top:8px}
- .honors-foot span{display:none}
- .honors-name:before{inset:-2px}
+.honors {
+  border: 1px solid var(--vien);
+  border-radius: 20px;
+  background: var(--the);
+  padding: 12px 14px 16px;
+  color: var(--muc);
+  overflow: hidden;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.honors-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.honors-heading h2 {
+  font-size: 17px;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  margin: 2px 0;
+}
+
+.honors-heading p,
+.honors-rules {
+  font-size: 11px;
+  color: var(--nhat);
+}
+
+.honors-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #fbbc04;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.honors-crown {
+  color: #fbbc04;
+  flex-shrink: 0;
+}
+
+.honors-podium {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  align-items: end;
+  margin: 12px 0 4px;
+}
+
+.honors-card {
+  text-align: center;
+  border-radius: 16px;
+  padding: 10px 8px 12px;
+  background: var(--the-2);
+  border: 1px solid var(--vien);
+  position: relative;
+  min-width: 0;
+}
+
+.honors-rank-1 {
+  grid-column: 2;
+  grid-row: 1;
+  background: var(--the);
+  border-color: #fbbc04;
+  padding-top: 14px;
+  z-index: 2;
+}
+
+.honors-top1-glow {
+  background: linear-gradient(180deg, rgba(254, 247, 224, 0.65) 0%, var(--the) 100%);
+  border: 2px solid #fbbc04;
+  box-shadow: 0 4px 20px rgba(251, 188, 4, 0.3), 0 0 30px rgba(251, 188, 4, 0.12);
+  animation: top1-card-breath 3.6s ease-in-out infinite alternate;
+}
+
+@keyframes top1-card-breath {
+  0% {
+    box-shadow: 0 4px 16px rgba(251, 188, 4, 0.25), 0 0 20px rgba(251, 188, 4, 0.1);
+    border-color: #fbbc04;
+  }
+  100% {
+    box-shadow: 0 6px 26px rgba(251, 188, 4, 0.45), 0 0 40px rgba(251, 188, 4, 0.25);
+    border-color: #f29900;
+  }
+}
+
+/* Ánh kim toả ra từ tâm đằng sau thần thú Top 1 */
+.honors-top1-radiance {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(251, 188, 4, 0.4) 0%, rgba(234, 67, 53, 0.12) 40%, rgba(66, 133, 244, 0.08) 60%, transparent 75%);
+  pointer-events: none;
+  z-index: 0;
+  animation: top1-radiance-pulse 3s ease-in-out infinite;
+}
+
+@keyframes top1-radiance-pulse {
+  0%, 100% {
+    transform: translate(-50%, 0) scale(0.9);
+    opacity: 0.65;
+  }
+  50% {
+    transform: translate(-50%, 0) scale(1.22);
+    opacity: 1;
+  }
+}
+
+/* Đốm sao 4 màu Google lấp lánh quanh Top 1 */
+.honors-sparkle {
+  position: absolute;
+  font-size: 14px;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  z-index: 3;
+  animation: sparkle-twinkle 2.8s ease-in-out infinite;
+}
+
+.honors-sparkle-1 {
+  top: 8px;
+  left: 10px;
+  color: #fbbc04; /* Google Gold */
+  animation-delay: 0s;
+}
+
+.honors-sparkle-2 {
+  top: 10px;
+  right: 12px;
+  color: #4285f4; /* Google Blue */
+  animation-delay: 0.7s;
+}
+
+.honors-sparkle-3 {
+  bottom: 28%;
+  left: 8px;
+  color: #34a853; /* Google Green */
+  animation-delay: 1.4s;
+}
+
+.honors-sparkle-4 {
+  bottom: 30%;
+  right: 8px;
+  color: #ea4335; /* Google Red */
+  animation-delay: 2.1s;
+}
+
+@keyframes sparkle-twinkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.65) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.3) rotate(90deg);
+    filter: drop-shadow(0 0 5px currentColor);
+  }
+}
+
+/* Vương miện xoay lắc nhẹ */
+.honors-crown-spin {
+  animation: crown-tilt 2.5s ease-in-out infinite;
+  display: inline-block;
+}
+
+@keyframes crown-tilt {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(-10deg) scale(1.12);
+  }
+  75% {
+    transform: rotate(10deg) scale(1.12);
+  }
+}
+
+.honors-rank-2 {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.honors-rank-3 {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.honors-rank {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  color: #fbbc04;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  position: relative;
+  z-index: 1;
+}
+
+.honors-spirit {
+  height: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  color: var(--vang-diu);
+  isolation: isolate;
+  overflow: visible;
+  margin: 4px 0 2px;
+  z-index: 1;
+}
+
+.honors-rank-1 .honors-spirit {
+  height: 84px;
+  margin: 6px 0 3px;
+}
+
+.honors-spirit img {
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+/* Thần thú Top 1 bay bổng nhịp nhàng */
+.honors-spirit-top1-animated {
+  display: block;
+  animation: top1-beast-float 3.2s ease-in-out infinite;
+  filter: drop-shadow(0 6px 12px rgba(251, 188, 4, 0.55));
+  will-change: transform;
+}
+
+@keyframes top1-beast-float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.05);
+  }
+}
+
+.honors-spirit-normal {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.12));
+}
+
+/* Bóng dưới chân thần thú */
+.honors-spirit-shadow {
+  width: 44px;
+  height: 6px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.22) 0%, transparent 70%);
+  border-radius: 50%;
+  margin-top: -2px;
+}
+
+.honors-shadow-top1-animated {
+  background: radial-gradient(ellipse at center, rgba(251, 188, 4, 0.45) 0%, transparent 70%);
+  animation: top1-shadow-pulse 3.2s ease-in-out infinite;
+}
+
+@keyframes top1-shadow-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(0.7);
+    opacity: 0.35;
+  }
+}
+
+.honors-card .honors-name {
+  position: relative;
+  z-index: 2;
+  isolation: isolate;
+  line-height: 1.35;
+  margin: 6px 0 4px;
+  padding: 4px 6px;
+  border-radius: 10px;
+  color: var(--muc);
+  background: var(--the);
+  font-size: 13px;
+  font-weight: 700;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--vien);
+}
+
+.honors-rank-1 .honors-name {
+  font-size: 14px;
+  font-weight: 800;
+  border-color: #fbbc04;
+  background: rgba(254, 247, 224, 0.8);
+  color: #795548;
+}
+
+.dark .honors-rank-1 .honors-name {
+  background: rgba(251, 188, 4, 0.15);
+  color: #fef08a;
+}
+
+.honors-score {
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #fbbc04;
+  margin-top: 2px;
+  line-height: 1.1;
+}
+
+.honors-rank-1 .honors-score {
+  font-size: 25px;
+  color: #d97706;
+}
+
+.dark .honors-rank-1 .honors-score {
+  color: #fbbf24;
+}
+
+.honors-score span {
+  font-size: 11px;
+  letter-spacing: 0;
+  color: var(--nhat);
+  margin-left: 2px;
+  font-weight: 600;
+}
+
+.honors-praise {
+  font-size: 10px;
+  margin-top: 3px;
+  line-height: 1.35;
+  color: var(--muc);
+}
+
+.honors-pet {
+  font-size: 9.5px;
+  color: var(--nhat);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+.honors-foot {
+  border-top: 1px solid var(--vien);
+  margin-top: 8px;
+  padding-top: 6px;
+  font-size: 9.5px;
+  color: var(--nhat);
+  line-height: 1.3;
+}
+
+.honors-foot span {
+  display: block;
+  margin-top: 3px;
+  overflow-wrap: anywhere;
+}
+
+.honors-empty {
+  padding: 16px 0;
+  color: var(--nhat);
+  font-size: 13px;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .honors {
+    padding: 10px 10px 14px;
+    border-radius: 18px;
+  }
+  .honors-heading h2 {
+    font-size: 15px;
+  }
+  .honors-podium {
+    gap: 6px;
+  }
+  .honors-card {
+    padding: 8px 4px 10px;
+    border-radius: 14px;
+  }
+  .honors-card .honors-name {
+    font-size: 11px;
+    min-height: 32px;
+    padding: 3px 4px;
+  }
+  .honors-rank-1 .honors-name {
+    font-size: 12px;
+  }
+  .honors-spirit {
+    height: 52px;
+  }
+  .honors-rank-1 .honors-spirit {
+    height: 68px;
+  }
+  .honors-score {
+    font-size: 18px;
+  }
+  .honors-rank-1 .honors-score {
+    font-size: 21px;
+  }
+  .honors-foot span {
+    display: none;
+  }
 }
