@@ -149,9 +149,10 @@ export default function BaoCaoCaThiHocSinhModal({
   }, [baiThi.maCa, sbd, scriptUrl])
 
   // Điểm từng phần
-  const diemI = baiThi.diemI !== null && baiThi.diemI !== undefined ? baiThi.diemI : Number((baiThi.diem * 0.45).toFixed(2))
-  const diemII = baiThi.diemII !== null && baiThi.diemII !== undefined ? baiThi.diemII : Number((baiThi.diem * 0.40).toFixed(2))
-  const diemIII = baiThi.diemIII !== null && baiThi.diemIII !== undefined ? baiThi.diemIII : Number((baiThi.diem * 0.15).toFixed(2))
+  const diemGoc = typeof baiThi.diem === 'number' ? baiThi.diem : 0
+  const diemI = baiThi.diemI !== null && baiThi.diemI !== undefined ? baiThi.diemI : Number((diemGoc * 0.45).toFixed(2))
+  const diemII = baiThi.diemII !== null && baiThi.diemII !== undefined ? baiThi.diemII : Number((diemGoc * 0.40).toFixed(2))
+  const diemIII = baiThi.diemIII !== null && baiThi.diemIII !== undefined ? baiThi.diemIII : Number((diemGoc * 0.15).toFixed(2))
 
   // ĐẾM CÂU: CHỈ DÙNG SỐ THẬT, KHÔNG SUY TỪ ĐIỂM.
   //
@@ -163,7 +164,7 @@ export default function BaoCaoCaThiHocSinhModal({
   //
   // Nay: ba số này đến từ bảng chấm qua `lichSuEm`. Không có thì để `null` và
   // giấu hẳn dòng đếm — thà không hiện còn hơn hiện số bịa cho phụ huynh đọc.
-  const diem = Number(baiThi.diem.toFixed(2))
+  const diem = Number(diemGoc.toFixed(2))
   const tongCau = baiThi.tongCau && baiThi.tongCau > 0 ? baiThi.tongCau : null
   const soDung = typeof baiThi.soCauDung === 'number' ? baiThi.soCauDung : null
   // Danh sách câu sai (bao gồm cả câu chưa làm / bỏ trống)

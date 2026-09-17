@@ -31,10 +31,13 @@ import {
   phanTichTyLeDang,
   rutLuyenDangBai,
   demCauDangBai,
+  phanTichBoLocCau,
+  rutLuyenTheoBoLoc,
   type BoLocCauLuyen,
   type CauSaiDauVao,
 } from '../lib/thuat-toan-rut-cau-sai'
-import type { CauLuyen } from '../lib/bai-tap-pdf'
+import { cauLuyenTuNguon, type CauLuyen } from '../lib/bai-tap-pdf'
+import { hopSao } from '../lib/loc-sao'
 import { normalizeNumericAnswer } from '../engine/score'
 import { loadScriptUrlHoacMacDinh, loadExamSources } from '../lib/exam-db'
 import { layDiaChiMayChu } from '../lib/dia-chi-may-chu'
@@ -195,10 +198,11 @@ export default function KhoiKhacPhuc3CheDo({
     } catch {}
   }
 
-  // Tải kho câu sai cho Chế độ 2 khi vào tab 2
+  // Tải kho câu cho Chế độ 2 và Chế độ 4
   const [dsCauSai2, setDsCauSai2] = useState<CauSaiDauVao[]>([])
   useEffect(() => {
-    if (cheDo !== 2) return
+    if (cheDo !== 2 && cheDo !== 4) return
+    if (khoDe2.length > 0) return
     let alive = true
     setDangTaiKho2(true)
     setLoiKho2('')
@@ -410,8 +414,23 @@ export default function KhoiKhacPhuc3CheDo({
 
   // Chế độ 3 (Dạng bài): tính toàn bộ số câu của dạng bài (không lọc)
   const tongToiDaCheDo3 = useMemo(() => demCauDangBai(khoDangBai), [khoDangBai])
-  // Chế độ 4 (Tự do): tính số câu theo bộ lọc mức độ
-  const tongToiDaCheDo4 = useMemo(() => demCauDangBai(khoDangBai, boLocCheDo4), [khoDangBai, boLocCheDo4])
+
+  // Chế độ 4 (Tự do): rút từ kho câu theo bộ lọc mức độ
+  const { dsUngVienCheDo4, tongToiDaCheDo4 } = useMemo(() => {
+    if (dsCauSai2.length > 0 && khoDe2.length > 0) {
+      const pt = phanTichBoLocCau(dsCauSai2, khoDe2, boLocCheDo4)
+      if (pt.tongToiDa > 0) {
+        return { dsUngVienCheDo4: [], tongToiDaCheDo4: pt.tongToiDa }
+      }
+    }
+    const tatCa = cauLuyenTuNguon(khoDe2).filter((cand) => {
+      if (!hopSao(cand.sao, boLocCheDo4.sao)) return false
+      if (boLocCheDo4.dang === 'ly_thuyet' && cand.dang !== 'ly_thuyet') return false
+      if (boLocCheDo4.dang === 'bai_tap' && cand.dang !== 'bai_tap') return false
+      return true
+    })
+    return { dsUngVienCheDo4: tatCa, tongToiDaCheDo4: tatCa.length }
+  }, [dsCauSai2, khoDe2, boLocCheDo4])
 
   useEffect(() => {
     if (tongToiDaCheDo3 > 0) {
@@ -421,7 +440,9 @@ export default function KhoiKhacPhuc3CheDo({
 
   useEffect(() => {
     if (tongToiDaCheDo4 > 0) {
-      setSoCauCheDo4((prev) => Math.min(tongToiDaCheDo4, Math.max(1, Math.min(prev, 50))))
+      setSoCauCheDo4((prev) => Math.min(tongToiDaCheDo4, Math.max(1, Math.min(prev > 0 ? prev : 20, 50))))
+    } else {
+      setSoCauCheDo4(0)
     }
   }, [tongToiDaCheDo4])
 
@@ -582,49 +603,38 @@ export default function KhoiKhacPhuc3CheDo({
         setCurrentTest(baiMoi)
         setSeconds(0)
       } else if (cheDo === 4) {
-        // Chế độ 4: Tự do theo mức độ (chọn nhiều dạng)
-        if (cacDangChon.size === 0) {
-          setLoi('Vui lòng tích chọn ít nhất 1 dạng bài trước khi bắt đầu.')
+        // Chế độ 4: Tự do theo mức độ (không ràng buộc chọn dạng bài)
+        if (khoDe2.length === 0) {
+          setLoi('Chưa có câu hỏi trong kho hoặc đang tải dữ liệu. Vui lòng thử lại sau giây lát.')
           return
         }
-        if (khoDangBai.length === 0) {
-          setLoi('Dạng bài này chưa có đề trong kho hoặc đang tải. Vui lòng thử lại sau giây lát.')
-          return
-        }
-        const tenDangChon =
-          cacDangChon.size === 1
-            ? dangsCuaBai.find((d) => cacDangChon.has(d.ma))?.ten || 'Dạng bài'
-            : `${cacDangChon.size} dạng bài`
-        const { dsCau } = rutLuyenDangBai(
-          khoDangBai,
-          soCauCheDo4,
-          {
+        let dsCau: CauLuyen[] = []
+        if (dsCauSai2.length > 0) {
+          const res = rutLuyenTheoBoLoc(dsCauSai2, khoDe2, boLocCheDo4, soCauCheDo4, {
             hoTen,
             sbd,
-            tenDang: tenDangChon,
-            tenBai: baiChon,
-            lop: lopChon,
-          },
-          boLocCheDo4
-        )
+          })
+          dsCau = res.dsCau
+        }
+        if (dsCau.length === 0 && dsUngVienCheDo4.length > 0) {
+          const tron = [...dsUngVienCheDo4].sort(() => Math.random() - 0.5)
+          dsCau = tron.slice(0, Math.min(soCauCheDo4, dsUngVienCheDo4.length))
+        }
         if (dsCau.length === 0) {
           setLoi('Không tìm thấy câu hỏi phù hợp với mức độ đã chọn.')
           return
         }
         const nhanMuc =
           mucDo === 'sao_2'
-            ? '2 sao'
+            ? '2 sao (Vận dụng)'
             : mucDo === 'sao_1'
-            ? '1 sao'
+            ? '1 sao (Thông hiểu)'
             : mucDo === 'ly_thuyet'
             ? 'Lý thuyết'
             : mucDo === 'bai_tap'
             ? 'Bài tập'
             : 'Ngẫu nhiên'
-        const tieuDe =
-          cacDangChon.size === 1
-            ? `Tự do (${nhanMuc}): ${tenDangChon} (${dsCau.length} câu)`
-            : `Tự do (${nhanMuc}): ${cacDangChon.size} dạng bài · Lớp ${lopChon} (${dsCau.length} câu)`
+        const tieuDe = `Tự do (${nhanMuc}): ${dsCau.length} câu`
         if (onGiaoBaiChoCon) {
           await onGiaoBaiChoCon(dsCau, tieuDe)
           return
@@ -736,7 +746,7 @@ export default function KhoiKhacPhuc3CheDo({
                 <Award className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                 <div>
                   <div className="text-xs font-medium text-emerald-800 dark:text-emerald-200">
-                    Kết quả: <strong>{currentTest.score?.toFixed(2)} / 10 điểm</strong>
+                    Kết quả: <strong>{typeof currentTest.score === 'number' ? currentTest.score.toFixed(2) : '--'} / 10 điểm</strong>
                   </div>
                   <div className="text-[11px] text-emerald-600 dark:text-emerald-400">
                     Đúng {currentTest.soCauDung} / {currentTest.tongSoCau} câu
@@ -1023,7 +1033,7 @@ export default function KhoiKhacPhuc3CheDo({
                           #{item.maCa} · {item.tenCa || `Ca ${item.maCa}`}
                         </span>
                         <span className="text-[11px] text-slate-400">
-                          Điểm: {item.tong !== null ? item.tong.toFixed(2) : '--'}
+                          Điểm: {typeof item.tong === 'number' ? item.tong.toFixed(2) : typeof item.diem === 'number' ? item.diem.toFixed(2) : '--'}
                         </span>
                       </div>
                     </div>
@@ -1412,126 +1422,25 @@ export default function KhoiKhacPhuc3CheDo({
         </div>
       )}
 
-      {/* NỘI DUNG CHẾ ĐỘ 4: TỰ DO (Tách từ mục 4 của SGK cũ) */}
+      {/* NỘI DUNG CHẾ ĐỘ 4: TỰ DO */}
       {cheDo === 4 && (
         <div className="space-y-3.5">
-          {dangTaiDm ? (
+          {dangTaiKho2 ? (
             <div className="py-6 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
               <RefreshCw size={16} className="animate-spin text-amber-500" />
-              Đang tải dữ liệu...
+              Đang tải dữ liệu kho câu...
+            </div>
+          ) : loiKho2 && tongToiDaCheDo4 === 0 ? (
+            <div className="p-3.5 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 text-xs flex items-center gap-2">
+              <AlertCircle size={16} className="shrink-0" />
+              <span>{loiKho2}</span>
             </div>
           ) : (
             <>
-              {/* Chọn Lớp 10 / 11 / 12 */}
+              {/* Chọn Mức độ luyện tập */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  1. Chọn Lớp:
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {['10', '11', '12'].map((lop) => (
-                    <button
-                      key={lop}
-                      type="button"
-                      onClick={() => handleChonLop(lop)}
-                      className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer ${
-                        lopChon === lop
-                          ? 'border-amber-500 bg-amber-500 text-white'
-                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:border-amber-300'
-                      }`}
-                    >
-                      Lớp {lop}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Chọn Bài SGK */}
-              {baisCuaLop.length > 0 && (
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    2. Chọn Bài học SGK:
-                  </label>
-                  <select
-                    value={baiChon}
-                    onChange={(e) => handleChonBai(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  >
-                    {baisCuaLop.map((b) => (
-                      <option key={b.tenBai} value={b.tenBai}>
-                        {b.tenBai} ({b.dangs.length} dạng)
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {/* Chọn Dạng bài trọng tâm (box có ô tích chọn nhiều dạng) */}
-              {dangsCuaBai.length > 0 && (
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                      3. Chọn Dạng toán trọng tâm:
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (cacDangChon.size === dangsCuaBai.length) {
-                          setCacDangChon(new Set())
-                        } else {
-                          setCacDangChon(new Set(dangsCuaBai.map((d) => d.ma)))
-                        }
-                      }}
-                      className="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
-                    >
-                      {cacDangChon.size === dangsCuaBai.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
-                    </button>
-                  </div>
-
-                  <div
-                    role="region"
-                    aria-label="Danh sách dạng bài"
-                    tabIndex={0}
-                    className="max-h-56 overflow-y-auto space-y-1.5 pr-1"
-                  >
-                    {dangsCuaBai.map((d) => {
-                      const isSelected = cacDangChon.has(d.ma)
-                      return (
-                        <div
-                          key={d.ma}
-                          onClick={() => {
-                            setCacDangChon((prev) => {
-                              const s = new Set(prev)
-                              if (s.has(d.ma)) s.delete(d.ma)
-                              else s.add(d.ma)
-                              return s
-                            })
-                          }}
-                          className={`p-2.5 rounded-xl border flex items-center justify-between gap-2.5 cursor-pointer transition text-xs ${
-                            isSelected
-                              ? 'border-amber-400 bg-amber-50/60 dark:bg-amber-950/30 text-slate-900 dark:text-white'
-                              : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-700 dark:text-slate-300'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <div className="text-amber-500 shrink-0">
-                              {isSelected ? <CheckSquare size={16} /> : <Square size={16} />}
-                            </div>
-                            <span className="font-semibold truncate">{d.ten}</span>
-                          </div>
-                          <span className="shrink-0 text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
-                            {d.soCau} câu
-                          </span>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* 4. Chọn Mức độ: Tách từ mục 4 cũ */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  4. Chọn Mức độ luyện tập:
+                  Chọn Mức độ luyện tập:
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs">
                   {[
@@ -1576,22 +1485,23 @@ export default function KhoiKhacPhuc3CheDo({
                   />
                 </div>
               ) : (
-                <p className="text-xs text-slate-400 italic">Dạng này chưa có câu phù hợp với mức độ đã chọn.</p>
+                <p className="text-xs text-slate-400 italic">Chưa có câu phù hợp với mức độ đã chọn.</p>
               )}
 
               <button
-                disabled={dangXuLy || dangTaiDang || cacDangChon.size === 0 || tongToiDaCheDo4 === 0}
+                disabled={dangXuLy || dangTaiKho2 || tongToiDaCheDo4 === 0}
                 onClick={batDauLamBai}
                 className="w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 transition cursor-pointer"
               >
-                {dangXuLy || dangTaiDang ? (
+                {dangXuLy || dangTaiKho2 ? (
                   <RefreshCw size={16} className="animate-spin" />
                 ) : (
                   <Play size={16} fill="currentColor" />
                 )}
                 <span>
-                  {vaiTro === 'ph' ? 'Giao bài tự do cho con ' : 'Bắt đầu bài luyện tự do '}
-                  {cacDangChon.size > 0 ? `(${cacDangChon.size} dạng đã chọn)` : ''}
+                  {vaiTro === 'ph'
+                    ? `Giao bài tự do cho con (${soCauCheDo4} câu)`
+                    : `Bắt đầu bài luyện tự do (${soCauCheDo4} câu)`}
                 </span>
               </button>
             </>
@@ -1730,7 +1640,7 @@ export default function KhoiKhacPhuc3CheDo({
                             : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
                         }`}
                       >
-                        {daNop ? `${h.score?.toFixed(2)} điểm` : 'Đang làm'}
+                        {daNop ? `${typeof h.score === 'number' ? h.score.toFixed(2) : '--'} điểm` : 'Đang làm'}
                       </span>
                       <button
                         onClick={(e) => xoaBai(h.id, e)}

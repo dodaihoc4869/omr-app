@@ -31,6 +31,7 @@ interface BaiThiCuaCon {
   tenCa: string
   ngayNop: string
   diem: number
+  tong?: number | null
   diemI?: number | null
   diemII?: number | null
   diemIII?: number | null
@@ -178,7 +179,8 @@ export default function ParentPortalScreen() {
                 maCa: c.maCa || '',
                 tenCa: c.tenCa || `Ca thi #${c.maCa}`,
                 ngayNop: c.nopLuc || '',
-                diem: typeof c.tong === 'number' ? c.tong : 0,
+                diem: typeof c.tong === 'number' ? c.tong : (typeof c.diem === 'number' ? c.diem : 0),
+                tong: typeof c.tong === 'number' ? c.tong : (typeof c.diem === 'number' ? c.diem : 0),
                 diemI: typeof c.diemI === 'number' ? c.diemI : null,
                 diemII: typeof c.diemII === 'number' ? c.diemII : null,
                 diemIII: typeof c.diemIII === 'number' ? c.diemIII : null,
@@ -526,7 +528,7 @@ export default function ParentPortalScreen() {
                     <div className="flex items-center gap-3 shrink-0">
                       <div className="text-right">
                         <div className="text-lg font-black text-blue-600 dark:text-blue-400 leading-none">
-                          {b.diem.toFixed(2)}
+                          {typeof b.diem === 'number' ? b.diem.toFixed(2) : typeof b.tong === 'number' ? b.tong.toFixed(2) : '--'}
                         </div>
                         <div className="text-[10px] text-slate-400 mt-0.5">điểm</div>
                       </div>
