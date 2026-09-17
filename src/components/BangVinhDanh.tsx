@@ -190,69 +190,69 @@ export default function BangVinhDanh({
             {vaiTro === 'hocsinh' ? (
               <>
                 {/* HỌC SINH - Ô 1: ĐỘNG LỰC HỌC TẬP (Google Blue Luminous) */}
-                <div className="google-box-blue rounded-xl border-2 p-2 sm:p-2.5 flex flex-col justify-between transition-all duration-300 relative overflow-hidden group">
+                <div className="honors-quote-card google-box-blue rounded-xl border-2 p-2 sm:p-2.5 flex flex-col justify-between transition-all duration-300 relative overflow-hidden group">
                   <div>
                     <div className="flex items-center justify-between gap-1">
-                      <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100/90 dark:bg-blue-950/90 text-blue-700 dark:text-blue-300 text-[10px] font-bold">
+                      <div className="honors-quote-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100/90 dark:bg-blue-950/90 text-blue-700 dark:text-blue-300 text-[10px] font-bold">
                         <Compass size={11} className="text-blue-600 dark:text-blue-400 shrink-0" />
                         <span>Động Lực Học Tập</span>
                       </div>
-                      <span className="text-[9px] font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                      <span className="honors-quote-subtag text-[9px] font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-blue-500 google-pulse-dot" />
                         00:01 mỗi ngày
                       </span>
                     </div>
-                    <p className="text-[11px] sm:text-xs font-medium text-slate-800 dark:text-slate-100 italic leading-snug mt-1 line-clamp-2">
+                    <p className="honors-quote-body text-[11px] sm:text-xs font-medium text-slate-800 dark:text-slate-100 italic leading-snug mt-1 line-clamp-2">
                       "{quotes.dongLuc.cau}"
                     </p>
                   </div>
-                  <div className="mt-1 pt-1 border-t border-blue-100/80 dark:border-blue-900/40 flex items-center justify-between text-[9.5px]">
+                  <div className="honors-quote-foot mt-1 pt-1 border-t border-blue-100/80 dark:border-blue-900/40 flex items-center justify-between text-[9.5px]">
                     <span className="text-blue-700/80 dark:text-blue-300/80 font-medium">Ý chí & mục tiêu</span>
                     <span className="font-bold text-blue-600 dark:text-blue-400">— {quotes.dongLuc.tacGia}</span>
                   </div>
                 </div>
 
                 {/* HỌC SINH - Ô 2 (Ở GIỮA): CÔNG ƠN CHA MẸ (Google Red / Rose Luminous) */}
-                <div className="google-box-red rounded-xl border-2 p-2 sm:p-2.5 flex flex-col justify-between transition-all duration-300 relative overflow-hidden group">
+                <div className="honors-quote-card google-box-red rounded-xl border-2 p-2 sm:p-2.5 flex flex-col justify-between transition-all duration-300 relative overflow-hidden group">
                   <div>
                     <div className="flex items-center justify-between gap-1">
-                      <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-100/90 dark:bg-rose-950/90 text-rose-700 dark:text-rose-300 text-[10px] font-bold">
+                      <div className="honors-quote-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-100/90 dark:bg-rose-950/90 text-rose-700 dark:text-rose-300 text-[10px] font-bold">
                         <Heart size={11} className="text-rose-600 dark:text-rose-400 shrink-0" fill="currentColor" />
                         <span>Ơn Nghĩa Sinh Thành</span>
                       </div>
-                      <span className="text-[9px] font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-1">
+                      <span className="honors-quote-subtag text-[9px] font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-rose-500 google-pulse-dot" />
                         Công cha mẹ
                       </span>
                     </div>
-                    <p className="text-[11px] sm:text-xs font-medium text-slate-800 dark:text-slate-100 italic leading-snug mt-1 line-clamp-2">
+                    <p className="honors-quote-body text-[11px] sm:text-xs font-medium text-slate-800 dark:text-slate-100 italic leading-snug mt-1 line-clamp-2">
                       "{quotes.chaMe.cau}"
                     </p>
                   </div>
-                  <div className="mt-1 pt-1 border-t border-rose-100/80 dark:border-rose-900/40 flex items-center justify-between text-[9.5px]">
+                  <div className="honors-quote-foot mt-1 pt-1 border-t border-rose-100/80 dark:border-rose-900/40 flex items-center justify-between text-[9.5px]">
                     <span className="text-rose-700/80 dark:text-rose-300/80 font-medium">Tri ân phụ mẫu</span>
                     <span className="font-bold text-rose-600 dark:text-rose-400">— {quotes.chaMe.tacGia}</span>
                   </div>
                 </div>
 
                 {/* HỌC SINH - Ô 3: TRI ÂN THẦY CÔ (Google Amber / Green Luminous) */}
-                <div className="google-box-amber rounded-xl border-2 p-2 sm:p-2.5 flex flex-col justify-between transition-all duration-300 relative overflow-hidden group">
+                <div className="honors-quote-card google-box-amber rounded-xl border-2 p-2 sm:p-2.5 flex flex-col justify-between transition-all duration-300 relative overflow-hidden group">
                   <div>
                     <div className="flex items-center justify-between gap-1">
-                      <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100/90 dark:bg-amber-950/90 text-amber-800 dark:text-amber-200 text-[10px] font-bold">
+                      <div className="honors-quote-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100/90 dark:bg-amber-950/90 text-amber-800 dark:text-amber-200 text-[10px] font-bold">
                         <GraduationCap size={12} className="text-amber-600 dark:text-amber-400 shrink-0" />
                         <span>Tri Ân Thầy Cô</span>
                       </div>
-                      <span className="text-[9px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                      <span className="honors-quote-subtag text-[9px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-amber-500 google-pulse-dot" />
                         Người lái đò
                       </span>
                     </div>
-                    <p className="text-[11px] sm:text-xs font-medium text-slate-800 dark:text-slate-100 italic leading-snug mt-1 line-clamp-2">
+                    <p className="honors-quote-body text-[11px] sm:text-xs font-medium text-slate-800 dark:text-slate-100 italic leading-snug mt-1 line-clamp-2">
                       "{quotes.thayCo.cau}"
                     </p>
                   </div>
-                  <div className="mt-1 pt-1 border-t border-amber-100/80 dark:border-amber-900/40 flex items-center justify-between text-[9.5px]">
+                  <div className="honors-quote-foot mt-1 pt-1 border-t border-amber-100/80 dark:border-amber-900/40 flex items-center justify-between text-[9.5px]">
                     <span className="text-amber-700/80 dark:text-amber-300/80 font-medium">Kính thầy trọng đạo</span>
                     <span className="font-bold text-amber-600 dark:text-amber-400">— {quotes.thayCo.tacGia}</span>
                   </div>
@@ -261,78 +261,78 @@ export default function BangVinhDanh({
             ) : (
               <>
                 {/* PHỤ HUYNH - Ô 1: THÔNG TIN PHỤ HUYNH & HỌC SINH (Google Blue Luminous) */}
-                <div className="google-box-blue rounded-xl border-2 p-2 sm:p-2.5 flex flex-col justify-between transition-all duration-300 relative overflow-hidden group">
+                <div className="honors-quote-card google-box-blue rounded-xl border-2 p-2 sm:p-2.5 flex flex-col justify-between transition-all duration-300 relative overflow-hidden group">
                   <div>
                     <div className="flex items-center justify-between gap-1">
-                      <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100/90 dark:bg-blue-950/90 text-blue-700 dark:text-blue-300 text-[10px] font-bold">
+                      <div className="honors-quote-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100/90 dark:bg-blue-950/90 text-blue-700 dark:text-blue-300 text-[10px] font-bold">
                         <Sparkles size={11} className="text-blue-600 dark:text-blue-400 shrink-0" />
                         <span>Đồng Hành Cùng Con</span>
                       </div>
                       {sbd && (
-                        <span className="text-[9.5px] font-mono font-bold text-blue-600 dark:text-blue-400">
+                        <span className="honors-quote-subtag text-[9.5px] font-mono font-bold text-blue-600 dark:text-blue-400">
                           SBD: {sbd} {lop ? `· ${lop}` : ''}
                         </span>
                       )}
                     </div>
                     <div className="mt-1">
-                      <div className="text-[11.5px] sm:text-xs font-black text-slate-900 dark:text-white leading-tight">
+                      <div className="honors-parent-title text-[11.5px] sm:text-xs font-black text-slate-900 dark:text-white leading-tight">
                         Chào Quý Phụ huynh{' '}
                         <span className="text-blue-600 dark:text-blue-400">của em {hoTen || 'học sinh'}!</span>
                       </div>
-                      <p className="text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+                      <p className="honors-parent-sub text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
                         Xem kết quả thi & tạo bài luyện khắc phục lỗi sai cho con.
                       </p>
                     </div>
                   </div>
-                  <div className="mt-1 pt-1 border-t border-blue-100/80 dark:border-blue-900/40 flex items-center justify-between text-[10px]">
+                  <div className="honors-quote-foot mt-1 pt-1 border-t border-blue-100/80 dark:border-blue-900/40 flex items-center justify-between text-[10px]">
                     <span className="text-slate-500 dark:text-slate-400">Tổng số ca thi:</span>
-                    <span className="px-2 py-0.2 rounded-md bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 font-black">
+                    <span className="honors-ca-pill px-2 py-0.2 rounded-md bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 font-black">
                       {tongSoCa} ca
                     </span>
                   </div>
                 </div>
 
                 {/* PHỤ HUYNH - Ô 2 (Ở GIỮA): LỜI TRI ÂN CHA MẸ (Google Red / Rose Luminous) */}
-                <div className="google-box-red rounded-xl border-2 p-2 sm:p-2.5 flex flex-col justify-between transition-all duration-300 relative overflow-hidden group">
+                <div className="honors-quote-card google-box-red rounded-xl border-2 p-2 sm:p-2.5 flex flex-col justify-between transition-all duration-300 relative overflow-hidden group">
                   <div>
                     <div className="flex items-center justify-between gap-1">
-                      <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-100/90 dark:bg-rose-950/90 text-rose-700 dark:text-rose-300 text-[10px] font-bold">
+                      <div className="honors-quote-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-100/90 dark:bg-rose-950/90 text-rose-700 dark:text-rose-300 text-[10px] font-bold">
                         <Heart size={11} className="text-rose-600 dark:text-rose-400 shrink-0" fill="currentColor" />
                         <span>Lời Tri Ân Cha Mẹ</span>
                       </div>
-                      <span className="text-[9px] font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-1">
+                      <span className="honors-quote-subtag text-[9px] font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-rose-500 google-pulse-dot" />
                         00:01 mỗi ngày
                       </span>
                     </div>
-                    <p className="text-[11px] sm:text-xs font-medium text-slate-800 dark:text-slate-100 italic leading-snug mt-1 line-clamp-2">
+                    <p className="honors-quote-body text-[11px] sm:text-xs font-medium text-slate-800 dark:text-slate-100 italic leading-snug mt-1 line-clamp-2">
                       "{quotes.chaMe.cau}"
                     </p>
                   </div>
-                  <div className="mt-1 pt-1 border-t border-rose-100/80 dark:border-rose-900/40 flex items-center justify-between text-[9.5px]">
+                  <div className="honors-quote-foot mt-1 pt-1 border-t border-rose-100/80 dark:border-rose-900/40 flex items-center justify-between text-[9.5px]">
                     <span className="text-rose-700/80 dark:text-rose-300/80 font-medium">Tình thương gia đình</span>
                     <span className="font-bold text-rose-600 dark:text-rose-400">— {quotes.chaMe.tacGia}</span>
                   </div>
                 </div>
 
                 {/* PHỤ HUYNH - Ô 3: ĐỒNG HÀNH CÙNG CON (Google Amber / Green Luminous) */}
-                <div className="google-box-amber rounded-xl border-2 p-2 sm:p-2.5 flex flex-col justify-between transition-all duration-300 relative overflow-hidden group">
+                <div className="honors-quote-card google-box-amber rounded-xl border-2 p-2 sm:p-2.5 flex flex-col justify-between transition-all duration-300 relative overflow-hidden group">
                   <div>
                     <div className="flex items-center justify-between gap-1">
-                      <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100/90 dark:bg-amber-950/90 text-amber-800 dark:text-amber-200 text-[10px] font-bold">
+                      <div className="honors-quote-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100/90 dark:bg-amber-950/90 text-amber-800 dark:text-amber-200 text-[10px] font-bold">
                         <Sparkles size={11} className="text-amber-600 dark:text-amber-400 shrink-0" />
                         <span>Đồng Hành Cùng Con</span>
                       </div>
-                      <span className="text-[9px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                      <span className="honors-quote-subtag text-[9px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-amber-500 google-pulse-dot" />
                         Bệ phóng tương lai
                       </span>
                     </div>
-                    <p className="text-[11px] sm:text-xs font-medium text-slate-800 dark:text-slate-100 italic leading-snug mt-1 line-clamp-2">
+                    <p className="honors-quote-body text-[11px] sm:text-xs font-medium text-slate-800 dark:text-slate-100 italic leading-snug mt-1 line-clamp-2">
                       "{quotes.dongHanhPh.cau}"
                     </p>
                   </div>
-                  <div className="mt-1 pt-1 border-t border-amber-100/80 dark:border-amber-900/40 flex items-center justify-between text-[9.5px]">
+                  <div className="honors-quote-foot mt-1 pt-1 border-t border-amber-100/80 dark:border-amber-900/40 flex items-center justify-between text-[9.5px]">
                     <span className="text-amber-700/80 dark:text-amber-300/80 font-medium">Chắp cánh ước mơ</span>
                     <span className="font-bold text-amber-600 dark:text-amber-400">— {quotes.dongHanhPh.tacGia}</span>
                   </div>
