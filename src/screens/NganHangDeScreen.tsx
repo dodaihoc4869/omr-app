@@ -23,6 +23,7 @@ import { buildTeacherSourceFromKhoDe, parseKhoDeJsonText } from '../lib/exam-kho
 import { mergeKeepAnswers, validateTeacherSource } from '../data/examContent'
 import { maDeTheoPhan, PHAN_DE_TACH, TEN_PHAN_TACH } from '../lib/tach-phan-de'
 import TheCau from '../components/TheCau'
+import NutQuayLai from '../components/NutQuayLai'
 import { useAppStore } from '../store/appStore'
 import { apDungSoSua, type SoSuaDang } from '../lib/sua-dang'
 
@@ -370,9 +371,7 @@ export default function NganHangDeScreen() {
             </p>
           </div>
         </div>
-        <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target hover:text-[#1a73e8] transition-colors cursor-pointer">
-          ← Kiểm tra
-        </button>
+        <NutQuayLai onClick={() => setScreen('examhub')} label="Kiểm tra" />
       </div>
 
       <TheNoiDung className="gv-bank-overview">

@@ -12,10 +12,10 @@ import {
   LogOut,
   RefreshCw,
   AlertCircle,
-  ArrowLeft,
   X,
 } from 'lucide-react'
 import LogoApp from '../components/LogoApp'
+import NutQuayLai from '../components/NutQuayLai'
 import InfographicHuongDan from '../components/InfographicHuongDan'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import BaoCaoCaThiPhuHuynhModal from '../components/BaoCaoCaThiPhuHuynhModal'
@@ -407,48 +407,56 @@ export default function ParentPortalScreen() {
     )
   }
 
+  const dangToanManHinh =
+    tabPh !== null ||
+    !!caDangXem ||
+    !!xemPhieuHtml ||
+    (Array.isArray(dsCauSaiModalMom) && dsCauSaiModalMom.length > 0) ||
+    hienHuongDan
+
   // GIAO DIỆN 2: ĐÃ ĐĂNG NHẬP — 2 Ô CHÍNH (XEM BÁO CÁO & TẠO BÀI CỦA MOM GIAO)
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
-      {/* HEADER */}
-      <header className="px-4 pb-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-30 flex items-center justify-between" style={{ paddingTop: 'env(safe-area-inset-top, 10px)' }}>
-        <div className="flex items-center gap-3">
-          <LogoApp vai="phuhuynh" size={36} hienChu={true} phuDe="PHỤ HUYNH" />
-        </div>
+      {/* THANH ĐIỀU HƯỚNG CẠNH TRÁI — Bỏ nền, thu nhỏ lại, ẩn khi toàn màn hình */}
+      {!dangToanManHinh && (
+        <header
+          className="fixed left-3 sm:left-5 top-3 z-40 flex items-center gap-2 sm:gap-3 px-3 py-1.5 rounded-full bg-slate-100/60 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/40 dark:border-slate-800/40 shadow-xs transition-all"
+          style={{ paddingTop: 'max(env(safe-area-inset-top, 6px), 6px)' }}
+          aria-label="Điều hướng Phụ Huynh"
+        >
+          <LogoApp vai="phuhuynh" size={30} hienChu={false} phuDe="PHỤ HUYNH" />
 
-        <div className="flex items-center gap-2 sm:gap-3">
-          <button
-            type="button"
-            onClick={() => setHienHuongDan(true)}
-            className="p-2 text-slate-500 hover:text-blue-600 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition tap-target"
-            title="Hướng dẫn đăng nhập"
-          >
-            <HelpCircle size={18} />
-          </button>
-
-          <div className="text-right hidden sm:block">
-            <div className="text-xs font-bold text-slate-900 dark:text-white leading-tight">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="text-xs font-bold text-slate-900 dark:text-white hidden md:inline truncate max-w-[130px]">
               {hoTenCon}
-            </div>
-            <div className="text-[11px] text-slate-500 dark:text-slate-400">
-              SBD: <span className="font-mono font-bold text-blue-600">{sbdHienTai}</span> {lopCon ? `· ${lopCon}` : ''}
-            </div>
-          </div>
+            </span>
+            <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-100/70 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/50">
+              #{sbdHienTai}
+            </span>
 
-          <button
-            type="button"
-            onClick={dangXuat}
-            className="px-3 py-1.5 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 flex items-center gap-1 cursor-pointer tap-target"
-            title="Đổi học sinh khác"
-          >
-            <LogOut size={14} />
-            <span className="hidden sm:inline">Đổi SBD</span>
-          </button>
-        </div>
-      </header>
+            <button
+              type="button"
+              onClick={() => setHienHuongDan(true)}
+              className="p-1.5 text-slate-500 hover:text-blue-600 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-800/60 transition tap-target"
+              title="Hướng dẫn"
+            >
+              <HelpCircle size={15} />
+            </button>
+
+            <button
+              type="button"
+              onClick={dangXuat}
+              className="p-1.5 rounded-full text-slate-500 hover:text-rose-600 hover:bg-rose-100/60 dark:hover:bg-rose-950/60 transition cursor-pointer tap-target"
+              title="Đổi SBD"
+            >
+              <LogOut size={14} />
+            </button>
+          </div>
+        </header>
+      )}
 
       {/* BODY CHÍNH */}
-      <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6 pb-24">
+      <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6 pt-14 sm:pt-16 pb-24">
         <div className="mb-6">
           <BangTinPhuHuynh
             sbd={sbdHienTai}
@@ -468,14 +476,7 @@ export default function ParentPortalScreen() {
         <div className="fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto flex flex-col animate-google-fade">
           {/* Header Toàn Màn Hình */}
           <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-3 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 shadow-xs">
-            <button
-              type="button"
-              onClick={() => setTabPh(null)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs sm:text-sm font-bold transition cursor-pointer active:scale-95"
-            >
-              <ArrowLeft size={16} />
-              <span>Quay lại Bảng tin</span>
-            </button>
+            <NutQuayLai onClick={() => setTabPh(null)} label="Quay lại Bảng tin" />
 
             <div className="flex items-center gap-2 min-w-0 max-w-[200px] sm:max-w-md">
               <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />

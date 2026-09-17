@@ -315,7 +315,6 @@ function App() {
   return (
     <div className={`min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100${laManThi ? '' : ' khung-app'}`}>
       <Toast />
-      {!laManThi && <ThanhBenTrai />}
       <div className="khung-noi-dung">
         <div className="giua-noi-dung" data-teacher-screen={laManThi ? undefined : screen}>
       {/* Một màn ném lỗi thì chỉ màn đó hiện báo lỗi, app KHÔNG trắng. key theo
@@ -337,6 +336,7 @@ function App() {
       </ChanLoi>
         </div>
       </div>
+      {!laManThi && <ThanhBenTrai />}
       {!HIDE_BOTTOMNAV_ON.includes(screen) && <BottomNav />}
     </div>
   )

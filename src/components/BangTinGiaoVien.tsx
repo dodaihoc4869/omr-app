@@ -12,6 +12,7 @@ import {
 import { layCauHinhMayChu } from '../lib/may-chu-moi'
 import { loadTeacherSecret } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
+import { dinhDangDeCayThuMuc } from '../screens/PhanCongScreen'
 import './BangTinPhuHuynh.css'
 
 type Report = {
@@ -236,7 +237,9 @@ export default function BangTinGiaoVien() {
                           className="flex items-center justify-between gap-1 font-bold text-slate-900 dark:text-white"
                           style={{ overflowWrap: 'anywhere' }}
                         >
-                          <span className="line-clamp-1">{b.ma_de}</span>
+                          <span className="line-clamp-1 font-semibold" title={b.ma_de}>
+                            {dinhDangDeCayThuMuc(b.ma_de) || b.ma_de}
+                          </span>
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shrink-0">
                             {b.da_nop || 0}/{b.tong} đã nộp
                           </span>

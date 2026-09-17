@@ -1,4 +1,5 @@
 import {experimentHtml,experimentOriginal} from './experiments/render'
+import { tachDongTheoY } from './tach-dong-cau'
 // DỰNG PHIẾU THÀNH MỘT TRANG WEB ĐỌC ĐƯỢC, BẤM VÀO CÂU LÀ HIỆN LỜI GIẢI.
 //
 // VÌ SAO ĐỔI KHỎI BẢN "GIẤY A4"
@@ -212,6 +213,71 @@ export const CSS_PHIEU = `
   --bong: 0 2px 10px rgba(0,0,0,.04);
   --bong-cao: 0 8px 30px rgba(0,0,0,.08);
   --muot: .25s cubic-bezier(.4, 0, .2, 1);
+}
+
+@media screen and (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --nen: #0b1120;
+    --the-nen: #1e293b;
+    --muc: #f8fafc;
+    --muc-2: #cbd5e1;
+    --nhat: #94a3b8;
+    --rat-nhat: #64748b;
+    --vien: #334155;
+    --vien-dam: #475569;
+    --kem-nen: #292524;
+    --kem-vien: #78350f;
+    --kem-muc: #fef3c7;
+    --kem-nhan: #fbbf24;
+  }
+  .q-card { background: #1e293b; border-color: #334155; }
+  .q-text { color: #f8fafc; }
+  .thanh { background: rgba(30, 41, 59, 0.95); border-color: #334155; color: #f8fafc; }
+  .sa-input { background: #0f172a; color: #f8fafc; border-color: #475569; }
+  .sa-input:focus { background: #1e293b; color: #ffffff; border-color: #3b82f6; }
+  .q-opt { background: #0f172a; border-color: #334155; color: #e2e8f0; }
+  .q-opt-letter { background: #1e293b; color: #cbd5e1; border-color: #334155; }
+  .tf-statement { background: #0f172a; border-color: #334155; color: #e2e8f0; }
+  .chan { color: #94a3b8; }
+  .sol-box { background: #292524; border-color: #78350f; color: #fef3c7; }
+  .chua-gi, .lam-lai, .nhac-phieu { background: #292524; border-color: #78350f; color: #fef3c7; }
+  .chua-gi li { color: #fef3c7; }
+  .em-hoi { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+}
+
+:root.dark, body.dark, [data-theme="dark"] {
+  color-scheme: dark;
+  --nen: #0b1120;
+  --the-nen: #1e293b;
+  --muc: #f8fafc;
+  --muc-2: #cbd5e1;
+  --nhat: #94a3b8;
+  --rat-nhat: #64748b;
+  --vien: #334155;
+  --vien-dam: #475569;
+  --kem-nen: #292524;
+  --kem-vien: #78350f;
+  --kem-muc: #fef3c7;
+  --kem-nhan: #fbbf24;
+}
+
+@media screen {
+  :root.dark .q-card, body.dark .q-card, [data-theme="dark"] .q-card { background: #1e293b; border-color: #334155; }
+  :root.dark .q-text, body.dark .q-text, [data-theme="dark"] .q-text { color: #f8fafc; }
+  :root.dark .thanh, body.dark .thanh, [data-theme="dark"] .thanh { background: rgba(30, 41, 59, 0.95); border-color: #334155; color: #f8fafc; }
+  :root.dark .sa-input, body.dark .sa-input, [data-theme="dark"] .sa-input { background: #0f172a; color: #f8fafc; border-color: #475569; }
+  :root.dark .sa-input:focus, body.dark .sa-input:focus, [data-theme="dark"] .sa-input:focus { background: #1e293b; color: #ffffff; border-color: #3b82f6; }
+  :root.dark .q-opt, body.dark .q-opt, [data-theme="dark"] .q-opt { background: #0f172a; border-color: #334155; color: #e2e8f0; }
+  :root.dark .q-opt-letter, body.dark .q-opt-letter, [data-theme="dark"] .q-opt-letter { background: #1e293b; color: #cbd5e1; border-color: #334155; }
+  :root.dark .tf-statement, body.dark .tf-statement, [data-theme="dark"] .tf-statement { background: #0f172a; border-color: #334155; color: #e2e8f0; }
+  :root.dark .chan, body.dark .chan, [data-theme="dark"] .chan { color: #94a3b8; }
+  :root.dark .sol-box, body.dark .sol-box, [data-theme="dark"] .sol-box { background: #292524; border-color: #78350f; color: #fef3c7; }
+  :root.dark .chua-gi, body.dark .chua-gi, [data-theme="dark"] .chua-gi,
+  :root.dark .lam-lai, body.dark .lam-lai, [data-theme="dark"] .lam-lai,
+  :root.dark .nhac-phieu, body.dark .nhac-phieu, [data-theme="dark"] .nhac-phieu { background: #292524; border-color: #78350f; color: #fef3c7; }
+  :root.dark .chua-gi li, body.dark .chua-gi li, [data-theme="dark"] .chua-gi li { color: #fef3c7; }
+  :root.dark .em-hoi, body.dark .em-hoi, [data-theme="dark"] .em-hoi { background: #1e293b; border-color: #334155; color: #e2e8f0; }
 }
 
 /* DẢI 4 MÀU THƯƠNG HIỆU GOOGLE (CHUẨN MẪU MOM GIAO) */
@@ -1054,7 +1120,8 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
 
   // Ảnh cắt cả thân câu LÀ đề bài — có nó thì không in `text` nữa, đúng như màn
   // làm bài của học sinh (lớp chữ trong PDF gốc hay vỡ công thức ÂM THẦM).
-  const deBai = (c.anhThanCau ? anhHtml(c.anhThanCau, 'than', 'Đề bài') : `<div class="q-text">${chuHtml(c.text)}</div>`) + experimentHtml(c.text)
+  const txtDinhDang = tachDongTheoY(c.text)
+  const deBai = (c.anhThanCau ? anhHtml(c.anhThanCau, 'than', 'Đề bài') : `<div class="q-text" style="white-space: pre-line;">${chuHtml(txtDinhDang)}</div>`) + experimentHtml(txtDinhDang)
   const giai = anGiai ? '' : oGiaiHtml(c)
   const nut = giai
     ? `<button class="q-nut-giai" type="button" aria-expanded="${moSan ? 'true' : 'false'}" aria-controls="giai-${stt}">${MUI_TEN}<span class="chu-mo">Xem lời giải</span><span class="chu-dong">Ẩn lời giải</span></button>
@@ -1987,10 +2054,16 @@ export const JS_PHIEU = `
 
 /** Tài liệu HTML hoàn chỉnh, tự chứa — mở bằng một chạm, không cần mạng. */
 export function taiLieuHtml(than: string, tieuDe: string, lopBody = ''): string {
+  const isDark =
+    typeof document !== 'undefined' &&
+    (document.documentElement.classList.contains('dark') ||
+      document.body.classList.contains('dark') ||
+      document.documentElement.getAttribute('data-theme') === 'dark')
+  const bodyClass = [lopBody, isDark ? 'dark' : ''].filter(Boolean).join(' ')
   return `<!DOCTYPE html>
-<html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="vi"${isDark ? ' class="dark"' : ''}><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${thoat(tieuDe)}</title><style>${CSS_PHIEU}</style></head>
-<body${lopBody ? ` class="${lopBody}"` : ''}>${than}
+<body${bodyClass ? ` class="${bodyClass}"` : ''}>${than}
 <script>${JS_PHIEU}</script></body></html>`
 }
 

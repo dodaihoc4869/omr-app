@@ -113,6 +113,7 @@ export function gradeHomework(keys: Map<string, string>, raw: Record<string, unk
 export async function homeworkQuestions(env: Env, maDe: string) {
   const out: Record<string, unknown>[] = []; const seen = new Set<string>(); const cache = new Map<string, Record<string, unknown>[]>()
   for (const ma of maDe.split(',').map(x => x.trim()).filter(Boolean)) {
+    if (/(?:-VD|-DT)(?:-|$)/i.test(ma)) continue
     const match = ma.match(/-(TN|DS|TLN)$/), goc = match ? ma.slice(0, -match[0].length) : ma
     const phan = match ? ({ TN: 'I', DS: 'II', TLN: 'III' } as Record<string, string>)[match[1]] : null
     if (!cache.has(goc)) {
@@ -120,7 +121,12 @@ export async function homeworkQuestions(env: Env, maDe: string) {
       const g = await new Response(o.body).json() as Record<string, unknown>
       cache.set(goc, Array.isArray(g.cau) ? g.cau as Record<string, unknown>[] : ['phanI', 'phanII', 'phanIII'].flatMap((k, i) => Array.isArray(g[k]) ? (g[k] as Record<string, unknown>[]).map(c => ({ ...c, phan: c.phan || ['I', 'II', 'III'][i] })) : []))
     }
-    for (const c of cache.get(goc) || []) { if (phan && c.phan !== phan) continue; const qid = `${goc}-${c.phan}-${c.so}`; if (seen.has(qid)) continue; seen.add(qid); out.push({ ...c, qid }) }
+    for (const c of cache.get(goc) || []) {
+      if (phan && c.phan !== phan) continue
+      const da = String(c.dap_an ?? c.dapAn ?? '').trim()
+      if (c.phan === 'III' && ((da.length > 20 && /\s/.test(da)) || /[\n;→⇌:]/.test(da))) continue
+      const qid = `${goc}-${c.phan}-${c.so}`; if (seen.has(qid)) continue; seen.add(qid); out.push({ ...c, qid })
+    }
   }
   return out
 }

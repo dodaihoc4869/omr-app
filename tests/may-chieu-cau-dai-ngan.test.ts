@@ -75,7 +75,7 @@ describe('Thuật toán laCauDai và chia đợt máy chiếu', () => {
     // Đợt 1 phải là đợt đơn mc-dot-don (2/3 + 1/3)
     expect(html).toContain('class="mc-dot mc-dot-don"')
     expect(html).toContain('mc-cot-lam-bai')
-    expect(html).toContain('Bảng học sinh lên làm')
+    expect(html).not.toContain('Bảng học sinh lên làm')
     expect(html).toContain('Học sinh HS_DAI')
   })
 

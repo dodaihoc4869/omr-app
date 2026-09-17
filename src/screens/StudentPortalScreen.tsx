@@ -7,6 +7,8 @@ import KhungThanThuToanManHinh from '../components/KhungThanThuToanManHinh'
 import LuyenDeChuan from '../components/LuyenDeChuan'
 import KhoiKhacPhuc3CheDo from '../components/KhoiKhacPhuc3CheDo'
 import {syncStudentExp} from '../game/than-thu-v2/academic-sync'
+import { tachDongTheoY } from '../lib/tach-dong-cau'
+import NutQuayLai from '../components/NutQuayLai'
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import {
   Award,
@@ -27,8 +29,8 @@ import {
   Heart,
   Timer,
   Check,
+  Pause,
   X,
-  ArrowLeft,
 } from 'lucide-react'
 import {
   hsDangNhapApi,
@@ -340,8 +342,14 @@ export default function StudentPortalScreen() {
     try {
       const data = await momApi('start', {token:auth.token,id:bai.id})
       const capNhat = chuanHoaBaiMom(data.item)
-      let answers = data.item.dapAnDaNop || {}
-      try { const raw = localStorage.getItem(`omr_mom_draft_${auth.sbd}_${bai.id}`); if (raw) answers = {...answers, ...JSON.parse(raw)} } catch {}
+      let answers: Record<string, string> = {}
+      try {
+        const raw = localStorage.getItem(`omr_mom_draft_${auth.sbd}_${bai.id}`) || localStorage.getItem(`omr_mom_draft_${bai.id}_${auth.sbd}`)
+        if (raw) {
+          const parsed = JSON.parse(raw)
+          answers = { ...answers, ...(parsed.cauTraLoi || parsed) }
+        }
+      } catch {}
       setCauTraLoiMom(answers)
       if (capNhat.trangThai === 'da_nop') {
         await napDsMom()
@@ -447,7 +455,7 @@ export default function StudentPortalScreen() {
                 ${c.dungSai ? '✓ ĐÚNG' : '✗ SAI'}
               </span>
             </div>
-            <div style="font-size: 15px; line-height: 1.65; margin-bottom: 14px; color: var(--muc, rgb(51, 65, 85)); font-weight: 500;">${c.text}</div>
+            <div style="font-size: 15px; line-height: 1.65; margin-bottom: 14px; color: var(--muc, rgb(51, 65, 85)); font-weight: 500; white-space: pre-line;">${tachDongTheoY(c.text)}</div>
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 14.5px; margin-bottom: 16px;">
               ${c.choices
                 .map(
@@ -1029,29 +1037,39 @@ export default function StudentPortalScreen() {
     )
   }
 
+  const dangToanManHinh =
+    tab !== null ||
+    dangLamMom !== null ||
+    manThi ||
+    boVaoThi !== null ||
+    !!phieuHtml ||
+    !!xemDeHtml ||
+    caXemBaoCaoModal !== null ||
+    dsCauSaiKhacPhucModal !== null
+
   // KHI ĐÃ ĐĂNG NHẬP THÀNH CÔNG
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
-      {/* Header Google Workspace style */}
-      <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200/80 dark:border-slate-800 px-4 pb-2 sm:px-6" style={{ paddingTop: 'env(safe-area-inset-top, 6px)' }}>
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
-          {/* Logo Học sinh phong cách Google */}
-          <LogoHocSinh size={38} hienChu={true} />
+      {/* THANH ĐIỀU HƯỚNG CẠNH TRÁI — Bỏ nền, thu nhỏ lại, ẩn khi toàn màn hình */}
+      {!dangToanManHinh && (
+        <header
+          className="fixed left-3 sm:left-6 top-3 z-40 flex items-center gap-2 sm:gap-3 px-3 py-1.5 rounded-full bg-slate-100/60 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/40 dark:border-slate-800/40 shadow-xs transition-all"
+          style={{ paddingTop: 'max(env(safe-area-inset-top, 6px), 6px)' }}
+          aria-label="Điều hướng Học sinh"
+        >
+          <LogoHocSinh size={30} hienChu={false} />
 
-          {/* Thông tin học sinh dạng Google Account Pill */}
-          <div className="flex items-center gap-2.5">
-            <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 shadow-xs">
-              <div className="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-[11px] shadow-2xs">
                 {auth.hoTen.charAt(0).toUpperCase()}
               </div>
-              <div className="hidden sm:flex flex-col text-left leading-tight">
-                <span className="font-bold text-slate-900 dark:text-white text-xs">
-                  {auth.hoTen}
-                </span>
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
-                  SBD: {auth.sbd} {auth.lop ? `· ${auth.lop}` : ''}
-                </span>
-              </div>
+              <span className="font-bold text-slate-900 dark:text-white text-xs hidden md:inline truncate max-w-[120px]">
+                {auth.hoTen}
+              </span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono font-bold px-1.5 py-0.5 rounded bg-slate-200/60 dark:bg-slate-800/60">
+                #{auth.sbd}
+              </span>
             </div>
 
             {auth.token && (
@@ -1071,20 +1089,20 @@ export default function StudentPortalScreen() {
                 }}
               />
             )}
+
             <button
               onClick={dangXuat}
               title="Đăng xuất"
-              className="btn-google-outlined inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold cursor-pointer"
+              className="p-1.5 rounded-full text-slate-500 hover:text-rose-600 hover:bg-rose-100/60 dark:hover:bg-rose-950/60 transition cursor-pointer tap-target"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Đăng xuất</span>
             </button>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {auth.token && !dangLamMom && !manThi && (
-        <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-5">
+        <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-14 sm:pt-16">
           <BangTinPhuHuynh
             sbd={auth.sbd}
             hoTen={auth.hoTen}
@@ -1112,14 +1130,7 @@ export default function StudentPortalScreen() {
         <div className="fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto flex flex-col animate-google-fade">
           {/* Header Toàn Màn Hình */}
           <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-3 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 shadow-xs">
-            <button
-              type="button"
-              onClick={() => setTab(null)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs sm:text-sm font-bold transition cursor-pointer active:scale-95"
-            >
-              <ArrowLeft size={16} />
-              <span>Quay lại Bảng tin</span>
-            </button>
+            <NutQuayLai onClick={() => setTab(null)} label="Quay lại Bảng tin" />
 
             <div className="flex items-center gap-2 min-w-0 max-w-[200px] sm:max-w-md">
               <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />
@@ -1440,16 +1451,14 @@ export default function StudentPortalScreen() {
                 {/* Thanh điều khiển đếm ngược 2 tiếng ghim trên */}
                 <div className="sticky top-16 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-4 rounded-2xl border border-rose-200 dark:border-rose-900/60 shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
-                    <button
+                    <NutQuayLai
                       onClick={() => {
                         if (confirm('Em có chắc muốn tạm dừng bài làm không? Đồng hồ 2 tiếng vẫn tiếp tục đếm ngược.')) {
                           setDangLamMom(null)
                         }
                       }}
-                      className="btn-google-outlined text-xs py-1.5 px-3 rounded-full cursor-pointer"
-                    >
-                      ← Danh sách bài
-                    </button>
+                      label="Danh sách bài"
+                    />
                     <div className="font-bold text-sm text-slate-800 dark:text-slate-100 line-clamp-1">
                       {dangLamMom.tieuDe}
                     </div>
@@ -1469,6 +1478,26 @@ export default function StudentPortalScreen() {
                     <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                       Đã làm: <strong className="text-slate-800 dark:text-slate-200">{Object.keys(cauTraLoiMom).length}</strong>/{(dangLamMom.dsCau || dangLamMom.cau || []).length}
                     </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        try {
+                          localStorage.setItem(`omr_mom_draft_${dangLamMom.id}_${auth.sbd}`, JSON.stringify({
+                            cauTraLoi: cauTraLoiMom,
+                            luuLuc: new Date().toISOString(),
+                            giayConLai: giayConLaiMom,
+                          }))
+                        } catch {}
+                        alert('Đã lưu nháp an toàn! Em có thể vào làm tiếp bất cứ lúc nào trước khi hết hạn (deadline).')
+                        setDangLamMom(null)
+                      }}
+                      className="border border-amber-300 dark:border-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/60 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 font-bold text-xs py-2 px-3.5 rounded-full flex items-center gap-1.5 shadow-xs cursor-pointer transition-colors"
+                      title="Tạm dừng và lưu tiến độ để làm tiếp sau"
+                    >
+                      <Pause className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                      <span>Tạm dừng</span>
+                    </button>
 
                     <button
                       onClick={nopBaiCuaMom}
@@ -1504,7 +1533,7 @@ export default function StudentPortalScreen() {
                           <MomQuestionStem q={cau} />
                         </div>
 
-                        {cau.phan === 'II' ? <div className="space-y-3">{(cau.ideas || cau.luaChon || cau.choices || []).map((idea:string,i:number)=><div key={i} className="rounded-xl border border-slate-200 p-3"><MomOption q={cau} index={i} text={`${String.fromCharCode(97+i)}) ${idea}`} tf /><div className="mt-2 flex gap-2">{['D','S'].map(v=><button key={v} onClick={()=>setCauTraLoiMom(prev=>{const a=(prev[cau.id]||'----').split('');a[i]=v;return {...prev,[cau.id]:a.join('')}})} className={`rounded-full px-4 py-2 text-sm font-semibold ${daChon?.[i]===v?'bg-rose-600 text-white':'bg-slate-100 text-slate-700'}`}>{v==='D'?'Đúng':'Sai'}</button>)}</div></div>)}</div> : Array.isArray(cau?.choices) && cau.choices.length > 0 ? (
+                        {cau.phan === 'II' ? <div className="space-y-3">{(cau.ideas || cau.luaChon || cau.choices || []).map((idea:string,i:number)=><div key={i} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-3"><MomOption q={cau} index={i} text={`${String.fromCharCode(97+i)}) ${idea}`} tf /><div className="mt-2 flex gap-2">{['D','S'].map(v=><button key={v} onClick={()=>setCauTraLoiMom(prev=>{const a=(prev[cau.id]||'----').split('');a[i]=v;return {...prev,[cau.id]:a.join('')}})} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${daChon?.[i]===v?'bg-rose-600 text-white shadow-xs':'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700'}`}>{v==='D'?'Đúng':'Sai'}</button>)}</div></div>)}</div> : Array.isArray(cau?.choices) && cau.choices.length > 0 ? (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                             {cau.choices.map((choice: string, cIdx: number) => {
                               const kyTu = String.fromCharCode(65 + cIdx)

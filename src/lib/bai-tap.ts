@@ -14,6 +14,8 @@ import type { KeyBank } from './exam-api'
 import { dangCua, hopDang, LOC_DANG_MAC_DINH, type LocDang } from './dang-cau'
 import { hopSao, LOC_SAO_MAC_DINH, type LocSao } from './loc-sao'
 
+import { hopLeDeRut } from './loc-cau-rut'
+
 export const SO_CAU_BAI_TAP_TOI_DA = PHAN_I_NEED + PHAN_II_NEED + PHAN_III_NEED
 export const SO_CAU_BAI_TAP_TOI_THIEU = 5
 export const SO_CAU_BAI_TAP_MAC_DINH = 10
@@ -45,7 +47,7 @@ export interface KetQuaRutBaiTap {
   soCauLapLai: number
 }
 
-type CauBatKy = { id: string; chuyenDe?: string; mucDo?: string; canChua?: CanChua }
+type CauBatKy = { id: string; chuyenDe?: string; mucDo?: string; canChua?: CanChua; text?: string; correct?: unknown }
 
 /** Câu có khớp bộ lọc chuyên đề + mức độ + dạng + sao không. */
 export function khopLoc(
@@ -56,6 +58,7 @@ export function khopLoc(
   phan?: 'I' | 'II' | 'III',
   sao: LocSao = LOC_SAO_MAC_DINH,
 ): boolean {
+  if (!hopLeDeRut({ phan, id: cau.id, dapAn: cau.correct, text: cau.text })) return false
   if (chuyenDe.length > 0 && !chuyenDe.includes(String(cau.chuyenDe || '').trim())) return false
   if (mucDo !== 'tron' && String(cau.mucDo || '') !== mucDo) return false
   if (!hopSao(soSao(cau), sao)) return false

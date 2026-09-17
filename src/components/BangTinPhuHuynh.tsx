@@ -19,8 +19,36 @@ import {
   LogIn,
   AlertCircle,
   ChevronRight,
+  TrendingUp,
 } from 'lucide-react'
-type Report={day:string;updatedAt:string;today:{tenCa:string;diem:number|null;nopLuc:string}[];weak:{name:string;count:number}[];wrong:number;pending:number;pendingDetails?:{btvn:number;mom:number;daily:number};questionCount:number;assignmentCount:number;minutes:number;mode:string;reason:string}
+type Report = {
+  day: string
+  updatedAt: string
+  today: { tenCa: string; diem: number | null; nopLuc: string }[]
+  weak: { name: string; count: number }[]
+  wrong: number
+  pending: number
+  pendingDetails?: { btvn: number; mom: number; daily: number }
+  questionCount: number
+  assignmentCount: number
+  minutes: number
+  mode: string
+  reason: string
+  duDoanDiem?: {
+    diem: number
+    khoangDiem: string
+    thang: string
+    nhanXet: string
+    doTinCay: 'cao' | 'trung_binh' | 'khoi_dau'
+  }
+  keHoach?: {
+    tongCau: number
+    soCauSuaLoi: number
+    soCauOnBaiCu: number
+    soCauTienBo: number
+    phuongPhap: string
+  }
+}
 export default function BangTinPhuHuynh({
   sbd,
   onSent,
@@ -81,8 +109,62 @@ export default function BangTinPhuHuynh({
         <span>Đang tổng hợp dữ liệu học tập của con…</span>
       </div>
     </div>
-  ):(<>
-    <div className="flex flex-wrap justify-between gap-2 text-xs news-muted"><span>Ngày {report.day.split('-').reverse().join('/')}</span><span>Cập nhật {new Date(report.updatedAt).toLocaleTimeString('vi-VN')}</span></div>
+  ) : (
+    <>
+      <div className="flex flex-wrap justify-between gap-2 text-xs news-muted"><span>Ngày {report.day.split('-').reverse().join('/')}</span><span>Cập nhật {new Date(report.updatedAt).toLocaleTimeString('vi-VN')}</span></div>
+
+    {/* ĐIỂM CA GẦN NHẤT — NHẤP NHÁY TO MÀU ĐẸP CHUẨN GOOGLE ĐẦU BẢNG TIN */}
+    {latestCa && (
+      <button
+        type="button"
+        onClick={() => onSelectTab?.('diem')}
+        className="w-full text-left p-4 sm:p-5 rounded-3xl border-2 border-[#1a73e8] dark:border-[#8ab4f8] bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-blue-50/40 dark:from-blue-950/80 dark:via-slate-900 dark:to-indigo-950/60 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer group relative overflow-hidden active:scale-[0.99]"
+      >
+        {/* Vầng sáng nhấp nháy chuẩn Google */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-[#1a73e8]/20 via-[#34a853]/20 to-[#4285f4]/20 rounded-3xl blur-md animate-pulse pointer-events-none" />
+
+        <div className="relative z-10 flex items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#1a73e8] to-[#1557b0] text-white flex items-center justify-center shadow-md shrink-0 group-hover:scale-105 transition-transform">
+              <Award size={26} />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#1a73e8] text-white shadow-2xs">
+                  Điểm ca thi gần nhất
+                </span>
+                {latestCa.maCa && (
+                  <span className="font-mono text-xs font-bold text-slate-500 dark:text-slate-400">
+                    #{latestCa.maCa}
+                  </span>
+                )}
+              </div>
+              <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white truncate mt-1 group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] transition">
+                {latestCa.tenCa || 'Bài kiểm tra hoàn thành'}
+              </h3>
+              <p className="text-xs text-[#1a73e8] dark:text-[#8ab4f8] font-semibold flex items-center gap-0.5 mt-0.5">
+                <span>Xem điểm tất cả ({tabStats?.diemCount ?? 0} ca thi)</span>
+                <ChevronRight size={14} />
+              </p>
+            </div>
+          </div>
+
+          {/* Số điểm to nhấp nháy phát sáng chuẩn Google */}
+          <div className="shrink-0 text-right pl-3 sm:pl-5 border-l-2 border-blue-200/80 dark:border-blue-800/80">
+            <div className="flex items-baseline justify-end gap-1">
+              <span className="text-3xl sm:text-4xl font-black text-[#1a73e8] dark:text-[#8ab4f8] tabular-nums tracking-tight animate-pulse drop-shadow-xs">
+                {typeof latestCa.diem === 'number' ? latestCa.diem.toFixed(2) : '--'}
+              </span>
+              <span className="text-sm font-bold text-slate-400">/10</span>
+            </div>
+            <div className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mt-0.5">
+              Điểm số của con
+            </div>
+          </div>
+        </div>
+      </button>
+    )}
+
    {/* BẢNG TIN TỔNG QUAN & GỢI Ý: Trên điện thoại 1 cột rộng rãi, trên máy tính/tablet 2 cột */}
    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 items-stretch">
     {/* CỘT 1: TỔNG QUAN HỌC TẬP (Metrics, Bài thi, Kiến thức cần củng cố) */}
@@ -390,11 +472,11 @@ export default function BangTinPhuHuynh({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-            {/* 1. Ô NHỎ HIỂN THỊ ĐIỂM CỦA CA THI GẦN NHẤT */}
+            {/* 1. THẺ XEM ĐIỂM CA THI */}
             <button
               type="button"
               onClick={() => onSelectTab?.('diem')}
-              className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 active:scale-[0.98] group shadow-2xs ${
+              className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-2.5 active:scale-[0.98] group shadow-2xs ${
                 activeTab === 'diem'
                   ? 'border-2 border-[#1a73e8] bg-blue-50/90 dark:bg-blue-950/80 shadow-md ring-2 ring-blue-400/30'
                   : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-400 hover:shadow-xs'
@@ -405,43 +487,43 @@ export default function BangTinPhuHuynh({
                   <Award size={20} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                      Ca gần nhất
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition whitespace-nowrap">
+                      Xem điểm ca thi
                     </span>
-                    {latestCa?.maCa ? (
-                      <span className="font-mono text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-200">
+                    {latestCa?.maCa && (
+                      <span className="font-mono text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-200 shrink-0">
                         #{latestCa.maCa}
                       </span>
-                    ) : null}
+                    )}
                   </div>
-                  <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white truncate mt-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
-                    {latestCa?.tenCa || (tabStats?.diemCount ? 'Đã có ca thi' : 'Chưa có ca thi')}
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                    {latestCa?.tenCa || 'Lịch sử kết quả ca thi'}
                   </div>
-                  <div className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold mt-0.5 flex items-center gap-0.5">
-                    <span>Xem điểm tất cả ({tabStats?.diemCount ?? 0})</span>
+                  <div className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold mt-0.5 flex items-center gap-0.5 whitespace-nowrap">
+                    <span>Xem tất cả ({tabStats?.diemCount ?? 0} ca)</span>
                     <ChevronRight size={13} />
                   </div>
                 </div>
               </div>
 
-              <div className="shrink-0 text-right pl-2 border-l border-slate-100 dark:border-slate-800">
-                <div className="text-xl sm:text-2xl font-black text-[#1a73e8] dark:text-[#8ab4f8] tabular-nums leading-none">
-                  {latestCa && typeof latestCa.diem === 'number'
-                    ? latestCa.diem.toFixed(2)
-                    : '--'}
+              {latestCa && typeof latestCa.diem === 'number' && (
+                <div className="shrink-0 text-right pl-2 border-l border-slate-100 dark:border-slate-800">
+                  <div className="text-lg sm:text-xl font-black text-[#1a73e8] dark:text-[#8ab4f8] tabular-nums leading-none">
+                    {latestCa.diem.toFixed(2)}
+                  </div>
+                  <div className="text-[9px] font-bold text-slate-400 dark:text-slate-500 mt-0.5 uppercase">
+                    Điểm
+                  </div>
                 </div>
-                <div className="text-[9px] font-bold text-slate-400 dark:text-slate-500 mt-1 uppercase">
-                  Điểm số
-                </div>
-              </div>
+              )}
             </button>
 
-            {/* 2. NÚT KHẮC PHỤC LUYỆN ĐỀ (4 LỰA CHỌN) */}
+            {/* 2. THẺ KHẮC PHỤC LUYỆN ĐỀ (4 LỰA CHỌN) */}
             <button
               type="button"
               onClick={() => onSelectTab?.('khacphuc')}
-              className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 active:scale-[0.98] group shadow-2xs ${
+              className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex items-center justify-between gap-2.5 active:scale-[0.98] group shadow-2xs ${
                 activeTab === 'khacphuc'
                   ? 'border-2 border-[#f29900] bg-amber-50/90 dark:bg-amber-950/80 shadow-md ring-2 ring-amber-400/30'
                   : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-amber-400 hover:shadow-xs'
@@ -453,17 +535,17 @@ export default function BangTinPhuHuynh({
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">
+                    <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition whitespace-nowrap">
                       Khắc phục luyện đề
                     </span>
-                    <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200">
+                    <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 shrink-0">
                       4 mục
                     </span>
                   </div>
                   <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
                     Rút câu sai · Dạng bài · Tự do
                   </div>
-                  <div className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold mt-0.5 flex items-center gap-0.5">
+                  <div className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold mt-0.5 flex items-center gap-0.5 whitespace-nowrap">
                     <span>Mở 4 lựa chọn</span>
                     <ChevronRight size={13} />
                   </div>
@@ -495,9 +577,33 @@ export default function BangTinPhuHuynh({
             </h3>
           </div>
           <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
-            Cá nhân hoá
+            Ít nhất 12 câu / ngày
           </span>
         </div>
+
+        {/* DỰ ĐOÁN ĐIỂM THI THẬT THEO THÁNG */}
+        {report.duDoanDiem && (
+          <div className="p-3.5 rounded-2xl border border-indigo-200/90 dark:border-indigo-800/80 bg-gradient-to-r from-indigo-50/90 via-blue-50/70 to-indigo-50/50 dark:from-indigo-950/70 dark:via-slate-900 dark:to-blue-950/60 shadow-xs space-y-1.5">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <div className="p-1 rounded-lg bg-indigo-600 text-white shadow-2xs">
+                  <TrendingUp size={15} />
+                </div>
+                <span className="text-xs font-bold uppercase tracking-wider text-indigo-900 dark:text-indigo-200">
+                  Dự đoán đề thi tốt nghiệp ({report.duDoanDiem.thang})
+                </span>
+              </div>
+              <div className="text-sm sm:text-base font-black text-indigo-700 dark:text-indigo-300 tabular-nums">
+                {report.duDoanDiem.khoangDiem} đ
+              </div>
+            </div>
+            <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 leading-snug">
+              {studentToken
+                ? report.duDoanDiem.nhanXet.replace(/Con/g, 'Em').replace(/con/g, 'em')
+                : report.duDoanDiem.nhanXet}
+            </p>
+          </div>
+        )}
 
         {/* CẢNH BÁO BÀI CHỜ LÀM (NẾU CÓ) */}
         {tongChuaNop > 0 && (
@@ -568,6 +674,26 @@ export default function BangTinPhuHuynh({
             ? report.reason.replace(/Con/g, 'Em').replace(/con/g, 'em')
             : report.reason}
         </div>
+
+        {/* PHÂN BỔ 12 CÂU THEO PHƯƠNG PHÁP XỊN NHẤT */}
+        {report.keHoach && (
+          <div className="flex items-center justify-between gap-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100/90 dark:bg-slate-800/80 p-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 shadow-2xs">
+            <span className="flex items-center gap-1">
+              <span>🎯</span>
+              <span><strong>{report.keHoach.soCauSuaLoi}c</strong> sửa lỗi</span>
+            </span>
+            <span className="text-slate-300 dark:text-slate-600">·</span>
+            <span className="flex items-center gap-1">
+              <span>🔄</span>
+              <span><strong>{report.keHoach.soCauOnBaiCu}c</strong> chống quên</span>
+            </span>
+            <span className="text-slate-300 dark:text-slate-600">·</span>
+            <span className="flex items-center gap-1">
+              <span>🚀</span>
+              <span><strong>{report.keHoach.soCauTienBo}c</strong> tiến bộ</span>
+            </span>
+          </div>
+        )}
 
         {/* KIẾN THỨC CẦN CỦNG CỐ CHUYỂN SANG ĐÂY */}
         {report.weak.length > 0 && (

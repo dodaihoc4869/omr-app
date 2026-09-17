@@ -20,6 +20,7 @@ import { soSao } from '../data/examContent'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { dangCua, hopDang, LOC_DANG_MAC_DINH, type DangCau, type LocDang } from './dang-cau'
 import { hopSao, LOC_SAO_MAC_DINH, type LocSao } from './loc-sao'
+import { hopLeDeRut } from './loc-cau-rut'
 import { chuanChuyenDe } from './goi-len-bang'
 
 export type MucDoCau = 'biet' | 'hieu' | 'van_dung'
@@ -117,9 +118,15 @@ function goiCau(nguon: TeacherExamSource[]): CauNguon[] {
   const ra: CauNguon[] = []
   for (const s of nguon) {
     const maDe = String(s.maDe || '')
-    for (const q of s.phanI) ra.push({ phan: 'I', maDe, q })
-    for (const q of s.phanII) ra.push({ phan: 'II', maDe, q })
-    for (const q of s.phanIII) ra.push({ phan: 'III', maDe, q })
+    for (const q of s.phanI) {
+      if (hopLeDeRut({ phan: 'I', maDe, nhom: s.nhom, nguon: s.nguon, q })) ra.push({ phan: 'I', maDe, q })
+    }
+    for (const q of s.phanII) {
+      if (hopLeDeRut({ phan: 'II', maDe, nhom: s.nhom, nguon: s.nguon, q })) ra.push({ phan: 'II', maDe, q })
+    }
+    for (const q of s.phanIII) {
+      if (hopLeDeRut({ phan: 'III', maDe, nhom: s.nhom, nguon: s.nguon, q })) ra.push({ phan: 'III', maDe, q })
+    }
   }
   return ra
 }
@@ -136,11 +143,18 @@ function doiSang(c: CauNguon): CauLuyen {
   } else if (c.phan === 'II' && lg?.tungY) {
     lyDo = (['a', 'b', 'c', 'd'] as const).filter((k) => lg.tungY?.[k]).map((k) => ({ khoa: k, dung: Boolean(lg.tungY?.[k]?.dung), ly: String(lg.tungY?.[k]?.viSao ?? '') }))
   }
-  // Ảnh: gom `hinhAnh` (dữ liệu mới) và `imageDataUrl` (dữ liệu cũ, luôn nằm
-  // sau đề) về một danh sách. Ảnh thân câu và ảnh phương án giữ riêng vì chúng
-  // THAY THẾ chữ chứ không đứng cạnh chữ.
-  const hinh: HinhCau[] = [...(q.hinhAnh ?? []).map((h) => ({ src: h.src, viTri: String(h.viTri), alt: h.alt }))]
-  if (q.imageDataUrl) hinh.unshift({ src: q.imageDataUrl, viTri: 'sau_de' })
+  // Ảnh: gom `hinhAnh`, `hinh`, `imageDataUrl`, `soDo` về danh sách
+  const rawHinh = Array.isArray(q.hinhAnh) ? q.hinhAnh : Array.isArray((q as any).hinh) ? (q as any).hinh : []
+  const hinh: HinhCau[] = rawHinh
+    .map((h: any) => ({
+      src: String(h?.src || h?.url || (typeof h === 'string' ? h : '')),
+      viTri: String(h?.viTri || 'sau_de'),
+      alt: h?.alt,
+    }))
+    .filter((h: { src: string }) => h.src.trim())
+  if (q.imageDataUrl && !hinh.some((h) => h.src === q.imageDataUrl)) {
+    hinh.unshift({ src: q.imageDataUrl, viTri: 'sau_de' })
+  }
 
   return {
     phan: c.phan,

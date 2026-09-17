@@ -12,6 +12,7 @@ import { Check, RotateCcw, X as XIcon } from 'lucide-react'
 import { normalizeNumericAnswer } from '../engine/score'
 import type { HinhAnh, LoiGiaiCauTruc, TrangThaiLoiGiai } from '../data/examContent'
 import { ChemText } from '../lib/chem-format'
+import { tachDongTheoY } from '../lib/tach-dong-cau'
 import { BangSoLieu, CauHinh, HinhTaiViTri } from './QuestionMedia'
 import { TheNoiDung, DauThe, Hang, Nhan } from './DesignSystem'
 
@@ -488,11 +489,11 @@ export default function TheCau(props: TheCauProps) {
             <img src={thanCauImg} alt="Đề bài" className="w-full" style={{ borderRadius: 'var(--bo-1)', border: '1px solid var(--vien)' }} />
           </button>
         ) : (
-          <div className="cau-de" style={{ overflowWrap: 'break-word' }}>
-            <ChemText text={text} />
+          <div className="cau-de" style={{ overflowWrap: 'break-word', whiteSpace: 'pre-line' }}>
+            <ChemText text={tachDongTheoY(text)} />
           </div>
         )}
-        <ExperimentDemo text={text}/>
+        <ExperimentDemo text={tachDongTheoY(text)}/>
         <BangSoLieu table={table} />
         <ExperimentOriginal text={text} hasImages={Boolean(imageDataUrl || hinhAnh?.some(h=>h.viTri==='sau_de'))}>        {imageDataUrl && <CauHinh src={imageDataUrl} alt={`Hình ${nhan}`} onZoom={onZoom} />}
         <HinhTaiViTri hinhAnh={hinhAnh} viTri="sau_de" onZoom={onZoom} nhan={nhan} /></ExperimentOriginal>

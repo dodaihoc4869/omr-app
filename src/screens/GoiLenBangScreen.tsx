@@ -23,6 +23,7 @@ import { khuTrungNguon } from '../lib/khu-trung-cau'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import HopChonDe from '../components/HopChonDe'
+import NutQuayLai from '../components/NutQuayLai'
 import { baiLamTuCa, cauTuBanDe, daCoBaiLam, emTuCa, luotMoiNhat, rowsLopSai, type BanDeCa, type HoSoRutGon, type LuotCa } from '../lib/du-lieu-len-bang'
 import { rutDeChua } from '../lib/rut-de-chua'
 import { LOC_SAO_MAC_DINH, MOI_LOC_SAO, TEN_LOC_SAO, type LocSao } from '../lib/loc-sao'
@@ -963,9 +964,7 @@ export default function GoiLenBangScreen() {
             </p>
           </div>
         </div>
-        <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target hover:text-[#1a73e8] transition-colors cursor-pointer">
-          ← Kiểm tra
-        </button>
+        <NutQuayLai onClick={() => setScreen('examhub')} label="Kiểm tra" />
       </div>
 
       <TheNoiDung>

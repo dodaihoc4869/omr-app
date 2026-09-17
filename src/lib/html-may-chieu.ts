@@ -277,12 +277,7 @@ function dotMotEmHtml(o: OBang, soDot: number, tuyChon: TuyChonMayChieu): string
     <div class="mc-trang" aria-hidden="true"></div>
   </section>
   <section class="mc-cot-lam-bai" aria-label="Bảng để học sinh lên làm">
-    <div class="mc-bang-trong">
-      <div class="mc-bang-trong-khung">
-        <div class="mc-bang-trong-nhan">Bảng học sinh lên làm</div>
-        <div class="mc-bang-trong-phu">${thoat(o.hoTen || o.sbd)} · Câu ${o.soCau}</div>
-      </div>
-    </div>
+    <div class="mc-bang-trong"></div>
   </section>
 </div>`
 }

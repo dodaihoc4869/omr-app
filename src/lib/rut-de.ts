@@ -28,6 +28,7 @@ import { hashSeed, seededPermutation } from './exam-shuffle'
 import { chuanChuyenDe } from './goi-len-bang'
 import { dangCua, hopDang, LOC_DANG_MAC_DINH, type DangCau, type LocDang } from './dang-cau'
 import { hopSao, LOC_SAO_MAC_DINH, type LocSao } from './loc-sao'
+import { hopLeDeRut } from './loc-cau-rut'
 
 export type MucDoRut = 'biet' | 'hieu' | 'van_dung'
 export type PhanDe = 'I' | 'II' | 'III'
@@ -110,6 +111,9 @@ export function dungUngVien(sources: TeacherExamSource[]): Record<PhanDe, CauUng
     ]
     for (const [phan, ds] of day) {
       ds.forEach((q, i) => {
+        // Loại bỏ câu ví dụ minh hoạ, dạng toán trọng tâm, và câu tự luận không điền được đáp án
+        if (!hopLeDeRut({ phan, maDe: s.maDe, nhom: s.nhom, nguon: s.nguon, q })) return
+
         const mcq = q as TeacherMcqQuestion
         const tf = q as TeacherTrueFalseQuestion
         const sa = q as TeacherShortAnswerQuestion

@@ -11,6 +11,7 @@ import { danhSachCa, khoiPhucCa, xoaNhieuCa, xoaVinhVienCa, type CaTomTat } from
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { useAppStore } from '../store/appStore'
+import NutQuayLai from '../components/NutQuayLai'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -199,9 +200,7 @@ export default function LichSuCaScreen() {
             </p>
           </div>
         </div>
-        <button onClick={() => setScreen('examhub')} style={NHAN_NHO} className="tap-target hover:text-[#1a73e8] transition-colors cursor-pointer">
-          ← Kiểm tra
-        </button>
+        <NutQuayLai onClick={() => setScreen('examhub')} label="Kiểm tra" />
       </div>
 
       <TheNoiDung className="gv-directory">

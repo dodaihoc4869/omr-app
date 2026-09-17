@@ -843,7 +843,14 @@ function TheGiaoBtvn() {
 
           <div style={NHAN_NHO}>
             <label className="flex flex-wrap items-center gap-3">Hạn nộp bài
-              <input aria-label="Hạn nộp bài mới" type="datetime-local" value={hanMoi} onChange={e=>setHanMoi(e.target.value)} className="rounded-xl border border-slate-200 bg-white p-2 text-slate-800" />
+              <input
+                aria-label="Hạn nộp bài mới"
+                type="datetime-local"
+                value={hanMoi}
+                onChange={(e) => setHanMoi(e.target.value)}
+                style={{ colorScheme: 'light dark' }}
+                className="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 p-2 text-slate-900 dark:text-white font-medium"
+              />
             </label>
             {hanMoi ? 'Áp dụng hạn đã chọn cho học sinh được giao.' : 'Để trống: hạn nộp sau 48 giờ kể từ lúc giao.'}
           </div>
@@ -872,7 +879,14 @@ function TheGiaoBtvn() {
                   {t.quaHan ? ' · đã quá hạn' : ''}
                 </div>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <input aria-label={`Hạn nộp ${t.maBtvn}`} type="datetime-local" value={suaHan[t.maBtvn] ?? new Date(Date.parse(t.hanNop)-new Date(t.hanNop).getTimezoneOffset()*60000).toISOString().slice(0,16)} onChange={e=>setSuaHan(v=>({...v,[t.maBtvn]:e.target.value}))} className="rounded-xl border border-slate-200 bg-white p-2 text-sm text-slate-800" />
+                  <input
+                    aria-label={`Hạn nộp ${t.maBtvn}`}
+                    type="datetime-local"
+                    value={suaHan[t.maBtvn] ?? new Date(Date.parse(t.hanNop)-new Date(t.hanNop).getTimezoneOffset()*60000).toISOString().slice(0,16)}
+                    onChange={(e) => setSuaHan((v) => ({ ...v, [t.maBtvn]: e.target.value }))}
+                    style={{ colorScheme: 'light dark' }}
+                    className="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 p-2 text-sm text-slate-900 dark:text-white font-medium"
+                  />
                   <button disabled={dangSua===t.maBtvn} onClick={()=>capNhatBai(t)} className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">Đặt hạn nộp</button>
                   <button disabled={dangSua===t.maBtvn} onClick={()=>setXacNhan({text:`Thu hồi bài này của ${t.tong} học sinh? Kết quả đã nộp vẫn được giữ lại.`,run:()=>capNhatBai(t,true)})} className="rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 disabled:opacity-50">Thu hồi bài</button>
                 </div>
