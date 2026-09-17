@@ -227,14 +227,15 @@ export default function BangTinPhuHuynh({
         </div>
       </div>
 
-      {/* KHỐI 4 LỰA CHỌN KHẮC PHỤC LUYỆN ĐỀ (HIỆN TRỰC TIẾP TRONG Ô) */}
-      <div
-        className={`w-full p-3.5 sm:p-4 rounded-2xl border transition-all duration-150 shadow-2xs ${
-          activeTab === 'khacphuc'
-            ? 'border-2 border-[#f29900] bg-amber-50/40 dark:bg-amber-950/30 shadow-md ring-2 ring-amber-400/30'
-            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'
-        }`}
-      >
+      {/* KHỐI 4 LỰA CHỌN KHẮC PHỤC LUYỆN ĐỀ (HIỆN TRỰC TIẾP TRONG Ô) - Ẩn ở app học sinh theo yêu cầu */}
+      {!studentToken && (
+        <div
+          className={`w-full p-3.5 sm:p-4 rounded-2xl border transition-all duration-150 shadow-2xs ${
+            activeTab === 'khacphuc'
+              ? 'border-2 border-[#f29900] bg-amber-50/40 dark:bg-amber-950/30 shadow-md ring-2 ring-amber-400/30'
+              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'
+          }`}
+        >
         {/* Header của ô */}
         <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800/80">
           <div className="flex items-center gap-3 min-w-0">
@@ -381,6 +382,7 @@ export default function BangTinPhuHuynh({
           </button>
         </div>
       </div>
+      )}
 
       {/* BÀI THI ĐÃ NỘP HÔM NAY (NẾU CÓ) */}
       {report.today.length > 0 && (

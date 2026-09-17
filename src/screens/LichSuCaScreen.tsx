@@ -493,9 +493,9 @@ export default function LichSuCaScreen() {
                           handleKhoiPhuc(c.maCa)
                         }}
                         disabled={dangKhoiPhuc === c.maCa}
-                        className="tap-target font-bold inline-flex items-center text-xs px-2.5 py-1 rounded-lg border border-slate-300 hover:bg-slate-100 cursor-pointer"
+                        className="tap-target font-bold inline-flex items-center text-xs px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-200 transition-all cursor-pointer"
                       >
-                        <RotateCcw size={13} className="mr-1" /> {dangKhoiPhuc === c.maCa ? 'Đang khôi phục…' : 'Khôi phục'}
+                        <RotateCcw size={14} className="mr-1.5 text-blue-600" /> {dangKhoiPhuc === c.maCa ? 'Đang khôi phục…' : 'Khôi phục'}
                       </button>
                       <button
                         type="button"
@@ -503,23 +503,13 @@ export default function LichSuCaScreen() {
                           e.stopPropagation()
                           setDsXoaVinhVien([c.maCa])
                         }}
-                          disabled={dangXoaVinhVien}
-                          className="tap-target font-bold inline-flex items-center active:scale-95 hover:scale-105 transition-all cursor-pointer shadow-xs"
-                          style={{
-                            ...NHAN_NHO,
-                            gap: 4,
-                            color: 'var(--do)',
-                            background: 'var(--do-nen)',
-                            minHeight: 32,
-                            padding: '0 10px',
-                            borderRadius: 'var(--bo-tron)',
-                            border: '1px solid var(--do)',
-                          }}
-                        >
-                          <Trash2 size={14} /> Xoá vĩnh viễn
-                        </button>
-                      </div>
-                    )}
+                        disabled={dangXoaVinhVien}
+                        className="tap-target font-bold inline-flex items-center text-xs px-3 py-1.5 rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-700 dark:text-rose-300 transition-all cursor-pointer"
+                      >
+                        <Trash2 size={14} className="mr-1.5" /> Xoá vĩnh viễn
+                      </button>
+                    </div>
+                  )}
                 </div>
               )
             })}

@@ -37,20 +37,12 @@ export default function HocSinhNhanBai({
       diemThiDoiChieu: null,
     }))
 
-  // Sắp xếp ưu tiên:
-  // 1. Học sinh có dấu hiệu nghi vấn gian lận (sao đỏ) ĐẨY LÊN ĐẦU
-  // 2. Học sinh đã nộp trước học sinh chưa nộp
-  // 3. Thời gian nộp mới nhất
-  // 4. Số báo danh
+  // Sắp xếp:
+  // 1. Học sinh đã nộp trước học sinh chưa nộp
+  // 2. Thời gian nộp mới nhất
+  // 3. Số báo danh
   const found = [...all]
     .sort((a, b) => {
-      const isSuspectA = Boolean(a.gianLan || (a.xacSuatGianLan && a.xacSuatGianLan >= 70))
-      const isSuspectB = Boolean(b.gianLan || (b.xacSuatGianLan && b.xacSuatGianLan >= 70))
-      if (isSuspectA !== isSuspectB) return isSuspectB ? 1 : -1
-      if (isSuspectA && isSuspectB) {
-        return (b.xacSuatGianLan || 0) - (a.xacSuatGianLan || 0)
-      }
-
       const nopA = Number(Boolean(a.nopLuc))
       const nopB = Number(Boolean(b.nopLuc))
       if (nopA !== nopB) return nopB - nopA
@@ -62,8 +54,6 @@ export default function HocSinhNhanBai({
       return a.sbd.localeCompare(b.sbd, 'vi', { numeric: true })
     })
     .filter((e) => norm(`${e.sbd} ${e.hoTen}`).includes(norm(query.trim())))
-
-  const dsGianLan = found.filter((e) => e.gianLan || (e.xacSuatGianLan && e.xacSuatGianLan >= 70))
 
   return (
     <div style={{ marginTop: 16 }}>
@@ -88,21 +78,6 @@ export default function HocSinhNhanBai({
         <p style={{ color: 'var(--nhat)', fontSize: 13, margin: 0 }}>
           Hiển thị {found.length}/{all.length} học sinh
         </p>
-        {dsGianLan.length > 0 && (
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: '#d93025',
-              background: 'rgba(217, 48, 37, 0.08)',
-              border: '1px solid rgba(217, 48, 37, 0.3)',
-              borderRadius: 8,
-              padding: '2px 8px',
-            }}
-          >
-            ⭐ Có {dsGianLan.length} học sinh nghi vấn gian lận (đã đẩy lên đầu)
-          </span>
-        )}
       </div>
 
       <div
@@ -120,7 +95,6 @@ export default function HocSinhNhanBai({
         }}
       >
         {found.map((e) => {
-          const isSuspect = Boolean(e.gianLan || (e.xacSuatGianLan && e.xacSuatGianLan >= 70))
           const diemBtvn =
             e.soCau && e.soCau > 0 && typeof e.soDung === 'number'
               ? ((e.soDung / e.soCau) * 10).toFixed(1)
@@ -131,28 +105,15 @@ export default function HocSinhNhanBai({
               key={e.sbd}
               style={{
                 padding: 16,
-                border: isSuspect ? '2px solid #d93025' : '1px solid var(--vien)',
+                border: '1px solid var(--vien)',
                 borderRadius: 16,
-                background: isSuspect ? 'rgba(217, 48, 37, 0.04)' : 'var(--the)',
+                background: 'var(--the)',
                 minWidth: 0,
                 position: 'relative',
-                boxShadow: isSuspect ? '0 2px 8px rgba(217, 48, 37, 0.12)' : 'none',
               }}
             >
-              {/* Tiêu đề & Tên học sinh (Gắn dấu sao đỏ nếu nghi vấn) */}
+              {/* Tiêu đề & Tên học sinh */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                {isSuspect && (
-                  <span
-                    title="Nghi vấn gian lận dựa trên đối chiếu ca thi thật và tương quan bài nộp"
-                    style={{
-                      fontSize: 16,
-                      filter: 'drop-shadow(0 0 3px rgba(217,48,37,0.5))',
-                      cursor: 'help',
-                    }}
-                  >
-                    ⭐
-                  </span>
-                )}
                 {e.nopLuc ? (
                   <button
                     onClick={() => setXem(e.sbd)}
@@ -166,7 +127,7 @@ export default function HocSinhNhanBai({
                       textAlign: 'left',
                       font: 'inherit',
                       fontWeight: 700,
-                      color: isSuspect ? '#d93025' : 'var(--xanh)',
+                      color: 'var(--xanh)',
                       textDecoration: 'underline',
                       cursor: 'pointer',
                     }}
@@ -174,7 +135,7 @@ export default function HocSinhNhanBai({
                     {e.hoTen || e.sbd}
                   </button>
                 ) : (
-                  <strong style={{ color: isSuspect ? '#d93025' : 'inherit' }}>{e.hoTen || e.sbd}</strong>
+                  <strong>{e.hoTen || e.sbd}</strong>
                 )}
               </div>
 
@@ -195,23 +156,6 @@ export default function HocSinhNhanBai({
                 >
                   {e.thuHoi ? 'Đã thu hồi' : e.nopLuc ? 'Đã nộp' : 'Chưa nộp'}
                 </span>
-
-                {isSuspect && (
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      padding: '3px 8px',
-                      borderRadius: 8,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      background: '#fce8e6',
-                      color: '#c5221f',
-                      border: '1px solid #fad2cf',
-                    }}
-                  >
-                    ⭐ Nghi vấn {e.xacSuatGianLan}%
-                  </span>
-                )}
               </div>
 
               {/* Thông tin số câu đúng */}
@@ -219,27 +163,6 @@ export default function HocSinhNhanBai({
                 <p style={{ fontSize: 12, color: 'var(--nhat)', marginTop: 8, marginBottom: 4 }}>
                   {e.soDung}/{e.soCau} câu đúng ({diemBtvn}/10) · {new Date(e.nopLuc).toLocaleString('vi-VN')}
                 </p>
-              )}
-
-              {/* Khối cảnh báo đối chiếu ca thi thật (nếu có nghi vấn) */}
-              {isSuspect && e.lyDoGianLan && (
-                <div
-                  style={{
-                    marginTop: 8,
-                    padding: '8px 10px',
-                    borderRadius: 10,
-                    background: 'rgba(217, 48, 37, 0.07)',
-                    border: '1px solid rgba(217, 48, 37, 0.25)',
-                    fontSize: 11,
-                    lineHeight: 1.4,
-                    color: '#a50e0e',
-                  }}
-                >
-                  <div style={{ fontWeight: 700, marginBottom: 2, display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span>⚠️ Đối chiếu ca thi:</span>
-                  </div>
-                  <div>{e.lyDoGianLan}</div>
-                </div>
               )}
 
               {/* Nút hành động */}

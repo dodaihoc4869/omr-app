@@ -967,15 +967,36 @@ export default function GoiLenBangScreen() {
         <NutQuayLai onClick={() => setScreen('examhub')} label="Kiểm tra" />
       </div>
 
-      <TheNoiDung>
-        <button type="button" role="switch" aria-label="Dạy học" aria-checked={dayHoc}
-          onClick={() => { setDayHoc(!dayHoc); setCachLayCau('tu_chon'); setKq(null); setKqXep(null); setKqBuoi(null); setHtmlMayChieu('') }}
-          className="flex w-full items-center justify-between gap-3 text-left font-bold">
-          <span>{dayHoc ? 'Dạy học' : 'Chữa bài tập về nhà'}</span>
-          <span className={`rounded-full px-4 py-2 ${dayHoc ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'}`}>{dayHoc ? 'Dạy học: Bật' : 'Dạy học: Tắt'}</span>
+      {/* SEGMENTED SWITCHER CHUẨN GOOGLE MATERIAL 3 */}
+      <div className="flex items-center gap-2 p-1.5 bg-slate-100 dark:bg-slate-800/80 rounded-2xl w-full max-w-md border border-slate-200/80 dark:border-slate-700/80 shadow-2xs">
+        <button
+          type="button"
+          onClick={() => { setDayHoc(false); setCachLayCau('tu_chon'); setKq(null); setKqXep(null); setKqBuoi(null); setHtmlMayChieu('') }}
+          className={`flex-1 py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+            !dayHoc
+              ? 'bg-white dark:bg-slate-700 text-[#1a73e8] dark:text-blue-400 shadow-xs ring-1 ring-black/5 dark:ring-white/10'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+          }`}
+        >
+          <BookOpenCheck size={16} /> Chữa bài thi & BTVN
         </button>
-        {dayHoc && <p className="mt-3 text-sm text-slate-500">Lấy toàn bộ câu trong đề đã chọn. Mỗi đợt 2 em khác nhau; ưu tiên ít lên bảng, bốc ngẫu nhiên khi bằng lượt. Nếu số câu lẻ, đợt cuối có 1 em. Chọn ca bên dưới để lấy danh sách học sinh.</p>}
-      </TheNoiDung>
+        <button
+          type="button"
+          onClick={() => { setDayHoc(true); setCachLayCau('tu_chon'); setKq(null); setKqXep(null); setKqBuoi(null); setHtmlMayChieu('') }}
+          className={`flex-1 py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+            dayHoc
+              ? 'bg-white dark:bg-slate-700 text-[#1a73e8] dark:text-blue-400 shadow-xs ring-1 ring-black/5 dark:ring-white/10'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+          }`}
+        >
+          <UserCheck size={16} /> Dạy học theo đề
+        </button>
+      </div>
+      {dayHoc && (
+        <p className="text-xs text-slate-500 dark:text-slate-400 -mt-2">
+          Lấy toàn bộ câu trong đề đã chọn. Mỗi đợt 2 em khác nhau; ưu tiên ít lên bảng, bốc ngẫu nhiên khi bằng lượt.
+        </p>
+      )}
       {loi && <OThongBao tone="do">{loi}</OThongBao>}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
@@ -1057,7 +1078,7 @@ export default function GoiLenBangScreen() {
           Bài làm của em ở mục 1 luôn được dùng để tính câu nào cả lớp cùng sai. Mục này chỉ quyết định LẤY CÂU NÀO RA CHỮA.
         </div>
 
-        <div className="flex flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k3)' }} role="radiogroup" aria-label="Cách lấy câu để chữa">
+        <div className="flex flex-wrap gap-2 mb-3" role="radiogroup" aria-label="Cách lấy câu để chữa">
           {(!dayHoc ? ['theo_dang', 'san', 'tu_chon'] as const : []).map((c) => {
             const chon = cachLayCau === c
             const tat = (c === 'san' && !du?.khoChua) || (c === 'theo_dang' && (demChua?.tongUngVien ?? 0) === 0)
@@ -1069,18 +1090,11 @@ export default function GoiLenBangScreen() {
                 aria-checked={chon}
                 disabled={tat}
                 onClick={() => setCachLayCau(c)}
-                className="tap-target font-bold"
-                style={{
-                  minHeight: 44,
-                  padding: '0 var(--k4)',
-                  borderRadius: 'var(--bo-tron)',
-                  background: chon ? 'var(--muc)' : 'var(--the-2)',
-                  color: tat ? 'var(--mo)' : chon ? 'var(--muc-nguoc)' : 'var(--muc)',
-                  border: 'none',
-                  fontFamily: 'var(--sans)',
-                  fontSize: 'var(--cx-1)',
-                  opacity: tat ? 0.6 : 1,
-                }}
+                className={`text-xs font-bold px-3.5 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
+                  chon
+                    ? 'bg-blue-50 dark:bg-blue-950/60 text-[#1a73e8] dark:text-blue-300 border border-blue-300 dark:border-blue-700 shadow-2xs ring-2 ring-blue-400/20'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
+                } ${tat ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 {c === 'theo_dang' ? 'Theo dạng câu cả lớp sai' : c === 'san' ? 'Kiểm tra điểm yếu cộng dồn' : 'Tôi tự chọn bài để chữa'}
               </button>
@@ -1094,54 +1108,48 @@ export default function GoiLenBangScreen() {
               Rút từ <b>cả kho</b>, chỉ lấy câu cùng mã dạng với những câu cả lớp làm sai. Không lấy câu chuyên đề khác, không bó trong đề của ca.
             </div>
             {/* DẠNG CÂU — bấm là trần ở thanh dưới đổi theo, thầy chốt 07/09. */}
-            <div className="flex flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k2)' }} role="radiogroup" aria-label="Dạng câu">
-              {MOI_LOC_DANG.map((v) => (
-                <button
-                  key={v}
-                  type="button"
-                  role="radio"
-                  aria-checked={locDang === v}
-                  onClick={() => setLocDang(v)}
-                  className="tap-target font-bold"
-                  style={{
-                    minHeight: 36,
-                    padding: '0 var(--k3)',
-                    borderRadius: 'var(--bo-tron)',
-                    border: 'none',
-                    background: locDang === v ? 'var(--phu-dam)' : 'var(--the-2)',
-                    color: locDang === v ? 'var(--muc-nguoc)' : 'var(--muc)',
-                    fontFamily: 'var(--sans)',
-                    fontSize: 'var(--cx-1)',
-                  }}
-                >
-                  {TEN_LOC_DANG[v]}
-                </button>
-              ))}
+            <div className="flex flex-wrap gap-1.5 mb-2" role="radiogroup" aria-label="Dạng câu">
+              {MOI_LOC_DANG.map((v) => {
+                const chon = locDang === v
+                return (
+                  <button
+                    key={v}
+                    type="button"
+                    role="radio"
+                    aria-checked={chon}
+                    onClick={() => setLocDang(v)}
+                    className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all cursor-pointer ${
+                      chon
+                        ? 'bg-[#1a73e8] text-white shadow-2xs ring-2 ring-blue-400/20'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
+                    }`}
+                  >
+                    {TEN_LOC_DANG[v]}
+                  </button>
+                )
+              })}
             </div>
             {/* MỨC SAO — thầy chốt 07/09. */}
-            <div className="flex flex-wrap" style={{ gap: 'var(--k2)', marginBottom: 'var(--k3)' }} role="radiogroup" aria-label="Mức sao">
-              {MOI_LOC_SAO.map((v) => (
-                <button
-                  key={v}
-                  type="button"
-                  role="radio"
-                  aria-checked={locSao === v}
-                  onClick={() => setLocSao(v)}
-                  className="tap-target font-bold"
-                  style={{
-                    minHeight: 36,
-                    padding: '0 var(--k3)',
-                    borderRadius: 'var(--bo-tron)',
-                    border: 'none',
-                    background: locSao === v ? 'var(--phu-dam)' : 'var(--the-2)',
-                    color: locSao === v ? 'var(--muc-nguoc)' : 'var(--muc)',
-                    fontFamily: 'var(--sans)',
-                    fontSize: 'var(--cx-1)',
-                  }}
-                >
-                  {TEN_LOC_SAO[v]}
-                </button>
-              ))}
+            <div className="flex flex-wrap gap-1.5 mb-3" role="radiogroup" aria-label="Mức sao">
+              {MOI_LOC_SAO.map((v) => {
+                const chon = locSao === v
+                return (
+                  <button
+                    key={v}
+                    type="button"
+                    role="radio"
+                    aria-checked={chon}
+                    onClick={() => setLocSao(v)}
+                    className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all cursor-pointer ${
+                      chon
+                        ? 'bg-[#1a73e8] text-white shadow-2xs ring-2 ring-blue-400/20'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
+                    }`}
+                  >
+                    {TEN_LOC_SAO[v]}
+                  </button>
+                )
+              })}
             </div>
             <ThanhSoCauChua
               soCau={soCauChua}
