@@ -37,6 +37,7 @@ import {
 import type { CauLuyen } from '../lib/bai-tap-pdf'
 import { normalizeNumericAnswer } from '../engine/score'
 import { loadScriptUrlHoacMacDinh, loadExamSources } from '../lib/exam-db'
+import { layDiaChiMayChu } from '../lib/dia-chi-may-chu'
 import { napKhoChoMayEm } from '../lib/kho-cho-may-em'
 import type { TeacherExamSource } from '../data/examContent'
 import ModalXacNhanNop from './ModalXacNhanNop'
@@ -63,6 +64,11 @@ export interface KhoiKhacPhuc3CheDoProps {
   hoTen: string
   dsLichSu: any[]
   scriptUrl?: string
+  vaiTro?: 'hs' | 'ph'
+  dsMomGiao?: any[]
+  thongBaoMom?: { loai: 'ok' | 'loi'; chu: string } | null
+  onGiaoBaiChoCon?: (dsCau: any[], tieuDe: string) => Promise<void> | void
+  onXemKetQuaMom?: (bai: any) => void
 }
 
 function chamBai(
@@ -120,13 +126,22 @@ function chamBai(
 
 export default function KhoiKhacPhuc3CheDo({
   sbd,
+  token: _token,
   hoTen,
   dsLichSu,
   scriptUrl: scriptUrlProp,
+  vaiTro = 'hs',
+  dsMomGiao,
+  thongBaoMom,
+  onGiaoBaiChoCon,
+  onXemKetQuaMom,
 }: KhoiKhacPhuc3CheDoProps) {
   const [cheDo, setCheDo] = useState<1 | 2 | 3 | 4>(1)
   const [dangXuLy, setDangXuLy] = useState(false)
   const [loi, setLoi] = useState('')
+
+  const layUrl = async () =>
+    scriptUrlProp || (await layDiaChiMayChu()) || (await loadScriptUrlHoacMacDinh().catch(() => ''))
 
   // Chế độ 1: Rút từ ca đã thi
   const [cacCaChon, setCacCaChon] = useState<Set<string>>(() => {
@@ -189,12 +204,12 @@ export default function KhoiKhacPhuc3CheDo({
     setLoiKho2('')
     void (async () => {
       try {
-        const url = scriptUrlProp || (await loadScriptUrlHoacMacDinh().catch(() => ''))
+        const url = await layUrl()
         // Bước 1: xin danh sách câu sai của em từ server
         const res = await hsCauSaiApi(url, sbd, [])
         if (!alive) return
         if (!res.ok || !res.items || res.items.length === 0) {
-          setLoiKho2(res.error || 'Em không có câu sai nào trong lịch sử.')
+          setLoiKho2(res.error || (vaiTro === 'ph' ? 'Con không có câu sai nào trong lịch sử.' : 'Em không có câu sai nào trong lịch sử.'))
           setKhoDe2([])
           setDsCauSai2([])
           return
@@ -279,7 +294,7 @@ export default function KhoiKhacPhuc3CheDo({
     void (async () => {
       setDangTaiDm(true)
       try {
-        const url = scriptUrlProp || (await loadScriptUrlHoacMacDinh().catch(() => ''))
+        const url = await layUrl()
         const kq = await danhMucDangBai(url)
         if (!alive) return
         if (kq.lops && kq.lops.length > 0) {
@@ -295,7 +310,7 @@ export default function KhoiKhacPhuc3CheDo({
         }
       } catch {
       } finally {
-        if (!alive) setDangTaiDm(false)
+        if (alive) setDangTaiDm(false)
       }
     })()
     return () => {
@@ -348,7 +363,7 @@ export default function KhoiKhacPhuc3CheDo({
     void (async () => {
       setDangTaiDang(true)
       try {
-        const url = scriptUrlProp || (await loadScriptUrlHoacMacDinh().catch(() => ''))
+        const url = await layUrl()
         const canTai = dsMa.filter((ma) => !cacheDeRef.current.has(ma))
         if (canTai.length > 0) {
           await Promise.all(
@@ -424,23 +439,23 @@ export default function KhoiKhacPhuc3CheDo({
     }
   }, [currentTest?.id, currentTest?.status])
 
-  // BẮT ĐẦU LÀM BÀI
+  // BẮT ĐẦU LÀM BÀI / GIAO BÀI CHO CON
   const batDauLamBai = async () => {
     setDangXuLy(true)
     setLoi('')
     try {
-      const url = scriptUrlProp || (await loadScriptUrlHoacMacDinh().catch(() => ''))
+      const url = await layUrl()
 
       if (cheDo === 1) {
         // Chế độ 1: Rút từ ca đã chọn
         const dsMa = Array.from(cacCaChon)
         if (dsMa.length === 0) {
-          setLoi('Vui lòng chọn ít nhất 1 ca thi để rút câu sai.')
+          setLoi(vaiTro === 'ph' ? 'Vui lòng chọn ít nhất 1 ca thi để rút câu sai cho con.' : 'Vui lòng chọn ít nhất 1 ca thi để rút câu sai.')
           return
         }
         const res = await hsCauSaiApi(url, sbd, dsMa)
         if (!res.ok || !res.items || res.items.length === 0) {
-          setLoi(res.error || 'Các ca thi đã chọn không có câu sai nào cần khắc phục!')
+          setLoi(res.error || (vaiTro === 'ph' ? 'Các ca thi đã chọn không có câu sai nào cần khắc phục!' : 'Các ca thi đã chọn không có câu sai nào cần khắc phục!'))
           return
         }
         const { dsCau } = taoDeLamLaiCauSai(res.items as CauSaiDauVao[], {
@@ -453,6 +468,10 @@ export default function KhoiKhacPhuc3CheDo({
           return
         }
         const tieuDe = `Khắc phục: ${dsMa.length === 1 ? `Ca #${dsMa[0]}` : `${dsMa.length} ca`} (${dsCau.length} câu)`
+        if (onGiaoBaiChoCon) {
+          await onGiaoBaiChoCon(dsCau, tieuDe)
+          return
+        }
         const baiMoi: BaiLuyenKhacPhuc = {
           id: `kp_${Date.now()}`,
           tieuDe,
@@ -473,20 +492,24 @@ export default function KhoiKhacPhuc3CheDo({
       } else if (cheDo === 2) {
         // Chế độ 2: Dạng câu sai — rút câu cùng nhãn dán theo tỷ lệ từ kho
         if (dsCauSaiCheDo2.length === 0) {
-          setLoi('Vui lòng tick chọn ít nhất một ca thi có câu sai.')
+          setLoi(vaiTro === 'ph' ? 'Vui lòng tick chọn ít nhất một ca thi có câu sai của con.' : 'Vui lòng tick chọn ít nhất một ca thi có câu sai.')
           return
         }
         if (khoDe2.length === 0) {
-          setLoi('Chưa có kho câu cùng dạng. Em đợi hệ thống tải xong hoặc thử lại.')
+          setLoi('Chưa có kho câu cùng dạng. Vui lòng đợi hệ thống tải xong hoặc thử lại.')
           return
         }
         const res2 = rutLuyenThemDangCauSai(dsCauSaiCheDo2, khoDe2, soCauCheDo2, { hoTen, sbd })
         const dsCau = res2.dsCau
         if (dsCau.length === 0) {
-          setLoi('Kho đề chưa có câu nào cùng dạng câu sai. Em hãy làm thêm bài để ghi nhận câu sai.')
+          setLoi(vaiTro === 'ph' ? 'Kho đề chưa có câu nào cùng dạng câu sai của con.' : 'Kho đề chưa có câu nào cùng dạng câu sai. Em hãy làm thêm bài để ghi nhận câu sai.')
           return
         }
         const tieuDe = `Dạng câu sai: ${dsCau.length} câu (chia theo tỷ lệ ${dsCauSaiCheDo2.length} câu sai)`
+        if (onGiaoBaiChoCon) {
+          await onGiaoBaiChoCon(dsCau, tieuDe)
+          return
+        }
         const baiMoi: BaiLuyenKhacPhuc = {
           id: `kp_${Date.now()}`,
           tieuDe,
@@ -511,7 +534,7 @@ export default function KhoiKhacPhuc3CheDo({
           return
         }
         if (khoDangBai.length === 0) {
-          setLoi('Dạng bài này chưa có đề trong kho hoặc đang tải. Em thử lại sau giây lát.')
+          setLoi('Dạng bài này chưa có đề trong kho hoặc đang tải. Vui lòng thử lại sau giây lát.')
           return
         }
         const tenDangChon =
@@ -537,6 +560,10 @@ export default function KhoiKhacPhuc3CheDo({
           cacDangChon.size === 1
             ? `Dạng bài: ${tenDangChon} — Lớp ${lopChon} (${dsCau.length} câu)`
             : `Luyện ${cacDangChon.size} dạng bài — Lớp ${lopChon} · ${baiChon} (${dsCau.length} câu)`
+        if (onGiaoBaiChoCon) {
+          await onGiaoBaiChoCon(dsCau, tieuDe)
+          return
+        }
         const baiMoi: BaiLuyenKhacPhuc = {
           id: `kp_${Date.now()}`,
           tieuDe,
@@ -561,7 +588,7 @@ export default function KhoiKhacPhuc3CheDo({
           return
         }
         if (khoDangBai.length === 0) {
-          setLoi('Dạng bài này chưa có đề trong kho hoặc đang tải. Em thử lại sau giây lát.')
+          setLoi('Dạng bài này chưa có đề trong kho hoặc đang tải. Vui lòng thử lại sau giây lát.')
           return
         }
         const tenDangChon =
@@ -598,6 +625,10 @@ export default function KhoiKhacPhuc3CheDo({
           cacDangChon.size === 1
             ? `Tự do (${nhanMuc}): ${tenDangChon} (${dsCau.length} câu)`
             : `Tự do (${nhanMuc}): ${cacDangChon.size} dạng bài · Lớp ${lopChon} (${dsCau.length} câu)`
+        if (onGiaoBaiChoCon) {
+          await onGiaoBaiChoCon(dsCau, tieuDe)
+          return
+        }
         const baiMoi: BaiLuyenKhacPhuc = {
           id: `kp_${Date.now()}`,
           tieuDe,
@@ -614,6 +645,7 @@ export default function KhoiKhacPhuc3CheDo({
         }
         luuHistory([baiMoi, ...history])
         setCurrentTest(baiMoi)
+        setSeconds(0)
       }
     } catch (e) {
       setLoi(e instanceof Error ? e.message : 'Có lỗi xảy ra khi tạo đề.')
@@ -834,17 +866,26 @@ export default function KhoiKhacPhuc3CheDo({
     )
   }
 
-  // MÀN HÌNH CHỌN 3 CHẾ ĐỘ & DANH SÁCH BÀI LUYỆN
+  // MÀN HÌNH CHỌN 4 CHẾ ĐỘ & DANH SÁCH BÀI LUYỆN
   return (
     <section className={panel}>
-      <div>
-        <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-lg">
-          <Sparkles size={20} />
-          <h2>4 CHẾ ĐỘ KHẮC PHỤC CÂU SAI</h2>
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-lg">
+            <Sparkles size={20} />
+            <h2>{vaiTro === 'ph' ? '4 CHẾ ĐỘ GIAO BÀI CHO CON' : '4 CHẾ ĐỘ KHẮC PHỤC CÂU SAI'}</h2>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            {vaiTro === 'ph'
+              ? 'Hệ thống tự động phân tích và tạo bài luyện khắc phục theo nhu cầu của con'
+              : 'Hệ thống tự động phân tích và tạo bài luyện khắc phục theo nhu cầu của em'}
+          </p>
         </div>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-          Hệ thống tự động phân tích và tạo bài luyện khắc phục theo nhu cầu của em
-        </p>
+        {vaiTro === 'ph' && (
+          <span className="text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 px-2.5 py-1 rounded-full border border-rose-200 dark:border-rose-900 shrink-0">
+            Hạn 2 tiếng
+          </span>
+        )}
       </div>
 
       {/* 4 Nút chọn chế độ */}
@@ -860,7 +901,7 @@ export default function KhoiKhacPhuc3CheDo({
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          1. Rút từ ca
+          1. Sửa câu sai
         </button>
         <button
           onClick={() => {
@@ -903,6 +944,19 @@ export default function KhoiKhacPhuc3CheDo({
         </button>
       </div>
 
+      {thongBaoMom && (
+        <div
+          className={`p-3.5 rounded-xl text-xs leading-relaxed border flex items-center gap-2 ${
+            thongBaoMom.loai === 'ok'
+              ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800'
+              : 'bg-red-50 dark:bg-red-950/50 text-red-800 dark:text-red-200 border-red-200 dark:border-red-800'
+          }`}
+        >
+          <AlertCircle size={16} className="shrink-0" />
+          <span>{thongBaoMom.chu}</span>
+        </div>
+      )}
+
       {loi && (
         <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 rounded-xl text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
           <AlertCircle size={16} className="shrink-0" />
@@ -910,7 +964,7 @@ export default function KhoiKhacPhuc3CheDo({
         </div>
       )}
 
-      {/* NỘI DUNG CHẾ ĐỘ 1: RÚT TỪ CA */}
+      {/* NỘI DUNG CHẾ ĐỘ 1: SỬA CÂU SAI */}
       {cheDo === 1 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
@@ -998,7 +1052,11 @@ export default function KhoiKhacPhuc3CheDo({
             ) : (
               <Play size={16} fill="currentColor" />
             )}
-            <span>Bắt đầu làm bài ({cacCaChon.size} ca đã chọn)</span>
+            <span>
+              {vaiTro === 'ph'
+                ? `Giao bài sửa câu sai cho con (${cacCaChon.size} ca đã chọn)`
+                : `Bắt đầu sửa câu sai (${cacCaChon.size} ca đã chọn)`}
+            </span>
           </button>
         </div>
       )}
@@ -1167,7 +1225,9 @@ export default function KhoiKhacPhuc3CheDo({
           ) : dsCauSai2.length > 0 ? (
             <div className="p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-500 dark:text-slate-400 text-xs flex items-center gap-2">
               <Info size={14} className="shrink-0" />
-              Kho chưa có câu nào cùng dạng câu sai. Em làm đúng các câu sai trước, thầy sẽ bổ sung câu luyện.
+              {vaiTro === 'ph'
+                ? 'Kho chưa có câu nào cùng dạng câu sai của con. Cho con sửa các câu sai trước, thầy sẽ bổ sung câu luyện.'
+                : 'Kho chưa có câu nào cùng dạng câu sai. Em làm đúng các câu sai trước, thầy sẽ bổ sung câu luyện.'}
             </div>
           ) : null}
             </div>
@@ -1187,7 +1247,9 @@ export default function KhoiKhacPhuc3CheDo({
               {dangTaiKho2
                 ? 'Đang tải kho...'
                 : tongToiDaCheDo2 > 0
-                ? `Bắt đầu luyện dạng câu sai (${soCauCheDo2} câu)`
+                ? vaiTro === 'ph'
+                  ? `Giao bài dạng câu sai cho con (${soCauCheDo2} câu)`
+                  : `Bắt đầu luyện dạng câu sai (${soCauCheDo2} câu)`
                 : 'Bắt đầu luyện dạng câu sai'}
             </span>
           </button>
@@ -1341,7 +1403,8 @@ export default function KhoiKhacPhuc3CheDo({
                   <Play size={16} fill="currentColor" />
                 )}
                 <span>
-                  Bắt đầu bài luyện dạng bài {cacDangChon.size > 0 ? `(${cacDangChon.size} dạng đã chọn)` : ''}
+                  {vaiTro === 'ph' ? 'Giao bài dạng bài cho con ' : 'Bắt đầu bài luyện dạng bài '}
+                  {cacDangChon.size > 0 ? `(${cacDangChon.size} dạng đã chọn)` : ''}
                 </span>
               </button>
             </>
@@ -1527,7 +1590,8 @@ export default function KhoiKhacPhuc3CheDo({
                   <Play size={16} fill="currentColor" />
                 )}
                 <span>
-                  Bắt đầu bài luyện tự do {cacDangChon.size > 0 ? `(${cacDangChon.size} dạng đã chọn)` : ''}
+                  {vaiTro === 'ph' ? 'Giao bài tự do cho con ' : 'Bắt đầu bài luyện tự do '}
+                  {cacDangChon.size > 0 ? `(${cacDangChon.size} dạng đã chọn)` : ''}
                 </span>
               </button>
             </>
@@ -1535,72 +1599,153 @@ export default function KhoiKhacPhuc3CheDo({
         </div>
       )}
 
-      {/* DANH SÁCH BÀI LUYỆN CỦA EM — CHO VÀO BOX CUỘN TRÁNH TRÀN TRANG */}
+      {/* DANH SÁCH BÀI LUYỆN CỦA EM HOẶC BÀI MOM ĐÃ GIAO */}
       <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs">
         <div className="flex items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800 px-4 py-3 border-b border-slate-100 dark:border-slate-800">
           <h3 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2">
             <FileText size={16} className="text-amber-500" />
-            Bài luyện của em
+            {vaiTro === 'ph' ? 'Các bài Mom đã giao' : 'Bài luyện của em'}
           </h3>
-          <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{history.length} bài</span>
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            {vaiTro === 'ph' ? (dsMomGiao ? dsMomGiao.length : 0) : history.length} bài
+          </span>
         </div>
 
-        {history.length === 0 ? (
-          <p className="p-4 text-xs text-slate-400 text-center bg-white dark:bg-slate-900">
-            Chưa có bài luyện nào. Em hãy chọn chế độ phía trên để bắt đầu làm bài!
-          </p>
+        {vaiTro === 'ph' ? (
+          !dsMomGiao || dsMomGiao.length === 0 ? (
+            <p className="p-4 text-xs text-slate-400 text-center bg-white dark:bg-slate-900">
+              Chưa có bài tập nào được giao. Phụ huynh hãy chọn một trong 4 chế độ phía trên để giao bài cho con!
+            </p>
+          ) : (
+            <div
+              role="region"
+              aria-label="Danh sách bài Mom đã giao"
+              tabIndex={0}
+              className="max-h-60 overflow-y-auto overscroll-contain p-2 space-y-2"
+            >
+              {dsMomGiao.map((m) => {
+                const daNop = m.trangThai === 'da_nop'
+                return (
+                  <div
+                    key={m.id}
+                    onClick={() => {
+                      if (daNop && onXemKetQuaMom) {
+                        onXemKetQuaMom(m)
+                      }
+                    }}
+                    className={`p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/70 transition flex items-center justify-between gap-3 ${
+                      daNop ? 'hover:border-amber-300 dark:hover:border-amber-700 cursor-pointer' : ''
+                    }`}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate block">
+                        {m.tieuDe}
+                      </span>
+                      <span className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
+                        <Clock3 size={12} />
+                        {new Date(m.taoLuc).toLocaleString('vi-VN', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
+                          daNop
+                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                            : m.trangThai === 'dang_lam'
+                            ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
+                            : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
+                        }`}
+                      >
+                        {daNop
+                          ? `Đã nộp: ${m.diem?.toFixed(2) ?? '—'} điểm`
+                          : m.trangThai === 'dang_lam'
+                          ? 'Con đang làm'
+                          : 'Đã giao · Con chưa làm'}
+                      </span>
+                      {daNop && onXemKetQuaMom && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onXemKetQuaMom(m)
+                          }}
+                          className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] flex items-center gap-1 transition cursor-pointer shadow-xs"
+                          title="Xem kết quả bài nộp"
+                        >
+                          <span>Xem kết quả</span>
+                          <ArrowUpRight size={13} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )
         ) : (
-          <div
-            role="region"
-            aria-label="Danh sách bài luyện của em"
-            tabIndex={0}
-            className="max-h-60 overflow-y-auto overscroll-contain p-2 space-y-2"
-          >
-            {history.map((h) => {
-              const daNop = h.status === 'submitted'
-              return (
-                <div
-                  key={h.id}
-                  onClick={() => setCurrentTest(h)}
-                  className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/70 hover:border-amber-300 dark:hover:border-amber-700 transition flex items-center justify-between gap-3 cursor-pointer"
-                >
-                  <div className="min-w-0 flex-1">
-                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate block">
-                      {h.tieuDe}
-                    </span>
-                    <span className="text-[11px] text-slate-400 mt-0.5 block">
-                      {new Date(h.createdAt).toLocaleString('vi-VN', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                      })}
-                    </span>
+          history.length === 0 ? (
+            <p className="p-4 text-xs text-slate-400 text-center bg-white dark:bg-slate-900">
+              Chưa có bài luyện nào. Em hãy chọn chế độ phía trên để bắt đầu làm bài!
+            </p>
+          ) : (
+            <div
+              role="region"
+              aria-label="Danh sách bài luyện của em"
+              tabIndex={0}
+              className="max-h-60 overflow-y-auto overscroll-contain p-2 space-y-2"
+            >
+              {history.map((h) => {
+                const daNop = h.status === 'submitted'
+                return (
+                  <div
+                    key={h.id}
+                    onClick={() => setCurrentTest(h)}
+                    className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/70 hover:border-amber-300 dark:hover:border-amber-700 transition flex items-center justify-between gap-3 cursor-pointer"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate block">
+                        {h.tieuDe}
+                      </span>
+                      <span className="text-[11px] text-slate-400 mt-0.5 block">
+                        {new Date(h.createdAt).toLocaleString('vi-VN', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
+                          daNop
+                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                            : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
+                        }`}
+                      >
+                        {daNop ? `${h.score?.toFixed(2)} điểm` : 'Đang làm'}
+                      </span>
+                      <button
+                        onClick={(e) => xoaBai(h.id, e)}
+                        title="Xoá bài luyện này"
+                        className="text-slate-300 hover:text-rose-500 p-1 rounded transition cursor-pointer"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                      <ArrowUpRight size={14} className="text-slate-400" />
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span
-                      className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
-                        daNop
-                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                          : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
-                      }`}
-                    >
-                      {daNop ? `${h.score?.toFixed(2)} điểm` : 'Đang làm'}
-                    </span>
-                    <button
-                      onClick={(e) => xoaBai(h.id, e)}
-                      title="Xoá bài luyện này"
-                      className="text-slate-300 hover:text-rose-500 p-1 rounded transition cursor-pointer"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                    <ArrowUpRight size={14} className="text-slate-400" />
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+                )
+              })}
+            </div>
+          )
         )}
       </div>
     </section>

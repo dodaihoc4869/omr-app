@@ -1,5 +1,7 @@
 import {layDiaChiMayChu} from './dia-chi-may-chu'
-import {chuanHoaLoiGiaiCau, taoHtmlKhungLoiGiaiGoogle} from './chuan-hoa-loi-giai'
+import {chuanHoaLoiGiaiCau} from './chuan-hoa-loi-giai'
+import {dungPhieu, type ThongTinPhieu} from './html-phieu'
+import type {CauLuyen} from './bai-tap-pdf'
 const saves = new Map<string, Promise<any>>()
 export function momApi(action:string,body:Record<string,unknown>):Promise<any>{
   if (action !== 'save' && action !== 'submit') return requestMom(action,body)
@@ -40,45 +42,106 @@ export async function migrateMom(sbd:string){
   }
 }
 
-/** Báo cáo dựng từ nội dung và điểm đã lưu trên máy chủ, không nhận HTML tùy ý. */
-export function momReviewHtml(b:any):string {
-  const escape=(s:unknown)=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
-  const plain=(s:unknown)=>{
-    try {
-      const doc=new DOMParser().parseFromString(String(s??''),'text/html')
-      return doc.body.textContent||''
-    } catch {
-      return String(s??'')
-    }
+export function chuanHoaBaiMom(b: any): any {
+  const rawCau = Array.isArray(b?.dsCau) ? b.dsCau : (Array.isArray(b?.cau) ? b.cau : [])
+  const dsCau = rawCau.map((c: any, i: number) => ({
+    ...c,
+    phan: c?.phan || (/^[DS]{4}$/i.test(String(c?.dapAn || c?.dapAnDung)) ? 'II' : undefined),
+    id: String(c?.id || `cau_${i + 1}`),
+    text: String(c?.text || c?.noiDung || 'Câu hỏi'),
+    choices: Array.isArray(c?.choices)
+      ? c.choices.map(String)
+      : (Array.isArray(c?.luaChon) ? c.luaChon.map(String) : (Array.isArray(c?.ideas) ? c.ideas.map(String) : [])),
+    dapAn: String(c?.dapAn || c?.dapAnDung || 'A'),
+    dapAnDung: String(c?.dapAnDung || c?.dapAn || 'A'),
+    loiGiai: c?.loiGiai != null && String(c.loiGiai) !== '[object Object]' ? c.loiGiai : '',
+    chuyenDe: String(c?.chuyenDe || 'Hoá học'),
+  }))
+
+  const id = String(b?.id || `mom_${Date.now()}`)
+  const tieuDe = String(b?.tieuDe || `Bài của Mom giao (${dsCau.length} câu)`)
+  const ngayGiao = String(b?.ngayGiao || b?.taoLuc || new Date().toISOString())
+  const taoLuc = String(b?.taoLuc || b?.ngayGiao || new Date().toISOString())
+  const soCau = Number(b?.soCau) || dsCau.length
+  const thoiGianPhut = Number(b?.thoiGianPhut) || 120
+  const trangThai = b?.trangThai || 'chua_lam'
+  const htmlKetQua = b?.htmlKetQua || b?.htmlBaoCao || ''
+
+  return {
+    dapAnDaNop: b?.dapAnDaNop,
+    ...b,
+    id,
+    tieuDe,
+    ngayGiao,
+    taoLuc,
+    soCau,
+    thoiGianPhut,
+    dsCau,
+    cau: dsCau,
+    trangThai,
+    htmlKetQua,
+    htmlBaoCao: htmlKetQua,
   }
-  return `<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kết quả bài của Mom</title><style>
-body{font:16px/1.7 system-ui,-apple-system,BlinkMacSystemFont,sans-serif;background:#f8fafc;color:#172033;max-width:900px;margin:auto;padding:24px}
-article{background:white;padding:24px;border:1px solid #e2e8f0;border-radius:20px;margin:20px 0;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
-p{white-space:pre-wrap;margin:10px 0}
-h1{font-size:24px;margin-bottom:8px}
-h2{font-size:18px;margin-top:0;color:#1e293b}
-.score{font-size:36px;font-weight:900;color:#059669;margin:8px 0}
-.summary{color:#64748b;font-size:15px;margin-bottom:24px}
-.ans-box{background:#f1f5f9;padding:12px 16px;border-radius:12px;margin:12px 0}
-</style>
-<h1>${escape(b.tieuDe)}</h1>
-<div class="score">${escape(b.diem ?? 0)}/10</div>
-<div class="summary">Đúng ${escape(b.soCauDung ?? 0)}/${escape(b.soCau ?? 0)} câu</div>
-${(b.dsCau||[]).map((c:any,i:number)=>{
-  const lgChuan = chuanHoaLoiGiaiCau(c.loiGiai, c.phan || 'I', c.dapAn || c.dapAnDung)
-  const khungLg = taoHtmlKhungLoiGiaiGoogle(lgChuan)
-  const daChon = b.dapAnDaNop?.[c.id] || 'Chưa trả lời'
-  const dung = c.dapAn || c.dapAnDung || ''
-  return `<article>
-    <h2>Câu ${i+1}</h2>
-    <p>${escape(plain(c.text||c.noiDung))}</p>
-    ${(c.choices||c.luaChon||[]).map((v:unknown,k:number)=>`<p><b>${String.fromCharCode(65+k)}.</b> ${escape(plain(v))}</p>`).join('')}
-    <div class="ans-box">
-      Em trả lời: <b>${escape(daChon)}</b><br>
-      Đáp án đúng: <b>${escape(dung)}</b>
-    </div>
-    ${khungLg}
-  </article>`
-}).join('')}
-</html>`
+}
+
+/** Báo cáo dựng từ nội dung và điểm đã lưu trên máy chủ, đồng điệu với tất cả các phiếu HTML trong app. */
+export function momReviewHtml(b: any): string {
+  const dsCauRaw = Array.isArray(b.dsCau) ? b.dsCau : (Array.isArray(b.cau) ? b.cau : [])
+  const dapAnDaNop = b.dapAnDaNop || b.answers || {}
+
+  const cauLuyen: CauLuyen[] = dsCauRaw.map((c: any, i: number) => {
+    const daChon = dapAnDaNop[c.id] || ''
+    const dung = String(c.dapAn || c.dapAnDung || '').trim()
+    const lg = chuanHoaLoiGiaiCau(c.loiGiai, c.phan || 'I', dung)
+    const phan = (c.phan as 'I' | 'II' | 'III') || (/^[DS]{4}$/i.test(dung) ? 'II' : (c.choices?.length || c.luaChon?.length ? 'I' : 'III'))
+
+    return {
+      id: c.id || `cau_${i + 1}`,
+      phan,
+      maDe: c.maDe || 'MOM',
+      chuyenDe: c.chuyenDe || 'Hoá học',
+      dang: 'chua_ro',
+      sao: 1,
+      mucDo: c.mucDo || '',
+      text: c.text || c.noiDung || '',
+      luaChon: c.choices || c.luaChon || null,
+      dapAn: dung,
+      chot: lg.chot,
+      lyDo: lg.lyDo,
+      buoc: lg.buoc,
+      ketQua: lg.ketQua,
+      anhThanCau: c.anhThanCau || c.thanCauImg,
+      anhLuaChon: c.anhLuaChon,
+      chuaCho: {
+        qid: c.id,
+        soCau: i + 1,
+        phan,
+        maDang: '',
+        bac: 1,
+        laDeCuaEm: true,
+        daChon,
+        dapAnDung: dung,
+      },
+    }
+  })
+
+  const thongTin: ThongTinPhieu = {
+    hoTen: b.sbd ? `SBD: ${b.sbd}` : '',
+    sbd: b.sbd || '',
+    ngay: new Date(b.nopLuc || b.taoLuc || Date.now()),
+    tenChuyenDe: b.tieuDe || 'Bài luyện của Mom',
+    ketQua: `${b.diem ?? 0} điểm · Đúng ${b.soCauDung ?? 0}/${b.soCau ?? cauLuyen.length} câu`,
+    hienDapAn: true,
+    nhanBia: 'BÀI CỦA MOM GIAO',
+    oBia: [
+      { nhan: 'Điểm số', gia: `${b.diem ?? 0}/10` },
+      { nhan: 'Kết quả', gia: `${b.soCauDung ?? 0}/${b.soCau ?? cauLuyen.length} câu đúng` },
+      { nhan: 'Thời gian nộp', gia: b.nopLuc ? new Date(b.nopLuc).toLocaleDateString('vi-VN') : 'Đã nộp' },
+    ],
+  }
+
+  return dungPhieu(thongTin, cauLuyen, {
+    moSan: true,
+    loiNhac: `Kết quả bài của Mom giao: Đạt ${b.diem ?? 0}/10 điểm (Đúng ${b.soCauDung ?? 0}/${b.soCau ?? cauLuyen.length} câu). Bấm vào từng câu để mở hoặc đóng lời giải chi tiết.`,
+  })
 }

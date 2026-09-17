@@ -1,5 +1,6 @@
 import BangTinPhuHuynh from '../components/BangTinPhuHuynh'
-import {momApi, migrateMom} from '../lib/mom-api'
+import { momApi, migrateMom, momReviewHtml, chuanHoaBaiMom } from '../lib/mom-api'
+import KhoiKhacPhuc3CheDo from '../components/KhoiKhacPhuc3CheDo'
 import { useEffect, useState } from 'react'
 import DongDemCau from '../components/DongDemCau'
 import {
@@ -9,8 +10,6 @@ import {
   Calendar,
   ChevronRight,
   Sparkles,
-  Heart,
-  Clock,
   HelpCircle,
   LogOut,
   RefreshCw,
@@ -81,7 +80,7 @@ export default function ParentPortalScreen() {
   const [caDangXem, setCaDangXem] = useState<BaiThiCuaCon | null>(null)
   const [dsMomGiao, setDsMomGiao] = useState<BaiMomGiao[]>([])
 
-  const [dangTaoMom, setDangTaoMom] = useState(false)
+  const [, setDangTaoMom] = useState(false)
   const [thongBaoMom, setThongBaoMom] = useState<{ loai: 'ok' | 'loi'; chu: string } | null>(null)
 
   // Khắc phục câu sai (Bài của Mom giao - 3 chế độ đồng bộ)
@@ -550,110 +549,29 @@ export default function ParentPortalScreen() {
             </div>
           </section>
 
-          {/* Ô 2: TẠO BÀI TẬP CHO CON LUYỆN KHẮC PHỤC LỖI SAI ("BÀI CỦA MOM GIAO") */}
-          <section className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 font-bold">
-                    <Heart size={22} />
-                  </div>
-                  <div>
-                    <h2 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
-                      Bài của Mom giao
-                    </h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Tự động rút câu cùng nhãn khắc phục lỗi sai của con
-                    </p>
-                  </div>
-                </div>
-                <span className="text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 px-2.5 py-1 rounded-full">
-                  Hạn 2 tiếng
-                </span>
-              </div>
-
-              {/* MÔ TẢ CƠ CHẾ SƯ PHẠM */}
-              <div className="p-4 rounded-2xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/40 mb-5 text-xs text-rose-900 dark:text-rose-200 leading-relaxed space-y-2">
-                <div className="font-bold">💡 4 phương pháp khắc phục câu sai tối ưu cho con:</div>
-                <div className="space-y-1.5 pl-1 text-[11.5px] text-rose-800 dark:text-rose-300">
-                  <div>• <b>1. Làm lại các câu sai</b>: Con làm lại đúng các câu bị mất điểm kèm lời giải chuẩn để ghi nhớ.</div>
-                  <div>• <b>2. Luyện thêm dạng câu sai</b>: Tự động rút câu cùng nhãn dán theo đúng tỷ lệ tối đa (lẻ làm tròn lên).</div>
-                  <div>• <b>3. Lựa chọn luyện câu</b>: Lọc theo mức sao (2 sao, 1 sao, 0 sao) và thể loại (lý thuyết, tính toán), tối đa 100 câu.</div>
-                  <div>• <b>4. Luyện dạng bài</b>: Chọn lớp 10/11/12 → tên bài theo sách giáo khoa → dạng toán trọng tâm, gom tất cả câu trong kho thuộc dạng ấy.</div>
-                </div>
-              </div>
-
-              {/* NÚT TẠO VÀ GỬI BÀI CHO CON */}
-              <button
-                type="button"
-                onClick={xuLyTaoBaiCuaMom}
-                disabled={dangTaoMom}
-                className="w-full py-4 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm shadow-md transition-all active:scale-[0.98] disabled:opacity-40 cursor-pointer flex items-center justify-center gap-2"
-              >
-                {dangTaoMom ? (
-                  <>
-                    <RefreshCw size={18} className="animate-spin" />
-                    <span>Đang trích xuất câu sai của con…</span>
-                  </>
-                ) : (
-                  <>
-                    <Heart size={18} />
-                    <span>Tạo bài luyện khắc phục cho con (4 chế độ)</span>
-                  </>
-                )}
-              </button>
-
-              {thongBaoMom && (
-                <div
-                  className={`mt-4 p-3.5 rounded-2xl text-xs leading-relaxed border ${
-                    thongBaoMom.loai === 'ok'
-                      ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800'
-                      : 'bg-red-50 dark:bg-red-950/50 text-red-800 dark:text-red-200 border-red-200 dark:border-red-800'
-                  }`}
-                >
-                  {thongBaoMom.chu}
-                </div>
-              )}
-            </div>
-
-            {/* DANH SÁCH CÁC BÀI MOM ĐÃ GIAO GẦN ĐÂY */}
-            <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2.5">
-                Các bài Mom đã giao gần đây
-              </h4>
-              {dsMomGiao.length === 0 ? (
-                <p className="text-xs text-slate-400 italic">Chưa có bài tập nào được giao.</p>
-              ) : (
-                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                  {dsMomGiao.map((m) => (
-                    <div
-                      key={m.id}
-                      className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 text-xs flex items-center justify-between"
-                    >
-                      <div>
-                        <div className="font-bold text-slate-800 dark:text-slate-200">{m.tieuDe}</div>
-                        <div className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
-                          <Clock size={11} /> {new Date(m.taoLuc).toLocaleString('vi-VN')}
-                        </div>
-                      </div>
-
-                      <div>
-                        {m.trangThai === 'da_nop' ? (
-                          <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300">
-                            Đã nộp: {m.diem?.toFixed(1) ?? '—'} điểm
-                          </span>
-                        ) : (
-                          <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300">
-                            {m.trangThai === 'dang_lam' ? 'Con đang làm' : 'Đã giao · Con chưa bắt đầu'}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </section>
+          {/* Ô 2: 4 CHẾ ĐỘ GIAO BÀI CHO CON ("BÀI CỦA MOM GIAO") */}
+          <div>
+            <KhoiKhacPhuc3CheDo
+              sbd={sbdHienTai || ''}
+              hoTen={hoTenCon || 'Con'}
+              dsLichSu={dsBaiThi}
+              scriptUrl={scriptUrl}
+              vaiTro="ph"
+              dsMomGiao={dsMomGiao}
+              thongBaoMom={thongBaoMom}
+              onGiaoBaiChoCon={xuLyGiaoBaiTrucTiep}
+              onXemKetQuaMom={(bai) => {
+                void (async () => {
+                  try {
+                    const data = await momApi('review', { id: bai.id, sbd: sbdHienTai || '' })
+                    setXemPhieuHtml(momReviewHtml(chuanHoaBaiMom(data.item || bai)))
+                  } catch {
+                    setXemPhieuHtml(momReviewHtml(chuanHoaBaiMom(bai)))
+                  }
+                })()
+              }}
+            />
+          </div>
         </div>
       </main>
 

@@ -2028,6 +2028,8 @@ export interface TuyChonPhieu {
    * Bắt buộc phải nằm TRONG tài liệu: phiếu hiện trong lớp phủ toàn màn hình,
    * nên chữ đặt trên trang app bị che kín. Không có nó thì phiếu chỉ đọc trông
    * y hệt phiếu hỏng. */
+  /** Mở sẵn tất cả lời giải ngay khi mở phiếu (tiện cho việc xem lại/review). */
+  moSan?: boolean
   loiNhac?: string | null
 }
 
@@ -2040,7 +2042,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   const nop = !anGiai && tuyChon.nop ? tuyChon.nop : null
   const chNop = cauHinhNop(nop?.cauHinh)
   const cau = anGiai ? cauVao.map(boLoiGiai) : cauVao
-  const the = cau.map((c, i) => theCauHtml(c, i + 1, false, anGiai, !!nop)).join('\n')
+  const the = cau.map((c, i) => theCauHtml(c, i + 1, !!tuyChon.moSan, anGiai, !!nop)).join('\n')
   // KHOÁ LỜI GIẢI TỚI KHI NỘP. Chỉ áp cho phiếu nộp được và khi thầy không
   // bật `HIEN_GIAI_TRUOC_NOP`.
   const khoaGiai = !!nop && !chNop.HIEN_GIAI_TRUOC_NOP
