@@ -437,15 +437,6 @@ export default function ParentPortalScreen() {
 
             <button
               type="button"
-              onClick={() => setHienHuongDan(true)}
-              className="p-1.5 text-slate-500 hover:text-blue-600 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-800/60 transition tap-target"
-              title="Hướng dẫn"
-            >
-              <HelpCircle size={15} />
-            </button>
-
-            <button
-              type="button"
               onClick={dangXuat}
               className="p-1.5 rounded-full text-slate-500 hover:text-rose-600 hover:bg-rose-100/60 dark:hover:bg-rose-950/60 transition cursor-pointer tap-target"
               title="Đổi SBD"
