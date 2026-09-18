@@ -225,7 +225,7 @@ export default function BaoCaoCaThiHocSinhModal({
     return [
       {
         ten: 'Nhận biết',
-        moTa: 'Lý thuyết cơ bản, công thức, khái niệm',
+        moTa: 'Vòng 1: Lõi Căn Bản (Bắt buộc 100%) · Lý thuyết cơ bản, công thức, khái niệm',
         dung: dungBiet,
         tong: tongBiet,
         phanTram: Math.round((dungBiet / tongBiet) * 100),
@@ -233,7 +233,7 @@ export default function BaoCaoCaThiHocSinhModal({
       },
       {
         ten: 'Thông hiểu',
-        moTa: 'Bản chất hoá học, giải thích hiện tượng, phản ứng',
+        moTa: 'Vòng 2: Trọng Tâm Cá Nhân (Bắt buộc) · Bản chất hoá học, giải thích hiện tượng, phản ứng',
         dung: dungHieu,
         tong: tongHieu,
         phanTram: Math.round((dungHieu / tongHieu) * 100),
@@ -241,7 +241,7 @@ export default function BaoCaoCaThiHocSinhModal({
       },
       {
         ten: 'Vận dụng',
-        moTa: 'Bảo toàn e, tính toán nồng độ, este, kim loại',
+        moTa: 'Vòng 3: Thử Thách Bứt Phá (x2 EXP) · Bảo toàn e, tính toán nồng độ, este, kim loại',
         dung: dungVD,
         tong: tongVD,
         phanTram: Math.round((dungVD / tongVD) * 100),
@@ -249,7 +249,7 @@ export default function BaoCaoCaThiHocSinhModal({
       },
       {
         ten: 'Vận dụng cao',
-        moTa: 'Biện luận cấu tạo, bài toán phân hoá 9+',
+        moTa: 'Vòng 3: Thử Thách Bứt Phá (x2 EXP) · Biện luận cấu tạo, bài toán phân hoá 9+',
         dung: dungVDC,
         tong: tongVDC,
         phanTram: Math.round((dungVDC / tongVDC) * 100),

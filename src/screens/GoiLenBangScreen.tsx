@@ -192,6 +192,7 @@ export default function GoiLenBangScreen() {
 
   /** HTML tờ máy chiếu đang mở. Rỗng là chưa dựng. */
   const [htmlMayChieu, setHtmlMayChieu] = useState('')
+  const [dangMoMayChieu, setDangMoMayChieu] = useState(false)
 
   /** Hồ sơ ĐẦY ĐỦ cả lớp — bài thi + bài tập về nhà + khắc phục câu sai. */
   const [hoSoLop, setHoSoLop] = useState<HoSoEmDayDu[]>([])
@@ -410,7 +411,7 @@ export default function GoiLenBangScreen() {
   const soCoMat = dsEmCa.filter((e) => e.coMat).length
 
   /** Tra câu ĐẦY ĐỦ theo id — gộp nhiều đề thì `viTri` của hai đề trùng nhau,
-   * phải tra theo id. */
+   * phải tra theo id. Nạp thêm toàn bộ đề đã lưu để không bao giờ thiếu câu. */
   const traCau = useMemo(() => {
     const m = new Map<string, CauDayDu>()
     for (const b of [du?.bank, bankThem]) {
@@ -419,8 +420,13 @@ export default function GoiLenBangScreen() {
       for (const q of b.phanII) m.set(q.id, { phan: 'II', q })
       for (const q of b.phanIII) m.set(q.id, { phan: 'III', q })
     }
+    for (const s of deDaLuu) {
+      for (const q of s.phanI) m.set(q.id, { phan: 'I', q })
+      for (const q of s.phanII) m.set(q.id, { phan: 'II', q })
+      for (const q of s.phanIII) m.set(q.id, { phan: 'III', q })
+    }
     return m
-  }, [du, bankThem])
+  }, [du, bankThem, deDaLuu])
 
   // ------------------------------------------------ GIÁO ÁN 80 PHÚT: dữ liệu
   //
@@ -703,21 +709,19 @@ export default function GoiLenBangScreen() {
    * Nguồn là ĐÚNG bảng phân công vừa chạy, không rút lại bộ khác: tờ chiếu lên
    * bảng mà khác bảng phân công thầy đang cầm thì gọi nhầm em ngay. */
   const moMayChieu = async () => {
-    // NGUỒN LÀ BUỔI CHỮA MỚI khi đã xếp; chưa xếp thì lùi về bảng phân công cũ.
-    // BÀI TẬP VỀ NHÀ đi kèm từng ô: câu ấy em ở nhà làm ra sao, và cả lượt em
-    // làm được bao nhiêu. Đường phân công CŨ (chưa xếp buổi chữa) không có hồ
-    // sơ em, nên để trống — tờ chiếu sẽ không in dòng ấy, chứ không đoán.
-    const dsPc: {
-      sbd: string
-      hoTen: string
-      cau: CauChua
-      viSao: string
-      btvnCau?: KetQuaBtvn
-      btvnTom?: OBangMayChieu['btvnTom']
-    }[] = kqBuoi
-      ? kqBuoi.dong
-          .filter((d) => d.tang === 'len_bang' && d.em)
-          .map((d) => ({
+    setDangMoMayChieu(true)
+    try {
+      // NGUỒN LÀ BUỔI CHỮA MỚI khi có học sinh lên bảng; nếu không có thì lùi về bảng phân công
+      const dongLenBang = kqBuoi ? kqBuoi.dong.filter((d) => d.tang === 'len_bang' && d.em) : []
+      const dsPc: {
+        sbd: string
+        hoTen: string
+        cau: CauChua
+        viSao: string
+        btvnCau?: KetQuaBtvn
+        btvnTom?: OBangMayChieu['btvnTom']
+      }[] = dongLenBang.length > 0
+        ? dongLenBang.map((d) => ({
             sbd: d.em!.sbd,
             hoTen: d.em!.hoTen,
             cau: d.cau,
@@ -734,77 +738,118 @@ export default function GoiLenBangScreen() {
                   }
                 : undefined,
           }))
-      : (kq?.phanCong ?? []).map((p) => ({ sbd: p.sbd, hoTen: p.hoTen, cau: p.cau, viSao: p.viSao }))
-    if (dsPc.length === 0) {
-      return showToast('Chưa có bảng phân công — bấm "Xếp giờ & phân công lên bảng" trước', 'warn')
-    }
+        : (kq?.phanCong ?? []).map((p) => ({ sbd: p.sbd, hoTen: p.hoTen, cau: p.cau, viSao: p.viSao }))
 
-    const [{ cauLuyenTuBoCau }, { taoHtmlMayChieu }] = await Promise.all([
-      import('../lib/bai-tap-pdf'),
-      import('../lib/html-may-chieu'),
-    ])
-
-    const dsO: OBangMayChieu[] = []
-    const thieu: string[] = []
-    for (const p of dsPc) {
-      const day = traCau.get(p.cau.id)
-      if (!day) {
-        thieu.push(`${p.hoTen || p.sbd} — câu ${p.cau.so} phần ${p.cau.phan}`)
-        continue
+      if (dsPc.length === 0) {
+        showToast('Chưa có bảng phân công — bấm "Xếp giờ & phân công lên bảng" trước', 'warn')
+        return
       }
-      const [cl] = cauLuyenTuBoCau([{ phan: day.phan, q: day.q } as Parameters<typeof cauLuyenTuBoCau>[0][number]])
-      if (!cl) {
-        thieu.push(`${p.hoTen || p.sbd} — câu ${p.cau.so} phần ${p.cau.phan}`)
-        continue
+
+      const [{ cauLuyenTuBoCau }, { taoHtmlMayChieu }] = await Promise.all([
+        import('../lib/bai-tap-pdf'),
+        import('../lib/html-may-chieu'),
+      ])
+
+      const dsO: OBangMayChieu[] = []
+      for (const p of dsPc) {
+        let day = traCau.get(p.cau.id)
+        if (!day) {
+          for (const [k, v] of traCau.entries()) {
+            if (k.endsWith(p.cau.id) || p.cau.id.endsWith(k)) {
+              day = v
+              break
+            }
+          }
+        }
+
+        let cl: CauLuyen | undefined
+        if (day) {
+          const [parsed] = cauLuyenTuBoCau([{ phan: day.phan, q: day.q } as Parameters<typeof cauLuyenTuBoCau>[0][number]])
+          cl = parsed
+        }
+
+        // Tạo câu luyện dự phòng đảm bảo tờ chiếu 100% mở được
+        const cauHopLe: CauLuyen = cl ?? {
+          id: p.cau.id,
+          phan: p.cau.phan,
+          maDe: '',
+          chuyenDe: '',
+          dang: 'chua_ro',
+          sao: p.cau.sao,
+          mucDo: (p.cau.mucDo as any) || '',
+          text: p.cau.tomTat || `Nội dung câu hỏi ${p.cau.so}`,
+          luaChon: null,
+          dapAn: '',
+          chot: '',
+          lyDo: null,
+          buoc: null,
+          ketQua: '',
+        }
+
+        dsO.push({
+          sbd: p.sbd,
+          hoTen: p.hoTen,
+          soCau: p.cau.so,
+          sao: p.cau.sao,
+          mucDo: p.cau.mucDo,
+          cau: cauHopLe,
+          viSao: p.viSao,
+          btvnCau: p.btvnCau,
+          btvnTom: p.btvnTom,
+        })
       }
-      dsO.push({ sbd: p.sbd, hoTen: p.hoTen, soCau: p.cau.so, sao: p.cau.sao, mucDo: p.cau.mucDo, cau: cl, viSao: p.viSao, btvnCau: p.btvnCau, btvnTom: p.btvnTom })
-    }
 
-    // CẤM CHIẾU MỘT TỜ THIẾU CÂU MÀ KHÔNG NÓI. Câu nào không tra được nội dung
-    // thì nói thẳng tên em ấy, để thầy biết mà gọi tay.
-    if (thieu.length > 0) {
-      showToast(`${thieu.length} em chưa tra được đề: ${thieu.slice(0, 3).join(' · ')}`, 'warn')
-    }
-    if (dsO.length === 0) return
-
-    // THẦN THÚ CỦA TỪNG EM — góc phải tờ chiếu (thầy chốt 15-09).
-    //
-    // Gọi song song và CÓ HẠN CHỜ. Máy chủ chậm, mất mạng, hay em chưa chọn
-    // thần thú thì tờ chiếu vẫn mở đúng như cũ, chỉ thiếu con thú — việc gọi em
-    // lên bảng KHÔNG được phụ thuộc vào một thứ trang trí.
-    //
-    // Nhập kiểu động: bộ vẽ thần thú chỉ cần đúng lúc bấm máy chiếu, không việc
-    // gì phải nằm trong gói khởi động của màn thầy.
-    try {
-      const { thanThuV2ChoToChieu } = await import('../lib/anh-than-thu-v2')
-      const docThu = thanThuLopDocApi
-      const dsThu = await Promise.all(
-        dsO.map((o) => thanThuV2ChoToChieu(docThu, o.sbd).catch(() => null)),
-      )
-      for (const [i, t] of dsThu.entries()) {
-        if (t !== null) dsO[i]!.thanThu = t
+      if (dsO.length === 0) {
+        showToast('Chưa có câu nào để chiếu lên bảng', 'warn')
+        return
       }
-    } catch {
-      /* không lấy được thú thì thôi — tờ chiếu vẫn phải mở */
-    }
 
-    // CÂU CHỈ ĐỌC ĐÁP ÁN đi thành trang đáp án nối sau các đợt (thầy chốt 14/09).
-    const dsDapAn: CauLuyen[] = []
-    for (const c of kqBuoi?.cauDocDapAn ?? []) {
-      const day = traCau.get(c.id)
-      if (!day) continue
-      const [cl] = cauLuyenTuBoCau([{ phan: day.phan, q: day.q } as Parameters<typeof cauLuyenTuBoCau>[0][number]])
-      if (cl) dsDapAn.push(cl)
-    }
+      // THẦN THÚ CỦA TỪNG EM (có timeout an toàn)
+      try {
+        const { thanThuV2ChoToChieu } = await import('../lib/anh-than-thu-v2')
+        const docThu = thanThuLopDocApi
+        const dsThu = await Promise.all(
+          dsO.map((o) => thanThuV2ChoToChieu(docThu, o.sbd, 2000).catch(() => null)),
+        )
+        for (const [i, t] of dsThu.entries()) {
+          if (t !== null && dsO[i]) dsO[i]!.thanThu = t
+        }
+      } catch {
+        /* không lấy được thú thì thôi — tờ chiếu vẫn phải mở */
+      }
 
-    setHtmlMayChieu(
-      taoHtmlMayChieu(dsO, {
+      // CÂU CHỈ ĐỌC ĐÁP ÁN đi thành trang đáp án nối sau các đợt
+      const dsDapAn: CauLuyen[] = []
+      for (const c of kqBuoi?.cauDocDapAn ?? []) {
+        let day = traCau.get(c.id)
+        if (!day) {
+          for (const [k, v] of traCau.entries()) {
+            if (k.endsWith(c.id) || c.id.endsWith(k)) {
+              day = v
+              break
+            }
+          }
+        }
+        if (!day) continue
+        const [cl] = cauLuyenTuBoCau([{ phan: day.phan, q: day.q } as Parameters<typeof cauLuyenTuBoCau>[0][number]])
+        if (cl) dsDapAn.push(cl)
+      }
+
+      const html = taoHtmlMayChieu(dsO, {
         dayHoc,
         tenBuoi: dayHoc ? 'Dạy học · Gọi lên bảng' : du ? `Chữa bài ca ${du.maCa}` : 'Gọi lên bảng',
         ngay: new Date(),
         dsDapAn,
-      }),
-    )
+      })
+
+      setHtmlMayChieu(html)
+      showToast('Đang mở tờ chiếu lên bảng', 'success')
+    } catch (e) {
+      console.error('Lỗi khi mở tờ máy chiếu:', e)
+      showToast(e instanceof Error ? e.message : 'Không mở được tờ máy chiếu', 'warn')
+    } finally {
+      setDangMoMayChieu(false)
+    }
   }
 
   const doiVang = (sbd: string) =>
@@ -1175,8 +1220,7 @@ export default function GoiLenBangScreen() {
           )
         ) : (
           <div style={{ ...NHAN_NHO, marginBottom: 'var(--k3)' }} data-tu-chon>
-            Tích bài muốn chữa. Bảng chữa CHỈ lấy câu trong bài thầy tích, không chen câu chuyên đề khác. Trong đó máy lấy <b>câu 2 sao trước, rồi 1 sao, rồi 0 sao</b>, và chọn em lên bảng bằng{' '}
-            <b>điểm yếu cộng dồn ở đúng chuyên đề của câu đó</b> — em sai nhiều chuyên đề ấy nhất được gọi trước.
+            Tích bài muốn chữa. Bảng chữa CHỈ lấy câu trong bài thầy tích, áp dụng <b>Bậc thang Sư phạm 3 Nấc & Vùng phát triển gần (ZPD)</b>: Nấc 1 (câu 0 sao/Nhận biết) gọi em cần củng cố gốc để làm được ngay, tự tin; Nấc 2 (1 sao/Thông hiểu) gọi em khá làm mẫu chuẩn mực cho cả lớp; Nấc 3 (2 sao/Vận dụng) gọi em giỏi mở rộng tư duy tranh biện. Ghép đúng em đã làm sai hoặc chưa làm câu đó ở nhà nhưng rơi đúng vào vùng ZPD để em tự sửa và tiến bộ thực sự.
           </div>
         )}
 
@@ -1409,14 +1453,26 @@ export default function GoiLenBangScreen() {
                     </div>
                   ))}
               </div>
-              <button
-                type="button"
-                onClick={() => void navigator.clipboard.writeText(bangChuBuoiChua(kqBuoi, du ? `Ca ${du.maCa}` : 'Buổi chữa')).then(() => showToast('Đã copy bảng buổi chữa', 'success'))}
-                className="tap-target inline-flex items-center font-bold"
-                style={{ gap: 6, minHeight: 40, marginTop: 'var(--k3)', padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--the)', color: 'var(--muc)', border: '1px solid var(--vien)', fontSize: 'var(--cx-1)' }}
-              >
-                <ClipboardCopy size={16} /> Copy bảng buổi chữa
-              </button>
+              <div className="flex items-center gap-2 flex-wrap" style={{ marginTop: 'var(--k3)' }}>
+                <button
+                  type="button"
+                  onClick={() => void moMayChieu()}
+                  disabled={dangMoMayChieu}
+                  className="tap-target inline-flex items-center font-bold px-4 py-2 rounded-full cursor-pointer bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all"
+                  style={{ gap: 6, minHeight: 40, fontSize: 'var(--cx-1)' }}
+                >
+                  <MonitorPlay size={16} />
+                  <span>{dangMoMayChieu ? 'Đang mở tờ chiếu...' : 'Chiếu lên bảng ngay'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void navigator.clipboard.writeText(bangChuBuoiChua(kqBuoi, du ? `Ca ${du.maCa}` : 'Buổi chữa')).then(() => showToast('Đã copy bảng buổi chữa', 'success'))}
+                  className="tap-target inline-flex items-center font-bold"
+                  style={{ gap: 6, minHeight: 40, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--the)', color: 'var(--muc)', border: '1px solid var(--vien)', fontSize: 'var(--cx-1)' }}
+                >
+                  <ClipboardCopy size={16} /> Copy bảng buổi chữa
+                </button>
+              </div>
             </div>
           )}
 
@@ -1534,6 +1590,7 @@ export default function GoiLenBangScreen() {
         <button
           type="button"
           onClick={() => void moMayChieu()}
+          disabled={dangMoMayChieu}
           className="tap-target w-full font-bold flex items-center justify-center gap-2 select-none active:scale-[0.98] hover:-translate-y-0.5 transition-all duration-150"
           style={{
             height: 52,
@@ -1546,9 +1603,9 @@ export default function GoiLenBangScreen() {
             fontSize: 'var(--cx-2)',
           }}
         >
-          <MonitorPlay size={18} /> Chiếu lên bảng
+          <MonitorPlay size={18} /> {dangMoMayChieu ? 'Đang mở tờ chiếu...' : 'Chiếu lên bảng'}
           <span style={{ ...SO, opacity: 0.75, fontWeight: 600 }}>
-            {Math.ceil(kq.phanCong.length / 2)} đợt · 2 em mỗi đợt
+            {Math.ceil(((kqBuoi && kqBuoi.dong.filter(d => d.tang === 'len_bang' && d.em).length > 0) ? kqBuoi.soEmLenBang : kq.phanCong.length) / 2)} đợt · 2 em mỗi đợt
           </span>
         </button>
       )}

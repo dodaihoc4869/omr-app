@@ -120,60 +120,76 @@ export function analyzeParent(
 
   const duDoanDiem = tinhDuDoanDiem(exams, details, now)
 
-  // THIẾT KẾ KẾ HOẠCH BÀI LUYỆN: TỰ ĐỘNG TĂNG CÂU HỎI KHI HỌC SINH ĐAM MÊ LUYỆN TẬP
-  // Mức nền tảng tối thiểu: 12 câu / ngày. Tối đa: 36 câu / ngày.
+  // THUẬT TOÁN ĐỀ XUẤT THÍCH ỨNG (Adaptive Pacing & Workload Balancing):
+  // Không áp đặt số câu cứng nhắc. Tính toán dựa trên 2 yếu tố cốt lõi:
+  // 1. Tồn đọng bài tập (Pending Backlog): số bài/câu đang chờ làm
+  // 2. Tốc độ làm bài thực tế (Speed/Pacing): số giây trung bình mỗi câu
+  const tongBaiPending = pendingDetails
+    ? (pendingDetails.btvn || 0) + (pendingDetails.mom || 0) + (pendingDetails.daily || 0)
+    : 0
+  const tongTonDong = Math.max(pending, tongBaiPending)
+
   let targetCount = 12
+  let lyDoDieuChinh = ''
 
-  // Đo mức độ đam mê / chăm chỉ luyện tập của học sinh:
-  if (today.length >= 4) {
-    targetCount = 36
-  } else if (today.length === 3) {
-    targetCount = 30
-  } else if (today.length === 2) {
-    targetCount = 24
-  } else if (today.length === 1) {
-    targetCount = 18
-  } else if (exams.length >= 6 && pending <= 3) {
-    // Học sinh chăm chỉ nộp đều các ngày gần đây và không để tồn đọng bài
-    targetCount = 18
+  if (tongTonDong >= 15) {
+    // TỒN ĐỌNG LỚN (>= 15 bài/câu): Giảm tải tối đa, chia nhỏ chỉ 6-8 câu Vòng 1 Lõi Căn Bản
+    // để học sinh gỡ nợ bài tập dần, giải tỏa áp lực tâm lý, không bị nản lòng.
+    targetCount = 6
+    lyDoDieuChinh = `Đang tồn đọng ${tongTonDong} bài/câu chưa nộp — thuật toán tự động giảm tải xuống ${targetCount} câu trọng tâm Vòng 1 (Lõi Căn Bản) để gỡ bài tập nhẹ nhàng, vừa sức.`
+  } else if (tongTonDong >= 6) {
+    // TỒN ĐỌNG VỪA (6 - 14 bài/câu): Rút gọn 8-10 câu cân bằng
+    targetCount = sec > 100 ? 8 : 10
+    lyDoDieuChinh = `Đang có ${tongTonDong} bài/câu cần hoàn thành — kế hoạch rút gọn ${targetCount} câu tập trung giải quyết dứt điểm các lỗi sai cốt lõi.`
+  } else {
+    // TỒN ĐỌNG THẤP (<= 5 bài/câu): Điều chỉnh theo tốc độ và đà học tập
+    if (sec > 130) {
+      // Học sinh cần nhiều thời gian suy nghĩ (> 2 phút/câu) -> giữ mức 10 câu để buổi học dưới 20 phút
+      targetCount = 10
+      lyDoDieuChinh = `Tốc độ suy nghĩ kỹ lưỡng (~${Math.round(sec)}s/câu) — tối ưu ${targetCount} câu để đảm bảo chất lượng, không kéo dài thời gian.`
+    } else if (today.length >= 2 && exams.length >= 6 && tongTonDong === 0 && sec <= 60) {
+      // Phong độ xuất sắc, tốc độ nhanh, không tồn bài -> nâng lên 16-18 câu có thêm Vòng 3 Thử Thách x2 EXP
+      targetCount = 18
+      lyDoDieuChinh = `Phong độ xuất sắc và hoàn thành nhanh — mở rộng ${targetCount} câu (gồm câu Vòng 3 Thử Thách thưởng x2 EXP Thần Thú).`
+    } else if (today.length >= 1 && tongTonDong <= 2) {
+      targetCount = 14
+      lyDoDieuChinh = `Tiến độ đều đặn — kế hoạch ${targetCount} câu theo mô hình 3 Vòng Phân Tầng để bồi đắp kiến thức.`
+    } else {
+      targetCount = 12
+      lyDoDieuChinh = `Kế hoạch chuẩn mực 12 câu/ngày theo 3 Vòng Phân Tầng.`
+    }
   }
 
-  // Tăng tối đa 36 câu nếu vừa thi nhiều ca hôm nay vừa có thói quen làm bài tích cực
-  if (today.length >= 2 && exams.length >= 8 && pending === 0) {
-    targetCount = 36
-  }
+  // Nếu tồn đọng quá nghiêm trọng (> 40 câu), tạm hoãn giao thêm để tập trung làm bài cũ
+  const quaTai = tongTonDong >= 40
 
-  // Giới hạn tuyệt đối trong khoảng [12, 36]
-  targetCount = Math.min(36, Math.max(12, targetCount))
-
-  // Nếu học sinh còn quá nhiều bài dồn ứ (> 36 câu), tạm hoãn để giải toả tồn đọng.
-  const quaTai = pending >= 36
-
-  // Phân chia cấu trúc câu theo 3 trụ cột Spaced Repetition & Cognitive Scaffolding:
-  // 1. Sửa lỗi trọng tâm (khoảng 45-50% target, ưu tiên câu cơ bản 1 sao trước để nâng đỡ)
-  const soCauSuaLoi = Math.min(relevantWrong.length, Math.round(targetCount * 0.5))
-  const conLai = targetCount - soCauSuaLoi
-  // 2. Ôn bài cũ chống quên (Spaced Repetition từ các câu đã làm đúng từ trước)
-  const soCauOnBaiCu = Math.min(relevantCorrect.length, Math.round(conLai * 0.5))
-  // 3. Tiến bộ dạng mới vừa sức (câu mới thuộc phạm vi của học sinh)
+  // Phân chia cấu trúc câu theo 3 Vòng Phân Tầng Thông Minh:
+  // Vòng 1: Lõi căn bản / Sửa lỗi cốt lõi (khoảng 50-60% target)
+  const soCauSuaLoi = Math.min(relevantWrong.length, Math.round(targetCount * 0.55))
+  const conLai = Math.max(0, targetCount - soCauSuaLoi)
+  // Vòng 2: Trọng tâm cá nhân / Chống quên (Spaced Repetition)
+  const soCauOnBaiCu = Math.min(relevantCorrect.length, Math.round(conLai * 0.6))
+  // Vòng 3: Tiến bộ dạng mới / Thử thách bứt phá
   const soCauTienBo = Math.max(0, conLai - soCauOnBaiCu)
 
   const count = quaTai ? 0 : targetCount
   const assignmentCount = count > 0 ? 1 : 0
-  const minutes = Math.max(15, Math.ceil((count * sec) / 60))
+  const minutes = Math.max(10, Math.ceil((count * sec) / 60))
 
   const keHoach: KeHoachLuyenTap = {
     tongCau: count,
     soCauSuaLoi,
     soCauOnBaiCu,
     soCauTienBo,
-    phuongPhap: 'Lặp lại ngắt quãng (Spaced Repetition) & Nâng đỡ thích ứng',
+    phuongPhap: '3 Vòng Phân Tầng & Điều chỉnh nhịp độ thích ứng (Adaptive Pacing)',
   }
 
   const mode =
-    relevantWrong.length > 0
+    tongTonDong >= 15
+      ? `Gỡ tồn đọng & Nâng đỡ Lõi (${count} câu)`
+      : relevantWrong.length > 0
       ? `Khắc phục lỗi sai & Nâng đỡ (${count} câu)`
-      : `Rèn phản xạ & Tiến bộ dạng mới (${count} câu)`
+      : `Rèn phản xạ & Thử thách (${count} câu)`
 
   const weak = [...topics]
     .sort((a, b) => b[1] - a[1])
@@ -182,13 +198,13 @@ export function analyzeParent(
 
   let reason = ''
   if (quaTai) {
-    reason = `Con đang còn ${pending} câu chưa nộp; ưu tiên hoàn thành bài đang chờ để không bị quá tải.`
+    reason = `Con đang còn ${tongTonDong} bài/câu chưa nộp; tạm hoãn giao thêm để con tập trung hoàn thành bài đang chờ, tránh áp lực quá tải.`
+  } else if (tongTonDong >= 15) {
+    reason = `Học sinh đang có ${tongTonDong} bài chưa nộp. Thuật toán tự động giảm tải xuống bài ngắn ${targetCount} câu (Vòng 1: Lõi Căn Bản) để con gỡ nợ bài tập nhẹ nhàng, vừa sức và không bị áp lực.`
   } else if (relevantWrong.length > 0) {
-    const damMeNote = targetCount > 12 ? ` (Tự động tăng lên ${targetCount} câu vì con rất chăm chỉ luyện tập)` : ''
-    reason = `Kế hoạch ${targetCount} câu hôm nay${damMeNote}: ${soCauSuaLoi} câu trọng tâm sửa lỗi chuyên đề (${weak.map((w) => w.name).slice(0, 2).join(', ')}), ${soCauOnBaiCu} câu lặp lại ngắt quãng chống quên, và ${soCauTienBo} câu tiến bộ dạng mới vừa sức.`
+    reason = `Kế hoạch ${targetCount} câu hôm nay (${lyDoDieuChinh}): ${soCauSuaLoi} câu Vòng 1 sửa lỗi chuyên đề (${weak.map((w) => w.name).slice(0, 2).join(', ')}), ${soCauOnBaiCu} câu Vòng 2 chống quên ngắt quãng, và ${soCauTienBo} câu Vòng 3 tiến bộ vừa sức.`
   } else {
-    const damMeNote = targetCount > 12 ? ` (Tự động tăng lên ${targetCount} câu vì tinh thần học tập tích cực)` : ''
-    reason = `Con đã hoàn thành rất tốt các bài thi! Kế hoạch ${targetCount} câu hôm nay${damMeNote} áp dụng phương pháp lặp lại ngắt quãng để củng cố phản xạ bài cũ và mở rộng câu mới vừa sức mỗi ngày.`
+    reason = `Con hoàn thành rất tốt các bài thi! Kế hoạch ${targetCount} câu hôm nay (${lyDoDieuChinh}) áp dụng mô hình 3 Vòng Phân Tầng để duy trì phản xạ và phát triển tư duy nâng cao.`
   }
 
   return {

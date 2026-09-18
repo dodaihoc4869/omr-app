@@ -628,7 +628,11 @@ export default function BangTinPhuHuynh({
             </h3>
           </div>
           <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
-            Ít nhất 12 câu / ngày
+            {tongChuaNop >= 15
+              ? 'Gỡ tồn đọng vừa sức'
+              : report.questionCount
+              ? `Đề xuất ${report.questionCount} câu vừa sức`
+              : 'Theo nhịp độ cá nhân'}
           </span>
         </div>
 
@@ -726,22 +730,22 @@ export default function BangTinPhuHuynh({
             : report.reason}
         </div>
 
-        {/* PHÂN BỔ 12 CÂU THEO PHƯƠNG PHÁP XỊN NHẤT */}
+        {/* PHÂN BỔ CÂU THEO THUẬT TOÁN 3 VÒNG PHÂN TẦNG */}
         {report.keHoach && (
           <div className="flex items-center justify-between gap-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100/90 dark:bg-slate-800/80 p-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 shadow-2xs">
             <span className="flex items-center gap-1">
-              <span>🎯</span>
-              <span><strong>{report.keHoach.soCauSuaLoi}c</strong> sửa lỗi</span>
+              <span className="px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold">V1</span>
+              <span><strong>{report.keHoach.soCauSuaLoi}c</strong> Lõi sửa lỗi</span>
             </span>
             <span className="text-slate-300 dark:text-slate-600">·</span>
             <span className="flex items-center gap-1">
-              <span>🔄</span>
-              <span><strong>{report.keHoach.soCauOnBaiCu}c</strong> chống quên</span>
+              <span className="px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 text-[10px] font-bold">V2</span>
+              <span><strong>{report.keHoach.soCauOnBaiCu}c</strong> Chống quên</span>
             </span>
             <span className="text-slate-300 dark:text-slate-600">·</span>
             <span className="flex items-center gap-1">
-              <span>🚀</span>
-              <span><strong>{report.keHoach.soCauTienBo}c</strong> tiến bộ</span>
+              <span className="px-1.5 py-0.2 rounded bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 text-[10px] font-bold">V3</span>
+              <span><strong>{report.keHoach.soCauTienBo}c</strong> Thử thách</span>
             </span>
           </div>
         )}
