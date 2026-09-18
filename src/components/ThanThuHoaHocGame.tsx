@@ -1982,6 +1982,15 @@ export default function ThanThuHoaHocGame({
                 </p>
               </div>
 
+              <div className="p-3.5 bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/80 rounded-2xl text-[11px] text-purple-900 dark:text-purple-200 text-left space-y-1.5 shadow-2xs">
+                <div className="font-bold flex items-center gap-1.5 text-purple-700 dark:text-purple-300 text-xs">
+                  <Sparkles size={14} /> ✨ Thuật toán Tháp & EXP thông minh mới:
+                </div>
+                <div>• <b>Chống lặp câu:</b> Tự động đổi câu hỏi theo cấp độ sao & dạng bài, câu hỏi không bị lặp lại nhàm chán qua các tầng.</div>
+                <div>• <b>Thưởng x1.5 EXP:</b> Đúng dạng bài từng làm sai ở lớp được thưởng thêm 50% EXP.</div>
+                <div>• <b>Thưởng Combo:</b> Trả lời đúng liên tiếp nhân thưởng từ x1.15 đến x1.5 EXP.</div>
+              </div>
+
               {daiNguonCau}
 
               <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/70 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300">

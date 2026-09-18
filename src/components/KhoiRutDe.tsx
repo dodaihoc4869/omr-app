@@ -568,13 +568,21 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
 
           <div className="flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
             <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
-              Kho của ca: <b style={SO}>{tongCau(daRut)}</b> câu (I {daRut.I} · II {daRut.II} · III {daRut.III})
-              {rieng ? (
+              {deRieng ? (
                 <>
-                  {' '}
-                  · mỗi em làm <b style={SO}>{tongCau(soCau)}</b> câu
+                  Kho câu ứng viên: <b style={SO}>{tongKho}</b> câu (I {co.I} · II {co.II} · III {co.III}) · mỗi em làm <b style={SO}>{tongCau(soCau)}</b> câu
                 </>
-              ) : null}
+              ) : (
+                <>
+                  Kho của ca: <b style={SO}>{tongCau(daRut)}</b> câu (I {daRut.I} · II {daRut.II} · III {daRut.III})
+                  {rieng ? (
+                    <>
+                      {' '}
+                      · mỗi em làm <b style={SO}>{tongCau(soCau)}</b> câu
+                    </>
+                  ) : null}
+                </>
+              )}
             </div>
             <button type="button" onClick={() => setMoChiTiet((v) => !v)} className="tap-target font-bold inline-flex items-center" style={{ ...NHAN_NHO, gap: 4, color: 'var(--muc)' }} aria-expanded={moChiTiet}>
               {moChiTiet ? 'Thu lại' : 'Xem từng câu'}
@@ -598,9 +606,13 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
           )}
 
           <div style={NHAN_NHO}>
-            {rieng
-              ? `Máy bốc ${tongCau(soCau)} câu riêng cho từng em từ kho ${tongCau(daRut)} câu này, rồi đảo thứ tự câu và thứ tự A–D. Hai em ngồi cạnh nhau gần như chắc chắn khác đề. Đổi lại, hai em làm hai bộ câu khác nhau nên điểm không so tuyệt đối với nhau được; hạng lớp trong báo cáo chỉ còn là so tương đối.`
-              : 'Cả lớp làm cùng bộ câu này, chỉ đảo thứ tự câu và thứ tự A–D riêng từng em. Điểm hai em so được trực tiếp với nhau.'}
+            {rieng ? (
+              <span>
+                ✨ <b>Thuật toán mới cá nhân hóa 100%:</b> Quét toàn bộ kho {tongKho} câu ứng viên để rút đề riêng biệt đẳng cấu cho từng em (cùng dạng bài và mức độ, triệt tiêu quay cóp lân cận). Tự động lồng ghép Cặp đôi Song sinh 50/50 từ câu sai ca trước và 70% câu mới nâng đỡ tiến bộ.
+              </span>
+            ) : (
+              'Cả lớp làm cùng bộ câu này, chỉ đảo thứ tự câu và thứ tự A–D riêng từng em. Điểm hai em so được trực tiếp với nhau.'
+            )}
           </div>
         </>
       )}

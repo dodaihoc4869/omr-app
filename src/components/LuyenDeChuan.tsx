@@ -165,12 +165,15 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
   if (!paper) {
     return (
       <section className={panel}>
-        <h2 className="font-bold text-lg text-blue-700 dark:text-blue-400">LUYỆN ĐỀ CHUẨN CẤU TRÚC</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="font-bold text-lg text-blue-700 dark:text-blue-400">LUYỆN ĐỀ CHUẨN CẤU TRÚC</h2>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">✨ Chuẩn Bộ GD&ĐT 2026</span>
+        </div>
         <p className="font-semibold text-xs text-slate-700 dark:text-slate-300">
           Chỉ dành cho học sinh đã học xong toàn bộ chương trình Hóa THPT.
         </p>
         <p className="text-xs text-slate-500 dark:text-slate-400">
-          Rút từ BỘ ĐỀ lớp 12 · 50 phút · 18 câu chọn đáp án, 4 câu đúng/sai, 6 câu trả lời ngắn.
+          Rút từ BỘ ĐỀ lớp 12 theo thuật toán ma trận đẳng cấu chuẩn Bộ GD&ĐT · 50 phút · 28 câu: 18 câu chọn đáp án (Phần I), 4 câu đúng/sai (Phần II), 6 câu trả lời ngắn (Phần III).
         </p>
         <label className="flex gap-2 items-center text-xs font-medium cursor-pointer text-slate-800 dark:text-slate-200">
           <input

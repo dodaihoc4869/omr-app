@@ -1134,10 +1134,10 @@ export default function KhoiKhacPhuc3CheDo({
           <div className="p-4 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl space-y-1.5">
             <div className="flex items-center gap-2 font-semibold text-xs text-amber-800 dark:text-amber-200">
               <Layers size={16} />
-              Luyện thêm câu cùng dạng câu sai trong toàn kho
+              ✨ Thuật toán mới: Luyện thêm câu cùng dạng câu sai trong toàn kho
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              Hệ thống quét toàn bộ lịch sử câu sai của em, tìm câu có cùng nhãn dạng trong kho đề, rút theo tỷ lệ (làm tròn lên).
+              Hệ thống tự động phân tích lịch sử câu sai, rút câu cùng dạng bài theo tiến trình sư phạm 3 nấc (Củng cố nền tảng → Rèn luyện → Bứt phá) để lấp dứt điểm lỗ hổng kiến thức.
             </p>
           </div>
 

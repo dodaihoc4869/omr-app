@@ -563,7 +563,7 @@ export default function ModalKhacPhucCauSai({
                     2. Luyện thêm dạng câu sai (Tỷ lệ tối đa: {tongToiDaCheDo2} câu)
                   </div>
                   <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                    Rút thêm các câu có cùng nhãn dán với từng câu sai chia theo đúng tỷ lệ tối đa (nếu lẻ làm tròn lên).
+                    ✨ Thuật toán mới: Rút câu theo Cặp đôi Song sinh và tiến trình 3 nấc sư phạm (Củng cố nền tảng → Rèn luyện → Bứt phá), tập trung đúng dạng bài em còn yếu.
                   </p>
                 </div>
               </div>

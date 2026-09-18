@@ -57,8 +57,8 @@ export const TEN_PHAM_VI_HOI_LAI: Record<CauHinhDeRieng['PHAM_VI_HOI_LAI'], stri
 }
 
 export const GIAI_THICH_PHAM_VI: Record<CauHinhDeRieng['PHAM_VI_HOI_LAI'], string> = {
-  gan_nhat: 'Quét cả thư mục năm sinh, tìm ca GẦN NHẤT TỪNG EM có nộp rồi lấy 30% số câu em sai ở đúng ca đó. Em nghỉ mấy buổi vẫn tìm ra.',
-  ba_ca: 'Bốc 3 ca bất kỳ TRONG THƯ MỤC NĂM SINH, gộp câu sai rồi lấy 30%. Bắt được cả lỗi cũ em vẫn chưa sửa.',
+  gan_nhat: 'Quét ca gần nhất từng em có nộp: Rút câu theo Cặp đôi Song sinh 50/50 (50% câu sai gốc + 50% câu cùng dạng đổi số) theo chuẩn phân bổ {Phần I: ≤3, Phần II: ≤1, Phần III: ≤1}. 70% còn lại là câu mới nâng đỡ tiến bộ.',
+  ba_ca: 'Quét tích lũy các ca trước đó: Truy vết các dạng bài em sai dai dẳng (lặp lại nhiều lần) để ưu tiên bốc cặp song sinh 50/50, củng cố dứt điểm lỗ hổng kiến thức.',
 }
 
 export const CAU_HINH_DE_RIENG_MAC_DINH: CauHinhDeRieng = {

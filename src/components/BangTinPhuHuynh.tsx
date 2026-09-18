@@ -246,12 +246,12 @@ export default function BangTinPhuHuynh({
               <span className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
                 Khắc phục luyện đề
               </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 shrink-0">
-                4 lựa chọn
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 shrink-0">
+                ✨ Thuật toán mới
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Bấm trực tiếp vào 1 trong 4 lựa chọn để bắt đầu luyện tập:
+              Cá nhân hóa theo Cặp đôi Song sinh & tiến trình sư phạm 3 nấc giúp con lấp lỗ hổng nhanh nhất:
             </p>
           </div>
         </div>
