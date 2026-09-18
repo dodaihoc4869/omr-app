@@ -1,8 +1,4 @@
-// MÀN PHÂN CÔNG + NÚT NỘP BTVN — phần nhìn thấy được của bài tập về nhà.
-//
-// Đặc tả `claude/PHAN-CONG-GIAO-BTVN.md`, và điều CẤM nặng nhất trong đó:
-// **cấm đụng vào mục Gọi lên bảng đang chạy**. Nên màn cũ được lồng NGUYÊN vào
-// thẻ thứ hai, không sửa một dòng.
+// Kiểm tra BTVN hiện tại: giao bài và gọi lên bảng là hai màn riêng.
 import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -16,36 +12,44 @@ const NUT = doc('src/components/NutNopBtvn.tsx')
 const CHO_EM = doc('src/lib/btvn-cho-em.ts')
 const TAKE = doc('src/screens/ExamTakeScreen.tsx')
 
-describe('KHÔNG ĐỤNG MÀN GỌI LÊN BẢNG', () => {
-  it('màn cũ được lồng NGUYÊN vào, không chép lại', () => {
-    expect(PC).toContain("import GoiLenBangScreen from './GoiLenBangScreen'")
-    expect(PC).toContain('<GoiLenBangScreen />')
+describe('GIAO BÀI VÀ GỌI LÊN BẢNG TÁCH RIÊNG', () => {
+  it('mỗi chức năng có màn riêng trong app', () => {
+    expect(APP).toContain("import('./screens/GoiLenBangScreen')")
+    expect(APP).toContain("import('./screens/PhanCongScreen')")
+    expect(PC).not.toContain('<GoiLenBangScreen')
   })
 
-  it('đổi nhãn mục thành “Phân công” ở cả hai chỗ', () => {
-    expect(APP).toContain("goilenbang: 'Phân công'")
-    expect(THANH).toContain("ten: 'Phân công'")
+  it('menu phân biệt giao bài với gọi lên bảng', () => {
+    expect(APP).toContain("goilenbang: 'Gọi lên bảng'")
+    expect(APP).toContain("giaobtvn: 'Giao bài tập về nhà'")
+    expect(THANH).toContain('Gọi lên bảng')
+    expect(THANH).toContain('Giao bài tập về nhà')
   })
 })
 
 describe('THẺ GIAO BÀI — nói thẳng khi chưa chuyển kho đề', () => {
   it('kho rỗng thì chỉ đúng việc thầy phải làm, không để thầy đoán', () => {
-    expect(PC).toContain('Kho đề trên máy chủ mới đang rỗng')
+    expect(PC).toContain('Chưa có đề sẵn sàng để giao.')
     expect(PC).toContain('Chuyển KHO ĐỀ sang máy chủ mới')
   })
 
   it('nút Giao khoá khi chưa chọn đủ ca và đề', () => {
     // Từ 12/09 tick được NHIỀU tờ đề, nên điều kiện là "đã tick ít nhất một tờ".
-    expect(PC).toContain('disabled={dangGiao || caChon.size === 0 || daChon.size === 0}')
+    expect(PC).toContain("(cheDo === 'ca' && caChon.size === 0")
+    expect(PC).toContain("(cheDo === 'hoc_sinh' && dsTheoLop.length === 0)")
+    expect(PC).toContain("(cheDo === 'theo_em' && sbdChonTheoEm.size === 0)")
+    expect(PC).toContain('daChon.size === 0')
   })
 
   it('bảng theo dõi kê TÊN em chưa nộp', () => {
-    expect(PC).toContain('t.chuaNop.map((e) =>')
+    expect(PC).toContain('<HocSinhNhanBai')
+    expect(doc('src/components/HocSinhNhanBai.tsx')).toContain('bai.chuaNop.map')
   })
 
   it('nói rõ hạn 48 giờ chặn ở MÁY CHỦ, không phải ẩn nút', () => {
     expect(PC).toContain('máy chủ')
-    expect(PC).toContain('Để trống: hạn nộp sau 48 giờ kể từ lúc giao.')
+    expect(PC).toContain('Để trống: mặc định hạn nộp sau 48 giờ')
+    expect(doc('server/src/index.ts')).toContain('if (quaHan && !em.nop_luc)')
   })
 
   it('kho đề đọc từ máy chủ mới, không đọc Apps Script', () => {
@@ -162,7 +166,7 @@ describe('CHỌN ĐỀ Y NHƯ MÀN MỞ CA', () => {
       expect(MO_CA, x).toContain(x)
     }
     // Cùng bộ tham số: tick nhiều, có chip nhóm, có nút chọn cả nhánh.
-    for (const x of ['chonNhieu', 'nhomLoc={nhomLoc}', 'onChonTatCa']) expect(PC, x).toContain(x)
+    for (const x of ['chonNhieu', 'daChon={daChon}', 'onChonTatCa']) expect(PC, x).toContain(x)
   })
 
   it('CHỈ hiện tờ máy chủ đã có — tick tờ chưa chuyển thì bấm Giao mới báo là quá muộn', () => {
@@ -199,8 +203,8 @@ describe('CHỌN ĐỀ Y NHƯ MÀN MỞ CA', () => {
 
   it('em mở bài chỉ nhận ĐÚNG phần đã tick, và mỗi tờ chỉ tải một lần', () => {
     const han = WK.slice(WK.indexOf('async function btvnCuaEm('), WK.indexOf('async function nopBtvn('))
-    expect(han).toContain('const daDoc = new Map<string, Record<string, unknown>[]>()')
-    expect(han).toContain("phan ? cau.filter((x) => String(x.phan ?? '') === phan) : cau")
+    expect(han).toContain('await homeworkQuestions(env,String(bt.ma_de))')
+    expect(doc('server/src/btvn-grading.ts')).toContain('export async function homeworkQuestions')
   })
 
   it('máy chủ nhận NHIỀU tờ đề một lượt giao, và vẫn nhận dáng một tờ của bản cũ', () => {
@@ -214,8 +218,8 @@ describe('CHỌN ĐỀ Y NHƯ MÀN MỞ CA', () => {
 
   it('em mở bài thì gộp câu của mọi tờ, đúng thứ tự thầy tick, KHÔNG xáo', () => {
     const han = WK.slice(WK.indexOf('async function btvnCuaEm('), WK.indexOf('async function nopBtvn('))
-    expect(han).toContain("String(bt.ma_de ?? '')")
-    expect(han).toContain('docCauTuGoiDe(')
+    expect(han).toContain("String(bt.ma_de)")
+    expect(han).toContain('homeworkQuestions(')
     for (const cam of ['sort(', 'shuffle', 'Math.random']) expect(han, cam).not.toContain(cam)
   })
 })
@@ -230,11 +234,11 @@ describe('GIAO CHO NHIỀU CA MỘT LƯỢT', () => {
   it('màn bỏ ô chọn một ca, dùng danh sách tick', () => {
     expect(PC).not.toContain('— chọn ca —')
     expect(PC).toContain('caChon')
-    expect(PC).toContain('Chọn hết')
+    expect(PC).toContain('onChonTatCa')
   })
 
   it('mỗi ca là một nút đủ to cho ngón tay, có trạng thái tick rõ', () => {
-    expect(PC).toContain('minHeight: 56')
+    expect(PC).toContain('p-3')
     expect(PC).toContain('aria-pressed={chon}')
   })
 
@@ -267,6 +271,6 @@ describe('GIAO CHO NHIỀU CA MỘT LƯỢT', () => {
   })
 
   it('có trần số ca một lượt, nói rõ thầy đang tick bao nhiêu', () => {
-    expect(HAM).toContain('dsMaCa.length > 10')
+    expect(HAM).toContain("dsMaCa.filter(c=>c!=='Riêng').length > 10")
   })
 })

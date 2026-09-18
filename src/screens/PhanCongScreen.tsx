@@ -1,16 +1,10 @@
+import { hanNhapVietNam, hanChoOChon, mocThoiGian, gioHanVietNam } from '../lib/han-bai-tap'
+import { useGioHocTap } from '../hooks/useGioHocTap'
+import NhanHanBaiTap from '../components/NhanHanBaiTap'
 import {nhomBtvn, type NhomBtvn} from '../lib/nhom-btvn'
 import NhomCaThuGon from '../components/NhomCaThuGon'
 import HocSinhNhanBai from '../components/HocSinhNhanBai'
-// PHÂN CÔNG — hai việc sau một ca thi, chung một chỗ.
-//
-// Thầy chốt 11/09: đổi mục "Phân công lên bảng" thành **Phân công**, trong đó
-// có hai phần: **Giao bài tập về nhà** (mới) và **Gọi lên bảng** (giữ nguyên).
-//
-// MÀN GỌI LÊN BẢNG KHÔNG BỊ ĐỤNG MỘT DÒNG NÀO. Nó được lồng nguyên vào thẻ thứ
-// hai — đúng điều cấm trong đặc tả `claude/PHAN-CONG-GIAO-BTVN.md`.
-//
-// Phần giao bài tập chạy 0% Apps Script: ca và đề đọc từ máy chủ mới, bài giao
-// và bài nộp cũng ở đó.
+// Giao và theo dõi BTVN. Gọi lên bảng là màn riêng; không thay đổi bộ rút câu.
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { CheckSquare, ClipboardList, RefreshCw, Search, Square, UserCheck, Users, Send, ClipboardCheck, Clock, GraduationCap } from 'lucide-react'
 import { OThongBao } from '../components/DesignSystem'
@@ -29,11 +23,7 @@ interface DeKho {
   soCau: number
 }
 
-function gioVN(iso: string): string {
-  const d = new Date(iso)
-  if (!Number.isFinite(d.getTime())) return ''
-  return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
-}
+const gioVN = gioHanVietNam
 
 /** Đổi mã đề dạng DH-12-C2-B6-DS,DH-12-C2-B6-TLN thành cây thư mục Dạy học / Lớp 12 / Ch.2 / Bài 6 / Đúng sai · Trả lời ngắn */
 export function dinhDangDeCayThuMuc(maDeStr: string): string {
@@ -119,11 +109,11 @@ export default function PhanCongScreen() {
                 Giao bài tập về nhà
               </h1>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-                ✨ Thuật toán 3 Vòng Phân Tầng
+                Bài tập theo 3 vòng
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Cả lớp nhận chung đề nhưng phân tầng thông minh (Vòng 1: Lõi căn bản bắt buộc · Vòng 2: Trọng tâm cá nhân hóa lấp điểm nghẽn · Vòng 3: Thử thách bứt phá x2 EXP).
+              Chọn học sinh, chọn đề và đặt hạn nộp. Theo dõi bài chưa nộp ở mục Đã giao.
             </p>
           </div>
         </div>
@@ -134,7 +124,7 @@ export default function PhanCongScreen() {
 }
 
 function TheGiaoBtvn() {
-  const [tabBtvn, setTabBtvn] = useState<'giao' | 'theodoi'>('giao')
+  const [tabBtvn, setTabBtvn] = useState<'giao' | 'theodoi'>('theodoi')
   const [cheDo, setCheDo] = useState<'ca' | 'hoc_sinh' | 'theo_em'>('ca')
   const [dsCa, setDsCa] = useState<CaTomTat[]>([])
   const [dsDe, setDsDe] = useState<DeKho[]>([])
@@ -170,6 +160,7 @@ function TheGiaoBtvn() {
   const [suaHan, setSuaHan] = useState<Record<string,string>>({})
   const [dangSua, setDangSua] = useState('')
   const [xacNhan,setXacNhan]=useState<{text:string;run:()=>Promise<void>}|null>(null)
+  const nowHocTap = useGioHocTap()
   const [theoDoi, setTheoDoi] = useState<DongTheoDoiBtvn[]>([])
 
   const nap = useCallback(async () => {
@@ -386,7 +377,7 @@ function TheGiaoBtvn() {
     try {
       const ch=await layCauHinhMayChu(), mat=(await loadTeacherSecret())||''
       if(!thuHoi && !suaHan[t.maBtvn])throw new Error('Thầy chọn ngày giờ hạn nộp trước.')
-      for (const original of (t as NhomBtvn).baiGoc||[t]) await suaGiaoBtvn(ch,mat,original.maBtvn,thuHoi?{thuHoi:true}:{hanNop:new Date(suaHan[t.maBtvn]).toISOString()})
+      for (const original of (t as NhomBtvn).baiGoc||[t]) await suaGiaoBtvn(ch,mat,original.maBtvn,thuHoi?{thuHoi:true}:{hanNop:hanNhapVietNam(suaHan[t.maBtvn], nowHocTap)})
       setTheoDoi(await theoDoiBtvn(ch,mat))
       setBao({ok:true,chu:thuHoi?'Đã thu hồi bài. Kết quả đã nộp được giữ nguyên.':'Đã cập nhật hạn nộp cho học sinh.'})
     } catch(e){setBao({ok:false,chu:e instanceof Error?e.message:'Chưa cập nhật được.'})}
@@ -406,7 +397,7 @@ function TheGiaoBtvn() {
         : undefined
       if (dsSbdGui && dsSbdGui.length === 0) throw new Error('Chưa có học sinh được chọn.')
       const dsCaGui = cheDo === 'hoc_sinh' || cheDo === 'theo_em' ? [] : [...caChon]
-      const kq = await giaoBtvn(ch, mat, dsCaGui, [...daChon], dsSbdGui, hanMoi ? new Date(hanMoi).toISOString() : undefined, cheDo === 'ca' && chonRieng ? [...sbdChon] : undefined)
+      const kq = await giaoBtvn(ch, mat, dsCaGui, [...daChon], dsSbdGui, hanMoi ? hanNhapVietNam(hanMoi, nowHocTap) : undefined, cheDo === 'ca' && chonRieng ? [...sbdChon] : undefined)
       const boQua = kq.caRong && kq.caRong.length > 0 ? ` Bỏ qua ${kq.caRong.length} ca chưa em nào vào thi: ${kq.caRong.join(', ')}.` : ''
       const noiDungCa = kq.soCa ? ` ở ${kq.soCa} ca` : ''
       setBao({
@@ -417,6 +408,7 @@ function TheGiaoBtvn() {
       setNguonKho(await loadExamSources())
 
       setTheoDoi(await theoDoiBtvn(ch, mat))
+      setTabBtvn('theodoi')
     } catch (e) {
       setBao({ ok: false, chu: e instanceof Error ? e.message : 'Không giao được' })
     } finally {
@@ -855,6 +847,7 @@ function TheGiaoBtvn() {
               )}
             </div>
 
+            {!dangNap && dsDeTach.length === 0 && <OThongBao tone="cam">Chưa có đề sẵn sàng để giao. Thầy kiểm tra kho trên máy và mục Chuyển KHO ĐỀ sang máy chủ mới.</OThongBao>}
             {/* HỘP CHỌN ĐỀ */}
             <div className="w-full overflow-hidden">
               <HopChonDe
@@ -889,7 +882,7 @@ function TheGiaoBtvn() {
 
             <div className="flex flex-wrap items-center gap-4 text-xs">
               <label className="flex items-center gap-2 font-bold text-slate-700 dark:text-slate-300">
-                <Clock size={16} className="text-slate-400" /> Hạn nộp bài:
+                <Clock size={16} className="text-slate-400" /> Hạn nộp (giờ Việt Nam):
                 <input
                   aria-label="Hạn nộp bài mới"
                   type="datetime-local"
@@ -900,7 +893,7 @@ function TheGiaoBtvn() {
                 />
               </label>
               <span className="text-slate-500 dark:text-slate-400">
-                {hanMoi ? 'Áp dụng mốc hạn nộp đã chọn.' : '(Để trống: mặc định hạn nộp sau 48 giờ)'}
+                {hanMoi ? 'Áp dụng giờ Việt Nam đã chọn. Học sinh cần nộp trước mốc này.' : '(Để trống: mặc định hạn nộp sau 48 giờ)'}
               </span>
             </div>
 
@@ -925,10 +918,7 @@ function TheGiaoBtvn() {
             <div className="flex items-center gap-3 pt-1">
               <button
                 type="button"
-                onClick={async () => {
-                  await giao()
-                  setTabBtvn('theodoi')
-                }}
+                onClick={() => void giao()}
                 disabled={
                   dangGiao ||
                   (cheDo === 'ca' && caChon.size === 0 && !(chonRieng && sbdChon.size > 0)) ||
@@ -966,6 +956,11 @@ function TheGiaoBtvn() {
         </div>
       )}
 
+      {tabBtvn === 'theodoi' && !dangNap && <section aria-label="Bài tập cần theo dõi" className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {[['Bài chưa nộp đã quá hạn', theoDoi.filter(b => (mocThoiGian(b.hanNop) ?? Infinity) <= nowHocTap).reduce((n,b) => n + b.chuaNop.length, 0)],
+          ['Bài chưa nộp đến hạn trong 24 giờ', theoDoi.filter(b => (mocThoiGian(b.hanNop) ?? Infinity) > nowHocTap && (mocThoiGian(b.hanNop) ?? Infinity) <= nowHocTap + 86400_000).reduce((n,b) => n + b.chuaNop.length, 0)],
+          ['Lượt bài đã nộp', theoDoi.reduce((n,b) => n + b.daNop, 0)]].map(([label, count]) => <div key={label} className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 bg-white dark:bg-slate-900"><p className="text-2xl font-bold">{count}</p><p className="text-xs mt-1">{label}</p></div>)}
+      </section>}
       {/* TAB 2: ĐỢT BÀI ĐÃ GIAO & THEO DÕI NỘP BÀI */}
       {tabBtvn === 'theodoi' && (
         <div className="w-full max-w-full min-w-0 flex flex-col gap-4">
@@ -975,7 +970,7 @@ function TheGiaoBtvn() {
                 Danh sách bài tập về nhà đã giao
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Theo dõi tiến độ làm bài, danh sách học sinh và quản lý hạn nộp
+                Ưu tiên hỗ trợ học sinh chưa nộp bài gần hạn. Gia hạn trước khi mở lại bài đã hết hạn.
               </p>
             </div>
             <button
@@ -1010,7 +1005,7 @@ function TheGiaoBtvn() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-              {nhomBtvn(theoDoi).map((t) => {
+              {nhomBtvn(theoDoi).sort((a,b) => Number(b.chuaNop.length > 0) - Number(a.chuaNop.length > 0) || (mocThoiGian(a.hanNop) ?? Infinity) - (mocThoiGian(b.hanNop) ?? Infinity)).map((t) => {
                 const daDu = t.daNop === t.tong
                 const quaHan = t.quaHan
                 return (
@@ -1028,7 +1023,8 @@ function TheGiaoBtvn() {
                           {dinhDangDeCayThuMuc(t.maDe)}
                         </h3>
                         <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                          Giao lúc {gioVN(t.giaoLuc)} · Hạn {gioVN(t.hanNop)}
+                          Giao lúc {gioVN(t.giaoLuc)}
+                          <NhanHanBaiTap han={t.hanNop} now={nowHocTap} daNop={t.chuaNop.length === 0} />
                         </p>
                       </div>
                       <span
@@ -1051,9 +1047,7 @@ function TheGiaoBtvn() {
                         type="datetime-local"
                         value={
                           suaHan[t.maBtvn] ??
-                          new Date(Date.parse(t.hanNop) - new Date(t.hanNop).getTimezoneOffset() * 60000)
-                            .toISOString()
-                            .slice(0, 16)
+                          hanChoOChon(t.hanNop)
                         }
                         onChange={(e) => setSuaHan((v) => ({ ...v, [t.maBtvn]: e.target.value }))}
                         style={{ colorScheme: 'light dark' }}

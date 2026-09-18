@@ -10,6 +10,7 @@
 // được mở thật. Đẩy lên đây chỉ để đường nóng có chỗ chạy nhanh; hỏng thì ca
 // vẫn mở bình thường và cả lớp thi trên đường cũ.
 import type { CauHinhMayChu } from './cau-hinh-may-chu'
+import { voiHanCho } from './han-cho'
 
 /** Hạn chờ khi đẩy. Rộng vì gói đề tới vài MB, nhưng vẫn hữu hạn. */
 export const HAN_DAY_CA_GIAY = 45
@@ -28,6 +29,7 @@ export interface CaDay {
   nguongGiay?: number
   lop?: string
   phongCho?: boolean
+  dongBoGio?: boolean
   batDauThiLuc?: string
   giuDeDoc?: boolean
   anHanGiay?: number
@@ -378,4 +380,74 @@ export async function ghiLenBangMoi(
 ): Promise<boolean> {
   if (!ch.BAT || !ch.URL || !d.sbd || !d.chuyenDe) return false
   return guiJson(ch, maBiMat, '/len-bang', d, HAN_DAY_CA_GIAY)
+}
+
+/** Tạo ca: lỗi rõ nguyên nhân, mất phản hồi thì hỏi lại trước khi gửi lại cùng mã. */
+export function diaChiGuiCa(server: string, origin: string): string {
+  const base = server.replace(/\/+$/, '')
+  // Trên app chính, điện thoại chỉ cần kết nối tên miền app đang mở.
+  // Cấu hình máy chủ khác vẫn đi đúng nơi được cấu hình, không gửi nhầm mã.
+  if (base === 'https://omr.ttadodaihoc.workers.dev' && /^https:\/\/(?:[a-z0-9-]+\.)?omr-app-b3u\.pages\.dev$/.test(origin)) return `${origin}/api`
+  return base
+}
+
+export async function taoCaDaXacNhan(ch: CauHinhMayChu, secret: string, ca: CaDay, bank: unknown, keyBank?: unknown): Promise<boolean> {
+  if (!ch.BAT || !ch.URL) throw new Error('Chưa có kết nối máy chủ. Thầy kiểm tra cấu hình kết nối.')
+  if (!secret.trim()) throw new Error('Chưa có mã xác thực giáo viên. Thầy đăng nhập lại app giáo viên.')
+  const body = JSON.stringify({ ca, bank, keyBank, secret })
+  const headers = { 'content-type': 'text/plain;charset=utf-8' }
+  const directBase = ch.URL.replace(/\/+$/, '')
+  const base = diaChiGuiCa(ch.URL, typeof location === 'undefined' ? '' : location.origin)
+  const gui = async (path: string, payload: string, seconds: number) => {
+    const controller = new AbortController()
+    // fetch() kết thúc khi có HEADER, chưa chắc đã nhận đủ thân phản hồi.
+    // Giữ hạn chờ tới khi đọc xong JSON để tránh nút mở ca quay mãi.
+    return voiHanCho((async () => {
+      let res: Response
+      try {
+        res = await fetch(base + path, { method: 'POST', headers, body: payload, signal: controller.signal })
+      } catch (err) {
+        if (base !== directBase && !controller.signal.aborted) {
+          res = await fetch(directBase + path, { method: 'POST', headers, body: payload, signal: controller.signal })
+        } else {
+          throw err
+        }
+      }
+      // Nếu proxy Pages trả lỗi máy chủ 5xx, tự động lui về gọi thẳng máy chủ
+      if (res.status >= 500 && base !== directBase && !controller.signal.aborted) {
+        try {
+          const directRes = await fetch(directBase + path, { method: 'POST', headers, body: payload, signal: controller.signal })
+          if (directRes.ok || directRes.status < 500) {
+            res = directRes
+          }
+        } catch {
+          // giữ res ban đầu nếu direct cũng lỗi mạng
+        }
+      }
+      if (res.status === 401 || res.status === 403) throw new Error('AUTH')
+      const data = await res.json().catch(() => null) as { ok?: boolean; error?: string; daLuu?: boolean } | null
+      return { ok: res.ok, status: res.status, data }
+    })(), seconds * 1000, 'Máy chủ chưa phản hồi kịp.', () => controller.abort())
+  }
+  let loi = 'Không kết nối được máy chủ.'
+  for (let lan = 0; lan < 2; lan++) {
+    let thuLai = true
+    try {
+      const res = await gui('/ca/day', body, HAN_DAY_CA_GIAY)
+      const j = res.data
+      if (res.ok && j?.ok === true) return true
+      if (res.status === 413) { loi = 'Gói đề quá lớn. Thầy chọn ít đề hơn rồi mở lại ca.'; thuLai = false }
+      else { loi = j?.error || `Máy chủ chưa lưu được ca (HTTP ${res.status}).`; thuLai = res.status >= 500 || res.status === 429 }
+    } catch (e) {
+      if (e instanceof Error && e.message === 'AUTH') throw new Error('Mã xác thực giáo viên không hợp lệ. Thầy đăng nhập lại app giáo viên.')
+      loi = 'Mất kết nối hoặc máy chủ chưa phản hồi kịp.'
+    }
+    // Chỉ đọc xác nhận; không dựng ca hay thay đổi bài của học sinh.
+    try {
+      const res = await gui('/ca/xac-nhan', JSON.stringify({ secret, maCa: ca.maCa, batDau: ca.batDau, tenCa: ca.tenCa, canDe: !!bank, canKey: !!keyBank }), 10)
+      if (res.ok && res.data?.daLuu === true) return true
+    } catch { /* Giữ nguyên lỗi ban đầu nếu mạng vẫn đứt. */ }
+    if (!thuLai) break
+  }
+  throw new Error(`${loi} Chưa xác nhận lưu ca #${ca.maCa}. Thầy giữ màn này và kiểm tra kết nối.`)
 }

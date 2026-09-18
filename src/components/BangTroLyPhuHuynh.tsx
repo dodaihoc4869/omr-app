@@ -1,3 +1,6 @@
+import { useGioHocTap } from '../hooks/useGioHocTap'
+import { hanBaiMom, mocThoiGian } from '../lib/han-bai-tap'
+import NhanHanBaiTap from './NhanHanBaiTap'
 import { useMemo } from 'react'
 import {
   Sparkles,
@@ -37,7 +40,8 @@ export default function BangTroLyPhuHuynh({
   onXemBangDiem,
   onGiaoBaiLuyen,
 }: BangTroLyPhuHuynhProps) {
-  // Phân tích trạng thái học tập của con
+  const now = useGioHocTap()
+  // Chỉ nhận xét dữ liệu đã có; một điểm cao không xác nhận đã nắm chắc kiến thức.
   const thongKe = useMemo(() => {
     const soCaThi = dsBaiThi.length
     const diemGanNhat = caGanNhat ? (typeof caGanNhat.tong === 'number' ? caGanNhat.tong : (typeof caGanNhat.diem === 'number' ? caGanNhat.diem : null)) : null
@@ -47,20 +51,20 @@ export default function BangTroLyPhuHuynh({
     const momDaNop = dsMomGiao.filter((b) => b.trangThai === 'da_nop').length
 
     // Nhận định sư phạm thích ứng
-    let danhGia = 'Con đang duy trì tiến độ học tập ổn định.'
+    let danhGia = 'Chưa đủ dữ liệu để nhận xét tiến bộ. Anh/chị có thể xem bài gần nhất cùng con.'
     let mucDoKhanCap = 'binh_thuong'
 
     if (tongCauSai >= 15) {
-      danhGia = `Con đang tồn đọng ${tongCauSai} câu sai chưa chữa dứt điểm. Bố mẹ nên ưu tiên giao bài khắc phục ngắn (3–5 câu) để con bịt lỗ hổng kiến thức trước khi làm đề mới.`
+      danhGia = `Đang ghi nhận ${tongCauSai} câu sai. Anh/chị nhắc con xem lại bước làm còn vướng và hỏi Thầy trước khi nhận thêm bài.`
       mucDoKhanCap = 'can_chu_y'
     } else if (momChuaLam > 0) {
-      danhGia = `Con đang có ${momChuaLam} bài bố mẹ giao đang chờ hoàn thành. Hãy khích lệ con hoàn thành đúng hạn 2 tiếng để rèn luyện tính kỷ luật.`
+      danhGia = `Có ${momChuaLam} bài gia đình giao chưa nộp. Mỗi bài có 120 phút tính từ khi con bắt đầu. Anh/chị xem thời hạn bên dưới.`
       mucDoKhanCap = 'binh_thuong'
     } else if (diemGanNhat !== null && diemGanNhat >= 8) {
-      danhGia = `Điểm ca gần nhất đạt ${diemGanNhat.toFixed(1)} điểm — con đang nắm rất chắc kiến thức trọng tâm! Bố mẹ có thể thưởng linh thú hoặc cho con thử sức câu hỏi nâng cao.`
+      danhGia = `Ca gần nhất đạt ${diemGanNhat.toFixed(1)} điểm. Cần xem thêm lỗi sai và kết quả những lần kiểm tra sau để đánh giá tiến bộ.`
       mucDoKhanCap = 'khen_ngoi'
     } else if (soCaThi > 0) {
-      danhGia = `Con đã hoàn thành ${soCaThi} ca thi. Việc sửa lỗi sai kịp thời sẽ giúp con tiến bộ rõ rệt qua từng buổi học.`
+      danhGia = `Con có ${soCaThi} ca thi trong danh sách. Anh/chị xem báo cáo gần nhất để biết phần con còn cần sửa.`
     }
 
     return {
@@ -86,18 +90,18 @@ export default function BangTroLyPhuHuynh({
               ĐĐH
             </div>
             <span
-              title="Trợ lý đang hoạt động trực tuyến"
+              title="Thông tin từ dữ liệu đã tải"
               className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900"
             />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white flex items-center gap-1.5">
-                <span>Trợ Lý Đồng Hành Cùng Con</span>
+                <span>Theo dõi việc học của con</span>
                 <Sparkles className="w-4 h-4 text-amber-500" />
               </h2>
               <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300">
-                Toàn diện · Trực tuyến
+                Bài làm và hạn nộp
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -121,7 +125,7 @@ export default function BangTroLyPhuHuynh({
           ) : (
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-bold">
               <FileCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Đã bịt sạch câu sai</span>
+              <span>Chưa ghi nhận câu sai</span>
             </div>
           )}
         </div>
@@ -138,19 +142,36 @@ export default function BangTroLyPhuHuynh({
             {thongKe.danhGia}
           </p>
           <div className="text-[11px] text-slate-500 dark:text-slate-400 pt-0.5 italic">
-            Gợi ý: Chỉ cần 10–15 phút mỗi ngày cùng con xem lại 3–5 câu sai trọng tâm sẽ tạo ra bước nhảy vọt về điểm số.
+            Anh/chị hỏi con đang vướng câu nào. Nếu chưa hiểu lời giải, con có thể gửi câu hỏi cho Thầy.
           </div>
         </div>
       </div>
+
+      <section aria-label="Hạn bài gia đình giao" className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 space-y-3">
+        <h3 className="font-bold text-sm">Bài gia đình giao: đã làm gì, còn việc gì?</h3>
+        <p className="text-xs text-slate-600 dark:text-slate-300">{thongKe.momDaNop} bài đã nộp · {thongKe.momChuaLam} bài chưa nộp. Mục này chỉ gồm bài gia đình giao.</p>
+        {dsMomGiao.length === 0 && <p className="text-sm">Chưa có bài gia đình giao trong danh sách.</p>}
+        {[...dsMomGiao].sort((a, b) => Number(a.trangThai === 'da_nop') - Number(b.trangThai === 'da_nop') || (mocThoiGian(hanBaiMom(a)) ?? Infinity) - (mocThoiGian(hanBaiMom(b)) ?? Infinity)).slice(0, 5).map(b => {
+          const han = hanBaiMom(b)
+          const daNop = b.trangThai === 'da_nop'
+          const hetGio = !daNop && (mocThoiGian(han) ?? Infinity) <= now
+          return <div key={b.id} className="border-t border-slate-100 dark:border-slate-800 pt-3 space-y-1">
+            <p className="text-sm font-semibold">{b.tieuDe || 'Bài gia đình giao'}</p>
+            {han ? <NhanHanBaiTap han={han} now={now} daNop={daNop} /> : <p className="text-xs">{daNop ? 'Đã nộp' : 'Chưa bắt đầu. Thời gian làm bài: 120 phút từ khi bắt đầu.'}</p>}
+            {hetGio && <p className="text-xs text-amber-800 dark:text-amber-200">Anh/chị nhắc con mở bài để hoàn tất nộp phần đã lưu.</p>}
+          </div>
+        })}
+        <p className="text-xs text-slate-500 dark:text-slate-400">Kiểm tra bài Thầy giao trong app học sinh trước khi giao thêm bài.</p>
+      </section>
 
       {/* 3. TOP HÀNH ĐỘNG TRỢ LÝ ĐỀ XUẤT CHO BỐ MẸ (1-CLICK) */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="font-bold text-xs sm:text-sm uppercase tracking-wide text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
             <Target className="w-4 h-4 text-blue-600" />
-            <span>Trợ lý đề xuất cho Bố Mẹ hôm nay (Bấm là bung ra làm ngay)</span>
+            <span>Việc anh/chị có thể làm</span>
           </h3>
-          <span className="text-[11px] text-slate-400">1-Click cá nhân hoá</span>
+          <span className="text-[11px] text-slate-400">Chọn việc cần hỗ trợ</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -162,10 +183,10 @@ export default function BangTroLyPhuHuynh({
             <div>
               <div className="flex items-center justify-between gap-1.5 mb-2">
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300">
-                  #1 BỊT LỖ HỔNG
+                  #1 LUYỆN CÂU SAI
                 </span>
                 <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400">
-                  {tongCauSai > 0 ? `${tongCauSai} câu đang chờ` : 'Sạch lỗi sai'}
+                  {tongCauSai > 0 ? `${tongCauSai} câu đang chờ` : 'Chưa ghi nhận câu sai'}
                 </span>
               </div>
               <h4 className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm group-hover:text-rose-600 dark:group-hover:text-rose-400 transition">
@@ -173,8 +194,8 @@ export default function BangTroLyPhuHuynh({
               </h4>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
                 {tongCauSai > 0
-                  ? `Chọn lọc từ ${tongCauSai} câu con đã làm sai ở các ca thi để giao con làm lại, bịt dứt điểm lỗ hổng.`
-                  : 'Con đã làm đúng hết các câu! Bố mẹ có thể chọn thêm chuyên đề mới cho con.'}
+                  ? `Chọn lọc từ ${tongCauSai} câu con đã làm sai ở các ca thi để con luyện lại.`
+                  : 'Chưa có câu sai trong dữ liệu đang xem. Anh/chị kiểm tra bài cần nộp trước khi giao thêm.'}
               </p>
             </div>
 

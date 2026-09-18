@@ -456,6 +456,8 @@ body {
  * vẫn phủ kín — ở đó không có gì bên trái để chừa. Trình duyệt không hiểu
  * `:has` thì phủ kín như cũ, không vỡ. */
 .lop-xem-phieu {
+  box-sizing: border-box;
+  padding-top: calc(48px + env(safe-area-inset-top));
   position: fixed;
   inset: 0;
   z-index: 60;

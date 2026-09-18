@@ -7,7 +7,7 @@ import type { DongCa, DongLuot } from './kieu'
 
 export type LyDoChan =
   | 'khong_co_ca' | 'da_xoa' | 'da_dong' | 'dang_lam_may_khac'
-  | 'da_nop' | 'chua_mo' | 'het_han_vao' | 'thieu'
+  | 'da_nop' | 'chua_mo' | 'het_han_vao' | 'het_gio_chung' | 'thieu'
 
 export type CachVao = 'moi' | 'khoi_phuc' | 'duyet_lai'
 
@@ -48,10 +48,12 @@ export function quyetDinhVaoThi(ca: DongCa | null, luot: DongLuot | null, idThie
     // nên em vào ĐÚNG lượt ấy — không đẻ thêm lần thử thứ ba, và KHÔNG bị hạn
     // vào phòng chặn: thầy duyệt sau giờ đóng cửa là chuyện thường.
     if (luot.trang_thai === 'duoc_duyet_lai') {
+      if (daHetGioChung(ca, nowMs)) return { ok: false, lyDo: 'het_gio_chung' }
       return { ok: true, cach: 'duyet_lai', lanThu: luot.lan_thu }
     }
   }
 
+  if (daHetGioChung(ca, nowMs)) return { ok: false, lyDo: 'het_gio_chung' }
   const hetHan = ms(ca.het_han_vao)
   if (Number.isFinite(hetHan) && nowMs > hetHan) return { ok: false, lyDo: 'het_han_vao' }
   return { ok: true, cach: 'moi', lanThu: (luot?.lan_thu ?? 0) + 1 }
@@ -61,9 +63,15 @@ export function quyetDinhVaoThi(ca: DongCa | null, luot: DongLuot | null, idThie
 export function mocHetGio(ca: DongCa, vaoLucMs: number): string {
   if (ca.loai === 'baitap') return ca.han_nop || ''
   const phut = Number(ca.thoi_gian_phut) || 45
-  return new Date(vaoLucMs + phut * 60000).toISOString()
+  const chung = Number(ca.dong_bo_gio) === 1 ? ms(ca.bat_dau_thi_luc) : NaN
+  return new Date((Number.isFinite(chung) ? chung : vaoLucMs) + phut * 60000).toISOString()
 }
 
 export function khoaLuot(maCa: string, sbd: string, lanThu: number): string {
   return `${maCa}|${sbd}|${lanThu}`
+}
+
+function daHetGioChung(ca: DongCa, nowMs: number): boolean {
+  return ca.loai !== 'baitap' && Number(ca.dong_bo_gio) === 1 &&
+    Number.isFinite(ms(ca.bat_dau_thi_luc)) && nowMs >= ms(mocHetGio(ca, nowMs))
 }

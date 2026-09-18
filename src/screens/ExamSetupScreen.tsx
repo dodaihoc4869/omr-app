@@ -25,11 +25,13 @@ import HopChonDe from '../components/HopChonDe'
 import HangNhomDe from '../components/HangNhomDe'
 import { locNguonTheoId, qidDaRaTuCacCa, type SoCauPhan } from '../lib/rut-de'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
-import { randomSessionCode, taoLinkMoi } from '../lib/ca-link'
+import { randomSessionCode, taoLinkMoiTrucTiep } from '../lib/ca-link'
+import { layDiaChiMayChu } from '../lib/dia-chi-may-chu'
+import { voiHanCho } from '../lib/han-cho'
 import { TheNoiDung, NutChinh } from '../components/DesignSystem'
 import NutDongBo from '../components/NutDongBo'
 import { chuoi, danhSachEm, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
-import { docSoCauCa, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, luuCheDoDeRieng, luuKhoChuaCa, luuSoCauCa, saveSessionTeacherBank } from '../lib/exam-db'
+import { docSoCauCa, loadAllSessionTeacherBanks, loadExamSources, loadTeacherSecret, luuCheDoDeRieng, luuKhoChuaCa, luuSoCauCa, saveSessionTeacherBank } from '../lib/exam-db'
 import { AN_HAN_CHON_GIAY, BAT_MAC_DINH_CA_THI, MS_AN_HAN_NHA_TAY } from '../lib/giu-de-doc'
 import { dongBoNganHang } from '../lib/exam-sync'
 import { khuTrungNguon, tongBoQua } from '../lib/khu-trung-cau'
@@ -138,6 +140,7 @@ export default function ExamSetupScreen() {
   // cả lớp nhận đề đúng một thời điểm khi thầy bấm "Bắt đầu thi" ở màn Theo
   // dõi. Mặc định TẮT — ca luyện tập và bài tập về nhà không cần chờ ai.
   const [phongCho, setPhongCho] = useState(false)
+  const [dongBoGio, setDongBoGio] = useState(false)
   const [anHanGiay, setAnHanGiay] = useState(MS_AN_HAN_NHA_TAY / 1000)
   const [matKhauCa, setMatKhauCa] = useState('')
   const [chiNop3PhutCuoi, setChiNop3PhutCuoi] = useState(false)
@@ -152,6 +155,8 @@ export default function ExamSetupScreen() {
   // rút đề tránh phát lại câu lớp vừa làm tuần trước.
   const [qidCaTruoc, setQidCaTruoc] = useState<string[]>([])
   const [opening, setOpening] = useState(false)
+  const [buocMoCa, setBuocMoCa] = useState('')
+  const [loiMoCa, setLoiMoCa] = useState('')
   const [opened, setOpened] = useState<{ maCa: string; joinLink: string; batDau: string; hetHanVao: string } | null>(null)
   const [daCopy, setDaCopy] = useState(false)
   const [hienChonDe, setHienChonDe] = useState(false)
@@ -167,7 +172,7 @@ export default function ExamSetupScreen() {
 
   useEffect(() => {
     let huy = false
-    loadScriptUrl().then(setScriptUrl)
+    layDiaChiMayChu().then(setScriptUrl).catch(() => {})
     loadTeacherSecret().then(setMaBiMat)
     loadAllSessionTeacherBanks()
       .then(async (ds) => {
@@ -184,7 +189,7 @@ export default function ExamSetupScreen() {
     })
     // Đồng bộ IM LẶNG khi mở màn (đề pipeline vừa đẩy lên tự về) — lỗi/mất
     // mạng thì bỏ qua, thầy vẫn còn nút "Đồng bộ" để bấm tay.
-    Promise.all([loadScriptUrl(), loadTeacherSecret()])
+    Promise.all([layDiaChiMayChu(), loadTeacherSecret()])
       .then(([url, mat]) => (url.trim() && mat.trim() ? dongBoNganHang(url.trim(), mat.trim()) : null))
       .then((kq) => {
         if (!kq || huy) return
@@ -274,7 +279,6 @@ export default function ExamSetupScreen() {
 
 
   const handleOpenSession = async () => {
-    if (!scriptUrl.trim()) return showToast('Chưa cấu hình địa chỉ máy chủ — vào Ngân hàng câu hỏi → Cấu hình', 'error')
     if (selectedSources.length === 0) return showToast('Chưa chọn đề nào cho ca này', 'error')
     if (!lop.trim()) return showToast('Chưa nhập lớp', 'error')
     if (!Number.isFinite(thoiGianPhut) || thoiGianPhut <= 0) return showToast('Thời gian làm bài phải lớn hơn 0', 'error')
@@ -288,7 +292,11 @@ export default function ExamSetupScreen() {
     }
 
     setOpening(true)
+    setLoiMoCa('')
+    setBuocMoCa('Đang kiểm tra kết nối…')
     try {
+      const diaChi = await voiHanCho(layDiaChiMayChu(scriptUrl), 10000, 'Chưa đọc được kết nối máy chủ. Thầy đóng các tab app khác rồi thử lại.')
+      if (!diaChi) throw new Error('Chưa có kết nối máy chủ. Thầy mở lại app khi có mạng.')
       const maCa = randomSessionCode()
       const nguonCuoi = chuan2026 ? rutDeChuan2026(selectedSources, maCa) : nguonRaDe
       const soCauCuoi = chuan2026 ? SO_CAU_CHUAN_2026 : soCauRaDe
@@ -298,8 +306,9 @@ export default function ExamSetupScreen() {
       // sách em đang đứng ở phòng chờ (thầy chốt 08/09). Gói đề đẩy lên là KHO
       // RỘNG để lúc đó còn câu mà rút.
       const publicBank = mergeAndStrip(nguonCuoi, soCauCuoi)
-      const keyBank = congBoDiem === 'khong' ? undefined : mergeKeepAnswers(nguonCuoi, soCauCuoi)
-      const moc = await publishSession(scriptUrl.trim(), maCa, lop.trim(), chuan2026 ? 50 : thoiGianPhut, publicBank, congBoDiem, keyBank, {
+      const keyBank = mergeKeepAnswers(nguonCuoi, soCauCuoi)
+      setBuocMoCa(`Đang gửi ca #${maCa} lên máy chủ…`)
+      const moc = await publishSession(diaChi, maCa, lop.trim(), chuan2026 ? 50 : thoiGianPhut, publicBank, congBoDiem, keyBank, {
         batDau: batDauIso,
         hanVaoPhut,
         tenCa: tenCa.trim(),
@@ -311,7 +320,8 @@ export default function ExamSetupScreen() {
         giuDeDoc,
         // ĐỀ RIÊNG TỰ BẬT PHÒNG CHỜ. Không có phòng chờ thì em vào là nhận đề
         // ngay, mà lúc đó bản đồ chưa dựng — em nhận bộ câu theo luật hash.
-        phongCho: phongCho || deRiengBat,
+        phongCho: phongCho || deRiengBat || dongBoGio,
+        dongBoGio,
         // Cờ chế độ lên MÁY CHỦ. `luuCheDoDeRieng` bên dưới chỉ còn là bản
         // sao ở máy này cho nhanh, không còn là nguồn sự thật duy nhất.
         deRieng: deRiengBat,
@@ -325,19 +335,26 @@ export default function ExamSetupScreen() {
       // Lưu bản CÓ đáp án trên máy thầy để màn Theo dõi chấm lại được sau này.
       // Lưu ĐÚNG bộ đã rút, không lưu cả kho: chấm lại phải tái tạo y hệt bộ
       // câu em đã làm, mà máy chủ chỉ giữ bộ đã rút.
-      await saveSessionTeacherBank(maCa, nguonCuoi)
+      // Máy chủ đã giữ đầy đủ đề, đáp án, số câu và chế độ. Bản sao cục bộ
+      // không được chặn thông báo thành công khi IndexedDB chậm/hết dung lượng.
+      const banSao = [saveSessionTeacherBank(maCa, nguonCuoi)]
       // KHO CHỮA: chỉ ở chế độ "Phân công lên bảng". Rộng hơn đề em làm để màn
       // Gọi lên bảng đủ câu chia bốn lượt. Lưu ở máy thầy, không đẩy lên máy
       // chủ — em không được thấy câu chưa làm.
-      if (!chuan2026 && boRut?.lenBang && boRut.idsChua) await luuKhoChuaCa(maCa, locNguonTheoId(selectedSources, boRut.idsChua))
-      if (soCauCuoi) await luuSoCauCa(maCa, soCauCuoi)
+      if (!chuan2026 && boRut?.lenBang && boRut.idsChua) banSao.push(luuKhoChuaCa(maCa, locNguonTheoId(selectedSources, boRut.idsChua)))
+      if (soCauCuoi) banSao.push(luuSoCauCa(maCa, soCauCuoi))
       // Đánh dấu ca này mở ở chế độ đề riêng. Bộ câu rút lúc bấm Bắt đầu.
-      if (deRiengBat) await luuCheDoDeRieng(maCa, true)
-      setOpened({ maCa, joinLink: await taoLinkMoi(maCa, scriptUrl.trim()), batDau: moc.batDau, hetHanVao: moc.hetHanVao })
+      if (deRiengBat) banSao.push(luuCheDoDeRieng(maCa, true))
+      void voiHanCho(Promise.all(banSao), 10000, 'Chưa lưu được bản sao trên máy').catch(() => {
+        showToast(`Ca #${maCa} đã lưu trên máy chủ; chưa lưu được bản sao trên máy này.`, 'error')
+      })
+      setOpened({ maCa, joinLink: taoLinkMoiTrucTiep(maCa, diaChi), batDau: moc.batDau, hetHanVao: moc.hetHanVao })
       setDaCopy(false)
       showToast('Đã mở ca', 'success')
     } catch (e) {
-      showToast(`Lỗi mở ca: ${e instanceof Error ? e.message : 'không rõ nguyên nhân'}`, 'error')
+      const loi = `Lỗi mở ca: ${e instanceof Error ? e.message : 'không rõ nguyên nhân'}`
+      setLoiMoCa(loi)
+      showToast(loi, 'error')
     } finally {
       setOpening(false)
     }
@@ -621,6 +638,14 @@ export default function ExamSetupScreen() {
           </div>
         </div>
 
+        <label className="flex items-start gap-3 rounded-xl border border-slate-200 dark:border-slate-700 p-3">
+          <input type="checkbox" role="switch" aria-label="Đồng bộ giờ cả phòng" checked={dongBoGio}
+            onChange={e => setDongBoGio(e.target.checked)} className="mt-1 h-5 w-5" />
+          <span className="text-sm text-slate-800 dark:text-slate-200"><b>Đồng bộ giờ cả phòng</b><br />
+            Bật sẽ dùng phòng chờ. Cả phòng tính giờ từ lúc thầy bấm Bắt đầu thi và cùng hết giờ; em vào muộn chỉ còn thời gian chung.
+          </span>
+        </label>
+
         {/* 2 Chế độ kiểm soát phòng thi */}
         <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-1.5">
           <div className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
@@ -629,10 +654,10 @@ export default function ExamSetupScreen() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <button
               type="button"
-              disabled={deRiengBat}
+              disabled={deRiengBat || dongBoGio}
               onClick={() => !deRiengBat && setPhongCho((v) => !v)}
               className={`tap-target p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-2 active:scale-98 ${
-                phongCho || deRiengBat
+                phongCho || deRiengBat || dongBoGio
                   ? 'bg-blue-50/70 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200 shadow-2xs'
                   : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
               } ${deRiengBat ? 'opacity-80 cursor-not-allowed' : ''}`}
@@ -647,12 +672,12 @@ export default function ExamSetupScreen() {
               </div>
               <span
                 className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
-                  phongCho || deRiengBat
+                  phongCho || deRiengBat || dongBoGio
                     ? 'bg-blue-200/80 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
                     : 'bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
                 }`}
               >
-                {phongCho || deRiengBat ? 'BẬT' : 'TẮT'}
+                {phongCho || deRiengBat || dongBoGio ? 'BẬT' : 'TẮT'}
               </span>
             </button>
 
@@ -772,7 +797,7 @@ export default function ExamSetupScreen() {
           {opening ? (
             <>
               <RefreshCw size={19} className="animate-spin" />
-              <span>Đang khởi tạo ca kiểm tra…</span>
+              <span role="status">{buocMoCa}</span>
             </>
           ) : (
             <>
@@ -783,6 +808,7 @@ export default function ExamSetupScreen() {
             </>
           )}
         </button>
+        {loiMoCa && <p role="alert" className="mt-3 rounded-xl border border-red-300 bg-red-50 p-3 text-sm text-red-800">{loiMoCa}</p>}
       </div>
 
       {/* MODAL 1: CHỌN ĐỀ KIỂM TRA (NGÂN HÀNG CÂY THƯ MỤC) */}

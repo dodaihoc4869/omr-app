@@ -12,8 +12,10 @@ import { chuanTenCa } from './ten-ca'
 import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
 import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi, xongNapDiaChi } from './may-chu-moi'
 import { layDiaChiMayChu } from './dia-chi-may-chu'
+import { taoCaDaXacNhan } from './day-ca-may-chu-moi'
+import { voiHanCho } from './han-cho'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
-import { chamDiemMoi, chiTietCaMoi, danhSachEmMoi, dayCaMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, ghiLenBangMoi, luotCuaCaMoi, napDayDuCaMoi, suaCaMoi, tienDoEmMoi, type OSuaCa } from './day-ca-may-chu-moi'
+import { chamDiemMoi, chiTietCaMoi, danhSachEmMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, ghiLenBangMoi, luotCuaCaMoi, napDayDuCaMoi, suaCaMoi, tienDoEmMoi, type OSuaCa } from './day-ca-may-chu-moi'
 import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu } from './man-ca-may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
 
@@ -193,6 +195,7 @@ export type LyDoChan =
   | 'da_nop'
   | 'chua_mo'
   | 'het_han_vao'
+  | 'het_gio_chung'
   | 'chua_co_ho_so'
   | 'khong_thuoc_khoi'
   | 'khong_trong_danh_sach'
@@ -438,8 +441,9 @@ export async function batDauThi(
   /** BIÊN BẢN lúc rút. Đi lên máy chủ để MÁY NÀO mở ca cũng đọc được, không
    * phải đúng cái máy đã bấm Bắt đầu (thầy chốt 08/09: "máy nào cũng được"). */
   bienBan?: Record<string, unknown> | null,
+  dongBoGio?: boolean,
 ): Promise<{ batDauLuc: string; daBatTruoc: boolean; thieuBoTheoEm: boolean; chuaSangMayChuMoi: boolean }> {
-  const r = await postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm, lapTheoEm, demSaiTheoEm, bienBan })
+  const r = await postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm, lapTheoEm, demSaiTheoEm, bienBan, dongBoGio })
   if (!r.ok) throw new Error(r.error || 'Không bắt đầu được ca')
 
   // ĐẨY MỐC BẮT ĐẦU VÀ BẢN ĐỒ ĐỀ RIÊNG sang máy chủ mới.
@@ -641,6 +645,8 @@ export function thongDiepChan(kq: Extract<KetQuaVaoThi, { ok: false }>, gio: (is
       return `Em đã nộp bài ca này${kq.nopLuc ? ` lúc ${gio(kq.nopLuc)}` : ''}${kq.lanThu && kq.lanThu > 1 ? ` (lần ${kq.lanThu})` : ''}. Muốn thi lại, xin thầy duyệt.`
     case 'chua_mo':
       return `Ca thi chưa mở${kq.batDau ? ` — bắt đầu lúc ${gio(kq.batDau)}` : ''}. Đợi đến giờ rồi bấm Vào thi lại.`
+    case 'het_gio_chung':
+      return 'Ca thi đã hết giờ chung. Em báo Thầy nếu cần làm bài ở ca khác.'
     case 'het_han_vao':
       return `Đã quá giờ vào phòng thi${kq.hetHanVao ? ` (hết hạn ${gio(kq.hetHanVao)})` : ''} — mã ca không còn hiệu lực.`
     case 'chua_co_ho_so':
@@ -718,6 +724,7 @@ export interface MocThoiGianCa {
   /** PHÒNG CHỜ (thầy chốt 07/09): em vào ca thì đứng ở màn chờ, chưa nhận đề.
    * Cả lớp nhận đề đúng một thời điểm khi thầy bấm "Bắt đầu thi". */
   phongCho?: boolean
+  dongBoGio?: boolean
   /** ĐỀ RIÊNG TỪNG EM. Cờ này phải lên MÁY CHỦ, không nằm lại ở máy mở ca:
    * mở ca ở điện thoại rồi bấm Bắt đầu trên máy tính thì máy tính mới biết
    * phải rút bộ câu riêng (thầy bắt được ở ca 933467, 08/09). */
@@ -777,10 +784,11 @@ export async function publishSession(
   // dòng ca vào D1 KHÔNG còn bị chặn sau lượt Sheet, nên Apps Script chậm hay
   // hỏng thì ca VẪN sẵn sàng trên máy chủ mới cho cả lớp vào thi.
   const dayMayChuMoi = (async (): Promise<boolean> => {
-      const chMoi = await layCauHinhMayChu()
-      if (!chMoi.BAT || !chMoi.URL) return false
-      const matThay = await loadTeacherSecret()
-      await dayCaMoi(
+      const [diaChi, cauHinh, matThay] = await voiHanCho(Promise.all([
+        layDiaChiMayChu(_scriptUrl), layCauHinhMayChu(), loadTeacherSecret(),
+      ]), 10000, 'Chưa đọc được cấu hình trên máy. Thầy đóng các tab app khác rồi mở lại app giáo viên.')
+      const chMoi = { ...cauHinh, URL: diaChi, BAT: !!diaChi }
+      const daLuu = await taoCaDaXacNhan(
         chMoi,
         matThay,
         {
@@ -790,13 +798,15 @@ export async function publishSession(
           batDau: batDauISO,
           hetHanVao: hetHanISO,
           thoiGianPhut,
+          soCau: bank.soCau,
           loai: moc.loai || 'thi',
           hanNop: moc.hanNop || '',
           congBo: congBoDiem,
           nguongLan: moc.nguongLan || 0,
           nguongGiay: moc.nguongGiay || 0,
           lop,
-          phongCho: moc.phongCho === true,
+          phongCho: moc.phongCho === true || moc.dongBoGio === true,
+          dongBoGio: moc.dongBoGio === true,
           giuDeDoc: moc.giuDeDoc === true,
           anHanGiay: moc.giuDeDoc === true ? moc.anHanGiay || 3 : 0,
           // BỐN CỜ NÀY TRƯỚC ĐÂY CHỈ SỐNG BÊN SHEET. Cắt Sheet mà quên chúng là
@@ -831,7 +841,7 @@ export async function publishSession(
         // `congBoSauNop` vẫn chỉ trả khi ca công bố NGAY.
         keyBank,
       )
-      return true
+      return daLuu
   })()
 
   // KHÔNG CÒN LƯỢT GHI GOOGLE SHEET.
@@ -2119,6 +2129,7 @@ export interface CaTomTat {
   phongCho?: boolean
   /** Thầy bấm "Bắt đầu thi" lúc nào. Rỗng = chưa bấm, em vẫn đang chờ. */
   batDauThiLuc?: string
+  dongBoGio?: boolean
   /** CA ĐỀ RIÊNG TỪNG EM — đọc từ máy chủ, nên máy nào mở ca cũng biết.
    * Ca mở trước 08/09 không có cột này ⇒ false, chạy y như trước. */
   deRieng?: boolean

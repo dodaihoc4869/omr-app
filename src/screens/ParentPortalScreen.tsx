@@ -611,16 +611,10 @@ export default function ParentPortalScreen() {
       <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6 pt-14 sm:pt-16 pb-24">
         {!giaoDienCu ? (
           <div className="space-y-6">
-            {/* 1. BẢNG VINH DANH */}
-            <BangVinhDanh
-              vaiTro="phuhuynh"
-              hoTen={hoTenCon}
-              sbd={sbdHienTai}
-              lop={lopCon}
-              tongSoCa={dsBaiThi.length}
-            />
+            {/* Việc học và hạn nộp hiển thị trước bảng vinh danh. */}
 
-            {/* 2. BẢNG TRỢ LÝ PHỤ HUYNH */}
+
+            {/* Báo cáo và hạn bài gia đình giao. */}
             <BangTroLyPhuHuynh
               sbd={sbdHienTai}
               hoTen={hoTenCon}
@@ -641,6 +635,13 @@ export default function ParentPortalScreen() {
               onGiaoBaiLuyen={() => {
                 void xuLyGiaoBaiLuyen1Click()
               }}
+            />
+            <BangVinhDanh
+              vaiTro="phuhuynh"
+              hoTen={hoTenCon}
+              sbd={sbdHienTai}
+              lop={lopCon}
+              tongSoCa={dsBaiThi.length}
             />
           </div>
         ) : (

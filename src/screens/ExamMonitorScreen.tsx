@@ -233,6 +233,7 @@ export default function ExamMonitorScreen() {
   // PHÒNG CHỜ (thầy chốt 07/09): ca bật phòng chờ thì em đứng ở màn trắng cho
   // tới khi thầy bấm Bắt đầu thi ngay tại đây.
   const [dangBatDau, setDangBatDau] = useState(false)
+  const [gioChungTheoCa, setGioChungTheoCa] = useState<Record<string, boolean>>({})
   const [hoiHuy, setHoiHuy] = useState(false)
   // Đã ghi điểm lên Sheet cho lượt nào (khoá `${sbd}:${lanThu}:${nopLuc}`) — không ghi lặp mỗi lần tải lại.
   const daGhiRef = useRef<Set<string>>(new Set())
@@ -812,7 +813,7 @@ export default function ExamMonitorScreen() {
           }
         }
       }
-      const kq = await batDauThi(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, boTheoEm, lapTheoEm, demSai, bienBan as unknown as Record<string, unknown>)
+      const kq = await batDauThi(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, boTheoEm, lapTheoEm, demSai, bienBan as unknown as Record<string, unknown>, gioChungTheoCa[chiTiet.ca.maCa] ?? chiTiet.ca.dongBoGio ?? false)
       for (const d of bcTranTrung) showToast(d, d.startsWith('Không dựng được') ? 'error' : 'success')
       if (kq.thieuBoTheoEm) {
         // KHÔNG NUỐT. Ca đã phát đề trước khi có bản đồ ⇒ em làm một bộ câu,
@@ -1171,6 +1172,17 @@ export default function ExamMonitorScreen() {
                     Ca này hỏi lại câu em từng sai. Bấm Bắt đầu thì máy rút bộ câu riêng cho đúng {(chiTiet.dsCho ?? []).length} em đang chờ — em vào sau đó nhận đề theo luật bốc ngẫu nhiên như ca thường.
                   </div>
                 )}
+                {chiTiet.ca.loai !== 'baitap' && (
+                  <label className="flex items-start" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)', color: 'var(--muc)' }}>
+                    <input type="checkbox" role="switch" aria-label="Đồng bộ giờ cả phòng"
+                      checked={gioChungTheoCa[chiTiet.ca.maCa] ?? chiTiet.ca.dongBoGio ?? false} disabled={dangBatDau}
+                      onChange={e => setGioChungTheoCa(c => ({ ...c, [chiTiet.ca.maCa]: e.target.checked }))}
+                      style={{ width: 22, height: 22, accentColor: 'var(--tim)' }} />
+                    <span><b>Đồng bộ giờ cả phòng</b><br />
+                      <span style={NHAN_NHO}>Bật: cả phòng tính giờ từ lúc thầy bấm Bắt đầu thi, cùng hết giờ. Em vào muộn chỉ còn thời gian chung. Tắt: mỗi em có đủ thời gian từ lúc nhận đề. Lựa chọn được lưu khi bắt đầu ca.</span>
+                    </span>
+                  </label>
+                )}
                 <div className="grid grid-cols-2" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
                   <button
                     type="button"
@@ -1208,7 +1220,7 @@ export default function ExamMonitorScreen() {
             )}
             {chiTiet.ca.phongCho && chiTiet.ca.batDauThiLuc && (
               <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>
-                Phòng chờ đã mở lúc <span style={SO}>{gio(chiTiet.ca.batDauThiLuc)}</span> — em vào từ giờ nhận đề ngay.
+                Phòng chờ đã mở lúc <span style={SO}>{gio(chiTiet.ca.batDauThiLuc)}</span> — {chiTiet.ca.dongBoGio ? `đồng bộ giờ cả phòng, cùng hết giờ lúc ${gio(new Date(Date.parse(chiTiet.ca.batDauThiLuc) + chiTiet.ca.thoiGianPhut * 60000).toISOString())}.` : 'em vào từ giờ nhận đề ngay, tính giờ riêng từng em.'}
               </div>
             )}
             {/* CỬA VÀO CA — HAI NÚT, LUÔN THẤY CẢ HAI (thầy chốt 05/09).

@@ -554,8 +554,8 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
                      cong_bo, nguong_lan, nguong_giay, bank_r2, so_cau_json, bo_theo_em_json, cap_nhat_luc,
                      lop, phong_cho, bat_dau_thi_luc, giu_de_doc, an_han_giay,
                      pham_vi, len_bang, de_rieng, pham_vi_hoi_lai, danh_sach_chon_json,
-                     mat_khau, chi_nop_3_phut_cuoi, sinh_tai_d1)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)
+                     mat_khau, chi_nop_3_phut_cuoi, dong_bo_gio, sinh_tai_d1)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)
      ON CONFLICT(ma_ca) DO UPDATE SET
        -- CHỐT CHẶN THỨ HAI: chuỗi RỖNG không được ghi đè chữ đang có. Lượt đẩy
        -- thiếu trường là chuyện thường (xem khối chiMoc ở trên); mất tên ca
@@ -588,7 +588,8 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
        pham_vi_hoi_lai=COALESCE(NULLIF(excluded.pham_vi_hoi_lai,''), ca.pham_vi_hoi_lai),
        danh_sach_chon_json=COALESCE(excluded.danh_sach_chon_json, ca.danh_sach_chon_json),
        mat_khau=COALESCE(NULLIF(excluded.mat_khau,''), ca.mat_khau),
-       chi_nop_3_phut_cuoi=excluded.chi_nop_3_phut_cuoi`,
+       chi_nop_3_phut_cuoi=excluded.chi_nop_3_phut_cuoi,
+       dong_bo_gio=CASE WHEN ca.bat_dau_thi_luc IS NULL OR ca.bat_dau_thi_luc = '' THEN excluded.dong_bo_gio ELSE ca.dong_bo_gio END`,
   )
     .bind(
       maCa, String(ca.tenCa ?? ''), String(ca.trangThai ?? 'mo'), String(ca.batDau ?? ''),
@@ -596,40 +597,42 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
       String(ca.hanNop ?? ''), String(ca.congBo ?? 'khong'), Number(ca.nguongLan) || 3,
       Number(ca.nguongGiay) || 10, bankKey, ca.soCau ? JSON.stringify(ca.soCau) : null,
       ca.boTheoEm ? JSON.stringify(ca.boTheoEm) : null, new Date().toISOString(),
-      String(ca.lop ?? ''), ca.phongCho ? 1 : 0, String(ca.batDauThiLuc ?? '') || null,
+      String(ca.lop ?? ''), ca.phongCho || ca.dongBoGio === true ? 1 : 0, String(ca.batDauThiLuc ?? '') || null,
       ca.giuDeDoc ? 1 : 0, Number(ca.anHanGiay) || 0,
       String(ca.phamVi ?? ''), ca.lenBang === false ? 0 : 1, ca.deRieng === true ? 1 : 0,
       String(ca.phamViHoiLai ?? ''),
       ca.danhSachMoi === undefined || ca.danhSachMoi === '' ? null : JSON.stringify(ca.danhSachMoi),
       String(ca.matKhau ?? '') || null,
       ca.chiNop3PhutCuoi ? 1 : 0,
+      ca.dongBoGio === true ? 1 : 0,
     )
     .run()
   return ra({ ok: true, maCa, coDe: !!bankKey })
 }
 
 /** Thầy bấm BẮT ĐẦU THI — cả lớp nhận đề đúng một thời điểm. */
-async function batDauThi(env: Env, maCa: string): Promise<Response> {
+async function batDauThi(env: Env, maCa: string, dongBoGio?: unknown): Promise<Response> {
   if (!maCa) return ra({ ok: false, error: 'Thiếu mã ca' })
-  const ca = await env.DB.prepare('SELECT bat_dau_thi_luc, de_rieng, bo_theo_em_json FROM ca WHERE ma_ca = ?')
-    .bind(maCa)
-    .first<Record<string, unknown>>()
+  const ca = await docCa(env, maCa)
   if (!ca) return ra({ ok: false, error: 'Không tìm thấy ca kiểm tra' })
-
-  // BẤM LẦN HAI GIỮ MỐC LẦN ĐẦU.
-  //
-  // Bản trước ghi đè mốc mỗi lần bấm. Giữa ca thầy bấm nhầm lần nữa là ĐỒNG HỒ
-  // CỦA CẢ LỚP CHẠY LẠI TỪ ĐẦU: em đã làm 30 phút bỗng được thêm 45 phút, còn
-  // `het_gio_luc` của những lượt đã vào thì tính theo mốc cũ — hai bên lệch
-  // nhau, và không có dấu hiệu nào trên màn.
+  if (dongBoGio !== undefined && typeof dongBoGio !== 'boolean') return ra({ ok: false, error: 'Lựa chọn đồng bộ giờ không hợp lệ' })
+  if (ca.trang_thai === 'dong' || ca.trang_thai === 'da_xoa') return ra({ ok: false, error: 'Ca đã đóng hoặc đã xoá' })
   const cu = chuoiRong(ca.bat_dau_thi_luc)
   const canBoTheoEm = Number(ca.de_rieng ?? 0) === 1
   const coBoTheoEm = chuoiRong(ca.bo_theo_em_json) !== ''
-  if (cu) return ra({ ok: true, batDauLuc: cu, daBatTruoc: true, canBoTheoEm, coBoTheoEm })
-
+  // Lặp yêu cầu hoặc hai máy cùng bấm đều giữ mốc và lựa chọn của lần đầu.
+  if (cu) return ra({ ok: true, batDauLuc: cu, daBatTruoc: true, canBoTheoEm, coBoTheoEm, dongBoGio: Number(ca.dong_bo_gio) === 1 })
+  if (dongBoGio === true && (Number(ca.phong_cho) !== 1 || ca.loai === 'baitap')) {
+    return ra({ ok: false, error: 'Đồng bộ giờ chỉ áp dụng cho ca thi có phòng chờ' })
+  }
   const luc = new Date().toISOString()
-  await env.DB.prepare('UPDATE ca SET bat_dau_thi_luc = ?, cap_nhat_luc = ? WHERE ma_ca = ?').bind(luc, luc, maCa).run()
-  return ra({ ok: true, batDauLuc: luc, daBatTruoc: false, canBoTheoEm, coBoTheoEm })
+  const r = await env.DB.prepare(`UPDATE ca SET bat_dau_thi_luc = ?, dong_bo_gio = ?, cap_nhat_luc = ?
+    WHERE ma_ca = ? AND (bat_dau_thi_luc IS NULL OR bat_dau_thi_luc = '') AND trang_thai NOT IN ('dong','da_xoa')`)
+    .bind(luc, (dongBoGio ?? (Number(ca.dong_bo_gio) === 1)) ? 1 : 0, luc, maCa).run()
+  const daLuu = await docCa(env, maCa)
+  if (!daLuu?.bat_dau_thi_luc) return ra({ ok: false, error: 'Ca vừa thay đổi. Thầy tải lại ca rồi thử lại.' })
+  return ra({ ok: true, batDauLuc: daLuu.bat_dau_thi_luc, daBatTruoc: r.meta.changes === 0,
+    canBoTheoEm, coBoTheoEm, dongBoGio: Number(daLuu.dong_bo_gio) === 1 })
 }
 
 /** Đọc một ô có thể null thành chuỗi đã cắt khoảng trắng. */
@@ -908,6 +911,7 @@ async function danhSachCaMoi(env: Env, daXoa: boolean): Promise<Response> {
       anHanGiay: Number(v.an_han_giay) || 0,
       phongCho: Number(v.phong_cho ?? 0) === 1,
       batDauThiLuc: String(v.bat_dau_thi_luc ?? ''),
+      dongBoGio: Number(v.dong_bo_gio) === 1,
       xoaLuc: String(v.xoa_luc ?? ''),
       daVao: Math.max(Number(t.da_vao) || 0, chup.da_vao),
       daNop: Math.max(Number(t.da_nop) || 0, chup.da_nop),
@@ -1100,6 +1104,7 @@ async function chiTietCaMoi(env: Env, maCa: string): Promise<Response> {
       batDau: String(ca.bat_dau ?? ''),
       hetHanVao: String(ca.het_han_vao ?? ''),
       batDauThiLuc: String(ca.bat_dau_thi_luc ?? ''),
+      dongBoGio: Number(ca.dong_bo_gio) === 1,
       thoiGianPhut: Number(ca.thoi_gian_phut) || 45,
       loai: String(ca.loai ?? '') === 'baitap' ? 'baitap' : 'thi',
       hanNop: String(ca.han_nop ?? ''),
@@ -2550,7 +2555,7 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
 
     // ---- CA THI ----------------------------------------------------------
     case 'publish': return dayCa(env, b)
-    case 'batDauThi': return batDauThi(env, String(b.maCa ?? ''))
+    case 'batDauThi': return batDauThi(env, String(b.maCa ?? ''), b.dongBoGio)
     case 'chiTietCa': {
       // Đường cũ trả `{ok:false}` khi không có ca, và màn Theo dõi dựa vào đó.
       // Đường mới trả `{ok:true, coCa:false}` (hình dáng riêng của nó), nên chỗ
@@ -2761,12 +2766,20 @@ export default {
       if (p === '/teacher-news') return ra(await teacherNews(env,b))
       if (p === '/game-v2-admin') return ra(await adminGame(env,b))
       if (p === '/ca/day') return dayCa(env, b)
+      if (p === '/ca/xac-nhan') {
+        const maCa = String(b.maCa ?? '')
+        const ca = await docCa(env, maCa)
+        const khop = ca && ca.bat_dau === String(b.batDau ?? '') && (ca.ten_ca || '') === String(b.tenCa ?? '')
+        const de = khop && b.canDe ? await env.DE.get(ca!.bank_r2 || `de/${maCa}.json`) : true
+        const key = khop && b.canKey ? await env.DE.get(`key/${maCa}.json`) : true
+        return ra({ ok: true, daLuu: !!(khop && de && key) })
+      }
       if (p === '/danh-sach/day') return dayDanhSach(env, b)
       if (p === '/phieu/day') return dayPhieu(env, b)
       if (p === '/phieu/xoa') return xoaPhieuR2(env, String(b.ma ?? ''))
       if (p === '/chua-day') return chuaDay(env, String(b.maCa ?? ''))
       if (p === '/da-day') return danhDauDaDay(env, b)
-      if (p === '/ca/bat-dau') return batDauThi(env, String(b.maCa ?? ''))
+      if (p === '/ca/bat-dau') return batDauThi(env, String(b.maCa ?? ''), b.dongBoGio)
       if (p === '/theo-doi') return xemTheoDoi(env, String(b.maCa ?? ''))
       if (p === '/ca/luot') return luotCuaCa(env, String(b.maCa ?? ''))
       if (p === '/ca/nhieu') return dayNhieuCa(env, b)

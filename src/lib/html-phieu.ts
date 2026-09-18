@@ -210,6 +210,12 @@ export const CSS_PHIEU = `
   --kem-nhan: #92400e;
   --bo: 24px;
   --bo-nho: 14px;
+  --o-nen: #ffffff;
+  --o-chu: #334155;
+  --chu-cai-nen: #f1f5f9;
+  --chu-cai-muc: #475569;
+  --chon-nen: #eef2f6;
+  --chon-vien: #2f3e46;
   --bong: 0 2px 10px rgba(0,0,0,.04);
   --bong-cao: 0 8px 30px rgba(0,0,0,.08);
   --muot: .25s cubic-bezier(.4, 0, .2, 1);
@@ -219,6 +225,12 @@ export const CSS_PHIEU = `
   :root {
     color-scheme: dark;
     --nen: #0b1120;
+  --o-nen: #0f172a;
+  --o-chu: #e2e8f0;
+  --chu-cai-nen: #1e293b;
+  --chu-cai-muc: #cbd5e1;
+  --chon-nen: #263b55;
+  --chon-vien: #93c5fd;
     --the-nen: #1e293b;
     --muc: #f8fafc;
     --muc-2: #cbd5e1;
@@ -231,24 +243,18 @@ export const CSS_PHIEU = `
     --kem-muc: #fef3c7;
     --kem-nhan: #fbbf24;
   }
-  .q-card { background: #1e293b; border-color: #334155; }
-  .q-text { color: #f8fafc; }
-  .thanh { background: rgba(30, 41, 59, 0.95); border-color: #334155; color: #f8fafc; }
-  .sa-input { background: #0f172a; color: #f8fafc; border-color: #475569; }
-  .sa-input:focus { background: #1e293b; color: #ffffff; border-color: #3b82f6; }
-  .q-opt { background: #0f172a; border-color: #334155; color: #e2e8f0; }
-  .q-opt-letter { background: #1e293b; color: #cbd5e1; border-color: #334155; }
-  .tf-statement { background: #0f172a; border-color: #334155; color: #e2e8f0; }
-  .chan { color: #94a3b8; }
-  .sol-box { background: #292524; border-color: #78350f; color: #fef3c7; }
-  .chua-gi, .lam-lai, .nhac-phieu { background: #292524; border-color: #78350f; color: #fef3c7; }
-  .chua-gi li { color: #fef3c7; }
-  .em-hoi { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+
 }
 
 :root.dark, body.dark, [data-theme="dark"] {
   color-scheme: dark;
   --nen: #0b1120;
+  --o-nen: #0f172a;
+  --o-chu: #e2e8f0;
+  --chu-cai-nen: #1e293b;
+  --chu-cai-muc: #cbd5e1;
+  --chon-nen: #263b55;
+  --chon-vien: #93c5fd;
   --the-nen: #1e293b;
   --muc: #f8fafc;
   --muc-2: #cbd5e1;
@@ -262,23 +268,6 @@ export const CSS_PHIEU = `
   --kem-nhan: #fbbf24;
 }
 
-@media screen {
-  :root.dark .q-card, body.dark .q-card, [data-theme="dark"] .q-card { background: #1e293b; border-color: #334155; }
-  :root.dark .q-text, body.dark .q-text, [data-theme="dark"] .q-text { color: #f8fafc; }
-  :root.dark .thanh, body.dark .thanh, [data-theme="dark"] .thanh { background: rgba(30, 41, 59, 0.95); border-color: #334155; color: #f8fafc; }
-  :root.dark .sa-input, body.dark .sa-input, [data-theme="dark"] .sa-input { background: #0f172a; color: #f8fafc; border-color: #475569; }
-  :root.dark .sa-input:focus, body.dark .sa-input:focus, [data-theme="dark"] .sa-input:focus { background: #1e293b; color: #ffffff; border-color: #3b82f6; }
-  :root.dark .q-opt, body.dark .q-opt, [data-theme="dark"] .q-opt { background: #0f172a; border-color: #334155; color: #e2e8f0; }
-  :root.dark .q-opt-letter, body.dark .q-opt-letter, [data-theme="dark"] .q-opt-letter { background: #1e293b; color: #cbd5e1; border-color: #334155; }
-  :root.dark .tf-statement, body.dark .tf-statement, [data-theme="dark"] .tf-statement { background: #0f172a; border-color: #334155; color: #e2e8f0; }
-  :root.dark .chan, body.dark .chan, [data-theme="dark"] .chan { color: #94a3b8; }
-  :root.dark .sol-box, body.dark .sol-box, [data-theme="dark"] .sol-box { background: #292524; border-color: #78350f; color: #fef3c7; }
-  :root.dark .chua-gi, body.dark .chua-gi, [data-theme="dark"] .chua-gi,
-  :root.dark .lam-lai, body.dark .lam-lai, [data-theme="dark"] .lam-lai,
-  :root.dark .nhac-phieu, body.dark .nhac-phieu, [data-theme="dark"] .nhac-phieu { background: #292524; border-color: #78350f; color: #fef3c7; }
-  :root.dark .chua-gi li, body.dark .chua-gi li, [data-theme="dark"] .chua-gi li { color: #fef3c7; }
-  :root.dark .em-hoi, body.dark .em-hoi, [data-theme="dark"] .em-hoi { background: #1e293b; border-color: #334155; color: #e2e8f0; }
-}
 
 /* DẢI 4 MÀU THƯƠNG HIỆU GOOGLE (CHUẨN MẪU MOM GIAO) */
 .google-bar {
@@ -519,7 +508,7 @@ button.topic-item.chon .topic-cau, button.topic-item.chon .topic-cd { color: var
    chỉ đọc, nhưng vẫn là nút với trình duyệt — đó mới là thứ làm cú chạm ăn. */
 button.lam-o {
   appearance: none; -webkit-appearance: none;
-  font: inherit; color: inherit; text-align: left; margin: 0;
+  font: inherit; text-align: left; margin: 0;
 }
 .lam-o {
   cursor: pointer; -webkit-tap-highlight-color: transparent;
@@ -543,14 +532,14 @@ body.co-lam .tf-badge.lam-o::after { content: ''; position: absolute; inset: -6p
 body.co-lam .tf-o { gap: 12px; }
 body.co-lam .tf-item { padding: 9px 10px; }
 .q-opt.lam-o { transition: background-color .12s, border-color .12s; }
-.q-opt.lam-o[aria-checked="true"] { background: #eef2f6; border-color: #2f3e46; }
+.q-opt.lam-o[aria-checked="true"] { background: var(--chon-nen); border-color: var(--chon-vien); }
 .q-opt.lam-o[aria-checked="true"] .q-opt-letter { background: #2f3e46; color: #ffffff; }
 .tf-badge.lam-o { transition: background-color .12s, border-color .12s, color .12s; }
 .tf-badge.lam-o[aria-checked="true"] { background: #2f3e46; border-color: #2f3e46; color: #ffffff; }
 .lam-o:focus-visible { outline: 3px solid rgba(47,62,70,.35); outline-offset: 2px; }
 .lam-nhap {
   width: 100%; max-width: 260px; height: 40px; border-radius: 10px; border: 1px solid #e4e0d7;
-  padding: 0 14px; font: inherit; font-size: 14px; color: #1c1c20; background: #ffffff;
+  padding: 0 14px; font: inherit; font-size: 14px; color: var(--muc); background: var(--o-nen);
 }
 .lam-nhap:focus { outline: none; border-color: #2f3e46; }
 /* Sau khi nộp: khoá ô lại và tô đúng/sai. Màu KHÔNG đứng một mình — mỗi thẻ
@@ -561,10 +550,10 @@ body.co-lam .tf-item { padding: 9px 10px; }
 .q-card.cau-sai .lam-ket { color: #b42318; }
 
 /* Thanh nộp và dải kết quả. */
-.nop-chu { flex: 1; min-width: 0; font-size: 12.5px; color: #67646f; }
+.nop-chu { flex: 1; min-width: 0; font-size: 12.5px; color: var(--muc-2); }
 .nut.nop { background: #16171a; color: #ffffff; }
 .nut.nop[disabled] { opacity: .5; cursor: default; }
-.nop-ket { font-weight: 700; font-size: 14px; color: #1c1c20; }
+.nop-ket { font-weight: 700; font-size: 14px; color: var(--muc); }
 .nop-loi { font-size: 12.5px; color: #b42318; }
 
 /* ================= THANH ĐIỀU KHIỂN ================= */
@@ -572,12 +561,13 @@ body.co-lam .tf-item { padding: 9px 10px; }
   position: sticky; top: 0; z-index: 20;
   display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
   margin: 0 auto 18px; padding: 11px 13px;
-  background: rgba(255,255,255,.92);
+  background: var(--the-nen);
   -webkit-backdrop-filter: saturate(180%) blur(14px);
   backdrop-filter: saturate(180%) blur(14px);
   border: 1px solid var(--vien); border-radius: 22px;
   box-shadow: 0 2px 4px rgba(15,48,87,.04), 0 14px 34px -10px rgba(15,48,87,.16);
 }
+body.co-lam .thanh:not(#thanh-nop) { position: static; }
 .thanh-chu { flex: 1 1 100%; min-width: 120px; font-size: 13px; font-weight: 600; color: var(--nhat); }
 /* Nút chính CHIẾM CHỖ CÒN LẠI của hàng dưới — thanh nhìn cân, và trên điện
    thoại 360px vùng chạm rộng hết cỡ thay vì một viên thuốc bé tí ở góc. */
@@ -650,7 +640,7 @@ body.co-lam .tf-item { padding: 9px 10px; }
 .q-tag.level-1 { background: #ecfdf5; color: #047857; }
 .q-tag.level-2 { background: #fdf2f8; color: #be185d; }
 .q-tag.level-3 { background: #fff7ed; color: #c2410c; }
-.q-tag.topic { background: #f1f5f9; color: #475569; }
+.q-tag.topic { background: var(--chu-cai-nen); color: var(--chu-cai-muc); }
 /* NHÃN CHỮA — lý do câu này có mặt trên phiếu, nên phải đọc thấy trước ba nhãn
    kia. Thầy chốt 07/09: "gắn màu nào cho nổi bật lên".
    Cam đậm: ba nhãn còn lại đều là màu pastel nhạt (xanh nhạt, hồng nhạt, xám),
@@ -831,14 +821,14 @@ body.co-lam .tf-item { padding: 9px 10px; }
 .q-opt {
   display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 10px 16px;
   width: 100%; box-sizing: border-box;
-  background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 16px;
-  font-size: 14.5px; line-height: 1.5; color: #334155; font-weight: 500;
+  background: var(--o-nen); border: 1.5px solid var(--vien); border-radius: 16px;
+  font-size: 14.5px; line-height: 1.5; color: var(--o-chu); font-weight: 500;
   box-shadow: 0 1px 2px rgba(0,0,0,0.02);
   transition: background-color var(--muot), border-color var(--muot), color var(--muot);
 }
 .q-opt-letter {
   flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
-  background: #f1f5f9; color: #475569;
+  background: var(--chu-cai-nen); color: var(--chu-cai-muc);
   display: flex; align-items: center; justify-content: center;
   font-size: 13px; font-weight: 800; line-height: 1;
   transition: background-color var(--muot), color var(--muot);
@@ -866,7 +856,7 @@ body.co-lam .tf-item { padding: 9px 10px; }
   transition: background-color var(--muot);
 }
 .tf-item + .tf-item { margin-top: 4px; }
-.q-card.mo .tf-item { background: #f8fafc; }
+.q-card.mo .tf-item { background: var(--o-nen); }
 .tf-statement { flex: 1; min-width: 0; font-size: 14.5px; line-height: 1.55; color: var(--muc-2); overflow-wrap: break-word; }
 .tf-o { display: flex; gap: 10px; flex-shrink: 0; }
 .tf-badge {
@@ -877,7 +867,7 @@ body.co-lam .tf-item { padding: 9px 10px; }
      dat san cho o chua chon la noi doi bang hinh thuc. O da chon van noi bat vi
      no doi ca NEN lan MAU CHU, khong can muon them do dam. */
   font-size: 14px; font-weight: 500;
-  background: #f1f5f9; color: var(--rat-nhat); border: 1px solid var(--vien);
+  background: var(--chu-cai-nen); color: var(--chu-cai-muc); border: 1px solid var(--vien);
   transition: background-color var(--muot), color var(--muot), border-color var(--muot);
 }
 .q-card.mo .tf-badge.d.dung { background: var(--dung-nen); color: var(--dung-muc); border-color: var(--dung); }
@@ -904,7 +894,7 @@ body.co-lam .tf-item { padding: 9px 10px; }
 .q-bang-cuon { overflow-x: auto; margin: 12px 0; }
 .q-bang { width: 100%; border-collapse: collapse; font-size: 14px; }
 .q-bang th, .q-bang td { border: 1px solid var(--vien-dam); padding: 7px 12px; text-align: center; color: var(--muc-2); white-space: nowrap; }
-.q-bang th { background: #f1f5f9; font-weight: 700; }
+.q-bang th { background: var(--o-nen); font-weight: 700; }
 
 /* ================= NÚT MỞ LỜI GIẢI ================= */
 .q-nut-giai {
@@ -967,7 +957,7 @@ body.co-lam .tf-item { padding: 9px 10px; }
   margin: -4px 0 0; padding: 9px 14px;
   border: 1px solid var(--vien); border-top: none;
   border-radius: 0 0 12px 12px;
-  background: #f8fafc;
+  background: var(--the-nen);
   font-size: 13.5px; line-height: 1.6; color: var(--muc-2);
   overflow-wrap: break-word;
 }
@@ -1027,6 +1017,7 @@ body.co-lam .tf-item { padding: 9px 10px; }
    Bấm In rồi chọn "Lưu thành PDF" là ra bản chữ vector, nét và bôi đen chọn
    được. Bản in MỞ SẴN mọi lời giải: trên giấy không bấm được. */
 @media print {
+  :root, :root.dark, body.dark, [data-theme="dark"] { color-scheme: light; --nen: #ffffff; --the-nen: #ffffff; --muc: #0f172a; --muc-2: #334155; --nhat: #475569; --o-nen: #ffffff; --o-chu: #334155; --chu-cai-nen: #f1f5f9; --chu-cai-muc: #475569; --chon-nen: #eef2f6; --chon-vien: #2f3e46; }
   body { background: #ffffff; }
   .khung { max-width: none; padding: 0; }
   /* Trên giấy không bấm được: bỏ thanh điều khiển, nút mở lời giải và mọi gợi
@@ -1139,7 +1130,7 @@ body.chi-de #mo-het, body.chi-de .thanh-chu b { display: none; }
    mà không lộ đáp án (thầy báo tối 08/09: "bấm 1 đáp án ra hết 4 đáp án").
    Hai yêu cầu ấy chỉ cùng thoả khi màu ô-đang-chọn KHÔNG phụ thuộc lớp dung. */
 body.chua-nop .q-opt.lam-o[aria-checked="true"],
-body.chi-de .q-opt.lam-o[aria-checked="true"] { background: #eef2f6 !important; border-color: #2f3e46 !important; color: var(--muc) !important; font-weight: 600 !important; }
+body.chi-de .q-opt.lam-o[aria-checked="true"] { background: var(--chon-nen) !important; border-color: var(--chon-vien) !important; color: var(--muc) !important; font-weight: 600 !important; }
 body.chua-nop .q-opt.lam-o[aria-checked="true"] .q-opt-letter,
 body.chi-de .q-opt.lam-o[aria-checked="true"] .q-opt-letter { background: #2f3e46 !important; color: #ffffff !important; }
 body.chua-nop .tf-badge.lam-o[aria-checked="true"],
@@ -1152,13 +1143,13 @@ body.chi-de .tf-badge.lam-o[aria-checked="true"] { background: #2f3e46 !importan
 .pdf-chon {
   position: absolute; right: 0; bottom: calc(100% + 10px); z-index: 30;
   display: flex; flex-direction: column; gap: 10px; width: max-content; min-width: 214px; max-width: 78vw;
-  padding: 14px; border-radius: 20px; background: #fff;
+  padding: 14px; border-radius: 20px; background: var(--the-nen);
   border: 1px solid var(--vien); box-shadow: 0 4px 10px rgba(15,23,42,.06), 0 22px 50px -14px rgba(15,23,42,.32);
 }
 .pdf-chon[hidden] { display: none; }
 .pdf-chon button {
   display: block; width: 100%; text-align: left; min-height: 48px;
-  padding: 12px 18px; border-radius: 999px; border: 1px solid var(--vien-dam); background: #fff;
+  padding: 12px 18px; border-radius: 999px; border: 1px solid var(--vien-dam); background: var(--o-nen);
   font: inherit; font-size: 14.5px; font-weight: 800; color: var(--muc); cursor: pointer;
   transition: background-color var(--muot), border-color var(--muot);
 }

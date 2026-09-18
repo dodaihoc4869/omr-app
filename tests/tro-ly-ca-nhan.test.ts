@@ -23,7 +23,7 @@ describe('Thuật toán Trợ lý Cá nhân AI (tro-ly-ca-nhan.ts)', () => {
       const budget = tinhNganSachNgay(18, 5, 90, 0)
       expect(budget.mucTieuCau).toBe(8)
       expect(budget.trangThaiTai).toBe('go_no_giam_tai')
-      expect(budget.chuThich).toContain('giảm tải gỡ nợ')
+      expect(budget.chuThich).toContain('Gợi ý giảm tải')
     })
 
     it('giảm tải xuống 8 câu khi có quá nhiều câu sai tồn đọng (>= 20 câu)', () => {

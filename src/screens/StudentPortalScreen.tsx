@@ -1,7 +1,10 @@
+import BangTroLyHocSinh from '../components/BangTroLyHocSinh'
+import NhanHanBaiTap from '../components/NhanHanBaiTap'
+import { mocThoiGian } from '../lib/han-bai-tap'
+import { useGioHocTap } from '../hooks/useGioHocTap'
 import ThongBaoHocSinh,{noticeApi} from '../components/ThongBaoHocSinh'
 import BangTinPhuHuynh from '../components/BangTinPhuHuynh'
 import BangVinhDanh from '../components/BangVinhDanh'
-import BangTroLyHocSinh from '../components/BangTroLyHocSinh'
 import CardCaThiGanNhat from '../components/CardCaThiGanNhat'
 import {MomQuestionStem,MomOption} from '../components/MomQuestionMedia'
 import {momApi, momReviewHtml} from '../lib/mom-api'
@@ -175,6 +178,7 @@ function ChoNapGame() {
 }
 
 export default function StudentPortalScreen() {
+  const nowHocTap = useGioHocTap()
   const [auth, setAuth] = useState<ThongTinHs | null>(() => {
     try {
       const luu = localStorage.getItem(KHOA_LUU_AUTH)
@@ -357,6 +361,7 @@ export default function StudentPortalScreen() {
 
   const batDauLamBaiMom = async (bai: BaiMomGiao) => {
     if (!auth) return
+    setTab('mom')
     try {
       const data = await momApi('start', {token:auth.token,id:bai.id})
       const capNhat = chuanHoaBaiMom(data.item)
@@ -374,7 +379,8 @@ export default function StudentPortalScreen() {
         try {
           const rev = await momApi('review', { token: auth.token, id: bai.id })
           if (rev?.item) setPhieuHtml(momReviewHtml(chuanHoaBaiMom(rev.item)))
-        } catch {}
+          else setLoiMom('Chưa tải được kết quả. Em thử lại.')
+        } catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được kết quả. Em thử lại.') }
         return
       }
       setDangLamMom(capNhat)
@@ -1340,18 +1346,12 @@ export default function StudentPortalScreen() {
         </header>
       )}
 
-      {auth.token && !dangLamMom && !manThi && (
+      {auth.token && !(tab === 'mom' && dangLamMom) && !manThi && (
         <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-14 sm:pt-16 space-y-6">
           {!giaoDienCu ? (
             <>
-              {/* 1. BẢNG VINH DANH */}
-              <BangVinhDanh
-                vaiTro="hocsinh"
-                hoTen={auth.hoTen}
-                sbd={auth.sbd}
-                lop={auth.lop}
-                tongSoCa={dsLichSu.length}
-              />
+              {/* Việc học và hạn nộp hiển thị trước bảng vinh danh. */}
+
 
               {/* 2. Ô HIỂN THỊ KẾT QUẢ CA THI GẦN NHẤT */}
               {caGanNhat && (
@@ -1361,7 +1361,7 @@ export default function StudentPortalScreen() {
                 />
               )}
 
-              {/* 3. TRỢ LÝ HỌC TẬP CÁ NHÂN TOÀN DIỆN ĐỖ ĐẠI HỌC AI */}
+              {/* Kế hoạch dựa trên bài được giao. */}
               <BangTroLyHocSinh
                 sbd={auth.sbd}
                 hoTen={auth.hoTen}
@@ -1372,6 +1372,14 @@ export default function StudentPortalScreen() {
                 hoSoThanThu={hoSoThanThu}
                 onAction={xuLyHanhDongTroLy}
                 onMoGame={() => setTab('thanthu')}
+              />
+
+              <BangVinhDanh
+                vaiTro="hocsinh"
+                hoTen={auth.hoTen}
+                sbd={auth.sbd}
+                lop={auth.lop}
+                tongSoCa={dsLichSu.length}
               />
             </>
           ) : (
@@ -1396,6 +1404,7 @@ export default function StudentPortalScreen() {
                 onAction={xuLyHanhDongTroLy}
                 onMoGame={() => setTab('thanthu')}
               />
+
 
               <BangTinPhuHuynh
                 sbd={auth.sbd}
@@ -1436,7 +1445,7 @@ export default function StudentPortalScreen() {
               <h2 className="font-bold text-xs sm:text-base text-slate-900 dark:text-white truncate">
                 {tab === 'diem' && 'Xem Điểm & Lịch Sử Ca Thi'}
                 {tab === 'btvn' && 'Bài Tập Về Nhà'}
-                {tab === 'mom' && 'Bài Của Mom Giao (Hạn 2 tiếng)'}
+                {tab === 'mom' && 'Bài gia đình giao (120 phút từ khi bắt đầu)'}
                 {tab === 'khacphuc' && 'Khắc Phục Lỗi Sai & Luyện Đề'}
                 {tab === 'vaothi' && 'Vào Phòng Thi Trực Tuyến'}
                 {tab === 'thanthu' && 'Thần Thú Hóa Học (Alchemon)'}
@@ -1662,7 +1671,7 @@ export default function StudentPortalScreen() {
               </div>
             ) : (
               <div role="region" aria-label="Bài tập về nhà" tabIndex={0} className="space-y-3 max-h-[65vh] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-3 sm:p-4">
-                {dsBtvn.map((bt) => (
+                {[...dsBtvn].sort((a, b) => Number(!!a.daNop) - Number(!!b.daNop) || (mocThoiGian(a.hanNop) ?? Infinity) - (mocThoiGian(b.hanNop) ?? Infinity)).map((bt) => (
                   <div
                     key={bt.maBtvn || bt.maCa}
                     className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4"
@@ -1693,7 +1702,7 @@ export default function StudentPortalScreen() {
                       <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-1.5">
                         {bt.soCau > 0 && <span>Số câu: <strong>{bt.soCau}</strong></span>}
                         {bt.hanNop && (
-                          <span>Hạn nộp: <strong className="text-rose-600 dark:text-rose-400">{dinhDangNgayGio(bt.hanNop)}</strong></span>
+                          <NhanHanBaiTap han={bt.hanNop} now={nowHocTap} daNop={!!bt.daNop} />
                         )}
                         {bt.nopLuc && (
                           <span>Nộp lúc: {dinhDangNgayGio(bt.nopLuc)}</span>
@@ -1705,7 +1714,7 @@ export default function StudentPortalScreen() {
                       {bt.daNop && bt.diem !== null && (
                         <div className="text-right mr-1">
                           <div className="text-base font-bold text-emerald-600 dark:text-emerald-400">
-                            {bt.diem.toFixed(2)}đ
+                            {typeof bt.diem === 'number' && Number.isFinite(bt.diem) ? `${bt.diem.toFixed(2)}đ` : 'Chưa có điểm'}
                           </div>
                           <div className="text-[11px] text-slate-400">
                             {bt.soDung}/{bt.soCau} câu đúng
@@ -1726,7 +1735,7 @@ export default function StudentPortalScreen() {
                             <span>Xem lại bài</span>
                           </button>
 
-                          {(bt.soLanLamLaiConLai ?? 3) > 0 ? (
+                          {(bt.soLanLamLaiConLai ?? 3) > 0 && (mocThoiGian(bt.hanNop) ?? Infinity) > nowHocTap ? (
                             <button
                               type="button"
                               onClick={() => void moBaiTap(bt, true)}
@@ -1743,10 +1752,12 @@ export default function StudentPortalScreen() {
                             </button>
                           ) : (
                             <span className="text-[11px] text-slate-400 italic px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-full">
-                              Hết lượt làm lại (3/3)
+                              {(mocThoiGian(bt.hanNop) ?? Infinity) <= nowHocTap ? 'Cần Thầy gia hạn để làm lại' : 'Đã hết lượt làm lại'}
                             </span>
                           )}
                         </>
+                      ) : (mocThoiGian(bt.hanNop) ?? Infinity) <= nowHocTap ? (
+                        <p className="text-xs text-amber-800 dark:text-amber-200">Đã hết hạn. Em báo Thầy để được gia hạn.</p>
                       ) : (
                         <button
                           type="button"

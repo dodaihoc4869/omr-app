@@ -6,13 +6,18 @@ export function randomSessionCode(): string {
   return String(Math.floor(100000 + Math.random() * 900000))
 }
 
+/** Dựng link ngay, không để việc tải cấu hình giữ màn mở ca ở trạng thái chờ. */
+export function taoLinkMoiTrucTiep(maCa: string, scriptUrl: string): string {
+  return `${location.origin}${import.meta.env.BASE_URL}?examCode=${maCa}&api=${encodeURIComponent(scriptUrl)}`
+}
+
 /** Link mời NGẮN: <origin>/omr-app/t/<mã ca> (public/404.html chuyển hướng về
  * ?examCode=…; máy em lấy link Apps Script từ public/cau-hinh.json). Chỉ dùng
  * link ngắn khi link trong cau-hinh.json ĐÚNG BẰNG link thầy đang dùng — lệch
  * thì quay về link dài có &api=… để em không nộp nhầm chỗ. */
 export async function taoLinkMoi(maCa: string, scriptUrl: string): Promise<string> {
   const base = import.meta.env.BASE_URL
-  const linkDai = `${location.origin}${base}?examCode=${maCa}&api=${encodeURIComponent(scriptUrl)}`
+  const linkDai = taoLinkMoiTrucTiep(maCa, scriptUrl)
   try {
     const res = await fetch(`${base}cau-hinh.json`, { cache: 'no-cache' })
     if (!res.ok) return linkDai

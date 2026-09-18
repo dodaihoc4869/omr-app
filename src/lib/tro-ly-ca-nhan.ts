@@ -1,11 +1,6 @@
-// THUẬT TOÁN TRỢ LÝ CÁ NHÂN ĐỖ ĐẠI HỌC AI (PERSONAL LEARNING CO-PILOT)
-//
-// Phục vụ học sinh:
-// 1. Quản lý toàn diện deadline (BTVN Thầy giao, Bài Mom giao 2 tiếng, Ca thi).
-// 2. Quản lý ngân sách học tập thích ứng (Anti-Burnout Budget: 8-16 câu/ngày).
-// 3. Chu kỳ bịt lỗ hổng câu sai (Spaced Repetition Vòng 1 -> Vòng 2).
-// 4. Ma trận ưu tiên động trích xuất Top 3 việc quan trọng nhất hôm nay (1-Click Action).
-// 5. Thần Thú đồng hành (EXP, Streak, Tinh lực phát sáng).
+// Tổng hợp việc cần làm từ bài đã giao. Không thay đổi bộ rút câu hoặc luật chấm.
+import { chuoiNgayHoc, hanBaiMom, mocThoiGian, ngayVietNam } from './han-bai-tap'
+import { gioMayChu } from './gio-may-chu'
 
 export type LoaiNhiemVu =
   | 'btvn_vong1'
@@ -91,6 +86,7 @@ export function dinhDangConLai(ms?: number): string {
   if (ms === undefined || Number.isNaN(ms)) return 'Không rõ'
   if (ms <= 0) return 'Đã quá hạn'
   const phut = Math.floor(ms / (60 * 1000))
+  if (ms < 60_000) return 'Còn dưới 1 phút'
   if (phut < 60) return `Còn ${phut} phút`
   const gio = Math.floor(phut / 60)
   const phutLe = phut % 60
@@ -119,27 +115,27 @@ export function tinhNganSachNgay(
 } {
   let mucTieu = 12
   let trangThaiTai: 'nhe_nhang' | 'vua_suc' | 'go_no_giam_tai' = 'vua_suc'
-  let chuThich = 'Nhịp độ học tập tiêu chuẩn: 12 câu (~18 phút) để duy trì phản xạ và tiến bộ.'
+  let chuThich = 'Gợi ý luyện thêm: 12 câu, khoảng 18 phút. Bài được giao vẫn cần nộp đủ trước hạn.'
 
   // Khi học sinh đang bị tồn đọng nhiều bài (>= 15 câu nợ hoặc >= 20 câu sai)
   if (tongPending >= 15 || tongCauSai >= 20) {
     mucTieu = 8
     trangThaiTai = 'go_no_giam_tai'
-    chuThich = 'Đang giảm tải gỡ nợ: Tập trung 8 câu Vòng 1 Lõi Căn Bản để giải tỏa áp lực và lấy lại tự tin.'
+    chuThich = 'Gợi ý giảm tải: bắt đầu với 8 câu. Nếu không kịp bài đến hạn, em báo Thầy để sắp xếp.'
   } else if (tongPending >= 6 || tongCauSai >= 10) {
     mucTieu = 10
     trangThaiTai = 'vua_suc'
-    chuThich = 'Tải học tập vừa sức: 10 câu trọng tâm (~15 phút) giúp hoàn thành chỉ tiêu mà không ngợp.'
+    chuThich = 'Gợi ý luyện thêm: 10 câu, khoảng 15 phút. Mốc này không thay yêu cầu của bài được giao.'
   } else if (tongPending <= 2 && tongCauSai <= 4) {
     // Học sinh theo kịp tiến độ tốt
     if (vanTocGiayMoiCau < 75) {
       mucTieu = 16
       trangThaiTai = 'nhe_nhang'
-      chuThich = 'Phong độ xuất sắc: 16 câu (kèm câu Vòng 3 Thử Thách) để bứt phá điểm 9-10 và nhân đôi EXP Thần Thú.'
+      chuThich = 'Gợi ý luyện thêm: tối đa 16 câu. Em có thể dừng sau phần bắt buộc.'
     } else {
       mucTieu = 12
       trangThaiTai = 'vua_suc'
-      chuThich = 'Tiến độ rất tốt: Duy trì 12 câu đều đặn mỗi ngày để nắm chắc điểm 8+.'
+      chuThich = 'Gợi ý luyện thêm: 12 câu. Số câu đã làm chưa chứng minh em đã nhớ kiến thức.'
     }
   }
 
@@ -247,10 +243,11 @@ export function tongHopKeHoachTroLy(input: {
   dsLichSu: any[]
   tongCauSai: number
   hoSoThanThu?: any
+  now?: number
 }): KeHoachNgayTroLy {
   const { sbd: _sbd, hoTen, dsBtvn, dsMomGiao, dsLichSu, tongCauSai, hoSoThanThu } = input
 
-  const now = Date.now()
+  const now = input.now ?? gioMayChu()
 
   // 1. Phân tích Bài Mom giao
   const momChuaNop = dsMomGiao.filter((b) => b.trangThai !== 'da_nop')
@@ -258,18 +255,21 @@ export function tongHopKeHoachTroLy(input: {
 
   const tongPending = momChuaNop.length + btvnChuaNop.length
 
-  // 2. Tính số câu đã làm hôm nay
+  // Đếm câu có số lượng xác nhận, theo ngày Việt Nam. Thiếu số liệu không tự bù 10 câu.
   let soCauDaLamHomNay = 0
-  const homNayIso = new Date().toISOString().slice(0, 10)
-  for (const c of dsLichSu) {
-    if (c.nopLuc && c.nopLuc.startsWith(homNayIso)) {
-      soCauDaLamHomNay += c.tongCau || c.soCau || 10
-    }
-  }
-  for (const b of dsMomGiao) {
-    if (b.trangThai === 'da_nop' && b.nopLuc && b.nopLuc.startsWith(homNayIso)) {
-      soCauDaLamHomNay += b.soCau || 10
-    }
+  const homNayIso = ngayVietNam(now)
+  const baiDaNop = [
+    ...dsLichSu.map(c => ({ ...c, key: `thi:${c.maCa || c.nopLuc}` })),
+    ...dsBtvn.filter(b => b.daNop).map(b => ({ ...b, key: `bt:${b.maBtvn || b.maCa}` })),
+    ...dsMomGiao.filter(b => b.trangThai === 'da_nop').map(b => ({ ...b, key: `mom:${b.id}` })),
+  ]
+  const seen = new Set<string>()
+  for (const b of baiDaNop) {
+    if (seen.has(b.key)) continue
+    seen.add(b.key)
+    if (ngayVietNam(b.nopLuc) !== homNayIso) continue
+    const n = Number(b.tongCau ?? b.soCau)
+    if (Number.isFinite(n) && n > 0) soCauDaLamHomNay += Math.floor(n)
   }
 
   // 3. Tính Ngân sách ngày
@@ -284,18 +284,15 @@ export function tongHopKeHoachTroLy(input: {
     let conLaiChu = 'Hạn 2 tiếng'
     let isOverdue = false
 
-    if (mom.batDauLuc) {
-      const daTroi = Math.floor((now - new Date(mom.batDauLuc).getTime()) / 1000)
-      const conGiay = Math.max(0, 7200 - daTroi)
-      conLaiMs = conGiay * 1000
+    const hanMom = hanBaiMom(mom)
+    if (hanMom) {
+      conLaiMs = Date.parse(hanMom) - now
       conLaiChu = dinhDangConLai(conLaiMs)
-      if (conGiay <= 0) isOverdue = true
-    } else if (mom.hanNop) {
-      const hanTime = new Date(mom.hanNop).getTime()
-      conLaiMs = hanTime - now
-      conLaiChu = dinhDangConLai(conLaiMs)
-      if (conLaiMs <= 0) isOverdue = true
+      isOverdue = conLaiMs <= 0
+    } else {
+      conLaiChu = '120 phút từ khi bắt đầu'
     }
+    // Bài Mom hết giờ vẫn phải vào để nộp phần đã lưu; không mời làm tiếp.
 
     const { score, capDo } = tinhDiemUuTien({
       conLaiMs,
@@ -313,7 +310,7 @@ export function tongHopKeHoachTroLy(input: {
       soCau: mom.soCau || 10,
       phutUocTinh: Math.ceil(((mom.soCau || 10) * 80) / 60),
       expThuong: (mom.soCau || 10) * 2,
-      hanNop: mom.hanNop,
+      hanNop: hanMom,
       conLaiMs,
       conLaiChu,
       capDoUuTien: capDo,
@@ -321,7 +318,7 @@ export function tongHopKeHoachTroLy(input: {
       hanhDong: {
         loai: 'mo_mom',
         payload: { id: mom.id, bai: mom },
-        nhanNut: 'Làm bài của Mom',
+        nhanNut: isOverdue ? 'Mở để hoàn tất nộp bài' : 'Làm bài của Mom',
       },
     })
   }
@@ -333,11 +330,12 @@ export function tongHopKeHoachTroLy(input: {
     let isOverdue = false
 
     if (bt.hanNop) {
-      const hanTime = new Date(bt.hanNop).getTime()
-      conLaiMs = hanTime - now
-      if (conLaiMs <= 0) isOverdue = true
+      const hanTime = mocThoiGian(bt.hanNop)
+      conLaiMs = hanTime === undefined ? undefined : hanTime - now
+      if (conLaiMs !== undefined && conLaiMs <= 0) isOverdue = true
     }
 
+    if (isOverdue) continue // Máy chủ chặn BTVN quá hạn; giữ trong danh sách theo dõi.
     const conLaiChu = dinhDangConLai(conLaiMs)
     const tongCauBtvn = bt.soCau || 15
     const soCauV1 = Math.max(4, Math.round(tongCauBtvn * 0.45))
@@ -355,7 +353,7 @@ export function tongHopKeHoachTroLy(input: {
     candidateTasks.push({
       id: `btvn_v1_${id}`,
       loai: 'btvn_vong1',
-      tieuDe: `${bt.tieuDe || 'BTVN'}: Vòng 1 (Lõi Căn Bản)`,
+      tieuDe: `${bt.tenBtvn || bt.tieuDe || 'BTVN'}: Vòng 1 (Lõi Căn Bản)`,
       moTa: `Bắt buộc hoàn thành · ${soCauV1} câu nền tảng · ${conLaiChu}`,
       soCau: soCauV1,
       phutUocTinh: Math.ceil((soCauV1 * 75) / 60),
@@ -384,8 +382,8 @@ export function tongHopKeHoachTroLy(input: {
     candidateTasks.push({
       id: `btvn_v2_${id}`,
       loai: 'btvn_vong2',
-      tieuDe: `${bt.tieuDe || 'BTVN'}: Vòng 2 (Trọng Tâm Cá Nhân)`,
-      moTa: `Bổ sung chuyên đề hay sai · Đạt 100% chỉ tiêu bài tập`,
+      tieuDe: `${bt.tenBtvn || bt.tieuDe || 'BTVN'}: Vòng 2 (Trọng Tâm Cá Nhân)`,
+      moTa: `Luyện tiếp vòng 2. Bấm Nộp bài để ghi nhận kết quả.`,
       soCau: soCauV2,
       phutUocTinh: Math.ceil((soCauV2 * 90) / 60),
       expThuong: soCauV2 * 2,
@@ -402,7 +400,7 @@ export function tongHopKeHoachTroLy(input: {
     })
   }
 
-  // C. Candidate: Bịt Lỗ Hổng Câu Sai (Spaced Repetition)
+  // Gợi ý mở luồng luyện câu sai có sẵn; chưa phải lịch ôn giãn cách.
   if (tongCauSai > 0) {
     const soCauSua = Math.min(4, Math.max(2, Math.round(tongCauSai * 0.2)))
     const { score: scoreSua, capDo: capDoSua } = tinhDiemUuTien({
@@ -414,7 +412,7 @@ export function tongHopKeHoachTroLy(input: {
     candidateTasks.push({
       id: 'sua_loi_cot_loi',
       loai: 'sua_loi_vong1',
-      tieuDe: `Bịt lỗ hổng: Sửa ${soCauSua} câu sai căn bản`,
+      tieuDe: `Luyện sửa ${soCauSua} câu sai căn bản`,
       moTa: `Tự tay làm lại câu sai ca thi gần nhất để không sai lặp lại`,
       soCau: soCauSua,
       phutUocTinh: Math.ceil((soCauSua * 80) / 60),
@@ -439,8 +437,8 @@ export function tongHopKeHoachTroLy(input: {
   candidateTasks.push({
     id: 'thu_thach_vong3',
     loai: 'thu_thach_vong3',
-    tieuDe: 'Thử thách bứt phá 9+ (x2 EXP Thần Thú)',
-    moTa: '2 câu Vận dụng cao · Rèn luyện bản lĩnh & bứt phá điểm số',
+    tieuDe: 'Luyện nâng cao (tự chọn)',
+    moTa: 'Chỉ chọn khi em đã xong bài cần nộp.',
     soCau: 2,
     phutUocTinh: 6,
     expThuong: 8,
@@ -453,11 +451,18 @@ export function tongHopKeHoachTroLy(input: {
     },
   })
 
-  // Sắp xếp tasks theo điểm ưu tiên giảm dần
-  candidateTasks.sort((a, b) => b.diemUuTien - a.diemUuTien)
-
-  // Trích xuất Top 3
-  const top3 = candidateTasks.slice(0, 3)
+  // Chỉ xếp thứ tự việc học. Giữ nguyên payload, số câu và các vòng của bộ làm bài.
+  const due = (t: NhiemVuTroLy) => t.conLaiMs !== undefined && t.conLaiMs > 0 && t.conLaiMs <= 86400_000
+  candidateTasks.sort((a, b) => Number(due(b)) - Number(due(a)) ||
+    (due(a) && due(b) ? a.conLaiMs! - b.conLaiMs! : 0) || b.diemUuTien - a.diemUuTien)
+  // Mỗi bài chỉ chiếm một ô trên trang chủ; các vòng vẫn có trong màn làm bài.
+  const daXep = new Set<string>()
+  const top3 = candidateTasks.filter(t => {
+    const key = t.hanhDong.loai === 'mo_btvn' ? `bt:${t.hanhDong.payload?.bt.maBtvn || t.hanhDong.payload?.bt.maCa}` : t.id
+    if (daXep.has(key)) return false
+    daXep.add(key)
+    return true
+  }).slice(0, 3)
 
   // 5. Radar Deadline
   const radarItems: DongRadarDeadline[] = []
@@ -476,29 +481,22 @@ export function tongHopKeHoachTroLy(input: {
       })
     } else {
       let conLaiMs: number | undefined
-      if (m.batDauLuc) {
-        const daTroi = Math.floor((now - new Date(m.batDauLuc).getTime()) / 1000)
-        conLaiMs = Math.max(0, (7200 - daTroi) * 1000)
-      } else if (m.hanNop) {
-        conLaiMs = new Date(m.hanNop).getTime() - now
-      }
-
-      const conLaiChu = dinhDangConLai(conLaiMs)
-      let tt: DongRadarDeadline['trangThai'] = 'sap_den'
+      const hanMom = hanBaiMom(m)
+      if (hanMom) conLaiMs = Date.parse(hanMom) - now
+      const conLaiChu = conLaiMs === undefined ? '120 phút từ khi bắt đầu' : dinhDangConLai(conLaiMs)
+      let tt: DongRadarDeadline['trangThai'] = 'binh_thuong'
       if (conLaiMs !== undefined && conLaiMs <= 0) {
         tt = 'qua_han'
         countQuaHan++
-      } else if (conLaiMs !== undefined && conLaiMs <= 6 * 3600 * 1000) {
+      } else if (conLaiMs !== undefined && conLaiMs <= 86400_000) {
         tt = 'khan_cap'
-        countSapHetHan++
-      } else {
         countSapHetHan++
       }
 
       radarItems.push({
         id: `mom_${m.id}`,
         tieuDe: m.tieuDe || 'Bài Mom giao',
-        hanNop: m.hanNop,
+        hanNop: hanMom,
         conLaiChu,
         trangThai: tt,
         loai: 'mom',
@@ -511,7 +509,7 @@ export function tongHopKeHoachTroLy(input: {
       countDaXong++
       radarItems.push({
         id: `bt_${b.maBtvn || b.maCa}`,
-        tieuDe: b.tieuDe || 'BTVN Thầy giao',
+        tieuDe: b.tenBtvn || b.tieuDe || 'BTVN Thầy giao',
         conLaiChu: 'Đã nộp bài',
         trangThai: 'da_xong',
         loai: 'btvn',
@@ -519,7 +517,8 @@ export function tongHopKeHoachTroLy(input: {
     } else {
       let conLaiMs: number | undefined
       if (b.hanNop) {
-        conLaiMs = new Date(b.hanNop).getTime() - now
+        const ms = mocThoiGian(b.hanNop)
+        conLaiMs = ms === undefined ? undefined : ms - now
       }
 
       const conLaiChu = dinhDangConLai(conLaiMs)
@@ -537,7 +536,7 @@ export function tongHopKeHoachTroLy(input: {
 
       radarItems.push({
         id: `bt_${b.maBtvn || b.maCa}`,
-        tieuDe: b.tieuDe || 'BTVN Thầy giao',
+        tieuDe: b.tenBtvn || b.tieuDe || 'BTVN Thầy giao',
         hanNop: b.hanNop,
         conLaiChu,
         trangThai: tt,
@@ -546,8 +545,8 @@ export function tongHopKeHoachTroLy(input: {
     }
   }
 
-  // 6. Streak tính toán
-  const soNgayLienTiep = Math.max(1, Math.min(30, dsLichSu.length > 0 ? (dsLichSu.length % 7) + 1 : 1))
+  // Chuỗi ngày có bài nộp, không phải phép đo mức độ nắm kiến thức.
+  const soNgayLienTiep = chuoiNgayHoc(baiDaNop.map(b => b.nopLuc), now)
   const daHocHomNay = soCauDaLamHomNay >= nganSach.mucTieuCau
 
   // 7. Thần Thú Profile
@@ -561,25 +560,25 @@ export function tongHopKeHoachTroLy(input: {
   if (tinhLucWallet > 0) {
     thongDiepThu = `Em đang có ${tinhLucWallet} EXP tinh lực trong kho! Bấm nạp tinh lực để giúp ${tenThu} tăng cấp ngay.`
   } else if (expCanLenCap - expHienTai <= 15) {
-    thongDiepThu = `Chỉ còn ${expCanLenCap - expHienTai} EXP nữa là ${tenThu} lên cấp ${cap + 1}! Hoàn thành 1 bài tập là đủ EXP.`
+    thongDiepThu = `Chỉ còn ${expCanLenCap - expHienTai} EXP nữa là ${tenThu} lên cấp ${cap + 1}! EXP được ghi nhận theo kết quả bài làm.`
   }
 
   // 8. Lời khuyên Sư phạm của Thầy Đỗ Đại Học
-  let tieuDeLoiKhuyen = `Chào em ${hoTen || ''}! Hãy giữ vững nhịp độ mỗi ngày`
-  let noiDungLoiKhuyen = `Mỗi ngày em chỉ cần hoàn thành 10-12 câu vừa sức theo đúng gợi ý của Trợ lý. Kiến thức ngấm sâu từng ngày chắc chắn sẽ mang lại kết quả bứt phá.`
+  let tieuDeLoiKhuyen = `Việc học của em ${hoTen || ''} hôm nay`
+  let noiDungLoiKhuyen = `Em xem hạn nộp trước, làm bài được giao rồi luyện lại câu sai. Gợi ý số câu không thay yêu cầu nộp bài.`
   let mucDoTapTrung: KeHoachNgayTroLy['loiKhuyenSuPham']['mucDoTapTrung'] = 'duy_tri_phong_do'
 
   if (countQuaHan > 0 || countSapHetHan > 0) {
     tieuDeLoiKhuyen = 'Ưu tiên giải quyết các bài sắp đến hạn trước'
-    noiDungLoiKhuyen = 'Em hãy tập trung làm trước các bài tập có hạn nộp trong ngày để giữ trọn vẹn điểm chuyên cần và không bị dồn bài nhé.'
+    noiDungLoiKhuyen = 'Em làm bài gần hạn trước. BTVN quá hạn cần Thầy gia hạn; bài gia đình giao hết giờ cần mở để nộp phần đã lưu.'
     mucDoTapTrung = 'go_loi_cot_loi'
   } else if (tongCauSai >= 15) {
-    tieuDeLoiKhuyen = 'Tập trung bịt dứt điểm các lỗi sai căn bản'
-    noiDungLoiKhuyen = 'Sai ở đâu đứng lên ở đó. Khi em hiểu rõ vì sao mình sai ở câu Nhận biết, em sẽ không bao giờ mắc lại bẫy đó trong đề thi thật.'
+    tieuDeLoiKhuyen = 'Luyện lại những câu em còn sai'
+    noiDungLoiKhuyen = 'Em làm lại câu sai trước khi xem giải. Sau đó ghi lại bước còn vướng để hỏi Thầy.'
     mucDoTapTrung = 'go_loi_cot_loi'
   } else if (soCauDaLamHomNay >= nganSach.mucTieuCau) {
-    tieuDeLoiKhuyen = 'Xuất sắc! Em đã hoàn thành chỉ tiêu học tập hôm nay'
-    noiDungLoiKhuyen = 'Em có thể nghỉ ngơi thư giãn hoặc thử sức với 1-2 câu Vòng 3 Thử Thách để nhận thêm x2 EXP nuôi Thần Thú.'
+    tieuDeLoiKhuyen = 'Em đã đạt số câu gợi ý hôm nay'
+    noiDungLoiKhuyen = 'Em kiểm tra bài cần nộp trước khi nghỉ. Đạt số câu gợi ý không có nghĩa mọi bài đã nộp đủ.'
     mucDoTapTrung = 'but_pha_dinh_cao'
   }
 

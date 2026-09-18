@@ -84,6 +84,15 @@ export default function BangTinGiaoVien() {
 
   return (
     <>
+      <section className="rounded-2xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 p-4 sm:p-5 space-y-3">
+        <h2 className="text-lg font-bold">Việc cần theo dõi hôm nay</h2>
+        <p className="text-sm">Xem học sinh chưa nộp bài gần hạn, xử lý câu hỏi đang vướng rồi kiểm tra lại phần đã chữa.</p>
+        <div className="flex flex-wrap gap-2">
+          <button className="btn-google-primary px-4 py-2 rounded-xl text-sm" onClick={() => navigate('giaobtvn')}>Theo dõi hạn bài tập</button>
+          <button className="btn-google-outlined px-4 py-2 rounded-xl text-sm" onClick={() => navigate('cauhoi')}>Câu hỏi của học sinh</button>
+          <button className="btn-google-outlined px-4 py-2 rounded-xl text-sm" onClick={() => navigate('hocsinh')}>Xem hồ sơ học sinh</button>
+        </div>
+      </section>
       <section className="parent-news space-y-3.5 !p-3.5 sm:!p-5 rounded-3xl">
         {/* HEADER: Tinh gọn, nhỏ hơn */}
         <header className="flex flex-wrap items-center justify-between gap-2.5 pb-1">
@@ -156,7 +165,7 @@ export default function BangTinGiaoVien() {
                     </h3>
                   </div>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300">
-                    Google Style
+                    Theo ngày
                   </span>
                 </div>
 
