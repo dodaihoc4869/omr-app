@@ -16,6 +16,7 @@ it('reset lưu ảnh chụp kết quả rồi mới mở lại, thu hồi chỉ 
   expect(JSON.parse(executed[0].args[4]).so_dung).toBe(9)
   expect(executed[1].args).toEqual(['BT1|1'])
   expect(executed[1].sql).toContain(hanhDong==='reset'?'nop_luc=NULL':'thu_hoi=1')
+ if(hanhDong==='reset')expect(executed[1].sql).toContain('xong_vong1_luc=NULL')
  }
 })
 it('reset riêng học sinh vẫn bắt buộc quyền giáo viên',async()=>{const {env}=setup();expect((await worker.fetch(req({maBtvn:'BT1',sbd:'1',hanhDong:'reset'},'wrong'),env)).status).toBe(403)})

@@ -1656,7 +1656,7 @@ async function suaBtvn(env:Env,b:Record<string,unknown>):Promise<Response> {
    }
    await env.DB.batch([
      env.DB.prepare('INSERT INTO btvn_em_lich_su(id,khoa,luu_luc,hanh_dong,du_lieu) VALUES(?,?,?,?,?)').bind(crypto.randomUUID(),khoa,new Date().toISOString(),String(b.hanhDong),JSON.stringify(em)),
-     b.hanhDong==='thu-hoi'?env.DB.prepare('UPDATE btvn_em SET thu_hoi=1 WHERE khoa=?').bind(khoa):env.DB.prepare('UPDATE btvn_em SET thu_hoi=0,nop_luc=NULL,so_dung=NULL,so_cau=NULL,dap_an_json=NULL,so_lan_lam=1 WHERE khoa=?').bind(khoa)
+     b.hanhDong==='thu-hoi'?env.DB.prepare('UPDATE btvn_em SET thu_hoi=1 WHERE khoa=?').bind(khoa):env.DB.prepare('UPDATE btvn_em SET thu_hoi=0,nop_luc=NULL,so_dung=NULL,so_cau=NULL,dap_an_json=NULL,so_lan_lam=1,xong_vong1_luc=NULL WHERE khoa=?').bind(khoa)
    ])
    return ra({ok:true})
  }
