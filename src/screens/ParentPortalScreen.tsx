@@ -24,6 +24,7 @@ import InfographicHuongDan from '../components/InfographicHuongDan'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import BaoCaoCaThiPhuHuynhModal from '../components/BaoCaoCaThiPhuHuynhModal'
 import ModalKhacPhucCauSai from '../components/ModalKhacPhucCauSai'
+import { hopLeDeRut } from '../lib/loc-cau-rut'
 import { hsCauSaiApi, hsLichSuCaApi, tenTheoSbd } from '../lib/exam-api'
 import { loadScriptUrl } from '../lib/exam-db'
 import { nhoVaiDaDung } from '../lib/vai-tro'
@@ -294,6 +295,115 @@ export default function ParentPortalScreen() {
     } finally { setDangTaoMom(false) }
   }
 
+  // 1-CLICK GIAO BÀI KHẮC PHỤC CÂU SAI SANG APP CON THEO THUẬT TOÁN MỚI
+  const xuLyGiaoBaiKhacPhuc1Click = async () => {
+    if (!sbdHienTai) return
+    setDangTaoMom(true)
+    setThongBaoMom(null)
+
+    try {
+      let dsCauSai: any[] = []
+      try {
+        const res = await hsCauSaiApi(scriptUrl, sbdHienTai, [])
+        if (res && res.ok && Array.isArray(res.items)) dsCauSai = res.items
+      } catch {
+        // bỏ qua lỗi nếu không lấy được câu sai
+      }
+
+      const hopLe = dsCauSai.filter((c) =>
+        hopLeDeRut({
+          phan: c.phan,
+          maDe: c.maCa,
+          dapAnDung: c.dapAnDung,
+          text: c.text,
+          choices: c.choices || c.ideas,
+        })
+      )
+
+      if (hopLe.length === 0) {
+        await xuLyGiaoBaiLuyen1Click()
+        return
+      }
+
+      // Thuật toán sư phạm thích ứng:
+      // Tồn nhiều (>= 15 câu): Gỡ nợ giảm tải -> chọn 4 câu căn bản nhất (ưu tiên Phần I & II cốt lõi)
+      // Tồn trung bình (5-14 câu): Chọn 5 câu trọng tâm
+      // Tồn ít (<= 4 câu): Chọn toàn bộ câu còn lại
+      let soCauGiao = 5
+      if (hopLe.length >= 15) soCauGiao = 4
+      else if (hopLe.length <= 4) soCauGiao = hopLe.length
+
+      const phanI = hopLe.filter((c) => c.phan === 'I')
+      const phanII = hopLe.filter((c) => c.phan === 'II')
+      const phanKhac = hopLe.filter((c) => c.phan !== 'I' && c.phan !== 'II')
+
+      const dsChon: any[] = []
+      for (const c of [...phanI, ...phanII, ...phanKhac]) {
+        if (dsChon.length < soCauGiao) dsChon.push(c)
+      }
+
+      const tieuDe = `Bài khắc phục câu sai Mẹ giao (${dsChon.length} câu trọng tâm)`
+      await xuLyGiaoBaiTrucTiep(dsChon, tieuDe)
+      setThongBaoMom({
+        loai: 'ok',
+        chu: `✨ Đã giao ${dsChon.length} câu khắc phục trực tiếp sang app của con! Trợ lý của con đã nhận và đưa lên đầu danh sách làm bài (Thời hạn 2 tiếng).`,
+      })
+    } catch (e) {
+      setThongBaoMom({
+        loai: 'loi',
+        chu: e instanceof Error ? e.message : 'Chưa giao được bài cho con',
+      })
+    } finally {
+      setDangTaoMom(false)
+    }
+  }
+
+  // 1-CLICK GIAO BÀI LUYỆN BỨT PHÁ SANG APP CON THEO THUẬT TOÁN MỚI
+  const xuLyGiaoBaiLuyen1Click = async () => {
+    if (!sbdHienTai) return
+    setDangTaoMom(true)
+    setThongBaoMom(null)
+
+    try {
+      const { loadExamSources } = await import('../lib/exam-db')
+      const { cauLuyenTuNguon } = await import('../lib/bai-tap-pdf')
+      const kho = await loadExamSources()
+      const tatCaCau = cauLuyenTuNguon(kho)
+
+      const hopLe = tatCaCau.filter((c) => c.phan && c.dapAn)
+      const soCauGiao = Math.min(8, Math.max(5, hopLe.length > 8 ? 6 : hopLe.length))
+      const dsChon = hopLe.slice(0, soCauGiao).map((c, i) => ({
+        id: c.id || `cau_luyen_${i + 1}`,
+        phan: c.phan,
+        text: c.text,
+        choices: c.luaChon,
+        dapAn: c.dapAn,
+        dapAnDung: c.dapAn,
+        loiGiai: c.chot || (Array.isArray(c.buoc) ? c.buoc.join('\n') : ''),
+        chuyenDe: c.chuyenDe || 'Luyện tập trọng tâm',
+      }))
+
+      if (dsChon.length === 0) {
+        setThongBaoMom({ loai: 'loi', chu: 'Chưa rút được câu hỏi từ kho đề để giao cho con.' })
+        return
+      }
+
+      const tieuDe = `Bài luyện bứt phá Mẹ giao (${dsChon.length} câu)`
+      await xuLyGiaoBaiTrucTiep(dsChon, tieuDe)
+      setThongBaoMom({
+        loai: 'ok',
+        chu: `✨ Đã giao ${dsChon.length} câu luyện tập sang app của con! Trợ lý của con đã nhận và mở trực tiếp để con làm ngay (Hạn 2 tiếng).`,
+      })
+    } catch (e) {
+      setThongBaoMom({
+        loai: 'loi',
+        chu: e instanceof Error ? e.message : 'Chưa giao được bài luyện cho con',
+      })
+    } finally {
+      setDangTaoMom(false)
+    }
+  }
+
   // TỰ ĐỘNG MỞ MODAL KHẮC PHỤC LỖI SAI (BÀI CỦA MOM GIAO - 3 CHẾ ĐỘ CHUẨN)
   const xuLyTaoBaiCuaMom = async () => {
     if (!sbdHienTai) return
@@ -520,7 +630,7 @@ export default function ParentPortalScreen() {
               tongCauSai={tongSoCauSaiCon > 0 ? tongSoCauSaiCon : dsBaiThi.reduce((acc, b) => acc + (b.soCauSai || 0), 0)}
               dsMomGiao={dsMomGiao}
               onGiaoBaiKhacPhuc={() => {
-                void xuLyTaoBaiCuaMom()
+                void xuLyGiaoBaiKhacPhuc1Click()
               }}
               onXemChiTietCa={(ca) => {
                 setCaDangXem(ca)
@@ -529,7 +639,7 @@ export default function ParentPortalScreen() {
                 setTabPh('diem')
               }}
               onGiaoBaiLuyen={() => {
-                setTabPh('khacphuc')
+                void xuLyGiaoBaiLuyen1Click()
               }}
             />
           </div>

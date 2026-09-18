@@ -684,6 +684,100 @@ body.co-lam .tf-item { padding: 9px 10px; }
 }
 /* Cả thẻ câu cũng đổi vạch trái: nhìn lướt là thấy câu nào là câu chữa. */
 .q-card.la-chua { border-left-color: #c2410c; }
+/* PHÂN TẦNG BTVN: HIỆN SÁNG CÂU ĐƯỢC GIAO HÔM NAY, ẨN MỜ CÂU KHÁC */
+.q-card.q-card-active {
+  border-left-color: #2563eb !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12), var(--bong);
+}
+.q-card.q-card-dimmed {
+  opacity: 0.32;
+  filter: grayscale(80%) blur(0.4px);
+  position: relative;
+  transition: opacity 0.3s ease, filter 0.3s ease;
+  user-select: none;
+}
+.q-card.q-card-dimmed:hover, .q-card.q-card-dimmed:focus-within {
+  opacity: 0.78;
+  filter: none;
+}
+.q-card.q-card-dimmed .lam-o, .q-card.q-card-dimmed .lam-nhap {
+  pointer-events: none;
+}
+.dimmed-pacing-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(148, 163, 184, 0.16);
+  border: 1px dashed rgba(148, 163, 184, 0.45);
+  color: #64748b;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+:root.dark .dimmed-pacing-banner, body.dark .dimmed-pacing-banner {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(71, 85, 105, 0.5);
+  color: #94a3b8;
+}
+.q-tag.muc-tieu-hom-nay-tag {
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: #ffffff !important;
+  font-size: 11px;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+}
+.thanh-phan-tang-btvn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 18px;
+  margin-bottom: 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(79, 70, 229, 0.08));
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  color: #1e3a8a;
+  font-size: 13px;
+  font-weight: 600;
+}
+:root.dark .thanh-phan-tang-btvn, body.dark .thanh-phan-tang-btvn {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.3), rgba(67, 56, 202, 0.3));
+  border-color: rgba(96, 165, 250, 0.3);
+  color: #bfdbfe;
+}
+.thanh-phan-tang-btvn .tpt-trai {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.thanh-phan-tang-btvn .tpt-nut-mo {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #ffffff;
+  color: #2563eb;
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  transition: all 0.2s;
+}
+.thanh-phan-tang-btvn .tpt-nut-mo:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+:root.dark .thanh-phan-tang-btvn .tpt-nut-mo {
+  background: #1e293b;
+  color: #93c5fd;
+  border-color: rgba(147, 197, 253, 0.3);
+}
+:root.dark .thanh-phan-tang-btvn .tpt-nut-mo:hover {
+  background: #3b82f6;
+  color: #ffffff;
+}
 /* Khối "Phiếu này chữa gì" — đọc trước khi làm bài, nên đặt màu nhạt cùng họ
    với nhãn chữa để mắt nối được hai thứ với nhau. */
 /* LỜI NHẮC ĐẦU PHIẾU — vì sao phiếu này mở ra ở dạng chỉ đọc.
@@ -1093,10 +1187,19 @@ const MUI_TEN = '<svg class="q-mui" viewBox="0 0 24 24" fill="none" stroke="curr
  * mọi thứ dưới đây chỉ bật khi `choLam`.
  */
 
-export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = false, choLam = false, laBtvn = false): string {
+export function theCauHtml(
+  c: CauLuyen,
+  stt: number,
+  moSan = false,
+  anGiai = false,
+  choLam = false,
+  laBtvn = false,
+  soCauSang?: number,
+): string {
   // Nhãn CHỮA đứng trước mọi nhãn khác: đọc một dòng là biết câu này có mặt
   // ở đây để sửa lỗi nào, không phải "một câu Ester bất kỳ".
   const n = c.chuaCho
+  const laDimmed = Boolean(laBtvn && soCauSang && stt > soCauSang)
   const tagVong = laBtvn
     ? c.mucDo === 'van_dung'
       ? '<span class="q-tag vong-btvn vong-3">Vòng 3: Thử Thách (x2 EXP)</span>'
@@ -1104,7 +1207,11 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
       ? '<span class="q-tag vong-btvn vong-2">Vòng 2: Trọng Tâm</span>'
       : '<span class="q-tag vong-btvn vong-1">Vòng 1: Lõi Căn Bản</span>'
     : ''
+  const tagMucTieu = Boolean(laBtvn && soCauSang && stt <= soCauSang)
+    ? '<span class="q-tag muc-tieu-hom-nay-tag">✨ Mục tiêu hôm nay</span>'
+    : ''
   const tags = [
+    tagMucTieu,
     tagVong,
     n
       ? `<span class="q-tag ${n.laDeCuaEm ? 'sai-cua-em' : 'chua'}">${
@@ -1123,7 +1230,7 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
     `<span class="q-tag ${LOP_LOAI[c.phan]}">${TEN_LOAI[c.phan]}</span>`,
     c.mucDo ? `<span class="q-tag ${LOP_MUC[c.mucDo]}">${TEN_MUC[c.mucDo]}</span>` : '',
     c.chuyenDe ? `<span class="q-tag topic">${thoat(c.chuyenDe)}</span>` : '',
-  ].join('')
+  ].filter(Boolean).join('')
 
   let than = ''
   if (c.phan === 'I' && c.luaChon) {
@@ -1208,9 +1315,23 @@ export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = fal
           n.viSaoSai ? ` ${thoat(n.viSaoSai)}` : ' Em xem lại lời giải bên dưới rồi tự làm lại từ đầu.'
         }</div>`
       : ''
-  return `<article class="q-card${n ? ' la-chua' : ''}${moSan ? ' mo' : ''}${giai ? '' : ' khong-giai'}" data-so="${stt}" data-phan="${c.phan}" data-muc="${thoat(c.mucDo || '')}"${choLam ? ` data-qid="${thoat(c.id || '')}"` : ''}>
+
+  const bannerDimmed = laDimmed
+    ? `<div class="dimmed-pacing-banner"><span class="dimmed-lock-icon">🔒</span><span>Câu thuộc Vòng tiếp theo · Hoàn thành ${soCauSang} câu sáng hôm nay trước để đạt chỉ tiêu</span></div>`
+    : ''
+
+  const cacLop = [
+    'q-card',
+    n ? 'la-chua' : '',
+    moSan ? 'mo' : '',
+    giai ? '' : 'khong-giai',
+    laDimmed ? 'q-card-dimmed' : (laBtvn && soCauSang ? 'q-card-active' : ''),
+  ].filter(Boolean).join(' ')
+
+  return `<article class="${cacLop}" data-so="${stt}" data-phan="${c.phan}" data-muc="${thoat(c.mucDo || '')}"${choLam ? ` data-qid="${thoat(c.id || '')}"` : ''}>
   <div class="q-header"><div class="q-num"><span class="ky">${stt}</span></div><div class="q-tags">${tags}</div></div>
   <div class="q-than">
+    ${bannerDimmed}
     ${oLamLai}
     ${deBai}
     ${bangHtml(c.bang)}
@@ -1679,6 +1800,21 @@ export const JS_PHIEU = `
       var t = demLai();
       for (var i = 0; i < t.ds.length; i++) bat(t.ds[i], !t.het);
       demLai();
+    });
+  }
+
+  var nutMoHetCau = document.getElementById('nut-mo-het-cau');
+  if (nutMoHetCau) {
+    nutMoHetCau.addEventListener('click', function () {
+      var dimmed = document.querySelectorAll('.q-card.q-card-dimmed');
+      for (var i = 0; i < dimmed.length; i++) {
+        dimmed[i].classList.remove('q-card-dimmed');
+        dimmed[i].classList.add('q-card-active');
+      }
+      var banners = document.querySelectorAll('.dimmed-pacing-banner');
+      for (var j = 0; j < banners.length; j++) banners[j].remove();
+      var tpt = document.getElementById('thanh-phan-tang-btvn');
+      if (tpt) tpt.innerHTML = '<div class="tpt-trai"><span class="tpt-sao">✨</span><span>Đã mở toàn bộ ' + tatCa.length + ' câu của bài tập. Em có thể làm tiếp để nhận thêm EXP Thần Thú!</span></div>';
     });
   }
   /** HIỆN ĐỀ — giấu đáp án và lời giải ngay trên màn hình.
@@ -2208,6 +2344,8 @@ export interface TuyChonPhieu {
   moSan?: boolean
   loiNhac?: string | null
   laBtvn?: boolean
+  soCauSang?: number
+  vongHienTai?: number
 }
 
 export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChonPhieu = {}): string {
@@ -2220,7 +2358,13 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   const nop = !anGiai && tuyChon.nop ? tuyChon.nop : null
   const chNop = cauHinhNop(nop?.cauHinh)
   const cau = anGiai ? cauVao.map(boLoiGiai) : cauVao
-  const the = cau.map((c, i) => theCauHtml(c, i + 1, !!tuyChon.moSan, anGiai, !!nop, laBtvn)).join('\n')
+
+  // Phân tầng BTVN: Nếu là BTVN và chưa nộp, tính số câu hiện sáng (mặc định Vòng 1: ~45% số câu)
+  const soCauSang = typeof tuyChon.soCauSang === 'number'
+    ? tuyChon.soCauSang
+    : (laBtvn && !tuyChon.moSan && nop ? Math.max(4, Math.round(cau.length * 0.45)) : undefined)
+
+  const the = cau.map((c, i) => theCauHtml(c, i + 1, !!tuyChon.moSan, anGiai, !!nop, laBtvn, soCauSang)).join('\n')
   // KHOÁ LỜI GIẢI TỚI KHI NỘP. Chỉ áp cho phiếu nộp được và khi thầy không
   // bật `HIEN_GIAI_TRUOC_NOP`.
   const khoaGiai = !!nop && !chNop.HIEN_GIAI_TRUOC_NOP
@@ -2229,6 +2373,17 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
     ? 'Em làm vào vở rồi đối chiếu với link lời giải bố mẹ gửi sau. Muốn bản giấy thì bấm "In đề" rồi chọn "Lưu thành PDF".'
     : 'Bấm vào từng câu để xem lời giải. Muốn bản giấy thì bấm "In đề" (phát cho em tự làm) hoặc "In kèm lời giải", rồi chọn "Lưu thành PDF".'
   const nhac = (tuyChon.loiNhac ?? '').trim()
+
+  const thanhPhanTang = (laBtvn && typeof soCauSang === 'number' && soCauSang < cau.length)
+    ? `<div class="thanh-phan-tang-btvn" id="thanh-phan-tang-btvn">
+        <div class="tpt-trai">
+          <span class="tpt-sao">✨</span>
+          <span>Hôm nay em làm <b>${soCauSang}</b> câu sáng (Vòng 1 Lõi Căn Bản) · <b>${cau.length - soCauSang}</b> câu kế tiếp ẩn mờ để tránh quá tải.</span>
+        </div>
+        <button type="button" class="tpt-nut-mo" id="nut-mo-het-cau">Hiện tất cả ${cau.length} câu</button>
+      </div>`
+    : ''
+
   const than = `${biaHtml(t, cau.length)}
 <div class="khung">
   ${nhac ? `<div class="nhac-phieu">${thoat(nhac)}</div>` : ''}
@@ -2237,6 +2392,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   ${thanhHtml(coGiai, anGiai)}
   ${nop ? thanhNopHtml(cau.length) : ''}
   ${khoaGiai ? '<div class="giai-khoa" id="giai-khoa">Lời giải mở ra ngay sau khi em bấm Nộp bài.</div>' : ''}
+  ${thanhPhanTang}
   ${!anGiai ? '<div class="ds-tieu-de">LỜI GIẢI CHI TIẾT TỪNG CÂU THEO CHUẨN HOÁ HỌC:</div>' : ''}
   <div class="ds-cau">${the}</div>
   <div class="chan">Thầy Đỗ Đại Học · ${thoat(t.tenChuyenDe)} · ${ngayVN(t.ngay)}<span class="chi-man"><br>${huongDan}</span></div>

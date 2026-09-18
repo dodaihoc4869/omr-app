@@ -2,7 +2,6 @@ import ThongBaoHocSinh,{noticeApi} from '../components/ThongBaoHocSinh'
 import BangTinPhuHuynh from '../components/BangTinPhuHuynh'
 import BangVinhDanh from '../components/BangVinhDanh'
 import BangTroLyHocSinh from '../components/BangTroLyHocSinh'
-import BongBongChatHocSinh from '../components/BongBongChatHocSinh'
 import {MomQuestionStem,MomOption} from '../components/MomQuestionMedia'
 import {momApi, momReviewHtml} from '../lib/mom-api'
 import PhongVaoThi from '../components/PhongVaoThi'
@@ -598,7 +597,7 @@ export default function StudentPortalScreen() {
     }
   }, [auth])
 
-  const moBaiTap = async (bt: any, lamLai = false) => {
+  const moBaiTap = async (bt: any, lamLai = false, tuyChonPhanTang?: { vong?: number; soCauSang?: number }) => {
     if (!auth) return
     const id = bt.maBtvn || bt.maCa
 
@@ -635,7 +634,7 @@ export default function StudentPortalScreen() {
         return
       }
       const { dungPhieuBtvn } = await import('../lib/btvn-cho-em')
-      const html = await dungPhieuBtvn(r, bt.maCa || 'Riêng', auth.sbd, { lamLai })
+      const html = await dungPhieuBtvn(r, bt.maCa || 'Riêng', auth.sbd, { lamLai, ...tuyChonPhanTang })
       setPhieuHtml(html)
     } catch (e) {
       alert(e instanceof Error ? e.message : 'Không mở được bài tập')
@@ -664,13 +663,16 @@ export default function StudentPortalScreen() {
     }
   }, [auth?.sbd])
 
-  // Xử lý hành động 1-Click từ Trợ lý cá nhân
+  // Xử lý hành động 1-Click từ Trợ lý cá nhân (Zero-Friction Direct Test Launch)
   const xuLyHanhDongTroLy = useCallback((hanhDong: any) => {
     if (!hanhDong) return
     switch (hanhDong.loai) {
       case 'mo_btvn':
         if (hanhDong.payload?.bt) {
-          void moBaiTap(hanhDong.payload.bt)
+          void moBaiTap(hanhDong.payload.bt, false, {
+            vong: hanhDong.payload?.vong,
+            soCauSang: hanhDong.payload?.soCau,
+          })
         } else {
           setTab('btvn')
         }
@@ -685,10 +687,138 @@ export default function StudentPortalScreen() {
         }
         break
       case 'mo_khac_phuc':
-        if (hanhDong.payload?.cheDo) {
-          setCheDoKhacPhuc(hanhDong.payload.cheDo)
-        }
-        setTab('khacphuc')
+        void (async () => {
+          if (!auth) return
+          setDangMoDe(true)
+          try {
+            const url = await loadScriptUrlHoacMacDinh().catch(() => '')
+            let dsSai: any[] = []
+            try {
+              const res = await hsCauSaiApi(url, auth.sbd, [])
+              if (res && res.ok && Array.isArray(res.items)) dsSai = res.items
+            } catch {}
+
+            const { hopLeDeRut } = await import('../lib/loc-cau-rut')
+            const hopLe = dsSai.filter((c) =>
+              hopLeDeRut({
+                phan: c.phan,
+                maDe: c.maCa,
+                dapAnDung: c.dapAnDung,
+                text: c.text,
+                choices: c.choices || c.ideas,
+              })
+            )
+
+            if (hopLe.length === 0) {
+              alert('Em không có câu sai nào cần khắc phục! Em có thể thử sức với câu hỏi bứt phá 9+.')
+              return
+            }
+
+            // Chọn 3-5 câu căn bản theo thuật toán mới (ưu tiên Phần I & Phần II cốt lõi)
+            const soCauRut = hanhDong.payload?.soCau || (hopLe.length >= 15 ? 4 : Math.min(5, hopLe.length))
+            const phanI = hopLe.filter((c) => c.phan === 'I')
+            const phanII = hopLe.filter((c) => c.phan === 'II')
+            const phanKhac = hopLe.filter((c) => c.phan !== 'I' && c.phan !== 'II')
+            const dsChon: any[] = []
+            for (const c of [...phanI, ...phanII, ...phanKhac]) {
+              if (dsChon.length < soCauRut) dsChon.push(c)
+            }
+
+            const { chuyenCauSaiSangCauLuyen } = await import('../lib/thuat-toan-rut-cau-sai')
+            const { dungPhieu } = await import('../lib/html-phieu')
+            const dsCauLuyen = dsChon.map(chuyenCauSaiSangCauLuyen)
+            const maPhieu = `sua_loi_${auth.sbd}_${Date.now()}`
+
+            const html = dungPhieu(
+              {
+                hoTen: auth.hoTen,
+                sbd: auth.sbd,
+                ngay: new Date(),
+                tenChuyenDe: `BỊT LỖ HỔNG: SỬA ${dsCauLuyen.length} CÂU SAI CĂN BẢN`,
+                ketQua: `Gồm ${dsCauLuyen.length} câu sai căn bản nhất em cần tự tay làm lại để không sai lặp lại`,
+                hienDapAn: false,
+                nhanBia: 'BỊT LỖ HỔNG CÂU SAI',
+                oBia: [
+                  { nhan: 'Học sinh', gia: auth.hoTen },
+                  { nhan: 'Số báo danh', gia: auth.sbd },
+                  { nhan: 'Mục tiêu', gia: 'Khắc phục dứt điểm lỗi sai cốt lõi' },
+                ],
+              },
+              dsCauLuyen,
+              {
+                anGiai: false,
+                nop: {
+                  ma: maPhieu,
+                  sbd: auth.sbd,
+                  url: `${String(url || '').replace(/\/+$/, '')}/goi`,
+                },
+                loiNhac: `Em chọn đáp án trực tiếp trên từng câu và bấm "Nộp bài" ở thanh trên để máy chấm điểm ngay và mở lời giải chi tiết.`,
+              }
+            )
+
+            setPhieuHtml(html)
+          } catch (err) {
+            alert(err instanceof Error ? err.message : 'Chưa mở được bài khắc phục lỗi')
+          } finally {
+            setDangMoDe(false)
+          }
+        })()
+        break
+      case 'mo_thu_thach':
+        void (async () => {
+          if (!auth) return
+          setDangMoDe(true)
+          try {
+            const url = await loadScriptUrlHoacMacDinh().catch(() => '')
+            const { loadExamSources } = await import('../lib/exam-db')
+            const { cauLuyenTuNguon } = await import('../lib/bai-tap-pdf')
+            const { dungPhieu } = await import('../lib/html-phieu')
+
+            const kho = await loadExamSources()
+            const tatCa = cauLuyenTuNguon(kho)
+            const vdc = tatCa.filter((c) => (c.sao === 2 || c.mucDo === 'van_dung') && c.dapAn)
+            const nguon = vdc.length >= 2 ? vdc : tatCa.filter((c) => c.dapAn)
+            const dsCau = nguon.slice(0, 2)
+
+            if (dsCau.length === 0) {
+              alert('Kho đề đang cập nhật thêm câu hỏi thử thách. Em thử lại sau nhé!')
+              return
+            }
+
+            const maPhieu = `thu_thach_${auth.sbd}_${Date.now()}`
+            const html = dungPhieu(
+              {
+                hoTen: auth.hoTen,
+                sbd: auth.sbd,
+                ngay: new Date(),
+                tenChuyenDe: 'THỬ THÁCH BỨT PHÁ 9+ (x2 EXP THẦN THÚ)',
+                ketQua: '2 câu Vận dụng cao rèn luyện tư duy đỉnh cao',
+                hienDapAn: false,
+                nhanBia: 'THỬ THÁCH BỨT PHÁ 9+',
+                oBia: [
+                  { nhan: 'Học sinh', gia: auth.hoTen },
+                  { nhan: 'Phần thưởng', gia: 'x2 EXP Thần Thú khi hoàn thành' },
+                ],
+              },
+              dsCau,
+              {
+                anGiai: false,
+                nop: {
+                  ma: maPhieu,
+                  sbd: auth.sbd,
+                  url: `${String(url || '').replace(/\/+$/, '')}/goi`,
+                },
+                loiNhac: 'Thử thách bứt phá điểm 9+: Hoàn thành 2 câu này em sẽ được nhân đôi EXP Thần Thú. Làm xong bấm Nộp bài.',
+              }
+            )
+
+            setPhieuHtml(html)
+          } catch (err) {
+            alert(err instanceof Error ? err.message : 'Chưa mở được bài thử thách')
+          } finally {
+            setDangMoDe(false)
+          }
+        })()
         break
       case 'mo_thi':
         setTab('vaothi')
@@ -699,7 +829,7 @@ export default function StudentPortalScreen() {
       default:
         break
     }
-  }, [moBaiTap, batDauLamBaiMom])
+  }, [moBaiTap, batDauLamBaiMom, auth])
 
   // Nạp dữ liệu khi đã đăng nhập
   useEffect(() => {
@@ -1223,10 +1353,6 @@ export default function StudentPortalScreen() {
                 tongSoCauSai={tongSoCauSaiDaChon}
                 hoSoThanThu={hoSoThanThu}
                 onAction={xuLyHanhDongTroLy}
-                onMoChat={() => {
-                  const nut = document.getElementById('btn-bong-bong-chat-hs')
-                  if (nut) nut.click()
-                }}
               />
             </>
           ) : (
@@ -1241,10 +1367,6 @@ export default function StudentPortalScreen() {
                 tongSoCauSai={tongSoCauSaiDaChon}
                 hoSoThanThu={hoSoThanThu}
                 onAction={xuLyHanhDongTroLy}
-                onMoChat={() => {
-                  const nut = document.getElementById('btn-bong-bong-chat-hs')
-                  if (nut) nut.click()
-                }}
               />
 
               <BangTinPhuHuynh
@@ -2115,15 +2237,6 @@ export default function StudentPortalScreen() {
             setDsCauSaiKhacPhucModal(null)
             setPhieuHtml(html)
           }}
-        />
-      )}
-
-      {/* BONG BÓNG CHAT & TRỢ LÝ AI ĐỒNG HÀNH */}
-      {auth && !manThi && !dangLamMom && (
-        <BongBongChatHocSinh
-          sbd={auth.sbd}
-          hoTen={auth.hoTen}
-          lop={auth.lop}
         />
       )}
     </div>

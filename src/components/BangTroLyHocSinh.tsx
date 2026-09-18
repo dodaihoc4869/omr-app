@@ -27,7 +27,6 @@ export interface BangTroLyHocSinhProps {
   tongSoCauSai: number
   hoSoThanThu?: any
   onAction: (hanhDong: NhiemVuTroLy['hanhDong']) => void
-  onMoChat?: () => void
 }
 
 export default function BangTroLyHocSinh({
@@ -39,7 +38,6 @@ export default function BangTroLyHocSinh({
   tongSoCauSai,
   hoSoThanThu,
   onAction,
-  onMoChat,
 }: BangTroLyHocSinhProps) {
   const [moRadar, setMoRadar] = useState(false)
 
@@ -335,23 +333,6 @@ export default function BangTroLyHocSinh({
           </div>
         )}
       </div>
-
-      {/* 6. HỎI ĐÁP / KẾT NỐI AI */}
-      {onMoChat && (
-        <div className="flex items-center justify-between pt-1">
-          <p className="text-[11px] text-slate-500 dark:text-slate-400">
-            Vướng câu nào hoặc cần trợ giúp phương pháp học?
-          </p>
-          <button
-            type="button"
-            onClick={onMoChat}
-            className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
-          >
-            <span>Hỏi Trợ lý AI giải bài</span>
-            <ChevronRight className="w-3 h-3" />
-          </button>
-        </div>
-      )}
     </section>
   )
 }

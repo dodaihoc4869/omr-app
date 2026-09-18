@@ -33,7 +33,7 @@ export interface NhiemVuTroLy {
   capDoUuTien: CapDoUuTien
   diemUuTien: number
   hanhDong: {
-    loai: 'mo_btvn' | 'mo_mom' | 'mo_khac_phuc' | 'mo_thi' | 'mo_than_thu'
+    loai: 'mo_btvn' | 'mo_mom' | 'mo_khac_phuc' | 'mo_thi' | 'mo_than_thu' | 'mo_thu_thach'
     payload?: Record<string, any>
     nhanNut: string
   }
@@ -367,7 +367,7 @@ export function tongHopKeHoachTroLy(input: {
       diemUuTien: scoreV1,
       hanhDong: {
         loai: 'mo_btvn',
-        payload: { bt },
+        payload: { bt, vong: 1, soCau: soCauV1 },
         nhanNut: 'Làm Vòng 1',
       },
     })
@@ -396,7 +396,7 @@ export function tongHopKeHoachTroLy(input: {
       diemUuTien: scoreV2,
       hanhDong: {
         loai: 'mo_btvn',
-        payload: { bt },
+        payload: { bt, vong: 2, soCau: soCauV1 + soCauV2 },
         nhanNut: 'Làm Vòng 2',
       },
     })
@@ -423,7 +423,7 @@ export function tongHopKeHoachTroLy(input: {
       diemUuTien: scoreSua,
       hanhDong: {
         loai: 'mo_khac_phuc',
-        payload: { cheDo: 1 },
+        payload: { cheDo: 1, soCau: soCauSua },
         nhanNut: 'Sửa lỗi ngay',
       },
     })
@@ -447,8 +447,8 @@ export function tongHopKeHoachTroLy(input: {
     capDoUuTien: capDoV3,
     diemUuTien: scoreV3,
     hanhDong: {
-      loai: 'mo_than_thu',
-      payload: {},
+      loai: 'mo_thu_thach',
+      payload: { vong: 3, soCau: 2 },
       nhanNut: 'Thử sức ngay',
     },
   })

@@ -19,10 +19,20 @@ describe('1. Mật khẩu ca thi', () => {
   })
 })
 
-describe('2. Ẩn bong bóng chat trong màn làm bài thi của học sinh', () => {
+describe('2. Đã xoá bong bóng chat và trợ lý giải bài trong app học sinh', () => {
   it('ExamTakeScreen không còn chứa BongBongChatHocSinh', () => {
     const file = fs.readFileSync(path.join(__dirname, '../src/screens/ExamTakeScreen.tsx'), 'utf-8')
     expect(file).not.toContain('BongBongChatHocSinh')
+  })
+
+  it('StudentPortalScreen không còn chứa BongBongChatHocSinh', () => {
+    const file = fs.readFileSync(path.join(__dirname, '../src/screens/StudentPortalScreen.tsx'), 'utf-8')
+    expect(file).not.toContain('BongBongChatHocSinh')
+  })
+
+  it('BangTroLyHocSinh không còn chứa nút/chữ Hỏi Trợ lý AI giải bài', () => {
+    const file = fs.readFileSync(path.join(__dirname, '../src/components/BangTroLyHocSinh.tsx'), 'utf-8')
+    expect(file).not.toContain('Hỏi Trợ lý AI giải bài')
   })
 })
 

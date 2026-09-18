@@ -49,7 +49,7 @@ export async function dungPhieuBtvn(
   },
   maCa: string,
   sbd: string,
-  tuyChon?: { lamLai?: boolean },
+  tuyChon?: { lamLai?: boolean; soCauSang?: number; vong?: number },
 ): Promise<string> {
   const [{ dungPhieu }, { parseKhoDeJson, buildTeacherSourceFromKhoDe }, { cauLuyenTuNguon }, { layCauHinhChoEmBtvn: layCh }] = await Promise.all([
     import('./html-phieu'),
@@ -106,6 +106,16 @@ export async function dungPhieuBtvn(
     cau,
     {
       laBtvn: true,
+      soCauSang: typeof tuyChon?.soCauSang === 'number'
+        ? tuyChon.soCauSang
+        : r.daNop
+        ? cau.length
+        : tuyChon?.vong === 2
+        ? Math.max(6, Math.round(cau.length * 0.8))
+        : tuyChon?.vong === 3
+        ? cau.length
+        : Math.max(4, Math.round(cau.length * 0.45)),
+      vongHienTai: tuyChon?.vong ?? 1,
       // Đã nộp rồi thì mở thành phiếu CHỈ ĐỌC kèm lời giải — em xem lại bài,
       // không nộp thêm lần nữa.
       nop: r.daNop || !maBtvn ? null : { ma: maBtvn, sbd, banNhap, legacyIds:cau.map(c=>doc.json!.ma_de+(c.id.match(/-(III|II|I)-\d+$/)?.[0]||'')), url: `${String(ch.URL ?? '').replace(/\/+$/, '')}/goi` },
