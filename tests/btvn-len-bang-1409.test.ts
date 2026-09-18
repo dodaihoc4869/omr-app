@@ -252,7 +252,7 @@ describe('MÁY CHỦ — quy bài tập về nhà về TỪNG CÂU', () => {
 
   it('CHẤM và HỒ SƠ dùng CHUNG một hàm đọc đáp án — không hai bảng đáp án', () => {
     const SRV = doc('server/src/goi-cu.ts')
-    expect(SRV).toContain('const dapAnDung: Record<string, string> = Object.fromEntries(await dapAnTheoMaDe(env, chuoi(bt.ma_de)))')
+    expect(SRV).toContain('homeworkKeys(await homeworkQuestions(env,chuoi(bt.ma_de)))')
     expect(SRV).toContain('dapAnLuot.set(m, await dapAnTheoMaDe(env, luotTheoMa.get(m)?.maDe ?? ')
   })
 })

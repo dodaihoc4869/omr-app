@@ -167,3 +167,142 @@ export function demCauTheoChuyenDe(nguon: TeacherExamSource[], mucDo: MucDoLoc):
   }
   return dem
 }
+
+/** 3 VÒNG PHÂN TẦNG BÀI TẬP VỀ NHÀ THÔNG MINH */
+export type VongBtvn = 'loi' | 'trong_tam' | 'thu_thach'
+
+export interface CauPhanTangBtvn {
+  id: string
+  vong: VongBtvn
+  tenVong: string
+  batBuoc: boolean
+  moTa: string
+  sao?: number
+}
+
+export const MO_TA_VONG_BTVN: Record<VongBtvn, { ten: string; moTa: string; batBuoc: boolean }> = {
+  loi: {
+    ten: 'Vòng 1: Lõi Căn Bản',
+    moTa: 'Kiến thức cốt lõi nhận biết & thông hiểu. Bắt buộc 100% học sinh hoàn thành.',
+    batBuoc: true,
+  },
+  trong_tam: {
+    ten: 'Vòng 2: Trọng Tâm Cá Nhân',
+    moTa: 'Câu hỏi nhắm vào chuyên đề / dạng bài em hay sai để lấp lỗ hổng kiến thức.',
+    batBuoc: true,
+  },
+  thu_thach: {
+    ten: 'Vòng 3: Thử Thách Bứt Phá',
+    moTa: 'Câu vận dụng cao 2 sao. Dành cho em muốn bứt phá điểm 9-10 & nhân đôi EXP Thần Thú.',
+    batBuoc: false,
+  },
+}
+
+/**
+ * Phân loại câu trong bài tập về nhà thành 3 vòng thông minh.
+ * @param cau Danh sách câu hỏi trong đề BTVN
+ * @param chuyenDeYeu Danh sách chuyên đề em hay sai nhất (từ hồ sơ cá nhân)
+ */
+export function phanTangBtvn(
+  cau: { id: string; chuyenDe?: string; mucDo?: string; sao?: number }[],
+  chuyenDeYeu: string[] = [],
+): Record<string, CauPhanTangBtvn> {
+  const cdYeuNorm = new Set(chuyenDeYeu.map((c) => c.toLowerCase().trim()))
+  const ketQua: Record<string, CauPhanTangBtvn> = {}
+
+  for (const c of cau) {
+    const sao = c.sao ?? (c.mucDo === 'van_dung' ? 2 : c.mucDo === 'hieu' ? 1 : 0)
+    const cd = (c.chuyenDe || '').toLowerCase().trim()
+    const laChuyenDeYeu = cd && cdYeuNorm.has(cd)
+
+    let vong: VongBtvn
+    if (sao === 2) {
+      vong = 'thu_thach'
+    } else if (laChuyenDeYeu) {
+      vong = 'trong_tam'
+    } else {
+      vong = 'loi'
+    }
+
+    const info = MO_TA_VONG_BTVN[vong]
+    ketQua[c.id] = {
+      id: c.id,
+      vong,
+      tenVong: info.ten,
+      batBuoc: info.batBuoc,
+      moTa: info.moTa,
+      sao,
+    }
+  }
+
+  return ketQua
+}
+
+/**
+ * Tính tiến độ hoàn thành thông minh (Smart Completion Rate).
+ * Học sinh KHÔNG bắt buộc làm 100% đề máy móc:
+ * Chỉ cần hoàn thành Vòng 1 (Lõi) + Vòng 2 (Trọng tâm) là đạt 100% yêu cầu.
+ * Làm thêm Vòng 3 (Thử thách) sẽ vượt 100% (thưởng bứt phá).
+ */
+export function tinhTienDoThongMinh(
+  danhSachCau: { id: string; chuyenDe?: string; mucDo?: string; sao?: number }[],
+  cauDaLam: Set<string> | string[],
+  chuyenDeYeu: string[] = [],
+): {
+  datYeuCau: boolean
+  tiLeHoanThanh: number
+  soLoiDaLam: number
+  tongLoi: number
+  soTrongTamDaLam: number
+  tongTrongTam: number
+  soThuThachDaLam: number
+  tongThuThach: number
+  tongDaLam: number
+  tongSoCau: number
+} {
+  const daLamSet = new Set(cauDaLam)
+  const phanTang = phanTangBtvn(danhSachCau, chuyenDeYeu)
+
+  let tongLoi = 0
+  let soLoiDaLam = 0
+  let tongTrongTam = 0
+  let soTrongTamDaLam = 0
+  let tongThuThach = 0
+  let soThuThachDaLam = 0
+
+  for (const c of danhSachCau) {
+    const pt = phanTang[c.id]
+    const da = daLamSet.has(c.id)
+    if (pt.vong === 'loi') {
+      tongLoi++
+      if (da) soLoiDaLam++
+    } else if (pt.vong === 'trong_tam') {
+      tongTrongTam++
+      if (da) soTrongTamDaLam++
+    } else {
+      tongThuThach++
+      if (da) soThuThachDaLam++
+    }
+  }
+
+  const tongBatBuoc = tongLoi + tongTrongTam
+  const daLamBatBuoc = soLoiDaLam + soTrongTamDaLam
+
+  const tiLeHoanThanh =
+    tongBatBuoc > 0 ? Math.min(100, Math.round((daLamBatBuoc / tongBatBuoc) * 100)) : 100
+  const datYeuCau = daLamBatBuoc >= tongBatBuoc
+
+  return {
+    datYeuCau,
+    tiLeHoanThanh,
+    soLoiDaLam,
+    tongLoi,
+    soTrongTamDaLam,
+    tongTrongTam,
+    soThuThachDaLam,
+    tongThuThach,
+    tongDaLam: daLamSet.size,
+    tongSoCau: danhSachCau.length,
+  }
+}
+

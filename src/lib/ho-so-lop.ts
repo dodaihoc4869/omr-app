@@ -173,12 +173,37 @@ export function diemHopCau(em: HoSoEmDayDu, cau: CauChua): { diem: number; viSao
   const pIt = 1 - Math.min(1, em.lenBang.soLan / TRAN_LAN_LEN_BANG)
   if (em.lenBang.soLan === 0) ly.push('chưa lên bảng lần nào')
 
+  // 5. Vùng phát triển gần ZPD: ưu tiên em vấp ngã nhưng câu hỏi đúng tầm với để tiến bộ (chỉ tính khi có số liệu)
+  let pZpd = 0
+  if (coSo) {
+    if (cau.sao === 2) {
+      if (tl >= 0.2 && tl <= 0.65) {
+        pZpd = 0.08
+        ly.push('đúng vùng ZPD bứt phá')
+      } else if (tl > 0.65) {
+        ly.push('cần thầy hướng dẫn bước chốt')
+      }
+    } else if (cau.sao === 0) {
+      if (tl >= 0.4) {
+        pZpd = 0.08
+        ly.push('vừa sức củng cố nền tảng')
+      }
+    } else {
+      // 1 sao
+      if (tl >= 0.2 && tl <= 0.6) {
+        pZpd = 0.05
+        ly.push('vừa nấc rèn luyện kỹ năng')
+      }
+    }
+  }
+
   const diem =
     TRONG_SO.BTVN_CHINH_CAU * pBtvn +
     TRONG_SO.SAI_CHINH_CAU * pSai +
     TRONG_SO.YEU_CHUYEN_DE * pYeu +
     TRONG_SO.CHUA_LAM * pChuaLam +
-    TRONG_SO.IT_LEN_BANG * pIt
+    TRONG_SO.IT_LEN_BANG * pIt +
+    pZpd
 
   return { diem, viSao: ly.length > 0 ? ly.join(' · ') : 'chưa có dữ liệu riêng, gọi để lấy căn cứ' }
 }

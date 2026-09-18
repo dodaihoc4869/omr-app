@@ -114,11 +114,16 @@ export default function PhanCongScreen() {
             <ClipboardList size={22} />
           </div>
           <div>
-            <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">
-              Giao bài tập về nhà
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">
+                Giao bài tập về nhà
+              </h1>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                ✨ Thuật toán 3 Vòng Phân Tầng
+              </span>
+            </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Chọn người nhận theo lớp/ca, chọn bộ câu và quản lý tiến độ nộp bài
+              Cả lớp nhận chung đề nhưng phân tầng thông minh (Vòng 1: Lõi căn bản bắt buộc · Vòng 2: Trọng tâm cá nhân hóa lấp điểm nghẽn · Vòng 3: Thử thách bứt phá x2 EXP).
             </p>
           </div>
         </div>

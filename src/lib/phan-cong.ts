@@ -145,6 +145,7 @@ export function tiLeSaiChuyenDe(em: EmGoi, cd: string): number {
 }
 
 function tiLeSaiCd(em: EmGoi, cd: string): number {
+  if (!em.chuyenDe) return 0.5
   const t = em.chuyenDe.find((c) => chuanChuyenDe(c.ten) === chuanChuyenDe(cd))
   return t && t.soCau > 0 ? t.soSai / t.soCau : 0.5
 }

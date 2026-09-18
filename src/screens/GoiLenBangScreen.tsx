@@ -992,9 +992,13 @@ export default function GoiLenBangScreen() {
           <UserCheck size={16} /> Dạy học theo đề
         </button>
       </div>
-      {dayHoc && (
-        <p className="text-xs text-slate-500 dark:text-slate-400 -mt-2">
-          Lấy toàn bộ câu trong đề đã chọn. Mỗi đợt 2 em khác nhau; ưu tiên ít lên bảng, bốc ngẫu nhiên khi bằng lượt.
+      {dayHoc ? (
+        <p className="text-xs text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/50 p-2.5 rounded-xl border border-blue-200 dark:border-blue-800/60 -mt-2 leading-relaxed">
+          ✨ <strong>Thuật toán Bậc thang Sư phạm 3 Nấc</strong>: Phân công câu hỏi theo nấc nhận thức (Nấc 1: Khởi động nền tảng cho em yếu/củng cố gốc · Nấc 2: Kỹ năng chuẩn mực cho em khá · Nấc 3: Mở rộng bứt phá bản chất cho em giỏi). Đảm bảo công bằng số lượt lên bảng.
+        </p>
+      ) : (
+        <p className="text-xs text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-800/60 -mt-2 leading-relaxed">
+          ✨ <strong>Thuật toán Chữa BTVN 3 Luồng & Vùng phát triển gần (ZPD)</strong>: Lọc câu dễ (≥ 85% đúng) vào Chiếu đáp án · Lọc câu bẫy tập thể (≥ 35% độ chụm) Thầy giảng cả lớp · Gọi 12–20 em lên bảng cho các câu trọng điểm theo đúng tầm với ZPD của em để cả lớp cùng tiến bộ.
         </p>
       )}
       {loi && <OThongBao tone="do">{loi}</OThongBao>}
