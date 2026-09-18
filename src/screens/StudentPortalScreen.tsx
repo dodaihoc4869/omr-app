@@ -1,5 +1,8 @@
 import ThongBaoHocSinh,{noticeApi} from '../components/ThongBaoHocSinh'
 import BangTinPhuHuynh from '../components/BangTinPhuHuynh'
+import BangVinhDanh from '../components/BangVinhDanh'
+import BangTroLyHocSinh from '../components/BangTroLyHocSinh'
+import BongBongChatHocSinh from '../components/BongBongChatHocSinh'
 import {MomQuestionStem,MomOption} from '../components/MomQuestionMedia'
 import {momApi, momReviewHtml} from '../lib/mom-api'
 import PhongVaoThi from '../components/PhongVaoThi'
@@ -180,6 +183,20 @@ export default function StudentPortalScreen() {
       return null
     }
   })
+
+  const [giaoDienCu, setGiaoDienCu] = useState(() => {
+    try {
+      return localStorage.getItem('omr_hs_giao_dien_cu') === '1'
+    } catch {
+      return false
+    }
+  })
+  const chuyenGiaoDien = (cu: boolean) => {
+    setGiaoDienCu(cu)
+    try {
+      localStorage.setItem('omr_hs_giao_dien_cu', cu ? '1' : '0')
+    } catch {}
+  }
 
   useEffect(()=>{
     if(!auth?.sbd||!auth.token)return
@@ -626,6 +643,63 @@ export default function StudentPortalScreen() {
       setDangMoBai(null)
     }
   }
+
+  // Hồ sơ Thần thú cho Trợ lý cá nhân
+  const [hoSoThanThu, setHoSoThanThu] = useState<any>(null)
+
+  useEffect(() => {
+    if (!auth?.sbd) return
+    let huy = false
+    void (async () => {
+      try {
+        const url = await loadScriptUrlHoacMacDinh().catch(() => '')
+        const res = await thanThuDocApi(url, auth.sbd)
+        if (!huy && res.ok && res.hoSo) {
+          setHoSoThanThu(res.hoSo)
+        }
+      } catch {}
+    })()
+    return () => {
+      huy = true
+    }
+  }, [auth?.sbd])
+
+  // Xử lý hành động 1-Click từ Trợ lý cá nhân
+  const xuLyHanhDongTroLy = useCallback((hanhDong: any) => {
+    if (!hanhDong) return
+    switch (hanhDong.loai) {
+      case 'mo_btvn':
+        if (hanhDong.payload?.bt) {
+          void moBaiTap(hanhDong.payload.bt)
+        } else {
+          setTab('btvn')
+        }
+        break
+      case 'mo_mom':
+        if (hanhDong.payload?.bai) {
+          void batDauLamBaiMom(hanhDong.payload.bai)
+        } else if (hanhDong.payload?.id) {
+          void batDauLamBaiMom({ id: hanhDong.payload.id } as BaiMomGiao)
+        } else {
+          setTab('mom')
+        }
+        break
+      case 'mo_khac_phuc':
+        if (hanhDong.payload?.cheDo) {
+          setCheDoKhacPhuc(hanhDong.payload.cheDo)
+        }
+        setTab('khacphuc')
+        break
+      case 'mo_thi':
+        setTab('vaothi')
+        break
+      case 'mo_than_thu':
+        setTab('thanthu')
+        break
+      default:
+        break
+    }
+  }, [moBaiTap, batDauLamBaiMom])
 
   // Nạp dữ liệu khi đã đăng nhập
   useEffect(() => {
@@ -1091,6 +1165,30 @@ export default function StudentPortalScreen() {
               />
             )}
 
+            {/* Nút chuyển đổi Giao diện cũ / Giao diện Trợ lý AI */}
+            <button
+              type="button"
+              onClick={() => chuyenGiaoDien(!giaoDienCu)}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition cursor-pointer active:scale-95 ${
+                giaoDienCu
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
+                  : 'bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
+              }`}
+              title={giaoDienCu ? 'Bật Giao diện Trợ lý AI & Bảng vinh danh' : 'Quay về giao diện cũ đầy đủ'}
+            >
+              {giaoDienCu ? (
+                <>
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Giao diện Trợ lý AI</span>
+                </>
+              ) : (
+                <>
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Quay về giao diện cũ</span>
+                </>
+              )}
+            </button>
+
             <button
               onClick={dangXuat}
               title="Đăng xuất"
@@ -1103,29 +1201,76 @@ export default function StudentPortalScreen() {
       )}
 
       {auth.token && !dangLamMom && !manThi && (
-        <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-14 sm:pt-16">
-          <BangTinPhuHuynh
-            sbd={auth.sbd}
-            hoTen={auth.hoTen}
-            lop={auth.lop}
-            studentToken={auth.token}
-            onSent={(id) => {
-              void napDsMom()
-              setTab('mom')
-              if (id) void batDauLamBaiMom({ id } as BaiMomGiao)
-            }}
-            activeTab={tab}
-            onSelectTab={(k, cd) => {
-              if (cd) setCheDoKhacPhuc(cd)
-              setTab((prev) => (prev === k && !cd ? null : (k as TabType)))
-            }}
-            tabStats={{
-              diemCount: dsLichSu.length,
-              btvnCount: dsBtvn.length,
-              momCount: dsMomGiao.length,
-              wrongCount: tongSoCauSaiDaChon,
-            }}
-          />
+        <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-14 sm:pt-16 space-y-6">
+          {!giaoDienCu ? (
+            <>
+              {/* 1. BẢNG VINH DANH */}
+              <BangVinhDanh
+                vaiTro="hocsinh"
+                hoTen={auth.hoTen}
+                sbd={auth.sbd}
+                lop={auth.lop}
+                tongSoCa={dsLichSu.length}
+              />
+
+              {/* 2. TRỢ LÝ HỌC TẬP CÁ NHÂN TOÀN DIỆN ĐỖ ĐẠI HỌC AI */}
+              <BangTroLyHocSinh
+                sbd={auth.sbd}
+                hoTen={auth.hoTen}
+                dsBtvn={dsBtvn}
+                dsMomGiao={dsMomGiao}
+                dsLichSu={dsLichSu}
+                tongSoCauSai={tongSoCauSaiDaChon}
+                hoSoThanThu={hoSoThanThu}
+                onAction={xuLyHanhDongTroLy}
+                onMoChat={() => {
+                  const nut = document.getElementById('btn-bong-bong-chat-hs')
+                  if (nut) nut.click()
+                }}
+              />
+            </>
+          ) : (
+            <>
+              {/* TRỢ LÝ HỌC TẬP CÁ NHÂN TOÀN DIỆN ĐỖ ĐẠI HỌC AI */}
+              <BangTroLyHocSinh
+                sbd={auth.sbd}
+                hoTen={auth.hoTen}
+                dsBtvn={dsBtvn}
+                dsMomGiao={dsMomGiao}
+                dsLichSu={dsLichSu}
+                tongSoCauSai={tongSoCauSaiDaChon}
+                hoSoThanThu={hoSoThanThu}
+                onAction={xuLyHanhDongTroLy}
+                onMoChat={() => {
+                  const nut = document.getElementById('btn-bong-bong-chat-hs')
+                  if (nut) nut.click()
+                }}
+              />
+
+              <BangTinPhuHuynh
+                sbd={auth.sbd}
+                hoTen={auth.hoTen}
+                lop={auth.lop}
+                studentToken={auth.token}
+                onSent={(id) => {
+                  void napDsMom()
+                  setTab('mom')
+                  if (id) void batDauLamBaiMom({ id } as BaiMomGiao)
+                }}
+                activeTab={tab}
+                onSelectTab={(k, cd) => {
+                  if (cd) setCheDoKhacPhuc(cd)
+                  setTab((prev) => (prev === k && !cd ? null : (k as TabType)))
+                }}
+                tabStats={{
+                  diemCount: dsLichSu.length,
+                  btvnCount: dsBtvn.length,
+                  momCount: dsMomGiao.length,
+                  wrongCount: tongSoCauSaiDaChon,
+                }}
+              />
+            </>
+          )}
         </div>
       )}
 
@@ -1970,6 +2115,15 @@ export default function StudentPortalScreen() {
             setDsCauSaiKhacPhucModal(null)
             setPhieuHtml(html)
           }}
+        />
+      )}
+
+      {/* BONG BÓNG CHAT & TRỢ LÝ AI ĐỒNG HÀNH */}
+      {auth && !manThi && !dangLamMom && (
+        <BongBongChatHocSinh
+          sbd={auth.sbd}
+          hoTen={auth.hoTen}
+          lop={auth.lop}
         />
       )}
     </div>

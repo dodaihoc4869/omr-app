@@ -18,6 +18,8 @@ import { ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenChec
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, lichSuLenBang, thanThuLopDocApi, type CaTomTat, type LichSuLenBangEm } from '../lib/exam-api'
 import { docKhoChuaCa, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
+import { theoDoiBtvn, type DongTheoDoiBtvn } from '../lib/btvn-may-chu-moi'
+import { layCauHinhMayChu } from '../lib/may-chu-moi'
 import { mergeKeepAnswers } from '../data/examContent'
 import { khuTrungNguon } from '../lib/khu-trung-cau'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
@@ -168,7 +170,10 @@ export default function GoiLenBangScreen() {
   //               ĐÚNG chuyên đề của câu đó để chọn em nào lên bảng.
   // Mặc định TỰ CHỌN: chưa mở ca thì chưa biết ca có bộ rút sẵn hay không, mà
   // hộp tích đề phải hiện sẵn để thầy làm việc được ngay.
-  const [cachLayCau, setCachLayCau] = useState<'san' | 'tu_chon' | 'theo_dang'>('tu_chon')
+  const [cachLayCau, setCachLayCau] = useState<'san' | 'tu_chon' | 'theo_dang' | 'btvn_gan_nhat'>('tu_chon')
+  const [dsBtvnCa, setDsBtvnCa] = useState<DongTheoDoiBtvn[]>([])
+  const [dangTaiBtvnCa, setDangTaiBtvnCa] = useState(false)
+  const [btvnChon, setBtvnChon] = useState<string | null>(null)
   /** RÚT THEO MÃ DẠNG (v4 mục 2). Nguồn là CẢ KHO, không phải đề thầy tích. */
   const [khoDe, setKhoDe] = useState<TeacherExamSource[]>([])
   const [soCauChua, setSoCauChua] = useState(SO_CAU_MAC_DINH)
@@ -375,6 +380,7 @@ export default function GoiLenBangScreen() {
     // Thầy tự chọn thì BỎ HẲN kho tự nạp: gộp cả hai là bảng chữa lại đầy câu
     // máy chọn, đúng chỗ thầy vừa kêu.
     if (cachLayCau === 'theo_dang') return bankTheoDang
+    if (cachLayCau === 'btvn_gan_nhat') return bankTichTay
     const san = cachLayCau === 'san' ? du?.khoChua : null
     return {
       phanI: [...(san?.phanI ?? []), ...bankTichTay.phanI],
@@ -383,18 +389,47 @@ export default function GoiLenBangScreen() {
     }
   }, [du, bankTichTay, cachLayCau, bankTheoDang])
 
+  /** NẠP BTVN ĐÃ GIAO CHO CA NÀY (ĐỂ CHỌN CHỮA BTVN GẦN NHẤT) */
+  useEffect(() => {
+    if (!du?.maCa) {
+      setDsBtvnCa([])
+      setBtvnChon(null)
+      return
+    }
+    let huy = false
+    void (async () => {
+      setDangTaiBtvnCa(true)
+      try {
+        const ch = await layCauHinhMayChu()
+        const mat = (await loadTeacherSecret()) || ''
+        const list = await theoDoiBtvn(ch, mat, du.maCa)
+        if (!huy) {
+          setDsBtvnCa(list)
+          if (list.length > 0) {
+            setBtvnChon(list[0].maBtvn)
+            if (list[0].maDe) {
+              setMaDeChon(new Set([list[0].maDe]))
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Lỗi nạp BTVN theo ca:', err)
+      } finally {
+        if (!huy) setDangTaiBtvnCa(false)
+      }
+    })()
+    return () => {
+      huy = true
+    }
+  }, [du?.maCa])
+
   /** DANH SÁCH CÂU ĐÁNG CHỮA = câu của ca + câu thầy tích thêm.
    *
    * Số câu của phần thêm đánh tiếp sau câu của ca, không đánh lại từ 1: hai
    * dòng cùng ghi "Phần I câu 3" là thầy đọc nhầm câu ngay trên lớp. */
   const dsCau: CauChua[] = useMemo(() => {
-    // THẦY TỰ CHỌN BÀI ⇒ CHỈ chữa đúng những câu đó.
-    //
-    // Thầy báo 05/09 tối: tích đề chương 2 mà máy vẫn phân câu chương 1. Đúng
-    // vậy — câu của ca đã thi có bài làm nên điểm cao hơn, chen hết chỗ. Thầy
-    // chọn bài nào thì bảng chữa chỉ được có bài đó, không câu nào chuyên đề
-    // khác. Bài làm của ca vẫn dùng, nhưng chỉ để biết em nào yếu chỗ nào.
-    if (cachLayCau === 'tu_chon' || cachLayCau === 'theo_dang') return cauTuBanDe(bankThem)
+    // THẦY TỰ CHỌN BÀI hoặc CHỌN BTVN GẦN NHẤT ⇒ CHỈ chữa đúng những câu đó.
+    if (cachLayCau === 'tu_chon' || cachLayCau === 'theo_dang' || cachLayCau === 'btvn_gan_nhat') return cauTuBanDe(bankThem)
 
     const cuaCa = du ? cauTuBanDe(du.bank) : []
     const dich = { I: du?.bank.phanI.length ?? 0, II: du?.bank.phanII.length ?? 0, III: du?.bank.phanIII.length ?? 0 }
@@ -1128,9 +1163,9 @@ export default function GoiLenBangScreen() {
         </div>
 
         <div className="flex flex-wrap gap-2 mb-3" role="radiogroup" aria-label="Cách lấy câu để chữa">
-          {(!dayHoc ? ['theo_dang', 'san', 'tu_chon'] as const : []).map((c) => {
+          {(!dayHoc ? ['theo_dang', 'san', 'tu_chon', 'btvn_gan_nhat'] as const : []).map((c) => {
             const chon = cachLayCau === c
-            const tat = (c === 'san' && !du?.khoChua) || (c === 'theo_dang' && (demChua?.tongUngVien ?? 0) === 0)
+            const tat = (c === 'san' && !du?.khoChua) || (c === 'theo_dang' && (demChua?.tongUngVien ?? 0) === 0) || (c === 'btvn_gan_nhat' && !du)
             return (
               <button
                 key={c}
@@ -1145,7 +1180,13 @@ export default function GoiLenBangScreen() {
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
                 } ${tat ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                {c === 'theo_dang' ? 'Theo dạng câu cả lớp sai' : c === 'san' ? 'Kiểm tra điểm yếu cộng dồn' : 'Tôi tự chọn bài để chữa'}
+                {c === 'theo_dang'
+                  ? 'Theo dạng câu cả lớp sai'
+                  : c === 'san'
+                  ? 'Kiểm tra điểm yếu cộng dồn'
+                  : c === 'btvn_gan_nhat'
+                  ? 'Chữa BTVN đã phân gần nhất'
+                  : 'Tôi tự chọn bài để chữa'}
               </button>
             )
           })}
@@ -1218,6 +1259,78 @@ export default function GoiLenBangScreen() {
           ) : (
             <OThongBao tone="cam">Ca này không mở bằng chế độ Kiểm tra điểm yếu nên không có bộ câu rút sẵn. Chuyển sang "Tôi tự chọn bài để chữa".</OThongBao>
           )
+        ) : cachLayCau === 'btvn_gan_nhat' ? (
+          <div className="space-y-3 mb-3" data-btvn-gan-nhat>
+            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>
+              Chọn bài tập về nhà đã phân gần nhất cho ca <b>{du?.maCa}</b> để gọi học sinh lên bảng chữa.
+              Hệ thống áp dụng <b>Bậc thang Sư phạm 3 Nấc & Vùng phát triển gần (ZPD)</b> để gọi đúng em cần củng cố câu đó.
+            </div>
+
+            {dangTaiBtvnCa ? (
+              <div className="p-6 text-center text-xs text-slate-500 flex items-center justify-center gap-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                <RefreshCw size={15} className="animate-spin text-blue-600" />
+                <span>Đang tải danh sách bài tập về nhà đã giao cho ca này…</span>
+              </div>
+            ) : dsBtvnCa.length === 0 ? (
+              <OThongBao tone="cam">
+                Chưa có bài tập về nhà nào được giao cho ca {du?.maCa}. Thầy có thể chuyển sang "Tôi tự chọn bài để chữa" để chọn đề từ kho.
+              </OThongBao>
+            ) : (
+              <div className="space-y-2 max-h-[280px] overflow-y-auto">
+                {dsBtvnCa.map((bt) => {
+                  const daChon = btvnChon === bt.maBtvn
+                  const tiLeNop = bt.tong > 0 ? Math.round((bt.daNop / bt.tong) * 100) : 0
+                  return (
+                    <div
+                      key={bt.maBtvn}
+                      onClick={() => {
+                        setBtvnChon(bt.maBtvn)
+                        if (bt.maDe) {
+                          setMaDeChon(new Set([bt.maDe]))
+                        }
+                      }}
+                      className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                        daChon
+                          ? 'bg-blue-50 dark:bg-blue-950/70 border-blue-400 dark:border-blue-600 shadow-2xs ring-2 ring-blue-400/20'
+                          : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-300'
+                      }`}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-mono text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100/60 dark:bg-blue-900/60 px-2 py-0.5 rounded">
+                            #{bt.maDe || bt.maBtvn}
+                          </span>
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                            {bt.maDe ? `Đề: ${bt.maDe}` : `BTVN: ${bt.maBtvn}`}
+                          </span>
+                          {bt.soCau > 0 && (
+                            <span className="text-[11px] text-slate-500 font-semibold">
+                              ({bt.soCau} câu)
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2 flex-wrap">
+                          <span>Giao: {new Date(bt.giaoLuc).toLocaleDateString('vi-VN')}</span>
+                          <span>·</span>
+                          <span>Hạn: {new Date(bt.hanNop).toLocaleDateString('vi-VN')}</span>
+                          {bt.quaHan && <span className="text-rose-500 font-bold">(Đã quá hạn)</span>}
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <div className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                          {bt.daNop}/{bt.tong} em đã nộp
+                        </div>
+                        <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                          {tiLeNop}% hoàn thành
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
         ) : (
           <div style={{ ...NHAN_NHO, marginBottom: 'var(--k3)' }} data-tu-chon>
             Tích bài muốn chữa. Bảng chữa CHỈ lấy câu trong bài thầy tích, áp dụng <b>Bậc thang Sư phạm 3 Nấc & Vùng phát triển gần (ZPD)</b>: Nấc 1 (câu 0 sao/Nhận biết) gọi em cần củng cố gốc để làm được ngay, tự tin; Nấc 2 (1 sao/Thông hiểu) gọi em khá làm mẫu chuẩn mực cho cả lớp; Nấc 3 (2 sao/Vận dụng) gọi em giỏi mở rộng tư duy tranh biện. Ghép đúng em đã làm sai hoặc chưa làm câu đó ở nhà nhưng rơi đúng vào vùng ZPD để em tự sửa và tiến bộ thực sự.

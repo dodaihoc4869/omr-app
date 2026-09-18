@@ -209,7 +209,7 @@ function thuHtml(o: OBang): string {
 
 /** Header học sinh: nổi hẳn lên trên (sticky), gọn gàng chuẩn Google */
 function headerEmHtml(o: OBang, ma: string): string {
-  return `<header class="mc-em" id="em-${ma}" hidden>
+  return `<header class="mc-em" id="em-${ma}">
     <div class="mc-em-trai">
       <div class="mc-em-hang1">
         <span class="mc-ten">${thoat(o.hoTen || o.sbd)}</span>
@@ -568,7 +568,6 @@ const JS_MAY_CHIEU = `
     var seconds = Number(page && page.getAttribute('data-seconds'));
     clock.hidden = !seconds;document.body.classList.toggle('mc-timing',!!seconds);
     if (!seconds) return;
-    page.querySelectorAll('.mc-em').forEach(function(e) { e.hidden = true; });
     page.querySelectorAll('.mc-giai').forEach(function(e) { e.hidden = true; });
     page.querySelectorAll('.mc-nut-giai').forEach(function(e) { e.setAttribute('aria-expanded','false'); var t=e.querySelector('.mc-nut-chu'); if(t)t.textContent='Hiện lời giải'; });
     deadline = Date.now() + seconds * 1000;
@@ -766,7 +765,7 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChon: TuyChonMayChieu = {}): st
   return `<!DOCTYPE html>
 <html lang="vi" data-projector="matte-light" data-sang><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${thoat(tuyChon.tenBuoi || 'Gọi lên bảng')} — tờ máy chiếu</title>
-<style>${CSS_PHIEU}</style><style>.mc-day-hoc .mc-nut-hien-em {display:none !important}</style><style>${CSS_MAY_CHIEU}</style></head>
+<style>${CSS_PHIEU}</style><style>${CSS_MAY_CHIEU}</style></head>
 <body class="mc${tuyChon.dayHoc ? ' mc-day-hoc' : ''}">${than}
 <script>${JS_MAY_CHIEU}</script></body></html>`
 }

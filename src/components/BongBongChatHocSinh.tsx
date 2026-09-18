@@ -285,6 +285,7 @@ export default function BongBongChatHocSinh({
       {/* NÚT BONG BÓNG */}
       <button
         type="button"
+        id="btn-bong-bong-chat-hs"
         onClick={() => setOpen(!open)}
         className="fixed bottom-6 right-6 z-40 rounded-full shadow-lg flex items-center justify-center tap-target transition-transform active:scale-95 cursor-pointer"
         style={{

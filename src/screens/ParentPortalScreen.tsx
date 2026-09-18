@@ -1,4 +1,6 @@
 import BangTinPhuHuynh from '../components/BangTinPhuHuynh'
+import BangVinhDanh from '../components/BangVinhDanh'
+import BangTroLyPhuHuynh from '../components/BangTroLyPhuHuynh'
 import { momApi, migrateMom, momReviewHtml, chuanHoaBaiMom } from '../lib/mom-api'
 import KhoiKhacPhuc3CheDo from '../components/KhoiKhacPhuc3CheDo'
 import { useEffect, useMemo, useState } from 'react'
@@ -13,6 +15,8 @@ import {
   RefreshCw,
   AlertCircle,
   X,
+  Sparkles,
+  RotateCcw,
 } from 'lucide-react'
 import LogoApp from '../components/LogoApp'
 import NutQuayLai from '../components/NutQuayLai'
@@ -77,6 +81,21 @@ export default function ParentPortalScreen() {
   const [scriptUrl, setScriptUrl] = useState('')
   const [dangTai, setDangTai] = useState(false)
   const [thongBaoLoi, setThongBaoLoi] = useState('')
+  const [tongSoCauSaiCon, setTongSoCauSaiCon] = useState(0)
+
+  const [giaoDienCu, setGiaoDienCu] = useState(() => {
+    try {
+      return localStorage.getItem('omr_ph_giao_dien_cu') === '1'
+    } catch {
+      return false
+    }
+  })
+  const chuyenGiaoDien = (cu: boolean) => {
+    setGiaoDienCu(cu)
+    try {
+      localStorage.setItem('omr_ph_giao_dien_cu', cu ? '1' : '0')
+    } catch {}
+  }
 
   // Dữ liệu con
   const [dsBaiThi, setDsBaiThi] = useState<BaiThiCuaCon[]>([])
@@ -211,6 +230,13 @@ export default function ParentPortalScreen() {
         } catch {
           // fallback
         }
+
+        try {
+          const resSai = await hsCauSaiApi(url, sbdSach, [])
+          if (resSai && resSai.ok && Array.isArray(resSai.items)) {
+            setTongSoCauSaiCon(resSai.items.length)
+          }
+        } catch {}
       }
 
       // 3. Tải danh sách bài Mom giao
@@ -435,6 +461,30 @@ export default function ParentPortalScreen() {
               #{sbdHienTai}
             </span>
 
+            {/* Nút chuyển đổi Giao diện cũ / Giao diện Trợ lý AI */}
+            <button
+              type="button"
+              onClick={() => chuyenGiaoDien(!giaoDienCu)}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition cursor-pointer active:scale-95 ${
+                giaoDienCu
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
+                  : 'bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
+              }`}
+              title={giaoDienCu ? 'Bật Giao diện Trợ lý AI & Bảng vinh danh' : 'Quay về giao diện cũ đầy đủ'}
+            >
+              {giaoDienCu ? (
+                <>
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Giao diện Trợ lý AI</span>
+                </>
+              ) : (
+                <>
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Quay về giao diện cũ</span>
+                </>
+              )}
+            </button>
+
             <button
               type="button"
               onClick={dangXuat}
@@ -449,21 +499,57 @@ export default function ParentPortalScreen() {
 
       {/* BODY CHÍNH */}
       <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6 pt-14 sm:pt-16 pb-24">
-        <div className="mb-6">
-          <BangTinPhuHuynh
-            sbd={sbdHienTai}
-            hoTen={hoTenCon}
-            lop={lopCon}
-            onSent={() => void napDanhSachMomGiao(sbdHienTai)}
-            activeTab={tabPh}
-            onSelectTab={(tab, cd) => {
-              if (cd) setCheDoKhacPhuc(cd)
-              setTabPh((prev) => (prev === tab && !cd ? null : (tab as any)))
-            }}
-            tabStats={{ diemCount: dsBaiThi.length }}
-            caGanNhat={caGanNhat}
-          />
-        </div>
+        {!giaoDienCu ? (
+          <div className="space-y-6">
+            {/* 1. BẢNG VINH DANH */}
+            <BangVinhDanh
+              vaiTro="phuhuynh"
+              hoTen={hoTenCon}
+              sbd={sbdHienTai}
+              lop={lopCon}
+              tongSoCa={dsBaiThi.length}
+            />
+
+            {/* 2. BẢNG TRỢ LÝ PHỤ HUYNH */}
+            <BangTroLyPhuHuynh
+              sbd={sbdHienTai}
+              hoTen={hoTenCon}
+              lop={lopCon}
+              dsBaiThi={dsBaiThi}
+              caGanNhat={caGanNhat}
+              tongCauSai={tongSoCauSaiCon > 0 ? tongSoCauSaiCon : dsBaiThi.reduce((acc, b) => acc + (b.soCauSai || 0), 0)}
+              dsMomGiao={dsMomGiao}
+              onGiaoBaiKhacPhuc={() => {
+                void xuLyTaoBaiCuaMom()
+              }}
+              onXemChiTietCa={(ca) => {
+                setCaDangXem(ca)
+              }}
+              onXemBangDiem={() => {
+                setTabPh('diem')
+              }}
+              onGiaoBaiLuyen={() => {
+                setTabPh('khacphuc')
+              }}
+            />
+          </div>
+        ) : (
+          <div className="mb-6">
+            <BangTinPhuHuynh
+              sbd={sbdHienTai}
+              hoTen={hoTenCon}
+              lop={lopCon}
+              onSent={() => void napDanhSachMomGiao(sbdHienTai)}
+              activeTab={tabPh}
+              onSelectTab={(tab, cd) => {
+                if (cd) setCheDoKhacPhuc(cd)
+                setTabPh((prev) => (prev === tab && !cd ? null : (tab as any)))
+              }}
+              tabStats={{ diemCount: dsBaiThi.length }}
+              caGanNhat={caGanNhat}
+            />
+          </div>
+        )}
       </main>
 
       {/* FULLSCREEN CHỨC NĂNG PHỤ HUYNH: BẤM VÀO MỞ TOÀN MÀN HÌNH */}

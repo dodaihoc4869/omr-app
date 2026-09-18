@@ -48,12 +48,20 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
   // cho khác biệt: lấy đúng con số trình duyệt đang bố cục, mọi lối vào đều ra
   // một kết quả. Thanh trái ẩn (màn hẹp, hoặc màn làm bài không dựng thanh) thì
   // ra 0, tức phủ kín — đúng như mong muốn.
+  const isMayChieu = Boolean(ten && (ten.toLowerCase().includes('máy chiếu') || ten.toLowerCase().includes('chiếu')))
   const [meTrai, setMeTrai] = useState(0)
   useLayoutEffect(() => {
+    if (isMayChieu) {
+      setMeTrai(0)
+      return
+    }
     const thanh = document.querySelector('.ben-trai') as HTMLElement | null
     const do_ = () => {
       if (!thanh || getComputedStyle(thanh).display === 'none') return setMeTrai(0)
-      setMeTrai(Math.round(thanh.getBoundingClientRect().right))
+      const rect = thanh.getBoundingClientRect()
+      // Thanh menu ở CẠNH PHẢI màn hình (rect.left > 100) -> mép trái phủ từ 0
+      if (rect.left > 100) return setMeTrai(0)
+      setMeTrai(Math.round(rect.right))
     }
     do_()
     window.addEventListener('resize', do_)
@@ -64,7 +72,7 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
       window.removeEventListener('resize', do_)
       theoDoi?.disconnect()
     }
-  }, [])
+  }, [isMayChieu])
 
   // GIỮ `dong` TRONG REF, và hiệu ứng dưới chạy ĐÚNG MỘT LẦN lúc mở.
   //
@@ -141,7 +149,7 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
   }, [])
 
   return createPortal(
-    <div className="lop-xem-phieu" role="dialog" aria-modal="true" aria-label={ten || 'Phiếu bài tập'} style={{ left: meTrai }}>
+    <div className="lop-xem-phieu" role="dialog" aria-modal="true" aria-label={ten || 'Phiếu bài tập'} style={{ left: isMayChieu ? 0 : meTrai, zIndex: 99999 }}>
       <iframe
         title={ten || 'Phiếu bài tập'}
         {...(html ? { srcDoc: html } : { src })}

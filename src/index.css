@@ -484,7 +484,7 @@ body {
  * không nhấp nháy phủ kín trong một khung hình đầu tiên trước khi đo xong. */
 @media (min-width: 880px) {
   body:has(.ben-trai) .lop-xem-phieu {
-    left: var(--rong-ben-trai, 232px);
+    left: 0;
   }
 }
 
