@@ -1291,11 +1291,16 @@ export default function StudentPortalScreen() {
           <div className="space-y-4 animate-google-fade">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                  Bài tập về nhà
-                </h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                    Bài tập về nhà
+                  </h2>
+                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    Thuật toán 3 Vòng Phân Tầng
+                  </span>
+                </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Danh sách các bài tập Thầy giao, thời hạn nộp bài và kết quả làm bài
+                  Hoàn thành Vòng 1 (Lõi) + Vòng 2 (Trọng tâm) là đạt 100% chỉ tiêu · Vòng 3 thử thách x2 EXP Thần Thú
                 </p>
               </div>
 
@@ -1308,6 +1313,32 @@ export default function StudentPortalScreen() {
                 <RefreshCw className={`w-3.5 h-3.5 ${dangTaiBtvn ? 'animate-spin' : ''}`} />
                 <span>Làm mới</span>
               </button>
+            </div>
+
+            {/* Banner 3 Vòng BTVN Thông Minh */}
+            <div className="bg-gradient-to-r from-emerald-50/80 via-amber-50/60 to-rose-50/80 dark:from-emerald-950/20 dark:via-amber-950/20 dark:to-rose-950/20 border border-emerald-200/80 dark:border-emerald-800/60 rounded-2xl p-4">
+              <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">
+                  Quy định làm bài 3 Vòng Phân Tầng
+                </span>
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-700">
+                  Đạt 100% chỉ tiêu = Vòng 1 + Vòng 2
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
+                <div className="bg-white/80 dark:bg-slate-900/80 rounded-xl p-2.5 border border-emerald-200/60 dark:border-emerald-800/40">
+                  <div className="font-bold text-emerald-700 dark:text-emerald-400 mb-0.5">VÒNG 1: LÕI CĂN BẢN</div>
+                  <div className="text-[11px] text-slate-600 dark:text-slate-300">Bắt buộc 100% học sinh hoàn thành để nắm chắc kiến thức cốt lõi.</div>
+                </div>
+                <div className="bg-white/80 dark:bg-slate-900/80 rounded-xl p-2.5 border border-amber-200/60 dark:border-amber-800/40">
+                  <div className="font-bold text-amber-700 dark:text-amber-400 mb-0.5">VÒNG 2: TRỌNG TÂM CÁ NHÂN</div>
+                  <div className="text-[11px] text-slate-600 dark:text-slate-300">Bắt buộc hoàn thành theo chuyên đề cá nhân hóa để đủ chuẩn bài tập.</div>
+                </div>
+                <div className="bg-white/80 dark:bg-slate-900/80 rounded-xl p-2.5 border border-rose-200/60 dark:border-rose-800/40">
+                  <div className="font-bold text-rose-700 dark:text-rose-400 mb-0.5">VÒNG 3: THỬ THÁCH BỨT PHÁ</div>
+                  <div className="text-[11px] text-slate-600 dark:text-slate-300">Không ép buộc — thử sức chinh phục điểm 9–10 & thưởng x2 EXP Thần Thú.</div>
+                </div>
+              </div>
             </div>
 
             {dangTaiBtvn ? (
@@ -1342,9 +1373,12 @@ export default function StudentPortalScreen() {
                     className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                   >
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                           #{bt.maCa}
+                        </span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                          3 Vòng Phân Tầng
                         </span>
                         {bt.daNop ? (
                           <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">

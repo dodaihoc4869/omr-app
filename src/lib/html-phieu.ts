@@ -441,6 +441,76 @@ button.topic-item.chon { background: var(--the-nen); box-shadow: inset 0 0 0 1.5
 button.topic-item.chon .topic-ten { color: var(--nav); }
 button.topic-item.chon .topic-cau, button.topic-item.chon .topic-cd { color: var(--nav); opacity: .78; }
 
+/* 3 VÒNG PHÂN TẦNG BTVN THÔNG MINH */
+.btvn-3vong-banner {
+  background: var(--the-nen, #f8fafc);
+  border: 1.5px solid var(--vien-dam, #cbd5e1);
+  border-radius: 18px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.btvn-3vong-tieu-de {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+.btvn-3vong-tieu-de strong { font-weight: 800; color: var(--muc); }
+.btvn-chi-tieu {
+  font-size: 12px;
+  font-weight: 700;
+  background: #ecfdf5;
+  color: #047857;
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid #a7f3d0;
+}
+.btvn-3vong-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+.vong-col {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--vien);
+  background: var(--nen);
+}
+.vong-col.col-1 { border-left: 4px solid #1e8e3e; }
+.vong-col.col-2 { border-left: 4px solid #e37400; }
+.vong-col.col-3 { border-left: 4px solid #c5221f; }
+.vong-head {
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+.col-1 .vong-head { color: #1e8e3e; }
+.col-2 .vong-head { color: #e37400; }
+.col-3 .vong-head { color: #c5221f; }
+.vong-body {
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--nhat);
+}
+.vong-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  margin-left: 6px;
+  white-space: nowrap;
+}
+.vong-pill.p1 { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+.vong-pill.p2 { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+.vong-pill.p3 { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+
+.q-tag.vong-btvn { font-weight: 800; letter-spacing: 0.02em; }
+.q-tag.vong-1 { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+.q-tag.vong-2 { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+.q-tag.vong-3 { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+
 /* ================= Ô LÀM BÀI (phiếu nộp được) =================
    CHỌN NGAY TRÊN PHƯƠNG ÁN, không có hàng "EM CHỌN" riêng nữa (thầy chốt
    08/09). Hàng phương án của đề vốn đã cao hơn 44px nên cỡ chạm đã đạt; ở đây
@@ -1023,22 +1093,19 @@ const MUI_TEN = '<svg class="q-mui" viewBox="0 0 24 24" fill="none" stroke="curr
  * mọi thứ dưới đây chỉ bật khi `choLam`.
  */
 
-export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = false, choLam = false): string {
+export function theCauHtml(c: CauLuyen, stt: number, moSan = false, anGiai = false, choLam = false, laBtvn = false): string {
   // Nhãn CHỮA đứng trước mọi nhãn khác: đọc một dòng là biết câu này có mặt
   // ở đây để sửa lỗi nào, không phải "một câu Ester bất kỳ".
   const n = c.chuaCho
+  const tagVong = laBtvn
+    ? c.mucDo === 'van_dung'
+      ? '<span class="q-tag vong-btvn vong-3">Vòng 3: Thử Thách (x2 EXP)</span>'
+      : c.mucDo === 'hieu'
+      ? '<span class="q-tag vong-btvn vong-2">Vòng 2: Trọng Tâm</span>'
+      : '<span class="q-tag vong-btvn vong-1">Vòng 1: Lõi Căn Bản</span>'
+    : ''
   const tags = [
-    // Nhãn PHẢI kèm phần: "câu 2" trần trỏ vào hai câu khác nhau của cùng một
-    // bài thi, em không biết mình đang chữa câu nào.
-    // Ba mức, nói đúng mức của mình — nhãn "khắc phục" chỉ dành cho câu CÙNG
-    // MÃ DẠNG. Câu chỉ cùng chuyên đề thì nói là luyện thêm, không được đội lốt
-    // câu chữa: thầy nhìn phiếu phải biết ngay câu nào chữa đúng bệnh.
-    // BỐN MỨC, mỗi mức nói đúng việc của mình.
-    //
-    // Mức `laDeCuaEm` thêm 14/09: thầy bấm "Xem đề và lời giải kèm lỗi sai" mà
-    // ra một tờ trông y hệt phiếu khắc phục, vì MỌI câu em làm sai đều bị dán
-    // nhãn "Khắc phục lỗi sai câu N phần P". Tờ này là CHÍNH ĐỀ em vừa làm —
-    // nhãn của nó phải nói em sai câu nào, không được nói đang chữa câu nào.
+    tagVong,
     n
       ? `<span class="q-tag ${n.laDeCuaEm ? 'sai-cua-em' : 'chua'}">${
           n.laDeCuaEm
@@ -1327,7 +1394,7 @@ function oThongKe(so: number, nhan: string, loc: string): string {
   return `<button type="button" class="stat-card" data-loc="${loc}" aria-pressed="false" title="${loc === 'tat' ? 'Xem tất cả' : 'Chỉ xem phần này'}">${trong}</button>`
 }
 
-export function tongQuanHtml(cau: CauLuyen[]): string {
+export function tongQuanHtml(cau: CauLuyen[], laBtvn = false): string {
   const dem = (p: string) => cau.filter((c) => c.phan === p).length
   // Mức độ là thang THỨ BẬC dễ → khó, nên màu cũng phải đi theo bậc: xanh lá →
   // cam → đỏ, đúng lối Material của Google. Bản cũ để hồng cho "Thông hiểu" —
@@ -1349,12 +1416,48 @@ export function tongQuanHtml(cau: CauLuyen[]): string {
       const lien = so[so.length - 1] - so[0] + 1 === so.length
       const nhan = so.length === 1 ? `Câu ${so[0]}` : lien ? `Câu ${so[0]}–${so[so.length - 1]}` : `Câu ${so.join(', ')}`
       const cd = [...new Set(ds.map((x) => x.c.chuyenDe).filter(Boolean))].join(', ')
-      return `<button type="button" class="topic-item" data-loc="muc:${k}" aria-pressed="false"><span class="topic-cham"><span class="topic-dot" style="background:${mau};"></span></span><span class="topic-ten"><strong>${ten}</strong>${cd ? `<span class="topic-cd">${thoat(cd)}</span>` : ''}</span><span class="topic-cau">${nhan} · ${ds.length} câu</span></button>`
+      const tagVong = laBtvn
+        ? k === 'biet'
+          ? '<span class="vong-pill p1">Vòng 1: Lõi Căn Bản (Bắt buộc)</span>'
+          : k === 'hieu'
+          ? '<span class="vong-pill p2">Vòng 2: Trọng Tâm Cá Nhân (Bắt buộc)</span>'
+          : '<span class="vong-pill p3">Vòng 3: Thử Thách Bứt Phá (x2 EXP)</span>'
+        : ''
+      return `<button type="button" class="topic-item" data-loc="muc:${k}" aria-pressed="false"><span class="topic-cham"><span class="topic-dot" style="background:${mau};"></span></span><span class="topic-ten"><strong>${ten}</strong>${cd ? `<span class="topic-cd">${thoat(cd)}</span>` : ''}${tagVong}</span><span class="topic-cau">${nhan} · ${ds.length} câu</span></button>`
     })
     .join('')
+
+  const v1Count = cau.filter((c) => c.mucDo === 'biet' || !c.mucDo).length
+  const v2Count = cau.filter((c) => c.mucDo === 'hieu').length
+  const v3Count = cau.filter((c) => c.mucDo === 'van_dung').length
+
+  const bannerBtvn = laBtvn
+    ? `<div class="btvn-3vong-banner">
+  <div class="btvn-3vong-tieu-de">
+    <strong>THUẬT TOÁN 3 VÒNG PHÂN TẦNG BÀI TẬP VỀ NHÀ:</strong>
+    <span class="btvn-chi-tieu">Hoàn thành Vòng 1 + Vòng 2 là đạt 100% chỉ tiêu BTVN</span>
+  </div>
+  <div class="btvn-3vong-grid">
+    <div class="vong-col col-1">
+      <div class="vong-head">VÒNG 1: LÕI CĂN BẢN · ${v1Count} câu</div>
+      <div class="vong-body">Kiến thức cốt lõi nhận biết & thông hiểu. Bắt buộc 100% học sinh hoàn thành để nắm chắc nền tảng.</div>
+    </div>
+    <div class="vong-col col-2">
+      <div class="vong-head">VÒNG 2: TRỌNG TÂM CÁ NHÂN · ${v2Count} câu</div>
+      <div class="vong-body">Rèn luyện kỹ năng & lấp lỗ hổng chuyên đề. Bắt buộc hoàn thành để đạt chuẩn bài tập.</div>
+    </div>
+    <div class="vong-col col-3">
+      <div class="vong-head">VÒNG 3: THỬ THÁCH BỨT PHÁ · ${v3Count} câu</div>
+      <div class="vong-body">Vận dụng cao 2 sao. Không ép buộc học sinh; thử sức để bứt phá điểm 9–10 và nhận x2 EXP Thần Thú.</div>
+    </div>
+  </div>
+</div>`
+    : ''
+
   // KHÔNG EMOJI: quy tắc viết của thầy cấm emoji trong mọi thứ gửi phụ huynh và
   // học sinh, mà phiếu này gửi cả hai. Bốn ô đã tự nói tên phần của mình.
   return `<section class="summary-page">
+  ${bannerBtvn}
   <div class="summary-dau">
     <span class="summary-title">Tổng quan đề bài</span>
     <span class="summary-tong">${cau.length} câu · chạm một ô để xem riêng phần đó</span>
@@ -1365,7 +1468,7 @@ export function tongQuanHtml(cau: CauLuyen[]): string {
     ${oThongKe(dem('II'), 'Đúng / Sai', 'phan:II')}
     ${oThongKe(dem('III'), 'Trả lời ngắn', 'phan:III')}
   </div>
-  ${dong ? `<div class="topics-list"><h3>Phân loại mức độ</h3>${dong}</div>` : ''}
+  ${dong ? `<div class="topics-list"><h3>${laBtvn ? 'Phân loại mức độ & Vòng phân tầng' : 'Phân loại mức độ'}</h3>${dong}</div>` : ''}
 </section>`
 }
 
@@ -2104,18 +2207,20 @@ export interface TuyChonPhieu {
   /** Mở sẵn tất cả lời giải ngay khi mở phiếu (tiện cho việc xem lại/review). */
   moSan?: boolean
   loiNhac?: string | null
+  laBtvn?: boolean
 }
 
 export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChonPhieu = {}): string {
   // `thieuChua` đi kèm phiếu để khối đầu phiếu nói được câu sai nào chưa có câu
   // chữa — im lặng bỏ qua là thầy tưởng phiếu đã chữa hết.
   const anGiai = !!tuyChon.anGiai
+  const laBtvn = Boolean(tuyChon.laBtvn || t.nhanBia === 'BÀI TẬP VỀ NHÀ' || t.tenChuyenDe === 'Bài tập về nhà')
   // PHIẾU NỘP ĐƯỢC: chỉ khi chỗ gọi khai `nop`, và không đi cùng `anGiai`
   // (phiếu chỉ có đề thì không có đáp án để chấm).
   const nop = !anGiai && tuyChon.nop ? tuyChon.nop : null
   const chNop = cauHinhNop(nop?.cauHinh)
   const cau = anGiai ? cauVao.map(boLoiGiai) : cauVao
-  const the = cau.map((c, i) => theCauHtml(c, i + 1, !!tuyChon.moSan, anGiai, !!nop)).join('\n')
+  const the = cau.map((c, i) => theCauHtml(c, i + 1, !!tuyChon.moSan, anGiai, !!nop, laBtvn)).join('\n')
   // KHOÁ LỜI GIẢI TỚI KHI NỘP. Chỉ áp cho phiếu nộp được và khi thầy không
   // bật `HIEN_GIAI_TRUOC_NOP`.
   const khoaGiai = !!nop && !chNop.HIEN_GIAI_TRUOC_NOP
@@ -2128,7 +2233,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
 <div class="khung">
   ${nhac ? `<div class="nhac-phieu">${thoat(nhac)}</div>` : ''}
   ${khoiChuaGiHtml(cau, tuyChon.thieuChua ?? [])}
-  ${tongQuanHtml(cau)}
+  ${tongQuanHtml(cau, laBtvn)}
   ${thanhHtml(coGiai, anGiai)}
   ${nop ? thanhNopHtml(cau.length) : ''}
   ${khoaGiai ? '<div class="giai-khoa" id="giai-khoa">Lời giải mở ra ngay sau khi em bấm Nộp bài.</div>' : ''}

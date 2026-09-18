@@ -105,14 +105,15 @@ export async function dungPhieuBtvn(
     },
     cau,
     {
+      laBtvn: true,
       // Đã nộp rồi thì mở thành phiếu CHỈ ĐỌC kèm lời giải — em xem lại bài,
       // không nộp thêm lần nữa.
       nop: r.daNop || !maBtvn ? null : { ma: maBtvn, sbd, banNhap, legacyIds:cau.map(c=>doc.json!.ma_de+(c.id.match(/-(III|II|I)-\d+$/)?.[0]||'')), url: `${String(ch.URL ?? '').replace(/\/+$/, '')}/goi` },
       loiNhac: r.daNop
-        ? `Em đã nộp bài này rồi — đây là bản xem lại, bấm vào từng câu để mở lời giải.${conLai > 0 ? ` Thầy cho phép làm lại tối đa 3 lần (còn ${conLai} lượt).` : ' (Đã hết 3 lượt làm lại)'}`
+        ? `Em đã nộp bài này rồi — đây là bản xem lại theo mô hình 3 Vòng Phân Tầng, bấm vào từng câu để mở lời giải.${conLai > 0 ? ` Thầy cho phép làm lại tối đa 3 lần (còn ${conLai} lượt).` : ' (Đã hết 3 lượt làm lại)'}`
         : laLamLai
-        ? `Bài tập về nhà (Làm lại lần ${lanLamHienTai - 1} · còn ${conLai} lượt) · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Làm xong bấm Nộp bài ở thanh trên.`
-        : `Bài tập về nhà · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Làm xong bấm Nộp bài ở thanh trên.`,
+        ? `Bài tập về nhà (3 Vòng Phân Tầng · Làm lại lần ${lanLamHienTai - 1} · còn ${conLai} lượt) · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Hoàn thành Vòng 1 (Lõi Căn Bản) + Vòng 2 (Trọng Tâm Cá Nhân) là đạt 100% yêu cầu; Vòng 3 (Thử Thách) thưởng x2 EXP Thần Thú. Làm xong bấm Nộp bài ở thanh trên.`
+        : `Bài tập về nhà (3 Vòng Phân Tầng) · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Hoàn thành Vòng 1 (Lõi Căn Bản) + Vòng 2 (Trọng Tâm Cá Nhân) là đạt 100% yêu cầu; Vòng 3 (Thử Thách) thưởng x2 EXP Thần Thú. Làm xong bấm Nộp bài ở thanh trên.`,
     },
   )
 }

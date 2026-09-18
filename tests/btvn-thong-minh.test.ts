@@ -42,4 +42,32 @@ describe('BÀI TẬP VỀ NHÀ THÔNG MINH — 3 VÒNG PHÂN TẦNG', () => {
     expect(td.datYeuCau).toBe(false)
     expect(td.tiLeHoanThanh).toBe(33) // 1/3 câu bắt buộc
   })
+
+  it('dungPhieu render đầy đủ banner 3 Vòng Phân Tầng và nhãn vòng trên từng câu', async () => {
+    const { dungPhieu } = await import('../src/lib/html-phieu')
+    const html = dungPhieu(
+      {
+        hoTen: 'Đỗ Đại Học',
+        sbd: 'ddh',
+        ngay: new Date(),
+        tenChuyenDe: 'Bài tập về nhà',
+        nhanBia: 'BÀI TẬP VỀ NHÀ',
+      },
+      [
+        { id: 'c1', phan: 'I', tieuDe: 'Câu 1', de: 'Nội dung câu 1', mucDo: 'biet', dapAn: 'A' },
+        { id: 'c2', phan: 'I', tieuDe: 'Câu 2', de: 'Nội dung câu 2', mucDo: 'hieu', dapAn: 'B' },
+        { id: 'c3', phan: 'I', tieuDe: 'Câu 3', de: 'Nội dung câu 3', mucDo: 'van_dung', dapAn: 'C' },
+      ],
+      { laBtvn: true },
+    )
+    expect(html).toContain('THUẬT TOÁN 3 VÒNG PHÂN TẦNG BÀI TẬP VỀ NHÀ:')
+    expect(html).toContain('Hoàn thành Vòng 1 + Vòng 2 là đạt 100% chỉ tiêu BTVN')
+    expect(html).toContain('Vòng 1: Lõi Căn Bản')
+    expect(html).toContain('Vòng 2: Trọng Tâm Cá Nhân')
+    expect(html).toContain('Vòng 3: Thử Thách Bứt Phá')
+    expect(html).toContain('vong-btvn vong-1')
+    expect(html).toContain('vong-btvn vong-2')
+    expect(html).toContain('vong-btvn vong-3')
+  })
 })
+
