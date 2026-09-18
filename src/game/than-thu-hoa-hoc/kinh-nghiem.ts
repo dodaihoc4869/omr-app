@@ -169,10 +169,58 @@ export const NGUON_EXP = {
   nopMom: (diem: number) => 150 + Math.max(0, Math.round(diem * 25)),
 } as const
 
+export interface TinhExpLuyenThuParams {
+  sao?: number
+  laDangYeu?: boolean
+  comboDungLienTiep?: number
+  soCauTrongNgay?: number
+}
+
+/** TÍNH EXP THÔNG MINH CHO TỪNG HỌC SINH KHI LUYỆN THÚ.
+ *
+ * 1. Phân tầng theo sao: 0 sao (20), 1 sao (45), 2 sao (90).
+ * 2. Hệ số Lỗ hổng x1.5 khi học sinh hạ gục đúng dạng bài đang yếu.
+ * 3. Thưởng chuỗi Combo đúng liên tiếp (Streak 3 x1.15, 5 x1.3, 10 x1.5).
+ * 4. Chống cày cuốc tiêu cực: trên 25 câu/ngày giảm còn 20%. */
+export function tinhExpLuyenThu(p: TinhExpLuyenThuParams): {
+  exp: number
+  expCoBan: number
+  heSoLoHong: number
+  heSoCombo: number
+  heSoGiamMoiMet: number
+  thongDiepThuong: string
+} {
+  const sao = p.sao === 2 ? 2 : p.sao === 1 ? 1 : 0
+  const expCoBan = sao === 2 ? 90 : sao === 1 ? 45 : 20
+  const heSoLoHong = p.laDangYeu ? 1.5 : 1.0
+  const combo = Math.max(1, p.comboDungLienTiep ?? 1)
+  const heSoCombo = combo >= 10 ? 1.5 : combo >= 5 ? 1.3 : combo >= 3 ? 1.15 : 1.0
+  const daLuyen = p.soCauTrongNgay ?? 0
+  const heSoGiamMoiMet = daLuyen >= 25 ? 0.2 : 1.0
+
+  const tongExp = Math.max(1, Math.round(expCoBan * heSoLoHong * heSoCombo * heSoGiamMoiMet))
+
+  const notes: string[] = []
+  if (p.laDangYeu) notes.push('Khắc phục lỗ hổng x1.5')
+  if (heSoCombo > 1) notes.push(`Combo x${combo} (+${Math.round((heSoCombo - 1) * 100)}%)`)
+  if (heSoGiamMoiMet < 1) notes.push('Đã luyện >25 câu hôm nay (nghỉ ngơi giữ sức)')
+
+  return {
+    exp: tongExp,
+    expCoBan,
+    heSoLoHong,
+    heSoCombo,
+    heSoGiamMoiMet,
+    thongDiepThuong: notes.join(' · '),
+  }
+}
+
 /** Nhãn hiện cho học sinh — phải khớp đúng con số ở trên, không hứa suông. */
 export const BANG_NGUON_EXP: readonly { viec: string; thuong: string }[] = [
+  { viec: 'Luyện câu theo sao & độ khó', thuong: '20 ★0 · 45 ★1 · 90 ★2' },
+  { viec: 'Khắc phục dạng bài em đang yếu', thuong: 'Thưởng thêm x1.5 EXP' },
+  { viec: 'Combo đúng liên tiếp', thuong: 'Chuỗi 3, 5, 10 thưởng tới +50%' },
   { viec: 'Hạ trùm một tầng tháp MỚI', thuong: '25 + 0,9 × số tầng' },
-  { viec: 'Leo lại tầng đã hạ', thuong: 'chỉ 12%' },
   { viec: 'Thanh tẩy một câu sai', thuong: '100 EXP' },
   { viec: 'Nộp đủ một bài tập về nhà', thuong: '200 EXP' },
   { viec: 'Thi xong một ca', thuong: '60 EXP mỗi điểm' },

@@ -54,7 +54,7 @@ import {
 } from '../game/than-thu-hoa-hoc/rut-cau-thap'
 import {
   nhanExp, NGUON_EXP, BANG_NGUON_EXP, SUC_CHUA_ONG,
-  DS_NGUON_EXP, TEN_NGUON_EXP, tongSoExp, type NguonKiemExp,
+  DS_NGUON_EXP, TEN_NGUON_EXP, tongSoExp, tinhExpLuyenThu, type NguonKiemExp,
 } from '../game/than-thu-hoa-hoc/kinh-nghiem'
 import { KHO_CAU_HOI, type CauHoi } from '../game/than-thu-hoa-hoc/kho-cau-hoi'
 import {
@@ -733,8 +733,10 @@ export default function ThanThuHoaHocGame({
       setQidDaThanhTay((truoc) => {
         if (truoc.includes(q.qid)) return truoc
         const sau = [...truoc, q.qid]
-        setHoSo((h) => ({ ...h, soCauDaThanhTay: sau.length }))
-        themVaoKho(NGUON_EXP.suaCauSai(), 'sanBoss', `Hạ quái câu sai: ${q.tenDang || q.chuyenDe}`)
+        const saoCau = q.sao ?? 1
+        const thuong = tinhExpLuyenThu({ sao: saoCau, laDangYeu: true, comboDungLienTiep: 1 })
+        const expNhan = Math.max(NGUON_EXP.suaCauSai(), thuong.exp)
+        themVaoKho(expNhan, 'sanBoss', `Hạ quái câu sai (${saoCau}★ x1.5): ${q.tenDang || q.chuyenDe}`)
         return sau
       })
     } else {
@@ -918,6 +920,8 @@ export default function ThanThuHoaHocGame({
   /** Khoá câu đang hỏi: `qid` thật khi là câu của em, `kho_<i>` khi mượn kho chung. */
   const [khoaCauHienTai, setKhoaCauHienTai] = useState('')
   const [daHoiCau, setDaHoiCau] = useState<string[]>([])
+  const [comboLeoThap, setComboLeoThap] = useState(0)
+  const [soCauDungTrongNgay, setSoCauDungTrongNgay] = useState(0)
   /**
    * KẾT QUẢ CÂU VỪA LÀM — màn hình dừng ở đây cho em ĐỌC LỜI GIẢI.
    *
@@ -966,6 +970,7 @@ export default function ThanThuHoaHocGame({
     setMauBossToiDa(mauTrumTang(tang))
     setMauPetCombat(chiSoPet.mau)
     setDaHoiCau([])
+    setComboLeoThap(0)
     const tkMo = tinhHeSoTuongKhac(infoPet.he, heTrumTang(tang))
     setThongBaoChienDau(`Tầng ${tang} — ${tenTrumTang(tang)}. ${tkMo.thongDiep}`)
     raCauHoiMoi([], tang)
@@ -981,32 +986,25 @@ export default function ThanThuHoaHocGame({
    * Chỗ này chỉ nối dữ liệu vào và ghi sổ.
    */
   const raCauHoiMoi = useCallback((daHoi: string[], tang: number) => {
-    // ƯU TIÊN CÂU CỦA CHÍNH EM. Chỉ khi em chưa có câu nào đọc được mới mượn
-    // kho chung — và màn hình NÓI RÕ đang mượn, không giả vờ là câu của em.
-    if (dsCauCuaEm.length === 0) {
-      const ds = KHO_CAU_HOI.map((c, i) => ({ cau: c, khoa: 'kho_' + i }))
-      const conLai = ds.filter((x) => !daHoi.includes(x.khoa))
-      const chon = conLai.length > 0 ? conLai : ds
-      const x = chon[Math.floor(Math.random() * chon.length)]!
-      setKhoaCauHienTai(x.khoa)
-      setCauHoiHienTai(x.cau)
-      setLyDoNoiCau(['muonKhoChung'])
-      setThoiGianConLaiCau(15)
-      return
-    }
-
     const chuyenDeDaGap = new Set(
       daHoi.map((q) => dsCauCuaEm.find((c) => c.qid === q)?.chuyenDe ?? '').filter((x) => x !== ''),
     )
     const kho: CauUngVien[] = dsCauCuaEm.map((c) => ({
       qid: c.qid, sao: c.sao, chuyenDe: c.chuyenDe, tungSai: c.tungSai, doDai: c.doDai,
     }))
+    const khoChungUngVien: CauUngVien[] = KHO_CAU_HOI.map((c, i) => ({
+      qid: 'kho_' + i,
+      sao: c.bac === 1 ? 0 : c.bac === 2 ? 1 : 2,
+      chuyenDe: c.chuyenDe,
+      tungSai: false,
+      doDai: c.cau.length + c.phuongAn.join('').length,
+    }))
+
     const kq = rutCauChoTang({
       kho,
+      khoChung: khoChungUngVien,
       tang,
       saoMucTieu: saoMucTieuTheoTang(tang),
-      // Thầy chốt 15-09: *"càng tầng cao câu càng khó càng dài"*. Tầng 1 nhắm
-      // câu ngắn nhất kho của em, tầng 999 nhắm câu dài nhất.
       daiMucTieu: saoMucTieuTheoTang(tang) / 2,
       lichSu: hoSoRef.current.lichSuThap,
       daHoiLuotNay: daHoi,
@@ -1014,16 +1012,24 @@ export default function ThanThuHoaHocGame({
       ngauNhien: Math.random,
     })
     if (kq.cau === null) return
-    const day = dsCauCuaEm.find((c) => c.qid === kq.cau!.qid)
-    if (day === undefined) return
-    setKhoaCauHienTai(day.qid)
-    setCauHoiHienTai(day as CauHoi)
+    let cauChon: CauHoi | null = null
+    const khoa = kq.cau.qid
+
+    if (khoa.startsWith('kho_')) {
+      const idx = Number(khoa.replace('kho_', ''))
+      cauChon = KHO_CAU_HOI[idx] ?? null
+    } else {
+      const day = dsCauCuaEm.find((c) => c.qid === khoa)
+      if (day) cauChon = day as CauHoi
+    }
+    if (!cauChon) return
+
+    setKhoaCauHienTai(khoa)
+    setCauHoiHienTai(cauChon)
     setLyDoNoiCau(kq.daNoi)
     setThoiGianConLaiCau(15)
-    // GHI SỔ ngay lúc hỏi, không đợi trả lời: em thoát giữa chừng thì câu ấy
-    // vẫn coi như đã gặp, nếu không là mở lại gặp đúng nó.
     const bayGio = Date.now()
-    setHoSo((prev) => ({ ...prev, lichSuThap: ghiLichSu(prev.lichSuThap, day.qid, bayGio) }))
+    setHoSo((prev) => ({ ...prev, lichSuThap: ghiLichSu(prev.lichSuThap, khoa, bayGio) }))
   }, [dsCauCuaEm])
 
   /**
@@ -1075,6 +1081,11 @@ export default function ThanThuHoaHocGame({
 
     if (idxChon === cauHoiHienTai.dung) {
       amThanhRef.current?.dungCauHoi()
+      const comboMoi = comboLeoThap + 1
+      setComboLeoThap(comboMoi)
+      const soCauMoi = soCauDungTrongNgay + 1
+      setSoCauDungTrongNgay(soCauMoi)
+
       // SÁT THƯƠNG THẬT: lấy từ chỉ số thú, nhân hệ số tương khắc nguyên tố.
       // Bản trước cắm cứng 45 — nên mọi buff từ điểm học tập chỉ là chữ trang trí.
       const tk = tinhHeSoTuongKhac(infoPet.he, heTrumTang(tangHienTai))
@@ -1092,7 +1103,20 @@ export default function ThanThuHoaHocGame({
       } else {
         amThanhRef.current?.tanCong()
       }
-      setThongBaoChienDau(`Đúng! ${infoPet.kyNangThuong} gây ${satThuong} sát thương — ${tk.thongDiep}`)
+
+      // THƯỞNG EXP THÔNG MINH CHO CÂU ĐÚNG: theo sao, lỗ hổng x1.5, chuỗi combo streak
+      const saoCau = (cauHoiHienTai as unknown as { sao?: number }).sao ?? (cauHoiHienTai.bac === 3 ? 2 : cauHoiHienTai.bac === 2 ? 1 : 0)
+      const laDangYeu = (cauHoiHienTai as unknown as { tungSai?: boolean }).tungSai ?? false
+      const thuongExp = tinhExpLuyenThu({
+        sao: saoCau,
+        laDangYeu,
+        comboDungLienTiep: comboMoi,
+        soCauTrongNgay: soCauMoi,
+      })
+      themVaoKho(thuongExp.exp, 'leoThap', `Đúng câu ${saoCau}★ ${thuongExp.thongDiepThuong ? `(${thuongExp.thongDiepThuong})` : ''}`.trim())
+
+      const thongBaoCombo = comboMoi >= 3 ? ` · 🔥 Combo x${comboMoi} (+${thuongExp.exp} EXP)` : ` · +${thuongExp.exp} EXP`
+      setThongBaoChienDau(`Đúng! ${infoPet.kyNangThuong} gây ${satThuong} sát thương — ${tk.thongDiep}${thongBaoCombo}`)
 
       if (mauBossMoi <= 0) {
         amThanhRef.current?.thangTran()
@@ -1104,7 +1128,7 @@ export default function ThanThuHoaHocGame({
           : NGUON_EXP.leoThapLai(tangHienTai)
         const nhan = laTangCanh(tangHienTai) ? thuong * 2 : thuong
         setThongBaoChienDau(
-          `${infoPet.kyNangNo}! Hạ ${tenTrumTang(tangHienTai)} — +${nhan} EXP`
+          `${infoPet.kyNangNo}! Hạ ${tenTrumTang(tangHienTai)} — +${nhan} EXP trùm`
           + (tangMoi ? '' : ' (tầng đã hạ, chỉ 12%)'),
         )
         setHoSo((prev) => ({
@@ -1122,6 +1146,7 @@ export default function ThanThuHoaHocGame({
         thua: false,
       })
     } else {
+      setComboLeoThap(0)
       amThanhRef.current?.saiCauHoi()
       amThanhRef.current?.trungDon()
       // Giáp thật sự đỡ đòn.

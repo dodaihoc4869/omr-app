@@ -232,8 +232,11 @@ export interface BienBanDeRieng {
    * ngay "đã quét đúng thư mục chưa", thay vì phải suy từ mã ca. */
   namQuet?: string | null
   nguonNam?: 'hoc_sinh' | 'ten_ca' | 'khong_xac_dinh'
-  /** Tổng số ca THI trong thư mục năm sinh đó. */
   soCaThuMuc?: number
+  /** sbd → danh sách câu gốc kiểm tra lại. */
+  cauGocTheoEm?: Record<string, string[]>
+  /** sbd → danh sách câu song sinh cùng dạng đổi số. */
+  songSinhTheoEm?: Record<string, string[]>
   lucRut: string
 }
 

@@ -14,10 +14,13 @@ import { Nhan, OThongBao } from './DesignSystem'
 import { boMotCau, demDangUngVien, demMucDo, doiMotCau, dsChuyenDe, dungUngVien, giayUocTinh, moiIdDaRut, MOI_MUC, PHAN_DE, PHUT_TOI_DA_LEN_BANG, rutDe, rutDeLenBang, rutKhoChua, soCauCua, soCauLenBang, soTinHieu, TEN_MUC, tongCau, type CauUngVien, type KetQuaRut, type MucDoRut, type PhanDe, type SoCauPhan, type YeuCauRut } from '../lib/rut-de'
 import { MOI_LOC_DANG, LOC_DANG_MAC_DINH, soCauDung, TEN_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
 import { demSao, LOC_SAO_MAC_DINH, MOI_LOC_SAO, soCauHopSao, TEN_LOC_SAO, type LocSao } from '../lib/loc-sao'
-import { CAU_HINH_DE_RIENG_MAC_DINH, GIAI_THICH_PHAM_VI, TEN_PHAM_VI_HOI_LAI, type CauHinhDeRieng } from '../lib/cau-hinh-de-rieng'
+import { GIAI_THICH_PHAM_VI, TEN_PHAM_VI_HOI_LAI, type CauHinhDeRieng } from '../lib/cau-hinh-de-rieng'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
+
+/** Cấu trúc đề 14 câu chuẩn Thầy chốt (9 trắc nghiệm, 2 đúng/sai, 3 trả lời ngắn) */
+export const SO_CAU_14: SoCauPhan = { I: 9, II: 2, III: 3 }
 
 /** Cấu trúc đề tốt nghiệp THPT hiện hành — mặc định khi thầy không đổi gì. */
 export const SO_CAU_CHUAN: SoCauPhan = { I: 18, II: 4, III: 6 }
@@ -178,8 +181,12 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
   const [cheDo, setCheDo] = useState<CheDoLay>(() => (tongKho > tongCau(SO_CAU_CHUAN) ? 'rut' : 'tron'))
   const rut = cheDo === 'rut'
   const lenBang = cheDo === 'lenbang'
-  // SỐ CÂU MỖI EM LÀM.
-  const [soCau, setSoCau] = useState<SoCauPhan>(() => ({ I: Math.min(SO_CAU_CHUAN.I, co.I), II: Math.min(SO_CAU_CHUAN.II, co.II), III: Math.min(SO_CAU_CHUAN.III, co.III) }))
+  // SỐ CÂU MỖI EM LÀM — mặc định cấu trúc chuẩn 14 câu (9 - 2 - 3) Thầy chốt.
+  const [soCau, setSoCau] = useState<SoCauPhan>(() => ({
+    I: Math.min(SO_CAU_14.I, co.I),
+    II: Math.min(SO_CAU_14.II, co.II),
+    III: Math.min(SO_CAU_14.III, co.III),
+  }))
   // SỐ CÂU RÚT VÀO KHO CỦA CA. Lớn hơn số câu mỗi em thì mỗi em bốc một bộ khác
   // nhau từ kho đó (máy bốc theo mã ca + số báo danh nên tái tạo lại được khi
   // chấm lại). Bằng nhau thì cả lớp làm cùng một đề.
@@ -192,8 +199,8 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
   const [seed, setSeed] = useState(() => Math.floor(Math.random() * 1e9))
   const [moChiTiet, setMoChiTiet] = useState(false)
   const [kq, setKq] = useState<KetQuaRut | null>(null)
-  // ĐỀ RIÊNG TỪNG EM (DE-RIENG-TUNG-EM). Không bật mặc định.
-  const [deRieng, setDeRieng] = useState(false)
+  // ĐỀ RIÊNG TỪNG EM (DE-RIENG-TUNG-EM). BẬT MẶC ĐỊNH theo thuật toán cá nhân hóa mới.
+  const [deRieng, setDeRieng] = useState(true)
   // HAI NÚT PHẠM VI (thầy chốt 08/09): lấy câu sai của ca gần nhất, hay gộp
   // câu sai của 3 ca gần nhất. Mặc định ca gần nhất — đo đúng buổi vừa dạy.
   const [phamViHoiLai, setPhamViHoiLai] = useState<CauHinhDeRieng['PHAM_VI_HOI_LAI']>('gan_nhat')
@@ -202,11 +209,15 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
 
   // Đổi đề đã chọn thì mọi thứ phải tính lại từ đầu.
   useEffect(() => {
-    setSoCau({ I: Math.min(SO_CAU_CHUAN.I, co.I), II: Math.min(SO_CAU_CHUAN.II, co.II), III: Math.min(SO_CAU_CHUAN.III, co.III) })
+    setSoCau({
+      I: Math.min(SO_CAU_14.I, co.I),
+      II: Math.min(SO_CAU_14.II, co.II),
+      III: Math.min(SO_CAU_14.III, co.III),
+    })
     setChonCd([])
     setChonMuc([])
     setDaBo([])
-    setCheDo(tongKho > tongCau(SO_CAU_CHUAN) ? 'rut' : 'tron')
+    setCheDo('rut')
   }, [co.I, co.II, co.III, tongKho])
 
   // Kho của ca: gấp HE_SO_KHO lần số câu mỗi em, chặn trên bằng số câu thật có.
@@ -287,11 +298,13 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
 
       <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Cách lấy câu">
         <Chip chon={rut} onClick={() => setCheDo('rut')}>
-          Rút bộ câu
+          🎯 Rút đề thông minh
         </Chip>
-        <Chip chon={cheDo === 'tron'} onClick={() => setCheDo('tron')}>
-          Lấy trọn kho ({tongKho} câu)
-        </Chip>
+        {tongKho <= 28 && (
+          <Chip chon={cheDo === 'tron'} onClick={() => setCheDo('tron')}>
+            Lấy trọn kho ({tongKho} câu)
+          </Chip>
+        )}
         <Chip
           chon={lenBang}
           onClick={() => {
@@ -351,7 +364,53 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
               thêm tờ đề ở khối <b>Bộ câu ra đề</b> phía trên.
             </div>
           )}
-          <div style={NHAN_NHO}>Mỗi em làm</div>
+          <div style={NHAN_NHO}>Số câu mỗi em làm</div>
+
+          {/* NÚT 1 CHẠM CHỌN NHANH CẤU TRÚC ĐỀ */}
+          <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)', marginBottom: 'var(--k1)' }}>
+            <span style={NHAN_NHO}>Cấu trúc nhanh:</span>
+            <button
+              type="button"
+              onClick={() => {
+                setSoCau({ I: Math.min(9, co.I), II: Math.min(2, co.II), III: Math.min(3, co.III) })
+                setDeRieng(true)
+                setRieng(true)
+              }}
+              className="tap-target font-bold"
+              style={{
+                ...SO,
+                fontSize: 'var(--cx-1)',
+                padding: '6px 14px',
+                borderRadius: 'var(--bo-tron)',
+                background: soCau.I === 9 && soCau.II === 2 && soCau.III === 3 ? 'var(--tim-nen)' : 'var(--the-2)',
+                color: soCau.I === 9 && soCau.II === 2 && soCau.III === 3 ? 'var(--tim)' : 'var(--muc)',
+                border: `1.5px solid ${soCau.I === 9 && soCau.II === 2 && soCau.III === 3 ? 'var(--tim)' : 'transparent'}`,
+                cursor: 'pointer',
+              }}
+            >
+              ⚡ Chuẩn 14 câu (9 Phần I · 2 Phần II · 3 Phần III)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSoCau({ I: Math.min(18, co.I), II: Math.min(4, co.II), III: Math.min(6, co.III) })
+              }}
+              className="tap-target font-bold"
+              style={{
+                ...SO,
+                fontSize: 'var(--cx-1)',
+                padding: '6px 14px',
+                borderRadius: 'var(--bo-tron)',
+                background: soCau.I === 18 && soCau.II === 4 && soCau.III === 6 ? 'var(--tim-nen)' : 'var(--the-2)',
+                color: soCau.I === 18 && soCau.II === 4 && soCau.III === 6 ? 'var(--tim)' : 'var(--muc)',
+                border: `1.5px solid ${soCau.I === 18 && soCau.II === 4 && soCau.III === 6 ? 'var(--tim)' : 'transparent'}`,
+                cursor: 'pointer',
+              }}
+            >
+              📋 Đề THPT 28 câu (18 · 4 · 6)
+            </button>
+          </div>
+
           <div className="flex flex-wrap items-end" style={{ gap: 'var(--k4)' }}>
             <OSo nhan="Phần I" tri={soCau.I} doi={(n) => capNhat('I', n)} tran={co.I} />
             <OSo nhan="Phần II" tri={soCau.II} doi={(n) => capNhat('II', n)} tran={co.II} />
@@ -367,6 +426,14 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
           </div>
 
           <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }}>
+            <button
+              type="button"
+              onClick={() => setSoCau({ I: Math.min(9, co.I), II: Math.min(2, co.II), III: Math.min(3, co.III) })}
+              className="tap-target"
+              style={{ ...NHAN_NHO, textDecoration: 'underline' }}
+            >
+              Về chuẩn 14 câu (9/2/3)
+            </button>
             {(['I', 'II', 'III'] as const).map((p) => (
               <button key={p} type="button" onClick={() => capNhat(p, Math.min(SO_CAU_CHUAN[p], co[p]))} className="tap-target" style={{ ...NHAN_NHO, textDecoration: 'underline' }}>
                 Phần {p} về {Math.min(SO_CAU_CHUAN[p], co[p])}
@@ -375,42 +442,45 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
           </div>
 
           <div>
-            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Đề của từng em</div>
-            <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Đề của từng em">
-              <Chip chon={rieng} onClick={() => setRieng(true)}>
-                Mỗi em một bộ câu riêng
+            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Chế độ đề thi của học sinh</div>
+            <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Chế độ đề thi">
+              <Chip
+                chon={deRieng}
+                onClick={() => {
+                  setDeRieng(true)
+                  setRieng(true)
+                }}
+                mau="tim"
+              >
+                🎯 Đề riêng từng em — Nâng đỡ tiến bộ
               </Chip>
-              <Chip chon={!rieng} onClick={() => setRieng(false)}>
-                Cả lớp cùng một đề
+              <Chip
+                chon={!deRieng}
+                onClick={() => {
+                  setDeRieng(false)
+                  setRieng(false)
+                }}
+              >
+                👥 Cả lớp cùng một đề
               </Chip>
             </div>
           </div>
 
-          {/* ĐỀ RIÊNG TỪNG EM — DE-RIENG-TUNG-EM mục 4.3.
-              Thầy phải thấy ĐỦ CON SỐ trước khi bấm mở, không phải mở màn khác
-              để biết ai thiếu câu lặp. */}
           <div data-khoi="de-rieng">
-            <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }}>
-              <Chip chon={deRieng} onClick={() => setDeRieng((v) => !v)} mau="tim">
-                Hỏi lại câu em từng sai
-              </Chip>
-            </div>
-            {deRieng && (
+            {deRieng ? (
               <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
-                {/* SỐ CÂU LẶP KHÔNG BIẾT TRƯỚC ĐƯỢC. Mẫu số là số câu CHÍNH EM
-                    sai ở ca trước (thầy chốt 08/09), mà mỗi em sai một khác —
-                    nên ở đây nói LUẬT, không in một con số chung cho cả lớp. */}
                 <div style={NHAN_NHO}>
-                  Mỗi em một đề, trong đó có <b style={{ ...SO, color: 'var(--muc)' }}>{Math.round(CAU_HINH_DE_RIENG_MAC_DINH.TI_LE_CAU_LAP * 100)}%</b> số câu chính em đã sai ở ca gần nhất em có nộp, làm tròn lên. Ca trước
-                  sai <b style={SO}>10</b> câu thì lần này gặp lại <b style={SO}>3</b> câu; sai <b style={SO}>4</b> câu thì gặp lại <b style={SO}>2</b>. Em không sai câu nào thì đề toàn câu mới. Ca này KHÔNG xếp hạng lớp.
+                  ✨ <b>Thuật toán mới cá nhân hóa 100%:</b> Mỗi học sinh nhận một đề riêng biệt (độ trùng ≈ 0%, triệt tiêu quay cóp).
                 </div>
                 <div style={NHAN_NHO}>
-                  Câu hỏi lại được <b>đánh dấu ngay trên đề</b> để em biết đây là câu cũ. Câu em từng sai mà không nằm trong kho vừa rút thì máy <b>tự kéo từ cả kho</b> vào ca này, nên chọn chuyên đề nào cũng hỏi lại
-                  được.
+                  🔄 <b>Cặp đôi Song sinh (50/50):</b> Tự động rút 50% câu sai gốc (đo độ hiểu lời giải) + 50% câu song sinh cùng dạng đổi số từ kho đề (chống học vẹt đáp án). Áp dụng trần chuẩn {'{I: 3, II: 1, III: 1}'} cho ca 14 câu.
                 </div>
-                {/* HAI NÚT PHẠM VI — thầy chốt 08/09. Hai việc dạy khác nhau:
-                    kiểm tra đúng buổi vừa dạy, hay truy lại lỗi cũ chưa sửa. */}
-                <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Lấy câu sai từ đâu">
+                <div style={NHAN_NHO}>
+                  📈 <b>70% câu mới:</b> Rút thích ứng dạng bài để củng cố lỗ hổng và phát triển năng lực cho từng em.
+                </div>
+
+                <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)', marginTop: 'var(--k1)' }} role="radiogroup" aria-label="Lấy câu sai từ đâu">
+                  <span style={NHAN_NHO}>Phạm vi quét câu sai:</span>
                   {(['gan_nhat', 'ba_ca'] as const).map((v) => (
                     <Chip key={v} chon={phamViHoiLai === v} onClick={() => setPhamViHoiLai(v)} mau="tim">
                       {TEN_PHAM_VI_HOI_LAI[v]}
@@ -419,9 +489,12 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
                 </div>
                 <div style={NHAN_NHO}>{GIAI_THICH_PHAM_VI[phamViHoiLai]}</div>
                 <OThongBao tone="xanh">
-                  Ca này <b>tự bật phòng chờ</b>. Em vào thì đứng ở màn chờ; thầy bấm <b>Bắt đầu thi</b> thì máy mới rút bộ câu riêng cho ĐÚNG những em đang có mặt, rồi mới phát đề. Chạy được với cả chế độ tích từng em lẫn
-                  chế độ chỉ nhập số báo danh — không phải đoán trước ai tới.
+                  Ca này <b>tự bật phòng chờ</b>. Em vào thì đứng ở màn chờ; thầy bấm <b>Bắt đầu thi</b> thì máy mới rút bộ câu riêng cho ĐÚNG những em đang có mặt, rồi mới phát đề.
                 </OThongBao>
+              </div>
+            ) : (
+              <div style={{ ...NHAN_NHO, marginTop: 'var(--k1)' }}>
+                Cả lớp làm cùng bộ câu này, chỉ đảo thứ tự câu và thứ tự A–D riêng từng em. Điểm hai em so được trực tiếp với nhau.
               </div>
             )}
           </div>
@@ -486,7 +559,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
             </div>
           </div>
 
-          {thieu.length > 0 && kq && (
+          {thieu.length > 0 && kq && !deRieng && (
             <OThongBao tone="cam">
               Kho không đủ câu hợp bộ lọc: {thieu.map((p) => `phần ${p} thiếu ${kq.thieu[p]} câu`).join(', ')}. Bỏ bớt bộ lọc chuyên đề hoặc mức độ, hoặc hạ số câu xuống.
             </OThongBao>

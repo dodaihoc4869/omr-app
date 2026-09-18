@@ -58,7 +58,7 @@ export function khopLoc(
   phan?: 'I' | 'II' | 'III',
   sao: LocSao = LOC_SAO_MAC_DINH,
 ): boolean {
-  if (!hopLeDeRut({ phan, id: cau.id, dapAn: cau.correct, text: cau.text })) return false
+  if (!hopLeDeRut({ phan, id: cau.id, dapAn: cau.correct, text: cau.text, q: cau })) return false
   if (chuyenDe.length > 0 && !chuyenDe.includes(String(cau.chuyenDe || '').trim())) return false
   if (mucDo !== 'tron' && String(cau.mucDo || '') !== mucDo) return false
   if (!hopSao(soSao(cau), sao)) return false

@@ -12,6 +12,7 @@ import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { useAppStore } from '../store/appStore'
 import NutQuayLai from '../components/NutQuayLai'
+import NutDongBoMoiCa from '../components/NutDongBoMoiCa'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -202,6 +203,8 @@ export default function LichSuCaScreen() {
         </div>
         <NutQuayLai onClick={() => setScreen('examhub')} label="Kiểm tra" />
       </div>
+
+      {!xemDaXoa && !chonMode && <NutDongBoMoiCa />}
 
       <TheNoiDung className="gv-directory">
         <div className="gv-filterbar flex items-center gap-2 sm:gap-2.5 mb-3">

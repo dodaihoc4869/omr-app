@@ -317,6 +317,10 @@ export interface KetQuaDungDeRieng {
   boTheoEm: Record<string, string[]>
   /** sbd → qid câu lặp có thật trong đề em đó. Đi kèm `boTheoEm` lên máy chủ. */
   lapTheoEm: Record<string, string[]>
+  /** sbd → danh sách câu sai gốc được kiểm tra lại. */
+  cauGocTheoEm?: Record<string, string[]>
+  /** sbd → danh sách câu song sinh cùng dạng đổi số để chống học vẹt. */
+  songSinhTheoEm?: Record<string, string[]>
   lapCua: Record<string, Record<string, number>>
   thieu: EmThieuLap[]
   canCua: Record<string, number>
@@ -461,6 +465,8 @@ export async function dungDeRiengChoCa(
     cauNoiThem,
     boTheoEm: ra.boTheoEm,
     lapTheoEm: ra.lapTheoEm,
+    cauGocTheoEm: ra.cauGocTheoEm,
+    songSinhTheoEm: ra.songSinhTheoEm,
     lapCua: lapCuaTungEm(ra.boTheoEm, demLanSai(dsCa)),
     thieu: ra.thieuLap,
     canCua: ra.canCua,

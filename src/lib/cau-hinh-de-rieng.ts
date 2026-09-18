@@ -38,6 +38,14 @@ export interface CauHinhDeRieng {
    *                  3 ca bạn rút ngẫu nhiên 3 ca trước đó bất kì không cần
    *                  gần nhất nhé"). Bắt được lỗi cũ em vẫn chưa sửa. */
   PHAM_VI_HOI_LAI: 'gan_nhat' | 'ba_ca'
+  /** Có bật cơ chế CÂU SONG SINH (Isomorphic Twin) cùng dạng bài để chống học vẹt không. */
+  CO_CAU_SONG_SINH: boolean
+  /** Tỷ lệ câu song sinh so với câu gốc trong số câu khắc phục (0..1, mặc định 0.5 = 50%). */
+  TI_LE_SONG_SINH: number
+  /** Trần phân bổ số câu khắc phục cho ca chuẩn 14 câu (9 Phần I, 2 Phần II, 3 Phần III). */
+  TRAN_PHAN_BO_14_CAU: { I: number; II: number; III: number }
+  /** Ưu tiên câu sai dai dẳng / lỗ hổng kiến thức trước câu ẩu. */
+  UU_TIEN_LO_HONG: boolean
 }
 
 /** Bao nhiêu ca được BỐC khi chọn phạm vi `ba_ca`. */
@@ -59,6 +67,10 @@ export const CAU_HINH_DE_RIENG_MAC_DINH: CauHinhDeRieng = {
   TRAN_LAP_MOT_CAU: 3,
   CHO_LAP_CAU_BO_TRONG: false,
   PHAM_VI_HOI_LAI: 'gan_nhat',
+  CO_CAU_SONG_SINH: true,
+  TI_LE_SONG_SINH: 0.5,
+  TRAN_PHAN_BO_14_CAU: { I: 3, II: 1, III: 1 },
+  UU_TIEN_LO_HONG: true,
 }
 
 function soDuong(v: unknown, macDinh: number): number {
@@ -69,6 +81,7 @@ function soDuong(v: unknown, macDinh: number): number {
 export function cauHinhDeRieng(luu?: Partial<CauHinhDeRieng> | null): CauHinhDeRieng {
   const c = luu ?? {}
   const ti = Number(c.TI_LE_CAU_LAP)
+  const tiSongSinh = Number(c.TI_LE_SONG_SINH)
   return {
     // Kẹp trong (0, 1]: tỉ lệ 0 là tắt tính năng mà vẫn bật công tắc, tỉ lệ > 1
     // là đòi nhiều câu lặp hơn số câu của đề.
@@ -77,6 +90,10 @@ export function cauHinhDeRieng(luu?: Partial<CauHinhDeRieng> | null): CauHinhDeR
     TRAN_LAP_MOT_CAU: soDuong(c.TRAN_LAP_MOT_CAU, CAU_HINH_DE_RIENG_MAC_DINH.TRAN_LAP_MOT_CAU),
     CHO_LAP_CAU_BO_TRONG: c.CHO_LAP_CAU_BO_TRONG === true,
     PHAM_VI_HOI_LAI: c.PHAM_VI_HOI_LAI === 'ba_ca' ? 'ba_ca' : 'gan_nhat',
+    CO_CAU_SONG_SINH: c.CO_CAU_SONG_SINH !== false,
+    TI_LE_SONG_SINH: Number.isFinite(tiSongSinh) && tiSongSinh >= 0 && tiSongSinh <= 1 ? tiSongSinh : CAU_HINH_DE_RIENG_MAC_DINH.TI_LE_SONG_SINH,
+    TRAN_PHAN_BO_14_CAU: c.TRAN_PHAN_BO_14_CAU ?? CAU_HINH_DE_RIENG_MAC_DINH.TRAN_PHAN_BO_14_CAU,
+    UU_TIEN_LO_HONG: c.UU_TIEN_LO_HONG !== false,
   }
 }
 

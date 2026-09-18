@@ -173,10 +173,12 @@ export function rutCauChoTang(p: {
   chuyenDeDaGap: ReadonlySet<string>
   /** Độ dài mục tiêu 0…1 theo tầng. Tầng 1 nhắm câu ngắn, tầng 999 nhắm câu dài. */
   daiMucTieu?: number
+  /** Kho câu hỏi chung bổ sung — khi kho riêng của em cạn/ít câu, rút từ đây thay vì lặp lại nhàm chán */
+  khoChung?: readonly CauUngVien[]
   ngauNhien: () => number
 }): KetQuaRut {
-  const { kho, saoMucTieu, lichSu, daHoiLuotNay, chuyenDeDaGap, ngauNhien } = p
-  if (kho.length === 0) return { cau: null, daNoi: ['muonKhoChung'] }
+  const { kho, saoMucTieu, lichSu, daHoiLuotNay, chuyenDeDaGap, khoChung = [], ngauNhien } = p
+  if (kho.length === 0 && khoChung.length === 0) return { cau: null, daNoi: ['muonKhoChung'] }
 
   const so = banDo(lichSu)
   const soLan = (q: string): number => so.get(q)?.soLanHoi ?? 0
@@ -187,7 +189,7 @@ export function rutCauChoTang(p: {
   )
   const trongLuot = new Set(daHoiLuotNay)
 
-  const thangDai = thangDoDai(kho)
+  const thangDai = thangDoDai(kho.length > 0 ? kho : khoChung)
   const chamDiem = (ds: readonly CauUngVien[]) =>
     ds.map((x) => ({
       x,
@@ -195,18 +197,35 @@ export function rutCauChoTang(p: {
         p.daiMucTieu, thangDai.get(x.qid)),
     }))
 
-  // Lớp 1 — câu chưa hỏi trong lượt này VÀ không nằm trong 40 câu gần nhất.
+  // Lớp 1 — câu của CHÍNH EM chưa hỏi trong lượt này VÀ không nằm trong 40 câu gần nhất.
   const lop1 = kho.filter((c) => !trongLuot.has(c.qid) && !ganDay.has(c.qid))
   if (lop1.length > 0) return { cau: bocTheoTrongSo(chamDiem(lop1), ngauNhien), daNoi: [] }
 
-  // Lớp 2 — nới sổ chống lặp, nhưng vẫn không lặp TRONG lượt này.
+  // Lớp 1.5 — kho riêng hết câu mới: mở rộng rút kho câu chung của Thầy trước khi phải lặp lại!
+  if (khoChung.length > 0) {
+    const lopChung1 = khoChung.filter((c) => !trongLuot.has(c.qid) && !ganDay.has(c.qid))
+    if (lopChung1.length > 0) {
+      return { cau: bocTheoTrongSo(chamDiem(lopChung1), ngauNhien), daNoi: ['muonKhoChung'] }
+    }
+  }
+
+  // Lớp 2 — nới sổ chống lặp câu riêng, nhưng vẫn không lặp TRONG lượt này.
   const lop2 = kho.filter((c) => !trongLuot.has(c.qid))
   if (lop2.length > 0) {
     return { cau: bocTheoTrongSo(chamDiem(lop2), ngauNhien), daNoi: ['hetCauMoi'] }
   }
 
+  // Lớp 2.5 — kho chung không lặp trong lượt
+  if (khoChung.length > 0) {
+    const lopChung2 = khoChung.filter((c) => !trongLuot.has(c.qid))
+    if (lopChung2.length > 0) {
+      return { cau: bocTheoTrongSo(chamDiem(lopChung2), ngauNhien), daNoi: ['muonKhoChung', 'hetCauMoi'] }
+    }
+  }
+
   // Lớp 3 — cạn thật, đành lặp cả trong lượt.
-  return { cau: bocTheoTrongSo(chamDiem(kho), ngauNhien), daNoi: ['hetCauMoi', 'phaiLap'] }
+  const nguonCuoi = kho.length > 0 ? kho : khoChung
+  return { cau: bocTheoTrongSo(chamDiem(nguonCuoi), ngauNhien), daNoi: ['hetCauMoi', 'phaiLap'] }
 }
 
 /** Ghi một lượt hỏi vào sổ, cắt bớt cho khỏi phình. */

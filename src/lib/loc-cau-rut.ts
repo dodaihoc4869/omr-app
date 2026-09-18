@@ -100,6 +100,16 @@ export function laCauTuLuan(
   if (p === '2') p = 'II'
   if (p === '3') p = 'III'
 
+  if (!p) {
+    if (choices && choices.length >= 2) {
+      p = 'I'
+    } else if (da && /^[dđstfDĐSTF]{4}$/i.test(da.replace(/\s+/g, ''))) {
+      p = 'II'
+    } else if (da && /^[+-]?\d+(?:[.,]\d+)?$/.test(da)) {
+      p = 'III'
+    }
+  }
+
   if (p !== 'I' && p !== 'II' && p !== 'III') {
     return true
   }

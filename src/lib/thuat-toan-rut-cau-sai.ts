@@ -320,12 +320,23 @@ export function rutLuyenThemDangCauSai(
       continue
     }
 
+    // LỘ TRÌNH BẮC CẦU (Scaffold Step-Up): Sắp xếp câu từ cơ bản (0, 1 sao, lý thuyết) -> nâng cao (2 sao, bài tập)
+    const ungVienScaffold = [...t.ungVien].sort((a, b) => {
+      const sa = typeof a.sao === 'number' ? a.sao : 0
+      const sb = typeof b.sao === 'number' ? b.sao : 0
+      if (sa !== sb) return sa - sb
+      if (a.dang === 'ly_thuyet' && b.dang !== 'ly_thuyet') return -1
+      if (a.dang !== 'ly_thuyet' && b.dang === 'ly_thuyet') return 1
+      return 0
+    })
+
     let dem = 0
-    for (const cand of t.ungVien) {
+    for (const cand of ungVienScaffold) {
       if (dem >= soLuong) break
       if (!daLayId.has(cand.id)) {
         daLayId.add(cand.id)
-        // Gắn nhãn chữa cho câu sai
+        // Gắn nhãn chữa cho câu sai theo bậc tiến trình Scaffold
+        const bacTienTrinh = dem === 0 ? 1 : dem === 1 ? 2 : 3
         const cauKemNhan: CauLuyen = {
           ...cand,
           chuaCho: {
@@ -334,7 +345,7 @@ export function rutLuyenThemDangCauSai(
             phan: t.phan,
             maDang: t.nhanDan,
             tenDang: t.tenDang,
-            bac: 1,
+            bac: bacTienTrinh as any,
           },
         }
         dsCauRut.push(cauKemNhan)
@@ -465,11 +476,21 @@ export function rutLuyenTheoBoLoc(
 
   for (const t of thongKe) {
     const soLuong = phanBo.get(t.qid) ?? 0
+    const ungVienScaffold = [...t.ungVien].sort((a, b) => {
+      const sa = typeof a.sao === 'number' ? a.sao : 0
+      const sb = typeof b.sao === 'number' ? b.sao : 0
+      if (sa !== sb) return sa - sb
+      if (a.dang === 'ly_thuyet' && b.dang !== 'ly_thuyet') return -1
+      if (a.dang !== 'ly_thuyet' && b.dang === 'ly_thuyet') return 1
+      return 0
+    })
+
     let dem = 0
-    for (const cand of t.ungVien) {
+    for (const cand of ungVienScaffold) {
       if (dem >= soLuong) break
       if (!daLayId.has(cand.id)) {
         daLayId.add(cand.id)
+        const bacTienTrinh = dem === 0 ? 1 : dem === 1 ? 2 : 3
         dsCauRut.push({
           ...cand,
           chuaCho: {
@@ -478,7 +499,7 @@ export function rutLuyenTheoBoLoc(
             phan: t.phan,
             maDang: t.nhanDan,
             tenDang: t.tenDang,
-            bac: 1,
+            bac: bacTienTrinh as any,
           },
         })
         dem++

@@ -210,14 +210,14 @@ describe('Cân bằng 999 tầng', () => {
 })
 
 describe('999 trùm', () => {
-  it('SÁU hệ trùm đều xuất hiện — bản cũ thiếu Điện hoá và Hữu cơ', () => {
+  it('TÁM hệ trùm đều xuất hiện cân bằng', () => {
     const dem = new Map<string, number>()
     for (let t = 1; t <= TANG_TOI_DA; t++) {
       const h = heTrumTang(t)
       dem.set(h, (dem.get(h) ?? 0) + 1)
     }
     expect(dem.size).toBe(DS_HE.length)
-    for (const h of DS_HE) expect(dem.get(h), `hệ ${h} không có trùm nào`).toBeGreaterThan(150)
+    for (const h of DS_HE) expect(dem.get(h), `hệ ${h} không có trùm nào`).toBeGreaterThan(120)
   })
 
   it('tên trùm không phải một cái lặp 999 lần', () => {

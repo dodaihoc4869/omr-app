@@ -260,7 +260,7 @@ export default function ExamSetupScreen() {
   //
   // Phiếu gửi phụ huynh và cộng dồn mạnh/yếu KHÔNG dính gì tới cờ này: mọi ca,
   // mọi lựa chọn đều ghi điểm và chi tiết từng câu như nhau.
-  const lenBang = !chuan2026 && boRut?.lenBang === true
+  const lenBang = boRut?.lenBang === true && !chuan2026
   /** Ca mở ở chế độ ĐỀ RIÊNG TỪNG EM — kéo theo phòng chờ, bắt buộc. */
   const deRiengBat = !chuan2026 && boRut?.deRieng === true
 
@@ -629,19 +629,20 @@ export default function ExamSetupScreen() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <button
               type="button"
+              disabled={deRiengBat}
               onClick={() => !deRiengBat && setPhongCho((v) => !v)}
               className={`tap-target p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-2 active:scale-98 ${
                 phongCho || deRiengBat
                   ? 'bg-blue-50/70 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200 shadow-2xs'
                   : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
-              }`}
+              } ${deRiengBat ? 'opacity-80 cursor-not-allowed' : ''}`}
             >
               <div className="min-w-0">
                 <div className="text-xs font-bold flex items-center gap-1.5">
                   <span>🚪 Phòng chờ phát đề</span>
                 </div>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                  Chờ Thầy bấm Bắt đầu mới đếm ngược
+                  {deRiengBat ? 'Bật sẵn và không tắt được (Đề riêng từng em)' : 'Chờ Thầy bấm Bắt đầu mới đếm ngược'}
                 </div>
               </div>
               <span

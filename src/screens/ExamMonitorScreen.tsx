@@ -766,12 +766,14 @@ export default function ExamMonitorScreen() {
           boQua: ra.boQua,
           caDaQuet: ra.caDaQuet,
           namQuet: ra.namQuet,
-          nguonNam: ra.nguonNam,
-          soCaThuMuc: ra.soCaThuMuc,
+          cauGocTheoEm: ra.cauGocTheoEm,
+          songSinhTheoEm: ra.songSinhTheoEm,
           lucRut: new Date().toISOString(),
         }
         demSai = ra.lapCua
         await luuDeRiengCa(chiTiet.ca.maCa, ra.boTheoEm, ra.lapCua, ra.lapTheoEm, bienBan)
+        const tongSongSinh = Object.values(ra.songSinhTheoEm ?? {}).reduce((s, a) => s + (a?.length ?? 0), 0)
+        if (tongSongSinh > 0) showToast(`Đã sinh ${tongSongSinh} câu song sinh cùng dạng đổi số chống học vẹt.`, 'success')
         if (ra.cauNoiThem.soCau > 0) showToast(`Đã kéo ${ra.cauNoiThem.soCau} câu em từng sai từ kho vào đề ca này.`, 'success')
         if (ra.thieu.length > 0) showToast(`${ra.thieu.length} em không đủ câu hỏi lại — xem chi tiết trong ca.`, 'warn')
       }
