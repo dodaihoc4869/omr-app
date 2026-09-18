@@ -2,6 +2,7 @@ import ThongBaoHocSinh,{noticeApi} from '../components/ThongBaoHocSinh'
 import BangTinPhuHuynh from '../components/BangTinPhuHuynh'
 import BangVinhDanh from '../components/BangVinhDanh'
 import BangTroLyHocSinh from '../components/BangTroLyHocSinh'
+import CardCaThiGanNhat from '../components/CardCaThiGanNhat'
 import {MomQuestionStem,MomOption} from '../components/MomQuestionMedia'
 import {momApi, momReviewHtml} from '../lib/mom-api'
 import PhongVaoThi from '../components/PhongVaoThi'
@@ -959,6 +960,15 @@ export default function StudentPortalScreen() {
     return t
   }, [dsLichSu])
 
+  const caGanNhat = useMemo(() => {
+    if (!dsLichSu || dsLichSu.length === 0) return null
+    return [...dsLichSu].sort((a, b) => {
+      const ta = a.nopLuc ? new Date(a.nopLuc).getTime() : 0
+      const tb = b.nopLuc ? new Date(b.nopLuc).getTime() : 0
+      return tb - ta
+    })[0]
+  }, [dsLichSu])
+
   // Rút đề khắc phục câu sai
   /**
    * LẤY CÂU SAI CỦA EM CHO GAME THẦN THÚ.
@@ -1343,7 +1353,15 @@ export default function StudentPortalScreen() {
                 tongSoCa={dsLichSu.length}
               />
 
-              {/* 2. TRỢ LÝ HỌC TẬP CÁ NHÂN TOÀN DIỆN ĐỖ ĐẠI HỌC AI */}
+              {/* 2. Ô HIỂN THỊ KẾT QUẢ CA THI GẦN NHẤT */}
+              {caGanNhat && (
+                <CardCaThiGanNhat
+                  ca={caGanNhat}
+                  onXemBaoCao={() => setCaXemBaoCaoModal(caGanNhat)}
+                />
+              )}
+
+              {/* 3. TRỢ LÝ HỌC TẬP CÁ NHÂN TOÀN DIỆN ĐỖ ĐẠI HỌC AI */}
               <BangTroLyHocSinh
                 sbd={auth.sbd}
                 hoTen={auth.hoTen}
@@ -1353,10 +1371,19 @@ export default function StudentPortalScreen() {
                 tongSoCauSai={tongSoCauSaiDaChon}
                 hoSoThanThu={hoSoThanThu}
                 onAction={xuLyHanhDongTroLy}
+                onMoGame={() => setTab('thanthu')}
               />
             </>
           ) : (
             <>
+              {/* Ô HIỂN THỊ KẾT QUẢ CA THI GẦN NHẤT */}
+              {caGanNhat && (
+                <CardCaThiGanNhat
+                  ca={caGanNhat}
+                  onXemBaoCao={() => setCaXemBaoCaoModal(caGanNhat)}
+                />
+              )}
+
               {/* TRỢ LÝ HỌC TẬP CÁ NHÂN TOÀN DIỆN ĐỖ ĐẠI HỌC AI */}
               <BangTroLyHocSinh
                 sbd={auth.sbd}
@@ -1367,6 +1394,7 @@ export default function StudentPortalScreen() {
                 tongSoCauSai={tongSoCauSaiDaChon}
                 hoSoThanThu={hoSoThanThu}
                 onAction={xuLyHanhDongTroLy}
+                onMoGame={() => setTab('thanthu')}
               />
 
               <BangTinPhuHuynh

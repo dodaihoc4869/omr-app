@@ -12,6 +12,8 @@ import {
   ChevronUp,
   PenSquare,
 } from 'lucide-react'
+import Spirit2D from '../game/than-thu-v2/Spirit2D'
+import { PETS } from '../game/than-thu-v2/core'
 import {
   tongHopKeHoachTroLy,
   type NhiemVuTroLy,
@@ -27,6 +29,7 @@ export interface BangTroLyHocSinhProps {
   tongSoCauSai: number
   hoSoThanThu?: any
   onAction: (hanhDong: NhiemVuTroLy['hanhDong']) => void
+  onMoGame?: () => void
 }
 
 export default function BangTroLyHocSinh({
@@ -38,6 +41,7 @@ export default function BangTroLyHocSinh({
   tongSoCauSai,
   hoSoThanThu,
   onAction,
+  onMoGame,
 }: BangTroLyHocSinhProps) {
   const [moRadar, setMoRadar] = useState(false)
 
@@ -54,6 +58,10 @@ export default function BangTroLyHocSinh({
   }, [sbd, hoTen, dsBtvn, dsMomGiao, dsLichSu, tongSoCauSai, hoSoThanThu])
 
   const { nganSach, streak, top3, radarDeadline, thanThu, loiKhuyenSuPham } = keHoach
+
+  const petId = hoSoThanThu?.pet || 'hoa_long'
+  const petIndex = Math.max(0, PETS.findIndex((p) => p.id === petId))
+  const petInfo = PETS[petIndex] || PETS[0]
 
   return (
     <section
@@ -105,8 +113,14 @@ export default function BangTroLyHocSinh({
             <span>Chuỗi {streak.soNgayLienTiep} ngày</span>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 text-purple-800 dark:text-purple-300 text-xs font-bold">
-            <Zap className="w-3.5 h-3.5 text-purple-600" />
+          <div
+            onClick={onMoGame}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 text-purple-800 dark:text-purple-300 text-xs font-bold ${
+              onMoGame ? 'cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/60 transition' : ''
+            }`}
+            title="Mở Đảo Thần Thú"
+          >
+            <Zap className="w-3.5 h-3.5 text-purple-600 animate-pulse" />
             <span>{thanThu.tenThu} · Cấp {thanThu.cap}</span>
           </div>
         </div>
@@ -124,6 +138,68 @@ export default function BangTroLyHocSinh({
           </p>
           <div className="text-[11px] text-purple-700 dark:text-purple-300 font-medium pt-1">
             Linh thú nhắc em: {thanThu.thongDiepThu}
+          </div>
+        </div>
+      </div>
+
+      {/* 2.5. THẦN THÚ HIỆN HÀNH (CẤP 1 ĐỘNG) */}
+      <div className="rounded-2xl bg-gradient-to-r from-purple-50/80 via-indigo-50/50 to-blue-50/60 dark:from-purple-950/30 dark:via-indigo-950/20 dark:to-slate-900 border border-purple-200/80 dark:border-purple-800/60 p-3.5 sm:p-4 shadow-2xs flex flex-col sm:flex-row items-center gap-4">
+        <div className="relative w-28 h-28 sm:w-32 sm:h-32 shrink-0 flex items-center justify-center overflow-hidden rounded-2xl bg-slate-900/10 dark:bg-slate-900/60 border border-purple-200 dark:border-purple-800/80 shadow-inner">
+          <div className="w-full h-full transform scale-90 sm:scale-100 flex items-center justify-center pointer-events-none">
+            <Spirit2D index={petIndex} level={thanThu.cap} compact motion="idle" />
+          </div>
+          <span className="absolute bottom-1 left-2 text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-purple-600/90 text-white uppercase tracking-wider shadow-xs">
+            Cấp {thanThu.cap}
+          </span>
+        </div>
+
+        <div className="flex-1 min-w-0 space-y-1.5 text-center sm:text-left w-full">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex items-center gap-2 justify-center sm:justify-start">
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950/80 px-2.5 py-0.5 rounded-full border border-purple-300/60 dark:border-purple-800">
+                Thần Thú Hiện Hành (Cấp {thanThu.cap})
+              </span>
+              <span className="text-xs font-bold text-slate-600 dark:text-slate-400">
+                Hệ {petInfo.element.toUpperCase()}
+              </span>
+            </div>
+
+            {onMoGame && (
+              <button
+                type="button"
+                onClick={onMoGame}
+                className="text-xs font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 hover:underline flex items-center gap-1 cursor-pointer mx-auto sm:mx-0"
+              >
+                <span>Mở Đảo Thần Thú</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          <h3 className="font-extrabold text-slate-900 dark:text-white text-base sm:text-lg">
+            {thanThu.tenThu}
+          </h3>
+
+          <p className="text-xs text-slate-600 dark:text-slate-300">
+            {thanThu.thongDiepThu}
+          </p>
+
+          {/* Thanh EXP của thần thú */}
+          <div className="pt-1 space-y-1">
+            <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+              <span>Tiến độ tiến hoá</span>
+              <span className="font-bold text-purple-600 dark:text-purple-400">
+                {thanThu.expHienTai} / {thanThu.expCanLenCap} EXP
+              </span>
+            </div>
+            <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-500 rounded-full"
+                style={{
+                  width: `${Math.min(100, Math.max(5, (thanThu.expHienTai / Math.max(1, thanThu.expCanLenCap)) * 100))}%`,
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>

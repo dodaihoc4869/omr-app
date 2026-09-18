@@ -250,7 +250,19 @@
 }
 
 .honors-spirit-normal {
+  display: block;
+  animation: honors-spirit-gentle 3.6s ease-in-out infinite;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.12));
+  will-change: transform;
+}
+
+@keyframes honors-spirit-gentle {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-5px) scale(1.03);
+  }
 }
 
 /* Bóng dưới chân thần thú */

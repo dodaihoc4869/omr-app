@@ -419,6 +419,17 @@ body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); overflow: 
 .mc-nut-giai[aria-expanded="true"] { background: var(--mc-xanh-nen); color: var(--mc-xanh); border-color: var(--mc-xanh-nen); }
 .mc-giai { margin-top: 10px; }
 .mc-em[hidden] { display: none !important; }
+@keyframes mc-ten-reveal {
+  0% { transform: scale(2.2); opacity: 0; filter: drop-shadow(0 10px 24px rgba(35, 78, 107, 0.6)); }
+  22% { transform: scale(2.2); opacity: 1; filter: drop-shadow(0 10px 24px rgba(35, 78, 107, 0.6)); }
+  65% { transform: scale(1.35); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; filter: none; }
+}
+.mc-ten-reveal {
+  display: inline-block;
+  transform-origin: left center;
+  animation: mc-ten-reveal 1.4s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
 .mc-nut-hien-em { align-self: flex-start; margin-bottom: 12px; }
 /* LỜI GIẢI PHẢI HIỆN RA. Thầy bắt được 14/09: bấm "Hiện lời giải" trên tờ
    chiếu thì khối mở ra nhưng TRẮNG TRƠN. Nguyên nhân gốc: oGiaiHtml trả về
@@ -529,7 +540,15 @@ const JS_MAY_CHIEU = `
   function revealWithPets(page) {
     clearIntro();
     var heads = Array.from(page.querySelectorAll('.mc-em'));
-    heads.forEach(function(h) { h.hidden=false; });
+    heads.forEach(function(h) {
+      h.hidden = false;
+      var ten = h.querySelector('.mc-ten');
+      if (ten) {
+        ten.classList.remove('mc-ten-reveal');
+        void ten.offsetWidth;
+        ten.classList.add('mc-ten-reveal');
+      }
+    });
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) return;
     var overlay=document.createElement('div'); overlay.className='mc-intro'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-label','Mời học sinh lên bảng');
@@ -568,6 +587,7 @@ const JS_MAY_CHIEU = `
     var seconds = Number(page && page.getAttribute('data-seconds'));
     clock.hidden = !seconds;document.body.classList.toggle('mc-timing',!!seconds);
     if (!seconds) return;
+    page.querySelectorAll('.mc-em').forEach(function(e) { e.hidden = true; });
     page.querySelectorAll('.mc-giai').forEach(function(e) { e.hidden = true; });
     page.querySelectorAll('.mc-nut-giai').forEach(function(e) { e.setAttribute('aria-expanded','false'); var t=e.querySelector('.mc-nut-chu'); if(t)t.textContent='Hiện lời giải'; });
     deadline = Date.now() + seconds * 1000;
@@ -687,17 +707,20 @@ const JS_MAY_CHIEU = `
   // sang phông sans của hệ (chính phông đang vẽ đúng tên học sinh ngay trên
   // cùng tờ này) và nói ra, chứ không để thầy chiếu chữ vỡ lên bảng.
   try {
-    var cv = document.createElement('canvas').getContext('2d');
-    var goc = getComputedStyle(document.documentElement);
-    var phongSerif = (goc.getPropertyValue('--mc-serif') || 'Georgia, serif').trim();
-    var phongSans = (goc.getPropertyValue('--mc-sans') || 'sans-serif').trim();
-    var rong = function (chu, phong) { cv.font = '64px ' + phong; return cv.measureText(chu).width; };
-    var veTach = function (phong) { return Math.abs(rong('ếềồấắ', phong) - rong('êêôââ', phong)) > 0.5; };
-    if (veTach(phongSerif)) {
-      var thay2 = veTach(phongSans) ? 'Arial, Helvetica, sans-serif' : phongSans;
-      document.documentElement.style.setProperty('--mc-serif', thay2);
-      var bao = document.getElementById('mc-dem');
-      if (bao) bao.title = 'Phông serif của máy này không vẽ được chữ hai dấu — đã đổi sang phông hệ thống.';
+    var canvasEl = document.createElement('canvas');
+    var cv = canvasEl && canvasEl.getContext ? canvasEl.getContext('2d') : null;
+    if (cv) {
+      var goc = getComputedStyle(document.documentElement);
+      var phongSerif = (goc.getPropertyValue('--mc-serif') || 'Georgia, serif').trim();
+      var phongSans = (goc.getPropertyValue('--mc-sans') || 'sans-serif').trim();
+      var rong = function (chu, phong) { cv.font = '64px ' + phong; return cv.measureText(chu).width; };
+      var veTach = function (phong) { return Math.abs(rong('ếềồấắ', phong) - rong('êêôââ', phong)) > 0.5; };
+      if (veTach(phongSerif)) {
+        var thay2 = veTach(phongSans) ? 'Arial, Helvetica, sans-serif' : phongSans;
+        document.documentElement.style.setProperty('--mc-serif', thay2);
+        var bao = document.getElementById('mc-dem');
+        if (bao) bao.title = 'Phông serif của máy này không vẽ được chữ hai dấu — đã đổi sang phông hệ thống.';
+      }
     }
   } catch (e) {
     console.warn('[may-chieu] không kiểm được phông:', e);
