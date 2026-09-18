@@ -2852,12 +2852,28 @@ export async function hsLichSuCa(env: Env, b: Record<string, unknown>): Promise<
   }
 }
 
+/** NGÂN SÁCH VÒNG 2 (KIEM-TRA-VONG-2.md): 24 giờ kể từ lúc em xong Vòng 1,
+ * KHÔNG BAO GIỜ muộn hơn hạn chung của cả bài — hạn mềm, hạn chung vẫn là thứ
+ * máy chủ chặn nộp. Trùng công thức với `tinhHanVong2` ở `src/lib/han-bai-tap.ts`;
+ * hai nơi (máy chủ Worker và máy em) không dùng chung được một bản build nên
+ * giữ SONG SONG — đổi một bên thì đổi cả hai, có phép kiểm đối chiếu ở cả hai. */
+const NGAN_SACH_VONG2_MS = 24 * 3600 * 1000
+
+function hanVong2Cua(xongVong1Luc: string, hanNop: string): string | null {
+  const x = Date.parse(xongVong1Luc)
+  if (!Number.isFinite(x)) return null
+  const han2 = x + NGAN_SACH_VONG2_MS
+  const h = Date.parse(hanNop)
+  return new Date(Number.isFinite(h) && h < han2 ? h : han2).toISOString()
+}
+
 export async function hsBtvn(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const sbd = chuoi(b.sbd).trim()
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
 
   const r = await env.DB.prepare(
     `SELECT be.ma_btvn, be.sbd, be.nop_luc, be.so_dung, be.so_cau AS em_so_cau, COALESCE(be.so_lan_lam, 1) AS so_lan_lam,
+            be.xong_vong1_luc,
             b.ma_ca, b.ma_de, b.han_nop, b.so_cau, b.giao_luc
        FROM btvn_em be
        JOIN btvn b ON b.ma_btvn = be.ma_btvn
@@ -2880,15 +2896,22 @@ export async function hsBtvn(env: Env, b: Record<string, unknown>): Promise<Reco
       const daNop = Boolean(x.nop_luc)
       const soLanLam = Math.max(1, Number(x.so_lan_lam) || 1)
       const soLanLamLaiConLai = daNop ? Math.max(0, 4 - soLanLam) : 3
+      const hanNop = chuoi(x.han_nop)
+      const xongVong1Luc = chuoi(x.xong_vong1_luc) || null
+      // Hạn Vòng 2 chỉ có nghĩa khi CHƯA nộp và ĐÃ xong Vòng 1 — không tính
+      // cho bài đã nộp (mọi vòng coi như xong) hay bài chưa chạm Vòng 1.
+      const hanVong2 = !daNop && xongVong1Luc ? hanVong2Cua(xongVong1Luc, hanNop) : null
       return {
         maBtvn: chuoi(x.ma_btvn),
         maCa,
         maDe,
         tenBtvn,
-        hanNop: chuoi(x.han_nop),
+        hanNop,
         giaoLuc: chuoi(x.giao_luc),
         nopLuc: chuoi(x.nop_luc),
         daNop,
+        xongVong1Luc,
+        hanVong2,
         diem,
         soDung,
         soSai,

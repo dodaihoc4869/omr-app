@@ -140,3 +140,15 @@ export async function suaGiaoBtvn(ch:CauHinhMayChu,mat:string,maBtvn:string,opti
  const r=await goi<{ok:boolean;error?:string}>(ch,'/btvn/sua',{maBtvn,...options},mat)
  if(!r?.ok)throw new Error(r?.error||'Chưa cập nhật được bài tập. Thầy thử lại.')
 }
+
+/** EM BÁO XONG VÒNG 1 (KIEM-TRA-VONG-2.md) — đường CÔNG KHAI như `btvnCuaEm`.
+ * An toàn gọi lại nhiều lần: máy chủ chỉ ghi mốc lần đầu (COALESCE), nên phiếu
+ * mở lại hay mất mạng giữa chừng gọi lại cũng không sai lệch mốc đã có. */
+export async function xongVongBtvn(
+  ch: CauHinhMayChu,
+  d: { maBtvn: string; sbd: string; vong: number },
+): Promise<{ ok: boolean; xongVong1Luc?: string; error?: string }> {
+  const r = await goi<{ ok?: boolean; xongVong1Luc?: string; error?: string }>(ch, '/btvn/xong-vong', d)
+  if (!r) return { ok: false, error: 'Không nối được máy chủ' }
+  return { ...r, ok: r.ok === true }
+}

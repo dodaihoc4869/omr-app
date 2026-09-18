@@ -2001,6 +2001,24 @@ export const JS_PHIEU = `
         }
       } catch (e4b) {}
 
+      // XONG VÒNG 1 (KIEM-TRA-VONG-2.md): mọi câu trong 'du.soCauV1' câu ĐẦU
+      // đã có đáp án — đúng lúc thanh phân tầng phía trên đổi từ "còn khoá"
+      // sang "hiện hết". Chỉ báo MỘT LẦN mỗi lần mở phiếu (biến daBaoXongVong1);
+      // báo lại giữa hai lần mở là bình thường, máy chủ tự lọc trùng.
+      var daBaoXongVong1 = false;
+      function baoXongVong1() {
+        if (daBaoXongVong1 || !du.soCauV1) return;
+        for (var iV1 = 0; iV1 < du.soCauV1; iV1++) {
+          if (!String(lam[du.cau[iV1].id] || '').trim()) return;
+        }
+        daBaoXongVong1 = true;
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ type: 'ddh-btvn-xong-vong', ma: du.ma, sbd: du.sbd, vong: 1 }, '*');
+          }
+        } catch (ePostV) {}
+      }
+
       function luuLam() {
         try { localStorage.setItem(KHOA_LUU, JSON.stringify(lam)); } catch (e5) {}
         try {
@@ -2008,6 +2026,7 @@ export const JS_PHIEU = `
             window.parent.postMessage({ type: 'ddh-btvn-draft', ma: du.ma, sbd: du.sbd, lam: lam }, '*');
           }
         } catch (ePost) {}
+        baoXongVong1();
       }
       function soDaLam() {
         var n = 0;
@@ -2391,6 +2410,14 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   const ai = t.oBia && t.oBia.length > 0 ? t.oBia[0].gia : t.hoTen
   // Dữ liệu nộp đi kèm tài liệu, KHÔNG gắn vào chuỗi JS bằng nối chuỗi: đáp án
   // và mã phiếu là dữ liệu, nhét thẳng vào mã là mở đường chèn mã lạ.
+  // NGƯỠNG VÒNG 1 CỐ ĐỊNH (KIEM-TRA-VONG-2.md) — LUÔN theo công thức
+  // round(tổng câu × 0,45), KHÔNG theo `soCauSang` của màn đang mở: soCauSang
+  // đổi theo vòng đang xem (Vòng 2 mở ra là ~80%, Vòng 3 là 100%), còn ngưỡng
+  // này phải đứng yên để script nhận biết đúng "đã xong Vòng 1" ở bất kỳ màn
+  // nào trong 3 màn. Trùng công thức với `soCauV1` ở `tro-ly-ca-nhan.ts`.
+  // Bằng hoặc lớn hơn tổng số câu thì không có gì để "xong trước" — bỏ qua.
+  const soCauV1Nguong = Math.max(4, Math.round(cau.length * 0.45))
+  const soCauV1ChoNop = laBtvn && nop && soCauV1Nguong < cau.length ? soCauV1Nguong : undefined
   const goiNop = nop
     ? `<script type="application/json" id="du-nop">${JSON.stringify({
         ma: nop.ma,
@@ -2399,6 +2426,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
         url: nop.url,
         ch: chNop,
         banNhap: nop.banNhap,
+        soCauV1: soCauV1ChoNop,
         cau: cau.map((c) => ({ id: c.id, phan: c.phan, dapAn: c.dapAn })),
       }).replace(/</g, '\\u003c')}<\/script>`
     : ''

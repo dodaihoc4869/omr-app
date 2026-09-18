@@ -1607,6 +1607,29 @@ async function nopBtvn(env: Env, b: Record<string, unknown>): Promise<Response> 
   return ra(await G.nopBtvnQuaPhieu(env,bt,sbd,(b.dapAn||{}) as Record<string,unknown>))
 }
 
+/** EM BÁO XONG MỘT VÒNG BTVN (KIEM-TRA-VONG-2.md). Đường công khai, như /btvn/nop.
+ *
+ * CHỈ GHI MỐC LẦN ĐẦU — `COALESCE(xong_vong1_luc, ?)` giữ giá trị cũ nếu đã có.
+ * Gọi lại bao nhiêu lần (mất mạng, em mở lại phiếu) cũng ra đúng MỘT mốc, và
+ * mốc luôn là giờ MÁY CHỦ, không tin giờ máy em gửi lên. */
+async function xongVongBtvn(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const maBtvn = String(b.maBtvn ?? '').trim()
+  const sbd = String(b.sbd ?? '').trim()
+  const vong = Number(b.vong) || 0
+  if (!maBtvn || !sbd || vong !== 1) return ra({ ok: false, error: 'Thiếu dữ liệu' })
+
+  const luc = new Date().toISOString()
+  const r = await env.DB.prepare(
+    `UPDATE btvn_em SET xong_vong1_luc = COALESCE(xong_vong1_luc, ?) WHERE khoa = ?`,
+  ).bind(luc, `${maBtvn}|${sbd}`).run()
+  if (r.meta.changes === 0) return ra({ ok: false, error: 'Em không có bài tập này.' })
+
+  const em = await env.DB.prepare('SELECT xong_vong1_luc FROM btvn_em WHERE khoa=?')
+    .bind(`${maBtvn}|${sbd}`)
+    .first<{ xong_vong1_luc: string }>()
+  return ra({ ok: true, xongVong1Luc: String(em?.xong_vong1_luc ?? luc) })
+}
+
 async function xemBaiBtvn(env:Env,b:Record<string,unknown>):Promise<Response>{
  const em=await env.DB.prepare('SELECT e.*,b.ma_de FROM btvn_em e JOIN btvn b ON b.ma_btvn=e.ma_btvn WHERE e.ma_btvn=? AND e.sbd=?').bind(String(b.maBtvn||''),String(b.sbd||'')).first<Record<string,unknown>>()
  if(!em?.nop_luc)return ra({ok:false,error:'Học sinh chưa có bài nộp.'})
@@ -2760,6 +2783,7 @@ export default {
       if (p === '/goi') return goiCu(req, env, b)
       if (p === '/btvn/cua-em') return btvnCuaEm(env, b)
       if (p === '/btvn/nop') return nopBtvn(env, b)
+      if (p === '/btvn/xong-vong') return xongVongBtvn(env, b)
 
       // Lệnh của THẦY — đòi mã bí mật.
       if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)

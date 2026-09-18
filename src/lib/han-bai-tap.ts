@@ -47,3 +47,24 @@ export function hanChoOChon(value: string): string {
   const ms = mocThoiGian(value)
   return ms === undefined ? '' : new Date(ms + 7 * 3600_000).toISOString().slice(0, 16)
 }
+
+/** NGÂN SÁCH VÒNG 2 (KIEM-TRA-VONG-2.md): 24 giờ kể từ lúc em xong Vòng 1. */
+export const NGAN_SACH_VONG2_MS = 24 * 3600_000
+
+/**
+ * Hạn Vòng 2 của một BTVN đang chia vòng — hạn MỀM, không thay hạn cứng.
+ *
+ * = xongVong1Luc + NGAN_SACH_VONG2_MS, nhưng KHÔNG BAO GIỜ muộn hơn hanChung:
+ * hạn chung là thứ duy nhất máy chủ còn chặn nộp, hạn Vòng 2 chỉ đổi CHỮ hiện
+ * trên bảng tin để nhắc em, không đổi luật nộp/chấm/thưởng.
+ *
+ * Thuần, không đọc Date.now(). xongVong1Luc hỏng/rỗng thì coi như chưa có mốc
+ * riêng, trả nguyên hanChung.
+ */
+export function tinhHanVong2(xongVong1Luc: string, hanChung: string): string {
+  const xongMs = mocThoiGian(xongVong1Luc)
+  if (xongMs === undefined) return hanChung
+  const han2Ms = xongMs + NGAN_SACH_VONG2_MS
+  const hanChungMs = mocThoiGian(hanChung)
+  return new Date(hanChungMs !== undefined && hanChungMs < han2Ms ? hanChungMs : han2Ms).toISOString()
+}
