@@ -645,6 +645,20 @@ button.bnv-the:active {
   color: var(--m3-on-primary-container);
   text-align: left;
 }
+.bnv-dang-lam-moi {
+  display: flex;
+  align-items: center;
+  gap: var(--k3, 12px);
+  padding: var(--k3, 12px) var(--k4, 16px);
+  border-radius: var(--m3-bo-16);
+  background: var(--m3-secondary-container);
+  color: var(--m3-on-secondary-container);
+}
+.bnv-dang-lam-moi svg { flex-shrink: 0; }
+.bnv-dang-lam-moi-chu { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.bnv-dang-lam-moi-ten { margin: 0; font-size: var(--bnv-cx-2); font-weight: 700; line-height: 1.4; }
+.bnv-dang-lam-moi-so { white-space: nowrap; }
+.bnv-dang-lam-moi-phu { margin: 0; font-size: var(--bnv-cx-1); line-height: 1.4; color: var(--m3-on-secondary-container-phu); }
 button.bnv-chon-thu { cursor: pointer; box-shadow: var(--m3-cao-do-1); }
 button.bnv-chon-thu:active { transform: scale(0.99); }
 button.bnv-chon-thu:focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 2px; }

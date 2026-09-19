@@ -1285,6 +1285,7 @@ export default function StudentPortalScreen() {
           now={nowHocTap}
           duLieu={dungBanNho ? banNho! : duLieuNhiemVu}
           dangTai={!sanSangBang && !dungBanNho}
+          dangLamMoi={keHoachNgay.dangLamMoi}
           mucMenu={mucMenuHocSinh(moManCu, dangXuat)}
           khePhai={
             <ThongBaoHocSinh

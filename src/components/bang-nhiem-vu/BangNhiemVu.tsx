@@ -4,7 +4,7 @@
 // Màn này KHÔNG xếp việc, không tính điểm, không gọi API nhiệm vụ: nhận
 // `DuLieuBangNhiemVu` từ `nhiem-vu-adapter` và chỉ vẽ.
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { CheckCircle2, ChevronRight, ClipboardCheck, MessageSquare, PawPrint, Plus, Shield, Sparkles, Zap } from 'lucide-react'
+import { CheckCircle2, ChevronRight, ClipboardCheck, MessageSquare, PawPrint, Plus, RefreshCw, Shield, Sparkles, Zap } from 'lucide-react'
 import type { DuLieuBangNhiemVu, HanhDongNhiemVu, TheNhiemVu } from '../../lib/nhiem-vu-adapter'
 import type { SpiritMotion } from '../../game/than-thu-v2/Spirit2D'
 import DauTrang, { type MucMenu, type ThanThuGoc } from './DauTrang'
@@ -94,6 +94,8 @@ export interface BangNhiemVuProps {
   caDangMo?: boolean
   /** Một dòng nói thật về phần dữ liệu app CHƯA có (vd. phụ huynh chưa có danh sách BTVN của con). */
   ghiChuNguon?: string
+  /** Máy chủ đang làm mới (reset): vẽ một dải thông báo nhẹ; phần còn lại của màn giữ nguyên. */
+  dangLamMoi?: boolean
   onHanhDong?: (hanhDong: HanhDongNhiemVu) => void
   onMoThanThu?: () => void
   onVaoThi?: () => void
@@ -117,6 +119,7 @@ export default function BangNhiemVu({
   khePhai,
   caDangMo = false,
   ghiChuNguon,
+  dangLamMoi,
   onHanhDong,
   onMoThanThu,
   onVaoThi,
@@ -203,6 +206,18 @@ export default function BangNhiemVu({
           mucMenu={mucMenu}
           khePhai={khePhai}
         />
+
+        {!dangTai && dangLamMoi && (
+          <div className="bnv-dang-lam-moi" role="status" data-vung="dang-lam-moi">
+            <RefreshCw size={22} aria-hidden="true" />
+            <div className="bnv-dang-lam-moi-chu">
+              <p className="bnv-dang-lam-moi-ten">
+                Hệ thống đang làm mới, khoảng <span className="bnv-dang-lam-moi-so">1–5 phút</span>.
+              </p>
+              <p className="bnv-dang-lam-moi-phu">{laPh ? 'Con' : 'Em'} cứ để app mở, app tự vào lại.</p>
+            </div>
+          </div>
+        )}
 
         {dangTai ? (
           <div aria-busy="true" aria-label="Đang tải việc hôm nay" style={{ display: 'grid', gap: 16 }}>

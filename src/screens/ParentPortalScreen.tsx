@@ -624,6 +624,7 @@ export default function ParentPortalScreen() {
           now={nowHocTap}
           duLieu={dungBanNho ? banNho! : duLieuNhiemVu}
           dangTai={!sanSangBang && !dungBanNho}
+          dangLamMoi={keHoachNgay.dangLamMoi}
           mucMenu={mucMenuPhuHuynh(setTabPh, dangXuat, {
             // Kết quả giao nhanh hiện ở khung thông báo của sheet "khắc phục", nên mở sheet ngay.
             khacPhuc: () => {
