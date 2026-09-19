@@ -32,11 +32,13 @@ export const HP_QUAI = 24
 /** Mỗi quái còn sống cuối hiệp đánh Linh Tâm từng này. */
 export const CONG_QUAI = 4
 export const QUAI_TOI_DA = 8
-export const CHAN_DUNG = 12
-/** Sai hoặc bỏ trống vẫn được Chắn, nhưng chỉ là khiên yếu. */
-export const CHAN_SAI = 4
+// KHÔNG AI SUY RA ĐƯỢC BẠN SAI: khiên của Chắn bằng nhau dù em đúng hay sai, và đòn của em SAI tự chuyển thành Chắn ("sai vẫn được Chắn").
+// Nhờ vậy một bạn đã chốt mà trên sân chỉ thấy "chắn 8" thì có thể là: đúng và chủ động chắn, hoặc sai — không phân biệt được.
+// Phần thưởng cho việc làm ĐÚNG khi chắn là thứ chỉ mình em thấy: +2 năng lượng thay vì +1.
+export const CHAN = 8
 export const NL_TOI_DA = 3
 export const NL_KY_NANG = 2
+export const NL_CHAN_DUNG = 2
 export const HIEU_UNG_LAN = 6
 export const HIEU_UNG_CHAN = 12
 export const HIEU_UNG_HOI = 10
@@ -240,12 +242,13 @@ function giaiHiepThuong(c: Chang, nopVao: NopHiep[]): KetQuaHiep {
   const lan: number[] = []
   for (const [i, n] of [...nop].sort((a, b) => a[0] - b[0])) {
     const g = c.ghe[i]!, r = kq[i]!, lk = lienKich.has(i)
-    // Thiếu năng lượng mà vẫn gửi "kỹ năng" (máy chủ lẽ ra đã chặn) → coi như Đánh, không làm hỏng phòng.
-    const hanhDong: HanhDong = n.hanhDong === 'chan' ? 'chan' : n.hanhDong === 'ky_nang' && g.nangLuong >= NL_KY_NANG ? 'ky_nang' : 'danh'
+    // Sai / bỏ trống → đòn tự chuyển thành Chắn (kỹ năng không bị trừ năng lượng). Thiếu năng lượng mà vẫn gửi "kỹ năng"
+    // (máy chủ lẽ ra đã chặn) → coi như Đánh, không làm hỏng phòng.
+    const hanhDong: HanhDong = !n.dung || n.hanhDong === 'chan' ? 'chan' : n.hanhDong === 'ky_nang' && g.nangLuong >= NL_KY_NANG ? 'ky_nang' : 'danh'
     const chieu = CHIEU[g.pet]!, an = hanhDong === 'ky_nang' && !!n.anThach
     Object.assign(r, { nop: true, dung: n.dung, hanhDong, lienKich: lk && n.dung })
     r.tenChieu = hanhDong === 'chan' ? 'Chắn' : hanhDong === 'danh' ? chieu.chuong : an ? chieu.kyNangAn : chieu.kyNang
-    if (hanhDong === 'chan') r.chan = (n.dung ? CHAN_DUNG : CHAN_SAI) * (lk && n.dung ? HE_LIEN_KICH : 1)
+    if (hanhDong === 'chan') r.chan = CHAN * (lk && n.dung ? HE_LIEN_KICH : 1)
     else {
       r.satThuong = satThuongDon({ dung: n.dung, lienKich: lk, anThach: an })
       r.heSo = { dung: n.dung ? HE_DUNG : 0, lienKich: lk && n.dung ? HE_LIEN_KICH : 1, anThach: an && n.dung ? HE_AN_THACH : 1 }
@@ -256,7 +259,7 @@ function giaiHiepThuong(c: Chang, nopVao: NopHiep[]): KetQuaHiep {
       if (chieu.nhom === 'hoi') r.hoi = HIEU_UNG_HOI
       if (chieu.nhom === 'cong') lan.push(i)
     }
-    if (n.dung) g.nangLuong = Math.min(NL_TOI_DA, g.nangLuong + 1)
+    if (n.dung) g.nangLuong = Math.min(NL_TOI_DA, g.nangLuong + (hanhDong === 'chan' ? NL_CHAN_DUNG : 1))
     tongChan += r.chan; linhTamHoi += r.hoi
   }
   // Người tiếp sức thành công được thêm 1 năng lượng: dạy bạn cũng là một cách nạp chiêu.
@@ -330,10 +333,10 @@ export function tomTatChang(c: Chang): TomTatChang {
 }
 
 // ───────────────────────── Khung nhìn gửi xuống máy từng em ─────────────────────────
-/** Điều một em được thấy về BẠN sau hiệp: bạn ra đòn / chắn / giữ vị trí. Không có "sai", không có hệ số, không có ý trùm. */
+/** Điều một em được thấy về BẠN sau hiệp: bạn ra đòn / chắn / giữ vị trí (= không chốt). Không có "sai", không có hệ số, không có ý trùm. */
 export interface GheBanThay { ghe: number; ra: 'don' | 'chan' | 'giu'; tenChieu: string; satThuong: number; haGuc: number; lienKich: boolean }
 export interface KhungNhinHiep extends Omit<KetQuaHiep, 'ghe'> { cuaEm: KetQuaGhe | null; ban: GheBanThay[] }
-/** Không ai thấy bạn SAI gì: đòn 0 sát thương, khiên yếu và không chốt đều hiện chung là "giữ vị trí" / "chắn". */
+/** Không ai thấy bạn SAI gì: bạn đã chốt mà không ra đòn thì luôn hiện "chắn" với cùng một khiên — đúng-rồi-chắn và sai trông Y HỆT nhau. */
 export function khungNhinHiep(kq: KetQuaHiep, gheXem: number): KhungNhinHiep {
   const { ghe, ...chung } = kq
   const ban = ghe.filter(r => r.ghe !== gheXem).map((r): GheBanThay => {

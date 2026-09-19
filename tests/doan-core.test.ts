@@ -1,5 +1,5 @@
 // ĐOÀN HỘ TỐNG — bước 1: lõi thuần. Mọi con số dưới đây TÍNH TAY từ luật ở mục 7 bản đề xuất
-// (nền 16 × 1,5 × Liên Kích 2 × ấn thạch 1,25; quái 24 máu, đánh Linh Tâm 4; chắn đúng 12 / sai 4;
+// (nền 16 × 1,5 × Liên Kích 2 × ấn thạch 1,25; quái 24 máu, đánh Linh Tâm 4; Chắn 8 dù đúng hay sai, sai thì đòn tự thành Chắn;
 // Linh Tâm 40 + 20 × số ghế; trùm vỡ giáp từ 3/4 ý, không vỡ thì đánh 8 × số đoạn giáp còn).
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
@@ -65,22 +65,26 @@ describe('Đoàn Hộ Tống · hiệp thường (tính tay)', () => {
     expect([c.hiep, c.linhTam.hp, c.quai.length]).toEqual([2, 100, 3])
     expect(c.ghe.map(g => g.nangLuong)).toEqual([1, 1, 1])
   })
-  it('2 đúng 1 sai: còn 1 quái đánh Linh Tâm 4 → 96; em sai gây 0 và không có năng lượng', () => {
-    const c = giaiHiep(doi(3), { nop: [nop(0, true), nop(1, true), nop(2, false)] }), h = cuoi(c)
+  it('2 đúng, 1 bạn KHÔNG chốt: còn 1 quái đánh Linh Tâm 4 → 96; bạn không chốt không gây gì, không có năng lượng', () => {
+    const c = giaiHiep(doi(3), { nop: [nop(0, true), nop(1, true)] }), h = cuoi(c)
     expect([h.tongSatThuong, h.quaiConLai, h.linhTamMat, c.linhTam.hp]).toEqual([48, 1, 4, 96])
-    expect(h.ghe[2]).toMatchObject({ nop: true, dung: false, satThuong: 0, haGuc: 0 })
+    expect(h.ghe[2]).toMatchObject({ nop: false, dung: false, satThuong: 0, chan: 0, haGuc: 0 })
     expect(c.ghe.map(g => g.nangLuong)).toEqual([1, 1, 0])
     expect(c.quai).toHaveLength(4) // 1 con tồn + 3 con mới
   })
-  it('Chắn đúng 12 đỡ hết đòn của 2 quái còn lại (8); khiên dư không hồi máu', () => {
-    const c = giaiHiep(doi(3), { nop: [nop(0, true), nop(1, true, 'chan'), nop(2, false)] }), h = cuoi(c)
-    expect([h.quaiConLai, h.tongChan, h.linhTamMat, c.linhTam.hp]).toEqual([2, 12, 0, 100])
-    expect(h.ghe[1]).toMatchObject({ chan: 12, satThuong: 0, tenChieu: 'Chắn' })
+  it('Chắn 8 đỡ đúng đòn của 2 quái còn lại (8); đúng mà chắn được +2 năng lượng (chỉ mình em thấy)', () => {
+    const c = giaiHiep(doi(3), { nop: [nop(0, true), nop(1, true, 'chan')] }), h = cuoi(c)
+    expect([h.quaiConLai, h.tongChan, h.linhTamMat, c.linhTam.hp]).toEqual([2, 8, 0, 100])
+    expect(h.ghe[1]).toMatchObject({ chan: 8, satThuong: 0, tenChieu: 'Chắn' }); expect(c.ghe.map(g => g.nangLuong)).toEqual([1, 2, 0])
   })
-  it('sai vẫn được Chắn nhưng chỉ khiên yếu 4; em không chốt thì không làm gì: 3 quái × 4 − 4 = 8 → 92', () => {
+  it('SAI thì đòn tự chuyển thành Chắn, khiên vẫn 8 (không yếu hơn), không có năng lượng; khiên dư không hồi máu', () => {
     const c = giaiHiep(doi(3), { nop: [nop(0, false), nop(1, false, 'chan')] }), h = cuoi(c)
-    expect([h.tongChan, h.linhTamMat, c.linhTam.hp]).toEqual([4, 8, 92])
-    expect(h.ghe[2]).toMatchObject({ nop: false, hanhDong: null, satThuong: 0, chan: 0 })
+    expect(h.ghe.map(r => [r.hanhDong, r.satThuong, r.chan])).toEqual([['chan', 0, 8], ['chan', 0, 8], [null, 0, 0]])
+    expect([h.tongChan, h.quaiConLai, h.linhTamMat, c.linhTam.hp]).toEqual([16, 3, 0, 100]); expect(c.ghe.map(g => g.nangLuong)).toEqual([0, 0, 0])
+  })
+  it('cả đội sai liên tục: không hạ được quái nào, quái dồn lại 2 → 4 → 6; tới hiệp 3 thì 6 × 4 = 24 vượt 2 khiên × 8 → Linh Tâm bắt đầu mất máu', () => {
+    let c = doi(2); for (let i = 0; i < 3; i++) c = giaiHiep(c, { nop: caDoi(c, false) })
+    expect(c.lichSu.map(h => [h.quaiConLai, h.linhTamMat])).toEqual([[2, 0], [4, 0], [6, 8]]); expect(c.linhTam.hp).toBe(72)
   })
   it('sát thương dư tràn sang quái kế; số quái trên sân không vượt trần', () => {
     let c = doi(4)
@@ -103,15 +107,15 @@ describe('Đoàn Hộ Tống · Tiếp sức và Liên Kích', () => {
     expect(c.ghe.map(g => g.nangLuong)).toEqual([2, 1, 0]); expect(c.ghe[1]!.daNhanTiepSuc).toBe(1)
     expect(h.quaiHaGuc).toBe(3) // 96 sát thương đổ vào 3 quái 24 máu, dư 24 bỏ
   })
-  it('bạn làm lại vẫn SAI → không Liên Kích, người giúp vẫn 24, câu vẫn tính là đã được giúp', () => {
+  it('bạn làm lại vẫn SAI → không Liên Kích, người giúp vẫn 24, bạn chắn 8, câu vẫn tính là đã được giúp', () => {
     const c = giaiHiep(doi(2), { nop: [nop(0, true), nop(1, false, 'danh', { tiepSucBoi: 0 })] }), h = cuoi(c)
-    expect(h.ghe.map(r => [r.satThuong, r.lienKich])).toEqual([[24, false], [0, false]])
+    expect(h.ghe.map(r => [r.satThuong, r.chan, r.lienKich])).toEqual([[24, 0, false], [0, 8, false]])
     expect(h.ghe[0]).toMatchObject({ giup: 1, giupThanhCong: false }); expect(h.ghe[1]!.tuLam).toBe(false)
     expect(c.ghe[0]!.nangLuong).toBe(1); expect(c.ghe[1]!.daNhanTiepSuc).toBe(1)
   })
-  it('Liên Kích nhân đôi cả khiên: Chắn đúng sau tiếp sức = 24', () => {
+  it('Liên Kích nhân đôi cả khiên: Chắn đúng sau tiếp sức = 16', () => {
     const h = cuoi(giaiHiep(doi(2), { nop: [nop(0, true), nop(1, true, 'chan', { tiepSucBoi: 0 })] }))
-    expect(h.ghe[1]!.chan).toBe(24); expect(h.ghe[0]!.satThuong).toBe(48)
+    expect(h.ghe[1]!.chan).toBe(16); expect(h.ghe[0]!.satThuong).toBe(48)
   })
   it('mỗi hiệp giúp được MỘT bạn; không tự giúp mình; hiệp trùm không có thẻ; bạn máy không nhận', () => {
     const c = doi(3)
@@ -147,8 +151,8 @@ describe('Đoàn Hộ Tống · Kỹ năng và năng lượng', () => {
     expect(h.ghe[1]).toMatchObject({ satThuong: 24, haGuc: 1, chan: 12, tenChieu: 'Địa Tinh Thuẫn' })
     expect([h.quaiConLai, h.linhTamMat]).toEqual([0, 0]); expect(c.ghe.map(g => g.nangLuong)).toEqual([1, 1])
   })
-  it('đòn lan nhóm công: quái 2 còn 18 sau đòn chính, lan trừ thêm 6 → 12; quái ấy đánh Linh Tâm 4 → 76', () => {
-    const c = giaiHiep(vaoHiep3(), { nop: [nop(0, true, 'ky_nang', { anThach: true }), nop(1, false)] }), h = cuoi(c)
+  it('đòn lan nhóm công: quái 2 còn 18 sau đòn chính, lan trừ thêm 6 → 12; bạn không chốt nên quái ấy đánh Linh Tâm 4 → 76', () => {
+    const c = giaiHiep(vaoHiep3(), { nop: [nop(0, true, 'ky_nang', { anThach: true })] }), h = cuoi(c)
     expect(h.ghe[0]).toMatchObject({ satThuong: 30, lan: 6, haGuc: 1 }); expect(h.tongSatThuong).toBe(36)
     expect(c.quai[0]!.hp).toBe(12); expect(c.linhTam.hp).toBe(76)
   })
@@ -156,7 +160,7 @@ describe('Đoàn Hộ Tống · Kỹ năng và năng lượng', () => {
     const c = vaoHiep3()
     expect(cuoi(giaiHiep(c, { nop: [nop(0, true, 'danh', { anThach: true })] })).ghe[0]!.satThuong).toBe(24)
     const d = giaiHiep(c, { nop: [nop(0, false, 'ky_nang', { anThach: true })] })
-    expect(cuoi(d).ghe[0]).toMatchObject({ satThuong: 0, lan: 0 }); expect(d.ghe[0]!.nangLuong).toBe(2)
+    expect(cuoi(d).ghe[0]).toMatchObject({ hanhDong: 'chan', satThuong: 0, lan: 0, chan: 8 }); expect(d.ghe[0]!.nangLuong).toBe(2)
   })
   it('gửi "kỹ năng" khi thiếu năng lượng → lõi coi là Đánh, không làm hỏng phòng', () => {
     expect(cuoi(giaiHiep(doi(2), { nop: [nop(0, true, 'ky_nang', { anThach: true })] })).ghe[0]).toMatchObject({ hanhDong: 'danh', satThuong: 24, tenChieu: CHIEU[2]!.chuong })
@@ -171,7 +175,7 @@ describe('Đoàn Hộ Tống · Kỹ năng và năng lượng', () => {
     const day = giaiHiep(vaoHiep3([1, 0]), { nop: [nop(0, true, 'ky_nang'), nop(1, true)] }); expect(day.linhTam.hp).toBe(80)
   })
   it('hồi và mất tính GỘP rồi mới kẹp: đầy máu 80 − 4 + 10 vẫn 80; còn 3 máu − 4 + 10 = 9, Linh Tâm không vỡ', () => {
-    const c = vaoHiep3([1, 0]), bai = { nop: [nop(0, true, 'ky_nang'), nop(1, false)] } // hạ 1 quái, còn 1 quái đánh 4
+    const c = vaoHiep3([1, 0]), bai = { nop: [nop(0, true, 'ky_nang')] } // hạ 1 quái; bạn không chốt nên còn 1 quái đánh 4
     expect(cuoi(giaiHiep(c, bai))).toMatchObject({ linhTamMat: 4, linhTamHoi: 10, linhTamSau: 80 })
     const mong = giaiHiep({ ...c, linhTam: { hp: 3, toiDa: 80 } }, bai); expect([mong.linhTam.hp, mong.ketThuc]).toEqual([9, false])
   })
@@ -247,7 +251,7 @@ describe('Đoàn Hộ Tống · thắng, thua, sao, tóm tắt', () => {
     c = giaiHiep(c, { nop: [nop(0, true), nop(1, false, 'chan', { tiepSucBoi: 0 })] })
     const t = tomTatChang(c)
     expect(t.ghe[0]).toMatchObject({ soLanGiup: 2, soLanGiupThanhCong: 1, soLienKich: 1, soTuLamDung: 2, satThuong: 72 })
-    expect(t.ghe[1]).toMatchObject({ soLanDuocGiup: 2, soDung: 1, soTuLamDung: 0, satThuong: 48, chan: 4 }); expect(t.soLienKich).toBe(1)
+    expect(t.ghe[1]).toMatchObject({ soLanDuocGiup: 2, soDung: 1, soTuLamDung: 0, satThuong: 48, chan: 8 }); expect(t.soLienKich).toBe(1)
   })
 })
 
@@ -287,7 +291,7 @@ describe('Đoàn Hộ Tống · bạn máy và rời trận', () => {
   it('đi một mình trọn chặng: lõi tự đánh thay bạn máy (kể cả ý trùm), bỏ qua mọi thứ gửi hộ ghế máy', () => {
     let c = doi(1); const may = banMayNop(c, 1)
     c = giaiHiep(c, { nop: [nop(0, true), nop(1, !may.dung, 'chan')] })
-    expect(cuoi(c).ghe[1]).toMatchObject({ nop: true, dung: may.dung, hanhDong: 'danh' })
+    expect(cuoi(c).ghe[1]).toMatchObject({ nop: true, dung: may.dung, hanhDong: may.dung ? 'danh' : 'chan' })
     while (!c.ketThuc) {
       if (!hiepLaTrum(c.hiep)) { c = giaiHiep(c, { nop: [nop(0, true)] }); continue }
       const mong = c.giaoY.filter((ghe, y) => ghe === 0 || banMayDungY(c, y)).length
@@ -299,7 +303,7 @@ describe('Đoàn Hộ Tống · bạn máy và rời trận', () => {
   it('rời trận → máy đỡ thay từ hiệp ấy, đội không bị phạt; bài gửi của ghế đã rời bị bỏ qua', () => {
     const c = roiTran(doi(2), 'hs1'), may = banMayNop(c, 1)
     expect(c.ghe[1]).toMatchObject({ roi: true, laMay: false }); expect(c.linhTam.hp).toBe(80)
-    expect(cuoi(giaiHiep(c, { nop: [nop(0, true), nop(1, !may.dung, 'chan')] })).ghe[1]).toMatchObject({ dung: may.dung, hanhDong: may.hanhDong })
+    expect(cuoi(giaiHiep(c, { nop: [nop(0, true), nop(1, !may.dung, 'chan')] })).ghe[1]).toMatchObject({ dung: may.dung, hanhDong: may.dung ? may.hanhDong : 'chan' })
     expect(roiTran(c, 'khong-co')).toEqual(c)
   })
 })
@@ -323,16 +327,27 @@ describe('Đoàn Hộ Tống · tất định và thuần', () => {
 })
 
 describe('Đoàn Hộ Tống · khung nhìn gửi xuống máy em', () => {
-  it('không ai thấy bạn SAI gì: đòn trượt và không chốt đều là "giữ vị trí"; không lộ đúng/sai, hệ số, tự làm', () => {
+  it('về bạn chỉ có ra đòn / chắn / giữ vị trí (= không chốt); không lộ đúng/sai, hệ số, tự làm', () => {
     const h = cuoi(giaiHiep(doi(4), { nop: [nop(0, true), nop(1, false), nop(2, false, 'chan')] })), k = khungNhinHiep(h, 0)
     expect(k.cuaEm).toMatchObject({ ghe: 0, dung: true, satThuong: 24 })
     expect(k.ban).toEqual([
-      { ghe: 1, ra: 'giu', tenChieu: '', satThuong: 0, haGuc: 0, lienKich: false },
+      { ghe: 1, ra: 'chan', tenChieu: '', satThuong: 0, haGuc: 0, lienKich: false },
       { ghe: 2, ra: 'chan', tenChieu: '', satThuong: 0, haGuc: 0, lienKich: false },
       { ghe: 3, ra: 'giu', tenChieu: '', satThuong: 0, haGuc: 0, lienKich: false },
     ])
     expect(JSON.stringify(k.ban)).not.toMatch(/dung|tuLam|heSo|duocGiup|yDung/); expect('ghe' in k).toBe(false)
     expect(khungNhinHiep(h, 1).ban[0]).toEqual({ ghe: 0, ra: 'don', tenChieu: CHIEU[2]!.chuong, satThuong: 24, haGuc: 1, lienKich: false })
+  })
+  it('KHÔNG SUY RA ĐƯỢC bạn sai — kể cả khi chỉ MỘT bạn chắn: đúng-rồi-chắn, sai-khi-Đánh, sai-khi-Chắn, sai-khi-Kỹ-năng cho khung nhìn Y HỆT nhau', () => {
+    // Đội 2 bạn, hiệp 3, bạn ghế 1 đang có 2 năng lượng (để "kỹ năng" là lựa chọn thật). Người xem là ghế 0.
+    let c = doi(2); for (let i = 0; i < 2; i++) c = giaiHiep(c, { nop: caDoi(c, true) })
+    const nhin = (ban: NopHiep) => JSON.stringify(khungNhinHiep(cuoi(giaiHiep(c, { nop: [nop(0, true), ban] })), 0))
+    const dungRoiChan = nhin(nop(1, true, 'chan'))
+    for (const sai of [nop(1, false, 'danh'), nop(1, false, 'chan'), nop(1, false, 'ky_nang'), nop(1, false, 'ky_nang', { anThach: true })]) expect(nhin(sai)).toBe(dungRoiChan)
+    // …và mọi con số công khai của sân (máu Linh Tâm, khiên, quái) cũng y hệt → không suy ngược được từ thanh máu
+    const san = (ban: NopHiep) => { const d = giaiHiep(c, { nop: [nop(0, true), ban] }); return JSON.stringify([d.linhTam, d.quai, cuoi(d).tongChan, cuoi(d).linhTamMat, cuoi(d).tongSatThuong]) }
+    expect(san(nop(1, false, 'danh'))).toBe(san(nop(1, true, 'chan')))
+    expect(nhin(nop(1, true, 'danh'))).not.toBe(dungRoiChan) // còn bạn ĐÚNG và ra đòn thì thấy được — đó là tin vui, không phải tin xấu
   })
   it('hiệp trùm: em chỉ thấy ý CỦA EM đúng hay sai; về bạn chỉ có tổng số ý đúng của cả đội', () => {
     let c = doi(4); for (let i = 0; i < 3; i++) c = giaiHiep(c, { nop: caDoi(c, true) })
