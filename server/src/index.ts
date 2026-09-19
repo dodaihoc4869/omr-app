@@ -3,7 +3,7 @@ import {ghiSuKien,ghiSuKienThi,ghiSuKienLoBtvn,ngayVn,type LuotThi} from './su-k
 import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
 import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
 import {hsThoiGianHoc,chayCaLop} from './ke-hoach-ngay-d1'
-import {chayResetNeuDenGio,dangLamMoi,docMocReset,maDaDung,resetDryRun,LOI_DANG_LAM_MOI} from './reset-toan-app'
+import {chayResetNeuDenGio,chayTiepTay,dangLamMoi,docMocReset,doGioiHanTruyVan,maDaDung,maDaDungTrong,resetDryRun,LOI_DANG_LAM_MOI} from './reset-toan-app'
 import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQua} from './exp-d1'
 import {hsCauTheoQid,docDoPhuPhucVu} from './cau-theo-qid'
 import {hsOnLaiNop} from './on-lai-nop'
@@ -789,9 +789,16 @@ async function xoaPhieuR2(env: Env, ma: string): Promise<Response> {
  * N bài chưa về Sheet" rồi đẩy ngược lại đúng những dòng đã có — vừa sai số
  * vừa có nguy cơ ghi đè bản trên Sheet bằng bản chép thiếu cột. */
 async function dayNhieuCa(env: Env, b: Record<string, unknown>): Promise<Response> {
-  const dsCa = Array.isArray(b.ca) ? (b.ca as Record<string, unknown>[]) : []
-  const dsLuot = Array.isArray(b.luot) ? (b.luot as Record<string, unknown>[]) : []
+  let dsCa = Array.isArray(b.ca) ? (b.ca as Record<string, unknown>[]) : []
+  let dsLuot = Array.isArray(b.luot) ? (b.luot as Record<string, unknown>[]) : []
   if (dsCa.length === 0 && dsLuot.length === 0) return ra({ ok: false, error: 'Không có gì để đẩy' })
+  // Sau reset 21/09: ca và lượt mang MÃ CA ĐÃ TỪNG DÙNG (tập nạp lúc reset) bị BỎ QUA và báo lại, phần còn lại vẫn đẩy — app thầy không được đẩy ngược ca ma lên máy chủ.
+  const maCu = await maDaDungTrong(env, 'ca', [...dsCa.map((c) => String(c.maCa ?? '').trim()), ...dsLuot.map((l) => String(l.maCa ?? '').trim())])
+  if (maCu.size > 0) {
+    dsCa = dsCa.filter((c) => !maCu.has(String(c.maCa ?? '').trim()))
+    dsLuot = dsLuot.filter((l) => !maCu.has(String(l.maCa ?? '').trim()))
+    if (dsCa.length === 0 && dsLuot.length === 0) return ra({ ok: false, error: 'Mọi ca trong lượt đẩy đều là mã cũ đã bị xoá khi làm mới hệ thống', maCaDaDung: true, boQuaMaCu: [...maCu] })
+  }
   const nay = new Date().toISOString()
   const cau: D1PreparedStatement[] = []
 
@@ -852,7 +859,7 @@ async function dayNhieuCa(env: Env, b: Record<string, unknown>): Promise<Respons
   }
 
   for (let i = 0; i < cau.length; i += 200) await env.DB.batch(cau.slice(i, i + 200))
-  return ra({ ok: true, soCa: dsCa.length, soLuot: dsLuot.length, soCau: cau.length })
+  return ra({ ok: true, soCa: dsCa.length, soLuot: dsLuot.length, soCau: cau.length, ...(maCu.size > 0 ? { boQuaMaCu: [...maCu] } : {}) })
 }
 
 /** DANH SÁCH CA + ĐẾM ĐÃ VÀO / ĐÃ NỘP / CẢNH BÁO — thay `danhSachCa` bên Apps
@@ -2797,7 +2804,9 @@ async function themMocReset(env: Env, res: Response): Promise<Response> {
 export default {
   async scheduled(event:{cron:string}, env:Env) {
     // RESET TOÀN APP (chỉ chạy đúng một lần, sau mốc 00:01 thứ Hai 21/09; trước mốc và sau khi xong thì trả về ngay). PHẢI chạy trước mọi việc khác của cron.
-    await chayResetNeuDenGio(env,Date.now()).then(r=>{if(r.chay||r.lyDo==='loi')console.log('[reset] cron',JSON.stringify({chay:r.chay,lyDo:r.lyDo,trangThai:r.trangThai?.trangThai,loi:r.trangThai?.loi}))}).catch(e=>console.error('[reset] cron lỗi:',e))
+    // Job chia bước (≤ 40 truy vấn D1 mỗi lượt): đang làm/nhường thì các việc cron khác nghỉ lượt này (kế hoạch, tin PH, vinh danh đều dựng lại theo yêu cầu khi có người mở).
+    const dangReset=await chayResetNeuDenGio(env,Date.now()).then(r=>{if(r.chay||r.lyDo==='loi'||r.lyDo==='qua_gio')console.log('[reset] cron',JSON.stringify({chay:r.chay,lyDo:r.lyDo,trangThai:r.trangThai?.trangThai,buoc:r.trangThai?.buoc,soTruyVan:r.soTruyVan,loi:r.trangThai?.loi}));return r.chay||r.lyDo==='dang_chay'||r.lyDo==='cho_tiep'}).catch(e=>{console.error('[reset] cron lỗi:',e);return false})
+    if(dangReset)return
     if(event.cron==='1 17 * * *'){
       // 00:01 giờ VN: tin phụ huynh + vinh danh như cũ, THÊM chốt ngày cũ và lập kế hoạch ngày mới (GĐ 2).
       // Kế hoạch có lỗi thì chỉ ghi log — không được kéo hai việc cũ đổ theo.
@@ -2930,6 +2939,10 @@ export default {
       if (p === '/ho-so/do-phu-dang') return ra(await docDoPhuDang(env))
       // Chạy thử reset (chỉ ĐẾM, không ghi): job sẽ xoá bảng nào, bao nhiêu dòng, giữ bảng nào.
       if (p === '/reset/dry-run') return ra(await resetDryRun(env))
+      // Chạy tiếp TAY (bỏ qua hạn 01:00; vẫn cần cờ cho phép, không cờ huỷ): MỘT lượt ≤ 40 truy vấn, gọi lặp tới khi trangThai 'xong'.
+      if (p === '/reset/chay-tiep') return ra({ ok: true, ...(await chayTiepTay(env, Date.now())) })
+      // Đo giới hạn truy vấn D1 mỗi lượt gọi của gói đang dùng (chỉ đọc).
+      if (p === '/reset/do-gioi-han') return ra(await doGioiHanTruyVan(env))
       if (p === '/ke-hoach/do-phu-phuc-vu') return ra(await docDoPhuPhucVu(env, ngayVn(Date.now())))
       if (p === '/ke-hoach/chay-ca-lop') return ra({ ok: true, ...(await chayCaLop(env, Date.now())) })
       if (p === '/game-v2-admin') return ra(await adminGame(env,b))

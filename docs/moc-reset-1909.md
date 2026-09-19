@@ -15,7 +15,7 @@ Người viết: Code 3 (máy chủ). Mã: `server/src/reset-toan-app.ts`, nối
 - Nên dọn (HS/PH): bản nhớ kế hoạch ngày, nháp/khôi phục bài làm theo MÃ CA trong IndexedDB, danh sách ca, bài Mẹ giao/BTVN nhớ trong máy (`omr_mom_btvn_<sbd>`…), bản nhớ thần thú/EXP (máy chủ đã về vạch xuất phát, em chọn thú lại). GIỮ: đăng nhập/token (mật khẩu không đổi), cài đặt giao diện.
 - Nên dọn (giáo viên): danh sách ca, bank/đáp án và bản đồ đề riêng nhớ theo mã ca cũ, hàng đợi đẩy dữ liệu chưa gửi của ca cũ (kẻo đẩy ngược ca ma lên máy chủ).
 
-## 2. Lúc job đang chạy (đóng băng 00:00–00:20 giờ VN, mở ngay khi job xong)
+## 2. Lúc job đang chạy (đóng băng từ 00:00 tới khi job xong hoặc 01:00 giờ VN; CHỈ khi thầy đã bật cờ "lên đạn")
 
 Mọi lệnh (trừ `/khoe` và các đường chuyển hướng) trả:
 
@@ -34,6 +34,7 @@ Job nạp mọi mã ca (từ `ca`, `luot`, `phieu`…), mã BTVN và mã bài M�
 | `capNhatKeyBank` | mã ca cũ, không còn trong `ca` | `{ ok:false, error:"Ca này đã bị xoá khi làm mới hệ thống…", maCaDaDung:true }` — KHÔNG ghi R2 (lớp bảo hiểm thứ hai; app thầy đã tự chặn không đẩy ca ngoài danh sách máy chủ) |
 | `noiKhoCa` | như trên | như trên |
 | Mẹ giao `create` | id nằm trong tập | lỗi `"Mã bài đã từng dùng. Tạo lại bài với mã khác."` |
+| `/ca/nhieu` (đẩy nhiều ca + lượt) | ca hoặc lượt mang mã ca cũ | BỎ QUA các mục mã cũ, phần còn lại vẫn đẩy; phản hồi có `boQuaMaCu:[…]`; nếu mọi ca đều là mã cũ: `{ ok:false, maCaDaDung:true, boQuaMaCu:[…] }` |
 
 Mã ca chưa từng dùng và chưa có dòng trong `ca` vẫn ghi được `capNhatKeyBank` bình thường (đẩy đáp án có thể đi trước đẩy ca). Mã BTVN do máy chủ sinh dạng `<mã ca>-<thời gian base36>` nên không trùng; giữ trong tập để tra cứu.
 
