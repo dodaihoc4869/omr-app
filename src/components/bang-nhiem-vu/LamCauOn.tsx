@@ -61,6 +61,8 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong }: La
   const [chuaLam, setChuaLam] = useState<string[]>([])
   const [tienBo, setTienBo] = useState<TienBoOn | null>(null)
   const [exp, setExp] = useState(0)
+  const [expNhan, setExpNhan] = useState<{ exp: number; ghiChu: string }[]>([])
+  const [manhNhan, setManhNhan] = useState<{ so: number; ghiChu: string }[]>([])
   const [dangNop, setDangNop] = useState(false)
   const [loiNop, setLoiNop] = useState('')
   const [daNopLan, setDaNopLan] = useState(0)
@@ -139,6 +141,8 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong }: La
     setChuaLam(r.chuaLam || [])
     if (r.tienBo) setTienBo(r.tienBo)
     setExp((e) => e + (r.exp && r.exp > 0 ? r.exp : 0))
+    if (r.expNhan && r.expNhan.length > 0) setExpNhan((t) => [...t, ...r.expNhan!])
+    if (r.manhNhan && r.manhNhan.length > 0) setManhNhan((t) => [...t, ...r.manhNhan!])
     setDaNopLan((n) => n + 1)
   }
 
@@ -210,6 +214,17 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong }: La
             </p>
           )}
           {exp > 0 && <p className="lco-exp">+{exp} EXP học tập</p>}
+          {/* EXP mới đã bật: in NGUYÊN VĂN từng khoản máy chủ đã ghi (kèm mảnh khiên); chưa bật thì chỉ có dòng tổng ở trên. */}
+          {(expNhan.length > 0 || manhNhan.length > 0) && (
+            <ul className="lco-exp-ds" aria-label="EXP và mảnh khiên vừa nhận">
+              {expNhan.map((x, i) => (
+                <li key={`e${i}`}>{x.ghiChu}</li>
+              ))}
+              {manhNhan.map((x, i) => (
+                <li key={`m${i}`}>{x.ghiChu}</li>
+              ))}
+            </ul>
+          )}
           {soChuaTraLoi > 0 && (
             <p className="lco-nhac">
               Còn {soChuaTraLoi} câu chưa trả lời — <b>chưa được tính</b>. Em làm nốt rồi nộp tiếp.

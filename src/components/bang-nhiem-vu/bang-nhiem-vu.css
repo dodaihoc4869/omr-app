@@ -602,6 +602,36 @@ button.bnv-the:active {
   gap: 10px;
   width: 100%;
 }
+/* EXP học tập + mảnh khiên hôm nay (chỉ khi máy chủ có nói). Tonal trung tính; "vừa nhận" là băng tertiary có thể ẩn. */
+.bnv-exp {
+  display: flex;
+  flex-direction: column;
+  gap: var(--k2, 8px);
+  padding: var(--k3, 12px) var(--k4, 16px);
+  border-radius: var(--m3-bo-16);
+  background: var(--m3-surface-container);
+  color: var(--m3-on-surface);
+}
+.bnv-exp-hang { display: flex; flex-wrap: wrap; align-items: center; gap: 6px var(--k4, 16px); font-size: var(--bnv-cx-2); }
+.bnv-exp-so, .bnv-exp-khien { display: inline-flex; align-items: center; gap: 6px; }
+.bnv-exp-so b { font-size: var(--bnv-cx-3); font-variant-numeric: tabular-nums; }
+.bnv-exp-khien { color: var(--m3-on-surface-variant); }
+.bnv-exp-ct summary { min-height: 48px; display: flex; align-items: center; cursor: pointer; font-size: var(--bnv-cx-1); font-weight: 700; color: var(--m3-primary); }
+.bnv-exp-ct ul { margin: 0 0 4px; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; font-size: var(--bnv-cx-1); line-height: 1.5; color: var(--m3-on-surface-variant); }
+.bnv-exp-moi {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--k3, 12px);
+  padding: var(--k3, 12px) var(--k4, 16px);
+  border-radius: var(--m3-bo-16);
+  background: var(--m3-tertiary-container);
+  color: var(--m3-on-tertiary-container);
+}
+.bnv-exp-moi > svg { flex-shrink: 0; margin-top: 2px; }
+.bnv-exp-moi-chu { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; font-size: var(--bnv-cx-1); line-height: 1.5; }
+.bnv-exp-moi-chu b { font-size: var(--bnv-cx-2); }
+.bnv-exp-an { flex-shrink: 0; min-width: 48px; min-height: 48px; padding: 0 var(--k3, 12px); border-radius: var(--m3-bo-tron); color: var(--m3-on-tertiary-container); font-size: var(--bnv-cx-1); font-weight: 700; }
+
 /* Thẻ MỪNG "xong việc hôm nay" (em đã đạt chỉ tiêu, chỉ còn việc tuỳ chọn): tertiary tonal, không "Làm ngay". */
 .bnv-mung {
   display: flex;

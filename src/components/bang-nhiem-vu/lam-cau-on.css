@@ -34,6 +34,7 @@
 .lco-tong-ket-chinh { margin: 0; font-size: var(--bnv-cx-4); font-weight: 700; }
 .lco-tong-ket .lco-phu { color: var(--m3-on-tertiary-container-phu); }
 .lco-exp { margin: 0; font-size: var(--bnv-cx-2); font-weight: 700; color: var(--m3-on-tertiary-container); }
+.lco-exp-ds { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 2px; font-size: var(--bnv-cx-1); line-height: 1.5; color: var(--m3-on-tertiary-container-phu); }
 .lco-nhac {
   margin: 4px 0 0; padding: 10px var(--k3, 12px); border-radius: var(--m3-bo-12);
   background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); font-size: var(--bnv-cx-2); line-height: 1.5;

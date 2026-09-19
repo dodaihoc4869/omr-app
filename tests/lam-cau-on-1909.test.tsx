@@ -183,6 +183,23 @@ describe('nộp', () => {
     expect(screen.getByText('+2 EXP học tập')).toBeTruthy()
   })
 
+  it('EXP mới đã bật: in NGUYÊN VĂN từng khoản expNhan + manhNhan; cộng dồn qua các lần nộp; không có thì chỉ dòng tổng', async () => {
+    traNop = () => ({ ok: true, ketQua: [KQ1], chuaLam: [], tienBo: null, exp: 4, expNhan: [{ loai: 'cau', exp: 4, ghiChu: '2 câu đúng · +4 EXP' }, { ghiChu: '   ' }], manhNhan: [{ loai: 'dat', so: 1, ghiChu: 'Đạt ngày · +1 mảnh khiên' }] })
+    dung()
+    await screen.findByText('Este X có tên gọi là gì?')
+    chonI(0, 1)
+    fireEvent.click(nutNop())
+    await screen.findByText('Đúng 0/1 câu đã chấm')
+    expect(screen.getByText('+4 EXP học tập')).toBeTruthy()
+    const ds = screen.getByRole('list', { name: 'EXP và mảnh khiên vừa nhận' })
+    expect(Array.from(ds.querySelectorAll('li')).map((x) => x.textContent)).toEqual(['2 câu đúng · +4 EXP', 'Đạt ngày · +1 mảnh khiên'])
+    traNop = () => ({ ok: true, ketQua: [KQ4], chuaLam: [], tienBo: null, exp: 2, expNhan: [{ loai: 'cau', exp: 2, ghiChu: '1 câu đúng · +2 EXP' }] })
+    chonI(3, 2)
+    fireEvent.click(nutNop())
+    await screen.findByText('+6 EXP học tập')
+    expect(Array.from(screen.getByRole('list', { name: 'EXP và mảnh khiên vừa nhận' }).querySelectorAll('li')).map((x) => x.textContent)).toEqual(['2 câu đúng · +4 EXP', '1 câu đúng · +2 EXP', 'Đạt ngày · +1 mảnh khiên'])
+  })
+
   it('EXP = 0 hoặc máy chủ chưa có trường: KHÔNG hiện dòng EXP', async () => {
     traNop = () => ({ ok: true, ketQua: [KQ1], chuaLam: [], tienBo: null })
     dung()

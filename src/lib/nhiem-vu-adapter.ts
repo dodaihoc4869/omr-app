@@ -92,6 +92,22 @@ export interface DuLieuBangNhiemVu {
    * ở trạng thái đó. (0.Planer đổi luật 19/09: trước đây "chỉ còn tuỳ chọn" bị coi là TRỐNG và em chăm không bao giờ thấy việc ôn thêm.)
    */
   daXongHomNay: { daLamCau: number; lenBac: number } | null
+  /**
+   * EXP học tập + mảnh khiên hôm nay — CHỈ có khi máy chủ đã bật cho em (`exp` trong /hs/ke-hoach-ngay); vắng ⇒ `null` và màn ẩn hết,
+   * KHÔNG bịa số. Mọi số do máy chủ tính từ sổ; giao diện không cộng, không đoán.
+   */
+  exp: DuLieuExp | null
+  /** Khoản EXP MỚI ghi trong CHÍNH lần gọi này (gọi lại thì rỗng) — để bật thông báo "+EXP". Không lưu vào bản nhớ (kẻo phát lại). */
+  expNhan: { exp: number; ghiChu: string }[]
+  /** Mảnh khiên mới trong lần gọi này (không lưu vào bản nhớ). */
+  manhNhan: { so: number; ghiChu: string }[]
+}
+
+export interface DuLieuExp {
+  homNay: number
+  /** `ghiChu` là tiếng Việt máy chủ đã viết sẵn — in nguyên văn. */
+  chiTiet: { loai: string; exp: number; ghiChu: string }[]
+  manhKhien: { manh: number; moiKhien: number; khienConLai: number } | null
 }
 
 /**
@@ -305,6 +321,9 @@ export function tuKeHoachTroLy(keHoach: KeHoachNgayTroLy, phu: NguonPhuTroLy = {
     // Nguồn trợ lý chỉ có bảng V1 (không có id thần thú) — KHÔNG đoán, để giữ chỗ.
     thanThu: { kieu: 'chua_biet' },
     tonCu: { soBai: 0, soCau: 0, bai: [] },
+    exp: null,
+    expNhan: [],
+    manhNhan: [],
   }, {
     // Nguồn trợ lý không có `tienBo.dat`: coi là đạt khi đã làm đủ mức gợi ý.
     dat: nganSach.mucTieuCau > 0 && nganSach.daLamCau >= nganSach.mucTieuCau,
@@ -362,7 +381,37 @@ export interface KeHoachNgayMayChu {
    * `tienBo.dat` (còn đòi câu tới hạn ôn phải lên bậc, việc bắt buộc không trễ nhịp) — màn KHÔNG được nói "xong việc hôm nay" khi nó
    * chưa đạt, kẻo em bỏ qua đúng việc ôn cần để đạt (docs/ke-hoach-ngay-api-1909.md).
    */
-  exp?: { datNgay?: { dat?: boolean; thieu?: string[]; laNghi?: boolean } | null } | null
+  exp?: {
+    homNay?: number
+    chiTietHomNay?: { loai?: string; exp?: number; ghiChu?: string; soKhoan?: number }[]
+    manhKhien?: { manh?: number; moiKhien?: number; khienRen?: number; khienConLai?: number; choCongVaoHoSo?: boolean } | null
+    datNgay?: { dat?: boolean; thieu?: string[]; laNghi?: boolean } | null
+  } | null
+  /** Khoản EXP mới ghi trong CHÍNH lần gọi này. */
+  expNhan?: { loai?: string; exp?: number; ghiChu?: string }[]
+  manhNhan?: { loai?: string; so?: number; ghiChu?: string }[]
+}
+
+const soNguyen = (v: unknown) => Math.max(0, Math.floor(Number(v) || 0))
+
+/** Đọc phần EXP của máy chủ: thiếu `exp` (chưa bật cho em / máy chủ cũ) ⇒ `null`, giao diện ẩn hết. Bỏ khoản không có chữ `ghiChu`. */
+function docExp(k: KeHoachNgayMayChu): Pick<DuLieuBangNhiemVu, 'exp' | 'expNhan' | 'manhNhan'> {
+  const e = k.exp
+  const co = !!e && typeof e === 'object' && e.homNay !== undefined && Number.isFinite(Number(e.homNay))
+  const mk = co ? e!.manhKhien : null
+  return {
+    exp: co
+      ? {
+          homNay: soNguyen(e!.homNay),
+          chiTiet: (Array.isArray(e!.chiTietHomNay) ? e!.chiTietHomNay : [])
+            .map((c) => ({ loai: String(c?.loai ?? ''), exp: soNguyen(c?.exp), ghiChu: String(c?.ghiChu ?? '').trim() }))
+            .filter((c) => c.ghiChu),
+          manhKhien: mk && Number.isFinite(Number(mk.manh)) ? { manh: soNguyen(mk.manh), moiKhien: soNguyen(mk.moiKhien) || 12, khienConLai: soNguyen(mk.khienConLai) } : null,
+        }
+      : null,
+    expNhan: co ? (Array.isArray(k.expNhan) ? k.expNhan : []).map((x) => ({ exp: soNguyen(x?.exp), ghiChu: String(x?.ghiChu ?? '').trim() })).filter((x) => x.ghiChu) : [],
+    manhNhan: co ? (Array.isArray(k.manhNhan) ? k.manhNhan : []).map((x) => ({ so: soNguyen(x?.so), ghiChu: String(x?.ghiChu ?? '').trim() })).filter((x) => x.ghiChu) : [],
+  }
 }
 
 /** Chốt kiểu: JSON máy chủ trả về có đủ phần giao diện cần không (lỗi/HTML/`{ok:true,items:[]}` ⇒ false). */
@@ -564,6 +613,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     ngayNghi: keHoach.lanNghi === true,
     thanThu: docThanThu(keHoach.thanThu),
     tonCu,
+    ...docExp(keHoach),
   }, { dat: keHoach.tienBo.dat === true && !expChuaDat, daLamCau: daLam, lenBac })
 }
 
@@ -609,7 +659,18 @@ export interface BanNhoBangNhiemVu {
 export function dongGoiBanNho(duLieu: DuLieuBangNhiemVu, now: number): BanNhoBangNhiemVu | null {
   if (duLieu.nguon !== 'ke_hoach_ngay' || duLieu.ghiChuCu) return null
   const ngay = ngayVietNam(now)
-  return ngay ? { ngay, luuLuc: now, duLieu } : null
+  // "Vừa nhận EXP" là thông báo MỘT LẦN của đúng lần gọi ấy: lưu vào bản nhớ thì mở lại app sẽ phát lại.
+  return ngay ? { ngay, luuLuc: now, duLieu: { ...duLieu, expNhan: [], manhNhan: [] } } : null
+}
+
+function docExpDaLuu(x: any): DuLieuExp | null {
+  if (!x || typeof x !== 'object' || !Number.isFinite(x.homNay)) return null
+  const mk = x.manhKhien
+  return {
+    homNay: x.homNay,
+    chiTiet: (Array.isArray(x.chiTiet) ? x.chiTiet : []).filter((c: any) => c && typeof c.ghiChu === 'string' && c.ghiChu).map((c: any) => ({ loai: String(c.loai ?? ''), exp: Number(c.exp) || 0, ghiChu: c.ghiChu })),
+    manhKhien: mk && Number.isFinite(mk.manh) ? { manh: mk.manh, moiKhien: Number(mk.moiKhien) || 12, khienConLai: Number(mk.khienConLai) || 0 } : null,
+  }
 }
 
 const laMang = Array.isArray
@@ -655,6 +716,9 @@ export function phucHoiBanNho(x: unknown, now: number): DuLieuBangNhiemVu | null
     thanThu,
     tonCu,
     daXongHomNay,
+    exp: docExpDaLuu((d as any).exp),
+    expNhan: [],
+    manhNhan: [],
     lamNgay: d.lamNgay ? lamMoiThe(d.lamNgay, now) : null,
     cacBac: d.cacBac.map((g) => ({ ...g, viec: g.viec.map((v) => lamMoiThe(v, now)) })),
     ghiChuCu: gioLuu ? `Kế hoạch lúc ${gioLuu} · đang cập nhật…` : 'Kế hoạch đã nhớ · đang cập nhật…',

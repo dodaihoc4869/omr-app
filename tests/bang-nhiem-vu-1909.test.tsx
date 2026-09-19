@@ -696,6 +696,59 @@ describe('xong việc hôm nay: chỉ còn việc tuỳ chọn', () => {
   })
 })
 
+describe('EXP học tập + mảnh khiên trên bảng', () => {
+  const EXP = {
+    homNay: 22,
+    chiTietHomNay: [{ loai: 'cau', exp: 12, ghiChu: '6 câu đúng · +12 EXP', soKhoan: 6 }, { loai: 'lo', exp: 10, ghiChu: 'Xong lô đúng nhịp · +10 EXP', soKhoan: 1 }],
+    manhKhien: { manh: 1, moiKhien: 12, khienRen: 0, khienConLai: 0, choCongVaoHoSo: false },
+    datNgay: null,
+  }
+  const co = (extra: object = {}) => conThu(tuKeHoachNgay({ ...keHoachMayChu, exp: EXP, ...extra } as any, NOW, phu))
+
+  it('có exp: dòng "EXP hôm nay 22" + "Mảnh khiên 1/12", chi tiết nguyên văn máy chủ; PH đọc "của con"', () => {
+    const { container, unmount } = ve({ duLieu: co(), taiVinhDanh: vinhDanhRong })
+    const e = container.querySelector('[data-vung="exp"]') as HTMLElement
+    expect(e.textContent).toContain('EXP hôm nay')
+    expect(e.querySelector('.bnv-exp-so b')!.textContent).toBe('22')
+    expect(e.textContent).toContain('Mảnh khiên 1/12')
+    expect(e.querySelector('.bnv-exp-khien')!.textContent).toBe('Mảnh khiên 1/12') // khienConLai = 0 ⇒ không nói "0 khiên"
+    expect(Array.from(e.querySelectorAll('li')).map((x) => x.textContent)).toEqual(['6 câu đúng · +12 EXP', 'Xong lô đúng nhịp · +10 EXP'])
+    unmount()
+    const ph = render(<BangNhiemVu vaiTro="phuhuynh" hoTen="PH" now={NOW} duLieu={co()} taiVinhDanh={vinhDanhRong} />).container
+    expect(ph.querySelector('[data-vung="exp"]')!.textContent).toContain('EXP hôm nay của con')
+  })
+
+  it('còn khiên dùng được thì nói số khiên; thiếu exp ⇒ KHÔNG dựng vùng EXP, không số bịa', () => {
+    const { container, unmount } = ve({ duLieu: co({ exp: { ...EXP, manhKhien: { ...EXP.manhKhien, khienConLai: 2 } } }), taiVinhDanh: vinhDanhRong })
+    expect(container.querySelector('[data-vung="exp"]')!.textContent).toContain('Mảnh khiên 1/12 · 2 khiên')
+    unmount()
+    const c2 = ve({ duLieu: duLieuMay(), taiVinhDanh: vinhDanhRong }).container
+    expect(c2.querySelector('[data-vung="exp"]')).toBeNull()
+    expect(c2.querySelector('[data-vung="exp-moi"]')).toBeNull()
+  })
+
+  it('khoản MỚI nhận trong lần gọi này: băng "+N EXP" nguyên văn ghiChu (kèm mảnh khiên), ẩn được; không có khoản mới thì không băng', async () => {
+    const d = co({ expNhan: [{ loai: 'cau', exp: 4, ghiChu: '2 câu đúng · +4 EXP' }, { loai: 'lo', exp: 10, ghiChu: 'Xong lô đúng nhịp · +10 EXP' }], manhNhan: [{ loai: 'dat', so: 1, ghiChu: 'Đạt ngày · +1 mảnh khiên' }] })
+    const { container } = ve({ duLieu: d, taiVinhDanh: vinhDanhRong })
+    const b = container.querySelector('[data-vung="exp-moi"]') as HTMLElement
+    expect(b.getAttribute('role')).toBe('status')
+    expect(b.querySelector('b')!.textContent).toBe('+14 EXP học tập')
+    expect(b.textContent).toContain('2 câu đúng · +4 EXP')
+    expect(b.textContent).toContain('Đạt ngày · +1 mảnh khiên')
+    fireEvent.click(screen.getByRole('button', { name: 'Ẩn thông báo EXP' }))
+    expect(container.querySelector('[data-vung="exp-moi"]')).toBeNull()
+    cleanup()
+    expect(ve({ duLieu: co(), taiVinhDanh: vinhDanhRong }).container.querySelector('[data-vung="exp-moi"]')).toBeNull()
+  })
+
+  it('chỉ có mảnh khiên mới (không EXP): băng vẫn hiện, không in "+0 EXP"', () => {
+    const { container } = ve({ duLieu: co({ manhNhan: [{ loai: 'chuoi7', so: 3, ghiChu: 'Chuỗi 7 ngày · +3 mảnh khiên' }] }), taiVinhDanh: vinhDanhRong })
+    const b = container.querySelector('[data-vung="exp-moi"]') as HTMLElement
+    expect(b.textContent).toContain('Chuỗi 7 ngày · +3 mảnh khiên')
+    expect(b.textContent).not.toMatch(/\+0 EXP/)
+  })
+})
+
 describe('kỷ luật mã nguồn của thư mục bang-nhiem-vu', () => {
   const tep = (dir: string): string[] =>
     readdirSync(dir).flatMap((t) => (statSync(join(dir, t)).isDirectory() ? tep(join(dir, t)) : [join(dir, t)]))

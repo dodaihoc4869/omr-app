@@ -52,6 +52,9 @@ export interface PhanHoiNopOn {
   tienBo?: TienBoOn | null
   /** EXP vừa cộng (0 = không cộng). Chưa có trường thì coi như 0 và không hiện. */
   exp?: number
+  /** Khi EXP mới đã bật cho em: từng khoản vừa ghi (`ghiChu` là tiếng Việt máy chủ đã viết sẵn — in nguyên văn) và mảnh khiên mới. */
+  expNhan?: { exp: number; ghiChu: string }[]
+  manhNhan?: { so: number; ghiChu: string }[]
 }
 
 interface KetQuaGoi {
@@ -120,5 +123,7 @@ export async function nopOnLai(token: string, traLoi: MucTraLoi[]): Promise<Phan
     chuaLam: Array.isArray(d.chuaLam) ? d.chuaLam.map(String) : [],
     tienBo: d.tienBo && typeof d.tienBo === 'object' ? d.tienBo : null,
     exp: Number.isFinite(Number(d.exp)) ? Number(d.exp) : 0,
+    expNhan: (Array.isArray(d.expNhan) ? d.expNhan : []).map((x: any) => ({ exp: Math.max(0, Math.floor(Number(x?.exp) || 0)), ghiChu: String(x?.ghiChu ?? '').trim() })).filter((x: { ghiChu: string }) => x.ghiChu),
+    manhNhan: (Array.isArray(d.manhNhan) ? d.manhNhan : []).map((x: any) => ({ so: Math.max(0, Math.floor(Number(x?.so) || 0)), ghiChu: String(x?.ghiChu ?? '').trim() })).filter((x: { ghiChu: string }) => x.ghiChu),
   }
 }

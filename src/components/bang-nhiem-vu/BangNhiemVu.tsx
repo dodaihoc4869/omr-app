@@ -4,7 +4,7 @@
 // Màn này KHÔNG xếp việc, không tính điểm, không gọi API nhiệm vụ: nhận
 // `DuLieuBangNhiemVu` từ `nhiem-vu-adapter` và chỉ vẽ.
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { CheckCircle2, ClipboardCheck, MessageSquare, Plus, Sparkles } from 'lucide-react'
+import { CheckCircle2, ClipboardCheck, MessageSquare, Plus, Shield, Sparkles, Zap } from 'lucide-react'
 import type { DuLieuBangNhiemVu, HanhDongNhiemVu, TheNhiemVu } from '../../lib/nhiem-vu-adapter'
 import type { SpiritMotion } from '../../game/than-thu-v2/Spirit2D'
 import DauTrang, { type MucMenu, type ThanThuGoc } from './DauTrang'
@@ -152,6 +152,17 @@ export default function BangNhiemVu({
     return () => clearTimeout(t)
   }, [daXong, laPh])
 
+  // "+EXP" vừa nhận (khoản MỚI trong đúng lần gọi này): hiện một băng 12 s, chữ NGUYÊN VĂN của máy chủ; thiếu trường ⇒ không hiện gì.
+  const khoaNhan = `${duLieu.expNhan.map((x) => `${x.exp}:${x.ghiChu}`).join('|')}#${duLieu.manhNhan.map((x) => `${x.so}:${x.ghiChu}`).join('|')}`
+  const [khoaDaAn, setKhoaDaAn] = useState('')
+  useEffect(() => {
+    if (khoaNhan === '#' || dangTai) return
+    const t = setTimeout(() => setKhoaDaAn(khoaNhan), 12000)
+    return () => clearTimeout(t)
+  }, [khoaNhan, dangTai])
+  const coBaoNhan = !dangTai && khoaNhan !== '#' && khoaNhan !== khoaDaAn
+  const tongExpMoi = duLieu.expNhan.reduce((t, x) => t + x.exp, 0)
+
   const chon = (viec: TheNhiemVu) => onHanhDong?.(viec.hanhDong)
   const { tienDo, tocDo } = duLieu
   const viec = tatCaViec(duLieu)
@@ -199,6 +210,23 @@ export default function BangNhiemVu({
           </div>
         ) : (
           <>
+            {coBaoNhan && (
+              <section className="bnv-exp-moi" role="status" aria-label="Vừa nhận EXP" data-vung="exp-moi">
+                <Zap size={20} aria-hidden="true" />
+                <div className="bnv-exp-moi-chu">
+                  {tongExpMoi > 0 && <b>+{tongExpMoi} EXP học tập</b>}
+                  {duLieu.expNhan.map((x, i) => (
+                    <span key={`e${i}`}>{x.ghiChu}</span>
+                  ))}
+                  {duLieu.manhNhan.map((x, i) => (
+                    <span key={`m${i}`}>{x.ghiChu}</span>
+                  ))}
+                </div>
+                <button type="button" className="bnv-exp-an" onClick={() => setKhoaDaAn(khoaNhan)} aria-label="Ẩn thông báo EXP">
+                  Ẩn
+                </button>
+              </section>
+            )}
             <section className="bnv-tien-do" aria-label="Tiến độ hôm nay" data-vung="tien-do">
               <div className="bnv-tien-do-dau">
                 <span className="bnv-tien-do-so">
@@ -258,6 +286,37 @@ export default function BangNhiemVu({
                 </span>
               )}
             </section>
+
+            {duLieu.exp && (
+              <section className="bnv-exp" aria-label={laPh ? 'EXP học tập hôm nay của con' : 'EXP học tập hôm nay'} data-vung="exp">
+                <div className="bnv-exp-hang">
+                  <span className="bnv-exp-so">
+                    <Zap size={18} aria-hidden="true" />
+                    <span>{laPh ? 'EXP hôm nay của con' : 'EXP hôm nay'}</span>
+                    <b>{duLieu.exp.homNay}</b>
+                  </span>
+                  {duLieu.exp.manhKhien && (
+                    <span className="bnv-exp-khien">
+                      <Shield size={18} aria-hidden="true" />
+                      <span>
+                        Mảnh khiên {duLieu.exp.manhKhien.manh}/{duLieu.exp.manhKhien.moiKhien}
+                        {duLieu.exp.manhKhien.khienConLai > 0 ? ` · ${duLieu.exp.manhKhien.khienConLai} khiên` : ''}
+                      </span>
+                    </span>
+                  )}
+                </div>
+                {duLieu.exp.chiTiet.length > 0 && (
+                  <details className="bnv-exp-ct">
+                    <summary>Chi tiết EXP hôm nay</summary>
+                    <ul>
+                      {duLieu.exp.chiTiet.map((c, i) => (
+                        <li key={`${c.loai}:${i}`}>{c.ghiChu}</li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
+              </section>
+            )}
 
             {duLieu.trong ? (
               <section className="bnv-trong" aria-label="Hôm nay chưa có việc" data-vung="trong">

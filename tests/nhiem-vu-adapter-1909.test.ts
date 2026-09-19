@@ -452,6 +452,45 @@ describe('chỉ còn việc TUỲ CHỌN (0.Planer đổi luật 19/09)', () => 
   })
 })
 
+describe('EXP học tập + mảnh khiên (docs/ke-hoach-ngay-api-1909.md mục EXP): chỉ khi máy chủ đã bật, thiếu trường ⇒ ẩn, không bịa số', () => {
+  const EXP = {
+    homNay: 22,
+    chiTietHomNay: [{ loai: 'cau', exp: 12, ghiChu: '6 câu đúng · +12 EXP', soKhoan: 6 }, { loai: 'lo', exp: 10, ghiChu: 'Xong lô đúng nhịp · +10 EXP', soKhoan: 1 }, { loai: 'x', exp: 5, ghiChu: '   ', soKhoan: 1 }],
+    manhKhien: { manh: 1, moiKhien: 12, khienRen: 0, khienConLai: 2, choCongVaoHoSo: false },
+    datNgay: null,
+  }
+  it('có exp ⇒ exp.homNay, chi tiết in nguyên ghiChu (bỏ khoản không có chữ), mảnh khiên; khoản mới + mảnh mới đi riêng', () => {
+    const d = tuKeHoachNgay({ ...keHoachMayChu, exp: EXP, expNhan: [{ loai: 'cau', exp: 4, ghiChu: '2 câu đúng · +4 EXP' }, { loai: 'x', exp: 1, ghiChu: '' }], manhNhan: [{ loai: 'dat', so: 1, ghiChu: 'Đạt ngày · +1 mảnh khiên' }] } as any, NOW)
+    expect(d.exp).toEqual({
+      homNay: 22,
+      chiTiet: [{ loai: 'cau', exp: 12, ghiChu: '6 câu đúng · +12 EXP' }, { loai: 'lo', exp: 10, ghiChu: 'Xong lô đúng nhịp · +10 EXP' }],
+      manhKhien: { manh: 1, moiKhien: 12, khienConLai: 2 },
+    })
+    expect(d.expNhan).toEqual([{ exp: 4, ghiChu: '2 câu đúng · +4 EXP' }])
+    expect(d.manhNhan).toEqual([{ so: 1, ghiChu: 'Đạt ngày · +1 mảnh khiên' }])
+  })
+
+  it('thiếu exp (chưa bật/máy chủ cũ) ⇒ null + hai mảng rỗng, KHÔNG bịa 0 EXP; trợ lý cũng vậy; exp không phải số ⇒ null', () => {
+    for (const d of [tuKeHoachNgay(keHoachMayChu, NOW), tuKeHoachTroLy(troLy()), tuKeHoachNgay({ ...keHoachMayChu, exp: {} as any, expNhan: [{ exp: 5, ghiChu: 'lạc' }] } as any, NOW), tuKeHoachNgay({ ...keHoachMayChu, exp: { homNay: 'x' } as any } as any, NOW)]) {
+      expect(d.exp).toBeNull()
+      expect(d.expNhan).toEqual([])
+      expect(d.manhNhan).toEqual([])
+    }
+  })
+
+  it('bản nhớ giữ exp nhưng KHÔNG giữ khoản mới (mở lại app không phát lại "+EXP"); bản nhớ cũ thiếu trường ⇒ exp null', () => {
+    const d = tuKeHoachNgay({ ...keHoachMayChu, exp: EXP, expNhan: [{ exp: 4, ghiChu: 'x' }], manhNhan: [{ so: 1, ghiChu: 'y' }] } as any, NOW)
+    const luu = JSON.parse(JSON.stringify(dongGoiBanNho(d, NOW)))
+    expect(luu.duLieu.expNhan).toEqual([])
+    expect(luu.duLieu.manhNhan).toEqual([])
+    const lai = phucHoiBanNho(luu, NOW)!
+    expect(lai.exp?.homNay).toBe(22)
+    expect(lai.expNhan).toEqual([])
+    delete luu.duLieu.exp
+    expect(phucHoiBanNho(luu, NOW)!.exp).toBeNull()
+  })
+})
+
 describe('bài Mẹ giao chưa bắt đầu: máy chủ đưa vào viec[] (chuaBatDau); bài cũ ngoài đó vào tonCu', () => {
   const moChuaBD = (id: string, over: object = {}) =>
     v({ id: `mom:${id}`, loai: 'mom', soCau: 6, batBuoc: true, ghiChu: 'Bài Mom giao, chưa bắt đầu. Bấm bắt đầu thì có 120 phút làm.', chiTiet: { id, chuaBatDau: true, taoLuc: gio(-5) }, ...over })
