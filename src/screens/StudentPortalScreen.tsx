@@ -17,6 +17,8 @@ import KhoiKhacPhuc3CheDo from '../components/KhoiKhacPhuc3CheDo'
 import {syncStudentExp} from '../game/than-thu-v2/academic-sync'
 import { tachDongTheoY } from '../lib/tach-dong-cau'
 import NutQuayLai from '../components/NutQuayLai'
+import { dungM3, ThanhTren } from '../components/m3'
+import '../components/bang-nhiem-vu/sheet-m3.css'
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import {
   Award,
@@ -1254,6 +1256,16 @@ export default function StudentPortalScreen() {
     )
   }
 
+  // Vỏ M3 của sheet toàn màn: chỉ ở cổng học sinh (dungM3) và không phải game (game thần thú giữ nguyên, test khoá).
+  const vaoM3 = dungM3() && tab !== 'thanthu'
+  const tieuSheet =
+    tab === 'diem' ? 'Xem điểm & lịch sử ca thi'
+    : tab === 'btvn' ? 'Bài tập về nhà'
+    : tab === 'mom' ? 'Bài gia đình giao'
+    : tab === 'khacphuc' ? 'Khắc phục lỗi sai & luyện đề'
+    : tab === 'vaothi' ? 'Vào phòng thi trực tuyến'
+    : 'Bảng tin & bài luyện hôm nay'
+
   const moManCu = (man: TabType) => {
     setTab(man)
     if (man === 'mom') void napDsMom()
@@ -1298,9 +1310,24 @@ export default function StudentPortalScreen() {
 
       {/* FULLSCREEN CHỨC NĂNG: BẤM VÀO MỞ FULL MÀN HÌNH */}
       {tab !== null && (
-        <div className="fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto flex flex-col animate-google-fade">
-          {/* Header Toàn Màn Hình */}
-          <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-3 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 shadow-xs">
+        <div
+          className={`${vaoM3 ? 'm3 m3-sheet ' : ''}fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto flex flex-col animate-google-fade`}
+        >
+          {/* Header Toàn Màn Hình. Cổng học sinh (mọi màn cũ trừ game) dùng thanh trên M3 dùng chung; mọi đường khác giữ đúng cái cũ. */}
+          {vaoM3 && (
+            <ThanhTren
+              tieuDe={tieuSheet}
+              onQuayLai={() => setTab(null)}
+              nhanQuayLai="Quay lại Bảng tin"
+              phai={
+                <button type="button" onClick={() => setTab(null)} className="m3-nut-chu" title="Đóng toàn màn hình">
+                  <X size={18} aria-hidden="true" />
+                  <span>Đóng</span>
+                </button>
+              }
+            />
+          )}
+          {!vaoM3 && <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-3 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 shadow-xs">
             <NutQuayLai onClick={() => setTab(null)} label="Quay lại Bảng tin" />
 
             <div className="flex items-center gap-2 min-w-0 max-w-[200px] sm:max-w-md">
@@ -1325,7 +1352,7 @@ export default function StudentPortalScreen() {
               <X size={16} />
               <span className="hidden sm:inline">Đóng</span>
             </button>
-          </header>
+          </header>}
 
           <main className="max-w-6xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-6 flex-1">
 

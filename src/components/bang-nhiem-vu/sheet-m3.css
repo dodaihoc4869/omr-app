@@ -1,0 +1,15 @@
+/* VỎ "SHEET TOÀN MÀN" của cổng học sinh (việc C · C1). Chỉ có hiệu lực dưới `.m3-sheet`, lớp do StudentPortalScreen đặt
+ * cùng với `.m3` khi dungM3() và không phải game. Màu chỉ đọc biến `--m3-*` của m3-theme.css; không mã màu cứng. */
+.m3-sheet {
+  background: var(--m3-surface);
+  color: var(--m3-on-surface);
+}
+/* Thanh trên dính (ThanhTren của Code 4) nằm THẲNG dưới vùng cuộn để `position: sticky` bám đúng; đệm hai bên như nội dung. */
+.m3-sheet > .m3-thanh-tren {
+  z-index: 30;
+  padding: 4px var(--k3, 12px);
+  padding-top: max(4px, env(safe-area-inset-top));
+}
+@media (min-width: 640px) {
+  .m3-sheet > .m3-thanh-tren { padding-inline: var(--k6, 24px); }
+}

@@ -83,6 +83,32 @@ Lập 19/09/2026 12:25. Theo `DIEU-PHOI.md` luật 4: phần giao diện ghi s�
 - [ ] `ExamTakeScreen.tsx:670` mặc áo M3 (cùng đợt C cuối)
 - Ghi nhận cho lần sau: (a) chưa có nút "Xem lại sau"/bản vẽ hạn nộp giờ VN riêng — hạn hiện dạng chuỗi máy chủ đã định dạng trong `oBia`; (b) "Tải PDF"/"Hiện tất cả N câu" cũ còn nguyên (không phải việc B); (c) thanh trên chỉ có ở phiếu `nop`, phiếu chỉ đọc không có (màn bọc `KhungXemPhieu` đã có tiêu đề).
 
+## VIỆC C — BẢNG KIỂM KÊ (bước 0, gửi 0.Planer 19/09; PHẦN CỦA CODE 2 — phần Code 4 xem SO-VIEC-GIAO-DIEN-C.md)
+
+Cột: mã · màn (đường bấm) · tệp:dòng · loại · ai · test soi tệp · rủi ro · thứ tự đề xuất.
+
+| Mã | Màn / đường bấm | Tệp:dòng | Loại | Test soi | Rủi ro | Thứ tự |
+|---|---|---|---|---|---|---|
+| C1 | Vỏ "sheet toàn màn" của /hs (thanh trên + nút Quay lại + tiêu đề + nút Đóng) bao MỌI tab cũ | StudentPortalScreen.tsx:1286–1330 | React/Tailwind cũ, chung cho 6 tab | 11 tệp đọc StudentPortalScreen (tên hàm/nhãn) | THẤP, lợi lớn (một chỗ đổi được cả 6 tab) | 1 |
+| C6 | Khung toàn màn bao phiếu HTML ("Xem phiếu", "Xem đề", khắc phục, BTVN…) | components/KhungXemPhieu.tsx (186) | React; DÙNG CHUNG với giáo viên (tờ máy chiếu, NutPhieuHtml, PhieuZaloEm) ⇒ cô lập bằng dungM3() như Code 4 | 5 | VỪA (GV không được đổi) | 2 |
+| C7 | Trang liên kết phiếu công khai /phieu/<mã> (vỏ ngoài: tải, lỗi, nút "Xem đề em vừa làm") | screens/PhieuScreen.tsx (813) | React, style nội tuyến | 15 | VỪA | 3 |
+| C2 | Tab "Xem điểm & lịch sử ca thi" | StudentPortalScreen.tsx:1359–1483 | React/Tailwind | (cùng nhóm 11) | THẤP (mở BaoCaoCaThiHocSinhModal đã M3) | 4 |
+| C3 | Tab "Bài tập về nhà" (danh sách + lô + hạn + nút mở phiếu) | :1484–1679 | React/Tailwind | mo-bai-tu-bang-tin, bang-nhiem-vu-may-chu | THẤP–VỪA | 5 |
+| C5 | Tab "Vào phòng thi" (thẻ + tấm phủ mở ExamTakeScreen); PhongVaoThi đã M3 (Code 4) | :1985–2056 | React/Tailwind cũ | 1–2 | THẤP | 6 |
+| C11 | LÀM CÂU ÔN của việc on_lai/on_thi — hiện mở luồng khắc phục cũ, vì máy chủ chưa có API. NAY ĐÃ CÓ: /hs/cau-theo-qid (đề không đáp án) + /hs/on-lai/nop (chấm, ghi sổ, lời giải; câu chưa trả lời không ghi sổ, trả `chuaLam`) + gọi lại /hs/ke-hoach-ngay | MỚI: src/components/bang-nhiem-vu/LamCauOn.tsx (+ máy chủ-ngữ trong may-chu.ts) | React mới, mặc M3 ngay từ đầu | MỚI (test mới) | VỪA (đường nộp thật, phải đọc `chuaLam`, khoá ô sau khi hiện lời giải) | 7 (XIN 0.Planer CHỌN: làm ngay sau C1 hay sau C7) |
+| C4 | Tab "Bài gia đình giao" (danh sách + LÀM BÀI NGAY trong màn: đồng hồ 120 phút, nháp localStorage `omr_mom_draft_*`, lưu máy chủ, nộp) | :1680–1965 (286 dòng) | React/Tailwind | mom-api, phu-huynh-giao-bai, mo-bai-tu-bang-tin | CAO (nộp thật + đồng hồ): chỉ đổi áo, giữ mọi hàm/khoá | 8 |
+| C8 | Sheet "Bảng tin & bài luyện hôm nay" (BangTinPhuHuynh, dùng ở cả HS và PH) | components/BangTinPhuHuynh.tsx (831) | React/Tailwind | 1 | VỪA (không có trong bảng của Code 4) | 9 |
+| C9 | /ph: phần cũ ngoài Bảng nhiệm vụ (tabPh diem/khacphuc/bantin: danh sách ca của con, Mẹ giao, BTVN của con, giao bài) | ParentPortalScreen.tsx (875) | React/Tailwind | 8 | THẤP–VỪA | 10 |
+| C10 | MÀN THI THẬT: vỏ (thanh trên, dải số câu, nút Nộp, đặt className `m3` ở gốc — Code 4 chọn cách (a) nên TheCau tự ăn theo) + `ExamTakeScreen.tsx:670` mở phiếu "Đề của em kèm lời giải" mặc giao diện học sinh | screens/ExamTakeScreen.tsx (3 452) + exam-setup.css | React + CSS | 40 tệp đọc ExamTakeScreen | RẤT CAO ⇒ LÀM CUỐI CÙNG, commit riêng, 0.Planer soát diff trước khi đẩy; chỉ màu/bo/chữ/khoảng cách, giữ VanTay, ManGiuDeDoc, ManChan, z-index, nút Đ/S nội tuyến 44 px | 11 (cuối) |
+
+Duyệt của 0.Planer (15:20): thứ tự C1 → C11 → C6 → C7 → C2 → C3 → C5 → C4 → C10; C8 (BangTinPhuHuynh) và C9 (ParentPortalScreen phần cũ) CHUYỂN CHO CODE 4 — em không đụng hai tệp đó.
+
+TIẾN ĐỘ VIỆC C:
+- [x] C1 vỏ sheet toàn màn /hs: `StudentPortalScreen.tsx` dùng `ThanhTren` + `NutTron` của Code 4; gốc sheet `m3 m3-sheet` khi `dungM3()` và tab ≠ 'thanthu' (game KHÔNG bọc: TheCau trong game có test khoá); tên "Quay lại Bảng tin" và title "Đóng toàn màn hình" giữ nguyên; mọi đường khác (jsdom `/`) DOM cũ y nguyên. `sheet-m3.css` (chỉ biến --m3-*, chỉ dưới `.m3-sheet`). Compat CSS của Code 4 đổi luôn màu/chữ của nội dung 5 tab. | bằng chứng: tests/vo-sheet-m3-1909.test.tsx 9/9 (5 tab × vỏ; Quay lại/Đóng; game không bọc; đường `/` giữ header cũ; CSS không hex), đột biến 4/4 làm đỏ; Chromium thật 390 sáng+tối: thanh trên 56 px, 0 tràn ngang, 0 chữ dưới 4,5 ở diem/btvn(2 chữ "Vào làm bài" 3,6 = nút xanh cũ, thuộc C3)/…; ảnh docs/anh-dong-bo-m3-1909/c1-*.png. Phát hiện cho tab sau: nút "Xem báo cáo" ở tab điểm bị bóp thành hình tròn (C2); nút "Bắt đầu làm bài" của Mẹ giao còn gradient đỏ (C4); "Vào làm bài" xanh lá cũ (C3); bảng vinh danh/dải 4 màu Google ở Bảng tin là của Code 4 (C8).
+
+Đã có người làm (không lặp): phiếu HTML mọi lối (Code 2, MỐC B), Bảng nhiệm vụ HS+PH (Code 2, MỐC A); Code 4: vỏ PhongVaoThi, ThongBaoHocSinh, MaCaInput + PhongChoGame (564dc08), TamTruotHoiBai (5d0d1c4), LuyenDeChuan, KhoiKhacPhuc3CheDo, ModalKhacPhucCauSai, hai modal báo cáo, BieuDoTienBoGoogle, TheCau (e1555a4, CSS dưới `.m3`).
+KHÔNG làm (có lý do): game thần thú tab 'thanthu' (test khoá, không có `.m3`), app giáo viên, 4 tệp mã chết + KhoiTienBo (chỉ GV), KhoiBaiLuyen/TheCauChiTiet bản giấy (Code 4 đề nghị để nguyên; phiếu HTML mà nó mở đã M3).
+
 ## Nhật ký vòng sửa (nguyên nhân gốc → sửa → chạy lại đúng lệnh)
 
 1. Bài Mẹ giao mất khỏi trang chủ (nhánh trợ lý). Gốc: `tongHopKeHoachTroLy` chỉ trả top3. Sửa: bù trong adapter; 6 test khoá; E2E lại: đủ 3 thẻ.
