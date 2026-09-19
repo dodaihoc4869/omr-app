@@ -1,6 +1,7 @@
 import type {Env} from './kieu'
 import {gameIdentity} from './game-v2-auth'
 import {ghiSuKien,suKienChamBai,type CauChamBai} from './su-kien-hoc'
+import {expNhanSauNop} from './exp-d1'
 
 type Question = Record<string, unknown>
 type Row = {sbd:string;id:string;title:string;created_at:string;question_count:number;bank_key:string;started_at:string|null;submitted_at:string|null;answers:string;result:string|null}
@@ -73,12 +74,14 @@ export async function mom(env:Env,action:string,b:Record<string,unknown>):Promis
     const nop=await env.DB.prepare('UPDATE mom_bai SET answers=?,result=?,submitted_at=? WHERE sbd=? AND id=? AND submitted_at IS NULL').bind(JSON.stringify(final),JSON.stringify(result),nopLuc,sbd,id).run()
     // SỔ SỰ KIỆN HỌC (GĐ 0): sổ chấm bằng luật chung `isAnswerCorrect`, điểm bài Mom vẫn là `gradeMom`.
     // Câu không có mã thật (`cau_N` do app tự đánh số) không định danh được câu nào → không ghi.
+    let exp:Record<string,unknown>={}
     if(nop?.meta?.changes){
       const cau:CauChamBai[]=q.flatMap(c=>{const qid=String(c.id??'').trim();return qid&&!/^cau_\d+$/.test(qid)?[{qid,dapAnDung:String(c.dapAn||c.dapAnDung||'A'),chuyenDe:String(c.chuyenDe??''),mucDo:String(c.mucDo??''),phan:typeof c.phan==='string'?c.phan:undefined}]:[]})
       await ghiSuKien(env,suKienChamBai('mom',id,sbd,1,nopLuc,cau,final))
+      exp=await expNhanSauNop(env,sbd,Date.now()) // EXP HỌC TẬP MỚI: cờ tắt thì {}
     }
     r=(await env.DB.prepare('SELECT * FROM mom_bai WHERE sbd=? AND id=?').bind(sbd,id).first<Row>())!
-    return {ok:true,item:{...item(r),dapAnDaNop:JSON.parse(r.answers)}}
+    return {ok:true,item:{...item(r),dapAnDaNop:JSON.parse(r.answers)},...exp}
   }
   if(action==='review')return {ok:true,item:{...item(r),dsCau:await questions(env,r),dapAnDaNop:JSON.parse(r.answers)}}
   throw new Error('Thao tác không hợp lệ.')

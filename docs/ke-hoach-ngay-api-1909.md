@@ -66,5 +66,30 @@ Vòng đầy đủ của việc `on_lai`: (1) `POST /hs/cau-theo-qid` lấy Đ�
 - **CHƯA LÀM thì KHÔNG nộp được** (luật 0.Planer chốt 19/09; cùng luật "điền đủ" của game v2): mục có `dapAn` rỗng, chỉ toàn `-`, thiếu ý ở Phần II (không đủ 4 ý), hoặc sai định dạng (Phần I ngoài `A`–`D`) là CHƯA TRẢ LỜI: KHÔNG ghi sổ, KHÔNG khoá, KHÔNG đáp án/lời giải, và nằm trong **`chuaLam: [qid, …]`** của phản hồi. Giao diện GIỮ câu đó lại cho em làm tiếp trong ngày; nộp lại sau vẫn được chấm như lần đầu. Chỉ câu ĐÃ TRẢ LỜI mới được chấm, ghi sổ, khoá lần đầu và nhận lời giải. Lý do: đường này để ÔN, không phải bài thi có giờ — muốn xem đáp án thì phải trả lời; trả lời bừa thì bị tính sai, hạ bậc, mai gặp lại. Vì vậy `ketQua[i].dung` luôn là `true|false` (không còn `null`).
 - **Phản hồi** `{ ok: true, ketQua: [...], khongCo: [...], chuaLam: [...], tienBo, exp }`. `ketQua[i]` = `{ qid, dung: true|false, dapAnDung, loiGiai, anhLoiGiai: [{viTri:'sau_loi_giai', …}] }` (`loiGiai` có thể là chữ hoặc đối tượng như kho, `null` nếu kho chưa có). `chuaLam`: qid nhận được nhưng chưa trả lời (xem trên). `khongCo`: qid không nhận (chưa từng gặp / kho không có / đề đang bảo vệ). `tienBo` = `{ daLamCau, lenBac, tutBac }` của HÔM NAY sau lượt nộp (`null` nếu không tính được). `exp` = EXP học tập vừa cộng (0 nếu em chưa có hồ sơ game, đã nhận rồi, hoặc hết trần 100/ngày).
 - **ĐÁP ÁN VÀ LỜI GIẢI CHỈ ĐI RA SAU KHI ĐÃ GHI SỔ THÀNH CÔNG.** Ghi không được → `{ ok:false, error }` và không có đáp án nào trong phản hồi; em nộp lại được (idempotent). `ok:false` khác: `traLoi` không phải mảng, quá 20 mục, token sai, không kiểm được đề bảo vệ.
-- **EXP**: đi qua đúng `creditAcademic` với khoá `practice:<qid>` (2 EXP/câu ĐÚNG, mỗi câu một lần cả đời — nên làm lại ở Mom cũng không cộng thêm —, trần 100/ngày). Chỉ cộng khi em đã có hồ sơ game; lỗi EXP không làm hỏng lượt nộp.
+- **EXP**: chưa bật EXP mới cho em → đường cũ `creditAcademic` (khoá `practice:<qid>`, 2 EXP/câu ĐÚNG, mỗi câu một lần cả đời, trần 100/ngày), `exp` là số EXP cộng lần này và KHÔNG có `expNhan`. ĐÃ bật (xem mục "EXP học tập mới" ở dưới) → `exp` = tổng EXP của các khoản vừa ghi, kèm `expNhan[]` và `manhNhan[]`. Chỉ cộng vào hồ sơ game khi em đã có hồ sơ; lỗi EXP không làm hỏng lượt nộp.
 - Chi phí: ≈ 3 truy vấn lấy câu + 1 ghi sổ + 1 đọc lại + dựng lại hồ sơ + 1 truy vấn tiến bộ (+ EXP nếu có câu đúng).
+
+## EXP học tập mới + mảnh khiên (đặc tả thầy chốt: `DE-XUAT-EXP-MANH-KHIEN-1909.md`)
+
+**Cờ.** Chỉ chạy với em được bật (`cau_hinh.exp_moi`); chưa bật thì MỌI phản hồi dưới đây KHÔNG có các trường mới (giao diện: thấy thiếu `exp` thì ẩn hết phần EXP, không bịa số). Mọi EXP do máy chủ tính từ sổ, KHÔNG có EXP nào do máy em khai.
+
+### `POST /hs/ke-hoach-ngay` (đã bật) — thêm trường
+```
+exp: {
+  homNay: 22,                                   // tổng EXP học tập đã ghi hôm nay (gộp mọi khoản, không gồm cộng vào cấp)
+  chiTietHomNay: [{ loai, exp, ghiChu, soKhoan }],   // gộp theo loại; ghiChu là tiếng Việt sẵn in, kèm số
+  manhKhien: { manh: 1, moiKhien: 12, khienRen: 0, khienConLai: 0, choCongVaoHoSo: false },
+  datNgay: { dat, thieu: [...], daLam, toiThieu, daTrao, laNghi } | null
+},
+expNhan:  [{ loai, exp, ghiChu }],   // khoản MỚI ghi trong CHÍNH lần gọi này (gọi lại thì []) — để bật thông báo "+EXP"
+manhNhan: [{ loai, so, ghiChu }]     // mảnh khiên mới trong lần gọi này
+```
+- `loai` của khoản EXP: `cau` (câu đúng), `lo` (xong lô BTVN), `btvn` (nộp bài đúng hạn), `mom` (xong bài Mẹ giao), `len_bac` (câu ôn lên bậc), `khac_phuc`, `len_bang`, `diem_ca` (ca thi đã công bố), `dat_ngay`, `chuoi`, `tiepsuc` (game Đoàn Hộ Tống). `loai` của mảnh: `dat`, `chuoi7`, `dang`.
+- `manhKhien.manh` = mảnh đang giữ (0..11, kẹp 24); `moiKhien` = 12 mảnh rèn 1 khiên (tự rèn khi đủ); `khienRen` = khiên RÈN chưa dùng (tối đa 5); `khienConLai` = khiên còn dùng được (quà tiến hoá + rèn − đã dùng, đúng số `shield-use` chấp nhận). `choCongVaoHoSo: true` = còn mảnh trong sổ chưa cộng vào hồ sơ game (em chưa có hồ sơ game).
+- **`exp.datNgay`** (để màn không nói "đã đủ" khi EXP đạt ngày chưa về): `dat` = đủ điều kiện đạt nhiệm vụ ngày theo ĐỊNH NGHĨA CHỐT NGÀY (chặt hơn `tienBo.dat`); `thieu` ⊂ `['cau_toi_thieu','tre_nhip','chua_len_bac']` = còn thiếu gì (`cau_toi_thieu`: chưa đủ `toiThieu` câu; `tre_nhip`: còn việc bắt buộc trễ nhịp; `chua_len_bac`: còn câu tới hạn ôn mà chưa lên bậc câu nào); `daTrao` = đã trao +20/chuỗi/mảnh; `laNghi` = ngày nghỉ (không đạt, không thiếu gì). `null` = chưa có kế hoạch ngày đã lưu. Ngày phát hành chỉ tính việc làm SAU mốc.
+- Bảng EXP câu đúng (Phần × số sao): I 2/3/5 · II 3/5/8 · III 4/6/10; cùng một câu chỉ một lần mỗi ngày; sau `2 × mucTieuCau` câu-được-thưởng trong ngày chỉ nhận 25% (làm tròn lên, tối thiểu 1). Thưởng việc: xong lô đúng nhịp +10 / trễ +4, nộp cả bài BTVN đúng hạn +15, bài Mẹ giao xong +10, câu ôn lên bậc +6, khắc phục xong +30, lên bảng đạt/chưa đạt +15/+5, điểm ca thi ×3, đạt ngày +20, chuỗi 2×min(chuỗi,10), tiếp sức +3 (≤ 5 lần/ngày). Mảnh: đạt ngày +1, chuỗi bội 7 +3, một dạng rời danh sách yếu +2. Nguồn `game` KHÔNG nhận EXP câu (game giữ 20/40/40 theo mastery).
+- Nộp trống KHÔNG được thưởng (lô/bài Mẹ giao toàn bỏ trống, câu chưa trả lời). Ca thi CHƯA công bố: không có EXP câu/lên bậc nào (tránh lộ đúng sai); khi công bố thì trao bù đúng một lần, `ghiChu` ghi "Ca … vừa công bố".
+
+### Các lệnh nộp đính thêm `expNhan` + `manhNhan` (chỉ khi đã bật)
+`POST /hs/on-lai/nop` (kèm `exp` = tổng EXP vừa ghi), `POST /btvn/nop` (không có khi là lần gửi lại y hệt: phản hồi `daNhan:true` như cũ), `POST /btvn/xong-lo` (chỉ khi có `dapAn` → có ghi sổ), lệnh nộp khắc phục (`nopKhacPhuc`), Mom `submit` (ở gốc phản hồi, cạnh `item`), luyện đề `submit`. Hiển thị "EXP vừa nhận" = in nguyên `ghiChu` từng khoản. Khoản của lên bảng / ca thi công bố / đạt ngày chốt bằng cron không đi theo lệnh nộp của em: chúng hiện ở `expNhan` của lần `/hs/ke-hoach-ngay` kế tiếp.
+

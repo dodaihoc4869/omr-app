@@ -2,7 +2,7 @@
 // EXP HỌC TẬP + MẢNH KHIÊN — TẦNG D1 (DE-XUAT-EXP-MANH-KHIEN-1909.md, Bước 2). Chạy trên SQLite THẬT (lược đồ thật + mọi migration).
 import { describe, it, expect, vi } from 'vitest'
 import worker from '../server/src/index'
-import { capNhatExp, congVaoHoSoGame, docCauHinhExp, docExpHomNay, hsKeHoachNgayCoExp, mocExpCuaEm } from '../server/src/exp-d1'
+import { capNhatExp, chotExpNgayQua, congVaoHoSoGame, docCauHinhExp, docExpHomNay, docThanhTichNgay, ghiTiepSuc, hsKeHoachNgayCoExp, mocExpCuaEm } from '../server/src/exp-d1'
 import { congTongSoVaoHoSo, khienConLai, khienRenChuaDung } from '../server/src/exp-ho-so-game'
 import { ghiSuKien, ngayVn } from '../server/src/su-kien-hoc'
 import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
@@ -70,7 +70,7 @@ describe('cờ: KHÔNG có cấu hình = tắt, hành vi y như cũ', () => {
     await ghi(d, [sk(qid(1), 1, NOW)])
     const truoc = docHoSoGame(d)
     const r = await capNhatExp(d.env, 'S1', NOW)
-    expect(r).toEqual({ bat: false, khoan: [], manh: [], daCong: null })
+    expect(r).toEqual({ bat: false, khoan: [], manh: [], daCong: null, datNgay: null })
     expect(d.dem('exp_so') + d.dem('manh_khien_so')).toBe(0)
     expect(docHoSoGame(d)).toEqual(truoc)
   })
@@ -300,6 +300,10 @@ describe('thưởng theo việc: lô, nộp bài, mom, ca thi', () => {
     await capNhatExp(d.env, 'S1', NOW)
     expect(expCua(d, 'diem|CA2|1')).toBe(18)
     expect(expCua(d, 'cau|t2|2026-09-19')).toBe(2)
+    const gc = (khoa: string) => dongExp(d).find((x) => x.khoa === `S1|${khoa}`)?.ghi_chu
+    expect(gc('diem|CA2|1')).toMatch(/^Ca CA2 vừa công bố\. Điểm ca thi 6: \+18$/)
+    expect(gc('cau|t2|2026-09-19')).toMatch(/\(ca CA2 vừa công bố\)$/)
+    expect(gc('diem|CA1|1')).toBe('Điểm ca thi 7: +21')
     const truoc = d.chup('exp_so')
     await capNhatExp(d.env, 'S1', NOW)
     expect(d.chup('exp_so')).toBe(truoc)
@@ -543,5 +547,159 @@ describe('luật CŨ ngừng sinh khoản mới sau mốc (syncAcademic)', () =>
     }
     expect(await chay(false)).toBe(2)
     expect(await chay(true)).toBe(0)
+  })
+})
+
+describe('ngày phát hành: chỉ việc SAU mốc mới làm nên "đạt ngày"', () => {
+  it('em đã làm đủ TRƯỚC mốc thì không nhận +20 miễn phí; làm đủ SAU mốc thì nhận', async () => {
+    const d = taoD1That()
+    themHs(d)
+    themHoSoGame(d)
+    const tu = iso(NOW - H)
+    d.sql.prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('exp_moi',?,'x')").run(JSON.stringify({ dsSbd: ['S1'], tu }))
+    luuKeHoach(d, { toiThieu: 4 })
+    await ghi(d, [1, 2, 3, 4, 5].map((i) => sk(qid(i), 1, NOW - 3 * H - i * 1000)))
+    const a = await capNhatExp(d.env, 'S1', NOW)
+    expect(khoaExp(d)).toEqual([])
+    expect(a.datNgay).toMatchObject({ dat: false, thieu: ['cau_toi_thieu'], daLam: 0, daTrao: false })
+    await ghi(d, [10, 11, 12, 13].map((i) => sk(qid(i), 1, NOW - 30 * 60_000 - i * 1000)))
+    const b = await capNhatExp(d.env, 'S1', NOW)
+    expect(khoaExp(d)).toContain(`dat|${HOM_NAY}`)
+    expect(b.datNgay).toMatchObject({ dat: true, thieu: [], daLam: 4, daTrao: true })
+  })
+})
+
+describe('trạng thái đạt ngày cho giao diện: còn THIẾU gì', () => {
+  const chay = async (kh: Parameters<typeof luuKeHoach>[1], soCau: number, lenBac = false) => {
+    const d = await dung()
+    luuKeHoach(d, kh)
+    const ev = Array.from({ length: soCau }, (_, i) => sk(qid(i), 1, NOW - (soCau - i) * 1000))
+    if (lenBac) ev.push(sk('OLD', 0, NOW - D), sk('OLD', 1, NOW - 500))
+    await ghi(d, ev)
+    return (await capNhatExp(d.env, 'S1', NOW)).datNgay
+  }
+  it('đủ mọi điều kiện → dat, thieu rỗng, đã trao', async () => {
+    expect(await chay({ toiThieu: 4 }, 4)).toEqual({ dat: true, thieu: [], daLam: 4, toiThieu: 4, daTrao: true, laNghi: false })
+  })
+  it('thiếu từng điều kiện được gọi đúng tên; nhiều thiếu thì liệt kê đủ', async () => {
+    expect((await chay({ toiThieu: 6 }, 4))!.thieu).toEqual(['cau_toi_thieu'])
+    expect((await chay({ toiThieu: 4, treNhip: true }, 4))!.thieu).toEqual(['tre_nhip'])
+    expect((await chay({ toiThieu: 4, soCauToiHan: 3 }, 4))!.thieu).toEqual(['chua_len_bac'])
+    expect((await chay({ toiThieu: 4, soCauToiHan: 3 }, 4, true))!.thieu).toEqual([])
+    expect((await chay({ toiThieu: 9, treNhip: true, soCauToiHan: 1 }, 2))!.thieu).toEqual(['cau_toi_thieu', 'tre_nhip', 'chua_len_bac'])
+  })
+  it('chưa có kế hoạch ngày đã lưu → null; ngày nghỉ → không đạt, không thiếu gì', async () => {
+    const d = await dung()
+    await ghi(d, [sk(qid(1), 1, NOW)])
+    expect((await capNhatExp(d.env, 'S1', NOW)).datNgay).toBeNull()
+    luuKeHoach(d)
+    d.sql.prepare("UPDATE ke_hoach_ngay SET la_ngay_nghi=1 WHERE sbd='S1'").run()
+    expect((await capNhatExp(d.env, 'S1', NOW)).datNgay).toMatchObject({ dat: false, thieu: [], laNghi: true })
+  })
+  it('/hs/ke-hoach-ngay trả exp.datNgay khi cờ bật', async () => {
+    const d = await dung()
+    const r = await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd: 'S1' })
+    expect(r.exp.datNgay).toMatchObject({ dat: false, thieu: expect.arrayContaining(['cau_toi_thieu']), daTrao: false })
+  })
+})
+
+describe('tiếp sức đồng đội cho game (ghiTiepSuc)', () => {
+  it('+3 EXP mỗi lần, tối đa 5 lần một ngày VN, sang ngày mới đếm lại; khoá `<sbd>|tiepsuc|<ngày>|<n>`', async () => {
+    const d = await dung()
+    const kq = []
+    for (let i = 0; i < 7; i++) kq.push(await ghiTiepSuc(d.env, 'S1', NOW + i))
+    expect(kq.map((x) => [x.exp, x.lanThu, x.conLai])).toEqual([[3, 1, 4], [3, 2, 3], [3, 3, 2], [3, 4, 1], [3, 5, 0], [0, 0, 0], [0, 0, 0]])
+    expect(khoaExp(d)).toEqual([1, 2, 3, 4, 5].map((n) => `tiepsuc|${HOM_NAY}|${n}`))
+    expect(docHoSoGame(d).earned).toBe(15)
+    expect((await ghiTiepSuc(d.env, 'S1', NOW + D)).exp).toBe(3)
+  })
+  it('gọi lại cùng `idLuot` không cộng đôi', async () => {
+    const d = await dung()
+    expect((await ghiTiepSuc(d.env, 'S1', NOW, 'luot-1')).exp).toBe(3)
+    const l = await ghiTiepSuc(d.env, 'S1', NOW + 1, 'luot-1')
+    expect(l).toMatchObject({ exp: 0, daGhiTruoc: true, conLai: 4 })
+    expect((await ghiTiepSuc(d.env, 'S1', NOW + 2, 'luot-2')).lanThu).toBe(2)
+    expect(tongExp(d)).toBe(6)
+  })
+  it('năm lượt CHỒNG NHAU vẫn đúng 5 khoản, mỗi ô một lần', async () => {
+    const d = await dung()
+    const r = await Promise.all(Array.from({ length: 8 }, (_, i) => ghiTiepSuc(d.env, 'S1', NOW + i, `l${i}`)))
+    expect(r.filter((x) => x.exp === 3)).toHaveLength(5)
+    expect(new Set(khoaExp(d)).size).toBe(5)
+    expect(docHoSoGame(d).earned).toBe(15)
+  })
+  it('cờ tắt → không ghi gì; không ném lỗi khi thiếu bảng', async () => {
+    const t = taoD1That()
+    themHs(t)
+    themHoSoGame(t)
+    expect(await ghiTiepSuc(t.env, 'S1', NOW)).toEqual({ bat: false, exp: 0, lanThu: 0, conLai: 0, daGhiTruoc: false })
+    expect(t.dem('exp_so')).toBe(0)
+    const d = await dung()
+    d.sql.exec('DROP TABLE exp_so')
+    expect((await ghiTiepSuc(d.env, 'S1', NOW)).exp).toBe(0)
+  })
+})
+
+describe('hàm đọc-chỉ cho game phát vé (docThanhTichNgay)', () => {
+  it('trả đúng khoá `dat|<ngày>` và các lô ĐÚNG NHỊP của ngày; lô trễ nhịp không tính; không ghi gì', async () => {
+    const d = await dung()
+    luuKeHoach(d, { toiThieu: 4, viec: [{ id: 'btvn_lo:B1:0', hanMem: iso(NOW + 5 * H) }, { id: 'btvn_lo:B1:1', hanMem: iso(NOW - 5 * H) }] })
+    await ghi(d, [
+      sk('q1', 1, NOW - 4000, { nguon: 'btvn_lo', maNguon: 'B1', lan: 0 }), sk('q2', 1, NOW - 3000, { nguon: 'btvn_lo', maNguon: 'B1', lan: 1 }),
+      sk('q3', 1, NOW - 2000), sk('q4', 1, NOW - 1000),
+    ])
+    await capNhatExp(d.env, 'S1', NOW)
+    const truoc = d.chup('exp_so')
+    const r = await docThanhTichNgay(d.env, 'S1', NOW)
+    expect(r).toEqual({ bat: true, ngay: HOM_NAY, datNgay: true, loDungNhip: [{ maBtvn: 'B1', chiSo: 0, khoa: 'lo|B1|0' }] })
+    expect(d.chup('exp_so')).toBe(truoc)
+    expect(await docThanhTichNgay(d.env, 'S1', NOW, '2026-09-19')).toMatchObject({ datNgay: false, loDungNhip: [] })
+  })
+  it('cờ tắt hoặc chưa có sổ → bat:false / rỗng, không ném lỗi', async () => {
+    const t = taoD1That()
+    expect(await docThanhTichNgay(t.env, 'S1', NOW)).toEqual({ bat: false, ngay: HOM_NAY, datNgay: false, loDungNhip: [] })
+    const d = await dung()
+    d.sql.exec('DROP TABLE exp_so')
+    expect((await docThanhTichNgay(d.env, 'S1', NOW)).datNgay).toBe(false)
+  })
+})
+
+describe('cron 00:01: chốt EXP của ngày vừa qua (chotExpNgayQua)', () => {
+  const homQua = '2026-09-19'
+  const NOW_CRON = Date.parse('2026-09-19T17:01:00.000Z') // 00:01 VN ngày 20/09
+  it('em có ngày hôm qua chốt "dat" mà chưa có khoản dat|<ngày> thì được tính bù; em đã có rồi thì bỏ qua; em không nằm trong cờ thì không đụng', async () => {
+    const d = await dung()
+    themHs(d, 'S2')
+    themHs(d, 'S3')
+    themHoSoGame(d, {}, 'S2')
+    // S1: làm 4 câu hôm qua bằng đường CHƯA gọi capNhatExp, kế hoạch hôm qua đã chốt "dat".
+    luuKeHoach(d, { ngay: homQua, toiThieu: 4, ketQua: 'dat' })
+    await ghi(d, [1, 2, 3, 4].map((i) => sk(qid(i), 1, Date.parse('2026-09-19T05:00:00Z') + i * 1000)))
+    // S2 cũng đạt nhưng không nằm trong danh sách bật cờ.
+    luuKeHoach(d, { ngay: homQua, toiThieu: 4, ketQua: 'dat', sbd: 'S2' })
+    await ghi(d, [1, 2, 3, 4].map((i) => sk(qid(i), 1, Date.parse('2026-09-19T05:00:00Z') + i * 1000, { sbd: 'S2' })))
+    const r = await chotExpNgayQua(d.env, NOW_CRON)
+    expect(r).toEqual({ soEm: 1, daTinh: 1 })
+    expect(khoaExp(d)).toContain(`dat|${homQua}`)
+    expect(khoaExp(d, 'S2')).toEqual([])
+    // Chạy lại: không còn em nào cần bù, sổ không đổi.
+    const truoc = d.chup('exp_so')
+    expect(await chotExpNgayQua(d.env, NOW_CRON)).toEqual({ soEm: 0, daTinh: 0 })
+    expect(d.chup('exp_so')).toBe(truoc)
+  })
+  it('cờ tắt hoặc không có kế hoạch nào chốt → không làm gì', async () => {
+    const t = taoD1That()
+    expect(await chotExpNgayQua(t.env, NOW_CRON)).toEqual({ soEm: 0, daTinh: 0 })
+    const d = await dung()
+    expect(await chotExpNgayQua(d.env, NOW_CRON)).toEqual({ soEm: 0, daTinh: 0 })
+  })
+  it('toanBo: tối đa 40 em mỗi lượt', async () => {
+    const d = taoD1That()
+    bat(d, { toanBo: true, dsSbd: [] })
+    for (let i = 0; i < 45; i++) {
+      themHs(d, `E${i}`)
+      luuKeHoach(d, { ngay: homQua, sbd: `E${i}`, ketQua: 'dat' })
+    }
+    expect((await chotExpNgayQua(d.env, NOW_CRON)).soEm).toBe(40)
   })
 })

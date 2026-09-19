@@ -3,7 +3,7 @@ import {ghiSuKien,ghiSuKienThi,ghiSuKienLoBtvn,type LuotThi} from './su-kien-hoc
 import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
 import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
 import {hsThoiGianHoc,chayCaLop} from './ke-hoach-ngay-d1'
-import {hsKeHoachNgayCoExp} from './exp-d1'
+import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQua} from './exp-d1'
 import {hsCauTheoQid} from './cau-theo-qid'
 import {hsOnLaiNop} from './on-lai-nop'
 import {hoSoOnCa} from './ho-so-on-ca'
@@ -1651,7 +1651,9 @@ async function xongLoBtvn(env: Env, b: Record<string, unknown>): Promise<Respons
   // "xong lô" không còn là điền đủ ô. Không gửi đáp án thì hành vi y như cũ.
   const dapAn = b.dapAn && typeof b.dapAn === 'object' && !Array.isArray(b.dapAn) ? (b.dapAn as Record<string, unknown>) : null
   const ghi = dapAn && Object.keys(dapAn).length ? await ghiSuKienLoBtvn(env, maBtvn, sbd, Math.floor(chiSo), dapAn) : null
-  return ra({ ok: true, loDaXong: Number(em?.lo_da_xong ?? loDaXongMoi), ...(ghi ? { suKien: ghi.soGui } : {}) })
+  // EXP HỌC TẬP MỚI (exp-d1.ts): xong lô đúng nhịp/trễ nhịp + EXP từng câu; cờ tắt thì không đính gì.
+  const expMoi = ghi?.ok ? await expNhanSauNop(env, sbd, Date.now()) : {}
+  return ra({ ok: true, loDaXong: Number(em?.lo_da_xong ?? loDaXongMoi), ...(ghi ? { suKien: ghi.soGui } : {}), ...expMoi })
 }
 
 /** EM HỎI: LỚP CỦA EM CÓ CA THI ĐANG MỞ KHÔNG — để nút "Vào thi" đổi màu (Bảng nhiệm vụ).
@@ -2783,6 +2785,8 @@ export default {
       // THỨ TỰ: kế hoạch ngày TRƯỚC, tin phụ huynh SAU — tin phụ huynh (GĐ 5) đọc số câu từ kế hoạch vừa lập; chạy song song
       // thì tin có thể đọc kế hoạch của ngày cũ hoặc thiếu.
       await chayCaLop(env,Date.now()).then(r=>console.log('[ke-hoach] cron',JSON.stringify(r))).catch(e=>console.error('[ke-hoach] cron lỗi:',e))
+      // EXP học tập mới: chốt "đạt ngày/chuỗi" của ngày vừa qua cho em nào chưa được trao (chỉ em đang bật cờ). Lỗi chỉ ghi log.
+      await chotExpNgayQua(env,Date.now()).then(r=>console.log('[exp] cron',JSON.stringify(r))).catch(e=>console.error('[exp] cron lỗi:',e))
       await Promise.all([refreshDailyNews(env),dailyHonors(env,false)])
     }else await deliverNotices(env)
   },

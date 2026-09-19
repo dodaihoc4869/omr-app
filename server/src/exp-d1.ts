@@ -12,7 +12,7 @@
 import type { D1PreparedStatement, Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { chuyenTrangThaiTrongNgay } from './exp-chuyen-trang-thai'
-import { EXP_MOI_TU, MANH_MOI_KHIEN } from './exp-cau-hinh'
+import { EXP_LO_DUNG_NHIP, EXP_MOI_TU, EXP_TIEP_SUC, MANH_MOI_KHIEN, TIEP_SUC_TOI_DA_NGAY } from './exp-cau-hinh'
 import { congManh, NGUON_EXP_CAU, tinhExp, type KhoanExp, type KhoanManh, type MetaCauExp, type VaoTinhExp } from './exp-hoc-tap'
 import { congTongSoVaoHoSo, khienConLai, khienRenChuaDung, type DaCong, type HoSoGameExp } from './exp-ho-so-game'
 import { NGAN_SACH_SAN, SO_NGAY_LICH_SU, TOI_THIEU_CAU_SAN } from './ho-so-cau-hinh'
@@ -96,6 +96,7 @@ async function docSo(env: Env, sbd: string): Promise<DongSo[]> {
 
 interface LuotCongBo {
   maCa: string
+  tenCa: string
   lanThu: number
   nopLuc: string
   diem: number
@@ -105,7 +106,7 @@ interface LuotCongBo {
 async function docLuotCongBo(env: Env, sbd: string): Promise<LuotCongBo[]> {
   const r = await an(
     () => env.DB.prepare(
-      `SELECT l.ma_ca, l.lan_thu, l.nop_luc, l.diem_i, l.diem_ii, l.diem_iii FROM luot l JOIN ca c ON c.ma_ca = l.ma_ca
+      `SELECT l.ma_ca, c.ten_ca, l.lan_thu, l.nop_luc, l.diem_i, l.diem_ii, l.diem_iii FROM luot l JOIN ca c ON c.ma_ca = l.ma_ca
         WHERE l.sbd = ? AND l.trang_thai IN ('da_nop','khoa') AND c.trang_thai <> 'da_xoa'
           AND (c.cong_bo = 'ngay' OR (c.cong_bo = 'ca_lop_xong' AND (c.trang_thai = 'dong' OR NOT EXISTS (SELECT 1 FROM luot x WHERE x.ma_ca = c.ma_ca AND x.trang_thai <> 'da_nop'))))
         ORDER BY l.nop_luc`,
@@ -113,7 +114,7 @@ async function docLuotCongBo(env: Env, sbd: string): Promise<LuotCongBo[]> {
     null,
   )
   return (r?.results ?? []).map((x) => ({
-    maCa: String(x.ma_ca), lanThu: Number(x.lan_thu) || 1, nopLuc: String(x.nop_luc),
+    maCa: String(x.ma_ca), tenCa: String(x.ten_ca ?? '').trim(), lanThu: Number(x.lan_thu) || 1, nopLuc: String(x.nop_luc),
     diem: Number(x.diem_i) + Number(x.diem_ii) + Number(x.diem_iii),
   }))
 }
@@ -238,9 +239,33 @@ export interface KetQuaExp {
   manh: KhoanManh[]
   /** Phần vừa cộng vào hồ sơ game; null = em chưa có hồ sơ game (khoản nằm chờ) hoặc cộng lỗi (lần sau tự bắt kịp). */
   daCong: DaCong | null
+  /** Ngày này còn THIẾU GÌ để "đạt nhiệm vụ ngày" (để màn không nói "đã đủ" khi EXP đạt ngày chưa về). null = chưa có kế hoạch ngày đã lưu. */
+  datNgay: TrangThaiDatNgay | null
 }
 
-const KHONG_BAT: KetQuaExp = { bat: false, khoan: [], manh: [], daCong: null }
+export type ThieuDat = 'cau_toi_thieu' | 'tre_nhip' | 'chua_len_bac'
+
+export interface TrangThaiDatNgay {
+  /** Đủ điều kiện đạt (định nghĩa của chốt ngày). */
+  dat: boolean
+  thieu: ThieuDat[]
+  daLam: number
+  toiThieu: number
+  /** Khoản `dat|<ngày>` đã nằm trong sổ EXP (đã trao +20). */
+  daTrao: boolean
+  laNghi: boolean
+}
+
+const KHONG_BAT: KetQuaExp = { bat: false, khoan: [], manh: [], daCong: null, datNgay: null }
+
+/**
+ * Gọi SAU khi ghi sổ ở một lệnh NỘP của em: cập nhật EXP rồi trả phần đính thêm vào phản hồi. Cờ tắt → `{}` (phản hồi y hệt cũ).
+ * Không ném lỗi.
+ */
+export async function expNhanSauNop(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
+  const k = await capNhatExp(env, sbd, nowMs)
+  return k.bat ? { expNhan: expNhanCuaKetQua(k), manhNhan: manhNhanCuaKetQua(k) } : {}
+}
 
 /** EXP vừa nhận, dạng gửi cho máy em: `[{loai, exp, ghiChu}]` (chữ tiếng Việt in sẵn, kèm số). */
 export const expNhanCuaKetQua = (k: KetQuaExp) => k.khoan.map((x) => ({ loai: x.loai, exp: x.exp, ghiChu: x.ghiChu }))
@@ -268,7 +293,7 @@ export async function capNhatExp(env: Env, sbd: string, nowMs: number, tuyChon: 
     return await capNhatCoTu(env, sbd, nowMs, tu, tuyChon)
   } catch (e) {
     console.error('[exp] cập nhật lỗi (bỏ qua, lần gọi sau tự bắt kịp):', e instanceof Error ? e.message : e)
-    return { bat: true, khoan: [], manh: [], daCong: null }
+    return { bat: true, khoan: [], manh: [], daCong: null, datNgay: null }
   }
 }
 
@@ -376,20 +401,26 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
 
   // Đạt nhiệm vụ ngày (định nghĩa của CHỐT NGÀY `chotNgayCu`, để khớp chuỗi ngày đạt): đã làm ≥ mức tối thiểu, không việc bắt buộc nào trễ nhịp,
   // và (có câu lên bậc HOẶC không có câu tới hạn). Chưa có kế hoạch ngày đã lưu thì chưa xét (em chưa từng mở nhiệm vụ hôm nay).
-  const tinhDat = (): VaoTinhExp['datNgay'] => {
-    if (!coKeHoach || laNghi || toiThieu === undefined) return null
-    const dsHomNay = soTho.filter((e) => e.ngayVn === homNay)
+  const chiTietDat = ((): { dat: boolean; thieu: ThieuDat[]; daLam: number; toiThieu: number; luc: string; laNghi: boolean } | null => {
+    if (!coKeHoach || toiThieu === undefined) return null
+    if (laNghi) return { dat: false, thieu: [], daLam: 0, toiThieu, luc: '', laNghi: true }
+    // NGÀY PHÁT HÀNH: chỉ việc SAU mốc mới tính (không tính lại quá khứ) — không thì mọi em đã đạt từ sáng nhận +20 miễn phí lúc bật.
+    const sauMoc = (e: DongSo) => homNay !== tuNgay || e.luc >= tu
+    const dsHomNay = soTho.filter((e) => e.ngayVn === homNay && sauMoc(e))
     const daLam = new Set(dsHomNay.map((e) => e.qid)).size
     // "Đã làm" đếm cả bài thi chưa công bố (không nói gì về đúng/sai), nhưng "lên bậc" chỉ đếm trên sổ ĐÃ LỌC: ca chưa công bố mà lên bậc bị đếm
     // thì việc đạt ngày sẽ lộ câu thi làm đúng.
     const truocHomNay = new Map<string, boolean>()
     for (const e of so) if (e.ngayVn < homNay && (e.ketQua === 0 || e.ketQua === null)) truocHomNay.set(e.qid, true)
-    const lenBac = new Set(so.filter((e) => e.ngayVn === homNay && e.ketQua === 1 && truocHomNay.has(e.qid)).map((e) => e.qid)).size
-    if (!(daLam >= toiThieu && !treNhip && (lenBac >= 1 || soCauToiHan === 0))) return null
-    return { chuoi: 0, luc: dsHomNay.reduce((m, e) => (e.luc > m ? e.luc : m), '') }
-  }
-  let datNgay = tinhDat()
-  if (datNgay) datNgay = { ...datNgay, chuoi: (kh ? kh.chuoiDat : await docChuoiTruoc(env, sbd, homNay)) + 1 }
+    const lenBac = new Set(so.filter((e) => e.ngayVn === homNay && sauMoc(e) && e.ketQua === 1 && truocHomNay.has(e.qid)).map((e) => e.qid)).size
+    const thieu: ThieuDat[] = []
+    if (daLam < toiThieu) thieu.push('cau_toi_thieu')
+    if (treNhip) thieu.push('tre_nhip')
+    if (lenBac < 1 && soCauToiHan > 0) thieu.push('chua_len_bac')
+    return { dat: thieu.length === 0, thieu, daLam, toiThieu, luc: dsHomNay.reduce((m, e) => (e.luc > m ? e.luc : m), ''), laNghi: false }
+  })()
+  let datNgay: VaoTinhExp['datNgay'] = null
+  if (chiTietDat?.dat) datNgay = { chuoi: (kh ? kh.chuoiDat : await docChuoiTruoc(env, sbd, homNay)) + 1, luc: chiTietDat.luc }
 
   const cacKhoan: KhoanExp[] = []
   const cacManh: KhoanManh[] = []
@@ -410,6 +441,13 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
     for (const m of ra.manh) { cacManh.push(m); daCo.add(m.khoa) }
   }
 
+  // Ca thi CÔNG BỐ MUỘN (nộp ở ngày trước, công bố hôm nay): khoản trao bù ghi rõ để em hiểu vì sao có EXP của bài cũ.
+  const tenCa = new Map(luot.map((l) => [l.maCa, l.tenCa || l.maCa]))
+  for (const k of cacKhoan) {
+    if (k.loai === 'diem_ca' && k.maNguon && ngayVn(ms(k.luc)) !== k.ngay) k.ghiChu = `Ca ${tenCa.get(k.maNguon) ?? k.maNguon} vừa công bố. ${k.ghiChu}`
+    else if (k.loai === 'cau' && k.ngay !== homNay && k.maNguon && tenCa.has(k.maNguon)) k.ghiChu = `${k.ghiChu} (ca ${tenCa.get(k.maNguon)} vừa công bố)`
+  }
+
   // Ghi: một câu lệnh nhiều dòng (json_each), tối đa 25 câu lệnh mỗi batch.
   const lenh: D1PreparedStatement[] = []
   for (const g of chunk(cacKhoan, DONG_MOI_LENH)) {
@@ -421,7 +459,10 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
   for (const g of chunk(lenh, 25)) await env.DB.batch(g)
 
   const daCong = await congVaoHoSoGame(env, sbd, await docTuNgayMua(env))
-  return { bat: true, khoan: cacKhoan, manh: cacManh, daCong }
+  const trangThaiDat: TrangThaiDatNgay | null = chiTietDat
+    ? { dat: chiTietDat.dat, thieu: chiTietDat.thieu, daLam: chiTietDat.daLam, toiThieu: chiTietDat.toiThieu, daTrao: daCo.has(`dat|${homNay}`), laNghi: chiTietDat.laNghi }
+    : null
+  return { bat: true, khoan: cacKhoan, manh: cacManh, daCong, datNgay: trangThaiDat }
 }
 
 /**
@@ -449,6 +490,114 @@ export async function congVaoHoSoGame(env: Env, sbd: string, since: string): Pro
     if (r.meta.changes) return ra
   }
   return null
+}
+
+// --- Hàm cho game "Đoàn Hộ Tống" (docs/hop-dong-exp-cho-game-1909.md) ----------------------------------
+
+export interface KetQuaTiepSuc {
+  /** false = EXP mới chưa bật cho em này: KHÔNG ghi gì. */
+  bat: boolean
+  /** EXP vừa cộng lần này (0 khi đã đủ số lần trong ngày hoặc lượt này đã ghi rồi). */
+  exp: number
+  /** Lần tiếp sức thứ mấy trong ngày (1..TIEP_SUC_TOI_DA_NGAY); 0 khi đã đủ. */
+  lanThu: number
+  conLai: number
+  /** Lượt này (`idLuot`) đã được ghi từ trước — gọi lại không cộng thêm. */
+  daGhiTruoc: boolean
+}
+
+/**
+ * Tiếp sức đồng đội: +EXP_TIEP_SUC mỗi lần, tối đa TIEP_SUC_TOI_DA_NGAY lần mỗi ngày VN. Khoá `tiepsuc|<ngày>|<n>` trong sổ của em (khoá đầy đủ
+ * `<sbd>|tiepsuc|<ngày>|<n>`). `idLuot` (mã lượt của game) làm gọi lại cùng lượt KHÔNG cộng đôi. Không ném lỗi. Game gọi hàm này sau khi tự xác thực em.
+ */
+export async function ghiTiepSuc(env: Env, sbd: string, nowMs: number, idLuot: string | null = null): Promise<KetQuaTiepSuc> {
+  const khong: KetQuaTiepSuc = { bat: false, exp: 0, lanThu: 0, conLai: 0, daGhiTruoc: false }
+  try {
+    const tu = mocExpCuaEm(await docCauHinhExp(env), sbd, nowMs)
+    if (!tu) return khong
+    const ngay = ngayVn(nowMs)
+    const luc = new Date(nowMs).toISOString()
+    for (let thu = 0; thu < TIEP_SUC_TOI_DA_NGAY + 1; thu++) {
+      const r = await env.DB.prepare("SELECT khoa, ma_nguon FROM exp_so WHERE sbd = ? AND ngay_vn = ? AND loai = 'tiepsuc'").bind(sbd, ngay).all<{ khoa: string; ma_nguon: string | null }>()
+      const co = r.results ?? []
+      if (idLuot && co.some((x) => x.ma_nguon === idLuot)) return { bat: true, exp: 0, lanThu: 0, conLai: Math.max(0, TIEP_SUC_TOI_DA_NGAY - co.length), daGhiTruoc: true }
+      if (co.length >= TIEP_SUC_TOI_DA_NGAY) return { bat: true, exp: 0, lanThu: 0, conLai: 0, daGhiTruoc: false }
+      const n = co.length + 1
+      const w = await env.DB.prepare(
+        `INSERT OR IGNORE INTO exp_so (khoa, sbd, ngay_vn, loai, qid, ma_nguon, exp, luc, ghi_chu) VALUES (?, ?, ?, 'tiepsuc', NULL, ?, ?, ?, ?)`,
+      ).bind(`${sbd}|tiepsuc|${ngay}|${n}`, sbd, ngay, idLuot, EXP_TIEP_SUC, luc, `Tiếp sức đồng đội lần ${n}: +${EXP_TIEP_SUC}`).run()
+      if (w.meta.changes) {
+        await congVaoHoSoGame(env, sbd, await docTuNgayMua(env))
+        return { bat: true, exp: EXP_TIEP_SUC, lanThu: n, conLai: TIEP_SUC_TOI_DA_NGAY - n, daGhiTruoc: false }
+      }
+      // Ô số n vừa bị lượt khác giữ chỗ: đọc lại và thử ô kế.
+    }
+    return { bat: true, exp: 0, lanThu: 0, conLai: 0, daGhiTruoc: false }
+  } catch (e) {
+    console.error('[exp] tiếp sức lỗi (bỏ qua):', e instanceof Error ? e.message : e)
+    return khong
+  }
+}
+
+export interface ThanhTichNgay {
+  bat: boolean
+  ngay: string
+  /** Đã có khoản "đạt nhiệm vụ ngày" (`dat|<ngày>`) trong sổ EXP. */
+  datNgay: boolean
+  /** Lô BTVN xong ĐÚNG NHỊP đã ghi sổ trong ngày (khoá `lo|<mã bài>|<chỉ số lô>`). */
+  loDungNhip: { maBtvn: string; chiSo: number; khoa: string }[]
+}
+
+/**
+ * ĐỌC-CHỈ cho game phát vé: hôm nay em này đã có khoá `dat|<ngày>` và những khoá `lo|…` đúng nhịp nào. Không ghi gì, không tính lại — muốn số mới nhất thì gọi
+ * `capNhatExp` trước. Cờ tắt → `bat:false`, rỗng. Không ném lỗi.
+ */
+export async function docThanhTichNgay(env: Env, sbd: string, nowMs: number, ngay: string = ngayVn(nowMs)): Promise<ThanhTichNgay> {
+  const rong: ThanhTichNgay = { bat: false, ngay, datNgay: false, loDungNhip: [] }
+  try {
+    if (!mocExpCuaEm(await docCauHinhExp(env), sbd, nowMs)) return rong
+    const r = await an(
+      () => env.DB.prepare("SELECT khoa, loai, exp, ma_nguon FROM exp_so WHERE sbd = ? AND ngay_vn = ? AND loai IN ('dat_ngay','lo') ORDER BY luc, khoa").bind(sbd, ngay).all<Record<string, unknown>>(),
+      null,
+    )
+    const ra: ThanhTichNgay = { bat: true, ngay, datNgay: false, loDungNhip: [] }
+    const tienTo = `${sbd}|`
+    for (const x of r?.results ?? []) {
+      const khoa = String(x.khoa).slice(tienTo.length)
+      if (x.loai === 'dat_ngay') ra.datNgay = true
+      else if (Number(x.exp) === EXP_LO_DUNG_NHIP) ra.loDungNhip.push({ maBtvn: String(x.ma_nguon ?? ''), chiSo: Number(khoa.split('|')[2]), khoa })
+    }
+    return ra
+  } catch (e) {
+    console.error('[exp] đọc thành tích ngày lỗi (bỏ qua):', e instanceof Error ? e.message : e)
+    return rong
+  }
+}
+
+// --- Cron 00:01: chốt EXP của ngày vừa qua -----------------------------------------------------------
+
+const TOI_DA_EM_CHOT_MOT_LUOT = 40
+
+/**
+ * Sau khi `chayCaLop` chốt ngày cũ: em nào có ngày hôm qua `ket_qua = 'dat'` mà sổ EXP chưa có khoản `dat|<ngày>` (làm bằng đường chưa gọi `capNhatExp`)
+ * thì tính lại đúng ngày đó. Chỉ xét em đang bật cờ; tối đa 40 em mỗi lượt để không vượt trần truy vấn của một lượt chạy.
+ */
+export async function chotExpNgayQua(env: Env, nowMs: number): Promise<{ soEm: number; daTinh: number }> {
+  const cfg = await docCauHinhExp(env)
+  if (!cfg.tu || ms(cfg.tu) > nowMs || (!cfg.toanBo && cfg.dsSbd.length === 0)) return { soEm: 0, daTinh: 0 }
+  const homQua = themNgay(ngayVn(nowMs), -1)
+  const loc = cfg.toanBo ? '' : 'AND k.sbd IN (SELECT value FROM json_each(?))'
+  const lenh = env.DB.prepare(
+    `SELECT k.sbd FROM ke_hoach_ngay k WHERE k.ngay = ? AND k.ket_qua = 'dat'
+        AND NOT EXISTS (SELECT 1 FROM exp_so e WHERE e.khoa = k.sbd || '|dat|' || k.ngay) ${loc} ORDER BY k.sbd LIMIT ${TOI_DA_EM_CHOT_MOT_LUOT}`,
+  )
+  const r = await an(() => (cfg.toanBo ? lenh.bind(homQua) : lenh.bind(homQua, json(cfg.dsSbd))).all<{ sbd: string }>(), null)
+  let daTinh = 0
+  for (const x of r?.results ?? []) {
+    const k = await capNhatExp(env, String(x.sbd), nowMs, { ngay: homQua })
+    if (k.bat) daTinh++
+  }
+  return { soEm: (r?.results ?? []).length, daTinh }
 }
 
 // --- Đọc cho màn hình -----------------------------------------------------------------------------
@@ -516,5 +665,5 @@ export async function hsKeHoachNgayCoExp(env: Env, b: Record<string, unknown>): 
     },
   })
   if (!k.bat) return r
-  return { ...r, exp: await docExpHomNay(env, sbd, now), expNhan: expNhanCuaKetQua(k), manhNhan: manhNhanCuaKetQua(k) }
+  return { ...r, exp: { ...(await docExpHomNay(env, sbd, now)), datNgay: k.datNgay }, expNhan: expNhanCuaKetQua(k), manhNhan: manhNhanCuaKetQua(k) }
 }
