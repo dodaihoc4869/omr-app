@@ -8,7 +8,9 @@
  * (--cx-1..6), khoảng cách (--k*), đường cong chuyển động, vàng vinh danh
  * (--gg-vang) và nền cảnh báo (--gg-vang-nen). Sáng/tối theo
  * prefers-color-scheme như tokens.css — không có nút chuyển. */
-.bnv {
+/* `.bnv` = riêng Bảng nhiệm vụ; `.m3` = bí danh cho MỌI màn khác muốn dùng cùng bảng màu (đặt lên phần tử gốc của màn). */
+.bnv,
+.m3 {
   --m3-primary: rgb(11 87 208);
   --m3-on-primary: rgb(255 255 255);
   --m3-primary-container: rgb(211 227 253);
@@ -87,7 +89,8 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .bnv {
+  .bnv,
+  .m3 {
     --m3-primary: rgb(168 199 250);
     --m3-on-primary: rgb(6 46 111);
     --m3-primary-container: rgb(8 66 160);

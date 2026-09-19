@@ -9,6 +9,16 @@ Lập 19/09/2026 12:25. Theo `DIEU-PHOI.md` luật 4: phần giao diện ghi s�
 - SAU ĐÓ việc C: gửi 0.Planer BẢNG KIỂM KÊ mọi đường bấm HS/PH rồi làm nhóm 1 (React – xem), 2, 3; màn thi thật (ExamTakeScreen/exam-setup.css) LÀM CUỐI và nhắn 0.Planer soát diff trước khi đẩy.
 - Nếu phiên bị ngắt: đọc mục "Việc" + "Nhật ký vòng sửa" dưới đây; mọi thứ của mốc A đã commit.
 
+## DÙNG LẠI CHO PHIÊN KHÁC (Code 4…) — bảng màu và mẫu giao diện M3
+
+- **Bảng màu**: `src/components/bang-nhiem-vu/m3-theme.css` — `import '.../bang-nhiem-vu/m3-theme.css'` rồi đặt `className="m3"` lên phần tử GỐC của màn (bí danh của `.bnv`). Sáng/tối tự theo `prefers-color-scheme`. KHÔNG hard-code màu trong .tsx: chỉ `var(--m3-…)`.
+- **Biến**: `--m3-primary/on-primary/primary-container/on-primary-container(+ -phu)`, `--m3-secondary(-container/on-…)`, `--m3-tertiary(-container/on-…)`, `--m3-error(-container/on-…)`, bề mặt `--m3-surface`, `--m3-surface-container-lowest/low/(trơn)/high`, `--m3-on-surface`, `--m3-on-surface-variant`, `--m3-outline`; cao độ `--m3-cao-do-1/3`; bo góc `--m3-bo-12/16/28/tron`; chữ `--bnv-cx-1..6` (đã kèm rem cho cỡ chữ hệ thống 130%).
+- **Vai trò màu → ý nghĩa**: error=khẩn/sai, primary=bắt buộc/đang chọn, secondary=nên làm/thông tin, tertiary=tuỳ chọn/đúng/đạt. Thẻ tonal: đặt `data-vai-tro="error|primary|secondary|tertiary"` để có `--bnv-mau-nen/-chu/-chu-phu/-dam` (xem `bang-nhiem-vu.css`, cuối tệp có `.bnv-the--nhat` cho thẻ trung tính).
+- **CHƯA có thư viện thành phần chung**: các mẫu (nút tròn 48 px `.bnv-nut-tron`, nút `.bnv-nut-tonal/-vien/-chinh`, thẻ `.bnv-the`, chip `.bnv-chip`, skeleton `.bnv-xuong`, menu, thanh trên) nằm trong `bang-nhiem-vu.css` và gắn với `.bnv`. Phiên khác tạo `src/components/m3/` (ThanhTren, TheTonal, NutChinh/NutPhu, ChipTrangThai, HangChon, NutPhanDoan, OSo, TamTruot) dựa trên các mẫu này, dùng `.m3` + biến trên; đừng sửa `bang-nhiem-vu/**` (của em).
+- **Luật cứng**: đích chạm ≥ 48 px; tương phản ≥ 4,5 (đo bằng Lighthouse/getComputedStyle, KHÔNG chỉ mắt); không viền — tách lớp bằng tonal + cao độ; tắt chuyển động khi `prefers-reduced-motion`; aria-label chứa NGUYÊN chữ nhìn thấy; thẻ mờ 38% cho việc chưa mở; tên gọi/luồng dữ liệu/khoá localStorage giữ nguyên.
+- **Phiếu HTML** (chuỗi, không phải React) do em làm ở `src/lib/html-phieu.ts` dưới lớp `body.gd-m3` — đừng đụng.
+- **Ảnh chụp/đo**: bộ chụp Chromium + Lighthouse của em ở thư mục tạm phiên (chup.mjs, medir.sh); nếu cần, hỏi em. Nền vitest 98 đỏ / 43 tệp; `escort-context-menu` chập chờn theo tải.
+
 ## Việc — MỐC A
 
 - [x] Adapter `src/lib/nhiem-vu-adapter.ts`: nhánh 1 (tongHopKeHoachTroLy) + nhánh 2 (/hs/ke-hoach-ngay THẬT) | bằng chứng: tests/nhiem-vu-adapter-1909.test.ts 38/38
