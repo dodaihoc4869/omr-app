@@ -291,7 +291,11 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
         ? `lớp chỉ có ${em.length} em có mặt`
         : thuTu.length <= daChua.size
           ? `chỉ có ${thuTu.length} câu để chữa — tích thêm ít nhất ${con} bài nữa`
-          : `hết ngân sách ${Math.round(nganSach / 60)} phút — nới giờ buổi hoặc bỏ bớt câu bắt buộc`
+          : // Còn câu chưa chữa mà KHÔNG em nào còn lại nhận được (bị chặn bậc "biết" ở câu 2 sao) thì
+            // giờ không phải thủ phạm: nới giờ cũng không thêm được em nào.
+            !thuTu.some((c) => !daChua.has(c.cau.id) && !khongEmNhan(c))
+            ? `còn ${cauKhongEmNhan.length} câu chưa chữa nhưng mọi em còn lại đều ở bậc "biết" của dạng ấy (chưa nhận câu 2 sao) — tích thêm câu 1 sao / 0 sao`
+            : `hết ngân sách ${Math.round(nganSach / 60)} phút — nới giờ buổi hoặc bỏ bớt câu bắt buộc`
     thieu = { soEmConThieu: con, viSao }
     canhBao.push(`Mới xếp được ${soEmLenBang}/${ch.SO_EM_LEN_BANG_TOI_THIEU} em lên bảng: ${viSao}`)
   }

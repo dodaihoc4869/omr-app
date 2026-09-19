@@ -40,7 +40,7 @@ import { baiLamCoGiayTuCa } from '../lib/du-lieu-len-bang'
 import { CAU_HINH_LEN_BANG_MAC_DINH, TEN_LANE, dongHo, nganSachGiay } from '../lib/len-bang-cau-hinh'
 import { dungDoKho, vapCuaLop } from '../lib/do-kho-cau'
 import { doiEmChoDong, xepGioLenBang, type KetQuaXep } from '../lib/xep-gio-len-bang'
-import { xepBuoiChua, bangChuBuoiChua, type CauVaoXep, type KetQuaBuoiChua } from '../lib/xep-buoi-chua'
+import { xepBuoiChua, bangChuBuoiChua, type CauVaoXep, type DongChua, type KetQuaBuoiChua } from '../lib/xep-buoi-chua'
 import { btvnCuaCau, napHoSoLop, type HoSoEmDayDu, type KetQuaBtvn } from '../lib/ho-so-lop'
 import { dungGiaoAn } from '../lib/giao-an-len-bang'
 import { KHO_DO_KHO_RONG, gopCaVaoKho, thongKeKho, type KhoDoKhoLuu } from '../lib/kho-do-kho'
@@ -91,6 +91,57 @@ function TheBtvn({ kq }: { kq: KetQuaBtvn | null }) {
     </span>
   )
 }
+/** NÚT ĐẠT / KHÔNG ĐẠT của một dòng trên BẢNG BUỔI CHỮA (thuật toán mới, Engine E) — cùng dáng
+ * với hai nút của bảng "Phân công" cũ. Máy chủ nhận rồi thì chỉ còn nhãn kết quả: bấm lại là ghi
+ * đôi vào sổ lên bảng, mà sổ chỉ thêm, không sửa. */
+function NutChamBuoi({
+  tenEm,
+  ketQua,
+  daGhi,
+  dangGhi,
+  onChon,
+}: {
+  tenEm: string
+  ketQua: 'dat' | 'khong_dat' | undefined
+  /** Em này đã được ghi câu ấy từ bảng khác (Engine C) trong phiên này. */
+  daGhi: boolean
+  dangGhi: boolean
+  onChon: (dat: boolean) => void
+}) {
+  if (ketQua || daGhi) {
+    return (
+      <Nhan tone={ketQua === 'khong_dat' ? 'do' : 'xanh'} data-nhan="da-cham-buoi">
+        {ketQua === 'dat' ? 'Đã ghi: Đạt' : ketQua === 'khong_dat' ? 'Đã ghi: Không đạt' : 'Đã ghi'}
+      </Nhan>
+    )
+  }
+  return (
+    <span className="inline-flex items-center flex-wrap" style={{ gap: 'var(--k2)' }} data-cham-buoi>
+      <button
+        type="button"
+        onClick={() => onChon(true)}
+        disabled={dangGhi}
+        aria-label={`${tenEm}: Đạt`}
+        className="tap-target inline-flex items-center font-bold"
+        style={{ gap: 6, minHeight: 36, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--xanh-nen)', color: 'var(--xanh)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+      >
+        <ThumbsUp size={15} /> Đạt
+      </button>
+      <button
+        type="button"
+        onClick={() => onChon(false)}
+        disabled={dangGhi}
+        aria-label={`${tenEm}: Không đạt`}
+        className="tap-target inline-flex items-center font-bold"
+        style={{ gap: 6, minHeight: 36, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--do-nen)', color: 'var(--do)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+      >
+        <ThumbsDown size={15} /> Không đạt
+      </button>
+      {dangGhi && <span style={NHAN_NHO}>Đang ghi…</span>}
+    </span>
+  )
+}
+
 const O_NHAP: React.CSSProperties = {
   height: 48,
   borderRadius: 'var(--bo-1)',
@@ -214,9 +265,15 @@ export default function GoiLenBangScreen() {
   const [daCopy, setDaCopy] = useState(false)
   const [xemCau, setXemCau] = useState('')
   const [dangCham, setDangCham] = useState('')
+  /** Kết quả thầy đã bấm trên BẢNG BUỔI CHỮA (Engine E), theo `sbd|qid`. Máy chủ nhận rồi thì
+   * khoá nút: bấm lại là ghi đôi vào sổ lên bảng, mà sổ chỉ thêm, không sửa. */
+  const [ketQuaBuoi, setKetQuaBuoi] = useState<Record<string, 'dat' | 'khong_dat'>>({})
   /** Hồ sơ lớp đang giữ là của (danh sách em × danh sách câu) nào. Đổi em có mặt hay đổi
    * bài chữa thì phải xin lại: hồ sơ nắm kiến thức chỉ có đúng những câu ĐÃ XIN. */
   const khoaHoSoDaNap = useRef('')
+  /** Các dòng buổi chữa ĐANG chờ máy chủ. `dangCham` chỉ nhớ MỘT dòng — bấm dòng khác trong lúc chờ là
+   * dòng trước mở khoá lại, bấm tiếp là ghi đôi. */
+  const dangGhiBuoi = useRef(new Set<string>())
 
   useEffect(() => {
     void (async () => {
@@ -918,13 +975,28 @@ export default function GoiLenBangScreen() {
     }
   }
 
-  /** CHẤM CÂU TRÊN BẢNG: ghi đạt/không đạt vào log mạnh–yếu của em rồi bỏ dòng
-   * khỏi bảng. Ghi hỏng thì GIỮ dòng lại — mất dòng mà máy chủ chưa có gì là
-   * thầy tưởng đã ghi rồi. */
+  /** CHẤM CÂU TRÊN BẢNG PHÂN CÔNG (Engine C): ghi đạt/không đạt vào log mạnh–yếu rồi bỏ dòng
+   * khỏi bảng (`boDong`). Ghi hỏng thì GIỮ dòng lại — mất dòng mà máy chủ chưa có gì là thầy
+   * tưởng đã ghi rồi. Việc ghi nằm ở `ghiKetQua`, dùng chung với bảng buổi chữa. */
   const cham = async (p: DongPhanCong, dat: boolean) => {
-    if (!cauHinh) return showToast('Chưa cấu hình máy chủ', 'error')
+    if (await ghiKetQua(p, dat)) boDong(p)
+  }
+
+  /** GHI MỘT KẾT QUẢ LÊN BẢNG — MỘT đường duy nhất cho cả hai bảng: `cham` (Engine C, bảng
+   * "Phân công") và `chamBuoi` (Engine E, bảng buổi chữa/tờ máy chiếu). Cùng một lệnh
+   * `ghiLenBang`, máy chủ ghi `len_bang` + sổ `nguon='len_bang'`, cùng thông báo, cùng cập nhật
+   * lịch sử tại chỗ. Trả `true` chỉ khi máy chủ đã nhận: ghi hỏng thì bên gọi GIỮ dòng lại — mất
+   * dòng mà máy chủ chưa có gì là thầy tưởng đã ghi rồi. */
+  const ghiKetQua = async (p: { sbd: string; hoTen: string; cau: CauChua }, dat: boolean): Promise<boolean> => {
+    if (!cauHinh) {
+      showToast('Chưa cấu hình máy chủ', 'error')
+      return false
+    }
     const cd = p.cau.chuyenDe
-    if (!cd) return showToast('Câu này không có chuyên đề — chưa ghi được vào log mạnh–yếu', 'warn')
+    if (!cd) {
+      showToast('Câu này không có chuyên đề — chưa ghi được vào log mạnh–yếu', 'warn')
+      return false
+    }
     setDangCham(p.sbd + p.cau.id)
     try {
       await ghiLenBang(cauHinh.url, cauHinh.mat, { sbd: p.sbd, chuyenDe: cd, dat, qid: p.cau.id })
@@ -946,12 +1018,36 @@ export default function GoiLenBangScreen() {
             }
           : cu,
       )
-      setKq((cu) => (cu ? { ...cu, phanCong: cu.phanCong.filter((x) => !(x.sbd === p.sbd && x.cau.id === p.cau.id)) } : cu))
-      if (xemCau === p.sbd + p.cau.id) setXemCau('')
+      // …và vào hồ sơ lớp của buổi chữa: xếp lại buổi thì em vừa lên bảng đã tính một lượt, không bị gọi lại như chưa từng lên.
+      setHoSoLop((cu) =>
+        cu.map((e) =>
+          e.sbd === p.sbd
+            ? { ...e, lenBang: { soLan: e.lenBang.soLan + 1, lanCuoi: new Date().toISOString(), qids: [...new Set([...e.lenBang.qids, p.cau.id])] } }
+            : e,
+        ),
+      )
+      return true
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không ghi được kết quả', 'error')
+      return false
     } finally {
       setDangCham('')
+    }
+  }
+
+  /** CHẤM CÂU TRÊN BẢNG BUỔI CHỮA (Engine E) — cùng `ghiKetQua` với `cham`. Dòng KHÔNG bị bỏ khỏi
+   * bảng (bảng này cũng là nguồn của tờ máy chiếu đang chiếu): chỉ đổi nút thành kết quả đã ghi. */
+  const chamBuoi = async (d: DongChua, dat: boolean) => {
+    if (!d.em) return
+    const khoa = `${d.em.sbd}|${d.cau.id}`
+    if (ketQuaBuoi[khoa] || (daGoiCau[d.em.sbd] ?? []).includes(d.cau.id) || dangGhiBuoi.current.has(khoa)) return
+    dangGhiBuoi.current.add(khoa)
+    try {
+      if (await ghiKetQua({ sbd: d.em.sbd, hoTen: d.em.hoTen, cau: d.cau }, dat)) {
+        setKetQuaBuoi((cu) => ({ ...cu, [khoa]: dat ? 'dat' : 'khong_dat' }))
+      }
+    } finally {
+      dangGhiBuoi.current.delete(khoa)
     }
   }
 
@@ -1558,7 +1654,7 @@ export default function GoiLenBangScreen() {
                 {kqBuoi.dong
                   .filter((d) => d.tang === 'len_bang')
                   .map((d, i) => (
-                    <div key={d.cau.id} className="flex items-center" style={{ gap: 'var(--k2)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}>
+                    <div key={d.cau.id} className="flex items-center flex-wrap" style={{ gap: 'var(--k2)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }} data-dong-buoi={d.em ? `${d.em.sbd}|${d.cau.id}` : undefined}>
                       <span style={{ ...SO, color: 'var(--nhat)', minWidth: 22 }}>{i + 1}.</span>
                       <span className="font-bold">{d.em?.hoTen || d.em?.sbd}</span>
                       <span style={{ ...NHAN_NHO, ...SO }}>{chuCau(d.cau)}</span>
@@ -1573,6 +1669,17 @@ export default function GoiLenBangScreen() {
                       )}
                       <span style={{ ...NHAN_NHO, ...SO, marginLeft: 'auto' }}>{Math.round(d.giay / 60)}′</span>
                       <span className="truncate" style={{ ...NHAN_NHO, flex: '0 1 auto' }}>{d.viSao}</span>
+                      {/* ĐẠT / KHÔNG ĐẠT ngay trên bảng thầy đang cầm — ghi ĐÚNG lệnh `ghiLenBang`
+                          của bảng Phân công (máy chủ ghi `len_bang` + sổ `nguon='len_bang'`). */}
+                      {d.em && (
+                        <NutChamBuoi
+                          tenEm={d.em.hoTen || d.em.sbd}
+                          ketQua={ketQuaBuoi[`${d.em.sbd}|${d.cau.id}`]}
+                          daGhi={(daGoiCau[d.em.sbd] ?? []).includes(d.cau.id)}
+                          dangGhi={dangCham === d.em.sbd + d.cau.id}
+                          onChon={(dat) => void chamBuoi(d, dat)}
+                        />
+                      )}
                     </div>
                   ))}
               </div>

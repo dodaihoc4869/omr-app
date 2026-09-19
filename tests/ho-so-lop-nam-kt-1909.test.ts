@@ -308,6 +308,34 @@ describe('CHẶN CỨNG: em bậc "biết" ở dạng ấy không nhận câu 2 
     expect(kq.datSan).toBe(true)
   })
 
+  it('trượt sàn VÌ BỊ CHẶN ⇒ `thieu.viSao` nói đúng lý do (không đổ cho giờ), không bịa em, không lặng lẽ tụt sàn', () => {
+    // 25 em, chỉ có câu 2 sao, 24 em còn ở bậc biết ⇒ chỉ 1 em nhận được. Nới giờ cũng vô ích.
+    const ds = Array.from({ length: 6 }, (_, i) => vaoXep(i + 1, 2))
+    const lop = Array.from({ length: 25 }, (_, i) => {
+      const nkAll = new Map<string, NamKtCauEm>()
+      if (i > 0) for (const c of ds) nkAll.set(c.cau.id, nk({ bac: 'biet' }))
+      return emTrang(i + 1, { namKt: nkAll })
+    })
+    const kq = xepBuoiChua(ds, lop)
+    expect(kq.datSan).toBe(false)
+    expect(kq.soEmLenBang).toBe(1) // đúng em duy nhất không bị chặn — không bịa thêm
+    expect(kq.thieu?.soEmConThieu).toBe(CAU_HINH_LEN_BANG_MAC_DINH.SO_EM_LEN_BANG_TOI_THIEU - 1)
+    expect(kq.thieu?.viSao).toMatch(/bậc "biết"/)
+    expect(kq.thieu?.viSao).not.toMatch(/ngân sách/)
+    expect(kq.canhBao.join(' ')).toMatch(/Mới xếp được 1\/20.*bậc "biết"/)
+    // Không em bị chặn nào lên bảng ở câu 2 sao.
+    for (const d of kq.dong) if (d.tang === 'len_bang') expect(lyDoChanCau(d.em!, d.cau)).toBeNull()
+  })
+
+  it('trượt sàn vì HẾT GIỜ (không ai bị chặn) vẫn nói "ngân sách" — lý do thật không bị nuốt', () => {
+    const ds = Array.from({ length: 30 }, (_, i) => vaoXep(i + 1, 2))
+    const lop = Array.from({ length: 30 }, (_, i) => emTrang(i + 1))
+    const cfg = { ...CAU_HINH_LEN_BANG_MAC_DINH, NGAN_SACH_PHUT: 30 }
+    const kq = xepBuoiChua(ds, lop, { cauHinh: cfg })
+    expect(kq.datSan).toBe(false)
+    expect(kq.thieu?.viSao).toMatch(/ngân sách/)
+  })
+
   it('bị chặn ở câu 2 sao, em vẫn lên bảng ở câu 1 sao / 0 sao (em nào cũng có cơ hội)', () => {
     const ds = [vaoXep(1, 2), vaoXep(2, 1), vaoXep(3, 0)]
     const lop = [1, 2, 3].map((i) => emTrang(i, { namKt: new Map(ds.map((c) => [c.cau.id, nk({ bac: 'biet' })] as const)) }))
