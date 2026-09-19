@@ -237,6 +237,10 @@ export interface BienBanDeRieng {
   cauGocTheoEm?: Record<string, string[]>
   /** sbd → danh sách câu song sinh cùng dạng đổi số. */
   songSinhTheoEm?: Record<string, string[]>
+  /** GHI CHÚ LÚC RÚT (19/09): `tin` in màu thường ("N em chưa vào phòng chờ đã được
+   * chuẩn bị đề sẵn"), `canh_bao` in màu cam — tin thầy cần hành động ("kho mỏng…").
+   * Biên bản cũ không có trường này thì không in gì. */
+  ghiChu?: { loai: 'tin' | 'canh_bao'; loi: string }[]
   lucRut: string
 }
 

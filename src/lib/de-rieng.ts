@@ -17,7 +17,7 @@
 import { hashSeed, seededPermutation } from './exam-shuffle'
 import { PHAN_DE, locTheoYeuCau, type CauUngVien, type PhanDe, type YeuCauRut } from './rut-de'
 import { CAU_HINH_DE_RIENG_MAC_DINH, SO_CA_BOC_NGAU_NHIEN as SO_CA_HOI_LAI, soCauLapCan, type CauHinhDeRieng } from './cau-hinh-de-rieng'
-import { sinhBoMotO, type CamTheoEm } from './de-rieng-tran-trung'
+import { noiTapCam, sinhBoMotO, type CamTheoEm } from './de-rieng-tran-trung'
 import { CAU_HINH_TRAN_TRUNG_MAC_DINH } from './de-rieng-cau-hinh'
 
 /** Một ca đã chấm, rút gọn còn đúng phần thuật toán cần. Ca gần nhất đứng
@@ -679,6 +679,208 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
     noiCam,
     daKhacPhucTheoEm,
   }
+}
+
+// ---------------------------------------------------------------------------
+// LƯỢT HAI — EM CÙNG LỚP CHƯA VÀO PHÒNG CHỜ LÚC THẦY BẤM BẮT ĐẦU (19/09)
+// ---------------------------------------------------------------------------
+
+export interface YeuCauLuotHai {
+  /** ĐÚNG yêu cầu đã đưa vào `dungDeRieng` ở lượt một. Kho phần câu MỚI của em
+   * vắng là kho này — không phải `uvThem` — để "câu ít dùng nhất" đo trên cùng
+   * một kho với bộ đếm của lượt một. */
+  y: YeuCauDeRieng
+  /** Kết quả lượt một, ĐÃ CHỐT. Hàm này chỉ ĐỌC nó: bộ đề của em có mặt không
+   * đổi một qid, em vắng không chiếm suất chia vòng tròn của ai. */
+  luotMot: KetQuaDeRieng
+  /** Em cùng lớp chưa vào phòng chờ. Thứ tự là một phần đầu vào (chỗ gọi sắp theo SBD). */
+  dsSbdVang: string[]
+  /** Hồ sơ ôn của em vắng. `undefined` = lượt `hoSoOnCa` của em vắng hỏng ⇒ em
+   * vắng rút theo LUẬT CŨ (không hồ sơ) — không liên quan gì tới em có mặt. */
+  hoSoVang?: Record<string, HoSoOnEm>
+  /** Kho MỞ RỘNG = kho lượt một + câu em vắng từng sai vừa nối thêm. Chỉ dùng để
+   * TRA câu khắc phục và tìm câu song sinh. Thiếu thì dùng kho lượt một. */
+  uvThem?: Record<PhanDe, CauUngVien[]>
+  /** qid → mã dạng trên kho mở rộng. Thiếu thì dùng `y.maDangCua`. */
+  maDangCuaThem?: Record<string, string>
+}
+
+export interface KetQuaLuotHai {
+  boTheoEm: Record<string, string[]>
+  lapTheoEm: Record<string, string[]>
+  cauGocTheoEm: Record<string, string[]>
+  songSinhTheoEm: Record<string, string[]>
+  soLapCua: Record<string, number>
+  canCua: Record<string, number>
+  daKhacPhucTheoEm: Record<string, string[]>
+  thieuCau: { sbd: string; thieu: number }[]
+  noiCam: { sbd: string; soNoi: number }[]
+  canDayLai: { qid: string; dsSbd: string[] }[]
+  /** Đỉnh trùng (theo TỪNG PHẦN, cùng thước đo với lượt một) giữa một em vắng và
+   * bất kỳ em nào khác. Để chỗ gọi và test thấy lượt hai có đẩy trùng lên không. */
+  dinhTrung: number
+}
+
+/** DỰNG ĐỀ RIÊNG CHO EM VẮNG, SAU KHI MỌI EM CÓ MẶT ĐÃ CHỐT.
+ *
+ * VÌ SAO KHÔNG GỘP VÀO LƯỢT MỘT (như bản 17/09 đã làm): chia vòng tròn coi mọi
+ * em như nhau, nên 15 em vắng ăn mất 15 suất của kho mỏng — đỉnh trùng của 25 em
+ * đang ngồi thi cao lên vì những em có thể không bao giờ tới. Mà bỏ hẳn em vắng
+ * (bản 19/09 sáng) thì em vào muộn vài phút rơi về bốc theo hash: mất câu hỏi
+ * lại, mất cá nhân hoá — chuyện thường ngày ở lớp thật.
+ *
+ * Nên: lượt một KHÔNG BIẾT tới em vắng. Lượt hai đi sau, nhận bộ đếm của lượt
+ * một, và với từng em vắng lần lượt:
+ *   · PHA A y như em có mặt (`chonCauLapChoEm`, có hồ sơ thì theo hồ sơ; bộ đếm
+ *     song sinh nối tiếp từ lượt một);
+ *   · PHA B THAM LAM: mỗi lần lấy câu làm ĐỈNH trùng của em này với mọi em khác
+ *     thấp nhất; hoà thì câu ÍT EM DÙNG NHẤT; hoà nữa thì theo một hoán vị có hạt
+ *     giống, xoay theo SBD. Không đổi chỗ với ai — đề em có mặt là bất khả xâm phạm.
+ *
+ * Tất định: không `Math.random`, không đọc đồng hồ. */
+export function dungDeRiengLuotHai(h: YeuCauLuotHai): KetQuaLuotHai {
+  const y = h.y
+  const ch = y.ch ?? CAU_HINH_DE_RIENG_MAC_DINH
+  const tongCau = tongCauCua(y.yc)
+  const demSai = demLanSai(y.dsCa)
+  const uvTra = h.uvThem ?? y.uv
+  const cauCua = new Map<string, CauUngVien>()
+  for (const p of PHAN_DE) for (const c of uvTra[p]) cauCua.set(c.id, c)
+  const nguonMaDang = h.maDangCuaThem ?? y.maDangCua
+  const maDangCua = h.hoSoVang && nguonMaDang ? new Map(Object.entries(nguonMaDang)) : undefined
+
+  // Bộ đếm song sinh NỐI TIẾP lượt một: em vắng nhận câu song sinh ít em có mặt nhận nhất.
+  const demSongSinh = new Map<string, number>()
+  for (const ds of Object.values(h.luotMot.songSinhTheoEm)) for (const q of ds) demSongSinh.set(q, (demSongSinh.get(q) ?? 0) + 1)
+
+  const ra: KetQuaLuotHai = { boTheoEm: {}, lapTheoEm: {}, cauGocTheoEm: {}, songSinhTheoEm: {}, soLapCua: {}, canCua: {}, daKhacPhucTheoEm: {}, thieuCau: [], noiCam: [], canDayLai: [], dinhTrung: 0 }
+  const coMat = new Set(y.dsSbd)
+  const dsVang = [...new Set(h.dsSbdVang)].filter((sbd) => sbd && !coMat.has(sbd))
+  if (dsVang.length === 0) return ra
+
+  // Kho phần câu mới của TỪNG PHẦN — đúng phép chọn của lượt một.
+  const poolCua = {} as Record<PhanDe, string[]>
+  for (const p of PHAN_DE) {
+    const canP = Math.max(0, Math.floor(Number(y.yc.soCau[p]) || 0))
+    const hop = locTheoYeuCau(y.uv[p], y.yc)
+    poolCua[p] = (hop.length >= canP ? hop : y.uv[p]).map((c) => c.id)
+  }
+
+  // AI ĐANG GIỮ CÂU NÀO — bộ đếm tần suất của lượt một, tách theo phần. Chỉ số
+  // người giữ: em có mặt trước, em vắng đã dựng xong nối theo sau.
+  const nguoiGiu = {} as Record<PhanDe, Map<string, number[]>>
+  for (const p of PHAN_DE) nguoiGiu[p] = new Map()
+  const ghiGiu = (q: string, nguoi: number) => {
+    const p = cauCua.get(q)?.phan
+    if (!p) return
+    const ds = nguoiGiu[p].get(q)
+    if (ds) ds.push(nguoi)
+    else nguoiGiu[p].set(q, [nguoi])
+  }
+  y.dsSbd.forEach((sbd, i) => {
+    for (const q of h.luotMot.boTheoEm[sbd] ?? []) ghiGiu(q, i)
+  })
+
+  const dayLai = new Map<string, string[]>()
+  dsVang.forEach((sbd, thuTu) => {
+    const nguoi = y.dsSbd.length + thuTu
+    const daLamSet = new Set<string>()
+    for (const ca of y.dsCa) for (const q of ca.daLamCua[sbd] ?? []) daLamSet.add(q)
+    const tuyChonLap: TuyChonHoSoLap | undefined = h.hoSoVang
+      ? { hoSo: h.hoSoVang[sbd], ngayCa: y.ngayCa, maDangCua, seed: y.yc.seed, demSongSinh }
+      : undefined
+    const lap = chonCauLapChoEm(sbd, y.dsCa, tongCau, demSai, ch, cauCua, daLamSet, tuyChonLap)
+    ra.canCua[sbd] = lap.can
+    if (lap.daKhacPhuc && lap.daKhacPhuc.length > 0) ra.daKhacPhucTheoEm[sbd] = lap.daKhacPhuc
+    for (const q of lap.canDayLai) dayLai.set(q, [...(dayLai.get(q) ?? []), sbd])
+
+    const batBuoc: Partial<Record<PhanDe, string[]>> = {}
+    for (const q of lap.qids) {
+      const c = cauCua.get(q)
+      if (c) (batBuoc[c.phan] ??= []).push(q)
+    }
+
+    const qids: string[] = []
+    let thieu = 0
+    let soNoi = 0
+    for (const p of PHAN_DE) {
+      const canP = Math.max(0, Math.floor(Number(y.yc.soCau[p]) || 0))
+      if (canP <= 0) continue
+      const ids = poolCua[p]
+      const bo = new Set((batBuoc[p] ?? []).slice(0, canP))
+      const trongPool = new Set(ids)
+      const lam = (h.hoSoVang?.[sbd]?.lam ?? []).filter((q) => trongPool.has(q) && !bo.has(q))
+      const noi = noiTapCam(ids, canP, 1, [bo], [lam])
+      const cam = noi.cam[0]!
+      soNoi += noi.soNoi[0]!
+      const can = Math.min(canP, ids.length)
+
+      // Số câu chung (trong PHẦN này) của em đang dựng với từng người khác.
+      const chung = new Map<number, number>()
+      let dinhEm = 0
+      const cong = (q: string) => {
+        for (const s of nguoiGiu[p].get(q) ?? []) {
+          const v = (chung.get(s) ?? 0) + 1
+          chung.set(s, v)
+          if (v > dinhEm) dinhEm = v
+        }
+      }
+      for (const q of bo) cong(q)
+
+      // Thứ tự phân xử cuối: MỘT hoán vị có hạt giống cho cả lượt hai, xoay theo em.
+      const N = ids.length
+      const perm = seededPermutation(N, hashSeed(`${y.yc.seed}:${p}:luot-hai`))
+      const xoay = N > 0 ? hashSeed(`${y.yc.seed}|${sbd}|${p}|luot-hai`) % N : 0
+      const ungVien: string[] = []
+      for (let b = 0; b < N; b++) {
+        const q = ids[perm[(b + xoay) % N]!]!
+        if (!bo.has(q) && !cam.has(q)) ungVien.push(q)
+      }
+      const daLay = new Set<number>()
+      while (bo.size < can && daLay.size < ungVien.length) {
+        let tot = -1
+        let totDinh = Infinity
+        let totDung = Infinity
+        for (let i = 0; i < ungVien.length; i++) {
+          if (daLay.has(i)) continue
+          const giu = nguoiGiu[p].get(ungVien[i]!) ?? []
+          let dinhSau = dinhEm
+          for (const s of giu) {
+            const v = (chung.get(s) ?? 0) + 1
+            if (v > dinhSau) dinhSau = v
+          }
+          if (dinhSau < totDinh || (dinhSau === totDinh && giu.length < totDung)) {
+            tot = i
+            totDinh = dinhSau
+            totDung = giu.length
+            if (dinhSau === dinhEm && giu.length === 0) break // không thể tốt hơn: câu chưa ai dùng
+          }
+        }
+        if (tot < 0) break
+        daLay.add(tot)
+        const q = ungVien[tot]!
+        cong(q)
+        bo.add(q)
+      }
+      if (dinhEm > ra.dinhTrung) ra.dinhTrung = dinhEm
+      for (const q of bo) {
+        qids.push(q)
+        ghiGiu(q, nguoi)
+      }
+      thieu += Math.max(0, canP - bo.size)
+    }
+
+    ra.boTheoEm[sbd] = qids
+    const trongDe = new Set(qids)
+    ra.lapTheoEm[sbd] = lap.qids.filter((q) => trongDe.has(q))
+    ra.cauGocTheoEm[sbd] = (lap.cauGoc ?? []).filter((q) => trongDe.has(q))
+    ra.songSinhTheoEm[sbd] = (lap.songSinh ?? []).filter((q) => trongDe.has(q))
+    ra.soLapCua[sbd] = ra.lapTheoEm[sbd]!.length
+    if (thieu > 0) ra.thieuCau.push({ sbd, thieu })
+    if (soNoi > 0) ra.noiCam.push({ sbd, soNoi })
+  })
+  ra.canDayLai = [...dayLai.entries()].map(([qid, dsSbd]) => ({ qid, dsSbd }))
+  return ra
 }
 
 /** VỊ TRÍ CÂU LẶP TRONG ĐỀ CỦA MỘT EM — dùng để tự kiểm "không dồn lên đầu".

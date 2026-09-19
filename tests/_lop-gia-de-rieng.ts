@@ -65,3 +65,28 @@ export function lopGia(c: number): YeuCauDeRieng {
 export function vanTay(boTheoEm: Record<string, string[]>): number {
   return hashSeed(JSON.stringify(boTheoEm))
 }
+
+// ---------------------------------------------------------------------------
+// THÊM 19/09 (lượt hai — em vào muộn). Hàm MỚI, không sửa gì ở trên.
+
+/** Lớp giả thứ `c` KÈM hồ sơ ôn + mã dạng ngẫu nhiên — đường MỚI (có lệnh `hoSoOnCa`).
+ * Dấu vân tay của 12 lớp này lấy bằng mã đã gộp vào main (5e99e08), TRƯỚC khi có
+ * lượt hai: khoá "em có mặt không đổi một qid". ĐỪNG sửa bộ sinh này. */
+export function lopGiaCoHoSo(c: number): YeuCauDeRieng {
+  const y = lopGia(c)
+  const r = bocSoGia(7000 + c * 104729)
+  const tat = [...y.uv.I, ...y.uv.II, ...y.uv.III]
+  const hoSo: NonNullable<YeuCauDeRieng['hoSo']> = {}
+  for (const sbd of y.dsSbd) {
+    if (r() < 0.15) continue // em chưa có dòng hồ sơ nào
+    const sai = y.dsCa.find((x) => (x.daLamCua[sbd] ?? []).length > 0)?.saiCua[sbd] ?? []
+    hoSo[sbd] = {
+      tuCa: 'ca0',
+      sai: sai.filter(() => r() < 0.5).map((qid) => ({ qid, lanSai: 1, mocOnKe: r() < 0.5 ? '2026-09-19' : '2026-09-28', maDang: r() < 0.5 ? `DANG.${Math.floor(r() * 4)}.X` : null, trangThai: 'moi_sai' as const })),
+      daKhacPhuc: sai.filter(() => r() < 0.2),
+      lam: tat.filter(() => r() < 0.2).map((x) => x.id),
+    }
+  }
+  const maDangCua = Object.fromEntries(tat.filter(() => r() < 0.7).map((x) => [x.id, `DANG.${Math.floor(r() * 4)}.X`]))
+  return { ...y, hoSo, ngayCa: '2026-09-21', maDangCua }
+}
