@@ -241,33 +241,35 @@ export default function BaoCaoCaThiPhuHuynhModal({
     ]
   }, [dsCauSai])
 
-  // Lời khuyên sư phạm của Thầy Đỗ Đại Học
+  // Lời khuyên của Thầy — CHỈ NÓI SỐ LIỆU CỦA CA NÀY, không kết luận năng lực con từ một điểm số (luật thầy chốt 18/09:
+  // "không coi số câu nộp là bằng chứng đã nắm chắc kiến thức"). Cấm các cụm "nắm chắc / nắm vững / thành thạo / bịt sạch / rất chắc chắn".
   const loiKhuyenSuPham = useMemo(() => {
+    const d = diem.toFixed(2)
     if (diem >= 9.0) {
       return {
-        tieuDe: 'Thành tích xuất sắc! Tiếp tục giữ vững phong độ đỉnh cao',
-        loiNhan: `Em ${hoTenCon} đã làm bài rất xuất sắc ở ca thi này. Khả năng tư duy hóa học và phản xạ giải toán rất chắc chắn. Phụ huynh hãy khen ngợi con, đồng thời khuyến khích con tiếp tục thử sức với các dạng bài vận dụng cao để duy trì mục tiêu thủ khoa/á khoa.`,
+        tieuDe: `Điểm ca này cao: ${d}/10`,
+        loiNhan: `Em ${hoTenCon} được ${d}/10 điểm ở ca thi này. Phụ huynh hãy ghi nhận cố gắng của con, đồng thời khuyến khích con thử sức thêm với các dạng bài vận dụng cao.`,
         viecCanLam: 'Luyện thêm các bài toán phân hóa khó của các đề thi thử trường chuyên để tối ưu tốc độ.',
       }
     }
     if (diem >= 8.0) {
       return {
-        tieuDe: 'Kết quả Giỏi! Nắm rất chắc nền tảng, cần bứt phá các câu khó',
-        loiNhan: `Em ${hoTenCon} đạt kết quả rất tốt. Phần lớn kiến thức cốt lõi và các câu thông hiểu con đều giải quyết nhẹ nhàng. Một vài câu sai nằm ở bẫy đề thi hoặc bài toán nhiều bước.`,
-        viecCanLam: 'Cho con làm lại các câu bị sai ở Phần II và III để khắc phục dứt điểm các bẫy lý thuyết.',
+        tieuDe: `Điểm ca này ${d}/10, còn một số câu cần chữa`,
+        loiNhan: `Em ${hoTenCon} được ${d}/10 điểm. Các câu còn sai nằm ở mục Câu sai cần chữa, mỗi câu có lời giải chi tiết để con xem lại.`,
+        viecCanLam: 'Cho con làm lại các câu bị sai ở Phần II và III rồi so lại với lời giải từng câu.',
       }
     }
     if (diem >= 6.5) {
       return {
-        tieuDe: 'Học lực Khá! Có tiềm năng lớn, cần củng cố phản xạ và cẩn thận hơn',
-        loiNhan: `Em ${hoTenCon} có nền tảng tư duy tốt nhưng tốc độ và độ chính xác chưa đều. Con còn bị mất điểm ở những câu lý thuyết dễ hoặc vội vàng khi tính toán.`,
-        viecCanLam: 'Bấm ngay nút "Tạo bài luyện khắc phục lỗi sai" để con làm lại đúng các dạng câu vừa mất điểm.',
+        tieuDe: `Điểm ca này ${d}/10`,
+        loiNhan: `Em ${hoTenCon} được ${d}/10 điểm. Các câu mất điểm được liệt kê ở mục Câu sai cần chữa; con làm lại đúng các dạng câu đó sẽ thấy rõ mình sai ở bước nào.`,
+        viecCanLam: 'Bấm nút "Tạo bài luyện khắc phục cho con" để con làm lại đúng các dạng câu vừa mất điểm.',
       }
     }
     return {
-      tieuDe: 'Cần nỗ lực củng cố kiến thức gốc ngay từ hôm nay',
-      loiNhan: `Ca thi này con gặp khó khăn ở nhiều dạng câu hỏi cơ bản. Phụ huynh đừng tạo áp lực mà hãy cùng Thầy đồng hành, nhắc nhở con xem lại lời giải chi tiết và làm đều đặn bài tập mỗi tối.`,
-      viecCanLam: 'Tạo bài tập 10-15 câu mỗi ngày từ các câu con sai để lấp lỗ hổng kiến thức từng bước một.',
+      tieuDe: `Điểm ca này ${d}/10, còn nhiều câu cần chữa`,
+      loiNhan: `Ca thi này con được ${d}/10 điểm. Phụ huynh đừng tạo áp lực mà hãy cùng Thầy đồng hành: xem lại lời giải chi tiết của từng câu sai và làm đều đặn bài tập mỗi tối.`,
+      viecCanLam: 'Tạo bài tập 10-15 câu mỗi ngày từ các câu con sai để con làm lại từng bước một.',
     }
   }, [diem, hoTenCon])
 
