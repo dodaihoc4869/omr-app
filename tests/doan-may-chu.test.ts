@@ -15,13 +15,15 @@ beforeEach(() => { bayGio = T0; vi.useFakeTimers({ toFake: ['Date'] }); vi.setSy
 afterEach(() => vi.useRealTimers())
 
 const BI_MAT = 'LOI-GIAI-BI-MAT'
-type CauKho = { qid: string; phan: 'I' | 'II'; dang: string; correct: string; mucDo: string }
+type CauKho = { qid: string; phan: 'I' | 'II'; dang: string; correct: string; mucDo: string; kt?: string[] }
 const KHO: CauKho[] = [
   ...Array.from({ length: 9 }, (_, i): CauKho => ({ qid: `X${i + 1}`, phan: 'I', dang: 'ES.A.X', correct: 'ABCD'[i % 4]!, mucDo: 'biet' })),
   ...Array.from({ length: 9 }, (_, i): CauKho => ({ qid: `Y${i + 1}`, phan: 'I', dang: 'AN.B.Y', correct: 'DCBA'[i % 4]!, mucDo: 'biet' })),
   // Phần II bậc vận dụng: không bao giờ vào suất câu cá nhân của em đang ở bậc "biết" → luôn còn cho câu chung của trùm.
   { qid: 'TX1', phan: 'II', dang: 'ES.A.X', correct: 'DSDS', mucDo: 'van_dung' }, { qid: 'TX2', phan: 'II', dang: 'ES.A.X', correct: 'SSDD', mucDo: 'van_dung' },
   { qid: 'TY1', phan: 'II', dang: 'AN.B.Y', correct: 'DDSS', mucDo: 'van_dung' },
+  // Cùng dạng Ester nhưng cần kiến thức nền K-LA mà CHƯA bạn nào có bằng chứng → không bao giờ được thành câu chung (không đoán phạm vi từ tên dạng).
+  { qid: 'TX-LA', phan: 'II', dang: 'ES.A.X', correct: 'DDDD', mucDo: 'biet', kt: ['K1', 'K-LA'] },
 ]
 const dapAn = new Map(KHO.map(c => [c.qid, c.correct]))
 const saiCua = (qid: string) => (dapAn.get(qid) === 'A' ? 'B' : 'A')
@@ -32,7 +34,7 @@ function dungTruong(hs: [string, string, string][] = [['S1', 'Nguyễn Thu Hà',
   d.sql.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
   for (const c of KHO) {
     const q = { qid: c.qid, maDe: 'DE1', version: 'v1', group: `g-${c.qid}`, phan: c.phan, text: `Đề ${c.qid}`, choices: c.phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: c.phan === 'II' ? ['ý a', 'ý b', 'ý c', 'ý d'] : [],
-      hinhAnh: [{ src: `${BI_MAT}-anh`, viTri: 'sau_loi_giai' }], dang: c.dang, tenDang: c.dang === 'ES.A.X' ? 'Ester' : 'Ancol', mucDo: c.mucDo, sao: 1, kienThuc: ['K1'], correct: c.correct, solution: `${BI_MAT}-${c.qid}`, reviewed: true }
+      hinhAnh: [{ src: `${BI_MAT}-anh`, viTri: 'sau_loi_giai' }], dang: c.dang, tenDang: c.dang === 'ES.A.X' ? 'Ester' : 'Ancol', mucDo: c.mucDo, sao: 1, kienThuc: c.kt ?? ['K1'], correct: c.correct, solution: `${BI_MAT}-${c.qid}`, reviewed: true }
     d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE1', q.qid, 'v1', q.group, q.dang, JSON.stringify(q))
   }
   for (const [sbd, ten, lop] of hs) {
@@ -190,6 +192,7 @@ describe('Đoàn Hộ Tống · máy chủ · hai tài khoản cùng chặng', (
     expect(s2.doan.tran.hiep).toBe(2); expect(s2.doan.hiepVuaXong.cuaEm.satThuong).toBe(24)
     expect(s2.doan.hiepVuaXong.ban).toEqual([{ ghe: 0, ra: 'chan', tenChieu: '', satThuong: 0, haGuc: 0, lienKich: false }]) // bạn sai → tự chắn; trông y hệt bạn đúng-rồi-chắn
     expect(s2.doan.hiepVuaXong).toMatchObject({ quaiConLai: 1, tongChan: 8, linhTamMat: 0, linhTamSau: 80 })
+    expect(Object.keys(s2.doan.hiepVuaXong)).not.toContain('ghe'); expect(JSON.stringify(s2.doan.hiepVuaXong.ban)).not.toMatch(/"dung"|"tuLam"|"heSo"|"hanhDong"/) // kết quả thô từng ghế không bao giờ xuống máy
     // hiệp 2: đổi vai — em cấp 1 đúng cũng gây đúng 24
     troi(NGHI_GIUA_HIEP_MS); await lamHiep(d, 'S2', ma, false); const r = await lamHiep(d, 'S1', ma, true)
     expect(r.doan.hiepVuaXong.cuaEm.satThuong).toBe(24)
@@ -287,6 +290,7 @@ describe('Đoàn Hộ Tống · máy chủ · trùm câu chung', () => {
     d.sql.prepare("INSERT INTO game_v2_scope(sbd,json,updated_at) VALUES('S2',?,'x')").run(JSON.stringify({ enabled: true, types: [], blocked: ['TX2', 'TY1'] }))
     const ma = (await goi(d, 'S1', 'mo', { cheDo: 'phong' })).doan.ma as string
     await goi(d, 'S2', 'vao', { ma }); await goi(d, 'S1', 'bat-dau', { ma }); troi(DEM_NGUOC_MS)
+    // TX1 đang bảo vệ, TX2 + TY1 thầy chặn riêng S2, TX-LA đòi kiến thức nền chưa ai có → không còn câu chung hợp lệ
     expect(JSON.parse((d.sql.prepare('SELECT json FROM doan_chang WHERE ma=?').get(ma) as any).json).trum).toEqual({ 4: null, 8: null })
     for (let h = 1; h <= 3; h++) { await lamHiep(d, 'S1', ma); await lamHiep(d, 'S2', ma, h === 1); troi(NGHI_GIUA_HIEP_MS) }
     // Phong độ: S1 tự làm đúng 3/3 → 2 ý của S1 đúng; S2 đúng 1/3 → 2 ý của S2 sai → 2/4, không vỡ giáp. Không ai phải bấm gì.
