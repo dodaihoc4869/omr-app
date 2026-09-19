@@ -1,3 +1,55 @@
+# SỔ VIỆC — 19/09 · KHO MỎNG RÚT LẶP THÔNG MINH + DÃN LỊCH BTVN THEO DEADLINE
+
+## Yêu cầu nhận trong phiên này (nguyên văn)
+
+- [ ] "Bạn quét toàn bộ ổ đĩa ngoài đăng nhập mọi thứ, sửa và tự động đẩy lên máy chủ cho tôi"  | bằng chứng: (xem KẸT bên dưới — không có nghĩa hành động nào thực hiện được trong sandbox này)
+- [ ] File đính kèm "nhiệm vụ cần sửa — cập nhật 19/09/2026" (5 mục, chép nguyên văn từng mục bên dưới)
+
+## SỰ CỐ TỰ GÂY RA — phải khai ngay đầu, không giấu
+
+Bước đầu phiên tôi dùng `Write` ghi đè thẳng `SO-VIEC.md` mà KHÔNG gọi `Read`
+trước — xoá mất 693 dòng lịch sử (lượt 10 → lượt 15/09, nhiều tính năng: BTVN
+lên bảng, service worker vá lỗi truy cập, v.v.). Phát hiện qua `git diff
+--stat` ngay sau đó (24 insertions, 684 deletions). Đã khôi phục nguyên vẹn
+bằng `git show HEAD:SO-VIEC.md`, dán lại y hệt, rồi chèn mục này vào ĐẦU file
+theo đúng quy ước "lượt mới nhất nằm trên". Không có dữ liệu nào mất vĩnh viễn
+vì bản cũ vẫn nằm trong lịch sử git (đã cam kết ở lượt trước) — chỉ là tôi
+suýt làm mất bản trên đĩa. Từ giờ dùng `Edit`/prepend qua lệnh, không `Write`
+đè cả file này nữa.
+
+### Mục 1 — Phát hành bản vá "rút đề lẫn chương"
+**Nguyên văn cần:** dán lại output `npx wrangler pages deploy dist --project-name=omr-app --branch=main` để kiểm chứng độc lập và đóng mục.
+- [!] KẸT: sandbox phiên này KHÔNG có tài khoản Cloudflare (`wrangler whoami` → "not authenticated"), không có `CF_API_TOKEN`. Không tự chạy lệnh deploy Pages được — việc này chỉ thầy chạy được trên máy đã đăng nhập Cloudflare.
+- [x] Đối chiếu git: nhánh làm việc TRÙNG 100% với `origin/main` (`git log origin/main..HEAD` rỗng) — code bản vá (2a22f73, d0a4772, 020f2a8) đã nằm trong main. Phần Worker coi như xong; chỉ còn thao tác build+deploy Pages ngoài tầm với của phiên.
+
+### Mục 2 — Rút đề riêng: kho không đủ thì rút lặp thông minh, không cặp học sinh nào trùng quá 2 câu
+**Nguyên văn:** "phải sửa triệt để cho tôi rút đề riêng, thay đổi thành nếu kho không đủ thì rút lặp lại tính toán rút lặp lại thông minh để học sinh không bị trùng quá 2 câu."
+- [x] PHÁT HIỆN QUAN TRỌNG: thuật toán "chặn trần trùng" (peak-overlap capping) ĐÃ ĐƯỢC XÂY, có test đầy đủ — `src/lib/de-rieng-tran-trung.ts` (`chiaVongTron` pha 1 chia vòng tròn công bằng tần suất + `haDinh` pha 2 đổi chỗ hạ đỉnh trùng), `src/lib/de-rieng-blueprint.ts` (`sinhBoTheoEm` — phân tầng chuyên đề×mức độ, tự hạ mức phân tầng khi kho mỏng), đặc tả `DE-RIENG-CHAN-TRAN-TRUNG.md` (chưa tìm thấy file này trên đĩa — có thể đã mất cùng đợt hoặc chưa từng được ghi riêng, chỉ tồn tại trong SO-VIEC.md cũ). Test `tests/de-rieng-tran-trung.test.ts` + `tests/de-rieng-blueprint.test.ts` + `tests/noi-chan-tran-trung-vao-ca.test.ts` đã có sẵn.
+- [x] TRA RÕ: `sinhBoTheoEm` (`ExamMonitorScreen.tsx:799`, lúc bấm "Bắt đầu") chỉ phủ đường "Ca thi" — dựng đề CHUNG cả lớp lúc vào phòng. Đường thầy đang phàn nàn là đường KHÁC: "Đề riêng từng em — Nâng đỡ tiến bộ" (`deRieng` bật ở `KhoiRutDe.tsx`) → `dungDeRiengChoCa` (de-rieng-nguon.ts) → `dungDeRieng` (de-rieng.ts) → TRƯỚC ĐÂY gọi `rutDeCoBatBuoc` RIÊNG TỪNG EM (seed `${ca}:${idxEm}:{sbd}`) cho phần "câu mới" — đúng nguyên nhân sinh ra cảnh hai em trùng gần hết đề khi kho đúng chuyên đề mỏng, y hệt mô tả file nhiệm vụ. | bằng chứng: đọc trực tiếp `de-rieng.ts:309-404` (bản cũ) + `de-rieng-nguon.ts:373-516`.
+- [x] SỬA: `dungDeRieng` (de-rieng.ts) viết lại thành hai pha — Pha A giữ NGUYÊN `chonCauLapChoEm` (câu khắc phục cá nhân, không đổi một dòng); Pha B dựng "câu mới" CHUNG CHO CẢ LỚP mỗi phần một lượt bằng `sinhBoMotO` (tái dùng nguyên bộ máy `chiaVongTron`/`haDinh` đã có sẵn + test riêng ở `de-rieng-tran-trung.ts`, KHÔNG viết thuật toán mới). Câu khắc phục của từng em được truyền vào làm `boSan` (tính vào đúng chỉ tiêu) VÀ `khoa` (pha đổi chỗ hạ trùng không bao giờ được rút mất) — mở rộng `chiaVongTron`/`haDinh`/`sinhBoMotO` thêm tham số tuỳ chọn, không phá chữ ký cũ (test `de-rieng-tran-trung.test.ts` + `de-rieng-blueprint.test.ts` vẫn xanh nguyên, không sửa). | bằng chứng: `git diff src/lib/de-rieng-tran-trung.ts src/lib/de-rieng.ts`
+- [x] TEST MỚI tái hiện đúng kịch bản kho mỏng: `tests/kho-mong-rut-lap-thong-minh-1909.test.ts` — kho 200 câu · 30 em · 18 câu/em (đúng tổ hợp đã đo đỉnh ≤2 ở `de-rieng-tran-trung.test.ts`), đối chứng với đường CŨ (bốc độc lập qua `rutDeCoBatBuoc`) cho đỉnh cao hơn hẳn (>2) trong khi đường MỚI ≤2; kèm ca biên "câu khắc phục không bị đổi mất dù đang hạ trùng" và "kho siêu mỏng phải báo đúng số thiếu, không im lặng". | bằng chứng: `npx vitest run tests/kho-mong-rut-lap-thong-minh-1909.test.ts` → 7/7 PASS
+- [x] `npx tsc -b --noEmit` sạch, không lỗi kiểu.
+- [x] Bộ test liên quan trực tiếp de-rieng* (11 file, 188 test): 186 passed, 2 fail — ĐÚNG BẰNG baseline đo lại TRƯỚC KHI sửa (2 lỗi có sẵn: `de-rieng-luc-bat-dau.test.ts`, `danh-dau-cau-hoi-lai.test.ts` — không liên quan tới thay đổi này, không tạo fail mới).
+- [x] Toàn bộ bộ test (347 file — 346 gốc + 1 file mới của lượt này): `45 failed | 301 passed | 1 skipped (347)` file, `98 failed | 4495 passed | 11 skipped (4604)` test. KHỚP CHÍNH XÁC con số nền `45 file / 98 test fail` đã ghi nhận trong lịch sử phiên trước (commit d0a4772) — không có fail mới, không có fail nào biến mất bất thường (đã soát: file fail duy nhất trùng tên với de-rieng là `de-rieng-luc-bat-dau.test.ts`, đúng lỗi có sẵn). **MỤC 2 XONG, ĐỦ BẰNG CHỨNG.**
+
+### Mục 3 — Bỏ Vòng 1/Vòng 2, thay bằng dãn lịch thông minh theo hạn (việc lớn, toàn quyền)
+**Nguyên văn:** "Tôi muốn bạn bỏ vòng 1 và vòng 2 đi, từ giờ nếu tôi phân bài tập hoặc phụ huynh phân bài tập, khi thuật toán đã phân câu riêng cho học sinh, bạn hãy tính toán theo thời gian dealine tách luôn câu hiển thị lên bảng tin theo ngày hoặc theo giờ dãn cách thông minh hiệu quả cùng với các nhiệm vụ khác để học sinh không bị quá tải mà vẫn hoàn thành dealine hiệu quả, nếu chưa hoàn thành nhiệm vụ trước thì gán nhãn khẩn cấp hơn, chỉ khi nào hoàn thành xong nhiệm vụ trước thì nhiệm vụ mới mới hiển thị." Quyền hạn: toàn quyền hoàn thiện hết rồi đẩy thẳng lên máy chủ, không hỏi lại chi tiết vặt.
+- [ ] Bỏ cơ chế Vòng 1/Vòng 2 hiện tại (14 file liên quan đã khoanh vùng: StudentPortalScreen.tsx, tro-ly-ca-nhan.ts, html-phieu.ts, han-bai-tap.ts, bai-tap.ts, btvn-cho-em.ts, btvn-may-chu-moi.ts, Game.tsx, dau-truong-chan-ly.ts, KhungXemPhieu.tsx, BaoCaoCaThi*Modal.tsx, DauTruongChanLy.tsx) | bằng chứng: (chưa có)
+- [ ] Thuật toán dãn câu theo ngày/giờ tính ngược từ deadline, xét các nhiệm vụ khác cùng lúc | bằng chứng: (chưa có)
+- [ ] Gán nhãn khẩn cấp hơn khi nhiệm vụ trước chưa xong | bằng chứng: (chưa có)
+- [ ] Cổng hiển thị: nhiệm vụ mới chỉ hiện khi nhiệm vụ trước đã hoàn thành | bằng chứng: (chưa có)
+- [!] KẸT: `git stash list` rỗng, `git fsck --unreachable` không tìm commit lơ lửng nào. Container phiên trước đã bị thu hồi (môi trường ephemeral) — hai bản `git stash` "WIP Thread C nộp riêng" và "Thread B" nêu trong file nhiệm vụ KHÔNG CÒN trong checkout này, không khôi phục được từ đây. Sẽ thiết kế lại hành vi (khoá nộp, xác nhận nộp) từ mô tả yêu cầu, không có code cũ để gộp.
+- [ ] Test hồi quy đầy đủ trước khi phát hành | bằng chứng: (chưa có)
+- **Việc lớn, chưa bắt tay trong phiên này** vì mục 2 (đã có sẵn hạ tầng, gần xong hơn) và việc dọn SO-VIEC.md ưu tiên trước. Sẽ làm ngay sau khi mục 2 đóng, đúng thứ tự khẩn cấp trong file nhiệm vụ gốc.
+
+### Mục 4 — "Gửi bị treo" / "Làm mới xoay vô hạn" (còn nợ)
+- [ ] Điều tra riêng nếu còn tái diễn sau khi bản vá mục 1 lên | bằng chứng: không có ca tái hiện thật trong phiên này để điều tra — để nguyên trạng thái "còn nợ" như file nhiệm vụ ghi.
+
+### Mục 5 — Thread B BTVN Vòng 3 nộp riêng (gộp vào mục 3)
+- [x] Xác nhận không còn stash để gộp riêng (xem KẸT mục 3) — xử lý cùng lúc với mục 3.
+
+---
+
 # SỔ VIỆC — 14/09 lượt 12 · VIẾT LẠI THUẬT TOÁN PHÂN CÔNG LÊN BẢNG
 
 - [ ] "viết lại thuật toán phân công bên bảng"  | bằng chứng: (chưa có)

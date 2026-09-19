@@ -55,16 +55,22 @@ function xao<T>(ds: T[], r: () => number): T[] {
  * chuyện chống lộ đề.
  *
  * Khi `m·k ≤ ids.length`, con trỏ không quay vòng nên các bộ RỜI NHAU và đỉnh
- * trùng bằng 0 ngay tại đây — pha 2 không còn việc gì để làm. */
-export function chiaVongTron(ids: string[], k: number, m: number, seed: number): Set<string>[] {
+ * trùng bằng 0 ngay tại đây — pha 2 không còn việc gì để làm.
+ *
+ * `boSan` (tuỳ chọn) — mỗi em có thể đã CÓ SẴN một ít câu từ trước (câu khắc
+ * phục cá nhân, không phải chỗ này chọn). Những câu đó tính vào đúng chỉ tiêu
+ * `k` của em luôn — vòng lặp chỉ bù phần CÒN THIẾU, không phát thêm cho em đã
+ * đủ. Không truyền thì coi như mọi em bắt đầu từ rỗng, hệt bản gốc. */
+export function chiaVongTron(ids: string[], k: number, m: number, seed: number, boSan?: Set<string>[]): Set<string>[] {
   const N = ids.length
-  const bo: Set<string>[] = Array.from({ length: m }, () => new Set<string>())
+  const bo: Set<string>[] = Array.from({ length: m }, (_, e) => new Set<string>(boSan?.[e] ?? []))
   if (N === 0 || k <= 0 || m <= 0) return bo
   const can = Math.min(k, N)
   const thu = xao(ids, bocSo(seed))
   let i = 0
   for (let vong = 0; vong < can; vong++) {
     for (let e = 0; e < m; e++) {
+      if (bo[e].size >= can) continue // đã đủ chỉ tiêu từ `boSan` hoặc vòng trước
       // Câu này em đã có rồi thì đi tiếp — không ai nhận hai lần một câu.
       let dem = 0
       while (bo[e].has(thu[i % N]) && dem <= N) {
@@ -130,12 +136,19 @@ export function doTrung(bo: Set<string>[]): DoTrung {
  *   · `G[a][b]` — số câu chung của từng cặp, sửa tại chỗ sau mỗi lần đổi;
  *   · `tui[v]`  — tập các cặp đang có đúng `v` câu chung, để lấy cặp tệ nhất
  *                 trong thời gian hằng số thay vì quét m² cặp.
- * Một phép đổi chỉ động tới `a`, `c` và các cặp dính hai em đó ⇒ O(m). */
+ * Một phép đổi chỉ động tới `a`, `c` và các cặp dính hai em đó ⇒ O(m).
+ *
+ * `khoa` (tuỳ chọn) — câu KHOÁ của từng em, không được đổi đi: câu khắc phục
+ * cá nhân (em sai câu gì phải nhận đúng câu đó) không phải chỗ pha này được
+ * quyền động vào. Một cặp trùng chỉ vì cùng dính câu khoá thì ĐÀNH CHỊU — đó
+ * là trùng thật của lịch sử làm bài, không phải lỗi thuật toán, và không có
+ * quyền sửa bằng cách rút mất câu khắc phục của em. */
 export function haDinh(
   boVao: Set<string>[],
   seed: number,
   cauHinh: CauHinhDeRiengTranTrung = CAU_HINH_TRAN_TRUNG_MAC_DINH,
   batDauMs = Date.now(),
+  khoa?: Set<string>[],
 ): Set<string>[] {
   const bo = boVao.map((s) => new Set(s))
   const m = bo.length
@@ -172,10 +185,18 @@ export function haDinh(
   }
 
   const r = bocSo(seed)
+  // Cặp tệ nhất bị KHOÁ hết đường đổi (mọi câu chung đều là câu khoá của một
+  // trong hai em) thì quẩn mãi ở cùng cặp đó — `goEmDinh` chỉ hạ đỉnh khi túi
+  // RỖNG, không phải khi túi toàn cặp bất động. Đếm liền mấy lần không đổi
+  // được gì; vượt trần thì dừng hẳn, coi phần trùng còn lại là trùng thật của
+  // lịch sử làm bài, không phải chỗ thuật toán còn có thể nắn.
+  let khongDoiLien = 0
+  const tranKhongDoi = Math.max(64, m * 4)
   for (let v = 0; v < cauHinh.VONG_DOI_CHO; v++) {
     goEmDinh()
     if (dinh === 0) break
     if (cauHinh.CAT_THEO_GIO && (v & 31) === 0 && Date.now() - batDauMs > cauHinh.NGAN_SACH_MS) break
+    if (khongDoiLien > tranKhongDoi) break
 
     // Cặp tệ nhất: bốc trong túi đỉnh, không quét m² cặp.
     const tuiDinh = tui[dinh]
@@ -186,14 +207,20 @@ export function haDinh(
     const a = Math.floor(ic / m)
     const b = ic % m
 
+    // Câu chung mà em `a` ĐƯỢC PHÉP nhả ra — bỏ câu khoá của `a` khỏi ứng viên.
     const chung: string[] = []
-    for (const x of bo[a]) if (bo[b].has(x)) chung.push(x)
-    if (chung.length === 0) break
+    for (const x of bo[a]) if (bo[b].has(x) && !khoa?.[a]?.has(x)) chung.push(x)
+    if (chung.length === 0) {
+      khongDoiLien++
+      continue
+    }
+    khongDoiLien = 0 // có câu chung hợp lệ để thử — không tính là quẩn
     const q = chung[Math.floor(r() * chung.length)]
     const c = Math.floor(r() * m)
     if (c === a || c === b || bo[c].has(q)) continue
+    // Câu em `c` ĐƯỢC PHÉP nhả ra — bỏ câu khoá của `c` khỏi ứng viên.
     const ung: string[] = []
-    for (const x of bo[c]) if (!bo[a].has(x)) ung.push(x)
+    for (const x of bo[c]) if (!bo[a].has(x) && !khoa?.[c]?.has(x)) ung.push(x)
     if (ung.length === 0) continue
     const p = ung[Math.floor(r() * ung.length)]
 
@@ -234,7 +261,11 @@ export function haDinh(
   return bo
 }
 
-/** Chạy trọn hai pha cho MỘT ô blueprint. */
+/** Chạy trọn hai pha cho MỘT ô blueprint.
+ *
+ * `boSan`/`khoa` tuỳ chọn — xem `chiaVongTron` và `haDinh`. Truyền cả hai khi
+ * một số em đã có sẵn câu KHÔNG ĐƯỢC ĐỘNG (câu khắc phục cá nhân): pha 1 tính
+ * chúng vào đúng chỉ tiêu, pha 2 không bao giờ đổi chúng đi. */
 export function sinhBoMotO(
   ids: string[],
   k: number,
@@ -242,10 +273,12 @@ export function sinhBoMotO(
   seed: number,
   cauHinh: CauHinhDeRiengTranTrung = CAU_HINH_TRAN_TRUNG_MAC_DINH,
   batDauMs = Date.now(),
+  boSan?: Set<string>[],
+  khoa?: Set<string>[],
 ): Set<string>[] {
-  const pha1 = chiaVongTron(ids, k, m, seed)
+  const pha1 = chiaVongTron(ids, k, m, seed, boSan)
   if (m < 2 || k <= 0 || ids.length === 0) return pha1
-  return haDinh(pha1, seed ^ 0x5bf03635, cauHinh, batDauMs)
+  return haDinh(pha1, seed ^ 0x5bf03635, cauHinh, batDauMs, khoa)
 }
 
 /** Tần suất dùng của từng câu — max trừ min. Pha 1 bảo đảm ≤ 1. */

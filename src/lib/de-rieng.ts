@@ -15,8 +15,10 @@
 //   3. Cấm lặp mãi một câu — quá `TRAN_LAP_MOT_CAU` lần thì chuyển sang
 //      `canDayLai`, việc của người dạy chứ không phải của máy ra đề.
 import { hashSeed, seededPermutation } from './exam-shuffle'
-import { PHAN_DE, rutDeCoBatBuoc, type CauUngVien, type KetQuaRut, type PhanDe, type YeuCauRut } from './rut-de'
+import { PHAN_DE, locTheoYeuCau, type CauUngVien, type PhanDe, type YeuCauRut } from './rut-de'
 import { CAU_HINH_DE_RIENG_MAC_DINH, SO_CA_BOC_NGAU_NHIEN as SO_CA_HOI_LAI, soCauLapCan, type CauHinhDeRieng } from './cau-hinh-de-rieng'
+import { sinhBoMotO } from './de-rieng-tran-trung'
+import { CAU_HINH_TRAN_TRUNG_MAC_DINH } from './de-rieng-cau-hinh'
 
 /** Một ca đã chấm, rút gọn còn đúng phần thuật toán cần. Ca gần nhất đứng
  * ĐẦU mảng — chỗ gọi sắp xếp trước, ở đây không đoán lại theo ngày. */
@@ -310,7 +312,21 @@ function tongCauCua(yc: YeuCauRut): number {
  *
  * Trả về bản đồ `boTheoEm` mà `assignStudentQuestions` đã biết đọc sẵn từ
  * trước (nhánh CA CHẨN ĐOÁN) — không thêm nhánh phát đề thứ hai, không đổi
- * luật hash cũ, nên ca không bật chế độ này chấm lại vẫn ra đúng điểm cũ. */
+ * luật hash cũ, nên ca không bật chế độ này chấm lại vẫn ra đúng điểm cũ.
+ *
+ * VÁ 19/09 — PHẦN "CÂU MỚI" DỰNG CHUNG CHO CẢ LỚP, KHÔNG BỐC ĐỘC LẬP TỪNG EM.
+ * Bản trước gọi `rutDeCoBatBuoc` riêng cho từng em (seed `${ca}:${idxEm}:{sbd}`)
+ * — mỗi em bốc độc lập từ cùng một kho. Kho đúng chuyên đề mà mỏng (sau vá
+ * "rút đề lẫn chương" không còn được bù bằng chương khác nữa) thì độc lập kiểu
+ * này luôn có một cặp em xui xẻo trùng gần hết đề — đúng sự cố thầy báo.
+ *
+ * Nay dùng chung một thuật toán với màn Ca thi (`sinhBoMotO` /
+ * `de-rieng-tran-trung.ts`, đã có sẵn, đã có test riêng đo đỉnh trùng): pha 1
+ * chia vòng tròn công bằng tần suất, pha 2 đổi chỗ hạ ĐỈNH trùng giữa mọi cặp
+ * em — chạy MỘT LƯỢT cho cả lớp, mỗi phần. Câu khắc phục cá nhân của từng em
+ * (`batBuoc`) được KHOÁ — pha 2 không bao giờ đổi mất câu em cần phải làm lại;
+ * một cặp trùng chỉ vì cùng dính đúng câu khắc phục là trùng thật của lịch sử
+ * làm bài, không phải chỗ sửa được. */
 export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
   const ch = y.ch ?? CAU_HINH_DE_RIENG_MAC_DINH
   const tongCau = tongCauCua(y.yc)
@@ -320,29 +336,24 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
   const cauCua = new Map<string, CauUngVien>()
   for (const p of PHAN_DE) for (const c of y.uv[p]) cauCua.set(c.id, c)
 
-  const boTheoEm: Record<string, string[]> = {}
-  const lapTheoEm: Record<string, string[]> = {}
-  const cauGocTheoEm: Record<string, string[]> = {}
-  const songSinhTheoEm: Record<string, string[]> = {}
-  const soLapCua: Record<string, number> = {}
+  const m = y.dsSbd.length
+  const lapCuaEm: ReturnType<typeof chonCauLapChoEm>[] = []
+  const batBuocCuaEm: Partial<Record<PhanDe, CauUngVien[]>>[] = []
   const canCua: Record<string, number> = {}
   const saiCaTruocCua: Record<string, number> = {}
   const tuCaCua: Record<string, string> = {}
-  const thieuLap: EmThieuLap[] = []
-  const thieuCau: { sbd: string; thieu: number }[] = []
   const dayLai = new Map<string, string[]>()
-  const ids = new Set<string>()
 
-  for (let idxEm = 0; idxEm < y.dsSbd.length; idxEm++) {
+  // PHA A — câu khắc phục riêng từng em, KHÔNG đổi so với bản trước.
+  for (let idxEm = 0; idxEm < m; idxEm++) {
     const sbd = y.dsSbd[idxEm]!
     const daLamSet = new Set<string>()
     for (const ca of y.dsCa) {
       for (const q of (ca.daLamCua[sbd] ?? [])) daLamSet.add(q)
     }
-
     const lap = chonCauLapChoEm(sbd, y.dsCa, tongCau, demSai, ch, cauCua, daLamSet)
-    const can = lap.can
-    canCua[sbd] = can
+    lapCuaEm.push(lap)
+    canCua[sbd] = lap.can
     saiCaTruocCua[sbd] = lap.soSaiCaTruoc
     tuCaCua[sbd] = lap.tuCa
     for (const q of lap.canDayLai) dayLai.set(q, [...(dayLai.get(q) ?? []), sbd])
@@ -355,10 +366,50 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
       if (!c) continue
       ;(batBuoc[c.phan] ??= []).push(c)
     }
+    batBuocCuaEm.push(batBuoc)
+  }
 
-    // Seed RIÊNG TỪNG EM cho phần câu mới kết hợp phân bổ phân tán lân cận
-    const kq: KetQuaRut = rutDeCoBatBuoc(y.uv, { ...y.yc, seed: hashSeed(`${y.yc.seed}:${idxEm}:${sbd}`) }, batBuoc)
-    const qids = PHAN_DE.flatMap((p) => kq.chon[p].map((c) => c.id))
+  // PHA B — câu mới, dựng CHUNG cho cả lớp từng phần một, chặn đỉnh trùng.
+  const qidsCuaEm: string[][] = Array.from({ length: m }, () => [])
+  const thieuTongCuaEm = new Array<number>(m).fill(0)
+  const ids = new Set<string>()
+
+  for (const p of PHAN_DE) {
+    const canP = Math.max(0, Math.floor(Number(y.yc.soCau[p]) || 0))
+    if (canP <= 0 || m === 0) continue
+
+    // Câu khắc phục KHÔNG qua bộ lọc mức độ/dạng/sao — giữ đúng hành vi cũ.
+    const boSan: Set<string>[] = batBuocCuaEm.map((b) => new Set((b[p] ?? []).slice(0, canP).map((c) => c.id)))
+
+    const hop = locTheoYeuCau(y.uv[p], y.yc)
+    // Kho lọc không đủ cho MỘT em thì bỏ lọc, lấy nguyên kho phần này — y hệt
+    // đường bù cũ của `rutDeCoBatBuoc`, chỉ khác là quyết định MỘT LẦN cho cả
+    // lớp thay vì lặp lại quyết định giống hệt nhau cho từng em.
+    const pool = hop.length >= canP ? hop : y.uv[p]
+    const idsPool = pool.map((c) => c.id)
+
+    const boPhan = sinhBoMotO(idsPool, canP, m, hashSeed(`${y.yc.seed}:${p}`), CAU_HINH_TRAN_TRUNG_MAC_DINH, Date.now(), boSan, boSan)
+
+    for (let e = 0; e < m; e++) {
+      const bo = boPhan[e] ?? new Set<string>()
+      for (const q of bo) qidsCuaEm[e]!.push(q)
+      thieuTongCuaEm[e]! += Math.max(0, canP - bo.size)
+    }
+  }
+
+  const boTheoEm: Record<string, string[]> = {}
+  const lapTheoEm: Record<string, string[]> = {}
+  const cauGocTheoEm: Record<string, string[]> = {}
+  const songSinhTheoEm: Record<string, string[]> = {}
+  const soLapCua: Record<string, number> = {}
+  const thieuLap: EmThieuLap[] = []
+  const thieuCau: { sbd: string; thieu: number }[] = []
+
+  for (let idxEm = 0; idxEm < m; idxEm++) {
+    const sbd = y.dsSbd[idxEm]!
+    const lap = lapCuaEm[idxEm]!
+    const can = lap.can
+    const qids = qidsCuaEm[idxEm]!
     boTheoEm[sbd] = qids
     for (const q of qids) ids.add(q)
     // ĐẾM LẠI trên bộ câu THẬT trong đề, không tin con số đếm lúc chọn
@@ -369,7 +420,7 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
     cauGocTheoEm[sbd] = (lap.cauGoc ?? []).filter((q) => trongDe.has(q))
     songSinhTheoEm[sbd] = (lap.songSinh ?? []).filter((q) => trongDe.has(q))
     soLapCua[sbd] = soLap
-    const thieuTong = PHAN_DE.reduce((s, p) => s + kq.thieu[p], 0)
+    const thieuTong = thieuTongCuaEm[idxEm]!
     if (thieuTong > 0) thieuCau.push({ sbd, thieu: thieuTong })
     if (soLap < can || lap.lyDo !== '') {
       const coTrongKho = lap.qids.filter((q) => cauCua.has(q)).length
