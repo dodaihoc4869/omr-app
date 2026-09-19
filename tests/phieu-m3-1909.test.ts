@@ -569,6 +569,14 @@ describe('luồng nộp không đổi một bước khi có mã lệnh M3 (hộp
     expect(window.confirm).toBe(confirm)
   })
 
+  it('HỢP ĐỒNG CỦA CÁCH MƯỢN confirm: JS_PHIEU chỉ có ĐÚNG MỘT window.confirm (lời hỏi khi nộp thiếu câu)', () => {
+    // Hộp M3 ghi lại lời hỏi của MỘT lượt bấm bằng cách thay window.confirm tạm thời. Nếu ai thêm lời hỏi thứ hai vào
+    // luồng nộp, hộp sẽ nuốt nó: test này đỏ để buộc người đó xử lý hộp M3 trước.
+    expect((JS_PHIEU.match(/window\.confirm\(/g) ?? []).length).toBe(1)
+    expect((JS_PHIEU.match(/\bconfirm\(/g) ?? []).length).toBe(1)
+    expect(JS_PHIEU).toContain("window.confirm('Còn ' + thieu + ' câu chưa làm, mấy câu đó tính là sai. Nộp luôn?')")
+  })
+
   it('sau nộp, thanh đáy đọc kết quả từ #nop-ket (bỏ dấu chấm giữa đầu dòng)', async () => {
     await chayNop(day)
     await cho()
