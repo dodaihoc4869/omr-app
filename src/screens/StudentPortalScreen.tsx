@@ -18,6 +18,7 @@ import {syncStudentExp} from '../game/than-thu-v2/academic-sync'
 import { tachDongTheoY } from '../lib/tach-dong-cau'
 import NutQuayLai from '../components/NutQuayLai'
 import { dungM3, ThanhTren } from '../components/m3'
+import LichSuCaM3 from '../components/bang-nhiem-vu/LichSuCaM3'
 import '../components/bang-nhiem-vu/sheet-m3.css'
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import {
@@ -1394,7 +1395,18 @@ export default function StudentPortalScreen() {
           )}
 
           {/* TAB 1: XEM ĐIỂM */}
-          {tab === 'diem' && (
+          {tab === 'diem' && vaoM3 && (
+            <LichSuCaM3
+              dangTai={dangTaiLichSu}
+              ds={dsLichSu}
+              ngayGio={dinhDangNgayGio}
+              dongDem={(item) => <DongDemCau so={item as any} />}
+              dangMoDe={dangMoDe}
+              onXemBaoCao={(item) => setCaXemBaoCaoModal(item as any)}
+              onXemDe={(maCa) => void moDeVaLoiGiai(maCa)}
+            />
+          )}
+          {tab === 'diem' && !vaoM3 && (
           <div className="space-y-4 animate-google-fade">
             <div className="flex items-center justify-between">
               <div>

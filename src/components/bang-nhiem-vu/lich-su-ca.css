@@ -1,0 +1,53 @@
+/* TAB LỊCH SỬ CA THI (LichSuCaM3.tsx). Chỉ đọc biến --m3-*; mọi bộ chọn dưới `.lsc`; không mã màu cứng.
+ * Thẻ tonal không viền; điểm là chip theo bậc; ba điểm phần là ba ô; hai nút xếp dọc, cao ≥ 48 px, chữ được xuống dòng. */
+.lsc { display: flex; flex-direction: column; gap: var(--k4, 16px); max-width: 720px; margin: 0 auto; color: var(--m3-on-surface); }
+.lsc-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.lsc-tieu { display: flex; flex-direction: column; gap: 4px; }
+.lsc-h { margin: 0; font-size: var(--bnv-cx-4); font-weight: 700; line-height: 1.25; color: var(--m3-on-surface); }
+.lsc-phu { margin: 0; font-size: var(--bnv-cx-1); line-height: 1.5; color: var(--m3-on-surface-variant); }
+.lsc-ds { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--k3, 12px); }
+@media (min-width: 720px) { .lsc { max-width: 960px; } .lsc-ds { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.lsc-trong {
+  display: flex; flex-direction: column; align-items: center; gap: var(--k2, 8px); padding: var(--k8, 32px) var(--k4, 16px);
+  border-radius: var(--m3-bo-16); background: var(--m3-surface-container); color: var(--m3-on-surface-variant); text-align: center;
+}
+.lsc-trong-ten { margin: 0; font-size: var(--bnv-cx-3); font-weight: 700; color: var(--m3-on-surface); }
+
+.lsc-the {
+  display: flex; flex-direction: column; gap: var(--k3, 12px); padding: var(--k4, 16px); border-radius: var(--m3-bo-16);
+  background: var(--m3-surface-container); color: var(--m3-on-surface);
+}
+.lsc-dau { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--k3, 12px); }
+.lsc-ten { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; }
+.lsc-ma {
+  padding: 2px 8px; border-radius: var(--m3-bo-tron); background: var(--m3-surface-container-high); color: var(--m3-on-surface-variant);
+  font-size: var(--bnv-cx-1); font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.lsc-ten-ca { margin: 0; font-size: var(--bnv-cx-3); font-weight: 700; line-height: 1.3; color: var(--m3-on-surface); overflow-wrap: anywhere; }
+.lsc-diem {
+  display: flex; align-items: baseline; gap: 2px; flex-shrink: 0; padding: 6px 12px; border-radius: var(--m3-bo-12);
+  background: var(--m3-surface-container-high); color: var(--m3-on-surface);
+}
+.lsc-diem b { font-size: var(--bnv-cx-5); font-weight: 800; font-variant-numeric: tabular-nums; }
+.lsc-diem span { font-size: var(--bnv-cx-1); font-weight: 600; color: var(--m3-on-surface-variant); }
+.lsc-diem[data-muc='cao'] { background: var(--m3-tertiary-container); color: var(--m3-on-tertiary-container); }
+.lsc-diem[data-muc='kha'] { background: var(--m3-primary-container); color: var(--m3-on-primary-container); }
+.lsc-diem[data-muc='tb'] { background: var(--m3-canh-bao, var(--m3-secondary-container)); color: var(--m3-tren-canh-bao, var(--m3-on-secondary-container)); }
+.lsc-diem[data-muc='thap'] { background: var(--m3-error-container); color: var(--m3-on-error-container); }
+.lsc-diem[data-muc='cao'] span { color: var(--m3-on-tertiary-container-phu); }
+.lsc-diem[data-muc='kha'] span { color: var(--m3-on-primary-container-phu); }
+.lsc-diem[data-muc='tb'] span, .lsc-diem[data-muc='thap'] span { color: inherit; }
+.lsc-diem[data-muc='thap'] span { color: var(--m3-on-error-container-phu); }
+
+.lsc-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--k3, 12px); font-size: var(--bnv-cx-1); line-height: 1.5; color: var(--m3-on-surface-variant); }
+.lsc-gio { display: inline-flex; align-items: center; gap: 6px; }
+.lsc-dem { color: var(--m3-on-surface-variant); }
+
+.lsc-phan { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--k2, 8px); margin: 0; }
+.lsc-phan > div { display: flex; flex-direction: column; gap: 2px; padding: 8px var(--k2, 8px); border-radius: var(--m3-bo-12); background: var(--m3-surface-container-high); text-align: center; }
+.lsc-phan dt { font-size: var(--bnv-cx-1); line-height: 1.3; color: var(--m3-on-surface-variant); }
+.lsc-phan dd { margin: 0; font-size: var(--bnv-cx-3); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--m3-on-surface); }
+
+.lsc-nut { display: flex; flex-direction: column; gap: var(--k2, 8px); }
+.lsc-nut .m3-nut-tonal, .lsc-nut .m3-nut-vien { width: 100%; min-height: 48px; height: auto; padding-block: 10px; white-space: normal; }
