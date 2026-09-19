@@ -730,22 +730,19 @@ export default function BangTinPhuHuynh({
             : report.reason}
         </div>
 
-        {/* PHÂN BỔ CÂU THEO THUẬT TOÁN 3 VÒNG PHÂN TẦNG */}
+        {/* PHÂN BỔ CÂU THEO KẾ HOẠCH HÔM NAY (sửa lỗi · ôn bài cũ · câu tiến bộ) */}
         {report.keHoach && (
           <div className="flex items-center justify-between gap-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100/90 dark:bg-slate-800/80 p-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 shadow-2xs">
             <span className="flex items-center gap-1">
-              <span className="px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold">V1</span>
-              <span><strong>{report.keHoach.soCauSuaLoi}c</strong> Lõi sửa lỗi</span>
+              <span><strong>{report.keHoach.soCauSuaLoi}c</strong> Sửa lỗi</span>
             </span>
             <span className="text-slate-300 dark:text-slate-600">·</span>
             <span className="flex items-center gap-1">
-              <span className="px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 text-[10px] font-bold">V2</span>
-              <span><strong>{report.keHoach.soCauOnBaiCu}c</strong> Chống quên</span>
+              <span><strong>{report.keHoach.soCauOnBaiCu}c</strong> Ôn bài cũ</span>
             </span>
             <span className="text-slate-300 dark:text-slate-600">·</span>
             <span className="flex items-center gap-1">
-              <span className="px-1.5 py-0.2 rounded bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 text-[10px] font-bold">V3</span>
-              <span><strong>{report.keHoach.soCauTienBo}c</strong> Thử thách</span>
+              <span><strong>{report.keHoach.soCauTienBo}c</strong> Câu tiến bộ</span>
             </span>
           </div>
         )}
