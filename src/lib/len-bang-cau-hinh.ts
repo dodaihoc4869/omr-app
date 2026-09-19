@@ -166,6 +166,8 @@ export const THOI_GIAN_LEN_BANG = {
   CHUA_GIAY_MOI_BUOC: 25,
   CHUA_BUOC_TOI_THIEU: 1,
   CHUA_BUOC_TOI_DA: 6,
+  /** Câu 0 sao ("đọc đáp án là đủ") chữa tối đa bấy nhiêu bước trên bảng — câu dễ không cần chữa 6 bước (0.Planer chốt 19/09). */
+  CHUA_BUOC_TOI_DA_SAO_0: 3,
   CHUA_NGUONG_LOP_SAI: 0.5,
   CHUA_HE_SO_KHO: 1.3,
   TOI_THIEU_GIAY: 60,

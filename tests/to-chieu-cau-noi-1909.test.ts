@@ -110,13 +110,13 @@ describe('tiện ích của giao thức', () => {
 })
 
 describe('tờ dựng ra: có nút khi nào', () => {
-  it('KHÔNG cầu nối ⇒ tờ y hệt cũ: không nút, không mã, không kiểu, không script thêm', () => {
+  it('KHÔNG cầu nối ⇒ tờ không có nút, không mã, không kiểu, không script cầu nối (chỉ còn script của tờ và của bố cục)', () => {
     for (const h of [taoHtmlMayChieu([o('A'), o('B')]), taoHtmlMayChieu([o('A'), o('B')], { cauNoi: undefined }), taoHtmlMayChieu([o('A'), o('B')], { cauNoi: { maPhien: '' } }), taoHtmlMayChieu([o('A'), o('B')], { cauNoi: { maPhien: '"<>/ ' } })]) {
       expect(h).not.toContain('mc-cham')
       expect(h).not.toContain('data-cau-noi')
       expect(h).not.toContain('ddh-mc-')
       expect(h).toContain('<body class="mc">')
-      expect(h.match(/<script>/g)).toHaveLength(1)
+      expect(h.match(/<script>/g)).toHaveLength(2) // tờ + bố cục đo thật (M2); KHÔNG có script cầu nối
     }
     expect(taoHtmlMayChieu([o('A'), o('B')])).toBe(taoHtmlMayChieu([o('A'), o('B')], { cauNoi: undefined }))
   })

@@ -21,6 +21,7 @@ import {experimentHtml,experimentOriginal} from './experiments/render'
 import type { CauLuyen } from './bai-tap-pdf'
 import { CSS_PHIEU, anhHtml, bangHtml, chuHtml, dapAnChu, hinhTaiViTri, oGiaiHtml, thoat } from './html-phieu'
 import { noiDungTuCauLuyen, thoiGianCau } from './thoi-gian-len-bang'
+import { CSS_BO_CUC, jsBoCuc } from './bo-cuc-to-chieu'
 import { CSS_CAU_NOI_TO_CHIEU, chuanMaPhien, jsCauNoiToChieu, khoaToChieu, mangNutChamToChieu } from './to-chieu-cau-noi'
 
 /** Một ô bảng: một em, một câu. */
@@ -30,6 +31,10 @@ export interface OBang {
   /** Mã câu (qid) — CHỈ để tờ chiếu ghi kết quả Đạt / Không đạt về màn giáo viên (`cauNoi`). Thiếu thì ô
    * không có nút. Không bao giờ hiện thành chữ trên tờ. */
   qid?: string
+  /** BẬC BỐ CỤC ƯỚC LƯỢNG lúc xếp buổi (`uoc-luong-bo-cuc.ts`): 1 = vừa nửa bảng, ghép đôi được; ≥ 2 = phải chiếm 2/3 bảng
+   * trở lên. Có thì tờ CHỈ GHÉP ĐÔI hai câu cùng bậc 1 (câu bậc ≥ 2 đứng một mình); thiếu thì lùi về đoán `laCauDai`.
+   * Ước lượng sai một bậc không gây tràn chữ: tờ chiếu luôn đo lại (`bo-cuc-to-chieu.ts`) và tự tách/gộp. */
+  bacUoc?: 1 | 2 | 3 | 4 | 5
   /** Số thứ tự câu in cho em nhìn. */
   soCau: number
   sao?: number
@@ -79,10 +84,13 @@ export interface TuyChonMayChieu {
   dsDapAn?: CauLuyen[]
   /** CẦU NỐI VỀ MÀN GIÁO VIÊN (thầy chốt 19/09: "cho lên máy chiếu luôn"). Có thì mỗi ô em × câu (có `qid`)
    * mang hai nút Đạt / Không đạt — ẨN cho tới khi màn giáo viên trả lời bắt tay, và BỎ HẲN nếu tờ được mở
-   * riêng (tệp đã lưu, tab riêng): khi ấy không có ai để ghi. Không có `cauNoi` thì tờ chiếu byte-for-byte
-   * như trước, không thêm nút, kiểu chữ hay mã nào. Xem `to-chieu-cau-noi.ts`. */
+   * riêng (tệp đã lưu, tab riêng): khi ấy không có ai để ghi. Không có `cauNoi` thì tờ không có nút, mã phiên,
+   * kiểu chữ hay script cầu nối nào. Xem `to-chieu-cau-noi.ts`. */
   cauNoi?: { maPhien: string }
 }
+
+/** Khi có bậc ước lượng: một câu bậc 1 tìm bạn ghép đôi trong bấy nhiêu câu kế tiếp (kéo lên, không xáo trộn xa). */
+const CUA_SO_TIM_BAN_GHEP = 6
 
 /** Số câu mỗi trang đáp án. Chiếu lên tường thì 12 dòng là vừa mắt từ cuối lớp;
  * nhồi hơn là em ngồi xa không đọc nổi. */
@@ -251,20 +259,22 @@ function chamHtml(o: OBang, cauNoi: boolean): string {
   return cauNoi && o.qid ? mangNutChamToChieu(khoaToChieu(o.sbd, o.qid)) : ''
 }
 
-function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number, cauNoi = false): string {
+function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number, cauNoi = false, dayHoc = false): string {
   if (!o) {
     return `<section class="mc-nua mc-${viTri} mc-trong" aria-hidden="true"><div class="mc-trong-chu">Đợt này chỉ gọi một em</div></section>`
   }
   const ma = `giai-${maDot}-${viTri}`
-  return `<section class="mc-nua mc-${viTri}">
+  // `data-giay`: giờ ĐỌC + LÀM của chính câu này — để đợt bị TÁCH lúc chiếu (M2) tính lại thời gian từng đợt.
+  return `<section class="mc-nua mc-${viTri}"${dayHoc ? ` data-giay="${thoiGianDayHoc(o)}"` : ''}>
   <button type="button" class="mc-nut-hien-em mc-nut-giai" aria-expanded="false" aria-controls="em-${ma}">Hiện học sinh và thần thú →</button>
   ${headerEmHtml(o, ma)}
-  <div class="mc-than">${thanCauHtml(o.cau)}</div>
+  <div class="mc-vung-de"><div class="mc-than">${thanCauHtml(o.cau)}</div>
+    <div class="mc-giai" id="${ma}" hidden>${oGiaiHtml(o.cau)}</div>
+  </div>
   <div class="mc-giai-vung">
     <button type="button" class="mc-nut-giai" aria-expanded="false" aria-controls="${ma}">
       <span class="mc-nut-chu">Hiện lời giải</span>
     </button>${chamHtml(o, cauNoi)}
-    <div class="mc-giai" id="${ma}" hidden>${oGiaiHtml(o.cau)}</div>
   </div>
   <div class="mc-trang" aria-hidden="true"></div>
 </section>`
@@ -274,7 +284,7 @@ function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number, ca
 function dotHaiEmHtml(o1: OBang, o2: OBang | undefined, soDot: number, tuyChon: TuyChonMayChieu): string {
   const secondsAttr = tuyChon.dayHoc ? `data-seconds="${Math.max(thoiGianDayHoc(o1), o2 ? thoiGianDayHoc(o2) : 0)}"` : ''
   const cauNoi = Boolean(tuyChon.cauNoi?.maPhien)
-  return `<div class="mc-dot" data-dot="${soDot}" ${secondsAttr}>${nuaHtml(o1, 'trai', soDot, cauNoi)}${nuaHtml(o2, 'phai', soDot, cauNoi)}</div>`
+  return `<div class="mc-dot" data-dot="${soDot}" ${secondsAttr}>${nuaHtml(o1, 'trai', soDot, cauNoi, Boolean(tuyChon.dayHoc))}${nuaHtml(o2, 'phai', soDot, cauNoi, Boolean(tuyChon.dayHoc))}</div>`
 }
 
 /** Đợt chiếu một em khi câu dài: 2/3 bảng chiếu câu hỏi, 1/3 bảng để trống cho học sinh lên làm */
@@ -282,15 +292,16 @@ function dotMotEmHtml(o: OBang, soDot: number, tuyChon: TuyChonMayChieu): string
   const secondsAttr = tuyChon.dayHoc ? `data-seconds="${thoiGianDayHoc(o)}"` : ''
   const ma = `giai-${soDot}-don`
   return `<div class="mc-dot mc-dot-don" data-dot="${soDot}" ${secondsAttr}>
-  <section class="mc-nua mc-don">
+  <section class="mc-nua mc-don"${tuyChon.dayHoc ? ` data-giay="${thoiGianDayHoc(o)}"` : ''}>
     <button type="button" class="mc-nut-hien-em mc-nut-giai" aria-expanded="false" aria-controls="em-${ma}">Hiện học sinh và thần thú →</button>
     ${headerEmHtml(o, ma)}
-    <div class="mc-than">${thanCauHtml(o.cau)}</div>
+    <div class="mc-vung-de"><div class="mc-than">${thanCauHtml(o.cau)}</div>
+      <div class="mc-giai" id="${ma}" hidden>${oGiaiHtml(o.cau)}</div>
+    </div>
     <div class="mc-giai-vung">
       <button type="button" class="mc-nut-giai" aria-expanded="false" aria-controls="${ma}">
         <span class="mc-nut-chu">Hiện lời giải</span>
       </button>${chamHtml(o, Boolean(tuyChon.cauNoi?.maPhien))}
-      <div class="mc-giai" id="${ma}" hidden>${oGiaiHtml(o.cau)}</div>
     </div>
     <div class="mc-trang" aria-hidden="true"></div>
   </section>
@@ -354,8 +365,11 @@ const CSS_MAY_CHIEU = `
 }
 body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); overflow: hidden; }
 .mc-thanh { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 12px; padding: 10px 20px; background: var(--mc-nen); border-bottom: 1px solid var(--mc-vien); font-family: var(--sans, system-ui, sans-serif); }
+.mc-thanh-trai { min-width: 0; flex: 0 1 auto; max-width: 40%; }
 .mc-thanh-ten { font-weight: 800; font-size: 15px; }
-.mc-thanh-phu { color: var(--mc-nhat); font-size: 13px; }
+.mc-thanh-phu { color: var(--mc-nhat); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mc-thanh-phu[data-ghi-chu] { color: var(--mc-muc); font-weight: 600; }
+.mc-thanh-phu[data-ghi-chu="canh-bao"] { color: var(--mc-cam); }
 .mc-dem { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 800; font-size: 15px; }
 .mc-dieu { display: flex; gap: 8px; }
 .mc-dieu button { min-height: 40px; padding: 0 18px; border: none; border-radius: 999px; background: var(--mc-xanh); color: rgb(255,255,255); font-weight: 800; font-size: 14px; cursor: pointer; font-family: inherit; }
@@ -377,7 +391,7 @@ body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); overflow: 
 .mc-dot-don { grid-template-columns: 2fr 1fr; }
 .mc-cot-lam-bai { display: flex; flex-direction: column; padding: 18px 22px; border-left: 2px dashed var(--mc-vien); background: var(--mc-nen); min-height: 0; overflow: hidden; box-sizing: border-box; }
 /* Nửa bảng tự cuộn khi câu quá dài — TRANG thì không bao giờ cuộn. */
-.mc-nua { display: flex; flex-direction: column; padding: 18px 22px 0; min-width: 0; min-height: 0; overflow-y: auto; position: relative; }
+.mc-nua { display: flex; flex-direction: column; padding: 18px 22px 0; min-width: 0; min-height: 0; overflow: hidden; position: relative; }
 .mc-trai { border-right: 2px dashed var(--mc-vien); }
 /* Vạch giữa hai đợt: nhìn là biết đã sang trang, không lẫn với vạch chia bảng. */
 .mc-dot + .mc-dot .mc-trai, .mc-dot + .mc-dot-don .mc-nua { border-left: 4px solid var(--mc-vien); }
@@ -507,7 +521,7 @@ body.mc-timing .mc-ray{box-sizing:border-box;padding-bottom:64px}
 
 const JS_MAY_CHIEU = `
 (function () {
-  function fitOptions(){document.querySelectorAll('.mc-auto-options').forEach(function(grid){
+  function fitOptions(goc){(goc||document).querySelectorAll('.mc-auto-options').forEach(function(grid){
     var available=grid.clientWidth,maxWidth=0;
     if(!available)return;
     Array.prototype.forEach.call(grid.children,function(option){
@@ -519,10 +533,11 @@ const JS_MAY_CHIEU = `
     var cols=maxWidth*4+gap*3<=available?4:maxWidth*2+gap<=available?2:1;
     grid.style.setProperty('--mc-option-cols',String(cols));
   });}
-  window.addEventListener('resize',fitOptions);
-  if(document.fonts)document.fonts.ready.then(fitOptions);
+  window.addEventListener('resize',function(){fitOptions()});
+  window.__mcFitOptions=fitOptions; // bộ đo bố cục (bo-cuc-to-chieu.ts) chia lại cột phương án mỗi khi đổi bậc
+  if(document.fonts)document.fonts.ready.then(function(){fitOptions()});
   if (typeof requestAnimationFrame !== 'undefined') {
-    requestAnimationFrame(fitOptions);
+    requestAnimationFrame(function(){fitOptions()});
   } else {
     fitOptions();
   }
@@ -544,6 +559,7 @@ const JS_MAY_CHIEU = `
   var ray = document.getElementById('mc-ray');
   var dots = Array.prototype.slice.call(document.querySelectorAll('.mc-dot'));
   var dem = document.getElementById('mc-dem');
+  var phu = document.querySelector('.mc-thanh-phu');
   var truoc = document.getElementById('mc-truoc');
   var sau = document.getElementById('mc-sau');
   var i = 0;
@@ -618,9 +634,21 @@ const JS_MAY_CHIEU = `
     tick(); timer=setInterval(tick,250);
   }
 
+  // Ghi chú của đợt đang hiện (đợt tự tách, chữ nhỏ, toàn bảng…) chép lên dòng phụ của thanh trên, thay dòng ngày/số em.
+  function veGhiChu() {
+    if (phu) {
+      var gc = dots[i] ? dots[i].querySelector(':scope > .mc-ghi-chu') : null;
+      var chu = gc ? gc.textContent : '';
+      if (phu.getAttribute('data-goc') === null) phu.setAttribute('data-goc', phu.textContent || '');
+      phu.textContent = chu || phu.getAttribute('data-goc');
+      var canhBao = !!gc && (gc.getAttribute('data-kieu') === 'canh-bao' || (dots[i].className || '').indexOf('mc-b5') >= 0);
+      if (chu) phu.setAttribute('data-ghi-chu', canhBao ? 'canh-bao' : 'thong-tin'); else phu.removeAttribute('data-ghi-chu');
+    }
+  }
   function ve() {
     startClock();
     if (dem) dem.textContent = 'Đợt ' + (i + 1) + '/' + dots.length;
+    veGhiChu();
     if (truoc) truoc.disabled = i <= 0;
     if (sau) sau.disabled = i >= dots.length - 1;
   }
@@ -744,6 +772,15 @@ const JS_MAY_CHIEU = `
     console.warn('[may-chieu] không kiểm được phông:', e);
   }
 
+  // Đợt bị TÁCH lúc đo bố cục (M2) làm đổi số đợt: nạp lại danh sách và vẽ lại bộ đếm.
+  document.addEventListener('mc-bo-cuc-xong', veGhiChu);
+  document.addEventListener('mc-doi-dot', function () {
+    dots = Array.prototype.slice.call(document.querySelectorAll('.mc-dot'));
+    if (i > dots.length - 1) i = Math.max(0, dots.length - 1);
+    timedPage = -1;
+    ve();
+  });
+
   ve();
 })();
 `
@@ -760,26 +797,57 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}):
   const tuyChon: TuyChonMayChieu = { ...tuyChonGoc, cauNoi: maPhien ? { maPhien } : undefined }
   const ngay = tuyChon.ngay ?? new Date()
   const dot: string[] = []
-  let k = 0
   let demDot = 0
-  while (k < dsO.length) {
-    demDot++
-    const o1 = dsO[k]
-    const cau1Dai = laCauDai(o1.cau)
-    if (cau1Dai) {
-      // Câu dài không vừa nửa bảng: chiếu 1 câu lên 2/3 bảng, 1/3 để trống cho học sinh lên làm
-      dot.push(dotMotEmHtml(o1, demDot, tuyChon))
-      k += 1
-    } else {
-      const o2 = dsO[k + 1]
-      if (o2 && !laCauDai(o2.cau)) {
-        // Cả 2 câu đủ ngắn: chia đôi bảng 50% - 50%
-        dot.push(dotHaiEmHtml(o1, o2, demDot, tuyChon))
-        k += 2
+  const coBacUoc = dsO.some((o) => o.bacUoc !== undefined)
+  if (coBacUoc) {
+    // Có bậc ước lượng: CHỈ ghép đôi hai câu cùng bậc 1. Câu bậc 1 chưa có bạn thì tìm bạn trong vài câu kế tiếp (kéo lên);
+    // câu bậc ≥ 2 đứng một mình (2/3 bảng). Câu không có `bacUoc` lùi về đoán `laCauDai`.
+    const ghepDuoc = (o: OBang) => (o.bacUoc !== undefined ? o.bacUoc === 1 : !laCauDai(o.cau))
+    const da = new Array<boolean>(dsO.length).fill(false)
+    for (let k = 0; k < dsO.length; k++) {
+      if (da[k]) continue
+      da[k] = true
+      demDot++
+      const o1 = dsO[k]
+      if (!ghepDuoc(o1)) {
+        dot.push(dotMotEmHtml(o1, demDot, tuyChon))
+        continue
+      }
+      let j = -1
+      for (let x = k + 1; x < dsO.length && x <= k + CUA_SO_TIM_BAN_GHEP; x++) {
+        if (!da[x] && ghepDuoc(dsO[x])) {
+          j = x
+          break
+        }
+      }
+      if (j >= 0) {
+        da[j] = true
+        dot.push(dotHaiEmHtml(o1, dsO[j], demDot, tuyChon))
       } else {
-        // Câu 1 ngắn nhưng không có bạn ghép đôi cùng ngắn: để trắng nửa còn lại
         dot.push(dotHaiEmHtml(o1, undefined, demDot, tuyChon))
+      }
+    }
+  } else {
+    let k = 0
+    while (k < dsO.length) {
+      demDot++
+      const o1 = dsO[k]
+      const cau1Dai = laCauDai(o1.cau)
+      if (cau1Dai) {
+        // Câu dài không vừa nửa bảng: chiếu 1 câu lên 2/3 bảng, 1/3 để trống cho học sinh lên làm
+        dot.push(dotMotEmHtml(o1, demDot, tuyChon))
         k += 1
+      } else {
+        const o2 = dsO[k + 1]
+        if (o2 && !laCauDai(o2.cau)) {
+          // Cả 2 câu đủ ngắn: chia đôi bảng 50% - 50%
+          dot.push(dotHaiEmHtml(o1, o2, demDot, tuyChon))
+          k += 2
+        } else {
+          // Câu 1 ngắn nhưng không có bạn ghép đôi cùng ngắn: để trắng nửa còn lại
+          dot.push(dotHaiEmHtml(o1, undefined, demDot, tuyChon))
+          k += 1
+        }
       }
     }
   }
@@ -791,7 +859,7 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}):
   const soDot = dot.length
 
   const than = `<div class="mc-thanh">
-  <div>
+  <div class="mc-thanh-trai">
     <div class="mc-thanh-ten">${thoat(tuyChon.tenBuoi || 'Gọi lên bảng')}</div>
     <div class="mc-thanh-phu">${ngayVn(ngay)} · ${dsO.length} em · ${soDot} trang${dsDa.length > 0 ? ` · ${dsDa.length} câu chỉ đọc đáp án` : ''}</div>
   </div>
@@ -809,7 +877,7 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}):
   return `<!DOCTYPE html>
 <html lang="vi" data-projector="matte-light" data-sang><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${thoat(tuyChon.tenBuoi || 'Gọi lên bảng')} — tờ máy chiếu</title>
-<style>${CSS_PHIEU}</style><style>${CSS_MAY_CHIEU}</style>${maPhien ? `<style>${CSS_CAU_NOI_TO_CHIEU}</style>` : ''}</head>
+<style>${CSS_PHIEU}</style><style>${CSS_MAY_CHIEU}</style><style>${CSS_BO_CUC}</style>${maPhien ? `<style>${CSS_CAU_NOI_TO_CHIEU}</style>` : ''}</head>
 <body class="mc${tuyChon.dayHoc ? ' mc-day-hoc' : ''}"${maPhien ? ` data-cau-noi="${maPhien}"` : ''}>${than}
-<script>${JS_MAY_CHIEU}</script>${maPhien ? `<script>${jsCauNoiToChieu()}</script>` : ''}</body></html>`
+<script>${JS_MAY_CHIEU}</script><script>${jsBoCuc()}</script>${maPhien ? `<script>${jsCauNoiToChieu()}</script>` : ''}</body></html>`
 }

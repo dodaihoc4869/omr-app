@@ -34,6 +34,7 @@ import type { CauChua } from './phan-cong'
 import { chuanChuyenDe } from './phan-cong'
 import { CAU_HINH_LEN_BANG_MAC_DINH, nganSachGiay, type CauHinhLenBang } from './len-bang-cau-hinh'
 import { giayBienGhepDoi, thoiGianCau, type NoiDungCau } from './thoi-gian-len-bang'
+import type { BacBoCuc } from './bo-cuc-to-chieu'
 import type { HoSoEmDayDu } from './ho-so-lop'
 import { btvnCuaCau, canDayLaiCau, CHU_BTVN, diemHopCau, lyDoChanCau, tomTatBtvn } from './ho-so-lop'
 
@@ -49,6 +50,9 @@ export interface CauVaoXep {
   /** Nội dung câu (số từ, hình/bảng, số bước lời giải) — để tính thời gian lên bảng theo ĐỘ DÀI (`thoi-gian-len-bang.ts`).
    * Thiếu (gói đề không tải được, test dựng tối giản) ⇒ rơi về 300/180/120 theo sao như cũ. */
   noiDung?: NoiDungCau
+  /** BẬC BỐ CỤC ước lượng trên tờ chiếu (`uoc-luong-bo-cuc.ts`): 1 = ghép đôi được … 5 = chiếm CẢ bảng (em làm ở bảng phụ).
+   * Thiếu thì không cảnh báo gì về bố cục. */
+  bacUoc?: BacBoCuc
 }
 
 export type TangChua = 'len_bang' | 'doc_dap_an'
@@ -85,6 +89,8 @@ export interface KetQuaBuoiChua {
   cauDocDapAn: CauChua[]
   /** Câu BẮT BUỘC mà ngân sách không đủ để chữa. Rỗng là tốt. */
   batBuocChuaChua: CauChua[]
+  /** Câu ĐƯỢC GỌI EM LÊN BẢNG mà quá dài, tờ chiếu phải dành CẢ bảng cho đề (bậc 5): em làm ở bảng phụ. */
+  cauChiemCaBang: CauChua[]
   canhBao: string[]
 }
 
@@ -324,6 +330,13 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
   if (batBuocChuaChua.length > 0) {
     canhBao.push(`${batBuocChuaChua.length} câu bắt buộc chưa gọi được em nào — sẽ chiếu đáp án, thầy cân nhắc nới giờ`)
   }
+  // Câu dài tới mức chiếm cả bảng (bậc 5) mà có em lên bảng: thầy cần biết TRƯỚC để chuẩn bị bảng phụ / cân nhắc bỏ câu.
+  const cauChiemCaBang = dong.filter((d) => d.tang === 'len_bang' && dsCau.find((c) => c.cau.id === d.cau.id)?.bacUoc === 5).map((d) => d.cau)
+  if (cauChiemCaBang.length > 0) {
+    canhBao.push(
+      `${cauChiemCaBang.length} câu dài tới mức chiếm cả bảng (em làm ở bảng phụ): ${cauChiemCaBang.map((c) => `Phần ${c.phan} câu ${c.so}`).join(' · ')}`,
+    )
+  }
   if (cauKhongEmNhan.length > 0) {
     canhBao.push(
       `${cauKhongEmNhan.length} câu 2 sao chưa gọi được em nào: mọi em còn lại đều ở bậc "biết" của dạng ấy — chiếu đáp án, thầy giảng`,
@@ -340,6 +353,7 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
     nganSach,
     cauDocDapAn,
     batBuocChuaChua,
+    cauChiemCaBang,
     canhBao,
   }
 }

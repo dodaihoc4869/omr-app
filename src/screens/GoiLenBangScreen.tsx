@@ -43,6 +43,7 @@ import { CAU_HINH_LEN_BANG_MAC_DINH, TEN_LANE, dongHo, nganSachGiay } from '../l
 import { dungDoKho, vapCuaLop } from '../lib/do-kho-cau'
 import { doiEmChoDong, xepGioLenBang, type KetQuaXep } from '../lib/xep-gio-len-bang'
 import { noiDungTuCauGoc } from '../lib/thoi-gian-len-bang'
+import { uocLuongBacCau, uocLuongBacCauGoc } from '../lib/uoc-luong-bo-cuc'
 import { xepBuoiChua, bangChuBuoiChua, type CauVaoXep, type DongChua, type KetQuaBuoiChua } from '../lib/xep-buoi-chua'
 import { btvnCuaCau, napHoSoLop, type HoSoEmDayDu, type KetQuaBtvn } from '../lib/ho-so-lop'
 import { dungGiaoAn } from '../lib/giao-an-len-bang'
@@ -759,6 +760,8 @@ export default function GoiLenBangScreen() {
           batBuoc: d.batBuoc && !boBatBuoc.includes(d.cau.id),
           // Độ DÀI của câu (số từ, hình/bảng, số bước lời giải) — để giờ lên bảng tính theo đề dài hay ngắn, không chỉ theo sao.
           noiDung: goc ? noiDungTuCauGoc(goc.phan, goc.q) : undefined,
+          // Bậc bố cục ƯỚC LƯỢNG trên tờ chiếu (1 = ghép đôi được … 5 = chiếm cả bảng) — để cảnh báo câu quá dài ngay lúc xếp buổi.
+          bacUoc: goc ? uocLuongBacCauGoc(goc.phan, goc.q).bac : undefined,
         }
       }),
     [doKhoCau, boBatBuoc, traCau],
@@ -916,6 +919,8 @@ export default function GoiLenBangScreen() {
           sbd: p.sbd,
           hoTen: p.hoTen,
           qid: p.cau.id,
+          // Bậc bố cục ước lượng: tờ CHỈ ghép đôi hai câu cùng bậc 1 (câu dài đứng một mình); tờ vẫn đo lại lúc chiếu.
+          bacUoc: (day ? uocLuongBacCauGoc(day.phan, day.q) : uocLuongBacCau(cauHopLe)).bac,
           soCau: p.cau.so,
           sao: p.cau.sao,
           mucDo: p.cau.mucDo,

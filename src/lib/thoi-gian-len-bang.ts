@@ -140,7 +140,9 @@ export function thoiGianCau(d: DauVaoThoiGian, ch: CauHinhLenBang = CAU_HINH_LEN
 
   const doc = tg.DOC_NEN_GIAY + tg.DOC_GIAY_MOI_TU * d.noiDung.soTu + (d.noiDung.coHinh ? tg.DOC_HINH_GIAY : 0)
   const lam = tg.LAM_NEN_GIAY[d.phan] * tg.HE_SO_SAO[sao] * (1 + tg.HE_SO_LOP_SAI * lopSai) * bac
-  const soBuoc = kep(d.noiDung.soBuoc > 0 ? d.noiDung.soBuoc : tg.CHUA_BUOC_TOI_THIEU, tg.CHUA_BUOC_TOI_THIEU, tg.CHUA_BUOC_TOI_DA)
+  // Câu 0 sao ("đọc đáp án là đủ") chữa tối đa CHUA_BUOC_TOI_DA_SAO_0 bước: câu dễ không cần chữa 6 bước trên bảng.
+  const tranBuoc = sao === 0 ? Math.min(tg.CHUA_BUOC_TOI_DA, tg.CHUA_BUOC_TOI_DA_SAO_0) : tg.CHUA_BUOC_TOI_DA
+  const soBuoc = kep(d.noiDung.soBuoc > 0 ? d.noiDung.soBuoc : tg.CHUA_BUOC_TOI_THIEU, tg.CHUA_BUOC_TOI_THIEU, tranBuoc)
   const chua = (tg.CHUA_NEN_GIAY + tg.CHUA_GIAY_MOI_BUOC * soBuoc) * (lopSai >= tg.CHUA_NGUONG_LOP_SAI ? tg.CHUA_HE_SO_KHO : 1)
 
   const tho = doc + lam + chua

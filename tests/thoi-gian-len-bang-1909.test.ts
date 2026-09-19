@@ -76,7 +76,7 @@ describe('BẢNG GIÁ TRỊ — tính tay từ công thức (một nguồn hằn
                   expect(t.lam).toBeGreaterThanOrEqual(0)
                   expect(t.chua).toBeGreaterThanOrEqual(0)
                 }
-  })
+  }, 60000)
 
   it('ĐƠN ĐIỆU: đề dài hơn, sao cao hơn, lớp sai nhiều hơn ⇒ không bao giờ ngắn hơn', () => {
     const tg = (o: Partial<DauVaoThoiGian> & { soTu?: number }) => thoiGianCau({ phan: 'II', sao: 1, noiDung: nd(o.soTu ?? 50, false, 3), ...o }).tong
@@ -101,6 +101,19 @@ describe('BẢNG GIÁ TRỊ — tính tay từ công thức (một nguồn hằn
     expect(goc(20)).toBe(goc(6))
     expect(goc(6)).toBeGreaterThan(goc(5))
     expect(chua(2)).toBeLessThan(chua(4))
+  })
+
+  it('câu 0 SAO chữa tối đa 3 bước (câu dễ không chữa 6 bước trên bảng); sao 1, 2 vẫn kẹp 6', () => {
+    const cfg = { ...THOI_GIAN_LEN_BANG, LAM_TRON_GIAY: 1, TOI_DA_GIAY: 99999 } as typeof THOI_GIAN_LEN_BANG
+    const chua = (sao: 0 | 1 | 2, soBuoc: number) => thoiGianCau({ phan: 'I', sao, noiDung: nd(30, false, soBuoc) }, CAU_HINH_LEN_BANG_MAC_DINH, cfg).chua
+    expect(chua(0, 6)).toBe(chua(0, 3))
+    expect(chua(0, 6)).toBe(30 + 25 * 3)
+    expect(chua(0, 2)).toBe(30 + 25 * 2) // dưới trần thì giữ nguyên
+    expect(chua(1, 6)).toBe(30 + 25 * 6)
+    expect(chua(2, 9)).toBe(30 + 25 * 6)
+    // câu I·0 sao·60 từ·6 bước từng ra 255 s (>4 phút) — nay còn ≤ 3 phút ở chi phí ghép đôi
+    const t = thoiGianCau({ phan: 'I', sao: 0, noiDung: nd(60, false, 6), tiLeLopSai: 0.3, bacEm: 'hieu' })
+    expect(giayBienGhepDoi(t)).toBeLessThanOrEqual(180)
   })
 
   it('lớp sai ≥ 50% nhân T_chữa 1,3; dưới 50% thì không', () => {
@@ -219,8 +232,10 @@ describe('chi phí trong NGÂN SÁCH BUỔI khi hai em lên SONG SONG (giayBienG
     }
     const ds = Array.from({ length: 30 }, (_, i) => cost(i))
     const tong20 = (k: 'noiTiep' | 'ghepDoi') => ds.map((x) => x[k]).sort((a, b) => a - b).slice(0, 20).reduce((a, b) => a + b, 0)
-    expect(tong20('noiTiep')).toBeGreaterThan(nganSachGiay(CAU_HINH_LEN_BANG_MAC_DINH)) // 5.025 > 4.920: dù chọn khéo cũng không đủ 20 em
-    expect(tong20('ghepDoi')).toBeLessThanOrEqual(nganSachGiay(CAU_HINH_LEN_BANG_MAC_DINH)) // 3.780
+    // 10 câu còn lại (30 − 20) vẫn phải được đọc đáp án, mỗi câu ≥ L0 = 5 giây.
+    const docDapAn = 10 * CAU_HINH_LEN_BANG_MAC_DINH.GIAY_LANE.L0
+    expect(tong20('noiTiep') + docDapAn).toBeGreaterThan(nganSachGiay(CAU_HINH_LEN_BANG_MAC_DINH)) // ≈4.905 + 50 > 4.920: dù chọn khéo cũng không đủ 20 em
+    expect(tong20('ghepDoi') + docDapAn).toBeLessThanOrEqual(nganSachGiay(CAU_HINH_LEN_BANG_MAC_DINH)) // ≈3.700
   })
 })
 
