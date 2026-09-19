@@ -52,6 +52,8 @@ Phân vùng dự kiến theo hai bản thiết kế:
 
 ## Nhật ký (mới nhất ở trên, mỗi dòng: giờ VN · phiên · việc)
 
+- 19/09 16:45 (giờ máy) · 0.Planer · ĐÃ GỘP nhánh rút đề riêng `claude/busy-austin-a4ab8b` vào main = 5e99e08 (gộp ở bản sạch rồi tua nhanh main). 0.Planer đã soát 5e99e08 (gồm 27f90b6, c089e6e, 0a85b8f, a80db49, aa4799a, 36981a1, 228c0f0): đề riêng đọc hồ sơ ôn qua lệnh `hoSoOnCa` (đã sống c130d7cc); lệnh hỏng/không hồ sơ ⇒ đề Y HỆT bản cũ (khoá bằng dấu vân tay 30 lớp); tất định, không Math.random; ExamMonitorScreen chỉ đổi dsCho = phòng chờ. Test trên bản sạch sau gộp: 12 tệp bất biến + tệp mới = 280 xanh / 2 đỏ ĐÚNG NỀN (de-rieng-luc-bat-dau, danh-dau-cau-hoi-lai); cat-google-1209 XANH; tsc -b sạch. ĐƯỢC ĐẨY PAGES. VIỆC TIẾP cho phiên rút đề riêng: bù đề riêng cho em VÀO MUỘN (sau khi thầy bấm Bắt đầu) mà không làm loãng suất chia của em có mặt.
+
 - 19/09 16:20 (giờ máy) · 0.Planer · Đã xem fae899f, 93198bf (C8 Bảng tin HS+PH), 2c14e68 (C9 cổng phụ huynh phần cũ) của Code 4 — KHÔNG thuộc luồng thi thật/làn giáo viên → ĐƯỢC ĐẨY theo cổng thường. Chuyển tiếp C6 (KhungXemPhieu) + C7 (PhieuScreen /phieu/<mã>) từ Code 2 sang Code 4 để chạy song song; Code 2 giữ C1 → C11 → C2 → C3 → C5 → C4 → C10 (đều trong StudentPortalScreen/ExamTakeScreen).
 
 - 19/09 15:37 · Code 4 · XONG C9 (2c14e68: ParentPortalScreen phần cũ ngoài Bảng nhiệm vụ). Toàn vitest 100 đỏ / 44 tệp: 3 test mới đỏ KHÔNG của Code 4 — tests/nhiem-vu-adapter-1909.test.ts ("expected lam_cau_on to match /^mo_/": Code 2 đang sửa dở src/lib/nhiem-vu-adapter.ts + bang-nhiem-vu/LamCauOn.tsx chưa commit) và 2 test tests/than-thu-v2.test.ts (chập chờn theo tải: chạy riêng xanh); loại ra → 97 đỏ / 42 tệp, đỏ MỚI của Code 4: không. Đã có: C8 93198bf, Sửa lỗi fae899f. src/ của Code 4 sạch.
