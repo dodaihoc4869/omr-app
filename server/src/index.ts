@@ -1,4 +1,6 @@
 import {homeworkQuestions,homeworkKeys,gradeHomework} from './btvn-grading'
+import {ghiSuKien,ghiSuKienThi,ghiSuKienLoBtvn,type LuotThi} from './su-kien-hoc'
+import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
 import {notifications,deliverNotices} from './notifications'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
@@ -1639,7 +1641,11 @@ async function xongLoBtvn(env: Env, b: Record<string, unknown>): Promise<Respons
   const em = await env.DB.prepare('SELECT lo_da_xong FROM btvn_em WHERE khoa=?')
     .bind(`${maBtvn}|${sbd}`)
     .first<{ lo_da_xong: number }>()
-  return ra({ ok: true, loDaXong: Number(em?.lo_da_xong ?? loDaXongMoi) })
+  // SỔ SỰ KIỆN HỌC (GĐ 0): máy em gửi kèm đáp án của lô thì máy chủ CHẤM và ghi sổ —
+  // "xong lô" không còn là điền đủ ô. Không gửi đáp án thì hành vi y như cũ.
+  const dapAn = b.dapAn && typeof b.dapAn === 'object' && !Array.isArray(b.dapAn) ? (b.dapAn as Record<string, unknown>) : null
+  const ghi = dapAn && Object.keys(dapAn).length ? await ghiSuKienLoBtvn(env, maBtvn, sbd, Math.floor(chiSo), dapAn) : null
+  return ra({ ok: true, loDaXong: Number(em?.lo_da_xong ?? loDaXongMoi), ...(ghi ? { suKien: ghi.soGui } : {}) })
 }
 
 async function xemBaiBtvn(env:Env,b:Record<string,unknown>):Promise<Response>{
@@ -2185,6 +2191,24 @@ async function chamDiem(env: Env, b: Record<string, unknown>): Promise<Response>
 
   for (let i = 0; i < cau.length; i += 100) await env.DB.batch(cau.slice(i, i + 100))
 
+  // SỔ SỰ KIỆN HỌC (GĐ 0): mỗi câu đã chấm là một sự kiện `thi`. Ghi SAU khi
+  // chi tiết đã nằm trong D1; lỗi sổ không làm hỏng việc chấm điểm.
+  const luotSk: LuotThi[] = []
+  for (const x of bai) {
+    const sbd = String(x.sbd ?? '').trim()
+    if (!sbd) continue
+    const dsCau = Array.isArray(x.cau) ? (x.cau as Record<string, unknown>[]) : []
+    luotSk.push({
+      sbd,
+      lanThu: Number(x.lanThu) || 1,
+      // Chỉ những câu đã vào `chi_tiet_cau` ở trên (có phần + số câu), để hai bên đếm khớp nhau.
+      cau: dsCau
+        .filter((c) => String(c.phan ?? '') && Number(c.soCau))
+        .map((c) => ({ qid: c.qid, chuyenDe: c.chuyenDe, mucDo: c.mucDo, dapAnChon: c.dapAnChon, dungSai: c.dungSai, giay: c.giay })),
+    })
+  }
+  await ghiSuKienThi(env, maCa, luotSk, nay)
+
   // TIẾN ĐỘ TỔNG — TÍNH LẠI TỪ ĐẦU cho từng em vừa chấm.
   //
   // Chạy SAU khi mọi câu trên đã ghi xong, vì nó đọc chính `tien_do_ca` vừa
@@ -2279,7 +2303,16 @@ async function ghiLenBangMoi(env: Env, b: Record<string, unknown>): Promise<Resp
     // Chữa đúng câu đã sai ⇒ đánh dấu đã chữa.
     if (dat) cau.push(env.DB.prepare('UPDATE ban_do_sai SET da_chua = 1, chua_luc = ? WHERE sbd = ? AND qid = ?').bind(nay, sbd, qid))
   }
-  await env.DB.batch(cau)
+  const kq = await env.DB.batch(cau)
+  // SỔ SỰ KIỆN HỌC (GĐ 0): mỗi lượt gọi bảng là một sự kiện, khoá theo id dòng `len_bang`
+  // (giống hệt đường nạp lại). Không có qid thì không có bằng chứng về câu nào — không ghi.
+  if (qid) {
+    const id = Number(kq?.[0]?.meta?.last_row_id) || 0
+    await ghiSuKien(env, [{
+      nguon: 'len_bang', maNguon: 'lb', sbd, qid, lan: id > 0 ? id : Date.parse(nay),
+      ketQua: dat ? 1 : 0, luc: nay, chuyenDe, mucDo: '',
+    }])
+  }
   return ra({ ok: true })
 }
 
@@ -2800,6 +2833,8 @@ export default {
       // Lệnh của THẦY — đòi mã bí mật.
       if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
       if (p === '/teacher-news') return ra(await teacherNews(env,b))
+      if (p === '/ho-so/nap-lai') return ra(await napLaiSuKien(env, b.sbd, b.nguon as NguonNapLai | undefined))
+      if (p === '/ho-so/kiem-cheo') return ra(await kiemCheoSuKien(env, b.sbd))
       if (p === '/game-v2-admin') return ra(await adminGame(env,b))
       if (p === '/ca/day') return dayCa(env, b)
       if (p === '/ca/xac-nhan') {

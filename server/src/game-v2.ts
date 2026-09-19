@@ -10,6 +10,7 @@ import type {Attempt,Mastery,PrivateQuestion,Mode,Arena,ArenaAction} from '../..
 import {nhanExp,thanhExp} from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import {shieldRemaining,type ShieldState} from '../../src/game/than-thu-v2/shields'
 import {syncAcademic,type Academic,academicDay} from './game-v2-academic'
+import {ghiSuKien} from './su-kien-hoc'
 export interface Profile {nickname?:string;academic?:Academic;shields?:ShieldState;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string}
 type Row={revision:number;json:string}
 type Session={guardian?:string;guardianRound?:number;mode:Mode;questions:{qid:string;maDe:string;version:string;group:string;novel:boolean}[];created:number}
@@ -147,6 +148,8 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     queries.push(env.DB.prepare('UPDATE game_v2_profile SET json=?,revision=revision+1 WHERE sbd=? AND revision=? AND EXISTS(SELECT 1 FROM game_v2_attempt WHERE id=?)').bind(JSON.stringify(p),sbd,revision,receipt))
     const written=await env.DB.batch(queries)
     if(!written[0]?.meta.changes)throw new Error('Một thiết bị khác vừa cập nhật. Em bấm chấm lại để đồng bộ.')
+    // SỔ SỰ KIỆN HỌC (GĐ 0): câu có trợ giúp không phải bằng chứng tự làm (bất biến của game) → không ghi.
+    if(!attempt.assisted)await ghiSuKien(env,[{nguon:'game',maNguon:id,sbd,qid,lan:1,ketQua:attempt.correct?1:0,luc:new Date(attempt.at).toISOString(),maDang:q.dang,chuyenDe:'',mucDo:q.mucDo??''}])
     return {ok:true,...result,profile:visible(p),revision:revision+1}
   }
   if(action==='complete'){

@@ -1,4 +1,5 @@
 import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect} from './btvn-grading'
+import {ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,type CauChamBai} from './su-kien-hoc'
 import { hopLe3DangChuan } from './loc-cau-chuan'
 // CỔNG TƯƠNG THÍCH `/goi` — CẮT HẲN GOOGLE.
 //
@@ -888,6 +889,10 @@ export async function nopBtvnQuaPhieu(
     .run()
 
   if(!saved.meta.changes)return {ok:false,error:'Bài vừa được cập nhật từ một lần nộp khác. Em tải lại để xem kết quả.'}
+  // SỔ SỰ KIỆN HỌC (GĐ 0): mỗi câu của tờ là một sự kiện `btvn`, lan = lượt làm, dựng từ CHÍNH kết quả
+  // `gradeHomework` vừa chấm (không đọc lại R2). Lượt 1 bỏ qua câu đã ghi qua lô (`btvn_lo`) để nộp cả
+  // bài không đếm đôi. Lỗi sổ không làm hỏng lượt nộp.
+  await ghiSuKien(env, suKienTuKetQuaCham('btvn', maBtvn, sbd, lanMoi, nay, graded), { tranhTrungLo: lanMoi === 1 })
   return { ok: true, lanThu: lanMoi, soCau, soDung, qidSai, nopLuc: nay, soLanLamLaiConLai: Math.max(0, 4 - lanMoi) }
 }
 
@@ -987,6 +992,7 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
 
   // ĐÁP ÁN LẤY TỪ GÓI PHIẾU trên R2 — không lấy từ gói máy em gửi lên.
   let dapAnDung: Record<string, string> = {}
+  const cauPhieu: CauChamBai[] = []
   let maCa = ''
   if (env.DE) {
     const o = await env.DE.get(`phieu/${ma}.json`)
@@ -998,10 +1004,14 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
         const cau = Array.isArray(ph.cau) ? (ph.cau as Record<string, unknown>[]) : []
         for (const c of cau) {
           const qid = chuoi(c.id)
-          if (qid) dapAnDung[qid] = chuoi(c.dapAn).trim().toUpperCase()
+          if (qid) {
+            dapAnDung[qid] = chuoi(c.dapAn).trim().toUpperCase()
+            if (dapAnDung[qid]) cauPhieu.push({ qid, dapAnDung: dapAnDung[qid], chuyenDe: chuoi(c.chuyenDe), mucDo: chuoi(c.mucDo) })
+          }
         }
       } catch {
         dapAnDung = {}
+        cauPhieu.length = 0
       }
     }
   }
@@ -1021,7 +1031,7 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
 
   const nay = NAY()
   const khoa = `${ma}|${sbd}`
-  const cu = await env.DB.prepare('SELECT so_cau FROM nop_khac_phuc WHERE khoa = ?').bind(khoa).first<{ so_cau: number }>()
+  const cu = await env.DB.prepare('SELECT so_cau, dap_an_json FROM nop_khac_phuc WHERE khoa = ?').bind(khoa).first<{ so_cau: number; dap_an_json?: string }>()
   await env.DB.prepare(
     `INSERT INTO nop_khac_phuc (khoa, ma_phieu, sbd, ma_ca, dap_an_json, so_dung, so_cau, nop_luc)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -1030,6 +1040,22 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
   )
     .bind(khoa, ma, sbd, maCa, JSON.stringify(lam), soDung, soCau, nay)
     .run()
+  // SỔ SỰ KIỆN HỌC (GĐ 0): bảng `nop_khac_phuc` chỉ giữ lượt cuối, sổ giữ MỌI lượt (`lan`).
+  // Gửi lại y hệt (mất mạng) thì không ghi thêm; nộp lại đáp án khác thì lan = lượt kế tiếp.
+  if (!cu || String(cu.dap_an_json ?? '') !== JSON.stringify(lam)) {
+    let lan = 1
+    if (cu) {
+      try {
+        const r = await env.DB.prepare(
+          "SELECT COALESCE(MAX(lan), 0) + 1 AS n FROM su_kien_hoc WHERE nguon = 'khac_phuc' AND ma_nguon = ? AND sbd = ?",
+        ).bind(ma, sbd).first<{ n: number }>()
+        lan = Math.max(2, Number(r?.n) || 2)
+      } catch {
+        lan = 2
+      }
+    }
+    await ghiSuKien(env, suKienChamBai('khac_phuc', ma, sbd, lan, nay, cauPhieu, lam))
+  }
   return { ok: true, lanThu: cu ? 2 : 1, soCau, soDung, qidSai, nopLuc: nay }
 }
 
@@ -2755,7 +2781,22 @@ async function luuChiTietCauNeuChuaCo(
     }
   } catch (e) {
     console.error('Lỗi tự động ghi chi_tiet_cau:', e)
+    return
   }
+  // SỔ SỰ KIỆN HỌC (GĐ 0): dòng chi tiết vừa được "chữa lành" cũng là bằng chứng của lượt thi này.
+  await ghiSuKienThi(
+    env,
+    maCa,
+    [{
+      sbd,
+      lanThu,
+      cau: dsChiTiet.map((c) => ({
+        qid: c.qid, chuyenDe: c.chuyen_de, mucDo: c.muc_do, dapAnChon: c.dap_an_chon,
+        dungSai: c.dung_sai === null || c.dung_sai === undefined ? null : Number(c.dung_sai) === 1, giay: null,
+      })),
+    }],
+    nay,
+  )
 }
 
 export async function hsLichSuCa(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {

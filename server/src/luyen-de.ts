@@ -1,6 +1,7 @@
 import type { Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { protectedQuestions, contentGroup } from './game-v2-bank'
+import { ghiSuKien, suKienLuyenDe } from './su-kien-hoc'
 import { parseKhoDeJson, buildTeacherSourceFromKhoDe } from '../../src/lib/exam-kho-de-import'
 import { mergeAndStrip, type TeacherExamSource } from '../../src/data/examContent'
 import { rutDeChuan2026, SO_CAU_CHUAN_2026, laBoDe12, MA_TRAN_HOA_2026 } from '../../src/lib/ma-tran-hoa-2026'
@@ -78,7 +79,9 @@ export async function luyenDe(env:Env, action:string,b:Record<string,unknown>):P
     // Bài gửi sau hạn chỉ chấm các đáp án đã lưu trước hạn, không nhận thêm.
     const answers=now<row.deadline?cleanAnswers(b.answers,sources):JSON.parse(row.answers)
     const result=chamDeChuan(sources,answers)
-    await env.DB.prepare("UPDATE luyen_de_2026 SET answers=?,result=?,status='submitted',updated_at=? WHERE id=? AND sbd=? AND status='active'").bind(JSON.stringify(answers),JSON.stringify(result),now,row.id,sbd).run()
+    const nop=await env.DB.prepare("UPDATE luyen_de_2026 SET answers=?,result=?,status='submitted',updated_at=? WHERE id=? AND sbd=? AND status='active'").bind(JSON.stringify(answers),JSON.stringify(result),now,row.id,sbd).run()
+    // SỔ SỰ KIỆN HỌC (GĐ 0): kết quả từng câu lấy đúng từ `chamDeChuan` vừa chấm.
+    if(nop?.meta?.changes)await ghiSuKien(env,suKienLuyenDe(sbd,row.id,new Date(now).toISOString(),sources,answers,result.detail))
     row=(await env.DB.prepare('SELECT * FROM luyen_de_2026 WHERE id=? AND sbd=?').bind(row.id,sbd).first<Row>())!
   }
   const bank=mergeAndStrip(sources,SO_CAU_CHUAN_2026)
