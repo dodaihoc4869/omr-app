@@ -2,7 +2,7 @@
 // POST /hs/on-lai/nop — em NỘP bài làm câu "ôn lại": máy chủ chấm, ghi sổ nguon='on_lai', dựng lại hồ sơ, rồi MỚI trả đáp án.
 import { describe, it, expect, vi } from 'vitest'
 import worker from '../server/src/index'
-import { daTraLoi, docTraLoi } from '../server/src/on-lai-nop'
+import { CAN_DANG_NHAP, daTraLoi, docTraLoi } from '../server/src/on-lai-nop'
 import { ghiSuKien, ngayVn } from '../server/src/su-kien-hoc'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
 
@@ -60,6 +60,13 @@ describe('xác thực: BẮT BUỘC token học sinh', () => {
       expect('ketQua' in r).toBe(false)
     }
     expect(d.chup('su_kien_hoc')).toBe(truoc)
+  })
+  it('lời từ chối đúng việc ôn câu ("Em đăng nhập lại để nộp câu ôn."), không mượn lời của game (mật khẩu/hồ sơ game/phiên game)', async () => {
+    const d = await dung()
+    for (const r of [await nop(d, [{ qid: I1, dapAn: 'B' }], null), await nop(d, [{ qid: I1, dapAn: 'B' }], 'token-sai'), await nop(d, [{ qid: I1, dapAn: 'B' }], null, { sbd: 'S1' })]) {
+      expect(r).toMatchObject({ ok: false, error: CAN_DANG_NHAP })
+      expect(String(r.error)).not.toMatch(/mật khẩu|game|hồ sơ|phiên/i)
+    }
   })
   it('có token thì SBD lấy từ chữ ký, sbd trong body bị bỏ qua (không nộp hộ em khác)', async () => {
     const d = await dung()

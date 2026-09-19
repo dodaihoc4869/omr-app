@@ -27,6 +27,7 @@ import { TIEN_BO_NGAY } from './ke-hoach-ngay-d1'
 import { DAI_QID_TOI_DA, donQid, layCauChoEm, TOI_DA_QID_MOT_LUOT } from './cau-theo-qid'
 import { ghiSuKien, ngayVn, phanTuQid, type SuKien } from './su-kien-hoc'
 
+export const CAN_DANG_NHAP = 'Em đăng nhập lại để nộp câu ôn.'
 const GIAY_MIN = 5
 const GIAY_MAX = 1200
 const DAI_DAP_AN_TOI_DA = 40
@@ -85,7 +86,13 @@ async function ganExp(env: Env, sbd: string, qidDung: string[], luc: string): Pr
 }
 
 export async function hsOnLaiNop(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
-  const sbd = await gameIdentity(env, b) // ném lỗi nếu không có token hợp lệ: SBD trần không bao giờ được nộp
+  // Không token / token sai / SBD trần đều bị từ chối. Lời báo đúng việc của đường này (em đang ÔN CÂU), không mượn lời của game.
+  let sbd: string
+  try {
+    sbd = await gameIdentity(env, b)
+  } catch {
+    return { ok: false, error: CAN_DANG_NHAP }
+  }
   if (!Array.isArray(b.traLoi)) return { ok: false, error: 'Thiếu bài làm (traLoi)' }
   if (b.traLoi.length > TOI_DA_QID_MOT_LUOT) return { ok: false, error: `Mỗi lần nộp tối đa ${TOI_DA_QID_MOT_LUOT} câu` }
   const lam = docTraLoi(b.traLoi)
