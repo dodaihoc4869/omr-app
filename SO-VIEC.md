@@ -69,6 +69,9 @@ npx wrangler d1 execute omr --file=server/migration-1909-lo-btvn.sql --remote -y
 ```
 Có phòng vệ nếu quên: `hsBtvn`/`xongLoBtvn` bắt lỗi cột thiếu, KHÔNG sập cả API — chỉ riêng tiến độ lô chưa lưu được và nút "Cho làm lại" (reset BTVN) báo lỗi rõ ràng cho tới khi chạy migration này. Chạy càng sớm càng tốt để tính năng lô hoạt động đầy đủ.
 
+- [x] Đã commit (21d88c5) + push lên nhánh `claude/scan-external-drive-push-server-wq0aot` + merge fast-forward vào `main` + push `main` (đúng quy trình thầy chốt ở mục 1) — code mục 2 VÀ mục 3 đã nằm trên `main`.
+- [!] KẸT (ngoài phạm vi phiên, cần thầy xử lý): GitHub Actions "Phát hành lên Cloudflare Pages" vẫn báo thiếu `CLOUDFLARE_API_TOKEN` ở LẦN CHẠY THỨ BA liên tiếp (run #411, #412 sau khi thầy báo đã thêm secret, #413) — cùng một lỗi y hệt. Đã hướng dẫn thầy các bước thêm secret ở mục 1, đang chờ thầy gửi ảnh chụp đúng trang Settings → Secrets and variables → Actions → "Repository secrets" để đối chiếu tên secret. Migration D1 (`migration-1909-lo-btvn.sql`) cũng cần thầy tự chạy vì phiên này không có quyền D1.
+
 ### Mục 4 — "Gửi bị treo" / "Làm mới xoay vô hạn" (còn nợ)
 - [ ] Điều tra riêng nếu còn tái diễn sau khi bản vá mục 1 lên | bằng chứng: không có ca tái hiện thật trong phiên này để điều tra — để nguyên trạng thái "còn nợ" như file nhiệm vụ ghi.
 
