@@ -20,6 +20,7 @@ import { dongSoCauHoiLai } from '../lib/dem-cau-hoi-lai'
 import { maCaLay, vaBienBanCu } from '../lib/va-bien-ban-cu'
 import { sinhBoTheoEm, TEN_MUC_PHAN_TANG } from '../lib/de-rieng-blueprint'
 import { docCheDoDeRieng, docDeRiengCa, docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuDeRiengCa, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret, type BienBanDeRieng, type DeRiengCaLuu } from '../lib/exam-db'
+import { loiKhongTimThayCa } from '../lib/cau-chu-ca'
 import { CHU_LY_DO_THIEU } from '../lib/de-rieng'
 import { CAU_HINH_DE_RIENG_MAC_DINH } from '../lib/cau-hinh-de-rieng'
 import { dungDeRiengChoCa, dungLapTuMayChu } from '../lib/de-rieng-nguon'
@@ -334,7 +335,7 @@ export default function ExamMonitorScreen() {
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'lỗi không rõ'
       if (msg.includes('Không tìm thấy ca kiểm tra')) {
-        setLoi(`Không tìm thấy ca kiểm tra #${ma.trim()}. Bạn hãy kiểm tra lại mã ca hoặc chọn từ danh sách ca thi bên dưới.`)
+        setLoi(loiKhongTimThayCa(ma, dsCaGoiY.length > 0))
       } else {
         setLoi(`Không tải được ca: ${msg}`)
       }
