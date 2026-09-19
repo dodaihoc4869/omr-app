@@ -332,3 +332,24 @@ describe('màn thi thật: CHỈ đổi thẻ logo — luồng và các chỗ g�
     expect(doc('src/components/PhongChoGame.tsx')).toContain('<LogoHocSinh size={44} hienChu={false} />')
   })
 })
+
+// ───────────────────────── dọn bản cũ: không tệp / chỗ nào còn trỏ tới logo -v2 ─────────────────────────
+describe('bản logo cũ (-v2) đã gỡ hẳn', () => {
+  it('public/ không còn logo-*-v2.png; không tệp nguồn nào (mã, html tĩnh, manifest, mobileconfig, kiểm thử) còn tên logo -v2', () => {
+    expect(fs.readdirSync(path.join(goc, 'public')).filter((t) => /^logo-.*-v2\./.test(t))).toEqual([])
+    const quet = (dir: string, ra: string[] = []) => {
+      for (const t of fs.readdirSync(path.join(goc, dir), { withFileTypes: true })) {
+        const p = `${dir}/${t.name}`
+        if (t.isDirectory()) {
+          if (!['graphify-out', 'than-thu-v2', 'assets'].includes(t.name)) quet(p, ra)
+        } else if (/\.(tsx?|mjs|json|html|css|mobileconfig|svg)$/.test(t.name)) ra.push(p)
+      }
+      return ra
+    }
+    const tep = [...quet('src'), ...quet('public'), ...quet('scripts'), 'index.html', 'vite.config.ts'].filter((p) => !p.endsWith('logo-bo-moi-1909.test.tsx'))
+    const con = tep.filter((p) => /logo-(gv|hs|ph)-[a-z0-9-]*v2\.png/.test(doc(p)))
+    expect(con).toEqual([])
+    const testCon = fs.readdirSync(path.join(goc, 'tests')).filter((t) => /\.(ts|tsx)$/.test(t) && t !== 'logo-bo-moi-1909.test.tsx').filter((t) => /logo-(gv|hs|ph)-[a-z0-9-]*v2\.png/.test(doc(`tests/${t}`)))
+    expect(testCon).toEqual([])
+  })
+})
