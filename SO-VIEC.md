@@ -93,6 +93,16 @@
 - [x] Dừng, KHÔNG làm GĐ 3–6  | bằng chứng: không sửa `tro-ly-ca-nhan.ts`, `html-phieu.ts`, `btvn-cho-em.ts`, `StudentPortalScreen.tsx`, `ParentPortalScreen.tsx`; GĐ 3–6 chưa bắt đầu.
 - [x] Báo giới hạn dùng còn lại  | bằng chứng: xem báo cáo cuối lượt.
 
+### BÀN GIAO CHO PHIÊN SAU (GĐ 3–6 chưa làm; GĐ 5 phần máy chủ hoãn tới khi thầy ra lệnh trực tiếp)
+- **Lõi** (`server/src/`): `su-kien-hoc.ts` (MỘT hàm ghi sổ `ghiSuKien`, không bao giờ ném lỗi), `ho-so-nam-kt.ts` (`phatLaiSuKien` thuần + `dungLaiHoSo`), `ke-hoach-ngay.ts` (thuần) + `ke-hoach-ngay-d1.ts` (đọc gộp 50 em/lô, cron), `ho-so-cau-hinh.ts` (MỌI hằng số). Route ở `index.ts`: `/ho-so/*`, `/hs/ke-hoach-ngay`, `/hs/ca-dang-mo`, `/ke-hoach/chay-ca-lop`. Test 4 tệp `tests/{su-kien-hoc,ho-so-nam-kt,ke-hoach-ngay,ca-dang-mo}-1909.test.ts` chạy trên SQLite thật qua `tests/_d1-that.ts`.
+- **Bẫy D1:** dùng MỘT tham số `json_each(?)` (D1 chỉ cho 100 tham số); UNION quá ~5 vế → lỗi 7500; `INSERT…SELECT…ON CONFLICT` bắt buộc có `WHERE 1`; một lượt chạy ≤ 1000 truy vấn nên cron gộp 50 em/lô (260 em ≈ 100 truy vấn).
+- **Bẫy lược đồ:** bảng `ca` thật có 5 cột (`pham_vi`, `danh_sach_chon_json`, `mat_khau`, `de_rieng`, `pham_vi_hoi_lai`) mà không migration nào trong repo tạo — `_d1-that.ts` tự thêm; dựng D1 mới từ repo sẽ thiếu, cần một migration ghi lại.
+- **Bẫy dữ liệu thật:** 189/189 `nop_khac_phuc` có `so_cau=0` (phiếu `sua_loi_*` máy em sinh chưa lên R2) → sổ chấm bằng tờ kho theo qid (`cauTuKhoTheoQid`). `homeworkQuestions` loại Phần III đáp án mô tả dài và tờ `-VD/-DT` nên sổ BTVN ít hơn `btvn_em.so_cau` 135 dòng — KHÔNG phải lỗi. `ke_hoach_ngay` có 1 dòng thử `00000000`, giữ nguyên.
+- **Bẫy mã/test:** `tests/btvn-len-bang-1409.test.ts:255` soi NGUYÊN VĂN dòng `homeworkKeys(await homeworkQuestions(env,chuoi(bt.ma_de)))` trong `goi-cu.ts` — đừng tách dòng; route mới trong `index.ts` phải `return await` (không thì lỗi lọt khỏi `catch`); đường công khai phải kiểm SBD có thật TRƯỚC khi ghi.
+- **So nền vitest:** `npx vitest run --reporter=json --outputFile=/tmp/x.json` rồi so `testResults[].name` có `status:'failed'` với `docs/nen-vitest-do-1909.txt` (nền 98 test / 43 tệp, đo trước mọi thay đổi 19/09). Khi so, LOẠI `tests/bang-nhiem-vu-1909.test.tsx` và `tests/nhiem-vu-adapter-1909.test.ts` (của phiên Giao diện, có thể đỏ tạm) — bỏ hai tệp đó mà không ra đúng nền thì lỗi là của mình.
+- **Phát hành:** chỉ `./DAY-MAY-CHU.command < /dev/null` (có chốt ca thi; mã thoát 1 là do `read` cuối gặp EOF, xem dòng ">>> MÁY CHỦ ĐÃ LÊN"); migration `cd server && npx wrangler d1 execute omr --file=<tệp> --remote -y`. Mã bí mật thầy ở `/Volumes/SSD NGOÀI/kho-de/cau-hinh.json` (header `x-ma-bi-mat`) — không in ra, không ghi vào tệp.
+- **Còn nợ:** GĐ 3 (`lo_json`, `chiaCauVaoLo`, máy em gửi `dapAn` của lô — sửa `html-phieu.ts`, bỏ `dapAn` khỏi `#du-nop`, bỏ ba test "3 vòng"), GĐ 4, GĐ 5, GĐ 6, token phụ huynh. Kiểm `ket_qua`/`chuoiDat` của `ke_hoach_ngay` sau lần cron 00:01 ngày 20/09 đầu tiên; chưa kiểm được nhánh `coCaMo:true` của `/hs/ca-dang-mo` trên bản sống.
+
 ---
 
 # SỔ VIỆC — 19/09 (chiều) · PHÁT HÀNH CỤC BỘ + ĐỀ XUẤT CÁ NHÂN HOÁ "TIẾN BỘ TỪNG NGÀY"
