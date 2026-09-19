@@ -16,7 +16,7 @@ export function hashSeed(input: string): number {
 }
 
 /** PRNG mulberry32 — nhỏ gọn, đủ tốt cho xáo trình bày (không cần bảo mật mật mã). */
-function mulberry32(seed: number): () => number {
+export function mulberry32(seed: number): () => number {
   let a = seed >>> 0
   return () => {
     a |= 0

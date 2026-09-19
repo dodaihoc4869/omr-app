@@ -1,5 +1,6 @@
 import NhomCaThuGon from '../components/NhomCaThuGon'
 import { phanCongDayHoc } from '../lib/phan-cong-day-hoc'
+import { hashSeed } from '../lib/exam-shuffle'
 // GỌI HỌC SINH LÊN BẢNG — MỘT MÀN, MỘT LUỒNG (thầy chốt 05/09 chiều).
 //
 // Nguồn duy nhất là CA thầy vừa cho lớp làm. Từ một ca ấy ra cả hai việc:
@@ -796,7 +797,8 @@ export default function GoiLenBangScreen() {
     if (dayHoc) {
       if (!lichSu) return showToast('Chưa tải được lịch sử lên bảng. Thầy tải lại lịch sử trước khi phân công.', 'warn')
       try {
-        const result = phanCongDayHoc(dsCau, dsEmCa.map(e => ({...e, soLanLenBang: lichSu.theoEm[e.sbd]?.soLan ?? 0})))
+        // Seed theo MÃ CA: cùng ca, cùng đầu vào ⇒ cùng bảng (không còn bốc thăm `Math.random` mỗi lần bấm).
+        const result = phanCongDayHoc(dsCau, dsEmCa.map(e => ({...e, soLanLenBang: lichSu.theoEm[e.sbd]?.soLan ?? 0})), hashSeed(`day-hoc:${du?.maCa ?? ''}`))
         setKqXep(null); setKqBuoi(null); setKq(result); setXemCau('')
       } catch (e) { showToast(e instanceof Error ? e.message : 'Chưa phân công được', 'warn') }
       return

@@ -1,5 +1,6 @@
 import type { CauChua, EmGoi, KetQuaPhanCong } from './phan-cong'
 import { tiLeSaiChuyenDe } from './phan-cong'
+import { hashSeed, mulberry32 } from './exam-shuffle'
 
 /**
  * THUẬT TOÁN GỌI LÊN BẢNG DẠY HỌC — BẬC THANG SƯ PHẠM 3 NẤC (SCAFFOLDING LADDER)
@@ -39,7 +40,21 @@ const TEN_NAC: Record<1 | 2 | 3, string> = {
   3: 'Nấc 3: Mở rộng bứt phá · Đào sâu bản chất & biện luận',
 }
 
-export function phanCongDayHoc(cau: CauChua[], em: EmGoi[], random: () => number = Math.random): KetQuaPhanCong {
+/** Nguồn số ngẫu nhiên của bước "bốc thăm giữa các em ngang nhau": một HÀM (test truyền tay), hoặc một
+ * SEED — số, hoặc chuỗi (qua `hashSeed`, ví dụ mã ca) — để bảng dựng lại được y hệt. */
+export type NguonBocTham = (() => number) | number | string
+
+/** Không truyền gì thì vẫn TẤT ĐỊNH: hai lần bấm cùng đầu vào ra cùng bảng. Trước 19/09 mặc định là
+ * `Math.random` nên bấm lại là ra bảng khác, và không dựng lại được bảng thầy đã cầm hôm qua. */
+const SEED_MAC_DINH = 'phan-cong-day-hoc'
+
+function taoBocTham(nguon: NguonBocTham): () => number {
+  if (typeof nguon === 'function') return nguon
+  return mulberry32(typeof nguon === 'number' ? nguon : hashSeed(nguon))
+}
+
+export function phanCongDayHoc(cau: CauChua[], em: EmGoi[], nguon: NguonBocTham = SEED_MAC_DINH): KetQuaPhanCong {
+  const random = taoBocTham(nguon)
   const ds = em.filter((e) => e.coMat)
   if (ds.length < 2) throw new Error('Cần ít nhất 2 học sinh có mặt để phân công dạy học.')
   if (!cau.length) throw new Error('Thầy chọn đề để phân công dạy học.')
