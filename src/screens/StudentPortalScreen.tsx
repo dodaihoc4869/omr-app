@@ -713,6 +713,7 @@ export default function StudentPortalScreen() {
                 tenChuyenDe: `BỊT LỖ HỔNG: SỬA ${dsCauLuyen.length} CÂU SAI CĂN BẢN`,
                 ketQua: `Gồm ${dsCauLuyen.length} câu sai căn bản nhất em cần tự tay làm lại để không sai lặp lại`,
                 hienDapAn: false,
+                giaoDienHocSinh: true,
                 nhanBia: 'BỊT LỖ HỔNG CÂU SAI',
                 oBia: [
                   { nhan: 'Học sinh', gia: auth.hoTen },
@@ -770,6 +771,7 @@ export default function StudentPortalScreen() {
                 tenChuyenDe: 'THỬ THÁCH BỨT PHÁ 9+ (x2 EXP THẦN THÚ)',
                 ketQua: '2 câu Vận dụng cao rèn luyện tư duy đỉnh cao',
                 hienDapAn: false,
+                giaoDienHocSinh: true,
                 nhanBia: 'THỬ THÁCH BỨT PHÁ 9+',
                 oBia: [
                   { nhan: 'Học sinh', gia: auth.hoTen },

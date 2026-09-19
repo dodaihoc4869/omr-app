@@ -284,7 +284,7 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duC
         // con link kèm `~<số câu>` thì em chỉ nhận bấy nhiêu câu ĐẦU (đã xếp dễ
         // lên khó). Link không ghi số thì lấy trọn như trước.
         const cau = soCauLink ? g.cau.slice(0, chanSoCau(soCauLink)) : g.cau
-        const tt = { ...g.tt, ngay: new Date(g.tt.ngay) }
+        const tt = { ...g.tt, ngay: new Date(g.tt.ngay), giaoDienHocSinh: true }
         if (soCauLink && Array.isArray(tt.oBia)) tt.oBia = tt.oBia.map((o) => (o.nhan === 'Số câu' ? { ...o, gia: `${cau.length} câu` } : o))
         // HAI LINK, MỘT PHIẾU: `~20d` là ĐỀ cho em tự làm (không một đáp án nào
         // trong trang), `~20g` là LỜI GIẢI để em dò. Link cũ không ghi chữ
@@ -704,6 +704,7 @@ function NutXemDeDaLam({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: bool
             tenChuyenDe: cd.length === 1 ? cd[0] : du.tenCa || 'Hoá học',
             ketQua: `Điểm ${du.diem.toFixed(2).replace('.', ',')}/10`,
             hienDapAn: true,
+            giaoDienHocSinh: true,
             nhanBia: `Đề ${xung} vừa làm, kèm lời giải`,
             oBia: [
               { nhan: 'Học sinh', gia: du.hoTen },

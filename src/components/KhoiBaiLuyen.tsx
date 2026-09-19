@@ -173,6 +173,7 @@ function NutTaiBaiTap({ du, laCuaEm = false, xinLink }: { du: PhieuDayDu; laCuaE
         tenChuyenDe: sai[0]?.ten || du.chuyenDeCa[0]?.ten || 'Hoá học',
         ketQua: sai.length > 0 ? `Sai ${sai.reduce((n, c) => n + c.soSai, 0)}/${sai.reduce((n, c) => n + c.soCau, 0)} câu` : '',
         hienDapAn: false,
+        giaoDienHocSinh: true,
         nhanBia: laCuaEm ? 'Câu khắc phục lỗi sai' : 'Phiếu Bài Tập Riêng',
       }
       // MỘT lần dựng. Bản trước dựng hai lần (đề, lời giải) rồi nối chuỗi nên

@@ -184,6 +184,7 @@ export function taoDeLamLaiCauSai(
     tenChuyenDe: thongTin.tenDe || 'ĐỀ LÀM LẠI CÁC CÂU SAI',
     ketQua: `Gồm ${dsCau.length} câu làm sai cần khắc phục`,
     hienDapAn: false,
+    giaoDienHocSinh: true,
     nhanBia: 'LÀM LẠI CÂU SAI',
   }
   const html = dungPhieu(tt, dsCau, { anGiai: false })
@@ -361,6 +362,7 @@ export function rutLuyenThemDangCauSai(
     tenChuyenDe: thongTin.tenDe || 'ĐỀ LUYỆN DẠNG KHẮC PHỤC CÂU SAI',
     ketQua: `Gồm ${dsCauRut.length} câu cùng dạng (chia theo tỷ lệ từ ${tongToiDa} câu tối đa)`,
     hienDapAn: false,
+    giaoDienHocSinh: true,
     nhanBia: 'LUYỆN DẠNG CÂU SAI',
   }
   const html = dungPhieu(tt, dsCauRut, { anGiai: false })
@@ -518,6 +520,7 @@ export function rutLuyenTheoBoLoc(
     tenChuyenDe: thongTin.tenDe || `ĐỀ ÔN THEO BỘ LỌC (${nhanSao} · ${nhanDang})`,
     ketQua: `Gồm ${dsCauRut.length} câu (rút từ tối đa ${tongToiDa} câu)`,
     hienDapAn: false,
+    giaoDienHocSinh: true,
     nhanBia: 'BỘ LỌC CÂU LUYỆN',
   }
   const html = dungPhieu(tt, dsCauRut, { anGiai: false })
@@ -578,6 +581,7 @@ export function rutLuyenDangBai(
     tenChuyenDe: `${thongTin.tenDang} — Lớp ${thongTin.lop} · ${thongTin.tenBai}`,
     ketQua: `Gồm ${dsCauRut.length} câu (kho có ${tatCa.length} câu thuộc dạng này)`,
     hienDapAn: false,
+    giaoDienHocSinh: true,
     nhanBia: 'LUYỆN ĐỀ TỰ DO',
   }
   const html = dungPhieu(tt, dsCauRut, { anGiai: false })

@@ -58,6 +58,10 @@ export interface ThongTinPhieu {
    *
    * Ô Ngày và ô kết quả vẫn do bìa tự thêm, khỏi chỗ nào cũng phải lặp. */
   oBia?: OBia[]
+  /** Phiếu này dành cho HỌC SINH / PHỤ HUYNH cầm trên màn hình (khắc phục, đề + lời giải của em, xem lại…): mặc áo
+   * Material 3 (lớp gd-m3 trên <html>). Phiếu nộp được (`nop`) luôn mặc áo ấy, không cần cờ này. Phiếu của giáo
+   * viên, bản in và tờ máy chiếu KHÔNG bao giờ đặt cờ này nên ra đúng từng byte như trước. */
+  giaoDienHocSinh?: boolean
 }
 
 const CHU_PA = ['A', 'B', 'C', 'D']
@@ -2302,19 +2306,587 @@ export const JS_PHIEU = `
 })();
 `
 
+/** GIAO DIỆN MATERIAL 3 của phiếu học sinh làm/nộp (lớp `gd-m3` trên <html>). CHỈ được chèn khi `taiLieuHtml`
+ * nhận lớp ấy; mọi phiếu khác (giáo viên, in, máy chiếu) KHÔNG có một byte nào của khối này. */
+export const CSS_PHIEU_M3 = `
+/* ===================== GIAO DIỆN MATERIAL 3 CỦA PHIẾU (lớp html.gd-m3) =====================
+   Chỉ được chèn khi <html> có lớp gd-m3 (phiếu học sinh làm/nộp). Phiếu giáo viên, bản in, tờ máy
+   chiếu KHÔNG có khối này. Phần tô kiểu nằm trong @media screen nên bản in không đổi một byte; chỉ thêm một luật ẩn thanh bấm-được khi in.
+   THAY ÁO, KHÔNG THAY XƯƠNG: không đổi id/class/thuộc tính mà mã lệnh và test đang dùng.
+   QUY TẮC GIẤU ĐÁP ÁN vẫn nguyên: ở đây chỉ tô kiểu cho ô đang chọn (aria-checked) và cho lớp
+   dung/sai (mã lệnh chỉ gắn lớp ấy vào DOM khi được phép lộ). KHÔNG bao giờ theo [data-dung].
+   (Cấm dấu huyền ngược và ký hiệu đô-la-ngoặc-nhọn trong khối này: cả khối nằm trong một chuỗi mẫu.) */
+/* Ngoài màn hình (in, chiếu): thanh trên và tấm lưới là đồ chỉ để bấm, không được lọt ra giấy. */
+@media not screen {
+  html.gd-m3 body .gd-tren, html.gd-m3 body .gd-luoi, html.gd-m3 body .gd-luoi-nen { display: none !important; }
+}
+@media screen {
+html.gd-m3 body {
+  /* --- KHỐI TOKEN: bảng màu vai trò M3, cùng mã với src/components/bang-nhiem-vu/m3-theme.css --- */
+  --gm-primary: #0b57d0; --gm-on-primary: #ffffff; --gm-primary-c: #d3e3fd; --gm-on-primary-c: #041e49;
+  --gm-secondary-c: #c2e7ff; --gm-on-secondary-c: #001d35;
+  --gm-tertiary: #146c2e; --gm-tertiary-c: #c4eed0; --gm-on-tertiary-c: #072100;
+  --gm-error: #b3261e; --gm-error-c: #f9dedc; --gm-on-error-c: #410e0b;
+  --gm-surface: #fdfbff; --gm-lowest: #ffffff; --gm-sc: #f0f4f9; --gm-sc-high: #e9eef6;
+  --gm-on-surface: #1f1f1f; --gm-on-surface-v: #444746; --gm-outline: #747775; --gm-outline-v: #c4c7c5;
+  --gm-cao1: 0 1px 2px rgba(0,0,0,.3), 0 1px 3px 1px rgba(0,0,0,.15);
+  --gm-cao-tren: 0 -1px 3px rgba(0,0,0,.15);
+}
+@media (prefers-color-scheme: dark) {
+  html.gd-m3 body {
+    --gm-primary: #a8c7fa; --gm-on-primary: #062e6f; --gm-primary-c: #0842a0; --gm-on-primary-c: #d3e3fd;
+    --gm-secondary-c: #004a77; --gm-on-secondary-c: #c2e7ff;
+    --gm-tertiary: #6dd58c; --gm-tertiary-c: #0f5223; --gm-on-tertiary-c: #c4eed0;
+    --gm-error: #f2b8b5; --gm-error-c: #8c1d18; --gm-on-error-c: #f9dedc;
+    --gm-surface: #131314; --gm-lowest: #3a3c3f; --gm-sc: #1e1f20; --gm-sc-high: #282a2c;
+    --gm-on-surface: #e3e3e3; --gm-on-surface-v: #c4c7c5; --gm-outline: #8e918f; --gm-outline-v: #444746;
+    --gm-cao1: 0 1px 2px rgba(0,0,0,.5), 0 1px 3px 1px rgba(0,0,0,.3);
+    --gm-cao-tren: 0 -2px 8px rgba(0,0,0,.5);
+  }
+}
+html.gd-m3 body.dark {
+  --gm-primary: #a8c7fa; --gm-on-primary: #062e6f; --gm-primary-c: #0842a0; --gm-on-primary-c: #d3e3fd;
+  --gm-secondary-c: #004a77; --gm-on-secondary-c: #c2e7ff;
+  --gm-tertiary: #6dd58c; --gm-tertiary-c: #0f5223; --gm-on-tertiary-c: #c4eed0;
+  --gm-error: #f2b8b5; --gm-error-c: #8c1d18; --gm-on-error-c: #f9dedc;
+  --gm-surface: #131314; --gm-lowest: #3a3c3f; --gm-sc: #1e1f20; --gm-sc-high: #282a2c;
+  --gm-on-surface: #e3e3e3; --gm-on-surface-v: #c4c7c5; --gm-outline: #8e918f; --gm-outline-v: #444746;
+  --gm-cao1: 0 1px 2px rgba(0,0,0,.5), 0 1px 3px 1px rgba(0,0,0,.3);
+  --gm-cao-tren: 0 -2px 8px rgba(0,0,0,.5);
+}
+
+/* --- biểu tượng nét (mặt nạ SVG, không thêm yêu cầu mạng) --- */
+html.gd-m3 body {
+  --gm-i-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+  --gm-i-x: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E");
+  --gm-i-khoa: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2'/%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'/%3E%3C/svg%3E");
+  /* --- ánh xạ biến cũ của phiếu sang token M3: mọi phần chưa ghi đè riêng tự hợp màu --- */
+  --nen: var(--gm-surface); --the-nen: var(--gm-sc); --muc: var(--gm-on-surface); --muc-2: var(--gm-on-surface);
+  --nhat: var(--gm-on-surface-v); --rat-nhat: var(--gm-outline); --vien: var(--gm-outline-v); --vien-dam: var(--gm-outline);
+  --nav: var(--gm-primary); --luc: var(--gm-primary);
+  --o-nen: var(--gm-lowest); --o-chu: var(--gm-on-surface); --chu-cai-nen: var(--gm-sc-high); --chu-cai-muc: var(--gm-on-surface-v);
+  --chon-nen: var(--gm-primary-c); --chon-vien: var(--gm-primary);
+  --dung: var(--gm-tertiary); --dung-nen: var(--gm-tertiary-c); --dung-muc: var(--gm-on-tertiary-c);
+  --sai: var(--gm-error); --sai-nen: var(--gm-error-c); --sai-muc: var(--gm-on-error-c);
+  --kem-nen: var(--gm-sc-high); --kem-vien: transparent; --kem-muc: var(--gm-on-surface); --kem-nhan: var(--gm-on-surface-v);
+  --bo: 20px; --bo-nho: 12px; --bong: none; --bong-cao: none;
+  background: var(--gm-surface); color: var(--gm-on-surface);
+  -webkit-tap-highlight-color: transparent;
+}
+html.gd-m3 body .cover, html.gd-m3 body .summary-page, html.gd-m3 body .ds-tieu-de, html.gd-m3 body #doi-mau { display: none; }
+/* Cách chia "3 Vòng" đã thay bằng lô theo ngày/giờ: chữ còn nằm trong DOM (bài kiểm khoá chuỗi) nhưng học sinh không thấy. */
+html.gd-m3 body .q-tag.vong-btvn, html.gd-m3 body .vong-pill, html.gd-m3 body .btvn-3vong-banner { display: none; }
+/* Chừa chỗ cho hai thanh dính: tab/cuộn tới một ô không được bị thanh trên hoặc thanh nộp che mất. */
+html.gd-m3 { --gd-cao: 96px; scroll-padding-top: calc(var(--gd-cao) + 16px); scroll-padding-bottom: 96px; }
+html.gd-m3 body .khung { max-width: 720px; margin: 0 auto; padding: 14px 16px 132px; }
+/* Thanh trên là position:fixed (thu gọn khi cuộn KHÔNG được đổi chiều cao dòng chảy, nếu không trang giật và cuộn
+   dao động); chỗ của nó do padding này giữ, --gd-cao do mã lệnh trang trí đo lại theo chiều cao thật. */
+html.gd-m3 body.co-lam .khung { padding-top: calc(var(--gd-cao) + 14px); }
+html.gd-m3 body .chan { color: var(--gm-on-surface-v); }
+
+/* --- thanh trên dính: tên bài + tiến độ + lưới số câu --- */
+html.gd-m3 body .gd-tren {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 30; box-sizing: border-box;
+  padding: max(12px, env(safe-area-inset-top)) 16px 12px;
+  background: var(--gm-surface); box-shadow: var(--gm-cao1);
+}
+html.gd-m3 body .gd-tren-trong { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+html.gd-m3 body .gd-tren-hang { display: flex; align-items: center; gap: 8px; }
+html.gd-m3 body .gd-tren-chu { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+html.gd-m3 body .gd-hang-tieu { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+html.gd-m3 body .gd-han { flex-shrink: 0; font-size: 12px; font-weight: 600; color: var(--gm-on-surface-v); }
+html.gd-m3 body .gd-tieu-de { min-width: 0; font-size: 17px; line-height: 24px; font-weight: 700; color: var(--gm-on-surface); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html.gd-m3 body .gd-phu-hang { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; }
+html.gd-m3 body .gd-phu { font-size: 13px; font-weight: 600; color: var(--gm-on-surface-v); }
+/* Cuộn xuống thì thu gọn: bỏ tên bài, chỉ còn số câu + tiến độ + nút lưới. */
+html.gd-m3 body .gd-tren.gd-gon { padding-top: max(6px, env(safe-area-inset-top)); padding-bottom: 8px; }
+html.gd-m3 body .gd-tren.gd-gon .gd-hang-tieu { display: none; }
+html.gd-m3 body .gd-nut-luoi {
+  flex-shrink: 0; width: 48px; height: 48px; padding: 0; border: 0; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  background: var(--gm-sc-high); color: var(--gm-on-primary-c);
+}
+html.gd-m3 body .gd-khich {
+  padding: 2px 10px; border-radius: 999px; background: var(--gm-tertiary-c); color: var(--gm-on-tertiary-c);
+  font-size: 12px; font-weight: 700;
+}
+html.gd-m3 body .gd-khich[hidden] { display: none; }
+html.gd-m3 body .gd-tien { height: 6px; border-radius: 999px; background: var(--gm-primary-c); overflow: hidden; }
+html.gd-m3 body .gd-tien-day { height: 100%; width: var(--gd-tien, 0%); border-radius: 999px; background: var(--gm-primary); transition: width .2s cubic-bezier(.2,0,0,1); }
+html.gd-m3 body.gd-vua-xong .gd-tien { animation: gd-nay .4s cubic-bezier(.2,0,0,1) 1; }
+@keyframes gd-nay { 0% { transform: scaleY(1); } 40% { transform: scaleY(1.9); } 100% { transform: scaleY(1); } }
+/* Chọn đáp án: dòng vừa chọn nảy nhẹ 120 ms (chạy khi bộ chọn bắt đầu khớp; tắt hẳn khi giảm chuyển động). */
+@keyframes gd-chon { 0% { transform: scale(.985); } 100% { transform: scale(1); } }
+html.gd-m3 body .q-opt.lam-o[aria-checked="true"], html.gd-m3 body .tf-badge.lam-o[aria-checked="true"] { animation: gd-chon .12s cubic-bezier(.2,0,0,1) 1; }
+
+/* --- thanh nộp: dải dính dưới cùng, nút Nộp bài filled --- */
+html.gd-m3 body #thanh-nop {
+  position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 40; box-sizing: border-box;
+  margin: 0; border: 0; border-radius: 0; flex-wrap: nowrap; gap: 12px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: var(--gm-sc); box-shadow: var(--gm-cao-tren);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+html.gd-m3 body #thanh-nop .nop-chu { flex: 1; min-width: 0; font-size: 14px; font-weight: 700; color: var(--gm-on-surface); }
+/* Khi mã lệnh trang trí đã chạy (lớp gd-js) thì #gd-con thay dòng đếm cũ: con số ở thanh trên và ở đây không được
+   lệch nhau (lô 5 câu mà đáy còn ghi "/12"). Dòng cũ vẫn nằm trong DOM, mã nộp vẫn ghi vào đó như trước. */
+html.gd-m3.gd-js body #thanh-nop .nop-chu { display: none; }
+html.gd-m3 body #thanh-nop .gd-con { flex: 1; min-width: 0; font-size: 14px; font-weight: 700; color: var(--gm-on-surface); }
+html.gd-m3 body #thanh-nop .gd-con.ket { color: var(--gm-tertiary); }
+html.gd-m3 body #thanh-nop .nop-ket { font-size: 13px; font-weight: 700; color: var(--gm-on-surface-v); }
+html.gd-m3 body #thanh-nop .nop-loi { display: block; font-size: 12px; color: var(--gm-error); }
+html.gd-m3 body #thanh-nop .nut.nop {
+  flex-shrink: 0; min-height: 52px; height: 52px; padding: 0 24px; border: 0; border-radius: 26px;
+  background: var(--gm-primary); color: var(--gm-on-primary); font-size: 15px; font-weight: 700;
+  box-shadow: var(--gm-cao1); cursor: pointer;
+}
+html.gd-m3 body #thanh-nop .nut.nop[disabled] { opacity: .38; box-shadow: none; }
+
+/* --- thanh điều khiển cũ (mở hết lời giải, lọc): thẻ tonal gọn, không viền không bóng --- */
+html.gd-m3 body .thanh:not(#thanh-nop) {
+  position: static; margin: 0 0 14px; padding: 8px 12px; gap: 8px;
+  background: var(--gm-sc); border: 0; border-radius: 16px; box-shadow: none;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+html.gd-m3 body .thanh:not(#thanh-nop) .thanh-chu { font-size: 13px; color: var(--gm-on-surface-v); }
+html.gd-m3 body .nut {
+  min-height: 48px; border: 0; border-radius: 999px; padding: 0 18px; font-size: 14px; font-weight: 700;
+  background: var(--gm-sc-high); color: var(--gm-primary); box-shadow: none;
+}
+html.gd-m3 body .nut.chinh, html.gd-m3 body .nut.dam { background: var(--gm-primary); color: var(--gm-on-primary); }
+
+/* --- băng thông tin đầu phiếu --- */
+html.gd-m3 body .nhac-phieu {
+  margin: 0 0 12px; padding: 12px 16px; border: 0; border-radius: 16px;
+  background: var(--gm-secondary-c); color: var(--gm-on-secondary-c); font-size: 14px; line-height: 1.5;
+}
+html.gd-m3 body .nhac-phieu b { color: var(--gm-on-secondary-c); }
+html.gd-m3 body .thanh-phan-tang-btvn {
+  margin: 0 0 14px; padding: 12px 14px; border: 0; border-radius: 16px;
+  background: var(--gm-tertiary-c); color: var(--gm-on-tertiary-c); font-size: 13px; line-height: 1.45;
+}
+html.gd-m3 body .thanh-phan-tang-btvn .tpt-sao { display: none; }
+html.gd-m3 body .tpt-nut-mo {
+  min-height: 48px; padding: 0 14px; border: 0; border-radius: 24px; background: transparent;
+  color: var(--gm-on-tertiary-c); font-size: 13px; font-weight: 700; cursor: pointer;
+}
+html.gd-m3 body .giai-khoa {
+  margin: 0 0 12px; padding: 12px 16px; border-radius: 16px; background: var(--gm-sc-high);
+  color: var(--gm-on-surface-v); font-size: 13px; font-weight: 600;
+}
+
+/* --- thẻ câu: tonal, không viền, bo 20 --- */
+html.gd-m3 body .ds-cau { gap: 14px; }
+html.gd-m3 body .q-card {
+  background: var(--gm-sc); border: 0; border-radius: 20px; box-shadow: none; overflow: visible;
+  transition: box-shadow .12s;
+}
+html.gd-m3 body .q-card:hover { box-shadow: none; }
+html.gd-m3 body .q-card:focus-within { box-shadow: inset 0 0 0 2px var(--gm-primary); }
+html.gd-m3 body .q-card.mo, html.gd-m3 body .q-card.la-chua, html.gd-m3 body .q-card.la-chua.mo { border-left: 0; }
+html.gd-m3 body .q-card.q-card-active { border-left: 0 !important; box-shadow: none; }
+html.gd-m3 body .q-card.q-card-active:focus-within { box-shadow: inset 0 0 0 2px var(--gm-primary); }
+html.gd-m3 body.chi-de .q-card { border-left: 0 !important; }
+html.gd-m3 body .q-header { padding: 16px 16px 0; align-items: center; gap: 10px; }
+html.gd-m3 body .q-num {
+  position: relative; width: 30px; height: 30px; border-radius: 50%; background: transparent; box-shadow: inset 0 0 0 1.5px var(--gm-outline);
+  color: var(--gm-on-surface-v); font-size: 13px; font-weight: 700;
+}
+/* Đã làm xong câu: vòng số đổi thành dấu tích. Lớp gd-da-lam do mã lệnh trang trí gắn (không phụ thuộc :has). */
+html.gd-m3 body .q-card.gd-da-lam .q-num, html.gd-m3 body .q-card.cau-dung .q-num {
+  background: var(--gm-tertiary-c); color: var(--gm-on-tertiary-c); box-shadow: none;
+}
+html.gd-m3 body .q-card.gd-da-lam .q-num .ky, html.gd-m3 body .q-card.cau-dung .q-num .ky, html.gd-m3 body .q-card.cau-sai .q-num .ky { font-size: 0; }
+html.gd-m3 body .q-card.gd-da-lam .q-num::after, html.gd-m3 body .q-card.cau-dung .q-num::after {
+  content: ''; position: absolute; width: 16px; height: 16px; background: currentColor;
+  -webkit-mask: var(--gm-i-check) center / contain no-repeat; mask: var(--gm-i-check) center / contain no-repeat;
+}
+html.gd-m3 body .q-card.cau-sai .q-num { background: var(--gm-error-c); color: var(--gm-on-error-c); box-shadow: none; }
+html.gd-m3 body .q-card.cau-sai .q-num::after {
+  content: ''; position: absolute; width: 16px; height: 16px; background: currentColor;
+  -webkit-mask: var(--gm-i-x) center / contain no-repeat; mask: var(--gm-i-x) center / contain no-repeat;
+}
+/* nhãn: chip tonal */
+html.gd-m3 body .q-tags { gap: 6px; }
+html.gd-m3 body .q-tag {
+  padding: 3px 9px; border: 0; border-radius: 999px; box-shadow: none; letter-spacing: 0;
+  background: var(--gm-sc-high); color: var(--gm-on-surface-v); font-size: 11px; font-weight: 600;
+}
+html.gd-m3 body .q-tag::before { display: none; }
+html.gd-m3 body .q-tag.type-mc, html.gd-m3 body .q-tag.type-tf, html.gd-m3 body .q-tag.type-sa { background: var(--gm-secondary-c); color: var(--gm-on-secondary-c); }
+html.gd-m3 body .q-tag.vong-1, html.gd-m3 body .q-tag.level-1 { background: var(--gm-tertiary-c); color: var(--gm-on-tertiary-c); }
+html.gd-m3 body .q-tag.vong-2, html.gd-m3 body .q-tag.level-2, html.gd-m3 body .q-tag.level-3 { background: var(--gm-sc-high); color: var(--gm-on-surface-v); }
+html.gd-m3 body .q-tag.vong-3, html.gd-m3 body .q-tag.sai-cua-em { background: var(--gm-error-c); color: var(--gm-on-error-c); }
+html.gd-m3 body .q-tag.chua, html.gd-m3 body .q-tag.chua-2 { background: var(--gm-secondary-c); color: var(--gm-on-secondary-c); }
+html.gd-m3 body .q-tag.muc-tieu-hom-nay-tag { background: var(--gm-primary-c); color: var(--gm-on-primary-c) !important; box-shadow: none; }
+html.gd-m3 body .q-tag.topic { background: var(--gm-sc-high); color: var(--gm-on-surface-v); white-space: normal; }
+html.gd-m3 body .q-text { font-size: 16px; line-height: 1.55; color: var(--gm-on-surface); }
+html.gd-m3 body .lam-lai { border-radius: 12px; background: var(--gm-sc-high); color: var(--gm-on-surface); }
+
+/* --- phương án Phần I: hàng chọn M3 --- */
+html.gd-m3 body .q-options, html.gd-m3 body .q-options.single-col { grid-template-columns: 1fr; gap: 8px; margin-top: 12px; }
+html.gd-m3 body .q-opt {
+  min-height: 52px; padding: 8px 14px; gap: 12px; border: 0; border-radius: 14px;
+  background: var(--gm-lowest); color: var(--gm-on-surface); font-size: 15px; font-weight: 500; text-align: left;
+  box-shadow: inset 0 0 0 1px var(--gm-outline-v); transition: background-color .12s, box-shadow .12s;
+}
+html.gd-m3 body .q-opt-letter {
+  position: relative; width: 30px; height: 30px; background: transparent; color: var(--gm-on-surface-v);
+  box-shadow: inset 0 0 0 1.5px var(--gm-outline); font-size: 13px; font-weight: 700;
+}
+html.gd-m3 body .q-opt.lam-o:active { background: var(--gm-sc-high); }
+html.gd-m3 body .lam-o:focus-visible { outline: 3px solid var(--gm-primary); outline-offset: 2px; }
+/* Ô EM ĐANG CHỌN: một kiểu duy nhất, đúng hay sai chưa nói gì (giữ luật giấu đáp án). */
+html.gd-m3 body .q-opt.lam-o[aria-checked="true"],
+html.gd-m3 body.co-lam.chua-nop .q-opt.lam-o[aria-checked="true"],
+html.gd-m3 body.co-lam.chi-de .q-opt.lam-o[aria-checked="true"] {
+  background: var(--gm-primary-c) !important; color: var(--gm-on-primary-c) !important; font-weight: 600 !important;
+  border-color: transparent !important; box-shadow: inset 0 0 0 2px var(--gm-primary) !important;
+}
+html.gd-m3 body .q-opt.lam-o[aria-checked="true"] .q-opt-letter,
+html.gd-m3 body.co-lam.chua-nop .q-opt.lam-o[aria-checked="true"] .q-opt-letter,
+html.gd-m3 body.co-lam.chi-de .q-opt.lam-o[aria-checked="true"] .q-opt-letter {
+  background: var(--gm-primary) !important; color: var(--gm-on-primary) !important; box-shadow: none !important; font-size: 0;
+}
+html.gd-m3 body .q-opt.lam-o[aria-checked="true"] .q-opt-letter .ky { font-size: 0; }
+html.gd-m3 body .q-opt.lam-o[aria-checked="true"] .q-opt-letter::after {
+  content: ''; position: absolute; width: 16px; height: 16px; background: currentColor;
+  -webkit-mask: var(--gm-i-check) center / contain no-repeat; mask: var(--gm-i-check) center / contain no-repeat;
+}
+/* Sau khi mã lệnh cho lộ đáp án (lớp dung/sai chỉ có trong DOM lúc ấy). */
+html.gd-m3 body .q-card.mo .q-opt.dung, html.gd-m3 body .q-opt.dung {
+  background: var(--gm-tertiary-c); color: var(--gm-on-tertiary-c); border-color: transparent; box-shadow: inset 0 0 0 1.5px var(--gm-tertiary); font-weight: 700;
+}
+html.gd-m3 body .q-card.mo .q-opt.dung .q-opt-letter, html.gd-m3 body .q-opt.dung .q-opt-letter {
+  background: var(--gm-tertiary); color: var(--gm-surface); box-shadow: none;
+}
+html.gd-m3 body .q-card.mo .q-opt.sai, html.gd-m3 body .q-opt.sai, html.gd-m3 body .q-card.da-cham .q-opt.sai {
+  background: var(--gm-error-c); color: var(--gm-on-error-c); border-color: transparent; box-shadow: inset 0 0 0 1.5px var(--gm-error); font-weight: 700;
+}
+html.gd-m3 body .q-card.mo .q-opt.sai .q-opt-letter, html.gd-m3 body .q-opt.sai .q-opt-letter, html.gd-m3 body .q-card.da-cham .q-opt.sai .q-opt-letter {
+  background: var(--gm-error); color: var(--gm-surface); box-shadow: none;
+}
+
+/* --- Phần II: hàng ý + nút phân đoạn Đ | S --- */
+html.gd-m3 body .tf-item, html.gd-m3 body.co-lam .tf-item {
+  min-height: 52px; padding: 6px 8px 6px 14px; gap: 10px; border-radius: 14px; background: var(--gm-lowest);
+}
+html.gd-m3 body .q-card.mo .tf-item { background: var(--gm-lowest); }
+html.gd-m3 body .tf-statement { font-size: 14px; line-height: 1.45; color: var(--gm-on-surface); }
+html.gd-m3 body .tf-o, html.gd-m3 body.co-lam .tf-o {
+  gap: 0; overflow: hidden; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--gm-outline);
+}
+html.gd-m3 body .tf-badge, html.gd-m3 body.co-lam .tf-badge {
+  width: 52px; height: 48px; border: 0; border-radius: 0; box-shadow: none; background: transparent;
+  color: var(--gm-on-surface-v); font-size: 14px; font-weight: 600;
+}
+html.gd-m3 body .tf-badge.s, html.gd-m3 body.co-lam .tf-badge.s { box-shadow: inset 1px 0 0 var(--gm-outline); }
+html.gd-m3 body.co-lam .tf-badge.lam-o::after { inset: 0; border-radius: 0; }
+html.gd-m3 body .tf-badge.lam-o:active { background: var(--gm-sc-high); }
+html.gd-m3 body .tf-badge.lam-o[aria-checked="true"],
+html.gd-m3 body.co-lam.chua-nop .tf-badge.lam-o[aria-checked="true"],
+html.gd-m3 body.co-lam.chi-de .tf-badge.lam-o[aria-checked="true"] {
+  background: var(--gm-secondary-c) !important; color: var(--gm-on-secondary-c) !important; font-weight: 700 !important; border-color: transparent !important;
+}
+html.gd-m3 body .q-card.mo .tf-badge.d.dung { background: var(--gm-tertiary-c); color: var(--gm-on-tertiary-c); border-color: transparent; }
+html.gd-m3 body .q-card.mo .tf-badge.s.dung { background: var(--gm-error-c); color: var(--gm-on-error-c); border-color: transparent; }
+
+/* --- Phần III: ô nhập outlined --- */
+html.gd-m3 body .sa-vung { min-height: 56px; }
+html.gd-m3 body .lam-nhap {
+  width: 100%; max-width: none; height: 56px; padding: 0 16px; border: 0; border-radius: 12px; background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--gm-outline); color: var(--gm-on-surface); font-size: 18px; font-weight: 600;
+}
+html.gd-m3 body .lam-nhap::placeholder { color: var(--gm-on-surface-v); font-weight: 500; }
+html.gd-m3 body .lam-nhap:focus { outline: none; box-shadow: inset 0 0 0 2px var(--gm-primary); }
+html.gd-m3 body .sa-blank { border-radius: 12px; }
+html.gd-m3 body .sa-answer { background: var(--gm-tertiary-c); color: var(--gm-on-tertiary-c); border-radius: 12px; }
+
+/* --- câu thuộc lô sau: mờ 38% + khoá --- */
+html.gd-m3 body .q-card.q-card-dimmed, html.gd-m3 body .q-card.q-card-dimmed:hover, html.gd-m3 body .q-card.q-card-dimmed:focus-within { opacity: .38; filter: none; }
+html.gd-m3 body .dimmed-pacing-banner {
+  padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--gm-on-surface-v); font-size: 14px; font-weight: 500;
+}
+html.gd-m3 body .dimmed-lock-icon {
+  display: inline-block; width: 18px; height: 18px; font-size: 0; flex-shrink: 0; background: currentColor;
+  -webkit-mask: var(--gm-i-khoa) center / contain no-repeat; mask: var(--gm-i-khoa) center / contain no-repeat;
+}
+
+/* --- kết quả sau nộp trên từng thẻ --- */
+html.gd-m3 body .lam-ket {
+  display: inline-flex; margin-top: 10px; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 700;
+}
+html.gd-m3 body .q-card.cau-dung .lam-ket { background: var(--gm-tertiary-c); color: var(--gm-on-tertiary-c); }
+html.gd-m3 body .q-card.cau-sai .lam-ket { background: var(--gm-error-c); color: var(--gm-on-error-c); }
+
+/* --- lời giải: khung bao ngoài đổi, NỘI DUNG bên trong giữ nguyên --- */
+html.gd-m3 body .q-nut-giai {
+  min-height: 48px; border: 0; border-top: 0; background: transparent; color: var(--gm-primary); font-size: 14px; font-weight: 700;
+}
+/* Khung nằm ở .sol-box (không ở .sol-inner: ô lưới đang đóng 0fr mà .sol-inner có đệm thì vẫn chừa khoảng trống). */
+html.gd-m3 body .sol-box {
+  margin: 0 16px 16px; padding: 16px; border: 0; border-radius: 16px; box-shadow: none;
+  background: var(--gm-sc-high); color: var(--gm-on-surface);
+}
+html.gd-m3 body .sol-label { color: var(--gm-on-surface-v); }
+html.gd-m3 body .sol-dap, html.gd-m3 body .sol-dap b, html.gd-m3 body .sol-text, html.gd-m3 body .sol-text strong,
+html.gd-m3 body .sol-cot-loi, html.gd-m3 body .sol-pa, html.gd-m3 body .sol-pa strong, html.gd-m3 body .sol-step,
+html.gd-m3 body .sol-ket { color: var(--gm-on-surface); }
+html.gd-m3 body .sol-pa + .sol-pa { border-top-color: var(--gm-outline-v); }
+html.gd-m3 body .sol-pa.chon { color: var(--gm-tertiary); }
+html.gd-m3 body .sol-anh img { border: 0; }
+
+/* --- lưới số câu (tấm trượt từ dưới) --- */
+html.gd-m3 body .gd-luoi-nen { position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.5); }
+html.gd-m3 body .gd-luoi-nen[hidden], html.gd-m3 body .gd-luoi[hidden] { display: none; }
+html.gd-m3 body .gd-luoi {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 61; box-sizing: border-box; max-height: 72vh; overflow: auto;
+  padding: 12px 16px calc(24px + env(safe-area-inset-bottom)); border-radius: 28px 28px 0 0;
+  background: var(--gm-sc); color: var(--gm-on-surface); box-shadow: var(--gm-cao-tren);
+  display: flex; flex-direction: column; gap: 14px;
+}
+html.gd-m3 body .gd-luoi-cam { width: 32px; height: 4px; border-radius: 999px; background: var(--gm-outline); align-self: center; }
+html.gd-m3 body .gd-luoi-dau { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+html.gd-m3 body .gd-luoi-dau b { font-size: 16px; }
+html.gd-m3 body .gd-luoi-dau span { font-size: 12px; color: var(--gm-on-surface-v); }
+html.gd-m3 body .gd-luoi-o { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+html.gd-m3 body .gd-o {
+  height: 48px; padding: 0; border: 0; border-radius: 14px; cursor: pointer; background: transparent;
+  color: var(--gm-on-surface-v); box-shadow: inset 0 0 0 1px var(--gm-outline-v); font: inherit; font-size: 14px; font-weight: 600;
+}
+html.gd-m3 body .gd-o.da { background: var(--gm-primary-c); color: var(--gm-on-primary-c); box-shadow: none; font-weight: 700; }
+html.gd-m3 body .gd-o.dang { background: var(--gm-primary); color: var(--gm-on-primary); box-shadow: none; font-weight: 700; }
+html.gd-m3 body .gd-o[disabled] { opacity: .38; cursor: default; }
+html.gd-m3 body .gd-o:focus-visible, html.gd-m3 body .gd-nut-luoi:focus-visible { outline: 3px solid var(--gm-primary); outline-offset: 2px; }
+html.gd-m3 body .gd-chu-thich { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--gm-on-surface-v); }
+html.gd-m3 body .gd-chu-thich i { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -1px; border-radius: 4px; box-shadow: inset 0 0 0 1px var(--gm-outline); }
+html.gd-m3 body .gd-chu-thich i.da { background: var(--gm-primary-c); box-shadow: none; }
+html.gd-m3 body .gd-chu-thich i.dang { background: var(--gm-primary); box-shadow: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html.gd-m3 body *, html.gd-m3 body *::before, html.gd-m3 body *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+}
+`
+
+/** Mã lệnh TRANG TRÍ của phiếu M3 (thanh tiến độ, lời khích lệ, lưới số câu). Chạy trong một thẻ <script> RIÊNG,
+ * bọc try/catch: lỗi ở đây không bao giờ chạm tới luồng chọn/lưu/nộp của `JS_PHIEU`. Không ghi đáp án, không gọi mạng. */
+export const JS_PHIEU_M3 = `
+(function () {
+  try {
+    var tren = document.getElementById('gd-tren');
+    if (!tren) return;
+    var dem = document.getElementById('gd-dem');
+    var tong = document.getElementById('gd-tong');
+    var thanh = tren.querySelector('.gd-tien');
+    var khich = document.getElementById('gd-khich');
+    var nutLuoi = document.getElementById('gd-nut-luoi');
+    var giam = false;
+    try { giam = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+    var coLo = !!document.getElementById('thanh-phan-tang-btvn');
+    var daXongTruoc = false;
+    // Đáy phiếu: #gd-con thay dòng đếm cũ (lô 5 câu mà đáy còn ghi "/12" là hai con số lệch nhau).
+    var thanhNop = document.getElementById('thanh-nop');
+    var oKet = document.getElementById('nop-ket');
+    var con = null;
+    if (thanhNop && thanhNop.querySelector('.nop-chu')) {
+      con = document.createElement('div');
+      con.className = 'gd-con';
+      con.id = 'gd-con';
+      thanhNop.insertBefore(con, thanhNop.firstChild);
+      document.documentElement.classList.add('gd-js');
+    }
+
+    function cacThe() { return Array.prototype.slice.call(document.querySelectorAll('.q-card[data-qid]')); }
+    function biKhoa(the) { return the.classList.contains('q-card-dimmed'); }
+    function daLam(the) {
+      var hangY = the.querySelectorAll('.tf-item[data-y]');
+      if (hangY.length) {
+        for (var i = 0; i < hangY.length; i++) { if (!hangY[i].querySelector('[aria-checked="true"]')) return false; }
+        return true;
+      }
+      var nhap = the.querySelector('.lam-nhap');
+      if (nhap) return String(nhap.value || '').trim() !== '';
+      return !!the.querySelector('.q-opt[aria-checked="true"]');
+    }
+    function capNhat() {
+      try {
+        var ds = cacThe(), t = 0, l = 0;
+        for (var i = 0; i < ds.length; i++) {
+          var lam = daLam(ds[i]);
+          if (ds[i].classList.contains('gd-da-lam') !== lam) ds[i].classList.toggle('gd-da-lam', lam);
+          if (biKhoa(ds[i])) continue;
+          t++;
+          if (lam) l++;
+        }
+        var pct = t > 0 ? Math.round((l * 100) / t) : 0;
+        if (dem) dem.textContent = String(l);
+        if (tong) tong.textContent = String(t);
+        tren.style.setProperty('--gd-tien', pct + '%');
+        if (thanh) thanh.setAttribute('aria-valuenow', String(pct));
+        var xong = t > 0 && l >= t;
+        var chu = '';
+        if (xong) chu = coLo ? 'Xong lô hôm nay' : 'Đã làm hết các câu';
+        else if (pct >= 50) chu = 'Được nửa đường rồi';
+        if (khich) {
+          if (chu) { khich.textContent = chu; khich.hidden = false; } else { khich.hidden = true; }
+        }
+        document.body.classList.toggle('gd-xong', xong);
+        if (con) {
+          var chuKet = oKet && !oKet.hidden ? String(oKet.textContent || '').replace(/^[ ·]+/, '').trim() : '';
+          var daNop = chuKet !== '';
+          var chuCon = daNop ? chuKet : (t - l > 0 ? 'Còn ' + (t - l) + ' câu chưa làm' : 'Đã làm hết các câu');
+          if (con.textContent !== chuCon) con.textContent = chuCon;
+          con.classList.toggle('ket', daNop);
+        }
+        if (xong && !daXongTruoc && !giam) {
+          document.body.classList.add('gd-vua-xong');
+          setTimeout(function () { document.body.classList.remove('gd-vua-xong'); }, 500);
+        }
+        daXongTruoc = xong;
+      } catch (e) {}
+    }
+
+    var dsEl = document.querySelector('.ds-cau');
+    document.addEventListener('click', function () { setTimeout(capNhat, 0); }, true);
+    document.addEventListener('input', capNhat, true);
+    document.addEventListener('change', capNhat, true);
+    if (window.MutationObserver && dsEl) {
+      new MutationObserver(capNhat).observe(dsEl, { attributes: true, subtree: true, attributeFilter: ['aria-checked'] });
+    }
+    if (window.MutationObserver && oKet) {
+      new MutationObserver(capNhat).observe(oKet, { attributes: true, childList: true, characterData: true, subtree: true });
+    }
+    // Cuộn xuống quá 120px thì thu gọn thanh trên; về gần đầu trang hoặc cuộn ngược thì mở lại.
+    var yCu = 0, gon = false, cho = false;
+    function khiCuon() {
+      if (cho) return;
+      cho = true;
+      (window.requestAnimationFrame || function (f) { setTimeout(f, 16); })(function () {
+        cho = false;
+        var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+        var xuong = y > yCu + 6, len = y < yCu - 6;
+        var muon = gon;
+        if (y < 40 || len) muon = false; else if (y > 120 && xuong) muon = true;
+        if (muon !== gon) { gon = muon; tren.classList.toggle('gd-gon', gon); }
+        if (Math.abs(y - yCu) > 6) yCu = y;
+      });
+    }
+    window.addEventListener('scroll', khiCuon, { passive: true });
+    // Đo chiều cao thật của thanh trên (lúc đang mở rộng) để .khung chừa đúng chỗ.
+    function doCao() {
+      try {
+        if (gon) return;
+        var h = tren.offsetHeight;
+        if (h > 40) document.documentElement.style.setProperty('--gd-cao', h + 'px');
+      } catch (e) {}
+    }
+    doCao();
+    setTimeout(doCao, 300);
+    window.addEventListener('resize', doCao);
+    window.addEventListener('load', doCao);
+    capNhat();
+    setTimeout(capNhat, 400);
+
+    // ---- lưới số câu: tấm trượt từ dưới; chỉ để nhảy tới câu, KHÔNG đổi đáp án ----
+    var luoiNen = null, luoiHop = null;
+    function dongLuoi() {
+      if (luoiNen && luoiNen.parentNode) luoiNen.parentNode.removeChild(luoiNen);
+      if (luoiHop && luoiHop.parentNode) luoiHop.parentNode.removeChild(luoiHop);
+      luoiNen = luoiHop = null;
+      document.removeEventListener('keydown', phim, true);
+      if (nutLuoi) { nutLuoi.setAttribute('aria-expanded', 'false'); try { nutLuoi.focus(); } catch (e) {} }
+    }
+    function phim(e) { if (e.key === 'Escape') { e.stopPropagation(); dongLuoi(); } }
+    function moLuoi() {
+      if (luoiHop) { dongLuoi(); return; }
+      var ds = cacThe();
+      var dang = -1;
+      for (var i = 0; i < ds.length; i++) {
+        if (biKhoa(ds[i])) continue;
+        if (ds[i].getBoundingClientRect().bottom > 140) { dang = i; break; }
+      }
+      luoiNen = document.createElement('div');
+      luoiNen.className = 'gd-luoi-nen';
+      luoiNen.addEventListener('click', dongLuoi);
+      luoiHop = document.createElement('div');
+      luoiHop.className = 'gd-luoi';
+      luoiHop.setAttribute('role', 'dialog');
+      luoiHop.setAttribute('aria-modal', 'true');
+      luoiHop.setAttribute('aria-label', 'Lưới số câu');
+      luoiHop.tabIndex = -1;
+      var cam = document.createElement('div'); cam.className = 'gd-luoi-cam'; luoiHop.appendChild(cam);
+      var dau = document.createElement('div'); dau.className = 'gd-luoi-dau';
+      var tieu = document.createElement('b'); tieu.textContent = 'Lưới số câu';
+      var dem2 = document.createElement('span'); dem2.textContent = ds.length + ' câu';
+      dau.appendChild(tieu); dau.appendChild(dem2); luoiHop.appendChild(dau);
+      var luoi = document.createElement('div'); luoi.className = 'gd-luoi-o';
+      var dau1 = null;
+      for (var j = 0; j < ds.length; j++) {
+        (function (k) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          var khoa = biKhoa(ds[k]);
+          var lam = ds[k].classList.contains('gd-da-lam');
+          b.className = 'gd-o' + (k === dang ? ' dang' : lam ? ' da' : '');
+          b.textContent = String(k + 1);
+          b.setAttribute('aria-label', 'Câu ' + (k + 1) + (khoa ? ', thuộc lô sau, chưa mở' : lam ? ', đã làm' : ', chưa làm'));
+          if (khoa) b.disabled = true;
+          b.addEventListener('click', function () {
+            dongLuoi();
+            var el = ds[k];
+            if (el.scrollIntoView) {
+              try { el.scrollIntoView({ behavior: giam ? 'auto' : 'smooth', block: 'start' }); } catch (e) { el.scrollIntoView(); }
+            }
+          });
+          if (!dau1 && !khoa) dau1 = b;
+          luoi.appendChild(b);
+        })(j);
+      }
+      luoiHop.appendChild(luoi);
+      var ct = document.createElement('div'); ct.className = 'gd-chu-thich';
+      ct.innerHTML = '<span><i class="da"></i>Đã làm</span><span><i class="dang"></i>Đang xem</span><span><i></i>Chưa làm / lô sau</span>';
+      luoiHop.appendChild(ct);
+      document.body.appendChild(luoiNen);
+      document.body.appendChild(luoiHop);
+      document.addEventListener('keydown', phim, true);
+      if (nutLuoi) nutLuoi.setAttribute('aria-expanded', 'true');
+      try { (dau1 || luoiHop).focus(); } catch (e) {}
+    }
+    if (nutLuoi) nutLuoi.addEventListener('click', moLuoi);
+  } catch (e) {}
+})();
+`
+
+/** Thanh trên dính của phiếu M3: tên bài + "Đã làm X/N câu" + tiến độ + nút lưới số câu. Số liệu do JS_PHIEU_M3 cập nhật. */
+export function dauTrangM3Html(tieuDe: string, tong: number, han = ''): string {
+  return `<header class="gd-tren" id="gd-tren">
+  <div class="gd-tren-trong">
+    <div class="gd-tren-hang">
+      <div class="gd-tren-chu"><div class="gd-hang-tieu"><div class="gd-tieu-de">${thoat(tieuDe)}</div>${han ? `<div class="gd-han">Hạn ${thoat(han)}</div>` : ''}</div><div class="gd-phu-hang"><span class="gd-phu">Đã làm <b id="gd-dem">0</b>/<span id="gd-tong">${tong}</span> câu</span><span class="gd-khich" id="gd-khich" hidden></span></div></div>
+      <button type="button" class="gd-nut-luoi" id="gd-nut-luoi" aria-label="Mở lưới số câu" aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button>
+    </div>
+    <div class="gd-tien" role="progressbar" aria-label="Tiến độ làm bài" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="gd-tien-day"></div></div>
+  </div>
+</header>`
+}
+
 /** Tài liệu HTML hoàn chỉnh, tự chứa — mở bằng một chạm, không cần mạng. */
-export function taiLieuHtml(than: string, tieuDe: string, lopBody = ''): string {
+export function taiLieuHtml(than: string, tieuDe: string, lopBody = '', m3 = false): string {
   const isDark =
     typeof document !== 'undefined' &&
     (document.documentElement.classList.contains('dark') ||
       document.body.classList.contains('dark') ||
       document.documentElement.getAttribute('data-theme') === 'dark')
   const bodyClass = [lopBody, isDark ? 'dark' : ''].filter(Boolean).join(' ')
+  // Khối M3 chỉ có ở phiếu học sinh: cờ `m3` đặt lớp gd-m3 lên <html> (KHÔNG đụng lớp của <body>, nhiều bài kiểm
+  // đang ghim đúng chuỗi `<body class="co-lam chua-nop">`). Mọi phiếu khác ra ĐÚNG như trước, từng byte.
+  const htmlClass = [m3 ? 'gd-m3' : '', isDark ? 'dark' : ''].filter(Boolean).join(' ')
   return `<!DOCTYPE html>
-<html lang="vi"${isDark ? ' class="dark"' : ''}><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${thoat(tieuDe)}</title><style>${CSS_PHIEU}</style></head>
+<html lang="vi"${htmlClass ? ` class="${htmlClass}"` : ''}><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${thoat(tieuDe)}</title><style>${CSS_PHIEU}${m3 ? CSS_PHIEU_M3 : ''}</style></head>
 <body${bodyClass ? ` class="${bodyClass}"` : ''}>${than}
-<script>${JS_PHIEU}</script></body></html>`
+<script>${JS_PHIEU}</script>${m3 ? `<script>${JS_PHIEU_M3}</script>` : ''}</body></html>`
 }
 
 /** DỰNG TRỌN PHIẾU: bìa · tổng quan · thanh điều khiển · danh sách câu.
@@ -2377,6 +2949,9 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
     ? tuyChon.soCauSang
     : (laBtvn && !tuyChon.moSan && nop ? Math.max(4, Math.round(cau.length * 0.45)) : undefined)
 
+  // GIAO DIỆN M3: phiếu học sinh làm/nộp (`nop`) hoặc phiếu học sinh chỉ đọc do chỗ gọi khai `giaoDienHocSinh`.
+  // KHÔNG suy từ `laBtvn`/`anGiai`: hai cờ ấy còn dùng cho phiếu của giáo viên.
+  const m3 = Boolean(nop || t.giaoDienHocSinh)
   const the = cau.map((c, i) => theCauHtml(c, i + 1, !!tuyChon.moSan, anGiai, !!nop, laBtvn, soCauSang)).join('\n')
   // KHOÁ LỜI GIẢI TỚI KHI NỘP. Chỉ áp cho phiếu nộp được và khi thầy không
   // bật `HIEN_GIAI_TRUOC_NOP`.
@@ -2397,7 +2972,9 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
       </div>`
     : ''
 
-  const than = `${biaHtml(t, cau.length)}
+  const soCauLam = typeof soCauSang === 'number' && soCauSang < cau.length ? soCauSang : cau.length
+  const hanNop = String((t.oBia ?? []).find((o) => o.nhan === 'Hạn nộp')?.gia ?? '').trim().replace(/^—$/, '')
+  const than = `${m3 && nop ? dauTrangM3Html(t.tenChuyenDe, soCauLam, hanNop) : ''}${biaHtml(t, cau.length)}
 <div class="khung">
   ${nhac ? `<div class="nhac-phieu">${thoat(nhac)}</div>` : ''}
   ${khoiChuaGiHtml(cau, tuyChon.thieuChua ?? [])}
@@ -2436,7 +3013,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   // `co-lam` bật khổ ô Đ/S to bằng ngón tay. Tách khỏi `chua-nop` vì thầy có
   // thể bật HIEN_GIAI_TRUOC_NOP — lúc đó vẫn làm bài, chỉ là không khoá giải.
   const lopBody = [nop ? 'co-lam' : '', khoaGiai ? 'chua-nop' : ''].filter(Boolean).join(' ')
-  return taiLieuHtml(than + goiNop, `${t.tenChuyenDe}${ai ? ` · ${ai}` : ''}`, lopBody)
+  return taiLieuHtml(than + goiNop, `${t.tenChuyenDe}${ai ? ` · ${ai}` : ''}`, lopBody, m3)
 }
 
 /** THANH NỘP — dính dưới thanh điều khiển, NOP-PHIEU-KHAC-PHUC mục 6. */

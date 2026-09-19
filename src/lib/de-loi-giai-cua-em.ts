@@ -84,6 +84,7 @@ export function dungHtmlDeVaLoiGiai(
     tenChuyenDe: tenCa || `Ca ${maCa}`,
     ketQua: soSai > 0 ? `${cau.length} câu · em sai ${soSai} câu` : `${cau.length} câu · em làm đúng hết`,
     hienDapAn: true,
+    giaoDienHocSinh: true,
     nhanBia: 'ĐỀ VÀ LỜI GIẢI',
   }
   return dungPhieu(tt, cau, { anGiai: false })

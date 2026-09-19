@@ -132,6 +132,7 @@ export function momReviewHtml(b: any): string {
     tenChuyenDe: b.tieuDe || 'Bài luyện của Mom',
     ketQua: `${b.diem ?? 0} điểm · Đúng ${b.soCauDung ?? 0}/${b.soCau ?? cauLuyen.length} câu`,
     hienDapAn: true,
+    giaoDienHocSinh: true,
     nhanBia: 'BÀI CỦA MOM GIAO',
     oBia: [
       { nhan: 'Điểm số', gia: `${b.diem ?? 0}/10` },

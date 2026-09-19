@@ -265,5 +265,6 @@ export function dungTrangTongHop(t: ThongTinTongHop, dong: CauHoiCuaEm[], deCuaC
   <div class="ds-cau">${the}</div>
   <div class="chan">Thầy Đỗ Đại Học · ${thoat(t.tenCa)} · ${ngayVN(t.ngay)}<span class="chi-man"><br>Câu nhiều em hỏi nhất xếp trên cùng. Bấm vào từng câu để mở lời giải.</span></div>
 </div>`
-  return taiLieuHtml(than, `Câu hỏi của em · ${t.tenCa}`)
+  // Tờ "Câu hỏi của em" do học sinh cầm trên màn hình: mặc áo M3 (cờ cuối), không đụng bố cục và mã lệnh.
+  return taiLieuHtml(than, `Câu hỏi của em · ${t.tenCa}`, '', true)
 }
