@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { cleanup, render } from '@testing-library/react'
 import React from 'react'
 import fs from 'node:fs'
+import zlib from 'node:zlib'
 import path from 'node:path'
 // @ts-expect-error — tệp .mjs của scripts/, không có khai báo kiểu
 import { BAN_CHEP, BAN_PNG, BAN_MOBILECONFIG, thayIcon } from '../scripts/sinh-logo-png.mjs'
@@ -59,8 +60,8 @@ describe('SVG của app: tệp tĩnh trong public/, tự chứa, nhẹ', () => {
 })
 
 describe('PNG sinh từ SVG: đủ tệp, đúng cỡ, icon cài máy là ảnh đặc (không alpha)', () => {
-  it('19 PNG khai trong script đều có, đúng cỡ; tràn nền (icon cài máy, iOS) là RGB đặc, bản 64 px nét đậm là RGBA nền trong suốt', () => {
-    expect(BAN_PNG).toHaveLength(19)
+  it('20 PNG khai trong script đều có, đúng cỡ; tràn nền (icon cài máy, iOS) là RGB đặc, bản 64 px nét đậm là RGBA nền trong suốt', () => {
+    expect(BAN_PNG).toHaveLength(20)
     for (const { co, den, tu } of BAN_PNG as { co: number; den: string; tu: string }[]) {
       const h = ihdr(docBuf(den))
       expect([h.w, h.h], den).toEqual([co, co])
@@ -154,10 +155,10 @@ describe('trang cài app (cai-app.html · cai-dat.html · cai-app/index.html): b
 })
 
 describe('service worker + cấu hình PWA', () => {
-  it('thông báo đẩy dùng icon 192 / huy hiệu 64 của học sinh (-v3, có thật)', () => {
+  it('thông báo đẩy: icon là logo MÀU 192 của học sinh, huy hiệu là PNG đơn sắc chỉ-alpha (-v3, có thật)', () => {
     const s = doc('src/sw.ts')
-    expect(s).toContain("icon:'/logo-hs-192-v3.png',badge:'/logo-hs-64-v3.png'")
-    for (const t of ['logo-hs-192-v3.png', 'logo-hs-64-v3.png']) expect(fs.existsSync(path.join(goc, 'public', t))).toBe(true)
+    expect(s).toContain("icon:'/logo-hs-192-v3.png',badge:'/logo-huy-hieu-96-v3.png'")
+    for (const t of ['logo-hs-192-v3.png', 'logo-huy-hieu-96-v3.png']) expect(fs.existsSync(path.join(goc, 'public', t)), t).toBe(true)
   })
 
   it('vite.config.ts: includeAssets chỉ nêu tệp có thật hoặc mẫu -v3 (trước đây liệt kê icon-hs-192… không tồn tại)', () => {
@@ -351,5 +352,74 @@ describe('bản logo cũ (-v2) đã gỡ hẳn', () => {
     expect(con).toEqual([])
     const testCon = fs.readdirSync(path.join(goc, 'tests')).filter((t) => /\.(ts|tsx)$/.test(t) && t !== 'logo-bo-moi-1909.test.tsx').filter((t) => /logo-(gv|hs|ph)-[a-z0-9-]*v2\.png/.test(doc(`tests/${t}`)))
     expect(testCon).toEqual([])
+  })
+})
+
+// ───────────────────────── huy hiệu thông báo Android + ghi chú icon mới ─────────────────────────
+/** Giải mã PNG RGBA 8-bit không xen kẽ (đủ cho tệp Chromium sinh ra): trả về {w, h, d} với d là RGBA. */
+function giaiMaRGBA(buf: Buffer) {
+  const w = buf.readUInt32BE(16)
+  const h = buf.readUInt32BE(20)
+  expect([buf[24], buf[25], buf[28]]).toEqual([8, 6, 0]) // 8 bit, RGBA, không xen kẽ
+  const idat: Buffer[] = []
+  for (let i = 8; i < buf.length; ) {
+    const n = buf.readUInt32BE(i)
+    if (buf.subarray(i + 4, i + 8).toString() === 'IDAT') idat.push(buf.subarray(i + 8, i + 8 + n))
+    i += 12 + n
+  }
+  const raw = zlib.inflateSync(Buffer.concat(idat))
+  const d = Buffer.alloc(w * h * 4)
+  const dong = w * 4
+  for (let y = 0; y < h; y++) {
+    const loc = raw[y * (dong + 1)]
+    for (let x = 0; x < dong; x++) {
+      const v = raw[y * (dong + 1) + 1 + x]
+      const a = x >= 4 ? d[y * dong + x - 4] : 0
+      const b = y > 0 ? d[(y - 1) * dong + x] : 0
+      const c = x >= 4 && y > 0 ? d[(y - 1) * dong + x - 4] : 0
+      const p = a + b - c
+      const [pa, pb, pc] = [Math.abs(p - a), Math.abs(p - b), Math.abs(p - c)]
+      const du = [0, a, b, (a + b) >> 1, pa <= pb && pa <= pc ? a : pb <= pc ? b : c][loc]
+      d[y * dong + x] = (v + du) & 255
+    }
+  }
+  return { w, h, d }
+}
+
+describe('huy hiệu thông báo Android (logo-huy-hieu-96-v3.png)', () => {
+  const { w, h, d } = giaiMaRGBA(docBuf('public/logo-huy-hieu-96-v3.png'))
+
+  it('96 × 96, nền trong suốt (4 góc alpha 0), có hình (≥ 500 điểm không trong suốt)', () => {
+    expect([w, h]).toEqual([96, 96])
+    for (const [x, y] of [[0, 0], [95, 0], [0, 95], [95, 95]]) expect(d[(y * w + x) * 4 + 3], `góc ${x},${y}`).toBe(0)
+    let co = 0
+    for (let i = 3; i < d.length; i += 4) if (d[i] > 0) co++
+    expect(co).toBeGreaterThan(500)
+  })
+
+  it('ĐƠN SẮC: mọi điểm có alpha > 0 đều màu trắng (Android chỉ đọc alpha; màu khác trắng là hình khối màu sẽ ra khối đặc)', () => {
+    for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 0) expect([d[i], d[i + 1], d[i + 2]], `điểm ${i / 4}`).toEqual([255, 255, 255])
+  })
+
+  it('chữ A nằm gọn, chừa lề ≥ 8 px bốn phía (không chạm mép)', () => {
+    let [x0, y0, x1, y1] = [w, h, -1, -1]
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (d[(y * w + x) * 4 + 3] > 0) [x0, y0, x1, y1] = [Math.min(x0, x), Math.min(y0, y), Math.max(x1, x), Math.max(y1, y)]
+    expect(Math.min(x0, y0, w - 1 - x1, h - 1 - y1)).toBeGreaterThanOrEqual(8)
+  })
+
+  it('sinh từ logo-don-sac.svg (nét dày lên 24/20) — không phải hình khối màu', () => {
+    const [b] = (BAN_PNG as { den: string; tu: string; thay?: string[][] }[]).filter((x) => x.den === 'public/logo-huy-hieu-96-v3.png')
+    expect(b.tu).toBe('docs/logo-1909/logo-don-sac.svg')
+    expect(b.thay!.some(([tu, sang]) => tu === 'stroke-width="13"' && sang === 'stroke-width="24"')).toBe(true)
+  })
+})
+
+describe('trang cài app: dòng nhắc icon mới cho app đã cài', () => {
+  it('cả 3 bản có đúng MỘT dòng "Muốn thấy icon mới: gỡ app khỏi màn hình chính rồi thêm lại."', () => {
+    for (const t of ['public/cai-app.html', 'public/cai-dat.html', 'public/cai-app/index.html']) {
+      const h = doc(t)
+      expect(h.match(/Muốn thấy icon mới: gỡ app khỏi màn hình chính rồi thêm lại\./g), t).toHaveLength(1)
+      expect(h).toContain('<p class="ghi-chu-icon-moi">')
+    }
   })
 })

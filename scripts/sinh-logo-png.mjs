@@ -15,6 +15,9 @@
 //                             hình vuông bo / ngôi nhà chạm ngoài VÒNG AN TOÀN maskable (bán kính 40% cạnh, đo được 42–44%);
 //                             thu thêm 90% thì mọi điểm của hình nằm trong vòng (đo lại bằng Chromium, xem sổ việc)
 //   apple-touch-icon.png · icon-192.png · icon-512.png   = bản tràn nền của GIÁO VIÊN;  icon-512-maskable.png = bản maskable GV
+//   logo-huy-hieu-96-v3.png   HUY HIỆU thông báo Android (96 px, nền trong suốt, chữ A trắng): Android chỉ đọc kênh alpha của huy
+//                             hiệu (đơn sắc), nên dùng chữ A đơn sắc từ logo-don-sac.svg chứ không phải hình khối màu (ra khối đặc).
+//                             Nét chéo/ngang dày lên 24/20 (bản đơn sắc 13/11 mảnh quá ở 24 dp) — bản nét đậm của hình khối là 19/16
 //   favicon.svg               = bản nét đậm của GIÁO VIÊN (tự chứa, không còn <image> trỏ sang PNG)
 // Tên có hậu tố `-v3` để phá cache service worker / trình duyệt của bản `-v2` cũ.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
@@ -36,7 +39,8 @@ export const BAN_CHEP = [
   [`${DOC}/logo-gv-nho.svg`, 'public/favicon.svg'],
 ]
 
-/** { nguồn svg, cỡ (px vuông), đích, thuNho? } — vẽ từ SVG. `thuNho` (0–1): vẽ hình nhỏ lại giữa tấm phủ đúng màu nền của bản tràn nền. */
+/** { nguồn svg, cỡ (px vuông), đích, thuNho?, thay? } — vẽ từ SVG. `thuNho` (0–1): vẽ hình nhỏ lại giữa tấm phủ đúng màu nền của bản
+ *  tràn nền. `thay` [[từ, sang], …]: thay chuỗi trong SVG trước khi vẽ (huy hiệu: mực đen của bản đơn sắc → trắng, nét dày lên). */
 export const BAN_PNG = [
   ...VAI.flatMap((v) => [
     { tu: `${DOC}/logo-${v}-day.svg`, co: 180, den: `public/logo-${v}-180-v3.png` },
@@ -49,6 +53,7 @@ export const BAN_PNG = [
   { tu: `${DOC}/logo-gv-day.svg`, co: 192, den: 'public/icon-192.png' },
   { tu: `${DOC}/logo-gv-day.svg`, co: 512, den: 'public/icon-512.png' },
   { tu: `${DOC}/logo-gv-day.svg`, co: 512, den: 'public/icon-512-maskable.png', thuNho: 0.9 },
+  { tu: `${DOC}/logo-don-sac.svg`, co: 96, den: 'public/logo-huy-hieu-96-v3.png', thay: [['fill="#1f1f1f"', 'fill="#ffffff"'], ['stroke="#1f1f1f"', 'stroke="#ffffff"'], ['stroke-width="13"', 'stroke-width="24"'], ['stroke-width="11"', 'stroke-width="20"']] },
 ]
 
 /** Hồ sơ cấu hình iPhone nhúng biểu tượng 180 px (khoá Icon) — sinh lại cho khớp `logo-<vai>-180-v3.png`. */
@@ -99,9 +104,14 @@ async function main() {
     const page = await (await browser.newContext({ deviceScaleFactor: 1 })).newPage()
     const nho = new Map() // cùng (nguồn, cỡ) chỉ vẽ một lần
     const pngRa = new Map()
-    for (const { tu, co, den, thuNho } of BAN_PNG) {
-      const k = `${tu}@${co}@${thuNho ?? 1}`
-      if (!nho.has(k)) nho.set(k, await ve(page, doc(tu), co, thuNho))
+    for (const { tu, co, den, thuNho, thay } of BAN_PNG) {
+      const k = `${tu}@${co}@${thuNho ?? 1}@${JSON.stringify(thay ?? '')}`
+      let nguon = doc(tu)
+      for (const [tuChuoi, sang] of thay ?? []) {
+        if (!nguon.toString('utf8').includes(tuChuoi)) throw new Error(`${tu}: không có ${tuChuoi} để thay`)
+        nguon = Buffer.from(nguon.toString('utf8').replaceAll(tuChuoi, sang))
+      }
+      if (!nho.has(k)) nho.set(k, await ve(page, nguon, co, thuNho))
       pngRa.set(den, nho.get(k))
       ghi(den, nho.get(k))
       dau.png++

@@ -189,7 +189,7 @@ export {}
 // Push shows a generic message; the authenticated inbox holds assignment details.
 self.addEventListener('push',event=>{
  let data:{title?:string;body?:string}={};try{data=event.data?.json()||{}}catch{}
- event.waitUntil(self.registration.showNotification(data.title||'Đỗ Đại Học',{body:data.body||'Em có cập nhật bài tập.',icon:'/logo-hs-192-v3.png',badge:'/logo-hs-64-v3.png',tag:'student-homework',data:{url:'/hs?thongbao=1'}}))
+ event.waitUntil(self.registration.showNotification(data.title||'Đỗ Đại Học',{body:data.body||'Em có cập nhật bài tập.',icon:'/logo-hs-192-v3.png',badge:'/logo-huy-hieu-96-v3.png',tag:'student-homework',data:{url:'/hs?thongbao=1'}}))
 })
 self.addEventListener('notificationclick',event=>{
  event.notification.close()
