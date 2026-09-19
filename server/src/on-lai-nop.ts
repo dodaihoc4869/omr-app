@@ -15,13 +15,14 @@
 //   · ĐÁP ÁN VÀ LỜI GIẢI CHỈ ĐI RA SAU KHI ĐÃ GHI SỔ THÀNH CÔNG. Ghi không được thì `ok:false` và KHÔNG có đáp án nào trong phản hồi.
 //   · Dựng lại hồ sơ (`dungLaiHoSo`, luật Leitner hiện có: đúng cùng ngày VN chỉ tính một mốc); lỗi ở bước này không làm hỏng lượt nộp
 //     (sổ là nguồn sự thật, kế hoạch kế tiếp tự dựng lại khi số dòng sổ đổi).
-//   · EXP học tập: đúng đường `creditAcademic` với khoá `practice:<qid>` (mỗi câu một lần cả đời, trần 100/ngày) — CHỈ khi em đã có hồ sơ game
+//   · EXP học tập: EXP MỚI (`exp-d1.ts`, bảng phần × sao, trần mềm, lên bậc, đạt ngày...) khi đã bật cho em; CHƯA bật thì đường cũ: `creditAcademic` với khoá `practice:<qid>` (mỗi câu một lần cả đời, trần 100/ngày) — CHỈ khi em đã có hồ sơ game
 //     (không tự tạo hồ sơ chỉ để cộng EXP); xung đột phiên bản thì bỏ qua EXP, không làm hỏng lượt nộp.
 import type { Env } from './kieu'
 import { isAnswerCorrect } from './btvn-grading'
 import { creditAcademic } from './game-v2-academic'
 import { loadProfile } from './game-v2'
 import { gameIdentity } from './game-v2-auth'
+import { capNhatExp, expNhanCuaKetQua, manhNhanCuaKetQua, tongExpCuaKetQua } from './exp-d1'
 import { dungLaiHoSo } from './ho-so-nam-kt'
 import { TIEN_BO_NGAY } from './ke-hoach-ngay-d1'
 import { DAI_QID_TOI_DA, donQid, layCauChoEm, TOI_DA_QID_MOT_LUOT } from './cau-theo-qid'
@@ -140,7 +141,9 @@ export async function hsOnLaiNop(env: Env, b: Record<string, unknown>): Promise<
     tienBo = { daLamCau: Number(t?.da_lam) || 0, lenBac: Number(t?.len_bac) || 0, tutBac: Number(t?.tut_bac) || 0 }
   } catch { /* không có tiến bộ ngày thì vẫn trả kết quả từng câu */ }
 
-  const exp = await ganExp(env, sbd, nhan.filter((x) => ketQuaLuu.get(x.qid) === 1).map((x) => x.qid), luc)
+  // EXP: EXP HỌC TẬP MỚI (exp-d1.ts) khi đã bật cho em này; chưa bật thì luật cũ (2 EXP/câu, khoá `practice:<qid>`).
+  const moi = await capNhatExp(env, sbd, now)
+  const exp = moi.bat ? tongExpCuaKetQua(moi) : await ganExp(env, sbd, nhan.filter((x) => ketQuaLuu.get(x.qid) === 1).map((x) => x.qid), luc)
 
   // ĐÁP ÁN Ở ĐÂY MỚI ĐI RA — sau khi đã ghi sổ và đọc lại kết quả lần đầu.
   const ketQua = nhan.map((x) => {
@@ -154,5 +157,5 @@ export async function hsOnLaiNop(env: Env, b: Record<string, unknown>): Promise<
       anhLoiGiai: (q.hinhAnh ?? []).filter((h) => h.viTri === 'sau_loi_giai'),
     }
   })
-  return { ok: true, ketQua, khongCo: r.khongCo, chuaLam, tienBo, exp }
+  return { ok: true, ketQua, khongCo: r.khongCo, chuaLam, tienBo, exp, ...(moi.bat ? { expNhan: expNhanCuaKetQua(moi), manhNhan: manhNhanCuaKetQua(moi) } : {}) }
 }

@@ -541,7 +541,9 @@ describe('6. KHÔNG CÓ HỒ SƠ / LỆNH LỖI → bộ đề Y HỆT bản tr�
     hoSoOnCa.mockRejectedValue(new Error('Lệnh lạ: hoSoOnCa'))
     const ra = await dungDeRiengChoCa('u', 'm', 'moi', DS, CAU_HINH_DE_RIENG_MAC_DINH, { ngayCa: NGAY_CA })
     expect(ra.hoSoOn).toEqual({ coHoSo: false, ngayCa: NGAY_CA, soEmCoHoSo: 0, soEmHong: 45, loi: 'Lệnh lạ: hoSoOnCa' })
-    expect(ra.boQua.some((b) => b.maCa === 'hồ sơ ôn' && b.vi_sao.includes('rút đúng luật cũ'))).toBe(true)
+    // Dòng báo nằm ở `ghiChu` (màu cảnh báo), KHÔNG còn nhét vào "Ca không đọc được".
+    expect(ra.ghiChu.some((g) => g.loai === 'canh_bao' && g.loi.includes('hồ sơ ôn chưa đọc được') && g.loi.includes('rút đúng luật cũ'))).toBe(true)
+    expect(ra.boQua.some((b) => b.maCa === 'hồ sơ ôn')).toBe(false)
     expect(ra.noiCam).toEqual([])
 
     // So với LÕI gọi thẳng KHÔNG hồ sơ — chính đường mà 30 dấu vân tay ở trên đã
@@ -563,7 +565,7 @@ describe('6. KHÔNG CÓ HỒ SƠ / LỆNH LỖI → bộ đề Y HỆT bản tr�
     for (const c of hoSoOnCa.mock.calls) expect(c.slice(3)).toEqual(['moi', NGAY_CA, 1])
     expect(ra.hoSoOn.coHoSo).toBe(true)
     expect(ra.hoSoOn.soEmCoHoSo).toBe(45)
-    expect(ra.boQua.some((b) => b.maCa === 'hồ sơ ôn')).toBe(false)
+    expect(ra.ghiChu.some((g) => g.loi.includes('hồ sơ ôn'))).toBe(false)
   })
 
   it('phạm vi "3 ca" ⇒ gửi soCa = 3', async () => {
@@ -579,7 +581,9 @@ describe('6. KHÔNG CÓ HỒ SƠ / LỆNH LỖI → bộ đề Y HỆT bản tr�
     })
     const ra = await dungDeRiengChoCa('u', 'm', 'moi', DS, CAU_HINH_DE_RIENG_MAC_DINH, { ngayCa: NGAY_CA })
     expect(ra.hoSoOn).toEqual({ coHoSo: true, ngayCa: NGAY_CA, soEmCoHoSo: 25, soEmHong: 20, loi: 'mất mạng' })
-    expect(ra.boQua.some((b) => b.maCa === 'hồ sơ ôn' && b.vi_sao.includes('20 em'))).toBe(true)
+    expect(ra.ghiChu.some((g) => g.loai === 'canh_bao' && g.loi.includes('20 em không đọc được hồ sơ ôn'))).toBe(true)
+    // Tin TỐT in màu thường: 25 em đã tự khắc phục 7 câu mỗi em.
+    expect(ra.ghiChu).toContainEqual({ loai: 'tin', loi: '25 em đã tự khắc phục tổng 175 câu sai ca trước ở bài luyện — không hỏi lại các câu đó' })
     expect(ra.lapTheoEm['12000']).toEqual([]) // đã khắc phục hết ⇒ không hỏi lại
     expect(ra.daKhacPhucTheoEm['12000']).toEqual(SAI['12000'])
     expect(ra.lapTheoEm['12020']!.length).toBe(3) // lô hỏng ⇒ luật cũ: sai 7 ⇒ 3 câu

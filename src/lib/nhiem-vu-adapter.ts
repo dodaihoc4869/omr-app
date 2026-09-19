@@ -11,7 +11,14 @@ export type BacNhiemVu = 'khan' | 'bat_buoc' | 'nen_lam' | 'tuy_chon'
 /** Vai trò màu Material 3 của từng bậc — giao diện chỉ đọc, không tự chọn màu. */
 export type VaiTroMau = 'error' | 'primary' | 'secondary' | 'tertiary'
 export type BieuTuongViec = 'btvn' | 'mom' | 'on' | 'muc_tieu' | 'sao'
-export type HanhDongNhiemVu = NhiemVuTroLy['hanhDong']
+/** Việc ôn câu (on_lai) đã có đường lấy đề + nộp riêng: mở màn LamCauOn với đúng các qid máy chủ chọn. (`tro-ly-ca-nhan.ts` không mở
+ * cho phiên giao diện nên loại hành động mới khai ở đây, hợp với loại cũ bằng phép hợp.) */
+export interface HanhDongLamCauOn {
+  loai: 'lam_cau_on'
+  payload: { viecId: string; qid: string[]; soCau: number; tieuDe: string }
+  nhanNut: string
+}
+export type HanhDongNhiemVu = NhiemVuTroLy['hanhDong'] | HanhDongLamCauOn
 
 export const THU_TU_BAC: readonly BacNhiemVu[] = ['khan', 'bat_buoc', 'nen_lam', 'tuy_chon']
 export const VAI_TRO_MAU: Record<BacNhiemVu, VaiTroMau> = {
@@ -79,6 +86,28 @@ export interface DuLieuBangNhiemVu {
   ngayNghi: boolean
   thanThu: TrangThaiThanThu
   tonCu: TonCu
+  /**
+   * Em ĐÃ ĐẠT chỉ tiêu hôm nay (`tienBo.dat`) và máy chủ chỉ còn mời việc TUỲ CHỌN ⇒ đầu bảng là thẻ MỪNG ("Em đã xong việc hôm
+   * nay" + một dòng số đo), KHÔNG có thẻ "Làm ngay", bậc TUỲ CHỌN mang tên "LÀM THÊM · TUỲ CHỌN" và vẫn bấm được. `null` = không
+   * ở trạng thái đó. (0.Planer đổi luật 19/09: trước đây "chỉ còn tuỳ chọn" bị coi là TRỐNG và em chăm không bao giờ thấy việc ôn thêm.)
+   */
+  daXongHomNay: { daLamCau: number; lenBac: number } | null
+  /**
+   * EXP học tập + mảnh khiên hôm nay — CHỈ có khi máy chủ đã bật cho em (`exp` trong /hs/ke-hoach-ngay); vắng ⇒ `null` và màn ẩn hết,
+   * KHÔNG bịa số. Mọi số do máy chủ tính từ sổ; giao diện không cộng, không đoán.
+   */
+  exp: DuLieuExp | null
+  /** Khoản EXP MỚI ghi trong CHÍNH lần gọi này (gọi lại thì rỗng) — để bật thông báo "+EXP". Không lưu vào bản nhớ (kẻo phát lại). */
+  expNhan: { exp: number; ghiChu: string }[]
+  /** Mảnh khiên mới trong lần gọi này (không lưu vào bản nhớ). */
+  manhNhan: { so: number; ghiChu: string }[]
+}
+
+export interface DuLieuExp {
+  homNay: number
+  /** `ghiChu` là tiếng Việt máy chủ đã viết sẵn — in nguyên văn. */
+  chiTiet: { loai: string; exp: number; ghiChu: string }[]
+  manhKhien: { manh: number; moiKhien: number; khienConLai: number } | null
 }
 
 /**
@@ -162,20 +191,39 @@ function gomBac(viec: TheNhiemVu[]): NhomBac[] {
   }))
 }
 
+/** Nhãn bậc TUỲ CHỌN khi em đã xong việc hôm nay: việc còn lại là LÀM THÊM, không phải nợ. */
+export const NHAN_LAM_THEM = 'LÀM THÊM · TUỲ CHỌN'
+
 function dongGoi(
   nguon: DuLieuBangNhiemVu['nguon'],
   viec: TheNhiemVu[],
-  phanConLai: Pick<DuLieuBangNhiemVu, 'tienDo' | 'tocDo' | 'chuoiNgay' | 'canhBao' | 'quaHan' | 'capNhatLuc' | 'ghiChuCu' | 'ngayNghi' | 'thanThu' | 'tonCu'>,
+  phanConLai: Omit<DuLieuBangNhiemVu, 'nguon' | 'lamNgay' | 'cacBac' | 'trong' | 'daXongHomNay'>,
+  xong: { dat: boolean; daLamCau: number; lenBac: number },
 ): DuLieuBangNhiemVu {
-  // Chỉ còn việc tuỳ chọn ⇒ coi là "hôm nay chưa có việc": không dựng thẻ nào.
-  const coViecThat = viec.some((v) => v.bac !== 'tuy_chon')
-  if (!coViecThat) return { nguon, lamNgay: null, cacBac: gomBac([]), trong: true, ...phanConLai }
+  // TRỐNG khi nguồn không đưa việc nào. Riêng nguồn TRỢ LÝ (dự phòng khi máy chủ lỗi) luôn kèm một gợi ý "Luyện nâng cao (tự chọn)"
+  // cố định, không phải lời mời của máy chủ ⇒ ở đó "chỉ còn tuỳ chọn" vẫn là trống như cũ; ở nguồn MÁY CHỦ, việc tuỳ chọn là lời mời thật.
+  const tuyChonLaViecThat = nguon === 'ke_hoach_ngay'
+  const chiTuyChon = viec.every((v) => v.bac === 'tuy_chon')
+  if (viec.length === 0 || (!tuyChonLaViecThat && chiTuyChon)) return { nguon, lamNgay: null, cacBac: gomBac([]), trong: true, daXongHomNay: null, ...phanConLai }
+  if (chiTuyChon && xong.dat) {
+    // Đã đạt chỉ tiêu: mừng, không "Làm ngay"; việc tuỳ chọn là LÀM THÊM và vẫn bấm được như thường.
+    return {
+      nguon,
+      lamNgay: null,
+      cacBac: gomBac(viec).map((g) => (g.bac === 'tuy_chon' ? { ...g, nhan: NHAN_LAM_THEM } : g)),
+      trong: false,
+      daXongHomNay: { daLamCau: Math.max(0, Math.floor(xong.daLamCau) || 0), lenBac: Math.max(0, Math.floor(xong.lenBac) || 0) },
+      ...phanConLai,
+    }
+  }
+  // Còn việc thật, hoặc chỉ tuỳ chọn mà CHƯA đạt: việc mở đầu tiên là "Làm ngay" (kể cả khi nó là việc tuỳ chọn).
   const lamNgay = viec.find((v) => !v.biCong) ?? null
   return {
     nguon,
     lamNgay,
     cacBac: gomBac(viec.filter((v) => v !== lamNgay)),
     trong: false,
+    daXongHomNay: null,
     ...phanConLai,
   }
 }
@@ -273,6 +321,14 @@ export function tuKeHoachTroLy(keHoach: KeHoachNgayTroLy, phu: NguonPhuTroLy = {
     // Nguồn trợ lý chỉ có bảng V1 (không có id thần thú) — KHÔNG đoán, để giữ chỗ.
     thanThu: { kieu: 'chua_biet' },
     tonCu: { soBai: 0, soCau: 0, bai: [] },
+    exp: null,
+    expNhan: [],
+    manhNhan: [],
+  }, {
+    // Nguồn trợ lý không có `tienBo.dat`: coi là đạt khi đã làm đủ mức gợi ý.
+    dat: nganSach.mucTieuCau > 0 && nganSach.daLamCau >= nganSach.mucTieuCau,
+    daLamCau: nganSach.daLamCau,
+    lenBac: 0,
   })
 }
 
@@ -320,6 +376,42 @@ export interface KeHoachNgayMayChu {
   /** Bài Mẹ giao cũ chưa làm (ngoài 3 ngày/3 bài gần nhất trong viec[]). Vắng = máy chủ chưa gửi trường này. */
   tonCu?: { id?: string; ma?: string; soCau?: number; taoLuc?: string }[]
   tonCuTong?: { soBai?: number; soCau?: number }
+  /**
+   * EXP học tập mới (chỉ có khi máy chủ đã bật cho em; vắng ⇒ bỏ qua). Chỉ dùng `datNgay`: định nghĩa "đạt nhiệm vụ ngày" CHẶT HƠN
+   * `tienBo.dat` (còn đòi câu tới hạn ôn phải lên bậc, việc bắt buộc không trễ nhịp) — màn KHÔNG được nói "xong việc hôm nay" khi nó
+   * chưa đạt, kẻo em bỏ qua đúng việc ôn cần để đạt (docs/ke-hoach-ngay-api-1909.md).
+   */
+  exp?: {
+    homNay?: number
+    chiTietHomNay?: { loai?: string; exp?: number; ghiChu?: string; soKhoan?: number }[]
+    manhKhien?: { manh?: number; moiKhien?: number; khienRen?: number; khienConLai?: number; choCongVaoHoSo?: boolean } | null
+    datNgay?: { dat?: boolean; thieu?: string[]; daLam?: number; toiThieu?: number; daTrao?: boolean; laNghi?: boolean } | null
+  } | null
+  /** Khoản EXP mới ghi trong CHÍNH lần gọi này. */
+  expNhan?: { loai?: string; exp?: number; ghiChu?: string }[]
+  manhNhan?: { loai?: string; so?: number; ghiChu?: string }[]
+}
+
+const soNguyen = (v: unknown) => Math.max(0, Math.floor(Number(v) || 0))
+
+/** Đọc phần EXP của máy chủ: thiếu `exp` (chưa bật cho em / máy chủ cũ) ⇒ `null`, giao diện ẩn hết. Bỏ khoản không có chữ `ghiChu`. */
+function docExp(k: KeHoachNgayMayChu): Pick<DuLieuBangNhiemVu, 'exp' | 'expNhan' | 'manhNhan'> {
+  const e = k.exp
+  const co = !!e && typeof e === 'object' && e.homNay !== undefined && Number.isFinite(Number(e.homNay))
+  const mk = co ? e!.manhKhien : null
+  return {
+    exp: co
+      ? {
+          homNay: soNguyen(e!.homNay),
+          chiTiet: (Array.isArray(e!.chiTietHomNay) ? e!.chiTietHomNay : [])
+            .map((c) => ({ loai: String(c?.loai ?? ''), exp: soNguyen(c?.exp), ghiChu: String(c?.ghiChu ?? '').trim() }))
+            .filter((c) => c.ghiChu),
+          manhKhien: mk && Number.isFinite(Number(mk.manh)) ? { manh: soNguyen(mk.manh), moiKhien: soNguyen(mk.moiKhien) || 12, khienConLai: soNguyen(mk.khienConLai) } : null,
+        }
+      : null,
+    expNhan: co ? (Array.isArray(k.expNhan) ? k.expNhan : []).map((x) => ({ exp: soNguyen(x?.exp), ghiChu: String(x?.ghiChu ?? '').trim() })).filter((x) => x.ghiChu) : [],
+    manhNhan: co ? (Array.isArray(k.manhNhan) ? k.manhNhan : []).map((x) => ({ so: soNguyen(x?.so), ghiChu: String(x?.ghiChu ?? '').trim() })).filter((x) => x.ghiChu) : [],
+  }
 }
 
 /** Chốt kiểu: JSON máy chủ trả về có đủ phần giao diện cần không (lỗi/HTML/`{ok:true,items:[]}` ⇒ false). */
@@ -396,8 +488,15 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
       }
       case 'than_thu':
         return { loai: 'mo_than_thu', nhanNut: 'Luyện với thần thú' }
+      case 'on_lai': {
+        // Việc ôn câu: máy chủ đã chọn ĐÚNG các qid (chiTiet.qid) và có đường lấy đề + nộp (`/hs/cau-theo-qid`, `/hs/on-lai/nop`)
+        // ⇒ mở màn LamCauOn với chính các câu ấy. Thiếu qid (máy chủ cũ) thì rơi về luồng luyện câu sai cũ.
+        const qid = Array.isArray(ct.qid) ? ct.qid.filter((q: unknown): q is string => typeof q === 'string' && q.trim() !== '') : []
+        if (qid.length > 0) return { loai: 'lam_cau_on', payload: { viecId: v.id, qid: qid.slice(0, 20), soCau: qid.length, tieuDe: tenViec(v) }, nhanNut: 'Ôn ngay' }
+        return { loai: 'mo_khac_phuc', payload: { cheDo: 1, soCau: v.soCau }, nhanNut: 'Ôn ngay' }
+      }
       default:
-        // on_lai / on_thi: chưa có luồng mở ĐÚNG các câu máy chủ chọn ⇒ mở luồng luyện lại câu sai hiện có.
+        // on_thi: chưa có đường lấy/nộp riêng ⇒ mở luồng luyện lại câu sai hiện có.
         return { loai: 'mo_khac_phuc', payload: { cheDo: 1, soCau: v.soCau }, nhanNut: 'Ôn ngay' }
     }
   }
@@ -486,9 +585,26 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
   const lenBac = Math.max(0, Number(keHoach.tienBo.lenBac) || 0)
   const conThieu = Math.max(0, Number(keHoach.tienBo.conThieu) || 0)
   // Nộp ≠ nắm: chỉ nói "đã làm N câu, M câu lên bậc", không nói "nắm chắc".
-  const ghiChuTienDo = `Đã làm ${daLam} câu${lenBac > 0 ? `, ${lenBac} câu lên bậc ôn` : ''} · ${conThieu > 0 ? `còn ${conThieu} câu là đạt hôm nay` : 'đã đủ số câu tối thiểu hôm nay'}`
+  const ghiChuTienDo0 = `Đã làm ${daLam} câu${lenBac > 0 ? `, ${lenBac} câu lên bậc ôn` : ''} · ${conThieu > 0 ? `còn ${conThieu} câu là đạt hôm nay` : 'đã đủ số câu tối thiểu hôm nay'}`
   const chuoi = Math.max(0, Number(keHoach.chuoiDat) || 0)
   const daDo = keHoach.nganSach.vanTocNguon === 'do' && Number(keHoach.nganSach.vanTocGiay) > 0
+  // "Đã xong việc hôm nay" chỉ khi CẢ HAI cùng đạt: `tienBo.dat` và (nếu máy chủ có nói) `exp.datNgay.dat`. Ngày nghỉ: chỉ `tienBo.dat`.
+  const datNgayExp = keHoach.exp?.datNgay
+  const coDatNgay = !!datNgayExp && datNgayExp.laNghi !== true && typeof datNgayExp.dat === 'boolean'
+  const expChuaDat = coDatNgay && datNgayExp!.dat === false
+  // Khi máy chủ CÓ nói `datNgay` thì câu trạng thái CHỈ theo `datNgay` (kèm số): hai định nghĩa "đạt" mà nói cùng lúc sẽ tự mâu thuẫn
+  // ("đã đủ số câu tối thiểu · Để đạt hôm nay: chưa đủ số câu tối thiểu"). Không có `datNgay` thì giữ câu cũ theo `tienBo`.
+  const soConThieu = Math.max(1, Math.floor(Number(datNgayExp?.toiThieu) || 0) - Math.floor(Number(datNgayExp?.daLam) || 0))
+  const CHU_THIEU: Record<string, string> = {
+    cau_toi_thieu: `làm thêm ${soConThieu} câu`,
+    tre_nhip: 'làm nốt việc bắt buộc đang trễ nhịp',
+    chua_len_bac: 'lên bậc ít nhất một câu tới hạn ôn',
+  }
+  const thieuChu = expChuaDat ? (datNgayExp!.thieu || []).map((k) => CHU_THIEU[k]).filter(Boolean) : []
+  const dauTienDo = `Đã làm ${daLam} câu${lenBac > 0 ? `, ${lenBac} câu lên bậc ôn` : ''}`
+  const ghiChuTienDo = coDatNgay
+    ? `${dauTienDo} · ${expChuaDat ? (thieuChu.length > 0 ? `Để đạt hôm nay: ${thieuChu.join('; ')}` : 'chưa đạt hôm nay') : 'đã đạt hôm nay'}`
+    : ghiChuTienDo0
   return dongGoi('ke_hoach_ngay', viec, {
     tienDo: { daLam, mucTieu, phanTram: phanTram(daLam, mucTieu), ghiChu: ghiChuTienDo },
     tocDo: daDo
@@ -503,7 +619,8 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     ngayNghi: keHoach.lanNghi === true,
     thanThu: docThanThu(keHoach.thanThu),
     tonCu,
-  })
+    ...docExp(keHoach),
+  }, { dat: keHoach.tienBo.dat === true && !expChuaDat, daLamCau: daLam, lenBac })
 }
 
 const TEN_LOAI: Record<string, string> = {
@@ -548,7 +665,18 @@ export interface BanNhoBangNhiemVu {
 export function dongGoiBanNho(duLieu: DuLieuBangNhiemVu, now: number): BanNhoBangNhiemVu | null {
   if (duLieu.nguon !== 'ke_hoach_ngay' || duLieu.ghiChuCu) return null
   const ngay = ngayVietNam(now)
-  return ngay ? { ngay, luuLuc: now, duLieu } : null
+  // "Vừa nhận EXP" là thông báo MỘT LẦN của đúng lần gọi ấy: lưu vào bản nhớ thì mở lại app sẽ phát lại.
+  return ngay ? { ngay, luuLuc: now, duLieu: { ...duLieu, expNhan: [], manhNhan: [] } } : null
+}
+
+function docExpDaLuu(x: any): DuLieuExp | null {
+  if (!x || typeof x !== 'object' || !Number.isFinite(x.homNay)) return null
+  const mk = x.manhKhien
+  return {
+    homNay: x.homNay,
+    chiTiet: (Array.isArray(x.chiTiet) ? x.chiTiet : []).filter((c: any) => c && typeof c.ghiChu === 'string' && c.ghiChu).map((c: any) => ({ loai: String(c.loai ?? ''), exp: Number(c.exp) || 0, ghiChu: c.ghiChu })),
+    manhKhien: mk && Number.isFinite(mk.manh) ? { manh: mk.manh, moiKhien: Number(mk.moiKhien) || 12, khienConLai: Number(mk.khienConLai) || 0 } : null,
+  }
 }
 
 const laMang = Array.isArray
@@ -587,10 +715,16 @@ export function phucHoiBanNho(x: unknown, now: number): DuLieuBangNhiemVu | null
     tc && Number.isFinite(tc.soBai) && Number.isFinite(tc.soCau) && Array.isArray(tc.bai) && tc.bai.every((b: any) => b && typeof b.id === 'string' && b.hanhDong && typeof b.hanhDong.loai === 'string')
       ? tc
       : { soBai: 0, soCau: 0, bai: [] }
+  const xh: any = (d as any).daXongHomNay
+  const daXongHomNay = xh && Number.isFinite(xh.daLamCau) && Number.isFinite(xh.lenBac) ? { daLamCau: xh.daLamCau, lenBac: xh.lenBac } : null
   return {
     ...d,
     thanThu,
     tonCu,
+    daXongHomNay,
+    exp: docExpDaLuu((d as any).exp),
+    expNhan: [],
+    manhNhan: [],
     lamNgay: d.lamNgay ? lamMoiThe(d.lamNgay, now) : null,
     cacBac: d.cacBac.map((g) => ({ ...g, viec: g.viec.map((v) => lamMoiThe(v, now)) })),
     ghiChuCu: gioLuu ? `Kế hoạch lúc ${gioLuu} · đang cập nhật…` : 'Kế hoạch đã nhớ · đang cập nhật…',

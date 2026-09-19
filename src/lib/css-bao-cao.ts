@@ -105,7 +105,7 @@ export const CSS_BAO_CAO = `
 .bc-vp-noi{font-size:12.5px;color:var(--p-nhat);line-height:1.65;margin-top:10px}
 
 .bc-nut-doi{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.bc-nut{flex:1 1 150px;min-height:46px;border-radius:12px;font-family:var(--sans);font-size:14px;font-weight:700;
+.bc-nut{flex:1 1 150px;min-height:48px;border-radius:12px;font-family:var(--sans);font-size:14px;font-weight:700;
   cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 12px;border:none}
 .bc-nut.chinh{background:var(--p-tim);color:var(--p-trang)}
 /* NÚT VÀNG (thầy chốt 04-09 tối): chữ đen trên nền hổ phách, tương phản cao

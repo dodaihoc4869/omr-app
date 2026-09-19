@@ -411,3 +411,28 @@ describe('tab BTVN của học sinh nói đúng hệ LÔ (không còn "3 Vòng P
     expect(chu).not.toMatch(/3 Vòng|Phân Tầng|VÒNG [123]|Vòng [123]|nắm chắc/i)
   })
 })
+
+describe('C11 · việc on_lai mở màn LamCauOn với ĐÚNG câu máy chủ chọn', () => {
+  const datDuong = (d: string) => window.history.replaceState(null, '', d)
+  afterEach(() => datDuong('/'))
+
+  it('bấm "Ôn ngay" → sheet "Ôn câu hôm nay" gọi /hs/cau-theo-qid với token + qid của việc; đóng sheet thì hỏi lại /hs/ke-hoach-ngay', async () => {
+    datDuong('/hs')
+    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: 'test', hoTen: 'Em thử', token: 'test-token' }))
+    mocks.items = []
+    mocks.momItems = []
+    const qid = (KE_HOACH.viec[0].chiTiet as any).qid as string[]
+    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
+    tra['/hs/cau-theo-qid'] = { body: { ok: true, cau: [{ qid: qid[0], phan: 'I', text: 'Câu ôn thử phải hiện', choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [] }], khongCo: [] } }
+    render(<StudentPortalScreen />)
+    fireEvent.click(await screen.findByRole('button', { name: /Ôn ngay/ }))
+    expect(await screen.findByText('Câu ôn thử phải hiện')).toBeTruthy()
+    expect(document.querySelector('.m3-thanh-tren-ten')!.textContent).toBe('Ôn câu hôm nay')
+    expect(goiTheo('/hs/cau-theo-qid')[0].body).toEqual({ token: 'test-token', qid })
+    // KHÔNG mở luồng khắc phục cũ (hsCauSaiApi/luyện lại câu sai)
+    expect(goiTheo('/hs/cau-sai').length).toBe(0)
+    const truoc = goiTheo('/hs/ke-hoach-ngay').length
+    fireEvent.click(screen.getByTitle('Đóng toàn màn hình'))
+    await waitFor(() => expect(goiTheo('/hs/ke-hoach-ngay').length).toBeGreaterThan(truoc))
+  })
+})

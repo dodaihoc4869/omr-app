@@ -3,7 +3,7 @@
 import { describe, it, expect } from 'vitest'
 import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
-import { readScope } from '../server/src/game-v2-bank'
+import { protectedQuestions, readScope } from '../server/src/game-v2-bank'
 import { dauNgayVn, masteryTheoHoSo, qidChanHomNay } from '../server/src/game-v2-ho-so'
 import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
 import { lapVaLuuKeHoach } from '../server/src/ke-hoach-ngay-d1'
@@ -288,5 +288,40 @@ describe('K4 tích hợp: gameV2 start trên D1 thật', () => {
     d.sql.exec('DROP TABLE nam_kt_cau'); d.sql.exec('DROP TABLE nam_kt_dang'); d.sql.exec('DROP TABLE su_kien_hoc')
     const r = await start(d)
     expect(r.ok).toBe(true)
+  })
+})
+
+describe('bộ nhớ đệm câu đang bảo vệ KHÔNG bị lệnh game ghi bẩn (Code 5 báo 19/09)', () => {
+  it('protectedQuestions trả BẢN SAO: thêm vào kết quả không đổi các lần gọi sau (cả lần dựng mới lẫn lần trúng đệm)', async () => {
+    const d = taoD1That()
+    // Mã ca riêng cho từng lần chạy → vân tay đệm mới → lần gọi đầu là LẦN DỰNG MỚI, lần sau trúng đệm.
+    d.sql.prepare("INSERT INTO ca(ma_ca,trang_thai,cap_nhat_luc) VALUES(?, 'mo', 'x')").run(`CA-DEM-${Date.now()}-${Math.random()}`)
+    const moi = await protectedQuestions(d.env)
+    moi.add('RO-RI-MOI')
+    const trung = await protectedQuestions(d.env)
+    expect(trung.has('RO-RI-MOI')).toBe(false)
+    trung.add('RO-RI-TRUNG')
+    expect((await protectedQuestions(d.env)).has('RO-RI-TRUNG')).toBe(false)
+    expect(moi).not.toBe(trung)
+  })
+
+  it('câu em A làm hôm nay không làm em B mất câu khi hai em gọi start trong CÙNG tiến trình (trước sửa: B mất Q)', async () => {
+    const d = taoD1That()
+    themHs(d, 'S1'); themHs(d, 'S2')
+    d.sql.exec('CREATE TABLE IF NOT EXISTS game_v2_settings (key TEXT PRIMARY KEY, json TEXT NOT NULL)')
+    d.sql.prepare("INSERT INTO ca(ma_ca,trang_thai,cap_nhat_luc) VALUES(?, 'mo', 'x')").run(`CA-DEM2-${Date.now()}-${Math.random()}`)
+    themCau(d, ['E1', 'Q1', 'Q2', 'Q3', 'Q4'].map((q) => cauKho(q, 'ES.A.X')))
+    // Cả hai em cùng có bằng chứng dạng ES.A.X (E1 sai ở BTVN 3 ngày trước). CHỈ S1 làm Q1 hôm nay ở BTVN.
+    await ghi(d, [
+      { sbd: 'S1', qid: 'E1', nguon: 'btvn', gio: -72, kq: 0 }, { sbd: 'S2', qid: 'E1', nguon: 'btvn', gio: -72, kq: 0 },
+      { sbd: 'S1', qid: 'Q1', nguon: 'btvn', gio: -0.5, kq: 1 },
+    ])
+    await dung(d, 'S1'); await dung(d, 'S2')
+    const start = async (sbd: string) => ((await gameV2(d.env, 'start', { token: await gameToken(d.env, sbd) })) as { questions: { qid: string }[] }).questions.map((q) => q.qid)
+    const s1 = await start('S1')
+    expect(s1).not.toContain('Q1') // S1 vừa làm Q1 hôm nay: không ra ở game
+    const s2 = await start('S2')
+    expect(s2).toContain('Q1') // S2 chưa làm Q1: kho của S2 không được teo vì S1
+    expect((await start('S1'))).not.toContain('Q1')
   })
 })

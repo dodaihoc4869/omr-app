@@ -64,6 +64,30 @@ describe('ParentPortalScreen — đã đăng nhập: khung sheet toàn màn', ()
   })
 })
 
+describe('hai lỗi nhỏ ghi tồn — sửa ở chỗ dùng (0.Planer 19/09)', () => {
+  it('(ii) tiêu đề sheet không còn bị chặn 200 px: ở màn hẹp xuống hàng riêng full bề rộng, cắt (truncate) chỉ khi thật sự hết chỗ', async () => {
+    localStorage.setItem('omr_ph_sbd', '12121212')
+    const { container } = render(<ParentPortalScreen />)
+    await waitFor(() => expect(container.querySelector('.bnv')).toBeTruthy())
+    fireEvent.click(await screen.findByRole('button', { name: 'Mở menu' }))
+    fireEvent.click(await screen.findByText('Báo cáo điểm các ca thi'))
+    const tieuDe = (await screen.findByText('Báo Cáo Điểm Tất Cả Các Ca Thi')) as HTMLElement
+    expect(tieuDe.className).toContain('truncate')
+    const khung = tieuDe.parentElement!
+    expect(khung.className).toContain('basis-full')
+    expect(khung.className).toContain('order-last')
+    expect(khung.className).not.toContain('max-w-[200px]')
+    expect(khung.parentElement!.className).toContain('flex-wrap')
+  })
+
+  it('(i) thanh trên màn đăng nhập chừa tối thiểu 10 px phía trên (env() rỗng ở máy không tai thỏ làm chữ ĐỖ ĐẠI HỌC bị cắt mép); LogoApp.tsx KHÔNG bị sửa', () => {
+    const t = doc('src/screens/ParentPortalScreen.tsx')
+    expect(t).toContain("paddingTop: 'max(10px, env(safe-area-inset-top))'")
+    expect(t).not.toContain("paddingTop: 'env(safe-area-inset-top, 10px)'")
+    expect(doc('src/components/LogoApp.tsx')).not.toContain('safe-area')
+  })
+})
+
 describe('ParentPortalScreen.tsx: không mã màu cứng, phạm vi bộ sinh', () => {
   it('không #hex, không import hay sửa gì ngoài lớp m3; nằm trong phạm vi bộ sinh lớp tương thích', () => {
     const t = doc('src/screens/ParentPortalScreen.tsx')

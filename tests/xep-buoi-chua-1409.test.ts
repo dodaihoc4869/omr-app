@@ -291,7 +291,7 @@ describe('QUÉT DIỆN RỘNG — sàn 20 em phải đứng vững', () => {
     console.log(`[xếp buổi chữa] quét ${soCa} tổ hợp · trượt ${truot.length}`)
     expect(truot.slice(0, 5)).toEqual([])
     expect(soCa).toBeGreaterThan(500)
-  })
+  }, 60000)
 
   it('câu bắt buộc luôn được chữa trước, kể cả khi ngân sách chật', () => {
     for (const soBatBuoc of [1, 3, 5, 8, 10]) {

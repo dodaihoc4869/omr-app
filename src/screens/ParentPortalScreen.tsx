@@ -532,7 +532,7 @@ export default function ParentPortalScreen() {
     return (
       <div className="m3">
       <div className="min-h-screen flex flex-col justify-between bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
-        <header className="px-4 pb-3 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900" style={{ paddingTop: 'env(safe-area-inset-top, 10px)' }}>
+        <header className="px-4 pb-3 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900" style={{ paddingTop: 'max(10px, env(safe-area-inset-top))' }}>
           <LogoApp vai="phuhuynh" size={38} hienChu={true} phuDe="PHỤ HUYNH" />
           <button
             type="button"
@@ -661,10 +661,10 @@ export default function ParentPortalScreen() {
       {tabPh !== null && (
         <div className="fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto flex flex-col animate-google-fade">
           {/* Header Toàn Màn Hình */}
-          <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-3 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 shadow-xs">
+          <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-3 sm:px-6 py-2.5 sm:py-3.5 flex flex-wrap sm:flex-nowrap items-center justify-between gap-x-2 gap-y-1 shadow-xs">
             <NutQuayLai onClick={() => setTabPh(null)} label="Quay lại Bảng tin" />
 
-            <div className="flex items-center gap-2 min-w-0 max-w-[200px] sm:max-w-md">
+            <div className="flex items-center gap-2 min-w-0 order-last basis-full sm:order-none sm:basis-auto sm:flex-1 sm:max-w-md">
               <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />
               <h2 className="font-bold text-xs sm:text-base text-slate-900 dark:text-white truncate">
                 {tabPh === 'diem' && 'Báo Cáo Điểm Tất Cả Các Ca Thi'}

@@ -11,7 +11,7 @@ import { taoChiTietCau } from './chi-tiet-cau'
 import { docDeRiengCa, loadExamSources, loadSessionTeacherBank, docSoCauCa, saveSessionTeacherBank } from './exam-db'
 import { mergeAndStrip, mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
 import { CAU_HINH_DE_RIENG_MAC_DINH, SO_CA_BOC_NGAU_NHIEN, type CauHinhDeRieng } from './cau-hinh-de-rieng'
-import { demLanSai, docHoSoOnEm, dungDeRieng, type CaTruocDaCham, type EmThieuLap, type HoSoOnEm } from './de-rieng'
+import { demLanSai, docHoSoOnEm, dungDeRieng, dungDeRiengLuotHai, type CaTruocDaCham, type EmThieuLap, type HoSoOnEm, type YeuCauDeRieng } from './de-rieng'
 import { dungUngVien } from './rut-de'
 import { chuanChuyenDe } from './goi-len-bang'
 import { hashSeed } from './exam-shuffle'
@@ -407,12 +407,37 @@ export interface KetQuaDungDeRieng {
   noiCam: { sbd: string; soNoi: number }[]
   /** sbd → câu sai ca trước KHÔNG hỏi lại vì hồ sơ nói đã khắc phục. */
   daKhacPhucTheoEm: Record<string, string[]>
+  /** GHI CHÚ CHO BIÊN BẢN — `tin` in màu thường, `canh_bao` in màu cam (thầy cần
+   * làm gì đó). Màn Ca thi chép nguyên mảng này vào `BienBanDeRieng.ghiChu`. */
+  ghiChu: GhiChuBienBan[]
+  /** LƯỢT HAI — em cùng lớp chưa vào phòng chờ lúc bấm Bắt đầu, đã được chuẩn bị
+   * đề sẵn. Bộ đề của các em này ĐÃ nằm trong `boTheoEm`/`lapTheoEm` ở trên (máy
+   * chủ phải có thì em vào muộn mới nhận được), nhưng KHÔNG nằm trong mọi con số
+   * biên bản (`thieu`, `canCua`, `soLapCua`, `saiCaTruocCua`, `tuCaCua`, `trungBinh`). */
+  vang: { dsSbd: string[]; coHoSo: boolean; soCauNoiThem: number; dinhTrung: number; thieuCau: { sbd: string; thieu: number }[]; noiCam: { sbd: string; soNoi: number }[] }
 }
 
-/** Phần tuỳ chọn của `dungDeRiengChoCa` — chủ yếu để test truyền ngày cố định. */
+export interface GhiChuBienBan {
+  loai: 'tin' | 'canh_bao'
+  loi: string
+}
+
+/** Phần tuỳ chọn của `dungDeRiengChoCa`. */
 export interface TuyChonDungDeRieng {
   /** Ngày VN của ca. Mặc định: ngày VN lúc thầy bấm Bắt đầu. */
   ngayCa?: string
+  /** LỚP của ca (`ca.lop`). Có thì em CÙNG LỚP chưa vào phòng chờ được chuẩn bị đề
+   * sẵn ở LƯỢT HAI. Rỗng/thiếu ⇒ KHÔNG có lượt hai: ca không ghi lớp mà vẫn gộp
+   * là gộp cả trường (bản 17/09 mắc đúng chỗ này). Không đụng luật vào thi — em
+   * vắng chỉ có thêm một dòng trong bản đồ, vào được hay không vẫn do cổng cũ quyết. */
+  lopCa?: string
+}
+
+/** CA LẤY NGUỒN CÂU SAI của một em — đúng phép chọn của `chonCauLapChoEm`: ca gần
+ * nhất em có nộp (`gan_nhat`), hoặc tối đa 3 ca gần nhất em có nộp (`ba_ca`). */
+function caNguonCuaEm(dsCa: CaTruocDaCham[], sbd: string, ch: CauHinhDeRieng): CaTruocDaCham[] {
+  const coNop = dsCa.slice(0, Math.max(0, ch.TRAN_CA_QUET)).filter((c) => (c.daLamCua[sbd] ?? []).length > 0)
+  return coNop.slice(0, ch.PHAM_VI_HOI_LAI === 'ba_ca' ? SO_CA_BOC_NGAU_NHIEN : 1)
 }
 
 /** LỌC KHO TOÀN BỘ VỀ ĐÚNG CHUYÊN ĐỀ CỦA CA (vá 19/09 — sự cố "chọn chương 1
@@ -456,17 +481,39 @@ export async function dungDeRiengChoCa(
   const sc = await docSoCauCa(maCa)
   if (!sc) throw new Error('Ca này chưa ghi số câu mỗi phần')
 
-  const { dsCa, boQua, namQuet, nguonNam, soCaThuMuc } = await docCacCaTruoc(url, mat, [maCa], ch, dsSbd)
+  // DANH SÁCH LỚP đi SONG SONG với việc quét ca cũ — lượt hai không được làm thầy
+  // đứng chờ thêm. Hỏng thì chỉ mất lượt hai (em vào muộn bốc theo hash như ca
+  // thường), việc bấm Bắt đầu không hỏng theo.
+  const lopCa = String(tuyChon.lopCa ?? '').trim()
+  const [nguonCaTruoc, dsLop] = await Promise.all([
+    docCacCaTruoc(url, mat, [maCa], ch, dsSbd),
+    lopCa ? danhSachEm(url, mat).catch(() => null) : Promise.resolve(null),
+  ])
+  const { dsCa, boQua, namQuet, nguonNam, soCaThuMuc } = nguonCaTruoc
+  const ghiChu: GhiChuBienBan[] = []
+  const coMat = new Set(dsSbd)
+  // Sắp theo SBD: thứ tự máy chủ trả danh sách lớp không phải là đầu vào của thuật toán.
+  const dsSbdVang = dsLop
+    ? [...new Set(dsLop.filter((e) => String(e.lop ?? '').trim() === lopCa).map((e) => String(e.sbd ?? '').trim()))].filter((x) => x && !coMat.has(x)).sort()
+    : []
+  if (!lopCa) ghiChu.push({ loai: 'tin', loi: 'ca không ghi lớp — em vào muộn rút theo luật thường (không chuẩn bị đề sẵn)' })
+  else if (!dsLop) ghiChu.push({ loai: 'canh_bao', loi: 'không đọc được danh sách lớp — em vào muộn rút theo luật thường, không có câu hỏi lại' })
 
   // HỒ SƠ ÔN (GĐ 6 Kênh 1, 19/09) — lớp thông tin THÊM, ≤ 3 lệnh cho 60 em.
   // `banDoSaiCa` ở trên vẫn là nguồn của luật 30% và trần lặp; hồ sơ chỉ nói câu
   // nào em đã tự chữa, câu nào tới hạn ôn, và tuần này em vừa làm câu gì. Lệnh
   // hỏng ⇒ `hoSo` là `undefined` ⇒ `dungDeRieng` chạy đúng bản trước.
   const ngayCa = tuyChon.ngayCa ?? ngayVnCua(Date.now())
-  const docHoSo = await docHoSoOnCa(url, mat, dsSbd, maCa, ngayCa, ch.PHAM_VI_HOI_LAI === 'ba_ca' ? 3 : 1)
-  // KHAI RA, không im lặng — cùng chỗ thầy vẫn đọc "ca không đọc được".
-  if (!docHoSo.hoSo) boQua.push({ maCa: 'hồ sơ ôn', vi_sao: `chưa đọc được (${docHoSo.loi || 'máy chủ chưa có lệnh'}) — rút đúng luật cũ, không phải lỗi ca` })
-  else if (docHoSo.soEmHong > 0) boQua.push({ maCa: 'hồ sơ ôn', vi_sao: `${docHoSo.soEmHong} em không đọc được hồ sơ (${docHoSo.loi}) — các em đó rút theo luật cũ` })
+  const soCaHoSo = ch.PHAM_VI_HOI_LAI === 'ba_ca' ? 3 : 1
+  // Hồ sơ của em VẮNG là một lượt RIÊNG (chia lô 20 như cũ), chạy song song: nó
+  // hỏng thì chỉ em vắng đi luật cũ, không kéo em có mặt theo — và ngược lại.
+  const [docHoSo, docHoSoVang] = await Promise.all([
+    docHoSoOnCa(url, mat, dsSbd, maCa, ngayCa, soCaHoSo),
+    dsSbdVang.length > 0 ? docHoSoOnCa(url, mat, dsSbdVang, maCa, ngayCa, soCaHoSo) : Promise.resolve<KetQuaDocHoSoOn>({ hoSo: undefined, soEmHong: 0, loi: '' }),
+  ])
+  // KHAI RA, không im lặng.
+  if (!docHoSo.hoSo) ghiChu.push({ loai: 'canh_bao', loi: `hồ sơ ôn chưa đọc được (${docHoSo.loi || 'máy chủ chưa có lệnh'}) — rút đúng luật cũ, không phải lỗi ca` })
+  else if (docHoSo.soEmHong > 0) ghiChu.push({ loai: 'canh_bao', loi: `${docHoSo.soEmHong} em không đọc được hồ sơ ôn (${docHoSo.loi}) — các em đó rút theo luật cũ` })
 
   // KÉO CÂU EM TỪNG SAI TỪ CẢ KHO VÀO CA NÀY (thầy chốt 08/09: "bất kể là tôi
   // chọn chuyên đề gì thi mà ca trước sai 9 câu phải rút đúng 3 câu đó ra vào
@@ -571,7 +618,7 @@ export async function dungDeRiengChoCa(
     }
   }
 
-  const ra = dungDeRieng({
+  const yeuCau: YeuCauDeRieng = {
     uv: uvCuoi,
     yc: { soCau: sc, chuyenDe: [], mucDo: [], tranhQid: [], seed: hashSeed(maCa) },
     dsSbd,
@@ -580,18 +627,99 @@ export async function dungDeRiengChoCa(
     // Ba trường dưới CHỈ có khi lệnh `hoSoOnCa` chạy được. Thiếu cả ba thì lời gọi
     // này giống hệt bản trước 19/09 và ra đúng bộ đề đó.
     ...(docHoSo.hoSo ? { hoSo: docHoSo.hoSo, ngayCa, maDangCua: maDangCuaKho(bankDung) } : {}),
-  })
+  }
+  const ra = dungDeRieng(yeuCau)
   if (ra.noiCam.length > 0) {
     const tong = ra.noiCam.reduce((t, x) => t + x.soNoi, 0)
-    boQua.push({ maCa: 'kho mỏng', vi_sao: `${ra.noiCam.length} em phải nhận lại tổng ${tong} câu vừa làm trong tuần (đã nới câu cũ nhất trước) — thêm câu vào kho ca để hết trùng` })
+    ghiChu.push({ loai: 'canh_bao', loi: `kho mỏng — ${ra.noiCam.length} em phải nhận lại tổng ${tong} câu vừa làm trong tuần (đã nới câu cũ nhất trước); thêm câu vào kho ca để hết trùng` })
   }
+  const emDaKhacPhuc = Object.values(ra.daKhacPhucTheoEm)
+  if (emDaKhacPhuc.length > 0) {
+    ghiChu.push({ loai: 'tin', loi: `${emDaKhacPhuc.length} em đã tự khắc phục tổng ${emDaKhacPhuc.reduce((t, x) => t + x.length, 0)} câu sai ca trước ở bài luyện — không hỏi lại các câu đó` })
+  }
+
+  // LƯỢT HAI — EM VẮNG. Chạy SAU khi `ra` (mọi em có mặt) đã chốt và chỉ ĐỌC `ra`.
+  const vang: KetQuaDungDeRieng['vang'] = { dsSbd: dsSbdVang, coHoSo: Boolean(docHoSoVang.hoSo), soCauNoiThem: 0, dinhTrung: 0, thieuCau: [], noiCam: [] }
+  let boVang: ReturnType<typeof dungDeRiengLuotHai> | null = null
+  if (dsSbdVang.length > 0) {
+    // Câu em vắng từng sai mà kho ca chưa có: nối vào bằng MỘT lượt `noiKhoCa`
+    // riêng. Kho phần câu MỚI của lượt một không đổi (đã chốt ở trên), nên đề em
+    // có mặt không đổi một qid. Lượt nối hỏng ⇒ em vắng bỏ các câu ngoài kho
+    // (đúng lý do `ngoai_kho` như cũ), việc bấm Bắt đầu KHÔNG hỏng theo.
+    let bankVang = bankDung
+    try {
+      const daCo = new Set(bankDung.flatMap((b) => [...b.phanI, ...b.phanII, ...b.phanIII].map((q) => q.id)))
+      const canTheoCaVang = new Map<string, Set<string>>()
+      for (const sbd of dsSbdVang) {
+        for (const ca of caNguonCuaEm(dsCa, sbd, ch)) {
+          for (const q of ca.saiCua[sbd] ?? []) {
+            if (daCo.has(q)) continue
+            const bo = canTheoCaVang.get(ca.maCa) ?? new Set<string>()
+            bo.add(q)
+            canTheoCaVang.set(ca.maCa, bo)
+          }
+        }
+      }
+      if (canTheoCaVang.size > 0) {
+        const can = new Set([...canTheoCaVang.values()].flatMap((b) => [...b]))
+        const kho = await loadExamSources().catch(() => [] as TeacherExamSource[])
+        const themVang: TeacherExamSource = {
+          maDe: `${maCa}-hoi-lai-vang`,
+          phanI: kho.flatMap((b) => b.phanI.filter((q) => can.has(q.id))),
+          phanII: kho.flatMap((b) => b.phanII.filter((q) => can.has(q.id))),
+          phanIII: kho.flatMap((b) => b.phanIII.filter((q) => can.has(q.id))),
+        }
+        const daLay = new Set([...themVang.phanI, ...themVang.phanII, ...themVang.phanIII].map((q) => q.id))
+        const conThieu = new Map<string, Set<string>>()
+        for (const [ma, bo] of canTheoCaVang) {
+          const b = new Set([...bo].filter((q) => !daLay.has(q)))
+          if (b.size > 0) conThieu.set(ma, b)
+        }
+        if (conThieu.size > 0) {
+          const buCa = await gomCauTuCaCu(url, mat, conThieu)
+          themVang.phanI = [...themVang.phanI, ...buCa.phanI]
+          themVang.phanII = [...themVang.phanII, ...buCa.phanII]
+          themVang.phanIII = [...themVang.phanIII, ...buCa.phanIII]
+        }
+        const soThem = themVang.phanI.length + themVang.phanII.length + themVang.phanIII.length
+        if (soThem > 0) {
+          await noiKhoCa(url, mat, maCa, mergeAndStrip([themVang]), { phanI: themVang.phanI, phanII: themVang.phanII, phanIII: themVang.phanIII })
+          bankVang = [...bankDung, themVang]
+          await saveSessionTeacherBank(maCa, bankVang)
+          vang.soCauNoiThem = soThem
+        }
+      }
+    } catch (e) {
+      bankVang = bankDung
+      ghiChu.push({ loai: 'canh_bao', loi: `không nối được câu em vắng từng sai vào kho ca (${e instanceof Error ? e.message : 'lỗi không rõ'}) — em vào muộn có thể thiếu câu hỏi lại` })
+    }
+
+    boVang = dungDeRiengLuotHai({
+      y: yeuCau,
+      luotMot: ra,
+      dsSbdVang,
+      hoSoVang: docHoSoVang.hoSo,
+      ...(bankVang !== bankDung ? { uvThem: dungUngVien(bankVang) } : {}),
+      ...(docHoSoVang.hoSo ? { maDangCuaThem: maDangCuaKho(bankVang) } : {}),
+    })
+    vang.dinhTrung = boVang.dinhTrung
+    vang.thieuCau = boVang.thieuCau
+    vang.noiCam = boVang.noiCam
+    if (!docHoSoVang.hoSo) ghiChu.push({ loai: 'canh_bao', loi: `hồ sơ ôn của ${dsSbdVang.length} em chưa vào phòng chờ không đọc được (${docHoSoVang.loi || 'lỗi không rõ'}) — đề sẵn của các em đó rút theo luật cũ` })
+    // ĐÚNG MỘT DÒNG về em vắng trong biên bản; mọi con số khác chỉ đếm em có mặt.
+    ghiChu.push({ loai: 'tin', loi: `${dsSbdVang.length} em chưa vào phòng chờ đã được chuẩn bị đề sẵn` })
+  }
+  // Bản đồ GỬI MÁY CHỦ phải có cả em vắng — không có thì em vào muộn không nhận
+  // được đề đã chuẩn bị. Em có mặt đứng trước, y nguyên thứ tự và nội dung.
+  const gop = (a: Record<string, string[]>, b: Record<string, string[]> | undefined) => (b ? { ...a, ...b } : a)
+  const boTheoEm = gop(ra.boTheoEm, boVang?.boTheoEm)
   return {
     cauNoiThem,
-    boTheoEm: ra.boTheoEm,
-    lapTheoEm: ra.lapTheoEm,
-    cauGocTheoEm: ra.cauGocTheoEm,
-    songSinhTheoEm: ra.songSinhTheoEm,
-    lapCua: lapCuaTungEm(ra.boTheoEm, demLanSai(dsCa)),
+    boTheoEm,
+    lapTheoEm: gop(ra.lapTheoEm, boVang?.lapTheoEm),
+    cauGocTheoEm: gop(ra.cauGocTheoEm, boVang?.cauGocTheoEm),
+    songSinhTheoEm: gop(ra.songSinhTheoEm, boVang?.songSinhTheoEm),
+    lapCua: lapCuaTungEm(boTheoEm, demLanSai(dsCa)),
     thieu: ra.thieuLap,
     canCua: ra.canCua,
     soLapCua: ra.soLapCua,
@@ -612,6 +740,8 @@ export async function dungDeRiengChoCa(
     },
     noiCam: ra.noiCam,
     daKhacPhucTheoEm: ra.daKhacPhucTheoEm,
+    ghiChu,
+    vang,
   }
 }
 

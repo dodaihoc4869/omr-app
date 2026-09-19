@@ -1,5 +1,6 @@
 import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect} from './btvn-grading'
 import {cauTuKhoTheoQid,ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,type CauChamBai} from './su-kien-hoc'
+import {expNhanSauNop} from './exp-d1'
 import { hopLe3DangChuan } from './loc-cau-chuan'
 // CỔNG TƯƠNG THÍCH `/goi` — CẮT HẲN GOOGLE.
 //
@@ -894,7 +895,8 @@ export async function nopBtvnQuaPhieu(
   // `gradeHomework` vừa chấm (không đọc lại R2). Lượt 1 bỏ qua câu đã ghi qua lô (`btvn_lo`) để nộp cả
   // bài không đếm đôi. Lỗi sổ không làm hỏng lượt nộp.
   await ghiSuKien(env, suKienTuKetQuaCham('btvn', maBtvn, sbd, lanMoi, nay, graded), { tranhTrungLo: lanMoi === 1 })
-  return { ok: true, lanThu: lanMoi, soCau, soDung, qidSai, nopLuc: nay, soLanLamLaiConLai: Math.max(0, 4 - lanMoi) }
+  // EXP HỌC TẬP MỚI (exp-d1.ts): chỉ đính thêm `expNhan`/`manhNhan` khi đã bật cho em; tắt thì phản hồi y hệt cũ.
+  return { ok: true, lanThu: lanMoi, soCau, soDung, qidSai, nopLuc: nay, soLanLamLaiConLai: Math.max(0, 4 - lanMoi), ...(await expNhanSauNop(env, sbd, Date.now())) }
 }
 
 /** Gỡ hậu tố phần khỏi mã đề — bản dùng trong tệp này (xem `goPhanKhoiMaDe`
@@ -1059,7 +1061,7 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
     const cauSo = cauPhieu.length ? cauPhieu : await cauTuKhoTheoQid(env, Object.keys(lam))
     await ghiSuKien(env, suKienChamBai('khac_phuc', ma, sbd, lan, nay, cauSo, lam))
   }
-  return { ok: true, lanThu: cu ? 2 : 1, soCau, soDung, qidSai, nopLuc: nay }
+  return { ok: true, lanThu: cu ? 2 : 1, soCau, soDung, qidSai, nopLuc: nay, ...(await expNhanSauNop(env, sbd, Date.now())) }
 }
 
 export async function nopKhacPhucTheoCa(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {

@@ -84,7 +84,8 @@ describe('hai nguồn ra cùng một cấu trúc', () => {
         expect(v.id).toBeTruthy()
         expect(v.tieuDe).toBeTruthy()
         expect(typeof v.biCong).toBe('boolean')
-        expect(v.hanhDong.loai).toMatch(/^mo_/)
+        // `mo_*` mở một màn cũ; `lam_cau_on` (C11, có chủ ý) mở màn LamCauOn với đúng các câu máy chủ chọn.
+        expect(v.hanhDong.loai).toMatch(/^(mo_|lam_cau_on$)/)
         expect(v.hanhDong.nhanNut).toBeTruthy()
       }
     }
@@ -224,6 +225,29 @@ describe('nhánh máy chủ: tên, payload khi bấm, quá hạn, cảnh báo', 
     expect(theo['than_thu:CARBOHYDRATE.UNG_DUNG'].hanhDong.loai).toBe('mo_than_thu')
   })
 
+  it('C11: on_lai có chiTiet.qid → hành động lam_cau_on mang ĐÚNG các qid (tối đa 20, bỏ rỗng/không phải chuỗi); thiếu qid → luồng cũ', () => {
+    const on = theo['on_lai:2026-09-19']
+    expect(on.hanhDong).toEqual({ loai: 'lam_cau_on', payload: { viecId: 'on_lai:2026-09-19', qid: ['a', 'b', 'c'], soCau: 3, tieuDe: 'Ôn 3 câu đã tới hạn nhắc lại' }, nhanNut: 'Ôn ngay' })
+    const nhieu = Array.from({ length: 25 }, (_, i) => `q${i}`)
+    const kh: KeHoachNgayMayChu = {
+      ...keHoachMayChu,
+      viec: [
+        v({ id: 'on_lai:A', loai: 'on_lai', soCau: 25, chiTiet: { qid: [...nhieu, '', 7, null] } }),
+        v({ id: 'on_lai:B', loai: 'on_lai', soCau: 2, chiTiet: {} }),
+        v({ id: 'on_lai:C', loai: 'on_lai', soCau: 2, chiTiet: { qid: [] } }),
+        v({ id: 'on_thi:D', loai: 'on_thi', soCau: 2, chiTiet: { qid: ['x'] } }),
+      ] as any,
+    }
+    const t = Object.fromEntries(tatCaViec(tuKeHoachNgay(kh, NOW, phu)).map((x) => [x.id, x]))
+    expect((t['on_lai:A'].hanhDong.payload as any).qid).toEqual(nhieu.slice(0, 20))
+    expect(t['on_lai:A'].hanhDong.loai).toBe('lam_cau_on')
+    // thiếu / rỗng qid (máy chủ cũ): giữ luồng luyện lại câu sai hiện có, không mở màn rỗng
+    expect(t['on_lai:B'].hanhDong).toMatchObject({ loai: 'mo_khac_phuc', nhanNut: 'Ôn ngay' })
+    expect(t['on_lai:C'].hanhDong.loai).toBe('mo_khac_phuc')
+    // on_thi chưa có đường lấy/nộp riêng: KHÔNG mượn đường on_lai
+    expect(t['on_thi:D'].hanhDong.loai).toBe('mo_khac_phuc')
+  })
+
   it('trễ nhịp được nói ra; btvn_nop có nút Nộp bài', () => {
     const kh: KeHoachNgayMayChu = { ...keHoachMayChu, viec: [
       v({ id: 'btvn_lo:BT-ANCOL:0', loai: 'btvn_lo', soCau: 6, hanCung: gio(10), batBuoc: true, khan: true, nhan: 'khan_cap', chiTiet: { ma: 'BT-ANCOL', chiSo: 0, tongLo: 2, treNhip: true } }),
@@ -326,12 +350,153 @@ describe('bài Mẹ giao không bao giờ rơi khỏi trang chủ (top3 cắt m�
   })
 })
 
-describe('chỉ còn việc tuỳ chọn ⇒ trạng thái trống (nút thần thú nằm ở thẻ trống)', () => {
-  it('nhánh máy chủ', () => {
-    const kh = { ...keHoachMayChu, viec: [v({ id: 'than_thu:X', loai: 'than_thu', soCau: 6, nhan: 'tuy_chon', ghiChu: 'Luyện dạng còn yếu với thần thú' })] as any }
+// 0.Planer ĐỔI LUẬT 19/09 (có chủ ý): trước đây "chỉ còn việc tuỳ chọn ⇒ trống" ở nhánh MÁY CHỦ khiến em chăm (đã đủ chỉ tiêu, còn 158 câu
+// tới hạn ôn, máy chủ mời ôn 3 câu) thấy "không có bài nào đang chờ" và KHÔNG BAO GIỜ thấy việc ôn thêm. Nay: trống CHỈ khi viec rỗng.
+// Nguồn TRỢ LÝ (dự phòng) giữ luật cũ vì nó luôn kèm gợi ý cố định "Luyện nâng cao (tự chọn)" — không phải lời mời của máy chủ.
+describe('chỉ còn việc TUỲ CHỌN (0.Planer đổi luật 19/09)', () => {
+  const onLai = v({ id: 'on_lai:2026-09-19', loai: 'on_lai', soCau: 3, nhan: 'tuy_chon', ghiChu: 'Ôn 3 câu đã tới hạn nhắc lại', chiTiet: { qid: ['a', 'b', 'c'] } })
+  const thu = v({ id: 'than_thu:X', loai: 'than_thu', soCau: 6, nhan: 'tuy_chon', ghiChu: 'Luyện dạng còn yếu với thần thú', chiTiet: { dang: 'X' } })
+  const khCoDat = (dat: boolean | undefined, viec: any[] = [onLai, thu]): KeHoachNgayMayChu => ({
+    ...keHoachMayChu,
+    viec: viec as any,
+    tienBo: { daLamCau: 9, lenBac: 3, ...(dat === undefined ? {} : { dat }), conThieu: 0 } as any,
+  })
+
+  it('ĐÃ ĐẠT (tienBo.dat=true): KHÔNG trống, KHÔNG có "Làm ngay", có thẻ mừng; bậc tuỳ chọn tên "LÀM THÊM · TUỲ CHỌN" liệt kê cả hai việc, bấm được như thường', () => {
+    const d = tuKeHoachNgay(khCoDat(true), NOW)
+    expect(d.trong).toBe(false)
+    expect(d.lamNgay).toBeNull()
+    expect(d.daXongHomNay).toEqual({ daLamCau: 9, lenBac: 3 })
+    const tc = d.cacBac.find((b) => b.bac === 'tuy_chon')!
+    expect(tc.nhan).toBe('LÀM THÊM · TUỲ CHỌN')
+    expect(tc.viec.map((x) => x.id)).toEqual(['on_lai:2026-09-19', 'than_thu:X'])
+    expect(tc.viec[0].hanhDong.loai).toBe('lam_cau_on')
+    expect(tc.viec[0].biCong).toBe(false)
+    // ba bậc kia vẫn giữ tên cũ
+    expect(d.cacBac.filter((b) => b.bac !== 'tuy_chon').map((b) => b.nhan)).toEqual(['KHẨN', 'BẮT BUỘC HÔM NAY', 'NÊN LÀM'])
+  })
+
+  it('CHƯA ĐẠT (dat=false hoặc thiếu): KHÔNG trống; việc tuỳ chọn mở đầu tiên là "Làm ngay"; không thẻ mừng; bậc vẫn tên "TUỲ CHỌN"', () => {
+    for (const dat of [false, undefined]) {
+      const d = tuKeHoachNgay(khCoDat(dat), NOW)
+      expect(d.trong).toBe(false)
+      expect(d.daXongHomNay).toBeNull()
+      expect(d.lamNgay?.id).toBe('on_lai:2026-09-19')
+      expect(d.cacBac.find((b) => b.bac === 'tuy_chon')!.nhan).toBe('TUỲ CHỌN')
+      expect(d.cacBac.find((b) => b.bac === 'tuy_chon')!.viec.map((x) => x.id)).toEqual(['than_thu:X'])
+    }
+  })
+
+  it('`exp.datNgay` (định nghĩa đạt ngày CHẶT HƠN tienBo.dat): tienBo.dat=true mà datNgay.dat=false ⇒ KHÔNG mừng, việc ôn là "Làm ngay"; câu trạng thái CHỈ theo datNgay, kèm số, không tự mâu thuẫn', () => {
+    const kh: KeHoachNgayMayChu = { ...khCoDat(true), exp: { datNgay: { dat: false, thieu: ['chua_len_bac'], daLam: 9, toiThieu: 6 } } }
     const d = tuKeHoachNgay(kh, NOW)
+    expect(d.daXongHomNay).toBeNull()
+    expect(d.trong).toBe(false)
+    expect(d.lamNgay?.id).toBe('on_lai:2026-09-19')
+    expect(d.tienDo.ghiChu).toBe('Đã làm 9 câu, 3 câu lên bậc ôn · Để đạt hôm nay: lên bậc ít nhất một câu tới hạn ôn')
+    // có datNgay ⇒ KHÔNG còn câu theo tienBo ("đã đủ số câu tối thiểu…") đứng cạnh câu "chưa đủ" (mâu thuẫn thầy 0.Planer bắt trên bản sống)
+    expect(d.tienDo.ghiChu).not.toMatch(/đã đủ số câu tối thiểu|còn \d+ câu là đạt/)
+    // thiếu câu: nói SỐ câu (toiThieu − daLam, tối thiểu 1); nhiều lý do ghép bằng "; "; mã lạ bị bỏ
+    const thieu = tuKeHoachNgay({ ...khCoDat(true), exp: { datNgay: { dat: false, thieu: ['cau_toi_thieu', 'tre_nhip', 'ma_la'], daLam: 4, toiThieu: 6 } } }, NOW)
+    expect(thieu.tienDo.ghiChu).toContain('Để đạt hôm nay: làm thêm 2 câu; làm nốt việc bắt buộc đang trễ nhịp')
+    expect(thieu.tienDo.ghiChu).not.toContain('ma_la')
+    const min1 = tuKeHoachNgay({ ...khCoDat(true), exp: { datNgay: { dat: false, thieu: ['cau_toi_thieu'], daLam: 6, toiThieu: 6 } } }, NOW)
+    expect(min1.tienDo.ghiChu).toContain('làm thêm 1 câu')
+    // chưa đạt mà máy chủ không nói lý do: nói thật là chưa đạt
+    expect(tuKeHoachNgay({ ...khCoDat(true), exp: { datNgay: { dat: false, thieu: [] } } }, NOW).tienDo.ghiChu).toBe('Đã làm 9 câu, 3 câu lên bậc ôn · chưa đạt hôm nay')
+  })
+
+  it('`exp.datNgay.dat=true` ⇒ "đã đạt hôm nay" (mừng); thiếu `exp`, `datNgay:null` hoặc ngày NGHỈ ⇒ theo tienBo như cũ (câu ghi chú cũ nguyên văn)', () => {
+    const bt = tuKeHoachNgay(khCoDat(true), NOW)
+    expect(bt.tienDo.ghiChu).toBe('Đã làm 9 câu, 3 câu lên bậc ôn · đã đủ số câu tối thiểu hôm nay')
+    const dat = tuKeHoachNgay({ ...khCoDat(true), exp: { datNgay: { dat: true, thieu: [] } } }, NOW)
+    expect(dat.daXongHomNay).toEqual({ daLamCau: 9, lenBac: 3 })
+    expect(dat.tienDo.ghiChu).toBe('Đã làm 9 câu, 3 câu lên bậc ôn · đã đạt hôm nay')
+    for (const exp of [{ datNgay: null }, null, { datNgay: { dat: false, thieu: [], laNghi: true } }] as any[]) {
+      const d = tuKeHoachNgay({ ...khCoDat(true), exp }, NOW)
+      expect(d.daXongHomNay).toEqual({ daLamCau: 9, lenBac: 3 })
+      expect(d.tienDo.ghiChu).toBe(bt.tienDo.ghiChu)
+    }
+  })
+
+  it('chưa đạt mà mọi việc tuỳ chọn còn bị cổng: không trống, chưa có "Làm ngay", các thẻ hiện mờ', () => {
+    const bi = [{ ...onLai, hien: false, cong: 'x' }, { ...thu, hien: false, cong: 'on_lai:2026-09-19' }]
+    const d = tuKeHoachNgay(khCoDat(false, bi), NOW)
+    expect(d.trong).toBe(false)
+    expect(d.lamNgay).toBeNull()
+    expect(d.cacBac.find((b) => b.bac === 'tuy_chon')!.viec.every((x) => x.biCong)).toBe(true)
+  })
+
+  it('viec RỖNG mới là trống — kể cả khi đã đạt', () => {
+    for (const dat of [true, false]) {
+      const d = tuKeHoachNgay(khCoDat(dat, []), NOW)
+      expect(d.trong).toBe(true)
+      expect(d.lamNgay).toBeNull()
+      expect(d.daXongHomNay).toBeNull()
+      expect(d.cacBac.every((b) => b.viec.length === 0)).toBe(true)
+    }
+  })
+
+  it('còn việc THẬT (bắt buộc/nên làm) thì đạt hay chưa cũng không có thẻ mừng: "Làm ngay" là việc thật', () => {
+    const that = v({ id: 'mom:M1', loai: 'mom', soCau: 8, batBuoc: true, chiTiet: { id: 'M1' } })
+    const d = tuKeHoachNgay(khCoDat(true, [that, onLai]), NOW)
+    expect(d.daXongHomNay).toBeNull()
+    expect(d.lamNgay?.id).toBe('mom:M1')
+  })
+
+  it('nguồn TRỢ LÝ giữ luật cũ: chỉ có gợi ý cố định "Luyện nâng cao (tự chọn)" ⇒ vẫn trống', () => {
+    const d = tuKeHoachTroLy(troLy())
     expect(d.trong).toBe(true)
     expect(d.lamNgay).toBeNull()
+    expect(d.daXongHomNay).toBeNull()
+  })
+
+  it('bản nhớ giữ thẻ mừng; bản nhớ cũ thiếu trường ⇒ null (không ném)', () => {
+    const d = tuKeHoachNgay(khCoDat(true), NOW)
+    const b = dongGoiBanNho(d, NOW)!
+    expect(phucHoiBanNho(JSON.parse(JSON.stringify(b)), NOW)!.daXongHomNay).toEqual({ daLamCau: 9, lenBac: 3 })
+    const cu: any = JSON.parse(JSON.stringify(b))
+    delete cu.duLieu.daXongHomNay
+    expect(phucHoiBanNho(cu, NOW)!.daXongHomNay).toBeNull()
+  })
+})
+
+describe('EXP học tập + mảnh khiên (docs/ke-hoach-ngay-api-1909.md mục EXP): chỉ khi máy chủ đã bật, thiếu trường ⇒ ẩn, không bịa số', () => {
+  const EXP = {
+    homNay: 22,
+    chiTietHomNay: [{ loai: 'cau', exp: 12, ghiChu: '6 câu đúng · +12 EXP', soKhoan: 6 }, { loai: 'lo', exp: 10, ghiChu: 'Xong lô đúng nhịp · +10 EXP', soKhoan: 1 }, { loai: 'x', exp: 5, ghiChu: '   ', soKhoan: 1 }],
+    manhKhien: { manh: 1, moiKhien: 12, khienRen: 0, khienConLai: 2, choCongVaoHoSo: false },
+    datNgay: null,
+  }
+  it('có exp ⇒ exp.homNay, chi tiết in nguyên ghiChu (bỏ khoản không có chữ), mảnh khiên; khoản mới + mảnh mới đi riêng', () => {
+    const d = tuKeHoachNgay({ ...keHoachMayChu, exp: EXP, expNhan: [{ loai: 'cau', exp: 4, ghiChu: '2 câu đúng · +4 EXP' }, { loai: 'x', exp: 1, ghiChu: '' }], manhNhan: [{ loai: 'dat', so: 1, ghiChu: 'Đạt ngày · +1 mảnh khiên' }] } as any, NOW)
+    expect(d.exp).toEqual({
+      homNay: 22,
+      chiTiet: [{ loai: 'cau', exp: 12, ghiChu: '6 câu đúng · +12 EXP' }, { loai: 'lo', exp: 10, ghiChu: 'Xong lô đúng nhịp · +10 EXP' }],
+      manhKhien: { manh: 1, moiKhien: 12, khienConLai: 2 },
+    })
+    expect(d.expNhan).toEqual([{ exp: 4, ghiChu: '2 câu đúng · +4 EXP' }])
+    expect(d.manhNhan).toEqual([{ so: 1, ghiChu: 'Đạt ngày · +1 mảnh khiên' }])
+  })
+
+  it('thiếu exp (chưa bật/máy chủ cũ) ⇒ null + hai mảng rỗng, KHÔNG bịa 0 EXP; trợ lý cũng vậy; exp không phải số ⇒ null', () => {
+    for (const d of [tuKeHoachNgay(keHoachMayChu, NOW), tuKeHoachTroLy(troLy()), tuKeHoachNgay({ ...keHoachMayChu, exp: {} as any, expNhan: [{ exp: 5, ghiChu: 'lạc' }] } as any, NOW), tuKeHoachNgay({ ...keHoachMayChu, exp: { homNay: 'x' } as any } as any, NOW)]) {
+      expect(d.exp).toBeNull()
+      expect(d.expNhan).toEqual([])
+      expect(d.manhNhan).toEqual([])
+    }
+  })
+
+  it('bản nhớ giữ exp nhưng KHÔNG giữ khoản mới (mở lại app không phát lại "+EXP"); bản nhớ cũ thiếu trường ⇒ exp null', () => {
+    const d = tuKeHoachNgay({ ...keHoachMayChu, exp: EXP, expNhan: [{ exp: 4, ghiChu: 'x' }], manhNhan: [{ so: 1, ghiChu: 'y' }] } as any, NOW)
+    const luu = JSON.parse(JSON.stringify(dongGoiBanNho(d, NOW)))
+    expect(luu.duLieu.expNhan).toEqual([])
+    expect(luu.duLieu.manhNhan).toEqual([])
+    const lai = phucHoiBanNho(luu, NOW)!
+    expect(lai.exp?.homNay).toBe(22)
+    expect(lai.expNhan).toEqual([])
+    delete luu.duLieu.exp
+    expect(phucHoiBanNho(luu, NOW)!.exp).toBeNull()
   })
 })
 

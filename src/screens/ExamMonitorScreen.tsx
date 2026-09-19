@@ -137,6 +137,15 @@ export function BangBienBanLap({ bb, tenCua }: { bb: BienBanDeRieng; tenCua: (sb
           Ca không đọc được: {bb.boQua.map((b) => `${b.maCa} (${b.vi_sao})`).join(' · ')}
         </div>
       )}
+      {/* GHI CHÚ LÚC RÚT (19/09). Tin thầy CẦN LÀM GÌ ĐÓ (kho mỏng, hồ sơ không đọc
+          được) in cam; tin tốt (em vắng đã có đề sẵn, em đã tự khắc phục) in màu
+          thường. Biên bản cũ không có `ghiChu` thì khối này không in gì. */}
+      {(bb.ghiChu ?? []).map((g, i) => (
+        <div key={`ghi-chu-${i}`} style={{ ...NHAN_NHO, color: g.loai === 'canh_bao' ? 'var(--cam)' : 'var(--nhat)', marginTop: 4, lineHeight: 1.6 }}>
+          {g.loai === 'canh_bao' ? '⚠ ' : ''}
+          {g.loi}
+        </div>
+      ))}
       <div className="flex flex-col" style={{ gap: 4, marginTop: 'var(--k2)' }}>
         {ds.map((sbd) => {
           const can = bb.canCua[sbd] ?? 0
@@ -752,7 +761,10 @@ export default function ExamMonitorScreen() {
         // PHẠM VI thầy chọn lúc mở ca, đọc từ máy chủ nên máy nào bấm Bắt đầu
         // cũng rút đúng thứ thầy đã chốt.
         const pv = (chiTiet.ca as { phamViHoiLai?: 'gan_nhat' | 'ba_ca' }).phamViHoiLai === 'ba_ca' ? 'ba_ca' : 'gan_nhat'
-        const ra = await dungDeRiengChoCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, dsCho, { ...CAU_HINH_DE_RIENG_MAC_DINH, PHAM_VI_HOI_LAI: pv })
+        // LƯỢT HAI (19/09): em CÙNG LỚP chưa kịp vào phòng chờ vẫn được chuẩn bị đề
+        // riêng, nhưng tính SAU khi mọi em trong `dsCho` đã chốt — không chiếm suất
+        // chia của ai, không vào con số nào của biên bản. Ca không ghi lớp thì thôi.
+        const ra = await dungDeRiengChoCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, dsCho, { ...CAU_HINH_DE_RIENG_MAC_DINH, PHAM_VI_HOI_LAI: pv }, { lopCa: chiTiet.ca.lop })
         boTheoEm = ra.boTheoEm
         lapTheoEm = ra.lapTheoEm
         // BIÊN BẢN cất cùng bản đồ. Toast biến mất sau ba giây; câu hỏi "vì sao
@@ -769,6 +781,7 @@ export default function ExamMonitorScreen() {
           namQuet: ra.namQuet,
           cauGocTheoEm: ra.cauGocTheoEm,
           songSinhTheoEm: ra.songSinhTheoEm,
+          ghiChu: ra.ghiChu,
           lucRut: new Date().toISOString(),
         }
         demSai = ra.lapCua

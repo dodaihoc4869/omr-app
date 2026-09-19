@@ -4,6 +4,7 @@ import {dapAnTheoMaDe} from './goi-cu'
 import {hash,readScope,normalizeBank,readJson} from './game-v2-bank'
 import {grade} from '../../src/game/than-thu-v2/core'
 import {nhanExp} from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
+import {docCauHinhExp,mocExpCuaEm} from './exp-d1'
 type Row=Record<string,unknown>
 export interface Academic {since?:string;seen:string[];sources:Record<string,string>;days:Record<string,number>;total:number;lastGain:number;at:string}
 export const academicDay=(date:string)=>new Date(Date.parse(date)+7*3600000).toISOString().slice(0,10)
@@ -77,5 +78,7 @@ export async function syncAcademic(env:Env,sbd:string,p:Profile,mom:unknown){
    if(!found){pending++;continue}a.sources[source]=fingerprint
   }
  }
- const gain=creditAcademic(p,events);return {gain,pending}
+ // EXP HỌC TẬP MỚI (exp-d1.ts): với em đã bật, khoản có giờ SAU mốc do sổ `exp_so` trả — luật cũ ngừng sinh khoản mới. Khoản trước mốc vẫn trả như cũ.
+ const moc=mocExpCuaEm(await docCauHinhExp(env),sbd,Date.now()),mocMs=moc?Date.parse(moc):Infinity
+ const gain=creditAcademic(p,events.filter(e=>Date.parse(e.at)<mocMs));return {gain,pending}
 }
