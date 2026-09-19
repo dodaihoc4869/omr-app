@@ -1,5 +1,6 @@
 import {it,expect} from 'vitest'
 import {newsDay,analyzeParent,spreadTopics,applyPracticeOutcomes,tinhDuDoanDiem} from '../server/src/parent-news'
+import type {KeHoachChoPhuHuynh} from '../server/src/parent-news-chon-cau'
 
 it('đổi ngày chính xác 00:01 giờ Việt Nam',()=>{
   expect(newsDay(Date.parse('2026-09-16T17:00:59Z'))).toBe('2026-09-16')
@@ -9,28 +10,54 @@ it('đổi ngày chính xác 00:01 giờ Việt Nam',()=>{
 const now = Date.parse('2026-09-16T12:00:00Z')
 const details = Array.from({length:30},(_,i)=>({qid:`q${i}`,dung_sai:0,giay:120,chuyen_de:'Ester'}))
 
-it('cá nhân hoá số câu theo phương pháp nâng đỡ: luôn đề xuất ít nhất 12 câu',()=>{
-  const r = analyzeParent('x',[],details,0,now)
-  expect(r.questionCount).toBeGreaterThanOrEqual(12)
+// Kế hoạch ngày của con (GĐ 5, Kênh 5): số câu phụ huynh giao = mục tiêu − việc bắt buộc còn lại − số câu đã làm.
+const kh = (o: Partial<KeHoachChoPhuHuynh> = {}): KeHoachChoPhuHuynh => ({
+  mucTieuCau: 10, taiCung: 0, daLamCau: 0, toiHanSai: 0, toiHanDuyTri: 0, chuaKhacPhuc: 0, vanTocGiay: 90, ...o,
+})
+
+it('số câu đề xuất là phần dư của ngân sách ngày, chia theo nguồn đúng thứ tự chọn câu',()=>{
+  const r = analyzeParent('x',[],details,0,now,undefined,kh({mucTieuCau:10,taiCung:2,daLamCau:1,toiHanSai:3,toiHanDuyTri:1,chuaKhacPhuc:5}))
+  expect(r.questionCount).toBe(7)
   expect(r.assignmentCount).toBe(1)
   expect(r.speedMeasured).toBe(true)
   expect(r.weak[0].name).toBe('Ester')
-  expect(r.keHoach?.soCauSuaLoi).toBeGreaterThan(0)
+  expect(r.keHoach).toMatchObject({tongCau:7,soCauSuaLoi:3,soCauOnBaiCu:1,soCauTienBo:3})
+  expect(r.wrong).toBe(5)
+  // Lý do nói bằng số, không dùng gạch ngang dài.
+  for (const n of ['10 câu','2 câu','1 câu','7 câu']) expect(r.reason).toContain(n)
+  expect(r.reason).not.toContain('—')
 })
 
-it('không giao chồng thêm khi con còn quá nhiều câu đang chờ dồn ứ',()=>{
-  const r = analyzeParent('x',[],details,40,now)
+it('con đã đủ việc Thầy giao thì không giao thêm, và lý do nói bằng số',()=>{
+  const r = analyzeParent('x',[],details,40,now,undefined,kh({mucTieuCau:10,taiCung:12}))
   expect(r.assignmentCount).toBe(0)
   expect(r.questionCount).toBe(0)
+  expect(r.keHoach?.tongCau).toBe(0)
+  expect(r.reason).toContain('Mục tiêu hôm nay 10 câu')
+  expect(r.reason).toContain('12 câu')
+  expect(r.reason).toContain('Chưa cần giao thêm')
 })
 
-it('dù chưa có câu sai, vẫn đề xuất ít nhất 12 câu để chống quên và tiến bộ',()=>{
-  const r = analyzeParent('x',[],[],0,now)
+it('con đã làm đủ mục tiêu trong ngày thì cũng không giao thêm',()=>{
+  const r = analyzeParent('x',[],details,0,now,undefined,kh({mucTieuCau:8,taiCung:0,daLamCau:9}))
+  expect(r.questionCount).toBe(0)
+  expect(r.assignmentCount).toBe(0)
+})
+
+it('chưa có câu sai, chưa có câu đến hạn: vẫn giao đúng phần dư, toàn câu mới cùng dạng yếu hoặc bù',()=>{
+  const r = analyzeParent('x',[],[],0,now,undefined,kh({mucTieuCau:12}))
   expect(r.score).toBeNull()
   expect(r.speedMeasured).toBe(false)
   expect(r.questionCount).toBe(12)
   expect(r.assignmentCount).toBe(1)
-  expect(r.keHoach?.tongCau).toBe(12)
+  expect(r.keHoach).toMatchObject({tongCau:12,soCauSuaLoi:0,soCauOnBaiCu:0,soCauTienBo:12})
+})
+
+it('thiếu kế hoạch ngày thì không đoán số câu: không giao và nói rõ lý do',()=>{
+  const r = analyzeParent('x',[],details,0,now)
+  expect(r.questionCount).toBe(0)
+  expect(r.assignmentCount).toBe(0)
+  expect(r.reason).toContain('Chưa lập được kế hoạch ngày')
 })
 
 it('cập nhật điểm hôm nay và dự đoán điểm thi thật theo tháng chuẩn xác',()=>{
@@ -68,29 +95,17 @@ it('phân tách chi tiết số câu chưa nộp cho BTVN, Mom giao và Đề xu
   expect(r.pendingDetails).toEqual({btvn:5,mom:4,daily:6})
 })
 
-it('tự động tăng số câu đề xuất lên tối đa 36 câu khi học sinh chăm chỉ / đam mê luyện tập',()=>{
-  // 1 ca hôm nay -> 18 câu
-  const exam1 = [{nop_luc:'2026-09-16T08:00:00Z',tong:8.0}]
-  const r1 = analyzeParent('x',exam1,details,0,now)
-  expect(r1.questionCount).toBe(18)
-
-  // 2 ca hôm nay -> 24 câu
-  const exam2 = [
-    {nop_luc:'2026-09-16T10:00:00Z',tong:8.5},
-    {nop_luc:'2026-09-16T08:00:00Z',tong:7.5}
-  ]
-  const r2 = analyzeParent('x',exam2,details,0,now)
-  expect(r2.questionCount).toBe(24)
-
-  // 4 ca hôm nay -> 36 câu (tối đa)
+it('học sinh chăm chỉ cũng không vượt trần 16 câu của ngân sách ngày (thay cho mức 18/24/36 câu cũ)',()=>{
   const exam4 = [
     {nop_luc:'2026-09-16T11:00:00Z',tong:9.0},
     {nop_luc:'2026-09-16T10:00:00Z',tong:8.5},
     {nop_luc:'2026-09-16T09:00:00Z',tong:8.0},
     {nop_luc:'2026-09-16T08:00:00Z',tong:7.5}
   ]
-  const r4 = analyzeParent('x',exam4,details,0,now)
-  expect(r4.questionCount).toBe(36)
-  expect(r4.reason).toContain('36 câu')
+  for (const ca of [[], exam4.slice(0,1), exam4.slice(0,2), exam4]) {
+    const r = analyzeParent('x',ca,details,0,now,undefined,kh({mucTieuCau:16}))
+    expect(r.questionCount).toBe(16)
+    expect(r.reason).not.toContain('36 câu')
+  }
 })
 

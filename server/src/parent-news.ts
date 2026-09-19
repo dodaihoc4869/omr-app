@@ -1,7 +1,10 @@
 import type {Env} from './kieu'
-import {hsCauSai} from './goi-cu'
 import {mom} from './mom'
-import {hopLe3DangChuan} from './loc-cau-chuan'
+import {lapVaLuuKeHoach, TOI_DA_EM_MOI_LO} from './ke-hoach-ngay-d1'
+import type {KeHoachNgay} from './ke-hoach-ngay'
+import {chonCauBaiHangNgay} from './parent-news-nguon-cau'
+import {soCauPhanDu, tomTatKeHoach, type DemHoSo, type KeHoachChoPhuHuynh} from './parent-news-chon-cau'
+import {ngayVn} from './su-kien-hoc'
 
 type Row = Record<string, any>
 
@@ -81,8 +84,13 @@ export function tinhDuDoanDiem(exams: Row[], details: Row[], now = Date.now()): 
 }
 
 /**
- * THUẬT TOÁN CÁ NHÂN HOÁ HÀNG NGÀY (Spaced Repetition & Cognitive Scaffolding)
- * Luôn đề xuất ÍT NHẤT 12 CÂU mỗi ngày theo hướng nâng đỡ, củng cố và tiến bộ đều đặn.
+ * BÀI HẰNG NGÀY CỦA PHỤ HUYNH (Kênh 5, GĐ 5).
+ *
+ * Số câu = PHẦN DƯ ngân sách ngày của kế hoạch ngày (`soCauPhanDu`): mục tiêu − việc bắt buộc còn lại − số câu đã làm.
+ * Thầy chốt 19/09 (câu 4): bỏ mức "luôn ≥ 12 câu" và "tối đa 36 câu"; trần thật là ngân sách 8–16 câu của kế hoạch.
+ * Thiếu kế hoạch (`keHoachNgay` không truyền) thì KHÔNG giao thêm và nói rõ lý do, không đoán số.
+ *
+ * Hàm thuần: cùng đầu vào → cùng kết quả; `now` do nơi gọi truyền.
  */
 export function analyzeParent(
   sbd: string,
@@ -90,7 +98,8 @@ export function analyzeParent(
   details: Row[],
   pending: number,
   now = Date.now(),
-  pendingDetails?: { btvn: number; mom: number; daily: number }
+  pendingDetails?: { btvn: number; mom: number; daily: number },
+  keHoachNgay?: KeHoachChoPhuHuynh
 ) {
   const day = newsDay(now)
   const today = exams.filter(
@@ -99,7 +108,6 @@ export function analyzeParent(
   const latest = exams[0]
   const scores = today.filter((e) => e.tong != null).map((e) => Number(e.tong))
   const relevantWrong = details.filter((d) => d.dung_sai === 0)
-  const relevantCorrect = details.filter((d) => d.dung_sai === 1)
 
   const topics = new Map<string, number>()
   for (const d of relevantWrong) {
@@ -120,91 +128,50 @@ export function analyzeParent(
 
   const duDoanDiem = tinhDuDoanDiem(exams, details, now)
 
-  // THUẬT TOÁN ĐỀ XUẤT THÍCH ỨNG (Adaptive Pacing & Workload Balancing):
-  // Không áp đặt số câu cứng nhắc. Tính toán dựa trên 2 yếu tố cốt lõi:
-  // 1. Tồn đọng bài tập (Pending Backlog): số bài/câu đang chờ làm
-  // 2. Tốc độ làm bài thực tế (Speed/Pacing): số giây trung bình mỗi câu
-  const tongBaiPending = pendingDetails
-    ? (pendingDetails.btvn || 0) + (pendingDetails.mom || 0) + (pendingDetails.daily || 0)
-    : 0
-  const tongTonDong = Math.max(pending, tongBaiPending)
+  const weak = [...topics]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([name, count]) => ({ name, count }))
 
-  let targetCount = 12
-  let lyDoDieuChinh = ''
-
-  if (tongTonDong >= 15) {
-    // TỒN ĐỌNG LỚN (>= 15 bài/câu): Giảm tải tối đa, chia nhỏ chỉ 6-8 câu Vòng 1 Lõi Căn Bản
-    // để học sinh gỡ nợ bài tập dần, giải tỏa áp lực tâm lý, không bị nản lòng.
-    targetCount = 6
-    lyDoDieuChinh = `Đang tồn đọng ${tongTonDong} bài/câu chưa nộp — thuật toán tự động giảm tải xuống ${targetCount} câu trọng tâm Vòng 1 (Lõi Căn Bản) để gỡ bài tập nhẹ nhàng, vừa sức.`
-  } else if (tongTonDong >= 6) {
-    // TỒN ĐỌNG VỪA (6 - 14 bài/câu): Rút gọn 8-10 câu cân bằng
-    targetCount = sec > 100 ? 8 : 10
-    lyDoDieuChinh = `Đang có ${tongTonDong} bài/câu cần hoàn thành — kế hoạch rút gọn ${targetCount} câu tập trung giải quyết dứt điểm các lỗi sai cốt lõi.`
-  } else {
-    // TỒN ĐỌNG THẤP (<= 5 bài/câu): Điều chỉnh theo tốc độ và đà học tập
-    if (sec > 130) {
-      // Học sinh cần nhiều thời gian suy nghĩ (> 2 phút/câu) -> giữ mức 10 câu để buổi học dưới 20 phút
-      targetCount = 10
-      lyDoDieuChinh = `Tốc độ suy nghĩ kỹ lưỡng (~${Math.round(sec)}s/câu) — tối ưu ${targetCount} câu để đảm bảo chất lượng, không kéo dài thời gian.`
-    } else if (today.length >= 2 && exams.length >= 6 && tongTonDong === 0 && sec <= 60) {
-      // Phong độ xuất sắc, tốc độ nhanh, không tồn bài -> nâng lên 16-18 câu có thêm Vòng 3 Thử Thách x2 EXP
-      targetCount = 18
-      lyDoDieuChinh = `Phong độ xuất sắc và hoàn thành nhanh — mở rộng ${targetCount} câu (gồm câu Vòng 3 Thử Thách thưởng x2 EXP Thần Thú).`
-    } else if (today.length >= 1 && tongTonDong <= 2) {
-      targetCount = 14
-      lyDoDieuChinh = `Tiến độ đều đặn — kế hoạch ${targetCount} câu theo mô hình 3 Vòng Phân Tầng để bồi đắp kiến thức.`
-    } else {
-      targetCount = 12
-      lyDoDieuChinh = `Kế hoạch chuẩn mực 12 câu/ngày theo 3 Vòng Phân Tầng.`
-    }
-  }
-
-  // Nếu tồn đọng quá nghiêm trọng (> 40 câu), tạm hoãn giao thêm để tập trung làm bài cũ
-  const quaTai = tongTonDong >= 40
-
-  // Phân chia cấu trúc câu theo 3 Vòng Phân Tầng Thông Minh:
-  // Vòng 1: Lõi căn bản / Sửa lỗi cốt lõi (khoảng 50-60% target)
-  const soCauSuaLoi = Math.min(relevantWrong.length, Math.round(targetCount * 0.55))
-  const conLai = Math.max(0, targetCount - soCauSuaLoi)
-  // Vòng 2: Trọng tâm cá nhân / Chống quên (Spaced Repetition)
-  const soCauOnBaiCu = Math.min(relevantCorrect.length, Math.round(conLai * 0.6))
-  // Vòng 3: Tiến bộ dạng mới / Thử thách bứt phá
-  const soCauTienBo = Math.max(0, conLai - soCauOnBaiCu)
-
-  const count = quaTai ? 0 : targetCount
+  // Số câu = phần dư của kế hoạch ngày. Chia theo nguồn ĐÚNG thứ tự chọn câu: ôn tới hạn (câu từng sai, rồi câu đã sửa
+  // tới mốc duy trì), phần còn lại là câu mới cùng dạng yếu hoặc bù từ kho.
+  const kh = keHoachNgay
+  const count = kh ? soCauPhanDu(kh) : 0
+  const soCauSuaLoi = kh ? Math.min(count, kh.toiHanSai) : 0
+  const soCauOnBaiCu = kh ? Math.min(count - soCauSuaLoi, kh.toiHanDuyTri) : 0
+  const soCauTienBo = count - soCauSuaLoi - soCauOnBaiCu
   const assignmentCount = count > 0 ? 1 : 0
-  const minutes = Math.max(10, Math.ceil((count * sec) / 60))
+  const minutes = count > 0 ? Math.max(1, Math.ceil((count * sec) / 60)) : 0
 
   const keHoach: KeHoachLuyenTap = {
     tongCau: count,
     soCauSuaLoi,
     soCauOnBaiCu,
     soCauTienBo,
-    phuongPhap: '3 Vòng Phân Tầng & Điều chỉnh nhịp độ thích ứng (Adaptive Pacing)',
+    phuongPhap: 'Ôn theo mốc 1, 3, 7 ngày, tính từ từng câu con đã làm ở mọi nơi',
   }
 
   const mode =
-    tongTonDong >= 15
-      ? `Gỡ tồn đọng & Nâng đỡ Lõi (${count} câu)`
-      : relevantWrong.length > 0
-      ? `Khắc phục lỗi sai & Nâng đỡ (${count} câu)`
-      : `Rèn phản xạ & Thử thách (${count} câu)`
+    count === 0
+      ? 'Hôm nay chưa cần giao thêm'
+      : soCauSuaLoi + soCauOnBaiCu > 0
+      ? `Ôn câu đến hạn (${count} câu)`
+      : `Luyện dạng con còn yếu (${count} câu)`
 
-  const weak = [...topics]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3)
-    .map(([name, count]) => ({ name, count }))
-
-  let reason = ''
-  if (quaTai) {
-    reason = `Con đang còn ${tongTonDong} bài/câu chưa nộp; tạm hoãn giao thêm để con tập trung hoàn thành bài đang chờ, tránh áp lực quá tải.`
-  } else if (tongTonDong >= 15) {
-    reason = `Học sinh đang có ${tongTonDong} bài chưa nộp. Thuật toán tự động giảm tải xuống bài ngắn ${targetCount} câu (Vòng 1: Lõi Căn Bản) để con gỡ nợ bài tập nhẹ nhàng, vừa sức và không bị áp lực.`
-  } else if (relevantWrong.length > 0) {
-    reason = `Kế hoạch ${targetCount} câu hôm nay (${lyDoDieuChinh}): ${soCauSuaLoi} câu Vòng 1 sửa lỗi chuyên đề (${weak.map((w) => w.name).slice(0, 2).join(', ')}), ${soCauOnBaiCu} câu Vòng 2 chống quên ngắt quãng, và ${soCauTienBo} câu Vòng 3 tiến bộ vừa sức.`
+  let reason: string
+  if (!kh) {
+    reason = 'Chưa lập được kế hoạch ngày của con nên Thầy chưa giao thêm câu nào.'
+  } else if (count === 0) {
+    reason = `Mục tiêu hôm nay ${kh.mucTieuCau} câu. Bài đang chờ còn ${kh.taiCung} câu, con đã làm ${kh.daLamCau} câu. Chưa cần giao thêm.`
   } else {
-    reason = `Con hoàn thành rất tốt các bài thi! Kế hoạch ${targetCount} câu hôm nay (${lyDoDieuChinh}) áp dụng mô hình 3 Vòng Phân Tầng để duy trì phản xạ và phát triển tư duy nâng cao.`
+    const phan = [
+      soCauSuaLoi > 0 ? `${soCauSuaLoi} câu sai đến hạn ôn lại` : '',
+      soCauOnBaiCu > 0 ? `${soCauOnBaiCu} câu đã sửa đến hạn ôn duy trì` : '',
+      soCauTienBo > 0 ? `${soCauTienBo} câu mới cùng dạng con còn yếu` : '',
+    ].filter(Boolean)
+    reason =
+      `Mục tiêu hôm nay ${kh.mucTieuCau} câu. Bài đang chờ còn ${kh.taiCung} câu, con đã làm ${kh.daLamCau} câu, nên còn ${count} câu để ôn: ${phan.join(', ')}.` +
+      (weak.length > 0 ? ` Chuyên đề con hay sai: ${weak.slice(0, 2).map((w) => w.name).join(', ')}.` : '')
   }
 
   return {
@@ -220,7 +187,8 @@ export function analyzeParent(
     duDoanDiem,
     keHoach,
     weak,
-    wrong: relevantWrong.length,
+    // Một định nghĩa "câu sai cần khắc phục": số câu `moi_sai`/`dang_on` trong hồ sơ; chưa có kế hoạch thì đếm theo bài thi.
+    wrong: kh ? kh.chuaKhacPhuc : relevantWrong.length,
     pending,
     pendingDetails: pendingDetails || { btvn: 0, mom: 0, daily: 0 },
     questionCount: count,
@@ -230,14 +198,20 @@ export function analyzeParent(
     modeKey: score !== null && score < 5 ? 'basic' : 'adaptive',
     speedMeasured: seconds.length >= 5,
     reason,
+    phanDu: kh ? { mucTieuCau: kh.mucTieuCau, taiCung: kh.taiCung, daLamCau: kh.daLamCau, soCau: count } : null,
   }
 }
 
-async function data(env: Env, sbd?: string) {
+async function data(env: Env, sbd?: string, now = Date.now()) {
   const where = sbd ? ' WHERE sbd=?' : ''
-  const q = async (sql: string) => {
+  const homNay = newsDay(now)
+  const nowIso = new Date(now).toISOString()
+  // Bài Mom hết hạn sau 120 phút kể từ lúc bắt đầu: bài đã bắt đầu quá mốc đó không còn là "tồn đọng".
+  const heGio = new Date(now - 2 * 3600000).toISOString()
+  const q = async (sql: string, ...them: unknown[]) => {
     const st = env.DB.prepare(sql)
-    return (await (sbd ? st.bind(sbd) : st).all<Row>()).results
+    const tham = [...(sbd ? [sbd] : []), ...them]
+    return (await (tham.length ? st.bind(...tham) : st).all<Row>()).results
   }
   const exams = await q(
     `SELECT l.sbd,l.ma_ca,l.nop_luc,l.tong,c.ten_ca FROM luot l LEFT JOIN ca c ON c.ma_ca=l.ma_ca WHERE l.nop_luc IS NOT NULL ${
@@ -249,20 +223,26 @@ async function data(env: Env, sbd?: string) {
       sbd ? 'AND t.sbd=?' : ''
     } AND NOT EXISTS(SELECT 1 FROM chi_tiet_cau z JOIN luot n ON n.ma_ca=z.ma_ca AND n.sbd=z.sbd AND n.lan_thu=z.lan_thu WHERE z.sbd=t.sbd AND z.qid=t.qid AND n.nop_luc>l.nop_luc)`
   )
+  // Bài hằng ngày chỉ tính là tồn đọng khi là bài CỦA HÔM NAY hoặc đã bắt đầu và còn trong 120 phút; bài của ngày cũ mà chưa bắt đầu bị bỏ.
   const pendingDaily = await q(
     `SELECT sbd,SUM(question_count) n FROM mom_bai ${
       where ? where + ' AND' : 'WHERE'
-    } submitted_at IS NULL AND id LIKE 'daily_%' GROUP BY sbd`
+    } submitted_at IS NULL AND id LIKE 'daily_%' AND (id=? OR (started_at IS NOT NULL AND started_at>?)) GROUP BY sbd`,
+    `daily_${homNay}`,
+    heGio
   )
   const pendingMom = await q(
     `SELECT sbd,SUM(question_count) n FROM mom_bai ${
       where ? where + ' AND' : 'WHERE'
-    } submitted_at IS NULL AND id NOT LIKE 'daily_%' GROUP BY sbd`
+    } submitted_at IS NULL AND id NOT LIKE 'daily_%' AND (started_at IS NULL OR started_at>?) GROUP BY sbd`,
+    heGio
   )
+  // Chỉ bài BTVN CÒN HẠN; bài quá hạn được kế hoạch ngày liệt kê riêng, không đếm vào tồn đọng.
   const homework = await q(
     `SELECT e.sbd,SUM(b.so_cau) n FROM btvn_em e JOIN btvn b ON b.ma_btvn=e.ma_btvn WHERE b.da_xoa=0 AND e.thu_hoi=0 AND e.nop_luc IS NULL ${
       sbd ? 'AND e.sbd=?' : ''
-    } GROUP BY e.sbd`
+    } AND b.han_nop>? GROUP BY e.sbd`,
+    nowIso
   )
   const practice = await q(
     `SELECT sbd,submitted_at,result FROM mom_bai WHERE submitted_at IS NOT NULL ${
@@ -272,21 +252,85 @@ async function data(env: Env, sbd?: string) {
   return { exams, details: applyPracticeOutcomes(details, practice), pendingDaily, pendingMom, homework }
 }
 
-export async function refreshDailyNews(env: Env, sbd?: string) {
-  const d = await data(env, sbd)
+type KeHoachDoc = Pick<KeHoachNgay, 'nganSach' | 'tai' | 'tienBo' | 'viec'>
+
+/** Đếm hồ sơ theo em: câu từng sai tới mốc, câu đã sửa tới mốc duy trì, tổng câu chưa khắc phục. Bảng chưa có → 0. */
+async function docDemHoSo(env: Env, dsSbd: string[], homNay: string): Promise<Map<string, DemHoSo>> {
+  const ra = new Map<string, DemHoSo>()
+  for (const s of dsSbd) ra.set(s, { toiHanSai: 0, toiHanDuyTri: 0, chuaKhacPhuc: 0 })
+  try {
+    for (let i = 0; i < dsSbd.length; i += TOI_DA_EM_MOI_LO) {
+      const r = await env.DB.prepare(
+        `SELECT sbd, trang_thai, COUNT(*) AS n,
+                SUM(CASE WHEN can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke <= ? THEN 1 ELSE 0 END) AS toi_han
+           FROM nam_kt_cau WHERE sbd IN (SELECT value FROM json_each(?)) AND trang_thai IN ('moi_sai','dang_on','da_khac_phuc')
+          GROUP BY sbd, trang_thai`
+      ).bind(homNay, JSON.stringify(dsSbd.slice(i, i + TOI_DA_EM_MOI_LO))).all<Row>()
+      for (const x of r.results ?? []) {
+        const c = ra.get(String(x.sbd))
+        if (!c) continue
+        if (x.trang_thai === 'da_khac_phuc') c.toiHanDuyTri += Number(x.toi_han) || 0
+        else {
+          c.toiHanSai += Number(x.toi_han) || 0
+          c.chuaKhacPhuc += Number(x.n) || 0
+        }
+      }
+    }
+  } catch (e) {
+    if (!/no such (table|column)/i.test(e instanceof Error ? e.message : String(e))) throw e
+  }
+  return ra
+}
+
+/** Kế hoạch hôm nay: một em → lập mới (tươi khi phụ huynh mở); cả lớp (cron) → đọc bản đã lưu, em nào chưa có mới lập. */
+async function docKeHoach(env: Env, dsSbd: string[], now: number, laMotEm: boolean): Promise<Map<string, KeHoachDoc>> {
+  const ra = new Map<string, KeHoachDoc>()
+  if (dsSbd.length === 0) return ra
+  if (!laMotEm) {
+    const homNay = ngayVn(now)
+    try {
+      for (let i = 0; i < dsSbd.length; i += TOI_DA_EM_MOI_LO) {
+        const r = await env.DB.prepare('SELECT sbd, ngan_sach_json, viec_json FROM ke_hoach_ngay WHERE sbd IN (SELECT value FROM json_each(?)) AND ngay = ?')
+          .bind(JSON.stringify(dsSbd.slice(i, i + TOI_DA_EM_MOI_LO)), homNay).all<Row>()
+        for (const x of r.results ?? []) {
+          try {
+            const v = JSON.parse(String(x.viec_json)) as Pick<KeHoachNgay, 'viec' | 'tai' | 'tienBo'>
+            ra.set(String(x.sbd), { nganSach: JSON.parse(String(x.ngan_sach_json)), viec: v.viec, tai: v.tai, tienBo: v.tienBo })
+          } catch { /* dòng hỏng: lập lại bên dưới */ }
+        }
+      }
+    } catch (e) {
+      if (!/no such (table|column)/i.test(e instanceof Error ? e.message : String(e))) throw e
+    }
+  }
+  const thieu = dsSbd.filter((s) => !ra.has(s))
+  for (let i = 0; i < thieu.length; i += TOI_DA_EM_MOI_LO) {
+    for (const [s, k] of await lapVaLuuKeHoach(env, thieu.slice(i, i + TOI_DA_EM_MOI_LO), now)) ra.set(s, k)
+  }
+  return ra
+}
+
+export async function refreshDailyNews(env: Env, sbd?: string, now = Date.now()) {
+  const d = await data(env, sbd, now)
   const students = sbd ? [{ sbd }] : (await env.DB.prepare('SELECT sbd FROM hoc_sinh').all<{ sbd: string }>()).results
+  const dsSbd = students.map((e) => e.sbd)
+  const keHoachEm = await docKeHoach(env, dsSbd, now, Boolean(sbd))
+  const dem = await docDemHoSo(env, dsSbd, ngayVn(now))
+  const maBaiHangNgay = `daily_${newsDay(now)}`
   const reports = students.map((e) => {
     const btvn = Number(d.homework.find((x) => x.sbd === e.sbd)?.n || 0)
     const mom = Number(d.pendingMom.find((x) => x.sbd === e.sbd)?.n || 0)
     const daily = Number(d.pendingDaily.find((x) => x.sbd === e.sbd)?.n || 0)
     const pending = btvn + mom + daily
+    const kh = keHoachEm.get(e.sbd)
     return analyzeParent(
       e.sbd,
       d.exams.filter((x) => x.sbd === e.sbd),
       d.details.filter((x) => x.sbd === e.sbd),
       pending,
-      Date.now(),
-      { btvn, mom, daily }
+      now,
+      { btvn, mom, daily },
+      kh ? tomTatKeHoach(kh, dem.get(e.sbd)!, maBaiHangNgay) : undefined
     )
   })
   const statements = reports.map((r) =>
@@ -295,57 +339,7 @@ export async function refreshDailyNews(env: Env, sbd?: string) {
     ).bind(r.sbd, r.day, r.updatedAt, JSON.stringify(r))
   )
   for (let i = 0; i < statements.length; i += 50) await env.DB.batch(statements.slice(i, i + 50))
-  return { reports, details: d.details }
-}
-
-/**
- * LẤY CÂU BỔ SUNG TỪ KHO ĐỀ (R2) KHI HỌC SINH CHƯA ĐỦ 12 CÂU TỪ LỊCH SỬ THI
- */
-async function layCauTuKhoDe(env: Env, slCan = 12): Promise<Row[]> {
-  const ra: Row[] = []
-  if (!env.DE) return ra
-  try {
-    const dsDe = await env.DB.prepare('SELECT ma_de FROM de_kho LIMIT 6').all<{ ma_de: string }>()
-    for (const d of dsDe.results ?? []) {
-      if (ra.length >= slCan) break
-      try {
-        const o = await env.DE.get(`kho/${d.ma_de}.json`)
-        if (!o?.body) continue
-        const goi = (await new Response(o.body).json()) as any
-        const gom: any[] = Array.isArray(goi.cau) ? goi.cau : []
-        for (const k of ['phanI', 'phanII', 'phanIII']) if (Array.isArray(goi[k])) gom.push(...goi[k])
-        for (const c of gom) {
-          if (!c || !c.text || !c.dapAnDung) continue
-          if (
-            !hopLe3DangChuan({
-              phan: c.phan || 'I',
-              text: c.text,
-              dapAnDung: c.dapAnDung,
-              choices: c.choices,
-              ideas: c.ideas,
-              maDe: d.ma_de,
-            })
-          ) {
-            continue
-          }
-          ra.push({
-            id: c.id || c.qid || `${d.ma_de}_${ra.length + 1}`,
-            qid: c.id || c.qid || `${d.ma_de}_${ra.length + 1}`,
-            text: c.text,
-            choices: c.choices || [],
-            dapAnDung: c.dapAnDung,
-            dapAn: c.dapAnDung,
-            loiGiai: c.loiGiai || '',
-            chuyenDe: c.chuyenDe || 'Kiến thức trọng tâm',
-            mucDo: c.mucDo || 'nb',
-            phan: c.phan || 'I',
-          })
-          if (ra.length >= slCan) break
-        }
-      } catch {}
-    }
-  } catch {}
-  return ra
+  return { reports, details: d.details, keHoachEm }
 }
 
 export async function parentNews(env: Env, action: string, b: Record<string, unknown>) {
@@ -353,7 +347,8 @@ export async function parentNews(env: Env, action: string, b: Record<string, unk
   if (!sbd || !(await env.DB.prepare('SELECT sbd FROM hoc_sinh WHERE sbd=?').bind(sbd).first())) {
     throw new Error('Không tìm thấy số báo danh của con.')
   }
-  const { reports } = await refreshDailyNews(env, sbd)
+  const now = Date.now()
+  const { reports } = await refreshDailyNews(env, sbd, now)
   const report = reports[0]
 
   if (action === 'list') {
@@ -377,90 +372,9 @@ export async function parentNews(env: Env, action: string, b: Record<string, unk
   if (existing) return { ok: true, alreadySent: true, id }
   if (!report.questionCount) throw new Error(report.reason)
 
-  // LẤY TOÀN BỘ CÂU ĐÃ THI CỦA EM (chiSai: false để lấy cả câu đúng cho Spaced Repetition)
-  const result = await hsCauSai(env, { sbd, chiSai: false, dsMaCa: [] })
-  const allExamItems = (result.items || []) as Row[]
-
-  // Lọc sạch 100%, KHÓA VĨNH VIỄN MỌI CÂU TỰ LUẬN, CHỈ GIỮ LẠI 3 DẠNG CHUẨN
-  const allValidItems = allExamItems.filter((q) =>
-    hopLe3DangChuan({
-      phan: q.phan,
-      text: q.text,
-      dapAnDung: q.dapAnDung,
-      choices: q.choices,
-      ideas: q.ideas,
-      maDe: q.maCa,
-    })
-  )
-
-  const wrongPool = allValidItems.filter((q) => !q.dungSai && q.text && q.dapAnDung)
-  const correctPool = allValidItems.filter((q) => q.dungSai && q.text && q.dapAnDung)
-
-  // Sắp xếp câu sai theo chuyên đề yếu, ưu tiên câu cơ bản 1 sao trước (nâng đỡ)
-  let sortedWrong = spreadTopics(wrongPool, report.weak.map((t) => t.name))
-  sortedWrong.sort((a, b) => Number(a.sao || 0) - Number(b.sao || 0))
-
-  // Sắp xếp câu đúng từ các ca trước (lặp lại ngắt quãng chống quên)
-  const sortedCorrect = spreadTopics(correctPool, report.weak.map((t) => t.name))
-
-  const selectedQids = new Set<string>()
-  const dsCau: Row[] = []
-
-  // 1. Nhặt câu sửa lỗi theo kế hoạch
-  const mucSuaLoi = report.keHoach?.soCauSuaLoi ?? Math.min(sortedWrong.length, 7)
-  for (const q of sortedWrong) {
-    if (dsCau.length >= mucSuaLoi) break
-    const qid = String(q.qid || q.id)
-    if (!selectedQids.has(qid)) {
-      selectedQids.add(qid)
-      dsCau.push(q)
-    }
-  }
-
-  // 2. Nhặt câu ôn tập bài cũ (Spaced Repetition)
-  const mucOnBaiCu = (report.keHoach?.soCauOnBaiCu ?? 3) + (mucSuaLoi - dsCau.length)
-  for (const q of sortedCorrect) {
-    if (dsCau.length >= mucSuaLoi + mucOnBaiCu) break
-    const qid = String(q.qid || q.id)
-    if (!selectedQids.has(qid)) {
-      selectedQids.add(qid)
-      dsCau.push(q)
-    }
-  }
-
-  // 3. Nếu chưa đủ 12 câu, lấy thêm câu sai hoặc câu đúng còn lại
-  for (const q of [...sortedWrong, ...sortedCorrect]) {
-    if (dsCau.length >= report.questionCount) break
-    const qid = String(q.qid || q.id)
-    if (!selectedQids.has(qid)) {
-      selectedQids.add(qid)
-      dsCau.push(q)
-    }
-  }
-
-  // 4. Nếu học sinh có quá ít câu thi trong lịch sử, lấy bổ sung từ kho đề chuẩn
-  if (dsCau.length < report.questionCount) {
-    const extra = await layCauTuKhoDe(env, report.questionCount - dsCau.length)
-    for (const q of extra) {
-      if (dsCau.length >= report.questionCount) break
-      const qid = String(q.qid || q.id)
-      if (!selectedQids.has(qid)) {
-        selectedQids.add(qid)
-        dsCau.push(q)
-      }
-    }
-  }
-
-  const finalQuestions = dsCau.map((q) => ({
-    ...q,
-    id: q.qid || q.id,
-    dapAn: q.dapAnDung,
-    choices: q.phan === 'II' ? [] : q.choices,
-    loiGiai: q.loiGiai,
-  }))
-
+  const { cau: finalQuestions } = await chonCauBaiHangNgay(env, sbd, report.questionCount, now)
   if (!finalQuestions.length) {
-    throw new Error('Chưa tải đủ nội dung câu hỏi để giao. Vui lòng thử lại sau.')
+    throw new Error('Chưa tìm được câu phù hợp để giao hôm nay. Vui lòng thử lại sau.')
   }
 
   await mom(env, 'create', {

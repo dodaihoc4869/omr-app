@@ -2782,7 +2782,10 @@ export default {
     if(event.cron==='1 17 * * *'){
       // 00:01 giờ VN: tin phụ huynh + vinh danh như cũ, THÊM chốt ngày cũ và lập kế hoạch ngày mới (GĐ 2).
       // Kế hoạch có lỗi thì chỉ ghi log — không được kéo hai việc cũ đổ theo.
-      await Promise.all([refreshDailyNews(env),dailyHonors(env,false),chayCaLop(env,Date.now()).then(r=>console.log('[ke-hoach] cron',JSON.stringify(r))).catch(e=>console.error('[ke-hoach] cron lỗi:',e))])
+      // THỨ TỰ: kế hoạch ngày TRƯỚC, tin phụ huynh SAU — tin phụ huynh (GĐ 5) đọc số câu từ kế hoạch vừa lập; chạy song song
+      // thì tin có thể đọc kế hoạch của ngày cũ hoặc thiếu.
+      await chayCaLop(env,Date.now()).then(r=>console.log('[ke-hoach] cron',JSON.stringify(r))).catch(e=>console.error('[ke-hoach] cron lỗi:',e))
+      await Promise.all([refreshDailyNews(env),dailyHonors(env,false)])
     }else await deliverNotices(env)
   },
   async fetch(req: Request, env: Env): Promise<Response> {
