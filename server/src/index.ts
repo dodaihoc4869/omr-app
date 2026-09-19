@@ -2,6 +2,7 @@ import {homeworkQuestions,homeworkKeys,gradeHomework} from './btvn-grading'
 import {ghiSuKien,ghiSuKienThi,ghiSuKienLoBtvn,type LuotThi} from './su-kien-hoc'
 import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
 import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
+import {hsKeHoachNgay,hsThoiGianHoc,chayCaLop} from './ke-hoach-ngay-d1'
 import {notifications,deliverNotices} from './notifications'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
@@ -2734,7 +2735,13 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
 }
 
 export default {
-  async scheduled(event:{cron:string}, env:Env) { if(event.cron==='1 17 * * *')await Promise.all([refreshDailyNews(env),dailyHonors(env,false)]);else await deliverNotices(env) },
+  async scheduled(event:{cron:string}, env:Env) {
+    if(event.cron==='1 17 * * *'){
+      // 00:01 giờ VN: tin phụ huynh + vinh danh như cũ, THÊM chốt ngày cũ và lập kế hoạch ngày mới (GĐ 2).
+      // Kế hoạch có lỗi thì chỉ ghi log — không được kéo hai việc cũ đổ theo.
+      await Promise.all([refreshDailyNews(env),dailyHonors(env,false),chayCaLop(env,Date.now()).then(r=>console.log('[ke-hoach] cron',JSON.stringify(r))).catch(e=>console.error('[ke-hoach] cron lỗi:',e))])
+    }else await deliverNotices(env)
+  },
   async fetch(req: Request, env: Env): Promise<Response> {
     const url = new URL(req.url)
     const p = url.pathname
@@ -2830,6 +2837,9 @@ export default {
       if (p === '/btvn/cua-em') return btvnCuaEm(env, b)
       if (p === '/btvn/nop') return nopBtvn(env, b)
       if (p === '/btvn/xong-lo') return xongLoBtvn(env, b)
+      // KẾ HOẠCH NGÀY (GĐ 2) — em đọc kế hoạch hôm nay; đặt số phút học mỗi ngày (cần token).
+      if (p === '/hs/ke-hoach-ngay') return ra(await hsKeHoachNgay(env, b))
+      if (p === '/hs/thoi-gian-hoc') return ra(await hsThoiGianHoc(env, b))
 
       // Lệnh của THẦY — đòi mã bí mật.
       if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
@@ -2844,6 +2854,7 @@ export default {
       }
       if (p === '/ho-so/xem') return ra({ ok: true, ...(await docHoSoEm(env, String(b.sbd ?? '').trim())) })
       if (p === '/ho-so/do-phu-dang') return ra(await docDoPhuDang(env))
+      if (p === '/ke-hoach/chay-ca-lop') return ra({ ok: true, ...(await chayCaLop(env, Date.now())) })
       if (p === '/game-v2-admin') return ra(await adminGame(env,b))
       if (p === '/ca/day') return dayCa(env, b)
       if (p === '/ca/xac-nhan') {

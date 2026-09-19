@@ -29,3 +29,48 @@ export const SO_LAN_SAI_DAY_LAI = 3
 export const BAC_DANG_BAT_DAU = 1
 export const BAC_DANG_TOI_DA = 2
 export const TEN_BAC_DANG = ['biet', 'hieu', 'van_dung'] as const
+
+// --- Kế hoạch ngày (GĐ 2) ------------------------------------------------------
+// Ngân sách ngày vẫn do `tinhNganSachNgay` (src/lib/tro-ly-ca-nhan.ts, test đang khoá 8–16); ở đây chỉ là
+// các hằng số của bộ điều phối bao quanh nó. Không viết lại hàm đó — chỉ sửa ĐẦU VÀO và hạ/nâng có trần.
+
+/** Đổi công thức xếp việc thì tăng số này: kế hoạch cũ trong D1 còn nhận ra là bản cũ. */
+export const PHIEN_BAN_KE_HOACH = 1
+
+export const NGAN_SACH_SAN = 8
+export const NGAN_SACH_TRAN = 16
+
+/** Phút học/ngày khi em/phụ huynh chưa đặt (thầy chốt 19/09 câu 1). */
+export const PHUT_NGAY_MAC_DINH = 20
+export const PHUT_NGAY_TOI_THIEU = 10
+export const PHUT_NGAY_TOI_DA = 45
+
+/** Tốc độ (giây/câu): trung vị các lần có đo trong 30 ngày, lọc [5, 1200] s, cần ≥ SO_MAU_GIAY_TOI_THIEU mẫu, kẹp [45, 240]. */
+export const VAN_TOC_MAC_DINH = 90
+export const SO_MAU_GIAY_TOI_THIEU = 5
+export const GIAY_MOT_CAU_TOI_THIEU = 5
+export const GIAY_MOT_CAU_TOI_DA = 1200
+export const VAN_TOC_SAN = 45
+export const VAN_TOC_TRAN = 240
+export const SO_NGAY_DO_VAN_TOC = 30
+
+/** Điều chỉnh theo 7 ngày gần nhất: ≥ 3 ngày không đạt → −2; 7/7 đạt mà nhanh hơn ngưỡng dưới → +2. */
+export const SO_NGAY_LICH_SU = 7
+export const SO_NGAY_KHONG_DAT_DE_GIAM = 3
+export const BUOC_DIEU_CHINH = 2
+export const VAN_TOC_NHANH_DE_TANG = 75
+
+/** Câu tối thiểu mỗi ngày = clamp(round(mụcTiêu/2), 4, 8). */
+export const TOI_THIEU_CAU_SAN = 4
+export const TOI_THIEU_CAU_TRAN = 8
+
+/** Ôn tới hạn chiếm tối đa bấy nhiêu phần mục tiêu ngày. */
+export const TY_LE_ON_TOI_DA = 0.4
+/** Nhiệm vụ thần thú giao theo bội số này (một lượt game 6 câu). */
+export const BOI_THAN_THU = 6
+export const TRAN_THAN_THU_MOT_LUOT = 12
+/** Ôn thi: số câu cho ca sắp tới trong vòng bấy nhiêu ngày. */
+export const CAU_ON_THI = 4
+export const NGAY_ON_THI = 3
+/** Bài quá hạn quá bấy nhiêu ngày thì thôi liệt kê. */
+export const NGAY_LIET_KE_QUA_HAN = 14
