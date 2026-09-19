@@ -21,6 +21,7 @@ import { dungM3, ThanhTren } from '../components/m3'
 import LichSuCaM3 from '../components/bang-nhiem-vu/LichSuCaM3'
 import BtvnM3 from '../components/bang-nhiem-vu/BtvnM3'
 import VaoThiForm from '../components/bang-nhiem-vu/VaoThiForm'
+import { MomDanhSachM3, MomLamBaiM3, type BaiMomM3 } from '../components/bang-nhiem-vu/MomM3'
 import '../components/bang-nhiem-vu/sheet-m3.css'
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import {
@@ -1729,7 +1730,56 @@ export default function StudentPortalScreen() {
         )}
 
         {/* TAB 2.5: BÀI CỦA MOM GIAO (HẠN 2 TIẾNG) */}
-        {tab === 'mom' && (
+        {tab === 'mom' && vaoM3 && auth && (
+          <>
+            {dangLamMom ? (
+              <MomLamBaiM3
+                tieuDe={dangLamMom.tieuDe}
+                giayConLai={giayConLaiMom}
+                dinhDangThoiGian={dinhDangThoiGianMom}
+                soDaLam={Object.keys(cauTraLoiMom).length}
+                dsCau={dangLamMom.dsCau || dangLamMom.cau || []}
+                traLoi={cauTraLoiMom}
+                datTraLoi={(idCau, giaTri) => setCauTraLoiMom((prev) => ({ ...prev, [idCau]: giaTri }))}
+                loi={loiMom}
+                onQuayLai={() => {
+                  if (confirm('Em có chắc muốn tạm dừng bài làm không? Đồng hồ 2 tiếng vẫn tiếp tục đếm ngược.')) {
+                    setDangLamMom(null)
+                  }
+                }}
+                onTamDung={() => {
+                  try {
+                    localStorage.setItem(`omr_mom_draft_${dangLamMom.id}_${auth.sbd}`, JSON.stringify({
+                      cauTraLoi: cauTraLoiMom,
+                      luuLuc: new Date().toISOString(),
+                      giayConLai: giayConLaiMom,
+                    }))
+                  } catch {}
+                  alert('Đã lưu nháp an toàn! Em có thể vào làm tiếp bất cứ lúc nào trước khi hết hạn (deadline).')
+                  setDangLamMom(null)
+                }}
+                onNop={nopBaiCuaMom}
+              />
+            ) : (
+              <MomDanhSachM3
+                ds={dsMomGiao as unknown as BaiMomM3[]}
+                daTai={daTaiMom}
+                loi={loiMom}
+                thongBaoNop={thongBaoNopMom}
+                onDongThongBao={() => setThongBaoNopMom(null)}
+                onLamMoi={() => void napDsMom()}
+                ngayGio={dinhDangNgayGio}
+                onBatDau={(bai) => void batDauLamBaiMom(bai as unknown as BaiMomGiao)}
+                onXemKetQua={async (bai: any) => {
+                  if (bai.htmlKetQua) { setPhieuHtml(bai.htmlKetQua); return }
+                  try { const data = await momApi('review', { token: auth?.token, id: bai.id }); setPhieuHtml(momReviewHtml(chuanHoaBaiMom(data.item))) }
+                  catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được kết quả.') }
+                }}
+              />
+            )}
+          </>
+        )}
+        {tab === 'mom' && !vaoM3 && (
           <div className="space-y-4 animate-google-fade">
             {dangLamMom ? (
               /* MÀN HÌNH ĐANG LÀM BÀI CỦA MOM GIAO */
