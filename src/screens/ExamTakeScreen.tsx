@@ -56,6 +56,7 @@ import VanTay from '../components/VanTay'
 import TheCau from '../components/TheCau'
 import MaCaInput from '../components/MaCaInput'
 import LogoHocSinh from '../components/LogoHocSinh'
+import { LogoDoc } from '../components/LogoVai'
 import PhongChoGame from '../components/PhongChoGame'
 import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
 import { TriangleAlert, X, ArrowLeft, LayoutGrid, Clock, Sparkles } from 'lucide-react'
@@ -2438,16 +2439,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       <Trang className="flex items-center justify-center px-4 py-8">
         <div className="w-full" style={{ maxWidth: 400 }}>
           <TheNoiDung>
-            <div className="text-center" style={{ marginBottom: 'var(--k6)' }}>
-              <div className="flex justify-center" style={{ marginBottom: 'var(--k3)' }}>
-                <LogoHocSinh size={54} hienChu={false} />
-              </div>
-              <div className="font-bold tracking-tight text-slate-900 dark:text-white" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-5)' }}>
-                ĐỖ ĐẠI HỌC
-              </div>
-              <div className="text-xs font-bold tracking-wider uppercase text-emerald-600 dark:text-emerald-400 mt-1" style={{ fontFamily: 'var(--sans)' }}>
-                Kiên Trì
-              </div>
+            <div style={{ marginBottom: 'var(--k6)' }}>
+              <LogoDoc vai="hs" size={64} />
             </div>
             <div className="flex flex-col" style={{ gap: 'var(--k4)' }}>
               <div>

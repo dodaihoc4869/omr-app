@@ -10,6 +10,7 @@ import path from 'node:path'
 import { BAN_CHEP, BAN_PNG, BAN_MOBILECONFIG, thayIcon } from '../scripts/sinh-logo-png.mjs'
 import LogoGiaoVien from '../src/components/LogoGiaoVien'
 import LogoPhuHuynh from '../src/components/LogoPhuHuynh'
+import LogoHocSinh from '../src/components/LogoHocSinh'
 import LogoDDH from '../src/components/LogoDDH'
 import LogoApp from '../src/components/LogoApp'
 import { AnhLogo, LogoDoc, LogoNgang, NHAN_VAI, tepLogo } from '../src/components/LogoVai'
@@ -189,7 +190,7 @@ describe('LogoVai: bản nét đậm cho cỡ ≤ 40 px, bản thường cho c�
   })
 
   it('không tệp component logo nào còn bo góc, trỏ -v2 hay nhúng mã màu', () => {
-    for (const t of ['LogoVai', 'LogoGiaoVien', 'LogoPhuHuynh', 'LogoDDH', 'LogoApp']) {
+    for (const t of ['LogoVai', 'LogoGiaoVien', 'LogoPhuHuynh', 'LogoHocSinh', 'LogoDDH', 'LogoApp']) {
       const c = doc(`src/components/${t}.tsx`)
       expect(c, t).not.toMatch(/rounded-|-v2|#[0-9a-fA-F]{3,8}\b|rgb\(/)
     }
@@ -291,4 +292,43 @@ describe('logo-ddh.css: màu chữ qua biến, không mã hex; nhãn vai trò đ
       expect(tuongPhan(b.chu, b.nen), `${v} tối`).toBeGreaterThanOrEqual(4.5)
     })
   }
+})
+
+// ───────────────────────── nhóm 4: học sinh + màn thi thật (chỉ đổi thẻ logo) ─────────────────────────
+describe('LogoHocSinh (dùng trong màn thi thật + phòng chờ): bánh quy 12 múi xanh lá, cùng luật với hai app kia', () => {
+  it('thanh trên 38 px: bản nét đậm, chữ + viên thuốc HỌC SINH + hằng số; 44/48/54 px chỉ hình: bản thường, không bo góc, không chữ', () => {
+    const a = render(<LogoHocSinh size={38} hienChu />)
+    expect(srcImg(a.container)).toMatch(/logo-hs-nho-v3\.svg$/)
+    expect(a.container.querySelector('.logo-ddh-vien')!.getAttribute('data-vai')).toBe('hs')
+    expect(a.container.querySelector('.logo-ddh-vien')!.textContent).toBe('HỌC SINH')
+    expect(a.container.querySelector('.logo-ddh-hang-so')!.textContent).toBe('6,022 · 10²³')
+    expect(a.container.textContent).not.toContain('Kiên Trì')
+    a.unmount()
+    for (const co of [44, 48, 54]) {
+      const { container, unmount } = render(<LogoHocSinh size={co} hienChu={false} />)
+      expect(srcImg(container)).toMatch(/logo-hs-v3\.svg$/)
+      expect(container.querySelector('img')!.className).not.toMatch(/rounded/)
+      expect(container.textContent).toBe('')
+      unmount()
+    }
+  })
+
+  it('LogoApp vai="hocsinh" (màn "app đã chuyển") ra logo học sinh mới', () => {
+    expect(srcImg(render(<LogoApp vai="hocsinh" size={56} />).container)).toMatch(/logo-hs-v3\.svg$/)
+  })
+})
+
+describe('màn thi thật: CHỈ đổi thẻ logo — luồng và các chỗ gọi khác nguyên vẹn', () => {
+  it('ExamTakeScreen: màn vào thi dùng LogoDoc (học sinh, 64 px), hết khối tay + "Kiên Trì"; màn xác nhận vẫn LogoHocSinh 48 px như cũ', () => {
+    const e = doc('src/screens/ExamTakeScreen.tsx')
+    expect(e).toContain("import { LogoDoc } from '../components/LogoVai'")
+    expect(e.match(/<LogoDoc vai="hs" size=\{64\} \/>/g)).toHaveLength(1)
+    expect(e).toContain('<LogoHocSinh size={48} hienChu={false} />')
+    expect(e).not.toContain('Kiên Trì')
+    expect(e).not.toMatch(/logo-(gv|hs|ph)-/) // không nhúng tên tệp logo vào màn thi: mọi hình đi qua component
+  })
+
+  it('PhongChoGame không sửa một dòng nào: vẫn <LogoHocSinh size={44} hienChu={false} />', () => {
+    expect(doc('src/components/PhongChoGame.tsx')).toContain('<LogoHocSinh size={44} hienChu={false} />')
+  })
 })
