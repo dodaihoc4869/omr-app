@@ -129,6 +129,7 @@ describe('Đoàn Hộ Tống · giao diện · Tung chưởng và Kết chặng'
   it('em làm SAI: bảng của em nói thần thú đã chắn + câu sẽ quay lại — không có "vì sao đòn này mạnh"', async () => {
     dung(trongTran({ revision: 9, tran: tran({ hiep: 4, laTrum: true, moSauMs: 6000 }), cau: undefined, hiepVuaXong: { ...vuaXong, tongSatThuong: 48, cuaEm: { ...kqGhe, dung: false, hanhDong: 'chan', satThuong: 0, lienKich: false, chan: 8, giup: null, giupThanhCong: false, heSo: { dung: 0, lienKich: 1, anThach: 1 } } } as never }))
     const hop = await screen.findByRole('dialog'); expect(hop.textContent).toContain('HIỆP NÀY CỦA EM'); expect(hop.textContent).toContain('chắn cho Linh Tâm'); expect(hop.textContent).toContain('quay lại'); expect(hop.textContent).not.toContain('VÌ SAO ĐÒN NÀY MẠNH')
+    expect(hop.textContent).toContain('THU HÀ'); expect(hop.textContent).not.toMatch(/Nam/i); expect(hop.querySelectorAll('image[href*="/spells/"]').length).toBe(1) // chỉ bạn RA ĐÒN được nêu tên; bạn chắn (có thể vì sai) thì không
   })
   const ket = (tienBo: Record<string, unknown>, thang = true) => trongTran({ revision: 30, cau: undefined, tran: tran({ hiep: 8, laTrum: true, ketThuc: true, thang, quai: [] }),
     ketChang: { thang, sao: thang ? 3 : 0, linhTam: { hp: thang ? 84 : 0, toiDa: 100 }, trumVoGiap: [true, true], quaiHaGuc: 17, soLienKich: 1, cuaEm: { ghe: 0, id: 'x', laMay: false, soCau: 6, soDung: 5, soTuLamDung: 5, satThuong: 168, chan: 8, haGuc: 6, soLanGiup: 1, soLanGiupThanhCong: 1, soLanDuocGiup: 0, soLienKich: 1 },

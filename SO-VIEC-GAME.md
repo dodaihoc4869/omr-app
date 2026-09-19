@@ -6,8 +6,8 @@ Nơi làm: worktree riêng, nhánh `claude/zealous-taussig-a50c90` (tách từ m
 | Bước | Việc | Trạng thái |
 |---|---|---|
 | 1 | Lõi thuần `doan-core.ts` + test bảng giá trị + đột biến | **XONG 19/09** — 0.Planer đã soát + gộp main 243e746, duyệt cả 9 quyết định (ghi chú 9 → đã sửa, xem mục "Sửa sau soát") |
-| 2 | Máy chủ `server/src/game-v2-doan.ts` (mở/vào/nộp/kết chặng, chọn câu từ hồ sơ, ghi `su_kien_hoc` nguồn `game`) | **XONG 19/09** — chờ 0.Planer soát; Code 3 chạy migration + đẩy Worker |
-| 3 | Giao diện 6 màn theo bản vẽ | chưa làm |
+| 2 | Máy chủ `server/src/game-v2-doan.ts` (mở/vào/nộp/kết chặng, chọn câu từ hồ sơ, ghi `su_kien_hoc` nguồn `game`) | **XONG 19/09** — 0.Planer đã soát + gộp main e65efbb, duyệt luật Chắn mới và các điểm (3)(4)(5); Code 3 chạy migration + đẩy Worker |
+| 3 | Giao diện 6 màn theo bản vẽ | **XONG 19/09** 5/6 màn (màn 3 Tiếp sức đi cùng bước 4) — chờ 0.Planer soát |
 | 4 | Tiếp sức (3 thẻ gợi ý máy chủ soạn) | chưa làm |
 | 5 | Mồi hằng ngày (vé, Đoàn lớp, rương chuỗi, Trùm lớp) | chưa làm |
 | 6 | Ấn thạch dạng + hợp đồng hiển thị ngoài game | chưa làm |
@@ -110,3 +110,37 @@ Một câu Phần II đã duyệt, đủ 4 ý, thuộc dạng mà ít nhất m�
 
 ### Việc Code 3 cần làm khi 0.Planer đã soát
 1. `wrangler d1 execute … --remote --file server/migration-1909-game-doan.sql` (3 bảng + 5 chỉ mục, chỉ-thêm). 2. Đẩy Worker. 3. Kiểm bản sống bằng tài khoản thầy: `doan-mo` → có `doan.ma`, `doan.tran.hiep = 1`, payload không có `correct/solution`.
+
+---
+
+## BƯỚC 3 — Giao diện (19/09/2026)
+
+**Tệp MỚI** (đều trong `src/game/than-thu-v2/`): `doan-kieu.ts` (kiểu gói tin) · `DoanHinh.tsx` (thần thú thật cắt từ atlas, quái/trùm/Linh Tâm SVG) · `doan.css` (mọi bộ chọn có tiền tố `.dh`) · `DoanCau.tsx` (thẻ câu giấy ấm) · `DoanSanh.tsx` · `DoanTran.tsx` (trong trận + trùm) · `DoanTungChuong.tsx` · `DoanKetChang.tsx` · `DoanHoTong.tsx` (khung điều khiển). `tests/doan-giao-dien.test.tsx` · `docs/anh-doan-ho-tong-1909/` (9 ảnh + `chup.mjs`) · `docs/hop-dong-mo-game-doan-ho-tong-1909.md`.
+**Tệp SỬA:** `Game.tsx` (tab mới, cửa vào, Võ đài thứ Bảy) · `LearningBattle.tsx` (chỉ thêm chữ `export` trước `SpellArt`) · `server/src/game-v2-doan.ts` (khung nhìn thêm `cap`, `loaiQuai`, `loaiTrum` — CHỈ để vẽ, không vào lõi).
+Commit (mỗi màn một commit, theo lệnh 0.Planer): 9023df2 nền · 2bac1ee Sảnh · 28795c2 Trong trận + Trùm · 62394c9 Tung chưởng · 36670bc Kết chặng · c40b279 khung + cửa vào + test + mã chụp · commit cuối: test bổ sung sau đột biến + sổ việc + hợp đồng cửa vào.
+
+### Đã dựng
+- **Lớp phủ toàn màn vẽ qua cổng vào `document.body`** → không dính kiểu nút của game cũ (`.spirit-game button…`), không đụng màn nào khác. Thẻ câu ghim biến màu của app về bản SÁNG nên chế độ tối không bị chữ trắng trên giấy.
+- **Thần thú THẬT** (`evolutionCrop` + atlas `-cutout.png`, đúng hình thái theo cấp — cấp chỉ để vẽ) và **tia chiêu thức THẬT** (`public/than-thu-v2/spells/*.png`, dùng lại đúng `SpellArt` của màn luyện tập; ảnh vẽ ngang nên xoay −90° để bắn LÊN trúng quái như bản vẽ 4).
+- Nội dung câu (công thức hoá, bảng số liệu, ảnh cắt từ đề, lời giải) dùng lại đúng bộ hiển thị của app: `ChemText`, `BangSoLieu`, `CauHinh`, `HinhTaiViTri`, `LoiGiaiCauSai`. Phần I lưới 2×2 (phương án dài/có ảnh → một cột), Phần II bốn hàng Đúng/Sai, Phần III ô nhập số.
+- Màn 1 SẢNH: bản đồ + thần thú thật, thẻ "Chặng hôm nay" nói rõ câu của RIÊNG em hôm nay (đọc lệnh `recommendations` sẵn có: "3 câu Ester · 2 câu Ancol…"), nút vàng LÊN ĐƯỜNG, "Đi cùng bạn" (mở đoàn lấy mã / nhập mã), phòng chờ 4 ghế. **Đoàn lớp, vé, rương chuỗi, Trùm lớp, ấn thạch CHƯA hiện** — máy chủ chưa có số (bước 5, 6); không bịa số (có test).
+- Màn 2 TRONG TRẬN: 8 vạch hiệp (◆ trùm), vòng đếm giờ (đỏ khi ≤ 10 s), cảnh trận, dải đồng đội CHỈ có trạng thái, thẻ câu, 3 nút đòn (Kỹ năng khoá khi < 2 NL), nút Chốt ("Chốt đòn · B + Đánh" / "Chốt · bỏ trống + Chắn"). Chốt rồi không đổi. Quãng nghỉ 6 s: đọc lại câu vừa làm + lời giải. Rời chặng phải chạm HAI lần.
+- Màn 5 TRÙM: một câu Phần II, chỉ ý CỦA EM (viền vàng) có Đúng/Sai + nút Chốt; ý của bạn chỉ "đã chốt / đang nghĩ… / máy đỡ"; giáp 4 đoạn giữ NGUYÊN tới khi hiệp giải (không lộ ai đúng ai sai giữa chừng); 3 tín hiệu có sẵn, không ô nhập chữ; sau hiệp mới xin đáp án + lời giải. Không có câu chung hợp lệ → nói thật "Hiệp này không có câu chung phù hợp với cả đội" (đúng lệnh 0.Planer).
+- Màn 4 TUNG CHƯỞNG: dải tên chiêu cắt ngang, tia thật của tối đa hai bạn RA ĐÒN, quái rung, chớp sáng, số vàng, HẠ GỤC ×n, LIÊN KÍCH ×2, bảng "VÌ SAO ĐÒN NÀY MẠNH" (×1,5 tự làm đúng · ×2 Liên Kích · ẤN · hiệu ứng kỹ năng). Em sai → bảng "HIỆP NÀY CỦA EM": thần thú đã chắn + câu sẽ quay lại. Bạn chắn (có thể vì sai) KHÔNG bao giờ bị nêu tên. Tự tắt 3 s, một chạm là tắt, giảm chuyển động = ảnh tĩnh + số.
+- Màn 6 KẾT CHẶNG: VƯỢT CHẶNG + 3 sao + hoa giấy; thua → "Linh Tâm cần nghỉ · Thua không mất gì cả"; thẻ "HÔM NAY EM TIẾN BỘ GÌ" chỉ in số máy chủ đo được (dòng "lên bậc" ẩn khi máy chủ trả `null`); nút chính VỀ BẢNG NHIỆM VỤ.
+- Cửa vào: tab **Đoàn Hộ Tống** trong game; tab cũ thành **Võ đài thứ Bảy** (mã `EscortRoom` giữ NGUYÊN, chỉ mở thứ Bảy theo giờ VN; ngày khác là thẻ mời sang Đoàn). Mở từ ngoài: `manDau="doan"` hoặc sessionStorage `game-v2:man-dau` — hợp đồng cho Code 2 ở `docs/hop-dong-mo-game-doan-ho-tong-1909.md`. Chưa chọn thú → lời mời đẹp phía trên màn chọn thú, chọn xong vào thẳng Sảnh.
+
+### Bằng chứng
+- `tests/doan-giao-dien.test.tsx` **15/15** · cùng `doan-core` 52 + `doan-may-chu` 21 + `escort-context-menu` + `escort-question` = 92/92.
+- **Toàn bộ `npx vitest run`: 5804 test · 97 đỏ / 42 tệp = ĐÚNG NỀN · MỚI ĐỎ = [] · HẾT ĐỎ = []** (so từng tên test với lần chạy bước 2). `tsc` sạch cả app lẫn server.
+- `node docs/anh-doan-ho-tong-1909/chup.mjs` (Playwright, đi qua cổng học sinh thật `/hs`, máy chủ giả): 6 màn **0 lỗi console**; **màn trận và màn trùm KHÔNG cuộn ở 360×740 và 390×844** (đo `scrollHeight − clientHeight = 0`, đáy nút cuối 728/740 và 832/844); **tung chưởng tự tắt sau 2,78 s**, một chạm là bỏ qua; `prefers-reduced-motion` → **0 phần tử còn animation**, vẫn hiện −114.
+- **Cỡ gói (vite build, gzip −9): `DoanHoTong` JS 13,2 KB + CSS 6,7 KB = 19,9 KB** ≤ 60 KB; nạp riêng (`lazy`) nên không làm nặng Đảo thần thú. Không thêm ảnh, không thêm thư viện.
+- Đột biến giao diện: **21 đột biến → 21 đỏ** (mọi ý trùm đều có nút · kỹ năng không khoá · chưa chọn vẫn chốt · chốt rồi vẫn đổi đòn · giả vờ có câu chung · dải đồng đội in "sai" · rời một chạm · bỏ trống vẫn gửi đáp án · không gắn lớp tĩnh · sai lệnh vào đoàn · tung chưởng không tự tắt / kéo 6 s / chạm không tắt · nêu tên bạn đã chắn · em sai vẫn "vì sao đòn mạnh" · in "lên bậc" khi không đo được · nút chính không về Bảng nhiệm vụ · chữ "nắm chắc" · bịa số trạm · khách thấy nút lên đường · thứ Bảy theo UTC). Vòng đầu sống 1 ("nêu tên bạn đã chắn") → đã thêm ca test, nay đỏ.
+
+### Chưa làm trong bước này (nói thẳng)
+- Màn 3 TIẾP SỨC (tấm trượt 3 thẻ) — CSS đã có sẵn, component + lệnh máy chủ làm ở bước 4.
+- Các khối Sảnh cần số liệu bước 5/6 (Đoàn lớp 30 trạm, vé, chuỗi/rương, Trùm lớp, bạn đồng hành bù nhau, 6 ấn thạch) và dòng "Linh Tâm của lớp: trạm 17 → 18/30", mảnh khiên ở Kết chặng.
+- Chưa kiểm trên bản sống thật (cần Worker có `doan-*` + Pages mới): nghiệm thu 1 "đi trọn chặng một mình 5–6 phút" mới kiểm ở test máy chủ (đi trọn 8 hiệp) + ảnh từng màn, chưa phải một lượt chơi thật liền mạch.
+
+### Cách lùi
+`git revert` dải commit bước 3 → tab game về như cũ ("Hộ Tống Linh Tâm" mở mọi ngày). Không có dữ liệu nào bị đụng.
