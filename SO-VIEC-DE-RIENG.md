@@ -25,7 +25,7 @@ Nguyên văn yêu cầu (tách vế):
 - [x] (0.Planer bổ sung) `ca.lop` rỗng ⇒ biên bản ghi tin "ca không ghi lớp — em vào muộn rút theo luật thường" | bằng chứng: test "em vắng KHÔNG vào con số nào…" soi đúng dòng đó
 - [x] (0.Planer bổ sung) lượt `noiKhoCa` riêng của em vắng hỏng ⇒ em đó bỏ câu ngoài kho, KHÔNG hỏng Bắt đầu; có test | bằng chứng: test "lượt noiKhoCa của em vắng HỎNG…"
 - [x] (0.Planer chốt A) làm bền hai test đo giờ của `de-rieng-tran-trung.test.ts`, KHÔNG hạ ngưỡng | bằng chứng: commit `2c02c87` — "dưới 500 ms" giữ 500 ms, lấy lần nhanh nhất trong 3; "60 cấu hình" hạn chờ tường minh 60 s; không đổi phép so/dữ liệu/tên test; tệp 22/22
-- [ ] Báo cáo cuối cho 0.Planer | bằng chứng: (chưa gửi)
+- [x] Báo cáo cuối cho 0.Planer (tên nhánh, 7 commit, số test toàn bộ + từng tệp bất biến, khai lượt 98/43 do máy tải, điểm cần soát về boTheoEm có em chưa vào ca) | bằng chứng: msg_id `9f6fc4ab-af89-4019-be62-3cf634b1b5d7`; ba lần xin chốt trong lượt này: `7e94f2b8…` (ghiChu → B), `34b70148…` (test đo giờ → A)
 
 Chỗ tự quyết ở lượt 2 (đã báo 0.Planer, được đồng ý):
 1. "Em cùng lớp" = em trong `danhSachEm` có `lop` TRÙNG `ca.lop`, chỉ khi `ca.lop` khác rỗng. Không đụng luật vào thi: em vắng chỉ có thêm một dòng trong bản đồ.
