@@ -5,6 +5,7 @@ import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
 import {hsKeHoachNgay,hsThoiGianHoc,chayCaLop} from './ke-hoach-ngay-d1'
 import {hsCauTheoQid} from './cau-theo-qid'
 import {hsOnLaiNop} from './on-lai-nop'
+import {hoSoOnCa} from './ho-so-on-ca'
 import {notifications,deliverNotices} from './notifications'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
@@ -2596,7 +2597,7 @@ const LENH_CUA_THAY = new Set([
   'xoaDe', 'luuPhieu', 'luuNhieuPhieu', 'xoaPhieu', 'phieuTheoCa', 'nopKhacPhucTheoCa',
   'dungChiMuc', 'danhSachCauHoi', 'xoaCauHoi', 'danhDauDaChua', 'ghiLenBang', 'lichSuLenBang',
   // Hồ sơ CẢ LỚP là dữ liệu của nhiều em — lệnh của THẦY, không mở cho máy em.
-  'hoSoLopLenBang',
+  'hoSoLopLenBang', 'hoSoOnCa',
   'sendTeacherMessage', 'listMessages', 'demTinMoi', 'listStudents', 'markMessagesRead',
   'resetMatKhauHs',
 ])
@@ -2766,6 +2767,7 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
     case 'ghiLenBang': return ghiLenBangMoi(env, b)
     case 'lichSuLenBang': return ra(await G.lichSuLenBang(env, b))
     case 'hoSoLopLenBang': return ra(await G.hoSoLopLenBang(env, b))
+    case 'hoSoOnCa': return ra(await hoSoOnCa(env, b))
 
     default:
       return ra({ ok: false, error: `Máy chủ mới chưa dựng lệnh "${act}"` }, 400)
