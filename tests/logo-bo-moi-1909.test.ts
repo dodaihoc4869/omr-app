@@ -97,3 +97,66 @@ describe('hồ sơ iPhone (mobileconfig) nhúng đúng biểu tượng 180 px c�
     })
   }
 })
+
+// ───────────────────────── nhóm 2: manifest · index.html · trang cài app · service worker ─────────────────────────
+describe('manifest 3 app: icon trỏ tới PNG -v3 có thật, đúng cỡ, có bản maskable', () => {
+  for (const [v, tep] of [['gv', 'manifest.json'], ['hs', 'manifest-hs.json'], ['ph', 'manifest-ph.json']] as const) {
+    it(`${tep}: 192 + 512 (any) và 512 (maskable) của app ${v}; tệp tồn tại, đúng cỡ khai, không còn -v2`, () => {
+      const m = JSON.parse(doc(`public/${tep}`))
+      const ra = m.icons.map((i: { src: string; sizes: string; purpose: string }) => [i.src, i.sizes, i.purpose])
+      expect(ra).toEqual([
+        [`logo-${v}-192-v3.png`, '192x192', 'any'],
+        [`logo-${v}-512-v3.png`, '512x512', 'any'],
+        [`logo-${v}-512-maskable-v3.png`, '512x512', 'maskable'],
+      ])
+      for (const i of m.icons) {
+        const h = ihdr(docBuf(`public/${i.src}`))
+        expect(`${h.w}x${h.h}`, i.src).toBe(i.sizes)
+        expect(i.type).toBe('image/png')
+      }
+      expect(doc(`public/${tep}`)).not.toContain('-v2')
+    })
+  }
+})
+
+describe('index.html: favicon SVG nét đậm + PNG 64 + apple-touch-icon 180 theo vai — tệp có thật', () => {
+  it('ba thẻ link -v3 theo vai (gv/hs/ph) và mọi tên ghép ra đều tồn tại; không còn -v2', () => {
+    const h = doc('index.html')
+    expect(h).toContain(`<link rel="icon" type="image/svg+xml" sizes="any" href="/logo-' + logoVai + '-nho-v3.svg">`)
+    expect(h).toContain(`<link rel="icon" type="image/png" sizes="64x64" href="/logo-' + logoVai + '-64-v3.png">`)
+    expect(h).toContain(`<link rel="apple-touch-icon" href="/logo-' + logoVai + '-180-v3.png">`)
+    expect(h).not.toContain('-v2')
+    for (const v of VAI) for (const t of [`logo-${v}-nho-v3.svg`, `logo-${v}-64-v3.png`, `logo-${v}-180-v3.png`]) expect(fs.existsSync(path.join(goc, 'public', t)), t).toBe(true)
+  })
+})
+
+describe('trang cài app (cai-app.html · cai-dat.html · cai-app/index.html): ba bản y hệt nhau, dùng logo -v3', () => {
+  it('giống nhau từng byte; favicon SVG + PNG; header là logo giáo viên 180; hai ô xem trước mở bằng icon học sinh 192, đổi tab thì -v3 theo vai', () => {
+    const a = doc('public/cai-app.html')
+    expect(doc('public/cai-dat.html')).toBe(a)
+    expect(doc('public/cai-app/index.html')).toBe(a)
+    expect(a).toContain('<link rel="icon" type="image/svg+xml" sizes="any" href="/logo-gv-nho-v3.svg">')
+    expect(a).toContain('<link rel="apple-touch-icon" href="/logo-gv-180-v3.png">')
+    expect(a).toContain('<img src="/logo-gv-180-v3.png" alt="Đỗ Đại Học Logo">')
+    expect(a.match(/<img src="\/logo-hs-192-v3\.png" alt="App Icon">/g)).toHaveLength(2)
+    expect(a).toContain("img.src = '/logo-' + (role === 'hs' ? 'hs' : 'ph') + '-192-v3.png';")
+    expect(a).not.toMatch(/-v2|apple-touch-icon\.png/)
+  })
+})
+
+describe('service worker + cấu hình PWA', () => {
+  it('thông báo đẩy dùng icon 192 / huy hiệu 64 của học sinh (-v3, có thật)', () => {
+    const s = doc('src/sw.ts')
+    expect(s).toContain("icon:'/logo-hs-192-v3.png',badge:'/logo-hs-64-v3.png'")
+    for (const t of ['logo-hs-192-v3.png', 'logo-hs-64-v3.png']) expect(fs.existsSync(path.join(goc, 'public', t))).toBe(true)
+  })
+
+  it('vite.config.ts: includeAssets chỉ nêu tệp có thật hoặc mẫu -v3 (trước đây liệt kê icon-hs-192… không tồn tại)', () => {
+    const v = doc('vite.config.ts')
+    const m = /includeAssets:\s*\[([^\]]*)\]/.exec(v)!
+    const muc = [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1])
+    expect(muc).toEqual(expect.arrayContaining(['favicon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png', 'logo-*-v3.svg', 'logo-*-v3.png']))
+    for (const t of muc.filter((x) => !x.includes('*'))) expect(fs.existsSync(path.join(goc, 'public', t)), t).toBe(true)
+    expect(v).not.toMatch(/icon-(hs|ph)-/)
+  })
+})

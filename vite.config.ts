@@ -65,7 +65,7 @@ export default defineConfig({
       // ngay, không cần thầy/học sinh xoá cache tay mới thấy sửa lỗi —
       // injectRegister:false để không đăng ký trùng 2 lần.
       injectRegister: false,
-      includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png', 'icon-hs-192.png', 'icon-hs-512.png', 'icon-ph-192.png', 'icon-ph-512.png', 'manifest.json', 'manifest-hs.json', 'manifest-ph.json', 'cau-hinh.json'],
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png', 'logo-*-v3.svg', 'logo-*-v3.png', 'manifest.json', 'manifest-hs.json', 'manifest-ph.json', 'cau-hinh.json'],
       // KHÔNG để plugin sinh và CHÈN thẻ manifest. Thẻ nó chèn nằm cuối <head>
       // và luôn trỏ manifest chung, nên Chrome cài ra app "ĐỖ ĐẠI HỌC" chung dù
       // em đang ở app học sinh — mã JS đổi thẻ sau đó là đã muộn. Ba file

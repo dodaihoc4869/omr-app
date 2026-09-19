@@ -34,8 +34,9 @@
                 ? 'gv'
                 : localStorage.getItem('ddh.vaiDaDung') || ''
           var logoVai = vai === 'hs' ? 'hs' : vai === 'ph' ? 'ph' : 'gv'
-          document.write('<link rel="icon" type="image/png" href="/logo-' + logoVai + '-64-v2.png">')
-          document.write('<link rel="apple-touch-icon" href="/logo-' + logoVai + '-180-v2.png">')
+          document.write('<link rel="icon" type="image/svg+xml" sizes="any" href="/logo-' + logoVai + '-nho-v3.svg">')
+          document.write('<link rel="icon" type="image/png" sizes="64x64" href="/logo-' + logoVai + '-64-v3.png">')
+          document.write('<link rel="apple-touch-icon" href="/logo-' + logoVai + '-180-v3.png">')
           var ten = vai === 'hs' ? 'manifest-hs.json' : vai === 'ph' ? 'manifest-ph.json' : 'manifest.json'
           var ten2 = vai === 'hs' ? 'ĐĐH Học Sinh' : vai === 'ph' ? 'ĐĐH Phụ Huynh' : 'ĐỖ ĐẠI HỌC'
           document.write('<link rel="manifest" href="/' + ten + '">')
