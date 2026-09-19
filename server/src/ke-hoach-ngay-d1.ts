@@ -36,6 +36,17 @@ async function tat<T>(f: () => Promise<T>, dpr: T): Promise<T> {
   }
 }
 
+/** `mom_bai.qid_json` → mảng qid; NULL/hỏng → undefined (bài cũ: không chống trùng, không lỗi). */
+function docQid(v: unknown): string[] | undefined {
+  if (typeof v !== 'string' || !v) return undefined
+  try {
+    const a = JSON.parse(v) as unknown
+    return Array.isArray(a) ? a.filter((x): x is string => typeof x === 'string' && x !== '') : undefined
+  } catch {
+    return undefined
+  }
+}
+
 /** Ngày nghỉ thầy đặt: `cau_hinh.ngay_nghi` = mảng JSON hoặc chuỗi cách nhau bởi dấu phẩy/xuống dòng. */
 export async function docNgayNghi(env: Env): Promise<Set<string>> {
   const r = await tat(() => env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'ngay_nghi'").first<{ gia_tri: string }>(), null)
@@ -80,11 +91,15 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
 
   // Mom chưa nộp: đã bắt đầu (còn hạn 120 phút hoặc mới quá hạn ≤ 14 ngày, để liệt kê quá hạn) VÀ chưa bắt đầu (không hạn cứng nhưng vẫn là
   // việc em nợ). Bài hằng ngày `daily_<ngày>` của ngày cũ mà chưa bắt đầu thì bỏ ngay ở SQL — mỗi ngày một bài, không để dồn lại.
-  const rm = await tat(() => env.DB.prepare(
-    `SELECT sbd, id, question_count, created_at, started_at FROM mom_bai
-      WHERE ${IN_EM} AND submitted_at IS NULL AND ((started_at IS NOT NULL AND started_at > ?) OR (started_at IS NULL AND (id NOT LIKE 'daily_%' OR id = ?)))`,
-  ).bind(arr, cat14, `daily_${ngayHocMom(now)}`).all<Record<string, unknown>>(), trong())
-  for (const x of rm.results ?? []) cua(x)?.mom.push({ id: String(x.id), soCau: Number(x.question_count) || 0, taoLuc: String(x.created_at ?? ''), batDauLuc: x.started_at ? String(x.started_at) : null })
+  // `qid_json` (mã câu của bài) có từ migration-1909-mom-qid.sql; chưa có cột thì đọc như cũ, không chống trùng được.
+  const qm = (cot: string) => `SELECT sbd, id, question_count, created_at, started_at, ${cot} AS qid_json FROM mom_bai
+      WHERE ${IN_EM} AND submitted_at IS NULL AND ((started_at IS NOT NULL AND started_at > ?) OR (started_at IS NULL AND (id NOT LIKE 'daily_%' OR id = ?)))`
+  const tamMom = [arr, cat14, `daily_${ngayHocMom(now)}`] as const
+  let rm = await tat(() => env.DB.prepare(qm('qid_json')).bind(...tamMom).all<Record<string, unknown>>(), null)
+  if (!rm) rm = await tat(() => env.DB.prepare(qm('NULL')).bind(...tamMom).all<Record<string, unknown>>(), trong())
+  for (const x of rm.results ?? []) {
+    cua(x)?.mom.push({ id: String(x.id), soCau: Number(x.question_count) || 0, taoLuc: String(x.created_at ?? ''), batDauLuc: x.started_at ? String(x.started_at) : null, qid: docQid(x.qid_json) })
+  }
 
   // Hồ sơ: câu tới hạn ôn (chỉ câu TỪNG SAI; chua_thay_sai không vào hàng ôn), dạng, và số câu sai chưa khắc phục.
   const rc = await tat(() => env.DB.prepare(

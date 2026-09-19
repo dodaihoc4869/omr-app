@@ -4,7 +4,7 @@ import { describe, it, expect, vi } from 'vitest'
 import worker from '../server/src/index'
 import { newsDay, parentNews } from '../server/src/parent-news'
 import { ghiSuKien, type SuKien } from '../server/src/su-kien-hoc'
-import { taoD1That, type D1That } from './_d1-that'
+import { goiWorker, taoD1That, type D1That } from './_d1-that'
 
 const H = 3_600_000
 const iso = (gio: number) => new Date(Date.now() + gio * H).toISOString()
@@ -152,6 +152,26 @@ describe('Kênh 5 trên D1 thật: chọn câu cho bài hằng ngày', () => {
     expect(a.ok && !a.alreadySent).toBe(true)
     expect(b).toMatchObject({ ok: true, alreadySent: true, id: a.id })
     expect(d.dem('mom_bai', "id LIKE 'daily_%'")).toBe(1)
+  })
+
+  it('sau khi phụ huynh giao bài hằng ngày, bảng của em KHÔNG hiện lại các câu đó ở việc "ôn lại" (một câu hai nơi)', async () => {
+    const d = await dungEmCoHoSo()
+    const onLai = async () => {
+      const r = await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd: 'S1' })
+      return { r, qid: ((r.viec as { loai: string; chiTiet: { qid?: string[] } }[]).find((v) => v.loai === 'on_lai')?.chiTiet.qid ?? []) as string[] }
+    }
+    const truoc = await onLai()
+    expect(truoc.qid.length).toBeGreaterThan(0)
+    const a = (await parentNews(d.env, 'assign', { sbd: 'S1' })) as Record<string, any>
+    const trongBai = (await docBaiMom(d, 'S1', a.id)).map((c) => c.qid)
+    const sau = await onLai()
+    for (const q of sau.qid) expect(trongBai).not.toContain(q)
+    // Bài vừa giao hiện ở viec[] như việc bắt buộc; tổng việc không vượt mục tiêu ngày.
+    expect((sau.r.viec as { id: string }[]).map((v) => v.id)).toContain(`mom:${a.id}`)
+    expect(sau.r.tai.cung + sau.r.tai.bu + sau.r.tai.tuyChon).toBeLessThanOrEqual(sau.r.nganSach.mucTieuCau + sau.r.tai.vuot)
+    // Nộp xong: các câu tới hạn quay lại theo mốc ôn bình thường.
+    d.sql.prepare("UPDATE mom_bai SET started_at = ?, submitted_at = ? WHERE sbd = 'S1'").run(new Date().toISOString(), new Date().toISOString())
+    expect((await onLai()).qid).toEqual(truoc.qid)
   })
 
   it('câu vừa làm trong 3 ngày qua KHÔNG được giao lại làm câu mới, nhưng câu tới hạn vẫn ôn', async () => {

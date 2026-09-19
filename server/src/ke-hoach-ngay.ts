@@ -55,6 +55,8 @@ export interface MomDauVao {
   taoLuc: string
   /** null = chưa bắt đầu. Hạn cứng chỉ có sau khi bắt đầu (120 phút). */
   batDauLuc: string | null
+  /** Mã câu thật của bài (`mom_bai.qid_json`); thiếu (bài cũ) thì không chống trùng được. */
+  qid?: string[]
 }
 
 export interface CauToiHan {
@@ -276,6 +278,9 @@ export function lapKeHoachNgay(d: DauVaoKeHoach): KeHoachNgay {
 
   // 3. Lô đang chờ của từng bài BTVN (tải khác = phần câu/ngày của CÁC bài kia).
   const cung: Viec[] = []
+  // Câu đã nằm trong một bài Mom/daily_ CHƯA NỘP còn hiệu lực của hôm nay: việc "ôn lại" không giao lại (một câu hai nơi).
+  // Bài đã nộp không có trong `d.mom`; bài hết hạn (đã bắt đầu quá 120 phút) chỉ ở `quaHan`, nên câu của chúng quay lại theo mốc ôn.
+  const daGiaoTrongMom = new Set<string>([...momCung, ...momChuaBd].flatMap((m) => m.qid ?? []))
   const sapToi: KeHoachNgay['sapToi'] = []
   const chiTietBai: Record<string, { taiKhac: number; taiMoiNgay: number; conLai: number; soLo: number }> = {}
   for (const b of btvnCon) {
@@ -350,7 +355,7 @@ export function lapKeHoachNgay(d: DauVaoKeHoach): KeHoachNgay {
   if (vuot > 0) {
     canhBao.push({ loai: 'qua_tai', vuot, noiDung: `Việc bắt buộc hôm nay ${taiCung} câu, vượt mục tiêu ${B} câu (+${vuot}). Việc bắt buộc giữ nguyên, việc tự chọn tạm ẩn.` })
   } else {
-    mem.push(...dungViecMem(d, B, taiCung, seed, conCan))
+    mem.push(...dungViecMem(d, B, taiCung, seed, conCan, daGiaoTrongMom))
   }
   const bu: Viec[] = []
   const tuyChon: Viec[] = []
@@ -435,7 +440,7 @@ function viecCung(o: {
 }
 
 /** Danh sách việc MỀM theo thứ tự ưu tiên: ôn tới hạn → thần thú → ôn thi. */
-function dungViecMem(d: DauVaoKeHoach, B: number, taiCung: number, seed: number, conCan: number): Viec[] {
+function dungViecMem(d: DauVaoKeHoach, B: number, taiCung: number, seed: number, conCan: number, daGiaoTrongMom: ReadonlySet<string>): Viec[] {
   const ra: Viec[] = []
   const mem = (o: Pick<Viec, 'id' | 'loai' | 'soCau' | 'nguon' | 'ghiChu' | 'chiTiet'>): Viec => ({
     ...o, thuTu: 0, hanCung: null, hanMem: null, batBuoc: false, khan: false, cong: null, hien: true, nhan: null, trangThai: 'cho',
@@ -454,7 +459,7 @@ function dungViecMem(d: DauVaoKeHoach, B: number, taiCung: number, seed: number,
   const thanThuKhongVua = !dangThan || B - taiCung - tran40 < BOI_THAN_THU
   const gioiHan = Math.max(0, Math.min(thanThuKhongVua ? Math.max(tran40, conCan) : tran40, B - taiCung))
   const toiHan = d.cauToiHan
-    .filter((c) => c.mocOnKe <= d.homNay)
+    .filter((c) => c.mocOnKe <= d.homNay && !daGiaoTrongMom.has(c.qid))
     .map((c) => ({ c, h: hashSeed(`${seed}|${c.qid}`) }))
     .sort((a, b) => a.c.mocOnKe.localeCompare(b.c.mocOnKe) || b.c.lanSai - a.c.lanSai || a.h - b.h || a.c.qid.localeCompare(b.c.qid))
     .slice(0, gioiHan)

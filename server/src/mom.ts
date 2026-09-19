@@ -10,6 +10,12 @@ export function gradeMom(q:Question[], answers:Record<string,string>) {
   const soCauDung=q.filter((c,i)=>norm(answers[String(c.id||`cau_${i+1}`)])===norm(c.dapAn||c.dapAnDung||'A')).length
   return {soCauDung,diem:Math.round(soCauDung/Math.max(1,q.length)*1000)/100}
 }
+/** Mã câu THẬT của một bài: `id`/`qid` không rỗng, bỏ `cau_N` (app tự đánh số, không định danh câu nào), khử trùng, giữ thứ tự. */
+export function qidCuaBai(q:Question[]):string[]{
+  const ra:string[]=[]
+  for(const c of q){const v=c?.id??c?.qid;const qid=typeof v==='string'?v.trim():'';if(qid&&!/^cau_\d+$/.test(qid)&&!ra.includes(qid))ra.push(qid)}
+  return ra
+}
 function item(r:Row){return {id:r.id,sbd:r.sbd,tieuDe:r.title,taoLuc:r.created_at,ngayGiao:r.created_at,soCau:r.question_count,thoiGianPhut:120,batDauLuc:r.started_at,nopLuc:r.submitted_at,trangThai:r.submitted_at?'da_nop':r.started_at?'dang_lam':'chua_lam',...(r.result?JSON.parse(r.result):{})}}
 async function questions(env:Env,r:Row):Promise<Question[]>{const o=await env.DE.get(r.bank_key);if(!o)throw new Error('Chưa tải được nội dung bài. Vui lòng thử lại.');return await new Response(o.body).json() as Question[]}
 export async function mom(env:Env,action:string,b:Record<string,unknown>):Promise<Record<string,unknown>> {
@@ -32,7 +38,11 @@ export async function mom(env:Env,action:string,b:Record<string,unknown>):Promis
     const key=`mom/${encodeURIComponent(sbd)}/${id}/${crypto.randomUUID()}.json`
     await env.DE.put(key,json)
     const created=typeof b.taoLuc==='string'&&Number.isFinite(Date.parse(b.taoLuc))?new Date(b.taoLuc).toISOString():new Date().toISOString()
-    await env.DB.prepare('INSERT OR IGNORE INTO mom_bai(sbd,id,title,created_at,question_count,bank_key) VALUES(?,?,?,?,?,?)').bind(sbd,id,String(b.tieuDe||'Bài của Mom giao').slice(0,300),created,q.length,key).run()
+    // `qid_json`: các mã câu THẬT của bài — kế hoạch ngày dùng để không giao lại chúng ở việc "ôn lại". Chưa chạy migration thì ghi như cũ.
+    const tieuDe=String(b.tieuDe||'Bài của Mom giao').slice(0,300)
+    try{await env.DB.prepare('INSERT OR IGNORE INTO mom_bai(sbd,id,title,created_at,question_count,bank_key,qid_json) VALUES(?,?,?,?,?,?,?)').bind(sbd,id,tieuDe,created,q.length,key,JSON.stringify(qidCuaBai(q))).run()}
+    catch(e){if(!/no such column|has no column/i.test(e instanceof Error?e.message:String(e)))throw e
+      await env.DB.prepare('INSERT OR IGNORE INTO mom_bai(sbd,id,title,created_at,question_count,bank_key) VALUES(?,?,?,?,?,?)').bind(sbd,id,tieuDe,created,q.length,key).run()}
     r=await env.DB.prepare('SELECT * FROM mom_bai WHERE sbd=? AND id=?').bind(sbd,id).first<Row>()
     if(!r)throw new Error('Chưa lưu được bài. Vui lòng thử lại.')
     return {ok:true,item:item(r)}
