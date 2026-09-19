@@ -13,6 +13,7 @@ import { mergeAndStrip, mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSou
 import { CAU_HINH_DE_RIENG_MAC_DINH, SO_CA_BOC_NGAU_NHIEN, type CauHinhDeRieng } from './cau-hinh-de-rieng'
 import { demLanSai, dungDeRieng, type CaTruocDaCham, type EmThieuLap } from './de-rieng'
 import { dungUngVien } from './rut-de'
+import { chuanChuyenDe } from './goi-len-bang'
 import { hashSeed } from './exam-shuffle'
 
 export interface CaBoQua {
@@ -341,6 +342,34 @@ export interface KetQuaDungDeRieng {
   trungBinh: number
 }
 
+/** LỌC KHO TOÀN BỘ VỀ ĐÚNG CHUYÊN ĐỀ CỦA CA (vá 19/09 — sự cố "chọn chương 1
+ * ra cả chương 2").
+ *
+ * BÙ KHO cho phần CÂU MỚI (khi kho ca không đủ số câu mỗi phần) trước đây lấy
+ * bừa từ `khoToanBo` — TOÀN BỘ kho câu trên máy thầy, không lọc chuyên đề.
+ * Ca thầy chọn "Chương 1 – Ester" mà kho Chương 1 không đủ câu (đề bài mới,
+ * ít câu, hoặc đã loại bớt câu sao) thì phần thiếu bị lấp bằng câu CHƯƠNG
+ * KHÁC — im lặng, đề ra không còn đúng chuyên đề thầy chọn nữa.
+ *
+ * KHÁC với "câu khắc phục" (30% câu em từng sai): đó là thầy chủ động chốt
+ * 08/09 "bất kể chuyên đề gì", còn BÙ KHO là chuyện phát sinh ngoài ý định —
+ * không có lý do gì bù bằng câu khác chuyên đề. Chuyên đề ca lấy từ CHÍNH kho
+ * gốc của ca (`bankGoc`, trước khi nối câu khắc phục) — đó là câu thầy đã rút
+ * lúc mở ca, đúng những chuyên đề thầy chọn. Kho gốc không câu nào gắn chuyên
+ * đề (dữ liệu cũ, hoặc thầy không lọc chuyên đề lúc rút) thì trả nguyên
+ * `khoToanBo` — không có gì để lọc theo, thà bù đủ câu còn hơn ca thiếu câu. */
+export function locKhoToanBoTheoChuyenDeCa(khoToanBo: TeacherExamSource[], bankGoc: TeacherExamSource[]): TeacherExamSource[] {
+  const chuyenDeCa = new Set(
+    bankGoc
+      .flatMap((s) => [...s.phanI, ...s.phanII, ...s.phanIII])
+      .map((q) => chuanChuyenDe((q as { chuyenDe?: string }).chuyenDe ?? ''))
+      .filter(Boolean),
+  )
+  if (chuyenDeCa.size === 0) return khoToanBo
+  const hop = (q: { chuyenDe?: string }) => chuyenDeCa.has(chuanChuyenDe(q.chuyenDe ?? ''))
+  return khoToanBo.map((s) => ({ ...s, phanI: s.phanI.filter(hop), phanII: s.phanII.filter(hop), phanIII: s.phanIII.filter(hop) }))
+}
+
 export async function dungDeRiengChoCa(
   url: string,
   mat: string,
@@ -438,7 +467,11 @@ export async function dungDeRiengChoCa(
   const thieuII = Math.max(0, sc.II - soMoiCoII)
   const thieuIII = Math.max(0, sc.III - soMoiCoIII)
   if (thieuI > 0 || thieuII > 0 || thieuIII > 0) {
-    const khoToanBo = await loadExamSources().catch(() => [] as TeacherExamSource[])
+    const khoToanBoGoc = await loadExamSources().catch(() => [] as TeacherExamSource[])
+    // Lọc về đúng chuyên đề ca (vá 19/09) TRƯỚC khi bù — xem
+    // `locKhoToanBoTheoChuyenDeCa`. `bank` ở đây là kho GỐC của ca (trước khi
+    // nối câu khắc phục), đúng những chuyên đề thầy đã chọn lúc mở ca.
+    const khoToanBo = locKhoToanBoTheoChuyenDeCa(khoToanBoGoc, bank)
     const daCo = new Set([...bankDung.flatMap((s) => [...s.phanI, ...s.phanII, ...s.phanIII].map((q) => q.id))])
     const bu: TeacherExamSource = {
       maDe: `${maCa}-bu-kho`,
