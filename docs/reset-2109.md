@@ -25,6 +25,8 @@ Trạng thái khoá: `dang_chay` (nhịp tim cũ quá 3 phút = chết, lượt 
 
 Danh sách XOÁ (48 bảng) và GIỮ (14 bảng): xem `BANG_XOA`/`BANG_GIU` trong mã.
 
+Lưu ý cờ của các tính năng thử nằm trong `cau_hinh` (bảng GIỮ) nên SỐNG QUA reset: `cau_hinh.doan_ho_tong` = `{"dsSbd":["12121212"],"toanBo":false}` (cờ mở game Đoàn Hộ Tống riêng tài khoản thầy) giữ nguyên để 12121212 vẫn thử được sau thứ Hai; job chỉ ghi lại đúng `exp_moi`, `reset_20260921*` và `game_v2_settings.season`.
+
 ## 2. Đóng băng, huỷ, chạy thử
 
 - Đóng băng ghi từ 00:00 tới khi job `xong` HOẶC 01:00 giờ VN (không mở băng giữa chừng lúc 00:20 khi job có thể còn xoá dở; mở NGAY khi xong hoặc `qua_gio`), CHỈ khi có cờ cho phép và không huỷ: mọi lệnh (trừ `/khoe` và chuyển hướng) trả `{ok:false, error:"Hệ thống đang làm mới, thử lại sau 1 phút", dangLamMoi:true}` (HTTP 200).
