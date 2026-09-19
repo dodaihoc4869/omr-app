@@ -96,6 +96,8 @@ describe('hoSoLopLenBang trả namKt theo hợp đồng', () => {
     const cu = await goi(d, { dsSbd: ['S1', 'S2'] })
     const moi = await goi(d, { dsSbd: ['S1', 'S2'], dsQid: ['Q-ES-01', 'Q-ES-02', 'Q-ES-03'] })
     for (const s of ['S1', 'S2']) delete moi.em[s].namKt
+    // `serverNow` do route thêm mỗi lần gọi (giờ máy chủ, đổi theo mili giây) — không phải dữ liệu hồ sơ: bỏ khi so.
+    delete moi.serverNow; delete cu.serverNow
     expect(JSON.stringify(moi)).toBe(JSON.stringify(cu))
   })
 
