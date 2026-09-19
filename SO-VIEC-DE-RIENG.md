@@ -3,6 +3,43 @@
 Phiên: worktree `busy-austin-a4ab8b` · nhánh `claude/busy-austin-a4ab8b` · mở 19/09/2026.
 Điều phối: phiên **0.Planer** (thầy đã uỷ quyền — không hỏi thầy). KHÔNG phát hành, KHÔNG push, KHÔNG merge, KHÔNG đụng `server/**`.
 
+# LƯỢT 2 (19/09 chiều) — EM VÀO MUỘN: dựng đề sẵn ở "lượt hai"
+
+Giao bởi 0.Planer sau khi gộp lượt 1 vào main (`5e99e08`, `hoSoOnCa` sống trên Worker `c130d7cc`, `cat-google-1209` đã XANH). Nhánh đã fast-forward lên `30b2fb7` (nhánh là tổ tiên của main — không rebase, không viết lại lịch sử).
+
+Nguyên văn yêu cầu (tách vế):
+
+- [x] 1. Em CÓ MẶT ở phòng chờ: bộ đề KHÔNG đổi một qid so với `5e99e08` — khoá bằng test dấu vân tay | bằng chứng: 12 lớp `lopGiaCoHoSo` (đường có hồ sơ) lấy vân tay bằng mã `30b2fb7` TRƯỚC khi viết lượt hai → `tests/de-rieng-luot-hai-1909.test.ts` mục 1 khớp 12/12; 30 lớp đường không hồ sơ vẫn khớp (`de-rieng-ho-so-1909` mục 6); ở tầng dữ liệu: `boTheoEm`/`lapTheoEm` của 25 em có mặt `toEqual` lời gọi không có lớp
+- [x] 2a. Em cùng lớp CHƯA vào phòng chờ vẫn được dựng đề riêng (pha A theo hồ sơ + pha B), tính Ở LƯỢT HAI sau khi chốt mọi em có mặt | bằng chứng: `dungDeRiengLuotHai` (`de-rieng.ts`) chỉ ĐỌC kết quả lượt một; mục 2 (5 test): đủ 28 câu đúng 18-4-6, sai 7 ⇒ 3 câu hỏi lại của CHÍNH em, hồ sơ được tôn trọng
+- [x] 2b. Không chiếm suất chia vòng tròn, không làm tăng đỉnh trùng của em có mặt | bằng chứng: lượt một không nhận em vắng (test "em vắng KHÔNG nằm trong bất kỳ con số nào của lượt một"); mục 3: đỉnh trùng em có mặt y nguyên, cả lớp ≤ max(đỉnh có mặt, 2) trên kho 300; kho dư → em vắng chỉ nhận câu chưa ai dùng, đỉnh 0
+- [x] 2c. Không vào các con số "thiếu câu hỏi lại" của biên bản; biên bản thêm đúng một dòng "N em chưa vào phòng chờ đã được chuẩn bị đề sẵn" | bằng chứng: test so 10 trường (`canCua, soLapCua, saiCaTruocCua, tuCaCua, thieu, trungBinh, cauNoiThem, noiCam, daKhacPhucTheoEm, hoSoOn`) `toEqual` lời gọi không lớp; `ghiChu` lọc "chưa vào phòng chờ" ra ĐÚNG một dòng `{loai:'tin'}`
+- [x] 2d. Lượt hai nhận bộ đếm tần suất của lượt một để chọn câu ít dùng nhất | bằng chứng: `nguoiGiu` dựng từ `luotMot.boTheoEm`; test kho mỏng 60 câu: tần suất cả lớp sau lượt hai lệch ≤ 2
+- [x] 3a. Không tăng quá 1 lượt `hoSoOnCa` cho phần em vắng (chia lô 20) | bằng chứng: test đếm lô = [5, 15, 20], lô 15 đúng bằng danh sách em vắng, em lớp khác không lọt; cả lớp có mặt ⇒ không lượt thừa
+- [x] 3b. Lượt đó hỏng ⇒ em vắng rút theo luật cũ, KHÔNG kéo em có mặt theo | bằng chứng: test (d) + test chiều ngược lại
+- [x] 4. Lớp 40 em (25 có mặt) không chậm hơn bản hiện tại quá 1,5 lần — đo và ghi số | bằng chứng: **88,8 ms → 94,9 ms = 1,07 lần** (kho 300/40/60, đề 18-4-6, lần nhanh nhất trong 3; test in dòng `THỜI GIAN …`). Mạng: danh sách lớp và hồ sơ em vắng đi SONG SONG với lượt của em có mặt ⇒ không thêm độ trễ nối tiếp; chỉ `noiKhoCa` của em vắng (khi có câu ngoài kho) là một lượt nối tiếp thêm
+- [x] 5a. Tất định, không Math.random/Date.now trong lõi | bằng chứng: test soi thân hàm `dungDeRiengLuotHai` + test chạy hai lần cùng JSON
+- [x] 5b. Test mới tái hiện (a)(b)(c)(d) | bằng chứng: `npx vitest run tests/de-rieng-luot-hai-1909.test.ts` → **25 passed**
+- [x] 5c. Mọi test bất biến giữ nguyên số nền từng tệp; toàn vitest so tên với nền 97/42 | bằng chứng: lượt cuối (HEAD `95062f7`) → **5445 test · 5347 passed · 97 failed · 42 tệp đỏ / 390 tệp** — so TÊN: không test đỏ nào ngoài nền, không test nền nào đổi trạng thái (đúng 97/42). Từng tệp bất biến: de-rieng 18/0 · de-rieng-tran-trung 22/0 · de-rieng-blueprint 25/0 · kho-mong 7/0 · rut-du-so-cau 7/0 · noi-chan 14/0 · rut-de 40/0 · cho-thi-lai 18/0 · de-rieng-luc-bat-dau 13/1 (đỏ sẵn) · danh-dau-cau-hoi-lai 56/1 (đỏ sẵn) · cat-google 14/0 · de-rieng-ho-so-1909 46/0 · de-rieng-luot-hai-1909 25/0.
+  - **Khai thật:** lượt chạy toàn bộ NGAY TRƯỚC đó (15:56, load average 49 — nhiều phiên cùng chạy) ra 98/43: đỏ thêm đúng MỘT test `tests/xep-buoi-chua-1409.test.ts` › "QUÉT DIỆN RỘNG — sàn 20 em…" — quá hạn chờ mặc định 5 s (6,85 s). Tệp đó KHÔNG nhập tệp nào tôi sửa (`xep-buoi-chua`, `ho-so-lop`, `len-bang-cau-hinh`, `phan-cong`); chạy riêng 25/25 trong 1,4 s; lượt chạy lại (load ~25) xanh. Cùng loại bệnh với hai test đo giờ của `de-rieng-tran-trung` (đã chữa ở `2c02c87`) — là test của làn giáo viên, tôi không đụng, đã báo 0.Planer.
+- [x] (0.Planer chốt B) `ghiChu?: {loai:'tin'|'canh_bao'; loi}[]` vào `BienBanDeRieng` + khối in màu; chuyển 3 dòng cũ từ `boQua` sang `ghiChu`; cảnh báo (kho mỏng, hồ sơ không đọc được) in cam, tin tốt in thường | bằng chứng: commit `adc5720`; mục 6 test mới; 3 phép kiểm của `de-rieng-ho-so-1909` đổi `boQua` → `ghiChu` (đổi theo chốt của 0.Planer, không phải hạ ngưỡng)
+- [x] (0.Planer bổ sung) `ca.lop` rỗng ⇒ biên bản ghi tin "ca không ghi lớp — em vào muộn rút theo luật thường" | bằng chứng: test "em vắng KHÔNG vào con số nào…" soi đúng dòng đó
+- [x] (0.Planer bổ sung) lượt `noiKhoCa` riêng của em vắng hỏng ⇒ em đó bỏ câu ngoài kho, KHÔNG hỏng Bắt đầu; có test | bằng chứng: test "lượt noiKhoCa của em vắng HỎNG…"
+- [x] (0.Planer chốt A) làm bền hai test đo giờ của `de-rieng-tran-trung.test.ts`, KHÔNG hạ ngưỡng | bằng chứng: commit `2c02c87` — "dưới 500 ms" giữ 500 ms, lấy lần nhanh nhất trong 3; "60 cấu hình" hạn chờ tường minh 60 s; không đổi phép so/dữ liệu/tên test; tệp 22/22
+- [ ] Báo cáo cuối cho 0.Planer | bằng chứng: (chưa gửi)
+
+Chỗ tự quyết ở lượt 2 (đã báo 0.Planer, được đồng ý):
+1. "Em cùng lớp" = em trong `danhSachEm` có `lop` TRÙNG `ca.lop`, chỉ khi `ca.lop` khác rỗng. Không đụng luật vào thi: em vắng chỉ có thêm một dòng trong bản đồ.
+2. Câu em vắng từng sai nối bằng `noiKhoCa` RIÊNG sau lượt một; kho phần câu MỚI của em vắng = đúng kho lượt một (câu nối cho em vắng không lọt vào đề em có mặt — có test). Chỉ lấy câu của ca NGUỒN của em đó (1 ca, hoặc 3 ca ở `ba_ca`), không quét cả thư mục — em có thể không bao giờ tới.
+3. Pha B của em vắng là THAM LAM, không đổi chỗ (`haDinh`) với ai: đổi chỗ là sửa đề em có mặt. Thước đo trùng theo TỪNG PHẦN, cùng thước với lượt một.
+4. Bản đồ gửi máy chủ (`boTheoEm`, `lapTheoEm`, `lapCua`, `cauGoc/songSinhTheoEm`) CÓ em vắng — không có thì em vào muộn không nhận được đề sẵn. Toast "đã sinh N câu song sinh" vì thế đếm cả em vắng.
+5. Em vào muộn mà KHÔNG cùng lớp (hoặc ca không ghi lớp) vẫn bốc theo hash như cũ — ngoài phạm vi việc này.
+
+---
+
+# LƯỢT 1 (19/09 trưa) — đọc hồ sơ nắm kiến thức · ĐÃ GỘP vào main `5e99e08`
+
+> Cập nhật sau gộp: lệnh `hoSoOnCa` đã sống trên Worker `c130d7cc` nên `cat-google-1209` đã XANH — mục 1 dưới đây là chuyện lúc chưa gộp, giữ lại làm lịch sử.
+
 ## ĐỌC TRƯỚC — hai điều người gộp nhánh phải biết
 
 1. **+1 test đỏ CÓ CHỦ Ý** (0.Planer chốt phương án A, 19/09): `tests/cat-google-1209.test.ts` › "MỌI lệnh app còn gửi đều có mặt trong bảng dịch
