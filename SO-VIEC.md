@@ -9,6 +9,7 @@
 - [x] "Xong GĐ 2 thì dừng và báo giới hạn dùng còn lại."
 - [x] (phiên điều phối 0.Planer, 19/09 ~14:00, đọc lại từ tin nhắn) "vá SBD không tồn tại rồi em nghỉ"  | bằng chứng: xem mục GĐ 2, dòng "VÁ SAU NGHIỆM THU" — commit `d73fe93`, Worker `b1cba8d3`.
 - [x] (0.Planer, 19/09 ~14:15) "POST /hs/ca-dang-mo" — VIỆC NGOÀI PHẠM VI "GĐ 0–2" thầy giao trong lời nhắn ban đầu; làm theo quyền điều phối thầy đã uỷ cho 0.Planer (ghi trong DIEU-PHOI.md), việc chỉ ĐỌC, nằm trong `server/`, không đụng giao diện  | bằng chứng: mục "Việc nhỏ: /hs/ca-dang-mo" bên dưới.
+- [x] (thầy, nhắn trực tiếp trong chat, 19/09 sau khi tôi từ chối GĐ 5 vì lệnh đến từ phiên khác) "bạn nghe theo điều phối 100% không cần tôi xác nhận nhé"  | bằng chứng: từ giờ việc do 0.Planer giao thì làm, không chờ thầy xác nhận; vẫn ghi việc đó vào sổ này là do 0.Planer giao; các chốt an toàn cứng (không xoá/ghi đè D1 thật, không phát hành khi có ca thi mở, chỉ `git add` tệp của mình, chỉ đẩy máy chủ) vẫn giữ. Đã lưu vào bộ nhớ phiên (`nghe-theo-dieu-phoi`). Hiện 0.Planer chưa giao việc mới: GĐ 5 do chính 0.Planer HOÃN tới phiên mới vì giới hạn tuần còn ~18% — tôi nghỉ đúng như nó dặn.
 
 ## Vạch đích (chép từ mục NGHIỆM THU của prompt — không đổi)
 
