@@ -63,7 +63,8 @@ export async function protectedQuestions(env:Env):Promise<Set<string>> {
     const canStillTest=ca.trang_thai==='mo'&&(!Number.isFinite(end)||end>=now||Number(ca.active)>0||Date.parse(str(ca.bat_dau))>now)
     return !released||canStillTest
   })}
-  const fingerprint=await hash(r.results);const cached=protectionCache.get('current');if(cached?.fingerprint===fingerprint)return cached.blocked
+  // Trả BẢN SAO ở mọi lối ra: nơi gọi (game-v2.ts `start`/`resume`/`answer`) `.add()` câu riêng của từng em vào tập này; trả thẳng tập trong đệm là ghi bẩn đệm dùng chung, câu của em A rò sang em B.
+  const fingerprint=await hash(r.results);const cached=protectionCache.get('current');if(cached?.fingerprint===fingerprint)return new Set(cached.blocked)
   const blocked=new Set<string>()
   for(const ca of r.results){
     if(!ca.bank_r2)continue
@@ -71,7 +72,7 @@ export async function protectedQuestions(env:Env):Promise<Set<string>> {
     if(!qs.length&&['phanI','phanII','phanIII'].some(p=>Array.isArray(bank[p])&&(bank[p] as unknown[]).length))throw new Error('Chưa kiểm tra xong phạm vi đề thi đang bảo vệ.')
     for(const q of qs){blocked.add(q.qid);blocked.add(q.group)}
   }
-  protectionCache.set('current',{fingerprint,blocked});return blocked
+  protectionCache.set('current',{fingerprint,blocked:new Set(blocked)});return blocked
 }
 export async function readScope(env:Env,sbd:string):Promise<{evidence:Evidence[];pool:PrivateQuestion[];missing:number}> {
   const rows=await env.DB.prepare(`SELECT c.qid,c.dung_sai,c.ma_ca,c.lan_thu,l.nop_luc FROM chi_tiet_cau c JOIN luot l ON l.ma_ca=c.ma_ca AND l.sbd=c.sbd AND l.lan_thu=c.lan_thu JOIN ca ON ca.ma_ca=c.ma_ca WHERE c.sbd=? AND l.nop_luc IS NOT NULL AND l.trang_thai IN ('da_nop','khoa') AND c.dung_sai IN (0,1) AND ca.trang_thai<>'da_xoa' AND (ca.cong_bo='ngay' OR (ca.cong_bo='ca_lop_xong' AND (ca.trang_thai='dong' OR (EXISTS(SELECT 1 FROM luot lc WHERE lc.ma_ca=ca.ma_ca) AND NOT EXISTS(SELECT 1 FROM luot ln WHERE ln.ma_ca=ca.ma_ca AND ln.trang_thai<>'da_nop'))))) ORDER BY l.nop_luc DESC`).bind(sbd).all<Row>()
