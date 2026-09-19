@@ -31,6 +31,7 @@ import { loadScriptUrl } from '../lib/exam-db'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
 import { guiTinNhan } from '../lib/tro-ly/he-thong-chat'
+import '../components/m3'
 
 interface BaiThiCuaCon {
   maCa: string
@@ -529,6 +530,7 @@ export default function ParentPortalScreen() {
   // GIAO DIỆN 1: CHƯA ĐĂNG NHẬP (NHẬP DUY NHẤT SBD CỦA CON)
   if (!sbdHienTai) {
     return (
+      <div className="m3">
       <div className="min-h-screen flex flex-col justify-between bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
         <header className="px-4 pb-3 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900" style={{ paddingTop: 'env(safe-area-inset-top, 10px)' }}>
           <LogoApp vai="phuhuynh" size={38} hienChu={true} phuDe="PHỤ HUYNH" />
@@ -593,7 +595,7 @@ export default function ParentPortalScreen() {
               <button
                 type="submit"
                 disabled={!sbdInput.trim() || dangTai}
-                className="w-full py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md transition-all active:scale-[0.98] disabled:opacity-40 cursor-pointer flex items-center justify-center gap-2"
+                className="m3-nut-chinh w-full cursor-pointer"
               >
                 {dangTai ? (
                   <>
@@ -614,11 +616,13 @@ export default function ParentPortalScreen() {
 
         {hienHuongDan && <InfographicHuongDan onClose={() => setHienHuongDan(false)} vaiMacDinh="phuhuynh" />}
       </div>
+      </div>
     )
   }
 
   // GIAO DIỆN 2: ĐÃ ĐĂNG NHẬP — MỘT màn "Bảng nhiệm vụ" đọc-chỉ; mọi màn cũ mở dạng sheet toàn màn.
   return (
+    <div className="m3">
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
       {tabPh === null && (
         <BangNhiemVu
@@ -672,7 +676,7 @@ export default function ParentPortalScreen() {
             <button
               type="button"
               onClick={() => setTabPh(null)}
-              className="p-1.5 sm:px-3 sm:py-1.5 rounded-full bg-slate-100 hover:bg-rose-50 hover:text-rose-600 dark:bg-slate-800 dark:hover:bg-rose-950/60 dark:hover:text-rose-300 text-slate-600 dark:text-slate-300 text-xs sm:text-sm font-bold transition flex items-center gap-1 cursor-pointer active:scale-95"
+              className="min-w-[48px] justify-center p-1.5 sm:px-3 sm:py-1.5 rounded-full bg-slate-100 hover:bg-rose-50 hover:text-rose-600 dark:bg-slate-800 dark:hover:bg-rose-950/60 dark:hover:text-rose-300 text-slate-600 dark:text-slate-300 text-xs sm:text-sm font-bold transition flex items-center gap-1 cursor-pointer active:scale-95"
               title="Đóng toàn màn hình"
             >
               <X size={16} />
@@ -870,6 +874,7 @@ export default function ParentPortalScreen() {
           }}
         />
       )}
+    </div>
     </div>
   )
 }

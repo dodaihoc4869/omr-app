@@ -38,6 +38,8 @@ export const TEP = [
   'src/components/PhongChoGame.tsx',
   // C8 — sheet Bảng tin (học sinh + phụ huynh)
   'src/components/BangTinPhuHuynh.tsx',
+  // C9 — cổng phụ huynh: phần ngoài Bảng nhiệm vụ (đăng nhập, khung sheet toàn màn)
+  'src/screens/ParentPortalScreen.tsx',
 ]
 
 // ── họ màu Tailwind → vai trò M3 ────────────────────────────────────────────
