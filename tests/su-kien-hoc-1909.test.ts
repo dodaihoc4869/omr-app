@@ -264,13 +264,14 @@ describe('mỗi điểm ghi ghi ĐÚNG số dòng và idempotent', () => {
     expect(d.dem('su_kien_hoc', "nguon='mom'")).toBe(2)
   })
 
-  it('lên bảng (/len-bang): mỗi lượt gọi một dòng theo id; không qid thì không ghi; tien_do_hs vẫn cộng như cũ', async () => {
+  it('lên bảng (/len-bang): mỗi lượt gọi một dòng theo id; không qid thì không ghi; tien_do_hs KHÔNG còn được cộng (thầy chốt 19/09 câu 11, GĐ 6)', async () => {
     const d = taoD1That()
     await goiWorker(worker, d.env, '/len-bang', { sbd: 'S1', chuyenDe: 'ES', qid: 'DE1-I-1', dat: true }, true)
     await goiWorker(worker, d.env, '/len-bang', { sbd: 'S1', chuyenDe: 'ES', qid: 'DE1-I-1', dat: false }, true) // gọi lần nữa cùng câu: sự kiện MỚI
     await goiWorker(worker, d.env, '/len-bang', { sbd: 'S1', chuyenDe: 'ES', dat: true }, true) // không qid
     expect(hang(d, "nguon='len_bang'").map((x) => [x.qid, x.ket_qua, x.lan])).toEqual([['DE1-I-1', 1, 1], ['DE1-I-1', 0, 2]])
-    expect(d.sql.prepare("SELECT so_cau, so_sai FROM tien_do_hs WHERE khoa='S1|ES'").get()).toMatchObject({ so_cau: 3, so_sai: 1 }) // GĐ 6 mới ngừng cộng
+    // ĐỔI HỢP ĐỒNG (GĐ 6): trước đây kiểm `{ so_cau: 3, so_sai: 1 }` — ghi chú cũ của chính dòng này đã nói 'GĐ 6 mới ngừng cộng'. Nay ngừng thật.
+    expect(d.sql.prepare("SELECT so_cau, so_sai FROM tien_do_hs WHERE khoa='S1|ES'").get()).toBeUndefined()
   })
 
   it('game (answer): ghi đúng/sai với ma_dang; câu có trợ giúp KHÔNG ghi; trả lời lặp không đẻ dòng', async () => {

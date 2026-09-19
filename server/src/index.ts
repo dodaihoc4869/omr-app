@@ -2330,15 +2330,8 @@ async function ghiLenBangMoi(env: Env, b: Record<string, unknown>): Promise<Resp
 
   const cau: D1PreparedStatement[] = [
     env.DB.prepare('INSERT INTO len_bang (sbd, chuyen_de, qid, dat, luc) VALUES (?,?,?,?,?)').bind(sbd, chuyenDe, qid, dat ? 1 : 0, nay),
-    // Cộng thẳng vào bảng tổng: một câu, một lần.
-    env.DB.prepare(
-      `INSERT INTO tien_do_hs (khoa, sbd, chuyen_de, so_cau, so_sai, cap_nhat_luc)
-       VALUES (?,?,?,1,?,?)
-       ON CONFLICT(khoa) DO UPDATE SET
-         so_cau = tien_do_hs.so_cau + 1,
-         so_sai = tien_do_hs.so_sai + ?,
-         cap_nhat_luc = excluded.cap_nhat_luc`,
-    ).bind(`${sbd}|${chuyenDe}`, sbd, chuyenDe, dat ? 0 : 1, nay, dat ? 0 : 1),
+    // KHÔNG còn cộng thẳng vào `tien_do_hs` (thầy chốt 19/09, câu 11): `chamDiem` xoá rồi dựng lại bảng ấy từ `chi_tiet_cau` mỗi lần chấm lại một ca,
+    // nên phần lên bảng đã cộng bị mất. Nguồn sự thật nay là sổ `su_kien_hoc` (ghi ngay dưới, nguon='len_bang'); hồ sơ nắm dựng từ sổ.
   ]
   if (qid) {
     cau.push(

@@ -89,7 +89,9 @@ describe('KHỐI A — luật chấm điểm phải KHỚP Apps Script', () => {
     const lb = WK.slice(WK.indexOf('async function ghiLenBangMoi('), WK.indexOf('async function ghiLenBangMoi(') + 1800)
     expect(lb).not.toContain('INSERT INTO luot')
     expect(lb).not.toContain('UPDATE luot')
-    expect(lb).toContain('INSERT INTO tien_do_hs')
+    // ĐỔI THEO QUYẾT ĐỊNH CỦA THẦY 19/09 (câu 11, GĐ 6): trước đây dòng này khoá `toContain('INSERT INTO tien_do_hs')`. Lên bảng NGỪNG cộng thẳng
+    // vào tien_do_hs (chamDiem xoá rồi dựng lại bảng ấy nên phần cộng bị mất); nguồn sự thật là sổ su_kien_hoc. Số đếm: tests/ho-so-len-bang-may-chu-1909.test.ts.
+    expect(lb).not.toContain('INSERT INTO tien_do_hs')
   })
 })
 

@@ -17,6 +17,7 @@ import { hopLe3DangChuan } from './loc-cau-chuan'
 //   3. Lệnh của HỌC SINH không đòi mã bí mật; lệnh của THẦY thì đòi. Bảng
 //      `LENH_CUA_THAY` dưới đây là nơi duy nhất quyết định điều đó.
 import type { D1PreparedStatement, Env } from './kieu'
+import { docDsQid, docNamKtChoLop, type NamKtCauMayChu } from './ho-so-len-bang'
 
 export const NAY = (): string => new Date().toISOString()
 
@@ -1494,6 +1495,8 @@ export async function hoSoLopLenBang(env: Env, b: Record<string, unknown>): Prom
     qidDaLam: { qid: string; soLan: number }[]
     lenBang: { soLan: number; lanCuoi: string; qids: string[] }
     btvn: HoSoBtvnEm
+    /** GĐ 6: hồ sơ nắm kiến thức theo qid — chỉ khi request có `dsQid` và bảng `nam_kt_*` đọc được (docs/hop-dong-ho-so-len-bang-1909.md). */
+    namKt?: Record<string, NamKtCauMayChu>
   }> = {}
   for (const s2 of ds) {
     em[s2] = {
@@ -1643,6 +1646,9 @@ export async function hoSoLopLenBang(env: Env, b: Record<string, unknown>): Prom
     em[s2].chuyenDe.sort((a, c) => (c.soCau ? c.soSai / c.soCau : 0) - (a.soCau ? a.soSai / a.soCau : 0) || c.soSai - a.soSai)
   }
 
+  // GĐ 6: hồ sơ nắm kiến thức cho các câu của buổi chữa. Không `dsQid` hoặc thiếu bảng → KHÔNG có `namKt` (máy thầy chạy như trước 19/09).
+  const namKt = await docNamKtChoLop(env, ds, docDsQid(b.dsQid))
+  if (namKt) for (const s2 of ds) em[s2]!.namKt = namKt.get(s2) ?? {}
   return { ok: true, soNgay, em }
 }
 
