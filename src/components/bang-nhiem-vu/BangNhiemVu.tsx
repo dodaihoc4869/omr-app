@@ -346,15 +346,18 @@ export default function BangNhiemVu({
 
             {duLieu.trong ? (
               <section className="bnv-trong" aria-label="Hôm nay chưa có việc" data-vung="trong">
-                <h2>{laPh ? (ghiChuNguon ? 'Chưa có bài gia đình giao nào đang chờ' : 'Hôm nay con chưa có việc') : 'Hôm nay chưa có việc — thần thú đang nghỉ'}</h2>
+                <h2>{laPh ? (ghiChuNguon ? 'Chưa có bài gia đình giao nào đang chờ' : 'Hôm nay con chưa có việc') : chuaChonThu ? 'Hôm nay chưa có việc' : 'Hôm nay chưa có việc — thần thú đang nghỉ'}</h2>
                 <p>
                   {laPh
                     ? 'Không có bài gia đình giao nào đang chờ con.'
-                    : 'Thầy chưa giao bài và em không có bài nào đang chờ. Em có thể luyện thêm với thần thú hoặc xem lại bài đã nộp.'}
+                    : chuaChonThu
+                      ? 'Thầy chưa giao bài và em không có bài nào đang chờ. Em chọn thần thú ở trên để luyện thêm, hoặc xem lại bài đã nộp.'
+                      : 'Thầy chưa giao bài và em không có bài nào đang chờ. Em có thể luyện thêm với thần thú hoặc xem lại bài đã nộp.'}
                 </p>
                 {!laPh && (
                   <div className="bnv-trong-nut">
-                    {onMoThanThu && (
+                    {/* Chưa có thần thú thì KHÔNG mời "luyện với thần thú" (không có con nào): thẻ "Chọn thần thú của em" ở đầu bảng là lối duy nhất. */}
+                    {onMoThanThu && !chuaChonThu && (
                       <button type="button" className="bnv-nut-tonal" data-vai-tro="tertiary" onClick={onMoThanThu}>
                         <Sparkles size={20} aria-hidden="true" />
                         <span>Luyện với thần thú</span>

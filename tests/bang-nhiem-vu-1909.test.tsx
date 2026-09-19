@@ -792,6 +792,21 @@ describe('chưa chọn thần thú: thẻ mời đầu bảng', () => {
     expect(hs.querySelector('[data-vung="chon-than-thu"]')!.tagName).toBe('SECTION')
   })
 
+  it('SAU RESET: chưa chọn thần thú + không việc nào ⇒ trạng thái trống KHÔNG nói "thần thú đang nghỉ" / "luyện với thần thú" (em chưa có con nào); chỉ còn thẻ mời + "Xem bài đã nộp"', () => {
+    const { container } = ve({ duLieu: { ...duLieu(), thanThu: { kieu: 'chua_chon' } }, onXemBaiDaNop: () => {}, taiVinhDanh: vinhDanhRong })
+    expect(container.querySelector('[data-vung="trong"] h2')!.textContent).toBe('Hôm nay chưa có việc')
+    expect(container.querySelector('[data-vung="trong"]')!.textContent).toContain('Em chọn thần thú ở trên')
+    expect(screen.queryByText(/thần thú đang nghỉ/)).toBeNull()
+    expect(screen.queryByRole('button', { name: /Luyện với thần thú/ })).toBeNull()
+    expect(screen.getByRole('button', { name: /Xem bài đã nộp/ })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Chọn thần thú của em' })).toBeTruthy()
+    cleanup()
+    // có thần thú: câu chữ cũ giữ nguyên
+    ve({ duLieu: duLieu(), onXemBaiDaNop: () => {}, taiVinhDanh: vinhDanhRong })
+    expect(screen.getByText('Hôm nay chưa có việc — thần thú đang nghỉ')).toBeTruthy()
+    expect(screen.getByRole('button', { name: /Luyện với thần thú/ })).toBeTruthy()
+  })
+
   it('CSS thẻ mời: chỉ biến M3, không mã màu; cao ≥ 88 px', () => {
     const css = readFileSync(join(THU_MUC, 'bang-nhiem-vu.css'), 'utf8')
     const khoi = css.slice(css.indexOf('.bnv-chon-thu {'), css.indexOf('/* Thẻ MỪNG'))
