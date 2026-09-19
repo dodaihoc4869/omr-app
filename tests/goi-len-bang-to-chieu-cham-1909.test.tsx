@@ -99,6 +99,10 @@ async function chieuLenBang(r: ReturnType<typeof render>) {
   const khung = document.querySelector('.lop-xem-phieu iframe') as HTMLIFrameElement
   const html = khung.getAttribute('srcdoc') ?? ''
   expect(html).toContain('data-cau-noi=')
+  // Khung xuất hiện ở DOM TRƯỚC khi hiệu ứng thụ động của React gắn bộ nghe tin (`useEffect([htmlMayChieu])`).
+  // Không xả ở đây thì tin gửi ngay sau đó rơi vào khoảng trống — lúc máy tải nặng test "bấm đúp" đỏ ngẫu nhiên (1/6 lần),
+  // còn các test "bỏ tin lạ" thì xanh SUÔNG (không ai nghe thì đương nhiên không ghi).
+  await act(async () => {})
   return { khung, html, ma: /data-cau-noi="([^"]+)"/.exec(html)![1], khoa: [...html.matchAll(/data-khoa="([^"]+)"/g)].map((x) => x[1]) }
 }
 
