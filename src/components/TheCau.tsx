@@ -15,6 +15,7 @@ import { ChemText } from '../lib/chem-format'
 import { tachDongTheoY } from '../lib/tach-dong-cau'
 import { BangSoLieu, CauHinh, HinhTaiViTri } from './QuestionMedia'
 import { TheNoiDung, DauThe, Hang, Nhan } from './DesignSystem'
+import './m3/the-cau.css' // chỉ có hiệu lực dưới tổ tiên `.m3` (luyện đề / khắc phục / báo cáo…); game và app giáo viên không đổi
 
 export type CheDo = 'thi' | 'xem_lai'
 type Chu = 'A' | 'B' | 'C' | 'D'

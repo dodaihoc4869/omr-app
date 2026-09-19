@@ -1,0 +1,204 @@
+/* THẺ CÂU (TheCau) dưới `.m3` — bản vẽ thầy chốt project/PhieuLamBai.dc.html: thẻ tonal không viền, số câu dạng chip tròn,
+ * hàng phương án ≥ 52 px có vòng chữ cái (chọn → primaryContainer + vòng chữ đặc), nút Đ|S liền nhau ≥ 48 px, ô nhập viền nổi.
+ * MỌI luật mang tiền tố `.m3 .the-cau` (game thần thú, app giáo viên: không có `.m3` → không đổi). Kiểu nội tuyến của TheCau
+ * (nền/viền/44 px của nút, ô nhập) thắng CSS thường, nên các thuộc tính đó — và CHỈ chúng — dùng `!important` trong phạm vi này;
+ * TSX của TheCau không đổi (test khoá cả kiểu nội tuyến). Màu chỉ đọc biến --m3-*. */
+
+/* thẻ: tonal, không viền, không bóng; hàng con là "ô trắng" (--the-2 → lowest) đặt trên nền thẻ */
+.m3 .the-cau {
+  --the-2: var(--m3-surface-container-lowest);
+  background: var(--m3-surface-container) !important;
+  border: 0 !important;
+  border-radius: 20px !important;
+  box-shadow: none !important;
+  color: var(--m3-on-surface);
+}
+
+/* đầu thẻ: bỏ dải gradient → số câu (chip tròn 30 px) + tên chuyên đề (chip) */
+.m3 .the-cau > div:first-child {
+  height: auto !important;
+  min-height: 48px;
+  padding: var(--k4, 16px) var(--k4, 16px) 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+.m3 .the-cau > div:first-child > div:first-child {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 50% !important;
+  background: var(--m3-primary) !important;
+  color: var(--m3-on-primary);
+  font-size: var(--bnv-cx-1);
+}
+.m3 .the-cau > div:first-child > div:last-child {
+  flex: 0 1 auto !important;
+  padding: 3px 10px;
+  border-radius: var(--m3-bo-tron);
+  background: var(--m3-secondary-container);
+  color: var(--m3-on-secondary-container);
+  font-size: var(--bnv-cx-1) !important;
+}
+.m3 .the-cau > div:first-child > div:last-child:empty {
+  display: none;
+}
+
+/* chip số câu sát đề bài: bớt khoảng đệm trên của phần nội dung (đệm nội tuyến 20 px) */
+.m3 .the-cau > div:last-child {
+  padding-top: var(--k3, 12px) !important;
+}
+
+/* phương án (Phần I) */
+.m3 .the-cau .pa-hang {
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--k3, 12px);
+  min-height: 52px !important;
+  padding: 8px 14px !important;
+  border-radius: 14px !important;
+}
+/* vòng chữ cái: hiện "A" (bỏ dấu chấm bằng ::first-letter), 30 px */
+.m3 .the-cau .pa-ma {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--m3-outline);
+  text-align: center;
+  font-size: 0;
+  line-height: 30px;
+  color: var(--m3-on-surface-variant) !important;
+}
+.m3 .the-cau .pa-ma::first-letter {
+  font-size: var(--bnv-cx-1);
+  font-weight: 700;
+}
+.m3 .the-cau [data-trang-thai='chon'] .pa-ma {
+  background: var(--m3-primary);
+  box-shadow: none;
+  color: var(--m3-on-primary) !important;
+}
+.m3 .the-cau [data-trang-thai='dung'] .pa-ma {
+  background: var(--m3-tertiary);
+  box-shadow: none;
+  color: var(--m3-on-primary) !important;
+}
+.m3 .the-cau [data-trang-thai='sai'] .pa-ma {
+  background: var(--m3-error);
+  box-shadow: none;
+  color: var(--m3-on-error) !important;
+}
+/* trạng thái hàng: chọn = primary, ĐÚNG = tertiary, SAI = error (đúng/sai luôn phân biệt rõ ở cả sáng lẫn tối) */
+.m3 .the-cau .pa-hang[data-trang-thai='chon'] {
+  background: var(--m3-primary-container) !important;
+  border-color: var(--m3-primary) !important;
+}
+.m3 .the-cau .pa-hang[data-trang-thai='dung'],
+.m3 .the-cau [data-trang-thai='dung']:not(button) {
+  background: var(--m3-tertiary-container) !important;
+  border-color: var(--m3-tertiary) !important;
+}
+.m3 .the-cau .pa-hang[data-trang-thai='sai'],
+.m3 .the-cau [data-trang-thai='sai']:not(button) {
+  background: var(--m3-error-container) !important;
+  border-color: var(--m3-error) !important;
+}
+/* dấu ✓ / ✗ cuối hàng: chữ trên nền đặc tertiary / error */
+.m3 .the-cau [aria-label='đúng'] {
+  color: var(--m3-on-primary);
+}
+.m3 .the-cau [aria-label='sai'] {
+  color: var(--m3-on-error);
+}
+
+/* hàng ý (Phần II) + nút Đ | S liền nhau */
+.m3 .the-cau .y-hang {
+  border-radius: 14px;
+}
+.m3 .the-cau .y-nut {
+  gap: 0;
+}
+.m3 .the-cau .y-nut button {
+  width: 52px !important;
+  min-height: 48px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--m3-on-surface-variant) !important;
+  font-weight: 600;
+}
+.m3 .the-cau .y-nut button:first-of-type {
+  border-radius: 999px 0 0 999px !important;
+}
+.m3 .the-cau .y-nut button:nth-of-type(2) {
+  border-radius: 0 999px 999px 0 !important;
+  box-shadow: inset 1px 0 0 var(--m3-outline);
+}
+.m3 .the-cau .y-nut {
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--m3-outline);
+}
+.m3 .the-cau .y-nut:has(> [aria-label]) {
+  box-shadow: none;
+}
+.m3 .the-cau .y-nut button[data-trang-thai='chon'] {
+  background: var(--m3-secondary-container) !important;
+  color: var(--m3-on-secondary-container) !important;
+  font-weight: 700;
+}
+.m3 .the-cau .y-nut button[data-trang-thai='dung'] {
+  background: var(--m3-tertiary-container) !important;
+  color: var(--m3-on-tertiary-container) !important;
+  font-weight: 700;
+}
+.m3 .the-cau .y-nut button[data-trang-thai='sai'] {
+  background: var(--m3-error-container) !important;
+  color: var(--m3-on-error-container) !important;
+  font-weight: 700;
+}
+/* hai nút Đ|S không được co dưới 48 px khi hàng hẹp */
+.m3 .the-cau .y-nut button {
+  flex: 0 0 auto;
+}
+
+/* Phần III: ô nhập số — viền nổi, lấy nét thì viền 2 px primary */
+.m3 .the-cau input {
+  min-height: 56px !important;
+  border: 0 !important;
+  border-radius: var(--m3-bo-12) !important;
+  background: var(--m3-surface-container-lowest) !important;
+  box-shadow: inset 0 0 0 1px var(--m3-outline);
+  color: var(--m3-on-surface) !important;
+  font-weight: 600;
+}
+.m3 .the-cau input:focus,
+.m3 .the-cau input:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--m3-primary);
+  outline: none;
+}
+.m3 .the-cau .flex.items-stretch > button {
+  border: 0 !important;
+  border-radius: var(--m3-bo-12) !important;
+  min-width: 48px;
+}
+
+/* ô LỜI GIẢI (index.css `.loi-giai`, tone cảnh báo vàng của bản cũ) → khối tonal trung tính, tiêu đề primary; không cần !important
+ * (selector `.m3 .loi-giai` cao hơn `.loi-giai`, cùng tầng không phân lớp) */
+.m3 .loi-giai {
+  background: var(--m3-surface-container-high);
+  border-left: 0;
+  border-radius: var(--m3-bo-16);
+  padding: var(--k4, 16px);
+}
+.m3 .loi-giai-nhan,
+.m3 .lg-nhan,
+.m3 .loi-giai-nhan-nho {
+  color: var(--m3-primary);
+}
+.m3 .loi-giai-chot,
+.m3 .lg-chot {
+  border-left-color: var(--m3-primary);
+}
+.m3 .lg-buoc li::before {
+  background: var(--m3-primary);
+  color: var(--m3-on-primary);
+}

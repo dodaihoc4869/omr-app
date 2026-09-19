@@ -69,3 +69,19 @@ Giao bởi 0.Planer (thầy đã uỷ quyền 100%: "nghe theo điều phối, k
 - [x] đo Chromium thật sáng+tối: 8 thẻ (HS 4 thẻ + PH 4 thẻ): 0 chữ dưới 4,5, 0 đích chạm < 48, không tràn ngang
 - [x] toàn `npx vitest run` = 97 đỏ / 42 tệp; test đỏ MỚI: không (so từng tên test với lần chạy nhóm B); build riêng (vite build --outDir ngoài repo) OK; `npm run check:mau` 0 dòng của em. (`tsc -b` hiện báo 3 lỗi TS6133 ở src/lib/html-may-chieu.ts — tệp làm dở của phiên khác, không phải của em)
 - Hai commit: (1) mọi thứ TRỪ BaoCaoCaThiHocSinhModal; (2) RIÊNG BaoCaoCaThiHocSinhModal.tsx + test — thuộc luồng thi thật, chờ 0.Planer soát
+
+## SỬA LỖI 591d6e9 — báo cáo phụ huynh kết luận năng lực (0.Planer QUYẾT 1) — XONG 19/09 15:10
+
+- [x] Nguyên nhân gốc: `loiKhuyenSuPham` của BaoCaoCaThiPhuHuynhModal viết sẵn 4 câu theo dải điểm, mỗi câu khẳng định năng lực ("Nắm rất chắc nền tảng", "phản xạ giải toán rất chắc chắn", "giữ vững phong độ đỉnh cao") — trái luật thầy chốt 18/09 | tái hiện: tests/bao-cao-khong-ket-luan-nang-luc-1909.test.tsx trên bản 5f41d50 = 5/5 đỏ; sau sửa = 5/5 xanh
+- [x] Bốn dải chỉ còn nêu điểm ca này (x.xx/10) + chỉ dẫn xem mục Câu sai cần chữa; nhãn nút trong gợi ý sửa cho khớp nút thật ("Tạo bài luyện khắc phục cho con")
+- [x] Bản HỌC SINH (BaoCaoCaThiHocSinhModal, lib/danh-gia-bai.ts) đã sạch các cụm cấm nên KHÔNG sửa → không cần soát luồng thi thật. Test quét cả ba tệp (bỏ chú thích) khoá "không còn"
+- [ ] Ghi chú cho 0.Planer: lib/danh-gia-bai.ts (ngoài phạm vi em) còn câu "Phần lớn là bẫy đề và bước tính, không phải lỗ hổng lý thuyết" ở nhánh 8–9 điểm — cũng là suy luận năng lực từ điểm; chủ tệp quyết
+
+## Nhóm D · TheCau — commit 1 (CSS `.m3 .the-cau`, chưa bật ở màn thi) — 19/09 15:15
+
+- [x] `src/components/m3/the-cau.css` + MỘT dòng nạp CSS trong TheCau.tsx. Chỉ hiệu lực dưới tổ tiên `.m3` (luyện đề, khắc phục, báo cáo có sẵn); game thần thú (/hs) và app giáo viên không có `.m3` → KHÔNG đổi (test dưới /hs và /: gốc thẻ chỉ mang lớp `the-cau`, kiểu nội tuyến còn nguyên)
+- [x] Bộ mặt theo bản vẽ PhieuLamBai: thẻ tonal không viền; số câu chip tròn 30 px; hàng phương án 52 px có vòng chữ cái ("A" bằng ::first-letter, dấu chấm ẩn), chọn = primaryContainer + vòng đặc, ĐÚNG = tertiary, SAI = error; Đ|S liền nhau ≥ 48 px; ô nhập viền nổi 1 px, lấy nét 2 px primary; ô lời giải đổi từ tone cảnh báo vàng sang khối tonal trung tính
+- [x] Điều kiện của 0.Planer: (a) `!important` CHỈ trong `.m3 .the-cau …` — test quét tệp CSS (mọi bộ chọn của luật có !important đều bắt đầu `.m3 .the-cau`; thư mục m3/ ngoài the-cau.css chỉ còn khối tắt chuyển động); (c) test dưới ngữ cảnh game; (d) Chromium thật: hàng phương án 52 px trước và sau khi chọn (không xô), 8 nút Đ/S đều ≥ 48 px, ô Phần III inputMode=decimal 56 px; 0 chữ dưới 4,5 sáng+tối (cả chế độ xem lại đúng/sai); (e) không đụng chuỗi/kiểu nội tuyến mà xao-y-phan-hai, danh-dau-cau-hoi-lai, dau-tru-phan-ba, ba-loi-0609 khoá (test khoá lại các chuỗi đó)
+- [x] tests/m3-d-the-cau-1909.test.tsx 11 xanh; đột biến (luật !important trần, hạ 48→44, thêm lớp m3 vào thẻ ở game) → 5 test đỏ, hoàn lại → 11 xanh
+- [x] toàn `npx vitest run` = 100 đỏ / 43 tệp: 3 test mới đỏ ở tests/phieu-m3-1909.test.ts của CODE 2 (tệp untracked, html-phieu.ts đang sửa dở, 0 tham chiếu TheCau/m3); loại tệp đó → 97 đỏ / 42 tệp, test đỏ MỚI của em: không
+- [ ] COMMIT 2 (bật ở màn thi qua `laManThi()`): CHỜ Code 2 làm vỏ màn thi — hoặc Code 2 đặt `m3` ở gốc ExamTakeScreen thì khỏi cần. Đoạn mã `laManThi` đã cất ở scratchpad phiên (m3/index.ts)
