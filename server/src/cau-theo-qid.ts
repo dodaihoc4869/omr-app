@@ -14,7 +14,7 @@ import { gameIdentity } from './game-v2-auth'
 import { protectedQuestions } from './game-v2-bank'
 
 export const TOI_DA_QID_MOT_LUOT = 20
-const DAI_QID_TOI_DA = 120
+export const DAI_QID_TOI_DA = 120
 const KHONG_TIM_THAY = 'Không tìm thấy học sinh'
 
 /** Câu như máy em nhận: chỉ các trường này. KHÔNG có `correct`, `solution`, `reviewed`, `version`, `group`. */
@@ -42,31 +42,25 @@ export function cauCongKhai(q: PrivateQuestion) {
 }
 
 /**
- * `{ token | sbd, qid: string[] (≤ 20) }` → `{ ok, cau: [câu công khai theo đúng thứ tự xin], khongCo: [qid xin mà không trả được] }`.
- * `khongCo` gộp mọi lý do (chưa từng gặp, không có trong chỉ mục, đề đang bảo vệ) để không lộ câu nào có trong kho.
- * Đúng 3 truy vấn D1 (em thật + đã gặp; nội dung; đề bảo vệ) và KHÔNG đọc R2.
+ * NHẶT câu CHO ĐÚNG EM NÀY (dùng chung với `/hs/on-lai/nop`, để "câu nộp được" và "câu xin được" là MỘT tập, không lệch nhau):
+ * đúng 3 truy vấn D1 (em có thật + đã gặp; nội dung; đề bảo vệ), không R2. Trả câu RIÊNG (có đáp án) — NƠI GỌI phải tự lược sạch
+ * (`cauCongKhai`) trước khi ra đường công khai. `loi` có giá trị thì KHÔNG có câu nào (SBD lạ, hoặc không kiểm được đề bảo vệ: đóng cửa).
  */
-export async function hsCauTheoQid(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
-  const sbd = b.token ? await gameIdentity(env, b) : String(b.sbd ?? '').trim()
-  if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
-  if (sbd.length > 40) return { ok: false, error: KHONG_TIM_THAY }
-  if (!Array.isArray(b.qid)) return { ok: false, error: 'Thiếu danh sách câu (qid)' }
-  if (b.qid.length > TOI_DA_QID_MOT_LUOT) return { ok: false, error: `Mỗi lần xin tối đa ${TOI_DA_QID_MOT_LUOT} câu` }
-  const xin = [...new Set(b.qid.map((x) => (typeof x === 'string' ? x.trim() : '')).filter((x) => x !== '' && x.length <= DAI_QID_TOI_DA))]
-
+export async function layCauChoEm(env: Env, sbd: string, xin: string[]): Promise<{ loi?: string; cau: PrivateQuestion[]; khongCo: string[] }> {
+  if (sbd.length > 40) return { loi: KHONG_TIM_THAY, cau: [], khongCo: xin }
   // Truy vấn 1: em có thật không, và trong các qid xin, em đã từng gặp những câu nào. (Em có thật = như `laHocSinhThat`.)
   const r = await env.DB.prepare(
     `SELECT CASE WHEN EXISTS (SELECT 1 FROM hoc_sinh WHERE sbd = ?) OR EXISTS (SELECT 1 FROM danh_sach WHERE sbd = ?) OR EXISTS (SELECT 1 FROM luot WHERE sbd = ?)
                  THEN 1 ELSE 0 END AS co,
             (SELECT json_group_array(qid) FROM (SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)))) AS da_gap`,
   ).bind(sbd, sbd, sbd, sbd, JSON.stringify(xin)).first<{ co: number; da_gap: string | null }>()
-  if (Number(r?.co) !== 1) return { ok: false, error: KHONG_TIM_THAY }
+  if (Number(r?.co) !== 1) return { loi: KHONG_TIM_THAY, cau: [], khongCo: xin }
   let daGap: string[] = []
   try {
     daGap = (JSON.parse(r?.da_gap ?? '[]') as unknown[]).filter((x): x is string => typeof x === 'string')
   } catch { /* coi như chưa gặp câu nào */ }
   const duoc = xin.filter((q) => daGap.includes(q))
-  if (duoc.length === 0) return { ok: true, cau: [], khongCo: xin }
+  if (duoc.length === 0) return { cau: [], khongCo: xin }
 
   // Truy vấn 2: nội dung từ chỉ mục game.
   const rc = await env.DB.prepare(
@@ -81,19 +75,39 @@ export async function hsCauTheoQid(env: Env, b: Record<string, unknown>): Promis
       if (q?.qid && !theoQid.has(q.qid)) theoQid.set(q.qid, q)
     } catch { /* dòng hỏng: bỏ */ }
   }
-  if (theoQid.size === 0) return { ok: true, cau: [], khongCo: xin }
+  if (theoQid.size === 0) return { cau: [], khongCo: xin }
 
   // Truy vấn 3: đề thi đang bảo vệ. Không kiểm được thì KHÔNG trả gì (đóng cửa), thay vì trả câu có thể là đề chưa công bố.
   let baoVe: Set<string>
   try {
     baoVe = await protectedQuestions(env)
   } catch {
-    return { ok: false, error: 'Chưa kiểm tra xong phạm vi đề thi đang bảo vệ. Em thử lại sau.' }
+    return { loi: 'Chưa kiểm tra xong phạm vi đề thi đang bảo vệ. Em thử lại sau.', cau: [], khongCo: xin }
   }
   const cau = xin.flatMap((qid) => {
     const q = theoQid.get(qid)
-    return q && !baoVe.has(q.qid) && !baoVe.has(q.group) ? [cauCongKhai(q)] : []
+    return q && !baoVe.has(q.qid) && !baoVe.has(q.group) ? [q] : []
   })
   const co = new Set(cau.map((c) => c.qid))
-  return { ok: true, cau, khongCo: xin.filter((q) => !co.has(q)) }
+  return { cau, khongCo: xin.filter((q) => !co.has(q)) }
+}
+
+/** Dọn danh sách qid do máy em gửi: chỉ chữ, bỏ rỗng/trùng/quá dài, giữ thứ tự. */
+export function donQid(ds: unknown[]): string[] {
+  return [...new Set(ds.map((x) => (typeof x === 'string' ? x.trim() : '')).filter((x) => x !== '' && x.length <= DAI_QID_TOI_DA))]
+}
+
+/**
+ * `{ token | sbd, qid: string[] (≤ 20) }` → `{ ok, cau: [câu công khai theo đúng thứ tự xin], khongCo: [qid xin mà không trả được] }`.
+ * `khongCo` gộp mọi lý do (chưa từng gặp, không có trong chỉ mục, đề đang bảo vệ) để không lộ câu nào có trong kho.
+ */
+export async function hsCauTheoQid(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const sbd = b.token ? await gameIdentity(env, b) : String(b.sbd ?? '').trim()
+  if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
+  if (sbd.length > 40) return { ok: false, error: KHONG_TIM_THAY }
+  if (!Array.isArray(b.qid)) return { ok: false, error: 'Thiếu danh sách câu (qid)' }
+  if (b.qid.length > TOI_DA_QID_MOT_LUOT) return { ok: false, error: `Mỗi lần xin tối đa ${TOI_DA_QID_MOT_LUOT} câu` }
+  const r = await layCauChoEm(env, sbd, donQid(b.qid))
+  if (r.loi) return { ok: false, error: r.loi }
+  return { ok: true, cau: r.cau.map(cauCongKhai), khongCo: r.khongCo }
 }

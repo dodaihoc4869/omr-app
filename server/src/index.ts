@@ -4,6 +4,7 @@ import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
 import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
 import {hsKeHoachNgay,hsThoiGianHoc,chayCaLop} from './ke-hoach-ngay-d1'
 import {hsCauTheoQid} from './cau-theo-qid'
+import {hsOnLaiNop} from './on-lai-nop'
 import {notifications,deliverNotices} from './notifications'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
@@ -2887,6 +2888,7 @@ export default {
       // KẾ HOẠCH NGÀY (GĐ 2) — em đọc kế hoạch hôm nay; đặt số phút học mỗi ngày (cần token).
       if (p === '/hs/ke-hoach-ngay') return ra(await hsKeHoachNgay(env, b))
       if (p === '/hs/cau-theo-qid') return ra(await hsCauTheoQid(env, b))
+      if (p === '/hs/on-lai/nop') return ra(await hsOnLaiNop(env, b))
       if (p === '/hs/thoi-gian-hoc') return ra(await hsThoiGianHoc(env, b))
       // `await` là bắt buộc: trả thẳng promise thì lỗi (vd. token sai) lọt khỏi `catch` bên dưới.
       if (p === '/hs/ca-dang-mo') return await hsCaDangMo(env, b)
