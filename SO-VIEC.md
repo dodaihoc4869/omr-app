@@ -2,11 +2,11 @@
 
 ## Yêu cầu nhận (nguyên văn)
 
-- [ ] "Đọc DE-XUAT-CA-NHAN-HOA-1909.md và prompt-ca-nhan-hoa-tien-bo-tung-ngay.md trong thư mục này, rồi đọc mục đầu SO-VIEC.md để biết giai đoạn nào đã xong."  | bằng chứng: đã đọc cả ba file; mục đầu sổ ghi "Chưa build gì" ⇒ chưa giai đoạn nào xong, bắt đầu từ GĐ 0.
-- [ ] "11 câu chốt: đồng ý hết theo cột "Đề nghị" ở mục 5 của DE-XUAT."  | bằng chứng: 11/11 theo đề nghị (20 phút; bỏ trống = chưa làm; mốc theo ngày; PH giao = phần dư; xoá 3 test 3 Vòng; thần thú không khoá; daily_ bỏ; nghỉ không đứt streak; PH cần token (GĐ 5); phòng chờ; ngừng cộng tien_do_hs)
-- [ ] "HÃY THỰC THI PROMPT NÀY, chỉ làm GĐ 0 đến GĐ 2"
-- [ ] "mỗi giai đoạn xong thì test, phát hành, ghi sổ việc"
-- [ ] "Xong GĐ 2 thì dừng và báo giới hạn dùng còn lại."
+- [x] "Đọc DE-XUAT-CA-NHAN-HOA-1909.md và prompt-ca-nhan-hoa-tien-bo-tung-ngay.md trong thư mục này, rồi đọc mục đầu SO-VIEC.md để biết giai đoạn nào đã xong."  | bằng chứng: đã đọc cả ba file; mục đầu sổ ghi "Chưa build gì" ⇒ chưa giai đoạn nào xong, bắt đầu từ GĐ 0.
+- [x] "11 câu chốt: đồng ý hết theo cột "Đề nghị" ở mục 5 của DE-XUAT."  | bằng chứng: 11/11 theo đề nghị, đã áp dụng (20 phút; bỏ trống = chưa làm; mốc theo ngày; PH giao = phần dư; xoá 3 test 3 Vòng; thần thú không khoá; daily_ bỏ; nghỉ không đứt streak; PH cần token (GĐ 5); phòng chờ; ngừng cộng tien_do_hs)
+- [x] "HÃY THỰC THI PROMPT NÀY, chỉ làm GĐ 0 đến GĐ 2"
+- [x] "mỗi giai đoạn xong thì test, phát hành, ghi sổ việc"
+- [x] "Xong GĐ 2 thì dừng và báo giới hạn dùng còn lại."
 
 ## Vạch đích (chép từ mục NGHIỆM THU của prompt — không đổi)
 
@@ -47,13 +47,36 @@
 3. Bậc dạng bắt đầu ở "hiểu" (1) như `lich-on-lai.ts`; mỗi lần đúng ở NGÀY MỚI của một câu bất kỳ trong dạng thì nâng 1 bậc, mỗi lần sai hạ 1 bậc, kẹp [0, 2]. Đề xuất chỉ ghi "nâng/hạ 1 bậc" — chưa nói bậc đầu và đơn vị; đây là chỗ đáng xem lại khi có dữ liệu thật vài tuần.
 4. Câu `chua_thay_sai` cũng có `moc_on_ke` (như công thức đề xuất). GĐ 2 KHÔNG đưa chúng vào hàng ôn (chỉ câu từng sai), vì ôn giãn cách cho câu chưa từng sai sẽ làm ngày nào cũng ngập.
 
-### GĐ 2 — Kế hoạch ngày `ke_hoach_ngay`
-- [ ] `server/src/ke-hoach-ngay.ts` thuần (EDF, khả thi, bù, cổng) + bảng `ke_hoach_ngay` + `/hs/ke-hoach-ngay` + cron + lập lại theo sự kiện + handler `study_preferences`  | bằng chứng: (chưa có)
-- [ ] NGHIỆM THU GĐ 2: em có 2 BTVN (hạn 2 ngày và 14 ngày) → lô hạn gần đứng trước, taiKhac của bài hạn 14 ngày < 1/7 số câu còn lại; em không có bài → có việc `bu` đủ `toiThieuCau`  | bằng chứng: (chưa có)
-- [ ] Toàn bộ vitest không tăng đỏ; phát hành; ghi sổ  | bằng chứng: (chưa có)
+### GĐ 2 — Kế hoạch ngày `ke_hoach_ngay`  ·  XONG (19/09, Worker `eb987ca7`, commit `c01148b`)
+- [x] `server/src/ke-hoach-ngay.ts` thuần (EDF, kiểm khả thi, bù, cổng, nhãn) + `ke-hoach-ngay-d1.ts` (đọc gộp 50 em/lô, dựng lại hồ sơ khi sổ đổi, lưu, chốt ngày, cron) + bảng `ke_hoach_ngay` + `POST /hs/ke-hoach-ngay` + `POST /hs/thoi-gian-hoc` + cron 00:01 VN + `POST /ke-hoach/chay-ca-lop` (thầy)  | bằng chứng: `tests/ke-hoach-ngay-1909.test.ts` → **44 passed (44)**; migration `migration-1909-ke-hoach.sql` chạy `--remote` (3 đối tượng mới).
+- [x] NGHIỆM THU GĐ 2 — ĐẠT (kiểm bằng test trên SQLite thật + hàm thuần; xem "giới hạn kiểm chứng" ngay dưới):
+  · em có 2 BTVN (30 câu hạn 2 ngày, 42 câu hạn 14 ngày): lô bài hạn gần đứng TRƯỚC (dù khai báo ngược); phần câu/ngày bài 14 ngày đè lên bài khác = ⌈42/14⌉ = **3 < 42/7 = 6** (đúng < 1/7 số câu còn lại), và `taiKhac` của bài hạn gần chính là 3, không phải cả 42 câu;
+  · cùng đầu vào → cùng JSON (hai lần liên tiếp, và đảo/xáo thứ tự mảng đầu vào vẫn ra cùng JSON);
+  · EDF cộng dồn báo số: cần 15 câu/ngày → `khong_kip` + đề xuất tăng tạm; cần 60 → đề xuất gia hạn, việc bắt buộc GIỮ NGUYÊN (`qua_tai +X`, việc mềm bị cắt); cộng dồn 112 câu/5 ngày → cảnh báo đúng bài xa;
+  · cổng: việc bắt buộc sau chỉ hiện khi việc trước xong, trừ `khan_cap` (hạn ≤ 24 h/trễ nhịp) luôn hiện; lô chưa tới mốc nằm ở `sapToi`; quá hạn liệt kê riêng, không vào tải;
+  · em không có bài: có việc `bu`, tổng bù (+ số câu đã làm hôm nay) ≥ `toiThieuCau`, và **tổng KHÔNG BAO GIỜ vượt mục tiêu ngày** (test quét 24 tổ hợp);
+  · thiếu mẫu giây nói thật: "chưa đo được tốc độ (2/5 mẫu)"; hồ sơ mỏng không có gì để bù → cảnh báo `thieu_nguon_bu`, không bịa việc.
+- [x] Chạy trên D1 THẬT: `POST /ke-hoach/chay-ca-lop` → **260 em, 6 lô, 14,6 s** (lần hai 7,5 s, vẫn 260 dòng: idempotent). Kế hoạch 19/09: 206 em có việc ôn, 204 có thần thú, **49 em `thieu_nguon_bu`** (hồ sơ mỏng), 48 em chưa đủ mẫu tốc độ, 0 `qua_tai`, 0 lô BTVN (hiện không em nào nợ BTVN còn hạn). Em thật 12001 gọi qua đường công khai: mục tiêu 8, tối thiểu 4, đã làm 2 (1 lên bậc) → bù đúng phần thiếu 2 câu ôn + 6 câu thần thú tuỳ chọn.
+- [x] Toàn bộ vitest không tăng đỏ  | bằng chứng: `npx vitest run` → **4764 tests, 98 failed | 4665 passed; 43 tệp đỏ = nền 98/43**; so danh sách tệp đỏ: MỚI ĐỎ [] · HẾT ĐỎ []. `lich-lo-btvn.ts` và `tro-ly-ca-nhan.ts` KHÔNG bị sửa (chỉ import).
+- [x] Phát hành + ghi sổ  | bằng chứng: chỉ Worker qua `DAY-MAY-CHU.command` (chốt ca thi "SẠCH 8 ca" cả hai lần): `d378c25` → Worker `9c9660a5`; bản vá `c01148b` (chữ ghiChu/danh sách qid của việc ôn khớp số câu) → Worker **`eb987ca7`**. Lùi: `git revert c01148b d378c25` rồi `./DAY-MAY-CHU.command` (bảng `ke_hoach_ngay` cứ để nguyên; cron chạy hàm cũ không còn gọi kế hoạch).
+- [x] Hình dạng JSON của `/hs/ke-hoach-ngay` gửi 0.Planer cho phiên Giao diện nối adapter  | bằng chứng: tin nhắn kèm mẫu thật (che SBD).
+
+**GIỚI HẠN KIỂM CHỨNG (nói thật):** trên D1 thật hiện KHÔNG có em nào nợ BTVN còn hạn nên kịch bản "2 BTVN hạn 2 và 14 ngày" chưa chạy được trên bản sống; nó được kiểm bằng test đi qua `worker.fetch('/hs/ke-hoach-ngay')` trên SQLite thật với lược đồ thật (không tạo bài giả vào hồ sơ học sinh thật). Chuỗi ngày `chuoiDat`/`chốt ngày` mới có dữ liệu thật sau lần cron 00:01 ngày 20/09 đầu tiên (hôm nay mới là dòng đầu tiên của bảng) — chốt ngày đã kiểm bằng test.
+
+**Ghi nhận / lệch với đề xuất:**
+1. KHÔNG thêm tham số thứ 5 `phutNgay?` vào `tinhNganSachNgay`: hàm nằm ở `src/lib/tro-ly-ca-nhan.ts`, tệp client mà Pages đóng gói và phiên Giao diện đang chung; sửa nó đổi bundle của app đang chạy. Thay vào đó bộ điều phối GỌI NGUYÊN hàm gốc rồi áp phút/ngày làm trần (chỉ hạ) — cùng hiệu lực, hàm gốc và test của nó không đổi.
+2. `btvn_em.ngan_sach_lo` / `tai_khac_lo` (đóng băng lúc giao) là việc của GĐ 3. Ở GĐ 2 `taiKhac` được TÍNH LẠI mỗi lần đọc nên lịch lô có thể trôi theo ngày khi tải thay đổi; đóng băng ở GĐ 3. Chưa em nào thấy lịch này (chưa app nào đọc `/hs/ke-hoach-ngay`).
+2b. Ngày làm dở: bù trừ cả số câu ĐÃ LÀM hôm nay (`daLam`). Lô BTVN xong mà chưa gửi đáp án (GĐ 3 mới gửi) thì chưa có sự kiện nên tạm không tính vào `daLam` — chuyển tiếp, hết khi GĐ 3 xong.
+3. "Lập lại khi có sự kiện" (giaoBtvn, mom create, mọi handler nộp, suaBtvn): thay bằng ĐỌC-LẬP-LẠI mỗi lần em mở + cron đêm; hồ sơ dựng lại khi số dòng sổ đổi (`so_su_kien`). Lý do: không thêm câu truy vấn nào vào đường nộp (luật "1–3 câu/lệnh"). Đổi lại chưa có "đẩy" tới máy em — máy em phải gọi lại.
+4. Trần ôn 40% mục tiêu giữ, CHỈ nới (đúng phần thiếu) khi thần thú không lo nổi (không có dạng yếu, hoặc một lượt 6 câu không vừa ngân sách) — bản đầu để thần thú bội 6 đẩy tổng lên 9 > 8 (lỗi tôi bắt được bằng test quét tổ hợp, đã sửa). Ôn chỉ lấy câu TỪNG SAI (`chua_thay_sai` không vào hàng ôn, kẻo ngày nào cũng ngập).
+5. Ôn thi: việc MỀM (prompt hỏi mềm hay bắt buộc, chưa được trả lời; chọn mềm theo đề nghị). Hiện chỉ nói "Ôn cho ca X" 4 câu, CHƯA chọn câu theo chuyên đề của ca (chưa biết chuyên đề ca sắp tới) — GĐ 5/6.
+6. Không sinh `game_v2_task` (GĐ 5); nhiệm vụ thần thú do PH đã nhắc thì được ưu tiên trong kế hoạch. `/hs/thoi-gian-hoc` dùng token HS; token phụ huynh là GĐ 5.
+7. `cau_hinh.ngay_nghi`: định dạng chưa ai đặt — nhận mảng JSON `["2026-09-21"]` hoặc chuỗi ngày cách nhau dấu phẩy/xuống dòng.
+8. Tốc độ đo được của em 12001 chạm sàn 45 giây/câu (14 mẫu): số giây trong sổ hiện chỉ có từ ca thi, và có thể phản ánh chuyện em bấm nhanh; nên xem lại trước khi tin tốc độ để hạ mục tiêu ở GĐ 3+.
 
 ### Sau GĐ 2
-- [ ] Dừng, KHÔNG làm GĐ 3–6; báo giới hạn dùng còn lại  | bằng chứng: (chưa có)
+- [x] Dừng, KHÔNG làm GĐ 3–6  | bằng chứng: không sửa `tro-ly-ca-nhan.ts`, `html-phieu.ts`, `btvn-cho-em.ts`, `StudentPortalScreen.tsx`, `ParentPortalScreen.tsx`; GĐ 3–6 chưa bắt đầu.
+- [x] Báo giới hạn dùng còn lại  | bằng chứng: xem báo cáo cuối lượt.
 
 ---
 
