@@ -169,6 +169,38 @@ export function suKienChamBai(
   return ra
 }
 
+/** Ném khi lượt nạp lại hết ngân sách đọc R2 — phải đi thẳng lên `napLaiTuR2`, không bị nuốt. */
+export class HetLuotDoc extends Error {}
+
+/** Mã tờ kho gốc của một qid (`DH-12-C1-B2-I-49` → `DH-12-C1-B2`). */
+export function gocTuQid(qid: string): string {
+  return qid.replace(/-(III|II|I)-\d+$/, '')
+}
+
+/**
+ * Khắc phục không có phiếu trên R2 (phiếu `sua_loi_*` do máy em tự sinh — cả 189 bài đã nộp tính
+ * đến 19/09 đều rơi vào đây, `so_cau = 0`): chấm bằng CHÍNH tờ kho theo qid, như BTVN. Chỉ lấy đúng
+ * những câu em đã gửi lên (không biết phiếu còn câu nào khác). Tờ kho thiếu thì bỏ câu đó, không đoán.
+ */
+export async function cauTuKhoTheoQid(
+  env: Env,
+  qids: string[],
+  docKho: (goc: string) => Promise<Record<string, unknown>[]> = (g) => homeworkQuestions(env, g),
+): Promise<CauChamBai[]> {
+  const can = new Set(qids.filter((q) => /-(III|II|I)-\d+$/.test(q)))
+  const goc = [...new Set([...can].map(gocTuQid))]
+  const ra: CauChamBai[] = []
+  for (const g of goc) {
+    try {
+      ra.push(...cauTuKho(await docKho(g)).filter((c) => can.has(c.qid)))
+    } catch (e) {
+      if (e instanceof HetLuotDoc) throw e
+      console.warn('[su-kien-hoc] không đọc được tờ kho', g, e instanceof Error ? e.message : e)
+    }
+  }
+  return ra
+}
+
 /**
  * BTVN cả bài: dựng sự kiện từ CHÍNH kết quả `gradeHomework` (đường chấm cũ, giữ nguyên) — không
  * đọc lại tờ kho. `qidSai` = câu sai HOẶC bỏ trống; câu đúng chắc chắn có đáp án, nên hợp của hai

@@ -15,6 +15,8 @@ import type { Env } from './kieu'
 import { gradeHomework, homeworkKeys, homeworkQuestions } from './btvn-grading'
 import {
   CAC_NGUON,
+  cauTuKhoTheoQid,
+  HetLuotDoc,
   ghiSuKien,
   suKienChamBai,
   suKienLuyenDe,
@@ -172,11 +174,11 @@ async function napLaiTuR2(env: Env, nguon: Exclude<NguonNapLai, 'sql'>, ds: stri
   }
 }
 
-class HetLuotDoc extends Error {}
+class KhongCoTepR2 extends Error {}
 
 async function docR2Json(env: Env, khoa: string): Promise<unknown> {
   const o = await env.DE.get(khoa)
-  if (!o) throw new Error(`Không có ${khoa} trên R2`)
+  if (!o) throw new KhongCoTepR2(`Không có ${khoa} trên R2`)
   return await new Response(o.body).json()
 }
 
@@ -216,13 +218,22 @@ async function docSuKienMotEm(env: Env, nguon: Exclude<NguonNapLai, 'sql'>, sbd:
       .bind(sbd).all<Record<string, unknown>>()
     for (const x of r.results ?? []) {
       const ma = String(x.ma_phieu ?? '')
-      const goi = (await doc(`phieu:${ma}`, () => docR2Json(env, `phieu/${ma}.json`))) as Record<string, unknown>
-      const cau: CauChamBai[] = mangCau((goi.phieu as Record<string, unknown> | undefined)?.cau).flatMap((c) => {
-        const qid = String(c.id ?? '').trim()
-        const dung = String(c.dapAn ?? '').trim().toUpperCase()
-        return qid && dung ? [{ qid, dapAnDung: dung, chuyenDe: String(c.chuyenDe ?? ''), mucDo: String(c.mucDo ?? '') }] : []
-      })
-      ra.push(...suKienChamBai('khac_phuc', ma, sbd, 1, String(x.nop_luc), cau, doiObj(x.dap_an_json)))
+      const dapAn = doiObj(x.dap_an_json)
+      // Cùng luật với `nopKhacPhuc`: có phiếu trên R2 thì chấm theo phiếu; không có (phiếu máy em tự sinh)
+      // thì chấm theo tờ kho bằng qid. Chỉ lỗi "không có phiếu" mới rơi sang kho — lỗi khác vẫn báo.
+      let cau: CauChamBai[] = []
+      try {
+        const goi = (await doc(`phieu:${ma}`, () => docR2Json(env, `phieu/${ma}.json`))) as Record<string, unknown>
+        cau = mangCau((goi.phieu as Record<string, unknown> | undefined)?.cau).flatMap((c) => {
+          const qid = String(c.id ?? '').trim()
+          const dung = String(c.dapAn ?? '').trim().toUpperCase()
+          return qid && dung ? [{ qid, dapAnDung: dung, chuyenDe: String(c.chuyenDe ?? ''), mucDo: String(c.mucDo ?? '') }] : []
+        })
+      } catch (e) {
+        if (e instanceof HetLuotDoc || !(e instanceof KhongCoTepR2)) throw e
+      }
+      if (cau.length === 0) cau = await cauTuKhoTheoQid(env, Object.keys(dapAn), (g) => doc(`kho:${g}`, () => homeworkQuestions(env, g)))
+      ra.push(...suKienChamBai('khac_phuc', ma, sbd, 1, String(x.nop_luc), cau, dapAn))
     }
   } else if (nguon === 'mom') {
     const r = await env.DB.prepare('SELECT id, answers, bank_key, submitted_at FROM mom_bai WHERE sbd = ? AND submitted_at IS NOT NULL')

@@ -1,5 +1,5 @@
 import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect} from './btvn-grading'
-import {ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,type CauChamBai} from './su-kien-hoc'
+import {cauTuKhoTheoQid,ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,type CauChamBai} from './su-kien-hoc'
 import { hopLe3DangChuan } from './loc-cau-chuan'
 // CỔNG TƯƠNG THÍCH `/goi` — CẮT HẲN GOOGLE.
 //
@@ -1054,7 +1054,9 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
         lan = 2
       }
     }
-    await ghiSuKien(env, suKienChamBai('khac_phuc', ma, sbd, lan, nay, cauPhieu, lam))
+    // Phiếu tự sinh của máy em không có trên R2 → chấm sổ bằng tờ kho theo qid (điểm nộp cũ giữ nguyên).
+    const cauSo = cauPhieu.length ? cauPhieu : await cauTuKhoTheoQid(env, Object.keys(lam))
+    await ghiSuKien(env, suKienChamBai('khac_phuc', ma, sbd, lan, nay, cauSo, lam))
   }
   return { ok: true, lanThu: cu ? 2 : 1, soCau, soDung, qidSai, nopLuc: nay }
 }
