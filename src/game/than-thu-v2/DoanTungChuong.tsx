@@ -62,7 +62,7 @@ export default function DoanTungChuong({ kq, ghe, loaiQuai, tenQuai, tinh, onXon
           <div className="dh-chuong-dich"><QuaiHinh loai={loaiQuai} size={120} /></div>
           {tia.map((t, i) => (
             <div key={t.g.ghe}>
-              <div className="dh-chuong-cot" style={{ left: tia.length === 1 ? 'calc(50% - 75px)' : i ? 'calc(50% - 8px)' : 'calc(50% - 142px)', transform: `rotate(${tia.length === 1 ? 0 : i ? -13 : 13}deg)` }}>
+              <div className="dh-chuong-cot" style={{ left: tia.length === 1 ? 'calc(44% - 84px)' : i ? 'calc(44% + 2px)' : 'calc(44% - 170px)', transform: `rotate(${tia.length === 1 ? 0 : i ? -17 : 17}deg)` }}>
                 <div className="dh-chuong-tia" style={{ '--bc': `rgb(${BATTLE_SKINS[t.g.pet]!.color})` } as CSSProperties}><SpellArt pet={t.g.pet} stage={evolutionStage(t.g.cap)} clipId={i ? idB : idA} /></div>
               </div>
               <ThuHinh pet={t.g.pet} cap={t.g.cap} size={150} quayTrai={i === 1} className="dh-chuong-thu" style={{ [i ? 'right' : 'left']: tia.length === 1 ? 'calc(50% - 75px)' : '2%' } as CSSProperties} />

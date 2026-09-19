@@ -144,3 +144,14 @@ Commit (mỗi màn một commit, theo lệnh 0.Planer): 9023df2 nền · 2bac1ee
 
 ### Cách lùi
 `git revert` dải commit bước 3 → tab game về như cũ ("Hộ Tống Linh Tâm" mở mọi ngày). Không có dữ liệu nào bị đụng.
+
+### Sửa sau soát bước 3 (0.Planer, 19/09) — CỜ MỞ GAME + 4 ô SẮP MỞ + tung chưởng
+- **CỜ MỞ GAME** (chặn gộp): bảng `cau_hinh`, khoá `doan_ho_tong`, JSON `{"dsSbd":["12121212"],"toanBo":false}` — cùng kiểu cờ EXP của Code 3. KHÔNG có dòng / JSON hỏng / thiếu bảng = TẮT với mọi em.
+  - Máy chủ: `doanMoCho(env, sbd)` trong `game-v2-doan.ts`; mọi lệnh `doan-*` của em chưa được mở → "Đoàn Hộ Tống sắp ra mắt. Em chờ thêm ít hôm nhé." (kiểm TRƯỚC mọi thứ, không ghi gì); lệnh `profile` trả thêm `doanMo`. `game-v2.ts` thêm đúng 2 chỗ: tên hàm trong dòng import + một trường trong phản hồi `profile` (đã báo Code 3).
+  - Giao diện: `doanMo=false` (hoặc máy chủ cũ không trả cờ) ⇒ game Y HỆT trước: 4 mục cũ, tên tab "Hộ Tống Linh Tâm", Võ đài mở MỌI ngày, không chữ "Đoàn" nào, lớp phủ Đoàn KHÔNG được dựng dù một khung hình; cửa ngoài xin mở Đoàn → về Đảo thần thú, không màn trống. `doanMo=true` ⇒ giao diện mới. Hàm thuần `cuaGame(doanMo, now)`.
+  - Test: `tests/doan-cua-vao.test.tsx` 6 ca (dựng `Game` thật với fetch giả, cả hai phía cờ, chưa chọn thú, thứ Hai/thứ Bảy) + 2 ca cờ ở `doan-may-chu` (9 lệnh đều bị từ chối và không ghi dòng nào; theo danh sách; toanBo; JSON hỏng). Đột biến cờ: 12 → 12 đỏ ("máy chủ BỎ KIỂM CỜ" đỏ 2 test; vòng đầu sống 1 "cờ tắt vẫn dựng lớp phủ" → test nạp sẵn gói lazy rồi đếm số lần dựng, nay đỏ).
+  - BẬT cho một em (0.Planer/Code 3 chạy, em KHÔNG chạy): `INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('doan_ho_tong','{"dsSbd":["12121212"],"toanBo":false}',datetime('now')) ON CONFLICT(khoa) DO UPDATE SET gia_tri=excluded.gia_tri,cap_nhat_luc=excluded.cap_nhat_luc;` — TẮT lại: xoá dòng ấy.
+- **4 ô "SẮP MỞ" có khoá** ở Sảnh: Đoàn lớp · Rương chuỗi ngày · Trùm lớp (Chủ nhật 20:00) · Ấn thạch dạng — chỉ tên + một dòng mô tả + biểu tượng khoá, không con số nào (test khoá: không chữ số ngoài "20:00", không nút bấm).
+- **Tung chưởng**: hai tia (lửa của em + nước của bạn) nay xuất phát từ ĐẦU từng thần thú và hội vào quái như bản vẽ 4 (cột tia 168 px × 37 vh, nghiêng ±17°); số sát thương đặt dưới dải tên chiêu, cách mép phải 16 px, không đè chữ.
+- Test đo giờ: ca "tự tắt sau 3 giây" từng ĐỎ OAN khi chạy chung cả bộ (đồng hồ giả trôi theo giờ thật, máy nặng thì màn đã tự tắt trước khi test kịp tìm) → viết lại KHÔNG chờ đồng hồ: bắt đúng cái hẹn giờ 3000 ms rồi tự bấm; ca "một chạm là tắt" kiểm NGAY sau cú chạm (không còn được hẹn giờ cứu). Hạn chờ findBy/waitFor của hai tệp giao diện nới lên 8 s.
+- Toàn bộ vitest sau cùng: **5812 test · 97 đỏ / 42 tệp = ĐÚNG NỀN · MỚI ĐỎ = []**; tsc sạch app + server.

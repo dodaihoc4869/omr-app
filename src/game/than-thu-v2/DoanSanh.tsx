@@ -5,6 +5,13 @@ import type { ReactNode } from 'react'
 import type { DoanXem } from './doan-kieu'
 import { BieuTuong, LinhTamCau, QuaiHinh, ThuHinh } from './DoanHinh'
 
+// Bốn thứ đang tới (bước 5, 6). CỐ Ý không có con số nào: máy chủ chưa có số thì không bịa — chỉ tên, một dòng mô tả, biểu tượng khoá.
+const SAP_MO = [
+  ['Đoàn lớp', 'Mỗi chặng thắng đẩy Linh Tâm của cả lớp tiến một trạm trên bản đồ mùa.'],
+  ['Rương chuỗi ngày', 'Đi đều mỗi ngày để mở rương — đứt chuỗi thì đếm lại.'],
+  ['Trùm lớp', 'Chủ nhật 20:00, cả lớp cùng online đánh trùm mùa.'],
+  ['Ấn thạch dạng', 'Khắc phục xong một dạng bài thì ấn sáng, mở biến thể kỹ năng.'],
+] as const
 export interface GoiYHomNay { tong: number; nhom: { ten: string; so: number }[]; hetLuot: boolean }
 interface Props {
   pet: number; cap: number; tenDoan: string; goiY: GoiYHomNay | null
@@ -67,6 +74,14 @@ export default function DoanSanh(p: Props) {
             <small>Đi một mình vẫn có bạn đồng hành do máy điều khiển · thua không mất gì</small>
           </section>
           {p.khoiThem}
+          <section className="dh-sap-mo" aria-label="Sắp mở">
+            {SAP_MO.map(([ten, moTa]) => (
+              <div key={ten} className="dh-kinh">
+                <span className="dh-khoa" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>SẮP MỞ</span>
+                <b>{ten}</b><small>{moTa}</small>
+              </div>
+            ))}
+          </section>
           <section className="dh-kinh dh-muc" aria-label="Đi cùng bạn">
             <div className="dh-nhan">ĐI CÙNG BẠN · 2–4 BẠN MỘT ĐOÀN</div>
             <p>Ngồi cạnh nhau thì càng vui: bạn nào kẹt sẽ bật tín hiệu "cần tiếp sức", trùm thì cả đội cùng bàn một câu.</p>

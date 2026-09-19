@@ -32,6 +32,18 @@ export const NGHI_GIUA_HIEP_MS = 6000
 export const AN_HAN_MS = 1500
 export const PHONG_HET_HAN_MS = 3_600_000
 
+// CỜ MỞ GAME (0.Planer đặt 19/09, cùng kiểu cờ EXP của Code 3): bảng `cau_hinh`, khoá `doan_ho_tong`, JSON `{"dsSbd":["12121212"],"toanBo":false}`.
+// KHÔNG có dòng / JSON hỏng / thiếu bảng = TẮT với mọi em: game y hệt trước khi có Đoàn. Bật cho vài em để chơi thật trên bản sống rồi mới mở cả trường.
+export const LOI_CHUA_MO = 'Đoàn Hộ Tống sắp ra mắt. Em chờ thêm ít hôm nhé.'
+export async function doanMoCho(env: Env, sbd: string): Promise<boolean> {
+  try {
+    const r = await env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa='doan_ho_tong'").first<{ gia_tri: string | null }>()
+    if (!r?.gia_tri) return false
+    const o = JSON.parse(r.gia_tri) as { dsSbd?: unknown; toanBo?: unknown }
+    return o.toanBo === true || (Array.isArray(o.dsSbd) && o.dsSbd.map(x => String(x).trim()).includes(sbd))
+  } catch { return false }
+}
+
 // Lệnh `answer` cho phiên câu của Đoàn chỉ được gọi TỪ ĐÂY (cờ `assisted` do máy chủ quyết, không do máy em khai).
 // WeakSet theo đối tượng: gói tin từ máy em không cách nào tự đánh dấu mình là "nội bộ".
 const noiBo = new WeakSet<object>()
@@ -300,6 +312,7 @@ const ketQuaCau = (r: Row) => ({ correct: r.correct, answer: r.answer, solution:
 
 // ───────────────────────── Bộ lệnh /game-v2/doan-* ─────────────────────────
 export async function doanAction(env: Env, sbd: string, p: Profile, action: string, b: Row, goiGame: GoiGame): Promise<Record<string, unknown>> {
+  if (!await doanMoCho(env, sbd)) throw new Error(LOI_CHUA_MO)
   try { return await chay(env, sbd, p, action, b, goiGame) } catch (e) {
     if (e instanceof Error && /no such table: doan_/i.test(e.message)) throw new Error('Đoàn Hộ Tống chưa mở trên máy chủ. Em quay lại sau nhé.')
     throw e

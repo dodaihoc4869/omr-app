@@ -1,12 +1,15 @@
 // ĐOÀN HỘ TỐNG — bước 3: giao diện. Máy chủ giả bằng một hàm `call`; kiểm đúng gói tin gửi đi và ĐIỀU KHÔNG ĐƯỢC HIỆN.
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
-import { render, screen, fireEvent, cleanup, waitFor, act } from '@testing-library/react'
+import { render, screen, fireEvent, cleanup, waitFor, act, configure } from '@testing-library/react'
 vi.mock('../src/components/KhoiCauSai', () => ({ LoiGiaiCauSai: () => <p>Lời giải từ kho</p> }))
 vi.mock('../src/game/than-thu-v2/battle-audio', () => ({ unlockBattleAudio: vi.fn(), playBattleSound: vi.fn() }))
 import DoanHoTong from '../src/game/than-thu-v2/DoanHoTong'
+import { GIAY_TUNG_CHUONG } from '../src/game/than-thu-v2/DoanTungChuong'
 import { laThuBayVn } from '../src/game/than-thu-v2/Game'
 import type { DoanXem } from '../src/game/than-thu-v2/doan-kieu'
 
+// Chạy chung với cả bộ 5000+ test thì máy rất nặng: nới hạn chờ của findBy/waitFor để không đỏ oan vì chậm (không đo thời gian ở đây).
+configure({ asyncUtilTimeout: 8000 })
 beforeEach(() => { sessionStorage.clear(); localStorage.clear() })
 afterEach(() => { cleanup(); vi.useRealTimers() })
 
@@ -36,6 +39,9 @@ describe('Đoàn Hộ Tống · giao diện · Sảnh', () => {
     const { call } = dung(null)
     expect(await screen.findByText('2 câu Ester')).toBeTruthy(); expect(screen.getByText('1 câu Ancol')).toBeTruthy()
     expect(man().dataset.man).toBe('sanh'); expect(man().textContent).not.toMatch(/Trạm \d|\d+\/30|\d+ vé|chuỗi \d/i)
+    // Bốn ô SẮP MỞ có khoá: tên + một dòng mô tả, KHÔNG con số nào ngoài giờ hẹn Chủ nhật 20:00
+    const sapMo = screen.getByLabelText('Sắp mở'); expect([...sapMo.querySelectorAll('b')].map(b => b.textContent)).toEqual(['Đoàn lớp', 'Rương chuỗi ngày', 'Trùm lớp', 'Ấn thạch dạng'])
+    expect(sapMo.querySelectorAll('.dh-khoa')).toHaveLength(4); expect(sapMo.textContent!.replace('20:00', '')).not.toMatch(/\d/); expect(sapMo.querySelectorAll('button')).toHaveLength(0)
     fireEvent.click(screen.getByRole('button', { name: /LÊN ĐƯỜNG/ }))
     await waitFor(() => expect(call).toHaveBeenCalledWith('doan-mo', {}))
   })
@@ -118,13 +124,17 @@ describe('Đoàn Hộ Tống · giao diện · Tung chưởng và Kết chặng'
     expect(hop.textContent).toContain('VÌ SAO ĐÒN NÀY MẠNH'); expect(hop.textContent).toContain('tự làm đúng'); expect(hop.textContent).toContain('sau khi em tiếp sức')
     expect(hop.textContent).not.toMatch(/\bsai\b|trượt|Nam/i) // bạn chắn (có thể vì sai) không bị nêu tên
     expect(hop.querySelectorAll('image[href*="/spells/"]').length).toBe(2) // tia chiêu thức THẬT của hai bạn ra đòn
-    fireEvent.click(hop); await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    fireEvent.click(hop); expect(screen.queryByRole('dialog')).toBeNull() // tắt NGAY ở cú chạm, không phải nhờ hẹn giờ 3 giây
   })
-  it('tự tắt sau 3 giây; bật "giảm hiệu ứng" của game thì màn mang lớp tĩnh', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true }); localStorage.setItem('game-v2-low', '1')
+  it('tự tắt sau ĐÚNG 3 giây (không hơn); bật "giảm hiệu ứng" của game thì màn mang lớp tĩnh', async () => {
+    // Không chờ đồng hồ thật (máy tải nặng sẽ đỏ oan): bắt đúng cái hẹn giờ 3000 ms mà màn đặt ra, rồi tự bấm nó.
+    const datHen = globalThis.setTimeout, hen: (() => void)[] = []
+    vi.spyOn(globalThis, 'setTimeout').mockImplementation(((fn: () => void, ms?: number, ...a: unknown[]) => ms === 3000 ? (hen.push(fn), 0) : datHen(fn, ms, ...a)) as never)
+    localStorage.setItem('game-v2-low', '1'); expect(GIAY_TUNG_CHUONG).toBeLessThanOrEqual(3)
     dung(sauHiep)
     const hop = await screen.findByRole('dialog'); expect(hop.className).toContain('dh-tinh'); expect(man().className).toContain('dh-tinh')
-    await act(async () => { vi.advanceTimersByTime(3100) }); expect(screen.queryByRole('dialog')).toBeNull()
+    expect(hen).toHaveLength(1); act(() => hen[0]!()); expect(screen.queryByRole('dialog')).toBeNull()
+    vi.restoreAllMocks()
   })
   it('em làm SAI: bảng của em nói thần thú đã chắn + câu sẽ quay lại — không có "vì sao đòn này mạnh"', async () => {
     dung(trongTran({ revision: 9, tran: tran({ hiep: 4, laTrum: true, moSauMs: 6000 }), cau: undefined, hiepVuaXong: { ...vuaXong, tongSatThuong: 48, cuaEm: { ...kqGhe, dung: false, hanhDong: 'chan', satThuong: 0, lienKich: false, chan: 8, giup: null, giupThanhCong: false, heSo: { dung: 0, lienKich: 1, anThach: 1 } } } as never }))

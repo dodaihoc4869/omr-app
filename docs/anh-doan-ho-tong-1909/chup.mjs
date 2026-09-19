@@ -53,7 +53,7 @@ async function moMan(ten, { width = 390, height = 844, giamChuyenDong = false } 
     if (['127.0.0.1', 'localhost'].includes(u.hostname)) return route.continue()
     let data = { ok: true, items: [], ca: [], ds: [], btvn: [] }
     if (u.pathname.includes('/game-v2/')) {
-      data = { ok: true, profile, revision: 1, tasks: [] }
+      data = { ok: true, profile, revision: 1, tasks: [], doanMo: true } // cờ mở game BẬT cho em kiểm thử
       if (u.pathname.endsWith('/recommendations')) Object.assign(data, { dailyUsed: 12, remaining: 188, suggestions: [{ title: 'Ester', source: 'D', part: 'I' }, { title: 'Ester', source: 'D', part: 'I' }, { title: 'Ester', source: 'D', part: 'I' }, { title: 'Ancol', source: 'D', part: 'I' }, { title: 'Ancol', source: 'D', part: 'I' }, { title: 'Amin', source: 'D', part: 'I' }] })
       if (/\/doan-/.test(u.pathname)) data = xem ? { ok: true, doan: xem } : { ok: false, error: 'Không tìm thấy chặng này.' }
     }

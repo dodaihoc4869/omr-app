@@ -76,6 +76,12 @@
 .dh-ds-ban>div{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:18px;background:rgba(255,255,255,.06);font-size:12px;font-weight:700;text-align:center;min-height:96px;justify-content:center}
 .dh-ds-ban>div.dh-trong{opacity:.4;font-weight:500}
 
+.dh-sap-mo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.dh-sap-mo>div{padding:14px;display:flex;flex-direction:column;gap:6px;opacity:.82}
+.dh-sap-mo b{font-size:15px;font-weight:800;line-height:1.2}
+.dh-sap-mo small{font-size:12px;line-height:1.4;color:#c9d6f2}
+.dh-khoa{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:12px;background:rgba(255,209,102,.16);box-shadow:inset 0 0 0 1px rgba(255,209,102,.45);font-size:10.5px;font-weight:800;letter-spacing:.08em;color:var(--dh-vang-nhat)}
+
 /* ───── 2. TRONG TRẬN (không cuộn từ 360×740) ───── */
 .dh-tran{overflow:hidden}
 .dh-tran .dh-khung{height:100%;min-height:0;gap:10px;padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(12px,env(safe-area-inset-bottom))}
@@ -191,15 +197,15 @@
 .dh-chuong-dai.dh-phu{top:auto;bottom:46%;left:auto;right:-20px;width:62%;height:50px;background:linear-gradient(270deg,#2f8cff,#7fe9ff 70%,rgba(127,233,255,0));box-shadow:0 8px 24px rgba(60,160,255,.5);animation-delay:.25s}
 .dh-chuong-dai.dh-phu>div{left:auto;right:40px;align-items:flex-end;top:5px}
 .dh-chuong-dai.dh-phu small{color:#06224a}.dh-chuong-dai.dh-phu b{font-size:17px;text-shadow:0 2px 0 #0a3a7a}
-.dh-chuong-dich{position:absolute;left:50%;top:21%;transform:translateX(-50%);z-index:3}
+.dh-chuong-dich{position:absolute;left:44%;top:22%;transform:translateX(-50%);z-index:3}
 .dh-chuong-dich>*{animation:dh-hit .5s ease-in-out .7s 3}
 /* Ảnh tia chiêu thức vẽ NGANG (bắn sang phải) → đặt khung ngang dài bằng chiều cao cột rồi xoay −90° để tia bắn LÊN trúng quái. */
-.dh-chuong-cot{position:absolute;bottom:42%;height:35vh;width:150px;z-index:1;transform-origin:50% 100%}
+.dh-chuong-cot{position:absolute;bottom:41%;height:37vh;width:168px;z-index:1;transform-origin:50% 100%}
 .dh-chuong-tia{position:absolute;inset:0;transform-origin:50% 100%;animation:dh-beam-len .5s ease-out .35s both,dh-beam 1.2s ease-in-out .85s infinite;filter:drop-shadow(0 0 14px var(--bc))}
-.dh-chuong-tia svg{position:absolute;left:50%;top:50%;width:35vh;height:150px;transform:translate(-50%,-50%) rotate(-90deg)}
+.dh-chuong-tia svg{position:absolute;left:50%;top:50%;width:37vh;height:168px;transform:translate(-50%,-50%) rotate(-90deg)}
 .dh-chuong-thu{position:absolute;bottom:27%;z-index:2}
-.dh-chuong-so{z-index:5;position:absolute;right:6%;top:22%;display:flex;flex-direction:column;align-items:flex-start;transform:rotate(6deg);animation:dh-pop-in .5s cubic-bezier(.2,1.6,.4,1) .8s both}
-.dh-chuong-so b{font-size:54px;font-weight:800;line-height:1}
+.dh-chuong-so{z-index:5;position:absolute;right:16px;top:calc(13% + 78px);display:flex;flex-direction:column;align-items:flex-start;transform:rotate(6deg);animation:dh-pop-in .5s cubic-bezier(.2,1.6,.4,1) .8s both}
+.dh-chuong-so b{font-size:48px;font-weight:800;line-height:1}
 .dh-chuong-so small{margin-top:-4px;font-size:12px;font-weight:800;letter-spacing:.1em;text-shadow:0 0 10px #ff8a3d}
 .dh-chuong-lk{z-index:5;position:absolute;left:10px;top:30%;padding:7px 14px;border-radius:999px;background:linear-gradient(90deg,#ff7a45,#ffc53d 55%,#7fe9ff);box-shadow:0 0 22px rgba(255,200,90,.9);font-size:14px;font-weight:800;letter-spacing:.06em;color:#2a1200;transform:rotate(-8deg);animation:dh-pop-in .45s cubic-bezier(.2,1.6,.4,1) .6s both}
 .dh-chuong-san{z-index:5;position:absolute;left:14px;top:36%;width:170px;text-shadow:0 1px 3px #000;display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#e6ff7a}
