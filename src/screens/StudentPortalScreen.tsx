@@ -1,5 +1,6 @@
 import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
 import { mucMenuHocSinh } from '../components/bang-nhiem-vu/muc-menu'
+import { useCaDangMo, useKeHoachNgay, useLamMoiKhiDong } from '../components/bang-nhiem-vu/may-chu'
 import { dungBangNhiemVu } from '../lib/nhiem-vu-adapter'
 import { tongHopKeHoachTroLy } from '../lib/tro-ly-ca-nhan'
 import { PETS } from '../game/than-thu-v2/core'
@@ -959,7 +960,11 @@ export default function StudentPortalScreen() {
     return t
   }, [dsLichSu])
 
-  // Bảng nhiệm vụ: một adapter nhận nguồn trợ lý (nguồn /hs/ke-hoach-ngay nối sau).
+  // Bảng nhiệm vụ: kế hoạch ngày của máy chủ (/hs/ke-hoach-ngay); lỗi/mất mạng → bản cuối hoặc nguồn trợ lý.
+  const dangMoManCon =
+    tab !== null || dangLamMom !== null || manThi || boVaoThi !== null || !!phieuHtml || !!xemDeHtml || caXemBaoCaoModal !== null || dsCauSaiKhacPhucModal !== null
+  const keHoachNgay = useKeHoachNgay({ token: auth?.token, sbd: auth?.sbd }, !!auth, useLamMoiKhiDong(dangMoManCon))
+  const caDangMo = useCaDangMo({ token: auth?.token, sbd: auth?.sbd }, !!auth)
   const duLieuNhiemVu = useMemo(
     () =>
       dungBangNhiemVu({
@@ -974,9 +979,12 @@ export default function StudentPortalScreen() {
           hoSoThanThu,
         }),
         now: nowHocTap,
+        keHoachNgay: keHoachNgay.keHoach,
+        cu: keHoachNgay.cu,
+        dsBtvn,
         dsMomGiao,
       }),
-    [nowHocTap, auth?.sbd, auth?.hoTen, dsBtvn, dsMomGiao, dsLichSu, tongSoCauSaiDaChon, hoSoThanThu],
+    [nowHocTap, auth?.sbd, auth?.hoTen, dsBtvn, dsMomGiao, dsLichSu, tongSoCauSaiDaChon, hoSoThanThu, keHoachNgay],
   )
   const thanThuGoc = useMemo(() => {
     const index = Math.max(0, PETS.findIndex((p) => p.id === (hoSoThanThu?.pet || 'hoa_long')))
@@ -1281,7 +1289,7 @@ export default function StudentPortalScreen() {
           hoTen={auth.hoTen}
           now={nowHocTap}
           duLieu={duLieuNhiemVu}
-          dangTai={!daNapLanDau || (!daTaiMom && !loiMom)}
+          dangTai={!daNapLanDau || (!daTaiMom && !loiMom) || !keHoachNgay.daXong}
           thanThu={thanThuGoc}
           mucMenu={mucMenuHocSinh(moManCu, dangXuat)}
           khePhai={
@@ -1301,6 +1309,7 @@ export default function StudentPortalScreen() {
               }}
             />
           }
+          caDangMo={caDangMo}
           onHanhDong={xuLyHanhDongTroLy}
           onMoThanThu={() => setTab('thanthu')}
           onVaoThi={() => setTab('vaothi')}

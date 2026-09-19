@@ -5,7 +5,8 @@ import { dungBangNhiemVu } from '../lib/nhiem-vu-adapter'
 import { tongHopKeHoachTroLy } from '../lib/tro-ly-ca-nhan'
 import { PETS } from '../game/than-thu-v2/core'
 import { useGioHocTap } from '../hooks/useGioHocTap'
-import { momApi, migrateMom, momReviewHtml, chuanHoaBaiMom, parentNewsApi } from '../lib/mom-api'
+import { useKeHoachNgay } from '../components/bang-nhiem-vu/may-chu'
+import { momApi, migrateMom, momReviewHtml, chuanHoaBaiMom } from '../lib/mom-api'
 import KhoiKhacPhuc3CheDo from '../components/KhoiKhacPhuc3CheDo'
 import { useEffect, useMemo, useState } from 'react'
 import DongDemCau from '../components/DongDemCau'
@@ -26,7 +27,7 @@ import KhungXemPhieu from '../components/KhungXemPhieu'
 import BaoCaoCaThiPhuHuynhModal from '../components/BaoCaoCaThiPhuHuynhModal'
 import ModalKhacPhucCauSai from '../components/ModalKhacPhucCauSai'
 import { hopLeDeRut } from '../lib/loc-cau-rut'
-import { hsCauSaiApi, hsLichSuCaApi, tenTheoSbd, thanThuDocApi } from '../lib/exam-api'
+import { hsBtvnApi, hsCauSaiApi, hsLichSuCaApi, tenTheoSbd, thanThuDocApi } from '../lib/exam-api'
 import { loadScriptUrl } from '../lib/exam-db'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
@@ -92,9 +93,8 @@ export default function ParentPortalScreen() {
   // Bảng nhiệm vụ: skeleton tới khi lượt nạp bài gia đình giao đầu tiên xong (kể cả lỗi).
   const [daNapMomLanDau, setDaNapMomLanDau] = useState(false)
   const [hoSoThanThuCon, setHoSoThanThuCon] = useState<any>(null)
-  // Số bài chưa nộp do máy chủ báo (parent-news). Phụ huynh CHƯA có danh sách BTVN
-  // của con, nên chỉ nói số — không dựng thẻ việc từ số liệu không có.
-  const [chuaNopCon, setChuaNopCon] = useState<{ btvn: number; mom: number; daily: number } | null>(null)
+  // BTVN của con (`/hs/btvn` tra theo SBD, như màn học sinh): lấy TÊN bài cho kế hoạch ngày và nguồn dự phòng.
+  const [dsBtvnCon, setDsBtvnCon] = useState<any[]>([])
   const nowHocTap = useGioHocTap()
 
   const caGanNhat = useMemo(() => {
@@ -106,6 +106,7 @@ export default function ParentPortalScreen() {
     })[0]
   }, [dsBaiThi])
 
+  const keHoachNgay = useKeHoachNgay({ sbd: sbdHienTai ?? undefined }, !!sbdHienTai, 0)
   const duLieuNhiemVu = useMemo(
     () =>
       dungBangNhiemVu({
@@ -113,16 +114,19 @@ export default function ParentPortalScreen() {
           now: nowHocTap,
           sbd: sbdHienTai ?? '',
           hoTen: hoTenCon,
-          dsBtvn: [],
+          dsBtvn: dsBtvnCon,
           dsMomGiao,
           dsLichSu: dsBaiThi.map((b) => ({ maCa: b.maCa, nopLuc: b.ngayNop, tongCau: b.tongSoCau })),
           tongCauSai: tongSoCauSaiCon > 0 ? tongSoCauSaiCon : dsBaiThi.reduce((acc, b) => acc + (b.soCauSai || 0), 0),
           hoSoThanThu: hoSoThanThuCon,
         }),
         now: nowHocTap,
+        keHoachNgay: keHoachNgay.keHoach,
+        cu: keHoachNgay.cu,
+        dsBtvn: dsBtvnCon,
         dsMomGiao,
       }),
-    [nowHocTap, sbdHienTai, hoTenCon, dsMomGiao, dsBaiThi, tongSoCauSaiCon, hoSoThanThuCon],
+    [nowHocTap, sbdHienTai, hoTenCon, dsMomGiao, dsBtvnCon, dsBaiThi, tongSoCauSaiCon, hoSoThanThuCon, keHoachNgay],
   )
   const thanThuCon = useMemo(() => {
     const index = Math.max(0, PETS.findIndex((p) => p.id === (hoSoThanThuCon?.pet || 'hoa_long')))
@@ -183,11 +187,11 @@ export default function ParentPortalScreen() {
     let huy = false
     const nap = async () => {
       try {
-        const [url, r] = await Promise.all([loadScriptUrl().catch(() => ''), parentNewsApi('list', sbdHienTai)])
+        const url = await loadScriptUrl().catch(() => '')
+        const [bt, th] = await Promise.all([hsBtvnApi(url, sbdHienTai).catch(() => null), thanThuDocApi(url, sbdHienTai).catch(() => null)])
         if (huy) return
-        setChuaNopCon(r?.report?.pendingDetails ?? null)
-        const th = await thanThuDocApi(url, sbdHienTai)
-        if (!huy && th.ok && th.hoSo) setHoSoThanThuCon(th.hoSo)
+        if (bt?.ok && Array.isArray(bt.items)) setDsBtvnCon(bt.items)
+        if (th?.ok && th.hoSo) setHoSoThanThuCon(th.hoSo)
       } catch {
         /* Không có số liệu thì không nói số. */
       }
@@ -294,7 +298,7 @@ export default function ParentPortalScreen() {
     setDsBaiThi([])
     setDsMomGiao([])
     setDaNapMomLanDau(false)
-    setChuaNopCon(null)
+    setDsBtvnCon([])
     setHoSoThanThuCon(null)
     setSbdInput('')
   }
@@ -593,7 +597,7 @@ export default function ParentPortalScreen() {
           hoTen={hoTenCon}
           now={nowHocTap}
           duLieu={duLieuNhiemVu}
-          dangTai={dangTai || !daNapMomLanDau}
+          dangTai={dangTai || !daNapMomLanDau || !keHoachNgay.daXong}
           thanThu={thanThuCon}
           mucMenu={mucMenuPhuHuynh(setTabPh, dangXuat, {
             // Kết quả giao nhanh hiện ở khung thông báo của sheet "khắc phục", nên mở sheet ngay.
@@ -606,11 +610,6 @@ export default function ParentPortalScreen() {
               void xuLyGiaoBaiLuyen1Click()
             },
           })}
-          ghiChuNguon={
-            chuaNopCon && chuaNopCon.btvn > 0
-              ? `Con còn ${chuaNopCon.btvn} bài tập Thầy giao chưa nộp. Chi tiết từng bài xem ở “Bảng tin của con” trong menu.`
-              : undefined
-          }
           onGiaoBai={() => setTabPh('khacphuc')}
         />
       )}

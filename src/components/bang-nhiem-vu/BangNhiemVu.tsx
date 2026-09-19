@@ -9,7 +9,7 @@ import type { DuLieuBangNhiemVu, HanhDongNhiemVu, TheNhiemVu } from '../../lib/n
 import type { SpiritMotion } from '../../game/than-thu-v2/Spirit2D'
 import DauTrang, { type MucMenu, type ThanThuGoc } from './DauTrang'
 import TheLamNgay from './TheLamNgay'
-import DanhSachNhiemVu from './DanhSachNhiemVu'
+import DanhSachNhiemVu, { DanhSachQuaHan } from './DanhSachNhiemVu'
 import TheVinhDanh, { type DuLieuVinhDanh } from './TheVinhDanh'
 import NutVaoThi from './NutVaoThi'
 import './m3-theme.css'
@@ -203,7 +203,23 @@ export default function BangNhiemVu({
                 </div>
               ) : (
                 <span className="bnv-chu-phu">
-                  {conLai > 0 ? `Còn ${conLai} câu là tới mức gợi ý hôm nay` : 'Em đã tới mức gợi ý hôm nay'}
+                  {tienDo.ghiChu ?? (conLai > 0 ? `Còn ${conLai} câu là tới mức gợi ý hôm nay` : 'Em đã tới mức gợi ý hôm nay')}
+                </span>
+              )}
+              {laPh && tienDo.ghiChu && <span className="bnv-chu-phu">{tienDo.ghiChu}</span>}
+              {duLieu.ngayNghi && (
+                <span className="bnv-chu-phu" data-vung="ngay-nghi">
+                  Hôm nay là ngày nghỉ · chuỗi không đứt
+                </span>
+              )}
+              {duLieu.canhBao.map((c) => (
+                <span key={`${c.loai}:${c.noiDung}`} className="bnv-chu-phu" data-vung="canh-bao" data-loai={c.loai}>
+                  {c.noiDung}
+                </span>
+              ))}
+              {duLieu.ghiChuCu && (
+                <span className="bnv-chu-phu" data-vung="ke-hoach-cu">
+                  {duLieu.ghiChuCu}
                 </span>
               )}
               {ghiChuNguon && (
@@ -244,6 +260,7 @@ export default function BangNhiemVu({
                 <DanhSachNhiemVu cacBac={duLieu.cacBac} docChi={laPh} onChon={chon} />
               </>
             )}
+            <DanhSachQuaHan viec={duLieu.quaHan} docChi={laPh} onChon={(q) => q.hanhDong && onHanhDong?.(q.hanhDong)} />
 
             {laPh && onGiaoBai && (
               <section className="bnv-giao-bai" data-vuot={vuotTai ? 'true' : 'false'} aria-label="Giao bài cho con" data-vung="giao-bai">
@@ -269,7 +286,8 @@ export default function BangNhiemVu({
           </>
         )}
 
-        <TheVinhDanh tatChuyenDong={!choDong} taiDuLieu={taiVinhDanh} />
+        {/* Không dựng khi còn skeleton: thẻ này nằm dưới vùng nhiệm vụ, nội dung thật phình ra sẽ đẩy nó đi (CLS). */}
+        {!dangTai && <TheVinhDanh tatChuyenDong={!choDong} taiDuLieu={taiVinhDanh} />}
       </main>
 
       {!laPh && onVaoThi && <NutVaoThi caDangMo={caDangMo} onVaoThi={onVaoThi} />}

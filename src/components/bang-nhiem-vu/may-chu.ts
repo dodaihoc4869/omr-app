@@ -1,0 +1,139 @@
+// Gọi máy chủ cho Bảng nhiệm vụ: kế hoạch ngày + "có ca đang mở". Mọi lỗi → null/false, KHÔNG ném:
+// màn phải sống được khi mất mạng (rơi về nguồn trợ lý, hoặc hiện bản cuối kèm "kế hoạch lúc …").
+import { useEffect, useRef, useState } from 'react'
+import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
+import { laKeHoachNgayHopLe, type KeHoachNgayMayChu } from '../../lib/nhiem-vu-adapter'
+
+export interface DinhDanh {
+  /** Có token thì SBD lấy từ chữ ký (ưu tiên). Không thì SBD (phụ huynh). */
+  token?: string
+  sbd?: string
+}
+
+async function goiPost(duong: string, body: unknown, giay: number): Promise<any | null> {
+  const c = new AbortController()
+  const t = setTimeout(() => c.abort(), giay * 1000)
+  try {
+    const url = await layDiaChiMayChu()
+    if (!url) return null
+    const r = await fetch(`${url}${duong}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal: c.signal })
+    if (!r.ok) return null
+    return await r.json()
+  } catch {
+    return null
+  } finally {
+    clearTimeout(t)
+  }
+}
+
+const thanDinhDanh = (d: DinhDanh) => (d.token ? { token: d.token } : { sbd: d.sbd })
+
+/** `POST /hs/ke-hoach-ngay` — máy chủ tính lại mỗi lần gọi. Trả null nếu lỗi hoặc JSON không đủ phần. */
+export async function taiKeHoachNgay(d: DinhDanh): Promise<KeHoachNgayMayChu | null> {
+  const r = await goiPost('/hs/ke-hoach-ngay', thanDinhDanh(d), 10)
+  return laKeHoachNgayHopLe(r) ? r : null
+}
+
+/** `POST /hs/ca-dang-mo` → { ok, coCaMo, soCa }. Lỗi/404/thiếu trường → false. */
+export async function taiCaDangMo(d: DinhDanh): Promise<boolean> {
+  const r = await goiPost('/hs/ca-dang-mo', thanDinhDanh(d), 8)
+  return !!r && r.ok === true && r.coCaMo === true
+}
+
+const nguoiCua = (d: DinhDanh) => d.token || d.sbd || ''
+
+/** Nhịp gọi lại: mở màn, mỗi 60 s khi tab đang hiện, khi quay lại tab, và khi `khoa` đổi. */
+function useNhipGoi(chay: () => void, bat: boolean, khoa: string) {
+  const ref = useRef(chay)
+  ref.current = chay
+  useEffect(() => {
+    if (!bat) return
+    const goi = () => {
+      if (typeof document === 'undefined' || !document.hidden) ref.current()
+    }
+    goi()
+    const t = setInterval(goi, 60_000)
+    window.addEventListener('focus', goi)
+    document.addEventListener('visibilitychange', goi)
+    return () => {
+      clearInterval(t)
+      window.removeEventListener('focus', goi)
+      document.removeEventListener('visibilitychange', goi)
+    }
+  }, [bat, khoa])
+}
+
+export interface TrangThaiKeHoach {
+  keHoach: KeHoachNgayMayChu | null
+  /** Lượt gọi ĐẦU đã có kết quả (thành công hay lỗi) — trước đó màn vẽ skeleton. */
+  daXong: boolean
+  /** Lần gọi mới nhất lỗi mà còn bản cuối ⇒ đang hiện bản cuối. */
+  cu: boolean
+}
+const BAN_DAU: TrangThaiKeHoach & { nguoi: string } = { keHoach: null, daXong: false, cu: false, nguoi: '' }
+
+export function useKeHoachNgay(d: DinhDanh, bat: boolean, lamMoi: number): TrangThaiKeHoach {
+  const nguoi = nguoiCua(d)
+  const [t, setT] = useState(BAN_DAU)
+  const dangGoi = useRef(false)
+  useNhipGoi(
+    () => {
+      if (dangGoi.current) return
+      dangGoi.current = true
+      void taiKeHoachNgay(d).then((kq) => {
+        dangGoi.current = false
+        setT((truoc) => {
+          const cung = truoc.nguoi === nguoi
+          const cuBan = cung ? truoc.keHoach : null
+          return kq ? { keHoach: kq, daXong: true, cu: false, nguoi } : { keHoach: cuBan, daXong: true, cu: cuBan !== null, nguoi }
+        })
+      })
+    },
+    bat && !!nguoi,
+    `${nguoi}|${lamMoi}`,
+  )
+  return t.nguoi === nguoi ? t : BAN_DAU
+}
+
+export function useCaDangMo(d: DinhDanh, bat: boolean): boolean {
+  const nguoi = nguoiCua(d)
+  const [co, setCo] = useState(false)
+  useNhipGoi(
+    () => {
+      void taiCaDangMo(d).then(setCo)
+    },
+    bat && !!nguoi,
+    nguoi,
+  )
+  return bat && !!nguoi ? co : false
+}
+
+/** Tăng 1 mỗi lần `dangMo` chuyển từ true → false (vừa đóng một màn/sheet): lúc đó nên hỏi lại kế hoạch. */
+export function useLamMoiKhiDong(dangMo: boolean): number {
+  const [n, setN] = useState(0)
+  const truoc = useRef(dangMo)
+  useEffect(() => {
+    if (truoc.current && !dangMo) setN((x) => x + 1)
+    truoc.current = dangMo
+  }, [dangMo])
+  return n
+}
+
+/** true sau khung hình đầu tiên đã vẽ: dùng để KHÔNG kéo ảnh sprite thần thú (3 MB) trước khi có chữ + thẻ. */
+export function useSauVeDauTien(): boolean {
+  const [xong, setXong] = useState(false)
+  useEffect(() => {
+    let huy = false
+    const chay = () => {
+      if (!huy) setXong(true)
+    }
+    const w = window as any
+    const id = typeof w.requestIdleCallback === 'function' ? w.requestIdleCallback(chay, { timeout: 2000 }) : setTimeout(chay, 150)
+    return () => {
+      huy = true
+      if (typeof w.cancelIdleCallback === 'function') w.cancelIdleCallback(id)
+      else clearTimeout(id)
+    }
+  }, [])
+  return xong
+}

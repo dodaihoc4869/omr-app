@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Check, EllipsisVertical, Flame } from 'lucide-react'
 import Spirit2D, { type SpiritMotion } from '../../game/than-thu-v2/Spirit2D'
+import { useSauVeDauTien } from './may-chu'
 
 export interface MucMenu {
   id: string
@@ -84,11 +85,13 @@ export default function DauTrang({
   }, [moMenu])
 
   const laPh = vaiTro === 'phuhuynh'
+  // Ảnh sprite thần thú nặng ~3 MB: chỉ gắn Spirit2D sau khi chữ + thẻ đã vẽ; vòng 96 dp giữ chỗ nên không xô bố cục.
+  const sauVe = useSauVeDauTien()
   const ten = tenGoi(hoTen, laPh ? 'con' : 'em')
   const nhanThu = `${thanThu.ten} · Cấp ${thanThu.cap}`
   const hinhThu = (
     <span className="bnv-thu-vong">
-      <Spirit2D index={thanThu.index} level={thanThu.cap} compact motion={dongThu} reducedMotion={tatChuyenDong || nghi} />
+      {sauVe && <Spirit2D index={thanThu.index} level={thanThu.cap} compact motion={dongThu} reducedMotion={tatChuyenDong || nghi} />}
     </span>
   )
 

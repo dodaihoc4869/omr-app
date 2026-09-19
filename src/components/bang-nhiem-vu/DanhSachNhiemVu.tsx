@@ -3,7 +3,7 @@
 // Việc bị cổng hiện mờ 38% kèm nhãn "Mở sau khi xong: <tên việc>".
 import { useEffect, useState } from 'react'
 import { BookOpen, ChevronRight, Heart, Lock, RotateCcw, Sparkles, Target } from 'lucide-react'
-import type { BieuTuongViec, NhomBac, TheNhiemVu } from '../../lib/nhiem-vu-adapter'
+import type { BieuTuongViec, NhomBac, TheNhiemVu, TheQuaHan } from '../../lib/nhiem-vu-adapter'
 
 const BIEU_TUONG: Record<BieuTuongViec, typeof Heart> = {
   btvn: BookOpen,
@@ -119,5 +119,42 @@ export default function DanhSachNhiemVu({
           </section>
         ))}
     </>
+  )
+}
+
+/** Việc đã quá hạn — liệt kê RIÊNG, không phải nhiệm vụ hôm nay (máy chủ không tính vào tải). */
+export function DanhSachQuaHan({ viec, docChi, onChon }: { viec: TheQuaHan[]; docChi: boolean; onChon: (viec: TheQuaHan) => void }) {
+  if (viec.length === 0) return null
+  return (
+    <section className="bnv-bac" data-bac="qua_han" aria-label={`Đã quá hạn: ${viec.length} việc`}>
+      <h2 className="bnv-bac-dau">
+        <span className="bnv-bac-cham" aria-hidden="true" />
+        <span>QUÁ HẠN · {viec.length}</span>
+      </h2>
+      {viec.map((v) => {
+        const Icon = v.loai === 'mom' ? Heart : BookOpen
+        const ruot = (
+          <>
+            <span className="bnv-the-o">
+              <Icon size={20} aria-hidden="true" />
+            </span>
+            <span className="bnv-the-chu">
+              <span className="bnv-the-ten">{v.tieuDe}</span>{' '}
+              <span className="bnv-the-mo-ta">{v.chu}</span>
+            </span>
+            {v.hanhDong && !docChi && <ChevronRight size={20} aria-hidden="true" />}
+          </>
+        )
+        return v.hanhDong && !docChi ? (
+          <button key={v.id} type="button" className="bnv-the bnv-the--nhat" aria-label={`${v.tieuDe} ${v.chu} — QUÁ HẠN`} onClick={() => onChon(v)}>
+            {ruot}
+          </button>
+        ) : (
+          <div key={v.id} className="bnv-the bnv-the--nhat" role="group" aria-label={`${v.tieuDe} ${v.chu} — QUÁ HẠN`}>
+            {ruot}
+          </div>
+        )
+      })}
+    </section>
   )
 }

@@ -25,18 +25,32 @@ const troLy = (over: object = {}) =>
   tongHopKeHoachTroLy({ sbd: 't', hoTen: 'Minh', dsBtvn: [], dsMomGiao: [], dsLichSu: [], tongCauSai: 0, now: NOW, ...over })
 const duLieu = (over: object = {}) => dungBangNhiemVu({ keHoachTroLy: troLy(over), now: NOW })
 
+const dsBtvnMay = [
+  { maBtvn: 'BT-ANCOL', maCa: 'CA-ANCOL', tenBtvn: 'BTVN Ancol', soCau: 12 },
+  { maBtvn: 'BT-ESTE', maCa: 'CA-ESTE', tenBtvn: 'BTVN Este', soCau: 12 },
+]
+const momDangLam = { id: 'M9', tieuDe: 'Bài của Mẹ giao', soCau: 8, trangThai: 'dang_lam' }
+const phu = { dsBtvn: dsBtvnMay, dsMomGiao: [momDangLam] }
+const vm = (o: object) => ({ thuTu: 1, batBuoc: false, khan: false, cong: null, hien: true, nhan: null, trangThai: 'cho', ghiChu: '', chiTiet: {}, hanCung: null, hanMem: null, nguon: 'x', ...o })
+// Hình dạng thật của POST /hs/ke-hoach-ngay: 5 việc phủ đủ 4 bậc; 2 việc cuối bị cổng (hien:false).
 const keHoachMayChu: KeHoachNgayMayChu = {
+  ok: true,
+  nganSach: { mucTieuCau: 12, toiThieuCau: 6, vanTocGiay: 78, vanTocNguon: 'do', ghiChuVanToc: '' },
   viec: [
-    { id: 'lo1', loai: 'btvn_lo', tieuDe: 'BTVN Ancol · Lô 2/4', soCau: 6, hanCung: gio(2), batBuoc: true, trangThai: 'chua_lam' },
-    { id: 'mom1', loai: 'mom', tieuDe: 'Bài của Mẹ giao', soCau: 8, hanCung: gio(0.7), batBuoc: true, khan: true, trangThai: 'dang_lam' },
-    { id: 'on1', loai: 'on_toi_han', soCau: 3, batBuoc: true, trangThai: 'chua_lam' },
-    { id: 'thi1', loai: 'on_thi', soCau: 4, nhan: 'bu', trangThai: 'chua_lam' },
-    { id: 'tt1', loai: 'thu_thach', soCau: 2, nhan: 'tuy_chon', trangThai: 'chua_lam' },
-  ],
-  nganSach: { mucTieuCau: 12, vanToc: 78 },
-  soCauDaLam: 6,
+    vm({ id: 'mom:M9', loai: 'mom', soCau: 8, hanCung: gio(0.7), batBuoc: true, khan: true, nhan: 'khan_cap', chiTiet: { id: 'M9' } }),
+    vm({ id: 'btvn_lo:BT-ANCOL:1', loai: 'btvn_lo', soCau: 6, hanCung: gio(1.5), batBuoc: true, khan: true, nhan: 'khan_cap', cong: 'mom:M9', chiTiet: { ma: 'BT-ANCOL', chiSo: 1, tongLo: 4 } }),
+    vm({ id: 'btvn_lo:BT-ESTE:0', loai: 'btvn_lo', soCau: 6, hanCung: gio(40), batBuoc: true, cong: 'btvn_lo:BT-ANCOL:1', chiTiet: { ma: 'BT-ESTE', chiSo: 0, tongLo: 2 } }),
+    vm({ id: 'on_lai:2026-09-19', loai: 'on_lai', soCau: 3, hien: false, nhan: 'bu', cong: 'btvn_lo:BT-ESTE:0', ghiChu: 'Ôn 3 câu đã tới hạn nhắc lại' }),
+    vm({ id: 'than_thu:X', loai: 'than_thu', soCau: 6, hien: false, nhan: 'tuy_chon', cong: 'on_lai:2026-09-19', ghiChu: 'Luyện dạng còn yếu với thần thú' }),
+  ] as any,
+  canhBao: [{ loai: 'qua_tai', noiDung: 'Hôm nay dồn 26 câu, vượt mức 12 câu (+14).' }],
+  quaHan: [{ loai: 'btvn', ma: 'BT-CU', hanNop: gio(-30), conLai: 10 }],
+  tienBo: { daLamCau: 6, lenBac: 2, conThieu: 0 },
   chuoiDat: 5,
+  lanNghi: true,
+  capNhatLuc: gio(-0.2),
 }
+const duLieuMay = (cu = false) => tuKeHoachNgay(keHoachMayChu, NOW, phu, cu)
 
 const vinhDanh3 = async () => ({
   day: '2026-09-19',
@@ -131,9 +145,10 @@ describe('một nút nổi bật', () => {
 
 describe('bốn bậc, bốn vai trò màu, cổng', () => {
   it('nguồn máy chủ: đủ 4 bậc, mỗi bậc đúng 1 vai trò màu', async () => {
-    const { container } = ve({ duLieu: tuKeHoachNgay(keHoachMayChu, NOW) })
+    const { container } = ve({ duLieu: duLieuMay() })
     const vaiTro = Object.fromEntries(
-      Array.from(container.querySelectorAll('[data-bac]')).map((n) => [n.getAttribute('data-bac'), n.getAttribute('data-vai-tro')]),
+      // Mục "quá hạn" là danh sách riêng, không thuộc 4 bậc nhiệm vụ (không có vai trò màu).
+      Array.from(container.querySelectorAll('[data-bac][data-vai-tro]')).map((n) => [n.getAttribute('data-bac'), n.getAttribute('data-vai-tro')]),
     )
     expect(vaiTro).toEqual({ khan: 'error', bat_buoc: 'primary', nen_lam: 'secondary', tuy_chon: 'tertiary' })
     // KHẨN đứng đầu danh sách.
@@ -142,22 +157,23 @@ describe('bốn bậc, bốn vai trò màu, cổng', () => {
   })
 
   it('việc KHẨN có đồng hồ đếm lùi', async () => {
-    ve({ duLieu: tuKeHoachNgay(keHoachMayChu, NOW) })
-    expect(screen.getByRole('timer').textContent).toMatch(/^\d{2}:\d{2}$/)
+    ve({ duLieu: duLieuMay() })
+    expect(screen.getByRole('timer').textContent).toMatch(/^(\d+:)?\d{2}:\d{2}$/)
     await screen.findByText('Hoả Long')
   })
 
   it('thẻ bị cổng: mờ 38% (CSS), aria-disabled, nhãn "Mở sau khi xong: <tên việc>", không bấm được', async () => {
     const onHanhDong = vi.fn()
-    const { container } = ve({ duLieu: tuKeHoachNgay(keHoachMayChu, NOW), onHanhDong })
+    const { container } = ve({ duLieu: duLieuMay(), onHanhDong })
     const biCong = Array.from(container.querySelectorAll('[data-bi-cong="true"]'))
     expect(biCong.length).toBeGreaterThan(0)
     for (const the of biCong) {
       expect(the.getAttribute('aria-disabled')).toBe('true')
       expect(the.tagName).not.toBe('BUTTON')
-      expect(the.textContent).toContain('Mở sau khi xong: BTVN Ancol · Lô 2/4')
+      expect(the.textContent).toContain('Mở sau khi xong: ')
       fireEvent.click(the)
     }
+    expect(biCong[0].textContent).toContain('Mở sau khi xong: BTVN Este: Lô 1/2')
     expect(onHanhDong).not.toHaveBeenCalled()
     const css = readFileSync(join(THU_MUC, 'bang-nhiem-vu.css'), 'utf8')
     expect(css).toMatch(/\.bnv-the\[aria-disabled='true'\]\s*\{[^}]*opacity:\s*0?\.38/)
@@ -172,17 +188,17 @@ describe('trạng thái trống nói thật', () => {
     expect(container.querySelectorAll('.bnv-the').length).toBe(0)
     expect(container.querySelectorAll('[data-vung="lam-ngay"]').length).toBe(0)
     expect(container.querySelectorAll('.bnv-nut-chinh').length).toBe(0)
-    expect(screen.getAllByRole('img', { name: 'Thần thú' }).length).toBeGreaterThan(0)
+    expect((await screen.findAllByRole('img', { name: 'Thần thú' })).length).toBeGreaterThan(0)
     expect(await screen.findByText(/Hôm nay chưa có bài chấm xong/)).toBeTruthy()
   })
 
   it('không có việc: thần thú đứng yên ("nghỉ"); có việc thì không', async () => {
     const { container, unmount } = ve({ duLieu: duLieu(), taiVinhDanh: vinhDanhRong })
-    expect(container.querySelector('.bnv-thu-vong [data-tinh]')!.getAttribute('data-tinh')).toBe('co')
+    await waitFor(() => expect(container.querySelector('.bnv-thu-vong [data-tinh]')!.getAttribute('data-tinh')).toBe('co'))
     await screen.findByText(/Hôm nay chưa có bài chấm xong/)
     unmount()
     const c2 = ve().container
-    expect(c2.querySelector('.bnv-thu-vong [data-tinh]')!.getAttribute('data-tinh')).toBe('khong')
+    await waitFor(() => expect(c2.querySelector('.bnv-thu-vong [data-tinh]')!.getAttribute('data-tinh')).toBe('khong'))
     await screen.findByText('Hoả Long')
   })
 
@@ -191,6 +207,11 @@ describe('trạng thái trống nói thật', () => {
     expect(container.querySelectorAll('[aria-busy="true"] .bnv-xuong').length).toBeGreaterThanOrEqual(3)
     expect(screen.queryByText('Hôm nay chưa có việc — thần thú đang nghỉ')).toBeNull()
     expect(container.querySelectorAll('.bnv-the').length).toBe(0)
+  })
+
+  it('đang tải: KHÔNG dựng thẻ Vinh danh (nó sẽ bị nội dung phình ra đẩy đi → CLS)', () => {
+    const { container } = ve({ dangTai: true, duLieu: duLieu(), taiVinhDanh: vinhDanhRong })
+    expect(container.querySelector('[data-vung="vinh-danh"]')).toBeNull()
   })
 
   it('chưa đo được tốc độ thì nói "chưa đo"; không có chữ "nắm chắc"', async () => {
@@ -228,7 +249,7 @@ describe('giảm chuyển động', () => {
     expect(container.querySelector('.bnv')!.getAttribute('data-chuyen-dong')).toBe('tat')
     expect(container.querySelector('.bnv-nen')!.classList.contains('bnv-nen--dong')).toBe(false)
     expect(container.querySelector('.bnv-vd')!.classList.contains('bnv-vd--dong')).toBe(false)
-    expect(container.querySelector('.bnv-thu-vong [data-tinh]')!.getAttribute('data-tinh')).toBe('co')
+    await waitFor(() => expect(container.querySelector('.bnv-thu-vong [data-tinh]')!.getAttribute('data-tinh')).toBe('co'))
     expect(container.querySelector('.bnv-thu-vong [data-motion]')!.getAttribute('data-motion')).toBe('idle')
   })
 
@@ -250,9 +271,10 @@ describe('giảm chuyển động', () => {
 
   it('thần thú mừng (victory) 1,2 s khi em vừa làm thêm câu, rồi về idle', async () => {
     vi.useFakeTimers()
-    const truoc = tuKeHoachNgay(keHoachMayChu, NOW)
+    const truoc = duLieuMay()
     const sau = { ...truoc, tienDo: { ...truoc.tienDo, daLam: truoc.tienDo.daLam + 2 } }
     const { container, rerender } = ve({ duLieu: truoc })
+    await act(async () => { vi.advanceTimersByTime(300) })
     const motion = () => container.querySelector('.bnv-thu-vong [data-motion]')!.getAttribute('data-motion')
     expect(motion()).toBe('idle')
     rerender(<BangNhiemVu vaiTro="hocsinh" hoTen="Đỗ Minh" now={NOW} duLieu={sau} thanThu={THU} taiVinhDanh={vinhDanh3} />)
@@ -262,9 +284,73 @@ describe('giảm chuyển động', () => {
   })
 })
 
+describe('thần thú nạp SAU khung hình đầu (ảnh sprite ~3 MB không được chặn lượt vẽ đầu)', () => {
+  it('khung đầu: có vòng giữ chỗ 96 dp nhưng CHƯA có Spirit2D; sau đó mới gắn', async () => {
+    vi.useFakeTimers()
+    const { container } = ve()
+    expect(container.querySelector('.bnv-thu-vong')).not.toBeNull()
+    expect(container.querySelector('.bnv-thu-vong [data-motion]')).toBeNull()
+    expect(screen.getByRole('button', { name: /Mở thần thú Hoả Long/ })).toBeTruthy()
+    await act(async () => { vi.advanceTimersByTime(300) })
+    expect(container.querySelector('.bnv-thu-vong [data-motion]')).not.toBeNull()
+  })
+
+  it('vòng giữ chỗ có kích thước cố định trong CSS (không xô bố cục khi ảnh về)', () => {
+    const css = readFileSync(join(THU_MUC, 'bang-nhiem-vu.css'), 'utf8')
+    expect(css).toMatch(/\.bnv-thu-vong\s*\{[^}]*width:\s*96px[^}]*height:\s*96px/s)
+  })
+})
+
+describe('dòng nói thật từ kế hoạch máy chủ', () => {
+  it('ghi chú tiến bộ, cảnh báo của máy chủ, ngày nghỉ; không "nắm chắc"', async () => {
+    const { container } = ve({ duLieu: duLieuMay() })
+    await screen.findByText('Hoả Long')
+    const tien = container.querySelector('[data-vung="tien-do"]')!.textContent!
+    expect(tien).toContain('Đã làm 6 câu, 2 câu lên bậc ôn')
+    expect(container.querySelector('[data-vung="canh-bao"]')!.textContent).toBe('Hôm nay dồn 26 câu, vượt mức 12 câu (+14).')
+    expect(container.querySelector('[data-vung="ngay-nghi"]')!.textContent).toContain('ngày nghỉ')
+    expect(container.textContent).not.toMatch(/nắm chắc/i)
+  })
+
+  it('đang hiện bản cuối: có dòng "Kế hoạch lúc …"; bản mới thì không', async () => {
+    const { container, unmount } = ve({ duLieu: duLieuMay(true) })
+    await screen.findByText('Hoả Long')
+    expect(container.querySelector('[data-vung="ke-hoach-cu"]')!.textContent).toMatch(/^Kế hoạch lúc \d{2}:\d{2} — chưa cập nhật được/)
+    unmount()
+    const c2 = ve({ duLieu: duLieuMay(false) }).container
+    await screen.findByText('Hoả Long')
+    expect(c2.querySelector('[data-vung="ke-hoach-cu"]')).toBeNull()
+  })
+
+  it('quá hạn: mục RIÊNG, BTVN quá hạn chỉ đọc (cần Thầy gia hạn), không tính vào số việc', async () => {
+    const { container } = ve({ duLieu: duLieuMay() })
+    await screen.findByText('Hoả Long')
+    const qh = container.querySelector('[data-bac="qua_han"]')!
+    expect(qh.textContent).toContain('QUÁ HẠN · 1')
+    expect(qh.textContent).toContain('cần Thầy gia hạn')
+    expect(qh.querySelectorAll('button').length).toBe(0)
+  })
+
+  it('bài Mẹ hết giờ bấm được để nộp phần đã lưu', async () => {
+    const onHanhDong = vi.fn()
+    const kh = tuKeHoachNgay({ ...keHoachMayChu, quaHan: [{ loai: 'mom', ma: 'M9', hanNop: gio(-1), conLai: 8 }] }, NOW, phu)
+    ve({ duLieu: kh, onHanhDong })
+    await screen.findByText('Hoả Long')
+    fireEvent.click(screen.getByRole('button', { name: /QUÁ HẠN/ }))
+    expect(onHanhDong.mock.calls[0][0]).toMatchObject({ loai: 'mo_mom', payload: { id: 'M9' } })
+  })
+
+  it('phụ huynh: quá hạn không có nút bấm', async () => {
+    const kh = tuKeHoachNgay({ ...keHoachMayChu, quaHan: [{ loai: 'mom', ma: 'M9', hanNop: gio(-1), conLai: 8 }] }, NOW, phu)
+    const { container } = ve({ vaiTro: 'phuhuynh', duLieu: kh, onGiaoBai: () => {} })
+    await screen.findByText('Hoả Long')
+    expect(container.querySelectorAll('[data-bac="qua_han"] button').length).toBe(0)
+  })
+})
+
 describe('phụ huynh: đọc-chỉ', () => {
   const phuHuynh = (props: Partial<BangNhiemVuProps> = {}) =>
-    ve({ vaiTro: 'phuhuynh', hoTen: 'Đỗ Minh', duLieu: tuKeHoachNgay(keHoachMayChu, NOW), onGiaoBai: () => {}, ...props })
+    ve({ vaiTro: 'phuhuynh', hoTen: 'Đỗ Minh', duLieu: duLieuMay(), onGiaoBai: () => {}, ...props })
 
   it('không nút Vào thi, không nút "Làm ngay", các thẻ không bấm được; thần thú của con vẫn hiện', async () => {
     const { container } = phuHuynh()

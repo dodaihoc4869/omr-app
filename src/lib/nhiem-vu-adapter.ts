@@ -35,7 +35,6 @@ export interface TheNhiemVu {
   moTa: string
   soCau: number
   phutUocTinh: number
-  expThuong: number
   hanNop?: string
   conLaiMs?: number
   conLaiChu?: string
@@ -63,10 +62,29 @@ export interface DuLieuBangNhiemVu {
   cacBac: NhomBac[]
   /** Nguồn không trả việc nào cần làm ⇒ giao diện hiện thẻ trống, không bịa việc. */
   trong: boolean
-  tienDo: { daLam: number; mucTieu: number; phanTram: number }
+  /** `ghiChu` (nếu có) là câu nói thật về tiến bộ; thiếu thì giao diện tự viết từ số câu. */
+  tienDo: { daLam: number; mucTieu: number; phanTram: number; ghiChu?: string }
   /** `giayMoiCau` thiếu = chưa đo; `chu` luôn nói thật ("chưa đo"). */
   tocDo: { giayMoiCau?: number; chu: string }
   chuoiNgay: { soNgay: number; chu: string }
+  /** Câu cảnh báo tiếng Việt máy chủ đã viết sẵn (khong_kip, qua_tai, thieu_nguon_bu…). */
+  canhBao: { loai: string; noiDung: string }[]
+  /** Việc đã quá hạn — liệt kê riêng, KHÔNG phải nhiệm vụ hôm nay. */
+  quaHan: TheQuaHan[]
+  /** ISO — chỉ có ở nguồn máy chủ. */
+  capNhatLuc?: string
+  /** Có chữ khi đang hiện BẢN CUỐI vì lần gọi mới nhất lỗi ("Kế hoạch lúc 12:54…"). */
+  ghiChuCu?: string
+  ngayNghi: boolean
+}
+
+export interface TheQuaHan {
+  id: string
+  loai: 'btvn' | 'mom'
+  tieuDe: string
+  chu: string
+  /** Chỉ bài Mẹ giao mới mở được (nộp phần đã lưu); BTVN quá hạn cần Thầy gia hạn. */
+  hanhDong?: HanhDongNhiemVu
 }
 
 const BAC_TU_CAP_DO: Record<CapDoUuTien, BacNhiemVu> = {
@@ -110,7 +128,7 @@ function gomBac(viec: TheNhiemVu[]): NhomBac[] {
 function dongGoi(
   nguon: DuLieuBangNhiemVu['nguon'],
   viec: TheNhiemVu[],
-  phanConLai: Pick<DuLieuBangNhiemVu, 'tienDo' | 'tocDo' | 'chuoiNgay'>,
+  phanConLai: Pick<DuLieuBangNhiemVu, 'tienDo' | 'tocDo' | 'chuoiNgay' | 'canhBao' | 'quaHan' | 'capNhatLuc' | 'ghiChuCu' | 'ngayNghi'>,
 ): DuLieuBangNhiemVu {
   // Chỉ còn việc tuỳ chọn ⇒ coi là "hôm nay chưa có việc": không dựng thẻ nào.
   const coViecThat = viec.some((v) => v.bac !== 'tuy_chon')
@@ -156,7 +174,6 @@ function themBaiMeBiCat(viec: TheNhiemVu[], keHoach: KeHoachNgayTroLy, phu: Nguo
       moTa: `Gồm ${soCau} câu ôn tập · ${r.conLaiChu}`,
       soCau,
       phutUocTinh: Math.ceil((soCau * 80) / 60),
-      expThuong: soCau * 2,
       hanNop: r.hanNop,
       conLaiMs: Number.isFinite(moc) && phu.now !== undefined ? moc - phu.now : undefined,
       conLaiChu: r.conLaiChu,
@@ -180,7 +197,6 @@ export function tuKeHoachTroLy(keHoach: KeHoachNgayTroLy, phu: NguonPhuTroLy = {
       moTa: t.moTa,
       soCau: t.soCau,
       phutUocTinh: t.phutUocTinh,
-      expThuong: t.expThuong,
       hanNop: t.hanNop,
       conLaiMs: t.conLaiMs,
       conLaiChu: t.conLaiChu,
@@ -207,17 +223,23 @@ export function tuKeHoachTroLy(keHoach: KeHoachNgayTroLy, phu: NguonPhuTroLy = {
       daLam: nganSach.daLamCau,
       mucTieu: nganSach.mucTieuCau,
       phanTram: phanTram(nganSach.daLamCau, nganSach.mucTieuCau),
+      ghiChu: undefined,
     },
     tocDo: { chu: 'tốc độ: chưa đo' },
     // `chuoiNgayHoc` đếm ngày CÓ NỘP BÀI, chưa phải ngày "đạt" — nói đúng tên.
     chuoiNgay: { soNgay: streak.soNgayLienTiep, chu: `${streak.soNgayLienTiep} ngày học liên tiếp` },
+    canhBao: [],
+    quaHan: [],
+    capNhatLuc: undefined,
+    ghiChuCu: undefined,
+    ngayNghi: false,
   })
 }
 
-/** Một việc trong `viec_json` của `/hs/ke-hoach-ngay` (mục 1.3 của đề xuất). */
-export interface ViecKeHoachNgay {
+/** Một việc trong `viec[]` của `POST /hs/ke-hoach-ngay` (docs/ke-hoach-ngay-api-1909.md). */
+export interface ViecMayChu {
   id: string
-  loai: string
+  loai: 'btvn_lo' | 'btvn_nop' | 'mom' | 'on_lai' | 'than_thu' | 'on_thi' | string
   thuTu?: number
   soCau?: number
   hanCung?: string | null
@@ -226,113 +248,231 @@ export interface ViecKeHoachNgay {
   khan?: boolean
   /** id việc đứng ngay trước (cổng). */
   cong?: string | null
+  /** false = CHƯA hiện (còn việc bắt buộc trước nó). Máy chủ đã áp cổng, giao diện KHÔNG tính lại. */
+  hien?: boolean
   nguon?: string
-  nhan?: 'bu' | 'tuy_chon' | string
-  trangThai?: 'chua_lam' | 'dang_lam' | 'xong' | string
-  tieuDe?: string
-  moTa?: string
-  hanhDong?: HanhDongNhiemVu
+  nhan?: 'khan_cap' | 'bu' | 'tuy_chon' | null
+  trangThai?: string
+  ghiChu?: string
+  chiTiet?: Record<string, any>
 }
 
 export interface KeHoachNgayMayChu {
-  viec: ViecKeHoachNgay[]
-  nganSach?: { mucTieuCau?: number; vanToc?: number | null; soMauTocDo?: number }
-  soCauDaLam?: number
-  /** Số ngày `dat` liên tiếp (ngày nghỉ thầy đặt không đứt). */
+  ok?: boolean
+  ngay?: string
+  nganSach: {
+    mucTieuCau: number
+    toiThieuCau?: number
+    vanTocGiay?: number
+    vanTocNguon?: 'do' | 'mac_dinh'
+    ghiChuVanToc?: string
+  }
+  /** Đã sắp EDF (`thuTu` 1..n). KHÔNG sắp lại. */
+  viec: ViecMayChu[]
+  canhBao?: { loai: string; noiDung: string }[]
+  quaHan?: { loai: 'btvn' | 'mom'; ma: string; hanNop: string; conLai?: number }[]
+  tienBo: { daLamCau: number; lenBac?: number; tutBac?: number; dat?: boolean; toiThieuCau?: number; conThieu?: number }
   chuoiDat?: number
+  lanNghi?: boolean
+  capNhatLuc?: string
+}
+
+/** Chốt kiểu: JSON máy chủ trả về có đủ phần giao diện cần không (lỗi/HTML/`{ok:true,items:[]}` ⇒ false). */
+export function laKeHoachNgayHopLe(x: unknown): x is KeHoachNgayMayChu {
+  const k = x as any
+  return !!k && k.ok !== false && Array.isArray(k.viec) && k.viec.every((x: any) => !!x && typeof x.id === 'string' && typeof x.loai === 'string') && !!k.nganSach && Number.isFinite(Number(k.nganSach.mucTieuCau)) && !!k.tienBo && Number.isFinite(Number(k.tienBo.daLamCau))
+}
+
+/** Dữ liệu thô của màn (danh sách bài) — chỉ để lấy TÊN bài và đúng payload {bt}/{id,bai} khi bấm. */
+export interface NguonPhuKeHoach {
+  dsBtvn?: any[]
+  dsMomGiao?: any[]
+}
+
+function gioVietNam(iso: string): string {
+  const t = Date.parse(iso)
+  if (!Number.isFinite(t)) return ''
+  return new Intl.DateTimeFormat('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(t))
+}
+
+function bacMayChu(v: ViecMayChu): BacNhiemVu {
+  if (v.khan === true || v.nhan === 'khan_cap') return 'khan'
+  if (v.batBuoc === true) return 'bat_buoc'
+  if (v.nhan === 'bu') return 'nen_lam'
+  if (v.nhan === 'tuy_chon') return 'tuy_chon'
+  // Máy chủ không nói gì thêm: xếp NÊN LÀM — không tự dựng thành khẩn hay bắt buộc.
+  return 'nen_lam'
+}
+
+const msIso = (v?: string | null): number | undefined => {
+  if (!v) return undefined
+  const n = Date.parse(v)
+  return Number.isFinite(n) ? n : undefined
+}
+
+/** NGUỒN 2 — `viec[]` máy chủ đã xếp và đã áp cổng. `now` chỉ để tính thời gian còn lại. */
+export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: NguonPhuKeHoach = {}, cu = false): DuLieuBangNhiemVu {
+  const btvnTheoMa = (ma: unknown) => (phu.dsBtvn || []).find((b) => b && (b.maBtvn === ma || b.maCa === ma))
+  const momTheoId = (id: unknown) => (phu.dsMomGiao || []).find((m) => m && m.id === id)
+  const vanToc = Number(keHoach.nganSach.vanTocGiay) > 0 ? Number(keHoach.nganSach.vanTocGiay) : 90
+
+  const tenViec = (v: ViecMayChu): string => {
+    const ct = v.chiTiet || {}
+    switch (v.loai) {
+      case 'btvn_lo': {
+        const bt = btvnTheoMa(ct.ma)
+        return `${bt?.tenBtvn || bt?.tieuDe || 'BTVN'}: Lô ${Number(ct.chiSo) + 1}/${Number(ct.tongLo)}`
+      }
+      case 'btvn_nop': {
+        const bt = btvnTheoMa(ct.ma)
+        return `${bt?.tenBtvn || bt?.tieuDe || 'BTVN'}: nộp bài`
+      }
+      case 'mom':
+        return momTheoId(ct.id)?.tieuDe || 'Bài của Mẹ giao'
+      case 'than_thu':
+        return 'Thần thú: luyện dạng còn yếu'
+      default:
+        return v.ghiChu || TEN_LOAI[v.loai] || v.loai
+    }
+  }
+  const tenTheoId = new Map(keHoach.viec.map((v) => [v.id, tenViec(v)]))
+
+  const hanhDongCua = (v: ViecMayChu): HanhDongNhiemVu => {
+    const ct = v.chiTiet || {}
+    switch (v.loai) {
+      case 'btvn_lo':
+      case 'btvn_nop': {
+        const bt = btvnTheoMa(ct.ma)
+        return { loai: 'mo_btvn', payload: bt ? { bt } : undefined, nhanNut: v.loai === 'btvn_nop' ? 'Nộp bài' : `Làm Lô ${Number(ct.chiSo) + 1}` }
+      }
+      case 'mom': {
+        const bai = momTheoId(ct.id)
+        return { loai: 'mo_mom', payload: bai ? { id: bai.id, bai } : { id: ct.id }, nhanNut: 'Làm bài của Mom' }
+      }
+      case 'than_thu':
+        return { loai: 'mo_than_thu', nhanNut: 'Luyện với thần thú' }
+      default:
+        // on_lai / on_thi: chưa có luồng mở ĐÚNG các câu máy chủ chọn ⇒ mở luồng luyện lại câu sai hiện có.
+        return { loai: 'mo_khac_phuc', payload: { cheDo: 1, soCau: v.soCau }, nhanNut: 'Ôn ngay' }
+    }
+  }
+
+  const viec: TheNhiemVu[] = keHoach.viec.map((v) => {
+    const bac = bacMayChu(v)
+    const ct = v.chiTiet || {}
+    const soCau = Math.max(0, Math.floor(Number(v.soCau) || 0))
+    const han = v.hanCung || v.hanMem || undefined
+    const moc = msIso(v.hanCung ?? v.hanMem)
+    const conLaiMs = moc === undefined ? undefined : moc - now
+    const conLaiChu = conLaiMs === undefined ? undefined : dinhDangConLai(conLaiMs)
+    const biCong = v.hien === false
+    const phanMoTa: string[] = []
+    if (v.loai === 'btvn_lo') {
+      phanMoTa.push(`${soCau} câu`)
+      if (ct.treNhip === true) phanMoTa.push('đã trễ nhịp — làm trước')
+    } else if (v.loai === 'mom') phanMoTa.push(`Gồm ${soCau} câu`)
+    else if (v.loai === 'btvn_nop') phanMoTa.push('Đã xong mọi lô — bấm nộp bài trước hạn')
+    else if (soCau > 0) phanMoTa.push(`${soCau} câu`)
+    if (conLaiChu) phanMoTa.push(conLaiChu)
+    const tieuDe = tenTheoId.get(v.id)!
+    return {
+      id: v.id,
+      bac,
+      vaiTroMau: VAI_TRO_MAU[bac],
+      bieuTuong: bieuTuongTuLoai(v.loai),
+      tieuDe,
+      moTa: phanMoTa.join(' · '),
+      soCau,
+      phutUocTinh: Math.ceil((soCau * vanToc) / 60),
+      hanNop: han,
+      conLaiMs,
+      conLaiChu,
+      tienDoLo: v.loai === 'btvn_lo' && Number.isFinite(Number(ct.chiSo)) && Number(ct.tongLo) > Number(ct.chiSo)
+        ? { hienTai: Number(ct.chiSo) + 1, tong: Number(ct.tongLo) }
+        : undefined,
+      biCong,
+      moSauKhiXong: biCong ? (v.cong ? tenTheoId.get(v.cong) : undefined) ?? 'việc trước' : undefined,
+      trangThai: 'chua_lam',
+      hanhDong: hanhDongCua(v),
+    }
+  })
+
+  // Máy chủ CHỈ đưa bài Mẹ giao ĐÃ BẮT ĐẦU (hạn 120') vào viec[]; bài mới nhận, chưa bắt đầu, không có trong đó.
+  // Không bù thì bài Mẹ giao vừa nhận biến mất khỏi trang chủ. Bù ở CUỐI, không chen lên trước.
+  const idMomTrongKeHoach = new Set(keHoach.viec.filter((v) => v.loai === 'mom').map((v) => v.chiTiet?.id))
+  const idMomQuaHan = new Set((keHoach.quaHan || []).filter((q) => q.loai === 'mom').map((q) => q.ma))
+  for (const bai of phu.dsMomGiao || []) {
+    if (!bai || bai.trangThai === 'da_nop' || idMomTrongKeHoach.has(bai.id) || idMomQuaHan.has(bai.id)) continue
+    const soCau = Math.max(1, Math.floor(Number(bai.soCau) || 10))
+    viec.push({
+      id: `mom:${bai.id}`,
+      bac: 'bat_buoc',
+      vaiTroMau: VAI_TRO_MAU.bat_buoc,
+      bieuTuong: 'mom',
+      tieuDe: bai.tieuDe || 'Bài của Mẹ giao',
+      moTa: `Gồm ${soCau} câu · 120 phút từ khi bắt đầu`,
+      soCau,
+      phutUocTinh: Math.ceil((soCau * vanToc) / 60),
+      biCong: false,
+      trangThai: bai.trangThai === 'dang_lam' ? 'dang_lam' : 'chua_lam',
+      hanhDong: { loai: 'mo_mom', payload: { id: bai.id, bai }, nhanNut: 'Làm bài của Mom' },
+    })
+  }
+
+  const quaHan: TheQuaHan[] = (keHoach.quaHan || []).map((q) => {
+    if (q.loai === 'mom') {
+      const bai = momTheoId(q.ma)
+      return { id: `qua_han:mom:${q.ma}`, loai: 'mom', tieuDe: bai?.tieuDe || 'Bài của Mẹ giao', chu: 'Đã hết giờ — mở để nộp phần đã lưu', hanhDong: { loai: 'mo_mom', payload: bai ? { id: bai.id, bai } : { id: q.ma }, nhanNut: 'Mở để nộp' } }
+    }
+    const bt = btvnTheoMa(q.ma)
+    return { id: `qua_han:btvn:${q.ma}`, loai: 'btvn', tieuDe: bt?.tenBtvn || bt?.tieuDe || 'BTVN', chu: 'Đã quá hạn — cần Thầy gia hạn' }
+  })
+
+  const mucTieu = Math.max(0, Number(keHoach.nganSach.mucTieuCau) || 0)
+  const daLam = Math.max(0, Number(keHoach.tienBo.daLamCau) || 0)
+  const lenBac = Math.max(0, Number(keHoach.tienBo.lenBac) || 0)
+  const conThieu = Math.max(0, Number(keHoach.tienBo.conThieu) || 0)
+  // Nộp ≠ nắm: chỉ nói "đã làm N câu, M câu lên bậc", không nói "nắm chắc".
+  const ghiChuTienDo = `Đã làm ${daLam} câu${lenBac > 0 ? `, ${lenBac} câu lên bậc ôn` : ''} · ${conThieu > 0 ? `còn ${conThieu} câu là đạt hôm nay` : 'đã đủ số câu tối thiểu hôm nay'}`
+  const chuoi = Math.max(0, Number(keHoach.chuoiDat) || 0)
+  const daDo = keHoach.nganSach.vanTocNguon === 'do' && Number(keHoach.nganSach.vanTocGiay) > 0
+  return dongGoi('ke_hoach_ngay', viec, {
+    tienDo: { daLam, mucTieu, phanTram: phanTram(daLam, mucTieu), ghiChu: ghiChuTienDo },
+    tocDo: daDo
+      ? { giayMoiCau: Math.round(Number(keHoach.nganSach.vanTocGiay)), chu: `tốc độ ${Math.round(Number(keHoach.nganSach.vanTocGiay))} s/câu · đo 30 ngày` }
+      : { chu: keHoach.nganSach.ghiChuVanToc || 'tốc độ: chưa đo' },
+    chuoiNgay: { soNgay: chuoi, chu: `${chuoi} ngày đạt liên tiếp` },
+    // `chua_do_toc_do` đã in ở dòng tốc độ (nguyên văn ghiChuVanToc) — không in hai lần.
+    canhBao: (keHoach.canhBao || []).filter((c) => c.loai !== 'chua_do_toc_do' && c.noiDung).map((c) => ({ loai: c.loai, noiDung: c.noiDung })),
+    quaHan,
+    capNhatLuc: keHoach.capNhatLuc,
+    ghiChuCu: cu && keHoach.capNhatLuc ? `Kế hoạch lúc ${gioVietNam(keHoach.capNhatLuc)} — chưa cập nhật được, đang hiện bản cuối.` : undefined,
+    ngayNghi: keHoach.lanNghi === true,
+  })
 }
 
 const TEN_LOAI: Record<string, string> = {
   btvn_lo: 'Lô BTVN',
   mom: 'Bài gia đình giao',
-  on_toi_han: 'Ôn câu sai tới hạn',
+  on_lai: 'Ôn câu tới hạn nhắc lại',
   on_thi: 'Ôn trước ca thi',
   than_thu: 'Thần thú: luyện dạng còn yếu',
-  thu_thach: 'Thử thách',
 }
 
-function hanhDongMacDinh(loai: string): HanhDongNhiemVu {
-  if (loai.startsWith('btvn')) return { loai: 'mo_btvn', nhanNut: 'Bắt đầu lô này' }
-  if (loai === 'mom') return { loai: 'mo_mom', nhanNut: 'Làm bài gia đình giao' }
-  if (loai === 'on_toi_han' || loai.startsWith('sua_loi')) return { loai: 'mo_khac_phuc', nhanNut: 'Ôn ngay' }
-  if (loai === 'than_thu') return { loai: 'mo_than_thu', nhanNut: 'Luyện với thần thú' }
-  if (loai === 'thu_thach') return { loai: 'mo_thu_thach', nhanNut: 'Thử sức' }
-  return { loai: 'mo_khac_phuc', nhanNut: 'Bắt đầu' }
-}
-
-function bacKeHoachNgay(v: ViecKeHoachNgay): BacNhiemVu {
-  if (v.khan) return 'khan'
-  if (v.batBuoc) return 'bat_buoc'
-  if (v.nhan === 'tuy_chon' || v.loai === 'than_thu' || v.loai === 'thu_thach') return 'tuy_chon'
-  return 'nen_lam'
-}
-
-/** NGUỒN 2 — `viec_json` đã xếp của máy chủ. `now` chỉ để tính thời gian còn lại. */
-export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number): DuLieuBangNhiemVu {
-  const tatCa = [...(keHoach.viec || [])]
-  const tenTheoId = new Map<string, string>()
-  for (const v of tatCa) tenTheoId.set(v.id, v.tieuDe || TEN_LOAI[v.loai] || v.loai)
-
-  const viec: TheNhiemVu[] = []
-  // Cổng hiển thị (đề xuất 1.3): việc i mở khi MỌI việc bắt buộc đứng trước đã
-  // xong, hoặc chính nó mang `khan`.
-  let chanDauTien: ViecKeHoachNgay | undefined
-  for (const v of tatCa) {
-    const xong = v.trangThai === 'xong'
-    if (!xong) {
-      const bac = bacKeHoachNgay(v)
-      const biCong = !v.khan && chanDauTien !== undefined
-      const tieuDe = tenTheoId.get(v.id)!
-      const han = v.hanCung || v.hanMem || undefined
-      const mocHan = han ? Date.parse(han) : NaN
-      const conLaiMs = Number.isFinite(mocHan) ? mocHan - now : undefined
-      const soCau = Math.max(0, Math.floor(Number(v.soCau) || 0))
-      viec.push({
-        id: v.id,
-        bac,
-        vaiTroMau: VAI_TRO_MAU[bac],
-        bieuTuong: bieuTuongTuLoai(v.loai),
-        tieuDe,
-        moTa: v.moTa || (soCau > 0 ? `${soCau} câu` : ''),
-        soCau,
-        phutUocTinh: Math.ceil((soCau * (keHoach.nganSach?.vanToc || 90)) / 60),
-        expThuong: soCau * 2,
-        hanNop: han,
-        conLaiMs,
-        conLaiChu: conLaiMs === undefined ? undefined : dinhDangConLai(conLaiMs),
-        tienDoLo: v.loai.startsWith('btvn') ? docTienDoLo(tieuDe) : undefined,
-        biCong,
-        moSauKhiXong: biCong ? tenTheoId.get(chanDauTien!.id) : undefined,
-        trangThai: v.trangThai === 'dang_lam' ? 'dang_lam' : 'chua_lam',
-        hanhDong: v.hanhDong || hanhDongMacDinh(v.loai),
-      })
-    }
-    if (v.batBuoc && !xong && !chanDauTien) chanDauTien = v
-  }
-
-  const mucTieu = Math.max(0, Number(keHoach.nganSach?.mucTieuCau) || 0)
-  const daLam = Math.max(0, Number(keHoach.soCauDaLam) || 0)
-  const vanToc = keHoach.nganSach?.vanToc
-  const soMau = keHoach.nganSach?.soMauTocDo
-  const chuoi = Math.max(0, Number(keHoach.chuoiDat) || 0)
-  return dongGoi('ke_hoach_ngay', viec, {
-    tienDo: { daLam, mucTieu, phanTram: phanTram(daLam, mucTieu) },
-    tocDo:
-      typeof vanToc === 'number' && vanToc > 0
-        ? { giayMoiCau: Math.round(vanToc), chu: `tốc độ ${Math.round(vanToc)} s/câu · đo 30 ngày` }
-        : { chu: typeof soMau === 'number' ? `tốc độ: chưa đo (${soMau}/5 mẫu)` : 'tốc độ: chưa đo' },
-    chuoiNgay: { soNgay: chuoi, chu: `${chuoi} ngày đạt liên tiếp` },
-  })
-}
-
-/** Cửa vào duy nhất cho giao diện: có kế hoạch máy chủ thì dùng, không thì trợ lý. */
+/**
+ * Cửa vào duy nhất cho giao diện: có kế hoạch máy chủ HỢP LỆ thì dùng (`cu` = đang hiện bản cuối
+ * vì lần gọi mới lỗi), không thì rơi về trợ lý. `dsBtvn`/`dsMomGiao` là dữ liệu thô của màn.
+ */
 export function dungBangNhiemVu(input: {
   keHoachNgay?: KeHoachNgayMayChu | null
   keHoachTroLy: KeHoachNgayTroLy
   now: number
-  /** Bài Mẹ giao thô — để nguồn trợ lý không làm rơi bài Mẹ giao khỏi trang chủ. */
+  dsBtvn?: any[]
   dsMomGiao?: any[]
+  cu?: boolean
 }): DuLieuBangNhiemVu {
-  if (input.keHoachNgay && Array.isArray(input.keHoachNgay.viec)) return tuKeHoachNgay(input.keHoachNgay, input.now)
+  if (laKeHoachNgayHopLe(input.keHoachNgay)) {
+    return tuKeHoachNgay(input.keHoachNgay, input.now, { dsBtvn: input.dsBtvn, dsMomGiao: input.dsMomGiao }, input.cu === true)
+  }
   return tuKeHoachTroLy(input.keHoachTroLy, { dsMomGiao: input.dsMomGiao, now: input.now })
 }

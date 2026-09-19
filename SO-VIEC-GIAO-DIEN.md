@@ -1,58 +1,65 @@
-# SỔ VIỆC — GIAO DIỆN "Bảng nhiệm vụ" (phiên Code 2)
+# SỔ VIỆC — GIAO DIỆN (phiên Code 2)
 
 Lập 19/09/2026 12:25. Theo `DIEU-PHOI.md` luật 4: phần giao diện ghi sổ ở đây, KHÔNG sửa `SO-VIEC.md`.
-Đặc tả: `prompt-giao-dien-nhiem-vu-hoc-sinh-phu-huynh.md`. Bản vẽ: https://claude.ai/artifact/RFUcbWFDRPQ9PPY7EPAYnK.
-Vùng được sửa: `src/components/bang-nhiem-vu/**`, `src/lib/nhiem-vu-adapter.ts` (DUY NHẤT tệp trong src/lib), `src/screens/StudentPortalScreen.tsx`, `src/screens/ParentPortalScreen.tsx`, test tương ứng, `docs/anh-bang-nhiem-vu-1909/`, tệp này.
-KHÔNG sửa: `tro-ly-ca-nhan.ts`, `lich-lo-btvn.ts`, `html-phieu.ts`, `btvn-cho-em.ts`, `server/**`, `SO-VIEC.md`, `index.html`. KHÔNG tự phát hành (nhắn 0.Planer).
 
-## Lời thầy / lệnh (nguyên văn)
+## ĐANG Ở ĐÂU / VIỆC KẾ TIẾP (cập nhật cuối mỗi mốc)
 
-- 12:22 · thầy: "xác nhận luôn" — giao phần GIAO DIỆN theo prompt trên.
-- 12:40 · (qua 0.Planer) thầy uỷ quyền điều phối: "cần hỏi gì thì hỏi qua bạn, tôi không muốn làm gì cả, chỉ xong việc nhắn tôi". Ba câu hỏi trong prompt đã chốt: bỏ hẳn thanh tab · không thanh EXP ở góc thần thú · vinh danh theo ngày.
-- 13:0x · (0.Planer) /hs/ke-hoach-ngay đã sống: nối nhánh thứ hai của adapter theo `docs/ke-hoach-ngay-api-1909.md`.
+- MỐC A (Bảng nhiệm vụ HS+PH, nối /hs/ke-hoach-ngay + /hs/ca-dang-mo): XONG mã + test + ảnh; commit ngay sau dòng này; toàn vitest 98 đỏ / 43 tệp = đúng nền. CHƯA đẩy Pages (em không tự đẩy: quyền đẩy bản live không cấp được qua tin nhắn giữa các phiên) → nhắn 0.Planer đẩy.
+- KẾ TIẾP: việc B = `prompt-giao-dien-phieu-lam-bai.md` + `prompt-giao-dien-dong-bo-man-hoc-sinh.md` (phủ MỌI lối gọi dungPhieu; thay áo, không thay xương; CSS mới dưới `body .gd-m3`; bản in/tờ máy chiếu không đổi 1 byte). Vùng mở thêm: `src/lib/html-phieu.ts`. Bản vẽ: 3 khung hàng 2 của canvas (PhieuLamBai/PhieuSauNop/PhieuLuoiCau).
+- SAU ĐÓ việc C: gửi 0.Planer BẢNG KIỂM KÊ mọi đường bấm HS/PH rồi làm nhóm 1 (React – xem), 2, 3; màn thi thật (ExamTakeScreen/exam-setup.css) LÀM CUỐI và nhắn 0.Planer soát diff trước khi đẩy.
+- Nếu phiên bị ngắt: đọc mục "Việc" + "Nhật ký vòng sửa" dưới đây; mọi thứ của mốc A đã commit.
 
-## Việc
+## Việc — MỐC A
 
-- [x] Đọc bản vẽ 5 tệp project/*.dc.html                                        | bằng chứng: đã đọc; màu vai trò khớp (xem NT-màu)
-- [x] Đọc mã hiện có (2 màn cổng, tokens.css, tro-ly-ca-nhan, BangVinhDanh, Spirit2D, PhongVaoThi) | bằng chứng: đã đọc
-- [x] `src/lib/nhiem-vu-adapter.ts` — hàm thuần, nguồn trợ lý (nhánh 1) | bằng chứng: tests/nhiem-vu-adapter-1909.test.ts 20/20
-- [ ] Adapter nhánh 2: `/hs/ke-hoach-ngay` theo docs/ke-hoach-ngay-api-1909.md (KHÔNG sắp lại viec[], hien===false → cổng, ghiChuVanToc, chuoiDat, rơi về trợ lý khi lỗi mạng) | bằng chứng: (chưa có) — nhánh 2 hiện có là bản GIẢ ĐỊNH theo đề xuất, sai hình dạng JSON thật
-- [ ] Nối gọi `/hs/ke-hoach-ngay` vào StudentPortalScreen (token, không có thì sbd) + phụ huynh | bằng chứng: (chưa có)
-- [x] `tests/nhiem-vu-adapter-1909.test.ts` | bằng chứng: 20 test xanh (2 nguồn cùng cấu trúc, 4 bậc đúng vai trò, cổng, bài Mẹ không rơi, trống thật)
-- [x] `m3-theme.css` (@theme + biến, sáng/tối) | bằng chứng: 9 vùng × 2 chế độ trùng mã bản vẽ bằng getComputedStyle trong Chromium
-- [x] `NenDong.css` — 2 lớp 24 s, ≤18%, tắt reduced-motion/pin yếu | bằng chứng: test CSS + test hook (jsdom)
-- [x] DauTrang / TheLamNgay / DanhSachNhiemVu / TheVinhDanh / NutVaoThi / BangNhiemVu | bằng chứng: tests/bang-nhiem-vu-1909.test.tsx 23/23 + ảnh chụp
-- [x] StudentPortalScreen: bỏ tab + công tắc giao diện cũ, sheet toàn màn (menu ba chấm), diff ≤ 400 | bằng chứng: `git diff --stat` 323 dòng
-- [x] ParentPortalScreen: vaiTro='phuhuynh', hàng "Giao bài cho con", không Vào thi, diff ≤ 400 | bằng chứng: 243 dòng
-- [x] Đổi selector (giữ hành vi) mo-bai-tu-bang-tin.test.tsx | bằng chứng: 7/7 xanh; ke-hoach-giao-dien.test.tsx không phải đổi (3/3 xanh)
-- [x] Bài Mẹ giao KHÔNG được rơi khỏi trang chủ khi top3 của tongHopKeHoachTroLy cắt mất (LỖI TỰ TÌM RA khi chạy bản dựng thật) | bằng chứng: nguyên nhân gốc = top3 cắt, "Luyện sửa lỗi" đẩy bài Mẹ ra; sửa trong adapter (không sửa tro-ly); 6 test khoá lỗi; chụp lại thấy đủ 3 thẻ bậc bắt buộc
-- [x] Tương phản nhãn "LÀM NGAY" 4,46 < 4,5 (Lighthouse) → 12% thay 18% | bằng chứng: Lighthouse hết `color-contrast`
-- [x] Tên truy cập chứa nguyên chữ nhìn thấy (label-content-name-mismatch) | bằng chứng: Lighthouse hết lỗi này (còn meta-viewport)
-- [x] Chuông thông báo 44→48 dp | bằng chứng: bộ chấm "nutNho = 0" ở 14 kịch bản
-- [ ] Ảnh chụp cuối (8 ảnh + trống + khẩn) → docs/anh-bang-nhiem-vu-1909/ + gửi thầy | bằng chứng: bản nháp đã chụp ở thư mục tạm, CHƯA chép vào repo (chụp lại sau khi nối nhánh 2)
-- [ ] Đoạn 5 dòng cho thầy | bằng chứng: (chưa có)
+- [x] Adapter `src/lib/nhiem-vu-adapter.ts`: nhánh 1 (tongHopKeHoachTroLy) + nhánh 2 (/hs/ke-hoach-ngay THẬT) | bằng chứng: tests/nhiem-vu-adapter-1909.test.ts 38/38
+- [x] Nhánh 2 theo docs/ke-hoach-ngay-api-1909.md: KHÔNG sắp lại viec[]; KHẨN=khan||khan_cap, BẮT BUỘC=batBuoc, NÊN LÀM=bu, TUỲ CHỌN=tuy_chon; hien:false → mờ + "Mở sau khi xong: <việc id=cong>"; Làm ngay = việc đầu hien; ghiChuVanToc in nguyên văn; chuoiDat; canhBao in nguyên văn; quaHan riêng; JSON hỏng → rơi về trợ lý | bằng chứng: các test trên + `laKeHoachNgayHopLe` (10 kiểu đầu vào hỏng)
+- [x] Nối gọi: `useKeHoachNgay` (token ưu tiên, không có thì sbd; mở màn + 60 s + khi quay lại tab + khi vừa đóng một sheet; lỗi → GIỮ bản cuối + "Kế hoạch lúc <giờ VN>"), `useCaDangMo` (POST /hs/ca-dang-mo; lỗi/404 → false) | bằng chứng: tests/bang-nhiem-vu-may-chu-1909.test.tsx 14/14 (gồm tích hợp StudentPortalScreen thật; đột biến làm hỏng parse → 3 test đỏ)
+- [x] Bài Mẹ giao KHÔNG rơi khỏi trang chủ: nhánh 1 vì top3 cắt; nhánh 2 vì máy chủ chỉ đưa bài Mẹ ĐÃ BẮT ĐẦU vào viec[] (bài mới nhận không có) → bù ở CUỐI nhóm BẮT BUỘC | bằng chứng: test tái hiện cả hai nhánh + E2E thấy thẻ "Bài của Mẹ giao" bấm được
+  · ĐỀ NGHỊ cho phía máy chủ (Coder 1 đã dừng): đưa bài Mẹ chưa bắt đầu vào viec[] (hanCung null, batBuoc true) thì adapter bỏ được đoạn bù.
+- [x] 5 vùng + 2 màn cổng (diff HS ~340 dòng, PH ~250) + nền động + thần thú nạp SAU khung hình đầu (vòng giữ chỗ 96 dp) | bằng chứng: test + ảnh
+- [x] Thần thú đứng yên khi trống ("đang nghỉ"); thẻ Vinh danh không dựng khi còn skeleton (CLS) | bằng chứng: test
+- [x] Ảnh chụp cuối: docs/anh-bang-nhiem-vu-1909/ (20 ảnh: HS khẩn 4 cỡ × sáng/tối = 8, đủ 4 bậc (khan2), ca đang mở (ca-mo), nguồn trợ lý, trống; PH khẩn + trống) | bằng chứng: Chromium trên bản dựng thật, 0 vi phạm / 20 kịch bản
+- [x] Đoạn 5 dòng cho thầy (dưới)
 
-## Nghiệm thu
+## Nghiệm thu — MỐC A
 
-- [x] NT1 · 1 BTVN khẩn + lô hôm nay + bài Mẹ: "Làm ngay" là BTVN khẩn, đúng 1 nút nổi bật, bấm gửi đúng {maCa:'CA-ANCOL',maBtvn:'BT-ANCOL'} (payload {bt}) | bằng chứng: E2E Chromium trên bản dựng thật (POST /btvn/cua-em đúng ca, không mở nhầm ca Este) + unit
-  · "4 bậc đúng 4 màu": nguồn trợ lý CHỈ sinh 3 bậc (khan/bat_buoc/tuy_chon; không bao giờ có nen_lam vì mọi loại việc ≥ severity .85) — đủ 4 bậc chỉ ở nguồn máy chủ (nhan==='bu'). Test jsdom kiểm đủ 4; ảnh E2E có 3.
-- [x] NT2 · không việc: thẻ trống nói thật, không thẻ nào, thần thú vẫn hiện (đứng yên "nghỉ") | bằng chứng: E2E + unit
-- [x] NT3 · grep "#[0-9a-f]{6}" -ri bang-nhiem-vu/ → 0; grep Spirit3D → 0; `npm run check:mau` không kêu tệp nào của em | bằng chứng: lệnh grep = 0, test kỷ luật mã nguồn
-- [!] NT4 · Lighthouse mobile (Slow 3G 400 Kbps/RTT 400 ms, CPU 4x): TRƯỢT ngưỡng. Học sinh: Perf 55 · A11y 94 · LCP 18,5 s (FCP 17,9 s) · TBT 0 · CLS 0,046. Phụ huynh: Perf 55 · A11y 94 · LCP 19,1 s.
-  · Đối chứng bản CŨ (HEAD d378c25, cùng phép đo): HS Perf 6 · A11y 89 · FCP 17,8 s · LCP 21,6 s · TBT 1650 ms · CLS 0,631; PH Perf 42 · A11y 87 · FCP 15,8 s.
-  · Kết luận: màn mới TỐT HƠN bản cũ ở mọi chỉ số do màn hình quyết định (TBT 1650→0, CLS 0,631→0,046) nhưng FCP y hệt (17,8 vs 17,9 s) ⇒ nút cổ chai là gói JS + ảnh của CẢ APP, không phải bảng nhiệm vụ. Ngoài vùng của em: (1) index.html `user-scalable=no,maximum-scale=1` — lỗi tiếp cận DUY NHẤT còn lại, xoá đi là A11y ≥ 95; (2) `public/than-thu-v2/evolution-elements-cutout.png` 3,1 MB (sprite thần thú, đã có từ trang chủ cũ); (3) JS ở đường găng ≈ 190 KB + 119 KB gzip (chem-format).
-- [x] NT5 · Reduce motion: nền đứng yên, thần thú tĩnh, shimmer tắt | bằng chứng: unit (matchMedia + getBattery) — chưa chụp trong Chromium với emulate reduced-motion
-- [x] NT6 · /honors 3 người đủ 3 kèm thần thú; rỗng → "Hôm nay chưa có bài chấm xong" | bằng chứng: E2E (3 hạng có SpiritArt) + unit
-- [ ] NT7 · Toàn bộ vitest ≤ 98 đỏ / 43 tệp; build; SW 10/10 | bằng chứng: lần đo 12:38 = 98/43 đúng nền, 12 test đỏ liên quan cổng (giao-btvn 5, khac-phuc-tren-dien-thoai 2, luyen-dang-bai 5) là CÓ SẴN trước khi em sửa cổng; build exit 0; SW 10/10 (`kiem-sw.mjs` trên bản dựng ở thư mục riêng). CẦN đo lại toàn bộ sau khi nối nhánh 2.
-- [ ] NT8 · Phát hành + curl 3 URL — KHÔNG phải việc của em (luật 2): nhắn 0.Planer
-- [!] Nút Vào thi tertiary khi "ca đang mở": prop `caDangMo` + CSS + test đã có nhưng KHÔNG có nguồn dữ liệu (không có endpoint máy chủ liệt kê ca đang mở cho lớp; server/** ngoài vùng em) ⇒ luôn false. Cần 0.Planer/Coder 1 quyết.
-- [!] Chưa có luồng "Nhắn Thầy" trong app phụ huynh ⇒ KHÔNG dựng nút giả (bản vẽ có). Prop `onNhanThay` sẵn, chỉ cần nối khi luồng có.
-- [!] Phụ huynh chưa có danh sách BTVN của con (`parentNewsApi` chỉ trả số) ⇒ bảng nhiệm vụ PH nói số bài chưa nộp bằng 1 dòng, không dựng thẻ. Sẽ đủ khi `/ke-hoach/xem` nối (nhánh 2).
+- [x] NT1 Làm ngay là BTVN khẩn, 1 nút nổi bật; bấm gửi đúng {maCa:'CA-ANCOL',maBtvn:'BT-ANCOL'} (không mở nhầm ca Este) | E2E Chromium + unit. Đủ 4 bậc/4 màu: ảnh hs-khan2 (error/primary/secondary/tertiary).
+- [x] NT2 không việc: thẻ trống nói thật + dòng cảnh báo thieu_nguon_bu của máy chủ, không thẻ nào, thần thú vẫn hiện (đứng yên)
+- [x] NT3 `grep '#[0-9a-f]{6}' -ri src/components/bang-nhiem-vu/` = 0; grep Spirit3D = 0; check:mau không kêu tệp của em; thư mục chỉ import react + lucide-react (test)
+- [x] Màu vai trò: 9 vùng × sáng/tối trùng mã bản vẽ (getComputedStyle trong Chromium thật)
+- [!] NT4 Lighthouse mobile Slow 3G (400 Kbps / RTT 400 ms / CPU 4x), 3 lần mỗi bên, trung vị — **chưa đạt đích tuyệt đối (Perf ≥ 90, LCP < 2,5 s); đạt tiêu chí đã sửa của 0.Planer ở Perf/TBT/CLS/A11y nhưng FCP/LCP TRỄ HƠN bản cũ chút**:
+  | | Perf | A11y | FCP | LCP | TBT | CLS |
+  |---|---|---|---|---|---|---|
+  | HS cũ (HEAD) | 31 | 89 | 17,8 s | 20,0 s | 58–61 ms | 0,83–0,90 |
+  | HS mới | 55 | 94 | 18,2 s | 21,6 s | 0–6 ms | 0 |
+  | PH cũ | 52 (28/53/52) | 87 | 15,8 s | 18,6 s | 58–1398 ms | 0,08–0,10 |
+  | PH mới | 55 | 94 | 15,8 s | 19,3 s | 0 ms | 0 |
+  · Trễ FCP/LCP (+0,4 / +1,6 s HS; +0 / +0,7 s PH): màn chờ kế hoạch máy chủ (thêm một vòng API) rồi mới vẽ nội dung, để không hiện "trống" giả. Có thể giảm bằng cách nhớ kế hoạch ngày gần nhất trong máy và vẽ ngay (kèm "Kế hoạch lúc …") — chưa làm.
+  · Cổ chai của CẢ APP (ngoài vùng): gói JS đường găng ~190 KB + 119 KB gzip; sprite `evolution-elements-cutout.png` 3,1 MB (0.Planer: không đổi định dạng vì thiếu công cụ).
+  · A11y 94 còn thiếu 1 lỗi duy nhất: index.html `user-scalable=no,maximum-scale=1` — 0.Planer quyết GIỮ (màn thi/quét); việc CHỜ THẦY QUYẾT.
+  · Đo lần đầu (12:5x) có số đẹp hơn (TBT 1650→0) là do bản CŨ dao động mạnh giữa các lần; bảng trên là 3 lần/bên.
+- [x] NT5 Reduce motion + pin yếu: unit (matchMedia, getBattery) — chưa chụp emulate reduce-motion trong Chromium
+- [x] NT6 vinh danh 3 hạng có thần thú; rỗng → "Hôm nay chưa có bài chấm xong" | E2E + unit
+- [x] NT7 Toàn bộ vitest 98 đỏ / 43 tệp = đúng nền (355 tệp, 4815 test); build exit 0; kiem-sw 10/10 (bản dựng ra thư mục riêng, không đè dist/)
+- [ ] NT8 Phát hành + curl 3 URL: 0.Planer đẩy (em không tự đẩy)
+- [x] "Ca đang mở" nối xong: test dựng phản hồi coCaMo:true → Vào thi tertiary + chấm nhịp; ảnh hs-ca-mo. Bản sống chưa có ca mở nên chưa thấy nhánh true ngoài đời.
+- [x] "Nhắn Thầy" ở app phụ huynh: HOÃN theo 0.Planer (chưa có luồng nhắn; không dựng nút giả). Prop `onNhanThay` sẵn.
+- [!] on_lai / on_thi (ôn câu tới hạn / ôn trước ca): chưa có luồng mở ĐÚNG các câu máy chủ chọn (chiTiet.qid) → tạm mở luồng "luyện lại câu sai" hiện có (báo "không có câu sai" nếu em chưa sai câu nào). Cần thêm lệnh máy chủ trả nội dung câu theo qid (thuộc GĐ 3+ của Coder 1).
+
+## Đoạn 5 dòng cho thầy — em sẽ thấy gì khác khi mở app
+
+1. Vào app là thấy ngay lời chào, chuỗi ngày và thần thú ở góc; không còn thanh tab nào.
+2. Ngay dưới có MỘT thẻ xanh "Làm ngay" — việc cần làm trước, kèm giờ còn lại và nút bắt đầu.
+3. Việc còn lại xếp 4 nhóm màu: Khẩn (đỏ, có đồng hồ đếm lùi), Bắt buộc hôm nay (xanh dương), Nên làm (xanh trời), Tuỳ chọn (xanh lá); việc chưa tới lượt mờ đi và ghi "Mở sau khi xong: …".
+4. Cuối trang là vinh danh top 3 hôm nay; nút "Vào thi" nổi góc dưới phải, đổi sang xanh lá có chấm nhịp khi lớp em có ca đang mở.
+5. Xem điểm, BTVN, bài Mẹ giao, khắc phục, thần thú vẫn còn — mở từ menu ba chấm góc trên; hôm nào không có việc thì hiện "Hôm nay chưa có việc — thần thú đang nghỉ".
 
 ## Nhật ký vòng sửa (nguyên nhân gốc → sửa → chạy lại đúng lệnh)
 
-1. 12:40 Bài Mẹ giao mất khỏi trang chủ. Gốc: `tongHopKeHoachTroLy` chỉ trả top3. Sửa: `themBaiMeBiCat` trong adapter (chỉ bài Mẹ, BTVN không bù vì luật nhịp lô). Chạy lại E2E: thẻ bậc bắt buộc 2→3.
-2. 12:45 Bộ chấm tương phản báo 20 chữ oan. Gốc: tính cả glyph `display:none` của Spirit2D. Sửa bộ chấm (bỏ phần tử không có client rect). Sau đó lộ tiếp: bộ chấm bỏ sót `color-mix` ⇒ thêm parse `color(srgb …)` + đếm `boQua`.
-3. 12:52 Lighthouse trượt tương phản 4,46 ở nhãn LÀM NGAY (bộ chấm tự viết đã bỏ sót). Gốc: lớp phủ 18% trên nền primary. Sửa 12% (≥5,0). Chạy lại Lighthouse: hết lỗi.
-4. 12:55 label-content-name-mismatch. Gốc: (a) nhãn bậc đứng đầu aria-label; (b) hai span liền nhau không có khoảng trắng. Sửa cả hai. Chạy lại: hết.
-5. 12:57 Đối chứng bản cũ ra điểm 0 (NO_FCP). Gốc: LỖI CỦA BỘ ĐO EM — `pkill -f "lh/may.mjs"` không khớp dòng lệnh thật nên máy chủ đo cũ không tắt, lượt dựng bản cũ ghi đè thư mục phục vụ. Sửa: `pkill -f "may.mjs"` + kiểm cổng trống. Chạy lại đúng 4 phép đo: hợp lệ.
+1. Bài Mẹ giao mất khỏi trang chủ (nhánh trợ lý). Gốc: `tongHopKeHoachTroLy` chỉ trả top3. Sửa: bù trong adapter; 6 test khoá; E2E lại: đủ 3 thẻ.
+2. Bộ chấm tương phản báo oan 20 chữ (glyph display:none) rồi bỏ sót `color-mix`. Sửa bộ chấm; Lighthouse tìm ra lỗi thật: nhãn LÀM NGAY 4,46 < 4,5 → lớp phủ 12% (≥ 5). Chạy lại: hết.
+3. label-content-name-mismatch: nhãn bậc đứng đầu aria-label + hai span liền nhau không có khoảng trắng. Sửa cả hai. Chạy lại: hết.
+4. Bộ đo bản cũ điểm 0. Gốc: LỖI CỦA BỘ ĐO EM (pkill sai mẫu, lsof sai cú pháp macOS, zsh không tách chuỗi khi `set -- $x`) → viết `medir.sh` (bash, đối số tường minh, thử lại khi lỗi). Chạy lại 3 lần/bên: hợp lệ.
+5. CLS phụ huynh 0,131 > cũ 0,101. Gốc: thẻ Vinh danh nằm dưới skeleton, nội dung thật phình ra đẩy nó. Sửa: không dựng thẻ Vinh danh khi còn skeleton (+ test). Chạy lại: CLS 0 ở cả hai app.
+6. Nhánh 2 viết theo giả định của đề xuất, sai hình dạng JSON thật (tienBo, nganSach, hien, cong, không có tieuDe) — 0.Planer báo 2 tệp test đỏ "reading daLamCau" khi Coder 1 chạy toàn bộ giữa lúc em sửa dở. Sửa: viết lại theo docs, fixture = JSON thật, validator từ chối JSON thiếu phần; chạy lại toàn bộ: nền 98/43.
+7. Máy chủ chỉ đưa bài Mẹ ĐÃ BẮT ĐẦU vào viec[] (đọc server/src/ke-hoach-ngay.ts) ⇒ bài mới nhận sẽ biến mất nếu chỉ vẽ theo viec[] ⇒ bù ở adapter (mục Việc).

@@ -1,0 +1,242 @@
+// Lớp gọi máy chủ của Bảng nhiệm vụ: /hs/ke-hoach-ngay + /hs/ca-dang-mo, các hook, và nối dây vào
+// StudentPortalScreen THẬT (kế hoạch máy chủ hiện lên; Vào thi đổi tertiary khi ca đang mở; lỗi → trợ lý).
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { act, cleanup, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react'
+import StudentPortalScreen from '../src/screens/StudentPortalScreen'
+import {
+  taiCaDangMo,
+  taiKeHoachNgay,
+  useCaDangMo,
+  useKeHoachNgay,
+  useLamMoiKhiDong,
+  useSauVeDauTien,
+} from '../src/components/bang-nhiem-vu/may-chu'
+
+const mocks = vi.hoisted(() => ({ homework: vi.fn(), sheet: vi.fn(), items: [] as any[], momItems: [] as any[] }))
+vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
+vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
+vi.mock('../src/components/ThongBaoHocSinh', () => ({ default: () => null, noticeApi: vi.fn() }))
+vi.mock('../src/game/than-thu-v2/academic-sync', () => ({ syncStudentExp: async () => {} }))
+vi.mock('../src/lib/exam-db', async (original) => ({ ...(await original<any>()), loadScriptUrlHoacMacDinh: async () => '/test' }))
+vi.mock('../src/lib/exam-api', async (original) => ({
+  ...(await original<any>()),
+  hsLichSuCaApi: async () => ({ ok: true, items: [] }),
+  hsBtvnApi: async () => ({ ok: true, items: mocks.items }),
+  thanThuDocApi: async () => ({ ok: true, hoSo: {} }),
+}))
+vi.mock('../src/lib/mom-api', async (original) => ({
+  ...(await original<any>()),
+  momApi: async () => ({ ok: true, items: mocks.momItems }),
+}))
+vi.mock('../src/lib/btvn-may-chu-moi', () => ({ btvnCuaEm: mocks.homework }))
+vi.mock('../src/lib/btvn-cho-em', () => ({ layCauHinhChoEmBtvn: async () => ({ URL: '/test' }), dungPhieuBtvn: mocks.sheet }))
+
+const NOW = Date.now()
+const gio = (h: number) => new Date(NOW + h * 3600_000).toISOString()
+const KE_HOACH = {
+  ok: true,
+  ngay: '2026-09-19',
+  nganSach: { mucTieuCau: 12, toiThieuCau: 6, vanTocGiay: 78, vanTocNguon: 'do', ghiChuVanToc: '' },
+  viec: [
+    { id: 'on_lai:2026-09-19', loai: 'on_lai', soCau: 3, thuTu: 1, batBuoc: false, khan: false, cong: null, hien: true, nhan: 'bu', trangThai: 'cho', ghiChu: 'Ôn 3 câu đã tới hạn nhắc lại', chiTiet: { qid: ['a'] }, hanCung: null, hanMem: null, nguon: 'ho_so' },
+    { id: 'than_thu:X', loai: 'than_thu', soCau: 6, thuTu: 2, batBuoc: false, khan: false, cong: 'on_lai:2026-09-19', hien: false, nhan: 'tuy_chon', trangThai: 'cho', ghiChu: 'Luyện dạng còn yếu với thần thú', chiTiet: { dang: 'X' }, hanCung: null, hanMem: null, nguon: 'ho_so' },
+  ],
+  canhBao: [],
+  quaHan: [],
+  tienBo: { daLamCau: 2, lenBac: 1, tutBac: 0, dat: false, toiThieuCau: 6, conThieu: 4 },
+  chuoiDat: 0,
+  lanNghi: false,
+  capNhatLuc: gio(-0.1),
+}
+
+type Tra = { status?: number; body?: any; nem?: boolean }
+let cuocGoi: { url: string; body: any }[] = []
+let tra: Record<string, Tra | (() => Tra)> = {}
+function giaLapFetch() {
+  cuocGoi = []
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (url: string, init?: any) => {
+      const u = String(url)
+      let body: any = {}
+      try { body = JSON.parse(init?.body || '{}') } catch {}
+      cuocGoi.push({ url: u, body })
+      const duong = new URL(u).pathname
+      const r = typeof tra[duong] === 'function' ? (tra[duong] as () => Tra)() : (tra[duong] as Tra | undefined)
+      if (r?.nem) throw new Error('mất mạng')
+      const status = r?.status ?? 200
+      return { ok: status >= 200 && status < 300, status, json: async () => r?.body ?? { ok: true, items: [] } }
+    }),
+  )
+}
+const goiTheo = (duong: string) => cuocGoi.filter((c) => new URL(c.url).pathname === duong)
+
+beforeEach(() => {
+  tra = {}
+  giaLapFetch()
+})
+afterEach(() => {
+  cleanup()
+  localStorage.clear()
+  vi.unstubAllGlobals()
+  vi.useRealTimers()
+  vi.clearAllMocks()
+})
+
+describe('taiKeHoachNgay / taiCaDangMo', () => {
+  it('có token → gửi {token} (không lộ sbd); không token → gửi {sbd}; đúng đường /hs/ke-hoach-ngay', async () => {
+    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
+    expect(await taiKeHoachNgay({ token: 'tk', sbd: '123' })).toMatchObject({ ok: true })
+    expect(goiTheo('/hs/ke-hoach-ngay')[0].body).toEqual({ token: 'tk' })
+    await taiKeHoachNgay({ sbd: '123' })
+    expect(goiTheo('/hs/ke-hoach-ngay')[1].body).toEqual({ sbd: '123' })
+    expect(cuocGoi[0].url).toBe('https://may.test/hs/ke-hoach-ngay')
+  })
+
+  it('lỗi mạng, 404/500, JSON không đủ phần, ok:false → null (không ném)', async () => {
+    for (const t of [{ nem: true }, { status: 404 }, { status: 500, body: KE_HOACH }, { body: { ok: true, items: [] } }, { body: { ok: false, error: 'x' } }, { body: null }] as Tra[]) {
+      tra['/hs/ke-hoach-ngay'] = t
+      expect(await taiKeHoachNgay({ token: 'tk' })).toBeNull()
+    }
+  })
+
+  it('ca đang mở: chỉ coCaMo:true (và ok:true) mới là true; lỗi/404/thiếu trường/ok:false → false', async () => {
+    tra['/hs/ca-dang-mo'] = { body: { ok: true, coCaMo: true, soCa: 2 } }
+    expect(await taiCaDangMo({ token: 'tk' })).toBe(true)
+    expect(goiTheo('/hs/ca-dang-mo')[0].body).toEqual({ token: 'tk' })
+    for (const t of [{ body: { ok: true, coCaMo: false, soCa: 0 } }, { body: { ok: true } }, { body: { ok: false, coCaMo: true } }, { status: 404 }, { nem: true }] as Tra[]) {
+      tra['/hs/ca-dang-mo'] = t
+      expect(await taiCaDangMo({ sbd: '1' })).toBe(false)
+    }
+  })
+})
+
+describe('các hook', () => {
+  it('useKeHoachNgay: có kế hoạch; lần sau lỗi thì GIỮ bản cuối và báo cu; hồi lại thì hết cu', async () => {
+    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
+    const { result, rerender } = renderHook(({ n }) => useKeHoachNgay({ token: 'tk' }, true, n), { initialProps: { n: 0 } })
+    expect(result.current).toMatchObject({ keHoach: null, daXong: false, cu: false })
+    await waitFor(() => expect(result.current.daXong).toBe(true))
+    expect(result.current.keHoach?.tienBo.daLamCau).toBe(2)
+    expect(result.current.cu).toBe(false)
+
+    tra['/hs/ke-hoach-ngay'] = { nem: true }
+    rerender({ n: 1 })
+    await waitFor(() => expect(result.current.cu).toBe(true))
+    expect(result.current.keHoach?.tienBo.daLamCau).toBe(2)
+
+    tra['/hs/ke-hoach-ngay'] = { body: { ...KE_HOACH, tienBo: { ...KE_HOACH.tienBo, daLamCau: 5 } } }
+    rerender({ n: 2 })
+    await waitFor(() => expect(result.current.keHoach?.tienBo.daLamCau).toBe(5))
+    expect(result.current.cu).toBe(false)
+  })
+
+  it('useKeHoachNgay: lỗi ngay lần đầu ⇒ daXong nhưng KHÔNG có kế hoạch cũ (rơi về trợ lý), cu = false', async () => {
+    tra['/hs/ke-hoach-ngay'] = { nem: true }
+    const { result } = renderHook(() => useKeHoachNgay({ token: 'tk' }, true, 0))
+    await waitFor(() => expect(result.current.daXong).toBe(true))
+    expect(result.current).toMatchObject({ keHoach: null, cu: false })
+  })
+
+  it('useKeHoachNgay: đổi người (đăng xuất/đăng nhập) không rò kế hoạch của người trước; chưa bật thì không gọi', async () => {
+    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
+    const { result, rerender } = renderHook(({ tk }) => useKeHoachNgay({ token: tk }, !!tk, 0), { initialProps: { tk: 'a' } })
+    await waitFor(() => expect(result.current.keHoach).not.toBeNull())
+    rerender({ tk: '' })
+    expect(result.current).toMatchObject({ keHoach: null, daXong: false })
+    const truoc = goiTheo('/hs/ke-hoach-ngay').length
+    await new Promise((r) => setTimeout(r, 30))
+    expect(goiTheo('/hs/ke-hoach-ngay').length).toBe(truoc)
+  })
+
+  it('useCaDangMo: true khi máy chủ báo coCaMo; tự về false khi 404; tắt thì luôn false', async () => {
+    tra['/hs/ca-dang-mo'] = { body: { ok: true, coCaMo: true, soCa: 1 } }
+    const { result } = renderHook(() => useCaDangMo({ token: 'tk' }, true))
+    expect(result.current).toBe(false)
+    await waitFor(() => expect(result.current).toBe(true))
+    const tat = renderHook(() => useCaDangMo({ token: 'tk' }, false))
+    await new Promise((r) => setTimeout(r, 20))
+    expect(tat.result.current).toBe(false)
+  })
+
+  it('useLamMoiKhiDong: chỉ tăng khi chuyển true → false (vừa đóng một màn)', () => {
+    const { result, rerender } = renderHook(({ m }) => useLamMoiKhiDong(m), { initialProps: { m: false } })
+    expect(result.current).toBe(0)
+    rerender({ m: true })
+    expect(result.current).toBe(0)
+    rerender({ m: false })
+    expect(result.current).toBe(1)
+    rerender({ m: false })
+    expect(result.current).toBe(1)
+  })
+
+  it('useSauVeDauTien: false ở khung đầu, true sau một nhịp rảnh', async () => {
+    vi.useFakeTimers()
+    const { result } = renderHook(() => useSauVeDauTien())
+    expect(result.current).toBe(false)
+    await act(async () => { vi.advanceTimersByTime(300) })
+    expect(result.current).toBe(true)
+  })
+})
+
+describe('StudentPortalScreen thật: nối kế hoạch máy chủ và "ca đang mở"', () => {
+  beforeEach(() => {
+    mocks.items = []
+    mocks.momItems = []
+    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: 'test', hoTen: 'Em thử', token: 'test-token' }))
+    mocks.sheet.mockResolvedValue('<html><body>Đề</body></html>')
+    mocks.homework.mockResolvedValue({ ok: true, maBtvn: 'BT1', de: {}, soCau: 1 })
+  })
+
+  it('kế hoạch máy chủ hợp lệ: thẻ "Làm ngay" là việc đầu của máy chủ, việc bị cổng mờ có nhãn, dùng token', async () => {
+    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
+    const { container } = render(<StudentPortalScreen />)
+    const lamNgay = await screen.findByRole('region', { name: /^Làm ngay: Ôn 3 câu đã tới hạn nhắc lại/ })
+    expect(lamNgay).toBeTruthy()
+    expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('ke_hoach_ngay')
+    const biCong = container.querySelector('[data-bi-cong="true"]')!
+    expect(biCong.textContent).toContain('Mở sau khi xong: Ôn 3 câu đã tới hạn nhắc lại')
+    expect(container.querySelector('[data-vung="tien-do"]')!.textContent).toContain('Đã làm 2 câu, 1 câu lên bậc ôn')
+    expect(goiTheo('/hs/ke-hoach-ngay')[0].body).toEqual({ token: 'test-token' })
+    expect(container.querySelectorAll('.bnv-nut-chinh').length).toBe(1)
+  })
+
+  it('máy chủ lỗi hoặc trả JSON hỏng: rơi về nguồn trợ lý, vẫn mở được bài Mẹ giao (không trắng màn)', async () => {
+    tra['/hs/ke-hoach-ngay'] = { body: { ok: true, items: [] } }
+    mocks.momItems = [{ id: 'M1', tieuDe: 'Bài luyện thử', soCau: 1, trangThai: 'chua_lam' }]
+    const { container } = render(<StudentPortalScreen />)
+    expect(await screen.findByRole('button', { name: 'Làm bài của Mom' })).toBeTruthy()
+    expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('tro_ly')
+  })
+
+  it('bài Mẹ giao mới nhận (chưa bắt đầu) không có trong viec[] của máy chủ nhưng VẪN hiện trên trang chủ', async () => {
+    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
+    mocks.momItems = [{ id: 'M1', tieuDe: 'Bài Mẹ mới nhận', soCau: 4, trangThai: 'chua_lam' }]
+    const { container } = render(<StudentPortalScreen />)
+    await screen.findByRole('region', { name: /^Làm ngay: Ôn 3 câu/ })
+    await waitFor(() => expect(container.textContent).toContain('Bài Mẹ mới nhận'))
+    expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('ke_hoach_ngay')
+  })
+
+  it('ca đang mở (máy chủ báo coCaMo:true): nút Vào thi đổi sang tertiary + chấm nhịp; bấm vẫn mở phòng vào thi', async () => {
+    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
+    tra['/hs/ca-dang-mo'] = { body: { ok: true, coCaMo: true, soCa: 1 } }
+    const { container } = render(<StudentPortalScreen />)
+    const fab = await screen.findByRole('button', { name: /Vào thi · ca đang mở/ })
+    expect(fab.getAttribute('data-ca-mo')).toBe('true')
+    expect(fab.querySelector('.bnv-fab-cham')).not.toBeNull()
+    expect(container.querySelectorAll('.bnv-nut-chinh').length).toBe(1)
+    fireEvent.click(fab)
+    expect(await screen.findByRole('dialog', { name: 'Vào phòng thi' })).toBeTruthy()
+    expect(goiTheo('/hs/ca-dang-mo')[0].body).toEqual({ token: 'test-token' })
+  })
+
+  it('không có ca đang mở (hoặc endpoint lỗi): nút Vào thi giữ dạng thường', async () => {
+    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
+    tra['/hs/ca-dang-mo'] = { status: 404 }
+    render(<StudentPortalScreen />)
+    const fab = await screen.findByRole('button', { name: 'Vào thi' })
+    await waitFor(() => expect(goiTheo('/hs/ca-dang-mo').length).toBeGreaterThan(0))
+    expect(fab.getAttribute('data-ca-mo')).toBe('false')
+  })
+})

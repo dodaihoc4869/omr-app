@@ -430,6 +430,12 @@ button.bnv-the:active {
   font-size: var(--bnv-cx-1);
   color: var(--bnv-mau-chu-phu);
 }
+.bnv-the--nhat {
+  --bnv-mau-nen: var(--m3-surface-container-high);
+  --bnv-mau-chu: var(--m3-on-surface);
+  --bnv-mau-chu-phu: var(--m3-on-surface-variant);
+  --bnv-mau-dam: var(--m3-outline);
+}
 .bnv-dem-lui,
 .bnv-chip {
   flex-shrink: 0;
