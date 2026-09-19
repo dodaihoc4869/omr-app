@@ -25,7 +25,7 @@ it('từ bảng tin mở đúng màn đề và đóng về bảng tin không tr�
  render(<StudentPortalScreen/>);fireEvent.click(await screen.findByRole('button',{name:'Làm bài của Mom'}))
  expect(await screen.findByText('Nội dung câu hỏi phải hiện')).toBeTruthy()
  fireEvent.click(screen.getByTitle('Đóng toàn màn hình'))
- expect(await screen.findByRole('heading',{name:'Hôm nay em học gì?'})).toBeTruthy()
+ expect(await screen.findByRole('heading',{name:'Chào thử'})).toBeTruthy()
  fireEvent.click(await screen.findByRole('button',{name:'Làm bài của Mom'}))
  expect(await screen.findByText('Nội dung câu hỏi phải hiện')).toBeTruthy()
 })
@@ -45,10 +45,9 @@ it.each(['chua_lam','dang_lam'])('nút đỏ trong danh sách Mom hoạt động
  expect(await screen.findByText('Nội dung câu hỏi phải hiện')).toBeTruthy()
 })
 it.each(['moi','xem','lamlai'])('BTVN mở đúng lượt và đúng chế độ: %s',async(mode)=>{
- localStorage.setItem('omr_hs_giao_dien_cu','1')
  const bt={maBtvn:'BT1',maCa:'CA1',soCau:1,tenBtvn:'Bài test',hanNop:new Date(Date.now()+86400000).toISOString(),daNop:mode!=='moi',soLanLamLaiConLai:3}
  mocks.items=[bt];vi.stubGlobal('confirm',()=>true)
- render(<StudentPortalScreen/>);fireEvent.click(await screen.findByRole('button',{name:'Danh sách BTVN'}))
+ render(<StudentPortalScreen/>);fireEvent.click(await screen.findByRole('button',{name:'Mở menu'}));fireEvent.click(await screen.findByRole('menuitem',{name:'Bài tập về nhà'}))
  const name=mode==='moi'?'Vào làm bài':mode==='xem'?/Xem lại/:/Làm lại/
  fireEvent.click(await screen.findByRole('button',{name}))
  expect(await screen.findByRole('dialog',{name:'Bài tập & Phiếu làm bài'})).toBeTruthy()

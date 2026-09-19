@@ -1,11 +1,13 @@
-import BangTroLyHocSinh from '../components/BangTroLyHocSinh'
+import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
+import { mucMenuHocSinh } from '../components/bang-nhiem-vu/muc-menu'
+import { dungBangNhiemVu } from '../lib/nhiem-vu-adapter'
+import { tongHopKeHoachTroLy } from '../lib/tro-ly-ca-nhan'
+import { PETS } from '../game/than-thu-v2/core'
 import NhanHanBaiTap from '../components/NhanHanBaiTap'
 import { mocThoiGian } from '../lib/han-bai-tap'
 import { useGioHocTap } from '../hooks/useGioHocTap'
 import ThongBaoHocSinh,{noticeApi} from '../components/ThongBaoHocSinh'
 import BangTinPhuHuynh from '../components/BangTinPhuHuynh'
-import BangVinhDanh from '../components/BangVinhDanh'
-import CardCaThiGanNhat from '../components/CardCaThiGanNhat'
 import {MomQuestionStem,MomOption} from '../components/MomQuestionMedia'
 import {momApi, momReviewHtml} from '../lib/mom-api'
 import PhongVaoThi from '../components/PhongVaoThi'
@@ -25,7 +27,6 @@ import {
   EyeOff,
   Lock,
   LogIn,
-  LogOut,
   RefreshCw,
   Sparkles,
   AlertCircle,
@@ -162,7 +163,7 @@ function mauDiem(diem: number | null): string {
   return 'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/40 dark:border-rose-800'
 }
 
-type TabType = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu'
+type TabType = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin'
 
 /** Chỗ giữ màn trong lúc mảnh mã game đang về. Cao bằng vùng game để không
  * giật layout, và nói rõ đang chờ chứ không để em nhìn khoảng trắng. */
@@ -187,20 +188,6 @@ export default function StudentPortalScreen() {
       return null
     }
   })
-
-  const [giaoDienCu, setGiaoDienCu] = useState(() => {
-    try {
-      return localStorage.getItem('omr_hs_giao_dien_cu') === '1'
-    } catch {
-      return false
-    }
-  })
-  const chuyenGiaoDien = (cu: boolean) => {
-    setGiaoDienCu(cu)
-    try {
-      localStorage.setItem('omr_hs_giao_dien_cu', cu ? '1' : '0')
-    } catch {}
-  }
 
   useEffect(()=>{
     if(!auth?.sbd||!auth.token)return
@@ -292,6 +279,8 @@ export default function StudentPortalScreen() {
   const retryMomAt = useRef(0)
   const [loiMom, setLoiMom] = useState('')
   const [daTaiMom, setDaTaiMom] = useState(false)
+  // Bảng nhiệm vụ vẽ skeleton tới khi lượt nạp đầu (điểm + BTVN) xong, kể cả khi lỗi.
+  const [daNapLanDau, setDaNapLanDau] = useState(false)
   const napDsMom = useCallback(async () => {
     if (!auth) return
     try {
@@ -843,24 +832,28 @@ export default function StudentPortalScreen() {
     if (!auth) return
     let huy = false
     void (async () => {
-      const url = await loadScriptUrlHoacMacDinh().catch(() => '')
-      if (huy) return
-      setDangTaiLichSu(true)
-      const resLs = await hsLichSuCaApi(url, auth.sbd)
-      if (!huy) {
-        setDangTaiLichSu(false)
-        if (resLs.ok && resLs.items) {
-          setDsLichSu(resLs.items)
+      try {
+        const url = await loadScriptUrlHoacMacDinh().catch(() => '')
+        if (huy) return
+        setDangTaiLichSu(true)
+        const resLs = await hsLichSuCaApi(url, auth.sbd)
+        if (!huy) {
+          setDangTaiLichSu(false)
+          if (resLs.ok && resLs.items) {
+            setDsLichSu(resLs.items)
+          }
         }
-      }
 
-      setDangTaiBtvn(true)
-      const resBt = await hsBtvnApi(url, auth.sbd)
-      if (!huy) {
-        setDangTaiBtvn(false)
-        if (resBt.ok && resBt.items) {
-          setDsBtvn(resBt.items)
+        setDangTaiBtvn(true)
+        const resBt = await hsBtvnApi(url, auth.sbd)
+        if (!huy) {
+          setDangTaiBtvn(false)
+          if (resBt.ok && resBt.items) {
+            setDsBtvn(resBt.items)
+          }
         }
+      } finally {
+        if (!huy) setDaNapLanDau(true)
       }
     })()
 
@@ -966,14 +959,29 @@ export default function StudentPortalScreen() {
     return t
   }, [dsLichSu])
 
-  const caGanNhat = useMemo(() => {
-    if (!dsLichSu || dsLichSu.length === 0) return null
-    return [...dsLichSu].sort((a, b) => {
-      const ta = a.nopLuc ? new Date(a.nopLuc).getTime() : 0
-      const tb = b.nopLuc ? new Date(b.nopLuc).getTime() : 0
-      return tb - ta
-    })[0]
-  }, [dsLichSu])
+  // Bảng nhiệm vụ: một adapter nhận nguồn trợ lý (nguồn /hs/ke-hoach-ngay nối sau).
+  const duLieuNhiemVu = useMemo(
+    () =>
+      dungBangNhiemVu({
+        keHoachTroLy: tongHopKeHoachTroLy({
+          now: nowHocTap,
+          sbd: auth?.sbd ?? '',
+          hoTen: auth?.hoTen ?? '',
+          dsBtvn,
+          dsMomGiao,
+          dsLichSu,
+          tongCauSai: tongSoCauSaiDaChon,
+          hoSoThanThu,
+        }),
+        now: nowHocTap,
+        dsMomGiao,
+      }),
+    [nowHocTap, auth?.sbd, auth?.hoTen, dsBtvn, dsMomGiao, dsLichSu, tongSoCauSaiDaChon, hoSoThanThu],
+  )
+  const thanThuGoc = useMemo(() => {
+    const index = Math.max(0, PETS.findIndex((p) => p.id === (hoSoThanThu?.pet || 'hoa_long')))
+    return { index, cap: Number(hoSoThanThu?.cap) || 1, ten: hoSoThanThu?.nickname || PETS[index]?.name || 'Thần thú' }
+  }, [hoSoThanThu])
 
   // Rút đề khắc phục câu sai
   /**
@@ -1258,179 +1266,46 @@ export default function StudentPortalScreen() {
     )
   }
 
-  const dangToanManHinh =
-    tab !== null ||
-    dangLamMom !== null ||
-    manThi ||
-    boVaoThi !== null ||
-    !!phieuHtml ||
-    !!xemDeHtml ||
-    caXemBaoCaoModal !== null ||
-    dsCauSaiKhacPhucModal !== null
+  const moManCu = (man: TabType) => {
+    setTab(man)
+    if (man === 'mom') void napDsMom()
+    else if (man === 'btvn') void napLaiBtvn()
+  }
 
-  // KHI ĐÃ ĐĂNG NHẬP THÀNH CÔNG
+  // KHI ĐÃ ĐĂNG NHẬP THÀNH CÔNG — MỘT màn "Bảng nhiệm vụ"; mọi màn cũ mở dạng sheet toàn màn.
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
-      {/* THANH ĐIỀU HƯỚNG CẠNH TRÁI — Bỏ nền, thu nhỏ lại, ẩn khi toàn màn hình */}
-      {!dangToanManHinh && (
-        <header
-          className="fixed left-3 sm:left-6 top-3 z-40 flex items-center gap-2 sm:gap-3 px-3 py-1.5 rounded-full bg-slate-100/60 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/40 dark:border-slate-800/40 shadow-xs transition-all"
-          style={{ paddingTop: 'max(env(safe-area-inset-top, 6px), 6px)' }}
-          aria-label="Điều hướng Học sinh"
-        >
-          <LogoHocSinh size={30} hienChu={false} />
-
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5">
-              <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-[11px] shadow-2xs">
-                {auth.hoTen.charAt(0).toUpperCase()}
-              </div>
-              <span className="font-bold text-slate-900 dark:text-white text-xs hidden md:inline truncate max-w-[120px]">
-                {auth.hoTen}
-              </span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono font-bold px-1.5 py-0.5 rounded bg-slate-200/60 dark:bg-slate-800/60">
-                #{auth.sbd}
-              </span>
-            </div>
-
-            {auth.token && (
-              <ThongBaoHocSinh
-                token={auth.token}
-                onOpen={(t, noticeId) => {
-                  setTab(t)
-                  if (t === 'mom') {
-                    void napDsMom()
-                    if (noticeId) {
-                      const momId = noticeId.startsWith('mom:') ? noticeId.split(':')[2] : noticeId
-                      if (momId) void batDauLamBaiMom({ id: momId } as BaiMomGiao)
-                    }
-                  } else if (t === 'btvn') {
-                    void napLaiBtvn()
-                  }
-                }}
-              />
-            )}
-
-            {/* Nút chuyển đổi Giao diện cũ / Giao diện Trợ lý AI */}
-            <button
-              type="button"
-              onClick={() => chuyenGiaoDien(!giaoDienCu)}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition cursor-pointer active:scale-95 ${
-                giaoDienCu
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
-                  : 'bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
-              }`}
-              title={giaoDienCu ? 'Bật Giao diện Trợ lý AI & Bảng vinh danh' : 'Quay về giao diện cũ đầy đủ'}
-            >
-              {giaoDienCu ? (
-                <>
-                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Giao diện Trợ lý AI</span>
-                </>
-              ) : (
-                <>
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Quay về giao diện cũ</span>
-                </>
-              )}
-            </button>
-
-            <button
-              onClick={dangXuat}
-              title="Đăng xuất"
-              className="p-1.5 rounded-full text-slate-500 hover:text-rose-600 hover:bg-rose-100/60 dark:hover:bg-rose-950/60 transition cursor-pointer tap-target"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </header>
-      )}
-
       {auth.token && !(tab === 'mom' && dangLamMom) && !manThi && (
-        <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-14 sm:pt-16 space-y-6">
-          {!giaoDienCu ? (
-            <>
-              {/* Việc học và hạn nộp hiển thị trước bảng vinh danh. */}
-
-
-              {/* 2. Ô HIỂN THỊ KẾT QUẢ CA THI GẦN NHẤT */}
-              {caGanNhat && (
-                <CardCaThiGanNhat
-                  ca={caGanNhat}
-                  onXemBaoCao={() => setCaXemBaoCaoModal(caGanNhat)}
-                />
-              )}
-
-              {/* Kế hoạch dựa trên bài được giao. */}
-              <BangTroLyHocSinh
-                sbd={auth.sbd}
-                hoTen={auth.hoTen}
-                dsBtvn={dsBtvn}
-                dsMomGiao={dsMomGiao}
-                dsLichSu={dsLichSu}
-                tongSoCauSai={tongSoCauSaiDaChon}
-                hoSoThanThu={hoSoThanThu}
-                onAction={xuLyHanhDongTroLy}
-                onMoGame={() => setTab('thanthu')}
-              />
-
-              <BangVinhDanh
-                vaiTro="hocsinh"
-                hoTen={auth.hoTen}
-                sbd={auth.sbd}
-                lop={auth.lop}
-                tongSoCa={dsLichSu.length}
-              />
-            </>
-          ) : (
-            <>
-              {/* Ô HIỂN THỊ KẾT QUẢ CA THI GẦN NHẤT */}
-              {caGanNhat && (
-                <CardCaThiGanNhat
-                  ca={caGanNhat}
-                  onXemBaoCao={() => setCaXemBaoCaoModal(caGanNhat)}
-                />
-              )}
-
-              {/* TRỢ LÝ HỌC TẬP CÁ NHÂN TOÀN DIỆN ĐỖ ĐẠI HỌC AI */}
-              <BangTroLyHocSinh
-                sbd={auth.sbd}
-                hoTen={auth.hoTen}
-                dsBtvn={dsBtvn}
-                dsMomGiao={dsMomGiao}
-                dsLichSu={dsLichSu}
-                tongSoCauSai={tongSoCauSaiDaChon}
-                hoSoThanThu={hoSoThanThu}
-                onAction={xuLyHanhDongTroLy}
-                onMoGame={() => setTab('thanthu')}
-              />
-
-
-              <BangTinPhuHuynh
-                sbd={auth.sbd}
-                hoTen={auth.hoTen}
-                lop={auth.lop}
-                studentToken={auth.token}
-                onSent={(id) => {
+        <BangNhiemVu
+          vaiTro="hocsinh"
+          hoTen={auth.hoTen}
+          now={nowHocTap}
+          duLieu={duLieuNhiemVu}
+          dangTai={!daNapLanDau || (!daTaiMom && !loiMom)}
+          thanThu={thanThuGoc}
+          mucMenu={mucMenuHocSinh(moManCu, dangXuat)}
+          khePhai={
+            <ThongBaoHocSinh
+              token={auth.token}
+              onOpen={(t, noticeId) => {
+                setTab(t)
+                if (t === 'mom') {
                   void napDsMom()
-                  setTab('mom')
-                  if (id) void batDauLamBaiMom({ id } as BaiMomGiao)
-                }}
-                activeTab={tab}
-                onSelectTab={(k, cd) => {
-                  if (cd) setCheDoKhacPhuc(cd)
-                  setTab((prev) => (prev === k && !cd ? null : (k as TabType)))
-                }}
-                tabStats={{
-                  diemCount: dsLichSu.length,
-                  btvnCount: dsBtvn.length,
-                  momCount: dsMomGiao.length,
-                  wrongCount: tongSoCauSaiDaChon,
-                }}
-              />
-            </>
-          )}
-        </div>
+                  if (noticeId) {
+                    const momId = noticeId.startsWith('mom:') ? noticeId.split(':')[2] : noticeId
+                    if (momId) void batDauLamBaiMom({ id: momId } as BaiMomGiao)
+                  }
+                } else if (t === 'btvn') {
+                  void napLaiBtvn()
+                }
+              }}
+            />
+          }
+          onHanhDong={xuLyHanhDongTroLy}
+          onMoThanThu={() => setTab('thanthu')}
+          onVaoThi={() => setTab('vaothi')}
+          onXemBaiDaNop={() => moManCu('diem')}
+        />
       )}
 
       {/* FULLSCREEN CHỨC NĂNG: BẤM VÀO MỞ FULL MÀN HÌNH */}
@@ -1449,6 +1324,7 @@ export default function StudentPortalScreen() {
                 {tab === 'khacphuc' && 'Khắc Phục Lỗi Sai & Luyện Đề'}
                 {tab === 'vaothi' && 'Vào Phòng Thi Trực Tuyến'}
                 {tab === 'thanthu' && 'Thần Thú Hóa Học (Alchemon)'}
+                {tab === 'bantin' && 'Bảng tin & bài luyện hôm nay'}
               </h2>
             </div>
 
@@ -1464,6 +1340,32 @@ export default function StudentPortalScreen() {
           </header>
 
           <main className="max-w-6xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-6 flex-1">
+
+          {/* SHEET BẢNG TIN: nhận bài luyện hôm nay, mở các màn cũ từ bảng tin */}
+          {tab === 'bantin' && (
+            <BangTinPhuHuynh
+              sbd={auth.sbd}
+              hoTen={auth.hoTen}
+              lop={auth.lop}
+              studentToken={auth.token}
+              onSent={(id) => {
+                void napDsMom()
+                setTab('mom')
+                if (id) void batDauLamBaiMom({ id } as BaiMomGiao)
+              }}
+              activeTab={tab}
+              onSelectTab={(k, cd) => {
+                if (cd) setCheDoKhacPhuc(cd)
+                setTab(k as TabType)
+              }}
+              tabStats={{
+                diemCount: dsLichSu.length,
+                btvnCount: dsBtvn.length,
+                momCount: dsMomGiao.length,
+                wrongCount: tongSoCauSaiDaChon,
+              }}
+            />
+          )}
 
           {/* TAB 1: XEM ĐIỂM */}
           {tab === 'diem' && (

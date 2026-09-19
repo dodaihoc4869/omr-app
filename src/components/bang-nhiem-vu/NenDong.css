@@ -1,0 +1,54 @@
+/* NỀN ĐỘNG — hai quầng radial-gradient màu vai trò, trôi 24 s bằng @keyframes.
+ * Chỉ transform (GPU), độ mờ trần 18%, không có vòng lặp JS. Lớp `--dong` chỉ
+ * được gắn khi máy cho phép chuyển động VÀ không ở chế độ tiết kiệm pin
+ * (BangNhiemVu.tsx quyết định); khối @media bên dưới là chốt chặn thứ hai. */
+.bnv-nen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.bnv-nen-lop {
+  position: absolute;
+  border-radius: 50%;
+  opacity: var(--m3-nen-dong-do-mo);
+  transform: translate3d(0, 0, 0);
+}
+.bnv-nen-lop-1 {
+  left: -140px;
+  top: -160px;
+  width: 460px;
+  height: 460px;
+  background: radial-gradient(circle at 45% 45%, var(--m3-nen-dong-1) 0%, transparent 68%);
+}
+.bnv-nen-lop-2 {
+  right: -170px;
+  top: 300px;
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle at 50% 50%, var(--m3-nen-dong-2) 0%, transparent 68%);
+}
+.bnv-nen--dong .bnv-nen-lop {
+  will-change: transform;
+}
+.bnv-nen--dong .bnv-nen-lop-1 {
+  animation: bnv-troi-1 24s var(--motion-standard, ease-in-out) infinite alternate;
+}
+.bnv-nen--dong .bnv-nen-lop-2 {
+  animation: bnv-troi-2 24s var(--motion-standard, ease-in-out) infinite alternate;
+}
+@keyframes bnv-troi-1 {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(70px, 90px, 0) scale(1.12); }
+}
+@keyframes bnv-troi-2 {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(-80px, -110px, 0) scale(0.92); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bnv-nen .bnv-nen-lop {
+    animation: none !important;
+    will-change: auto;
+  }
+}

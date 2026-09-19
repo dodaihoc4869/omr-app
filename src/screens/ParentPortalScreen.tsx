@@ -1,7 +1,11 @@
 import BangTinPhuHuynh from '../components/BangTinPhuHuynh'
-import BangVinhDanh from '../components/BangVinhDanh'
-import BangTroLyPhuHuynh from '../components/BangTroLyPhuHuynh'
-import { momApi, migrateMom, momReviewHtml, chuanHoaBaiMom } from '../lib/mom-api'
+import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
+import { mucMenuPhuHuynh } from '../components/bang-nhiem-vu/muc-menu'
+import { dungBangNhiemVu } from '../lib/nhiem-vu-adapter'
+import { tongHopKeHoachTroLy } from '../lib/tro-ly-ca-nhan'
+import { PETS } from '../game/than-thu-v2/core'
+import { useGioHocTap } from '../hooks/useGioHocTap'
+import { momApi, migrateMom, momReviewHtml, chuanHoaBaiMom, parentNewsApi } from '../lib/mom-api'
 import KhoiKhacPhuc3CheDo from '../components/KhoiKhacPhuc3CheDo'
 import { useEffect, useMemo, useState } from 'react'
 import DongDemCau from '../components/DongDemCau'
@@ -11,12 +15,9 @@ import {
   Calendar,
   ChevronRight,
   HelpCircle,
-  LogOut,
   RefreshCw,
   AlertCircle,
   X,
-  Sparkles,
-  RotateCcw,
 } from 'lucide-react'
 import LogoApp from '../components/LogoApp'
 import NutQuayLai from '../components/NutQuayLai'
@@ -25,7 +26,7 @@ import KhungXemPhieu from '../components/KhungXemPhieu'
 import BaoCaoCaThiPhuHuynhModal from '../components/BaoCaoCaThiPhuHuynhModal'
 import ModalKhacPhucCauSai from '../components/ModalKhacPhucCauSai'
 import { hopLeDeRut } from '../lib/loc-cau-rut'
-import { hsCauSaiApi, hsLichSuCaApi, tenTheoSbd } from '../lib/exam-api'
+import { hsCauSaiApi, hsLichSuCaApi, tenTheoSbd, thanThuDocApi } from '../lib/exam-api'
 import { loadScriptUrl } from '../lib/exam-db'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
@@ -73,7 +74,7 @@ export interface BaiMomGiao {
 const SBD_STORAGE_KEY = 'omr_ph_sbd'
 
 export default function ParentPortalScreen() {
-  const [tabPh, setTabPh] = useState<'diem' | 'khacphuc' | null>(null)
+  const [tabPh, setTabPh] = useState<'diem' | 'khacphuc' | 'bantin' | null>(null)
   const [cheDoKhacPhuc, setCheDoKhacPhuc] = useState<1 | 2 | 3 | 4>(1)
   const [sbdInput, setSbdInput] = useState('')
   const [sbdHienTai, setSbdHienTai] = useState<string | null>(null)
@@ -84,24 +85,17 @@ export default function ParentPortalScreen() {
   const [thongBaoLoi, setThongBaoLoi] = useState('')
   const [tongSoCauSaiCon, setTongSoCauSaiCon] = useState(0)
 
-  const [giaoDienCu, setGiaoDienCu] = useState(() => {
-    try {
-      return localStorage.getItem('omr_ph_giao_dien_cu') === '1'
-    } catch {
-      return false
-    }
-  })
-  const chuyenGiaoDien = (cu: boolean) => {
-    setGiaoDienCu(cu)
-    try {
-      localStorage.setItem('omr_ph_giao_dien_cu', cu ? '1' : '0')
-    } catch {}
-  }
-
   // Dữ liệu con
   const [dsBaiThi, setDsBaiThi] = useState<BaiThiCuaCon[]>([])
   const [caDangXem, setCaDangXem] = useState<BaiThiCuaCon | null>(null)
   const [dsMomGiao, setDsMomGiao] = useState<BaiMomGiao[]>([])
+  // Bảng nhiệm vụ: skeleton tới khi lượt nạp bài gia đình giao đầu tiên xong (kể cả lỗi).
+  const [daNapMomLanDau, setDaNapMomLanDau] = useState(false)
+  const [hoSoThanThuCon, setHoSoThanThuCon] = useState<any>(null)
+  // Số bài chưa nộp do máy chủ báo (parent-news). Phụ huynh CHƯA có danh sách BTVN
+  // của con, nên chỉ nói số — không dựng thẻ việc từ số liệu không có.
+  const [chuaNopCon, setChuaNopCon] = useState<{ btvn: number; mom: number; daily: number } | null>(null)
+  const nowHocTap = useGioHocTap()
 
   const caGanNhat = useMemo(() => {
     if (dsBaiThi.length === 0) return null
@@ -111,6 +105,29 @@ export default function ParentPortalScreen() {
       return tb - ta
     })[0]
   }, [dsBaiThi])
+
+  const duLieuNhiemVu = useMemo(
+    () =>
+      dungBangNhiemVu({
+        keHoachTroLy: tongHopKeHoachTroLy({
+          now: nowHocTap,
+          sbd: sbdHienTai ?? '',
+          hoTen: hoTenCon,
+          dsBtvn: [],
+          dsMomGiao,
+          dsLichSu: dsBaiThi.map((b) => ({ maCa: b.maCa, nopLuc: b.ngayNop, tongCau: b.tongSoCau })),
+          tongCauSai: tongSoCauSaiCon > 0 ? tongSoCauSaiCon : dsBaiThi.reduce((acc, b) => acc + (b.soCauSai || 0), 0),
+          hoSoThanThu: hoSoThanThuCon,
+        }),
+        now: nowHocTap,
+        dsMomGiao,
+      }),
+    [nowHocTap, sbdHienTai, hoTenCon, dsMomGiao, dsBaiThi, tongSoCauSaiCon, hoSoThanThuCon],
+  )
+  const thanThuCon = useMemo(() => {
+    const index = Math.max(0, PETS.findIndex((p) => p.id === (hoSoThanThuCon?.pet || 'hoa_long')))
+    return { index, cap: Number(hoSoThanThuCon?.cap) || 1, ten: hoSoThanThuCon?.nickname || PETS[index]?.name || 'Thần thú' }
+  }, [hoSoThanThuCon])
 
   const [, setDangTaoMom] = useState(false)
   const [thongBaoMom, setThongBaoMom] = useState<{ loai: 'ok' | 'loi'; chu: string } | null>(null)
@@ -157,8 +174,28 @@ export default function ParentPortalScreen() {
       else setThongBaoMom(previous => previous?.loai === 'loi' ? null : previous)
     } catch (e) {
       setThongBaoMom({loai:'loi',chu:`Chưa đồng bộ được bài: ${e instanceof Error ? e.message : 'Vui lòng thử lại.'}`})
+    } finally {
+      setDaNapMomLanDau(true)
     }
   }
+  useEffect(() => {
+    if (!sbdHienTai) return
+    let huy = false
+    const nap = async () => {
+      try {
+        const [url, r] = await Promise.all([loadScriptUrl().catch(() => ''), parentNewsApi('list', sbdHienTai)])
+        if (huy) return
+        setChuaNopCon(r?.report?.pendingDetails ?? null)
+        const th = await thanThuDocApi(url, sbdHienTai)
+        if (!huy && th.ok && th.hoSo) setHoSoThanThuCon(th.hoSo)
+      } catch {
+        /* Không có số liệu thì không nói số. */
+      }
+    }
+    void nap()
+    const t = setInterval(() => { if (!document.hidden) void nap() }, 60000)
+    return () => { huy = true; clearInterval(t) }
+  }, [sbdHienTai])
   useEffect(() => {
     if (!sbdHienTai) return
     const refresh = () => { if (!document.hidden) void napDanhSachMomGiao(sbdHienTai) }
@@ -256,6 +293,9 @@ export default function ParentPortalScreen() {
     setLopCon('')
     setDsBaiThi([])
     setDsMomGiao([])
+    setDaNapMomLanDau(false)
+    setChuaNopCon(null)
+    setHoSoThanThuCon(null)
     setSbdInput('')
   }
 
@@ -544,124 +584,36 @@ export default function ParentPortalScreen() {
     )
   }
 
-  const dangToanManHinh =
-    tabPh !== null ||
-    !!caDangXem ||
-    !!xemPhieuHtml ||
-    (Array.isArray(dsCauSaiModalMom) && dsCauSaiModalMom.length > 0) ||
-    hienHuongDan
-
-  // GIAO DIỆN 2: ĐÃ ĐĂNG NHẬP — 2 Ô CHÍNH (XEM BÁO CÁO & TẠO BÀI CỦA MOM GIAO)
+  // GIAO DIỆN 2: ĐÃ ĐĂNG NHẬP — MỘT màn "Bảng nhiệm vụ" đọc-chỉ; mọi màn cũ mở dạng sheet toàn màn.
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
-      {/* THANH ĐIỀU HƯỚNG CẠNH TRÁI — Bỏ nền, thu nhỏ lại, ẩn khi toàn màn hình */}
-      {!dangToanManHinh && (
-        <header
-          className="fixed left-3 sm:left-5 top-3 z-40 flex items-center gap-2 sm:gap-3 px-3 py-1.5 rounded-full bg-slate-100/60 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/40 dark:border-slate-800/40 shadow-xs transition-all"
-          style={{ paddingTop: 'max(env(safe-area-inset-top, 6px), 6px)' }}
-          aria-label="Điều hướng Phụ Huynh"
-        >
-          <LogoApp vai="phuhuynh" size={30} hienChu={false} phuDe="PHỤ HUYNH" />
-
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <span className="text-xs font-bold text-slate-900 dark:text-white hidden md:inline truncate max-w-[130px]">
-              {hoTenCon}
-            </span>
-            <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-100/70 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/50">
-              #{sbdHienTai}
-            </span>
-
-            {/* Nút chuyển đổi Giao diện cũ / Giao diện Trợ lý AI */}
-            <button
-              type="button"
-              onClick={() => chuyenGiaoDien(!giaoDienCu)}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition cursor-pointer active:scale-95 ${
-                giaoDienCu
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
-                  : 'bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
-              }`}
-              title={giaoDienCu ? 'Bật Giao diện Trợ lý AI & Bảng vinh danh' : 'Quay về giao diện cũ đầy đủ'}
-            >
-              {giaoDienCu ? (
-                <>
-                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Giao diện Trợ lý AI</span>
-                </>
-              ) : (
-                <>
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Quay về giao diện cũ</span>
-                </>
-              )}
-            </button>
-
-            <button
-              type="button"
-              onClick={dangXuat}
-              className="p-1.5 rounded-full text-slate-500 hover:text-rose-600 hover:bg-rose-100/60 dark:hover:bg-rose-950/60 transition cursor-pointer tap-target"
-              title="Đổi SBD"
-            >
-              <LogOut size={14} />
-            </button>
-          </div>
-        </header>
+      {tabPh === null && (
+        <BangNhiemVu
+          vaiTro="phuhuynh"
+          hoTen={hoTenCon}
+          now={nowHocTap}
+          duLieu={duLieuNhiemVu}
+          dangTai={dangTai || !daNapMomLanDau}
+          thanThu={thanThuCon}
+          mucMenu={mucMenuPhuHuynh(setTabPh, dangXuat, {
+            // Kết quả giao nhanh hiện ở khung thông báo của sheet "khắc phục", nên mở sheet ngay.
+            khacPhuc: () => {
+              setTabPh('khacphuc')
+              void xuLyGiaoBaiKhacPhuc1Click()
+            },
+            luyen: () => {
+              setTabPh('khacphuc')
+              void xuLyGiaoBaiLuyen1Click()
+            },
+          })}
+          ghiChuNguon={
+            chuaNopCon && chuaNopCon.btvn > 0
+              ? `Con còn ${chuaNopCon.btvn} bài tập Thầy giao chưa nộp. Chi tiết từng bài xem ở “Bảng tin của con” trong menu.`
+              : undefined
+          }
+          onGiaoBai={() => setTabPh('khacphuc')}
+        />
       )}
-
-      {/* BODY CHÍNH */}
-      <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6 pt-14 sm:pt-16 pb-24">
-        {!giaoDienCu ? (
-          <div className="space-y-6">
-            {/* Việc học và hạn nộp hiển thị trước bảng vinh danh. */}
-
-
-            {/* Báo cáo và hạn bài gia đình giao. */}
-            <BangTroLyPhuHuynh
-              sbd={sbdHienTai}
-              hoTen={hoTenCon}
-              lop={lopCon}
-              dsBaiThi={dsBaiThi}
-              caGanNhat={caGanNhat}
-              tongCauSai={tongSoCauSaiCon > 0 ? tongSoCauSaiCon : dsBaiThi.reduce((acc, b) => acc + (b.soCauSai || 0), 0)}
-              dsMomGiao={dsMomGiao}
-              onGiaoBaiKhacPhuc={() => {
-                void xuLyGiaoBaiKhacPhuc1Click()
-              }}
-              onXemChiTietCa={(ca) => {
-                setCaDangXem(ca)
-              }}
-              onXemBangDiem={() => {
-                setTabPh('diem')
-              }}
-              onGiaoBaiLuyen={() => {
-                void xuLyGiaoBaiLuyen1Click()
-              }}
-            />
-            <BangVinhDanh
-              vaiTro="phuhuynh"
-              hoTen={hoTenCon}
-              sbd={sbdHienTai}
-              lop={lopCon}
-              tongSoCa={dsBaiThi.length}
-            />
-          </div>
-        ) : (
-          <div className="mb-6">
-            <BangTinPhuHuynh
-              sbd={sbdHienTai}
-              hoTen={hoTenCon}
-              lop={lopCon}
-              onSent={() => void napDanhSachMomGiao(sbdHienTai)}
-              activeTab={tabPh}
-              onSelectTab={(tab, cd) => {
-                if (cd) setCheDoKhacPhuc(cd)
-                setTabPh((prev) => (prev === tab && !cd ? null : (tab as any)))
-              }}
-              tabStats={{ diemCount: dsBaiThi.length }}
-              caGanNhat={caGanNhat}
-            />
-          </div>
-        )}
-      </main>
 
       {/* FULLSCREEN CHỨC NĂNG PHỤ HUYNH: BẤM VÀO MỞ TOÀN MÀN HÌNH */}
       {tabPh !== null && (
@@ -675,6 +627,7 @@ export default function ParentPortalScreen() {
               <h2 className="font-bold text-xs sm:text-base text-slate-900 dark:text-white truncate">
                 {tabPh === 'diem' && 'Báo Cáo Điểm Tất Cả Các Ca Thi'}
                 {tabPh === 'khacphuc' && 'Khắc Phục Lỗi Sai & Luyện Đề (4 Lựa Chọn)'}
+                {tabPh === 'bantin' && 'Bảng tin của con'}
               </h2>
             </div>
 
@@ -690,6 +643,23 @@ export default function ParentPortalScreen() {
           </header>
 
           <main className="max-w-6xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-6 flex-1">
+            {/* SHEET BẢNG TIN CỦA CON: báo cáo trong ngày + 4 cách giao bài khắc phục */}
+            {tabPh === 'bantin' && (
+              <BangTinPhuHuynh
+                sbd={sbdHienTai ?? ''}
+                hoTen={hoTenCon}
+                lop={lopCon}
+                onSent={() => void napDanhSachMomGiao(sbdHienTai ?? '')}
+                activeTab={tabPh}
+                onSelectTab={(tab, cd) => {
+                  if (cd) setCheDoKhacPhuc(cd)
+                  setTabPh(tab as 'diem' | 'khacphuc' | 'bantin')
+                }}
+                tabStats={{ diemCount: dsBaiThi.length }}
+                caGanNhat={caGanNhat}
+              />
+            )}
+
             {/* TAB 1: BÁO CÁO ĐIỂM CÁC CA THI */}
             {tabPh === 'diem' && (
               <div className="space-y-4 animate-google-fade">
