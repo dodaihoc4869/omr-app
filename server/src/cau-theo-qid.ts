@@ -17,6 +17,55 @@ export const TOI_DA_QID_MOT_LUOT = 20
 export const DAI_QID_TOI_DA = 120
 const KHONG_TIM_THAY = 'Không tìm thấy học sinh'
 
+/**
+ * "PHỤC VỤ ĐƯỢC" — MỘT ĐỊNH NGHĨA cho cả hai nơi (kế hoạch ngày chọn qid cho việc `on_lai`, và lệnh lấy đề này). Một qid phục vụ được khi:
+ *   (1) có trong chỉ mục game của một tờ kho CÒN và đã lập chỉ mục đúng phiên bản (`game_v2_question` ⋈ `de_kho` ⋈ `game_v2_index`), và
+ *   (2) không nằm trong đề thi đang bảo vệ (`protectedQuestions`, theo cả qid lẫn nhóm nội dung).
+ * Kế hoạch mà chọn qid ngoài định nghĩa này thì việc "Ôn N câu" không bao giờ xong (19/09: 12121212 có 2/3 câu chết). Hai chỗ dùng chung
+ * đoạn SQL dưới và `khongBiBaoVe` để không bao giờ lệch nhau.
+ */
+const TU_CHI_MUC_GAME = `FROM game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de
+       JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
+      WHERE COALESCE(d.da_xoa, 0) = 0 AND q.qid IN (SELECT value FROM json_each(?))`
+
+export const khongBiBaoVe = (q: { qid: string; group: string }, baoVe: ReadonlySet<string>): boolean => !baoVe.has(q.qid) && !baoVe.has(q.group)
+
+export interface PhucVuDuoc {
+  /** qid phục vụ được. Nếu `kiemDuocBaoVe` = false thì chỉ mới qua (1). */
+  duoc: Set<string>
+  /** Không đọc được phạm vi đề đang bảo vệ (R2 lỗi): lệnh lấy đề đóng cửa, kế hoạch không lọc theo (2) để một lỗi tạm không làm trống việc ôn. */
+  kiemDuocBaoVe: boolean
+  /** Lý do loại, để đo: qid không có trong chỉ mục / qid bị đề bảo vệ. */
+  khongCoChiMuc: string[]
+  biBaoVe: string[]
+}
+
+/** Trong các `qids`, những qid PHỤC VỤ ĐƯỢC (không đọc nội dung, không cần R2 ngoài phạm vi bảo vệ đã có đệm). Không ném lỗi. */
+export async function qidPhucVuDuoc(env: Env, qids: string[]): Promise<PhucVuDuoc> {
+  const xin = [...new Set(qids.filter((q) => q !== ''))]
+  const ra: PhucVuDuoc = { duoc: new Set(), kiemDuocBaoVe: true, khongCoChiMuc: [], biBaoVe: [] }
+  if (xin.length === 0) return ra
+  const nhom = new Map<string, string>()
+  // Chia mỗi 800 qid một truy vấn: một tham số JSON nhưng không để chuỗi phình vô hạn khi cả lô 50 em có hàng nghìn câu tới hạn.
+  for (let i = 0; i < xin.length; i += 800) {
+    const rc = await env.DB.prepare(`SELECT q.qid, q.content_group ${TU_CHI_MUC_GAME}`).bind(JSON.stringify(xin.slice(i, i + 800))).all<{ qid: string; content_group: string }>()
+    for (const x of rc.results ?? []) if (!nhom.has(String(x.qid))) nhom.set(String(x.qid), String(x.content_group))
+  }
+  ra.khongCoChiMuc = xin.filter((q) => !nhom.has(q))
+  let baoVe: Set<string> | null = null
+  try {
+    baoVe = await protectedQuestions(env)
+  } catch (e) {
+    console.error('[phuc-vu] không kiểm được đề bảo vệ:', e instanceof Error ? e.message : e)
+    ra.kiemDuocBaoVe = false
+  }
+  for (const [qid, group] of nhom) {
+    if (baoVe && !khongBiBaoVe({ qid, group }, baoVe)) ra.biBaoVe.push(qid)
+    else ra.duoc.add(qid)
+  }
+  return ra
+}
+
 /** Câu như máy em nhận: chỉ các trường này. KHÔNG có `correct`, `solution`, `reviewed`, `version`, `group`. */
 export function cauCongKhai(q: PrivateQuestion) {
   return {
@@ -63,11 +112,7 @@ export async function layCauChoEm(env: Env, sbd: string, xin: string[]): Promise
   if (duoc.length === 0) return { cau: [], khongCo: xin }
 
   // Truy vấn 2: nội dung từ chỉ mục game.
-  const rc = await env.DB.prepare(
-    `SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de
-       JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
-      WHERE COALESCE(d.da_xoa, 0) = 0 AND q.qid IN (SELECT value FROM json_each(?))`,
-  ).bind(JSON.stringify(duoc)).all<{ json: string }>()
+  const rc = await env.DB.prepare(`SELECT q.json ${TU_CHI_MUC_GAME}`).bind(JSON.stringify(duoc)).all<{ json: string }>()
   const theoQid = new Map<string, PrivateQuestion>()
   for (const x of rc.results ?? []) {
     try {
@@ -86,7 +131,7 @@ export async function layCauChoEm(env: Env, sbd: string, xin: string[]): Promise
   }
   const cau = xin.flatMap((qid) => {
     const q = theoQid.get(qid)
-    return q && !baoVe.has(q.qid) && !baoVe.has(q.group) ? [q] : []
+    return q && khongBiBaoVe(q, baoVe) ? [q] : []
   })
   const co = new Set(cau.map((c) => c.qid))
   return { cau, khongCo: xin.filter((q) => !co.has(q)) }
@@ -110,4 +155,45 @@ export async function hsCauTheoQid(env: Env, b: Record<string, unknown>): Promis
   const r = await layCauChoEm(env, sbd, donQid(b.qid))
   if (r.loi) return { ok: false, error: r.loi }
   return { ok: true, cau: r.cau.map(cauCongKhai), khongCo: r.khongCo }
+}
+
+/**
+ * ĐO ĐỘ PHỦ "phục vụ được" trên dữ liệu THẬT (lệnh của thầy, chỉ đọc): trong các câu ĐANG TỚI HẠN ÔN của cả trường (`nam_kt_cau`), bao nhiêu qid và bao nhiêu cặp
+ * (em, qid) mà `/hs/cau-theo-qid` không phục vụ được, vì sao (không có trong chỉ mục / bị đề thi bảo vệ), và bao nhiêu em bị ảnh hưởng.
+ * Không trả SBD hay qid nào, chỉ SỐ ĐẾM.
+ */
+export async function docDoPhuPhucVu(env: Env, homNay: string): Promise<Record<string, unknown>> {
+  const r = await env.DB.prepare(
+    `SELECT sbd, qid FROM nam_kt_cau WHERE trang_thai IN ('moi_sai','dang_on','da_khac_phuc') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke <= ?`,
+  ).bind(homNay).all<{ sbd: string; qid: string }>()
+  const cap = (r.results ?? []).map((x) => ({ sbd: String(x.sbd), qid: String(x.qid) }))
+  const pv = await qidPhucVuDuoc(env, cap.map((x) => x.qid))
+  const chetChiMuc = new Set(pv.khongCoChiMuc)
+  const chetBaoVe = new Set(pv.biBaoVe)
+  const tongQid = new Set(cap.map((x) => x.qid)).size
+  const theoEm = new Map<string, { tong: number; chet: number }>()
+  let capChet = 0
+  for (const x of cap) {
+    const e = theoEm.get(x.sbd) ?? { tong: 0, chet: 0 }
+    e.tong++
+    if (!pv.duoc.has(x.qid)) { e.chet++; capChet++ }
+    theoEm.set(x.sbd, e)
+  }
+  const pt = (a: number, b: number) => (b ? Math.round((a / b) * 1000) / 10 : 0)
+  return {
+    ok: true,
+    ngay: homNay,
+    kiemDuocBaoVe: pv.kiemDuocBaoVe,
+    qidToiHan: tongQid,
+    qidPhucVuDuoc: pv.duoc.size,
+    qidKhongCoChiMuc: chetChiMuc.size,
+    qidBiDeBaoVe: chetBaoVe.size,
+    tiLeQidKhongPhucVuPhanTram: pt(tongQid - pv.duoc.size, tongQid),
+    capEmQid: cap.length,
+    capEmQidKhongPhucVu: capChet,
+    tiLeCapKhongPhucVuPhanTram: pt(capChet, cap.length),
+    soEm: theoEm.size,
+    soEmCoCauKhongPhucVu: [...theoEm.values()].filter((e) => e.chet > 0).length,
+    soEmMatHetCauToiHan: [...theoEm.values()].filter((e) => e.tong > 0 && e.chet === e.tong).length,
+  }
 }

@@ -1,10 +1,10 @@
 import {homeworkQuestions,homeworkKeys,gradeHomework} from './btvn-grading'
-import {ghiSuKien,ghiSuKienThi,ghiSuKienLoBtvn,type LuotThi} from './su-kien-hoc'
+import {ghiSuKien,ghiSuKienThi,ghiSuKienLoBtvn,ngayVn,type LuotThi} from './su-kien-hoc'
 import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
 import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
 import {hsThoiGianHoc,chayCaLop} from './ke-hoach-ngay-d1'
 import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQua} from './exp-d1'
-import {hsCauTheoQid} from './cau-theo-qid'
+import {hsCauTheoQid,docDoPhuPhucVu} from './cau-theo-qid'
 import {hsOnLaiNop} from './on-lai-nop'
 import {hoSoOnCa} from './ho-so-on-ca'
 import {notifications,deliverNotices} from './notifications'
@@ -2906,6 +2906,7 @@ export default {
       }
       if (p === '/ho-so/xem') return ra({ ok: true, ...(await docHoSoEm(env, String(b.sbd ?? '').trim())) })
       if (p === '/ho-so/do-phu-dang') return ra(await docDoPhuDang(env))
+      if (p === '/ke-hoach/do-phu-phuc-vu') return ra(await docDoPhuPhucVu(env, ngayVn(Date.now())))
       if (p === '/ke-hoach/chay-ca-lop') return ra({ ok: true, ...(await chayCaLop(env, Date.now())) })
       if (p === '/game-v2-admin') return ra(await adminGame(env,b))
       if (p === '/ca/day') return dayCa(env, b)

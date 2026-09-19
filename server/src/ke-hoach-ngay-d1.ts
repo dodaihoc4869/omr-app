@@ -14,6 +14,7 @@ import {
   NGAY_LIET_KE_QUA_HAN, NGAY_ON_THI, NHIEM_VU_THAN_THU_MO_TOI_DA, PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU, SO_NGAY_DO_VAN_TOC, SO_NGAY_LICH_SU,
 } from './ho-so-cau-hinh'
 import { lapKeHoachNgay, ngayHocMom, type DauVaoKeHoach, type KeHoachNgay } from './ke-hoach-ngay'
+import { qidPhucVuDuoc } from './cau-theo-qid'
 import { ngayVn } from './su-kien-hoc'
 
 export const TOI_DA_EM_MOI_LO = 50
@@ -56,6 +57,22 @@ export async function docNgayNghi(env: Env): Promise<Set<string>> {
     try { ds = JSON.parse(v) as unknown[] } catch { ds = [] }
   } else ds = v.split(/[,;\s]+/)
   return new Set(ds.map((x) => String(x).trim()).filter((x) => /^\d{4}-\d{2}-\d{2}$/.test(x)))
+}
+
+/**
+ * Tập qid phục vụ được trong `qids`; `null` = KHÔNG lọc (chưa lập chỉ mục game nào — máy chủ mới/fixture cũ — hoặc truy vấn lỗi). Lọc khi chưa có chỉ mục sẽ
+ * làm trống việc ôn của cả trường, mà lệnh lấy đề lúc đó cũng không phục vụ được gì: giữ hành vi cũ.
+ */
+async function tapQidPhucVu(env: Env, qids: string[]): Promise<Set<string> | null> {
+  if (qids.length === 0) return null
+  try {
+    const coChiMuc = await env.DB.prepare('SELECT 1 AS x FROM game_v2_index LIMIT 1').first()
+    if (!coChiMuc) return null
+    return (await qidPhucVuDuoc(env, qids)).duoc
+  } catch (e) {
+    console.error('[ke-hoach] không kiểm được qid phục vụ được (giữ nguyên hàng ôn):', e instanceof Error ? e.message : e)
+    return null
+  }
 }
 
 // --- Gom đầu vào -------------------------------------------------------------------------
@@ -106,7 +123,15 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
     `SELECT sbd, qid, ma_dang, moc_on_ke, lan_sai FROM nam_kt_cau
       WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on','da_khac_phuc') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke <= ?`,
   ).bind(arr, homNay).all<Record<string, unknown>>(), trong())
-  for (const x of rc.results ?? []) cua(x)?.cauToiHan.push({ qid: String(x.qid), maDang: x.ma_dang ? String(x.ma_dang) : null, mocOnKe: String(x.moc_on_ke), lanSai: Number(x.lan_sai) || 0 })
+  // CHỈ câu mà lệnh lấy đề (`/hs/cau-theo-qid`) PHỤC VỤ ĐƯỢC mới vào hàng ôn: cùng MỘT định nghĩa `qidPhucVuDuoc` (có trong chỉ mục game của tờ kho còn,
+  // không nằm trong đề thi đang bảo vệ). Câu chưa phục vụ được (đề đang bảo vệ, kho chưa lập chỉ mục) vẫn nằm trong hồ sơ, sẽ vào hàng ôn khi phục vụ
+  // được — chứ không được giao rồi để việc "Ôn N câu" không bao giờ xong.
+  const denHan = rc.results ?? []
+  const phucVu = await tapQidPhucVu(env, denHan.map((x) => String(x.qid)))
+  for (const x of denHan) {
+    if (phucVu && !phucVu.has(String(x.qid))) continue
+    cua(x)?.cauToiHan.push({ qid: String(x.qid), maDang: x.ma_dang ? String(x.ma_dang) : null, mocOnKe: String(x.moc_on_ke), lanSai: Number(x.lan_sai) || 0 })
+  }
   const rd = await tat(() => env.DB.prepare(`SELECT * FROM nam_kt_dang WHERE ${IN_EM}`).bind(arr).all<Record<string, unknown>>(), trong())
   for (const x of rd.results ?? []) {
     cua(x)?.dang.push({
