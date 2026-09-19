@@ -25,10 +25,10 @@ Chưa màn nào nạp lõi → gói Pages tăng 0 KB; game cũ (PvP 2v2) không 
 - **Sát thương = đúng công thức đã chốt**: `round(16 × (đúng ? 1,5 : 0) × (Liên Kích ? 2 : 1) × (kỹ năng ấn thạch ? 1,25 : 1))` → 24 / 48 / 30 / 60; sai hoặc bỏ trống = 0.
 - Lõi KHÔNG nhận cấp thần thú, độ khó, sao của câu — chỉ nhận "đúng/sai" máy chủ đã chấm ⇒ em yếu và em giỏi cùng đúng thì cùng 24.
 - Liên Kích: bạn được tiếp sức làm lại ĐÚNG → cả người giúp lẫn người được giúp ×2 (kể cả khiên). Câu đã nhận thẻ thì `tuLam = false` dù đúng hay sai (máy chủ dựa vào cờ này để KHÔNG ghi bằng chứng).
-- Hành động: Đánh / Chắn (đúng 12, sai hoặc bỏ trống vẫn được khiên yếu 4) / Kỹ năng (tốn 2 năng lượng; mỗi câu đúng +1, tối đa 3).
+- Hành động: Đánh / Chắn (khiên 8 dù đúng hay sai; em SAI thì đòn tự chuyển thành Chắn — luật đã đổi sau soát, xem "Sửa sau soát bước 1") / Kỹ năng (tốn 2 năng lượng; mỗi câu đúng +1, đúng-rồi-chắn +2, tối đa 3).
 - Trùm: một câu 4 ý chia vòng tròn cho các ghế (máy chủ giao lại theo bậc bằng `datGiaoY`); đúng ≥ 3/4 → vỡ giáp, quét sạch quái tồn; không vỡ → trùm đánh 8 × số đoạn giáp còn.
 - Thắng = Linh Tâm còn máu sau hiệp 8. Sao: về đích 1 · còn từ nửa máu +1 · vỡ giáp cả hai trùm +1. Thua = 0 sao, không mất gì.
-- `khungNhinHiep(kq, ghế)`: thứ được gửi xuống máy từng em — về BẠN chỉ có "ra đòn / chắn / giữ vị trí"; đòn trượt, khiên yếu, không chốt đều KHÔNG phân biệt được; không có đúng/sai, hệ số, ý trùm của bạn.
+- `khungNhinHiep(kq, ghế)`: thứ được gửi xuống máy từng em — về BẠN chỉ có "ra đòn / chắn / giữ vị trí (= không chốt)"; bạn sai và bạn đúng-rồi-chắn KHÔNG phân biệt được; không có đúng/sai, hệ số, ý trùm của bạn.
 
 ### Chỗ bản đề xuất để trống — Code 5 tự điền, CẦN 0.Planer SOÁT
 | # | Quyết định | Vì sao |
