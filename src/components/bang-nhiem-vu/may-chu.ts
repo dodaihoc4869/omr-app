@@ -2,6 +2,7 @@
 // màn phải sống được khi mất mạng (rơi về nguồn trợ lý, hoặc hiện bản cuối kèm "kế hoạch lúc …").
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
+import { donKhiDoiMocReset } from './don-moc-reset'
 import { dongGoiBanNho, laKeHoachNgayHopLe, phucHoiBanNho, type DuLieuBangNhiemVu, type KeHoachNgayMayChu } from '../../lib/nhiem-vu-adapter'
 
 export interface DinhDanh {
@@ -31,12 +32,15 @@ const thanDinhDanh = (d: DinhDanh) => (d.token ? { token: d.token } : { sbd: d.s
 /** `POST /hs/ke-hoach-ngay` — máy chủ tính lại mỗi lần gọi. Trả null nếu lỗi hoặc JSON không đủ phần. */
 export async function taiKeHoachNgay(d: DinhDanh): Promise<KeHoachNgayMayChu | null> {
   const r = await goiPost('/hs/ke-hoach-ngay', thanDinhDanh(d), 10)
+  // Máy chủ báo mốc đặt lại mùa ("YYYY-MM-DD"): mốc mới thì DỌN bộ nhớ trong máy TRƯỚC khi ai đó dựng bản nhớ/nháp (don-moc-reset.ts).
+  if (r && typeof r === 'object') donKhiDoiMocReset((r as { mocReset?: unknown }).mocReset)
   return laKeHoachNgayHopLe(r) ? r : null
 }
 
 /** `POST /hs/ca-dang-mo` → { ok, coCaMo, soCa }. Lỗi/404/thiếu trường → false. */
 export async function taiCaDangMo(d: DinhDanh): Promise<boolean> {
   const r = await goiPost('/hs/ca-dang-mo', thanDinhDanh(d), 8)
+  if (r && typeof r === 'object') donKhiDoiMocReset((r as { mocReset?: unknown }).mocReset)
   return !!r && r.ok === true && r.coCaMo === true
 }
 
