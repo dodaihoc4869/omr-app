@@ -12,9 +12,10 @@ import {shieldRemaining,type ShieldState} from '../../src/game/than-thu-v2/shiel
 import {syncAcademic,type Academic,academicDay} from './game-v2-academic'
 import {masteryTheoHoSo,qidChanHomNay} from './game-v2-ho-so'
 import {ghiSuKien} from './su-kien-hoc'
+import {doanAction,laGoiNoiBoDoan} from './game-v2-doan'
 export interface Profile {nickname?:string;academic?:Academic;shields?:ShieldState;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string}
 type Row={revision:number;json:string}
-type Session={guardian?:string;guardianRound?:number;mode:Mode;questions:{qid:string;maDe:string;version:string;group:string;novel:boolean}[];created:number}
+type Session={doan?:number;guardian?:string;guardianRound?:number;mode:Mode;questions:{qid:string;maDe:string;version:string;group:string;novel:boolean}[];created:number}
 const now=()=>new Date().toISOString()
 export async function loadProfile(env:Env,sbd:string):Promise<{profile:Profile;revision:number}>{
   const reset=await env.DB.prepare("SELECT json FROM game_v2_settings WHERE key='season'").first<{json:string}>()
@@ -54,6 +55,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
   const {profile:p,revision}=await loadProfile(env,sbd)
   if(action.startsWith('escort-')){if(p.choice)throw new Error('Em chọn thần thú trước khi vào võ đài.');return escortAction(env,sbd,p.pet,p.cap,action,b)}
   if(action.startsWith('room-'))return roomAction(env,sbd,p.pet,action,b)
+  if(action.startsWith('doan-')){if(p.choice)throw new Error('Em chọn thần thú trước khi lên đường cùng Đoàn Hộ Tống.');return doanAction(env,sbd,p,action,b,gameV2)}
   if(action==='academic-sync'){const result=await syncAcademic(env,sbd,p,b.mom);return {ok:true,...result,profile:visible(p),revision:await save(env,sbd,p,revision)}}
   if(action==='progress-history'){
     const rows=await env.DB.prepare(`SELECT date(created_at,'+7 hours') AS day, COUNT(*) AS total,
@@ -114,7 +116,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     return {ok:true,id,questions:qs.map(publicQuestion),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3)}
   }
   if(action==='resume'){
-    const row=await env.DB.prepare('SELECT id,json FROM game_v2_session WHERE sbd=? AND created_at>? ORDER BY created_at DESC LIMIT 1').bind(sbd,new Date(Date.now()-2*3600000).toISOString()).first<{id:string;json:string}>()
+    const row=await env.DB.prepare("SELECT id,json FROM game_v2_session WHERE sbd=? AND created_at>? AND json_extract(json,'$.doan') IS NULL ORDER BY created_at DESC LIMIT 1").bind(sbd,new Date(Date.now()-2*3600000).toISOString()).first<{id:string;json:string}>()
     if(!row)return {ok:true,questions:[]}
     const session=JSON.parse(row.json) as Session;const blocked=await protectedQuestions(env);const control=await readGameScope(env,sbd);if(!control.enabled)throw new Error('Thầy đang tạm dừng game.');for(const key of control.blocked)blocked.add(key);const qs=[]
     for(const ref of session.questions){const q=await currentQuestion(env,ref);if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Lượt cũ có câu đang bảo vệ. Em mở lượt mới.');qs.push(publicQuestion(q))}
@@ -126,6 +128,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     const row=await env.DB.prepare('SELECT json FROM game_v2_session WHERE id=? AND sbd=?').bind(id,sbd).first<{json:string}>()
     if(!row)throw new Error('Không tìm thấy lượt học của em.')
     const session=JSON.parse(row.json) as Session
+    if(session.doan&&!laGoiNoiBoDoan(b))throw new Error('Câu này thuộc chặng Đoàn Hộ Tống. Em trả lời ngay trong trận nhé.')
     if(Date.now()-session.created>2*3600000)throw new Error('Lượt học đã hết hạn. Em mở lượt mới.')
     const ref=session.questions.find(q=>q.qid===qid);if(!ref)throw new Error('Câu không thuộc lượt học.')
     const q=await currentQuestion(env,ref);const blocked=await protectedQuestions(env)
