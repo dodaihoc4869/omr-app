@@ -357,6 +357,12 @@ export interface KeHoachNgayMayChu {
   /** Bài Mẹ giao cũ chưa làm (ngoài 3 ngày/3 bài gần nhất trong viec[]). Vắng = máy chủ chưa gửi trường này. */
   tonCu?: { id?: string; ma?: string; soCau?: number; taoLuc?: string }[]
   tonCuTong?: { soBai?: number; soCau?: number }
+  /**
+   * EXP học tập mới (chỉ có khi máy chủ đã bật cho em; vắng ⇒ bỏ qua). Chỉ dùng `datNgay`: định nghĩa "đạt nhiệm vụ ngày" CHẶT HƠN
+   * `tienBo.dat` (còn đòi câu tới hạn ôn phải lên bậc, việc bắt buộc không trễ nhịp) — màn KHÔNG được nói "xong việc hôm nay" khi nó
+   * chưa đạt, kẻo em bỏ qua đúng việc ôn cần để đạt (docs/ke-hoach-ngay-api-1909.md).
+   */
+  exp?: { datNgay?: { dat?: boolean; thieu?: string[]; laNghi?: boolean } | null } | null
 }
 
 /** Chốt kiểu: JSON máy chủ trả về có đủ phần giao diện cần không (lỗi/HTML/`{ok:true,items:[]}` ⇒ false). */
@@ -530,9 +536,20 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
   const lenBac = Math.max(0, Number(keHoach.tienBo.lenBac) || 0)
   const conThieu = Math.max(0, Number(keHoach.tienBo.conThieu) || 0)
   // Nộp ≠ nắm: chỉ nói "đã làm N câu, M câu lên bậc", không nói "nắm chắc".
-  const ghiChuTienDo = `Đã làm ${daLam} câu${lenBac > 0 ? `, ${lenBac} câu lên bậc ôn` : ''} · ${conThieu > 0 ? `còn ${conThieu} câu là đạt hôm nay` : 'đã đủ số câu tối thiểu hôm nay'}`
+  const ghiChuTienDo0 = `Đã làm ${daLam} câu${lenBac > 0 ? `, ${lenBac} câu lên bậc ôn` : ''} · ${conThieu > 0 ? `còn ${conThieu} câu là đạt hôm nay` : 'đã đủ số câu tối thiểu hôm nay'}`
   const chuoi = Math.max(0, Number(keHoach.chuoiDat) || 0)
   const daDo = keHoach.nganSach.vanTocNguon === 'do' && Number(keHoach.nganSach.vanTocGiay) > 0
+  // "Đã xong việc hôm nay" chỉ khi CẢ HAI cùng đạt: `tienBo.dat` và (nếu máy chủ có nói) `exp.datNgay.dat`. Ngày nghỉ: chỉ `tienBo.dat`.
+  const datNgayExp = keHoach.exp?.datNgay
+  const expChuaDat = !!datNgayExp && datNgayExp.laNghi !== true && datNgayExp.dat === false
+  const CHU_THIEU: Record<string, string> = {
+    cau_toi_thieu: 'chưa đủ số câu tối thiểu',
+    tre_nhip: 'còn việc bắt buộc đang trễ nhịp',
+    chua_len_bac: 'còn câu tới hạn ôn mà chưa lên bậc câu nào',
+  }
+  const thieuChu = expChuaDat ? (datNgayExp!.thieu || []).map((k) => CHU_THIEU[k]).filter(Boolean) : []
+  // Nói thật lý do chưa đạt (chỉ khi máy chủ nói); chưa có `exp` thì giữ đúng câu cũ.
+  const ghiChuTienDo = thieuChu.length > 0 ? `${ghiChuTienDo0} · Để đạt hôm nay: ${thieuChu.join('; ')}` : ghiChuTienDo0
   return dongGoi('ke_hoach_ngay', viec, {
     tienDo: { daLam, mucTieu, phanTram: phanTram(daLam, mucTieu), ghiChu: ghiChuTienDo },
     tocDo: daDo
@@ -547,7 +564,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     ngayNghi: keHoach.lanNghi === true,
     thanThu: docThanThu(keHoach.thanThu),
     tonCu,
-  }, { dat: keHoach.tienBo.dat === true, daLamCau: daLam, lenBac })
+  }, { dat: keHoach.tienBo.dat === true && !expChuaDat, daLamCau: daLam, lenBac })
 }
 
 const TEN_LOAI: Record<string, string> = {

@@ -387,6 +387,29 @@ describe('chỉ còn việc TUỲ CHỌN (0.Planer đổi luật 19/09)', () => 
     }
   })
 
+  it('`exp.datNgay` (định nghĩa đạt ngày CHẶT HƠN tienBo.dat): tienBo.dat=true mà datNgay.dat=false ⇒ KHÔNG mừng, việc ôn là "Làm ngay", ghi thật vì sao chưa đạt', () => {
+    const kh: KeHoachNgayMayChu = { ...khCoDat(true), exp: { datNgay: { dat: false, thieu: ['chua_len_bac'] } } }
+    const d = tuKeHoachNgay(kh, NOW)
+    expect(d.daXongHomNay).toBeNull()
+    expect(d.trong).toBe(false)
+    expect(d.lamNgay?.id).toBe('on_lai:2026-09-19')
+    expect(d.tienDo.ghiChu).toContain('Để đạt hôm nay: còn câu tới hạn ôn mà chưa lên bậc câu nào')
+    // nhiều lý do, mã lạ bị bỏ, không ném
+    const nhieu = tuKeHoachNgay({ ...khCoDat(true), exp: { datNgay: { dat: false, thieu: ['cau_toi_thieu', 'tre_nhip', 'ma_la'] } } }, NOW)
+    expect(nhieu.tienDo.ghiChu).toContain('Để đạt hôm nay: chưa đủ số câu tối thiểu; còn việc bắt buộc đang trễ nhịp')
+    expect(nhieu.tienDo.ghiChu).not.toContain('ma_la')
+  })
+
+  it('`exp.datNgay.dat=true`, thiếu `exp`, `datNgay:null` hoặc ngày NGHỈ: theo tienBo.dat như thường (mừng khi đạt); câu ghi chú cũ không đổi', () => {
+    const bt = tuKeHoachNgay(khCoDat(true), NOW)
+    for (const exp of [{ datNgay: { dat: true, thieu: [] } }, { datNgay: null }, null, { datNgay: { dat: false, thieu: [], laNghi: true } }] as any[]) {
+      const d = tuKeHoachNgay({ ...khCoDat(true), exp }, NOW)
+      expect(d.daXongHomNay).toEqual({ daLamCau: 9, lenBac: 3 })
+      expect(d.tienDo.ghiChu).toBe(bt.tienDo.ghiChu)
+      expect(d.tienDo.ghiChu).not.toContain('Để đạt hôm nay')
+    }
+  })
+
   it('chưa đạt mà mọi việc tuỳ chọn còn bị cổng: không trống, chưa có "Làm ngay", các thẻ hiện mờ', () => {
     const bi = [{ ...onLai, hien: false, cong: 'x' }, { ...thu, hien: false, cong: 'on_lai:2026-09-19' }]
     const d = tuKeHoachNgay(khCoDat(false, bi), NOW)
