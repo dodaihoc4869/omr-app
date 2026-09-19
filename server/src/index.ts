@@ -1,6 +1,7 @@
 import {homeworkQuestions,homeworkKeys,gradeHomework} from './btvn-grading'
 import {ghiSuKien,ghiSuKienThi,ghiSuKienLoBtvn,type LuotThi} from './su-kien-hoc'
 import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
+import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
 import {notifications,deliverNotices} from './notifications'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
@@ -2835,6 +2836,14 @@ export default {
       if (p === '/teacher-news') return ra(await teacherNews(env,b))
       if (p === '/ho-so/nap-lai') return ra(await napLaiSuKien(env, b.sbd, b.nguon as NguonNapLai | undefined))
       if (p === '/ho-so/kiem-cheo') return ra(await kiemCheoSuKien(env, b.sbd))
+      // HỒ SƠ NẮM KIẾN THỨC (GĐ 1) — dựng lại từ sổ (≤ 50 em/lượt), xem một em, đo độ phủ mã dạng.
+      if (p === '/ho-so/dung-lai') {
+        const ds = Array.isArray(b.sbd) ? (b.sbd as unknown[]).map((x) => String(x ?? '').trim()).filter(Boolean) : []
+        if (ds.length === 0 || ds.length > 50) return ra({ ok: false, error: 'Gửi mảng "sbd" từ 1 đến 50 em.' })
+        return ra({ ok: true, ...(await dungLaiHoSo(env, ds, new Date().toISOString())) })
+      }
+      if (p === '/ho-so/xem') return ra({ ok: true, ...(await docHoSoEm(env, String(b.sbd ?? '').trim())) })
+      if (p === '/ho-so/do-phu-dang') return ra(await docDoPhuDang(env))
       if (p === '/game-v2-admin') return ra(await adminGame(env,b))
       if (p === '/ca/day') return dayCa(env, b)
       if (p === '/ca/xac-nhan') {
