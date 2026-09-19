@@ -31,12 +31,21 @@
 7. Không sửa test nào đang xanh. Chỉ một lần suýt vỡ: `tests/btvn-len-bang-1409.test.ts:255` khoá NGUYÊN VĂN dòng `homeworkKeys(await homeworkQuestions(env,chuoi(bt.ma_de)))` trong `goi-cu.ts` (bất biến "chấm và hồ sơ dùng chung một hàm đọc đáp án"); tôi trả nguyên dòng và dựng sự kiện từ kết quả `gradeHomework` (`suKienTuKetQuaCham`) thay vì tách dòng.
 8. Cảnh báo giới hạn: lệnh nạp lại đếm ngân sách theo số LƯỢT GỌI tờ đề (30/lượt), `homeworkQuestions` với danh sách nhiều tờ có thể đọc nhiều hơn số đó — chưa gặp vấn đề ở 261 em.
 
-### GĐ 1 — Hồ sơ `nam_kt_cau` / `nam_kt_dang`
-- [ ] `server/src/ho-so-cau-hinh.ts` (MOC_ON=[1,3,7], SO_MOC_KHAC_PHUC=3, SO_CAU_DU_TIN=4, NGUONG_DANG_YEU=0.7, TRAN_LAP_MOT_CAU=3) + test soi không lệch với chan-doan-cau-hinh.ts  | bằng chứng: (chưa có)
-- [ ] `phatLaiSuKien(sbd)` thuần + migration `nam_kt_cau`, `nam_kt_dang`  | bằng chứng: (chưa có)
-- [ ] NGHIỆM THU GĐ 1: phát lại 2 lần → giống hệt; sai 20/09 đúng 21/09, 22/09, 25/09 → `da_khac_phuc`; đúng 3 lần trong 21/09 → `dung_lien_tiep` = 1  | bằng chứng: (chưa có)
-- [ ] Đo độ phủ mã dạng trên kho thật (thong-ke-dang.ts), nói thật nếu thấp  | bằng chứng: (chưa có)
-- [ ] Toàn bộ vitest không tăng đỏ; phát hành; ghi sổ  | bằng chứng: (chưa có)
+### GĐ 1 — Hồ sơ `nam_kt_cau` / `nam_kt_dang`  ·  XONG (19/09, Worker `0f351ade`, commit `7f7f3d1`)
+- [x] `server/src/ho-so-cau-hinh.ts` một nguồn (MOC_ON=[1,3,7] ngày, SO_MOC_KHAC_PHUC=3, SO_CAU_DU_TIN=4, NGUONG_DANG_YEU=0,7, TRAN_LAP_MOT_CAU=3, SO_LAN_SAI_DAY_LAI=3) + test soi không lệch  | bằng chứng: `tests/ho-so-nam-kt-1909.test.ts` — MOC_ON = `CAU_HINH_CHAN_DOAN_MAC_DINH.MOC_ON`; SO_CAU_DU_TIN = số đọc nguyên văn từ `HoSoEmView.tsx`; không tệp máy chủ nào khác tự `const MOC_ON =…`.
+- [x] `phatLaiSuKien` thuần (hàm không đọc đồng hồ) + migration `server/migration-1909-ho-so.sql` (2 bảng + 3 chỉ mục, chỉ thêm), chạy `--remote`  | bằng chứng: `sqlite_master` → 5 đối tượng mới. Dựng lại từ sổ: `dungLaiHoSo` (xoá + chèn một giao dịch), `/ho-so/dung-lai` (≤ 50 em), `/ho-so/xem`, `/ho-so/do-phu-dang`.
+- [x] NGHIỆM THU GĐ 1 — ĐẠT: (a) phát lại 2 lần → cùng JSON, và KHÔNG phụ thuộc thứ tự dòng đầu vào (đảo/xáo cũng ra cùng); trên D1 THẬT: dựng cho 261 em hai lần liên tiếp → mọi tổng cột giống hệt (`n_cau=14932`, `n_dang=6643`, `Σlan_gap/lan_sai/lan_trong/dung_lien_tiep = 23161/4455/2401/13255`); Σlan_gap = 23.161 = đúng số dòng sổ. (b) sai 20/09, đúng 21/09, 22/09, 25/09 → `da_khac_phuc`, mốc từng bước 21/09 → 22/09 → 25/09 → 02/10 (test từng bước). (c) đúng 3 lần trong 21/09 → `dung_lien_tiep = 1`. Thêm: ranh giới ngày VN (23:30 vs 00:30), sai lại về mốc 1 + hạ bậc dạng, trống ≠ sai, `can_day_lai`, đã khắc phục rồi sai lại.
+- [x] Đo độ phủ mã dạng trên kho thật  | bằng chứng: `POST /ho-so/do-phu-dang` → **2041/2044 qid = 99,9%** có mã dạng thật (`game_v2_question.dang`), 0 chỉ có chuyên đề, 3 không có gì. Rủi ro "độ phủ mã dạng chưa đo" của đề xuất mục 6: KHÔNG xảy ra ở dữ liệu hiện tại.
+- [x] Toàn bộ vitest không tăng đỏ  | bằng chứng: `npx vitest run` → **4691 tests, 98 failed | 4592 passed; 43 tệp đỏ = nền**; so danh sách tệp đỏ: MỚI ĐỎ [] · HẾT ĐỎ []. Test tệp GĐ 1: **25 passed (25)**.
+- [x] Phát hành + ghi sổ  | bằng chứng: chỉ Worker (theo điều phối 0.Planer): `DAY-MAY-CHU.command` — chốt ca thi "SẠCH 8 ca" — Worker **`0f351ade`**. Lùi: `git revert 7f7f3d1` rồi `./DAY-MAY-CHU.command` (hai bảng mới cứ để nguyên).
+
+**Số liệu hồ sơ thật lần dựng đầu (19/09 12:40):** 261 em · 14.932 (em, câu) · 6.643 (em, dạng). Trạng thái câu: `chua_thay_sai` 9.368 · `moi_sai` 4.519 · `dang_on` 952 · `da_khac_phuc` 93 · `can_day_lai` 46. (`da_khac_phuc` mới 93 vì cần ≥ 3 NGÀY đúng khác nhau — dữ liệu mới có 8 ngày, đúng như đề xuất mục 6 đã báo.)
+
+**Ghi nhận / lệch với đề xuất:**
+1. Thêm 3 cột cho `nam_kt_dang`: `so_moi_sai`, `so_chua_thay_sai`, `moc_moi_sai` — đề xuất mô tả định nghĩa "dạng yếu" (tỉ lệ + câu `moi_sai` tới hạn) nhưng không liệt kê đủ cột để tính nó từ bảng; thiếu thì phải quét lại `nam_kt_cau` mỗi lần hỏi.
+2. `so_sai` của dạng = số CÂU từng sai (`lan_sai > 0`), không phải tổng lượt sai; `so_gap` = số câu KHÁC NHAU đã gặp. Hai số này là mẫu số/tử số của "dạng yếu".
+3. Bậc dạng bắt đầu ở "hiểu" (1) như `lich-on-lai.ts`; mỗi lần đúng ở NGÀY MỚI của một câu bất kỳ trong dạng thì nâng 1 bậc, mỗi lần sai hạ 1 bậc, kẹp [0, 2]. Đề xuất chỉ ghi "nâng/hạ 1 bậc" — chưa nói bậc đầu và đơn vị; đây là chỗ đáng xem lại khi có dữ liệu thật vài tuần.
+4. Câu `chua_thay_sai` cũng có `moc_on_ke` (như công thức đề xuất). GĐ 2 KHÔNG đưa chúng vào hàng ôn (chỉ câu từng sai), vì ôn giãn cách cho câu chưa từng sai sẽ làm ngày nào cũng ngập.
 
 ### GĐ 2 — Kế hoạch ngày `ke_hoach_ngay`
 - [ ] `server/src/ke-hoach-ngay.ts` thuần (EDF, khả thi, bù, cổng) + bảng `ke_hoach_ngay` + `/hs/ke-hoach-ngay` + cron + lập lại theo sự kiện + handler `study_preferences`  | bằng chứng: (chưa có)
