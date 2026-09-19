@@ -4,7 +4,7 @@
 import '../bang-nhiem-vu/m3-theme.css'
 import './m3.css'
 import './m3-tuong-thich.css'
-import { laManThayQuanLy } from '../../lib/vai-tro'
+import { laManThayQuanLy, docDuongVao } from '../../lib/vai-tro'
 
 /** Đang ở vùng HỌC SINH / PHỤ HUYNH (đường /hs, /ph, ?examCode=, ?vai=phieu…)
  *  hay chưa? Cùng phép `App.tsx` dùng để tách app của thầy khỏi hai cổng: `true`
@@ -25,3 +25,15 @@ export function dungM3(search?: string, duongDan?: string): boolean {
 
 export { default as NutTron } from './NutTron'
 export { default as ThanhTren } from './ThanhTren'
+
+/** Đường vào là MÀN THI / XEM ĐIỂM của em (`?examCode=…`, `/t/<mã ca>`, `/d/<mã ca>`) — cùng phép App.tsx dùng.
+ *  Khác `dungM3()` ở chỗ nó KHÔNG đúng cho game thần thú (`/hs` trần): TheCau dùng cả ở game, nên ở màn thi mới tự mang
+ *  `m3`; mọi chỗ khác thẻ câu chỉ đổi khi đã có tổ tiên `.m3` do màn gọi đặt. */
+export function laManThi(search?: string, duongDan?: string): boolean {
+  try {
+    if (search === undefined && duongDan === undefined && typeof location === 'undefined') return false
+    return !!docDuongVao(search ?? location.search, duongDan ?? location.pathname).maCa
+  } catch {
+    return false
+  }
+}

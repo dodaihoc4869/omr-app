@@ -43,10 +43,10 @@ function giaLapMayChu() {
 const dungPH = (onClose = vi.fn()) =>
   render(<BaoCaoCaThiPhuHuynhModal baiThi={BAI as any} hoTenCon="Minh" sbd="12001" lop="12A1" scriptUrl="https://may.test" onClose={onClose} onGiaoBaiChoCon={() => {}} onNhanTinChoThay={() => {}} />)
 
-describe('phạm vi bộ sinh lớp tương thích (nhóm B + C)', () => {
-  it('đúng 9 tệp: 4 của nhóm B + 2 modal báo cáo + 3 khối con nằm trong modal', () => {
+describe('phạm vi bộ sinh lớp tương thích (nhóm B + C + A2)', () => {
+  it('đúng 10 tệp: 4 nhóm B + 2 modal báo cáo + 3 khối con nằm trong modal + PhongChoGame (vào thi)', () => {
     expect(TEP.map((t: string) => path.basename(t)).sort()).toEqual(
-      ['BaoCaoCaThiHocSinhModal.tsx', 'BaoCaoCaThiPhuHuynhModal.tsx', 'BieuDoTienBoGoogle.tsx', 'DongDemCau.tsx', 'KhoiBaPhan.tsx', 'KhoiCauSai.tsx', 'KhoiKhacPhuc3CheDo.tsx', 'LuyenDeChuan.tsx', 'ModalKhacPhucCauSai.tsx'].sort(),
+      ['BaoCaoCaThiHocSinhModal.tsx', 'BaoCaoCaThiPhuHuynhModal.tsx', 'BieuDoTienBoGoogle.tsx', 'DongDemCau.tsx', 'KhoiBaPhan.tsx', 'KhoiCauSai.tsx', 'KhoiKhacPhuc3CheDo.tsx', 'LuyenDeChuan.tsx', 'ModalKhacPhucCauSai.tsx', 'PhongChoGame.tsx'].sort(),
     )
   })
   it('ánh xạ cả màu gradient (from-/via-/to-) → biến điểm dừng --tw-gradient-*, mọi luật vẫn có tiền tố `.m3 `', () => {

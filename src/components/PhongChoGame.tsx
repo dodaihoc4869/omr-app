@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import LogoHocSinh from './LogoHocSinh'
+import { laManThi } from './m3'
+import './m3/vao-thi.css'
 
 interface PhongChoGameProps {
   cho?: {
@@ -310,11 +312,11 @@ export default function PhongChoGame({ cho, loiCho }: PhongChoGameProps) {
     gameRef.current.targetX = x
   }
 
-  return (
+  const phong = (
     <div className="w-full flex flex-col items-center justify-center p-3 sm:p-4 select-none">
       <div className="w-full max-w-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xl overflow-hidden text-center transition-all">
         {/* Thanh tiêu đề Free Fire X Google Parachute */}
-        <div className="bg-gradient-to-r from-blue-600 via-emerald-600 to-indigo-600 p-3.5 text-white flex items-center justify-between text-xs font-bold">
+        <div className="m3-phong-cho-dau bg-gradient-to-r from-blue-600 via-emerald-600 to-indigo-600 p-3.5 text-white flex items-center justify-between text-xs font-bold">
           <div className="flex items-center gap-2">
             <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
             <span>PHÒNG CHỜ THI TRỰC TUYẾN</span>
@@ -382,4 +384,6 @@ export default function PhongChoGame({ cho, loiCho }: PhongChoGameProps) {
       </div>
     </div>
   )
+  // chỉ ở màn thi của em mới tự mang `m3` (xem MaCaInput)
+  return laManThi() ? <div className="m3">{phong}</div> : phong
 }

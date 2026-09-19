@@ -1,0 +1,47 @@
+/* Vào thi (nhóm A2): 6 ô mã ca (MaCaInput) + phòng chờ (PhongChoGame). Màu chỉ đọc biến --m3-*. Không !important:
+ * kích thước / nền / viền của ô mã ca đi qua biến `--ma-*` (MaCaInput.tsx đặt giá trị dự phòng = giá trị cũ). */
+
+/* ── 6 ô mã ca, theo bản vẽ ThiVaoVaKhoa: ô 60 px bo 14, trắng, viền 1 px; có số → vòng 2 px primary; ô đang gõ → primaryContainer + con trỏ nhấp nháy */
+.m3 .m3-ma-ca {
+  --ma-cao-hang: 60px;
+}
+.m3 .m3-ma-ca-hang {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--k2, 8px);
+}
+.m3 .m3-o-ma {
+  --ma-rong: auto;
+  --ma-cao: 60px;
+  --ma-bo: 14px;
+  --ma-nen: var(--m3-surface-container-lowest);
+  --ma-vien: 0 none;
+  box-shadow: inset 0 0 0 1px var(--m3-outline);
+  transition: box-shadow var(--nhanh, 140ms);
+}
+.m3 .m3-o-ma[data-co-so='1'] {
+  box-shadow: inset 0 0 0 2px var(--m3-primary);
+}
+.m3 .m3-o-ma[data-dang-go='1'] {
+  --ma-nen: var(--m3-primary-container);
+  box-shadow: inset 0 0 0 2px var(--m3-primary);
+}
+.m3 .m3-o-ma[data-dang-go='1']::after {
+  content: '';
+  width: 2px;
+  height: 26px;
+  background: var(--m3-primary);
+  animation: m3-nhap-nhay 1s steps(1) infinite;
+}
+@keyframes m3-nhap-nhay {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ── phòng chờ: đầu thẻ bỏ dải gradient xanh-lục-chàm → khối primaryContainer (chữ on-primary-container) */
+.m3 .m3-phong-cho-dau {
+  background-image: none;
+  background-color: var(--m3-primary-container);
+  color: var(--m3-on-primary-container);
+}

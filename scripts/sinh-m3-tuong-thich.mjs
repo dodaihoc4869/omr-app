@@ -34,6 +34,8 @@ export const TEP = [
   'src/components/BieuDoTienBoGoogle.tsx',
   'src/components/KhoiBaPhan.tsx',
   'src/components/DongDemCau.tsx',
+  // nhóm A2 — vào thi (luồng thi thật)
+  'src/components/PhongChoGame.tsx',
 ]
 
 // ── họ màu Tailwind → vai trò M3 ────────────────────────────────────────────
