@@ -5,13 +5,13 @@ Giao bởi 0.Planer (thầy đã uỷ quyền 100%: "nghe theo điều phối, k
 
 ## Nguyên văn việc giao (0.Planer, 19/09)
 
-- [ ] "đồng bộ Material 3 cho các COMPONENT ĐỘC LẬP mà học sinh/phụ huynh bấm vào" | bằng chứng: (chưa có)
+- [~] "đồng bộ Material 3 cho các COMPONENT ĐỘC LẬP mà học sinh/phụ huynh bấm vào" | bằng chứng: 15 tệp được duyệt: XONG 13 (A1 46140c6, B 4a37ff2, C 5f41d50/70d3408, TheCau e1555a4 [CSS, chưa bật ở màn thi], A2 564dc08, TamTruotHoiBai 5d0d1c4); ĐỀ NGHỊ ĐỂ NGUYÊN 2 (KhoiBaiLuyen, TheCauChiTiet — bản giấy, chờ 0.Planer); CHỜ Code 2: bật TheCau ở màn thi bằng `m3` ở gốc ExamTakeScreen
 - [x] BƯỚC 0: kiểm kê 20 tệp (có thật không, ai import, dùng chung với GV không, test soi gì) → nhắn 0.Planer | bằng chứng: bảng gửi 19/09; 0.Planer DUYỆT 17:00 (làm 15 tệp, bỏ 5: KhoiTienBo chỉ GV + 4 mã chết)
 - [x] "DÙNG LẠI token và thành phần của Code 2, KHÔNG tạo bảng màu thứ hai" | bằng chứng: tests/m3-a1-1909.test.tsx quét src/components/m3/*: 0 mã #, 0 khai báo --m3-* mới; check:mau 0 dòng ở tệp của em
-- [ ] "Mỗi nhóm MỘT commit; chạy test các tệp liên quan; toàn `npx vitest run` một lần trước khi báo xong nhóm (ghi Nhật ký trước; nền 98 đỏ/43 tệp)"
-- [ ] "`npm run build` ra thư mục riêng (đừng đè dist/)"
-- [ ] "Xong mỗi nhóm nhắn tôi: commit, tệp đã sửa, ảnh 390 px sáng+tối ở docs/anh-dong-bo-m3-1909/"
-- [ ] Điền dòng "Code 4" trong DIEU-PHOI.md thành "đang làm"
+- [x] "Mỗi nhóm MỘT commit; chạy test các tệp liên quan; toàn `npx vitest run` một lần trước khi báo xong nhóm (ghi Nhật ký trước; nền 98 đỏ/43 tệp)" | bằng chứng: mỗi nhóm có dòng Nhật ký trong DIEU-PHOI.md trước khi chạy; lần cuối 97 đỏ / 42 tệp, đỏ MỚI của em: không
+- [x] "`npm run build` ra thư mục riêng (đừng đè dist/)" | bằng chứng: `vite build --outDir <ngoài repo>` sau mỗi nhóm, không lỗi
+- [x] "Xong mỗi nhóm nhắn tôi: commit, tệp đã sửa, ảnh 390 px sáng+tối ở docs/anh-dong-bo-m3-1909/" | bằng chứng: tin gửi 0.Planer cho từng nhóm; ảnh a1-/b-/c-/d-/a2- trong docs/anh-dong-bo-m3-1909/
+- [x] Điền dòng "Code 4" trong DIEU-PHOI.md thành "đang làm" | bằng chứng: dòng 23 của bảng
 
 ## Luật cứng (chép từ lời giao)
 
@@ -99,3 +99,8 @@ Giao bởi 0.Planer (thầy đã uỷ quyền 100%: "nghe theo điều phối, k
 - [x] laManThi() (m3/index.ts): CHỈ ?examCode= | /t/<mã> | /d/<mã> — /hs (game) KHÔNG bật; tests/m3-a2-1909.test.tsx 14 xanh, tests/m3-d2-tam-truot-1909.test.tsx 4 xanh; đột biến (bọc vô điều kiện / đổi giá trị dự phòng / thêm !important) → 3 test đỏ mỗi tệp, hoàn lại xanh
 - [x] Chromium thật sáng+tối: ô mã ca, phòng chờ (có/không lỗi), tấm hỏi bài: 0 đích chạm < 48 px; 0 chữ < 4,5 ở phần của em. CÒN 4 cặp chữ nhỏ trong TheCauChiTiet (bảng --p-* "bản giấy": --p-do/--p-xanh làm chữ nhãn "A", "em chọn", "B", "đáp án đúng", 2,3–3,8:1) — NỢ CŨ, không phải do em; đổi cần sửa token trong tokens.css (tuong-phan-mau-1009 khoá)
 - [ ] KhoiBaiLuyen (PhieuScreen/PhieuV3: trang phiếu phụ huynh, bảng --p-* + lớp bc-* của css-bao-cao.ts): cùng lý do "bản giấy" với TheCauChiTiet → ĐỀ NGHỊ để nguyên (chờ 0.Planer)
+
+## Trạng thái cuối phiên — 19/09 15:50
+
+- Việc còn mở: (1) chờ 0.Planer soát 70d3408 (đã soát), e1555a4 (đã soát), 564dc08, 5d0d1c4, b72ca8d; (2) TheCau bật ở màn thi = Code 2 đặt `m3` ở gốc ExamTakeScreen (đã thoả thuận, Code 2 xác nhận cách (a)); (3) KhoiBaiLuyen + TheCauChiTiet để nguyên (đề nghị, chờ đồng ý); (4) nợ cũ ngoài phạm vi: 4 cặp chữ nhỏ --p-do/--p-xanh của TheCauChiTiet dưới 4,5:1 (tokens.css); (5) dọn: thư mục tạm `.claude/m3-xem/` (trang xem thử, KHÔNG commit) — xoá được
+- Mã chết không đổi áo: CardCaThiGanNhat, KhoiLuyenKhacPhuc, BongBongChatHocSinh, BongBongChatPhuHuynh; KhoiTienBo chỉ app giáo viên
