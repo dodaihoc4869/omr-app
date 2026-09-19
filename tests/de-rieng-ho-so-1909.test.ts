@@ -635,3 +635,26 @@ describe('7. CHẠY HAI LẦN cùng đầu vào → cùng JSON (có hồ sơ)', 
     }
   })
 })
+
+// ===========================================================================
+describe('8. MÀN CA THI — đề riêng rút cho ĐÚNG những em trong phòng chờ', () => {
+  // Lỗi tái hiện: bản 17/09 (b527061) dựng `dsCho` = phòng chờ ∪ MỌI em cùng lớp
+  // trong danh sách đăng ký. Em vắng cũng chiếm suất chia vòng tròn và bị đếm vào
+  // biên bản "thiếu câu hỏi lại" — trái ghi chú đầu khối "cho ĐÚNG những em đang đứng chờ".
+  const MAN = fs.readFileSync(path.join(process.cwd(), 'src/screens/ExamMonitorScreen.tsx'), 'utf8')
+  const than = MAN.slice(MAN.indexOf('const batDauCaNay = async () => {'), MAN.indexOf('/** HUỶ CA ĐANG CHỜ'))
+  const nhanh = than.slice(than.indexOf('if (caCanDeRieng) {'), than.indexOf('// CHẶN TRẦN TRÙNG CÂU'))
+
+  it('nhánh đề riêng lấy dsCho từ phòng chờ, KHÔNG gọi danh sách lớp để gộp thêm', () => {
+    expect(nhanh.length).toBeGreaterThan(200)
+    expect(nhanh).toContain('const dsCho = (chiTiet.dsCho ?? []).map((x) => x.sbd).filter(Boolean)')
+    expect(nhanh).not.toContain('danhSachEm(')
+    expect(nhanh).not.toContain('registered')
+    expect(nhanh).toContain('dungDeRiengChoCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, dsCho,')
+  })
+
+  it('phòng chờ trống thì vẫn dừng và báo, không rút đề cho ai', () => {
+    expect(nhanh).toContain('if (dsCho.length === 0) {')
+    expect(nhanh).toContain('Chưa em nào vào phòng chờ — chưa rút được đề riêng.')
+  })
+})
