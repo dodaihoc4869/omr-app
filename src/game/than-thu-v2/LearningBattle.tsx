@@ -45,7 +45,7 @@ const SPELL_ROWS:number[][]=[
 ]
 const SPELL_LEFT=[[60,60,60,60,35,0],[40,40,30,20,0,0],[450,310,210,150,80,0],[340,250,170,120,60,0],[100,80,50,20,0,0],[130,100,80,20,0,0],[340,100,60,30,0,0],[60,40,20,0,0,0]]
 const SPELL_RIGHT=[[850,980,1110,1250,1400,1536],[1480,1480,1500,1536,1536,1536],[1100,1180,1270,1330,1450,1536],[1170,1260,1370,1460,1536,1536],[1440,1470,1536,1536,1536,1536],[1240,1340,1430,1510,1536,1536],[1160,1330,1420,1470,1536,1536],[1310,1380,1460,1536,1536,1536]]
-function SpellArt({pet,stage,clipId}:{pet:number;stage:number;clipId:string}){
+export function SpellArt({pet,stage,clipId}:{pet:number;stage:number;clipId:string}){
  const rows=SPELL_ROWS[pet]??SPELL_ROWS[0]!,y=rows[stage]!,height=rows[stage+1]!-y,x=SPELL_LEFT[pet]![stage]!,width=SPELL_RIGHT[pet]![stage]!-x
  return <svg className="battle-painted-spell" data-stage={stage} data-pet={pet} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none"><defs><clipPath id={clipId}><rect width={width} height={height}/></clipPath></defs><g clipPath={`url(#${clipId})`}><image href={`/than-thu-v2/spells/${SPELL_NAMES[pet]}.png`} width="1536" height="1024" x={-x} y={-y}/></g></svg>
 }

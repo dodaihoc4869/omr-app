@@ -40,7 +40,8 @@ const danhDau = <T extends object>(b: T): T => { noiBo.add(b); return b }
 
 export type NhanCau = 'toi_han_on' | 'dang_yeu' | 'cau_moi' | 'vua_suc'
 interface CauRef { qid: string; maDe: string; version: string; nhan: NhanCau; dang: string | null; tenDang: string; nhom: string; kt: string[] }
-interface NguoiDoan { sbd: string; ten: string; pet: number; lop: string; phien: string; cau: CauRef[] }
+/** `cap` chỉ để VẼ đúng hình thái thần thú; không bao giờ vào lõi (cấp không cho chỉ số trong trận). */
+interface NguoiDoan { sbd: string; ten: string; pet: number; cap: number; lop: string; phien: string; cau: CauRef[] }
 interface NopLuu { dung: boolean; hanhDong: HanhDong; tuLam: boolean; boTrong: boolean; tiepSucBoi?: number }
 export interface PhongDoan {
   kind: 'doan-phong'; chu: string; taoLuc: number; nguoi: NguoiDoan[]
@@ -126,7 +127,7 @@ async function taoNguoi(env: Env, sbd: string, p: Profile, b: Row, goiGame: GoiG
   await env.DB.prepare("UPDATE game_v2_session SET json=json_set(json,'$.doan',1) WHERE id=? AND sbd=?").bind(phien, sbd).run()
   const hs = await env.DB.prepare('SELECT ho_ten,lop FROM hoc_sinh WHERE sbd=?').bind(sbd).first<{ ho_ten: string | null; lop: string | null }>()
   const pet = Math.max(0, PETS.findIndex(x => x.id === p.pet))
-  return { sbd, ten: tenGoi(String(hs?.ho_ten ?? ''), p.nickname || PETS[pet]!.name), pet, lop: String(hs?.lop ?? ''), phien, cau: await ganNhan(env, sbd, qs.slice(0, SO_HIEP - 2), now) }
+  return { sbd, ten: tenGoi(String(hs?.ho_ten ?? ''), p.nickname || PETS[pet]!.name), pet, cap: Math.max(1, Math.min(120, Number(p.cap) || 1)), lop: String(hs?.lop ?? ''), phien, cau: await ganNhan(env, sbd, qs.slice(0, SO_HIEP - 2), now) }
 }
 
 /**
@@ -248,7 +249,7 @@ async function khungNhin(env: Env, ma: string, p: PhongDoan, revision: number, s
     return p.tinHieu[ghe] === 'can_tiep_suc' ? 'can_tiep_suc' : 'dang_lam'
   }
   const ghe = (c ? c.ghe : p.nguoi.map(n => ({ ten: n.ten, pet: n.pet, laMay: false, roi: false }))).map((g, k) =>
-    ({ ghe: k, ten: g.ten, pet: g.pet, laMay: g.laMay, roi: g.roi, laEm: k === i, trangThai: trangThai(k), tinHieu: laTrum && mo ? p.tinHieu[k] ?? null : null }))
+    ({ ghe: k, ten: g.ten, pet: g.pet, cap: (p.nguoi[k] ?? p.nguoi[0]!).cap, laMay: g.laMay, roi: g.roi, laEm: k === i, trangThai: trangThai(k), tinHieu: laTrum && mo ? p.tinHieu[k] ?? null : null }))
   const doan: Record<string, unknown> = { ma, revision, laChu: p.chu === sbd, batDau: !!c, ghe, gioMayChu: now }
   if (!c) return { ok: true, doan }
 
@@ -256,7 +257,7 @@ async function khungNhin(env: Env, ma: string, p: PhongDoan, revision: number, s
   doan.tran = {
     tenChang: c.tenChang, hiep: c.hiep, soHiep: SO_HIEP, laTrum, ketThuc: c.ketThuc, thang: c.thang, linhTam: c.linhTam, quai: c.quai, trumVoGiap: c.trumVoGiap,
     nangLuong: c.ghe[i]!.nangLuong, daNhanTiepSuc: c.ghe[i]!.daNhanTiepSuc, giay: giayCuaHiep(c.hiep), moSauMs: Math.max(0, p.hiepLuc - now), conMs: c.ketThuc ? 0 : Math.max(0, hanHiep(p) - Math.max(now, p.hiepLuc)),
-    tenQuai: kb.quai.map(q => q.ten), tenTrum: kb.trum.map(t => t.ten),
+    tenQuai: kb.quai.map(q => q.ten), loaiQuai: kb.quai.map(q => q.id), tenTrum: kb.trum.map(t => t.ten), loaiTrum: kb.trum.map(t => t.id),
   }
   const vuaXong = c.lichSu.at(-1)
   if (vuaXong) doan.hiepVuaXong = khungNhinHiep(vuaXong, i)
