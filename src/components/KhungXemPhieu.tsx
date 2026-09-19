@@ -21,6 +21,10 @@
 // phiếu (html-phieu.ts), nên bản xem trong app và tệp HTML tải về giống hệt
 // nhau, và không có nút nào phải đoán nghĩa.
 //
+// CỔNG HỌC SINH / PHỤ HUYNH (dungM3()) mặc M3: vạch 48 px phía trên iframe — vốn đã có, chỗ nút X nổi — thành
+// thanh M3 (ThanhTren: nút Đóng tròn 48 px + tên phiếu) nền `surface`, cùng màu thanh dính của phiếu M3 bên trong
+// (m3/khung-xem-phieu.css). Vẫn MỘT thanh, không thêm dải thứ hai. Tờ máy chiếu và app giáo viên KHÔNG đổi.
+//
 // TRÊN MÀN RỘNG chỉ phủ NỬA PHẢI, chừa thanh điều hướng bên trái (xem
 // `.lop-xem-phieu` trong index.css). Phiếu co đúng theo bề rộng nửa phải, nên
 // thầy vẫn đổi được màn khác mà không phải đóng phiếu; kéo hẹp/rộng cột trái
@@ -28,6 +32,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
+import { ThanhTren, dungM3 } from './m3'
+import './m3/khung-xem-phieu.css'
 
 export interface KhungXemPhieuProps {
   /** Nội dung dựng sẵn tại máy. Dùng cho phiếu bài tập và đề ca. */
@@ -49,6 +55,8 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
   // một kết quả. Thanh trái ẩn (màn hẹp, hoặc màn làm bài không dựng thanh) thì
   // ra 0, tức phủ kín — đúng như mong muốn.
   const isMayChieu = Boolean(ten && (ten.toLowerCase().includes('máy chiếu') || ten.toLowerCase().includes('chiếu')))
+  // Tờ chiếu là đồ của thầy (chiếu lên bảng, giao diện riêng): không bao giờ mặc M3, dù đường vào là gì.
+  const m3 = !isMayChieu && dungM3()
   const [meTrai, setMeTrai] = useState(0)
   useLayoutEffect(() => {
     if (isMayChieu) {
@@ -164,7 +172,18 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
   }, [])
 
   return createPortal(
-    <div className="lop-xem-phieu" role="dialog" aria-modal="true" aria-label={ten || 'Phiếu bài tập'} style={{ left: isMayChieu ? 0 : meTrai, zIndex: 99999 }}>
+    <div
+      className={m3 ? 'lop-xem-phieu m3' : 'lop-xem-phieu'}
+      role="dialog"
+      aria-modal="true"
+      aria-label={ten || 'Phiếu bài tập'}
+      style={{ left: isMayChieu ? 0 : meTrai, zIndex: 99999 }}
+    >
+      {m3 && (
+        <div className="khung-phieu-thanh">
+          <ThanhTren tieuDe={ten || 'Phiếu bài tập'} onQuayLai={() => dongRef.current()} nhanQuayLai="Đóng" bieuTuong={<X size={24} aria-hidden="true" />} />
+        </div>
+      )}
       <iframe
         title={ten || 'Phiếu bài tập'}
         {...(html ? { srcDoc: html } : { src })}
@@ -173,13 +192,16 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
         // nút bấm không ăn mà cũng không báo lỗi gì.
         allow="fullscreen"
         allowFullScreen
-        style={{ display: 'block', width: '100%', height: '100%', border: 0, background: 'var(--p-giay)' }}
+        style={{ display: 'block', width: '100%', height: '100%', border: 0, background: m3 ? 'var(--m3-surface)' : 'var(--p-giay)' }}
       />
       {/* Nút thoát NHỎ, nổi góc trên phải. Không phải một dải chiếm hết bề
-          ngang: dải đó chồng lên nhau khi mở phiếu từ trong báo cáo. */}
-      <button className="nut-dong-phieu" type="button" onClick={() => dongRef.current()} aria-label="Đóng" title="Đóng (Esc, hoặc vuốt quay lại)">
-        <X size={18} />
-      </button>
+          ngang: dải đó chồng lên nhau khi mở phiếu từ trong báo cáo.
+          (Dưới M3 nút Đóng nằm trong thanh trên ở trên.) */}
+      {!m3 && (
+        <button className="nut-dong-phieu" type="button" onClick={() => dongRef.current()} aria-label="Đóng" title="Đóng (Esc, hoặc vuốt quay lại)">
+          <X size={18} />
+        </button>
+      )}
     </div>,
     document.body,
   )

@@ -1,0 +1,29 @@
+/* Khung toàn màn bao phiếu HTML (KhungXemPhieu) — CHỈ khi cổng học sinh / phụ huynh (dungM3()).
+ * Ngoài M3 khung vẫn là `.lop-xem-phieu` + `.nut-dong-phieu` của index.css, không đổi một điểm ảnh.
+ *
+ * KHÔNG THÊM THANH MỚI: vạch 48 px + tai thỏ phía trên iframe vốn đã có (padding-top của .lop-xem-phieu, chỗ nút X
+ * nổi). Nay chính vạch đó là thanh M3 (56 px = nút Đóng 48 px + 4 px hai đầu), nền cùng màu `surface` với thanh
+ * dính `.gd-tren` của phiếu bên trong iframe (cùng bảng màu M3) — không viền, không bóng, nên hai thanh liền một mảng
+ * nền; ranh giới duy nhất là bóng cao độ 1 của `.gd-tren` do phiếu tự vẽ. */
+.m3.lop-xem-phieu {
+  --khung-phieu-cao-thanh: 56px;
+  padding-top: calc(var(--khung-phieu-cao-thanh) + env(safe-area-inset-top));
+  background: var(--m3-surface);
+}
+.m3 .khung-phieu-thanh {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  padding: env(safe-area-inset-top) var(--k3, 12px) 0 var(--k1, 4px);
+  background: var(--m3-surface);
+}
+.m3 .khung-phieu-thanh .m3-thanh-tren {
+  min-height: var(--khung-phieu-cao-thanh);
+}
+.m3 .khung-phieu-thanh .m3-thanh-tren-ten {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
