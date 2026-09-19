@@ -77,6 +77,28 @@ export interface DuLieuBangNhiemVu {
   /** Có chữ khi đang hiện BẢN CUỐI vì lần gọi mới nhất lỗi ("Kế hoạch lúc 12:54…"). */
   ghiChuCu?: string
   ngayNghi: boolean
+  thanThu: TrangThaiThanThu
+}
+
+/**
+ * Thần thú CỦA EM, lấy từ máy chủ (`thanThu` trong /hs/ke-hoach-ngay, đọc game_v2_profile).
+ * KHÔNG có "thần thú mặc định": thiếu dữ liệu thì nói thiếu, không hiện con nào.
+ *  - co        : máy chủ nói rõ em đang có thần thú `pet` (id) cấp `cap`, biệt danh `ten` (nếu có).
+ *  - chua_chon : máy chủ nói em CHƯA chọn thần thú (`thanThu: null`), hoặc không có id.
+ *  - chua_biet : chưa có dữ liệu (máy chủ cũ/lỗi/nguồn trợ lý) — chỉ giữ chỗ, không vẽ.
+ * (`pet` lạ, không có trong danh sách game, được giao diện coi như chua_chon.)
+ */
+export type TrangThaiThanThu = { kieu: 'co'; pet: string; cap: number; ten?: string } | { kieu: 'chua_chon' } | { kieu: 'chua_biet' }
+
+export function docThanThu(raw: unknown): TrangThaiThanThu {
+  if (raw === undefined) return { kieu: 'chua_biet' }
+  if (raw === null) return { kieu: 'chua_chon' }
+  if (typeof raw !== 'object') return { kieu: 'chua_biet' }
+  const t = raw as any
+  const pet = typeof t.pet === 'string' ? t.pet.trim() : ''
+  if (!pet) return { kieu: 'chua_chon' }
+  const ten = typeof t.nickname === 'string' && t.nickname.trim() ? t.nickname.trim() : undefined
+  return { kieu: 'co', pet, cap: Math.max(1, Math.floor(Number(t.cap) || 1)), ten }
 }
 
 export interface TheQuaHan {
@@ -129,7 +151,7 @@ function gomBac(viec: TheNhiemVu[]): NhomBac[] {
 function dongGoi(
   nguon: DuLieuBangNhiemVu['nguon'],
   viec: TheNhiemVu[],
-  phanConLai: Pick<DuLieuBangNhiemVu, 'tienDo' | 'tocDo' | 'chuoiNgay' | 'canhBao' | 'quaHan' | 'capNhatLuc' | 'ghiChuCu' | 'ngayNghi'>,
+  phanConLai: Pick<DuLieuBangNhiemVu, 'tienDo' | 'tocDo' | 'chuoiNgay' | 'canhBao' | 'quaHan' | 'capNhatLuc' | 'ghiChuCu' | 'ngayNghi' | 'thanThu'>,
 ): DuLieuBangNhiemVu {
   // Chỉ còn việc tuỳ chọn ⇒ coi là "hôm nay chưa có việc": không dựng thẻ nào.
   const coViecThat = viec.some((v) => v.bac !== 'tuy_chon')
@@ -234,6 +256,8 @@ export function tuKeHoachTroLy(keHoach: KeHoachNgayTroLy, phu: NguonPhuTroLy = {
     capNhatLuc: undefined,
     ghiChuCu: undefined,
     ngayNghi: false,
+    // Nguồn trợ lý chỉ có bảng V1 (không có id thần thú) — KHÔNG đoán, để giữ chỗ.
+    thanThu: { kieu: 'chua_biet' },
   })
 }
 
@@ -276,6 +300,8 @@ export interface KeHoachNgayMayChu {
   chuoiDat?: number
   lanNghi?: boolean
   capNhatLuc?: string
+  /** Thần thú của em (game V2). `null` = chưa chọn; vắng = máy chủ cũ. */
+  thanThu?: { pet?: string | null; cap?: number; nickname?: string | null } | null
 }
 
 /** Chốt kiểu: JSON máy chủ trả về có đủ phần giao diện cần không (lỗi/HTML/`{ok:true,items:[]}` ⇒ false). */
@@ -449,6 +475,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     capNhatLuc: keHoach.capNhatLuc,
     ghiChuCu: cu && keHoach.capNhatLuc ? `Kế hoạch lúc ${gioVietNam(keHoach.capNhatLuc)} — chưa cập nhật được, đang hiện bản cuối.` : undefined,
     ngayNghi: keHoach.lanNghi === true,
+    thanThu: docThanThu(keHoach.thanThu),
   })
 }
 
@@ -521,8 +548,16 @@ export function phucHoiBanNho(x: unknown, now: number): DuLieuBangNhiemVu | null
   if (d.lamNgay !== null && !laThe(d.lamNgay)) return null
   if (!d.cacBac.every((g, i) => g && g.bac === THU_TU_BAC[i] && laMang(g.viec) && g.viec.every(laThe))) return null
   const gioLuu = d.capNhatLuc ? gioVietNam(d.capNhatLuc) : ''
+  const tt: any = (d as any).thanThu
+  const thanThu: TrangThaiThanThu =
+    tt && tt.kieu === 'co' && typeof tt.pet === 'string' && tt.pet && Number.isFinite(tt.cap)
+      ? { kieu: 'co', pet: tt.pet, cap: Math.max(1, Math.floor(tt.cap)), ten: typeof tt.ten === 'string' ? tt.ten : undefined }
+      : tt && tt.kieu === 'chua_chon'
+        ? { kieu: 'chua_chon' }
+        : { kieu: 'chua_biet' }
   return {
     ...d,
+    thanThu,
     lamNgay: d.lamNgay ? lamMoiThe(d.lamNgay, now) : null,
     cacBac: d.cacBac.map((g) => ({ ...g, viec: g.viec.map((v) => lamMoiThe(v, now)) })),
     ghiChuCu: gioLuu ? `Kế hoạch lúc ${gioLuu} · đang cập nhật…` : 'Kế hoạch đã nhớ · đang cập nhật…',

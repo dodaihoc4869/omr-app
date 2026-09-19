@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react'
 import StudentPortalScreen from '../src/screens/StudentPortalScreen'
 import { dongGoiBanNho, tuKeHoachNgay } from '../src/lib/nhiem-vu-adapter'
+import { PETS } from '../src/game/than-thu-v2/core'
 import {
   taiCaDangMo,
   taiKeHoachNgay,
@@ -15,7 +16,7 @@ import {
 
 const mocks = vi.hoisted(() => ({ homework: vi.fn(), sheet: vi.fn(), items: [] as any[], momItems: [] as any[], lichSuCho: null as Promise<any> | null }))
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
+vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: ({ index, level }: any) => <div data-testid="thu" data-index={index} data-level={level} /> }))
 vi.mock('../src/components/ThongBaoHocSinh', () => ({ default: () => null, noticeApi: vi.fn() }))
 vi.mock('../src/game/than-thu-v2/academic-sync', () => ({ syncStudentExp: async () => {} }))
 vi.mock('../src/lib/exam-db', async (original) => ({ ...(await original<any>()), loadScriptUrlHoacMacDinh: async () => '/test' }))
@@ -328,5 +329,56 @@ describe('A.1 — bản nhớ kế hoạch: vẽ NGAY khi mở lại, rồi thay
     await waitFor(() => expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('tro_ly'))
     expect(container.textContent).not.toContain('Ôn 3 câu đã tới hạn')
     expect(localStorage.getItem(KHOA)).toBeNull()
+  })
+})
+
+describe('thần thú của em trên StudentPortalScreen thật (lỗi thầy báo)', () => {
+  const KHOA = 'omr_bnv_ke_hoach:test'
+  const chi = (id: string) => PETS.findIndex((p) => p.id === id)
+  beforeEach(() => {
+    mocks.items = []
+    mocks.momItems = []
+    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: 'test', hoTen: 'Em thử', token: 'test-token' }))
+  })
+  const thu = (c: HTMLElement) => c.querySelector('.bnv-thu-vong [data-testid="thu"]') as HTMLElement | null
+
+  it('máy chủ báo nuoc_long cấp 37 "Bông" → đúng con, đúng cấp, đúng tên (KHÔNG phải Hoả Long cấp 1)', async () => {
+    tra['/hs/ke-hoach-ngay'] = { body: { ...KE_HOACH, thanThu: { pet: 'nuoc_long', cap: 37, nickname: 'Bông' } } }
+    const { container } = render(<StudentPortalScreen />)
+    await waitFor(() => expect(thu(container)).not.toBeNull())
+    expect(Number(thu(container)!.dataset.index)).toBe(chi('nuoc_long'))
+    expect(thu(container)!.dataset.level).toBe('37')
+    expect(screen.getByRole('button', { name: 'Mở thần thú Bông · Cấp 37' })).toBeTruthy()
+  })
+
+  it('máy chủ báo chưa chọn (thanThu:null): "Chưa chọn thần thú", chạm mở game, không con nào', async () => {
+    tra['/hs/ke-hoach-ngay'] = { body: { ...KE_HOACH, thanThu: null } }
+    const { container } = render(<StudentPortalScreen />)
+    await screen.findByRole('button', { name: /Chưa chọn thần thú/ })
+    await new Promise((r) => setTimeout(r, 250))
+    expect(thu(container)).toBeNull()
+  })
+
+  it('máy chủ cũ (không có trường) hoặc lỗi → giữ chỗ, KHÔNG hiện con mặc định', async () => {
+    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
+    const { container } = render(<StudentPortalScreen />)
+    await screen.findByRole('region', { name: /^Làm ngay/ })
+    await new Promise((r) => setTimeout(r, 250))
+    expect(thu(container)).toBeNull()
+    expect(container.textContent).not.toContain('Hoả Long')
+    expect(container.querySelector('.bnv-thu-vong')).not.toBeNull()
+  })
+
+  it('bản nhớ giữ thần thú: mở lại (mạng chưa về) vẫn đúng con, rồi thay khi máy chủ báo con khác', async () => {
+    const d = tuKeHoachNgay({ ...KE_HOACH, viec: KE_HOACH.viec.map((v) => ({ ...v })), thanThu: { pet: 'nuoc_long', cap: 37, nickname: 'Bông' } } as any, Date.now(), {})
+    localStorage.setItem(KHOA, JSON.stringify(dongGoiBanNho(d, Date.now())))
+    let giai!: () => void
+    tra['/hs/ke-hoach-ngay'] = { body: { ...KE_HOACH, thanThu: { pet: 'dat_quy', cap: 6, nickname: 'Rùa' } }, cho: new Promise<void>((ok) => (giai = ok)) }
+    mocks.lichSuCho = new Promise(() => {})
+    const { container } = render(<StudentPortalScreen />)
+    await waitFor(() => expect(thu(container)).not.toBeNull())
+    expect(Number(thu(container)!.dataset.index)).toBe(chi('nuoc_long'))
+    expect(thu(container)!.dataset.level).toBe('37')
+    mocks.lichSuCho = null
   })
 })

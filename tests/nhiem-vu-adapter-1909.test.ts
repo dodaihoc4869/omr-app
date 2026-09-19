@@ -3,6 +3,7 @@
 import { describe, expect, it } from 'vitest'
 import { tongHopKeHoachTroLy } from '../src/lib/tro-ly-ca-nhan'
 import {
+  docThanThu,
   dongGoiBanNho,
   dungBangNhiemVu,
   laKeHoachNgayHopLe,
@@ -477,5 +478,45 @@ describe('bản nhớ (stale-while-revalidate): đóng gói và phục hồi', (
     for (const x of hong) expect(() => phucHoiBanNho(x, NOW)).not.toThrow()
     for (const x of hong) expect(phucHoiBanNho(x, NOW)).toBeNull()
     expect(phucHoiBanNho(tot, NOW)).not.toBeNull()
+  })
+})
+
+describe('thần thú CỦA EM đọc từ kế hoạch máy chủ (không bao giờ bịa con mặc định)', () => {
+  it('docThanThu: có con → co; null → chua_chon; vắng → chua_biet; rác → không đoán', () => {
+    expect(docThanThu({ pet: 'nuoc_long', cap: 37, nickname: 'Bông' })).toEqual({ kieu: 'co', pet: 'nuoc_long', cap: 37, ten: 'Bông' })
+    expect(docThanThu({ pet: 'nuoc_long', cap: 0 })).toMatchObject({ kieu: 'co', cap: 1 })
+    expect(docThanThu({ pet: 'nuoc_long', cap: '12.9' })).toMatchObject({ cap: 12 })
+    expect(docThanThu({ pet: 'nuoc_long', cap: 5, nickname: '   ' })).toEqual({ kieu: 'co', pet: 'nuoc_long', cap: 5, ten: undefined })
+    expect(docThanThu(null)).toEqual({ kieu: 'chua_chon' })
+    expect(docThanThu({ pet: null, cap: 3 })).toEqual({ kieu: 'chua_chon' })
+    expect(docThanThu({ pet: '  ', cap: 3 })).toEqual({ kieu: 'chua_chon' })
+    expect(docThanThu({})).toEqual({ kieu: 'chua_chon' })
+    expect(docThanThu(undefined)).toEqual({ kieu: 'chua_biet' })
+    expect(docThanThu('nuoc_long')).toEqual({ kieu: 'chua_biet' })
+    expect(docThanThu(7)).toEqual({ kieu: 'chua_biet' })
+  })
+
+  it('nhánh máy chủ lấy thanThu từ phản hồi; nhánh trợ lý (bảng V1, không có id) KHÔNG đoán', () => {
+    const co = tuKeHoachNgay({ ...keHoachMayChu, thanThu: { pet: 'nuoc_long', cap: 37, nickname: 'Bông' } }, NOW, phu)
+    expect(co.thanThu).toEqual({ kieu: 'co', pet: 'nuoc_long', cap: 37, ten: 'Bông' })
+    expect(tuKeHoachNgay({ ...keHoachMayChu, thanThu: null }, NOW, phu).thanThu).toEqual({ kieu: 'chua_chon' })
+    expect(tuKeHoachNgay(keHoachMayChu, NOW, phu).thanThu).toEqual({ kieu: 'chua_biet' }) // máy chủ cũ, không có trường
+    expect(tuKeHoachTroLy(troLy({ dsMomGiao: [momChuaLam] })).thanThu).toEqual({ kieu: 'chua_biet' })
+    // Mọi đường ra đều không có "hoa_long" tự chế.
+    for (const d of [co, tuKeHoachNgay(keHoachMayChu, NOW, phu), tuKeHoachTroLy(troLy())]) expect(JSON.stringify(d.thanThu)).not.toContain('hoa_long')
+  })
+
+  it('bản nhớ giữ nguyên thần thú (mở lại vẫn đúng con); bản nhớ đời cũ không có trường → chua_biet', () => {
+    const tuoi = tuKeHoachNgay({ ...keHoachMayChu, thanThu: { pet: 'nuoc_long', cap: 37, nickname: 'Bông' } }, NOW, phu)
+    const jsonDi = (x: unknown) => JSON.parse(JSON.stringify(x))
+    expect(phucHoiBanNho(jsonDi(dongGoiBanNho(tuoi, NOW)), NOW)!.thanThu).toEqual({ kieu: 'co', pet: 'nuoc_long', cap: 37, ten: 'Bông' })
+    const chuaChon = tuKeHoachNgay({ ...keHoachMayChu, thanThu: null }, NOW, phu)
+    expect(phucHoiBanNho(jsonDi(dongGoiBanNho(chuaChon, NOW)), NOW)!.thanThu).toEqual({ kieu: 'chua_chon' })
+    const cu = jsonDi(dongGoiBanNho(tuoi, NOW))
+    delete cu.duLieu.thanThu
+    expect(phucHoiBanNho(cu, NOW)!.thanThu).toEqual({ kieu: 'chua_biet' })
+    const hong = jsonDi(dongGoiBanNho(tuoi, NOW))
+    hong.duLieu.thanThu = { kieu: 'co', pet: '', cap: 'x' }
+    expect(phucHoiBanNho(hong, NOW)!.thanThu).toEqual({ kieu: 'chua_biet' })
   })
 })

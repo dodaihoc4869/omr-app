@@ -3,7 +3,6 @@ import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
 import { mucMenuPhuHuynh } from '../components/bang-nhiem-vu/muc-menu'
 import { dungBangNhiemVu } from '../lib/nhiem-vu-adapter'
 import { tongHopKeHoachTroLy } from '../lib/tro-ly-ca-nhan'
-import { PETS } from '../game/than-thu-v2/core'
 import { useGioHocTap } from '../hooks/useGioHocTap'
 import { useBanNho, useKeHoachNgay } from '../components/bang-nhiem-vu/may-chu'
 import { momApi, migrateMom, momReviewHtml, chuanHoaBaiMom } from '../lib/mom-api'
@@ -27,7 +26,7 @@ import KhungXemPhieu from '../components/KhungXemPhieu'
 import BaoCaoCaThiPhuHuynhModal from '../components/BaoCaoCaThiPhuHuynhModal'
 import ModalKhacPhucCauSai from '../components/ModalKhacPhucCauSai'
 import { hopLeDeRut } from '../lib/loc-cau-rut'
-import { hsBtvnApi, hsCauSaiApi, hsLichSuCaApi, tenTheoSbd, thanThuDocApi } from '../lib/exam-api'
+import { hsBtvnApi, hsCauSaiApi, hsLichSuCaApi, tenTheoSbd } from '../lib/exam-api'
 import { loadScriptUrl } from '../lib/exam-db'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
@@ -92,7 +91,6 @@ export default function ParentPortalScreen() {
   const [dsMomGiao, setDsMomGiao] = useState<BaiMomGiao[]>([])
   // Bảng nhiệm vụ: skeleton tới khi lượt nạp bài gia đình giao đầu tiên xong (kể cả lỗi).
   const [daNapMomLanDau, setDaNapMomLanDau] = useState(false)
-  const [hoSoThanThuCon, setHoSoThanThuCon] = useState<any>(null)
   // BTVN của con (`/hs/btvn` tra theo SBD, như màn học sinh): lấy TÊN bài cho kế hoạch ngày và nguồn dự phòng.
   const [dsBtvnCon, setDsBtvnCon] = useState<any[]>([])
   const nowHocTap = useGioHocTap()
@@ -118,7 +116,6 @@ export default function ParentPortalScreen() {
           dsMomGiao,
           dsLichSu: dsBaiThi.map((b) => ({ maCa: b.maCa, nopLuc: b.ngayNop, tongCau: b.tongSoCau })),
           tongCauSai: tongSoCauSaiCon > 0 ? tongSoCauSaiCon : dsBaiThi.reduce((acc, b) => acc + (b.soCauSai || 0), 0),
-          hoSoThanThu: hoSoThanThuCon,
         }),
         now: nowHocTap,
         keHoachNgay: keHoachNgay.keHoach,
@@ -126,15 +123,11 @@ export default function ParentPortalScreen() {
         dsBtvn: dsBtvnCon,
         dsMomGiao,
       }),
-    [nowHocTap, sbdHienTai, hoTenCon, dsMomGiao, dsBtvnCon, dsBaiThi, tongSoCauSaiCon, hoSoThanThuCon, keHoachNgay],
+    [nowHocTap, sbdHienTai, hoTenCon, dsMomGiao, dsBtvnCon, dsBaiThi, tongSoCauSaiCon, keHoachNgay],
   )
   const sanSangBang = !dangTai && daNapMomLanDau && keHoachNgay.daXong
   const banNho = useBanNho(sbdHienTai ?? undefined, sanSangBang && !keHoachNgay.cu && duLieuNhiemVu.nguon === 'ke_hoach_ngay' ? duLieuNhiemVu : null)
   const dungBanNho = !!banNho && !sanSangBang
-  const thanThuCon = useMemo(() => {
-    const index = Math.max(0, PETS.findIndex((p) => p.id === (hoSoThanThuCon?.pet || 'hoa_long')))
-    return { index, cap: Number(hoSoThanThuCon?.cap) || 1, ten: hoSoThanThuCon?.nickname || PETS[index]?.name || 'Thần thú' }
-  }, [hoSoThanThuCon])
 
   const [, setDangTaoMom] = useState(false)
   const [thongBaoMom, setThongBaoMom] = useState<{ loai: 'ok' | 'loi'; chu: string } | null>(null)
@@ -191,10 +184,9 @@ export default function ParentPortalScreen() {
     const nap = async () => {
       try {
         const url = await loadScriptUrl().catch(() => '')
-        const [bt, th] = await Promise.all([hsBtvnApi(url, sbdHienTai).catch(() => null), thanThuDocApi(url, sbdHienTai).catch(() => null)])
+        const bt = await hsBtvnApi(url, sbdHienTai).catch(() => null)
         if (huy) return
         if (bt?.ok && Array.isArray(bt.items)) setDsBtvnCon(bt.items)
-        if (th?.ok && th.hoSo) setHoSoThanThuCon(th.hoSo)
       } catch {
         /* Không có số liệu thì không nói số. */
       }
@@ -302,7 +294,6 @@ export default function ParentPortalScreen() {
     setDsMomGiao([])
     setDaNapMomLanDau(false)
     setDsBtvnCon([])
-    setHoSoThanThuCon(null)
     setSbdInput('')
   }
 
@@ -601,7 +592,6 @@ export default function ParentPortalScreen() {
           now={nowHocTap}
           duLieu={dungBanNho ? banNho! : duLieuNhiemVu}
           dangTai={!sanSangBang && !dungBanNho}
-          thanThu={thanThuCon}
           mucMenu={mucMenuPhuHuynh(setTabPh, dangXuat, {
             // Kết quả giao nhanh hiện ở khung thông báo của sheet "khắc phục", nên mở sheet ngay.
             khacPhuc: () => {

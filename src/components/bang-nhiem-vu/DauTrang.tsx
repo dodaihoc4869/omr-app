@@ -4,6 +4,8 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Check, EllipsisVertical, Flame } from 'lucide-react'
 import Spirit2D, { type SpiritMotion } from '../../game/than-thu-v2/Spirit2D'
+import { PETS } from '../../game/than-thu-v2/core'
+import type { TrangThaiThanThu } from '../../lib/nhiem-vu-adapter'
 import { useSauVeDauTien } from './may-chu'
 
 export interface MucMenu {
@@ -15,11 +17,7 @@ export interface MucMenu {
   onChon: () => void
 }
 
-export interface ThanThuGoc {
-  index: number
-  cap: number
-  ten: string
-}
+export type ThanThuGoc = TrangThaiThanThu
 
 function ngayVietNamChu(now: number): string {
   const phan = new Intl.DateTimeFormat('vi-VN', {
@@ -88,12 +86,21 @@ export default function DauTrang({
   // Ảnh sprite thần thú nặng ~3 MB: chỉ gắn Spirit2D sau khi chữ + thẻ đã vẽ; vòng 96 dp giữ chỗ nên không xô bố cục.
   const sauVe = useSauVeDauTien()
   const ten = tenGoi(hoTen, laPh ? 'con' : 'em')
-  const nhanThu = `${thanThu.ten} · Cấp ${thanThu.cap}`
+  // Thần thú CỦA EM do máy chủ báo. Không có con mặc định: thiếu dữ liệu thì để trống, chưa chọn thì nói "chưa chọn".
+  const index = thanThu.kieu === 'co' ? PETS.findIndex((p) => p.id === thanThu.pet) : -1
+  const co = thanThu.kieu === 'co' && index >= 0
+  const chuaChon = thanThu.kieu === 'chua_chon' || (thanThu.kieu === 'co' && index < 0)
+  const nhanThu = co ? `${thanThu.ten || PETS[index].name} · Cấp ${thanThu.cap}` : chuaChon ? 'Chưa chọn thần thú' : ''
   const hinhThu = (
-    <span className="bnv-thu-vong">
-      {sauVe && <Spirit2D index={thanThu.index} level={thanThu.cap} compact motion={dongThu} reducedMotion={tatChuyenDong || nghi} />}
+    <span className="bnv-thu-vong" data-trang-thai={co ? 'co' : chuaChon ? 'chua-chon' : 'cho'} data-nghi={nghi ? 'true' : 'false'}>
+      {co && sauVe && (
+        <span className="bnv-thu-than">
+          <Spirit2D index={index} level={thanThu.cap} compact motion={dongThu} reducedMotion={tatChuyenDong || nghi} />
+        </span>
+      )}
     </span>
   )
+  const nhan = nhanThu ? <span className="bnv-thu-ten">{nhanThu}</span> : null
 
   return (
     <header className="bnv-vung-dau">
@@ -153,15 +160,24 @@ export default function DauTrang({
           )}
         </div>
 
-        {onMoThanThu ? (
-          <button type="button" className="bnv-thu" onClick={onMoThanThu} aria-label={`Mở thần thú ${nhanThu}`}>
+        {onMoThanThu && (co || chuaChon) ? (
+          <button
+            type="button"
+            className="bnv-thu"
+            onClick={onMoThanThu}
+            aria-label={co ? `Mở thần thú ${nhanThu}` : 'Chưa chọn thần thú — chạm để mở game và chọn'}
+          >
             {hinhThu}
-            <span className="bnv-thu-ten">{nhanThu}</span>
+            {nhan}
           </button>
-        ) : (
-          <div className="bnv-thu" aria-label={`Thần thú của con: ${nhanThu}`} role="group">
+        ) : co || chuaChon ? (
+          <div className="bnv-thu" role="group" aria-label={co ? `Thần thú của con: ${nhanThu}` : 'Con chưa chọn thần thú'}>
             {hinhThu}
-            <span className="bnv-thu-ten">{nhanThu}</span>
+            {nhan}
+          </div>
+        ) : (
+          <div className="bnv-thu" aria-hidden="true">
+            {hinhThu}
           </div>
         )}
       </div>

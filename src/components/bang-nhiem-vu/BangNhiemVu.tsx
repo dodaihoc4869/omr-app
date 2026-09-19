@@ -74,7 +74,6 @@ export interface BangNhiemVuProps {
   duLieu: DuLieuBangNhiemVu
   /** Dữ liệu nhiệm vụ chưa về ⇒ vẽ skeleton, không vẽ thẻ trống. */
   dangTai?: boolean
-  thanThu: ThanThuGoc
   mucMenu?: MucMenu[]
   /** Chỗ đặt chuông thông báo… ở thanh trên, bên trái menu ba chấm. */
   khePhai?: ReactNode
@@ -96,7 +95,6 @@ export default function BangNhiemVu({
   now,
   duLieu,
   dangTai = false,
-  thanThu,
   mucMenu = [],
   khePhai,
   caDangMo = false,
@@ -151,7 +149,7 @@ export default function BangNhiemVu({
           hoTen={hoTen}
           now={now}
           chuoiNgay={duLieu.chuoiNgay}
-          thanThu={thanThu}
+          thanThu={duLieu.thanThu}
           dongThu={dongThu}
           tatChuyenDong={!choDong}
           nghi={!dangTai && duLieu.trong}

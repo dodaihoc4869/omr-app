@@ -3,7 +3,6 @@ import { mucMenuHocSinh } from '../components/bang-nhiem-vu/muc-menu'
 import { useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong } from '../components/bang-nhiem-vu/may-chu'
 import { dungBangNhiemVu } from '../lib/nhiem-vu-adapter'
 import { tongHopKeHoachTroLy } from '../lib/tro-ly-ca-nhan'
-import { PETS } from '../game/than-thu-v2/core'
 import NhanHanBaiTap from '../components/NhanHanBaiTap'
 import { mocThoiGian } from '../lib/han-bai-tap'
 import { useGioHocTap } from '../hooks/useGioHocTap'
@@ -640,26 +639,6 @@ export default function StudentPortalScreen() {
     }
   }
 
-  // Hồ sơ Thần thú cho Trợ lý cá nhân
-  const [hoSoThanThu, setHoSoThanThu] = useState<any>(null)
-
-  useEffect(() => {
-    if (!auth?.sbd) return
-    let huy = false
-    void (async () => {
-      try {
-        const url = await loadScriptUrlHoacMacDinh().catch(() => '')
-        const res = await thanThuDocApi(url, auth.sbd)
-        if (!huy && res.ok && res.hoSo) {
-          setHoSoThanThu(res.hoSo)
-        }
-      } catch {}
-    })()
-    return () => {
-      huy = true
-    }
-  }, [auth?.sbd])
-
   // Xử lý hành động 1-Click từ Trợ lý cá nhân (Zero-Friction Direct Test Launch)
   const xuLyHanhDongTroLy = useCallback((hanhDong: any) => {
     if (!hanhDong) return
@@ -976,7 +955,6 @@ export default function StudentPortalScreen() {
           dsMomGiao,
           dsLichSu,
           tongCauSai: tongSoCauSaiDaChon,
-          hoSoThanThu,
         }),
         now: nowHocTap,
         keHoachNgay: keHoachNgay.keHoach,
@@ -984,16 +962,12 @@ export default function StudentPortalScreen() {
         dsBtvn,
         dsMomGiao,
       }),
-    [nowHocTap, auth?.sbd, auth?.hoTen, dsBtvn, dsMomGiao, dsLichSu, tongSoCauSaiDaChon, hoSoThanThu, keHoachNgay],
+    [nowHocTap, auth?.sbd, auth?.hoTen, dsBtvn, dsMomGiao, dsLichSu, tongSoCauSaiDaChon, keHoachNgay],
   )
   // Mọi dữ liệu đã về (thành công hay lỗi) chưa? Trước đó vẽ từ BẢN NHỚ cùng ngày nếu có, không thì skeleton.
   const sanSangBang = daNapLanDau && (daTaiMom || !!loiMom) && keHoachNgay.daXong
   const banNho = useBanNho(auth?.sbd, sanSangBang && !keHoachNgay.cu && duLieuNhiemVu.nguon === 'ke_hoach_ngay' ? duLieuNhiemVu : null)
   const dungBanNho = !!banNho && !sanSangBang
-  const thanThuGoc = useMemo(() => {
-    const index = Math.max(0, PETS.findIndex((p) => p.id === (hoSoThanThu?.pet || 'hoa_long')))
-    return { index, cap: Number(hoSoThanThu?.cap) || 1, ten: hoSoThanThu?.nickname || PETS[index]?.name || 'Thần thú' }
-  }, [hoSoThanThu])
 
   // Rút đề khắc phục câu sai
   /**
@@ -1294,7 +1268,6 @@ export default function StudentPortalScreen() {
           now={nowHocTap}
           duLieu={dungBanNho ? banNho! : duLieuNhiemVu}
           dangTai={!sanSangBang && !dungBanNho}
-          thanThu={thanThuGoc}
           mucMenu={mucMenuHocSinh(moManCu, dangXuat)}
           khePhai={
             <ThongBaoHocSinh

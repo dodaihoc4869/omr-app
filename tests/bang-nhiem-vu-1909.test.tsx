@@ -5,16 +5,21 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import BangNhiemVu, { type BangNhiemVuProps } from '../src/components/bang-nhiem-vu/BangNhiemVu'
-import { dungBangNhiemVu, tuKeHoachNgay, type KeHoachNgayMayChu } from '../src/lib/nhiem-vu-adapter'
+import { dungBangNhiemVu, tuKeHoachNgay, type DuLieuBangNhiemVu, type KeHoachNgayMayChu, type TrangThaiThanThu } from '../src/lib/nhiem-vu-adapter'
+import { PETS } from '../src/game/than-thu-v2/core'
 import { tongHopKeHoachTroLy } from '../src/lib/tro-ly-ca-nhan'
 
 vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({
-  default: ({ motion, reducedMotion }: any) => <div role="img" aria-label="Thần thú" data-motion={motion} data-tinh={reducedMotion ? 'co' : 'khong'} />,
+  default: ({ index, level, motion, reducedMotion }: any) => (
+    <div role="img" aria-label="Thần thú" data-index={index} data-level={level} data-motion={motion} data-tinh={reducedMotion ? 'co' : 'khong'} />
+  ),
 }))
 
 const NOW = Date.parse('2026-09-19T19:00:00+07:00')
 const gio = (h: number) => new Date(NOW + h * 3600_000).toISOString()
-const THU = { index: 0, cap: 12, ten: 'Hoả Long' }
+const THU = { kieu: 'co', pet: 'lua_phuong', cap: 12, ten: 'Hoả Long' } as const
+const INDEX_LUA = PETS.findIndex((p) => p.id === 'lua_phuong')
+const conThu = (d: DuLieuBangNhiemVu, thanThu: TrangThaiThanThu = THU): DuLieuBangNhiemVu => ({ ...d, thanThu })
 const THU_MUC = join(__dirname, '../src/components/bang-nhiem-vu')
 
 const btKhan = { maBtvn: 'B-KHAN', tenBtvn: 'BTVN Ancol', soCau: 12, giaoLuc: gio(-30), hanNop: gio(1.5) }
@@ -23,7 +28,7 @@ const mom = { id: 'M1', tieuDe: 'Bài của Mẹ giao', soCau: 8, trangThai: 'ch
 
 const troLy = (over: object = {}) =>
   tongHopKeHoachTroLy({ sbd: 't', hoTen: 'Minh', dsBtvn: [], dsMomGiao: [], dsLichSu: [], tongCauSai: 0, now: NOW, ...over })
-const duLieu = (over: object = {}) => dungBangNhiemVu({ keHoachTroLy: troLy(over), now: NOW })
+const duLieu = (over: object = {}) => conThu(dungBangNhiemVu({ keHoachTroLy: troLy(over), now: NOW }))
 
 const dsBtvnMay = [
   { maBtvn: 'BT-ANCOL', maCa: 'CA-ANCOL', tenBtvn: 'BTVN Ancol', soCau: 12 },
@@ -50,7 +55,7 @@ const keHoachMayChu: KeHoachNgayMayChu = {
   lanNghi: true,
   capNhatLuc: gio(-0.2),
 }
-const duLieuMay = (cu = false) => tuKeHoachNgay(keHoachMayChu, NOW, phu, cu)
+const duLieuMay = (cu = false) => conThu(tuKeHoachNgay(keHoachMayChu, NOW, phu, cu))
 
 const vinhDanh3 = async () => ({
   day: '2026-09-19',
@@ -70,7 +75,6 @@ function ve(props: Partial<BangNhiemVuProps> = {}) {
       hoTen="Đỗ Minh"
       now={NOW}
       duLieu={duLieu({ dsBtvn: [btKhan, btHomNay], dsMomGiao: [mom] })}
-      thanThu={THU}
       taiVinhDanh={vinhDanh3}
       onHanhDong={() => {}}
       onVaoThi={() => {}}
@@ -277,7 +281,7 @@ describe('giảm chuyển động', () => {
     await act(async () => { vi.advanceTimersByTime(300) })
     const motion = () => container.querySelector('.bnv-thu-vong [data-motion]')!.getAttribute('data-motion')
     expect(motion()).toBe('idle')
-    rerender(<BangNhiemVu vaiTro="hocsinh" hoTen="Đỗ Minh" now={NOW} duLieu={sau} thanThu={THU} taiVinhDanh={vinhDanh3} />)
+    rerender(<BangNhiemVu vaiTro="hocsinh" hoTen="Đỗ Minh" now={NOW} duLieu={sau} taiVinhDanh={vinhDanh3} />)
     expect(motion()).toBe('victory')
     await act(async () => { vi.advanceTimersByTime(1250) })
     expect(motion()).toBe('idle')
@@ -298,6 +302,93 @@ describe('thần thú nạp SAU khung hình đầu (ảnh sprite ~3 MB không đ
   it('vòng giữ chỗ có kích thước cố định trong CSS (không xô bố cục khi ảnh về)', () => {
     const css = readFileSync(join(THU_MUC, 'bang-nhiem-vu.css'), 'utf8')
     expect(css).toMatch(/\.bnv-thu-vong\s*\{[^}]*width:\s*96px[^}]*height:\s*96px/s)
+  })
+})
+
+describe('thần thú CỦA EM (lỗi thầy báo: mọi em đều ra Hoả Long cấp 1)', () => {
+  const cho = () => waitFor(() => expect(document.querySelector('.bnv-thu-vong [data-index]')).not.toBeNull())
+  const dl = (t: TrangThaiThanThu) => conThu(duLieu(), t)
+
+  it('đúng con, đúng cấp, đúng biệt danh do máy chủ báo (không rơi về hoa_long)', async () => {
+    const idx = PETS.findIndex((p) => p.id === 'nuoc_long')
+    const { container } = ve({ duLieu: dl({ kieu: 'co', pet: 'nuoc_long', cap: 37, ten: 'Bông' }) })
+    await cho()
+    const thu = container.querySelector('.bnv-thu-vong [data-index]')!
+    expect(Number(thu.getAttribute('data-index'))).toBe(idx)
+    expect(idx).not.toBe(INDEX_LUA)
+    expect(thu.getAttribute('data-level')).toBe('37')
+    expect(screen.getByRole('button', { name: 'Mở thần thú Bông · Cấp 37' })).toBeTruthy()
+  })
+
+  it('không có biệt danh thì dùng tên thần thú trong game', async () => {
+    ve({ duLieu: dl({ kieu: 'co', pet: 'dat_quy', cap: 5 }) })
+    await cho()
+    expect(screen.getByRole('button', { name: `Mở thần thú ${PETS.find((p) => p.id === 'dat_quy')!.name} · Cấp 5` })).toBeTruthy()
+  })
+
+  it('em CHƯA chọn thần thú: nói "Chưa chọn thần thú", không vẽ con nào, chạm mở game để chọn', async () => {
+    const onMoThanThu = vi.fn()
+    const { container } = ve({ duLieu: dl({ kieu: 'chua_chon' }), onMoThanThu })
+    await new Promise((r) => setTimeout(r, 250))
+    expect(container.querySelector('.bnv-thu-vong [data-index]')).toBeNull()
+    expect(container.textContent).toContain('Chưa chọn thần thú')
+    fireEvent.click(screen.getByRole('button', { name: /Chưa chọn thần thú/ }))
+    expect(onMoThanThu).toHaveBeenCalledTimes(1)
+  })
+
+  it('mã thần thú lạ (không có trong game) cũng là "chưa chọn", không đoán', async () => {
+    const { container } = ve({ duLieu: dl({ kieu: 'co', pet: 'thuy_lan', cap: 37 }) })
+    await new Promise((r) => setTimeout(r, 250))
+    expect(container.querySelector('.bnv-thu-vong [data-index]')).toBeNull()
+    expect(container.textContent).toContain('Chưa chọn thần thú')
+  })
+
+  it('chưa có dữ liệu (máy chủ cũ/lỗi/nguồn trợ lý): chỉ giữ chỗ, KHÔNG hiện con mặc định, không nút, không chữ', async () => {
+    const { container } = ve({ duLieu: dl({ kieu: 'chua_biet' }) })
+    await new Promise((r) => setTimeout(r, 250))
+    expect(container.querySelector('.bnv-thu-vong [data-index]')).toBeNull()
+    expect(container.querySelector('.bnv-thu-vong')).not.toBeNull() // giữ chỗ 96 dp
+    expect(container.querySelector('.bnv-thu-ten')).toBeNull()
+    expect(container.querySelector('button.bnv-thu')).toBeNull() // (nút "Luyện với thần thú" của thẻ trống là chuyện khác)
+    expect(container.textContent).not.toContain('Hoả Long · Cấp')
+  })
+
+  it('phụ huynh: thấy thần thú của con (chỉ đọc); chưa chọn thì nói "Con chưa chọn thần thú"', async () => {
+    const { container, unmount } = ve({ vaiTro: 'phuhuynh', duLieu: dl({ kieu: 'co', pet: 'nuoc_long', cap: 37, ten: 'Bông' }), onGiaoBai: () => {} })
+    await cho()
+    expect(screen.getByRole('group', { name: 'Thần thú của con: Bông · Cấp 37' })).toBeTruthy()
+    expect(container.querySelector('button.bnv-thu')).toBeNull()
+    unmount()
+    ve({ vaiTro: 'phuhuynh', duLieu: dl({ kieu: 'chua_chon' }), onGiaoBai: () => {} })
+    expect(screen.getByRole('group', { name: 'Con chưa chọn thần thú' })).toBeTruthy()
+  })
+
+  it('bỏ nền: khung thần thú KHÔNG còn vòng tròn/bóng khối; lơ lửng ±4px ~3,2 s chỉ bằng transform; chỉ chạy khi cho phép chuyển động', () => {
+    const css = readFileSync(join(THU_MUC, 'bang-nhiem-vu.css'), 'utf8')
+    const khung = /\.bnv-thu-vong \{([^}]*)\}/.exec(css)![1]
+    expect(khung).not.toMatch(/border-radius:\s*50%|background:\s*var|box-shadow:\s*var|overflow:\s*hidden/)
+    expect(khung).toMatch(/width:\s*96px[\s\S]*height:\s*96px/)
+    expect(css).toMatch(/@keyframes bnv-lo-lung\s*\{[^}]*translate3d\(0, 4px, 0\)[\s\S]*translate3d\(0, -4px, 0\)/)
+    expect(css).toMatch(/animation:\s*bnv-lo-lung 3\.2s ease-in-out infinite/)
+    expect(css).toMatch(/\.bnv--dong \.bnv-thu-vong\[data-trang-thai='co'\]\[data-nghi='false'\] \.bnv-thu-than/)
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*\.bnv-thu-than/)
+    // chỉ transform/opacity (GPU) trong hai khung hình
+    const kf = /@keyframes bnv-lo-lung[\s\S]*?\n\}/.exec(css)![0] + /@keyframes bnv-bong-lo-lung[\s\S]*?\n\}/.exec(css)![0]
+    expect(kf.match(/[a-z-]+(?=:)/g)!.filter((k) => !['transform', 'opacity'].includes(k))).toEqual([])
+  })
+
+  it('giảm chuyển động / thần thú đang nghỉ: khung KHÔNG được bật lơ lửng (lớp .bnv--dong tắt)', async () => {
+    giaLapMedia(true)
+    const { container } = ve()
+    await cho()
+    expect(container.querySelector('.bnv')!.classList.contains('bnv--dong')).toBe(false)
+    expect(container.querySelector('.bnv-thu-vong')!.getAttribute('data-nghi')).toBe('false')
+  })
+
+  it('trống ("thần thú đang nghỉ"): data-nghi = true nên không lơ lửng', async () => {
+    const { container } = ve({ duLieu: conThu(duLieu()), taiVinhDanh: vinhDanhRong })
+    await cho()
+    expect(container.querySelector('.bnv-thu-vong')!.getAttribute('data-nghi')).toBe('true')
   })
 })
 
@@ -333,7 +424,7 @@ describe('dòng nói thật từ kế hoạch máy chủ', () => {
 
   it('bài Mẹ hết giờ bấm được để nộp phần đã lưu', async () => {
     const onHanhDong = vi.fn()
-    const kh = tuKeHoachNgay({ ...keHoachMayChu, quaHan: [{ loai: 'mom', ma: 'M9', hanNop: gio(-1), conLai: 8 }] }, NOW, phu)
+    const kh = conThu(tuKeHoachNgay({ ...keHoachMayChu, quaHan: [{ loai: 'mom', ma: 'M9', hanNop: gio(-1), conLai: 8 }] }, NOW, phu))
     ve({ duLieu: kh, onHanhDong })
     await screen.findByText('Hoả Long')
     fireEvent.click(screen.getByRole('button', { name: /QUÁ HẠN/ }))
@@ -341,7 +432,7 @@ describe('dòng nói thật từ kế hoạch máy chủ', () => {
   })
 
   it('phụ huynh: quá hạn không có nút bấm', async () => {
-    const kh = tuKeHoachNgay({ ...keHoachMayChu, quaHan: [{ loai: 'mom', ma: 'M9', hanNop: gio(-1), conLai: 8 }] }, NOW, phu)
+    const kh = conThu(tuKeHoachNgay({ ...keHoachMayChu, quaHan: [{ loai: 'mom', ma: 'M9', hanNop: gio(-1), conLai: 8 }] }, NOW, phu))
     const { container } = ve({ vaiTro: 'phuhuynh', duLieu: kh, onGiaoBai: () => {} })
     await screen.findByText('Hoả Long')
     expect(container.querySelectorAll('[data-bac="qua_han"] button').length).toBe(0)

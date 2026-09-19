@@ -19,6 +19,11 @@ Lập 19/09/2026 12:25. Theo `DIEU-PHOI.md` luật 4: phần giao diện ghi s�
 - **Phiếu HTML** (chuỗi, không phải React) do em làm ở `src/lib/html-phieu.ts` dưới lớp `body.gd-m3` — đừng đụng.
 - **Ảnh chụp/đo**: bộ chụp Chromium + Lighthouse của em ở thư mục tạm phiên (chup.mjs, medir.sh); nếu cần, hỏi em. Nền vitest 98 đỏ / 43 tệp; `escort-context-menu` chập chờn theo tải.
 
+## SỬA LỖI THẦY BÁO 19/09 (0.Planer chuyển) — thần thú sai + bỏ nền tròn
+
+- [x] Trang chủ HS/PH hiện SAI thần thú (mọi em đều Hoả Long cấp 1). NGUYÊN NHÂN GỐC: màn cổng lấy hồ sơ từ `/hs/than-thu` (bảng V1) nhưng đọc trường V2 `pet/cap/nickname` ⇒ luôn `undefined` ⇒ rơi về `'hoa_long'`, cấp 1 (`tro-ly-ca-nhan.ts:564-567` cũng dính, KHÔNG sửa vì ngoài vùng). SỬA: adapter đọc `keHoach.thanThu` (máy chủ, game V2) làm nguồn DUY NHẤT; `docThanThu` → co / chua_chon (null hoặc không có id, hoặc id lạ) / chua_biet (máy chủ cũ, lỗi, nguồn trợ lý). KHÔNG BAO GIỜ bịa Hoả Long: chưa chọn → khung trống + "Chưa chọn thần thú" (chạm mở game); chưa biết → chỉ giữ chỗ 96 dp. Gỡ hẳn state/effect V1 khỏi hai màn cổng; bản nhớ (A.1) giữ thần thú; PH dùng cùng nguồn (không cần token game). | bằng chứng: 12 test adapter/thành phần/tích hợp (đúng con-cấp-tên; null; id lạ; vắng; PH; bản nhớ); E2E Chromium: mock V1 vẫn trả Hoả Long nhưng màn hiện Thuỷ Long cấp 37 "Bông". PHỤ THUỘC Code 3: máy chủ phải trả `thanThu` trong /hs/ke-hoach-ngay — TRƯỚC KHI có thì mọi em thấy khung thần thú TRỐNG (đúng yêu cầu "tạm ẩn, không hiện con mặc định").
+- [x] Bỏ vòng tròn nền + bóng khối; thần thú LƠ LỬNG (translateY ±4 px, 3,2 s, ease-in-out, chỉ transform) + bóng elip mờ co giãn theo nhịp (chỉ transform/opacity); tắt khi giảm chuyển động và khi "nghỉ"; nhịp thở riêng của Spirit2D nhường (một chuyển động duy nhất); hộp 96 dp trong suốt giữ chỗ; avatar 40 dp ở Vinh danh giữ nền tròn | bằng chứng: test CSS + Chromium `background: transparent | box-shadow: none | border-radius: 0 | overflow: visible`; ảnh docs/anh-bang-nhiem-vu-1909/hs-khan-390x844-*.png
+
 ## Việc — MỐC A
 
 - [x] Adapter `src/lib/nhiem-vu-adapter.ts`: nhánh 1 (tongHopKeHoachTroLy) + nhánh 2 (/hs/ke-hoach-ngay THẬT) | bằng chứng: tests/nhiem-vu-adapter-1909.test.ts 38/38
