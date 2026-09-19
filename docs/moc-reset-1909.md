@@ -8,7 +8,8 @@ Người viết: Code 3 (máy chủ). Mã: `server/src/reset-toan-app.ts`, nối
 - Ở GỐC JSON của ba phản hồi (không lồng trong `exp`/`thanThu`…):
   - `POST /hs/ke-hoach-ngay` (HS và PH gọi),
   - `POST /hs/ca-dang-mo` (HS và PH gọi),
-  - `POST /goi {action:"danhSachCa"}` (app giáo viên, đường gọi sớm nhất).
+  - `POST /ca/danh-sach` (đường CHÍNH của app giáo viên; lệnh của thầy, kèm mã bí mật),
+  - `POST /goi {action:"danhSachCa"}` (đường dự phòng của app giáo viên khi `/ca/danh-sach` trả null).
 - **VẮNG hoàn toàn cho tới khi job reset chạy XONG** (không gửi `null`, không gửi chuỗi rỗng). Lý do: máy khách coi "máy chưa từng thấy mốc + máy chủ có mốc" là tín hiệu dọn nháp; gửi sớm = xoá nháp bài của học sinh ngay tối Chủ nhật. Nguồn giá trị: `cau_hinh.reset_20260921.xongLuc` đã có. Job xong thì trường xuất hiện trong vài giây (bộ nhớ đệm máy chủ tối đa 5 giây).
 - Máy khách gợi ý: giữ `omr_moc_reset` trong localStorage. Khi phản hồi có `mocReset` mà giá trị đã lưu KHÁC (kể cả chưa từng lưu) → dọn bộ nhớ theo danh sách dưới rồi mới lưu mốc mới. Phản hồi không có `mocReset` → không làm gì.
 - Nên dọn (HS/PH): bản nhớ kế hoạch ngày, nháp/khôi phục bài làm theo MÃ CA trong IndexedDB, danh sách ca, bài Mẹ giao/BTVN nhớ trong máy (`omr_mom_btvn_<sbd>`…), bản nhớ thần thú/EXP (máy chủ đã về vạch xuất phát, em chọn thú lại). GIỮ: đăng nhập/token (mật khẩu không đổi), cài đặt giao diện.
@@ -30,7 +31,7 @@ Job nạp mọi mã ca (từ `ca`, `luot`, `phieu`…), mã BTVN và mã bài M�
 | Lệnh | Khi mã cũ | Phản hồi |
 |---|---|---|
 | `publish` (đẩy ca) | mã ca nằm trong tập và không còn trong `ca` | `{ ok:false, error:"Mã ca đã từng dùng, tạo lại với mã khác", maCaDaDung:true }` — app giáo viên tự sinh mã khác rồi đẩy lại |
-| `capNhatKeyBank` | mã ca cũ, không còn trong `ca` | `{ ok:false, error:"Ca này đã bị xoá khi làm mới hệ thống…", maCaDaDung:true }` — KHÔNG ghi R2; app thầy bỏ ca ấy khỏi hàng đợi đẩy |
+| `capNhatKeyBank` | mã ca cũ, không còn trong `ca` | `{ ok:false, error:"Ca này đã bị xoá khi làm mới hệ thống…", maCaDaDung:true }` — KHÔNG ghi R2 (lớp bảo hiểm thứ hai; app thầy đã tự chặn không đẩy ca ngoài danh sách máy chủ) |
 | `noiKhoCa` | như trên | như trên |
 | Mẹ giao `create` | id nằm trong tập | lỗi `"Mã bài đã từng dùng. Tạo lại bài với mã khác."` |
 

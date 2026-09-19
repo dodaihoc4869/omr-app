@@ -2951,7 +2951,7 @@ export default {
       if (p === '/theo-doi') return xemTheoDoi(env, String(b.maCa ?? ''))
       if (p === '/ca/luot') return luotCuaCa(env, String(b.maCa ?? ''))
       if (p === '/ca/nhieu') return dayNhieuCa(env, b)
-      if (p === '/ca/danh-sach') return danhSachCaMoi(env, b.daXoa === true)
+      if (p === '/ca/danh-sach') return themMocReset(env, await danhSachCaMoi(env, b.daXoa === true)) // đường CHÍNH app thầy (Code 1): phải mang `mocReset` như /goi danhSachCa
       if (p === '/ca/sua') return suaCa(env, b)
       if (p === '/ca/xoa-vinh-vien') return ra(await G.xoaVinhVienCa(env, b))
       if (p === '/ca/chi-tiet') return chiTietCaMoi(env, String(b.maCa ?? ''))

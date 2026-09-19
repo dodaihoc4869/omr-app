@@ -308,6 +308,7 @@ describe('mocReset cho máy khách: CHỈ sau khi job xong', () => {
       kh: await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd: '12121212' }),
       ca: await goiWorker(worker, d.env, '/hs/ca-dang-mo', { sbd: '12121212' }),
       gv: await goiWorker(worker, d.env, '/goi', { action: 'danhSachCa' }, true),
+      gv2: await goiWorker(worker, d.env, '/ca/danh-sach', {}, true), // đường CHÍNH của app thầy
     }
     for (const r of Object.values(truoc)) {
       expect(r.ok).toBe(true)
@@ -319,6 +320,7 @@ describe('mocReset cho máy khách: CHỈ sau khi job xong', () => {
       kh: await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd: '12121212' }),
       ca: await goiWorker(worker, d.env, '/hs/ca-dang-mo', { sbd: '12121212' }),
       gv: await goiWorker(worker, d.env, '/goi', { action: 'danhSachCa' }, true),
+      gv2: await goiWorker(worker, d.env, '/ca/danh-sach', {}, true),
     }
     for (const r of Object.values(sau)) {
       expect(r.ok).toBe(true)
