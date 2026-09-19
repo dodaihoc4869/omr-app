@@ -20,6 +20,8 @@ import NutQuayLai from '../components/NutQuayLai'
 import { dungM3, ThanhTren } from '../components/m3'
 import LichSuCaM3 from '../components/bang-nhiem-vu/LichSuCaM3'
 import BtvnM3 from '../components/bang-nhiem-vu/BtvnM3'
+import VaoThiForm from '../components/bang-nhiem-vu/VaoThiForm'
+import { MomDanhSachM3, MomLamBaiM3, type BaiMomM3 } from '../components/bang-nhiem-vu/MomM3'
 import '../components/bang-nhiem-vu/sheet-m3.css'
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import {
@@ -59,7 +61,7 @@ import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
-import LogoHocSinh from '../components/LogoHocSinh'
+import { LogoDoc } from '../components/LogoVai'
 // HAI GAME NẠP MUỘN — đo 14/09: mã game nặng ~234 KB nguồn, mà nhập thẳng
 // vào đây là nó rơi vào MẢNH MÃ CHÍNH (755 KB), thứ MỌI người tải, kể cả phụ
 // huynh chỉ mở một trang báo cáo trên điện thoại. Em nào mở tab game mới tải,
@@ -1118,19 +1120,8 @@ export default function StudentPortalScreen() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-50 to-blue-50/20 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 flex flex-col justify-center items-center p-4">
         <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200/80 dark:border-slate-800 p-8 transition-all">
-          <div className="text-center mb-6">
-            <div className="flex justify-center mb-3">
-              <LogoHocSinh size={54} hienChu={false} />
-            </div>
-            <div
-              className="text-2xl font-black tracking-tight text-slate-900 dark:text-white"
-              style={{ fontFamily: 'var(--sans)' }}
-            >
-              ĐỖ ĐẠI HỌC
-            </div>
-            <div className="text-xs font-bold tracking-wider uppercase text-emerald-600 dark:text-emerald-400 mt-1" style={{ fontFamily: 'var(--sans)' }}>
-              Kiên Trì
-            </div>
+          <div className="mb-6">
+            <LogoDoc vai="hs" size={64} />
           </div>
 
           {chuaCoMatKhau ? (
@@ -1294,6 +1285,7 @@ export default function StudentPortalScreen() {
           now={nowHocTap}
           duLieu={dungBanNho ? banNho! : duLieuNhiemVu}
           dangTai={!sanSangBang && !dungBanNho}
+          dangLamMoi={keHoachNgay.dangLamMoi}
           mucMenu={mucMenuHocSinh(moManCu, dangXuat)}
           khePhai={
             <ThongBaoHocSinh
@@ -1739,7 +1731,56 @@ export default function StudentPortalScreen() {
         )}
 
         {/* TAB 2.5: BÀI CỦA MOM GIAO (HẠN 2 TIẾNG) */}
-        {tab === 'mom' && (
+        {tab === 'mom' && vaoM3 && auth && (
+          <>
+            {dangLamMom ? (
+              <MomLamBaiM3
+                tieuDe={dangLamMom.tieuDe}
+                giayConLai={giayConLaiMom}
+                dinhDangThoiGian={dinhDangThoiGianMom}
+                soDaLam={Object.keys(cauTraLoiMom).length}
+                dsCau={dangLamMom.dsCau || dangLamMom.cau || []}
+                traLoi={cauTraLoiMom}
+                datTraLoi={(idCau, giaTri) => setCauTraLoiMom((prev) => ({ ...prev, [idCau]: giaTri }))}
+                loi={loiMom}
+                onQuayLai={() => {
+                  if (confirm('Em có chắc muốn tạm dừng bài làm không? Đồng hồ 2 tiếng vẫn tiếp tục đếm ngược.')) {
+                    setDangLamMom(null)
+                  }
+                }}
+                onTamDung={() => {
+                  try {
+                    localStorage.setItem(`omr_mom_draft_${dangLamMom.id}_${auth.sbd}`, JSON.stringify({
+                      cauTraLoi: cauTraLoiMom,
+                      luuLuc: new Date().toISOString(),
+                      giayConLai: giayConLaiMom,
+                    }))
+                  } catch {}
+                  alert('Đã lưu nháp an toàn! Em có thể vào làm tiếp bất cứ lúc nào trước khi hết hạn (deadline).')
+                  setDangLamMom(null)
+                }}
+                onNop={nopBaiCuaMom}
+              />
+            ) : (
+              <MomDanhSachM3
+                ds={dsMomGiao as unknown as BaiMomM3[]}
+                daTai={daTaiMom}
+                loi={loiMom}
+                thongBaoNop={thongBaoNopMom}
+                onDongThongBao={() => setThongBaoNopMom(null)}
+                onLamMoi={() => void napDsMom()}
+                ngayGio={dinhDangNgayGio}
+                onBatDau={(bai) => void batDauLamBaiMom(bai as unknown as BaiMomGiao)}
+                onXemKetQua={async (bai: any) => {
+                  if (bai.htmlKetQua) { setPhieuHtml(bai.htmlKetQua); return }
+                  try { const data = await momApi('review', { token: auth?.token, id: bai.id }); setPhieuHtml(momReviewHtml(chuanHoaBaiMom(data.item))) }
+                  catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được kết quả.') }
+                }}
+              />
+            )}
+          </>
+        )}
+        {tab === 'mom' && !vaoM3 && (
           <div className="space-y-4 animate-google-fade">
             {dangLamMom ? (
               /* MÀN HÌNH ĐANG LÀM BÀI CỦA MOM GIAO */
@@ -2053,7 +2094,10 @@ export default function StudentPortalScreen() {
         {/* TAB 4: VÀO PHÒNG THI */}
         {tab === 'vaothi' && !manThi && (
           <PhongVaoThi onClose={() => setTab('diem')}>
-          <div className="max-w-xl mx-auto py-4 animate-google-fade">
+          {vaoM3 && (
+            <VaoThiForm maCa={maCaVaoThi} onMaCa={setMaCaVaoThi} matKhau={matKhauCaVaoThi} onMatKhau={setMatKhauCaVaoThi} loi={loiVaoThi} onSubmit={vaoThi} sbd={auth.sbd} hoTen={auth.hoTen} />
+          )}
+          {!vaoM3 && <div className="max-w-xl mx-auto py-4 animate-google-fade">
             <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm">
               <div className="text-center mb-6">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-purple-600/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400 mb-3 shadow-inner">
@@ -2117,7 +2161,7 @@ export default function StudentPortalScreen() {
                 </button>
               </form>
             </div>
-          </div>
+          </div>}
           </PhongVaoThi>
         )}
 

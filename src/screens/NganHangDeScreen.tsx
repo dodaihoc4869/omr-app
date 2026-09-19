@@ -16,8 +16,8 @@ import KhoiMatKhauApp from '../components/KhoiMatKhauApp'
 import KhoiMayChuMoi from '../components/KhoiMayChuMoi'
 import KhoiMaDang from '../components/KhoiMaDang'
 import { ChemText } from '../lib/chem-format'
-import { deleteExamSource, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, saveExamSource, saveScriptUrl, saveSessionTeacherBank, saveTeacherSecret, loadSoSuaDang, saveSoSuaDang} from '../lib/exam-db'
-import { caDungDe, capNhatCaDaMo, dongBoNganHang, type KetQuaDongBo } from '../lib/exam-sync'
+import { deleteExamSource, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, saveExamSource, saveScriptUrl, saveSessionTeacherBank, saveTeacherSecret, loadSoSuaDang, saveSoSuaDang, xoaSessionTeacherBank } from '../lib/exam-db'
+import { caDungDe, capNhatCaDaMo, chiaBankTheoCaMayChu, dongBoNganHang, maCaConTrenMayChu, type KetQuaDongBo } from '../lib/exam-sync'
 import { capNhatKeyBank, dungChiMuc, luuDe, xoaDe as xoaDeTrenKho } from '../lib/exam-api'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJsonText } from '../lib/exam-kho-de-import'
 import { mergeKeepAnswers, validateTeacherSource } from '../data/examContent'
@@ -304,21 +304,37 @@ export default function NganHangDeScreen() {
       maDe: s.maDe,
       soCa: caLienQuan.length,
       capNhat: async () => {
+        // ĐAI + DÂY (19/09, cùng đợt reset dữ liệu): CHỈ đẩy lên máy chủ bank của ca máy chủ còn giữ. Bank ca đã bị xoá khỏi máy
+        // chủ (ca ma) bị bỏ qua — đẩy là tái tạo khoá của ca đã xoá — và (qua hai chốt an toàn) được dọn khỏi máy.
+        const coTaiKhoan = scriptUrl.trim() !== '' && secret.trim() !== ''
+        const chia = chiaBankTheoCaMayChu(banks, coTaiKhoan ? await maCaConTrenMayChu(scriptUrl.trim(), secret.trim()) : null)
+        const duocDay = new Set(chia.duocDay.map((x) => x.maCa))
+        const daBo = new Set(chia.canXoaKhoiMay.map((x) => x.maCa))
+        for (const x of chia.canXoaKhoiMay) await xoaSessionTeacherBank(x.maCa).catch(() => {})
+        let soCaCapNhat = 0
+        let soCaKhongDay = 0
         for (const b of caLienQuan) {
+          if (daBo.has(b.maCa)) continue
           const capNhat = b.sources.map((src) => {
             const cp: TeacherExamSource = JSON.parse(JSON.stringify(src))
             for (const q of [...cp.phanI, ...cp.phanII, ...cp.phanIII]) if (q.id === qid) apDung(q)
             return cp
           })
           await saveSessionTeacherBank(b.maCa, capNhat)
+          soCaCapNhat++
           // Đẩy bản CÓ đáp án mới lên máy chủ để học sinh xem lại đúng đáp án thầy chốt.
-          if (scriptUrl.trim() && secret.trim()) {
+          if (coTaiKhoan) {
+            if (!duocDay.has(b.maCa)) {
+              soCaKhongDay++
+              continue
+            }
             await capNhatKeyBank(scriptUrl.trim(), secret.trim(), b.maCa, mergeKeepAnswers(capNhat)).catch(() => {
               showToast(`Ca ${b.maCa}: chưa đẩy được đáp án mới lên máy chủ (mất mạng?)`, 'error')
             })
           }
         }
-        showToast(`Đã cập nhật đáp án cho ${caLienQuan.length} ca — mở "Theo dõi & chấm bài" từng ca để xem điểm mới`, 'success')
+        if (soCaKhongDay > 0) showToast(`${soCaKhongDay} ca không còn trên máy chủ (hoặc chưa hỏi được máy chủ) — chỉ cập nhật trong máy, không đẩy lên`, 'warn')
+        showToast(`Đã cập nhật đáp án cho ${soCaCapNhat} ca — mở "Theo dõi & chấm bài" từng ca để xem điểm mới`, 'success')
       },
     })
   }

@@ -34,14 +34,15 @@ const dung = (o: { hs?: boolean; onSelectTab?: (t: string) => void } = {}) =>
   render(<BangTinPhuHuynh sbd="12001" studentToken={o.hs === false ? undefined : 't'} hoTen="Minh" lop="12A1" onSent={() => {}} onSelectTab={o.onSelectTab} tabStats={{ diemCount: 5 }} caGanNhat={{ maCa: 'CA-ANCOL', tenCa: 'Ca Ancol', diem: 9.5 }} />)
 
 describe('BangTinPhuHuynh dưới M3', () => {
-  it('khối bảng tin nằm trong gốc `m3`; bảng vinh danh (thành phần khác) KHÔNG bị bọc; nút chính là nút M3', async () => {
+  it('khối bảng tin VÀ bảng vinh danh nằm trong CÙNG một gốc `m3` (từ 19/09 — vinh danh cần vai trò màu M3, xem bang-tin-trong-sau-reset-1909); nút chính là nút M3', async () => {
     datDuong('/?vai=hocsinh')
     giaLap()
     const { container } = dung()
     await screen.findByText('Bảng tin học tập của em')
     const the = container.querySelector('.parent-news') as HTMLElement
     expect(the.parentElement!.classList.contains('m3')).toBe(true)
-    expect(container.querySelector('.honors')!.closest('.m3')).toBeNull()
+    expect(container.querySelector('.honors')!.closest('.m3')).toBe(the.parentElement)
+    expect(container.querySelectorAll('.m3')).toHaveLength(1)
     const cta = await screen.findByRole('button', { name: 'Bắt đầu bài luyện hôm nay' })
     expect(cta.className).toContain('m3-nut-chinh')
     expect(cta.getAttribute('data-vai-tro')).toBeNull()

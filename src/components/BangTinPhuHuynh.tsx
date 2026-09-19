@@ -75,8 +75,11 @@ export default function BangTinPhuHuynh({
  const [daily,setDaily]=useState<{id:string;submitted_at:string|null}|null>(null)
  const api=useCallback((action:'list'|'assign')=>studentToken?studentNewsApi(action,studentToken):parentNewsApi(action,sbd),[sbd,studentToken])
  const [report,setReport]=useState<Report|null>(null),[error,setError]=useState(''),[sending,setSending]=useState(false),[sent,setSent]=useState('')
- const refresh=useCallback(async()=>{try{const r=await api('list');setReport(r.report);setDaily(r.daily||null);setError('');if(typeof navigator!=='undefined'&&'serviceWorker' in navigator){navigator.serviceWorker.ready.then(reg=>reg.update().catch(()=>{})).catch(()=>{})}}catch(e){setError(e instanceof Error?e.message:'Chưa cập nhật được dữ liệu.')}},[api])
- useEffect(()=>{setReport(null);setSent('');void refresh();const poll=()=>{if(!document.hidden)void refresh()};const t=setInterval(poll,15000);window.addEventListener('focus',poll);window.addEventListener('online',poll);return()=>{clearInterval(t);window.removeEventListener('focus',poll);window.removeEventListener('online',poll)}},[refresh])
+ // ĐÃ TẢI XONG LẦN ĐẦU (thành công hay lỗi). Máy chủ trả ok mà KHÔNG có `report` (vừa reset dữ liệu, chưa dựng bản tin) thì trước
+ // đây `report` mãi là null → vòng quay "Đang tổng hợp…" quay vô hạn. Phân biệt "đang tải lần đầu" với "đã tải mà chưa có bản tin".
+ const [daTai,setDaTai]=useState(false)
+ const refresh=useCallback(async()=>{try{const r=await api('list');setReport(r.report);setDaily(r.daily||null);setError('');if(typeof navigator!=='undefined'&&'serviceWorker' in navigator){navigator.serviceWorker.ready.then(reg=>reg.update().catch(()=>{})).catch(()=>{})}}catch(e){setError(e instanceof Error?e.message:'Chưa cập nhật được dữ liệu.')}finally{setDaTai(true)}},[api])
+ useEffect(()=>{setReport(null);setDaTai(false);setSent('');void refresh();const poll=()=>{if(!document.hidden)void refresh()};const t=setInterval(poll,15000);window.addEventListener('focus',poll);window.addEventListener('online',poll);return()=>{clearInterval(t);window.removeEventListener('focus',poll);window.removeEventListener('online',poll)}},[refresh])
  async function assign(){setSending(true);setError('');try{const r=await api('assign');setSent(r.alreadySent?'Bài theo đề xuất hôm nay đã được gửi. Không tạo thêm bài trùng.':`Đã gửi 1 bài gồm ${r.questionCount} câu sang app của con.`);onSent(r.id);await refresh()}catch(e){setError(e instanceof Error?e.message:'Chưa gửi được bài.')}finally{setSending(false)}}
 
  const btvnChuaNop = report?.pendingDetails?.btvn ?? 0
@@ -93,7 +96,7 @@ export default function BangTinPhuHuynh({
    ngayNop: report.today[0].nopLuc,
  } : null)
 
- return <>
+ return <div className="m3">
   <BangVinhDanh
     vaiTro={studentToken ? 'hocsinh' : 'phuhuynh'}
     hoTen={hoTen}
@@ -101,16 +104,23 @@ export default function BangTinPhuHuynh({
     lop={lop}
     tongSoCa={tabStats?.diemCount ?? 0}
   />
-  <div className="m3"><section className="parent-news space-y-5">
+  <section className="parent-news space-y-5">
   <div className="flex items-start justify-between gap-3"><div><h2 className="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white"><Calendar className="news-accent" size={22}/>{studentToken?'Bảng tin học tập của em':'Bảng tin học tập của con'}</h2><p className="mt-1 text-xs news-muted">Bản tin mới lúc 00:01 mỗi ngày · Giờ Việt Nam</p></div><button type="button" aria-label="Cập nhật bảng tin" onClick={()=>void refresh()} className="news-refresh"><RefreshCw size={18}/></button></div>
   {error&&<p role="alert" className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{error}</p>}
   {!report?(
+    // đã tải xong mà lỗi mạng: dải cảnh báo ở trên đã nói, không dựng thêm thẻ; tải xong mà chưa có bản tin: nói thật, không quay
+    daTai?(error?null:(
+      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 p-5 text-center shadow-xs">
+        <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">Chưa có bản tin hôm nay. Bản tin mới lúc 00:01 mỗi ngày.</p>
+      </div>
+    )):(
     <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 p-5 text-center shadow-xs">
       <div className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400">
         <RefreshCw size={16} className="animate-spin text-blue-600 dark:text-blue-400" />
-        <span>Đang tổng hợp dữ liệu học tập của con…</span>
+        <span>{studentToken?'Đang tổng hợp dữ liệu học tập của em…':'Đang tổng hợp dữ liệu học tập của con…'}</span>
       </div>
     </div>
+    )
   ) : (
     <>
       <div className="flex flex-wrap justify-between gap-2 text-xs news-muted"><span>Ngày {report.day.split('-').reverse().join('/')}</span><span>Cập nhật {new Date(report.updatedAt).toLocaleTimeString('vi-VN')}</span></div>
@@ -822,6 +832,6 @@ export default function BangTinPhuHuynh({
     </div>
    </div>
   </>)}
-  </section></div>
-  </>
+  </section>
+ </div>
 }

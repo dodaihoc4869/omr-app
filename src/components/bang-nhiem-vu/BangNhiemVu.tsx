@@ -4,7 +4,7 @@
 // Màn này KHÔNG xếp việc, không tính điểm, không gọi API nhiệm vụ: nhận
 // `DuLieuBangNhiemVu` từ `nhiem-vu-adapter` và chỉ vẽ.
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { CheckCircle2, ChevronRight, ClipboardCheck, MessageSquare, PawPrint, Plus, Shield, Sparkles, Zap } from 'lucide-react'
+import { CheckCircle2, ChevronRight, ClipboardCheck, MessageSquare, PawPrint, Plus, RefreshCw, Shield, Sparkles, Zap } from 'lucide-react'
 import type { DuLieuBangNhiemVu, HanhDongNhiemVu, TheNhiemVu } from '../../lib/nhiem-vu-adapter'
 import type { SpiritMotion } from '../../game/than-thu-v2/Spirit2D'
 import DauTrang, { type MucMenu, type ThanThuGoc } from './DauTrang'
@@ -94,6 +94,8 @@ export interface BangNhiemVuProps {
   caDangMo?: boolean
   /** Một dòng nói thật về phần dữ liệu app CHƯA có (vd. phụ huynh chưa có danh sách BTVN của con). */
   ghiChuNguon?: string
+  /** Máy chủ đang làm mới (reset): vẽ một dải thông báo nhẹ; phần còn lại của màn giữ nguyên. */
+  dangLamMoi?: boolean
   onHanhDong?: (hanhDong: HanhDongNhiemVu) => void
   onMoThanThu?: () => void
   onVaoThi?: () => void
@@ -117,6 +119,7 @@ export default function BangNhiemVu({
   khePhai,
   caDangMo = false,
   ghiChuNguon,
+  dangLamMoi,
   onHanhDong,
   onMoThanThu,
   onVaoThi,
@@ -203,6 +206,18 @@ export default function BangNhiemVu({
           mucMenu={mucMenu}
           khePhai={khePhai}
         />
+
+        {!dangTai && dangLamMoi && (
+          <div className="bnv-dang-lam-moi" role="status" data-vung="dang-lam-moi">
+            <RefreshCw size={22} aria-hidden="true" />
+            <div className="bnv-dang-lam-moi-chu">
+              <p className="bnv-dang-lam-moi-ten">
+                Hệ thống đang làm mới, khoảng <span className="bnv-dang-lam-moi-so">1–5 phút</span>.
+              </p>
+              <p className="bnv-dang-lam-moi-phu">{laPh ? 'Con' : 'Em'} cứ để app mở, app tự vào lại.</p>
+            </div>
+          </div>
+        )}
 
         {dangTai ? (
           <div aria-busy="true" aria-label="Đang tải việc hôm nay" style={{ display: 'grid', gap: 16 }}>
@@ -346,15 +361,18 @@ export default function BangNhiemVu({
 
             {duLieu.trong ? (
               <section className="bnv-trong" aria-label="Hôm nay chưa có việc" data-vung="trong">
-                <h2>{laPh ? (ghiChuNguon ? 'Chưa có bài gia đình giao nào đang chờ' : 'Hôm nay con chưa có việc') : 'Hôm nay chưa có việc — thần thú đang nghỉ'}</h2>
+                <h2>{laPh ? (ghiChuNguon ? 'Chưa có bài gia đình giao nào đang chờ' : 'Hôm nay con chưa có việc') : chuaChonThu ? 'Hôm nay chưa có việc' : 'Hôm nay chưa có việc — thần thú đang nghỉ'}</h2>
                 <p>
                   {laPh
                     ? 'Không có bài gia đình giao nào đang chờ con.'
-                    : 'Thầy chưa giao bài và em không có bài nào đang chờ. Em có thể luyện thêm với thần thú hoặc xem lại bài đã nộp.'}
+                    : chuaChonThu
+                      ? 'Thầy chưa giao bài và em không có bài nào đang chờ. Em chọn thần thú ở trên để luyện thêm, hoặc xem lại bài đã nộp.'
+                      : 'Thầy chưa giao bài và em không có bài nào đang chờ. Em có thể luyện thêm với thần thú hoặc xem lại bài đã nộp.'}
                 </p>
                 {!laPh && (
                   <div className="bnv-trong-nut">
-                    {onMoThanThu && (
+                    {/* Chưa có thần thú thì KHÔNG mời "luyện với thần thú" (không có con nào): thẻ "Chọn thần thú của em" ở đầu bảng là lối duy nhất. */}
+                    {onMoThanThu && !chuaChonThu && (
                       <button type="button" className="bnv-nut-tonal" data-vai-tro="tertiary" onClick={onMoThanThu}>
                         <Sparkles size={20} aria-hidden="true" />
                         <span>Luyện với thần thú</span>

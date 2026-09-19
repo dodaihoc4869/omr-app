@@ -7,7 +7,7 @@ import type { DongCa, DongLuot } from './kieu'
 
 export type LyDoChan =
   | 'khong_co_ca' | 'da_xoa' | 'da_dong' | 'dang_lam_may_khac'
-  | 'da_nop' | 'chua_mo' | 'het_han_vao' | 'het_gio_chung' | 'thieu'
+  | 'da_nop' | 'chua_mo' | 'het_han_vao' | 'het_gio_chung' | 'thieu' | 'sai_may'
 
 export type CachVao = 'moi' | 'khoi_phuc' | 'duyet_lai'
 
@@ -48,6 +48,10 @@ export function quyetDinhVaoThi(ca: DongCa | null, luot: DongLuot | null, idThie
     // nên em vào ĐÚNG lượt ấy — không đẻ thêm lần thử thứ ba, và KHÔNG bị hạn
     // vào phòng chặn: thầy duyệt sau giờ đóng cửa là chuyện thường.
     if (luot.trang_thai === 'duoc_duyet_lai') {
+      // CHO THI LẠI KHOÁ THEO MÁY (thầy chốt 08/09; chép Y HỆT `quyetDinhVaoThi_` của Apps Script): lượt `duoc_duyet_lai` có ghi sẵn id thiết bị nghĩa là thầy đã
+      // chốt em thi lại ở ĐÚNG máy cũ — máy khác gõ đúng số báo danh cũng không vào được. Chỉ khoá khi dòng CÓ id và máy xin vào CÓ id: `duyetThiLai` (đường cũ)
+      // để trống ô này nên em vào máy nào cũng được, và các đường kiểm không có máy (`/hs/ca-dang-mo`) không bị chặn.
+      if (luot.id_thiet_bi && idThietBi && luot.id_thiet_bi !== idThietBi) return { ok: false, lyDo: 'sai_may', lanThu: luot.lan_thu }
       if (daHetGioChung(ca, nowMs)) return { ok: false, lyDo: 'het_gio_chung' }
       return { ok: true, cach: 'duyet_lai', lanThu: luot.lan_thu }
     }

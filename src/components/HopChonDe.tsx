@@ -227,7 +227,10 @@ export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308,
 
       <div role="tree" aria-label="Cây chọn đề" style={{ maxHeight: cao, overflowY: 'auto', borderRadius: 'var(--bo-2)', border: '1px solid var(--vien)', background: 'var(--the)', overscrollBehavior: 'contain' }}>
         {cay.length === 0 ? (
-          <div style={{ ...NHAN_NHO, padding: 'var(--k4)' }}>Không có đề nào khớp "{tim.trim()}".</div>
+          // Ô tìm để trống mà cây vẫn rỗng = KHO ĐỀ TRỐNG (chưa nạp), không phải "không khớp": chữ cũ ra `khớp ""` — vô nghĩa.
+          <div style={{ ...NHAN_NHO, padding: 'var(--k4)' }}>
+            {tim.trim() ? `Không có đề nào khớp "${tim.trim()}".` : 'Kho đề đang trống. Vào Ngân hàng câu hỏi → Đồng bộ ngay để nạp đề.'}
+          </div>
         ) : (
           cay.map((n) => <Hang key={n.khoa} n={n} moRong={moRong} daChon={daChon} chonNhieu={!!chonNhieu} onGap={gap} onTich={tich} />)
         )}

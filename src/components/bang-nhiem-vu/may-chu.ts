@@ -2,6 +2,7 @@
 // màn phải sống được khi mất mạng (rơi về nguồn trợ lý, hoặc hiện bản cuối kèm "kế hoạch lúc …").
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
+import { donKhiDoiMocReset } from './don-moc-reset'
 import { dongGoiBanNho, laKeHoachNgayHopLe, phucHoiBanNho, type DuLieuBangNhiemVu, type KeHoachNgayMayChu } from '../../lib/nhiem-vu-adapter'
 
 export interface DinhDanh {
@@ -28,15 +29,37 @@ async function goiPost(duong: string, body: unknown, giay: number): Promise<any 
 
 const thanDinhDanh = (d: DinhDanh) => (d.token ? { token: d.token } : { sbd: d.sbd })
 
-/** `POST /hs/ke-hoach-ngay` — máy chủ tính lại mỗi lần gọi. Trả null nếu lỗi hoặc JSON không đủ phần. */
-export async function taiKeHoachNgay(d: DinhDanh): Promise<KeHoachNgayMayChu | null> {
+/**
+ * Lúc job reset chạy (đóng băng từ 00:00 VN tới khi xong hoặc 01:00) máy chủ trả HTTP 200 `{ ok:false, error, dangLamMoi:true }`
+ * (docs/moc-reset-1909.md mục 2). Đó KHÔNG phải lỗi đăng nhập hay mất mạng: giữ phiên, giữ bản nhớ, hiện dải "đang làm mới"
+ * (chữ do 0.Planer chốt, nằm ở BangNhiemVu), tự thử lại theo nhịp 60 s. Chỉ `=== true` mới tính — trường vắng/chuỗi "true" thì không.
+ */
+export function laDangLamMoi(r: unknown): boolean {
+  return !!r && typeof r === 'object' && (r as { dangLamMoi?: unknown }).dangLamMoi === true
+}
+
+export interface KetQuaKeHoach {
+  keHoach: KeHoachNgayMayChu | null
+  dangLamMoi: boolean
+}
+
+/** `POST /hs/ke-hoach-ngay` — máy chủ tính lại mỗi lần gọi. `keHoach` null nếu lỗi hoặc JSON không đủ phần; `dangLamMoi` true khi máy chủ đang làm mới. */
+export async function taiKeHoachNgayChiTiet(d: DinhDanh): Promise<KetQuaKeHoach> {
   const r = await goiPost('/hs/ke-hoach-ngay', thanDinhDanh(d), 10)
-  return laKeHoachNgayHopLe(r) ? r : null
+  // Máy chủ báo mốc đặt lại mùa ("YYYY-MM-DD"): mốc mới thì DỌN bộ nhớ trong máy TRƯỚC khi ai đó dựng bản nhớ/nháp (don-moc-reset.ts).
+  if (r && typeof r === 'object') donKhiDoiMocReset((r as { mocReset?: unknown }).mocReset)
+  return { keHoach: laKeHoachNgayHopLe(r) ? r : null, dangLamMoi: laDangLamMoi(r) }
+}
+
+/** Như trên nhưng chỉ lấy kế hoạch (null nếu lỗi / đang làm mới). */
+export async function taiKeHoachNgay(d: DinhDanh): Promise<KeHoachNgayMayChu | null> {
+  return (await taiKeHoachNgayChiTiet(d)).keHoach
 }
 
 /** `POST /hs/ca-dang-mo` → { ok, coCaMo, soCa }. Lỗi/404/thiếu trường → false. */
 export async function taiCaDangMo(d: DinhDanh): Promise<boolean> {
   const r = await goiPost('/hs/ca-dang-mo', thanDinhDanh(d), 8)
+  if (r && typeof r === 'object') donKhiDoiMocReset((r as { mocReset?: unknown }).mocReset)
   return !!r && r.ok === true && r.coCaMo === true
 }
 
@@ -69,8 +92,10 @@ export interface TrangThaiKeHoach {
   daXong: boolean
   /** Lần gọi mới nhất lỗi mà còn bản cuối ⇒ đang hiện bản cuối. */
   cu: boolean
+  /** Máy chủ đang làm mới (reset). Hết ngay khi một lượt gọi sau trả bình thường; lỗi mạng thường thì KHÔNG bật. */
+  dangLamMoi: boolean
 }
-const BAN_DAU: TrangThaiKeHoach & { nguoi: string } = { keHoach: null, daXong: false, cu: false, nguoi: '' }
+const BAN_DAU: TrangThaiKeHoach & { nguoi: string } = { keHoach: null, daXong: false, cu: false, dangLamMoi: false, nguoi: '' }
 
 export function useKeHoachNgay(d: DinhDanh, bat: boolean, lamMoi: number): TrangThaiKeHoach {
   const nguoi = nguoiCua(d)
@@ -80,12 +105,12 @@ export function useKeHoachNgay(d: DinhDanh, bat: boolean, lamMoi: number): Trang
     () => {
       if (dangGoi.current) return
       dangGoi.current = true
-      void taiKeHoachNgay(d).then((kq) => {
+      void taiKeHoachNgayChiTiet(d).then(({ keHoach: kq, dangLamMoi }) => {
         dangGoi.current = false
         setT((truoc) => {
           const cung = truoc.nguoi === nguoi
           const cuBan = cung ? truoc.keHoach : null
-          return kq ? { keHoach: kq, daXong: true, cu: false, nguoi } : { keHoach: cuBan, daXong: true, cu: cuBan !== null, nguoi }
+          return kq ? { keHoach: kq, daXong: true, cu: false, dangLamMoi: false, nguoi } : { keHoach: cuBan, daXong: true, cu: cuBan !== null, dangLamMoi, nguoi }
         })
       })
     },

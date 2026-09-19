@@ -18,6 +18,7 @@ import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
 import { chamDiemMoi, chiTietCaMoi, danhSachEmMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, ghiLenBangMoi, luotCuaCaMoi, napDayDuCaMoi, suaCaMoi, tienDoEmMoi, type OSuaCa } from './day-ca-may-chu-moi'
 import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu } from './man-ca-may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
+import { donTheoMocReset } from './don-moc-reset-giao-vien'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
 export interface KeyBank {
@@ -179,6 +180,9 @@ async function postJson(_scriptUrl: string, body: unknown, giay: number = HAN_GI
   // Mọi phản hồi có serverNow → hiệu chỉnh đồng hồ theo máy chủ ngay tại đây,
   // màn hình không phải nhớ gọi.
   if (r && typeof r.serverNow === 'number') dongBoGioMayChu(r.serverNow)
+  // Phản hồi `danhSachCa` mang mốc reset dữ liệu học sinh (`mocReset`, chỉ có SAU khi máy chủ reset xong): dọn bộ nhớ ca cũ trong
+  // máy thầy NGAY ĐÂY, trước khi ai cất thêm gì vào cache. Đường máy chủ mới `danhSachCaMoi` làm việc này ở `man-ca-may-chu-moi.ts`.
+  if (r && (body as { action?: unknown } | null)?.action === 'danhSachCa') await donTheoMocReset(r.mocReset)
   return r
 }
 

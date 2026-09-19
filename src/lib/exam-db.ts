@@ -729,3 +729,75 @@ export async function docLichOnLai<T>(): Promise<T | undefined> {
   const db = await getDb()
   return (await db.get(STORE_SETTINGS, 'lichOnLai')) as T | undefined
 }
+
+// ---------------------------------------------------------------------------
+// DỌN THEO MỐC RESET (`mocReset`) — thầy chốt 19/09/2026: 00:01 thứ Hai 21/09 máy chủ XOÁ TOÀN BỘ dữ liệu học sinh
+// (ca thi, điểm, bài làm, BTVN, lên bảng, sổ học…), GIỮ tài khoản + kho đề + cấu hình.
+//
+// Máy thầy giữ một BẢN SAO theo ca/em của những thứ ấy. Không dọn thì sáng thứ Hai hiện "ca ma", hoặc — nguy hiểm hơn —
+// đẩy ngược bank ca cũ lên máy chủ (`capNhatKeyBank`) tái tạo khoá của ca đã xoá. Cách dọn nằm ở
+// `don-moc-reset-giao-vien.ts`; ở đây chỉ có DANH SÁCH cái gì thuộc nhóm DỌN (nằm sát lược đồ để ai thêm khoá theo ca/em
+// mới thì thấy) và một giao dịch NGUYÊN TỬ thực hiện việc dọn.
+//
+// QUY ƯỚC KHI THÊM DỮ LIỆU MỚI VÀO `omr-exam`: khoá/store nào gắn với một CA hoặc một EM thì PHẢI vào các danh sách dưới
+// đây (test `don-moc-reset-giao-vien-1909` soi mọi khoá `settings` có `${…}` trong tệp này). Khoá cấu hình của thầy (địa chỉ
+// máy chủ, mã bí mật, khoá app, sổ sửa mã dạng, KHO ĐỀ `examSources`) tuyệt đối KHÔNG vào đây.
+// ---------------------------------------------------------------------------
+
+/** Store xoá SẠCH khi reset: bản ca cache, bank có đáp án theo ca, bài làm của em trên máy này. */
+export const STORE_DON_KHI_RESET = [STORE_SESSION_CACHE, STORE_SESSION_BANK_TEACHER, STORE_ATTEMPTS] as const
+/** Khoá `settings` theo TIỀN TỐ (`soCauCa:<maCa>`, `qidRaPhieu:<sbd>`…) bị xoá khi reset. */
+export const TIEN_TO_SETTINGS_DON_KHI_RESET = ['soCauCa:', 'khoChuaCa:', 'deRiengCa:', 'cheDoDeRieng:', 'qidRaPhieu:'] as const
+/** Khoá `settings` ĐÚNG TÊN bị xoá khi reset: điểm theo em, kho độ khó (qid → lượt/đúng/số ca), hàng đợi ôn giãn cách. */
+export const KHOA_SETTINGS_DON_KHI_RESET = [KHOA_DIEM_EM, 'khoDoKho', 'lichOnLai'] as const
+
+/** DẤU "đã dọn theo mốc này" — nằm trong `settings` (KHÔNG thuộc nhóm dọn) và được ghi CÙNG giao dịch với việc dọn. */
+const KHOA_MOC_RESET_DA_DON = 'mocResetDaDon'
+
+export function khoaSettingsThuocNhomDon(khoa: string): boolean {
+  return (KHOA_SETTINGS_DON_KHI_RESET as readonly string[]).includes(khoa) || TIEN_TO_SETTINGS_DON_KHI_RESET.some((t) => khoa.startsWith(t))
+}
+
+export interface KetQuaDonKhiReset {
+  /** Số bản ghi đã xoá khỏi các store (ca cache + bank + bài làm). */
+  soBanGhi: number
+  /** Số khoá `settings` đã xoá. */
+  soKhoaSettings: number
+}
+
+/** Mốc reset lần dọn gần nhất trên máy này ('' = chưa dọn lần nào). */
+export async function docMocResetDaDon(): Promise<string> {
+  const db = await getDb()
+  const v = await db.get(STORE_SETTINGS, KHOA_MOC_RESET_DA_DON)
+  return typeof v === 'string' ? v : ''
+}
+
+/** DỌN theo mốc `moc` trong MỘT giao dịch: xoá các store + các khoá `settings` nhóm dọn rồi ghi dấu. Hỏng giữa chừng thì
+ * giao dịch bị huỷ — không dọn nửa vời, không có dấu, lần sau thử lại. */
+export async function donDuLieuTheoMocReset(moc: string): Promise<KetQuaDonKhiReset> {
+  const db = await getDb()
+  const tx = db.transaction([STORE_SETTINGS, ...STORE_DON_KHI_RESET], 'readwrite')
+  let soBanGhi = 0
+  for (const ten of STORE_DON_KHI_RESET) {
+    const st = tx.objectStore(ten)
+    soBanGhi += await st.count()
+    await st.clear()
+  }
+  const cs = tx.objectStore(STORE_SETTINGS)
+  let soKhoaSettings = 0
+  for (const k of await cs.getAllKeys()) {
+    if (khoaSettingsThuocNhomDon(String(k))) {
+      await cs.delete(k)
+      soKhoaSettings++
+    }
+  }
+  await cs.put(moc, KHOA_MOC_RESET_DA_DON)
+  await tx.done
+  return { soBanGhi, soKhoaSettings }
+}
+
+/** Xoá bank ca (có đáp án) của MỘT ca khỏi máy — dùng khi máy chủ không còn mã ca ấy. */
+export async function xoaSessionTeacherBank(maCa: string): Promise<void> {
+  const db = await getDb()
+  await db.delete(STORE_SESSION_BANK_TEACHER, maCa)
+}
