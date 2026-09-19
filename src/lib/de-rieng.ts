@@ -121,7 +121,17 @@ export function chonCauLapChoEm(
   const demCua = demSai[sbd] ?? {}
   const canDayLai = daSai.filter((q) => (demCua[q] ?? 0) >= ch.TRAN_LAP_MOT_CAU)
   const conLap = daSai.filter((q) => (demCua[q] ?? 0) < ch.TRAN_LAP_MOT_CAU)
-  const can = Math.min(soCauLapCan(daSai.length, ch), Math.max(0, Math.floor(Number(tranCau) || 0)))
+  const tranCauSo = Math.max(0, Math.floor(Number(tranCau) || 0))
+  // TRẦN THEO ĐỀ MỚI (vá 19/09 — sự cố "chọn chương 1 ra cả chương 2"): câu
+  // khắc phục không được vượt quá TI_LE_CAU_LAP TÍNH TRÊN CHÍNH ĐỀ MỚI này,
+  // không chỉ trên số câu em từng sai. Thiếu trần này, em sai nhiều ở lịch sử
+  // (nhất là PHAM_VI_HOI_LAI='ba_ca' cộng dồn nhiều ca) có thể bị câu khắc
+  // phục lấp gần hết đề mới — kể cả khi đề mới thầy chọn chuyên đề khác hẳn
+  // chuyên đề của những câu sai đó. Với ca 14 câu chuẩn (9-2-3), trần này ra
+  // đúng 5 — khớp tổng TRAN_PHAN_BO_14_CAU {3,1,1} — nên ca chuẩn không đổi
+  // hành vi; chỉ chặn khi `can` lẽ ra vượt 30% của CHÍNH đề đang mở.
+  const tranTheoDeMoi = Math.ceil(tranCauSo * ch.TI_LE_CAU_LAP)
+  const can = Math.min(soCauLapCan(daSai.length, ch), tranCauSo, tranTheoDeMoi)
 
   if (conLap.length === 0 || can === 0) {
     return {

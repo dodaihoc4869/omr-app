@@ -199,8 +199,12 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
   const [seed, setSeed] = useState(() => Math.floor(Math.random() * 1e9))
   const [moChiTiet, setMoChiTiet] = useState(false)
   const [kq, setKq] = useState<KetQuaRut | null>(null)
-  // ĐỀ RIÊNG TỪNG EM (DE-RIENG-TUNG-EM). BẬT MẶC ĐỊNH theo thuật toán cá nhân hóa mới.
-  const [deRieng, setDeRieng] = useState(true)
+  // ĐỀ RIÊNG TỪNG EM (DE-RIENG-TUNG-EM). Không bật mặc định (vá 19/09: bản
+  // 18/09 (3dad7cc) từng lặng lẽ đổi mặc định này sang bật — không phải điều
+  // thầy yêu cầu, và đúng hôm bật mặc định thì xảy ra sự cố rút đề lẫn chương
+  // (câu khắc phục kéo cả câu chương khác vào đề — xem cau-hinh-de-rieng.ts).
+  // Trả về tắt mặc định: thầy vẫn bật tay được ở nút bên dưới khi muốn dùng.
+  const [deRieng, setDeRieng] = useState(false)
   // HAI NÚT PHẠM VI (thầy chốt 08/09): lấy câu sai của ca gần nhất, hay gộp
   // câu sai của 3 ca gần nhất. Mặc định ca gần nhất — đo đúng buổi vừa dạy.
   const [phamViHoiLai, setPhamViHoiLai] = useState<CauHinhDeRieng['PHAM_VI_HOI_LAI']>('gan_nhat')
