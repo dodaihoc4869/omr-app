@@ -336,16 +336,17 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duC
     return <iframe title="Phiếu bài tập" srcDoc={phieuBt} style={{ display: 'block', width: '100%', height: '100vh', border: 0 }} />
   }
 
-  // VỎ TẢI / LỖI mặc M3 ở cổng học sinh / phụ huynh (dungM3()): nền surface, chữ theo bảng màu M3 (sáng/tối), nút Thử lại
-  // đủ 48 px. Bản báo cáo BÊN DƯỚI vẫn là giấy trắng mực đen (xem đầu tệp) — chỉ hai màn trạng thái này đổi áo. Màu và kích
-  // thước đi qua biến `--phieu-*` có giá trị dự phòng = giá trị cũ, nên ngoài M3 (vitest ở `/`) vẫn ra đúng như trước.
+  // VỎ LỖI mặc M3 ở cổng học sinh / phụ huynh (dungM3()): nền surface, chữ theo bảng màu M3 (sáng/tối), nút Thử lại đủ
+  // 48 px. VỎ "ĐANG MỞ" thì KHÔNG: nó đứng ngay trước báo cáo giấy trắng mực đen (xem đầu tệp), mặc M3 thì máy bật chế độ
+  // tối chớp tối → trắng (0.Planer chốt 19/09). Màu và kích thước vỏ lỗi đi qua biến `--phieu-*` có giá trị dự phòng =
+  // giá trị cũ, nên ngoài M3 (vitest ở `/`) vẫn ra đúng như trước.
   const m3 = dungM3()
 
   if (du === undefined) {
     return (
-      <div className={m3 ? 'bc m3' : 'bc'} style={{ display: 'grid', placeItems: 'center' }}>
+      <div className="bc" style={{ display: 'grid', placeItems: 'center' }}>
         <style>{CSS}</style>
-        <div style={{ color: 'var(--phieu-chu-phu, var(--p-nhat))', fontSize: 14 }}>Đang mở báo cáo…</div>
+        <div style={{ color: 'var(--p-nhat)', fontSize: 14 }}>Đang mở báo cáo…</div>
       </div>
     )
   }

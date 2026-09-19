@@ -1,5 +1,6 @@
 // Việc C · C7 (Code 4): PhieuScreen — trang phiếu công khai (/p#<mã>, ?vai=phieu). Chỉ hai thứ đổi áo:
-//  · VỎ TẢI / LỖI (không phải báo cáo, chỉ là trạng thái của trang) → bảng màu M3, nút Thử lại 48 px;
+//  · VỎ LỖI (không phải báo cáo, chỉ là trạng thái của trang) → bảng màu M3, nút Thử lại 48 px. Vỏ "Đang mở báo cáo…" GIỮ
+//    NỀN GIẤY (0.Planer chốt 19/09): nó đứng ngay trước báo cáo giấy trắng nên mặc M3 thì máy tối chớp tối → trắng;
 //  · nút "Xem đề em/con vừa làm" → đích chạm 48 px, GIỮ bảng --p-* vì nó nằm trong thẻ giấy của báo cáo.
 // Báo cáo bên dưới, KhoiBaiLuyen, PhieuV3 KHÔNG đổi. Ngoài M3 (vitest ở `/`) mọi thứ phải ra đúng giá trị cũ:
 // kiểu nội tuyến chỉ đổi thành `var(--…, <giá trị cũ>)`.
@@ -38,13 +39,13 @@ const goc_ = () => document.querySelector('.bc') as HTMLElement
 const nutThuLai = () => screen.getByRole('button', { name: 'Thử lại' }) as HTMLButtonElement
 const nutXemDe = () => screen.getByRole('button', { name: /Xem đề con vừa làm \(2 câu\) kèm lời giải/ }) as HTMLButtonElement
 
-describe('vỏ TẢI / LỖI', () => {
-  it('ngoài M3 (`/`): gốc chỉ là `bc`, không lớp m3 ở đâu; chữ phụ và nút Thử lại mang ĐÚNG giá trị cũ làm dự phòng', () => {
+describe('vỏ ĐANG MỞ (giấy) và vỏ LỖI (M3)', () => {
+  it('ngoài M3 (`/`): gốc chỉ là `bc`, không lớp m3 ở đâu; chữ chờ đúng màu cũ; nút Thử lại mang ĐÚNG giá trị cũ làm dự phòng', () => {
     datDuong('/' + CO_MA)
     const a = render(<PhieuScreen />)
     expect(goc_().className).toBe('bc')
     expect(document.querySelector('[class*="m3"]')).toBeNull()
-    expect(screen.getByText('Đang mở báo cáo…').getAttribute('style')).toContain('color: var(--phieu-chu-phu, var(--p-nhat))')
+    expect(screen.getByText('Đang mở báo cáo…').getAttribute('style')).toContain('color: var(--p-nhat)')
     a.unmount()
     datDuong('/')
     render(<PhieuScreen />) // không có mã trong link → lỗi ngay
@@ -58,11 +59,12 @@ describe('vỏ TẢI / LỖI', () => {
     expect(st).toContain('min-height: var(--phieu-nut-cao, 0px)')
   })
 
-  it('cổng học sinh / phụ huynh (?vai=phieu): cả hai trạng thái mang `bc m3`; nút Thử lại vẫn là <button> bấm được', () => {
+  it('cổng học sinh / phụ huynh (?vai=phieu): vỏ ĐANG MỞ vẫn giấy (`bc`, không m3, không biến --phieu-*); vỏ LỖI mang `bc m3`; nút Thử lại vẫn là <button> bấm được', () => {
     datDuong(M3 + CO_MA)
     const a = render(<PhieuScreen />)
-    expect(goc_().className).toBe('bc m3')
-    expect(screen.getByText('Đang mở báo cáo…')).toBeTruthy()
+    expect(goc_().className).toBe('bc')
+    expect(document.querySelector('[class*="m3"]')).toBeNull()
+    expect(screen.getByText('Đang mở báo cáo…').getAttribute('style')).not.toContain('--phieu-')
     a.unmount()
     datDuong(M3)
     render(<PhieuScreen />)
@@ -116,7 +118,7 @@ describe('nút "Xem đề … vừa làm" (trong thẻ giấy của báo cáo)',
 describe('m3/phieu-screen.css', () => {
   const luat = (chon: string) => [...CSS.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^{}]*)\}/g)].find((m) => m[1].split(',').map((s) => s.trim()).includes(chon))![2]
 
-  it('vỏ: nền surface + chữ on-surface (thắng `.bc` giấy nhờ hai lớp); nút chính M3 cao 48 px, bo tròn, chữ on-primary', () => {
+  it('vỏ LỖI: nền surface + chữ on-surface (thắng `.bc` giấy nhờ hai lớp); nút chính M3 cao 48 px, bo tròn, chữ on-primary', () => {
     const r = luat('.bc.m3')
     expect(r).toMatch(/background:\s*var\(--m3-surface\)/)
     expect(r).toMatch(/color:\s*var\(--m3-on-surface\)/)
@@ -145,10 +147,17 @@ describe('PhieuScreen.tsx: chỉ thêm móc M3, giá trị cũ nằm trong dự 
   it('dự phòng = giá trị cũ; báo cáo / KhoiBaiLuyen / PhieuV3 không bị đóng dấu m3', () => {
     for (const s of ["'var(--xem-de-cao, 46px)'", "'var(--phieu-nut-dem, 10px 22px)'", "'var(--phieu-nut-bo, 10px)'", "'var(--phieu-nut-nen, var(--p-muc))'", "'var(--phieu-nut-chu, var(--p-giay))'", "'var(--phieu-chu-phu, var(--p-nhat))'"]) expect(SRC).toContain(s)
     expect(SRC).toContain("import '../components/m3/phieu-screen.css'")
-    expect(SRC).toContain("className={m3 ? 'bc m3' : 'bc'}")
+    expect(SRC.match(/className=\{m3 \? 'bc m3' : 'bc'\}/g)).toHaveLength(1) // chỉ vỏ LỖI
+    expect(SRC).toContain('<div style={{ color: \'var(--p-nhat)\', fontSize: 14 }}>Đang mở báo cáo…</div>')
     expect(SRC.match(/<div className="bc">/g)).toHaveLength(1) // bố cục báo cáo cũ giữ nguyên lớp `bc` trần
     expect(SRC).toContain('<PhieuV3 du={du} laCuaEm={laCuaEm} xinLink={xinLink} />')
     expect(SRC).toContain('<NutTaiBaiTap du={du} laCuaEm={laCuaEm} xinLink={xinLink} />')
     expect(SRC).toContain('location.reload()')
+  })
+})
+
+describe('css-bao-cao.ts: nút của báo cáo giấy (.bc-nut, KhoiBaiLuyen) đạt đích chạm 48 px', () => {
+  it('.bc-nut cao tối thiểu 48 px (trước 46)', () => {
+    expect(doc('src/lib/css-bao-cao.ts')).toMatch(/\.bc-nut\{flex:1 1 150px;min-height:48px;/)
   })
 })
