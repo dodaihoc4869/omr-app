@@ -17,7 +17,7 @@
 import { hashSeed, seededPermutation } from './exam-shuffle'
 import { PHAN_DE, locTheoYeuCau, type CauUngVien, type PhanDe, type YeuCauRut } from './rut-de'
 import { CAU_HINH_DE_RIENG_MAC_DINH, SO_CA_BOC_NGAU_NHIEN as SO_CA_HOI_LAI, soCauLapCan, type CauHinhDeRieng } from './cau-hinh-de-rieng'
-import { sinhBoMotO } from './de-rieng-tran-trung'
+import { sinhBoMotO, type CamTheoEm } from './de-rieng-tran-trung'
 import { CAU_HINH_TRAN_TRUNG_MAC_DINH } from './de-rieng-cau-hinh'
 
 /** Một ca đã chấm, rút gọn còn đúng phần thuật toán cần. Ca gần nhất đứng
@@ -30,8 +30,104 @@ export interface CaTruocDaCham {
   saiCua: Record<string, string[]>
 }
 
+/** MỘT CÂU EM CÒN PHẢI HỎI LẠI, theo hồ sơ nắm kiến thức (`nam_kt_cau`). */
+export interface CauSaiHoSo {
+  qid: string
+  /** Số lần sai ở MỌI nguồn. Chỉ để ghi biên bản — trần lặp vẫn đếm bằng các ca thi. */
+  lanSai: number
+  /** Mốc ôn kế, ngày VN 'YYYY-MM-DD'. `≤ ngayCa` = câu đã TỚI HẠN ôn. */
+  mocOnKe: string | null
+  /** Mã dạng ba tầng, hoặc `CD:<chuyên đề>`. `null` = hồ sơ chưa biết dạng. */
+  maDang: string | null
+  trangThai: 'moi_sai' | 'dang_on'
+}
+
+/** HỒ SƠ ÔN CỦA MỘT EM cho ca sắp mở — bản đã đọc phòng thủ của lệnh `hoSoOnCa`
+ * (hợp đồng: `docs/hop-dong-ho-so-on-ca-1909.md`). */
+export interface HoSoOnEm {
+  /** Ca máy chủ đã lấy nguồn. Chỉ để ghi biên bản. */
+  tuCa: string
+  sai: CauSaiHoSo[]
+  /** Câu em sai ở ca trước mà hồ sơ nói THẲNG là đã khắc phục (đúng 3 mốc ở
+   * BTVN/game/bài mẹ giao) — không hỏi lại nữa. Vắng mặt trong `sai` KHÔNG đủ để
+   * coi là đã khắc phục: sổ có chỗ thưa, suy vậy là bỏ hỏi lại im lặng. */
+  daKhacPhuc: string[]
+  /** qid em có làm trong 7 ngày qua ở MỌI nguồn, MỚI NHẤT đứng đầu. */
+  lam: string[]
+}
+
+const NGAY_VN = /^\d{4}-\d{2}-\d{2}$/
+
+/** ĐỌC PHÒNG THỦ một mục `em[sbd]` của lệnh `hoSoOnCa`. Không bao giờ ném lỗi.
+ *
+ * Sai kiểu ở đâu thì BỎ đúng chỗ đó về giá trị vô hại: dòng `sai` hỏng ⇒ bỏ dòng
+ * (câu đó xử theo luật cũ, vẫn được hỏi lại); `daKhacPhuc` hỏng ⇒ rỗng (không câu
+ * nào bị bỏ hỏi lại); `lam` hỏng ⇒ rỗng (không cấm gì). Một dòng rác từ máy chủ
+ * không thể làm em MẤT câu hỏi lại. */
+export function docHoSoOnEm(v: unknown): HoSoOnEm {
+  const o = typeof v === 'object' && v !== null && !Array.isArray(v) ? (v as Record<string, unknown>) : {}
+  const chuoiGon = (x: unknown): string[] => {
+    if (!Array.isArray(x)) return []
+    const ra: string[] = []
+    const co = new Set<string>()
+    for (const t of x) {
+      const q = typeof t === 'string' ? t.trim() : ''
+      if (q && !co.has(q)) {
+        co.add(q)
+        ra.push(q)
+      }
+    }
+    return ra
+  }
+  const sai: CauSaiHoSo[] = []
+  const coSai = new Set<string>()
+  for (const t of Array.isArray(o.sai) ? o.sai : []) {
+    if (typeof t !== 'object' || t === null) continue
+    const d = t as Record<string, unknown>
+    const qid = typeof d.qid === 'string' ? d.qid.trim() : ''
+    if (!qid || coSai.has(qid)) continue
+    if (d.trangThai !== 'moi_sai' && d.trangThai !== 'dang_on') continue
+    coSai.add(qid)
+    const lanSai = Math.floor(Number(d.lanSai))
+    const moc = typeof d.mocOnKe === 'string' ? d.mocOnKe.trim().slice(0, 10) : ''
+    const ma = typeof d.maDang === 'string' ? d.maDang.trim() : ''
+    sai.push({
+      qid,
+      lanSai: Number.isFinite(lanSai) && lanSai > 0 ? lanSai : 0,
+      mocOnKe: NGAY_VN.test(moc) ? moc : null,
+      maDang: ma || null,
+      trangThai: d.trangThai,
+    })
+  }
+  return {
+    tuCa: typeof o.tuCa === 'string' ? o.tuCa.trim() : '',
+    sai,
+    daKhacPhuc: chuoiGon(o.daKhacPhuc),
+    lam: chuoiGon(o.lam),
+  }
+}
+
+/** PHẦN THÊM CỦA `chonCauLapChoEm` KHI CA CÓ HỒ SƠ ÔN (19/09, GĐ 6 Kênh 1).
+ *
+ * KHÔNG truyền đối tượng này ⇒ hàm chạy đúng từng dòng của bản trước. Máy chủ
+ * chưa có lệnh `hoSoOnCa` thì cả lớp đi đường đó — tương thích ngược là bắt buộc. */
+export interface TuyChonHoSoLap {
+  /** Hồ sơ của ĐÚNG em này. Thiếu = em chưa có dòng nào: thứ tự chọn như cũ. */
+  hoSo?: HoSoOnEm
+  /** Ngày VN của ca sắp mở — mốc so `mocOnKe`. Thiếu thì không câu nào "tới hạn". */
+  ngayCa?: string
+  /** qid → mã dạng của câu TRONG KHO ca này (ứng viên song sinh). */
+  maDangCua?: Map<string, string>
+  /** Hạt giống xoay ứng viên song sinh. Cùng seed + cùng sbd ⇒ cùng câu. */
+  seed?: number
+  /** qid song sinh → số em trong lớp ĐÃ nhận. `dungDeRieng` truyền CHUNG một Map
+   * cho cả lớp, hàm này đọc rồi cộng vào — để hai em cùng sai một câu không
+   * nhận cùng một câu song sinh khi kho còn câu khác cùng dạng. */
+  demSongSinh?: Map<string, number>
+}
+
 /** Vì sao một em không đủ câu lặp. Rỗng = đủ, không phải báo gì. */
-export type LyDoThieuLap = '' | 'moi_vao' | 'dung_het' | 'khong_nop' | 'it_cau_sai' | 'ngoai_kho' | 'het_cho'
+export type LyDoThieuLap = '' | 'moi_vao' | 'dung_het' | 'khong_nop' | 'it_cau_sai' | 'ngoai_kho' | 'het_cho' | 'da_khac_phuc'
 
 export const CHU_LY_DO_THIEU: Record<Exclude<LyDoThieuLap, ''>, string> = {
   moi_vao: 'mới vào lớp, chưa có ca nào',
@@ -40,6 +136,7 @@ export const CHU_LY_DO_THIEU: Record<Exclude<LyDoThieuLap, ''>, string> = {
   it_cau_sai: 'ca trước sai ít hơn số câu lặp cần',
   ngoai_kho: 'câu em từng sai không nằm trong kho ca này',
   het_cho: 'đề không đủ chỗ — phần đó đã kín câu hỏi lại',
+  da_khac_phuc: 'câu sai ca trước em đã khắc phục ở bài luyện (đúng đủ 3 mốc) — không hỏi lại',
 }
 
 export interface CauLapCuaEm {
@@ -54,6 +151,8 @@ export interface CauLapCuaEm {
   songSinh?: string[]
   /** Câu bị bỏ vì đã lặp đủ trần mà vẫn sai — thầy phải dạy lại, không hỏi lại. */
   canDayLai: string[]
+  /** Câu sai ca trước bị BỎ vì hồ sơ nói đã khắc phục. Chỉ có khi ca có hồ sơ ôn. */
+  daKhacPhuc?: string[]
   /** SỐ CÂU EM SAI ở ca lấy nguồn. Đây là MẪU SỐ của tỉ lệ 30%. */
   soSaiCaTruoc: number
   /** Số câu lặp CẦN của riêng em này = làm tròn lên 30% × `soSaiCaTruoc`. */
@@ -90,6 +189,7 @@ export function chonCauLapChoEm(
   ch: CauHinhDeRieng = CAU_HINH_DE_RIENG_MAC_DINH,
   cauCua?: Map<string, CauUngVien>,
   daLamSet?: Set<string>,
+  tuyChon?: TuyChonHoSoLap,
 ): CauLapCuaEm {
   const quet = dsCa.slice(0, Math.max(0, ch.TRAN_CA_QUET))
   const caCoNop = quet.find((c) => (c.daLamCua[sbd] ?? []).length > 0)
@@ -121,9 +221,19 @@ export function chonCauLapChoEm(
   }
 
   const demCua = demSai[sbd] ?? {}
-  const canDayLai = daSai.filter((q) => (demCua[q] ?? 0) >= ch.TRAN_LAP_MOT_CAU)
-  const conLap = daSai.filter((q) => (demCua[q] ?? 0) < ch.TRAN_LAP_MOT_CAU)
+  // HỒ SƠ ÔN (19/09): câu hồ sơ nói THẲNG `da_khac_phuc` thì thôi hỏi lại, và
+  // cũng thôi xếp vào "cần dạy lại" — em đã tự chữa được ở BTVN/game. `sai` thắng
+  // `daKhacPhuc` nếu máy chủ lỡ trả một qid ở cả hai nơi: thà hỏi thừa một câu.
+  const hoSo = tuyChon?.hoSo
+  const conSaiTheoHoSo = new Map((hoSo?.sai ?? []).map((c) => [c.qid, c]))
+  const daKP = new Set((hoSo?.daKhacPhuc ?? []).filter((q) => !conSaiTheoHoSo.has(q)))
+  const daKhacPhuc = daSai.filter((q) => daKP.has(q))
+  const canDayLai = daSai.filter((q) => (demCua[q] ?? 0) >= ch.TRAN_LAP_MOT_CAU && !daKP.has(q))
+  const conLap = daSai.filter((q) => (demCua[q] ?? 0) < ch.TRAN_LAP_MOT_CAU && !daKP.has(q))
+  // SỐ CẦN vẫn tính trên MỌI câu em sai ca trước (kể cả câu đã khắc phục) — hồ
+  // sơ chỉ được đổi THỨ TỰ và bỏ câu, không được đổi mẫu số của luật 30%.
   const can = Math.min(soCauLapCan(daSai.length, ch), Math.max(0, Math.floor(Number(tranCau) || 0)))
+  const themHoSo = daKhacPhuc.length > 0 ? { daKhacPhuc } : {}
 
   if (conLap.length === 0 || can === 0) {
     return {
@@ -133,16 +243,36 @@ export function chonCauLapChoEm(
       cauGoc: [],
       songSinh: [],
       canDayLai,
+      ...themHoSo,
       soSaiCaTruoc: daSai.length,
       can,
-      lyDo: conLap.length === 0 ? 'dung_het' : '',
+      lyDo: conLap.length === 0 ? (daKhacPhuc.length > 0 && can > 0 ? 'da_khac_phuc' : 'dung_het') : '',
     }
   }
 
-  // SẮP XẾP ƯU TIÊN LỖ HỔNG (nếu bật UU_TIEN_LO_HONG)
+  // SẮP XẾP ƯU TIÊN LỖ HỔNG (nếu bật UU_TIEN_LO_HONG). Có hồ sơ thì trong CÙNG
+  // mức ưu tiên, câu đã TỚI HẠN ôn (`mocOnKe ≤ ngayCa`) đứng trước, quá hạn lâu
+  // hơn đứng trước nữa. `sort` của JS ổn định nên hoà thì giữ thứ tự cũ — không
+  // có hồ sơ là ra đúng thứ tự bản trước.
+  const ngayCa = tuyChon?.ngayCa ?? ''
+  const mocToiHan = (q: string): string => {
+    const moc = conSaiTheoHoSo.get(q)?.mocOnKe ?? ''
+    return moc !== '' && ngayCa !== '' && moc <= ngayCa ? moc : ''
+  }
+  const soToiHan = (a: string, b: string): number => {
+    const ma = mocToiHan(a)
+    const mb = mocToiHan(b)
+    if (ma === mb) return 0
+    if (ma === '') return 1
+    if (mb === '') return -1
+    return ma < mb ? -1 : 1
+  }
+  const coToiHan = conLap.some((q) => mocToiHan(q) !== '')
   const conLapSapXep = ch.UU_TIEN_LO_HONG
-    ? [...conLap].sort((a, b) => (demCua[b] ?? 0) - (demCua[a] ?? 0))
-    : conLap
+    ? [...conLap].sort((a, b) => (demCua[b] ?? 0) - (demCua[a] ?? 0) || (coToiHan ? soToiHan(a, b) : 0))
+    : coToiHan
+      ? [...conLap].sort(soToiHan)
+      : conLap
 
   // PHÂN BỔ THÔNG MINH CHO CẤU TRÚC ĐỀ (nếu có thông tin kho và cấu hình)
   if (cauCua && cauCua.size > 0) {
@@ -193,6 +323,10 @@ export function chonCauLapChoEm(
 
     // Tập hợp ứng viên trong kho ca này theo dạng bài cụ thể
     const ungVienTheoDang = new Map<string, CauUngVien[]>()
+    // CA CÓ HỒ SƠ ÔN: thêm một bảng thứ hai, ghép theo MÃ DẠNG. Khoá cũ
+    // `phan:lý thuyết|bài tập` coi mọi câu bài tập Phần I là "cùng dạng" — câu
+    // este ghép với câu điện phân. Mã dạng ba tầng mới là cùng dạng thật.
+    const ungVienTheoMaDang = new Map<string, CauUngVien[]>()
     for (const cand of cauCua.values()) {
       if (cand.dang && cand.dang !== 'chua_ro') {
         const keyDang = `${cand.phan}:${cand.dang}`
@@ -200,13 +334,50 @@ export function chonCauLapChoEm(
         arr.push(cand)
         ungVienTheoDang.set(keyDang, arr)
       }
+      if (tuyChon) {
+        const k = khoaMaDang(cand.phan, tuyChon.maDangCua?.get(cand.id), cand.dang)
+        if (k) ungVienTheoMaDang.set(k, [...(ungVienTheoMaDang.get(k) ?? []), cand])
+      }
     }
+    const lamGanDay = new Set(hoSo?.lam ?? [])
 
     for (const q of dsChonGoc) {
       const infoQ = cauCua.get(q)
       const muonSongSinh = songSinh.length < soSongSinhCan
 
-      if (muonSongSinh && infoQ && infoQ.dang && infoQ.dang !== 'chua_ro') {
+      if (muonSongSinh && infoQ && tuyChon) {
+        // ĐƯỜNG MỚI. Mã dạng của câu gốc: hồ sơ trước, kho sau. Có mã dạng thì
+        // CHỈ ghép trong mã dạng đó — không thấy câu cùng dạng thì giữ câu gốc,
+        // không lùi về khoá lỏng (câu "song sinh" khác dạng là câu lạ, không
+        // phải phép thử chống học vẹt). Thiếu mã dạng mới dùng khoá cũ.
+        const maDangQ = conSaiTheoHoSo.get(q)?.maDang || tuyChon.maDangCua?.get(q)
+        const kMa = khoaMaDang(infoQ.phan, maDangQ, infoQ.dang)
+        const khoa = kMa ?? (infoQ.dang && infoQ.dang !== 'chua_ro' ? `${infoQ.phan}:${infoQ.dang}` : '')
+        const cands = kMa ? (ungVienTheoMaDang.get(kMa) ?? []) : (ungVienTheoDang.get(khoa) ?? [])
+        // XOAY THEO EM, không lấy phần tử ĐẦU: bản trước mọi em cùng sai một dạng
+        // nhận CÙNG một câu song sinh, mà câu đó bị khoá nên pha hạ trùng không
+        // sửa được. Nay: câu ÍT em nhận nhất trước; hoà thì theo vòng xoay bắt
+        // đầu từ `hash(seed|sbd|khoá)` — tất định, không `Math.random`.
+        const L = cands.length
+        const dau = L > 0 ? hashSeed(`${tuyChon.seed ?? 0}|${sbd}|${khoa}`) % L : 0
+        let twin: CauUngVien | undefined
+        let diemTwin = Infinity
+        for (let buoc = 0; buoc < L; buoc++) {
+          const c = cands[(dau + buoc) % L]!
+          if (c.id === q || daChonId.has(c.id) || daLamSet?.has(c.id) || lamGanDay.has(c.id)) continue
+          const diem = tuyChon.demSongSinh?.get(c.id) ?? 0
+          if (diem < diemTwin) {
+            twin = c
+            diemTwin = diem
+          }
+        }
+        if (twin) {
+          songSinh.push(twin.id)
+          daChonId.add(twin.id)
+          tuyChon.demSongSinh?.set(twin.id, diemTwin + 1)
+          continue
+        }
+      } else if (muonSongSinh && infoQ && infoQ.dang && infoQ.dang !== 'chua_ro') {
         const keyDang = `${infoQ.phan}:${infoQ.dang}`
         const cands = ungVienTheoDang.get(keyDang) ?? []
         const twin = cands.find(
@@ -232,9 +403,10 @@ export function chonCauLapChoEm(
       cauGoc,
       songSinh,
       canDayLai,
+      ...themHoSo,
       soSaiCaTruoc: daSai.length,
       can,
-      lyDo: qids.length === 0 ? 'dung_het' : '',
+      lyDo: qids.length === 0 ? 'dung_het' : qids.length < can && daKhacPhuc.length > 0 ? 'da_khac_phuc' : '',
     }
   }
 
@@ -247,10 +419,24 @@ export function chonCauLapChoEm(
     cauGoc: qids,
     songSinh: [],
     canDayLai,
+    ...themHoSo,
     soSaiCaTruoc: daSai.length,
     can,
-    lyDo: conLap.length === 0 ? 'dung_het' : '',
+    lyDo: conLap.length === 0 ? 'dung_het' : qids.length < can && daKhacPhuc.length > 0 ? 'da_khac_phuc' : '',
   }
+}
+
+/** KHOÁ GHÉP SONG SINH THEO MÃ DẠNG. Trả `null` khi câu không có mã dạng — chỗ
+ * gọi lùi về khoá cũ.
+ *
+ * Luôn kèm `phan`: câu song sinh THAY câu gốc trong đúng phần đó của đề, khác
+ * phần là vỡ cấu trúc 9-2-3. Mã `CD:<chuyên đề>` (kho chưa gán mã ba tầng) thì
+ * kèm thêm lý thuyết/bài tập khi biết: cùng chuyên đề mà một câu tính toán ghép
+ * với một câu lý thuyết thì không phải song sinh. */
+function khoaMaDang(phan: PhanDe, maDang: string | null | undefined, kieu: CauUngVien['dang']): string | null {
+  const ma = String(maDang ?? '').trim()
+  if (!ma) return null
+  return ma.startsWith('CD:') && kieu && kieu !== 'chua_ro' ? `${phan}|${ma}|${kieu}` : `${phan}|${ma}`
 }
 
 export interface YeuCauDeRieng {
@@ -262,6 +448,17 @@ export interface YeuCauDeRieng {
   dsSbd: string[]
   dsCa: CaTruocDaCham[]
   ch?: CauHinhDeRieng
+  /** HỒ SƠ ÔN (19/09) — sbd → hồ sơ, từ lệnh máy chủ `hoSoOnCa`.
+   *
+   * CÓ trường này (kể cả `{}`) = ca đi ĐƯỜNG MỚI: bỏ câu đã khắc phục, câu tới
+   * hạn ôn đứng trước, song sinh ghép theo mã dạng và xoay theo em, phần câu mới
+   * né câu em vừa làm trong tuần. KHÔNG có (máy chủ chưa có lệnh, lệnh lỗi) =
+   * đúng từng dòng của bản trước, `boTheoEm` y hệt — có test khoá. */
+  hoSo?: Record<string, HoSoOnEm>
+  /** Ngày VN 'YYYY-MM-DD' của ca sắp mở. Chỗ gọi truyền vào — trong này cấm đọc đồng hồ. */
+  ngayCa?: string
+  /** qid → mã dạng của câu trong kho ca này (`dang.ma`, thiếu thì `CD:<chuyên đề>`). */
+  maDangCua?: Record<string, string>
 }
 
 export interface EmThieuLap {
@@ -302,6 +499,11 @@ export interface KetQuaDeRieng {
   canDayLai: { qid: string; dsSbd: string[] }[]
   /** Từng em rút thiếu bao nhiêu câu so với chỉ tiêu (kho không đủ câu). */
   thieuCau: { sbd: string; thieu: number }[]
+  /** KHO MỎNG PHẢI NỚI TẬP CẤM: em nào, bao nhiêu câu MỚI trong đề là câu em vừa
+   * làm trong tuần (nới câu cũ nhất trước). Rỗng = kho đủ, hoặc ca không có hồ sơ. */
+  noiCam: { sbd: string; soNoi: number }[]
+  /** sbd → câu sai ca trước KHÔNG hỏi lại vì hồ sơ nói đã khắc phục. */
+  daKhacPhucTheoEm: Record<string, string[]>
 }
 
 function tongCauCua(yc: YeuCauRut): number {
@@ -344,14 +546,22 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
   const tuCaCua: Record<string, string> = {}
   const dayLai = new Map<string, string[]>()
 
-  // PHA A — câu khắc phục riêng từng em, KHÔNG đổi so với bản trước.
+  // PHA A — câu khắc phục riêng từng em. Ca KHÔNG có hồ sơ ôn thì `tuyChonLap`
+  // là `undefined` và `chonCauLapChoEm` chạy đúng bản trước.
+  const maDangCua = y.hoSo && y.maDangCua ? new Map(Object.entries(y.maDangCua)) : undefined
+  const demSongSinh = new Map<string, number>()
+  const daKhacPhucTheoEm: Record<string, string[]> = {}
   for (let idxEm = 0; idxEm < m; idxEm++) {
     const sbd = y.dsSbd[idxEm]!
     const daLamSet = new Set<string>()
     for (const ca of y.dsCa) {
       for (const q of (ca.daLamCua[sbd] ?? [])) daLamSet.add(q)
     }
-    const lap = chonCauLapChoEm(sbd, y.dsCa, tongCau, demSai, ch, cauCua, daLamSet)
+    const tuyChonLap: TuyChonHoSoLap | undefined = y.hoSo
+      ? { hoSo: y.hoSo[sbd], ngayCa: y.ngayCa, maDangCua, seed: y.yc.seed, demSongSinh }
+      : undefined
+    const lap = chonCauLapChoEm(sbd, y.dsCa, tongCau, demSai, ch, cauCua, daLamSet, tuyChonLap)
+    if (lap.daKhacPhuc && lap.daKhacPhuc.length > 0) daKhacPhucTheoEm[sbd] = lap.daKhacPhuc
     lapCuaEm.push(lap)
     canCua[sbd] = lap.can
     saiCaTruocCua[sbd] = lap.soSaiCaTruoc
@@ -372,6 +582,7 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
   // PHA B — câu mới, dựng CHUNG cho cả lớp từng phần một, chặn đỉnh trùng.
   const qidsCuaEm: string[][] = Array.from({ length: m }, () => [])
   const thieuTongCuaEm = new Array<number>(m).fill(0)
+  const soNoiCuaEm = new Array<number>(m).fill(0)
   const ids = new Set<string>()
 
   for (const p of PHAN_DE) {
@@ -388,12 +599,24 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
     const pool = hop.length >= canP ? hop : y.uv[p]
     const idsPool = pool.map((c) => c.id)
 
-    const boPhan = sinhBoMotO(idsPool, canP, m, hashSeed(`${y.yc.seed}:${p}`), CAU_HINH_TRAN_TRUNG_MAC_DINH, Date.now(), boSan, boSan)
+    // TẬP CẤM THEO TỪNG EM = câu em vừa làm trong tuần (`lam` của hồ sơ ôn): đề
+    // thi không phát lại câu vừa giao BTVN/khắc phục/bài mẹ. Câu khắc phục của
+    // chính em (`boSan`) được MIỄN — hỏi lại câu sai là chủ ý, không phải trùng.
+    // Không em nào có `lam` dính kho phần này thì `camTheoEm` là `undefined`: đúng lời gọi cũ.
+    let camTheoEm: CamTheoEm | undefined
+    if (y.hoSo) {
+      const trongPool = new Set(idsPool)
+      const cam = y.dsSbd.map((sbd, e) => (y.hoSo?.[sbd]?.lam ?? []).filter((q) => trongPool.has(q) && !boSan[e]!.has(q)))
+      if (cam.some((c) => c.length > 0)) camTheoEm = { cam }
+    }
+
+    const boPhan = sinhBoMotO(idsPool, canP, m, hashSeed(`${y.yc.seed}:${p}`), CAU_HINH_TRAN_TRUNG_MAC_DINH, Date.now(), boSan, boSan, camTheoEm)
 
     for (let e = 0; e < m; e++) {
       const bo = boPhan[e] ?? new Set<string>()
       for (const q of bo) qidsCuaEm[e]!.push(q)
       thieuTongCuaEm[e]! += Math.max(0, canP - bo.size)
+      soNoiCuaEm[e]! += camTheoEm?.soNoi?.[e] ?? 0
     }
   }
 
@@ -404,6 +627,7 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
   const soLapCua: Record<string, number> = {}
   const thieuLap: EmThieuLap[] = []
   const thieuCau: { sbd: string; thieu: number }[] = []
+  const noiCam: { sbd: string; soNoi: number }[] = []
 
   for (let idxEm = 0; idxEm < m; idxEm++) {
     const sbd = y.dsSbd[idxEm]!
@@ -422,6 +646,7 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
     soLapCua[sbd] = soLap
     const thieuTong = thieuTongCuaEm[idxEm]!
     if (thieuTong > 0) thieuCau.push({ sbd, thieu: thieuTong })
+    if (soNoiCuaEm[idxEm]! > 0) noiCam.push({ sbd, soNoi: soNoiCuaEm[idxEm]! })
     if (soLap < can || lap.lyDo !== '') {
       const coTrongKho = lap.qids.filter((q) => cauCua.has(q)).length
       const lyDo: Exclude<LyDoThieuLap, ''> =
@@ -451,6 +676,8 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
     thieuLap,
     canDayLai: [...dayLai.entries()].map(([qid, dsSbd]) => ({ qid, dsSbd })),
     thieuCau,
+    noiCam,
+    daKhacPhucTheoEm,
   }
 }
 

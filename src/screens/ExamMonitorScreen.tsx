@@ -12,7 +12,7 @@ import { Check, RefreshCw, Trash2, ChevronRight, Lock, Unlock, Pencil, LogIn, Ba
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify } from '../engine/score'
-import { danhSachCa, type CaTomTat, danhSachEm, batDauThi, capNhatKeyBank, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
+import { danhSachCa, type CaTomTat, batDauThi, capNhatKeyBank, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
 import { chuanTenCa, tenHienCua, TEN_CA_TOI_DA } from '../lib/ten-ca'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { emLechDiem, loiBaoLechDiem } from '../lib/lech-diem'
@@ -738,12 +738,12 @@ export default function ExamMonitorScreen() {
       let bienBan: BienBanDeRieng | undefined
       let demSai: Record<string, Record<string, number>> | undefined
       if (caCanDeRieng) {
-        // Chuẩn bị cả học sinh cùng lớp chưa kịp vào phòng chờ; không đổi cổng quyền vào ca.
-        const registered = await danhSachEm(scriptUrl.trim(), secret.trim())
-        const dsCho = [...new Set([
-          ...(chiTiet.dsCho ?? []).map(x => x.sbd),
-          ...registered.filter(e => !chiTiet.ca.lop || String(e.lop).trim() === String(chiTiet.ca.lop).trim()).map(e => e.sbd),
-        ].filter(Boolean))]
+        // ĐÚNG NHỮNG EM TRONG PHÒNG CHỜ — không ∪ cả lớp đăng ký (vá 19/09). Bản 17/09
+        // gộp thêm mọi em cùng lớp: em vắng cũng chiếm một suất chia vòng tròn, nên
+        // kho mỏng bị chia cho 40 em trong khi chỉ 25 em ngồi thi — đỉnh trùng của
+        // các em CÓ MẶT cao lên vô cớ, và biên bản đếm "thiếu câu hỏi lại" cho cả em
+        // không tới. Em vào sau khi bấm Bắt đầu rơi về bốc theo hash như ca thường.
+        const dsCho = (chiTiet.dsCho ?? []).map((x) => x.sbd).filter(Boolean)
         if (dsCho.length === 0) {
           showToast('Chưa em nào vào phòng chờ — chưa rút được đề riêng.', 'error')
           setDangBatDau(false)

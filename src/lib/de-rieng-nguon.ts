@@ -6,12 +6,12 @@
 // cho một em. Quét cả thư mục năm sinh, chặn trần `TRAN_CA_QUET` ⇒ vẫn gộp cho
 // lớp 40 em, đúng ngưỡng ở bảng nghiệm thu.
 import { namSinhDaSo, namSinhTuTenCa } from './nam-sinh-ca'
-import { banDoSaiCa, chiTietCa, danhSachCa, danhSachEm, noiKhoCa } from './exam-api'
+import { banDoSaiCa, chiTietCa, danhSachCa, danhSachEm, hoSoOnCa, noiKhoCa } from './exam-api'
 import { taoChiTietCau } from './chi-tiet-cau'
 import { docDeRiengCa, loadExamSources, loadSessionTeacherBank, docSoCauCa, saveSessionTeacherBank } from './exam-db'
 import { mergeAndStrip, mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
 import { CAU_HINH_DE_RIENG_MAC_DINH, SO_CA_BOC_NGAU_NHIEN, type CauHinhDeRieng } from './cau-hinh-de-rieng'
-import { demLanSai, dungDeRieng, type CaTruocDaCham, type EmThieuLap } from './de-rieng'
+import { demLanSai, docHoSoOnEm, dungDeRieng, type CaTruocDaCham, type EmThieuLap, type HoSoOnEm } from './de-rieng'
 import { dungUngVien } from './rut-de'
 import { chuanChuyenDe } from './goi-len-bang'
 import { hashSeed } from './exam-shuffle'
@@ -305,6 +305,66 @@ export async function gomCauTuCaCu(
   return ra
 }
 
+/** Ngày VN (+07:00) 'YYYY-MM-DD' của một mốc giờ. Tầng ĐI LẤY DỮ LIỆU mới được
+ * đọc đồng hồ; lõi `de-rieng.ts` chỉ nhận ngày truyền vào. */
+export function ngayVnCua(ms: number): string {
+  return new Date(ms + 7 * 3600_000).toISOString().slice(0, 10)
+}
+
+export interface KetQuaDocHoSoOn {
+  /** sbd → hồ sơ ôn. `undefined` = KHÔNG lô nào đọc được (máy chủ chưa có lệnh,
+   * mất mạng) ⇒ chỗ gọi rút đề ĐÚNG NHƯ TRƯỚC 19/09. `{}` hoặc thiếu vài em =
+   * lệnh chạy được nhưng các em đó chưa có dòng nào / lô của các em đó hỏng. */
+  hoSo?: Record<string, HoSoOnEm>
+  /** Số em nằm trong lô KHÔNG đọc được. */
+  soEmHong: number
+  /** Lỗi của lô hỏng đầu tiên — để biên bản nói đúng chuyện đang xảy ra. */
+  loi: string
+}
+
+/** ĐỌC HỒ SƠ ÔN CHO CẢ PHÒNG CHỜ — lệnh máy chủ `hoSoOnCa`, chia lô 20 em.
+ *
+ * KHÔNG BAO GIỜ NÉM LỖI. Đây là lớp thông tin THÊM lên trên `banDoSaiCa`; nó
+ * hỏng thì ca vẫn phải mở được với đúng bộ đề bản cũ sẽ rút. Lô nào hỏng thì chỉ
+ * các em trong lô đó đi luật cũ. Hợp đồng: `docs/hop-dong-ho-so-on-ca-1909.md`. */
+export async function docHoSoOnCa(url: string, mat: string, dsSbd: string[], maCa: string, ngayCa: string, soCa: 1 | 3 = 1): Promise<KetQuaDocHoSoOn> {
+  const LO = 20
+  const ds = [...new Set(dsSbd.map((x) => String(x || '').trim()).filter(Boolean))]
+  const hoSo: Record<string, HoSoOnEm> = {}
+  let soLoDuoc = 0
+  let soEmHong = 0
+  let loi = ''
+  for (let i = 0; i < ds.length; i += LO) {
+    const lo = ds.slice(i, i + LO)
+    try {
+      const em = await hoSoOnCa(url, mat, lo, maCa, ngayCa, soCa)
+      soLoDuoc += 1
+      // Chỉ nhận em CÓ TRONG LÔ đã hỏi: máy chủ trả thừa SBD lạ thì bỏ.
+      for (const sbd of lo) if (sbd in em) hoSo[sbd] = docHoSoOnEm(em[sbd])
+    } catch (e) {
+      soEmHong += lo.length
+      if (!loi) loi = e instanceof Error ? e.message : 'không đọc được hồ sơ ôn'
+    }
+  }
+  return { hoSo: soLoDuoc > 0 ? hoSo : undefined, soEmHong, loi }
+}
+
+/** qid → MÃ DẠNG của mọi câu trong kho ca: `dang.ma` thầy đã gán lúc nạp đề,
+ * thiếu thì `CD:<chuyên đề>` — đúng quy ước máy chủ ghi vào `su_kien_hoc.ma_dang`,
+ * nên mã của câu gốc (từ hồ sơ) và mã của ứng viên song sinh (từ kho) so được. */
+export function maDangCuaKho(bank: TeacherExamSource[]): Record<string, string> {
+  const ra: Record<string, string> = {}
+  for (const s of bank) {
+    for (const q of [...s.phanI, ...s.phanII, ...s.phanIII]) {
+      const ma = String(q.dang?.ma ?? '').trim()
+      const cd = String(q.chuyenDe ?? '').trim()
+      if (ma) ra[q.id] = ma
+      else if (cd) ra[q.id] = `CD:${cd}`
+    }
+  }
+  return ra
+}
+
 /** DỰNG ĐỀ RIÊNG CHO ĐÚNG NHỮNG EM ĐANG CHỜ, gọi lúc thầy bấm BẮT ĐẦU.
  *
  * Kho lấy từ bản đề CÓ đáp án của chính ca này (đã cất lúc mở ca), số câu mỗi
@@ -340,6 +400,19 @@ export interface KetQuaDungDeRieng {
   /** Tổng số ca THI trong thư mục năm sinh đó. */
   soCaThuMuc: number
   trungBinh: number
+  /** HỒ SƠ ÔN (19/09): ca này rút theo đường nào. `coHoSo = false` = máy chủ chưa
+   * có lệnh `hoSoOnCa` hoặc lệnh lỗi ⇒ đề y hệt bản trước 19/09. */
+  hoSoOn: { coHoSo: boolean; ngayCa: string; soEmCoHoSo: number; soEmHong: number; loi: string }
+  /** Kho mỏng phải nới tập cấm: em nào nhận lại bao nhiêu câu vừa làm trong tuần. */
+  noiCam: { sbd: string; soNoi: number }[]
+  /** sbd → câu sai ca trước KHÔNG hỏi lại vì hồ sơ nói đã khắc phục. */
+  daKhacPhucTheoEm: Record<string, string[]>
+}
+
+/** Phần tuỳ chọn của `dungDeRiengChoCa` — chủ yếu để test truyền ngày cố định. */
+export interface TuyChonDungDeRieng {
+  /** Ngày VN của ca. Mặc định: ngày VN lúc thầy bấm Bắt đầu. */
+  ngayCa?: string
 }
 
 /** LỌC KHO TOÀN BỘ VỀ ĐÚNG CHUYÊN ĐỀ CỦA CA (vá 19/09 — sự cố "chọn chương 1
@@ -376,6 +449,7 @@ export async function dungDeRiengChoCa(
   maCa: string,
   dsSbd: string[],
   ch: CauHinhDeRieng = CAU_HINH_DE_RIENG_MAC_DINH,
+  tuyChon: TuyChonDungDeRieng = {},
 ): Promise<KetQuaDungDeRieng> {
   const bank = await loadSessionTeacherBank(maCa)
   if (!bank || bank.length === 0) throw new Error('Máy này chưa có bản đề CÓ đáp án của ca')
@@ -383,6 +457,16 @@ export async function dungDeRiengChoCa(
   if (!sc) throw new Error('Ca này chưa ghi số câu mỗi phần')
 
   const { dsCa, boQua, namQuet, nguonNam, soCaThuMuc } = await docCacCaTruoc(url, mat, [maCa], ch, dsSbd)
+
+  // HỒ SƠ ÔN (GĐ 6 Kênh 1, 19/09) — lớp thông tin THÊM, ≤ 3 lệnh cho 60 em.
+  // `banDoSaiCa` ở trên vẫn là nguồn của luật 30% và trần lặp; hồ sơ chỉ nói câu
+  // nào em đã tự chữa, câu nào tới hạn ôn, và tuần này em vừa làm câu gì. Lệnh
+  // hỏng ⇒ `hoSo` là `undefined` ⇒ `dungDeRieng` chạy đúng bản trước.
+  const ngayCa = tuyChon.ngayCa ?? ngayVnCua(Date.now())
+  const docHoSo = await docHoSoOnCa(url, mat, dsSbd, maCa, ngayCa, ch.PHAM_VI_HOI_LAI === 'ba_ca' ? 3 : 1)
+  // KHAI RA, không im lặng — cùng chỗ thầy vẫn đọc "ca không đọc được".
+  if (!docHoSo.hoSo) boQua.push({ maCa: 'hồ sơ ôn', vi_sao: `chưa đọc được (${docHoSo.loi || 'máy chủ chưa có lệnh'}) — rút đúng luật cũ, không phải lỗi ca` })
+  else if (docHoSo.soEmHong > 0) boQua.push({ maCa: 'hồ sơ ôn', vi_sao: `${docHoSo.soEmHong} em không đọc được hồ sơ (${docHoSo.loi}) — các em đó rút theo luật cũ` })
 
   // KÉO CÂU EM TỪNG SAI TỪ CẢ KHO VÀO CA NÀY (thầy chốt 08/09: "bất kể là tôi
   // chọn chuyên đề gì thi mà ca trước sai 9 câu phải rút đúng 3 câu đó ra vào
@@ -493,7 +577,14 @@ export async function dungDeRiengChoCa(
     dsSbd,
     dsCa,
     ch,
+    // Ba trường dưới CHỈ có khi lệnh `hoSoOnCa` chạy được. Thiếu cả ba thì lời gọi
+    // này giống hệt bản trước 19/09 và ra đúng bộ đề đó.
+    ...(docHoSo.hoSo ? { hoSo: docHoSo.hoSo, ngayCa, maDangCua: maDangCuaKho(bankDung) } : {}),
   })
+  if (ra.noiCam.length > 0) {
+    const tong = ra.noiCam.reduce((t, x) => t + x.soNoi, 0)
+    boQua.push({ maCa: 'kho mỏng', vi_sao: `${ra.noiCam.length} em phải nhận lại tổng ${tong} câu vừa làm trong tuần (đã nới câu cũ nhất trước) — thêm câu vào kho ca để hết trùng` })
+  }
   return {
     cauNoiThem,
     boTheoEm: ra.boTheoEm,
@@ -512,6 +603,15 @@ export async function dungDeRiengChoCa(
     nguonNam,
     soCaThuMuc,
     trungBinh: ra.soLapTrungBinh,
+    hoSoOn: {
+      coHoSo: Boolean(docHoSo.hoSo),
+      ngayCa,
+      soEmCoHoSo: Object.keys(docHoSo.hoSo ?? {}).length,
+      soEmHong: docHoSo.soEmHong,
+      loi: docHoSo.loi,
+    },
+    noiCam: ra.noiCam,
+    daKhacPhucTheoEm: ra.daKhacPhucTheoEm,
   }
 }
 
