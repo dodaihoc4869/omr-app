@@ -20,6 +20,7 @@ import NutQuayLai from '../components/NutQuayLai'
 import { dungM3, ThanhTren } from '../components/m3'
 import LichSuCaM3 from '../components/bang-nhiem-vu/LichSuCaM3'
 import BtvnM3 from '../components/bang-nhiem-vu/BtvnM3'
+import VaoThiForm from '../components/bang-nhiem-vu/VaoThiForm'
 import '../components/bang-nhiem-vu/sheet-m3.css'
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import {
@@ -2042,7 +2043,10 @@ export default function StudentPortalScreen() {
         {/* TAB 4: VÀO PHÒNG THI */}
         {tab === 'vaothi' && !manThi && (
           <PhongVaoThi onClose={() => setTab('diem')}>
-          <div className="max-w-xl mx-auto py-4 animate-google-fade">
+          {vaoM3 && (
+            <VaoThiForm maCa={maCaVaoThi} onMaCa={setMaCaVaoThi} matKhau={matKhauCaVaoThi} onMatKhau={setMatKhauCaVaoThi} loi={loiVaoThi} onSubmit={vaoThi} sbd={auth.sbd} hoTen={auth.hoTen} />
+          )}
+          {!vaoM3 && <div className="max-w-xl mx-auto py-4 animate-google-fade">
             <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm">
               <div className="text-center mb-6">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-purple-600/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400 mb-3 shadow-inner">
@@ -2106,7 +2110,7 @@ export default function StudentPortalScreen() {
                 </button>
               </form>
             </div>
-          </div>
+          </div>}
           </PhongVaoThi>
         )}
 
