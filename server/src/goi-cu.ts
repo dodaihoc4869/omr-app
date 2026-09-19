@@ -1340,7 +1340,14 @@ export async function moKhoaEm(env: Env, b: Record<string, unknown>): Promise<Re
   )
     .bind(`mở khoá bởi ${chuoi(b.nguoiMo) || 'thầy'}`, NAY(), maCa, sbd)
     .run()
-  return { ok: true, soDong: r.meta.changes ?? 0 }
+  // GỠ KHOÁ MÁY của lượt thi lại (`choThiLai` khoá em vào đúng máy cũ): máy cũ hỏng/mất thì thầy mở khoá để em vào máy khác. Lượt vẫn `duoc_duyet_lai`, chỉ xoá id máy.
+  const g = await env.DB.prepare(
+    `UPDATE luot SET id_thiet_bi = NULL, ghi_chu = ?, cap_nhat_luc = ?
+      WHERE ma_ca = ? AND sbd = ? AND trang_thai = 'duoc_duyet_lai' AND COALESCE(id_thiet_bi, '') <> ''`,
+  )
+    .bind(`thầy gỡ khoá máy (${chuoi(b.nguoiMo) || 'thầy'})`, NAY(), maCa, sbd)
+    .run()
+  return { ok: true, soDong: (r.meta.changes ?? 0) + (g.meta.changes ?? 0), goKhoaMay: (g.meta.changes ?? 0) > 0 }
 }
 
 /** THẦY DUYỆT CHO THI LẠI — tạo lượt MỚI, không sửa lượt cũ. */
@@ -1361,22 +1368,141 @@ export async function duyetThiLai(env: Env, b: Record<string, unknown>): Promise
   return { ok: true, lanThu }
 }
 
-/** CHO THI LẠI TỪ ĐẦU — xoá hẳn lượt của em trong ca để em vào lại như mới. */
+/** Lấy mọi mã câu trong một gói đề (ba dáng: `cau`, `items`, hoặc `phanI|phanII|phanIII`). Dáng lạ → rỗng, không đoán. */
+function qidTrongGoi(g: unknown): Set<string> {
+  const ra = new Set<string>()
+  if (!g || typeof g !== 'object') return ra
+  const o = g as Record<string, unknown>
+  const them = (a: unknown) => {
+    if (!Array.isArray(a)) return
+    for (const c of a) {
+      const q = chuoi((c as Record<string, unknown> | null)?.id ?? (c as Record<string, unknown> | null)?.qid).trim()
+      if (q) ra.add(q)
+    }
+  }
+  them(o.cau)
+  them(o.items)
+  them(o.phanI)
+  them(o.phanII)
+  them(o.phanIII)
+  return ra
+}
+
+async function docGoiR2(env: Env, khoa: string): Promise<unknown | null> {
+  try {
+    const o = await env.DE.get(khoa)
+    return o ? await new Response(o.body).json() : null
+  } catch {
+    return null
+  }
+}
+
+/** Đặt bộ câu MỚI của một em vào `bo_theo_em_json` (chép hành vi `choThiLai` của Apps Script: chỉ đổi `bo[sbd]`, xoá/đặt `lap[sbd]`, giữ mọi em khác). Dạng cũ `{sbd:[…]}` giữ nguyên hình. */
+export function datBoMoiChoEm(goiCu: string | null, sbd: string, boMoi: string[], lapMoi: unknown): string {
+  let g: Record<string, unknown> = {}
+  try {
+    const o = goiCu ? (JSON.parse(goiCu) as unknown) : null
+    if (o && typeof o === 'object' && !Array.isArray(o)) g = o as Record<string, unknown>
+  } catch { /* gói cũ hỏng: dựng lại từ đầu, chỉ còn bộ của em này */ }
+  const dangMoi = g.bo && typeof g.bo === 'object' && !Array.isArray(g.bo)
+  if (!dangMoi && Object.keys(g).length > 0) {
+    // Dạng cũ phẳng {sbd: [câu…]}: giữ nguyên hình, chỉ đổi phần của em này.
+    return JSON.stringify({ ...g, [sbd]: boMoi })
+  }
+  const bo = { ...((g.bo as Record<string, unknown> | undefined) ?? {}) }
+  const lap = { ...((g.lap as Record<string, unknown> | undefined) ?? {}) }
+  bo[sbd] = boMoi
+  if (Array.isArray(lapMoi)) lap[sbd] = lapMoi
+  else delete lap[sbd]
+  return JSON.stringify({ bo, lap, dem: g.dem ?? {}, bb: g.bb ?? null })
+}
+
+/**
+ * CHO THI LẠI TỪ ĐẦU — đúng ba việc thầy chốt 08/09 ("xoá lịch sử · vào đúng máy cũ · rút đề mới"), chép hành vi `choThiLai` của Apps Script:
+ *   1. XOÁ lượt, chi tiết từng câu, bản đồ sai, phòng chờ, tiến độ ca của ĐÚNG em này trong ca (sổ `su_kien_hoc` GIỮ: là bằng chứng học);
+ *   2. KHOÁ MÁY: lượt mới `duoc_duyet_lai` mang id thiết bị của lượt cũ (lượt GẦN NHẤT có id); cổng vào thi chặn máy khác (`sai_may`). Lượt cũ không ghi máy thì KHÔNG khoá
+ *      và phản hồi `khoaMay:false` NÓI THẬT;
+ *   3. ĐỀ MỚI: bộ câu do máy thầy rút (`boCauMoi`) ghi vào `ca.bo_theo_em_json` cho đúng em này.
+ * TỪ CHỐI (không xoá gì) khi: ca không có; em không có lượt nào; em ĐANG LÀM (`dang_lam`); bộ câu mới sai hình thức, có qid ngoài tờ đề của ca, hoặc không đọc được tờ đề để kiểm;
+ * ghi bộ mới không được. Phản hồi phản ánh SỰ THẬT (`daDoiDe`, `khoaMay`), không còn lặp lại cờ máy thầy gửi.
+ */
 export async function choThiLai(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const maCa = chuoi(b.maCa).trim()
   const sbd = chuoi(b.sbd).trim()
   if (!maCa || !sbd) return { ok: false, error: 'Thiếu mã ca hoặc số báo danh' }
+  const ca = await env.DB.prepare('SELECT ma_ca, bo_theo_em_json, bank_r2 FROM ca WHERE ma_ca = ?').bind(maCa).first<Record<string, unknown>>()
+  if (!ca) return { ok: false, error: `Không có ca ${maCa}` }
+
+  const luotCu = await env.DB.prepare('SELECT lan_thu, trang_thai, id_thiet_bi, ho_ten FROM luot WHERE ma_ca = ? AND sbd = ?').bind(maCa, sbd).all<Record<string, unknown>>()
+  const dsLuot = luotCu.results ?? []
+  if (dsLuot.length === 0) return { ok: false, error: 'Em này chưa có lượt nào trong ca' }
+  if (dsLuot.some((l) => chuoi(l.trang_thai) === 'dang_lam')) return { ok: false, error: 'Em này đang làm bài — khoá ca hoặc đợi em nộp rồi mới cho thi lại' }
+  let mayCu = ''
+  let lanCaoNhat = 0
+  let hoTen = ''
+  for (const l of dsLuot) {
+    const lan = Number(l.lan_thu) || 1
+    if (lan >= lanCaoNhat && chuoi(l.id_thiet_bi).trim()) { mayCu = chuoi(l.id_thiet_bi).trim(); lanCaoNhat = lan }
+    if (!hoTen && chuoi(l.ho_ten).trim()) hoTen = chuoi(l.ho_ten).trim()
+  }
+
+  // BỘ CÂU MỚI: kiểm hình thức và kiểm câu có thật trong tờ đề của ca TRƯỚC khi xoá bất cứ thứ gì.
+  const dsMoi = b.boCauMoi
+  const coBoMoi = Array.isArray(dsMoi) && dsMoi.length > 0
+  let boMoi: string[] = []
+  if (coBoMoi) {
+    boMoi = (dsMoi as unknown[]).map((x) => (typeof x === 'string' ? x.trim() : ''))
+    if (boMoi.length > 200 || boMoi.some((q) => q === '' || q.length > 80) || new Set(boMoi).size !== boMoi.length) {
+      return { ok: false, error: 'Bộ câu mới không hợp lệ (rỗng, trùng, quá dài hoặc quá 200 câu) — chưa xoá gì' }
+    }
+    if (!env.DE) return { ok: false, error: 'Chưa nối R2 — không kiểm được bộ câu mới, chưa xoá gì' }
+    const thuc = new Set<string>()
+    for (const khoa of [`key/${maCa}.json`, chuoi(ca.bank_r2).trim()]) {
+      if (khoa) for (const q of qidTrongGoi(await docGoiR2(env, khoa))) thuc.add(q)
+    }
+    if (thuc.size === 0) return { ok: false, error: 'Không đọc được tờ đề của ca để kiểm bộ câu mới — chưa xoá gì' }
+    const la = boMoi.filter((q) => !thuc.has(q))
+    if (la.length > 0) return { ok: false, error: `Bộ câu mới có ${la.length} câu không thuộc tờ đề của ca (ví dụ ${la.slice(0, 3).join(', ')}) — chưa xoá gì` }
+    // Ghi bản đồ đề riêng: đọc-sửa-ghi có CAS trên đúng chuỗi cũ, thử lại 3 lần (hai thầy cho hai em thi lại cùng lúc không đè mất bộ của nhau).
+    let daGhi = false
+    let goiCu = ca.bo_theo_em_json === null || ca.bo_theo_em_json === undefined ? null : chuoi(ca.bo_theo_em_json)
+    for (let lan = 0; lan < 3 && !daGhi; lan++) {
+      const moi = datBoMoiChoEm(goiCu, sbd, boMoi, b.lapMoi)
+      const r = await env.DB.prepare("UPDATE ca SET bo_theo_em_json = ?, cap_nhat_luc = ? WHERE ma_ca = ? AND COALESCE(bo_theo_em_json, '') = ?").bind(moi, NAY(), maCa, goiCu ?? '').run()
+      if (r.meta.changes) daGhi = true
+      else goiCu = (await env.DB.prepare('SELECT bo_theo_em_json FROM ca WHERE ma_ca = ?').bind(maCa).first<{ bo_theo_em_json: string | null }>())?.bo_theo_em_json ?? null
+    }
+    if (!daGhi) return { ok: false, error: 'Không ghi được bộ câu mới (ca vừa được sửa ở chỗ khác) — chưa xoá lượt cũ, thử lại' }
+  }
+
+  // XOÁ + LƯỢT MỚI trong MỘT giao dịch. Mọi câu đều kèm điều kiện "em không đang làm bài" để nếu em vừa bấm vào thì KHÔNG xoá gì.
+  const KHONG_DANG_LAM = 'NOT EXISTS (SELECT 1 FROM luot x WHERE x.ma_ca = ? AND x.sbd = ? AND x.trang_thai = \'dang_lam\')'
+  const nay = NAY()
   const r = await env.DB.batch([
-    env.DB.prepare('DELETE FROM luot WHERE ma_ca = ? AND sbd = ?').bind(maCa, sbd),
-    env.DB.prepare('DELETE FROM chi_tiet_cau WHERE ma_ca = ? AND sbd = ?').bind(maCa, sbd),
-    env.DB.prepare('DELETE FROM phong_cho WHERE ma_ca = ? AND sbd = ?').bind(maCa, sbd),
+    env.DB.prepare(`DELETE FROM chi_tiet_cau WHERE ma_ca = ? AND sbd = ? AND ${KHONG_DANG_LAM}`).bind(maCa, sbd, maCa, sbd),
+    env.DB.prepare(`DELETE FROM ban_do_sai WHERE ma_ca = ? AND sbd = ? AND ${KHONG_DANG_LAM}`).bind(maCa, sbd, maCa, sbd),
+    env.DB.prepare(`DELETE FROM phong_cho WHERE ma_ca = ? AND sbd = ? AND ${KHONG_DANG_LAM}`).bind(maCa, sbd, maCa, sbd),
+    env.DB.prepare(`DELETE FROM tien_do_ca WHERE ma_ca = ? AND sbd = ? AND ${KHONG_DANG_LAM}`).bind(maCa, sbd, maCa, sbd),
+    env.DB.prepare(`DELETE FROM luot WHERE ma_ca = ? AND sbd = ? AND ${KHONG_DANG_LAM}`).bind(maCa, sbd, maCa, sbd),
+    env.DB.prepare(
+      `INSERT INTO luot (khoa, ma_ca, sbd, lan_thu, id_thiet_bi, vao_luc, trang_thai, so_lan_roi_man, tong_giay_roi_man, ghi_chu, ho_ten, duyet_boi, duyet_luc, cap_nhat_luc)
+       SELECT ?, ?, ?, 1, ?, ?, 'duoc_duyet_lai', 0, 0, ?, ?, ?, ?, ? WHERE ${KHONG_DANG_LAM} ON CONFLICT(khoa) DO NOTHING`,
+    ).bind(
+      `${maCa}|${sbd}|1`, maCa, sbd, mayCu || null, nay,
+      mayCu ? 'thi lại — khoá đúng máy cũ' : 'thi lại — lượt cũ không ghi máy, không khoá được', hoTen, chuoi(b.nguoiDuyet) || 'thầy', nay, nay, maCa, sbd,
+    ),
   ])
+  const daTao = (r[5]?.meta?.changes ?? 0) > 0
+  if (!daTao) return { ok: false, error: 'Em này vừa vào làm bài — chưa xoá gì, đợi em nộp rồi cho thi lại', daGhiBoMoi: coBoMoi }
   return {
     ok: true,
-    soLuotXoa: r[0]?.meta?.changes ?? 0,
-    soCauXoa: r[1]?.meta?.changes ?? 0,
-    khoaMay: b.lapMoi === true,
-    daDoiDe: b.boCauMoi === true,
+    soLuotXoa: r[4]?.meta?.changes ?? 0,
+    soCauXoa: r[0]?.meta?.changes ?? 0,
+    soBanDoSaiXoa: r[1]?.meta?.changes ?? 0,
+    // Nói THẬT: khoá máy = lượt cũ có id máy VÀ lượt khoá đã tạo; đổi đề = bộ mới ĐÃ ghi vào bản đồ.
+    khoaMay: !!mayCu,
+    daDoiDe: coBoMoi,
+    lanThu: 1,
   }
 }
 
