@@ -13,7 +13,7 @@
 // nhìn thấy.
 import { useEffect, useState } from 'react'
 import { Eye, EyeOff, KeyRound, Loader2 } from 'lucide-react'
-import LogoGiaoVien from '../components/LogoGiaoVien'
+import { LogoDoc } from '../components/LogoVai'
 import { NutChinh, OThongBao, TheNoiDung } from '../components/DesignSystem'
 import { batKhoaApp, loadTeacherSecret, saveKhoaApp } from '../lib/exam-db'
 import { LOI_SAI_MAT_KHAU, TOI_THIEU_KY_TU, conChoGiay, datMatKhau, hopLeMatKhau, moKhoa, sauKhiDung, sauKhiSai, type BanGhiKhoa } from '../lib/khoa-app'
@@ -165,16 +165,8 @@ export default function KhoaAppScreen({ pha, banGhi, onMoDuoc }: KhoaAppScreenPr
     <div className="min-h-screen flex items-center justify-center px-4 py-8" style={{ background: 'var(--nen)', color: 'var(--muc)', fontFamily: 'var(--serif)' }}>
       <div className="w-full" style={{ maxWidth: 400 }}>
         <TheNoiDung>
-          <div className="text-center" style={{ marginBottom: 'var(--k5)' }}>
-            <div className="flex justify-center" style={{ marginBottom: 'var(--k3)' }}>
-              <LogoGiaoVien size={52} hienChu={false} />
-            </div>
-            <div className="font-bold tracking-tight text-slate-900 dark:text-white" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-5)' }}>
-              ĐỖ ĐẠI HỌC
-            </div>
-            <div className="text-xs font-bold tracking-wider uppercase text-blue-600 dark:text-blue-400 mt-1" style={{ fontFamily: 'var(--sans)' }}>
-              Kiên Trì
-            </div>
+          <div style={{ marginBottom: 'var(--k5)' }}>
+            <LogoDoc vai="gv" size={64} />
           </div>
 
           <div className="flex flex-col" style={{ gap: 'var(--k4)' }}>

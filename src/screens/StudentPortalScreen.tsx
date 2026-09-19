@@ -59,7 +59,7 @@ import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
-import LogoHocSinh from '../components/LogoHocSinh'
+import { LogoDoc } from '../components/LogoVai'
 // HAI GAME NẠP MUỘN — đo 14/09: mã game nặng ~234 KB nguồn, mà nhập thẳng
 // vào đây là nó rơi vào MẢNH MÃ CHÍNH (755 KB), thứ MỌI người tải, kể cả phụ
 // huynh chỉ mở một trang báo cáo trên điện thoại. Em nào mở tab game mới tải,
@@ -1118,19 +1118,8 @@ export default function StudentPortalScreen() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-50 to-blue-50/20 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 flex flex-col justify-center items-center p-4">
         <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200/80 dark:border-slate-800 p-8 transition-all">
-          <div className="text-center mb-6">
-            <div className="flex justify-center mb-3">
-              <LogoHocSinh size={54} hienChu={false} />
-            </div>
-            <div
-              className="text-2xl font-black tracking-tight text-slate-900 dark:text-white"
-              style={{ fontFamily: 'var(--sans)' }}
-            >
-              ĐỖ ĐẠI HỌC
-            </div>
-            <div className="text-xs font-bold tracking-wider uppercase text-emerald-600 dark:text-emerald-400 mt-1" style={{ fontFamily: 'var(--sans)' }}>
-              Kiên Trì
-            </div>
+          <div className="mb-6">
+            <LogoDoc vai="hs" size={64} />
           </div>
 
           {chuaCoMatKhau ? (

@@ -1,0 +1,73 @@
+/* Chữ đi kèm logo ĐỖ ĐẠI HỌC (thanh trên ngang + khối đăng nhập dọc). Bộ logo do thầy chốt 19/09/2026 —
+ * docs/logo-1909/DOC-TRUOC.md: "ĐỖ ĐẠI HỌC" đậm + nhãn vai trò dạng viên thuốc + dòng `6,022 · 10²³` nghiêng có chân.
+ * Màu chữ đi qua biến của tokens.css (--muc / --nhat: sáng/tối theo hệ thống; dưới `.m3` tự đổi sang vai trò M3).
+ * Nhãn vai trò: mỗi app một cặp nền nhạt + chữ đậm cùng họ màu với hình khối (xanh dương / xanh lá / cam). */
+.logo-ddh-ten {
+  font-family: var(--sans);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  color: var(--muc);
+  white-space: nowrap; /* thanh trên hẹp: nhãn vai trò tụt xuống dòng dưới, KHÔNG bẻ chữ ĐỖ ĐẠI HỌC làm đôi */
+}
+.logo-ddh-ten--lon {
+  font-size: var(--cx-5, 24px);
+  margin: 0;
+}
+.logo-ddh-vien {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.logo-ddh-vien[data-vai='gv'] {
+  background: rgb(219 231 251);
+  color: rgb(11 87 208);
+}
+.logo-ddh-vien[data-vai='hs'] {
+  background: rgb(201 240 216);
+  color: rgb(19 115 51);
+}
+.logo-ddh-vien[data-vai='ph'] {
+  background: rgb(255 220 200);
+  color: rgb(165 60 8);
+}
+.logo-ddh-hang-so {
+  font-family: Didot, 'Bodoni 72', Georgia, serif;
+  font-style: italic;
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--nhat);
+}
+/* khối dọc (màn đăng nhập): hình, tên, nhãn vai trò, hằng số — canh giữa */
+.logo-ddh-doc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+.logo-ddh-doc > img {
+  margin-bottom: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .logo-ddh-vien[data-vai='gv'] {
+    background: rgb(28 45 82);
+    color: rgb(166 200 255);
+  }
+  .logo-ddh-vien[data-vai='hs'] {
+    background: rgb(19 60 36);
+    color: rgb(157 224 180);
+  }
+  .logo-ddh-vien[data-vai='ph'] {
+    background: rgb(74 34 12);
+    color: rgb(255 190 150);
+  }
+}

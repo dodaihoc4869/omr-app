@@ -1,16 +1,24 @@
 // BỘ LOGO MỚI (thầy chốt 19/09): tài nguyên trong public/ là bản sinh từ docs/logo-1909/ bằng scripts/sinh-logo-png.mjs.
 // Nhóm 1 (tài nguyên + script): đủ tệp, đúng cỡ, SVG tự chứa và nhẹ, khớp nguồn, mobileconfig nhúng đúng biểu tượng.
 // (Các nhóm sau — manifest/html, component — thêm phép kiểm vào cuối tệp này.)
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
+import { cleanup, render } from '@testing-library/react'
+import React from 'react'
 import fs from 'node:fs'
 import path from 'node:path'
 // @ts-expect-error — tệp .mjs của scripts/, không có khai báo kiểu
 import { BAN_CHEP, BAN_PNG, BAN_MOBILECONFIG, thayIcon } from '../scripts/sinh-logo-png.mjs'
+import LogoGiaoVien from '../src/components/LogoGiaoVien'
+import LogoPhuHuynh from '../src/components/LogoPhuHuynh'
+import LogoDDH from '../src/components/LogoDDH'
+import LogoApp from '../src/components/LogoApp'
+import { AnhLogo, LogoDoc, LogoNgang, NHAN_VAI, tepLogo } from '../src/components/LogoVai'
 
 const goc = process.cwd()
 const docBuf = (p: string) => fs.readFileSync(path.join(goc, p))
 const doc = (p: string) => docBuf(p).toString('utf8')
 const VAI = ['gv', 'hs', 'ph'] as const
+afterEach(cleanup)
 
 /** Đọc khối IHDR: rộng, cao, kiểu màu (2 = RGB không alpha, 6 = RGBA). */
 function ihdr(buf: Buffer) {
@@ -159,4 +167,128 @@ describe('service worker + cấu hình PWA', () => {
     for (const t of muc.filter((x) => !x.includes('*'))) expect(fs.existsSync(path.join(goc, 'public', t)), t).toBe(true)
     expect(v).not.toMatch(/icon-(hs|ph)-/)
   })
+})
+
+// ───────────────────────── nhóm 3: component logo (giáo viên · phụ huynh · trần) + khối đăng nhập ─────────────────────────
+const srcImg = (c: HTMLElement) => c.querySelector('img')!.getAttribute('src')!
+describe('LogoVai: bản nét đậm cho cỡ ≤ 40 px, bản thường cho cỡ lớn; KHÔNG bo góc / cắt thêm', () => {
+  it('tepLogo: 24, 38, 40 → -nho; 41, 54, 64 → thường; tên -v3', () => {
+    for (const v of VAI) {
+      for (const co of [24, 38, 40]) expect(tepLogo(v, co)).toBe(`logo-${v}-nho-v3.svg`)
+      for (const co of [41, 54, 64]) expect(tepLogo(v, co)).toBe(`logo-${v}-v3.svg`)
+    }
+  })
+
+  it('AnhLogo: <img> SVG tĩnh đúng cỡ, alt rỗng (trang trí) trừ khi truyền, KHÔNG có lớp rounded-* (hình khối đã nằm trong SVG)', () => {
+    const { container } = render(<AnhLogo vai="hs" size={64} />)
+    const i = container.querySelector('img')!
+    expect(i.getAttribute('src')).toMatch(/logo-hs-v3\.svg$/)
+    expect([i.getAttribute('width'), i.getAttribute('height'), i.getAttribute('alt')]).toEqual(['64', '64', ''])
+    expect(i.className).not.toMatch(/rounded/)
+    expect(render(<AnhLogo vai="gv" size={48} alt="Đỗ Đại Học" />).container.querySelector('img')!.getAttribute('alt')).toBe('Đỗ Đại Học')
+  })
+
+  it('không tệp component logo nào còn bo góc, trỏ -v2 hay nhúng mã màu', () => {
+    for (const t of ['LogoVai', 'LogoGiaoVien', 'LogoPhuHuynh', 'LogoDDH', 'LogoApp']) {
+      const c = doc(`src/components/${t}.tsx`)
+      expect(c, t).not.toMatch(/rounded-|-v2|#[0-9a-fA-F]{3,8}\b|rgb\(/)
+    }
+  })
+})
+
+describe('LogoGiaoVien / LogoPhuHuynh / LogoApp: hình + chữ theo bản vẽ đã chốt', () => {
+  it('thanh trên 38 px: bản nét đậm; chữ ĐỖ ĐẠI HỌC + viên thuốc vai trò + `6,022 · 10²³`; hết dòng "Kiên Trì"', () => {
+    for (const [C, v, nhan] of [[LogoGiaoVien, 'gv', 'GIÁO VIÊN'], [LogoPhuHuynh, 'ph', 'PHỤ HUYNH']] as const) {
+      const { container, unmount } = render(<C size={38} hienChu />)
+      expect(srcImg(container)).toMatch(new RegExp(`logo-${v}-nho-v3\\.svg$`))
+      expect(container.querySelector('.logo-ddh-ten')!.textContent).toBe('ĐỖ ĐẠI HỌC')
+      const vien = container.querySelector('.logo-ddh-vien') as HTMLElement
+      expect([vien.textContent, vien.getAttribute('data-vai')]).toEqual([nhan, v])
+      expect(container.querySelector('.logo-ddh-hang-so')!.textContent).toBe('6,022 · 10²³')
+      expect(container.textContent).not.toContain('Kiên Trì')
+      unmount()
+    }
+  })
+
+  it('chỉ hình (hienChu=false): không chữ nào; cỡ 52 dùng bản thường; phuDe ghi đè nhãn vai trò', () => {
+    const a = render(<LogoGiaoVien size={52} />)
+    expect(srcImg(a.container)).toMatch(/logo-gv-v3\.svg$/)
+    expect(a.container.textContent).toBe('')
+    a.unmount()
+    const b = render(<LogoPhuHuynh size={38} hienChu phuDe="PH · LỚP 12" />)
+    expect(b.container.querySelector('.logo-ddh-vien')!.textContent).toBe('PH · LỚP 12')
+  })
+
+  it('LogoApp chọn đúng logo theo vai (mặc định giáo viên; phụ huynh) và truyền phuDe; LogoDDH là hình trần có alt', () => {
+    expect(srcImg(render(<LogoApp size={56} />).container)).toMatch(/logo-gv-v3\.svg$/)
+    cleanup()
+    const { container } = render(<LogoApp vai="phuhuynh" size={38} hienChu phuDe="PHỤ HUYNH" />)
+    expect(srcImg(container)).toMatch(/logo-ph-nho-v3\.svg$/)
+    expect(container.querySelector('.logo-ddh-vien')!.textContent).toBe('PHỤ HUYNH')
+    cleanup()
+    const d = render(<LogoDDH size={48} />).container.querySelector('img')!
+    expect([d.getAttribute('src'), d.getAttribute('alt')]).toEqual([expect.stringMatching(/logo-gv-v3\.svg$/), 'Đỗ Đại Học'])
+  })
+
+  it('LogoNgang: nhãn vai trò mặc định theo vai', () => {
+    for (const v of VAI) expect(render(<LogoNgang vai={v} hienChu />).container.querySelector('.logo-ddh-vien')!.textContent).toBe(NHAN_VAI[v])
+  })
+})
+
+describe('LogoDoc (khối thương hiệu dọc của màn đăng nhập)', () => {
+  it('hình 64 px + ĐỖ ĐẠI HỌC + nhãn vai trò + hằng số, canh giữa; tieuDe → h1', () => {
+    const { container } = render(<LogoDoc vai="ph" size={64} tieuDe />)
+    expect(srcImg(container)).toMatch(/logo-ph-v3\.svg$/)
+    expect(container.querySelector('h1')!.textContent).toBe('ĐỖ ĐẠI HỌC')
+    expect(container.querySelector('.logo-ddh-vien')!.textContent).toBe('PHỤ HUYNH')
+    expect(container.querySelector('.logo-ddh-hang-so')!.textContent).toBe('6,022 · 10²³')
+    cleanup()
+    expect(render(<LogoDoc vai="hs" />).container.querySelector('h1')).toBeNull()
+  })
+
+  it('3 màn đăng nhập (giáo viên khoá app, học sinh, phụ huynh) dùng LogoDoc; hết khối tay "ĐỖ ĐẠI HỌC" + "Kiên Trì"', () => {
+    for (const [t, v] of [['KhoaAppScreen', 'gv'], ['StudentPortalScreen', 'hs'], ['ParentPortalScreen', 'ph']] as const) {
+      const c = doc(`src/screens/${t}.tsx`)
+      expect(c, t).toContain("import { LogoDoc } from '../components/LogoVai'")
+      expect(c, t).toMatch(new RegExp(`<LogoDoc vai="${v}" size=\\{64\\}`))
+      expect(c, t).not.toContain('Kiên Trì')
+    }
+  })
+})
+
+describe('logo-ddh.css: màu chữ qua biến, không mã hex; nhãn vai trò đạt tương phản 4,5:1 ở cả sáng lẫn tối', () => {
+  const css = doc('src/components/logo-ddh.css')
+  const rgb = (s: string) => s.match(/\d+/g)!.slice(0, 3).map(Number)
+  const lum = ([r, g, b]: number[]) => {
+    const f = (v: number) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
+  }
+  const tuongPhan = (a: number[], b: number[]) => {
+    const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p)
+    return (x + 0.05) / (y + 0.05)
+  }
+  const cap = (vai: string, khoi: string) => {
+    const m = new RegExp(`\\.logo-ddh-vien\\[data-vai='${vai}'\\] \\{\\s*background: (rgb\\([^)]*\\));\\s*color: (rgb\\([^)]*\\));`).exec(khoi)!
+    return { nen: rgb(m[1]), chu: rgb(m[2]) }
+  }
+  const [sang, toi] = [css.split('@media')[0], css.split('@media')[1]]
+
+  it('không mã hex, không !important; tên và hằng số lấy --muc / --nhat', () => {
+    expect(css).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
+    expect(css.replace(/\/\*[\s\S]*?\*\//g, '')).not.toContain('!important')
+    expect(css).toMatch(/\.logo-ddh-ten \{[^}]*color: var\(--muc\)/)
+    expect(css).toMatch(/\.logo-ddh-hang-so \{[^}]*color: var\(--nhat\)/)
+    expect(css).toMatch(/\.logo-ddh-hang-so \{[^}]*font-style: italic/)
+    expect(css).toMatch(/Didot, 'Bodoni 72', Georgia, serif/)
+    expect(css).toMatch(/\.logo-ddh-ten \{[^}]*white-space: nowrap/)
+  })
+
+  for (const v of VAI) {
+    it(`nhãn ${v}: chữ / nền ≥ 4,5:1 — sáng và tối`, () => {
+      const a = cap(v, sang)
+      const b = cap(v, toi)
+      expect(tuongPhan(a.chu, a.nen), `${v} sáng`).toBeGreaterThanOrEqual(4.5)
+      expect(tuongPhan(b.chu, b.nen), `${v} tối`).toBeGreaterThanOrEqual(4.5)
+    })
+  }
 })

@@ -20,6 +20,7 @@ import {
   X,
 } from 'lucide-react'
 import LogoApp from '../components/LogoApp'
+import { LogoDoc } from '../components/LogoVai'
 import NutQuayLai from '../components/NutQuayLai'
 import InfographicHuongDan from '../components/InfographicHuongDan'
 import KhungXemPhieu from '../components/KhungXemPhieu'
@@ -546,16 +547,8 @@ export default function ParentPortalScreen() {
 
         <main className="flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200 dark:border-slate-800 animate-google-fade">
-            <div className="text-center mb-6">
-              <div className="flex justify-center mb-3">
-                <LogoApp vai="phuhuynh" size={54} hienChu={false} />
-              </div>
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white" style={{ fontFamily: 'var(--sans)' }}>
-                ĐỖ ĐẠI HỌC
-              </h1>
-              <div className="text-xs font-bold tracking-wider uppercase text-blue-600 dark:text-blue-400 mt-1" style={{ fontFamily: 'var(--sans)' }}>
-                Kiên Trì
-              </div>
+            <div className="mb-6">
+              <LogoDoc vai="ph" size={64} tieuDe />
             </div>
 
             <form
