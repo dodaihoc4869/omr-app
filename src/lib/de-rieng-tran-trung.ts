@@ -60,13 +60,21 @@ function xao<T>(ds: T[], r: () => number): T[] {
  * `boSan` (tuỳ chọn) — mỗi em có thể đã CÓ SẴN một ít câu từ trước (câu khắc
  * phục cá nhân, không phải chỗ này chọn). Những câu đó tính vào đúng chỉ tiêu
  * `k` của em luôn — vòng lặp chỉ bù phần CÒN THIẾU, không phát thêm cho em đã
- * đủ. Không truyền thì coi như mọi em bắt đầu từ rỗng, hệt bản gốc. */
-export function chiaVongTron(ids: string[], k: number, m: number, seed: number, boSan?: Set<string>[]): Set<string>[] {
+ * đủ. Không truyền thì coi như mọi em bắt đầu từ rỗng, hệt bản gốc.
+ *
+ * `cam` (tuỳ chọn, 19/09) — tập CẤM THEO TỪNG EM: câu em vừa làm trong tuần ở
+ * BTVN/khắc phục/bài mẹ giao thì đề thi không phát lại. Phải là tập ĐÃ NỚI SẴN
+ * bằng `noiTapCam` (kho mỏng mà cấm cứng thì em thiếu câu); `sinhBoMotO` lo việc
+ * đó. Không truyền, hoặc mọi tập đều rỗng ⇒ đúng thuật toán cũ. */
+export function chiaVongTron(ids: string[], k: number, m: number, seed: number, boSan?: Set<string>[], cam?: Set<string>[]): Set<string>[] {
   const N = ids.length
   const bo: Set<string>[] = Array.from({ length: m }, (_, e) => new Set<string>(boSan?.[e] ?? []))
   if (N === 0 || k <= 0 || m <= 0) return bo
   const can = Math.min(k, N)
   const thu = xao(ids, bocSo(seed))
+  // Có tập cấm thật sự thì đi nhánh riêng; KHÔNG có (hoặc toàn rỗng) thì chạy
+  // đúng vòng lặp cũ bên dưới, từng bước một — ca không có hồ sơ ôn ra y hệt bản trước.
+  if (cam && cam.some((c) => c && c.size > 0)) return chiaVongTronCoCam(thu, can, m, bo, cam)
   let i = 0
   for (let vong = 0; vong < can; vong++) {
     for (let e = 0; e < m; e++) {
@@ -79,6 +87,89 @@ export function chiaVongTron(ids: string[], k: number, m: number, seed: number, 
       }
       bo[e].add(thu[i % N])
       i++
+    }
+  }
+  return bo
+}
+
+/** TẬP CẤM THEO TỪNG EM, dạng chỗ gọi đưa vào `sinhBoMotO`. */
+export interface CamTheoEm {
+  /** `cam[e]` = qid KHÔNG phát cho em thứ `e`, câu em làm MỚI NHẤT đứng ĐẦU —
+   * thứ tự là một phần đầu vào: kho mỏng thì nới từ CUỐI mảng (cũ nhất trước). */
+  cam: string[][]
+  /** Hàm GHI vào đây, không đọc: `soNoi[e]` = số câu cấm đã phải nới cho em `e`.
+   * Bằng 0 hết = kho đủ, không em nào phải nhận lại câu vừa làm. */
+  soNoi?: number[]
+}
+
+/** NỚI TẬP CẤM CỦA ĐÚNG EM THIẾU CÂU — và ĐẾM số câu đã nới, không im lặng.
+ *
+ * Em `e` còn cần `can − |boSan[e]|` câu. Kho trừ câu em đã có, trừ câu cấm, mà
+ * còn ít hơn ngần ấy thì cấm cứng sẽ làm em THIẾU CÂU — tệ hơn nhiều so với
+ * gặp lại một câu cũ. Nên gỡ cấm vừa đủ số thiếu, câu CŨ NHẤT trước (cuối mảng):
+ * câu làm 6 ngày trước gặp lại đỡ hại hơn câu làm tối qua.
+ *
+ * Chỉ nới của em thiếu. Em khác kho vẫn đủ thì tập cấm của em đó giữ nguyên. */
+export function noiTapCam(ids: string[], k: number, m: number, boSan: Set<string>[] | undefined, cam: string[][]): { cam: Set<string>[]; soNoi: number[] } {
+  const trongKho = new Set(ids)
+  const can = Math.min(k, ids.length)
+  const ra: Set<string>[] = []
+  const soNoi = new Array<number>(m).fill(0)
+  for (let e = 0; e < m; e++) {
+    const daCo = boSan?.[e] ?? new Set<string>()
+    // Chỉ giữ câu CÓ TRONG KHO và em CHƯA có: câu ngoài kho cấm hay không cũng
+    // thế, đếm vào là báo "đã nới" cho một câu chẳng bao giờ phát được.
+    const thuTu = [...new Set(cam[e] ?? [])].filter((q) => trongKho.has(q) && !daCo.has(q))
+    let soDaCoTrongKho = 0
+    for (const q of daCo) if (trongKho.has(q)) soDaCoTrongKho++
+    const conCan = Math.max(0, can - daCo.size)
+    const conPhatDuoc = ids.length - soDaCoTrongKho - thuTu.length
+    const phaiNoi = Math.min(thuTu.length, Math.max(0, conCan - conPhatDuoc))
+    soNoi[e] = phaiNoi
+    ra.push(new Set(phaiNoi > 0 ? thuTu.slice(0, thuTu.length - phaiNoi) : thuTu))
+  }
+  return { cam: ra, soNoi }
+}
+
+/** Pha 1 khi CÓ tập cấm. Vẫn là một dòng chảy duy nhất `thu` lặp vòng, mỗi em
+ * tới lượt lấy câu SỚM NHẤT trong dòng mà mình nhận được.
+ *
+ * Khác vòng lặp gốc ở đúng một chỗ: câu em này không nhận được (đã có, hoặc bị
+ * cấm) KHÔNG bị bỏ phí — nó vào hàng `hoan` và em kế tiếp nhận được thì lấy
+ * trước khi con trỏ đi tiếp. Bỏ phí như vòng gốc thì câu cả lớp vừa làm ở BTVN
+ * kéo lệch tần suất của mọi câu đứng sau nó; xếp hàng thì câu nào không ai cấm
+ * vẫn được dùng đều, chênh nhau tối đa 1. */
+function chiaVongTronCoCam(thu: string[], can: number, m: number, bo: Set<string>[], cam: Set<string>[]): Set<string>[] {
+  const N = thu.length
+  const hoan: string[] = []
+  const trongHoan = new Set<string>()
+  const duoc = (e: number, x: string) => !bo[e].has(x) && !cam[e]?.has(x)
+  let i = 0
+  for (let vong = 0; vong < can; vong++) {
+    for (let e = 0; e < m; e++) {
+      if (bo[e].size >= can) continue
+      let lay: string | undefined
+      for (let h = 0; h < hoan.length; h++) {
+        if (duoc(e, hoan[h])) {
+          lay = hoan[h]
+          hoan.splice(h, 1)
+          trongHoan.delete(lay)
+          break
+        }
+      }
+      for (let dem = 0; lay === undefined && dem < N; dem++) {
+        const x = thu[i % N]
+        i++
+        if (duoc(e, x)) lay = x
+        else if (!trongHoan.has(x)) {
+          hoan.push(x)
+          trongHoan.add(x)
+        }
+      }
+      // LƯỚI AN TOÀN: tập cấm chưa qua `noiTapCam` mà kín cả kho. Thà phát một
+      // câu cấm còn hơn để em thiếu câu; đường `sinhBoMotO` không bao giờ tới đây.
+      for (let d = 0; lay === undefined && d < N; d++) if (!bo[e].has(thu[(i + d) % N])) lay = thu[(i + d) % N]
+      if (lay !== undefined) bo[e].add(lay)
     }
   }
   return bo
@@ -142,13 +233,18 @@ export function doTrung(bo: Set<string>[]): DoTrung {
  * cá nhân (em sai câu gì phải nhận đúng câu đó) không phải chỗ pha này được
  * quyền động vào. Một cặp trùng chỉ vì cùng dính câu khoá thì ĐÀNH CHỊU — đó
  * là trùng thật của lịch sử làm bài, không phải lỗi thuật toán, và không có
- * quyền sửa bằng cách rút mất câu khắc phục của em. */
+ * quyền sửa bằng cách rút mất câu khắc phục của em.
+ *
+ * `cam` (tuỳ chọn, 19/09) — tập cấm theo từng em, ĐÃ NỚI: phép đổi nào đưa một
+ * câu cấm vào tay đúng em bị cấm thì bỏ. Pha 1 tránh được mà pha 2 đổi trả lại
+ * thì tập cấm thành vô nghĩa. */
 export function haDinh(
   boVao: Set<string>[],
   seed: number,
   cauHinh: CauHinhDeRiengTranTrung = CAU_HINH_TRAN_TRUNG_MAC_DINH,
   batDauMs = Date.now(),
   khoa?: Set<string>[],
+  cam?: Set<string>[],
 ): Set<string>[] {
   const bo = boVao.map((s) => new Set(s))
   const m = bo.length
@@ -217,10 +313,11 @@ export function haDinh(
     khongDoiLien = 0 // có câu chung hợp lệ để thử — không tính là quẩn
     const q = chung[Math.floor(r() * chung.length)]
     const c = Math.floor(r() * m)
-    if (c === a || c === b || bo[c].has(q)) continue
+    // `q` nằm trong tập cấm của `c` (em vừa làm câu đó trong tuần) thì không đổi sang `c`.
+    if (c === a || c === b || bo[c].has(q) || cam?.[c]?.has(q)) continue
     // Câu em `c` ĐƯỢC PHÉP nhả ra — bỏ câu khoá của `c` khỏi ứng viên.
     const ung: string[] = []
-    for (const x of bo[c]) if (!bo[a].has(x) && !khoa?.[c]?.has(x)) ung.push(x)
+    for (const x of bo[c]) if (!bo[a].has(x) && !khoa?.[c]?.has(x) && !cam?.[a]?.has(x)) ung.push(x)
     if (ung.length === 0) continue
     const p = ung[Math.floor(r() * ung.length)]
 
@@ -265,7 +362,11 @@ export function haDinh(
  *
  * `boSan`/`khoa` tuỳ chọn — xem `chiaVongTron` và `haDinh`. Truyền cả hai khi
  * một số em đã có sẵn câu KHÔNG ĐƯỢC ĐỘNG (câu khắc phục cá nhân): pha 1 tính
- * chúng vào đúng chỉ tiêu, pha 2 không bao giờ đổi chúng đi. */
+ * chúng vào đúng chỉ tiêu, pha 2 không bao giờ đổi chúng đi.
+ *
+ * `camTheoEm` tuỳ chọn — xem `CamTheoEm`. Không truyền (hoặc mọi tập rỗng) thì
+ * kết quả y hệt bản trước; có truyền thì `camTheoEm.soNoi` được GHI lại để chỗ
+ * gọi báo thầy bao nhiêu câu phải nới vì kho mỏng. */
 export function sinhBoMotO(
   ids: string[],
   k: number,
@@ -275,10 +376,14 @@ export function sinhBoMotO(
   batDauMs = Date.now(),
   boSan?: Set<string>[],
   khoa?: Set<string>[],
+  camTheoEm?: CamTheoEm,
 ): Set<string>[] {
-  const pha1 = chiaVongTron(ids, k, m, seed, boSan)
+  // Tập cấm: nới TRƯỚC cho em nào kho không đủ, rồi cả hai pha dùng chung bản đã nới.
+  const noi = camTheoEm ? noiTapCam(ids, k, m, boSan, camTheoEm.cam) : undefined
+  if (camTheoEm && noi) camTheoEm.soNoi = noi.soNoi
+  const pha1 = chiaVongTron(ids, k, m, seed, boSan, noi?.cam)
   if (m < 2 || k <= 0 || ids.length === 0) return pha1
-  return haDinh(pha1, seed ^ 0x5bf03635, cauHinh, batDauMs, khoa)
+  return haDinh(pha1, seed ^ 0x5bf03635, cauHinh, batDauMs, khoa, noi?.cam)
 }
 
 /** Tần suất dùng của từng câu — max trừ min. Pha 1 bảo đảm ≤ 1. */
