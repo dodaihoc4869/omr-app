@@ -94,6 +94,22 @@
 - [x] Dừng, KHÔNG làm GĐ 3–6  | bằng chứng: không sửa `tro-ly-ca-nhan.ts`, `html-phieu.ts`, `btvn-cho-em.ts`, `StudentPortalScreen.tsx`, `ParentPortalScreen.tsx`; GĐ 3–6 chưa bắt đầu.
 - [x] Báo giới hạn dùng còn lại  | bằng chứng: xem báo cáo cuối lượt.
 
+### GĐ 5 — Kênh 4 (thần thú) + Kênh 5 (phụ huynh), PHẦN MÁY CHỦ  ·  ĐANG LÀM (0.Planer giao 19/09 sau khi thầy uỷ quyền trực tiếp; KHÔNG đụng `src/`)
+Yêu cầu nhận từ 0.Planer (nguyên văn tóm): "kênh 4: readScope đọc nam_kt_cau, một đồng hồ ôn moc_on_ke, task than_thu sinh từ kế hoạch ngày qua đường nội bộ, chooseSession nhận blocked + now máy chủ; kênh 5: analyzeParent/assign đọc kế hoạch ngày, questionCount = phần dư, ôn tới hạn → dạng yếu đúng bậc → bù kho có lọc, loại qid 3 ngày qua, bỏ sort sao ASC, wrongPool từ nam_kt_cau, daily_ sang ngày thì bỏ, tồn đọng chỉ bài còn hạn, sửa layCauTuKhoDe; test parent-news sửa 12-34, xoá 71-95 — ghi sổ từng dòng. Token phụ huynh sau cùng; chạm luồng đăng nhập thì dừng báo. Bốn việc phải dừng báo: xoá/ghi đè D1, đổi luật chấm điểm, đổi luật vào thi, schema không chỉ-thêm."
+- [ ] K4.1 `readScope`: thêm bằng chứng từ hồ sơ (`nam_kt_cau`, nguồn KHÔNG phải ca thi) — câu sai ở BTVN/Mom/khắc phục thành "weak"; bằng chứng ca thi CHƯA công bố vẫn KHÔNG lọt  | bằng chứng: (chưa có)
+- [ ] K4.2 mốc ôn của game = `moc_on_ke` của dạng (một đồng hồ) — chỉ đổi đầu vào `chooseSession`, không đổi phần thưởng/`advance`  | bằng chứng: (chưa có)
+- [ ] K4.3 `game_v2_task` sinh từ việc `than_thu` của kế hoạch ngày qua đường nội bộ (không qua `parentGame`)  | bằng chứng: (chưa có)
+- [ ] K4.4 `chooseSession` nhận `blocked` (qid đã làm hôm nay ở mọi nguồn) + `now` máy chủ  | bằng chứng: (chưa có)
+- [ ] K4.5 mọi bất biến `tests/than-thu-v2.test.ts` giữ nguyên + test mới; toàn vitest = nền; đẩy Worker; gọi thử; nhắn 0.Planer  | bằng chứng: (chưa có)
+- [ ] K5.1 `analyzeParent`/`assign` đọc kế hoạch ngày: `questionCount` = phần dư, nói rõ lý do bằng số  | bằng chứng: (chưa có)
+- [ ] K5.2 thứ tự câu: ôn tới hạn → câu mới cùng dạng yếu đúng bậc → bù kho CÓ lọc chuyên đề/lớp; loại qid có sự kiện 3 ngày qua; bỏ `.sort(sao ASC)`  | bằng chứng: (chưa có)
+- [ ] K5.3 `wrongPool` từ `nam_kt_cau` (hết lỗi `cau_N` không khớp qid)  | bằng chứng: (chưa có)
+- [ ] K5.4 `daily_` chưa bắt đầu sang ngày mới → bỏ, không tính tồn đọng; tồn đọng chỉ đếm bài CÒN HẠN  | bằng chứng: (chưa có)
+- [ ] K5.5 sửa `layCauTuKhoDe` (đòi `c.text && c.dapAnDung` trong khi kho dùng `dap_an`/`dapAn`)  | bằng chứng: (chưa có)
+- [ ] K5.6 test `tests/parent-news.test.ts`: sửa dòng 12-34, XOÁ dòng 71-95 (18/24/36 — trái trần 16, thầy đã chấp nhận câu chốt 4) — ghi từng dòng vào sổ + lý do  | bằng chứng: (chưa có)
+- [ ] K5.7 toàn vitest = nền; đẩy Worker; gọi thử; nhắn 0.Planer  | bằng chứng: (chưa có)
+- [ ] Token phụ huynh (câu chốt 9) — SAU CÙNG; chạm luồng đăng nhập thì dừng báo 0.Planer  | bằng chứng: (chưa có)
+
 ### BÀN GIAO CHO PHIÊN SAU (GĐ 3–6 chưa làm; GĐ 5 phần máy chủ hoãn tới khi thầy ra lệnh trực tiếp)
 - **Lõi** (`server/src/`): `su-kien-hoc.ts` (MỘT hàm ghi sổ `ghiSuKien`, không bao giờ ném lỗi), `ho-so-nam-kt.ts` (`phatLaiSuKien` thuần + `dungLaiHoSo`), `ke-hoach-ngay.ts` (thuần) + `ke-hoach-ngay-d1.ts` (đọc gộp 50 em/lô, cron), `ho-so-cau-hinh.ts` (MỌI hằng số). Route ở `index.ts`: `/ho-so/*`, `/hs/ke-hoach-ngay`, `/hs/ca-dang-mo`, `/ke-hoach/chay-ca-lop`. Test 4 tệp `tests/{su-kien-hoc,ho-so-nam-kt,ke-hoach-ngay,ca-dang-mo}-1909.test.ts` chạy trên SQLite thật qua `tests/_d1-that.ts`.
 - **Bẫy D1:** dùng MỘT tham số `json_each(?)` (D1 chỉ cho 100 tham số); UNION quá ~5 vế → lỗi 7500; `INSERT…SELECT…ON CONFLICT` bắt buộc có `WHERE 1`; một lượt chạy ≤ 1000 truy vấn nên cron gộp 50 em/lô (260 em ≈ 100 truy vấn).
