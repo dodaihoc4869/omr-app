@@ -1,3 +1,62 @@
+# SỔ VIỆC — 19/09 (tối) · THỰC THI CÁ NHÂN HOÁ "TIẾN BỘ TỪNG NGÀY" — GĐ 0 → GĐ 2
+
+## Yêu cầu nhận (nguyên văn)
+
+- [ ] "Đọc DE-XUAT-CA-NHAN-HOA-1909.md và prompt-ca-nhan-hoa-tien-bo-tung-ngay.md trong thư mục này, rồi đọc mục đầu SO-VIEC.md để biết giai đoạn nào đã xong."  | bằng chứng: đã đọc cả ba file; mục đầu sổ ghi "Chưa build gì" ⇒ chưa giai đoạn nào xong, bắt đầu từ GĐ 0.
+- [ ] "11 câu chốt: đồng ý hết theo cột "Đề nghị" ở mục 5 của DE-XUAT."  | bằng chứng: 11/11 theo đề nghị (20 phút; bỏ trống = chưa làm; mốc theo ngày; PH giao = phần dư; xoá 3 test 3 Vòng; thần thú không khoá; daily_ bỏ; nghỉ không đứt streak; PH cần token (GĐ 5); phòng chờ; ngừng cộng tien_do_hs)
+- [ ] "HÃY THỰC THI PROMPT NÀY, chỉ làm GĐ 0 đến GĐ 2"
+- [ ] "mỗi giai đoạn xong thì test, phát hành, ghi sổ việc"
+- [ ] "Xong GĐ 2 thì dừng và báo giới hạn dùng còn lại."
+
+## Vạch đích (chép từ mục NGHIỆM THU của prompt — không đổi)
+
+### GĐ 0 — Sổ `su_kien_hoc`  ·  XONG (19/09, Worker `47823f98`)
+- [x] Migration additive `server/migration-1909-su-kien-hoc.sql` (bảng + 3 chỉ mục), chạy `--remote`  | bằng chứng: `wrangler d1 execute omr --file=migration-1909-su-kien-hoc.sql --remote -y` → `changes:1`; SELECT `sqlite_master` → 4 đối tượng mới, 0 dòng lúc đầu.
+- [x] `ghiSuKien` một hàm duy nhất, idempotent theo `khoa`, gom ≤ 40 dòng/câu lệnh qua `json_each` (1 tham số, né giới hạn 100 tham số của D1), một `batch` ≤ 25 câu lệnh, KHÔNG ném lỗi khi chưa có bảng  | bằng chứng: `tests/su-kien-hoc-1909.test.ts` — 95 dòng = 3 câu lệnh + 1 batch; mất bảng → `ok:false`; 4 lượt nộp (/btvn/nop, /cham-diem, /len-bang, /btvn/xong-lo) vẫn `ok:true` khi chưa có bảng.
+- [x] Móc đủ 9 điểm ghi (8 nguồn + đường chữa lành chi tiết): `chamDiem`, `luuChiTietCauNeuChuaCo`, `nopBtvnQuaPhieu`, `xongLoBtvn` (nhận thêm `dapAn`), `nopKhacPhuc`, `mom submit`, `ghiLenBangMoi`, game `answer`, `luyenDe submit`  | bằng chứng: mỗi điểm có test đếm đúng số dòng + idempotent; kiểm thử ĐỘT BIẾN (tắt 4 điểm ghi) làm 7 test đỏ đúng chỗ rồi khôi phục 28/28.
+- [x] `POST /ho-so/nap-lai` (thầy, ≤ 20 em/lượt, nguồn `sql|btvn|khac_phuc|mom|luyen`) + `POST /ho-so/kiem-cheo`  | bằng chứng: chạy trên D1 thật cho 261 SBD (script trong phiên): sql +9.040, btvn +11.330, khắc phục +410, mom +1.847, luyện đề +504; lỗi còn lại xem mục "Ghi nhận" dưới.
+- [x] Test `tests/su-kien-hoc-1909.test.ts` (+ `tests/_d1-that.ts`: D1 giả bằng SQLite THẬT nạp đúng schema.sql + mọi migration-*.sql)  | bằng chứng: `npx vitest run tests/su-kien-hoc-1909.test.ts` → **30 passed (30)**.
+- [x] NGHIỆM THU GĐ 0 — ĐẠT: `SELECT COUNT(*) FROM su_kien_hoc WHERE nguon='thi'` = **4744** = `chi_tiet_cau` có qid (**4744**); game 4298 = 4298 lượt không trợ giúp; tổng 23.145 dòng, 217 em, 19/09 12–19/09. "Nộp BTVN thử 1 bài → đúng số dòng nguon='btvn'": ĐÃ KIỂM bằng test (`/btvn/nop`: 4 câu → 4 dòng, gửi lại y hệt không thêm, đáp án khác → lan 2) và bằng nạp lại trên dữ liệu thật; CHƯA có lượt nộp BTVN thật nào sau giờ phát hành để đối chiếu đường ghi trực tiếp (tôi không tạo bài nộp giả vào hồ sơ học sinh thật). Đường ghi trực tiếp ĐÃ có bằng chứng thật ở Mom (12 dòng) và game (2 dòng) do học sinh nộp sau giờ phát hành.
+- [x] Toàn bộ vitest không tăng đỏ  | bằng chứng: `npx vitest run` → **4652 tests, 98 failed | 4553 passed; 43 tệp đỏ = nền 98/43**; so danh sách tệp đỏ với nền: MỚI ĐỎ [] · HẾT ĐỎ [].
+- [x] Phát hành + ghi sổ  | bằng chứng: commit `0fcc397` (mã) + `ff0efe4` (bản vá khắc phục). Lần 1 `DAY-TAT-CA.command` → "XONG CẢ HAI", Worker `8907348c`, Pages builtAt 1789784130 → **1789794575**, curl 3 URL → 200 (đây là lần đẩy Pages duy nhất của tôi, TRƯỚC khi có DIEU-PHOI.md; `git status` khi đó không có tệp `src/` sửa dở). Lần 2 `DAY-MAY-CHU.command` (chốt ca thi: "SẠCH 8 ca") → Worker **`47823f98`**. Lùi: `git revert ff0efe4 0fcc397` rồi `./DAY-MAY-CHU.command` (bảng `su_kien_hoc` cứ để nguyên — chỉ thêm, không ai đọc).
+- [ ] CHỜ GĐ 3: máy em (phiếu BTVN) gửi kèm `dapAn` của lô khi báo xong lô. Phần MÁY CHỦ đã xong và có test; phần MÁY EM nằm ở `html-phieu.ts`/`KhungXemPhieu.tsx` — thuộc GĐ 3, ngoài phạm vi lượt này (và đang là vùng của phiên Giao diện).
+
+**Ghi nhận / lệch với đề xuất (gặp chỗ đề xuất mâu thuẫn mã thật → chọn phương án giữ bất biến test):**
+1. `ma_dang` KHÔNG tra lúc ghi (chỉ game/luyện đề biết chắc); còn lại NULL, GĐ 1 tra theo qid từ `game_v2_question`/`cau_hoi` lúc dựng hồ sơ — rẻ hơn ở đường nộp và luôn theo nhãn kho mới nhất. Chuyên đề của BTVN cũng để trống ở sổ vì lý do này.
+2. Ca thi ghi kiểu CẬP NHẬT (`ON CONFLICT DO UPDATE`), nguồn khác kiểu BỎ QUA — vì `chamDiem` cũng ghi đè khi chấm lại. Giờ sự kiện thi = `luot.nop_luc`, không phải giờ chấm.
+3. Game: câu có trợ giúp (`assisted`) KHÔNG ghi sổ (không phải bằng chứng tự làm — giữ bất biến game). Đề xuất viết `correct && !assisted` dễ hiểu thành ghi 0; tôi chọn bỏ hẳn.
+4. Mom: câu có mã `cau_N` (app tự đánh số) KHÔNG ghi — không định danh được câu nào, sẽ trộn nhiều câu khác nhau thành một qid; nhãn chuyên đề "Hoá học" (chữ điền tạm của app Mom) bị bỏ. GĐ 5 sửa 1-click để có qid thật.
+5. **Phát hiện dữ liệu thật**: cả **189/189** bài khắc phục đã nộp có `so_cau = 0` — phiếu `sua_loi_*` do máy em tự sinh chưa bao giờ được đẩy lên R2 nên máy chủ không có đáp án để chấm (điểm nộp cũ vẫn 0/0). Sổ chấm bằng tờ kho theo qid (như BTVN) — điểm nộp cũ KHÔNG đổi. Đề xuất "`isAnswerCorrect` vs `phieu/*.json`" không áp dụng được.
+6. BTVN: sổ chấm bằng CHÍNH `gradeHomework` hiện hành. Chênh lệch có sẵn với `btvn_em.so_cau` (đo 19/09): tổng sổ 11.330 vs Σ so_cau 11.465 (−135). Nguyên nhân gốc: `homeworkQuestions` (thêm sau) loại câu Phần III đáp án mô tả dài (tờ DH-11-C2-B4: 80 câu → 78) và loại hẳn tờ `-VD/-DT` (bài 174817-mu5ht5qq / em 12026, 27 câu → 0 dòng; `gradeHomework` báo "Chưa tải được đáp án"). Không phải lỗi ghi sổ; đây là số câu mà bộ chấm hiện hành coi là chấm được.
+7. Không sửa test nào đang xanh. Chỉ một lần suýt vỡ: `tests/btvn-len-bang-1409.test.ts:255` khoá NGUYÊN VĂN dòng `homeworkKeys(await homeworkQuestions(env,chuoi(bt.ma_de)))` trong `goi-cu.ts` (bất biến "chấm và hồ sơ dùng chung một hàm đọc đáp án"); tôi trả nguyên dòng và dựng sự kiện từ kết quả `gradeHomework` (`suKienTuKetQuaCham`) thay vì tách dòng.
+8. Cảnh báo giới hạn: lệnh nạp lại đếm ngân sách theo số LƯỢT GỌI tờ đề (30/lượt), `homeworkQuestions` với danh sách nhiều tờ có thể đọc nhiều hơn số đó — chưa gặp vấn đề ở 261 em.
+
+### GĐ 1 — Hồ sơ `nam_kt_cau` / `nam_kt_dang`
+- [ ] `server/src/ho-so-cau-hinh.ts` (MOC_ON=[1,3,7], SO_MOC_KHAC_PHUC=3, SO_CAU_DU_TIN=4, NGUONG_DANG_YEU=0.7, TRAN_LAP_MOT_CAU=3) + test soi không lệch với chan-doan-cau-hinh.ts  | bằng chứng: (chưa có)
+- [ ] `phatLaiSuKien(sbd)` thuần + migration `nam_kt_cau`, `nam_kt_dang`  | bằng chứng: (chưa có)
+- [ ] NGHIỆM THU GĐ 1: phát lại 2 lần → giống hệt; sai 20/09 đúng 21/09, 22/09, 25/09 → `da_khac_phuc`; đúng 3 lần trong 21/09 → `dung_lien_tiep` = 1  | bằng chứng: (chưa có)
+- [ ] Đo độ phủ mã dạng trên kho thật (thong-ke-dang.ts), nói thật nếu thấp  | bằng chứng: (chưa có)
+- [ ] Toàn bộ vitest không tăng đỏ; phát hành; ghi sổ  | bằng chứng: (chưa có)
+
+### GĐ 2 — Kế hoạch ngày `ke_hoach_ngay`
+- [ ] `server/src/ke-hoach-ngay.ts` thuần (EDF, khả thi, bù, cổng) + bảng `ke_hoach_ngay` + `/hs/ke-hoach-ngay` + cron + lập lại theo sự kiện + handler `study_preferences`  | bằng chứng: (chưa có)
+- [ ] NGHIỆM THU GĐ 2: em có 2 BTVN (hạn 2 ngày và 14 ngày) → lô hạn gần đứng trước, taiKhac của bài hạn 14 ngày < 1/7 số câu còn lại; em không có bài → có việc `bu` đủ `toiThieuCau`  | bằng chứng: (chưa có)
+- [ ] Toàn bộ vitest không tăng đỏ; phát hành; ghi sổ  | bằng chứng: (chưa có)
+
+### Sau GĐ 2
+- [ ] Dừng, KHÔNG làm GĐ 3–6; báo giới hạn dùng còn lại  | bằng chứng: (chưa có)
+
+---
+
+# SỔ VIỆC — 19/09 (chiều) · PHÁT HÀNH CỤC BỘ + ĐỀ XUẤT CÁ NHÂN HOÁ "TIẾN BỘ TỪNG NGÀY"
+
+- [x] Phát hành từ máy thầy theo PHAT-HANH-CUC-BO-1909.md: dọn 3 ref rác + HEAD.lock/index.lock 0 byte trong .git; git pull → f099f32; DAY-TAT-CA.command → Worker lên 02:15Z, Pages `builtAt` 1789784130; migration `migration-1909-lo-btvn.sql` chạy `--remote` thành công, `SELECT lo_da_xong FROM btvn_em LIMIT 1` → 0; curl 3 URL → 200. | bằng chứng: log phiên 19/09 09:15
+- [x] Thầy tạo `.claude/settings.local.json` cho phép Bash: 3 tệp .command, npx wrangler, mv/rm .git/*.lock — từ giờ tự deploy không hỏi.
+- [x] Quét toàn bộ mã về cá nhân hoá (15 agent, 896 lượt đọc, chạy cả bộ test: 4622 test, 98 đỏ/43 tệp — khớp nền) → 3 phương án thiết kế độc lập → tổng hợp. | bằng chứng: `DE-XUAT-CA-NHAN-HOA-1909.md` (thiết kế), `prompt-ca-nhan-hoa-tien-bo-tung-ngay.md` (prompt chờ lệnh)
+- [ ] **CHỜ THẦY**: 11 câu chốt ở mục 5 của DE-XUAT + lệnh `HÃY THỰC THI PROMPT NÀY`. Chưa build gì.
+
+---
+
 # SỔ VIỆC — 19/09 · KHO MỎNG RÚT LẶP THÔNG MINH + DÃN LỊCH BTVN THEO DEADLINE
 
 ## Yêu cầu nhận trong phiên này (nguyên văn)
