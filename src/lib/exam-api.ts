@@ -396,6 +396,32 @@ export async function banDoSaiCa(
   return ra
 }
 
+/** HỒ SƠ ÔN CHO RÚT ĐỀ RIÊNG (GĐ 6 Kênh 1, 19/09) — lệnh máy chủ MỚI `hoSoOnCa`.
+ *
+ * Hợp đồng: `docs/hop-dong-ho-so-on-ca-1909.md`. Mỗi lượt ≤ 20 em (máy chủ chặn
+ * cứng) — chỗ gọi tự chia lô. Trả NGUYÊN phần `em` máy chủ gửi về, chưa tin kiểu
+ * nào: đọc phòng thủ là việc của `docHoSoOnEm` (`de-rieng.ts`).
+ *
+ * Máy chủ đời cũ chưa có lệnh ⇒ `ok:false` ⇒ NÉM LỖI. Chỗ gọi bắt lỗi và rút đề
+ * đúng như trước 19/09 — đừng nuốt lỗi ở đây rồi trả `{}`: "không em nào có hồ
+ * sơ" và "máy chủ không có lệnh" là hai chuyện khác nhau. */
+export async function hoSoOnCa(
+  scriptUrl: string,
+  secret: string,
+  dsSbd: string[],
+  maCa: string,
+  ngayCa: string,
+  soCa: 1 | 3 = 1,
+): Promise<Record<string, unknown>> {
+  const ds = [...new Set(dsSbd.map((x) => String(x || '').trim()).filter(Boolean))]
+  if (ds.length === 0) return {}
+  const r = await postJson(scriptUrl, { action: 'hoSoOnCa', secret, dsSbd: ds, maCa, ngayCa, ...(soCa === 3 ? { soCa: 3 } : {}) })
+  if (!r.ok) throw new Error(r.error || 'Không đọc được hồ sơ ôn')
+  const em = r.em
+  if (typeof em !== 'object' || em === null || Array.isArray(em)) throw new Error('Hồ sơ ôn trả về sai khuôn')
+  return em as Record<string, unknown>
+}
+
 /** NỐI THÊM CÂU VÀO KHO CỦA MỘT CA — chỉ dùng cho đề riêng từng em.
  *
  * Câu em từng sai có thể nằm ngoài kho thầy vừa rút cho ca. Muốn hỏi lại đúng
