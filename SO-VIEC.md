@@ -7,6 +7,8 @@
 - [x] "HÃY THỰC THI PROMPT NÀY, chỉ làm GĐ 0 đến GĐ 2"
 - [x] "mỗi giai đoạn xong thì test, phát hành, ghi sổ việc"
 - [x] "Xong GĐ 2 thì dừng và báo giới hạn dùng còn lại."
+- [x] (phiên điều phối 0.Planer, 19/09 ~14:00, đọc lại từ tin nhắn) "vá SBD không tồn tại rồi em nghỉ"  | bằng chứng: xem mục GĐ 2, dòng "VÁ SAU NGHIỆM THU" — commit `d73fe93`, Worker `b1cba8d3`.
+- [x] (0.Planer, 19/09 ~14:15) "POST /hs/ca-dang-mo" — VIỆC NGOÀI PHẠM VI "GĐ 0–2" thầy giao trong lời nhắn ban đầu; làm theo quyền điều phối thầy đã uỷ cho 0.Planer (ghi trong DIEU-PHOI.md), việc chỉ ĐỌC, nằm trong `server/`, không đụng giao diện  | bằng chứng: mục "Việc nhỏ: /hs/ca-dang-mo" bên dưới.
 
 ## Vạch đích (chép từ mục NGHIỆM THU của prompt — không đổi)
 
@@ -77,6 +79,15 @@
 6. Không sinh `game_v2_task` (GĐ 5); nhiệm vụ thần thú do PH đã nhắc thì được ưu tiên trong kế hoạch. `/hs/thoi-gian-hoc` dùng token HS; token phụ huynh là GĐ 5.
 7. `cau_hinh.ngay_nghi`: định dạng chưa ai đặt — nhận mảng JSON `["2026-09-21"]` hoặc chuỗi ngày cách nhau dấu phẩy/xuống dòng.
 8. Tốc độ đo được của em 12001 chạm sàn 45 giây/câu (14 mẫu): số giây trong sổ hiện chỉ có từ ca thi, và có thể phản ánh chuyện em bấm nhanh; nên xem lại trước khi tin tốc độ để hạ mục tiêu ở GĐ 3+.
+
+### Việc nhỏ: `POST /hs/ca-dang-mo` (0.Planer giao, 19/09)  ·  XONG (Worker `040d3c25`, commit `f815fec`)
+- [x] Đường công khai như `/hs/btvn` (`{sbd}` hoặc `{token}`), chỉ trả `{ok, coCaMo, soCa}` — TUYỆT ĐỐI không mã ca, tên ca, mật khẩu, đường dẫn đề  | bằng chứng: `tests/ca-dang-mo-1909.test.ts` → **9 passed (9)**: có ca mở đúng lớp → true (1) / lớp khác → false; hai ca → soCa=2; ca đóng, ca xoá, **ca cờ `mo` nhưng đã quá hạn vào**, chưa tới giờ, bài tập, ca không gắn lớp (NULL và rỗng) → không tính; em không có lớp → false (không đoán); SBD lạ / `x`×200 / thiếu → `ok:false` và ảnh chụp 4 bảng trước/sau y hệt; em đã nộp ca ấy → false, đang làm dở → true; phạm vi khối/chọn theo `hopPhamVi`; JSON đúng 4 khoá (`ok, coCaMo, soCa, serverNow`) và không khớp `/ma_?ca|ten_?ca|mật khẩu|bank|de\//`; token đúng/sai; đúng **2 truy vấn** cho một lượt hỏi dù có 6 ca.
+- [x] Luật "đang mở" KHÔNG đặt mới: dùng chính `quyetDinhVaoThi` (đã mở giờ, chưa quá hạn vào, chưa đóng/xoá, em chưa nộp) + `hopPhamVi` (khối/danh sách chọn) — đúng cổng lúc em bấm Vào thi. Khớp lớp = `ca.lop` bằng `lop` của em (`hoc_sinh`, không có thì `danh_sach`). Mã hiện có KHÔNG so lớp ca với lớp em lúc vào thi (cổng thật là danh sách lớp + phạm vi + mật khẩu), nên đây là luật lớp DUY NHẤT của đường này; đã đối chiếu dữ liệu thật: `ca.lop` ∈ {10,11,12}, `hoc_sinh.lop` ∈ {10,11,12,''} cùng khuôn (3 em không có lớp → luôn false).
+- [x] Trên bản sống: em thật lớp 11 (`11000`) và lớp 12 (`12000`) → `coCaMo:false, soCa:0` — lớp 12 có 4 ca cờ `mo` nhưng cả 8 ca `mo` đều đã quá hạn vào (đúng thứ luật phải loại). SBD `00000000`/`khong-co`/thiếu/token sai → `ok:false`. Đếm `ma_ca|maCa|tenCa` trong JSON = 0. **CHƯA kiểm được nhánh `coCaMo:true` trên bản sống** (không có ca nào đang mở; thầy đã báo không mở ca mới) — nhánh ấy chỉ có bằng chứng ở test; lớp 10 chưa gọi thử (truy vấn chọn em lớp 10 không trả em nào).
+- [x] LỖI TÔI TỰ BẮT được khi viết: `return hsCaDangMo(env, b)` KHÔNG có `await` trong khối `try` nên token sai làm lỗi lọt khỏi `catch` của máy chủ (ném thẳng thay vì trả JSON `ok:false`). Test token-sai bắt được → sửa `return await` → chạy lại đúng test đó xanh.
+- [x] Ghi nhận lệch lược đồ có sẵn: bảng `ca` trên D1 thật có 5 cột (`pham_vi`, `danh_sach_chon_json`, `mat_khau`, `de_rieng`, `pham_vi_hoi_lai`) mà KHÔNG tệp `migration-*.sql` nào trong repo tạo ra (thêm tay/đường khác). D1 giả dùng chung (`tests/_d1-that.ts`) tự bổ sung đúng 5 cột đó (kiểm trước để không thêm trùng). Dựng D1 mới từ repo sẽ THIẾU chúng — nên bổ sung một migration ghi lại (ngoài phạm vi lượt này).
+- [x] Toàn vitest  | bằng chứng: `4755 tests, 106 failed | 4648 passed; 45 tệp đỏ`. MỚI ĐỎ chỉ 2 tệp của PHIÊN GIAO DIỆN đang sửa dở (`tests/bang-nhiem-vu-1909.test.tsx`, `tests/nhiem-vu-adapter-1909.test.ts`; vỡ ở `nhiem-vu-adapter.ts`: "Cannot read properties of undefined (reading 'daLamCau')"; không import gì từ `server/`; xanh ở lần chạy đầy đủ ngay trước). **BỎ hai tệp đó: đúng 98 test đỏ / 43 tệp, danh sách tệp đỏ y hệt nền** — phần của tôi không thêm đỏ. Đã ghi vào Nhật ký DIEU-PHOI.md và nhắc Code 2 cập nhật hai test cho khớp adapter mới.
+- [x] Phát hành  | bằng chứng: `DAY-MAY-CHU.command` (chốt ca thi "SẠCH 8 ca") → Worker **`040d3c25`**. Lùi: `git revert f815fec` rồi `./DAY-MAY-CHU.command`.
 
 ### Sau GĐ 2
 - [x] Dừng, KHÔNG làm GĐ 3–6  | bằng chứng: không sửa `tro-ly-ca-nhan.ts`, `html-phieu.ts`, `btvn-cho-em.ts`, `StudentPortalScreen.tsx`, `ParentPortalScreen.tsx`; GĐ 3–6 chưa bắt đầu.
