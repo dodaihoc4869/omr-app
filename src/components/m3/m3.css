@@ -17,13 +17,10 @@
 .m3 *::after {
   box-sizing: border-box;
 }
+/* Chỉ con trỏ: font/màu/viền/nền của nút đã có Tailwind preflight (@layer base); đặt lại ở đây (không phân lớp)
+ * sẽ đè mất font-semibold, text-center, bg-* … của các component còn dùng lớp Tailwind. */
 :where(.m3) button {
-  font: inherit;
-  color: inherit;
-  border: 0;
-  background: none;
   cursor: pointer;
-  text-align: inherit;
 }
 .m3 button:focus-visible,
 .m3 a:focus-visible,
@@ -224,6 +221,110 @@ button.m3-the:active {
 @keyframes m3-xuong {
   from { opacity: 0.55; }
   to { opacity: 1; }
+}
+
+/* ── hai vai trò còn thiếu ở m3-theme.css: CẢNH BÁO / chú ý (amber, yellow, orange của Tailwind cũ) ──
+ * Cặp màu lấy đúng ô cảnh báo trong bản vẽ thầy chốt (ThiVaoVaKhoa, PhuHuynhSang). Không sửa m3-theme.css
+ * của Code 2; cần đưa vào nguồn chung thì nhắn Code 2. */
+.m3 {
+  --m3-canh-bao: rgb(254 247 224);
+  --m3-tren-canh-bao: rgb(92 68 0);
+}
+@media (prefers-color-scheme: dark) {
+  .m3 {
+    --m3-canh-bao: rgb(74 59 18);
+    --m3-tren-canh-bao: rgb(253 214 99);
+  }
+}
+
+/* ── TOKEN CŨ (styles/tokens.css) → vai trò M3, chỉ dưới `.m3` ─────────────────────────────────
+ * Component nào còn đọc var(--the), var(--muc), var(--gg-xanh)… (TheCau, TheCauChiTiet, TamTruotHoiBai,
+ * MaCaInput…) tự mặc bảng màu M3 khi nằm dưới `.m3`. Ngoài `.m3` tokens.css giữ nguyên. Chữ học thuật vốn dùng
+ * --serif; bản vẽ đã chốt dùng Be Vietnam Pro cho cả câu hỏi nên dưới `.m3` --serif = --sans. */
+.m3 {
+  --nen: var(--m3-surface);
+  --the: var(--m3-surface-container-lowest);
+  --the-2: var(--m3-surface-container);
+  --the-mo: var(--m3-surface-container-low);
+  --muc: var(--m3-on-surface);
+  --nhat: var(--m3-on-surface-variant);
+  --mo: var(--m3-on-surface-variant);
+  --muc-nguoc: var(--m3-on-primary);
+  --vien: var(--m3-surface-container-high);
+  --vien-dam: var(--m3-outline);
+  --xanh: var(--m3-tertiary);
+  --xanh-nen: var(--m3-tertiary-container);
+  --do: var(--m3-error);
+  --do-nen: var(--m3-error-container);
+  --cam: var(--m3-tren-canh-bao);
+  --cam-nen: var(--m3-canh-bao);
+  --tim: var(--m3-primary);
+  --tim-nen: var(--m3-primary-container);
+  --gg-xanh: var(--m3-primary);
+  --gg-xanh-nen: var(--m3-primary-container);
+  --gg-do: var(--m3-error);
+  --gg-do-nen: var(--m3-error-container);
+  --gg-luc: var(--m3-tertiary);
+  --gg-luc-nen: var(--m3-tertiary-container);
+  --gg-vang-nen: var(--m3-canh-bao);
+  --vang-diu: var(--m3-tren-canh-bao);
+  --vang-diu-nen: var(--m3-canh-bao);
+  --bo-1: var(--m3-bo-12);
+  --bo-2: var(--m3-bo-16);
+  --bo-3: var(--m3-bo-16);
+  --bong-1: var(--m3-cao-do-1);
+  --bong-2: var(--m3-cao-do-3);
+  --serif: var(--sans, system-ui, sans-serif);
+}
+
+/* ── hình khối / cỡ chữ / đích chạm cho các lớp Tailwind cũ dưới `.m3` ─────────────────────── */
+.m3 .rounded,
+.m3 .rounded-md,
+.m3 .rounded-lg,
+.m3 .rounded-xl {
+  border-radius: var(--m3-bo-12);
+}
+.m3 .rounded-2xl {
+  border-radius: var(--m3-bo-16);
+}
+.m3 .rounded-3xl {
+  border-radius: var(--m3-bo-28);
+}
+.m3 .text-xs,
+.m3 .text-\[10px\],
+.m3 .text-\[11px\] {
+  font-size: var(--bnv-cx-1);
+}
+.m3 .text-sm,
+.m3 .text-base {
+  font-size: var(--bnv-cx-2);
+}
+.m3 .text-lg {
+  font-size: var(--bnv-cx-3);
+}
+.m3 .text-xl {
+  font-size: var(--bnv-cx-4);
+}
+.m3 .shadow-xs,
+.m3 .shadow-sm,
+.m3 .shadow-md {
+  box-shadow: var(--m3-cao-do-1);
+}
+.m3 .shadow-lg,
+.m3 .shadow-xl,
+.m3 .shadow-2xl {
+  box-shadow: var(--m3-cao-do-3);
+}
+.m3 button,
+.m3 [role='button'] {
+  min-height: 48px;
+  min-width: 48px;
+}
+.m3 input[type='checkbox'],
+.m3 input[type='radio'] {
+  width: 24px;
+  height: 24px;
+  accent-color: var(--m3-primary);
 }
 
 @media (prefers-reduced-motion: reduce) {

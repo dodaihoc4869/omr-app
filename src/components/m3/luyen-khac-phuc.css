@@ -1,0 +1,31 @@
+/* Nhóm B (luyện đề + khắc phục): vỏ khối, màn làm bài, thanh dưới. Màu chỉ đọc biến --m3-*. */
+.m3-khoi {
+  background: var(--m3-surface-container);
+  color: var(--m3-on-surface);
+  border-radius: var(--m3-bo-28);
+}
+.m3-man-lam {
+  background: var(--m3-surface);
+  color: var(--m3-on-surface);
+}
+.m3-dau-man {
+  padding: var(--k4, 16px) var(--k5, 20px);
+  border-radius: var(--m3-bo-28);
+  background: var(--m3-surface-container);
+  color: var(--m3-on-surface);
+}
+.m3-thanh-duoi {
+  border-radius: var(--m3-bo-28);
+  background: var(--m3-surface-container-high);
+  color: var(--m3-on-surface);
+  box-shadow: var(--m3-cao-do-3);
+}
+/* ô biểu tượng ở đầu hộp thoại khắc phục */
+.m3 .m3-o-dau {
+  background: var(--m3-primary-container);
+  color: var(--m3-on-primary-container);
+}
+/* dải 4 màu kiểu Google của bản cũ: bản M3 không có */
+.m3 .m3-an {
+  display: none;
+}

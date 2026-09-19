@@ -41,6 +41,8 @@ import { loadScriptUrl } from '../lib/exam-db'
 import { danhMucDangBai, deTheoDangBai, type LopDangBai, type DangBaiMuc } from '../lib/exam-api'
 import { parseKhoDeJson, buildTeacherSourceFromKhoDe } from '../lib/exam-kho-de-import'
 import { hopLeDeRut } from '../lib/loc-cau-rut'
+import { dungM3 } from './m3'
+import './m3/luyen-khac-phuc.css'
 
 /**
  * Máy chủ không rút được câu nào cùng dạng với các câu em sai.
@@ -459,19 +461,21 @@ export default function ModalKhacPhucCauSai({
     }
   }
 
+  // ModalKhacPhucCauSai còn được app giáo viên mở qua báo cáo ca: CHỈ cổng học sinh / phụ huynh mặc M3.
+  const m3 = dungM3()
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className={`${m3 ? 'm3 ' : ''}fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200`}>
         <div
-          className="khac-phuc-modal relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-3xl overflow-hidden shadow-2xl border border-slate-200"
-          style={{ background: 'var(--the, rgb(255, 255, 255))', color: 'var(--muc, rgb(15, 23, 42))' }}
+          className={`${m3 ? 'm3-hop' : 'khac-phuc-modal'} relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-3xl overflow-hidden shadow-2xl border border-slate-200`}
+          style={m3 ? undefined : { background: 'var(--the, rgb(255, 255, 255))', color: 'var(--muc, rgb(15, 23, 42))' }}
         >
           {/* Header phong cách Google Material 3 */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
             <div className="flex items-center gap-3">
               <div
-                className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-xs"
-                style={{ background: 'rgba(26, 115, 232, 0.1)', color: 'var(--gg-xanh, rgb(26, 115, 232))' }}
+                className={`${m3 ? 'm3-o-dau ' : ''}w-10 h-10 rounded-2xl flex items-center justify-center shadow-xs`}
+                style={m3 ? undefined : { background: 'rgba(26, 115, 232, 0.1)', color: 'var(--gg-xanh, rgb(26, 115, 232))' }}
               >
                 <Sparkles className="w-5 h-5" />
               </div>
@@ -495,7 +499,7 @@ export default function ModalKhacPhucCauSai({
           </div>
 
           {/* Dải 4 màu Google M3 */}
-          <div className="h-1 w-full grid grid-cols-4 shrink-0">
+          <div className={`${m3 ? 'm3-an ' : ''}h-1 w-full grid grid-cols-4 shrink-0`}>
             <div style={{ background: 'var(--gg-xanh, rgb(26, 115, 232))' }} />
             <div style={{ background: 'var(--gg-do, rgb(234, 67, 53))' }} />
             <div style={{ background: 'var(--gg-vang, rgb(251, 188, 4))' }} />
@@ -563,7 +567,7 @@ export default function ModalKhacPhucCauSai({
                     2. Luyện thêm dạng câu sai (Tỷ lệ tối đa: {tongToiDaCheDo2} câu)
                   </div>
                   <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                    ✨ Thuật toán mới: Rút câu theo Cặp đôi Song sinh và tiến trình 3 nấc sư phạm (Củng cố nền tảng → Rèn luyện → Bứt phá), tập trung đúng dạng bài em còn yếu.
+                    Thuật toán mới: Rút câu theo Cặp đôi Song sinh và tiến trình 3 nấc sư phạm (Củng cố nền tảng → Rèn luyện → Bứt phá), tập trung đúng dạng bài em còn yếu.
                   </p>
                 </div>
               </div>

@@ -43,6 +43,8 @@ import { layDiaChiMayChu } from '../lib/dia-chi-may-chu'
 import { napKhoChoMayEm } from '../lib/kho-cho-may-em'
 import type { TeacherExamSource } from '../data/examContent'
 import ModalXacNhanNop from './ModalXacNhanNop'
+import './m3'
+import './m3/luyen-khac-phuc.css'
 import NhomCaThuGon from './NhomCaThuGon'
 
 export interface BaiLuyenKhacPhuc {
@@ -769,13 +771,13 @@ export default function KhoiKhacPhuc3CheDo({
     return Object.values(currentTest.answers).filter((v) => v && v.trim() && v !== '----').length
   }, [currentTest])
 
-  const panel = 'p-4 sm:p-6 rounded-2xl border border-amber-200 dark:border-amber-900/50 bg-white dark:bg-slate-900 space-y-5 shadow-sm'
+  const panel = 'm3 m3-khoi p-4 sm:p-6 space-y-5'
 
   // NẾU ĐANG LÀM BÀI HOẶC XEM LẠI BÀI LUYỆN — FULL RA TOÀN MÀN HÌNH ĐỂ TẬP TRUNG
   if (currentTest) {
     const daNop = currentTest.status === 'submitted'
     return createPortal(
-      <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-100/90 dark:bg-slate-950 text-slate-900 dark:text-white overscroll-contain">
+      <div className="m3 m3-man-lam fixed inset-0 z-50 overflow-y-auto overscroll-contain">
         <div
           className="min-h-full max-w-4xl mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-6"
           style={{
@@ -784,11 +786,11 @@ export default function KhoiKhacPhuc3CheDo({
           }}
         >
           {/* Header bài luyện */}
-          <div className="rounded-2xl border border-amber-200 dark:border-amber-900/50 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm flex flex-wrap items-center justify-between gap-3">
+          <div className="m3-dau-man flex flex-wrap items-center justify-between gap-3">
             <div>
               <button
                 onClick={() => setCurrentTest(null)}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:underline mb-1 cursor-pointer"
+                className="m3-nut-chu -ml-3 cursor-pointer"
               >
                 <ChevronLeft size={16} />
                 Quay lại danh sách luyện tập
@@ -888,12 +890,12 @@ export default function KhoiKhacPhuc3CheDo({
             }}
           >
             <div
-              className="mx-auto flex max-w-3xl items-center justify-between gap-3 rounded-2xl border border-amber-300 dark:border-amber-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-3 shadow-xl"
+              className="m3-thanh-duoi mx-auto flex max-w-3xl items-center justify-between gap-3 p-3"
               style={{ pointerEvents: 'auto' }}
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2 font-bold tabular-nums text-slate-900 dark:text-white text-sm">
-                  <Clock3 size={18} className="text-amber-500" />
+                  <Clock3 size={18} className="text-blue-500" />
                   <span>
                     {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, '0')}
                   </span>
@@ -905,7 +907,7 @@ export default function KhoiKhacPhuc3CheDo({
               <button
                 disabled={dangXuLy}
                 onClick={() => setHienXacNhanNop(true)}
-                className="shrink-0 rounded-xl bg-amber-500 hover:bg-amber-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm disabled:opacity-50 transition cursor-pointer"
+                className="m3-nut-chinh shrink-0 cursor-pointer"
               >
                 Nộp bài
               </button>
@@ -937,7 +939,7 @@ export default function KhoiKhacPhuc3CheDo({
     <section className={panel}>
       <div className="flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-lg">
+          <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-lg">
             <Sparkles size={20} />
             <h2>{vaiTro === 'ph' ? '4 CHẾ ĐỘ GIAO BÀI CHO CON' : '4 CHẾ ĐỘ KHẮC PHỤC CÂU SAI'}</h2>
           </div>
@@ -955,7 +957,7 @@ export default function KhoiKhacPhuc3CheDo({
       </div>
 
       {/* 4 Nút chọn chế độ */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 bg-slate-200 dark:bg-slate-700 rounded-xl">
         <button
           onClick={() => {
             setCheDo(1)
@@ -963,7 +965,7 @@ export default function KhoiKhacPhuc3CheDo({
           }}
           className={`py-2 px-1 text-center rounded-lg text-xs font-semibold transition cursor-pointer ${
             cheDo === 1
-              ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-sm'
+              ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
@@ -976,7 +978,7 @@ export default function KhoiKhacPhuc3CheDo({
           }}
           className={`py-2 px-1 text-center rounded-lg text-xs font-semibold transition cursor-pointer ${
             cheDo === 2
-              ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-sm'
+              ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
@@ -989,7 +991,7 @@ export default function KhoiKhacPhuc3CheDo({
           }}
           className={`py-2 px-1 text-center rounded-lg text-xs font-semibold transition cursor-pointer ${
             cheDo === 3
-              ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-sm'
+              ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
@@ -1002,7 +1004,7 @@ export default function KhoiKhacPhuc3CheDo({
           }}
           className={`py-2 px-1 text-center rounded-lg text-xs font-semibold transition cursor-pointer ${
             cheDo === 4
-              ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-sm'
+              ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
@@ -1043,7 +1045,7 @@ export default function KhoiKhacPhuc3CheDo({
                   setCacCaChon(new Set(dsLichSu.map((c) => c.maCa)))
                 }
               }}
-              className="text-amber-600 dark:text-amber-400 font-semibold hover:underline cursor-pointer"
+              className="text-blue-600 dark:text-blue-400 font-semibold hover:underline cursor-pointer"
             >
               {cacCaChon.size === dsLichSu.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
             </button>
@@ -1076,12 +1078,12 @@ export default function KhoiKhacPhuc3CheDo({
                     }}
                     className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 cursor-pointer transition text-xs ${
                       isSelected
-                        ? 'border-amber-400 bg-amber-50/50 dark:bg-amber-950/20 text-slate-900 dark:text-white'
+                        ? 'border-blue-400 bg-blue-50/50 dark:bg-blue-950/20 text-slate-900 dark:text-white'
                         : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-700 dark:text-slate-300'
                     }`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="text-amber-500">
+                      <div className="text-blue-500">
                         {isSelected ? <CheckSquare size={16} /> : <Square size={16} />}
                       </div>
                       <div className="min-w-0">
@@ -1111,7 +1113,7 @@ export default function KhoiKhacPhuc3CheDo({
           <button
             disabled={dangXuLy || cacCaChon.size === 0}
             onClick={batDauLamBai}
-            className="w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 transition cursor-pointer"
+            className="m3-nut-chinh w-full flex items-center justify-center gap-2 cursor-pointer"
           >
             {dangXuLy ? (
               <RefreshCw size={16} className="animate-spin" />
@@ -1131,10 +1133,10 @@ export default function KhoiKhacPhuc3CheDo({
       {cheDo === 2 && (
         <div className="space-y-4">
           {/* Mô tả */}
-          <div className="p-4 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl space-y-1.5">
-            <div className="flex items-center gap-2 font-semibold text-xs text-amber-800 dark:text-amber-200">
+          <div className="p-4 bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-xl space-y-1.5">
+            <div className="flex items-center gap-2 font-semibold text-xs text-blue-800 dark:text-blue-200">
               <Layers size={16} />
-              ✨ Thuật toán mới: Luyện thêm câu cùng dạng câu sai trong toàn kho
+              Thuật toán mới: Luyện thêm câu cùng dạng câu sai trong toàn kho
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
               Hệ thống tự động phân tích lịch sử câu sai, rút câu cùng dạng bài theo tiến trình sư phạm 3 nấc (Củng cố nền tảng → Rèn luyện → Bứt phá) để lấp dứt điểm lỗ hổng kiến thức.
@@ -1144,11 +1146,11 @@ export default function KhoiKhacPhuc3CheDo({
           {/* Trạng thái tải kho */}
           {dangTaiKho2 ? (
             <div className="py-4 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
-              <RefreshCw size={14} className="animate-spin text-amber-500" />
+              <RefreshCw size={14} className="animate-spin text-blue-500" />
               Đang phân tích câu sai và tải kho đề cùng dạng…
             </div>
           ) : loiKho2 ? (
-            <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl text-amber-700 dark:text-amber-300 text-xs flex items-center gap-2">
+            <div className="p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-xl text-blue-700 dark:text-blue-300 text-xs flex items-center gap-2">
               <Info size={14} className="shrink-0" />
               <span>{loiKho2}</span>
             </div>
@@ -1159,14 +1161,14 @@ export default function KhoiKhacPhuc3CheDo({
                 <div className="p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                      <Layers size={14} className="text-amber-500" />
+                      <Layers size={14} className="text-blue-500" />
                       <span>Ca thi có câu sai ({caChonCheDo2.size}/{dsCaThi2.length} ca · {dsCauSaiCheDo2.length} câu sai)</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <button
                         type="button"
                         onClick={() => setCaChonCheDo2(new Set(dsCaThi2.map((c) => c.maCa)))}
-                        className="px-2.5 py-1 rounded-lg text-xs font-semibold text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition cursor-pointer"
+                        className="px-2.5 py-1 rounded-lg text-xs font-semibold text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
                       >
                         Chọn tất cả
                       </button>
@@ -1197,7 +1199,7 @@ export default function KhoiKhacPhuc3CheDo({
                           }}
                           className={`flex items-center justify-between p-2.5 rounded-xl border transition cursor-pointer ${
                             daTick
-                              ? 'bg-amber-50/40 border-amber-200 text-slate-800 dark:bg-amber-950/30 dark:border-amber-800 dark:text-slate-100'
+                              ? 'bg-blue-50/40 border-blue-200 text-slate-800 dark:bg-blue-950/30 dark:border-blue-800 dark:text-slate-100'
                               : 'bg-slate-50/50 border-slate-200/60 text-slate-400 dark:bg-slate-800/40 dark:border-slate-700 hover:bg-slate-50'
                           }`}
                         >
@@ -1206,7 +1208,7 @@ export default function KhoiKhacPhuc3CheDo({
                               type="checkbox"
                               checked={daTick}
                               onChange={() => {}}
-                              className="w-4 h-4 rounded text-amber-500 accent-amber-500 cursor-pointer pointer-events-none"
+                              className="w-4 h-4 rounded text-blue-500 accent-blue-500 cursor-pointer pointer-events-none"
                             />
                             <span className="text-xs font-semibold truncate">
                               {ca.tenCa}
@@ -1215,7 +1217,7 @@ export default function KhoiKhacPhuc3CheDo({
                           <span
                             className={`shrink-0 text-xs font-bold px-2 py-0.5 rounded-full border ${
                               daTick
-                                ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800'
+                                ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800'
                                 : 'bg-slate-100 text-slate-400 border-slate-200 dark:bg-slate-700 dark:text-slate-400 dark:border-slate-600'
                             }`}
                           >
@@ -1242,7 +1244,7 @@ export default function KhoiKhacPhuc3CheDo({
                     <Layers size={14} className="text-emerald-600" />
                     Số câu rút luyện tập:
                   </span>
-                  <strong className="text-amber-600 dark:text-amber-400 text-sm bg-amber-50 dark:bg-amber-950/40 px-2.5 py-0.5 rounded-lg border border-amber-200 dark:border-amber-700">
+                  <strong className="text-blue-600 dark:text-blue-400 text-sm bg-blue-50 dark:bg-blue-950/40 px-2.5 py-0.5 rounded-lg border border-blue-200 dark:border-blue-700">
                     {soCauCheDo2} / {tongToiDaCheDo2} câu
                   </strong>
                 </div>
@@ -1252,7 +1254,7 @@ export default function KhoiKhacPhuc3CheDo({
                   max={tongToiDaCheDo2}
                   value={soCauCheDo2}
                   onChange={(e) => setSoCauCheDo2(Number(e.target.value))}
-                  className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                  className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                 />
                 <div className="flex justify-between text-[11px] font-semibold text-slate-400">
                   <span>1 câu</span>
@@ -1278,7 +1280,7 @@ export default function KhoiKhacPhuc3CheDo({
                           <span className="truncate max-w-[220px]">
                             <b>Câu {t.soCau} ({t.phan})</b>: {t.tenDang || t.nhanDan}
                           </span>
-                          <span className="shrink-0 font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded border border-amber-100 dark:border-amber-800">
+                          <span className="shrink-0 font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded border border-blue-100 dark:border-blue-800">
                             +{soRut} / {t.soUngVienToiDa}
                           </span>
                         </div>
@@ -1302,7 +1304,7 @@ export default function KhoiKhacPhuc3CheDo({
           <button
             disabled={dangXuLy || dangTaiKho2 || dsCauSaiCheDo2.length === 0 || tongToiDaCheDo2 === 0 || soCauCheDo2 === 0}
             onClick={batDauLamBai}
-            className="w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 transition cursor-pointer"
+            className="m3-nut-chinh w-full flex items-center justify-center gap-2 cursor-pointer"
           >
             {dangXuLy || dangTaiKho2 ? (
               <RefreshCw size={16} className="animate-spin" />
@@ -1327,7 +1329,7 @@ export default function KhoiKhacPhuc3CheDo({
         <div className="space-y-3.5">
           {dangTaiDm ? (
             <div className="py-6 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
-              <RefreshCw size={16} className="animate-spin text-amber-500" />
+              <RefreshCw size={16} className="animate-spin text-blue-500" />
               Đang tải danh mục dạng bài...
             </div>
           ) : (
@@ -1345,8 +1347,8 @@ export default function KhoiKhacPhuc3CheDo({
                       onClick={() => handleChonLop(lop)}
                       className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer ${
                         lopChon === lop
-                          ? 'border-amber-500 bg-amber-500 text-white'
-                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:border-amber-300'
+                          ? 'border-blue-500 bg-blue-500 text-white'
+                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-300'
                       }`}
                     >
                       Lớp {lop}
@@ -1364,7 +1366,7 @@ export default function KhoiKhacPhuc3CheDo({
                   <select
                     value={baiChon}
                     onChange={(e) => handleChonBai(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     {baisCuaLop.map((b) => (
                       <option key={b.tenBai} value={b.tenBai}>
@@ -1391,7 +1393,7 @@ export default function KhoiKhacPhuc3CheDo({
                           setCacDangChon(new Set(dangsCuaBai.map((d) => d.ma)))
                         }
                       }}
-                      className="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
+                      className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
                     >
                       {cacDangChon.size === dangsCuaBai.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
                     </button>
@@ -1418,12 +1420,12 @@ export default function KhoiKhacPhuc3CheDo({
                           }}
                           className={`p-2.5 rounded-xl border flex items-center justify-between gap-2.5 cursor-pointer transition text-xs ${
                             isSelected
-                              ? 'border-amber-400 bg-amber-50/60 dark:bg-amber-950/30 text-slate-900 dark:text-white'
+                              ? 'border-blue-400 bg-blue-50/60 dark:bg-blue-950/30 text-slate-900 dark:text-white'
                               : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-700 dark:text-slate-300'
                           }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
-                            <div className="text-amber-500 shrink-0">
+                            <div className="text-blue-500 shrink-0">
                               {isSelected ? <CheckSquare size={16} /> : <Square size={16} />}
                             </div>
                             <span className="font-semibold truncate">{d.ten}</span>
@@ -1443,7 +1445,7 @@ export default function KhoiKhacPhuc3CheDo({
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
                     <span>Số câu muốn luyện:</span>
-                    <strong className="text-amber-600 dark:text-amber-400 text-sm">
+                    <strong className="text-blue-600 dark:text-blue-400 text-sm">
                       {soCauCheDo3} / {tongToiDaCheDo3} câu
                     </strong>
                   </div>
@@ -1453,7 +1455,7 @@ export default function KhoiKhacPhuc3CheDo({
                     max={tongToiDaCheDo3}
                     value={soCauCheDo3}
                     onChange={(e) => setSoCauCheDo3(Number(e.target.value))}
-                    className="w-full accent-amber-500 cursor-pointer"
+                    className="w-full accent-blue-500 cursor-pointer"
                   />
                 </div>
               )}
@@ -1461,7 +1463,7 @@ export default function KhoiKhacPhuc3CheDo({
               <button
                 disabled={dangXuLy || dangTaiDang || cacDangChon.size === 0 || tongToiDaCheDo3 === 0}
                 onClick={batDauLamBai}
-                className="w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 transition cursor-pointer"
+                className="m3-nut-chinh w-full flex items-center justify-center gap-2 cursor-pointer"
               >
                 {dangXuLy || dangTaiDang ? (
                   <RefreshCw size={16} className="animate-spin" />
@@ -1483,7 +1485,7 @@ export default function KhoiKhacPhuc3CheDo({
         <div className="space-y-3.5">
           {dangTaiKho2 ? (
             <div className="py-6 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
-              <RefreshCw size={16} className="animate-spin text-amber-500" />
+              <RefreshCw size={16} className="animate-spin text-blue-500" />
               Đang tải dữ liệu kho câu...
             </div>
           ) : loiKho2 && tongToiDaCheDo4 === 0 ? (
@@ -1503,7 +1505,7 @@ export default function KhoiKhacPhuc3CheDo({
                     <button
                       type="button"
                       onClick={() => setCacMucDoChon(new Set(['ngau_nhien']))}
-                      className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
+                      className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
                     >
                       Đặt lại ngẫu nhiên
                     </button>
@@ -1525,12 +1527,12 @@ export default function KhoiKhacPhuc3CheDo({
                         onClick={() => toggleMucDo(m.id)}
                         className={`p-2.5 rounded-xl border text-center font-semibold transition cursor-pointer text-xs flex items-center justify-center gap-1.5 ${
                           isSelected
-                            ? 'border-amber-500 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 font-bold ring-2 ring-amber-400/40 shadow-xs'
+                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-200 font-bold ring-2 ring-blue-400/40 shadow-xs'
                             : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
                         }`}
                       >
                         {isSelected && m.id !== 'ngau_nhien' && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
                         )}
                         <span>{m.label}</span>
                       </button>
@@ -1544,7 +1546,7 @@ export default function KhoiKhacPhuc3CheDo({
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
                     <span>Số câu muốn luyện:</span>
-                    <strong className="text-amber-600 dark:text-amber-400 text-sm">
+                    <strong className="text-blue-600 dark:text-blue-400 text-sm">
                       {soCauCheDo4} / {tongToiDaCheDo4} câu
                     </strong>
                   </div>
@@ -1554,7 +1556,7 @@ export default function KhoiKhacPhuc3CheDo({
                     max={tongToiDaCheDo4}
                     value={soCauCheDo4}
                     onChange={(e) => setSoCauCheDo4(Number(e.target.value))}
-                    className="w-full accent-amber-500 cursor-pointer"
+                    className="w-full accent-blue-500 cursor-pointer"
                   />
                 </div>
               ) : (
@@ -1564,7 +1566,7 @@ export default function KhoiKhacPhuc3CheDo({
               <button
                 disabled={dangXuLy || dangTaiKho2 || tongToiDaCheDo4 === 0}
                 onClick={batDauLamBai}
-                className="w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 transition cursor-pointer"
+                className="m3-nut-chinh w-full flex items-center justify-center gap-2 cursor-pointer"
               >
                 {dangXuLy || dangTaiKho2 ? (
                   <RefreshCw size={16} className="animate-spin" />
@@ -1590,11 +1592,11 @@ export default function KhoiKhacPhuc3CheDo({
           className="w-full flex items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800 px-4 py-3 hover:bg-slate-100/80 dark:hover:bg-slate-750 transition-colors text-left cursor-pointer"
         >
           <div className="flex items-center gap-2">
-            <FileText size={16} className="text-amber-500" />
+            <FileText size={16} className="text-blue-500" />
             <h3 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-100">
               {vaiTro === 'ph' ? 'Các bài Mom đã giao' : 'Bài luyện của em'}
             </h3>
-            <span className="text-[11px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 px-2 py-0.5 rounded-full">
+            <span className="text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 px-2 py-0.5 rounded-full">
               {vaiTro === 'ph' ? (dsMomGiao ? dsMomGiao.length : 0) : history.length} bài
             </span>
           </div>
@@ -1628,7 +1630,7 @@ export default function KhoiKhacPhuc3CheDo({
                         }
                       }}
                       className={`p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/70 transition flex items-center justify-between gap-3 ${
-                        daNop ? 'hover:border-amber-300 dark:hover:border-amber-700 cursor-pointer' : ''
+                        daNop ? 'hover:border-blue-300 dark:hover:border-blue-700 cursor-pointer' : ''
                       }`}
                     >
                       <div className="min-w-0 flex-1">
@@ -1653,7 +1655,7 @@ export default function KhoiKhacPhuc3CheDo({
                               ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
                               : m.trangThai === 'dang_lam'
                               ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
-                              : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
+                              : 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
                           }`}
                         >
                           {daNop
@@ -1669,7 +1671,7 @@ export default function KhoiKhacPhuc3CheDo({
                               e.stopPropagation()
                               onXemKetQuaMom(m)
                             }}
-                            className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] flex items-center gap-1 transition cursor-pointer shadow-xs"
+                            className="px-2.5 py-1 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-bold text-[11px] flex items-center gap-1 transition cursor-pointer shadow-xs"
                             title="Xem kết quả bài nộp"
                           >
                             <span>Xem kết quả</span>
@@ -1700,7 +1702,7 @@ export default function KhoiKhacPhuc3CheDo({
                     <div
                       key={h.id}
                       onClick={() => setCurrentTest(h)}
-                      className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/70 hover:border-amber-300 dark:hover:border-amber-700 transition flex items-center justify-between gap-3 cursor-pointer"
+                      className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/70 hover:border-blue-300 dark:hover:border-blue-700 transition flex items-center justify-between gap-3 cursor-pointer"
                     >
                       <div className="min-w-0 flex-1">
                         <span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate block">
@@ -1721,7 +1723,7 @@ export default function KhoiKhacPhuc3CheDo({
                           className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
                             daNop
                               ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                              : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
+                              : 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
                           }`}
                         >
                           {daNop ? `${typeof h.score === 'number' ? h.score.toFixed(2) : '--'} điểm` : 'Đang làm'}

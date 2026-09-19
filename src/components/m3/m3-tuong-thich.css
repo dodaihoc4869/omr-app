@@ -1,0 +1,166 @@
+/* TỆP SINH TỰ ĐỘNG — sửa scripts/sinh-m3-tuong-thich.mjs, KHÔNG sửa tay tệp này.
+ * Phạm vi quét: LuyenDeChuan.tsx, KhoiKhacPhuc3CheDo.tsx, ModalKhacPhucCauSai.tsx, KhoiCauSai.tsx.
+ * Mọi bộ chọn đều mang tiền tố `.m3 ` (không có luật trần): app giáo viên, game thần thú và Bảng nhiệm vụ (.bnv)
+ * không bị chạm. Không phân lớp (@layer) nên thắng lớp tiện ích Tailwind. Màu chỉ là biến --m3-*. */
+
+.m3 .accent-blue-500 { accent-color: var(--m3-primary); }
+.m3 .accent-blue-600 { accent-color: var(--m3-primary); }
+.m3 .bg-amber-50 { background-color: var(--m3-canh-bao); }
+.m3 .bg-amber-50\/80 { background-color: var(--m3-canh-bao); }
+.m3 .bg-black\/60 { background-color: var(--m3-man-che); }
+.m3 .bg-blue-100 { background-color: var(--m3-primary-container); }
+.m3 .bg-blue-50 { background-color: var(--m3-primary-container); }
+.m3 .bg-blue-50\/40 { background-color: var(--m3-primary-container); }
+.m3 .bg-blue-50\/50 { background-color: var(--m3-primary-container); }
+.m3 .bg-blue-50\/60 { background-color: var(--m3-primary-container); }
+.m3 .bg-blue-500 { background-color: var(--m3-primary); }
+.m3 .bg-blue-600 { background-color: var(--m3-primary); }
+.m3 .bg-emerald-50 { background-color: var(--m3-tertiary-container); }
+.m3 .bg-red-50 { background-color: var(--m3-error-container); }
+.m3 .bg-rose-100 { background-color: var(--m3-error-container); }
+.m3 .bg-rose-50 { background-color: var(--m3-error-container); }
+.m3 .bg-rose-600 { background-color: var(--m3-error); }
+.m3 .bg-slate-100 { background-color: var(--m3-surface-container); }
+.m3 .bg-slate-200 { background-color: var(--m3-surface-container-high); }
+.m3 .bg-slate-200\/80 { background-color: var(--m3-surface-container-high); }
+.m3 .bg-slate-50 { background-color: var(--m3-surface-container-low); }
+.m3 .bg-slate-50\/50 { background-color: var(--m3-surface-container-low); }
+.m3 .bg-white { background-color: var(--m3-surface-container-lowest); }
+.m3 .border-amber-200 { border-color: var(--m3-canh-bao); }
+.m3 .border-amber-200\/40 { border-color: var(--m3-canh-bao); }
+.m3 .border-blue-100 { border-color: var(--m3-primary-container); }
+.m3 .border-blue-200 { border-color: var(--m3-primary-container); }
+.m3 .border-blue-400 { border-color: var(--m3-primary); }
+.m3 .border-blue-500 { border-color: var(--m3-primary); }
+.m3 .border-blue-600 { border-color: var(--m3-primary); }
+.m3 .border-emerald-200 { border-color: var(--m3-tertiary-container); }
+.m3 .border-emerald-300 { border-color: var(--m3-tertiary-container); }
+.m3 .border-red-200 { border-color: var(--m3-error-container); }
+.m3 .border-rose-200 { border-color: var(--m3-error-container); }
+.m3 .border-rose-300 { border-color: var(--m3-error-container); }
+.m3 .border-rose-700 { border-color: var(--m3-error); }
+.m3 .border-slate-100 { border-color: var(--m3-surface-container-high); }
+.m3 .border-slate-200 { border-color: var(--m3-surface-container-high); }
+.m3 .border-slate-200\/60 { border-color: var(--m3-surface-container-high); }
+.m3 .border-slate-200\/80 { border-color: var(--m3-surface-container-high); }
+.m3 .border-slate-300 { border-color: var(--m3-outline); }
+.m3 .divide-slate-100 > :not(:last-child) { border-color: var(--m3-surface-container-high); }
+.m3 .ring-blue-400\/40 { --tw-ring-color: var(--m3-primary); }
+.m3 .text-amber-600 { color: var(--m3-tren-canh-bao); }
+.m3 .text-amber-700 { color: var(--m3-tren-canh-bao); }
+.m3 .text-amber-800 { color: var(--m3-tren-canh-bao); }
+.m3 .text-amber-900 { color: var(--m3-tren-canh-bao); }
+.m3 .text-amber-900\/80 { color: var(--m3-tren-canh-bao); }
+.m3 .text-amber-950 { color: var(--m3-tren-canh-bao); }
+.m3 .text-blue-100 { color: var(--m3-on-primary); }
+.m3 .text-blue-500 { color: var(--m3-primary); }
+.m3 .text-blue-600 { color: var(--m3-primary); }
+.m3 .text-blue-700 { color: var(--m3-primary); }
+.m3 .text-blue-800 { color: var(--m3-on-primary-container); }
+.m3 .text-emerald-600 { color: var(--m3-tertiary); }
+.m3 .text-emerald-700 { color: var(--m3-tertiary); }
+.m3 .text-emerald-800 { color: var(--m3-on-tertiary-container); }
+.m3 .text-emerald-900 { color: var(--m3-on-tertiary-container); }
+.m3 .text-red-600 { color: var(--m3-error); }
+.m3 .text-red-800 { color: var(--m3-on-error-container); }
+.m3 .text-rose-500 { color: var(--m3-error); }
+.m3 .text-rose-600 { color: var(--m3-error); }
+.m3 .text-rose-700 { color: var(--m3-error); }
+.m3 .text-rose-900 { color: var(--m3-on-error-container); }
+.m3 .text-slate-300 { color: var(--m3-on-surface-variant); }
+.m3 .text-slate-400 { color: var(--m3-on-surface-variant); }
+.m3 .text-slate-500 { color: var(--m3-on-surface-variant); }
+.m3 .text-slate-600 { color: var(--m3-on-surface); }
+.m3 .text-slate-700 { color: var(--m3-on-surface); }
+.m3 .text-slate-800 { color: var(--m3-on-surface); }
+.m3 .text-slate-900 { color: var(--m3-on-surface); }
+.m3 .bg-blue-500.text-white { color: var(--m3-on-primary); }
+.m3 .bg-blue-600.text-white { color: var(--m3-on-primary); }
+.m3 .bg-rose-600.text-white { color: var(--m3-on-error); }
+.m3 .focus\:ring-blue-500:focus { --tw-ring-color: var(--m3-primary); }
+.m3 .hover\:bg-blue-100:hover { background-color: var(--m3-primary-container); }
+.m3 .hover\:bg-blue-50:hover { background-color: var(--m3-primary-container); }
+.m3 .hover\:bg-blue-50\/60:hover { background-color: var(--m3-primary-container); }
+.m3 .hover\:bg-blue-600:hover { background-color: var(--m3-primary); }
+.m3 .hover\:bg-blue-700:hover { background-color: var(--m3-primary); }
+.m3 .hover\:bg-rose-700:hover { background-color: var(--m3-error); }
+.m3 .hover\:bg-slate-100:hover { background-color: var(--m3-surface-container); }
+.m3 .hover\:bg-slate-100\/80:hover { background-color: var(--m3-surface-container); }
+.m3 .hover\:bg-slate-50:hover { background-color: var(--m3-surface-container-low); }
+.m3 .hover\:border-blue-300:hover { border-color: var(--m3-primary-container); }
+.m3 .hover\:border-slate-200:hover { border-color: var(--m3-surface-container-high); }
+.m3 .hover\:border-slate-300:hover { border-color: var(--m3-outline); }
+.m3 .hover\:text-rose-500:hover { color: var(--m3-error); }
+.m3 .hover\:text-slate-600:hover { color: var(--m3-on-surface); }
+.m3 .hover\:text-slate-900:hover { color: var(--m3-on-surface); }
+
+@media (prefers-color-scheme: dark) {
+  .m3 .dark\:bg-amber-950 { background-color: var(--m3-canh-bao); }
+  .m3 .dark\:bg-amber-950\/40 { background-color: var(--m3-canh-bao); }
+  .m3 .dark\:bg-amber-950\/60 { background-color: var(--m3-canh-bao); }
+  .m3 .dark\:bg-blue-900\/50 { background-color: var(--m3-primary-container); }
+  .m3 .dark\:bg-blue-950 { background-color: var(--m3-primary-container); }
+  .m3 .dark\:bg-blue-950\/20 { background-color: var(--m3-primary-container); }
+  .m3 .dark\:bg-blue-950\/30 { background-color: var(--m3-primary-container); }
+  .m3 .dark\:bg-blue-950\/40 { background-color: var(--m3-primary-container); }
+  .m3 .dark\:bg-blue-950\/60 { background-color: var(--m3-primary-container); }
+  .m3 .dark\:bg-emerald-950 { background-color: var(--m3-tertiary-container); }
+  .m3 .dark\:bg-emerald-950\/50 { background-color: var(--m3-tertiary-container); }
+  .m3 .dark\:bg-emerald-950\/60 { background-color: var(--m3-tertiary-container); }
+  .m3 .dark\:bg-red-950\/50 { background-color: var(--m3-error-container); }
+  .m3 .dark\:bg-rose-950 { background-color: var(--m3-error-container); }
+  .m3 .dark\:bg-rose-950\/40 { background-color: var(--m3-error-container); }
+  .m3 .dark\:bg-rose-950\/60 { background-color: var(--m3-error-container); }
+  .m3 .dark\:bg-slate-700 { background-color: var(--m3-surface-container-high); }
+  .m3 .dark\:bg-slate-800 { background-color: var(--m3-surface-container); }
+  .m3 .dark\:bg-slate-800\/40 { background-color: var(--m3-man-che); }
+  .m3 .dark\:bg-slate-800\/70 { background-color: var(--m3-surface-container); }
+  .m3 .dark\:bg-slate-900 { background-color: var(--m3-surface-container-lowest); }
+  .m3 .dark\:bg-slate-900\/40 { background-color: var(--m3-man-che); }
+  .m3 .dark\:border-amber-800 { border-color: var(--m3-canh-bao); }
+  .m3 .dark\:border-amber-800\/40 { border-color: var(--m3-canh-bao); }
+  .m3 .dark\:border-amber-800\/80 { border-color: var(--m3-canh-bao); }
+  .m3 .dark\:border-blue-700 { border-color: var(--m3-primary-container); }
+  .m3 .dark\:border-blue-800 { border-color: var(--m3-primary-container); }
+  .m3 .dark\:border-emerald-700 { border-color: var(--m3-tertiary-container); }
+  .m3 .dark\:border-emerald-800 { border-color: var(--m3-tertiary-container); }
+  .m3 .dark\:border-red-800 { border-color: var(--m3-error-container); }
+  .m3 .dark\:border-rose-700 { border-color: var(--m3-error-container); }
+  .m3 .dark\:border-rose-800 { border-color: var(--m3-error-container); }
+  .m3 .dark\:border-rose-900 { border-color: var(--m3-error-container); }
+  .m3 .dark\:border-slate-600 { border-color: var(--m3-outline); }
+  .m3 .dark\:border-slate-700 { border-color: var(--m3-surface-container-high); }
+  .m3 .dark\:border-slate-800 { border-color: var(--m3-surface-container-high); }
+  .m3 .dark\:border-slate-800\/80 { border-color: var(--m3-surface-container-high); }
+  .m3 .dark\:divide-slate-800 > :not(:last-child) { border-color: var(--m3-surface-container-high); }
+  .m3 .dark\:text-amber-100 { color: var(--m3-tren-canh-bao); }
+  .m3 .dark\:text-amber-200 { color: var(--m3-tren-canh-bao); }
+  .m3 .dark\:text-amber-200\/80 { color: var(--m3-tren-canh-bao); }
+  .m3 .dark\:text-amber-300 { color: var(--m3-tren-canh-bao); }
+  .m3 .dark\:text-amber-400 { color: var(--m3-tren-canh-bao); }
+  .m3 .dark\:text-blue-200 { color: var(--m3-primary); }
+  .m3 .dark\:text-blue-300 { color: var(--m3-primary); }
+  .m3 .dark\:text-blue-400 { color: var(--m3-primary); }
+  .m3 .dark\:text-emerald-200 { color: var(--m3-tertiary); }
+  .m3 .dark\:text-emerald-300 { color: var(--m3-tertiary); }
+  .m3 .dark\:text-emerald-400 { color: var(--m3-tertiary); }
+  .m3 .dark\:text-red-200 { color: var(--m3-error); }
+  .m3 .dark\:text-rose-200 { color: var(--m3-error); }
+  .m3 .dark\:text-rose-300 { color: var(--m3-error); }
+  .m3 .dark\:text-rose-400 { color: var(--m3-error); }
+  .m3 .dark\:text-slate-100 { color: var(--m3-on-surface); }
+  .m3 .dark\:text-slate-200 { color: var(--m3-on-surface); }
+  .m3 .dark\:text-slate-300 { color: var(--m3-on-surface); }
+  .m3 .dark\:text-slate-400 { color: var(--m3-on-surface-variant); }
+  .m3 .dark\:text-slate-600 { color: var(--m3-on-surface-variant); }
+  .m3 .dark\:text-white { color: var(--m3-on-surface); }
+  .m3 .dark\:hover\:bg-blue-950\/40:hover { background-color: var(--m3-primary-container); }
+  .m3 .dark\:hover\:bg-slate-700:hover { background-color: var(--m3-surface-container-high); }
+  .m3 .dark\:hover\:bg-slate-750:hover { background-color: var(--m3-surface-container-high); }
+  .m3 .dark\:hover\:bg-slate-800:hover { background-color: var(--m3-surface-container); }
+  .m3 .dark\:hover\:bg-slate-800\/50:hover { background-color: var(--m3-man-che); }
+  .m3 .dark\:hover\:bg-slate-800\/60:hover { background-color: var(--m3-man-che); }
+  .m3 .dark\:hover\:bg-slate-800\/80:hover { background-color: var(--m3-surface-container); }
+  .m3 .dark\:hover\:border-blue-700:hover { border-color: var(--m3-primary-container); }
+  .m3 .dark\:hover\:text-white:hover { color: var(--m3-on-surface); }
+}

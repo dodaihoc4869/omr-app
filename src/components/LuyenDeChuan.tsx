@@ -5,6 +5,8 @@ import { ArrowUpRight, Clock3, FileText, ChevronLeft, Award, ChevronDown } from 
 import { layCauHinhMayChu, xongNapDiaChi } from '../lib/may-chu-moi'
 import type { PublicExamBank, TeacherExamSource } from '../data/examContent'
 import ModalXacNhanNop from './ModalXacNhanNop'
+import './m3'
+import './m3/luyen-khac-phuc.css'
 
 type Paper = {
   id: string
@@ -159,7 +161,7 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
     return () => clearTimeout(timer)
   }, [answers, paper?.id, paper?.status])
 
-  const panel = 'p-4 sm:p-6 rounded-2xl border border-blue-200 bg-white dark:bg-slate-900 space-y-4'
+  const panel = 'm3 m3-khoi p-4 sm:p-6 space-y-4'
 
   // MÀN HÌNH CHƯA MỞ BÀI LUYỆN
   if (!paper) {
@@ -167,7 +169,7 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
       <section className={panel}>
         <div className="flex items-center gap-2">
           <h2 className="font-bold text-lg text-blue-700 dark:text-blue-400">LUYỆN ĐỀ CHUẨN CẤU TRÚC</h2>
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">✨ Chuẩn Bộ GD&ĐT 2026</span>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">Chuẩn Bộ GD&ĐT 2026</span>
         </div>
         <p className="font-semibold text-xs text-slate-700 dark:text-slate-300">
           Chỉ dành cho học sinh đã học xong toàn bộ chương trình Hóa THPT.
@@ -175,7 +177,7 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
         <p className="text-xs text-slate-500 dark:text-slate-400">
           Rút từ BỘ ĐỀ lớp 12 theo thuật toán ma trận đẳng cấu chuẩn Bộ GD&ĐT · 50 phút · 28 câu: 18 câu chọn đáp án (Phần I), 4 câu đúng/sai (Phần II), 6 câu trả lời ngắn (Phần III).
         </p>
-        <label className="flex gap-2 items-center text-xs font-medium cursor-pointer text-slate-800 dark:text-slate-200">
+        <label className="flex gap-3 items-center min-h-[48px] text-xs font-medium cursor-pointer text-slate-800 dark:text-slate-200">
           <input
             type="checkbox"
             checked={ready}
@@ -185,7 +187,7 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
           Em đã học xong toàn bộ chương trình.
         </label>
         <button
-          className="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm disabled:opacity-50 transition cursor-pointer shadow-sm"
+          className="m3-nut-chinh disabled:opacity-50 cursor-pointer"
           disabled={!ready || busy}
           onClick={() => void open()}
         >
@@ -283,7 +285,7 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
   const soCauDaLam = Object.values(answers).filter((v) => v && v.trim() && v !== '----').length
 
   return createPortal(
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-100/90 dark:bg-slate-950 text-slate-900 dark:text-white overscroll-contain">
+    <div className="m3 m3-man-lam fixed inset-0 z-50 overflow-y-auto overscroll-contain">
       <div
         className="min-h-full max-w-4xl mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-6"
         style={{
@@ -292,11 +294,11 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
         }}
       >
         {/* Header bài luyện */}
-        <div className="rounded-2xl border border-blue-200 dark:border-blue-900/50 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm flex flex-wrap items-center justify-between gap-3">
+        <div className="m3-dau-man flex flex-wrap items-center justify-between gap-3">
           <div>
             <button
               onClick={() => setPaper(null)}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline mb-1 cursor-pointer"
+              className="m3-nut-chu -ml-3 cursor-pointer"
             >
               <ChevronLeft size={16} />
               Quay lại danh sách luyện tập
@@ -394,7 +396,7 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
           style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))', pointerEvents: 'none' }}
         >
           <div
-            className="mx-auto flex max-w-3xl items-center justify-between gap-3 rounded-2xl border border-blue-200 bg-white/95 p-3 shadow-xl backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/95"
+            className="m3-thanh-duoi mx-auto flex max-w-3xl items-center justify-between gap-3 p-3"
             style={{ pointerEvents: 'auto' }}
           >
             <div className="min-w-0">
@@ -414,7 +416,7 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
             </div>
             <button
               disabled={busy}
-              className="shrink-0 rounded-xl bg-blue-600 hover:bg-blue-700 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50 shadow-sm transition cursor-pointer"
+              className="m3-nut-chinh shrink-0 cursor-pointer"
               onClick={() => setHienXacNhanNop(true)}
             >
               {busy ? 'Đang nộp…' : 'Nộp bài'}

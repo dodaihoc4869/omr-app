@@ -3,6 +3,7 @@
 // Bảng nhiệm vụ (Code 2) — nạp lại đúng tệp đó, không có bảng màu thứ hai.
 import '../bang-nhiem-vu/m3-theme.css'
 import './m3.css'
+import './m3-tuong-thich.css'
 import { laManThayQuanLy } from '../../lib/vai-tro'
 
 /** Đang ở vùng HỌC SINH / PHỤ HUYNH (đường /hs, /ph, ?examCode=, ?vai=phieu…)
