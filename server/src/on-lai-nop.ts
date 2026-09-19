@@ -6,7 +6,10 @@
 // LUẬT (khoá bằng tests/on-lai-nop-1909.test.ts):
 //   · BẮT BUỘC token học sinh (`gameIdentity`); SBD trần bị từ chối — không nộp hộ, không giả em khác.
 //   · Chỉ nhận qid mà `/hs/cau-theo-qid` sẽ trả cho CHÍNH em đó (`layCauChoEm`: đã gặp, không thuộc đề đang bảo vệ) — một tập, không lệch.
-//   · CHẤM tại máy chủ bằng `isAnswerCorrect` — MỘT luật chấm cho sổ. Đáp án rỗng/`----` = bỏ trống → ket_qua NULL, không cộng lan_sai.
+//   · CHẤM tại máy chủ bằng `isAnswerCorrect` — MỘT luật chấm cho sổ. CHỈ câu ĐÃ TRẢ LỜI (`daTraLoi`: cùng luật "điền đủ" của `grade` game v2 —
+//     Phần I một chữ A–D, Phần II đủ 4 ý Đ/S, Phần III có số) mới được chấm, ghi sổ, khoá lần đầu và nhận lời giải. Câu chưa làm (rỗng,
+//     `----`, thiếu ý, sai định dạng) KHÔNG ghi sổ, KHÔNG khoá, KHÔNG có đáp án/lời giải, và nằm trong `chuaLam[]` để máy em giữ câu lại
+//     cho em làm tiếp trong ngày. Lý do (0.Planer): đường này để ÔN, không phải bài thi có giờ; muốn xem đáp án thì phải trả lời.
 //   · Ghi `su_kien_hoc` nguon='on_lai', ma_nguon=`on_lai:<ngày VN>`, lan=1: idempotent theo khoá, nộp lại cùng câu cùng ngày giữ lần ĐẦU
 //     (không cho sửa đáp án sau khi đã thấy lời giải). Kết quả trả về được ĐỌC LẠI từ sổ, nên nộp lại luôn ra kết quả lần đầu.
 //   · ĐÁP ÁN VÀ LỜI GIẢI CHỈ ĐI RA SAU KHI ĐÃ GHI SỔ THÀNH CÔNG. Ghi không được thì `ok:false` và KHÔNG có đáp án nào trong phản hồi.
@@ -22,7 +25,7 @@ import { gameIdentity } from './game-v2-auth'
 import { dungLaiHoSo } from './ho-so-nam-kt'
 import { TIEN_BO_NGAY } from './ke-hoach-ngay-d1'
 import { DAI_QID_TOI_DA, donQid, layCauChoEm, TOI_DA_QID_MOT_LUOT } from './cau-theo-qid'
-import { ghiSuKien, laBoTrong, ngayVn, phanTuQid, type SuKien } from './su-kien-hoc'
+import { ghiSuKien, ngayVn, phanTuQid, type SuKien } from './su-kien-hoc'
 
 const GIAY_MIN = 5
 const GIAY_MAX = 1200
@@ -50,6 +53,18 @@ export function docTraLoi(ds: unknown[]): BaiLam[] {
   return [...ra.values()]
 }
 
+/**
+ * Em đã TRẢ LỜI câu này chưa? Cùng luật "điền đủ" của `grade` trong game v2 (`game-v2.ts`, action `answer`):
+ * Phần I đúng một chữ A–D; Phần II đủ 4 ý Đ/S (Đ có dấu hay không đều được, `-` là ý còn trống); Phần III có nội dung (≤ 40 ký tự đã cắt sẵn).
+ */
+export function daTraLoi(phan: string, dapAn: string): boolean {
+  const hoa = dapAn.trim().toUpperCase()
+  if (phan === 'I') return /^[ABCD]$/.test(hoa) // 'Đ' KHÔNG được đổi thành 'D' ở Phần I: luật của game chỉ nhận A–D thô
+  const s = hoa.replace(/Đ/g, 'D').replace(/\s+/g, '')
+  if (phan === 'II') return /^[DS]{4}$/.test(s)
+  return s !== '' && !/^[-–—_]+$/.test(s)
+}
+
 /** Cộng EXP học tập cho các câu ĐÚNG lần đầu. Không bao giờ ném lỗi ra ngoài. */
 async function ganExp(env: Env, sbd: string, qidDung: string[], luc: string): Promise<number> {
   if (qidDung.length === 0) return 0
@@ -75,13 +90,16 @@ export async function hsOnLaiNop(env: Env, b: Record<string, unknown>): Promise<
   if (b.traLoi.length > TOI_DA_QID_MOT_LUOT) return { ok: false, error: `Mỗi lần nộp tối đa ${TOI_DA_QID_MOT_LUOT} câu` }
   const lam = docTraLoi(b.traLoi)
   const xin = donQid(lam.map((x) => x.qid))
-  if (xin.length === 0) return { ok: true, ketQua: [], khongCo: [], tienBo: null, exp: 0 }
+  if (xin.length === 0) return { ok: true, ketQua: [], khongCo: [], chuaLam: [], tienBo: null, exp: 0 }
 
   const r = await layCauChoEm(env, sbd, xin)
   if (r.loi) return { ok: false, error: r.loi }
   const cauTheoQid = new Map(r.cau.map((q) => [q.qid, q]))
-  const nhan = lam.filter((x) => cauTheoQid.has(x.qid))
-  if (nhan.length === 0) return { ok: true, ketQua: [], khongCo: r.khongCo, tienBo: null, exp: 0 }
+  const nhanHet = lam.filter((x) => cauTheoQid.has(x.qid))
+  // Chưa trả lời thì KHÔNG ghi, KHÔNG khoá, KHÔNG đáp án: trả lại `chuaLam` để em làm tiếp trong ngày.
+  const nhan = nhanHet.filter((x) => daTraLoi(cauTheoQid.get(x.qid)!.phan, x.dapAn))
+  const chuaLam = nhanHet.filter((x) => !nhan.includes(x)).map((x) => x.qid)
+  if (nhan.length === 0) return { ok: true, ketQua: [], khongCo: r.khongCo, chuaLam, tienBo: null, exp: 0 }
 
   // CHẤM rồi GHI SỔ. Chưa ghi được thì không có đáp án nào đi ra.
   const now = Date.now()
@@ -91,7 +109,7 @@ export async function hsOnLaiNop(env: Env, b: Record<string, unknown>): Promise<
     const q = cauTheoQid.get(x.qid)!
     return {
       nguon: 'on_lai', maNguon, sbd, qid: x.qid, lan: 1, luc, giay: x.giay, maDang: q.dang, chuyenDe: '', mucDo: q.mucDo ?? '',
-      ketQua: laBoTrong(x.dapAn) ? null : isAnswerCorrect(x.dapAn, q.correct, phanTuQid(x.qid, q.phan)) ? 1 : 0,
+      ketQua: isAnswerCorrect(x.dapAn, q.correct, phanTuQid(x.qid, q.phan)) ? 1 : 0, // đã qua `daTraLoi` nên không còn bỏ trống
     }
   })
   const ghi = await ghiSuKien(env, suKien)
@@ -129,5 +147,5 @@ export async function hsOnLaiNop(env: Env, b: Record<string, unknown>): Promise<
       anhLoiGiai: (q.hinhAnh ?? []).filter((h) => h.viTri === 'sau_loi_giai'),
     }
   })
-  return { ok: true, ketQua, khongCo: r.khongCo, tienBo, exp }
+  return { ok: true, ketQua, khongCo: r.khongCo, chuaLam, tienBo, exp }
 }

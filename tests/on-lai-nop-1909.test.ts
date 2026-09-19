@@ -2,7 +2,7 @@
 // POST /hs/on-lai/nop — em NỘP bài làm câu "ôn lại": máy chủ chấm, ghi sổ nguon='on_lai', dựng lại hồ sơ, rồi MỚI trả đáp án.
 import { describe, it, expect, vi } from 'vitest'
 import worker from '../server/src/index'
-import { docTraLoi } from '../server/src/on-lai-nop'
+import { daTraLoi, docTraLoi } from '../server/src/on-lai-nop'
 import { ghiSuKien, ngayVn } from '../server/src/su-kien-hoc'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
 
@@ -94,7 +94,8 @@ describe('chỉ nhận đúng tập câu mà /hs/cau-theo-qid trả cho em', () 
     const d = await dung()
     const xin = [I1, II2, III3, CHUA_GAP, 'KHONG-TON-TAI']
     const lay = await goiWorker(worker, d.env, '/hs/cau-theo-qid', { token: 'token-S1', qid: xin })
-    const dua = await nop(d, xin.map((qid) => ({ qid, dapAn: 'B' })))
+    const dapAnHopLe: Record<string, string> = { [I1]: 'B', [II2]: 'DSDS', [III3]: '0,39' }
+    const dua = await nop(d, xin.map((qid) => ({ qid, dapAn: dapAnHopLe[qid] ?? 'B' })))
     expect((dua.ketQua as { qid: string }[]).map((x) => x.qid)).toEqual((lay.cau as { qid: string }[]).map((x) => x.qid))
     expect(dua.khongCo).toEqual(lay.khongCo)
   })
@@ -127,15 +128,48 @@ describe('chấm tại máy chủ, ghi sổ, hồ sơ lên bậc', () => {
     expect(r.tienBo.lenBac).toBe(0)
   })
 
-  it('BỎ TRỐNG (rỗng, ----, khoảng trắng, thiếu dapAn): ket_qua NULL, dung null, KHÔNG cộng lan_sai', async () => {
+  it('CHƯA LÀM (rỗng, ----, khoảng trắng, thiếu dapAn): KHÔNG ghi sổ, KHÔNG khoá, KHÔNG đáp án; nằm trong chuaLam; hồ sơ không đổi', async () => {
     const d = await dung()
-    const laiSaiTruoc = (await nop(d, [{ qid: III3, dapAn: '' }])).ok
-    expect(laiSaiTruoc).toBe(true)
-    const r = await nop(d, [{ qid: II2, dapAn: '----' }, { qid: I1 }])
-    expect(r.ketQua.map((x: { dung: unknown }) => x.dung)).toEqual([null, null])
-    for (const q of [II2, I1, III3]) expect(suKien(d, q)[0]!.ket_qua).toBeNull()
-    for (const q of [I1, II2, III3]) expect(hoSo(d, q)!.lan_sai).toBe(1) // vẫn 1 lần sai từ BTVN, không thêm
-    expect(hoSo(d, I1)!.lan_trong).toBe(1)
+    const truoc = d.chup('su_kien_hoc')
+    const r = await nop(d, [{ qid: I1, dapAn: '' }, { qid: II2, dapAn: '----' }, { qid: III3, dapAn: '   ' }, { qid: I1 }])
+    expect(r.ok).toBe(true)
+    expect(r.ketQua).toEqual([])
+    expect(r.chuaLam).toEqual([I1, II2, III3])
+    expect(d.chup('su_kien_hoc')).toBe(truoc)
+    expect(d.dem('nam_kt_cau')).toBe(0) // không có dòng sổ mới nên chưa dựng lại hồ sơ
+    const chuoi = JSON.stringify(r)
+    for (const bi of [LOI_GIAI, 'ANH-LOI-GIAI', 'dapAnDung', 'loiGiai', 'DSDS']) expect(chuoi).not.toContain(bi)
+    expect(r.tienBo).toBeNull()
+    expect(r.exp).toBe(0)
+  })
+
+  it('THIẾU Ý / SAI ĐỊNH DẠNG cũng là chưa làm: Phần II thiếu ý, Phần I ngoài A–D hoặc hai chữ', async () => {
+    const d = await dung()
+    const r = await nop(d, [{ qid: II2, dapAn: 'DS' }, { qid: I1, dapAn: 'E' }])
+    expect(r.ketQua).toEqual([])
+    expect(r.chuaLam).toEqual([II2, I1])
+    const r2 = await nop(d, [{ qid: II2, dapAn: 'DS-S' }, { qid: I1, dapAn: 'AB' }, { qid: II2 + 'x', dapAn: 'DSDS' }])
+    expect(r2.chuaLam).toEqual([II2, I1])
+    expect(d.dem('su_kien_hoc', "nguon='on_lai'")).toBe(0)
+  })
+
+  it('TRỘN: 2 câu đã trả lời + 1 câu trống → ĐÚNG 2 dòng sổ, chỉ 2 câu nhận đáp án, câu trống nằm trong chuaLam', async () => {
+    const d = await dung()
+    const r = await nop(d, [{ qid: I1, dapAn: 'B' }, { qid: II2, dapAn: '' }, { qid: III3, dapAn: '0,39' }])
+    expect(d.dem('su_kien_hoc', "nguon='on_lai'")).toBe(2)
+    expect((r.ketQua as { qid: string }[]).map((x) => x.qid)).toEqual([I1, III3])
+    expect(r.chuaLam).toEqual([II2])
+    expect(suKien(d, II2)).toHaveLength(0)
+    expect(JSON.stringify(r.ketQua)).not.toContain('DSDS') // đáp án của câu trống không lọt
+  })
+
+  it('câu trống KHÔNG bị khoá: nộp lại sau đó vẫn được chấm bình thường (đúng hay sai theo lần trả lời thật)', async () => {
+    const d = await dung()
+    await nop(d, [{ qid: II2, dapAn: '' }])
+    const r = await nop(d, [{ qid: II2, dapAn: 'DSDS' }])
+    expect(r.ketQua[0]).toMatchObject({ qid: II2, dung: true, dapAnDung: 'DSDS' })
+    expect(suKien(d, II2)).toHaveLength(1)
+    expect(hoSo(d, II2)).toMatchObject({ trang_thai: 'dang_on' })
   })
 
   it('Phần II có dấu (ĐSĐS) và Phần III dấu phẩy/dấu chấm chấm đúng như luật chấm của sổ', async () => {
@@ -169,11 +203,11 @@ describe('idempotent: nộp lại cùng câu cùng ngày giữ lần ĐẦU', ()
     expect(suKien(d, I1)[0]!.ket_qua).toBe(0)
     expect(JSON.stringify(hoSo(d, I1))).toBe(hoSoTruoc)
   })
-  it('lần 1 đúng, lần 2 điền sai → vẫn ĐÚNG; lần 1 bỏ trống, lần 2 điền → vẫn bỏ trống', async () => {
+  it('lần 1 đúng, lần 2 điền sai → vẫn ĐÚNG (giữ lần đầu); câu trống lần 1 thì lần 2 được chấm như lần đầu thật sự', async () => {
     const d = await dung()
     await nop(d, [{ qid: I1, dapAn: 'B' }, { qid: II2, dapAn: '' }])
     const r = await nop(d, [{ qid: I1, dapAn: 'C' }, { qid: II2, dapAn: 'DSDS' }])
-    expect(r.ketQua.map((x: { dung: unknown }) => x.dung)).toEqual([true, null])
+    expect(r.ketQua.map((x: { dung: unknown }) => x.dung)).toEqual([true, true])
   })
   it('trong CÙNG một lượt, mục trùng qid: giữ mục đầu', async () => {
     const d = await dung()
@@ -268,6 +302,21 @@ describe('EXP học tập qua đúng đường creditAcademic (practice:<qid>)',
     expect(r.ok).toBe(true)
     expect(r.ketQua[0].dung).toBe(true)
     expect(suKien(d, I1)).toHaveLength(1)
+  })
+})
+
+describe('daTraLoi: cùng luật "điền đủ" của game v2', () => {
+  it('Phần I: đúng một chữ A–D (không phân biệt hoa thường, bỏ khoảng trắng)', () => {
+    for (const s of ['A', 'b', ' C ', 'd']) expect(daTraLoi('I', s)).toBe(true)
+    for (const s of ['', 'E', 'AB', '-', '1', 'Đ']) expect(daTraLoi('I', s)).toBe(false)
+  })
+  it('Phần II: đủ 4 ý Đ/S (Đ có dấu được; khoảng trắng bỏ qua); thiếu ý hoặc còn "-" là chưa làm', () => {
+    for (const s of ['DSDS', 'ĐSĐS', 'dsds', 'D S D S', 'SSSS']) expect(daTraLoi('II', s)).toBe(true)
+    for (const s of ['', 'DS', 'DSD', 'DS-S', '----', 'DSDSD', 'ABCD']) expect(daTraLoi('II', s)).toBe(false)
+  })
+  it('Phần III: có nội dung; rỗng hoặc toàn gạch là chưa làm', () => {
+    for (const s of ['0,39', '12', '-3', 'x']) expect(daTraLoi('III', s)).toBe(true)
+    for (const s of ['', '   ', '---', '–']) expect(daTraLoi('III', s)).toBe(false)
   })
 })
 
