@@ -604,7 +604,7 @@ export async function chotExpNgayQua(env: Env, nowMs: number): Promise<{ soEm: n
 
 const TEN_LOAI: Record<string, string> = {
   cau: 'câu đúng', lo: 'lô BTVN', btvn: 'nộp bài BTVN đúng hạn', mom: 'bài được giao', len_bac: 'câu ôn lên bậc', khac_phuc: 'câu khắc phục xong',
-  len_bang: 'lên bảng', diem_ca: 'điểm ca thi', dat_ngay: 'đạt nhiệm vụ ngày', chuoi: 'chuỗi ngày đạt',
+  len_bang: 'lần lên bảng', diem_ca: 'ca thi có điểm', dat_ngay: 'lần đạt nhiệm vụ ngày', chuoi: 'chuỗi ngày đạt', tiepsuc: 'lượt tiếp sức',
 }
 
 export interface ExpHomNay {
