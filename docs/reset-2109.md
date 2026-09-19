@@ -69,3 +69,10 @@ cd server && npx wrangler d1 execute omr --remote -y --file=/tmp/su_kien_hoc.sql
 
 ## 6. Thêm bảng mới về sau
 Test `tests/reset-toan-app-1909.test.ts` ("mọi bảng … được phân loại") sẽ đỏ nếu thêm bảng mà không đưa vào `BANG_XOA` hoặc `BANG_GIU` ở `server/src/reset-toan-app.ts`. Người thêm bảng phải quyết.
+
+## 7. Nhật ký sao lưu đã làm
+
+**Export thử 19/09/2026 ~17:00 giờ VN** → `/Volumes/SSD NGOÀI/omr-saoluu/omr-d1-thu-20260919.sql` (104.571.167 byte). `wrangler d1 export omr --remote` mất **15 giây** (D1 bị khoá trong chốc lát). Kiểm: tệp nạp được vào SQLite bộ nhớ trong 0,7 giây; 62 bảng; số dòng nạp của từng bảng = số câu `INSERT` của bảng ấy; so với D1 thật ngay sau đó chỉ lệch dữ liệu mới trong lúc export (`app_presence` +2, `su_kien_hoc` +3). Bookmark Time Travel lúc đó: `00000239-0000dca7-000050eb-e227f43314180c70f139eb8b6e3a5cd3` (khôi phục về đúng thời điểm ấy: `cd server && npx wrangler d1 time-travel restore omr --bookmark=00000239-0000dca7-000050eb-e227f43314180c70f139eb8b6e3a5cd3`; Time Travel giữ 30 ngày).
+
+**Export CHÍNH THỨC 20/09/2026 22:20** (0.Planer nhắn): tên tệp `omr-d1-20260920-2220.sql` cùng thư mục — kết quả ghi thêm ở đây sau khi làm.
+
