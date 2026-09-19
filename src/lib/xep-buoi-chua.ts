@@ -34,7 +34,7 @@ import type { CauChua } from './phan-cong'
 import { chuanChuyenDe } from './phan-cong'
 import { CAU_HINH_LEN_BANG_MAC_DINH, giayLenBang, nganSachGiay, type CauHinhLenBang } from './len-bang-cau-hinh'
 import type { HoSoEmDayDu } from './ho-so-lop'
-import { btvnCuaCau, CHU_BTVN, diemHopCau, tomTatBtvn } from './ho-so-lop'
+import { btvnCuaCau, canDayLaiCau, CHU_BTVN, diemHopCau, lyDoChanCau, tomTatBtvn } from './ho-so-lop'
 
 /** Một câu đã có thống kê lớp — phần thuật toán này cần đúng bấy nhiêu. */
 export interface CauVaoXep {
@@ -105,19 +105,28 @@ export function xepThuTuChua(ds: CauVaoXep[]): CauVaoXep[] {
   })
 }
 
-/** Chọn em hợp nhất còn rảnh cho một câu. Trả null khi không còn ai. */
+/** Chọn em hợp nhất còn rảnh cho một câu. Trả null khi không còn ai NHẬN được.
+ *
+ * Em bị CHẶN CỨNG (`chan` — bậc "biết" ở dạng của câu 2 sao) không bao giờ được
+ * chọn, dù điểm cao đến đâu. Điểm bằng nhau thì em mà câu này là câu CẦN DẠY LẠI
+ * của chính em ấy đứng trước; còn bằng nữa thì em đứng trước trong danh sách
+ * (tất định — không bốc thăm). */
 function chonEm(
   c: CauVaoXep,
   dsEm: HoSoEmDayDu[],
   daGoi: Set<string>,
 ): { em: HoSoEmDayDu; hop: number; viSao: string } | null {
-  let tot: { em: HoSoEmDayDu; hop: number; viSao: string } | null = null
+  let tot: { em: HoSoEmDayDu; hop: number; viSao: string; dayLai: boolean } | null = null
   for (const e of dsEm) {
     if (daGoi.has(e.sbd)) continue
     const d = diemHopCau(e, c.cau)
-    if (!tot || d.diem > tot.hop) tot = { em: e, hop: d.diem, viSao: d.viSao }
+    if (d.chan) continue
+    const dayLai = d.dayLai === true
+    if (!tot || d.diem > tot.hop + 1e-9 || (Math.abs(d.diem - tot.hop) <= 1e-9 && dayLai && !tot.dayLai)) {
+      tot = { em: e, hop: d.diem, viSao: d.viSao, dayLai }
+    }
   }
-  return tot
+  return tot ? { em: tot.em, hop: tot.hop, viSao: tot.viSao } : null
 }
 
 /**
@@ -138,7 +147,13 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
 
   const san = Math.min(ch.SO_EM_LEN_BANG_TOI_THIEU, em.length)
   const tran = Math.min(ch.SO_EM_LEN_BANG_TOI_DA, em.length)
-  const thuTu = xepThuTuChua(dsCau)
+
+  // CÂU CẦN DẠY LẠI → BẮT BUỘC (thầy chốt 19/09): có ÍT NHẤT MỘT em CÓ MẶT đã sai câu
+  // ấy ≥ 3 lần mà chưa đúng lại lần nào thì câu đó vào danh sách bắt buộc — đi
+  // vòng 1 cùng câu thầy chốt, không bị nhường chỗ cho câu dễ hơn. Em vắng thì
+  // không ép được ai, nên chỉ soi em có mặt.
+  const cauDayLai = new Set(dsCau.filter((c) => em.some((e) => canDayLaiCau(e, c.cau.id))).map((c) => c.cau.id))
+  const thuTu = xepThuTuChua(dsCau.map((c) => (!c.batBuoc && cauDayLai.has(c.cau.id) ? { ...c, batBuoc: true } : c)))
 
   // Giá RẺ NHẤT của một câu khi chỉ đọc đáp án. Câu bắt buộc phải nêu bẫy nên
   // đắt hơn; câu thường đọc lướt là xong.
@@ -150,6 +165,11 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
   const daChua = new Set<string>()
   let dung = 0
   const batBuocChuaChua: CauChua[] = []
+
+  /** Câu vào buổi vì có em CẦN DẠY LẠI mà em đứng lên không phải em ấy (em ấy bị chặn
+   * bậc, hoặc vắng lượt) — vẫn phải nói cho thầy biết đây là câu dạy lại. */
+  const lyDoGoi = (c: CauVaoXep, viSao: string) =>
+    cauDayLai.has(c.cau.id) && !viSao.includes('dạy lại') ? `câu cần dạy lại (có em sai ≥ 3 lần chưa đúng lại) · ${viSao}` : viSao
 
   /** Giá THÊM của việc nâng một câu từ đọc đáp án lên gọi em lên bảng. */
   const themGiay = (c: CauVaoXep) => giayLenBang(ch, c.cau.sao) - giayDoc(c)
@@ -206,7 +226,7 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
     daGoi.add(chon.em.sbd)
     daChua.add(c.cau.id)
     dung += giayLenBang(ch, c.cau.sao) - giayDoc(c)
-    dong.push({ tang: 'len_bang', cau: c.cau, giay: giayLenBang(ch, c.cau.sao), em: chon.em, viSao: chon.viSao, hop: chon.hop })
+    dong.push({ tang: 'len_bang', cau: c.cau, giay: giayLenBang(ch, c.cau.sao), em: chon.em, viSao: lyDoGoi(c, chon.viSao), hop: chon.hop })
   }
 
   // ── VÒNG 2: 2 SAO rồi 1 SAO rồi 0 SAO, cho tới khi ĐẠT SÀN ────────────────
@@ -217,11 +237,13 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
     if (daChua.has(c.cau.id)) continue
     if (!duCho(c, true)) continue
     const chon = chonEm(c, em, daGoi)
-    if (!chon) break
+    // Null = không em còn lại nào NHẬN được câu này (bị chặn bậc "biết"), chứ không
+    // hẳn hết em: câu sau (1 sao, 0 sao) vẫn còn em nhận được — không được dừng cả vòng.
+    if (!chon) continue
     daGoi.add(chon.em.sbd)
     daChua.add(c.cau.id)
     dung += giayLenBang(ch, c.cau.sao) - giayDoc(c)
-    dong.push({ tang: 'len_bang', cau: c.cau, giay: giayLenBang(ch, c.cau.sao), em: chon.em, viSao: chon.viSao, hop: chon.hop })
+    dong.push({ tang: 'len_bang', cau: c.cau, giay: giayLenBang(ch, c.cau.sao), em: chon.em, viSao: lyDoGoi(c, chon.viSao), hop: chon.hop })
   }
 
   // ── VÒNG 3: CÒN GIỜ THÌ GỌI THÊM, nhưng chỉ tới trần ──────────────────────
@@ -230,19 +252,31 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
     if (daChua.has(c.cau.id)) continue
     if (!duCho(c)) continue
     const chon = chonEm(c, em, daGoi)
-    if (!chon) break
+    if (!chon) continue
     daGoi.add(chon.em.sbd)
     daChua.add(c.cau.id)
     dung += giayLenBang(ch, c.cau.sao) - giayDoc(c)
-    dong.push({ tang: 'len_bang', cau: c.cau, giay: giayLenBang(ch, c.cau.sao), em: chon.em, viSao: chon.viSao, hop: chon.hop })
+    dong.push({ tang: 'len_bang', cau: c.cau, giay: giayLenBang(ch, c.cau.sao), em: chon.em, viSao: lyDoGoi(c, chon.viSao), hop: chon.hop })
   }
 
   // ── TẦNG 2: mọi câu còn lại chỉ đọc đáp án ────────────────────────────────
   const cauDocDapAn: CauChua[] = []
+  // Câu 2 sao mà MỌI em còn chưa được gọi đều đang bị chặn (bậc "biết") — nói đúng
+  // lý do, đừng để thầy tưởng "lớp làm được" hay "hết giờ".
+  const emConRanh = em.filter((e) => !daGoi.has(e.sbd))
+  const khongEmNhan = (c: CauVaoXep) => c.cau.sao === 2 && emConRanh.length > 0 && emConRanh.every((e) => lyDoChanCau(e, c.cau) !== null)
+  const cauKhongEmNhan: CauChua[] = []
   for (const c of thuTu) {
     if (daChua.has(c.cau.id)) continue
     cauDocDapAn.push(c.cau)
-    dong.push({ tang: 'doc_dap_an', cau: c.cau, giay: giayDoc(c), em: null, viSao: c.batBuoc ? 'bắt buộc chữa nhưng hết giờ gọi em — chiếu đáp án' : 'lớp làm được, chỉ cần đáp án', hop: 0 })
+    const chanHet = khongEmNhan(c)
+    if (chanHet) cauKhongEmNhan.push(c.cau)
+    const viSao = chanHet
+      ? 'mọi em còn lại đều ở bậc "biết" của dạng này — chưa nhận câu 2 sao, thầy giảng và chiếu đáp án'
+      : c.batBuoc
+        ? 'bắt buộc chữa nhưng hết giờ gọi em — chiếu đáp án'
+        : 'lớp làm được, chỉ cần đáp án'
+    dong.push({ tang: 'doc_dap_an', cau: c.cau, giay: giayDoc(c), em: null, viSao, hop: 0 })
   }
 
   const tongGiay = dong.reduce((n, d) => n + d.giay, 0)
@@ -263,6 +297,11 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
   }
   if (batBuocChuaChua.length > 0) {
     canhBao.push(`${batBuocChuaChua.length} câu bắt buộc chưa gọi được em nào — sẽ chiếu đáp án, thầy cân nhắc nới giờ`)
+  }
+  if (cauKhongEmNhan.length > 0) {
+    canhBao.push(
+      `${cauKhongEmNhan.length} câu 2 sao chưa gọi được em nào: mọi em còn lại đều ở bậc "biết" của dạng ấy — chiếu đáp án, thầy giảng`,
+    )
   }
 
   return {

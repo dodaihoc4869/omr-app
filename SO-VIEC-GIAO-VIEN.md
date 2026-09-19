@@ -1,0 +1,27 @@
+# SỔ VIỆC — LÀN GIÁO VIÊN (Code 1, phiên mới) · GĐ 6 phần GỌI LÊN BẢNG
+
+Phiên **Code 1** (không phải Coder 1 cũ). Việc do phiên **0.Planer** điều phối giao ngày 19/09/2026, theo sự uỷ quyền
+của thầy ("nghe theo điều phối 100%"). Sổ này riêng của làn giáo viên; `SO-VIEC.md` thuộc phiên khác, không sửa.
+
+## Yêu cầu nhận (nguyên văn tóm từ tin của 0.Planer, 19/09 ~16:30)
+
+- [x] (a) `diemHopCau` (`src/lib/ho-so-lop.ts`): `pSai = min(1, lan_sai/2)` từ hồ sơ thật; "đã chữa" 0,35 = `trang_thai='da_khac_phuc'`; `pYeu` từ `nam_kt_dang`; CHẶN CỨNG: em có `bac='biet'` ở dạng đó không nhận câu 2 sao; câu `can_day_lai` → bắt buộc lên bảng. GIỮ: `TRONG_SO` cộng đúng 1,0; SAI ở nhà > CHƯA LÀM > ĐÚNG; em chưa có dữ liệu vẫn có cơ hội; sàn 20 em/90 phút; không 2 em một câu; tất định.  | bằng chứng: `tests/ho-so-lop-nam-kt-1909.test.ts` 38 test + `tests/ho-so-lop-nap-may-chu-1909.test.ts` 6 test xanh; đột biến (tắt chặn cứng → 6 đỏ; tắt bắt buộc dạy lại → 2 đỏ; Vòng 2 `break` thay `continue` → 1 đỏ; bỏ `dsQid` khỏi yêu cầu → 1 đỏ) đều bị bắt rồi khôi phục; 15 tệp test liên quan (326 test) so nền: MỚI ĐỎ [] · HẾT ĐỎ []; `npx tsc -b --noEmit` sạch. Commit: xem Nhật ký.
+- [ ] (b) Bảng phân công Engine E (buổi chữa / tờ máy chiếu) trong `src/screens/GoiLenBangScreen.tsx`: nút Đạt / Không đạt gọi ĐÚNG hàm `ghiLenBang` mà Engine C đang dùng (~dòng 1835-1844); kết quả ghi về máy chủ (`nguon='len_bang'`).  | bằng chứng: (chưa có)
+- [ ] (c) `src/lib/phan-cong-day-hoc.ts:42` dùng `Math.random` → nhận seed (`hashSeed` từ `src/lib/exam-shuffle.ts`), chỗ gọi truyền seed theo mã ca; giữ test `phan-cong-day-hoc`.  | bằng chứng: (chưa có)
+- [ ] (d) Viết HỢP ĐỒNG máy chủ `docs/hop-dong-ho-so-len-bang-1909.md` (`hoSoLopLenBang` trả thêm cho mỗi em×qid: `lan_sai`, `trang_thai`, `can_day_lai`, `bac` theo dạng từ `nam_kt_cau`/`nam_kt_dang`; tương thích ngược: thiếu trường → hành vi cũ; kèm việc `ghiLenBangMoi` ngừng cộng thẳng `tien_do_hs` ở `index.ts` ~2263) rồi nhắn phiên "Code 3". Trong lúc chờ: client làm theo hợp đồng với dữ liệu giả + nhánh tương thích ngược.  | bằng chứng: tệp hợp đồng đã viết (6 mục); CHƯA nhắn Code 3 (cần `ListAgents` lấy tên).
+- [ ] (e) Nhắn 0.Planer một dòng sau mỗi mốc (a)/(b)/(c).  | bằng chứng: (chưa có)
+- [ ] (f) Điền dòng "Code 1" trong `DIEU-PHOI.md` thành "đang làm".  | bằng chứng: (chưa có)
+- [ ] (g) Toàn `npx vitest run` MỘT lần trước khi báo xong, so nền `docs/nen-vitest-do-1909.txt` (98 đỏ / 43 tệp); ghi Nhật ký trước; commit từng mốc.  | bằng chứng: (chưa có)
+
+## Luật của làn (chép từ tin nhắn — không đổi)
+
+- CHỈ `git add <tệp cụ thể>`. Cấm stash / reset --hard / checkout . / clean / `git add -A`. KHÔNG phát hành (0.Planer soát diff rồi đẩy Pages).
+- CẤM đụng: `server/**`, `StudentPortalScreen.tsx`, `ParentPortalScreen.tsx`, `html-phieu.ts`, `ExamTakeScreen.tsx`, `src/components/bang-nhiem-vu/**`, component app HS/PH (Code 2, Code 4), `src/lib/de-rieng*.ts` (GĐ 6 phần rút đề, giao sau).
+- Vùng được sửa: `src/lib/ho-so-lop.ts`, `src/lib/xep-buoi-chua.ts`, `src/lib/phan-cong-day-hoc.ts`, `src/screens/GoiLenBangScreen.tsx`, test tương ứng, `docs/hop-dong-ho-so-len-bang-1909.md`, sổ này.
+- Hàm thuần + test trước; tất định; thấy lỗi trong vùng mình là sửa luôn.
+
+## Nhật ký làn này
+
+- (a) xong mã + test, chờ commit (xem dòng "Commit" ở mục (a) khi có).
+- Việc TỰ PHÁT SINH đã sửa trong vùng mình (theo luật "thấy lỗi là sửa luôn"): `chayBuoiChua` chỉ so SỐ em có mặt để quyết định xin lại hồ sơ lớp ⇒ (1) hai em đổi chỗ vẫn dùng hồ sơ em cũ, (2) một lần mất mạng thì hồ sơ rỗng bị giữ mãi (số em không đổi). Nguyên nhân gốc: khoá cache là `hoSo.length !== coMat.length`. Sửa: khoá = (danh sách sbd có mặt × danh sách qid của buổi) và xin lại khi `loiHoSo`. Bằng chứng: test nguồn trong `tests/ho-so-lop-nap-may-chu-1909.test.ts` (chưa có test render — sẽ thêm ở mốc (b) cùng bài test tích hợp màn hình).
+- Sửa tệp NGOÀI danh sách của làn (cần báo 0.Planer): `src/lib/exam-api.ts` (chỉ thêm kiểu `NamKtCauMayChu`, trường `namKt?` và tham số tuỳ chọn `dsQid?` của `goiHoSoLopLenBang` — vì kiểu `HoSoLopMayChu` sống ở đó).

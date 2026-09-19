@@ -1521,8 +1521,23 @@ export interface HoSoLopMayChu {
        * của em với đáp án trong kho, nên ba mảng qid rời nhau và cộng lại
        * đúng bằng `soCauGiao`. Máy chủ đời cũ chưa trả trường này. */
       btvn?: HoSoBtvnMayChu
+      /** HỒ SƠ NẮM KIẾN THỨC theo qid (GĐ 6, 19/09) — CHỈ những qid máy thầy xin qua
+       * `dsQid`. Máy chủ đời cũ không trả trường này; máy thầy phải chạy như cũ.
+       * Hợp đồng: `docs/hop-dong-ho-so-len-bang-1909.md`. */
+      namKt?: Record<string, NamKtCauMayChu>
     }
   >
+}
+
+/** Hồ sơ nắm kiến thức của MỘT em ở MỘT câu — bản máy chủ trả về (`nam_kt_cau` + `nam_kt_dang`).
+ * Mọi trường có thể thiếu; `src/lib/ho-so-lop.ts` (`gopNamKt`) đọc phòng thủ từng trường. */
+export interface NamKtCauMayChu {
+  lanSai?: number
+  trangThai?: 'chua_thay_sai' | 'moi_sai' | 'dang_on' | 'da_khac_phuc' | null
+  canDayLai?: boolean
+  maDang?: string | null
+  bac?: 'biet' | 'hieu' | 'van_dung' | null
+  dang?: { soGap: number; soDaKhacPhuc: number; soChuaThaySai: number } | null
 }
 
 /** BÀI TẬP VỀ NHÀ CỦA MỘT EM — bản máy chủ trả về. Giữ đúng tên trường với
@@ -1541,8 +1556,16 @@ export interface HoSoBtvnMayChu {
   luot: { maBtvn: string; giaoLuc: string; daNop: boolean; soCau: number; soDung: number; soSai: number; soChuaLam: number }[]
 }
 
-export async function goiHoSoLopLenBang(scriptUrl: string, secret: string, dsSbd: string[], soNgay = 60): Promise<HoSoLopMayChu> {
-  const r = await postJson(scriptUrl, { action: 'hoSoLopLenBang', secret, dsSbd, soNgay }, 45)
+export async function goiHoSoLopLenBang(
+  scriptUrl: string,
+  secret: string,
+  dsSbd: string[],
+  soNgay = 60,
+  /** Các câu của buổi chữa. Có thì máy chủ mới trả thêm `namKt` cho đúng những câu này; máy chủ cũ bỏ qua trường thừa. */
+  dsQid?: string[],
+): Promise<HoSoLopMayChu> {
+  const qid = [...new Set((dsQid ?? []).filter(Boolean))]
+  const r = await postJson(scriptUrl, { action: 'hoSoLopLenBang', secret, dsSbd, soNgay, ...(qid.length > 0 ? { dsQid: qid } : {}) }, 45)
   if (!r.ok) throw new Error(r.error || 'Không lấy được hồ sơ lớp')
   return { em: (r.em ?? {}) as HoSoLopMayChu['em'] }
 }

@@ -13,7 +13,7 @@ import { phanCongDayHoc } from '../lib/phan-cong-day-hoc'
 //   · câu gần cả lớp làm đúng → chỉ đọc đáp án;
 //   · phần còn lại mới chia cho em, ưu tiên em SAI CHÍNH CÂU ĐÓ.
 // Thuật toán ở lib/phan-cong.ts, phần đọc dữ liệu ca ở lib/du-lieu-len-bang.ts.
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Shuffle, MonitorPlay, UserCheck } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, lichSuLenBang, thanThuLopDocApi, type CaTomTat, type LichSuLenBangEm } from '../lib/exam-api'
@@ -214,6 +214,9 @@ export default function GoiLenBangScreen() {
   const [daCopy, setDaCopy] = useState(false)
   const [xemCau, setXemCau] = useState('')
   const [dangCham, setDangCham] = useState('')
+  /** Hồ sơ lớp đang giữ là của (danh sách em × danh sách câu) nào. Đổi em có mặt hay đổi
+   * bài chữa thì phải xin lại: hồ sơ nắm kiến thức chỉ có đúng những câu ĐÃ XIN. */
+  const khoaHoSoDaNap = useRef('')
 
   useEffect(() => {
     void (async () => {
@@ -709,12 +712,19 @@ export default function GoiLenBangScreen() {
     const coMat = dsEmCa.filter((e) => e.coMat).map((e) => ({ sbd: e.sbd, hoTen: e.hoTen, coMat: true }))
     if (coMat.length === 0) return showToast('Không em nào có mặt', 'warn')
 
+    // Hồ sơ lớp là của (em có mặt × câu của buổi) nào — đổi một trong hai thì xin lại. Trước 19/09
+    // chỉ so SỐ em có mặt: hai em đổi chỗ vẫn giữ hồ sơ cũ; và một lần mất mạng thì hồ sơ rỗng
+    // được giữ mãi vì số em không đổi.
+    const qidBuoi = cauVaoXep.map((c) => c.cau.id)
+    const khoaHoSo = `${coMat.map((e) => e.sbd).sort().join(',')}|${[...new Set(qidBuoi)].sort().join(',')}`
     let hoSo = hoSoLop
-    if (hoSo.length !== coMat.length) {
-      const r = await napHoSoLop(cauHinh?.url ?? '', cauHinh?.mat ?? '', coMat)
+    if (loiHoSo || khoaHoSo !== khoaHoSoDaNap.current) {
+      // `qidBuoi`: máy chủ mới trả thêm hồ sơ nắm kiến thức (số lần sai thật, dạng yếu, bậc) ĐÚNG cho các câu này.
+      const r = await napHoSoLop(cauHinh?.url ?? '', cauHinh?.mat ?? '', coMat, qidBuoi)
       hoSo = r.hoSo
       setHoSoLop(r.hoSo)
       setLoiHoSo(r.loi)
+      khoaHoSoDaNap.current = r.loi ? '' : khoaHoSo
       // KHÔNG DỪNG khi mất mạng: vẫn xếp được bằng dữ liệu ca hiện tại, chỉ là
       // ghép em kém chính xác hơn — và màn hình nói rõ điều đó.
       if (r.loi) showToast(`Chưa lấy được hồ sơ lớp (${r.loi}) — xếp bằng dữ liệu ca này`, 'warn')
