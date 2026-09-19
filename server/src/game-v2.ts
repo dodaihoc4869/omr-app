@@ -10,6 +10,7 @@ import type {Attempt,Mastery,PrivateQuestion,Mode,Arena,ArenaAction} from '../..
 import {nhanExp,thanhExp} from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import {shieldRemaining,type ShieldState} from '../../src/game/than-thu-v2/shields'
 import {syncAcademic,type Academic,academicDay} from './game-v2-academic'
+import {masteryTheoHoSo,qidChanHomNay} from './game-v2-ho-so'
 import {ghiSuKien} from './su-kien-hoc'
 export interface Profile {nickname?:string;academic?:Academic;shields?:ShieldState;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string}
 type Row={revision:number;json:string}
@@ -89,6 +90,9 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     const scope=await readScope(env,sbd);const blocked=await protectedQuestions(env)
     const control=await readGameScope(env,sbd);if(!control.enabled)throw new Error('Thầy đang tạm dừng game cho hồ sơ này.')
     for(const key of control.blocked)blocked.add(key)
+    // GĐ 5 (Kênh 4): một đồng hồ giờ máy chủ cho cả lượt chọn; câu em đang/đã làm hôm nay ở chỗ khác không ra ở game; mốc ôn theo hồ sơ.
+    const tNow=Date.now()
+    for(const qid of await qidChanHomNay(env,sbd,tNow))blocked.add(qid)
     const history=await attempts(env,sbd)
     const eligible=scope.pool.filter(q=>allowed(q,scope.evidence,blocked)&&(control.types.length===0||q.dang!==null&&control.types.includes(q.dang))&&(typeof b.dang!=='string'||q.dang===b.dang))
     if(guardian){
@@ -98,7 +102,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     const dayStart=new Date(academicDay(now())+'T00:00:00+07:00')
     const count=await env.DB.prepare('SELECT COUNT(*) AS n FROM game_v2_attempt WHERE sbd=? AND created_at>=?').bind(sbd,dayStart.toISOString()).first<{n:number}>()
     const remaining=Math.max(0,200-(count?.n??0))
-    const selected=chooseSession(eligible,scope.evidence,history,p.mastery,mode,Date.now()).slice(0,remaining)
+    const selected=chooseSession(eligible,scope.evidence,history,await masteryTheoHoSo(env,sbd,p.mastery),mode,tNow).slice(0,remaining)
     if(action==='recommendations')return {ok:true,dailyUsed:count?.n??0,suggestions:selected.map(q=>({title:q.tenDang||'Ôn kiến thức đã học',source:q.maDe,part:q.phan})),remaining}
     if(!remaining)throw new Error('Em đã hoàn thành 200 câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.')
     const qs=mode==='arena'?selected.slice(0,b.guardian?1:2):selected

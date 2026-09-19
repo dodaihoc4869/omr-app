@@ -93,6 +93,16 @@ export async function readScope(env:Env,sbd:string):Promise<{evidence:Evidence[]
       rows.results.push({qid:q.qid,ma_ca:l.ma_ca,lan_thu:l.lan_thu,nop_luc:l.nop_luc,dung_sai:grade(q,answer)?1:0})
     }
   }
+  // GĐ 5 (Kênh 4): bằng chứng từ HỒ SƠ (nam_kt_cau) cho câu em đã gặp ở nguồn KHÁC ca thi và KHÁC game (BTVN, Mom, ôn lại, khắc phục…): câu sai
+  // ở đó thành "weak"; câu làm đúng ở đó thành nền để mở câu cùng dạng. Loại `thi` vì đường ca thi ở trên đã lọc theo công bố (ca chưa công bố KHÔNG được lọt);
+  // loại `game` vì game tự có `attempts`. Câu có ở cả hai nơi: HỒ SƠ quyết `wrong` (sai ở thi rồi sửa đúng ở BTVN thì không còn "weak"). Thiếu bảng thì bỏ qua.
+  try{
+    const rh=await env.DB.prepare(`SELECT qid,trang_thai,luc_cuoi,nguon_cuoi FROM nam_kt_cau WHERE sbd=? AND qid IN (SELECT qid FROM su_kien_hoc WHERE sbd=? AND nguon NOT IN ('thi','game'))`).bind(sbd,sbd).all<Row>()
+    const chuaKhacPhuc=(t:unknown)=>t==='moi_sai'||t==='dang_on'
+    const hoSo=new Map(rh.results.map(h=>[str(h.qid),h]))
+    for(const r of rows.results){const h=hoSo.get(str(r.qid));if(h){r.dung_sai=chuaKhacPhuc(h.trang_thai)?0:1;hoSo.delete(str(r.qid))}}
+    for(const h of hoSo.values())rows.results.push({qid:h.qid,ma_ca:str(h.nguon_cuoi),lan_thu:1,nop_luc:str(h.luc_cuoi),dung_sai:chuaKhacPhuc(h.trang_thai)?0:1})
+  }catch{/* lược đồ cũ/fixture chưa có bảng hồ sơ: chỉ dùng bằng chứng ca thi như trước */}
   const evidence:Evidence[]=[];let missing=0
   const qids=[...new Set(rows.results.map(r=>str(r.qid)))];const originals=new Map<string,PrivateQuestion>()
   for(let i=0;i<qids.length;i+=80){const ids=qids.slice(i,i+80);const r=await env.DB.prepare(`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0 AND q.qid IN (${ids.map(()=>'?').join(',')})`).bind(...ids).all<{json:string}>();for(const x of r.results){const q=JSON.parse(x.json) as PrivateQuestion;originals.set(q.qid,q)}}

@@ -11,7 +11,7 @@ import { gameIdentity } from './game-v2-auth'
 import { dungLaiHoSo } from './ho-so-nam-kt'
 import type { NamKtDang } from './ho-so-nam-kt'
 import {
-  NGAY_LIET_KE_QUA_HAN, NGAY_ON_THI, PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU, SO_NGAY_DO_VAN_TOC, SO_NGAY_LICH_SU,
+  NGAY_LIET_KE_QUA_HAN, NGAY_ON_THI, NHIEM_VU_THAN_THU_MO_TOI_DA, PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU, SO_NGAY_DO_VAN_TOC, SO_NGAY_LICH_SU,
 } from './ho-so-cau-hinh'
 import { lapKeHoachNgay, ngayHocMom, type DauVaoKeHoach, type KeHoachNgay } from './ke-hoach-ngay'
 import { ngayVn } from './su-kien-hoc'
@@ -186,6 +186,17 @@ const LUU = `INSERT INTO ke_hoach_ngay (khoa, sbd, ngay, phien_ban, seed, ngan_s
     so_su_kien = excluded.so_su_kien, cap_nhat_luc = excluded.cap_nhat_luc
   WHERE ke_hoach_ngay.ket_qua IS NULL`
 
+/**
+ * NHIỆM VỤ THẦN THÚ TỰ SINH (GĐ 5, Kênh 4): việc `than_thu` NHÃN `bu` của kế hoạch ngày ("tự phân thêm khi thiếu") thành một dòng `game_v2_task`
+ * để game hiện ra như nhiệm vụ. Đường NỘI BỘ, không qua `parentGame` (luật "phụ huynh chỉ nhắc dạng có mastery" giữ nguyên).
+ * Idempotent theo `id = sbd|than_thu|<ngày>|<dạng>`; không thêm khi em đã có nhiệm vụ MỞ cùng dạng (kể cả phụ huynh nhắc) hoặc đã đủ
+ * NHIEM_VU_THAN_THU_MO_TOI_DA nhiệm vụ mở. Mỗi em một dòng trong lượt nên phép đếm không tự cạnh tranh trong cùng câu lệnh.
+ */
+const TAO_NHIEM_VU = `INSERT OR IGNORE INTO game_v2_task (id, sbd, dang, created_at)
+  SELECT json_extract(j.value,'$.i'), json_extract(j.value,'$.s'), json_extract(j.value,'$.d'), ? FROM json_each(?) j
+   WHERE NOT EXISTS (SELECT 1 FROM game_v2_task t WHERE t.sbd = json_extract(j.value,'$.s') AND t.dang = json_extract(j.value,'$.d') AND t.completed_at IS NULL)
+     AND (SELECT COUNT(*) FROM game_v2_task t WHERE t.sbd = json_extract(j.value,'$.s') AND t.completed_at IS NULL) < ${NHIEM_VU_THAN_THU_MO_TOI_DA}`
+
 export interface KeHoachDaLap extends KeHoachNgay {
   capNhatLuc: string
 }
@@ -226,6 +237,14 @@ export async function lapVaLuuKeHoach(env: Env, dsSbd: string[], now: number, tu
   if (tuyChon.luu !== false) {
     const lenh = chunk(dong, 25).map((d) => env.DB.prepare(LUU).bind(nowIso, json(d)))
     await tat(async () => { for (const c of chunk(lenh, 25)) await env.DB.batch(c) }, undefined)
+    const nv = em.flatMap((sbd) => {
+      const dang = ra.get(sbd)?.viec.find((v) => v.loai === 'than_thu' && v.nhan === 'bu')?.chiTiet.dang
+      return typeof dang === 'string' && dang ? [{ i: `${sbd}|than_thu|${homNay}|${dang}`, s: sbd, d: dang }] : []
+    })
+    if (nv.length > 0) {
+      const tao = chunk(nv, 25).map((d) => env.DB.prepare(TAO_NHIEM_VU).bind(nowIso, json(d)))
+      await tat(async () => { for (const c of chunk(tao, 25)) await env.DB.batch(c) }, undefined)
+    }
   }
   return ra
 }

@@ -83,3 +83,6 @@ export const NGAY_LIET_KE_QUA_HAN = 14
  */
 export const MOM_CHUA_BAT_DAU_SO_NGAY = 3
 export const MOM_CHUA_BAT_DAU_TOI_DA = 3
+
+/** Số nhiệm vụ thần thú MỞ tối đa của một em (gồm cả nhiệm vụ phụ huynh nhắc). Kế hoạch ngày tự sinh nhiệm vụ mới chỉ khi còn dưới mức này. */
+export const NHIEM_VU_THAN_THU_MO_TOI_DA = 3
