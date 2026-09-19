@@ -29,6 +29,8 @@ import type { ThongTinPhieu } from '../lib/html-phieu'
 import type { CauLuyen } from '../lib/bai-tap-pdf'
 import { TEN_MUC_DO, TEN_PHAN } from '../lib/phan-tich-lam-bai'
 import { ChemText } from '../lib/chem-format'
+import { dungM3 } from '../components/m3'
+import '../components/m3/phieu-screen.css'
 
 // ---------------------------------------------------------------- kiểu chữ số
 function soVN(x: number, soLe = 2): string {
@@ -334,22 +336,27 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duC
     return <iframe title="Phiếu bài tập" srcDoc={phieuBt} style={{ display: 'block', width: '100%', height: '100vh', border: 0 }} />
   }
 
+  // VỎ TẢI / LỖI mặc M3 ở cổng học sinh / phụ huynh (dungM3()): nền surface, chữ theo bảng màu M3 (sáng/tối), nút Thử lại
+  // đủ 48 px. Bản báo cáo BÊN DƯỚI vẫn là giấy trắng mực đen (xem đầu tệp) — chỉ hai màn trạng thái này đổi áo. Màu và kích
+  // thước đi qua biến `--phieu-*` có giá trị dự phòng = giá trị cũ, nên ngoài M3 (vitest ở `/`) vẫn ra đúng như trước.
+  const m3 = dungM3()
+
   if (du === undefined) {
     return (
-      <div className="bc" style={{ display: 'grid', placeItems: 'center' }}>
+      <div className={m3 ? 'bc m3' : 'bc'} style={{ display: 'grid', placeItems: 'center' }}>
         <style>{CSS}</style>
-        <div style={{ color: 'var(--p-nhat)', fontSize: 14 }}>Đang mở báo cáo…</div>
+        <div style={{ color: 'var(--phieu-chu-phu, var(--p-nhat))', fontSize: 14 }}>Đang mở báo cáo…</div>
       </div>
     )
   }
 
   if (du === null) {
     return (
-      <div className="bc" style={{ display: 'grid', placeItems: 'center', padding: 24 }}>
+      <div className={m3 ? 'bc m3' : 'bc'} style={{ display: 'grid', placeItems: 'center', padding: 24 }}>
         <style>{CSS}</style>
         <div style={{ maxWidth: 340, textAlign: 'center' }}>
           <div style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 700 }}>Không mở được báo cáo</div>
-          <div style={{ marginTop: 10, color: 'var(--p-nhat)', fontSize: 14, lineHeight: 1.7 }}>
+          <div style={{ marginTop: 10, color: 'var(--phieu-chu-phu, var(--p-nhat))', fontSize: 14, lineHeight: 1.7 }}>
             {loi} {laLoiCho(loi) ? 'Link vẫn còn dùng được, chỉ là máy chủ đang bận. Phụ huynh bấm Thử lại.' : 'Phụ huynh nhắn lại cho Thầy Đỗ Đại Học để nhận link mới.'}
           </div>
           {/* NÚT THỬ LẠI — thầy báo 10/09 22:05. Trước đây màn này là ĐƯỜNG CỤT:
@@ -360,8 +367,8 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duC
             type="button"
             onClick={() => location.reload()}
             style={{
-              marginTop: 18, font: 'inherit', fontSize: 15, padding: '10px 22px',
-              border: 0, borderRadius: 10, background: 'var(--p-muc)', color: 'var(--p-giay)',
+              marginTop: 18, font: 'inherit', fontSize: 15, padding: 'var(--phieu-nut-dem, 10px 22px)', minHeight: 'var(--phieu-nut-cao, 0px)',
+              border: 0, borderRadius: 'var(--phieu-nut-bo, 10px)', background: 'var(--phieu-nut-nen, var(--p-muc))', color: 'var(--phieu-nut-chu, var(--p-giay))',
             }}
           >
             Thử lại
@@ -722,15 +729,17 @@ function NutXemDeDaLam({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: bool
     }
   }
 
+  // Nút nằm trong thẻ GIẤY của báo cáo (nền trắng cả khi máy bật chế độ tối), nên dưới M3 nó GIỮ bảng --p-* và chỉ đổi
+  // số đo qua biến `--xem-de-*` (đích chạm 46 → 48 px). KhungXemPhieu bên dưới tự mặc M3 theo dungM3().
   return (
-    <div style={{ marginTop: 14 }}>
+    <div style={{ marginTop: 14 }} className={dungM3() ? 'm3-phieu-xem-de' : undefined}>
       <button
         type="button"
         onClick={() => void mo()}
         disabled={dang}
         style={{
           width: '100%',
-          minHeight: 46,
+          minHeight: 'var(--xem-de-cao, 46px)',
           border: '1.5px solid var(--p-tim)',
           borderRadius: 12,
           background: 'var(--p-giay)',

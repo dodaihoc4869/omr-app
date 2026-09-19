@@ -1,0 +1,26 @@
+/* Trang phiếu công khai (PhieuScreen, đường /p#<mã> · ?vai=phieu) — CHỈ khi cổng học sinh / phụ huynh (dungM3()).
+ * Ngoài M3, mọi biến `--phieu-*` / `--xem-de-*` không được đặt nên các giá trị dự phòng cũ trong style nội tuyến có hiệu lực.
+ *
+ * Hai phần khác nhau, hai bảng màu khác nhau (chủ ý):
+ *  · VỎ TẢI / LỖI (`.bc.m3`): không phải báo cáo, chỉ là trạng thái của trang → bảng M3 (sáng/tối theo máy), nút Thử lại
+ *    là nút chính M3 cao 48 px.
+ *  · NÚT "XEM ĐỀ EM VỪA LÀM" (`.m3-phieu-xem-de`): nằm TRONG thẻ giấy của báo cáo — báo cáo rời máy thầy nên luôn giấy
+ *    trắng mực đen, kể cả khi máy bật chế độ tối (tokens.css, nhóm --p-*) — nên nút GIỮ màu --p-* và chỉ đổi số đo
+ *    (đích chạm 46 → 48 px). Đổi nó sang bảng M3 thì chữ primary của chế độ tối rơi lên nền giấy trắng (không đọc được). */
+.bc.m3 {
+  background: var(--m3-surface);
+  color: var(--m3-on-surface);
+  --phieu-chu-phu: var(--m3-on-surface-variant);
+  --phieu-nut-nen: var(--m3-primary);
+  --phieu-nut-chu: var(--m3-on-primary);
+  --phieu-nut-bo: var(--m3-bo-tron);
+  --phieu-nut-cao: 48px;
+  --phieu-nut-dem: 0 var(--k6, 24px);
+}
+.m3-phieu-xem-de {
+  --xem-de-cao: 48px;
+}
+.m3-phieu-xem-de button:focus-visible {
+  outline: 3px solid var(--p-tim);
+  outline-offset: 2px;
+}
