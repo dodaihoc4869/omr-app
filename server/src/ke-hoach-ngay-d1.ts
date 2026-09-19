@@ -219,7 +219,7 @@ export async function lapVaLuuKeHoach(env: Env, dsSbd: string[], now: number, tu
     ra.set(sbd, { ...kh, capNhatLuc: nowIso })
     dong.push({
       k: `${sbd}|${homNay}`, s: sbd, n: homNay, p: kh.phienBan, d: kh.seed, a: json(kh.nganSach),
-      v: json({ viec: kh.viec, sapToi: kh.sapToi, quaHan: kh.quaHan, tai: kh.tai, tienBo: kh.tienBo }), c: json(kh.canhBao),
+      v: json({ viec: kh.viec, sapToi: kh.sapToi, quaHan: kh.quaHan, tai: kh.tai, tienBo: kh.tienBo, tonCu: kh.tonCu, tonCuTong: kh.tonCuTong }), c: json(kh.canhBao),
       l: kh.tienBo.daLamCau, u: kh.tienBo.lenBac, t: kh.tienBo.tutBac, z: kh.lanNghi ? 1 : 0, e: soSk.get(sbd) ?? 0,
     })
   }

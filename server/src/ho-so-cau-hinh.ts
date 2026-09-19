@@ -74,3 +74,12 @@ export const CAU_ON_THI = 4
 export const NGAY_ON_THI = 3
 /** Bài quá hạn quá bấy nhiêu ngày thì thôi liệt kê. */
 export const NGAY_LIET_KE_QUA_HAN = 14
+
+/**
+ * Mom CHƯA BẮT ĐẦU vào `viec[]` (việc bắt buộc) chỉ khi bài được giao trong bấy nhiêu NGÀY VN gần nhất (gồm hôm nay) và tối đa bấy nhiêu
+ * bài (mới nhất trước). Phần còn lại là "tồn cũ" (`tonCu[]`): đứng riêng, KHÔNG tính tải, KHÔNG gây quá tải, KHÔNG vào cổng.
+ * Lý do (0.Planer 19/09): bài cũ chưa mở dồn lại (di chứng nút 1-click giao lại cùng vài câu) sẽ khoá em sau hàng chục việc bắt buộc.
+ * Bài ĐÃ bắt đầu (đồng hồ 120 phút đang chạy) luôn vào `viec[]`, không giới hạn.
+ */
+export const MOM_CHUA_BAT_DAU_SO_NGAY = 3
+export const MOM_CHUA_BAT_DAU_TOI_DA = 3

@@ -22,7 +22,7 @@ import { loDangCho, tinhLichLoBtvn, tongCauDenLo, type LichLoBtvn } from '../../
 import { tinhNganSachNgay } from '../../src/lib/tro-ly-ca-nhan'
 import {
   BOI_THAN_THU, BUOC_DIEU_CHINH, CAU_ON_THI, GIAY_MOT_CAU_TOI_DA, GIAY_MOT_CAU_TOI_THIEU, NGAN_SACH_SAN, NGAN_SACH_TRAN,
-  NGAY_LIET_KE_QUA_HAN, NGAY_ON_THI, PHIEN_BAN_KE_HOACH, PHUT_NGAY_MAC_DINH, PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU,
+  MOM_CHUA_BAT_DAU_SO_NGAY, MOM_CHUA_BAT_DAU_TOI_DA, NGAY_LIET_KE_QUA_HAN, NGAY_ON_THI, PHIEN_BAN_KE_HOACH, PHUT_NGAY_MAC_DINH, PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU,
   SO_MAU_GIAY_TOI_THIEU, SO_NGAY_KHONG_DAT_DE_GIAM, SO_NGAY_LICH_SU, TOI_THIEU_CAU_SAN, TOI_THIEU_CAU_TRAN,
   TRAN_THAN_THU_MOT_LUOT, TY_LE_ON_TOI_DA, VAN_TOC_MAC_DINH, VAN_TOC_NHANH_DE_TANG, VAN_TOC_SAN, VAN_TOC_TRAN,
 } from './ho-so-cau-hinh'
@@ -157,6 +157,12 @@ export interface KeHoachNgay {
   /** Cấp lịch sử ngày đạt liên tiếp (ngày nghỉ không đứt) — nơi gọi truyền vào `lichSu`. */
   chuoiDat: number
   lanNghi: boolean
+  /**
+   * Mom CHƯA bắt đầu mà giao từ lâu (ngoài `MOM_CHUA_BAT_DAU_SO_NGAY` ngày) hoặc vượt `MOM_CHUA_BAT_DAU_TOI_DA` bài: "tồn cũ". Đứng riêng như
+   * `quaHan`: KHÔNG tính vào `tai.cung`, KHÔNG gây `qua_tai`, KHÔNG tham gia cổng. Mới nhất trước. Em vẫn mở làm được.
+   */
+  tonCu: { id: string; loai: 'mom'; soCau: number; giaoLuc: string }[]
+  tonCuTong: { soBai: number; soCau: number }
 }
 
 // --- Tiện ích thuần ---------------------------------------------------------------------
@@ -167,6 +173,12 @@ const ms = (v: string | null | undefined): number | undefined => {
   return Number.isFinite(n) ? n : undefined
 }
 const kep = (x: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, x))
+/** Ngày VN (YYYY-MM-DD) của một mốc ISO; '' nếu không đọc được (bài có `taoLuc` hỏng coi như cũ). */
+const ngayVnCua = (iso: string): string => {
+  const t = Date.parse(iso)
+  return Number.isFinite(t) ? new Date(t + 7 * 3_600_000).toISOString().slice(0, 10) : ''
+}
+const lui = (ngay: string, n: number): string => new Date(Date.parse(`${ngay}T00:00:00Z`) + n * MOT_NGAY_MS).toISOString().slice(0, 10)
 
 /** Trung vị, lọc [5, 1200] s. Thiếu mẫu thì dùng mặc định và NÓI RA số mẫu. */
 export function tinhVanToc(mau: number[]): { giay: number; nguon: 'do' | 'mac_dinh'; soMau: number; ghiChu: string } {
@@ -259,7 +271,16 @@ export function lapKeHoachNgay(d: DauVaoKeHoach): KeHoachNgay {
   }
   quaHan.sort((a, b) => a.hanNop.localeCompare(b.hanNop) || a.ma.localeCompare(b.ma))
 
-  const nganSach = tinhNganSach(d, btvnCon.length + momCung.length + momChuaBd.length)
+  // Mom chưa bắt đầu: chỉ bài giao trong MOM_CHUA_BAT_DAU_SO_NGAY ngày VN gần nhất và tối đa MOM_CHUA_BAT_DAU_TOI_DA bài (mới nhất trước)
+  // là việc bắt buộc. Phần còn lại là "tồn cũ": đứng riêng, không tính tải, không quá tải, không vào cổng (xem `KeHoachNgay.tonCu`).
+  const ngayGiaoXaNhat = lui(d.homNay, -(MOM_CHUA_BAT_DAU_SO_NGAY - 1))
+  const momViec: MomDauVao[] = []
+  const tonCu: MomDauVao[] = []
+  for (const m of [...momChuaBd].sort((a, b) => b.taoLuc.localeCompare(a.taoLuc) || a.id.localeCompare(b.id))) {
+    ;(ngayVnCua(m.taoLuc) >= ngayGiaoXaNhat && momViec.length < MOM_CHUA_BAT_DAU_TOI_DA ? momViec : tonCu).push(m)
+  }
+
+  const nganSach = tinhNganSach(d, btvnCon.length + momCung.length + momViec.length)
   const B = nganSach.mucTieuCau
 
   // 2. Còn lại của từng bài (hai lượt: lượt 1 chưa tính tải khác để biết còn lại; lượt 2 tính lịch lô đúng).
@@ -280,7 +301,7 @@ export function lapKeHoachNgay(d: DauVaoKeHoach): KeHoachNgay {
   const cung: Viec[] = []
   // Câu đã nằm trong một bài Mom/daily_ CHƯA NỘP còn hiệu lực của hôm nay: việc "ôn lại" không giao lại (một câu hai nơi).
   // Bài đã nộp không có trong `d.mom`; bài hết hạn (đã bắt đầu quá 120 phút) chỉ ở `quaHan`, nên câu của chúng quay lại theo mốc ôn.
-  const daGiaoTrongMom = new Set<string>([...momCung, ...momChuaBd].flatMap((m) => m.qid ?? []))
+  const daGiaoTrongMom = new Set<string>([...momCung, ...momViec].flatMap((m) => m.qid ?? [])) // KHÔNG gồm bài trong tonCu
   const sapToi: KeHoachNgay['sapToi'] = []
   const chiTietBai: Record<string, { taiKhac: number; taiMoiNgay: number; conLai: number; soLo: number }> = {}
   for (const b of btvnCon) {
@@ -316,7 +337,7 @@ export function lapKeHoachNgay(d: DauVaoKeHoach): KeHoachNgay {
       ghiChu: 'Bài Mom đã bắt đầu — hết giờ sau 120 phút.', chiTiet: { id: m.id },
     }))
   }
-  for (const m of momChuaBd) {
+  for (const m of momViec) {
     cung.push(viecCung({
       id: `mom:${m.id}`, loai: 'mom', soCau: m.soCau, hanMs: null, hanMemMs: null, khan: false, nguon: m.id,
       ghiChu: 'Bài Mom giao, chưa bắt đầu. Bấm bắt đầu thì có 120 phút làm.', chiTiet: { id: m.id, chuaBatDau: true, taoLuc: m.taoLuc },
@@ -408,6 +429,8 @@ export function lapKeHoachNgay(d: DauVaoKeHoach): KeHoachNgay {
     phienBan: PHIEN_BAN_KE_HOACH, seed, sbd: d.sbd, ngay: d.homNay, nganSach, viec, canhBao, quaHan, sapToi,
     tai: { cung: taiCung, bu: bu.reduce((t, v) => t + v.soCau, 0), tuyChon: tuyChonCat.reduce((t, v) => t + v.soCau, 0), nganSach: B, vuot },
     tienBo, chuoiDat: demChuoiDat(d.lichSu), lanNghi: d.homNayLaNgayNghi,
+    tonCu: tonCu.map((m) => ({ id: m.id, loai: 'mom' as const, soCau: m.soCau, giaoLuc: m.taoLuc })),
+    tonCuTong: { soBai: tonCu.length, soCau: tonCu.reduce((t, m) => t + m.soCau, 0) },
   }
 }
 
