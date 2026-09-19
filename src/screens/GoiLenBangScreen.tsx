@@ -1,6 +1,7 @@
 import NhomCaThuGon from '../components/NhomCaThuGon'
 import { phanCongDayHoc } from '../lib/phan-cong-day-hoc'
 import { hashSeed } from '../lib/exam-shuffle'
+import { TIN_TO_CHIEU, gocGuiLai, khoaToChieu, kiemTinToChieu, taoMaPhienChieu } from '../lib/to-chieu-cau-noi'
 // GỌI HỌC SINH LÊN BẢNG — MỘT MÀN, MỘT LUỒNG (thầy chốt 05/09 chiều).
 //
 // Nguồn duy nhất là CA thầy vừa cho lớp làm. Từ một ca ấy ra cả hai việc:
@@ -272,9 +273,21 @@ export default function GoiLenBangScreen() {
   /** Hồ sơ lớp đang giữ là của (danh sách em × danh sách câu) nào. Đổi em có mặt hay đổi
    * bài chữa thì phải xin lại: hồ sơ nắm kiến thức chỉ có đúng những câu ĐÃ XIN. */
   const khoaHoSoDaNap = useRef('')
-  /** Các dòng buổi chữa ĐANG chờ máy chủ. `dangCham` chỉ nhớ MỘT dòng — bấm dòng khác trong lúc chờ là
-   * dòng trước mở khoá lại, bấm tiếp là ghi đôi. */
-  const dangGhiBuoi = useRef(new Set<string>())
+  /** KHOÁ CHỐNG GHI ĐÔI CHUNG `sbd|qid` cho MỌI nơi bấm: bảng Phân công, bảng buổi chữa, tờ máy chiếu.
+   * `dangGhiKhoa`: các ô ĐANG chờ máy chủ (`dangCham` chỉ nhớ MỘT dòng — bấm dòng khác trong lúc chờ là dòng
+   * trước mở khoá lại, bấm tiếp là ghi đôi). `daGhiKhoa`: các ô máy chủ ĐÃ nhận trong phiên này. */
+  const dangGhiKhoa = useRef(new Map<string, Promise<boolean>>())
+  const daGhiKhoa = useRef(new Set<string>())
+  /** PHIÊN TỜ MÁY CHIẾU đang mở: mã phiên ngẫu nhiên, các ô có trên tờ (tra lại theo `khoa`, không tin tin đến),
+   * khung iframe đã bắt tay (`cuaSo`) và gốc của nó. `null` khi không có tờ nào đang chiếu. */
+  const phienChieu = useRef<{
+    ma: string
+    o: Map<string, { sbd: string; hoTen: string; cau: CauChua }>
+    cuaSo: Window | null
+    goc: string
+  } | null>(null)
+  /** Bản MỚI NHẤT của `ghiTheoKhoa` cho bộ nghe tin của tờ chiếu (bộ nghe gắn một lần, không được giữ hàm cũ). */
+  const ghiTheoKhoaRef = useRef<((o: { sbd: string; hoTen: string; cau: CauChua }, dat: boolean) => Promise<boolean>) | null>(null)
 
   useEffect(() => {
     void (async () => {
@@ -855,6 +868,8 @@ export default function GoiLenBangScreen() {
       ])
 
       const dsO: OBangMayChieu[] = []
+      // Các ô CÓ TRÊN tờ, tra theo `khoa` khi tờ gửi lệnh ghi (không tin sbd/qid trong tin đến).
+      const oTrenTo = new Map<string, { sbd: string; hoTen: string; cau: CauChua }>()
       for (const p of dsPc) {
         let day = traCau.get(p.cau.id)
         if (!day) {
@@ -890,9 +905,11 @@ export default function GoiLenBangScreen() {
           ketQua: '',
         }
 
+        oTrenTo.set(khoaToChieu(p.sbd, p.cau.id), { sbd: p.sbd, hoTen: p.hoTen, cau: p.cau })
         dsO.push({
           sbd: p.sbd,
           hoTen: p.hoTen,
+          qid: p.cau.id,
           soCau: p.cau.so,
           sao: p.cau.sao,
           mucDo: p.cau.mucDo,
@@ -939,13 +956,17 @@ export default function GoiLenBangScreen() {
         if (cl) dsDapAn.push(cl)
       }
 
+      // CẦU NỐI GHI KẾT QUẢ NGAY TRÊN TỜ CHIẾU: mã phiên ngẫu nhiên mỗi lần mở, chỉ nằm trong HTML của tờ này.
+      const maPhien = taoMaPhienChieu()
       const html = taoHtmlMayChieu(dsO, {
         dayHoc,
         tenBuoi: dayHoc ? 'Dạy học · Gọi lên bảng' : du ? `Chữa bài ca ${du.maCa}` : 'Gọi lên bảng',
         ngay: new Date(),
         dsDapAn,
+        cauNoi: { maPhien },
       })
 
+      phienChieu.current = { ma: maPhien, o: oTrenTo, cuaSo: null, goc: '*' }
       setHtmlMayChieu(html)
       showToast('Đang mở tờ chiếu lên bảng', 'success')
     } catch (e) {
@@ -977,18 +998,31 @@ export default function GoiLenBangScreen() {
     }
   }
 
+  /** Gửi một tin xuống khung tờ máy chiếu đang mở (nếu đã bắt tay). Khung đóng rồi thì thôi. */
+  const guiToChieu = (msg: Record<string, unknown>) => {
+    const p = phienChieu.current
+    if (!p?.cuaSo) return
+    try {
+      p.cuaSo.postMessage({ ...msg, maPhien: p.ma }, p.goc)
+    } catch {
+      /* khung đã đóng */
+    }
+  }
+
   /** CHẤM CÂU TRÊN BẢNG PHÂN CÔNG (Engine C): ghi đạt/không đạt vào log mạnh–yếu rồi bỏ dòng
    * khỏi bảng (`boDong`). Ghi hỏng thì GIỮ dòng lại — mất dòng mà máy chủ chưa có gì là thầy
-   * tưởng đã ghi rồi. Việc ghi nằm ở `ghiKetQua`, dùng chung với bảng buổi chữa. */
+   * tưởng đã ghi rồi. Việc ghi nằm ở `ghiKetQua`, dùng chung với bảng buổi chữa và tờ máy chiếu.
+   * Ô đã ghi từ chỗ khác (bảng buổi chữa, tờ chiếu) thì chỉ bỏ dòng, không ghi đôi. */
   const cham = async (p: DongPhanCong, dat: boolean) => {
+    if (daGhiKhoa.current.has(khoaToChieu(p.sbd, p.cau.id))) return boDong(p)
     if (await ghiKetQua(p, dat)) boDong(p)
   }
 
-  /** GHI MỘT KẾT QUẢ LÊN BẢNG — MỘT đường duy nhất cho cả hai bảng: `cham` (Engine C, bảng
-   * "Phân công") và `chamBuoi` (Engine E, bảng buổi chữa/tờ máy chiếu). Cùng một lệnh
-   * `ghiLenBang`, máy chủ ghi `len_bang` + sổ `nguon='len_bang'`, cùng thông báo, cùng cập nhật
-   * lịch sử tại chỗ. Trả `true` chỉ khi máy chủ đã nhận: ghi hỏng thì bên gọi GIỮ dòng lại — mất
-   * dòng mà máy chủ chưa có gì là thầy tưởng đã ghi rồi. */
+  /** GHI MỘT KẾT QUẢ LÊN BẢNG — MỘT đường duy nhất cho MỌI nơi bấm: `cham` (Engine C, bảng
+   * "Phân công"), `chamBuoi` (Engine E, bảng buổi chữa) và tờ máy chiếu (qua `ghiTheoKhoa`). Cùng
+   * một lệnh `ghiLenBang`, máy chủ ghi `len_bang` + sổ `nguon='len_bang'`, cùng thông báo, cùng cập
+   * nhật lịch sử tại chỗ. Trả `true` chỉ khi máy chủ đã nhận: ghi hỏng thì bên gọi GIỮ dòng lại —
+   * mất dòng mà máy chủ chưa có gì là thầy tưởng đã ghi rồi. */
   const ghiKetQua = async (p: { sbd: string; hoTen: string; cau: CauChua }, dat: boolean): Promise<boolean> => {
     if (!cauHinh) {
       showToast('Chưa cấu hình máy chủ', 'error')
@@ -1028,6 +1062,10 @@ export default function GoiLenBangScreen() {
             : e,
         ),
       )
+      // Khoá chung + báo cho tờ máy chiếu (nếu đang chiếu) khoá ô ấy — bấm ở bảng thì tờ chiếu cũng khoá.
+      const khoa = khoaToChieu(p.sbd, p.cau.id)
+      daGhiKhoa.current.add(khoa)
+      guiToChieu({ type: TIN_TO_CHIEU.DA_GHI, khoa })
       return true
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không ghi được kết quả', 'error')
@@ -1037,21 +1075,80 @@ export default function GoiLenBangScreen() {
     }
   }
 
+  /** GHI THEO KHOÁ `sbd|qid` — cổng chung của bảng buổi chữa và tờ máy chiếu, IDEMPOTENT: ô đã ghi trả `true`
+   * ngay (không ghi lại); ô đang chờ máy chủ thì chờ đúng lượt ghi ấy (không mở lượt thứ hai). Nhờ vậy tờ chiếu
+   * quá 8 giây coi là lỗi rồi bấm lại cũng không ghi đôi nếu lượt đầu thật ra đã thành công. */
+  const ghiTheoKhoa = async (o: { sbd: string; hoTen: string; cau: CauChua }, dat: boolean): Promise<boolean> => {
+    const khoa = khoaToChieu(o.sbd, o.cau.id)
+    if (daGhiKhoa.current.has(khoa)) return true
+    const dang = dangGhiKhoa.current.get(khoa)
+    if (dang) return dang
+    const luot = ghiKetQua(o, dat)
+    dangGhiKhoa.current.set(khoa, luot)
+    try {
+      const ok = await luot
+      if (ok) setKetQuaBuoi((cu) => (cu[khoa] ? cu : { ...cu, [khoa]: dat ? 'dat' : 'khong_dat' }))
+      return ok
+    } finally {
+      dangGhiKhoa.current.delete(khoa)
+    }
+  }
+  ghiTheoKhoaRef.current = ghiTheoKhoa
+
   /** CHẤM CÂU TRÊN BẢNG BUỔI CHỮA (Engine E) — cùng `ghiKetQua` với `cham`. Dòng KHÔNG bị bỏ khỏi
    * bảng (bảng này cũng là nguồn của tờ máy chiếu đang chiếu): chỉ đổi nút thành kết quả đã ghi. */
   const chamBuoi = async (d: DongChua, dat: boolean) => {
     if (!d.em) return
-    const khoa = `${d.em.sbd}|${d.cau.id}`
-    if (ketQuaBuoi[khoa] || (daGoiCau[d.em.sbd] ?? []).includes(d.cau.id) || dangGhiBuoi.current.has(khoa)) return
-    dangGhiBuoi.current.add(khoa)
-    try {
-      if (await ghiKetQua({ sbd: d.em.sbd, hoTen: d.em.hoTen, cau: d.cau }, dat)) {
-        setKetQuaBuoi((cu) => ({ ...cu, [khoa]: dat ? 'dat' : 'khong_dat' }))
-      }
-    } finally {
-      dangGhiBuoi.current.delete(khoa)
-    }
+    await ghiTheoKhoa({ sbd: d.em.sbd, hoTen: d.em.hoTen, cau: d.cau }, dat)
   }
+
+  /** NGHE TỜ MÁY CHIẾU — chỉ khi đang chiếu. Mọi tin đi qua `kiemTinToChieu` (nguồn = ĐÚNG khung iframe tờ
+   * chiếu, gốc, mã phiên, ô có trên tờ); tin không đủ thì bỏ lặng lẽ. Lệnh ghi đi qua `ghiTheoKhoa` — cùng đường
+   * và cùng khoá chống ghi đôi với bảng buổi chữa; app trả lại `da_ghi` hoặc `loi` cho tờ. */
+  useEffect(() => {
+    if (!htmlMayChieu) return
+    const ma = phienChieu.current?.ma
+    const nghe = (e: MessageEvent) => {
+      const p = phienChieu.current
+      if (!p) return
+      const tin = kiemTinToChieu(e, {
+        maPhien: p.ma,
+        gocApp: window.location.origin,
+        laKhungToChieu: (nguon) =>
+          !!nguon && [...document.querySelectorAll<HTMLIFrameElement>('.lop-xem-phieu iframe')].some((f) => f.contentWindow === nguon),
+        khoaHopLe: (khoa) => p.o.has(khoa),
+      })
+      if (!tin) return
+      const cuaSo = e.source as Window
+      const goc = gocGuiLai(e.origin)
+      if (tin.loai === 'san_sang') {
+        p.cuaSo = cuaSo
+        p.goc = goc
+        guiToChieu({ type: TIN_TO_CHIEU.KET_NOI })
+        // Ô đã ghi từ trước khi tờ mở (bảng buổi chữa, bảng Phân công): khoá ngay, khỏi để bấm lần nữa.
+        for (const khoa of p.o.keys()) if (daGhiKhoa.current.has(khoa)) guiToChieu({ type: TIN_TO_CHIEU.DA_GHI, khoa })
+        return
+      }
+      const o = p.o.get(tin.khoa)
+      if (!o) return
+      void ghiTheoKhoaRef.current?.(o, tin.dat).then((ok) => {
+        if (phienChieu.current !== p) return // tờ đã đóng/đổi phiên trong lúc chờ máy chủ
+        try {
+          cuaSo.postMessage({ type: TIN_TO_CHIEU.PHAN_HOI, maPhien: p.ma, khoa: tin.khoa, kq: ok ? 'da_ghi' : 'loi' }, goc)
+        } catch {
+          /* khung đã đóng */
+        }
+      })
+    }
+    window.addEventListener('message', nghe)
+    return () => {
+      window.removeEventListener('message', nghe)
+      // Chỉ xoá phiên CỦA MÌNH: mở tờ mới đè lên tờ cũ thì phiên mới đã đặt trước khi dọn tờ cũ.
+      if (phienChieu.current?.ma === ma) phienChieu.current = null
+    }
+    // Gắn một lần cho mỗi tờ; các hàm bên trong đọc qua ref nên luôn là bản mới nhất.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [htmlMayChieu])
 
   const boDong = (p: DongPhanCong) => {
     setKq((cu) => (cu ? { ...cu, phanCong: cu.phanCong.filter((x) => !(x.sbd === p.sbd && x.cau.id === p.cau.id)) } : cu))

@@ -20,11 +20,15 @@ import {experimentHtml,experimentOriginal} from './experiments/render'
 // một khuôn với báo cáo và phiếu, không dựng khuôn thứ hai.
 import type { CauLuyen } from './bai-tap-pdf'
 import { CSS_PHIEU, anhHtml, bangHtml, chuHtml, dapAnChu, hinhTaiViTri, oGiaiHtml, thoat } from './html-phieu'
+import { CSS_CAU_NOI_TO_CHIEU, chuanMaPhien, jsCauNoiToChieu, khoaToChieu, mangNutChamToChieu } from './to-chieu-cau-noi'
 
 /** Một ô bảng: một em, một câu. */
 export interface OBang {
   sbd: string
   hoTen: string
+  /** Mã câu (qid) — CHỈ để tờ chiếu ghi kết quả Đạt / Không đạt về màn giáo viên (`cauNoi`). Thiếu thì ô
+   * không có nút. Không bao giờ hiện thành chữ trên tờ. */
+  qid?: string
   /** Số thứ tự câu in cho em nhìn. */
   soCau: number
   sao?: number
@@ -72,6 +76,11 @@ export interface TuyChonMayChieu {
    * Những câu này không gọi em nào lên bảng, nên chúng đi thành mấy TRANG ĐÁP
    * ÁN nối sau các đợt: thầy lật tiếp là chiếu đáp án cho cả lớp dò. */
   dsDapAn?: CauLuyen[]
+  /** CẦU NỐI VỀ MÀN GIÁO VIÊN (thầy chốt 19/09: "cho lên máy chiếu luôn"). Có thì mỗi ô em × câu (có `qid`)
+   * mang hai nút Đạt / Không đạt — ẨN cho tới khi màn giáo viên trả lời bắt tay, và BỎ HẲN nếu tờ được mở
+   * riêng (tệp đã lưu, tab riêng): khi ấy không có ai để ghi. Không có `cauNoi` thì tờ chiếu byte-for-byte
+   * như trước, không thêm nút, kiểu chữ hay mã nào. Xem `to-chieu-cau-noi.ts`. */
+  cauNoi?: { maPhien: string }
 }
 
 /** Số câu mỗi trang đáp án. Chiếu lên tường thì 12 dòng là vừa mắt từ cuối lớp;
@@ -234,7 +243,13 @@ export function thoiGianDayHoc(o: OBang): number {
   return Math.max(60, Math.min(180, Math.ceil((40 + words * 0.45 + difficulty + visual) / 15) * 15))
 }
 
-function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number): string {
+/** Hai nút Đạt / Không đạt của một ô — chỉ khi tờ được dựng kèm `cauNoi` và ô có `qid`. Mảnh markup, CSS và JS nằm
+ * ở `to-chieu-cau-noi.ts` (tờ chiếu chỉ việc đặt mảnh này ở đâu thầy muốn). TẾ NHỊ TRƯỚC LỚP: xem ghi chú ở đó. */
+function chamHtml(o: OBang, cauNoi: boolean): string {
+  return cauNoi && o.qid ? mangNutChamToChieu(khoaToChieu(o.sbd, o.qid)) : ''
+}
+
+function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number, cauNoi = false): string {
   if (!o) {
     return `<section class="mc-nua mc-${viTri} mc-trong" aria-hidden="true"><div class="mc-trong-chu">Đợt này chỉ gọi một em</div></section>`
   }
@@ -246,7 +261,7 @@ function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number): s
   <div class="mc-giai-vung">
     <button type="button" class="mc-nut-giai" aria-expanded="false" aria-controls="${ma}">
       <span class="mc-nut-chu">Hiện lời giải</span>
-    </button>
+    </button>${chamHtml(o, cauNoi)}
     <div class="mc-giai" id="${ma}" hidden>${oGiaiHtml(o.cau)}</div>
   </div>
   <div class="mc-trang" aria-hidden="true"></div>
@@ -256,7 +271,8 @@ function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number): s
 /** Đợt chiếu hai em chia đôi bảng 50% - 50% khi cả 2 câu đủ ngắn */
 function dotHaiEmHtml(o1: OBang, o2: OBang | undefined, soDot: number, tuyChon: TuyChonMayChieu): string {
   const secondsAttr = tuyChon.dayHoc ? `data-seconds="${Math.max(thoiGianDayHoc(o1), o2 ? thoiGianDayHoc(o2) : 0)}"` : ''
-  return `<div class="mc-dot" data-dot="${soDot}" ${secondsAttr}>${nuaHtml(o1, 'trai', soDot)}${nuaHtml(o2, 'phai', soDot)}</div>`
+  const cauNoi = Boolean(tuyChon.cauNoi?.maPhien)
+  return `<div class="mc-dot" data-dot="${soDot}" ${secondsAttr}>${nuaHtml(o1, 'trai', soDot, cauNoi)}${nuaHtml(o2, 'phai', soDot, cauNoi)}</div>`
 }
 
 /** Đợt chiếu một em khi câu dài: 2/3 bảng chiếu câu hỏi, 1/3 bảng để trống cho học sinh lên làm */
@@ -271,7 +287,7 @@ function dotMotEmHtml(o: OBang, soDot: number, tuyChon: TuyChonMayChieu): string
     <div class="mc-giai-vung">
       <button type="button" class="mc-nut-giai" aria-expanded="false" aria-controls="${ma}">
         <span class="mc-nut-chu">Hiện lời giải</span>
-      </button>
+      </button>${chamHtml(o, Boolean(tuyChon.cauNoi?.maPhien))}
       <div class="mc-giai" id="${ma}" hidden>${oGiaiHtml(o.cau)}</div>
     </div>
     <div class="mc-trang" aria-hidden="true"></div>
@@ -736,7 +752,10 @@ const JS_MAY_CHIEU = `
  * KHÔNG ĐỘN CHO ĐỦ CẶP: lẻ một em thì nửa còn lại để trắng và nói rõ, chứ không
  * gọi thêm một em không có trong phân công.
  */
-export function taoHtmlMayChieu(dsO: OBang[], tuyChon: TuyChonMayChieu = {}): string {
+export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}): string {
+  // Chuẩn hoá mã phiên MỘT lần rồi mọi chỗ cùng đọc: mã rỗng/toàn ký tự lạ = KHÔNG có cầu nối (không nút, không mã).
+  const maPhien = chuanMaPhien(tuyChonGoc.cauNoi?.maPhien)
+  const tuyChon: TuyChonMayChieu = { ...tuyChonGoc, cauNoi: maPhien ? { maPhien } : undefined }
   const ngay = tuyChon.ngay ?? new Date()
   const dot: string[] = []
   let k = 0
@@ -788,7 +807,7 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChon: TuyChonMayChieu = {}): st
   return `<!DOCTYPE html>
 <html lang="vi" data-projector="matte-light" data-sang><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${thoat(tuyChon.tenBuoi || 'Gọi lên bảng')} — tờ máy chiếu</title>
-<style>${CSS_PHIEU}</style><style>${CSS_MAY_CHIEU}</style></head>
-<body class="mc${tuyChon.dayHoc ? ' mc-day-hoc' : ''}">${than}
-<script>${JS_MAY_CHIEU}</script></body></html>`
+<style>${CSS_PHIEU}</style><style>${CSS_MAY_CHIEU}</style>${maPhien ? `<style>${CSS_CAU_NOI_TO_CHIEU}</style>` : ''}</head>
+<body class="mc${tuyChon.dayHoc ? ' mc-day-hoc' : ''}"${maPhien ? ` data-cau-noi="${maPhien}"` : ''}>${than}
+<script>${JS_MAY_CHIEU}</script>${maPhien ? `<script>${jsCauNoiToChieu()}</script>` : ''}</body></html>`
 }
