@@ -129,6 +129,47 @@ Giao bởi 0.Planer (thầy đã uỷ quyền 100%: "nghe theo điều phối, k
 
 - [x] 102 đỏ / 46 tệp (nền c9: 100/44). Đỏ MỚI: 5 — 4 test đo giờ (de-rieng-ho-so-1909 "dưới 500 ms", de-rieng-tran-trung ×2, xep-buoi-chua-1409 "ngân sách") + goi-len-bang-to-chieu-cham-1909 "BẤM ĐÚP" — chạy RIÊNG 4 tệp đó: 107/107 xanh (máy tải khi nhiều phiên chạy vitest cùng lúc). Test của em: 0 đỏ mới. 3 test xanh lại (nhiem-vu-adapter, than-thu-v2 ×2)
 
+## LOGO MỚI TOÀN HỆ THỐNG (0.Planer giao 19/09, thầy chốt "quá đẹp") — 19/09 17:30
+
+**Kiểm kê chỗ dùng logo/icon (đã đọc mã trước khi thay) → cách xử lý**
+
+| Nơi | Cỡ · nền | Bản dùng | SW cache theo tên? | Test khoá? | Xử lý |
+|---|---|---|---|---|---|
+| `LogoGiaoVien/PhuHuynh/HocSinh` (ThanhBenTrai 38 + chữ, ParentPortal thanh trên 38 + chữ, KhoaApp, các màn đăng nhập, PhongChoGame 44, ExamTakeScreen 48/54) | 38–64 px · sáng+tối | ≤ 40 → nét đậm `-nho`, > 40 → thường | precache theo tên tệp (revision băm) | không tên tệp; m3-c9 chỉ soi LogoApp không có `safe-area` | 3 tệp thành vỏ mỏng của `LogoVai.tsx` (SVG qua `<img>`, hết `rounded-xl`) |
+| `LogoDDH` (mã chết, 0 nơi gọi) · `LogoApp` (InfographicHuongDan 56, AppDaChuyenScreen 56) | 56 | thường | như trên | không | LogoDDH → `AnhLogo`; LogoApp không đổi (chọn theo vai) |
+| Khối tay "ĐỖ ĐẠI HỌC + Kiên Trì" ở 4 màn đăng nhập/vào thi (KhoaApp, StudentPortal, ParentPortal, ExamTakeScreen) | 52–54 px | thường | — | không | thay bằng `LogoDoc` (logo 64 + tên + viên thuốc vai trò + `6,022 · 10²³`) |
+| `index.html` (favicon + apple-touch-icon theo vai, `document.write`) | 64 / 180 | favicon SVG `-nho` + PNG 64 `-nho`; apple-touch 180 tràn nền | trình duyệt cache theo URL → đổi `-v3` | không | 3 thẻ `-v3` theo vai |
+| `manifest.json / -hs / -ph` | 192/512 | tràn nền + **maskable 512 riêng** (mới) | `/manifest*.json` no-cache (`_headers`) | không | icon `-v3`, thêm maskable |
+| `cai-app.html` = `cai-dat.html` = `cai-app/index.html` (3 bản y hệt) | header 78, xem trước 60 | tràn nền 180/192 (CSS tự bo góc) | — | không | `-v3`, đổi icon theo tab vai như cũ |
+| `hs.mobileconfig` / `ph.mobileconfig` (khoá `Icon` = PNG base64 180) | 180 | tràn nền | `_headers` no-store | không | script sinh lại base64 (75+77 KB → 21+20 KB) |
+| `src/sw.ts` thông báo đẩy | icon 192 / badge 64 | `logo-hs-192-v3` / `logo-hs-64-v3` | precache | không | đổi tên |
+| `vite.config.ts` includeAssets | — | — | — | không | bỏ 4 tên không tồn tại (`icon-hs/ph-*`), thêm `logo-*-v3.*` |
+| `apple-touch-icon.png`, `icon-192/512/512-maskable.png` (không manifest nào trỏ; còn ở `/`) | 180/192/512 | tràn nền GV | precache | không | sinh lại từ GV (giữ tên) |
+| `favicon.svg` | — | nét đậm GV | — | không | tự chứa, hết `<image>` trỏ sang PNG |
+| html-phieu / html-may-chieu / InfographicHuongDan | — | — | — | — | KHÔNG nhúng logo → không đổi |
+
+- [x] 0ad168f — **nhóm 1**: `scripts/sinh-logo-png.mjs` (Chromium của Playwright, không thêm phụ thuộc; `--kiem` so từng byte: chạy 2 lần đều ✅), `scripts/do-logo-maskable.mjs`, 26 tệp `public/logo-*-v3.*`, icon/favicon/mobileconfig sinh lại. Ghi chú lệch nhỏ so với lệnh: PNG **64 px sinh từ bản NÉT ĐẬM** (không phải tràn nền) vì DOC-TRUOC xếp favicon/thông báo ở bản nét đậm và tràn nền ở 64 px làm hình thu còn ~70%; thêm bản **maskable 512 thu 90%** vì bản `-day` gốc để góc vuông bo/mái nhà chạm ngoài vòng an toàn (đo 44,3% GV, 42,4% PH so với ngưỡng 40%): sau thu 90% = 39,8 / 32,9 / 38,1%; bản tràn nền chưa thu vẫn "NGOÀI" (đối chứng của phép đo)
+- [x] 4b0eb76 — **nhóm 2**: manifest ×3, index.html, cai-app ×3, sw.ts, vite.config.ts
+- [x] f3773f1 — **nhóm 3**: `LogoVai.tsx` + `logo-ddh.css` (không hex; viên thuốc vai trò `rgb()` đo ≥ 4,5:1: GV 5,12 / HS 4,80 / PH 5,02 sáng, ≥ 7,97 tối; tên 12,5–16,5:1; hằng số 6,49–9,39:1), LogoGiaoVien/PhuHuynh/DDH, 3 màn đăng nhập
+- [x] c92ca16 — **nhóm 4 (LUỒNG THI THẬT — CHỜ 0.Planer soát)**: `LogoHocSinh.tsx` + ExamTakeScreen đúng MỘT chỗ (khối thương hiệu màn vào thi → `LogoDoc` học sinh); PhongChoGame KHÔNG sửa dòng nào (test khoá dòng `<LogoHocSinh size={44} hienChu={false} />`); 43 tệp test đụng màn thi/phòng chờ: 0 đỏ mới
+- [x] ccd79a0 — phép kiểm "không còn -v2" (quét mã, html, manifest, scripts, test) + ảnh trước/sau. **Lưu ý**: lần `git rm` 12 PNG -v2 của em bị **commit c5c1348 của Code 2 cuốn theo** (dùng chung chỉ mục) — cây làm việc đúng, chỉ là nhãn commit không nói. Bài học: không để đồ staged giữa hai lệnh; dùng `git add` rồi `git commit` NGAY
+- [x] Ảnh docs/anh-logo-1909: `truoc-*` (bản cũ dựng ở worktree tạm cb5f192, đã xoá) và `sau-*`: thanh trên 3 app (`thanh-tren`), màn đăng nhập GV/HS/PH (`dn-gv/hs/ph`), trang cài app (`cai-app`), 390 px sáng + tối
+- [x] Chromium thật: mở manifest từng vai (`?vai=gv|hocsinh|phuhuynh`) qua CDP `Page.getAppManifest`: 0 lỗi manifest; 3 icon mỗi vai nạp được đúng cỡ khai (192, 512 any, 512 maskable); 3 thẻ link biểu tượng (SVG, PNG 64, apple-touch 180) đều 200 đúng content-type; 0 yêu cầu hỏng/4xx. Màn đăng nhập: 0 tràn ngang, mọi `<img>` logo nạp được, bo góc 0
+- [x] `vite build --outDir` ngoài repo exit 0; `kiem-sw.mjs` 10/10; dist không còn `-v2`; sw.js precache đủ 26 tệp logo mới
+- [x] **Cỡ gói**: logo + icon + hồ sơ iPhone **2 498 840 B → 957 702 B (−62%)**: PNG 192 = 14,5–17,9 KB (cũ 58–59 KB), PNG 512 = 74–96 KB (cũ 362–382 KB); SVG mỗi app: thường + nét đậm = 54,6 KB (GV) / 55,3 KB (HS) / 3,5 KB (PH) < PNG 59 KB cũ, mỗi tệp ≤ 33 KB
+- [x] tests/logo-bo-moi-1909.test.tsx 39 xanh (đổi .ts → .tsx); đột biến 7 (nhóm 1) + 7 (nhóm 2) + 11 (nhóm 3) + 4 (nhóm 4) + 2 (dọn -v2) đều đỏ rồi hoàn lại xanh
+- [ ] CÒN MỞ (không sửa vì ngoài lệnh): (a) huy hiệu thông báo Android là mặt nạ chỉ-alpha → `logo-hs-64-v3.png` ra khối bánh quy đặc, không thấy chữ A (trước là ô vuông đặc): muốn đẹp thì thêm một PNG huy hiệu từ `logo-don-sac.svg`; (b) header trang cài app vẫn dùng logo GIÁO VIÊN cho trang "Học sinh & Phụ huynh" (như cũ); (c) app đã cài trên máy em/phụ huynh giữ icon cũ tới khi gỡ cài lại (trình duyệt không tự làm mới icon PWA đã cài)
+
+## SỬA LỖI 140af65 — Bảng tin trạng thái trống (Code 2 báo, 0.Planer: mọi màn HS/PH đẹp khi dữ liệu trống hoàn toàn) — 19/09 17:20
+
+- [x] (1) Nguyên nhân gốc: `refresh()` chỉ `setReport(r.report)`; máy chủ ok mà không có `report` → null mãi; thẻ "Đang tổng hợp…" hiện khi `!report` nên quay vô hạn. Sửa: cờ `daTai` (đặt trong `finally`, về false khi đổi sbd) — đang tải lần đầu → vòng quay (HS xưng "em", PH "con"; trước HS cũng thấy "của con"); tải xong chưa có bản tin → "Chưa có bản tin hôm nay. Bản tin mới lúc 00:01 mỗi ngày."; lỗi mạng → chỉ dải cảnh báo. tests/bang-tin-trong-sau-reset-1909.test.tsx 7 ca; đột biến bỏ `finally` (đúng lỗi cũ) → 6 đỏ
+- [x] (2) BangVinhDanh (chung với app giáo viên, KHÔNG sửa .css/.tsx của nó) nay cùng gốc `m3` với Bảng tin; bang-tin.css ẩn dải 4 màu Google và cho chữ "DẤU ẤN MỖI NGÀY" theo `--m3-tren-canh-bao`: Chromium 390: **1,71 → 9,20:1 sáng, 7,89:1 tối**; câu trống vinh danh 9,39 / 6,49; trạng thái CÓ 3 người vinh danh so bản không-m3: không tụt (tên/khen/chân ≥ 6,1:1). tests/m3-c8-bang-tin-1909 đổi có chủ ý 1 phép khoá ("vinh danh KHÔNG bị bọc" → "cùng một gốc m3"), ghi chú trong tên test
+- [x] Ảnh docs/anh-dong-bo-m3-1909/c8-bang-tin-trong-{hs,ph}-390-*, c8-vinh-danh-co-nguoi-390-*
+
+## Kết quả vitest toàn bộ sau logo + sửa lỗi Bảng tin — 19/09 17:45
+
+- [x] 99 đỏ / 44 tệp (nền c6c7: 102/46). Đỏ MỚI 2: (1) **tests/m3-a1-1909 "không có mã màu # ở bất kỳ tệp nào của m3/" — LỖI CỦA EM**: chú thích mới trong bang-tin.css (140af65) có chữ `#fbbc04`; đã bỏ hex khỏi chú thích, m3-a1 xanh lại; (2) tests/ca-dang-mo-1909 "HAI truy vấn…" — chạy riêng xanh (máy tải). 5 test đo giờ đỏ ở nền nay xanh lại. Test của em khác: 0 đỏ mới. Bài học: chú thích trong m3/*.css cũng bị test quét hex
+
 ## Trạng thái cuối phiên — 19/09 15:50
 
 - Việc còn mở: (1) chờ 0.Planer soát 70d3408 (đã soát), e1555a4 (đã soát), 564dc08, 5d0d1c4, b72ca8d; (2) TheCau bật ở màn thi = Code 2 đặt `m3` ở gốc ExamTakeScreen (đã thoả thuận, Code 2 xác nhận cách (a)); (3) KhoiBaiLuyen + TheCauChiTiet để nguyên (đề nghị, chờ đồng ý); (4) nợ cũ ngoài phạm vi: 4 cặp chữ nhỏ --p-do/--p-xanh của TheCauChiTiet dưới 4,5:1 (tokens.css); (5) dọn: thư mục tạm `.claude/m3-xem/` (trang xem thử, KHÔNG commit) — xoá được

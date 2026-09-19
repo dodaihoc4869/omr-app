@@ -45,7 +45,7 @@
 }
 
 /* BẢNG VINH DANH (BangVinhDanh, dùng chung với app giáo viên) đứng TRONG `.m3` của Bảng tin học sinh / phụ huynh:
- * bỏ dải 4 màu Google ở mép trên thẻ, và chữ "DẤU ẤN MỖI NGÀY" (10 px, #fbbc04 trên nền sáng chỉ 1,71:1) đọc theo vai trò
+ * bỏ dải 4 màu Google ở mép trên thẻ, và chữ "DẤU ẤN MỖI NGÀY" (10 px, vàng cố định trên nền sáng chỉ 1,71:1) đọc theo vai trò
  * cảnh báo của M3 — tối trên nền sáng, vàng nhạt trên nền tối. Biểu tượng ✦ cạnh chữ theo màu chữ (Tailwind gán màu vàng cố định). */
 .m3 .honors:before {
   display: none;
