@@ -357,7 +357,8 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duC
         <div style={{ maxWidth: 340, textAlign: 'center' }}>
           <div style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 700 }}>Không mở được báo cáo</div>
           <div style={{ marginTop: 10, color: 'var(--phieu-chu-phu, var(--p-nhat))', fontSize: 14, lineHeight: 1.7 }}>
-            {loi} {laLoiCho(loi) ? 'Link vẫn còn dùng được, chỉ là máy chủ đang bận. Phụ huynh bấm Thử lại.' : 'Phụ huynh nhắn lại cho Thầy Đỗ Đại Học để nhận link mới.'}
+            {/* Câu lỗi của máy có khi không kết thúc bằng dấu câu ("…HTTP 503") — thêm dấu chấm để không dính vào câu hướng dẫn. */}
+            {/[.!?…]$/.test(loi.trim()) ? loi.trim() : `${loi.trim()}.`} {laLoiCho(loi) ? 'Link vẫn còn dùng được, chỉ là máy chủ đang bận. Phụ huynh bấm Thử lại.' : 'Phụ huynh nhắn lại cho Thầy Đỗ Đại Học để nhận link mới.'}
           </div>
           {/* NÚT THỬ LẠI — thầy báo 10/09 22:05. Trước đây màn này là ĐƯỜNG CỤT:
               phụ huynh bấm link Zalo đúng một lần, gặp lúc máy chủ bận là mất
