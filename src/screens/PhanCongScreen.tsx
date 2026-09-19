@@ -109,7 +109,7 @@ export default function PhanCongScreen() {
                 Giao bài tập về nhà
               </h1>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-                Bài tập theo 3 vòng
+                Chia lô theo hạn nộp
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
