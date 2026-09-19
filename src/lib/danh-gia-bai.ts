@@ -10,6 +10,10 @@
 // nào khen suông, không câu nào hối thúc khắc phục khi chẳng còn gì để khắc
 // phục, không dấu chấm than.
 //
+// Nhận xét cũng KHÔNG suy năng lực từ điểm ("bẫy đề chứ không phải lỗ hổng lý thuyết", "đã mất cả phần nhận biết và thông hiểu"):
+// hàm này chỉ có điểm, số câu cần chữa và tổng câu — không có dữ liệu theo phần / mức độ nên không được nói về chúng
+// (luật thầy chốt 18/09: không coi điểm là bằng chứng đã nắm chắc kiến thức).
+//
 // Hai cổng dùng chung hàm này nên xếp loại và nhận xét không bao giờ lệch nhau.
 
 export interface DanhGiaBai {
@@ -65,7 +69,7 @@ export function danhGiaBai(diem: number, soCanKhacPhuc: number, tongCau: number 
     return {
       xepLoai: 'Giỏi',
       ...LAM,
-      thongDiep: `Em được ${d.toFixed(2)} điểm, còn ${conCau}${veTong(tongCau)}. Phần lớn là bẫy đề và bước tính, không phải lỗ hổng lý thuyết.`,
+      thongDiep: `Em được ${d.toFixed(2)} điểm, còn ${conCau}${veTong(tongCau)}. Mở từng câu ở mục Câu sai cần chữa để xem mình sai ở bước nào.`,
       mucDoCanThiet: 'can_thien',
     }
   }
@@ -81,7 +85,7 @@ export function danhGiaBai(diem: number, soCanKhacPhuc: number, tongCau: number 
     return {
       xepLoai: 'Trung bình',
       ...HO_PHACH,
-      thongDiep: `Em được ${d.toFixed(2)} điểm, còn ${conCau}${veTong(tongCau)}. Số câu mất điểm đã sang cả phần nhận biết và thông hiểu — làm lại từng câu kèm lời giải.`,
+      thongDiep: `Em được ${d.toFixed(2)} điểm, còn ${conCau}${veTong(tongCau)}. Làm lại từng câu ở mục Câu sai cần chữa, kèm lời giải.`,
       mucDoCanThiet: 'khan_cap',
     }
   }

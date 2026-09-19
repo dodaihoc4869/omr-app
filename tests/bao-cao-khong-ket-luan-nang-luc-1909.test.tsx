@@ -6,6 +6,7 @@ import { cleanup, render } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import BaoCaoCaThiPhuHuynhModal from '../src/components/BaoCaoCaThiPhuHuynhModal'
+import { danhGiaBai } from '../src/lib/danh-gia-bai'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
 
@@ -44,6 +45,23 @@ describe('báo cáo ca thi không kết luận năng lực từ điểm số', (
       expect(chu).toContain(`${diem.toFixed(2)}/10`)
       expect(chu.match(CAM)?.[0] ?? null).toBeNull()
       expect(chu).toContain('Gợi ý hành động')
+    })
+  }
+})
+
+// nhận xét dùng chung (danhGiaBai) chỉ có điểm + số câu cần chữa + tổng câu → chỉ được nói những thứ đó
+const SUY_LUAN = /lỗ hổng|bẫy đề|bước tính|phần nhận biết|thông hiểu|vận dụng|năng lực|nền tảng/i
+describe('danhGiaBai: nhận xét chỉ nêu số liệu có trong tay', () => {
+  for (const [d, con] of [[10, 0], [9.6, 1], [8.4, 3], [7, 5], [5.5, 8], [3, 12]] as const) {
+    it(`điểm ${d}, còn ${con} câu: có con số của bài, không suy luận năng lực / mức độ`, () => {
+      const t = danhGiaBai(d, con, 28).thongDiep
+      if (con > 0) {
+        expect(t).toContain(`${d.toFixed(2)} điểm`)
+        expect(t).toContain(`${con} câu cần chữa`)
+      }
+      expect(t.match(CAM)?.[0] ?? null).toBeNull()
+      expect(t.match(SUY_LUAN)?.[0] ?? null).toBeNull()
+      expect(t).not.toContain('!')
     })
   }
 })
