@@ -281,6 +281,35 @@ export async function laHocSinhThat(env: Env, sbd: string): Promise<boolean> {
   return Number(r?.co) === 1
 }
 
+export interface ThanThu {
+  pet: string
+  /** Kẹp 1..120 như `loadProfile`. */
+  cap: number
+  nickname: string | null
+}
+
+/**
+ * Thần thú THẬT của em, đọc TƯƠI từ `game_v2_profile` (không lưu vào `ke_hoach_ngay`). Đúng MỘT truy vấn, đúng cách `honors.ts` đọc
+ * (`json_extract` `$.pet` `$.cap` `$.nickname`). `null` khi em chưa có hồ sơ game HOẶC chưa chọn thần thú (`choice = true`: `pet` lúc đó
+ * chỉ là `dat_quy` điền tạm, không phải lựa chọn của em) — TUYỆT ĐỐI không bịa một con mặc định.
+ * Lỗi lược đồ hoặc JSON hồ sơ hỏng → `null` và ghi log, không làm hỏng kế hoạch của em.
+ */
+export async function docThanThu(env: Env, sbd: string): Promise<ThanThu | null> {
+  const r = await tat(
+    () => env.DB.prepare(
+      `SELECT json_extract(json, '$.pet') AS pet, json_type(json, '$.pet') AS pet_kieu, json_extract(json, '$.cap') AS cap,
+              json_extract(json, '$.nickname') AS nickname, json_type(json, '$.nickname') AS nickname_kieu, json_extract(json, '$.choice') AS choice
+         FROM game_v2_profile WHERE sbd = ?`,
+    ).bind(sbd).first<Record<string, unknown>>(),
+    null,
+  )
+  if (!r || Number(r.choice) === 1) return null
+  const pet = r.pet_kieu === 'text' ? String(r.pet).trim() : ''
+  if (!pet) return null
+  const nickname = r.nickname_kieu === 'text' ? String(r.nickname).trim() : ''
+  return { pet, cap: Math.max(1, Math.min(120, Math.round(Number(r.cap)) || 1)), nickname: nickname || null }
+}
+
 /** `POST /hs/ke-hoach-ngay {sbd | token}` — công khai như `/btvn/cua-em`; có `token` thì lấy SBD từ chữ ký. */
 export async function hsKeHoachNgay(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const sbd = b.token ? await gameIdentity(env, b) : String(b.sbd ?? '').trim()
@@ -289,7 +318,8 @@ export async function hsKeHoachNgay(env: Env, b: Record<string, unknown>): Promi
   // Em có thật = có trong hoc_sinh, danh sách lớp, hoặc đã có lượt thi. Kiểm TRƯỚC mọi thao tác ghi.
   if (sbd.length > 40 || !(await laHocSinhThat(env, sbd))) return { ok: false, error: 'Không tìm thấy học sinh' }
   const kh = (await lapVaLuuKeHoach(env, [sbd], Date.now())).get(sbd)!
-  return { ok: true, ...kh }
+  // `thanThu` đọc tươi mỗi lần gọi, KHÔNG nằm trong bản ghi `ke_hoach_ngay`.
+  return { ok: true, ...kh, thanThu: await docThanThu(env, sbd) }
 }
 
 /** `POST /hs/thoi-gian-hoc {token, phut}` — em đặt số phút học mỗi ngày (10–45). Chỉ HẠ mục tiêu, không nâng vượt trần 16. */
