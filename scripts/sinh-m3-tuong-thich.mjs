@@ -36,6 +36,8 @@ export const TEP = [
   'src/components/DongDemCau.tsx',
   // nhóm A2 — vào thi (luồng thi thật)
   'src/components/PhongChoGame.tsx',
+  // C8 — sheet Bảng tin (học sinh + phụ huynh)
+  'src/components/BangTinPhuHuynh.tsx',
 ]
 
 // ── họ màu Tailwind → vai trò M3 ────────────────────────────────────────────
@@ -52,15 +54,16 @@ const VAI_TRO = {
 const HO = Object.keys(VAI_TRO).join('|')
 // (biến thể:)* tiện ích - màu [/độ mờ]
 const RE = new RegExp(
-  String.raw`(?<![\w:\[-])((?:(?:dark|hover|focus|active|disabled):)*)((bg|text|border|divide|ring|accent|from|via|to)-(white|black|transparent|(${HO})-(\d{2,3}))(?:/(\d+))?)(?![\w-])`,
+  String.raw`(?<![\w:\[-])((?:(?:dark|hover|focus|active|disabled|group-hover):)*)((bg|text|border(?:-[trblxy])?|divide|ring|accent|from|via|to)-(white|black|transparent|(${HO})-(\d{2,3}))(?:/(\d+))?)(?![\w-])`,
   'g',
 )
 
 export function quetLop(noiDung) {
   const ra = new Map()
   for (const m of noiDung.matchAll(RE)) {
-    const [, bienThe, tenLop, tienIch, mau, ho, bac, doMo] = m
-    ra.set(bienThe + tenLop, { bienThe, tenLop, tienIch, mau, ho: ho || null, bac: bac ? Number(bac) : null, doMo: doMo ? Number(doMo) : null })
+    const [, bienThe, tenLop, tienIchGoc, mau, ho, bac, doMo] = m
+    const [tienIch, canh] = tienIchGoc.startsWith('border-') ? ['border', tienIchGoc.slice(7)] : [tienIchGoc, '']
+    ra.set(bienThe + tenLop, { bienThe, tenLop, tienIch, canh, mau, ho: ho || null, bac: bac ? Number(bac) : null, doMo: doMo ? Number(doMo) : null })
   }
   return ra
 }
@@ -144,12 +147,16 @@ function luat(c) {
   const val = biMau(c)
   if (val === null) return null
   const goc = `.m3 .${esc(c.bienThe + c.tenLop)}`
-  const gia = c.bienThe.includes('hover:') ? ':hover' : c.bienThe.includes('focus:') ? ':focus' : c.bienThe.includes('active:') ? ':active' : c.bienThe.includes('disabled:') ? ':disabled' : ''
-  const chon = (goc + gia)
+  const gh = c.bienThe.includes('group-hover:') // `group-hover:text-…`: phần tử nằm trong `.group` đang được rê chuột
+  const gia = gh ? '' : c.bienThe.includes('hover:') ? ':hover' : c.bienThe.includes('focus:') ? ':focus' : c.bienThe.includes('active:') ? ':active' : c.bienThe.includes('disabled:') ? ':disabled' : ''
+  const chon = gh ? `.m3 .group:hover .${esc(c.bienThe + c.tenLop)}` : goc + gia
   switch (c.tienIch) {
     case 'bg': return `${chon} { background-color: ${val}; }`
     case 'text': return `${chon} { color: ${val}; }`
-    case 'border': return `${chon} { border-color: ${val}; }`
+    case 'border': {
+      const THUOC_TINH = { '': ['border-color'], t: ['border-top-color'], r: ['border-right-color'], b: ['border-bottom-color'], l: ['border-left-color'], x: ['border-left-color', 'border-right-color'], y: ['border-top-color', 'border-bottom-color'] }
+      return `${chon} { ${THUOC_TINH[c.canh || ''].map((t) => `${t}: ${val};`).join(' ')} }`
+    }
     case 'divide': return `.m3 .${esc(c.bienThe + c.tenLop)} > :not(:last-child) { border-color: ${val}; }`
     case 'ring': return `${chon} { --tw-ring-color: ${val}; }`
     case 'accent': return `${chon} { accent-color: ${val}; }`
@@ -177,7 +184,8 @@ export function sinh(doc = (p) => readFileSync(GOC + p, 'utf8')) {
     const m = /^var\(--m3-([a-z-]+)\)$/.exec(biMau(c) || '')
     if (m && CAP[m[1]]) sang.push({ c: { bienThe: '', tenLop: c.tenLop + '.text-white', tienIch: 'ghep' }, r: `.m3 .${esc(c.tenLop)}.text-white { color: ${V(CAP[m[1]])}; }` })
   }
-  const thuTu = (a) => (a.c.bienThe.includes('hover:') || a.c.bienThe.includes('focus:') || a.c.bienThe.includes('active:') ? 1 : 0)
+  // thứ tự: luật thường → viền theo CẠNH (phải đứng sau viền chung để thắng cùng độ ưu tiên) → biến thể hover/focus/active
+  const thuTu = (a) => (a.c.bienThe.includes('hover:') || a.c.bienThe.includes('focus:') || a.c.bienThe.includes('active:') ? 2 : a.c.tienIch === 'border' && a.c.canh ? 1 : 0)
   sang.sort((a, b) => thuTu(a) - thuTu(b))
   toi.sort((a, b) => thuTu(a) - thuTu(b))
   return [

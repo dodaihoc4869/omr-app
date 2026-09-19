@@ -55,7 +55,7 @@ describe('m3-tuong-thich.css (tệp SINH — scripts/sinh-m3-tuong-thich.mjs)', 
 
   it('mọi lớp MÀU dùng trong 4 tệp đều có luật (trừ `text-white` trần: giữ trắng trên gradient/ảnh)', () => {
     const co = new Set<string>()
-    for (const m of CSS_TT.matchAll(/^\s*\.m3 \.(.+?) \{/gm)) co.add(m[1].replace(/\\(.)/g, '$1').replace(/:(hover|focus|active|disabled)$/, ''))
+    for (const m of CSS_TT.matchAll(/^\s*\.m3 (?:\.group:hover )?\.(.+?) \{/gm)) co.add(m[1].replace(/\\(.)/g, '$1').replace(/:(hover|focus|active|disabled)$/, ''))
     const thieu: string[] = []
     for (const t of TEP) {
       for (const [ten, c] of quetLop(fs.readFileSync(path.join(goc, t), 'utf8')) as Map<string, any>) {

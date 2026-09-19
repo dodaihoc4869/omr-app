@@ -296,6 +296,7 @@ button.m3-the:active {
 .m3 .text-xs {
   font-size: var(--bnv-cx-1);
 }
+.m3 .text-\[9px\],
 .m3 .text-\[10px\],
 .m3 .text-\[11px\] {
   font-size: max(12px, 0.75rem);
