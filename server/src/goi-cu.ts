@@ -1,6 +1,7 @@
 import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect} from './btvn-grading'
 import {cauTuKhoTheoQid,ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,type CauChamBai} from './su-kien-hoc'
 import {expNhanSauNop} from './exp-d1'
+import {maDaDung} from './reset-toan-app'
 import { hopLe3DangChuan } from './loc-cau-chuan'
 // CỔNG TƯƠNG THÍCH `/goi` — CẮT HẲN GOOGLE.
 //
@@ -1662,6 +1663,8 @@ export async function capNhatKeyBank(env: Env, b: Record<string, unknown>): Prom
   const maCa = chuoi(b.maCa).trim()
   if (!maCa) return { ok: false, error: 'Thiếu mã ca' }
   if (!env.DE) return { ok: false, error: 'Chưa nối R2' }
+  // Ca CŨ đã bị xoá khi làm mới hệ thống (mã đã từng dùng, không còn trong `ca`): KHÔNG ghi tờ đáp án của nó lên R2 (chặn app thầy đẩy bank của ca cũ).
+  if ((await maDaDung(env, 'ca', maCa)) && !(await env.DB.prepare('SELECT 1 AS x FROM ca WHERE ma_ca = ?').bind(maCa).first())) return { ok: false, error: 'Ca này đã bị xoá khi làm mới hệ thống, không ghi đáp án cho mã cũ', maCaDaDung: true }
   await env.DE.put(`key/${maCa}.json`, JSON.stringify(b.keyBank ?? null))
   const ca = await env.DB.prepare('SELECT cong_bo FROM ca WHERE ma_ca = ?').bind(maCa).first<{ cong_bo: string }>()
   return { ok: true, congBo: chuoi(ca?.cong_bo) || 'khong' }
@@ -1671,6 +1674,7 @@ export async function capNhatKeyBank(env: Env, b: Record<string, unknown>): Prom
 export async function noiKhoCa(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const maCa = chuoi(b.maCa).trim()
   if (!maCa) return { ok: false, error: 'Thiếu mã ca' }
+  if ((await maDaDung(env, 'ca', maCa)) && !(await env.DB.prepare('SELECT 1 AS x FROM ca WHERE ma_ca = ?').bind(maCa).first())) return { ok: false, error: 'Ca này đã bị xoá khi làm mới hệ thống, không nối kho cho mã cũ', maCaDaDung: true }
 
   const bankObj = b.bank as Record<string, unknown> | undefined
   let pI: any[] = []

@@ -3,6 +3,7 @@ import {ghiSuKien,ghiSuKienThi,ghiSuKienLoBtvn,ngayVn,type LuotThi} from './su-k
 import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
 import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
 import {hsThoiGianHoc,chayCaLop} from './ke-hoach-ngay-d1'
+import {chayResetNeuDenGio,dangLamMoi,docMocReset,maDaDung,resetDryRun,LOI_DANG_LAM_MOI} from './reset-toan-app'
 import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQua} from './exp-d1'
 import {hsCauTheoQid,docDoPhuPhucVu} from './cau-theo-qid'
 import {hsOnLaiNop} from './on-lai-nop'
@@ -512,6 +513,8 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
   const ca = b.ca as Record<string, unknown>
   const maCa = String(ca?.maCa ?? '').trim()
   if (!maCa) return ra({ ok: false, error: 'Thiếu mã ca' })
+  // Mã ca ĐÃ TỪNG DÙNG (tập nạp lúc reset 21/09) mà không còn trong bảng `ca`: từ chối, để máy em không "khôi phục" bài của ca cũ vào ca mới trùng mã.
+  if ((await maDaDung(env, 'ca', maCa)) && !(await docCa(env, maCa))) return ra({ ok: false, error: 'Mã ca đã từng dùng, tạo lại với mã khác', maCaDaDung: true })
 
   let bankKey: string | null = null
   if (b.bank) {
@@ -2678,7 +2681,7 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
       if (j.coCa === false) return ra({ ok: false, error: 'Không tìm thấy ca kiểm tra' })
       return res
     }
-    case 'danhSachCa': return danhSachCaMoi(env, b.daXoa === true)
+    case 'danhSachCa': return themMocReset(env, await danhSachCaMoi(env, b.daXoa === true))
     case 'ghiDiem': return ghiDiemMoi(env, b)
     case 'khoaCa': return ra(await G.khoaCa(env, b))
     case 'moKhoaCa': return ra(await G.moKhoaCa(env, b))
@@ -2777,8 +2780,24 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
   }
 }
 
+const DUONG_QUA_BANG = new Set(['/khoe', '', '/', '/hs', '/hoc-sinh', '/hocsinh', '/ph', '/phu-huynh', '/phuhuynh', '/gv', '/giaovien'])
+
+/** Thêm `mocReset` (CHỈ khi job reset đã xong) vào phản hồi JSON; chưa xong thì trả nguyên phản hồi, KHÔNG có trường. */
+async function themMocReset(env: Env, res: Response): Promise<Response> {
+  const m = await docMocReset(env)
+  if (!m) return res
+  try {
+    const j = (await res.clone().json()) as Record<string, unknown>
+    return ra({ ...j, mocReset: m }, res.status)
+  } catch {
+    return res
+  }
+}
+
 export default {
   async scheduled(event:{cron:string}, env:Env) {
+    // RESET TOÀN APP (chỉ chạy đúng một lần, sau mốc 00:01 thứ Hai 21/09; trước mốc và sau khi xong thì trả về ngay). PHẢI chạy trước mọi việc khác của cron.
+    await chayResetNeuDenGio(env,Date.now()).then(r=>{if(r.chay||r.lyDo==='loi')console.log('[reset] cron',JSON.stringify({chay:r.chay,lyDo:r.lyDo,trangThai:r.trangThai?.trangThai,loi:r.trangThai?.loi}))}).catch(e=>console.error('[reset] cron lỗi:',e))
     if(event.cron==='1 17 * * *'){
       // 00:01 giờ VN: tin phụ huynh + vinh danh như cũ, THÊM chốt ngày cũ và lập kế hoạch ngày mới (GĐ 2).
       // Kế hoạch có lỗi thì chỉ ghi log — không được kéo hai việc cũ đổ theo.
@@ -2795,6 +2814,9 @@ export default {
     const p = url.pathname
 
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS })
+    // RESET TOÀN APP 00:01 thứ Hai 21/09 (reset-toan-app.ts): trong cửa sổ đóng băng [00:00, 00:20] giờ VN mà job CHƯA xong thì mọi lệnh trả lời tử tế để máy khách
+    // không coi là lỗi đăng nhập/mất mạng. Ngoài cửa sổ: không tốn truy vấn nào. Chỉ chuyển hướng và /khoe được qua.
+    if (!DUONG_QUA_BANG.has(p) && !p.startsWith('/t/') && !p.startsWith('/d/') && (await dangLamMoi(env, Date.now()))) return ra(LOI_DANG_LAM_MOI)
     // PHIẾU: đường đọc CÔNG KHAI, đặt trước mọi cổng mã bí mật.
     if (req.method === 'GET' && p.startsWith('/phieu/')) {
       return layPhieuR2(env, decodeURIComponent(p.slice('/phieu/'.length)))
@@ -2886,12 +2908,12 @@ export default {
       if (p === '/btvn/nop') return nopBtvn(env, b)
       if (p === '/btvn/xong-lo') return xongLoBtvn(env, b)
       // KẾ HOẠCH NGÀY (GĐ 2) — em đọc kế hoạch hôm nay; đặt số phút học mỗi ngày (cần token).
-      if (p === '/hs/ke-hoach-ngay') return ra(await hsKeHoachNgayCoExp(env, b))
+      if (p === '/hs/ke-hoach-ngay') return themMocReset(env, ra(await hsKeHoachNgayCoExp(env, b)))
       if (p === '/hs/cau-theo-qid') return ra(await hsCauTheoQid(env, b))
       if (p === '/hs/on-lai/nop') return ra(await hsOnLaiNop(env, b))
       if (p === '/hs/thoi-gian-hoc') return ra(await hsThoiGianHoc(env, b))
       // `await` là bắt buộc: trả thẳng promise thì lỗi (vd. token sai) lọt khỏi `catch` bên dưới.
-      if (p === '/hs/ca-dang-mo') return await hsCaDangMo(env, b)
+      if (p === '/hs/ca-dang-mo') return themMocReset(env, await hsCaDangMo(env, b))
 
       // Lệnh của THẦY — đòi mã bí mật.
       if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
@@ -2906,6 +2928,8 @@ export default {
       }
       if (p === '/ho-so/xem') return ra({ ok: true, ...(await docHoSoEm(env, String(b.sbd ?? '').trim())) })
       if (p === '/ho-so/do-phu-dang') return ra(await docDoPhuDang(env))
+      // Chạy thử reset (chỉ ĐẾM, không ghi): job sẽ xoá bảng nào, bao nhiêu dòng, giữ bảng nào.
+      if (p === '/reset/dry-run') return ra(await resetDryRun(env))
       if (p === '/ke-hoach/do-phu-phuc-vu') return ra(await docDoPhuPhucVu(env, ngayVn(Date.now())))
       if (p === '/ke-hoach/chay-ca-lop') return ra({ ok: true, ...(await chayCaLop(env, Date.now())) })
       if (p === '/game-v2-admin') return ra(await adminGame(env,b))

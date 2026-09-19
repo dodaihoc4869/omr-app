@@ -48,19 +48,22 @@ export interface CauHinhExp {
   tu: string | null
   dsSbd: string[]
   toanBo: boolean
+  /** Mốc RIÊNG của các em trong `dsSbd` (mặc định = `tu`): để em thử (12121212) giữ mốc sớm trong khi `toanBo` mở cho cả trường ở mốc `tu` muộn hơn. */
+  tuDsSbd: string | null
 }
 
-const TAT: CauHinhExp = { tu: null, dsSbd: [], toanBo: false }
+const TAT: CauHinhExp = { tu: null, dsSbd: [], toanBo: false, tuDsSbd: null }
 
 export async function docCauHinhExp(env: Env): Promise<CauHinhExp> {
   const r = await an(() => env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'exp_moi'").first<{ gia_tri: string }>(), null)
-  if (!r) return EXP_MOI_TU ? { tu: EXP_MOI_TU, dsSbd: [], toanBo: true } : TAT
+  if (!r) return EXP_MOI_TU ? { tu: EXP_MOI_TU, dsSbd: [], toanBo: true, tuDsSbd: null } : TAT
   try {
     const o = JSON.parse(String(r.gia_tri)) as Record<string, unknown>
     // Chuẩn hoá về ISO UTC: mọi chỗ so `luc >= tu` là so CHUỖI, nên `tu` viết kiểu `+07:00` sẽ so sai.
     const tu = typeof o.tu === 'string' && Number.isFinite(Date.parse(o.tu)) ? new Date(o.tu).toISOString() : null
     const ds = Array.isArray(o.dsSbd) ? o.dsSbd.map((x) => String(x).trim()).filter(Boolean) : []
-    return { tu, dsSbd: ds, toanBo: o.toanBo === true }
+    const tuDs = typeof o.tuDsSbd === 'string' && Number.isFinite(Date.parse(o.tuDsSbd)) ? new Date(o.tuDsSbd).toISOString() : null
+    return { tu, dsSbd: ds, toanBo: o.toanBo === true, tuDsSbd: tuDs }
   } catch {
     return TAT // cấu hình hỏng → TẮT, không đoán
   }
@@ -68,8 +71,10 @@ export async function docCauHinhExp(env: Env): Promise<CauHinhExp> {
 
 /** Mốc `tu` nếu EXP mới đang BẬT cho em này lúc `nowMs`; ngược lại null. */
 export function mocExpCuaEm(cfg: CauHinhExp, sbd: string, nowMs: number): string | null {
-  if (!cfg.tu || ms(cfg.tu) > nowMs) return null
-  return cfg.toanBo || cfg.dsSbd.includes(sbd) ? cfg.tu : null
+  const rieng = cfg.dsSbd.includes(sbd) ? (cfg.tuDsSbd ?? cfg.tu) : null
+  if (rieng && ms(rieng) <= nowMs) return rieng
+  if (cfg.toanBo && cfg.tu && ms(cfg.tu) <= nowMs) return cfg.tu
+  return null
 }
 
 // --- Đọc đầu vào --------------------------------------------------------------------------------
@@ -584,14 +589,17 @@ const TOI_DA_EM_CHOT_MOT_LUOT = 40
  */
 export async function chotExpNgayQua(env: Env, nowMs: number): Promise<{ soEm: number; daTinh: number }> {
   const cfg = await docCauHinhExp(env)
-  if (!cfg.tu || ms(cfg.tu) > nowMs || (!cfg.toanBo && cfg.dsSbd.length === 0)) return { soEm: 0, daTinh: 0 }
+  const tuToanBo = cfg.toanBo && cfg.tu && ms(cfg.tu) <= nowMs
+  const mocRieng = cfg.tuDsSbd ?? cfg.tu
+  const tuRieng = cfg.dsSbd.length > 0 && mocRieng && ms(mocRieng) <= nowMs
+  if (!tuToanBo && !tuRieng) return { soEm: 0, daTinh: 0 }
   const homQua = themNgay(ngayVn(nowMs), -1)
-  const loc = cfg.toanBo ? '' : 'AND k.sbd IN (SELECT value FROM json_each(?))'
+  const loc = tuToanBo ? '' : 'AND k.sbd IN (SELECT value FROM json_each(?))'
   const lenh = env.DB.prepare(
     `SELECT k.sbd FROM ke_hoach_ngay k WHERE k.ngay = ? AND k.ket_qua = 'dat'
         AND NOT EXISTS (SELECT 1 FROM exp_so e WHERE e.khoa = k.sbd || '|dat|' || k.ngay) ${loc} ORDER BY k.sbd LIMIT ${TOI_DA_EM_CHOT_MOT_LUOT}`,
   )
-  const r = await an(() => (cfg.toanBo ? lenh.bind(homQua) : lenh.bind(homQua, json(cfg.dsSbd))).all<{ sbd: string }>(), null)
+  const r = await an(() => (tuToanBo ? lenh.bind(homQua) : lenh.bind(homQua, json(cfg.dsSbd))).all<{ sbd: string }>(), null)
   let daTinh = 0
   for (const x of r?.results ?? []) {
     const k = await capNhatExp(env, String(x.sbd), nowMs, { ngay: homQua })
