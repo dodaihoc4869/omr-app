@@ -214,3 +214,9 @@
   font-weight: 700;
   color: var(--m3-v-chu);
 }
+/* nút ngắn trong tấm thông báo: không rớt dòng, không co */
+.m3-tb-day button,
+.m3-tb-dau .m3-nut-chu {
+  flex-shrink: 0;
+  white-space: nowrap;
+}

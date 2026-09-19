@@ -28,6 +28,12 @@ export const TEP = [
   'src/components/KhoiKhacPhuc3CheDo.tsx',
   'src/components/ModalKhacPhucCauSai.tsx',
   'src/components/KhoiCauSai.tsx',
+  // nhóm C — báo cáo + tiến bộ (và các khối con nằm TRONG hai modal báo cáo)
+  'src/components/BaoCaoCaThiHocSinhModal.tsx',
+  'src/components/BaoCaoCaThiPhuHuynhModal.tsx',
+  'src/components/BieuDoTienBoGoogle.tsx',
+  'src/components/KhoiBaPhan.tsx',
+  'src/components/DongDemCau.tsx',
 ]
 
 // ── họ màu Tailwind → vai trò M3 ────────────────────────────────────────────
@@ -44,7 +50,7 @@ const VAI_TRO = {
 const HO = Object.keys(VAI_TRO).join('|')
 // (biến thể:)* tiện ích - màu [/độ mờ]
 const RE = new RegExp(
-  String.raw`(?<![\w:\[-])((?:(?:dark|hover|focus|active|disabled):)*)((bg|text|border|divide|ring|accent)-(white|black|transparent|(${HO})-(\d{2,3}))(?:/(\d+))?)(?![\w-])`,
+  String.raw`(?<![\w:\[-])((?:(?:dark|hover|focus|active|disabled):)*)((bg|text|border|divide|ring|accent|from|via|to)-(white|black|transparent|(${HO})-(\d{2,3}))(?:/(\d+))?)(?![\w-])`,
   'g',
 )
 
@@ -65,6 +71,8 @@ function biMau(c) {
   const { tienIch, mau, ho, bac, doMo, bienThe } = c
   const toi = bienThe.startsWith('dark:')
   if (mau === 'transparent') return 'transparent'
+  // màu điểm dừng gradient (from-/via-/to-) ánh xạ như nền
+  if (tienIch === 'from' || tienIch === 'via' || tienIch === 'to') return biMau({ ...c, tienIch: 'bg' })
   const vt = ho ? VAI_TRO[ho] : 'trung'
   const b = bac ?? (mau === 'white' ? 0 : 1000) // white ~ 0, black ~ 1000
 
@@ -143,6 +151,9 @@ function luat(c) {
     case 'divide': return `.m3 .${esc(c.bienThe + c.tenLop)} > :not(:last-child) { border-color: ${val}; }`
     case 'ring': return `${chon} { --tw-ring-color: ${val}; }`
     case 'accent': return `${chon} { accent-color: ${val}; }`
+    case 'from': return `${chon} { --tw-gradient-from: ${val}; }`
+    case 'via': return `${chon} { --tw-gradient-via: ${val}; }`
+    case 'to': return `${chon} { --tw-gradient-to: ${val}; }`
   }
   return null
 }

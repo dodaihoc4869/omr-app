@@ -25,7 +25,3 @@
   background: var(--m3-primary-container);
   color: var(--m3-on-primary-container);
 }
-/* dải 4 màu kiểu Google của bản cũ: bản M3 không có */
-.m3 .m3-an {
-  display: none;
-}

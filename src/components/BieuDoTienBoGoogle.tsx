@@ -3,6 +3,7 @@ import { TrendingUp, TrendingDown, Minus, Award, Calendar, Trophy, ChevronRight,
 import { chuoiTienBo, moc, nhanXetTienBo, trungBinhCongDon } from '../lib/tien-bo'
 import type { HoSoEm } from '../lib/exam-api'
 import { classify } from '../engine/score'
+import { dungM3 } from './m3'
 
 interface BieuDoTienBoGoogleProps {
   ca: HoSoEm['ca']
@@ -66,7 +67,7 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
       {/* THẺ TỔNG QUAN GOOGLE M3 VỚI DẢI 4 MÀU */}
       <div className="p-5 rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-4">
         {/* Dải 4 màu thương hiệu Google */}
-        <div className="flex h-1.5 w-full rounded-full overflow-hidden">
+        <div className={`${dungM3() ? 'm3-an ' : ''}flex h-1.5 w-full rounded-full overflow-hidden`}>
           <div className="flex-1 bg-blue-500" />
           <div className="flex-1 bg-red-500" />
           <div className="flex-1 bg-amber-500" />
@@ -170,8 +171,8 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
             >
               <defs>
                 <linearGradient id="gradientGoogleVung" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="rgb(26, 115, 232)" stopOpacity="0.22" />
-                  <stop offset="100%" stopColor="rgb(26, 115, 232)" stopOpacity="0.0" />
+                  <stop offset="0%" stopColor="var(--m3-primary, rgb(26, 115, 232))" stopOpacity="0.22" />
+                  <stop offset="100%" stopColor="var(--m3-primary, rgb(26, 115, 232))" stopOpacity="0.0" />
                 </linearGradient>
               </defs>
 
@@ -183,7 +184,7 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
                     y1={y(v)}
                     x2={W - LE_P}
                     y2={y(v)}
-                    stroke="rgba(203, 213, 225, 0.4)"
+                    stroke="var(--m3-surface-container-high, rgba(203, 213, 225, 0.4))"
                     strokeWidth={v === 5 ? '1.5' : '1'}
                     strokeDasharray={v === 5 ? '3 3' : 'none'}
                   />
@@ -192,7 +193,7 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
                     y={y(v) + 3.5}
                     textAnchor="end"
                     fontSize="10"
-                    fill="rgb(148, 163, 184)"
+                    fill="var(--m3-on-surface-variant, rgb(148, 163, 184))"
                     fontFamily="sans-serif"
                     fontWeight="500"
                   >
@@ -209,7 +210,7 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
                 <path
                   d={duongTb}
                   fill="none"
-                  stroke="rgb(217, 119, 6)"
+                  stroke="var(--m3-tren-canh-bao, rgb(217, 119, 6))"
                   strokeWidth="2"
                   strokeDasharray="4 4"
                   strokeLinecap="round"
@@ -221,7 +222,7 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
                 <path
                   d={duong}
                   fill="none"
-                  stroke="rgb(26, 115, 232)"
+                  stroke="var(--m3-primary, rgb(26, 115, 232))"
                   strokeWidth="3.2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -240,7 +241,7 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
 
                     {/* Vòng ngoài nếu được chọn */}
                     {laChon && (
-                      <circle cx={cx} cy={cy} r={10} fill="none" stroke="rgb(26, 115, 232)" strokeWidth="2" strokeOpacity="0.4" />
+                      <circle cx={cx} cy={cy} r={10} fill="none" stroke="var(--m3-primary, rgb(26, 115, 232))" strokeWidth="2" strokeOpacity="0.4" />
                     )}
 
                     {/* Chấm tròn điểm */}
@@ -248,8 +249,8 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
                       cx={cx}
                       cy={cy}
                       r={laChon ? 6.5 : 5}
-                      fill={laChon ? 'rgb(26, 115, 232)' : 'white'}
-                      stroke="rgb(26, 115, 232)"
+                      fill={laChon ? 'var(--m3-primary, rgb(26, 115, 232))' : 'var(--m3-surface-container-lowest, white)'}
+                      stroke="var(--m3-primary, rgb(26, 115, 232))"
                       strokeWidth="2.5"
                     />
 
@@ -260,7 +261,7 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
                       textAnchor="middle"
                       fontSize={laChon ? '12' : '10'}
                       fontWeight="bold"
-                      fill={laChon ? 'rgb(26, 115, 232)' : 'rgb(51, 65, 85)'}
+                      fill={laChon ? 'var(--m3-primary, rgb(26, 115, 232))' : 'var(--m3-on-surface, rgb(51, 65, 85))'}
                       fontFamily="sans-serif"
                     >
                       {soVN(d.diem, 1)}
@@ -273,7 +274,7 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
                         y={H - 12}
                         textAnchor="middle"
                         fontSize="9.5"
-                        fill={laChon ? 'rgb(26, 115, 232)' : 'rgb(148, 163, 184)'}
+                        fill={laChon ? 'var(--m3-primary, rgb(26, 115, 232))' : 'var(--m3-on-surface-variant, rgb(148, 163, 184))'}
                         fontWeight={laChon ? 'bold' : 'normal'}
                         fontFamily="sans-serif"
                       >

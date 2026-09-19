@@ -90,7 +90,7 @@
   font-size: var(--bnv-cx-2);
   font-weight: 700;
   line-height: 1.2;
-  white-space: nowrap;
+  text-align: center;
 }
 .m3-nut-chinh {
   background: var(--m3-primary);
@@ -290,10 +290,19 @@ button.m3-the:active {
 .m3 .rounded-3xl {
   border-radius: var(--m3-bo-28);
 }
-.m3 .text-xs,
+.m3 .text-xs {
+  font-size: var(--bnv-cx-1);
+}
 .m3 .text-\[10px\],
 .m3 .text-\[11px\] {
-  font-size: var(--bnv-cx-1);
+  font-size: max(12px, 0.75rem);
+}
+/* nhóm chip ở đầu dòng câu sai (KhoiCauSai.DongCauSai): `shrink-0` khiến nhóm rộng bằng nội dung, ép vòng số + tên
+ * câu về 0 và chip tràn ra ngoài thẻ khi có 3 chip. Dưới `.m3` cho nhóm co/xuống dòng (không sửa KhoiCauSai.tsx:
+ * game thần thú dùng chung và test khoá chuỗi lớp). */
+.m3 button > .shrink-0.flex-wrap.justify-end {
+  flex-shrink: 1;
+  min-width: 0;
 }
 .m3 .text-sm,
 .m3 .text-base {
@@ -318,6 +327,10 @@ button.m3-the:active {
 .m3 button,
 .m3 [role='button'] {
   min-height: 48px;
+}
+/* min-width KHÔNG đặt cho mọi nút: nó đè `min-width: auto` mặc định của phần tử flex nên nút có chữ co lại dưới
+ * chiều rộng nội dung và đè lên nhau (thanh tab của báo cáo ca). Chỉ nút CHỈ có biểu tượng mới cần 48 px ngang. */
+.m3 button:has(> svg:only-child) {
   min-width: 48px;
 }
 .m3 input[type='checkbox'],
@@ -325,6 +338,16 @@ button.m3-the:active {
   width: 24px;
   height: 24px;
   accent-color: var(--m3-primary);
+}
+
+/* dải 4 màu kiểu Google của bản cũ: bản M3 không có */
+.m3 .m3-an {
+  display: none;
+}
+/* nút index.css `.btn-google-primary` đọc --gg-xanh (đã ánh xạ sang primary) nhưng chữ là --giay (trắng cố định):
+ * ở nền tối primary là xanh nhạt nên phải đổi chữ sang on-primary */
+.m3 .btn-google-primary {
+  color: var(--m3-on-primary);
 }
 
 @media (prefers-reduced-motion: reduce) {

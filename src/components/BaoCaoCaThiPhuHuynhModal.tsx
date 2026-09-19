@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import { hsCauSaiApi, hsLichSuCaApi } from '../lib/exam-api'
 import ModalKhacPhucCauSai from './ModalKhacPhucCauSai'
+import './m3'
 
 export interface ThongTinBaiThiPhuHuynh {
   maCa: string
@@ -203,7 +204,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
     return [
       {
         ten: 'Nhận biết',
-        moTa: 'Vòng 1: Lõi Căn Bản (Bắt buộc 100%) · Lý thuyết cơ bản, công thức, khái niệm',
+        moTa: 'Lý thuyết cơ bản, công thức, khái niệm',
         dung: dungBiet,
         tong: tongBiet,
         phanTram: Math.round((dungBiet / tongBiet) * 100),
@@ -212,7 +213,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
       },
       {
         ten: 'Thông hiểu',
-        moTa: 'Vòng 2: Trọng Tâm Cá Nhân (Bắt buộc) · Bản chất hoá học, giải thích hiện tượng, phản ứng',
+        moTa: 'Bản chất hoá học, giải thích hiện tượng, phản ứng',
         dung: dungHieu,
         tong: tongHieu,
         phanTram: Math.round((dungHieu / tongHieu) * 100),
@@ -221,7 +222,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
       },
       {
         ten: 'Vận dụng',
-        moTa: 'Vòng 3: Thử Thách Bứt Phá (x2 EXP) · Bảo toàn e, tính toán nồng độ, este, kim loại',
+        moTa: 'Bảo toàn e, tính toán nồng độ, este, kim loại',
         dung: dungVD,
         tong: tongVD,
         phanTram: Math.round((dungVD / tongVD) * 100),
@@ -230,7 +231,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
       },
       {
         ten: 'Vận dụng cao',
-        moTa: 'Vòng 3: Thử Thách Bứt Phá (x2 EXP) · Biện luận cấu tạo, bài toán phân hóa điểm 9-10',
+        moTa: 'Biện luận cấu tạo, bài toán phân hóa điểm 9-10',
         dung: dungVDC,
         tong: tongVDC,
         phanTram: Math.round((dungVDC / tongVDC) * 100),
@@ -271,7 +272,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
   }, [diem, hoTenCon])
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/70 backdrop-blur-md overflow-y-auto animate-google-fade">
+    <div className="m3 fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/70 backdrop-blur-md overflow-y-auto animate-google-fade">
       <div className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-3xl sm:rounded-[32px] shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh] overflow-hidden">
         {/* MODAL HEADER */}
         <header className="p-4 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between sticky top-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md z-20">
@@ -312,7 +313,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
         </header>
 
         {/* MODAL TABS NAVIGATION */}
-        <div className="px-4 sm:px-6 pt-3 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2 overflow-x-auto bg-slate-50/50 dark:bg-slate-900/50 scrollbar-none">
+        <div className="shrink-0 px-4 sm:px-6 pt-3 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2 overflow-x-auto bg-slate-50/50 dark:bg-slate-900/50 scrollbar-none">
           <button
             type="button"
             onClick={() => setTabPhanTich('tong_quan')}
@@ -377,7 +378,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
               {/* HERO SCORE CARD - GOOGLE STYLE */}
               <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/50 dark:from-slate-800/80 dark:via-slate-900 dark:to-indigo-950/40 border border-blue-100 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
                 <div className="space-y-3 text-center sm:text-left">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border shadow-xs" style={{ background: 'rgba(66, 133, 244, 0.08)', color: 'rgb(37, 99, 235)', borderColor: 'rgba(66, 133, 244, 0.2)' }}>
+                  <div className="m3-chip uppercase tracking-wider" data-vai-tro="primary">
                     <Award size={14} /> Kết quả bài thi của con
                   </div>
                   <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
@@ -649,7 +650,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
             <button
               type="button"
               onClick={() => setHienModalKhacPhuc(true)}
-              className="px-6 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer"
+              className="m3-nut-chinh cursor-pointer"
             >
               <Heart size={16} />
               <span>Tạo bài luyện khắc phục cho con (Hạn 2h)</span>

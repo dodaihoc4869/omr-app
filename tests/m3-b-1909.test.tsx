@@ -28,10 +28,10 @@ afterEach(() => {
 })
 
 describe('m3-tuong-thich.css (tệp SINH — scripts/sinh-m3-tuong-thich.mjs)', () => {
-  it('khớp bản sinh lại từ 4 tệp nhóm B (không ai sửa tay, không tệp nào bị bỏ sót)', () => {
+  it('khớp bản sinh lại từ danh sách TEP (không ai sửa tay, không tệp nào bị bỏ sót)', () => {
     expect(CSS_TT).toBe(sinh())
-    expect(TEP.map((t: string) => path.basename(t)).sort()).toEqual(
-      ['KhoiCauSai.tsx', 'KhoiKhacPhuc3CheDo.tsx', 'LuyenDeChuan.tsx', 'ModalKhacPhucCauSai.tsx'].sort(),
+    expect(TEP.map((t: string) => path.basename(t))).toEqual(
+      expect.arrayContaining(['KhoiCauSai.tsx', 'KhoiKhacPhuc3CheDo.tsx', 'LuyenDeChuan.tsx', 'ModalKhacPhucCauSai.tsx']), // + nhóm C: xem m3-c-1909
     )
     expect(CSS_TT.split('\n')[0]).toContain('TỆP SINH TỰ ĐỘNG — sửa scripts/sinh-m3-tuong-thich.mjs')
   })
