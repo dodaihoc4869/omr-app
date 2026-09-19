@@ -18,6 +18,13 @@ export function taoD1That() {
     if (BO_QUA.has(f)) continue
     sql.exec(readFileSync(`server/${f}`, 'utf8'))
   }
+  // LỆCH LƯỢC ĐỒ GIỮA REPO VÀ D1 THẬT (có từ trước, ghi nhận 19/09): bảng `ca` trên D1 thật có các cột dưới đây nhưng
+  // không tệp migration nào trong repo tạo ra chúng (thêm tay/đường khác). Bổ sung ở đây để câu SQL của máy chủ chạy
+  // trên đúng hình dạng bảng thật; kiểm trước để không thêm trùng nếu một migration sau này có thêm.
+  const cotCa = new Set((sql.prepare("SELECT name FROM pragma_table_info('ca')").all() as { name: string }[]).map((x) => x.name))
+  for (const c of ['pham_vi', 'danh_sach_chon_json', 'mat_khau', 'de_rieng', 'pham_vi_hoi_lai']) {
+    if (!cotCa.has(c)) sql.exec(`ALTER TABLE ca ADD COLUMN ${c} TEXT`)
+  }
   const objects = new Map<string, unknown>()
   const soLenh = { prepare: 0, batch: 0 }
 

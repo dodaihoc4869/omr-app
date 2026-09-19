@@ -1650,6 +1650,49 @@ async function xongLoBtvn(env: Env, b: Record<string, unknown>): Promise<Respons
   return ra({ ok: true, loDaXong: Number(em?.lo_da_xong ?? loDaXongMoi), ...(ghi ? { suKien: ghi.soGui } : {}) })
 }
 
+/** EM HỎI: LỚP CỦA EM CÓ CA THI ĐANG MỞ KHÔNG — để nút "Vào thi" đổi màu (Bảng nhiệm vụ).
+ *
+ * Đường công khai như `/hs/btvn` (SBD hoặc token). CHỈ trả `coCaMo` và `soCa`: TUYỆT ĐỐI không mã ca, tên ca,
+ * mật khẩu hay gì giúp vào thi khi thầy chưa phát mã.
+ *
+ * "Đang mở" dùng ĐÚNG luật cổng vào thi đang chạy, không đặt luật thứ hai: `quyetDinhVaoThi` (đã mở giờ, chưa quá
+ * hạn vào, chưa đóng/xoá, em chưa nộp — em đang làm dở thì vẫn mở) và `hopPhamVi` (khối/danh sách thầy chọn). Ca chỉ
+ * mang cờ `mo` mà đã quá hạn vào KHÔNG tính (D1 thật đang có 7 ca như thế). Khớp lớp = `ca.lop` bằng `lop` của em
+ * (hoc_sinh, không có thì danh_sach); ca không gắn lớp hay em không có lớp thì KHÔNG khớp — không đoán. */
+async function hsCaDangMo(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const sbd = b.token ? await gameIdentity(env, b) : String(b.sbd ?? '').trim()
+  if (!sbd) return ra({ ok: false, error: 'Thiếu số báo danh' })
+  if (sbd.length > 40) return ra({ ok: false, error: 'Không tìm thấy học sinh' })
+  // Một truy vấn: em có thật (hoc_sinh · danh_sach · từng có lượt thi) + lớp + năm sinh.
+  const em = await env.DB.prepare(
+    `SELECT COALESCE(NULLIF(h.lop, ''), d.lop, '') AS lop, d.nam_sinh AS nam_sinh,
+            CASE WHEN h.sbd IS NOT NULL OR d.sbd IS NOT NULL OR EXISTS (SELECT 1 FROM luot WHERE sbd = x.sbd) THEN 1 ELSE 0 END AS co
+       FROM (SELECT ? AS sbd) x LEFT JOIN hoc_sinh h ON h.sbd = x.sbd LEFT JOIN danh_sach d ON d.sbd = x.sbd`,
+  ).bind(sbd).first<{ lop: string; nam_sinh: string | null; co: number }>()
+  if (!em || Number(em.co) !== 1) return ra({ ok: false, error: 'Không tìm thấy học sinh' })
+  const lop = String(em.lop ?? '').trim()
+  if (!lop) return ra({ ok: true, coCaMo: false, soCa: 0 })
+
+  // Một truy vấn: ca thi cờ `mo` của đúng lớp em, kèm trạng thái lượt gần nhất CỦA EM ở ca ấy.
+  const r = await env.DB.prepare(
+    `SELECT c.trang_thai, c.loai, c.bat_dau, c.het_han_vao, c.thoi_gian_phut, c.dong_bo_gio, c.bat_dau_thi_luc, c.han_nop,
+            c.pham_vi, c.danh_sach_chon_json,
+            (SELECT l.trang_thai FROM luot l WHERE l.ma_ca = c.ma_ca AND l.sbd = ? ORDER BY l.lan_thu DESC LIMIT 1) AS luot_tt
+       FROM ca c
+      WHERE c.trang_thai = 'mo' AND COALESCE(c.loai, 'thi') = 'thi' AND TRIM(COALESCE(c.lop, '')) = ?`,
+  ).bind(sbd, lop).all<Record<string, unknown>>()
+  const nay = Date.now()
+  let soCa = 0
+  for (const c of r.results ?? []) {
+    // Em đã nộp/khoá thì quyetDinhVaoThi trả ok=false; đang làm dở thì ok (khôi phục) — id thiết bị bỏ trống để không kẹt "máy khác".
+    const luot = c.luot_tt ? ({ trang_thai: String(c.luot_tt), lan_thu: 1, id_thiet_bi: '' } as unknown as DongLuot) : null
+    if (!quyetDinhVaoThi(c as unknown as DongCa, luot, '', nay).ok) continue
+    if (!hopPhamVi(c, { nam_sinh: em.nam_sinh }, sbd).ok) continue
+    soCa++
+  }
+  return ra({ ok: true, coCaMo: soCa > 0, soCa })
+}
+
 async function xemBaiBtvn(env:Env,b:Record<string,unknown>):Promise<Response>{
  const em=await env.DB.prepare('SELECT e.*,b.ma_de FROM btvn_em e JOIN btvn b ON b.ma_btvn=e.ma_btvn WHERE e.ma_btvn=? AND e.sbd=?').bind(String(b.maBtvn||''),String(b.sbd||'')).first<Record<string,unknown>>()
  if(!em?.nop_luc)return ra({ok:false,error:'Học sinh chưa có bài nộp.'})
@@ -2840,6 +2883,8 @@ export default {
       // KẾ HOẠCH NGÀY (GĐ 2) — em đọc kế hoạch hôm nay; đặt số phút học mỗi ngày (cần token).
       if (p === '/hs/ke-hoach-ngay') return ra(await hsKeHoachNgay(env, b))
       if (p === '/hs/thoi-gian-hoc') return ra(await hsThoiGianHoc(env, b))
+      // `await` là bắt buộc: trả thẳng promise thì lỗi (vd. token sai) lọt khỏi `catch` bên dưới.
+      if (p === '/hs/ca-dang-mo') return await hsCaDangMo(env, b)
 
       // Lệnh của THẦY — đòi mã bí mật.
       if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
