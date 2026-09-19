@@ -8,8 +8,9 @@
 // phục, tải các bài khác tính theo câu/ngày) và xếp việc lên trên.
 //
 // XẾP VIỆC (tất định):
-//   cung   = lô BTVN đang chờ (đúng 1 lô mỗi bài; xong sớm KHÔNG mở sớm) + Mom đã bắt đầu; sắp EDF
-//            (hạn cứng tăng dần → hạn mềm → loại → id)
+//   cung   = lô BTVN đang chờ (đúng 1 lô mỗi bài; xong sớm KHÔNG mở sớm) + Mom (đã bắt đầu: hạn cứng = bắt đầu + 120';
+//            CHƯA bắt đầu: không hạn cứng nhưng vẫn là việc bắt buộc, xếp sau mọi việc có hạn cứng); sắp EDF
+//            (hạn cứng tăng dần, không hạn = xa nhất → hạn mềm → loại → giao lúc nào → id)
 //   kiểm tra khả thi: ∀k  Σ_{i≤k} còn_lại_i ≤ B × ngày(now → hạn_k)  — điều kiện cần-và-đủ của EDF.
 //            Không đạt → cảnh báo `khong_kip {canMoiNgay}` kèm đề xuất; KHÔNG cắt việc bắt buộc, KHÔNG giấu.
 //   bù     = nếu tải cứng + số câu đã làm hôm nay < mức tối thiểu → lấy từ danh sách mềm cho đủ ("tự phân thêm khi thiếu")
@@ -29,6 +30,12 @@ import { dangYeu, type NamKtDang } from './ho-so-nam-kt'
 
 const MOT_NGAY_MS = 86_400_000
 const MOM_PHUT = 120
+
+/**
+ * Ngày HỌC của bài Mom hằng ngày (`daily_<ngày>`): đổi lúc 00:01 giờ Việt Nam, đúng `newsDay` của `parent-news.ts` (không import ở đây
+ * vì `parent-news` đã import tệp này). Khác `homNay` (ngày lịch, đổi lúc 00:00) đúng một phút.
+ */
+export const ngayHocMom = (now: number): string => new Date(now + 7 * 3_600_000 - 60_000).toISOString().slice(0, 10)
 
 // --- Kiểu ------------------------------------------------------------------------
 
@@ -234,16 +241,23 @@ export function lapKeHoachNgay(d: DauVaoKeHoach): KeHoachNgay {
     quaHan.push({ loai: 'btvn', ma: b.ma, hanNop: b.hanNop, conLai: b.soCau })
   }
   const momCung: (MomDauVao & { hanMs: number })[] = []
+  const momChuaBd: MomDauVao[] = []
+  const baiHangNgay = `daily_${ngayHocMom(d.now)}`
   for (const m of d.mom) {
     const bd = ms(m.batDauLuc)
-    if (bd === undefined) continue // chưa bắt đầu: không hạn cứng, không tính vào tải cứng
+    if (bd === undefined) {
+      // Chưa bắt đầu: KHÔNG có hạn cứng (120 phút chỉ tính từ lúc bắt đầu — luật đã chốt) nhưng vẫn là việc bắt buộc em nợ.
+      // Bài hằng ngày `daily_<ngày>` của NGÀY CŨ mà chưa bắt đầu thì bỏ: nó chỉ có nghĩa trong ngày của nó.
+      if (m.soCau > 0 && !(m.id.startsWith('daily_') && m.id !== baiHangNgay)) momChuaBd.push(m)
+      continue
+    }
     const han = bd + MOM_PHUT * 60_000
     if (han > d.now) momCung.push({ ...m, hanMs: han })
     else quaHan.push({ loai: 'mom', ma: m.id, hanNop: new Date(han).toISOString(), conLai: m.soCau })
   }
   quaHan.sort((a, b) => a.hanNop.localeCompare(b.hanNop) || a.ma.localeCompare(b.ma))
 
-  const nganSach = tinhNganSach(d, btvnCon.length + momCung.length)
+  const nganSach = tinhNganSach(d, btvnCon.length + momCung.length + momChuaBd.length)
   const B = nganSach.mucTieuCau
 
   // 2. Còn lại của từng bài (hai lượt: lượt 1 chưa tính tải khác để biết còn lại; lượt 2 tính lịch lô đúng).
@@ -297,7 +311,14 @@ export function lapKeHoachNgay(d: DauVaoKeHoach): KeHoachNgay {
       ghiChu: 'Bài Mom đã bắt đầu — hết giờ sau 120 phút.', chiTiet: { id: m.id },
     }))
   }
-  cung.sort((a, b) => (ms(a.hanCung) ?? Infinity) - (ms(b.hanCung) ?? Infinity) || (ms(a.hanMem) ?? Infinity) - (ms(b.hanMem) ?? Infinity) || a.loai.localeCompare(b.loai) || a.id.localeCompare(b.id))
+  for (const m of momChuaBd) {
+    cung.push(viecCung({
+      id: `mom:${m.id}`, loai: 'mom', soCau: m.soCau, hanMs: null, hanMemMs: null, khan: false, nguon: m.id,
+      ghiChu: 'Bài Mom giao, chưa bắt đầu. Bấm bắt đầu thì có 120 phút làm.', chiTiet: { id: m.id, chuaBatDau: true, taoLuc: m.taoLuc },
+    }))
+  }
+  // Hạn cứng tăng dần (không hạn = xa nhất) → hạn mềm → loại → bài giao trước đứng trước (chỉ Mom chưa bắt đầu có `taoLuc`) → id.
+  cung.sort((a, b) => (ms(a.hanCung) ?? Infinity) - (ms(b.hanCung) ?? Infinity) || (ms(a.hanMem) ?? Infinity) - (ms(b.hanMem) ?? Infinity) || a.loai.localeCompare(b.loai) || String(a.chiTiet.taoLuc ?? '').localeCompare(String(b.chiTiet.taoLuc ?? '')) || a.id.localeCompare(b.id))
 
   // 4. Kiểm khả thi EDF trên TOÀN BỘ bài còn nợ (không chỉ lô hôm nay).
   const canhBao: CanhBao[] = []
@@ -404,10 +425,11 @@ function catViec(v: Viec, soCau: number): Viec {
 }
 
 function viecCung(o: {
-  id: string; loai: LoaiViec; soCau: number; hanMs: number; hanMemMs: number; khan: boolean; nguon: string; ghiChu: string; chiTiet: Record<string, unknown>
+  id: string; loai: LoaiViec; soCau: number; hanMs: number | null; hanMemMs: number | null; khan: boolean; nguon: string; ghiChu: string; chiTiet: Record<string, unknown>
 }): Viec {
   return {
-    id: o.id, loai: o.loai, thuTu: 0, soCau: o.soCau, hanCung: new Date(o.hanMs).toISOString(), hanMem: new Date(o.hanMemMs).toISOString(),
+    id: o.id, loai: o.loai, thuTu: 0, soCau: o.soCau, hanCung: o.hanMs === null ? null : new Date(o.hanMs).toISOString(),
+    hanMem: o.hanMemMs === null ? null : new Date(o.hanMemMs).toISOString(),
     batBuoc: true, khan: o.khan, cong: null, hien: true, nguon: o.nguon, nhan: o.khan ? 'khan_cap' : null, trangThai: 'cho', ghiChu: o.ghiChu, chiTiet: o.chiTiet,
   }
 }

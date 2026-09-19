@@ -13,7 +13,7 @@ import type { NamKtDang } from './ho-so-nam-kt'
 import {
   NGAY_LIET_KE_QUA_HAN, NGAY_ON_THI, PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU, SO_NGAY_DO_VAN_TOC, SO_NGAY_LICH_SU,
 } from './ho-so-cau-hinh'
-import { lapKeHoachNgay, type DauVaoKeHoach, type KeHoachNgay } from './ke-hoach-ngay'
+import { lapKeHoachNgay, ngayHocMom, type DauVaoKeHoach, type KeHoachNgay } from './ke-hoach-ngay'
 import { ngayVn } from './su-kien-hoc'
 
 export const TOI_DA_EM_MOI_LO = 50
@@ -78,8 +78,12 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
     cua(x)?.btvn.push({ ma: String(x.ma_btvn), soCau: Number(x.so_cau) || 0, giaoLuc: String(x.giao_luc ?? ''), hanNop: String(x.han_nop ?? ''), loDaXong: Number(x.lo) || 0, daNop: false })
   }
 
-  // Mom đã bắt đầu mà chưa nộp (chưa bắt đầu thì không có hạn cứng nên không vào kế hoạch).
-  const rm = await tat(() => env.DB.prepare(`SELECT sbd, id, question_count, created_at, started_at FROM mom_bai WHERE ${IN_EM} AND submitted_at IS NULL AND started_at IS NOT NULL AND started_at > ?`).bind(arr, cat14).all<Record<string, unknown>>(), trong())
+  // Mom chưa nộp: đã bắt đầu (còn hạn 120 phút hoặc mới quá hạn ≤ 14 ngày, để liệt kê quá hạn) VÀ chưa bắt đầu (không hạn cứng nhưng vẫn là
+  // việc em nợ). Bài hằng ngày `daily_<ngày>` của ngày cũ mà chưa bắt đầu thì bỏ ngay ở SQL — mỗi ngày một bài, không để dồn lại.
+  const rm = await tat(() => env.DB.prepare(
+    `SELECT sbd, id, question_count, created_at, started_at FROM mom_bai
+      WHERE ${IN_EM} AND submitted_at IS NULL AND ((started_at IS NOT NULL AND started_at > ?) OR (started_at IS NULL AND (id NOT LIKE 'daily_%' OR id = ?)))`,
+  ).bind(arr, cat14, `daily_${ngayHocMom(now)}`).all<Record<string, unknown>>(), trong())
   for (const x of rm.results ?? []) cua(x)?.mom.push({ id: String(x.id), soCau: Number(x.question_count) || 0, taoLuc: String(x.created_at ?? ''), batDauLuc: x.started_at ? String(x.started_at) : null })
 
   // Hồ sơ: câu tới hạn ôn (chỉ câu TỪNG SAI; chua_thay_sai không vào hàng ôn), dạng, và số câu sai chưa khắc phục.

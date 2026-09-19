@@ -111,11 +111,15 @@ describe('cổng hiển thị và nhãn khẩn', () => {
     expect(kh.viec[0]!.id).toBe(g.id) // EDF: hạn gần đứng đầu
     for (const v of kh.viec.filter((x) => x.khan)) expect(v.hien).toBe(true)
   })
-  it('Mom đã bắt đầu: hạn cứng = bắt đầu + 120 phút, khẩn; Mom chưa bắt đầu không vào kế hoạch', () => {
+  // ĐỔI HỢP ĐỒNG 19/09 (0.Planer, lỗi phiên Giao diện báo: bài Mẹ mới giao biến mất khỏi trang chủ): trước đây dòng cuối kiểm
+  // `not.toContain('mom:M2')` — "Mom chưa bắt đầu không vào kế hoạch". Nay Mom chưa bắt đầu LÀ việc bắt buộc, không hạn cứng
+  // (120 phút chỉ tính từ lúc bắt đầu, luật giữ nguyên). Chi tiết thứ tự/cổng/daily_ cũ: tests/ke-hoach-mom-chua-bd-1909.test.ts.
+  it('Mom đã bắt đầu: hạn cứng = bắt đầu + 120 phút, khẩn; Mom chưa bắt đầu: việc bắt buộc KHÔNG hạn cứng, xếp sau', () => {
     const kh = lapKeHoachNgay(dv({ mom: [{ id: 'M1', soCau: 8, taoLuc: iso(-5), batDauLuc: iso(-0.5) }, { id: 'M2', soCau: 8, taoLuc: iso(-5), batDauLuc: null }] }))
     const m = kh.viec.find((v) => v.id === 'mom:M1')!
     expect(m).toMatchObject({ batBuoc: true, khan: true, hanCung: iso(1.5) })
-    expect(ids(kh)).not.toContain('mom:M2')
+    expect(kh.viec.find((v) => v.id === 'mom:M2')).toMatchObject({ batBuoc: true, khan: false, hanCung: null })
+    expect(ids(kh).indexOf('mom:M1')).toBeLessThan(ids(kh).indexOf('mom:M2'))
   })
   it('lô chưa tới mốc KHÔNG hiện như việc hôm nay mà nằm ở sapToi (xong sớm không mở sớm)', () => {
     // Bài 30 câu, khung 10 ngày: xong lô 0 rồi thì lô 1 chỉ mở ở mốc sau.
