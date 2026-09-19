@@ -8,11 +8,14 @@ import {hash,readScope,syncIndex,protectedQuestions} from './game-v2-bank'
 import {PETS,ALIASES,OLD_SIX,allowed,chooseSession,publicQuestion,grade,advance,newArena,arenaAction} from '../../src/game/than-thu-v2/core'
 import type {Attempt,Mastery,PrivateQuestion,Mode,Arena,ArenaAction} from '../../src/game/than-thu-v2/core'
 import {nhanExp,thanhExp} from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
-import {shieldRemaining,type ShieldState} from '../../src/game/than-thu-v2/shields'
+import type {ShieldState} from '../../src/game/than-thu-v2/shields'
+import {khienConLai,khienRenChuaDung} from './exp-ho-so-game'
+import {MANH_MOI_KHIEN} from './exp-cau-hinh'
+import type {KhienRen} from './exp-hoc-tap'
 import {syncAcademic,type Academic,academicDay} from './game-v2-academic'
 import {masteryTheoHoSo,qidChanHomNay} from './game-v2-ho-so'
 import {ghiSuKien} from './su-kien-hoc'
-export interface Profile {nickname?:string;academic?:Academic;shields?:ShieldState;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string}
+export interface Profile {nickname?:string;academic?:Academic;shields?:ShieldState;expMoi?:{daCong:number;manhDaTinh:number};khienRen?:KhienRen;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string}
 type Row={revision:number;json:string}
 type Session={guardian?:string;guardianRound?:number;mode:Mode;questions:{qid:string;maDe:string;version:string;group:string;novel:boolean}[];created:number}
 const now=()=>new Date().toISOString()
@@ -41,7 +44,7 @@ export async function loadProfile(env:Env,sbd:string):Promise<{profile:Profile;r
   return {profile:current,revision:row.revision}
 }
 async function save(env:Env,sbd:string,p:Profile,rev:number){const r=await env.DB.prepare('UPDATE game_v2_profile SET json=?,revision=revision+1 WHERE sbd=? AND revision=?').bind(JSON.stringify(p),sbd,rev).run();if(!r.meta.changes)throw new Error('Hồ sơ vừa đổi trên thiết bị khác. Em tải lại hồ sơ.');return rev+1}
-function visible(p:Profile){const {legacy:_,academic,...rest}=p;return {...rest,academic:academic?{total:academic.total,today:academic.days[academicDay(now())]??0,lastGain:academic.lastGain,at:academic.at,dailyLimit:100}:undefined}}
+function visible(p:Profile){const {legacy:_,academic,expMoi:__,...rest}=p;return {...rest,khienRen:p.khienRen?{manh:p.khienRen.manh,daRen:p.khienRen.daRen,chuaDung:khienRenChuaDung(p),conLai:khienConLai(p),moiKhien:MANH_MOI_KHIEN}:undefined,academic:academic?{total:academic.total,today:academic.days[academicDay(now())]??0,lastGain:academic.lastGain,at:academic.at,dailyLimit:100}:undefined}}
 async function attempts(env:Env,sbd:string){const r=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE sbd=? ORDER BY created_at DESC LIMIT 3000').bind(sbd).all<{json:string}>();return r.results.map(x=>(JSON.parse(x.json) as {attempt:Attempt}).attempt).reverse()}
 async function currentQuestion(env:Env,q:{qid:string;maDe:string;version:string}){
   const row=await env.DB.prepare(`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE q.ma_de=? AND q.qid=? AND q.version=? AND COALESCE(d.da_xoa,0)=0`).bind(q.maDe,q.qid,q.version).first<{json:string}>()
@@ -67,7 +70,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
   if(action==='shield-use'){
     const id=String(b.useId??'');if(!/^[a-zA-Z0-9-]{16,80}$/.test(id))throw new Error('Lượt dùng khiên không hợp lệ.')
     if(p.shields?.lastUse===id||Number(p.shields?.activeUntil)>Date.now())return {ok:true,profile:visible(p),revision}
-    if(p.choice||shieldRemaining(p.cap,p.shields)<1)throw new Error('Em chưa có Khiên chống đuổi. Tiến hoá thần thú để nhận khiên.')
+    if(p.choice||khienConLai(p)<1)throw new Error('Em chưa có Khiên chống đuổi. Tiến hoá thần thú để nhận khiên.')
     p.shields={used:(p.shields?.used??0)+1,activeUntil:Date.now()+10000,lastUse:id}
     return {ok:true,profile:visible(p),revision:await save(env,sbd,p,revision)}
   }
