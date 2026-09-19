@@ -18,6 +18,20 @@ import './NenDong.css'
 
 export type { MucMenu, ThanThuGoc }
 
+/** Dữ liệu ô "Giao bài cho con" của phụ huynh — LẤY TỪ MÁY CHỦ (/parent-news), giao diện không tự tính, không tự viết câu. */
+export interface GiaoBaiHangNgay {
+  /** Câu NGUYÊN VĂN của máy chủ (kèm số). Vắng = chưa có dữ liệu ⇒ không in câu nào. */
+  reason?: string
+  /** Số câu còn dư chỗ giao hôm nay (0 = con đã đủ việc). Vắng = chưa biết. */
+  soCauDeXuat?: number
+  /** Hôm nay đã giao bài hằng ngày rồi (máy chủ không tạo bài thứ hai). */
+  daGiao?: { soCau: number; trangThai: 'chua_lam' | 'dang_lam' | 'da_nop' } | null
+  dangGui?: boolean
+  thongBao?: { loai: 'ok' | 'loi'; chu: string } | null
+}
+
+const TEN_TRANG_THAI_BAI = { chua_lam: 'con chưa làm', dang_lam: 'con đang làm', da_nop: 'con đã nộp' } as const
+
 /** Cho phép chuyển động khi máy KHÔNG xin giảm chuyển động và KHÔNG yếu pin.
  *  `navigator.getBattery` không có (Safari, Firefox) thì bỏ qua vế pin. */
 export function useChoPhepChuyenDong(): boolean {
@@ -84,7 +98,11 @@ export interface BangNhiemVuProps {
   onMoThanThu?: () => void
   onVaoThi?: () => void
   onXemBaiDaNop?: () => void
+  /** Luồng giao TAY cũ (chọn câu). Vẫn vào được khi con đã đủ việc — không chặn. */
   onGiaoBai?: () => void
+  /** Giao bài hằng ngày đã cá nhân hoá (máy chủ chọn câu). */
+  onGiaoHangNgay?: () => void
+  giaoBai?: GiaoBaiHangNgay
   onNhanThay?: () => void
   taiVinhDanh?: () => Promise<DuLieuVinhDanh | null>
 }
@@ -104,6 +122,8 @@ export default function BangNhiemVu({
   onVaoThi,
   onXemBaiDaNop,
   onGiaoBai,
+  onGiaoHangNgay,
+  giaoBai,
   onNhanThay,
   taiVinhDanh,
 }: BangNhiemVuProps) {
@@ -128,9 +148,12 @@ export default function BangNhiemVu({
   const viec = tatCaViec(duLieu)
   const conLai = Math.max(0, tienDo.mucTieu - tienDo.daLam)
 
-  // Ô cảnh báo tải của phụ huynh: đếm câu của việc đang mở, không ước đoán thêm.
-  const cauDangCho = viec.filter((v) => !v.biCong && v.bac !== 'tuy_chon').reduce((s, v) => s + v.soCau, 0)
-  const vuotTai = tienDo.mucTieu > 0 && tienDo.daLam + cauDangCho >= tienDo.mucTieu
+  // Ô giao bài của phụ huynh: mọi câu chữ và số là của máy chủ; giao diện chỉ chọn dạng nút.
+  const gb = giaoBai ?? {}
+  const conDu = !gb.daGiao && typeof gb.soCauDeXuat === 'number' && gb.soCauDeXuat > 0
+  const daDu = !gb.daGiao && gb.soCauDeXuat === 0
+  const trangThaiGiao = gb.daGiao ? 'da-giao' : conDu ? 'con-du' : daDu ? 'da-du' : 'chua-biet'
+  const bamGiao = conDu && onGiaoHangNgay ? onGiaoHangNgay : onGiaoBai
 
   return (
     <div
@@ -261,16 +284,29 @@ export default function BangNhiemVu({
             <DanhSachQuaHan viec={duLieu.quaHan} docChi={laPh} onChon={(q) => q.hanhDong && onHanhDong?.(q.hanhDong)} />
 
             {laPh && onGiaoBai && (
-              <section className="bnv-giao-bai" data-vuot={vuotTai ? 'true' : 'false'} aria-label="Giao bài cho con" data-vung="giao-bai">
-                <p>
-                  {vuotTai
-                    ? `Con đã làm ${tienDo.daLam} câu và còn ${cauDangCho} câu cần làm, ${tienDo.daLam + cauDangCho > tienDo.mucTieu ? 'vượt' : 'đủ'} mức gợi ý ${tienDo.mucTieu} câu/ngày. Giao thêm bài lúc này là dồn tải cho con.`
-                    : `Con còn khoảng ${Math.max(0, tienDo.mucTieu - tienDo.daLam - cauDangCho)} câu trong mức gợi ý ${tienDo.mucTieu} câu/ngày.`}
-                </p>
+              <section className="bnv-giao-bai" data-trang-thai={trangThaiGiao} aria-label="Giao bài cho con" data-vung="giao-bai">
+                {gb.reason && <p data-vung="ly-do-giao-bai">{gb.reason}</p>}
+                {gb.daGiao && (
+                  <p data-vung="da-giao">
+                    Hôm nay đã giao {gb.daGiao.soCau} câu · {TEN_TRANG_THAI_BAI[gb.daGiao.trangThai]}
+                  </p>
+                )}
+                {gb.thongBao && (
+                  <p role={gb.thongBao.loai === 'loi' ? 'alert' : 'status'} data-vung="thong-bao-giao-bai" data-loai={gb.thongBao.loai}>
+                    {gb.thongBao.chu}
+                  </p>
+                )}
                 <div className="bnv-giao-bai-nut">
-                  <button type="button" className="bnv-nut-tonal" data-vai-tro="secondary" onClick={onGiaoBai}>
+                  <button
+                    type="button"
+                    className={conDu ? 'bnv-nut-tonal' : 'bnv-nut-vien'}
+                    data-vai-tro={conDu ? 'secondary' : undefined}
+                    disabled={gb.dangGui}
+                    aria-busy={gb.dangGui || undefined}
+                    onClick={bamGiao}
+                  >
                     <Plus size={18} aria-hidden="true" />
-                    <span>Giao bài cho con</span>
+                    <span>{gb.dangGui ? 'Đang giao…' : 'Giao bài cho con'}</span>
                   </button>
                   {onNhanThay && (
                     <button type="button" className="bnv-nut-vien" onClick={onNhanThay}>

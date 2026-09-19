@@ -462,21 +462,103 @@ describe('phụ huynh: đọc-chỉ', () => {
     await screen.findByText('Hoả Long')
   })
 
-  it('cảnh báo tải nói đúng số: đã làm + còn lại so với mức gợi ý, "vượt" khi lớn hơn', async () => {
-    // 6 câu đã làm + (6 lô + 8 bài Mẹ) còn lại = 20 > 12 ⇒ "vượt"
-    const { container } = phuHuynh()
-    await screen.findByText('Hoả Long')
-    const chu = container.querySelector('[data-vung="giao-bai"] p')!.textContent!
-    expect(chu).toMatch(/Con đã làm 6 câu và còn \d+ câu cần làm, vượt mức gợi ý 12 câu\/ngày/)
-    expect(chu).not.toMatch(/đã chạm/)
-  })
-
   it('chưa có danh sách BTVN của con: nói thật bằng một dòng, không dựng thẻ việc', async () => {
     const { container } = phuHuynh({ duLieu: duLieu(), ghiChuNguon: 'Con còn 2 bài tập Thầy giao chưa nộp.' })
     await screen.findByText('Hoả Long')
     expect(container.querySelectorAll('.bnv-the').length).toBe(0)
     expect(screen.getByText('Chưa có bài gia đình giao nào đang chờ')).toBeTruthy()
     expect(container.querySelector('[data-vung="ghi-chu-nguon"]')!.textContent).toContain('2 bài tập Thầy giao chưa nộp')
+  })
+})
+
+describe('phụ huynh: "Giao bài cho con" đi đường bài hằng ngày cá nhân hoá (Kênh 5)', () => {
+  const LY_DO_DU = 'Mục tiêu hôm nay 12 câu. Bài đang chờ còn 8 câu, con đã làm 4 câu. Chưa cần giao thêm.'
+  const LY_DO_DU_CHO = 'Còn dư 3 câu trong mục tiêu 12 câu hôm nay; ưu tiên câu ôn tới hạn trước.'
+  const ph = (giaoBai: object | undefined, props: Partial<BangNhiemVuProps> = {}) => {
+    const onGiaoBai = vi.fn()
+    const onGiaoHangNgay = vi.fn()
+    const r = ve({ vaiTro: 'phuhuynh', duLieu: duLieuMay(), onGiaoBai, onGiaoHangNgay, giaoBai, ...props } as any)
+    return { ...r, onGiaoBai, onGiaoHangNgay }
+  }
+  const nut = () => screen.getByRole('button', { name: /Giao bài cho con|Đang giao/ })
+
+  it('CÒN DƯ (soCauDeXuat > 0): in NGUYÊN VĂN lý do của máy chủ; nút dạng tonal; bấm = giao bài hằng ngày, KHÔNG mở luồng tay', async () => {
+    const { container, onGiaoBai, onGiaoHangNgay } = ph({ reason: LY_DO_DU_CHO, soCauDeXuat: 3 })
+    await screen.findByText('Hoả Long')
+    expect(container.querySelector('[data-vung="ly-do-giao-bai"]')!.textContent).toBe(LY_DO_DU_CHO)
+    expect(container.querySelector('[data-vung="giao-bai"]')!.getAttribute('data-trang-thai')).toBe('con-du')
+    expect(nut().classList.contains('bnv-nut-tonal')).toBe(true)
+    fireEvent.click(nut())
+    expect(onGiaoHangNgay).toHaveBeenCalledTimes(1)
+    expect(onGiaoBai).not.toHaveBeenCalled()
+  })
+
+  it('ĐÃ ĐỦ (soCauDeXuat = 0): ô vàng in nguyên văn lý do, nút thành dạng PHỤ nhưng KHÔNG bị chặn — bấm vào luồng giao tay cũ (chốt G08)', async () => {
+    const { container, onGiaoBai, onGiaoHangNgay } = ph({ reason: LY_DO_DU, soCauDeXuat: 0 })
+    await screen.findByText('Hoả Long')
+    expect(container.querySelector('[data-vung="ly-do-giao-bai"]')!.textContent).toBe(LY_DO_DU)
+    expect(container.querySelector('[data-vung="giao-bai"]')!.getAttribute('data-trang-thai')).toBe('da-du')
+    expect(nut().classList.contains('bnv-nut-vien')).toBe(true)
+    expect((nut() as HTMLButtonElement).disabled).toBe(false)
+    fireEvent.click(nut())
+    expect(onGiaoBai).toHaveBeenCalledTimes(1)
+    expect(onGiaoHangNgay).not.toHaveBeenCalled()
+    const css = readFileSync(join(THU_MUC, 'bang-nhiem-vu.css'), 'utf8')
+    expect(css).toMatch(/\.bnv-giao-bai\[data-trang-thai='da-du'\]\s*\{[^}]*canh-bao-nen/)
+  })
+
+  it('ĐÃ GIAO hôm nay: "Hôm nay đã giao N câu · trạng thái bài"; nút phụ mở luồng tay; không giao trùng', async () => {
+    for (const [tt, chu] of [['chua_lam', 'con chưa làm'], ['dang_lam', 'con đang làm'], ['da_nop', 'con đã nộp']] as const) {
+      cleanup()
+      const { container, onGiaoBai, onGiaoHangNgay } = ph({ reason: LY_DO_DU_CHO, soCauDeXuat: 3, daGiao: { soCau: 9, trangThai: tt } })
+      await screen.findByText('Hoả Long')
+      expect(container.querySelector('[data-vung="da-giao"]')!.textContent).toBe(`Hôm nay đã giao 9 câu · ${chu}`)
+      expect(container.querySelector('[data-vung="giao-bai"]')!.getAttribute('data-trang-thai')).toBe('da-giao')
+      fireEvent.click(nut())
+      expect(onGiaoBai).toHaveBeenCalledTimes(1)
+      expect(onGiaoHangNgay).not.toHaveBeenCalled()
+    }
+  })
+
+  it('CHƯA BIẾT (máy chủ chưa trả): không in câu nào (không bịa), nút bấm vào luồng giao tay như cũ; không giả định "≥ 12 câu"', async () => {
+    const { container, onGiaoBai, onGiaoHangNgay } = ph(undefined)
+    await screen.findByText('Hoả Long')
+    expect(container.querySelector('[data-vung="ly-do-giao-bai"]')).toBeNull()
+    expect(container.querySelector('[data-vung="giao-bai"]')!.getAttribute('data-trang-thai')).toBe('chua-biet')
+    fireEvent.click(nut())
+    expect(onGiaoBai).toHaveBeenCalledTimes(1)
+    expect(onGiaoHangNgay).not.toHaveBeenCalled()
+    // Chỉ xét ô giao bài (các dòng khác như cảnh báo qua_tai là chữ của máy chủ): không còn chữ "3 Vòng", không giả định số câu.
+    expect(container.querySelector('[data-vung="giao-bai"]')!.textContent).not.toMatch(/3 Vòng|Phân Tầng|tối đa|\d+ câu\/ngày/i)
+  })
+
+  it('không có onGiaoHangNgay (chưa nối): "còn dư" vẫn bấm được vào luồng tay, không hỏng', async () => {
+    const onGiaoBai = vi.fn()
+    ve({ vaiTro: 'phuhuynh', duLieu: duLieuMay(), onGiaoBai, giaoBai: { reason: LY_DO_DU_CHO, soCauDeXuat: 3 } } as any)
+    await screen.findByText('Hoả Long')
+    fireEvent.click(nut())
+    expect(onGiaoBai).toHaveBeenCalledTimes(1)
+  })
+
+  it('đang gửi: nút khoá, ghi "Đang giao…", aria-busy — không bấm đúp được', async () => {
+    const { onGiaoHangNgay } = ph({ reason: LY_DO_DU_CHO, soCauDeXuat: 3, dangGui: true })
+    await screen.findByText('Hoả Long')
+    const b = nut() as HTMLButtonElement
+    expect(b.disabled).toBe(true)
+    expect(b.getAttribute('aria-busy')).toBe('true')
+    expect(b.textContent).toContain('Đang giao…')
+    fireEvent.click(b)
+    expect(onGiaoHangNgay).not.toHaveBeenCalled()
+  })
+
+  it('thông báo kết quả: thành công là "status", lỗi là "alert" và in nguyên văn lỗi của máy chủ', async () => {
+    const { container, unmount } = ph({ soCauDeXuat: 3, thongBao: { loai: 'ok', chu: 'Đã giao 1 bài gồm 3 câu sang app của con.' } })
+    await screen.findByText('Hoả Long')
+    expect(screen.getByRole('status').textContent).toBe('Đã giao 1 bài gồm 3 câu sang app của con.')
+    unmount()
+    ph({ soCauDeXuat: 3, thongBao: { loai: 'loi', chu: 'Chưa tìm được câu phù hợp để giao hôm nay. Vui lòng thử lại sau.' } })
+    await screen.findByText('Hoả Long')
+    expect(screen.getByRole('alert').textContent).toBe('Chưa tìm được câu phù hợp để giao hôm nay. Vui lòng thử lại sau.')
   })
 })
 

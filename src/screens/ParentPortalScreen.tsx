@@ -5,7 +5,7 @@ import { dungBangNhiemVu } from '../lib/nhiem-vu-adapter'
 import { tongHopKeHoachTroLy } from '../lib/tro-ly-ca-nhan'
 import { useGioHocTap } from '../hooks/useGioHocTap'
 import { useBanNho, useKeHoachNgay } from '../components/bang-nhiem-vu/may-chu'
-import { momApi, migrateMom, momReviewHtml, chuanHoaBaiMom } from '../lib/mom-api'
+import { momApi, migrateMom, momReviewHtml, chuanHoaBaiMom, parentNewsApi } from '../lib/mom-api'
 import KhoiKhacPhuc3CheDo from '../components/KhoiKhacPhuc3CheDo'
 import { useEffect, useMemo, useState } from 'react'
 import DongDemCau from '../components/DongDemCau'
@@ -93,6 +93,10 @@ export default function ParentPortalScreen() {
   const [daNapMomLanDau, setDaNapMomLanDau] = useState(false)
   // BTVN của con (`/hs/btvn` tra theo SBD, như màn học sinh): lấy TÊN bài cho kế hoạch ngày và nguồn dự phòng.
   const [dsBtvnCon, setDsBtvnCon] = useState<any[]>([])
+  // Bài hằng ngày đã cá nhân hoá (Kênh 5, /parent-news): số câu còn dư + lý do của máy chủ, và bài đã giao hôm nay (nếu có).
+  const [deXuat, setDeXuat] = useState<{ soCau: number; reason: string; dailyId: string | null } | null>(null)
+  const [dangGiao, setDangGiao] = useState(false)
+  const [thongBaoGiao, setThongBaoGiao] = useState<{ loai: 'ok' | 'loi'; chu: string } | null>(null)
   const nowHocTap = useGioHocTap()
 
   const caGanNhat = useMemo(() => {
@@ -178,6 +182,34 @@ export default function ParentPortalScreen() {
       setDaNapMomLanDau(true)
     }
   }
+  const napDeXuat = async (sbd: string, daHuy: () => boolean = () => false) => {
+    try {
+      const r = await parentNewsApi('list', sbd)
+      const rp = r?.report
+      if (daHuy() || !rp || !Number.isFinite(Number(rp.questionCount))) return
+      setDeXuat({ soCau: Number(rp.questionCount), reason: typeof rp.reason === 'string' ? rp.reason : '', dailyId: r?.daily?.id ?? null })
+    } catch {
+      /* Không có số liệu thì không nói gì (không tự bịa lý do). */
+    }
+  }
+  const giaoHangNgay = async () => {
+    if (!sbdHienTai || dangGiao) return
+    setDangGiao(true)
+    setThongBaoGiao(null)
+    try {
+      const r = await parentNewsApi('assign', sbdHienTai)
+      setThongBaoGiao({
+        loai: 'ok',
+        chu: r?.alreadySent ? 'Bài hôm nay đã được giao trước đó. Không tạo thêm bài trùng.' : `Đã giao 1 bài gồm ${r?.questionCount} câu sang app của con.`,
+      })
+      await napDanhSachMomGiao(sbdHienTai)
+      await napDeXuat(sbdHienTai)
+    } catch (e) {
+      setThongBaoGiao({ loai: 'loi', chu: e instanceof Error ? e.message : 'Chưa giao được bài. Vui lòng thử lại.' })
+    } finally {
+      setDangGiao(false)
+    }
+  }
   useEffect(() => {
     if (!sbdHienTai) return
     let huy = false
@@ -187,6 +219,7 @@ export default function ParentPortalScreen() {
         const bt = await hsBtvnApi(url, sbdHienTai).catch(() => null)
         if (huy) return
         if (bt?.ok && Array.isArray(bt.items)) setDsBtvnCon(bt.items)
+        void napDeXuat(sbdHienTai, () => huy)
       } catch {
         /* Không có số liệu thì không nói số. */
       }
@@ -294,6 +327,8 @@ export default function ParentPortalScreen() {
     setDsMomGiao([])
     setDaNapMomLanDau(false)
     setDsBtvnCon([])
+    setDeXuat(null)
+    setThongBaoGiao(null)
     setSbdInput('')
   }
 
@@ -604,6 +639,17 @@ export default function ParentPortalScreen() {
             },
           })}
           onGiaoBai={() => setTabPh('khacphuc')}
+          onGiaoHangNgay={() => void giaoHangNgay()}
+          giaoBai={{
+            reason: deXuat?.reason || undefined,
+            soCauDeXuat: deXuat?.soCau,
+            daGiao: (() => {
+              const bai = deXuat?.dailyId ? dsMomGiao.find((m) => m.id === deXuat.dailyId) : undefined
+              return bai ? { soCau: bai.soCau, trangThai: bai.trangThai === 'da_nop' ? 'da_nop' : bai.trangThai === 'dang_lam' ? 'dang_lam' : 'chua_lam' } : null
+            })(),
+            dangGui: dangGiao,
+            thongBao: thongBaoGiao,
+          }}
         />
       )}
 
