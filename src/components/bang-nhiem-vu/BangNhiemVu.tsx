@@ -4,7 +4,7 @@
 // Màn này KHÔNG xếp việc, không tính điểm, không gọi API nhiệm vụ: nhận
 // `DuLieuBangNhiemVu` từ `nhiem-vu-adapter` và chỉ vẽ.
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { ClipboardCheck, MessageSquare, Plus, Sparkles } from 'lucide-react'
+import { CheckCircle2, ClipboardCheck, MessageSquare, Plus, Sparkles } from 'lucide-react'
 import type { DuLieuBangNhiemVu, HanhDongNhiemVu, TheNhiemVu } from '../../lib/nhiem-vu-adapter'
 import type { SpiritMotion } from '../../game/than-thu-v2/Spirit2D'
 import DauTrang, { type MucMenu, type ThanThuGoc } from './DauTrang'
@@ -143,6 +143,15 @@ export default function BangNhiemVu({
     return () => clearTimeout(t)
   }, [dangTai, duLieu.tienDo.daLam, laPh])
 
+  // Vừa xong việc hôm nay (thẻ mừng hiện lần đầu): thần thú vui 1,6 s rồi trở lại nhịp thường.
+  const daXong = !dangTai && !!duLieu.daXongHomNay
+  useEffect(() => {
+    if (!daXong || laPh) return
+    setDongThu('victory')
+    const t = setTimeout(() => setDongThu('idle'), 1600)
+    return () => clearTimeout(t)
+  }, [daXong, laPh])
+
   const chon = (viec: TheNhiemVu) => onHanhDong?.(viec.hanhDong)
   const { tienDo, tocDo } = duLieu
   const viec = tatCaViec(duLieu)
@@ -277,6 +286,21 @@ export default function BangNhiemVu({
               </section>
             ) : (
               <>
+                {duLieu.daXongHomNay && (
+                  <section className="bnv-mung" aria-label={laPh ? 'Con đã xong việc hôm nay' : 'Em đã xong việc hôm nay'} data-vung="xong-hom-nay">
+                    <span className="bnv-mung-bt" aria-hidden="true">
+                      <CheckCircle2 size={26} />
+                    </span>
+                    <div className="bnv-mung-chu">
+                      <h2>{laPh ? 'Con đã xong việc hôm nay' : 'Em đã xong việc hôm nay'}</h2>
+                      {/* Chỉ nói số đo thật; KHÔNG nói "nắm chắc" (nộp ≠ nắm). */}
+                      <p>
+                        Đã làm {duLieu.daXongHomNay.daLamCau} câu{duLieu.daXongHomNay.lenBac > 0 ? `, ${duLieu.daXongHomNay.lenBac} câu lên bậc ôn` : ''}
+                      </p>
+                      <p className="bnv-mung-phu">{laPh ? 'Còn vài việc làm thêm, không bắt buộc.' : 'Muốn làm thêm thì chọn một việc bên dưới — không bắt buộc.'}</p>
+                    </div>
+                  </section>
+                )}
                 {duLieu.lamNgay && <TheLamNgay viec={duLieu.lamNgay} docChi={laPh} onLam={chon} />}
                 <DanhSachNhiemVu cacBac={duLieu.cacBac} docChi={laPh} onChon={chon} />
               </>

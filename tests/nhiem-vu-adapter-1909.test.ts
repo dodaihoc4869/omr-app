@@ -350,12 +350,82 @@ describe('bài Mẹ giao không bao giờ rơi khỏi trang chủ (top3 cắt m�
   })
 })
 
-describe('chỉ còn việc tuỳ chọn ⇒ trạng thái trống (nút thần thú nằm ở thẻ trống)', () => {
-  it('nhánh máy chủ', () => {
-    const kh = { ...keHoachMayChu, viec: [v({ id: 'than_thu:X', loai: 'than_thu', soCau: 6, nhan: 'tuy_chon', ghiChu: 'Luyện dạng còn yếu với thần thú' })] as any }
-    const d = tuKeHoachNgay(kh, NOW)
+// 0.Planer ĐỔI LUẬT 19/09 (có chủ ý): trước đây "chỉ còn việc tuỳ chọn ⇒ trống" ở nhánh MÁY CHỦ khiến em chăm (đã đủ chỉ tiêu, còn 158 câu
+// tới hạn ôn, máy chủ mời ôn 3 câu) thấy "không có bài nào đang chờ" và KHÔNG BAO GIỜ thấy việc ôn thêm. Nay: trống CHỈ khi viec rỗng.
+// Nguồn TRỢ LÝ (dự phòng) giữ luật cũ vì nó luôn kèm gợi ý cố định "Luyện nâng cao (tự chọn)" — không phải lời mời của máy chủ.
+describe('chỉ còn việc TUỲ CHỌN (0.Planer đổi luật 19/09)', () => {
+  const onLai = v({ id: 'on_lai:2026-09-19', loai: 'on_lai', soCau: 3, nhan: 'tuy_chon', ghiChu: 'Ôn 3 câu đã tới hạn nhắc lại', chiTiet: { qid: ['a', 'b', 'c'] } })
+  const thu = v({ id: 'than_thu:X', loai: 'than_thu', soCau: 6, nhan: 'tuy_chon', ghiChu: 'Luyện dạng còn yếu với thần thú', chiTiet: { dang: 'X' } })
+  const khCoDat = (dat: boolean | undefined, viec: any[] = [onLai, thu]): KeHoachNgayMayChu => ({
+    ...keHoachMayChu,
+    viec: viec as any,
+    tienBo: { daLamCau: 9, lenBac: 3, ...(dat === undefined ? {} : { dat }), conThieu: 0 } as any,
+  })
+
+  it('ĐÃ ĐẠT (tienBo.dat=true): KHÔNG trống, KHÔNG có "Làm ngay", có thẻ mừng; bậc tuỳ chọn tên "LÀM THÊM · TUỲ CHỌN" liệt kê cả hai việc, bấm được như thường', () => {
+    const d = tuKeHoachNgay(khCoDat(true), NOW)
+    expect(d.trong).toBe(false)
+    expect(d.lamNgay).toBeNull()
+    expect(d.daXongHomNay).toEqual({ daLamCau: 9, lenBac: 3 })
+    const tc = d.cacBac.find((b) => b.bac === 'tuy_chon')!
+    expect(tc.nhan).toBe('LÀM THÊM · TUỲ CHỌN')
+    expect(tc.viec.map((x) => x.id)).toEqual(['on_lai:2026-09-19', 'than_thu:X'])
+    expect(tc.viec[0].hanhDong.loai).toBe('lam_cau_on')
+    expect(tc.viec[0].biCong).toBe(false)
+    // ba bậc kia vẫn giữ tên cũ
+    expect(d.cacBac.filter((b) => b.bac !== 'tuy_chon').map((b) => b.nhan)).toEqual(['KHẨN', 'BẮT BUỘC HÔM NAY', 'NÊN LÀM'])
+  })
+
+  it('CHƯA ĐẠT (dat=false hoặc thiếu): KHÔNG trống; việc tuỳ chọn mở đầu tiên là "Làm ngay"; không thẻ mừng; bậc vẫn tên "TUỲ CHỌN"', () => {
+    for (const dat of [false, undefined]) {
+      const d = tuKeHoachNgay(khCoDat(dat), NOW)
+      expect(d.trong).toBe(false)
+      expect(d.daXongHomNay).toBeNull()
+      expect(d.lamNgay?.id).toBe('on_lai:2026-09-19')
+      expect(d.cacBac.find((b) => b.bac === 'tuy_chon')!.nhan).toBe('TUỲ CHỌN')
+      expect(d.cacBac.find((b) => b.bac === 'tuy_chon')!.viec.map((x) => x.id)).toEqual(['than_thu:X'])
+    }
+  })
+
+  it('chưa đạt mà mọi việc tuỳ chọn còn bị cổng: không trống, chưa có "Làm ngay", các thẻ hiện mờ', () => {
+    const bi = [{ ...onLai, hien: false, cong: 'x' }, { ...thu, hien: false, cong: 'on_lai:2026-09-19' }]
+    const d = tuKeHoachNgay(khCoDat(false, bi), NOW)
+    expect(d.trong).toBe(false)
+    expect(d.lamNgay).toBeNull()
+    expect(d.cacBac.find((b) => b.bac === 'tuy_chon')!.viec.every((x) => x.biCong)).toBe(true)
+  })
+
+  it('viec RỖNG mới là trống — kể cả khi đã đạt', () => {
+    for (const dat of [true, false]) {
+      const d = tuKeHoachNgay(khCoDat(dat, []), NOW)
+      expect(d.trong).toBe(true)
+      expect(d.lamNgay).toBeNull()
+      expect(d.daXongHomNay).toBeNull()
+      expect(d.cacBac.every((b) => b.viec.length === 0)).toBe(true)
+    }
+  })
+
+  it('còn việc THẬT (bắt buộc/nên làm) thì đạt hay chưa cũng không có thẻ mừng: "Làm ngay" là việc thật', () => {
+    const that = v({ id: 'mom:M1', loai: 'mom', soCau: 8, batBuoc: true, chiTiet: { id: 'M1' } })
+    const d = tuKeHoachNgay(khCoDat(true, [that, onLai]), NOW)
+    expect(d.daXongHomNay).toBeNull()
+    expect(d.lamNgay?.id).toBe('mom:M1')
+  })
+
+  it('nguồn TRỢ LÝ giữ luật cũ: chỉ có gợi ý cố định "Luyện nâng cao (tự chọn)" ⇒ vẫn trống', () => {
+    const d = tuKeHoachTroLy(troLy())
     expect(d.trong).toBe(true)
     expect(d.lamNgay).toBeNull()
+    expect(d.daXongHomNay).toBeNull()
+  })
+
+  it('bản nhớ giữ thẻ mừng; bản nhớ cũ thiếu trường ⇒ null (không ném)', () => {
+    const d = tuKeHoachNgay(khCoDat(true), NOW)
+    const b = dongGoiBanNho(d, NOW)!
+    expect(phucHoiBanNho(JSON.parse(JSON.stringify(b)), NOW)!.daXongHomNay).toEqual({ daLamCau: 9, lenBac: 3 })
+    const cu: any = JSON.parse(JSON.stringify(b))
+    delete cu.duLieu.daXongHomNay
+    expect(phucHoiBanNho(cu, NOW)!.daXongHomNay).toBeNull()
   })
 })
 

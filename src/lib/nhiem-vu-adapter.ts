@@ -86,6 +86,12 @@ export interface DuLieuBangNhiemVu {
   ngayNghi: boolean
   thanThu: TrangThaiThanThu
   tonCu: TonCu
+  /**
+   * Em ĐÃ ĐẠT chỉ tiêu hôm nay (`tienBo.dat`) và máy chủ chỉ còn mời việc TUỲ CHỌN ⇒ đầu bảng là thẻ MỪNG ("Em đã xong việc hôm
+   * nay" + một dòng số đo), KHÔNG có thẻ "Làm ngay", bậc TUỲ CHỌN mang tên "LÀM THÊM · TUỲ CHỌN" và vẫn bấm được. `null` = không
+   * ở trạng thái đó. (0.Planer đổi luật 19/09: trước đây "chỉ còn tuỳ chọn" bị coi là TRỐNG và em chăm không bao giờ thấy việc ôn thêm.)
+   */
+  daXongHomNay: { daLamCau: number; lenBac: number } | null
 }
 
 /**
@@ -169,20 +175,39 @@ function gomBac(viec: TheNhiemVu[]): NhomBac[] {
   }))
 }
 
+/** Nhãn bậc TUỲ CHỌN khi em đã xong việc hôm nay: việc còn lại là LÀM THÊM, không phải nợ. */
+export const NHAN_LAM_THEM = 'LÀM THÊM · TUỲ CHỌN'
+
 function dongGoi(
   nguon: DuLieuBangNhiemVu['nguon'],
   viec: TheNhiemVu[],
-  phanConLai: Pick<DuLieuBangNhiemVu, 'tienDo' | 'tocDo' | 'chuoiNgay' | 'canhBao' | 'quaHan' | 'capNhatLuc' | 'ghiChuCu' | 'ngayNghi' | 'thanThu' | 'tonCu'>,
+  phanConLai: Omit<DuLieuBangNhiemVu, 'nguon' | 'lamNgay' | 'cacBac' | 'trong' | 'daXongHomNay'>,
+  xong: { dat: boolean; daLamCau: number; lenBac: number },
 ): DuLieuBangNhiemVu {
-  // Chỉ còn việc tuỳ chọn ⇒ coi là "hôm nay chưa có việc": không dựng thẻ nào.
-  const coViecThat = viec.some((v) => v.bac !== 'tuy_chon')
-  if (!coViecThat) return { nguon, lamNgay: null, cacBac: gomBac([]), trong: true, ...phanConLai }
+  // TRỐNG khi nguồn không đưa việc nào. Riêng nguồn TRỢ LÝ (dự phòng khi máy chủ lỗi) luôn kèm một gợi ý "Luyện nâng cao (tự chọn)"
+  // cố định, không phải lời mời của máy chủ ⇒ ở đó "chỉ còn tuỳ chọn" vẫn là trống như cũ; ở nguồn MÁY CHỦ, việc tuỳ chọn là lời mời thật.
+  const tuyChonLaViecThat = nguon === 'ke_hoach_ngay'
+  const chiTuyChon = viec.every((v) => v.bac === 'tuy_chon')
+  if (viec.length === 0 || (!tuyChonLaViecThat && chiTuyChon)) return { nguon, lamNgay: null, cacBac: gomBac([]), trong: true, daXongHomNay: null, ...phanConLai }
+  if (chiTuyChon && xong.dat) {
+    // Đã đạt chỉ tiêu: mừng, không "Làm ngay"; việc tuỳ chọn là LÀM THÊM và vẫn bấm được như thường.
+    return {
+      nguon,
+      lamNgay: null,
+      cacBac: gomBac(viec).map((g) => (g.bac === 'tuy_chon' ? { ...g, nhan: NHAN_LAM_THEM } : g)),
+      trong: false,
+      daXongHomNay: { daLamCau: Math.max(0, Math.floor(xong.daLamCau) || 0), lenBac: Math.max(0, Math.floor(xong.lenBac) || 0) },
+      ...phanConLai,
+    }
+  }
+  // Còn việc thật, hoặc chỉ tuỳ chọn mà CHƯA đạt: việc mở đầu tiên là "Làm ngay" (kể cả khi nó là việc tuỳ chọn).
   const lamNgay = viec.find((v) => !v.biCong) ?? null
   return {
     nguon,
     lamNgay,
     cacBac: gomBac(viec.filter((v) => v !== lamNgay)),
     trong: false,
+    daXongHomNay: null,
     ...phanConLai,
   }
 }
@@ -280,6 +305,11 @@ export function tuKeHoachTroLy(keHoach: KeHoachNgayTroLy, phu: NguonPhuTroLy = {
     // Nguồn trợ lý chỉ có bảng V1 (không có id thần thú) — KHÔNG đoán, để giữ chỗ.
     thanThu: { kieu: 'chua_biet' },
     tonCu: { soBai: 0, soCau: 0, bai: [] },
+  }, {
+    // Nguồn trợ lý không có `tienBo.dat`: coi là đạt khi đã làm đủ mức gợi ý.
+    dat: nganSach.mucTieuCau > 0 && nganSach.daLamCau >= nganSach.mucTieuCau,
+    daLamCau: nganSach.daLamCau,
+    lenBac: 0,
   })
 }
 
@@ -517,7 +547,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     ngayNghi: keHoach.lanNghi === true,
     thanThu: docThanThu(keHoach.thanThu),
     tonCu,
-  })
+  }, { dat: keHoach.tienBo.dat === true, daLamCau: daLam, lenBac })
 }
 
 const TEN_LOAI: Record<string, string> = {
@@ -601,10 +631,13 @@ export function phucHoiBanNho(x: unknown, now: number): DuLieuBangNhiemVu | null
     tc && Number.isFinite(tc.soBai) && Number.isFinite(tc.soCau) && Array.isArray(tc.bai) && tc.bai.every((b: any) => b && typeof b.id === 'string' && b.hanhDong && typeof b.hanhDong.loai === 'string')
       ? tc
       : { soBai: 0, soCau: 0, bai: [] }
+  const xh: any = (d as any).daXongHomNay
+  const daXongHomNay = xh && Number.isFinite(xh.daLamCau) && Number.isFinite(xh.lenBac) ? { daLamCau: xh.daLamCau, lenBac: xh.lenBac } : null
   return {
     ...d,
     thanThu,
     tonCu,
+    daXongHomNay,
     lamNgay: d.lamNgay ? lamMoiThe(d.lamNgay, now) : null,
     cacBac: d.cacBac.map((g) => ({ ...g, viec: g.viec.map((v) => lamMoiThe(v, now)) })),
     ghiChuCu: gioLuu ? `Kế hoạch lúc ${gioLuu} · đang cập nhật…` : 'Kế hoạch đã nhớ · đang cập nhật…',

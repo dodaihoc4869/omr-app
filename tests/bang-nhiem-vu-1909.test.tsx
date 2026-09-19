@@ -631,6 +631,71 @@ describe('hàng "Bài cũ chưa làm" và thu gọn nhóm dài', () => {
   })
 })
 
+// 0.Planer ĐỔI LUẬT 19/09: chỉ còn việc TUỲ CHỌN của máy chủ không còn là "trống". Đã đạt ⇒ thẻ mừng + bậc "LÀM THÊM · TUỲ CHỌN" bấm được;
+// chưa đạt ⇒ việc tuỳ chọn đầu tiên là "Làm ngay"; chỉ viec rỗng mới trống.
+describe('xong việc hôm nay: chỉ còn việc tuỳ chọn', () => {
+  const tuyChon = [
+    vm({ id: 'on_lai:2026-09-19', loai: 'on_lai', soCau: 3, nhan: 'tuy_chon', ghiChu: 'Ôn 3 câu đã tới hạn nhắc lại', chiTiet: { qid: ['a', 'b', 'c'] } }),
+    vm({ id: 'than_thu:X', loai: 'than_thu', soCau: 6, nhan: 'tuy_chon', ghiChu: 'Luyện dạng còn yếu với thần thú' }),
+  ]
+  const kh = (dat: boolean, viec: any[] = tuyChon): KeHoachNgayMayChu => ({ ...keHoachMayChu, viec: viec as any, quaHan: [], canhBao: [], tienBo: { daLamCau: 9, lenBac: 3, dat, conThieu: 0 } as any })
+  const d = (dat: boolean, viec?: any[]) => conThu(tuKeHoachNgay(kh(dat, viec), NOW, phu))
+
+  it('học sinh, ĐÃ ĐẠT: thẻ mừng + số đo thật (không "nắm chắc"), KHÔNG thẻ "Làm ngay", KHÔNG trạng thái trống; hai việc bấm được dưới "LÀM THÊM · TUỲ CHỌN"', async () => {
+    const onHanhDong = vi.fn()
+    const { container } = ve({ duLieu: d(true), onHanhDong, taiVinhDanh: vinhDanhRong })
+    const mung = container.querySelector('[data-vung="xong-hom-nay"]') as HTMLElement
+    expect(mung.querySelector('h2')!.textContent).toBe('Em đã xong việc hôm nay')
+    expect(mung.textContent).toContain('Đã làm 9 câu, 3 câu lên bậc ôn')
+    expect(mung.textContent).not.toMatch(/nắm chắc/i)
+    expect(container.querySelectorAll('[data-vung="lam-ngay"]').length).toBe(0)
+    expect(container.querySelectorAll('[data-vung="trong"]').length).toBe(0)
+    expect(screen.queryByText(/Hôm nay chưa có việc/)).toBeNull()
+    const bac = container.querySelector('[data-bac="tuy_chon"]') as HTMLElement
+    expect(bac.getAttribute('aria-label')).toBe('LÀM THÊM · TUỲ CHỌN: 2 việc')
+    expect(bac.textContent).toContain('LÀM THÊM · TUỲ CHỌN · 2')
+    const the = bac.querySelectorAll<HTMLElement>('button.bnv-the')
+    expect(the.length).toBe(2)
+    fireEvent.click(the[0])
+    expect(onHanhDong).toHaveBeenCalledTimes(1)
+    expect(onHanhDong.mock.calls[0][0]).toMatchObject({ loai: 'lam_cau_on', payload: { qid: ['a', 'b', 'c'] } })
+    // đã đạt ⇒ không có nút filled "Làm ngay" (nút nổi bật duy nhất là Vào thi hoặc không có)
+    expect(container.querySelectorAll('.bnv-nut-chinh').length).toBe(0)
+  })
+
+  it('học sinh, CHƯA ĐẠT: việc tuỳ chọn đầu tiên là "Làm ngay" (nút filled), không thẻ mừng', () => {
+    const { container } = ve({ duLieu: d(false), taiVinhDanh: vinhDanhRong })
+    expect(container.querySelector('[data-vung="xong-hom-nay"]')).toBeNull()
+    expect(container.querySelectorAll('[data-vung="lam-ngay"]').length).toBe(1)
+    expect(container.querySelector('[data-vung="lam-ngay"]')!.textContent).toContain('Ôn 3 câu đã tới hạn nhắc lại')
+    expect(container.querySelectorAll('.bnv-nut-chinh').length).toBe(1)
+    expect(container.querySelector('[data-bac="tuy_chon"]')!.getAttribute('aria-label')).toBe('TUỲ CHỌN: 1 việc')
+  })
+
+  it('phụ huynh (đọc-chỉ), ĐÃ ĐẠT: "Con đã xong việc hôm nay", danh sách làm thêm KHÔNG có nút bấm', () => {
+    const { container } = render(<BangNhiemVu vaiTro="phuhuynh" hoTen="Phụ huynh" now={NOW} duLieu={d(true)} onHanhDong={() => {}} taiVinhDanh={vinhDanhRong} />)
+    expect(container.querySelector('[data-vung="xong-hom-nay"] h2')!.textContent).toBe('Con đã xong việc hôm nay')
+    expect(container.querySelector('[data-bac="tuy_chon"]')!.textContent).toContain('LÀM THÊM · TUỲ CHỌN')
+    expect(container.querySelectorAll('[data-bac="tuy_chon"] button.bnv-the').length).toBe(0)
+    expect(container.querySelectorAll('[data-vung="trong"]').length).toBe(0)
+  })
+
+  it('chỉ viec RỖNG mới ra trạng thái trống (kể cả khi đã đạt), câu chữ trống giữ nguyên', () => {
+    const { container } = ve({ duLieu: d(true, []), taiVinhDanh: vinhDanhRong })
+    expect(screen.getByText('Hôm nay chưa có việc — thần thú đang nghỉ')).toBeTruthy()
+    expect(container.querySelector('[data-vung="xong-hom-nay"]')).toBeNull()
+    expect(container.querySelectorAll('.bnv-the').length).toBe(0)
+  })
+
+  it('thẻ mừng đọc được: chữ ≥ tương phản qua biến M3 (không mã màu cứng) và có vai trò vùng có tên', () => {
+    const css = readFileSync(join(THU_MUC, 'bang-nhiem-vu.css'), 'utf8')
+    const khoi = css.slice(css.indexOf('.bnv-mung {'), css.indexOf('.bnv-nut-tonal,'))
+    expect(khoi).toContain('var(--m3-tertiary-container)')
+    expect(khoi).toContain('var(--m3-on-tertiary-container)')
+    expect(khoi).not.toMatch(/#[0-9a-fA-F]{3,8}\b|rgba?\(/)
+  })
+})
+
 describe('kỷ luật mã nguồn của thư mục bang-nhiem-vu', () => {
   const tep = (dir: string): string[] =>
     readdirSync(dir).flatMap((t) => (statSync(join(dir, t)).isDirectory() ? tep(join(dir, t)) : [join(dir, t)]))
