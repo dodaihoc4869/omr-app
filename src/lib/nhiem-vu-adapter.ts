@@ -385,7 +385,7 @@ export interface KeHoachNgayMayChu {
     homNay?: number
     chiTietHomNay?: { loai?: string; exp?: number; ghiChu?: string; soKhoan?: number }[]
     manhKhien?: { manh?: number; moiKhien?: number; khienRen?: number; khienConLai?: number; choCongVaoHoSo?: boolean } | null
-    datNgay?: { dat?: boolean; thieu?: string[]; laNghi?: boolean } | null
+    datNgay?: { dat?: boolean; thieu?: string[]; daLam?: number; toiThieu?: number; daTrao?: boolean; laNghi?: boolean } | null
   } | null
   /** Khoản EXP mới ghi trong CHÍNH lần gọi này. */
   expNhan?: { loai?: string; exp?: number; ghiChu?: string }[]
@@ -590,15 +590,21 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
   const daDo = keHoach.nganSach.vanTocNguon === 'do' && Number(keHoach.nganSach.vanTocGiay) > 0
   // "Đã xong việc hôm nay" chỉ khi CẢ HAI cùng đạt: `tienBo.dat` và (nếu máy chủ có nói) `exp.datNgay.dat`. Ngày nghỉ: chỉ `tienBo.dat`.
   const datNgayExp = keHoach.exp?.datNgay
-  const expChuaDat = !!datNgayExp && datNgayExp.laNghi !== true && datNgayExp.dat === false
+  const coDatNgay = !!datNgayExp && datNgayExp.laNghi !== true && typeof datNgayExp.dat === 'boolean'
+  const expChuaDat = coDatNgay && datNgayExp!.dat === false
+  // Khi máy chủ CÓ nói `datNgay` thì câu trạng thái CHỈ theo `datNgay` (kèm số): hai định nghĩa "đạt" mà nói cùng lúc sẽ tự mâu thuẫn
+  // ("đã đủ số câu tối thiểu · Để đạt hôm nay: chưa đủ số câu tối thiểu"). Không có `datNgay` thì giữ câu cũ theo `tienBo`.
+  const soConThieu = Math.max(1, Math.floor(Number(datNgayExp?.toiThieu) || 0) - Math.floor(Number(datNgayExp?.daLam) || 0))
   const CHU_THIEU: Record<string, string> = {
-    cau_toi_thieu: 'chưa đủ số câu tối thiểu',
-    tre_nhip: 'còn việc bắt buộc đang trễ nhịp',
-    chua_len_bac: 'còn câu tới hạn ôn mà chưa lên bậc câu nào',
+    cau_toi_thieu: `làm thêm ${soConThieu} câu`,
+    tre_nhip: 'làm nốt việc bắt buộc đang trễ nhịp',
+    chua_len_bac: 'lên bậc ít nhất một câu tới hạn ôn',
   }
   const thieuChu = expChuaDat ? (datNgayExp!.thieu || []).map((k) => CHU_THIEU[k]).filter(Boolean) : []
-  // Nói thật lý do chưa đạt (chỉ khi máy chủ nói); chưa có `exp` thì giữ đúng câu cũ.
-  const ghiChuTienDo = thieuChu.length > 0 ? `${ghiChuTienDo0} · Để đạt hôm nay: ${thieuChu.join('; ')}` : ghiChuTienDo0
+  const dauTienDo = `Đã làm ${daLam} câu${lenBac > 0 ? `, ${lenBac} câu lên bậc ôn` : ''}`
+  const ghiChuTienDo = coDatNgay
+    ? `${dauTienDo} · ${expChuaDat ? (thieuChu.length > 0 ? `Để đạt hôm nay: ${thieuChu.join('; ')}` : 'chưa đạt hôm nay') : 'đã đạt hôm nay'}`
+    : ghiChuTienDo0
   return dongGoi('ke_hoach_ngay', viec, {
     tienDo: { daLam, mucTieu, phanTram: phanTram(daLam, mucTieu), ghiChu: ghiChuTienDo },
     tocDo: daDo

@@ -264,7 +264,7 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong }: La
         </ol>
       )}
 
-      {pha === 'lam' && cau.length > 0 && (
+      {pha === 'lam' && (
         <div className="lco-day">
           {loiNop && (
             <p className="lco-loi-nop" role="alert">
@@ -272,7 +272,15 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong }: La
             </p>
           )}
           <div className="lco-day-hang">
-            {xongHet ? (
+            {cau.length === 0 ? (
+              <>
+                <p className="lco-day-chu">Không có câu nào mở được lúc này</p>
+                <button type="button" className="m3-nut-chinh" onClick={onXong}>
+                  <Check size={20} aria-hidden="true" />
+                  <span>Xong</span>
+                </button>
+              </>
+            ) : xongHet ? (
               <>
                 <p className="lco-day-chu">Em đã làm xong việc này</p>
                 <button type="button" className="m3-nut-chinh" onClick={onXong}>

@@ -98,6 +98,18 @@ describe('lấy đề', () => {
     expect(goi.filter((g) => g.url === '/hs/cau-theo-qid').length).toBe(2)
   })
 
+  it('KHÔNG câu nào mở được (máy chủ chọn qid mà lệnh lấy đề không phục vụ): thanh dưới cho "Xong", KHÔNG treo "Còn N câu chưa trả lời"; bấm Xong gọi onXong', async () => {
+    traCau = () => ({ ok: true, cau: [], khongCo: ['on1', 'on2', 'on3'] })
+    const { onXong } = dung({ qid: ['on1', 'on2', 'on3'] })
+    await screen.findByText(/Chưa mở được câu nào/)
+    expect(screen.getAllByText(/Chưa mở được câu này/).length).toBe(3)
+    expect(screen.queryByText(/câu chưa trả lời/)).toBeNull()
+    expect(screen.queryByRole('button', { name: /^Nộp/ })).toBeNull()
+    expect(screen.getByText('Không có câu nào mở được lúc này')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Xong' }))
+    expect(onXong).toHaveBeenCalledTimes(1)
+  })
+
   it('khongCo: vẽ "Chưa mở được câu này", không đoán lý do, các câu khác vẫn làm được', async () => {
     traCau = () => ({ ok: true, cau: CAU.slice(0, 2), khongCo: ['zz'] })
     dung({ qid: ['on1', 'on2', 'zz'] })
