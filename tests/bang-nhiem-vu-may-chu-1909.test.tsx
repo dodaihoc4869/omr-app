@@ -382,3 +382,20 @@ describe('thần thú của em trên StudentPortalScreen thật (lỗi thầy b�
     mocks.lichSuCho = null
   })
 })
+
+describe('tab BTVN của học sinh nói đúng hệ LÔ (không còn "3 Vòng Phân Tầng", không "nắm chắc")', () => {
+  it('mở từ menu ba chấm: tiêu đề/banner/nhãn từng bài nói "chia lô theo ngày/giờ"', async () => {
+    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: 'test', hoTen: 'Em thử', token: 'test-token' }))
+    mocks.items = [{ maBtvn: 'BT1', maCa: 'CA1', soCau: 8, tenBtvn: 'Bài test', giaoLuc: gio(-5), hanNop: gio(48), daNop: false, soLanLamLaiConLai: 3 }]
+    mocks.momItems = []
+    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
+    const { container } = render(<StudentPortalScreen />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Mở menu' }))
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Bài tập về nhà' }))
+    expect(await screen.findByText('Cách làm bài tập về nhà: chia lô theo ngày/giờ')).toBeTruthy()
+    const chu = container.textContent!
+    expect(chu).toContain('LÔ ĐANG MỞ')
+    expect(chu).toContain('Chia lô theo ngày/giờ')
+    expect(chu).not.toMatch(/3 Vòng|Phân Tầng|VÒNG [123]|Vòng [123]|nắm chắc/i)
+  })
+})
