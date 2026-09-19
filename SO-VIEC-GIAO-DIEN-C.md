@@ -98,7 +98,36 @@ Giao bởi 0.Planer (thầy đã uỷ quyền 100%: "nghe theo điều phối, k
 - [x] TamTruotHoiBai: bọc `m3` theo `laManThi()`; nút đóng 32→48, nút chọn nhanh 40→48, bo 28 phía trên qua biến `--tam-*` (dự phòng = giá trị cũ); danh sách TheCauChiTiet đặt trong MỘT tờ giấy (nền --p-giay, mực --p-muc) vì nền tối sẽ làm chữ thừa hưởng sáng trên giấy sáng (đo ra 1,17:1); DesignSystem.NutChinh: `color: var(--nut-chu, var(--giay))` (1 dòng; ngoài `.m3` y hệt) vì --giay trắng cố định đọc kém trên primary sáng của nền tối
 - [x] laManThi() (m3/index.ts): CHỈ ?examCode= | /t/<mã> | /d/<mã> — /hs (game) KHÔNG bật; tests/m3-a2-1909.test.tsx 14 xanh, tests/m3-d2-tam-truot-1909.test.tsx 4 xanh; đột biến (bọc vô điều kiện / đổi giá trị dự phòng / thêm !important) → 3 test đỏ mỗi tệp, hoàn lại xanh
 - [x] Chromium thật sáng+tối: ô mã ca, phòng chờ (có/không lỗi), tấm hỏi bài: 0 đích chạm < 48 px; 0 chữ < 4,5 ở phần của em. CÒN 4 cặp chữ nhỏ trong TheCauChiTiet (bảng --p-* "bản giấy": --p-do/--p-xanh làm chữ nhãn "A", "em chọn", "B", "đáp án đúng", 2,3–3,8:1) — NỢ CŨ, không phải do em; đổi cần sửa token trong tokens.css (tuong-phan-mau-1009 khoá)
-- [ ] KhoiBaiLuyen (PhieuScreen/PhieuV3: trang phiếu phụ huynh, bảng --p-* + lớp bc-* của css-bao-cao.ts): cùng lý do "bản giấy" với TheCauChiTiet → ĐỀ NGHỊ để nguyên (chờ 0.Planer)
+- [x] KhoiBaiLuyen (PhieuScreen/PhieuV3: trang phiếu phụ huynh, bảng --p-* + lớp bc-* của css-bao-cao.ts): cùng lý do "bản giấy" với TheCauChiTiet → để nguyên; 0.Planer đồng ý ở lệnh giao C6/C7 ("KhoiBaiLuyen bên trong giữ giấy")
+
+## SỬA LỖI 8475176 — cổng phụ huynh (ParentPortalScreen) — 19/09 15:58
+
+- [x] (ii) tiêu đề sheet Khắc phục bị cắt ở 200 px: thanh trên bọc dòng (`flex-wrap sm:flex-nowrap`), tiêu đề `order-last basis-full` ở màn hẹp, h2 `truncate`; (i) chữ "ĐỖ ĐẠI HỌC" bị cắt mép trên ở màn đăng nhập: `paddingTop: max(10px, env(safe-area-inset-top))` — gốc là env() trả 0 trên máy không tai thỏ nên dự phòng không bao giờ được dùng. 2 test mới trong tests/m3-c9-phu-huynh-1909.test.tsx (đỏ trước, xanh sau); ảnh 360 px c9-tieu-de-khac-phuc-360-*, c9-dang-nhap-logo-360-*
+
+## C6 — KhungXemPhieu (khung toàn màn bao phiếu HTML; ExamTakeScreen + app giáo viên dùng chung) — 19/09 16:05
+
+- [x] `dungM3()` (và không phải tờ máy chiếu) → gốc `lop-xem-phieu m3`, MỘT thanh trên M3 (ThanhTren + dấu X, nút Đóng tròn 48 px aria-label "Đóng", tên phiếu), nền `--m3-surface`, iframe cũng nền surface; nút X nổi 34 px cũ chỉ vẽ khi KHÔNG M3. KHÔNG thêm dải thứ hai: vạch 48 px + tai thỏ phía trên iframe vốn đã có (padding-top của `.lop-xem-phieu`, chỗ nút X) — nay nó là thanh M3 (56 px). Quyết định "không có thanh công cụ" của thầy 04-09 (tránh HAI dải "Đóng" chồng nhau) vẫn giữ: chỉ một dải, không còn nút Đóng nào khác ngoài thanh.
+- [x] Không viền đôi với `.gd-tren` của phiếu: thanh khung không viền, không bóng; nền = cùng `surface` với `.gd-tren` (test khoá: bảng surface của m3-theme.css == --gm-surface của phiếu, sáng + tối); ranh giới duy nhất là bóng cao độ 1 của `.gd-tren`. Ảnh thật khung + phiếu: docs/anh-dong-bo-m3-1909/c6-khung-phieu-lam-bai-390-{sang,toi}.png (phiếu làm bài có `.gd-tren`), c6-khung-phieu-chi-doc-390-{sang,toi}.png (phiếu chỉ đọc, không `.gd-tren`)
+- [x] ThanhTren thêm prop tuỳ chọn `bieuTuong` (mặc định vẫn ArrowLeft) — PhongVaoThi không đổi
+- [x] Cô lập: ở đường `/` bản mới và bản HEAD ra CÙNG DOM và CÙNG SHA điểm ảnh (2 loại phiếu × sáng/tối × 390/1280 = 8/8); đối chứng âm ở đường học sinh: 4/4 KHÁC. index.css KHÔNG đổi (tests/phieu-tuong-phan-trinh-duyet dựng lại đúng luật ở đó)
+- [x] Chromium thật sáng+tối, 390 và 320 px: thanh cao 56 px, iframe bắt đầu đúng 56 px và kín tới đáy, nút Đóng 48×48 bấm được, chữ tên 16,0/14,5:1, biểu tượng 9,1/10,9:1, tên dài cắt bằng dấu ba chấm, 0 tràn ngang
+- [x] tests/m3-c6-khung-xem-phieu-1909.test.tsx 20 xanh; 14 đột biến (bỏ !isMayChieu, luôn M3, nút cũ luôn vẽ, iframe luôn nền giấy, bỏ lớp m3, đổi/bỏ biểu tượng X, đổi nhãn, thêm bóng, thanh 44 px, bỏ tai thỏ, nền thanh khác, bỏ ellipsis, thêm !important, ThanhTren bỏ qua bieuTuong) → tất cả đỏ, hoàn lại xanh; 7 tệp khoá cũ (khung-xem-phieu, bam-chon-tren-de, ly-do-chi-doc…, man-phan-cong-btvn-1209, goi-len-bang-to-chieu-cham-1909, phieu-tuong-phan-trinh-duyet, m3-a1) 117 xanh KHÔNG sửa tệp nào
+
+## C7 — PhieuScreen (trang phiếu công khai /p#<mã>, ?vai=phieu) — 19/09 16:15
+
+- [x] Phạm vi đúng lời 0.Planer: VỎ TẢI/LỖI + nút "Xem đề em/con vừa làm". Vỏ: `bc m3` khi `dungM3()` (nền surface, chữ on-surface, nút Thử lại nút chính M3 cao 48 px bo tròn — trước đây ~42 px không có min-height); mọi kích thước/màu đi qua biến `--phieu-*` có giá trị dự phòng = giá trị cũ (như MaCaInput) → ngoài M3 không đổi
+- [x] Nút "Xem đề … vừa làm": đích chạm 46 → 48 px qua `--xem-de-cao`; GIỮ bảng --p-* (không sang M3) vì nó nằm trong THẺ GIẤY của báo cáo — báo cáo rời máy thầy nên luôn giấy trắng mực đen kể cả khi máy tối; chữ primary của chế độ tối rơi lên giấy trắng là không đọc được. Vòng focus dùng --p-tim. Báo cáo, KhoiBaiLuyen, PhieuV3 KHÔNG đổi
+- [x] Ảnh: c7-phieu-cho-390-*, c7-phieu-loi-390-*, c7-phieu-loi-cho-390-*, c7-phieu-nut-xem-de-390-*, c7-phieu-mo-khung-390-* (nút → khung M3 mở ra) sáng+tối
+- [x] tests/m3-c7-phieu-screen-1909.test.tsx 10 xanh; 15 tệp đọc PhieuScreen: 247/249 xanh, 2 đỏ (tests/nop-phieu-khac-phuc: `.q-opt.lam-o[aria-checked]` — chuỗi CSS phiếu của Code 2, ĐÃ đỏ trong nền) — không sửa test nào; 14 đột biến → đỏ, hoàn lại xanh
+- [ ] LƯU Ý cho 0.Planer (không sửa vì ngoài lệnh): `.bc-nut` trong css-bao-cao.ts (nút của KhoiBaiLuyen) cao 46 px — dưới 48 nhưng đó là bản giấy đã chốt để nguyên; muốn 48 thì đổi MỘT dòng `min-height:46px`
+
+## SỬA LỖI (C7) — màn lỗi trang phiếu dính hai câu — 19/09 16:35
+
+- [x] Nguyên nhân gốc: `{loi} {huongDan}` nối bằng một dấu cách nên câu lỗi không có dấu kết ("Máy chủ trả lỗi HTTP 503", "Chưa cấu hình được máy chủ") dính vào "Link vẫn còn dùng được…" / "Phụ huynh nhắn lại…". Thêm dấu chấm khi thiếu dấu câu. tests/phieu-loi-co-dau-cham-1909.test.tsx: đỏ 2/3 trước sửa, xanh sau; đột biến "luôn thêm chấm" → đỏ 1
+
+## Kết quả vitest toàn bộ sau C6 + C7 — 19/09 16:30
+
+- [x] 102 đỏ / 46 tệp (nền c9: 100/44). Đỏ MỚI: 5 — 4 test đo giờ (de-rieng-ho-so-1909 "dưới 500 ms", de-rieng-tran-trung ×2, xep-buoi-chua-1409 "ngân sách") + goi-len-bang-to-chieu-cham-1909 "BẤM ĐÚP" — chạy RIÊNG 4 tệp đó: 107/107 xanh (máy tải khi nhiều phiên chạy vitest cùng lúc). Test của em: 0 đỏ mới. 3 test xanh lại (nhiem-vu-adapter, than-thu-v2 ×2)
 
 ## Trạng thái cuối phiên — 19/09 15:50
 
