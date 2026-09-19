@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import { hsCauSaiApi, hsLichSuCaApi } from '../lib/exam-api'
 import ModalKhacPhucCauSai from './ModalKhacPhucCauSai'
+import { dungM3 } from './m3'
 
 export interface ThongTinBaiThiHocSinh {
   maCa: string
@@ -225,7 +226,7 @@ export default function BaoCaoCaThiHocSinhModal({
     return [
       {
         ten: 'Nhận biết',
-        moTa: 'Vòng 1: Lõi Căn Bản (Bắt buộc 100%) · Lý thuyết cơ bản, công thức, khái niệm',
+        moTa: 'Lý thuyết cơ bản, công thức, khái niệm',
         dung: dungBiet,
         tong: tongBiet,
         phanTram: Math.round((dungBiet / tongBiet) * 100),
@@ -233,7 +234,7 @@ export default function BaoCaoCaThiHocSinhModal({
       },
       {
         ten: 'Thông hiểu',
-        moTa: 'Vòng 2: Trọng Tâm Cá Nhân (Bắt buộc) · Bản chất hoá học, giải thích hiện tượng, phản ứng',
+        moTa: 'Bản chất hoá học, giải thích hiện tượng, phản ứng',
         dung: dungHieu,
         tong: tongHieu,
         phanTram: Math.round((dungHieu / tongHieu) * 100),
@@ -241,7 +242,7 @@ export default function BaoCaoCaThiHocSinhModal({
       },
       {
         ten: 'Vận dụng',
-        moTa: 'Vòng 3: Thử Thách Bứt Phá (x2 EXP) · Bảo toàn e, tính toán nồng độ, este, kim loại',
+        moTa: 'Bảo toàn e, tính toán nồng độ, este, kim loại',
         dung: dungVD,
         tong: tongVD,
         phanTram: Math.round((dungVD / tongVD) * 100),
@@ -249,7 +250,7 @@ export default function BaoCaoCaThiHocSinhModal({
       },
       {
         ten: 'Vận dụng cao',
-        moTa: 'Vòng 3: Thử Thách Bứt Phá (x2 EXP) · Biện luận cấu tạo, bài toán phân hoá 9+',
+        moTa: 'Biện luận cấu tạo, bài toán phân hoá 9+',
         dung: dungVDC,
         tong: tongVDC,
         phanTram: Math.round((dungVDC / tongVDC) * 100),
@@ -259,11 +260,13 @@ export default function BaoCaoCaThiHocSinhModal({
   }, [dsCauSai])
 
   if (typeof document === 'undefined') return null
+  // Modal này còn được app giáo viên mở (HocSinhScreen, ExamMonitorScreen): CHỈ cổng học sinh / phụ huynh / màn thi mặc M3.
+  const m3 = dungM3()
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto animate-google-fade">
+    <div className={`${m3 ? 'm3 ' : ''}fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto animate-google-fade`}>
       <div className="relative w-full max-w-3xl my-auto bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden flex flex-col max-h-[92vh]">
         {/* Dải 4 màu thương hiệu Google */}
-        <div className="h-1.5 w-full flex">
+        <div className={`${m3 ? 'm3-an ' : ''}h-1.5 w-full flex`}>
           <div className="flex-1 bg-blue-500" />
           <div className="flex-1 bg-rose-500" />
           <div className="flex-1 bg-amber-400" />
@@ -353,9 +356,11 @@ export default function BaoCaoCaThiHocSinhModal({
                     onClick={() => {
                       setHienModalKhacPhuc(true)
                     }}
-                    className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-500 text-white font-bold text-sm shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    className={m3
+                      ? 'm3-nut-chinh w-full sm:w-auto cursor-pointer'
+                      : 'w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-500 text-white font-bold text-sm shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100'}
                   >
-                    <Flame className="w-4 h-4 text-amber-200 animate-pulse" />
+                    <Flame className={m3 ? 'w-4 h-4' : 'w-4 h-4 text-amber-200 animate-pulse'} />
                     <span>
                       {`KHẮC PHỤC NGAY ${soKhacPhuc} CÂU SAI`}
                     </span>
