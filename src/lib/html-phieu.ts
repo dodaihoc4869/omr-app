@@ -1308,7 +1308,7 @@ export function theCauHtml(
       : ''
 
   const bannerDimmed = laDimmed
-    ? `<div class="dimmed-pacing-banner"><span class="dimmed-lock-icon">🔒</span><span>Câu thuộc Vòng tiếp theo · Hoàn thành ${soCauSang} câu sáng hôm nay trước để đạt chỉ tiêu</span></div>`
+    ? `<div class="dimmed-pacing-banner"><span class="dimmed-lock-icon">🔒</span><span>Câu thuộc lô tiếp theo · Hoàn thành ${soCauSang} câu sáng hôm nay trước để đạt chỉ tiêu</span></div>`
     : ''
 
   const cacLop = [
@@ -2001,20 +2001,21 @@ export const JS_PHIEU = `
         }
       } catch (e4b) {}
 
-      // XONG VÒNG 1 (KIEM-TRA-VONG-2.md): mọi câu trong 'du.soCauV1' câu ĐẦU
-      // đã có đáp án — đúng lúc thanh phân tầng phía trên đổi từ "còn khoá"
-      // sang "hiện hết". Chỉ báo MỘT LẦN mỗi lần mở phiếu (biến daBaoXongVong1);
-      // báo lại giữa hai lần mở là bình thường, máy chủ tự lọc trùng.
-      var daBaoXongVong1 = false;
-      function baoXongVong1() {
-        if (daBaoXongVong1 || !du.soCauV1) return;
-        for (var iV1 = 0; iV1 < du.soCauV1; iV1++) {
+      // XONG LÔ HIỆN TẠI (thay Vòng 1/2 — lich-lo-btvn.ts): mọi câu trong
+      // 'du.soCauMocLo' câu ĐẦU đã có đáp án — đúng lúc thanh phân tầng phía
+      // trên đổi từ "còn khoá" sang "hiện hết". Chỉ báo MỘT LẦN mỗi lần mở
+      // phiếu (biến daBaoXongLo); báo lại giữa hai lần mở là bình thường, máy
+      // chủ tự lọc trùng (chỉ tăng, không lùi tiến độ).
+      var daBaoXongLo = false;
+      function baoXongLo() {
+        if (daBaoXongLo || !du.soCauMocLo) return;
+        for (var iV1 = 0; iV1 < du.soCauMocLo; iV1++) {
           if (!String(lam[du.cau[iV1].id] || '').trim()) return;
         }
-        daBaoXongVong1 = true;
+        daBaoXongLo = true;
         try {
           if (window.parent && window.parent !== window) {
-            window.parent.postMessage({ type: 'ddh-btvn-xong-vong', ma: du.ma, sbd: du.sbd, vong: 1 }, '*');
+            window.parent.postMessage({ type: 'ddh-btvn-xong-lo', ma: du.ma, sbd: du.sbd, chiSo: du.chiSoLo }, '*');
           }
         } catch (ePostV) {}
       }
@@ -2026,7 +2027,7 @@ export const JS_PHIEU = `
             window.parent.postMessage({ type: 'ddh-btvn-draft', ma: du.ma, sbd: du.sbd, lam: lam }, '*');
           }
         } catch (ePost) {}
-        baoXongVong1();
+        baoXongLo();
       }
       function soDaLam() {
         var n = 0;
@@ -2355,7 +2356,9 @@ export interface TuyChonPhieu {
   loiNhac?: string | null
   laBtvn?: boolean
   soCauSang?: number
-  vongHienTai?: number
+  /** Chỉ số lô (0-based) đang mở — đi kèm `soCauSang` để báo đúng lô nào vừa
+   * xong khi em điền đủ đáp án (xem `lich-lo-btvn.ts`). */
+  chiSoLoHienTai?: number
 }
 
 export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChonPhieu = {}): string {
@@ -2388,7 +2391,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
     ? `<div class="thanh-phan-tang-btvn" id="thanh-phan-tang-btvn">
         <div class="tpt-trai">
           <span class="tpt-sao">✨</span>
-          <span>Hôm nay em làm <b>${soCauSang}</b> câu sáng (Vòng 1 Lõi Căn Bản) · <b>${cau.length - soCauSang}</b> câu kế tiếp ẩn mờ để tránh quá tải.</span>
+          <span>Hôm nay em làm <b>${soCauSang}</b> câu sáng · <b>${cau.length - soCauSang}</b> câu còn lại mở dần theo ngày/giờ để tránh quá tải.</span>
         </div>
         <button type="button" class="tpt-nut-mo" id="nut-mo-het-cau">Hiện tất cả ${cau.length} câu</button>
       </div>`
@@ -2410,14 +2413,13 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   const ai = t.oBia && t.oBia.length > 0 ? t.oBia[0].gia : t.hoTen
   // Dữ liệu nộp đi kèm tài liệu, KHÔNG gắn vào chuỗi JS bằng nối chuỗi: đáp án
   // và mã phiếu là dữ liệu, nhét thẳng vào mã là mở đường chèn mã lạ.
-  // NGƯỠNG VÒNG 1 CỐ ĐỊNH (KIEM-TRA-VONG-2.md) — LUÔN theo công thức
-  // round(tổng câu × 0,45), KHÔNG theo `soCauSang` của màn đang mở: soCauSang
-  // đổi theo vòng đang xem (Vòng 2 mở ra là ~80%, Vòng 3 là 100%), còn ngưỡng
-  // này phải đứng yên để script nhận biết đúng "đã xong Vòng 1" ở bất kỳ màn
-  // nào trong 3 màn. Trùng công thức với `soCauV1` ở `tro-ly-ca-nhan.ts`.
-  // Bằng hoặc lớn hơn tổng số câu thì không có gì để "xong trước" — bỏ qua.
-  const soCauV1Nguong = Math.max(4, Math.round(cau.length * 0.45))
-  const soCauV1ChoNop = laBtvn && nop && soCauV1Nguong < cau.length ? soCauV1Nguong : undefined
+  // NGƯỠNG LÔ HIỆN TẠI (thay Vòng 1 — lich-lo-btvn.ts) — chính là `soCauSang`
+  // chỗ gọi đã tính (một nguồn duy nhất, không suy luận lại ở đây): với lô
+  // theo ngày/giờ, mỗi lần mở phiếu chỉ có ĐÚNG MỘT "màn" (không còn 3 màn
+  // Vòng 1/2/3 chọn lại `soCauSang` khác nhau như trước), nên không cần công
+  // thức cố định riêng nữa. Bằng hoặc lớn hơn tổng số câu thì không có gì để
+  // "xong lô trước" — bỏ qua.
+  const soCauMocLoChoNop = laBtvn && nop && typeof soCauSang === 'number' && soCauSang < cau.length ? soCauSang : undefined
   const goiNop = nop
     ? `<script type="application/json" id="du-nop">${JSON.stringify({
         ma: nop.ma,
@@ -2426,7 +2428,8 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
         url: nop.url,
         ch: chNop,
         banNhap: nop.banNhap,
-        soCauV1: soCauV1ChoNop,
+        soCauMocLo: soCauMocLoChoNop,
+        chiSoLo: tuyChon.chiSoLoHienTai,
         cau: cau.map((c) => ({ id: c.id, phan: c.phan, dapAn: c.dapAn })),
       }).replace(/</g, '\\u003c')}<\/script>`
     : ''

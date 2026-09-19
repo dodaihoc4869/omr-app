@@ -49,6 +49,7 @@ describe('BTVN Phân Tầng: Hiện Sáng / Ẩn Mờ (Paced Highlighting & Dimm
     expect(html).toContain('id="thanh-phan-tang-btvn"')
     expect(html).toContain('id="nut-mo-het-cau"')
     expect(html).toContain('Hôm nay em làm <b>8</b> câu sáng')
+    expect(html).toContain('<b>12</b> câu còn lại mở dần theo ngày/giờ')
 
     // 2. Thẻ câu 1 đến 8 phải có class q-card-active và nhãn "Mục tiêu hôm nay"
     expect(html).toContain('class="q-tag muc-tieu-hom-nay-tag"')
@@ -57,7 +58,7 @@ describe('BTVN Phân Tầng: Hiện Sáng / Ẩn Mờ (Paced Highlighting & Dimm
     // 3. Các câu từ 9 trở đi phải có class q-card-dimmed và banner khóa nhẹ trong thẻ
     expect(html).toContain('q-card-dimmed')
     expect(html).toContain('<div class="dimmed-pacing-banner">')
-    expect(html).toContain('Câu thuộc Vòng tiếp theo · Hoàn thành 8 câu sáng hôm nay trước')
+    expect(html).toContain('Câu thuộc lô tiếp theo · Hoàn thành 8 câu sáng hôm nay trước')
   })
 
   it('Khi đã nộp bài hoặc mở xem lại thì không còn câu nào bị ẩn mờ', () => {
@@ -88,7 +89,7 @@ describe('BTVN Phân Tầng: Hiện Sáng / Ẩn Mờ (Paced Highlighting & Dimm
 })
 
 describe('Thuật toán Trợ Lý Cá Nhân: Tự động rút câu và gán hành động Zero-Friction', () => {
-  it('Trợ lý phân công Vòng 1 và Vòng 2 mang đúng payload số câu và vòng', () => {
+  it('Trợ lý phân công đúng lô đang chờ, mang payload bài tập gốc để phiếu tự tính lại lịch', () => {
     const keHoach = tongHopKeHoachTroLy({
       sbd: 'HS001',
       hoTen: 'Nguyễn Văn A',
@@ -98,7 +99,9 @@ describe('Thuật toán Trợ Lý Cá Nhân: Tự động rút câu và gán hà
           tieuDe: 'Este Đơn Chức',
           soCau: 16,
           daNop: false,
+          giaoLuc: new Date().toISOString(),
           hanNop: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
+          loDaXong: 0,
         },
       ],
       dsMomGiao: [],
@@ -109,12 +112,12 @@ describe('Thuật toán Trợ Lý Cá Nhân: Tự động rút câu và gán hà
     const topTasks = keHoach.top3
     expect(topTasks.length).toBeGreaterThan(0)
 
-    const taskV1 = topTasks.find((t) => t.loai === 'btvn_vong1')
-    if (taskV1) {
-      expect(taskV1.hanhDong.loai).toBe('mo_btvn')
-      expect(taskV1.hanhDong.payload?.vong).toBe(1)
-      expect(taskV1.hanhDong.payload?.soCau).toBeGreaterThanOrEqual(4)
-      expect(taskV1.hanhDong.nhanNut).toBe('Làm Vòng 1')
+    const taskLo = topTasks.find((t) => t.loai === 'btvn_lo')
+    if (taskLo) {
+      expect(taskLo.hanhDong.loai).toBe('mo_btvn')
+      expect(taskLo.hanhDong.payload?.bt?.maBtvn).toBe('BTVN_01')
+      expect(taskLo.soCau).toBeGreaterThan(0)
+      expect(taskLo.hanhDong.nhanNut).toMatch(/^Làm Lô \d+$/)
     }
 
     const taskSai = topTasks.find((t) => t.loai === 'sua_loi_vong1')

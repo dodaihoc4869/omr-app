@@ -64,7 +64,7 @@ describe('Thuật toán Trợ lý Cá nhân AI (tro-ly-ca-nhan.ts)', () => {
     it('gắn cấp độ khẩn cấp cho deadline dưới 2 giờ', () => {
       const kq = tinhDiemUuTien({
         conLaiMs: 1.5 * 3600 * 1000,
-        loai: 'btvn_vong1',
+        loai: 'btvn_lo',
         soCau: 6,
         expThuong: 12,
       })

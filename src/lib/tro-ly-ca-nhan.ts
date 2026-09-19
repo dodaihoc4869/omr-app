@@ -1,10 +1,10 @@
 // Tổng hợp việc cần làm từ bài đã giao. Không thay đổi bộ rút câu hoặc luật chấm.
-import { chuoiNgayHoc, gioHanVietNam, hanBaiMom, mocThoiGian, ngayVietNam, tinhHanVong2 } from './han-bai-tap'
+import { chuoiNgayHoc, hanBaiMom, mocThoiGian, ngayVietNam } from './han-bai-tap'
 import { gioMayChu } from './gio-may-chu'
+import { loDangCho, tinhLichLoBtvn } from './lich-lo-btvn'
 
 export type LoaiNhiemVu =
-  | 'btvn_vong1'
-  | 'btvn_vong2'
+  | 'btvn_lo'
   | 'mom'
   | 'sua_loi_vong1'
   | 'sua_loi_vong2'
@@ -194,14 +194,11 @@ export function tinhDiemUuTien(params: {
     case 'sua_loi_vong1':
       severity = 1.0 // Bịt lỗi cốt lõi trước để không sai dây chuyền
       break
-    case 'btvn_vong1':
-      severity = 0.9 // Vòng 1 Lõi bài mới
+    case 'btvn_lo':
+      severity = 0.85 // Lô BTVN đang tới lượt (thay Vòng 1/Vòng 2)
       break
     case 'sua_loi_vong2':
       severity = 0.75
-      break
-    case 'btvn_vong2':
-      severity = 0.7
       break
     case 'thu_thach_vong3':
       severity = 0.35 // Thử thách không ép buộc
@@ -323,13 +320,15 @@ export function tongHopKeHoachTroLy(input: {
     })
   }
 
-  // B. Candidate: BTVN Thầy giao
+  // B. Candidate: BTVN Thầy giao — LÔ THEO NGÀY/GIỜ (mục 3 SO-VIEC.md 19/09,
+  // thay Vòng 1/Vòng 2). Lịch tính THUẦN từ giaoLuc/hanNop/soCau + tải các
+  // nhiệm vụ khác (`lich-lo-btvn.ts`), không lưu gì ngoài `bt.loDaXong` (số lô
+  // đã xong, máy chủ ghi qua `/btvn/xong-lo`).
   //
-  // MỖI BÀI CHỈ SINH MỘT Ô — Vòng 1 hoặc Vòng 2, không bao giờ cả hai
-  // (KIEM-TRA-VONG-2.md). Trước đây luôn sinh cả hai rồi cậy khử trùng ở dưới
-  // để giữ một ô; Vòng 1 luôn thắng nên Vòng 2 KHÔNG BAO GIỜ hiện, kể cả khi
-  // em đã xong Vòng 1 thật. Nay tách rõ theo trạng thái `bt.xongVong1Luc`
-  // (mốc máy chủ ghi khi em xong Vòng 1 — xem `server/src/index.ts` `/btvn/xong-vong`).
+  // MỖI BÀI CHỈ SINH TỐI ĐA MỘT Ô — đúng lô em đang phải làm. Lô chưa tới mốc
+  // dự kiến thì KHÔNG sinh ô nào, dù lô trước đã xong: "chỉ khi nào hoàn thành
+  // xong nhiệm vụ trước thì nhiệm vụ mới mới hiển thị" đọc đúng nghĩa là xong
+  // lô trước VÀ đúng nhịp — xong sớm không kéo lô sau hiện sớm theo.
   for (const bt of btvnChuaNop) {
     const id = bt.maBtvn || bt.maCa || 'btvn'
     let conLaiMsHanChung: number | undefined
@@ -342,85 +341,56 @@ export function tongHopKeHoachTroLy(input: {
     }
 
     if (isOverdue) continue // Máy chủ chặn BTVN quá hạn; giữ trong danh sách theo dõi.
-    const tongCauBtvn = bt.soCau || 15
-    const soCauV1 = Math.max(4, Math.round(tongCauBtvn * 0.45))
-    const soCauV2 = Math.max(3, Math.round(tongCauBtvn * 0.35))
-    const xongVong1 = Boolean(bt.xongVong1Luc)
 
-    if (!xongVong1) {
-      // CHƯA XONG VÒNG 1 — hạn vẫn là hạn chung, y hệt trước khi có tính năng này.
-      const conLaiChu = dinhDangConLai(conLaiMsHanChung)
-      const { score: scoreV1, capDo: capDoV1 } = tinhDiemUuTien({
-        conLaiMs: conLaiMsHanChung,
-        isOverdue,
-        loai: 'btvn_vong1',
-        soCau: soCauV1,
-        expThuong: soCauV1 * 2,
-      })
+    // Tải các nhiệm vụ KHÁC (không tính chính bài này) — bài này phải nhường
+    // bớt ngân sách ngày cho chúng, lô co lại tương ứng để không dồn tải.
+    const taiKhac =
+      btvnChuaNop.filter((x) => x !== bt).reduce((s, x) => s + (x.soCau || 0), 0) +
+      momChuaNop.reduce((s, m) => s + (m.soCau || 10), 0)
 
-      candidateTasks.push({
-        id: `btvn_v1_${id}`,
-        loai: 'btvn_vong1',
-        tieuDe: `${bt.tenBtvn || bt.tieuDe || 'BTVN'}: Vòng 1 (Lõi Căn Bản)`,
-        moTa: `Bắt buộc hoàn thành · ${soCauV1} câu nền tảng · ${conLaiChu}`,
-        soCau: soCauV1,
-        phutUocTinh: Math.ceil((soCauV1 * 75) / 60),
-        expThuong: soCauV1 * 2,
-        hanNop: bt.hanNop,
-        conLaiMs: conLaiMsHanChung,
-        conLaiChu,
-        capDoUuTien: capDoV1,
-        diemUuTien: scoreV1,
-        hanhDong: {
-          loai: 'mo_btvn',
-          payload: { bt, vong: 1, soCau: soCauV1 },
-          nhanNut: 'Làm Vòng 1',
-        },
-      })
-      continue
-    }
+    const lich = tinhLichLoBtvn({
+      soCau: bt.soCau || 15,
+      giaoLuc: String(bt.giaoLuc || ''),
+      hanNop: String(bt.hanNop || ''),
+      nganSachNgay: nganSach.mucTieuCau,
+      taiKhac,
+    })
+    const dangCho = loDangCho(lich, Math.max(0, Number(bt.loDaXong) || 0), now)
+    if (!dangCho || !dangCho.daToiMoc) continue // xong hết lô bắt buộc, hoặc lô kế chưa tới nhịp
 
-    // ĐÃ XONG VÒNG 1 — thay ô Vòng 1 bằng ô Vòng 2, hạn MỀM tính từ lúc xong
-    // Vòng 1 (ưu tiên `bt.hanVong2` máy chủ đã tính sẵn — `hsBtvn` trong
-    // `server/src/goi-cu.ts`; tính lại bằng `tinhHanVong2` khi thiếu, ví dụ dữ
-    // liệu cũ chưa qua máy chủ mới). Không bao giờ muộn hơn hạn chung, và hạn
-    // chung vẫn là thứ DUY NHẤT máy chủ chặn nộp — quá mốc Vòng 2 chỉ đổi chữ.
-    const hanVong2 = bt.hanVong2 || tinhHanVong2(String(bt.xongVong1Luc), String(bt.hanNop || ''))
-    const hanVong2Ms = mocThoiGian(hanVong2)
-    const conLaiMsVong2 = hanVong2Ms === undefined ? undefined : hanVong2Ms - now
-    const quaMocVong2 = conLaiMsVong2 !== undefined && conLaiMsVong2 <= 0
-    const conLaiChuVong2 = quaMocVong2 ? 'Đã quá mốc Vòng 2' : dinhDangConLai(conLaiMsVong2)
-
-    const { score: scoreV2, capDo: capDoV2 } = tinhDiemUuTien({
-      // Quá mốc Vòng 2 không phải quá hạn thật — hạn chung vẫn còn hiệu lực —
-      // nên KHÔNG truyền `conLaiMs` âm vào đây (đẩy `urgency` lên tối đa sai
-      // chỗ); giữ mức khẩn cấp trung bình bằng cách không truyền `conLaiMs`.
-      conLaiMs: quaMocVong2 ? undefined : conLaiMsVong2,
+    const conLaiChu = dinhDangConLai(conLaiMsHanChung)
+    // TRỄ NHỊP (đã qua mốc lô KẾ TIẾP mà lô này vẫn chưa xong) ⇒ ép mức khẩn
+    // cấp lên hẳn thay vì chỉ dựa hạn chung còn xa — đúng "gán nhãn khẩn cấp
+    // hơn" thầy yêu cầu khi chưa hoàn thành nhiệm vụ trước.
+    const conLaiMsChoDiem = dangCho.treNhip ? Math.min(conLaiMsHanChung ?? 2 * 3600_000, 2 * 3600_000) : conLaiMsHanChung
+    const { score, capDo } = tinhDiemUuTien({
+      conLaiMs: conLaiMsChoDiem,
       isOverdue: false,
-      loai: 'btvn_vong2',
-      soCau: soCauV2,
-      expThuong: soCauV2 * 2,
+      loai: 'btvn_lo',
+      soCau: dangCho.soCau,
+      expThuong: dangCho.soCau * 2,
     })
 
+    const tongLo = lich.cacLo.length
     candidateTasks.push({
-      id: `btvn_v2_${id}`,
-      loai: 'btvn_vong2',
-      tieuDe: `${bt.tenBtvn || bt.tieuDe || 'BTVN'}: Vòng 2 (Trọng Tâm Cá Nhân)`,
-      moTa: quaMocVong2
-        ? `Đã quá mốc Vòng 2 · vẫn nộp được trước ${gioHanVietNam(bt.hanNop)} (giờ Việt Nam)`
-        : `Luyện tiếp vòng 2 · ${soCauV2} câu trọng tâm · ${conLaiChuVong2}. Bấm Nộp bài để ghi nhận kết quả.`,
-      soCau: soCauV2,
-      phutUocTinh: Math.ceil((soCauV2 * 90) / 60),
-      expThuong: soCauV2 * 2,
-      hanNop: hanVong2,
-      conLaiMs: conLaiMsVong2,
-      conLaiChu: conLaiChuVong2,
-      capDoUuTien: capDoV2,
-      diemUuTien: scoreV2,
+      id: `btvn_lo_${id}_${dangCho.chiSo}`,
+      loai: 'btvn_lo',
+      tieuDe: `${bt.tenBtvn || bt.tieuDe || 'BTVN'}: Lô ${dangCho.chiSo + 1}/${tongLo}`,
+      moTa: dangCho.treNhip
+        ? `Đã trễ nhịp dự kiến (${lich.donViDan === 'ngay' ? 'theo ngày' : 'theo giờ'}) — làm ngay để không dồn tiếp qua lô sau · ${dangCho.soCau} câu · ${conLaiChu}`
+        : `${dangCho.soCau} câu · ${conLaiChu}`,
+      soCau: dangCho.soCau,
+      phutUocTinh: Math.ceil((dangCho.soCau * 80) / 60),
+      expThuong: dangCho.soCau * 2,
+      hanNop: bt.hanNop,
+      conLaiMs: conLaiMsHanChung,
+      conLaiChu,
+      capDoUuTien: capDo,
+      diemUuTien: score,
       hanhDong: {
         loai: 'mo_btvn',
-        payload: { bt, vong: 2, soCau: soCauV1 + soCauV2 },
-        nhanNut: 'Làm Vòng 2',
+        payload: { bt },
+        nhanNut: `Làm Lô ${dangCho.chiSo + 1}`,
       },
     })
   }
@@ -540,18 +510,21 @@ export function tongHopKeHoachTroLy(input: {
         loai: 'btvn',
       })
     } else {
-      // Đã xong Vòng 1 thì radar theo dõi hạn VÒNG 2 (mềm) — cùng thứ ô top3
-      // đang hiện; hạn CHUNG (b.hanNop) vẫn là mốc duy nhất quyết định "quá hạn"
-      // thật (tt = qua_han), quá mốc Vòng 2 mà chưa quá hạn chung chỉ là
-      // 'khan_cap' để nhắc, không đếm là quá hạn.
-      const xongVong1 = Boolean(b.xongVong1Luc)
-      const hanHienThi = xongVong1 ? (b.hanVong2 || tinhHanVong2(String(b.xongVong1Luc), String(b.hanNop || ''))) : b.hanNop
+      // Radar dùng ĐÚNG hạn CHUNG (b.hanNop) — mốc duy nhất máy chủ chặn nộp —
+      // và chỉ ghi chú thêm "trễ nhịp lô" khi lô em đang chờ đã qua mốc lô kế
+      // tiếp mà chưa xong (xem `loDangCho`, thay Vòng 1/Vòng 2).
+      const taiKhacRadar =
+        dsBtvn.filter((x) => x !== b && !x.daNop).reduce((s, x) => s + (x.soCau || 0), 0) +
+        dsMomGiao.filter((m) => m.trangThai !== 'da_nop').reduce((s, m) => s + (m.soCau || 10), 0)
+      const lichRadar = tinhLichLoBtvn({
+        soCau: b.soCau || 15,
+        giaoLuc: String(b.giaoLuc || ''),
+        hanNop: String(b.hanNop || ''),
+        nganSachNgay: nganSach.mucTieuCau,
+        taiKhac: taiKhacRadar,
+      })
+      const dangChoRadar = loDangCho(lichRadar, Math.max(0, Number(b.loDaXong) || 0), now)
 
-      let conLaiMs: number | undefined
-      if (hanHienThi) {
-        const ms = mocThoiGian(hanHienThi)
-        conLaiMs = ms === undefined ? undefined : ms - now
-      }
       let conLaiMsHanChung: number | undefined
       if (b.hanNop) {
         const msc = mocThoiGian(b.hanNop)
@@ -559,17 +532,15 @@ export function tongHopKeHoachTroLy(input: {
       }
       const quaHanChung = conLaiMsHanChung !== undefined && conLaiMsHanChung <= 0
 
-      const conLaiChu = xongVong1 && conLaiMs !== undefined && conLaiMs <= 0 && !quaHanChung
-        ? 'Đã quá mốc Vòng 2'
-        : dinhDangConLai(conLaiMs)
+      const conLaiChu = dangChoRadar?.treNhip && !quaHanChung ? 'Đã trễ nhịp lô' : dinhDangConLai(conLaiMsHanChung)
       let tt: DongRadarDeadline['trangThai'] = 'binh_thuong'
       if (quaHanChung) {
         tt = 'qua_han'
         countQuaHan++
-      } else if (conLaiMs !== undefined && conLaiMs <= 12 * 3600 * 1000) {
+      } else if (conLaiMsHanChung !== undefined && conLaiMsHanChung <= 12 * 3600 * 1000) {
         tt = 'khan_cap'
         countSapHetHan++
-      } else if (conLaiMs !== undefined && conLaiMs <= 24 * 3600 * 1000) {
+      } else if (conLaiMsHanChung !== undefined && conLaiMsHanChung <= 24 * 3600 * 1000) {
         tt = 'sap_den'
         countSapHetHan++
       }
@@ -577,7 +548,7 @@ export function tongHopKeHoachTroLy(input: {
       radarItems.push({
         id: `bt_${b.maBtvn || b.maCa}`,
         tieuDe: b.tenBtvn || b.tieuDe || 'BTVN Thầy giao',
-        hanNop: hanHienThi,
+        hanNop: b.hanNop,
         conLaiChu,
         trangThai: tt,
         loai: 'btvn',

@@ -15,14 +15,16 @@ it('nút việc cần làm giữ đúng payload và cập nhật khi tới hạn
   vi.useFakeTimers()
   vi.setSystemTime(new Date('2026-09-18T12:00:00+07:00'))
   const action = vi.fn()
-  const bt = {maBtvn:'B1',tenBtvn:'Bài luyện este',soCau:16,hanNop:'2026-09-18T12:00:15+07:00'}
+  const bt = {maBtvn:'B1',tenBtvn:'Bài luyện este',soCau:16,giaoLuc:'2026-09-18T12:00:00+07:00',hanNop:'2026-09-18T12:00:15+07:00'}
   const {container} = render(<BangTroLyHocSinh sbd="test" hoTen="An" dsBtvn={[bt]} dsMomGiao={[]} dsLichSu={[]} tongSoCauSai={3} onAction={action} />)
-  fireEvent.click(screen.getByRole('button',{name:'Làm Vòng 1'}))
-  expect(action.mock.calls[0][0].payload).toEqual({bt,vong:1,soCau:7})
+  fireEvent.click(screen.getByRole('button',{name:'Làm Lô 1'}))
+  // Thay Vòng 1/2 (mục 3 SO-VIEC.md 19/09): payload chỉ còn `bt` gốc — phiếu tự
+  // tính lại lịch lô từ đó, không còn `vong`/`soCau` cứng trong payload.
+  expect(action.mock.calls[0][0].payload).toEqual({bt})
   expect(container.textContent!.indexOf('Việc nên làm trước')).toBeLessThan(container.textContent!.indexOf('Thần Thú Hiện Hành'))
   save('hoc-sinh', container.innerHTML)
   act(() => { vi.advanceTimersByTime(15_000) })
-  expect(screen.queryByRole('button', {name:'Làm Vòng 1'})).toBeNull()
+  expect(screen.queryByRole('button', {name:'Làm Lô 1'})).toBeNull()
   expect(screen.getByText('1 bài quá hạn')).toBeDefined()
 })
 it('phụ huynh không được báo con nắm chắc kiến thức từ một điểm cao', () => {

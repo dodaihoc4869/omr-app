@@ -118,19 +118,19 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
           const k = `ddh.btvn.draft.${e.data.ma}.${e.data.sbd || ''}`
           localStorage.removeItem(k)
         } catch {}
-      } else if (e.data?.type === 'ddh-btvn-xong-vong' && e.data.ma && e.data.vong === 1) {
-        // EM VỪA XONG VÒNG 1 (KIEM-TRA-VONG-2.md) — báo máy chủ để tính hạn
-        // Vòng 2. Không chặn UI của phiếu: gọi nền, hỏng thì thôi, phiếu vẫn
-        // dùng được — lần mở tiếp theo (hoặc lần lưu đáp án tiếp theo) sẽ báo
-        // lại, và máy chủ vốn đã idempotent với việc báo lại.
+      } else if (e.data?.type === 'ddh-btvn-xong-lo' && e.data.ma && Number.isFinite(e.data.chiSo)) {
+        // EM VỪA XONG LÔ HIỆN TẠI (thay Vòng 1/2 — lich-lo-btvn.ts) — báo máy
+        // chủ để mở lô kế tiếp đúng nhịp. Không chặn UI của phiếu: gọi nền,
+        // hỏng thì thôi, phiếu vẫn dùng được — lần mở tiếp theo (hoặc lần lưu
+        // đáp án tiếp theo) sẽ báo lại, máy chủ vốn đã idempotent (chỉ tăng).
         void (async () => {
           try {
-            const [{ layCauHinhChoEmBtvn }, { xongVongBtvn }] = await Promise.all([
+            const [{ layCauHinhChoEmBtvn }, { xongLoBtvn }] = await Promise.all([
               import('../lib/btvn-cho-em'),
               import('../lib/btvn-may-chu-moi'),
             ])
             const ch = await layCauHinhChoEmBtvn()
-            await xongVongBtvn(ch, { maBtvn: String(e.data.ma), sbd: String(e.data.sbd || ''), vong: 1 })
+            await xongLoBtvn(ch, { maBtvn: String(e.data.ma), sbd: String(e.data.sbd || ''), chiSo: Number(e.data.chiSo) })
           } catch {}
         })()
       }

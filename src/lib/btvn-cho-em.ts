@@ -8,6 +8,7 @@
 // em nhìn thấy đúng một kiểu trang, và để không đẻ thêm một bộ dựng thứ hai.
 import type { CauHinhMayChu } from './cau-hinh-may-chu'
 import { layCauHinhMayChu, xongNapDiaChi } from './may-chu-moi'
+import { loDangCho, tinhLichLoBtvn, tongCauDenLo } from './lich-lo-btvn'
 
 /** Cấu hình máy chủ cho đường BTVN của em. Dùng chung đường máy em vẫn tự tìm
  * địa chỉ (xem `layCauHinhChoEm`), nên máy nào mở link cũng chạy. */
@@ -40,16 +41,19 @@ export async function layCauHinhChoEmBtvn(): Promise<CauHinhMayChu> {
 export async function dungPhieuBtvn(
   r: {
     hanNop?: string
+    giaoLuc?: string
     soCau?: number
     de?: unknown
     daNop?: boolean
     maBtvn?: string
     soLanLam?: number
     soLanLamLaiConLai?: number
+    /** Số lô đã xong — máy chủ ghi qua `/btvn/xong-lo` (xem `lich-lo-btvn.ts`). */
+    loDaXong?: number
   },
   maCa: string,
   sbd: string,
-  tuyChon?: { lamLai?: boolean; soCauSang?: number; vong?: number },
+  tuyChon?: { lamLai?: boolean; soCauSang?: number },
 ): Promise<string> {
   const [{ dungPhieu }, { parseKhoDeJson, buildTeacherSourceFromKhoDe }, { cauLuyenTuNguon }, { layCauHinhChoEmBtvn: layCh }] = await Promise.all([
     import('./html-phieu'),
@@ -87,6 +91,21 @@ export async function dungPhieuBtvn(
     } catch {}
   }
 
+  // LỊCH LÔ (thay Vòng 1/2/3 — mục 3 SO-VIEC.md 19/09): tính lại ngay tại đây
+  // từ giaoLuc/hanNop/soCau + `loDaXong` máy chủ đã ghi, MỘT nguồn duy nhất
+  // cho mọi màn mở phiếu (trợ lý bảng tin lẫn tab "Bài tập" bấm thẳng) — không
+  // còn 3 màn Vòng 1/2/3 chọn `soCauSang` khác nhau nên không cần công thức cố
+  // định riêng cho auto-detect nữa (xem NGƯỠNG LÔ HIỆN TẠI ở html-phieu.ts).
+  // Ngân sách ngày dùng mặc định "vừa sức" (12 câu) vì hàm này không thấy được
+  // các nhiệm vụ KHÁC của em — trợ lý bảng tin (`tro-ly-ca-nhan.ts`) mới có đủ
+  // ngữ cảnh đó; lệch nhau ở đây chỉ ảnh hưởng NHỊP hiện câu, không ảnh hưởng
+  // hạn nộp thật (máy chủ vẫn chặn theo `hanNop`).
+  const lich = tinhLichLoBtvn({ soCau: cau.length, giaoLuc: String(r.giaoLuc ?? ''), hanNop: han, nganSachNgay: 12, taiKhac: 0 })
+  const dangCho = loDangCho(lich, Math.max(0, Number(r.loDaXong) || 0), Date.now())
+  const soCauSangMacDinh = r.daNop ? cau.length : dangCho ? tongCauDenLo(lich, dangCho.chiSo) : cau.length
+  const soCauSang = typeof tuyChon?.soCauSang === 'number' ? tuyChon.soCauSang : soCauSangMacDinh
+  const tongLo = lich.cacLo.length
+
   return dungPhieu(
     {
       hoTen: '',
@@ -106,24 +125,16 @@ export async function dungPhieuBtvn(
     cau,
     {
       laBtvn: true,
-      soCauSang: typeof tuyChon?.soCauSang === 'number'
-        ? tuyChon.soCauSang
-        : r.daNop
-        ? cau.length
-        : tuyChon?.vong === 2
-        ? Math.max(6, Math.round(cau.length * 0.8))
-        : tuyChon?.vong === 3
-        ? cau.length
-        : Math.max(4, Math.round(cau.length * 0.45)),
-      vongHienTai: tuyChon?.vong ?? 1,
+      soCauSang,
+      chiSoLoHienTai: dangCho?.chiSo,
       // Đã nộp rồi thì mở thành phiếu CHỈ ĐỌC kèm lời giải — em xem lại bài,
       // không nộp thêm lần nữa.
       nop: r.daNop || !maBtvn ? null : { ma: maBtvn, sbd, banNhap, legacyIds:cau.map(c=>doc.json!.ma_de+(c.id.match(/-(III|II|I)-\d+$/)?.[0]||'')), url: `${String(ch.URL ?? '').replace(/\/+$/, '')}/goi` },
       loiNhac: r.daNop
-        ? `Em đã nộp bài này rồi — đây là bản xem lại theo mô hình 3 Vòng Phân Tầng, bấm vào từng câu để mở lời giải.${conLai > 0 ? ` Thầy cho phép làm lại tối đa 3 lần (còn ${conLai} lượt).` : ' (Đã hết 3 lượt làm lại)'}`
+        ? `Em đã nộp bài này rồi — đây là bản xem lại, bấm vào từng câu để mở lời giải.${conLai > 0 ? ` Thầy cho phép làm lại tối đa 3 lần (còn ${conLai} lượt).` : ' (Đã hết 3 lượt làm lại)'}`
         : laLamLai
-        ? `Bài tập về nhà (3 Vòng Phân Tầng · Làm lại lần ${lanLamHienTai - 1} · còn ${conLai} lượt) · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Hoàn thành Vòng 1 (Lõi Căn Bản) + Vòng 2 (Trọng Tâm Cá Nhân) là đạt 100% yêu cầu; Vòng 3 (Thử Thách) thưởng x2 EXP Thần Thú. Làm xong bấm Nộp bài ở thanh trên.`
-        : `Bài tập về nhà (3 Vòng Phân Tầng) · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Hoàn thành Vòng 1 (Lõi Căn Bản) + Vòng 2 (Trọng Tâm Cá Nhân) là đạt 100% yêu cầu; Vòng 3 (Thử Thách) thưởng x2 EXP Thần Thú. Làm xong bấm Nộp bài ở thanh trên.`,
+        ? `Bài tập về nhà (Làm lại lần ${lanLamHienTai - 1} · còn ${conLai} lượt) · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Hôm nay làm ${soCauSang} câu${tongLo > 1 ? ` (lô ${(dangCho?.chiSo ?? 0) + 1}/${tongLo})` : ''}; câu còn lại mở dần theo ngày/giờ, không dồn hết một lúc. Làm xong bấm Nộp bài ở thanh trên.`
+        : `Bài tập về nhà · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Hôm nay làm ${soCauSang} câu${tongLo > 1 ? ` (lô ${(dangCho?.chiSo ?? 0) + 1}/${tongLo})` : ''}; câu còn lại mở dần theo ngày/giờ, không dồn hết một lúc. Làm xong bấm Nộp bài ở thanh trên.`,
     },
   )
 }

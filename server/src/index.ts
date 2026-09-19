@@ -1592,6 +1592,9 @@ async function btvnCuaEm(env: Env, b: Record<string, unknown>): Promise<Response
     soLanLam,
     soLanLamLaiConLai,
     duocLamLai: soLanLamLaiConLai > 0,
+    // Cột mới (migration-1909-lo-btvn.sql) — `SELECT *` nên chưa chạy migration
+    // thì trường này đơn giản là `undefined`, không làm lỗi cả truy vấn.
+    loDaXong: Number(em.lo_da_xong) || 0,
     de: goi,
   })
 }
@@ -1607,27 +1610,36 @@ async function nopBtvn(env: Env, b: Record<string, unknown>): Promise<Response> 
   return ra(await G.nopBtvnQuaPhieu(env,bt,sbd,(b.dapAn||{}) as Record<string,unknown>))
 }
 
-/** EM BÁO XONG MỘT VÒNG BTVN (KIEM-TRA-VONG-2.md). Đường công khai, như /btvn/nop.
+/** EM BÁO XONG MỘT LÔ BTVN (thay Vòng 1/2 — mục 3 SO-VIEC.md 19/09, lịch lô
+ * tính thuần ở `src/lib/lich-lo-btvn.ts`). Đường công khai, như `/btvn/nop`.
  *
- * CHỈ GHI MỐC LẦN ĐẦU — `COALESCE(xong_vong1_luc, ?)` giữ giá trị cũ nếu đã có.
- * Gọi lại bao nhiêu lần (mất mạng, em mở lại phiếu) cũng ra đúng MỘT mốc, và
- * mốc luôn là giờ MÁY CHỦ, không tin giờ máy em gửi lên. */
-async function xongVongBtvn(env: Env, b: Record<string, unknown>): Promise<Response> {
+ * CHỈ TĂNG, KHÔNG BAO GIỜ GIẢM — `MAX(lo_da_xong, ?)`. Gọi lại nhiều lần (mất
+ * mạng, em mở lại phiếu, báo trùng giữa hai lô) vẫn ra đúng một tiến độ thật,
+ * không bao giờ lùi lại lô đã qua. */
+async function xongLoBtvn(env: Env, b: Record<string, unknown>): Promise<Response> {
   const maBtvn = String(b.maBtvn ?? '').trim()
   const sbd = String(b.sbd ?? '').trim()
-  const vong = Number(b.vong) || 0
-  if (!maBtvn || !sbd || vong !== 1) return ra({ ok: false, error: 'Thiếu dữ liệu' })
+  const chiSo = Number(b.chiSo)
+  if (!maBtvn || !sbd || !Number.isFinite(chiSo) || chiSo < 0) return ra({ ok: false, error: 'Thiếu dữ liệu' })
 
-  const luc = new Date().toISOString()
-  const r = await env.DB.prepare(
-    `UPDATE btvn_em SET xong_vong1_luc = COALESCE(xong_vong1_luc, ?) WHERE khoa = ?`,
-  ).bind(luc, `${maBtvn}|${sbd}`).run()
+  const loDaXongMoi = Math.floor(chiSo) + 1
+  let r: { meta: { changes: number } }
+  try {
+    r = await env.DB.prepare(
+      `UPDATE btvn_em SET lo_da_xong = MAX(lo_da_xong, ?) WHERE khoa = ?`,
+    ).bind(loDaXongMoi, `${maBtvn}|${sbd}`).run()
+  } catch {
+    // Cột `lo_da_xong` chưa có (chưa chạy migration-1909-lo-btvn.sql) — báo rõ
+    // thay vì để lỗi SQL vô nghĩa lọt ra ngoài; máy em vẫn dùng phiếu bình
+    // thường, chỉ là tiến độ lô chưa lưu được tới khi thầy chạy migration.
+    return ra({ ok: false, error: 'Máy chủ chưa cập nhật cột tiến độ lô (thầy cần chạy migration-1909-lo-btvn.sql).' })
+  }
   if (r.meta.changes === 0) return ra({ ok: false, error: 'Em không có bài tập này.' })
 
-  const em = await env.DB.prepare('SELECT xong_vong1_luc FROM btvn_em WHERE khoa=?')
+  const em = await env.DB.prepare('SELECT lo_da_xong FROM btvn_em WHERE khoa=?')
     .bind(`${maBtvn}|${sbd}`)
-    .first<{ xong_vong1_luc: string }>()
-  return ra({ ok: true, xongVong1Luc: String(em?.xong_vong1_luc ?? luc) })
+    .first<{ lo_da_xong: number }>()
+  return ra({ ok: true, loDaXong: Number(em?.lo_da_xong ?? loDaXongMoi) })
 }
 
 async function xemBaiBtvn(env:Env,b:Record<string,unknown>):Promise<Response>{
@@ -1656,7 +1668,7 @@ async function suaBtvn(env:Env,b:Record<string,unknown>):Promise<Response> {
    }
    await env.DB.batch([
      env.DB.prepare('INSERT INTO btvn_em_lich_su(id,khoa,luu_luc,hanh_dong,du_lieu) VALUES(?,?,?,?,?)').bind(crypto.randomUUID(),khoa,new Date().toISOString(),String(b.hanhDong),JSON.stringify(em)),
-     b.hanhDong==='thu-hoi'?env.DB.prepare('UPDATE btvn_em SET thu_hoi=1 WHERE khoa=?').bind(khoa):env.DB.prepare('UPDATE btvn_em SET thu_hoi=0,nop_luc=NULL,so_dung=NULL,so_cau=NULL,dap_an_json=NULL,so_lan_lam=1,xong_vong1_luc=NULL WHERE khoa=?').bind(khoa)
+     b.hanhDong==='thu-hoi'?env.DB.prepare('UPDATE btvn_em SET thu_hoi=1 WHERE khoa=?').bind(khoa):env.DB.prepare('UPDATE btvn_em SET thu_hoi=0,nop_luc=NULL,so_dung=NULL,so_cau=NULL,dap_an_json=NULL,so_lan_lam=1,xong_vong1_luc=NULL,lo_da_xong=0 WHERE khoa=?').bind(khoa)
    ])
    return ra({ok:true})
  }
@@ -2783,7 +2795,7 @@ export default {
       if (p === '/goi') return goiCu(req, env, b)
       if (p === '/btvn/cua-em') return btvnCuaEm(env, b)
       if (p === '/btvn/nop') return nopBtvn(env, b)
-      if (p === '/btvn/xong-vong') return xongVongBtvn(env, b)
+      if (p === '/btvn/xong-lo') return xongLoBtvn(env, b)
 
       // Lệnh của THẦY — đòi mã bí mật.
       if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)

@@ -24,12 +24,15 @@ describe('Hạn bài và ngày học Việt Nam', () => {
     expect(p.top3.some(t => t.hanhDong.loai === 'mo_btvn')).toBe(false)
   })
   it('bài gần hạn đứng trước và không lặp cùng bài ở hai ô', () => {
-    const p = plan({ dsBtvn:[{maBtvn:'later',soCau:16,hanNop:new Date(now+23*3600_000).toISOString()}, {maBtvn:'soon',soCau:16,hanNop:new Date(now+3600_000).toISOString()}], tongCauSai:20 })
+    const p = plan({ dsBtvn:[{maBtvn:'later',soCau:16,giaoLuc:new Date(now).toISOString(),hanNop:new Date(now+23*3600_000).toISOString()}, {maBtvn:'soon',soCau:16,giaoLuc:new Date(now).toISOString(),hanNop:new Date(now+3600_000).toISOString()}], tongCauSai:20 })
     expect(p.top3[0].hanhDong.payload?.bt.maBtvn).toBe('soon')
     const ids = p.top3.filter(t => t.hanhDong.loai === 'mo_btvn').map(t => t.hanhDong.payload?.bt.maBtvn)
     expect(new Set(ids).size).toBe(ids.length)
-    expect(p.top3[0].hanhDong.payload?.soCau).toBe(7)
-    expect(p.top3[0].hanhDong.payload?.vong).toBe(1)
+    // Không còn payload.soCau/vong (thay Vòng 1/2 — mục 3 SO-VIEC.md 19/09):
+    // số câu của LÔ đang chờ nay là trường `soCau` cấp cao nhất của nhiệm vụ,
+    // và phiếu tự tính lại lịch lô từ `bt` gốc trong payload.
+    expect(p.top3[0].soCau).toBeGreaterThan(0)
+    expect(p.top3[0].hanhDong.nhanNut).toMatch(/^Làm Lô \d+$/)
   })
   it('hạn sai định dạng không bị coi là sát hạn', () => {
     expect(mocThoiGian('khong-hop-le')).toBeUndefined()
