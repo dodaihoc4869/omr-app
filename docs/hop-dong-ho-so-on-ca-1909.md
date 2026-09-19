@@ -148,6 +148,13 @@ Test gợi ý (SQLite thật qua `tests/_d1-that.ts`): (a) em sai 4 câu ca trư
 (d) `lam` đúng cửa sổ 7 ngày, đủ 8 nguồn, mới nhất trước; (e) `dsSbd` 21 em ⇒ `ok:false`; (f) thiếu bảng ⇒ `ok:false`, không ném lỗi;
 (g) đếm truy vấn ≤ 3; (h) `soCa = 3` ⇒ hợp 3 ca gần nhất em có nộp; (i) `banDoSaiCa` giữ nguyên phản hồi.
 
+## 5b. Cập nhật 19/09 chiều — máy thầy gọi thêm MỘT lượt cho em vắng (máy chủ KHÔNG phải đổi gì)
+
+Từ bản "lượt hai" (em cùng lớp chưa vào phòng chờ được chuẩn bị đề sẵn), mỗi lần thầy bấm Bắt đầu máy thầy gọi `hoSoOnCa` thêm một lượt
+cho danh sách em vắng — cùng `maCa`, `ngayCa`, `soCa`, vẫn chia lô ≤ 20, chạy SONG SONG với các lô của em có mặt. Lớp 40 em (25 có mặt)
+= 3 lệnh (20 + 5 + 15) thay vì 2. Lượt của em vắng hỏng thì chỉ em vắng rút theo luật cũ. Ghi chú lệch đã biết của máy chủ so với gợi ý ở mục 5:
+cột giờ mở ca là `ca.bat_dau` (không phải `mo_luc`) — khuôn phản hồi giữ đúng hợp đồng.
+
 ## 6. Ai làm gì
 
 | Việc | Ai | Ghi chú |
