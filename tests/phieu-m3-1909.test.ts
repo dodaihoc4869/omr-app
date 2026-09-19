@@ -377,44 +377,196 @@ describe('mã lệnh trang trí: tiến độ, khích lệ, lưới số câu (c
 })
 
 // ─────────────────────────── 7. LUỒNG NỘP: CÓ VÀ KHÔNG CÓ MÃ LỆNH M3 PHẢI Y HỆT ───────────────────────────
-describe('luồng nộp không đổi một bước khi có mã lệnh M3', () => {
+// Có mã lệnh M3 thì lời hỏi "Còn N câu chưa làm…" hiện bằng HỘP M3 thay vì window.confirm; mọi thứ sau đó phải như cũ.
+describe('luồng nộp không đổi một bước khi có mã lệnh M3 (hộp xác nhận M3 = window.confirm)', () => {
   const KQ = { ok: true, soDung: 1, soCau: 3, lanThu: 1, qidSai: ['q2', 'q3'] }
-  async function chayNop(html: string) {
+  const LOI_HOI = 'Còn 2 câu chưa làm, mấy câu đó tính là sai. Nộp luôn?'
+  type Cach = 'ok' | 'huy' | 'esc'
+  function dung(html: string, confirmTraVe = true) {
     moPhieu(html)
-    const confirm = vi.fn(() => true)
+    const confirm = vi.fn(() => confirmTraVe)
     window.confirm = confirm as unknown as typeof window.confirm
     const gui = vi.fn(async () => ({ json: async () => KQ }) as unknown as Response)
     globalThis.fetch = gui as unknown as typeof fetch
-    const su: string[] = []
+    return { confirm, gui }
+  }
+  const hop = () => document.querySelector<HTMLElement>('.gd-hop')
+  const chup = (confirm: ReturnType<typeof vi.fn>, gui: ReturnType<typeof vi.fn>) => ({
+    confirm: confirm.mock.calls,
+    fetch: gui.mock.calls.map((c) => [c[0], (c[1] as RequestInit).method, (c[1] as RequestInit).headers, (c[1] as RequestInit).body]),
+    nut: $('#nut-nop').textContent,
+    nutTat: ($('#nut-nop') as HTMLButtonElement).disabled,
+    ket: $('#nop-ket').textContent,
+    lopBody: document.body.className,
+    dem: $('#nop-dem').textContent,
+    sai: [...document.querySelectorAll('.q-card.cau-sai')].map((e) => e.getAttribute('data-qid')),
+    dung: [...document.querySelectorAll('.q-card.cau-dung')].map((e) => e.getAttribute('data-qid')),
+  })
+  /** Bấm Nộp khi còn câu trống. `cach` là cách người dùng trả lời hộp (hoặc confirm). */
+  async function chayNop(html: string, cach: Cach = 'ok') {
+    const { confirm, gui } = dung(html)
     chonI('q1', 2)
-    $('#nut-nop').addEventListener('click', () => su.push('click-nop'))
     $('#nut-nop').click()
-    await vi.waitFor(() => expect($('#nut-nop').textContent).toBe('Làm lại'))
-    return {
-      confirm: confirm.mock.calls,
-      fetch: gui.mock.calls.map((c) => [c[0], (c[1] as RequestInit).method, (c[1] as RequestInit).headers, (c[1] as RequestInit).body]),
-      nut: $('#nut-nop').textContent,
-      nutTat: ($('#nut-nop') as HTMLButtonElement).disabled,
-      ket: $('#nop-ket').textContent,
-      lopBody: document.body.className,
-      dem: $('#nop-dem').textContent,
-      sai: [...document.querySelectorAll('.q-card.cau-sai')].map((e) => e.getAttribute('data-qid')),
-      dung: [...document.querySelectorAll('.q-card.cau-dung')].map((e) => e.getAttribute('data-qid')),
-      su,
+    await cho()
+    const h = hop()
+    const hoi = h ? h.querySelector('.gd-hop-nd')!.textContent : null
+    if (h) {
+      if (cach === 'ok') h.querySelector<HTMLElement>('.gd-hop-ok')!.click()
+      else if (cach === 'huy') h.querySelector<HTMLElement>('.gd-hop-huy')!.click()
+      else if (cach === 'esc') document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
     }
+    if (cach === 'ok') await vi.waitFor(() => expect($('#nut-nop').textContent).toBe('Làm lại'))
+    else await cho()
+    return { ...chup(confirm, gui), hoi }
   }
   const day = dungPhieu(TT, CAU, { nop: NOP })
   const khongM3 = day.replace(`<script>${JS_PHIEU_M3}</script>`, '')
 
-  it('bỏ mã lệnh M3 đi thì mọi thứ máy chủ và người dùng thấy vẫn y hệt: confirm, fetch, nút, kết quả, lớp thẻ', async () => {
+  it('bỏ mã lệnh M3 đi thì mọi thứ máy chủ và người dùng thấy vẫn y hệt; chỉ khác chỗ hỏi: hộp M3 thay confirm, CÙNG chuỗi', async () => {
     expect(khongM3).not.toContain(JS_PHIEU_M3)
     const a = await chayNop(khongM3)
     const b = await chayNop(day)
-    expect(b).toEqual(a)
-    expect(a.confirm).toEqual([['Còn 2 câu chưa làm, mấy câu đó tính là sai. Nộp luôn?']])
+    // bản cũ: hỏi bằng window.confirm; bản M3: hỏi bằng hộp, KHÔNG gọi window.confirm
+    expect(a.confirm).toEqual([[LOI_HOI]])
+    expect(a.hoi).toBeNull()
+    expect(b.confirm).toEqual([])
+    expect(b.hoi).toBe(LOI_HOI)
+    // còn lại y hệt: dữ liệu gửi, nút, kết quả, lớp thẻ
+    expect({ ...b, confirm: null, hoi: null }).toEqual({ ...a, confirm: null, hoi: null })
     expect(a.fetch.length).toBe(1)
     expect(JSON.parse(a.fetch[0][3] as string)).toEqual({ action: 'nopKhacPhuc', ma: NOP.ma, sbd: NOP.sbd, dapAn: { q1: 'C' } })
     expect(a.lopBody).not.toContain('chua-nop')
+  })
+
+  it('Huỷ / Esc = như bấm Huỷ ở confirm: không gửi gì, nút Nộp còn nguyên, bấm lại vẫn hỏi lại', async () => {
+    for (const cach of ['huy', 'esc'] as const) {
+      const { confirm, gui } = dung(day)
+      chonI('q1', 2)
+      $('#nut-nop').click()
+      await cho()
+      const h = hop()!
+      expect(h).not.toBeNull()
+      if (cach === 'huy') h.querySelector<HTMLElement>('.gd-hop-huy')!.click()
+      else document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+      await cho()
+      expect(hop(), cach).toBeNull()
+      expect(gui, cach).not.toHaveBeenCalled()
+      expect(confirm, cach).not.toHaveBeenCalled()
+      expect($('#nut-nop').textContent, cach).toBe('Nộp bài')
+      expect(($('#nut-nop') as HTMLButtonElement).disabled, cach).toBe(false)
+      expect(document.activeElement, cach).toBe($('#nut-nop'))
+      expect(document.querySelectorAll('[inert]').length, cach).toBe(0)
+      // bấm lại: hỏi lại được
+      $('#nut-nop').click()
+      await cho()
+      expect(hop(), cach).not.toBeNull()
+    }
+  })
+
+  it('bấm vào nền mờ KHÔNG đóng hộp và không gửi gì (bấm đúp Nộp thì cú thứ hai rơi trúng nền)', async () => {
+    const { confirm, gui } = dung(day)
+    chonI('q1', 2)
+    $('#nut-nop').click()
+    await cho()
+    document.querySelector<HTMLElement>('.gd-hop-nen')!.click()
+    await cho()
+    expect(hop()).not.toBeNull()
+    expect(gui).not.toHaveBeenCalled()
+    expect(confirm).not.toHaveBeenCalled()
+  })
+
+  it('bấm Nộp liên tục khi hộp đang mở: chỉ một hộp, chỉ MỘT lần gửi sau khi đồng ý', async () => {
+    const { confirm, gui } = dung(day)
+    chonI('q1', 2)
+    const nut = $('#nut-nop')
+    nut.click()
+    await cho()
+    nut.click()
+    nut.click()
+    await cho()
+    expect(document.querySelectorAll('.gd-hop').length).toBe(1)
+    expect(gui).not.toHaveBeenCalled()
+    expect(nut.textContent).toBe('Nộp bài')
+    hop()!.querySelector<HTMLElement>('.gd-hop-ok')!.click()
+    nut.click() // bấm thêm ngay sau khi đồng ý (nút đã "Đang nộp…"/khoá)
+    await vi.waitFor(() => expect(nut.textContent).toBe('Làm lại'))
+    expect(gui).toHaveBeenCalledTimes(1)
+    expect(confirm).not.toHaveBeenCalled()
+  })
+
+  it('đủ câu (không còn câu trống): không hỏi gì cả, nộp thẳng như bản cũ', async () => {
+    const { confirm, gui } = dung(day)
+    chonI('q1', 2)
+    for (const [y, c] of [['a', 'D'], ['b', 'S'], ['c', 'D'], ['d', 'S']] as const) chonYD('q2', y, c)
+    gõ('q3', '12,5')
+    $('#nut-nop').click()
+    await vi.waitFor(() => expect($('#nut-nop').textContent).toBe('Làm lại'))
+    expect(hop()).toBeNull()
+    expect(confirm).not.toHaveBeenCalled()
+    expect(gui).toHaveBeenCalledTimes(1)
+  })
+
+  it('thầy bật CAN_LAM_HET_MOI_NOP: vẫn chặn bằng dòng báo lỗi cũ, không hộp, không gửi', async () => {
+    const chat = dungPhieu(TT, CAU, { nop: { ...NOP, cauHinh: { CAN_LAM_HET_MOI_NOP: true } } })
+    const { confirm, gui } = dung(chat)
+    chonI('q1', 2)
+    $('#nut-nop').click()
+    await cho()
+    expect(hop()).toBeNull()
+    expect($('#nop-loi').textContent).toBe('Còn 2 câu chưa làm.')
+    expect(confirm).not.toHaveBeenCalled()
+    expect(gui).not.toHaveBeenCalled()
+  })
+
+  it('không dựng được hộp → hỏi bằng window.confirm gốc, đúng chuỗi cũ: đồng ý thì nộp, huỷ thì thôi', async () => {
+    for (const dongY of [true, false]) {
+      const { confirm, gui } = dung(day, dongY)
+      chonI('q1', 2)
+      vi.spyOn(document.body, 'appendChild').mockImplementationOnce(() => { throw new Error('không dựng được') })
+      $('#nut-nop').click()
+      await cho()
+      expect(hop()).toBeNull()
+      expect(confirm.mock.calls).toEqual([[LOI_HOI]])
+      if (dongY) {
+        await vi.waitFor(() => expect($('#nut-nop').textContent).toBe('Làm lại'))
+        expect(gui).toHaveBeenCalledTimes(1)
+      } else {
+        expect(gui).not.toHaveBeenCalled()
+        expect($('#nut-nop').textContent).toBe('Nộp bài')
+      }
+      vi.restoreAllMocks()
+    }
+  })
+
+  it('hộp đúng vai trò trợ năng: alertdialog, aria-modal, có tiêu đề + mô tả, tiêu điểm ở "Xem lại", Tab xoay vòng trong hộp, nền bị inert', async () => {
+    dung(day)
+    chonI('q1', 2)
+    $('#nut-nop').click()
+    await cho()
+    const h = hop()!
+    expect(h.getAttribute('role')).toBe('alertdialog')
+    expect(h.getAttribute('aria-modal')).toBe('true')
+    expect(document.getElementById(h.getAttribute('aria-labelledby')!)!.textContent).toBe('Nộp bài?')
+    expect(document.getElementById(h.getAttribute('aria-describedby')!)!.textContent).toBe(LOI_HOI)
+    const huy = h.querySelector<HTMLElement>('.gd-hop-huy')!
+    const ok = h.querySelector<HTMLElement>('.gd-hop-ok')!
+    expect(document.activeElement).toBe(huy)
+    ok.focus()
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true }))
+    expect(document.activeElement).toBe(huy)
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true }))
+    expect(document.activeElement).toBe(ok)
+    for (const sel of ['.khung', '#gd-tren', '#thanh-nop']) expect(document.querySelector(sel)!.hasAttribute('inert'), sel).toBe(true)
+  })
+
+  it('bấm Nộp chỉ ghi đè window.confirm trong đúng một lượt bấm, rồi trả lại nguyên vẹn', async () => {
+    const { confirm } = dung(day)
+    const truoc = window.confirm
+    chonI('q1', 2)
+    $('#nut-nop').click()
+    await cho()
+    expect(window.confirm).toBe(truoc)
+    expect(window.confirm).toBe(confirm)
   })
 
   it('sau nộp, thanh đáy đọc kết quả từ #nop-ket (bỏ dấu chấm giữa đầu dòng)', async () => {
@@ -424,10 +576,10 @@ describe('luồng nộp không đổi một bước khi có mã lệnh M3', () =
     expect($('#gd-con').classList.contains('ket')).toBe(true)
   })
 
-  it('mã lệnh M3 hỏng giữa chừng không làm hỏng phiếu: chặn hết lỗi, luồng nộp vẫn chạy', async () => {
-    // giả mã lệnh M3 nổ ngay dòng đầu: bọc try/catch nên phần còn lại của trang chạy tiếp
+  it('mã lệnh M3 hỏng giữa chừng không làm hỏng phiếu: chặn hết lỗi, luồng nộp cũ vẫn chạy bằng window.confirm', async () => {
     const hong = day.replace(`<script>${JS_PHIEU_M3}</script>`, '<script>(function(){ try { null.x } catch (e) {} })();</script>')
     const kq = await chayNop(hong)
     expect(kq.nut).toBe('Làm lại')
+    expect(kq.confirm).toEqual([[LOI_HOI]])
   })
 })
