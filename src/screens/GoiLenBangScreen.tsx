@@ -42,6 +42,7 @@ import { baiLamCoGiayTuCa } from '../lib/du-lieu-len-bang'
 import { CAU_HINH_LEN_BANG_MAC_DINH, TEN_LANE, dongHo, nganSachGiay } from '../lib/len-bang-cau-hinh'
 import { dungDoKho, vapCuaLop } from '../lib/do-kho-cau'
 import { doiEmChoDong, xepGioLenBang, type KetQuaXep } from '../lib/xep-gio-len-bang'
+import { noiDungTuCauGoc } from '../lib/thoi-gian-len-bang'
 import { xepBuoiChua, bangChuBuoiChua, type CauVaoXep, type DongChua, type KetQuaBuoiChua } from '../lib/xep-buoi-chua'
 import { btvnCuaCau, napHoSoLop, type HoSoEmDayDu, type KetQuaBtvn } from '../lib/ho-so-lop'
 import { dungGiaoAn } from '../lib/giao-an-len-bang'
@@ -749,13 +750,18 @@ export default function GoiLenBangScreen() {
   /** CÂU ĐƯA VÀO THUẬT TOÁN MỚI — gộp độ khó đo được với sao trong kho. */
   const cauVaoXep = useMemo<CauVaoXep[]>(
     () =>
-      doKhoCau.map((d) => ({
-        cau: d.cau,
-        tiLeDung: d.n1 && d.n1.n > 0 ? (d.n1.n - d.n1.sai) / d.n1.n : null,
-        soEmLam: d.n1?.n ?? 0,
-        batBuoc: d.batBuoc && !boBatBuoc.includes(d.cau.id),
-      })),
-    [doKhoCau, boBatBuoc],
+      doKhoCau.map((d) => {
+        const goc = traCau.get(d.cau.id)
+        return {
+          cau: d.cau,
+          tiLeDung: d.n1 && d.n1.n > 0 ? (d.n1.n - d.n1.sai) / d.n1.n : null,
+          soEmLam: d.n1?.n ?? 0,
+          batBuoc: d.batBuoc && !boBatBuoc.includes(d.cau.id),
+          // Độ DÀI của câu (số từ, hình/bảng, số bước lời giải) — để giờ lên bảng tính theo đề dài hay ngắn, không chỉ theo sao.
+          noiDung: goc ? noiDungTuCauGoc(goc.phan, goc.q) : undefined,
+        }
+      }),
+    [doKhoCau, boBatBuoc, traCau],
   )
 
   /** BÀI TẬP VỀ NHÀ CẢ LỚP — cộng dồn từ hồ sơ, KHÔNG ước lượng. Không em nào

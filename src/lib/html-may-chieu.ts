@@ -20,6 +20,7 @@ import {experimentHtml,experimentOriginal} from './experiments/render'
 // một khuôn với báo cáo và phiếu, không dựng khuôn thứ hai.
 import type { CauLuyen } from './bai-tap-pdf'
 import { CSS_PHIEU, anhHtml, bangHtml, chuHtml, dapAnChu, hinhTaiViTri, oGiaiHtml, thoat } from './html-phieu'
+import { noiDungTuCauLuyen, thoiGianCau } from './thoi-gian-len-bang'
 import { CSS_CAU_NOI_TO_CHIEU, chuanMaPhien, jsCauNoiToChieu, khoaToChieu, mangNutChamToChieu } from './to-chieu-cau-noi'
 
 /** Một ô bảng: một em, một câu. */
@@ -234,13 +235,14 @@ function headerEmHtml(o: OBang, ma: string): string {
   </header>`
 }
 
-/** Ước lượng đọc và giải; làm tròn 15 giây, giới hạn 1–3 phút. */
+/** Thời gian ĐỌC VÀ LÀM của chế độ dạy học (đồng hồ đếm ngược trước khi mời em lên bảng): làm tròn 15 giây, giới hạn 1–3 phút.
+ *
+ * Từ M1 (19/09) dùng CHUNG `thoiGianCau` (`thoi-gian-len-bang.ts`) với Engine E — không còn công thức thứ hai:
+ * T_đọc + T_làm theo phần, sao, độ dài đề, hình/bảng. Kẹp 60–180 s là của RIÊNG chế độ dạy học (test `day-hoc-dem-nguoc`). */
 export function thoiGianDayHoc(o: OBang): number {
-  const html = thanCauHtml(o.cau)
-  const words = html.replace(/<[^>]*>/g, ' ').trim().split(/\s+/).length
-  const difficulty = o.mucDo === 'van_dung' || o.sao === 2 ? 60 : o.mucDo === 'hieu' || o.sao === 1 ? 30 : 0
-  const visual = /<(?:img|table)\b/i.test(html) ? 20 : 0
-  return Math.max(60, Math.min(180, Math.ceil((40 + words * 0.45 + difficulty + visual) / 15) * 15))
+  const sao = (o.sao === 0 || o.sao === 1 || o.sao === 2 ? o.sao : o.mucDo === 'van_dung' ? 2 : o.mucDo === 'hieu' ? 1 : 0) as 0 | 1 | 2
+  const t = thoiGianCau({ phan: o.cau.phan, sao, noiDung: noiDungTuCauLuyen(o.cau) })
+  return Math.max(60, Math.min(180, Math.round((t.doc + t.lam) / 15) * 15))
 }
 
 /** Hai nút Đạt / Không đạt của một ô — chỉ khi tờ được dựng kèm `cauNoi` và ô có `qid`. Mảnh markup, CSS và JS nằm

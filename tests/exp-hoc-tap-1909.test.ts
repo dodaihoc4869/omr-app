@@ -122,6 +122,23 @@ describe('thưởng theo việc + khoá idempotent', () => {
   })
 })
 
+describe('khoản theo CHUYỂN TRẠNG THÁI HỒ SƠ áp cho MỌI nguồn, kể cả game (0.Planer chốt 19/09)', () => {
+  it('em làm đúng câu ôn trong GAME: không có EXP câu (tránh thưởng đôi với 20/40/40) nhưng CÓ +6 lên bậc, +30 khắc phục và +2 mảnh khi dạng rời yếu', () => {
+    const r = tinhExp(vao({
+      suKien: [sk('G1', 1, { nguon: 'game' }), sk('G2', 1, { nguon: 'game' })],
+      lenBac: ['G1'], khacPhuc: [{ qid: 'G2', lan: 2, luc: luc(5) }], dangRoiYeu: [{ maDang: 'ES-01', lan: 1, luc: luc(6) }],
+    }))
+    expect(theoLoai(r.khoan, 'cau')).toEqual([]) // câu theo bảng 9 ô: loại game
+    expect(theoLoai(r.khoan, 'len_bac').map((k) => [k.khoa, k.exp])).toEqual([[`bac|G1|${NGAY}`, 6]])
+    expect(theoLoai(r.khoan, 'khac_phuc').map((k) => [k.khoa, k.exp])).toEqual([['kp|G2|2', 30]])
+    expect(r.manh.map((m) => [m.khoa, m.so])).toEqual([['manh|dang|ES-01|1', 2]])
+    expect(tong(r.khoan)).toBe(36)
+  })
+  it('câu game có trợ giúp không ghi sổ nên không có sự kiện, không có chuyển trạng thái ⇒ không có khoản nào', () => {
+    expect(tinhExp(vao({ suKien: [], lenBac: [], khacPhuc: [], dangRoiYeu: [] }))).toEqual({ khoan: [], manh: [] })
+  })
+})
+
 describe('đạt nhiệm vụ ngày, chuỗi và mảnh khiên', () => {
   it('đạt ngày +20 và chuỗi +2×min(chuỗi,10) trao CÙNG LÚC; mảnh +1', () => {
     for (const [chuoi, mong] of [[1, 2], [5, 10], [10, 20], [11, 20], [30, 20]] as const) {

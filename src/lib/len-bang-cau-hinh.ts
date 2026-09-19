@@ -140,6 +140,44 @@ export function giayLenBang(ch: CauHinhLenBang, sao: 0 | 1 | 2 | undefined): num
   return ch.GIAY_LEN_BANG_THEO_SAO[sao ?? 0] ?? ch.GIAY_LEN_BANG_THEO_SAO[0]
 }
 
+/** THỜI GIAN MỘT EM LÊN BẢNG THEO ĐỘ KHÓ × ĐỘ DÀI × EM — MỘT NGUỒN cho `thoi-gian-len-bang.ts`
+ * (0.Planer giao 19/09, thầy chốt: "dựa vào độ khó và đề dài hay ngắn tính toán lại hết thời gian lên bảng, chữa bài").
+ *
+ *   T = T_đọc + T_làm + T_chữa            (giây, một em)
+ *   T_đọc  = DOC_NEN_GIAY + DOC_GIAY_MOI_TU × sốTừ(đề + phương án/ý) + (có hình/bảng ? DOC_HINH_GIAY : 0)
+ *   T_làm  = LAM_NEN_GIAY[phần] × HE_SO_SAO[sao] × (1 + HE_SO_LOP_SAI × tỉLệLớpSai) × HE_SO_BAC[bậc em]
+ *   T_chữa = (CHUA_NEN_GIAY + CHUA_GIAY_MOI_BUOC × sốBước kẹp [CHUA_BUOC_TOI_THIEU, CHUA_BUOC_TOI_DA])
+ *            × (tỉLệLớpSai ≥ CHUA_NGUONG_LOP_SAI ? CHUA_HE_SO_KHO : 1)
+ *   T      = kẹp [TOI_THIEU_GIAY, TOI_DA_GIAY] rồi làm tròn LAM_TRON_GIAY
+ *   chi phí trong NGÂN SÁCH BUỔI của một em (hai em song song) = làm tròn(T_chữa + HE_LAM_SONG_SONG × (T_đọc + T_làm))
+ *
+ * Câu KHÔNG có văn bản (test cũ dựng `CauChua` tối giản) rơi về `GIAY_LEN_BANG_THEO_SAO` — 300/180/120 KHÔNG đổi.
+ * Đây là điểm xuất phát; muốn đổi con số nào thì đổi Ở ĐÂY và xem lại bảng giá trị trong
+ * `tests/thoi-gian-len-bang-1909.test.ts`. */
+export const THOI_GIAN_LEN_BANG = {
+  DOC_NEN_GIAY: 8,
+  DOC_GIAY_MOI_TU: 0.35,
+  DOC_HINH_GIAY: 10,
+  LAM_NEN_GIAY: { I: 45, II: 120, III: 150 },
+  HE_SO_SAO: { 0: 1.0, 1: 1.5, 2: 2.2 },
+  HE_SO_LOP_SAI: 0.5,
+  HE_SO_BAC: { biet: 1.25, hieu: 1.0, van_dung: 0.85 },
+  CHUA_NEN_GIAY: 30,
+  CHUA_GIAY_MOI_BUOC: 25,
+  CHUA_BUOC_TOI_THIEU: 1,
+  CHUA_BUOC_TOI_DA: 6,
+  CHUA_NGUONG_LOP_SAI: 0.5,
+  CHUA_HE_SO_KHO: 1.3,
+  TOI_THIEU_GIAY: 60,
+  TOI_DA_GIAY: 480,
+  LAM_TRON_GIAY: 15,
+  /** PHẦN (T_đọc + T_làm) mà MỖI EM phải gánh trong ngân sách buổi khi hai em lên bảng SONG SONG.
+   * Tờ chiếu chạy hai em một đợt: `T_đợt = max(T_đọc+T_làm) + T_chữa_A + T_chữa_B`, nên một em chỉ tốn thêm
+   * ≈ nửa giờ làm bài (em kia làm cùng lúc) + trọn giờ chữa của mình. Đặt 1 nếu muốn tính nối tiếp (mỗi em một mình):
+   * khi ấy buổi 30 câu thường chỉ xếp nổi ~13 em thay vì 20 — xem bảng trong `tests/thoi-gian-len-bang-1909.test.ts`. */
+  HE_LAM_SONG_SONG: 0.5,
+} as const
+
 /** Ngân sách thật cho phần chữa, sau khi trừ hao phí. Giây. */
 export function nganSachGiay(ch: CauHinhLenBang): number {
   return Math.max(0, ch.NGAN_SACH_PHUT * 60 - haoPhiGiay(ch))
