@@ -202,7 +202,8 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
   // ĐỀ RIÊNG TỪNG EM (DE-RIENG-TUNG-EM). Không bật mặc định (vá 19/09: bản
   // 18/09 (3dad7cc) từng lặng lẽ đổi mặc định này sang bật — không phải điều
   // thầy yêu cầu, và đúng hôm bật mặc định thì xảy ra sự cố rút đề lẫn chương
-  // (câu khắc phục kéo cả câu chương khác vào đề — xem cau-hinh-de-rieng.ts).
+  // (bước BÙ KHO ở de-rieng-nguon.ts lấy nhầm câu chương khác khi kho ca thiếu
+  // câu — xem `locKhoToanBoTheoChuyenDeCa`, đã vá riêng, không phải lỗi ở đây).
   // Trả về tắt mặc định: thầy vẫn bật tay được ở nút bên dưới khi muốn dùng.
   const [deRieng, setDeRieng] = useState(false)
   // HAI NÚT PHẠM VI (thầy chốt 08/09): lấy câu sai của ca gần nhất, hay gộp
