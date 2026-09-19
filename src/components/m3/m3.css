@@ -275,6 +275,9 @@ button.m3-the:active {
   --bong-1: var(--m3-cao-do-1);
   --bong-2: var(--m3-cao-do-3);
   --serif: var(--sans, system-ui, sans-serif);
+  --phu: var(--m3-man-che);
+  /* chữ trên nút chính của DesignSystem.NutChinh (mặc định --giay = trắng cố định; nền tối primary là xanh nhạt) */
+  --nut-chu: var(--m3-on-primary);
 }
 
 /* ── hình khối / cỡ chữ / đích chạm cho các lớp Tailwind cũ dưới `.m3` ─────────────────────── */

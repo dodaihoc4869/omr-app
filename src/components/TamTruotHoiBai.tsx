@@ -21,6 +21,8 @@ import { NutChinh, OThongBao } from './DesignSystem'
 import TheCauChiTiet, { CSS_THE_CAU } from './TheCauChiTiet'
 import { TOI_DA_GHI_CHU, loiNhacTickNhieu } from '../lib/hoi-bai'
 import type { CauSaiChiTiet } from '../lib/phieu-du-lieu'
+import { laManThi } from './m3'
+import './m3/tam-truot.css'
 
 /** Một câu trong tấm trượt: chi tiết đầy đủ như báo cáo, kèm mã câu để gửi. */
 export interface CauChon {
@@ -63,11 +65,11 @@ export default function TamTruotHoiBai({ cau, daCongBo, daHoi = [], ghiChuCu = '
   )
   const nhac = loiNhacTickNhieu(chon.size, cau.length)
 
-  return (
+  const tam = (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" style={{ background: 'var(--phu)' }}>
       <style>{CSS_THE_CAU}</style>
       <div
-        className="w-full flex flex-col"
+        className="w-full flex flex-col m3-tam-truot"
         style={{ maxWidth: 520, maxHeight: '92vh', background: 'var(--the)', borderRadius: 'var(--bo-3) var(--bo-3) 0 0', boxShadow: 'var(--bong-2)' }}
       >
         <div className="shrink-0 flex items-start justify-between" style={{ padding: 'var(--k5) var(--k5) var(--k3)', borderBottom: '1px solid var(--vien)' }}>
@@ -77,7 +79,7 @@ export default function TamTruotHoiBai({ cau, daCongBo, daHoi = [], ghiChuCu = '
             </div>
             <div style={NHAN}>Chạm vào từng câu để xem đề và lời giải. Tick câu em chưa hiểu.</div>
           </div>
-          <button onClick={dong} aria-label="Đóng" className="shrink-0 flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: 'var(--the-2)', color: 'var(--nhat)' }}>
+          <button onClick={dong} aria-label="Đóng" className="shrink-0 flex items-center justify-center rounded-full" style={{ width: 'var(--tam-nut, 32px)', height: 'var(--tam-nut, 32px)', background: 'var(--the-2)', color: 'var(--nhat)' }}>
             <X size={16} />
           </button>
         </div>
@@ -88,13 +90,13 @@ export default function TamTruotHoiBai({ cau, daCongBo, daHoi = [], ghiChuCu = '
               type="button"
               onClick={() => setChon(new Set(cauSai.map((c) => c.qid)))}
               className="tap-target font-bold"
-              style={{ minHeight: 40, marginBottom: 'var(--k2)', padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', border: 'none', background: 'var(--the-2)', color: 'var(--muc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+              style={{ minHeight: 'var(--tam-cao-nut, 40px)', marginBottom: 'var(--k2)', padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', border: 'none', background: 'var(--the-2)', color: 'var(--muc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
             >
               Tick hết câu em làm sai ({cauSai.length})
             </button>
           )}
 
-          <div>
+          <div className="m3-giay">
             {cau.map((c, i) => (
               <TheCauChiTiet
                 key={c.qid}
@@ -140,4 +142,6 @@ export default function TamTruotHoiBai({ cau, daCongBo, daHoi = [], ghiChuCu = '
       </div>
     </div>
   )
+  // chỉ ở màn thi của em mới tự mang `m3` (xem MaCaInput); thẻ câu chi tiết bên trong giữ kiểu "bản giấy" (--p-*) có chủ ý
+  return laManThi() ? <div className="m3">{tam}</div> : tam
 }

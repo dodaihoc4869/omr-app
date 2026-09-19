@@ -85,3 +85,17 @@ Giao bởi 0.Planer (thầy đã uỷ quyền 100%: "nghe theo điều phối, k
 - [x] tests/m3-d-the-cau-1909.test.tsx 11 xanh; đột biến (luật !important trần, hạ 48→44, thêm lớp m3 vào thẻ ở game) → 5 test đỏ, hoàn lại → 11 xanh
 - [x] toàn `npx vitest run` = 100 đỏ / 43 tệp: 3 test mới đỏ ở tests/phieu-m3-1909.test.ts của CODE 2 (tệp untracked, html-phieu.ts đang sửa dở, 0 tham chiếu TheCau/m3); loại tệp đó → 97 đỏ / 42 tệp, test đỏ MỚI của em: không
 - [ ] COMMIT 2 (bật ở màn thi qua `laManThi()`): CHỜ Code 2 làm vỏ màn thi — hoặc Code 2 đặt `m3` ở gốc ExamTakeScreen thì khỏi cần. Đoạn mã `laManThi` đã cất ở scratchpad phiên (m3/index.ts)
+
+## SỬA LỖI b72ca8d — lib/danh-gia-bai.ts (0.Planer QUYẾT 2) — 19/09 15:35
+
+- [x] Nguyên nhân gốc: `danhGiaBai(diem, soCanKhacPhuc, tongCau)` chỉ có 3 con số nhưng nhánh 8–9 điểm nói "Phần lớn là bẫy đề và bước tính, không phải lỗ hổng lý thuyết" và nhánh 5–6,5 nói "mất điểm đã sang cả phần nhận biết và thông hiểu" — hàm không có dữ liệu theo phần/mức độ ⇒ bịa. Sửa: chỉ còn điểm + số câu cần chữa + chỉ dẫn mở mục Câu sai cần chữa
+- [x] tests/bao-cao-khong-ket-luan-nang-luc-1909.test.tsx thêm 6 test cho danhGiaBai: bản cũ đỏ 2/6 (điểm 8,4 và 5,5), bản mới xanh; tests/dong-nhat-bao-cao-1409.test.ts (khoá "N câu cần chữa", không "!", không "trên" khi thiếu tổng) vẫn xanh — KHÔNG phải sửa test nào
+
+## Nhóm A2 (MaCaInput, PhongChoGame) + TamTruotHoiBai — 19/09 15:40
+
+- [x] MaCaInput: kích thước/nền/viền ô đi qua biến `--ma-*` có giá trị dự phòng = giá trị cũ (48×56, viền 1,5 px, bo --bo-1) → ngoài `.m3` không đổi; dưới `.m3` (vao-thi.css, KHÔNG !important): ô 60 px bo 14 trắng viền 1 px, có số → vòng 2 px primary, ô đang gõ → primaryContainer + con trỏ nhấp nháy (bản vẽ ThiVaoVaKhoa). Cấu trúc div > div > div giữ nguyên (tests/the-cau.test.tsx đọc theo cấu trúc đó)
+- [x] PhongChoGame: thêm vào phạm vi bộ sinh (10 tệp); móc lớp `m3-phong-cho-dau` (đầu thẻ gradient xanh-lục-chàm → primaryContainer); nội dung/chuỗi khoá (phong-cho-game-1309) nguyên
+- [x] TamTruotHoiBai: bọc `m3` theo `laManThi()`; nút đóng 32→48, nút chọn nhanh 40→48, bo 28 phía trên qua biến `--tam-*` (dự phòng = giá trị cũ); danh sách TheCauChiTiet đặt trong MỘT tờ giấy (nền --p-giay, mực --p-muc) vì nền tối sẽ làm chữ thừa hưởng sáng trên giấy sáng (đo ra 1,17:1); DesignSystem.NutChinh: `color: var(--nut-chu, var(--giay))` (1 dòng; ngoài `.m3` y hệt) vì --giay trắng cố định đọc kém trên primary sáng của nền tối
+- [x] laManThi() (m3/index.ts): CHỈ ?examCode= | /t/<mã> | /d/<mã> — /hs (game) KHÔNG bật; tests/m3-a2-1909.test.tsx 14 xanh, tests/m3-d2-tam-truot-1909.test.tsx 4 xanh; đột biến (bọc vô điều kiện / đổi giá trị dự phòng / thêm !important) → 3 test đỏ mỗi tệp, hoàn lại xanh
+- [x] Chromium thật sáng+tối: ô mã ca, phòng chờ (có/không lỗi), tấm hỏi bài: 0 đích chạm < 48 px; 0 chữ < 4,5 ở phần của em. CÒN 4 cặp chữ nhỏ trong TheCauChiTiet (bảng --p-* "bản giấy": --p-do/--p-xanh làm chữ nhãn "A", "em chọn", "B", "đáp án đúng", 2,3–3,8:1) — NỢ CŨ, không phải do em; đổi cần sửa token trong tokens.css (tuong-phan-mau-1009 khoá)
+- [ ] KhoiBaiLuyen (PhieuScreen/PhieuV3: trang phiếu phụ huynh, bảng --p-* + lớp bc-* của css-bao-cao.ts): cùng lý do "bản giấy" với TheCauChiTiet → ĐỀ NGHỊ để nguyên (chờ 0.Planer)

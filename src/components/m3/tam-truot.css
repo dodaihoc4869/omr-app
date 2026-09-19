@@ -1,0 +1,19 @@
+/* Tấm trượt "Hỏi bài Thầy" (TamTruotHoiBai) dưới `.m3`: bo 28 phía trên, nút đóng + nút chọn nhanh đủ 48 px.
+ * Kích thước đi qua biến `--tam-*` (TamTruotHoiBai.tsx đặt giá trị dự phòng = giá trị cũ) nên không cần !important. */
+.m3 .m3-tam-truot {
+  --bo-3: 28px;
+  --tam-nut: 48px;
+  --tam-cao-nut: 48px;
+}
+
+/* Danh sách câu bên trong dùng thẻ TheCauChiTiet kiểu "BẢN GIẤY" (--p-*, cố ý không theo nền sáng/tối vì phiếu còn in / gửi Zalo).
+ * Dưới `.m3` nền tối chữ thừa hưởng từ gốc sẽ sáng — đặt cả khối là MỘT tờ giấy (nền --p-giay, mực --p-muc) trong tấm M3. */
+.m3 .m3-tam-truot .m3-giay {
+  padding: var(--k2, 8px) var(--k3, 12px);
+  border-radius: var(--m3-bo-16);
+  background: var(--p-giay);
+  color: var(--p-muc);
+}
+.m3 .m3-tam-truot .m3-giay button {
+  min-width: 48px;
+}

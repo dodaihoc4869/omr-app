@@ -222,7 +222,7 @@ export function OThongBao({ tone = 'cam', children, className = '' }: { tone?: '
 // chinh=viên thuốc Google Blue; phu=Google Tonal viền xám; nguyhiem=Google Red.
 // ---------------------------------------------------------------------------
 const NUT_CHINH_STYLE: Record<'chinh' | 'phu' | 'nguyhiem', React.CSSProperties> = {
-  chinh: { background: 'var(--gg-xanh)', color: 'var(--giay)', border: '1px solid var(--gg-xanh)', boxShadow: 'var(--bong-1)' },
+  chinh: { background: 'var(--gg-xanh)', color: 'var(--nut-chu, var(--giay))', border: '1px solid var(--gg-xanh)', boxShadow: 'var(--bong-1)' },
   phu: { background: 'var(--the)', color: 'var(--muc)', border: '1px solid var(--vien-dam)' },
   nguyhiem: { background: 'var(--the)', color: 'var(--gg-do)', border: '1px solid var(--gg-do)' },
 }
