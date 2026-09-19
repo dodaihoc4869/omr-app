@@ -78,6 +78,7 @@ export interface DuLieuBangNhiemVu {
   ghiChuCu?: string
   ngayNghi: boolean
   thanThu: TrangThaiThanThu
+  tonCu: TonCu
 }
 
 /**
@@ -99,6 +100,19 @@ export function docThanThu(raw: unknown): TrangThaiThanThu {
   if (!pet) return { kieu: 'chua_chon' }
   const ten = typeof t.nickname === 'string' && t.nickname.trim() ? t.nickname.trim() : undefined
   return { kieu: 'co', pet, cap: Math.max(1, Math.floor(Number(t.cap) || 1)), ten }
+}
+
+/** Bài Mẹ giao CŨ chưa làm — đứng RIÊNG như quá hạn: không tính tải, không phải việc hôm nay, không tham gia cổng. */
+export interface TheTonCu {
+  id: string
+  tieuDe: string
+  soCau: number
+  hanhDong: HanhDongNhiemVu
+}
+export interface TonCu {
+  soBai: number
+  soCau: number
+  bai: TheTonCu[]
 }
 
 export interface TheQuaHan {
@@ -151,7 +165,7 @@ function gomBac(viec: TheNhiemVu[]): NhomBac[] {
 function dongGoi(
   nguon: DuLieuBangNhiemVu['nguon'],
   viec: TheNhiemVu[],
-  phanConLai: Pick<DuLieuBangNhiemVu, 'tienDo' | 'tocDo' | 'chuoiNgay' | 'canhBao' | 'quaHan' | 'capNhatLuc' | 'ghiChuCu' | 'ngayNghi' | 'thanThu'>,
+  phanConLai: Pick<DuLieuBangNhiemVu, 'tienDo' | 'tocDo' | 'chuoiNgay' | 'canhBao' | 'quaHan' | 'capNhatLuc' | 'ghiChuCu' | 'ngayNghi' | 'thanThu' | 'tonCu'>,
 ): DuLieuBangNhiemVu {
   // Chỉ còn việc tuỳ chọn ⇒ coi là "hôm nay chưa có việc": không dựng thẻ nào.
   const coViecThat = viec.some((v) => v.bac !== 'tuy_chon')
@@ -258,6 +272,7 @@ export function tuKeHoachTroLy(keHoach: KeHoachNgayTroLy, phu: NguonPhuTroLy = {
     ngayNghi: false,
     // Nguồn trợ lý chỉ có bảng V1 (không có id thần thú) — KHÔNG đoán, để giữ chỗ.
     thanThu: { kieu: 'chua_biet' },
+    tonCu: { soBai: 0, soCau: 0, bai: [] },
   })
 }
 
@@ -302,6 +317,9 @@ export interface KeHoachNgayMayChu {
   capNhatLuc?: string
   /** Thần thú của em (game V2). `null` = chưa chọn; vắng = máy chủ cũ. */
   thanThu?: { pet?: string | null; cap?: number; nickname?: string | null } | null
+  /** Bài Mẹ giao cũ chưa làm (ngoài 3 ngày/3 bài gần nhất trong viec[]). Vắng = máy chủ chưa gửi trường này. */
+  tonCu?: { id?: string; ma?: string; soCau?: number; taoLuc?: string }[]
+  tonCuTong?: { soBai?: number; soCau?: number }
 }
 
 /** Chốt kiểu: JSON máy chủ trả về có đủ phần giao diện cần không (lỗi/HTML/`{ok:true,items:[]}` ⇒ false). */
@@ -397,7 +415,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     if (v.loai === 'btvn_lo') {
       phanMoTa.push(`${soCau} câu`)
       if (ct.treNhip === true) phanMoTa.push('đã trễ nhịp — làm trước')
-    } else if (v.loai === 'mom') phanMoTa.push(`Gồm ${soCau} câu`)
+    } else if (v.loai === 'mom') phanMoTa.push(ct.chuaBatDau === true ? `Gồm ${soCau} câu · 120 phút từ khi bắt đầu` : `Gồm ${soCau} câu`)
     else if (v.loai === 'btvn_nop') phanMoTa.push('Đã xong mọi lô — bấm nộp bài trước hạn')
     else if (soCau > 0) phanMoTa.push(`${soCau} câu`)
     if (conLaiChu) phanMoTa.push(conLaiChu)
@@ -424,26 +442,34 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     }
   })
 
-  // Máy chủ CHỈ đưa bài Mẹ giao ĐÃ BẮT ĐẦU (hạn 120') vào viec[]; bài mới nhận, chưa bắt đầu, không có trong đó.
-  // Không bù thì bài Mẹ giao vừa nhận biến mất khỏi trang chủ. Bù ở CUỐI, không chen lên trước.
+  // Máy chủ (Worker a230c979+) đưa cả bài Mẹ CHƯA bắt đầu vào viec[] (chiTiet.chuaBatDau) — không tự bù thành thẻ nữa.
+  // Bài Mẹ giao CŨ ngoài viec[] nằm ở `tonCu[]` của máy chủ; máy chủ chưa gửi trường ấy thì suy từ danh sách bài của màn
+  // (chưa làm, không có trong viec[]/quaHan) để KHÔNG làm mất lối vào bài cũ — nhưng chỉ là hàng thu gọn, không phải thẻ việc.
   const idMomTrongKeHoach = new Set(keHoach.viec.filter((v) => v.loai === 'mom').map((v) => v.chiTiet?.id))
   const idMomQuaHan = new Set((keHoach.quaHan || []).filter((q) => q.loai === 'mom').map((q) => q.ma))
-  for (const bai of phu.dsMomGiao || []) {
-    if (!bai || bai.trangThai === 'da_nop' || idMomTrongKeHoach.has(bai.id) || idMomQuaHan.has(bai.id)) continue
-    const soCau = Math.max(1, Math.floor(Number(bai.soCau) || 10))
-    viec.push({
-      id: `mom:${bai.id}`,
-      bac: 'bat_buoc',
-      vaiTroMau: VAI_TRO_MAU.bat_buoc,
-      bieuTuong: 'mom',
-      tieuDe: bai.tieuDe || 'Bài của Mẹ giao',
-      moTa: `Gồm ${soCau} câu · 120 phút từ khi bắt đầu`,
-      soCau,
-      phutUocTinh: Math.ceil((soCau * vanToc) / 60),
-      biCong: false,
-      trangThai: bai.trangThai === 'dang_lam' ? 'dang_lam' : 'chua_lam',
-      hanhDong: { loai: 'mo_mom', payload: { id: bai.id, bai }, nhanNut: 'Làm bài của Mom' },
-    })
+  const theTonCu = (id: string, soCauMay?: number): TheTonCu => {
+    const bai = momTheoId(id)
+    return {
+      id,
+      tieuDe: bai?.tieuDe || 'Bài Mẹ giao',
+      soCau: Math.max(0, Math.floor(Number(soCauMay ?? bai?.soCau) || 0)),
+      hanhDong: { loai: 'mo_mom', payload: bai ? { id, bai } : { id }, nhanNut: 'Làm bài của Mom' },
+    }
+  }
+  // Máy chủ đã nói gì về bài cũ (`tonCu[]` hoặc `tonCuTong`, kể cả 0) thì CHỈ tin máy chủ; chưa nói gì mới suy từ danh sách bài.
+  const maySayTonCu = Array.isArray(keHoach.tonCu) || keHoach.tonCuTong !== undefined
+  const baiTonCu: TheTonCu[] = maySayTonCu
+    ? (Array.isArray(keHoach.tonCu) ? keHoach.tonCu : [])
+        .map((t) => ({ id: String(t?.id ?? t?.ma ?? ''), soCau: t?.soCau }))
+        .filter((t) => t.id)
+        .map((t) => theTonCu(t.id, t.soCau))
+    : (phu.dsMomGiao || [])
+        .filter((m) => m && m.trangThai === 'chua_lam' && !idMomTrongKeHoach.has(m.id) && !idMomQuaHan.has(m.id))
+        .map((m) => theTonCu(m.id))
+  const tonCu: TonCu = {
+    soBai: Math.max(baiTonCu.length, Math.floor(Number(keHoach.tonCuTong?.soBai) || 0)),
+    soCau: Math.max(baiTonCu.reduce((t, b) => t + b.soCau, 0), Math.floor(Number(keHoach.tonCuTong?.soCau) || 0)),
+    bai: baiTonCu,
   }
 
   const quaHan: TheQuaHan[] = (keHoach.quaHan || []).map((q) => {
@@ -476,6 +502,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     ghiChuCu: cu && keHoach.capNhatLuc ? `Kế hoạch lúc ${gioVietNam(keHoach.capNhatLuc)} — chưa cập nhật được, đang hiện bản cuối.` : undefined,
     ngayNghi: keHoach.lanNghi === true,
     thanThu: docThanThu(keHoach.thanThu),
+    tonCu,
   })
 }
 
@@ -555,9 +582,15 @@ export function phucHoiBanNho(x: unknown, now: number): DuLieuBangNhiemVu | null
       : tt && tt.kieu === 'chua_chon'
         ? { kieu: 'chua_chon' }
         : { kieu: 'chua_biet' }
+  const tc: any = (d as any).tonCu
+  const tonCu: TonCu =
+    tc && Number.isFinite(tc.soBai) && Number.isFinite(tc.soCau) && Array.isArray(tc.bai) && tc.bai.every((b: any) => b && typeof b.id === 'string' && b.hanhDong && typeof b.hanhDong.loai === 'string')
+      ? tc
+      : { soBai: 0, soCau: 0, bai: [] }
   return {
     ...d,
     thanThu,
+    tonCu,
     lamNgay: d.lamNgay ? lamMoiThe(d.lamNgay, now) : null,
     cacBac: d.cacBac.map((g) => ({ ...g, viec: g.viec.map((v) => lamMoiThe(v, now)) })),
     ghiChuCu: gioLuu ? `Kế hoạch lúc ${gioLuu} · đang cập nhật…` : 'Kế hoạch đã nhớ · đang cập nhật…',

@@ -212,13 +212,25 @@ describe('StudentPortalScreen thật: nối kế hoạch máy chủ và "ca đan
     expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('tro_ly')
   })
 
-  it('bài Mẹ giao mới nhận (chưa bắt đầu) không có trong viec[] của máy chủ nhưng VẪN hiện trên trang chủ', async () => {
-    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
+  it('bài Mẹ giao chưa bắt đầu do máy chủ đưa vào viec[]: hiện thành thẻ việc, bấm mở đúng bài', async () => {
+    tra['/hs/ke-hoach-ngay'] = { body: { ...KE_HOACH, viec: [{ id: 'mom:M1', loai: 'mom', soCau: 4, thuTu: 1, batBuoc: true, khan: false, cong: null, hien: true, nhan: null, trangThai: 'cho', ghiChu: 'Bài Mom giao, chưa bắt đầu.', chiTiet: { id: 'M1', chuaBatDau: true }, hanCung: null, hanMem: null, nguon: 'M1' }] } }
     mocks.momItems = [{ id: 'M1', tieuDe: 'Bài Mẹ mới nhận', soCau: 4, trangThai: 'chua_lam' }]
     const { container } = render(<StudentPortalScreen />)
-    await screen.findByRole('region', { name: /^Làm ngay: Ôn 3 câu/ })
-    await waitFor(() => expect(container.textContent).toContain('Bài Mẹ mới nhận'))
+    await screen.findByRole('region', { name: /^Làm ngay: Bài Mẹ mới nhận/ })
     expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('ke_hoach_ngay')
+    expect(container.querySelector('[data-vung="ton-cu"]')).toBeNull()
+  })
+
+  it('bài Mẹ cũ ngoài viec[] (máy chủ chưa gửi tonCu): hàng thu gọn "Bài cũ chưa làm · N bài", không thành thẻ việc; mở ra bấm được', async () => {
+    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
+    mocks.momItems = [{ id: 'M1', tieuDe: 'Bài Mẹ cũ', soCau: 4, trangThai: 'chua_lam' }]
+    const { container } = render(<StudentPortalScreen />)
+    await screen.findByRole('region', { name: /^Làm ngay: Ôn 3 câu/ })
+    await waitFor(() => expect(container.querySelector('[data-vung="ton-cu"]')).not.toBeNull())
+    expect(container.textContent).toContain('Bài cũ chưa làm · 1 bài')
+    expect(container.querySelectorAll('[data-viec="mom:M1"]').length).toBe(0)
+    fireEvent.click(screen.getByRole('button', { name: /Bài cũ chưa làm · 1 bài/ }))
+    expect(screen.getByRole('button', { name: 'Bài Mẹ cũ 4 câu — bài cũ' })).toBeTruthy()
   })
 
   it('ca đang mở (máy chủ báo coCaMo:true): nút Vào thi đổi sang tertiary + chấm nhịp; bấm vẫn mở phòng vào thi', async () => {

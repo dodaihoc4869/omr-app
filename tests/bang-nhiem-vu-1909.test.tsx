@@ -562,6 +562,75 @@ describe('phụ huynh: "Giao bài cho con" đi đường bài hằng ngày cá n
   })
 })
 
+describe('hàng "Bài cũ chưa làm" và thu gọn nhóm dài', () => {
+  const baiCu = (n: number) => ({
+    soBai: n, soCau: n * 5,
+    bai: Array.from({ length: n }, (_, i) => ({ id: `C${i + 1}`, tieuDe: `Bài cũ ${i + 1}`, soCau: 5, hanhDong: { loai: 'mo_mom' as const, payload: { id: `C${i + 1}` }, nhanNut: 'Làm bài của Mom' } })),
+  })
+  const voiTonCu = (n: number) => ({ ...duLieuMay(), tonCu: baiCu(n) })
+
+  it('rỗng → không vẽ gì; có → thu gọn mặc định, KHÔNG phải thẻ việc, không có màu vai trò', async () => {
+    const { container, unmount } = ve({ duLieu: duLieuMay() })
+    await screen.findByText('Hoả Long')
+    expect(container.querySelector('[data-vung="ton-cu"]')).toBeNull()
+    unmount()
+    const c2 = ve({ duLieu: voiTonCu(3) }).container
+    await screen.findByText('Hoả Long')
+    const hang = c2.querySelector('[data-vung="ton-cu"]')!
+    expect(hang.querySelector('button')!.getAttribute('aria-expanded')).toBe('false')
+    expect(hang.textContent).toContain('Bài cũ chưa làm · 3 bài')
+    expect(hang.querySelectorAll('.bnv-the').length).toBe(0)
+    expect(hang.closest('[data-vai-tro]')).toBeNull()
+  })
+
+  it('mở ra: tối đa 10 dòng + "Xem thêm N bài"; mỗi dòng mở đúng bài đó', async () => {
+    const onHanhDong = vi.fn()
+    const { container } = ve({ duLieu: voiTonCu(25), onHanhDong })
+    await screen.findByText('Hoả Long')
+    fireEvent.click(screen.getByRole('button', { name: /Bài cũ chưa làm · 25 bài/ }))
+    expect(container.querySelectorAll('[data-vung="ton-cu"] li .bnv-the').length).toBe(10)
+    fireEvent.click(screen.getByRole('button', { name: 'Xem thêm 15 bài' }))
+    expect(container.querySelectorAll('[data-vung="ton-cu"] li .bnv-the').length).toBe(20)
+    fireEvent.click(screen.getByRole('button', { name: 'Bài cũ 3 5 câu — bài cũ' }))
+    expect(onHanhDong).toHaveBeenCalledTimes(1)
+    expect(onHanhDong.mock.calls[0][0]).toMatchObject({ loai: 'mo_mom', payload: { id: 'C3' } })
+  })
+
+  it('phụ huynh: chỉ một dòng chữ "Con còn N bài Mẹ giao cũ chưa làm", không nút, không danh sách', async () => {
+    const { container } = ve({ vaiTro: 'phuhuynh', duLieu: voiTonCu(7), onGiaoBai: () => {} })
+    await screen.findByText('Hoả Long')
+    const hang = container.querySelector('[data-vung="ton-cu"]')!
+    expect(hang.textContent).toBe('Con còn 7 bài Mẹ giao cũ chưa làm')
+    expect(hang.querySelectorAll('button').length).toBe(0)
+  })
+
+  const nhomDai = (n: number) => {
+    const d = duLieuMay()
+    const mau = d.cacBac.find((b) => b.bac === 'bat_buoc')!.viec[0]
+    const viec = Array.from({ length: n }, (_, i) => ({ ...mau, id: `dai${i}`, tieuDe: `Việc dài ${i + 1}`, biCong: false }))
+    return { ...d, cacBac: d.cacBac.map((b) => (b.bac === 'bat_buoc' ? { ...b, viec } : b)) }
+  }
+
+  it('nhóm > 8 thẻ: thu gọn còn 5 + "Xem thêm N việc" (đếm ở tiêu đề vẫn là tổng, thứ tự giữ nguyên); bấm thì hiện hết', async () => {
+    const { container } = ve({ duLieu: nhomDai(12) })
+    await screen.findByText('Hoả Long')
+    const nhom = () => container.querySelector('[data-bac="bat_buoc"]')!
+    expect(nhom().querySelectorAll('.bnv-the').length).toBe(5)
+    expect(nhom().querySelector('h2')!.textContent).toContain('· 12')
+    expect(Array.from(nhom().querySelectorAll('.bnv-the-ten')).map((e) => e.textContent)).toEqual(['Việc dài 1', 'Việc dài 2', 'Việc dài 3', 'Việc dài 4', 'Việc dài 5'])
+    fireEvent.click(screen.getByRole('button', { name: 'Xem thêm 7 việc' }))
+    expect(nhom().querySelectorAll('.bnv-the').length).toBe(12)
+    expect(screen.queryByRole('button', { name: /Xem thêm/ })).toBeNull()
+  })
+
+  it('nhóm ≤ 8 thẻ không thu gọn', async () => {
+    const { container } = ve({ duLieu: nhomDai(8) })
+    await screen.findByText('Hoả Long')
+    expect(container.querySelector('[data-bac="bat_buoc"]')!.querySelectorAll('.bnv-the').length).toBe(8)
+    expect(screen.queryByRole('button', { name: /Xem thêm/ })).toBeNull()
+  })
+})
+
 describe('kỷ luật mã nguồn của thư mục bang-nhiem-vu', () => {
   const tep = (dir: string): string[] =>
     readdirSync(dir).flatMap((t) => (statSync(join(dir, t)).isDirectory() ? tep(join(dir, t)) : [join(dir, t)]))

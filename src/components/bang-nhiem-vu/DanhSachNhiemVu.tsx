@@ -2,8 +2,8 @@
 // cố định; thứ tự TRONG bậc là thứ tự adapter trả về, ở đây không xếp lại.
 // Việc bị cổng hiện mờ 38% kèm nhãn "Mở sau khi xong: <tên việc>".
 import { useEffect, useState } from 'react'
-import { BookOpen, ChevronRight, Heart, Lock, RotateCcw, Sparkles, Target } from 'lucide-react'
-import type { BieuTuongViec, NhomBac, TheNhiemVu, TheQuaHan } from '../../lib/nhiem-vu-adapter'
+import { BookOpen, ChevronDown, ChevronRight, Heart, Lock, RotateCcw, Sparkles, Target } from 'lucide-react'
+import type { BieuTuongViec, NhomBac, TheNhiemVu, TheQuaHan, TheTonCu, TonCu } from '../../lib/nhiem-vu-adapter'
 
 const BIEU_TUONG: Record<BieuTuongViec, typeof Heart> = {
   btvn: BookOpen,
@@ -12,6 +12,10 @@ const BIEU_TUONG: Record<BieuTuongViec, typeof Heart> = {
   muc_tieu: Target,
   sao: Sparkles,
 }
+
+const GIOI_HAN_NHOM = 8
+const SO_THE_KHI_THU_GON = 5
+const SO_DONG_TON_CU = 10
 
 function haiSo(n: number) {
   return String(n).padStart(2, '0')
@@ -101,23 +105,34 @@ export default function DanhSachNhiemVu({
   docChi: boolean
   onChon: (viec: TheNhiemVu) => void
 }) {
+  // Nhóm dài (> 8 thẻ) thu gọn còn 5 thẻ đầu + "Xem thêm N việc" (thứ tự vẫn là thứ tự của dữ liệu).
+  const [moRong, setMoRong] = useState<Record<string, boolean>>({})
   return (
     <>
       {cacBac
         .filter((b) => b.viec.length > 0)
-        .map((b) => (
-          <section key={b.bac} className="bnv-bac" data-bac={b.bac} data-vai-tro={b.vaiTroMau} aria-label={`${b.nhan}: ${b.viec.length} việc`}>
-            <h2 className="bnv-bac-dau">
-              <span className="bnv-bac-cham" aria-hidden="true" />
-              <span>
-                {b.nhan} · {b.viec.length}
-              </span>
-            </h2>
-            {b.viec.map((v) => (
-              <The key={v.id} viec={v} nhanBac={b.nhan} docChi={docChi} onChon={onChon} />
-            ))}
-          </section>
-        ))}
+        .map((b) => {
+          const dai = b.viec.length > GIOI_HAN_NHOM && !moRong[b.bac]
+          const hien = dai ? b.viec.slice(0, SO_THE_KHI_THU_GON) : b.viec
+          return (
+            <section key={b.bac} className="bnv-bac" data-bac={b.bac} data-vai-tro={b.vaiTroMau} aria-label={`${b.nhan}: ${b.viec.length} việc`}>
+              <h2 className="bnv-bac-dau">
+                <span className="bnv-bac-cham" aria-hidden="true" />
+                <span>
+                  {b.nhan} · {b.viec.length}
+                </span>
+              </h2>
+              {hien.map((v) => (
+                <The key={v.id} viec={v} nhanBac={b.nhan} docChi={docChi} onChon={onChon} />
+              ))}
+              {dai && (
+                <button type="button" className="bnv-xem-them" data-vai-tro={b.vaiTroMau} onClick={() => setMoRong((t) => ({ ...t, [b.bac]: true }))}>
+                  Xem thêm {b.viec.length - SO_THE_KHI_THU_GON} việc
+                </button>
+              )}
+            </section>
+          )
+        })}
     </>
   )
 }
@@ -155,6 +170,57 @@ export function DanhSachQuaHan({ viec, docChi, onChon }: { viec: TheQuaHan[]; do
           </div>
         )
       })}
+    </section>
+  )
+}
+
+/**
+ * Bài Mẹ giao CŨ chưa làm: hàng THU GỌN riêng (surfaceContainer, không màu vai trò), không phải việc hôm nay.
+ * Bấm mở danh sách (10 dòng + "xem thêm"); mỗi dòng mở đúng bài đó bằng luồng Mẹ giao hiện có. Rỗng → không vẽ gì.
+ * Phụ huynh chỉ thấy một dòng chữ.
+ */
+export function HangTonCu({ tonCu, docChi, onChon }: { tonCu: TonCu; docChi: boolean; onChon: (bai: TheTonCu) => void }) {
+  const [mo, setMo] = useState(false)
+  const [hien, setHien] = useState(SO_DONG_TON_CU)
+  if (tonCu.soBai <= 0) return null
+  if (docChi) {
+    return (
+      <div className="bnv-ton-cu bnv-ton-cu--chu" data-vung="ton-cu" role="group" aria-label={`Con còn ${tonCu.soBai} bài Mẹ giao cũ chưa làm`}>
+        Con còn {tonCu.soBai} bài Mẹ giao cũ chưa làm
+      </div>
+    )
+  }
+  return (
+    <section className="bnv-ton-cu" data-vung="ton-cu" aria-label={`Bài cũ chưa làm: ${tonCu.soBai} bài`}>
+      <button type="button" className="bnv-ton-cu-nut" aria-expanded={mo} onClick={() => setMo((m) => !m)}>
+        <span>Bài cũ chưa làm · {tonCu.soBai} bài</span>
+        <ChevronDown size={20} aria-hidden="true" className={mo ? 'bnv-xoay' : undefined} />
+      </button>
+      {mo && (
+        <ul className="bnv-ton-cu-ds">
+          {tonCu.bai.slice(0, hien).map((b) => (
+            <li key={b.id}>
+              <button type="button" className="bnv-the bnv-the--nhat" aria-label={`${b.tieuDe} ${b.soCau} câu — bài cũ`} onClick={() => onChon(b)}>
+                <span className="bnv-the-o">
+                  <Heart size={20} aria-hidden="true" />
+                </span>
+                <span className="bnv-the-chu">
+                  <span className="bnv-the-ten">{b.tieuDe}</span>{' '}
+                  <span className="bnv-the-mo-ta">{b.soCau} câu</span>
+                </span>
+                <ChevronRight size={20} aria-hidden="true" />
+              </button>
+            </li>
+          ))}
+          {tonCu.bai.length > hien && (
+            <li>
+              <button type="button" className="bnv-xem-them" onClick={() => setHien((h) => h + SO_DONG_TON_CU)}>
+                Xem thêm {tonCu.bai.length - hien} bài
+              </button>
+            </li>
+          )}
+        </ul>
+      )}
     </section>
   )
 }

@@ -9,7 +9,7 @@ import type { DuLieuBangNhiemVu, HanhDongNhiemVu, TheNhiemVu } from '../../lib/n
 import type { SpiritMotion } from '../../game/than-thu-v2/Spirit2D'
 import DauTrang, { type MucMenu, type ThanThuGoc } from './DauTrang'
 import TheLamNgay from './TheLamNgay'
-import DanhSachNhiemVu, { DanhSachQuaHan } from './DanhSachNhiemVu'
+import DanhSachNhiemVu, { DanhSachQuaHan, HangTonCu } from './DanhSachNhiemVu'
 import TheVinhDanh, { type DuLieuVinhDanh } from './TheVinhDanh'
 import NutVaoThi from './NutVaoThi'
 import './m3-theme.css'
@@ -281,6 +281,7 @@ export default function BangNhiemVu({
                 <DanhSachNhiemVu cacBac={duLieu.cacBac} docChi={laPh} onChon={chon} />
               </>
             )}
+            <HangTonCu tonCu={duLieu.tonCu} docChi={laPh} onChon={(b) => onHanhDong?.(b.hanhDong)} />
             <DanhSachQuaHan viec={duLieu.quaHan} docChi={laPh} onChon={(q) => q.hanhDong && onHanhDong?.(q.hanhDong)} />
 
             {laPh && onGiaoBai && (

@@ -335,34 +335,71 @@ describe('chỉ còn việc tuỳ chọn ⇒ trạng thái trống (nút thần 
   })
 })
 
-describe('nhánh máy chủ: bài Mẹ giao mới nhận (chưa bắt đầu) không được biến mất', () => {
-  // Máy chủ chỉ đưa bài Mẹ ĐÃ BẮT ĐẦU (hạn 120') vào viec[]; bài mới nhận không có trong đó.
-  it('bài chưa bắt đầu được bù ở CUỐI, bậc BẮT BUỘC, mở đúng payload; không chen lên trước', () => {
-    const ra = tatCaViec(tuKeHoachNgay(keHoachMayChu, NOW, { dsBtvn: dsBtvnMay, dsMomGiao: [momDangLam, momMoi] }))
+describe('bài Mẹ giao chưa bắt đầu: máy chủ đưa vào viec[] (chuaBatDau); bài cũ ngoài đó vào tonCu', () => {
+  const moChuaBD = (id: string, over: object = {}) =>
+    v({ id: `mom:${id}`, loai: 'mom', soCau: 6, batBuoc: true, ghiChu: 'Bài Mom giao, chưa bắt đầu. Bấm bắt đầu thì có 120 phút làm.', chiTiet: { id, chuaBatDau: true, taoLuc: gio(-5) }, ...over })
+
+  it('máy chủ đưa bài chưa bắt đầu vào viec[]: thẻ BẮT BUỘC, nói "120 phút từ khi bắt đầu", đúng payload; adapter KHÔNG tự bù thêm', () => {
+    const kh = { ...keHoachMayChu, viec: [...keHoachMayChu.viec, moChuaBD('M1')] as any }
+    const d = tuKeHoachNgay(kh, NOW, { dsBtvn: dsBtvnMay, dsMomGiao: [momDangLam, momMoi] })
+    const ra = tatCaViec(d).filter((x) => x.id === 'mom:M1')
+    expect(ra.length).toBe(1) // không nhân đôi
+    expect(ra[0]).toMatchObject({ bac: 'bat_buoc', biCong: false, tieuDe: 'Bài Mẹ mới nhận', soCau: 6, conLaiMs: undefined })
+    expect(ra[0].moTa).toBe('Gồm 6 câu · 120 phút từ khi bắt đầu')
+    expect(ra[0].hanhDong).toMatchObject({ loai: 'mo_mom', payload: { id: 'M1', bai: momMoi } })
+    expect(d.tonCu.soBai).toBe(0)
+  })
+
+  it('máy chủ KHÔNG đưa bài vào viec[]: adapter không còn tự dựng thẻ việc — chỉ hàng "bài cũ" (tonCu suy từ danh sách bài)', () => {
     const d = tuKeHoachNgay(keHoachMayChu, NOW, { dsBtvn: dsBtvnMay, dsMomGiao: [momDangLam, momMoi] })
-    // Trong nhóm BẮT BUỘC: việc của máy chủ trước, bài bù đứng sau; Làm ngay không đổi.
-    expect(d.cacBac.find((b) => b.bac === 'bat_buoc')!.viec.map((x) => x.id)).toEqual(['btvn_lo:BT-ESTE:0', 'mom:M1'])
-    expect(d.lamNgay?.id).toBe('mom:M9')
-    expect(ra.map((x) => x.id).sort()).toEqual([...keHoachMayChu.viec.map((x) => x.id), 'mom:M1'].sort())
-    const moi = ra.find((x) => x.id === 'mom:M1')!
-    expect(moi).toMatchObject({ bac: 'bat_buoc', biCong: false, tieuDe: 'Bài Mẹ mới nhận', soCau: 6 })
-    expect(moi.hanhDong).toMatchObject({ loai: 'mo_mom', payload: { id: 'M1', bai: momMoi } })
+    expect(tatCaViec(d).map((x) => x.id)).toEqual(tatCaViec(tuKeHoachNgay(keHoachMayChu, NOW, phu)).map((x) => x.id))
+    expect(d.tonCu.soBai).toBe(1)
+    expect(d.tonCu.bai[0]).toMatchObject({ id: 'M1', tieuDe: 'Bài Mẹ mới nhận', soCau: 6 })
+    expect(d.tonCu.bai[0].hanhDong).toMatchObject({ loai: 'mo_mom', payload: { id: 'M1', bai: momMoi } })
   })
 
-  it('không nhân đôi bài đã có trong kế hoạch, không bù bài đã nộp hay đã hết giờ', () => {
+  it('tonCu suy từ danh sách KHÔNG lấy bài đã nộp, đang làm/đã có trong viec[], hay đã hết giờ (quaHan)', () => {
     const xong = { ...momMoi, id: 'M2', trangThai: 'da_nop' }
-    const het = { ...momMoi, id: 'M3', trangThai: 'dang_lam' }
+    const het = { ...momMoi, id: 'M3', trangThai: 'chua_lam' }
     const kh = { ...keHoachMayChu, quaHan: [{ loai: 'mom' as const, ma: 'M3', hanNop: gio(-1), conLai: 6 }] }
-    const ra = tatCaViec(tuKeHoachNgay(kh, NOW, { dsBtvn: dsBtvnMay, dsMomGiao: [momDangLam, xong, het] })).map((x) => x.id)
-    expect(ra.filter((i) => i === 'mom:M9').length).toBe(1)
-    expect(ra).not.toContain('mom:M2')
-    expect(ra).not.toContain('mom:M3')
+    const d = tuKeHoachNgay(kh, NOW, { dsBtvn: dsBtvnMay, dsMomGiao: [momDangLam, xong, het, momMoi] })
+    expect(d.tonCu.bai.map((b) => b.id)).toEqual(['M1'])
   })
 
-  it('viec rỗng nhưng có bài Mẹ mới nhận ⇒ KHÔNG trống, "Làm ngay" là bài Mẹ', () => {
+  it('máy chủ gửi tonCu[]/tonCuTong: dùng đúng số máy chủ; id lạ vẫn mở được bằng {id}; mục không có id bị bỏ; tổng lấy số lớn hơn', () => {
+    const kh: KeHoachNgayMayChu = { ...keHoachMayChu, tonCu: [{ id: 'M1', soCau: 6 }, { ma: 'M77', soCau: 4 }, {}, { id: '' }] as any, tonCuTong: { soBai: 42, soCau: 300 } }
+    const d = tuKeHoachNgay(kh, NOW, { dsBtvn: dsBtvnMay, dsMomGiao: [momMoi] })
+    expect(d.tonCu.bai.map((b) => b.id)).toEqual(['M1', 'M77'])
+    expect(d.tonCu.bai[1]).toMatchObject({ tieuDe: 'Bài Mẹ giao', soCau: 4 })
+    expect(d.tonCu.bai[1].hanhDong).toMatchObject({ loai: 'mo_mom', payload: { id: 'M77' } })
+    expect(d).toMatchObject({ tonCu: { soBai: 42, soCau: 300 } })
+    // Máy chủ nói rõ là rỗng (mảng rỗng, hoặc chỉ có tonCuTong 0/0) thì KHÔNG suy thêm từ danh sách bài của màn.
+    const dsBai = { dsBtvn: dsBtvnMay, dsMomGiao: [momMoi] }
+    expect(tuKeHoachNgay({ ...keHoachMayChu, tonCu: [] }, NOW, dsBai).tonCu.soBai).toBe(0)
+    expect(tuKeHoachNgay({ ...keHoachMayChu, tonCuTong: { soBai: 0, soCau: 0 } }, NOW, dsBai).tonCu).toEqual({ soBai: 0, soCau: 0, bai: [] })
+    // Hình dạng thật của Code 3: [{ id, loai:'mom', soCau, giaoLuc }] + tonCuTong.
+    const that = tuKeHoachNgay({ ...keHoachMayChu, tonCu: [{ id: 'M1', loai: 'mom', soCau: 6, giaoLuc: gio(-100) }] as any, tonCuTong: { soBai: 21, soCau: 105 } }, NOW, dsBai)
+    expect(that.tonCu).toMatchObject({ soBai: 21, soCau: 105 })
+    expect(that.tonCu.bai.map((b) => b.id)).toEqual(['M1'])
+  })
+
+  it('tonCu KHÔNG tính vào việc hôm nay, không làm hết "trống", không tham gia cổng', () => {
     const d = tuKeHoachNgay({ ...keHoachMayChu, viec: [] }, NOW, { dsBtvn: [], dsMomGiao: [momMoi] })
-    expect(d.trong).toBe(false)
-    expect(d.lamNgay?.id).toBe('mom:M1')
+    expect(d.trong).toBe(true)
+    expect(d.lamNgay).toBeNull()
+    expect(d.tonCu.soBai).toBe(1)
+  })
+
+  it('nhánh trợ lý luôn có tonCu rỗng (cùng cấu trúc); bản nhớ giữ tonCu, bản nhớ đời cũ không có trường ⇒ rỗng', () => {
+    expect(tuKeHoachTroLy(troLy()).tonCu).toEqual({ soBai: 0, soCau: 0, bai: [] })
+    const jsonDi = (x: unknown) => JSON.parse(JSON.stringify(x))
+    const tuoi = tuKeHoachNgay({ ...keHoachMayChu, tonCu: [{ id: 'M1', soCau: 6 }] }, NOW, { dsBtvn: dsBtvnMay, dsMomGiao: [momMoi] })
+    expect(phucHoiBanNho(jsonDi(dongGoiBanNho(tuoi, NOW)), NOW)!.tonCu.bai.map((b) => b.id)).toEqual(['M1'])
+    const cu = jsonDi(dongGoiBanNho(tuoi, NOW))
+    delete cu.duLieu.tonCu
+    expect(phucHoiBanNho(cu, NOW)!.tonCu).toEqual({ soBai: 0, soCau: 0, bai: [] })
+    cu.duLieu.tonCu = { soBai: 'x', soCau: 1, bai: [{}] }
+    expect(phucHoiBanNho(cu, NOW)!.tonCu).toEqual({ soBai: 0, soCau: 0, bai: [] })
   })
 })
 
