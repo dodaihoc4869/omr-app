@@ -749,6 +749,58 @@ describe('EXP học tập + mảnh khiên trên bảng', () => {
   })
 })
 
+// THẦY CHỐT reset một lần 00:01 thứ Hai 21/09: EXP về 0, thần thú về cấp 1 và XOÁ lựa chọn ⇒ sáng đó cả trường ở `thanThu: null`.
+// Đầu bảng phải là thẻ MỜI "Chọn thần thú của em" (bấm một lần là vào màn chọn của game); phụ huynh: "Con chưa chọn thần thú" (đọc-chỉ).
+describe('chưa chọn thần thú: thẻ mời đầu bảng', () => {
+  const chua = (d = duLieuMay()) => ({ ...d, thanThu: { kieu: 'chua_chon' } as const })
+
+  it('học sinh: MỘT nút cả thẻ "Chọn thần thú của em" đứng TRƯỚC tiến độ; bấm gọi onMoThanThu đúng 1 lần; không tính là nút filled thứ hai', async () => {
+    const onMoThanThu = vi.fn()
+    const { container } = ve({ duLieu: chua(), onMoThanThu, taiVinhDanh: vinhDanhRong })
+    const the = screen.getByRole('button', { name: 'Chọn thần thú của em' })
+    expect(the.className).toContain('bnv-chon-thu')
+    expect(the.textContent).toContain('Em chưa có thần thú')
+    // đứng đầu vùng nhiệm vụ: trước tiến độ và trước thẻ "Làm ngay"
+    const tienDo = container.querySelector('[data-vung="tien-do"]')!
+    expect(the.compareDocumentPosition(tienDo) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    const lamNgay = container.querySelector('[data-vung="lam-ngay"]')
+    if (lamNgay) expect(the.compareDocumentPosition(lamNgay) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    fireEvent.click(the)
+    expect(onMoThanThu).toHaveBeenCalledTimes(1)
+    expect(container.querySelectorAll('.bnv-nut-chinh').length).toBe(1) // vẫn chỉ MỘT nút filled: "Làm ngay"
+    expect(container.querySelectorAll('[data-noi-bat="true"]').length).toBe(1)
+  })
+
+  it('CHỈ hiện khi máy chủ nói rõ chưa chọn: có thần thú, chưa biết (nguồn trợ lý/lỗi) hoặc đang tải ⇒ không thẻ', () => {
+    for (const d of [conThu(duLieuMay()), { ...duLieuMay(), thanThu: { kieu: 'chua_biet' } as const }]) {
+      const { container, unmount } = ve({ duLieu: d as any, taiVinhDanh: vinhDanhRong })
+      expect(container.querySelector('[data-vung="chon-than-thu"]')).toBeNull()
+      unmount()
+    }
+    const { container } = ve({ duLieu: chua(), dangTai: true, taiVinhDanh: vinhDanhRong })
+    expect(container.querySelector('[data-vung="chon-than-thu"]')).toBeNull()
+  })
+
+  it('phụ huynh: "Con chưa chọn thần thú" đọc-chỉ, KHÔNG có nút; cũng khi app không có lối mở game', () => {
+    const { container, unmount } = render(<BangNhiemVu vaiTro="phuhuynh" hoTen="PH" now={NOW} duLieu={chua()} onMoThanThu={() => {}} taiVinhDanh={vinhDanhRong} />)
+    const s = container.querySelector('[data-vung="chon-than-thu"]') as HTMLElement
+    expect(s.tagName).toBe('SECTION')
+    expect(s.querySelector('h2')!.textContent).toBe('Con chưa chọn thần thú')
+    expect(s.querySelectorAll('button').length).toBe(0)
+    unmount()
+    const hs = render(<BangNhiemVu vaiTro="hocsinh" hoTen="Em" now={NOW} duLieu={chua()} taiVinhDanh={vinhDanhRong} />).container
+    expect(hs.querySelector('[data-vung="chon-than-thu"]')!.tagName).toBe('SECTION')
+  })
+
+  it('CSS thẻ mời: chỉ biến M3, không mã màu; cao ≥ 88 px', () => {
+    const css = readFileSync(join(THU_MUC, 'bang-nhiem-vu.css'), 'utf8')
+    const khoi = css.slice(css.indexOf('.bnv-chon-thu {'), css.indexOf('/* Thẻ MỪNG'))
+    expect(khoi).toContain('var(--m3-primary-container)')
+    expect(khoi).toMatch(/min-height:\s*88px/)
+    expect(khoi).not.toMatch(/#[0-9a-fA-F]{3,8}\b|rgba?\(/)
+  })
+})
+
 describe('kỷ luật mã nguồn của thư mục bang-nhiem-vu', () => {
   const tep = (dir: string): string[] =>
     readdirSync(dir).flatMap((t) => (statSync(join(dir, t)).isDirectory() ? tep(join(dir, t)) : [join(dir, t)]))

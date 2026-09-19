@@ -500,6 +500,31 @@ describe('EXP học tập + mảnh khiên (docs/ke-hoach-ngay-api-1909.md mục 
   })
 })
 
+describe('reset mùa 00:01 thứ Hai 21/09 (thầy chốt): bản nhớ của NGÀY CŨ không được hiện thần thú/EXP cũ', () => {
+  const T2359 = Date.UTC(2026, 8, 20, 16, 59) // 23:59 20/09 giờ VN
+  const T0001 = Date.UTC(2026, 8, 20, 17, 1) // 00:01 21/09 giờ VN
+  const cu = () => {
+    const d = tuKeHoachNgay({ ...keHoachMayChu, thanThu: { pet: 'nuoc_long', cap: 37, nickname: 'Bông' }, exp: { homNay: 22, chiTietHomNay: [], manhKhien: { manh: 5, moiKhien: 12, khienConLai: 1 } } } as any, T2359)
+    return JSON.parse(JSON.stringify(dongGoiBanNho(d, T2359)))
+  }
+
+  it('cùng ngày (23:59) còn dùng được và giữ thần thú + EXP; qua nửa đêm (00:01 sáng thứ Hai) thì BỎ hẳn, không rơi về gì cũ', () => {
+    const luu = cu()
+    const cungNgay = phucHoiBanNho(luu, T2359)!
+    expect(cungNgay.thanThu).toMatchObject({ kieu: 'co', pet: 'nuoc_long', cap: 37 })
+    expect(cungNgay.exp?.homNay).toBe(22)
+    expect(phucHoiBanNho(luu, T0001)).toBeNull()
+    // và một bản nhớ ghi từ NGÀY HÔM TRƯỚC (đủ cấu trúc) cũng bị bỏ khi mở lại sau reset
+    expect(phucHoiBanNho({ ...luu, ngay: '2026-09-19' }, T2359)).toBeNull()
+  })
+
+  it('sau reset máy chủ nói `thanThu:null` ⇒ trạng thái chua_chon (KHÔNG hiện con nào), EXP về 0 do máy chủ nói, không lẫn số cũ', () => {
+    const d = tuKeHoachNgay({ ...keHoachMayChu, thanThu: null, exp: { homNay: 0, chiTietHomNay: [], manhKhien: { manh: 0, moiKhien: 12, khienConLai: 0 } } } as any, T0001)
+    expect(d.thanThu).toEqual({ kieu: 'chua_chon' })
+    expect(d.exp).toEqual({ homNay: 0, chiTiet: [], manhKhien: { manh: 0, moiKhien: 12, khienConLai: 0 } })
+  })
+})
+
 describe('bài Mẹ giao chưa bắt đầu: máy chủ đưa vào viec[] (chuaBatDau); bài cũ ngoài đó vào tonCu', () => {
   const moChuaBD = (id: string, over: object = {}) =>
     v({ id: `mom:${id}`, loai: 'mom', soCau: 6, batBuoc: true, ghiChu: 'Bài Mom giao, chưa bắt đầu. Bấm bắt đầu thì có 120 phút làm.', chiTiet: { id, chuaBatDau: true, taoLuc: gio(-5) }, ...over })

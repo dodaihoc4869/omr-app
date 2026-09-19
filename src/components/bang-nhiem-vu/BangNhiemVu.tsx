@@ -4,7 +4,7 @@
 // Màn này KHÔNG xếp việc, không tính điểm, không gọi API nhiệm vụ: nhận
 // `DuLieuBangNhiemVu` từ `nhiem-vu-adapter` và chỉ vẽ.
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { CheckCircle2, ClipboardCheck, MessageSquare, Plus, Shield, Sparkles, Zap } from 'lucide-react'
+import { CheckCircle2, ChevronRight, ClipboardCheck, MessageSquare, PawPrint, Plus, Shield, Sparkles, Zap } from 'lucide-react'
 import type { DuLieuBangNhiemVu, HanhDongNhiemVu, TheNhiemVu } from '../../lib/nhiem-vu-adapter'
 import type { SpiritMotion } from '../../game/than-thu-v2/Spirit2D'
 import DauTrang, { type MucMenu, type ThanThuGoc } from './DauTrang'
@@ -163,6 +163,9 @@ export default function BangNhiemVu({
   const coBaoNhan = !dangTai && khoaNhan !== '#' && khoaNhan !== khoaDaAn
   const tongExpMoi = duLieu.expNhan.reduce((t, x) => t + x.exp, 0)
 
+  // Máy chủ nói RÕ em chưa chọn thần thú (`thanThu: null`) — vd sáng sau khi đặt lại mùa: thẻ mời nổi bật đầu bảng. Không hiện khi chưa biết.
+  const chuaChonThu = !dangTai && duLieu.thanThu.kieu === 'chua_chon'
+
   const chon = (viec: TheNhiemVu) => onHanhDong?.(viec.hanhDong)
   const { tienDo, tocDo } = duLieu
   const viec = tatCaViec(duLieu)
@@ -210,6 +213,29 @@ export default function BangNhiemVu({
           </div>
         ) : (
           <>
+            {chuaChonThu &&
+              (laPh || !onMoThanThu ? (
+                <section className="bnv-chon-thu bnv-chon-thu--doc" data-vung="chon-than-thu" aria-label={laPh ? 'Con chưa chọn thần thú' : 'Em chưa chọn thần thú'}>
+                  <span className="bnv-chon-thu-bt" aria-hidden="true">
+                    <PawPrint size={28} />
+                  </span>
+                  <div className="bnv-chon-thu-chu">
+                    <h2>{laPh ? 'Con chưa chọn thần thú' : 'Em chưa chọn thần thú'}</h2>
+                    <p>{laPh ? 'Khi con chọn, thần thú sẽ hiện ở đầu trang này.' : 'Em mở game để chọn một bạn đồng hành.'}</p>
+                  </div>
+                </section>
+              ) : (
+                <button type="button" className="bnv-chon-thu" data-vung="chon-than-thu" onClick={onMoThanThu} aria-label="Chọn thần thú của em">
+                  <span className="bnv-chon-thu-bt" aria-hidden="true">
+                    <PawPrint size={28} />
+                  </span>
+                  <span className="bnv-chon-thu-chu">
+                    <span className="bnv-chon-thu-ten">Chọn thần thú của em</span>
+                    <span className="bnv-chon-thu-phu">Em chưa có thần thú. Chạm để chọn một bạn đồng hành học cùng em.</span>
+                  </span>
+                  <ChevronRight size={24} aria-hidden="true" />
+                </button>
+              ))}
             {coBaoNhan && (
               <section className="bnv-exp-moi" role="status" aria-label="Vừa nhận EXP" data-vung="exp-moi">
                 <Zap size={20} aria-hidden="true" />

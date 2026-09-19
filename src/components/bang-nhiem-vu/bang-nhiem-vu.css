@@ -632,6 +632,41 @@ button.bnv-the:active {
 .bnv-exp-moi-chu b { font-size: var(--bnv-cx-2); }
 .bnv-exp-an { flex-shrink: 0; min-width: 48px; min-height: 48px; padding: 0 var(--k3, 12px); border-radius: var(--m3-bo-tron); color: var(--m3-on-tertiary-container); font-size: var(--bnv-cx-1); font-weight: 700; }
 
+/* THẺ MỜI "Chọn thần thú của em" (máy chủ nói em chưa chọn): cả thẻ là MỘT nút (không tính là "nút filled" thứ hai), primary tonal, cao ≥ 88 px. */
+.bnv-chon-thu {
+  display: flex;
+  align-items: center;
+  gap: var(--k4, 16px);
+  width: 100%;
+  min-height: 88px;
+  padding: var(--k4, 16px) var(--k4, 16px) var(--k4, 16px) var(--k5, 20px);
+  border-radius: var(--m3-bo-28);
+  background: var(--m3-primary-container);
+  color: var(--m3-on-primary-container);
+  text-align: left;
+}
+button.bnv-chon-thu { cursor: pointer; box-shadow: var(--m3-cao-do-1); }
+button.bnv-chon-thu:active { transform: scale(0.99); }
+button.bnv-chon-thu:focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 2px; }
+.bnv-chon-thu--doc { background: var(--m3-surface-container-high); color: var(--m3-on-surface); box-shadow: none; }
+.bnv-chon-thu-bt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--m3-bo-tron);
+  background: var(--m3-primary);
+  color: var(--m3-on-primary);
+}
+.bnv-chon-thu--doc .bnv-chon-thu-bt { background: var(--m3-surface-container); color: var(--m3-on-surface-variant); }
+.bnv-chon-thu-chu { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+.bnv-chon-thu-ten, .bnv-chon-thu h2 { margin: 0; font-size: var(--bnv-cx-4); font-weight: 700; line-height: 1.25; text-wrap: balance; }
+.bnv-chon-thu-phu, .bnv-chon-thu p { margin: 0; font-size: var(--bnv-cx-2); line-height: 1.45; color: var(--m3-on-primary-container-phu); }
+.bnv-chon-thu--doc p { color: var(--m3-on-surface-variant); }
+.bnv-chon-thu > svg { flex-shrink: 0; }
+
 /* Thẻ MỪNG "xong việc hôm nay" (em đã đạt chỉ tiêu, chỉ còn việc tuỳ chọn): tertiary tonal, không "Làm ngay". */
 .bnv-mung {
   display: flex;
