@@ -19,6 +19,7 @@ import { tachDongTheoY } from '../lib/tach-dong-cau'
 import NutQuayLai from '../components/NutQuayLai'
 import { dungM3, ThanhTren } from '../components/m3'
 import LichSuCaM3 from '../components/bang-nhiem-vu/LichSuCaM3'
+import BtvnM3 from '../components/bang-nhiem-vu/BtvnM3'
 import '../components/bang-nhiem-vu/sheet-m3.css'
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import {
@@ -1531,7 +1532,18 @@ export default function StudentPortalScreen() {
         )}
 
         {/* TAB 2: NỘP BÀI TẬP VỀ NHÀ */}
-        {tab === 'btvn' && (
+        {tab === 'btvn' && vaoM3 && (
+          <BtvnM3
+            dangTai={dangTaiBtvn}
+            ds={dsBtvn}
+            now={nowHocTap}
+            dangMoId={dangMoBai}
+            ngayGio={dinhDangNgayGio}
+            onMo={(bt, lamLai) => void moBaiTap(bt, lamLai)}
+            onTaiLai={() => void napLaiBtvn()}
+          />
+        )}
+        {tab === 'btvn' && !vaoM3 && (
           <div className="space-y-4 animate-google-fade">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
