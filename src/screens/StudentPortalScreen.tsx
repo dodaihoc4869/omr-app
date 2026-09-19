@@ -72,6 +72,7 @@ import type { TuCongHocSinh } from './ExamTakeScreen'
 
 // Màn làm bài nạp trễ: cổng học sinh không phải kéo theo bộ chấm khi chỉ xem điểm.
 const ManLamBai = lazy(() => import('./ExamTakeScreen'))
+const LamCauOn = lazy(() => import('../components/bang-nhiem-vu/LamCauOn'))
 import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
 
 const KHOA_LUU_AUTH = 'omr_student_portal_auth'
@@ -165,7 +166,7 @@ function mauDiem(diem: number | null): string {
   return 'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/40 dark:border-rose-800'
 }
 
-type TabType = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin'
+type TabType = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon'
 
 /** Chỗ giữ màn trong lúc mảnh mã game đang về. Cao bằng vùng game để không
  * giật layout, và nói rõ đang chờ chứ không để em nhìn khoảng trắng. */
@@ -271,6 +272,8 @@ export default function StudentPortalScreen() {
   // Bài của Mom giao (Đồng hồ đếm ngược 2 tiếng)
   const [dsMomGiao, setDsMomGiao] = useState<BaiMomGiao[]>([])
   const [dangLamMom, setDangLamMom] = useState<BaiMomGiao | null>(null)
+  // Việc ÔN CÂU (on_lai) đang làm trong sheet 'cauon': đúng các qid máy chủ chọn, nộp về /hs/on-lai/nop.
+  const [cauOn, setCauOn] = useState<{ viecId: string; qid: string[]; tieuDe: string } | null>(null)
   const [giayConLaiMom, setGiayConLaiMom] = useState<number>(7200)
   const [cauTraLoiMom, setCauTraLoiMom] = useState<Record<string, string>>({})
   const [thongBaoNopMom, setThongBaoNopMom] = useState<string | null>(null)
@@ -662,6 +665,12 @@ export default function StudentPortalScreen() {
           void batDauLamBaiMom({ id: hanhDong.payload.id } as BaiMomGiao)
         } else {
           setTab('mom')
+        }
+        break
+      case 'lam_cau_on':
+        if (Array.isArray(hanhDong.payload?.qid) && hanhDong.payload.qid.length > 0) {
+          setCauOn({ viecId: String(hanhDong.payload.viecId || 'on_lai'), qid: hanhDong.payload.qid, tieuDe: String(hanhDong.payload.tieuDe || 'Ôn câu hôm nay') })
+          setTab('cauon')
         }
         break
       case 'mo_khac_phuc':
@@ -1264,6 +1273,7 @@ export default function StudentPortalScreen() {
     : tab === 'mom' ? 'Bài gia đình giao'
     : tab === 'khacphuc' ? 'Khắc phục lỗi sai & luyện đề'
     : tab === 'vaothi' ? 'Vào phòng thi trực tuyến'
+    : tab === 'cauon' ? 'Ôn câu hôm nay'
     : 'Bảng tin & bài luyện hôm nay'
 
   const moManCu = (man: TabType) => {
@@ -1338,6 +1348,7 @@ export default function StudentPortalScreen() {
                 {tab === 'mom' && 'Bài gia đình giao (120 phút từ khi bắt đầu)'}
                 {tab === 'khacphuc' && 'Khắc Phục Lỗi Sai & Luyện Đề'}
                 {tab === 'vaothi' && 'Vào Phòng Thi Trực Tuyến'}
+                {tab === 'cauon' && 'Ôn câu hôm nay'}
                 {tab === 'thanthu' && 'Thần Thú Hóa Học (Alchemon)'}
                 {tab === 'bantin' && 'Bảng tin & bài luyện hôm nay'}
               </h2>
@@ -2006,6 +2017,13 @@ export default function StudentPortalScreen() {
               />
             </div>
           </div>
+        )}
+
+        {/* ÔN CÂU HÔM NAY (việc on_lai): lấy đề → làm → nộp → lời giải. Đóng sheet thì màn cổng hỏi lại kế hoạch ngày. */}
+        {tab === 'cauon' && cauOn && auth && auth.token && (
+          <Suspense fallback={<div className="m3-xuong" style={{ height: 160 }} />}>
+            <LamCauOn token={auth.token} sbd={auth.sbd} viecId={cauOn.viecId} qid={cauOn.qid} tieuDe={cauOn.tieuDe} onXong={() => setTab(null)} />
+          </Suspense>
         )}
 
         {/* TAB 4: VÀO PHÒNG THI */}

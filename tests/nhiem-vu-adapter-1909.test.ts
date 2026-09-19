@@ -84,7 +84,8 @@ describe('hai nguồn ra cùng một cấu trúc', () => {
         expect(v.id).toBeTruthy()
         expect(v.tieuDe).toBeTruthy()
         expect(typeof v.biCong).toBe('boolean')
-        expect(v.hanhDong.loai).toMatch(/^mo_/)
+        // `mo_*` mở một màn cũ; `lam_cau_on` (C11, có chủ ý) mở màn LamCauOn với đúng các câu máy chủ chọn.
+        expect(v.hanhDong.loai).toMatch(/^(mo_|lam_cau_on$)/)
         expect(v.hanhDong.nhanNut).toBeTruthy()
       }
     }
@@ -222,6 +223,29 @@ describe('nhánh máy chủ: tên, payload khi bấm, quá hạn, cảnh báo', 
     expect(chuHienThi).not.toMatch(/CARBOHYDRATE|UNG_DUNG/)
     expect(theo['than_thu:CARBOHYDRATE.UNG_DUNG'].tieuDe).toBe('Thần thú: luyện dạng còn yếu')
     expect(theo['than_thu:CARBOHYDRATE.UNG_DUNG'].hanhDong.loai).toBe('mo_than_thu')
+  })
+
+  it('C11: on_lai có chiTiet.qid → hành động lam_cau_on mang ĐÚNG các qid (tối đa 20, bỏ rỗng/không phải chuỗi); thiếu qid → luồng cũ', () => {
+    const on = theo['on_lai:2026-09-19']
+    expect(on.hanhDong).toEqual({ loai: 'lam_cau_on', payload: { viecId: 'on_lai:2026-09-19', qid: ['a', 'b', 'c'], soCau: 3, tieuDe: 'Ôn 3 câu đã tới hạn nhắc lại' }, nhanNut: 'Ôn ngay' })
+    const nhieu = Array.from({ length: 25 }, (_, i) => `q${i}`)
+    const kh: KeHoachNgayMayChu = {
+      ...keHoachMayChu,
+      viec: [
+        v({ id: 'on_lai:A', loai: 'on_lai', soCau: 25, chiTiet: { qid: [...nhieu, '', 7, null] } }),
+        v({ id: 'on_lai:B', loai: 'on_lai', soCau: 2, chiTiet: {} }),
+        v({ id: 'on_lai:C', loai: 'on_lai', soCau: 2, chiTiet: { qid: [] } }),
+        v({ id: 'on_thi:D', loai: 'on_thi', soCau: 2, chiTiet: { qid: ['x'] } }),
+      ] as any,
+    }
+    const t = Object.fromEntries(tatCaViec(tuKeHoachNgay(kh, NOW, phu)).map((x) => [x.id, x]))
+    expect((t['on_lai:A'].hanhDong.payload as any).qid).toEqual(nhieu.slice(0, 20))
+    expect(t['on_lai:A'].hanhDong.loai).toBe('lam_cau_on')
+    // thiếu / rỗng qid (máy chủ cũ): giữ luồng luyện lại câu sai hiện có, không mở màn rỗng
+    expect(t['on_lai:B'].hanhDong).toMatchObject({ loai: 'mo_khac_phuc', nhanNut: 'Ôn ngay' })
+    expect(t['on_lai:C'].hanhDong.loai).toBe('mo_khac_phuc')
+    // on_thi chưa có đường lấy/nộp riêng: KHÔNG mượn đường on_lai
+    expect(t['on_thi:D'].hanhDong.loai).toBe('mo_khac_phuc')
   })
 
   it('trễ nhịp được nói ra; btvn_nop có nút Nộp bài', () => {

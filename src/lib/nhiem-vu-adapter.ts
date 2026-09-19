@@ -11,7 +11,14 @@ export type BacNhiemVu = 'khan' | 'bat_buoc' | 'nen_lam' | 'tuy_chon'
 /** Vai trò màu Material 3 của từng bậc — giao diện chỉ đọc, không tự chọn màu. */
 export type VaiTroMau = 'error' | 'primary' | 'secondary' | 'tertiary'
 export type BieuTuongViec = 'btvn' | 'mom' | 'on' | 'muc_tieu' | 'sao'
-export type HanhDongNhiemVu = NhiemVuTroLy['hanhDong']
+/** Việc ôn câu (on_lai) đã có đường lấy đề + nộp riêng: mở màn LamCauOn với đúng các qid máy chủ chọn. (`tro-ly-ca-nhan.ts` không mở
+ * cho phiên giao diện nên loại hành động mới khai ở đây, hợp với loại cũ bằng phép hợp.) */
+export interface HanhDongLamCauOn {
+  loai: 'lam_cau_on'
+  payload: { viecId: string; qid: string[]; soCau: number; tieuDe: string }
+  nhanNut: string
+}
+export type HanhDongNhiemVu = NhiemVuTroLy['hanhDong'] | HanhDongLamCauOn
 
 export const THU_TU_BAC: readonly BacNhiemVu[] = ['khan', 'bat_buoc', 'nen_lam', 'tuy_chon']
 export const VAI_TRO_MAU: Record<BacNhiemVu, VaiTroMau> = {
@@ -396,8 +403,15 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
       }
       case 'than_thu':
         return { loai: 'mo_than_thu', nhanNut: 'Luyện với thần thú' }
+      case 'on_lai': {
+        // Việc ôn câu: máy chủ đã chọn ĐÚNG các qid (chiTiet.qid) và có đường lấy đề + nộp (`/hs/cau-theo-qid`, `/hs/on-lai/nop`)
+        // ⇒ mở màn LamCauOn với chính các câu ấy. Thiếu qid (máy chủ cũ) thì rơi về luồng luyện câu sai cũ.
+        const qid = Array.isArray(ct.qid) ? ct.qid.filter((q: unknown): q is string => typeof q === 'string' && q.trim() !== '') : []
+        if (qid.length > 0) return { loai: 'lam_cau_on', payload: { viecId: v.id, qid: qid.slice(0, 20), soCau: qid.length, tieuDe: tenViec(v) }, nhanNut: 'Ôn ngay' }
+        return { loai: 'mo_khac_phuc', payload: { cheDo: 1, soCau: v.soCau }, nhanNut: 'Ôn ngay' }
+      }
       default:
-        // on_lai / on_thi: chưa có luồng mở ĐÚNG các câu máy chủ chọn ⇒ mở luồng luyện lại câu sai hiện có.
+        // on_thi: chưa có đường lấy/nộp riêng ⇒ mở luồng luyện lại câu sai hiện có.
         return { loai: 'mo_khac_phuc', payload: { cheDo: 1, soCau: v.soCau }, nhanNut: 'Ôn ngay' }
     }
   }
