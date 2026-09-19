@@ -1,6 +1,6 @@
 import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
 import { mucMenuHocSinh } from '../components/bang-nhiem-vu/muc-menu'
-import { useCaDangMo, useKeHoachNgay, useLamMoiKhiDong } from '../components/bang-nhiem-vu/may-chu'
+import { useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong } from '../components/bang-nhiem-vu/may-chu'
 import { dungBangNhiemVu } from '../lib/nhiem-vu-adapter'
 import { tongHopKeHoachTroLy } from '../lib/tro-ly-ca-nhan'
 import { PETS } from '../game/than-thu-v2/core'
@@ -986,6 +986,10 @@ export default function StudentPortalScreen() {
       }),
     [nowHocTap, auth?.sbd, auth?.hoTen, dsBtvn, dsMomGiao, dsLichSu, tongSoCauSaiDaChon, hoSoThanThu, keHoachNgay],
   )
+  // Mọi dữ liệu đã về (thành công hay lỗi) chưa? Trước đó vẽ từ BẢN NHỚ cùng ngày nếu có, không thì skeleton.
+  const sanSangBang = daNapLanDau && (daTaiMom || !!loiMom) && keHoachNgay.daXong
+  const banNho = useBanNho(auth?.sbd, sanSangBang && !keHoachNgay.cu && duLieuNhiemVu.nguon === 'ke_hoach_ngay' ? duLieuNhiemVu : null)
+  const dungBanNho = !!banNho && !sanSangBang
   const thanThuGoc = useMemo(() => {
     const index = Math.max(0, PETS.findIndex((p) => p.id === (hoSoThanThu?.pet || 'hoa_long')))
     return { index, cap: Number(hoSoThanThu?.cap) || 1, ten: hoSoThanThu?.nickname || PETS[index]?.name || 'Thần thú' }
@@ -1288,8 +1292,8 @@ export default function StudentPortalScreen() {
           vaiTro="hocsinh"
           hoTen={auth.hoTen}
           now={nowHocTap}
-          duLieu={duLieuNhiemVu}
-          dangTai={!daNapLanDau || (!daTaiMom && !loiMom) || !keHoachNgay.daXong}
+          duLieu={dungBanNho ? banNho! : duLieuNhiemVu}
+          dangTai={!sanSangBang && !dungBanNho}
           thanThu={thanThuGoc}
           mucMenu={mucMenuHocSinh(moManCu, dangXuat)}
           khePhai={

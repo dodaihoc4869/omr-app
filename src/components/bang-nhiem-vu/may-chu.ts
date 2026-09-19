@@ -1,8 +1,8 @@
 // Gọi máy chủ cho Bảng nhiệm vụ: kế hoạch ngày + "có ca đang mở". Mọi lỗi → null/false, KHÔNG ném:
 // màn phải sống được khi mất mạng (rơi về nguồn trợ lý, hoặc hiện bản cuối kèm "kế hoạch lúc …").
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
-import { laKeHoachNgayHopLe, type KeHoachNgayMayChu } from '../../lib/nhiem-vu-adapter'
+import { dongGoiBanNho, laKeHoachNgayHopLe, phucHoiBanNho, type DuLieuBangNhiemVu, type KeHoachNgayMayChu } from '../../lib/nhiem-vu-adapter'
 
 export interface DinhDanh {
   /** Có token thì SBD lấy từ chữ ký (ưu tiên). Không thì SBD (phụ huynh). */
@@ -136,4 +136,39 @@ export function useSauVeDauTien(): boolean {
     }
   }, [])
   return xong
+}
+
+// ─── bản nhớ trong máy (theo SBD) ───────────────────────────────────────────────────────
+const khoaNho = (sbd: string) => `omr_bnv_ke_hoach:${sbd}`
+
+export function docBanNho(sbd: string, now: number): DuLieuBangNhiemVu | null {
+  try {
+    const t = localStorage.getItem(khoaNho(sbd))
+    return t ? phucHoiBanNho(JSON.parse(t), now) : null
+  } catch {
+    return null
+  }
+}
+
+export function luuBanNho(sbd: string, duLieu: DuLieuBangNhiemVu, now: number): void {
+  const b = dongGoiBanNho(duLieu, now)
+  if (!b) return
+  try {
+    localStorage.setItem(khoaNho(sbd), JSON.stringify(b))
+  } catch {
+    /* Máy đầy/chế độ riêng tư: không nhớ được thì thôi, màn vẫn chạy. */
+  }
+}
+
+/**
+ * Bản nhớ CÙNG NGÀY (đọc một lần cho mỗi SBD) và tự lưu khi có bản MỚI dựng từ máy chủ.
+ * `moi` chỉ truyền vào khi mọi dữ liệu đã về và bản đó không phải bản cuối/nguồn trợ lý.
+ */
+export function useBanNho(sbd: string | undefined, moi: DuLieuBangNhiemVu | null): DuLieuBangNhiemVu | null {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const nho = useMemo(() => (sbd ? docBanNho(sbd, Date.now()) : null), [sbd])
+  useEffect(() => {
+    if (sbd && moi) luuBanNho(sbd, moi, Date.now())
+  }, [sbd, moi])
+  return nho
 }

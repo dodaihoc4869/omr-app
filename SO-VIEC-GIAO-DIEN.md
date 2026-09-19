@@ -4,7 +4,7 @@ Lập 19/09/2026 12:25. Theo `DIEU-PHOI.md` luật 4: phần giao diện ghi s�
 
 ## ĐANG Ở ĐÂU / VIỆC KẾ TIẾP (cập nhật cuối mỗi mốc)
 
-- MỐC A (Bảng nhiệm vụ HS+PH, nối /hs/ke-hoach-ngay + /hs/ca-dang-mo): XONG mã + test + ảnh; commit ngay sau dòng này; toàn vitest 98 đỏ / 43 tệp = đúng nền. CHƯA đẩy Pages (em không tự đẩy: quyền đẩy bản live không cấp được qua tin nhắn giữa các phiên) → nhắn 0.Planer đẩy.
+- MỐC A: XONG, đã lên Pages đợt 1 (0.Planer đẩy, 5a6effde). MỐC A.1 (bản nhớ kế hoạch ngày, stale-while-revalidate): XONG mã + test, commit ngay sau dòng này; toàn vitest 98 đỏ / 43 tệp (lần 1 có 99/44 vì `escort-context-menu` chập chờn theo tải — chạy riêng 4/4 xanh, chạy lại toàn bộ 98/43, 0 đỏ mới). Em KHÔNG tự đẩy Pages → 0.Planer đẩy đợt 1b.
 - KẾ TIẾP: việc B = `prompt-giao-dien-phieu-lam-bai.md` + `prompt-giao-dien-dong-bo-man-hoc-sinh.md` (phủ MỌI lối gọi dungPhieu; thay áo, không thay xương; CSS mới dưới `body .gd-m3`; bản in/tờ máy chiếu không đổi 1 byte). Vùng mở thêm: `src/lib/html-phieu.ts`. Bản vẽ: 3 khung hàng 2 của canvas (PhieuLamBai/PhieuSauNop/PhieuLuoiCau).
 - SAU ĐÓ việc C: gửi 0.Planer BẢNG KIỂM KÊ mọi đường bấm HS/PH rồi làm nhóm 1 (React – xem), 2, 3; màn thi thật (ExamTakeScreen/exam-setup.css) LÀM CUỐI và nhắn 0.Planer soát diff trước khi đẩy.
 - Nếu phiên bị ngắt: đọc mục "Việc" + "Nhật ký vòng sửa" dưới đây; mọi thứ của mốc A đã commit.
@@ -20,6 +20,7 @@ Lập 19/09/2026 12:25. Theo `DIEU-PHOI.md` luật 4: phần giao diện ghi s�
 - [x] Thần thú đứng yên khi trống ("đang nghỉ"); thẻ Vinh danh không dựng khi còn skeleton (CLS) | bằng chứng: test
 - [x] Ảnh chụp cuối: docs/anh-bang-nhiem-vu-1909/ (20 ảnh: HS khẩn 4 cỡ × sáng/tối = 8, đủ 4 bậc (khan2), ca đang mở (ca-mo), nguồn trợ lý, trống; PH khẩn + trống) | bằng chứng: Chromium trên bản dựng thật, 0 vi phạm / 20 kịch bản
 - [x] Đoạn 5 dòng cho thầy (dưới)
+- [x] MỐC A.1 — bản nhớ kế hoạch ngày (0.Planer giao 13:4x): nhớ bản dựng từ máy chủ (localStorage `omr_bnv_ke_hoach:<sbd>`, kèm tên bài + payload); mở lại thì VẼ NGAY từ bản nhớ cùng ngày VN + dòng "Kế hoạch lúc HH:MM · đang cập nhật…", gọi máy chủ rồi thay; bản nhớ ngày khác/rác không dùng để vẽ việc; máy chủ lỗi sau khi dữ liệu đã về ⇒ thôi vẽ bản nhớ, rơi về nguồn trợ lý; không nhớ nguồn trợ lý/bản cuối; khác SBD không lẫn | bằng chứng: adapter 43 + tích hợp StudentPortalScreen 20 (đột biến bỏ kiểm ngày → 2 test đỏ); Chromium thật với mọi API chậm 4 s/lần: thẻ "Làm ngay" hiện sau 80 ms từ bản nhớ, bấm được, rồi thay khi bản mới về
 
 ## Nghiệm thu — MỐC A
 

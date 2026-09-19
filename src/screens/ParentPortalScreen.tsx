@@ -5,7 +5,7 @@ import { dungBangNhiemVu } from '../lib/nhiem-vu-adapter'
 import { tongHopKeHoachTroLy } from '../lib/tro-ly-ca-nhan'
 import { PETS } from '../game/than-thu-v2/core'
 import { useGioHocTap } from '../hooks/useGioHocTap'
-import { useKeHoachNgay } from '../components/bang-nhiem-vu/may-chu'
+import { useBanNho, useKeHoachNgay } from '../components/bang-nhiem-vu/may-chu'
 import { momApi, migrateMom, momReviewHtml, chuanHoaBaiMom } from '../lib/mom-api'
 import KhoiKhacPhuc3CheDo from '../components/KhoiKhacPhuc3CheDo'
 import { useEffect, useMemo, useState } from 'react'
@@ -128,6 +128,9 @@ export default function ParentPortalScreen() {
       }),
     [nowHocTap, sbdHienTai, hoTenCon, dsMomGiao, dsBtvnCon, dsBaiThi, tongSoCauSaiCon, hoSoThanThuCon, keHoachNgay],
   )
+  const sanSangBang = !dangTai && daNapMomLanDau && keHoachNgay.daXong
+  const banNho = useBanNho(sbdHienTai ?? undefined, sanSangBang && !keHoachNgay.cu && duLieuNhiemVu.nguon === 'ke_hoach_ngay' ? duLieuNhiemVu : null)
+  const dungBanNho = !!banNho && !sanSangBang
   const thanThuCon = useMemo(() => {
     const index = Math.max(0, PETS.findIndex((p) => p.id === (hoSoThanThuCon?.pet || 'hoa_long')))
     return { index, cap: Number(hoSoThanThuCon?.cap) || 1, ten: hoSoThanThuCon?.nickname || PETS[index]?.name || 'Thần thú' }
@@ -596,8 +599,8 @@ export default function ParentPortalScreen() {
           vaiTro="phuhuynh"
           hoTen={hoTenCon}
           now={nowHocTap}
-          duLieu={duLieuNhiemVu}
-          dangTai={dangTai || !daNapMomLanDau || !keHoachNgay.daXong}
+          duLieu={dungBanNho ? banNho! : duLieuNhiemVu}
+          dangTai={!sanSangBang && !dungBanNho}
           thanThu={thanThuCon}
           mucMenu={mucMenuPhuHuynh(setTabPh, dangXuat, {
             // Kết quả giao nhanh hiện ở khung thông báo của sheet "khắc phục", nên mở sheet ngay.

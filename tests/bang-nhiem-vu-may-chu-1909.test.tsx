@@ -3,6 +3,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react'
 import StudentPortalScreen from '../src/screens/StudentPortalScreen'
+import { dongGoiBanNho, tuKeHoachNgay } from '../src/lib/nhiem-vu-adapter'
 import {
   taiCaDangMo,
   taiKeHoachNgay,
@@ -12,7 +13,7 @@ import {
   useSauVeDauTien,
 } from '../src/components/bang-nhiem-vu/may-chu'
 
-const mocks = vi.hoisted(() => ({ homework: vi.fn(), sheet: vi.fn(), items: [] as any[], momItems: [] as any[] }))
+const mocks = vi.hoisted(() => ({ homework: vi.fn(), sheet: vi.fn(), items: [] as any[], momItems: [] as any[], lichSuCho: null as Promise<any> | null }))
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
 vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
 vi.mock('../src/components/ThongBaoHocSinh', () => ({ default: () => null, noticeApi: vi.fn() }))
@@ -20,7 +21,7 @@ vi.mock('../src/game/than-thu-v2/academic-sync', () => ({ syncStudentExp: async 
 vi.mock('../src/lib/exam-db', async (original) => ({ ...(await original<any>()), loadScriptUrlHoacMacDinh: async () => '/test' }))
 vi.mock('../src/lib/exam-api', async (original) => ({
   ...(await original<any>()),
-  hsLichSuCaApi: async () => ({ ok: true, items: [] }),
+  hsLichSuCaApi: () => mocks.lichSuCho ?? Promise.resolve({ ok: true, items: [] }),
   hsBtvnApi: async () => ({ ok: true, items: mocks.items }),
   thanThuDocApi: async () => ({ ok: true, hoSo: {} }),
 }))
@@ -49,7 +50,7 @@ const KE_HOACH = {
   capNhatLuc: gio(-0.1),
 }
 
-type Tra = { status?: number; body?: any; nem?: boolean }
+type Tra = { status?: number; body?: any; nem?: boolean; cho?: Promise<void> }
 let cuocGoi: { url: string; body: any }[] = []
 let tra: Record<string, Tra | (() => Tra)> = {}
 function giaLapFetch() {
@@ -64,6 +65,7 @@ function giaLapFetch() {
       const duong = new URL(u).pathname
       const r = typeof tra[duong] === 'function' ? (tra[duong] as () => Tra)() : (tra[duong] as Tra | undefined)
       if (r?.nem) throw new Error('mất mạng')
+      if (r?.cho) await r.cho
       const status = r?.status ?? 200
       return { ok: status >= 200 && status < 300, status, json: async () => r?.body ?? { ok: true, items: [] } }
     }),
@@ -238,5 +240,93 @@ describe('StudentPortalScreen thật: nối kế hoạch máy chủ và "ca đan
     const fab = await screen.findByRole('button', { name: 'Vào thi' })
     await waitFor(() => expect(goiTheo('/hs/ca-dang-mo').length).toBeGreaterThan(0))
     expect(fab.getAttribute('data-ca-mo')).toBe('false')
+  })
+})
+
+describe('A.1 — bản nhớ kế hoạch: vẽ NGAY khi mở lại, rồi thay bằng bản mới', () => {
+  const KHOA = 'omr_bnv_ke_hoach:test'
+  const nho = (lui = 0) => {
+    const d = tuKeHoachNgay({ ...KE_HOACH, viec: KE_HOACH.viec.map((v) => ({ ...v })) } as any, Date.now(), {})
+    const b = dongGoiBanNho(d, Date.now() - lui)!
+    return JSON.stringify(b)
+  }
+  const gieoNho = (chu: string) => localStorage.setItem(KHOA, chu)
+  let giaiKeHoach!: () => void
+  let giaiLichSu!: (v: any) => void
+
+  beforeEach(() => {
+    mocks.items = []
+    mocks.momItems = []
+    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: 'test', hoTen: 'Em thử', token: 'test-token' }))
+    // Mạng và danh sách CHƯA về: chỉ bản nhớ mới có gì để vẽ.
+    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH, cho: new Promise<void>((ok) => (giaiKeHoach = ok)) }
+    mocks.lichSuCho = new Promise((ok) => (giaiLichSu = ok))
+  })
+  afterEach(() => {
+    mocks.lichSuCho = null
+  })
+
+  it('có bản nhớ CÙNG NGÀY: vẽ ngay (không chờ mạng), có dòng "Kế hoạch lúc … đang cập nhật", không skeleton', async () => {
+    gieoNho(nho())
+    const { container } = render(<StudentPortalScreen />)
+    expect(await screen.findByRole('region', { name: /^Làm ngay: Ôn 3 câu đã tới hạn nhắc lại/ })).toBeTruthy()
+    expect(container.querySelector('[data-vung="ke-hoach-cu"]')!.textContent).toMatch(/^Kế hoạch lúc \d{2}:\d{2} · đang cập nhật/)
+    expect(container.querySelector('[aria-busy="true"]')).toBeNull()
+    expect(goiTheo('/hs/ke-hoach-ngay').length).toBeGreaterThan(0) // vẫn gọi máy chủ để cập nhật
+  })
+
+  it('bản mới về thì THAY: bỏ dòng "đang cập nhật", lưu lại bản nhớ mới', async () => {
+    gieoNho(nho(60_000))
+    const { container } = render(<StudentPortalScreen />)
+    await screen.findByRole('region', { name: /^Làm ngay: Ôn 3 câu/ })
+    expect(container.querySelector('[data-vung="ke-hoach-cu"]')).not.toBeNull()
+    const luuTruoc = JSON.parse(localStorage.getItem(KHOA)!).luuLuc
+    await act(async () => {
+      giaiKeHoach()
+      giaiLichSu({ ok: true, items: [] })
+    })
+    await waitFor(() => expect(container.querySelector('[data-vung="ke-hoach-cu"]')).toBeNull())
+    expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('ke_hoach_ngay')
+    await waitFor(() => expect(JSON.parse(localStorage.getItem(KHOA)!).luuLuc).toBeGreaterThan(luuTruoc))
+  })
+
+  it('bản nhớ của NGÀY HÔM QUA: KHÔNG vẽ việc cũ — chỉ skeleton tới khi dữ liệu về', async () => {
+    gieoNho(nho(24 * 3600_000))
+    const { container } = render(<StudentPortalScreen />)
+    await waitFor(() => expect(container.querySelector('[aria-busy="true"]')).not.toBeNull())
+    expect(container.querySelector('[data-vung="lam-ngay"]')).toBeNull()
+    expect(container.querySelectorAll('.bnv-the').length).toBe(0)
+    expect(container.textContent).not.toContain('Ôn 3 câu đã tới hạn')
+  })
+
+  it('bản nhớ rác (không phải JSON / sai cấu trúc): bỏ qua, skeleton, không sập', async () => {
+    for (const rac of ['{khong-phai-json', JSON.stringify({ ngay: 'x' }), 'null', '[]']) {
+      cleanup()
+      gieoNho(rac)
+      const { container } = render(<StudentPortalScreen />)
+      await waitFor(() => expect(container.querySelector('[aria-busy="true"]')).not.toBeNull())
+      expect(container.querySelector('[data-vung="lam-ngay"]')).toBeNull()
+    }
+  })
+
+  it('máy chủ LỖI sau khi dữ liệu đã về: thôi vẽ bản nhớ, rơi về nguồn trợ lý (không giữ mãi bản cũ)', async () => {
+    gieoNho(nho())
+    tra['/hs/ke-hoach-ngay'] = { nem: true }
+    mocks.lichSuCho = null
+    mocks.momItems = [{ id: 'M1', tieuDe: 'Bài luyện thử', soCau: 1, trangThai: 'chua_lam' }]
+    const { container } = render(<StudentPortalScreen />)
+    await waitFor(() => expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('tro_ly'))
+    expect(container.querySelector('[data-vung="ke-hoach-cu"]')).toBeNull()
+  })
+
+  it('không lưu bản nhớ từ nguồn trợ lý; khác SBD không dùng bản nhớ của nhau', async () => {
+    tra['/hs/ke-hoach-ngay'] = { nem: true }
+    mocks.lichSuCho = null
+    mocks.momItems = [{ id: 'M1', tieuDe: 'Bài luyện thử', soCau: 1, trangThai: 'chua_lam' }]
+    localStorage.setItem('omr_bnv_ke_hoach:nguoi-khac', nho())
+    const { container } = render(<StudentPortalScreen />)
+    await waitFor(() => expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('tro_ly'))
+    expect(container.textContent).not.toContain('Ôn 3 câu đã tới hạn')
+    expect(localStorage.getItem(KHOA)).toBeNull()
   })
 })

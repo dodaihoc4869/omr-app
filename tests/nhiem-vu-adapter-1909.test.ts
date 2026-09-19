@@ -3,8 +3,10 @@
 import { describe, expect, it } from 'vitest'
 import { tongHopKeHoachTroLy } from '../src/lib/tro-ly-ca-nhan'
 import {
+  dongGoiBanNho,
   dungBangNhiemVu,
   laKeHoachNgayHopLe,
+  phucHoiBanNho,
   THU_TU_BAC,
   tuKeHoachNgay,
   tuKeHoachTroLy,
@@ -411,5 +413,69 @@ describe('nói thật', () => {
   it('không có chữ "nắm chắc" ở bất kỳ thẻ nào', () => {
     const d = tuKeHoachTroLy(troLy({ dsBtvn: [btKhan, btHomNay], dsMomGiao: [momChuaLam], tongCauSai: 20 }))
     expect(JSON.stringify(d)).not.toMatch(/nắm chắc/i)
+  })
+})
+
+describe('bản nhớ (stale-while-revalidate): đóng gói và phục hồi', () => {
+  const tuoi = () => tuKeHoachNgay(keHoachMayChu, NOW, phu)
+  const jsonDi = (x: unknown) => JSON.parse(JSON.stringify(x))
+
+  it('chỉ nhớ bản dựng TỪ MÁY CHỦ và MỚI: nguồn trợ lý và bản cuối (cu) không được nhớ', () => {
+    expect(dongGoiBanNho(tuoi(), NOW)).toMatchObject({ ngay: '2026-09-19', luuLuc: NOW })
+    expect(dongGoiBanNho(tuKeHoachTroLy(troLy()), NOW)).toBeNull()
+    expect(dongGoiBanNho(tuKeHoachNgay(keHoachMayChu, NOW, phu, true), NOW)).toBeNull()
+  })
+
+  it('cùng ngày VN: phục hồi đủ việc, giữ payload {bt}/{id,bai}, gắn "Kế hoạch lúc <giờ VN> · đang cập nhật…"', () => {
+    const b = jsonDi(dongGoiBanNho(tuoi(), NOW))
+    const d = phucHoiBanNho(b, NOW + 10 * 60_000)!
+    expect(d).not.toBeNull()
+    expect(d.nguon).toBe('ke_hoach_ngay')
+    expect(tatCaViec(d).map((x) => x.id)).toEqual(tatCaViec(tuoi()).map((x) => x.id))
+    const lo = tatCaViec(d).find((x) => x.id === 'btvn_lo:BT-ANCOL:1')!
+    expect(lo.hanhDong.payload).toEqual({ bt: dsBtvnMay[0] })
+    const gio2 = new Intl.DateTimeFormat('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(keHoachMayChu.capNhatLuc!))
+    expect(d.ghiChuCu).toBe(`Kế hoạch lúc ${gio2} · đang cập nhật…`)
+  })
+
+  it('thời gian còn lại được TÍNH LẠI theo giờ lúc mở (không dùng số cũ lúc lưu)', () => {
+    const b = jsonDi(dongGoiBanNho(tuoi(), NOW))
+    const truoc = tatCaViec(tuoi()).find((x) => x.id === 'mom:M9')!.conLaiMs!
+    const sau = tatCaViec(phucHoiBanNho(b, NOW + 20 * 60_000)!).find((x) => x.id === 'mom:M9')!
+    expect(sau.conLaiMs).toBe(truoc - 20 * 60_000)
+    expect(sau.conLaiChu).toBeTruthy()
+    // Quá hạn thì nói "Đã quá hạn", không còn số dương.
+    const het = tatCaViec(phucHoiBanNho(b, NOW + 3 * 3600_000)!).find((x) => x.id === 'mom:M9')!
+    expect(het.conLaiMs!).toBeLessThan(0)
+    expect(het.conLaiChu).toBe('Đã quá hạn')
+  })
+
+  it('bản nhớ của NGÀY KHÁC (theo ngày VN) không dùng để vẽ việc', () => {
+    const b = jsonDi(dongGoiBanNho(tuoi(), NOW))
+    expect(phucHoiBanNho(b, NOW + 24 * 3600_000)).toBeNull()
+    expect(phucHoiBanNho(b, NOW - 24 * 3600_000)).toBeNull()
+    // Sát nửa đêm: 23:59 VN vẫn cùng ngày, 00:01 hôm sau thì không.
+    const cuoiNgay = Date.parse('2026-09-19T23:59:00+07:00')
+    expect(phucHoiBanNho(b, cuoiNgay)).not.toBeNull()
+    expect(phucHoiBanNho(b, Date.parse('2026-09-20T00:01:00+07:00'))).toBeNull()
+  })
+
+  it('bản hỏng/thiếu phần/giả đều bị từ chối (không ném lỗi)', () => {
+    const tot = jsonDi(dongGoiBanNho(tuoi(), NOW))
+    const hong = [
+      null, undefined, 'x', 5, {}, { ngay: '2026-09-19' },
+      { ...tot, duLieu: null },
+      { ...tot, duLieu: { ...tot.duLieu, nguon: 'tro_ly' } },
+      { ...tot, duLieu: { ...tot.duLieu, cacBac: [] } },
+      { ...tot, duLieu: { ...tot.duLieu, cacBac: tot.duLieu.cacBac.slice(0, 3) } },
+      { ...tot, duLieu: { ...tot.duLieu, cacBac: [...tot.duLieu.cacBac].reverse() } },
+      { ...tot, duLieu: { ...tot.duLieu, tienDo: null } },
+      { ...tot, duLieu: { ...tot.duLieu, quaHan: 'x' } },
+      { ...tot, duLieu: { ...tot.duLieu, lamNgay: { id: 1 } } },
+      { ...tot, duLieu: { ...tot.duLieu, cacBac: tot.duLieu.cacBac.map((g: any) => ({ ...g, viec: [null] })) } },
+    ]
+    for (const x of hong) expect(() => phucHoiBanNho(x, NOW)).not.toThrow()
+    for (const x of hong) expect(phucHoiBanNho(x, NOW)).toBeNull()
+    expect(phucHoiBanNho(tot, NOW)).not.toBeNull()
   })
 })

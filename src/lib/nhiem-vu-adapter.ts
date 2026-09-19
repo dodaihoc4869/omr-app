@@ -4,6 +4,7 @@
 // Hàm thuần: không đọc giờ, không gọi mạng, KHÔNG xếp lại thứ tự — thứ tự là
 // của dữ liệu; ở đây chỉ gán bậc, tính cổng và chọn thẻ "Làm ngay".
 import { dinhDangConLai } from './tro-ly-ca-nhan'
+import { ngayVietNam } from './han-bai-tap'
 import type { CapDoUuTien, KeHoachNgayTroLy, NhiemVuTroLy } from './tro-ly-ca-nhan'
 
 export type BacNhiemVu = 'khan' | 'bat_buoc' | 'nen_lam' | 'tuy_chon'
@@ -475,4 +476,55 @@ export function dungBangNhiemVu(input: {
     return tuKeHoachNgay(input.keHoachNgay, input.now, { dsBtvn: input.dsBtvn, dsMomGiao: input.dsMomGiao }, input.cu === true)
   }
   return tuKeHoachTroLy(input.keHoachTroLy, { dsMomGiao: input.dsMomGiao, now: input.now })
+}
+
+// ─── BẢN NHỚ (stale-while-revalidate) ────────────────────────────────────────────────────
+// Mỗi lần mở app đều phải chờ thêm một vòng API. Nên nhớ bản kế hoạch vừa vẽ xong (cả tên bài và
+// payload để bấm được) và VẼ NGAY từ đó khi mở lại, rồi gọi máy chủ và thay khi có bản mới.
+// Bản nhớ của NGÀY KHÁC (theo ngày Việt Nam) KHÔNG được dùng để vẽ việc: việc hôm qua đã hết nghĩa.
+
+export interface BanNhoBangNhiemVu {
+  /** Ngày VN (YYYY-MM-DD) lúc lưu. */
+  ngay: string
+  luuLuc: number
+  duLieu: DuLieuBangNhiemVu
+}
+
+/** Chỉ lưu bản DỰNG TỪ MÁY CHỦ và đang MỚI (không phải bản cuối, không phải nguồn trợ lý). */
+export function dongGoiBanNho(duLieu: DuLieuBangNhiemVu, now: number): BanNhoBangNhiemVu | null {
+  if (duLieu.nguon !== 'ke_hoach_ngay' || duLieu.ghiChuCu) return null
+  const ngay = ngayVietNam(now)
+  return ngay ? { ngay, luuLuc: now, duLieu } : null
+}
+
+const laMang = Array.isArray
+const laThe = (v: any): v is TheNhiemVu =>
+  !!v && typeof v.id === 'string' && typeof v.tieuDe === 'string' && !!v.hanhDong && typeof v.hanhDong.loai === 'string' && typeof v.biCong === 'boolean'
+
+function lamMoiThe(v: TheNhiemVu, now: number): TheNhiemVu {
+  const moc = msIso(v.hanNop)
+  if (moc === undefined) return v
+  const conLaiMs = moc - now
+  return { ...v, conLaiMs, conLaiChu: dinhDangConLai(conLaiMs) }
+}
+
+/**
+ * Đọc lại bản nhớ: đúng cấu trúc + ĐÚNG NGÀY hôm nay (VN) mới dùng. Thời gian còn lại tính lại theo `now`
+ * (bản nhớ lưu lúc khác), gắn dòng "Kế hoạch lúc HH:MM · đang cập nhật". Sai một điều kiện ⇒ null.
+ */
+export function phucHoiBanNho(x: unknown, now: number): DuLieuBangNhiemVu | null {
+  const b = x as BanNhoBangNhiemVu | null
+  if (!b || typeof b !== 'object' || typeof b.ngay !== 'string' || b.ngay !== ngayVietNam(now)) return null
+  const d = b.duLieu as DuLieuBangNhiemVu | undefined
+  if (!d || d.nguon !== 'ke_hoach_ngay' || !laMang(d.cacBac) || d.cacBac.length !== THU_TU_BAC.length || !laMang(d.quaHan) || !laMang(d.canhBao)) return null
+  if (!d.tienDo || !Number.isFinite(d.tienDo.daLam) || !Number.isFinite(d.tienDo.mucTieu) || !d.tocDo || !d.chuoiNgay) return null
+  if (d.lamNgay !== null && !laThe(d.lamNgay)) return null
+  if (!d.cacBac.every((g, i) => g && g.bac === THU_TU_BAC[i] && laMang(g.viec) && g.viec.every(laThe))) return null
+  const gioLuu = d.capNhatLuc ? gioVietNam(d.capNhatLuc) : ''
+  return {
+    ...d,
+    lamNgay: d.lamNgay ? lamMoiThe(d.lamNgay, now) : null,
+    cacBac: d.cacBac.map((g) => ({ ...g, viec: g.viec.map((v) => lamMoiThe(v, now)) })),
+    ghiChuCu: gioLuu ? `Kế hoạch lúc ${gioLuu} · đang cập nhật…` : 'Kế hoạch đã nhớ · đang cập nhật…',
+  }
 }
