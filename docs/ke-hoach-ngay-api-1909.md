@@ -44,3 +44,12 @@ Thẻ "Làm ngay" = việc đầu tiên có `hien === true` và `trangThai === '
 ```
 
 Ví dụ đủ mọi loại việc (kể cả `btvn_lo`, `mom`): xem `tests/ke-hoach-ngay-1909.test.ts`.
+
+## `POST /hs/cau-theo-qid` — nội dung câu để em LÀM đúng các câu việc `on_lai` đã chọn
+
+- Gọi như `/hs/ke-hoach-ngay`: `POST https://omr.ttadodaihoc.workers.dev/hs/cau-theo-qid`, KHÔNG cần mã bí mật. Body `{ "sbd": "<sbd>" | "token": "<token HS>", "qid": ["…", …] }`, tối đa **20** qid mỗi lần (quá thì `ok:false`). Có `token` thì SBD lấy từ chữ ký và `sbd` trong body bị bỏ qua. Lấy `qid` từ `viec[].chiTiet.qid` của việc `on_lai`.
+- Trả `{ ok: true, cau: [...], khongCo: [...] }`. `cau` theo ĐÚNG thứ tự xin (đã bỏ rỗng/trùng). `khongCo` = qid xin mà không trả được — GỘP mọi lý do (em chưa từng gặp câu đó, kho không có, đề đang bảo vệ) để không cho dò kho; vẽ "chưa mở được câu này" chứ đừng đoán lý do.
+- Chỉ trả câu em ĐÃ TỪNG GẶP (có dòng trong sổ `su_kien_hoc`); kế hoạch hôm nay chỉ chọn qid từ hồ sơ dựng từ chính sổ đó nên đủ dùng. Câu thuộc đề thi CHƯA công bố bị loại kể cả khi em đã gặp; không kiểm được phạm vi đề bảo vệ thì `ok:false` (đóng cửa).
+- **Hình dạng một câu** (KHÔNG có đáp án, lời giải, `reviewed`, `version`, `group`; ảnh của lời giải `sau_loi_giai` bị bỏ): `{ qid, maDe, phan: 'I'|'II'|'III', text, choices: string[], ideas: string[], table?, thanCauImg?, imageDataUrl?, choiceImgs?, ideaImgs?, hinhAnh: [{viTri, …}], dang: string|null, tenDang, mucDo: 'biet'|'hieu'|'van_dung'|null, sao: 0|1|2|null, kienThuc: string[] }`. Phần I dùng `choices`, Phần II dùng `ideas` (4 ý đúng/sai), Phần III trả số. Đây là hình dạng câu của game v2 (`publicQuestion`), KHÔNG phải nguyên tờ kho như lệnh rút câu khắc phục cũ (`cauKhacPhuc` trả cả `dap_an`/`loiGiai` — cố ý không bắt chước).
+- Đáp án chỉ về SAU khi nộp, ở đường chấm của máy chủ (như luật hiện có). Chấm/ghi sổ các câu này là việc của GĐ 3 (máy em gửi đáp án lên); lệnh này chỉ đưa ĐỀ.
+- Chi phí: 3 truy vấn D1 (em có thật + đã gặp; nội dung từ chỉ mục game; kiểm đề bảo vệ, có cache), không đọc R2.
