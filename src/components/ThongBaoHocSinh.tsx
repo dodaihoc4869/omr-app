@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from 'react'
-import { Bell, BellOff, X, BookOpen, Sparkles, CheckCheck, ChevronRight } from 'lucide-react'
+import { Bell, BellOff, X, BookOpen, Sparkles, CheckCheck, ChevronRight, Check } from 'lucide-react'
 import { layDiaChiMayChu } from '../lib/dia-chi-may-chu'
+import { NutTron } from './m3'
+import './m3/thong-bao-hoc-sinh.css'
 
 type Notice = {
   id: string
@@ -197,143 +199,102 @@ export default function ThongBaoHocSinh({
   }
 
   const count = items.filter((x) => !x.read_at).length
+  const demHienThi = count > 99 ? '99+' : String(count)
 
   return (
-    <div className="relative inline-block" ref={panelRef}>
-      {/* Nút Chuông Thông Báo */}
-      <button
-        type="button"
+    <div className="m3 m3-tb" ref={panelRef}>
+      {/* Nút chuông thông báo */}
+      <NutTron
+        nhan={`Thông báo, ${demHienThi} chưa đọc`}
         onClick={() => setOpen((v) => !v)}
-        aria-label={`Thông báo, ${count} chưa đọc`}
         aria-expanded={open}
-        className="tap-target relative rounded-full p-2 transition-transform active:scale-95 cursor-pointer flex items-center justify-center"
-        style={{ background: 'var(--gg-xanh-nen)', color: 'var(--gg-xanh)' }}
         title="Thông báo của em"
+        className="m3-tb-chuong"
       >
-        <Bell size={20} className={count > 0 ? 'animate-wiggle' : ''} />
-        {count > 0 && (
-          <span
-            className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-bold text-white shadow-xs"
-            style={{ background: 'var(--do)' }}
-          >
-            {count > 99 ? '99+' : count}
-          </span>
-        )}
-      </button>
+        <Bell size={22} aria-hidden="true" />
+        {count > 0 && <span className="m3-tb-dem">{demHienThi}</span>}
+      </NutTron>
 
-      {/* Backdrop mờ khi mở menu */}
-      {open && (
-        <div
-          className="fixed inset-0 z-[10000] bg-slate-900/25 backdrop-blur-[2px] transition-opacity"
-          onClick={() => setOpen(false)}
-          aria-hidden="true"
-        />
-      )}
+      {/* Màn che mờ khi mở tấm thông báo */}
+      {open && <div className="m3-man-che m3-tb-che" onClick={() => setOpen(false)} aria-hidden="true" />}
 
-      {/* Panel Sổ Xuống Phong Cách Google Notification Shade / Material You */}
+      {/* Tấm thông báo: bo 28, cao độ 3, không viền */}
       {open && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Thông báo của em"
-          className="fixed inset-x-3 top-16 max-h-[82vh] sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2.5 sm:w-[410px] sm:max-h-[80vh] rounded-3xl shadow-2xl border border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md flex flex-col z-[10001] animate-in fade-in slide-in-from-top-3 duration-200 overflow-hidden"
-        >
-          {/* Header Panel */}
-          <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
-            <div className="flex items-center gap-2.5">
-              <div
-                className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold shadow-xs"
-                style={{ background: 'var(--gg-xanh-nen)', color: 'var(--gg-xanh)' }}
-              >
-                <Bell size={18} />
-              </div>
-              <div>
-                <h2 className="font-bold text-base text-slate-900 dark:text-white leading-tight">
-                  Thông báo
-                </h2>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                    {count > 0 ? `${count} tin chưa đọc` : 'Không có tin mới'}
-                  </span>
-                </div>
-              </div>
+        <div role="dialog" aria-modal="true" aria-label="Thông báo của em" className="m3-hop m3-tb-tam">
+          <div className="m3-tb-dau">
+            <div className="m3-tb-dau-chu">
+              <h2 className="m3-tb-tieu-de">Thông báo</h2>
+              <span className="m3-tb-phu">{count > 0 ? `${count} tin chưa đọc` : 'Không có tin mới'}</span>
             </div>
-
-            <div className="flex items-center gap-1.5">
-              {count > 0 && (
-                <button
-                  type="button"
-                  onClick={() => void danhDauDocTatCa()}
-                  className="px-2.5 py-1 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50 rounded-full transition-colors flex items-center gap-1 cursor-pointer"
-                  title="Đánh dấu tất cả đã đọc"
-                >
-                  <CheckCheck size={14} />
-                  <span className="hidden sm:inline">Đã đọc</span>
-                </button>
-              )}
+            {count > 0 && (
               <button
                 type="button"
-                aria-label="Đóng thông báo"
-                onClick={() => setOpen(false)}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                onClick={() => void danhDauDocTatCa()}
+                className="m3-nut-chu"
+                title="Đánh dấu tất cả đã đọc"
               >
-                <X size={18} />
+                <CheckCheck size={18} aria-hidden="true" />
+                <span>Đã đọc</span>
               </button>
-            </div>
+            )}
+            <NutTron nhan="Đóng thông báo" onClick={() => setOpen(false)}>
+              <X size={22} aria-hidden="true" />
+            </NutTron>
           </div>
 
-          {/* Thanh Bật/Tắt Thông Báo Đẩy Dạng Google Pill */}
-          <div className="px-4 py-2.5 bg-slate-50/90 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 text-xs">
-            <span className="text-slate-600 dark:text-slate-300 font-medium truncate">
-              Nhận thông báo khi đóng app
-            </span>
+          {/* Bật/tắt thông báo đẩy */}
+          <div className="m3-tb-day">
+            <span className="m3-tb-day-chu">Nhận thông báo khi đóng app</span>
             <button
               type="button"
               disabled={busy}
               onClick={() => void togglePush()}
-              className={`px-3 py-1 rounded-full font-bold text-xs transition-all cursor-pointer flex items-center gap-1 flex-shrink-0 ${
-                enabled
-                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
-                  : 'bg-blue-600 text-white hover:bg-blue-700 shadow-xs'
-              } disabled:opacity-50`}
+              className={enabled ? 'm3-nut-tonal' : 'm3-nut-chinh'}
+              data-vai-tro={enabled ? 'tertiary' : undefined}
             >
-              {busy ? 'Đang xử lý…' : enabled ? '✓ Đang bật' : 'Bật ngay'}
+              {busy ? (
+                'Đang xử lý…'
+              ) : enabled ? (
+                <>
+                  <Check size={18} aria-hidden="true" />
+                  <span>Đang bật</span>
+                </>
+              ) : (
+                'Bật ngay'
+              )}
             </button>
           </div>
 
-          {/* Thông điệp trạng thái Push */}
+          {/* Kết quả bật/tắt thông báo đẩy */}
           {message && (
-            <div className="mx-4 mt-3 p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs leading-relaxed">
+            <div role="status" className="m3-tb-tin" data-vai-tro="secondary">
               {message}
             </div>
           )}
 
-          {/* Danh Sách Thông Báo Sổ Xuống */}
-          <div className="flex-1 overflow-y-auto overscroll-contain p-3 sm:p-4 space-y-2.5 max-h-[55vh]">
+          {/* Danh sách thông báo */}
+          <div className="m3-tb-ds">
             {loadError && (
-              <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 rounded-2xl text-rose-700 dark:text-rose-300 text-xs text-center">
+              <div role="alert" className="m3-tb-tin" data-vai-tro="error">
                 {loadError}
               </div>
             )}
 
             {!loaded && !loadError && (
-              <div className="p-8 text-center text-slate-400 dark:text-slate-500 text-xs flex flex-col items-center gap-2">
-                <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              <div role="status" className="m3-tb-cho">
+                <div className="m3-xuong" />
+                <div className="m3-xuong" />
                 <span>Đang đồng bộ thông báo...</span>
               </div>
             )}
 
             {loaded && items.length === 0 && (
-              <div className="py-12 px-4 text-center flex flex-col items-center justify-center">
-                <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 mb-3">
-                  <BellOff size={26} />
+              <div className="m3-tb-trong">
+                <div className="m3-tb-trong-o">
+                  <BellOff size={26} aria-hidden="true" />
                 </div>
-                <h3 className="font-bold text-slate-700 dark:text-slate-200 text-sm">
-                  Chưa có thông báo nào
-                </h3>
-                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 max-w-[240px]">
-                  Bài tập Thầy giao và bài luyện từ Phụ huynh sẽ hiển thị ngay tại đây.
-                </p>
+                <h3>Chưa có thông báo nào</h3>
+                <p>Bài tập Thầy giao và bài luyện từ Phụ huynh sẽ hiển thị ngay tại đây.</p>
               </div>
             )}
 
@@ -355,56 +316,29 @@ export default function ThongBaoHocSinh({
                     onOpen(n.target, n.id)
                     setOpen(false)
                   }}
-                  className={`w-full text-left p-3.5 rounded-2xl transition-all duration-150 flex items-start gap-3 cursor-pointer group ${
-                    isUnread
-                      ? 'bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-800/60 shadow-xs hover:border-blue-300 dark:hover:border-blue-700'
-                      : 'bg-white dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80'
-                  }`}
+                  className={`m3-the m3-tb-muc ${isUnread ? '' : 'm3-the--nhat'}`.trim()}
+                  data-vai-tro={isUnread ? 'primary' : undefined}
+                  data-loai={isBtvn ? 'btvn' : 'mom'}
                 >
-                  {/* Icon phân loại thông báo */}
-                  <div
-                    className={`w-9 h-9 rounded-2xl flex-shrink-0 flex items-center justify-center transition-transform group-hover:scale-105 ${
-                      isBtvn
-                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                        : 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'
-                    }`}
-                  >
-                    {isBtvn ? <BookOpen size={18} /> : <Sparkles size={18} />}
+                  {/* Biểu tượng phân loại */}
+                  <div className="m3-the-o m3-tb-loai">
+                    {isBtvn ? <BookOpen size={20} aria-hidden="true" /> : <Sparkles size={20} aria-hidden="true" />}
                   </div>
 
-                  {/* Nội dung thông báo */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-1.5 mb-1">
-                      <div className="flex items-center gap-1.5 truncate">
-                        {isUnread && (
-                          <span
-                            className="w-2 h-2 rounded-full flex-shrink-0"
-                            style={{ background: 'var(--gg-xanh)' }}
-                          />
-                        )}
-                        <span
-                          className={`text-xs truncate ${
-                            isUnread
-                              ? 'font-black text-slate-900 dark:text-white'
-                              : 'font-semibold text-slate-700 dark:text-slate-300'
-                          }`}
-                        >
-                          {n.title}
-                        </span>
-                      </div>
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500 whitespace-nowrap flex-shrink-0 font-medium">
-                        {dinhDangThoiGian(n.created_at)}
+                  {/* Nội dung */}
+                  <div className="m3-tb-noi-dung">
+                    <div className="m3-tb-hang">
+                      <span className={`m3-tb-ten ${isUnread ? 'm3-tb-ten--moi' : ''}`.trim()}>
+                        {isUnread && <span className="m3-tb-cham" aria-hidden="true" />}
+                        <span className="m3-tb-ten-chu">{n.title}</span>
                       </span>
+                      <span className="m3-tb-gio">{dinhDangThoiGian(n.created_at)}</span>
                     </div>
-
-                    <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed break-words">
-                      {n.body}
-                    </p>
-
-                    <div className="mt-2 flex items-center gap-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 group-hover:underline">
+                    <p className="m3-tb-than">{n.body}</p>
+                    <span className="m3-tb-mo">
                       <span>Mở làm bài</span>
-                      <ChevronRight size={13} className="transition-transform group-hover:translate-x-0.5" />
-                    </div>
+                      <ChevronRight size={16} aria-hidden="true" />
+                    </span>
                   </div>
                 </button>
               )

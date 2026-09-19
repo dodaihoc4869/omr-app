@@ -1,0 +1,19 @@
+/* Tấm phủ "Vào phòng thi" (cổng học sinh). Màu chỉ đọc biến --m3-*. */
+.m3-phong {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--m3-surface);
+}
+.m3-phong-than {
+  max-width: 36rem;
+  margin: 0 auto;
+  padding-bottom: var(--k4, 16px);
+}
+/* thanh trên dính chừa tai thỏ: sticky bám mép cuộn nên phần chừa nằm TRONG thanh */
+.m3-phong .m3-thanh-tren {
+  padding-top: max(8px, env(safe-area-inset-top));
+  margin-left: -12px;
+}

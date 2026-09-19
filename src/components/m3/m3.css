@@ -1,0 +1,241 @@
+/* THƯ VIỆN M3 DÙNG CHUNG (việc C, Code 4) — chỉ lớp trình bày, KHÔNG có màu riêng.
+ * Màu CHỈ đọc biến --m3-* do `bang-nhiem-vu/m3-theme.css` khai (đặt className="m3"
+ * lên phần tử gốc). Mẫu nút/thẻ/chip lấy đúng dáng `.bnv-*` của Code 2 nhưng gắn
+ * với `.m3`, nên dùng được ngoài Bảng nhiệm vụ (tấm phủ, modal ở <body>).
+ * Tệp này KHÔNG bọc trong @layer → thắng lớp tiện ích Tailwind mà không cần
+ * `!important` (component còn lớp Tailwind cũ để giữ chuỗi test soi). */
+
+.m3 {
+  --m3-man-che: rgb(0 0 0 / 0.32);
+  color: var(--m3-on-surface);
+  font-family: var(--sans, system-ui, sans-serif);
+  -webkit-tap-highlight-color: transparent;
+}
+.m3,
+.m3 *,
+.m3 *::before,
+.m3 *::after {
+  box-sizing: border-box;
+}
+:where(.m3) button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: inherit;
+}
+.m3 button:focus-visible,
+.m3 a:focus-visible,
+.m3 input:focus-visible,
+.m3 textarea:focus-visible {
+  outline: 3px solid var(--m3-primary);
+  outline-offset: 2px;
+}
+
+/* ── vai trò màu cho thẻ / nút tonal / chip ────────────────────────────
+ * data-vai-tro="error|primary|secondary|tertiary" → 4 biến --m3-v-* */
+.m3 [data-vai-tro='error'],
+.m3[data-vai-tro='error'] {
+  --m3-v-nen: var(--m3-error-container);
+  --m3-v-chu: var(--m3-on-error-container);
+  --m3-v-chu-phu: var(--m3-on-error-container-phu);
+  --m3-v-dam: var(--m3-error);
+}
+.m3 [data-vai-tro='primary'],
+.m3[data-vai-tro='primary'] {
+  --m3-v-nen: var(--m3-primary-container);
+  --m3-v-chu: var(--m3-on-primary-container);
+  --m3-v-chu-phu: var(--m3-on-primary-container-phu);
+  --m3-v-dam: var(--m3-primary);
+}
+.m3 [data-vai-tro='secondary'],
+.m3[data-vai-tro='secondary'] {
+  --m3-v-nen: var(--m3-secondary-container);
+  --m3-v-chu: var(--m3-on-secondary-container);
+  --m3-v-chu-phu: var(--m3-on-secondary-container-phu);
+  --m3-v-dam: var(--m3-secondary);
+}
+.m3 [data-vai-tro='tertiary'],
+.m3[data-vai-tro='tertiary'] {
+  --m3-v-nen: var(--m3-tertiary-container);
+  --m3-v-chu: var(--m3-on-tertiary-container);
+  --m3-v-chu-phu: var(--m3-on-tertiary-container-phu);
+  --m3-v-dam: var(--m3-tertiary);
+}
+
+/* ── nút ───────────────────────────────────────────────────────────── */
+.m3-nut-tron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--m3-bo-tron);
+  color: var(--m3-on-surface-variant);
+}
+.m3-nut-tron:hover,
+.m3-nut-tron[aria-expanded='true'] {
+  background: var(--m3-surface-container-high);
+}
+.m3-nut-chinh,
+.m3-nut-tonal,
+.m3-nut-vien,
+.m3-nut-chu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--k2, 8px);
+  min-height: 48px;
+  padding: 0 var(--k5, 20px);
+  border-radius: var(--m3-bo-tron);
+  font-size: var(--bnv-cx-2);
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.m3-nut-chinh {
+  background: var(--m3-primary);
+  color: var(--m3-on-primary);
+}
+.m3-nut-tonal {
+  background: var(--m3-v-nen, var(--m3-secondary-container));
+  color: var(--m3-v-chu, var(--m3-on-secondary-container));
+}
+.m3-nut-vien {
+  color: var(--m3-primary);
+  box-shadow: inset 0 0 0 1px var(--m3-outline);
+}
+.m3-nut-chu {
+  color: var(--m3-primary);
+  padding: 0 var(--k3, 12px);
+}
+.m3-nut-chu:hover {
+  background: var(--m3-surface-container);
+}
+.m3-nut-chinh:disabled,
+.m3-nut-tonal:disabled,
+.m3-nut-vien:disabled,
+.m3-nut-chu:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+.m3-nut-chinh:active,
+.m3-nut-tonal:active {
+  transform: scale(0.98);
+}
+
+/* ── thanh trên dính ───────────────────────────────────────────────── */
+.m3-thanh-tren {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--k2, 8px);
+  min-height: 56px;
+  padding: 4px 0;
+  background: var(--m3-surface);
+}
+.m3-thanh-tren-ten {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--bnv-cx-4);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--m3-on-surface);
+}
+.m3-thanh-tren-phai {
+  display: flex;
+  align-items: center;
+  gap: var(--k1, 4px);
+  margin-left: auto;
+}
+
+/* ── thẻ tonal (không viền: tách lớp bằng nền + cao độ) ───────────── */
+.m3-the {
+  display: flex;
+  align-items: center;
+  gap: var(--k3, 12px);
+  width: 100%;
+  min-height: 64px;
+  padding: 14px var(--k4, 16px);
+  border-radius: var(--m3-bo-16);
+  background: var(--m3-v-nen, var(--m3-surface-container-high));
+  color: var(--m3-v-chu, var(--m3-on-surface));
+  text-align: left;
+}
+button.m3-the:active {
+  transform: scale(0.99);
+}
+.m3-the--nhat {
+  --m3-v-nen: var(--m3-surface-container);
+  --m3-v-chu: var(--m3-on-surface);
+  --m3-v-chu-phu: var(--m3-on-surface-variant);
+  --m3-v-dam: var(--m3-outline);
+}
+.m3-the-o {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--m3-bo-12);
+  background: var(--m3-o-bieu-tuong);
+  color: var(--m3-v-dam, var(--m3-on-surface-variant));
+}
+.m3-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border-radius: var(--m3-bo-tron);
+  background: var(--m3-v-nen, var(--m3-surface-container-high));
+  color: var(--m3-v-chu, var(--m3-on-surface-variant));
+  font-size: var(--bnv-cx-1);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── hộp thoại / tấm nổi: nền surface-container-high, bo 28, cao độ 3 ── */
+.m3-man-che {
+  position: fixed;
+  inset: 0;
+  background: var(--m3-man-che);
+}
+.m3-hop {
+  border-radius: var(--m3-bo-28);
+  background: var(--m3-surface-container-high);
+  color: var(--m3-on-surface);
+  box-shadow: var(--m3-cao-do-3);
+}
+
+/* ── skeleton (thay spinner) ───────────────────────────────────────── */
+.m3-xuong {
+  height: 64px;
+  border-radius: var(--m3-bo-16);
+  background: var(--m3-surface-container);
+  animation: m3-xuong 1.2s ease-in-out infinite alternate;
+}
+@keyframes m3-xuong {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m3 *,
+  .m3 *::before,
+  .m3 *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .m3-nut-chinh:active,
+  .m3-nut-tonal:active,
+  button.m3-the:active {
+    transform: none;
+  }
+}
