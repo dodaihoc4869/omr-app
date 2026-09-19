@@ -9,9 +9,9 @@
 // các đề khác — trả về danh sách lỗi để màn hình báo.
 import type { TeacherExamSource } from '../data/examContent'
 import { validateTeacherSource } from '../data/examContent'
-import { capNhatKeyBank, danhSachDe, layDe, type KhoDeItem } from './exam-api'
+import { capNhatKeyBank, danhSachCa, danhSachDe, layDe, type KhoDeItem } from './exam-api'
 import { apDungSoSua } from './sua-dang'
-import { deleteExamSource, loadAllSessionTeacherBanks, loadExamSources, saveExamSource, saveSessionTeacherBank, loadSoSuaDang} from './exam-db'
+import { deleteExamSource, loadAllSessionTeacherBanks, loadExamSources, saveExamSource, saveSessionTeacherBank, loadSoSuaDang, xoaSessionTeacherBank } from './exam-db'
 import { mergeKeepAnswers } from '../data/examContent'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJsonText } from './exam-kho-de-import'
 
@@ -53,14 +53,58 @@ export function maCanXoa(tren: KhoDeItem[], local: TeacherExamSource[]): string[
   return local.map((s) => s.maDe).filter((m) => !conSong.has(m))
 }
 
+/** ĐAI + DÂY cho mọi đường ĐẨY bank ca trong máy lên máy chủ (`capNhatKeyBank`) — thêm 19/09/2026, cùng đợt reset dữ liệu.
+ *
+ * Bank ca nằm trong máy thầy từ lúc mở ca. Sau khi máy chủ xoá ca (reset 21/09, thầy xoá vĩnh viễn ở máy khác…) mà bank
+ * còn đó, lặp qua MỌI bank rồi đẩy là TÁI TẠO khoá của ca đã xoá — "ca ma". Dây là dọn bank theo `mocReset`
+ * (`don-moc-reset-giao-vien.ts`); đây là ĐAI: chỉ đẩy cho ca mà máy chủ còn giữ (đang dùng HOẶC trong thùng rác — ca thùng
+ * rác khôi phục được nên KHÔNG được xoá bank của nó).
+ *
+ * `maCaMayChu`: mọi mã ca máy chủ còn. `null` = không hỏi được máy chủ ⇒ không biết ca nào còn ⇒ KHÔNG đẩy gì.
+ *
+ * HAI CHỐT AN TOÀN cho việc XOÁ bank khỏi máy (đẩy thì luôn bị chặn với ca không có trong danh sách) — cùng tinh thần `maCanXoa`:
+ *   1. Danh sách máy chủ RỖNG không được coi là "không ca nào còn": máy chủ trả rỗng vì lỗi/cắt trang cũng y hệt.
+ *   2. Bank nằm ngoài danh sách chiếm QUÁ 20% số bank ⇒ nghi danh sách bị cắt thiếu, không xoá gì.
+ * Bank giữ lại trong máy vì hai chốt này vẫn không được đẩy. */
+export const TI_LE_BANK_TOI_THIEU_CON_TREN_MAY_CHU = 0.8
+
+export function chiaBankTheoCaMayChu<T extends { maCa: string }>(
+  banks: T[],
+  maCaMayChu: string[] | null,
+): { duocDay: T[]; canXoaKhoiMay: T[] } {
+  if (maCaMayChu === null) return { duocDay: [], canXoaKhoiMay: [] }
+  const con = new Set(maCaMayChu.map(String))
+  const duocDay = banks.filter((b) => con.has(String(b.maCa)))
+  const ngoai = banks.filter((b) => !con.has(String(b.maCa)))
+  if (con.size === 0 || duocDay.length < banks.length * TI_LE_BANK_TOI_THIEU_CON_TREN_MAY_CHU) return { duocDay, canXoaKhoiMay: [] }
+  return { duocDay, canXoaKhoiMay: ngoai }
+}
+
+/** Mọi mã ca máy chủ còn giữ (ca đang dùng + ca trong thùng rác). `null` nếu không hỏi được — kể cả khi chỉ một trong hai
+ * lượt hỏi hỏng: thiếu một nửa danh sách là đúng thứ khiến bank ca thùng rác bị xoá nhầm. */
+export async function maCaConTrenMayChu(scriptUrl: string, secret: string): Promise<string[] | null> {
+  try {
+    const [dung, thung] = await Promise.all([danhSachCa(scriptUrl, secret, false), danhSachCa(scriptUrl, secret, true)])
+    return [...dung, ...thung].map((c) => String(c.maCa))
+  } catch {
+    return null
+  }
+}
+
 /** Đề `source` vừa đổi (lời giải mới / thầy chốt đáp án) → thay bản đề trong
  * ngân hàng riêng của MỌI ca đã mở có dùng mã đề này (máy thầy) và đẩy bản CÓ
  * đáp án mới lên máy chủ (capNhatKeyBank) để học sinh xem lại thấy ngay.
- * Trả về số ca đã cập nhật. Không đụng đề học sinh đang làm (BankJson). */
+ * Trả về số ca đã cập nhật. Không đụng đề học sinh đang làm (BankJson).
+ *
+ * CHỈ ĐẨY cho ca máy chủ còn giữ (`chiaBankTheoCaMayChu`): bank của ca không còn trên máy chủ bị bỏ qua, không tái tạo khoá. */
 export async function capNhatCaDaMo(scriptUrl: string, secret: string, source: TeacherExamSource): Promise<number> {
   const banks = await loadAllSessionTeacherBanks()
+  const { duocDay, canXoaKhoiMay } = chiaBankTheoCaMayChu(banks, await maCaConTrenMayChu(scriptUrl, secret))
+  for (const b of canXoaKhoiMay) await xoaSessionTeacherBank(b.maCa).catch(() => {})
+  const duocDaySet = new Set(duocDay.map((b) => b.maCa))
   let n = 0
   for (const b of banks) {
+    if (!duocDaySet.has(b.maCa)) continue
     if (!b.sources.some((s) => s.maDe === source.maDe)) continue
     const moi = b.sources.map((s) => (s.maDe === source.maDe ? source : s))
     await saveSessionTeacherBank(b.maCa, moi)

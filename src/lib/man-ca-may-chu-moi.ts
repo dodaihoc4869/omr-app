@@ -26,6 +26,7 @@
 // Chuyển dữ liệu hỏng nửa chừng ⇒ không có dấu ⇒ app đọc đường cũ y như hôm
 // nay. Không có trạng thái nào ở giữa.
 import type { CauHinhMayChu } from './cau-hinh-may-chu'
+import { donTheoMocReset } from './don-moc-reset-giao-vien'
 
 /** Hạn chờ cho lệnh của thầy trên máy chủ mới. Rộng hơn đường nóng của em vì
  * lượt chuyển dữ liệu đẩy hàng trăm dòng một lượt. */
@@ -115,12 +116,15 @@ export async function danhSachCaMoi(
   maBiMat: string,
   daXoa: boolean,
 ): Promise<{ items: Record<string, unknown>[]; dau: DauDongBo; soDongLuot: number } | null> {
-  const r = await goi<{ items?: unknown; dauDongBo?: unknown; soDongLuot?: number }>(ch, maBiMat, '/ca/danh-sach', { daXoa })
+  const r = await goi<{ items?: unknown; dauDongBo?: unknown; soDongLuot?: number; mocReset?: unknown }>(ch, maBiMat, '/ca/danh-sach', { daXoa })
   if (!r) return null
   const dau = (r.dauDongBo ?? null) as DauDongBo | null
   // CHƯA CHUYỂN DỮ LIỆU XONG ⇒ ĐI ĐƯỜNG CŨ. Đây là cổng an toàn của cả đợt.
   if (!dau || dau.ma !== 'ca_day_du') return null
   const items = Array.isArray(r.items) ? (r.items as Record<string, unknown>[]) : []
+  // `mocReset`: mốc reset dữ liệu học sinh do máy chủ báo (chỉ có SAU khi job reset chạy xong). Dọn bộ nhớ ca cũ trong máy thầy
+  // NGAY ĐÂY — trước khi danh sách ca đến tay bất kỳ ai để cất vào cache. Xem `don-moc-reset-giao-vien.ts`.
+  await donTheoMocReset(r.mocReset)
   return { items, dau, soDongLuot: Number(r.soDongLuot) || 0 }
 }
 
