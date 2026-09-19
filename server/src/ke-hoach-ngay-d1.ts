@@ -272,10 +272,22 @@ export async function chayCaLop(env: Env, now: number): Promise<{ soEm: number; 
 
 // --- Đường của học sinh -----------------------------------------------------------------------
 
+/** SBD có thật: trong `hoc_sinh`, `danh_sach` hoặc từng có lượt thi. Kiểm theo thứ tự rẻ → đắt, dừng ở chỗ đầu tiên thấy. */
+export async function laHocSinhThat(env: Env, sbd: string): Promise<boolean> {
+  const r = await env.DB.prepare(
+    `SELECT CASE WHEN EXISTS (SELECT 1 FROM hoc_sinh WHERE sbd = ?) OR EXISTS (SELECT 1 FROM danh_sach WHERE sbd = ?)
+                   OR EXISTS (SELECT 1 FROM luot WHERE sbd = ?) THEN 1 ELSE 0 END AS co`,
+  ).bind(sbd, sbd, sbd).first<{ co: number }>()
+  return Number(r?.co) === 1
+}
+
 /** `POST /hs/ke-hoach-ngay {sbd | token}` — công khai như `/btvn/cua-em`; có `token` thì lấy SBD từ chữ ký. */
 export async function hsKeHoachNgay(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const sbd = b.token ? await gameIdentity(env, b) : String(b.sbd ?? '').trim()
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
+  // Đường này công khai (như `/hs/btvn`), nên SBD bịa KHÔNG được phép sinh ra dòng nào trong `ke_hoach_ngay`.
+  // Em có thật = có trong hoc_sinh, danh sách lớp, hoặc đã có lượt thi. Kiểm TRƯỚC mọi thao tác ghi.
+  if (sbd.length > 40 || !(await laHocSinhThat(env, sbd))) return { ok: false, error: 'Không tìm thấy học sinh' }
   const kh = (await lapVaLuuKeHoach(env, [sbd], Date.now())).get(sbd)!
   return { ok: true, ...kh }
 }

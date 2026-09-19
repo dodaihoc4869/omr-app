@@ -272,7 +272,12 @@ describe('D1 thật: /hs/ke-hoach-ngay, lưu, chốt ngày, cron', () => {
   const now = () => Date.now()
   const isoT = (gio: number) => new Date(Date.now() + gio * H).toISOString()
 
+  /** Em có thật: đường công khai từ chối SBD không có trong hoc_sinh/danh_sach/luot (xem test "SBD KHÔNG có thật"). */
+  const themHs = (d: ReturnType<typeof taoD1That>, ...ds: string[]) =>
+    ds.forEach((x) => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES(?,'x','x')").run(x))
+
   function seedBtvn(d: ReturnType<typeof taoD1That>, sbd: string, ma: string, soCau: number, giaoGio: number, hanGio: number, lo = 0) {
+    themHs(d, sbd)
     d.sql.prepare('INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc) VALUES(?,?,?,?,?,?,0,?)').run(ma, 'CA', 'DE', soCau, isoT(giaoGio), isoT(hanGio), 'x')
     d.sql.prepare('INSERT INTO btvn_em(khoa,ma_btvn,sbd,lo_da_xong) VALUES(?,?,?,?)').run(`${ma}|${sbd}`, ma, sbd, lo)
   }
@@ -293,6 +298,7 @@ describe('D1 thật: /hs/ke-hoach-ngay, lưu, chốt ngày, cron', () => {
 
   it('em KHÔNG có bài nhưng có hồ sơ: có việc bu đủ toiThieuCau (hồ sơ tự dựng từ sổ lúc lập kế hoạch)', async () => {
     const d = taoD1That()
+    themHs(d, 'S1')
     d.sql.exec(`INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES('D','Q1','v','g','AA.BB.CC','{}'),('D','Q2','v','g2','AA.BB.CC','{}')`)
     const luc = isoT(-30)
     await ghiSuKien(d.env, ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6'].map((q, i) => ({ nguon: 'btvn' as const, maNguon: 'B', sbd: 'S1', qid: q, lan: i + 1, ketQua: 0 as const, luc })))
@@ -320,6 +326,7 @@ describe('D1 thật: /hs/ke-hoach-ngay, lưu, chốt ngày, cron', () => {
 
   it('hồ sơ dựng lại khi sổ đổi: đúng thêm một lần ở ngày khác → hồ sơ cập nhật ở lần lập kế hoạch kế tiếp', async () => {
     const d = taoD1That()
+    themHs(d, 'S1')
     const k = (ketQua: 0 | 1, gio: number, lan: number) => ({ nguon: 'btvn' as const, maNguon: 'B', sbd: 'S1', qid: 'Q1', lan, ketQua, luc: isoT(gio) })
     await ghiSuKien(d.env, [k(0, -50, 1)])
     await hsKeHoachNgay(d.env, { sbd: 'S1' })
@@ -366,6 +373,7 @@ describe('D1 thật: /hs/ke-hoach-ngay, lưu, chốt ngày, cron', () => {
 
   it('chuỗi ngày tiến bộ đọc từ lịch sử đã chốt, ngày nghỉ của thầy (cau_hinh.ngay_nghi) không đứt', async () => {
     const d = taoD1That()
+    themHs(d, 'S1')
     const hom = new Date(now() + 7 * H)
     const ngay = (n: number) => new Date(hom.getTime() - n * 24 * H).toISOString().slice(0, 10)
     const them = (n: number, kq: string | null) => d.sql.prepare('INSERT INTO ke_hoach_ngay(khoa,sbd,ngay,phien_ban,seed,ngan_sach_json,viec_json,canh_bao_json,ket_qua,cap_nhat_luc) VALUES(?,?,?,?,?,?,?,?,?,?)')
@@ -386,7 +394,9 @@ describe('D1 thật: /hs/ke-hoach-ngay, lưu, chốt ngày, cron', () => {
     expect((await goiWorker(worker, d.env, '/hs/thoi-gian-hoc', { token, phut: 10 })).ok).toBe(true)
     const kh = await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { token })
     expect(kh.nganSach).toMatchObject({ phutNgay: 10, phutNgayLaMacDinh: false, mucTieuCau: 8 })
-    const mac = await goiWorker(worker, taoD1That().env, '/hs/ke-hoach-ngay', { sbd: 'S9' })
+    const d2 = taoD1That()
+    themHs(d2, 'S9')
+    const mac = await goiWorker(worker, d2.env, '/hs/ke-hoach-ngay', { sbd: 'S9' })
     expect(mac.nganSach).toMatchObject({ phutNgay: 20, phutNgayLaMacDinh: true })
   })
 
@@ -412,6 +422,27 @@ describe('D1 thật: /hs/ke-hoach-ngay, lưu, chốt ngày, cron', () => {
     const truoc = d.dem('ke_hoach_ngay')
     await worker.scheduled({ cron: '* * * * *' }, d.env) // cron thông báo KHÔNG động vào kế hoạch
     expect(d.dem('ke_hoach_ngay')).toBe(truoc)
+  })
+
+  it('SBD KHÔNG có thật (không hoc_sinh, không danh_sach, không luot) → ok:false và KHÔNG ghi gì; ai cũng bơm rác bằng SBD bịa được thì sai', async () => {
+    const d = taoD1That()
+    const truoc = ['ke_hoach_ngay', 'su_kien_hoc', 'nam_kt_cau', 'nam_kt_dang'].map((b) => d.chup(b))
+    for (const sbd of ['00000000', 'khong-co', 'x'.repeat(200), "1'; DROP TABLE hoc_sinh;--"]) {
+      const r = await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd })
+      expect(r).toMatchObject({ ok: false, error: 'Không tìm thấy học sinh' })
+    }
+    expect(['ke_hoach_ngay', 'su_kien_hoc', 'nam_kt_cau', 'nam_kt_dang'].map((b) => d.chup(b))).toEqual(truoc)
+    expect(d.dem('ke_hoach_ngay')).toBe(0)
+  })
+
+  it('SBD có thật ở BẤT KỲ nguồn nào (hoc_sinh · danh_sach · luot) thì vẫn có kế hoạch', async () => {
+    const d = taoD1That()
+    d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES('H1','x','x')").run()
+    d.sql.prepare("INSERT INTO danh_sach(sbd,ho_ten,cap_nhat_luc) VALUES('D1','x','x')").run()
+    d.sql.prepare("INSERT INTO ca(ma_ca,trang_thai,cap_nhat_luc) VALUES('CA','dong','x')").run()
+    d.sql.prepare("INSERT INTO luot(khoa,ma_ca,sbd,lan_thu,vao_luc,trang_thai,cap_nhat_luc) VALUES('CA|L1|1','CA','L1',1,'x','da_nop','x')").run()
+    for (const sbd of ['H1', 'D1', 'L1']) expect((await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd })).ok).toBe(true)
+    expect(d.dem('ke_hoach_ngay')).toBe(3)
   })
 
   it('đường thầy /ke-hoach/chay-ca-lop đòi mã bí mật; đường em công khai', async () => {
