@@ -161,6 +161,15 @@ describe('bù khi thiếu ("tự phân thêm bài khi ngày thiếu") và việc
     // câu sai nhiều nhất (lanSai=3) được ưu tiên trong cùng mốc
     expect(cauHan(30).filter((c) => qid.includes(c.qid)).every((c) => c.lanSai >= 2)).toBe(true)
   })
+  it('chữ hiển thị và danh sách câu KHỚP số câu thật của việc ôn (kể cả khi bị cắt xuống phần thiếu)', () => {
+    for (const daLam of [0, 2, 3]) {
+      const kh = lapKeHoachNgay(dv({ cauToiHan: cauHan(3), daLamHomNay: { soCau: daLam, lenBac: 0, tutBac: 0 } }))
+      for (const v of kh.viec.filter((x) => x.loai === 'on_lai')) {
+        expect((v.chiTiet as { qid: string[] }).qid).toHaveLength(v.soCau)
+        expect(v.ghiChu).toContain(`Ôn ${v.soCau} câu`)
+      }
+    }
+  })
   it('chỉ có câu ôn (không dạng yếu, không ca) mà thiếu tối thiểu → ôn được NỚI đúng phần thiếu, không quá ngân sách', () => {
     const kh = lapKeHoachNgay(dv({ cauToiHan: cauHan(30) }))
     expect(kh.tai.bu).toBe(kh.nganSach.toiThieuCau)
@@ -393,6 +402,16 @@ describe('D1 thật: /hs/ke-hoach-ngay, lưu, chốt ngày, cron', () => {
     // Lần thứ hai: cập nhật, không nhân đôi.
     await chayCaLop(d.env, Date.now())
     expect(d.dem('ke_hoach_ngay')).toBe(119)
+  })
+
+  it('cron 00:01 VN (scheduled): chạy kế hoạch cả lớp NGOÀI hai việc cũ (tin phụ huynh, vinh danh); cron phút vẫn chạy đường thông báo', async () => {
+    const d = taoD1That()
+    d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,trang_thai,cap_nhat_luc) VALUES('S1','x','da_duyet','x')").run()
+    await worker.scheduled({ cron: '1 17 * * *' }, d.env)
+    expect(d.dem('ke_hoach_ngay', "sbd='S1'")).toBe(1)
+    const truoc = d.dem('ke_hoach_ngay')
+    await worker.scheduled({ cron: '* * * * *' }, d.env) // cron thông báo KHÔNG động vào kế hoạch
+    expect(d.dem('ke_hoach_ngay')).toBe(truoc)
   })
 
   it('đường thầy /ke-hoach/chay-ca-lop đòi mã bí mật; đường em công khai', async () => {

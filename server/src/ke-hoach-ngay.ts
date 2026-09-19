@@ -342,7 +342,7 @@ export function lapKeHoachNgay(d: DauVaoKeHoach): KeHoachNgay {
       if (v.loai === 'than_thu' && v.soCau > conCho) continue
       const soCau = v.loai === 'than_thu' ? v.soCau : Math.min(v.soCau, can, Math.max(0, conCho))
       if (soCau <= 0) continue
-      bu.push({ ...v, soCau, nhan: 'bu' })
+      bu.push({ ...catViec(v, soCau), nhan: 'bu' })
       can = Math.max(0, can - soCau)
     } else {
       tuyChon.push({ ...v, nhan: 'tuy_chon' })
@@ -394,6 +394,13 @@ export function demChuoiDat(lichSu: DauVaoKeHoach['lichSu']): number {
     n++
   }
   return n
+}
+
+/** Cắt việc mềm xuống `soCau` câu mà chữ hiển thị và danh sách câu vẫn KHỚP số câu (không nói "3 câu" khi chỉ giao 2). */
+function catViec(v: Viec, soCau: number): Viec {
+  if (soCau >= v.soCau || v.loai !== 'on_lai') return { ...v, soCau }
+  const qid = (v.chiTiet.qid as string[]).slice(0, soCau)
+  return { ...v, soCau, ghiChu: `Ôn ${soCau} câu đã tới hạn nhắc lại`, chiTiet: { ...v.chiTiet, qid } }
 }
 
 function viecCung(o: {
