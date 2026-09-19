@@ -28,8 +28,9 @@ const KHO: CauKho[] = [
 const dapAn = new Map(KHO.map(c => [c.qid, c.correct]))
 const saiCua = (qid: string) => (dapAn.get(qid) === 'A' ? 'B' : 'A')
 
-function dungTruong(hs: [string, string, string][] = [['S1', 'Nguyễn Thu Hà', '12A'], ['S2', 'Trần Văn Nam', '12A']]): D1That {
+function dungTruong(hs: [string, string, string][] = [['S1', 'Nguyễn Thu Hà', '12A'], ['S2', 'Trần Văn Nam', '12A']], moCo: unknown = { toanBo: true }): D1That {
   const d = taoD1That()
+  if (moCo) d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('doan_ho_tong',?,'x')").run(JSON.stringify(moCo))
   d.sql.prepare("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE1','DE1','12',?,?,0,'v1')").run(KHO.length, 'kho/DE1.json')
   d.sql.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
   for (const c of KHO) {
@@ -335,6 +336,25 @@ describe('Đoàn Hộ Tống · máy chủ · luật cũ vẫn khoá', () => {
     for (const t of ['doan_tiep_suc', 'doan_luot', 'doan_chang']) d.sql.exec(`DROP TABLE ${t}`)
     await expect(goi(d, 'S1', 'mo')).rejects.toThrow('chưa mở trên máy chủ'); await expect(goi(d, 'S1', 'xem', { ma: 'DH1' })).rejects.toThrow('chưa mở trên máy chủ')
     expect(await gameV2(d.env, 'start', { token: await gameToken(d.env, 'S1'), mode: 'adventure' })).toMatchObject({ ok: true })
+  })
+  it('CỜ MỞ GAME: không có dòng cấu hình = TẮT với mọi em — mọi lệnh doan-* từ chối tử tế, không ghi gì, profile báo doanMo:false, game cũ chạy như cũ', async () => {
+    const d = dungTruong(undefined, null); await bangChung(d, 'S1', 'X1')
+    for (const lenh of ['mo', 'xem', 'vao', 'nop', 'nop-y', 'bat-dau', 'tin-hieu', 'roi', 'loi-giai-trum']) await expect(goi(d, 'S1', lenh, { ma: 'DH1' })).rejects.toThrow('sắp ra mắt')
+    expect(dem(d, 'SELECT (SELECT COUNT(*) FROM doan_chang)+(SELECT COUNT(*) FROM doan_luot)+(SELECT COUNT(*) FROM game_v2_session) n')).toBe(0)
+    const token = await gameToken(d.env, 'S1')
+    expect(await gameV2(d.env, 'profile', { token })).toMatchObject({ ok: true, doanMo: false })
+    expect(await gameV2(d.env, 'start', { token, mode: 'adventure' })).toMatchObject({ ok: true })
+  })
+  it('CỜ MỞ GAME: bật theo danh sách thì chỉ em trong danh sách chơi được; toanBo mở cho mọi em; JSON hỏng = TẮT', async () => {
+    const d = dungTruong(undefined, { dsSbd: ['S1'], toanBo: false }); await bangChung(d, 'S1', 'X1'); await bangChung(d, 'S2', 'Y1')
+    expect(await gameV2(d.env, 'profile', { token: await gameToken(d.env, 'S1') })).toMatchObject({ doanMo: true })
+    expect(await gameV2(d.env, 'profile', { token: await gameToken(d.env, 'S2') })).toMatchObject({ doanMo: false })
+    const ma = (await goi(d, 'S1', 'mo', { cheDo: 'phong' })).doan.ma as string
+    await expect(goi(d, 'S2', 'vao', { ma })).rejects.toThrow('sắp ra mắt')
+    d.sql.prepare("UPDATE cau_hinh SET gia_tri=? WHERE khoa='doan_ho_tong'").run(JSON.stringify({ dsSbd: [], toanBo: true }))
+    expect((await goi(d, 'S2', 'vao', { ma })).doan.ghe).toHaveLength(2)
+    d.sql.prepare("UPDATE cau_hinh SET gia_tri='{hỏng' WHERE khoa='doan_ho_tong'").run()
+    await expect(goi(d, 'S1', 'xem', { ma })).rejects.toThrow('sắp ra mắt')
   })
   it('hàm nhỏ: hiệp → câu cá nhân thứ mấy; tên gọi không bao giờ là SBD', () => {
     expect([1, 2, 3, 5, 6, 7].map(chiSoCau)).toEqual([0, 1, 2, 3, 4, 5])
