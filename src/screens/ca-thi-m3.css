@@ -1,0 +1,279 @@
+/* MÀN THEO DÕI CA THI của thầy (G4) — Material 3, token --m3-*, bản vẽ docs/ban-ve-app-giao-vien-2109/2-ca-thi.jpg.
+ * Chỉ là lớp NHÌN: hàng học sinh là lưới CSS, tab chỉ lọc cái được hiện. Không mã màu hex, không cờ ép độ ưu tiên.
+ * Hai cột (học sinh | thời gian · thẻ ca · cảnh báo) từ khung 1360 px; bảng 5 cột đổi theo bề rộng CỦA CỘT TRÁI (container query),
+ * nên rail/drawer ở app thầy không làm bảng bị bóp. Hẹp hơn: một cột, thẻ ca đứng trên (đúng thứ tự cũ). */
+.ca-luoi {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.ca-cot {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.ca-cot-trai {
+  container: ca-trai / inline-size;
+}
+@media (min-width: 1360px) {
+  .ca-luoi {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    align-items: start;
+    gap: 20px;
+  }
+  .ca-cot-trai {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .ca-cot-phai {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+/* thẻ THỜI GIAN */
+.ca-gio {
+  padding: 20px;
+  border-radius: 20px;
+  background: var(--m3-surface-container-lowest);
+  border: 1px solid var(--vien);
+  color: var(--m3-on-surface);
+}
+.ca-nhan-nho {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--m3-on-surface-variant);
+}
+.ca-gio-hang {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+.ca-gio-so {
+  font-size: 44px;
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.ca-gio[data-co-chung='khong'] .ca-gio-so {
+  font-size: 28px;
+}
+.ca-gio-phu {
+  font-size: 14px;
+  color: var(--m3-on-surface-variant);
+}
+
+/* TAB lọc trạng thái */
+.ca-tab {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--vien);
+  margin: 0 0 4px;
+  scrollbar-width: none;
+}
+.ca-tab::-webkit-scrollbar {
+  display: none;
+}
+.vo-thay .giua-noi-dung .ca-tab-nut,
+.ca-tab-nut {
+  position: relative;
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--m3-on-surface-variant);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ca-tab-nut[aria-selected='true'] {
+  color: var(--m3-primary);
+  font-weight: 800;
+}
+.ca-tab-nut[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: -1px;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--m3-primary);
+}
+.ca-tab-nut:focus-visible {
+  outline: 2px solid var(--m3-primary);
+  outline-offset: -2px;
+}
+.ca-tab-so {
+  font-variant-numeric: tabular-nums;
+}
+
+/* BẢNG học sinh: thẻ xếp dọc khi hẹp, lưới 5 cột khi khung đủ rộng */
+.ca-bang {
+  --ca-cot: minmax(0, 2.3fr) minmax(124px, 1fr) minmax(112px, 1.1fr) minmax(112px, 1.2fr) 84px;
+  display: flex;
+  flex-direction: column;
+}
+.ca-bang-dau {
+  display: none;
+}
+.ca-hang {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'em diem'
+    'tt gian'
+    'tien tien'
+    'hd hd';
+  gap: 8px 12px;
+  align-items: start;
+  padding: 14px 4px;
+}
+.ca-hang + .ca-hang {
+  border-top: 1px solid var(--vien);
+}
+.ca-hang--don {
+  grid-template-areas: 'em tt';
+  align-items: center;
+}
+.ca-o {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  min-width: 0;
+}
+.ca-o-em {
+  grid-area: em;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+.ca-o-tt {
+  grid-area: tt;
+}
+.ca-o-tien {
+  grid-area: tien;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+.ca-o-gian {
+  grid-area: gian;
+  justify-content: flex-end;
+}
+.ca-o-diem {
+  grid-area: diem;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+  text-align: right;
+}
+.ca-hd {
+  grid-area: hd;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.ca-hd:empty {
+  display: none;
+}
+.ca-ten {
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--m3-on-surface);
+}
+.ca-tien-thanh {
+  flex: 1 1 auto;
+  min-width: 48px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--m3-surface-container-high);
+  overflow: hidden;
+}
+.ca-tien-thanh > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--m3-primary);
+}
+.ca-tien-so {
+  flex: 0 0 auto;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--m3-on-surface-variant);
+}
+.ca-gian-so,
+.ca-khong {
+  font-size: 13px;
+  color: var(--m3-on-surface-variant);
+}
+.ca-vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.ca-rong {
+  padding: 28px 8px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--m3-on-surface-variant);
+}
+@container ca-trai (min-width: 600px) {
+  .ca-bang-dau {
+    display: grid;
+    grid-template-columns: var(--ca-cot);
+    gap: 12px;
+    padding: 10px 4px;
+    border-bottom: 1px solid var(--vien);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--m3-on-surface-variant);
+  }
+  .ca-bang-dau > span:last-child {
+    text-align: right;
+  }
+  .ca-hang {
+    grid-template-columns: var(--ca-cot);
+    grid-template-areas:
+      'em tt tien gian diem'
+      'hd hd hd hd hd';
+    align-items: center;
+  }
+  .ca-hang--don {
+    grid-template-areas: 'em tt tien gian diem';
+  }
+  .ca-o-gian {
+    justify-content: flex-start;
+  }
+}
+
+/* Thẻ ca xếp DỌC — đầu thẻ, hai nút Mở/Khoá, hai link — khi nó hẹp: cột phải 380 px (khung ≥ 1360 px) hoặc điện thoại (< 900 px). */
+@media (max-width: 899px), (min-width: 1360px) {
+  .ca-cot-phai .gv-monitor-overview > .gv-page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ca-cot-phai .gv-monitor-overview > .gv-page-header > .shrink-0 {
+    justify-content: space-between;
+  }
+  .ca-cot-phai .gv-monitor-overview .grid-cols-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

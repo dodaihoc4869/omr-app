@@ -2,7 +2,7 @@
 // sử ca thi hoặc ngay sau khi mở ca. Dữ liệu lượt thi từ máy chủ
 // (chiTietCa); ĐIỂM chấm tại máy thầy bằng ngân hàng CÓ đáp án đã lưu khi mở
 // ca (đáp án không rời máy thầy) rồi tự ghi điểm + chi tiết từng câu lên
-// Sheet (ghiDiem) để phân tích về sau. Mỗi em một <Hang> kèm <Nhan>:
+// Sheet (ghiDiem) để phân tích về sau. Mỗi em một hàng `.ca-hang` kèm <Nhan>:
 // xám chờ thi lại · tím đang làm · cam rời màn N lần · đỏ bị khoá · xanh đã nộp.
 // Xoá ca = xoá mềm, phải gõ đúng mã ca.
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -10,7 +10,7 @@ import { demKetQua } from '../lib/dem-ket-qua'
 import { goiBaiThi } from '../lib/goi-bao-cao'
 import { Check, RefreshCw, Trash2, ChevronRight, Lock, Unlock, Pencil, LogIn, BarChart3, ArrowLeft } from 'lucide-react'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
-import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
+import { Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify } from '../engine/score'
 import { danhSachCa, type CaTomTat, batDauThi, capNhatKeyBank, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
 import { chuanTenCa, tenHienCua, TEN_CA_TOI_DA } from '../lib/ten-ca'
@@ -35,6 +35,10 @@ import { chuTatDe } from '../lib/giu-de-doc'
 import { useAppStore } from '../store/appStore'
 import { cuaVaoCa } from '../lib/cua-vao-ca'
 import { trangThaiCa } from './LichSuCaScreen'
+import KhoiThoiGianCa from '../components/KhoiThoiGianCa'
+import ThanhTabCa, { type MucTabCa } from '../components/ThanhTabCa'
+import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
+import './ca-thi-m3.css'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -219,6 +223,8 @@ export default function ExamMonitorScreen() {
   // đúng con số đó, nếu không thầy rút 25 câu phần I mà máy chỉ lấy 18 ⇒ điểm
   // chấm lại khác điểm đã gửi phụ huynh mà không có dấu hiệu gì.
   const [soCauCa, setSoCauCa] = useState<SoCauMoiPhan | undefined>(undefined)
+  // TAB LỌC danh sách em (G4): chỉ đổi cái được hiện. Mặc định 'tat_ca' để thầy không bị ẩn em nào lúc mới mở.
+  const [tabEm, setTabEm] = useState('tat_ca')
   const [daCopy, setDaCopy] = useState(false)
   const [daCopyDiem, setDaCopyDiem] = useState(false)
   const [xacNhanSbd, setXacNhanSbd] = useState<string | null>(null)
@@ -891,6 +897,30 @@ export default function ExamMonitorScreen() {
   const chuaVao =
     chiTiet && chiTiet.ca.phamVi === 'chon' && Array.isArray(chiTiet.ca.danhSachMoi) ? Math.max(0, chiTiet.ca.danhSachMoi.length - dsEm.length) : null
 
+  // ---------------------------------------------------------- TAB LỌC DANH SÁCH EM (G4)
+  // Mọi số ở tab là ĐẾM từ dữ liệu ca đã có (lượt, phòng chờ, danh sách mời) — không gọi thêm lệnh nào.
+  const sbdDaCoLuot = new Set(dsEm.map((e) => e.sbd))
+  const emChoVao = (chiTiet?.dsCho ?? []).filter((x) => !sbdDaCoLuot.has(x.sbd))
+  const emChuaVao =
+    chuaVao === null || !chiTiet || !Array.isArray(chiTiet.ca.danhSachMoi)
+      ? []
+      : (chiTiet.ca.danhSachMoi as unknown[]).map((x) => String(x)).filter((sbd) => !sbdDaCoLuot.has(sbd))
+  const mucTab: MucTabCa[] = [
+    { ma: 'tat_ca', nhan: 'Tất cả', so: dsEm.length },
+    { ma: 'dang_lam', nhan: 'Đang làm', so: dangLamNgay },
+    ...(chiTiet?.ca.phongCho || emChoVao.length > 0 ? [{ ma: 'cho', nhan: 'Phòng chờ', so: emChoVao.length }] : []),
+    { ma: 'da_nop', nhan: 'Đã nộp', so: tk?.daNop ?? 0 },
+    ...(chuaVao !== null ? [{ ma: 'chua_vao', nhan: 'Chưa vào', so: emChuaVao.length }] : []),
+  ]
+  const tabHieu = mucTab.some((m) => m.ma === tabEm) ? tabEm : 'tat_ca'
+  const dsHienThi =
+    tabHieu === 'dang_lam'
+      ? dsEm.filter((e) => e.moiNhat.trangThai === 'dang_lam')
+      : tabHieu === 'da_nop'
+        ? dsEm.filter((e) => e.moiNhat.trangThai === 'da_nop' || e.moiNhat.trangThai === 'khoa')
+        : dsEm
+  const tongCauDe = tongSoCauCa(soCauCa)
+
   // CỬA VÀO CA — luật nằm trong `cua-vao-ca.ts`, màn này chỉ vẽ.
   const cua = cuaVaoCa(chiTiet?.ca ?? null, now)
 
@@ -1089,6 +1119,9 @@ export default function ExamMonitorScreen() {
 
       {chiTiet && tk && tt && (
         <>
+          <div className="ca-luoi">
+          <div className="ca-cot ca-cot-phai">
+          <KhoiThoiGianCa ca={chiTiet.ca} />
           {/* THÔNG TIN CA */}
           <TheNoiDung className="gv-monitor-overview">
             <div className="gv-page-header flex items-start justify-between flex-wrap" style={{ gap: 'var(--k3)' }}>
@@ -1562,9 +1595,12 @@ export default function ExamMonitorScreen() {
               vào đây thì màn coi thi dài gấp đôi, mà lúc đang coi thi thì thầy
               chưa chữa bài — chữa bài là việc sau khi ca xong. */}
 
+          </div>
+          <div className="ca-cot ca-cot-trai">
           {/* DANH SÁCH EM */}
           <TheNoiDung className="gv-monitor-students">
             <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Học sinh trong ca ({dsEm.length})</div>
+            <ThanhTabCa muc={mucTab} dangChon={tabHieu} doi={setTabEm} idBang="ca-bang-em" />
             {/* EM CHƯA CÓ TÊN (thầy báo 07/09). Em vào thi chỉ gõ số báo danh
                 nên cột tên của lượt bỏ trống, và phiếu gửi phụ huynh in
                 "SBD 10038" thay vì tên con. Danh sách lớp có sẵn tên, chỉ cần
@@ -1585,17 +1621,64 @@ export default function ExamMonitorScreen() {
                 </button>
               </div>
             )}
-            {dsEm.length === 0 ? (
+            <div id="ca-bang-em" className="ca-bang" role="tabpanel" aria-labelledby={`ca-tab-${tabHieu}`}>
+            {tabHieu === 'cho' ? (
+              emChoVao.length === 0 ? (
+                <div className="ca-rong">Chưa em nào đứng ở phòng chờ.</div>
+              ) : (
+                emChoVao.map((x) => (
+                  <div key={`cho-${x.sbd}`} className="ca-hang ca-hang--don" data-trang-thai="Đang chờ">
+                    <span className="ca-o ca-o-em">
+                      <span className="ca-ten">{x.hoTen || '(chưa có tên)'}</span>
+                      <span style={NHAN_NHO}>
+                        SBD <span style={SO}>{x.sbd}</span>
+                        {x.vaoLuc ? ` · vào chờ ${gio(x.vaoLuc)}` : ''}
+                      </span>
+                    </span>
+                    <span className="ca-o ca-o-tt">
+                      <Nhan tone="xam">Đang chờ</Nhan>
+                    </span>
+                  </div>
+                ))
+              )
+            ) : tabHieu === 'chua_vao' ? (
+              emChuaVao.length === 0 ? (
+                <div className="ca-rong">Em được mời đã vào hết.</div>
+              ) : (
+                emChuaVao.map((sbd) => (
+                  <div key={`chua-${sbd}`} className="ca-hang ca-hang--don" data-trang-thai="Chưa vào">
+                    <span className="ca-o ca-o-em">
+                      <span className="ca-ten">{classList.find((c) => c.sbd === sbd)?.hoTen || '(chưa có tên)'}</span>
+                      <span style={NHAN_NHO}>
+                        SBD <span style={SO}>{sbd}</span>
+                      </span>
+                    </span>
+                    <span className="ca-o ca-o-tt">
+                      <Nhan tone="xam">Chưa vào</Nhan>
+                    </span>
+                  </div>
+                ))
+              )
+            ) : dsEm.length === 0 ? (
               <div style={NHAN_NHO}>Chưa có em nào vào thi.</div>
+            ) : dsHienThi.length === 0 ? (
+              <div className="ca-rong">Không có em nào ở mục này.</div>
             ) : (
-              <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
-                {dsEm.map((e) => {
+              <>
+                <div className="ca-bang-dau" aria-hidden="true">
+                  <span>HỌC SINH</span>
+                  <span>TRẠNG THÁI</span>
+                  <span>TIẾN ĐỘ</span>
+                  <span>CHỐNG GIAN LẬN</span>
+                  <span>ĐIỂM</span>
+                </div>
+                {dsHienThi.map((e) => {
                   const l = e.moiNhat
                   const nh = nhanCuaLuot(l)
                   const daNop = l.trangThai === 'da_nop' || l.trangThai === 'khoa'
                   return (
-                    <Hang key={e.sbd} data-trang-thai={nh.ten} style={{ alignItems: 'flex-start' }}>
-                      <span className="flex-1 min-w-0">
+                    <div key={e.sbd} className="ca-hang" data-trang-thai={nh.ten}>
+                      <span className="ca-o ca-o-em">
                         <span className="flex items-center flex-wrap" style={{ gap: 6 }}>
                           {/* CHẠM TÊN EM → hồ sơ đầy đủ ngay trong màn này:
                               mạnh–yếu, lịch sử ca, tin nhắn và ảnh phiếu Zalo. */}
@@ -1620,14 +1703,37 @@ export default function ExamMonitorScreen() {
                             {e.cacLuotCu.map((c) => `lần ${c.lanThu}: ${c.tong !== null && c.tong !== undefined ? c.tong.toFixed(2) : c.trangThai === 'khoa' ? 'khoá' : '—'}${c.nopLuc ? ` · ${gio(c.nopLuc)}` : ''}`).join(' · ')}
                           </span>
                         )}
-                        <span className="flex items-center flex-wrap" style={{ gap: 4, marginTop: 4 }}>
-                          <Nhan tone={nh.tone}>{nh.ten}</Nhan>
+                      </span>
+                      <span className="ca-o ca-o-tt">
+                        <Nhan tone={nh.tone}>{nh.ten}</Nhan>
+                      </span>
+                      <span className="ca-o ca-o-tien">
+                        {l.dapAn && tongCauDe ? (
+                          <>
+                            <span className="ca-tien-thanh" aria-hidden="true">
+                              <i style={{ width: `${Math.min(100, Math.round((demCauDaLam(l.dapAn) / tongCauDe) * 100))}%` }} />
+                            </span>
+                            <span className="ca-tien-so">
+                              <span className="ca-vh">Đã làm </span>
+                              {demCauDaLam(l.dapAn)}/{tongCauDe}
+                              <span className="ca-vh"> câu</span>
+                            </span>
+                          </>
+                        ) : (
+                          <span className="ca-khong" aria-label="Chưa có số liệu tiến độ">—</span>
+                        )}
+                      </span>
+                      <span className="ca-o ca-o-gian">
                           {daNop && l.soLanRoiMan > 0 && <Nhan tone="cam">rời màn {l.soLanRoiMan} lần / {l.tongGiayRoiMan}s</Nhan>}
+                          {!daNop && l.soLanRoiMan > 0 && <span className="ca-gian-so">{l.tongGiayRoiMan}s ngoài màn</span>}
                           {/* GIỮ ĐỂ ĐỌC (GIUDEDOC mục 4F): hai con số, KHÔNG tô
                               đỏ, KHÔNG gọi là vi phạm. Nhả tay là chuyện bình
                               thường; nhưng đề tắt 20 phút trong ca 50 phút là
                               điều thầy nên nhìn. */}
                           {chuTatDe(l.integrity) && <Nhan tone="xam">{chuTatDe(l.integrity)}</Nhan>}
+                          {l.soLanRoiMan === 0 && !chuTatDe(l.integrity) && <span className="ca-khong" aria-label="Không có cảnh báo">—</span>}
+                      </span>
+                      <span className="ca-hd">
                           {(l.trangThai === 'khoa' || l.soLanRoiMan > 0) && (
                             <button type="button" onClick={() => moBaoPhuHuynh(e.sbd, l.hoTen, l)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--cam)', minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--cam)' }}>
                               Báo phụ huynh
@@ -1671,9 +1777,8 @@ export default function ExamMonitorScreen() {
                                 Cho thi lại
                               </button>
                             ))}
-                        </span>
                       </span>
-                      <span className="shrink-0 text-right">
+                      <span className="ca-o ca-o-diem">
                         <span className="block font-bold" style={{ ...SO, fontSize: 'var(--cx-4)', color: e.diem === null ? 'var(--mo)' : 'var(--muc)' }}>
                           {e.diem === null ? '—' : e.diem.toFixed(2)}
                         </span>
@@ -1686,11 +1791,12 @@ export default function ExamMonitorScreen() {
                           </span>
                         )}
                       </span>
-                    </Hang>
+                    </div>
                   )
                 })}
-              </div>
+              </>
             )}
+            </div>
           </TheNoiDung>
 
           {/* HAI THẺ "XUẤT KẾT QUẢ" VÀ "TẢI ĐỀ & LỜI GIẢI" ĐÃ GỠ — thầy chốt
@@ -1711,6 +1817,9 @@ export default function ExamMonitorScreen() {
               showToast={showToast}
             />
           )}
+
+          </div>
+          </div>
 
           {/* BÁO PHỤ HUYNH — thầy đọc lại, sửa, rồi mới gửi */}
           {tinBao && (
