@@ -28,3 +28,6 @@ _*.tar.gz
 *.patch
 _patch_cu/
 .gitignore.bak*
+
+# Dữ liệu từng đêm của bộ não (có số liệu học sinh) — không bao giờ commit
+bo-nao/20*/
