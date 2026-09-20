@@ -3,6 +3,7 @@
 // (Tệp `tests/them-phut-1909.test.ts` là của Code 2, phía màn thi học sinh.)
 import { describe, it, expect } from 'vitest'
 import worker from '../server/src/index'
+import { moKhoaEm } from '../server/src/goi-cu'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
 
 const T0 = Date.parse('2026-09-21T03:00:00.000Z')
@@ -15,7 +16,7 @@ const caRow = (d: D1That) => d.sql.prepare("SELECT thoi_gian_phut AS p, them_phu
 const goi = (d: D1That, b: Record<string, unknown>, thay = true) => goiWorker(worker, d.env, '/ca/them-phut', b, thay)
 const HET = iso(T0 + 45 * 60_000)
 
-/** Ca thi C1 đang mở 45 phút; S1, S2 ĐANG LÀM; S3 đã nộp; S4 bị khoá; S5 đang làm nhưng chưa có hạn; S6 chờ duyệt lại; S7 đang làm nhưng hạn hỏng (không đọc được). */
+/** Ca thi C1 đang mở 45 phút; S1, S2 ĐANG LÀM; S3 đã nộp; S4 bị khoá (chờ thầy mở khoá); S5 đang làm nhưng chưa có hạn; S6 chờ duyệt lại; S7 đang làm nhưng hạn hỏng (không đọc được). */
 function dung(caO: string[] = []): D1That {
   const d = taoD1That()
   d.sql.prepare("INSERT INTO ca(ma_ca,ten_ca,trang_thai,loai,thoi_gian_phut,het_han_vao,cap_nhat_luc) VALUES('C1','Ca 1','mo','thi',45,?,'x')").run(iso(T0 + 3_600_000))
@@ -27,11 +28,11 @@ function dung(caO: string[] = []): D1That {
 }
 
 describe('/ca/them-phut: chỉ cộng, đúng lượt, đúng ca', () => {
-  it('cộng phút cho ca và cho lượt ĐANG LÀM có hạn; lượt đã nộp/khoá/chưa hạn/chờ duyệt lại, hạn vào, điểm, đáp án y nguyên', async () => {
+  it('cộng phút cho ca, cho lượt ĐANG LÀM và lượt KHOÁ có hạn; lượt đã nộp/chưa hạn/hạn hỏng/chờ duyệt lại, hạn vào, điểm, đáp án y nguyên', async () => {
     const d = dung()
     const truoc = d.sql.prepare('SELECT * FROM luot ORDER BY sbd').all() as Record<string, unknown>[]
     const r = await goi(d, { maCa: 'C1', phut: 5 })
-    expect(r).toMatchObject({ ok: true, phut: 5, soLuotCong: 2, thoiGianPhut: 50, themPhutTong: 5 })
+    expect(r).toMatchObject({ ok: true, phut: 5, soLuotCong: 2, soLuotKhoaCong: 1, thoiGianPhut: 50, themPhutTong: 5 }) // soLuotCong chỉ đếm lượt đang làm
     expect(han(d, 'S1')).toBe(iso(T0 + 50 * 60_000))
     expect(han(d, 'S2')).toBe(iso(T0 + 55 * 60_000))
     const sau = d.sql.prepare('SELECT * FROM luot ORDER BY sbd').all() as Record<string, unknown>[]
@@ -39,11 +40,18 @@ describe('/ca/them-phut: chỉ cộng, đúng lượt, đúng ca', () => {
       const { het_gio_luc: h0, cap_nhat_luc: c0, ...con0 } = truoc[i]!
       const { het_gio_luc: h1, cap_nhat_luc: c1, ...con1 } = sau[i]!
       expect(con1).toEqual(con0) // đáp án, điểm, trạng thái, nộp lúc... không đổi
-      if (['S1', 'S2'].includes(String(truoc[i]!.sbd))) expect(Date.parse(String(h1))).toBe(Date.parse(String(h0)) + 5 * 60_000)
+      if (['S1', 'S2', 'S4'].includes(String(truoc[i]!.sbd))) expect(Date.parse(String(h1))).toBe(Date.parse(String(h0)) + 5 * 60_000)
       else expect(h1).toBe(h0)
     }
     expect(caRow(d)).toEqual({ p: 50, t: 5, v: iso(T0 + 3_600_000), s: 'mo' })
-    expect(han(d, 'S3')).toBe(HET); expect(han(d, 'S4')).toBe(HET); expect(han(d, 'S5')).toBe(''); expect(han(d, 'S6')).toBe(HET); expect(han(d, 'S7')).toBe('khong-phai-ngay') // hạn hỏng: giữ nguyên, không xoá, không tính vào soLuotCong
+    expect(han(d, 'S4')).toBe(iso(T0 + 50 * 60_000)); expect(han(d, 'S3')).toBe(HET); expect(han(d, 'S5')).toBe(''); expect(han(d, 'S6')).toBe(HET); expect(han(d, 'S7')).toBe('khong-phai-ngay') // hạn hỏng: giữ nguyên, không xoá, không tính vào soLuotCong
+  })
+  it('em bị khoá được thầy MỞ KHOÁ sau khi thêm phút nhận đúng hạn mới (không thiệt giờ)', async () => {
+    const d = dung()
+    await goi(d, { maCa: 'C1', phut: 5 })
+    await goi(d, { maCa: 'C1', phut: 3 })
+    expect(await moKhoaEm(d.env, { maCa: 'C1', sbd: 'S4' })).toMatchObject({ ok: true, soDong: 1 })
+    expect(d.sql.prepare("SELECT trang_thai, het_gio_luc FROM luot WHERE sbd = 'S4'").get()).toEqual({ trang_thai: 'dang_lam', het_gio_luc: iso(T0 + 53 * 60_000) })
   })
   it('hạn mới là ISO chuẩn đúng định dạng của JS (…T…​.sssZ), cộng đúng tới từng mili giây', async () => {
     const d = dung()
@@ -114,6 +122,38 @@ describe('/ca/them-phut: chỉ cộng, đúng lượt, đúng ca', () => {
     expect(ct.ok).toBe(true)
     expect(ct.ca.themPhutTong).toBe(0)
     expect((await goiWorker(worker, d.env, '/trang-thai', { sbd: 'S1', maCa: 'C1', dangLam: true })).ok).toBe(true)
+  })
+})
+
+describe('đẩy lại ca (publish, /ca/nhieu) không làm mất phút đã thêm', () => {
+  const dayCa = (d: D1That, maCa: string, phut: number) => goiWorker(worker, d.env, '/goi', { action: 'publish', ca: { maCa, tenCa: 'Ca', trangThai: 'mo', loai: 'thi', thoiGianPhut: phut } }, true)
+  const phut = (d: D1That, ma: string) => (d.sql.prepare('SELECT thoi_gian_phut AS p FROM ca WHERE ma_ca = ?').get(ma) as { p: number }).p
+  it('publish: ca đã thêm phút giữ số lớn hơn (app gửi 45 thì vẫn 55; gửi 60 thì 60); ca chưa thêm phút theo đúng số app gửi (hạ được như cũ)', async () => {
+    const d = dung(["INSERT INTO ca(ma_ca,ten_ca,trang_thai,loai,thoi_gian_phut,cap_nhat_luc) VALUES('C9','Ca chưa thêm','mo','thi',45,'x')"])
+    await goi(d, { maCa: 'C1', phut: 10 }) // 55
+    expect((await dayCa(d, 'C1', 45)).ok).toBe(true)
+    expect(phut(d, 'C1')).toBe(55)
+    expect((await dayCa(d, 'C1', 60)).ok).toBe(true)
+    expect(phut(d, 'C1')).toBe(60)
+    expect((await dayCa(d, 'C9', 40)).ok).toBe(true)
+    expect(phut(d, 'C9')).toBe(40)
+    expect(caRow(d).t).toBe(10) // tổng đã thêm không bị đụng
+  })
+  it('/ca/nhieu: cùng luật cho từng ca trong lượt đẩy', async () => {
+    const d = dung(["INSERT INTO ca(ma_ca,ten_ca,trang_thai,loai,thoi_gian_phut,cap_nhat_luc) VALUES('C9','Ca chưa thêm','mo','thi',45,'x')"])
+    await goi(d, { maCa: 'C1', phut: 10 })
+    const r = await goiWorker(worker, d.env, '/ca/nhieu', { ca: [{ maCa: 'C1', tenCa: 'Ca 1', trangThai: 'mo', thoiGianPhut: 45 }, { maCa: 'C9', tenCa: 'Ca 9', trangThai: 'mo', thoiGianPhut: 40 }] }, true)
+    expect(r.ok).toBe(true)
+    expect(phut(d, 'C1')).toBe(55)
+    expect(phut(d, 'C9')).toBe(40)
+  })
+  it('chưa chạy migration (thiếu cột them_phut_tong): publish và /ca/nhieu vẫn ghi như cũ, không vỡ', async () => {
+    const d = dung()
+    d.sql.exec('ALTER TABLE ca DROP COLUMN them_phut_tong')
+    expect((await dayCa(d, 'C1', 50)).ok).toBe(true)
+    expect(phut(d, 'C1')).toBe(50)
+    expect((await goiWorker(worker, d.env, '/ca/nhieu', { ca: [{ maCa: 'C1', tenCa: 'Ca 1', trangThai: 'mo', thoiGianPhut: 47 }] }, true)).ok).toBe(true)
+    expect(phut(d, 'C1')).toBe(47)
   })
 })
 

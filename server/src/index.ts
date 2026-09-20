@@ -16,7 +16,7 @@ import {parentNews,refreshDailyNews} from './parent-news'
 import {phCapMa,phDemTruyCap,phKeHoach,phThoiGianHoc,phXacDinh} from './ph-truy-cap'
 import {homNayThay} from './hom-nay-thay'
 import {gvKeHoachEm} from './gv-ke-hoach-em'
-import {themPhutCa} from './them-phut'
+import {docPhutCaDaThem,phutKhongHaSauKhiThem,themPhutCa} from './them-phut'
 import {doiTenHocSinh} from './doi-ten-hoc-sinh'
 import { mom } from './mom'
 import { luyenDe } from './luyen-de'
@@ -577,6 +577,8 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
     return ra({ ok: true, maCa, coDe: !!bankKey, chiMoc: true, coCa: r.meta.changes > 0 })
   }
 
+  // Ca ĐÃ được thêm phút (`/ca/them-phut`): đẩy lại ca không được hạ `thoi_gian_phut` xuống dưới giá trị hiện có.
+  const phutDaThem = await docPhutCaDaThem(env, [maCa])
   await env.DB.prepare(
     `INSERT INTO ca (ma_ca, ten_ca, trang_thai, bat_dau, het_han_vao, thoi_gian_phut, loai, han_nop,
                      cong_bo, nguong_lan, nguong_giay, bank_r2, so_cau_json, bo_theo_em_json, cap_nhat_luc,
@@ -621,7 +623,7 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
   )
     .bind(
       maCa, String(ca.tenCa ?? ''), String(ca.trangThai ?? 'mo'), String(ca.batDau ?? ''),
-      String(ca.hetHanVao ?? ''), Number(ca.thoiGianPhut) || 45, String(ca.loai ?? 'thi'),
+      String(ca.hetHanVao ?? ''), phutKhongHaSauKhiThem(Number(ca.thoiGianPhut) || 45, phutDaThem.get(maCa)), String(ca.loai ?? 'thi'),
       String(ca.hanNop ?? ''), String(ca.congBo ?? 'khong'), Number(ca.nguongLan) || 3,
       Number(ca.nguongGiay) || 10, bankKey, ca.soCau ? JSON.stringify(ca.soCau) : null,
       ca.boTheoEm ? JSON.stringify(ca.boTheoEm) : null, new Date().toISOString(),
@@ -824,6 +826,7 @@ async function dayNhieuCa(env: Env, b: Record<string, unknown>): Promise<Respons
   const nay = new Date().toISOString()
   const cau: D1PreparedStatement[] = []
 
+  const phutDaThem = await docPhutCaDaThem(env, dsCa.map((c) => String(c.maCa ?? '').trim())) // ca đã thêm phút: không hạ thoi_gian_phut
   for (const c of dsCa) {
     const maCa = String(c.maCa ?? '').trim()
     if (!maCa) continue
@@ -846,7 +849,7 @@ async function dayNhieuCa(env: Env, b: Record<string, unknown>): Promise<Respons
            bat_dau_thi_luc=COALESCE(excluded.bat_dau_thi_luc, ca.bat_dau_thi_luc)`,
       ).bind(
         maCa, String(c.tenCa ?? ''), String(c.trangThai ?? 'mo'), String(c.batDau ?? ''),
-        String(c.hetHanVao ?? ''), Number(c.thoiGianPhut) || 45, String(c.loai ?? 'thi'),
+        String(c.hetHanVao ?? ''), phutKhongHaSauKhiThem(Number(c.thoiGianPhut) || 45, phutDaThem.get(maCa)), String(c.loai ?? 'thi'),
         String(c.hanNop ?? ''), String(c.congBo ?? 'khong'), nay, String(c.lop ?? ''),
         c.phongCho ? 1 : 0, String(c.batDauThiLuc ?? '') || null, c.giuDeDoc ? 1 : 0,
         Number(c.anHanGiay) || 0, String(c.moLuc ?? ''), String(c.phamVi ?? 'tu_do'),
