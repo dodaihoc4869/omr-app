@@ -1,0 +1,298 @@
+// BỘ NÃO — KHUÔN ĐẦU RA + KIỂM KHUÔN (Code 1, 21/09/2026). Đề bài `prompt-bo-nao.md`; KHUÔN là hợp đồng ở `bo-nao/HUONG-DAN-BO-NAO.md`; thiết kế `DE-XUAT-BO-NAO-AI-2109.md`.
+//
+// Hai nơi cùng import tệp này (hai lớp kiểm): `scripts/bo-nao/nop.mjs` kiểm tại máy thầy trước khi gửi, `server/src/bo-nao.ts` kiểm LẦN NỮA trước khi lưu.
+// THUẦN: không IO, không đồng hồ, không `Math.random`. Sai khuôn là BỎ phần tử ấy (không sửa hộ) và trả lý do bằng lời để báo thầy.
+//
+// AI (phiên trên máy thầy) chỉ VẶN NÚM trong khung; không bao giờ chọn mã câu, bỏ lõi, vượt bậc + 1, sửa điểm, soạn gì cho phụ huynh, nhắc ca thi đang mở.
+// Luật lời nhắn cho em: chỉ số có trong THẺ của em; không so với bạn; không nhãn năng lực; không doạ; ≤ 140 ký tự.
+import type { DieuChinhEm } from './btvn-nang-do'
+
+// ══════════════════════════════ KIỂU ══════════════════════════════
+
+export type HanhDongDang = 'uu_tien' | 'ha_mot_bac' | 'cho_thu_len_bac' | 'tam_nghi'
+export type CoBoNao = 'khong' | 'tut_nhip' | 'qua_tai' | 'lam_cho_xong' | 'nghi_chep'
+export type HanhDongChoThay = 'khong' | 'goi_len_bang' | 'nhan_phu_huynh' | 'giao_bai_rieng'
+
+/** MỘT PHẦN TỬ ĐẦU RA của bộ não cho MỘT em (`ra/<tệp>.json` là mảng các phần tử này). `biDanh` là bí danh của đêm — nop.mjs đổi về SBD trước khi gửi. */
+export interface DauRaEm {
+  biDanh: string
+  /** 0–1. Dưới `NGUONG_TIN_CAY` ⇒ máy chủ chỉ ghi sổ, không áp dụng. */
+  doTinCay: number
+  nhip: { lech: number; khoiDong: number }
+  dang: { ma: string; hanhDong: HanhDongDang; lyDo: string }[]
+  co: CoBoNao
+  loiNhanChoEm: string
+  goiYChoThay: { chu: string; hanhDong: HanhDongChoThay; dang: string }
+  ghiChuHlv: string
+  /** Em cần nhìn kỹ hơn (mô hình nhỏ đặt khi thấy tín hiệu khó) — KHÔNG phải điều chỉnh, máy chủ bỏ qua khi nộp. */
+  canSau: boolean
+}
+
+/** Một dòng bản tin sáng cho thầy (khối "Bộ não đêm qua"). Mỗi dòng một nút hành động. `biDanh` (nếu có) được nop.mjs đổi về SBD. */
+export interface DongBanTin {
+  loai: 'em_can_chu_y' | 'dang_ca_lop' | 'goi_len_bang' | 'ket_qua_hom_qua'
+  chu: string
+  biDanh: string
+  dang: string
+  hanhDong: 'khong' | 'goi_len_bang' | 'nhan_phu_huynh' | 'giao_bai_rieng' | 'xem_ho_so'
+}
+
+/** `ra/lop.json`: bản tin sáng ≤ 6 dòng. */
+export interface BanTinSang {
+  cacDong: DongBanTin[]
+}
+
+/** Kết quả kiểm: `lyDo` rỗng khi hợp lệ; mỗi lý do MỘT câu ngắn để báo thầy ("bị loại vì sao"). */
+export interface KetQuaKiem {
+  hopLe: boolean
+  lyDo: string[]
+}
+
+/** Phần thẻ CỦA EM mà kiểm khuôn cần: bí danh, mã dạng có trong thẻ, và TOÀN BỘ thẻ (để gom mọi con số có thật). Thẻ đầy đủ ở `bo-nao-dac-trung.ts`. */
+export interface TheDeKiem {
+  biDanh: string
+  /** Mã dạng có trong thẻ (dạng AI được phép nêu). Vắng/`undefined` ⇒ không kiểm mã dạng. */
+  maDang?: string[]
+  [khac: string]: unknown
+}
+
+// ══════════════════════════════ HẰNG SỐ ══════════════════════════════
+
+export const HAN_MUC_BO_NAO = {
+  NHIP_LECH_TOI_DA: 3,
+  KHOI_DONG_TOI_THIEU: 1,
+  KHOI_DONG_TOI_DA: 3,
+  SO_DANG_TOI_DA: 3,
+  LY_DO_TOI_DA: 80,
+  LOI_NHAN_TOI_DA: 140,
+  GOI_Y_TOI_DA: 200,
+  GHI_CHU_HLV_TOI_DA: 200,
+  BI_DANH_TOI_DA: 40,
+  MA_DANG_TOI_DA: 80,
+  BAN_TIN_SO_DONG_TOI_DA: 6,
+  DONG_BAN_TIN_TOI_DA: 200,
+  /** Dưới ngưỡng này máy chủ chỉ ghi sổ, không áp dụng (`DE-XUAT` mục 4). */
+  NGUONG_TIN_CAY: 0.5,
+  /** Điều chỉnh tự hết hạn sau bấy nhiêu ngày. */
+  HAN_NGAY: 3,
+} as const
+
+export const HANH_DONG_DANG: readonly HanhDongDang[] = ['uu_tien', 'ha_mot_bac', 'cho_thu_len_bac', 'tam_nghi']
+export const CO_BO_NAO: readonly CoBoNao[] = ['khong', 'tut_nhip', 'qua_tai', 'lam_cho_xong', 'nghi_chep']
+export const HANH_DONG_CHO_THAY: readonly HanhDongChoThay[] = ['khong', 'goi_len_bang', 'nhan_phu_huynh', 'giao_bai_rieng']
+const LOAI_DONG_BAN_TIN = ['em_can_chu_y', 'dang_ca_lop', 'goi_len_bang', 'ket_qua_hom_qua'] as const
+const HANH_DONG_BAN_TIN = ['khong', 'goi_len_bang', 'nhan_phu_huynh', 'giao_bai_rieng', 'xem_ho_so'] as const
+
+/** TỪ CẤM trong lời gửi CHO EM: nhãn năng lực, so với bạn, xếp hạng, doạ / mỉa. So theo TỪ (đã bỏ dấu và hạ chữ thường) hoặc CỤM. */
+export const TU_CAM_CHO_EM: readonly string[] = [
+  'yeu', 'kem', 'gioi', 'gioi hon', 'dot', 'ngu', 'luoi', 'te', 'kem coi', 'nam chac', 'thong minh', 'ngoc',
+  'xep hang', 'hang nhat', 'hang nhi', 'cao nhat lop', 'thap nhat lop', 'so voi ban', 'hon ban', 'thua ban', 'ban khac', 'cac ban', 'ca lop', 'bat kip ban',
+  'that bai', 'truot', 'rot', 'bi phat', 'phat', 'doa', 'nguy hiem', 'tham hai', 'vo vong',
+  'dap an', 'ca thi', 'phu huynh', 'cha me', 'bo me',
+]
+/** Trong lời cho THẦY (gợi ý, lý do, bản tin, ghi chú) chỉ cấm những từ này ("dạng yếu" là chữ thường dùng trong app). */
+export const TU_CAM_CHO_THAY: readonly string[] = ['nam chac', 'dot', 'ngu', 'luoi', 'ngoc', 'vo dung']
+
+// ══════════════════════════════ HÀM PHỤ ══════════════════════════════
+
+/** Bỏ dấu tiếng Việt + chữ thường + chuẩn NFC — để so từ cấm không lách được bằng dấu / hoa thường. */
+export function boDau(s: string): string {
+  return s
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'd')
+    .toLowerCase()
+}
+
+/** Độ dài theo ký tự người đọc thấy (điểm mã sau khi chuẩn NFC). */
+export function doDai(s: string): number {
+  return [...s.normalize('NFC')].length
+}
+
+/** Những từ / cụm cấm có trong `chu` (đã bỏ dấu). Trả danh sách cụm bị trúng (không lặp). */
+export function timTuCam(chu: string, danhSach: readonly string[]): string[] {
+  const t = ` ${boDau(chu).replace(/[^a-z0-9]+/g, ' ').trim()} `
+  return danhSach.filter((c) => t.includes(` ${c} `))
+}
+
+/** Mọi con số (chữ số) trong một đoạn chữ, chuẩn hoá dấu phẩy thập phân về dấu chấm; bỏ số 0 thừa đầu ("007" ⇒ "7") nhưng giữ "0.5". */
+export function timSoTrongChu(chu: string): string[] {
+  const ra: string[] = []
+  for (const m of chu.matchAll(/\d+(?:[.,]\d+)?/g)) ra.push(chuanSo(m[0]))
+  return ra
+}
+
+function chuanSo(x: string): string {
+  const n = Number(x.replace(',', '.'))
+  return Number.isFinite(n) ? String(n) : x
+}
+
+/** TẬP SỐ CÓ THẬT trong một thẻ (JSON bất kỳ): mọi số, và dạng hiển thị thường gặp — số làm tròn, một chữ số thập phân, phần trăm của số 0–1, và các số nằm TRONG chuỗi chữ của thẻ. */
+export function tapSoCuaThe(the: unknown): Set<string> {
+  const tap = new Set<string>()
+  const them = (n: number) => {
+    if (!Number.isFinite(n)) return
+    tap.add(String(n))
+    tap.add(String(Math.round(n)))
+    tap.add(String(Math.round(n * 10) / 10))
+    if (n > 0 && n <= 1) tap.add(String(Math.round(n * 100)))
+    if (n >= 0 && n <= 100) tap.add(String(Math.round(n)))
+  }
+  const duyet = (v: unknown, sau: number) => {
+    if (sau > 12 || v === null || v === undefined) return
+    if (typeof v === 'number') them(v)
+    else if (typeof v === 'string') for (const s of timSoTrongChu(v)) them(Number(s))
+    else if (Array.isArray(v)) for (const x of v) duyet(x, sau + 1)
+    else if (typeof v === 'object') for (const x of Object.values(v as Record<string, unknown>)) duyet(x, sau + 1)
+  }
+  duyet(the, 0)
+  return tap
+}
+
+/** Số trong `chu` mà `tap` KHÔNG có. */
+export function soLa(chu: string, tap: Set<string>): string[] {
+  return [...new Set(timSoTrongChu(chu).filter((s) => !tap.has(s)))]
+}
+
+const laChuoi = (v: unknown): v is string => typeof v === 'string'
+const laSoNguyenTrong = (v: unknown, lo: number, hi: number): v is number => typeof v === 'number' && Number.isInteger(v) && v >= lo && v <= hi
+const KY_TU_LA = /[ -<>`]|https?:|www\./i
+
+// ══════════════════════════════ KIỂM KHUÔN ══════════════════════════════
+
+/**
+ * KIỂM MỘT PHẦN TỬ ĐẦU RA của em (`dauRa` là JSON lạ — không tin kiểu). Kiểm: đủ trường + đúng kiểu, biên độ (nhịp ±3, khởi động 1–3, ≤ 3 dạng, độ tin cậy 0–1),
+ * độ dài, TỪ CẤM, ký tự lạ (điều khiển, `<`, `>`, đường dẫn), `biDanh` khớp thẻ, mã dạng có trong thẻ, và MỌI CON SỐ trong `loiNhanChoEm` / `lyDo` / `goiYChoThay.chu` phải có
+ * trong thẻ của em (`tapSoCuaThe`). `lyDo` của dạng phải có ít nhất một số ("lý do bằng số").
+ * Không sửa hộ, không đoán: sai là trả lý do để BỎ.
+ */
+export function kiemKhuon(dauRa: unknown, the: TheDeKiem): KetQuaKiem {
+  const loi: string[] = []
+  if (!dauRa || typeof dauRa !== 'object' || Array.isArray(dauRa)) return { hopLe: false, lyDo: ['không phải một đối tượng'] }
+  const d = dauRa as Record<string, unknown>
+  const tapSo = tapSoCuaThe(the)
+  const H = HAN_MUC_BO_NAO
+
+  if (!laChuoi(d.biDanh) || d.biDanh.length === 0 || d.biDanh.length > H.BI_DANH_TOI_DA) loi.push('biDanh thiếu hoặc quá dài')
+  else if (d.biDanh !== the.biDanh) loi.push('biDanh không khớp thẻ của em')
+
+  if (typeof d.doTinCay !== 'number' || !Number.isFinite(d.doTinCay) || d.doTinCay < 0 || d.doTinCay > 1) loi.push('doTinCay ngoài [0, 1]')
+
+  const nhip = d.nhip as Record<string, unknown> | undefined
+  if (!nhip || typeof nhip !== 'object') loi.push('thiếu nhip')
+  else {
+    if (!laSoNguyenTrong(nhip.lech, -H.NHIP_LECH_TOI_DA, H.NHIP_LECH_TOI_DA)) loi.push('nhip.lech phải là số nguyên trong [−3, +3]')
+    if (!laSoNguyenTrong(nhip.khoiDong, H.KHOI_DONG_TOI_THIEU, H.KHOI_DONG_TOI_DA)) loi.push('nhip.khoiDong phải là số nguyên trong [1, 3]')
+  }
+
+  if (!Array.isArray(d.dang)) loi.push('dang phải là mảng')
+  else {
+    if (d.dang.length > H.SO_DANG_TOI_DA) loi.push(`dang quá ${H.SO_DANG_TOI_DA} phần tử`)
+    const daThay = new Set<string>()
+    d.dang.forEach((x, i) => {
+      const o = x as Record<string, unknown> | null
+      if (!o || typeof o !== 'object') return void loi.push(`dang[${i}] không phải đối tượng`)
+      if (!laChuoi(o.ma) || o.ma.length === 0 || o.ma.length > H.MA_DANG_TOI_DA || KY_TU_LA.test(o.ma)) loi.push(`dang[${i}].ma không hợp lệ`)
+      else {
+        if (daThay.has(o.ma)) loi.push(`dang[${i}].ma lặp`)
+        daThay.add(o.ma)
+        if (the.maDang && !the.maDang.includes(o.ma)) loi.push(`dang[${i}].ma không có trong thẻ của em`)
+      }
+      if (!HANH_DONG_DANG.includes(o.hanhDong as HanhDongDang)) loi.push(`dang[${i}].hanhDong không thuộc bốn núm`)
+      if (!laChuoi(o.lyDo)) loi.push(`dang[${i}].lyDo thiếu`)
+      else {
+        if (doDai(o.lyDo) > H.LY_DO_TOI_DA) loi.push(`dang[${i}].lyDo quá ${H.LY_DO_TOI_DA} ký tự`)
+        if (KY_TU_LA.test(o.lyDo)) loi.push(`dang[${i}].lyDo có ký tự lạ`)
+        if (timSoTrongChu(o.lyDo).length === 0) loi.push(`dang[${i}].lyDo phải có số (lý do bằng số)`)
+        const la = soLa(o.lyDo, tapSo)
+        if (la.length) loi.push(`dang[${i}].lyDo có số không có trong thẻ: ${la.join(', ')}`)
+        const cam = timTuCam(o.lyDo, TU_CAM_CHO_THAY)
+        if (cam.length) loi.push(`dang[${i}].lyDo có từ cấm: ${cam.join(', ')}`)
+      }
+    })
+  }
+
+  if (!CO_BO_NAO.includes(d.co as CoBoNao)) loi.push('co không thuộc năm giá trị')
+
+  if (!laChuoi(d.loiNhanChoEm)) loi.push('loiNhanChoEm phải là chuỗi (có thể rỗng)')
+  else if (d.loiNhanChoEm.length > 0) {
+    const t = d.loiNhanChoEm
+    if (doDai(t) > H.LOI_NHAN_TOI_DA) loi.push(`loiNhanChoEm quá ${H.LOI_NHAN_TOI_DA} ký tự`)
+    if (KY_TU_LA.test(t)) loi.push('loiNhanChoEm có ký tự lạ')
+    const cam = timTuCam(t, TU_CAM_CHO_EM)
+    if (cam.length) loi.push(`loiNhanChoEm có từ cấm: ${cam.join(', ')}`)
+    const la = soLa(t, tapSo)
+    if (la.length) loi.push(`loiNhanChoEm có số không có trong thẻ: ${la.join(', ')}`)
+  }
+
+  const g = d.goiYChoThay as Record<string, unknown> | undefined
+  if (!g || typeof g !== 'object') loi.push('thiếu goiYChoThay')
+  else {
+    if (!laChuoi(g.chu)) loi.push('goiYChoThay.chu phải là chuỗi')
+    else if (g.chu.length > 0) {
+      if (doDai(g.chu) > H.GOI_Y_TOI_DA) loi.push(`goiYChoThay.chu quá ${H.GOI_Y_TOI_DA} ký tự`)
+      if (KY_TU_LA.test(g.chu)) loi.push('goiYChoThay.chu có ký tự lạ')
+      const cam = timTuCam(g.chu, TU_CAM_CHO_THAY)
+      if (cam.length) loi.push(`goiYChoThay.chu có từ cấm: ${cam.join(', ')}`)
+      const la = soLa(g.chu, tapSo)
+      if (la.length) loi.push(`goiYChoThay.chu có số không có trong thẻ: ${la.join(', ')}`)
+    }
+    if (!HANH_DONG_CHO_THAY.includes(g.hanhDong as HanhDongChoThay)) loi.push('goiYChoThay.hanhDong không thuộc bốn giá trị')
+    if (!laChuoi(g.dang)) loi.push('goiYChoThay.dang phải là chuỗi (có thể rỗng)')
+    else if (g.dang.length > 0 && (g.dang.length > H.MA_DANG_TOI_DA || KY_TU_LA.test(g.dang) || (the.maDang && !the.maDang.includes(g.dang)))) loi.push('goiYChoThay.dang không hợp lệ hoặc không có trong thẻ')
+    if (g.hanhDong === 'goi_len_bang' && laChuoi(g.dang) && g.dang.length === 0) loi.push('goiYChoThay gọi lên bảng phải nêu dạng')
+  }
+
+  if (!laChuoi(d.ghiChuHlv)) loi.push('ghiChuHlv phải là chuỗi (có thể rỗng)')
+  else {
+    if (doDai(d.ghiChuHlv) > H.GHI_CHU_HLV_TOI_DA) loi.push(`ghiChuHlv quá ${H.GHI_CHU_HLV_TOI_DA} ký tự`)
+    if (KY_TU_LA.test(d.ghiChuHlv)) loi.push('ghiChuHlv có ký tự lạ')
+    const cam = timTuCam(d.ghiChuHlv, ['nam chac'])
+    if (cam.length) loi.push('ghiChuHlv có từ cấm: nắm chắc')
+  }
+
+  if (typeof d.canSau !== 'boolean') loi.push('canSau phải là true/false')
+
+  return { hopLe: loi.length === 0, lyDo: loi }
+}
+
+/** Kiểm BẢN TIN SÁNG (`ra/lop.json`): ≤ 6 dòng, đúng khuôn từng dòng, số trong chữ phải có trong số liệu lớp (`soLieuLop`), từ cấm của lời cho thầy. */
+export function kiemBanTin(banTin: unknown, soLieuLop: unknown, biDanhHopLe?: ReadonlySet<string>): KetQuaKiem {
+  const loi: string[] = []
+  const b = banTin as Record<string, unknown> | null
+  if (!b || typeof b !== 'object' || !Array.isArray(b.cacDong)) return { hopLe: false, lyDo: ['bản tin phải có mảng cacDong'] }
+  if (b.cacDong.length > HAN_MUC_BO_NAO.BAN_TIN_SO_DONG_TOI_DA) loi.push(`bản tin quá ${HAN_MUC_BO_NAO.BAN_TIN_SO_DONG_TOI_DA} dòng`)
+  const tapSo = tapSoCuaThe(soLieuLop)
+  b.cacDong.forEach((x, i) => {
+    const o = x as Record<string, unknown> | null
+    if (!o || typeof o !== 'object') return void loi.push(`dòng ${i + 1}: không phải đối tượng`)
+    if (!LOAI_DONG_BAN_TIN.includes(o.loai as (typeof LOAI_DONG_BAN_TIN)[number])) loi.push(`dòng ${i + 1}: loai lạ`)
+    if (!HANH_DONG_BAN_TIN.includes(o.hanhDong as (typeof HANH_DONG_BAN_TIN)[number])) loi.push(`dòng ${i + 1}: hanhDong lạ`)
+    if (!laChuoi(o.biDanh) || o.biDanh.length > HAN_MUC_BO_NAO.BI_DANH_TOI_DA) loi.push(`dòng ${i + 1}: biDanh phải là chuỗi (có thể rỗng)`)
+    else if (o.biDanh.length > 0 && biDanhHopLe && !biDanhHopLe.has(o.biDanh)) loi.push(`dòng ${i + 1}: biDanh không có trong dữ liệu đêm`)
+    if (!laChuoi(o.dang) || o.dang.length > HAN_MUC_BO_NAO.MA_DANG_TOI_DA || KY_TU_LA.test(o.dang)) loi.push(`dòng ${i + 1}: dang phải là chuỗi ngắn (có thể rỗng)`)
+    if (!laChuoi(o.chu) || o.chu.length === 0) loi.push(`dòng ${i + 1}: chu thiếu`)
+    else {
+      if (doDai(o.chu) > HAN_MUC_BO_NAO.DONG_BAN_TIN_TOI_DA) loi.push(`dòng ${i + 1}: chu quá ${HAN_MUC_BO_NAO.DONG_BAN_TIN_TOI_DA} ký tự`)
+      if (KY_TU_LA.test(o.chu)) loi.push(`dòng ${i + 1}: chu có ký tự lạ`)
+      const cam = timTuCam(o.chu, TU_CAM_CHO_THAY)
+      if (cam.length) loi.push(`dòng ${i + 1}: từ cấm ${cam.join(', ')}`)
+      const la = soLa(o.chu, tapSo)
+      if (la.length) loi.push(`dòng ${i + 1}: số không có trong số liệu lớp: ${la.join(', ')}`)
+    }
+  })
+  return { hopLe: loi.length === 0, lyDo: loi }
+}
+
+// ══════════════════════════════ ĐỔI SANG NÚM CỦA LÕI BTVN ══════════════════════════════
+
+/** Điều chỉnh của một em dưới dạng cổng `dieuChinh` của `chonBoCuaEm` / `thichNghiChangSau` (`btvn-nang-do.ts`). Chỉ gọi sau khi `kiemKhuon` hợp lệ VÀ `doTinCay ≥ NGUONG_TIN_CAY`. */
+export function dieuChinhTuDauRa(d: Pick<DauRaEm, 'nhip' | 'dang'>): DieuChinhEm {
+  return { nhip: d.nhip.lech, khoiDong: d.nhip.khoiDong, dang: d.dang.map((x) => ({ ma: x.ma, nut: x.hanhDong })) }
+}
+
+/** Số THAY ĐỔI của một phần tử (nguyên tắc 10 "không rung lắc": ≤ 2 mỗi em mỗi đêm): nhịp lệch ≠ 0, khởi động ≠ 2, mỗi dạng bị vặn. Cờ không tính (chỉ là nhãn). */
+export function demThayDoi(d: Pick<DauRaEm, 'nhip' | 'dang'>): number {
+  return (d.nhip.lech !== 0 ? 1 : 0) + (d.nhip.khoiDong !== 2 ? 1 : 0) + d.dang.length
+}
