@@ -15,6 +15,7 @@ import {teacherNews,recordPresence} from './teacher-news'
 import {parentNews,refreshDailyNews} from './parent-news'
 import {phCapMa,phDemTruyCap,phKeHoach,phThoiGianHoc,phXacDinh} from './ph-truy-cap'
 import {homNayThay} from './hom-nay-thay'
+import {gvKeHoachEm} from './gv-ke-hoach-em'
 import { mom } from './mom'
 import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
@@ -1086,6 +1087,8 @@ async function chiTietCaMoi(env: Env, maCa: string): Promise<Response> {
     duyetBoi: String(l.duyet_boi ?? ''),
     duyetLuc: String(l.duyet_luc ?? ''),
     ghiChu: String(l.ghi_chu ?? ''),
+    // Lượt này đang KHOÁ MÁY (đã ghi id thiết bị)? CHỈ có/không, KHÔNG BAO GIỜ trả mã máy: nút "Cho vào bằng máy khác" của màn Theo dõi ca chỉ hiện ở lượt đang khoá.
+    khoaMay: String(l.id_thiet_bi ?? '').trim() !== '',
     dapAn: doJson(l.dap_an_json),
     integrity: doJson(l.integrity_json),
     giayCau: doJson(l.giay_cau_json),
@@ -2536,6 +2539,7 @@ async function luotCuaCa(env: Env, maCa: string): Promise<Response> {
     duyetBoi: '',
     duyetLuc: '',
     ghiChu: '',
+    khoaMay: String(l.id_thiet_bi ?? '').trim() !== '', // chỉ có/không, không trả mã máy (như chiTietCaMoi)
     // KHÔNG trả ba gói JSON nặng: màn Chi tiết ca chỉ cần biết AI ĐANG Ở ĐÂU.
     // Bài làm lấy bằng đường khác, và kéo cả bài của 50 em về mỗi nhịp làm mới
     // là dựng lại đúng cái chậm vừa bỏ.
@@ -2977,6 +2981,8 @@ export default {
       if (p === '/ke-hoach/do-phu-phuc-vu') return ra(await docDoPhuPhucVu(env, ngayVn(Date.now())))
       // Màn HÔM NAY của app giáo viên (docs/hop-dong-gv-hom-nay-2109.md): chỉ đọc, ≤ 8 truy vấn, khối nào không tính được thì null + lyDoThieu.
       if (p === '/ke-hoach/hom-nay-thay') return ra(await homNayThay(env, b))
+      // Kế hoạch hôm nay của MỘT em cho màn Học sinh của thầy: CHỈ ĐỌC (không lập kế hoạch, không capNhatExp) để không nuốt `expNhan` của em.
+      if (p === '/gv/ke-hoach-em') return ra(await gvKeHoachEm(env, b))
       if (p === '/ke-hoach/chay-ca-lop') return ra({ ok: true, ...(await chayCaLop(env, Date.now())) })
       if (p === '/game-v2-admin') return ra(await adminGame(env,b))
       if (p === '/ca/day') return dayCa(env, b)
