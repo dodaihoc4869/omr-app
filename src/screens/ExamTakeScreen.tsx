@@ -66,6 +66,7 @@ import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
 import { docDuongVao } from '../lib/vai-tro'
 import { dungM3 } from '../components/m3'
 import ThanhTrenThiM3 from './ThanhTrenThiM3'
+import DaiCauChuaLamM3, { KhungCauLamDoM3 } from './DaiCauChuaLamM3'
 import { gradeFromKeyBank, type GradedSubmission } from '../lib/exam-grade'
 import {
   cacheSession,
@@ -193,6 +194,20 @@ function cuonToiCau(stt: number) {
 /** Đầu phần dính — cuộn qua phần nào thì đầu phần đó dính lên dưới thanh trên. */
 function DauPhan({ phan, soCauBaPhan }: { phan: PhanKey; soCauBaPhan: SoCauBaPhan }) {
   const soCau = soCauBaPhan[phan]
+  // Đường học sinh/phụ huynh (dungM3): đầu phần theo bản vẽ ThiDangLam (cùng chữ, cùng số liệu; chỉ đổi dáng). Đường khác: bản cũ bên dưới.
+  if (dungM3()) {
+    return (
+      <div className="thi-dau-phan sticky z-20" style={{ top: 56 }}>
+        <div className="thi-dau-phan-hang">
+          <div className="thi-dau-phan-ten">
+            PHẦN {phan} — {TEN_PHAN[phan]} ({soCau} câu)
+          </div>
+          <div className="thi-dau-phan-duong" aria-hidden="true" />
+        </div>
+        <div className="thi-dau-phan-mo-ta">{moTaBieuDiem(soCauBaPhan, phan)}</div>
+      </div>
+    )
+  }
   return (
     <div className="sticky z-20 flex items-center" style={{ top: 56, background: 'var(--nen)', padding: 'var(--k3) 0', gap: 'var(--k3)' }}>
       <div
@@ -3120,7 +3135,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         {phan === 'II' &&
           assignment.phanII.map((item) => {
             stt += 1
-            return (
+            // Nhãn "Mới x/4 ý" (bản vẽ ThiDangLam) khi câu làm dở: chỉ đọc đáp án ĐÃ CÓ. Khung bọc có mặt SUỐT (không mọc/biến theo đáp án) để React không dựng lại thẻ giữa lúc em bấm.
+            const soYDaChon = (attempt.answers.phanII[item.qid] ?? []).filter((x) => x !== null && x !== undefined).length
+            const theCau = (
               <TheCau
                 key={item.qid}
                 cheDo="thi"
@@ -3142,6 +3159,13 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 onSelect={(idx, v) => setPhanII(item.qid, idx, v)}
                 onZoom={setZoomSrc}
               />
+            )
+            return dungM3() ? (
+              <KhungCauLamDoM3 key={item.qid} soY={soYDaChon}>
+                {theCau}
+              </KhungCauLamDoM3>
+            ) : (
+              theCau
             )
           })}
         {phan === 'III' &&
@@ -3283,6 +3307,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 
         {/* DANH SÁCH CÂU — cuộn dọc liên tục, đầu phần dính */}
         <div className="px-3 sm:px-4 flex flex-col" style={{ gap: 'var(--k5)', paddingTop: 'var(--k2)', paddingBottom: 'calc(var(--k8) + env(safe-area-inset-bottom))' }}>
+          {dungM3() && <DaiCauChuaLamM3 chuaLam={chuaLam} onToiCau={cuonToiCau} onMoLuoi={() => setShowGrid(true)} />}
           {renderPhan('I')}
           {renderPhan('II')}
           {renderPhan('III')}
