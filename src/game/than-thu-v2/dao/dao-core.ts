@@ -67,3 +67,25 @@ export function lyDoThuongTuKetQua(d:{correct:boolean;assisted:boolean;reward:nu
  if(!d.correct)return {moc:0,exp:0,chu:'Chưa đúng — dạng này hẹn em ôn lại vào ngày mai'}
  return {moc:0,exp:0,chu:d.stage>=3?'Đúng rồi · dạng này em đã đủ 3 sao, giữ phong độ nhé':`Đúng rồi · sao thứ ${Math.min(3,d.stage+1)} mở khi em làm đúng một câu KHÁC của dạng này vào ngày khác`}
 }
+
+/** SỔ TAY: 3 sao/dạng = `mastery[].stage` (mốc thưởng 20/40/40 = sao 1/2/3). */
+export interface ODang{key:string;ten:string;sao:0|1|2|3;daGap:boolean;yeu:boolean;toiHan:boolean}
+export interface ChuongSoTay{ma:string;ten:string;dang:ODang[];thanhThao:number}
+export interface DuLieuSoTay{chuong:ChuongSoTay[];thanhThao:number;tong:number;yeu:ODang[]}
+/**
+ * `danhMuc` = lệnh `so-tay` của máy chủ (mọi dạng em ĐƯỢC PHÉP làm, gom theo mã chương); dạng có trong danh mục mà chưa có trong
+ * `mastery[]` ⇒ ô "???" (KHÔNG lộ tên). Worker cũ chưa có lệnh ⇒ chỉ liệt kê các dạng em đã gặp, tên lấy từ những câu em từng làm.
+ */
+export function soTay(mastery:readonly Mastery[],now:number,danhMuc?:readonly {key:string;ten:string;chuong:string}[]|null,tenDang:Readonly<Record<string,string>>={},tenChuong:Readonly<Record<string,string>>={}):DuLieuSoTay{
+ const theoKey=new Map(mastery.map(m=>[m.key,m])),nhom=new Map<string,ODang[]>(),daCo=new Set<string>()
+ const o=(key:string,ten:string):ODang=>{const m=theoKey.get(key),sao=Math.max(0,Math.min(3,m?.stage??0)) as ODang['sao'];return {key,ten,sao,daGap:!!m,yeu:!!m&&sao===0,toiHan:!!m&&sao>0&&sao<3&&m.due<=now}}
+ const them=(ma:string,d:ODang)=>{if(daCo.has(d.key))return;daCo.add(d.key);nhom.set(ma,[...(nhom.get(ma)??[]),d])}
+ for(const d of danhMuc??[])them(d.chuong||'',o(d.key,d.ten||tenDang[d.key]||''))
+ for(const m of mastery)them(danhMuc?.length?'':'da-gap',o(m.key,tenDang[m.key]||''))
+ const chuong=[...nhom.entries()].map(([ma,dang])=>({ma,ten:ma==='da-gap'?'Dạng em đã gặp':ma===''?(danhMuc?.length?'Dạng khác em đã gặp':'Dạng em đã gặp'):tenChuong[ma]||`Nhóm ${ma}`,
+  // trong một chương: dạng đã gặp trước (nhiều sao trước), ô "???" dồn cuối
+  dang:[...dang].sort((a,b)=>Number(b.daGap)-Number(a.daGap)||b.sao-a.sao||a.ten.localeCompare(b.ten,'vi')||a.key.localeCompare(b.key)),thanhThao:dang.filter(d=>d.sao===3).length}))
+  .sort((a,b)=>Number(a.ma==='')-Number(b.ma==='')||a.ma.localeCompare(b.ma))
+ const tatCa=chuong.flatMap(c=>c.dang)
+ return {chuong,thanhThao:tatCa.filter(d=>d.sao===3).length,tong:tatCa.length,yeu:tatCa.filter(d=>d.yeu)}
+}

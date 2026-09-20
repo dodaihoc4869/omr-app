@@ -1,12 +1,12 @@
 // ĐẢO THẦN THÚ bản mới · màn 1 "Chọn bạn đồng hành": một chạm là chọn, tên được chuẩn hoá TRƯỚC khi gọi máy chủ,
 // tranh Cuồng nộ chỉ nạp khi em lật thẻ, chỉ nạp tranh thẻ giữa + hai thẻ kề.
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, cleanup } from '@testing-library/react'
 import ChonBanDongHanh, { TEN_GOI_Y, theMoDau } from '../src/game/than-thu-v2/dao/ChonBanDongHanh'
 import { PETS } from '../src/game/than-thu-v2/core'
 import { normalizePetName } from '../src/game/than-thu-v2/pet-name'
 
-afterEach(cleanup)
+afterEach(() => { cleanup(); vi.unstubAllGlobals() })
 const tranh = (c: HTMLElement) => [...c.querySelectorAll('img')].map(i => i.getAttribute('src'))
 
 describe('Chọn bạn đồng hành', () => {
@@ -51,14 +51,17 @@ describe('Chọn bạn đồng hành', () => {
     expect(giua.hasAttribute('data-lat')).toBe(false)
     expect(tranh(container).every(s => s!.startsWith('/than-thu-v2/nho/'))).toBe(true)
   })
-  it('vuốt sang thẻ khác ⇒ nút vàng đổi tên thú, thẻ lật trở về mặt thường, tranh thẻ mới được nạp', async () => {
+  it('vuốt sang thẻ khác ⇒ nút vàng đổi tên thú, thẻ lật trở về mặt thường, tranh thẻ mới được nạp', () => {
+    // KHÔNG đợi giờ thật: khung hình chạy ngay trong lúc bắn sự kiện cuộn (máy tải nặng thì rAF + waitFor 1 giây từng đỏ oan)
+    vi.stubGlobal('requestAnimationFrame', (f: FrameRequestCallback) => { f(0); return 0 })
+    vi.stubGlobal('cancelAnimationFrame', () => {})
     const { container } = render(<ChonBanDongHanh batDau={2} onChon={() => {}} />)
     const bang = container.querySelector<HTMLElement>('.dao-chon-bang')!
     fireEvent.click(container.querySelector<HTMLElement>('.dao-chon-the[aria-current]')!)
     // jsdom không có bố cục: bước = 1 px ⇒ scrollLeft = số thứ tự thẻ
     bang.scrollLeft = 5
     fireEvent.scroll(bang)
-    await waitFor(() => expect(screen.getByRole('button', { name: 'CHỌN ÁI HỒ' })).toBeTruthy())
+    expect(screen.getByRole('button', { name: 'CHỌN ÁI HỒ' })).toBeTruthy()
     expect(container.querySelector('[data-lat]')).toBeNull()
     expect(tranh(container)).toContain('/than-thu-v2/nho/the-6-binh-thuong.webp')
   })
