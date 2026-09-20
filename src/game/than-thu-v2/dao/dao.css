@@ -1,0 +1,77 @@
+/* ĐẢO THẦN THÚ bản mới (thầy chốt 21/09) — mẫu màu/bóng/keyframes theo docs/ban-ve-dao-than-thu-2109/sinh-ban-ve.py.
+   Mọi bộ chọn đều đứng sau `.dao` để thắng `.spirit-game button{…}` của game.css. Màu chỉ khai ở đây (TSX không có hex). */
+.dao{--dao-nen:rgb(9,13,40);--dao-nen-2:rgb(24,34,92);--dao-chu:rgb(242,245,255);--dao-chu-mo:rgb(201,214,242);--dao-chu-nhat:rgb(159,178,217);--dao-nhan:rgb(168,199,250);
+ --dao-vang:rgb(255,209,102);--dao-vang-dam:rgb(242,160,32);--dao-vang-chu:rgb(58,32,0);--dao-the:rgb(246,239,224);--dao-the-chu:rgb(42,33,22);--dao-the-chu-mo:rgb(90,74,54);--dao-cuong-no:rgb(194,65,12);
+ --dao-kinh:rgba(255,255,255,.1);--dao-kinh-vien:rgba(255,255,255,.2);--dao-do:rgb(255,180,171);--dao-he:rgb(65,101,183);
+ position:relative;isolation:isolate;overflow:hidden;box-sizing:border-box;color:var(--dao-chu);font-family:var(--sans),'Be Vietnam Pro',sans-serif;border-radius:24px;
+ background:radial-gradient(120% 60% at 50% 0%,var(--dao-nen-2) 0%,var(--dao-nen) 62%);-webkit-tap-highlight-color:transparent}
+.dao *,.dao *::before,.dao *::after{box-sizing:border-box}
+/* sao nền: vài chấm sáng tĩnh, không tốn khung hình */
+.dao::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.8;background-image:radial-gradient(1.2px 1.2px at 12% 9%,rgba(255,255,255,.9) 50%,transparent 51%),radial-gradient(1px 1px at 78% 6%,rgba(255,255,255,.8) 50%,transparent 51%),radial-gradient(1.4px 1.4px at 91% 22%,rgba(255,255,255,.7) 50%,transparent 51%),radial-gradient(1px 1px at 6% 31%,rgba(255,255,255,.7) 50%,transparent 51%),radial-gradient(1.2px 1.2px at 64% 15%,rgba(255,255,255,.6) 50%,transparent 51%),radial-gradient(1px 1px at 33% 4%,rgba(255,255,255,.8) 50%,transparent 51%),radial-gradient(1.3px 1.3px at 86% 58%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1px 1px at 9% 72%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1.1px 1.1px at 48% 88%,rgba(255,255,255,.45) 50%,transparent 51%)}
+.dao[data-thu="0"],.dao [data-thu="0"]{--dao-he:rgb(150,104,40)}.dao[data-thu="1"],.dao [data-thu="1"]{--dao-he:rgb(29,125,170)}.dao[data-thu="2"],.dao [data-thu="2"]{--dao-he:rgb(194,65,12)}.dao[data-thu="3"],.dao [data-thu="3"]{--dao-he:rgb(24,120,90)}
+.dao[data-thu="4"],.dao [data-thu="4"]{--dao-he:rgb(65,101,183)}.dao[data-thu="5"],.dao [data-thu="5"]{--dao-he:rgb(190,60,118)}.dao[data-thu="6"],.dao [data-thu="6"]{--dao-he:rgb(128,112,40)}.dao[data-thu="7"],.dao [data-thu="7"]{--dao-he:rgb(120,100,200)}
+.dao h2,.dao h3,.dao p{margin:0}
+.dao .dao-nhan{display:block;font-size:12px;font-weight:800;letter-spacing:.3em;color:var(--dao-nhan)}
+.dao .dao-loi{margin:0 16px;padding:8px 12px;border-radius:12px;background:rgba(255,180,171,.14);box-shadow:inset 0 0 0 1px rgba(255,180,171,.5);color:var(--dao-do);font-size:13px;line-height:1.4;text-align:center}
+/* NÚT: game.css có `.spirit-game button{…}` và `button:hover:not(:disabled){background;transform;box-shadow}` (0,3,1) — trên máy cảm ứng
+   hover DÍNH lại sau khi chạm. Vì vậy nền/chữ/bóng/dịch chuyển của MỌI nút trong đảo đi qua 4 biến --nut-*, và mọi luật nút viết dạng
+   `.dao button.<lớp>` (đứng sau luật đặt lại này, cùng độ ưu tiên ⇒ thắng theo thứ tự). */
+.dao.dao button,.dao.dao button:hover:not(:disabled){background:var(--nut-nen,transparent);color:var(--nut-chu,inherit);box-shadow:var(--nut-bong,none);transform:var(--nut-dich,none)}
+.dao.dao button{min-height:0;min-width:0;margin:0;padding:0;border:0;border-radius:0;font:inherit;line-height:inherit;letter-spacing:inherit;cursor:pointer}
+/* nút vàng dùng chung (CHỌN…, LÊN ĐƯỜNG) */
+.dao button.dao-nut-vang{--nut-nen:linear-gradient(180deg,rgb(255,224,138) 0%,var(--dao-vang) 42%,var(--dao-vang-dam) 100%);--nut-chu:var(--dao-vang-chu);--nut-bong:0 10px 26px rgba(255,170,40,.42),inset 0 2px 0 rgba(255,255,255,.6),inset 0 -3px 0 rgba(160,90,0,.35);
+ position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:60px;padding:0 20px;border-radius:30px;font-size:19px;font-weight:800;letter-spacing:.04em;transition:transform .12s}
+.dao .dao-nut-vang>span{position:relative}
+.dao .dao-nut-vang::before{content:"";position:absolute;top:0;bottom:0;left:-40%;width:34%;transform:skewX(-20deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:dao-loe 3.2s ease-in-out infinite}
+.dao button.dao-nut-vang:active{--nut-dich:translateY(2px) scale(.985)}
+.dao button.dao-nut-vang:disabled{opacity:.6;cursor:default}
+.dao .dao-nut-vang:focus-visible,.dao button:focus-visible,.dao input:focus-visible{outline:3px solid var(--dao-nhan);outline-offset:2px}
+@keyframes dao-loe{0%,55%{left:-40%}85%,100%{left:120%}}
+
+/* ───── 1. CHỌN BẠN ĐỒNG HÀNH ───── */
+.dao-chon{--the-rong:min(64vw,250px,30vh);display:flex;flex-direction:column;gap:12px;min-height:min(100dvh,844px);padding:max(14px,4.4vh) 0 16px}
+.dao .dao-chon-dau{text-align:center;padding:0 16px}
+.dao .dao-chon-dau h2{font-size:clamp(24px,7.6vw,30px);font-weight:800;line-height:1.2;margin-top:4px;color:var(--dao-chu)}
+.dao .dao-chon-dau p{font-size:clamp(12px,3.45vw,14px);color:var(--dao-chu-mo);margin-top:4px;text-wrap:balance}
+.dao .dao-chon-dau .dao-chon-moi{color:var(--dao-vang);font-weight:700}
+.dao .dao-chon-bang{display:flex;align-items:center;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+ padding:14px calc(50% - var(--the-rong)*.35) 24px;flex:1 0 auto}
+.dao .dao-chon-bang::-webkit-scrollbar{display:none}
+.dao .dao-chon-o{flex:0 0 calc(var(--the-rong)*.7);display:flex;justify-content:center;scroll-snap-align:center;scroll-snap-stop:always;perspective:900px}
+.dao button.dao-chon-the{--nut-nen:var(--dao-the);--nut-chu:var(--dao-the-chu);--nut-bong:0 10px 26px rgba(0,0,0,.5);--nut-dich:scale(.8);flex:0 0 var(--the-rong);width:var(--the-rong);border-radius:26px;overflow:hidden;text-align:left;
+ display:flex;flex-direction:column;opacity:.78;transition:transform .28s ease,opacity .28s ease,box-shadow .28s ease}
+.dao .dao-chon-o[data-lech="truoc"] button.dao-chon-the{--nut-dich:translateY(34px) rotate(-9deg) scale(.8)}
+.dao .dao-chon-o[data-lech="sau"] button.dao-chon-the{--nut-dich:translateY(34px) rotate(9deg) scale(.8)}
+.dao .dao-chon-o[data-xa] button.dao-chon-the{opacity:.4}
+.dao .dao-chon-o[data-lech="0"]{z-index:3}
+.dao .dao-chon-o[data-lech="0"] button.dao-chon-the{--nut-dich:none;--nut-bong:0 0 0 3px var(--dao-he),0 18px 40px rgba(0,0,0,.55),0 0 46px var(--dao-he);opacity:1}
+.dao .dao-chon-tranh{position:relative;display:block;width:100%;aspect-ratio:1;background:var(--dao-the);transform-style:preserve-3d;transition:transform .5s cubic-bezier(.3,.7,.2,1)}
+.dao .dao-chon-mat{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;backface-visibility:hidden;-webkit-backface-visibility:hidden;-webkit-user-drag:none;user-select:none}
+.dao .dao-chon-mat-no{transform:rotateY(180deg)}
+.dao .dao-chon-the[data-lat] .dao-chon-tranh{transform:rotateY(180deg)}
+.dao .dao-chon-no-nhan{position:absolute;left:10px;top:10px;transform:rotateY(180deg);backface-visibility:hidden;-webkit-backface-visibility:hidden;padding:4px 10px;border-radius:999px;background:linear-gradient(90deg,rgb(255,90,42),rgb(255,197,61));color:rgb(42,18,0);font-size:11px;font-weight:800;letter-spacing:.08em;box-shadow:0 0 14px rgba(255,140,40,.8)}
+.dao .dao-chon-chu{display:flex;flex-direction:column;gap:4px;padding:10px 14px 14px}
+.dao .dao-chon-ten{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.dao .dao-chon-ten strong{font-size:16px;font-weight:800}
+.dao .dao-chon-o[data-lech="0"] .dao-chon-ten strong{font-size:22px}
+.dao .dao-chon-ten em{flex-shrink:0;font-style:normal;padding:2px 9px;border-radius:999px;background:var(--dao-he);color:rgb(255,255,255);font-size:11px;font-weight:800}
+.dao .dao-chon-ta{font-size:13px;line-height:1.4;color:var(--dao-the-chu-mo)}
+.dao .dao-chon-ta b{color:var(--dao-the-chu)}.dao .dao-chon-ta .dao-chon-no-chu{color:var(--dao-cuong-no)}
+.dao .dao-chon-cham{display:flex;justify-content:center;margin-top:-6px}
+.dao .dao-chon-cham button{display:flex;align-items:center;justify-content:center;height:28px;padding:0 4px}
+.dao .dao-chon-cham i{display:block;width:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.3);transition:width .2s,background .2s}
+.dao .dao-chon-cham [aria-current] i{width:22px;background:var(--dao-vang)}
+.dao .dao-chon-ten-o{display:flex;gap:10px;padding:0 16px}
+.dao .dao-chon-ten-o input{flex:1;min-width:0;height:56px;padding:0 16px;border:0;border-radius:18px;background:var(--dao-kinh);box-shadow:inset 0 0 0 1px var(--dao-kinh-vien);color:var(--dao-chu);font:inherit;font-size:16px}
+.dao .dao-chon-ten-o input::placeholder{color:var(--dao-chu-mo);opacity:1}
+.dao button.dao-chon-goi-y{--nut-nen:var(--dao-kinh);--nut-chu:var(--dao-vang);--nut-bong:inset 0 0 0 1px var(--dao-kinh-vien);flex:0 0 56px;display:flex;align-items:center;justify-content:center;height:56px;border-radius:18px}
+.dao-chon>button.dao-nut-vang{width:auto;margin:4px 16px 0}
+.dao .dao-chon-meo{padding:0 20px;font-size:12px;line-height:1.45;color:var(--dao-chu-nhat);text-align:center}
+
+@media(prefers-reduced-motion:reduce){
+ .dao *,.dao *::before,.dao *::after{animation:none!important;transition:none!important}
+ /* không xoay 3D: đổi tranh tức thì */
+ .dao .dao-chon-tranh,.dao .dao-chon-the[data-lat] .dao-chon-tranh{transform:none}
+ .dao .dao-chon-mat-no,.dao .dao-chon-no-nhan{transform:none;backface-visibility:visible;-webkit-backface-visibility:visible}
+ .dao .dao-chon-mat-no{display:none}.dao .dao-chon-the[data-lat] .dao-chon-mat-no{display:block}
+}
