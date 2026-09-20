@@ -216,9 +216,9 @@ describe('KÝ TỰ LẠ / tiêm lệnh', () => {
 
 describe('BẢN TIN SÁNG (`ra/lop.json`)', () => {
   const SO_LIEU = { lop: { soEm: 30, xongChang: 22 }, dang: [{ ma: 'ESTE.THUY_PHAN', soEmKet: 9 }] }
-  const dong = (o: Record<string, unknown> = {}) => ({ loai: 'dang_ca_lop', chu: '9 em kẹt dạng thuỷ phân ester', biDanh: '', dang: 'ESTE.THUY_PHAN', hanhDong: 'goi_len_bang', ...o })
+  const dong = (o: Record<string, unknown> = {}) => ({ loai: 'ca_lop', chu: '9 em kẹt dạng thuỷ phân ester', biDanh: '', dang: 'ESTE.THUY_PHAN', hanhDong: 'goi_len_bang', ...o })
   it('hợp lệ: ≤ 6 dòng, số có trong số liệu lớp', () => {
-    expect(kiemBanTin({ cacDong: [dong(), dong({ chu: '22 em xong chặng hôm qua', loai: 'ket_qua_hom_qua', hanhDong: 'khong' })] }, SO_LIEU).hopLe).toBe(true)
+    expect(kiemBanTin({ cacDong: [dong(), dong({ chu: '22 em xong chặng hôm qua', loai: 'dieu_chinh', hanhDong: 'khong' })] }, SO_LIEU).hopLe).toBe(true)
     expect(kiemBanTin({ cacDong: [] }, SO_LIEU).hopLe).toBe(true)
   })
   it('quá 6 dòng, số bịa, từ cấm, loại lạ, thiếu chữ, bí danh không có trong đêm', () => {

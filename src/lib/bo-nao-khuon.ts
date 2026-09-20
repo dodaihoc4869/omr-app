@@ -28,13 +28,17 @@ export interface DauRaEm {
   canSau: boolean
 }
 
-/** Một dòng bản tin sáng cho thầy (khối "Bộ não đêm qua"). Mỗi dòng một nút hành động. `biDanh` (nếu có) được nop.mjs đổi về SBD. */
+/** Loại dòng bản tin (Boss chốt tên 21/09): em cần thầy để ý · dạng cả lớp · gợi ý gọi lên bảng · điều chỉnh hôm qua có ăn thua không · thầy xem lại một điều chỉnh. */
+export type LoaiDongBanTin = 'can_thay_y' | 'ca_lop' | 'goi_len_bang' | 'dieu_chinh' | 'thay_xem_lai'
+export type HanhDongBanTin = 'khong' | 'goi_len_bang' | 'nhan_phu_huynh' | 'giao_bai_rieng' | 'xem_ho_so'
+
+/** Một dòng bản tin sáng cho thầy (khối "Bộ não đêm qua") do AI viết: CHỈ chữ không tên. `biDanh` (có thể rỗng khi dòng nói về cả lớp) được nop.mjs đổi về SBD; máy chủ ghép TÊN em từ SBD. */
 export interface DongBanTin {
-  loai: 'em_can_chu_y' | 'dang_ca_lop' | 'goi_len_bang' | 'ket_qua_hom_qua'
+  loai: LoaiDongBanTin
   chu: string
   biDanh: string
   dang: string
-  hanhDong: 'khong' | 'goi_len_bang' | 'nhan_phu_huynh' | 'giao_bai_rieng' | 'xem_ho_so'
+  hanhDong: HanhDongBanTin
 }
 
 /** `ra/lop.json`: bản tin sáng ≤ 6 dòng. */
@@ -80,8 +84,8 @@ export const HAN_MUC_BO_NAO = {
 export const HANH_DONG_DANG: readonly HanhDongDang[] = ['uu_tien', 'ha_mot_bac', 'cho_thu_len_bac', 'tam_nghi']
 export const CO_BO_NAO: readonly CoBoNao[] = ['khong', 'tut_nhip', 'qua_tai', 'lam_cho_xong', 'nghi_chep']
 export const HANH_DONG_CHO_THAY: readonly HanhDongChoThay[] = ['khong', 'goi_len_bang', 'nhan_phu_huynh', 'giao_bai_rieng']
-const LOAI_DONG_BAN_TIN = ['em_can_chu_y', 'dang_ca_lop', 'goi_len_bang', 'ket_qua_hom_qua'] as const
-const HANH_DONG_BAN_TIN = ['khong', 'goi_len_bang', 'nhan_phu_huynh', 'giao_bai_rieng', 'xem_ho_so'] as const
+export const LOAI_DONG_BAN_TIN: readonly LoaiDongBanTin[] = ['can_thay_y', 'ca_lop', 'goi_len_bang', 'dieu_chinh', 'thay_xem_lai']
+export const HANH_DONG_BAN_TIN: readonly HanhDongBanTin[] = ['khong', 'goi_len_bang', 'nhan_phu_huynh', 'giao_bai_rieng', 'xem_ho_so']
 
 /** TỪ CẤM trong lời gửi CHO EM: nhãn năng lực, so với bạn, xếp hạng, doạ / mỉa. So theo TỪ (đã bỏ dấu và hạ chữ thường) hoặc CỤM. */
 export const TU_CAM_CHO_EM: readonly string[] = [
@@ -267,8 +271,8 @@ export function kiemBanTin(banTin: unknown, soLieuLop: unknown, biDanhHopLe?: Re
   b.cacDong.forEach((x, i) => {
     const o = x as Record<string, unknown> | null
     if (!o || typeof o !== 'object') return void loi.push(`dòng ${i + 1}: không phải đối tượng`)
-    if (!LOAI_DONG_BAN_TIN.includes(o.loai as (typeof LOAI_DONG_BAN_TIN)[number])) loi.push(`dòng ${i + 1}: loai lạ`)
-    if (!HANH_DONG_BAN_TIN.includes(o.hanhDong as (typeof HANH_DONG_BAN_TIN)[number])) loi.push(`dòng ${i + 1}: hanhDong lạ`)
+    if (!LOAI_DONG_BAN_TIN.includes(o.loai as LoaiDongBanTin)) loi.push(`dòng ${i + 1}: loai lạ`)
+    if (!HANH_DONG_BAN_TIN.includes(o.hanhDong as HanhDongBanTin)) loi.push(`dòng ${i + 1}: hanhDong lạ`)
     if (!laChuoi(o.biDanh) || o.biDanh.length > HAN_MUC_BO_NAO.BI_DANH_TOI_DA) loi.push(`dòng ${i + 1}: biDanh phải là chuỗi (có thể rỗng)`)
     else if (o.biDanh.length > 0 && biDanhHopLe && !biDanhHopLe.has(o.biDanh)) loi.push(`dòng ${i + 1}: biDanh không có trong dữ liệu đêm`)
     if (!laChuoi(o.dang) || o.dang.length > HAN_MUC_BO_NAO.MA_DANG_TOI_DA || KY_TU_LA.test(o.dang)) loi.push(`dòng ${i + 1}: dang phải là chuỗi ngắn (có thể rỗng)`)
