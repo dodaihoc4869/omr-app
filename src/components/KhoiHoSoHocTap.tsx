@@ -69,6 +69,8 @@ export default function KhoiHoSoHocTap({ sbd, chuyenDe }: { sbd: string; chuyenD
             <p className="hs-the-phu">Đang tải…</p>
           ) : !tt ? (
             <p className="hs-the-phu">Kế hoạch hôm nay: {CHO}.</p>
+          ) : tt.chuaCo ? (
+            <p className="hs-the-phu">Chưa có kế hoạch hôm nay của em (lập lúc 00:01 hoặc khi em mở app).</p>
           ) : tt.nghi ? (
             <p className="hs-the-phu">Hôm nay là ngày nghỉ của em.</p>
           ) : tt.dong.length === 0 ? (
@@ -94,6 +96,8 @@ export default function KhoiHoSoHocTap({ sbd, chuyenDe }: { sbd: string; chuyenD
             <p className="hs-the-phu">Đang tải…</p>
           ) : !tt ? (
             <p className="hs-the-phu">Thần thú: {CHO}.</p>
+          ) : tt.chuaCo ? (
+            <p className="hs-the-phu">Chưa có số liệu hôm nay.</p>
           ) : !tt.thanThu ? (
             <p className="hs-the-phu">Em chưa chọn thần thú.</p>
           ) : (

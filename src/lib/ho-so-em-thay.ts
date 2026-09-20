@@ -55,6 +55,8 @@ export interface ViecEm {
 }
 export interface KeHoachEm {
   ngay?: string
+  /** Máy chủ chưa có dòng kế hoạch của hôm nay (cron 00:01 hoặc lượt mở app của em chưa lập). */
+  chuaCo?: boolean
   lanNghi?: boolean
   nganSach?: { mucTieuCau?: number; phutNgay?: number }
   viec?: ViecEm[]
@@ -64,13 +66,12 @@ export interface KeHoachEm {
   exp?: { homNay?: number } | null
 }
 
-/** TẠM KHÔNG GỌI MÁY CHỦ (Boss chốt 21/09): `/hs/ke-hoach-ngay` là lệnh CÓ GHI — mỗi lần gọi nó dựng kế hoạch ngày và chạy `capNhatExp`, trả
- *  `expNhan` MỘT LẦN cho em; thầy mở hồ sơ mà gọi nó là NUỐT thông báo EXP của em. Khối "Kế hoạch hôm nay" và "Thần thú · EXP" hiện
- *  "đang chờ máy chủ" cho tới khi Code 3 có lệnh chỉ đọc `/gv/ke-hoach-em {sbd}` (mã bí mật, cùng dạng trường `KeHoachEm`) — lúc đó chỉ đổi
- *  thân hàm này. KHÔNG được nối lại vào `/hs/*`. */
-export async function layKeHoachEm(_sbd: string): Promise<KeHoachEm | null> {
-  void _sbd
-  return null
+/** Kế hoạch hôm nay của em — lệnh THẦY CHỈ ĐỌC `/gv/ke-hoach-em` (mã bí mật; Code 3, d996df4): 0 ghi, không lập kế hoạch, không `capNhatExp`,
+ *  không nuốt `expNhan` của em. TUYỆT ĐỐI KHÔNG dùng `/hs/ke-hoach-ngay` ở đây: lệnh ấy CÓ GHI (dựng kế hoạch + ghi sổ EXP, trả `expNhan` MỘT
+ *  lần cho em) — thầy mở hồ sơ mà gọi nó là nuốt thông báo EXP của em (Boss phát hiện 21/09, ba1ea0a). Chưa có kế hoạch hôm nay ⇒ `{ chuaCo: true }`. */
+export async function layKeHoachEm(sbd: string): Promise<KeHoachEm | null> {
+  const j = await goi('/gv/ke-hoach-em', { sbd }, true)
+  return j ? (j as unknown as KeHoachEm) : null
 }
 
 /** Ngày Việt Nam (YYYY-MM-DD) của một thời điểm — cùng mốc "ngày" với `ngay_vn` của máy chủ. */
@@ -133,6 +134,7 @@ export interface TomTatKeHoach {
   dong: DongKeHoach[]
   tienDo: string
   nghi: boolean
+  chuaCo: boolean
   thanThu: { ten: string; cap: number | null; expHomNay: number | null } | null
 }
 
@@ -149,6 +151,7 @@ export function tomTatKeHoach(kh: KeHoachEm): TomTatKeHoach {
     dong,
     tienDo,
     nghi: kh.lanNghi === true,
+    chuaCo: kh.chuaCo === true,
     thanThu: tt ? { ten: (tt.nickname || tt.pet || '').toString(), cap: typeof tt.cap === 'number' ? tt.cap : null, expHomNay: typeof kh.exp?.homNay === 'number' ? kh.exp.homNay : null } : null,
   }
 }

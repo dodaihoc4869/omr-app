@@ -105,15 +105,20 @@ describe('ho-so-em-thay: gọi máy chủ (chỉ đọc)', () => {
     expect(await lib.layHoSoNamKt('12001')).toBeNull()
   })
 
-  it('layKeHoachEm: TẠM KHÔNG gọi máy chủ (`/hs/ke-hoach-ngay` là lệnh CÓ GHI — nuốt thông báo EXP của em); trả null → màn "đang chờ máy chủ"', async () => {
-    const goi = vi.fn()
-    vi.stubGlobal('fetch', async (...a: unknown[]) => {
-      goi(...a)
-      return { ok: true, json: async () => ({ ok: true, ngay: '2026-09-21', viec: [] }) }
+  it('layKeHoachEm: POST /gv/ke-hoach-em {sbd} kèm x-ma-bi-mat (lệnh thầy CHỈ ĐỌC); null khi không ok', async () => {
+    const goi: { url: string; init: RequestInit }[] = []
+    vi.stubGlobal('fetch', async (url: string, init: RequestInit) => {
+      goi.push({ url, init })
+      return { ok: true, json: async () => ({ ok: true, ngay: '2026-09-21', viec: [], chuaCo: true }) }
     })
     const lib = await nap()
+    expect(await lib.layKeHoachEm('12001')).toMatchObject({ ngay: '2026-09-21', chuaCo: true })
+    expect(goi).toHaveLength(1)
+    expect(goi[0].url).toBe('https://may.test/gv/ke-hoach-em')
+    expect(JSON.parse(String(goi[0].init.body))).toEqual({ sbd: '12001' })
+    expect((goi[0].init.headers as Record<string, string>)['x-ma-bi-mat']).toBe('mat')
+    vi.stubGlobal('fetch', async () => ({ ok: true, json: async () => ({ ok: false, error: 'Không tìm thấy học sinh' }) }))
     expect(await lib.layKeHoachEm('12001')).toBeNull()
-    expect(goi).not.toHaveBeenCalled()
   })
 
   it('nguồn: không còn đường nào từ hồ sơ thầy tới lệnh `/hs/*` (lệnh của em, có ghi)', () => {
@@ -168,6 +173,11 @@ describe('KhoiHoSoHocTap', () => {
     m.keHoach.mockResolvedValue({ viec: [], thanThu: null })
     render(<KhoiHoSoHocTap sbd="12001" chuyenDe={null} />)
     expect(await screen.findByText('Hôm nay chưa có việc nào cho em.')).toBeTruthy()
+    cleanup()
+    m.keHoach.mockResolvedValue({ chuaCo: true, ngay: '2026-09-21' }) // máy chủ chưa lập kế hoạch hôm nay
+    render(<KhoiHoSoHocTap sbd="12001" chuyenDe={null} />)
+    expect(await screen.findByText('Chưa có kế hoạch hôm nay của em (lập lúc 00:01 hoặc khi em mở app).')).toBeTruthy()
+    expect(screen.getByText('Chưa có số liệu hôm nay.')).toBeTruthy()
   })
 
   it('đổi em thì tải lại đúng em đó', async () => {
