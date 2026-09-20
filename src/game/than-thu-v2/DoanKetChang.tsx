@@ -2,11 +2,11 @@
 // máy chủ không trả số nào thì dòng ấy không hiện (không bịa số, không có chữ kết luận năng lực).
 import type { CSSProperties, ReactNode } from 'react'
 import type { DoanXem } from './doan-kieu'
-import { SaoHinh, ThuHinh } from './DoanHinh'
+import { LinhTamCau, SaoHinh, ThuHinh } from './DoanHinh'
 
 const MAU_GIAY = ['#ffd166', '#7fe9ff', '#ff8a5c', '#7dffb0', '#d9c8ff', '#ff9ec7']
 
-export default function DoanKetChang({ xem, expNhan, onVe, onDiTiep, ban, khoiThem }: { xem: DoanXem; expNhan: number; onVe: () => void; onDiTiep: () => void; ban: boolean; khoiThem?: ReactNode }) {
+export default function DoanKetChang({ xem, expNhan, ve, onVe, onDiTiep, ban, khoiThem }: { xem: DoanXem; expNhan: number; ve?: number | null; onVe: () => void; onDiTiep: () => void; ban: boolean; khoiThem?: ReactNode }) {
   const k = xem.ketChang!, em = xem.ghe.find(g => g.laEm)!, banBe = xem.ghe.filter(g => !g.laEm).slice(0, 2), tb = k.tienBo
   const banDuocGiup = k.cuaEm.soLanGiup > 0
   return (
@@ -24,6 +24,16 @@ export default function DoanKetChang({ xem, expNhan, onVe, onDiTiep, ban, khoiTh
         {k.thang ? `Linh Tâm về đích với ${k.linhTam.hp}/${k.linhTam.toiDa} máu · cả đội hạ ${k.quaiHaGuc} Tạp Chất${k.trumVoGiap.filter(Boolean).length ? ` · vỡ giáp ${k.trumVoGiap.filter(Boolean).length} trùm` : ''}`
           : 'Thua không mất gì cả: mọi câu em tự làm đúng hôm nay vẫn được ghi nhận. Mai mình hộ tống lại nhé.'}
       </p>
+      {k.doanLop && (
+        <section className="dh-kinh dh-lop-tien" aria-label="Linh Tâm của lớp">
+          <LinhTamCau size={46} />
+          <div>
+            <b>Linh Tâm của lớp: trạm {k.doanLop.tramTruoc}{k.doanLop.tramSau > k.doanLop.tramTruoc ? <> → <span>{k.doanLop.tramSau}</span></> : null}/{k.doanLop.tongTram}</b>
+            <div className="dh-mau"><i style={{ width: `${Math.round(k.doanLop.tramSau * 100 / k.doanLop.tongTram)}%` }} /></div>
+            <span>{k.doanLop.banThu > 0 ? `Em là bạn thứ ${k.doanLop.banThu} góp sức hôm nay` : 'Chặng thắng mới đẩy Linh Tâm của lớp'}{k.doanLop.conTramToiMoc ? ` · còn ${k.doanLop.conTramToiMoc} trạm tới ${k.doanLop.tenMocKe}` : ''}{k.doanLop.trumLop ? ` · em góp ${k.doanLop.trumLop} sát thương vào Trùm lớp` : ''}</span>
+          </div>
+        </section>
+      )}
       {khoiThem}
 
       <section className="dh-tien-bo" aria-label="Hôm nay em tiến bộ gì">
@@ -47,7 +57,8 @@ export default function DoanKetChang({ xem, expNhan, onVe, onDiTiep, ban, khoiTh
       )}
 
       <button type="button" className="dh-nut-vang" onClick={onVe}>VỀ BẢNG NHIỆM VỤ</button>
-      <button type="button" className="dh-nut-mo" disabled={ban} onClick={onDiTiep}>Đi thêm một chặng</button>
+      <button type="button" className="dh-nut-mo" disabled={ban} onClick={onDiTiep}>Đi thêm một chặng{ve !== undefined && ve !== null ? ' · 1 vé' : ''}</button>
+      {ve === 0 && <p className="dh-ket-phu">Hết vé? Làm xong nhiệm vụ hôm nay để nhận 2 vé.</p>}
     </div>
   )
 }

@@ -8,8 +8,8 @@ Nơi làm: worktree riêng, nhánh `claude/zealous-taussig-a50c90` (tách từ m
 | 1 | Lõi thuần `doan-core.ts` + test bảng giá trị + đột biến | **XONG 19/09** — 0.Planer đã soát + gộp main 243e746, duyệt cả 9 quyết định (ghi chú 9 → đã sửa, xem mục "Sửa sau soát") |
 | 2 | Máy chủ `server/src/game-v2-doan.ts` (mở/vào/nộp/kết chặng, chọn câu từ hồ sơ, ghi `su_kien_hoc` nguồn `game`) | **XONG 19/09** — 0.Planer đã soát + gộp main e65efbb, duyệt luật Chắn mới và các điểm (3)(4)(5); Code 3 chạy migration + đẩy Worker |
 | 3 | Giao diện 6 màn theo bản vẽ | **XONG 19/09** — Boss (0.Planer) đã soát + gộp main c1cfaac, kèm CỜ MỞ GAME; Worker 6ddc48c7 đã có, cờ bật riêng 12121212 |
-| 4 | Tiếp sức (3 thẻ gợi ý máy chủ soạn) | **XONG 21/09** (máy chủ + màn 3) — chờ Boss soát |
-| 5 | Mồi hằng ngày (vé, Đoàn lớp, rương chuỗi, Trùm lớp) | chưa làm |
+| 4 | Tiếp sức (3 thẻ gợi ý máy chủ soạn) | **XONG 21/09** — Boss đã soát + gộp |
+| 5 | Mồi hằng ngày (vé, Đoàn lớp, rương chuỗi, Trùm lớp) | **XONG 21/09** (Trùm lớp bản GỌN, Boss đã đồng ý) — chờ Boss soát |
 | 6 | Ấn thạch dạng + hợp đồng hiển thị ngoài game | chưa làm |
 
 ---
@@ -188,3 +188,30 @@ B (chưa chốt) bấm **"Cần tiếp sức · còn 2 lần được tiếp s�
 
 ### Cách lùi
 `git revert` commit bước 4: nút xin/giúp biến mất, `assisted` về `false` cứng như bước 2; bảng `doan_tiep_suc` để nguyên (chỉ-thêm).
+
+---
+
+## BƯỚC 5 — Mồi hằng ngày (21/09/2026)
+
+**Tệp MỚI:** `server/src/game-v2-doan-mua.ts` · `server/migration-2109-game-doan-mua.sql` (chỉ-thêm: `doan_ve_so`, `doan_trum_lop`) · `tests/doan-mua.test.ts`.
+**Tệp SỬA:** `server/src/game-v2-doan.ts` (lệnh `doan-sanh`, cổng vé ở `doan-mo`/`doan-vao`, hoàn vé ở `doan-roi`, khối `doanLop` ở kết chặng, chặn vào đoàn thứ hai) · `doan-kieu.ts` · `DoanSanh.tsx` · `DoanKetChang.tsx` · `DoanHoTong.tsx` · `doan.css` · test + ảnh. KHÔNG đụng `game-v2.ts`.
+Commit: 7a203ac (máy chủ) · commit giao diện + sổ việc.
+
+### Luật
+- **Vé hộ tống** — sổ chỉ-thêm `doan_ve_so`, số vé = SUM(so), MỖI khoản một khoá idempotent (nạp lại hai lần không cộng trùng — có test): `<sbd>|dat|<ngày>` +2 · `<sbd>|lo|<mã>|<chỉ số>` +1 · `…|ruong|<mốc>|<ngày>` · `…|moc|<mùa>|<trạm>` +1 · `…|trum|<mùa>|<Chủ nhật>` +1 · `…|tieu|<mã chặng>` −1. **Vé CHỈ sinh từ việc học: game gọi `capNhatExp` rồi ĐỌC `docThanhTichNgay` của Code 3 (hôm nay + hôm qua, vì khoản có thể ghi bù muộn) — không tự tính "đạt ngày"/"đúng nhịp".** Lô trễ nhịp (exp 4) không có vé. Cờ EXP mới tắt cho em → không có vé, vẫn có chặng miễn phí mỗi ngày.
+- **Chặng đầu ngày (giờ VN) MIỄN PHÍ; chặng thêm tốn 1 vé**, trừ NGAY lúc mở/vào đoàn (khoá theo mã chặng nên bấm lại không trừ đôi). Sảnh bỏ dở KHÔNG đốt chặng miễn phí (chỉ chặng đã lên đường mới tính); rời sảnh trước khi lên đường → HOÀN vé; sảnh hết hạn 1 giờ → hoàn vé ở lần mở Sảnh kế. Đang ở một đoàn thì không vào được đoàn thứ hai (chặn lách "hai chặng miễn phí").
+- **Hết vé → từ chối bằng lời chỉ cách kiếm vé** (nghiệm thu 4): "Hôm nay em đã đi chặng miễn phí rồi và em chưa có vé. Vé chỉ kiếm bằng học: đạt nhiệm vụ ngày +2 vé, xong một lô bài tập đúng nhịp +1 vé…" — KHÔNG mở chặng, không ghi dòng `doan_chang` nào.
+- **Mùa 4 tuần** tính từ NGÀY ghi trong mùa game (`game_v2_settings.season.id` = `<YYYY-MM-DD>-mua-N`, Code 3 ghi lúc reset) — không gắn cứng 21/09; reset dời thì mùa 1 dời theo; chưa reset hoặc ngày ở tương lai → khối 28 ngày theo lịch (bắt đầu thứ Hai).
+- **Đoàn lớp 30 trạm**: số chặng THẮNG của lớp trong mùa ÷ `changMoiTram(sĩ số)` = ⌈sĩ số × 12 / 30⌉ (lớp 30 em: 12 chặng/trạm; tối thiểu 2). Đọc thẳng từ `doan_luot` (bạn máy không có dòng → không bao giờ được tính; chặng thua, chặng ngoài mùa không tính). Mốc 10/20/30 (Rừng Xúc Tác · Hồ Cân Bằng · Thành Pha Lê): em ĐÃ GÓP SỨC trong mùa nhận +1 vé.
+- **Rương chuỗi 3/7/14** = 1/2/3 vé, "rương may mắn" +1 rút TẤT ĐỊNH theo (sbd, ngày, mùa); mở đúng ngày chuỗi chạm mốc, xem lại không mở lần hai; hôm nay chưa đi thì chuỗi tới hôm qua vẫn sống.
+- **Trùm lớp — BẢN GỌN (Boss đồng ý cắt phạm vi có chủ ý):** không có phòng thời gian thực. Chặng THẮNG kết thúc trong khung **Chủ nhật 20:00–20:20 giờ VN** cộng sát thương của em vào sổ chỉ-thêm `doan_trum_lop`; mục tiêu = sĩ số × 100; lớp đạt → em đã góp tối đó +1 vé. Sảnh: trong khung là thanh máu "cả lớp đã góp X/Y", ngoài khung là thẻ hẹn "Chủ nhật 20:00 · còn N ngày M giờ", sáng thứ Hai vẫn thấy kết quả tối qua.
+- Kết chặng: "Linh Tâm của lớp: trạm 17 → 18/30 · Em là bạn thứ 10 góp sức hôm nay · còn 2 trạm tới <mốc>"; nút "Đi thêm một chặng · 1 vé"; hết vé → "Làm xong nhiệm vụ hôm nay để nhận 2 vé."
+- Chưa chạy migration bước 5: `doan-sanh` trả `sanh:null` (Sảnh giữ 4 ô SẮP MỞ), game vẫn chơi được một chặng miễn phí/ngày, không lỗi thô.
+
+### Bằng chứng
+- `tests/doan-mua.test.ts` **15/15** (5 ca hàm thuần tính tay + 10 ca D1 SQLite thật: miễn phí → từ chối → đạt ngày → có vé → trừ 1; nạp lại 3 lần không cộng trùng; cờ EXP tắt; sảnh bỏ dở/hoàn vé/đoàn thứ hai; thiếu migration; trạm lớp + bạn thứ mấy; thua/ngoài mùa; rương + mốc; Trùm lớp trong/ngoài khung, thắng/thua, quà; em không có lớp). `doan-may-chu` 28 · `doan-giao-dien` 22 (4 ca bước 5) · `doan-core` 52 · `doan-cua-vao` 6 · `doan-the-goi-y` 11 = **134/134**. tsc sạch app + server. Playwright 7 màn 0 lỗi console.
+- Đột biến bước 5: **35 → 34 đỏ**; 1 tương đương ("Trùm lớp theo giờ UTC": mốc nửa đêm và thứ trong tuần lệch cùng một lượng nên ra cùng thời điểm mở — đã thử 4 mép giờ). Vòng đầu sống thêm 1 ("chặng thua cũng góp Trùm lớp") → thêm ca thua trong khung giờ, nay đỏ.
+- Toàn bộ vitest: 6040 test · 111 đỏ / 52 tệp; **đỏ thuộc game = []**. Đỏ ngoài nền đều có sẵn trên main sạch 56c0704 (đã chạy lại trên worktree sạch): nhóm reset-toan-app + ke-hoach-than-thu + 11 test đã báo Code 3 hôm nay. Riêng test "MỌI bảng đều được phân loại XOÁ/GIỮ" sẽ kể thêm 2 bảng mới của game → đã nhắn Code 3 thêm `'doan_ve_so','doan_trum_lop'` vào nhóm XOÁ.
+
+### Cách lùi
+`git revert` hai commit bước 5: Sảnh về 4 ô SẮP MỞ, mọi chặng lại miễn phí như bước 4. Hai bảng mới để nguyên (chỉ-thêm) hoặc DROP theo ghi chú đầu tệp migration.

@@ -177,6 +177,10 @@ describe('Bước 5 · Đoàn lớp, rương chuỗi, Trùm lớp', () => {
     const k = (await diTronChang(d, 'S2')).xem.doan.ketChang
     expect(k.doanLop.trumLop).toBe(k.cuaEm.satThuong); expect(k.cuaEm.satThuong).toBe(144)
     await goi(d, 'S2', 'xem', { ma: String((d.sql.prepare('SELECT khoa FROM doan_trum_lop').get() as any).khoa).split('|')[0] }); expect(dem(d, 'SELECT COUNT(*) n FROM doan_trum_lop')).toBe(1) // xem lại không góp lần hai
+    // Chặng THUA trong khung giờ (S1 không chốt gì tới khi Linh Tâm vỡ) KHÔNG góp vào Trùm lớp
+    { const ma = (await goi(d, 'S1', 'mo')).doan.ma as string; let x = await goi(d, 'S1', 'xem', { ma }); for (let v = 0; !x.doan.tran.ketThuc && v < 40; v++) { troi(62_000); x = await goi(d, 'S1', 'xem', { ma }) }
+      expect(x.doan.ketChang.thang).toBe(false); expect(x.doan.ketChang.doanLop.trumLop).toBeNull(); expect(dem(d, "SELECT COUNT(*) n FROM doan_trum_lop WHERE sbd='S1'")).toBe(0) }
+    datGio(vn('2026-09-27T20:10:00'))
     d.sql.prepare("INSERT INTO doan_trum_lop(khoa,lop,chu_nhat,sbd,sat_thuong,luc) VALUES('X|S3','12A','2026-09-27','S3',160,'x')").run()
     const s2 = (await goi(d, 'S2', 'sanh')).sanh; expect(s2.trumLop).toMatchObject({ dangMo: true, daGop: 304, daHa: true }); expect(s2.quaMoi).toContainEqual({ loai: 'trum', ve: 1, ghiChu: 'Lớp em đã hạ Trùm lớp' })
     expect((await goi(d, 'S1', 'sanh')).sanh.quaMoi.some((q: any) => q.loai === 'trum')).toBe(false) // S1 không góp tối nay
