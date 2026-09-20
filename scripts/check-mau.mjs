@@ -17,6 +17,9 @@ const CHO_PHEP = new Set([
   'styles/tokens.css',
   'lib/html-phieu.ts',
   'lib/html-may-chieu.ts',
+  // Bảng màu của TỜ MÁY CHIẾU (M3, 19/09): tờ là HTML rời trong iframe, có thể lưu ra tệp / mở tab riêng / chiếu từ máy khác, và nền bảng luôn TỐI
+  // (#15181c) dù app đang sáng — nên không đi theo token app. Chỉ chứa bảng màu của tờ; test `giao-dien-to-chieu-1909` khoá từng giá trị.
+  'lib/giao-dien-to-chieu.ts',
   'lib/experiments/catalog.ts',
   'lib/experiments/render.ts',
   'lib/experiments/scene.ts',

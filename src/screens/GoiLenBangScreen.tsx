@@ -1415,7 +1415,7 @@ export default function GoiLenBangScreen() {
     <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
       <div className="gv-page-header flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-emerald-50 dark:bg-emerald-950/70 text-[#1e8e3e] border border-emerald-200 dark:border-emerald-800 shadow-2xs shrink-0">
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-emerald-50 dark:bg-emerald-950/70 text-[color:var(--m3-on-tertiary-container)] border border-emerald-200 dark:border-emerald-800 shadow-2xs shrink-0">
             <UserCheck size={22} />
           </div>
           <div>
@@ -1437,7 +1437,7 @@ export default function GoiLenBangScreen() {
           onClick={() => { setDayHoc(false); setCachLayCau('tu_chon'); setKq(null); setKqXep(null); setKqBuoi(null); setHtmlMayChieu('') }}
           className={`flex-1 py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
             !dayHoc
-              ? 'bg-white dark:bg-slate-700 text-[#1a73e8] dark:text-blue-400 shadow-xs ring-1 ring-black/5 dark:ring-white/10'
+              ? 'bg-white dark:bg-slate-700 text-[color:var(--m3-primary)] dark:text-blue-400 shadow-xs ring-1 ring-black/5 dark:ring-white/10'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
@@ -1448,7 +1448,7 @@ export default function GoiLenBangScreen() {
           onClick={() => { setDayHoc(true); setCachLayCau('tu_chon'); setKq(null); setKqXep(null); setKqBuoi(null); setHtmlMayChieu('') }}
           className={`flex-1 py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
             dayHoc
-              ? 'bg-white dark:bg-slate-700 text-[#1a73e8] dark:text-blue-400 shadow-xs ring-1 ring-black/5 dark:ring-white/10'
+              ? 'bg-white dark:bg-slate-700 text-[color:var(--m3-primary)] dark:text-blue-400 shadow-xs ring-1 ring-black/5 dark:ring-white/10'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
@@ -1559,7 +1559,7 @@ export default function GoiLenBangScreen() {
                 onClick={() => setCachLayCau(c)}
                 className={`text-xs font-bold px-3.5 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
                   chon
-                    ? 'bg-blue-50 dark:bg-blue-950/60 text-[#1a73e8] dark:text-blue-300 border border-blue-300 dark:border-blue-700 shadow-2xs ring-2 ring-blue-400/20'
+                    ? 'bg-blue-50 dark:bg-blue-950/60 text-[color:var(--m3-primary)] dark:text-blue-300 border border-blue-300 dark:border-blue-700 shadow-2xs ring-2 ring-blue-400/20'
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
                 } ${tat ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
@@ -1593,7 +1593,7 @@ export default function GoiLenBangScreen() {
                     onClick={() => setLocDang(v)}
                     className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all cursor-pointer ${
                       chon
-                        ? 'bg-[#1a73e8] text-white shadow-2xs ring-2 ring-blue-400/20'
+                        ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] shadow-2xs ring-2 ring-blue-400/20'
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
                     }`}
                   >
@@ -1615,7 +1615,7 @@ export default function GoiLenBangScreen() {
                     onClick={() => setLocSao(v)}
                     className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all cursor-pointer ${
                       chon
-                        ? 'bg-[#1a73e8] text-white shadow-2xs ring-2 ring-blue-400/20'
+                        ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] shadow-2xs ring-2 ring-blue-400/20'
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
                     }`}
                   >
