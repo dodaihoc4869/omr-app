@@ -2350,8 +2350,11 @@ async function ghiLenBangMoi(env: Env, b: Record<string, unknown>): Promise<Resp
   const dat = b.dat === true
   const qid = String(b.qid ?? '').trim()
 
+  // `giayThuc` (tuỳ chọn, hợp đồng docs/hop-dong-giay-thuc-len-bang-1909.md): số hữu hạn 20..1800 thì ghi, còn lại ghi NULL. KHÔNG BAO GIỜ từ chối lệnh ghi vì trường này.
+  const giayTho = b.giayThuc
+  const giayThuc = typeof giayTho === 'number' && Number.isFinite(giayTho) && giayTho >= 20 && giayTho <= 1800 ? giayTho : null
   const cau: D1PreparedStatement[] = [
-    env.DB.prepare('INSERT INTO len_bang (sbd, chuyen_de, qid, dat, luc) VALUES (?,?,?,?,?)').bind(sbd, chuyenDe, qid, dat ? 1 : 0, nay),
+    env.DB.prepare('INSERT INTO len_bang (sbd, chuyen_de, qid, dat, luc, giay_thuc) VALUES (?,?,?,?,?,?)').bind(sbd, chuyenDe, qid, dat ? 1 : 0, nay, giayThuc),
     // KHÔNG còn cộng thẳng vào `tien_do_hs` (thầy chốt 19/09, câu 11): `chamDiem` xoá rồi dựng lại bảng ấy từ `chi_tiet_cau` mỗi lần chấm lại một ca,
     // nên phần lên bảng đã cộng bị mất. Nguồn sự thật nay là sổ `su_kien_hoc` (ghi ngay dưới, nguon='len_bang'); hồ sơ nắm dựng từ sổ.
   ]
@@ -2365,7 +2368,15 @@ async function ghiLenBangMoi(env: Env, b: Record<string, unknown>): Promise<Resp
     // Chữa đúng câu đã sai ⇒ đánh dấu đã chữa.
     if (dat) cau.push(env.DB.prepare('UPDATE ban_do_sai SET da_chua = 1, chua_luc = ? WHERE sbd = ? AND qid = ?').bind(nay, sbd, qid))
   }
-  const kq = await env.DB.batch(cau)
+  let kq: Awaited<ReturnType<Env['DB']['batch']>>
+  try {
+    kq = await env.DB.batch(cau)
+  } catch (e) {
+    // Chưa chạy migration-1909-len-bang-giay-thuc.sql (cột `giay_thuc` chưa có): ghi như cũ, bỏ số đo. Batch là giao dịch nên thử lại không ghi đôi.
+    if (!/no such column|has no column named/i.test(e instanceof Error ? e.message : String(e))) throw e
+    cau[0] = env.DB.prepare('INSERT INTO len_bang (sbd, chuyen_de, qid, dat, luc) VALUES (?,?,?,?,?)').bind(sbd, chuyenDe, qid, dat ? 1 : 0, nay)
+    kq = await env.DB.batch(cau)
+  }
   // SỔ SỰ KIỆN HỌC (GĐ 0): mỗi lượt gọi bảng là một sự kiện, khoá theo id dòng `len_bang`
   // (giống hệt đường nạp lại). Không có qid thì không có bằng chứng về câu nào — không ghi.
   if (qid) {
