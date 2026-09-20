@@ -1,0 +1,56 @@
+/* THANH TRÊN MÀN THI — Material 3 (ThanhTrenThiM3.tsx). Chỉ đọc biến --m3-* (m3-theme.css, đặt bởi lớp `m3` ở khung Trang); mọi luật dưới `.m3`;
+ * KHÔNG position:fixed; cao đúng 56 px (CAO_THANH_TREN); z-index do lớp `z-30` của phần tử bọc ở màn thi — không đặt ở đây.
+ * `--thi-le-phai` = chỗ cổng học sinh chừa bên phải cho nút "Đóng phòng thi" của nó (mặc định 0). */
+.m3 .thi-tren {
+  position: relative;
+  height: 56px;
+  background: var(--m3-surface);
+  box-shadow: var(--m3-cao-do-1);
+}
+.m3 .thi-tren-hang {
+  display: flex;
+  align-items: center;
+  gap: var(--k3, 12px);
+  height: 56px;
+  padding: 0 calc(var(--k4, 16px) + var(--thi-le-phai, 0px)) 4px var(--k4, 16px);
+}
+.m3 .thi-vien-thuoc {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: var(--k2, 8px);
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 20px;
+  background: var(--m3-primary-container);
+  color: var(--m3-on-primary-container);
+  font-size: var(--bnv-cx-3);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.m3 .thi-tren[data-gap] .thi-vien-thuoc {
+  background: var(--m3-error-container);
+  color: var(--m3-on-error-container);
+}
+.m3 .thi-tren-chu { display: flex; flex: 1; flex-direction: column; gap: 1px; min-width: 0; }
+.m3 .thi-tren-ten { overflow: hidden; font-size: var(--bnv-cx-1); font-weight: 700; line-height: 1.25; color: var(--m3-on-surface); text-overflow: ellipsis; white-space: nowrap; }
+.m3 .thi-tren-da-lam { font-size: 12px; line-height: 1.25; color: var(--m3-on-surface-variant); }
+.m3 .thi-luu { display: inline-flex; align-items: center; flex-shrink: 0; gap: 5px; font-size: 11px; font-weight: 600; color: var(--m3-tertiary); }
+.m3 .thi-luu[data-trang-thai='dang-luu'] { color: var(--m3-on-surface-variant); }
+.m3 .thi-luu[data-trang-thai='ngoai-mang'] { color: var(--m3-canh-bao-chu); }
+/* màn hẹp: chỉ còn biểu tượng (tên trạng thái vẫn nằm ở aria-label/title) để tên ca và "Đã làm" không bị nuốt */
+@media (max-width: 439px) { .m3 .thi-luu-chu { display: none; } }
+.m3 .thi-nut-luoi {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  margin-right: -6px;
+  border-radius: 12px;
+  color: var(--m3-on-surface-variant);
+}
+.m3 .thi-tien-do { position: absolute; right: 0; bottom: 0; left: 0; height: 4px; background: var(--m3-primary-container); }
+.m3 .thi-tien-do-day { height: 4px; border-radius: 0 999px 999px 0; background: var(--m3-primary); transition: width 140ms cubic-bezier(0.2, 0, 0, 1); }
+@media (prefers-reduced-motion: reduce) { .m3 .thi-tien-do-day { transition: none; } }

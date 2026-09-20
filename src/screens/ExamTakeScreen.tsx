@@ -65,6 +65,7 @@ import { goiBaiThi } from '../lib/goi-bao-cao'
 import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
 import { docDuongVao } from '../lib/vai-tro'
 import { dungM3 } from '../components/m3'
+import ThanhTrenThiM3 from './ThanhTrenThiM3'
 import { gradeFromKeyBank, type GradedSubmission } from '../lib/exam-grade'
 import {
   cacheSession,
@@ -3179,7 +3180,24 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 
   return (
     <Trang className="man-lam-bai">
-      {/* THANH TRÊN — 56px, dính, mờ; tiến độ 3px sát mép trên; chấm lưu 6px góc phải */}
+      {/* THANH TRÊN — 56px, dính. Đường học sinh/phụ huynh (dungM3): bản M3 theo bản vẽ ThiDangLam/ThiCanhBao (ThanhTrenThiM3, chỉ trình bày lại
+          các giá trị dưới đây, cao ĐÚNG 56 px như CAO_THANH_TREN). Đường khác: thanh cũ y hệt (mờ; tiến độ 3px sát mép trên; chấm lưu 6px góc phải). */}
+      {dungM3() ? (
+        <div className="sticky top-0 z-30">
+          <ThanhTrenThiM3
+            dongHo={laBaiTap ? null : formatClock(remaining ?? 0)}
+            chuThayDongHo={hanNopNgan ? `Hạn ${hanNopNgan}` : 'Bài tập'}
+            gap={!laBaiTap && gapNow}
+            tenCa={attempt.tenCa || ''}
+            daLam={daLamCount}
+            tong={total}
+            nhanLuu={dotLabel}
+            mayNgoaiMang={!online}
+            dangLuu={!!saveFlash}
+            onMoLuoi={() => setShowGrid(true)}
+          />
+        </div>
+      ) : (
       <div
         className="sticky top-0 z-30"
         style={{ height: 56, background: 'var(--the-mo)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid var(--vien)' }}
@@ -3206,6 +3224,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           </button>
         </div>
       </div>
+      )}
 
 
       {/* DẢI CẢNH BÁO RỜI MÀN (mục 6) — dính dưới thanh trên, tự ẩn sau 15 giây */}
