@@ -5,6 +5,7 @@ import { Search } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { cauLyDo, hanhDongCua, layCauToiHan, layHomNay, NHAN_HANH_DONG, ngayDai, phanTram, type CauToiHan, type HomNay, type HomNayEm } from '../lib/hom-nay-api'
 import KhoiBtvnLo from '../components/KhoiBtvnLo'
+import KhoiBoNaoDemQua from '../components/KhoiBoNaoDemQua'
 import '../styles/hom-nay.css'
 
 const CHO = 'đang chờ máy chủ'
@@ -95,6 +96,8 @@ export default function HomNayScreen() {
         <SoLon vai="secondary" tieu="CÂU TỚI HẠN ÔN" so={cau ? cau.toiHan.toLocaleString('vi-VN') : '—'} phu={cau ? `cả trường · ${cau.moDuoc.toLocaleString('vi-VN')} mở được` : cau === undefined ? 'đang tải…' : CHO} />
         <SoLon vai="error" tieu="EM CẦN THẦY ĐỂ Ý" so={ty ? String(ty.tong) : '—'} phu={ty ? 'trễ nhịp ≥ 3 ngày, tụt bậc hoặc dạng đang yếu' : cho(ty, 'canYTuong')} />
       </section>
+
+      <KhoiBoNaoDemQua onMoHoSo={moHoSoEm} onGoiLenBang={() => setScreen('goilenbang')} onMoCaiDat={() => setScreen('caidat')} />
 
       <div className="hn-luoi">
         <div className="hn-cot">

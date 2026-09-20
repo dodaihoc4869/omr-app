@@ -13,6 +13,7 @@ import { layCauHinhMayChu } from '../lib/may-chu-moi'
 import { loadTeacherSecret } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 import { dinhDangDeCayThuMuc } from '../screens/PhanCongScreen'
+import KhoiBoNaoDemQua from './KhoiBoNaoDemQua'
 import './m3/bang-tin.css' // chữ vàng cố định của bảng vinh danh (1,7:1 trên nền sáng) đọc theo cặp cảnh báo M3 — cùng lớp với Bảng tin HS/PH
 import './BangTinPhuHuynh.css'
 
@@ -146,6 +147,9 @@ export default function BangTinGiaoVien() {
             {error}
           </div>
         )}
+
+        {/* BỘ NÃO TỰ HÀNH: bản tóm tắt "Đêm qua đã hỗ trợ N em". Xem đêm hiện tại thì chỉ tiêu đề + số đếm (khối đầy đủ nằm ngay trên màn Hôm nay); chọn ngày khác thì kèm 3 dòng. */}
+        <KhoiBoNaoDemQua gon ngay={day || undefined} soDongGon={day ? 3 : 0} />
 
         {!report ? (
           <div className="p-6 text-center text-xs news-muted">Đang tổng hợp hoạt động…</div>

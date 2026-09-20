@@ -2,6 +2,7 @@
 // kết nối máy chủ mới, mật khẩu mở app; thêm phần GIAO DIỆN (sáng / tối / theo máy). Không đổi hàm nào của hai khối cũ — chỉ đặt chúng ở đây.
 import { Monitor, Moon, Sun } from 'lucide-react'
 import { TheNoiDung } from '../components/DesignSystem'
+import KhoiBoNaoCaiDat from '../components/KhoiBoNaoCaiDat'
 import KhoiMatKhauApp from '../components/KhoiMatKhauApp'
 import KhoiMayChuMoi from '../components/KhoiMayChuMoi'
 import { useAppStore } from '../store/appStore'
@@ -22,7 +23,7 @@ export default function CaiDatScreen() {
       <div className="gv-page-header">
         <div>
           <h1>Cài đặt</h1>
-          <p>Giao diện, kết nối máy chủ và mật khẩu mở app</p>
+          <p>Giao diện, bộ não, kết nối máy chủ và mật khẩu mở app</p>
         </div>
       </div>
 
@@ -46,6 +47,8 @@ export default function CaiDatScreen() {
         </div>
         <p style={{ marginTop: 'var(--k3)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>"Theo máy" đi theo chế độ sáng/tối của điện thoại hoặc máy tính. Lựa chọn nhớ trên máy này.</p>
       </TheNoiDung>
+
+      <KhoiBoNaoCaiDat />
 
       <TheNoiDung>
         <KhoiMayChuMoi showToast={showToast} />

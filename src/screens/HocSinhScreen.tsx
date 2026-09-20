@@ -22,6 +22,7 @@ import { useAppStore } from '../store/appStore'
 import NutDongBoDanhSach from '../components/NutDongBoDanhSach'
 import NutThemHocSinh from '../components/NutThemHocSinh'
 import KhoiHoSoHocTap from '../components/KhoiHoSoHocTap'
+import NhatKyDieuChinh from '../components/NhatKyDieuChinh'
 import DoiTenHocSinh from '../components/DoiTenHocSinh'
 import { doiTenEmTrongDanhSachLop } from '../lib/classlist-db'
 import type { KetQuaDoiTen } from '../lib/doi-ten-hs-api'
@@ -374,6 +375,8 @@ export default function HocSinhScreen() {
                 )}
 
                 <KhoiHoSoHocTap sbd={hoSo.em.sbd} chuyenDe={<KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />} />
+
+                <NhatKyDieuChinh sbd={hoSo.em.sbd} />
 
                 {/* Các khối cũ ẩn đi theo yêu cầu người dùng, giữ trong DOM để bảo toàn các bài test */}
                 <div style={{ display: 'none' }} aria-hidden="true">
