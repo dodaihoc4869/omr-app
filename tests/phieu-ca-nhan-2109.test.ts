@@ -144,6 +144,7 @@ describe('đầu bài "Bài của riêng em" và nhãn từng câu', () => {
     expect(CSS_PHIEU_CA_NHAN).not.toContain('`')
     expect(CSS_PHIEU_CA_NHAN).not.toContain('${')
     expect(CSS_PHIEU_CA_NHAN).toContain('html.gd-m3 body.ca-nhan .thanh:not(#thanh-nop) { display: none; }')
+    expect(CSS_PHIEU_CA_NHAN).toContain('html.gd-m3 body.ca-nhan .q-tags { align-items: center; }')
   })
 })
 

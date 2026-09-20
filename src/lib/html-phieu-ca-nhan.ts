@@ -118,6 +118,8 @@ html.gd-m3 body .gcn-tt { background: var(--gcn-vang-nen); color: var(--gcn-vang
 html.gd-m3 body .gcn-hero .gcn-cl { background: var(--gm-lowest); }
 html.gd-m3 body .gcn-hero .gcn-rr { background: var(--gm-lowest); color: var(--gm-primary); }
 html.gd-m3 body .gcn-hang-nhan { display: flex; align-items: center; margin: 0 0 10px; }
+/* Hàng chip của thẻ câu: nhãn của bài cá nhân hoá cao hơn chip cũ ⇒ căn giữa cả hàng, không để chip cũ bị kéo giãn (chữ dính mép trên). */
+html.gd-m3 body.ca-nhan .q-tags { align-items: center; }
 html.gd-m3 body .gcn-ghi { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 12px; padding: 10px 12px; border-radius: 16px; background: var(--gcn-vang-nen); color: var(--gcn-vang-chu); font-size: 14px; font-weight: 600; line-height: 1.35; }
 html.gd-m3 body .gcn-ghi .gcn-i { margin-top: 1px; }
 html.gd-m3 body .gcn-cho { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; padding: 12px 14px; border-radius: 16px; background: var(--gm-sc); color: var(--gm-on-surface); font-size: 15px; font-weight: 600; }
