@@ -10,7 +10,7 @@ Worktree `busy-austin-a4ab8b`, nhánh `claude/confident-dhawan-e9fbb6` (Boss g�
 | 3 | Hòn đảo của em + Túi đồ + lõi `dao-core` (vỏ `DaoThanThu` + thanh dưới: commit nối cuối) | XONG phần màn | commit màn 2 · `tests/dao-cua-em.test.tsx` 13/13 · ảnh `2-*` |
 | 4 | Chuyến thám hiểm 6 ải | XONG phần màn | commit màn 3 · `tests/dao-tham-hiem.test.tsx` 8/8 · ảnh `3-*` |
 | 5 | Sổ tay dạng bài | XONG phần màn | commit màn 4 · `tests/dao-so-tay.test.tsx` 5/5 · ảnh `4-so-tay-390.jpg` |
-| 6 | Hợp đồng prop cho Code 5 | bản đầu đã gửi | `docs/hop-dong-dao-than-thu-prop-2109.md` |
+| 6 | Vỏ `DaoThanThu` + thanh dưới + hợp đồng prop cho Code 5 | XONG (chờ Code 5 nối `Game.tsx`) | commit vỏ · `tests/dao-than-thu-vo.test.tsx` 7/7 · `docs/hop-dong-dao-than-thu-prop-2109.md` |
 | 7 | Nghiệm thu 6 điều (đo ảnh ≤ 400 KB bằng Chromium, 360×740, console sạch, so tên vitest) | chưa | |
 
 ## 21/09 · Mục 1 — ảnh nhẹ
@@ -56,3 +56,11 @@ Worktree `busy-austin-a4ab8b`, nhánh `claude/confident-dhawan-e9fbb6` (Boss g�
 - Thẻ "N dạng đang yếu" = dạng đã gặp mà 0 sao (chưa lần nào tự làm đúng); hồ sơ trống sau reset ⇒ lời mời LÊN ĐƯỜNG, không màn trắng.
 - Ô "trang phục Hoả Diệm" của bản vẽ ⇒ "Phần thưởng thành thạo trọn chương · SẮP MỞ" có khoá (test chặn chữ trang phục).
 - Xem thử: `?man=so-tay[&khongdanhmuc]`.
+
+## 21/09 · Vỏ `dao/DaoThanThu.tsx` + trọn vòng
+- MỘT nút LÊN ĐƯỜNG = `resume` (đi tiếp lượt dở) → `sync` tới hết → `start`; lời báo bằng tiếng học sinh ("Đang soạn hành trang… còn N bài cần xem lại"), bỏ chữ "tờ đề"/"dòng kết quả chưa nối". Kho chưa có câu hợp ⇒ ở lại đảo kèm lời chỉ việc.
+- Thanh dưới Đảo · Đoàn (chỉ khi `doanMo`) · Sổ tay · Túi đồ; đang thám hiểm thì ẩn. Chọn thú: `choose` rồi mới `rename`; rename hỏng KHÔNG làm hỏng việc chọn (báo em đặt lại bằng cây bút).
+- Sửa lỗi tự bắt khi chạy thật: `call` đổi danh tính mỗi lần vẽ ⇒ hiệu ứng nạp `so-tay` chạy vô hạn ("Maximum update depth") — nay giữ `call` qua ref, có test khoá.
+- TRỌN VÒNG Playwright 360×740, máy chủ giả trong trang (`?man=vo&chuachon&doan`): chọn thú 1 chạm → đảo; đảo → câu đầu 1 chạm; 6 ải (I, III, II xen kẽ) → tổng kết 6/6, +60 EXP, 2 sao → về đảo có nút "Nạp 60 EXP" → Sổ tay → Túi đồ; **0 lỗi + 0 cảnh báo console**, không cuộn ngang. Đáy phần trận + câu: trắc nghiệm 635–732 px (< 740), trả lời ngắn 540 px; câu Đúng/Sai 4 ý 909 px (dài tự nhiên, phải cuộn — nút trả lời nổi sẵn ở đáy).
+- ĐO ẢNH bằng Chromium: màn chọn lần đầu 139 KB (3 thẻ); màn đảo lần đầu ở ca nặng nhất (cấp 100 = 1 ảnh thú + 6 ảnh bé) **97 KB** ≤ 400 KB; thêm tối đa 71 KB khi cuồng nộ.
+- Gói thêm ≈ 25 KB gzip (JS 17,9 + CSS 7,2; cận trên) ≤ 40 KB.
