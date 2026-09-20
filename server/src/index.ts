@@ -16,6 +16,7 @@ import {parentNews,refreshDailyNews} from './parent-news'
 import {phCapMa,phDemTruyCap,phKeHoach,phThoiGianHoc,phXacDinh} from './ph-truy-cap'
 import {homNayThay} from './hom-nay-thay'
 import {gvKeHoachEm} from './gv-ke-hoach-em'
+import {themPhutCa} from './them-phut'
 import { mom } from './mom'
 import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
@@ -442,7 +443,7 @@ async function dayTrangThai(env: Env, b: Record<string, unknown>): Promise<Respo
   const sbd = String(b.sbd ?? '').trim()
   if (!sbd) return ra({ ok: false, lyDo: 'thieu' })
   const nay = new Date().toISOString()
-  await env.DB.prepare(
+  const ghi = env.DB.prepare(
     `INSERT INTO trang_thai (sbd, ma_ca, lop, dang_lam, bat_dau_luc, da_lam_cau_hoi,
                              tong_cau_hoi, so_lan_roi_app, blocked, cap_nhat_luc, da_day_sheet)
      VALUES (?,?,?,?,?,?,?,?,?,?,0)
@@ -457,8 +458,19 @@ async function dayTrangThai(env: Env, b: Record<string, unknown>): Promise<Respo
       String(b.batDauLuc ?? nay), Number(b.daLamCauHoi ?? 0), Number(b.tongCauHoi ?? 0),
       Number(b.soLanRoiApp ?? 0), b.blocked ? 1 : 0, nay,
     )
-    .run()
-  return ra({ ok: true })
+  // HẠN HIỆN HÀNH của lượt đang làm (thầy có thể đã THÊM PHÚT, docs/hop-dong-them-phut-2109.md): máy em đọc `hetGioLuc` ở nhịp này và chỉ nhận khi MUỘN hơn hạn đang giữ.
+  // Cùng một lượt gọi D1 (batch) với câu ghi, nên nhịp nóng nhất không thêm một vòng đi-về. Vắng khi không có `maCa`, không có lượt đang làm, hoặc lượt chưa có hạn.
+  const maCa = String(b.maCa ?? '').trim()
+  if (!maCa) {
+    await ghi.run()
+    return ra({ ok: true })
+  }
+  const kq = await env.DB.batch([
+    ghi,
+    env.DB.prepare(`SELECT het_gio_luc FROM luot WHERE ma_ca = ? AND sbd = ? AND trang_thai = 'dang_lam' ORDER BY lan_thu DESC LIMIT 1`).bind(maCa, sbd),
+  ])
+  const han = String((kq[1]?.results?.[0] as { het_gio_luc?: string } | undefined)?.het_gio_luc ?? '').trim()
+  return ra(han ? { ok: true, hetGioLuc: han } : { ok: true })
 }
 
 /** Phụ huynh xem con đang làm tới đâu. Không đòi mã bí mật — giống Apps Script
@@ -1135,6 +1147,7 @@ async function chiTietCaMoi(env: Env, maCa: string): Promise<Response> {
       batDauThiLuc: String(ca.bat_dau_thi_luc ?? ''),
       dongBoGio: Number(ca.dong_bo_gio) === 1,
       thoiGianPhut: Number(ca.thoi_gian_phut) || 45,
+      themPhutTong: Number(ca.them_phut_tong) || 0, // tổng phút thầy đã THÊM cho ca đang chạy (`/ca/them-phut`)
       loai: String(ca.loai ?? '') === 'baitap' ? 'baitap' : 'thi',
       hanNop: String(ca.han_nop ?? ''),
       congBo: String(ca.cong_bo ?? 'khong'),
@@ -3007,6 +3020,8 @@ export default {
       if (p === '/ca/sua') return suaCa(env, b)
       if (p === '/ca/xoa-vinh-vien') return ra(await G.xoaVinhVienCa(env, b))
       if (p === '/ca/chi-tiet') return chiTietCaMoi(env, String(b.maCa ?? ''))
+      // THÊM PHÚT cho ca đang chạy (docs/hop-dong-them-phut-2109.md): chỉ cộng, trần 30 phút mỗi ca.
+      if (p === '/ca/them-phut') return ra(await themPhutCa(env, b))
       if (p === '/diem') return ghiDiemMoi(env, b)
       if (p === '/em/danh-sach') return danhSachEmMoi(env)
       if (p === '/ca/nap-day-du') return napDayDuCa(env, b)

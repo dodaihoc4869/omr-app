@@ -52,6 +52,7 @@ export function taoD1That() {
         return { results: [] as T[], success: true, meta: { changes: Number(r.changes), last_row_id: Number(r.lastInsertRowid), rows_read: 0, rows_written: Number(r.changes) } }
       },
     }
+    ;(st as unknown as { _q: string })._q = query
     return st
   }
 
@@ -64,7 +65,8 @@ export function taoD1That() {
         sql.exec('BEGIN')
         try {
           const r = []
-          for (const s of ds) r.push(await s.run())
+          // Như D1 thật: câu SELECT trong batch trả `results` (câu ghi trả `meta.changes`).
+          for (const s of ds) r.push(/^\s*(SELECT|WITH)\b/i.test((s as unknown as { _q?: string })._q ?? '') ? await s.all() : await s.run())
           sql.exec('COMMIT')
           return r
         } catch (e) {
