@@ -200,12 +200,12 @@ export default function TheCauChiTiet({ c, stt, mauSo, anLoiGiai = false, tick, 
                           {c.anhLuaChon?.[i] ? <Hinh src={c.anhLuaChon[i]} lop="pa" alt={`Phương án ${k}`} /> : <ChemText text={pa} />}
                           <HinhTaiViTri c={c} viTri={`sau_pa_${k}`} />
                           {laDung && (
-                            <span className="bc-co" style={{ background: 'var(--p-xanh)', color: 'var(--p-trang)' }}>
+                            <span className="bc-co" style={{ background: 'var(--p-xanh-dam)', color: 'var(--p-trang)' }}>
                               đáp án đúng
                             </span>
                           )}
                           {emChon && (laDung ? false : true) && (
-                            <span className="bc-co" style={{ background: anLoiGiai ? 'var(--p-chim)' : 'var(--p-do)', color: anLoiGiai ? 'var(--p-nhat)' : 'var(--p-trang)' }}>
+                            <span className="bc-co" style={{ background: anLoiGiai ? 'var(--p-chim)' : 'var(--p-do-dam)', color: anLoiGiai ? 'var(--p-nhat)' : 'var(--p-trang)' }}>
                               em chọn
                             </span>
                           )}

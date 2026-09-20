@@ -128,6 +128,10 @@
   --p-vien: #e5e7eb;
   --p-xanh: #10b981;
   --p-do: #ef4444;
+  /* BẢN ĐẬM cho CHỮ TRẮNG nằm trên nền xanh / đỏ (huy hiệu "đáp án đúng" / "em chọn" 10,5 px của thẻ câu): trắng trên --p-xanh chỉ 2,54:1,
+   * trên --p-do 3,76:1. Hai bản đậm này đạt ≥ 4,5:1 (khoá bằng the-cau-chi-tiet-nhan-1909.test.ts). Như cả nhóm --p-*: không redefine ở nền tối. */
+  --p-xanh-dam: #047857;
+  --p-do-dam: #b91c1c;
   --p-cam: #f59e0b;
   --p-tim: #6366f1;
   --p-tim-2: #8b5cf6;

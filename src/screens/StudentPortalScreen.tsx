@@ -1143,29 +1143,31 @@ export default function StudentPortalScreen() {
               )}
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label htmlFor="hs-mk-moi" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                   Mật khẩu mới
                 </label>
                 <input
+                  id="hs-mk-moi"
                   type="password"
                   value={matKhauMoi}
                   onChange={(e) => setMatKhauMoi(e.target.value)}
                   placeholder="Nhập mật khẩu mới..."
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition"
+                  className="w-full min-h-[48px] px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label htmlFor="hs-mk-xac-nhan" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                   Xác nhận mật khẩu
                 </label>
                 <input
+                  id="hs-mk-xac-nhan"
                   type="password"
                   value={xacNhanMatKhau}
                   onChange={(e) => setXacNhanMatKhau(e.target.value)}
                   placeholder="Nhập lại mật khẩu..."
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition"
+                  className="w-full min-h-[48px] px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition"
                   required
                 />
               </div>
@@ -1174,14 +1176,14 @@ export default function StudentPortalScreen() {
                 <button
                   type="button"
                   onClick={() => setChuaCoMatKhau(false)}
-                  className="w-1/3 py-2.5 px-3 rounded-full btn-google-outlined text-sm font-semibold cursor-pointer"
+                  className="w-1/3 min-h-[48px] py-2.5 px-3 rounded-full btn-google-outlined text-sm font-semibold cursor-pointer"
                 >
                   Quay lại
                 </button>
                 <button
                   type="submit"
                   disabled={dangDatMatKhau}
-                  className="w-2/3 py-2.5 px-4 rounded-full btn-google-primary text-sm shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                  className="w-2/3 min-h-[48px] py-2.5 px-4 rounded-full btn-google-primary text-sm shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                 >
                   {dangDatMatKhau ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
                   <span>Xác nhận & Đăng nhập</span>
@@ -1198,15 +1200,16 @@ export default function StudentPortalScreen() {
               )}
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label htmlFor="hs-dn-sbd" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                   Số báo danh (SBD)
                 </label>
                 <input
+                  id="hs-dn-sbd"
                   type="text"
                   value={sbdInput}
                   onChange={(e) => setSbdInput(e.target.value)}
                   placeholder="Ví dụ: 110234 hoặc 12026"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-mono transition"
+                  className="w-full min-h-[48px] px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-mono transition"
                   required
                   autoFocus
                 />
@@ -1214,7 +1217,7 @@ export default function StudentPortalScreen() {
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  <label htmlFor="hs-dn-mat-khau" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                     Mật khẩu
                   </label>
                   <span className="text-[11px] text-slate-400">
@@ -1223,16 +1226,18 @@ export default function StudentPortalScreen() {
                 </div>
                 <div className="relative">
                   <input
+                    id="hs-dn-mat-khau"
                     type={hienMatKhau ? 'text' : 'password'}
                     value={matKhauInput}
                     onChange={(e) => setMatKhauInput(e.target.value)}
                     placeholder="Nhập mật khẩu của em..."
-                    className="w-full px-4 py-2.5 pr-10 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition"
+                    className="w-full min-h-[48px] px-4 py-2.5 pr-12 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition"
                   />
                   <button
                     type="button"
                     onClick={() => setHienMatKhau(!hienMatKhau)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                    aria-label={hienMatKhau ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
                   >
                     {hienMatKhau ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -1242,7 +1247,7 @@ export default function StudentPortalScreen() {
               <button
                 type="submit"
                 disabled={dangXuLyDangNhap}
-                className="btn-google-primary w-full py-3 px-4 text-sm disabled:opacity-50 mt-3 shadow-sm cursor-pointer"
+                className="btn-google-primary w-full min-h-[48px] py-3 px-4 text-sm disabled:opacity-50 mt-3 shadow-sm cursor-pointer"
               >
                 {dangXuLyDangNhap ? <RefreshCw className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
                 <span>Đăng nhập</span>
