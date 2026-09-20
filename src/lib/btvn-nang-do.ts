@@ -23,7 +23,7 @@ export const BTVN_NANG_DO = {
   NGUONG_DANG_YEU: 0.7,
   /** Mỗi dạng YẾU của em có ít nhất bấy nhiêu câu trong bộ (khi kho còn và ngân sách đủ). */
   DANG_YEU_TOI_THIEU_CAU: 2,
-  /** Câu thử thách (+1 bậc): mục tiêu 15 %, TRẦN 20 % bộ, mỗi chặng tối đa một câu (đứng cuối chặng). */
+  /** Câu thử thách (+1 bậc): mục tiêu 15 %, TRẦN 20 % (làm tròn xuống, có thể 0) của phần NGOÀI lõi, mỗi chặng tối đa một câu (đứng cuối chặng). */
   TL_THU_THACH: 0.15,
   TL_THU_THACH_TOI_DA: 0.2,
   /** Mở +1 bậc đích khi em đã đúng (khắc phục hoặc chưa từng sai) ≥ bấy nhiêu câu ở BẬC HIỆN TẠI của dạng trong bài này. */
@@ -150,7 +150,7 @@ export interface BoCuaEm {
   loi: string[]
   /** Phần riêng chọn theo hồ sơ (không gồm thử thách). */
   rieng: string[]
-  /** Câu +1 bậc so với bậc đích, chỉ ở dạng em đang ổn; ≤ 20 % bộ. */
+  /** Câu +1 bậc so với bậc đích, chỉ ở dạng em đang ổn; ≤ 20 % (làm tròn xuống) của phần NGOÀI lõi. */
   thuThach: string[]
   /** Các chặng theo ngày (chặng đầu = ngày đầu); MỖI chặng: 2 khởi động → lõi → dạng yếu → củng cố → (câu lõi cao) → thử thách đứng cuối. */
   chang: string[][]
@@ -428,8 +428,10 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
 
   // ── số chỗ: tổng = min(ngân sách, số câu có thể cho) ──
   const conCho = Math.max(0, nganSachCau - loiIdx.length)
-  const tranThu = Math.min(Math.floor(D.TL_THU_THACH_TOI_DA * nganSachCau), soNgay)
-  const mucThu = Math.min(tranThu, Math.max(ungThu.length > 0 ? 1 : 0, Math.round(D.TL_THU_THACH * nganSachCau)))
+  // THỬ THÁCH tính trên CHỖ TRỐNG SAU LÕI, không trên cả bộ (Boss 21/09 — sửa lỗi cũ: ngân sách chỉ hơn lõi vài câu mà nhiều ngày thì toàn bộ chỗ trống thành thử thách):
+  // ≤ 20 % (làm tròn xuống, có thể bằng 0), mục tiêu 15 %, mỗi chặng tối đa một. Chỗ còn lại theo thứ tự: dạng YẾU đúng bậc đích → củng cố → (thử thách ở trên).
+  const tranThu = Math.min(Math.floor(D.TL_THU_THACH_TOI_DA * conCho), soNgay)
+  const mucThu = Math.min(tranThu, Math.round(D.TL_THU_THACH * conCho))
   const soThu = Math.min(conCho, ungThu.length, mucThu)
   const choRieng = Math.max(0, conCho - soThu)
 
@@ -478,8 +480,8 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
     }
   }
 
-  // Trần 20 % tính trên bộ THẬT (phần riêng có thể ít hơn chỗ trống): bớt câu thử thách kém ưu tiên nhất tới khi vừa.
-  while (chonThu.length > 0 && chonThu.length > Math.floor(D.TL_THU_THACH_TOI_DA * (loiIdx.length + chonRieng.length + chonThu.length))) chonThu.pop()
+  // Trần 20 % tính trên phần NGOÀI lõi THẬT (phần riêng có thể ít hơn chỗ trống): bớt câu thử thách kém ưu tiên nhất tới khi vừa.
+  while (chonThu.length > 0 && chonThu.length > Math.floor(D.TL_THU_THACH_TOI_DA * (chonRieng.length + chonThu.length))) chonThu.pop()
 
   // ── NHÃN + CHẶNG ──
   const rieng = [...chonRieng].sort((a, b) => a - b)

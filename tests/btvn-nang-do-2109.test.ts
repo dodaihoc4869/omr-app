@@ -241,8 +241,48 @@ describe('chonBoCuaEm — tính chất trên nhiều em', () => {
           expect(c.mucDo, `${ten} thử thách ${q}`).toBe(t.bac + 1)
           expect(t.yeu, `${ten} thử thách ở dạng yếu ${q}`).toBe(false)
         }
-        expect(bo.thuThach.length, ten).toBeLessThanOrEqual(Math.floor(0.2 * tapCua(bo).length))
+        expect(bo.thuThach.length, ten).toBeLessThanOrEqual(Math.floor(0.2 * (bo.rieng.length + bo.thuThach.length))) // ≤ 20 % phần NGOÀI lõi, làm tròn xuống
       }
+  })
+
+  it('BOSS — CHỖ TRỐNG SAU LÕI ÍT: em yếu, ngân sách = lõi + 3 ⇒ 0 thử thách, 3 câu đều đúng bậc đích ở dạng YẾU; thử thách ≤ 20 % phần ngoài lõi (làm tròn xuống) ở mọi cỡ ngân sách', () => {
+    const ho = emYeu()
+    const bo = chonBoCuaEm(CAU, LOI, ho, NS(1, LOI.length + 3, 0), 'B1|it')
+    expect(bo.thuThach).toEqual([])
+    expect(bo.rieng).toHaveLength(3)
+    for (const q of bo.rieng) {
+      const c = CAU.find((x) => x.qid === q)!
+      const t = bacDichTest(ho, CAU, maDangCua(c))
+      expect(t.yeu, `${q} phải ở dạng yếu`).toBe(true)
+      expect(c.mucDo, `${q} đúng bậc đích`).toBe(t.bac)
+    }
+    // "7 ngày × 4 câu/ngày" từng làm toàn bộ chỗ trống thành thử thách: nay chỗ trống là phần riêng
+    const bay = chonBoCuaEm(CAU, LOI, rong(), NS(7, 4, 0), 'B1|it')
+    expect(bay.tomTat.nganSachCau).toBe(28)
+    expect(bay.thuThach).toEqual([])
+    expect(bay.rieng).toHaveLength(4)
+    // mọi số chỗ trống 0..40 × 3 kiểu em × nhiều số ngày: thử thách ≤ floor(20 % phần ngoài lõi) và ≤ số chặng
+    for (const tao of [rong, emYeu, emTB, emKha])
+      for (const soNgay of [1, 3, 7, 14])
+        for (let them = 0; them <= 40; them++) {
+          const b = chonBoCuaEm(CAU, LOI, tao(), { soNgay, cauMoiNgay: Math.ceil((LOI.length + them) / soNgay), onLaiMoiNgay: 0 }, 'B1|it')
+          const ngoaiLoi = b.rieng.length + b.thuThach.length
+          expect(b.thuThach.length, `${tao.name} ${soNgay} ngày +${them}`).toBeLessThanOrEqual(Math.floor(0.2 * ngoaiLoi))
+          expect(b.thuThach.length).toBeLessThanOrEqual(b.chang.length)
+          expect(b.tomTat.tong).toBeLessThanOrEqual(Math.max(LOI.length, b.tomTat.nganSachCau))
+        }
+  })
+
+  it('THỨ TỰ LẤP chỗ trống: dạng yếu đúng bậc đích → củng cố → thử thách (chỗ trống 10 ⇒ ưu tiên dạng yếu, thử thách ≤ 2)', () => {
+    const ho = emYeu()
+    const bo = chonBoCuaEm(CAU, LOI, ho, NS(1, LOI.length + 10, 0), 'B1|tt')
+    const yeuDungBac = bo.rieng.filter((q) => {
+      const c = CAU.find((x) => x.qid === q)!
+      const t = bacDichTest(ho, CAU, maDangCua(c))
+      return t.yeu && c.mucDo === t.bac
+    })
+    expect(yeuDungBac.length).toBeGreaterThanOrEqual(Math.min(6, bo.rieng.length)) // dạng yếu (kho còn) chiếm phần lớn phần riêng
+    expect(bo.thuThach.length).toBeLessThanOrEqual(1) // 1 ngày ⇒ tối đa 1 chặng ⇒ tối đa 1 thử thách
   })
 
   it('EM CHƯA HỒ SƠ ⇒ lõi + Biết/Hiểu: phần riêng chỉ Biết, thử thách chỉ Hiểu; không Vận dụng ngoài lõi', () => {
@@ -464,8 +504,10 @@ describe('theTienBo — chỉ số đếm, so em với chính em', () => {
 // ───────────────────────── CỔNG ĐIỀU CHỈNH `dieuChinh` ─────────────────────────
 describe('chonBoCuaEm — cổng `dieuChinh` (bộ não đêm)', () => {
   const LOI = chonLoi(CAU, [])
-  /** Chữ ký vàng của kết quả TRƯỚC khi có cổng (tính bằng đúng bản 569ebfd): 60 em ngẫu nhiên × 6 ngân sách (hạt giống cố định). Đổi số này = đổi hành vi khi vắng cổng — phải có lý do. */
-  const VANG = 1036170693
+  /** Chữ ký vàng của kết quả khi VẮNG cổng: 60 em ngẫu nhiên × 6 ngân sách (hạt giống cố định). Đổi số này = đổi hành vi khi vắng cổng — phải có lý do.
+   * Lịch sử: 1036170693 = bản 569ebfd (đã kiểm: bản có cổng cho đúng số ấy). 21/09 Boss QUYẾT sửa cách chia chỗ trống (thử thách tính trên phần NGOÀI lõi, ≤ 20 % làm tròn xuống)
+   * ⇒ số mới 1419150711; chưa có gì của lõi lên máy chủ nên đổi kết quả không hại. */
+  const VANG = 1419150711
   const NS6: [number, number, number][] = [[7, 12, 3], [7, 10, 4], [5, 16, 2], [3, 8, 8], [14, 16, 0], [1, 12, 2]]
   const chuKy = (dc?: DieuChinhEm | null) => {
     let x = 0
@@ -644,7 +686,7 @@ describe('chonBoCuaEm — cổng `dieuChinh` (bộ não đêm)', () => {
           const c = CAU.find((x) => x.qid === q)!
           expect(c.mucDo, `em ${sd} ${q}`).toBeLessThanOrEqual(bacDichTest(ho, CAU, maDangCua(c)).bac + 1)
         }
-        expect(bo.thuThach.length).toBeLessThanOrEqual(Math.floor(0.2 * tap.length))
+        expect(bo.thuThach.length).toBeLessThanOrEqual(Math.floor(0.2 * (bo.rieng.length + bo.thuThach.length)))
       }
     }
   })
