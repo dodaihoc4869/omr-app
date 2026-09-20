@@ -15,6 +15,6 @@ export function DaiCanhBaoRoiM3({ muc, loi }: { muc: 'nhe' | 'dam'; loi: string 
 }
 
 /** Khung của thẻ "BÀI THI ĐÃ KHOÁ": errorContainer, chữ onErrorContainer (thay TheNoiDung). Nội dung bên trong do màn thi truyền vào, không đổi. */
-export function KhungKhoaM3({ children }: { children?: ReactNode }) {
+export function KhungKhoaM3({ children }: { children: ReactNode }) {
   return <div className="thi-khoa">{children}</div>
 }

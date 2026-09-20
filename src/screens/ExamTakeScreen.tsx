@@ -2807,7 +2807,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   if (phase === 'submitted') {
     if (attempt?.integrity.blocked && !xemLai) {
       // Đường học sinh (dungM3): thẻ khoá errorContainer theo bản vẽ ThiVaoVaKhoa; MỌI chữ, nút, điều kiện bên trong giữ nguyên.
-      const KhungKhoa: React.ComponentType<{ children?: React.ReactNode }> = dungM3() ? KhungKhoaM3 : TheNoiDung
+      const KhungKhoa: React.ComponentType<{ children: React.ReactNode }> = dungM3() ? KhungKhoaM3 : TheNoiDung
       return (
         <Trang className="flex items-center justify-center px-4">
           <div className="w-full" style={{ maxWidth: 400 }}>

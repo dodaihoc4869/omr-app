@@ -72,7 +72,7 @@ describe('nối vào màn thi (khoá nguồn)', () => {
   })
 
   it('thẻ khoá bài: khung chọn theo dungM3, biểu tượng khoá chỉ ở M3 (cũ giữ TriangleAlert), MỌI câu chữ và điều kiện cũ còn nguyên', () => {
-    expect(man).toContain("const KhungKhoa: React.ComponentType<{ children?: React.ReactNode }> = dungM3() ? KhungKhoaM3 : TheNoiDung")
+    expect(man).toContain("const KhungKhoa: React.ComponentType<{ children: React.ReactNode }> = dungM3() ? KhungKhoaM3 : TheNoiDung")
     expect(man).toContain("{dungM3() ? <Lock size={32} aria-hidden=\"true\" /> : <TriangleAlert size={40} style={{ color: 'var(--do)' }} />}")
     expect((man.match(/<KhungKhoa>/g) || []).length).toBe(1)
     expect((man.match(/<\/KhungKhoa>/g) || []).length).toBe(1)
