@@ -731,8 +731,8 @@ function NutXemDeDaLam({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: bool
     }
   }
 
-  // Nút nằm trong thẻ GIẤY của báo cáo (nền trắng cả khi máy bật chế độ tối), nên dưới M3 nó GIỮ bảng --p-* và chỉ đổi
-  // số đo qua biến `--xem-de-*` (đích chạm 46 → 48 px). KhungXemPhieu bên dưới tự mặc M3 theo dungM3().
+  // Nút nằm trong thẻ GIẤY của báo cáo (nền trắng cả khi máy bật chế độ tối), nên dưới M3 nó GIỮ bảng --p-* (họ màu chàm) và chỉ đổi
+  // số đo + chàm ĐẬM HƠN cho chữ (--p-tim 4,47:1 trên giấy, thiếu 0,03) qua biến `--xem-de-*`. KhungXemPhieu bên dưới tự mặc M3.
   return (
     <div style={{ marginTop: 14 }} className={dungM3() ? 'm3-phieu-xem-de' : undefined}>
       <button
@@ -745,7 +745,7 @@ function NutXemDeDaLam({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: bool
           border: '1.5px solid var(--p-tim)',
           borderRadius: 12,
           background: 'var(--p-giay)',
-          color: 'var(--p-tim)',
+          color: 'var(--xem-de-chu, var(--p-tim))',
           fontFamily: 'var(--sans)',
           fontSize: 14.5,
           fontWeight: 700,

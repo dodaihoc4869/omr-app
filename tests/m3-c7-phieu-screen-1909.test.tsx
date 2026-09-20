@@ -93,7 +93,7 @@ describe('nút "Xem đề … vừa làm" (trong thẻ giấy của báo cáo)',
     const st = nut.getAttribute('style')!
     expect(st).toContain('border: 1.5px solid var(--p-tim)')
     expect(st).toContain('background: var(--p-giay)')
-    expect(st).toContain('color: var(--p-tim)')
+    expect(st).toContain('color: var(--xem-de-chu, var(--p-tim))')
     expect(st).not.toContain('--m3-')
     // báo cáo (giấy trắng mực đen) không bị đóng dấu m3
     expect(document.querySelector('.bc')!.className).toBe('bc')
@@ -132,6 +132,11 @@ describe('m3/phieu-screen.css', () => {
   it('nút xem đề: chỉ đổi SỐ ĐO (48 px) — tuyệt đối không có màu --m3-* (chữ primary của chế độ tối sẽ rơi lên giấy trắng); vòng focus dùng --p-tim', () => {
     const r = luat('.m3-phieu-xem-de')
     expect(r).toMatch(/--xem-de-cao:\s*48px/)
+    // chữ chàm đậm hơn --p-tim (#6366f1 = 4,47:1 trên giấy trắng): rgb(67 56 202) ≥ 4,5:1 — tính từ chính giá trị trong CSS
+    const chu = /--xem-de-chu:\s*rgb\((\d+) (\d+) (\d+)\)/.exec(r)!.slice(1).map(Number)
+    const f = (v: number) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)
+    const L = 0.2126 * f(chu[0]) + 0.7152 * f(chu[1]) + 0.0722 * f(chu[2])
+    expect(1.05 / (L + 0.05)).toBeGreaterThanOrEqual(4.5)
     expect(r).not.toContain('--m3-')
     expect(luat('.m3-phieu-xem-de button:focus-visible')).toMatch(/outline:\s*3px solid var\(--p-tim\)/)
   })
