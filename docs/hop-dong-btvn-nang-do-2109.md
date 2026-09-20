@@ -1,6 +1,6 @@
 # HỢP ĐỒNG — BTVN "NÂNG ĐỠ": máy chủ ↔ app thầy (Code 4) ↔ app học sinh + phụ huynh (Code 2)
 
-Người viết: Code 3 (máy chủ), 21/09/2026. Thiết kế: `DE-XUAT-BTVN-NANG-DO-2109.md`; đề bài: `prompt-btvn-nang-do.md`; lõi thuần: `src/lib/btvn-nang-do.ts` (Code 1, máy chủ import như `doan-core`; kiểu `CauGiao`, `HoSoEmRut`, `NganSachBai`, `BoCuaEm`, `TomTatBo`, `NhanCau` dùng nguyên văn).
+Người viết: Code 3 (máy chủ), 21/09/2026. Thiết kế: `DE-XUAT-BTVN-NANG-DO-2109.md`; đề bài: `prompt-btvn-nang-do.md`; lõi thuần: `src/lib/btvn-nang-do.ts` (Code 1, máy chủ import như `doan-core`; kiểu `CauGiao`, `HoSoEmRut`, `NganSachBai`, `BoCuaEm`, `TomTatBo`, `NhanCau` (có `loi_cao`), `TienBo` dùng nguyên văn).
 **ĐỔI LUẬT CHẤM BTVN (thầy duyệt 21/09): điểm tính trên SỐ CÂU CỦA TỪNG EM.** Bài `ca_nhan = 0` và mọi bài đang chạy: chạy Y NHƯ CŨ, từng byte phản hồi. Chưa đẩy Worker khi Boss chưa soát.
 
 ## 0 · Hiện trạng đã dò (để khỏi dò lại)
@@ -17,7 +17,7 @@ Người viết: Code 3 (máy chủ), 21/09/2026. Thiết kế: `DE-XUAT-BTVN-NA
 - Cờ toàn cục `cau_hinh.btvn_ca_nhan`: vắng = BẬT; `false`/`0`/`{"tat":true}` = TẮT. TẮT chỉ làm `caNhan` của lượt giao MỚI bị bỏ qua (bài thành `ca_nhan=0`); bài `ca_nhan=1` đang chạy giữ nguyên bộ đã chốt.
 
 ## 2 · `POST /btvn/giao` (thầy, mã bí mật) — thêm trường VÀO
-`caNhan?: boolean` · `cau?: CauGiao[]` (≤ 300; `{qid, dang|null, chuyenDe, mucDo 0|1|2, sao 0|1|2, phan}`) · `ghim?: string[]` (qid cả lớp bắt buộc) · `hatGiong?: string` (≤ 40 ký tự, máy thầy sinh MỘT lần cho mỗi hộp thoại giao; dùng chung với `/btvn/xem-truoc` để bộ xem trước = bộ thật; vắng ⇒ máy chủ dùng `ma_btvn`). Vắng `caNhan` hoặc `false` ⇒ như cũ.
+`caNhan?: boolean` · `cau?: CauGiao[]` (≤ 300; `{qid, dang|null, chuyenDe, mucDo 0|1|2, sao 0|1|2, phan}`) · `ghim?: string[]` (qid cả lớp bắt buộc; TUỲ CHỌN: vắng hoặc `[]` đều hợp lệ) · `hatGiong?: string` (≤ 40 ký tự, máy thầy sinh MỘT lần cho mỗi hộp thoại giao; dùng chung với `/btvn/xem-truoc` để bộ xem trước = bộ thật; vắng ⇒ máy chủ dùng `ma_btvn`). Vắng `caNhan` hoặc `false` ⇒ như cũ.
 Bài `caNhan`: `cau[]` đối chiếu với các qid thật của tờ đề (`homeworkQuestions`): qid lạ bị bỏ (`boQuaQid`), qid của tờ mà `cau[]` thiếu được điền `{dang:null, chuyenDe:'', mucDo:0, sao:0}` (đếm ở `thieuMeta`). Máy chủ chạy `chonLoi(cau, ghim)`, ghi `btvn_cau` + `btvn.so_loi`. Đề nghị máy thầy gửi ĐỦ mọi câu của bài.
 Ra thêm: `caNhan`, `soLoi`, `hatGiong`, `boQuaQid: string[]`, `thieuMeta: number`, `canhBao?: 'loi_it_hon_6'` (lõi < 6 câu ⇒ so chống chép bài không đủ mẫu; vẫn giao).
 
@@ -25,16 +25,20 @@ Ra thêm: `caNhan`, `soLoi`, `hatGiong`, `boQuaQid: string[]`, `thieuMeta: numbe
 Bài `ca_nhan=0`: KHÔNG đổi. Bài `ca_nhan=1`, lần đầu (hoặc lần đầu kế hoạch ngày cần) máy chủ CHỐT bộ của em: đọc `nam_kt_dang`/`nam_kt_cau`/`su_kien_hoc` (số ngày đúng của từng câu) + ngân sách ngày của em, gọi `chonBoCuaEm(cau, loi, hoSo, nganSach, "<hatGiong>|<sbd>")`, ghi `btvn_em_cau` + các cột `btvn_em` — MỘT lần, các lần mở sau đọc lại đúng bộ ấy. Ra (thêm vào phản hồi cũ):
 - `caNhan: true` · `soCau` = SỐ CÂU CỦA EM (không còn là số của bài) · `soCauCuaEm` (cùng số) · `soChang` · `loDaXong` (= số chặng đã xong, giữ tên cũ) · `changDangMo` (chỉ số chặng em làm bây giờ, 0-based; `null` khi đã xong hết).
 - `chang: [{ chiSo, soCau, moLuc: ISO, daMo: boolean, daXong: boolean }]` (mọi chặng, KHÔNG có danh sách câu của chặng chưa mở).
-- `nhan: Record<qid, 'loi'|'khoi_dong'|'dang_yeu'|'cung_co'|'thu_thach'>` cho câu đã mở; `tomTat: TomTatBo` (chỉ số đếm cho đầu bài "Bài của riêng em: N câu · K chặng").
+- `nhan: Record<qid, 'loi'|'khoi_dong'|'dang_yeu'|'cung_co'|'thu_thach'|'loi_cao'>` cho câu đã mở; `tomTat: TomTatBo` (chỉ số đếm cho đầu bài "Bài của riêng em: N câu · K chặng").
 - `de: { ma_de, cau[] }` CHỈ gồm câu của các chặng ĐÃ MỞ (theo thứ tự chặng → thứ tự trong chặng), mỗi câu đúng dạng cũ + `qid`. Đã nộp thì trả MỌI câu của em (xem lại).
 - Mở chặng: chặng 0 mở ngay lúc chốt; chặng k > 0 mở khi CHẶNG k−1 ĐÃ XONG và `now ≥ moLuc[k]` (`moLuc[k]` = 00:00 giờ VN của ngày thứ k kể từ ngày chốt, không muộn hơn hạn nộp). Đợt 2: "Em muốn làm thêm" mở sớm.
 - Không đưa số câu/bộ của bạn khác; không có xếp hạng.
 Lỗi mới: `lyDo:'chua_chot'` không có (luôn chốt được); nếu hồ sơ không đọc được ⇒ chốt bằng hồ sơ rỗng (lõi + Biết/Hiểu), không lỗi.
 
-## 4 · Nộp và chấm
-- `POST /btvn/nop {maBtvn, sbd, dapAn}` (đầu vào KHÔNG đổi): bài `ca_nhan` chấm trên tập câu CỦA EM (`btvn_em_cau`); `soCau` = số câu của em; `soDung`, `qidSai` chỉ trong tập ấy; sổ `su_kien_hoc` và EXP giữ công thức cũ nhưng chỉ cho câu của em. Đáp án ngoài tập của em bị bỏ, không lỗi. Phản hồi thêm `caNhan:true`. Điểm = `soDung / soCau × 10` với `soCau` = câu của em.
-- `POST /btvn/xong-lo {maBtvn, sbd, chiSo, dapAn?}`: bài `ca_nhan`: `chiSo` = chặng. `chiSo ≥ soChang` hoặc chặng CHƯA MỞ ⇒ `{ok:false, lyDo:'chang_chua_mo'}`. Có `dapAn` ⇒ chấm chỉ câu của chặng ấy (ghi sổ nguồn `btvn_lo`, `lan = chiSo`). Ra thêm `changDangMo`.
-- `POST /hs/btvn` (danh sách): mỗi item thêm `caNhan`, `soCauCuaEm` (null khi CHƯA chốt), `soChang`; `diem`, `soCau` của bài `ca_nhan` theo câu của em.
+## 4 · Nộp và chấm — LUẬT ĐIỂM (thầy duyệt 21/09: "thử thách sai không bị trừ")
+- Câu THƯỞNG = câu nhãn `thu_thach` hoặc `loi_cao` của em. **Đúng ⇒ vào CẢ tử và mẫu điểm; sai (kể cả bỏ trống) ⇒ KHÔNG vào mẫu.** Điểm = `soDung / mẫu × 10` với `soDung` = số câu đúng trong bộ của em (kể cả thưởng đúng) và `mẫu` = |bộ của em| − số câu thưởng SAI. Câu thường (loi, khoi_dong, dang_yeu, cung_co) sai vẫn nằm trong mẫu.
+- `POST /btvn/nop {maBtvn, sbd, dapAn}` (đầu vào KHÔNG đổi): bài `ca_nhan` chấm trên tập câu CỦA EM (`btvn_em_cau`); đáp án ngoài tập bị bỏ, không lỗi. Ra: `soDung`, `soCau` = **MẪU điểm** (đúng thứ máy khách đang chia để ra điểm; đã trừ thưởng sai), `soCauCuaEm` = |bộ của em|, `soCauThuongSai` (số câu thưởng sai không tính), `qidSai` (như cũ, gồm cả thưởng sai), `caNhan:true`. Cột `btvn_em.so_cau` lưu MẪU, `so_cau_em` lưu |bộ|; `hsBtvn` tính `diem = so_dung / so_cau × 10` không đổi công thức. Sổ `su_kien_hoc` và EXP giữ công thức cũ (mọi câu đã làm vẫn ghi sổ, kể cả thưởng sai — hồ sơ cần biết).
+- Thống kê LÕI để so lớp (`diemLoi`, mục 6) tính `loi_cao` BÌNH THƯỜNG (đúng/lõi), không áp luật thưởng.
+- `POST /btvn/xong-lo {maBtvn, sbd, chiSo, dapAn?}` = NỘP CHẶNG. Bài `ca_nhan`: `chiSo` = chặng. `chiSo ≥ soChang` hoặc chặng CHƯA MỞ ⇒ `{ok:false, lyDo:'chang_chua_mo'}`. Nên gửi `dapAn` của chặng: máy chủ chấm CHỈ câu của chặng ấy (ghi sổ nguồn `btvn_lo`, `lan = chiSo`), cộng EXP, rồi trả (KHÔNG lộ đáp án, KHÔNG có `qidSai`):
+  `{ ok, loDaXong, changDangMo, chang: {chiSo, soCau, soDung}, exp: {homNay, conLaiLenCap}, tienBo: TienBo & {dangLenBac[].ten}, expNhan?, manhNhan? }`.
+  `exp.homNay` = EXP học tập hôm nay (`docExpHomNay`); `conLaiLenCap` = EXP còn thiếu để lên cấp thú (`null` khi em chưa có thần thú). `tienBo` = `theTienBo(hồ sơ TRƯỚC chặng, hồ sơ SAU chặng)` của lõi Code 1: `dangLenBac[{ma, ten, tu, den}]`, `soCauDungLai`, `soCauMoiGap`, `soDangMoi`, `coTienBo` (chỉ số đếm; không có `coTienBo` ⇒ thẻ im). Không gửi `dapAn` ⇒ chỉ đánh dấu xong chặng như cũ, KHÔNG có `chang`/`exp`/`tienBo`.
+- `POST /hs/btvn` (danh sách): mỗi item thêm `caNhan`, `soCauCuaEm` (null khi CHƯA chốt), `soChang`; `diem`, `soCau` của bài `ca_nhan` theo mẫu ở trên.
 
 ## 5 · `POST /btvn/xem-truoc` (thầy, mã bí mật) — MỚI, CHỈ ĐỌC (0 INSERT/UPDATE; test khoá)
 Vào: `{ dsSbd: string[] ≤ 50, sbdChiTiet?: string }` VÀ một trong hai:
@@ -43,7 +47,7 @@ Vào: `{ dsSbd: string[] ≤ 50, sbdChiTiet?: string }` VÀ một trong hai:
 Ra: `{ ok, hatGiong, soCauBai, soLoi, loi: string[], ds: [{ sbd, hoTen, daChot: boolean, coHoSo: boolean, nganSach: {soNgay, cauMoiNgay, onLaiMoiNgay}, tomTat: TomTatBo }], chiTiet?: { sbd, chang: string[][], nhan: Record<qid, NhanCau> } }`. Em đã chốt (chỉ có ở (b)) trả ĐÚNG bộ đã ghi; em chưa chốt trả bộ TÍNH THỬ bằng cùng hạt giống, cùng hàm, hồ sơ hiện tại (nếu hồ sơ đổi trước khi em mở bài thì bộ thật có thể khác; màn ghi rõ "Bộ câu của em chốt khi em mở bài"). `chiTiet` chỉ có cho `sbdChiTiet` (giữ payload nhỏ). Không ghi `btvn_em_cau`.
 
 ## 6 · `POST /btvn/theo-doi` (thầy) và `/btvn/bai-lam`
-- Mỗi bài thêm `caNhan`, `soLoi`. Mỗi `hocSinh[]` thêm: `soCauCuaEm` (null nếu chưa chốt), `soChang`, `loDaXong` (= chặng đã xong), `soDungLoi`, `soCauLoi`, `diemLoi` (đúng/lõi ×10, so lớp CHỈ trên lõi). `soDung`/`soCau`/`diem` theo câu của em.
+- Mỗi bài thêm `caNhan`, `soLoi`. Mỗi `hocSinh[]` thêm: `soCauCuaEm` (null nếu chưa chốt), `soChang`, `loDaXong` (= chặng đã xong), `soDungLoi`, `soCauLoi`, `diemLoi` (đúng/lõi ×10, so lớp CHỈ trên lõi). `soDung`/`soCau`/`diem` theo câu của em và luật thưởng ở mục 4; `soCauThuongSai`.
 - Chống chép bài (`gian-lan-btvn.ts`): bài `ca_nhan` chỉ so trên câu LÕI (qid chung của mọi em; cần ≥ 6 câu chung — lõi < 6 ⇒ không đủ mẫu, không gắn cờ).
 - `/btvn/bai-lam {maBtvn, sbd}`: bài `ca_nhan` trả `de` chỉ gồm câu của em, kèm `caNhan`, `chang`, `nhan`; `soCau` = câu của em.
 
