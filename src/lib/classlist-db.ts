@@ -54,3 +54,13 @@ export async function findStudentBySbd(sbd: string): Promise<ClassListRow | unde
   const db = await getDb()
   return db.get(STORE, sbd)
 }
+
+/** Đổi TÊN một em trong danh sách lớp cất ở máy thầy (chỉ sau khi máy chủ đã đổi thật). Không đụng em khác, không xoá/ghi lại cả danh sách.
+ *  Trả `false` nếu máy này không có em đó. */
+export async function doiTenEmTrongDanhSachLop(sbd: string, hoTen: string): Promise<boolean> {
+  const db = await getDb()
+  const hang = (await db.get(STORE, sbd)) as ClassListRow | undefined
+  if (!hang) return false
+  await db.put(STORE, { ...hang, hoTen })
+  return true
+}

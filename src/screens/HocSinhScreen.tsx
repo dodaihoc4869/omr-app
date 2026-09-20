@@ -22,6 +22,9 @@ import { useAppStore } from '../store/appStore'
 import NutDongBoDanhSach from '../components/NutDongBoDanhSach'
 import NutThemHocSinh from '../components/NutThemHocSinh'
 import KhoiHoSoHocTap from '../components/KhoiHoSoHocTap'
+import DoiTenHocSinh from '../components/DoiTenHocSinh'
+import { doiTenEmTrongDanhSachLop } from '../lib/classlist-db'
+import type { KetQuaDoiTen } from '../lib/doi-ten-hs-api'
 import PhieuZaloEm from '../components/PhieuZaloEm'
 import './hoc-sinh-m3.css'
 
@@ -82,6 +85,7 @@ export default function HocSinhScreen() {
   const [lopLoc, setLopLoc] = useState('')
 
   const [hoSo, setHoSo] = useState<HoSoEm | null>(null)
+  const [lanTaiHoSo, setLanTaiHoSo] = useState(0) // tăng lên để tải lại hồ sơ (sau khi đổi tên)
   const [dangTaiHoSo, setDangTaiHoSo] = useState(false)
   const [caBaoCao, setCaBaoCao] = useState<HoSoEm['ca'][number] | null>(null)
   const [tabBaoCaoMo, setTabBaoCaoMo] = useState<string>('tong_quan')
@@ -121,7 +125,7 @@ export default function HocSinhScreen() {
       .then(setHoSo)
       .catch((e) => setLoi(e instanceof Error ? e.message : 'Không mở được hồ sơ'))
       .finally(() => setDangTaiHoSo(false))
-  }, [sbdDangXem, cauHinh])
+  }, [sbdDangXem, cauHinh, lanTaiHoSo])
 
   // Tự động bật luôn báo cáo mới chuẩn Google Material 3 khi chạm "Báo cáo"
   useEffect(() => {
@@ -196,6 +200,23 @@ export default function HocSinhScreen() {
     return hoSo.ca.find((c) => c.tong !== null) ?? hoSo.ca[0]
   }, [hoSo?.ca])
 
+  /** Máy chủ ĐÃ đổi tên thật (lệnh Đổi tên học sinh): cập nhật danh sách trên màn + danh sách lớp cất ở máy thầy, tải lại hồ sơ, báo thật. */
+  const xongDoiTen = async (k: KetQuaDoiTen) => {
+    const tenCu = k.tenCu || hoSo?.em.hoTen || ''
+    setDs((truoc) => (truoc === null ? truoc : truoc.map((e) => (e.sbd === k.sbd ? { ...e, hoTen: k.tenMoi } : e))))
+    let mayThayLech = false
+    try {
+      await doiTenEmTrongDanhSachLop(k.sbd, k.tenMoi)
+      const kho = useAppStore.getState()
+      kho.setClassList(kho.classList.map((h) => (h.sbd === k.sbd ? { ...h, hoTen: k.tenMoi } : h)))
+    } catch {
+      mayThayLech = true
+    }
+    setLanTaiHoSo((n) => n + 1)
+    showToast(`Đã đổi tên: «${tenCu}» → «${k.tenMoi}»`, 'success')
+    if (mayThayLech) showToast('Máy chủ đã đổi tên; danh sách lớp trên máy này chưa cập nhật được — đồng bộ lại danh sách lớp nếu thấy tên cũ.', 'warn')
+  }
+
   // Ca em nộp gần nhất — nơi nút "Cho thi lại" dẫn tới (việc xoá lượt + rút đề mới vẫn làm ở hàng của em trong ca, sau bước xác nhận).
   const caGanNhatCuaEm = useMemo(() => {
     if (!hoSo?.ca || hoSo.ca.length === 0) return null
@@ -224,9 +245,7 @@ export default function HocSinhScreen() {
                     {(hoSo.em.hoTen || '?').trim().slice(0, 1).toUpperCase()}
                   </div>
                   <div>
-                    <h2 className="hs-ho-so-ten">
-                      {hoSo.em.hoTen || `SBD ${hoSo.em.sbd}`}
-                    </h2>
+                    <DoiTenHocSinh sbd={hoSo.em.sbd} hoTen={hoSo.em.hoTen} onXong={xongDoiTen} />
                     <div className="hs-meta">
                       <span className="hs-sbd">
                         #{hoSo.em.sbd}

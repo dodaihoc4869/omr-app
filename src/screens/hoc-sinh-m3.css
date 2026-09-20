@@ -410,3 +410,72 @@
   background: var(--m3-tertiary-container);
   color: var(--m3-on-tertiary-container);
 }
+
+/* đổi tên học sinh (thầy lệnh 21/09) */
+.hs-ten-dong {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.hs-nut-but {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--m3-on-surface-variant);
+  cursor: pointer;
+}
+.hs-nut-but:hover {
+  background: var(--m3-surface-container-high);
+}
+.hs-nut-but:focus-visible {
+  outline: 2px solid var(--m3-primary);
+  outline-offset: 2px;
+}
+.hs-doi-ten {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.hs-doi-ten-hang {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.hs-doi-ten-o {
+  flex: 1 1 220px;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--m3-outline);
+  border-radius: 14px;
+  background: var(--m3-surface-container-lowest);
+  color: var(--m3-on-surface);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+}
+.hs-doi-ten-o:focus-visible {
+  outline: 2px solid var(--m3-primary);
+  outline-offset: 1px;
+}
+.hs-doi-ten-loi {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--m3-on-error-container);
+}
+.hs-doi-ten-ghi-chu {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--m3-on-surface-variant);
+}
