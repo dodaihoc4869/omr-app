@@ -14,6 +14,7 @@
 // Nhận chạm (`pointer-events: auto`): chạm đầu tiên chỉ để mở lại đề, không
 // lọt xuống nút đáp án bên dưới.
 import { Hand } from 'lucide-react'
+import { dungM3 } from './m3'
 import { CHU_TAM_PHU } from '../lib/giu-de-doc'
 
 /** Chiều cao thanh trên màn thi — cùng con số dải cảnh báo rời màn đang dùng. */
@@ -39,7 +40,14 @@ export default function ManGiuDeDoc() {
         touchAction: 'none',
       }}
     >
-      <Hand size={40} style={{ color: 'var(--mo)' }} />
+      {dungM3() ? (
+        // M3 (bản vẽ ThiGiuDeDoc): bàn tay lớn trong vòng tròn tonal có quầng — CHỈ đổi dáng; vị trí, z-index, nhận chạm ở thẻ ngoài không đổi.
+        <div className="thi-giu-de-tron">
+          <Hand size={52} strokeWidth={1.8} aria-hidden="true" />
+        </div>
+      ) : (
+        <Hand size={40} style={{ color: 'var(--mo)' }} />
+      )}
       <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-3)' }}>
         {CHU_TAM_PHU}
       </div>

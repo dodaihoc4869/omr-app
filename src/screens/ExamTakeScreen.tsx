@@ -59,13 +59,14 @@ import LogoHocSinh from '../components/LogoHocSinh'
 import { LogoDoc } from '../components/LogoVai'
 import PhongChoGame from '../components/PhongChoGame'
 import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
-import { TriangleAlert, X, ArrowLeft, LayoutGrid, Clock, Sparkles, Flag } from 'lucide-react'
+import { TriangleAlert, X, ArrowLeft, LayoutGrid, Clock, Sparkles, Flag, Lock } from 'lucide-react'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import { goiBaiThi } from '../lib/goi-bao-cao'
 import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
 import { docDuongVao } from '../lib/vai-tro'
 import { dungM3 } from '../components/m3'
 import ThanhTrenThiM3 from './ThanhTrenThiM3'
+import { DaiCanhBaoRoiM3, KhungKhoaM3 } from './ThongBaoThiM3'
 import DaiCauChuaLamM3, { KhungCauM3 } from './DaiCauChuaLamM3'
 import { docXemLai, doiDauXemLai, luuXemLai } from '../lib/xem-lai-sau'
 import { gradeFromKeyBank, type GradedSubmission } from '../lib/exam-grade'
@@ -2805,12 +2806,14 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   // ------------------------------------------------------------- ĐÃ NỘP BÀI
   if (phase === 'submitted') {
     if (attempt?.integrity.blocked && !xemLai) {
+      // Đường học sinh (dungM3): thẻ khoá errorContainer theo bản vẽ ThiVaoVaKhoa; MỌI chữ, nút, điều kiện bên trong giữ nguyên.
+      const KhungKhoa: React.ComponentType<{ children?: React.ReactNode }> = dungM3() ? KhungKhoaM3 : TheNoiDung
       return (
         <Trang className="flex items-center justify-center px-4">
           <div className="w-full" style={{ maxWidth: 400 }}>
-            <TheNoiDung>
+            <KhungKhoa>
               <div className="flex flex-col items-center text-center" style={{ gap: 'var(--k3)' }}>
-                <TriangleAlert size={40} style={{ color: 'var(--do)' }} />
+                {dungM3() ? <Lock size={32} aria-hidden="true" /> : <TriangleAlert size={40} style={{ color: 'var(--do)' }} />}
                 <div className="font-bold" style={{ fontSize: 'var(--cx-4)', color: 'var(--do)' }}>
                   BÀI THI ĐÃ KHOÁ
                 </div>
@@ -2840,7 +2843,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                   </div>
                 )}
               </div>
-            </TheNoiDung>
+            </KhungKhoa>
           </div>
         </Trang>
       )
@@ -3276,13 +3279,18 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 
 
       {/* DẢI CẢNH BÁO RỜI MÀN (mục 6) — dính dưới thanh trên, tự ẩn sau 15 giây */}
-      {canhBaoRoi && (
-        <div className="sticky z-30 px-3 sm:px-4" style={{ top: 56, paddingTop: 'var(--k2)', background: 'var(--nen)' }} role="alert" data-canh-bao={canhBaoRoi.muc}>
-          <OThongBao tone={canhBaoRoi.muc === 'dam' ? 'do' : 'cam'}>
-            <b>{canhBaoRoi.loi}</b>
-          </OThongBao>
-        </div>
-      )}
+      {canhBaoRoi &&
+        (dungM3() ? (
+          <div className="sticky z-30" style={{ top: 56 }} role="alert" data-canh-bao={canhBaoRoi.muc}>
+            <DaiCanhBaoRoiM3 muc={canhBaoRoi.muc} loi={canhBaoRoi.loi} />
+          </div>
+        ) : (
+          <div className="sticky z-30 px-3 sm:px-4" style={{ top: 56, paddingTop: 'var(--k2)', background: 'var(--nen)' }} role="alert" data-canh-bao={canhBaoRoi.muc}>
+            <OThongBao tone={canhBaoRoi.muc === 'dam' ? 'do' : 'cam'}>
+              <b>{canhBaoRoi.loi}</b>
+            </OThongBao>
+          </div>
+        ))}
 
       {/* HAI CỘT TRÊN MÀN RỘNG. Cột trái KHÔNG phải menu của thầy: em đang thi
           mà bên cạnh có "Ngân hàng câu hỏi" thì một chạm là ra hết đáp án. Cột
