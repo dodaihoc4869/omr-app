@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Search } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
-import { cauLyDo, hanhDongCua, layCauToiHan, layHomNay, NHAN_HANH_DONG, ngayDai, phanTram, thuCuaHan, type CauToiHan, type HomNay, type HomNayEm } from '../lib/hom-nay-api'
+import { cauLyDo, hanhDongCua, layCauToiHan, layHomNay, NHAN_HANH_DONG, ngayDai, phanTram, type CauToiHan, type HomNay, type HomNayEm } from '../lib/hom-nay-api'
 import KhoiBtvnLo from '../components/KhoiBtvnLo'
 import '../styles/hom-nay.css'
 
