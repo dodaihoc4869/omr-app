@@ -4,6 +4,7 @@ import type {Mastery} from '../core'
 import {BATTLE_SKINS} from '../learning-battle'
 import {EVOLUTION_LEVELS,evolutionStage} from '../evolution'
 import {thanhExp} from '../../than-thu-hoa-hoc/kinh-nghiem'
+import {lyDoThuong} from '../ly-do-thuong'
 import type {DaoExp,DaoProfile,LyDoThuong,VaiAi} from './kieu'
 
 export const CAP_TOI_DA=120
@@ -57,16 +58,8 @@ export function loiThu(profile:DaoProfile,now:number,chuoiNgay?:number){const te
  if(!t.daGap)return `${ten} háo hức đi chuyến đầu tiên cùng em`
  return `${ten} sẵn sàng lên đường cùng em`}
 
-/** Lý do thưởng khi Worker chưa trả `lyDoThuong` — CÙNG câu chữ với src/game/than-thu-v2/ly-do-thuong.ts của máy chủ (mốc 20/40/40 = sao 1/2/3). */
-export function lyDoThuongTuKetQua(d:{correct:boolean;assisted:boolean;reward:number;stage:number}):LyDoThuong{
- const moc=(d.reward>0&&d.stage>=1&&d.stage<=3?d.stage:0) as LyDoThuong['moc']
- if(moc===1)return {moc,exp:d.reward,chu:`+${d.reward} · lần đầu em tự làm đúng dạng này — sao thứ 1`}
- if(moc===2)return {moc,exp:d.reward,chu:`+${d.reward} · đúng lại ở một câu khác sau 1 ngày — sao thứ 2 của dạng này`}
- if(moc===3)return {moc,exp:d.reward,chu:`+${d.reward} · đúng lại sau 7 ngày — sao thứ 3, dạng này đã khắc phục xong`}
- if(d.assisted)return {moc:0,exp:0,chu:'Câu có trợ giúp nên chưa tính sao — mai em tự làm lại câu cùng dạng nhé'}
- if(!d.correct)return {moc:0,exp:0,chu:'Chưa đúng — dạng này hẹn em ôn lại vào ngày mai'}
- return {moc:0,exp:0,chu:d.stage>=3?'Đúng rồi · dạng này em đã đủ 3 sao, giữ phong độ nhé':`Đúng rồi · sao thứ ${Math.min(3,d.stage+1)} mở khi em làm đúng một câu KHÁC của dạng này vào ngày khác`}
-}
+/** Lý do thưởng khi Worker chưa trả `lyDoThuong`: dùng CHÍNH hàm của máy chủ (`../ly-do-thuong`, Code 5) — mốc = `stage` khi câu có thưởng (20/40/40 = sao 1/2/3). */
+export function lyDoThuongTuKetQua(d:{correct:boolean;assisted:boolean;reward:number;stage:number}):LyDoThuong{return lyDoThuong({...d,milestone:d.reward>0?d.stage:0})}
 
 /** SỔ TAY: 3 sao/dạng = `mastery[].stage` (mốc thưởng 20/40/40 = sao 1/2/3). */
 export interface ODang{key:string;ten:string;sao:0|1|2|3;daGap:boolean;yeu:boolean;toiHan:boolean}
