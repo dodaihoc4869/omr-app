@@ -8,6 +8,7 @@ function setup(){
  first:async()=>sql.includes('hoc_sinh')?(a[0]==='S1'?{sbd:'S1'}:null):rows.get(`${a[0]}:${a[1]}`)||null,
  all:async()=>({results:[...rows.values()].filter(r=>r.sbd===a[0])}),
  run:async()=>{
+ if(sql.includes('ph_truy_cap'))return {success:true} // đếm truy cập phụ huynh (ph-truy-cap.ts): ghi thêm một dòng riêng, không phải bài Mom
  if(sql.startsWith('INSERT')){const key=`${a[0]}:${a[1]}`;if(!rows.has(key))rows.set(key,{sbd:a[0],id:a[1],title:a[2],created_at:a[3],question_count:a[4],bank_key:a[5],started_at:null,submitted_at:null,answers:'{}',result:null})}
  else if(sql.includes('started_at=COALESCE')){const r=rows.get(`${a[1]}:${a[2]}`);if(r&&!r.submitted_at)r.started_at ||= a[0]}
  else if(sql.includes('result=?')){const r=rows.get(`${a[3]}:${a[4]}`);if(r&&!r.submitted_at){r.answers=a[0];r.result=a[1];r.submitted_at=a[2]}}

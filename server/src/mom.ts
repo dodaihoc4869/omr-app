@@ -3,6 +3,7 @@ import {gameIdentity} from './game-v2-auth'
 import {ghiSuKien,suKienChamBai,type CauChamBai} from './su-kien-hoc'
 import {expNhanSauNop} from './exp-d1'
 import {maDaDung} from './reset-toan-app'
+import {sbdCuaPhuHuynh} from './ph-truy-cap'
 
 type Question = Record<string, unknown>
 type Row = {sbd:string;id:string;title:string;created_at:string;question_count:number;bank_key:string;started_at:string|null;submitted_at:string|null;answers:string;result:string|null}
@@ -20,12 +21,12 @@ export function qidCuaBai(q:Question[]):string[]{
 }
 function item(r:Row){return {id:r.id,sbd:r.sbd,tieuDe:r.title,taoLuc:r.created_at,ngayGiao:r.created_at,soCau:r.question_count,thoiGianPhut:120,batDauLuc:r.started_at,nopLuc:r.submitted_at,trangThai:r.submitted_at?'da_nop':r.started_at?'dang_lam':'chua_lam',...(r.result?JSON.parse(r.result):{})}}
 async function questions(env:Env,r:Row):Promise<Question[]>{const o=await env.DE.get(r.bank_key);if(!o)throw new Error('Chưa tải được nội dung bài. Vui lòng thử lại.');return await new Response(o.body).json() as Question[]}
-export async function mom(env:Env,action:string,b:Record<string,unknown>):Promise<Record<string,unknown>> {
-  // Cổng phụ huynh hiện dùng SBD; giữ đúng cơ chế truy cập hiện hành.
+export async function mom(env:Env,action:string,b:Record<string,unknown>,opts:{noiBo?:boolean}={}):Promise<Record<string,unknown>> {
+  // Cổng phụ huynh: token `pass` hoặc SBD trần (giai đoạn mềm, có đếm truy cập, xem ph-truy-cap.ts). `noiBo` = lệnh gọi từ chính máy chủ (bài hằng ngày), SBD đã xác thực.
   // Mọi thao tác làm/nộp bài bắt buộc phiên học sinh và lấy SBD từ chữ ký.
   const parent=action==='parent-list'||action==='create'
-  const sbd=parent?String(b.sbd??'').trim():await gameIdentity(env,b)
-  if(parent&&!await env.DB.prepare('SELECT sbd FROM hoc_sinh WHERE sbd=?').bind(sbd).first())throw new Error('Không tìm thấy số báo danh của con.')
+  const sbd=parent?(opts.noiBo?String(b.sbd??'').trim():(await sbdCuaPhuHuynh(env,b,'mom')).sbd):await gameIdentity(env,b)
+  if(parent&&opts.noiBo&&!await env.DB.prepare('SELECT sbd FROM hoc_sinh WHERE sbd=?').bind(sbd).first())throw new Error('Không tìm thấy số báo danh của con.')
   if(action==='parent-list'||action==='list'){
     const r=await env.DB.prepare('SELECT * FROM mom_bai WHERE sbd=? ORDER BY created_at DESC').bind(sbd).all<Row>()
     return {ok:true,items:r.results.map(item),serverNow:Date.now()}
