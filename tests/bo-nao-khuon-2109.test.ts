@@ -11,6 +11,8 @@ import {
   doDai,
   kiemBanTin,
   kiemKhuon,
+  lamSachDauRa,
+  TU_CAM_CHO_PHU_HUYNH,
   soLa,
   tapSoCuaThe,
   timSoTrongChu,
@@ -23,6 +25,8 @@ import {
 const THE: TheDeKiem = {
   biDanh: 'A17',
   maDang: ['ESTE.THUY_PHAN', 'CARB.PHAN_LOAI', 'LIPID.BEO'],
+  khiNaoVietPhuHuynh: ['moc_dang_khen'],
+  luotSoiKyTuan: true,
   dang: [{ ma: 'ESTE.THUY_PHAN', gap: 9, dung: 7, sai: 2, bac: 0, tiLe: 0.78, xuHuong: 'len' }],
   chang: { xong: 2, boDo: 1, caoNhat: 12 },
   chuoi: 4,
@@ -37,6 +41,8 @@ const tot = (): DauRaEm => ({
   khacPhuc: [],
   co: 'tut_nhip',
   loiNhanChoEm: 'Hôm nay em đúng lại 2 câu thuỷ phân ester từng sai. Chuỗi 4 ngày rồi, giữ nhịp nhé.',
+  loiNhanChoPhuHuynh: '',
+  thuTuan: '',
   goiYChoThay: { chu: 'Bỏ dở 1 chặng, chuỗi 4 ngày — nên hỏi han', hanhDong: 'goi_len_bang', dang: 'ESTE.THUY_PHAN' },
   ghiChuHlv: 'Đang thử giảm nhịp; chờ xem em có xong chặng mai không',
   canSau: false,
@@ -58,7 +64,7 @@ describe('phần tử ĐÚNG khuôn', () => {
     expect(ket(tot())).toEqual({ hopLe: true, lyDo: [] })
   })
   it('em ổn: `thayDoi` rỗng + lời nhắn rỗng + không dạng vẫn hợp lệ (không ép bịa việc)', () => {
-    const d = voi((x) => Object.assign(x, { dang: [], khacPhuc: [], co: 'khong', nhip: { lech: 0, khoiDong: 2 }, loiNhanChoEm: '', goiYChoThay: { chu: '', hanhDong: 'khong', dang: '' }, ghiChuHlv: '' }))
+    const d = voi((x) => Object.assign(x, { dang: [], khacPhuc: [], loiNhanChoPhuHuynh: '', thuTuan: '', co: 'khong', nhip: { lech: 0, khoiDong: 2 }, loiNhanChoEm: '', goiYChoThay: { chu: '', hanhDong: 'khong', dang: '' }, ghiChuHlv: '' }))
     expect(ket(d).hopLe).toBe(true)
   })
   it('biên: nhịp ±3, khởi động 1 và 3, đúng 3 dạng, đúng 140 / 200 / 80 ký tự đều hợp lệ', () => {
@@ -110,8 +116,8 @@ describe('BIÊN ĐỘ', () => {
     coLoi(voi((x) => (x.dang = [{ ...d1, hanhDong: 'xoa_cau' as never }])), 'bốn núm')
     coLoi(voi((x) => (x.dang = [{ ...d1, ma: 'DANG.LA' }])), 'không có trong thẻ')
   })
-  it('độ dài: lời nhắn 141, gợi ý 201, ghi chú 201, lý do 81 ký tự', () => {
-    coLoi(voi((x) => (x.loiNhanChoEm = 'a'.repeat(141))), 'loiNhanChoEm quá 140')
+  it('độ dài: lời nhắn 161, gợi ý 201, ghi chú 201, lý do 81 ký tự', () => {
+    coLoi(voi((x) => (x.loiNhanChoEm = 'a'.repeat(161))), 'loiNhanChoEm quá 160')
     coLoi(voi((x) => (x.goiYChoThay.chu = 'a'.repeat(201))), 'goiYChoThay.chu quá 200')
     coLoi(voi((x) => (x.ghiChuHlv = 'a'.repeat(201))), 'ghiChuHlv quá 200')
     coLoi(voi((x) => (x.dang[0].lyDo = '7'.repeat(81))), 'lyDo quá 80')
@@ -119,7 +125,7 @@ describe('BIÊN ĐỘ', () => {
   it('độ dài tính theo ký tự NGƯỜI ĐỌC (chữ có dấu, biểu tượng 2 đơn vị không tính đôi)', () => {
     expect(doDai('Thuỷ phân ester')).toBe(15)
     expect(doDai('ậ')).toBe(1) // ạ + dấu mũ, sau NFC là một ký tự
-    expect(ket(voi((x) => (x.loiNhanChoEm = 'ề'.repeat(140)))).hopLe).toBe(true)
+    expect(ket(voi((x) => (x.loiNhanChoEm = 'ề'.repeat(160)))).hopLe).toBe(true)
   })
   it('lời cho thầy: `co` ngoài năm giá trị, hành động gợi ý lạ, gọi lên bảng mà không nêu dạng', () => {
     coLoi({ ...tot(), co: 'khan_cap' }, 'co không thuộc')
@@ -205,30 +211,31 @@ describe('MỌI CON SỐ trong lời nhắn / lý do / gợi ý phải có trong
   })
 })
 
-describe('TỪ CẤM', () => {
+describe('TỪ CẤM (so theo TỪ có dấu)', () => {
   const cam = (t: string, mau: string) => coLoi(voi((x) => (x.loiNhanChoEm = t)), mau)
-  it('nhãn năng lực, so với bạn, xếp hạng, doạ — kể cả lách bằng hoa/thường và bỏ dấu', () => {
-    cam('Em còn yếu dạng này.', 'yeu')
-    cam('EM YẾU quá', 'yeu')
-    cam('em yeu phan nay', 'yeu')
-    cam('Em kém hơn cả lớp', 'kem')
-    cam('Em học giỏi lắm', 'gioi')
-    cam('Em nắm chắc dạng này rồi', 'nam chac')
-    cam('Em nắm  chắc', 'nam chac')
-    cam('Em đứng hạng nhất', 'hang nhat')
-    cam('Em hơn bạn khác rồi', 'hon ban')
-    cam('Cố lên kẻo bị phạt', 'phat')
-    cam('Em lười quá', 'luoi')
+  it('nhãn năng lực, so với bạn, xếp hạng, doạ — hoa/thường và khoảng trắng thừa không lách được', () => {
+    cam('Em còn yếu dạng này.', 'yếu')
+    cam('EM YẾU quá', 'yếu')
+    cam('Em kém hơn cả lớp', 'kém')
+    cam('Em học giỏi lắm', 'giỏi')
+    cam('Em nắm chắc dạng này rồi', 'nắm chắc')
+    cam('Em nắm   chắc', 'nắm chắc')
+    cam('Em đứng hạng nhất', 'hạng nhất')
+    cam('Em hơn bạn khác rồi', 'hơn bạn')
+    cam('Cố lên kẻo bị phạt', 'phạt')
+    cam('Em lười quá', 'lười')
   })
-  it('không báo nhầm: chữ chứa từ cấm nhưng KHÔNG phải từ ("yếu tố", "kém" trong từ khác) — so theo TỪ', () => {
-    expect(timTuCam('Yếu tố quyết định là em đúng 7 câu', TU_CAM_CHO_EM)).toEqual(['yeu']) // "yếu" là một từ độc lập ở đây: cấm chặt, chấp nhận báo dư
-    expect(timTuCam('Cường độ dòng điện', TU_CAM_CHO_EM)).toEqual([])
-    expect(timTuCam('Phương pháp giải', TU_CAM_CHO_EM)).toEqual([])
+  it('KHÔNG báo nhầm chữ bình thường của bài Hoá / lời khen: "kẽm", "đốt cháy", "rót", "yêu thích", "tiến bộ", "phương pháp", "cường độ"', () => {
+    for (const t of ['Em làm đúng câu về kẽm rồi.', 'Câu đốt cháy em làm đúng 7 câu.', 'Rót từ từ, em làm đúng 7 câu.', 'Em yêu thích dạng này, đúng 7 câu.', 'Em tiến bộ, đúng 7 câu.', 'Phương pháp giải của em ổn, đúng 7 câu.', 'Cường độ dòng điện, đúng 7 câu.']) {
+      expect(timTuCam(t, TU_CAM_CHO_EM), t).toEqual([])
+    }
+    expect(timTuCam('Yếu tố quyết định', TU_CAM_CHO_EM)).toEqual(['yếu']) // báo dư có chủ ý: so theo TỪ, "yếu tố" chứa từ "yếu" — viết "nhân tố" thay
+    expect(timTuCam('axit yếu', TU_CAM_CHO_EM)).toEqual(['yếu']) // nhược điểm đã ghi: thuật ngữ "axit yếu" cũng bị chặn trong lời cho em
   })
   it('không nhắc ca thi, đáp án, phụ huynh trong lời cho em (luật cứng của cẩm nang)', () => {
     cam('Em vừa làm ca thi xong', 'ca thi')
-    cam('Đáp án câu này là B', 'dap an')
-    cam('Bố mẹ sẽ vui', 'bo me')
+    cam('Đáp án câu này là B', 'đáp án')
+    cam('Bố mẹ sẽ vui', 'bố mẹ')
   })
   it('lời cho THẦY được dùng "dạng yếu" (chữ thường dùng trong app) nhưng vẫn cấm "nắm chắc" và chửi', () => {
     expect(ket(voi((x) => (x.goiYChoThay.chu = 'Dạng yếu: đúng 7 câu'))).hopLe).toBe(true)
@@ -236,8 +243,87 @@ describe('TỪ CẤM', () => {
     coLoi(voi((x) => (x.dang[0].lyDo = 'em lười 7 ngày')), 'từ cấm')
     coLoi(voi((x) => (x.ghiChuHlv = 'em nắm chắc dạng')), 'nắm chắc')
   })
-  it('`boDau` bỏ dấu + đ + hoa thường', () => {
+  it('`boDau` bỏ dấu + đ + hoa thường (còn dùng cho việc khác)', () => {
     expect(boDau('Đề THỂ Yếu')).toBe('de the yeu')
+  })
+})
+
+describe('LỜI CHO PHỤ HUYNH + THƯ TUẦN — lỗi chỉ làm mất LỜI ấy, phần núm được giữ', () => {
+  const PH = 'Anh chị ơi, hôm qua con đã đúng lại 2 câu thuỷ phân ester từng sai. Bộ não A.I đã xếp thêm ba câu cùng dạng cho con. Anh chị chỉ cần hỏi con hôm nay học dạng gì.'
+  const moPh = (t: string, the: TheDeKiem = THE) => ket(voi((x) => (x.loiNhanChoPhuHuynh = t)), the)
+  it('lời hợp lệ khi thẻ có lý do "khi nào viết": không cảnh báo', () => {
+    expect(moPh(PH)).toEqual({ hopLe: true, lyDo: [] })
+    expect(ket(voi((x) => (x.thuTuan = 'Tuần này con đúng 7 câu, có chuỗi 4 ngày.')))).toEqual({ hopLe: true, lyDo: [] })
+  })
+  it('NGÀY THƯỜNG (thẻ không có lý do): lời bị BỎ nhưng phần tử vẫn hợp lệ, có cảnh báo và `boLoi`', () => {
+    for (const the of [{ ...THE, khiNaoVietPhuHuynh: [] }, { ...THE, khiNaoVietPhuHuynh: undefined }, { ...THE, khiNaoVietPhuHuynh: ['ly_do_la'] }]) {
+      const k = moPh(PH, the)
+      expect(k.hopLe).toBe(true)
+      expect(k.boLoi).toEqual(['loiNhanChoPhuHuynh'])
+      expect(k.canhBao?.join()).toContain('không có lý do được phép')
+    }
+    expect(moPh('', { ...THE, khiNaoVietPhuHuynh: [] })).toEqual({ hopLe: true, lyDo: [] }) // rỗng thì luôn được
+  })
+  it('lý do "vấp lặp đã xử lý" chỉ tính khi phần tử ĐÃ xử lý (có núm hoặc khắc phục)', () => {
+    const the = { ...THE, khiNaoVietPhuHuynh: ['vap_lap_da_xu_ly'] }
+    expect(ket(voi((x) => Object.assign(x, { loiNhanChoPhuHuynh: PH, dang: [], khacPhuc: [] })), the).boLoi).toEqual(['loiNhanChoPhuHuynh'])
+    expect(ket(voi((x) => (x.loiNhanChoPhuHuynh = PH)), the).boLoi).toBeUndefined() // còn `dang` uu_tien
+  })
+  it('số không có trong thẻ, từ cấm MỞ RỘNG, ký tự lạ, quá 280 ký tự ⇒ bỏ lời (không loại phần tử)', () => {
+    const co = (t: string, mau: string) => {
+      const k = moPh(t)
+      expect(k.hopLe, t).toBe(true)
+      expect(k.canhBao?.join(' | '), t).toContain(mau)
+      expect(k.boLoi, t).toEqual(['loiNhanChoPhuHuynh'])
+    }
+    co('Con đúng 99 câu hôm qua.', 'có số không có trong thẻ: 99')
+    co('Con giỏi hơn các bạn, đúng 7 câu.', 'có từ cấm')
+    co('Con có thể trượt đại học nếu không chăm, đúng 7 câu.', 'có từ cấm')
+    co('Anh chị đóng học phí đúng hạn, con đúng 7 câu.', 'có từ cấm')
+    co('Con bị nghi chép bài, đúng 7 câu.', 'có từ cấm')
+    co('Con đang bị căng thẳng, đúng 7 câu.', 'có từ cấm')
+    co('Con đúng 7 câu <b>tuần này</b>', 'có ký tự lạ')
+    co('a'.repeat(281), 'quá 280')
+    expect(moPh('a'.repeat(280)).boLoi).toBeUndefined()
+  })
+  it('KHÔNG báo nhầm "tiến bộ" (tiến ≠ tiền) và "kẽm"/"đốt cháy" trong lời phụ huynh', () => {
+    expect(moPh('Con tiến bộ rõ: đúng 7 câu về kẽm, đốt cháy.').boLoi).toBeUndefined()
+    expect(timTuCam('tiền', TU_CAM_CHO_PHU_HUYNH)).toEqual(['tiền'])
+    expect(timTuCam('tiến bộ', TU_CAM_CHO_PHU_HUYNH)).toEqual([])
+  })
+  it('THƯ TUẦN chỉ ở lượt soi kỹ hằng tuần: ngoài lượt thì bỏ; quá 600 ký tự thì bỏ', () => {
+    const tuan = (t: string, the: TheDeKiem = THE) => ket(voi((x) => (x.thuTuan = t)), the)
+    expect(tuan('Tuần này con đúng 7 câu.', { ...THE, luotSoiKyTuan: false }).boLoi).toEqual(['thuTuan'])
+    expect(tuan('Tuần này con đúng 7 câu.', { ...THE, luotSoiKyTuan: undefined }).boLoi).toEqual(['thuTuan'])
+    expect(tuan('a'.repeat(601)).boLoi).toEqual(['thuTuan'])
+    expect(tuan('a'.repeat(600)).boLoi).toBeUndefined()
+    expect(tuan('Tuần này con đúng 99 câu.').canhBao?.join()).toContain('số không có trong thẻ: 99')
+  })
+  it('sai KIỂU (không phải chuỗi) là lỗi cứng; vắng trường = rỗng', () => {
+    coLoi({ ...tot(), loiNhanChoPhuHuynh: 5 }, 'loiNhanChoPhuHuynh phải là chuỗi')
+    coLoi({ ...tot(), thuTuan: {} }, 'thuTuan phải là chuỗi')
+    const cu = tot() as unknown as Record<string, unknown>
+    delete cu.loiNhanChoPhuHuynh
+    delete cu.thuTuan
+    expect(ket(cu).hopLe).toBe(true)
+  })
+  it('`lamSachDauRa`: làm rỗng đúng lời bị bỏ, giữ nguyên núm và lời cho em; điền trường vắng', () => {
+    const d = voi((x) => Object.assign(x, { loiNhanChoPhuHuynh: 'Con đúng 99 câu.', thuTuan: 'Tuần này con đúng 7 câu.' }))
+    const k = ket(d)
+    const sach = lamSachDauRa(d, k)
+    expect(sach.loiNhanChoPhuHuynh).toBe('')
+    expect(sach.thuTuan).toBe('Tuần này con đúng 7 câu.')
+    expect(sach.nhip).toEqual(d.nhip)
+    expect(sach.loiNhanChoEm).toBe(d.loiNhanChoEm)
+    const cu = { ...tot() } as unknown as Record<string, unknown>
+    delete cu.khacPhuc
+    delete cu.thuTuan
+    expect(lamSachDauRa(cu as unknown as DauRaEm, { hopLe: true, lyDo: [] })).toMatchObject({ khacPhuc: [], thuTuan: '', loiNhanChoPhuHuynh: '' })
+  })
+  it('lời nhắn gần đây trong thẻ KHÔNG mở thêm số được nói (chống lặp không phải nguồn số)', () => {
+    const the: TheDeKiem = { ...THE, loiNhanGanDay: ['Hôm qua em đúng 88 câu'] }
+    expect(tapSoCuaThe(the).has('88')).toBe(false)
+    coLoi(voi((x) => (x.loiNhanChoEm = 'Em đúng 88 câu')), 'không có trong thẻ: 88', the)
   })
 })
 
@@ -292,6 +378,6 @@ describe('khoá nguồn', () => {
     expect(readFileSync('src/lib/bo-nao-khuon.ts', 'utf8')).toMatch(/^import type \{ DieuChinhEm \}/m)
   })
   it('hằng số khớp cẩm nang: ±3, khởi động 1–3, ≤ 3 dạng, ≤ 2 khắc phục, 80/140/200 ký tự, tin cậy áp dụng 0,6, hết hạn 3 ngày', () => {
-    expect(HAN_MUC_BO_NAO).toMatchObject({ NHIP_LECH_TOI_DA: 3, KHOI_DONG_TOI_THIEU: 1, KHOI_DONG_TOI_DA: 3, SO_DANG_TOI_DA: 3, LY_DO_TOI_DA: 80, LOI_NHAN_TOI_DA: 140, GOI_Y_TOI_DA: 200, NGUONG_TIN_CAY: 0.6, HAN_NGAY: 3, BAN_TIN_SO_DONG_TOI_DA: 6, SO_KHAC_PHUC_TOI_DA: 2 })
+    expect(HAN_MUC_BO_NAO).toMatchObject({ NHIP_LECH_TOI_DA: 3, KHOI_DONG_TOI_THIEU: 1, KHOI_DONG_TOI_DA: 3, SO_DANG_TOI_DA: 3, LY_DO_TOI_DA: 80, LOI_NHAN_TOI_DA: 160, LOI_PHU_HUYNH_TOI_DA: 280, THU_TUAN_TOI_DA: 600, GOI_Y_TOI_DA: 200, NGUONG_TIN_CAY: 0.6, HAN_NGAY: 3, BAN_TIN_SO_DONG_TOI_DA: 6, SO_KHAC_PHUC_TOI_DA: 2 })
   })
 })

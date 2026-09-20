@@ -36,6 +36,10 @@ export interface DauRaEm {
   khacPhuc: KhacPhucEm[]
   co: CoBoNao
   loiNhanChoEm: string
+  /** ≤ 280 ký tự hoặc rỗng — CHỈ khi thẻ có một lý do "khi nào viết" (xem `KHI_NAO_VIET_PHU_HUYNH`); ngày thường để rỗng. Vắng ⇒ coi như rỗng. */
+  loiNhanChoPhuHuynh: string
+  /** ≤ 600 ký tự hoặc rỗng — CHỈ ở lượt soi kỹ hằng tuần của em (`the.luotSoiKyTuan`). Vắng ⇒ coi như rỗng. */
+  thuTuan: string
   goiYChoThay: { chu: string; hanhDong: HanhDongChoThay; dang: string }
   ghiChuHlv: string
   /** Em cần nhìn kỹ hơn (mô hình nhỏ đặt khi thấy tín hiệu khó) — KHÔNG phải điều chỉnh, máy chủ bỏ qua khi nộp. */
@@ -63,7 +67,11 @@ export interface BanTinSang {
 /** Kết quả kiểm: `lyDo` rỗng khi hợp lệ; mỗi lý do MỘT câu ngắn để báo thầy ("bị loại vì sao"). */
 export interface KetQuaKiem {
   hopLe: boolean
+  /** Lỗi làm HỎNG phần tử (bị BỎ cả phần tử). */
   lyDo: string[]
+  /** Lỗi chỉ làm mất MỘT LỜI (phụ huynh / thư tuần): phần tử vẫn hợp lệ, phần núm được giữ, lời đó bị làm rỗng (`lamSachDauRa`). */
+  canhBao?: string[]
+  boLoi?: ('loiNhanChoPhuHuynh' | 'thuTuan')[]
 }
 
 /** Phần thẻ CỦA EM mà kiểm khuôn cần: bí danh, mã dạng có trong thẻ, và TOÀN BỘ thẻ (để gom mọi con số có thật). Thẻ đầy đủ ở `bo-nao-dac-trung.ts`. */
@@ -71,6 +79,10 @@ export interface TheDeKiem {
   biDanh: string
   /** Mã dạng có trong thẻ (dạng AI được phép nêu). Vắng/`undefined` ⇒ không kiểm mã dạng. */
   maDang?: string[]
+  /** Hôm nay là lượt soi kỹ hằng tuần của em ⇒ được viết `thuTuan`. Vắng ⇒ không. */
+  luotSoiKyTuan?: boolean
+  /** Các lý do "khi nào viết lời cho phụ huynh" mà thuật toán thấy trong thẻ. Vắng/rỗng ⇒ KHÔNG được có `loiNhanChoPhuHuynh`. */
+  khiNaoVietPhuHuynh?: string[]
   [khac: string]: unknown
 }
 
@@ -85,7 +97,9 @@ export const HAN_MUC_BO_NAO = {
   KHAC_PHUC_SO_CAU_TOI_THIEU: 2,
   KHAC_PHUC_SO_CAU_TOI_DA: 4,
   LY_DO_TOI_DA: 80,
-  LOI_NHAN_TOI_DA: 140,
+  LOI_NHAN_TOI_DA: 160,
+  LOI_PHU_HUYNH_TOI_DA: 280,
+  THU_TUAN_TOI_DA: 600,
   GOI_Y_TOI_DA: 200,
   GHI_CHU_HLV_TOI_DA: 200,
   BI_DANH_TOI_DA: 40,
@@ -104,15 +118,30 @@ export const HANH_DONG_CHO_THAY: readonly HanhDongChoThay[] = ['khong', 'goi_len
 export const LOAI_DONG_BAN_TIN: readonly LoaiDongBanTin[] = ['can_thay_y', 'ca_lop', 'goi_len_bang', 'dieu_chinh', 'thay_xem_lai']
 export const HANH_DONG_BAN_TIN: readonly HanhDongBanTin[] = ['khong', 'xem_ho_so', 'goi_len_bang', 'dua_vao_buoi_chua', 'nhan_phu_huynh', 'giao_bai_rieng']
 
-/** TỪ CẤM trong lời gửi CHO EM: nhãn năng lực, so với bạn, xếp hạng, doạ / mỉa. So theo TỪ (đã bỏ dấu và hạ chữ thường) hoặc CỤM. */
+/** Các lý do được phép viết lời cho phụ huynh ("khi nào viết", cẩm nang): con đạt mốc đáng khen · con vấp lặp một dạng VÀ bộ não ĐÃ xử lý · con bỏ dở 2 ngày liền · con vắng ≥ 3 ngày · con vừa thi xong. */
+export const KHI_NAO_VIET_PHU_HUYNH = ['moc_dang_khen', 'vap_lap_da_xu_ly', 'bo_do_2_ngay', 'vang_3_ngay', 'vua_thi'] as const
+
+// TỪ CẤM — so theo TỪ / CỤM ĐÃ CHUẨN NFC, chữ thường, CÓ DẤU (không bỏ dấu: "kẽm", "đốt cháy", "rót", "yêu thích", "tiến bộ" là chữ bình thường của bài Hoá / lời khen và
+// KHÔNG được báo nhầm). Nhược điểm chấp nhận: "axit yếu" trong lời cho em bị chặn — viết "axit có độ phân li nhỏ" hoặc bỏ nhắc thuật ngữ.
+/** Lời gửi CHO EM: nhãn năng lực, so với bạn, xếp hạng, doạ / mỉa, nhắc đáp án / ca thi / phụ huynh. */
 export const TU_CAM_CHO_EM: readonly string[] = [
-  'yeu', 'kem', 'gioi', 'gioi hon', 'dot', 'ngu', 'luoi', 'te', 'kem coi', 'nam chac', 'thong minh', 'ngoc',
-  'xep hang', 'hang nhat', 'hang nhi', 'cao nhat lop', 'thap nhat lop', 'so voi ban', 'hon ban', 'thua ban', 'ban khac', 'cac ban', 'ca lop', 'bat kip ban',
-  'that bai', 'truot', 'rot', 'bi phat', 'phat', 'doa', 'nguy hiem', 'tham hai', 'vo vong',
-  'dap an', 'ca thi', 'phu huynh', 'cha me', 'bo me',
+  'yếu', 'kém', 'giỏi', 'dốt', 'ngu', 'lười', 'tệ', 'tồi', 'ngốc', 'nắm chắc', 'thông minh', 'năng lực',
+  'xếp hạng', 'hạng nhất', 'hạng nhì', 'cao nhất lớp', 'thấp nhất lớp', 'so với bạn', 'hơn bạn', 'thua bạn', 'bạn khác', 'các bạn', 'cả lớp', 'bắt kịp bạn',
+  'thất bại', 'trượt', 'rớt', 'bị phạt', 'phạt', 'doạ', 'dọa', 'nguy hiểm', 'thảm hại', 'vô vọng',
+  'đáp án', 'ca thi', 'phụ huynh', 'cha mẹ', 'bố mẹ', 'ba mẹ', 'điểm thi', 'dự đoán',
 ]
-/** Trong lời cho THẦY (gợi ý, lý do, bản tin, ghi chú) chỉ cấm những từ này ("dạng yếu" là chữ thường dùng trong app). */
-export const TU_CAM_CHO_THAY: readonly string[] = ['nam chac', 'dot', 'ngu', 'luoi', 'ngoc', 'vo dung']
+/** Lời cho THẦY (gợi ý, lý do, bản tin, ghi chú): "dạng yếu" là chữ thường dùng trong app nên chỉ cấm những từ này. */
+export const TU_CAM_CHO_THAY: readonly string[] = ['nắm chắc', 'dốt', 'ngu', 'lười', 'ngốc', 'vô dụng']
+/** Lời cho PHỤ HUYNH (`loiNhanChoPhuHuynh`, `thuTuan`): MỞ RỘNG — so với con nhà khác, nhãn năng lực, dự đoán điểm, sức khoẻ / tâm lý, tiền bạc / quảng cáo, chép bài / gian lận, báo động. */
+export const TU_CAM_CHO_PHU_HUYNH: readonly string[] = [
+  'yếu', 'kém', 'giỏi', 'dốt', 'ngu', 'lười', 'tệ', 'tồi', 'ngốc', 'nắm chắc', 'thông minh', 'năng lực', 'tài năng', 'thiên phú',
+  'con nhà khác', 'con người ta', 'bạn cùng lớp', 'các bạn', 'cả lớp', 'bạn khác', 'hơn bạn', 'thua bạn', 'xếp hạng', 'hạng nhất', 'top đầu',
+  'dự đoán', 'dự kiến điểm', 'sẽ đạt', 'sẽ trượt', 'đậu đại học', 'rớt đại học', 'trượt đại học', 'điểm thi', 'điểm chuẩn', 'thất bại', 'trượt', 'rớt',
+  'trầm cảm', 'lo âu', 'căng thẳng', 'stress', 'áp lực', 'bệnh', 'sức khoẻ', 'sức khỏe', 'tâm lý', 'tự ti', 'mệt mỏi',
+  'học phí', 'tiền', 'đóng phí', 'khuyến mãi', 'giảm giá', 'ưu đãi', 'đăng ký', 'lớp học thêm', 'khoá học', 'khóa học', 'gói học', 'quảng cáo',
+  'chép bài', 'gian lận', 'sao chép', 'đạo văn', 'nghi vấn', 'nghi ngờ',
+  'cảnh báo', 'báo động', 'khẩn cấp', 'nghiêm trọng', 'nguy hiểm', 'thảm hại', 'vô vọng', 'đáp án',
+]
 
 // ══════════════════════════════ HÀM PHỤ ══════════════════════════════
 
@@ -131,10 +160,15 @@ export function doDai(s: string): number {
   return [...s.normalize('NFC')].length
 }
 
-/** Những từ / cụm cấm có trong `chu` (đã bỏ dấu). Trả danh sách cụm bị trúng (không lặp). */
+/** Những từ / cụm cấm có trong `chu` (so theo TỪ, chuẩn NFC + chữ thường, CÓ DẤU). Trả danh sách cụm bị trúng (không lặp). */
 export function timTuCam(chu: string, danhSach: readonly string[]): string[] {
-  const t = ` ${boDau(chu).replace(/[^a-z0-9]+/g, ' ').trim()} `
-  return danhSach.filter((c) => t.includes(` ${c} `))
+  const t = ` ${chu
+    .normalize('NFC')
+    .toLowerCase()
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter(Boolean)
+    .join(' ')} `
+  return danhSach.filter((c) => t.includes(` ${c.normalize('NFC')} `))
 }
 
 /** Mọi con số (chữ số) trong một đoạn chữ, chuẩn hoá dấu phẩy thập phân về dấu chấm; bỏ số 0 thừa đầu ("007" ⇒ "7") nhưng giữ "0.5". */
@@ -149,8 +183,10 @@ function chuanSo(x: string): string {
   return Number.isFinite(n) ? String(n) : x
 }
 
-/** Khoá của thẻ mang MÃ / định danh / mốc thời gian, không phải sự thật để nêu cho em: số nằm trong chúng ("D3", "12-C1", "2026-09-22") KHÔNG được coi là số có thật. */
-const KHOA_KHONG_LAY_SO = new Set(['ma', 'maDang', 'qid', 'biDanh', 'sbd', 'ngay', 'luc'])
+/** Khoá của thẻ mang MÃ / định danh / mốc thời gian / bậc 0-1-2 (nói bằng TÊN bậc: Biết, Hiểu, Vận dụng — không nói bằng số), không phải sự thật để nêu cho em: số nằm trong chúng ("D3", "12-C1", "2026-09-22") KHÔNG được coi là số có thật. */
+const KHOA_KHONG_LAY_SO = new Set(['ma', 'maDang', 'qid', 'biDanh', 'sbd', 'ngay', 'luc', 'loiNhanGanDay', 'khiNaoVietPhuHuynh', 'bac', 'tu', 'den', 'bacCuaMaDang'])
+/** Khoá mà GIÁ TRỊ CHUỖI là mã (mã dạng, tên núm…) — bỏ khi là chuỗi, nhưng vẫn đi vào khi là mảng/đối tượng (`dang: [{gap: 9}]` là số thật). */
+const KHOA_CHUOI_LA_MA = new Set(['dang', 'hanhDong', 'kieu', 'co', 'trangThai', 'xuHuong'])
 
 /** TẬP SỐ CÓ THẬT trong một thẻ (JSON bất kỳ): mọi số, và dạng hiển thị thường gặp — số làm tròn, một chữ số thập phân, phần trăm của số 0–1, và các số nằm TRONG chuỗi chữ của thẻ. */
 export function tapSoCuaThe(the: unknown): Set<string> {
@@ -158,6 +194,8 @@ export function tapSoCuaThe(the: unknown): Set<string> {
   const them = (n: number) => {
     if (!Number.isFinite(n)) return
     tap.add(String(n))
+    tap.add(String(Math.abs(n))) // "nhịp −2" trong thẻ ⇒ lời nhắn được nói "giảm 2 câu"
+    tap.add(String(Math.round(Math.abs(n))))
     tap.add(String(Math.round(n)))
     tap.add(String(Math.round(n * 10) / 10))
     if (n > 0 && n <= 1) tap.add(String(Math.round(n * 100)))
@@ -168,7 +206,7 @@ export function tapSoCuaThe(the: unknown): Set<string> {
     if (typeof v === 'number') them(v)
     else if (typeof v === 'string') for (const s of timSoTrongChu(v)) them(Number(s))
     else if (Array.isArray(v)) for (const x of v) duyet(x, sau + 1)
-    else if (typeof v === 'object') for (const [k, x] of Object.entries(v as Record<string, unknown>)) if (!KHOA_KHONG_LAY_SO.has(k)) duyet(x, sau + 1)
+    else if (typeof v === 'object') for (const [k, x] of Object.entries(v as Record<string, unknown>)) if (!KHOA_KHONG_LAY_SO.has(k) && !(typeof x === 'string' && KHOA_CHUOI_LA_MA.has(k))) duyet(x, sau + 1)
   }
   duyet(the, 0)
   return tap
@@ -274,6 +312,30 @@ export function kiemKhuon(dauRa: unknown, the: TheDeKiem): KetQuaKiem {
     if (la.length) loi.push(`loiNhanChoEm có số không có trong thẻ: ${la.join(', ')}`)
   }
 
+  // ── LỜI CHO PHỤ HUYNH + THƯ TUẦN: lỗi ở đây CHỈ làm mất lời ấy (phần núm được giữ) ──
+  const canhBao: string[] = []
+  const boLoi: ('loiNhanChoPhuHuynh' | 'thuTuan')[] = []
+  const kiemLoiNgoai = (ten: 'loiNhanChoPhuHuynh' | 'thuTuan', v: unknown, toiDa: number, duocViet: boolean, lyDoKhong: string) => {
+    if (v === undefined || v === '') return
+    if (!laChuoi(v)) return void loi.push(`${ten} phải là chuỗi (có thể rỗng)`)
+    const e: string[] = []
+    if (!duocViet) e.push(lyDoKhong)
+    if (doDai(v) > toiDa) e.push(`quá ${toiDa} ký tự`)
+    if (KY_TU_LA.test(v)) e.push('có ký tự lạ')
+    const cam = timTuCam(v, TU_CAM_CHO_PHU_HUYNH)
+    if (cam.length) e.push(`có từ cấm: ${cam.join(', ')}`)
+    const la = soLa(v, tapSo)
+    if (la.length) e.push(`có số không có trong thẻ: ${la.join(', ')}`)
+    if (e.length) {
+      boLoi.push(ten)
+      canhBao.push(`${ten} bị bỏ (giữ núm): ${e.join('; ')}`)
+    }
+  }
+  const daXuLy = (Array.isArray(d.khacPhuc) && d.khacPhuc.length > 0) || (Array.isArray(d.dang) && d.dang.length > 0)
+  const lyDoPh = (the.khiNaoVietPhuHuynh ?? []).filter((x) => KHI_NAO_VIET_PHU_HUYNH.includes(x as (typeof KHI_NAO_VIET_PHU_HUYNH)[number]) && (x !== 'vap_lap_da_xu_ly' || daXuLy))
+  kiemLoiNgoai('loiNhanChoPhuHuynh', d.loiNhanChoPhuHuynh, H.LOI_PHU_HUYNH_TOI_DA, lyDoPh.length > 0, 'hôm nay không có lý do được phép viết lời cho phụ huynh')
+  kiemLoiNgoai('thuTuan', d.thuTuan, H.THU_TUAN_TOI_DA, the.luotSoiKyTuan === true, 'chưa tới lượt soi kỹ hằng tuần của em')
+
   const g = d.goiYChoThay as Record<string, unknown> | undefined
   if (!g || typeof g !== 'object') loi.push('thiếu goiYChoThay')
   else {
@@ -296,13 +358,25 @@ export function kiemKhuon(dauRa: unknown, the: TheDeKiem): KetQuaKiem {
   else {
     if (doDai(d.ghiChuHlv) > H.GHI_CHU_HLV_TOI_DA) loi.push(`ghiChuHlv quá ${H.GHI_CHU_HLV_TOI_DA} ký tự`)
     if (KY_TU_LA.test(d.ghiChuHlv)) loi.push('ghiChuHlv có ký tự lạ')
-    const cam = timTuCam(d.ghiChuHlv, ['nam chac'])
-    if (cam.length) loi.push('ghiChuHlv có từ cấm: nắm chắc')
+    const cam = timTuCam(d.ghiChuHlv, TU_CAM_CHO_THAY)
+    if (cam.length) loi.push(`ghiChuHlv có từ cấm: ${cam.join(', ')}`)
   }
 
   if (typeof d.canSau !== 'boolean') loi.push('canSau phải là true/false')
 
-  return { hopLe: loi.length === 0, lyDo: loi }
+  const ra: KetQuaKiem = { hopLe: loi.length === 0, lyDo: loi }
+  if (canhBao.length) {
+    ra.canhBao = canhBao
+    ra.boLoi = boLoi
+  }
+  return ra
+}
+
+/** Phần tử ĐÃ KIỂM → bản sạch để lưu: điền trường vắng (`khacPhuc: []`, hai lời phụ huynh rỗng) và làm rỗng các lời bị `boLoi`. Chỉ gọi khi `hopLe`. */
+export function lamSachDauRa(d: DauRaEm, kq: KetQuaKiem): DauRaEm {
+  const ra: DauRaEm = { ...d, khacPhuc: d.khacPhuc ?? [], loiNhanChoPhuHuynh: d.loiNhanChoPhuHuynh ?? '', thuTuan: d.thuTuan ?? '' }
+  for (const t of kq.boLoi ?? []) ra[t] = ''
+  return ra
 }
 
 /** Kiểm BẢN TIN SÁNG (`ra/lop.json`): ≤ 6 dòng, đúng khuôn từng dòng, số trong chữ phải có trong số liệu lớp (`soLieuLop`), từ cấm của lời cho thầy. */
