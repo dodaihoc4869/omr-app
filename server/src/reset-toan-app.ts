@@ -1,8 +1,9 @@
-// RESET TOÀN APP — MỘT LẦN, CHẠY THEO LỆNH (thầy chốt 19/09 rồi ĐỔI 21/09 00:08: "tiếp tục tới khi xong hết thì tiến hành reset luôn, cho chọn lại thú, xoá hết mọi ca thi
-// và btvn nhưng GIỮ LẠI toàn bộ hồ sơ mạnh yếu của học sinh đã kiểm tra trước đó").
+// RESET TOÀN APP — MỘT LẦN, CHẠY THEO LỆNH (thầy chốt 19/09, ĐỔI 21/09 00:08 "cho chọn lại thú, xoá hết BTVN nhưng GIỮ LẠI toàn bộ hồ sơ mạnh yếu", ĐỔI TIẾP 21/09 ~01:30
+// "khi reset giữ lại toàn bộ ca thi đã thi").
 //
-// XOÁ: mọi ca thi/lượt/điểm, BTVN, bài Mẹ giao, luyện đề, kế hoạch ngày, trao đổi, game + thần thú + EXP + mảnh khiên (chọn lại thú), vinh danh, bảng tin phụ huynh.
-// GIỮ: tài khoản/mật khẩu, lớp, kho đề, cấu hình, VÀ SỔ + HỒ SƠ MẠNH YẾU (`su_kien_hoc`, `nam_kt_cau`, `nam_kt_dang`, `tien_do_hs`, `qid_da_lam`). `su_kien_hoc` là NGUỒN của hồ sơ
+// XOÁ: BTVN, bài Mẹ giao, luyện đề, kế hoạch ngày, trao đổi, game + thần thú + EXP + mảnh khiên + Đoàn (chọn lại thú), vinh danh, bảng tin phụ huynh.
+// GIỮ: tài khoản/mật khẩu, lớp, kho đề, cấu hình, MỌI CA THI đã thi (`ca`, `luot`, `chi_tiet_cau`, `ban_do_sai`, `phong_cho`, `chan_vao`, `trang_thai`, `phieu`, `kho_ca_them`, `nhan_xet`,
+// `de_rieng`, `dong_bo`, `nop_khac_phuc`, `tien_do_ca`), VÀ SỔ + HỒ SƠ MẠNH YẾU (`su_kien_hoc`, `nam_kt_cau`, `nam_kt_dang`, `tien_do_hs`, `qid_da_lam`). `su_kien_hoc` là NGUỒN của hồ sơ
 // (hồ sơ được dựng lại từ sổ sau mỗi lần nộp): xoá sổ mà giữ hồ sơ thì lần dựng lại đầu tiên xoá sạch hồ sơ của em.
 //
 // AN TOÀN, theo thứ tự:
@@ -18,7 +19,9 @@
 //   · CHẠY THỬ: `resetDryRun` chỉ đếm, không ghi gì, ≤ 40 truy vấn.
 //   · Sao lưu: trước khi xoá, khoá ghi `batDauLuc` (mốc D1 Time Travel) và `demTruoc` (số dòng từng bảng); tập mã đã dùng nạp vào `ma_da_dung` TRƯỚC khi xoá `ca`.
 //     Ngoài job: bản export .sql do Boss ra lệnh và R2 giữ nguyên (docs/reset-2109.md).
-//   · EXP sau reset: `exp_moi.tu` = `batDauLuc` nên sổ cũ KHÔNG sinh EXP; câu cũ từng sai nay làm đúng vẫn "lên bậc" (sổ giữ, `exp-d1.ts` coi sự kiện `thi` của ca đã bị xoá là ĐÃ công bố).
+//   · EXP sau reset: `exp_moi.tu` = `batDauLuc` nên sổ cũ và lượt thi cũ (`nop_luc` < tu) KHÔNG sinh EXP (câu, lên bậc, điểm ca); câu cũ từng sai nay làm đúng vẫn "lên bậc" (sổ giữ).
+//     Ca thi được GIỮ nên luật "ca chưa công bố thì ẩn câu thi" giữ nguyên; luật "ca không còn trong bảng `ca` thì coi là đã công bố" (`exp-d1.ts`, `game-v2-bank.ts`) chỉ còn dùng khi thầy xoá cứng ca.
+//   · MÃ ĐÃ DÙNG: chỉ nạp BTVN và bài Mẹ giao (đã xoá nên máy em còn nháp theo mã cũ). KHÔNG nạp mã ca: ca còn nguyên trong bảng `ca`, không có mã ca nào "đã dùng mà biến mất".
 //   · KHÔNG đụng: tài khoản/mật khẩu/token (`hoc_sinh`), danh sách lớp, kho đề/câu hỏi, chỉ mục game, cấu hình thầy, cài đặt em, đăng ký push, thống kê dùng app, sổ + hồ sơ mạnh yếu, R2.
 import type { D1PreparedStatement, Env } from './kieu'
 
@@ -42,12 +45,10 @@ const HAN_DEM_MS = 3000
 
 /** XOÁ — theo lệnh thầy. */
 export const BANG_XOA: readonly string[] = [
-  // Ca thi và lượt
-  'ca', 'luot', 'chi_tiet_cau', 'ban_do_sai', 'phong_cho', 'chan_vao', 'trang_thai', 'phieu', 'kho_ca_them', 'nhan_xet', 'de_rieng', 'dong_bo', 'nop_khac_phuc',
   // BTVN, bài giao, luyện đề
   'btvn', 'btvn_em', 'btvn_em_lich_su', 'mom_bai', 'luyen_de_2026', 'yeu_cau_giao_bai', 'study_drafts',
-  // Kế hoạch ngày và tiến độ theo ca (SỔ + HỒ SƠ MẠNH YẾU được GIỮ, xem BANG_GIU)
-  'ke_hoach_ngay', 'tien_do_ca', 'len_bang',
+  // Kế hoạch ngày và lên bảng (SỔ + HỒ SƠ MẠNH YẾU và CA THI được GIỮ, xem BANG_GIU)
+  'ke_hoach_ngay', 'len_bang',
   // Trao đổi
   'tin_nhan', 'cau_hoi_em', 'student_notice', 'student_push_delivery',
   // Game, thần thú, EXP
@@ -66,6 +67,8 @@ export const BANG_GIU: readonly string[] = [
   'ph_truy_cap',
   // SỔ + HỒ SƠ MẠNH YẾU của học sinh (thầy chốt 21/09 00:08: giữ lại toàn bộ hồ sơ mạnh yếu đã kiểm tra)
   'su_kien_hoc', 'nam_kt_cau', 'nam_kt_dang', 'tien_do_hs', 'qid_da_lam',
+  // MỌI CA THI đã thi (thầy chốt 21/09 ~01:30: khi reset giữ lại toàn bộ ca thi đã thi): ca, lượt, điểm từng câu, bản đồ sai, phòng chờ, chặn vào, trạng thái, phiếu, kho ca thêm, nhận xét, đề riêng, đồng bộ Sheet, nộp khắc phục, tiến độ theo ca
+  'ca', 'luot', 'chi_tiet_cau', 'ban_do_sai', 'phong_cho', 'chan_vao', 'trang_thai', 'phieu', 'kho_ca_them', 'nhan_xet', 'de_rieng', 'dong_bo', 'nop_khac_phuc', 'tien_do_ca',
 ]
 
 const TEN_HOP_LE = /^[a-z][a-z0-9_]*$/
@@ -234,23 +237,11 @@ export async function demCacBang(env: Env, hienCo: ReadonlyMap<string, unknown>)
 
 // --- Tập mã đã dùng ---------------------------------------------------------------------------------
 
-/** Nơi giữ MÃ CA (mã ca xuất hiện ở đâu thì nạp từ đó). */
-const NGUON_MA_CA: readonly string[] = [
-  'ca', 'luot', 'phieu', 'chi_tiet_cau', 'ban_do_sai', 'phong_cho', 'kho_ca_them', 'btvn', 'tien_do_ca', 'nhan_xet', 'nop_khac_phuc', 'chan_vao', 'de_rieng',
-]
-/** D1 chỉ cho compound SELECT ngắn (5 vế chạy, 8 vế lỗi trên bản thật): gộp tối đa 5 bảng một truy vấn. */
-const VE_MOI_COMPOUND = 5
-
+/**
+ * Tập mã đã dùng nạp lúc reset: BTVN và bài Mẹ giao (đã xoá). KHÔNG có mã ca: mọi ca thi được GIỮ trong bảng `ca`. Trường `ca` của kết quả luôn rỗng, giữ lại cho đúng hình dạng cũ
+ * của `maSeGiuLai` và để các nơi chặn "mã ca đã dùng mà không còn trong ca" (publish, capNhatKeyBank, noiKhoCa, /ca/nhieu) vẫn hoạt động nếu sau này có mã ca được nạp tay.
+ */
 async function docMaDaDung(env: Env, hienCo: ReadonlyMap<string, unknown>): Promise<{ ca: string[]; btvn: string[]; mom: string[] }> {
-  const ca = new Set<string>()
-  const co = NGUON_MA_CA.filter((t) => hienCo.has(t))
-  for (let i = 0; i < co.length; i += VE_MOI_COMPOUND) {
-    const nhom = co.slice(i, i + VE_MOI_COMPOUND)
-    try {
-      const r = await env.DB.prepare(nhom.map((t) => `SELECT ma_ca AS ma FROM "${t}" WHERE ma_ca IS NOT NULL AND ma_ca <> ''`).join(' UNION ')).all<{ ma: string }>()
-      for (const x of r.results ?? []) ca.add(String(x.ma))
-    } catch { /* một bảng không có cột ma_ca ở lược đồ này: bỏ cả nhóm này khỏi tập (báo bằng số đếm ở dryRun) */ }
-  }
   const btvn: string[] = []
   if (hienCo.has('btvn')) {
     const r = await env.DB.prepare("SELECT DISTINCT ma_btvn AS ma FROM btvn WHERE ma_btvn IS NOT NULL AND ma_btvn <> ''").all<{ ma: string }>()
@@ -261,7 +252,7 @@ async function docMaDaDung(env: Env, hienCo: ReadonlyMap<string, unknown>): Prom
     const r = await env.DB.prepare("SELECT DISTINCT id AS ma FROM mom_bai WHERE id IS NOT NULL AND id <> ''").all<{ ma: string }>()
     for (const x of r.results ?? []) if (!UUID.test(String(x.ma))) mom.push(String(x.ma)) // id UUID không bao giờ trùng nên khỏi giữ
   }
-  return { ca: [...ca].sort(), btvn: btvn.sort(), mom: mom.sort() }
+  return { ca: [], btvn: btvn.sort(), mom: mom.sort() }
 }
 
 const CHEN_MA = `INSERT OR IGNORE INTO ma_da_dung (loai, ma, xoa_luc)
@@ -453,7 +444,7 @@ export async function chayReset(envGoc: Env, nowMs: number, tuyChon: TuyChonChay
     st.chuaPhanLoai = [...hienCo.keys()].filter((t) => !phanLoai.has(t)).sort()
     for (;;) {
       if (st.buoc === 'nap_ma') {
-        // Nạp tập MÃ ĐÃ DÙNG trước khi xoá `ca`/`btvn`/`mom_bai` (lặp lại được: INSERT OR IGNORE). Chưa có bảng `ma_da_dung` thì DỪNG — không xoá khi chưa giữ được mã.
+        // Nạp tập MÃ ĐÃ DÙNG trước khi xoá `btvn`/`mom_bai` (lặp lại được: INSERT OR IGNORE). Chưa có bảng `ma_da_dung` thì DỪNG — không xoá khi chưa giữ được mã.
         if (!hienCo.has('ma_da_dung')) throw new Error('Chưa chạy migration-1909-ma-da-dung.sql — DỪNG, chưa xoá gì')
         if (!conNganSach(CHI_PHI_NAP_MA)) return await nhuong()
         const ma = await docMaDaDung(env, hienCo)

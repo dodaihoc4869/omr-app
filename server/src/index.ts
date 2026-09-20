@@ -798,6 +798,11 @@ async function dayNhieuCa(env: Env, b: Record<string, unknown>): Promise<Respons
   // Sau reset 21/09: ca và lượt mang MÃ CA ĐÃ TỪNG DÙNG (tập nạp lúc reset) bị BỎ QUA và báo lại, phần còn lại vẫn đẩy — app thầy không được đẩy ngược ca ma lên máy chủ.
   const maCu = await maDaDungTrong(env, 'ca', [...dsCa.map((c) => String(c.maCa ?? '').trim()), ...dsLuot.map((l) => String(l.maCa ?? '').trim())])
   if (maCu.size > 0) {
+    // Mã còn trong bảng `ca` (ca được GIỮ khi reset) không phải "ca ma": chỉ chặn mã đã dùng mà KHÔNG còn trong `ca` (cùng điều kiện với publish, capNhatKeyBank, noiKhoCa).
+    const con = await env.DB.prepare('SELECT ma_ca FROM ca WHERE ma_ca IN (SELECT value FROM json_each(?))').bind(JSON.stringify([...maCu])).all<{ ma_ca: string }>()
+    for (const x of con.results ?? []) maCu.delete(String(x.ma_ca))
+  }
+  if (maCu.size > 0) {
     dsCa = dsCa.filter((c) => !maCu.has(String(c.maCa ?? '').trim()))
     dsLuot = dsLuot.filter((l) => !maCu.has(String(l.maCa ?? '').trim()))
     if (dsCa.length === 0 && dsLuot.length === 0) return ra({ ok: false, error: 'Mọi ca trong lượt đẩy đều là mã cũ đã bị xoá khi làm mới hệ thống', maCaDaDung: true, boQuaMaCu: [...maCu] })

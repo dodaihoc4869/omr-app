@@ -1,6 +1,6 @@
 // @vitest-environment node
 // RESET TOÀN APP — MỘT LẦN, CHẠY THEO LỆNH (server/src/reset-toan-app.ts) — chạy trên SQLite THẬT với lược đồ thật + mọi migration.
-// Thiết kế 21/09 00:08 (thầy): xoá ca thi/BTVN/game/EXP (chọn lại thú) nhưng GIỮ sổ + hồ sơ mạnh yếu (su_kien_hoc, nam_kt_cau, nam_kt_dang, tien_do_hs, qid_da_lam).
+// Thiết kế 21/09 (thầy): xoá BTVN/Mẹ giao/game/EXP (chọn lại thú) nhưng GIỮ sổ + hồ sơ mạnh yếu (su_kien_hoc, nam_kt_cau, nam_kt_dang, tien_do_hs, qid_da_lam) VÀ toàn bộ CA THI đã thi (14 bảng).
 // Không có mốc cố định: job chạy khi có CỜ LÊN ĐẠN; cửa sổ tự chạy + đóng băng = 60 phút kể từ lúc lên đạn.
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import worker from '../server/src/index'
@@ -31,6 +31,8 @@ const HAN_MS = LEN_DAN_MS + CUA_SO_MS
 
 /** Sổ + hồ sơ mạnh yếu: thầy chốt GIỮ. Khai cứng ở đây (không lấy từ BANG_GIU) để đột biến "chuyển nhầm sang XOÁ" bị bắt. */
 const HO_SO_GIU = ['su_kien_hoc', 'nam_kt_cau', 'nam_kt_dang', 'tien_do_hs', 'qid_da_lam'] as const
+/** Mọi ca thi đã thi: thầy chốt GIỮ (21/09 ~01:30). Khai cứng vì cùng lý do như `HO_SO_GIU`. */
+const CA_THI_GIU = ['ca', 'luot', 'chi_tiet_cau', 'ban_do_sai', 'phong_cho', 'chan_vao', 'trang_thai', 'phieu', 'kho_ca_them', 'nhan_xet', 'de_rieng', 'dong_bo', 'nop_khac_phuc', 'tien_do_ca'] as const
 
 const bangHienCo = (d: D1That) => (d.sql.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%' ORDER BY name").all() as { name: string }[]).map((x) => x.name)
 const bam = (d: D1That, t: string) => JSON.stringify(d.sql.prepare(`SELECT * FROM "${t}" ORDER BY rowid`).all())
@@ -84,7 +86,7 @@ async function chayHet(d: D1That, batDau = SAU, toiDaLuot = 40) {
   return { cuoi, luot: luot + 1, toiDaTruyVan: toiDa }
 }
 /** Mọi bảng GIỮ có NỘI DUNG không được đổi (trừ ba bảng cấu hình mà job chỉ ghi vài dòng). Hợp với `HO_SO_GIU` để đột biến bị bắt dù `BANG_GIU` bị sửa. */
-const KHONG_DOI_NOI_DUNG = [...new Set([...BANG_GIU, ...HO_SO_GIU])].filter((t) => !['cau_hinh', 'game_v2_settings', 'ma_da_dung'].includes(t))
+const KHONG_DOI_NOI_DUNG = [...new Set([...BANG_GIU, ...HO_SO_GIU, ...CA_THI_GIU])].filter((t) => !['cau_hinh', 'game_v2_settings', 'ma_da_dung'].includes(t))
 
 describe('phân loại bảng', () => {
   it('MỌI bảng của lược đồ (schema + mọi migration) đều được phân loại XOÁ hoặc GIỮ — thêm bảng mới là buộc phải quyết', () => {
@@ -98,10 +100,11 @@ describe('phân loại bảng', () => {
       expect(BANG_XOA, t).not.toContain(t)
     }
     for (const t of HO_SO_GIU) expect(BANG_GIU, t).toContain(t)
+    for (const t of CA_THI_GIU) { expect(BANG_XOA, t).not.toContain(t); expect(BANG_GIU, t).toContain(t) }
     expect(new Set(BANG_XOA).size).toBe(BANG_XOA.length)
   })
-  it('mọi thứ thầy bảo XOÁ đều nằm trong danh sách XOÁ (ca thi, lượt, điểm, BTVN, bài Mẹ giao, luyện đề, kế hoạch ngày, trao đổi, game, thú, EXP, khiên, Đoàn, vinh danh, tin PH)', () => {
-    for (const t of ['ca', 'luot', 'chi_tiet_cau', 'ban_do_sai', 'tien_do_ca', 'btvn', 'btvn_em', 'mom_bai', 'luyen_de_2026', 'ke_hoach_ngay', 'tin_nhan', 'game_v2_profile', 'game_v2_attempt', 'than_thu', 'exp_so', 'manh_khien_so', 'doan_chang', 'doan_luot', 'doan_tiep_suc', 'doan_ve_so', 'doan_trum_lop', 'doan_trum_cau', 'daily_honors', 'parent_daily_news']) {
+  it('mọi thứ thầy bảo XOÁ đều nằm trong danh sách XOÁ (BTVN, bài Mẹ giao, luyện đề, kế hoạch ngày, lên bảng, trao đổi, game, thú, EXP, khiên, Đoàn, vinh danh, tin PH)', () => {
+    for (const t of ['btvn', 'btvn_em', 'btvn_em_lich_su', 'mom_bai', 'luyen_de_2026', 'yeu_cau_giao_bai', 'study_drafts', 'ke_hoach_ngay', 'len_bang', 'tin_nhan', 'cau_hoi_em', 'student_notice', 'student_push_delivery', 'game_v2_profile', 'game_v2_attempt', 'game_v2_reward', 'game_v2_room', 'game_v2_session', 'game_v2_task', 'than_thu', 'exp_so', 'manh_khien_so', 'doan_chang', 'doan_luot', 'doan_tiep_suc', 'doan_ve_so', 'doan_trum_lop', 'doan_trum_cau', 'daily_honors', 'parent_daily_news']) {
       expect(BANG_XOA, t).toContain(t)
     }
   })
@@ -122,15 +125,15 @@ describe('chạy thử (dryRun): chỉ đếm, không ghi gì', () => {
     expect(r.soTruyVan).toBeLessThanOrEqual(TOI_DA_TRUY_VAN_MOI_LUOT)
     expect(r.chuaPhanLoai).toEqual(['bang_la_moi'])
     // Sổ + hồ sơ nằm ở danh sách GIỮ, không ở XOÁ.
-    for (const t of HO_SO_GIU) {
+    for (const t of [...HO_SO_GIU, ...CA_THI_GIU]) {
       expect(r.giu.find((x) => x.bang === t)!.dong, t).toBe(dem(d, t))
       expect(r.xoa.find((x) => x.bang === t), t).toBeUndefined()
     }
     expect(r.giu.find((x) => x.bang === 'hoc_sinh')!.dong).toBe(dem(d, 'hoc_sinh'))
     expect(r.tongDongSeXoa).toBe(BANG_XOA.reduce((t, b) => t + dem(d, b), 0))
-    expect(r.tongDongGiu).toBeGreaterThanOrEqual(HO_SO_GIU.reduce((t, b) => t + dem(d, b), 0))
-    expect(r.maSeGiuLai).toMatchObject({ mom: 3 }) // chỉ id KHÔNG phải UUID (2 dòng mẫu + daily_…)
-    expect(r.maSeGiuLai.ca).toBeGreaterThan(0)
+    expect(r.tongDongGiu).toBeGreaterThanOrEqual([...HO_SO_GIU, ...CA_THI_GIU].reduce((t, b) => t + dem(d, b), 0))
+    expect(r.maSeGiuLai).toMatchObject({ ca: 0, mom: 3 }) // KHÔNG nạp mã ca (ca được giữ); mom: chỉ id KHÔNG phải UUID (2 dòng mẫu + daily_…)
+    expect(r.maSeGiuLai.btvn).toBeGreaterThan(0)
   })
   it('chưa lên đạn: lenDanLuc/hanTuChay là null, choPhep:false; vẫn chạy được', async () => {
     const d = dung({}, false)
@@ -156,7 +159,7 @@ describe('chạy thật', () => {
   it('bảng XOÁ rỗng hết; SỔ + HỒ SƠ và mọi bảng GIỮ y nguyên TỪNG DÒNG (so băm); mùa game mới; exp_moi.tu = lúc bắt đầu; các dòng cấu hình khác còn nguyên', async () => {
     const d = dung()
     expect(d.sql.prepare("SELECT 1 AS x FROM game_v2_profile WHERE sbd='12121212'").get()).toBeTruthy() // trước reset em có hồ sơ thú
-    for (const t of HO_SO_GIU) expect(dem(d, t), `${t} có dữ liệu để giữ`).toBeGreaterThan(0)
+    for (const t of [...HO_SO_GIU, ...CA_THI_GIU]) expect(dem(d, t), `${t} có dữ liệu để giữ`).toBeGreaterThan(0)
     const giuTruoc = bamTatCa(d, KHONG_DOI_NOI_DUNG)
     const cauHinhKhac = d.sql.prepare("SELECT * FROM cau_hinh WHERE khoa NOT IN ('exp_moi') ORDER BY khoa").all()
     const luotTruoc = d.soLenh.prepare
@@ -167,7 +170,7 @@ describe('chạy thật', () => {
     expect(d.soLenh.prepare - luotTruoc).toBeGreaterThan(TOI_DA_TRUY_VAN_MOI_LUOT) // tổng nhiều hơn một lượt nhưng từng lượt ≤ 40
     for (const t of BANG_XOA) expect(dem(d, t), t).toBe(0)
     expect(bamTatCa(d, KHONG_DOI_NOI_DUNG)).toEqual(giuTruoc)
-    for (const t of HO_SO_GIU) expect(dem(d, t), `${t} còn nguyên`).toBeGreaterThan(0)
+    for (const t of [...HO_SO_GIU, ...CA_THI_GIU]) expect(dem(d, t), `${t} còn nguyên`).toBeGreaterThan(0)
     const batDauLuc = new Date(SAU).toISOString()
     expect(JSON.parse((d.sql.prepare("SELECT json FROM game_v2_settings WHERE key='season'").get() as { json: string }).json)).toEqual({ id: '2026-09-21-mua-1', startedAt: batDauLuc })
     expect(JSON.parse((d.sql.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa='exp_moi'").get() as { gia_tri: string }).gia_tri)).toEqual({ tu: batDauLuc, toanBo: true })
@@ -177,8 +180,9 @@ describe('chạy thật', () => {
     expect(st.soLanChay).toBeGreaterThan(1)
     expect(st.xongLuc).toBeTruthy()
     for (const t of HO_SO_GIU) expect(st.demSau![t], t).toBe(st.demTruoc[t])
-    expect(st.demTruoc.ca).toBeGreaterThan(0)
-    expect(st.demSau!.ca).toBe(0)
+    for (const t of CA_THI_GIU) expect(st.demSau![t], t).toBe(st.demTruoc[t])
+    expect(st.demTruoc.btvn).toBeGreaterThan(0)
+    expect(st.demSau!.btvn).toBe(0)
     expect(st.demSau!.hoc_sinh).toBe(st.demTruoc.hoc_sinh)
     expect(JSON.parse(st.expMoiCu!)).toMatchObject({ dsSbd: ['12121212'] })
   })
@@ -198,10 +202,10 @@ describe('chạy thật', () => {
     expect(dem(d, 'su_kien_hoc')).toBe(soSo)
   })
 
-  it('TẬP MÃ ĐÃ DÙNG nạp TRƯỚC khi xoá: mã ca, btvn, bài Mẹ giao không phải UUID (UUID thì không cần giữ); bảng ma_da_dung KHÔNG bị xoá', async () => {
+  it('TẬP MÃ ĐÃ DÙNG nạp TRƯỚC khi xoá: btvn và bài Mẹ giao không phải UUID (UUID thì không cần giữ); KHÔNG nạp mã ca (ca được giữ); bảng ma_da_dung KHÔNG bị xoá', async () => {
     const d = dung()
     await chayHet(d)
-    expect(await maDaDung(d.env, 'ca', 'CA-CU-1')).toBe(true)
+    expect(await maDaDung(d.env, 'ca', 'CA-CU-1')).toBe(false) // ca còn nguyên trong bảng `ca`, không có mã nào "đã dùng mà biến mất"
     expect(await maDaDung(d.env, 'btvn', 'CA-CU-1-abc')).toBe(true)
     expect(await maDaDung(d.env, 'mom', 'daily_2026-09-20')).toBe(true)
     expect(await maDaDung(d.env, 'mom', '123e4567-e89b-42d3-a456-426614174000')).toBe(false)
@@ -463,26 +467,43 @@ describe('sau reset: tài khoản còn nguyên, mọi lệnh chạy khi hồ sơ
     expect((await goiWorker(worker, d.env, '/goi', { action: 'danhSachCa' }, true)).ok).toBe(true)
   })
 
-  it('mở ca mới (publish) chạy bình thường trên bảng trống; mã ca CŨ bị từ chối, mã mới thì được', async () => {
+  it('CA THI ĐƯỢC GIỮ: mở ca mới chạy bình thường; đẩy lại ca cũ (đang có trong bảng ca) KHÔNG bị chặn; ca cũ vẫn còn nguyên dòng', async () => {
     const d = dung()
+    const caTruoc = bam(d, 'ca')
     await chayHet(d)
+    expect(bam(d, 'ca')).toBe(caTruoc)
     const moi = await goiWorker(worker, d.env, '/goi', { action: 'publish', ca: { maCa: 'CA-MOI-1', tenCa: 'Ca mới', trangThai: 'mo' } }, true)
     expect(moi.ok).toBe(true)
     expect(d.sql.prepare("SELECT ma_ca FROM ca WHERE ma_ca='CA-MOI-1'").get()).toBeTruthy()
-    const cu = await goiWorker(worker, d.env, '/goi', { action: 'publish', ca: { maCa: 'CA-CU-1', tenCa: 'Ca ma', trangThai: 'mo' }, keyBank: { phanI: [] } }, true)
-    expect(cu).toMatchObject({ ok: false, maCaDaDung: true })
-    expect(d.sql.prepare("SELECT ma_ca FROM ca WHERE ma_ca='CA-CU-1'").get()).toBeUndefined()
-    expect(d.objects.has('key/CA-CU-1.json')).toBe(false)
+    const cu = await goiWorker(worker, d.env, '/goi', { action: 'publish', ca: { maCa: 'CA-CU-1', tenCa: 'Ca cũ đẩy lại', trangThai: 'dong' }, keyBank: { phanI: [] } }, true)
+    expect(cu.maCaDaDung).toBeUndefined()
+    expect(cu.ok).toBe(true)
+    expect(d.sql.prepare("SELECT ma_ca FROM ca WHERE ma_ca='CA-CU-1'").get()).toBeTruthy()
   })
 
-  it('đường đẩy tờ đáp án của ca CŨ (capNhatKeyBank, noiKhoCa) bị từ chối và KHÔNG ghi R2; ca mới/mã lạ vẫn ghi được', async () => {
+  it('chặn "mã ca đã dùng mà KHÔNG còn trong bảng ca" vẫn hoạt động (mã nạp tay), và KHÔNG chặn ca CÒN trong bảng: publish, capNhatKeyBank, noiKhoCa, /ca/nhieu', async () => {
     const d = dung()
     await chayHet(d)
-    expect(await capNhatKeyBank(d.env, { maCa: 'CA-CU-1', keyBank: { x: 1 } })).toMatchObject({ ok: false, maCaDaDung: true })
-    expect(await noiKhoCa(d.env, { maCa: 'CA-CU-1', bank: [] })).toMatchObject({ ok: false, maCaDaDung: true })
-    expect(d.objects.has('key/CA-CU-1.json')).toBe(false)
-    expect(await capNhatKeyBank(d.env, { maCa: 'CA-CHUA-CO-1', keyBank: { x: 1 } })).toMatchObject({ ok: true })
-    expect(d.objects.has('key/CA-CHUA-CO-1.json')).toBe(true)
+    d.sql.prepare("INSERT INTO ma_da_dung(loai,ma,xoa_luc) VALUES('ca','CA-MA','x'), ('ca','CA-CU-1','x')").run() // CA-MA không còn trong ca; CA-CU-1 còn
+    // Mã ma: bị chặn ở cả bốn đường và KHÔNG ghi R2.
+    expect(await goiWorker(worker, d.env, '/goi', { action: 'publish', ca: { maCa: 'CA-MA', tenCa: 'Ma', trangThai: 'mo' }, keyBank: { phanI: [] } }, true)).toMatchObject({ ok: false, maCaDaDung: true })
+    expect(await capNhatKeyBank(d.env, { maCa: 'CA-MA', keyBank: { x: 1 } })).toMatchObject({ ok: false, maCaDaDung: true })
+    expect(await noiKhoCa(d.env, { maCa: 'CA-MA', bank: [] })).toMatchObject({ ok: false, maCaDaDung: true })
+    expect(d.objects.has('key/CA-MA.json')).toBe(false)
+    const nhieu = await goiWorker(worker, d.env, '/ca/nhieu', {
+      ca: [{ maCa: 'CA-MA', tenCa: 'Ma' }, { maCa: 'CA-CU-1', tenCa: 'Cũ còn' }, { maCa: 'CA-MOI-2', tenCa: 'Mới' }],
+      luot: [{ maCa: 'CA-MA', sbd: '12121212', lanThu: 1 }, { maCa: 'CA-CU-1', sbd: '12121212', lanThu: 1 }],
+    }, true)
+    expect(nhieu).toMatchObject({ ok: true, soCa: 2, soLuot: 1, boQuaMaCu: ['CA-MA'] }) // chỉ mã ma bị bỏ qua; ca còn trong bảng vẫn đẩy được
+    expect(d.sql.prepare("SELECT ma_ca FROM ca WHERE ma_ca='CA-MA'").get()).toBeUndefined()
+    expect(d.sql.prepare("SELECT ma_ca FROM luot WHERE ma_ca='CA-MA'").get()).toBeUndefined()
+    expect(d.sql.prepare("SELECT ma_ca FROM ca WHERE ma_ca='CA-MOI-2'").get()).toBeTruthy()
+    expect(await goiWorker(worker, d.env, '/ca/nhieu', { ca: [{ maCa: 'CA-MA' }] }, true)).toMatchObject({ ok: false, maCaDaDung: true })
+    // Ca còn trong bảng: capNhatKeyBank/noiKhoCa/publish KHÔNG bị chặn dù mã nằm trong tập.
+    expect(await capNhatKeyBank(d.env, { maCa: 'CA-CU-1', keyBank: { x: 1 } })).toMatchObject({ ok: true })
+    expect(d.objects.has('key/CA-CU-1.json')).toBe(true)
+    expect((await noiKhoCa(d.env, { maCa: 'CA-CU-1', bank: [] })).maCaDaDung).toBeUndefined()
+    expect((await goiWorker(worker, d.env, '/goi', { action: 'publish', ca: { maCa: 'CA-CU-1', tenCa: 'Cũ', trangThai: 'dong' }, keyBank: { phanI: [] } }, true)).maCaDaDung).toBeUndefined()
   })
 
   it('bài Mẹ giao: mã cũ không phải UUID bị từ chối; mã mới tạo được', async () => {
@@ -494,7 +515,7 @@ describe('sau reset: tài khoản còn nguyên, mọi lệnh chạy khi hồ sơ
   })
 })
 
-describe('HỒ SƠ CÒN – CA/LƯỢT/BTVN TRỐNG: kế hoạch, câu phục vụ được, bằng chứng của game, hồ sơ lớp lên bảng, EXP', () => {
+describe('CA THI VÀ HỒ SƠ ĐƯỢC GIỮ, BTVN/Mẹ giao/game TRỐNG: kế hoạch, câu phục vụ được, bằng chứng của game, hồ sơ lớp lên bảng, EXP', () => {
   const NGAY_CU = Date.parse('2026-09-17T03:00:00.000Z') // 3 ngày trước
   const HOM_NAY = Date.parse('2026-09-20T02:00:00.000Z') // 09:00 VN, TRƯỚC lúc reset (12:00 VN)
   const RESET_LUC = Date.parse('2026-09-20T05:00:00.000Z') // 12:00 VN ngày 20/09
@@ -526,7 +547,9 @@ describe('HỒ SƠ CÒN – CA/LƯỢT/BTVN TRỐNG: kế hoạch, câu phục v
     themCau(d, 'DE-OK', ['OK1', 'OK2', 'OK3'])
     themCau(d, 'DE-BV', ['BAOVE1'])
     themCaBaoVe(d, 'CA-MO-1', ['BAOVE1'])
-    d.sql.prepare("INSERT INTO luot(khoa,ma_ca,sbd,lan_thu,vao_luc,trang_thai,cap_nhat_luc) VALUES('CA-MO-1|S1|1','CA-MO-1','S1',1,'x','dang_lam','x')").run()
+    // S1 đã NỘP lượt 1 của CA-MO-1 (nên sổ có sự kiện `thi` lan 1) nhưng S2 còn ĐANG LÀM ⇒ ca `ca_lop_xong` chưa công bố: câu thi của ca vẫn ẩn.
+    d.sql.prepare("INSERT INTO luot(khoa,ma_ca,sbd,lan_thu,vao_luc,nop_luc,trang_thai,cap_nhat_luc) VALUES('CA-MO-1|S1|1','CA-MO-1','S1',1,'2026-09-17T02:00:00.000Z','2026-09-17T03:00:00.000Z','da_nop','x')").run()
+    d.sql.prepare("INSERT INTO luot(khoa,ma_ca,sbd,lan_thu,vao_luc,trang_thai,cap_nhat_luc) VALUES('CA-MO-1|S2|1','CA-MO-1','S2',1,'x','dang_lam','x')").run()
     d.sql.prepare("INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc) VALUES('B-CU-1','CA-CU-1','DE-OK',3,'x','y',0,'x')").run()
     d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('exp_moi',?,'x')").run(JSON.stringify({ tu: '2026-09-01T00:00:00.000Z', dsSbd: ['S1'] }))
     const r = await ghiSuKien(d.env, [
@@ -547,68 +570,88 @@ describe('HỒ SƠ CÒN – CA/LƯỢT/BTVN TRỐNG: kế hoạch, câu phục v
   const dsQid = ['OK1', 'OK2', 'OK3', 'BAOVE1']
   const lenBang = async (d: D1That) => (await goiWorker(worker, d.env, '/goi', { action: 'hoSoLopLenBang', dsSbd: ['S1'], dsQid }, true)).em.S1
 
-  it('TRƯỚC reset: câu thi của ca chưa công bố bị ẩn và bị bảo vệ; SAU reset sổ + hồ sơ y nguyên, câu ấy hết bị ẩn/bảo vệ, kế hoạch + lệnh lấy câu + game + lên bảng chạy trên hồ sơ', async () => {
+  /** Ca đã thi xong và công bố (`cong_bo='ngay'`), em S1 nộp TRƯỚC lúc reset: dưới cờ EXP cũ sinh EXP điểm ca; sau reset thì KHÔNG. */
+  function themCaDaThi(d: D1That) {
+    d.sql.prepare("INSERT INTO ca(ma_ca,ten_ca,trang_thai,cong_bo,loai,lop,cap_nhat_luc) VALUES('CA-DA-THI','Ca đã thi','dong','ngay','thi','12','x')").run()
+    d.sql.prepare("INSERT INTO luot(khoa,ma_ca,sbd,lan_thu,vao_luc,nop_luc,trang_thai,diem_i,diem_ii,diem_iii,cap_nhat_luc) VALUES('CA-DA-THI|S1|1','CA-DA-THI','S1',1,'2026-09-19T02:00:00.000Z','2026-09-19T03:00:00.000Z','da_nop',2,1,1,'x')").run()
+    d.sql.prepare("INSERT INTO chi_tiet_cau(khoa,ma_ca,sbd,lan_thu,phan,so_cau,qid,dung_sai,cap_nhat_luc) VALUES('CA-DA-THI|S1|1|OK1','CA-DA-THI','S1',1,'I',1,'OK1',0,'x')").run()
+  }
+
+  it('CA THI ĐƯỢC GIỮ nguyên từng byte (ca, lượt, chi tiết…); BTVN/kế hoạch ngày/EXP bị xoá; ca chưa công bố VẪN ẩn và VẪN bảo vệ; sổ + hồ sơ y nguyên; kế hoạch, lệnh lấy câu, hồ sơ lớp lên bảng chạy như trước', async () => {
     const d = await dungHoSo()
+    themCaDaThi(d)
     lenDan(d, iso(RESET_LUC - 60_000))
 
     // --- trước ---
     const evTruoc = (await readScope(d.env, 'S1')).evidence
     expect(evTruoc.map((e) => e.qid).sort()).toEqual(['OK1', 'OK2', 'OK3'])
     expect((await qidPhucVuDuoc(d.env, dsQid)).biBaoVe).toEqual(['BAOVE1'])
-    expect([...(await protectedQuestions(d.env))]).toContain('BAOVE1')
     const onLaiTruoc = await qidOnLai(d)
     expect(onLaiTruoc).not.toContain('BAOVE1')
     expect(onLaiTruoc).toEqual(expect.arrayContaining(['OK1', 'OK2']))
     const lbTruoc = await lenBang(d)
     const hoSoTruoc = hoSo(d)
     const hoSoKhongGio = { cau: boCapNhat(d, 'nam_kt_cau'), dang: boCapNhat(d, 'nam_kt_dang') }
-    expect(dem(d, 'ca')).toBeGreaterThan(0)
-    expect(dem(d, 'luot')).toBeGreaterThan(0)
-    expect(dem(d, 'btvn')).toBeGreaterThan(0)
+    const caThiTruoc = bamTatCa(d, CA_THI_GIU)
+    expect(dem(d, 'ca')).toBeGreaterThan(0); expect(dem(d, 'luot')).toBeGreaterThan(0); expect(dem(d, 'btvn')).toBeGreaterThan(0)
 
     // --- reset ---
     const { cuoi } = await chayHet(d, RESET_LUC)
     expect(cuoi.trangThai!.trangThai).toBe('xong')
-    for (const t of ['ca', 'luot', 'btvn', 'ke_hoach_ngay', 'exp_so']) expect(dem(d, t), t).toBe(0)
+    for (const t of ['btvn', 'ke_hoach_ngay', 'exp_so']) expect(dem(d, t), t).toBe(0)
+    expect(bamTatCa(d, CA_THI_GIU)).toEqual(caThiTruoc) // MỌI bảng ca thi y nguyên từng byte
     expect(hoSo(d)).toEqual(hoSoTruoc) // sổ + hồ sơ giữ nguyên từng byte
 
-    // --- sau ---
-    // (a) hồ sơ dựng lại từ sổ vẫn ra đúng hồ sơ cũ (nếu sổ bị xoá mà hồ sơ giữ, lần dựng lại này sẽ xoá sạch hồ sơ).
+    // --- sau: ca vẫn còn nên mọi thứ liên quan ca hành xử NHƯ TRƯỚC ---
     await dungLaiHoSo(d.env, ['S1'], iso(BAY_GIO))
-    expect({ cau: boCapNhat(d, 'nam_kt_cau'), dang: boCapNhat(d, 'nam_kt_dang') }).toEqual(hoSoKhongGio)
-    // (b) game: sự kiện thi của ca ĐÃ BỊ XOÁ tính là ĐÃ công bố → thành bằng chứng, không bị ẩn vĩnh viễn.
+    expect({ cau: boCapNhat(d, 'nam_kt_cau'), dang: boCapNhat(d, 'nam_kt_dang') }).toEqual(hoSoKhongGio) // dựng lại từ sổ ra đúng hồ sơ cũ
+    const evSau = (await readScope(d.env, 'S1')).evidence
+    expect(evSau.map((e) => e.qid).sort()).toEqual(['OK1', 'OK2', 'OK3']) // câu thi của ca CHƯA công bố vẫn ẩn
+    expect([...(await protectedQuestions(d.env))]).toContain('BAOVE1')
+    expect((await qidPhucVuDuoc(d.env, dsQid)).biBaoVe).toEqual(['BAOVE1'])
+    expect(await qidOnLai(d)).toEqual(onLaiTruoc)
+    const lay = await layCauChoEm(d.env, 'S1', ['BAOVE1', 'OK1'])
+    expect(lay.khongCo).toEqual(['BAOVE1'])
+    expect(lay.cau.map((c) => c.qid)).toEqual(['OK1'])
+    expect(await lenBang(d)).toEqual(lbTruoc) // hồ sơ lớp cho màn lên bảng của thầy: không đổi
+  })
+
+  it('thầy XOÁ CỨNG một ca (không phải do reset): sự kiện thi của ca không còn trong bảng ca tính là ĐÃ công bố, câu hết bị bảo vệ và vào kế hoạch', async () => {
+    const d = await dungHoSo()
+    lenDan(d, iso(RESET_LUC - 60_000))
+    const onLaiTruoc = await qidOnLai(d)
+    await chayHet(d, RESET_LUC)
+    d.sql.prepare("DELETE FROM ca WHERE ma_ca = 'CA-MO-1'").run()
     const evSau = (await readScope(d.env, 'S1')).evidence
     expect(evSau.map((e) => e.qid).sort()).toEqual(['BAOVE1', 'OK1', 'OK2', 'OK3'])
     expect(evSau.find((e) => e.qid === 'BAOVE1')).toMatchObject({ wrong: true })
-    // (c) hết ca bảo vệ: câu ấy phục vụ được và vào việc ôn; lệnh lấy câu trả được.
     expect([...(await protectedQuestions(d.env))]).not.toContain('BAOVE1')
     expect((await qidPhucVuDuoc(d.env, dsQid)).biBaoVe).toEqual([])
-    const onLaiSau = await qidOnLai(d)
-    expect(onLaiSau).toEqual(expect.arrayContaining([...onLaiTruoc, 'BAOVE1']))
+    expect(await qidOnLai(d)).toEqual(expect.arrayContaining([...onLaiTruoc, 'BAOVE1']))
     const lay = await layCauChoEm(d.env, 'S1', ['BAOVE1', 'OK1'])
     expect(lay.khongCo).toEqual([])
-    expect(lay.cau.map((c) => c.qid).sort()).toEqual(['BAOVE1', 'OK1'])
-    // (d) hồ sơ lớp cho màn lên bảng của thầy: chỉ đọc hồ sơ, không đổi.
-    expect(await lenBang(d)).toEqual(lbTruoc)
   })
 
-  it('EXP: sổ cũ NGUYÊN mà tổng EXP sau reset = 0 (tu = lúc bắt đầu); câu cũ từng sai nay làm đúng vẫn "lên bậc" +6', async () => {
+  it('EXP: sổ cũ NGUYÊN và lượt thi cũ còn mà tổng EXP sau reset = 0 (tu = lúc bắt đầu); câu cũ từng sai nay làm đúng vẫn "lên bậc" +6', async () => {
     const d = await dungHoSo()
+    themCaDaThi(d)
     lenDan(d, iso(RESET_LUC - 60_000))
-    // Cờ EXP CŨ (tu 01/09) tính EXP từ sổ hôm nay: đây là thứ reset phải cắt.
+    // Cờ EXP CŨ (tu 01/09) tính EXP từ sổ hôm nay VÀ điểm ca đã thi: đây là thứ reset phải cắt.
     const truoc = await capNhatExp(d.env, 'S1', BAY_GIO)
     expect(truoc.bat).toBe(true)
     expect(truoc.khoan.length).toBeGreaterThan(0)
+    expect(truoc.khoan.some((k) => k.loai === 'diem_ca')).toBe(true)
     const tongTruoc = (d.sql.prepare("SELECT COALESCE(SUM(exp),0) AS t FROM exp_so WHERE sbd='S1'").get() as { t: number }).t
     expect(tongTruoc).toBeGreaterThan(0)
 
     await chayHet(d, RESET_LUC)
     expect(dem(d, 'exp_so')).toBe(0)
     expect(dem(d, 'su_kien_hoc')).toBeGreaterThan(0) // sổ còn nguyên
+    expect(dem(d, 'luot')).toBeGreaterThan(0) // lượt thi còn nguyên
     expect(JSON.parse((d.sql.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa='exp_moi'").get() as { gia_tri: string }).gia_tri)).toEqual({ tu: iso(RESET_LUC), toanBo: true })
 
     const sau = await capNhatExp(d.env, 'S1', BAY_GIO)
-    expect(sau.khoan).toEqual([])
+    expect(sau.khoan).toEqual([]) // không câu, không lên bậc, không điểm ca của lượt nộp TRƯỚC reset
     expect(d.sql.prepare("SELECT COALESCE(SUM(exp),0) AS t FROM exp_so WHERE sbd='S1'").get()).toEqual({ t: 0 })
 
     // Sau reset em làm ĐÚNG câu OK1 (từng sai 3 ngày trước): lên bậc +6 (cộng EXP câu), dù sổ cũ vẫn còn đó.
@@ -617,12 +660,24 @@ describe('HỒ SƠ CÒN – CA/LƯỢT/BTVN TRỐNG: kế hoạch, câu phục v
     expect(moi.khoan.map((k) => k.loai)).toContain('len_bac')
     expect(moi.khoan.find((k) => k.loai === 'len_bac')!.exp).toBe(6)
     expect(moi.khoan.map((k) => k.loai)).toContain('cau')
-    // Câu BAOVE1 sai ở CA THI đã bị xoá: lần sai ấy vẫn là "trước" (ca không còn = coi là đã công bố), nên làm đúng nay cũng lên bậc.
-    expect((await ghiSuKien(d.env, [sk('BAOVE1', 1, SAU_RESET + 1000, 'btvn', 'B-MOI', 2)])).ok).toBe(true)
-    const baoVe = await capNhatExp(d.env, 'S1', BAY_GIO)
-    expect(baoVe.khoan.some((k) => k.loai === 'len_bac' && k.qid === 'BAOVE1')).toBe(true)
+    expect(moi.khoan.map((k) => k.loai)).not.toContain('diem_ca')
     // Lần OK3 đúng lúc 09:00 (trước reset) KHÔNG được tính lại.
     expect(moi.khoan.filter((k) => k.qid === 'OK3')).toEqual([])
+  })
+
+  it('EXP: câu sai ở ca thi CHƯA công bố (ca được giữ) chỉ lên bậc khi ca công bố; ca bị xoá cứng thì coi như đã công bố', async () => {
+    for (const cach of ['cong_bo', 'xoa'] as const) {
+      const d = await dungHoSo()
+      lenDan(d, iso(RESET_LUC - 60_000))
+      await chayHet(d, RESET_LUC)
+      expect((await ghiSuKien(d.env, [sk('BAOVE1', 1, SAU_RESET, 'btvn', 'B-MOI', 2)])).ok).toBe(true)
+      const truocCongBo = await capNhatExp(d.env, 'S1', BAY_GIO)
+      expect(truocCongBo.khoan.some((k) => k.loai === 'len_bac' && k.qid === 'BAOVE1'), 'ca chưa công bố thì lần sai ở ca ẩn').toBe(false)
+      if (cach === 'cong_bo') d.sql.prepare("UPDATE ca SET cong_bo = 'ngay' WHERE ma_ca = 'CA-MO-1'").run()
+      else d.sql.prepare("DELETE FROM ca WHERE ma_ca = 'CA-MO-1'").run()
+      const sau = await capNhatExp(d.env, 'S1', BAY_GIO)
+      expect(sau.khoan.some((k) => k.loai === 'len_bac' && k.qid === 'BAOVE1'), cach).toBe(true)
+    }
   })
 })
 
@@ -741,21 +796,7 @@ describe('mocReset cho máy khách: CHỈ sau khi job xong, = ngày VN lúc XONG
   })
 })
 
-describe('sau reset: /ca/nhieu và /goi doGioiHan', () => {
-  it('/ca/nhieu (đẩy nhiều ca + lượt) BỎ QUA ca và lượt mang mã cũ, báo lại; ca mới vẫn đẩy được', async () => {
-    const d = dung()
-    await chayHet(d)
-    const r = await goiWorker(worker, d.env, '/ca/nhieu', {
-      ca: [{ maCa: 'CA-CU-1', tenCa: 'Ma' }, { maCa: 'CA-MOI-2', tenCa: 'Mới' }],
-      luot: [{ maCa: 'CA-CU-1', sbd: '12121212', lanThu: 1 }, { maCa: 'CA-MOI-2', sbd: '12121212', lanThu: 1 }],
-    }, true)
-    expect(r).toMatchObject({ ok: true, soCa: 1, soLuot: 1, boQuaMaCu: ['CA-CU-1'] })
-    expect(d.sql.prepare("SELECT ma_ca FROM ca WHERE ma_ca='CA-CU-1'").get()).toBeUndefined()
-    expect(d.sql.prepare("SELECT ma_ca FROM ca WHERE ma_ca='CA-MOI-2'").get()).toBeTruthy()
-    expect(d.sql.prepare("SELECT ma_ca FROM luot WHERE ma_ca='CA-CU-1'").get()).toBeUndefined()
-    const toanCu = await goiWorker(worker, d.env, '/ca/nhieu', { ca: [{ maCa: 'CA-CU-1' }] }, true)
-    expect(toanCu).toMatchObject({ ok: false, maCaDaDung: true })
-  })
+describe('lệnh của thầy: chạy tiếp tay và đo giới hạn', () => {
   it('lệnh chạy tiếp tay và đo giới hạn qua Worker đòi mã bí mật; đo giới hạn trả số truy vấn', async () => {
     const d = dung()
     expect((await goiWorker(worker, d.env, '/reset/chay-tiep', {})).ok).not.toBe(true)
