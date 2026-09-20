@@ -10,7 +10,7 @@
 //   3. Hạn 48 giờ tính từ lúc thầy bấm Giao, chung cho cả lớp. Quá hạn thì máy
 //      chủ từ chối, vì giờ trên máy em chỉnh được.
 import type { CauHinhMayChu } from './cau-hinh-may-chu'
-import { docKetQuaChang, type KetQuaChang } from './btvn-ca-nhan-em'
+import { docKetQuaChang, type KetQuaChang } from './btvn-ca-nhan-kieu'
 
 export interface KetQuaGiaoBtvn {
   maBtvn: string

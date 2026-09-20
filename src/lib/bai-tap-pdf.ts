@@ -22,7 +22,7 @@ import { dangCua, hopDang, LOC_DANG_MAC_DINH, type DangCau, type LocDang } from 
 import { hopSao, LOC_SAO_MAC_DINH, type LocSao } from './loc-sao'
 import { hopLeDeRut } from './loc-cau-rut'
 import { chuanChuyenDe } from './goi-len-bang'
-import type { NhanCauEm } from './btvn-ca-nhan-em'
+import type { NhanCauEm } from './btvn-ca-nhan-kieu'
 
 export type MucDoCau = 'biet' | 'hieu' | 'van_dung'
 const BAC: MucDoCau[] = ['biet', 'hieu', 'van_dung']

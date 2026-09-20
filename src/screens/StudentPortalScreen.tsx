@@ -59,7 +59,7 @@ import {
 } from '../lib/exam-api'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import KhungXemPhieu from '../components/KhungXemPhieu'
-import type { TheChangView } from '../lib/btvn-ca-nhan-em'
+import type { TheChangView } from '../lib/btvn-ca-nhan-kieu'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
 import { LogoDoc } from '../components/LogoVai'
@@ -2262,7 +2262,7 @@ export default function StudentPortalScreen() {
           nopChang={async (tin) => {
             // Bài `ca_nhan`: phiếu KHÔNG có đáp án, gửi đáp án MỘT chặng ra đây. Thành công ⇒ dựng lại phiếu có kết quả
             // (đổi html), xong hẳn chặng thì bật thẻ tiến bộ. Hỏng ⇒ trả lời báo cho phiếu, bài làm vẫn còn ở máy.
-            const [{ nopChangCaNhan }, { theChangView }] = await Promise.all([import('../lib/btvn-nop-chang-em'), import('../lib/btvn-ca-nhan-em')])
+            const [{ nopChangCaNhan }, { theChangView }] = await Promise.all([import('../lib/btvn-nop-chang-em'), import('../lib/btvn-ca-nhan-kieu')])
             const kq = await nopChangCaNhan(tin, maCaPhieuRef.current)
             if (!kq.ok) return { ok: false, error: kq.error }
             if (!kq.html) {

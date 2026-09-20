@@ -5,7 +5,7 @@
 // không kéo thêm thư viện (test bang-nhiem-vu-1909 chỉ cho react + lucide-react).
 import { useEffect, useRef } from 'react'
 import { ArrowRight, Award, Layers, RotateCcw, Sparkles, TrendingUp, X } from 'lucide-react'
-import type { TheChangView } from '../../lib/btvn-ca-nhan-em'
+import type { TheChangView } from '../../lib/btvn-ca-nhan-kieu'
 import './m3-theme.css'
 import './the-cuoi-chang.css'
 

@@ -4,7 +4,7 @@
 // Chỉ được dùng khi chỗ gọi khai `caNhan` cho `dungPhieu`. Phiếu KHÔNG khai `caNhan` không có một byte nào của
 // tệp này. Màu chỉ dùng token của khối M3 trong phiếu (`--gm-*`) hoặc rgb() — không hex (npm run check:mau).
 // (Cấm dấu huyền ngược và ký hiệu đô-la-ngoặc-nhọn trong khối CSS: cả khối nằm trong một chuỗi mẫu.)
-import { thongTinNhan, type NhanCauEm } from './btvn-ca-nhan-em'
+import { thongTinNhan, type NhanCauEm } from './btvn-ca-nhan-kieu'
 
 const esc = (s: unknown): string =>
   String(s ?? '')
