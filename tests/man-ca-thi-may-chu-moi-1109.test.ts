@@ -98,7 +98,8 @@ describe('LUẬT ĐẾM PHẢI KHỚP APPS SCRIPT — lệch một ly là thầy
 })
 
 describe('ĐẨY DỮ LIỆU CŨ — không được giả vờ là bài chưa về Sheet', () => {
-  const HAM = MAY.slice(MAY.indexOf('async function dayNhieuCa'), MAY.indexOf('async function dayNhieuCa') + 4200)
+  // 5200: khối lọc mã cũ đã dùng (reset toàn app) thêm ~700 ký tự phía trên; vẫn cùng một hàm, chỉ nới cửa sổ đọc.
+  const HAM = MAY.slice(MAY.indexOf('async function dayNhieuCa'), MAY.indexOf('async function dayNhieuCa') + 5200)
 
   it('MỌI dòng lượt đẩy ở đây đánh dấu `da_day_sheet = 1`', () => {
     expect(HAM).toContain('VALUES (?,?,?,?,?,?,?,?,?,?,?,1)')

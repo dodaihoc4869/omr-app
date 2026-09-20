@@ -307,9 +307,16 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
   const soTho = await docSo(env, sbd)
   const luot = await docLuotCongBo(env, sbd)
 
-  // Sự kiện ca thi CHỈ tính khi ca đã công bố (đúng luật cũ): chưa công bố mà có EXP theo từng câu là lộ câu nào đúng.
+  // Sự kiện ca thi CHỈ tính khi ca đã công bố (đúng luật cũ): chưa công bố mà có EXP theo từng câu là lộ câu nào đúng. NGOẠI LỆ (reset toàn app giữ sổ, xoá ca): sự kiện `thi` của ca
+  // KHÔNG CÒN trong bảng `ca` coi là ĐÃ công bố — không bị ẩn vĩnh viễn khỏi lịch sử (lên bậc, khắc phục, dạng yếu). Không đọc được bảng `ca` thì coi mọi ca còn (đóng cửa, không lộ).
   const congBo = new Set(luot.map((l) => `${l.maCa}|${l.lanThu}`))
-  const so = soTho.filter((e) => e.nguon !== 'thi' || congBo.has(`${e.maNguon}|${e.lan}`))
+  const maCaThi = [...new Set(soTho.filter((e) => e.nguon === 'thi').map((e) => e.maNguon))]
+  let caConTai = new Set<string>(maCaThi)
+  if (maCaThi.length > 0) {
+    const rc = await an(() => env.DB.prepare('SELECT ma_ca FROM ca WHERE ma_ca IN (SELECT value FROM json_each(?))').bind(json(maCaThi)).all<{ ma_ca: string }>(), null)
+    if (rc) caConTai = new Set((rc.results ?? []).map((x) => String(x.ma_ca)))
+  }
+  const so = soTho.filter((e) => e.nguon !== 'thi' || !caConTai.has(e.maNguon) || congBo.has(`${e.maNguon}|${e.lan}`))
 
   // Ngày cần tính: ngày chính + ngày nộp của ca thi vừa được công bố muộn (chưa có khoản `diem|…`).
   const daCo = new Set<string>()

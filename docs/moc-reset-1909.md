@@ -1,21 +1,21 @@
 # Hợp đồng `mocReset` và phản hồi "đang làm mới" — cho app học sinh, phụ huynh, giáo viên
 
-Người viết: Code 3 (máy chủ). Mã: `server/src/reset-toan-app.ts`, nối ở `server/src/index.ts`. Bối cảnh: thầy chốt RESET TOÀN APP lúc 00:01 giờ VN thứ Hai 21/09/2026 (xoá ca thi, lượt, BTVN, sổ học, game, thần thú…; giữ tài khoản, lớp, kho đề, cấu hình). Máy học sinh/giáo viên còn giữ nhiều thứ theo mã cũ trong localStorage/IndexedDB; mốc này cho máy tự dọn.
+Người viết: Code 3 (máy chủ). Mã: `server/src/reset-toan-app.ts`, nối ở `server/src/index.ts`. Bối cảnh: thầy chốt RESET TOÀN APP (cập nhật 21/09 00:08): xoá ca thi, lượt, điểm, BTVN, bài Mẹ giao, kế hoạch ngày, game, thần thú (em chọn lại thú), EXP, mảnh khiên; GIỮ tài khoản, lớp, kho đề, cấu hình và toàn bộ SỔ + HỒ SƠ MẠNH YẾU của học sinh. Không còn giờ cố định: job chạy khi thầy/Boss ra lệnh (xem `docs/reset-2109.md`). Máy học sinh/giáo viên còn giữ nhiều thứ theo mã cũ trong localStorage/IndexedDB; mốc này cho máy tự dọn.
 
 ## 1. Trường `mocReset`
 
-- Kiểu: chuỗi `"YYYY-MM-DD"`. Giá trị duy nhất hiện nay: `"2026-09-21"`.
+- Kiểu: chuỗi `"YYYY-MM-DD"` = **ngày VN lúc job reset XONG** (không còn hằng `2026-09-21`; ngày thật do lúc ra lệnh quyết định, chưa biết trước). Máy khách KHÔNG được so với một giá trị cố định: chỉ so "khác giá trị đã lưu".
 - Ở GỐC JSON của ba phản hồi (không lồng trong `exp`/`thanThu`…):
   - `POST /hs/ke-hoach-ngay` (HS và PH gọi),
   - `POST /hs/ca-dang-mo` (HS và PH gọi),
   - `POST /ca/danh-sach` (đường CHÍNH của app giáo viên; lệnh của thầy, kèm mã bí mật),
   - `POST /goi {action:"danhSachCa"}` (đường dự phòng của app giáo viên khi `/ca/danh-sach` trả null).
-- **VẮNG hoàn toàn cho tới khi job reset chạy XONG** (không gửi `null`, không gửi chuỗi rỗng). Lý do: máy khách coi "máy chưa từng thấy mốc + máy chủ có mốc" là tín hiệu dọn nháp; gửi sớm = xoá nháp bài của học sinh ngay tối Chủ nhật. Nguồn giá trị: `cau_hinh.reset_20260921.xongLuc` đã có. Job xong thì trường xuất hiện trong vài giây (bộ nhớ đệm máy chủ tối đa 5 giây).
+- **VẮNG hoàn toàn cho tới khi job reset chạy XONG** (không gửi `null`, không gửi chuỗi rỗng). Lý do: máy khách coi "máy chưa từng thấy mốc + máy chủ có mốc" là tín hiệu dọn nháp; gửi sớm = xoá nháp bài của học sinh ngay tối Chủ nhật. Nguồn giá trị: khoá `cau_hinh.reset_toan_app` có `trangThai:"xong"` (giá trị lấy từ `mocReset` trong khoá). Job xong thì trường xuất hiện trong vài giây (bộ nhớ đệm máy chủ 3 giây). Nếu về sau có một lần reset khác thì giá trị mới KHÁC giá trị cũ (khác ngày) và máy dọn lại; hai lần cùng một ngày VN thì không phân biệt được (job này chỉ chạy một lần).
 - Máy khách gợi ý: giữ `omr_moc_reset` trong localStorage. Khi phản hồi có `mocReset` mà giá trị đã lưu KHÁC (kể cả chưa từng lưu) → dọn bộ nhớ theo danh sách dưới rồi mới lưu mốc mới. Phản hồi không có `mocReset` → không làm gì.
 - Nên dọn (HS/PH): bản nhớ kế hoạch ngày, nháp/khôi phục bài làm theo MÃ CA trong IndexedDB, danh sách ca, bài Mẹ giao/BTVN nhớ trong máy (`omr_mom_btvn_<sbd>`…), bản nhớ thần thú/EXP (máy chủ đã về vạch xuất phát, em chọn thú lại). GIỮ: đăng nhập/token (mật khẩu không đổi), cài đặt giao diện.
 - Nên dọn (giáo viên): danh sách ca, bank/đáp án và bản đồ đề riêng nhớ theo mã ca cũ, hàng đợi đẩy dữ liệu chưa gửi của ca cũ (kẻo đẩy ngược ca ma lên máy chủ).
 
-## 2. Lúc job đang chạy (đóng băng từ 00:00 tới khi job xong hoặc 01:00 giờ VN; CHỈ khi thầy đã bật cờ "lên đạn")
+## 2. Lúc job đang chạy (đóng băng từ lúc lên đạn tới khi job xong hoặc hết 60 phút; CHỈ khi thầy đã bật cờ "lên đạn")
 
 Mọi lệnh (trừ `/khoe` và các đường chuyển hướng) trả:
 
@@ -40,6 +40,10 @@ Mã ca chưa từng dùng và chưa có dòng trong `ca` vẫn ghi được `cap
 
 ## 4. Sau reset, máy chủ trả gì
 
-- `/hs/ke-hoach-ngay`: `thanThu: null` cho mọi em (chưa chọn thú); `exp`/`expNhan` theo EXP mới từ mốc 00:01 21/09 (`cau_hinh.exp_moi = {tu:"2026-09-20T17:01:00.000Z", toanBo:true}`).
-- Game v2: hồ sơ tạo lại là bản trắng (`choice:true`, cấp 1, 0 EXP, 0 mảnh khiên, không tên), mùa game mới `2026-09-21-mua-1`.
+- `/hs/ke-hoach-ngay`: `thanThu: null` cho mọi em (chưa chọn thú); `exp`/`expNhan` theo EXP mới từ lúc job bắt đầu (`cau_hinh.exp_moi = {tu:"<batDauLuc>", toanBo:true}`). Sổ học cũ vẫn còn nhưng KHÔNG sinh EXP. Kế hoạch ngày, câu ôn, hồ sơ mạnh yếu của em GIỮ NGUYÊN (dựa trên sổ + hồ sơ được giữ): việc ôn hôm nay của em vẫn là các câu tới hạn từ trước reset.
+- Game v2: hồ sơ tạo lại là bản trắng (`choice:true`, cấp 1, 0 EXP, 0 mảnh khiên, không tên), mùa game mới `<ngày VN lúc bắt đầu>-mua-1`.
 - Đăng nhập: mật khẩu và token cũ dùng được (bảng `hoc_sinh` giữ nguyên).
+
+## 5. Máy khách cần và không cần làm gì
+- Cần dọn khi `mocReset` đổi (mục 1). Vì reset mới GIỮ hồ sơ mạnh yếu ở máy chủ, KHÔNG dọn những thứ chỉ là bản nhớ của hồ sơ mạnh yếu nếu app có: chúng vẫn đúng. Chỉ dọn thứ gắn với ca, BTVN, bài Mẹ giao, EXP, thú.
+- Không cần đổi mã nếu máy khách chỉ so chuỗi `mocReset` với giá trị đã lưu (khác thì dọn). Sai nếu máy so với hằng `"2026-09-21"`.

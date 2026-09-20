@@ -1,6 +1,6 @@
 // @vitest-environment node
 // GĐ 5 — KÊNH 4 (thần thú): bằng chứng từ hồ sơ, một đồng hồ ôn (moc_on_ke), chặn câu đã làm/đang giao hôm nay, nhiệm vụ tự sinh từ kế hoạch ngày.
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
 import { protectedQuestions, readScope } from '../server/src/game-v2-bank'
@@ -12,6 +12,10 @@ import { ghiSuKien, ngayVn, type NguonSuKien } from '../server/src/su-kien-hoc'
 import { taoD1That, type D1That } from './_d1-that'
 
 const H = 3_600_000
+// ĐỒNG HỒ CỐ ĐỊNH 12:00 giờ VN (tiêm vào `Date`): các test dựng sự kiện "N giờ trước" rồi so theo NGÀY VN, nên chạy trong 00:00–01:00 giờ VN
+// thì "1 giờ trước" rơi sang ngày hôm trước và test đỏ oan (21/09 00:20–00:50). Giữ nguyên mọi số liệu, chỉ đóng băng giờ máy.
+beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(new Date('2026-09-20T05:00:00.000Z')) })
+afterEach(() => vi.useRealTimers())
 const iso = (gio: number) => new Date(Date.now() + gio * H).toISOString()
 const cauKho = (qid: string, dang: string | null, mucDo: string | null = 'biet', o: Record<string, unknown> = {}) => ({
   qid, maDe: 'x', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Đề ${qid}`, choices: ['A', 'B', 'C', 'D'], ideas: [], hinhAnh: [], dang, tenDang: 'Dạng', mucDo, sao: 1,
@@ -27,6 +31,8 @@ type Ev = { sbd?: string; qid: string; nguon: NguonSuKien; gio: number; kq: 0 | 
 async function ghi(d: D1That, ds: Ev[]) {
   const r = await ghiSuKien(d.env, ds.map((e, i) => ({ nguon: e.nguon, maNguon: `M${i}`, sbd: e.sbd ?? 'S1', qid: e.qid, lan: e.lan ?? 1, ketQua: e.kq, luc: iso(e.gio), maDang: e.dang === undefined ? 'ES.A.X' : e.dang })))
   expect(r.ok).toBe(true)
+  // Sự kiện `thi` của một ca CÒN TRONG BẢNG và CHƯA công bố (cong_bo ca_lop_xong, chưa ai nộp xong). Ca không còn (reset toàn app) thì coi là đã công bố — xem test cuối tệp.
+  ds.forEach((e, i) => { if (e.nguon === 'thi') d.sql.prepare("INSERT OR IGNORE INTO ca(ma_ca,trang_thai,cong_bo,cap_nhat_luc) VALUES(?, 'mo', 'ca_lop_xong', 'x')").run(`M${i}`) })
 }
 const dung = (d: D1That, sbd = 'S1') => dungLaiHoSo(d.env, [sbd], new Date().toISOString())
 
@@ -323,5 +329,20 @@ describe('bộ nhớ đệm câu đang bảo vệ KHÔNG bị lệnh game ghi b�
     const s2 = await start('S2')
     expect(s2).toContain('Q1') // S2 chưa làm Q1: kho của S2 không được teo vì S1
     expect((await start('S1'))).not.toContain('Q1')
+  })
+})
+
+describe('reset toàn app: ca bị xoá, sổ + hồ sơ giữ (thầy chốt 21/09)', () => {
+  it('sự kiện thi của ca KHÔNG CÒN trong bảng ca coi là ĐÃ công bố: câu sai ở thi cũ thành bằng chứng wrong của game; ca còn mà chưa công bố thì vẫn ẩn', async () => {
+    const d = taoD1That()
+    themHs(d, 'S1')
+    themCau(d, ['T1', 'K1'].map((q) => cauKho(q, 'ES.A.X')))
+    await ghi(d, [{ qid: 'T1', nguon: 'thi', gio: -80, kq: 0 }])
+    await dung(d)
+    expect((await readScope(d.env, 'S1')).evidence.map((e) => e.qid)).toEqual([])
+    d.sql.exec('DELETE FROM ca')
+    const e = (await readScope(d.env, 'S1')).evidence
+    expect(e.map((x) => x.qid)).toEqual(['T1'])
+    expect(e[0]).toMatchObject({ wrong: true })
   })
 })

@@ -112,6 +112,8 @@ describe('/hs/ca-dang-mo', () => {
     const d = taoD1That()
     hs(d, 'E12', '12')
     for (let i = 0; i < 6; i++) ca(d, `C${i}`, { lop: '12' })
+    // Cổng đóng băng của reset đọc cau_hinh 1 lần rồi đệm 3 giây trong isolate: làm nóng đệm để chỉ đo truy vấn của lệnh này.
+    await goiWorker(worker, d.env, '/khong-co-duong-nay', {})
     const truoc = d.soLenh.prepare
     await hoi(d, { sbd: 'E12' })
     // 1 = em có thật + lớp + năm sinh · 2 = ca mở của lớp em (kèm lượt của em)
