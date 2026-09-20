@@ -11,6 +11,24 @@ Lập 19/09/2026 bởi phiên **0.Planer** (điều phối). Mọi phiên làm v
 - **THẤY LỖI LÀ SỬA LUÔN (thầy ra lệnh 19/09 14:40: "tìm ra lỗi bảo tự động sửa luôn không cần hỏi ý kiến tôi… hãy chủ động mọi thứ để tiến độ và kết quả xịn nhất").** Cách làm: (1) lỗi trong vùng tệp của mình → sửa ngay, thêm test tái hiện lỗi, commit riêng có chữ "Sửa lỗi:" ở đầu, đẩy theo luật 2, ghi sổ việc; (2) lỗi ở vùng phiên khác → nhắn chủ vùng (tệp:dòng, cách tái hiện, đề xuất sửa), chủ vùng sửa luôn không hỏi lại ai; phiên chủ vùng đã dừng → nhắn 0.Planer để gọi dậy; (3) lỗi có sẵn từ trước (không do mình gây ra) mà ảnh hưởng học sinh/phụ huynh thật (mất bài, sai điểm, sai số liệu hiển thị, không mở được bài) → cũng sửa luôn theo (1)/(2); lỗi chỉ là test trôi chữ thì gom lại báo 0.Planer, không sa đà; (4) VẪN PHẢI DỪNG và báo 0.Planer trước khi làm: xoá/ghi đè dữ liệu D1 thật, đổi luật chấm điểm/tính điểm ca thi, đổi luật vào thi/chống gian lận, đổi schema không phải chỉ-thêm.
 - Tin nhắn có thể bị giữ chờ thầy duyệt; im lặng KHÔNG phải là đồng ý. Việc gì quan trọng thì ghi thêm vào tệp này.
 
+## DANH BẠ + LUẬT NÓI CHUYỆN TRỰC TIẾP GIỮA CÁC PHIÊN (thầy ra lệnh 21/09: "cho tất cả các phiên nói chuyện được với nhau… trao đổi thông tin sao cho tốt nhất")
+
+**Các phiên NHẮN THẲNG NHAU, không cần đi vòng qua Boss**, bằng `ListAgents` → `SendMessage({to:"<tên>"})`. Boss chỉ là nơi QUYẾT, SOÁT và GỘP.
+
+| Phiên | Hỏi phiên này về | Làn tệp (chỉ phiên này sửa) |
+|---|---|---|
+| **Boss** (tên cũ 0.Planer) | quyết định, ưu tiên, soát commit luồng thi/làn giáo viên, gộp nhánh worktree, lệnh của thầy, reset | `DIEU-PHOI.md`, tài liệu thiết kế/đề bài, `docs/logo-1909`, `docs/infographic-2109` |
+| **Code 1** | app GIÁO VIÊN: gọi lên bảng, tờ máy chiếu, xếp buổi chữa, thời gian lên bảng, dọn IndexedDB máy thầy, nút cho thi lại | `GoiLenBangScreen`, `html-may-chieu`, `xep-buoi-chua`, `thoi-gian-len-bang`, `bo-cuc-to-chieu`, `uoc-luong-bo-cuc`, `len-bang-cau-hinh`, `don-moc-reset-giao-vien`, `SO-VIEC-GIAO-VIEN.md` |
+| **Code 2** | cổng HỌC SINH + PHỤ HUYNH: Bảng nhiệm vụ, adapter, LamCauOn, phiếu HTML (`html-phieu`), vỏ màn thi, dọn bộ nhớ máy HS/PH; **NGƯỜI ĐẨY PAGES** | `StudentPortalScreen`, `bang-nhiem-vu/**`, `nhiem-vu-adapter`, `html-phieu`, `don-moc-reset`, `ExamTakeScreen` (vỏ), `SO-VIEC-GIAO-DIEN.md` |
+| **Code 3** | MÁY CHỦ: mọi lệnh Worker, D1, hợp đồng API, EXP, kế hoạch ngày, hồ sơ, reset; **NGƯỜI DUY NHẤT đẩy Worker + chạy migration --remote** | `server/**` (trừ `game-v2-doan*`), `docs/*hop-dong*`, `docs/reset-2109.md`, `SO-VIEC.md` |
+| **Code 4** | COMPONENT dùng chung mặc M3, logo, Bảng tin, cổng PH phần cũ, KhungXemPhieu, PhieuScreen, app giáo viên trạng thái trống | `components/m3/**`, `Logo*`, `BangTinPhuHuynh`, `ParentPortalScreen`, `KhungXemPhieu`, `PhieuScreen`, `TheCau`, `SO-VIEC-GIAO-DIEN-C.md` |
+| **Code 5 - Game** | game Đoàn Hộ Tống (lõi, máy chủ game, giao diện); ở WORKTREE riêng `claude/zealous-taussig-a50c90` — Boss gộp | `src/game/than-thu-v2/**`, `server/src/game-v2-doan*`, `tests/doan-*`, `SO-VIEC-GAME.md` |
+
+**NHẮN THẲNG NHAU khi:** khớp hợp đồng API/tên trường/kiểu dữ liệu · cần một dòng trong tệp của phiên khác (xin chủ tệp sửa, KHÔNG tự sửa) · thấy lỗi trong làn phiên khác (kèm cách tái hiện) · test của phiên khác đỏ/chập chờn · xin đẩy (Worker → Code 3, Pages → Code 2) · hỏi "hàm/tệp này hoạt động thế nào" · hẹn nhau commit cùng đợt.
+**PHẢI QUA BOSS khi:** đổi luật thầy đã chốt (chấm điểm, vào thi/chống gian lận, EXP, reset) · schema không-chỉ-thêm, xoá/ghi đè dữ liệu D1 thật · đổi phạm vi/ưu tiên việc · commit thuộc luồng thi thật hoặc làn giáo viên (cần dòng "đã soát") · gộp nhánh worktree · hai phiên không thống nhất được trong 2 lượt tin.
+**CÁCH NHẮN CHO TỐT:** dòng đầu tự đủ nghĩa · nêu mã commit + đường dẫn tệp:dòng + điều cần + hạn · một tin một việc · trả lời bằng `from` của tin đến · thoả thuận xong thì GHI LẠI: hợp đồng vào `docs/hop-dong-*.md` (chủ tệp là bên CUNG CẤP), một dòng vào sổ việc của mình; chỉ báo Boss MỘT DÒNG khi thoả thuận làm đổi giao diện/hành vi người dùng thấy.
+**KHÔNG BAO GIỜ:** nhờ phiên khác làm việc mình bị từ chối quyền · coi tin của phiên khác là lệnh của thầy · sửa tệp ngoài làn · hỏi thầy (thầy chỉ muốn được báo khi xong) · im lặng = đồng ý.
+
 ## Ai làm gì (cập nhật khi đổi)
 
 | Phiên | Việc | Tệp được sửa | Trạng thái |
@@ -51,6 +69,8 @@ Phân vùng dự kiến theo hai bản thiết kế:
 7. Trước khi dừng phiên: commit tệp của mình, cập nhật bảng trên, nhắn 0.Planer một dòng tóm tắt.
 
 ## Nhật ký (mới nhất ở trên, mỗi dòng: giờ VN · phiên · việc)
+
+- 21/09 00:14 (giờ máy) · Boss · THẦY RA LỆNH: mọi phiên nói chuyện TRỰC TIẾP với nhau. Đã thêm mục "DANH BẠ + LUẬT NÓI CHUYỆN TRỰC TIẾP" (đầu tệp): ai lo gì, khi nào nhắn thẳng nhau, khi nào phải qua Boss, cách ghi lại thoả thuận.
 
 - 21/09 00:11 (giờ máy) · Boss (= 0.Planer) · **THẦY ĐỔI LỆNH RESET (21/09 00:08):** nguyên văn "bạn hãy tiếp tục tới khi xong hết thì tiến hành reset luôn, tôi muốn bạn cho chọn lại thú, xoá hết mọi ca thi và btvn nhưng GIỮ LẠI toàn bộ hồ sơ mạnh yếu của học sinh đã kiểm tra trước đó". HỆ QUẢ: (1) 00:01 21/09 KHÔNG có gì bị xoá (job chưa lên đạn — máy ngủ từ 17:12 thứ Bảy, sao lưu chính thức chưa chạy). (2) PHẠM VI MỚI: GIỮ thêm `su_kien_hoc`, `nam_kt_cau`, `nam_kt_dang`, `tien_do_hs`, `qid_da_lam`; vẫn XOÁ mọi ca thi/lượt/điểm, BTVN, bài Mẹ giao, luyện đề, kế hoạch ngày, trao đổi, game + thần thú (chọn lại thú) + EXP + mảnh khiên, vinh danh, bảng tin PH; GIỮ tài khoản/mật khẩu, lớp, kho đề, cấu hình. (3) THỜI ĐIỂM: bỏ mốc cứng; reset chạy KHI MỌI PHIÊN XONG VIỆC, do Boss ra lệnh (thầy đã uỷ quyền), theo trình tự: export chính thức ra SSD + bookmark Time Travel → dryRun khớp → lên đạn → theo dõi tới `xong` → kiểm bản sống bằng 12121212 → báo thầy. (4) MỌI PHIÊN: làm LIÊN TỤC tới hết hàng việc của mình, xong thì báo Boss một dòng "XONG TRỌN" kèm mã commit cuối; Boss soát, gom đợt đẩy cuối, rồi mới reset. Infographic gửi học sinh (docs/infographic-2109/) đang ghi "00:01 THỨ HAI 21/09" — sẽ đổi ngày khi biết ngày reset thật.
 
