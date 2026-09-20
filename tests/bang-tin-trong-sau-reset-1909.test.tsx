@@ -119,6 +119,17 @@ describe('(2) bảng vinh danh trong Bảng tin: dải 4 màu + chữ vàng ch�
     expect(luat('.m3 .honors-eyebrow svg')).toMatch(/color:\s*inherit/)
   })
 
+  it('tương phản thẻ vinh danh (Code 2 đo 21/09): nhãn TOP n + điểm + tên hạng 1 đọc theo cặp cảnh báo M3; tên hạng 1 đặt CẢ nền lẫn chữ (không dựa `.dark`)', () => {
+    expect(luat('.m3 .honors .honors-rank')).toMatch(/color:\s*var\(--m3-tren-canh-bao\)/)
+    expect(luat('.m3 .honors .honors-rank')).toMatch(/font-weight:\s*800/)
+    const diem = luat('.m3 .honors .honors-score')
+    expect(diem).toMatch(/color:\s*var\(--m3-tren-canh-bao\)/)
+    const ten = luat('.m3 .honors .honors-rank-1 .honors-name')
+    expect(ten).toMatch(/background:\s*var\(--m3-canh-bao-nen\)/)
+    expect(ten).toMatch(/color:\s*var\(--m3-tren-canh-bao\)/)
+    expect(css).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
+  })
+
   it('bảng vinh danh nằm TRONG gốc `m3` của Bảng tin ở cả hai vai', async () => {
     for (const hs of [true, false]) {
       mayChu('co-report')
