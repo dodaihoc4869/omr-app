@@ -80,6 +80,7 @@ Phân vùng dự kiến theo hai bản thiết kế:
 
 > Chỉ giữ 12 dòng mới nhất ở đây để mỗi phiên đọc nhanh, đỡ tốn ngữ cảnh. Dòng cũ hơn: `docs/nhat-ky-dieu-phoi-cu.md` (các dòng "đã soát <mã>" cũ vẫn có hiệu lực — tra ở đó bằng `grep`).
 
+- 21/09 01:06 (giờ máy) · Boss · Boss đã soát 1b42fd8 (Code 1, M4: lưu buổi chữa dở ở khoá settings `buoiChua:…`, thẻ "Tiếp tục buổi trước", giữ em có mặt/thay em vắng, hạn 14 ngày, gắn mốc reset; chỉ tệp trong làn). ĐƯỢC ĐẨY.
 - 21/09 01:02 (giờ máy) · Boss · Boss đã soát 75eb057 (Code 4, app giáo viên G2: màn HÔM NAY — tệp mới HomNayScreen/hom-nay-api/hom-nay.css, ExamHubScreen đổi 9 dòng; chưa có lệnh máy chủ thì hiện "đang chờ máy chủ", không bịa số). ĐƯỢC ĐẨY. Nối Đảo đợt 1 của Code 5 (ddede84) CHƯA gộp — chờ vỏ Đảo của Code 6 để lên một lần cho trọn.
 - 21/09 01:01 (giờ máy) · Boss · Boss đã soát 0a092f1 (Code 2, C10 bước 3: thân màn thi M3 — dải "Còn N câu chưa làm", đầu phần, nhãn "Mới x/4 ý"; chỉ trình bày lại dữ liệu sẵn có, 0 state/effect mới, chỉ đường học sinh). ĐƯỢC ĐẨY. Worker bf307951 (game bước 6 + token PH mềm + doan_trum_cau vào XOÁ) đã lên.
 - 21/09 00:56 (giờ máy) · Boss · ĐÃ GỘP 033df66 = game bước 6 + 3 việc máy chủ cho Đảo (`start` trả `role`, `answer` trả `lyDoThuong`, lệnh đọc-chỉ `so-tay`; core đổi `chooseSession` → `chooseSessionWithRoles`, test than-thu-v2/kenh4 xanh) và 314126e (Code 6: màn Hòn đảo + Túi đồ). Bản sạch 262/262 test game+đảo, tsc app+server sạch. ĐƯỢC ĐẨY. Code 3: chạy `server/migration-2109-game-doan-trum-cau.sql` --remote, thêm `doan_trum_cau` vào BANG_XOA, đẩy Worker.
