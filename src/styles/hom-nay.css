@@ -1,0 +1,335 @@
+/* MÀN HÔM NAY của thầy (G2) — Material 3, token --m3-* (bản vẽ docs/ban-ve-app-giao-vien-2109/1-hom-nay.jpg). Không hex, không !important. */
+.hn {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px 32px 28px;
+  color: var(--m3-on-surface);
+}
+.hn-dau {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+.hn-chao {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.hn-ngay {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: var(--m3-on-surface-variant);
+}
+.hn-dau-phai {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.hn-tim {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 280px;
+  height: 48px;
+  padding: 0 18px;
+  border-radius: 24px;
+  background: var(--m3-surface-container);
+  color: var(--m3-on-surface-variant);
+}
+.hn-tim input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--m3-on-surface);
+  font: inherit;
+  font-size: 14px;
+}
+.hn-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 16px;
+  background: var(--m3-surface-container-high);
+  color: var(--m3-on-surface-variant);
+  font-size: 12px;
+  font-weight: 700;
+}
+.hn-chip--dang-mo {
+  background: var(--m3-tertiary-container);
+  color: var(--m3-on-tertiary-container);
+}
+
+.hn-hang-so {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.hn-so {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px;
+  border-radius: 24px;
+}
+.hn-so--tertiary {
+  background: var(--m3-tertiary-container);
+  color: var(--m3-on-tertiary-container);
+}
+.hn-so--primary {
+  background: var(--m3-primary-container);
+  color: var(--m3-on-primary-container);
+}
+.hn-so--secondary {
+  background: var(--m3-secondary-container);
+  color: var(--m3-on-secondary-container);
+}
+.hn-so--error {
+  background: var(--m3-error-container);
+  color: var(--m3-on-error-container);
+}
+.hn-so-tieu {
+  font-size: 13px;
+  font-weight: 700;
+}
+.hn-so-gia-tri {
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1;
+}
+.hn-so-gia-tri small {
+  font-size: 20px;
+  font-weight: 700;
+}
+.hn-so-phu {
+  font-size: 13px;
+}
+
+.hn-luoi {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.hn-cot {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.hn-the {
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--m3-surface-container-lowest);
+  box-shadow: inset 0 0 0 1px var(--m3-outline);
+}
+.hn-the--chua {
+  background: var(--m3-primary-container);
+  color: var(--m3-on-primary-container);
+  box-shadow: none;
+}
+.hn-the h2 {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--m3-on-surface-variant);
+}
+.hn-the--chua h2 {
+  color: var(--m3-on-primary-container);
+}
+.hn-the-dau {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.hn-lien-ket {
+  min-height: 40px;
+  padding: 0 4px;
+  background: transparent;
+  color: var(--m3-primary);
+  font-size: 13px;
+  font-weight: 700;
+}
+.hn-trong {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--m3-on-surface-variant);
+}
+.hn-chua-noi-dung {
+  margin: 8px 0 14px;
+  font-size: 14px;
+}
+
+.hn-em {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-top: 1px solid var(--m3-outline);
+}
+.hn-em-chu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--m3-error-container);
+  color: var(--m3-on-error-container);
+  font-size: 15px;
+  font-weight: 800;
+}
+.hn-em-thong-tin {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.hn-em-ten {
+  font-size: 15px;
+  font-weight: 700;
+}
+.hn-em-lop {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--m3-on-surface-variant);
+}
+.hn-em-ly-do {
+  font-size: 13px;
+  color: var(--m3-on-surface-variant);
+}
+
+.hn-nut {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.hn-nut--chinh {
+  background: var(--m3-primary);
+  color: var(--m3-on-primary);
+}
+.hn-nut--vien {
+  background: transparent;
+  color: var(--m3-primary);
+  box-shadow: inset 0 0 0 1px var(--m3-outline);
+}
+.hn-hang-nut {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.hn-btvn {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) auto auto auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-top: 1px solid var(--m3-outline);
+  font-size: 14px;
+}
+.hn-btvn-ten {
+  font-weight: 700;
+  min-width: 0;
+}
+.hn-lo {
+  display: flex;
+  gap: 4px;
+}
+.hn-lo i {
+  width: 30px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--m3-surface-container-high);
+}
+.hn-lo i.da {
+  background: var(--m3-primary);
+}
+.hn-btvn-lo,
+.hn-btvn-han {
+  font-size: 13px;
+  color: var(--m3-on-surface-variant);
+}
+.hn-btvn-kip {
+  font-weight: 700;
+  color: var(--m3-on-tertiary-container);
+}
+
+.hn-yeu {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 110px auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  font-size: 14px;
+}
+.hn-yeu-thanh {
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--m3-surface-container-high);
+  overflow: hidden;
+}
+.hn-yeu-thanh i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--m3-error);
+}
+.hn-yeu-thanh--doan i {
+  background: var(--m3-primary);
+}
+.hn-yeu-so {
+  font-size: 13px;
+  color: var(--m3-on-surface-variant);
+}
+.hn-doan-dong {
+  margin: 4px 0 10px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+@media (max-width: 1099px) {
+  .hn-hang-so {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .hn-luoi {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 879px) {
+  .hn {
+    padding: 16px 14px 24px;
+  }
+  .hn-tim {
+    min-width: 0;
+    width: 100%;
+  }
+  .hn-btvn {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .hn-lo {
+    grid-column: 1 / -1;
+  }
+  .hn-em {
+    flex-wrap: wrap;
+  }
+}

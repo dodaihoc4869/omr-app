@@ -9,6 +9,7 @@ Màn Hôm nay (`src/screens/HomNayScreen.tsx`) chỉ hiện số NÉM TỪ máy 
 ```
 serverNow, ngay,
 soEm, soLop,                      // hoc_sinh/danh_sach — số em, số lớp có em
+caDangMo,                         // số ca trang_thai='mo' đang trong giờ vào/làm (chip "N ca đang mở" ở đầu màn); null nếu không đếm được
 nhiemVu:  { tong, dat, tongHomQua|null, datHomQua|null } | null
             // tong = số dòng ke_hoach_ngay hôm nay (la_ngay_nghi=0); dat = số em đã đạt kế hoạch HÔM NAY theo đúng công thức chotNgayCu
             // (ke-hoach-ngay-d1.ts:308) áp cho ngày đang chạy; homQua = đếm ket_qua='dat' (null nếu chưa có dữ liệu — sau reset)
