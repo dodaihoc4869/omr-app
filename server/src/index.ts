@@ -5,6 +5,7 @@ import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
 import {hsThoiGianHoc,chayCaLop} from './ke-hoach-ngay-d1'
 import {chayResetNeuDenGio,chayTiepTay,dangLamMoi,docMocReset,doGioiHanTruyVan,maDaDung,maDaDungTrong,resetDryRun,LOI_DANG_LAM_MOI} from './reset-toan-app'
 import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQua} from './exp-d1'
+import {doanMoCho} from './game-v2-doan'
 import {hsCauTheoQid,docDoPhuPhucVu} from './cau-theo-qid'
 import {hsOnLaiNop} from './on-lai-nop'
 import {hoSoOnCa} from './ho-so-on-ca'
@@ -2917,7 +2918,12 @@ export default {
       if (p === '/btvn/nop') return nopBtvn(env, b)
       if (p === '/btvn/xong-lo') return xongLoBtvn(env, b)
       // KẾ HOẠCH NGÀY (GĐ 2) — em đọc kế hoạch hôm nay; đặt số phút học mỗi ngày (cần token).
-      if (p === '/hs/ke-hoach-ngay') return themMocReset(env, ra(await hsKeHoachNgayCoExp(env, b)))
+      if (p === '/hs/ke-hoach-ngay') {
+        const kh = await hsKeHoachNgayCoExp(env, b)
+        // `doanMo` (boolean, chỉ khi ok:true): em này được mở game Đoàn Hộ Tống chưa (cùng nguồn cau_hinh.doan_ho_tong với các lệnh doan-*) — Bảng nhiệm vụ chỉ hiện thẻ khi === true.
+        if (kh.ok === true && typeof kh.sbd === 'string') kh.doanMo = await doanMoCho(env, kh.sbd)
+        return themMocReset(env, ra(kh))
+      }
       if (p === '/hs/cau-theo-qid') return ra(await hsCauTheoQid(env, b))
       if (p === '/hs/on-lai/nop') return ra(await hsOnLaiNop(env, b))
       if (p === '/hs/thoi-gian-hoc') return ra(await hsThoiGianHoc(env, b))

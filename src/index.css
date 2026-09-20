@@ -796,6 +796,16 @@ html[data-giu-de-an] [data-giu-de-phu] {
   user-select: none;
 }
 
+/* NỀN TỐI: --gg-xanh thành xanh NHẠT (#8ab4f8) mà --giay là trắng CỐ ĐỊNH → chữ trắng trên xanh nhạt chỉ 2,11:1 (đo Chromium: nút
+ * "Đăng nhập" của cổng học sinh). Nền tối dùng chữ xanh đậm của --gg-xanh-nen (≈ 8:1). Nền sáng giữ chữ trắng. Dưới `.m3` đã có
+ * luật riêng (m3.css) nên không bị ảnh hưởng. CHỈ nút ở nền xanh mặc định: nút tự đặt nền khác bằng `!bg-*` (rose/purple/emerald/amber ở
+ * game và cổng học sinh) vẫn giữ chữ trắng của chúng — chữ xanh đậm trên các nền ấy sẽ tệ hơn. */
+@media (prefers-color-scheme: dark) {
+  .btn-google-primary:not([class*='!bg-']) {
+    color: var(--gg-xanh-nen);
+  }
+}
+
 .btn-google-primary:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(26, 115, 232, 0.35);

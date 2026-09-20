@@ -20,6 +20,7 @@
 }
 .m3-phieu-xem-de {
   --xem-de-cao: 48px;
+  --xem-de-chu: rgb(67 56 202);
 }
 .m3-phieu-xem-de button:focus-visible {
   outline: 3px solid var(--p-tim);

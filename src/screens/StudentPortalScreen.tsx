@@ -67,6 +67,8 @@ import { LogoDoc } from '../components/LogoVai'
 // huynh chỉ mở một trang báo cáo trên điện thoại. Em nào mở tab game mới tải,
 // và service worker cất lại ngay nên lần sau tức thì.
 const ThanThuHoaHocGame = lazy(() => import('../game/than-thu-v2/Game'))
+/** = KHOA_MAN_DAU của Game.tsx (test khoá khớp). KHÔNG import hằng ấy từ Game.tsx: sẽ kéo cả game vào gói chính, mất nạp lười. */
+const KHOA_MAN_DAU_GAME = 'game-v2:man-dau'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import DongDemCau, { docSoDem } from '../components/DongDemCau'
 import { goiBaiThi } from '../lib/goi-bao-cao'
@@ -1307,6 +1309,15 @@ export default function StudentPortalScreen() {
           caDangMo={caDangMo}
           onHanhDong={xuLyHanhDongTroLy}
           onMoThanThu={() => setTab('thanthu')}
+          onLenDuongDoan={() => {
+            // Hợp đồng cửa vào của game (docs/hop-dong-mo-game-doan-ho-tong-1909.md): khoá màn đầu rồi mở tab game; game đọc MỘT lần rồi tự xoá.
+            try {
+              sessionStorage.setItem(KHOA_MAN_DAU_GAME, 'doan')
+            } catch {
+              /* máy chặn lưu: game vẫn mở, ở màn Đảo thần thú */
+            }
+            setTab('thanthu')
+          }}
           onVaoThi={() => setTab('vaothi')}
           onXemBaiDaNop={() => moManCu('diem')}
         />
@@ -2180,7 +2191,7 @@ export default function StudentPortalScreen() {
             docThanThuMayChu={docThanThuChoGame}
             ghiThanThuMayChu={ghiThanThuChoGame}
             congVoDai={congVoDai}
-            onDong={() => setTab('diem')}
+            onDong={() => setTab(null)}
             onChuyenSangKhacPhuc={() => setTab('khacphuc')}
             onChuyenSangBtvn={() => setTab('btvn')}
             onChuyenSangVaoThi={() => setTab('vaothi')}

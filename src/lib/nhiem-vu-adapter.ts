@@ -101,6 +101,11 @@ export interface DuLieuBangNhiemVu {
   expNhan: { exp: number; ghiChu: string }[]
   /** Mảnh khiên mới trong lần gọi này (không lưu vào bản nhớ). */
   manhNhan: { so: number; ghiChu: string }[]
+  /**
+   * Máy chủ báo game "Đoàn Hộ Tống" MỞ cho em (`doanMo === true` ở gốc /hs/ke-hoach-ngay; nguồn cau_hinh.doan_ho_tong). CHỈ `true` thật mới hiện
+   * thẻ mời; vắng/false/kiểu khác ⇒ ẩn hết, không chữ "Đoàn" nào. Có lưu vào bản nhớ (chỉ để khỏi giật bố cục khi mở lại; bản mới về thì thay).
+   */
+  doanMo?: boolean
 }
 
 export interface DuLieuExp {
@@ -390,6 +395,8 @@ export interface KeHoachNgayMayChu {
   /** Khoản EXP mới ghi trong CHÍNH lần gọi này. */
   expNhan?: { loai?: string; exp?: number; ghiChu?: string }[]
   manhNhan?: { loai?: string; so?: number; ghiChu?: string }[]
+  /** Cờ mở game Đoàn Hộ Tống cho em (docs/hop-dong-mo-game-doan-ho-tong-1909.md). Đọc chặt `=== true`. */
+  doanMo?: unknown
 }
 
 const soNguyen = (v: unknown) => Math.max(0, Math.floor(Number(v) || 0))
@@ -620,6 +627,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     thanThu: docThanThu(keHoach.thanThu),
     tonCu,
     ...docExp(keHoach),
+    doanMo: keHoach.doanMo === true,
   }, { dat: keHoach.tienBo.dat === true && !expChuaDat, daLamCau: daLam, lenBac })
 }
 
@@ -725,6 +733,7 @@ export function phucHoiBanNho(x: unknown, now: number): DuLieuBangNhiemVu | null
     exp: docExpDaLuu((d as any).exp),
     expNhan: [],
     manhNhan: [],
+    doanMo: (d as any).doanMo === true,
     lamNgay: d.lamNgay ? lamMoiThe(d.lamNgay, now) : null,
     cacBac: d.cacBac.map((g) => ({ ...g, viec: g.viec.map((v) => lamMoiThe(v, now)) })),
     ghiChuCu: gioLuu ? `Kế hoạch lúc ${gioLuu} · đang cập nhật…` : 'Kế hoạch đã nhớ · đang cập nhật…',

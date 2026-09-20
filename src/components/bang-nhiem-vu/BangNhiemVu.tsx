@@ -4,7 +4,7 @@
 // Màn này KHÔNG xếp việc, không tính điểm, không gọi API nhiệm vụ: nhận
 // `DuLieuBangNhiemVu` từ `nhiem-vu-adapter` và chỉ vẽ.
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { CheckCircle2, ChevronRight, ClipboardCheck, MessageSquare, PawPrint, Plus, RefreshCw, Shield, Sparkles, Zap } from 'lucide-react'
+import { CheckCircle2, ChevronRight, ClipboardCheck, Compass, MessageSquare, PawPrint, Plus, RefreshCw, Shield, Sparkles, Zap } from 'lucide-react'
 import type { DuLieuBangNhiemVu, HanhDongNhiemVu, TheNhiemVu } from '../../lib/nhiem-vu-adapter'
 import type { SpiritMotion } from '../../game/than-thu-v2/Spirit2D'
 import DauTrang, { type MucMenu, type ThanThuGoc } from './DauTrang'
@@ -98,6 +98,8 @@ export interface BangNhiemVuProps {
   dangLamMoi?: boolean
   onHanhDong?: (hanhDong: HanhDongNhiemVu) => void
   onMoThanThu?: () => void
+  /** Mở game ở màn Đoàn Hộ Tống. Thẻ mời chỉ hiện khi CÓ hàm này, là học sinh, và máy chủ báo `duLieu.doanMo === true`. */
+  onLenDuongDoan?: () => void
   onVaoThi?: () => void
   onXemBaiDaNop?: () => void
   /** Luồng giao TAY cũ (chọn câu). Vẫn vào được khi con đã đủ việc — không chặn. */
@@ -122,6 +124,7 @@ export default function BangNhiemVu({
   dangLamMoi,
   onHanhDong,
   onMoThanThu,
+  onLenDuongDoan,
   onVaoThi,
   onXemBaiDaNop,
   onGiaoBai,
@@ -168,6 +171,20 @@ export default function BangNhiemVu({
 
   // Máy chủ nói RÕ em chưa chọn thần thú (`thanThu: null`) — vd sáng sau khi đặt lại mùa: thẻ mời nổi bật đầu bảng. Không hiện khi chưa biết.
   const chuaChonThu = !dangTai && duLieu.thanThu.kieu === 'chua_chon'
+  // Thẻ mời game Đoàn Hộ Tống: chỉ học sinh, chỉ khi máy chủ báo game mở cho em. Em chưa chọn thú vẫn thấy: game tự mở màn chọn thú có lời mời.
+  const theDoan =
+    !dangTai && !laPh && duLieu.doanMo === true && onLenDuongDoan ? (
+      <button type="button" className="bnv-doan" data-vung="doan-ho-tong" onClick={onLenDuongDoan} aria-label="Lên đường cùng Đoàn Hộ Tống">
+        <span className="bnv-doan-bt" aria-hidden="true">
+          <Compass size={28} />
+        </span>
+        <span className="bnv-doan-chu">
+          <span className="bnv-doan-ten">Lên đường cùng Đoàn Hộ Tống</span>
+          <span className="bnv-doan-phu">{chuaChonThu ? 'Em chọn một thần thú rồi cùng cả lớp hộ tống Linh Tâm.' : 'Cả lớp cùng hộ tống Linh Tâm. Chạm để vào Sảnh.'}</span>
+        </span>
+        <ChevronRight size={24} aria-hidden="true" />
+      </button>
+    ) : null
 
   const chon = (viec: TheNhiemVu) => onHanhDong?.(viec.hanhDong)
   const { tienDo, tocDo } = duLieu
@@ -360,6 +377,7 @@ export default function BangNhiemVu({
             )}
 
             {duLieu.trong ? (
+              <>
               <section className="bnv-trong" aria-label="Hôm nay chưa có việc" data-vung="trong">
                 <h2>{laPh ? (ghiChuNguon ? 'Chưa có bài gia đình giao nào đang chờ' : 'Hôm nay con chưa có việc') : chuaChonThu ? 'Hôm nay chưa có việc' : 'Hôm nay chưa có việc — thần thú đang nghỉ'}</h2>
                 <p>
@@ -387,6 +405,8 @@ export default function BangNhiemVu({
                   </div>
                 )}
               </section>
+              {theDoan}
+              </>
             ) : (
               <>
                 {duLieu.daXongHomNay && (
@@ -405,6 +425,7 @@ export default function BangNhiemVu({
                   </section>
                 )}
                 {duLieu.lamNgay && <TheLamNgay viec={duLieu.lamNgay} docChi={laPh} onLam={chon} />}
+                {theDoan}
                 <DanhSachNhiemVu cacBac={duLieu.cacBac} docChi={laPh} onChon={chon} />
               </>
             )}
