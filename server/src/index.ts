@@ -13,6 +13,8 @@ import {notifications,deliverNotices} from './notifications'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
 import {parentNews,refreshDailyNews} from './parent-news'
+import {phCapMa,phDemTruyCap,phKeHoach,phThoiGianHoc,phXacDinh} from './ph-truy-cap'
+import {homNayThay} from './hom-nay-thay'
 import { mom } from './mom'
 import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
@@ -2888,11 +2890,15 @@ export default {
       if (p === '/presence') return ra(await recordPresence(env,b))
       if (p.startsWith('/student-news/')) {
         const sbd = await gameIdentity(env,b)
-        return ra(await parentNews(env,p.slice('/student-news/'.length),{sbd}))
+        return ra(await parentNews(env,p.slice('/student-news/'.length),{sbd},'hs'))
       }
       if (p.startsWith('/parent-news/')) return ra(await parentNews(env,p.slice('/parent-news/'.length),b))
       if (p.startsWith('/mom/')) return ra(await mom(env,p.slice('/mom/'.length),b))
       if (p === '/game-v2-parent') return ra(await parentGame(env,b))
+      // CỔNG PHỤ HUYNH — token giai đoạn mềm (docs/token-phu-huynh-1909.md): chỉ nhận `pass` (token do thầy cấp).
+      if (p === '/ph/xac-dinh') return ra(await phXacDinh(env, b))
+      if (p === '/ph/ke-hoach') return ra(await phKeHoach(env, b))
+      if (p === '/ph/thoi-gian-hoc') return ra(await phThoiGianHoc(env, b))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
       if (p.startsWith('/game-v2/')) return ra(await gameV2(env, p.slice('/game-v2/'.length), b))
       if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))
@@ -2933,6 +2939,9 @@ export default {
       // Lệnh của THẦY — đòi mã bí mật.
       if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
       if (p === '/teacher-news') return ra(await teacherNews(env,b))
+      // Token phụ huynh: cấp liên kết theo danh sách/lớp, và đếm truy cập (token so với SBD trần) để quyết giai đoạn cứng.
+      if (p === '/ph/cap-ma') return ra(await phCapMa(env, b))
+      if (p === '/ph/dem-truy-cap') return ra(await phDemTruyCap(env, b))
       if (p === '/ho-so/nap-lai') return ra(await napLaiSuKien(env, b.sbd, b.nguon as NguonNapLai | undefined))
       if (p === '/ho-so/kiem-cheo') return ra(await kiemCheoSuKien(env, b.sbd))
       // HỒ SƠ NẮM KIẾN THỨC (GĐ 1) — dựng lại từ sổ (≤ 50 em/lượt), xem một em, đo độ phủ mã dạng.
@@ -2950,6 +2959,8 @@ export default {
       // Đo giới hạn truy vấn D1 mỗi lượt gọi của gói đang dùng (chỉ đọc).
       if (p === '/reset/do-gioi-han') return ra(await doGioiHanTruyVan(env))
       if (p === '/ke-hoach/do-phu-phuc-vu') return ra(await docDoPhuPhucVu(env, ngayVn(Date.now())))
+      // Màn HÔM NAY của app giáo viên (docs/hop-dong-gv-hom-nay-2109.md): chỉ đọc, ≤ 8 truy vấn, khối nào không tính được thì null + lyDoThieu.
+      if (p === '/ke-hoach/hom-nay-thay') return ra(await homNayThay(env, b))
       if (p === '/ke-hoach/chay-ca-lop') return ra({ ok: true, ...(await chayCaLop(env, Date.now())) })
       if (p === '/game-v2-admin') return ra(await adminGame(env,b))
       if (p === '/ca/day') return dayCa(env, b)

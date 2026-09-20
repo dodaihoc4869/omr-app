@@ -4,7 +4,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import type { DoanXem } from './doan-kieu'
 import { LinhTamCau, SaoHinh, ThuHinh } from './DoanHinh'
 
-const MAU_GIAY = ['#ffd166', '#7fe9ff', '#ff8a5c', '#7dffb0', '#d9c8ff', '#ff9ec7']
+const MAU_GIAY = ['rgb(255,209,102)', 'rgb(127,233,255)', 'rgb(255,138,92)', 'rgb(125,255,176)', 'rgb(217,200,255)', 'rgb(255,158,199)']
 
 export default function DoanKetChang({ xem, expNhan, ve, onVe, onDiTiep, ban, khoiThem }: { xem: DoanXem; expNhan: number; ve?: number | null; onVe: () => void; onDiTiep: () => void; ban: boolean; khoiThem?: ReactNode }) {
   const k = xem.ketChang!, em = xem.ghe.find(g => g.laEm)!, banBe = xem.ghe.filter(g => !g.laEm).slice(0, 2), tb = k.tienBo
@@ -40,6 +40,7 @@ export default function DoanKetChang({ xem, expNhan, ve, onVe, onDiTiep, ban, kh
         <div className="dh-nhan">HÔM NAY EM TIẾN BỘ GÌ</div>
         <div><i>✓</i><span>Em <b>tự làm đúng {tb.tuLamDung}/{tb.soCau} câu</b> của riêng mình</span></div>
         {tb.lenBac !== null && tb.lenBac > 0 && <div><i>↑</i><span><b>{tb.lenBac} câu lên bậc ôn</b> · em làm đúng lại ở một ngày khác</span></div>}
+        {k.anThach && <div><i className="dh-cam">◆</i><span>Ấn <b>{k.anThach.ten}</b>: còn <b>{k.anThach.conCau} câu</b> nữa là sáng → mở {k.anThach.kyNang}</span></div>}
         {k.cuaEm.soLanGiup > 0 && <div><i className="dh-lam">⇄</i><span>Em <b>tiếp sức {k.cuaEm.soLanGiup} lần</b>{k.cuaEm.soLanGiupThanhCong > 0 ? ` · ${k.cuaEm.soLanGiupThanhCong} lần bạn làm lại đúng` : ''}</span></div>}
         {tb.duocGiup > 0 && <div><i className="dh-cam">↻</i><span>Em được tiếp sức <b>{tb.duocGiup} câu</b></span></div>}
         {(tb.duocGiup > 0 || banDuocGiup) && <small>Câu được giúp hôm nay sẽ quay lại để {tb.duocGiup > 0 ? 'em' : 'bạn'} tự làm vào ngày mai.</small>}

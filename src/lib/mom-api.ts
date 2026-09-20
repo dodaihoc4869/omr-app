@@ -3,6 +3,15 @@ import {chuanHoaLoiGiaiCau} from './chuan-hoa-loi-giai'
 import {dungPhieu, type ThongTinPhieu} from './html-phieu'
 import type {CauLuyen} from './bai-tap-pdf'
 const saves = new Map<string, Promise<any>>()
+// TOKEN PHỤ HUYNH (giai đoạn mềm, docs/token-phu-huynh-1909.md): có pass thì các lệnh phụ huynh gửi `{pass}` THAY `{sbd}` (máy chủ lấy danh tính từ token).
+// Chỉ bốn đường máy chủ đã nhận pass: /parent-news/*, /mom/parent-list, /mom/create. Không có pass ⇒ như cũ (SBD trần).
+let passPhuHuynh = ''
+export function datPassPhuHuynh(pass: string): void {
+  passPhuHuynh = pass.trim()
+}
+export function goiPhuHuynhCoPass(action: string, prefix: string): boolean {
+  return !!passPhuHuynh && (prefix === '/parent-news' || (prefix === '/mom' && (action === 'parent-list' || action === 'create')))
+}
 export function momApi(action:string,body:Record<string,unknown>):Promise<any>{
   if (action !== 'save' && action !== 'submit') return requestMom(action,body)
   const key = `${body.token}:${body.id}`
@@ -16,6 +25,7 @@ export function studentNewsApi(action:'list'|'assign',token:string){return reque
 export function parentNewsApi(action:'list'|'assign',sbd:string){return requestMom(action,{sbd},'/parent-news')}
 async function requestMom(action:string,body:Record<string,unknown>,prefix='/mom'):Promise<any>{
   if (prefix === '/mom' && !action.startsWith('parent-') && action !== 'create' && !body.token) throw new Error('Em đăng xuất rồi đăng nhập lại để nhận bài từ Mom.')
+  if(goiPhuHuynhCoPass(action,prefix)){const {sbd:_boSbd,...con}=body;void _boSbd;body={...con,pass:passPhuHuynh}}
   const url=await layDiaChiMayChu()
   if(!url)throw new Error('Chưa kết nối được máy chủ. Vui lòng thử lại.')
   const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),25000)

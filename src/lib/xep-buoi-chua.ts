@@ -53,6 +53,10 @@ export interface CauVaoXep {
   /** BẬC BỐ CỤC ước lượng trên tờ chiếu (`uoc-luong-bo-cuc.ts`): 1 = ghép đôi được … 5 = chiếm CẢ bảng (em làm ở bảng phụ).
    * Thiếu thì không cảnh báo gì về bố cục. */
   bacUoc?: BacBoCuc
+  /** NỐI BUỔI (M4): sbd em đã ĐỊNH cho câu này ở lần xếp trước. Em ấy còn CÓ MẶT, còn rảnh và không bị chặn bậc thì giữ nguyên
+   * (buổi nối không xáo lại người đã đứng chỗ); vắng/bận/bị chặn thì chọn em hợp nhất như thường (`diemHopCau`). Đặt ở từng câu
+   * (không ở `YeuCauBuoiChua`) để màn hình gọi `xepBuoiChua(cauVaoXep, hoSo)` nguyên dạng như test cũ khoá. */
+  emDaDinh?: string
 }
 
 export type TangChua = 'len_bang' | 'doc_dap_an'
@@ -125,7 +129,15 @@ function chonEm(
   c: CauVaoXep,
   dsEm: HoSoEmDayDu[],
   daGoi: Set<string>,
+  emDaDinh?: string,
 ): { em: HoSoEmDayDu; hop: number; viSao: string } | null {
+  if (emDaDinh) {
+    const e = dsEm.find((x) => x.sbd === emDaDinh)
+    if (e && !daGoi.has(e.sbd)) {
+      const d = diemHopCau(e, c.cau)
+      if (!d.chan) return { em: e, hop: d.diem, viSao: d.viSao }
+    }
+  }
   let tot: { em: HoSoEmDayDu; hop: number; viSao: string; dayLai: boolean } | null = null
   for (const e of dsEm) {
     if (daGoi.has(e.sbd)) continue
@@ -245,7 +257,7 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
   for (const c of thuTu) {
     if (!c.batBuoc) continue
     if (daGoi.size >= tran) break
-    const chon = chonEm(c, em, daGoi)
+    const chon = chonEm(c, em, daGoi, c.emDaDinh)
     if (!chon || !duCho(c, chon.em)) {
       batBuocChuaChua.push(c.cau)
       continue
@@ -263,7 +275,7 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
     if (daGoi.size >= san || daGoi.size >= tran) break
     if (daChua.has(c.cau.id)) continue
     // Chọn em TRƯỚC rồi mới kiểm giờ: chi phí phụ thuộc bậc của em đứng lên (`giayLen`).
-    const chon = chonEm(c, em, daGoi)
+    const chon = chonEm(c, em, daGoi, c.emDaDinh)
     // Null = không em còn lại nào NHẬN được câu này (bị chặn bậc "biết"), chứ không
     // hẳn hết em: câu sau (1 sao, 0 sao) vẫn còn em nhận được — không được dừng cả vòng.
     if (!chon) continue
@@ -278,7 +290,7 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
   for (const c of thuTu) {
     if (daGoi.size >= tran) break
     if (daChua.has(c.cau.id)) continue
-    const chon = chonEm(c, em, daGoi)
+    const chon = chonEm(c, em, daGoi, c.emDaDinh)
     if (!chon) continue
     if (!duCho(c, chon.em)) continue
     daGoi.add(chon.em.sbd)

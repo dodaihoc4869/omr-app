@@ -75,6 +75,14 @@ describe('Đoàn Hộ Tống · giao diện · Sảnh bước 5 (vé, chuỗi, �
     expect(screen.getByLabelText('Trùm lớp').textContent).toContain('Chủ nhật 20:00'); expect(screen.getByLabelText('Trùm lớp').textContent).toContain('còn 4 ngày 4 giờ')
     expect([...screen.getByLabelText('Sắp mở').querySelectorAll('b')].map(b => b.textContent)).toEqual(['Ấn thạch dạng'])
   })
+  it('bước 6: 6 ấn thạch (nứt trước), "khắc phục thêm 3 câu là sáng → mở <biến thể kỹ năng>", thẻ bạn đồng hành BÙ NHAU chỉ nói điều mỗi bên vững; có ấn thật thì hết ô SẮP MỞ', async () => {
+    const an = { sang: 1, nut: 1, ds: [{ dang: 'ES', ten: 'Ester', trangThai: 'nut', conCau: 3 }, { dang: 'AN', ten: 'Ancol', trangThai: 'sang', conCau: 0 }], ganSang: { ten: 'Ester', conCau: 3, kyNang: 'Liệt Diễm Xuyên Giáp' } }
+    dung(null, lenh => lenh === 'doan-sanh' ? { ok: true, sanh: sanh(), anThach: an, banDongHanh: { ten: 'Thu Hà', pet: 1, cap: 30, banVung: 'Ester', emVung: 'Ancol' }, dangDo: null } : { ok: true })
+    const khoi = await screen.findByLabelText('Ấn thạch dạng của em'); expect(khoi.textContent).toContain('sáng 1 · nứt 1'); expect(khoi.textContent).toContain('khắc phục thêm 3 câu là sáng → mở kỹ năng Liệt Diễm Xuyên Giáp')
+    expect([...khoi.querySelectorAll('.dh-an > div')].map(x => [x.textContent, x.className])).toEqual([['Ester', 'dh-an-nut'], ['Ancol', '']])
+    const bdh = screen.getByLabelText('Bạn đồng hành hợp nhất hôm nay'); expect(bdh.textContent).toContain('Thu Hà vững Ester →'); expect(bdh.textContent).toContain('← Em vững Ancol'); expect(bdh.textContent).not.toMatch(/yếu|nứt|kém/)
+    expect(screen.queryByLabelText('Sắp mở')).toBeNull()
+  })
   it('đã đi chặng miễn phí: còn vé → "CHẶNG THÊM · 1 VÉ"; hết vé → nút khoá + lời chỉ cách kiếm vé; vé mới nhận hiện kèm lý do', async () => {
     voi(sanh({ mienPhiHomNay: false, ve: 1, quaMoi: [{ loai: 'dat', ve: 2, ghiChu: 'Em đạt nhiệm vụ ngày' }] }))
     expect(await screen.findByText('CHẶNG THÊM · 1 VÉ')).toBeTruthy(); expect(screen.getByText('＋2 vé · Em đạt nhiệm vụ ngày')).toBeTruthy(); expect((screen.getByRole('button', { name: /LÊN ĐƯỜNG/ }) as HTMLButtonElement).disabled).toBe(false)
@@ -109,6 +117,12 @@ describe('Đoàn Hộ Tống · giao diện · Trong trận', () => {
     await waitFor(() => expect(call).toHaveBeenCalledWith('doan-nop', { ma: 'DH1', hiep: 3, answer: 'B', hanhDong: 'danh' }))
     expect(await screen.findByText('Em trả lời đúng.')).toBeTruthy(); expect(screen.getByText(/Em đã chốt/)).toBeTruthy()
     expect(screen.queryByRole('group', { name: 'Chọn đòn' })).toBeNull() // chốt rồi không đổi
+  })
+  it('câu thuộc dạng ẤN ĐÃ SÁNG: nút kỹ năng mang tên biến thể + "ấn sáng ×1,25", thẻ câu ghi "ấn đã sáng"; câu thường thì không', async () => {
+    dung(trongTran({ tran: tran({ nangLuong: 2 }), cau: { qid: 'Q1', nhan: 'vua_suc', an: true, de: cau } }))
+    expect(await screen.findByRole('button', { name: /Liệt Diễm Xuyên Giáp.*ấn sáng ×1,25 · 2\/2 NL/ })).toBeTruthy(); expect(screen.getByText(/Ester · vừa sức em · ấn đã sáng/)).toBeTruthy()
+    cleanup(); sessionStorage.clear(); dung(trongTran({ tran: tran({ nangLuong: 2 }) }))
+    expect(await screen.findByRole('button', { name: /^Liệt Diễm\s*kỹ năng · 2\/2 NL/ })).toBeTruthy(); expect(man().textContent).not.toContain('ấn đã sáng')
   })
   it('bỏ trống chỉ đi với Chắn: gửi boTrong, không gửi đáp án', async () => {
     const { call } = dung(trongTran())
@@ -220,7 +234,9 @@ describe('Đoàn Hộ Tống · giao diện · Tung chưởng và Kết chặng'
   it('kết chặng bước 5: "Linh Tâm của lớp: trạm 17 → 18/30", em là bạn thứ mấy, còn mấy trạm tới mốc; nút đi tiếp ghi "· 1 vé", hết vé thì chỉ cách kiếm', async () => {
     const x = ket({}); x.ketChang!.doanLop = { tramTruoc: 17, tramSau: 18, tongTram: 30, banThu: 10, siSo: 32, conTramToiMoc: 2, tenMocKe: 'Hồ Cân Bằng', trumLop: null }
     dung(x, lenh => lenh === 'doan-sanh' ? { ok: true, sanh: { ve: 0 } as never, dangDo: null } : { ok: true, doan: x })
+    x.ketChang!.anThach = { ten: 'Ester', conCau: 3, kyNang: 'Liệt Diễm Xuyên Giáp' }
     const lop = await screen.findByLabelText('Linh Tâm của lớp'); expect(lop.textContent).toContain('trạm 17 → 18/30'); expect(lop.textContent).toContain('Em là bạn thứ 10 góp sức hôm nay · còn 2 trạm tới Hồ Cân Bằng')
+    expect(screen.getByLabelText('Hôm nay em tiến bộ gì').textContent).toContain('Ấn Ester: còn 3 câu nữa là sáng → mở Liệt Diễm Xuyên Giáp')
     expect(await screen.findByRole('button', { name: 'Đi thêm một chặng · 1 vé' })).toBeTruthy(); expect(screen.getByText('Hết vé? Làm xong nhiệm vụ hôm nay để nhận 2 vé.')).toBeTruthy()
   })
   it('máy chủ không đo được "lên bậc" (thiếu sổ) → dòng ấy KHÔNG hiện; thua thì nói rõ không mất gì', async () => {

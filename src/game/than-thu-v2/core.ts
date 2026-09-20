@@ -55,7 +55,10 @@ export function targetLevel(dang:string|null,evidence:Evidence[],attempts:Attemp
   if(last.length===2&&last[0]!.group!==last[1]!.group&&attempts.slice(-2).every(a=>!a.correct)) level=Math.max(0,level-1)
   return level
 }
-export function chooseSession(pool:PrivateQuestion[],evidence:Evidence[],attempts:Attempt[],mastery:Mastery[],mode:Mode,now:number):PrivateQuestion[] {
+/** Vai của một câu trong lượt 6 câu — đúng bốn suất của công thức chọn câu: 2 yếu · 1 tới hạn · lấp · 1 thử thách. Chỉ để KỂ cho em nghe, không đổi cách chọn. */
+export type QuestionRole='yeu'|'toi_han'|'lap'|'thu_thach'
+export function chooseSession(pool:PrivateQuestion[],evidence:Evidence[],attempts:Attempt[],mastery:Mastery[],mode:Mode,now:number):PrivateQuestion[] {return chooseSessionWithRoles(pool,evidence,attempts,mastery,mode,now).map(x=>x.q)}
+export function chooseSessionWithRoles(pool:PrivateQuestion[],evidence:Evidence[],attempts:Attempt[],mastery:Mastery[],mode:Mode,now:number):{q:PrivateQuestion;role:QuestionRole}[] {
   const key=(q:Question)=>q.dang??q.group
   const latest=new Map<string,Attempt>(),counts=new Map<string,number>()
   for(const a of [...attempts].sort((a,b)=>a.at-b.at)){latest.set(a.group,a);counts.set(a.group,(counts.get(a.group)??0)+1)}
@@ -75,22 +78,23 @@ export function chooseSession(pool:PrivateQuestion[],evidence:Evidence[],attempt
     return recent.has(q.group)?3:2}
   const rank=(q:Question)=>{let h=2166136261;for(const c of q.group)h=Math.imul(h^c.charCodeAt(0),16777619);return (h^(Math.floor(now/3600000)+attempts.length)*2654435761)>>>0}
   const sorted=pool.filter(q=>q.reviewed).sort((a,b)=>tier(a)-tier(b)||(latest.get(a.group)?.at??0)-(latest.get(b.group)?.at??0)||(counts.get(a.group)??0)-(counts.get(b.group)??0)||rank(a)-rank(b)||a.qid.localeCompare(b.qid))
-  const used=new Set<string>(),out:PrivateQuestion[]=[]
+  const used=new Set<string>(),out:PrivateQuestion[]=[],roles=new Map<string,QuestionRole>()
+  const withRoles=()=>out.slice(0,6).map(q=>({q,role:roles.get(q.qid)??'lap'}))
   const topics=new Map<string,number>()
-  const add=(list:PrivateQuestion[],n:number)=>{while(n>0){const candidates=list.filter(q=>!used.has(q.group));if(!candidates.length)break
+  const add=(list:PrivateQuestion[],n:number,role:QuestionRole='lap')=>{while(n>0){const candidates=list.filter(q=>!used.has(q.group));if(!candidates.length)break
     // Rotate topics within the same freshness tier, rather than six copies of one skill.
     const bestTier=tier(candidates[0]!);const q=candidates.filter(q=>tier(q)===bestTier).sort((a,b)=>(topics.get(key(a))??0)-(topics.get(key(b))??0))[0]!
-    used.add(q.group);topics.set(key(q),(topics.get(key(q))??0)+1);out.push(q);n--}}
+    used.add(q.group);topics.set(key(q),(topics.get(key(q))??0)+1);out.push(q);roles.set(q.qid,role);n--}}
   const base=sorted.filter(suitable)
-  if(mode==='repair'){add(base.filter(q=>weak.has(key(q))),6);return out}
+  if(mode==='repair'){add(base.filter(q=>weak.has(key(q))),6,'yeu');return withRoles()}
   // Keep repair/review quotas only when a non-recent candidate is available.
-  add(base.filter(q=>tier(q)<=1&&weak.has(key(q))),2)
-  add(base.filter(q=>tier(q)<=1&&due.has(key(q))),1)
+  add(base.filter(q=>tier(q)<=1&&weak.has(key(q))),2,'yeu')
+  add(base.filter(q=>tier(q)<=1&&due.has(key(q))),1,'toi_han')
   add(base.filter(q=>tier(q)<=1),5-out.length)
   // One measured challenge, never more than one difficulty step ahead.
-  add(sorted.filter(q=>tier(q)<=1&&level(q)===target(q.dang)+1),1)
+  add(sorted.filter(q=>tier(q)<=1&&level(q)===target(q.dang)+1),1,'thu_thach')
   add(base,6-out.length)
-  return out.slice(0,6)
+  return withRoles()
 }
 export function advance(old:Mastery|undefined,a:Attempt):{mastery:Mastery;reward:number;milestone:number} {
   const m:Mastery=old?{...old,groups:[...old.groups]}:{key:a.dang??a.group,stage:0,first:0,due:0,groups:[],repaired:false}

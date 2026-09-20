@@ -51,7 +51,12 @@ function docQid(v: unknown): string[] | undefined {
 /** Ngày nghỉ thầy đặt: `cau_hinh.ngay_nghi` = mảng JSON hoặc chuỗi cách nhau bởi dấu phẩy/xuống dòng. */
 export async function docNgayNghi(env: Env): Promise<Set<string>> {
   const r = await tat(() => env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'ngay_nghi'").first<{ gia_tri: string }>(), null)
-  const v = String(r?.gia_tri ?? '').trim()
+  return phanTichNgayNghi(String(r?.gia_tri ?? ''))
+}
+
+/** Phần thuần của `docNgayNghi`: đọc giá trị `cau_hinh.ngay_nghi` (mảng JSON hoặc chuỗi cách nhau bởi dấu phẩy/chấm phẩy/khoảng trắng) thành tập ngày YYYY-MM-DD. */
+export function phanTichNgayNghi(giaTri: string): Set<string> {
+  const v = giaTri.trim()
   let ds: unknown[] = []
   if (v.startsWith('[')) {
     try { ds = JSON.parse(v) as unknown[] } catch { ds = [] }
@@ -388,7 +393,12 @@ export async function hsKeHoachNgay(env: Env, b: Record<string, unknown>): Promi
 /** `POST /hs/thoi-gian-hoc {token, phut}` — em đặt số phút học mỗi ngày (10–45). Chỉ HẠ mục tiêu, không nâng vượt trần 16. */
 export async function hsThoiGianHoc(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const sbd = await gameIdentity(env, b)
-  const phut = Math.round(Number(b.phut))
+  return datPhutMoiNgay(env, sbd, b.phut)
+}
+
+/** Đặt số phút học mỗi ngày (10–45) của MỘT em: dùng chung cho em (`/hs/thoi-gian-hoc`) và phụ huynh (`/ph/thoi-gian-hoc`). `sbd` đã được xác thực bởi nơi gọi. */
+export async function datPhutMoiNgay(env: Env, sbd: string, phutTho: unknown): Promise<Record<string, unknown>> {
+  const phut = Math.round(Number(phutTho))
   if (!Number.isFinite(phut) || phut < PHUT_NGAY_TOI_THIEU || phut > PHUT_NGAY_TOI_DA) {
     return { ok: false, error: `Số phút mỗi ngày phải từ ${PHUT_NGAY_TOI_THIEU} đến ${PHUT_NGAY_TOI_DA}.` }
   }

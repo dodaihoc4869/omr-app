@@ -74,11 +74,11 @@ export default function DoanTungChuong({ kq, ghe, loaiQuai, tenQuai, tinh, onXon
       )}
       <div className="dh-chuong-san">
         {!kq.laTrum && <span>{tenQuai} · hạ {kq.quaiHaGuc} · còn {kq.quaiConLai}</span>}
-        <span style={{ color: '#c8f6ff' }}>Linh Tâm {kq.linhTamMat > 0 ? `−${kq.linhTamMat}` : 'an toàn'}{kq.linhTamHoi > 0 ? ` · +${kq.linhTamHoi}` : ''} → {kq.linhTamSau}</span>
+        <span style={{ color: 'rgb(200,246,255)' }}>Linh Tâm {kq.linhTamMat > 0 ? `−${kq.linhTamMat}` : 'an toàn'}{kq.linhTamHoi > 0 ? ` · +${kq.linhTamHoi}` : ''} → {kq.linhTamSau}</span>
       </div>
       {viSao && (
         <div className="dh-chuong-vi-sao">
-          <div className="dh-nhan" style={{ color: '#ffd9a0' }}>{emRaDon ? 'VÌ SAO ĐÒN NÀY MẠNH' : 'HIỆP NÀY CỦA EM'}</div>
+          <div className="dh-nhan" style={{ color: 'rgb(255,217,160)' }}>{emRaDon ? 'VÌ SAO ĐÒN NÀY MẠNH' : 'HIỆP NÀY CỦA EM'}</div>
           {viSao.slice(0, 3).map(([mau, nhan, chu], i) => <div key={i}><i className={mau ? `dh-${mau}` : ''}>{nhan}</i><span>{chu}</span></div>)}
         </div>
       )}
