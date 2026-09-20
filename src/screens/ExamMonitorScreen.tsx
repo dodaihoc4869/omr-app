@@ -550,7 +550,7 @@ export default function ExamMonitorScreen() {
       // lượt cũ, khoá đúng máy em đã thi, và rút ĐỀ MỚI.
       const kq = await choEmThiLai(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, sbd)
       const phan = [`xoá ${kq.soLuotXoa} lượt cũ`, kq.daDoiDe ? `đề mới ${kq.soCauKhac}/${kq.soCauMoi} câu khác đề cũ` : 'GIỮ ĐỀ CŨ']
-      phan.push(kq.khoaMay ? 'chỉ vào được ở máy cũ' : 'lượt cũ không ghi máy nên KHÔNG khoá được máy')
+      phan.push(kq.khoaMay ? 'chỉ vào được ở máy cũ (máy cũ hỏng thì bấm "Cho vào bằng máy khác")' : 'lượt cũ không ghi máy nên KHÔNG khoá được máy')
       showToast(`Đã cho thi lại: ${phan.join(' · ')}.`, kq.daDoiDe && kq.khoaMay ? 'success' : 'warn')
       await tai(chiTiet.ca.maCa, true)
     } catch (e) {
@@ -572,6 +572,26 @@ export default function ExamMonitorScreen() {
       await tai(chiTiet.ca.maCa, true)
     } catch (e) {
       showToast(`Không mở khoá được: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
+    } finally {
+      setDangDuyet(null)
+    }
+  }
+
+  // CHO VÀO BẰNG MÁY KHÁC: sau "Cho thi lại" em chỉ vào được ĐÚNG MÁY CŨ; máy cũ hỏng / mất thì thầy gỡ khoá máy. Cùng lệnh `moKhoa` của
+  // máy chủ (lượt vẫn chờ thi lại, chỉ xoá id máy — đề mới giữ nguyên). Máy chủ báo `goKhoaMay`: nói ĐÚNG kết quả, không mặc định là đã gỡ.
+  const [xacNhanMayKhac, setXacNhanMayKhac] = useState<string | null>(null)
+  const handleChoVaoMayKhac = async (sbd: string) => {
+    if (!chiTiet) return
+    setXacNhanMayKhac(null)
+    setDangDuyet(sbd)
+    try {
+      const kq = await moKhoa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, sbd)
+      if (kq.goKhoaMay === true) showToast('Đã gỡ khoá máy: em đăng nhập lại bằng MÁY KHÁC là vào được (đề mới giữ nguyên)', 'success')
+      else if (kq.goKhoaMay === false) showToast('Lượt này không còn khoá máy (đã gỡ trước đó, hoặc lượt cũ không ghi máy) — em vào được ở máy nào cũng được', 'warn')
+      else showToast('Đã gửi lệnh nhưng máy chủ chưa báo có gỡ khoá máy hay không — nhờ em thử vào bằng máy khác, không được thì báo thầy', 'warn')
+      await tai(chiTiet.ca.maCa, true)
+    } catch (e) {
+      showToast(`Không gỡ được khoá máy: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
     } finally {
       setDangDuyet(null)
     }
@@ -1752,6 +1772,28 @@ export default function ExamMonitorScreen() {
                             ) : (
                               <button type="button" onClick={() => setXacNhanMoKhoa(e.sbd)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--do)', minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--do)' }}>
                                 Mở khoá
+                              </button>
+                            ))}
+                          {l.trangThai === 'duoc_duyet_lai' &&
+                            l.khoaMay !== false &&
+                            (xacNhanMayKhac === e.sbd ? (
+                              /* Nói rõ việc này làm gì TRƯỚC khi thầy bấm: chỉ gỡ khoá máy, không xoá gì, không đổi đề. */
+                              <span className="inline-flex flex-col" style={{ gap: 4 }}>
+                                <span style={{ ...NHAN_NHO, lineHeight: 1.5 }}>
+                                  Em sẽ vào được bằng MÁY KHÁC (không còn buộc vào máy cũ). Đề mới giữ nguyên; máy cũ cũng vẫn vào được.
+                                </span>
+                                <span className="inline-flex items-center" style={{ gap: 4 }}>
+                                  <button type="button" onClick={() => handleChoVaoMayKhac(e.sbd)} disabled={dangDuyet === e.sbd} className="tap-target font-bold" style={{ ...NHAN_NHO, minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--muc)', color: 'var(--muc-nguoc)' }}>
+                                    {dangDuyet === e.sbd ? '…' : 'Đồng ý cho vào bằng máy khác'}
+                                  </button>
+                                  <button type="button" onClick={() => setXacNhanMayKhac(null)} className="tap-target" style={{ ...NHAN_NHO, minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)' }}>
+                                    Huỷ
+                                  </button>
+                                </span>
+                              </span>
+                            ) : (
+                              <button type="button" onClick={() => setXacNhanMayKhac(e.sbd)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--muc)', minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien-dam)' }}>
+                                Cho vào bằng máy khác
                               </button>
                             ))}
                           {daNop &&

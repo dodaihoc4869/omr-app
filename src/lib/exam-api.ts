@@ -695,10 +695,22 @@ export function thongDiepChan(kq: Extract<KetQuaVaoThi, { ok: false }>, gio: (is
   }
 }
 
-/** Thầy MỞ KHOÁ lượt bị khoá vì rời màn (mục 6): trạng thái về dang_lam, em mở lại link trên cùng máy là làm tiếp. */
-export async function moKhoa(scriptUrl: string, secret: string, maCa: string, sbd: string, nguoiMo = 'thầy'): Promise<void> {
+/** Kết quả `moKhoa`: `goKhoaMay` = máy chủ báo THẬT có gỡ khoá máy của lượt thi lại không (`true`/`false`); máy chủ đời cũ không báo ⇒ `undefined`
+ * — nơi gọi không được coi vắng mặt là "đã gỡ". `soDong` = số lượt máy chủ vừa đổi. */
+export interface KetQuaMoKhoa {
+  soDong?: number
+  goKhoaMay?: boolean
+}
+
+/** Thầy MỞ KHOÁ lượt bị khoá vì rời màn (mục 6): trạng thái về dang_lam, em mở lại link trên cùng máy là làm tiếp.
+ * Cùng lệnh này còn GỠ KHOÁ MÁY của lượt `duoc_duyet_lai` (sau "Cho thi lại" em chỉ vào được đúng máy cũ): lượt vẫn chờ thi lại, chỉ xoá id máy. */
+export async function moKhoa(scriptUrl: string, secret: string, maCa: string, sbd: string, nguoiMo = 'thầy'): Promise<KetQuaMoKhoa> {
   const r = await postJson(scriptUrl, { action: 'moKhoa', secret, maCa, sbd, nguoiMo })
   if (!r.ok) throw new Error(r.error || 'Không mở khoá được')
+  return {
+    soDong: typeof r.soDong === 'number' ? r.soDong : undefined,
+    goKhoaMay: typeof r.goKhoaMay === 'boolean' ? r.goKhoaMay : undefined,
+  }
 }
 
 /** Thầy cho 1 em thi lại (cần mã bí mật) — máy chủ tạo lượt mới trạng thái duoc_duyet_lai. */
@@ -2305,6 +2317,8 @@ export interface LuotThiRow {
   dapAn: AnswerRecord | null
   integrity: IntegrityLog | null
   giayCau: Record<string, number> | null
+  /** Lượt này đang KHOÁ VÀO ĐÚNG MỘT MÁY (`id_thiet_bi` có giá trị) — máy chủ chỉ báo có/không, không lộ mã máy. Thiếu (máy chủ chưa trả) ⇒ chưa biết. */
+  khoaMay?: boolean
 }
 
 export interface ChiTietCa {
