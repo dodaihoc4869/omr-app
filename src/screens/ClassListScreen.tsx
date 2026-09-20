@@ -111,7 +111,7 @@ export default function ClassListScreen() {
       {/* HEADER GOOGLE STYLE */}
       <header className="flex flex-wrap items-center justify-between gap-3 pb-1 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/70 text-[#1a73e8] border border-blue-200 dark:border-blue-800 shadow-2xs">
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/70 text-[color:var(--m3-primary)] border border-blue-200 dark:border-blue-800 shadow-2xs">
             <GraduationCap size={20} />
           </div>
           <div>
@@ -124,7 +124,7 @@ export default function ClassListScreen() {
           </div>
         </div>
 
-        <div className="text-xs font-bold px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/70 text-[#1a73e8] dark:text-blue-300 border border-blue-200/80 dark:border-blue-800 shadow-2xs">
+        <div className="text-xs font-bold px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/70 text-[color:var(--m3-primary)] dark:text-blue-300 border border-blue-200/80 dark:border-blue-800 shadow-2xs">
           Đang lưu: {classList.length} học sinh
         </div>
       </header>
@@ -132,7 +132,7 @@ export default function ClassListScreen() {
       {/* THÔNG BÁO / HƯỚNG DẪN KIỂU GOOGLE AMBER */}
       <div className="rounded-2xl border-2 border-amber-200/90 dark:border-amber-800/70 bg-gradient-to-br from-amber-50/50 via-white to-orange-50/20 dark:from-slate-900 dark:via-slate-900 dark:to-amber-950/30 p-3.5 sm:p-4 text-xs sm:text-sm text-amber-900 dark:text-amber-200 shadow-sm leading-relaxed space-y-1">
         <div className="font-bold flex items-center gap-1.5 text-amber-800 dark:text-amber-300">
-          <Sparkles size={16} className="text-[#fbbc04]" />
+          <Sparkles size={16} className="text-[color:var(--m3-tren-canh-bao)]" />
           <span>Lưu ý kết nối Google Sheet</span>
         </div>
         <p>
@@ -146,7 +146,7 @@ export default function ClassListScreen() {
           onClick={() => setMode('gviz')}
           className={`tap-target flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 shadow-2xs ${
             mode === 'gviz'
-              ? 'bg-[#1a73e8] text-white shadow-xs'
+              ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] shadow-xs'
               : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-blue-300'
           }`}
         >
@@ -157,7 +157,7 @@ export default function ClassListScreen() {
           onClick={() => setMode('tsv')}
           className={`tap-target flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 shadow-2xs ${
             mode === 'tsv'
-              ? 'bg-[#1a73e8] text-white shadow-xs'
+              ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] shadow-xs'
               : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-blue-300'
           }`}
         >
@@ -178,7 +178,7 @@ export default function ClassListScreen() {
             <button
               onClick={handleFetch}
               disabled={loading || !sheetUrl}
-              className="tap-target w-full min-h-[46px] rounded-xl bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold text-sm shadow-xs transition disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+              className="tap-target w-full min-h-[46px] rounded-xl bg-[color:var(--m3-primary)] hover:opacity-90 text-[color:var(--m3-on-primary)] font-bold text-sm shadow-xs transition disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
             >
               <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
               <span>{loading ? 'Đang tải…' : 'Đồng bộ'}</span>
@@ -194,7 +194,7 @@ export default function ClassListScreen() {
             />
             <button
               onClick={handleParseTsv}
-              className="tap-target w-full min-h-[46px] rounded-xl bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold text-sm shadow-xs transition cursor-pointer"
+              className="tap-target w-full min-h-[46px] rounded-xl bg-[color:var(--m3-primary)] hover:opacity-90 text-[color:var(--m3-on-primary)] font-bold text-sm shadow-xs transition cursor-pointer"
             >
               Đọc dữ liệu đã dán
             </button>
@@ -213,7 +213,7 @@ export default function ClassListScreen() {
         <div className="rounded-2xl border-2 border-blue-200/90 dark:border-blue-800/70 bg-gradient-to-br from-blue-50/40 via-white to-slate-50/20 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/30 p-4 sm:p-5 shadow-sm space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-blue-100 dark:border-blue-900/60">
             <h2 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-[#1a73e8]" />
+              <CheckCircle2 size={16} className="text-[color:var(--m3-primary)]" />
               <span>Ánh xạ cột ({rows.length - 1} dòng dữ liệu)</span>
             </h2>
           </div>
@@ -245,7 +245,7 @@ export default function ClassListScreen() {
 
           <button
             onClick={handleConfirmSave}
-            className="tap-target w-full min-h-[48px] rounded-xl bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold text-sm shadow-sm transition active:scale-[0.99] cursor-pointer"
+            className="tap-target w-full min-h-[48px] rounded-xl bg-[color:var(--m3-primary)] hover:opacity-90 text-[color:var(--m3-on-primary)] font-bold text-sm shadow-sm transition active:scale-[0.99] cursor-pointer"
           >
             Lưu danh sách lớp
           </button>

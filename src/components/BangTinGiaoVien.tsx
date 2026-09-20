@@ -97,7 +97,7 @@ export default function BangTinGiaoVien() {
         {/* HEADER: Tinh gọn, nhỏ hơn */}
         <header className="flex flex-wrap items-center justify-between gap-2.5 pb-1">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/70 text-[#1a73e8] border border-blue-200 dark:border-blue-800 shadow-2xs">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/70 text-[color:var(--m3-primary)] border border-blue-200 dark:border-blue-800 shadow-2xs">
               <CalendarDays size={19} />
             </div>
             <div>
@@ -119,7 +119,7 @@ export default function BangTinGiaoVien() {
               className="text-xs sm:text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
             />
             <button
-              className="w-9 h-9 rounded-xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/60 text-[#1a73e8] border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-colors shadow-2xs cursor-pointer disabled:opacity-50"
+              className="w-9 h-9 rounded-xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/60 text-[color:var(--m3-primary)] border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-colors shadow-2xs cursor-pointer disabled:opacity-50"
               disabled={loading}
               aria-label="Cập nhật bảng tin giáo viên"
               onClick={() => void refresh()}
@@ -129,7 +129,7 @@ export default function BangTinGiaoVien() {
             {day && (
               <button
                 onClick={() => setDay('')}
-                className="text-xs font-bold text-[#1a73e8] hover:underline px-2 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950 cursor-pointer"
+                className="text-xs font-bold text-[color:var(--m3-primary)] hover:underline px-2 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950 cursor-pointer"
               >
                 Hôm nay
               </button>
@@ -157,7 +157,7 @@ export default function BangTinGiaoVien() {
               <div className="rounded-2xl border-2 border-blue-200/90 dark:border-blue-800/70 bg-gradient-to-br from-blue-50/70 via-white to-indigo-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40 p-3.5 sm:p-4 shadow-sm space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-lg bg-[#1a73e8] text-white shadow-xs">
+                    <div className="p-1.5 rounded-lg bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] shadow-xs">
                       <Sparkles size={15} />
                     </div>
                     <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
@@ -172,7 +172,7 @@ export default function BangTinGiaoVien() {
                 {/* 2 Metric con nổi khối */}
                 <div className="grid grid-cols-2 gap-2.5">
                   <div className="p-2.5 rounded-xl border border-blue-200 dark:border-blue-800/80 bg-white/90 dark:bg-slate-800/90 text-center shadow-2xs">
-                    <div className="text-xl sm:text-2xl font-black text-[#1a73e8] leading-tight">
+                    <div className="text-xl sm:text-2xl font-black text-[color:var(--m3-primary)] leading-tight">
                       {report.homework.length}
                     </div>
                     <div className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mt-0.5">
@@ -184,7 +184,7 @@ export default function BangTinGiaoVien() {
                   </div>
 
                   <div className="p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-800/80 bg-white/90 dark:bg-slate-800/90 text-center shadow-2xs">
-                    <div className="text-xl sm:text-2xl font-black text-[#1e8e3e] leading-tight">
+                    <div className="text-xl sm:text-2xl font-black text-[color:var(--m3-on-tertiary-container)] leading-tight">
                       {Number(report.board?.n || 0)}
                     </div>
                     <div className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mt-0.5">
@@ -223,7 +223,7 @@ export default function BangTinGiaoVien() {
                 <div>
                   <div className="flex items-center justify-between pb-2 border-b border-emerald-100 dark:border-emerald-900/60">
                     <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-[#1e8e3e] text-white shadow-xs">
+                      <div className="p-1.5 rounded-lg bg-[color:var(--m3-tertiary)] text-[color:var(--m3-on-primary)] shadow-xs">
                         <ClipboardList size={15} />
                       </div>
                       <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
@@ -272,7 +272,7 @@ export default function BangTinGiaoVien() {
 
                 <button
                   type="button"
-                  className="mt-3 pt-2 border-t border-emerald-100 dark:border-emerald-900/60 text-xs font-bold text-[#1a73e8] hover:text-blue-700 hover:underline flex items-center gap-1 cursor-pointer"
+                  className="mt-3 pt-2 border-t border-emerald-100 dark:border-emerald-900/60 text-xs font-bold text-[color:var(--m3-primary)] hover:text-blue-700 hover:underline flex items-center gap-1 cursor-pointer"
                   onClick={() => navigate('giaobtvn')}
                 >
                   <span>Quản lý bài tập</span>
@@ -288,7 +288,7 @@ export default function BangTinGiaoVien() {
                 <div>
                   <div className="flex items-center justify-between pb-2 border-b border-amber-100 dark:border-amber-900/60">
                     <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-[#f29900] text-white shadow-xs">
+                      <div className="p-1.5 rounded-lg bg-[color:var(--m3-tren-canh-bao)] text-[color:var(--m3-canh-bao-nen)] shadow-xs">
                         <GraduationCap size={15} />
                       </div>
                       <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
@@ -341,7 +341,7 @@ export default function BangTinGiaoVien() {
 
                 <button
                   type="button"
-                  className="mt-3 pt-2 border-t border-amber-100 dark:border-amber-900/60 text-xs font-bold text-[#d97706] hover:text-amber-800 hover:underline flex items-center gap-1 cursor-pointer"
+                  className="mt-3 pt-2 border-t border-amber-100 dark:border-amber-900/60 text-xs font-bold text-[color:var(--m3-tren-canh-bao)] hover:text-amber-800 hover:underline flex items-center gap-1 cursor-pointer"
                   onClick={() => navigate('lichsuca')}
                 >
                   <span>Xem ca thi</span>
@@ -353,7 +353,7 @@ export default function BangTinGiaoVien() {
               <div className="flex-1 rounded-2xl border-2 border-rose-200/90 dark:border-rose-800/70 bg-gradient-to-br from-rose-50/40 via-white to-purple-50/20 dark:from-slate-900 dark:via-slate-900 dark:to-rose-950/30 p-3.5 sm:p-4 shadow-sm space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-lg bg-[#ea4335] text-white shadow-xs">
+                    <div className="p-1.5 rounded-lg bg-[color:var(--m3-error)] text-[color:var(--m3-on-error)] shadow-xs">
                       <Activity size={15} />
                     </div>
                     <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
@@ -361,7 +361,7 @@ export default function BangTinGiaoVien() {
                     </h3>
                   </div>
                   <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#ea4335] animate-ping" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[color:var(--m3-error)] animate-ping" />
                     Trực tiếp
                   </span>
                 </div>
@@ -373,8 +373,8 @@ export default function BangTinGiaoVien() {
                     const v = report.visits?.find((item) => item.role === 'gv')
                     return (
                       <div className="p-2 rounded-xl bg-blue-50/60 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-800/80 text-center shadow-2xs">
-                        <div className="text-[11px] font-bold text-[#1a73e8] flex items-center justify-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#1a73e8]" />
+                        <div className="text-[11px] font-bold text-[color:var(--m3-primary)] flex items-center justify-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[color:var(--m3-primary)]" />
                           Giáo viên
                         </div>
                         <div className="text-base sm:text-lg font-black text-slate-900 dark:text-white mt-0.5">
@@ -392,8 +392,8 @@ export default function BangTinGiaoVien() {
                     const v = report.visits?.find((item) => item.role === 'hs')
                     return (
                       <div className="p-2 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/80 text-center shadow-2xs">
-                        <div className="text-[11px] font-bold text-[#1e8e3e] flex items-center justify-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#1e8e3e]" />
+                        <div className="text-[11px] font-bold text-[color:var(--m3-on-tertiary-container)] flex items-center justify-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[color:var(--m3-tertiary)]" />
                           Học sinh
                         </div>
                         <div className="text-base sm:text-lg font-black text-slate-900 dark:text-white mt-0.5">
@@ -411,8 +411,8 @@ export default function BangTinGiaoVien() {
                     const v = report.visits?.find((item) => item.role === 'ph')
                     return (
                       <div className="p-2 rounded-xl bg-amber-50/60 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/80 text-center shadow-2xs">
-                        <div className="text-[11px] font-bold text-[#d97706] flex items-center justify-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#d97706]" />
+                        <div className="text-[11px] font-bold text-[color:var(--m3-tren-canh-bao)] flex items-center justify-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[color:var(--m3-tren-canh-bao)]" />
                           Phụ huynh
                         </div>
                         <div className="text-base sm:text-lg font-black text-slate-900 dark:text-white mt-0.5">

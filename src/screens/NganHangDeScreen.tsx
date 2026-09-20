@@ -375,7 +375,7 @@ export default function NganHangDeScreen() {
 
       <div className="gv-page-header flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/70 text-[#1a73e8] border border-blue-200 dark:border-blue-800 shadow-2xs shrink-0">
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/70 text-[color:var(--m3-primary)] border border-blue-200 dark:border-blue-800 shadow-2xs shrink-0">
             <Library size={22} />
           </div>
           <div>

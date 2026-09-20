@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Search } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { cauLyDo, hanhDongCua, layCauToiHan, layHomNay, NHAN_HANH_DONG, ngayDai, phanTram, thuCuaHan, type CauToiHan, type HomNay, type HomNayEm } from '../lib/hom-nay-api'
+import KhoiBtvnLo from '../components/KhoiBtvnLo'
 import '../styles/hom-nay.css'
 
 const CHO = 'đang chờ máy chủ'
@@ -126,36 +127,7 @@ export default function HomNayScreen() {
             ))}
           </section>
 
-          <section className="hn-the" aria-labelledby="hn-btvn">
-            <div className="hn-the-dau">
-              <h2 id="hn-btvn">BÀI TẬP VỀ NHÀ ĐANG CHẠY · CHIA LÔ THEO HẠN NỘP</h2>
-              <button type="button" className="hn-lien-ket" onClick={() => setScreen('giaobtvn')}>
-                Giao bài mới
-              </button>
-            </div>
-            {!bt && <p className="hn-trong">{tai ? 'Đang tải…' : `BTVN đang chạy: ${lyDo('btvn')}${/[.!]$/.test(lyDo('btvn')) ? '' : '.'}`}</p>}
-            {bt && bt.dangChay.length === 0 && <p className="hn-trong">Chưa có bài tập về nhà nào đang chạy.</p>}
-            {bt?.dangChay.map((b) => {
-              const kip = phanTram(b.soEmKip, b.soEm)
-              return (
-                <div className="hn-btvn" key={b.ma}>
-                  <span className="hn-btvn-ten">
-                    {b.ten} · {b.lop}
-                  </span>
-                  <span className="hn-lo" aria-label={`Lô ${b.loHienTai} trên ${b.tongLo}`}>
-                    {Array.from({ length: b.tongLo }, (_, i) => (
-                      <i key={i} className={i < b.loHienTai ? 'da' : ''} />
-                    ))}
-                  </span>
-                  <span className="hn-btvn-lo">
-                    lô {b.loHienTai}/{b.tongLo}
-                  </span>
-                  <span className="hn-btvn-kip">{kip == null ? '' : `${kip}% kịp`}</span>
-                  <span className="hn-btvn-han">{b.han ? `hạn ${thuCuaHan(b.han)}` : ''}</span>
-                </div>
-              )
-            })}
-          </section>
+          <KhoiBtvnLo bt={bt} tai={tai} lyDo={lyDo('btvn')} onGiaoMoi={() => setScreen('giaobtvn')} />
         </div>
 
         <div className="hn-cot">

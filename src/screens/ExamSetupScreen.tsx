@@ -76,7 +76,7 @@ function ChipChon({ chon, onClick, children }: { chon: boolean; onClick: () => v
       onClick={onClick}
       className={`tap-target text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full transition-all cursor-pointer active:scale-95 shadow-2xs ${
         chon
-          ? 'bg-[#1a73e8] text-white ring-2 ring-blue-400/30 shadow-xs'
+          ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] ring-2 ring-blue-400/30 shadow-xs'
           : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
       }`}
       style={SO}
@@ -430,7 +430,7 @@ export default function ExamSetupScreen() {
       <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs">
         <div className="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/70 text-[#1a73e8] border border-blue-200/80 dark:border-blue-800 flex items-center justify-center shrink-0 shadow-2xs">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/70 text-[color:var(--m3-primary)] border border-blue-200/80 dark:border-blue-800 flex items-center justify-center shrink-0 shadow-2xs">
               <Library size={18} />
             </div>
             <div className="min-w-0">
@@ -458,7 +458,7 @@ export default function ExamSetupScreen() {
             <button
               type="button"
               onClick={() => setHienChonDe(true)}
-              className="tap-target px-4 py-2 rounded-xl text-xs font-bold bg-blue-50 dark:bg-blue-950/70 text-[#1a73e8] dark:text-blue-300 border border-blue-200/90 dark:border-blue-800 hover:bg-blue-100/70 cursor-pointer transition active:scale-95 shadow-2xs"
+              className="tap-target px-4 py-2 rounded-xl text-xs font-bold bg-blue-50 dark:bg-blue-950/70 text-[color:var(--m3-primary)] dark:text-blue-300 border border-blue-200/90 dark:border-blue-800 hover:bg-blue-100/70 cursor-pointer transition active:scale-95 shadow-2xs"
             >
               {selectedSources.length > 0 ? 'Đổi đề khác' : 'Chọn đề kiểm tra'}
             </button>
@@ -756,7 +756,7 @@ export default function ExamSetupScreen() {
               onClick={() => setHienNangCao(true)}
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer tap-target transition shadow-2xs"
             >
-              <Settings2 size={15} className="text-[#1a73e8]" />
+              <Settings2 size={15} className="text-[color:var(--m3-primary)]" />
               <span>Nâng cao: {nguongLan}l rời · {matKhauCa ? 'có mật khẩu' : 'không MK'}</span>
             </button>
 
@@ -792,7 +792,7 @@ export default function ExamSetupScreen() {
           type="button"
           disabled={opening || selectedSources.length === 0}
           onClick={handleOpenSession}
-          className="w-full py-4 px-6 rounded-2xl bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold text-sm sm:text-base shadow-md hover:shadow-lg transition-all active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2.5"
+          className="w-full py-4 px-6 rounded-2xl bg-[color:var(--m3-primary)] hover:opacity-90 text-[color:var(--m3-on-primary)] font-bold text-sm sm:text-base shadow-md hover:shadow-lg transition-all active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2.5"
         >
           {opening ? (
             <>
@@ -817,7 +817,7 @@ export default function ExamSetupScreen() {
           <div className="w-full sm:max-w-2xl bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-h-[85vh] flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
             <div className="p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Library size={18} className="text-[#1a73e8]" />
+                <Library size={18} className="text-[color:var(--m3-primary)]" />
                 <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
                   Chọn đề kiểm tra ({selectedSources.length} đề · {tongCauDaChon} câu)
                 </h3>
@@ -845,12 +845,12 @@ export default function ExamSetupScreen() {
 
             <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex items-center justify-between">
               <span className="text-xs text-slate-500">
-                Đã chọn: <b className="text-[#1a73e8]">{tongCauDaChon} câu</b>
+                Đã chọn: <b className="text-[color:var(--m3-primary)]">{tongCauDaChon} câu</b>
               </span>
               <button
                 type="button"
                 onClick={() => setHienChonDe(false)}
-                className="px-5 py-2 rounded-full bg-[#1a73e8] text-white font-bold text-xs cursor-pointer shadow-xs active:scale-95"
+                className="px-5 py-2 rounded-full bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] font-bold text-xs cursor-pointer shadow-xs active:scale-95"
               >
                 Xong
               </button>
@@ -890,7 +890,7 @@ export default function ExamSetupScreen() {
               <button
                 type="button"
                 onClick={() => setHienRutDe(false)}
-                className="px-5 py-2 rounded-full bg-[#1a73e8] text-white font-bold text-xs cursor-pointer shadow-xs active:scale-95"
+                className="px-5 py-2 rounded-full bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] font-bold text-xs cursor-pointer shadow-xs active:scale-95"
               >
                 Xong
               </button>
@@ -905,7 +905,7 @@ export default function ExamSetupScreen() {
           <div className="w-full sm:max-w-lg bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-h-[85vh] flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
             <div className="p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Users size={18} className="text-[#1a73e8]" />
+                <Users size={18} className="text-[color:var(--m3-primary)]" />
                 <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
                   Tích chọn học sinh ({chonSbd.size} em)
                 </h3>
@@ -954,7 +954,7 @@ export default function ExamSetupScreen() {
                           : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200/60 dark:border-slate-700/60 text-slate-800 dark:text-slate-200'
                       }`}
                     >
-                      <span className={chon ? 'text-[#1a73e8]' : 'text-slate-400'}>
+                      <span className={chon ? 'text-[color:var(--m3-primary)]' : 'text-slate-400'}>
                         {chon ? <CheckSquare size={17} /> : <Square size={17} />}
                       </span>
                       <span className="truncate flex-1 text-xs">{r.hoTen || '(chưa có tên)'}</span>
@@ -969,7 +969,7 @@ export default function ExamSetupScreen() {
               <button
                 type="button"
                 onClick={() => setHienChonEm(false)}
-                className="px-5 py-2 rounded-full bg-[#1a73e8] text-white font-bold text-xs cursor-pointer shadow-xs active:scale-95"
+                className="px-5 py-2 rounded-full bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] font-bold text-xs cursor-pointer shadow-xs active:scale-95"
               >
                 Xong ({chonSbd.size} em)
               </button>
@@ -984,7 +984,7 @@ export default function ExamSetupScreen() {
           <div className="w-full sm:max-w-md bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-h-[85vh] flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
             <div className="p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Settings2 size={18} className="text-[#1a73e8]" />
+                <Settings2 size={18} className="text-[color:var(--m3-primary)]" />
                 <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
                   Tùy chọn nâng cao
                 </h3>
@@ -1078,7 +1078,7 @@ export default function ExamSetupScreen() {
               <button
                 type="button"
                 onClick={() => setHienNangCao(false)}
-                className="px-5 py-2 rounded-full bg-[#1a73e8] text-white font-bold text-xs cursor-pointer shadow-xs active:scale-95"
+                className="px-5 py-2 rounded-full bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] font-bold text-xs cursor-pointer shadow-xs active:scale-95"
               >
                 Đóng
               </button>

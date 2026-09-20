@@ -195,7 +195,7 @@ export default function CauHoiScreen() {
     <div className="gv-page min-h-screen pb-24 px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)' }}>
       <header className="gv-page-header flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-rose-50 dark:bg-rose-950/70 text-[#ea4335] border border-rose-200 dark:border-rose-800 shadow-2xs shrink-0">
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-rose-50 dark:bg-rose-950/70 text-[color:var(--m3-on-error-container)] border border-rose-200 dark:border-rose-800 shadow-2xs shrink-0">
             <MessageCircleQuestion size={22} />
           </div>
           <div>
@@ -221,7 +221,7 @@ export default function CauHoiScreen() {
           disabled={dang}
           className={`tap-target text-xs sm:text-sm font-bold px-4 py-2 rounded-full transition-all cursor-pointer ${
             !laRac
-              ? 'bg-[#1a73e8] text-white ring-2 ring-blue-400/30 shadow-xs'
+              ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] ring-2 ring-blue-400/30 shadow-xs'
               : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200/80 dark:border-slate-700'
           }`}
         >
@@ -233,7 +233,7 @@ export default function CauHoiScreen() {
           disabled={dang}
           className={`tap-target text-xs sm:text-sm font-bold px-4 py-2 rounded-full transition-all cursor-pointer ${
             laRac
-              ? 'bg-[#ea4335] text-white ring-2 ring-rose-400/30 shadow-xs'
+              ? 'bg-[color:var(--m3-error)] text-[color:var(--m3-on-error)] ring-2 ring-rose-400/30 shadow-xs'
               : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200/80 dark:border-slate-700'
           }`}
         >

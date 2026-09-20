@@ -44,6 +44,9 @@ interface AppState {
   /** SBD đang mở hồ sơ ở màn Học sinh (BA-APP.md đợt 2). Rỗng = đang ở danh sách. */
   sbdDangXem: string
   moHoSoEm: (sbd: string) => void
+  /** Em thầy vừa bấm "Giao bài riêng" ở hồ sơ: màn Giao bài tập về nhà đọc một lần để chọn sẵn em ấy, rồi xoá. Rỗng = không có. */
+  sbdGiaoRieng: string
+  datSbdGiaoRieng: (sbd: string) => void
 
   sheets: ScannedSheet[]
   addSheet: (sheet: ScannedSheet) => void
@@ -78,6 +81,8 @@ export const useAppStore = create<AppState>((set) => ({
   moChiTietCa: (maCa) => set({ maCaTheoDoi: maCa, screen: 'exammonitor' }),
   sbdDangXem: '',
   moHoSoEm: (sbd) => set({ sbdDangXem: sbd, screen: 'hocsinh' }),
+  sbdGiaoRieng: '',
+  datSbdGiaoRieng: (sbd) => set({ sbdGiaoRieng: sbd }),
 
   sheets: [],
   addSheet: (sheet) => set((st) => ({ sheets: [...st.sheets, sheet] })),

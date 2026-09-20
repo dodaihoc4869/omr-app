@@ -15,6 +15,7 @@ const m = vi.hoisted(() => ({
   moHoSoEm: vi.fn(),
   setScreen: vi.fn(),
   moChiTietCa: vi.fn(),
+  datSbd: vi.fn(),
   sbd: { v: '' },
 }))
 
@@ -203,7 +204,7 @@ const HO_SO = {
 } as unknown as HoSoEm
 
 vi.mock('../src/store/appStore', () => ({
-  useAppStore: (sel: (s: Record<string, unknown>) => unknown) => sel({ sbdDangXem: m.sbd.v, moHoSoEm: m.moHoSoEm, showToast: vi.fn(), setScreen: m.setScreen, moChiTietCa: m.moChiTietCa }),
+  useAppStore: (sel: (s: Record<string, unknown>) => unknown) => sel({ sbdDangXem: m.sbd.v, moHoSoEm: m.moHoSoEm, showToast: vi.fn(), setScreen: m.setScreen, moChiTietCa: m.moChiTietCa, datSbdGiaoRieng: m.datSbd }),
 }))
 vi.mock('../src/lib/exam-db', () => ({ loadScriptUrl: async () => 'https://x', loadTeacherSecret: async () => 'mat' }))
 vi.mock('../src/lib/exam-api', async (goc) => ({
@@ -272,6 +273,7 @@ describe('HocSinhScreen · hồ sơ tổng quan', () => {
     await waitFor(() => expect(container.querySelector('.hs-viec')).toBeTruthy())
     fireEvent.click(screen.getByRole('button', { name: 'Giao bài riêng' }))
     expect(m.setScreen).toHaveBeenCalledWith('giaobtvn')
+    expect(m.datSbd).toHaveBeenCalledWith('001') // màn Giao bài mở sẵn, đã tick đúng em này
     fireEvent.click(screen.getByRole('button', { name: 'Cho thi lại' }))
     expect(m.moChiTietCa).toHaveBeenCalledWith('222222') // nộp 03/09 — muộn hơn ca 01/09
     const zalo = screen.getByText('KHOI PHIEU ZALO').parentElement as HTMLElement

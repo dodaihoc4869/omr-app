@@ -60,6 +60,7 @@ export default function HocSinhScreen() {
   const moHoSoEm = useAppStore((s) => s.moHoSoEm)
   const [mucHoSo, setMucHoSo] = useState<MucHoSo>('tong-quan')
   const setScreen = useAppStore((s) => s.setScreen)
+  const datSbdGiaoRieng = useAppStore((s) => s.datSbdGiaoRieng)
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
   const [hienZalo, setHienZalo] = useState(false)
 
@@ -261,7 +262,14 @@ export default function HocSinhScreen() {
               </div>
 
               <div className="hs-hanh-dong">
-                <button type="button" className="tap-target hs-nut-chinh" onClick={() => setScreen('giaobtvn')}>
+                <button
+                  type="button"
+                  className="tap-target hs-nut-chinh"
+                  onClick={() => {
+                    datSbdGiaoRieng?.(hoSo.em.sbd) // màn Giao bài mở sẵn chế độ chọn từng em, đã tick em này
+                    setScreen('giaobtvn')
+                  }}
+                >
                   Giao bài riêng
                 </button>
                 <button
