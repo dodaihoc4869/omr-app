@@ -1,6 +1,6 @@
 # ĐỀ XUẤT — BTVN "NÂNG ĐỠ": giao 80 câu, mỗi em nhận bộ câu vừa sức và tiến lên từng ngày
 
-Người viết: Boss · 21/09/2026 · CHỜ THẦY CHỐT (chưa build gì).
+Người viết: Boss · 21/09/2026 · **THẦY ĐÃ CHỐT 21/09 05:53 ("chốt, tập trung triển khai cái này luôn") — cả 4 điều mục 6 = CÓ.** Đề bài build: `prompt-btvn-nang-do.md`.
 Thầy lệnh: "rút số câu phù hợp cho từng em theo hướng nâng đỡ tiến bộ từng ngày… mọi em làm đủ câu cốt lõi bao quát kiến thức… em yếu không phân câu khó nhưng phải tiến bộ lên được… làm xong thấy mình giỏi lên một chút."
 
 ## 0 · HIỆN TRẠNG (đã dò mã, không đoán)
