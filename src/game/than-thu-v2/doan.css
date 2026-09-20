@@ -47,8 +47,8 @@
 
 /* ───── 1. SẢNH ───── */
 .dh-dau{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.dh-dau h1{margin:2px 0 0;font-size:26px;font-weight:800;line-height:1.15}
-.dh .dh-nut-dong{flex-shrink:0;height:36px;padding:0 14px;border-radius:18px;background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);font-size:13px;font-weight:700}
+.dh-dau h1{margin:2px 0 0;font-size:24px;font-weight:800;line-height:1.15}
+.dh .dh-nut-dong{flex-shrink:0;height:34px;min-width:34px;padding:0 10px;border-radius:18px;background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);font-size:13px;font-weight:700}
 .dh-ban-do{position:relative;height:250px;border-radius:28px;overflow:hidden;background:linear-gradient(180deg,#1b2a66 0%,#16224f 55%,#0f2a3a 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 14px 30px rgba(0,0,0,.35)}
 .dh-ban-do>svg{position:absolute;inset:0;width:100%;height:100%}
 .dh-ban-do .dh-trang{position:absolute;right:-30px;top:-30px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,224,138,.4) 0%,rgba(255,224,138,0) 68%)}
@@ -76,6 +76,24 @@
 .dh-ds-ban>div{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:18px;background:rgba(255,255,255,.06);font-size:12px;font-weight:700;text-align:center;min-height:96px;justify-content:center}
 .dh-ds-ban>div.dh-trong{opacity:.4;font-weight:500}
 
+.dh-dau-phai{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.dh-the-so{display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 11px;border-radius:17px;font-size:14px;font-weight:800}
+.dh-the-ve{background:linear-gradient(180deg,rgba(255,209,102,.28),rgba(255,209,102,.12));box-shadow:inset 0 0 0 1px rgba(255,209,102,.5);color:#ffe08a}
+.dh-the-chuoi{background:linear-gradient(180deg,rgba(255,138,92,.3),rgba(255,138,92,.12));box-shadow:inset 0 0 0 1px rgba(255,138,92,.55);color:#ffc2a6}
+.dh-ban-do-gop{position:absolute;left:12px;right:12px;bottom:10px;padding:6px 10px;border-radius:12px;background:rgba(5,10,30,.62);font-size:11.5px;line-height:1.35;color:#dfe8ff}
+.dh-ban-do-gop b{color:#fff}
+.dh-qua-moi{padding:8px 12px;border-radius:14px;background:rgba(255,209,102,.2);box-shadow:inset 0 0 0 1px rgba(255,209,102,.55);font-size:13px;font-weight:700;color:#fff3c0}
+.dh-hai-the{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.dh-hai-the .dh-muc{padding:14px;gap:8px}
+.dh-chuoi-vach{display:flex;gap:4px}
+.dh-chuoi-vach i{flex:1;height:7px;border-radius:4px;background:rgba(255,255,255,.14)}
+.dh-chuoi-vach i.dh-xong{background:linear-gradient(90deg,#ff8a5c,#ffb59a)}
+.dh-lop-tien{display:flex;align-items:center;gap:14px;padding:14px 16px}
+.dh-lop-tien>div:last-child{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;font-size:12.5px;line-height:1.4;color:#dfe8ff}
+.dh-lop-tien b{font-size:14.5px;font-weight:700;color:#fff}
+.dh-lop-tien b span{color:var(--dh-xanh)}
+.dh-lop-tien .dh-mau{height:8px;background:rgba(255,255,255,.14)}
+.dh-lop-tien .dh-mau>i{background:linear-gradient(90deg,#6dd58c,#7dffb0)}
 .dh-sap-mo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .dh-sap-mo>div{padding:14px;display:flex;flex-direction:column;gap:6px;opacity:.82}
 .dh-sap-mo b{font-size:15px;font-weight:800;line-height:1.2}

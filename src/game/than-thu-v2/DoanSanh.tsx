@@ -2,7 +2,7 @@
 // rương chuỗi, Trùm lớp, ấn thạch — bước 5 và 6) thì KHÔNG hiện: không bịa số.
 import { useState } from 'react'
 import type { ReactNode } from 'react'
-import type { DoanXem } from './doan-kieu'
+import type { DoanXem, SanhXem } from './doan-kieu'
 import { BieuTuong, LinhTamCau, QuaiHinh, ThuHinh } from './DoanHinh'
 
 // Bốn thứ đang tới (bước 5, 6). CỐ Ý không có con số nào: máy chủ chưa có số thì không bịa — chỉ tên, một dòng mô tả, biểu tượng khoá.
@@ -14,21 +14,28 @@ const SAP_MO = [
 ] as const
 export interface GoiYHomNay { tong: number; nhom: { ten: string; so: number }[]; hetLuot: boolean }
 interface Props {
-  pet: number; cap: number; tenDoan: string; goiY: GoiYHomNay | null
+  pet: number; cap: number; tenDoan: string; goiY: GoiYHomNay | null; sanh: SanhXem | null
   phong: DoanXem | null; ban: boolean; loi: string
   onLenDuong: () => void; onMoPhong: () => void; onVaoPhong: (ma: string) => void; onBatDau: () => void; onRoi: () => void; onDong: () => void
   khoiThem?: ReactNode
 }
 
+const hen = (ms: number) => { const gio = Math.floor(ms / 3_600_000), ngay = Math.floor(gio / 24); return ngay > 0 ? `còn ${ngay} ngày ${gio % 24} giờ` : gio > 0 ? `còn ${gio} giờ ${Math.floor(ms / 60_000) % 60} phút` : `còn ${Math.max(1, Math.ceil(ms / 60_000))} phút` }
+
 export default function DoanSanh(p: Props) {
   const [ma, setMa] = useState('')
+  const s = p.sanh, lop = s?.doanLop, hetVe = !!s && !s.mienPhiHomNay && !s.ve
   const sao = Array.from({ length: 26 }, (_, i) => <i key={i} style={{ left: `${(i * 53 + 17) % 100}%`, top: `${(i * 29 + 7) % 60}%`, animationDelay: `${(i % 7) * .4}s` }} />)
   return (
     <div className="dh-khung">
       <div className="dh-sao-nen" aria-hidden="true">{sao}</div>
       <header className="dh-dau">
-        <div><div className="dh-nhan">HỘ TỐNG LINH TÂM · CẢ LỚP MỘT ĐOÀN</div><h1>{p.tenDoan}</h1></div>
-        <button type="button" className="dh-nut-dong" onClick={p.onDong}>Về đảo</button>
+        <div><div className="dh-nhan">{s ? `MÙA ${s.mua.so} · CÒN ${s.mua.conNgay} NGÀY` : 'HỘ TỐNG LINH TÂM · CẢ LỚP MỘT ĐOÀN'}</div><h1>{s?.tenDoan ?? p.tenDoan}</h1></div>
+        <div className="dh-dau-phai">
+          {s && s.ve !== null && <span className="dh-the-so dh-the-ve" aria-label={`Em có ${s.ve} vé hộ tống`}>🎟 {s.ve}</span>}
+          {s && s.chuoi.ngay > 0 && <span className="dh-the-so dh-the-chuoi" aria-label={`Chuỗi ${s.chuoi.ngay} ngày`}>🔥 {s.chuoi.ngay}</span>}
+          <button type="button" className="dh-nut-dong" aria-label="Về Đảo thần thú" title="Về Đảo thần thú" onClick={p.onDong}>✕</button>
+        </div>
       </header>
 
       <div className="dh-ban-do" aria-hidden="true">
@@ -36,12 +43,13 @@ export default function DoanSanh(p: Props) {
         <svg viewBox="0 0 358 250" preserveAspectRatio="none">
           <path d="M0 150 C60 118 110 160 170 132 S290 100 358 142 L358 250 L0 250Z" fill="rgba(10,30,50,.55)" />
           <path d="M120 214 C170 206 214 196 244 160 S300 96 332 60" stroke="rgba(255,255,255,.35)" strokeWidth="5" strokeDasharray="2 11" strokeLinecap="round" fill="none" />
-          <path d="M120 214 C170 206 214 196 244 160" stroke="#7dffb0" strokeWidth="5" strokeLinecap="round" fill="none" style={{ filter: 'drop-shadow(0 0 6px rgba(125,255,176,.9))' }} />
+          <path d="M120 214 C170 206 214 196 244 160 S300 96 332 60" stroke="#7dffb0" pathLength={100} strokeDasharray={`${lop ? Math.max(4, Math.round(lop.tram * 100 / lop.tongTram)) : 46} 100`} strokeWidth="5" strokeLinecap="round" fill="none" style={{ filter: 'drop-shadow(0 0 6px rgba(125,255,176,.9))' }} />
           <polygon points="316,22 326,44 322,78 310,78 306,44" fill="#c8e6ff" opacity=".95" /><polygon points="298,38 306,52 306,78 294,78 292,54" fill="#9fd0ff" opacity=".9" /><polygon points="334,36 340,52 338,78 326,78 326,52" fill="#9fd0ff" opacity=".9" />
         </svg>
         <ThuHinh pet={p.pet} cap={p.cap} size={150} className="dh-thu-chinh dh-noi" />
         <LinhTamCau size={50} />
-        <div className="dh-ban-do-nhan">Linh Tâm đang chờ đoàn của em</div>
+        <div className="dh-ban-do-nhan">{lop ? `Trạm ${lop.tram}/${lop.tongTram}${lop.conTramToiMoc ? ` · còn ${lop.conTramToiMoc} trạm tới ${lop.tenMocKe}` : ' · đã về đích mùa này'}` : 'Linh Tâm đang chờ đoàn của em'}</div>
+        {lop && <div className="dh-ban-do-gop"><b>{lop.gopSucHomNay}/{lop.siSo} bạn</b> góp sức hôm nay · còn {lop.conChangToiTramKe} chặng thắng nữa là lớp tiến một trạm</div>}
       </div>
 
       {p.phong && !p.phong.batDau ? (
@@ -60,7 +68,7 @@ export default function DoanSanh(p: Props) {
       ) : (
         <>
           <section className="dh-chang" aria-label="Chặng hôm nay">
-            <span className="dh-chang-nhan">CHẶNG HÔM NAY</span>
+            <span className="dh-chang-nhan">{!s ? 'CHẶNG HÔM NAY' : s.mienPhiHomNay ? 'CHẶNG HÔM NAY · MIỄN PHÍ' : 'CHẶNG THÊM · 1 VÉ'}</span>
             <h2>Hộ tống Linh Tâm qua 8 hiệp</h2>
             <div className="dh-quai-goc" aria-hidden="true"><QuaiHinh loai="bun_acid" size={76} /></div>
             <p>
@@ -69,13 +77,32 @@ export default function DoanSanh(p: Props) {
                   : <>Mỗi hiệp em nhận MỘT câu vừa sức từ hồ sơ của chính em. Làm đúng thì ra đòn, làm sai thì thần thú tự chắn cho Linh Tâm. 8 hiệp · 5–6 phút.</>}
             </p>
             <div className="dh-chang-qua"><span className="dh-vien-thuoc">EXP thần thú</span><span className="dh-vien-thuoc">Liên Kích ×2 khi tiếp sức</span></div>
+            {s?.quaMoi.map((q, i) => <div key={i} className="dh-qua-moi" role="status">＋{q.ve} vé · {q.ghiChu}</div>)}
             {p.loi && <div className="dh-loi" role="alert">{p.loi}</div>}
-            <button type="button" className="dh-nut-vang" disabled={p.ban || !!p.goiY?.hetLuot} onClick={p.onLenDuong}>{BieuTuong.choi}<span>{p.ban ? 'ĐANG MỞ ĐƯỜNG…' : 'LÊN ĐƯỜNG'}</span></button>
-            <small>Đi một mình vẫn có bạn đồng hành do máy điều khiển · thua không mất gì</small>
+            <button type="button" className="dh-nut-vang" disabled={p.ban || !!p.goiY?.hetLuot || hetVe} onClick={p.onLenDuong}>{BieuTuong.choi}<span>{p.ban ? 'ĐANG MỞ ĐƯỜNG…' : hetVe ? 'HẾT VÉ HÔM NAY' : 'LÊN ĐƯỜNG'}</span></button>
+            <small>{hetVe ? 'Hết vé? Làm xong nhiệm vụ hôm nay để nhận 2 vé · xong một lô bài tập đúng nhịp nhận 1 vé.' : s ? 'Chặng thêm tốn 1 vé · vé chỉ kiếm được bằng làm bài tập · thua không mất gì' : 'Đi một mình vẫn có bạn đồng hành do máy điều khiển · thua không mất gì'}</small>
           </section>
           {p.khoiThem}
+          {s && (
+            <div className="dh-hai-the">
+              <section className="dh-kinh dh-muc" aria-label="Rương chuỗi ngày">
+                <div className="dh-nhan" style={{ color: '#ffd9a0' }}>RƯƠNG CHUỖI NGÀY</div>
+                <p>{s.chuoi.mocKe ? <>Còn <b style={{ color: '#ffd166' }}>{s.chuoi.conNgay} ngày</b> mở rương {s.chuoi.mocKe} ngày</> : <>Em đã mở đủ rương của chuỗi này.</>}{!s.chuoi.daDiHomNay && s.chuoi.ngay > 0 ? ' · đi chặng hôm nay để giữ chuỗi' : ''}</p>
+                <div className="dh-chuoi-vach" role="img" aria-label={`Chuỗi ${s.chuoi.ngay} ngày`}>{Array.from({ length: 7 }, (_, i) => <i key={i} className={i < Math.min(7, s.chuoi.ngay) ? 'dh-xong' : ''} />)}</div>
+              </section>
+              <section className="dh-kinh dh-muc" aria-label="Trùm lớp">
+                <div className="dh-nhan" style={{ color: '#d9c8ff' }}>TRÙM LỚP</div>
+                {s.trumLop.dangMo || s.trumLop.daGop > 0 ? (
+                  <>
+                    <p><b style={{ color: '#fff' }}>{s.trumLop.daHa ? 'Lớp em đã hạ trùm!' : s.trumLop.dangMo ? `Đang mở · ${hen(s.trumLop.conMs)}` : 'Tối Chủ nhật vừa rồi'}</b><br />Cả lớp đã góp {s.trumLop.daGop}/{s.trumLop.mucTieu} sát thương</p>
+                    <div className="dh-mau" style={{ height: 8 }}><i style={{ width: `${Math.min(100, Math.round(s.trumLop.daGop * 100 / Math.max(1, s.trumLop.mucTieu)))}%`, background: 'linear-gradient(90deg,#b79cff,#ff8a5c)' }} /></div>
+                  </>
+                ) : <p><b style={{ color: '#fff', fontSize: 16 }}>Chủ nhật 20:00</b><br />Cả lớp cùng đánh 20 phút · {hen(s.trumLop.moSauMs)}</p>}
+              </section>
+            </div>
+          )}
           <section className="dh-sap-mo" aria-label="Sắp mở">
-            {SAP_MO.map(([ten, moTa]) => (
+            {SAP_MO.filter(([ten]) => !s || ten === 'Ấn thạch dạng').map(([ten, moTa]) => (
               <div key={ten} className="dh-kinh">
                 <span className="dh-khoa" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>SẮP MỞ</span>
                 <b>{ten}</b><small>{moTa}</small>

@@ -37,7 +37,7 @@ const MAN = {
   '6-ket-chang': { ma: 'DH1', revision: 30, laChu: true, batDau: true, ghe: ghe3(['cho', 'cho', 'cho']), gioMayChu: 0, tran: tran({ hiep: 8, laTrum: true, ketThuc: true, thang: true, quai: [], trumVoGiap: [true, true], linhTam: { hp: 84, toiDa: 100 } }),
     ketChang: { thang: true, sao: 3, linhTam: { hp: 84, toiDa: 100 }, trumVoGiap: [true, true], quaiHaGuc: 17, soLienKich: 1,
       cuaEm: { ghe: 0, id: 'x', laMay: false, soCau: 6, soDung: 5, soTuLamDung: 5, satThuong: 168, chan: 8, haGuc: 6, soLanGiup: 1, soLanGiupThanhCong: 1, soLanDuocGiup: 0, soLienKich: 1 },
-      tienBo: { soCau: 6, tuLamDung: 5, lenBac: 2, giup: 1, giupThanhCong: 1, duocGiup: 0 }, ban: [{ ghe: 1, laMay: false, soLanGiupThanhCong: 0 }, { ghe: 2, laMay: false, soLanGiupThanhCong: 0 }] } },
+      tienBo: { soCau: 6, tuLamDung: 5, lenBac: 2, giup: 1, giupThanhCong: 1, duocGiup: 0 }, doanLop: { tramTruoc: 17, tramSau: 18, tongTram: 30, banThu: 10, siSo: 32, conTramToiMoc: 2, tenMocKe: 'Hồ Cân Bằng', trumLop: null }, ban: [{ ghe: 1, laMay: false, soLanGiupThanhCong: 0 }, { ghe: 2, laMay: false, soLanGiupThanhCong: 0 }] } },
 }
 
 async function moMan(ten, { width = 390, height = 844, giamChuyenDong = false } = {}) {
@@ -57,6 +57,9 @@ async function moMan(ten, { width = 390, height = 844, giamChuyenDong = false } 
     if (u.pathname.includes('/game-v2/')) {
       data = { ok: true, profile, revision: 1, tasks: [], doanMo: true } // cờ mở game BẬT cho em kiểm thử
       if (u.pathname.endsWith('/recommendations')) Object.assign(data, { dailyUsed: 12, remaining: 188, suggestions: [{ title: 'Ester', source: 'D', part: 'I' }, { title: 'Ester', source: 'D', part: 'I' }, { title: 'Ester', source: 'D', part: 'I' }, { title: 'Ancol', source: 'D', part: 'I' }, { title: 'Ancol', source: 'D', part: 'I' }, { title: 'Amin', source: 'D', part: 'I' }] })
+      if (u.pathname.endsWith('/doan-sanh')) return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, dangDo: null, sanh: { lop: '12A1', tenDoan: 'Đoàn Hộ Tống 12A1', mua: { so: 1, conNgay: 19 }, ve: 2, mienPhiHomNay: true, chuoi: { ngay: 5, daDiHomNay: false, mocKe: 7, conNgay: 2 },
+        doanLop: { lop: '12A1', tram: 17, tongTram: 30, changThang: 221, changMoiTram: 13, conChangToiTramKe: 4, mocKe: 20, tenMocKe: 'Hồ Cân Bằng', conTramToiMoc: 3, gopSucHomNay: 9, siSo: 32 },
+        trumLop: { dangMo: false, chuNhat: '2026-09-27', moSauMs: 4 * 86400000 + 4 * 3600000, conMs: 0, daGop: 0, mucTieu: 3200, daHa: false }, quaMoi: [] } }) })
       if (/\/doan-/.test(u.pathname)) data = xem ? { ok: true, doan: xem } : { ok: false, error: 'Không tìm thấy chặng này.' }
       if (u.pathname.endsWith('/doan-the-goi-y')) data.goiY = { den: 1, ten: 'Thu Hà', pet: 1, cap: 30, tenDang: 'Ancol', de: 'Oxi hoá ethanol bằng CuO, đun nóng, thu được chất hữu cơ X. X là…', the: [{ loai: 'nhac_cong_thuc', tieuDe: 'Nhắc công thức', moTa: 'Gửi bạn kiến thức gốc của câu' }, { loai: 'loai_phuong_an', tieuDe: 'Loại 1 phương án', moTa: 'Máy gạch một đáp án sai' }, { loai: 'buoc_dau', tieuDe: 'Chỉ bước đầu', moTa: 'Hé bước đầu của lời giải' }] }
     }
